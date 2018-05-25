@@ -53,7 +53,7 @@ void standard_solve(const logic_step step) {
 	intent_contextualization_system().contextualize_movement_intents(step);
 
 	movement_system().set_movement_flags_from_input(step);
-	movement_system().apply_movement_forces(cosmos);
+	movement_system().apply_movement_forces(step);
 
 	gun_system().consume_gun_intents(step);
 	gun_system().launch_shots_due_to_pressed_triggers(step);

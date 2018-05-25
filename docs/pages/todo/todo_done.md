@@ -809,3 +809,9 @@ we consider whole type overrides too complex architeciturally:
 
 - tests of traits: check no ids in invariants, at least
 	- screw initial components really
+
+- Footstep sounds & particle effects
+	- Movement system just posts faf effects
+	- Effect happens when:
+		- animation amount has just entered an edge frame
+		- the velocity is greater than some threshold 

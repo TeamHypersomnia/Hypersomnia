@@ -262,6 +262,48 @@ void load_test_scene_particle_effects(
 		}
 	}
 
+	{
+		auto& effect = acquire_effect(test_scene_particle_effect_id::FOOTSTEP_SMOKE);
+
+		{
+			particles_emission em;
+			default_bounds(em);
+
+			em.swing_spread.set(0, 0);
+			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
+			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
+
+			em.spread_degrees = float_range(360, 360);
+			em.num_of_particles_to_spawn_initially.set(15, 25);
+			em.stream_lifetime_ms = float_range(0, 0);
+
+			em.base_speed = float_range(10, 180);
+			em.base_speed_variation = float_range(4.f, 8.f);
+
+			em.rotation_speed = float_range(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
+			em.particle_lifetime_ms = float_range(600, 800);
+
+			for (int i = 0; i < 3; ++i) {
+				general_particle particle_definition;
+
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 50;
+				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 30));
+				particle_definition.unshrinking_time_ms = 80.f;
+				particle_definition.shrink_when_ms_remaining = 300.f;
+				particle_definition.acc.set(40, -40);
+
+				em.add_particle_definition(particle_definition);
+			}
+
+			em.size_multiplier = float_range(0.25, 0.25);
+			em.target_render_layer = render_layer::DIM_SMOKES;
+			em.initial_rotation_variation = 180;
+			em.randomize_acceleration = true;
+
+			effect.emissions.push_back(em);
+		}
+	}
 
 	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::CAST_CHARGING);

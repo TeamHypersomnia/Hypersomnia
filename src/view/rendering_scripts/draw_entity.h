@@ -49,35 +49,31 @@ FORCE_INLINE void specific_entity_drawer(
 	}
 
 	if (const auto maybe_torso = typed_handle.template find<invariants::torso>()) {
-		if (const auto maybe_movement = typed_handle.template find<components::movement>()) {
+		if (const auto movement = typed_handle.template find<components::movement>()) {
 			const auto& cosm = typed_handle.get_cosmos();
 			const auto& logicals = cosm.get_logical_assets();
 
 			const auto vel = typed_handle.get_effective_velocity();
-			const auto speed = vel.length();
 			const auto degrees = vel.degrees();
-
-			constexpr auto max_speed_for_easing = 300;
 
 			const auto facing = vel.degrees_between(vec2::from_degrees(viewing_transform.rotation));
 
 			auto do_animation = [&](
 				const auto* const chosen_animation,
-				auto choose_index,
-				const auto rotation 
+				const auto rotation
 			) {
 				if (chosen_animation != nullptr) {
-					const auto duration_ms = chosen_animation->frames[0].duration_milliseconds;
-					const auto amount = maybe_movement->animation_amount * 1000.f;
-					const auto index = static_cast<unsigned>(amount / duration_ms);
+					auto& state = movement->four_ways_animation;
 
-					auto i = choose_index(index, static_cast<unsigned>(chosen_animation->frames.size()));
+					auto index = state.index;
 
-					if (speed < max_speed_for_easing) {
-						i.first = augs::interp(0u, i.first, speed / max_speed_for_easing);
+					if (chosen_animation->has_backward_frames && state.backward) {
+						index = chosen_animation->frames.size() - index - 1;
 					}
 
-					const auto frame_id = chosen_animation->get_image_id(i.first);
+					const auto should_flip = chosen_animation->flip_when_cycling && state.flip;
+
+					const auto frame_id = chosen_animation->get_image_id(index);
 
 					invariants::sprite sprite;
 					sprite.set(frame_id, in.manager);
@@ -88,7 +84,7 @@ FORCE_INLINE void specific_entity_drawer(
 					input.renderable_transform = viewing_transform;
 					input.renderable_transform.rotation = rotation;
 
-					input.flip.vertically = i.second;
+					input.flip.vertically = should_flip;
 					render_visitor(sprite, in.manager, input);
 				}
 			};
@@ -96,18 +92,12 @@ FORCE_INLINE void specific_entity_drawer(
 			if (facing <= 30 || facing >= 150) {
 				do_animation(
 					mapped_or_nullptr(logicals.legs_animations, maybe_torso->forward_legs),
-					[](const unsigned index, const unsigned n) {
-						return augs::ping_pong_4_flip_inverse(index, n);
-					},
 					degrees
 				);
 			}
 			else {
 				do_animation(
 					mapped_or_nullptr(logicals.legs_animations, maybe_torso->strafe_legs),
-					[](const unsigned index, const unsigned n) {
-						return augs::simple_pair(index % n, !((index / n) % 2));
-					},
 					degrees - 90
 				);
 			}
@@ -130,18 +120,8 @@ FORCE_INLINE void specific_entity_drawer(
 				return maybe_torso->stances[w.template get<invariants::item>().holding_stance];
 			}();
 
-			const bool four_ways = std::addressof(chosen_stance) == std::addressof(bare_stance);
-
 			do_animation(
 				mapped_or_nullptr(logicals.torso_animations, chosen_stance.carry),
-				[&](const unsigned index, const unsigned n) {
-					if (four_ways) {
-						return augs::ping_pong_4_flip_inverse(index, n);
-					}
-					else {
-						return augs::simple_pair(augs::ping_pong_2_inverse(index, n), false);
-					}
-				},
 				viewing_transform.rotation
 			);
 		}

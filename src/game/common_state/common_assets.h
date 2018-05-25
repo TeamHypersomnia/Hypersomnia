@@ -1,10 +1,10 @@
 #pragma once
 #include "game/assets/ids/asset_ids.h"
-#include "game/assets/ids/asset_ids.h"
-#include "game/assets/ids/asset_ids.h"
 
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
+
+#include "game/detail/footstep_effect.h"
 
 struct common_assets {
 	// GEN INTROSPECTOR struct common_assets
@@ -19,5 +19,7 @@ struct common_assets {
 	assets::particle_effect_id exploding_ring_smoke;
 	assets::particle_effect_id exploding_ring_sparkles;
 	assets::particle_effect_id thunder_remnants;
+
+	footstep_effect_input standard_footstep;
 	// END GEN INTROSPECTOR
 };

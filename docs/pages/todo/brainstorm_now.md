@@ -5,8 +5,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- rethink our roadmap
-
 - Rethinking attachment offsets
 	- Don't use a matrix. It will introduce shitload of redundancy
 	- Solution:
@@ -24,6 +22,10 @@ summary: That which we are brainstorming at the moment.
 			- we'll also reinfer upon switching the armour
 	- Drawing considerations
 		- What about viewing transforms?
+			- If we draw with sentiences, not subject to interpolation - and correctly
+			- Singular function to calculate the current animation frame
+				- Will anyways be used in more than just one place
+					- E.g. on calculating the collider connection, we'll take the first frame
 		- If we draw held item sprites separately, we must calculate the torso frame twice
 			- We'd go bottom-up everytime... for each attachment, etc.
 			- That sort of sucks

@@ -55,8 +55,11 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 	}
 }
 
-void movement_system::apply_movement_forces(cosmos& cosmos) {
+void movement_system::apply_movement_forces(const logic_step step) {
+	auto& cosmos = step.get_cosmos();
+
 	const auto delta = cosmos.get_fixed_delta();
+	const auto delta_ms = delta.in_milliseconds();
 
 	cosmos.for_each_having<components::movement>(
 		[&](const auto it) {
@@ -117,12 +120,13 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 			const bool is_inert = movement.make_inert_for_ms > 0.f;
 
 			if (is_inert) {
-				movement.make_inert_for_ms -= static_cast<float>(delta.in_milliseconds());
+				movement.make_inert_for_ms -= static_cast<float>(delta_ms);
 			}
 
 			const auto requested_by_input = movement.get_force_requested_by_input(movement_def.input_acceleration_axes);
+			const bool propelling = requested_by_input.non_zero();
 
-			if (requested_by_input.non_zero()) {
+			if (propelling) {
 				if (movement.was_sprint_effective) {
 					movement_force_mult /= 2.f;
 
@@ -158,10 +162,83 @@ void movement_system::apply_movement_forces(cosmos& cosmos) {
 				);
 			}
 
-			const auto max_speed = std::max(1.f, movement_def.max_speed_for_animation);
-			const auto animation_dt = delta.in_seconds() * rigid_body.get_velocity().length() / max_speed;
+			const auto num_frames = movement_def.animation_frame_num;
+			const auto frame_ms = movement_def.animation_frame_ms;
 
-			movement.animation_amount += animation_dt;
+			const auto duration_bound = num_frames * frame_ms;
+
+			const auto conceptual_max_speed = std::max(1.f, movement_def.max_speed_for_animation);
+			const auto current_speed = rigid_body.get_velocity().length();
+
+			const auto speed_mult = current_speed / conceptual_max_speed;
+			const auto animation_dt = delta_ms * speed_mult;
+
+			const bool anim_finishing = !propelling && current_speed <= conceptual_max_speed / 2;
+			auto& bd = movement.four_ways_animation.backward;
+			auto& amount = movement.animation_amount;
+
+			auto start_footstep_effect = [&]() {
+				const auto transform = it.get_logic_transform();
+
+				auto& chosen_effect = cosmos.get_common_assets().standard_footstep;
+
+				auto sound = chosen_effect.sound;
+				const auto gain_mult = speed_mult / 2;
+				const auto pitch_mult = std::min(1.7f, 1 + gain_mult);
+
+				sound.modifier.gain *= gain_mult;
+				sound.modifier.pitch *= pitch_mult;
+
+				LOG_NVPS(gain_mult);
+				LOG_NVPS(sound.modifier.gain);
+
+				sound.start(
+					step, 
+					sound_effect_start_input::at_entity(it.get_id())
+				);
+
+				chosen_effect.particles.start(
+					step, 
+					particle_effect_start_input::fire_and_forget(transform.pos)
+				);
+			};
+
+			if (anim_finishing) {
+				const auto decreasing_dt = delta_ms * std::max(sqrt(sqrt(speed_mult)), 0.2f);
+				amount = std::max(0.f, amount - decreasing_dt);
+			}
+			else {
+				if (bd) {
+					amount -= animation_dt;
+
+					if (augs::flip_if_lt(amount, 0.f)) {
+						bd = false;
+
+						auto& f = movement.four_ways_animation.flip;
+						f = !f;
+					}
+				}
+				else {
+					amount += animation_dt;
+
+					if (augs::flip_if_gt(amount, static_cast<float>(duration_bound))) {
+						bd = true;
+					}
+				}
+			}
+
+			auto& idx = movement.four_ways_animation.index;
+			auto new_idx = idx;
+
+			new_idx = static_cast<unsigned>(amount / frame_ms);
+			new_idx = std::min(new_idx, num_frames - 1);
+			new_idx = std::max(new_idx, 0u);
+
+			if (idx == num_frames - 2 && new_idx == num_frames - 1) {
+				start_footstep_effect();
+			}
+
+			idx = new_idx;
 
 			rigid_body.infer_caches();
 		}

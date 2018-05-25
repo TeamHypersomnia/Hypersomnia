@@ -11,6 +11,15 @@ namespace invariants {
 	struct movement;
 }
 
+struct movement_animation_state {
+	// GEN INTROSPECTOR struct movement_animation_state
+	unsigned index = 0;
+	bool flip = false;
+	bool backward = false;
+	pad_bytes<2> pad;
+	// END GEN INTROSPECTOR
+};
+
 namespace components {
 	struct movement {
 		// GEN INTROSPECTOR struct components::movement
@@ -26,6 +35,8 @@ namespace components {
 
 		float make_inert_for_ms = 0.f;
 		float animation_amount = 0.f;
+
+		movement_animation_state four_ways_animation;
 		// END GEN INTROSPECTOR
 
 		bool any_moving_requested() const {
@@ -58,6 +69,8 @@ namespace invariants {
 		float braking_damping = 0.f;
 
 		float max_speed_for_animation = 700.f;
+		unsigned animation_frame_ms = 30;
+		unsigned animation_frame_num = 5;
 		// END GEN INTROSPECTOR
 	};
 }

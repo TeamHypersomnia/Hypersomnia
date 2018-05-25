@@ -39,6 +39,9 @@ namespace test_scenes {
 		common.ambient_light_color = { 53, 97, 102, 255 }; // Brighten it up a little
 
 		auto& common_assets = common.assets;
+		common_assets.standard_footstep.sound.id = to_sound_id(test_scene_sound_id::STANDARD_FOOTSTEP);
+		common_assets.standard_footstep.sound.modifier.pitch = 1.25f;
+		common_assets.standard_footstep.sound.modifier.gain = 0.4;
 		common_assets.cast_unsuccessful_sound.id = to_sound_id(test_scene_sound_id::CAST_UNSUCCESSFUL);
 		common_assets.ped_shield_impact_sound.id = to_sound_id(test_scene_sound_id::EXPLOSION);
 		common_assets.ped_shield_destruction_sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
@@ -46,6 +49,7 @@ namespace test_scenes {
 		common_assets.item_throw_sound.modifier.pitch = 1.15f;
 		common_assets.item_throw_sound.modifier.gain = 0.8f;
 
+		common_assets.standard_footstep.particles.id = to_particle_effect_id(test_scene_particle_effect_id::FOOTSTEP_SMOKE);
 		common_assets.exhausted_smoke_particles.id = to_particle_effect_id(test_scene_particle_effect_id::EXHAUSTED_SMOKE);
 		common_assets.exploding_ring_smoke = to_particle_effect_id(test_scene_particle_effect_id::EXPLODING_RING_SMOKE);
 		common_assets.exploding_ring_sparkles = to_particle_effect_id(test_scene_particle_effect_id::EXPLODING_RING_SPARKLES);

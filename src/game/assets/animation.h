@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/pad_bytes.h"
 #include "augs/math/declare_math.h"
 #include "augs/misc/constant_size_vector.h"
 #include "augs/math/transform.h"
@@ -114,12 +115,18 @@ struct plain_animation : animation_mixin<plain_animation> {
 struct torso_animation : animation_mixin<torso_animation> {
 	// GEN INTROSPECTOR struct torso_animation
 	torso_animation_frames_type frames = {};
+	bool has_backward_frames = false;
+	bool flip_when_cycling = true;
+	pad_bytes<2> pad;
 	// END GEN INTROSPECTOR
 };
 
 struct legs_animation : animation_mixin<legs_animation> {
 	// GEN INTROSPECTOR struct legs_animation
 	legs_animation_frames_type frames = {};
+	bool has_backward_frames = false;
+	bool flip_when_cycling = true;
+	pad_bytes<2> pad;
 	// END GEN INTROSPECTOR
 };
 
