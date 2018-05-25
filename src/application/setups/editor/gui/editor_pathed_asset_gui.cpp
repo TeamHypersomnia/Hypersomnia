@@ -25,6 +25,7 @@
 #include "application/setups/editor/property_editor/special_widgets.h"
 #include "augs/readwrite/byte_readwrite.h"
 
+#include "view/try_load_meta_lua.h"
 #include "augs/templates/list_utils.h"
 
 template <class id_type>
@@ -342,11 +343,51 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			ImGui::NextColumn();
 
 			if (node) {
+				auto& definition_object = definitions[id];
+				const auto& project_path = cmd_in.folder.current_path;
+				using command_type = change_asset_property_command<asset_id_type>;
+
+				{
+					using def_type = std::remove_reference_t<decltype(definition_object)>;
+					const auto& view = asset_definition_view<def_type>(project_path, definition_object);
+					const auto resolved = view.get_resolved_source_path();
+
+					{
+						const auto meta_lua_path = get_meta_lua_path(resolved);
+						auto cols = maybe_disabled_cols(settings, !augs::exists(meta_lua_path));
+
+						if (ImGui::Button("Read defaults")) {
+							try {
+								decltype(definition_object.meta) new_meta;
+								try_load_meta_lua(cmd_in.lua, new_meta, resolved);
+
+								command_type cmd;
+
+								cmd.affected_assets = { id };
+								cmd.property_id.field = make_field_address(definition_object, definition_object.meta);
+								cmd.value_after_change = augs::to_bytes(new_meta);
+								cmd.built_description = "Read defaults from " + augs::to_display(meta_lua_path);
+
+								post_editor_command(cmd_in, std::move(cmd));
+							}
+							catch (...) {
+
+							}
+						}
+
+						ImGui::SameLine();
+					}
+
+					{
+						if (ImGui::Button("Write defaults")) {
+							save_meta_lua(cmd_in.lua, definition_object.meta, resolved);
+						}
+					}
+				}
+
 				auto sc = scoped_indent();
 
 				const auto property_location = typesafe_sprintf(" (in %x)", displayed_name);
-
-				using command_type = change_asset_property_command<asset_id_type>;
 
 				auto post_new_change = [&](
 					const auto& description,
@@ -397,12 +438,11 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 				auto prop_in = property_editor_input { settings, property_editor_data };
 
-				const auto& project_path = cmd_in.folder.current_path;
 				const bool disable_path_chooser = current_ticked && ticked_ids.size() > 1;
 
 				general_edit_properties(
 					prop_in,
-					definitions[id],
+					definition_object,
 					post_new_change,
 					rewrite_last_change,
 					[&](const auto& first, const field_address field_id) {

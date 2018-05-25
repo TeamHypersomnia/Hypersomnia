@@ -83,21 +83,8 @@ struct plain_animation_frame {
 	// END GEN INTROSPECTOR
 };
 
-struct torso_animation_frame {
-	// GEN INTROSPECTOR struct torso_animation_frame
-	assets::image_id image_id;
-	float duration_milliseconds = 0.f;
-	transformi hand_offset;
-	// END GEN INTROSPECTOR
-};
-
-struct legs_animation_frame {
-	// GEN INTROSPECTOR struct legs_animation_frame
-	assets::image_id image_id;
-	float duration_milliseconds = 0.f;
-	vec2i leg_offset;
-	// END GEN INTROSPECTOR
-};
+using torso_animation_frame = plain_animation_frame;
+using legs_animation_frame = plain_animation_frame;
 
 template <class T>
 using make_animation_frames = augs::constant_size_vector<T, ANIMATION_FRAME_COUNT>;

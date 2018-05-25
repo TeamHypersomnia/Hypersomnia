@@ -12,6 +12,9 @@
 
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
+struct sound_meta;
+struct image_meta;
+
 using edited_field_type_id = type_in_list_id<
 	type_list<
 		augs::trivial_type_marker,
@@ -28,7 +31,10 @@ using edited_field_type_id = type_in_list_id<
 
 		plain_animation_frames_type,
 		torso_animation_frames_type,
-		legs_animation_frames_type
+		legs_animation_frames_type,
+
+		sound_meta,
+		image_meta
 	>
 >;
 
