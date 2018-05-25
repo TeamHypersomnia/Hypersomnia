@@ -32,6 +32,19 @@ summary: That which we are brainstorming at the moment.
 			- Instead we might draw the entire character if we determine that it has torso
 			- And avoid drawing anything if the owner capability has a torso
 
+- Specyfing hotspots on the images
+	- State considerations
+		- Image definition shall store image_logical_meta 
+			- Each metric type will be specified with value_with_flag
+		- On modification in Images GUI, they will be rewritten into cosmos common state
+			- And cosmos will be thus reinferred
+		- Our state will be duplicated, but it is not really bad
+	- Cases
+		- Bullet spawn offsets
+		- Head offsets
+		- Primary/secondary hand offsets
+		- Back offsets (for backpacks)
+
 - Animation architecture
 	- Animation asset
 		- Several distinct types of animations

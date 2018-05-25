@@ -15,10 +15,6 @@ augs::path_type get_desaturation_path(augs::path_type from_source_path) {
 	return augs::path_type(GENERATED_FILES_DIR) / from_source_path.replace_extension(".desaturation.png").string();
 }
 
-bool image_loadables::operator==(const image_loadables& b) const {
-	return augs::introspective_equal(*this, b);
-}
-
 augs::path_type image_definition_view::calc_custom_neon_map_path() const {
 	return augs::path_type(resolved_source_path).replace_extension(".neon_map.png");
 }
@@ -42,7 +38,7 @@ std::optional<augs::path_type> image_definition_view::find_custom_neon_map_path(
 }
 
 std::optional<augs::path_type> image_definition_view::find_generated_neon_map_path() const {
-	if (def.loadables.should_generate_neon_map()) {
+	if (def.meta.extra_loadables.should_generate_neon_map()) {
 		return calc_generated_neon_map_path();
 	}
 
@@ -50,7 +46,7 @@ std::optional<augs::path_type> image_definition_view::find_generated_neon_map_pa
 }
 
 std::optional<augs::path_type> image_definition_view::find_desaturation_path() const {
-	if (def.loadables.should_generate_desaturation()) {
+	if (def.meta.extra_loadables.should_generate_desaturation()) {
 		return calc_desaturation_path();
 	}
 
@@ -70,11 +66,11 @@ void image_definition_view::regenerate_neon_map(
 ) const {
 	const auto diffuse_path = resolved_source_path;
 
-	if (def.loadables.should_generate_neon_map()) {
+	if (def.meta.extra_loadables.should_generate_neon_map()) {
 		::regenerate_neon_map(
 			diffuse_path,
 			find_generated_neon_map_path().value(),
-			def.loadables.extras.generate_neon_map.value,
+			def.meta.extra_loadables.generate_neon_map.value,
 			force_regenerate
 		);
 	}
@@ -85,7 +81,7 @@ void image_definition_view::regenerate_desaturation(
 ) const {
 	const auto diffuse_path = resolved_source_path;
 
-	if (def.loadables.should_generate_desaturation()) {
+	if (def.meta.extra_loadables.should_generate_desaturation()) {
 		::regenerate_desaturation(
 			diffuse_path,
 			find_desaturation_path().value(),

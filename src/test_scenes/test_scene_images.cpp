@@ -14,18 +14,11 @@
 static void try_load_lua_neighbors(
 	const augs::path_type& resolved,
    	sol::state& lua,
-   	image_extra_loadables& extras,
 	image_meta& meta
 ) {
 	const auto with_ext = [&](const auto ext) {
 		return augs::path_type(resolved).replace_extension(ext);
 	};
-
-	if (const auto extra_loadables_path = with_ext(".extras.lua");
-		augs::exists(extra_loadables_path)
-	) {
-		augs::load_from_lua_table(lua, extras, extra_loadables_path);
-	}
 
 	if (const auto meta_path = with_ext(".meta.lua");
 		augs::exists(meta_path)
@@ -52,13 +45,10 @@ void load_test_scene_images(
 		const auto stem = to_lowercase(augs::enum_to_string(enum_id));
 
 		image_definition definition;
-		auto& loadables_def = definition.loadables;
-		image_meta meta;
-
 		definition.set_source_path({ stem + ".png", true });
 
 		try {
-			try_load_lua_neighbors(image_definition_view({}, definition).get_source_image_path(), lua, loadables_def.extras, meta);
+			try_load_lua_neighbors(image_definition_view({}, definition).get_source_image_path(), lua, definition.meta);
 		}
 		catch (augs::lua_deserialization_error err) {
 			throw test_scene_asset_loading_error(

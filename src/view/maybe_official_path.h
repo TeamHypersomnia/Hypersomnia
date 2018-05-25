@@ -17,6 +17,10 @@ struct maybe_official_path {
 		return path == b.path && is_official == b.is_official;
 	}
 
+	bool operator!=(const maybe_official_path& b) const {
+		return !operator==(b);
+	}
+
 	bool operator<(const maybe_official_path& b) const {
 		if (is_official == b.is_official) {
 			return path < b.path;

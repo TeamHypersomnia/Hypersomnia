@@ -144,7 +144,7 @@ necessary_image_definitions_map::necessary_image_definitions_map(
 		const auto stem = to_lowercase(augs::enum_to_string(id));
 
 		image_definition definition_template;
-		auto& source_image = definition_template.loadables.source_image;
+		auto& source_image = definition_template.source_image;
 
 		if (
 			const auto additional_properties_path = typesafe_sprintf("%x/%x.lua", directory, stem);

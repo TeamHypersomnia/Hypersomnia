@@ -42,7 +42,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 				/* Check for unloaded and changed resources */
 				for_each_id_and_object(now_defs, [&](const auto key, const auto& old_def) {
 					if (const auto new_def = mapped_or_nullptr(new_defs, key)) {
-						if (new_def->loadables != old_def.loadables) {
+						if (new_def->loadables_differ(old_def)) {
 							/* Changed, so reload. */
 							new_atlas_required = true;
 						}

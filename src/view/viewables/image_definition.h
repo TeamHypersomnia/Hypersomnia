@@ -1,7 +1,6 @@
 #pragma once
 #include <optional>
 
-#include "augs/templates/value_with_flag.h"
 #include "augs/filesystem/path.h"
 
 #include "augs/drawing/flip.h"
@@ -18,46 +17,25 @@
 augs::path_type get_neon_map_path(augs::path_type from_source_image_path);
 augs::path_type get_desaturation_path(augs::path_type from_source_image_path);
 
-struct image_extra_loadables {
-	// GEN INTROSPECTOR struct image_extra_loadables
-	augs::value_with_flag<neon_map_input> generate_neon_map;
-	bool generate_desaturation = false;
-	pad_bytes<3> pad;
-	// END GEN INTROSPECTOR
-};
-
-struct image_loadables {
-	// GEN INTROSPECTOR struct image_loadables
-	maybe_official_image_path source_image;
-	image_extra_loadables extras;
-	// END GEN INTROSPECTOR
-
-	bool operator==(const image_loadables& b) const;
-	bool operator!=(const image_loadables& b) const {
-		return !operator==(b);
-	}
-
-	bool should_generate_desaturation() const {
-		return extras.generate_desaturation;
-	}
-
-	bool should_generate_neon_map() const {
-		return extras.generate_neon_map && extras.generate_neon_map.value.valid();
-	}
-};
-
 struct image_definition {
 	// GEN INTROSPECTOR struct image_definition
-	image_loadables loadables;
+	maybe_official_image_path source_image;
 	image_meta meta;
 	// END GEN INTROSPECTOR
 
+	bool loadables_differ(const image_definition& b) const {
+		return 
+			source_image != b.source_image 
+			|| meta.extra_loadables != b.meta.extra_loadables
+		;
+	}
+
 	void set_source_path(const maybe_official_image_path& p) {
-		loadables.source_image = p;
+		source_image = p;
 	}
 
 	const auto& get_source_path() const {
-		return loadables.source_image;
+		return source_image;
 	}
 };
 
