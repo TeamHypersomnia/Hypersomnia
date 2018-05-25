@@ -437,8 +437,9 @@ void RenderTextVertical(const ImFont* font,ImDrawList* draw_list, float size, Im
                 // Wrapping skips upcoming blanks
                 while (s < text_end)
                 {
-                    const char c = *s;
-                    if (ImCharIsSpace(c)) { s++; } else if (c == '\n') { s++; break; } else { break; }
+					//const char c = *s;
+					assert(false);
+					//if (ImCharIsSpace(c)) { s++; } else if (c == '\n') { s++; break; } else { break; }
                 }
                 continue;
             }
