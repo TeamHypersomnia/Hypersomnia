@@ -347,6 +347,8 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 				const auto& project_path = cmd_in.folder.current_path;
 				using command_type = change_asset_property_command<asset_id_type>;
 
+				auto sc = scoped_indent();
+
 				{
 					using def_type = std::remove_reference_t<decltype(definition_object)>;
 					const auto& view = asset_definition_view<def_type>(project_path, definition_object);
@@ -383,9 +385,9 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 							save_meta_lua(cmd_in.lua, definition_object.meta, resolved);
 						}
 					}
-				}
 
-				auto sc = scoped_indent();
+					next_columns(num_cols);
+				}
 
 				const auto property_location = typesafe_sprintf(" (in %x)", displayed_name);
 

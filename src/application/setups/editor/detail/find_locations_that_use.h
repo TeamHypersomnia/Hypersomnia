@@ -89,12 +89,7 @@ void find_locations_that_use(
 				p, 
 				[&](const auto&, const auto& asset) {
 					find_object_in_object<always_false, allow_conversion>(id, asset, [&](const auto& location) {
-						if constexpr(std::is_same_v<plain_animation, remove_cref<decltype(asset)>>) {
-							// TODO: animation view?
-						}
-						else {
-							location_callback(preffix + asset.name + " (" + location + ")");
-						}
+						location_callback(preffix + get_displayed_name(asset, viewables.image_definitions) + " (" + location + ")");
 					});
 				}
 			);
@@ -102,6 +97,8 @@ void find_locations_that_use(
 	};
 
 	traverse_assets("Particle effect: ", viewables.particle_effects);
-	traverse_assets("Animation: ", logicals.plain_animations);
+	traverse_assets("Plain animation: ", logicals.plain_animations);
+	traverse_assets("Torso animation: ", logicals.torso_animations);
+	traverse_assets("Legs animation: ", logicals.legs_animations);
 	traverse_assets("Physical material: ", logicals.physical_materials);
 }
