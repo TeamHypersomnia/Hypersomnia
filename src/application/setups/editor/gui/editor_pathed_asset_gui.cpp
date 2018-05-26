@@ -75,6 +75,8 @@ struct image_offset_widget {
 		std::optional<tweaker_type> result;
 
 		{
+			auto less_spacing = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+
 			auto iw = scoped_item_width(100);
 			result = detail_direct_edit(identity_label, object);
 
