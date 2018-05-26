@@ -69,14 +69,21 @@ struct image_offset_widget {
 	}
 
 	template <class T>
-	std::optional<tweaker_type> handle(const std::string& identity_label, T& object) const {
+	auto handle(const std::string& identity_label, T& object) const {
 		using namespace augs::imgui;
 
-		bool modified = false;
+		std::optional<tweaker_type> result;
 
-		const auto displayed_str = typesafe_sprintf("dx: %x, dy: %x", object.x, object.y);
+		{
+			auto iw = scoped_item_width(100);
+			result = detail_direct_edit(identity_label, object);
 
-		if (auto combo = scoped_combo(identity_label.c_str(), displayed_str.c_str(), ImGuiComboFlags_HeightLargest)) {
+			ImGui::SameLine();
+		}
+
+		auto iw = scoped_item_width(-1);
+
+		if (auto combo = scoped_combo((identity_label + "Picker").c_str(), "Pick...", ImGuiComboFlags_HeightLargest)) {
             auto& io = ImGui::GetIO();
 			const auto pos = ImGui::GetCursorScreenPos();
 			const auto& entry = game_atlas.at(id);
@@ -89,21 +96,41 @@ struct image_offset_widget {
 			invisible_button_reset_cursor("###OffsetSelector", viewing_size);
 			game_image(entry.diffuse, viewing_size);
 
+			auto draw_cross = [is](const vec2i where, const rgba col) {
+				draw_rect_local(
+					ltrb::from_points(
+						vec2(where.x, 0) * zoom,
+						vec2(where.x + 1, is.y) * zoom
+					),
+					col
+				);
+
+				draw_rect_local(
+					ltrb::from_points(
+						vec2(0, where.y) * zoom,
+						vec2(is.x, where.y + 1) * zoom
+					),
+					col
+				);
+			};
+
+			const auto cross_alpha = 200;
+
+			draw_cross(object, rgba(red.rgb(), cross_alpha));
+
 			if (ImGui::IsItemClicked()) {
 				object = chosen_center_offset;
-				modified = true;
+				result = tweaker_type::DISCRETE;
 			}
 
 			if (ImGui::IsItemHovered()) {
+				draw_cross(chosen_center_offset, rgba(green.rgb(), cross_alpha));
+
 				text_tooltip("Chosen offset: %x", chosen_center_offset);
 			}
 		}
 
-		if (modified) {
-			return tweaker_type::DISCRETE;
-		}
-
-		return std::nullopt;
+		return result;
 	}
 };
 
