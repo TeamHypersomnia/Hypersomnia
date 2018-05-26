@@ -45,6 +45,7 @@ void intercosm::make_test_scene(
 	auto reloader = [&](auto populator){
 		world.change_common_significant([&](cosmos_common_significant& common){
 			common.logical_assets = logicals;
+			viewables.update_relevant(common.logical_assets);
 			populator.populate(caches, common);
 
 			return changer_callback_result::DONT_REFRESH;
@@ -185,4 +186,13 @@ void intercosm::load_from_int(const augs::path_type& path) {
 			err.what()
 		};
 	}
+}
+
+void intercosm::update_offsets_of(const assets::image_id& id, const changer_callback_result result) {
+	world.change_common_significant(
+		[&](cosmos_common_significant& common) {
+			common.logical_assets.get_offsets(id) = viewables.image_definitions[id].meta.offsets;
+			return result;
+		}
+	);
 }

@@ -65,8 +65,6 @@ namespace invariants {
 
 		float damage_multiplier = 1.f;
 
-		vec2 bullet_spawn_offset;
-
 		augs::minmax<float> shell_velocity = { 300.f, 1700.f };
 		augs::minmax<float> shell_angular_velocity = { 2.f, 14.f };
 
@@ -91,8 +89,42 @@ namespace invariants {
 		constrained_entity_flavour_id<invariants::missile, components::sender> magic_missile_flavour;
 		recoil_player_instance_def recoil;
 		// END GEN INTROSPECTOR
-
-		vec2 calc_muzzle_position(components::transform gun_transform, float gun_width) const;
-		vec2 calc_barrel_center(components::transform gun_transform) const;
 	};
+}
+
+template <class T>
+auto get_bullet_spawn_offset(
+	const T& gun_handle
+) {
+	const auto& cosmos = gun_handle.get_cosmos();
+	const auto reference_id = gun_handle.template get<invariants::sprite>().image_id;
+	const auto& offsets = cosmos.get_logical_assets().get_offsets(reference_id);
+	return offsets.gun.bullet_spawn;
+}
+
+template <class T>
+vec2 calc_muzzle_position(
+	const T& gun_handle,
+	const transformr& gun_transform
+) {
+	const auto bullet_spawn_offset = get_bullet_spawn_offset(gun_handle);
+
+	if (const auto logical_width = gun_handle.find_logical_width()) {
+		return (
+			gun_transform 
+			* transformr(bullet_spawn_offset + vec2(*logical_width / 2, 0))
+		).pos;
+	}
+
+	return {};
+}
+
+template <class T>
+vec2 calc_barrel_center(
+	const T& gun_handle,
+	const transformr& gun_transform
+) {
+	const auto bullet_spawn_offset = get_bullet_spawn_offset(gun_handle);
+
+	return (gun_transform * transformr(vec2(0, bullet_spawn_offset.y))).pos;
 }

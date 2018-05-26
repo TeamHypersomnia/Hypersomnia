@@ -189,9 +189,6 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				sound.modifier.gain *= gain_mult;
 				sound.modifier.pitch *= pitch_mult;
 
-				LOG_NVPS(gain_mult);
-				LOG_NVPS(sound.modifier.gain);
-
 				sound.start(
 					step, 
 					sound_effect_start_input::at_entity(it.get_id())

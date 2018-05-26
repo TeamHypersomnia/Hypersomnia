@@ -376,7 +376,6 @@ namespace test_flavours {
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
 			gun_def.muzzle_velocity = {3000.f, 3000.f};
 			gun_def.shot_cooldown_ms = 100.f;
-			gun_def.bullet_spawn_offset.set(0, -7);
 
 			gun_def.shell_spawn_offset.pos.set(0, 10);
 			gun_def.shell_spawn_offset.rotation = 45;

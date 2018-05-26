@@ -6,6 +6,7 @@
 #include "game/assets/recoil_player.h"
 #include "game/assets/animation.h"
 #include "game/assets/physical_material.h"
+#include "game/assets/image_offsets.h"
 
 using plain_animations_pool = make_asset_pool<plain_animation, assets::plain_animation_id_key>;
 using torso_animations_pool = make_asset_pool<torso_animation, assets::torso_animation_id_key>;
@@ -21,5 +22,15 @@ struct all_logical_assets {
 
 	recoil_players_pool recoils;
 	physical_materials_pool physical_materials;
+
+	std::array<all_image_offsets, MAX_IMAGES_IN_INTERCOSM> image_offsets;
 	// END GEN INTROSPECTOR
+
+	auto& get_offsets(const assets::image_id id) {
+		return image_offsets.at(id.get_cache_index());
+	}
+
+	const auto& get_offsets(const assets::image_id id) const {
+		return image_offsets.at(id.get_cache_index());
+	}
 };

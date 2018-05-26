@@ -77,4 +77,6 @@ struct intercosm {
 			std::forward<Callbacks>(callbacks)...
 		);
 	}
+
+	void update_offsets_of(const assets::image_id&, changer_callback_result = changer_callback_result::REFRESH);
 };

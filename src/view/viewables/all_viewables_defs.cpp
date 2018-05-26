@@ -32,5 +32,15 @@ std::optional<I> find_asset_id_by_path(
 	return result_id;
 }
 
+
+void all_viewables_defs::update_relevant(all_logical_assets& logicals) {
+	for_each_id_and_object(
+		image_definitions,
+		[&](const auto id, const auto& l) {
+			logicals.image_offsets.at(id.get_cache_index()) = l.meta.offsets;
+		}
+	);
+}
+
 template std::optional<assets::image_id> find_asset_id_by_path(const maybe_official_image_path& p, const image_definitions_map& definitions);
 template std::optional<assets::sound_id> find_asset_id_by_path(const maybe_official_sound_path& p, const sound_definitions_map& definitions);

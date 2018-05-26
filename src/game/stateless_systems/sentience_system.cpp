@@ -446,11 +446,9 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 					const auto subject_item = cosmos[items[0]];
 
 					if (const auto* const maybe_gun_def = subject_item.template find<invariants::gun>()) {
-						const auto& gun_def = *maybe_gun_def;
-
 						const auto rifle_transform = subject_item.get_logic_transform();
-						auto barrel_center = gun_def.calc_barrel_center(rifle_transform);
-						auto muzzle = gun_def.calc_muzzle_position(rifle_transform, *subject_item.find_logical_width());
+						auto barrel_center = calc_barrel_center(subject_item, rifle_transform);
+						auto muzzle = calc_muzzle_position(subject_item, rifle_transform);
 						const auto mc = subject_transform.pos;
 
 						barrel_center.rotate(-subject_transform.rotation, mc);

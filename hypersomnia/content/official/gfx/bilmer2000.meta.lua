@@ -19,9 +19,11 @@ return {
     }
   },
   offsets = {
-    bullet_spawn = {
-      x = 0,
-      y = -2
-    }
+    gun = {
+      bullet_spawn = {
+        x = 0,
+        y = -2
+      }
+  	}
   }
 }

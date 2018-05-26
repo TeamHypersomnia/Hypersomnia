@@ -90,6 +90,17 @@ void change_property_command<D>::redo(const editor_command_input in) {
 	);
 
 	value_after_change.clear();
+
+	if constexpr(std::is_same_v<D, change_asset_property_command<assets::image_id>>) {
+		for (const auto& i : self.affected_assets) {
+			in.folder.work->update_offsets_of(i, changer_callback_result::DONT_REFRESH);
+		}
+
+		if (!self.affected_assets.empty()) {
+			/* Only for refreshing */
+			in.folder.work->update_offsets_of(self.affected_assets.front());
+		}	
+	}
 }
 
 template <class D>

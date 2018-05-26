@@ -3,6 +3,7 @@
 #include "augs/drawing/flip.h"
 
 #include "augs/templates/value_with_flag.h"
+#include "game/assets/image_offsets.h"
 #include "view/viewables/regeneration/neon_maps.h"
 
 struct image_usage_as_button {
@@ -33,20 +34,10 @@ struct image_extra_loadables {
 	}
 };
 
-struct image_offsets {
-	// GEN INTROSPECTOR struct image_offsets
-	vec2i primary_hand;
-	vec2i secondary_hand;
-	vec2i back;
-	vec2i foot;
-	vec2i bullet_spawn;
-	// END GEN INTROSPECTOR
-};
-
 struct image_meta {
 	// GEN INTROSPECTOR struct image_meta
 	image_extra_loadables extra_loadables;
 	image_usage_as_button usage_as_button;
-	image_offsets offsets; 
+	all_image_offsets offsets; 
 	// END GEN INTROSPECTOR
 };

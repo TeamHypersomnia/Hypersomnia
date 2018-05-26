@@ -28,6 +28,10 @@ std::string create_pathed_asset_id_command<I>::describe() const {
 template <class I>
 void create_pathed_asset_id_command<I>::redo(const editor_command_input in) {
 	base::redo(get_asset_pool<I>(in), construct_from);
+
+	if constexpr(std::is_same_v<I, assets::image_id>) {
+		in.folder.work->update_offsets_of(base::get_allocated_id());
+	}
 }
 
 template <class I>
