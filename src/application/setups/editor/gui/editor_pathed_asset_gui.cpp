@@ -87,13 +87,15 @@ struct image_offset_widget {
 
 		if (auto combo = scoped_combo((identity_label + "Picker").c_str(), "Pick...", ImGuiComboFlags_HeightLargest)) {
             auto& io = ImGui::GetIO();
-			const auto pos = ImGui::GetCursorScreenPos();
+
 			const auto& entry = game_atlas.at(id);
-			const auto is = vec2(entry.get_original_size());
+
+			const auto is = entry.get_original_size();
 			const auto zoom = 4;
+
 			const auto viewing_size = (is * zoom).operator ImVec2();
 
-			const auto chosen_center_offset = vec2i(vec2(io.MousePos.x - pos.x, io.MousePos.y - pos.y) / zoom);
+			text("Image size: %x, zoom: %x", is, zoom);
 
 			invisible_button_reset_cursor("###OffsetSelector", viewing_size);
 			game_image(entry.diffuse, viewing_size);
@@ -118,17 +120,25 @@ struct image_offset_widget {
 
 			const auto cross_alpha = 200;
 
-			draw_cross(object, rgba(red.rgb(), cross_alpha));
+			const auto reference_point = is / 2;
+			const auto pos = ImGui::GetCursorScreenPos();
+
+			const auto image_space_new = vec2i(vec2(io.MousePos.x - pos.x, io.MousePos.y - pos.y) / zoom);
+			const auto image_space_old = reference_point + object;
+
+			const auto chosen_new_offset = image_space_new - reference_point;
+
+			draw_cross(image_space_old, rgba(red.rgb(), cross_alpha));
 
 			if (ImGui::IsItemClicked()) {
-				object = chosen_center_offset;
+				object = chosen_new_offset;
 				result = tweaker_type::DISCRETE;
 			}
 
 			if (ImGui::IsItemHovered()) {
-				draw_cross(chosen_center_offset, rgba(green.rgb(), cross_alpha));
+				draw_cross(image_space_new, rgba(green.rgb(), cross_alpha));
 
-				text_tooltip("Chosen offset: %x", chosen_center_offset);
+				text_tooltip("Chosen offset: %x\nImage space: %x", chosen_new_offset, image_space_new);
 			}
 		}
 

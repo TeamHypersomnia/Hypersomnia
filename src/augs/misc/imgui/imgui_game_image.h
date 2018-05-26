@@ -7,11 +7,14 @@
 namespace augs {
 	namespace imgui {
 		template <class T>
-		void invisible_button_reset_cursor(const std::string& id, const T& size) {
-			const auto imsize = static_cast<ImVec2>(size);
+		void invisible_button(const std::string& id, const T& size) {
+			ImGui::InvisibleButton(id.c_str(), static_cast<ImVec2>(size));
+		}
 
+		template <class T>
+		void invisible_button_reset_cursor(const std::string& id, const T& size) {
 			const auto local_pos = ImGui::GetCursorPos();
-			ImGui::InvisibleButton(id.c_str(), imsize);
+			invisible_button(id, size);
 			ImGui::SetCursorPos(local_pos);
 		}
 
