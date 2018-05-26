@@ -90,7 +90,7 @@ struct image_offset_widget {
 
 			const auto& entry = game_atlas.at(id);
 
-			const auto is = entry.get_original_size();
+			const auto is = vec2i(entry.get_original_size());
 			const auto zoom = 4;
 
 			const auto viewing_size = (is * zoom).operator ImVec2();
@@ -120,7 +120,14 @@ struct image_offset_widget {
 
 			const auto cross_alpha = 200;
 
-			const auto reference_point = is / 2;
+			const bool reference_to_the_right = identity_label == "##bullet_spawn";
+
+			const auto reference_point = 
+				reference_to_the_right ? 
+				vec2i(is.x - 1, is.y / 2) 
+				: vec2i(is / 2)
+			;
+
 			const auto pos = ImGui::GetCursorScreenPos();
 
 			const auto image_space_new = vec2i(vec2(io.MousePos.x - pos.x, io.MousePos.y - pos.y) / zoom);

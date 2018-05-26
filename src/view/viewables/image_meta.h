@@ -39,6 +39,7 @@ struct image_offsets {
 	vec2i secondary_hand;
 	vec2i back;
 	vec2i foot;
+	vec2i bullet_spawn;
 	// END GEN INTROSPECTOR
 };
 
