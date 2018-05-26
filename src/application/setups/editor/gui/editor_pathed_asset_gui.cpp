@@ -86,7 +86,8 @@ struct image_offset_widget {
 
 			const auto chosen_center_offset = vec2i(vec2(io.MousePos.x - pos.x, io.MousePos.y - pos.y) / zoom);
 
-			game_image("###OffsetSelector", entry.diffuse, viewing_size);
+			invisible_button_reset_cursor("###OffsetSelector", viewing_size);
+			game_image(entry.diffuse, viewing_size);
 
 			if (ImGui::IsItemClicked()) {
 				object = chosen_center_offset;
@@ -377,7 +378,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			if constexpr(is_image_type) {
 				if (ImGui::IsItemHovered()) {
 					auto tooltip = scoped_tooltip();
-					game_image("###TooltipPreview", game_atlas.at(id).diffuse);
+					game_image_button("###TooltipPreview", game_atlas.at(id).diffuse);
 				}
 			}
 

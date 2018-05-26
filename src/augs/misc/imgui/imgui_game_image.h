@@ -7,7 +7,16 @@
 namespace augs {
 	namespace imgui {
 		template <class T>
-		void game_image(const std::string& id, const augs::atlas_entry& entry, const T& size) {
+		void invisible_button_reset_cursor(const std::string& id, const T& size) {
+			const auto imsize = static_cast<ImVec2>(size);
+
+			const auto local_pos = ImGui::GetCursorPos();
+			ImGui::InvisibleButton(id.c_str(), imsize);
+			ImGui::SetCursorPos(local_pos);
+		}
+
+		template <class T>
+		void game_image(const augs::atlas_entry& entry, const T& size) {
 			const auto imsize = static_cast<ImVec2>(size);
 
 			std::array<vec2, 4> texcoords = {
@@ -20,10 +29,6 @@ namespace augs {
 			for (auto& t : texcoords) {
 				t = entry.get_atlas_space_uv(t);
 			}
-
-			const auto local_pos = ImGui::GetCursorPos();
-			ImGui::InvisibleButton(id.c_str(), imsize);
-			ImGui::SetCursorPos(local_pos);
 
 			const auto cpos = ImGui::GetCursorScreenPos();
 
@@ -41,8 +46,14 @@ namespace augs {
 			);
 		}
 
-		inline void game_image(const std::string& id, const augs::atlas_entry& entry) {
-			return game_image(id, entry, entry.get_original_size());
+		template <class T>
+		inline auto game_image_button(const std::string& id, const augs::atlas_entry& entry, const T& size) {
+			invisible_button_reset_cursor(id, size);
+			game_image(entry, size);
+		}
+
+		inline auto game_image_button(const std::string& id, const augs::atlas_entry& entry) {
+			return game_image_button(id, entry, entry.get_original_size());
 		}
 	}
 }
