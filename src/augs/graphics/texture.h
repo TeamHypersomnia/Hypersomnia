@@ -33,6 +33,10 @@ namespace augs {
 
 			void bind() const;
 			static void unbind();
+
+			auto get_texture_id() const {
+				return id;
+			}
 		};
 	}
 }

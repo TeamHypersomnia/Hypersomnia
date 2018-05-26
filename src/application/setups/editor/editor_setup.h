@@ -66,6 +66,8 @@ struct editor_destructor_input {
 	sol::state& lua;
 };
 
+class images_in_atlas_map;
+
 class editor_setup : private current_access_cache<editor_setup> {
 	using base = current_access_cache<editor_setup>;
 	friend base;
@@ -222,7 +224,8 @@ public:
 	void perform_custom_imgui(
 		sol::state& lua,
 		augs::window& owner,
-		const bool in_direct_gameplay
+		bool in_direct_gameplay,
+		const images_in_atlas_map&
 	);
 
 	void customize_for_viewing(config_lua_table& cfg) const;

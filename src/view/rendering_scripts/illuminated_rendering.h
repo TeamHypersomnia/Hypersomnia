@@ -369,12 +369,8 @@ void illuminated_rendering(
 
 	set_shader_with_matrix(shaders.circular_bars);
 
-	const auto set_center_uniform = [&](const auto& tex) {
-		const auto upper = tex.get_atlas_space_uv({ 0.0f, 0.0f });
-		const auto lower = tex.get_atlas_space_uv({ 1.f, 1.f });
-		const auto center = (upper + lower) / 2;
-
-		shaders.circular_bars->set_uniform("texture_center", center);
+	const auto set_center_uniform = [&](const augs::atlas_entry& tex) {
+		shaders.circular_bars->set_uniform("texture_center", tex.get_center());
 	};
 
 	augs::vertex_triangle_buffer textual_infos;

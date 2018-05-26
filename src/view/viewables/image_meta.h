@@ -33,9 +33,19 @@ struct image_extra_loadables {
 	}
 };
 
+struct image_offsets {
+	// GEN INTROSPECTOR struct image_offsets
+	vec2i primary_hand;
+	vec2i secondary_hand;
+	vec2i back;
+	vec2i foot;
+	// END GEN INTROSPECTOR
+};
+
 struct image_meta {
 	// GEN INTROSPECTOR struct image_meta
 	image_extra_loadables extra_loadables;
 	image_usage_as_button usage_as_button;
+	image_offsets offsets; 
 	// END GEN INTROSPECTOR
 };

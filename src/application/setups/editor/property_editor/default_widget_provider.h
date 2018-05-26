@@ -3,6 +3,9 @@
 #include "augs/templates/identity_templates.h"
 
 struct default_widget_provider {
+	template <class... Args>
+	default_widget_provider(Args&&...) {}
+
 	template <class T>
 	static constexpr bool handles = always_false_v<T>;
 

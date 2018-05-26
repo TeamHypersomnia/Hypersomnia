@@ -10,6 +10,7 @@
 #include "augs/window_framework/shell.h"
 
 #include "game/detail/visible_entities.h"
+#include "view/viewables/images_in_atlas_map.h"
 
 #include "application/config_lua_table.h"
 #include "application/setups/editor/editor_setup.h"
@@ -237,7 +238,8 @@ void editor_setup::fill_with_test_scene() {
 void editor_setup::perform_custom_imgui(
 	sol::state& lua,
 	augs::window& owner,
-	const bool in_direct_gameplay
+	const bool in_direct_gameplay,
+	const images_in_atlas_map& game_atlas
 ) {
 	using namespace augs::imgui;
 
@@ -434,8 +436,9 @@ void editor_setup::perform_custom_imgui(
 
 		summary_gui.perform(*this);
 
-		images_gui.perform(settings.property_editor, make_command_input());
-		sounds_gui.perform(settings.property_editor, make_command_input());
+		images_gui.perform(settings.property_editor, game_atlas, make_command_input());
+		sounds_gui.perform(settings.property_editor, game_atlas, make_command_input());
+
 		plain_animations_gui.perform(settings.property_editor, make_command_input());
 		torso_animations_gui.perform(settings.property_editor, make_command_input());
 		legs_animations_gui.perform(settings.property_editor, make_command_input());

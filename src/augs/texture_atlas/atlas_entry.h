@@ -24,6 +24,13 @@ namespace augs {
 			return cached_original_size_pixels;
 		}
 
+		vec2 get_center() const {
+			return { 
+				atlas_space.x + static_cast<float>(atlas_space.w) / 2,
+				atlas_space.y + static_cast<float>(atlas_space.h) / 2
+			};
+		}
+
 		vec2 get_atlas_space_uv(const vec2 entry_space) const {
 			if (!was_flipped) {
 				return { 

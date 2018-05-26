@@ -6,6 +6,7 @@
 #include "augs/graphics/fbo.h"
 
 #include "augs/drawing/drawing.h"
+#include "augs/graphics/imgui_payload.h"
 
 #include "augs/texture_atlas/atlas_entry.h"
 
@@ -248,6 +249,8 @@ namespace augs {
 		const auto* const draw_data = ImGui::GetDrawData();
 
 		if (draw_data != nullptr) {
+			imgui_atlas.bind();
+
 			ImGuiIO& io = ImGui::GetIO();
 			// const int fb_width = static_cast<int>(io.DisplaySize.x * io.DisplayFramebufferScale.x);
 			const int fb_height = static_cast<int>(io.DisplaySize.y * io.DisplayFramebufferScale.y);
@@ -267,26 +270,33 @@ namespace augs {
 				for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; ++cmd_i) {
 					const ImDrawCmd* const pcmd = &cmd_list->CmdBuffer[cmd_i];
 
-					if (pcmd->UserCallback != nullptr) {
-						pcmd->UserCallback(cmd_list, pcmd);
-					}
-					else {
-						//manager.at(assets::gl_texture_id{ reinterpret_cast<intptr_t>(pcmd->TextureId) }).bind();
-						imgui_atlas.bind();
+					const auto atlas_type = static_cast<augs::imgui_atlas_type>(reinterpret_cast<intptr_t>(pcmd->TextureId));
 
-						GL_CHECK(glScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y)));
-						GL_CHECK(glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer_offset));
+					bool rebind = false;
+
+					if (atlas_type == augs::imgui_atlas_type::GAME) {
+						if (game_world_atlas != nullptr) {
+							game_world_atlas->bind();
+							rebind = true;
+						}
 					}
+					
+					GL_CHECK(glScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y)));
+					GL_CHECK(glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer_offset));
 
 					idx_buffer_offset += pcmd->ElemCount;
+
+					if (rebind) {
+						imgui_atlas.bind();
+					}
 				}
 			}
 
 			GL_CHECK(glDisable(GL_SCISSOR_TEST));
-		}
 
-		if (game_world_atlas != nullptr) {
-			game_world_atlas->bind();
+			if (game_world_atlas != nullptr) {
+				game_world_atlas->bind();
+			}
 		}
 	}
 

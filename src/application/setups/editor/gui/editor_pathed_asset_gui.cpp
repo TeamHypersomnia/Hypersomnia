@@ -7,9 +7,11 @@
 
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
+#include "augs/misc/imgui/imgui_game_image.h"
 #include "augs/misc/imgui/path_tree_structs.h"
 
 #include "game/organization/for_each_entity_type.h"
+#include "view/viewables/images_in_atlas_map.h"
 
 #include "application/setups/editor/gui/editor_pathed_asset_gui.h"
 #include "application/setups/editor/editor_folder.h"
@@ -51,6 +53,59 @@ struct pathed_asset_entry : public browsed_path_entry_base<id_type> {
 	{}
 };
 
+struct image_offset_widget {
+	const assets::image_id id;
+	const images_in_atlas_map& game_atlas;
+
+	template <class T>
+	static constexpr bool handles = std::is_same_v<T, vec2i>;
+
+	template <class T>
+	auto describe_changed(
+		const std::string& formatted_label,
+		const T& to
+	) const {
+		return typesafe_sprintf("Changed %x to %x", formatted_label, to);
+	}
+
+	template <class T>
+	std::optional<tweaker_type> handle(const std::string& identity_label, T& object) const {
+		using namespace augs::imgui;
+
+		bool modified = false;
+
+		const auto displayed_str = typesafe_sprintf("dx: %x, dy: %x", object.x, object.y);
+
+		if (auto combo = scoped_combo(identity_label.c_str(), displayed_str.c_str(), ImGuiComboFlags_HeightLargest)) {
+            auto& io = ImGui::GetIO();
+			const auto pos = ImGui::GetCursorScreenPos();
+			const auto& entry = game_atlas.at(id);
+			const auto is = vec2(entry.get_original_size());
+			const auto zoom = 4;
+			const auto viewing_size = (is * zoom).operator ImVec2();
+
+			const auto chosen_center_offset = vec2i(vec2(io.MousePos.x - pos.x, io.MousePos.y - pos.y) / zoom);
+
+			game_image("###OffsetSelector", entry.diffuse, viewing_size);
+
+			if (ImGui::IsItemClicked()) {
+				object = chosen_center_offset;
+				modified = true;
+			}
+
+			if (ImGui::IsItemHovered()) {
+				text_tooltip("Chosen offset: %x", chosen_center_offset);
+			}
+		}
+
+		if (modified) {
+			return tweaker_type::DISCRETE;
+		}
+
+		return std::nullopt;
+	}
+};
+
 struct source_path_widget {
 	all_viewables_defs& defs;
 	const augs::path_type& project_path;
@@ -66,11 +121,6 @@ struct source_path_widget {
 		const T& to
 	) const {
 		return typesafe_sprintf("Changed %x path to %x", to.get_label(), to.path);
-	}
-
-	template <class T>
-	auto get_sane_default() const {
-		return T();
 	}
 
 	template <class T>
@@ -113,8 +163,11 @@ struct source_path_widget {
 template <class asset_id_type>
 void editor_pathed_asset_gui<asset_id_type>::perform(
 	const property_editor_settings& settings,
+	const images_in_atlas_map& game_atlas,
    	editor_command_input cmd_in
 ) {
+	constexpr bool is_image_type = std::is_same_v<asset_id_type, assets::image_id>;
+
 	using namespace augs::imgui;
 
 	auto window = base::make_scoped_window();
@@ -321,6 +374,13 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 			const auto node = scoped_tree_node_ex(displayed_name + "###Node", flags);
 
+			if constexpr(is_image_type) {
+				if (ImGui::IsItemHovered()) {
+					auto tooltip = scoped_tooltip();
+					game_image("###TooltipPreview", game_atlas.at(id).diffuse);
+				}
+			}
+
 			next_columns(2);
 
 			text_disabled(displayed_dir);
@@ -442,6 +502,19 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 				const bool disable_path_chooser = current_ticked && ticked_ids.size() > 1;
 
+				/* 
+					Don't construct this widget for sounds and other pathed widgets. 
+					Image offsets apply only to... images.
+				*/
+
+				using special_image_widget = 
+					std::conditional_t<
+						is_image_type,
+						image_offset_widget,
+					   	default_widget_provider
+					>
+				;
+
 				general_edit_properties(
 					prop_in,
 					definition_object,
@@ -460,7 +533,8 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 						);
 					},
 					special_widgets(
-						source_path_widget { viewables, project_path, settings, disable_path_chooser }
+						source_path_widget { viewables, project_path, settings, disable_path_chooser },
+						special_image_widget { id, game_atlas }
 					),
 					default_sane_default_provider(),
 					num_cols - 2

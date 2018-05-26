@@ -1,10 +1,14 @@
 #pragma once
 #include <unordered_set>
 
+#include "augs/graphics/imgui_payload.h"
+
 #include "application/setups/editor/editor_command_input.h"
 #include "application/setups/editor/gui/standard_window_mixin.h"
 #include "application/setups/editor/gui/asset_path_browser_settings.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
+
+class images_in_atlas_map;
 
 template <class asset_id_type>
 struct editor_pathed_asset_gui : standard_window_mixin<editor_pathed_asset_gui<asset_id_type>> {
@@ -19,7 +23,7 @@ struct editor_pathed_asset_gui : standard_window_mixin<editor_pathed_asset_gui<a
 
 	bool acquire_missing_paths = true;
 
-	void perform(const property_editor_settings&, editor_command_input);
+	void perform(const property_editor_settings&, const images_in_atlas_map&, editor_command_input);
 
 private:
 	std::unordered_set<asset_id_type> ticked_assets;
