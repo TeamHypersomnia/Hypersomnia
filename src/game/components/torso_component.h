@@ -19,6 +19,9 @@ namespace invariants {
 
 		assets::legs_animation_id forward_legs;
 		assets::legs_animation_id strafe_legs;
+
+		unsigned min_strafe_facing = 50;
+		unsigned max_strafe_facing = 130;
 		// END GEN INTROSPECTOR
 	};
 };
@@ -34,10 +37,10 @@ inline auto calc_leg_anim(
 ) {
 	const auto facing = velocity.degrees_between(vec2::from_degrees(face_degrees));
 
-	if (facing <= 30 || facing >= 150) {
-		return torso.forward_legs;
+	if (facing >= torso.min_strafe_facing && facing <= torso.max_strafe_facing) {
+		return torso.strafe_legs;
 	}
 	else {
-		return torso.strafe_legs;
+		return torso.forward_legs;
 	}
 }

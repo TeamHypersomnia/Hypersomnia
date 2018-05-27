@@ -213,8 +213,8 @@ void movement_system::apply_movement_forces(const logic_step step) {
 							offset.y *= -1;
 						}
 
-						auto effect_transform = transform * transformr(offset);
-						effect_transform.rotation = current_velocity.degrees();
+						const auto velocity_degrees = current_velocity.degrees();
+						auto effect_transform = transformr(transform.pos, velocity_degrees) * transformr(offset);
 
 						auto particles = chosen_effect.particles;
 
