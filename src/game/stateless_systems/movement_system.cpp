@@ -168,7 +168,8 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			const auto duration_bound = num_frames * frame_ms;
 
 			const auto conceptual_max_speed = std::max(1.f, movement_def.max_speed_for_animation);
-			const auto current_speed = rigid_body.get_velocity().length();
+			const auto current_velocity = rigid_body.get_velocity();
+			const auto current_speed = current_velocity.length();
 
 			const auto speed_mult = current_speed / conceptual_max_speed;
 			const auto animation_dt = delta_ms * speed_mult;
@@ -194,10 +195,40 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					sound_effect_start_input::at_entity(it.get_id())
 				);
 
-				chosen_effect.particles.start(
-					step, 
-					particle_effect_start_input::fire_and_forget(transform.pos)
+				const auto anim_id = ::calc_leg_anim(
+					it.template get<invariants::torso>(),
+					current_velocity,
+					transform.rotation
 				);
+
+				if (const auto anim = mapped_or_nullptr(cosmos.get_logical_assets().legs_animations, anim_id)) {
+					const auto frame = movement.four_ways_animation.get_frame_and_flip(*anim);
+
+					const auto& im_def = cosmos.get_logical_assets().get_offsets(frame.first.image_id);
+
+					{
+						auto offset = im_def.legs.foot;
+
+						if (frame.second) {
+							offset.y *= -1;
+						}
+
+						auto effect_transform = transform * transformr(offset);
+						effect_transform.rotation = current_velocity.degrees();
+
+						auto particles = chosen_effect.particles;
+
+						const auto scale = std::max(0.8f, speed_mult);
+
+						particles.modifier.scale_amounts *= scale;
+						particles.modifier.scale_lifetimes *= scale;
+
+						particles.start(
+							step, 
+							particle_effect_start_input::fire_and_forget(effect_transform)
+						);
+					}
+				}
 			};
 
 			if (anim_finishing) {
@@ -225,17 +256,15 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			}
 
 			auto& idx = movement.four_ways_animation.index;
-			auto new_idx = idx;
+			const auto old_idx = idx;
 
-			new_idx = static_cast<unsigned>(amount / frame_ms);
-			new_idx = std::min(new_idx, num_frames - 1);
-			new_idx = std::max(new_idx, 0u);
+			idx = static_cast<unsigned>(amount / frame_ms);
+			idx = std::min(idx, num_frames - 1);
+			idx = std::max(idx, 0u);
 
-			if (idx == num_frames - 2 && new_idx == num_frames - 1) {
+			if (old_idx == num_frames - 2 && idx == num_frames - 1) {
 				start_footstep_effect();
 			}
-
-			idx = new_idx;
 
 			rigid_body.infer_caches();
 		}

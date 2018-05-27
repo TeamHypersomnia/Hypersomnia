@@ -55,28 +55,17 @@ FORCE_INLINE void specific_entity_drawer(
 
 			const auto vel = typed_handle.get_effective_velocity();
 			const auto degrees = vel.degrees();
-
-			const auto facing = vel.degrees_between(vec2::from_degrees(viewing_transform.rotation));
+			const auto face_degrees = viewing_transform.rotation;
 
 			auto do_animation = [&](
 				const auto* const chosen_animation,
 				const auto rotation
 			) {
 				if (chosen_animation != nullptr) {
-					auto& state = movement->four_ways_animation;
-
-					auto index = state.index;
-
-					if (chosen_animation->has_backward_frames && state.backward) {
-						index = chosen_animation->frames.size() - index - 1;
-					}
-
-					const auto should_flip = chosen_animation->flip_when_cycling && state.flip;
-
-					const auto frame_id = chosen_animation->get_image_id(index);
+					const auto frame = movement->four_ways_animation.get_frame_and_flip(*chosen_animation);
 
 					invariants::sprite sprite;
-					sprite.set(frame_id, in.manager);
+					sprite.set(frame.first.image_id, in.manager);
 
 					using input_type = invariants::sprite::drawing_input;
 
@@ -84,23 +73,15 @@ FORCE_INLINE void specific_entity_drawer(
 					input.renderable_transform = viewing_transform;
 					input.renderable_transform.rotation = rotation;
 
-					input.flip.vertically = should_flip;
+					input.flip.vertically = frame.second;
 					render_visitor(sprite, in.manager, input);
 				}
 			};
 
-			if (facing <= 30 || facing >= 150) {
-				do_animation(
-					mapped_or_nullptr(logicals.legs_animations, maybe_torso->forward_legs),
-					degrees
-				);
-			}
-			else {
-				do_animation(
-					mapped_or_nullptr(logicals.legs_animations, maybe_torso->strafe_legs),
-					degrees - 90
-				);
-			}
+			do_animation(
+				mapped_or_nullptr(logicals.legs_animations, ::calc_leg_anim(*maybe_torso, vel, face_degrees)),
+				degrees
+			);
 
 			const auto& bare_stance = maybe_torso->stances[item_holding_stance::BARE_LIKE];
 

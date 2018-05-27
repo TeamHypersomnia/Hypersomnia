@@ -273,11 +273,11 @@ void load_test_scene_particle_effects(
 			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
 			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 
-			em.spread_degrees = float_range(360, 360);
-			em.num_of_particles_to_spawn_initially.set(15, 25);
+			em.spread_degrees = float_range(40, 60);
+			em.num_of_particles_to_spawn_initially.set(10, 20);
 			em.stream_lifetime_ms = float_range(0, 0);
 
-			em.base_speed = float_range(10, 180);
+			em.base_speed = float_range(50, 250);
 			em.base_speed_variation = float_range(4.f, 8.f);
 
 			em.rotation_speed = float_range(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
@@ -289,7 +289,7 @@ void load_test_scene_particle_effects(
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 50;
 				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 30));
-				particle_definition.unshrinking_time_ms = 80.f;
+				particle_definition.unshrinking_time_ms = 40.f;
 				particle_definition.shrink_when_ms_remaining = 300.f;
 				particle_definition.acc.set(40, -40);
 

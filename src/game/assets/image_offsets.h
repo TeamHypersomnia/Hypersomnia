@@ -22,11 +22,19 @@ struct legs_offsets {
 	// END GEN INTROSPECTOR
 };
 
+struct item_offsets {
+	// GEN INTROSPECTOR struct item_offsets
+	vec2i hand_anchor;
+	vec2i back_anchor;
+	// END GEN INTROSPECTOR
+};
+
 struct all_image_offsets {
 	// GEN INTROSPECTOR struct all_image_offsets
 	torso_offets torso;
 	legs_offsets legs;
 	gun_offsets gun;
+	item_offsets item;
 	// END GEN INTROSPECTOR
 };
 
