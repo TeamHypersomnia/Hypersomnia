@@ -58,15 +58,15 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel(const logic
 
 	for (const auto& c : contacts) {
 		if (c.type == messages::collision_message::event_type::END_CONTACT) {
-			const auto& driver = cosmos[c.subject];
-			const auto& car = cosmos[c.collider].get_owner_of_colliders();
+			const auto& driver_entity = cosmos[c.subject];
+			const auto car_entity = cosmos[c.collider].get_owner_of_colliders();
 
-			const auto* const maybe_driver = driver.find<components::driver>();
-
-			if (maybe_driver) {
-				if (maybe_driver->owned_vehicle == car) {
-					release_car_ownership(driver);
-					driver.get<components::movement>().make_inert_for_ms = 500.f;
+			if (car_entity.alive()) {
+				if (const auto* const driver = driver_entity.find<components::driver>()) {
+					if (driver->owned_vehicle == car_entity) {
+						release_car_ownership(driver_entity);
+						driver_entity.get<components::movement>().make_inert_for_ms = 500.f;
+					}
 				}
 			}
 		}
