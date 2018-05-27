@@ -155,7 +155,7 @@ void illuminated_rendering(
 	const auto& light = in.audiovisuals.get<light_system>();
 	
 	const auto laser_glow = necessarys.at(assets::necessary_image_id::LASER_GLOW);
-	const auto laser_glow_edge = necessarys.at(assets::necessary_image_id::LASER_GLOW_EDGE);
+	const auto glow_edge_tex = necessarys.at(assets::necessary_image_id::LASER_GLOW_EDGE);
 
 	const auto cast_highlight = necessarys.at(assets::necessary_image_id::CAST_HIGHLIGHT);
 
@@ -175,14 +175,15 @@ void illuminated_rendering(
 							return;
 						}
 
-						const vec2 edge_size = static_cast<vec2>(laser_glow_edge.get_original_size());
+						const vec2 edge_size = static_cast<vec2>(glow_edge_tex.get_original_size());
 
 						output.line(laser_glow, from, to, edge_size.y / 3.f, col);
 
-						const auto edge_offset = (to - from).set_length(edge_size.x);
+						const auto edge_dir = (to - from).normalize();
+						const auto edge_offset = edge_dir * edge_size.x;
 
-						output.line(laser_glow_edge, to, to + edge_offset, edge_size.y / 3.f, col);
-						output.line(laser_glow_edge, from - edge_offset, from, edge_size.y / 3.f, col, flip_flags::make_horizontally());
+						output.line(glow_edge_tex, to, to + edge_offset, edge_size.y / 3.f, col);
+						output.line(glow_edge_tex, from - edge_offset + edge_dir, from + edge_dir, edge_size.y / 3.f, col, flip_flags::make_horizontally());
 					},
 					[](const vec2, const vec2) {},
 					interp,

@@ -72,7 +72,7 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 
 			if (subject_item.has<components::gun>()) {
 				const auto rifle_transform = subject_item.get_viewing_transform(in.interpolation);
-				const auto barrel_center = calc_muzzle_position(subject_item, rifle_transform);
+				const auto barrel_center = calc_barrel_center(subject_item, rifle_transform);
 				const auto muzzle = calc_muzzle_position(subject_item, rifle_transform);
 
 				const auto proj = crosshair_pos.get_projection_multiplier(barrel_center, muzzle);
