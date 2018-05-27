@@ -1,18 +1,20 @@
 #pragma once
 #include "augs/math/vec2.h"
+#include "augs/math/transform.h"
 
 struct torso_offets {
 	// GEN INTROSPECTOR struct torso_offets
-	vec2i primary_hand;
-	vec2i secondary_hand;
-	vec2i back;
-	vec2i head;
+	transformi primary_hand;
+	transformi secondary_hand;
+	transformi back;
+	transformi head;
 	// END GEN INTROSPECTOR
 };
 
 struct gun_offsets {
 	// GEN INTROSPECTOR struct gun_offsets
 	vec2i bullet_spawn;
+	transformi magazine;
 	// END GEN INTROSPECTOR
 };
 
@@ -26,6 +28,7 @@ struct item_offsets {
 	// GEN INTROSPECTOR struct item_offsets
 	vec2i hand_anchor;
 	vec2i back_anchor;
+	vec2i attachment_anchor;
 	// END GEN INTROSPECTOR
 };
 

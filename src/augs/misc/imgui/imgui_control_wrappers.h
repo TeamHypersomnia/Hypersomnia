@@ -12,6 +12,7 @@
 #include "augs/misc/minmax.h"
 
 #include "augs/math/vec2.h"
+#include "augs/math/transform.h"
 #include "augs/graphics/rgba.h"
 
 #include "augs/misc/imgui/imgui_controls.h"
@@ -135,6 +136,67 @@ namespace augs {
 			else {
 				static_assert(always_false_v<T>, "Unsupported type. Use a suitable wrapper.");
 			}
+		}
+
+		template <class T, class... Args>
+		decltype(auto) drag_transform(
+			const std::string& label_s,
+			basic_transform<T>& into,
+			const float speed = 1.f,
+			T v_min = static_cast<T>(0),
+			T v_max = static_cast<T>(0),
+			Args&&... args
+		) {
+			using namespace detail;
+			using namespace ImGui;
+
+			ImGuiDataType pos_data_type;
+
+			if constexpr(std::is_same_v<T, real32>) {
+				pos_data_type = ImGuiDataType_Float;
+			}
+			else if constexpr(std::is_same_v<T, int>) {
+				pos_data_type = ImGuiDataType_S32;
+			}
+			else {
+				static_assert(always_false_v<T>);
+			}
+
+			ImGuiContext& g = *GImGui;
+			bool value_changed = false;
+			BeginGroup();
+
+			const auto* label = label_s.c_str();
+			PushID(label);
+			PushMultiItemsWidths(3);
+
+			PushID(0);
+			value_changed |= DragScalar("##v", pos_data_type, &into.pos.x, speed, &v_min, &v_max, std::forward<Args>(args)...);
+			SameLine(0, g.Style.ItemInnerSpacing.x);
+			PopID();
+			PopItemWidth();
+
+			PushID(1);
+			value_changed |= DragScalar("##v", pos_data_type, &into.pos.y, speed, &v_min, &v_max, std::forward<Args>(args)...);
+			SameLine(0, g.Style.ItemInnerSpacing.x);
+			PopID();
+			PopItemWidth();
+
+			PushID(2);
+
+			const float dmin = -180.f;
+			const float dmax = 180.f;
+
+			value_changed |= DragScalar("##v", ImGuiDataType_Float, &into.rotation, speed, &dmin, &dmax, std::forward<Args>(args)...);
+			SameLine(0, g.Style.ItemInnerSpacing.x);
+			PopID();
+			PopItemWidth();
+
+			TextUnformatted(label, FindRenderedTextEnd(label));
+			PopID();
+			EndGroup();
+
+			return value_changed;
 		}
 
 		template <class T, class... Args>

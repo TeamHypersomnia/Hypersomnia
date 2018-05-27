@@ -69,5 +69,17 @@ namespace augs {
 				0.f
 			);
 		}
+
+		inline void draw_quad_local(const std::array<vec2, 4>& points, const rgba color) {
+			const auto cpos = vec2(ImGui::GetCursorScreenPos());
+
+			ImGui::GetWindowDrawList()->AddQuadFilled(
+				static_cast<ImVec2>(cpos + points[0]), 
+				static_cast<ImVec2>(cpos + points[1]), 
+				static_cast<ImVec2>(cpos + points[2]), 
+				static_cast<ImVec2>(cpos + points[3]), 
+				ImGui::GetColorU32(color)
+			);
+		}
 	}
 }

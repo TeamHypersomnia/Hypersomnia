@@ -58,7 +58,6 @@ std::optional<colliders_connection> physics_mixin<E>::calc_colliders_connection(
 				if (auto topmost_container_connection = 
 					cosmos[topmost_container->owner].calc_colliders_connection()
 				) {
-					// TODO: use attachment matrix
 #if MORE_LOGS
 					LOG("%x (item) owned by %x", self, cosmos[topmost_container_connection->owner]);
 #endif

@@ -58,7 +58,7 @@ struct image_offset_widget {
 	const images_in_atlas_map& game_atlas;
 
 	template <class T>
-	static constexpr bool handles = std::is_same_v<T, vec2i>;
+	static constexpr bool handles = is_one_of_v<T, vec2i, transformi>;
 
 	template <class T>
 	auto describe_changed(
@@ -72,18 +72,20 @@ struct image_offset_widget {
 	auto handle(const std::string& identity_label, T& object) const {
 		using namespace augs::imgui;
 
+		constexpr bool only_vec = std::is_same_v<T, vec2i>;
+
+		auto& current_pos = [&]() -> vec2i& {
+			if constexpr(only_vec) {
+				return object;
+			}
+			else {
+				return object.pos;
+			}
+		}();
+
 		std::optional<tweaker_type> result;
 
-		{
-			auto less_spacing = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-
-			auto iw = scoped_item_width(100);
-			result = detail_direct_edit(identity_label, object);
-
-			ImGui::SameLine();
-		}
-
-		auto iw = scoped_item_width(-1);
+		auto iw = scoped_item_width(80);
 
 		if (auto combo = scoped_combo((identity_label + "Picker").c_str(), "Pick...", ImGuiComboFlags_HeightLargest)) {
             auto& io = ImGui::GetIO();
@@ -99,6 +101,25 @@ struct image_offset_widget {
 
 			invisible_button_reset_cursor("###OffsetSelector", viewing_size);
 			game_image(entry.diffuse, viewing_size);
+
+			const auto cross_alpha = 200;
+			const auto ray_alpha = 120;
+
+			auto draw_ray = [is](const vec2i center, const int degrees, const rgba col) {
+				std::array<vec2, 4> points;
+				const auto w = 1.f / zoom;
+				points[0] = vec2(center.x, center.y - w);
+				points[1] = vec2(center.x + is.x, center.y - w);
+				points[2] = vec2(center.x + is.x, center.y + w);
+				points[3] = vec2(center.x, center.y + w);
+
+				for (auto& p : points) {
+					p.rotate(static_cast<float>(degrees), vec2(center));
+					p *= zoom;
+				}
+
+				draw_quad_local(points, col);
+			};
 
 			auto draw_cross = [is](const vec2i where, const rgba col) {
 				draw_rect_local(
@@ -118,8 +139,6 @@ struct image_offset_widget {
 				);
 			};
 
-			const auto cross_alpha = 200;
-
 			const bool reference_to_the_right = identity_label == "##bullet_spawn";
 
 			const auto reference_point = 
@@ -131,21 +150,67 @@ struct image_offset_widget {
 			const auto pos = ImGui::GetCursorScreenPos();
 
 			const auto image_space_new = vec2i(vec2(io.MousePos.x - pos.x, io.MousePos.y - pos.y) / zoom);
-			const auto image_space_old = reference_point + object;
+			const auto image_space_old = reference_point + current_pos;
 
 			const auto chosen_new_offset = image_space_new - reference_point;
 
 			draw_cross(image_space_old, rgba(red.rgb(), cross_alpha));
 
-			if (ImGui::IsItemClicked()) {
-				object = chosen_new_offset;
-				result = tweaker_type::DISCRETE;
+			if constexpr(!only_vec) {
+				draw_ray(image_space_old, object.rotation, rgba(white.rgb(), ray_alpha));
 			}
 
-			if (ImGui::IsItemHovered()) {
-				draw_cross(image_space_new, rgba(green.rgb(), cross_alpha));
+			const bool pos_mode = only_vec || !io.KeyShift;
 
-				text_tooltip("Chosen offset: %x\nImage space: %x", chosen_new_offset, image_space_new);
+			if (pos_mode) {
+				if (ImGui::IsItemClicked()) {
+					current_pos = chosen_new_offset;
+					result = tweaker_type::DISCRETE;
+				}
+
+				if (ImGui::IsItemHovered()) {
+					draw_cross(image_space_new, rgba(green.rgb(), cross_alpha));
+
+					text_tooltip("Chosen offset: %x\nImage space: %x", chosen_new_offset, image_space_new);
+				}
+			}
+			else {
+				if constexpr(!only_vec) {
+					const auto degrees_new = (image_space_new - image_space_old).degrees();
+
+					if (ImGui::IsItemClicked()) {
+						object.rotation = degrees_new;
+						result = tweaker_type::DISCRETE;
+					}
+
+					if (ImGui::IsItemHovered()) {
+						draw_cross(image_space_new, rgba(green.rgb(), ray_alpha));
+						draw_ray(image_space_old, degrees_new, rgba(green.rgb(), cross_alpha));
+
+						text_tooltip("Chosen rotation: %x", degrees_new);
+					}
+				}
+			}
+		}
+
+		if (result) {
+			return result;
+		}
+
+		{
+			ImGui::SameLine();
+
+			auto iw = scoped_item_width(-1);
+
+			if constexpr(only_vec) {
+				if (drag_vec2(identity_label, object)) {
+					result = tweaker_type::CONTINUOUS;
+				}
+			}
+			else {
+				if (drag_transform(identity_label, object)) {
+					result = tweaker_type::CONTINUOUS;
+				}
 			}
 		}
 

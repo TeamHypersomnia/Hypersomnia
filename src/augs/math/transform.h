@@ -8,19 +8,20 @@ template <class T>
 struct basic_transform {
 	using transform = basic_transform<T>;
 	using vec2 = basic_vec2<T>;
+	using R = real32;
 
 	static constexpr bool reinfer_when_tweaking = true;
 
 	// GEN INTROSPECTOR struct basic_transform class T
 	vec2 pos;
-	T rotation = static_cast<T>(0);
+	R rotation = static_cast<R>(0);
 	// END GEN INTROSPECTOR
 
 	basic_transform() = default;
 
 	basic_transform(
 		const vec2 pos,
-		const T rotation = static_cast<T>(0)
+		const R rotation = static_cast<R>(0)
 	) :
 		pos(pos),
 		rotation(rotation)
@@ -41,11 +42,11 @@ struct basic_transform {
 	}
 
 	transform to_si_space(const si_scaling si) const {
-		return{ si.get_meters(pos), rotation * DEG_TO_RAD<T> };
+		return{ si.get_meters(pos), rotation * DEG_TO_RAD<R> };
 	}
 
 	transform to_user_space(const si_scaling si) const {
-		return{ si.get_pixels(pos), rotation * RAD_TO_DEG<T> };
+		return{ si.get_pixels(pos), rotation * RAD_TO_DEG<R> };
 	}
 
 	transform operator-(const transform& b) const {
@@ -66,7 +67,7 @@ struct basic_transform {
 
 	auto interp(
 		const transform next,
-		const T alpha
+		const R alpha
 	) const {
 		return transform{
 			augs::interp(pos, next.pos, alpha),
@@ -74,10 +75,11 @@ struct basic_transform {
 		};
 	}
 
+	template <class A, class B>
 	auto interp_separate(
 		const transform next,
-		const T positional_alpha,
-		const T rotational_alpha
+		const A positional_alpha,
+		const B rotational_alpha
 	) const {
 		return transform{
 			augs::interp(pos, next.pos, positional_alpha),
@@ -85,9 +87,10 @@ struct basic_transform {
 		};
 	}
 
+	template <class E>
 	auto& snap_to(
 		const transform to,
-		const T epsilon
+		const E epsilon
 	) {
 		if ((pos - to.pos).length_sq() > epsilon) {
 			pos = to.pos;
@@ -100,10 +103,11 @@ struct basic_transform {
 		return *this;
 	}
 
+	template <class A, class B>
 	auto& snap_to(
 		const transform to,
-		const T positional_epsilon,
-		const T rotational_epsilon
+		const A positional_epsilon,
+		const B rotational_epsilon
 	) {
 		if ((pos - to.pos).length_sq() > positional_epsilon) {
 			pos = to.pos;
@@ -123,7 +127,7 @@ struct basic_transform {
 
 	void reset() {
 		pos.reset();
-		rotation = static_cast<T>(0);
+		rotation = static_cast<R>(0);
 	}
 
 	auto interpolation_direction(const transform& previous) const {
@@ -134,10 +138,11 @@ struct basic_transform {
 		return vec2::from_degrees(rotation);
 	}
 
+	template <class A = real32, class B = real32>
 	bool compare(
 		const transform& b,
-		const T positional_eps = AUGS_EPSILON<T>,
-		const T rotational_eps = AUGS_EPSILON<T>
+		const A positional_eps = AUGS_EPSILON<A>,
+		const B rotational_eps = AUGS_EPSILON<B>
 	) const {
 		return pos.compare_abs(b.pos, positional_eps) && std::abs(rotation - b.rotation) <= rotational_eps;
 	}
@@ -146,32 +151,32 @@ struct basic_transform {
 		return compare({});
 	}
 
-	auto& rotate(const T degrees, const vec2 origin) {
+	auto& rotate(const R degrees, const vec2 origin) {
 		pos.rotate(degrees, origin);
 		rotation += degrees;
 		return *this;
 	}
 
-	auto& rotate_radians(const T radians, const vec2 origin) {
+	auto& rotate_radians(const R radians, const vec2 origin) {
 		pos.rotate_radians(radians, origin);
 		rotation += radians;
 		return *this;
 	}
 
-	auto rotate_degrees_with_90_multiples(const T degrees, const vec2 origin) {
+	auto rotate_degrees_with_90_multiples(const R degrees, const vec2 origin) {
 		const auto delta = augs::rotate_degrees_with_90_multiples(pos, origin, degrees);
 		rotation += delta;
 		return delta;
 	}
 
-	auto rotate_radians_with_90_multiples(const T radians, const vec2 origin) {
+	auto rotate_radians_with_90_multiples(const R radians, const vec2 origin) {
 		const auto delta = augs::rotate_radians_with_90_multiples(pos, origin, radians);
 		rotation += delta;
 		return delta;
 	}
 };
 
-template<class T>
+template <class T>
 std::ostream& operator<<(std::ostream& out, const basic_transform<T>& x) {
 	return out << typesafe_sprintf("(%x;%x;%x*)", x.pos.x, x.pos.y, x.rotation);
 }
