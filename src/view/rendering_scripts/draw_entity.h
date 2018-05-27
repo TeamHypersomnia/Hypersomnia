@@ -79,30 +79,12 @@ FORCE_INLINE void specific_entity_drawer(
 			};
 
 			do_animation(
-				mapped_or_nullptr(logicals.legs_animations, ::calc_leg_anim(*maybe_torso, vel, face_degrees)),
+				mapped_or_nullptr(logicals.legs_animations, maybe_torso->calc_leg_anim(vel, face_degrees)),
 				degrees
 			);
 
-			const auto& bare_stance = maybe_torso->stances[item_holding_stance::BARE_LIKE];
-
-			const auto& chosen_stance = [&]() -> const stance_animations& {
-				const auto wielded = typed_handle.get_wielded_items();
-				const auto n = wielded.size();
-
-				if (n == 0) {
-					return bare_stance;
-				}
-
-				if (n == 2) {
-					return maybe_torso->akimbo;
-				}
-
-				const auto w = cosm[wielded[0]];
-				return maybe_torso->stances[w.template get<invariants::item>().holding_stance];
-			}();
-
 			do_animation(
-				mapped_or_nullptr(logicals.torso_animations, chosen_stance.carry),
+				mapped_or_nullptr(logicals.torso_animations, maybe_torso->calc_stance(cosm, typed_handle.get_wielded_items()).carry),
 				viewing_transform.rotation
 			);
 		}

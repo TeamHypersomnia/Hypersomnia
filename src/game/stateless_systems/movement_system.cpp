@@ -195,8 +195,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					sound_effect_start_input::at_entity(it.get_id())
 				);
 
-				const auto anim_id = ::calc_leg_anim(
-					it.template get<invariants::torso>(),
+				const auto anim_id = it.template get<invariants::torso>().calc_leg_anim(
 					current_velocity,
 					transform.rotation
 				);
