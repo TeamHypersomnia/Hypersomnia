@@ -2,8 +2,8 @@
 #include "augs/math/vec2.h"
 #include "augs/math/transform.h"
 
-struct torso_offets {
-	// GEN INTROSPECTOR struct torso_offets
+struct torso_offsets {
+	// GEN INTROSPECTOR struct torso_offsets
 	transformi primary_hand;
 	transformi secondary_hand;
 	transformi back;
@@ -14,7 +14,7 @@ struct torso_offets {
 struct gun_offsets {
 	// GEN INTROSPECTOR struct gun_offsets
 	vec2i bullet_spawn;
-	transformi magazine;
+	transformi detachable_magazine;
 	// END GEN INTROSPECTOR
 };
 
@@ -34,7 +34,7 @@ struct item_offsets {
 
 struct all_image_offsets {
 	// GEN INTROSPECTOR struct all_image_offsets
-	torso_offets torso;
+	torso_offsets torso;
 	legs_offsets legs;
 	gun_offsets gun;
 	item_offsets item;

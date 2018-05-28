@@ -23,7 +23,3 @@ enum class slot_function {
 	// END GEN INTROSPECTOR
 	COUNT
 };
-
-inline bool is_torso_function(const slot_function s) {
-	return s == slot_function::HAT || s == slot_function::SHOULDER || s == slot_function::TORSO_ARMOR || s == slot_function::PRIMARY_HAND || s == slot_function::SECONDARY_HAND;
-}

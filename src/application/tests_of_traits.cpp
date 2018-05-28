@@ -428,6 +428,22 @@ struct game_state_checks {
 				);
 
 				for_each_through_std_get(
+					assert_first_implies_second(),
+					[](auto constraint) {
+						using C = decltype(constraint);
+						using F = typename C::First;
+						using S = typename C::Second;
+
+						if constexpr(is_one_of_list_v<F, List>) {
+							static_assert(
+								is_one_of_list_v<S, List>,
+								"An entity type lacks a component/invariant to function properly."
+							);
+						}
+					}
+				);
+
+				for_each_through_std_get(
 					assert_never_together(),
 					[](auto constraint) {
 						using C = decltype(constraint);

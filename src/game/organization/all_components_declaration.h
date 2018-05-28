@@ -80,6 +80,10 @@ using assert_always_together = type_list<
 	type_pair<invariants::crosshair, components::crosshair>
 >;
 
+using assert_first_implies_second = type_list<
+	type_pair<invariants::item, invariants::sprite>
+>;
+
 using assert_never_together = type_list<
 	type_pair<components::rigid_body, components::transform>,
 	type_pair<components::wandering_pixels, components::transform>,

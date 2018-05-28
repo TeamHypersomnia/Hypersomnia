@@ -1,6 +1,7 @@
 #pragma once
 #include <optional>
 
+#include "game/assets/image_offsets.h"
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/container_templates.h"
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
@@ -11,12 +12,110 @@
 #include "game/detail/inventory/wielding_result.h"
 #include "augs/enums/callback_result.h"
 
+template <class A, class B>
+transformr direct_attachment_offset(
+	const A& container, 
+	const B& attachment,
+	const slot_function type
+) {
+	const auto& cosm = container.get_cosmos();
+
+	const auto& logicals = cosm.get_logical_assets();
+
+	const auto anchors = [&]() {
+		if (const auto* const sprite = attachment.template find<invariants::sprite>()) {
+			return logicals.get_offsets(sprite->image_id).item;
+		}
+
+		return item_offsets();
+	}();
+
+	auto get_offsets_by_torso = [&]() {
+		if (const auto* const torso = container.template find<invariants::torso>()) {
+			const auto& stance = torso->calc_stance(cosm, container.get_wielded_items());
+
+			if (const auto* const anim = mapped_or_nullptr(logicals.torso_animations, stance.carry)) {
+				return logicals.get_offsets(anim->frames[0].image_id).torso;
+			}
+		}
+
+		return torso_offsets();
+	};
+
+	auto get_offsets_by_gun = [&]() {
+		if (const auto* const sprite = container.template find<invariants::sprite>()) {
+			return logicals.get_offsets(sprite->image_id).gun;
+		}
+
+		return gun_offsets();
+	};
+
+	transformi attachment_offset;
+	vec2i anchor;
+
+	switch (type) {
+		case slot_function::PRIMARY_HAND: 
+		LOG("PRIM");
+		attachment_offset = get_offsets_by_torso().primary_hand;
+		anchor = anchors.hand_anchor;
+		break;
+
+		case slot_function::SECONDARY_HAND: 
+		LOG("SECO");
+		attachment_offset = get_offsets_by_torso().secondary_hand;
+		anchor = anchors.hand_anchor;
+		break;
+
+		case slot_function::SHOULDER: 
+		LOG("SHOULD");
+		attachment_offset = get_offsets_by_torso().back;
+		anchor = anchors.back_anchor;
+		break;
+
+		case slot_function::GUN_DETACHABLE_MAGAZINE: 
+		LOG("DETACH");
+		attachment_offset = get_offsets_by_gun().detachable_magazine;
+		anchor = anchors.attachment_anchor;
+		break;
+
+		case slot_function::GUN_MUZZLE: 
+		attachment_offset.pos = ::calc_muzzle_position(attachment, {});
+		attachment_offset.rotation = 0;
+		anchor = anchors.attachment_anchor;
+		break;
+
+		default:
+		attachment_offset = {};
+		anchor = {};
+		break;
+	}
+
+	LOG_NVPS(attachment_offset, anchor);
+
+	const auto rotation = attachment_offset.rotation;
+
+	const auto old_center = attachment_offset.pos;
+	const auto new_center = (old_center - anchor).rotate(rotation, old_center);
+
+	return { new_center, rotation };
+}
+
 template <class derived_handle_type>
 class inventory_mixin {
-	static void sum(colliders_connection& into, const colliders_connection from) {
-		into.owner = from.owner;
-		// TODO: Sum from a matrix
-		into.shape_offset += components::transform();
+	template <class A, class B>
+	void accumulate_offset(
+		colliders_connection& result, 
+		const A& item_entity, 
+		const B& slot
+	) const {
+		const auto container_entity = slot.get_container();
+		const auto direct_offset = direct_attachment_offset(container_entity, item_entity, slot.get_id().type);
+
+		result.owner = container_entity;
+
+		const auto new_offset = result.shape_offset * direct_offset;
+		LOG_NVPS(new_offset, result.shape_offset, direct_offset);
+		result.shape_offset = new_offset;
 	}
 
 public:
@@ -28,7 +127,7 @@ public:
 	static constexpr size_t hand_count = 2;
 	using hand_selections_array = std::array<entity_id, hand_count>;
 
-	void infer_changed_slot() const {
+	void infer_item_colliders_recursive() const {
 		const auto& self = *static_cast<const derived_handle_type*>(this);
 		ensure(self);
 
@@ -39,9 +138,16 @@ public:
 		});
 	}
 
+	void infer_change_of_current_slot() const {
+		/* Synonym */
+		infer_item_colliders_recursive();
+	}
+
 	std::optional<unsigned> find_space_occupied() const;	
 
 	generic_handle_type get_owning_transfer_capability() const;
+	generic_handle_type get_topmost_container() const;
+
 	bool owning_transfer_capability_alive_and_same_as_of(const entity_id) const;
 
 	std::optional<colliders_connection> calc_connection_to_topmost_container() const {
@@ -52,7 +158,8 @@ public:
 
 		colliders_connection result;
 
-		inventory_slot_id it = self.get_current_slot();
+		auto it = self.get_current_slot().get_id();
+		auto current_attachment = self.get_id();
 
 		while (const auto slot = cosmos[it]) {
 			if (slot->physical_behaviour == slot_physical_behaviour::DEACTIVATE_BODIES) {
@@ -65,10 +172,14 @@ public:
 				return std::nullopt;
 			}
 
-			ensure_eq(slot->physical_behaviour, slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY); 
+			/* 
+				At this point, 
+				behaviour must be slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY.
+			*/
 
-			sum(result, { it.container_entity, {} });
+			accumulate_offset(result, cosmos[current_attachment], slot);
 
+			current_attachment = it.container_entity;
 			it = slot.get_container().get_current_slot();
 		}
 		
@@ -89,7 +200,8 @@ public:
 
 		colliders_connection result;
 
-		inventory_slot_id it = self.get_current_slot();
+		auto it = self.get_current_slot().get_id();
+		auto current_attachment = self.get_id();
 
 		do {
 			const auto slot = cosmos[it];
@@ -104,9 +216,14 @@ public:
 				return std::nullopt;
 			}
 
-			ensure_eq(slot->physical_behaviour, slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY); 
+			/* 
+				At this point, 
+				behaviour must be slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY.
+			*/
 
-			sum(result, { it.container_entity, {} });
+			accumulate_offset(result, cosmos[current_attachment], slot);
+
+			current_attachment = it.container_entity;
 
 			it = slot.get_container().get_current_slot();
 		} while(it.container_entity != until);
@@ -304,13 +421,39 @@ typename inventory_mixin<E>::generic_handle_type inventory_mixin<E>::get_owning_
 		return self;
 	}
 
-	const auto maybe_item = self.template find<components::item>();
+	if (const auto item = self.template find<components::item>()) {
+		if (const auto slot = cosmos[item->get_current_slot()]) {
+			return slot.get_container().get_owning_transfer_capability();
+		}
+	}
 
-	if (!maybe_item || cosmos[maybe_item->get_current_slot()].dead()) {
+	return cosmos[entity_id()];
+}
+
+template <class E>
+typename inventory_mixin<E>::generic_handle_type inventory_mixin<E>::get_topmost_container() const {
+	const auto& self = *static_cast<const E*>(this);
+	auto& cosmos = self.get_cosmos();
+
+	if (self.dead()) {
 		return cosmos[entity_id()];
 	}
 
-	return cosmos[maybe_item->get_current_slot()].get_container().get_owning_transfer_capability();
+	if (self.template has<components::item_slot_transfers>()) {
+		return self;
+	}
+
+	if (const auto item = self.template find<components::item>()) {
+		if (const auto slot = cosmos[item->get_current_slot()]) {
+			return slot.get_container().get_topmost_container();
+		}
+	}
+
+	if (self.template has<invariants::container>()) {
+		return self;
+	}
+
+	return cosmos[entity_id()];
 }
 
 template <class E>

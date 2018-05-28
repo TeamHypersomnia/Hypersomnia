@@ -449,7 +449,14 @@ namespace prefabs {
 			perform_transfer(item_slot_transfer_request::standard(load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE]), step);
 
 			if (load_mag[slot_function::ITEM_DEPOSIT].has_items()) {
-				perform_transfer(item_slot_transfer_request::standard(load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1), step);
+				perform_transfer(
+					item_slot_transfer_request::standard(
+						load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], 
+						weapon[slot_function::GUN_CHAMBER], 
+						1
+					), 
+					step
+				);
 			}
 		}
 
@@ -465,6 +472,7 @@ namespace prefabs {
 		if (load_mag.alive()) {
 			perform_transfer(item_slot_transfer_request::standard(load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE]), step);
 
+			LOG("loadin kek");
 			if (load_mag[slot_function::ITEM_DEPOSIT].has_items()) {
 				perform_transfer(item_slot_transfer_request::standard(load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1), step);
 			}

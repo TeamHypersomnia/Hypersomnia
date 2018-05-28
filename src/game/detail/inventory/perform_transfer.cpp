@@ -50,6 +50,13 @@ perform_transfer_result perform_transfer(
 	const item_slot_transfer_request r, 
 	cosmos& cosmos
 ) {
+	const auto result = query_transfer_result(cosmos, r);
+
+	if (!is_successful(result.result)) {
+		LOG("Warning: an item-slot transfer was not successful.");
+		return {};
+	}
+
 	perform_transfer_result output;
 
 	auto deguidize = [&](const auto s) {
@@ -61,15 +68,8 @@ perform_transfer_result perform_transfer(
 	};
 
 	const auto transferred_item = cosmos[r.item];
+
 	auto& item = get_item_of(transferred_item);
-
-	const auto result = query_transfer_result(cosmos, r);
-
-	if (!is_successful(result.result)) {
-		LOG("Warning: an item-slot transfer was not successful.");
-		return output;
-	}
-
 	auto& items_of_slots = cosmos.get_solvable_inferred(inferred_access).relational.items_of_slots;
 
 	const auto previous_slot = cosmos[deguidize(item.current_slot)];
@@ -78,11 +78,24 @@ perform_transfer_result perform_transfer(
 	const auto previous_slot_container = previous_slot.get_container();
 	const auto target_slot_container = target_slot.get_container();
 
+	const auto previous_root = previous_slot_container.get_topmost_container();
+	const auto target_root = target_slot_container.get_topmost_container();
+
 	const bool is_pickup = result.result == item_transfer_result_type::SUCCESSFUL_PICKUP;
 	const bool target_slot_exists = result.result == item_transfer_result_type::SUCCESSFUL_TRANSFER || is_pickup;
 	const bool is_drop_request = result.result == item_transfer_result_type::SUCCESSFUL_DROP;
 
 	const auto initial_transform_of_transferred = transferred_item.get_logic_transform();
+
+	const auto previous_container_transform = 
+		previous_slot.alive() ?
+		previous_slot_container.get_logic_transform() 
+		: transformr()
+	;  
+
+	const bool whole_item_grabbed = 
+		item.charges == static_cast<int>(result.transferred_charges)
+	;
 
 	/*
 		if (result.result == item_transfer_result_type::UNMOUNT_BEFOREHAND) {
@@ -95,46 +108,48 @@ perform_transfer_result perform_transfer(
 			return;
 		}
 	*/
-	entity_id target_item_to_stack_with_id;
+	
+	if (previous_slot && whole_item_grabbed) {
+		/* The slot will no longer have this item. */
 
-	if (target_slot_exists) {
-		for (const auto potential_stack_target : target_slot.get_items_inside()) {
-			if (can_stack_entities(transferred_item, cosmos[potential_stack_target])) {
-				target_item_to_stack_with_id = potential_stack_target;
-			}
-		}
-	}
-
-	const bool whole_item_grabbed = item.charges == static_cast<int>(result.transferred_charges);
-
-	components::transform previous_container_transform;
-
-	if (previous_slot.alive()) {
-		previous_container_transform = previous_slot_container.get_logic_transform();
-
-		if (whole_item_grabbed) {
-			item.current_slot.unset();
-			items_of_slots.unset_parenthood(transferred_item, previous_slot);
-		}
+		item.current_slot.unset();
+		items_of_slots.unset_parenthood(transferred_item, previous_slot);
 
 		if (previous_slot.is_hand_slot()) {
 			unset_input_flags_of_orphaned_entity(transferred_item);
 		}
 	}
 
-	const auto target_item_to_stack_with = cosmos[target_item_to_stack_with_id];
+	if (target_slot_exists) {
+		/* Try to stack the item. */
 
-	if (target_item_to_stack_with.alive()) {
-		if (whole_item_grabbed) {
-			output.destructed.emplace(transferred_item);
+		entity_id stack_target_id;
+
+		for (const auto potential_stack_target : target_slot.get_items_inside()) {
+			if (can_stack_entities(transferred_item, cosmos[potential_stack_target])) {
+				stack_target_id = potential_stack_target;
+				break;
+			}
 		}
-		else {
-			item.charges -= result.transferred_charges;
+
+		if (const auto stack_target = cosmos[stack_target_id]) {
+			if (whole_item_grabbed) {
+				output.destructed.emplace(transferred_item);
+			}
+			else {
+				item.charges -= result.transferred_charges;
+			}
+
+			get_item_of(stack_target).charges += result.transferred_charges;
+			
+			/* 
+				Mere alteration of charge numbers between two items
+				does not warrant any further inference of state, nor messages posted.
+				It is a transparent operation. (perhaps not so when we'll get to mounting?)
+			*/
+
+			return output;
 		}
-
-		get_item_of(target_item_to_stack_with).charges += result.transferred_charges;
-
-		return output;
 	}
 
 	entity_id grabbed_item_part;
@@ -143,9 +158,11 @@ perform_transfer_result perform_transfer(
 		grabbed_item_part = transferred_item;
 	}
 	else {
-		grabbed_item_part = cosmic::clone_entity(transferred_item);
+		const auto cloned_stack = cosmic::clone_entity(transferred_item);
+		get_item_of(cloned_stack).charges = result.transferred_charges;
+
 		item.charges -= result.transferred_charges;
-		get_item_of(cosmos[grabbed_item_part]).charges = result.transferred_charges;
+		grabbed_item_part = cloned_stack;
 	}
 
 	const auto grabbed_item_part_handle = cosmos[grabbed_item_part];
@@ -166,15 +183,20 @@ perform_transfer_result perform_transfer(
 		items_of_slots.assign_parenthood(moved_item, target_slot);
 	}
 
-	grabbed_item_part_handle.infer_changed_slot();
+	/* 
+		Infer right from the root container,
+   		because some stances might have changed completely. 
+	*/
 
-	if (is_pickup) {
-		const auto target_capability = target_slot_container.get_owning_transfer_capability();
-
-		output.picked.emplace();
-		output.picked->subject = target_capability;
-		output.picked->item = grabbed_item_part_handle;
+	if (previous_root) {
+		previous_root.infer_item_colliders_recursive();
 	}
+
+	if (target_root) {
+		target_root.infer_item_colliders_recursive();
+	}
+
+	grabbed_item_part_handle.infer_change_of_current_slot();
 
 #if TODO_MOUNTING
 	auto& grabbed_item = get_item_of(grabbed_item_part_handle);
@@ -193,9 +215,17 @@ perform_transfer_result perform_transfer(
 	if (is_drop_request) {
 		ensure(previous_slot_container.alive());
 
+		/* 
+			Since a dropped item does not belong to any capability tree now,
+			it must be inferred separately from the other two recursive calls.
+		*/
+
 		const auto rigid_body = grabbed_item_part_handle.get<components::rigid_body>();
-		const auto capability_entity = previous_slot_container.get_owning_transfer_capability();
-		const auto& capability_def = capability_entity.get<invariants::item_slot_transfers>();
+
+		const auto capability_def = previous_root.find<invariants::item_slot_transfers>();
+
+		const auto disable_collision_for_ms = capability_def ? capability_def->disable_collision_on_drop_for_ms : 300;
+		const auto standard_drop_impulse = capability_def ? capability_def->standard_drop_impulse : impulse_mults();
 
 		// LOG_NVPS(rigid_body.get_velocity());
 		// ensure(rigid_body.get_velocity().is_epsilon());
@@ -204,10 +234,7 @@ perform_transfer_result perform_transfer(
 		rigid_body.set_angular_velocity(0.f);
 		rigid_body.set_transform(initial_transform_of_transferred);
 
-		const auto total_impulse = 
-			r.additional_drop_impulse + capability_def.standard_drop_impulse
-		;
-
+		const auto total_impulse = r.additional_drop_impulse + standard_drop_impulse;
 		const auto impulse = 
 			total_impulse.linear * vec2::from_degrees(previous_container_transform.rotation)
 		;
@@ -218,20 +245,28 @@ perform_transfer_result perform_transfer(
 		auto& special_physics = grabbed_item_part_handle.get_special_physics();
 
 		special_physics.dropped_or_created_cooldown.set(
-			capability_def.disable_collision_on_drop_for_ms,
+			disable_collision_for_ms,
 		   	cosmos.get_timestamp()
 		);
 
 		special_physics.during_cooldown_ignore_collision_with = previous_slot_container;
 
-		output.dropped.emplace();
-		auto& dropped = *output.dropped;
+		performed_drop_result dropped;
 
 		dropped.sound_input = cosmos.get_common_assets().item_throw_sound;
-
 		dropped.sound_start = sound_effect_start_input::orbit_absolute(
 			grabbed_item_part_handle, initial_transform_of_transferred
-		).set_listener(capability_entity);
+		).set_listener(previous_root);
+
+		output.dropped = std::move(dropped);
+	}
+
+	if (is_pickup) {
+		messages::item_picked_up_message message;
+		message.subject = target_root;
+		message.item = grabbed_item_part_handle;
+
+		output.picked = message;
 	}
 
 	return output;

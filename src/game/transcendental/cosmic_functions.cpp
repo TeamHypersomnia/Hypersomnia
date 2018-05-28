@@ -115,7 +115,7 @@ void entity_deleter(
 
 	/* After identity is destroyed, reinfer entities dependent on the identity */
 	for (const auto& d : dependent_items) {
-		cosmos[d].infer_changed_slot();
+		cosmos[d].infer_change_of_current_slot();
 	}
 }
 

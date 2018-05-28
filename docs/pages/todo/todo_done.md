@@ -815,3 +815,8 @@ we consider whole type overrides too complex architeciturally:
 	- Effect happens when:
 		- animation amount has just entered an edge frame
 		- the velocity is greater than some threshold 
+
+- Looks like old offsets are still dangling after performing transfer
+	- if for example bare is unset, but akimbo is set
+	- fixed by reinferring whole capability trees
+

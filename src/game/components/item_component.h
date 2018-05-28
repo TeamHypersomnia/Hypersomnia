@@ -21,20 +21,19 @@
 
 #include "game/detail/view_input/sound_effect_input.h"
 
+struct performed_drop_result {
+	sound_effect_input sound_input;
+	sound_effect_start_input sound_start;
+
+	components::transform sound_transform;
+	entity_id sound_subject;
+};
+
 struct perform_transfer_result {
 	std::optional<messages::queue_destruction> destructed;
 	std::vector<messages::interpolation_correction_request> interpolation_corrected;
 	std::optional<messages::item_picked_up_message> picked;
-
-	struct drop {
-		sound_effect_input sound_input;
-		sound_effect_start_input sound_start;
-
-		components::transform sound_transform;
-		entity_id sound_subject;
-	};
-
-	std::optional<drop> dropped;
+	std::optional<performed_drop_result> dropped;
 
 	void notify(logic_step) const;
 };
