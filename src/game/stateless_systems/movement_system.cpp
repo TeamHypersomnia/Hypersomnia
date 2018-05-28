@@ -154,7 +154,6 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				}
 
 				applied_force *= movement_force_mult;
-				applied_force *= rigid_body.get_mass();
 
 				rigid_body.apply_force(
 					applied_force, 

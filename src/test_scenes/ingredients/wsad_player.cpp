@@ -133,7 +133,7 @@ namespace test_flavours {
 			invariants::movement movement;
 
 			movement.input_acceleration_axes.set(1, 1);
-			movement.acceleration_length = 10000;
+			movement.acceleration_length = 4300;
 			movement.braking_damping = 12.5f;
 			movement.standard_linear_damping = 20.f;
 
