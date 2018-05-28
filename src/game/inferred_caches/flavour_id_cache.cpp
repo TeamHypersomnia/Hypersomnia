@@ -5,7 +5,7 @@
 
 void flavour_id_cache::infer_cache_for(const const_entity_handle h) {
 	const auto id = h.get_id();
-	get_entities_by_flavour_map(id)[h.get_flavour_id().raw].emplace(id.basic());
+	get_entities_by_flavour_map(id)[h.get_flavour_id().raw].emplace(id.raw);
 }
 
 void flavour_id_cache::destroy_cache_of(const const_entity_handle h) {
@@ -16,7 +16,7 @@ void flavour_id_cache::destroy_cache_of(const const_entity_handle h) {
 
 	auto& entities_with_this_flavour_id = entities_by_flavour[this_flavour_id];
 
-	erase_element(entities_with_this_flavour_id, id);
+	erase_element(entities_with_this_flavour_id, id.raw);
 
 	if (entities_with_this_flavour_id.empty()) {
 		erase_element(entities_by_flavour, this_flavour_id);

@@ -50,8 +50,8 @@ class cosmos_solvable {
 
 		const auto result = pool.allocate(new_guid, std::forward<Args>(args)...);
 
-		allocation_result<entity_id, decltype(result.object)> output {
-			entity_id(result.key, entity_type_id::of<E>()), result.object
+		allocation_result<typed_entity_id<E>, decltype(result.object)> output {
+			typed_entity_id<E>(result.key), result.object
 		};
 
 		return output;
@@ -62,8 +62,8 @@ class cosmos_solvable {
 		auto& pool = significant.get_pool<E>();
 		const auto result = pool.undo_free(std::forward<Args>(args)...);
 
-		allocation_result<entity_id, decltype(result.object)> output {
-			entity_id(result.key, entity_type_id::of<E>()), result.object
+		allocation_result<typed_entity_id<E>, decltype(result.object)> output {
+			typed_entity_id<E>(result.key), result.object
 		};
 
 		return output;
@@ -83,7 +83,7 @@ class cosmos_solvable {
 			return self.significant.entity_pools.visit(
 				id.type_id,
 				[&](auto& pool) -> decltype(auto) {	
-					return callback(static_cast<meta_ptr>(pool.find(id.basic())));
+					return callback(static_cast<meta_ptr>(pool.find(id.raw)));
 				}
 			);
 		}
@@ -227,12 +227,12 @@ public:
 
 	template <class E>
 	auto* dereference_entity(const typed_entity_id<E> id) {
-		return significant.get_pool<E>().find(id.basic());
+		return significant.get_pool<E>().find(id.raw);
 	}
 
 	template <class E>
 	const auto* dereference_entity(const typed_entity_id<E> id) const {
-		return significant.get_pool<E>().find(id.basic());
+		return significant.get_pool<E>().find(id.raw);
 	}
 
 	template <class F>
@@ -268,7 +268,7 @@ inline entity_id cosmos_solvable::to_versioned(const unversioned_entity_id id) c
 	return { 
 		significant.on_pool(
 			id.type_id, 
-			[id](const auto& p){ return p.to_versioned(id); }
+			[id](const auto& p){ return p.to_versioned(id.raw); }
 		), 
 		id.type_id 
 	};

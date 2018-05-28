@@ -29,9 +29,28 @@ void cosmic::destroy_caches_of(const entity_handle h) {
 }
 
 void cosmic::infer_all_entities(cosmos& cosm) {
-	for (const auto& ordered_pair : cosm.get_solvable().get_guid_to_id()) {
-		infer_caches_for(cosm[ordered_pair.second]);
-	}
+	/* 
+		Infer domain-wise.
+
+		In normal circumstances, when an entity depends on caches of another entity,
+		the inferrers see all caches constructed for that entity, never just some.
+
+		This works because a dependency of an entity is always fully constructed
+		when a dependent entity comes into existence.
+
+		Here however, we have no idea which entity depends on which,
+		so we solve these dependencies by inferring domain-wise.
+
+		The inferred systems are ordered in such a way that dependencies always go first.
+	*/
+
+	auto constructor = [&cosm](auto, auto& sys) {
+		for (const auto& ordered_pair : cosm.get_solvable().get_guid_to_id()) {
+			sys.infer_cache_for(cosm[ordered_pair.second]);
+		}
+	};
+
+	augs::introspect(constructor, cosm.get_solvable_inferred({}));
 }
 
 void cosmic::reserve_storage_for_entities(cosmos& cosm, const cosmic_pool_size_type s) {

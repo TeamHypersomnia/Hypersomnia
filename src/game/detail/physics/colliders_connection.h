@@ -5,7 +5,7 @@
 struct colliders_connection {
 	// GEN INTROSPECTOR struct colliders_connection
 	entity_id owner;
-	components::transform shape_offset;
+	transformr shape_offset;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const colliders_connection& b) const {

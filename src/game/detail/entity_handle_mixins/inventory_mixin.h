@@ -102,20 +102,28 @@ transformr direct_attachment_offset(
 
 template <class derived_handle_type>
 class inventory_mixin {
-	template <class A, class B>
-	void accumulate_offset(
+	template <class A, class Csm, class E, class C>
+	void detail_save_and_forward(
 		colliders_connection& result, 
-		const A& item_entity, 
-		const B& slot
+		const A& slot,
+		const Csm& cosm, 
+		E& current_attachment,
+		C& offsets,
+		inventory_slot_id& it
 	) const {
+		const auto item_entity = cosm[current_attachment];
 		const auto container_entity = slot.get_container();
-		const auto direct_offset = direct_attachment_offset(container_entity, item_entity, slot.get_id().type);
+
+		LOG_NVPS(container_entity, item_entity);
+
+		offsets.push_back(
+			direct_attachment_offset(container_entity, item_entity, it.type)
+		);
 
 		result.owner = container_entity;
 
-		const auto new_offset = result.shape_offset * direct_offset;
-		LOG_NVPS(new_offset, result.shape_offset, direct_offset);
-		result.shape_offset = new_offset;
+		current_attachment = container_entity.get_id();
+		it = container_entity.get_current_slot();
 	}
 
 public:
@@ -151,6 +159,9 @@ public:
 	bool owning_transfer_capability_alive_and_same_as_of(const entity_id) const;
 
 	std::optional<colliders_connection> calc_connection_to_topmost_container() const {
+		thread_local augs::constant_size_vector<transformr, 50> offsets;
+		offsets.clear();
+
 		const auto& self = *static_cast<const derived_handle_type*>(this);
 		ensure(self);
 
@@ -159,7 +170,7 @@ public:
 		colliders_connection result;
 
 		auto it = self.get_current_slot().get_id();
-		auto current_attachment = self.get_id();
+		entity_id current_attachment = self.get_id();
 
 		while (const auto slot = cosmos[it]) {
 			if (slot->physical_behaviour == slot_physical_behaviour::DEACTIVATE_BODIES) {
@@ -177,16 +188,24 @@ public:
 				behaviour must be slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY.
 			*/
 
-			accumulate_offset(result, cosmos[current_attachment], slot);
+			detail_save_and_forward(result, slot, cosmos, current_attachment, offsets, it);
+		}
 
-			current_attachment = it.container_entity;
-			it = slot.get_container().get_current_slot();
+		LOG_NVPS(offsets.size());
+
+		for (const auto& o : reverse(offsets)) {
+			LOG_NVPS(result.shape_offset, o);
+			result.shape_offset = result.shape_offset * o;
+			LOG_NVPS(result.shape_offset);
 		}
 		
 		return result;
 	}
 
 	std::optional<colliders_connection> calc_connection_until_container(const entity_id until) const {
+		thread_local augs::constant_size_vector<transformr, 50> offsets;
+		offsets.clear();
+
 		const auto& self = *static_cast<const derived_handle_type*>(this);
 
 		ensure(self);
@@ -201,7 +220,7 @@ public:
 		colliders_connection result;
 
 		auto it = self.get_current_slot().get_id();
-		auto current_attachment = self.get_id();
+		entity_id current_attachment = self.get_id();
 
 		do {
 			const auto slot = cosmos[it];
@@ -221,13 +240,13 @@ public:
 				behaviour must be slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY.
 			*/
 
-			accumulate_offset(result, cosmos[current_attachment], slot);
-
-			current_attachment = it.container_entity;
-
-			it = slot.get_container().get_current_slot();
+			detail_save_and_forward(result, slot, cosmos, current_attachment, offsets, it);
 		} while(it.container_entity != until);
 
+		for (const auto& o : reverse(offsets)) {
+			result.shape_offset = result.shape_offset * o;
+		}
+		
 		return result;
 	}
 

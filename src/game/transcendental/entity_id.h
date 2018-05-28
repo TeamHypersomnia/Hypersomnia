@@ -39,20 +39,24 @@ struct entity_guid {
 	}
 };
 
-struct unversioned_entity_id : unversioned_entity_id_base {
-	using base = unversioned_entity_id_base;
-	using introspect_base = base;
-
+struct unversioned_entity_id {
 	// GEN INTROSPECTOR struct unversioned_entity_id
+	unversioned_entity_id_base raw;
 	entity_type_id type_id;
 	// END GEN INTROSPECTOR
 
-	auto basic() const {
-		return *static_cast<const base*>(this);
-	}
+	unversioned_entity_id() = default;
+
+	unversioned_entity_id(
+		const unversioned_entity_id_base id,
+		const entity_type_id type_id
+	) : 
+		raw(id),
+		type_id(type_id)
+	{}
 
 	bool is_set() const {
-		return base::is_set() && type_id.is_set();
+		return raw.is_set() && type_id.is_set();
 	}
 
 	void unset() {
@@ -60,44 +64,29 @@ struct unversioned_entity_id : unversioned_entity_id_base {
 	}
 
 	bool operator==(const unversioned_entity_id b) const {
-		return type_id == b.type_id && basic() == b.basic();
+		return type_id == b.type_id && raw == b.raw;
 	}
 
 	bool operator!=(const unversioned_entity_id b) const {
 		return !operator==(b);
 	}
-
-	unversioned_entity_id() = default;
-
-	unversioned_entity_id(
-		const base id,
-		entity_type_id type_id
-	) : 
-		base(id),
-		type_id(type_id)
-	{}
-
-private:
-	using base::operator==;
-	using base::operator!=;
 };
 
 struct child_entity_id;
 
-struct entity_id : entity_id_base {
-	using base = entity_id_base;
-	using introspect_base = base;
-
+struct entity_id {
 	// GEN INTROSPECTOR struct entity_id
+	entity_id_base raw;
 	entity_type_id type_id;
 	// END GEN INTROSPECTOR
+
 	entity_id() = default;
 
 	entity_id(
-		const base id,
+		const entity_id_base id,
 		entity_type_id type_id
 	) : 
-		base(id),
+		raw(id),
 		type_id(type_id)
 	{}
 
@@ -105,12 +94,8 @@ struct entity_id : entity_id_base {
 		const child_entity_id& id
 	);
 
-	auto basic() const {
-		return *static_cast<const base*>(this);
-	}
-
 	bool operator==(const entity_id b) const {
-		return type_id == b.type_id && basic() == b.basic();
+		return type_id == b.type_id && raw == b.raw;
 	}
 
 	bool operator!=(const entity_id b) const {
@@ -122,45 +107,39 @@ struct entity_id : entity_id_base {
 	}
 
 	bool is_set() const {
-		return base::is_set() && type_id.is_set();
+		return raw.is_set() && type_id.is_set();
 	}
 
 	operator unversioned_entity_id() const {
-		return { basic(), type_id };
+		return { raw, type_id };
 	}
 
 	friend std::ostream& operator<<(std::ostream& out, const entity_id x);
-
-private:
-	using base::operator==;
-	using base::operator!=;
 }; 
 
 template <class E>
-struct typed_entity_id : entity_id_base {
-	using base = entity_id_base;
+struct typed_entity_id {
+	using raw_type = entity_id_base;
 
-	typed_entity_id(const entity_id_base b = {}) : entity_id_base(b) {}
+	// GEN INTROSPECTOR struct typed_entity_id class E
+	raw_type raw;
+	// END GEN INTROSPECTOR
 
-	auto basic() const {
-		return *static_cast<const base*>(this);
-	}
+	typed_entity_id() = default;
+	typed_entity_id(const entity_id b) = delete;
+	explicit typed_entity_id(const raw_type b) : raw(b) {}
 
 	operator entity_id() const {
-		return { *this, entity_type_id::of<E>() };
+		return { raw, entity_type_id::of<E>() };
 	}
 
 	bool operator==(const typed_entity_id<E> b) const {
-		return basic() == b.basic();
+		return raw == b.raw;
 	}
 
 	bool operator!=(const typed_entity_id<E> b) const {
 		return !operator==(b);
 	}
-
-private:
-	using base::operator==;
-	using base::operator!=;
 }; 
 
 struct child_entity_id : entity_id {
@@ -169,15 +148,11 @@ struct child_entity_id : entity_id {
 
 	child_entity_id(const entity_id id = entity_id()) : entity_id(id) {}
 	using base::operator unversioned_entity_id;
-
-	auto basic() const {
-		return *static_cast<const base*>(this);
-	}
 };
 
 inline entity_id::entity_id(
 	const child_entity_id& id
-) : entity_id(id.basic()) {}
+) : entity_id(static_cast<const entity_id&>(id)) {}
 
 namespace std {
 	template <>
@@ -190,21 +165,21 @@ namespace std {
 	template <>
 	struct hash<entity_id> {
 		std::size_t operator()(const entity_id v) const {
-			return augs::simple_two_hash(v.basic(), v.type_id);
+			return augs::simple_two_hash(v.raw, v.type_id);
 		}
 	};
 
 	template <class E>
 	struct hash<typed_entity_id<E>> {
 		std::size_t operator()(const typed_entity_id<E> v) const {
-			return hash<entity_id_base>()(v.basic());
+			return hash<entity_id_base>()(v.raw);
 		}
 	};
 
 	template <>
 	struct hash<unversioned_entity_id> {
 		std::size_t operator()(const unversioned_entity_id v) const {
-			return augs::simple_two_hash(v.basic(), v.type_id);
+			return augs::simple_two_hash(v.raw, v.type_id);
 		}
 	};
 }

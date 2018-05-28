@@ -103,7 +103,7 @@ unsigned cosmos_solvable::get_steps_per_second() const {
 std::optional<cosmic_pool_undo_free_input> cosmos_solvable::free_entity(const entity_id id) {
 	clear_guid(id);
 
-	return significant.on_pool(id.type_id, [id](auto& p){ return p.free(id); });
+	return significant.on_pool(id.type_id, [id](auto& p){ return p.free(id.raw); });
 }
 
 void cosmos_solvable::undo_last_allocate_entity(const entity_id id) {
@@ -114,7 +114,7 @@ void cosmos_solvable::undo_last_allocate_entity(const entity_id id) {
 
 	ensure_eq(next_entity_guid, erased_guid);
 
-	return significant.on_pool(id.type_id, [id](auto& p){ return p.undo_last_allocate(id); });
+	return significant.on_pool(id.type_id, [id](auto& p){ return p.undo_last_allocate(id.raw); });
 }
 
 entity_guid cosmos_solvable::clear_guid(const entity_id cleared) {

@@ -123,9 +123,7 @@ void move_entities_command::push_entry(const const_entity_handle handle) {
 		using E = entity_type_of<decltype(typed_handle)>;
 		using vector_type = make_data_vector<E>;
 
-		const auto id = typed_handle.get_id();
-
-		moved_entities.get<vector_type>().push_back({ typed_entity_id<E>(id.basic()) });
+		moved_entities.get<vector_type>().push_back({ typed_handle.get_id() });
 	});
 }
 

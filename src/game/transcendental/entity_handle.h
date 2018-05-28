@@ -125,23 +125,23 @@ public:
 	}
 
 	bool operator==(const this_handle_type& h) const {
-		return this->get_id() == h.get_id();
+		return raw_id == h.raw_id;
 	}
 
 	bool operator==(const basic_entity_handle<!is_const>& h) const {
-		return this->get_id() == h.get_id();
+		return raw_id == h.raw_id;
 	}
 
 	bool operator==(const entity_id id) const {
 		return raw_id == id;
 	}
 
-	bool operator==(const entity_guid id) const {
-		return this->get_guid() == id;
-	}
-
 	bool operator!=(const entity_id id) const {
 		return !operator==(id);
+	}
+
+	bool operator==(const entity_guid id) const {
+		return this->get_guid() == id;
 	}
 
 	operator entity_guid() const {
@@ -177,7 +177,7 @@ public:
 
 		const auto specific_ptr = reinterpret_cast<specific_ptr_type>(ptr);
 		ensure(specific_ptr != nullptr);
-		const auto stored_id = ref_stored_id_provider<handle_type>( *specific_ptr, typed_entity_id<E>(raw_id.basic()) );
+		const auto stored_id = ref_stored_id_provider<handle_type>( *specific_ptr, typed_entity_id<E>(raw_id.raw) );
 		return handle_type(owner, stored_id);
 	}
 

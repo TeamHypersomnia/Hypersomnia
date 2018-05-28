@@ -196,8 +196,6 @@ perform_transfer_result perform_transfer(
 		target_root.infer_item_colliders_recursive();
 	}
 
-	grabbed_item_part_handle.infer_change_of_current_slot();
-
 #if TODO_MOUNTING
 	auto& grabbed_item = get_item_of(grabbed_item_part_handle);
 
@@ -214,6 +212,8 @@ perform_transfer_result perform_transfer(
 
 	if (is_drop_request) {
 		ensure(previous_slot_container.alive());
+
+		grabbed_item_part_handle.infer_change_of_current_slot();
 
 		/* 
 			Since a dropped item does not belong to any capability tree now,

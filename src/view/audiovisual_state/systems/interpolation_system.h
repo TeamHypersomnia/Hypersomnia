@@ -22,12 +22,12 @@ public:
 	struct cache {
 		components::transform recorded_place_of_birth;
 		components::transform interpolated_transform;
-		decltype(entity_id::version) recorded_version = entity_id().version;
+		decltype(entity_id().raw.version) recorded_version = entity_id().raw.version;
 		float rotational_slowdown_multiplier = 1.f;
 		float positional_slowdown_multiplier = 1.f;
 
 		bool is_constructed() const {
-			return recorded_version != entity_id().version;
+			return recorded_version != entity_id().raw.version;
 		}
 	};
 

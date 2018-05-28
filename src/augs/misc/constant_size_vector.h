@@ -230,6 +230,22 @@ namespace augs {
 			return as_value_array().begin() + size();
 		}
 
+		auto rbegin() {
+			return as_value_array().rbegin() + (max_size() - size());
+		}
+
+		auto rend() {
+			return as_value_array().rend();
+		}
+
+		auto rbegin() const {
+			return as_value_array().rbegin() + (max_size() - size());
+		}
+
+		auto rend() const {
+			return as_value_array().rend();
+		}
+
 		std::size_t size() const {
 			return static_cast<std::size_t>(count);
 		}

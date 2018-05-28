@@ -65,7 +65,7 @@ public:
 		const auto& cosmos = handle.get_cosmos();
 
 		if (const auto connection = handle.find_colliders_connection();
-			connection && connection->owner != handle
+			connection && connection->owner != handle.get_id()
 		) {
 			if (auto body_transform = sys.find_interpolated(cosmos[connection->owner])) {
 				auto bt = *body_transform;

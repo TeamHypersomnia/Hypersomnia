@@ -71,7 +71,7 @@ void interpolation_system::set_updated_interpolated_transform(
 	
 	cache.recorded_place_of_birth = info.place_of_birth;
 	cache.interpolated_transform = updated_value;
-	cache.recorded_version = subject.get_id().version;
+	cache.recorded_version = subject.get_id().raw.version;
 }
 
 void interpolation_system::integrate_interpolated_transforms(
@@ -128,7 +128,7 @@ void interpolation_system::integrate_interpolated_transforms(
 			auto& recorded_ver = cache.recorded_version;
 
 			const auto pob = info.place_of_birth;
-			const auto ver = e.get_id().version;
+			const auto ver = e.get_id().raw.version;
 
 			if (const auto actual = e.find_logic_transform()) {
 				if (recorded_pob.compare(pob, 0.01f, 1.f) && recorded_ver == ver) {

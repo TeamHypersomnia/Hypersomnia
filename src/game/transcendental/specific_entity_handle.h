@@ -251,14 +251,13 @@ class specific_entity_handle :
 public:
 	using const_type = specific_entity_handle<true, entity_type, identifier_provider>;
 	using misc_base::get_flavour;
-	using used_identifier_provider::get_id;
 	using used_identifier_provider::get;
 	using used_identifier_provider::alive;
 	using used_identifier_provider::dead;
 	using used_identifier_provider::ensure_alive;
 	using used_identifier_provider::operator bool;
 	using used_entity_type = entity_type;
-
+	using typed_id_type = typed_entity_id<entity_type>;
 
 private:
 	owner_reference owner;
@@ -348,11 +347,19 @@ public:
 	}
 
 	bool operator==(const entity_id id) const {
-		return get_id() == id;
+		return operator entity_id() == id;
 	}
 
 	bool operator!=(const entity_id id) const {
-		return !operator==(id);
+		return operator entity_id() != id;
+	}
+
+	bool operator==(const typed_id_type id) const {
+		return operator typed_id_type() == id;
+	}
+
+	bool operator!=(const typed_id_type id) const {
+		return operator typed_id_type() != id;
 	}
 
 	/* Return a handle with a reference instead of a pointer */
@@ -366,16 +373,20 @@ public:
 		return entity_type_id::of<entity_type>();
 	}
 
+	operator typed_id_type() const {
+		return this->get_id();
+	}
+
 	operator entity_id() const {
-		return get_id();
+		return operator typed_id_type();
 	}
 
 	operator child_entity_id() const {
-		return get_id();
+		return operator entity_id();
 	}
 
 	operator unversioned_entity_id() const {
-		return entity_id(get_id()).operator unversioned_entity_id();
+		return operator entity_id().operator unversioned_entity_id();
 	}
 
 	template <class F>
@@ -418,7 +429,7 @@ public:
 		}
 
 		using void_entity_ptr = maybe_const_ptr_t<is_const, void>;
-		return { static_cast<void_entity_ptr>(find_subject()), owner, get_id() };
+		return { static_cast<void_entity_ptr>(find_subject()), owner, this->get_id() };
 	}
 };
 

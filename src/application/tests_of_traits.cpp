@@ -110,7 +110,6 @@ struct tests_of_traits {
 
 	static_assert(!augs::is_byte_stream_v<derivedintrotest>);
 
-	static_assert(has_introspect_base_v<entity_id>);
 	static_assert(has_introspect_base_v<child_entity_id>);
 
 	static_assert(!has_introspect_base_v<int>);
@@ -144,6 +143,14 @@ struct tests_of_traits {
 
 	static_assert(is_comparable_v<const int, int>);
 	static_assert(!is_comparable_v<typed_entity_id<controlled_character>, typed_entity_id<plain_missile>>);
+
+	static_assert(std::is_convertible_v<typed_entity_id<controlled_character>, entity_id>);
+	static_assert(!std::is_constructible_v<typed_entity_id<controlled_character>, entity_id>);
+	static_assert(!std::is_convertible_v<entity_id, typed_entity_id<controlled_character>>);
+
+	static_assert(std::is_convertible_v<typed_entity_flavour_id<controlled_character>, entity_flavour_id>);
+	static_assert(!std::is_constructible_v<typed_entity_flavour_id<controlled_character>, entity_flavour_id>);
+	static_assert(!std::is_convertible_v<entity_flavour_id, typed_entity_flavour_id<controlled_character>>);
 
 	static_assert(has_any_of_v<controlled_character, invariants::sprite, invariants::polygon>);
 	static_assert(!has_any_of_v<controlled_character, invariants::trace>);
