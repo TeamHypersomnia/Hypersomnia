@@ -823,3 +823,5 @@ we consider whole type overrides too complex architeciturally:
 - Don't inherit in entity_id, just store the base as "raw"
 	- Exactly as in flavours - this works well.
 
+- Fix magazine offsets
+

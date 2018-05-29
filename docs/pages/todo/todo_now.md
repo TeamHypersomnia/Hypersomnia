@@ -7,8 +7,6 @@ summary: Just a hidden scratchpad.
 
 ## Microplanned implementation order
 
-- Fix magazine offsets
-
 - rename the flavour on setting an image
 	- if it is detected that it is yet unnamed
 

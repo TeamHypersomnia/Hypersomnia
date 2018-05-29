@@ -16,7 +16,11 @@ void create_frames(
 	const test_scene_image_id last_frame,
 	const float frame_duration_ms
 ) {
-	for (auto i = int(first_frame); i <= int(last_frame); ++i) {
+	const auto first = int(first_frame);
+	const auto last = int(last_frame);
+	const auto dt = first <= last ? 1 : -1;
+
+	for (auto i = first; i != last; i += dt) {
 		typename decltype(anim.frames)::value_type frame;
 		frame.duration_milliseconds = frame_duration_ms;
 		frame.image_id = to_image_id(test_scene_image_id(i));
@@ -120,6 +124,29 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 			anim.flip_when_cycling = false;
 
 			alloc(test_id_type::RESISTANCE_CHARACTER_RIFLE, anim);
+		}
+
+		{
+			torso_animation anim;
+			auto& f = anim.frames;
+			f.resize(7);
+
+			f[0].image_id = to_image_id(test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_SHOOT_1);
+			f[1].image_id = to_image_id(test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_SHOOT_2);
+			f[2].image_id = to_image_id(test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_SHOOT_3);
+			f[3].image_id = to_image_id(test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_SHOOT_4);
+			f[4].image_id = to_image_id(test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_SHOOT_3);
+			f[5].image_id = to_image_id(test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_SHOOT_2);
+			f[6].image_id = to_image_id(test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_SHOOT_1);
+			f[0].duration_milliseconds = 20;
+			f[1].duration_milliseconds = 20;
+			f[2].duration_milliseconds = 20;
+			f[3].duration_milliseconds = 30;
+			f[4].duration_milliseconds = 35;
+			f[5].duration_milliseconds = 50;
+			f[6].duration_milliseconds = 60;
+
+			alloc(test_id_type::RESISTANCE_CHARACTER_RIFLE_SHOOT, anim);
 		}
 	}
 

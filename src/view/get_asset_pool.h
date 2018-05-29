@@ -2,6 +2,7 @@
 #include "augs/templates/identity_templates.h"
 #include "game/assets/ids/asset_ids.h"
 #include "game/assets/animation.h"
+#include "game/assets/animation_templates.h"
 #include "game/transcendental/cosmos_common_significant_access.h"
 
 template <class I, class T>

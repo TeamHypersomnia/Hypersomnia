@@ -18,24 +18,6 @@ struct movement_animation_state {
 	bool backward = false;
 	pad_bytes<2> pad;
 	// END GEN INTROSPECTOR
-
-	template <class T>
-	auto get_frame_and_flip(T& animation) const 
-		-> std::pair<const typename decltype(T::frames)::value_type&, bool> 
-	{
-		const auto frames_n = static_cast<unsigned>(animation.frames.size());
-
-		auto i = index;
-
-		if (animation.has_backward_frames && backward) {
-			i = frames_n - index - 1;
-		}
-
-		return { 
-			animation.frames[std::min(frames_n - 1, i)], 
-			animation.flip_when_cycling && flip
-		};
-	}
 };
 
 namespace components {

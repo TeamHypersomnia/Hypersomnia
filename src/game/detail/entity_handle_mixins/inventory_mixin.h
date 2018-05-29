@@ -55,25 +55,21 @@ transformr direct_attachment_offset(
 
 	switch (type) {
 		case slot_function::PRIMARY_HAND: 
-		LOG("PRIM");
 		attachment_offset = get_offsets_by_torso().primary_hand;
 		anchor = anchors.hand_anchor;
 		break;
 
 		case slot_function::SECONDARY_HAND: 
-		LOG("SECO");
 		attachment_offset = get_offsets_by_torso().secondary_hand;
 		anchor = anchors.hand_anchor;
 		break;
 
 		case slot_function::SHOULDER: 
-		LOG("SHOULD");
 		attachment_offset = get_offsets_by_torso().back;
 		anchor = anchors.back_anchor;
 		break;
 
 		case slot_function::GUN_DETACHABLE_MAGAZINE: 
-		LOG("DETACH");
 		attachment_offset = get_offsets_by_gun().detachable_magazine;
 		anchor = anchors.attachment_anchor;
 		break;
@@ -89,8 +85,6 @@ transformr direct_attachment_offset(
 		anchor = {};
 		break;
 	}
-
-	LOG_NVPS(attachment_offset, anchor);
 
 	const auto rotation = attachment_offset.rotation;
 
@@ -114,8 +108,6 @@ class inventory_mixin {
 		const auto item_entity = cosm[current_attachment];
 		const auto container_entity = slot.get_container();
 
-		LOG_NVPS(container_entity, item_entity);
-
 		offsets.push_back(
 			direct_attachment_offset(container_entity, item_entity, it.type)
 		);
@@ -125,6 +117,8 @@ class inventory_mixin {
 		current_attachment = container_entity.get_id();
 		it = container_entity.get_current_slot();
 	}
+
+	using offset_vector = std::vector<transformr>;
 
 public:
 	static constexpr bool is_const = is_handle_const_v<derived_handle_type>;
@@ -159,7 +153,7 @@ public:
 	bool owning_transfer_capability_alive_and_same_as_of(const entity_id) const;
 
 	std::optional<colliders_connection> calc_connection_to_topmost_container() const {
-		thread_local augs::constant_size_vector<transformr, 50> offsets;
+		thread_local offset_vector offsets;
 		offsets.clear();
 
 		const auto& self = *static_cast<const derived_handle_type*>(this);
@@ -191,19 +185,15 @@ public:
 			detail_save_and_forward(result, slot, cosmos, current_attachment, offsets, it);
 		}
 
-		LOG_NVPS(offsets.size());
-
 		for (const auto& o : reverse(offsets)) {
-			LOG_NVPS(result.shape_offset, o);
 			result.shape_offset = result.shape_offset * o;
-			LOG_NVPS(result.shape_offset);
 		}
 		
 		return result;
 	}
 
 	std::optional<colliders_connection> calc_connection_until_container(const entity_id until) const {
-		thread_local augs::constant_size_vector<transformr, 50> offsets;
+		thread_local offset_vector offsets;
 		offsets.clear();
 
 		const auto& self = *static_cast<const derived_handle_type*>(this);

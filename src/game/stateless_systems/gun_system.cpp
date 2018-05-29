@@ -42,7 +42,7 @@ void components::gun::set_cocking_handle_pulling(
 	is_cocking_handle_being_pulled = enabled;
 }
 
-void components::gun::load_next_round(
+static void load_next_round(
 	const entity_id subject,
 	const logic_step step
 ) {
@@ -317,7 +317,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				*/
 
 				if (gun_def.action_mode >= gun_action_type::SEMI_AUTOMATIC) {
-					components::gun::load_next_round(gun_entity, step);
+					::load_next_round(gun_entity, step);
 				}
 			}
 

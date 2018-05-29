@@ -41,11 +41,6 @@ namespace components {
 		recoil_player_instance recoil;
 		// END GEN INTROSPECTOR
 
-		static void load_next_round(
-			const entity_id subject,
-			const logic_step step
-		);
-
 		void set_cocking_handle_pulling(
 			const bool enabled,
 			const augs::stepped_timestamp now

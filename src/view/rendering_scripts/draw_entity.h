@@ -14,6 +14,7 @@
 #include "game/components/render_component.h"
 
 #include "game/detail/physics/physics_scripts.h"
+#include "game/detail/frame_calculation.h"
 
 #include "view/viewables/all_viewables_declarations.h"
 #include "view/viewables/images_in_atlas_map.h"
@@ -53,39 +54,70 @@ FORCE_INLINE void specific_entity_drawer(
 			const auto& cosm = typed_handle.get_cosmos();
 			const auto& logicals = cosm.get_logical_assets();
 
-			const auto vel = typed_handle.get_effective_velocity();
-			const auto degrees = vel.degrees();
+			const auto velocity = typed_handle.get_effective_velocity();
+
+			const auto legs_degrees = velocity.degrees();
 			const auto face_degrees = viewing_transform.rotation;
 
-			auto do_animation = [&](
-				const auto* const chosen_animation,
-				const auto rotation
+			auto render_frame = [&in, &render_visitor, &viewing_transform](
+				const auto& frame,
+				const real32 rotation
 			) {
-				if (chosen_animation != nullptr) {
-					const auto frame = movement->four_ways_animation.get_frame_and_flip(*chosen_animation);
+				invariants::sprite sprite;
+				sprite.set(frame.first.image_id, in.manager);
 
-					invariants::sprite sprite;
-					sprite.set(frame.first.image_id, in.manager);
+				using input_type = invariants::sprite::drawing_input;
 
-					using input_type = invariants::sprite::drawing_input;
+				auto input = input_type(in.drawer);
+				input.renderable_transform = viewing_transform;
+				input.renderable_transform.rotation = rotation;
 
-					auto input = input_type(in.drawer);
-					input.renderable_transform = viewing_transform;
-					input.renderable_transform.rotation = rotation;
+				input.flip.vertically = frame.second;
+				render_visitor(sprite, in.manager, input);
+			};
 
-					input.flip.vertically = frame.second;
-					render_visitor(sprite, in.manager, input);
+			auto do_movement_animation = [&](
+				const auto* const animation,
+				const real32 rotation
+			) {
+				if (animation != nullptr) {
+					render_frame(
+						::get_frame_and_flip(movement->four_ways_animation, *animation),
+						rotation
+					);
 				}
 			};
 
-			do_animation(
-				mapped_or_nullptr(logicals.legs_animations, maybe_torso->calc_leg_anim(vel, face_degrees)),
-				degrees
-			);
+			{
+				const auto leg_animation_id = maybe_torso->calc_leg_anim(velocity, face_degrees);
 
-			do_animation(
-				mapped_or_nullptr(logicals.torso_animations, maybe_torso->calc_stance(cosm, typed_handle.get_wielded_items()).carry),
-				viewing_transform.rotation
+				do_movement_animation(
+					mapped_or_nullptr(logicals.legs_animations, leg_animation_id),
+					legs_degrees
+				);
+			}
+
+			const auto wielded_items = typed_handle.get_wielded_items();
+			const auto& stance = maybe_torso->calc_stance(cosm, wielded_items);
+
+			if (const auto shoot_animation = mapped_or_nullptr(logicals.torso_animations, stance.shoot)) {
+				/* Determine whether we draw a carrying or a shooting animation */
+				if (wielded_items.size() > 0) {
+					if (const auto gun = cosm[wielded_items[0]].template find<components::gun>()) {
+						const auto now = cosm.get_timestamp();
+						const auto dt = cosm.get_fixed_delta();
+
+						if (const auto frame = ::get_frame(*gun, *shoot_animation, now, dt)) {
+							render_frame(augs::simple_pair(*frame, false), face_degrees);
+							return;
+						}
+					}
+				}
+			}
+
+			do_movement_animation(
+				mapped_or_nullptr(logicals.torso_animations, stance.carry),
+				face_degrees
 			);
 		}
 	}

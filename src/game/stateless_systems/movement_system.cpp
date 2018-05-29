@@ -16,6 +16,7 @@
 #include "game/stateless_systems/sentience_system.h"
 
 #include "game/detail/physics/physics_scripts.h"
+#include "game/detail/frame_calculation.h"
 
 using namespace augs;
 
@@ -200,7 +201,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				);
 
 				if (const auto anim = mapped_or_nullptr(cosmos.get_logical_assets().legs_animations, anim_id)) {
-					const auto frame = movement.four_ways_animation.get_frame_and_flip(*anim);
+					const auto frame = get_frame_and_flip(movement.four_ways_animation, *anim);
 
 					const auto& im_def = cosmos.get_logical_assets().get_offsets(frame.first.image_id);
 
