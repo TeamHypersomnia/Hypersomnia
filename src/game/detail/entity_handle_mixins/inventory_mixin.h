@@ -311,43 +311,60 @@ public:
 	template <class A, class G>
 	void for_each_attachment_recursive(
 		A attachment_callback,
-		G get_offsets_by_torso,
-		const transformr current_offset = {}
+		G get_offsets_by_torso
 	) const {
-		const auto this_container = *static_cast<const derived_handle_type*>(this);
-		auto& cosm = this_container.get_cosmos();
+		struct node {
+			inventory_slot_id parent;
+			entity_id child;
+			transformr offset;
+		};
 
-		if (const auto container = this_container.template find<invariants::container>()) {
-			for (const auto& s : container->slots) {
-				const auto type = s.first;
+		thread_local std::vector<node> container_stack;
+		container_stack.clear();
 
-				if (s.second.makes_physical_connection()) {
-					for (const auto& id : get_items_inside(this_container, type)) {
-						const auto handle = cosm[id];
+		const auto root_container = *static_cast<const derived_handle_type*>(this);
+		auto& cosm = root_container.get_cosmos();
 
-						handle.dispatch(
-							[&](const auto typed_handle) {
-								const auto direct_offset = direct_attachment_offset(
-									this_container,
-									typed_handle,
-									get_offsets_by_torso,
-									type
-								);
+		container_stack.push_back({ {}, root_container, transformr() });
 
-								const auto total_offset = current_offset * direct_offset;
+		while (!container_stack.empty()) {
+			const auto it = container_stack.back();
+			container_stack.pop_back();
 
-								attachment_callback(typed_handle, total_offset);
+			cosm[it.child].dispatch(
+				[&](const auto this_attachment) {
+					auto current_offset = it.offset;
 
-								typed_handle.for_each_attachment_recursive(
-									attachment_callback,
-									get_offsets_by_torso,
-									total_offset
-								);
-							}
+					if (it.parent.container_entity.is_set()) {
+						/* Don't do it for the root */
+						const auto direct_offset = direct_attachment_offset(
+							cosm[it.parent.container_entity],
+							this_attachment,
+							get_offsets_by_torso,
+							it.parent.type
 						);
+
+						current_offset *= direct_offset;
+						attachment_callback(this_attachment, current_offset);
+					}
+
+					const auto& this_container = this_attachment;
+
+					if (const auto container = this_container.template find<invariants::container>()) {
+						for (const auto& s : container->slots) {
+							const auto type = s.first;
+
+							if (s.second.makes_physical_connection()) {
+								const auto this_container_id = this_container.get_id();
+
+								for (const auto& id : get_items_inside(this_container, type)) {
+									container_stack.push_back({ { s.first, this_container_id }, id, current_offset });
+								}
+							}
+						}
 					}
 				}
-			}
+			);
 		}
 	}
 	template <class I>

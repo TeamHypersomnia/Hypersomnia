@@ -34,6 +34,12 @@ struct basic_transform {
 		};
 	}
 
+	transform& operator*=(const transform& offset) {
+		pos += vec2(offset.pos).rotate(rotation, vec2()); 
+		rotation += offset.rotation;
+		return *this;
+	}
+
 	transform operator+(const transform& b) const {
 		transform out;
 		out.pos = pos + b.pos;
