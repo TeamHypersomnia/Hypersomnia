@@ -40,7 +40,12 @@ transformr direct_attachment_offset(
 		break;
 
 		case slot_function::SECONDARY_HAND: 
-		attachment_offset = get_offsets_by_torso().secondary_hand;
+		if (container.get_if_any_item_in_hand_no(0).alive()) {
+			attachment_offset = get_offsets_by_torso().secondary_hand;
+		}
+		else {
+			attachment_offset = get_offsets_by_torso().primary_hand;
+		}
 		anchor = anchors.hand_anchor;
 		break;
 

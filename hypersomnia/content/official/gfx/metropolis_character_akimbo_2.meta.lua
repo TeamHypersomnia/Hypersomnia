@@ -50,9 +50,9 @@ return {
       back = {
         pos = {
           x = -22,
-          y = -3
+          y = -1
         },
-        rotation = 21
+        rotation = 0
       },
       head = {
         pos = {
@@ -63,15 +63,15 @@ return {
       },
       primary_hand = {
         pos = {
-          x = -1,
-          y = 18
+          x = 28,
+          y = 31
         },
-        rotation = -32
+        rotation = 0
       },
       secondary_hand = {
         pos = {
-          x = 0,
-          y = 0
+          x = 28,
+          y = -32
         },
         rotation = 0
       }

@@ -162,7 +162,11 @@ FORCE_INLINE void specific_entity_drawer(
 				render_frame(*stance_frame, face_degrees);
 
 				const auto stance_image_id = stance_frame->frame.image_id;
-				const auto offsets = logicals.get_offsets(stance_image_id).torso;
+				auto offsets = logicals.get_offsets(stance_image_id).torso;
+
+				if (stance_frame->flip) {
+					offsets.flip_vertically();
+				}
 
 				typed_handle.for_each_attachment_recursive(
 					[&](

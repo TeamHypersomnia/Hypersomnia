@@ -131,6 +131,11 @@ struct basic_transform {
 		return *this;
 	}
 
+	void flip_vertically() {
+		pos.y = -pos.y;
+		rotation = -rotation;
+	}
+
 	void reset() {
 		pos.reset();
 		rotation = static_cast<R>(0);

@@ -9,6 +9,15 @@ struct torso_offsets {
 	transformi back;
 	transformi head;
 	// END GEN INTROSPECTOR
+
+	void flip_vertically() {
+		primary_hand.flip_vertically();
+		secondary_hand.flip_vertically();
+		back.flip_vertically();
+		head.flip_vertically();
+
+		std::swap(primary_hand, secondary_hand);
+	}
 };
 
 struct gun_offsets {

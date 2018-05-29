@@ -52,7 +52,7 @@ return {
           x = -20,
           y = -4
         },
-        rotation = -75
+        rotation = 15
       },
       head = {
         pos = {
