@@ -18,14 +18,24 @@ void create_frames(
 ) {
 	const auto first = int(first_frame);
 	const auto last = int(last_frame);
-	const auto dt = first <= last ? 1 : -1;
 
-	for (auto i = first; i != last; i += dt) {
-		typename decltype(anim.frames)::value_type frame;
-		frame.duration_milliseconds = frame_duration_ms;
-		frame.image_id = to_image_id(test_scene_image_id(i));
+	if (first <= last) {
+		for (auto i = first; i <= last; ++i) {
+			typename decltype(anim.frames)::value_type frame;
+			frame.duration_milliseconds = frame_duration_ms;
+			frame.image_id = to_image_id(test_scene_image_id(i));
 
-		anim.frames.push_back(frame);
+			anim.frames.push_back(frame);
+		}
+	}
+	else {
+		for (auto i = last; i >= first; --i) {
+			typename decltype(anim.frames)::value_type frame;
+			frame.duration_milliseconds = frame_duration_ms;
+			frame.image_id = to_image_id(test_scene_image_id(i));
+
+			anim.frames.push_back(frame);
+		}
 	}
 }
 

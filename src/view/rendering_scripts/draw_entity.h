@@ -45,7 +45,7 @@ FORCE_INLINE void specific_entity_drawer(
 	if (typed_handle.template has<invariants::item>()) {
 		if (typed_handle.get_owning_transfer_capability().alive()) {
 			/* Will be drawn when the capability itself is drawn. */
-			//return;
+			return;
 		}
 	}
 
@@ -64,7 +64,7 @@ FORCE_INLINE void specific_entity_drawer(
 				const real32 rotation
 			) {
 				invariants::sprite sprite;
-				sprite.set(frame.first.image_id, in.manager);
+				sprite.set(frame.frame.image_id, in.manager);
 
 				using input_type = invariants::sprite::drawing_input;
 
@@ -72,23 +72,23 @@ FORCE_INLINE void specific_entity_drawer(
 				input.renderable_transform = viewing_transform;
 				input.renderable_transform.rotation = rotation;
 
-				input.flip.vertically = frame.second;
+				input.flip.vertically = frame.flip;
 				render_visitor(sprite, in.manager, input);
 			};
 
-			auto do_movement_animation = [&](
-				const auto* const animation,
-				const real32 rotation
-			) {
-				if (animation != nullptr) {
-					render_frame(
-						::get_frame_and_flip(movement->four_ways_animation, *animation),
-						rotation
-					);
-				}
-			};
-
 			{
+				auto do_movement_animation = [&](
+					const auto* const animation,
+					const real32 rotation
+				) {
+					if (animation != nullptr) {
+						render_frame(
+							::get_frame_and_flip(movement->four_ways_animation, *animation),
+							rotation
+						);
+					}
+				};
+
 				const auto leg_animation_id = maybe_torso->calc_leg_anim(velocity, face_degrees);
 
 				do_movement_animation(
@@ -100,25 +100,14 @@ FORCE_INLINE void specific_entity_drawer(
 			const auto wielded_items = typed_handle.get_wielded_items();
 			const auto& stance = maybe_torso->calc_stance(cosm, wielded_items);
 
-			if (const auto shoot_animation = mapped_or_nullptr(logicals.torso_animations, stance.shoot)) {
-				/* Determine whether we draw a carrying or a shooting animation */
-				if (wielded_items.size() > 0) {
-					if (const auto gun = cosm[wielded_items[0]].template find<components::gun>()) {
-						const auto now = cosm.get_timestamp();
-						const auto dt = cosm.get_fixed_delta();
-
-						if (const auto frame = ::get_frame(*gun, *shoot_animation, now, dt)) {
-							render_frame(augs::simple_pair(*frame, false), face_degrees);
-							return;
-						}
-					}
-				}
+			if (const auto stance_frame = calc_stance_frame(
+				cosm,
+				stance, 
+				movement->four_ways_animation,
+				wielded_items
+			)) {
+				render_frame(*stance_frame, face_degrees);
 			}
-
-			do_movement_animation(
-				mapped_or_nullptr(logicals.torso_animations, stance.carry),
-				face_degrees
-			);
 		}
 	}
 	else if (const auto maybe_sprite = typed_handle.template find<invariants::sprite>()) {

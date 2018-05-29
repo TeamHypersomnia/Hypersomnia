@@ -201,14 +201,14 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				);
 
 				if (const auto anim = mapped_or_nullptr(cosmos.get_logical_assets().legs_animations, anim_id)) {
-					const auto frame = get_frame_and_flip(movement.four_ways_animation, *anim);
+					const auto frame = ::get_frame_and_flip(movement.four_ways_animation, *anim);
 
-					const auto& im_def = cosmos.get_logical_assets().get_offsets(frame.first.image_id);
+					const auto& im_def = cosmos.get_logical_assets().get_offsets(frame.frame.image_id);
 
 					{
 						auto offset = im_def.legs.foot;
 
-						if (frame.second) {
+						if (frame.flip) {
 							offset.y *= -1;
 						}
 
