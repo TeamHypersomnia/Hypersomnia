@@ -63,17 +63,17 @@ return {
       },
       primary_hand = {
         pos = {
-          x = 2,
-          y = 17
+          x = 3,
+          y = 15
         },
-        rotation = -45
+        rotation = -38
       },
       secondary_hand = {
         pos = {
-          x = 2,
-          y = 17
+          x = 3,
+          y = 15
         },
-        rotation = -45
+        rotation = -38
       }
     }
   },

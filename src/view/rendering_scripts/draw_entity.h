@@ -30,8 +30,61 @@ struct draw_renderable_input {
 
 using entities_with_renderables = entity_types_with_any_of<
 	invariants::sprite,
+	invariants::torso,
+	invariants::gun,
    	invariants::polygon
 >;
+
+template <class E, class T>
+FORCE_INLINE void detail_specific_entity_drawer(
+	const cref_typed_entity_handle<E> typed_handle,
+	const draw_renderable_input in,
+	T render_visitor,
+	transformr viewing_transform
+) {
+	if (const auto maybe_sprite = typed_handle.template find<invariants::sprite>()) {
+		const auto& sprite = *maybe_sprite;
+		using input_type = invariants::sprite::drawing_input;
+
+		auto input = input_type(in.drawer);
+
+		if (const auto flips = typed_handle.calculate_flip_flags()) { 
+			input.flip = *flips;
+		}
+
+		input.renderable_transform = viewing_transform;
+		input.global_time_seconds = in.global_time_seconds;
+
+		if (const auto trace = typed_handle.template find<components::trace>()) {
+			const auto tracified_size = vec2(sprite.size) * trace->last_size_mult;
+
+			if (const auto center_offset = tracified_size * trace->last_center_offset_mult;
+				center_offset.non_zero()
+			) {
+				const auto final_rotation = input.renderable_transform.rotation;
+				input.renderable_transform.pos -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
+			}
+
+			auto tracified_sprite = sprite;
+			tracified_sprite.size = tracified_size;
+
+			render_visitor(tracified_sprite, in.manager, input);
+		}
+		else {
+			render_visitor(sprite, in.manager, input);
+		}
+	}
+	else if (const auto polygon = typed_handle.template find<invariants::polygon>()) {
+		using input_type = invariants::polygon::drawing_input;
+
+		auto input = input_type(in.drawer);
+
+		input.renderable_transform = viewing_transform;
+		input.global_time_seconds = in.global_time_seconds;
+
+		render_visitor(*polygon, in.manager, input);
+	}
+}
 
 template <class E, class T>
 FORCE_INLINE void specific_entity_drawer(
@@ -107,51 +160,42 @@ FORCE_INLINE void specific_entity_drawer(
 				wielded_items
 			)) {
 				render_frame(*stance_frame, face_degrees);
+
+				const auto stance_image_id = stance_frame->frame.image_id;
+				const auto offsets = logicals.get_offsets(stance_image_id).torso;
+
+				typed_handle.for_each_attachment_recursive(
+					[&](
+						const auto attachment_entity,
+						const auto attachment_offset
+					) {
+						attachment_entity.dispatch(
+							[&](const auto typed_attachment_handle) {
+								detail_specific_entity_drawer(
+									typed_attachment_handle,
+									in,
+									render_visitor,
+									viewing_transform * attachment_offset
+								);
+							}
+						);
+					},
+					[offsets]() {
+						return offsets;
+					}
+				);
 			}
 		}
+
+		return;
 	}
-	else if (const auto maybe_sprite = typed_handle.template find<invariants::sprite>()) {
-		const auto& sprite = *maybe_sprite;
-		using input_type = invariants::sprite::drawing_input;
 
-		auto input = input_type(in.drawer);
-
-		if (const auto flips = typed_handle.calculate_flip_flags()) { 
-			input.flip = *flips;
-		}
-
-		input.renderable_transform = viewing_transform;
-		input.global_time_seconds = in.global_time_seconds;
-
-		if (const auto trace = typed_handle.template find<components::trace>()) {
-			const auto tracified_size = vec2(sprite.size) * trace->last_size_mult;
-
-			if (const auto center_offset = tracified_size * trace->last_center_offset_mult;
-				center_offset.non_zero()
-			) {
-				const auto final_rotation = input.renderable_transform.rotation;
-				input.renderable_transform.pos -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
-			}
-
-			auto tracified_sprite = sprite;
-			tracified_sprite.size = tracified_size;
-
-			render_visitor(tracified_sprite, in.manager, input);
-		}
-		else {
-			render_visitor(sprite, in.manager, input);
-		}
-	}
-	else if (const auto polygon = typed_handle.template find<invariants::polygon>()) {
-		using input_type = invariants::polygon::drawing_input;
-
-		auto input = input_type(in.drawer);
-
-		input.renderable_transform = viewing_transform;
-		input.global_time_seconds = in.global_time_seconds;
-
-		render_visitor(*polygon, in.manager, input);
-	}
+	detail_specific_entity_drawer(
+		typed_handle,
+		in,
+		render_visitor,
+		viewing_transform
+	);
 }
 
 template <class E>

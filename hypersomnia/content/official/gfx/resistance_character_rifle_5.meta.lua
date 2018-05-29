@@ -1,21 +1,14 @@
 return {
   extra_loadables = {
-    enabled_generate_neon_map = {
+    disabled_generate_neon_map = {
       alpha_multiplier = 1,
-      amplification = 60,
-      light_colors = {
-        "0 255 255 255",
-        "255 0 0 255",
-        "255 0 255 255",
-        "0 255 174 255",
-        "255 0 228 255",
-        "0 198 255 255"
-      },
+      amplification = 0,
+      light_colors = {},
       radius = {
-        x = 80,
-        y = 80
+        x = 0,
+        y = 0
       },
-      standard_deviation = 6
+      standard_deviation = 0
     },
     generate_desaturation = false
   },
@@ -27,10 +20,10 @@ return {
       },
       detachable_magazine = {
         pos = {
-          x = 10,
-          y = -5
+          x = 0,
+          y = 0
         },
-        rotation = 90
+        rotation = 0
       }
     },
     item = {
@@ -43,8 +36,8 @@ return {
         y = 0
       },
       hand_anchor = {
-        x = -27,
-        y = -1
+        x = 0,
+        y = 0
       }
     },
     legs = {
@@ -56,10 +49,10 @@ return {
     torso = {
       back = {
         pos = {
-          x = 0,
-          y = 0
+          x = -19,
+          y = -4
         },
-        rotation = 0
+        rotation = -79
       },
       head = {
         pos = {
@@ -70,17 +63,17 @@ return {
       },
       primary_hand = {
         pos = {
-          x = 0,
-          y = 0
+          x = 6,
+          y = 15
         },
-        rotation = 0
+        rotation = -45
       },
       secondary_hand = {
         pos = {
-          x = 0,
-          y = 0
+          x = 3,
+          y = 15
         },
-        rotation = 0
+        rotation = -38
       }
     }
   },

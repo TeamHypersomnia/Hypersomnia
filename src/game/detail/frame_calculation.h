@@ -41,7 +41,7 @@ frame_and_flip<T> get_frame_and_flip(
 }
 
 template <class C, class T>
-inline auto calc_stance_frame(
+auto calc_stance_frame(
 	const C& cosm,
 	const stance_animations& stance,
 	const movement_animation_state& movement, 

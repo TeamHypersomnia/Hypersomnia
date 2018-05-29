@@ -432,7 +432,7 @@ namespace test_flavours {
 
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("3.0");
-			item.holding_stance = item_holding_stance::PISTOL_LIKE;
+			item.holding_stance = item_holding_stance::RIFLE_LIKE;
 			meta.set(item);
 		}
 	}

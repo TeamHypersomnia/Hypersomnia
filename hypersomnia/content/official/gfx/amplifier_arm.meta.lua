@@ -43,8 +43,8 @@ return {
         y = 0
       },
       hand_anchor = {
-        x = -19,
-        y = 0
+        x = -15,
+        y = 2
       }
     },
     legs = {

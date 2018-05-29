@@ -259,12 +259,12 @@ private:
 		S slot_callback, 
 		I item_callback
 	) const {
-		const auto this_item_handle = *static_cast<const derived_handle_type*>(this);
-		auto& cosm = this_item_handle.get_cosmos();
+		const auto this_container = *static_cast<const derived_handle_type*>(this);
+		auto& cosm = this_container.get_cosmos();
 
-		if (const auto container = this_item_handle.template find<invariants::container>()) {
+		if (const auto container = this_container.template find<invariants::container>()) {
 			for (const auto& s : container->slots) {
-				const auto this_slot_id = inventory_slot_id(s.first, this_item_handle.get_id());
+				const auto this_slot_id = inventory_slot_id(s.first, this_container.get_id());
 				const auto slot_callback_result = slot_callback(cosm[this_slot_id]);
 
 				if (slot_callback_result == recursive_callback_result::ABORT) {
@@ -274,7 +274,7 @@ private:
 					continue;
 				}
 				else if (slot_callback_result == recursive_callback_result::CONTINUE_AND_RECURSE) {
-					for (const auto& id : get_items_inside(this_item_handle, s.first)) {
+					for (const auto& id : get_items_inside(this_container, s.first)) {
 						const auto child_item_handle = cosm[id];
 						const auto item_callback_result = item_callback(child_item_handle);
 
@@ -308,6 +308,48 @@ private:
 
 public:
 
+	template <class A, class G>
+	void for_each_attachment_recursive(
+		A attachment_callback,
+		G get_offsets_by_torso,
+		const transformr current_offset = {}
+	) const {
+		const auto this_container = *static_cast<const derived_handle_type*>(this);
+		auto& cosm = this_container.get_cosmos();
+
+		if (const auto container = this_container.template find<invariants::container>()) {
+			for (const auto& s : container->slots) {
+				const auto type = s.first;
+
+				if (s.second.makes_physical_connection()) {
+					for (const auto& id : get_items_inside(this_container, type)) {
+						const auto handle = cosm[id];
+
+						handle.dispatch(
+							[&](const auto typed_handle) {
+								const auto direct_offset = direct_attachment_offset(
+									this_container,
+									typed_handle,
+									get_offsets_by_torso,
+									type
+								);
+
+								const auto total_offset = current_offset * direct_offset;
+
+								attachment_callback(typed_handle, total_offset);
+
+								typed_handle.for_each_attachment_recursive(
+									attachment_callback,
+									get_offsets_by_torso,
+									total_offset
+								);
+							}
+						);
+					}
+				}
+			}
+		}
+	}
 	template <class I>
 	void for_each_contained_item_recursive(I&& item_callback) const {
 		for_each_contained_slot_and_item_recursive(
