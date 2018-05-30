@@ -9,7 +9,10 @@ namespace augs {
 	template <class B>
 	class basic_ref_memory_stream;
 
-	class memory_stream;
+	template <class B>
+	class basic_memory_stream;
+
+	using memory_stream = basic_memory_stream<std::vector<std::byte>>;
 
 	using ref_memory_stream = basic_ref_memory_stream<std::vector<std::byte>>;
 	using cref_memory_stream = basic_ref_memory_stream<const std::vector<std::byte>>;

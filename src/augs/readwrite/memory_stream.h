@@ -46,8 +46,6 @@ namespace augs {
 		}
 	};
 
-	class memory_stream;
-
 	class byte_counter_stream : public stream_position {
 	public:
 		memory_stream create_reserved_stream();
@@ -158,30 +156,56 @@ namespace augs {
 		}
 	};
 
-	class memory_stream : public memory_stream_mixin<memory_stream> {
+	template <class B>
+	class basic_memory_stream : public memory_stream_mixin<basic_memory_stream<B>> {
 		using base = memory_stream_mixin<memory_stream>;
 		friend base;
 
-		std::vector<std::byte> buffer;
+		B buffer;
 
 	public:
-		memory_stream() = default;
+		using base::set_write_pos;
+		using base::get_write_pos;
+		using base::set_read_pos;
+		using base::get_read_pos;
 
-		operator std::vector<std::byte>&&() && {
+		basic_memory_stream() = default;
+
+		operator B&&() && {
 			resize_no_init(buffer, get_write_pos());
 			return std::move(buffer);
 		}
 
-		memory_stream(memory_stream&&) = default;
-		memory_stream(const memory_stream&) = default;
+		basic_memory_stream(basic_memory_stream&&) = default;
+		basic_memory_stream(const basic_memory_stream&) = default;
 
-		memory_stream& operator=(const memory_stream&) = default;
-		memory_stream& operator=(memory_stream&&) = default;
+		basic_memory_stream& operator=(const basic_memory_stream&) = default;
+		basic_memory_stream& operator=(basic_memory_stream&&) = default;
 
-		memory_stream(const std::vector<std::byte>& new_buffer);
-		memory_stream(std::vector<std::byte>&& new_buffer);
-		memory_stream& operator=(const std::vector<std::byte>& new_buffer);
-		memory_stream& operator=(std::vector<std::byte>&& new_buffer);
+		basic_memory_stream(const B& new_buffer)
+			: buffer(new_buffer)
+		{
+			set_write_pos(buffer.size());
+		}
+
+		basic_memory_stream(B&& new_buffer)
+			: buffer(std::move(new_buffer))
+		{
+			set_write_pos(buffer.size());
+		}
+
+		basic_memory_stream& operator=(const B& new_buffer) {
+			buffer = new_buffer;
+			set_write_pos(buffer.size());
+			set_read_pos(0);
+			return *this;
+		}
+		basic_memory_stream& operator=(B&& new_buffer) {
+			buffer = std::move(new_buffer);
+			set_write_pos(buffer.size());
+			set_read_pos(0);
+			return *this;
+		}
 	};
 
 	template <class B>
