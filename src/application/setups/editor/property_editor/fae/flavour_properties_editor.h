@@ -24,7 +24,7 @@ decltype(auto) get_name_of(const entity_flavour<T>& flavour) {
 template <class C, class T, class N>
 void describe_if_rename(C& cmd, std::string& old, const field_address field, const T& invariant, const N& new_content) {
 	if constexpr(std::is_same_v<T, invariants::text_details> && std::is_same_v<N, std::string>) {
-		if (field == make_field_address(&invariants::text_details::name)) {
+		if (field == MACRO_MAKE_FIELD_ADDRESS(invariants::text_details, name)) {
 			if (old.empty()) {
 				old = "Renamed " + invariant.name;
 			}

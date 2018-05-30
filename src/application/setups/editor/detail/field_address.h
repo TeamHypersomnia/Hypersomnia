@@ -81,8 +81,15 @@ auto make_field_address(const O& object, const M& member) {
 	return result;
 }
 
-template <class O, class M>
-auto make_field_address(const M O::* const member) {
-	static const O o;
-	return make_field_address(o, o.*member);
+
+template <class M>
+auto make_field_address(const std::size_t offset) {
+	field_address result;
+
+	result.type_id = get_type_id_for_field<M>();
+	result.offset = static_cast<unsigned>(offset);
+
+	return result;
 }
+
+#define MACRO_MAKE_FIELD_ADDRESS(a,b) make_field_address<decltype(a :: b)>(augs_offsetof(a,b))

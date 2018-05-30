@@ -1,4 +1,6 @@
 #pragma once
+#include "augs/build_settings/offsetof.h"
+
 #include "game/assets/ids/asset_ids.h"
 #include "view/viewables/image_cache.h"
 
@@ -34,7 +36,7 @@ inline void update_size_if_tex_changed(
 		auto cmd = in.command;
 
 		{
-			const auto addr = make_field_address(&invariants::sprite::size);
+			const auto addr = MACRO_MAKE_FIELD_ADDRESS(invariants::sprite, size);
 			cmd.property_id = flavour_property_id { in.invariant_id, addr };
 		}
 
@@ -55,7 +57,7 @@ inline void update_size_if_tex_changed(
 		auto cmd = in.command;
 
 		{
-			const auto addr = make_field_address(&invariants::shape_polygon::shape);
+			const auto addr = MACRO_MAKE_FIELD_ADDRESS(invariants::shape_polygon, shape);
 			cmd.property_id = flavour_property_id { *invariant_id, addr };
 		}
 

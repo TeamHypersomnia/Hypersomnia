@@ -1,6 +1,8 @@
 #include <cstring>
 #include "physics_world_cache.h"
 
+#include "augs/build_settings/offsetof.h"
+
 #include "game/components/item_component.h"
 #include "game/components/driver_component.h"
 #include "game/components/fixtures_component.h"
@@ -485,13 +487,11 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 
 	b2BlockAllocator& migrated_allocator = migrated_b2World.m_blockAllocator;
 
-#define my_offsetof(s,m) ((std::size_t)&reinterpret_cast<char const volatile&>((((s*)0)->m)))
-	
-	const auto contact_edge_a_offset = my_offsetof(b2Contact, m_nodeA);
-	const auto contact_edge_b_offset = my_offsetof(b2Contact, m_nodeB);
+	const auto contact_edge_a_offset = augs_offsetof(b2Contact, m_nodeA);
+	const auto contact_edge_b_offset = augs_offsetof(b2Contact, m_nodeB);
 
-	const auto joint_edge_a_offset = my_offsetof(b2Joint, m_edgeA);
-	const auto joint_edge_b_offset = my_offsetof(b2Joint, m_edgeB);
+	const auto joint_edge_a_offset = augs_offsetof(b2Joint, m_edgeA);
+	const auto joint_edge_b_offset = augs_offsetof(b2Joint, m_edgeB);
 
 #if DEBUG_PHYSICS_SYSTEM_COPY
 	std::unordered_set<void**> already_migrated_pointers;
