@@ -116,6 +116,7 @@ enum class test_finishing_traces {
 enum class test_container_items {
 	// GEN INTROSPECTOR enum class test_container_items
 	SAMPLE_BACKPACK,
+	BROWN_BACKPACK,
 	SAMPLE_MAGAZINE,
 
 	COUNT

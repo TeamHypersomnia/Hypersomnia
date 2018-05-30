@@ -49,6 +49,7 @@ enum class test_scene_image_id {
 	GREEN_CHARGE,
 	GREEN_SHELL,
 	BACKPACK,
+	BROWN_BACKPACK,
 
 	HAVE_A_PLEASANT,
 	AWAKENING,

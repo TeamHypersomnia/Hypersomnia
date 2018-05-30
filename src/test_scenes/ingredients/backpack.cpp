@@ -40,6 +40,13 @@ namespace test_flavours {
 			item.categories_for_slot_compatibility.set(item_category::SHOULDER_CONTAINER);
 
 			meta.set(item);
+
+			{
+				auto& brown = get_test_flavour(flavours, test_container_items::BROWN_BACKPACK);
+				brown = meta;
+				brown.get<invariants::text_details>().name = format_enum(test_container_items::BROWN_BACKPACK);
+				test_flavours::add_sprite(brown, logicals, test_scene_image_id::BROWN_BACKPACK, white);
+			}
 		}
 	}
 }
@@ -48,6 +55,12 @@ namespace prefabs {
 	entity_handle create_sample_backpack(const logic_step step, vec2 pos) {
 		auto& world = step.get_cosmos();
 		const auto backpack = create_test_scene_entity(world, test_container_items::SAMPLE_BACKPACK, pos);
+		return backpack;
+	}
+
+	entity_handle create_brown_backpack(const logic_step step, vec2 pos) {
+		auto& world = step.get_cosmos();
+		const auto backpack = create_test_scene_entity(world, test_container_items::BROWN_BACKPACK, pos);
 		return backpack;
 	}
 }

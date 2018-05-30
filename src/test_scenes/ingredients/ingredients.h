@@ -78,7 +78,8 @@ namespace prefabs {
 	entity_handle create_cyan_charge(const logic_step, vec2 pos);
 
 	entity_handle create_sample_backpack(const logic_step, vec2 pos);
-	
+	entity_handle create_brown_backpack(const logic_step, vec2 pos);
+
 	entity_handle create_metropolis_soldier(
 		const logic_step,
 		const components::transform pos, 

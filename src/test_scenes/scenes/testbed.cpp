@@ -112,7 +112,8 @@ namespace test_scenes {
 		for (int i = 0; i < num_characters; ++i) {
 			auto transform = character_transforms[i];
 
-			const auto new_character = (i % 2 == 0 ? prefabs::create_metropolis_soldier : prefabs::create_resistance_soldier)(step, transform, typesafe_sprintf("player%x", i));
+			const bool is_metropolis = i % 2 == 0;
+			const auto new_character = (is_metropolis ? prefabs::create_metropolis_soldier : prefabs::create_resistance_soldier)(step, transform, typesafe_sprintf("player%x", i));
 
 			new_characters[i] = new_character;
 
@@ -162,7 +163,7 @@ namespace test_scenes {
 					perform_transfer(item_slot_transfer_request::standard(rifle, new_character.get_primary_hand()), step);
 				}
 
-				const auto backpack = prefabs::create_sample_backpack(step, vec2(200, -650));
+				const auto backpack = (is_metropolis ? prefabs::create_sample_backpack : prefabs::create_brown_backpack)(step, vec2(200, -650));
 				perform_transfer(item_slot_transfer_request::standard(backpack, new_character[slot_function::SHOULDER]), step);
 			}
 
@@ -319,7 +320,9 @@ namespace test_scenes {
 
 		prefabs::create_amplifier_arm(step, vec2(-300, -500 + 50));
 		prefabs::create_cyan_urban_machete(step, vec2(100, 100));
+
 		prefabs::create_sample_backpack(step, vec2(200, -750));
+		prefabs::create_brown_backpack(step, vec2(280, -750));
 
 		if (character(2).alive()) {
 			const auto second_machete = prefabs::create_cyan_urban_machete(step, vec2(0, 300));
