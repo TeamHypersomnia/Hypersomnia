@@ -139,22 +139,27 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 		{
 			torso_animation anim;
 			auto& f = anim.frames;
-			f.resize(7);
+			f.resize(9);
 
 			f[0].image_id = to_image_id(test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_SHOOT_1);
 			f[1].image_id = to_image_id(test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_SHOOT_2);
 			f[2].image_id = to_image_id(test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_SHOOT_3);
 			f[3].image_id = to_image_id(test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_SHOOT_4);
-			f[4].image_id = to_image_id(test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_SHOOT_3);
-			f[5].image_id = to_image_id(test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_SHOOT_2);
-			f[6].image_id = to_image_id(test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_SHOOT_1);
+			f[4].image_id = to_image_id(test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_SHOOT_5);
+			f[5].image_id = to_image_id(test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_SHOOT_4);
+			f[6].image_id = to_image_id(test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_SHOOT_3);
+			f[7].image_id = to_image_id(test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_SHOOT_2);
+			f[8].image_id = to_image_id(test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_SHOOT_1);
+
 			f[0].duration_milliseconds = 20;
 			f[1].duration_milliseconds = 20;
 			f[2].duration_milliseconds = 20;
-			f[3].duration_milliseconds = 30;
-			f[4].duration_milliseconds = 35;
-			f[5].duration_milliseconds = 50;
-			f[6].duration_milliseconds = 60;
+			f[3].duration_milliseconds = 20;
+			f[4].duration_milliseconds = 20;
+			f[5].duration_milliseconds = 30;
+			f[6].duration_milliseconds = 35;
+			f[7].duration_milliseconds = 35;
+			f[8].duration_milliseconds = 40;
 
 			alloc(test_id_type::RESISTANCE_CHARACTER_RIFLE_SHOOT, anim);
 		}
