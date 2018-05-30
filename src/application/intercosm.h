@@ -59,8 +59,8 @@ struct intercosm {
 	void to_bytes(std::vector<std::byte>&) const;
 	void from_bytes(const std::vector<std::byte>&);
 
-	auto make_logic_step_input(const cosmic_entropy& entropy) {
-		return logic_step_input{ world, entropy };	
+	logic_step_input make_logic_step_input(const cosmic_entropy& entropy) {
+		return { world, entropy };	
 	}
 
 	void clear();

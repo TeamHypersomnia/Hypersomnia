@@ -60,11 +60,11 @@ namespace augs {
 
 	template <class derived>
 	class memory_stream_mixin : public stream_position {
-		auto& buffer() {
+		auto& get_buffer() {
 			return static_cast<derived*>(this)->buffer;
 		}
 
-		const auto& buffer() const {
+		const auto& get_buffer() const {
 			return static_cast<const derived*>(this)->buffer;
 		}
 
@@ -81,7 +81,7 @@ namespace augs {
 				);
 			}
 
-			std::memcpy(data, buffer().data() + read_pos, bytes);
+			std::memcpy(data, get_buffer().data() + read_pos, bytes);
 			read_pos += bytes;
 		}
 
@@ -98,11 +98,11 @@ namespace augs {
 		}
 
 		std::byte* data() {
-			return buffer().data();
+			return get_buffer().data();
 		}
 
 		const std::byte* data() const {
-			return buffer().data();
+			return get_buffer().data();
 		}
 
 		std::byte& operator[](const size_t idx) {
@@ -114,7 +114,7 @@ namespace augs {
 		}
 
 		size_t capacity() const {
-			return buffer().size();
+			return get_buffer().size();
 		}
 
 		void write(const std::byte* const data, const size_t bytes) {
@@ -122,7 +122,7 @@ namespace augs {
 				reserve((write_pos + bytes) * 2);
 			}
 
-			std::memcpy(buffer().data() + write_pos, data, bytes);
+			std::memcpy(get_buffer().data() + write_pos, data, bytes);
 			write_pos += bytes;
 		}
 
@@ -131,7 +131,7 @@ namespace augs {
 		}
 
 		void reserve(const std::size_t bytes) {
-			resize_no_init(buffer(), bytes);
+			resize_no_init(get_buffer(), bytes);
 		}
 
 		void reserve(const byte_counter_stream& r) {
@@ -140,19 +140,19 @@ namespace augs {
 
 		template<class T>
 		T peek() const {
-			return *reinterpret_cast<const T*>(buffer().data() + read_pos);
+			return *reinterpret_cast<const T*>(get_buffer().data() + read_pos);
 		}
 
 		template <class Archive>
 		void write_with_properties(Archive& ar) const {
-			augs::write_bytes(ar, buffer());
+			augs::write_bytes(ar, get_buffer());
 			augs::write_bytes(ar, write_pos);
 			augs::write_bytes(ar, read_pos);
 		}
 
 		template <class Archive>
 		void read_with_properties(Archive& ar) {
-			augs::read_bytes(ar, buffer());
+			augs::read_bytes(ar, get_buffer());
 			augs::read_bytes(ar, write_pos);
 			augs::read_bytes(ar, read_pos);
 		}
