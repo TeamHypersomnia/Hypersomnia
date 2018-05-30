@@ -42,7 +42,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 	T render_visitor,
 	transformr viewing_transform
 ) {
-	if (const auto maybe_sprite = typed_handle.template find<invariants::sprite>()) {
+	if (const auto* const maybe_sprite = typed_handle.template find<invariants::sprite>()) {
 		const auto& sprite = *maybe_sprite;
 		using input_type = invariants::sprite::drawing_input;
 
@@ -69,10 +69,28 @@ FORCE_INLINE void detail_specific_entity_drawer(
 			tracified_sprite.size = tracified_size;
 
 			render_visitor(tracified_sprite, in.manager, input);
+			return;
 		}
-		else {
-			render_visitor(sprite, in.manager, input);
+
+		if constexpr(typed_handle.template has<components::gun>()) {
+			const auto& gun = typed_handle.template get<components::gun>();
+			const auto& gun_def = typed_handle.template get<invariants::gun>();
+
+			const auto& cosm = typed_handle.get_cosmos();
+			const auto& logicals = cosm.get_logical_assets();
+
+			if (const auto shoot_animation = mapped_or_nullptr(logicals.plain_animations, gun_def.shoot_animation)) {
+				if (const auto* const frame = ::get_frame(gun, *shoot_animation, cosm)) {
+					auto animated = sprite;
+					animated.image_id = frame->image_id;
+
+					render_visitor(animated, in.manager, input);
+					return;
+				}
+			}
 		}
+
+		render_visitor(sprite, in.manager, input);
 	}
 	else if (const auto polygon = typed_handle.template find<invariants::polygon>()) {
 		using input_type = invariants::polygon::drawing_input;

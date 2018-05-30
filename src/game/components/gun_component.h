@@ -14,7 +14,6 @@
 #include "game/components/render_component.h"
 
 #include "game/assets/ids/asset_ids.h"
-#include "game/assets/ids/asset_ids.h"
 #include "game/assets/recoil_player.h"
 
 #include "game/detail/view_input/sound_effect_input.h"
@@ -78,11 +77,14 @@ namespace invariants {
 		particle_effect_input muzzle_particles;
 
 		real32 kickback_towards_wielder = 0.f;
+		real32 recoil_multiplier = 1.f;
 
 		float cocking_handle_pull_duration_ms = 500.f;
 
 		constrained_entity_flavour_id<invariants::missile, components::sender> magic_missile_flavour;
 		recoil_player_instance_def recoil;
+
+		assets::plain_animation_id shoot_animation;
 		// END GEN INTROSPECTOR
 	};
 }

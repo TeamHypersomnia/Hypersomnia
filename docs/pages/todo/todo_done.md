@@ -825,3 +825,44 @@ we consider whole type overrides too complex architeciturally:
 
 - Fix magazine offsets
 
+
+- Rethinking attachment offsets
+	- Don't use a matrix. It will introduce shitload of redundancy
+	- Solution:
+		- In item invariant, store the holding offset (from center)
+			- Maybe also the back holding offset, for backpacks
+		- Each torso animation specifies hand positions
+			- Maybe also the back positions, for carrying backpacks
+		- Do the math
+		- Make it very specific, not per slot type
+	- Contextual positioning - still useful?
+		- Probably not if we have good previews in animation
+	- We will need reinference when modifying animation state,
+		- as we will probably read the offsets from the relevant torso invariants
+			- for now, we'll always just take the first frame and be done with it.
+			- we'll also reinfer upon switching the armour
+	- Drawing considerations
+		- What about viewing transforms?
+			- If we draw with sentiences, not subject to interpolation - and correctly
+			- Singular function to calculate the current animation frame
+				- Will anyways be used in more than just one place
+					- E.g. on calculating the collider connection, we'll take the first frame
+		- If we draw held item sprites separately, we must calculate the torso frame twice
+			- We'd go bottom-up everytime... for each attachment, etc.
+			- That sort of sucks
+			- Instead we might draw the entire character if we determine that it has torso
+			- And avoid drawing anything if the owner capability has a torso
+
+
+- Specyfing hotspots on the images
+	- State considerations
+		- Image definition shall store image_logical_meta 
+			- Each metric type will be specified with value_with_flag
+		- On modification in Images GUI, they will be rewritten into cosmos common state
+			- And cosmos will be thus reinferred
+		- Our state will be duplicated, but it is not really bad
+	- Cases
+		- Bullet spawn offsets
+		- Head offsets
+		- Primary/secondary hand offsets
+		- Back offsets (for backpacks)

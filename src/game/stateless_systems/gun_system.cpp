@@ -168,7 +168,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					if (pe.value >= mana_needed) {
 						if (try_to_fire()) {
 							pe.value -= pe.calc_damage_result(mana_needed).effective;
-							total_recoil += missile.recoil_multiplier;
+							total_recoil += missile.recoil_multiplier * gun_def.recoil_multiplier;
 
 							cosmic::create_entity(
 								cosmos, 
@@ -257,7 +257,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 								}
 
 								const auto& missile_def = round_entity.template get<invariants::missile>();
-								total_recoil += missile_def.recoil_multiplier;
+								total_recoil += missile_def.recoil_multiplier * gun_def.recoil_multiplier;
 
 								round_entity.set_logic_transform(muzzle_transform);
 

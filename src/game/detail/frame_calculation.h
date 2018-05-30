@@ -14,6 +14,15 @@ frame_type_t<T>* get_frame(
 	return calc_current_frame(anim, animation_time_ms);
 }
 
+template <class T, class C>
+frame_type_t<T>* get_frame(
+	const components::gun& gun,
+	T& anim, 
+	const C& cosm
+) {
+	return ::get_frame(gun, anim, cosm.get_timestamp(), cosm.get_fixed_delta());
+}
+
 template <class T>
 struct frame_and_flip {
 	frame_type_t<T>& frame;
@@ -53,10 +62,7 @@ auto calc_stance_frame(
 		/* Determine whether we want a carrying or a shooting animation */
 		if (wielded_items.size() > 0) {
 			if (const auto gun = cosm[wielded_items[0]].template find<components::gun>()) {
-				const auto now = cosm.get_timestamp();
-				const auto dt = cosm.get_fixed_delta();
-
-				if (const auto frame = ::get_frame(*gun, *shoot_animation, now, dt)) {
+				if (const auto frame = ::get_frame(*gun, *shoot_animation, cosm)) {
 					return { { *frame, false } };
 				}
 			}

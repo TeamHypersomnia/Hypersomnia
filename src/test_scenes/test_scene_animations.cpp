@@ -29,7 +29,7 @@ void create_frames(
 		}
 	}
 	else {
-		for (auto i = last; i >= first; --i) {
+		for (auto i = first; i >= last; --i) {
 			typename decltype(anim.frames)::value_type frame;
 			frame.duration_milliseconds = frame_duration_ms;
 			frame.image_id = to_image_id(test_scene_image_id(i));
@@ -65,6 +65,21 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 			);
 
 			alloc(test_id_type::CAST_BLINK_ANIMATION, anim);
+		} 
+
+		{
+			plain_animation anim;
+
+			create_frames(
+				anim,
+				test_scene_image_id::VINDICATOR_SHOOT_19,
+				test_scene_image_id::VINDICATOR_SHOOT_1,
+				40.0f
+			);
+
+			anim.frames[0].duration_milliseconds = 50.f;
+
+			alloc(test_id_type::VINDICATOR_SHOOT, anim);
 		} 
 	}
 

@@ -70,6 +70,7 @@ namespace prefabs {
 	// guns
 	entity_handle create_sample_magazine(const logic_step, components::transform pos, entity_id charge_inside = entity_id(), int force_num_charges = -1);
 	entity_handle create_sample_rifle(const logic_step, vec2 pos, entity_id load_mag = entity_id());
+	entity_handle create_vindicator(const logic_step, vec2 pos, entity_id load_mag = entity_id());
 	entity_handle create_kek9(const logic_step step, vec2 pos, entity_id load_mag_id);
 	entity_handle create_amplifier_arm(
 		const logic_step,

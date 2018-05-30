@@ -22,6 +22,7 @@
 
 #include "game/detail/inventory/item_slot_transfer_request.h"
 
+#include "test_scenes/test_scene_animations.h"
 #include "test_scenes/ingredients/ingredients.h"
 #include "game/detail/inventory/perform_transfer.h"
 
@@ -332,7 +333,7 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4000.f, 4000.f};
-			gun_def.shot_cooldown_ms = 100.f;
+			gun_def.shot_cooldown_ms = 92.f;
 
 			gun_def.shell_spawn_offset.pos.set(0, 10);
 			gun_def.shell_spawn_offset.rotation = 45;
@@ -354,6 +355,55 @@ namespace test_flavours {
 			meta.set(gun_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ASSAULT_RIFLE, white);
+			add_shape_invariant_from_renderable(meta, caches);
+			test_flavours::add_see_through_dynamic_body(meta);
+			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_shootable_weapons::VINDICATOR);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			meta.get<invariants::text_details>().description =
+				"Standard issue sample rifle."
+			;
+
+			invariants::gun gun_def;
+
+			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::VINDICATOR_MUZZLE);
+
+			gun_def.action_mode = gun_action_type::AUTOMATIC;
+			gun_def.muzzle_velocity = {4200.f, 4400.f};
+			gun_def.shot_cooldown_ms = 100.f;
+
+			gun_def.shell_spawn_offset.pos.set(0, 10);
+			gun_def.shell_spawn_offset.rotation = 45;
+			gun_def.shell_angular_velocity = {2.f, 14.f};
+			gun_def.shell_spread_degrees = 20.f;
+			gun_def.shell_velocity = {300.f, 1700.f};
+			gun_def.damage_multiplier = 2.4f;
+			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
+			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
+			gun_def.kickback_towards_wielder = 70.f;
+
+			gun_def.maximum_heat = 2.1f;
+			gun_def.gunshot_adds_heat = 0.052f;
+			gun_def.engine_sound_strength = 0.5f;
+			gun_def.recoil_multiplier = 1.3f;
+
+			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
+			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::VINDICATOR_SHOOT);
+
+			meta.set(gun_def);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::VINDICATOR_SHOOT_1, white);
 			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE);
@@ -439,6 +489,30 @@ namespace test_flavours {
 }
 
 namespace prefabs {
+	entity_handle create_vindicator(const logic_step step, vec2 pos, entity_id load_mag_id) {
+		auto& cosmos = step.get_cosmos();
+		auto load_mag = cosmos[load_mag_id];
+
+		auto weapon = create_test_scene_entity(cosmos, test_shootable_weapons::VINDICATOR, pos);
+
+		if (load_mag.alive()) {
+			perform_transfer(item_slot_transfer_request::standard(load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE]), step);
+
+			if (load_mag[slot_function::ITEM_DEPOSIT].has_items()) {
+				perform_transfer(
+					item_slot_transfer_request::standard(
+						load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], 
+						weapon[slot_function::GUN_CHAMBER], 
+						1
+					), 
+					step
+				);
+			}
+		}
+
+		return weapon;
+	}
+
 	entity_handle create_sample_rifle(const logic_step step, vec2 pos, entity_id load_mag_id) {
 		auto& cosmos = step.get_cosmos();
 		auto load_mag = cosmos[load_mag_id];
@@ -472,7 +546,6 @@ namespace prefabs {
 		if (load_mag.alive()) {
 			perform_transfer(item_slot_transfer_request::standard(load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE]), step);
 
-			LOG("loadin kek");
 			if (load_mag[slot_function::ITEM_DEPOSIT].has_items()) {
 				perform_transfer(item_slot_transfer_request::standard(load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1), step);
 			}

@@ -135,7 +135,7 @@ namespace test_scenes {
 				sentience.get<personal_electricity_meter_instance>().set_value(10000);
 				sentience.get<personal_electricity_meter_instance>().set_maximum_value(10000);
 
-				const auto rifle = prefabs::create_sample_rifle(
+				const auto rifle = (is_metropolis ? prefabs::create_sample_rifle : prefabs::create_vindicator)(
 					step, vec2(100, -500), prefabs::create_sample_magazine(step, vec2(100, -650), prefabs::create_cyan_charge(step, vec2(0, 0)), 3000)
 				);
 
