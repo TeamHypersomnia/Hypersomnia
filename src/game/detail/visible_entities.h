@@ -31,7 +31,7 @@ struct visible_entities {
 		in order to take advantage of the reserved space in containers.
 	*/
 
-	void reacquire_all_and_sort(const visible_entities_query);
+	visible_entities& reacquire_all_and_sort(const visible_entities_query);
 	
 	void acquire_physical(const visible_entities_query);
 	void acquire_non_physical(const visible_entities_query);

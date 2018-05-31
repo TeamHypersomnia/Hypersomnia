@@ -53,11 +53,13 @@ void visible_entities::clear() {
 	}
 }
 
-void visible_entities::reacquire_all_and_sort(const visible_entities_query input) {
+visible_entities& visible_entities::reacquire_all_and_sort(const visible_entities_query input) {
 	clear();
 	acquire_non_physical(input);
 	acquire_physical(input);
 	sort_per_layer(input.cosm);
+
+	return *this;
 }
 
 void visible_entities::acquire_physical(const visible_entities_query input) {

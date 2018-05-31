@@ -53,7 +53,7 @@ enum class test_scene_image_id {
 	VINDICATOR_SHOOT_18,
 	VINDICATOR_SHOOT_19,
 
-	TEST_BACKGROUND,
+	SOIL,
 	FLOOR,
 
 	SAMPLE_MAGAZINE,

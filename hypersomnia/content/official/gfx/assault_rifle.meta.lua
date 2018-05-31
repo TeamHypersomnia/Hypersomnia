@@ -2,7 +2,7 @@ return {
   extra_loadables = {
     enabled_generate_neon_map = {
       alpha_multiplier = 1,
-      amplification = 60,
+      amplification = 80,
       light_colors = {
         "0 255 255 255",
         "255 0 0 255",
@@ -45,6 +45,10 @@ return {
       hand_anchor = {
         x = -27,
         y = -1
+      },
+      head_anchor = {
+        x = 0,
+        y = 0
       }
     },
     legs = {

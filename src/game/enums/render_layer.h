@@ -1,6 +1,13 @@
 #pragma once
 #include "augs/misc/enum/enum_array.h"
 
+/*
+
+	TODO: Some render layers might correspond to distinct entity types.
+	Rendering performance could be vastly improved by assigning an ordering based on these types,
+	as we would avoid dispatching per-entity.
+*/
+
 enum class render_layer {
 	// GEN INTROSPECTOR enum class render_layer
 	INVALID,

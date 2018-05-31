@@ -37,6 +37,7 @@ namespace invariants {
 	struct item_slot_transfers;
 	struct torso;
 	struct head;
+	struct ground;
 }
 
 namespace components {
@@ -154,7 +155,8 @@ using invariant_list_t = List<
 	invariants::light,
 	invariants::item_slot_transfers,
 	invariants::torso,
-	invariants::head
+	invariants::head,
+	invariants::ground
 >;
 
 template <class... Types>

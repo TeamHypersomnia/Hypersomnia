@@ -14,6 +14,12 @@ namespace augs {
 		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 
+		template <class A>
+		void emplace(A&& a) {
+			value = std::forward<A>(a);
+			is_enabled = true;
+		}
+
 		explicit operator bool() const {
 			return is_enabled;
 		}

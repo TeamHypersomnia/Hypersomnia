@@ -38,3 +38,4 @@
 #include "game/components/text_details_component.h"
 #include "game/components/torso_component.h"
 #include "game/components/head_component.h"
+#include "game/components/ground_component.h"

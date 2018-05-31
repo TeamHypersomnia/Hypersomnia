@@ -17,6 +17,7 @@
 
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/frame_calculation.h"
+#include "game/detail/visible_entities.h"
 
 using namespace augs;
 
@@ -181,9 +182,64 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			auto start_footstep_effect = [&]() {
 				const auto transform = it.get_logic_transform();
 
-				auto& chosen_effect = cosmos.get_common_assets().standard_footstep;
+				const auto velocity_degrees = current_velocity.degrees();
+				auto effect_transform = transformr(transform.pos, velocity_degrees);
 
-				auto sound = chosen_effect.sound;
+				const auto anim_id = it.template get<invariants::torso>().calc_leg_anim(
+					current_velocity,
+					transform.rotation
+				);
+
+				if (const auto anim = mapped_or_nullptr(cosmos.get_logical_assets().legs_animations, anim_id)) {
+					/* Offset the effect transform by leg offset, if the animation exists */
+					const auto frame = ::get_frame_and_flip(movement.four_ways_animation, *anim);
+					const auto& im_def = cosmos.get_logical_assets().get_offsets(frame.frame.image_id);
+
+					auto offset = im_def.legs.foot;
+
+					if (frame.flip) {
+						offset.y *= -1;
+					}
+
+					effect_transform *= transformr(offset);
+				}
+
+				
+
+				auto chosen_effect = cosmos.get_common_assets().standard_footstep;
+				
+				{
+					const auto queried_camera = camera_cone { effect_transform, 1.f };
+
+					/* Choose effect based on where the foot has landed */
+					const auto visible = visible_entities().reacquire_all_and_sort({
+						cosmos,
+						queried_camera,
+						vec2i(1, 1)
+					}).per_layer;
+
+					const std::array<render_layer, 5> checked_layers = {
+						render_layer::CAR_WHEEL,
+						render_layer::CAR_INTERIOR,
+						render_layer::ON_GROUND,
+						render_layer::GROUND,
+						render_layer::UNDER_GROUND
+					};
+
+					for (const auto& l : checked_layers) {
+						if (visible[l].size() > 0) {
+							if (const auto ground = cosmos[visible[l][0]].find<invariants::ground>()) {
+								if (ground->footstep_effect.is_enabled) {
+									chosen_effect = ground->footstep_effect.value;
+								}
+
+								break;
+							}
+						}
+					}
+				}
+
+				auto& sound = chosen_effect.sound;
 				const auto gain_mult = speed_mult / 2;
 				const auto pitch_mult = std::min(1.7f, 1 + gain_mult);
 
@@ -195,39 +251,16 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					sound_effect_start_input::at_entity(it.get_id())
 				);
 
-				const auto anim_id = it.template get<invariants::torso>().calc_leg_anim(
-					current_velocity,
-					transform.rotation
+				const auto scale = std::max(0.8f, speed_mult);
+
+				auto& particles = chosen_effect.particles;
+				particles.modifier.scale_amounts *= scale;
+				particles.modifier.scale_lifetimes *= scale;
+
+				particles.start(
+					step, 
+					particle_effect_start_input::fire_and_forget(effect_transform)
 				);
-
-				if (const auto anim = mapped_or_nullptr(cosmos.get_logical_assets().legs_animations, anim_id)) {
-					const auto frame = ::get_frame_and_flip(movement.four_ways_animation, *anim);
-
-					const auto& im_def = cosmos.get_logical_assets().get_offsets(frame.frame.image_id);
-
-					{
-						auto offset = im_def.legs.foot;
-
-						if (frame.flip) {
-							offset.y *= -1;
-						}
-
-						const auto velocity_degrees = current_velocity.degrees();
-						auto effect_transform = transformr(transform.pos, velocity_degrees) * transformr(offset);
-
-						auto particles = chosen_effect.particles;
-
-						const auto scale = std::max(0.8f, speed_mult);
-
-						particles.modifier.scale_amounts *= scale;
-						particles.modifier.scale_lifetimes *= scale;
-
-						particles.start(
-							step, 
-							particle_effect_start_input::fire_and_forget(effect_transform)
-						);
-					}
-				}
 			};
 
 			if (anim_finishing) {

@@ -281,14 +281,14 @@ namespace test_scenes {
 				}
 
 				{
-					const vec2 bg_size = caches.at(to_image_id(test_scene_image_id::TEST_BACKGROUND)).get_original_size();
+					const vec2 bg_size = caches.at(to_image_id(test_scene_image_id::SOIL)).get_original_size();
 
 					const auto num_roads = 10 * 10;
 					const auto side = static_cast<int>(sqrt(num_roads) / 2);
 
 					for (int x = -side; x < side; ++x) {
 						for (int y = -side; y < side * 16; ++y) {
-							create_test_scene_entity(world, test_sprite_decorations::STREET, components::transform{ bg_size * vec2i(x, y) });
+							create_test_scene_entity(world, test_sprite_decorations::SOIL, components::transform{ bg_size * vec2i(x, y) });
 						}
 					}
 				}

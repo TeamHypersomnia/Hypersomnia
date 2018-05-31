@@ -25,7 +25,7 @@ enum class test_static_lights {
 enum class test_sprite_decorations {
 	// GEN INTROSPECTOR enum class test_sprite_decorations
 	HAVE_A_PLEASANT,
-	STREET,
+	SOIL,
 	ROAD_DIRT,
 	ROAD,
 	FLOOR,

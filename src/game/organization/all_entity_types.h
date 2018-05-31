@@ -73,6 +73,7 @@ struct plain_sprited_body {
 		invariants::shape_polygon,
 		invariants::sprite,
 		invariants::render,
+		invariants::ground,
 
 		invariants::interpolation
 	>;
@@ -152,7 +153,8 @@ struct sprite_decoration {
 
 	using invariants = type_list<
 		invariants::sprite,
-		invariants::render
+		invariants::render,
+		invariants::ground
 	>;
 
 	using components = type_list<

@@ -59,7 +59,20 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_sprite_decorations::STREET);
+			auto& meta = get_test_flavour(flavours, test_sprite_decorations::SOIL);
+
+			{
+				invariants::ground ground_def;
+
+				footstep_effect_input dirt;
+				dirt.sound.id = to_sound_id(test_scene_sound_id::FOOTSTEP_DIRT);
+				dirt.sound.modifier.gain = .5f;
+				dirt.particles.id = to_particle_effect_id(test_scene_particle_effect_id::FOOTSTEP_SMOKE);
+
+				ground_def.footstep_effect.emplace(dirt);
+
+				meta.set(ground_def);
+			}
 
 			{
 				invariants::render render_def;
@@ -69,7 +82,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, logicals,
-			test_scene_image_id::TEST_BACKGROUND, gray1);
+			test_scene_image_id::SOIL, gray1);
 		}
 		{
 			auto& meta = get_test_flavour(flavours, test_sprite_decorations::ROAD_DIRT);
