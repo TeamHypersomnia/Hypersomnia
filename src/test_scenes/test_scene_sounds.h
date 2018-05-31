@@ -46,6 +46,7 @@ enum class test_scene_sound_id {
 	FOOTSTEP_FLOOR,
 
 	STANDARD_GUN_DRAW,
+	PLASMA_DRAW,
 
 	COUNT
 	// END GEN INTROSPECTOR
