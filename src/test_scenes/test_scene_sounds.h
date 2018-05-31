@@ -48,6 +48,8 @@ enum class test_scene_sound_id {
 	STANDARD_HOLSTER,
 
 	STANDARD_GUN_DRAW,
+	STANDARD_PISTOL_DRAW,
+
 	PLASMA_DRAW,
 
 	COUNT
