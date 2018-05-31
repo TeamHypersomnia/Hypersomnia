@@ -81,6 +81,30 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 
 			alloc(test_id_type::VINDICATOR_SHOOT, anim);
 		} 
+
+		{
+			plain_animation anim;
+
+			create_frames(
+				anim,
+				test_scene_image_id::DATUM_GUN_SHOOT_1,
+				test_scene_image_id::DATUM_GUN_SHOOT_8,
+				10.0f
+			);
+
+			reverse_range(anim.frames);
+
+			anim.frames[0].duration_milliseconds = 10.f;
+			anim.frames[1].duration_milliseconds = 10.f;
+			anim.frames[2].duration_milliseconds = 10.f;
+			anim.frames[3].duration_milliseconds = 10.f;
+			anim.frames[4].duration_milliseconds = 20.f;
+			anim.frames[5].duration_milliseconds = 25.f;
+			anim.frames[6].duration_milliseconds = 25.f;
+			anim.frames[7].duration_milliseconds = 30.f;
+
+			alloc(test_id_type::DATUM_GUN_SHOOT, anim);
+		} 
 	}
 
 	{

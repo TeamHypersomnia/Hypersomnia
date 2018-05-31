@@ -93,17 +93,27 @@ auto calc_stance_info(
 
 		if (n > 0) {
 			if (const auto gun = cosm[wielded_items[0]].template find<components::gun>()) {
-				if (const auto frame = ::get_frame(*gun, *shoot_animation, cosm)) {
-
+				const auto frame = ::get_frame(*gun, *shoot_animation, cosm);
+				const auto second_frame = [n, &cosm, shoot_animation, &wielded_items]() -> decltype(frame) {
 					if (n == 2) {
 						if (const auto second_gun = cosm[wielded_items[1]].template find<components::gun>()) {
-							if (const auto second_frame = ::get_frame(*second_gun, *shoot_animation, cosm)) {
-								return result_t::shoot(*std::min(frame, second_frame));
-							}
+							return ::get_frame(*second_gun, *shoot_animation, cosm);
 						}
 					}
 
+					return nullptr;
+				}();
+				
+				if (frame && second_frame) {
+					return result_t::shoot(*std::min(frame, second_frame));
+				}
+
+				if (frame) {
 					return result_t::shoot(*frame);
+				}
+
+				if (second_frame) {
+					return result_t::shoot(*second_frame);
 				}
 			}
 		}

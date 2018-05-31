@@ -65,6 +65,7 @@ enum class test_shootable_weapons {
 	VINDICATOR,
 	KEK9,
 	AMPLIFIER_ARM,
+	DATUM_GUN,
 
 	COUNT
 	// END GEN INTROSPECTOR
