@@ -24,6 +24,7 @@ struct controlled_character {
 		invariants::sprite,
 		invariants::render,
 		invariants::torso,
+		invariants::head,
 
 		invariants::interpolation
 	>;
@@ -38,6 +39,7 @@ struct controlled_character {
 
 		components::driver,
 		components::attitude,
+		components::head,
 
 		components::interpolation
 	>;

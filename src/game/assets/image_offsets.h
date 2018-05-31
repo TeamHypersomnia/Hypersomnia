@@ -37,6 +37,7 @@ struct item_offsets {
 	// GEN INTROSPECTOR struct item_offsets
 	vec2i hand_anchor;
 	vec2i back_anchor;
+	vec2i head_anchor;
 	vec2i attachment_anchor;
 	// END GEN INTROSPECTOR
 };

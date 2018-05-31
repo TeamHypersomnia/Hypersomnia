@@ -37,3 +37,4 @@
 #include "game/components/sender_component.h"
 #include "game/components/text_details_component.h"
 #include "game/components/torso_component.h"
+#include "game/components/head_component.h"

@@ -385,6 +385,18 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 		}
 
 		if (d.victim_shake.any()) {
+			if (auto* const head = subject.find<components::head>()) {
+				if (const auto* const crosshair = subject.find_crosshair()) {
+					const auto recoil_amount = crosshair->recoil.rotation;
+					const auto recoil_dir = augs::sgn(recoil_amount);
+					const auto considered_amount = (recoil_dir == 0 ? 1 : recoil_dir) * std::min(1.f, std::max(std::abs(recoil_amount), 0.2f));
+
+					const auto& head_def = subject.get<invariants::head>();
+
+					head->shake_rotation_amount += considered_amount * head_def.impulse_mult_on_shake;
+				}
+			}
+
 			if (sentience) {
 				d.victim_shake.apply(now, *sentience);
 			}
@@ -398,11 +410,18 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 }
 
 void sentience_system::cooldown_aimpunches(const logic_step step) const {
-	const auto& cosmos = step.get_cosmos();
+	auto& cosmos = step.get_cosmos();
+	const auto dt = cosmos.get_fixed_delta();
 
-	cosmos.for_each_having<components::sentience>(
-		[&](const auto) {
+	cosmos.for_each_having<components::head>(
+		[&](const auto typed_handle) {
+			const auto& head_def = typed_handle.template get<invariants::head>();
+			auto& head = typed_handle.template get<components::head>();
 
+			{
+				auto& a = head.shake_rotation_amount;
+				a = augs::damp(a, dt.in_seconds(), head_def.shake_rotation_damping);
+			}
 		}
 	);
 }

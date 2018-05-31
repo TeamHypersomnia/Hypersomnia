@@ -57,6 +57,17 @@ namespace test_flavours {
 				meta.set(torso_def);
 			}
 
+			{
+				invariants::head head_def;
+
+				head_def.head_image = to_image_id(test_scene_image_id::METROPOLIS_HEAD);
+				head_def.shooting_head_image = to_image_id(test_scene_image_id::METROPOLIS_HEAD);
+				head_def.shake_rotation_damping = 10.f;
+				head_def.impulse_mult_on_shake = 1000.f;
+
+				meta.set(head_def);
+			}
+
 			add_sprite(meta, logicals, test_scene_image_id::METROPOLIS_CHARACTER_BARE_1);
 			add_shape_invariant_from_renderable(meta, logicals);
 
@@ -196,6 +207,17 @@ namespace test_flavours {
 				torso_def.akimbo.shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_CHARACTER_BARE);
 
 				meta.set(torso_def);
+			}
+
+			{
+				invariants::head head_def;
+
+				head_def.head_image = to_image_id(test_scene_image_id::RESISTANCE_HEAD);
+				head_def.shooting_head_image = to_image_id(test_scene_image_id::RESISTANCE_HEAD);
+				head_def.shake_rotation_damping = 10.f;
+				head_def.impulse_mult_on_shake = 1000.f;
+
+				meta.set(head_def);
 			}
 
 			{

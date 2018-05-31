@@ -36,6 +36,7 @@ namespace invariants {
 	struct crosshair;
 	struct item_slot_transfers;
 	struct torso;
+	struct head;
 }
 
 namespace components {
@@ -63,6 +64,7 @@ namespace components {
 	struct motor_joint;
 	struct hand_fuse;
 	struct sender;
+	struct head;
 }
 
 using assert_always_together = type_list<
@@ -121,7 +123,8 @@ using component_list_t = List<
 	components::wandering_pixels,
 	components::motor_joint,
 	components::hand_fuse,
-	components::sender
+	components::sender,
+	components::head
 >;
 
 template <template <class...> class List>
@@ -150,7 +153,8 @@ using invariant_list_t = List<
 	invariants::crosshair,
 	invariants::light,
 	invariants::item_slot_transfers,
-	invariants::torso
+	invariants::torso,
+	invariants::head
 >;
 
 template <class... Types>

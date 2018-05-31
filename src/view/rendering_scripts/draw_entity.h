@@ -171,19 +171,19 @@ FORCE_INLINE void specific_entity_drawer(
 			const auto wielded_items = typed_handle.get_wielded_items();
 			const auto& stance = maybe_torso->calc_stance(cosm, wielded_items);
 
-			if (const auto stance_frame = calc_stance_frame(
+			if (const auto stance_info = calc_stance_info(
 				cosm,
 				stance, 
 				movement->four_ways_animation,
 				wielded_items
 			)) {
-				render_frame(*stance_frame, face_degrees);
+				render_frame(stance_info.get_with_flip(), face_degrees);
 
-				const auto stance_image_id = stance_frame->frame.image_id;
-				auto offsets = logicals.get_offsets(stance_image_id).torso;
+				const auto stance_image_id = stance_info.frame->image_id;
+				auto stance_offsets = logicals.get_offsets(stance_image_id).torso;
 
-				if (stance_frame->flip) {
-					offsets.flip_vertically();
+				if (stance_info.flip) {
+					stance_offsets.flip_vertically();
 				}
 
 				typed_handle.for_each_attachment_recursive(
@@ -202,10 +202,32 @@ FORCE_INLINE void specific_entity_drawer(
 							}
 						);
 					},
-					[offsets]() {
-						return offsets;
+					[stance_offsets]() {
+						return stance_offsets;
 					}
 				);
+
+				if constexpr(typed_handle.template has<components::head>()) {
+					const auto& head = typed_handle.template get<components::head>();
+					const auto& head_def = typed_handle.template get<invariants::head>();
+
+					const auto target_image = stance_info.is_shooting ? head_def.shooting_head_image : head_def.head_image;
+
+					const auto& head_offsets = logicals.get_offsets(target_image);
+					const auto target_offset = ::get_anchored_offset(stance_offsets.head, head_offsets.item.head_anchor);
+					const auto target_transform = viewing_transform * target_offset;
+
+					invariants::sprite sprite;
+					sprite.set(target_image, in.manager);
+
+					using input_type = invariants::sprite::drawing_input;
+
+					auto input = input_type(in.drawer);
+					input.renderable_transform = target_transform;
+					input.renderable_transform.rotation += head.shake_rotation_amount;
+
+					render_visitor(sprite, in.manager, input);
+				}
 			}
 		}
 

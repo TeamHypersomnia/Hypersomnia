@@ -49,13 +49,42 @@ frame_and_flip<T> get_frame_and_flip(
 	};
 }
 
+template <class T>
+struct stance_frame_info {
+	const frame_type_t<T>* const frame;
+	const bool flip;
+	const bool is_shooting;
+
+	static auto none() {
+		return stance_frame_info<T> { nullptr, false, false };
+	}
+
+	static auto carry(const frame_and_flip<T>& f) {
+		return stance_frame_info<T> { std::addressof(f.frame), f.flip, false };
+	}
+
+	static auto shoot(const frame_type_t<T>& f) {
+		return stance_frame_info<T> { std::addressof(f), false, true };
+	}
+
+	explicit operator bool() const {
+		return frame != nullptr;
+	}
+
+	auto get_with_flip() const {
+		return frame_and_flip<T>{ *frame, flip };
+	}
+};
+
 template <class C, class T>
-auto calc_stance_frame(
+auto calc_stance_info(
 	const C& cosm,
 	const stance_animations& stance,
 	const movement_animation_state& movement, 
 	const T& wielded_items
-) -> std::optional<frame_and_flip<const torso_animation>> {
+) {
+	using result_t = stance_frame_info<const torso_animation>;
+
 	const auto& logicals = cosm.get_logical_assets();
 
 	if (const auto shoot_animation = mapped_or_nullptr(logicals.torso_animations, stance.shoot)) {
@@ -63,15 +92,15 @@ auto calc_stance_frame(
 		if (wielded_items.size() > 0) {
 			if (const auto gun = cosm[wielded_items[0]].template find<components::gun>()) {
 				if (const auto frame = ::get_frame(*gun, *shoot_animation, cosm)) {
-					return { { *frame, false } };
+					return result_t::shoot(*frame);
 				}
 			}
 		}
 	}
 
 	if (const auto carry_animation = mapped_or_nullptr(logicals.torso_animations, stance.carry)) {
-		return ::get_frame_and_flip(movement, *carry_animation);
+		return result_t::carry(::get_frame_and_flip(movement, *carry_animation));
 	}
 
-	return std::nullopt;
+	return result_t::none();
 }
