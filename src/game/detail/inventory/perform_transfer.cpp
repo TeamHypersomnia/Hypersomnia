@@ -22,16 +22,12 @@ void perform_transfer_result::notify(const logic_step step) const {
 	step.post_message_if(picked);
 	step.post_messages(interpolation_corrected);
 	step.post_message_if(destructed);
+	play_sound(step);
+}
 
-	if (dropped.has_value()) {
-		auto& d = *dropped;
-
-		d.sound_input.start(step, d.sound_start);
-	}
-
-	if (wielded.has_value()) {
-		auto& d = *wielded;
-
+void perform_transfer_result::play_sound(const logic_step step) const {
+	if (transfer_sound.has_value()) {
+		auto& d = *transfer_sound;
 		d.sound_input.start(step, d.sound_start);
 	}
 }
@@ -40,7 +36,8 @@ void perform_transfer(
 	const item_slot_transfer_request r,
 	const logic_step step
 ) {
-	perform_transfer(r, step.get_cosmos()).notify(step);
+	const auto result = perform_transfer(r, step.get_cosmos());
+	result.notify(step);
 }
 
 perform_transfer_result perform_transfer(
@@ -256,15 +253,48 @@ perform_transfer_result perform_transfer(
 		);
 
 		special_physics.during_cooldown_ignore_collision_with = previous_slot_container;
+	}
 
-		performed_drop_result dropped;
+	if (r.play_sound_effects) {
+		if (is_drop_request) {
+			transfer_sound_result dropped;
 
-		dropped.sound_input = cosmos.get_common_assets().item_throw_sound;
-		dropped.sound_start = sound_effect_start_input::orbit_absolute(
-			grabbed_item_part_handle, initial_transform_of_transferred
-		).set_listener(previous_root);
+			dropped.sound_input = cosmos.get_common_assets().item_throw_sound;
+			dropped.sound_start = sound_effect_start_input::orbit_absolute(
+				grabbed_item_part_handle, initial_transform_of_transferred
+			).set_listener(previous_root);
 
-		output.dropped = std::move(dropped);
+			output.transfer_sound.emplace(std::move(dropped));
+		}
+		else if (target_slot) {
+			if (target_slot.is_hand_slot()) {
+				transfer_sound_result wielded;
+
+				const auto& item_def = transferred_item.get<invariants::item>();
+
+				wielded.sound_input = item_def.wield_sound;
+				wielded.sound_start = sound_effect_start_input::at_entity(target_root);
+
+				output.transfer_sound.emplace(std::move(wielded));
+			}
+			else if (target_slot.get_id().type == slot_function::ITEM_DEPOSIT) {
+				/* Holster or pickup */
+				transfer_sound_result wielded;
+
+				if (is_pickup) {
+					wielded.sound_input = cosmos.get_common_assets().item_pickup_sound;
+				}
+				else {
+					wielded.sound_input = cosmos.get_common_assets().item_holster_sound;
+				}
+
+				wielded.sound_start = sound_effect_start_input::orbit_absolute(
+					grabbed_item_part_handle, initial_transform_of_transferred
+				).set_listener(previous_root);
+
+				output.transfer_sound.emplace(std::move(wielded));
+			}
+		}
 	}
 
 	if (is_pickup) {
@@ -273,19 +303,6 @@ perform_transfer_result perform_transfer(
 		message.item = grabbed_item_part_handle;
 
 		output.picked = message;
-	}
-
-	if (target_slot.is_hand_slot()) {
-		performed_wield_result wielded;
-
-		const auto& item_def = transferred_item.get<invariants::item>();
-
-		wielded.sound_input = item_def.wield_sound;
-		wielded.sound_start = sound_effect_start_input::at_entity(target_root);
-
-		LOG_NVPS(target_root);
-
-		output.wielded = std::move(wielded);
 	}
 
 	return output;

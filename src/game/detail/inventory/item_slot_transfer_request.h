@@ -22,7 +22,8 @@ struct basic_item_slot_transfer_request {
 	impulse_mults additional_drop_impulse;
 	bool force_immediate_mount = false;
 	bool allow_unauthorized_transfers = false;
-	pad_bytes<2> pad;
+	bool play_sound_effects = true;
+	pad_bytes<1> pad;
 	// END GEN INTROSPECTOR
 
 	static auto standard(const id_type item, const target_slot_type target) {

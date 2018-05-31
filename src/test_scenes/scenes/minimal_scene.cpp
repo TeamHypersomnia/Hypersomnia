@@ -22,6 +22,8 @@ namespace test_scenes {
 		load_test_scene_sentience_properties(common);
 
 		auto& common_assets = common.assets;
+		common_assets.item_holster_sound.id = to_sound_id(test_scene_sound_id::STANDARD_HOLSTER);
+
 		common_assets.standard_footstep.sound.id = to_sound_id(test_scene_sound_id::STANDARD_FOOTSTEP);
 		common_assets.cast_unsuccessful_sound.id = to_sound_id(test_scene_sound_id::CAST_UNSUCCESSFUL);
 		common_assets.ped_shield_impact_sound.id = to_sound_id(test_scene_sound_id::EXPLOSION);

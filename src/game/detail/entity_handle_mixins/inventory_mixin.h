@@ -670,5 +670,15 @@ wielding_result inventory_mixin<E>::make_wielding_transfers_for(const hand_selec
 	concatenate(result.transfers, holsters);
 	concatenate(result.transfers, draws);
 
+	/* Play only the last transfer to avoid cognitive overload */
+
+	for (auto& r : result.transfers) {
+		r.play_sound_effects = false;
+	}
+	
+	if (result.transfers.size() > 0) {
+		result.transfers.back().play_sound_effects = true;
+	}
+
 	return result;
 }

@@ -45,6 +45,8 @@ enum class test_scene_sound_id {
 	FOOTSTEP_DIRT,
 	FOOTSTEP_FLOOR,
 
+	STANDARD_HOLSTER,
+
 	STANDARD_GUN_DRAW,
 	PLASMA_DRAW,
 

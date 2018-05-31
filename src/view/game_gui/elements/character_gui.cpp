@@ -182,7 +182,9 @@ wielding_result character_gui::make_wielding_transfers_for(
 	const auto actually_available_setup = new_setup.get_available_entities(gui_entity);
 	ensure_eq(new_setup, actually_available_setup);
 
-	return gui_entity.make_wielding_transfers_for(new_setup.hand_selections);
+	const auto result = gui_entity.make_wielding_transfers_for(new_setup.hand_selections);
+	LOG_NVPS(result.transfers.size());
+	return result;
 }
 
 wielding_result character_gui::make_wielding_transfers_for_previous_hotbar_selection_setup(

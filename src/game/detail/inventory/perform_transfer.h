@@ -12,14 +12,11 @@ perform_transfer_result perform_transfer(
 
 /* Handles all messages in place */
 
-void perform_transfer(
-	const item_slot_transfer_request, 
-	const logic_step step
-);
+void perform_transfer(item_slot_transfer_request, logic_step step);
 
 template <class C, class step_type>
 void perform_transfers(const C requests, const step_type step) {
-	for (const auto r : requests) {
+	for (const auto& r : requests) {
 		perform_transfer(r, step);
 	}
 }

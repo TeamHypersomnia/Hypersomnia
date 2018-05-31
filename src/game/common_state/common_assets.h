@@ -13,6 +13,8 @@ struct common_assets {
 	sound_effect_input cast_unsuccessful_sound;
 
 	sound_effect_input item_throw_sound;
+	sound_effect_input item_holster_sound;
+	sound_effect_input item_pickup_sound;
 
 	particle_effect_input exhausted_smoke_particles;
 

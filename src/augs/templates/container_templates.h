@@ -218,3 +218,9 @@ std::size_t index_in(C& container, T& object) {
 	return std::addressof(object) - std::addressof(container[0]);
 }
 
+template <class T, class C>
+bool is_last_in(C& container, T& object) {
+	auto diff = std::addressof(object) - std::addressof(container[0]);
+	return diff == static_cast<decltype(diff)>(container.size() - 1);
+}
+

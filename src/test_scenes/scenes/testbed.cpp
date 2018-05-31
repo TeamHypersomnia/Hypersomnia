@@ -39,6 +39,8 @@ namespace test_scenes {
 		common.ambient_light_color = { 53, 97, 102, 255 }; // Brighten it up a little
 
 		auto& common_assets = common.assets;
+		common_assets.item_holster_sound.id = to_sound_id(test_scene_sound_id::STANDARD_HOLSTER);
+
 		common_assets.standard_footstep.sound.id = to_sound_id(test_scene_sound_id::STANDARD_FOOTSTEP);
 		common_assets.standard_footstep.sound.modifier.pitch = 1.25f;
 		common_assets.standard_footstep.sound.modifier.gain = 0.4;

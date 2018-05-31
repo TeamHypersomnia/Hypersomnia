@@ -6,5 +6,6 @@
 void wielding_result::apply(const logic_step step) {
 	ensure_eq(result, type::SUCCESSFUL);
 
+	LOG_NVPS(transfers.size());
 	perform_transfers(transfers, step);
 }

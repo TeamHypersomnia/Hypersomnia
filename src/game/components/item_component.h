@@ -21,12 +21,7 @@
 
 #include "game/detail/view_input/sound_effect_input.h"
 
-struct performed_drop_result {
-	sound_effect_input sound_input;
-	sound_effect_start_input sound_start;
-};
-
-struct performed_wield_result {
+struct transfer_sound_result {
 	sound_effect_input sound_input;
 	sound_effect_start_input sound_start;
 };
@@ -35,10 +30,11 @@ struct perform_transfer_result {
 	std::optional<messages::queue_destruction> destructed;
 	std::vector<messages::interpolation_correction_request> interpolation_corrected;
 	std::optional<messages::item_picked_up_message> picked;
-	std::optional<performed_drop_result> dropped;
-	std::optional<performed_wield_result> wielded;
+
+	std::optional<transfer_sound_result> transfer_sound;
 
 	void notify(logic_step) const;
+	void play_sound(logic_step) const;
 };
 
 perform_transfer_result perform_transfer(
