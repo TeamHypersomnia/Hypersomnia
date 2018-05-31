@@ -66,7 +66,7 @@ namespace test_flavours {
 
 				footstep_effect_input dirt;
 				dirt.sound.id = to_sound_id(test_scene_sound_id::FOOTSTEP_DIRT);
-				dirt.sound.modifier.gain = .5f;
+				dirt.sound.modifier.gain = .35f;
 				dirt.particles.id = to_particle_effect_id(test_scene_particle_effect_id::FOOTSTEP_SMOKE);
 
 				ground_def.footstep_effect.emplace(dirt);
@@ -117,6 +117,20 @@ namespace test_flavours {
 				render_def.layer = render_layer::ON_GROUND;
 
 				meta.set(render_def);
+			}
+
+			{
+				invariants::ground ground_def;
+
+				footstep_effect_input dirt;
+				dirt.sound.id = to_sound_id(test_scene_sound_id::FOOTSTEP_FLOOR);
+				dirt.sound.modifier.gain = .6f;
+				dirt.sound.modifier.pitch = .9f;
+				dirt.particles.id = to_particle_effect_id(test_scene_particle_effect_id::FOOTSTEP_SMOKE);
+
+				ground_def.footstep_effect.emplace(dirt);
+
+				meta.set(ground_def);
 			}
 
 			test_flavours::add_sprite(meta, logicals,

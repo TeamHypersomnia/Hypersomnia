@@ -89,9 +89,20 @@ auto calc_stance_info(
 
 	if (const auto shoot_animation = mapped_or_nullptr(logicals.torso_animations, stance.shoot)) {
 		/* Determine whether we want a carrying or a shooting animation */
-		if (wielded_items.size() > 0) {
+		const auto n = wielded_items.size();
+
+		if (n > 0) {
 			if (const auto gun = cosm[wielded_items[0]].template find<components::gun>()) {
 				if (const auto frame = ::get_frame(*gun, *shoot_animation, cosm)) {
+
+					if (n == 2) {
+						if (const auto second_gun = cosm[wielded_items[1]].template find<components::gun>()) {
+							if (const auto second_frame = ::get_frame(*second_gun, *shoot_animation, cosm)) {
+								return result_t::shoot(*std::min(frame, second_frame));
+							}
+						}
+					}
+
 					return result_t::shoot(*frame);
 				}
 			}

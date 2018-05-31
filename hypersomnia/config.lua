@@ -9,7 +9,7 @@ return {
     MouseButton4 = "SWITCH_GAME_GUI_MODE"
   },
   audio = {
-    enable_hrtf = true,
+    enable_hrtf = false,
     max_number_of_sound_sources = 4096,
     output_device_name = ""
   },
