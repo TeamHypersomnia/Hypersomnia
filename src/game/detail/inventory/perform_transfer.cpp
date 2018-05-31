@@ -28,6 +28,12 @@ void perform_transfer_result::notify(const logic_step step) const {
 
 		d.sound_input.start(step, d.sound_start);
 	}
+
+	if (wielded.has_value()) {
+		auto& d = *wielded;
+
+		d.sound_input.start(step, d.sound_start);
+	}
 }
 
 void perform_transfer(
@@ -267,6 +273,19 @@ perform_transfer_result perform_transfer(
 		message.item = grabbed_item_part_handle;
 
 		output.picked = message;
+	}
+
+	if (target_slot.is_hand_slot()) {
+		performed_wield_result wielded;
+
+		const auto& item_def = transferred_item.get<invariants::item>();
+
+		wielded.sound_input = item_def.wield_sound;
+		wielded.sound_start = sound_effect_start_input::at_entity(target_root);
+
+		LOG_NVPS(target_root);
+
+		output.wielded = std::move(wielded);
 	}
 
 	return output;

@@ -24,9 +24,11 @@
 struct performed_drop_result {
 	sound_effect_input sound_input;
 	sound_effect_start_input sound_start;
+};
 
-	components::transform sound_transform;
-	entity_id sound_subject;
+struct performed_wield_result {
+	sound_effect_input sound_input;
+	sound_effect_start_input sound_start;
 };
 
 struct perform_transfer_result {
@@ -34,6 +36,7 @@ struct perform_transfer_result {
 	std::vector<messages::interpolation_correction_request> interpolation_corrected;
 	std::optional<messages::item_picked_up_message> picked;
 	std::optional<performed_drop_result> dropped;
+	std::optional<performed_wield_result> wielded;
 
 	void notify(logic_step) const;
 };
@@ -129,6 +132,7 @@ namespace invariants {
 		unsigned dual_wield_accuracy_loss_percentage = 50;
 		unsigned dual_wield_accuracy_loss_multiplier = 1;
 
+		sound_effect_input wield_sound;
 		item_category_flagset categories_for_slot_compatibility = { item_category::GENERAL };
 		// END GEN INTROSPECTOR
 	};

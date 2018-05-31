@@ -76,6 +76,7 @@ namespace test_flavours {
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("3.5");
 			item.holding_stance = stance;
+			item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
 			meta.set(item);
 		};
 	
