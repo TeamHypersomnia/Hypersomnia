@@ -38,6 +38,10 @@ return {
       hand_anchor = {
         x = 0,
         y = 0
+      },
+      head_anchor = {
+        x = 0,
+        y = 0
       }
     },
     legs = {
@@ -56,7 +60,7 @@ return {
       },
       head = {
         pos = {
-          x = 0,
+          x = -5,
           y = 0
         },
         rotation = 0
