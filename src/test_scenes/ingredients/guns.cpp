@@ -359,7 +359,6 @@ namespace test_flavours {
 			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE);
-			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 		}
 
 		{

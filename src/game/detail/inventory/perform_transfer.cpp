@@ -288,9 +288,17 @@ perform_transfer_result perform_transfer(
 					wielded.sound_input = cosmos.get_common_assets().item_holster_sound;
 				}
 
-				wielded.sound_start = sound_effect_start_input::orbit_absolute(
-					grabbed_item_part_handle, initial_transform_of_transferred
-				).set_listener(previous_root);
+				wielded.sound_start = sound_effect_start_input::at_entity(target_root);
+
+				output.transfer_sound.emplace(std::move(wielded));
+			}
+			else {
+				transfer_sound_result wielded;
+
+				const auto& item_def = transferred_item.get<invariants::item>();
+
+				wielded.sound_input = item_def.wear_sound;
+				wielded.sound_start = sound_effect_start_input::at_entity(target_root);
 
 				output.transfer_sound.emplace(std::move(wielded));
 			}

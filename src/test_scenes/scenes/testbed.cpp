@@ -40,6 +40,7 @@ namespace test_scenes {
 
 		auto& common_assets = common.assets;
 		common_assets.item_holster_sound.id = to_sound_id(test_scene_sound_id::STANDARD_HOLSTER);
+		common_assets.item_pickup_sound.id = to_sound_id(test_scene_sound_id::BACKPACK_INSERT);
 
 		common_assets.standard_footstep.sound.id = to_sound_id(test_scene_sound_id::STANDARD_FOOTSTEP);
 		common_assets.standard_footstep.sound.modifier.pitch = 1.25f;

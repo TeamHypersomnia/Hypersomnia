@@ -129,6 +129,8 @@ namespace invariants {
 		unsigned dual_wield_accuracy_loss_multiplier = 1;
 
 		sound_effect_input wield_sound;
+		sound_effect_input wear_sound;
+
 		item_category_flagset categories_for_slot_compatibility = { item_category::GENERAL };
 		// END GEN INTROSPECTOR
 	};
