@@ -53,6 +53,113 @@ struct pathed_asset_entry : public browsed_path_entry_base<id_type> {
 	{}
 };
 
+struct image_color_picker_widget {
+	const assets::image_id id;
+	const images_in_atlas_map& game_atlas;
+	const image_definitions_map& defs;
+	editor_image_preview& current_preview;
+	const augs::path_type& project_path;
+
+	template <class T>
+	static constexpr bool handles = is_one_of_v<T, rgba>;
+
+	template <class T>
+	auto describe_changed(
+		const std::string& formatted_label,
+		const T& to
+	) const {
+		return typesafe_sprintf("Changed %x to %x", formatted_label, to);
+	}
+
+	template <class T>
+	auto handle(const std::string& identity_label, T& object) const {
+		using namespace augs::imgui;
+
+		std::optional<tweaker_type> result;
+
+		{
+			const auto& p = defs[id].get_source_path();
+
+			if (current_preview.path != p) {
+				current_preview.image.from_file(p.resolve(project_path));
+				current_preview.path = p;
+			}
+		}
+
+		auto iw = scoped_item_width(60);
+
+		if (auto combo = scoped_combo((identity_label + "Picker").c_str(), "Pick", ImGuiComboFlags_HeightLargest)) {
+            auto& io = ImGui::GetIO();
+
+			const auto& entry = game_atlas.at(id);
+
+			const auto is = vec2i(entry.get_original_size());
+			const auto zoom = 4;
+
+			const auto viewing_size = (is * zoom).operator ImVec2();
+
+			text("Image size: %x, zoom: %x", is, zoom);
+
+			invisible_button_reset_cursor("###OffsetSelector", viewing_size);
+			game_image(entry.diffuse, viewing_size);
+
+			const auto cross_alpha = 200;
+
+			auto draw_cross = [is](const vec2i where, const rgba col) {
+				draw_rect_local(
+					ltrb::from_points(
+						vec2(where.x, 0) * zoom,
+						vec2(where.x + 1, is.y) * zoom
+					),
+					col
+				);
+
+				draw_rect_local(
+					ltrb::from_points(
+						vec2(0, where.y) * zoom,
+						vec2(is.x, where.y + 1) * zoom
+					),
+					col
+				);
+			};
+
+			const auto pos = ImGui::GetCursorScreenPos();
+
+			const auto image_space_new = vec2i(vec2(io.MousePos.x - pos.x, io.MousePos.y - pos.y) / zoom);
+
+			if (ImGui::IsItemClicked()) {
+				object = current_preview.image.pixel(image_space_new);
+				result = tweaker_type::DISCRETE;
+			}
+
+			if (ImGui::IsItemHovered()) {
+				draw_cross(image_space_new, rgba(green.rgb(), cross_alpha));
+
+				auto scope = scoped_tooltip();
+				text("Image space: %x", image_space_new);
+				rgba color_preview = current_preview.image.pixel(image_space_new);
+				color_edit("##colorpreview", color_preview);
+			}
+		}
+
+		if (result) {
+			return result;
+		}
+
+		{
+			ImGui::SameLine();
+
+			auto iw = scoped_item_width(-1);
+
+			if (color_edit(identity_label, object)) {
+				result = tweaker_type::CONTINUOUS;
+			}
+		}
+
+		return result;
+	}
+};
+
 struct image_offset_widget {
 	const assets::image_id id;
 	const images_in_atlas_map& game_atlas;
@@ -619,10 +726,18 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 					Image offsets apply only to... images.
 				*/
 
-				using special_image_widget = 
+				using offset_widget = 
 					std::conditional_t<
 						is_image_type,
 						image_offset_widget,
+					   	default_widget_provider
+					>
+				;
+
+				using color_widget =
+					std::conditional_t<
+						is_image_type,
+						image_color_picker_widget,
 					   	default_widget_provider
 					>
 				;
@@ -646,7 +761,8 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 					},
 					special_widgets(
 						source_path_widget { viewables, project_path, settings, disable_path_chooser },
-						special_image_widget { id, game_atlas }
+						offset_widget { id, game_atlas },
+						color_widget { id, game_atlas, viewables.image_definitions, preview, project_path }
 					),
 					default_sane_default_provider(),
 					num_cols - 2
