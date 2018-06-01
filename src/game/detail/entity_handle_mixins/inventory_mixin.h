@@ -48,6 +48,16 @@ public:
 	static constexpr size_t hand_count = 2;
 	using hand_selections_array = std::array<entity_id, hand_count>;
 
+	static bool is_akimbo(const cosmos& cosm, const hand_selections_array& sels) {
+		for (const auto& s : sels) {
+			if (cosm[s].dead()) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	void infer_item_colliders_recursive() const {
 		const auto& self = *static_cast<const derived_handle_type*>(this);
 		ensure(self);
@@ -616,6 +626,12 @@ wielding_result inventory_mixin<E>::swap_wielded_items() const {
 		result.result = wielding_result::type::SUCCESSFUL;
 	}
 
+	result.play_effects_only_in_first();
+
+	for (auto& r : result.transfers) {
+		r.play_transfer_particles = false;
+	}
+
 	return result;
 }
 
@@ -624,18 +640,42 @@ wielding_result inventory_mixin<E>::make_wielding_transfers_for(const hand_selec
 	const auto& self = *static_cast<const E*>(this);
 	auto& cosmos = self.get_cosmos();
 
+	if (auto swapping_appropriate =
+		is_akimbo(cosmos, selections)
+		&& self.get_hand_no(0).get_item_if_any() == selections[1]
+		&& self.get_hand_no(1).get_item_if_any() == selections[0]
+	) {
+		return swap_wielded_items();
+	}
+
 	wielding_result result;
 	result.result = wielding_result::type::THE_SAME_SETUP;
+
+	if (auto move_to_secondary_and_draw = 
+		is_akimbo(cosmos, selections)
+		&& self.get_hand_no(0).get_item_if_any() == selections[1]
+		&& !self.get_hand_no(1).has_items() 
+	) {
+		result.transfers.push_back(item_slot_transfer_request::standard(
+			self.get_hand_no(0).get_item_if_any(), 
+			self.get_hand_no(1)
+		));
+
+		result.transfers.push_back(item_slot_transfer_request::standard(
+			selections[0],
+			self.get_hand_no(0)
+		));
+
+		result.result = wielding_result::type::SUCCESSFUL;
+		result.play_effects_only_in_last();
+		return result;
+	}
 
 	augs::constant_size_vector<item_slot_transfer_request, hand_count> holsters;
 	augs::constant_size_vector<item_slot_transfer_request, hand_count> draws;
 
 	for (size_t i = 0; i < selections.size(); ++i) {
 		const auto hand = self.get_hand_no(i);
-
-		if (hand.dead()) {
-			continue;
-		}
 
 		const auto item_for_hand = cosmos[selections[i]];
 		const auto item_in_hand = hand.get_item_if_any();
@@ -670,15 +710,7 @@ wielding_result inventory_mixin<E>::make_wielding_transfers_for(const hand_selec
 	concatenate(result.transfers, holsters);
 	concatenate(result.transfers, draws);
 
-	/* Play only the last transfer to avoid cognitive overload */
-
-	for (auto& r : result.transfers) {
-		r.play_sound_effects = false;
-	}
-	
-	if (result.transfers.size() > 0) {
-		result.transfers.back().play_sound_effects = true;
-	}
+	result.play_effects_only_in_last();
 
 	return result;
 }

@@ -20,10 +20,16 @@
 #include "game/enums/item_holding_stance.h"
 
 #include "game/detail/view_input/sound_effect_input.h"
+#include "game/detail/view_input/particle_effect_input.h"
 
 struct transfer_sound_result {
 	sound_effect_input sound_input;
 	sound_effect_start_input sound_start;
+};
+
+struct transfer_particles_result {
+	particle_effect_input particles_input;
+	particle_effect_start_input particles_start;
 };
 
 struct perform_transfer_result {
@@ -32,9 +38,10 @@ struct perform_transfer_result {
 	std::optional<messages::item_picked_up_message> picked;
 
 	std::optional<transfer_sound_result> transfer_sound;
+	std::optional<transfer_particles_result> transfer_particles;
 
 	void notify(logic_step) const;
-	void play_sound(logic_step) const;
+	void play_effects(logic_step) const;
 };
 
 perform_transfer_result perform_transfer(

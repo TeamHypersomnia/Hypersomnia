@@ -56,8 +56,9 @@ struct particles_emission {
 
 	float initial_rotation_variation = 0.f;
 	bool randomize_acceleration = false;
+	bool scale_damping_to_velocity = false;
 	bool should_particles_look_towards_velocity = true;
-	pad_bytes<2> pad;
+	pad_bytes<1> pad;
 
 	tuple_of_particle_definitions_vectors particle_definitions;
 	render_layer target_render_layer = render_layer::ILLUMINATING_PARTICLES;

@@ -22,6 +22,8 @@ enum class test_scene_particle_effect_id {
 	THUNDER_REMNANTS,
 	MISSILE_SMOKE_TRAIL,
 
+	PICKUP_SPARKLES,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

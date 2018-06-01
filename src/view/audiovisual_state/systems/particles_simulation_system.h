@@ -122,7 +122,8 @@ public:
 		auto new_particle = templates[rng.randval(0u, static_cast<unsigned>(templates.size()) - 1)];
 		
 		const auto velocity_degrees = basic_velocity_degrees + angular_offset + rng.randval(spread);
-		const auto new_velocity = vec2::from_degrees(velocity_degrees) * rng.randval(speed);
+		const auto chosen_speed = rng.randval(speed);
+		const auto new_velocity = vec2::from_degrees(velocity_degrees) * chosen_speed;
 		
 		new_particle.set_velocity(new_velocity);
 		new_particle.set_position(position);
@@ -135,7 +136,9 @@ public:
 			new_particle.set_rotation(rng.randval(emission.initial_rotation_variation));
 		}
 
-		new_particle.set_rotation_speed(rng.randval(emission.rotation_speed));
+		const auto chosen_rotation_speed = rng.randval(emission.rotation_speed);
+
+		new_particle.set_rotation_speed(chosen_rotation_speed);
 		new_particle.set_max_lifetime_ms(rng.randval(emission.particle_lifetime_ms));
 
 		if (emission.randomize_acceleration) {
@@ -144,6 +147,18 @@ public:
 					rng.randval(spread) + basic_velocity_degrees
 				) * rng.randval(emission.acceleration)
 			);
+		}
+
+		if (emission.scale_damping_to_velocity) {
+			{
+				const auto mult = chosen_speed / speed.second;
+				new_particle.linear_damping *= mult;
+			}
+
+			/* { */
+			/* 	const auto mult = chosen_rotation_speed / emission.rotation_speed.second; */
+			/* 	new_particle.angular_damping *= mult; */
+			/* } */
 		}
 
 		return new_particle;

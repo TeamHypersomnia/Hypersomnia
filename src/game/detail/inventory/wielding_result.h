@@ -16,6 +16,9 @@ struct wielding_result {
 
 	void apply(const logic_step);
 
+	void play_effects_only_in_first();
+	void play_effects_only_in_last();
+
 	bool successful() const {
 		return result == type::SUCCESSFUL;
 	}

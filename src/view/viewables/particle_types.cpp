@@ -50,7 +50,7 @@ void general_particle::set_acceleration(const vec2 new_acc) {
 }
 
 void general_particle::multiply_size(const float mult) {
-	size *= mult;
+	size = vec2(size) * mult;
 }
 
 void general_particle::set_rotation(const float new_rotation) {
@@ -71,7 +71,7 @@ void general_particle::colorize(const rgba mult) {
 
 void general_particle::set_image(
 	const assets::image_id id,
-	vec2 s,
+	const vec2i s,
 	const rgba col
 ) {
 	image_id = id;

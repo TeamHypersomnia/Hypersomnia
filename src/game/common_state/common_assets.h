@@ -14,8 +14,9 @@ struct common_assets {
 
 	sound_effect_input item_throw_sound;
 	sound_effect_input item_holster_sound;
-	sound_effect_input item_pickup_sound;
+	sound_effect_input item_pickup_to_deposit_sound;
 
+	particle_effect_input item_pickup_particles;
 	particle_effect_input exhausted_smoke_particles;
 
 	assets::particle_effect_id exploding_ring_smoke;

@@ -22,13 +22,18 @@ void perform_transfer_result::notify(const logic_step step) const {
 	step.post_message_if(picked);
 	step.post_messages(interpolation_corrected);
 	step.post_message_if(destructed);
-	play_sound(step);
+	play_effects(step);
 }
 
-void perform_transfer_result::play_sound(const logic_step step) const {
+void perform_transfer_result::play_effects(const logic_step step) const {
 	if (transfer_sound.has_value()) {
 		auto& d = *transfer_sound;
 		d.sound_input.start(step, d.sound_start);
+	}
+
+	if (transfer_particles.has_value()) {
+		auto& d = *transfer_particles;
+		d.particles_input.start(step, d.particles_start);
 	}
 }
 
@@ -255,7 +260,7 @@ perform_transfer_result perform_transfer(
 		special_physics.during_cooldown_ignore_collision_with = previous_slot_container;
 	}
 
-	if (r.play_sound_effects) {
+	if (r.play_transfer_sounds) {
 		if (is_drop_request) {
 			transfer_sound_result dropped;
 
@@ -278,19 +283,20 @@ perform_transfer_result perform_transfer(
 				output.transfer_sound.emplace(std::move(wielded));
 			}
 			else if (target_slot.get_id().type == slot_function::ITEM_DEPOSIT) {
-				/* Holster or pickup */
-				transfer_sound_result wielded;
+				{
+					transfer_sound_result sound;
 
-				if (is_pickup) {
-					wielded.sound_input = cosmos.get_common_assets().item_pickup_sound;
+					if (is_pickup) {
+						sound.sound_input = cosmos.get_common_assets().item_pickup_to_deposit_sound;
+					}
+					else {
+						sound.sound_input = cosmos.get_common_assets().item_holster_sound;
+					}
+
+					sound.sound_start = sound_effect_start_input::at_entity(target_root);
+
+					output.transfer_sound.emplace(std::move(sound));
 				}
-				else {
-					wielded.sound_input = cosmos.get_common_assets().item_holster_sound;
-				}
-
-				wielded.sound_start = sound_effect_start_input::at_entity(target_root);
-
-				output.transfer_sound.emplace(std::move(wielded));
 			}
 			else {
 				transfer_sound_result wielded;
@@ -302,6 +308,25 @@ perform_transfer_result perform_transfer(
 
 				output.transfer_sound.emplace(std::move(wielded));
 			}
+		}
+
+	}
+
+	if (r.play_transfer_particles) {
+		if (is_pickup) {
+			transfer_particles_result particles;
+
+			particles.particles_input = cosmos.get_common_assets().item_pickup_particles;
+
+			auto effect_transform = initial_transform_of_transferred;
+
+			if (const auto root_transform = target_root.find_logic_transform()) {
+				effect_transform.rotation = (effect_transform.pos - root_transform->pos).degrees();
+			}
+
+			particles.particles_start = particle_effect_start_input::fire_and_forget(effect_transform);
+
+			output.transfer_particles.emplace(std::move(particles));
 		}
 	}
 

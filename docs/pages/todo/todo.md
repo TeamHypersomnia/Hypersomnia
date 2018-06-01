@@ -5,6 +5,9 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Improve wielding transfers calculation so that less transfers are made
+	- Transfer effects will be fixed automagically then
+
 - Support for animation import
 	- Not important until deathmatch as we will probably setup testbed animations for both parties, programatically
 	- Combo with text "Import..."

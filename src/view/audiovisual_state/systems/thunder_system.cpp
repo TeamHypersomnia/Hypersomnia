@@ -127,17 +127,17 @@ void thunder_system::advance(
 					const auto* const remnants = mapped_or_nullptr(manager, cosmos.get_common_assets().thunder_remnants);
 
 					if (remnants != nullptr) {
-						const auto remnants_emission = remnants->emissions.at(0);
+						const auto& remnants_emission = remnants->emissions.at(0);
 
 						{
 							const auto spawner = [&](auto dummy) {
 								auto new_p = particles_output_for_effects.spawn_particle<decltype(dummy)>(
 									rng,
 									0.f,
-									{ 20.f, 100.f },
+									remnants_emission.base_speed,
 									b.to,
 									0.f,
-									360.f,
+									rng.randval(remnants_emission.spread_degrees),
 									remnants_emission
 								);
 

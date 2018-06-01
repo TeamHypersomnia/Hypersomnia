@@ -23,7 +23,7 @@ struct general_particle {
 	vec2 acc;
 	assets::image_id image_id;
 	rgba color = white;
-	vec2 size;
+	vec2i size;
 	float rotation = 0.f;
 	float rotation_speed = 0.f;
 	float linear_damping = 0.f;
@@ -66,13 +66,22 @@ struct general_particle {
 			size_mult *= std::min(1.f, (current_lifetime_ms / unshrinking_time_ms)*(current_lifetime_ms / unshrinking_time_ms));
 		}
 
-		if (const auto drawn_size = vec2i(size_mult * size); drawn_size.area() > 1) {
+		auto draw = [&](const vec2i drawn_size) {
 			if (in.use_neon_map) {
 				augs::detail_neon_sprite(in.output.output_buffer, manager, image_id, drawn_size, pos, rotation, color);
 			}
 			else {
 				augs::detail_sprite(in.output.output_buffer, manager, image_id, drawn_size, pos, rotation, color);
 			}
+		};
+
+		if (size_mult != 1.f) {
+			if (const auto target_size = vec2i(vec2(size) * size_mult); target_size.area() > 1) {
+				draw(target_size);
+			}
+		}
+		else {
+			draw(size);
 		}
 	}
 
@@ -87,11 +96,7 @@ struct general_particle {
 	void set_max_lifetime_ms(const float);
 	void colorize(const rgba);
 
-	void set_image(
-		const assets::image_id,
-		vec2 size,
-		const rgba
-	);
+	void set_image(assets::image_id, vec2i size, rgba);
 };
 
 struct animation_in_particle {
