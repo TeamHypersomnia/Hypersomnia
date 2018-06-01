@@ -29,3 +29,5 @@ private:
 using editor_plain_animations_gui = editor_unpathed_asset_gui<assets::plain_animation_id>;
 using editor_torso_animations_gui = editor_unpathed_asset_gui<assets::torso_animation_id>;
 using editor_legs_animations_gui = editor_unpathed_asset_gui<assets::legs_animation_id>;
+
+using editor_particle_effects_gui = editor_unpathed_asset_gui<assets::particle_effect_id>;

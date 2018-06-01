@@ -402,6 +402,16 @@ struct tests_of_traits {
 	>);
 
 	static_assert(std::is_trivially_copyable_v<augs::value_with_flag<int>>);
+
+	static_assert(is_minmax_v<augs::minmax<float>>);
+	static_assert(is_minmax_v<augs::minmax<int>>);
+	static_assert(!is_minmax_v<augs::simple_pair<float, int>>);
+
+	static_assert(is_arithmetic_minmax_v<augs::minmax<float>>);
+	static_assert(is_arithmetic_minmax_v<augs::minmax<int>>);
+
+	static_assert(!is_arithmetic_minmax_v<augs::minmax<std::string>>);
+	static_assert(!is_arithmetic_minmax_v<augs::minmax<augs::minmax<float>>>);
 };
 
 /* 

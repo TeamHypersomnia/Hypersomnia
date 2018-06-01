@@ -320,3 +320,5 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 template struct editor_unpathed_asset_gui<assets::plain_animation_id>;
 template struct editor_unpathed_asset_gui<assets::torso_animation_id>;
 template struct editor_unpathed_asset_gui<assets::legs_animation_id>;
+
+template struct editor_unpathed_asset_gui<assets::particle_effect_id>;

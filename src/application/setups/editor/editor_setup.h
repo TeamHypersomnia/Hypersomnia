@@ -104,6 +104,8 @@ class editor_setup : private current_access_cache<editor_setup> {
 	editor_plain_animations_gui plain_animations_gui = std::string("Plain animations");
 	editor_torso_animations_gui torso_animations_gui = std::string("Torso animations");
 	editor_legs_animations_gui legs_animations_gui = std::string("Legs animations");
+
+	editor_particle_effects_gui particle_effects_gui = std::string("Particle effects");
 	// END GEN INTROSPECTOR
 
 	std::optional<editor_popup> ok_only_popup;

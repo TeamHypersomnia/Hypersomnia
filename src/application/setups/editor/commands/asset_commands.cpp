@@ -86,3 +86,8 @@ template struct create_unpathed_asset_id_command<assets::legs_animation_id>;
 template struct forget_asset_id_command<assets::legs_animation_id>;
 template struct duplicate_asset_command<assets::legs_animation_id>;
 template struct change_asset_property_command<assets::legs_animation_id>;
+
+template struct create_unpathed_asset_id_command<assets::particle_effect_id>;
+template struct forget_asset_id_command<assets::particle_effect_id>;
+template struct duplicate_asset_command<assets::particle_effect_id>;
+template struct change_asset_property_command<assets::particle_effect_id>;

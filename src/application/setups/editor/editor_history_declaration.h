@@ -81,5 +81,10 @@ using editor_history_base = augs::history_with_marks<
 	create_unpathed_asset_id_command<assets::legs_animation_id>,
 	forget_asset_id_command<assets::legs_animation_id>,
 	duplicate_asset_command<assets::legs_animation_id>,
-	change_asset_property_command<assets::legs_animation_id>
+	change_asset_property_command<assets::legs_animation_id>,
+
+	create_unpathed_asset_id_command<assets::particle_effect_id>,
+	forget_asset_id_command<assets::particle_effect_id>,
+	duplicate_asset_command<assets::particle_effect_id>,
+	change_asset_property_command<assets::particle_effect_id>
 >;

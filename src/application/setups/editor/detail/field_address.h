@@ -2,6 +2,7 @@
 #include <cstddef>
 #include "augs/filesystem/path_declaration.h"
 #include "game/assets/animation.h"
+#include "view/viewables/particle_effect.h"
 
 #include "game/components/shape_polygon_component.h"
 #include "game/components/rigid_body_component.h"
@@ -32,6 +33,8 @@ using edited_field_type_id = type_in_list_id<
 		plain_animation_frames_type,
 		torso_animation_frames_type,
 		legs_animation_frames_type,
+
+		std::vector<particles_emission>,
 
 		sound_meta,
 		image_meta
