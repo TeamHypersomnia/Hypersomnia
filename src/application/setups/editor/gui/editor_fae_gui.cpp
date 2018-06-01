@@ -274,6 +274,10 @@ fae_tree_output editor_selected_fae_gui::perform(
 		for_each_match
 	);
 
+	auto after_return = augs::scope_guard([&]() { 
+		do_view_mode_switch(); 
+	});
+
 	const auto provider = in_selection_provider { cosm, cached_flavour_to_entities, true };
 
 	switch (view_mode) {
