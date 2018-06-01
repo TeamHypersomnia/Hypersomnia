@@ -9,7 +9,8 @@ namespace components {
 	struct sprite {
 		// GEN INTROSPECTOR struct components::sprite
 		flip_flags flip;
-		pad_bytes<2> pad;
+		bool disable_neon_map = false;
+		pad_bytes<1> pad;
 		// END GEN INTROSPECTOR
 	};
 };

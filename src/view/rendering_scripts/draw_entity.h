@@ -42,8 +42,8 @@ FORCE_INLINE void detail_specific_entity_drawer(
 	T render_visitor,
 	transformr viewing_transform
 ) {
-	if (const auto* const maybe_sprite = typed_handle.template find<invariants::sprite>()) {
-		const auto& sprite = *maybe_sprite;
+	if constexpr(typed_handle.template has<invariants::sprite>()) {
+		const auto& sprite = typed_handle.template get<invariants::sprite>();
 		using input_type = invariants::sprite::drawing_input;
 
 		auto input = input_type(in.drawer);
@@ -91,8 +91,10 @@ FORCE_INLINE void detail_specific_entity_drawer(
 		}
 
 		render_visitor(sprite, in.manager, input);
+		return;
 	}
-	else if (const auto polygon = typed_handle.template find<invariants::polygon>()) {
+
+	if (const auto polygon = typed_handle.template find<invariants::polygon>()) {
 		using input_type = invariants::polygon::drawing_input;
 
 		auto input = input_type(in.drawer);
@@ -101,6 +103,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 		input.global_time_seconds = in.global_time_seconds;
 
 		render_visitor(*polygon, in.manager, input);
+		return;
 	}
 }
 
@@ -302,6 +305,12 @@ FORCE_INLINE void specific_draw_neon_map(
 	const draw_renderable_input in,
 	const interpolation_system& interp
 ) {
+	if constexpr(typed_handle.template has<components::sprite>()) {
+		if (typed_handle.template get<components::sprite>().disable_neon_map) {
+			return;
+		}
+	}
+
 	auto neon_maker  = [](const auto& renderable, const auto& manager, auto& input) {
 		input.use_neon_map = true;
 		renderable.draw(manager, input);
