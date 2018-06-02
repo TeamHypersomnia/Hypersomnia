@@ -25,3 +25,6 @@
 - title: Inferred caches
   name: inferred_caches
   title_link: inferred_cache
+- title: Scratchpads (PL)
+  name: scratchpads_pl
+  description: Working drafts of manuals in Polish. Will eventually be translated into English and integrated with the rest of this wiki.

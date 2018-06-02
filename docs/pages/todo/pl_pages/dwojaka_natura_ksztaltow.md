@@ -1,5 +1,6 @@
 ---
 title: Dwojaka natura kształtów
+tags: [scratchpads_pl]
 hide_sidebar: true
 permalink: dwojaka_natura_ksztaltow
 summary: Takie tam.

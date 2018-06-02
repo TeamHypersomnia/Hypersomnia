@@ -1,5 +1,6 @@
 ---
 title: Obrazki w edytorze
+tags: [scratchpads_pl]
 hide_sidebar: true
 permalink: obrazki_w_edytorze
 summary: Takie tam.
