@@ -110,6 +110,10 @@ Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.
 
 	{% include image.html file="pages/todo/pl_pages/torso_bare.png" %}
 
+	Ta animacja będzie dodatkowo służyć jako domyślna animacja trzymania itemów, do których nie ma żadnej specjalnej animacji.  
+	Istotnie, ta animacja nie wygląda źle z małymi itemami.  
+	Później, jeśli będziemy mieli czas, możemy dorobić oddzielną animację na chodzenie z małymi itemami w rękach.  
+
 	- Gra **samodzielnie** kontynuuje animację puszczając ją od tyłu...
 		- ...a potem **odbijając ją w pionie** i odtwarzając jeszcze raz, tworząc **pełny cykl** chodzenia na dwóch nogach.
 		- Pierwsza i ostatnia klatka odtwarza się dwa razy. To upraszcza nam ogromnie kalkulacje, ale również nie wygląda źle.
@@ -185,11 +189,19 @@ Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.
 7. Animacja strzelania z pistoletu. 
 	- Wszystko tak samo jak w punkcie 4 (strzelanie z karabinu), tylko na obrazkach będzie inna postawa.
 
-8. (Opcjonalnie) Animacja chodzenia z ciężkim karabinem maszynowym. 
+8. (Opcjonalnie) Animacja chodzenia z granatem. 
+	- Wszystko tak samo jak w punkcie 3 (chodzenie z karabinem), tylko na obrazkach będzie inna postawa.
+	- W przypadku braku tej animacji nie będzie tragedii jeśli zastąpi ją animacja nr 1 (chodzenie z pustymi rękoma).
+
+9. (Opcjonalnie) Animacja rzucenia granatu. 
+	- Wszystko tak samo jak w punkcie 4 (strzelanie z karabinu), tylko na obrazkach będzie inna postawa.
+	- Ta animacja dodatkowo posłuży jako animacja wyrzucenia itema.
+
+10. (Opcjonalnie) Animacja chodzenia z ciężkim karabinem maszynowym. 
 	- Wszystko tak samo jak w punkcie 3 (chodzenie z karabinem), tylko na obrazkach będzie inna postawa.
 	- W przypadku braku tej animacji nie będzie tragedii jeśli zastąpi ją animacja nr 3 (chodzenie z karabinem).
 
-9. (Opcjonalnie) Animacja strzelania z ciężkiego karabinu maszynowego. 
+11. (Opcjonalnie) Animacja strzelania z ciężkiego karabinu maszynowego. 
 	- Wszystko tak samo jak w punkcie 4 (strzelanie z karabinu), tylko na obrazkach będzie inna postawa.
 	- W przypadku braku tej animacji nie będzie tragedii jeśli zastąpi ją animacja nr 4 (strzelanie z karabinu).
 
@@ -202,6 +214,8 @@ Obrazki nóg muszą być ciągłe, nie mogą być w środku puste ani mieć w �
 Jako bonus, to sprawi, że nasze nogi będą kompatybilne również z "chudszymi" torsami.  
 
 **TODO:** Poprawić animacje nóg w myśl tej zasady.
+
+#### Lista
 
 1. Animacja nóg podczas chodzenia **równoległego** do kierunku patrzenia.  
 	{% include tip.html content="Oprócz tego, że nie rysujemy pierwszej klatki, procedura dla tej animacji jest analogiczna do animacji chodzenia z pustymi rękoma." %}
@@ -238,8 +252,6 @@ Jako bonus, to sprawi, że nasze nogi będą kompatybilne również z "chudszymi
 		- Przy strafowaniu wygląda to na konieczne.
 		- W edytorze: pierwsza i dziesiąta klatka powinny być puste.
 	- Brak wymagań co do symetrii.
-
-#### Lista
 
 ### Głowa
 
