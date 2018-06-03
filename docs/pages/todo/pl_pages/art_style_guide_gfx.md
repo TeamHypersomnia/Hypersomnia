@@ -13,6 +13,7 @@ summary: Założenia dotyczące grafiki.
 - Obrazek **dynamiczny** to taki, którego ruch jest nieograniczony.
 	- Przykłady: postacie, itemy, bronie, skrzynki jako przeszkody na scenie, bomba.
 
+### Artefakty z osamotnionymi pikselami
 Jeżeli na obrazku **dynamicznym** potrzebujemy postawić jakiś "osamotniony" piksel który kontrastuje z resztą,  
 to nie może być to *istotny* element obrazka.  
 
@@ -31,9 +32,10 @@ Rozwiązaniem tego problemu jest dodanie sąsiedniego piksela:
 
 {% include image.html file="pages/todo/pl_pages/bilmer_two_px.png" %}
 
-W tym przypadku, nawet gdy przy obrocie zostanie utracony jeden piksel, drugi zawsze będzie widoczny, i artefakt nie będzie miał miejsca.  
+W tym przypadku, nawet gdy przy obrocie zostanie utracony jeden piksel, drugi zawsze będzie widoczny i artefakt nie będzie miał miejsca.  
 
-Oczywiście, jeśli nagłe zniknięcie piksela nie psuje nam całokształtu wyglądu (element nie jest *istotny*), to możemy zostawić go bez takich sąsiadów.
+Oczywiście, jeśli nagłe zniknięcie piksela nie psuje nam całokształtu wyglądu (element nie jest *istotny*), to możemy zostawić go bez takich sąsiadów.  
+Problem nie aplikuje się do obrazków **sztywnych**, które z definicji nie będą nigdy obracane, i nie będą miały szansy źle się wyrenderować.  
 
 ## Cieniowanie
 
@@ -67,4 +69,26 @@ Zatem wszystkie dotąd istniejące grafiki można uznać za **diffuse mapy**.
 
 ### Postać
 
+### Bronie
 
+#### Wystrzał
+
+Jeżeli dodajemy do broni animację wystrzału, to nie powinna ona opierać się wyłącznie na drobnych zmianach koloru.  
+Gra jest bardzo dynamiczna, dlatego animacja powinna:
+- w jakiś sposób zmieniać kształt broni, lub
+- rozszerzać istniejące elementy ujawniając jaskrawe światło pod spodem, lub
+- dodawać kompletnie nowy element, najlepiej też jaskrawy, lub
+- wszystkiego po trochu.
+
+To jest przykład animacji, która będzie praktycznie niezauważalna w całym chaosie rozgrywki:
+
+{% include image.html file="pages/todo/pl_pages/vindicator.gif" %}
+
+To jest za to przykład animacji która zmienia kształt broni i będzie bardzo zauważalna, osiągając zamierzony efekt:
+
+{% include image.html file="pages/todo/pl_pages/gral3.gif" %}
+
+
+### Dekoracje
+
+- Może być kuszące, aby dużym dekoracjom robić animacje na całym ich obszarze. Niestety musimy liczyć się z ogarniczoną przestrzenią atlasu.
