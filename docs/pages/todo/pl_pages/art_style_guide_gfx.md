@@ -8,11 +8,11 @@ summary: Założenia dotyczące grafiki.
 
 ## Kontur
 
-- Preferujemy twardy, czarny, zewnętrzny obrys wokół obrazków o grubości jednego piksela.
+- Preferujemy twardy, czarny obrys grubości jednego piksela na zewnątrz każdego obrazka.
 	- Wyjątek: krawędze wzdłuż których obrazek układany jest w kafelki, np. na podłogach lub ścianach.
 - Zdajemy sobie sprawę z tego, że istnieją inne techniki kolorowania krawędzi, ale...
 	- Zależy nam na tym aby obiekty się wyróżniały.
-	- Mniej mamy na głowie, a zmiana koloru konturu jest czymś co można zrobić zawsze.
+	- Mniej mamy teraz na głowie, a zmiana koloru konturu jest czymś co można zrobić później, również po skończeniu pracy nad obrazkiem.
 
 ## Obrazki sztywne i dynamiczne
 
@@ -30,7 +30,7 @@ Może nas podkusić aby po prostu zostawić taki piksel:
 
 {% include image.html file="pages/todo/pl_pages/bilmer_one_px.png" %}
 Jest to jednak broń -  bronie są w grze często **obracane**.
-Niestety pixel-art ma to do siebie, że traci jakość podczas obrotu.  
+Niestety, pixel-art ma to do siebie, że traci jakość podczas obrotu.  
 Następujący artefakt może mieć miejsce:  
 
 {% include image.html file="pages/todo/pl_pages/one_pixel_problem.png" %}
@@ -43,7 +43,7 @@ Rozwiązaniem tego problemu jest dodanie sąsiedniego piksela:
 W tym przypadku, nawet gdy przy obrocie zostanie utracony jeden piksel, drugi zawsze będzie widoczny i artefakt nie będzie miał miejsca.  
 
 Oczywiście, jeśli nagłe zniknięcie piksela nie psuje nam całokształtu wyglądu (element nie jest *istotny*), to możemy zostawić go bez takich sąsiadów.  
-Problem nie aplikuje się do obrazków **sztywnych**, które z definicji nie będą nigdy obracane, i nie będą miały szansy źle się wyrenderować.  
+Problem nie aplikuje się do obrazków **sztywnych**, które z definicji nie będą nigdy obracane i nie będą miały szansy źle się wyrenderować.  
 
 ## Cieniowanie
 
@@ -57,7 +57,7 @@ Idealnym wzorem do naśladowania jest laboratoryjna podłoga - mamy charakteryst
 Oczywiście, ta technika musi być stosowana z umiarem aby rezultat nie przypominał pillow shadingu.  
 
 W przyszłości, to ograniczenie będzie rozwiązane przez wprowadzenie normal map - wtedy artysta będzie miał pełnię możliwości definiowania kształtu obiektu.  
-Zatem wszystkie dotąd istniejące grafiki można uznać za **diffuse mapy**.
+Wszystkie dotąd istniejące grafiki można zatem uznać za **diffuse mapy**.
 
 ## Kolorystyka
 
@@ -70,7 +70,7 @@ Zatem wszystkie dotąd istniejące grafiki można uznać za **diffuse mapy**.
 - Jeśli item nie wiąże się z żadną frakcją, ale jest związany z "żywiołem" (np. broń plazmowa), to powinien przestrzegać kolorystyki tego właśnie żywiołu - np. plasma gun powinien mieć w większości zielone światła.
 - Jeśli obrazek jest dekoracją specifyczną dla danego środowiska, to powinien przestrzegać kolorystyki tego środowiska.
 	- To już do ustalenia przez mapującego.
-		- Przykładowo, laboratoryjne podłogi i ściany mogłyby mieć kolory białe i szare z cyjanowymi światłami.
+		- Przykładowo, wszystkie laboratoryjne podłogi i ściany mogłyby mieć kolory białe i szare, z cyjanowymi światłami.
 - Jeśli item nie jest związany z żadną frakcją, ani żadnym żywiołem, ani nie jest to dekoracja specyficzna dla danego środowiska, to nie ma zasad kolorystyki.
 
 ## Neon mapy
@@ -88,7 +88,7 @@ Gra jest bardzo dynamiczna, dlatego animacja powinna:
 - w jakiś sposób zmieniać kształt broni, lub
 - rozszerzać istniejące elementy ujawniając jaskrawe światło pod spodem, lub
 - dodawać kompletnie nowy element, najlepiej też jaskrawy, lub
-- wszystkiego po trochu.
+- mieszać powyższe techniki.
 
 To jest przykład animacji, która będzie praktycznie niezauważalna w całym chaosie rozgrywki:
 
