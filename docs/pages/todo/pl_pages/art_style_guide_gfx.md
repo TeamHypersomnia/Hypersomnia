@@ -78,15 +78,90 @@ Wszystkie dotąd istniejące grafiki można zatem uznać za **diffuse mapy**.
 		- Przykładowo, wszystkie laboratoryjne podłogi i ściany mogłyby mieć kolory białe i szare, z cyjanowymi światłami.
 - Jeśli item nie jest związany z żadną frakcją, ani żadnym żywiołem, ani nie jest to dekoracja specyficzna dla danego środowiska, to nie ma zasad kolorystyki.
 
-## Neon mapy
+## Kategoria: Postać
 
-## Animacje
+Poniżej znajduje się lista grafik i animacji które są konieczne aby stworzyć kompletne doświadczenie postaci na scenie.
 
-### Postać
+{% include important.html content="Jeden i ten sam *obrazek* może być używany przez wiele *klatek*." %}
+{% include important.html content="Należy przestrzegać ustalanych poniżej liczb rysowanych obrazków, aby klatki poszczególnych części ciała perfekcyjnie współgrały ze sobą na ekranie." %}
 
-### Bronie
+Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.  
+  
+### Tors
 
-#### Wystrzał
+{% include important.html content="Wszystkie klatki torsu powinny być **pozbawione głowy**. Ta jest dodana podczas rozgrywki." %}
+
+- **TODO: Przykłady muszą być poprawione w myśl tej zasady!**
+
+#### Lista
+
+1. Animacja chodzenia z pustymi rękoma.  
+	Ilość rysowanych *obrazków*: **n (= 5)** lub **2n (= 10)**.  
+	Długość kompletnego cyklu ruchu: **4n (= 20)** *klatek*.  
+
+	Przykład poprawnej animacji:  
+
+	{% include image.html file="pages/todo/pl_pages/torso_bare.png" %}
+
+	- Gra **samodzielnie** kontynuuje animację puszczając ją od tyłu...
+		- ...a potem **odbijając ją w pionie** i odtwarzając jeszcze raz, tworząc **pełny cykl** chodzenia na dwóch nogach.
+		- Pierwsza i ostatnia klatka odtwarza się dwa razy. To upraszcza nam ogromnie kalkulacje, ale również nie wygląda źle.
+	- **Alternatywne rozwiązanie**: Dla każdej animacji, edytor eksponuje opcję *has_backward_frames*.
+		- To pozwala artyście samodzielnie narysować animację powrotną.
+		- Wtedy artysta musi narysować **2n - 1 (= 9)** obrazków do animacji chodzenia.
+			- Dziesiąta klatka powinna być dodana do edytora z obrazka pierwszej, aby cykl kończył się na takim samym obrazku, na którym zaczął.
+			- Późniejsze odbicie w pionie i tak jest pozostawione grze.
+	- Pierwsza klatka będzie wyświetlana dodatkowo dla **gracza który stoi w miejscu**.
+	- Brak wymagań co do symetrii.
+
+
+2. Animacja chodzenia z karabinem.  
+	Ilość rysowanych obrazków: **n (= 5)**
+	Długość kompletnego cyklu ruchu: **2n (= 10)** *klatek*.  
+
+	**TODO:** Gdy będziemy mieli już solidne animacje wszystkich postaw, możemy zwiększyć ilość obrazków (i klatek) dla tej animacji.
+
+	Przykład poprawnej animacji:
+
+	{% include image.html file="pages/todo/pl_pages/torso_rifle.png" %}
+
+	- Gra **samodzielnie** kontynuuje animację puszczając ją od tyłu...
+		- ...ale już nie odbija jej w pionie na kolejny cykl. W tym wypadku to już tak dobrze nie zadziała.
+	- **Alternatywne rozwiązanie**: Dla każdej animacji, edytor eksponuje opcję *has_backward_frames*.
+		- To pozwala artyście samodzielnie narysować animację powrotną.
+		- Wtedy artysta musi narysować **2n - 1 (= 9)** obrazków do animacji chodzenia.
+			- Dziesiąta klatka powinna być dodana do edytora z obrazka pierwszej, aby cykl kończył się na takim samym obrazku, na którym zaczął.
+	- Pierwsza klatka będzie wyświetlana dodatkowo dla **gracza który stoi w miejscu**.
+	- Brak wymagań co do symetrii.
+
+3. Animacja strzelania z karabinu.  
+	Ilość rysowanych obrazków: **x = dowolne!** (może być równa **n**, ale nie ma to znaczenia.)  
+	Długość wynikowego cyklu: **2x**  
+
+	Przykład poprawnej animacji:  
+
+	{% include image.html file="pages/todo/pl_pages/torso_rifle_shoot.png" %}
+
+3. Animacja chodzenia z pistoletem. 
+	- Wszystko tak samo jak w punkcie 2., tylko inne obrazki!
+
+3. Animacja chodzenia z ciężkim karabinem maszynowym. 
+	- Wszystko tak samo jak w punkcie 2., tylko inne obrazki!
+
+4. Animacja chodzenia z dwiema brońmi (akimbo). 
+
+### Nogi
+
+#### Lista
+
+### Głowa
+
+Jeden sprite.  
+Najlepiej, jeśli centrum obrazka głowy wypada dokładnie w środku głowy.  
+
+## Kategoria: Bronie
+
+### Wystrzał
 
 Jeżeli dodajemy do broni animację wystrzału, to nie powinna ona opierać się wyłącznie na drobnych zmianach koloru.  
 Gra jest bardzo dynamiczna, dlatego animacja powinna:
@@ -99,17 +174,18 @@ To jest przykład animacji, która będzie praktycznie niezauważalna w całym c
 
 {% include image.html file="pages/todo/pl_pages/vindicator.gif" %}
 
-To jest za to przykład animacji która zmienia kształt broni i będzie bardzo zauważalna, osiągając zamierzony efekt:
+To jest za to idealny przykład animacji która zmienia kształt broni i będzie bardzo zauważalna, osiągając zamierzony efekt:
 
 {% include image.html file="pages/todo/pl_pages/gral3.gif" %}
 
 
-### Dekoracje
+## Kategoria: Dekoracje
 
 - Może być kuszące, aby dużym dekoracjom robić animacje na całym ich obszarze. Niestety musimy liczyć się z ograniczoną przestrzenią atlasu.
+
 
 ## Wskazówki ogólne
 
 - Jeśli rysujemy jakieś urządzenie elektroniczne...
 	- Warto zrobić wyświetlacze w oddzielnym obrazku/animacji, **w kolorach czarno-białych**.
-	- Wtedy z poziomu gry da się zmienić kolory samego wyświetlacza, np. na czerwony który sygnalizuje awarię lub zniszczenie.
+		- Wtedy z poziomu gry da się zmienić kolory samego wyświetlacza, np. na czerwony który sygnalizuje awarię lub zniszczenie.
