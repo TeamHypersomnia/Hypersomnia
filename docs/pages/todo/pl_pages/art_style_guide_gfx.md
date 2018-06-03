@@ -81,9 +81,16 @@ Wszystkie dotąd istniejące grafiki można zatem uznać za **diffuse mapy**.
 ## Kategoria: Postać
 
 Poniżej znajduje się lista grafik i animacji które są konieczne aby stworzyć kompletne doświadczenie postaci na scenie.
+Każda kolekcja utworzona z tej listy jest uniwersalna, w tym sensie, że będzie działać dla wszystkich możliwych kombinacji trzymanych przez postać itemów, broni, kapeluszy etc.  
+
+Edytor umożliwia bardzo łatwe ustawianie metryk dla każdego obrazka postaci, np. gdzie ma głowę, plecy i dłonie.  
+Dodatkowo, każdy item ma ustawiane offsety - "kotwice" - za które powinien być trzymany, np. dla broni można ustawić lokację spustu, a dla plecaka można ustawić jego wewnętrzną krawędź.  
+Za pomocą tych właśnie zmiennych gra poprawnie oblicza relatywne pozycjonowanie itemów do obrazka postaci.  
 
 {% include important.html content="Jeden i ten sam *obrazek* może być używany przez wiele *klatek*." %}
 {% include important.html content="Należy przestrzegać ustalanych poniżej liczb rysowanych obrazków, aby klatki poszczególnych części ciała perfekcyjnie współgrały ze sobą na ekranie." %}
+
+{% include tip.html content="Niektóre podpunkty mogą się powtarzać co do słowa. To nie jest pomyłka, a zabieg celowy, aby uprościć pracę nad pojedynczą sekwencją." %}
 
 Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.  
   
@@ -96,8 +103,8 @@ Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.
 #### Lista
 
 1. Animacja chodzenia z pustymi rękoma.  
-	Ilość rysowanych *obrazków*: **n (= 5)** lub **2n (= 10)**.  
-	Długość kompletnego cyklu ruchu: **4n (= 20)** *klatek*.  
+	Ilość rysowanych *obrazków*: **n = 5** lub **2n = 10**.  
+	Długość kompletnego cyklu ruchu: **4n = 20** *klatek*.  
 
 	Przykład poprawnej animacji:  
 
@@ -108,8 +115,8 @@ Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.
 		- Pierwsza i ostatnia klatka odtwarza się dwa razy. To upraszcza nam ogromnie kalkulacje, ale również nie wygląda źle.
 	- **Alternatywne rozwiązanie**: Dla każdej animacji, edytor eksponuje opcję *has_backward_frames*.
 		- To pozwala artyście samodzielnie narysować animację powrotną.
-		- Wtedy artysta musi narysować **2n - 1 (= 9)** obrazków do animacji chodzenia.
-			- Dziesiąta klatka powinna być dodana do edytora z obrazka pierwszej, aby cykl kończył się na takim samym obrazku, na którym zaczął.
+		- Wtedy artysta musi narysować **2n - 1 = 9** obrazków do animacji chodzenia.
+			- W edytorze: dziesiąta klatka powinna być dodana do edytora z obrazka pierwszej, aby cykl kończył się na takim samym obrazku, na którym zaczął.
 			- Późniejsze odbicie w pionie i tak jest pozostawione grze.
 	- Pierwsza klatka będzie wyświetlana dodatkowo dla **gracza który stoi w miejscu**.
 	- Brak wymagań co do symetrii.
@@ -120,8 +127,8 @@ Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.
 	- W przypadku braku tej animacji nie będzie tragedii jeśli zastąpi ją animacja nr 1 (chodzenie z pustymi rękoma).
 
 3. Animacja chodzenia z karabinem.  
-	Ilość rysowanych obrazków: **n (= 5)**  
-	Długość kompletnego cyklu ruchu: **2n (= 10)** *klatek*.  
+	Ilość rysowanych obrazków: **n = 5**  
+	Długość kompletnego cyklu ruchu: **2n = 10** *klatek*.  
 
 	**TODO:** Gdy będziemy mieli już solidne animacje wszystkich postaw, możemy zwiększyć ilość obrazków (i klatek) dla tej animacji.
 
@@ -135,8 +142,8 @@ Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.
 		- ...ale już nie odbija jej w pionie na kolejny cykl. W tym wypadku to nie ma sensu.
 	- **Alternatywne rozwiązanie**: Dla każdej animacji, edytor eksponuje opcję *has_backward_frames*.
 		- To pozwala artyście samodzielnie narysować animację powrotną.
-		- Wtedy artysta musi narysować **2n - 1 (= 9)** obrazków do animacji chodzenia.
-			- Dziesiąta klatka powinna być dodana do edytora z obrazka pierwszej, aby cykl kończył się na takim samym obrazku, na którym zaczął.
+		- Wtedy artysta musi narysować **2n - 1 = 9** obrazków do animacji chodzenia.
+			- W edytorze: dziesiąta klatka powinna być dodana do edytora z obrazka pierwszej, aby cykl kończył się na takim samym obrazku, na którym zaczął.
 	- Pierwsza klatka będzie wyświetlana dodatkowo dla **gracza który stoi w miejscu**.
 	- Brak wymagań co do symetrii.
 
@@ -188,6 +195,49 @@ Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.
 
 
 ### Nogi
+
+Jako, że nogi będą pod torsem, możemy być skłonni do tego aby nie wypełnić detalicznie środkowych elementów obrazków nóg.  
+Jednakże, ponieważ nogi mogą być obracane dowolnie, musimy założyć że każdy piksel może nagle stać się widoczny.  
+Obrazki nóg muszą być ciągłe, nie mogą być w środku puste ani mieć w środku przerywających krawędzi.  
+Jako bonus, to sprawi, że nasze nogi będą kompatybilne również z "chudszymi" torsami.  
+
+**TODO:** Poprawić animacje nóg w myśl tej zasady.
+
+1. Animacja nóg podczas chodzenia **równoległego** do kierunku patrzenia.  
+	{% include tip.html content="Oprócz tego, że nie rysujemy pierwszej klatki, procedura dla tej animacji jest analogiczna do animacji chodzenia z pustymi rękoma." %}
+	Ilość rysowanych *obrazków*: **n - 1 = 4** lub **2(n - 1) = 8**.  
+	Długość kompletnego cyklu ruchu: **4n = 20** *klatek*.  
+
+	Artysta **nie rysuje obrazka dla pierwszej klatki**, ponieważ ta jest zawsze niewidoczna pod stojącym torsem.
+
+	Przykład poprawnej animacji:  
+
+	{% include image.html file="pages/todo/pl_pages/legs_forward.png" %}
+
+	- Gra **samodzielnie** kontynuuje animację puszczając ją od tyłu...
+		- ...a potem **odbijając ją w pionie** i odtwarzając jeszcze raz, tworząc **pełny cykl** chodzenia na dwóch nogach.
+		- Pierwsza i ostatnia klatka odtwarza się dwa razy. To upraszcza nam ogromnie kalkulacje, ale również nie wygląda źle.
+	- **Alternatywne rozwiązanie**: Dla każdej animacji, edytor eksponuje opcję *has_backward_frames*.
+		- To pozwala artyście samodzielnie narysować animację powrotną.
+		- Wtedy artysta musi narysować **2(n - 1) = 8** obrazków do animacji chodzenia.
+			- W edytorze: pierwsza i dziesiąta klatka powinny być puste.
+			- Późniejsze odbicie w pionie i tak jest pozostawione grze.
+	- Brak wymagań co do symetrii.
+
+2. Animacja nóg podczas chodzenia **prostopadłego** do kierunku patrzenia.  
+	Ilość rysowanych *obrazków*: lub **2(n - 1) = 8**.  
+	Długość kompletnego cyklu ruchu: **4n = 20** *klatek*.  
+
+	Artysta **nie rysuje obrazka dla pierwszej i ostatniej klatki**, ponieważ ta jest zawsze niewidoczna pod stojącym torsem.
+
+	Przykład poprawnej animacji:  
+
+	{% include image.html file="pages/todo/pl_pages/legs_strafe.png" %}
+
+	- Uwaga: w przeciwieństwie do animacji chodzenia prosto, artysta *zawsze* samodzielnie rysuje animację powrotną.
+		- Przy strafowaniu wygląda to na konieczne.
+		- W edytorze: pierwsza i dziesiąta klatka powinny być puste.
+	- Brak wymagań co do symetrii.
 
 #### Lista
 
