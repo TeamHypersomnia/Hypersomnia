@@ -6,6 +6,14 @@ permalink: art_style_guide_gfx
 summary: Założenia dotyczące grafiki.
 ---
 
+## Kontur
+
+- Preferujemy twardy, czarny, zewnętrzny obrys wokół obrazków o grubości jednego piksela.
+	- Wyjątek: krawędze wzdłuż których obrazek układany jest w kafelki, np. na podłogach lub ścianach.
+- Zdajemy sobie sprawę z tego, że istnieją inne techniki kolorowania krawędzi, ale...
+	- Zależy nam na tym aby obiekty się wyróżniały.
+	- Mniej mamy na głowie, a zmiana koloru konturu jest czymś co można zrobić zawsze.
+
 ## Obrazki sztywne i dynamiczne
 
 - Obrazek **sztywny** to taki, który nigdy **nie będzie się obracał**. W praktyce, najczęściej będzie stał w miejscu.
@@ -65,6 +73,8 @@ Zatem wszystkie dotąd istniejące grafiki można uznać za **diffuse mapy**.
 		- Przykładowo, laboratoryjne podłogi i ściany mogłyby mieć kolory białe i szare z cyjanowymi światłami.
 - Jeśli item nie jest związany z żadną frakcją, ani żadnym żywiołem, ani nie jest to dekoracja specyficzna dla danego środowiska, to nie ma zasad kolorystyki.
 
+## Neon mapy
+
 ## Animacje
 
 ### Postać
@@ -91,4 +101,8 @@ To jest za to przykład animacji która zmienia kształt broni i będzie bardzo 
 
 ### Dekoracje
 
-- Może być kuszące, aby dużym dekoracjom robić animacje na całym ich obszarze. Niestety musimy liczyć się z ogarniczoną przestrzenią atlasu.
+- Może być kuszące, aby dużym dekoracjom robić animacje na całym ich obszarze. Niestety musimy liczyć się z ograniczoną przestrzenią atlasu.
+
+## Wskazówki ogólne
+
+- Jeśli rysujemy jakieś urządzenie elektroniczne, warto zrobić wyświetlacze w oddzielnym obrazku, aby z poziomu gry dało się zmienić kolory samego wyświetlacza, np. na czerwony - po zniszczeniu lub jakiejś awarii.
