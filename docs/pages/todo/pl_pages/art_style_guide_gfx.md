@@ -16,7 +16,7 @@ summary: Założenia dotyczące grafiki.
 		- Np. obrazki cząsteczek lub smug pocisków.
 			- Te nie mają krawędzi wcale.
 - Zdajemy sobie sprawę z tego, że istnieją inne techniki kolorowania krawędzi, ale...
-	- Zależy nam na tym aby obiekty się wyróżniały.
+	- Zależy nam na tym aby granice obiektów były natychmiast widoczne.
 	- Mniej mamy teraz na głowie, a zmiana koloru konturu jest czymś co można zrobić później, również po skończeniu pracy nad obrazkiem.
 
 ## Obrazki sztywne i dynamiczne
@@ -140,7 +140,7 @@ Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.
 
 	{% include image.html file="pages/todo/pl_pages/torso_rifle.png" %}
 
-	Wszystkie animacje postawy z karabinem powinny odwzorowywać trzymanie broni tak, gdybyśmy strzelali **z biodra**.
+	Wszystkie animacje postawy z karabinem powinny odwzorowywać trzymanie broni tak, jak gdybyśmy strzelali **z biodra**.
 
 	- Gra **samodzielnie** kontynuuje animację puszczając ją od tyłu...
 		- ...ale już nie odbija jej w pionie na kolejny cykl. W tym wypadku to nie ma sensu.
@@ -159,7 +159,7 @@ Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.
 
 	{% include image.html file="pages/todo/pl_pages/torso_rifle_shoot.png" %}
 
-	Wszystkie animacje postawy z karabinem powinny odwzorowywać trzymanie broni tak, gdybyśmy strzelali **z biodra**.
+	Wszystkie animacje postawy z karabinem powinny odwzorowywać trzymanie broni tak, jak gdybyśmy strzelali **z biodra**.
 
 	- Gra **samodzielnie** kontynuuje animację puszczając ją od tyłu.
 	- **Alternatywne rozwiązanie**: Dla każdej animacji, edytor eksponuje opcję *has_backward_frames*.
@@ -170,7 +170,7 @@ Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.
 
 
 5. Animacja strzelania podczas gdy w obu rękach trzymamy bronie - **akimbo**.
-	- Wszystko **tak samo** jak w punkcie 3 (strzelanie z karabinu), tylko...
+	- Wszystko **tak samo** jak w punkcie 4 (strzelanie z karabinu), tylko...
 		- ...na obrazkach obie ręce będą wyciągnięte do przodu!
 		- Rysowane obrazki powinny odwzorowywać odrzut dla **prawego (dolnego) ramienia**.
 			- Lewą rękę należy utrzymać wyciągniętą do przodu (może przesunąć się nawet trochę dalej).
@@ -242,7 +242,7 @@ Jako bonus, to sprawi, że nasze nogi będą kompatybilne również z "chudszymi
 	Ilość rysowanych *obrazków*: lub **2(n - 1) = 8**.  
 	Długość kompletnego cyklu ruchu: **4n = 20** *klatek*.  
 
-	Artysta **nie rysuje obrazka dla pierwszej i ostatniej klatki**, ponieważ ta jest zawsze niewidoczna pod stojącym torsem.
+	Artysta **nie rysuje obrazka dla pierwszej i ostatniej klatki**, ponieważ te są zawsze niewidoczne pod stojącym torsem.
 
 	Przykład poprawnej animacji:  
 
