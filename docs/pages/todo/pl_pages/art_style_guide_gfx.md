@@ -89,7 +89,7 @@ Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.
   
 ### Tors
 
-{% include important.html content="Wszystkie klatki torsu powinny być **pozbawione głowy**. Ta jest dodana podczas rozgrywki." %}
+{% include important.html content="Wszystkie klatki torsu powinny być **pozbawione głowy**. Ta jest dodana podczas rozgrywki. **Tors powinien wyglądać rozsądnie również bez głowy**, np. gdy zostanie odstrzelona. " %}
 
 - **TODO: Przykłady muszą być poprawione w myśl tej zasady!**
 
@@ -114,9 +114,13 @@ Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.
 	- Pierwsza klatka będzie wyświetlana dodatkowo dla **gracza który stoi w miejscu**.
 	- Brak wymagań co do symetrii.
 
+2. (Opcjonalnie) Animacja chodzenia z dwiema brońmi - **akimbo**.
+	- Wszystko **tak samo** jak w punkcie 1 (chodzenie z pustymi rękoma), tylko...
+		- ...na obrazkach obie ręce będą wyciągnięte do przodu!
+	- W przypadku braku tej animacji nie będzie tragedii jeśli zastąpi ją animacja nr 1 (chodzenie z pustymi rękoma).
 
-2. Animacja chodzenia z karabinem.  
-	Ilość rysowanych obrazków: **n (= 5)**
+3. Animacja chodzenia z karabinem.  
+	Ilość rysowanych obrazków: **n (= 5)**  
 	Długość kompletnego cyklu ruchu: **2n (= 10)** *klatek*.  
 
 	**TODO:** Gdy będziemy mieli już solidne animacje wszystkich postaw, możemy zwiększyć ilość obrazków (i klatek) dla tej animacji.
@@ -125,8 +129,10 @@ Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.
 
 	{% include image.html file="pages/todo/pl_pages/torso_rifle.png" %}
 
+	Wszystkie animacje postawy z karabinem powinny odwzorowywać trzymanie broni tak, gdybyśmy strzelali **z biodra**.
+
 	- Gra **samodzielnie** kontynuuje animację puszczając ją od tyłu...
-		- ...ale już nie odbija jej w pionie na kolejny cykl. W tym wypadku to już tak dobrze nie zadziała.
+		- ...ale już nie odbija jej w pionie na kolejny cykl. W tym wypadku to nie ma sensu.
 	- **Alternatywne rozwiązanie**: Dla każdej animacji, edytor eksponuje opcję *has_backward_frames*.
 		- To pozwala artyście samodzielnie narysować animację powrotną.
 		- Wtedy artysta musi narysować **2n - 1 (= 9)** obrazków do animacji chodzenia.
@@ -134,7 +140,7 @@ Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.
 	- Pierwsza klatka będzie wyświetlana dodatkowo dla **gracza który stoi w miejscu**.
 	- Brak wymagań co do symetrii.
 
-3. Animacja strzelania z karabinu.  
+4. Animacja strzelania z karabinu.  
 	Ilość rysowanych obrazków: **x = dowolne!** (może być równa **n**, ale nie ma to znaczenia.)  
 	Długość wynikowego cyklu: **2x**  
 
@@ -142,13 +148,44 @@ Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.
 
 	{% include image.html file="pages/todo/pl_pages/torso_rifle_shoot.png" %}
 
-3. Animacja chodzenia z pistoletem. 
-	- Wszystko tak samo jak w punkcie 2., tylko inne obrazki!
+	Wszystkie animacje postawy z karabinem powinny odwzorowywać trzymanie broni tak, gdybyśmy strzelali **z biodra**.
 
-3. Animacja chodzenia z ciężkim karabinem maszynowym. 
-	- Wszystko tak samo jak w punkcie 2., tylko inne obrazki!
+	- Gra **samodzielnie** kontynuuje animację puszczając ją od tyłu.
+	- **Alternatywne rozwiązanie**: Dla każdej animacji, edytor eksponuje opcję *has_backward_frames*.
+		- To pozwala artyście samodzielnie narysować animację powrotną.
+			- Ilość klatek pozostaje dowolna zarównież w tym przypadku.
+			- Ostatnia klatka nie musi być dodana z pierwszego obrazka.
+	- Brak wymagań co do symetrii.
 
-4. Animacja chodzenia z dwiema brońmi (akimbo). 
+
+5. Animacja strzelania podczas gdy w obu rękach trzymamy bronie - **akimbo**.
+	- Wszystko **tak samo** jak w punkcie 3 (strzelanie z karabinu), tylko...
+		- ...na obrazkach obie ręce będą wyciągnięte do przodu!
+		- Rysowane obrazki powinny odwzorowywać odrzut dla **prawego (dolnego) ramienia**.
+			- Lewą rękę należy utrzymać wyciągniętą do przodu (może przesunąć się nawet trochę dalej).
+			- Tak, jak gdyby strzał padł wyłącznie z prawej ręki.
+			- **W szczególności, nie ma wymagań co do symetrii.**
+		- Jeżeli gra wykryje, że strzał padł z prawej ręki, to odtworzy tą animację normalnie, jak gdyby strzelało się z jednej broni.
+		- Jeżeli gra wykryje, że strzał padł z lewej ręki, to **odbije animację w pionie** i odtworzy ją jak gdyby strzelało się z jednej broni.
+		- Jeżeli gra wykryje że z obu broni padł strzał w krótkim czasie, to zawsze odtworzy animację dla tej ręki dla której strzał padł ostatni.
+			- W chaosie strzelania z dwóch broni nie będzie to miało znaczenia czy oba ramienia odtwarzają się niezależnie.
+
+{% include tip.html content="Pozostałe animacje torsu powtarzają wyżej opisane schematy." %}
+
+6. Animacja chodzenia z pistoletem. 
+	- Wszystko tak samo jak w punkcie 3 (chodzenie z karabinem), tylko na obrazkach będzie inna postawa.
+
+7. Animacja strzelania z pistoletu. 
+	- Wszystko tak samo jak w punkcie 4 (strzelanie z karabinu), tylko na obrazkach będzie inna postawa.
+
+8. (Opcjonalnie) Animacja chodzenia z ciężkim karabinem maszynowym. 
+	- Wszystko tak samo jak w punkcie 3 (chodzenie z karabinem), tylko na obrazkach będzie inna postawa.
+	- W przypadku braku tej animacji nie będzie tragedii jeśli zastąpi ją animacja nr 3 (chodzenie z karabinem).
+
+9. (Opcjonalnie) Animacja strzelania z ciężkiego karabinu maszynowego. 
+	- Wszystko tak samo jak w punkcie 4 (strzelanie z karabinu), tylko na obrazkach będzie inna postawa.
+	- W przypadku braku tej animacji nie będzie tragedii jeśli zastąpi ją animacja nr 4 (strzelanie z karabinu).
+
 
 ### Nogi
 
