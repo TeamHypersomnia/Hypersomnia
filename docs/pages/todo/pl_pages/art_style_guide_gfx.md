@@ -9,7 +9,12 @@ summary: Założenia dotyczące grafiki.
 ## Kontur
 
 - Preferujemy twardy, czarny obrys grubości jednego piksela na zewnątrz każdego obrazka.
-	- Wyjątek: krawędze wzdłuż których obrazek układany jest w kafelki, np. na podłogach lub ścianach.
+	- Wyjątek: krawędze, wzdłuż których obrazek układany jest w kafelki, np. na podłogach lub ścianach.
+	- Wyjątek: elementy, które są w dużej mierze światłem i które wystają na zewnątrz obrazka.
+		- Np. główka elektrycznej pałki lub inne świecące elementy.
+			- Te mają krawędź w odcieniu emitowanego światła, odrobinę przyciemnioną.
+		- Np. obrazki cząsteczek lub smug pocisków.
+			- Te nie mają krawędzi wcale.
 - Zdajemy sobie sprawę z tego, że istnieją inne techniki kolorowania krawędzi, ale...
 	- Zależy nam na tym aby obiekty się wyróżniały.
 	- Mniej mamy teraz na głowie, a zmiana koloru konturu jest czymś co można zrobić później, również po skończeniu pracy nad obrazkiem.
@@ -105,4 +110,6 @@ To jest za to przykład animacji która zmienia kształt broni i będzie bardzo 
 
 ## Wskazówki ogólne
 
-- Jeśli rysujemy jakieś urządzenie elektroniczne, warto zrobić wyświetlacze w oddzielnym obrazku, aby z poziomu gry dało się zmienić kolory samego wyświetlacza, np. na czerwony - po zniszczeniu lub jakiejś awarii.
+- Jeśli rysujemy jakieś urządzenie elektroniczne...
+	- Warto zrobić wyświetlacze w oddzielnym obrazku/animacji, **w kolorach czarno-białych**.
+	- Wtedy z poziomu gry da się zmienić kolory samego wyświetlacza, np. na czerwony który sygnalizuje awarię lub zniszczenie.
