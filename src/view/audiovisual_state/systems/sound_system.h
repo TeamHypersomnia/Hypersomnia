@@ -23,7 +23,7 @@ namespace augs {
 }
 
 class sound_system {
-	struct short_sound_cache {
+	struct generic_sound_cache {
 		augs::sound_source source;
 		absolute_or_local positioning;
 
@@ -32,6 +32,24 @@ class sound_system {
 
 		/* For calculating sound's velocity */
 		std::optional<components::transform> previous_transform;
+
+		generic_sound_cache() = default;
+
+		generic_sound_cache(
+			const_entity_handle listening_character,
+			const augs::sound_buffer& source_effect,
+			const sound_effect_input&,
+			const sound_effect_start_input&,
+			const std::optional<components::transform>&
+		);
+
+		bool update_properties(
+			const augs::audio_volume_settings&,
+			const cosmos&,
+			const interpolation_system&,
+			const vec2 listener_pos,
+			const augs::delta dt
+		);
 	};
 
 	struct fading_source {
@@ -39,13 +57,15 @@ class sound_system {
 		augs::sound_source source;
 	};
 
-	std::vector<short_sound_cache> short_sounds;
+	std::vector<generic_sound_cache> short_sounds;
 	std::vector<fading_source> fading_sources;
 
 	void update_listener(
 		const const_entity_handle subject,
 		const interpolation_system& sys
 	);
+
+	void start_fading(generic_sound_cache&);
 
 public:
 	void reserve_caches_for_entities(const std::size_t) const {}

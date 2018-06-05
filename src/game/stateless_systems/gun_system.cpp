@@ -7,7 +7,7 @@
 
 #include "game/assets/all_logical_assets.h"
 #include "game/messages/intent_message.h"
-#include "game/messages/gunshot_response.h"
+#include "game/messages/gunshot_message.h"
 #include "game/messages/interpolation_correction_request.h"
 
 #include "game/detail/inventory/item_slot_transfer_request.h"
@@ -119,8 +119,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 			const auto muzzle_transform = components::transform { calc_muzzle_position(gun_entity, gun_transform), gun_transform.rotation };
 
-			auto make_gunshot_response = [&](){
-				messages::gunshot_response response;
+			auto make_gunshot_message = [&](){
+				messages::gunshot_message response;
 
 				response.muzzle_transform = muzzle_transform;
 				response.subject = gun_entity;
@@ -135,9 +135,9 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				step.post_message(request);
 			};
 
-			auto try_to_fire = [&]() -> bool {
+			auto try_to_fire_interval = [&]() -> bool {
 				if (gun.is_trigger_pressed) {
-					if (try_to_fire_and_reset(gun_def.shot_cooldown_ms, gun.when_last_fired, now, delta)) {
+					if (augs::try_to_fire_and_reset(gun_def.shot_cooldown_ms, gun.when_last_fired, now, delta)) {
 						if (gun_def.action_mode != gun_action_type::AUTOMATIC) {
 							gun.is_trigger_pressed = false;
 						}
@@ -166,7 +166,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					auto& pe = sentience->get<personal_electricity_meter_instance>();
 
 					if (pe.value >= mana_needed) {
-						if (try_to_fire()) {
+						if (try_to_fire_interval()) {
 							pe.value -= pe.calc_damage_result(mana_needed).effective;
 							total_recoil += missile.recoil_multiplier * gun_def.recoil_multiplier;
 
@@ -192,7 +192,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 									}
 
 									{
-										auto response = make_gunshot_response();
+										auto response = make_gunshot_message();
 										response.spawned_rounds.push_back(round_entity);
 										step.post_message(response);
 									}
@@ -207,13 +207,13 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			}
 			else if (
 				gun_entity[slot_function::GUN_CHAMBER].get_items_inside().size() > 0
-				&& try_to_fire()
+				&& try_to_fire_interval()
 			) {
 				/* This is a normal gun */
 				const auto chamber_slot = gun_entity[slot_function::GUN_CHAMBER];
 				const auto cartridge_in_chamber = cosmos[chamber_slot.get_items_inside()[0]];
 
-				auto response = make_gunshot_response();
+				auto response = make_gunshot_message();
 				response.cartridge_definition = cartridge_in_chamber.template get<invariants::cartridge>();
 
 				thread_local std::vector<entity_id> bullet_stacks;
@@ -347,43 +347,9 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			else if (is_ready(gun_def.shot_cooldown_ms, gun.when_last_fired, now, delta)) {
 				/* Apply idle cooldown */
 				gun.recoil.cooldown(gun_def.recoil, delta.in_milliseconds());
-				gun.current_heat = std::max(0.f, gun.current_heat - delta.in_seconds()/gun_def.maximum_heat);
+				gun.current_heat = std::max(0.f, gun.current_heat - delta.in_seconds() / gun_def.maximum_heat);
 			}
 
-#if TODO
-			const auto firing_engine_sound = cosmos[gun.firing_engine_sound];
-			const bool sound_enabled = gun.current_heat > 0.20f && firing_engine_sound.alive();
-			const auto pitch = static_cast<float>(gun.current_heat / gun_def.maximum_heat);
-
-			if (firing_engine_sound.alive() && firing_engine_sound.has<components::sound_existence>()) {
-				auto& existence = firing_engine_sound.get<components::sound_existence>();
-
-				if (sound_enabled) {
-					existence.input.direct_listener = owning_capability;
-					existence.input.effect.modifier.pitch = pitch;
-					existence.input.effect.modifier.gain = (gun.current_heat - 0.20f) / gun_def.maximum_heat;
-
-					existence.input.effect.modifier.pitch = pow(existence.input.effect.modifier.pitch, 2) * gun_def.engine_sound_strength;
-					existence.input.effect.modifier.gain = pow(existence.input.effect.modifier.gain, 2)* gun_def.engine_sound_strength;
-
-					components::sound_existence::activate(firing_engine_sound);
-				}
-				else {
-					components::sound_existence::deactivate(firing_engine_sound);
-				}
-			}
-
-			const auto muzzle_particles = cosmos[gun.muzzle_particles];
-
-			if (muzzle_particles.alive() && muzzle_particles.has<components::particles_existence>()) {
-				if (pitch > 0.2f && !components::particles_existence::is_activated(muzzle_particles)) {
-					components::particles_existence::activate(muzzle_particles);
-				}
-				else if (pitch < 0.1f && components::particles_existence::is_activated(muzzle_particles)) {
-					components::particles_existence::deactivate(muzzle_particles);
-				}
-			}
-#endif
 		}
 	);
 }

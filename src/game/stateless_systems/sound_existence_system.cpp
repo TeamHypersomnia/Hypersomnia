@@ -13,8 +13,9 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/sentience_component.h"
 
+#include "game/messages/start_sound_effect.h"
 #include "game/messages/collision_message.h"
-#include "game/messages/gunshot_response.h"
+#include "game/messages/gunshot_message.h"
 #include "game/messages/queue_destruction.h"
 #include "game/messages/damage_message.h"
 #include "game/messages/melee_swing_response.h"
@@ -23,7 +24,7 @@
 
 void sound_existence_system::create_sounds_from_game_events(const logic_step step) const {
 	const auto& collisions = step.get_queue<messages::collision_message>();
-	const auto& gunshots = step.get_queue<messages::gunshot_response>();
+	const auto& gunshots = step.get_queue<messages::gunshot_message>();
 	const auto& damages = step.get_queue<messages::damage_message>();
 	const auto& healths = step.get_queue<messages::health_event>();
 	const auto& exhausted_casts = step.get_queue<messages::exhausted_cast>();
@@ -79,40 +80,39 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 	}
 
 	for (const auto& g : gunshots) {
+		const auto subject = cosmos[g.subject];
+		const auto& gun_def = subject.get<invariants::gun>();
+
+		const auto gun_transform = subject.get_logic_transform();
+		const auto owning_capability = subject.get_owning_transfer_capability();
+
 		{
-			const auto subject = cosmos[g.subject];
-			const auto& gun_def = subject.get<invariants::gun>();
-			const auto gun_transform = subject.get_logic_transform();
-			const auto owning_capability = subject.get_owning_transfer_capability();
+			const auto& effect = gun_def.muzzle_shot_sound;
 
-			{
-				const auto& effect = gun_def.muzzle_shot_sound;
+			effect.start(
+				step,
+				sound_effect_start_input::at_entity(subject).set_listener(owning_capability)
+			);
+		}
 
-				effect.start(
-					step,
-					sound_effect_start_input::at_entity(subject).set_listener(owning_capability)
-				);
-			}
+		{
 
-			{
+			const auto cued_count = gun_def.num_last_bullets_to_trigger_low_ammo_cue;
 
-				const auto cued_count = gun_def.num_last_bullets_to_trigger_low_ammo_cue;
+			if (cued_count > 0) {
+				const auto ammo_info = get_ammunition_information(subject);
 
-				if (cued_count > 0) {
-					const auto ammo_info = get_ammunition_information(subject);
+				if (ammo_info.total_charges < cued_count) {
+					auto effect = gun_def.low_ammo_cue_sound;
 
-					if (ammo_info.total_charges < cued_count) {
-						auto effect = gun_def.low_ammo_cue_sound;
-
-						if (ammo_info.total_charges == cued_count - 1) {
-							effect.modifier.gain *= 0.65f;
-						}
-
-						effect.start(
-							step,
-							sound_effect_start_input::fire_and_forget(gun_transform).set_listener(owning_capability)
-						);
+					if (ammo_info.total_charges == cued_count - 1) {
+						effect.modifier.gain *= 0.65f;
 					}
+
+					effect.start(
+						step,
+						sound_effect_start_input::fire_and_forget(gun_transform).set_listener(owning_capability)
+					);
 				}
 			}
 		}

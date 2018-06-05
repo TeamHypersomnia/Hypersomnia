@@ -140,8 +140,6 @@ Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.
 
 	{% include image.html file="pages/todo/pl_pages/torso_rifle.png" %}
 
-	Wszystkie animacje postawy z karabinem powinny odwzorowywać trzymanie broni tak, jak gdybyśmy strzelali **z biodra**.
-
 	- Gra **samodzielnie** kontynuuje animację puszczając ją od tyłu...
 		- ...ale już nie odbija jej w pionie na kolejny cykl. W tym wypadku to nie ma sensu.
 	- **Alternatywne rozwiązanie**: Dla każdej animacji, edytor eksponuje opcję *has_backward_frames*.
@@ -158,8 +156,6 @@ Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.
 	Przykład poprawnej animacji:  
 
 	{% include image.html file="pages/todo/pl_pages/torso_rifle_shoot.png" %}
-
-	Wszystkie animacje postawy z karabinem powinny odwzorowywać trzymanie broni tak, jak gdybyśmy strzelali **z biodra**.
 
 	- Gra **samodzielnie** kontynuuje animację puszczając ją od tyłu.
 	- **Alternatywne rozwiązanie**: Dla każdej animacji, edytor eksponuje opcję *has_backward_frames*.

@@ -8,7 +8,7 @@
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/components/sentience_component.h"
 
-#include "game/messages/gunshot_response.h"
+#include "game/messages/gunshot_message.h"
 #include "game/messages/start_particle_effect.h"
 #include "game/messages/queue_destruction.h"
 #include "game/messages/damage_message.h"
@@ -20,7 +20,7 @@
 #include "game/stateless_systems/particles_existence_system.h"
 
 void particles_existence_system::game_responses_to_particle_effects(const logic_step step) const {
-	const auto& gunshots = step.get_queue<messages::gunshot_response>();
+	const auto& gunshots = step.get_queue<messages::gunshot_message>();
 	const auto& damages = step.get_queue<messages::damage_message>();
 	const auto& healths = step.get_queue<messages::health_event>();
 	const auto& exhausted_casts = step.get_queue<messages::exhausted_cast>();

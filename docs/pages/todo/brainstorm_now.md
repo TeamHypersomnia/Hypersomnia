@@ -5,6 +5,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Gun engine sounds and car engine sounds
+	- This case is analogous to wandering pixels, for example
+
 - Animation architecture
 	- Animation asset
 		- Several distinct types of animations

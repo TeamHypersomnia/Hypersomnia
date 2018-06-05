@@ -4,7 +4,7 @@
 #include "game/components/cartridge_component.h"
 
 namespace messages {
-	struct gunshot_response : message {
+	struct gunshot_message : message {
 		components::transform muzzle_transform;
 		invariants::cartridge cartridge_definition;
 

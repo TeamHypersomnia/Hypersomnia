@@ -8,7 +8,7 @@
 #include "game/messages/collision_message.h"
 #include "game/messages/start_particle_effect.h"
 #include "game/messages/start_sound_effect.h"
-#include "game/messages/gunshot_response.h"
+#include "game/messages/gunshot_message.h"
 #include "game/messages/crosshair_motion_message.h"
 #include "game/messages/melee_swing_response.h"
 #include "game/messages/health_event.h"

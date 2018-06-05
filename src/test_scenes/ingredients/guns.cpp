@@ -355,7 +355,7 @@ namespace test_flavours {
 
 			meta.set(gun_def);
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::ASSAULT_RIFLE, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::BILMER2000, white);
 			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE);
