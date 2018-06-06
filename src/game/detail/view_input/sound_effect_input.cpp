@@ -10,14 +10,20 @@ void sound_effect_input::start(
 	const sound_effect_start_input start
 ) const {
 	messages::start_sound_effect msg;
-	msg.effect = *this;
-	msg.start = start;
+	auto& p = msg.payload;
 
-	if (msg.start.variation_number == static_cast<std::size_t>(-1)) {
-		msg.start.variation_number = step.get_cosmos().get_rng_seed_for(start.positioning.target);
+	p.input = *this;
+	p.start = start;
+
+	if (p.start.variation_number == static_cast<std::size_t>(-1)) {
+		p.start.variation_number = step.get_cosmos().get_rng_seed_for(start.positioning.target);
 	}
 
 	step.post_message(msg);
+}
+
+void packaged_sound_effect::post(const logic_step step) const {
+	input.start(step, start);
 }
 
 sound_effect_start_input sound_effect_start_input::orbit_absolute(const const_entity_handle h, components::transform world_transform) {

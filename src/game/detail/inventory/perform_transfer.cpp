@@ -27,13 +27,11 @@ void perform_transfer_result::notify(const logic_step step) const {
 
 void perform_transfer_result::play_effects(const logic_step step) const {
 	if (transfer_sound.has_value()) {
-		auto& d = *transfer_sound;
-		d.sound_input.start(step, d.sound_start);
+		transfer_sound->post(step);
 	}
 
 	if (transfer_particles.has_value()) {
-		auto& d = *transfer_particles;
-		d.particles_input.start(step, d.particles_start);
+		transfer_particles->post(step);
 	}
 }
 
@@ -262,10 +260,10 @@ perform_transfer_result perform_transfer(
 
 	if (r.play_transfer_sounds) {
 		if (is_drop_request) {
-			transfer_sound_result dropped;
+			packaged_sound_effect dropped;
 
-			dropped.sound_input = cosmos.get_common_assets().item_throw_sound;
-			dropped.sound_start = sound_effect_start_input::orbit_absolute(
+			dropped.input = cosmos.get_common_assets().item_throw_sound;
+			dropped.start = sound_effect_start_input::orbit_absolute(
 				grabbed_item_part_handle, initial_transform_of_transferred
 			).set_listener(previous_root);
 
@@ -273,38 +271,38 @@ perform_transfer_result perform_transfer(
 		}
 		else if (target_slot) {
 			if (target_slot.is_hand_slot()) {
-				transfer_sound_result wielded;
+				packaged_sound_effect wielded;
 
 				const auto& item_def = transferred_item.get<invariants::item>();
 
-				wielded.sound_input = item_def.wield_sound;
-				wielded.sound_start = sound_effect_start_input::at_entity(target_root);
+				wielded.input = item_def.wield_sound;
+				wielded.start = sound_effect_start_input::at_entity(target_root);
 
 				output.transfer_sound.emplace(std::move(wielded));
 			}
 			else if (target_slot.get_id().type == slot_function::ITEM_DEPOSIT) {
 				{
-					transfer_sound_result sound;
+					packaged_sound_effect sound;
 
 					if (is_pickup) {
-						sound.sound_input = cosmos.get_common_assets().item_pickup_to_deposit_sound;
+						sound.input = cosmos.get_common_assets().item_pickup_to_deposit_sound;
 					}
 					else {
-						sound.sound_input = cosmos.get_common_assets().item_holster_sound;
+						sound.input = cosmos.get_common_assets().item_holster_sound;
 					}
 
-					sound.sound_start = sound_effect_start_input::at_entity(target_root);
+					sound.start = sound_effect_start_input::at_entity(target_root);
 
 					output.transfer_sound.emplace(std::move(sound));
 				}
 			}
 			else {
-				transfer_sound_result wielded;
+				packaged_sound_effect wielded;
 
 				const auto& item_def = transferred_item.get<invariants::item>();
 
-				wielded.sound_input = item_def.wear_sound;
-				wielded.sound_start = sound_effect_start_input::at_entity(target_root);
+				wielded.input = item_def.wear_sound;
+				wielded.start = sound_effect_start_input::at_entity(target_root);
 
 				output.transfer_sound.emplace(std::move(wielded));
 			}
@@ -314,9 +312,9 @@ perform_transfer_result perform_transfer(
 
 	if (r.play_transfer_particles) {
 		if (is_pickup) {
-			transfer_particles_result particles;
+			packaged_particle_effect particles;
 
-			particles.particles_input = cosmos.get_common_assets().item_pickup_particles;
+			particles.input = cosmos.get_common_assets().item_pickup_particles;
 
 			auto effect_transform = initial_transform_of_transferred;
 
@@ -324,7 +322,7 @@ perform_transfer_result perform_transfer(
 				effect_transform.rotation = (effect_transform.pos - root_transform->pos).degrees();
 			}
 
-			particles.particles_start = particle_effect_start_input::fire_and_forget(effect_transform);
+			particles.start = particle_effect_start_input::fire_and_forget(effect_transform);
 
 			output.transfer_particles.emplace(std::move(particles));
 		}

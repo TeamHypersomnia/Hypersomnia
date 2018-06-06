@@ -25,7 +25,7 @@ void sound_system::start_fading(generic_sound_cache& cache) {
 	auto& source = cache.source;
 
 	if (source.is_playing()) {
-		fading_sources.push_back({ cache.original_effect.id, std::move(source) });
+		fading_sources.push_back({ cache.original.input.id, std::move(source) });
 	}
 }
 
@@ -35,7 +35,7 @@ void sound_system::clear_sources_playing(const assets::sound_id id) {
 	});
 	
 	erase_if(short_sounds, [id](generic_sound_cache& it) {
-		return id == it.original_effect.id;
+		return id == it.original.input.id;
 	});
 }
 
@@ -73,14 +73,13 @@ void sound_system::update_listener(
 sound_system::generic_sound_cache::generic_sound_cache(
 	const const_entity_handle listening_character,
 	const augs::sound_buffer& source_effect,
-	const sound_effect_input& effect,
-	const sound_effect_start_input& start,
+	const packaged_sound_effect& original,
 	const interpolation_system& interp
 ) :
-	positioning(start.positioning),
-	original_effect(effect),
-	original_start(start)
+	positioning(original.start.positioning),
+	original(original)
 {
+	const auto& start = original.start;
 	const auto& cosm = listening_character.get_cosmos();
 
 	previous_transform = ::find_transform(start.positioning, cosm, interp);
@@ -102,7 +101,7 @@ sound_system::generic_sound_cache::generic_sound_cache(
 
 	source.play();
 
-	const auto& modifier = effect.modifier;
+	const auto& modifier = original.input.modifier;
 
 	const auto si = cosm.get_si();
 
@@ -144,7 +143,7 @@ bool sound_system::generic_sound_cache::update_properties(
 		}
 	}
 
-	const auto& input = original_effect;
+	const auto& input = original.input;
 
 	source.set_pitch(input.modifier.pitch);
 	source.set_gain(input.modifier.gain * settings.sound_effects);
@@ -173,12 +172,12 @@ void sound_system::update_effects_from_messages(
 				}
 
 				if (const auto m = e.match_effect_id) {
-					if (*m != c.original_effect.id) {
+					if (*m != c.original.input.id) {
 						return false;
 					}	
 				}
 
-				if (c.original_effect.modifier.fade_on_exit) {
+				if (c.original.input.modifier.fade_on_exit) {
 					start_fading(c);
 				}
 
@@ -190,14 +189,13 @@ void sound_system::update_effects_from_messages(
 	const auto& events = step.get_queue<messages::start_sound_effect>();
 
 	for (auto& e : events) {
-		const auto effect_id = e.effect.id;
+		const auto effect_id = e.payload.input.id;
 
 		if (const auto source_effect = mapped_or_nullptr(manager, effect_id)) try {
 			short_sounds.emplace_back(
 				listening_character,
 				*source_effect,
-				e.effect,
-				e.start,
+				e.payload,
 				interp
 			);
 		}
@@ -242,20 +240,26 @@ void sound_system::update_sound_properties(
 				total_pitch *= total_pitch;
 				total_gain *= total_gain;
 
-				auto in = gun_def.firing_engine_sound;
-
-				in.modifier.pitch *= total_pitch;
-				in.modifier.gain *= total_gain;
-
 				const auto id = gun_entity.get_id().to_unversioned();
-				const auto start = sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability);
+
+				packaged_sound_effect effect;
+
+				{
+					auto in = gun_def.firing_engine_sound;
+
+					in.modifier.pitch *= total_pitch;
+					in.modifier.gain *= total_gain;
+
+					effect.input = in;
+				}
+
+				effect.start = sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability);
 
 				if (const auto existing = mapped_or_nullptr(firearm_engine_caches, id)) {
-					existing->original_effect = in;
-					existing->original_start = start;
+					existing->original = effect;
 				}
 				else {
-					const auto effect_id = in.id;
+					const auto effect_id = effect.input.id;
 
 					if (const auto source_effect = mapped_or_nullptr(manager, effect_id)) try {
 						firearm_engine_caches.try_emplace(
@@ -263,8 +267,7 @@ void sound_system::update_sound_properties(
 
 							listening_character,
 							*source_effect,
-							in,
-							start,
+							effect,
 							interp
 						);
 					}

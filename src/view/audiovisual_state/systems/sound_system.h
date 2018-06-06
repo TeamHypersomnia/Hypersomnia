@@ -27,9 +27,7 @@ class sound_system {
 	struct generic_sound_cache {
 		augs::sound_source source;
 		absolute_or_local positioning;
-
-		sound_effect_input original_effect;
-		sound_effect_start_input original_start;
+		packaged_sound_effect original;
 
 		/* For calculating sound's velocity */
 		std::optional<components::transform> previous_transform;
@@ -39,8 +37,7 @@ class sound_system {
 		generic_sound_cache(
 			const_entity_handle listening_character,
 			const augs::sound_buffer& source_effect,
-			const sound_effect_input&,
-			const sound_effect_start_input&,
+			const packaged_sound_effect&,
 			const interpolation_system&
 		);
 

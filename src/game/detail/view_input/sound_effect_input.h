@@ -66,3 +66,10 @@ struct sound_effect_input {
 
 	void start(logic_step, sound_effect_start_input) const;
 };
+
+struct packaged_sound_effect {
+	sound_effect_input input;
+	sound_effect_start_input start;
+
+	void post(logic_step step) const;
+};

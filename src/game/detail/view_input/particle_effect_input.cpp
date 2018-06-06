@@ -10,10 +10,17 @@ void particle_effect_input::start(
 	const particle_effect_start_input start
 ) const {
 	messages::start_particle_effect msg;
-	msg.effect = *this;
-	msg.start = start;
+
+	auto& p = msg.payload;
+
+	p.input = *this;
+	p.start = start;
 
 	step.post_message(msg);
+}
+
+void packaged_particle_effect::post(const logic_step step) const {
+	input.start(step, start);
 }
 
 particle_effect_start_input particle_effect_start_input::orbit_absolute(const const_entity_handle h, components::transform world_transform) {

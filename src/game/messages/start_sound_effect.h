@@ -10,8 +10,7 @@
 
 namespace messages {
 	struct start_sound_effect {
-		sound_effect_input effect;
-		sound_effect_start_input start;
+		packaged_sound_effect payload;
 	};
 
 	struct stop_sound_effect {

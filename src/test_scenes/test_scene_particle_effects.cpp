@@ -1193,7 +1193,7 @@ void load_test_scene_particle_effects(
 				particle_definition.linear_damping = 50;
 				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 15));
 				particle_definition.shrink_when_ms_remaining = 400.f;
-				particle_definition.unshrinking_time_ms = 100.f;
+				particle_definition.unshrinking_time_ms = 150.f;
 
 				em.add_particle_definition(particle_definition);
 			}
@@ -1234,7 +1234,7 @@ void load_test_scene_particle_effects(
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 0;
 				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 15));
-				particle_definition.unshrinking_time_ms = 100.f;
+				particle_definition.unshrinking_time_ms = 150.f;
 				particle_definition.shrink_when_ms_remaining = 50.f;
 				particle_definition.acc.set(0, 0);
 

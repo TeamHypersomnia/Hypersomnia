@@ -10,8 +10,7 @@
 
 namespace messages {
 	struct start_particle_effect {
-		particle_effect_input effect;
-		particle_effect_start_input start;
+		packaged_particle_effect payload;
 	};
 
 	struct stop_particle_effect {

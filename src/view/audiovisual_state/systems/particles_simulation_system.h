@@ -76,7 +76,7 @@ public:
 	struct orbital_cache {
 		std::vector<emission_instance> emission_instances;
 		absolute_or_local chasing;
-		particle_effect_input original_effect;
+		packaged_particle_effect original;
 
 		bool is_over() const {
 			return are_over(emission_instances);

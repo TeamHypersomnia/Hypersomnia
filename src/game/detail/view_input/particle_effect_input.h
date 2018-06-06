@@ -52,3 +52,10 @@ struct particle_effect_input {
 
 	void start(logic_step, particle_effect_start_input) const;
 };
+
+struct packaged_particle_effect {
+	particle_effect_input input;
+	particle_effect_start_input start;
+
+	void post(logic_step step) const;
+};
