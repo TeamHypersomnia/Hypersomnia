@@ -12,6 +12,7 @@
 
 #include "game/detail/view_input/sound_effect_input.h"
 
+#include "view/audiovisual_state/systems/audiovisual_cache_common.h"
 #include "view/viewer_eye.h"
 #include "view/viewables/all_viewables_declarations.h"
 
@@ -40,7 +41,7 @@ class sound_system {
 			const augs::sound_buffer& source_effect,
 			const sound_effect_input&,
 			const sound_effect_start_input&,
-			const std::optional<components::transform>&
+			const interpolation_system&
 		);
 
 		bool update_properties(
@@ -59,6 +60,8 @@ class sound_system {
 
 	std::vector<generic_sound_cache> short_sounds;
 	std::vector<fading_source> fading_sources;
+
+	audiovisual_cache_map<generic_sound_cache> firearm_engine_caches;
 
 	void update_listener(
 		const const_entity_handle subject,

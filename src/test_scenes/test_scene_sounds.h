@@ -20,7 +20,14 @@ enum class test_scene_sound_id {
 	ENGINE,
 
 	LOW_AMMO_CUE,
+#if 0
+	VINDICATOR_LOW_AMMO_CUE,
+#endif
+
 	FIREARM_ENGINE,
+#if 0
+	FIREARM_HEAT_ENGINE,
+#endif
 
 	CAST_SUCCESSFUL,
 	CAST_UNSUCCESSFUL,

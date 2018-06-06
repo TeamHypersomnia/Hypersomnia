@@ -68,7 +68,6 @@ namespace invariants {
 
 		float gunshot_adds_heat = 0.05f;
 		float maximum_heat = 1.f;
-		float engine_sound_strength = 1.f;
 
 		sound_effect_input muzzle_shot_sound;
 		sound_effect_input low_ammo_cue_sound;

@@ -110,6 +110,10 @@ struct entity_id {
 		return raw.is_set() && type_id.is_set();
 	}
 
+	unversioned_entity_id to_unversioned() const {
+		return { raw, type_id };
+	}
+
 	operator unversioned_entity_id() const {
 		return { raw, type_id };
 	}
@@ -130,6 +134,10 @@ struct typed_entity_id {
 	explicit typed_entity_id(const raw_type b) : raw(b) {}
 
 	operator entity_id() const {
+		return { raw, entity_type_id::of<E>() };
+	}
+
+	unversioned_entity_id to_unversioned() const {
 		return { raw, entity_type_id::of<E>() };
 	}
 

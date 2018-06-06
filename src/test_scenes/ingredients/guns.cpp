@@ -346,12 +346,12 @@ namespace test_flavours {
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = 40.f;
 
-			gun_def.maximum_heat = 2.1f;
+			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.052f;
-			gun_def.engine_sound_strength = 0.5f;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
+			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 
 			meta.set(gun_def);
 
@@ -393,9 +393,9 @@ namespace test_flavours {
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = 70.f;
 
-			gun_def.maximum_heat = 2.1f;
-			gun_def.gunshot_adds_heat = 0.052f;
-			gun_def.engine_sound_strength = 0.5f;
+			gun_def.maximum_heat = 2.f;
+			gun_def.gunshot_adds_heat = 0.05f;
+			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.recoil_multiplier = 1.3f;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
@@ -442,9 +442,9 @@ namespace test_flavours {
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = 80.f;
 
-			gun_def.maximum_heat = 2.1f;
-			gun_def.gunshot_adds_heat = 0.052f;
-			gun_def.engine_sound_strength = 0.5f;
+			gun_def.maximum_heat = 2.f;
+			gun_def.gunshot_adds_heat = 0.072f;
+			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.recoil_multiplier = 1.3f;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
@@ -487,9 +487,9 @@ namespace test_flavours {
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 
-			gun_def.maximum_heat = 2.1f;
+			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.052f;
-			gun_def.engine_sound_strength = 0.5f;
+			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);

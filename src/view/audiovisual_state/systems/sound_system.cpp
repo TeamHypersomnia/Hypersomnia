@@ -75,13 +75,16 @@ sound_system::generic_sound_cache::generic_sound_cache(
 	const augs::sound_buffer& source_effect,
 	const sound_effect_input& effect,
 	const sound_effect_start_input& start,
-	const std::optional<components::transform>& previous_transform
+	const interpolation_system& interp
 ) :
 	positioning(start.positioning),
 	original_effect(effect),
-	original_start(start),
-	previous_transform(previous_transform)
+	original_start(start)
 {
+	const auto& cosm = listening_character.get_cosmos();
+
+	previous_transform = ::find_transform(start.positioning, cosm, interp);
+
 	{
 		const auto& variations = source_effect.variations;
 		const auto chosen_variation = start.variation_number % variations.size();
@@ -101,7 +104,7 @@ sound_system::generic_sound_cache::generic_sound_cache(
 
 	const auto& modifier = effect.modifier;
 
-	const auto si = listening_character.get_cosmos().get_si();
+	const auto si = cosm.get_si();
 
 	source.set_max_distance(si, modifier.max_distance);
 	source.set_reference_distance(si, modifier.reference_distance);
@@ -157,7 +160,6 @@ void sound_system::update_effects_from_messages(
 	const viewer_eye ear
 ) {
 	const auto listening_character = ear.viewed_character;
-	const auto& cosmos = listening_character.get_cosmos();
 
 	{
 		const auto& events = step.get_queue<messages::stop_sound_effect>();
@@ -196,7 +198,7 @@ void sound_system::update_effects_from_messages(
 				*source_effect,
 				e.effect,
 				e.start,
-				find_transform(e.start.positioning, cosmos, interp)
+				interp
 			);
 		}
 		catch (augs::too_many_sound_sources_error err) {
@@ -207,7 +209,7 @@ void sound_system::update_effects_from_messages(
 
 void sound_system::update_sound_properties(
 	const augs::audio_volume_settings& settings,
-	const loaded_sounds_map&,
+	const loaded_sounds_map& manager,
 	const interpolation_system& interp,
 	const viewer_eye ear,
 	const augs::delta dt
@@ -216,11 +218,6 @@ void sound_system::update_sound_properties(
 	auto queried_size = cone.visible_world_area;
 	queried_size.set(10000.f, 10000.f);
 #endif
-
-	static std::unordered_map<
-		entity_id, sound_system::generic_sound_cache
-	> firearm_engines;
-
 	const auto listening_character = ear.viewed_character;
 
 	update_listener(listening_character, interp);
@@ -228,6 +225,67 @@ void sound_system::update_sound_properties(
 	const auto& cosm = listening_character.get_cosmos();
 
 	const auto listener_pos = listening_character.get_viewing_transform(interp).pos;
+
+	cosm.for_each_having<components::gun>(
+		[&](const auto gun_entity) {
+			const auto owning_capability = gun_entity.get_owning_transfer_capability();
+
+			auto& gun = gun_entity.template get<components::gun>();
+			const auto& gun_def = gun_entity.template get<invariants::gun>();
+
+			const bool sound_enabled = gun.current_heat > 0.20f;
+
+			if (sound_enabled) {
+				auto total_pitch = static_cast<float>(gun.current_heat / gun_def.maximum_heat);
+				auto total_gain = (gun.current_heat - 0.20f) / gun_def.maximum_heat;
+
+				total_pitch *= total_pitch;
+				total_gain *= total_gain;
+
+				auto in = gun_def.firing_engine_sound;
+
+				in.modifier.pitch *= total_pitch;
+				in.modifier.gain *= total_gain;
+
+				const auto id = gun_entity.get_id().to_unversioned();
+				const auto start = sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability);
+
+				if (const auto existing = mapped_or_nullptr(firearm_engine_caches, id)) {
+					existing->original_effect = in;
+					existing->original_start = start;
+				}
+				else {
+					const auto effect_id = in.id;
+
+					if (const auto source_effect = mapped_or_nullptr(manager, effect_id)) try {
+						firearm_engine_caches.try_emplace(
+							id,
+
+							listening_character,
+							*source_effect,
+							in,
+							start,
+							interp
+						);
+					}
+					catch (...) {
+
+					}
+				}
+			}
+		}
+	);
+
+	erase_if(firearm_engine_caches, [&](auto& it) {
+		auto& cache = it.second;
+
+		if (!cosm[it.first].template has<components::gun>()) {
+			start_fading(cache);
+			return true;
+		}
+
+		return cache.update_properties(settings, cosm, interp, listener_pos, dt);
+	});
 
 	erase_if(short_sounds, [&](generic_sound_cache& cache) {
 		return cache.update_properties(settings, cosm, interp, listener_pos, dt);
@@ -238,8 +296,10 @@ void sound_system::fade_sources(const augs::delta dt) {
 	erase_if(fading_sources, [dt](fading_source& f) {
 		auto& source = f.source;
 
-		const auto new_gain = source.get_gain() - dt.in_seconds()*3.f;
-		const auto new_pitch = source.get_pitch() - dt.in_seconds()/3.f;
+		const auto fade_duration_secs = 3.f;
+
+		const auto new_gain = source.get_gain() - dt.in_seconds() * fade_duration_secs;
+		const auto new_pitch = source.get_pitch() - dt.in_seconds() / fade_duration_secs;
 
 		if (new_pitch > 0.1f) {
 			source.set_pitch(new_pitch);
