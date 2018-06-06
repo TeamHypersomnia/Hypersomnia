@@ -60,6 +60,8 @@ enum class test_scene_sound_id {
 	BACKPACK_WEAR,
 	BACKPACK_INSERT,
 
+	STEAM_BURST,
+
 	PLASMA_DRAW,
 
 	COUNT

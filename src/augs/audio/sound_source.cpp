@@ -178,7 +178,7 @@ namespace augs {
 	}
 
 	void sound_source::set_direct_channels(const bool flag) const {
-		AL_CHECK(alSourcei(id, AL_DIRECT_CHANNELS_SOFT, flag));
+		AL_CHECK(alSourcei(id, AL_DIRECT_CHANNELS_SOFT, flag ? 1 : 0));
 
 #if TRACE_PARAMETERS
 		LOG_NVPS(flag);

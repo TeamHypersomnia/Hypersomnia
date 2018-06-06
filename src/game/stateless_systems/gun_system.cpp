@@ -322,6 +322,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			}
 
 			/* Shot aftermath */
+			auto& heat = gun.current_heat;
+
 			if (total_recoil != 0.f) {
 				if (const auto* const recoil_player = mapped_or_nullptr(metas, gun_def.recoil.id)) {
 					if (sentience) {
@@ -342,14 +344,47 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					}
 				}
 
-				gun.current_heat = std::min(gun_def.maximum_heat, gun.current_heat + gun_def.gunshot_adds_heat);
+				heat = std::min(gun_def.maximum_heat, heat + gun_def.gunshot_adds_heat);
+
+				if (heat >= gun_def.get_steam_schedule_heat()) {
+					auto& max_heat = gun.max_heat_after_steam_schedule;
+					max_heat = std::max(max_heat, heat);
+
+					gun.steam_burst_scheduled = true;
+				}
 			}
 			else if (is_ready(gun_def.shot_cooldown_ms, gun.when_last_fired, now, delta)) {
 				/* Apply idle cooldown */
 				gun.recoil.cooldown(gun_def.recoil, delta.in_milliseconds());
-				gun.current_heat = std::max(0.f, gun.current_heat - delta.in_seconds() / gun_def.maximum_heat);
-			}
+				heat = std::max(0.f, heat - delta.in_seconds() / gun_def.maximum_heat);
 
+				const auto perform_heat = gun.max_heat_after_steam_schedule - gun_def.get_steam_perform_diff();
+
+				if (gun.steam_burst_scheduled && heat <= perform_heat) {
+					const auto additional_intensity = gun.max_heat_after_steam_schedule / gun_def.maximum_heat;
+					gun.max_heat_after_steam_schedule = 0.f;
+
+					{
+						auto chosen_effect = gun_def.steam_burst_sound;
+
+						chosen_effect.modifier.pitch /= additional_intensity;
+						chosen_effect.modifier.gain *= additional_intensity;
+
+						chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability));
+					}
+
+					{
+						auto chosen_effect = gun_def.steam_burst_particles;
+
+						chosen_effect.modifier.scale_amounts += additional_intensity;
+						chosen_effect.modifier.scale_lifetimes += additional_intensity;
+
+						chosen_effect.start(step, particle_effect_start_input::orbit_absolute(gun_entity, muzzle_transform));
+					}
+
+					gun.steam_burst_scheduled = false;
+				}
+			}
 		}
 	);
 }

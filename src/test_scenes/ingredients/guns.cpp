@@ -78,6 +78,13 @@ namespace test_flavours {
 			item.holding_stance = stance;
 			item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
 			meta.set(item);
+
+			meta.template get<invariants::gun>().steam_burst_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEAM_BURST);
+			meta.template get<invariants::gun>().steam_burst_sound.id = to_sound_id(test_scene_sound_id::STEAM_BURST);
+			meta.template get<invariants::gun>().steam_burst_sound.modifier.gain = 0.7f;
+
+			meta.template get<invariants::gun>().steam_burst_perform_diff = 0.2f;
+			meta.template get<invariants::gun>().steam_burst_schedule_mult = 0.65f;
 		};
 	
 		{
@@ -394,7 +401,7 @@ namespace test_flavours {
 			gun_def.kickback_towards_wielder = 70.f;
 
 			gun_def.maximum_heat = 2.f;
-			gun_def.gunshot_adds_heat = 0.05f;
+			gun_def.gunshot_adds_heat = 0.062f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.recoil_multiplier = 1.3f;
 

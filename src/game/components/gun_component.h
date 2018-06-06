@@ -30,10 +30,12 @@ namespace components {
 
 		bool is_trigger_pressed = false;
 		bool is_cocking_handle_being_pulled = false;
+		bool steam_burst_scheduled = false;
 
-		pad_bytes<2> pad;
+		pad_bytes<1> pad;
 
 		float current_heat = 0.f;
+		float max_heat_after_steam_schedule = 0.f;
 
 		augs::stepped_timestamp when_began_pulling_cocking_handle;
 
@@ -69,6 +71,12 @@ namespace invariants {
 		float gunshot_adds_heat = 0.05f;
 		float maximum_heat = 1.f;
 
+		float steam_burst_schedule_mult = 0.75f;
+		float steam_burst_perform_diff = 0.5f;
+
+		sound_effect_input steam_burst_sound;
+		particle_effect_input steam_burst_particles;
+
 		sound_effect_input muzzle_shot_sound;
 		sound_effect_input low_ammo_cue_sound;
 
@@ -85,6 +93,14 @@ namespace invariants {
 
 		assets::plain_animation_id shoot_animation;
 		// END GEN INTROSPECTOR
+
+		auto get_steam_schedule_heat() const {
+			return steam_burst_schedule_mult * maximum_heat;
+		}
+
+		auto get_steam_perform_diff() const {
+			return steam_burst_perform_diff * maximum_heat;
+		}
 	};
 }
 
