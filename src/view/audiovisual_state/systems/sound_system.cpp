@@ -188,37 +188,11 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 
 	cosm.for_each_having<components::gun>(
 		[&](const auto gun_entity) {
-			const auto owning_capability = gun_entity.get_owning_transfer_capability();
-
-			auto& gun = gun_entity.template get<components::gun>();
-			const auto& gun_def = gun_entity.template get<invariants::gun>();
-
-			const bool sound_enabled = gun.current_heat > 0.20f;
 			const auto id = gun_entity.get_id().to_unversioned();
 
-			if (sound_enabled) {
-				auto total_pitch = static_cast<float>(gun.current_heat / gun_def.maximum_heat);
-				auto total_gain = (gun.current_heat - 0.20f) / gun_def.maximum_heat;
-
-				total_pitch *= total_pitch;
-				total_gain *= total_gain;
-
-				packaged_sound_effect effect;
-
-				{
-					auto in = gun_def.firing_engine_sound;
-
-					in.modifier.pitch *= total_pitch;
-					in.modifier.gain *= total_gain;
-					in.modifier.repetitions = -1;
-
-					effect.input = in;
-				}
-
-				effect.start = sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability);
-
+			if (const auto effect = ::calc_firearm_engine_effects(gun_entity)) {
 				if (auto* const existing = mapped_or_nullptr(firearm_engine_caches, id)) {
-					existing->original = effect;
+					existing->original = effect->sound;
 
 					if (!existing->rebind_buffer(in)) {
 						fade_and_erase(firearm_engine_caches, id);
@@ -226,7 +200,7 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 				}
 				else {
 					try {
-						firearm_engine_caches.try_emplace(id, effect, in);
+						firearm_engine_caches.try_emplace(id, effect->sound, in);
 					}
 					catch (...) {
 

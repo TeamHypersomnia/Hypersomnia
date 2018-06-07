@@ -11,6 +11,7 @@
 #include "game/enums/render_layer.h"
 #include "game/detail/view_input/particle_effect_input.h"
 
+#include "view/audiovisual_state/systems/audiovisual_cache_common.h"
 #include "view/viewables/all_viewables_declarations.h"
 #include "view/viewables/particle_effect.h"
 
@@ -100,6 +101,8 @@ public:
 	/* Current streams vectors */
 	std::vector<orbital_cache> orbital_emissions;
 	std::vector<faf_cache> fire_and_forget_emissions;
+
+	audiovisual_cache_map<orbital_cache> firearm_engine_caches;
 
 	void clear();
 	void clear_dead_entities(const cosmos&);

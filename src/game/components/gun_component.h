@@ -18,6 +18,7 @@
 
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
+#include "game/detail/view_input/packaged_particles_and_sound.h"
 
 namespace augs {
 	struct introspection_access;
@@ -81,7 +82,7 @@ namespace invariants {
 		sound_effect_input low_ammo_cue_sound;
 
 		sound_effect_input firing_engine_sound;
-		particle_effect_input muzzle_particles;
+		particle_effect_input firing_engine_particles;
 
 		real32 kickback_towards_wielder = 0.f;
 		real32 recoil_multiplier = 1.f;
@@ -102,47 +103,4 @@ namespace invariants {
 			return steam_burst_perform_diff * maximum_heat;
 		}
 	};
-}
-
-template <class T>
-auto get_bullet_spawn_offset(
-	const T& gun_handle
-) {
-	const auto& cosmos = gun_handle.get_cosmos();
-
-	if (const auto* const sprite = gun_handle.template find<invariants::sprite>()) {
-		const auto reference_id = sprite->image_id;
-		const auto& offsets = cosmos.get_logical_assets().get_offsets(reference_id);
-
-		return offsets.gun.bullet_spawn;
-	}
-
-	return vec2i();
-}
-
-template <class T>
-vec2 calc_muzzle_position(
-	const T& gun_handle,
-	const transformr& gun_transform
-) {
-	const auto bullet_spawn_offset = get_bullet_spawn_offset(gun_handle);
-
-	if (const auto logical_width = gun_handle.find_logical_width()) {
-		return (
-			gun_transform 
-			* transformr(bullet_spawn_offset + vec2(*logical_width / 2, 0))
-		).pos;
-	}
-
-	return {};
-}
-
-template <class T>
-vec2 calc_barrel_center(
-	const T& gun_handle,
-	const transformr& gun_transform
-) {
-	const auto bullet_spawn_offset = get_bullet_spawn_offset(gun_handle);
-
-	return (gun_transform * transformr(vec2(0, bullet_spawn_offset.y))).pos;
 }

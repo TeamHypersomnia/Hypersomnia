@@ -1174,10 +1174,10 @@ void load_test_scene_particle_effects(
 			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 
 			em.spread_degrees = float_range(90, 100);
-			em.num_of_particles_to_spawn_initially.set(80, 80);
+			em.num_of_particles_to_spawn_initially.set(60, 60);
 			em.stream_lifetime_ms = float_range(0, 0);
 
-			em.base_speed = float_range(50, 80);
+			em.base_speed = float_range(50, 100);
 			em.base_speed_variation = float_range(0.f, 0.f);
 
 			em.randomize_spawn_point_within_circle_of_inner_radius = float_range(30.f, 30.f);
@@ -1201,7 +1201,7 @@ void load_test_scene_particle_effects(
 			em.size_multiplier = float_range(0.2, 0.2);
 			em.randomize_acceleration = true;
 			em.scale_damping_to_velocity = true;
-			em.target_render_layer = render_layer::DIM_SMOKES;
+			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
 			em.initial_rotation_variation = 180;
 
 			effect.emissions.push_back(em);

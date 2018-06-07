@@ -274,7 +274,7 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("1");
+			charge_deposit_def.space_available = to_space_units("0.3");
 
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
 			meta.set(container);

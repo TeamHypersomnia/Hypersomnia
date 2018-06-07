@@ -29,6 +29,7 @@
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/spells/spell_logic_input.h"
 
+#include "game/detail/gun_math.h"
 #include "game/stateless_systems/driver_system.h"
 
 void sentience_system::cast_spells(const logic_step step) const {

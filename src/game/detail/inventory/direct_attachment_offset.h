@@ -3,6 +3,7 @@
 #include "game/enums/slot_function.h"
 #include "game/components/sprite_component.h"
 #include "game/components/gun_component.h"
+#include "game/detail/gun_math.h"
 
 inline transformr get_anchored_offset(
 	const transformi attachment_offset,

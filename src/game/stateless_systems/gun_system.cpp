@@ -12,6 +12,7 @@
 
 #include "game/detail/inventory/item_slot_transfer_request.h"
 #include "game/detail/inventory/perform_transfer.h"
+#include "game/detail/gun_math.h"
 
 #include "game/components/rigid_body_component.h"
 #include "game/components/missile_component.h"
