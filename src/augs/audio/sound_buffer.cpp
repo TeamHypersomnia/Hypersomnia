@@ -166,4 +166,14 @@ namespace augs {
 			}
 		}
 	}
+
+	const single_sound_buffer& sound_buffer::get_buffer(
+		const std::size_t variation_index,
+		const bool direct
+	) const {
+		const auto chosen_variation = variation_index % variations.size();
+		const auto& buffer = variations[chosen_variation];
+
+		return direct ? buffer.stereo_or_mono() : buffer.mono_or_stereo();
+	}
 }

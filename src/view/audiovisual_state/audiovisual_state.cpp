@@ -106,11 +106,13 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		ear.cone.transform = viewed_character.get_viewing_transform(interp);
 		
 		sounds.update_sound_properties(
-			input.audio_volume,
-			input.sounds,
-			interp,
-			ear,
-			dt
+			{
+				input.audio_volume,
+				input.sounds,
+				interp,
+				ear,
+				dt
+			}
 		);
 	}
 
@@ -191,7 +193,16 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 		}
 	}
 
-	sounds.update_effects_from_messages(step, input.sounds, interp, ear);
+	sounds.update_effects_from_messages(
+		step, 
+		{
+			input.audio_volume,
+			input.sounds, 
+			interp, 
+			ear,
+			augs::delta::zero
+		}
+	);
 
 	for (const auto& h : healths) {
 		flying_number_indicator_system::number::input vn;

@@ -56,5 +56,10 @@ namespace augs {
 		sound_buffer(const sound_buffer_loading_input);
 
 		std::vector<variation> variations;
+
+		const single_sound_buffer& get_buffer(
+			std::size_t variation_index,
+			bool direct
+		) const;
 	};
 }

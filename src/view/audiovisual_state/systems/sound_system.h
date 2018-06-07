@@ -24,35 +24,56 @@ namespace augs {
 }
 
 class sound_system {
+	struct update_properties_input {
+		const augs::audio_volume_settings& settings;
+		const loaded_sounds_map& manager;
+		const interpolation_system& interp;
+		const viewer_eye ear;
+		const augs::delta dt;
+
+		auto get_listener() const {
+			return ear.viewed_character;
+		}
+		std::optional<transformr> find_transform(const absolute_or_local&) const;
+	};
+
+	struct sound_not_found {};
+
 	struct generic_sound_cache {
 		augs::sound_source source;
-		absolute_or_local positioning;
 		packaged_sound_effect original;
+		absolute_or_local positioning;
 
 		/* For calculating sound's velocity */
 		std::optional<components::transform> previous_transform;
 
 		generic_sound_cache() = default;
-
 		generic_sound_cache(
-			const_entity_handle listening_character,
-			const augs::sound_buffer& source_effect,
-			const packaged_sound_effect&,
-			const interpolation_system&
-		);
+			const packaged_sound_effect& original,
+			const update_properties_input in
+		) : 
+			original(original),
+			positioning(original.start.positioning)
+		{
+			if (!rebind_buffer(in)) {
+				throw sound_not_found {}; 
+			}
 
-		bool update_properties(
-			const augs::audio_volume_settings&,
-			const cosmos&,
-			const interpolation_system&,
-			const vec2 listener_pos,
-			const augs::delta dt
-		);
+			update_properties(in);
+			previous_transform = in.find_transform(positioning);
+			source.play();
+		}
+
+		bool rebind_buffer(update_properties_input in);
+		bool update_properties(update_properties_input in);
+
+		void bind(const augs::sound_buffer&, entity_id listener);
 	};
 
 	struct fading_source {
 		assets::sound_id id;
 		augs::sound_source source;
+		float fade_per_sec = 3.f;
 	};
 
 	std::vector<generic_sound_cache> short_sounds;
@@ -60,30 +81,26 @@ class sound_system {
 
 	audiovisual_cache_map<generic_sound_cache> firearm_engine_caches;
 
+	template <class T>
+	void fade_and_erase(T& caches, const unversioned_entity_id id, const float fade_per_sec = 3.f) {
+		if (auto* const cache = mapped_or_nullptr(caches, id)) {
+			start_fading(*cache, fade_per_sec);
+			caches.erase(id);
+		}
+	}
+
 	void update_listener(
 		const const_entity_handle subject,
 		const interpolation_system& sys
 	);
 
-	void start_fading(generic_sound_cache&);
+	void start_fading(generic_sound_cache&, float fade_per_sec = 3.f);
 
 public:
 	void reserve_caches_for_entities(const std::size_t) const {}
 
-	void update_effects_from_messages(
-		const_logic_step step,
-		const loaded_sounds_map& manager,
-		const interpolation_system& interp,
-		viewer_eye ear
-	);
-
-	void update_sound_properties(
-		const augs::audio_volume_settings&,
-		const loaded_sounds_map&,
-		const interpolation_system& sys,
-		viewer_eye ear,
-		augs::delta dt
-	);
+	void update_effects_from_messages(const_logic_step, update_properties_input);
+	void update_sound_properties(update_properties_input);
 
 	void fade_sources(const augs::delta dt);
 

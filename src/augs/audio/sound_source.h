@@ -16,6 +16,7 @@ namespace augs {
 
 namespace augs {
 	class single_sound_buffer;
+	class sound_buffer;
 
 	void set_listener_velocity(const si_scaling, vec2);
 	void set_listener_position(const si_scaling, vec2);
@@ -56,6 +57,13 @@ namespace augs {
 		bool is_playing() const;
 
 		void bind_buffer(const single_sound_buffer&);
+
+		void bind_buffer(
+			const sound_buffer&, 
+			std::size_t variation_index,
+			bool direct
+		);
+
 		void unbind_buffer();
 		const single_sound_buffer* get_bound_buffer() const;
 

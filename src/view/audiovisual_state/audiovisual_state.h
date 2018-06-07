@@ -29,7 +29,7 @@ struct session_profiler;
 struct audiovisual_post_solve_input {
 	const particle_effects_map& particle_effects;
 	const loaded_sounds_map& sounds;
-
+	const augs::audio_volume_settings audio_volume;
 	const viewer_eye eye;
 };
 

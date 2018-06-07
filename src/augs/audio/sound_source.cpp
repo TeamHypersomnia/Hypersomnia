@@ -208,11 +208,44 @@ namespace augs {
 	}
 
 	void sound_source::bind_buffer(const single_sound_buffer& buf) {
-		attached_buffer = &buf;
+		std::optional<float> previous_seconds;
+
+		{
+			const auto buf_addr = std::addressof(buf);
+
+			if (attached_buffer == buf_addr) {
+				return;
+			}
+
+			if (attached_buffer != nullptr) {
+				previous_seconds = get_time_in_seconds();
+			}
+
+			attached_buffer = &buf;
+		}
+
+		if (previous_seconds) {
+			stop();
+		}
+
 		AL_CHECK(alSourcei(id, AL_BUFFER, buf.get_id()));
 #if TRACE_PARAMETERS
 		LOG_NVPS(buf.get_id());
 #endif
+
+		if (previous_seconds) {
+			play();
+			seek_to(*previous_seconds);
+		}
+	}
+
+	void sound_source::bind_buffer(
+		const sound_buffer& source_buffer, 
+		const std::size_t variation_index,
+		const bool direct
+	) {
+		bind_buffer(source_buffer.get_buffer(variation_index, direct));
+		set_direct_channels(direct);
 	}
 
 	void sound_source::unbind_buffer() {

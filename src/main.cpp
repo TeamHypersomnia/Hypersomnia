@@ -630,14 +630,15 @@ int work(const int argc, const char* const * const argv) try {
 		});
 	};
 
-	static auto setup_post_solve = [](const const_logic_step step) {
+	static auto setup_post_solve = [](const const_logic_step step, const config_lua_table& viewing_config) {
 		{
 			const auto& defs = get_viewable_defs();
 
 			audiovisuals.standard_post_solve(step, { 
 				defs.particle_effects, 
 				streaming.loaded_sounds,
-				get_viewer_eye() 
+				viewing_config.audio_volume,
+				get_viewer_eye()
 			});
 		}
 
@@ -694,7 +695,7 @@ int work(const int argc, const char* const * const argv) try {
 			frame_delta,
 			setup_pre_solve,
 			[&](const const_logic_step step) {
-				_setup_post_solve(step);
+				_setup_post_solve(step, viewing_config);
 				_audiovisual_step(augs::delta::zero, 0.0, viewing_config);
 			},
 			setup_post_cleanup
