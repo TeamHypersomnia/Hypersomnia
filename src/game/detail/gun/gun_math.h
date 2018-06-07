@@ -40,7 +40,3 @@ vec2 calc_barrel_center(
 	return (gun_transform * transformr(vec2(0, bullet_spawn_offset.y))).pos;
 }
 
-template <class T>
-auto can_have_firearm_engine_effect(const T& gun_handle) {
-	return gun_handle.template has<components::gun>();
-}

@@ -75,3 +75,8 @@ auto calc_firearm_engine_sound(const T& gun_handle)
 
 	return std::nullopt;
 }
+
+template <class T>
+auto can_have_firearm_engine_effect(const T& gun_handle) {
+	return gun_handle.alive() && gun_handle.template has<components::gun>();
+}

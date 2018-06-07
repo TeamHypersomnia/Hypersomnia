@@ -96,7 +96,8 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 				const auto owning_capability = subject_handle.get_owning_transfer_capability();
 
-				const bool is_victim_a_held_item = owning_capability.alive() && owning_capability != it.subject;
+				const bool is_victim_an_item = subject_handle.has<components::item>();
+				const bool is_victim_a_held_item = is_victim_an_item && owning_capability.alive() && owning_capability != it.subject;
 
 				messages::damage_message damage_msg;
 				damage_msg.subject_b2Fixture_index = it.subject_b2Fixture_index;
@@ -109,7 +110,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 					);
 				}
 
-				if (!is_victim_a_held_item && missile_def.destroy_upon_damage) {
+				if (!is_victim_an_item && missile_def.destroy_upon_damage) {
 					missile->damage_charges_before_destruction--;
 					
 					detonate_if_explosive(step, it.point, missile_handle);
