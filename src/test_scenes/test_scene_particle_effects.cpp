@@ -219,6 +219,42 @@ void load_test_scene_particle_effects(
 
 			effect.emissions.push_back(em);
 		}
+
+		{
+			particles_emission em; 
+			default_bounds(em);
+
+			em.swing_spread.set(10, 20);
+			em.swings_per_sec.set(1.3, 1.5);
+			em.swing_spread_change_rate.set(0.8, 0.9);
+
+			em.spread_degrees = float_range(3, 3);
+			em.particles_per_sec.set(10, 10);
+			em.stream_lifetime_ms = float_range(3000000, 3000000);
+
+			em.base_speed = float_range(10, 50);
+
+			em.rotation_speed = float_range(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
+			em.particle_lifetime_ms = float_range(1500, 1500);
+
+			for (int i = 0; i < 3; ++i) {
+				general_particle particle_definition;
+
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 0;
+				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 15));
+				particle_definition.unshrinking_time_ms = 0.f;
+				particle_definition.shrink_when_ms_remaining = 100.f;
+
+				em.add_particle_definition(particle_definition);
+			}
+
+			em.size_multiplier = float_range(0.1, 0.1);
+			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
+			em.initial_rotation_variation = 180;
+
+			effect.emissions.push_back(em);
+		}
 	}
 
 	{

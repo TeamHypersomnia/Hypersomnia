@@ -29,7 +29,7 @@
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/spells/spell_logic_input.h"
 
-#include "game/detail/gun_math.h"
+#include "game/detail/gun/gun_math.h"
 #include "game/stateless_systems/driver_system.h"
 
 void sentience_system::cast_spells(const logic_step step) const {
@@ -468,7 +468,7 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 					if (const auto* const maybe_gun_def = subject_item.template find<invariants::gun>()) {
 						const auto rifle_transform = subject_item.get_logic_transform();
 						auto barrel_center = calc_barrel_center(subject_item, rifle_transform);
-						auto muzzle = calc_muzzle_position(subject_item, rifle_transform);
+						auto muzzle = calc_muzzle_transform(subject_item, rifle_transform).pos;
 						const auto mc = subject_transform.pos;
 
 						barrel_center.rotate(-subject_transform.rotation, mc);

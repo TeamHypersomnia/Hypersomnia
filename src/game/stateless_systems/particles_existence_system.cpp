@@ -125,6 +125,8 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 				}
 				else {
 					effect.modifier.colorize = red;
+
+					/* Fix it when we can specify modifiers per-emission */
 					effect.modifier.scale_amounts = h.effective_amount / 100.f;// (1.25f + h.ratio_effective_to_maximum)*(1.25f + h.ratio_effective_to_maximum);
 					effect.modifier.scale_lifetimes = 1.25f + h.effective_amount / 100.f;
 				}

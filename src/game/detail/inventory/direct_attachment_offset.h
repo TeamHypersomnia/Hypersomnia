@@ -3,7 +3,7 @@
 #include "game/enums/slot_function.h"
 #include "game/components/sprite_component.h"
 #include "game/components/gun_component.h"
-#include "game/detail/gun_math.h"
+#include "game/detail/gun/gun_math.h"
 
 inline transformr get_anchored_offset(
 	const transformi attachment_offset,
@@ -73,8 +73,7 @@ transformr direct_attachment_offset(
 		break;
 
 		case slot_function::GUN_MUZZLE: 
-		attachment_offset.pos = ::calc_muzzle_position(attachment, {});
-		attachment_offset.rotation = 0;
+		attachment_offset = ::calc_muzzle_transform(attachment, {}).get_integerized();
 		anchor = anchors.attachment_anchor;
 		break;
 

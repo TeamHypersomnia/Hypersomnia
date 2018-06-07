@@ -18,7 +18,6 @@
 
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
-#include "game/detail/view_input/packaged_particles_and_sound.h"
 
 namespace augs {
 	struct introspection_access;

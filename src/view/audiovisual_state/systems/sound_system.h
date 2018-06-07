@@ -37,7 +37,7 @@ class sound_system {
 		std::optional<transformr> find_transform(const absolute_or_local&) const;
 	};
 
-	struct sound_not_found {};
+	struct effect_not_found {};
 
 	struct generic_sound_cache {
 		augs::sound_source source;
@@ -56,7 +56,7 @@ class sound_system {
 			positioning(original.start.positioning)
 		{
 			if (!rebind_buffer(in)) {
-				throw sound_not_found {}; 
+				throw effect_not_found {}; 
 			}
 
 			update_properties(in);

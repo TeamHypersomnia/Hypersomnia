@@ -11,6 +11,7 @@
 #include "game/components/fixtures_component.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/audiovisual_state/systems/sound_system.h"
+#include "game/detail/gun/firearm_engine.h"
 
 #include "view/viewables/loaded_sounds_map.h"
 
@@ -166,7 +167,7 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 		try {
 			short_sounds.emplace_back(e.payload, in);
 		}
-		catch (sound_not_found) {
+		catch (effect_not_found) {
 
 		}
 		catch (augs::too_many_sound_sources_error err) {
@@ -190,9 +191,9 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		[&](const auto gun_entity) {
 			const auto id = gun_entity.get_id().to_unversioned();
 
-			if (const auto effect = ::calc_firearm_engine_effects(gun_entity)) {
+			if (const auto sound = ::calc_firearm_engine_sound(gun_entity)) {
 				if (auto* const existing = mapped_or_nullptr(firearm_engine_caches, id)) {
-					existing->original = effect->sound;
+					existing->original = *sound;
 
 					if (!existing->rebind_buffer(in)) {
 						fade_and_erase(firearm_engine_caches, id);
@@ -200,7 +201,7 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 				}
 				else {
 					try {
-						firearm_engine_caches.try_emplace(id, effect->sound, in);
+						firearm_engine_caches.try_emplace(id, *sound, in);
 					}
 					catch (...) {
 
@@ -216,7 +217,7 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 	erase_if(firearm_engine_caches, [&](auto& it) {
 		auto& cache = it.second;
 
-		if (!cosm[it.first].template has<components::gun>()) {
+		if (!can_have_firearm_engine_effect(cosm[it.first])) {
 			start_fading(cache);
 			return true;
 		}

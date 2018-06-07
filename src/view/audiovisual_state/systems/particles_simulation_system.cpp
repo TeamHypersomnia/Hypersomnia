@@ -18,6 +18,67 @@
 
 #include "view/audiovisual_state/systems/particles_simulation_system.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
+#include "game/detail/gun/firearm_engine.h"
+
+void particles_simulation_system::emission_instance::init_bounds(
+	const particles_emission& emission,
+	randomization& rng
+) {
+	{
+		const auto var_v = rng.randval(emission.base_speed_variation);
+		particle_speed.set(std::max(0.f, emission.base_speed.first - var_v / 2), emission.base_speed.second + var_v / 2);
+	}
+
+	source_emission = emission;
+	angular_offset = rng.randval(emission.angular_offset);
+	spread = rng.randval(emission.spread_degrees);
+	particles_per_sec = rng.randval(emission.particles_per_sec);
+	swing_spread = rng.randval(emission.swing_spread);
+	swings_per_sec = rng.randval(emission.swings_per_sec);
+
+	swing_spread_bound = rng.randval(emission.swing_spread_bound);
+	swings_per_sec_bound = rng.randval(emission.swings_per_sec_bound);
+
+	stream_max_lifetime_ms = rng.randval(emission.stream_lifetime_ms);
+	stream_particles_to_spawn = rng.randval(emission.num_of_particles_to_spawn_initially);
+	swing_speed_change = rng.randval(emission.swing_speed_change_rate);
+	swing_spread_change = rng.randval(emission.swing_spread_change_rate);
+
+	fade_when_ms_remaining = rng.randval(emission.fade_when_ms_remaining);
+
+	randomize_spawn_point_within_circle_of_inner_radius = rng.randval(emission.randomize_spawn_point_within_circle_of_inner_radius);
+	randomize_spawn_point_within_circle_of_outer_radius = rng.randval(emission.randomize_spawn_point_within_circle_of_outer_radius);
+
+	starting_homing_force = rng.randval(emission.starting_homing_force);
+	ending_homing_force = rng.randval(emission.ending_homing_force);
+
+	starting_spawn_circle_size_multiplier = rng.randval(emission.starting_spawn_circle_size_multiplier);
+	ending_spawn_circle_size_multiplier = rng.randval(emission.ending_spawn_circle_size_multiplier);
+}
+
+particles_simulation_system::emission_instance::emission_instance(
+	const particles_emission& emission,
+	randomization& rng
+) {
+	init_bounds(emission, rng);
+}
+
+particles_simulation_system::basic_cache::basic_cache(
+	const packaged_particle_effect& original,
+	const particle_effects_map& manager,
+	randomization& rng
+) : original(original) {
+	if (const auto* const source_effect = mapped_or_nullptr(manager, original.input.id)) {
+		emission_instances.reserve(source_effect->emissions.size());
+
+		for (auto emission : source_effect->emissions) {
+			emission_instances.emplace_back(emission, rng);
+		}
+	}
+	else {
+		throw effect_not_found {};
+	}
+}
 
 void particles_simulation_system::clear() {
 	orbital_emissions.clear();
@@ -92,82 +153,31 @@ void particles_simulation_system::update_effects_from_messages(
 
 	const auto& events = step.get_queue<messages::start_particle_effect>();
 
-	auto instantiate_emission = [&](const particles_emission& emission) {
-		emission_instance instance;
-
-		const auto var_v = rng.randval(emission.base_speed_variation);
-		//LOG("V: %x", var_v);
-		instance.particle_speed.set(std::max(0.f, emission.base_speed.first - var_v / 2), emission.base_speed.second + var_v / 2);
-		//LOG("Vl: %x Vu: %x", instance.velocity.first, instance.velocity.second);
-
-		instance.source_emission = emission;
-		instance.enable_streaming = true;
-		instance.stream_lifetime_ms = 0.f;
-		instance.angular_offset = rng.randval(emission.angular_offset);
-		instance.spread = rng.randval(emission.spread_degrees);
-		instance.particles_per_sec = rng.randval(emission.particles_per_sec);
-		instance.swing_spread = rng.randval(emission.swing_spread);
-		instance.swings_per_sec = rng.randval(emission.swings_per_sec);
-
-		instance.swing_spread_bound = rng.randval(emission.swing_spread_bound);
-		instance.swings_per_sec_bound = rng.randval(emission.swings_per_sec_bound);
-
-		instance.stream_max_lifetime_ms = rng.randval(emission.stream_lifetime_ms);
-		instance.stream_particles_to_spawn = rng.randval(emission.num_of_particles_to_spawn_initially);
-		instance.swing_speed_change = rng.randval(emission.swing_speed_change_rate);
-		instance.swing_spread_change = rng.randval(emission.swing_spread_change_rate);
-
-		instance.fade_when_ms_remaining = rng.randval(emission.fade_when_ms_remaining);
-
-		instance.randomize_spawn_point_within_circle_of_inner_radius = rng.randval(emission.randomize_spawn_point_within_circle_of_inner_radius);
-		instance.randomize_spawn_point_within_circle_of_outer_radius = rng.randval(emission.randomize_spawn_point_within_circle_of_outer_radius);
-
-		instance.starting_homing_force = rng.randval(emission.starting_homing_force);
-		instance.ending_homing_force = rng.randval(emission.ending_homing_force);
-
-		instance.starting_spawn_circle_size_multiplier = rng.randval(emission.starting_spawn_circle_size_multiplier);
-		instance.ending_spawn_circle_size_multiplier = rng.randval(emission.ending_spawn_circle_size_multiplier);
-
-		return instance;
-	};
-
 	for (auto& e : events) {
-		const auto& effect = e.payload.input;
 		const auto& start = e.payload.start;
 
-		if (const auto* const source_effect = mapped_or_nullptr(manager, effect.id)) {
-			auto& instances = [&]() -> emission_instances& {
-				if (!start.positioning.target.is_set()) {
-					faf_cache c;
-					c.transform = start.positioning.offset;
-					fire_and_forget_emissions.push_back(c);
+		try {
+			if (!start.positioning.target.is_set()) {
+				fire_and_forget_emissions.emplace_back(
+					start.positioning.offset,
 
-					return fire_and_forget_emissions.back().emission_instances;
-				}
-
-				orbital_cache c;
-				c.chasing = start.positioning;
-				c.original.start = start;
-				c.original.input = effect;
-				orbital_emissions.push_back(c);
-
-#if MORE_LOGS
-				if (effect.id == to_particle_effect_id(test_scene_particle_effect_id::HEALTH_DAMAGE_SPARKLES)) {
-					LOG("Adding health sparkles");
-				}
-#endif
-
-				return orbital_emissions.back().emission_instances;
-			}();
-
-			for (auto emission : source_effect->emissions) {
-				emission.apply_modifier(effect.modifier);
-
-				auto new_instance = instantiate_emission(emission);
-				new_instance.homing_target = start.homing_target;
-
-				instances.push_back(new_instance);
+					e.payload,
+					manager,
+					rng
+				);
 			}
+			else {
+				orbital_emissions.emplace_back(
+					start.positioning,
+
+					e.payload,
+					manager,
+					rng
+				);
+			}
+		}
+		catch (effect_not_found) {
+
 		}
 	}
 }
@@ -222,8 +232,8 @@ void particles_simulation_system::integrate_all_particles(
 void particles_simulation_system::advance_visible_streams(
 	const camera_cone current_cone, 
 	const vec2 screen_size,
-	const cosmos& cosmos,
-	const particle_effects_map&,
+	const cosmos& cosm,
+	const particle_effects_map& manager,
 	const plain_animations_pool& anims,
 	const augs::delta delta,
 	const interpolation_system& interp
@@ -233,8 +243,12 @@ void particles_simulation_system::advance_visible_streams(
 	auto advance_emissions = [&](
 		emission_instances& instances, 
 		const components::transform current_transform,
-		const bool visible_in_camera
+		const bool visible_in_camera,
+		const packaged_particle_effect& effect
 	) {
+		const auto& modifier = effect.input.modifier;
+		const auto homing_target = effect.start.homing_target;
+
 		for (auto& instance : instances) {
 			const auto stream_alivity_mult = 
 				instance.stream_max_lifetime_ms == 0.f ? 1.f : instance.stream_lifetime_ms / instance.stream_max_lifetime_ms
@@ -258,7 +272,10 @@ void particles_simulation_system::advance_visible_streams(
 				continue;
 			}
 
-			auto new_particles_to_spawn_by_time = instance.particles_per_sec * (stream_delta / 1000.f);
+			auto new_particles_to_spawn_by_time = 
+				(instance.particles_per_sec * modifier.scale_amounts) * 
+				(stream_delta / 1000.f)
+			;
 
 			instance.stream_particles_to_spawn += new_particles_to_spawn_by_time;
 
@@ -276,8 +293,6 @@ void particles_simulation_system::advance_visible_streams(
 				clamp(instance.swings_per_sec, instance.swings_per_sec_bound);
 			}
 
-			const int to_spawn = static_cast<int>(std::floor(instance.stream_particles_to_spawn));
-
 #if TODO
 			const auto segment_length = existence.distribute_within_segment_of_length;
 #endif
@@ -286,7 +301,11 @@ void particles_simulation_system::advance_visible_streams(
 			const vec2 segment_A = current_transform.pos + vec2::from_degrees(current_transform.rotation + 90).set_length(segment_length / 2);
 			const vec2 segment_B = current_transform.pos - vec2::from_degrees(current_transform.rotation + 90).set_length(segment_length / 2);
 			
-			const auto homing_target_pos = cosmos[instance.homing_target].alive() ? cosmos[instance.homing_target].get_viewing_transform(interp).pos : vec2();
+			const auto homing_target_pos = cosm[homing_target].alive() ? cosm[homing_target].get_viewing_transform(interp).pos : vec2();
+
+			const auto to_spawn = static_cast<int>(std::floor(
+				instance.stream_particles_to_spawn * modifier.scale_amounts
+			));
 
 			for (int i = 0; i < to_spawn; ++i) {
 				const float t = (static_cast<float>(i) / to_spawn);
@@ -318,7 +337,7 @@ void particles_simulation_system::advance_visible_streams(
 				const auto spawner = [&](auto dummy) {
 					using spawned_particle_type = decltype(dummy);
 
-					return this->spawn_particle<spawned_particle_type>(
+					auto particle = this->spawn_particle<spawned_particle_type>(
 						_rng,
 						instance.angular_offset,
 						instance.particle_speed,
@@ -327,6 +346,8 @@ void particles_simulation_system::advance_visible_streams(
 						instance.spread,
 						emission
 					);
+
+					return ::apply_to_particle(modifier, particle);
 				};
 
 				if (emission.get_definitions<general_particle>().size() > 0) {
@@ -335,15 +356,13 @@ void particles_simulation_system::advance_visible_streams(
 					add_particle(emission.target_render_layer, new_general);
 				}
 
-				if (emission.get_definitions<animated_particle>().size() > 0)
-				{
+				if (emission.get_definitions<animated_particle>().size() > 0) {
 					auto new_animated = spawner(animated_particle());
 					new_animated.integrate(time_elapsed, anims);
 					add_particle(emission.target_render_layer, new_animated);
 				}
 
-				if (emission.get_definitions<homing_animated_particle>().size() > 0)
-				{
+				if (emission.get_definitions<homing_animated_particle>().size() > 0) {
 					auto new_homing_animated = spawner(homing_animated_particle());
 
 					new_homing_animated.homing_force = augs::interp(
@@ -353,11 +372,12 @@ void particles_simulation_system::advance_visible_streams(
 					);
 
 					new_homing_animated.integrate(time_elapsed, homing_target_pos, anims);
-					add_particle(emission.target_render_layer, instance.homing_target, new_homing_animated);
+					add_particle(emission.target_render_layer, homing_target, new_homing_animated);
 				}
-
-				instance.stream_particles_to_spawn -= 1.f;
 			}
+
+			/* Leave only the fractional part */
+			instance.stream_particles_to_spawn -= static_cast<int>(instance.stream_particles_to_spawn);
 		}
 	};
 
@@ -369,18 +389,59 @@ void particles_simulation_system::advance_visible_streams(
 			const auto where = c.transform;
 			const bool visible_in_camera = checked_cone.get_visible_world_rect_aabb(screen_size).hover(where.pos);
 
-			advance_emissions(c.emission_instances, where, visible_in_camera);
+			advance_emissions(c.emission_instances, where, visible_in_camera, c.original);
 		}
 
 		for (auto& c : orbital_emissions) { 
 			const auto chase = c.chasing;
-			const auto where = find_transform(chase, cosmos, interp);
+			const auto where = find_transform(chase, cosm, interp);
 			const bool visible_in_camera = where && checked_cone.get_visible_world_rect_aabb(screen_size).hover(where->pos);
 
-			advance_emissions(c.emission_instances, *where, visible_in_camera);
+			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
+		}
+
+		for (auto& it : firearm_engine_caches) { 
+			auto& c = it.second;
+
+			const auto chase = c.chasing;
+			const auto where = find_transform(chase, cosm, interp);
+			const bool visible_in_camera = where && checked_cone.get_visible_world_rect_aabb(screen_size).hover(where->pos);
+
+			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
 		}
 	}
 
 	erase_if(fire_and_forget_emissions, [](const faf_cache& c){ return c.is_over(); });
 	erase_if(orbital_emissions, [](const orbital_cache& c){ return c.is_over(); });
+
+	cosm.for_each_having<components::gun>(
+		[&](const auto gun_entity) {
+			const auto id = gun_entity.get_id().to_unversioned();
+
+			if (const auto particles = ::calc_firearm_engine_particles(gun_entity)) {
+				if (auto* const existing = mapped_or_nullptr(firearm_engine_caches, id)) {
+					existing->original = *particles;
+				}
+				else {
+					try {
+						firearm_engine_caches.try_emplace(id, particles->start.positioning, *particles, manager, rng);
+					}
+					catch (effect_not_found) {
+
+					}
+				}
+			}
+			else {
+				firearm_engine_caches.erase(id);
+			}
+		}
+	);
+
+	erase_if(firearm_engine_caches, [&](auto& it) {
+		if (!can_have_firearm_engine_effect(cosm[it.first])) {
+			return true;
+		}
+
+		return false;
+	});
 }

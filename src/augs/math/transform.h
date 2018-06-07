@@ -185,6 +185,13 @@ struct basic_transform {
 		rotation += delta;
 		return delta;
 	}
+
+	basic_transform<int> get_integerized() const {
+		return {
+			static_cast<vec2i>(pos),
+			rotation
+		};
+	}
 };
 
 template <class T>

@@ -7,14 +7,7 @@
 
 #include "game/assets/ids/asset_ids.h"
 #include "game/detail/transform_copying.h"
-
-struct particle_effect_modifier {
-	// GEN INTROSPECTOR struct particle_effect_modifier
-	rgba colorize = white;
-	real32 scale_amounts = 1.f;
-	real32 scale_lifetimes = 1.f;
-	// END GEN INTROSPECTOR
-};	
+#include "game/detail/view_input/particle_effect_modifier.h"
 
 struct particle_effect_start_input {
 	absolute_or_local positioning;

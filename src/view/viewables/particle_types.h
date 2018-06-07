@@ -5,11 +5,21 @@
 #include "augs/graphics/rgba.h"
 #include "game/transcendental/entity_id.h"
 
+#include "game/detail/view_input/particle_effect_modifier.h"
 #include "game/assets/all_logical_assets.h"
 #include "game/assets/asset_pools.h"
 #include "game/assets/animation.h"
 
 #include "augs/drawing/sprite_helpers.h"
+
+template <class T, class = void>
+struct has_lifetime : std::false_type {};
+
+template <class T>
+struct has_lifetime<T, decltype(std::declval<T&>().current_lifetime_ms, void())> : std::true_type {};
+
+template <class T>
+constexpr bool has_lifetime_v = has_lifetime<T>::value;
 
 struct draw_particles_input {
 	augs::drawer output;
@@ -216,3 +226,14 @@ struct homing_animated_particle {
 	void set_max_lifetime_ms(const float);
 	void colorize(const rgba);
 };
+
+template <class T>
+T& apply_to_particle(const particle_effect_modifier& m, T& p) {
+	p.colorize(m.colorize);
+
+	if constexpr(has_lifetime_v<T>) {
+		p.max_lifetime_ms *= m.scale_lifetimes;
+	}
+
+	return p;
+}

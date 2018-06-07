@@ -79,12 +79,20 @@ namespace test_flavours {
 			item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
 			meta.set(item);
 
-			meta.template get<invariants::gun>().steam_burst_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEAM_BURST);
-			meta.template get<invariants::gun>().steam_burst_sound.id = to_sound_id(test_scene_sound_id::STEAM_BURST);
-			meta.template get<invariants::gun>().steam_burst_sound.modifier.gain = 0.7f;
+			{
+				auto& gun_def = meta.template get<invariants::gun>();
 
-			meta.template get<invariants::gun>().steam_burst_perform_diff = 0.2f;
-			meta.template get<invariants::gun>().steam_burst_schedule_mult = 0.65f;
+				gun_def.steam_burst_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEAM_BURST);
+				gun_def.steam_burst_sound.id = to_sound_id(test_scene_sound_id::STEAM_BURST);
+				gun_def.steam_burst_sound.modifier.gain = 0.7f;
+				gun_def.steam_burst_perform_diff = 0.2f;
+				gun_def.steam_burst_schedule_mult = 0.65f;
+
+				gun_def.firing_engine_particles.id = to_particle_effect_id(test_scene_particle_effect_id::MUZZLE_SMOKE);
+
+				gun_def.firing_engine_particles.modifier.scale_amounts = 0.8f;
+				//gun_def.firing_engine_particles.modifier.scale_lifetimes = 0.5f;
+			}
 		};
 	
 		{

@@ -6,11 +6,8 @@ struct has_rotation : std::false_type {};
 template <class T>
 struct has_rotation<T, decltype(std::declval<T&>().rotation, void())> : std::true_type {};
 
-template <class T, class = void>
-struct has_lifetime : std::false_type {};
-
 template <class T>
-struct has_lifetime<T, decltype(std::declval<T&>().current_lifetime_ms, void())> : std::true_type {};
+constexpr bool has_rotation_v = has_rotation<T>::value;
 
 template <class T>
 inline void generic_integrate_particle(T& p, const float dt) {
@@ -19,11 +16,11 @@ inline void generic_integrate_particle(T& p, const float dt) {
 	
 	p.vel.shrink(p.linear_damping * dt);
 
-	if constexpr(has_lifetime<T>::value) {
+	if constexpr(has_lifetime_v<T>) {
 		p.current_lifetime_ms += dt * 1000;
 	}
 
-	if constexpr(has_rotation<T>::value) {
+	if constexpr(has_rotation_v<T>) {
 		p.rotation += p.rotation_speed * dt;
 		augs::shrink(p.rotation_speed, p.angular_damping * dt);
 	}

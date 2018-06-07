@@ -78,8 +78,6 @@ struct particles_emission {
 	void add_particle_definition(const T& t) {
 		get_definitions<T>().push_back(t);
 	}
-
-	void apply_modifier(const particle_effect_modifier m);
 };
 
 struct particle_effect {

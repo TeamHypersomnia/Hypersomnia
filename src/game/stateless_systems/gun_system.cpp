@@ -12,7 +12,7 @@
 
 #include "game/detail/inventory/item_slot_transfer_request.h"
 #include "game/detail/inventory/perform_transfer.h"
-#include "game/detail/gun_math.h"
+#include "game/detail/gun/gun_math.h"
 
 #include "game/components/rigid_body_component.h"
 #include "game/components/missile_component.h"
@@ -118,7 +118,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			auto& gun = gun_entity.template get<components::gun>();
 			const auto& gun_def = gun_entity.template get<invariants::gun>();
 
-			const auto muzzle_transform = components::transform { calc_muzzle_position(gun_entity, gun_transform), gun_transform.rotation };
+			const auto muzzle_transform = calc_muzzle_transform(gun_entity, gun_transform);
 
 			auto make_gunshot_message = [&](){
 				messages::gunshot_message response;

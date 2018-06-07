@@ -16,14 +16,12 @@
 #include "view/viewables/particle_effect.h"
 
 class interpolation_system;
+struct randomization;
 
 class particles_simulation_system {
 public:
 	struct emission_instance {
 		using minmax = augs::minmax<float>;
-
-		bool enable_streaming = false;
-		pad_bytes<2> pad;
 
 		float angular_offset = 0.f;
 
@@ -55,11 +53,21 @@ public:
 		float fade_when_ms_remaining = 0.f;
 
 		particles_emission source_emission;
-		entity_id homing_target;
 
 		bool is_over() const {
 			return stream_lifetime_ms >= stream_max_lifetime_ms;
 		}
+
+		void init_bounds(
+			const particles_emission& emission,
+			randomization& rng
+		);
+
+		emission_instance() = default;
+		emission_instance(
+			const particles_emission& emission,
+			randomization& rng
+		);
 	};
 
 	using emission_instances = std::vector<emission_instance>;
@@ -74,23 +82,51 @@ public:
 		return true;
 	}
 
-	struct orbital_cache {
+	struct effect_not_found {};
+
+	struct basic_cache {
 		std::vector<emission_instance> emission_instances;
-		absolute_or_local chasing;
 		packaged_particle_effect original;
+
+		basic_cache() = default;
+
+		basic_cache(
+			const packaged_particle_effect& original,
+			const particle_effects_map& manager,
+			randomization& rng
+		);
 
 		bool is_over() const {
 			return are_over(emission_instances);
 		}
 	};
 
-	struct faf_cache {
-		components::transform transform;
-		std::vector<emission_instance> emission_instances;
+	struct orbital_cache : basic_cache {
+		absolute_or_local chasing;
 
-		bool is_over() const {
-			return are_over(emission_instances);
-		}
+		orbital_cache() = default;
+
+		template <class... Args>
+		orbital_cache(
+			const absolute_or_local& chasing, Args&&... args
+		) : 
+			basic_cache(std::forward<Args>(args)...), 
+			chasing(chasing) 
+		{}
+	};
+
+	struct faf_cache : basic_cache {
+		transformr transform;
+
+		faf_cache() = default;
+
+		template <class... Args>
+		faf_cache(
+			const transformr& transform, Args&&... args
+		) : 
+			basic_cache(std::forward<Args>(args)...), 
+			transform(transform) 
+		{}
 	};
 
 	/* Particle vectors */
