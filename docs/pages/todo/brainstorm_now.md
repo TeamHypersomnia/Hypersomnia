@@ -5,17 +5,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Schedule steam outburst effect if max heat exceeds ~80%
-
-- Gun engine sounds and car engine sounds
-	- This case is analogous to wandering pixels, for example
-	- This would be useful to consider in networking context already
-	- Messaging in step vs polling
-		- Polling might not be that bad performance-wise if we only ever consider entities near camera
-		- And it is the most robust approach that will respond with correct results to arbitrarily passed cosmoi
-	- Implementation should just use message responding logic to create specialized caches
-	- just make regular audiovisual caches...
-
 - Animation architecture
 	- Animation asset
 		- Several distinct types of animations
@@ -103,15 +92,6 @@ summary: That which we are brainstorming at the moment.
 		- We will always simulate all particles that we have in memory.
 		- This will add a nice speedup, and also we will easily invalidate particles when particle flavour changes or is deleted.
 		- Particle types will also be pooled and will be a separate viewable.
-
-- Complex ImGui controls in general property editor
-	- In fae tree:
-		- Flavours
-		- Entities
-		- Recoil players
-			- Name-able, linear combo box
-		- Physical materials
-			- Name-able, linear combo box
 
 - Fix what happens when too many entities are created
 	- **Let the game work when a new entity cannot be created.**

@@ -866,3 +866,24 @@ we consider whole type overrides too complex architeciturally:
 		- Head offsets
 		- Primary/secondary hand offsets
 		- Back offsets (for backpacks)
+
+- Schedule steam outburst effect if max heat exceeds ~80%
+
+- Gun engine sounds and car engine sounds
+	- This case is analogous to wandering pixels, for example
+	- This would be useful to consider in networking context already
+	- Messaging in step vs polling
+		- Polling might not be that bad performance-wise if we only ever consider entities near camera
+		- And it is the most robust approach that will respond with correct results to arbitrarily passed cosmoi
+	- Implementation should just use message responding logic to create specialized caches
+	- just make regular audiovisual caches...
+
+- Complex ImGui controls in general property editor
+	- In fae tree:
+		- Flavours
+		- Entities
+		- Recoil players
+			- Name-able, linear combo box
+		- Physical materials
+			- Name-able, linear combo box
+
