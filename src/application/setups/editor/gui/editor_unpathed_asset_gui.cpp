@@ -64,6 +64,30 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 
 	auto& folder = cmd_in.folder;
 
+	checkbox("Orphaned", show_orphaned);
+
+	ImGui::SameLine();
+	checkbox("Using locations", show_using_locations);
+
+	ImGui::Separator();
+
+	{
+		const auto button_label = "Create";
+
+		if (ImGui::Button(button_label)) {
+			create_unpathed_asset_id_command<asset_id_type> cmd;
+			post_editor_command(cmd_in, std::move(cmd));
+			show_orphaned = true;
+		}
+
+		ImGui::Separator();
+	}
+
+	thread_local ImGuiTextFilter filter;
+	filter.Draw();
+
+	base::acquire_keyboard_once();
+
 	using asset_entry_type = unpathed_asset_entry<asset_id_type>;
 
 	thread_local std::vector<asset_entry_type> orphaned_assets;
@@ -99,19 +123,6 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 			(new_entry.used() ? used_assets : orphaned_assets).emplace_back(std::move(new_entry));
 		}
 	);
-
-	checkbox("Orphaned", show_orphaned);
-
-	ImGui::SameLine();
-	checkbox("Using locations", show_using_locations);
-
-	ImGui::Separator();
-
-	thread_local ImGuiTextFilter filter;
-	filter.Draw();
-
-	base::acquire_keyboard_once();
-
 	auto for_each_range = [](auto callback) {
 		callback(orphaned_assets);
 		callback(used_assets);

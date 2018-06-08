@@ -8,6 +8,10 @@ struct recoil_player {
 	std::vector<real32> offsets = {};
 	std::string name;
 	// END GEN INTROSPECTOR
+
+	const auto& get_name() const {
+		return name;
+	}
 };
 
 struct recoil_player_instance_def {

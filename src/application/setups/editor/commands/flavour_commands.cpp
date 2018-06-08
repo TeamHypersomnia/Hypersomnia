@@ -7,6 +7,7 @@
 
 #include "application/setups/editor/property_editor/widgets/asset_sane_default_provider.h"
 #include "application/setups/editor/property_editor/widgets/pathed_asset_widget.h"
+#include "application/setups/editor/detail/find_free_name.h"
 
 std::string create_flavour_command::describe() const {
 	return built_description;
@@ -51,34 +52,14 @@ void create_flavour_command::redo_and_copy(const editor_command_input in, const 
 				}
 			}
 
-			auto make_new_flavour_name = [&](const auto i) {
-				return basic_name + "-" + std::to_string(i);
-			};
+			const auto new_name = ::find_free_name(flavours, basic_name + "-");
+			new_object.template get<invariants::text_details>().name = new_name;
 
-			for (int i = 1; ; ++i) {
-				const auto tried_name = make_new_flavour_name(i);
-				bool is_free = true;
-
-				for_each_id_and_object(flavours,
-					[&](const auto&, const auto& flavour) {
-						if (flavour.get_name() == tried_name) {
-							is_free = false;
-						}
-					}
-				);
-
-				if (is_free) {
-					new_object.template get<invariants::text_details>().name = tried_name;
-
-					if (source_flavour) {
-						built_description = typesafe_sprintf("Duplicated flavour: %x", source_flavour->get_name());
-					}
-					else {
-						built_description = typesafe_sprintf("Created flavour: %x", tried_name);
-					}
-
-					break;
-				}
+			if (source_flavour) {
+				built_description = typesafe_sprintf("Duplicated flavour: %x", source_flavour->get_name());
+			}
+			else {
+				built_description = typesafe_sprintf("Created flavour: %x", new_name);
 			}
 		}
 	);

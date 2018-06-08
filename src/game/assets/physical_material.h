@@ -13,4 +13,8 @@ struct physical_material {
 	collision_sound_matrix_type collision_sound_matrix;
 	std::string name;
 	// END GEN INTROSPECTOR
+
+	const auto& get_name() const {
+		return name;
+	}
 };

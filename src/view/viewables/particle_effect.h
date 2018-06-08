@@ -85,4 +85,8 @@ struct particle_effect {
 	std::vector<particles_emission> emissions;
 	std::string name;
 	// END GEN INTROSPECTOR
+
+	const auto& get_name() const {
+		return name;
+	}
 };
