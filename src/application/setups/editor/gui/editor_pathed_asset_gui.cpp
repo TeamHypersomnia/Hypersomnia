@@ -9,6 +9,7 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_game_image.h"
 #include "augs/misc/imgui/path_tree_structs.h"
+#include "augs/misc/imgui/imgui_drawers.h"
 
 #include "game/organization/for_each_entity_type.h"
 #include "view/viewables/images_in_atlas_map.h"
@@ -106,21 +107,7 @@ struct image_color_picker_widget {
 			const auto cross_alpha = 200;
 
 			auto draw_cross = [is](const vec2i where, const rgba col) {
-				draw_rect_local(
-					ltrb::from_points(
-						vec2(where.x, 0) * zoom,
-						vec2(where.x + 1, is.y) * zoom
-					),
-					col
-				);
-
-				draw_rect_local(
-					ltrb::from_points(
-						vec2(0, where.y) * zoom,
-						vec2(is.x, where.y + 1) * zoom
-					),
-					col
-				);
+				draw_cross_overlay(is, where, zoom, col);
 			};
 
 			const auto pos = ImGui::GetCursorScreenPos();
@@ -145,6 +132,8 @@ struct image_color_picker_widget {
 		if (result) {
 			return result;
 		}
+
+		/* Perform the standard widget for manual tweaking */
 
 		{
 			ImGui::SameLine();
@@ -213,37 +202,11 @@ struct image_offset_widget {
 			const auto ray_alpha = 120;
 
 			auto draw_ray = [is](const vec2i center, const int degrees, const rgba col) {
-				std::array<vec2, 4> points;
-				const auto w = 1.f / zoom;
-				points[0] = vec2(center.x, center.y - w);
-				points[1] = vec2(center.x + is.x, center.y - w);
-				points[2] = vec2(center.x + is.x, center.y + w);
-				points[3] = vec2(center.x, center.y + w);
-
-				for (auto& p : points) {
-					p.rotate(static_cast<float>(degrees), vec2(center));
-					p *= zoom;
-				}
-
-				draw_quad_local(points, col);
+				draw_ray_overlay(is, center, degrees, zoom, col);
 			};
 
 			auto draw_cross = [is](const vec2i where, const rgba col) {
-				draw_rect_local(
-					ltrb::from_points(
-						vec2(where.x, 0) * zoom,
-						vec2(where.x + 1, is.y) * zoom
-					),
-					col
-				);
-
-				draw_rect_local(
-					ltrb::from_points(
-						vec2(0, where.y) * zoom,
-						vec2(is.x, where.y + 1) * zoom
-					),
-					col
-				);
+				draw_cross_overlay(is, where, zoom, col);
 			};
 
 			const bool reference_to_the_right = identity_label == "##bullet_spawn";
@@ -304,6 +267,7 @@ struct image_offset_widget {
 			return result;
 		}
 
+		/* Perform the standard widget for manual tweaking */
 		{
 			ImGui::SameLine();
 

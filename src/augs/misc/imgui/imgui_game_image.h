@@ -58,28 +58,5 @@ namespace augs {
 		inline auto game_image_button(const std::string& id, const augs::atlas_entry& entry) {
 			return game_image_button(id, entry, entry.get_original_size());
 		}
-
-		inline void draw_rect_local(const ltrb& origin, const rgba color) {
-			const auto cpos = vec2(ImGui::GetCursorScreenPos());
-
-			ImGui::GetWindowDrawList()->AddRectFilled(
-				static_cast<ImVec2>(cpos + origin.left_top()), 
-				static_cast<ImVec2>(cpos + origin.right_bottom()), 
-				ImGui::GetColorU32(color),
-				0.f
-			);
-		}
-
-		inline void draw_quad_local(const std::array<vec2, 4>& points, const rgba color) {
-			const auto cpos = vec2(ImGui::GetCursorScreenPos());
-
-			ImGui::GetWindowDrawList()->AddQuadFilled(
-				static_cast<ImVec2>(cpos + points[0]), 
-				static_cast<ImVec2>(cpos + points[1]), 
-				static_cast<ImVec2>(cpos + points[2]), 
-				static_cast<ImVec2>(cpos + points[3]), 
-				ImGui::GetColorU32(color)
-			);
-		}
 	}
 }
