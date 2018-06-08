@@ -12,7 +12,10 @@
 #include "game/transcendental/entity_handle.h"
 
 namespace test_flavours {
-	void populate_backpack_flavours(const loaded_image_caches_map& logicals, all_entity_flavours& flavours) {
+	void populate_backpack_flavours(const populate_flavours_input in) {
+		auto& flavours = in.flavours;
+		auto& caches = in.caches;
+
 		{
 			auto& meta = get_test_flavour(flavours, test_container_items::SAMPLE_BACKPACK);
 
@@ -21,8 +24,8 @@ namespace test_flavours {
 
 			meta.set(render_def);
 
-			test_flavours::add_sprite(meta, logicals, test_scene_image_id::BACKPACK, white);
-			add_shape_invariant_from_renderable(meta, logicals);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::BACKPACK, white);
+			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 
 			invariants::container container; 
@@ -47,7 +50,7 @@ namespace test_flavours {
 				auto& brown = get_test_flavour(flavours, test_container_items::BROWN_BACKPACK);
 				brown = meta;
 				brown.get<invariants::text_details>().name = format_enum(test_container_items::BROWN_BACKPACK);
-				test_flavours::add_sprite(brown, logicals, test_scene_image_id::BROWN_BACKPACK, white);
+				test_flavours::add_sprite(brown, caches, test_scene_image_id::BROWN_BACKPACK, white);
 			}
 		}
 	}

@@ -12,7 +12,8 @@
 #include "game/detail/inventory/perform_transfer.h"
 
 namespace test_flavours {
-	void populate_melee_flavours(const loaded_image_caches_map& /* logicals */, all_entity_flavours& /* flavours */) {
+	void populate_melee_flavours(const populate_flavours_input in) {
+		(void)in;
 		{
 #if TODO
 			auto& meta = get_test_flavour(flavours, test_scene_flavour::URBAN_CYAN_MACHETE);
@@ -21,8 +22,8 @@ namespace test_flavours {
 			render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
 
 			meta.set(render_def);
-			test_flavours::add_sprite(meta, logicals, test_scene_image_id::URBAN_CYAN_MACHETE, white);
-			add_shape_invariant_from_renderable(meta, logicals);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::URBAN_CYAN_MACHETE, white);
+			add_shape_invariant_from_renderable(meta, caches);
 
 			test_flavours::add_see_through_dynamic_body(meta);
 

@@ -6,6 +6,7 @@
 #include "game/transcendental/entity_flavour_id.h"
 #include "game/transcendental/cosmic_functions.h"
 
+#include "game/assets/all_logical_assets.h"
 #include "game/common_state/entity_flavours.h"
 
 #include "view/viewables/image_in_atlas.h"
@@ -213,15 +214,21 @@ auto& get_test_flavour(all_entity_flavours& flavours, const T enum_id) {
 	return new_flavour;
 }
 
+struct populate_flavours_input {
+	const loaded_image_caches_map& caches;
+	const plain_animations_pool& plain_animations;
+	all_entity_flavours& flavours;
+};
+
 namespace test_flavours {
-	void populate_other_flavours(const loaded_image_caches_map& caches, all_entity_flavours& flavours);
-	void populate_car_flavours(const loaded_image_caches_map& caches, all_entity_flavours& flavours);
-	void populate_crate_flavours(const loaded_image_caches_map& caches, all_entity_flavours& flavours);
-	void populate_melee_flavours(const loaded_image_caches_map& caches, all_entity_flavours& flavours);
-	void populate_backpack_flavours(const loaded_image_caches_map& caches, all_entity_flavours& flavours);
-	void populate_gun_flavours(const loaded_image_caches_map& caches, all_entity_flavours& flavours);
-	void populate_grenade_flavours(const loaded_image_caches_map& caches, all_entity_flavours& flavours);
-	void populate_character_flavours(const loaded_image_caches_map& caches, all_entity_flavours& flavours);
+	void populate_other_flavours(populate_flavours_input);
+	void populate_car_flavours(populate_flavours_input);
+	void populate_crate_flavours(populate_flavours_input);
+	void populate_melee_flavours(populate_flavours_input);
+	void populate_backpack_flavours(populate_flavours_input);
+	void populate_gun_flavours(populate_flavours_input);
+	void populate_grenade_flavours(populate_flavours_input);
+	void populate_character_flavours(populate_flavours_input);
 }
 
-void populate_test_scene_flavours(const loaded_image_caches_map& caches, all_entity_flavours& into);
+void populate_test_scene_flavours(populate_flavours_input);

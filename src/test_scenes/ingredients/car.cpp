@@ -22,7 +22,8 @@
 #include "game/enums/filters.h"
 
 namespace test_flavours {
-	void populate_car_flavours(const loaded_image_caches_map& /* logicals */, all_entity_flavours& /* flavours */) {
+	void populate_car_flavours(const populate_flavours_input in) {
+		(void)in;
 #if TODO
 		{
 			auto& meta = get_test_flavour(flavours, test_scene_flavour::TRUCK_FRONT);
@@ -33,13 +34,13 @@ namespace test_flavours {
 			meta.set(render_def);
 
 			invariants::polygon poly;
-			const auto b = logicals.at(to_image_id(test_scene_image_id::TRUCK_FRONT)).make_box();
+			const auto b = caches.at(to_image_id(test_scene_image_id::TRUCK_FRONT)).make_box();
 			poly.add_convex_polygons(b.convex_polys);
 			poly.texture_map_id = to_image_id(test_scene_image_id::TRUCK_FRONT);
 
 			meta.set(poly);
 
-			add_shape_invariant_from_renderable(meta, logicals);
+			add_shape_invariant_from_renderable(meta, caches);
 		}
 		{
 			auto& meta = get_test_flavour(flavours, test_scene_flavour::TRUCK_INTERIOR);
@@ -49,8 +50,8 @@ namespace test_flavours {
 
 			meta.set(render_def);
 
-			add_sprite(meta, logicals, test_scene_image_id::TRUCK_INSIDE);
-						add_shape_invariant_from_renderable(meta, logicals);
+			add_sprite(meta, caches, test_scene_image_id::TRUCK_INSIDE);
+						add_shape_invariant_from_renderable(meta, caches);
 
 		}
 
@@ -64,7 +65,7 @@ namespace test_flavours {
 			invariants::sprite sprite_def;
 			sprite_def.set(to_image_id(test_scene_image_id::BLANK), vec2 ( 40, 20 ), rgba(255, 255, 255, 0));
 			meta.set(sprite_def);
-			add_shape_invariant_from_renderable(meta, logicals);
+			add_shape_invariant_from_renderable(meta, caches);
 		}
 
 		{
@@ -75,8 +76,8 @@ namespace test_flavours {
 
 			meta.set(render_def);
 
-			add_sprite(meta, logicals, test_scene_image_id::TRUCK_ENGINE);
-			add_shape_invariant_from_renderable(meta, logicals);
+			add_sprite(meta, caches, test_scene_image_id::TRUCK_ENGINE);
+			add_shape_invariant_from_renderable(meta, caches);
 		}
 #endif
 	}

@@ -56,3 +56,4 @@ void populate_test_scene_viewables(
 	all_viewables_defs& output_sources
 );
 
+void populate_test_scene_common(const loaded_image_caches_map&, cosmos_common_significant&);

@@ -46,7 +46,7 @@ void intercosm::make_test_scene(
 		world.change_common_significant([&](cosmos_common_significant& common){
 			common.logical_assets = logicals;
 			viewables.update_relevant(common.logical_assets);
-			populator.populate(caches, common);
+			::populate_test_scene_common(caches, common);
 
 			return changer_callback_result::DONT_REFRESH;
 		});

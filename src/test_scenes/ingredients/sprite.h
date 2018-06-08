@@ -13,13 +13,13 @@ namespace test_flavours {
 	template <class E>
 	void add_sprite(
 		E& t, 
-		const loaded_image_caches_map& logicals,
+		const loaded_image_caches_map& caches,
 		const assets::image_id id, 
 		const rgba col = white,
 		const augs::sprite_special_effect effect = augs::sprite_special_effect::NONE
 	) {
 		invariants::sprite sprite_def;
-		sprite_def.set(id, logicals, col);
+		sprite_def.set(id, caches, col);
 		sprite_def.effect = effect;
 		t.set(sprite_def);
 	}
@@ -27,11 +27,11 @@ namespace test_flavours {
 	template <class E>
 	void add_sprite(
 		E& t, 
-		const loaded_image_caches_map& logicals,
+		const loaded_image_caches_map& caches,
 		const test_scene_image_id id, 
 		const rgba col = white,
 		const augs::sprite_special_effect effect = augs::sprite_special_effect::NONE
 	) {
-		add_sprite(t, logicals, to_image_id(id), col, effect); 
+		add_sprite(t, caches, to_image_id(id), col, effect); 
 	}
 }

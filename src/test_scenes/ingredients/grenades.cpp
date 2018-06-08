@@ -19,7 +19,13 @@
 #include "game/detail/inventory/perform_transfer.h"
 
 namespace test_flavours {
-	void populate_grenade_flavours(const loaded_image_caches_map& logicals, all_entity_flavours& flavours) {
+	void populate_grenade_flavours(const populate_flavours_input in) {
+		auto& flavours = in.flavours;
+		auto& caches = in.caches;
+		auto& plain_animations = in.plain_animations;
+
+		(void)plain_animations;
+
 		{
 			auto& meta = get_test_flavour(flavours, test_throwable_explosives::FORCE_GRENADE);
 
@@ -34,8 +40,8 @@ namespace test_flavours {
 				meta.set(render_def);
 
 			}
-			test_flavours::add_sprite(meta, logicals, test_scene_image_id::FORCE_GRENADE, white);
-			add_shape_invariant_from_renderable(meta, logicals);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::FORCE_GRENADE, white);
+			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 
 			invariants::item item;
@@ -81,8 +87,8 @@ namespace test_flavours {
 
 				meta.set(render_def);
 			}
-			test_flavours::add_sprite(meta, logicals, test_scene_image_id::INTERFERENCE_GRENADE, white);
-			add_shape_invariant_from_renderable(meta, logicals);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::INTERFERENCE_GRENADE, white);
+			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 
 			invariants::item item;
@@ -129,8 +135,8 @@ namespace test_flavours {
 
 				meta.set(render_def);
 			}
-			test_flavours::add_sprite(meta, logicals, test_scene_image_id::PED_GRENADE, white);
-			add_shape_invariant_from_renderable(meta, logicals);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::PED_GRENADE, white);
+			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 
 			invariants::item item;

@@ -4,7 +4,10 @@
 #include "game/components/fixtures_component.h"
 
 namespace test_flavours {
-	void populate_crate_flavours(const loaded_image_caches_map& logicals, all_entity_flavours& flavours) {
+	void populate_crate_flavours(const populate_flavours_input in) {
+		auto& caches = in.caches;
+		auto& flavours = in.flavours;
+
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_sprited_bodys::CRATE);
 
@@ -13,8 +16,8 @@ namespace test_flavours {
 
 			meta.set(render_def);
 
-			test_flavours::add_sprite(meta, logicals, test_scene_image_id::CRATE, white);
-			add_shape_invariant_from_renderable(meta, logicals);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::CRATE, white);
+			add_shape_invariant_from_renderable(meta, caches);
 
 			test_flavours::add_standard_dynamic_body(meta);
 
@@ -33,9 +36,9 @@ namespace test_flavours {
 
 			meta.set(render_def);
 
-			test_flavours::add_sprite(meta, logicals, test_scene_image_id::BRICK_WALL, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::BRICK_WALL, white);
 			meta.get<invariants::sprite>().size = vec2(128, 128);
-			add_shape_invariant_from_renderable(meta, logicals);
+			add_shape_invariant_from_renderable(meta, caches);
 
 			test_flavours::add_standard_static_body(meta);
 

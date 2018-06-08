@@ -23,7 +23,13 @@
 #include "game/detail/inventory/perform_transfer.h"
 
 namespace test_flavours {
-	void populate_character_flavours(const loaded_image_caches_map& logicals, all_entity_flavours& flavours) {
+	void populate_character_flavours(const populate_flavours_input in) {
+		auto& flavours = in.flavours;
+		auto& caches = in.caches;
+		auto& plain_animations = in.plain_animations;
+
+		(void)plain_animations;
+
 		{
 			auto& meta = get_test_flavour(flavours, test_controlled_characters::METROPOLIS_SOLDIER);
 
@@ -68,8 +74,8 @@ namespace test_flavours {
 				meta.set(head_def);
 			}
 
-			add_sprite(meta, logicals, test_scene_image_id::METROPOLIS_CHARACTER_BARE_1);
-			add_shape_invariant_from_renderable(meta, logicals);
+			add_sprite(meta, caches, test_scene_image_id::METROPOLIS_CHARACTER_BARE_1);
+			add_shape_invariant_from_renderable(meta, caches);
 
 			{
 				invariants::flags flags_def;
@@ -152,7 +158,7 @@ namespace test_flavours {
 
 			{
 				invariants::crosshair crosshair; 
-				crosshair.appearance.set(to_image_id(test_scene_image_id::TEST_CROSSHAIR), logicals);
+				crosshair.appearance.set(to_image_id(test_scene_image_id::TEST_CROSSHAIR), caches);
 
 				crosshair.recoil_damping.linear = { 5, 5 };
 				crosshair.recoil_damping.angular = 5;
