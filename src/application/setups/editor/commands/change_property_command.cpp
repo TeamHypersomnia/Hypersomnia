@@ -152,6 +152,4 @@ template class change_property_command<change_asset_property_command<assets::ima
 template class change_property_command<change_asset_property_command<assets::sound_id>>;
 
 template class change_property_command<change_asset_property_command<assets::plain_animation_id>>;
-template class change_property_command<change_asset_property_command<assets::torso_animation_id>>;
-template class change_property_command<change_asset_property_command<assets::legs_animation_id>>;
 template class change_property_command<change_asset_property_command<assets::particle_effect_id>>;

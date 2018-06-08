@@ -83,36 +83,22 @@ struct plain_animation_frame {
 	// END GEN INTROSPECTOR
 };
 
-using torso_animation_frame = plain_animation_frame;
 using legs_animation_frame = plain_animation_frame;
+using torso_animation_frame = plain_animation_frame;
 
 template <class T>
 using make_animation_frames = augs::constant_size_vector<T, ANIMATION_FRAME_COUNT>;
 
 using plain_animation_frames_type = make_animation_frames<plain_animation_frame>;
-using torso_animation_frames_type = make_animation_frames<torso_animation_frame>;
-using legs_animation_frames_type = make_animation_frames<legs_animation_frame>;
 
 struct plain_animation : animation_mixin<plain_animation> {
 	// GEN INTROSPECTOR struct plain_animation
 	plain_animation_frames_type frames = {};
-	// END GEN INTROSPECTOR
-};
-
-struct torso_animation : animation_mixin<torso_animation> {
-	// GEN INTROSPECTOR struct torso_animation
-	torso_animation_frames_type frames = {};
 	bool has_backward_frames = false;
 	bool flip_when_cycling = true;
 	pad_bytes<2> pad;
 	// END GEN INTROSPECTOR
 };
 
-struct legs_animation : animation_mixin<legs_animation> {
-	// GEN INTROSPECTOR struct legs_animation
-	legs_animation_frames_type frames = {};
-	bool has_backward_frames = false;
-	bool flip_when_cycling = true;
-	pad_bytes<2> pad;
-	// END GEN INTROSPECTOR
-};
+using torso_animation = plain_animation;
+using legs_animation = plain_animation;

@@ -20,8 +20,6 @@ namespace assets {
 	class particle_effect_id_key { particle_effect_id_key() = delete; };
 
 	class plain_animation_id_key { plain_animation_id_key() = delete; };
-	class torso_animation_id_key { torso_animation_id_key() = delete; };
-	class legs_animation_id_key { legs_animation_id_key() = delete; };
 
 	using image_id = make_asset_pool_id<image_id_key>;
 	using sound_id = make_asset_pool_id<sound_id_key>;
@@ -31,8 +29,9 @@ namespace assets {
 	using physical_material_id = make_asset_pool_id<physical_material_id_key>;
 
 	using plain_animation_id = make_asset_pool_id<plain_animation_id_key>;
-	using torso_animation_id = make_asset_pool_id<torso_animation_id_key>;
-	using legs_animation_id = make_asset_pool_id<legs_animation_id_key>;
+
+	using torso_animation_id = plain_animation_id;
+	using legs_animation_id  = plain_animation_id;
 }
 
 template <class T>
@@ -49,9 +48,7 @@ constexpr bool is_unpathed_asset = is_one_of_v<
 	assets::recoil_player_id,
 	assets::physical_material_id,
 
-	assets::plain_animation_id,
-	assets::torso_animation_id,
-	assets::legs_animation_id
+	assets::plain_animation_id
 >;
 
 /* 

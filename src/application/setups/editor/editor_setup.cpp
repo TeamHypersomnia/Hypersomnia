@@ -397,8 +397,6 @@ void editor_setup::perform_custom_imgui(
 					do_window_entry(sounds_gui);
 					do_window_entry(particle_effects_gui);
 					do_window_entry(plain_animations_gui);
-					do_window_entry(torso_animations_gui);
-					do_window_entry(legs_animations_gui);
 				}
 			}
 		}
@@ -442,8 +440,6 @@ void editor_setup::perform_custom_imgui(
 
 		particle_effects_gui.perform(settings.property_editor, make_command_input());
 		plain_animations_gui.perform(settings.property_editor, make_command_input());
-		torso_animations_gui.perform(settings.property_editor, make_command_input());
-		legs_animations_gui.perform(settings.property_editor, make_command_input());
 
 		const auto all_selected = [&]() -> decltype(get_all_selected_entities()) {
 			auto selections = get_all_selected_entities();
@@ -882,8 +878,6 @@ bool editor_setup::handle_input_before_imgui(
 				case key::N: sounds_gui.open(); return true;
 				case key::R: particle_effects_gui.open(); return true;
 				case key::M: plain_animations_gui.open(); return true;
-				case key::T: torso_animations_gui.open(); return true;
-				case key::L: legs_animations_gui.open(); return true;
 				default: break;
 			}
 		}

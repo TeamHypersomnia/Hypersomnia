@@ -97,8 +97,6 @@ void find_locations_that_use(
 	};
 
 	traverse_assets("Particle effect: ", viewables.particle_effects);
-	traverse_assets("Plain animation: ", logicals.plain_animations);
-	traverse_assets("Torso animation: ", logicals.torso_animations);
-	traverse_assets("Legs animation: ", logicals.legs_animations);
+	traverse_assets("Animation: ", logicals.plain_animations);
 	traverse_assets("Physical material: ", logicals.physical_materials);
 }
