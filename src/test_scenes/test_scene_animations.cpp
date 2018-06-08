@@ -221,17 +221,10 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 		{
 			legs_animation anim;
 
-			{
-				legs_animation_frame f;
-				f.image_id = to_image_id(test_scene_image_id::CAST_BLINK_1);
-				f.duration_milliseconds = 30.f;
-				anim.frames.push_back(f);
-			}
-
 			create_frames(
 				anim,
 				test_scene_image_id::SILVER_TROUSERS_1,
-				test_scene_image_id::SILVER_TROUSERS_4,
+				test_scene_image_id::SILVER_TROUSERS_5,
 				30.0f
 			);
 
@@ -241,29 +234,15 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 		{
 			legs_animation anim;
 
-			{
-				legs_animation_frame f;
-				f.image_id = to_image_id(test_scene_image_id::CAST_BLINK_1);
-				f.duration_milliseconds = 30.f;
-				anim.frames.push_back(f);
-			}
-
 			create_frames(
 				anim,
 				test_scene_image_id::SILVER_TROUSERS_STRAFE_1,
-				test_scene_image_id::SILVER_TROUSERS_STRAFE_8,
+				test_scene_image_id::SILVER_TROUSERS_STRAFE_10,
 				30.0f
 			);
 
 			anim.has_backward_frames = true;
 			anim.flip_when_cycling = false;
-
-			{
-				legs_animation_frame f;
-				f.image_id = to_image_id(test_scene_image_id::CAST_BLINK_1);
-				f.duration_milliseconds = 30.f;
-				anim.frames.push_back(f);
-			}
 
 			alloc(test_id_type::SILVER_TROUSERS_STRAFE, anim);
 		} 
