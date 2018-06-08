@@ -22,7 +22,7 @@ const std::string& get_type_name() {
 			return get_type_name<typename T::value_type>() + '[' + std::to_string(is_std_array<T>::size) + ']';
 		}
 		else if constexpr(is_enum_array_v<T>) {
-			return get_type_name<typename T::value_type>() + '[' + get_type_name<typename T::enum_type> + "::COUNT (" + std::to_string(is_enum_array<T>::size) + ")]";
+			return get_type_name<typename T::value_type>() + '[' + get_type_name<typename T::enum_type>() + "::COUNT (" + std::to_string(is_enum_array<T>::size) + ")]";
 		}
 
 		return demangle(typeid(T).name());

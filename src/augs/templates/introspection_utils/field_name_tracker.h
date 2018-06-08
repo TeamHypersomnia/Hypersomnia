@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/misc/scope_guard.h"
+#include "augs/misc/constant_size_vector.h"
 
 namespace augs {
 	class field_name_tracker {
@@ -8,30 +9,37 @@ namespace augs {
 		struct entry {
 			string_type str;
 			int idx;
+
+			entry() {}
+			entry(string_type str, int idx) : str(str), idx(idx) {}
 		};
 
-		std::vector<entry> fields;
+		augs::constant_size_vector<entry, 500> fields;
 
+	public:
 		void pop() {
 			fields.pop_back();
 		}
 
-	public:
-		auto track() {
-			return true;
-		}
-
 		auto track(const int idx) {
-			fields.push_back(entry { nullptr, idx });
+			fields.emplace_back(nullptr, idx);
 			return augs::scope_guard([this](){ pop(); });
 		}
 
 		auto track(const string_type& name) {
-			fields.push_back({ name, -1 });
+			fields.emplace_back(name, -1);
 			return augs::scope_guard([this](){ pop(); });
 		}
 
-		auto get_full_name(const string_type& current_name) const {
+		void track_no_scope(const int idx) {
+			fields.emplace_back(nullptr, idx);
+		}
+
+		void track_no_scope(const string_type& name) {
+			fields.emplace_back(name, -1);
+		}
+
+		auto get_full_name() const {
 			std::string name;
 
 			for (const auto& d : fields) {
@@ -45,7 +53,11 @@ namespace augs {
 				name +=	".";
 			}
 
-			return name + current_name;
+			return name;
+		}
+
+		auto get_full_name(const string_type& current_name) const {
+			return get_full_name() + current_name;
 		}
 
 		auto get_indent() const {

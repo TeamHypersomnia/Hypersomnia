@@ -412,6 +412,8 @@ struct tests_of_traits {
 
 	static_assert(!is_arithmetic_minmax_v<augs::minmax<std::string>>);
 	static_assert(!is_arithmetic_minmax_v<augs::minmax<augs::minmax<float>>>);
+
+	static_assert(!is_typed_flavour_id_v<assets::image_id>);
 };
 
 /* 

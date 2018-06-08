@@ -10,17 +10,16 @@ namespace augs {
 		template <class S, class F>
 		static void for_each_measurement(F&& callback, S& s) {
 			augs::introspect(
-				augs::recursive([&](auto self, const auto& label, auto& m) {
+				[&](auto& label, auto& m) {
 					using T = remove_cref<decltype(m)>;
 
 					if constexpr(has_title_v<T>) {
-						(void)self;
 						callback(label, m);
 					}
 					else {
-						augs::introspect(augs::recursive(self), m);
+						for_each_measurement(std::forward<F>(callback), m);
 					}
-				}),
+				},
 				s
 			);
 		}

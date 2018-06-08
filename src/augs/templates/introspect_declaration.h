@@ -1,5 +1,4 @@
 #pragma once
-#include "augs/templates/recursive.h"
 
 namespace augs {
 	template <

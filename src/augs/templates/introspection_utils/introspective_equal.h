@@ -1,5 +1,4 @@
 #pragma once
-#include "augs/templates/recursive.h"
 #include "augs/templates/introspect.h"
 #include "augs/templates/traits/is_optional.h"
 #include "augs/templates/traits/is_comparable.h"
