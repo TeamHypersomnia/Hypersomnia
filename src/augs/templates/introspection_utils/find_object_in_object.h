@@ -64,7 +64,7 @@ void find_object_in_object(
 				else if constexpr(augs::has_dynamic_content_v<Candidate>) {
 					augs::on_dynamic_content(
 						[&](auto& dyn, auto... args) {
-							auto scope = fields.track(typesafe_sprintf("%x", args...));
+							auto scope = fields.track(args...);
 							self(self, "", dyn);
 						},
 						field

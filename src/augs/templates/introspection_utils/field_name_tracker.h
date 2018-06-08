@@ -3,27 +3,46 @@
 
 namespace augs {
 	class field_name_tracker {
-		std::vector<std::string> fields;
+		using string_type = const char*;
+
+		struct entry {
+			string_type str;
+			int idx;
+		};
+
+		std::vector<entry> fields;
 
 		void pop() {
 			fields.pop_back();
 		}
 
 	public:
-		auto track(const std::string& name) {
-			fields.push_back(name);
+		auto track() {
+			return true;
+		}
+
+		auto track(const int idx) {
+			fields.push_back(entry { nullptr, idx });
 			return augs::scope_guard([this](){ pop(); });
 		}
 
-		auto get_full_name(const std::string& current_name) const {
+		auto track(const string_type& name) {
+			fields.push_back({ name, -1 });
+			return augs::scope_guard([this](){ pop(); });
+		}
+
+		auto get_full_name(const string_type& current_name) const {
 			std::string name;
 
 			for (const auto& d : fields) {
-				if (d.empty()) {
-					continue;
+				if (d.idx != -1) {
+					name += std::to_string(d.idx);
+				}
+				else {
+					name += d.str;
 				}
 
-				name += d + ".";
+				name +=	".";
 			}
 
 			return name + current_name;

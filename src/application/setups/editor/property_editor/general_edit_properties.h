@@ -406,7 +406,7 @@ void general_edit_properties(
 		}
 	};
 
-	auto traverse = [&](const std::string& member_label, auto& member) {
+	auto traverse = [&](const auto& member_label, auto& member) {
 		detail_general_edit_properties<Behaviour>(
 			detail_edit_properties_input<S, D> { 
 				special_widget_provider,
