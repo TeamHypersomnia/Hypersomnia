@@ -6,7 +6,10 @@ void asset_path_browser_settings::do_tweakers() {
 
 	tree_settings.do_tweakers();
 	ImGui::SameLine();
-	checkbox("Show orphaned", show_orphaned);
+	checkbox("Orphaned", show_orphaned);
+
+	ImGui::SameLine();
+	checkbox("Using locations", show_using_locations);
 
 	ImGui::Separator();
 }

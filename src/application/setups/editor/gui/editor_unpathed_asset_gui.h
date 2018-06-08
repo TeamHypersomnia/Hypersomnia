@@ -14,6 +14,7 @@ struct editor_unpathed_asset_gui : standard_window_mixin<editor_unpathed_asset_g
 
 	// GEN INTROSPECTOR struct editor_unpathed_asset_gui class asset_id_type
 	bool show_orphaned = true;
+	bool show_using_locations = false;
 	// END GEN INTROSPECTOR
 
 	bool acquire_missing_paths = true;

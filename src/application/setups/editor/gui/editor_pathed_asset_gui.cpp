@@ -426,7 +426,6 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 		return in_range;
 	};
 
-
 	if (base::acquire_once) {
 		acquire_missing_paths = true;
 	}
@@ -436,15 +435,16 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 	}
 
 	auto& definitions = get_viewable_pool<asset_id_type>(viewables);
+	using def_type = typename std::remove_reference_t<decltype(definitions)>::mapped_type;
 
 	const auto label = std::string(maybe_official_path<asset_id_type>::get_label());
 
 	for_each_id_and_object(definitions,
-		[&](const auto id, const auto& object) mutable {
+		[&](const asset_id_type id, const def_type& object) mutable {
 			const auto path = object.get_source_path();
 			auto new_entry = asset_entry_type(path, id);
 
-			find_locations_that_use(id, work, [&](const auto& location) {
+			find_locations_that_use(id, work, [&](const std::string& location) {
 				new_entry.using_locations.push_back(location);
 			});
 
@@ -469,8 +469,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 				return found_in(last_seen_missing_paths, p);
 			};
 
-			using def_type = std::remove_reference_t<decltype(object)>;
-			const auto& view = asset_definition_view<def_type>(folder.current_path, object);
+			const auto& view = asset_definition_view<const def_type>(folder.current_path, object);
 
 			if (lazy_check_missing(view.get_resolved_source_path())) {
 				push_missing();
@@ -525,7 +524,8 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 	auto files_view = scoped_child("Files view");
 
-	const auto num_cols = 4;
+	const bool show_using_locations = path_browser_settings.show_using_locations;
+	const auto num_cols = 3 + (show_using_locations ? 1 : 0);
 
 	if (tree_settings.linear_view) {
 		ImGui::Columns(num_cols);
@@ -604,19 +604,21 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 			text_disabled(displayed_dir);
 
-			ImGui::NextColumn();
+			if (show_using_locations) {
+				ImGui::NextColumn();
 
-			if (path_entry.used()) {
-				const auto& using_locations = path_entry.using_locations;
+				if (path_entry.used()) {
+					const auto& using_locations = path_entry.using_locations;
 
-				if (auto node = scoped_tree_node(typesafe_sprintf("%x locations###locations", using_locations.size()).c_str())) {
-					for (const auto& l : using_locations) {
-						text(l);
+					if (auto node = scoped_tree_node(typesafe_sprintf("%x locations###locations", using_locations.size()).c_str())) {
+						for (const auto& l : using_locations) {
+							text(l);
+						}
 					}
 				}
-			}
-			else {
-				text_disabled("(Nowhere)");
+				else {
+					text_disabled("(Nowhere)");
+				}
 			}
 
 			ImGui::NextColumn();
@@ -809,8 +811,12 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			ImGui::NextColumn();
 			text_disabled(labels[1]);
 			ImGui::NextColumn();
-			text_disabled(labels[2]);
-			ImGui::NextColumn();
+
+			if (show_using_locations) {
+				text_disabled(labels[2]);
+				ImGui::NextColumn();
+			}
+
 			ImGui::Separator();
 
 			const auto ticked_and_existing = get_all_ticked_and_existing(paths);

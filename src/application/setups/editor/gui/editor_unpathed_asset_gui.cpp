@@ -100,7 +100,10 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 		}
 	);
 
-	checkbox("Show orphaned", show_orphaned);
+	checkbox("Orphaned", show_orphaned);
+
+	ImGui::SameLine();
+	checkbox("Using locations", show_using_locations);
 
 	ImGui::Separator();
 
@@ -132,7 +135,7 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 
 	auto files_view = scoped_child("Assets view");
 
-	const auto num_cols = 3;
+	const auto num_cols = 2 + (show_using_locations ? 1 : 0);
 
 	ImGui::Columns(num_cols);
 
@@ -161,20 +164,22 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 
 		next_columns(2);
 
-		if (asset_entry.used()) {
-			const auto& using_locations = asset_entry.using_locations;
+		if (show_using_locations) {
+			if (asset_entry.used()) {
+				const auto& using_locations = asset_entry.using_locations;
 
-			if (auto node = scoped_tree_node(typesafe_sprintf("%x locations###locations", using_locations.size()).c_str())) {
-				for (const auto& l : using_locations) {
-					text(l);
+				if (auto node = scoped_tree_node(typesafe_sprintf("%x locations###locations", using_locations.size()).c_str())) {
+					for (const auto& l : using_locations) {
+						text(l);
+					}
 				}
 			}
-		}
-		else {
-			text_disabled("(Nowhere)");
-		}
+			else {
+				text_disabled("(Nowhere)");
+			}
 
-		ImGui::NextColumn();
+			ImGui::NextColumn();
+		}
 
 		if (node) {
 			auto sc = scoped_indent();
@@ -284,8 +289,12 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 		text_disabled("Properties");
 
 		ImGui::NextColumn();
-		text_disabled(labels[1]);
-		ImGui::NextColumn();
+
+		if (show_using_locations) {
+			text_disabled(labels[1]);
+			ImGui::NextColumn();
+		}
+
 		ImGui::Separator();
 
 		const auto ticked_and_existing = get_all_ticked_and_existing(entries);
