@@ -157,7 +157,7 @@ auto tree_of_flavours(
 							);
 
 							if (fae_in.show_flavour_control_buttons) {
-								duplicate_delete_buttons<
+								if (dd_buttons_result::DELETE == duplicate_delete_buttons<
 									duplicate_flavour_command,
 									delete_flavour_command
 								> (
@@ -166,12 +166,11 @@ auto tree_of_flavours(
 									settings,
 									imgui_id,
 									locations.empty()
-								);
-
-								const auto& cosm = cpe_in.command_in.get_cosmos();
-
-								if (nullptr == cosm.find_flavour(flavour_id)) {
-									/* It has just been deleted. */
+								)) {
+									/* 
+										The flavour has just been deleted.
+										Return right away to avoid dereferencing the now invalid reference.
+									*/
 									return;
 								}
 							}

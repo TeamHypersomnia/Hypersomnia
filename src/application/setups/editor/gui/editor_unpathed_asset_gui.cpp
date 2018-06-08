@@ -150,12 +150,19 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 
 		const auto flags = do_selection_checkbox(ticked_assets, id, current_ticked, id);
 
-		duplicate_delete_buttons<
+		const auto result = duplicate_delete_buttons<
 			duplicate_asset_command<asset_id_type>,
 			forget_asset_id_command<asset_id_type>
 		> (cmd_in, id, settings, "", !asset_entry.used());
 
-		if (nullptr == mapped_or_nullptr(definitions, id)) {
+		if (result == dd_buttons_result::DUPLICATE) {
+			/* 
+				Show orphaned assets if they aren't already. 
+				Otherwise the author would have no feedback for pressing duplicate button.
+			*/
+			show_orphaned = true;
+		}
+		else if (result == dd_buttons_result::DELETE) {
 			/* It has just been deleted. */
 			return;
 		}

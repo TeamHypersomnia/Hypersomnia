@@ -3,8 +3,14 @@
 #include "3rdparty/imgui/imgui.h"
 #include "application/setups/editor/editor_command_input.h"
 
+enum class dd_buttons_result {
+	NONE,
+	DUPLICATE,
+	DELETE
+};
+
 template <class duplicate_command, class delete_command, class I>
-void duplicate_delete_buttons(
+auto duplicate_delete_buttons(
 	const editor_command_input cmd_in,
 	const I& id,
 	const property_editor_settings& settings,
@@ -17,6 +23,7 @@ void duplicate_delete_buttons(
 		ImGui::Button(button_label.c_str())
 	) {
 		post_editor_command(cmd_in, duplicate_command(id));
+		return dd_buttons_result::DUPLICATE;
 	}
 
 	ImGui::SameLine();
@@ -28,9 +35,12 @@ void duplicate_delete_buttons(
 			ImGui::Button(button_label.c_str())
 		) {
 			post_editor_command(cmd_in, delete_command(id));
+			return dd_buttons_result::DELETE;
 		}
 	}
 
 	ImGui::SameLine();
+
+	return dd_buttons_result::NONE;
 }
 
