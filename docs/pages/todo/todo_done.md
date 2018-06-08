@@ -887,3 +887,22 @@ we consider whole type overrides too complex architeciturally:
 		- Physical materials
 			- Name-able, linear combo box
 
+- for now do an undo_delete_entity test with a floor and some walls perhaps
+- storage format for deleted entities
+
+- For continuous sounds, sound system should probably assume the same strategy as an inferred cache.
+
+- animation in our architecture
+	- should work statelessly, in particular it should not set values to sprite.
+	- callbacks
+		- normally, one would have std::function per each frame.
+		- what we will to is to store a variant per each animation frame.
+			- even if the variant is big, the animation will be an asset anyway.
+		- then the animation system will perform the logic and e.g. spawn particles and sounds.
+		- we won't separate concerns here because we're not writing an engine, rather a game.
+
+- properly templatize entity_id_base, add entity type's key to it
+- Implement a color picker inside the neon map light color chooser
+	- less pain in the ass
+	- look for imgui logic to acquire mouse positioning relative to the control
+

@@ -21,7 +21,7 @@ summary: We don't need to do this yet, because...
 
 - what do we do with invalid sprite ids?
 	- We guarantee the validity of the ids everywhere. Period.
-		- That is because the editor will forbid from settings invalid values.
+		- That is because the editor will forbid from setting invalid values.
 		- And adding a new value to the container will call a sane default provider.
 		- Also removing a currently used id will be forbidden.
 	- E.g. sprites, animations or other invariants.

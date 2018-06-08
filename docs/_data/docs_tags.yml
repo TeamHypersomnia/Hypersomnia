@@ -28,3 +28,6 @@
 - title: Scratchpads (PL)
   name: scratchpads_pl
   description: Working drafts of manuals in Polish. Will eventually be translated into English and integrated with the rest of this wiki.
+- title: Planning
+  name: planning
+  description: Project-wide to-do lists and brainstormed strategies. These are drafts not meant to be understood by the public.

@@ -1,5 +1,6 @@
 ---
 title: Brainstorm now
+tags: [planning]
 hide_sidebar: true
 permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.

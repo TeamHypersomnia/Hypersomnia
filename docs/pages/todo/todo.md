@@ -1,5 +1,6 @@
 ---
 title: ToDo
+tags: [planning]
 hide_sidebar: true
 permalink: todo
 summary: Just a hidden scratchpad.
@@ -78,10 +79,6 @@ summary: Just a hidden scratchpad.
 		- Probably less checks to make, in GUI as well
 	- Can make those the first in test scene image enums so that we can stop importing images after some point
 
-- Implement a color picker inside the neon map light color chooser
-	- less pain in the ass
-	- look for imgui logic to acquire mouse positioning relative to the control
-
 - Ctrl+I shall open a quick go to gui that will instantiate a chosen flavour
 
 - Fix this: due to a filter, the node disappears during renaming
@@ -107,7 +104,6 @@ summary: Just a hidden scratchpad.
 	- For now on re-opening the newly saved project these resources will be missing
 
 - add this maybe? https://github.com/jpakkane/naturalsort
-- properly templatize entity_id_base, add entity type's key to it
 
 - research building with clang on windows?
 
@@ -119,7 +115,7 @@ summary: Just a hidden scratchpad.
 
 - normalize the names of getters in xywh/ltrb
 
-- consider having entity guids in components instead of ids for simplicity of network transfers
+- consider having entity guids in components instead of entity ids for simplicity of network transfers
 	- there ain't really that many and it will be greatly useful
 
 - in go to dialog, make selection groups appear as the first
@@ -160,15 +156,6 @@ summary: Just a hidden scratchpad.
 	- because inventory slot handle item getters should return handles that guarantee presence of an item
 	- thanks to that we can avoid problems with having many entity types and enlarging the dispatch code
 
-- animation in our architecture
-	- should work statelessly, in particular it should not set values to sprite.
-	- callbacks
-		- normally, one would have std::function per each frame.
-		- what we will to is to store a variant per each animation frame.
-			- even if the variant is big, the animation will be an asset anyway.
-		- then the animation system will perform the logic and e.g. spawn particles and sounds.
-		- we won't separate concerns here because we're not writing an engine, rather a game.
-
 - Entity groups will be useful later, not until we make a simple deathmatch where we can include some simple weapon/car creation logic etc
 	- Really?
 	- What about weapon spawns
@@ -189,14 +176,9 @@ summary: Just a hidden scratchpad.
 	- Then, in the editor, when the game is still unstable, we will catch an error during whenever we step the cosmos or change some sensitive valuesa,
 	- then upon catching, we will save the last known correct version to hdd.
 
-- For continuous sounds, sound system should probably assume the same strategy as an inferred cache.
-
 - Local setup should record session live
 	- This is really important in the face of bugs.
 	- Or just get rid of test scene setup for now and let it by default launch a scene in editor that records inputs
-
-- for now do an undo_delete_entity test with a floor and some walls perhaps
-- storage format for deleted entities
 
 - ensure should throw so that the editor destructor can perform autosave
 	- for cores, just emit them programatically on unix
