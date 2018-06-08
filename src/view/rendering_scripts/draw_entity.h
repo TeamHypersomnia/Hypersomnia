@@ -83,6 +83,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 				if (const auto* const frame = ::get_frame(gun, *shoot_animation, cosm)) {
 					auto animated = sprite;
 					animated.image_id = frame->image_id;
+					animated.size = in.manager.at(frame->image_id).get_original_size();
 
 					render_visitor(animated, in.manager, input);
 					return;
