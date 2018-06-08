@@ -159,7 +159,7 @@ template <
 	class T
 >
 void detail_general_edit_properties(
-	const detail_edit_properties_input<S, D> input,
+	detail_edit_properties_input<S, D> input,
 	Eq equality_predicate,
 	F notify_change_of,
 	const std::string& label,
@@ -246,6 +246,16 @@ void detail_general_edit_properties(
 					}
 
 					if (auto node = node_and_columns(displayed_container_label, input.extra_columns)) {
+						if constexpr(S::template handles<typename T::value_type>) {
+							ImGui::NextColumn();
+
+							if (input.special_widget_provider.handle_container_prologue(displayed_container_label, altered)) {
+								notify_change_of(formatted_label, tweaker_type::DISCRETE, altered);
+							}
+
+							augs::imgui::next_columns(input.extra_columns + 1);
+						}
+
 						for (unsigned i = 0; i < static_cast<unsigned>(altered.size()); ++i) {
 							if constexpr(expandable) {
 								{

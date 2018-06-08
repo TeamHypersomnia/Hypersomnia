@@ -54,6 +54,52 @@ struct pathed_asset_entry : public browsed_path_entry_base<id_type> {
 	{}
 };
 
+inline std::optional<rgba> image_color_picker(
+	const int zoom,
+	const augs::atlas_entry& entry,
+	const augs::image& viewed_image
+) {
+	using namespace augs::imgui;
+
+	auto& io = ImGui::GetIO();
+
+	const auto is = vec2i(entry.get_original_size());
+
+	const auto viewing_size = (is * zoom).operator ImVec2();
+
+	text("Image size: %x, zoom: %x", is, zoom);
+
+	invisible_button_reset_cursor("###OffsetSelector", viewing_size);
+	game_image(entry, viewing_size);
+
+	const auto cross_alpha = 200;
+
+	auto draw_cross = [is, zoom](const vec2i where, const rgba col) {
+		draw_cross_overlay(is, where, zoom, col);
+	};
+
+	const auto pos = ImGui::GetCursorScreenPos();
+
+	const auto image_space_new = vec2i(vec2(io.MousePos.x - pos.x, io.MousePos.y - pos.y) / zoom);
+
+	std::optional<rgba> result;
+
+	if (ImGui::IsItemClicked()) {
+		result = viewed_image.pixel(image_space_new);
+	}
+
+	if (ImGui::IsItemHovered()) {
+		draw_cross(image_space_new, rgba(green.rgb(), cross_alpha));
+
+		auto scope = scoped_tooltip();
+		text("Image space: %x", image_space_new);
+		rgba color_preview = viewed_image.pixel(image_space_new);
+		color_edit("##colorpreview", color_preview);
+	}
+
+	return result;
+}
+
 struct image_color_picker_widget {
 	const assets::image_id id;
 	const images_in_atlas_map& game_atlas;
@@ -72,60 +118,53 @@ struct image_color_picker_widget {
 		return typesafe_sprintf("Changed %x to %x", formatted_label, to);
 	}
 
+	void update_preview() const {
+		const auto& p = defs[id].get_source_path();
+
+		if (current_preview.path != p) {
+			current_preview.image.from_file(p.resolve(project_path));
+			current_preview.path = p;
+		}
+	}
+
+	template <class T>
+	bool handle_container_prologue(const std::string& identity_label, T& object) const {
+		using namespace augs::imgui;
+
+		static_assert(handles<typename T::value_type>);
+
+		update_preview();
+
+		if (auto combo = scoped_combo(("###AddMultiple" + identity_label).c_str(), "Add multiple...", ImGuiComboFlags_HeightLargest)) {
+			const auto zoom = 4;
+			const auto& entry = game_atlas.at(id).diffuse;
+
+			if (const auto picked = image_color_picker(zoom, entry, current_preview.image)) {
+				object.emplace_back(*picked);
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	template <class T>
 	auto handle(const std::string& identity_label, T& object) const {
 		using namespace augs::imgui;
 
 		std::optional<tweaker_type> result;
 
-		{
-			const auto& p = defs[id].get_source_path();
-
-			if (current_preview.path != p) {
-				current_preview.image.from_file(p.resolve(project_path));
-				current_preview.path = p;
-			}
-		}
+		update_preview();
 
 		auto iw = scoped_item_width(60);
 
 		if (auto combo = scoped_combo((identity_label + "Picker").c_str(), "Pick", ImGuiComboFlags_HeightLargest)) {
-            auto& io = ImGui::GetIO();
-
-			const auto& entry = game_atlas.at(id);
-
-			const auto is = vec2i(entry.get_original_size());
 			const auto zoom = 4;
+			const auto& entry = game_atlas.at(id).diffuse;
 
-			const auto viewing_size = (is * zoom).operator ImVec2();
-
-			text("Image size: %x, zoom: %x", is, zoom);
-
-			invisible_button_reset_cursor("###OffsetSelector", viewing_size);
-			game_image(entry.diffuse, viewing_size);
-
-			const auto cross_alpha = 200;
-
-			auto draw_cross = [is](const vec2i where, const rgba col) {
-				draw_cross_overlay(is, where, zoom, col);
-			};
-
-			const auto pos = ImGui::GetCursorScreenPos();
-
-			const auto image_space_new = vec2i(vec2(io.MousePos.x - pos.x, io.MousePos.y - pos.y) / zoom);
-
-			if (ImGui::IsItemClicked()) {
-				object = current_preview.image.pixel(image_space_new);
+			if (const auto picked = image_color_picker(zoom, entry, current_preview.image)) {
+				object = *picked;
 				result = tweaker_type::DISCRETE;
-			}
-
-			if (ImGui::IsItemHovered()) {
-				draw_cross(image_space_new, rgba(green.rgb(), cross_alpha));
-
-				auto scope = scoped_tooltip();
-				text("Image space: %x", image_space_new);
-				rgba color_preview = current_preview.image.pixel(image_space_new);
-				color_edit("##colorpreview", color_preview);
 			}
 		}
 

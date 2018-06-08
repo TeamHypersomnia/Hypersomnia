@@ -167,6 +167,13 @@ auto tree_of_flavours(
 									imgui_id,
 									locations.empty()
 								);
+
+								const auto& cosm = cpe_in.command_in.get_cosmos();
+
+								if (nullptr == cosm.find_flavour(flavour_id)) {
+									/* It has just been deleted. */
+									return;
+								}
 							}
 
 							const auto flavour_node = scoped_tree_node_ex(node_label, flags);

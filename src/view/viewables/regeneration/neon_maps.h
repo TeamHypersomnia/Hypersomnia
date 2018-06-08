@@ -7,9 +7,9 @@
 
 struct neon_map_input {
 	// GEN INTROSPECTOR struct neon_map_input
-	float standard_deviation = 0.f;
-	vec2u radius;
-	float amplification = 0.f;
+	float standard_deviation = 6.f;
+	vec2u radius = { 80u, 80u };
+	float amplification = 60.f;
 	float alpha_multiplier = 1.f;
 
 	std::vector<rgba> light_colors;

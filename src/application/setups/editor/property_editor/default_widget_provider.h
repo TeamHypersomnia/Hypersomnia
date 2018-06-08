@@ -16,6 +16,12 @@ struct default_widget_provider {
 	}
 
 	template <class T>
+	bool handle_container_prologue(const std::string&, const T&) {
+		static_assert(handles<typename T::value_type>);
+		return false;
+	}
+
+	template <class T>
 	std::string describe_changed(const std::string&, const T&, const T&) {
 		static_assert(always_false_v<T>);
 		return "";

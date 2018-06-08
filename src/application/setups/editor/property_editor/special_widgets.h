@@ -34,5 +34,14 @@ struct special_widgets {
 		using matching = find_matching_type_in_list<detail_handles<T>::template type, type_list<Args...>>;
 		return std::get<matching>(handlers).handle(identity_label, object);
 	}
+
+	template <class T>
+	decltype(auto) handle_container_prologue(
+		const std::string& identity_label, 
+		T& object
+	) {
+		using matching = find_matching_type_in_list<detail_handles<typename T::value_type>::template type, type_list<Args...>>;
+		return std::get<matching>(handlers).handle_container_prologue(identity_label, object);
+	}
 };
 

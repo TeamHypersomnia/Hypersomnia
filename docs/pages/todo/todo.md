@@ -6,6 +6,10 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Possibly abort the for_each_flavour loop altogether after deleting a flavour?
+	- Will only be problematic if the ids will be rewritten in place, which won't even be the case with sparse pools, not even with pointer ids
+	- Only problematic with direct index-based ids
+
 - Improve wielding transfers calculation so that less transfers are made
 	- Transfer effects will be fixed automagically then
 
