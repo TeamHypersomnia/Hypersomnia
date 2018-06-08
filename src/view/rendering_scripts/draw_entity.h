@@ -79,7 +79,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 			const auto& cosm = typed_handle.get_cosmos();
 			const auto& logicals = cosm.get_logical_assets();
 
-			if (const auto shoot_animation = mapped_or_nullptr(logicals.plain_animations, gun_def.shoot_animation)) {
+			if (const auto shoot_animation = logicals.find(gun_def.shoot_animation)) {
 				if (const auto* const frame = ::get_frame(gun, *shoot_animation, cosm)) {
 					auto animated = sprite;
 					animated.image_id = frame->image_id;
@@ -165,10 +165,7 @@ FORCE_INLINE void specific_entity_drawer(
 
 				const auto leg_animation_id = maybe_torso->calc_leg_anim(velocity, face_degrees);
 
-				do_movement_animation(
-					mapped_or_nullptr(logicals.legs_animations, leg_animation_id),
-					legs_degrees
-				);
+				do_movement_animation(logicals.find(leg_animation_id), legs_degrees);
 			}
 
 			const auto wielded_items = typed_handle.get_wielded_items();

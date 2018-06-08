@@ -99,7 +99,7 @@ transformr direct_attachment_offset(
 		if (const auto* const torso = container.template find<invariants::torso>()) {
 			const auto& stance = torso->calc_stance(cosm, container.get_wielded_items());
 
-			if (const auto* const anim = mapped_or_nullptr(logicals.torso_animations, stance.carry)) {
+			if (const auto* const anim = logicals.find(stance.carry)) {
 				return logicals.get_offsets(anim->frames[0].image_id).torso;
 			}
 		}

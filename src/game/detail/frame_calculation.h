@@ -87,7 +87,7 @@ auto calc_stance_info(
 
 	const auto& logicals = cosm.get_logical_assets();
 
-	if (const auto shoot_animation = mapped_or_nullptr(logicals.torso_animations, stance.shoot)) {
+	if (const auto shoot_animation = logicals.find(stance.shoot)) {
 		/* Determine whether we want a carrying or a shooting animation */
 		const auto n = wielded_items.size();
 
@@ -119,7 +119,7 @@ auto calc_stance_info(
 		}
 	}
 
-	if (const auto carry_animation = mapped_or_nullptr(logicals.torso_animations, stance.carry)) {
+	if (const auto carry_animation = logicals.find(stance.carry)) {
 		return result_t::carry(::get_frame_and_flip(movement, *carry_animation));
 	}
 

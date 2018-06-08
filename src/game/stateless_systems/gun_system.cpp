@@ -107,7 +107,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto delta = step.get_delta();
 	const auto now = cosmos.get_timestamp();
-	const auto& metas = step.get_logical_assets().recoils;
+	const auto& logicals = step.get_logical_assets();
 
 	cosmos.for_each_having<components::gun>(
 		[&](const auto gun_entity) {
@@ -326,7 +326,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			auto& heat = gun.current_heat;
 
 			if (total_recoil != 0.f) {
-				if (const auto* const recoil_player = mapped_or_nullptr(metas, gun_def.recoil.id)) {
+				if (const auto* const recoil_player = logicals.find(gun_def.recoil.id)) {
 					if (sentience) {
 						const auto recoil_value = gun.recoil.shoot_and_get_impulse(gun_def.recoil, *recoil_player);
 

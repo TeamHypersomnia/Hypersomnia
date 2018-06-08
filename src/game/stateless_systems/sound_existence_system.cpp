@@ -28,7 +28,7 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 	const auto& damages = step.get_queue<messages::damage_message>();
 	const auto& healths = step.get_queue<messages::health_event>();
 	const auto& exhausted_casts = step.get_queue<messages::exhausted_cast>();
-	const auto& metas = step.get_logical_assets().physical_materials;
+	const auto& logicals = step.get_logical_assets();
 
 	auto& cosmos = step.get_cosmos();
 
@@ -42,8 +42,8 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			const auto subject_coll = subject.get<invariants::fixtures>();
 			const auto collider_coll = collider.get<invariants::fixtures>();
 
-			const auto* const subject_coll_material = mapped_or_nullptr(metas, subject_coll.material);
-			const auto* const collider_coll_material = mapped_or_nullptr(metas, collider_coll.material);
+			const auto* const subject_coll_material = logicals.find(subject_coll.material);
+			const auto* const collider_coll_material = logicals.find(collider_coll.material);
 
 			if (
 				subject_coll_material != nullptr

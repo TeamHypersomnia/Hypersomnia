@@ -8,6 +8,8 @@
 #include "game/assets/physical_material.h"
 #include "game/assets/image_offsets.h"
 
+#include "game/assets/get_logicals_pool.h"
+
 using plain_animations_pool = make_asset_pool<plain_animation, assets::plain_animation_id_key>;
 using torso_animations_pool = make_asset_pool<torso_animation, assets::torso_animation_id_key>;
 using legs_animations_pool = make_asset_pool<legs_animation, assets::legs_animation_id_key>;
@@ -32,5 +34,15 @@ struct all_logical_assets {
 
 	const auto& get_offsets(const assets::image_id id) const {
 		return image_offsets.at(id.get_cache_index());
+	}
+
+	template <class T>
+	auto find(const T& id) {
+		return mapped_or_nullptr(get_logicals_pool<T>(*this), id);
+	}
+
+	template <class T>
+	auto find(const T& id) const {
+		return mapped_or_nullptr(get_logicals_pool<T>(*this), id);
 	}
 };
