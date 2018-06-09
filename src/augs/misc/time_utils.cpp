@@ -18,7 +18,14 @@ static std::string leading_zero(const t component) {
 	return result;
 }
 
-augs::date_time::date_time() : t(std::time(nullptr)) {}
+augs::date_time::date_time() : date_time(std::time(nullptr)) {}
+
+augs::date_time::date_time(
+	const std::chrono::system_clock::time_point& tp
+) : 
+	date_time(std::chrono::system_clock::to_time_t(tp)) 
+{
+}
 
 std::string augs::date_time::get_stamp() const {
     std::tm local_time = *std::localtime(&t);
@@ -41,6 +48,14 @@ std::string augs::date_time::get_readable() const {
 }
 
 std::string augs::date_time::how_long_ago() const {
+	return how_long_ago(false);
+}
+
+std::string augs::date_time::how_long_ago_tell_seconds() const {
+	return how_long_ago(true);
+}
+
+std::string augs::date_time::how_long_ago(const bool tell_seconds) const {
 	const auto secs = static_cast<unsigned long long>(std::difftime(std::time(nullptr), t));
 
 	const auto mins = secs / 60;
@@ -48,6 +63,10 @@ std::string augs::date_time::how_long_ago() const {
 	const auto days = hrs / 24;
 
 	if (mins < 1) {
+		if (tell_seconds) {
+			return typesafe_sprintf("%x seconds ago", secs);
+		}
+
 		return "A while ago";
 	}
 	else if (mins == 1) {

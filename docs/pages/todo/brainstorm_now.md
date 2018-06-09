@@ -17,12 +17,24 @@ summary: That which we are brainstorming at the moment.
 		- An animation could have a button to "Re-import" frames
 			- Then they will be re-read from disk
 				- Possibly creating new entries
-		- Each frame has a filename?
-			- Otherwise we would have to disallow animation frames with non-compliant filenames
-				- In practice such uses won't be frequent
+		- Format: literal, direct: store filenames to be looked for in the current folder
+			- Each frame has a filename?
+				- Otherwise we would have to disallow animation frames with non-compliant filenames
+					- In practice such uses won't be frequent
+			- Con: have to re-import any time we create new frames
+				- Wait a minute. **We will anyway have to re-import manually**, because the editor has its own copy of frames and durations
+				- Therefore it is only a problem if we want to update official resource...
+					- ...in which case being explicit is better
+				- The artist's intervention will almost always be required anywany, especially for setting new durations et cetera
+			- **So we're gonna go with the literal format, at least for now**
+				- Nothing stops us from manually writing lua files for official resources to later have no need to re-import and re-export in editor
+<!--
+		- Semi-literal format: literal if there is a need, don't store filenames if the use corresponds directly to the frames on disk
+			- Con: quite complicated workflow? Simplicity sometimes beats the automation?
+-->
 	- Problem: It would be nice to set durations in bulk, in editor
 		- But for that we'll need to play with mass editing of container elements
-			- State storage is problematic here
+			- Tick state storage is problematic here
 				- We could store an unordered set of integers and map it after the imgui id.
 		- Or at least have a tick to say that we want a constant frame rate
 

@@ -635,7 +635,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 				{
 					using def_type = std::remove_reference_t<decltype(definition_object)>;
-					const auto& view = asset_definition_view<def_type>(project_path, definition_object);
+					const auto& view = asset_definition_view<const def_type>(project_path, definition_object);
 					const auto resolved = view.get_resolved_source_path();
 
 					{
@@ -666,7 +666,52 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 					{
 						if (ImGui::Button("Write defaults")) {
-							save_meta_lua(cmd_in.lua, definition_object.meta, resolved);
+							if (!current_ticked) {
+								save_meta_lua(cmd_in.lua, definition_object.meta, resolved);
+							}
+							else {
+								for (const auto& t : ticked_in_range) {
+									const auto& ticked_definition_object = definitions[t.id];
+									const auto& ticked_view = asset_definition_view<const def_type>(project_path, ticked_definition_object);
+									const auto ticked_resolved = ticked_view.get_resolved_source_path();
+
+									save_meta_lua(cmd_in.lua, ticked_definition_object.meta, ticked_resolved);
+								}
+							}
+						}
+
+						if (ImGui::IsItemHovered()) {
+							auto get_lwt = [](const augs::path_type& meta_path) {
+								try {
+									const auto lwt = augs::last_write_time(meta_path);
+									return typesafe_sprintf("(LM: %x)", augs::date_time(lwt).how_long_ago_tell_seconds());
+								}
+								catch (...) {
+									return std::string("(Doesn't exist)");
+								}
+							};
+
+							auto print_path = [&](const augs::path_type& ticked_resolved) {
+								const auto meta_path = get_meta_lua_path(ticked_resolved);
+								return meta_path.string() + " " + get_lwt(meta_path);
+							};
+
+							if (!current_ticked) {
+								text_tooltip("Write defaults to:\n%x", print_path(resolved));
+							}
+							else {
+								std::string all_resolved;
+
+								for (const auto& t : ticked_in_range) {
+									const auto& ticked_definition_object = definitions[t.id];
+									const auto& ticked_view = asset_definition_view<const def_type>(project_path, ticked_definition_object);
+									const auto ticked_resolved = ticked_view.get_resolved_source_path();
+
+									all_resolved += print_path(ticked_resolved) + "\n";
+								}
+
+								text_tooltip("Write defaults to:\n%x", all_resolved);
+							}
 						}
 					}
 
