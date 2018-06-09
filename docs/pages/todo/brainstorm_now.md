@@ -6,6 +6,26 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Animation import
+	- It will be useful to not have to re-specify parameters of official animations.
+	Will also reduce the load for test scene code where it does not buy us much.
+		- Durations - surely
+		- Booleans for has_backward and flip - yeah, as well
+		- Frame orders?
+			- The need is implied by durations
+	- Saving format
+		- An animation could have a button to "Re-import" frames
+			- Then they will be re-read from disk
+				- Possibly creating new entries
+		- Each frame has a filename?
+			- Otherwise we would have to disallow animation frames with non-compliant filenames
+				- In practice such uses won't be frequent
+	- Problem: It would be nice to set durations in bulk, in editor
+		- But for that we'll need to play with mass editing of container elements
+			- State storage is problematic here
+				- We could store an unordered set of integers and map it after the imgui id.
+		- Or at least have a tick to say that we want a constant frame rate
+
 - Particles and flavours
 	- std::unordered_map<particle_flavour_id, vector of particles>
 		- We will always simulate all particles that we have in memory.

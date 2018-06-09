@@ -19,6 +19,11 @@
 #include "application/setups/editor/detail/field_address.h"
 
 template <class T>
+static constexpr bool forbid_zero_elements_v = 
+	is_one_of_v<T, plain_animation_frames_type>
+;
+
+template <class T>
 static constexpr bool has_direct_widget_v = 
 	is_one_of_v<T, std::string, bool, vec2, vec2i, rgba>
 	|| is_arithmetic_minmax_v<T>
@@ -274,6 +279,11 @@ void detail_general_edit_properties(
 								}
 
 								{
+									auto colors = maybe_disabled_cols(
+										input.settings, 
+										altered.size() == 1 && forbid_zero_elements_v<T>
+									);
+
 									const auto button_label = typesafe_sprintf("-##%x", i);
 
 									if (ImGui::Button(button_label.c_str())) {

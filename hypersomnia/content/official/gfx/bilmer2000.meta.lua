@@ -27,7 +27,7 @@ return {
       },
       detachable_magazine = {
         pos = {
-          x = -13,
+          x = -26,
           y = 6
         },
         rotation = 90
@@ -45,6 +45,10 @@ return {
       hand_anchor = {
         x = -26,
         y = -1
+      },
+      head_anchor = {
+        x = 0,
+        y = 0
       }
     },
     legs = {
