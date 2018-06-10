@@ -91,6 +91,8 @@ bool sound_system::generic_sound_cache::rebind_buffer(const update_properties_in
 
 bool sound_system::generic_sound_cache::update_properties(const update_properties_input in) {
 	const auto listening_character = in.get_listener();
+	const bool is_direct_listener = listening_character == original.start.direct_listener;
+
 	const auto listener_pos = listening_character.get_viewing_transform(in.interp).pos;
 
 	const auto& cosm = listening_character.get_cosmos();
@@ -103,15 +105,20 @@ bool sound_system::generic_sound_cache::update_properties(const update_propertie
 
 	const auto current_transform = *maybe_transform;
 
-	{
+	if (is_direct_listener) {
+		source.set_air_absorption_factor(0.f);
+	}
+	else {
 		const auto dist_from_listener = (listener_pos - current_transform.pos).length();
 		const auto absorption = std::min(10.f, static_cast<float>(pow(std::max(0.f, dist_from_listener - 2220.f)/520.f, 2)));
-
 		source.set_air_absorption_factor(absorption);
 	}
 
-	{
-		if (previous_transform) {
+	if (previous_transform) {
+		if (is_direct_listener) {
+			source.set_velocity(si, vec2::zero);
+		}
+		else {
 			const auto displacement = current_transform - *previous_transform;
 			previous_transform = current_transform;
 
@@ -129,7 +136,12 @@ bool sound_system::generic_sound_cache::update_properties(const update_propertie
 	source.set_reference_distance(si, m.reference_distance);
 	source.set_looping(m.repetitions == -1);
 
-	source.set_position(si, current_transform.pos);
+	if (is_direct_listener) {
+		source.set_position(si, listener_pos);
+	}
+	else {
+		source.set_position(si, current_transform.pos);
+	}
 
 	return !source.is_playing();
 }
