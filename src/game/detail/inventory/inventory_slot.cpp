@@ -18,6 +18,10 @@ bool inventory_slot::has_unlimited_space() const {
 }
 
 bool inventory_slot::is_category_compatible_with(const const_entity_handle id) const {
+	if (only_allow_flavour.type_id.is_set()) {
+		return id.get_flavour_id() == only_allow_flavour;
+	}
+
 	auto& item_def = id.get<invariants::item>();
 	
 	return item_def.categories_for_slot_compatibility.test(category_allowed);

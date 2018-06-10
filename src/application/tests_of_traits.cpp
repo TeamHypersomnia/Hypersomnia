@@ -15,6 +15,7 @@
 #include "game/assets/all_logical_assets.h"
 
 #include "augs/templates/traits/container_traits.h"
+#include "augs/templates/traits/is_enum_map.h"
 #include "game/components/pathfinding_component.h"
 #include "game/organization/for_each_entity_type.h"
 #include "game/organization/for_each_component_type.h"
@@ -414,6 +415,8 @@ struct tests_of_traits {
 	static_assert(!is_arithmetic_minmax_v<augs::minmax<augs::minmax<float>>>);
 
 	static_assert(!is_typed_flavour_id_v<assets::image_id>);
+	static_assert(is_enum_map_v<decltype(invariants::container().slots)>);
+	static_assert(!is_enum_map_v<int>);
 };
 
 /* 

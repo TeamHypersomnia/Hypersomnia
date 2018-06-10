@@ -25,7 +25,7 @@ public:
 	;
 
 	template <class T>
-	static constexpr bool handles_prologue = is_one_of_v<T, std::vector<rgba>>;
+	static constexpr bool handles_prologue = false;
 
 	template <class T>
 	auto describe_changed(

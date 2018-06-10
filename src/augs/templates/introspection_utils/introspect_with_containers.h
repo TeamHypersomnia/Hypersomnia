@@ -5,6 +5,8 @@
 #include "augs/templates/traits/is_optional.h"
 #include "augs/templates/traits/container_traits.h"
 
+#include "augs/templates/traits/is_enum_map.h"
+
 namespace augs {
 	template <class T>
 	constexpr bool has_dynamic_content_v =
@@ -32,7 +34,15 @@ namespace augs {
 			int i = 0;
 
 			for (auto&& elem : object) {
-				callback(elem, i++);
+				if constexpr(is_enum_map_v<T>) {
+					callback(elem.first, i);
+					callback(elem.second, i);
+
+					++i;
+				}
+				else {
+					callback(elem, i++);
+				}
 			}
 		}
 		else {

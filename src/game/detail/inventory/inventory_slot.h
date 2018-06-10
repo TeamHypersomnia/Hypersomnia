@@ -9,6 +9,7 @@
 
 #include "game/enums/item_category.h"
 #include "game/enums/slot_physical_behaviour.h"
+#include "game/transcendental/entity_flavour_id.h"
 
 class cosmos;
 
@@ -19,6 +20,7 @@ namespace augs {
 struct inventory_slot {
 	// GEN INTROSPECTOR struct inventory_slot
 	item_category category_allowed = item_category::GENERAL;
+	entity_flavour_id only_allow_flavour;
 
 #if TODO_MOUNTING
 	bool items_need_mounting = false;

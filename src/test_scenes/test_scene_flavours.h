@@ -64,6 +64,7 @@ enum class test_shootable_weapons {
 	// GEN INTROSPECTOR enum class test_shootable_weapons
 	SAMPLE_RIFLE,
 	VINDICATOR,
+	LEWSII,
 	KEK9,
 	AMPLIFIER_ARM,
 	DATUM_GUN,
@@ -121,6 +122,7 @@ enum class test_container_items {
 	SAMPLE_BACKPACK,
 	BROWN_BACKPACK,
 	SAMPLE_MAGAZINE,
+	LEWSII_MAG,
 
 	COUNT
 	// END GEN INTROSPECTOR

@@ -68,6 +68,8 @@ namespace prefabs {
 	entity_handle create_car(const logic_step, const components::transform&);
 
 	// guns
+	entity_handle create_magazine(const logic_step, components::transform pos, test_container_items, entity_id charge_inside = entity_id(), int force_num_charges = -1);
+
 	entity_handle create_sample_magazine(const logic_step, components::transform pos, entity_id charge_inside = entity_id(), int force_num_charges = -1);
 	entity_handle create_sample_rifle(const logic_step, vec2 pos, entity_id load_mag = entity_id());
 	entity_handle create_rifle(const logic_step, vec2 pos, test_shootable_weapons, entity_id load_mag = entity_id());

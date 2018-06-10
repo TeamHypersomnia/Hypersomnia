@@ -300,6 +300,38 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_container_items::LEWSII_MAG);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::LEWSII_MAG, white);
+			add_shape_invariant_from_renderable(meta, caches);
+			test_flavours::add_see_through_dynamic_body(meta);
+
+			invariants::container container; 
+
+			inventory_slot charge_deposit_def;
+			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
+			charge_deposit_def.space_available = to_space_units("1.0");
+
+			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
+			meta.set(container);
+
+			{
+				invariants::item item;
+
+				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				item.space_occupied_per_charge = to_space_units("1.0");
+				meta.set(item);
+			}
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_finishing_traces::CYAN_ROUND_FINISHING_TRACE);
 			
 			{
@@ -426,6 +458,57 @@ namespace test_flavours {
 			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_shootable_weapons::LEWSII);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			meta.get<invariants::text_details>().description =
+				"Standard issue sample rifle."
+			;
+
+			invariants::gun gun_def;
+
+			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::VINDICATOR_MUZZLE);
+
+			gun_def.action_mode = gun_action_type::AUTOMATIC;
+			gun_def.muzzle_velocity = {3700.f, 3700.f};
+			gun_def.shot_cooldown_ms = 60.f;
+
+			gun_def.shell_spawn_offset.pos.set(0, 10);
+			gun_def.shell_spawn_offset.rotation = 45;
+			gun_def.shell_angular_velocity = {2.f, 14.f};
+			gun_def.shell_spread_degrees = 20.f;
+			gun_def.shell_velocity = {300.f, 1700.f};
+			gun_def.damage_multiplier = 2.2f;
+			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
+			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
+			gun_def.kickback_towards_wielder = 80.f;
+
+			gun_def.maximum_heat = 2.f;
+			gun_def.gunshot_adds_heat = 0.062f;
+			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
+			gun_def.recoil_multiplier = 1.3f;
+
+			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
+			//gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::VINDICATOR_SHOOT);
+
+			meta.set(gun_def);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::LEWSII, white);
+			add_shape_invariant_from_renderable(meta, caches);
+			test_flavours::add_see_through_dynamic_body(meta);
+			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE);
+
+			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].only_allow_flavour = ::to_entity_flavour_id(test_container_items::LEWSII_MAG);
 		}
 
 		{
@@ -620,11 +703,11 @@ namespace prefabs {
 }
 
 namespace prefabs {
-	entity_handle create_sample_magazine(const logic_step step, const components::transform pos, const entity_id charge_inside_id, const int force_num_charges) {
+	entity_handle create_magazine(const logic_step step, const components::transform pos, const test_container_items flav, const entity_id charge_inside_id, const int force_num_charges) {
 		auto& cosmos = step.get_cosmos();
 		auto charge_inside = cosmos[charge_inside_id];
 
-		auto sample_magazine = create_test_scene_entity(cosmos, test_container_items::SAMPLE_MAGAZINE, pos);
+		auto sample_magazine = create_test_scene_entity(cosmos, flav, pos);
 
 		if (charge_inside.alive()) {
 			const auto load_charge = item_slot_transfer_request::standard(charge_inside, sample_magazine[slot_function::ITEM_DEPOSIT]);
@@ -636,6 +719,11 @@ namespace prefabs {
 		}
 
 		return sample_magazine;
+	}
+
+
+	entity_handle create_sample_magazine(const logic_step step, const components::transform pos, const entity_id charge_inside_id, const int force_num_charges) {
+		return create_magazine(step, pos, test_container_items::SAMPLE_MAGAZINE, charge_inside_id, force_num_charges);
 	}
 
 	entity_handle create_cyan_charge(const logic_step step, const vec2 pos) {
