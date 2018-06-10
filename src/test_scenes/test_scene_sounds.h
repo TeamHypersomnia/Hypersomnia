@@ -30,6 +30,7 @@ enum class test_scene_sound_id {
 #endif
 
 	HEAVY_HEAT_START,
+	LIGHT_HEAT_START,
 
 	CAST_SUCCESSFUL,
 	CAST_UNSUCCESSFUL,

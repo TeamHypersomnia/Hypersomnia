@@ -54,6 +54,7 @@ enum class test_plain_sprited_bodys {
 	// GEN INTROSPECTOR enum class test_plain_sprited_bodys
 	CRATE,
 	CYAN_SHELL,
+	STEEL_SHELL,
 	BRICK_WALL,
 
 	COUNT
@@ -76,6 +77,7 @@ enum class test_shootable_weapons {
 enum class test_shootable_charges {
 	// GEN INTROSPECTOR enum class test_shootable_charges
 	CYAN_CHARGE,
+	STEEL_CHARGE,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -102,6 +104,7 @@ enum class test_throwable_explosives {
 enum class test_plain_missiles {
 	// GEN INTROSPECTOR enum class test_plain_missiles
 	CYAN_ROUND,
+	STEEL_ROUND,
 	ELECTRIC_MISSILE,
 
 	COUNT
@@ -111,6 +114,7 @@ enum class test_plain_missiles {
 enum class test_finishing_traces {
 	// GEN INTROSPECTOR enum class test_finishing_traces
 	CYAN_ROUND_FINISHING_TRACE,
+	STEEL_ROUND_FINISHING_TRACE,
 	ELECTRIC_MISSILE_FINISHING_TRACE,
 
 	COUNT

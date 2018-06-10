@@ -95,6 +95,7 @@ void gun_system::consume_gun_intents(const logic_step step) {
 
 		if (gun_entity.intent == game_intent_type::PRESS_GUN_TRIGGER) {
 			gun.is_trigger_pressed = gun_entity.was_pressed();
+			gun.play_trigger_effect_once = true;
 		}
 
 		if (gun_entity.intent == game_intent_type::RELOAD && gun_entity.was_pressed()) {
@@ -152,6 +153,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 			/* For common aftermath */
 			float total_recoil = 0.f;
+			bool decrease_heat_in_aftermath = true;
 
 			if (const auto magic_missile_flavour_id = gun_def.magic_missile_flavour; magic_missile_flavour_id.is_set()) {
 				const auto& missile = cosmos.on_flavour(
@@ -206,119 +208,157 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					}
 				}
 			}
-			else if (
-				gun_entity[slot_function::GUN_CHAMBER].get_items_inside().size() > 0
-				&& try_to_fire_interval()
-			) {
-				/* This is a normal gun */
-				const auto chamber_slot = gun_entity[slot_function::GUN_CHAMBER];
-				const auto cartridge_in_chamber = cosmos[chamber_slot.get_items_inside()[0]];
+			else if (gun_entity[slot_function::GUN_CHAMBER].get_items_inside().size() > 0) {
+				/* 
+					TODO: 
+					Properly parametrize all these magic numbers.
+					These serve purely for managing the rotating magazine - thus, aesthetic reasons.
+				*/
 
-				auto response = make_gunshot_message();
-				response.cartridge_definition = cartridge_in_chamber.template get<invariants::cartridge>();
+				if (gun.current_heat < gun_def.minimum_heat_to_shoot) {
+					if (gun.is_trigger_pressed) {
+						auto& heat = gun.current_heat;
 
-				thread_local std::vector<entity_id> bullet_stacks;
-				bullet_stacks.clear();
+						const auto trigger_effect_cooldown_ms = 100.f;
 
-				const auto pellets_slot = cartridge_in_chamber[slot_function::ITEM_DEPOSIT];
+						if (gun.play_trigger_effect_once && augs::try_to_fire_and_reset(trigger_effect_cooldown_ms, gun.when_last_played_trigger_effect, now, delta)) {
+							if (heat <= 0.2f) {
+								gun.magazine.apply(50000.5f * delta.in_seconds());
 
-				thread_local destruction_queue destructions;
-				destructions.clear();
+								auto chosen_effect = gun_def.heavy_heat_start_sound;
+								chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability));
+							}
+							else {
+								auto chosen_effect = gun_def.light_heat_start_sound;
+								chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability));
+							}
 
-				if (pellets_slot.alive()) {
-					bullet_stacks = pellets_slot.get_items_inside();
+							gun.play_trigger_effect_once = false;
+						}
 
-					/* 
-						apart from the pellets stacks inside the cartridge,
-						we must additionally queue the cartridge itself
-					*/
+						decrease_heat_in_aftermath = false;
 
-					destructions.emplace_back(cartridge_in_chamber);
+						heat += gun_def.gunshot_adds_heat * (delta.in_milliseconds() / gun_def.shot_cooldown_ms);
+						heat = std::min(gun_def.maximum_heat, heat);
+
+						gun.magazine.apply(5000.5f * delta.in_seconds());
+					}
 				}
-				else {
-					bullet_stacks.push_back(cartridge_in_chamber);
-				}
+				else if (try_to_fire_interval()) {
+					if (gun_def.minimum_heat_to_shoot > 0.f && gun.magazine.angular_velocity < 5000) {
+						gun.magazine.angular_velocity = 5000;
+					}
 
-				ensure(bullet_stacks.size() > 0);
+					/* This is a normal gun */
+					const auto chamber_slot = gun_entity[slot_function::GUN_CHAMBER];
+					const auto cartridge_in_chamber = cosmos[chamber_slot.get_items_inside()[0]];
 
-				for (const auto single_bullet_or_pellet_stack_id : bullet_stacks) {
-					const auto single_bullet_or_pellet_stack = cosmos[single_bullet_or_pellet_stack_id];
+					auto response = make_gunshot_message();
+					response.cartridge_definition = cartridge_in_chamber.template get<invariants::cartridge>();
 
-					int charges = single_bullet_or_pellet_stack.get<components::item>().get_charges();
+					thread_local std::vector<entity_id> bullet_stacks;
+					bullet_stacks.clear();
 
-					while (charges--) {
-						if (const auto round_flavour = single_bullet_or_pellet_stack.get<invariants::cartridge>().round_flavour; round_flavour.is_set()) {
-							cosmic::create_entity(cosmos, round_flavour, [&](const auto round_entity){
-								auto& sender = round_entity.template get<components::sender>();
-								sender.set(gun_entity);
+					const auto pellets_slot = cartridge_in_chamber[slot_function::ITEM_DEPOSIT];
 
-								{
-									auto& missile = round_entity.template get<components::missile>();
-									missile.power_multiplier_of_sender = gun_def.damage_multiplier;
-								}
+					thread_local destruction_queue destructions;
+					destructions.clear();
 
-								const auto& missile_def = round_entity.template get<invariants::missile>();
-								total_recoil += missile_def.recoil_multiplier * gun_def.recoil_multiplier;
+					if (pellets_slot.alive()) {
+						bullet_stacks = pellets_slot.get_items_inside();
 
-								round_entity.set_logic_transform(muzzle_transform);
+						/* 
+							apart from the pellets stacks inside the cartridge,
+							we must additionally queue the cartridge itself
+						*/
 
-								response.spawned_rounds.push_back(round_entity);
+						destructions.emplace_back(cartridge_in_chamber);
+					}
+					else {
+						bullet_stacks.push_back(cartridge_in_chamber);
+					}
 
-								{
-									auto rng = cosmos.get_rng_for(round_entity);
+					ensure(bullet_stacks.size() > 0);
 
-									const auto missile_velocity = 
-										vec2::from_degrees(muzzle_transform.rotation)
-										* missile_def.muzzle_velocity_mult
-										* rng.randval(gun_def.muzzle_velocity)
-									;
+					for (const auto single_bullet_or_pellet_stack_id : bullet_stacks) {
+						const auto single_bullet_or_pellet_stack = cosmos[single_bullet_or_pellet_stack_id];
 
-									round_entity.template get<components::rigid_body>().set_velocity(missile_velocity);
-								}
+						int charges = single_bullet_or_pellet_stack.get<components::item>().get_charges();
 
-								correct_interpolation_for(round_entity);
+						while (charges--) {
+							if (const auto round_flavour = single_bullet_or_pellet_stack.get<invariants::cartridge>().round_flavour; round_flavour.is_set()) {
+								cosmic::create_entity(cosmos, round_flavour, [&](const auto round_entity){
+									auto& sender = round_entity.template get<components::sender>();
+									sender.set(gun_entity);
+
+									{
+										auto& missile = round_entity.template get<components::missile>();
+										missile.power_multiplier_of_sender = gun_def.damage_multiplier;
+									}
+
+									const auto& missile_def = round_entity.template get<invariants::missile>();
+									total_recoil += missile_def.recoil_multiplier * gun_def.recoil_multiplier;
+
+									round_entity.set_logic_transform(muzzle_transform);
+
+									response.spawned_rounds.push_back(round_entity);
+
+									{
+										auto rng = cosmos.get_rng_for(round_entity);
+
+										const auto missile_velocity = 
+											vec2::from_degrees(muzzle_transform.rotation)
+											* missile_def.muzzle_velocity_mult
+											* rng.randval(gun_def.muzzle_velocity)
+										;
+
+										round_entity.template get<components::rigid_body>().set_velocity(missile_velocity);
+									}
+
+									correct_interpolation_for(round_entity);
+								}, [&](const auto) {});
+							}
+						}
+
+						if (const auto shell_flavour = single_bullet_or_pellet_stack.get<invariants::cartridge>().shell_flavour; shell_flavour.is_set()) {
+							cosmic::create_entity(cosmos, shell_flavour, [&](const auto shell_entity){
+								auto rng = cosmos.get_rng_for(shell_entity);
+
+								const auto spread_component = rng.randval(gun_def.shell_spread_degrees) + gun_def.shell_spawn_offset.rotation;
+
+								auto shell_transform = gun_transform;
+								shell_transform.pos += vec2(gun_def.shell_spawn_offset.pos).rotate(gun_transform.rotation, vec2());
+								shell_transform.rotation += spread_component;
+
+								shell_entity.set_logic_transform(shell_transform);
+
+								shell_entity.template get<components::rigid_body>().set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
+								response.spawned_shell = shell_entity;
 							}, [&](const auto) {});
 						}
+
+						destructions.emplace_back(single_bullet_or_pellet_stack);
 					}
 
-					if (const auto shell_flavour = single_bullet_or_pellet_stack.get<invariants::cartridge>().shell_flavour; shell_flavour.is_set()) {
-						cosmic::create_entity(cosmos, shell_flavour, [&](const auto shell_entity){
-							auto rng = cosmos.get_rng_for(shell_entity);
+					step.post_message(response);
 
-							const auto spread_component = rng.randval(gun_def.shell_spread_degrees) + gun_def.shell_spawn_offset.rotation;
+					/* 
+						by now every item inside the chamber is queued for destruction.
+						we do not clear items_inside by dropping them by perform_transfers 
+						to avoid unnecessary activation of the rigid bodies of the bullets, due to being dropped.
+					*/
 
-							auto shell_transform = gun_transform;
-							shell_transform.pos += vec2(gun_def.shell_spawn_offset.pos).rotate(gun_transform.rotation, vec2());
-							shell_transform.rotation += spread_component;
+					reverse_perform_deletions(make_deletion_queue(destructions, cosmos), cosmos);
 
-							shell_entity.set_logic_transform(shell_transform);
+					/*
+						Note that the above operation would happen automatically once all children entities are destroyed
+						(and thus their inferred relational caches are also destroyed)
+						But we need the result now so that the 
+					*/
 
-							shell_entity.template get<components::rigid_body>().set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
-							response.spawned_shell = shell_entity;
-						}, [&](const auto) {});
+					if (gun_def.action_mode >= gun_action_type::SEMI_AUTOMATIC) {
+						::load_next_round(gun_entity, step);
 					}
-
-					destructions.emplace_back(single_bullet_or_pellet_stack);
-				}
-
-				step.post_message(response);
-
-				/* 
-					by now every item inside the chamber is queued for destruction.
-					we do not clear items_inside by dropping them by perform_transfers 
-					to avoid unnecessary activation of the rigid bodies of the bullets, due to being dropped.
-				*/
-
-				reverse_perform_deletions(make_deletion_queue(destructions, cosmos), cosmos);
-
-				/*
-					Note that the above operation would happen automatically once all children entities are destroyed
-					(and thus their inferred relational caches are also destroyed)
-					But we need the result now so that the 
-				*/
-
-				if (gun_def.action_mode >= gun_action_type::SEMI_AUTOMATIC) {
-					::load_next_round(gun_entity, step);
 				}
 			}
 
@@ -354,10 +394,11 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					gun.steam_burst_scheduled = true;
 				}
 			}
-			else if (is_ready(gun_def.shot_cooldown_ms, gun.when_last_fired, now, delta)) {
+			else if (decrease_heat_in_aftermath && is_ready(gun_def.shot_cooldown_ms, gun.when_last_fired, now, delta)) {
 				/* Apply idle cooldown */
 				gun.recoil.cooldown(gun_def.recoil, delta.in_milliseconds());
-				heat = std::max(0.f, heat - delta.in_seconds() / gun_def.maximum_heat);
+				heat = std::max(0.f, heat - (gun_def.heat_cooldown_speed_mult * delta.in_seconds()) / gun_def.maximum_heat);
+				gun.magazine.damp(delta.in_seconds(), 2.f);
 
 				const auto perform_heat = gun.max_heat_after_steam_schedule - gun_def.get_steam_perform_diff();
 
@@ -386,6 +427,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					gun.steam_burst_scheduled = false;
 				}
 			}
+
+			gun.magazine.integrate(delta.in_seconds());
 		}
 	);
 }

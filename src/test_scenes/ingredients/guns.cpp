@@ -99,6 +99,67 @@ namespace test_flavours {
 		};
 	
 		{
+			auto& meta = get_test_flavour(flavours, test_plain_missiles::STEEL_ROUND);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::FLYING_BULLETS;
+
+				meta.set(render_def);
+			}
+
+
+			{
+				invariants::flags flags_def;
+				flags_def.values.set(entity_flag::IS_IMMUNE_TO_PAST);
+				meta.set(flags_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white);
+			add_shape_invariant_from_renderable(meta, caches);
+
+			{
+				{
+					invariants::trace trace_def;
+
+					trace_def.max_multiplier_x = {0.670f, 1.8f};
+					trace_def.max_multiplier_y = {0.f, 0.09f};
+					trace_def.lengthening_duration_ms = {36.f, 466.f};
+					trace_def.additional_multiplier = vec2(1.f, 1.f);
+					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::STEEL_ROUND_FINISHING_TRACE);
+
+					meta.set(trace_def);
+				}
+			}
+
+			test_flavours::add_bullet_round_physics(meta);
+
+			invariants::missile missile;
+
+			missile.destruction_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
+			missile.destruction_particles.modifier.colorize = white;
+
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::MISSILE_SMOKE_TRAIL);
+			missile.trace_particles.modifier.colorize = white;
+
+			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
+			missile.muzzle_leave_particles.modifier.colorize = white;//{ 255, 218, 5, 255 };
+			missile.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+
+			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
+			missile.destruction_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
+
+			auto& trace_modifier = missile.trace_sound.modifier;
+
+			trace_modifier.max_distance = 1020.f;
+			trace_modifier.reference_distance = 100.f;
+			trace_modifier.gain = 1.3f;
+			trace_modifier.fade_on_exit = false;
+
+			meta.set(missile);
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::CYAN_ROUND);
 
 			{
@@ -143,6 +204,7 @@ namespace test_flavours {
 			missile.trace_particles.modifier.colorize = cyan;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
+			missile.trace_particles_fly_backwards = true;
 			missile.muzzle_leave_particles.modifier.colorize = cyan;
 			missile.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
@@ -230,6 +292,21 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_plain_sprited_bodys::STEEL_SHELL);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_SHELL, white);
+			add_shape_invariant_from_renderable(meta, caches);
+			test_flavours::add_shell_dynamic_body(meta);
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::CYAN_CHARGE);
 
 			{
@@ -262,6 +339,44 @@ namespace test_flavours {
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_plain_sprited_bodys::CYAN_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::CYAN_ROUND);
+
+				meta.set(cartridge);
+			}
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_shootable_charges::STEEL_CHARGE);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_CHARGE, white);
+			add_shape_invariant_from_renderable(meta, caches);
+			test_flavours::add_see_through_dynamic_body(meta);
+
+			invariants::item item;
+			item.space_occupied_per_charge = to_space_units("0.01");
+			item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
+			item.stackable = true;
+
+			meta.set(item);
+
+			components::item item_inst;
+			item_inst.charges = 30;
+			meta.set(item_inst);
+
+			{
+				invariants::cartridge cartridge; 
+
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::CONCENTRATED_WANDERING_PIXELS);
+				cartridge.shell_trace_particles.modifier.colorize = white;
+
+				cartridge.shell_flavour = to_entity_flavour_id(test_plain_sprited_bodys::STEEL_SHELL);
+				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::STEEL_ROUND);
 
 				meta.set(cartridge);
 			}
@@ -344,6 +459,22 @@ namespace test_flavours {
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::CYAN_ROUND).get<invariants::trace>());
+			}
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_finishing_traces::STEEL_ROUND_FINISHING_TRACE);
+			
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::FLYING_BULLETS;
+
+				meta.set(render_def);
+				test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white);
+			}
+
+			{
+				meta.set(get_test_flavour(flavours, test_plain_missiles::STEEL_ROUND).get<invariants::trace>());
 			}
 		}
 
@@ -492,10 +623,17 @@ namespace test_flavours {
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = 80.f;
 
-			gun_def.maximum_heat = 2.f;
-			gun_def.gunshot_adds_heat = 0.062f;
-			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
-			gun_def.recoil_multiplier = 1.3f;
+			gun_def.heavy_heat_start_sound.id = to_sound_id(test_scene_sound_id::HEAVY_HEAT_START);
+			gun_def.light_heat_start_sound.id = to_sound_id(test_scene_sound_id::LIGHT_HEAT_START);
+
+			gun_def.steam_burst_schedule_mult = 1.f;
+			gun_def.heat_cooldown_speed_mult = 4.f;
+
+			gun_def.minimum_heat_to_shoot = 3.8f;
+			gun_def.maximum_heat = 4.0f;
+			gun_def.gunshot_adds_heat = 0.2f;
+			gun_def.firing_engine_sound.modifier.pitch = 0.4f;
+			gun_def.recoil_multiplier = 2.f;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
@@ -731,5 +869,11 @@ namespace prefabs {
 		auto& cosmos = step.get_cosmos();
 		const auto cyan_charge = create_test_scene_entity(cosmos, test_shootable_charges::CYAN_CHARGE, pos);
 		return cyan_charge;
+	}
+
+	entity_handle create_steel_charge(const logic_step step, const vec2 pos) {
+		auto& cosmos = step.get_cosmos();
+		const auto steel_charge = create_test_scene_entity(cosmos, test_shootable_charges::STEEL_CHARGE, pos);
+		return steel_charge;
 	}
 }

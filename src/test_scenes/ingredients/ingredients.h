@@ -80,6 +80,7 @@ namespace prefabs {
 		const vec2 pos 
 	);
 	entity_handle create_cyan_charge(const logic_step, vec2 pos);
+	entity_handle create_steel_charge(const logic_step, vec2 pos);
 
 	entity_handle create_sample_backpack(const logic_step, vec2 pos);
 	entity_handle create_brown_backpack(const logic_step, vec2 pos);

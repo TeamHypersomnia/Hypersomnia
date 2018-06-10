@@ -2,6 +2,7 @@
 #include <cstddef>
 #include "augs/pad_bytes.h"
 
+#include "augs/math/simple_physics.h"
 #include "augs/misc/timing/stepped_timing.h"
 #include "augs/misc/minmax.h"
 
@@ -27,12 +28,12 @@ namespace components {
 	struct gun {
 		// GEN INTROSPECTOR struct components::gun
 		augs::stepped_timestamp when_last_fired;
+		augs::stepped_timestamp when_last_played_trigger_effect;
 
 		bool is_trigger_pressed = false;
 		bool is_cocking_handle_being_pulled = false;
 		bool steam_burst_scheduled = false;
-
-		pad_bytes<1> pad;
+		bool play_trigger_effect_once = false;
 
 		float current_heat = 0.f;
 		float max_heat_after_steam_schedule = 0.f;
@@ -40,6 +41,8 @@ namespace components {
 		augs::stepped_timestamp when_began_pulling_cocking_handle;
 
 		recoil_player_instance recoil;
+
+		simple_rot_vel magazine;
 		// END GEN INTROSPECTOR
 
 		void set_cocking_handle_pulling(
@@ -69,10 +72,15 @@ namespace invariants {
 		components::transform shell_spawn_offset;
 
 		float gunshot_adds_heat = 0.05f;
+		float heat_cooldown_speed_mult = 1.f;
 		float maximum_heat = 1.f;
+		float minimum_heat_to_shoot = 0.f;
 
 		float steam_burst_schedule_mult = 0.75f;
 		float steam_burst_perform_diff = 0.5f;
+
+		sound_effect_input heavy_heat_start_sound;
+		sound_effect_input light_heat_start_sound;
 
 		sound_effect_input steam_burst_sound;
 		particle_effect_input steam_burst_particles;

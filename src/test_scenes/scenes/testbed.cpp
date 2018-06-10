@@ -107,7 +107,7 @@ namespace test_scenes {
 				sentience.get<personal_electricity_meter_instance>().set_maximum_value(10000);
 
 				const auto rifle = (is_metropolis ? prefabs::create_sample_rifle : prefabs::create_vindicator)(
-					step, vec2(100, -500), prefabs::create_sample_magazine(step, vec2(100, -650), prefabs::create_cyan_charge(step, vec2(0, 0)), 30)
+					step, vec2(100, -500), prefabs::create_sample_magazine(step, vec2(100, -650), prefabs::create_steel_charge(step, vec2(0, 0)), 30)
 				);
 
 				if (i == 1) {
@@ -296,13 +296,13 @@ namespace test_scenes {
 		prefabs::create_brown_backpack(step, vec2(280, -750));
 
 		prefabs::create_rifle(step, vec2(280, -750), test_shootable_weapons::DATUM_GUN, prefabs::create_sample_magazine(step, vec2(100, -650), prefabs::create_cyan_charge(step, vec2(0, 0)), 25));
-		prefabs::create_rifle(step, vec2(280, -750), test_shootable_weapons::LEWSII, prefabs::create_magazine(step, vec2(100, -650), test_container_items::LEWSII_MAG, prefabs::create_cyan_charge(step, vec2(0, 0)), 100));
+		prefabs::create_rifle(step, vec2(0, -100), test_shootable_weapons::LEWSII, prefabs::create_magazine(step, vec2(100, -650), test_container_items::LEWSII_MAG, prefabs::create_steel_charge(step, vec2(0, 0)), 10000));
 
 		if (character(2).alive()) {
 			const auto second_machete = prefabs::create_cyan_urban_machete(step, vec2(0, 300));
 			perform_transfer(item_slot_transfer_request::standard(second_machete, character(2).get_primary_hand()), step);
 		}
 
-		return character(0);
+		return character(1);
 	}
 }

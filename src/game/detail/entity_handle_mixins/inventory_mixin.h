@@ -28,7 +28,12 @@ class inventory_mixin {
 		const auto container_entity = slot.get_container();
 
 		offsets.push_back(
-			direct_attachment_offset(container_entity, item_entity, it.type)
+			direct_attachment_offset(
+				container_entity, 
+				item_entity, 
+				attachment_offset_settings::for_logic(), 
+				it.type
+			)
 		);
 
 		result.owner = container_entity;
@@ -321,7 +326,8 @@ public:
 	template <class A, class G>
 	void for_each_attachment_recursive(
 		A attachment_callback,
-		G get_offsets_by_torso
+		G get_offsets_by_torso,
+		const attachment_offset_settings settings
 	) const {
 		struct node {
 			inventory_slot_id parent;
@@ -351,6 +357,7 @@ public:
 							cosm[it.parent.container_entity],
 							this_attachment,
 							get_offsets_by_torso,
+							settings,
 							it.parent.type
 						);
 

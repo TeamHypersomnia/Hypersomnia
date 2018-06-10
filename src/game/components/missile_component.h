@@ -62,6 +62,8 @@ namespace invariants {
 		sound_effect_input pass_through_held_item_sound;
 
 		particle_effect_input muzzle_leave_particles;
+		bool trace_particles_fly_backwards = false;
+		pad_bytes<3> pad;
 		particle_effect_input trace_particles;
 		particle_effect_input destruction_particles;
 		// END GEN INTROSPECTOR

@@ -17,11 +17,26 @@ inline transformr get_anchored_offset(
 	return { new_center, rotation };
 }
 
+struct attachment_offset_settings {
+	bool consider_mag_rotations = false;
+
+	static auto for_logic() {
+		return attachment_offset_settings();
+	}
+
+	static auto for_rendering() {
+		attachment_offset_settings output;
+		output.consider_mag_rotations = true;
+		return output;
+	}
+};
+
 template <class A, class B, class C>
 transformr direct_attachment_offset(
 	const A& container, 
 	const B& attachment,
 	C get_offsets_by_torso,
+	const attachment_offset_settings settings,
 	const slot_function type
 ) {
 	const auto& cosm = container.get_cosmos();
@@ -37,7 +52,15 @@ transformr direct_attachment_offset(
 
 	auto get_offsets_by_gun = [&]() {
 		if (const auto* const sprite = container.template find<invariants::sprite>()) {
-			return logicals.get_offsets(sprite->image_id).gun;
+			auto offsets = logicals.get_offsets(sprite->image_id).gun;
+
+			if (settings.consider_mag_rotations) {
+				if (const auto* const gun = container.template find<components::gun>()) {
+					offsets.detachable_magazine.rotation += gun->magazine.rotation;
+				}
+			}
+
+			return offsets;
 		}
 
 		return gun_offsets();
@@ -90,6 +113,7 @@ template <class A, class B>
 transformr direct_attachment_offset(
 	const A& container, 
 	const B& attachment,
+	const attachment_offset_settings settings,
 	const slot_function type
 ) {
 	const auto& cosm = container.get_cosmos();
@@ -111,6 +135,7 @@ transformr direct_attachment_offset(
 		container, 
 		attachment, 
 		get_offsets_by_torso,
+		settings,
 		type
 	);
 }

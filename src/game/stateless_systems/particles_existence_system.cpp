@@ -43,9 +43,11 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 				if (const auto missile = spawned_round.find<invariants::missile>()) {
 					const auto& effect = missile->trace_particles;
 
+					const auto rotation = missile->trace_particles_fly_backwards ? 180.f : 0.f;
+
 					effect.start(
 						step,
-						particle_effect_start_input::orbit_local(cosmos[r], { vec2::zero, 180 } )
+						particle_effect_start_input::orbit_local(cosmos[r], { vec2::zero, rotation } )
 					);
 				}
 			}

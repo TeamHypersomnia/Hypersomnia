@@ -205,7 +205,8 @@ FORCE_INLINE void specific_entity_drawer(
 					},
 					[stance_offsets]() {
 						return stance_offsets;
-					}
+					},
+					attachment_offset_settings::for_rendering()
 				);
 
 				if constexpr(typed_handle.template has<components::head>()) {
