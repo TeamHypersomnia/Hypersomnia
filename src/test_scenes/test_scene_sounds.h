@@ -29,6 +29,8 @@ enum class test_scene_sound_id {
 	FIREARM_HEAT_ENGINE,
 #endif
 
+	HEAVY_HEAT_START,
+
 	CAST_SUCCESSFUL,
 	CAST_UNSUCCESSFUL,
 
@@ -56,6 +58,7 @@ enum class test_scene_sound_id {
 
 	STANDARD_GUN_DRAW,
 	STANDARD_PISTOL_DRAW,
+	LEWSII_DRAW,
 
 	BACKPACK_WEAR,
 	BACKPACK_INSERT,
