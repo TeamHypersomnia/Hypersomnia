@@ -1,32 +1,24 @@
 #define INCLUDE_TYPES_IN 1
 
-#include "augs/misc/simple_pair.h"
 #include "application/setups/editor/gui/editor_fae_gui.h"
 #include "application/setups/editor/editor_command_input.h"
-#include "augs/misc/imgui/imgui_enum_radio.h"
 
 void editor_fae_gui_base::interrupt_tweakers() {
 	property_editor_data.last_active.reset();
 	property_editor_data.old_description.clear();
 }
 
-void editor_fae_gui_base::do_view_mode_switch() {
-	using namespace augs::imgui;
-
-	auto child = scoped_child("fae-view-switch");
-	ImGui::Separator();
-	enum_radio(view_mode, true);
-}
-
 #if BUILD_PROPERTY_EDITOR
 
 #include "augs/templates/for_each_std_get.h"
+#include "augs/misc/simple_pair.h"
 
 #include "augs/readwrite/memory_stream.h"
 
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
+#include "augs/misc/imgui/imgui_enum_radio.h"
 
 #include "application/intercosm.h"
 #include "application/setups/editor/editor_folder.h"
@@ -39,6 +31,14 @@ void editor_fae_gui_base::do_view_mode_switch() {
 
 using ticked_flavours_type = editor_fae_gui_base::ticked_flavours_type;
 using ticked_entities_type = editor_fae_gui_base::ticked_entities_type;
+
+void editor_fae_gui_base::do_view_mode_switch() {
+	using namespace augs::imgui;
+
+	auto child = scoped_child("fae-view-switch");
+	ImGui::Separator();
+	enum_radio(view_mode, true);
+}
 
 template <class C>
 void sort_flavours_by_name(const cosmos& cosm, C& ids) {
@@ -196,10 +196,12 @@ void for_each_typed_handle_in(const cosmos& cosm, const C& container, F&& callba
 	}
 }
 
+#endif
 fae_tree_output editor_selected_fae_gui::perform(
 	const editor_fae_gui_input in,
 	const fae_selections_type& matches
 ) {
+#if BUILD_PROPERTY_EDITOR
 	using namespace augs::imgui;
 
 	auto entities = make_scoped_window();
@@ -289,12 +291,18 @@ fae_tree_output editor_selected_fae_gui::perform(
 		default: 
 			return {};
 	}
+#else
+	(void)in;
+	(void)matches;
+	return {};
+#endif
 }
 
 fae_tree_output editor_fae_gui::perform(
 	const editor_fae_gui_input in, 
 	fae_selections_type& all_selections
 ) {
+#if BUILD_PROPERTY_EDITOR
 	using namespace augs::imgui;
 
 	auto entities = make_scoped_window();
@@ -373,19 +381,9 @@ fae_tree_output editor_fae_gui::perform(
 			return {};
 		break;
 	}
-}
-
 #else
-fae_tree_output editor_fae_gui::perform(
-	const editor_fae_gui_input in
-) {
+	(void)in;
+	(void)all_selections;
 	return {};
-}
-
-fae_tree_output editor_selected_fae_gui::perform(
-	const editor_fae_gui_input in,
-	const fae_selections_type& matches
-) {
-	return {};
-}
 #endif
+}

@@ -117,6 +117,7 @@ void editor_common_state_gui::perform(const editor_settings& settings, const edi
 }
 #else
 void editor_common_state_gui::perform(const editor_settings& settings, const editor_command_input in) {
-
+	(void)settings;
+	(void)in;
 }
 #endif

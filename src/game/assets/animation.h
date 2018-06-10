@@ -91,12 +91,18 @@ using make_animation_frames = augs::constant_size_vector<T, ANIMATION_FRAME_COUN
 
 using plain_animation_frames_type = make_animation_frames<plain_animation_frame>;
 
-struct plain_animation : animation_mixin<plain_animation> {
-	// GEN INTROSPECTOR struct plain_animation
-	plain_animation_frames_type frames = {};
+struct plain_animation_meta {
+	// GEN INTROSPECTOR struct plain_animation_meta
 	bool has_backward_frames = false;
 	bool flip_when_cycling = true;
 	pad_bytes<2> pad;
+	// END GEN INTROSPECTOR
+};
+
+struct plain_animation : animation_mixin<plain_animation> {
+	// GEN INTROSPECTOR struct plain_animation
+	plain_animation_frames_type frames = {};
+	plain_animation_meta meta;
 	// END GEN INTROSPECTOR
 };
 

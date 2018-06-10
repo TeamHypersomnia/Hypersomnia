@@ -158,6 +158,12 @@ namespace augs {
 			return scope_guard([]() { ImGui::EndTooltip(); });
 		}
 		
+		inline auto scoped_group() {
+			ImGui::BeginGroup();
+		
+			return scope_guard([]() { ImGui::EndGroup(); });
+		}
+
 		inline auto scoped_item_width(const float v) {
 			ImGui::PushItemWidth(v);
 		

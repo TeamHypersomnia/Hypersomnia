@@ -10,13 +10,16 @@ struct default_widget_provider {
 	static constexpr bool handles = always_false_v<T>;
 
 	template <class T>
+	static constexpr bool handles_prologue = always_false_v<T>;
+
+	template <class T>
 	bool handle(const std::string&, const T&) {
 		static_assert(handles<T>());
 		return false;
 	}
 
 	template <class T>
-	bool handle_container_prologue(const std::string&, const T&) {
+	bool handle_prologue(const std::string&, const T&) {
 		static_assert(handles<typename T::value_type>);
 		return false;
 	}

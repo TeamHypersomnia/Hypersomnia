@@ -170,7 +170,7 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 				30.0f
 			);
 
-			anim.flip_when_cycling = false;
+			anim.meta.flip_when_cycling = false;
 
 			alloc(test_id_type::RESISTANCE_CHARACTER_RIFLE, anim);
 		}
@@ -241,8 +241,8 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 				30.0f
 			);
 
-			anim.has_backward_frames = true;
-			anim.flip_when_cycling = false;
+			anim.meta.has_backward_frames = true;
+			anim.meta.flip_when_cycling = false;
 
 			alloc(test_id_type::SILVER_TROUSERS_STRAFE, anim);
 		} 

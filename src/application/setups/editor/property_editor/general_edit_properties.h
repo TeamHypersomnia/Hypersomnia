@@ -17,10 +17,16 @@
 #include "application/setups/editor/detail/maybe_different_colors.h"
 #include "application/setups/editor/property_editor/tweaker_type.h"
 #include "application/setups/editor/detail/field_address.h"
+#include "augs/templates/introspection_utils/count_members.h"
 
 template <class T>
 static constexpr bool forbid_zero_elements_v = 
 	is_one_of_v<T, plain_animation_frames_type>
+;
+
+template <class T>
+static constexpr bool inline_with_members_v = 
+	is_one_of_v<T, plain_animation_frame>
 ;
 
 template <class T>
@@ -156,7 +162,8 @@ inline auto node_and_columns(
 
 template <
 	class Behaviour,
-	bool pass_notifier_through = false,
+	bool pass_notifier_through,
+	bool inline_properties,
 	class S,
 	class D,
 	class Eq,
@@ -182,12 +189,24 @@ void detail_general_edit_properties(
 		const auto formatted_label = format_field_name(label);
 		const auto identity_label = "##" + label;
 
-		if constexpr(do_handler_or_direct<S, T>) {
-			auto scope = bulleted_property_name(formatted_label, input.extra_columns);
-			auto colors = ::maybe_different_value_cols(input.settings, !equality_predicate(altered)); 
+		if constexpr(inline_properties || do_handler_or_direct<S, T>) {
+			if constexpr(inline_properties) {
+				auto colors = ::maybe_different_value_cols(input.settings, !equality_predicate(altered)); 
 
-			if (auto result = handler_or_direct(input.special_widget_provider, identity_label, altered)) {
-				notify_change_of(formatted_label, *result, altered);
+				if (auto result = handler_or_direct(input.special_widget_provider, identity_label, altered)) {
+					notify_change_of(formatted_label, *result, altered);
+				}
+
+				ImGui::PopItemWidth();
+				ImGui::SameLine();
+			}
+			else {
+				auto scope = bulleted_property_name(formatted_label, input.extra_columns);
+				auto colors = ::maybe_different_value_cols(input.settings, !equality_predicate(altered)); 
+
+				if (auto result = handler_or_direct(input.special_widget_provider, identity_label, altered)) {
+					notify_change_of(formatted_label, *result, altered);
+				}
 			}
 		}
 		else {
@@ -205,7 +224,7 @@ void detail_general_edit_properties(
 
 				auto colors = maybe_disabled_cols(input.settings, !all_equal || !altered.is_enabled);
 
-				detail_general_edit_properties<Behaviour, pass_notifier_through>(input, equality_predicate, notify_change_of, label, altered.value, false);
+				detail_general_edit_properties<Behaviour, pass_notifier_through, inline_properties>(input, equality_predicate, notify_change_of, label, altered.value, false);
 			}
 			else if constexpr(is_std_array_v<T> || is_enum_array_v<T>) {
 				auto further = [&]() {
@@ -219,7 +238,7 @@ void detail_general_edit_properties(
 							element_label = std::to_string(i);
 						}
 
-						detail_general_edit_properties<Behaviour, pass_notifier_through>(input, equality_predicate, notify_change_of, element_label, altered[i]);
+						detail_general_edit_properties<Behaviour, pass_notifier_through, inline_properties>(input, equality_predicate, notify_change_of, element_label, altered[i]);
 					}
 				};
 
@@ -251,10 +270,10 @@ void detail_general_edit_properties(
 					}
 
 					if (auto node = node_and_columns(displayed_container_label, input.extra_columns)) {
-						if constexpr(S::template handles<typename T::value_type>) {
+						if constexpr(S::template handles_prologue<T>) {
 							ImGui::NextColumn();
 
-							if (input.special_widget_provider.handle_container_prologue(displayed_container_label, altered)) {
+							if (input.special_widget_provider.handle_prologue(displayed_container_label, altered)) {
 								notify_change_of(formatted_label, tweaker_type::DISCRETE, altered);
 							}
 
@@ -262,12 +281,13 @@ void detail_general_edit_properties(
 						}
 
 						for (unsigned i = 0; i < static_cast<unsigned>(altered.size()); ++i) {
+							auto i_id = augs::imgui::scoped_id(i);
+
 							if constexpr(expandable) {
 								{
 									auto colors = maybe_disabled_cols(input.settings, altered.size() >= altered.max_size());
-									const auto button_label = typesafe_sprintf("D##%x", i);
 
-									if (ImGui::Button(button_label.c_str())) {
+									if (ImGui::Button("D")) {
 										auto duplicated = altered[i];
 										altered.insert(altered.begin() + i + 1, std::move(duplicated));
 										notify_change_of(formatted_label, tweaker_type::DISCRETE, altered);
@@ -284,9 +304,7 @@ void detail_general_edit_properties(
 										altered.size() == 1 && forbid_zero_elements_v<T>
 									);
 
-									const auto button_label = typesafe_sprintf("-##%x", i);
-
-									if (ImGui::Button(button_label.c_str())) {
+									if (ImGui::Button("-")) {
 										altered.erase(altered.begin() + i);
 										notify_change_of(formatted_label, tweaker_type::DISCRETE, altered);
 										break;
@@ -299,7 +317,7 @@ void detail_general_edit_properties(
 							const auto element_label = std::to_string(i);
 
 							if constexpr(pass_notifier_through) {
-								detail_general_edit_properties<Behaviour, true>(
+								detail_general_edit_properties<Behaviour, true, inline_properties>(
 									input, 
 									equality_predicate,
 									notify_change_of,
@@ -308,7 +326,7 @@ void detail_general_edit_properties(
 								);
 							}
 							else {
-								detail_general_edit_properties<Behaviour, true>(
+								detail_general_edit_properties<Behaviour, true, inline_properties>(
 									input, 
 									[&equality_predicate, i, &altered] (auto&&...) { return equality_predicate(altered, i); },
 									[&notify_change_of, i, &altered] (const auto& l, const tweaker_type t, auto&) { notify_change_of(l, t, altered, i); },
@@ -333,12 +351,33 @@ void detail_general_edit_properties(
 			}
 			else {
 				auto further = [&](const std::string& l, auto& m) {
-					detail_general_edit_properties<Behaviour, pass_notifier_through>(input, equality_predicate, notify_change_of, l, m);
+					detail_general_edit_properties<Behaviour, pass_notifier_through, inline_properties>(input, equality_predicate, notify_change_of, l, m);
 				};
 
 				if (nodify_introspected) {
-					if (auto node = node_and_columns(formatted_label, input.extra_columns)) {
-						augs::introspect(further, altered);
+					if constexpr(inline_with_members_v<T>) {
+						augs::imgui::text(formatted_label);
+						augs::imgui::next_columns(1);
+
+						{
+							auto whole_column = augs::imgui::scoped_item_width(-1);
+
+							const auto num_members = static_cast<int>(augs::count_members(altered));
+							ImGui::PushMultiItemsWidths(num_members);
+
+							auto further_inline = [&](const std::string& l, auto& m) {
+								detail_general_edit_properties<Behaviour, pass_notifier_through, true>(input, equality_predicate, notify_change_of, l, m);
+							};
+
+							augs::introspect(further_inline, altered);
+						}
+
+						augs::imgui::next_columns(1 + input.extra_columns);
+					}
+					else {
+						if (auto node = node_and_columns(formatted_label, input.extra_columns)) {
+							augs::introspect(further, altered);
+						}
 					}
 				}
 				else {
@@ -417,7 +456,7 @@ void general_edit_properties(
 	};
 
 	auto traverse = [&](const auto& member_label, auto& member) {
-		detail_general_edit_properties<Behaviour>(
+		detail_general_edit_properties<Behaviour, false, false>(
 			detail_edit_properties_input<S, D> { 
 				special_widget_provider,
 				sane_defaults,

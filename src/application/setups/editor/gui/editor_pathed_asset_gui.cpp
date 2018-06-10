@@ -1,11 +1,15 @@
 #define INCLUDE_TYPES_IN 1
 
+#include "application/setups/editor/gui/editor_pathed_asset_gui.h"
+
+#if BUILD_PROPERTY_EDITOR
 #include "augs/string/string_templates.h"
 
 #include "augs/templates/introspection_utils/field_name_tracker.h"
 #include "augs/templates/introspection_utils/introspect_with_containers.h"
 
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
+#include "augs/misc/imgui/imgui_image_color_picker.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_game_image.h"
 #include "augs/misc/imgui/path_tree_structs.h"
@@ -14,7 +18,6 @@
 #include "game/organization/for_each_entity_type.h"
 #include "view/viewables/images_in_atlas_map.h"
 
-#include "application/setups/editor/gui/editor_pathed_asset_gui.h"
 #include "application/setups/editor/editor_folder.h"
 #include "application/intercosm.h"
 
@@ -54,52 +57,6 @@ struct pathed_asset_entry : public browsed_path_entry_base<id_type> {
 	{}
 };
 
-inline std::optional<rgba> image_color_picker(
-	const int zoom,
-	const augs::atlas_entry& entry,
-	const augs::image& viewed_image
-) {
-	using namespace augs::imgui;
-
-	auto& io = ImGui::GetIO();
-
-	const auto is = vec2i(entry.get_original_size());
-
-	const auto viewing_size = (is * zoom).operator ImVec2();
-
-	text("Image size: %x, zoom: %x", is, zoom);
-
-	invisible_button_reset_cursor("###OffsetSelector", viewing_size);
-	game_image(entry, viewing_size);
-
-	const auto cross_alpha = 200;
-
-	auto draw_cross = [is, zoom](const vec2i where, const rgba col) {
-		draw_cross_overlay(is, where, zoom, col);
-	};
-
-	const auto pos = ImGui::GetCursorScreenPos();
-
-	const auto image_space_new = vec2i(vec2(io.MousePos.x - pos.x, io.MousePos.y - pos.y) / zoom);
-
-	std::optional<rgba> result;
-
-	if (ImGui::IsItemClicked()) {
-		result = viewed_image.pixel(image_space_new);
-	}
-
-	if (ImGui::IsItemHovered()) {
-		draw_cross(image_space_new, rgba(green.rgb(), cross_alpha));
-
-		auto scope = scoped_tooltip();
-		text("Image space: %x", image_space_new);
-		rgba color_preview = viewed_image.pixel(image_space_new);
-		color_edit("##colorpreview", color_preview);
-	}
-
-	return result;
-}
-
 struct image_color_picker_widget {
 	const assets::image_id id;
 	const images_in_atlas_map& game_atlas;
@@ -109,6 +66,9 @@ struct image_color_picker_widget {
 
 	template <class T>
 	static constexpr bool handles = is_one_of_v<T, rgba>;
+
+	template <class T>
+	static constexpr bool handles_prologue = is_one_of_v<T, std::vector<rgba>>;
 
 	template <class T>
 	auto describe_changed(
@@ -128,7 +88,7 @@ struct image_color_picker_widget {
 	}
 
 	template <class T>
-	bool handle_container_prologue(const std::string& identity_label, T& object) const {
+	bool handle_prologue(const std::string& identity_label, T& object) const {
 		using namespace augs::imgui;
 
 		static_assert(handles<typename T::value_type>);
@@ -194,6 +154,9 @@ struct image_offset_widget {
 
 	template <class T>
 	static constexpr bool handles = is_one_of_v<T, vec2i, transformi>;
+
+	template <class T>
+	static constexpr bool handles_prologue = false;
 
 	template <class T>
 	auto describe_changed(
@@ -338,6 +301,9 @@ struct source_path_widget {
 	static constexpr bool handles = is_maybe_official_path<T>::value;
 
 	template <class T>
+	static constexpr bool handles_prologue = false;
+
+	template <class T>
 	auto describe_changed(
 		const std::string& /* formatted_label */,
 		const T& to
@@ -382,12 +348,15 @@ struct source_path_widget {
 	}
 };
 
+#endif
+
 template <class asset_id_type>
 void editor_pathed_asset_gui<asset_id_type>::perform(
 	const property_editor_settings& settings,
 	const images_in_atlas_map& game_atlas,
    	editor_command_input cmd_in
 ) {
+#if BUILD_PROPERTY_EDITOR
 	constexpr bool is_image_type = std::is_same_v<asset_id_type, assets::image_id>;
 
 	using namespace augs::imgui;
@@ -661,6 +630,10 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 							}
 						}
 
+						if (ImGui::IsItemHovered()) {
+							text_tooltip("Read defaults from:\n%x", meta_lua_path);
+						}
+
 						ImGui::SameLine();
 					}
 
@@ -820,7 +793,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			}
 		};
 
-		int s = 0;
+		int section_index = 0;
 		
 		auto do_section = [&](
 			const auto& paths,
@@ -842,7 +815,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 							callback(p.id);
 						}
 					},
-					s++
+					section_index++
 				);
 
 				if (color) {
@@ -912,6 +885,11 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 	else {
 
 	}
+#else
+	(void)settings;
+	(void)game_atlas;
+	(void)cmd_in;
+#endif
 }
 
 template struct editor_pathed_asset_gui<assets::image_id>;

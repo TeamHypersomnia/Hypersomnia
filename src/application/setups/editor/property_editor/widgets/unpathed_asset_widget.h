@@ -25,6 +25,9 @@ public:
 	;
 
 	template <class T>
+	static constexpr bool handles_prologue = is_one_of_v<T, std::vector<rgba>>;
+
+	template <class T>
 	auto describe_changed(
 		const std::string& formatted_label,
 		const T& asset_id

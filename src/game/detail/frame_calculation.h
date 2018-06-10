@@ -39,13 +39,13 @@ frame_and_flip<T> get_frame_and_flip(
 	const auto index = state.index;
 	auto i = index;
 
-	if (animation.has_backward_frames && state.backward) {
+	if (animation.meta.has_backward_frames && state.backward) {
 		i = frames_n - index - 1;
 	}
 
 	return { 
 		animation.frames[std::min(frames_n - 1, i)], 
-		animation.flip_when_cycling && state.flip
+		animation.meta.flip_when_cycling && state.flip
 	};
 }
 
