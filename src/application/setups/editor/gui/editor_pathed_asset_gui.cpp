@@ -6,7 +6,7 @@
 #include "augs/string/string_templates.h"
 
 #include "augs/templates/introspection_utils/field_name_tracker.h"
-#include "augs/templates/introspection_utils/introspect_with_containers.h"
+#include "augs/templates/introspection_utils/on_dynamic_content.h"
 
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_image_color_picker.h"

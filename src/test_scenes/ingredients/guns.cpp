@@ -610,7 +610,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::VINDICATOR_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {3700.f, 3700.f};
+			gun_def.muzzle_velocity = {3900.f, 3900.f};
 			gun_def.shot_cooldown_ms = 60.f;
 
 			gun_def.shell_spawn_offset.pos.set(0, 10);
@@ -619,7 +619,7 @@ namespace test_flavours {
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 2.2f;
-			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
+			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = 80.f;
 

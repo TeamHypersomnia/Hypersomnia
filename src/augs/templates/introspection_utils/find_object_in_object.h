@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/templates/identity_templates.h"
 
-#include "augs/templates/introspection_utils/introspect_with_containers.h"
+#include "augs/templates/introspection_utils/on_dynamic_content.h"
 #include "augs/templates/introspection_utils/field_name_tracker.h"
 #include "augs/templates/introspection_utils/types_in.h"
 

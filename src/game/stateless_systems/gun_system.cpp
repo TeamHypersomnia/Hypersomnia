@@ -222,7 +222,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						const auto trigger_effect_cooldown_ms = 100.f;
 
 						if (gun.play_trigger_effect_once && augs::try_to_fire_and_reset(trigger_effect_cooldown_ms, gun.when_last_played_trigger_effect, now, delta)) {
-							if (heat <= 0.2f) {
+							if (heat <= 2.f) {
 								gun.magazine.apply(50000.5f * delta.in_seconds());
 
 								auto chosen_effect = gun_def.heavy_heat_start_sound;
