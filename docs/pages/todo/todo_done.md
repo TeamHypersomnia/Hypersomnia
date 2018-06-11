@@ -996,3 +996,4 @@ we consider whole type overrides too complex architeciturally:
 	- Interaction with item attachment offsets
 		- item invariant should specify hand offset, which will determine relative positioning to the hand
 
+- on_dynamic_content rename 

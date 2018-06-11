@@ -1,19 +1,14 @@
 #pragma once
 #include <unordered_set>
 
-#include "augs/image/image.h"
-#include "view/maybe_official_path.h"
 #include "augs/graphics/imgui_payload.h"
+
+#include "application/setups/editor/detail/editor_image_preview.h"
 
 #include "application/setups/editor/editor_command_input.h"
 #include "application/setups/editor/gui/standard_window_mixin.h"
 #include "application/setups/editor/gui/asset_path_browser_settings.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
-
-struct editor_image_preview {
-	augs::image image;
-	maybe_official_path<assets::image_id> path;
-};
 
 class images_in_atlas_map;
 

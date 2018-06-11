@@ -6,6 +6,13 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Fix this: due to a filter, the node disappears during renaming
+	- just when constructing a filter, save a name with which it was remembered in cached fae selections
+		- i guess we will still be able to do for eaches and all flav id getters even with changed state structure
+	- also when it is duplicated
+	- Just rebuild a cache each time a filter is modified?
+		- Not responsive if for example history is moved around, so no.
+
 - Possibly abort the for_each_flavour loop altogether after deleting a flavour?
 	- Will only be problematic if the ids will be rewritten in place, which won't even be the case with sparse pools, not even with pointer ids
 	- Only problematic with direct index-based ids
@@ -76,11 +83,6 @@ summary: Just a hidden scratchpad.
 	- Can make those the first in test scene image enums so that we can stop importing images after some point
 
 - Ctrl+I shall open a quick go to gui that will instantiate a chosen flavour
-
-- Fix this: due to a filter, the node disappears during renaming
-	- just when constructing a filter, save a name with which it was remembered in cached fae selections
-		- i guess we will still be able to do for eaches and all flav id getters even with changed state structure
-	- also when it is duplicated
 
 - finish work with atlas and sound regeneration
 	- regenerate only seen assets

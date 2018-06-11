@@ -1,6 +1,7 @@
 #pragma once
 #include <tuple>
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
+#include "application/setups/editor/property_editor/property_editor_settings.h"
 
 inline auto maybe_different_value_cols(
 	const property_editor_settings& settings,

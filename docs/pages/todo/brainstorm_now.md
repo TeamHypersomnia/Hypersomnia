@@ -6,7 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- on_dynamic_content rename 
 - Animation import
 	- It will be useful to not have to re-specify parameters of official animations.
 	Will also reduce the load for test scene code where it does not buy us much.

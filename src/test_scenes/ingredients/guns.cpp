@@ -633,7 +633,7 @@ namespace test_flavours {
 			gun_def.maximum_heat = 4.0f;
 			gun_def.gunshot_adds_heat = 0.2f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.4f;
-			gun_def.recoil_multiplier = 2.f;
+			gun_def.recoil_multiplier = 1.7f;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);

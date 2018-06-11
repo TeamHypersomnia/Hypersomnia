@@ -108,8 +108,6 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 	auto& definitions = get_asset_pool<asset_id_type>(cmd_in);
 	using def_type = typename remove_cref<decltype(definitions)>::mapped_type;
 
-	const auto label = uncapitalize_first(format_field_name(get_type_name_strip_namespace<def_type>()));
-
 	for_each_id_and_object(definitions,
 		[&](const auto id, const def_type& object) mutable {
 			asset_entry_type new_entry;
@@ -123,26 +121,29 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 			(new_entry.used() ? used_assets : orphaned_assets).emplace_back(std::move(new_entry));
 		}
 	);
-	auto for_each_range = [](auto callback) {
-		callback(orphaned_assets);
-		callback(used_assets);
-	};
 
-	auto prepare = [&](auto& range) {
-		erase_if(range, [&](const auto& entry) {
-			const auto& displayed_name = entry.name;
+	{
+		auto for_each_range = [](auto callback) {
+			callback(orphaned_assets);
+			callback(used_assets);
+		};
 
-			if (!filter.PassFilter(displayed_name.c_str())) {
-				return true;
-			}
+		auto prepare = [&](auto& range) {
+			erase_if(range, [&](const auto& entry) {
+				const auto& displayed_name = entry.name;
 
-			return false;
-		});
+				if (!filter.PassFilter(displayed_name.c_str())) {
+					return true;
+				}
 
-		sort_range(range);
-	};
+				return false;
+			});
 
-	for_each_range(prepare);
+			sort_range(range);
+		};
+
+		for_each_range(prepare);
+	}
 
 	auto files_view = scoped_child("Assets view");
 
@@ -330,6 +331,8 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 
 		ImGui::Separator();
 	};
+
+	const auto label = uncapitalize_first(format_field_name(get_type_name_strip_namespace<def_type>()));
 
 	if (show_orphaned) {
 		do_section(
