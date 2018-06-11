@@ -206,7 +206,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 void viewables_streaming::finalize_load(viewables_finalize_input in) {
 	auto& now_all_defs = now_loaded_viewables_defs;
 
-	/* Unpack asynchronous asset loading results */
+	/* Unpack results of asynchronous asset loading */
 
 	if (valid_and_is_ready(future_general_atlas)) {
 		const bool measure_atlas_uploading = in.measure_atlas_upload;
@@ -262,7 +262,7 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 		auto& now_loaded_defs = now_all_defs.sounds;
 		auto& new_loaded_defs = future_sound_definitions;
 
-		auto unload = [&](const assets::sound_id key){
+		auto unload = [&](const assets::sound_id key) {
 			in.sounds.clear_sources_playing(key);
 			loaded_sounds.erase(key);
 		};

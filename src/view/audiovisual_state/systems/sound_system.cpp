@@ -35,12 +35,17 @@ void sound_system::start_fading(generic_sound_cache& cache, const float fade_per
 }
 
 void sound_system::clear_sources_playing(const assets::sound_id id) {
-	erase_if(fading_sources, [id](fading_source& source) {
+	erase_if(fading_sources, [id](const fading_source& source) {
 		return id == source.id;
 	});
 	
-	erase_if(short_sounds, [id](generic_sound_cache& it) {
+	auto erase_pred = [id](const generic_sound_cache& it) {
 		return id == it.original.input.id;
+	};
+
+	erase_if(short_sounds, erase_pred);
+	erase_if(firearm_engine_caches, [erase_pred](const auto& it) {
+		return erase_pred(it.second);
 	});
 }
 
