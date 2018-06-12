@@ -17,6 +17,9 @@ struct frames_prologue_widget {
 	const std::vector<assets::plain_animation_id>& ticked_ids;
 	const bool is_current_ticked;
 
+	const images_in_atlas_map& game_atlas;
+	const bool preview_animations;
+
 	template <class T>
 	static constexpr bool handles = false;
 

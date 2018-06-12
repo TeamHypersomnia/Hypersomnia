@@ -43,8 +43,6 @@ struct image_offset_widget {
 		auto iw = scoped_item_width(80);
 
 		if (auto combo = scoped_combo((identity_label + "Picker").c_str(), "Pick...", ImGuiComboFlags_HeightLargest)) {
-			auto& io = ImGui::GetIO();
-
 			const auto& entry = game_atlas.at(id);
 
 			const auto is = vec2i(entry.get_original_size());
@@ -77,6 +75,8 @@ struct image_offset_widget {
 			;
 
 			const auto pos = ImGui::GetCursorScreenPos();
+
+			const auto& io = ImGui::GetIO();
 
 			const auto image_space_new = vec2i(vec2(io.MousePos.x - pos.x, io.MousePos.y - pos.y) / zoom);
 			const auto image_space_old = reference_point + current_pos;

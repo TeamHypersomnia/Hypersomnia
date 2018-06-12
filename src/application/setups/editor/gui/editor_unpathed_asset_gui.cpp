@@ -56,6 +56,7 @@ struct unpathed_asset_entry {
 template <class asset_id_type>
 void editor_unpathed_asset_gui<asset_id_type>::perform(
 	const property_editor_settings& settings,
+	const images_in_atlas_map& game_atlas,
    	const editor_command_input cmd_in
 ) {
 	using namespace augs::imgui;
@@ -72,6 +73,13 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 
 	ImGui::SameLine();
 	checkbox("Using locations", show_using_locations);
+
+	constexpr bool is_animation_type = std::is_same_v<asset_id_type, assets::plain_animation_id>;
+
+	if constexpr(is_animation_type) {
+		ImGui::SameLine();
+		checkbox("Preview animations", preview_animations);
+	}
 
 	ImGui::Separator();
 
@@ -251,8 +259,6 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 			const auto& project_path = cmd_in.folder.current_path;
 			auto& viewables = folder.work->viewables;
 
-			constexpr bool is_animation_type = std::is_same_v<asset_id_type, assets::plain_animation_id>;
-
 			using frames_widget_type = 
 				std::conditional_t<
 					is_animation_type,
@@ -280,7 +286,7 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 				},
 				special_widgets(
 					pathed_asset_widget { viewables, project_path, cmd_in },
-					frames_widget_type { prop_in, cmd_in, id, project_path, ticked_ids, is_current_ticked }
+					frames_widget_type { prop_in, cmd_in, id, project_path, ticked_ids, is_current_ticked, game_atlas, preview_animations }
 				),
 				asset_sane_default_provider { viewables },
 				num_cols - 2

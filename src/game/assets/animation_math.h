@@ -2,6 +2,33 @@
 #include "augs/math/declare_math.h"
 #include "game/assets/animation_templates.h"
 
+template <class T, class M>
+auto get_max_frame_size(const T& frames, const M& manager) {
+	vec2u result;
+
+	for (const auto& f : frames) {
+		const auto frame_size = manager.at(f.image_id).get_original_size();
+
+		result.x = std::max(result.x, frame_size.x);
+		result.y = std::max(result.y, frame_size.y);
+	}
+
+	return result;
+}
+
+template <class T>
+auto get_total_duration(
+	const T& frames
+) {
+	real32 result = 0.f;
+
+	for (const auto& f : frames) {
+		result += f.duration_milliseconds;
+	}
+
+	return result;
+}
+
 template <class T>
 auto calc_current_frame_index(
 	const T& frames, 

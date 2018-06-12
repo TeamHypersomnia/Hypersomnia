@@ -19,7 +19,7 @@ namespace augs {
 		}
 
 		template <class T>
-		void game_image(const augs::atlas_entry& entry, const T& size) {
+		void game_image(const augs::atlas_entry& entry, const T& size, const vec2 offset = vec2::zero) {
 			const auto imsize = static_cast<ImVec2>(size);
 
 			std::array<vec2, 4> texcoords = {
@@ -33,11 +33,11 @@ namespace augs {
 				t = entry.get_atlas_space_uv(t);
 			}
 
-			const auto cpos = ImGui::GetCursorScreenPos();
+			const auto cpos = vec2(ImGui::GetCursorScreenPos()) + offset;
 
 			ImGui::GetWindowDrawList()->AddImageQuad(
 				reinterpret_cast<ImTextureID>(augs::imgui_atlas_type::GAME),
-				cpos,
+				static_cast<ImVec2>(cpos),
 				{ cpos.x + imsize.x, cpos.y },
 				{ cpos.x + imsize.x, cpos.y + imsize.y },
 				{ cpos.x, cpos.y + imsize.y },

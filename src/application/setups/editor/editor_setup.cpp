@@ -437,8 +437,8 @@ void editor_setup::perform_custom_imgui(
 		images_gui.perform(settings.property_editor, game_atlas, make_command_input());
 		sounds_gui.perform(settings.property_editor, game_atlas, make_command_input());
 
-		particle_effects_gui.perform(settings.property_editor, make_command_input());
-		plain_animations_gui.perform(settings.property_editor, make_command_input());
+		particle_effects_gui.perform(settings.property_editor, game_atlas, make_command_input());
+		plain_animations_gui.perform(settings.property_editor, game_atlas, make_command_input());
 
 		const auto all_selected = [&]() -> decltype(get_all_selected_entities()) {
 			auto selections = get_all_selected_entities();

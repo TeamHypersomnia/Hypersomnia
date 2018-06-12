@@ -5,6 +5,8 @@
 #include "application/setups/editor/gui/standard_window_mixin.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
+class images_in_atlas_map;
+
 template <class asset_id_type>
 struct editor_unpathed_asset_gui : standard_window_mixin<editor_unpathed_asset_gui<asset_id_type>> {
 	using base = standard_window_mixin<editor_unpathed_asset_gui<asset_id_type>>;
@@ -15,11 +17,16 @@ struct editor_unpathed_asset_gui : standard_window_mixin<editor_unpathed_asset_g
 	// GEN INTROSPECTOR struct editor_unpathed_asset_gui class asset_id_type
 	bool show_orphaned = true;
 	bool show_using_locations = false;
+	bool preview_animations = true;
 	// END GEN INTROSPECTOR
 
 	bool acquire_missing_paths = true;
 
-	void perform(const property_editor_settings&, editor_command_input);
+	void perform(
+		const property_editor_settings&, 
+		const images_in_atlas_map&,
+		editor_command_input
+	);
 
 private:
 	std::unordered_set<asset_id_type> ticked_assets;

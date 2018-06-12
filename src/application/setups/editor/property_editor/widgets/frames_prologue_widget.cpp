@@ -1,6 +1,10 @@
+#include "augs/misc/timing/timer.h"
 #include "augs/filesystem/file.h"
+#include "augs/misc/imgui/imgui_game_image.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
+#include "game/assets/animation_math.h"
+#include "view/viewables/images_in_atlas_map.h"
 #include "application/setups/editor/property_editor/widgets/frames_prologue_widget.h"
 #include "application/setups/editor/detail/field_address.h"
 
@@ -37,6 +41,25 @@ bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation
 	const auto& logicals = cmd_in.get_logical_assets();
 	const auto& defs = cmd_in.get_viewable_defs();
 	const auto& image_defs = defs.image_definitions;
+
+	if (preview_animations) {
+		thread_local augs::timer anim_timer;
+
+		const auto& anim = *logicals.find(id);
+		const auto total_duration = static_cast<double>(::get_total_duration(anim.frames));
+		const auto total_time = anim_timer.get<std::chrono::milliseconds>();
+		const auto considered_time = std::fmod(total_time, total_duration);
+		const auto current_frame = ::calc_current_frame(anim, considered_time);
+
+		const auto& entry = game_atlas.at(current_frame->image_id);
+
+		const auto is = vec2i(entry.get_original_size());
+
+		const auto max_aabb = ::get_max_frame_size(anim.frames, game_atlas);
+
+		game_image(entry.diffuse, is, max_aabb / 2 - is / 2);
+		invisible_button("###animpreview", max_aabb);
+	}
 
 	bool has_parent = false;
 
