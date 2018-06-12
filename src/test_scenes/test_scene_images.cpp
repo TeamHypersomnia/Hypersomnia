@@ -1,7 +1,6 @@
 #include "augs/filesystem/file.h"
 #include "augs/misc/pool/pool.h"
 
-#include "view/viewables/image_in_atlas.h"
 #include "view/viewables/image_meta.h"
 #include "view/viewables/image_definition.h"
 

@@ -608,6 +608,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/viewables/streaming/viewables_streaming.cpp"
 	"src/view/viewables/streaming/viewables_streaming_profiler.cpp"
 	"src/application/setups/editor/gui/editor_unpathed_asset_gui.cpp"
+	"src/application/setups/editor/property_editor/widgets/frames_prologue_widget.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

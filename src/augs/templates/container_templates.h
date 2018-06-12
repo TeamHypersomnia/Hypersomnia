@@ -224,3 +224,7 @@ bool is_last_in(C& container, T& object) {
 	return diff == static_cast<decltype(diff)>(container.size() - 1);
 }
 
+template <class C>
+bool container_full(const C& container) {
+	return container.size() == container.max_size();
+}

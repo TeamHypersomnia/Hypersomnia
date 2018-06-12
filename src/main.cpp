@@ -1715,14 +1715,13 @@ catch (augs::filesystem_error err) {
 
 	return EXIT_FAILURE;
 }
-
+/* We want the debugger to break if it is not in production */
+#if IS_PRODUCTION_BUILD
 catch (const std::runtime_error err) {
 	LOG("std::runtime_error thrown: %x", err.what());
 
 	return EXIT_FAILURE;
 }
-/* We want the debugger to break if it is not in production */
-#if IS_PRODUCTION_BUILD
 catch (...) {
 	LOG("Unknown exception.");
 	return EXIT_FAILURE;

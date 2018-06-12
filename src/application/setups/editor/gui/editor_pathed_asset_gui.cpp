@@ -227,15 +227,17 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			const auto displayed_name = tree_settings.get_prettified(path_entry.get_filename());
 			const auto displayed_dir = path_entry.get_displayed_directory();
 
-			const auto current_ticked = is_ticked(path_entry);
+			const auto is_current_ticked = is_ticked(path_entry);
 
-			const auto flags = do_selection_checkbox(ticked_assets, id, current_ticked, id);
+			const auto flags = do_selection_checkbox(ticked_assets, id, is_current_ticked, id);
 
 			if (!path_entry.used()) {
 				const auto scoped_style = in_line_button_style();
 
 				if (ImGui::Button("F")) {
-					auto forget = [&](const auto& which, const bool has_parent) {
+					bool has_parent = false;
+
+					auto forget = [&](const auto& which) {
 						forget_asset_id_command<asset_id_type> cmd;
 						cmd.freed_id = which.id;
 						cmd.built_description = 
@@ -244,24 +246,20 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 						cmd.common.has_parent = has_parent;
 						post_editor_command(cmd_in, std::move(cmd));
+
+						has_parent = true;
 					};
 
-					if (!current_ticked) {
-						forget(path_entry, false);
+					if (!is_current_ticked) {
+						forget(path_entry);
 					}
 					else {
-						const auto& all = ticked_in_range;
-
-						forget(all[0], false);
-
-						for (std::size_t i = 1; i < all.size(); ++i) {
-							forget(all[i], true);
-						}
+						for_each_in(ticked_in_range, forget);
 					}
 				}
 
 				if (ImGui::IsItemHovered()) {
-					if (current_ticked && ticked_in_range.size() > 1) {
+					if (is_current_ticked && ticked_in_range.size() > 1) {
 						text_tooltip("Forget %x %xs", ticked_in_range.size(), label);
 					}
 					else {
@@ -353,7 +351,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 					{
 						if (ImGui::Button("Write defaults")) {
-							if (!current_ticked) {
+							if (!is_current_ticked) {
 								save_meta_lua(cmd_in.lua, definition_object.meta, resolved);
 							}
 							else {
@@ -383,7 +381,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 								return meta_path.string() + " " + get_lwt(meta_path);
 							};
 
-							if (!current_ticked) {
+							if (!is_current_ticked) {
 								text_tooltip("Write defaults to:\n%x", print_path(resolved));
 							}
 							else {
@@ -424,7 +422,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 						cmd.affected_assets = { id };
 					}
 					else {
-						if (current_ticked) {
+						if (is_current_ticked) {
 							cmd.affected_assets = ticked_ids;
 						}
 						else {
@@ -456,7 +454,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 				auto prop_in = property_editor_input { settings, property_editor_data };
 
-				const bool disable_path_chooser = current_ticked && ticked_ids.size() > 1;
+				const bool disable_path_chooser = is_current_ticked && ticked_ids.size() > 1;
 
 				/* 
 					Don't construct this widget for sounds and other pathed widgets. 
@@ -485,7 +483,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 					post_new_change,
 					rewrite_last_change,
 					[&](const auto& first, const field_address field_id) {
-						if (!current_ticked) {
+						if (!is_current_ticked) {
 							return true;
 						}
 

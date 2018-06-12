@@ -21,10 +21,13 @@
 #include "application/setups/editor/detail/find_locations_that_use.h"
 #include "application/setups/editor/detail/checkbox_selection.h"
 #include "application/setups/editor/detail/duplicate_delete_buttons.h"
+
+#include "application/setups/editor/property_editor/widgets/frames_prologue_widget.h"
 #include "application/setups/editor/property_editor/widgets/asset_sane_default_provider.h"
-#include "application/setups/editor/property_editor/compare_all_fields_to.h"
-#include "application/setups/editor/property_editor/special_widgets.h"
 #include "application/setups/editor/property_editor/widgets/pathed_asset_widget.h"
+#include "application/setups/editor/property_editor/special_widgets.h"
+
+#include "application/setups/editor/property_editor/compare_all_fields_to.h"
 #include "augs/readwrite/byte_readwrite.h"
 
 #include "augs/templates/list_utils.h"
@@ -158,9 +161,9 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 		auto scope = scoped_id(id);
 		const auto& displayed_name = asset_entry.name;
 
-		const auto current_ticked = is_ticked(asset_entry);
+		const auto is_current_ticked = is_ticked(asset_entry);
 
-		const auto flags = do_selection_checkbox(ticked_assets, id, current_ticked, id);
+		const auto flags = do_selection_checkbox(ticked_assets, id, is_current_ticked, id);
 
 		const auto result = duplicate_delete_buttons<
 			duplicate_asset_command<asset_id_type>,
@@ -214,7 +217,7 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 			) {
 				command_type cmd;
 
-				if (current_ticked) {
+				if (is_current_ticked) {
 					cmd.affected_assets = ticked_ids;
 				}
 				else {
@@ -247,13 +250,23 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 			const auto& project_path = cmd_in.folder.current_path;
 			auto& viewables = folder.work->viewables;
 
+			constexpr bool is_animation_type = std::is_same_v<asset_id_type, assets::plain_animation_id>;
+
+			using frames_widget_type = 
+				std::conditional_t<
+					is_animation_type,
+					frames_prologue_widget,
+					default_widget_provider
+				>
+			;
+
 			general_edit_properties(
 				prop_in,
 				definitions[id],
 				post_new_change,
 				rewrite_last_change,
 				[&](const auto& first, const field_address field_id) {
-					if (!current_ticked) {
+					if (!is_current_ticked) {
 						return true;
 					}
 
@@ -265,7 +278,8 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 					);
 				},
 				special_widgets(
-					pathed_asset_widget { viewables, project_path, cmd_in }
+					pathed_asset_widget { viewables, project_path, cmd_in },
+					frames_widget_type { cmd_in, id, project_path, ticked_ids, is_current_ticked }
 				),
 				asset_sane_default_provider { viewables },
 				num_cols - 2

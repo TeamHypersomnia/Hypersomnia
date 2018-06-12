@@ -79,7 +79,7 @@ struct animation_mixin {
 struct plain_animation_frame {
 	// GEN INTROSPECTOR struct plain_animation_frame
 	assets::image_id image_id;
-	float duration_milliseconds = 0.f;
+	float duration_milliseconds = 20.f;
 	// END GEN INTROSPECTOR
 };
 

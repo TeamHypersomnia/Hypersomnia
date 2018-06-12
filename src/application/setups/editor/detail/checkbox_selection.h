@@ -32,7 +32,7 @@ ImGuiTreeNodeFlags do_selection_checkbox(
 			if (current_selected && !altered) {
 				erase_element(current_selections, current_id);
 			}
-			else if(!current_selected && altered) {
+			else if (!current_selected && altered) {
 				current_selections.emplace(current_id);
 			}
 		}

@@ -13,6 +13,8 @@ struct editor_fae_gui;
 class cosmos;
 
 struct entity_id;
+struct all_viewables_defs;
+struct all_logical_assets;
 
 struct editor_command_input {
 	sol::state& lua;
@@ -23,6 +25,9 @@ struct editor_command_input {
 	editor_entity_mover& mover;
 
 	cosmos& get_cosmos() const; 
+
+	all_viewables_defs& get_viewable_defs() const;
+	const all_logical_assets& get_logical_assets() const;
 
 	void purge_selections() const;
 	void interrupt_tweakers() const;

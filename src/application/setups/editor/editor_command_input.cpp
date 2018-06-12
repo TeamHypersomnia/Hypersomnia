@@ -8,6 +8,14 @@
 
 #include "application/setups/editor/gui/editor_fae_gui.h"
 
+all_viewables_defs& editor_command_input::get_viewable_defs() const {
+	return folder.work->viewables;
+}
+
+const all_logical_assets& editor_command_input::get_logical_assets() const {
+	return get_cosmos().get_logical_assets();
+}
+
 cosmos& editor_command_input::get_cosmos() const {
 	return folder.work->world;
 }
