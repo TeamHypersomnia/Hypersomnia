@@ -1,5 +1,6 @@
 #pragma once
 #include <cstddef>
+#include "augs/build_settings/offsetof.h"
 #include "augs/filesystem/path_declaration.h"
 #include "game/assets/animation.h"
 #include "view/viewables/particle_effect.h"
@@ -93,4 +94,4 @@ auto make_field_address(const std::size_t offset) {
 	return result;
 }
 
-#define MACRO_MAKE_FIELD_ADDRESS(a,b) make_field_address<decltype(a :: b)>(augs_offsetof(a,b))
+#define MACRO_MAKE_FIELD_ADDRESS(a,b) make_field_address<decltype(a::b)>(augs_offsetof(a,b))

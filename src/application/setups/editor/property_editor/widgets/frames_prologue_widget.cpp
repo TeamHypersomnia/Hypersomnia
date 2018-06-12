@@ -1,6 +1,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "application/setups/editor/property_editor/widgets/frames_prologue_widget.h"
+#include "application/setups/editor/detail/field_address.h"
 
 #include "application/setups/editor/detail/get_id_or_import.h"
 #include "augs/readwrite/memory_stream.h"
@@ -53,6 +54,22 @@ bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation
 		else {
 			for_each_in(ticked_ids, callback);
 		}
+	};
+
+	auto post_new_frames = [&](
+		const auto id,
+		const auto& new_frames,
+		auto&& description
+	) {
+		change_prop_command cmd;
+
+		cmd.common.has_parent = get_has_parent();
+		cmd.affected_assets = { id };
+		cmd.property_id.field = MACRO_MAKE_FIELD_ADDRESS(plain_animation, frames);
+		cmd.value_after_change = augs::to_bytes(new_frames);
+		cmd.built_description = std::forward<decltype(description)>(description);
+
+		post_editor_command(cmd_in, std::move(cmd));
 	};
 
 	if (ImGui::Button("From file sequence")) {
@@ -112,15 +129,8 @@ bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation
 				}
 			}
 
-			change_prop_command cmd;
-
-			cmd.common.has_parent = get_has_parent();
-			cmd.affected_assets = { id };
-			cmd.property_id.field = make_field_address(source_animation, source_animation.frames);
-			cmd.value_after_change = augs::to_bytes(new_frames);
-			cmd.built_description = typesafe_sprintf("Read a sequence of %x frames starting from %x", new_frames.size(), first_source_path.path);
-
-			post_editor_command(cmd_in, std::move(cmd));
+			auto description = typesafe_sprintf("Read a sequence of %x frames starting from %x", new_frames.size(), first_source_path.path);
+			post_new_frames(id, new_frames, description);
 		};
 
 		on_current_or_ticked(import_frames);
@@ -130,17 +140,37 @@ bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation
 		auto reverse_frames = [&](const auto& id) {
 			const auto& source_animation = *logicals.find(id);
 			auto new_frames = source_animation.frames;
-			reverse_range(new_frames);
 
-			change_prop_command cmd;
+			auto description = typesafe_sprintf("Reversed frames in %x", get_displayed_name(source_animation, image_defs));
+			post_new_frames(id, reverse_range(new_frames), description);
+		};
 
-			cmd.common.has_parent = get_has_parent();
-			cmd.affected_assets = { id };
-			cmd.property_id.field = make_field_address(source_animation, source_animation.frames);
-			cmd.value_after_change = augs::to_bytes(new_frames);
-			cmd.built_description = typesafe_sprintf("Reversed frames in %x", get_displayed_name(source_animation, image_defs));
+		on_current_or_ticked(reverse_frames);
+	}
 
-			post_editor_command(cmd_in, std::move(cmd));
+	ImGui::SameLine();
+
+	if (ImGui::Button("Ping-pong")) {
+		auto reverse_frames = [&](const auto& id) {
+			const auto& source_animation = *logicals.find(id);
+			auto new_frames = source_animation.frames;
+
+			{
+				auto second_half = new_frames;
+				reverse_range(second_half);
+				second_half.erase(second_half.begin());
+
+				for (auto& s : second_half) {
+					if (container_full(new_frames)) {
+						break;
+					}
+
+					new_frames.push_back(s);
+				}
+			}
+
+			auto description = typesafe_sprintf("Ping-ponged frames in %x", get_displayed_name(source_animation, image_defs));
+			post_new_frames(id, new_frames, description);
 		};
 
 		on_current_or_ticked(reverse_frames);
