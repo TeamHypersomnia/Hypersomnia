@@ -32,6 +32,14 @@ void create_unpathed_asset_id_command<I>::redo(const editor_command_input in) {
 	if constexpr(has_get_name_v<O>) {
 		new_object.name = ::find_free_name(pool, get_type_name_strip_namespace<O>() + "-");
 	}
+
+	if constexpr(has_frames_v<O>) {
+		/* Always create a single frame to avoid crashes */
+
+		frame_type_t<O> f;
+		f.image_id = in.get_viewable_defs().image_definitions.get_nth_id(0);
+		new_object.frames.push_back(f);
+	}
 }
 
 template <class I>

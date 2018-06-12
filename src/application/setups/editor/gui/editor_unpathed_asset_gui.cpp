@@ -15,6 +15,7 @@
 #include "application/setups/editor/editor_folder.h"
 #include "application/intercosm.h"
 
+#include "application/setups/editor/detail/read_write_defaults_buttons.h"
 #include "application/setups/editor/detail/other_styles.h"
 #include "application/setups/editor/detail/format_struct_name.h"
 #include "application/setups/editor/property_editor/general_edit_properties.h"

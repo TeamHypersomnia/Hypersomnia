@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/filesystem/file.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 
 #include "view/try_load_meta_lua.h"
