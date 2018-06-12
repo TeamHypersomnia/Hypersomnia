@@ -27,26 +27,36 @@ std::optional<unsigned long> get_number_at_end(const std::string& s) {
 bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation_frames_type&) const {
 	using namespace augs::imgui;
 
+	using change_prop_command = change_asset_property_command<animation_id_type>;
+
+	const auto& logicals = cmd_in.get_logical_assets();
+	const auto& defs = cmd_in.get_viewable_defs();
+	const auto& image_defs = defs.image_definitions;
+
+	bool has_parent = false;
+
+	/* 
+		TODO: Probably let history have push/pop commands parent?
+		So that we don't have funny lambdas for has_parent.
+	*/
+
+	auto get_has_parent = [&has_parent]() {
+		const bool hp = has_parent;
+		has_parent = true;
+		return hp;
+	};
+
+	auto on_current_or_ticked = [&](auto callback) {
+		if (!is_current_ticked) {
+			callback(id);
+		}
+		else {
+			for_each_in(ticked_ids, callback);
+		}
+	};
+
 	if (ImGui::Button("From file sequence")) {
-		const auto& logicals = cmd_in.get_logical_assets();
-		const auto& defs = cmd_in.get_viewable_defs();
-
-		bool has_parent = false;
-
-		/* 
-			TODO: Probably let history have push/pop commands parent?
-			So that we don't have funny lambdas for has_parent.
-		*/
-
-		auto get_has_parent = [&has_parent]() mutable {
-			const bool hp = has_parent;
-			has_parent = true;
-			return hp;
-		};
-
-		auto import_frames = [&](const auto& id) mutable {
-			const auto& image_defs = defs.image_definitions;
-
+		auto import_frames = [&](const auto& id) {
 			const auto& source_animation = *logicals.find(id);
 			const auto& frames = source_animation.frames;
 
@@ -102,9 +112,7 @@ bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation
 				}
 			}
 
-			using command_type = change_asset_property_command<animation_id_type>;
-
-			command_type cmd;
+			change_prop_command cmd;
 
 			cmd.common.has_parent = get_has_parent();
 			cmd.affected_assets = { id };
@@ -115,12 +123,27 @@ bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation
 			post_editor_command(cmd_in, std::move(cmd));
 		};
 
-		if (!is_current_ticked) {
-			import_frames(id);
-		}
-		else {
-			for_each_in(ticked_ids, import_frames);
-		}
+		on_current_or_ticked(import_frames);
+	}
+
+	if (ImGui::Button("Reverse")) {
+		auto reverse_frames = [&](const auto& id) {
+			const auto& source_animation = *logicals.find(id);
+			auto new_frames = source_animation.frames;
+			reverse_range(new_frames);
+
+			change_prop_command cmd;
+
+			cmd.common.has_parent = get_has_parent();
+			cmd.affected_assets = { id };
+			cmd.property_id.field = make_field_address(source_animation, source_animation.frames);
+			cmd.value_after_change = augs::to_bytes(new_frames);
+			cmd.built_description = typesafe_sprintf("Reversed frames in %x", get_displayed_name(source_animation, image_defs));
+
+			post_editor_command(cmd_in, std::move(cmd));
+		};
+
+		on_current_or_ticked(reverse_frames);
 	}
 
 	return false;
