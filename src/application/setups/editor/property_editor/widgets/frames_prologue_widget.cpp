@@ -1,5 +1,6 @@
 #include "augs/filesystem/file.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
+#include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "application/setups/editor/property_editor/widgets/frames_prologue_widget.h"
 #include "application/setups/editor/detail/field_address.h"
 
@@ -27,6 +28,9 @@ std::optional<unsigned long> get_number_at_end(const std::string& s) {
 
 bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation_frames_type&) const {
 	using namespace augs::imgui;
+
+	using frames_type = plain_animation_frames_type;
+	using frame_type = typename frames_type::value_type;
 
 	using change_prop_command = change_asset_property_command<animation_id_type>;
 
@@ -80,9 +84,6 @@ bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation
 			const auto& first_image_def = image_defs[frames[0].image_id];
 			const auto& first_source_path = first_image_def.get_source_path();
 			const auto first_path_no_ext = augs::path_type(first_source_path.path).replace_extension("");
-
-			using frames_type = remove_cref<decltype(frames)>;
-			using frame_type = typename frames_type::value_type;
 
 			frames_type new_frames;
 			new_frames.push_back(frames[0]);
@@ -174,6 +175,56 @@ bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation
 		};
 
 		on_current_or_ticked(reverse_frames);
+	}
+
+	using duration_type = decltype(frame_type::duration_milliseconds);
+
+	std::optional<duration_type> constant_rate;
+	bool abrt = false;
+
+	auto check_if_constant = [&](const auto& id) {
+		if (abrt) { return; }
+
+		const auto& source_animation = *logicals.find(id);
+
+		for (auto& f : source_animation.frames) {
+			if (!constant_rate) {
+				constant_rate = f.duration_milliseconds;
+			}
+			else if (constant_rate != f.duration_milliseconds) {
+				constant_rate = std::nullopt;
+				abrt = true;
+				return;
+			}
+		}
+	};
+
+	on_current_or_ticked(check_if_constant);
+
+	const auto fmt = constant_rate ? "%.0f" : "Set...";
+
+	{
+		text("Constant framerate:");
+
+		ImGui::SameLine();
+
+		auto sw = scoped_item_width(-1);
+
+		if (drag("###constantframerate", *constant_rate, 1.f, 1.f, 1000.f, fmt)) {
+			auto set_constant_rate = [&](const auto id) {
+				const auto& source_animation = *logicals.find(id);
+				auto new_frames = source_animation.frames;
+
+				for (auto& f : new_frames) {
+					f.duration_milliseconds = *constant_rate;
+				}
+
+				auto description = typesafe_sprintf("Set constant framerate of %x ms in %x", *constant_rate, get_displayed_name(source_animation, image_defs));
+				post_new_frames(id, new_frames, description);
+			};
+
+			on_current_or_ticked(set_constant_rate);
+		}
 	}
 
 	return false;

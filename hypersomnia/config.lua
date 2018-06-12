@@ -273,7 +273,7 @@ return {
   },
   session = {
     automatically_hide_settings_ingame = false,
-    show_developer_console = true,
+    show_developer_console = false,
     camera_query_aabb_mult = 1.0
   },
   test_scene = {
