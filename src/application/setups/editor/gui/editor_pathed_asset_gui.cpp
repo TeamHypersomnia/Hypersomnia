@@ -5,6 +5,7 @@
 #if BUILD_PROPERTY_EDITOR
 #include "augs/string/string_templates.h"
 
+#include "augs/templates/list_utils.h"
 #include "augs/templates/introspection_utils/field_name_tracker.h"
 #include "augs/templates/introspection_utils/on_dynamic_content.h"
 
@@ -30,14 +31,12 @@
 #include "application/setups/editor/property_editor/widgets/source_path_widget.h"
 
 #include "application/setups/editor/property_editor/general_edit_properties.h"
+#include "application/setups/editor/detail/read_write_defaults_buttons.h"
 #include "application/setups/editor/detail/find_locations_that_use.h"
 #include "application/setups/editor/detail/checkbox_selection.h"
 #include "application/setups/editor/property_editor/compare_all_fields_to.h"
 #include "application/setups/editor/property_editor/special_widgets.h"
 #include "augs/readwrite/byte_readwrite.h"
-
-#include "view/try_load_meta_lua.h"
-#include "augs/templates/list_utils.h"
 
 template <class id_type>
 struct pathed_asset_entry : public browsed_path_entry_base<id_type> {
@@ -312,102 +311,24 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			ImGui::NextColumn();
 
 			if (node) {
-				auto& definition_object = definitions[id];
-				const auto& project_path = cmd_in.folder.current_path;
-				using command_type = change_asset_property_command<asset_id_type>;
-
 				auto sc = scoped_indent();
 
 				{
-					using def_type = std::remove_reference_t<decltype(definition_object)>;
-					const auto& view = asset_definition_view<const def_type>(project_path, definition_object);
-					const auto resolved = view.get_resolved_source_path();
-
-					{
-						const auto meta_lua_path = get_meta_lua_path(resolved);
-						auto cols = maybe_disabled_cols(settings, !augs::exists(meta_lua_path));
-
-						if (ImGui::Button("Read defaults")) {
-							try {
-								decltype(definition_object.meta) new_meta;
-								try_load_meta_lua(cmd_in.lua, new_meta, resolved);
-
-								command_type cmd;
-
-								cmd.affected_assets = { id };
-								cmd.property_id.field = make_field_address(definition_object, definition_object.meta);
-								cmd.value_after_change = augs::to_bytes(new_meta);
-								cmd.built_description = "Read defaults from " + augs::to_display(meta_lua_path);
-
-								post_editor_command(cmd_in, std::move(cmd));
-							}
-							catch (...) {
-
-							}
-						}
-
-						if (ImGui::IsItemHovered()) {
-							text_tooltip("Read defaults from:\n%x", meta_lua_path);
-						}
-
-						ImGui::SameLine();
-					}
-
-					{
-						if (ImGui::Button("Write defaults")) {
-							if (!is_current_ticked) {
-								save_meta_lua(cmd_in.lua, definition_object.meta, resolved);
-							}
-							else {
-								for (const auto& t : ticked_in_range) {
-									const auto& ticked_definition_object = definitions[t.id];
-									const auto& ticked_view = asset_definition_view<const def_type>(project_path, ticked_definition_object);
-									const auto ticked_resolved = ticked_view.get_resolved_source_path();
-
-									save_meta_lua(cmd_in.lua, ticked_definition_object.meta, ticked_resolved);
-								}
-							}
-						}
-
-						if (ImGui::IsItemHovered()) {
-							auto get_lwt = [](const augs::path_type& meta_path) {
-								try {
-									const auto lwt = augs::last_write_time(meta_path);
-									return typesafe_sprintf("(LM: %x)", augs::date_time(lwt).how_long_ago_tell_seconds());
-								}
-								catch (...) {
-									return std::string("(Doesn't exist)");
-								}
-							};
-
-							auto print_path = [&](const augs::path_type& ticked_resolved) {
-								const auto meta_path = get_meta_lua_path(ticked_resolved);
-								return meta_path.string() + " " + get_lwt(meta_path);
-							};
-
-							if (!is_current_ticked) {
-								text_tooltip("Write defaults to:\n%x", print_path(resolved));
-							}
-							else {
-								std::string all_resolved;
-
-								for (const auto& t : ticked_in_range) {
-									const auto& ticked_definition_object = definitions[t.id];
-									const auto& ticked_view = asset_definition_view<const def_type>(project_path, ticked_definition_object);
-									const auto ticked_resolved = ticked_view.get_resolved_source_path();
-
-									all_resolved += print_path(ticked_resolved) + "\n";
-								}
-
-								text_tooltip("Write defaults to:\n%x", all_resolved);
-							}
-						}
-					}
+					::read_write_defaults_buttons(
+						settings,
+						cmd_in,
+						definitions,
+						id,
+						is_current_ticked,
+						ticked_in_range
+					);
 
 					next_columns(num_cols);
 				}
 
 				const auto property_location = typesafe_sprintf(" (in %x)", displayed_name);
+
+				using command_type = change_asset_property_command<asset_id_type>;
 
 				auto post_new_change = [&](
 					const auto& description,
@@ -481,9 +402,11 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 					>
 				;
 
+				const auto& project_path = cmd_in.folder.current_path;
+
 				general_edit_properties(
 					prop_in,
-					definition_object,
+					definitions[id],
 					post_new_change,
 					rewrite_last_change,
 					[&](const auto& first, const field_address field_id) {
