@@ -15,6 +15,7 @@ class cosmos;
 struct entity_id;
 struct all_viewables_defs;
 struct all_logical_assets;
+struct editor_history;
 
 struct editor_command_input {
 	sol::state& lua;
@@ -26,6 +27,7 @@ struct editor_command_input {
 
 	cosmos& get_cosmos() const; 
 
+	editor_history& get_history() const;
 	all_viewables_defs& get_viewable_defs() const;
 	const all_logical_assets& get_logical_assets() const;
 
@@ -36,5 +38,5 @@ struct editor_command_input {
 
 template <class E, class T>
 decltype(auto) post_editor_command(const E& in, T&& cmd) {
-	return in.folder.history.execute_new(std::forward<T>(cmd), in);
+	return in.get_history().execute_new(std::forward<T>(cmd), in);
 }

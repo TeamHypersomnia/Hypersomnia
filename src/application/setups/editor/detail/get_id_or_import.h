@@ -3,7 +3,7 @@
 #include "view/maybe_official_path.h"
 
 #include "view/try_load_meta_lua.h"
-#include "application/setups/editor/editor_folder.h"
+#include "application/setups/editor/editor_history.h"
 #include "application/setups/editor/editor_command_input.h"
 
 template <class I, class P>
@@ -18,7 +18,7 @@ I get_id_or_import(
 		return *asset_id;
 	}
 
-	auto& history = in.folder.history;
+	auto& history = in.get_history();
 
 	{
 		using def_type = typename P::mapped_type;

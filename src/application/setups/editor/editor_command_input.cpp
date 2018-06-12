@@ -8,6 +8,10 @@
 
 #include "application/setups/editor/gui/editor_fae_gui.h"
 
+editor_history& editor_command_input::get_history() const {
+	return folder.history;
+}
+
 all_viewables_defs& editor_command_input::get_viewable_defs() const {
 	return folder.work->viewables;
 }

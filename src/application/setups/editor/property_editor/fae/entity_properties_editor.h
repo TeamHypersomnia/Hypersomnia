@@ -25,7 +25,7 @@ void edit_component(
 	const auto cmd_in = cpe_in.command_in;
 
 	/* Linker error fix */
-	auto& history = cmd_in.folder.history;
+	auto& history = cmd_in.get_history();
 
 	auto post_new_change = [&](
 		const auto& description,

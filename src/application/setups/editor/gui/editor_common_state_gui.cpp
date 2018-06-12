@@ -43,7 +43,7 @@ static void edit_common(
 
 	auto& cmd_in = in.command_in;
 	/* Linker error fix */
-	auto& history = cmd_in.folder.history;
+	auto& history = cmd_in.get_history();
 
 	auto post_new_change = [&](
 		const auto& description,

@@ -416,14 +416,7 @@ void general_edit_properties(
 ) {
 	using namespace augs::imgui;
 
-	{
-		auto& last_active = prop_in.state.last_active;
-
-		if (last_active && last_active.value() != ImGui::GetActiveID()) {
-			last_active.reset();
-			prop_in.state.old_description = {};
-		}
-	}
+	prop_in.state.poll_change_of_active_widget();
 
 	auto do_tweaker = [&](const auto tw_in) {
 		const auto type = tw_in.type;
@@ -439,19 +432,14 @@ void general_edit_properties(
 			);
 		}
 		else if (type == tweaker_type::CONTINUOUS) {
-			const auto this_id = ImGui::GetActiveID();
 			const auto description = ::describe_changed(field_name, new_value, special_widget_provider);
 
-			auto& last_active = prop_in.state.last_active;
-
-			if (last_active != this_id) {
+			if (prop_in.state.tweaked_widget_changed()) {
 				post_new_change(description, field_location, new_value);
 			}
 			else {
 				rewrite_last(description, new_value);
 			}
-
-			last_active = this_id;
 		}
 	};
 

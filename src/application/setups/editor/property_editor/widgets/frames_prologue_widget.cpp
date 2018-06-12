@@ -201,7 +201,7 @@ bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation
 
 	on_current_or_ticked(check_if_constant);
 
-	const auto fmt = constant_rate ? "%.0f" : "Set...";
+	const auto fmt = constant_rate ? "%.0f ms" : "Set...";
 
 	{
 		text("Constant framerate:");
@@ -210,7 +210,17 @@ bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation
 
 		auto sw = scoped_item_width(-1);
 
+		if (!constant_rate) {
+			constant_rate = 0.f;
+		}
+
 		if (drag("###constantframerate", *constant_rate, 1.f, 1.f, 1000.f, fmt)) {
+			const bool new_cmd = prop_in.state.tweaked_widget_changed();
+
+			if (!new_cmd) {
+				cmd_in.get_history().undo(cmd_in);
+			}
+
 			auto set_constant_rate = [&](const auto id) {
 				const auto& source_animation = *logicals.find(id);
 				auto new_frames = source_animation.frames;
@@ -220,6 +230,7 @@ bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation
 				}
 
 				auto description = typesafe_sprintf("Set constant framerate of %x ms in %x", *constant_rate, get_displayed_name(source_animation, image_defs));
+
 				post_new_frames(id, new_frames, description);
 			};
 

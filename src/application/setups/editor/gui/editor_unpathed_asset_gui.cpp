@@ -236,7 +236,7 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 				const auto& description,
 				const auto& new_content
 			) {
-				auto& last = cmd_in.folder.history.last_command();
+				auto& last = cmd_in.get_history().last_command();
 
 				if (auto* const cmd = std::get_if<command_type>(std::addressof(last))) {
 					cmd->built_description = description + property_location;
@@ -280,7 +280,7 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 				},
 				special_widgets(
 					pathed_asset_widget { viewables, project_path, cmd_in },
-					frames_widget_type { cmd_in, id, project_path, ticked_ids, is_current_ticked }
+					frames_widget_type { prop_in, cmd_in, id, project_path, ticked_ids, is_current_ticked }
 				),
 				asset_sane_default_provider { viewables },
 				num_cols - 2

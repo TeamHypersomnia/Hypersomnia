@@ -3,10 +3,12 @@
 #include "game/assets/all_logical_assets.h"
 #include "view/viewables/all_viewables_defs.h"
 #include "application/setups/editor/editor_command_input.h"
+#include "application/setups/editor/property_editor/property_editor_structs.h"
 
 struct frames_prologue_widget {
 	using animation_id_type = assets::plain_animation_id;
 
+	const property_editor_input prop_in;
 	const editor_command_input cmd_in;
 	const animation_id_type id;
 

@@ -366,7 +366,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 					const auto& description,
 					const auto& new_content
 				) {
-					auto& last = cmd_in.folder.history.last_command();
+					auto& last = cmd_in.get_history().last_command();
 
 					if (auto* const cmd = std::get_if<command_type>(std::addressof(last))) {
 						cmd->built_description = description + property_location;

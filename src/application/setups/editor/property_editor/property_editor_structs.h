@@ -7,9 +7,15 @@
 
 struct property_editor_settings;
 
-struct property_editor_state {
-	std::optional<ImGuiID> last_active;
+class property_editor_state {
+	std::optional<ImGuiID> last_tweaked;
+
+public:
 	std::string old_description = "";
+
+	void poll_change_of_active_widget();
+	bool tweaked_widget_changed();
+	void reset();
 };
 
 struct property_editor_input {

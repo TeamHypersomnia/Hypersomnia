@@ -58,7 +58,7 @@ void edit_invariant(
 	}();
 
 	/* Linker error fix */
-	auto& history = cmd_in.folder.history;
+	auto& history = cmd_in.get_history();
 
 	auto& defs = cmd_in.folder.work->viewables;
 	auto& old_description = cpe_in.prop_in.state.old_description;

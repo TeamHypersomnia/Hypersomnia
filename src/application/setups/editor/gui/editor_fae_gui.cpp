@@ -4,8 +4,7 @@
 #include "application/setups/editor/editor_command_input.h"
 
 void editor_fae_gui_base::interrupt_tweakers() {
-	property_editor_data.last_active.reset();
-	property_editor_data.old_description.clear();
+	property_editor_data.reset();
 }
 
 #if BUILD_PROPERTY_EDITOR

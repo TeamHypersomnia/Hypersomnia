@@ -10,7 +10,7 @@ void editor_history_gui::perform(const editor_command_input in) {
 	using namespace augs::imgui;
 	using index_type = editor_history::index_type;
 
-	auto& history = in.folder.history;
+	auto& history = in.get_history();
 
 	auto window = make_scoped_window();
 
