@@ -110,14 +110,14 @@ namespace augs {
 			}
 		}
 
-		template <class T, class... Args>
+		template <class T>
 		decltype(auto) drag_vec2(
 			const std::string& label,
 			basic_vec2<T>& into,
 			const float speed = 1.f,
 			T v_min = static_cast<T>(0),
 			T v_max = static_cast<T>(0),
-			Args&&... args
+			const char* const fmt = nullptr
 		) {
 			using namespace detail;
 
@@ -125,12 +125,12 @@ namespace augs {
 
 			if constexpr(std::is_integral_v<T>) {
 				return direct_or_convert(into, [&](vec2i& input) {
-					return ImGui::DragInt2(label.c_str(), &input.x, speed, v_min, v_max, std::forward<Args>(args)...);
+					return ImGui::DragInt2(label.c_str(), &input.x, speed, v_min, v_max, fmt);
 				});
 			}
 			else if constexpr(std::is_floating_point_v<T>) {
 				return direct_or_convert(into, [&](vec2& input) {
-					return ImGui::DragFloat2(label.c_str(), &input.x, speed, v_min, v_max, std::forward<Args>(args)...);
+					return ImGui::DragFloat2(label.c_str(), &input.x, speed, v_min, v_max, fmt);
 				});
 			}
 			else {
@@ -138,14 +138,14 @@ namespace augs {
 			}
 		}
 
-		template <class T, class... Args>
+		template <class T>
 		decltype(auto) drag_transform(
 			const std::string& label_s,
 			basic_transform<T>& into,
 			const float speed = 1.f,
 			T v_min = static_cast<T>(0),
 			T v_max = static_cast<T>(0),
-			Args&&... args
+			const char* const fmt = nullptr
 		) {
 			using namespace detail;
 			using namespace ImGui;
@@ -171,13 +171,13 @@ namespace augs {
 			PushMultiItemsWidths(3);
 
 			PushID(0);
-			value_changed |= DragScalar("##v", pos_data_type, &into.pos.x, speed, &v_min, &v_max, std::forward<Args>(args)...);
+			value_changed |= DragScalar("##v", pos_data_type, &into.pos.x, speed, &v_min, &v_max, fmt);
 			SameLine(0, g.Style.ItemInnerSpacing.x);
 			PopID();
 			PopItemWidth();
 
 			PushID(1);
-			value_changed |= DragScalar("##v", pos_data_type, &into.pos.y, speed, &v_min, &v_max, std::forward<Args>(args)...);
+			value_changed |= DragScalar("##v", pos_data_type, &into.pos.y, speed, &v_min, &v_max, fmt);
 			SameLine(0, g.Style.ItemInnerSpacing.x);
 			PopID();
 			PopItemWidth();
@@ -187,7 +187,7 @@ namespace augs {
 			const float dmin = -180.f;
 			const float dmax = 180.f;
 
-			value_changed |= DragScalar("##v", ImGuiDataType_Float, &into.rotation, speed, &dmin, &dmax, std::forward<Args>(args)...);
+			value_changed |= DragScalar("##v", ImGuiDataType_Float, &into.rotation, speed, &dmin, &dmax, fmt);
 			SameLine(0, g.Style.ItemInnerSpacing.x);
 			PopID();
 			PopItemWidth();
@@ -199,14 +199,14 @@ namespace augs {
 			return value_changed;
 		}
 
-		template <class T, class... Args>
+		template <class T>
 		decltype(auto) drag_minmax(
 			const std::string& label,
 			minmax<T>& into,
 			const float speed = 1.f,
 			T v_min = static_cast<T>(0),
 			T v_max = static_cast<T>(0),
-			Args&&... args
+			const char* const fmt = nullptr
 		) {
 			using namespace detail;
 
@@ -214,12 +214,12 @@ namespace augs {
 
 			if constexpr(std::is_integral_v<T>) {
 				return direct_or_convert(into, [&](minmax<int>& input) {
-					return ImGui::DragIntRange2(label.c_str(), std::addressof(input.first), std::addressof(input.second), speed, v_min, v_max, std::forward<Args>(args)...);
+					return ImGui::DragIntRange2(label.c_str(), std::addressof(input.first), std::addressof(input.second), speed, v_min, v_max, fmt);
 				});
 			}
 			else if constexpr(std::is_floating_point_v<T>) {
 				return direct_or_convert(into, [&](minmax<float>& input) {
-					return ImGui::DragFloatRange2(label.c_str(), std::addressof(input.first), std::addressof(input.second), speed, v_min, v_max, std::forward<Args>(args)...);
+					return ImGui::DragFloatRange2(label.c_str(), std::addressof(input.first), std::addressof(input.second), speed, v_min, v_max, fmt);
 				});
 			}
 			else {
@@ -227,14 +227,14 @@ namespace augs {
 			}
 		}
 
-		template <class T, class... Args>
+		template <class T>
 		decltype(auto) drag(
 			const std::string& label,
 			T& into,
 			const float speed = 1.f,
 			T v_min = static_cast<T>(0),
 			T v_max = static_cast<T>(0),
-			Args&&... args
+			const char* const fmt = nullptr
 		) {
 			using namespace detail;
 
@@ -242,12 +242,12 @@ namespace augs {
 
 			if constexpr(std::is_integral_v<T>) {
 				return direct_or_convert(into, [&](int& input) {
-					return ImGui::DragInt(label.c_str(), &input, speed, v_min, v_max, std::forward<Args>(args)...);
+					return ImGui::DragInt(label.c_str(), &input, speed, v_min, v_max, fmt);
 				});
 			}
 			else if constexpr(std::is_floating_point_v<T>) {
 				return direct_or_convert(into, [&](float& input) {
-					return ImGui::DragFloat(label.c_str(), &input, speed, v_min, v_max, std::forward<Args>(args)...);
+					return ImGui::DragFloat(label.c_str(), &input, speed, v_min, v_max, fmt);
 				});
 			}
 			else {
@@ -336,13 +336,13 @@ namespace augs {
 			ImGui::NextColumn();
 		};
 
-		template <class T, class... Args>
+		template <class T>
 		bool slider(
 			const std::string& label, 
 			T& into, 
 			T lower_bound,
 			T upper_bound,
-			Args&&... args
+			const char* const fmt = nullptr
 		) {
 			using namespace detail;
 
@@ -350,27 +350,27 @@ namespace augs {
 
 			if constexpr(std::is_integral_v<T>) {
 				return direct_or_convert(into, [&](int& input) {
-					return ImGui::SliderInt(label.c_str(), &input, lower_bound, upper_bound, std::forward<Args>(args)...);
+					return ImGui::SliderInt(label.c_str(), &input, lower_bound, upper_bound, fmt);
 				});
 			}
 			else if constexpr(std::is_floating_point_v<T>) {
 				return direct_or_convert(into, [&](float& input) {
-					return ImGui::SliderFloat(label.c_str(), &input, lower_bound, upper_bound, std::forward<Args>(args)...);
+					return ImGui::SliderFloat(label.c_str(), &input, lower_bound, upper_bound, fmt);
 				});
 			}
 			else if constexpr(std::is_same_v<T, ImVec2>) {
 				return direct_or_convert(into, [&](ImVec2& input) {
-					return ImGui::SliderFloat2(label.c_str(), &input.x, lower_bound, upper_bound, std::forward<Args>(args)...);
+					return ImGui::SliderFloat2(label.c_str(), &input.x, lower_bound, upper_bound, fmt);
 				});
 			}
 			else if constexpr(std::is_same_v<T, vec2> || std::is_same_v<T, vec2d>) {
 				return direct_or_convert(into, [&](vec2& input) {
-					return ImGui::SliderFloat2(label.c_str(), &input.x, lower_bound, upper_bound, std::forward<Args>(args)...);
+					return ImGui::SliderFloat2(label.c_str(), &input.x, lower_bound, upper_bound, fmt);
 				});
 			}
 			else if constexpr(std::is_same_v<T, vec2i> || std::is_same_v<T, vec2u>) {
 				return direct_or_convert(into, [&](vec2i& input) {
-					return ImGui::SliderInt2(label.c_str(), &input.x, lower_bound, upper_bound, std::forward<Args>(args)...);
+					return ImGui::SliderInt2(label.c_str(), &input.x, lower_bound, upper_bound, fmt);
 				});
 			}
 		}
@@ -393,7 +393,7 @@ namespace augs {
 						changed = true;
 					} 
 				}
-				
+
 				return changed;
 			};
 		}
