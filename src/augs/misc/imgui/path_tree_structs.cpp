@@ -5,8 +5,10 @@
 void path_tree_settings::do_tweakers() {
 	using namespace augs::imgui;
 
+#if TODO_LINEAR_VIEW
 	checkbox("Linear view", linear_view);
 	ImGui::SameLine();
+#endif
 	checkbox("Prettify filenames", prettify_filenames);
 }
 
