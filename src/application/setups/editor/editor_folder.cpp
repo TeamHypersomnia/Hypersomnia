@@ -62,13 +62,8 @@ void editor_folder::save_folder(const augs::path_type& to, const augs::path_type
 	augs::save_as_bytes(view, paths.view_file);
 	augs::save_as_bytes(history, paths.hist_file);
 
-	try {
-		const auto old_autosave_path = paths.autosave_path;
-		augs::remove_directory(old_autosave_path);
-	}
-	catch (...) {
-
-	}
+	const auto old_autosave_path = paths.autosave_path;
+	augs::remove_directory(old_autosave_path);
 }
 
 std::optional<editor_warning> editor_folder::load_folder_maybe_autosave() {

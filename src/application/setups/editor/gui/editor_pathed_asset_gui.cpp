@@ -279,8 +279,12 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 			if constexpr(is_image_type) {
 				if (ImGui::IsItemHovered()) {
-					auto tooltip = scoped_tooltip();
-					game_image_button("###TooltipPreview", game_atlas.at(id).diffuse);
+					const auto entry = game_atlas.at(id).diffuse;
+
+					if (entry.was_successfully_packed) {
+						auto tooltip = scoped_tooltip();
+						game_image_button("###TooltipPreview", entry);
+					}
 				}
 			}
 

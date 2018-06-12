@@ -51,7 +51,11 @@ void bake_fresh_atlas(
 			auto& out_entry = baked.images[input_img_id];
 
 			try {
-				const auto u_size = [&]() { auto sc = measure_scope(scope); return augs::image::get_size(input_img_id); }();
+				const auto u_size = [&]() { 
+					auto sc = measure_scope(scope); 
+					return augs::image::get_size(input_img_id); 
+				}();
+
 				out_entry.cached_original_size_pixels = u_size;
 
 				const auto size = vec2i(u_size);
@@ -59,6 +63,7 @@ void bake_fresh_atlas(
 			}
 			catch (augs::image_loading_error err) {
 				out_entry.cached_original_size_pixels = vec2u::zero;
+				rects_for_packer.push_back(rect_xywh(0, 0, 0, 0));
 			}
 		}
 	}
@@ -118,13 +123,7 @@ void bake_fresh_atlas(
 		constexpr bool allow_flip = true;
 
 		using spaces_type = rectpack2D::empty_spaces<allow_flip>;
-		using rect_ptr = rect_xywhf*;
 
-		auto pathology_sort = [](const rect_ptr a, const rect_ptr b) {
-			return a->get_wh().pathological_mult() > b->get_wh().pathological_mult();
-		};
-
-#if 1
 		const auto result_size = find_best_packing<spaces_type>(
 			rects_for_packer,
 			make_finder_input(
@@ -134,38 +133,7 @@ void bake_fresh_atlas(
 				[](auto){ ensure(false); return false; }
 			)
 		);
-		(void)pathology_sort;
 
-#else
-		std::vector<rect_ptr> input_for_packer;
-
-		for (auto& r : rects_for_packer) {
-			input_for_packer.push_back(&r);
-		}
-
-		(void)max_size;
-		(void)pathology_sort;
-		auto packing_root = spaces_type({ 2432, 2432 });
-
-		sort_range(input_for_packer,[](const rect_ptr a, const rect_ptr b) {
-			//return std::max(a->w, a->h) > std::max(b->w, b->h);
-			return a->get_wh().pathological_mult() > b->get_wh().pathological_mult();
-			});
-
-
-		for (auto* rr : input_for_packer) {
-			if (const auto n = packing_root.insert(rr->get_wh())) {
-				*rr = *n;
-			}
-			else {
-				ensure(false);
-				break;
-			}
-		}
-
-		const auto result_size = packing_root.get_rects_aabb();
-
-#endif
 		output_image_size = vec2u(result_size.w, result_size.h);
 
 		std::size_t total_used_space = 0;
@@ -185,8 +153,6 @@ void bake_fresh_atlas(
 		out.profiler.wasted_space_percent.measure(100 * double(wasted_space) / output_image_size.area());
 		//out.profiler.atlas_width.measure(output_image_size.x);
 	}
-
-	// translate pixels into atlas space and render the image
 
 	auto output_image = [&out, output_image_size]() {
 		if (out.whole_image != nullptr) {
@@ -217,7 +183,14 @@ void bake_fresh_atlas(
 
 			for (const auto& input_img_id : subjects.images) {
 				const auto current_rect = index_in(subjects.images, input_img_id);
-				augs::file_to_bytes(input_img_id, all_loaded_bytes[current_rect]);
+
+				try {
+					all_loaded_bytes[current_rect].clear();
+					augs::file_to_bytes(input_img_id, all_loaded_bytes[current_rect]);
+				}
+				catch (...) {
+
+				}
 			}
 		}
 
@@ -257,30 +230,51 @@ void bake_fresh_atlas(
 			const auto& input_img_id = subjects.images[current_rect];
 			const auto packed_rect = rects_for_packer[current_rect];
 
-			{
-				auto& output_entry = baked.images[input_img_id];
+			auto& output_entry = baked.images[input_img_id];
 
-				if (output_entry.cached_original_size_pixels.non_zero()) {
-					output_entry.atlas_space.set(
-						static_cast<float>(packed_rect.x) / output_image_size.x,
-						static_cast<float>(packed_rect.y) / output_image_size.y,
-						static_cast<float>(packed_rect.w) / output_image_size.x,
-						static_cast<float>(packed_rect.h) / output_image_size.y
-					);
+			auto set_glitch_uv = [&output_entry, output_image_size](){
+				output_entry.atlas_space.set(0.f, 0.f, 1.f, 1.f);
+				output_entry.cached_original_size_pixels = output_image_size;
+				output_entry.was_flipped = false;
+				output_entry.was_successfully_packed = false;
+			};
 
-					output_entry.was_flipped = packed_rect.flipped;
-				}
-				else {
-					output_entry.atlas_space.set(0.f, 0.f, 1.f, 1.f);
-					output_entry.cached_original_size_pixels = output_image_size;
-					output_entry.was_flipped = false;
+			if (output_entry.cached_original_size_pixels.is_zero()) {
+				/* 
+					Image failed to load from disk. 
 
-					return;
-				}
+					Set the texture coordinate to the entire atlas, 
+					so that the glitch is immediately noticeable.
+				*/
+
+				set_glitch_uv();
+				return;
 			}
 
+			output_entry.atlas_space.set(
+				static_cast<float>(packed_rect.x) / output_image_size.x,
+				static_cast<float>(packed_rect.y) / output_image_size.y,
+				static_cast<float>(packed_rect.w) / output_image_size.x,
+				static_cast<float>(packed_rect.h) / output_image_size.y
+			);
+
+			output_entry.was_flipped = packed_rect.flipped;
+			output_entry.was_successfully_packed = true;
+
 			thread_local augs::image loaded_image;
-			loaded_image.from_png(all_loaded_bytes[current_rect], input_img_id);
+
+			if (all_loaded_bytes[current_rect].empty()) {
+				set_glitch_uv();
+				return;
+			}
+
+			try {
+				loaded_image.from_png(all_loaded_bytes[current_rect], input_img_id);
+			}
+			catch (...) {
+				set_glitch_uv();
+				return;
+			}
 
 #if DEBUG_FILL_IMGS_WITH_COLOR
 			loaded_image.fill(white.set_hsv({ rng.randval(0.0f, 1.0f), rng.randval(0.3f, 1.0f), rng.randval(0.3f, 1.0f) }));
@@ -296,9 +290,9 @@ void bake_fresh_atlas(
 			);
 		};
 
-#if 0
+#if 1
 		for (auto& r : subjects.images) {
-			worker(r);
+			worker(worker_inputs[index_in(subjects.images, r)]);
 		}
 #else
 		const auto num_workers = std::size_t(in.blitting_threads);

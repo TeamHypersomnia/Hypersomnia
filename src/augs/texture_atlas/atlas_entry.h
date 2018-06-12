@@ -6,7 +6,8 @@ namespace augs {
 	struct atlas_entry {
 		xywh atlas_space;
 		bool was_flipped = false;
-		pad_bytes<3> pad;
+		bool was_successfully_packed = false;
+		pad_bytes<2> pad;
 
 		/*
 			Each atlas entry caches its original size 

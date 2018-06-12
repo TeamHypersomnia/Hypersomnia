@@ -44,11 +44,13 @@ namespace augs {
 	}
 
 	inline decltype(auto) remove_file(const path_type& path) {
-		return std::experimental::filesystem::remove(path);
+		std::error_code err;
+		return std::experimental::filesystem::remove(path, err);
 	}
 
 	inline decltype(auto) remove_directory(const path_type& path) {
-		return std::experimental::filesystem::remove_all(path);
+		std::error_code err;
+		return std::experimental::filesystem::remove_all(path, err);
 	}
 
 	inline path_type first_free_path(const path_type path_template) {
