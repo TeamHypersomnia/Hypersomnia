@@ -39,7 +39,7 @@ frame_and_flip<T> get_frame_and_flip(
 	const auto index = state.index;
 	auto i = index;
 
-	if (animation.meta.has_backward_frames && state.backward) {
+	if (animation.meta.specifies_backward_frames && state.backward) {
 		i = frames_n - index - 1;
 	}
 

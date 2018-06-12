@@ -93,7 +93,7 @@ using plain_animation_frames_type = make_animation_frames<plain_animation_frame>
 
 struct plain_animation_meta {
 	// GEN INTROSPECTOR struct plain_animation_meta
-	bool has_backward_frames = false;
+	bool specifies_backward_frames = false;
 	bool flip_when_cycling = true;
 	pad_bytes<2> pad;
 	// END GEN INTROSPECTOR

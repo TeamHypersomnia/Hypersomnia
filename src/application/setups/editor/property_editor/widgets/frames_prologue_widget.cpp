@@ -159,7 +159,7 @@ bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation
 			{
 				auto second_half = new_frames;
 				reverse_range(second_half);
-				second_half.erase(second_half.begin());
+				//second_half.erase(second_half.begin());
 
 				for (auto& s : second_half) {
 					if (container_full(new_frames)) {

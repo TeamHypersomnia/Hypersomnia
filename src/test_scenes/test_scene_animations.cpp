@@ -14,7 +14,8 @@ void create_frames(
 	T& anim,
 	const test_scene_image_id first_frame,
 	const test_scene_image_id last_frame,
-	const float frame_duration_ms
+	const float frame_duration_ms,
+	const bool ping_pong = false
 ) {
 	const auto first = int(first_frame);
 	const auto last = int(last_frame);
@@ -36,6 +37,10 @@ void create_frames(
 
 			anim.frames.push_back(frame);
 		}
+	}
+
+	if (ping_pong) {
+		create_frames(anim, last_frame, first_frame, frame_duration_ms, false);
 	}
 }
 
@@ -241,7 +246,7 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 				30.0f
 			);
 
-			anim.meta.has_backward_frames = true;
+			anim.meta.specifies_backward_frames = true;
 			anim.meta.flip_when_cycling = false;
 
 			alloc(test_id_type::SILVER_TROUSERS_STRAFE, anim);

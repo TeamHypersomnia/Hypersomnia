@@ -117,7 +117,7 @@ Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.
 	- Gra **samodzielnie** kontynuuje animację puszczając ją od tyłu...
 		- ...a potem **odbijając ją w pionie** i odtwarzając jeszcze raz, tworząc **pełny cykl** chodzenia na dwóch nogach.
 		- Pierwsza i ostatnia klatka odtwarza się dwa razy. To upraszcza nam ogromnie kalkulacje, ale również nie wygląda źle.
-	- **Alternatywne rozwiązanie**: Dla każdej animacji, edytor eksponuje opcję *has_backward_frames*.
+	- **Alternatywne rozwiązanie**: Dla każdej animacji, edytor eksponuje opcję *specifies_backward_frames*.
 		- To pozwala artyście samodzielnie narysować animację powrotną.
 		- Wtedy artysta musi narysować **2n - 1 = 9** obrazków do animacji chodzenia.
 			- W edytorze: dziesiąta klatka powinna być dodana do edytora z obrazka pierwszej, aby cykl kończył się na takim samym obrazku, na którym zaczął.
@@ -142,7 +142,7 @@ Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.
 
 	- Gra **samodzielnie** kontynuuje animację puszczając ją od tyłu...
 		- ...ale już nie odbija jej w pionie na kolejny cykl. W tym wypadku to nie ma sensu.
-	- **Alternatywne rozwiązanie**: Dla każdej animacji, edytor eksponuje opcję *has_backward_frames*.
+	- **Alternatywne rozwiązanie**: Dla każdej animacji, edytor eksponuje opcję *specifies_backward_frames*.
 		- To pozwala artyście samodzielnie narysować animację powrotną.
 		- Wtedy artysta musi narysować **2n - 1 = 9** obrazków do animacji chodzenia.
 			- W edytorze: dziesiąta klatka powinna być dodana do edytora z obrazka pierwszej, aby cykl kończył się na takim samym obrazku, na którym zaczął.
@@ -158,7 +158,7 @@ Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.
 	{% include image.html file="pages/todo/pl_pages/torso_rifle_shoot.png" %}
 
 	- Gra **samodzielnie** kontynuuje animację puszczając ją od tyłu.
-	- **Alternatywne rozwiązanie**: Dla każdej animacji, edytor eksponuje opcję *has_backward_frames*.
+	- **Alternatywne rozwiązanie**: Dla każdej animacji, edytor eksponuje opcję *specifies_backward_frames*.
 		- To pozwala artyście samodzielnie narysować animację powrotną.
 			- Ilość klatek pozostaje dowolna zarównież w tym przypadku.
 			- Ostatnia klatka nie musi być dodana z pierwszego obrazka.
@@ -227,7 +227,7 @@ Jako bonus, to sprawi, że nasze nogi będą kompatybilne również z "chudszymi
 	- Gra **samodzielnie** kontynuuje animację puszczając ją od tyłu...
 		- ...a potem **odbijając ją w pionie** i odtwarzając jeszcze raz, tworząc **pełny cykl** chodzenia na dwóch nogach.
 		- Pierwsza i ostatnia klatka odtwarza się dwa razy. To upraszcza nam ogromnie kalkulacje, ale również nie wygląda źle.
-	- **Alternatywne rozwiązanie**: Dla każdej animacji, edytor eksponuje opcję *has_backward_frames*.
+	- **Alternatywne rozwiązanie**: Dla każdej animacji, edytor eksponuje opcję *specifies_backward_frames*.
 		- To pozwala artyście samodzielnie narysować animację powrotną.
 		- Wtedy artysta musi narysować **2(n - 1) = 8** obrazków do animacji chodzenia.
 			- W edytorze: pierwsza i dziesiąta klatka powinny być puste.
