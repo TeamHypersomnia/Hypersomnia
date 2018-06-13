@@ -85,6 +85,8 @@ void populate_test_scene_common(const loaded_image_caches_map& caches, cosmos_co
 	common_assets.exploding_ring_sparkles = to_particle_effect_id(test_scene_particle_effect_id::EXPLODING_RING_SPARKLES);
 	common_assets.thunder_remnants = to_particle_effect_id(test_scene_particle_effect_id::THUNDER_REMNANTS);
 
+	common_assets.haste_footstep_particles.id = to_particle_effect_id(test_scene_particle_effect_id::HASTE_FOOTSTEP);
+
 	load_test_scene_sentience_properties(common);
 
 	auto& spells = common.spells;

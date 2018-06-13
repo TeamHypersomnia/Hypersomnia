@@ -1441,4 +1441,70 @@ void load_test_scene_particle_effects(
 			effect.emissions.push_back(em);
 		}
 	}
+
+	{
+		auto& effect = acquire_effect(test_scene_particle_effect_id::HASTE_FOOTSTEP);
+
+		{
+		particles_emission em;
+		em.spread_degrees = float_range(90, 180);
+		em.particle_lifetime_ms = float_range(100, 349);
+		em.num_of_particles_to_spawn_initially.set(2, 3);
+		em.base_speed = float_range(100, 220);
+		em.rotation_speed = float_range(0, 0);
+
+		em.randomize_spawn_point_within_circle_of_inner_radius = float_range(2.f, 2.f);
+		em.randomize_spawn_point_within_circle_of_outer_radius = float_range(15.f, 15.f);
+
+		for (size_t i = 0; i < (anim.frames.size() - 1) / 3; ++i) {
+			animated_particle particle_definition;
+
+			particle_definition.linear_damping = 0;
+			particle_definition.animation.starting_frame_num = i;
+			particle_definition.animation.speed_factor = 2.5f;
+			particle_definition.animation.id = cast_blink_id;
+			particle_definition.color = white;
+
+			em.add_particle_definition(particle_definition);
+		}
+
+		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+		em.initial_rotation_variation = 0;
+
+		effect.emissions.push_back(em);
+	}
+	{
+		particles_emission em;
+		em.spread_degrees = float_range(0, 1);
+		em.particle_lifetime_ms = float_range(100, 349);
+		em.num_of_particles_to_spawn_initially.set(5, 5);
+		em.base_speed = float_range(50, 120);
+		em.rotation_speed = float_range(0, 0);
+
+		em.randomize_spawn_point_within_circle_of_inner_radius = float_range(2.f, 2.f);
+		em.randomize_spawn_point_within_circle_of_outer_radius = float_range(15.f, 15.f);
+
+		for (int i = 0; i < 5; ++i) {
+			general_particle particle_definition;
+
+			particle_definition.angular_damping = 0;
+			particle_definition.linear_damping = 0;
+			
+			set_with_size(particle_definition,
+				to_image_id(test_scene_image_id::BLANK), 
+				vec2i(i % 2 + 1, i % 2 + 1), 
+				rgba(255, 255, 255, 255)
+			);
+
+			particle_definition.alpha_levels = 1;
+
+			em.add_particle_definition(particle_definition);
+		}
+
+		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+		em.initial_rotation_variation = 0;
+
+		effect.emissions.push_back(em);
+	}
+	}
 }

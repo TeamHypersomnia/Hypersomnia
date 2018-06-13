@@ -24,5 +24,6 @@ struct common_assets {
 	assets::particle_effect_id thunder_remnants;
 
 	footstep_effect_input standard_footstep;
+	particle_effect_input haste_footstep_particles;
 	// END GEN INTROSPECTOR
 };

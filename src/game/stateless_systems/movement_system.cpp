@@ -89,6 +89,29 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			value_meter::damage_result consciousness_damage_by_sprint;
 			float minimum_consciousness_to_sprint = 0.f;
 
+			enum class haste_type {
+				NONE,
+				NORMAL,
+				GREATER
+			};
+
+			const auto current_haste = [&]() {
+				if (is_sentient) {
+					const auto& haste = sentience->get<haste_perk_instance>();
+
+					if (haste.timing.is_enabled(cosmos.get_timestamp(), cosmos.get_fixed_delta())) {
+						if (haste.is_greater) {
+							return haste_type::GREATER;
+						}
+						else {
+							return haste_type::NORMAL;
+						}
+					}
+				}
+
+				return haste_type::NONE;
+			}();
+
 			if (is_sentient) {
 				auto& consciousness = sentience->get<consciousness_meter_instance>();
 
@@ -107,15 +130,11 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					movement.was_sprint_effective = false;
 				}
 
-				const auto& haste = sentience->get<haste_perk_instance>();
-
-				if (haste.timing.is_enabled(cosmos.get_timestamp(), cosmos.get_fixed_delta())) {
-					if (haste.is_greater) {
-						movement_force_mult *= 1.45f;
-					}
-					else {
-						movement_force_mult *= 1.3f;
-					}
+				if (current_haste == haste_type::GREATER) {
+					movement_force_mult *= 1.45f;
+				}
+				else if (current_haste == haste_type::NORMAL) {
+					movement_force_mult *= 1.3f;
 				}
 			}
 
@@ -206,9 +225,8 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					effect_transform *= transformr(offset);
 				}
 
-				
-
-				auto chosen_effect = cosmos.get_common_assets().standard_footstep;
+				const auto& common_assets = cosmos.get_common_assets();
+				auto chosen_effect = common_assets.standard_footstep;
 				
 				{
 					const auto queried_camera = camera_cone { effect_transform, 1.f };
@@ -255,14 +273,31 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 				const auto scale = std::max(0.8f, speed_mult);
 
-				auto& particles = chosen_effect.particles;
-				particles.modifier.scale_amounts *= scale;
-				particles.modifier.scale_lifetimes *= scale;
+				{
+					auto& particles = chosen_effect.particles;
+					particles.modifier.scale_amounts *= scale;
+					particles.modifier.scale_lifetimes *= scale;
 
-				particles.start(
-					step, 
-					particle_effect_start_input::fire_and_forget(effect_transform)
-				);
+					particles.start(
+						step, 
+						particle_effect_start_input::fire_and_forget(effect_transform)
+					);
+				}
+
+				if (current_haste != haste_type::NONE) {
+					auto particles = common_assets.haste_footstep_particles;
+
+					particles.modifier.scale_amounts *= scale;
+					particles.modifier.scale_lifetimes *= scale;
+					particles.modifier.colorize = green;
+
+					effect_transform.rotation += 180;
+
+					particles.start(
+						step, 
+						particle_effect_start_input::fire_and_forget(effect_transform)
+					);
+				}
 			};
 
 			if (anim_finishing) {
