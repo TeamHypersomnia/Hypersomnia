@@ -1670,11 +1670,11 @@ int work(const int argc, const char* const * const argv) try {
 
 	return EXIT_SUCCESS;
 }
-catch (const config_read_error err) {
+catch (const config_read_error& err) {
 	LOG("Failed to read the initial config for the game!\n%x", err.what());
 	return EXIT_FAILURE;
 }
-catch (const augs::imgui_init_error err) {
+catch (const augs::imgui_init_error& err) {
 	LOG("Failed init imgui:\n%x", err.what());
 	return EXIT_FAILURE;
 }
@@ -1690,34 +1690,34 @@ catch (const augs::renderer_error& err) {
 	LOG("Failed to initialize the renderer: %x", err.what());
 	return EXIT_FAILURE;
 }
-catch (const necessary_resource_loading_error err) {
+catch (const necessary_resource_loading_error& err) {
 	LOG("Failed to load a resource necessary for the game to function!\n%x", err.what());
 	return EXIT_FAILURE;
 }
-catch (const augs::lua_state_creation_error err) {
+catch (const augs::lua_state_creation_error& err) {
 	LOG("Failed to create a lua state for the game!\n%x", err.what());
 	return EXIT_FAILURE;
 }
-catch (const augs::unit_test_session_error err) {
+catch (const augs::unit_test_session_error& err) {
 	LOG("Unit test session failure:\n%x\ncout:%x\ncerr:%x\nclog:%x\n", 
 		err.what(), err.cout_content, err.cerr_content, err.clog_content
 	);
 
 	return EXIT_FAILURE;
 }
-catch (const augs::too_many_sound_sources_error err) {
+catch (const augs::too_many_sound_sources_error& err) {
 	LOG("std::runtime_error thrown: %x", err.what());
 
 	return EXIT_FAILURE;
 }
-catch (augs::filesystem_error err) {
+catch (const augs::filesystem_error& err) {
 	LOG("std::filesystem_error thrown: %x\npath1: %x\npath2: %x", err.what(), err.path1(), err.path2());
 
 	return EXIT_FAILURE;
 }
 /* We want the debugger to break if it is not in production */
 #if IS_PRODUCTION_BUILD
-catch (const std::runtime_error err) {
+catch (const std::runtime_error& err) {
 	LOG("std::runtime_error thrown: %x", err.what());
 
 	return EXIT_FAILURE;

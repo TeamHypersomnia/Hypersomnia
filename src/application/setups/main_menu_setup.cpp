@@ -100,7 +100,7 @@ main_menu_setup::main_menu_setup(
 	try {
 		menu_theme.emplace(settings.menu_theme_path);
 	}
-	catch (std::runtime_error err) {
+	catch (const std::runtime_error& err) {
 		LOG("Warning: could not load the main menu theme:\n%x", err.what());
 	}
 

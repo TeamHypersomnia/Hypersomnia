@@ -87,7 +87,7 @@ std::optional<editor_warning> editor_folder::load_folder_maybe_autosave() {
 			return editor_warning {"Warning", message, ""};
 		}
 	}
-	catch (editor_popup p) {
+	catch (const editor_popup& p) {
 		/* If no autosave folder was found, try the real path. */
 		*this = editor_folder(real_path);
 		load_folder();
@@ -111,7 +111,7 @@ void editor_folder::load_folder(const augs::path_type& from, const augs::path_ty
 	try {
 		work->load_from_int(paths.int_file);
 	}
-	catch (const intercosm_loading_error err) {
+	catch (const intercosm_loading_error& err) {
 		editor_popup p;
 
 		p.title = err.title;
@@ -125,7 +125,7 @@ void editor_folder::load_folder(const augs::path_type& from, const augs::path_ty
 		augs::load_from_bytes(view, paths.view_file);
 		augs::load_from_bytes(history, paths.hist_file);
 	}
-	catch (augs::file_open_error) {
+	catch (const augs::file_open_error&) {
 		/* We just let it happen. These files are not necessary. */
 	}
 }

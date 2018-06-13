@@ -176,7 +176,7 @@ void particles_simulation_system::update_effects_from_messages(
 				);
 			}
 		}
-		catch (effect_not_found) {
+		catch (const effect_not_found&) {
 
 		}
 	}
@@ -426,7 +426,7 @@ void particles_simulation_system::advance_visible_streams(
 					try {
 						firearm_engine_caches.try_emplace(id, particles->start.positioning, *particles, manager, rng);
 					}
-					catch (effect_not_found) {
+					catch (const effect_not_found&) {
 
 					}
 				}

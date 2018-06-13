@@ -77,7 +77,7 @@ void open_last_folders(
 
 				signi.folders.emplace_back(std::move(new_folder));
 			}
-			catch (editor_popup p) {
+			catch (const editor_popup& p) {
 				/* Could load neither from autosave nor the real path. Utter failure. */
 				failures.push_back(p);
 			}

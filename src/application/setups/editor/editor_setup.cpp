@@ -134,7 +134,7 @@ void editor_setup::load_gui_state() {
 	try {
 		augs::load_from_bytes(*this, get_editor_gui_state_path());
 	}
-	catch (const augs::file_open_error) {
+	catch (const augs::file_open_error&) {
 		// We don't care if it does not exist
 	}
 }
@@ -210,7 +210,7 @@ void editor_setup::save_current_folder() {
 		folder().save_folder();
 		folder().history.mark_as_just_saved();
 	}
-	catch (std::runtime_error what) {
+	catch (const std::runtime_error& what) {
 		set_popup({ "Error", "Failed to save the project.\nSome serious problem has occured.", what.what() });
 	}
 }

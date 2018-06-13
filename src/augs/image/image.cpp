@@ -101,10 +101,10 @@ namespace augs {
 				);
 			}
 		}
-		catch (image_loading_error err) {
+		catch (const image_loading_error& err) {
 			throw;
 		}
-		catch (std::exception err) {
+		catch (const std::exception& err) {
 			throw image_loading_error("Failed to read size of %x:\n%x", file_path, err.what());
 		}
 	}

@@ -61,7 +61,7 @@ void bake_fresh_atlas(
 				const auto size = vec2i(u_size);
 				rects_for_packer.push_back(rect_xywh(0, 0, size.x, size.y));
 			}
-			catch (augs::image_loading_error err) {
+			catch (const augs::image_loading_error& err) {
 				out_entry.cached_original_size_pixels = vec2u::zero;
 				rects_for_packer.push_back(rect_xywh(0, 0, 0, 0));
 			}

@@ -110,28 +110,28 @@ void intercosm::load_from_lua(const intercosm_path_op op) {
 
 		version = hypersomnia_version();
 	}
-	catch (const cosmos_loading_error err) {
+	catch (const cosmos_loading_error& err) {
 		throw intercosm_loading_error {
 			"Error",
 			typesafe_sprintf("Failed to load %x.\nFile might be corrupt.", display_path),
 			err.what()
 		};
 	}
-	catch (const augs::stream_read_error err) {
+	catch (const augs::stream_read_error& err) {
 		throw intercosm_loading_error{
 			"Error",
 			typesafe_sprintf("Failed to load %x.\nFile might be corrupt.", display_path),
 			err.what()
 		};
 	}
-	catch (const augs::lua_deserialization_error err) {
+	catch (const augs::lua_deserialization_error& err) {
 		throw intercosm_loading_error {
 			"Error",
 			typesafe_sprintf("Failed to load %x.\nNot a valid lua table.", display_path),
 			err.what()
 		};
 	}
-	catch (const augs::file_open_error err) {
+	catch (const augs::file_open_error& err) {
 		throw intercosm_loading_error {
 			"Error",
 			typesafe_sprintf("Failed to load %x.\nFile might be missing.", display_path),
@@ -165,21 +165,21 @@ void intercosm::load_from_int(const augs::path_type& path) {
 
 		version = hypersomnia_version();
 	}
-	catch (const cosmos_loading_error err) {
+	catch (const cosmos_loading_error& err) {
 		throw intercosm_loading_error {
 			"Error",
 			typesafe_sprintf("Failed to load %x.\nFile might be corrupt.", display_path),
 			err.what()
 		};
 	}
-	catch (const augs::stream_read_error err) {
+	catch (const augs::stream_read_error& err) {
 		throw intercosm_loading_error{
 			"Error",
 			typesafe_sprintf("Failed to load %x.\nFile might be corrupt.", display_path),
 			err.what()
 		};
 	}
-	catch (const augs::file_open_error err) {
+	catch (const augs::file_open_error& err) {
 		throw intercosm_loading_error {
 			"Error",
 			typesafe_sprintf("Failed to load %x.\nFile might be missing.", display_path),

@@ -38,14 +38,14 @@ void load_test_scene_images(
 				image_definition_view({}, definition).get_source_image_path()
 			);
 		}
-		catch (augs::lua_deserialization_error err) {
+		catch (const augs::lua_deserialization_error& err) {
 			throw test_scene_asset_loading_error(
 				"Failed to load additional properties for %x:\nNot a valid lua table.\n%x",
 				stem,
 				err.what()
 			);
 		}
-		catch (augs::file_open_error err) {
+		catch (const augs::file_open_error& err) {
 			throw test_scene_asset_loading_error(
 				"Failed to load additional properties for %x:\nFile might be corrupt.\n%x",
 				stem,

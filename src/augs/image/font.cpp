@@ -154,7 +154,7 @@ namespace augs {
 				}
 			}
 		}
-		catch (const augs::file_open_error err) {
+		catch (const augs::file_open_error& err) {
 
 		}
 #endif

@@ -708,7 +708,7 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 			remove_file(temp_result);
 			return result;
 		}
-		catch (augs::file_open_error) {
+		catch (const augs::file_open_error&) {
 			LOG("Error: %x did not produce %x", script_path, temp_result);
 			return std::nullopt;
 		}

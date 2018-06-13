@@ -184,10 +184,10 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 		try {
 			short_sounds.emplace_back(e.payload, in);
 		}
-		catch (effect_not_found) {
+		catch (const effect_not_found&) {
 
 		}
-		catch (augs::too_many_sound_sources_error err) {
+		catch (const augs::too_many_sound_sources_error& err) {
 			LOG("Warning: maxmimum number of sound sources reached at sound_system.cpp.");
 		}
 	}

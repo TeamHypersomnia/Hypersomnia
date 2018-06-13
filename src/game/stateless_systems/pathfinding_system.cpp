@@ -444,7 +444,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 						//				first_priority_candidates.push_back(v);
 						//			}
 						//		}
-						//		catch (std::exception compilation_error) {
+						//		catch (const std::exception& compilation_error) {
 						//			LOG(compilation_error.what());
 						//		}
 						//	}

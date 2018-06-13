@@ -63,7 +63,7 @@ all_necessary_shaders::all_necessary_shaders(
 					final_fsh_path
 				);
 			}
-			catch (augs::graphics::shader_error err) {
+			catch (const augs::graphics::shader_error& err) {
 				LOG(
 					"There was a problem building %x.\n That shader was not set.",
 					label
@@ -121,7 +121,7 @@ all_necessary_sounds::all_necessary_sounds(
 	button_click(augs::sound_data(typesafe_sprintf("%x/button_click.wav", directory))),
 	button_hover(augs::sound_data(typesafe_sprintf("%x/button_hover.wav", directory)))
 {}
-catch (const augs::sound_decoding_error err) {
+catch (const augs::sound_decoding_error& err) {
 	throw necessary_resource_loading_error(err.what());
 }
 
@@ -157,7 +157,7 @@ necessary_image_definitions_map::necessary_image_definitions_map(
 					additional_properties_path
 				);
 			}
-			catch (augs::lua_deserialization_error err) {
+			catch (const augs::lua_deserialization_error& err) {
 				throw necessary_resource_loading_error(
 					"Failed to load additional properties for %x (%x).\nNot a valid lua table.\n%x",
 					stem, 
@@ -165,7 +165,7 @@ necessary_image_definitions_map::necessary_image_definitions_map(
 					err.what()
 				);
 			}
-			catch (augs::file_open_error err) {
+			catch (const augs::file_open_error& err) {
 				throw necessary_resource_loading_error(
 					"Failed to load additional properties for %x (%x).\nFile might be corrupt.\n%x",
 					stem,
@@ -190,7 +190,7 @@ necessary_image_definitions_map::necessary_image_definitions_map(
 			try {
 				augs::load_from_lua_table(lua, def, procedural_definition_path);
 			}
-			catch (augs::lua_deserialization_error err) {
+			catch (const augs::lua_deserialization_error& err) {
 				throw necessary_resource_loading_error(
 					"Failed to load procedural image definition for %x (%x).\nNot a valid lua table.\n%x",
 					stem,
@@ -198,7 +198,7 @@ necessary_image_definitions_map::necessary_image_definitions_map(
 					err.what()
 				);
 			}
-			catch (augs::file_open_error err) {
+			catch (const augs::file_open_error& err) {
 				throw necessary_resource_loading_error(
 					"Failed to load procedural image definition for %x (%x).\nFile might be corrupt.\n%x",
 					stem,

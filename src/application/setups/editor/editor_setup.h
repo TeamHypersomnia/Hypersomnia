@@ -121,7 +121,7 @@ class editor_setup : private current_access_cache<editor_setup> {
 		try {
 			callback();
 		}
-		catch (editor_popup p) {
+		catch (const editor_popup& p) {
 			set_popup(p);
 		}
 	}
@@ -141,7 +141,7 @@ class editor_setup : private current_access_cache<editor_setup> {
 			new_folder_provider(new_folder);
 			set_current(new_index);
 		}
-		catch (editor_popup p) {
+		catch (const editor_popup& p) {
 			signi.folders.erase(signi.folders.begin() + new_index);
 			set_popup(p);
 		}
