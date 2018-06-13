@@ -8,6 +8,7 @@
 struct image_offset_widget {
 	const assets::image_id id;
 	const images_in_atlas_map& game_atlas;
+	const bool nodeize;
 
 	template <class T>
 	static constexpr bool handles = is_one_of_v<T, vec2i, transformi>;
@@ -42,7 +43,7 @@ struct image_offset_widget {
 
 		auto iw = scoped_item_width(80);
 
-		if (auto combo = scoped_combo((identity_label + "Picker").c_str(), "Pick...", ImGuiComboFlags_HeightLargest)) {
+		auto perform_widget = [&]() {
 			const auto& entry = game_atlas.at(id);
 
 			const auto is = vec2i(entry.get_original_size());
@@ -120,14 +121,12 @@ struct image_offset_widget {
 					}
 				}
 			}
-		}
 
-		if (result) {
-			return result;
-		}
+			invisible_button("###OffsetSelectorAfter", viewing_size);
+		};
 
-		/* Perform the standard widget for manual tweaking */
-		{
+		auto perform_standard_widget = [&]() {
+			/* Perform the standard widget for manual tweaking */
 			ImGui::SameLine();
 
 			auto iw = scoped_item_width(-1);
@@ -142,6 +141,25 @@ struct image_offset_widget {
 					result = tweaker_type::CONTINUOUS;
 				}
 			}
+		};
+
+		if (nodeize) {
+			const auto node_label = "" + identity_label;
+
+			auto node = scoped_tree_node(node_label.c_str());
+
+			perform_standard_widget();
+
+			if (node) {
+				perform_widget();
+			}
+		}
+		else {
+			if (auto combo = scoped_combo((identity_label + "Picker").c_str(), "Pick...", ImGuiComboFlags_HeightLargest)) {
+				perform_widget();
+			}
+
+			perform_standard_widget();
 		}
 
 		return result;

@@ -6,17 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Simpler solution: Sequence view
-	- PGUP/PGDOWN just move to the next id searching through images defs
-		- with help of cut number and get number at end
-			- actually *maybe* no: might be useful to have pgup/pgdown for filtered outputs as it will also
-			avoid the need to click the found item with mouse; just always pgup/pgdown for the next found
-	- V button next to tickbox to enable viewing if property column is enabled
-		- make property column disabled by default then
-	- VIEWING textual preffix
-	- node'ize (instead of combo'ize) the offset/color pickers so that multiple offsets can be viewed at once
-
-
 - Particles and flavours
 	- std::unordered_map<particle_flavour_id, vector of particles>
 		- We will always simulate all particles that we have in memory.

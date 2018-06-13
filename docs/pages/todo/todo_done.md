@@ -997,3 +997,15 @@ we consider whole type overrides too complex architeciturally:
 		- item invariant should specify hand offset, which will determine relative positioning to the hand
 
 - on_dynamic_content rename 
+
+- Simpler solution: Sequence view
+	- PGUP/PGDOWN just move to the next id searching through images defs
+		- with help of cut number and get number at end
+			- actually *maybe* no: might be useful to have pgup/pgdown for filtered outputs as it will also
+			avoid the need to click the found item with mouse; just always pgup/pgdown for the next found
+	- V button next to tickbox to enable viewing if property column is enabled
+		- make property column disabled by default then
+	- VIEWING textual preffix
+	- node'ize (instead of combo'ize) the offset/color pickers so that multiple offsets can be viewed at once
+
+

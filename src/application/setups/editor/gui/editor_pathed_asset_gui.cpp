@@ -40,6 +40,14 @@
 #include "augs/readwrite/byte_readwrite.h"
 
 #endif
+template <class asset_id_type>
+void editor_pathed_asset_gui<asset_id_type>::set_currently_viewed(const asset_id_type id) {
+	property_editor_data.reset();
+	separate_properties.show = true;
+	separate_properties.currently_viewed = id;
+
+	ImGui::SetWindowFocus("Current image");
+}
 
 template <class asset_id_type>
 void editor_pathed_asset_gui<asset_id_type>::perform(
@@ -192,6 +200,10 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 	for_each_range(prepare);
 
+	if (!path_browser_settings.show_orphaned) {
+		orphaned_paths.clear();
+	}
+
 	asset_entry_type* currently_viewed_entry = nullptr;
 	std::vector<asset_entry_type>* range_of_currently_viewed = nullptr;
 
@@ -207,6 +219,54 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 	look_for_current_in(orphaned_paths);
 	look_for_current_in(used_paths);
 
+	auto handle_moving_of_currently_viewed = [&]() {
+		if (ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows | ImGuiFocusedFlags_RootWindow)) {
+			if (move_currently_viewed_by != 0 && (orphaned_paths.size() + used_paths.size() > 0)) {
+				std::optional<int> found_idx;
+
+				for (auto& p : orphaned_paths) { 
+					if (std::addressof(p) == currently_viewed_entry) {
+						found_idx = index_in(orphaned_paths, p);
+					}
+				}
+
+				for (auto& p : used_paths) { 
+					if (std::addressof(p) == currently_viewed_entry) {
+						found_idx = orphaned_paths.size() + index_in(used_paths, p);
+					}
+				}
+
+				if (!found_idx) {
+					found_idx = -1;
+				}
+
+				auto new_idx = *found_idx + move_currently_viewed_by;
+
+				const auto all_n = orphaned_paths.size() + used_paths.size();
+
+				if (new_idx < 0) {
+					new_idx = all_n + new_idx;
+				}
+
+				new_idx %= all_n;
+
+				if (new_idx < static_cast<std::ptrdiff_t>(orphaned_paths.size())) {
+					currently_viewed_entry = orphaned_paths.data() + new_idx;
+					range_of_currently_viewed = std::addressof(orphaned_paths);
+				}
+				else {
+					currently_viewed_entry = used_paths.data() + new_idx - orphaned_paths.size();
+					range_of_currently_viewed = std::addressof(used_paths);
+				}
+
+				move_currently_viewed_by = 0;
+				set_currently_viewed(currently_viewed_entry->id);
+			}
+		}
+	};
+
+	handle_moving_of_currently_viewed();
+
 	const auto prop_in = property_editor_input { settings, property_editor_data };
 
 	if (separate_properties.show && currently_viewed_entry != nullptr) {
@@ -214,6 +274,8 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 		ImGui::SetNextWindowSize(ImVec2(350,560), ImGuiCond_FirstUseEver);
 		auto scope = scoped_window("Current image", std::addressof(separate_properties.show));
+
+		handle_moving_of_currently_viewed();
 
 		ImGui::Columns(2);
 
@@ -239,7 +301,8 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			is_current_ticked,
 			game_atlas,
 			preview,
-			2
+			2,
+			true
 		);
 
 		ImGui::Columns(1);
@@ -264,6 +327,8 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 		}
 
 	}
+
+	move_currently_viewed_by = 0;
 
 	auto files_view = scoped_child("Files view");
 
@@ -315,10 +380,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 			if (!show_properties_column) {
 				if (ImGui::IsItemClicked()) {
-					separate_properties.currently_viewed = id;
-					separate_properties.show = true;
-
-					ImGui::SetWindowFocus("Current image");
+					set_currently_viewed(id);
 				}
 			}
 

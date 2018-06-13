@@ -14,7 +14,16 @@ class images_in_atlas_map;
 
 namespace augs {
 	class window;
+	struct introspection_access;
 }
+
+template <class asset_id_type>
+struct separate_properties_window {
+	// GEN INTROSPECTOR struct separate_properties_window class asset_id_type
+	bool show = true;
+	asset_id_type currently_viewed;
+	// END GEN INTROSPECTOR
+};
 
 template <class asset_id_type>
 struct editor_pathed_asset_gui : standard_window_mixin<editor_pathed_asset_gui<asset_id_type>> {
@@ -23,11 +32,17 @@ struct editor_pathed_asset_gui : standard_window_mixin<editor_pathed_asset_gui<a
 
 	using introspect_base = base;
 
+	friend augs::introspection_access;
+
 	// GEN INTROSPECTOR struct editor_pathed_asset_gui class asset_id_type
 	asset_path_browser_settings path_browser_settings;
+private:
+	separate_properties_window<asset_id_type> separate_properties;
+public:
 	// END GEN INTROSPECTOR
 
 	bool acquire_missing_paths = true;
+	int move_currently_viewed_by = 0;
 
 	void perform(
 		const augs::window&,
@@ -42,12 +57,7 @@ private:
 
 	editor_image_preview preview;
 
-	struct separate_properties_window {
-		bool show = true;
-		asset_id_type currently_viewed;
-	};
-
-	separate_properties_window separate_properties;
+	void set_currently_viewed(asset_id_type);
 };
 
 using editor_images_gui = editor_pathed_asset_gui<assets::image_id>;

@@ -18,7 +18,7 @@ namespace augs {
 
 			text("Image size: %x, zoom: %x", is, zoom);
 
-			invisible_button_reset_cursor("###OffsetSelector", viewing_size);
+			invisible_button_reset_cursor("###ColorSelector", viewing_size);
 			game_image(entry, viewing_size);
 
 			const auto cross_alpha = 200;
@@ -45,6 +45,8 @@ namespace augs {
 				rgba color_preview = viewed_image.pixel(image_space_new);
 				color_edit("##colorpreview", color_preview);
 			}
+
+			invisible_button("###ColorSelectorAfter", viewing_size);
 
 			return result;
 		}

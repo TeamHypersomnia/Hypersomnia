@@ -15,7 +15,8 @@ void do_pathed_asset_properties(
 	const bool is_current_ticked,
 	const C& game_atlas,
 	editor_image_preview& preview,
-	const int num_cols
+	const int num_cols,
+	const bool nodeize_image_widgets = false
 ) {
 	using namespace augs::imgui;
 
@@ -135,8 +136,8 @@ void do_pathed_asset_properties(
 		},
 		special_widgets(
 			source_path_widget { viewables, project_path, prop_in.settings, disable_path_chooser },
-			offset_widget { id, game_atlas },
-			color_widget { id, game_atlas, viewables.image_definitions, preview, project_path }
+			offset_widget { id, game_atlas, nodeize_image_widgets },
+			color_widget { id, game_atlas, viewables.image_definitions, preview, project_path, nodeize_image_widgets }
 		),
 		default_sane_default_provider(),
 		num_cols - 2

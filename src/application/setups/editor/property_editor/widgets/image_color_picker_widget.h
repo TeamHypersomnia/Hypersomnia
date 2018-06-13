@@ -12,6 +12,7 @@ struct image_color_picker_widget {
 	const image_definitions_map& defs;
 	editor_image_preview& current_preview;
 	const augs::path_type& project_path;
+	const bool nodeize;
 
 	template <class T>
 	static constexpr bool handles = is_one_of_v<T, rgba>;
@@ -44,17 +45,32 @@ struct image_color_picker_widget {
 
 		update_preview();
 
-		if (auto combo = scoped_combo(("###AddMultiple" + identity_label).c_str(), "Add multiple...", ImGuiComboFlags_HeightLargest)) {
+		bool result = false;
+
+		auto perform_widget = [&]() {
 			const auto zoom = 4;
 			const auto& entry = game_atlas.at(id).diffuse;
 
 			if (const auto picked = image_color_picker(zoom, entry, current_preview.image)) {
 				object.emplace_back(*picked);
-				return true;
+				result = true;
+			}
+		};
+
+		if (nodeize) {
+			const auto node_label = "Add multiple...###" + identity_label;
+
+			if (auto node = scoped_tree_node(node_label.c_str())) {
+				perform_widget();
+			}
+		}
+		else {
+			if (auto combo = scoped_combo(("###AddMultiple" + identity_label).c_str(), "Add multiple...", ImGuiComboFlags_HeightLargest)) {
+				perform_widget();
 			}
 		}
 
-		return false;
+		return result;
 	}
 
 	template <class T>
@@ -67,7 +83,7 @@ struct image_color_picker_widget {
 
 		auto iw = scoped_item_width(60);
 
-		if (auto combo = scoped_combo((identity_label + "Picker").c_str(), "Pick", ImGuiComboFlags_HeightLargest)) {
+		auto perform_widget = [&]() {
 			const auto zoom = 4;
 			const auto& entry = game_atlas.at(id).diffuse;
 
@@ -75,15 +91,11 @@ struct image_color_picker_widget {
 				object = *picked;
 				result = tweaker_type::DISCRETE;
 			}
-		}
+		};
 
-		if (result) {
-			return result;
-		}
+		auto perform_standard_widget = [&]() {
+			/* Perform the standard widget for manual tweaking */
 
-		/* Perform the standard widget for manual tweaking */
-
-		{
 			ImGui::SameLine();
 
 			auto iw = scoped_item_width(-1);
@@ -91,6 +103,25 @@ struct image_color_picker_widget {
 			if (color_edit(identity_label, object)) {
 				result = tweaker_type::CONTINUOUS;
 			}
+		};
+
+		if (nodeize) {
+			const auto node_label = "" + identity_label;
+
+			auto node = scoped_tree_node(node_label.c_str());
+
+			perform_standard_widget();
+
+			if (node) {
+				perform_widget();
+			}
+		}
+		else {
+			if (auto combo = scoped_combo((identity_label + "Picker").c_str(), "Pick", ImGuiComboFlags_HeightLargest | ImGuiComboFlags_NoPreview)) {
+				perform_widget();
+			}
+
+			perform_standard_widget();
 		}
 
 		return result;

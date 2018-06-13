@@ -69,14 +69,14 @@ return {
       },
       primary_hand = {
         pos = {
-          x = 17,
+          x = 16,
           y = 20
         },
         rotation = 0
       },
       secondary_hand = {
         pos = {
-          x = 14,
+          x = 13,
           y = -19
         },
         rotation = 0

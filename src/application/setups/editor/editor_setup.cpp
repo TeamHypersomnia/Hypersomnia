@@ -851,13 +851,21 @@ bool editor_setup::handle_input_before_imgui(
 	if (e.was_any_key_pressed()) {
 		const auto k = e.data.key.key;
 		
-		/* Media buttons work regardless of pause */
+		auto move_currently_viewed = [&](const int n) {
+			images_gui.move_currently_viewed_by += n;
+			sounds_gui.move_currently_viewed_by += n;
+		};
 
 		switch (k) {
+			case key::PAGEUP: move_currently_viewed(-1); return true;
+			case key::PAGEDOWN: move_currently_viewed(1); return true;
+
+			/* Media buttons work regardless of pause */
 			case key::PLAY_PAUSE_TRACK: play_pause(); return true;
 			case key::PREV_TRACK: prev(); return true;
 			case key::NEXT_TRACK: next(); return true;
 			case key::STOP_TRACK: stop(); return true;
+
 			default: break;
 		}
 
