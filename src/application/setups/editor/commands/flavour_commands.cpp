@@ -52,7 +52,8 @@ void create_flavour_command::redo_and_copy(const editor_command_input in, const 
 				}
 			}
 
-			const auto new_name = ::find_free_name(flavours, basic_name + "-");
+			const auto suffix = source_flavour != nullptr ? "-Dup-" : "-New-";
+			const auto new_name = ::find_free_name(flavours, basic_name + suffix);
 			new_object.template get<invariants::text_details>().name = new_name;
 
 			if (source_flavour) {

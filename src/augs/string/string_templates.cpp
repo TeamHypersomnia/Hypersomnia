@@ -74,6 +74,24 @@ std::string& cut_preffix(std::string& value, const std::string& preffix) {
 	return value;
 }
 
+void cut_number_at_end(std::string& s) {
+	if (const auto it = s.find_last_not_of("0123456789"); it != std::string::npos) {
+		const auto len = s.size() - 1 - it;
+		s.erase(s.end() - len, s.end());
+	}
+}
+
+std::optional<unsigned long> get_number_at_end(const std::string& s) {
+	try {
+		return std::stoul(s.substr(s.find_last_not_of("0123456789") + 1));
+	}
+	catch (...) {
+
+	}
+
+	return std::nullopt;
+}
+
 #if BUILD_UNIT_TESTS
 #include <catch.hpp>
 

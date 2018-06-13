@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <cctype>
 #include <cstddef>
+#include <optional>
 
 #include "augs/ensure.h"
 
@@ -131,6 +132,9 @@ std::string&& uncapitalize_first(std::string&& value);
 
 bool begins_with(const std::string& value, const std::string& beginning);
 bool ends_with(const std::string& value, const std::string& ending);
+
+void cut_number_at_end(std::string&);
+std::optional<unsigned long> get_number_at_end(const std::string&);
 
 template <class T>
 auto format_as_bytes(const T& t) {
