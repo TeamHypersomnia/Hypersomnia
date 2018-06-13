@@ -84,10 +84,18 @@ Current platforms are actively supported:
 
 ### Dependencies
 
+
 #### Tools
 
+- ``git``
 - ``cmake``
 - ``ninja``
+
+#### Dependencies of the source code
+
+- ``libx11``
+- ``libxcb``
+- ``xcb-util-keysyms``
 
 #### Compiler toolchain
 
@@ -116,12 +124,6 @@ make all -j8 -C build/current  781.58s user 33.29s system 696% cpu 1:57.04 total
 
 LLVM toolchain is expected to yield much faster build times, even on the order of minutes.  
 The generated binary is also more performant (e.g. a simple benchmark yielded ``700 FPS`` versus ``800 FPS`` on a default main menu scene)
-
-#### Other dependencies
-
-- ``libx11``
-- ``libxcb``
-- ``xcb-util-keysyms``
 
 ### One-shot launch
 
