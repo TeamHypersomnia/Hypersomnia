@@ -152,10 +152,6 @@ public:
 		return raw_id;
 	}
 
-	operator child_entity_id() const {
-		return raw_id;
-	}
-
 	operator unversioned_entity_id() const {
 		return raw_id;
 	}

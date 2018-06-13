@@ -191,10 +191,10 @@ void detail_general_edit_properties(
 
 		if constexpr(inline_properties || do_handler_or_direct<S, T>) {
 			if constexpr(inline_properties) {
-				auto colors = ::maybe_different_value_cols(input.settings, !equality_predicate(altered)); 
+				auto colors = ::maybe_different_value_cols(input.settings, !equality_predicate(altered, std::nullopt)); 
 
 				if (auto result = handler_or_direct(input.special_widget_provider, identity_label, altered)) {
-					notify_change_of(formatted_label, *result, altered);
+					notify_change_of(formatted_label, *result, altered, std::nullopt);
 				}
 
 				ImGui::PopItemWidth();
@@ -202,23 +202,23 @@ void detail_general_edit_properties(
 			}
 			else {
 				auto scope = bulleted_property_name(formatted_label, input.extra_columns);
-				auto colors = ::maybe_different_value_cols(input.settings, !equality_predicate(altered)); 
+				auto colors = ::maybe_different_value_cols(input.settings, !equality_predicate(altered, std::nullopt)); 
 
 				if (auto result = handler_or_direct(input.special_widget_provider, identity_label, altered)) {
-					notify_change_of(formatted_label, *result, altered);
+					notify_change_of(formatted_label, *result, altered, std::nullopt);
 				}
 			}
 		}
 		else {
 			if constexpr(is_value_with_flag_v<T>) {
-				const auto all_equal = equality_predicate(altered.is_enabled);
+				const auto all_equal = equality_predicate(altered.is_enabled, std::nullopt);
 
 				{
 					auto scope = bulleted_property_name(formatted_label, input.extra_columns);
 					auto colors = ::maybe_different_value_cols(input.settings, !all_equal); 
 
 					if (const auto result = augs::imgui::checkbox(identity_label, altered.is_enabled)) {
-						notify_change_of(formatted_label, tweaker_type::DISCRETE, altered.is_enabled);
+						notify_change_of(formatted_label, tweaker_type::DISCRETE, altered.is_enabled, std::nullopt);
 					}
 				}
 
@@ -274,7 +274,7 @@ void detail_general_edit_properties(
 							ImGui::NextColumn();
 
 							if (input.special_widget_provider.handle_prologue(displayed_container_label, altered)) {
-								notify_change_of(formatted_label, tweaker_type::DISCRETE, altered);
+								notify_change_of(formatted_label, tweaker_type::DISCRETE, altered, std::nullopt);
 							}
 
 							augs::imgui::next_columns(input.extra_columns + 1);
@@ -290,7 +290,7 @@ void detail_general_edit_properties(
 									if (ImGui::Button("D")) {
 										auto duplicated = altered[i];
 										altered.insert(altered.begin() + i + 1, std::move(duplicated));
-										notify_change_of(formatted_label, tweaker_type::DISCRETE, altered);
+										notify_change_of(formatted_label, tweaker_type::DISCRETE, altered, std::nullopt);
 										break;
 									}
 
@@ -306,7 +306,7 @@ void detail_general_edit_properties(
 
 									if (ImGui::Button("-")) {
 										altered.erase(altered.begin() + i);
-										notify_change_of(formatted_label, tweaker_type::DISCRETE, altered);
+										notify_change_of(formatted_label, tweaker_type::DISCRETE, altered, std::nullopt);
 										break;
 									}
 								}
@@ -329,7 +329,7 @@ void detail_general_edit_properties(
 								detail_general_edit_properties<Behaviour, true, inline_properties>(
 									input, 
 									[&equality_predicate, i, &altered] (auto&&...) { return equality_predicate(altered, i); },
-									[&notify_change_of, i, &altered] (const auto& l, const tweaker_type t, auto&) { notify_change_of(l, t, altered, i); },
+									[&notify_change_of, i, &altered] (const auto& l, const tweaker_type t, auto&&...) { notify_change_of(l, t, altered, i); },
 									element_label,
 									altered[i]
 								);
@@ -340,7 +340,7 @@ void detail_general_edit_properties(
 							if (altered.size() < altered.max_size()) {
 								if (ImGui::Button("+")) {
 									altered.emplace_back(input.sane_defaults.template construct<typename T::value_type>());
-									notify_change_of(formatted_label, tweaker_type::DISCRETE, altered);
+									notify_change_of(formatted_label, tweaker_type::DISCRETE, altered, std::nullopt);
 								}
 
 								augs::imgui::next_columns(input.extra_columns + 2);
@@ -451,37 +451,32 @@ void general_edit_properties(
 				prop_in.settings,
 				extra_columns
 			},
-			[&parent_altered, &field_equality_predicate](const auto& modified, const auto... index) {
+			[&parent_altered, &field_equality_predicate](const auto& modified, const auto index) {
+				using I = std::remove_const_t<decltype(index)>;
+
 				auto addr = ::make_field_address(parent_altered, modified);
 
-				/* A forceful approach to lambda overloading... */
-
-				if constexpr(1 == num_types_in_list_v<type_list<decltype(index)...>>) {
-					addr.element_index = (index, ...);
-
-					return field_equality_predicate(modified[(index, ...)], addr);
+				if constexpr(std::is_same_v<I, unsigned>) {
+					addr.element_index = index;
+					return field_equality_predicate(modified[index], addr);
 				}
 				else {
-					static_assert(num_types_in_list_v<type_list<decltype(index)...>> == 0);
-
 					return field_equality_predicate(modified, addr);
 				}
 			},
-			[&parent_altered, &do_tweaker](const std::string& formatted_label, const tweaker_type t, const auto& modified, const auto... index) {
+			[&parent_altered, &do_tweaker](const std::string& formatted_label, const tweaker_type t, const auto& modified, const auto index) {
+				using I = std::remove_const_t<decltype(index)>;
+
 				auto addr = ::make_field_address(parent_altered, modified);
 
-				/* A forceful approach to lambda overloading... */
+				if constexpr(std::is_same_v<I, unsigned>) {
+					addr.element_index = index;
 
-				if constexpr(1 == num_types_in_list_v<type_list<decltype(index)...>>) {
-					addr.element_index = (index, ...);
-
-					do_tweaker(tweaker_input<remove_cref<decltype(modified[(index, ...)])>>{
-						t, formatted_label, addr, modified[(index, ...)]
+					do_tweaker(tweaker_input<remove_cref<decltype(modified[index])>>{
+						t, formatted_label, addr, modified[index]
 					});
 				}
 				else {
-					static_assert(num_types_in_list_v<type_list<decltype(index)...>> == 0);
-
 					do_tweaker(tweaker_input<remove_cref<decltype(modified)>>{
 						t, formatted_label, addr, modified
 					});

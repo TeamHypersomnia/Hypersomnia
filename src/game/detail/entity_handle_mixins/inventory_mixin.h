@@ -53,7 +53,8 @@ public:
 	static constexpr size_t hand_count = 2;
 	using hand_selections_array = std::array<entity_id, hand_count>;
 
-	static bool is_akimbo(const cosmos& cosm, const hand_selections_array& sels) {
+	template <class C>
+	static bool is_akimbo(const C& cosm, const hand_selections_array& sels) {
 		for (const auto& s : sels) {
 			if (cosm[s].dead()) {
 				return false;

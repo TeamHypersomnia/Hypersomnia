@@ -381,10 +381,6 @@ public:
 		return operator typed_id_type();
 	}
 
-	operator child_entity_id() const {
-		return operator entity_id();
-	}
-
 	operator unversioned_entity_id() const {
 		return operator entity_id().operator unversioned_entity_id();
 	}

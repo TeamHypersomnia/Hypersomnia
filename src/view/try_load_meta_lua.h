@@ -11,7 +11,7 @@ void try_load_meta_lua(sol::state& lua, T& meta, augs::path_type resolved) {
 	try {
 		augs::load_from_lua_table(lua, meta, get_meta_lua_path(resolved));
 	}
-	catch (augs::file_open_error err) {
+	catch (const augs::file_open_error& err) {
 		/* Do not intervene. */
 	}
 }
