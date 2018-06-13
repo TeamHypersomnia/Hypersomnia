@@ -89,7 +89,20 @@ std::string& cut_trailing_spaces(std::string& s) {
 }
 
 std::string& cut_trailing_number_and_spaces(std::string& s) {
-	return cut_trailing(s, " 0123456789");
+	{
+		auto test = s;
+		cut_trailing_number(test);
+
+		const auto n = test.size();
+		cut_trailing_spaces(test);
+
+		/* If some spaces were successfully cut */
+		if (n != test.size()) {
+			s = std::move(test);
+		}
+	}
+
+	return s;
 }
 
 std::string cut_preffix(std::string&& value, const std::string& preffix) {
@@ -110,6 +123,14 @@ std::string cut_trailing_spaces(std::string&& s) {
 
 std::string cut_trailing_number_and_spaces(std::string&& s) {
 	return std::move(cut_trailing_number_and_spaces(s));
+}
+
+std::string cut_trailing_number_and_spaces(const std::string& s) {
+	return cut_trailing_number_and_spaces(std::string(s));
+}
+
+std::string cut_trailing_number(const std::string& s) {
+	return cut_trailing_number(std::string(s));
 }
 
 std::optional<unsigned long> get_trailing_number(const std::string& s) {

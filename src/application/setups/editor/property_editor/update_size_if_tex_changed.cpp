@@ -68,23 +68,39 @@ void update_size_if_tex_changed(
 
 	const auto& name_from_image = ::get_displayed_name(image_defs[new_id]);
 
+	auto make_name_from_image = [](const image_definition& def) {
+		return ::cut_trailing_number_and_spaces(::get_displayed_name(def));
+	};
+
 	for (const auto& raw_flavour_id : in.command.affected_flavours) {
 		const auto flavour_id = entity_flavour_id { raw_flavour_id, in.command.type_id };
 
 		cosm.on_flavour(flavour_id, [&](const auto& flavour) {
-			auto name = flavour.get_name();
+			const bool is_duplicate_or_created = [&]() {
+				const auto name = cut_trailing_number(flavour.get_name());
 
-			cut_trailing_number(name);
+				static const std::string dup_suff = "-Dup-";
+				static const std::string new_suff = "-New-";
 
-			static const std::string dup_suff = "-Dup-";
-			static const std::string new_suff = "-New-";
+				return 
+					ends_with(name, dup_suff)
+					|| ends_with(name, new_suff)
+				;
+			}();
 
-			const bool suitable = 
-				ends_with(name, dup_suff)
-				|| ends_with(name, new_suff)
-			;
+			const bool begins_with_some_image_name = [&]() {
+				const auto name = flavour.get_name();
 
-			if (suitable > 0) {
+				for (const auto& def : image_defs) {
+					if (::begins_with(name, make_name_from_image(def))) {
+						return true;
+					}
+				}
+
+				return false;
+			}();
+
+			if (is_duplicate_or_created || begins_with_some_image_name) {
 				const auto new_name = ::find_free_name(
 					cosm.get_common_significant().flavours.get_for<entity_type_of<decltype(flavour)>>(),
 					name_from_image,
