@@ -193,6 +193,11 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 
 		const auto node = scoped_tree_node_ex(displayed_name + "###Node", flags);
 
+		if constexpr(is_animation_type) {
+			ImGui::SameLine();
+			text_disabled(typesafe_sprintf("(%x frames)", definitions[id].frames.size()));
+		}
+
 		next_columns(2);
 
 		if (show_using_locations) {

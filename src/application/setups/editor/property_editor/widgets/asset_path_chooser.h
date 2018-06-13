@@ -30,7 +30,7 @@ public:
 	) {
 		using namespace augs::imgui;
 
-		const auto displayed_str = current_source.to_display_prettified();
+		const auto displayed_str = current_source.get_prettified_full();
 
 		if (auto combo = scoped_combo(label.c_str(), displayed_str.c_str(), ImGuiComboFlags_HeightLargest)) {
 			if (base::check_opened_first_time()) {

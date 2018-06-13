@@ -35,6 +35,9 @@ namespace augs {
 	template <class Archive>
 	void read_object_bytes(Archive& ar, std::string& storage) = delete;
 
+	/*
+		"/a/b/c/cyan_charge.png" -> " (/a/b/c)"
+	*/
 	inline std::string parenthesized_dir(path_type target_path) {
 		if (const auto directory = target_path.replace_filename("").string();
 			!directory.empty()
@@ -45,14 +48,28 @@ namespace augs {
 		return "";
 	}
 
-	inline std::string to_display(path_type target_path) {
+	/*
+		"/a/b/c/cyan_charge.png" -> "Cyan charge"
+	*/
+	inline std::string get_prettified_filename(const path_type& target_path) {
+		return format_field_name(target_path.stem().string());
+	}
+
+	/*
+		"/a/b/c/cyan_charge.png" -> "Cyan charge (/a/b/c)"
+	*/
+
+	inline std::string get_prettified_full(const path_type& target_path) {
+		return get_prettified_filename(target_path) + parenthesized_dir(target_path);
+	}
+
+	/*
+		"/a/b/c/cyan_charge.png" -> "cyan_charge.png (/a/b/c)"
+	*/
+	inline std::string filename_first(const path_type& target_path) {
 		return target_path.filename().string() + parenthesized_dir(target_path);
-
 	}
 
-	inline std::string to_display_prettified(path_type target_path) {
-		return format_field_name(target_path.stem().string()) + parenthesized_dir(target_path);
-	}
 }
 
 std::string describe_moved_file(

@@ -9,18 +9,18 @@ void path_tree_settings::do_tweakers() {
 	checkbox("Linear view", linear_view);
 	ImGui::SameLine();
 #endif
-	checkbox("Prettify filenames", prettify_filenames);
+	checkbox("Pretty names", pretty_names);
 }
 
 void path_tree_settings::do_name_location_columns() const {
 	using namespace augs::imgui;
 
-	text_disabled(prettify_filenames ? "Name" : "Filename");
+	text_disabled(pretty_names ? "Name" : "Filename");
 	ImGui::NextColumn();
 	text_disabled("Location");
 	ImGui::NextColumn();
 }
 
 std::string path_tree_settings::get_prettified(const std::string& filename) const {
-	return prettify_filenames ? format_field_name(augs::path_type(filename).stem()) : filename;
+	return pretty_names ? format_field_name(augs::path_type(filename).stem()) : filename;
 }

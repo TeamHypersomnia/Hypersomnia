@@ -63,4 +63,44 @@ void update_size_if_tex_changed(
 
 		post_editor_command(cmd_in, std::move(cmd));
 	}
+
+	const auto& cosm = cmd_in.get_cosmos();
+
+	const auto& name_from_image = ::get_displayed_name(image_defs[new_id]);
+
+	for (const auto& raw_flavour_id : in.command.affected_flavours) {
+		const auto flavour_id = entity_flavour_id { raw_flavour_id, in.command.type_id };
+
+		cosm.on_flavour(flavour_id, [&](const auto& flavour) {
+			auto name = flavour.get_name();
+
+			cut_trailing_number(name);
+
+			static const std::string dup_suff = "-Dup-";
+			static const std::string new_suff = "-New-";
+
+			const bool suitable = 
+				ends_with(name, dup_suff)
+				|| ends_with(name, new_suff)
+			;
+
+			if (suitable > 0) {
+				const auto new_name = ::find_free_name(
+					cosm.get_common_significant().flavours.get_for<entity_type_of<decltype(flavour)>>(),
+					name_from_image,
+					"-"
+				);
+
+				auto cmd = in.command;
+				cmd.affected_flavours = { raw_flavour_id };
+				cmd.property_id.invariant_id = in.text_details_invariant_id;
+				cmd.property_id.field = MACRO_MAKE_FIELD_ADDRESS(invariants::text_details, name);
+				cmd.common.has_parent = true;
+				cmd.built_description = "Updated flavour name to name of the chosen image";
+				cmd.value_after_change = augs::to_bytes(new_name);
+
+				post_editor_command(cmd_in, std::move(cmd));
+			}
+		});
+	}
 }

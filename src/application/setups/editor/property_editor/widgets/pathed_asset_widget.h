@@ -31,7 +31,7 @@ struct pathed_asset_widget {
 	) const {
 		static_assert(handles<T>);
 
-		return typesafe_sprintf("Set %x to %x", formatted_label, augs::to_display(get_viewable_pool<T>(defs)[to].get_source_path().path));
+		return typesafe_sprintf("Set %x to %x", formatted_label, augs::filename_first(get_viewable_pool<T>(defs)[to].get_source_path().path));
 	}
 
 	template <class T>

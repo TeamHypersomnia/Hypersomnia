@@ -37,12 +37,12 @@ struct maybe_official_path {
 		return p + (is_official ? "(Official)" : "(Project)");
 	}
 
-	auto to_display() const {
-		return suffixed(augs::to_display(path));
+	auto filename_first() const {
+		return suffixed(augs::filename_first(path));
 	}
 
-	auto to_display_prettified() const {
-		return suffixed(augs::to_display_prettified(path));
+	auto get_prettified_full() const {
+		return suffixed(augs::get_prettified_full(path));
 	}
 
 	template <class E>

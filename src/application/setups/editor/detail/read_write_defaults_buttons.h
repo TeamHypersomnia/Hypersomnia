@@ -40,7 +40,7 @@ void read_write_defaults_buttons(
 				cmd.affected_assets = { id };
 				cmd.property_id.field = make_field_address(definition_object, definition_object.meta);
 				cmd.value_after_change = augs::to_bytes(new_meta);
-				cmd.built_description = "Read defaults from " + augs::to_display(meta_lua_path);
+				cmd.built_description = "Read defaults from " + augs::filename_first(meta_lua_path);
 
 				post_editor_command(cmd_in, std::move(cmd));
 			}

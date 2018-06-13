@@ -133,8 +133,12 @@ std::string&& uncapitalize_first(std::string&& value);
 bool begins_with(const std::string& value, const std::string& beginning);
 bool ends_with(const std::string& value, const std::string& ending);
 
-void cut_number_at_end(std::string&);
-std::optional<unsigned long> get_number_at_end(const std::string&);
+void cut_trailing(std::string&, const char* const characters);
+
+void cut_trailing_number(std::string&);
+void cut_trailing_spaces(std::string&);
+
+std::optional<unsigned long> get_trailing_number(const std::string&);
 
 template <class T>
 auto format_as_bytes(const T& t) {

@@ -75,8 +75,8 @@ std::optional<editor_warning> editor_folder::load_folder_maybe_autosave() {
 		load_folder(autosave_path, ::get_project_name(real_path));
 
 		if (!augs::exists(real_path)) {
-			const auto display_autosave = augs::to_display(autosave_path);
-			const auto display_real = augs::to_display(real_path);
+			const auto display_autosave = augs::filename_first(autosave_path);
+			const auto display_real = augs::filename_first(real_path);
 
 			const auto message = typesafe_sprintf(
 				"Found the autosave file %x,\nbut there is no %x!\nSave the file immediately!",

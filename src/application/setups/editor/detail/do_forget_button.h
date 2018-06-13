@@ -25,7 +25,7 @@ bool do_forget_button(
 				forget_asset_id_command<asset_id_type> cmd;
 				cmd.freed_id = which.id;
 				cmd.built_description = 
-					typesafe_sprintf("Stopped tracking %x", which.get_full_path().to_display())
+					typesafe_sprintf("Stopped tracking %x", which.get_full_path().filename_first())
 				;
 
 				cmd.common.has_parent = has_parent;
@@ -51,7 +51,7 @@ bool do_forget_button(
 				text_tooltip("Forget %x %xs", ticked_in_range.size(), label);
 			}
 			else {
-				text_tooltip("Forget %x", path_entry.get_full_path().to_display());
+				text_tooltip("Forget %x", path_entry.get_full_path().filename_first());
 			}
 		}
 	}

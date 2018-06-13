@@ -99,7 +99,7 @@ void intercosm::save_as_lua(const intercosm_path_op op) const {
 }
 
 void intercosm::load_from_lua(const intercosm_path_op op) {
-	const auto display_path = augs::to_display(op.path);
+	const auto display_path = augs::filename_first(op.path);
 
 	try {
 		clear();
@@ -154,7 +154,7 @@ void intercosm::save_as_int(const augs::path_type& path) const {
 }
 
 void intercosm::load_from_int(const augs::path_type& path) {
-	const auto display_path = augs::to_display(path);
+	const auto display_path = augs::filename_first(path);
 
 	try {
 		clear();

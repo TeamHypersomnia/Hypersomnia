@@ -87,11 +87,15 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 	thread_local std::vector<asset_entry_type> orphaned_paths;
 	thread_local std::vector<asset_entry_type> used_paths;
 
-	missing_orphaned_paths.clear();
-	missing_paths.clear();
+	auto for_each_range = [](auto callback) {
+		callback(missing_orphaned_paths);
+		callback(missing_paths);
 
-	orphaned_paths.clear();
-	used_paths.clear();
+		callback(orphaned_paths);
+		callback(used_paths);
+	};
+
+	for_each_range([](auto& r) { r.clear(); });
 
 	auto is_ticked = [this](const auto& p) {
 		return found_in(ticked_assets, p.id);
@@ -175,17 +179,13 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 	auto& tree_settings = path_browser_settings.tree_settings;
 
-	auto for_each_range = [](auto callback) {
-		callback(missing_orphaned_paths);
-		callback(missing_paths);
-
-		callback(orphaned_paths);
-		callback(used_paths);
+	auto get_displayed_asset_name = [&](const auto& entry) {
+		return tree_settings.pretty_names ? ::get_displayed_name(definitions[entry.id]) : entry.get_filename().string();
 	};
 
 	auto prepare = [&](auto& range){
 		erase_if(range, [&](const auto& entry){
-			const auto displayed_name = tree_settings.get_prettified(entry.get_filename());
+			const auto displayed_name = get_displayed_asset_name(entry);
 			const auto displayed_dir = entry.get_displayed_directory();
 
 			if (!filter.PassFilter(displayed_name.c_str()) && !filter.PassFilter(displayed_dir.c_str())) {
@@ -346,7 +346,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			const auto id = path_entry.id;
 			auto scope = scoped_id(id);
 
-			const auto displayed_name = tree_settings.get_prettified(path_entry.get_filename());
+			const auto displayed_name = get_displayed_asset_name(path_entry);
 			const auto displayed_dir = path_entry.get_displayed_directory();
 
 			const auto is_current_ticked = is_ticked(path_entry);

@@ -138,8 +138,8 @@ void edit_flavour(
 		return index_in_list_v<remove_cref<decltype(inv)>, invariants_of<E>>;
 	};
 
-	const auto& name_invariant = flavour.template get<invariants::text_details>();
-	const auto source_flavour_name = name_invariant.name;
+	const auto& text_details_invariant = flavour.template get<invariants::text_details>();
+	const auto source_flavour_name = text_details_invariant.name;
 
 	/*
 		Show the name invariant as the first one,
@@ -152,17 +152,20 @@ void edit_flavour(
 		shape_polygon_invariant_id = static_cast<unsigned>(get_index(invariants::shape_polygon()));
 	}
 
+	const auto text_details_invariant_id = static_cast<unsigned>(get_index(invariants::text_details()));
+
 	auto do_edit_invariant = [&](const auto& invariant) {
 		edit_invariant(invariant, edit_invariant_input {
 			in,
 			static_cast<unsigned>(get_index(invariant)),
+			text_details_invariant_id,
 			shape_polygon_invariant_id,
 			source_flavour_name,
 			command
 		});
 	};
 
-	do_edit_invariant(name_invariant);
+	do_edit_invariant(text_details_invariant);
 
 	for_each_through_std_get(
 		flavour.invariants,

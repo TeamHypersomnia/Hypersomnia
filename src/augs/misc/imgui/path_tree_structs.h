@@ -4,7 +4,7 @@
 struct path_tree_settings {
 	// GEN INTROSPECTOR struct path_tree_settings
 	bool linear_view = true;
-	bool prettify_filenames = true;
+	bool pretty_names = true;
 	// END GEN INTROSPECTOR
 
 	std::string get_prettified(const std::string& filename) const;

@@ -93,9 +93,9 @@ bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation
 			frames_type new_frames;
 			new_frames.push_back(frames[0]);
 
-			if (const auto num = get_number_at_end(first_path_no_ext)) {
+			if (const auto num = get_trailing_number(first_path_no_ext)) {
 				auto first_path_no_num = first_path_no_ext.string();
-				cut_number_at_end(first_path_no_num);
+				cut_trailing_number(first_path_no_num);
 
 				const auto ext = first_source_path.path.extension();
 

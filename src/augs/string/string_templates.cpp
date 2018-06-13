@@ -74,14 +74,22 @@ std::string& cut_preffix(std::string& value, const std::string& preffix) {
 	return value;
 }
 
-void cut_number_at_end(std::string& s) {
-	if (const auto it = s.find_last_not_of("0123456789"); it != std::string::npos) {
+void cut_trailing(std::string& s, const char* const characters) {
+	if (const auto it = s.find_last_not_of(characters); it != std::string::npos) {
 		const auto len = s.size() - 1 - it;
 		s.erase(s.end() - len, s.end());
 	}
 }
 
-std::optional<unsigned long> get_number_at_end(const std::string& s) {
+void cut_trailing_number(std::string& s) {
+	cut_trailing(s, "0123456789");
+}
+
+void cut_trailing_spaces(std::string& s) {
+	cut_trailing(s, " ");
+}
+
+std::optional<unsigned long> get_trailing_number(const std::string& s) {
 	try {
 		return std::stoul(s.substr(s.find_last_not_of("0123456789") + 1));
 	}
