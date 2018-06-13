@@ -83,6 +83,11 @@ Current platforms are actively supported:
 
 ### Dependencies
 
+#### Tools
+
+- ``cmake``
+- ``ninja``
+
 #### Compiler toolchain
 
 You can go with:
@@ -122,7 +127,7 @@ The generated binary is also more performant (e.g. a simple benchmark yielded ``
 ```
 git clone https://github.com/TeamHypersomnia/Hypersomnia --recursive
 cd Hypersomnia
-cmake/build.sh Release x64
+cmake/build.sh RelWithDebInfo x64
 ninja run -C build/current
 ```
 

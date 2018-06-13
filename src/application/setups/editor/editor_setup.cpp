@@ -427,6 +427,7 @@ void editor_setup::perform_custom_imgui(
 				const auto created_id = executed.get_created_id();
 				view().selected_entities = { created_id };
 				mover.start_moving_selection(make_mover_input());
+				make_last_command_a_child();
 			}
 		}
 
