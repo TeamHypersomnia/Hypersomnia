@@ -40,10 +40,14 @@ void find_locations_that_use(
 
 		const auto& common = cosm.get_common_significant();
 
-		find_object_in_object<ignore_in_common, allow_conversion>(id, common, [&](const auto& location) {
+		using finder = object_in_object<ignore_in_common, allow_conversion>;
+
+		finder::find(id, common, [&](const auto& location) {
 			location_callback("Common: " + location);
 		});
 	}
+	
+	using finder = object_in_object<always_false, allow_conversion>;
 
 	/* Scan all flavours. */
 
@@ -62,7 +66,7 @@ void find_locations_that_use(
 							using C = remove_cref<decltype(c)>;
 
 							if constexpr(contains::template value<C, object_type>) {
-								find_object_in_object<always_false, allow_conversion>(id, c, [&](const auto& location) {
+								finder::find(id, c, [&](const auto& location) {
 									location_callback("Flavour: " + name + " (" + format_struct_name(c) + "." + location + ")");
 								});
 							}
@@ -88,7 +92,7 @@ void find_locations_that_use(
 			for_each_id_and_object(
 				p, 
 				[&](const auto&, const auto& asset) {
-					find_object_in_object<always_false, allow_conversion>(id, asset, [&](const auto& location) {
+					finder::find(id, asset, [&](const auto& location) {
 						location_callback(preffix + ::get_displayed_name(asset, viewables.image_definitions) + " (" + location + ")");
 					});
 				}
