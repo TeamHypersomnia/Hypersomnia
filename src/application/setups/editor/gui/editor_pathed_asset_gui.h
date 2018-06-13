@@ -12,6 +12,10 @@
 
 class images_in_atlas_map;
 
+namespace augs {
+	class window;
+}
+
 template <class asset_id_type>
 struct editor_pathed_asset_gui : standard_window_mixin<editor_pathed_asset_gui<asset_id_type>> {
 	using base = standard_window_mixin<editor_pathed_asset_gui<asset_id_type>>;
@@ -25,13 +29,25 @@ struct editor_pathed_asset_gui : standard_window_mixin<editor_pathed_asset_gui<a
 
 	bool acquire_missing_paths = true;
 
-	void perform(const property_editor_settings&, const images_in_atlas_map&, editor_command_input);
+	void perform(
+		const augs::window&,
+		const property_editor_settings&, 
+		const images_in_atlas_map&, 
+		editor_command_input
+	);
 
 private:
 	std::unordered_set<asset_id_type> ticked_assets;
 	property_editor_state property_editor_data;
 
 	editor_image_preview preview;
+
+	struct separate_properties_window {
+		bool show = true;
+		asset_id_type currently_viewed;
+	};
+
+	separate_properties_window separate_properties;
 };
 
 using editor_images_gui = editor_pathed_asset_gui<assets::image_id>;

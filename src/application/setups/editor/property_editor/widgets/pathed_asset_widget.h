@@ -8,7 +8,6 @@
 #include "augs/misc/imgui/path_tree_structs.h"
 
 #include "application/setups/editor/detail/get_id_or_import.h"
-#include "application/setups/editor/gui/asset_path_browser_settings.h"
 #include "application/setups/editor/property_editor/tweaker_type.h"
 #include "application/setups/editor/property_editor/widgets/asset_path_chooser.h"
 

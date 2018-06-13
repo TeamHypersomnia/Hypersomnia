@@ -11,7 +11,8 @@ void asset_path_browser_settings::do_tweakers() {
 	ImGui::SameLine();
 	checkbox("Using locations", show_using_locations);
 
-	ImGui::Separator();
+	ImGui::SameLine();
+	checkbox("Properties column", show_properties_column);
 }
 
 

@@ -1,3 +1,5 @@
+#include <thread>
+
 #include <unistd.h>
 #include <fcntl.h>
 
@@ -748,6 +750,8 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 			return;
 		}
 
-		augs::shell(typesafe_sprintf("%x %x", script_path, p.string()));
+		const auto shell_command = typesafe_sprintf("%x %x", script_path, p.string());
+
+		std::thread([shell_command](){ augs::shell(shell_command); }).detach();
 	}
 }

@@ -434,8 +434,8 @@ void editor_setup::perform_custom_imgui(
 
 		summary_gui.perform(*this);
 
-		images_gui.perform(settings.property_editor, game_atlas, make_command_input());
-		sounds_gui.perform(settings.property_editor, game_atlas, make_command_input());
+		images_gui.perform(owner, settings.property_editor, game_atlas, make_command_input());
+		sounds_gui.perform(owner, settings.property_editor, game_atlas, make_command_input());
 
 		particle_effects_gui.perform(settings.property_editor, game_atlas, make_command_input());
 		plain_animations_gui.perform(settings.property_editor, game_atlas, make_command_input());

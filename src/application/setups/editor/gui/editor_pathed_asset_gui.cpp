@@ -5,6 +5,7 @@
 #if BUILD_PROPERTY_EDITOR
 #include "augs/string/string_templates.h"
 
+#include "augs/window_framework/window.h"
 #include "augs/templates/list_utils.h"
 #include "augs/templates/introspection_utils/field_name_tracker.h"
 #include "augs/templates/introspection_utils/on_dynamic_content.h"
@@ -30,54 +31,32 @@
 #include "application/setups/editor/property_editor/widgets/image_offset_widget.h"
 #include "application/setups/editor/property_editor/widgets/source_path_widget.h"
 
-#include "application/setups/editor/property_editor/general_edit_properties.h"
-#include "application/setups/editor/detail/read_write_defaults_buttons.h"
+#include "application/setups/editor/detail/do_pathed_asset_properties.h"
+#include "application/setups/editor/detail/do_forget_button.h"
+
 #include "application/setups/editor/detail/find_locations_that_use.h"
 #include "application/setups/editor/detail/checkbox_selection.h"
 #include "application/setups/editor/property_editor/compare_all_fields_to.h"
-#include "application/setups/editor/property_editor/special_widgets.h"
 #include "augs/readwrite/byte_readwrite.h"
-
-template <class id_type>
-struct pathed_asset_entry : public browsed_path_entry_base<id_type> {
-	using base = browsed_path_entry_base<id_type>;
-
-	id_type id;
-	std::vector<std::string> using_locations;
-
-	bool missing = false;
-
-	bool used() const {
-		return using_locations.size() > 0;
-	}
-
-	pathed_asset_entry() = default;
-	pathed_asset_entry(
-		const maybe_official_path<id_type>& from,
-	   	const id_type id
-	) :
-		base(from),
-		id(id)
-	{}
-};
 
 #endif
 
 template <class asset_id_type>
 void editor_pathed_asset_gui<asset_id_type>::perform(
+	const augs::window& window,
 	const property_editor_settings& settings,
 	const images_in_atlas_map& game_atlas,
    	editor_command_input cmd_in
 ) {
 #if BUILD_PROPERTY_EDITOR
 	constexpr bool is_image_type = std::is_same_v<asset_id_type, assets::image_id>;
-	const bool separate_property_window = false;
+	const bool show_properties_column = path_browser_settings.show_properties_column;
 
 	using namespace augs::imgui;
 
-	auto window = base::make_scoped_window();
+	auto window_scope = base::make_scoped_window();
 
-	if (!window) {
+	if (!window_scope) {
 		return;
 	}
 
@@ -85,6 +64,9 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 	auto& work = *folder.work;
 
 	auto& viewables = work.viewables;
+	auto& definitions = get_viewable_pool<asset_id_type>(viewables);
+
+	using def_type = typename std::remove_reference_t<decltype(definitions)>::mapped_type;
 
 	using asset_entry_type = pathed_asset_entry<asset_id_type>;
 
@@ -120,9 +102,6 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 		last_seen_missing_paths.clear();
 	}
 
-	auto& definitions = get_viewable_pool<asset_id_type>(viewables);
-	using def_type = typename std::remove_reference_t<decltype(definitions)>::mapped_type;
-
 	const auto label = std::string(maybe_official_path<asset_id_type>::get_label());
 
 	for_each_id_and_object(definitions,
@@ -135,11 +114,13 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			});
 
 			auto push_missing = [&]() {
-				(new_entry.used() ? missing_paths : missing_orphaned_paths).emplace_back(std::move(new_entry));
+				auto& target_range = new_entry.used() ? missing_paths : missing_orphaned_paths;
+				target_range.emplace_back(std::move(new_entry));
 			};
 
 			auto push_existing = [&]() {
-				(new_entry.used() ? used_paths : orphaned_paths).emplace_back(std::move(new_entry));
+				auto& target_range = new_entry.used() ? used_paths : orphaned_paths;
+				target_range.emplace_back(std::move(new_entry));
 			};
 
 			auto lazy_check_missing = [&](const auto& p) {
@@ -169,6 +150,9 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 	acquire_missing_paths = false;
 	
 	path_browser_settings.do_tweakers();
+	ImGui::SameLine();
+	checkbox("Properties window", separate_properties.show);
+	ImGui::Separator();
 
 	if (ImGui::Button("Re-check existence")) {
 		acquire_missing_paths = true;
@@ -208,142 +192,90 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 	for_each_range(prepare);
 
+	asset_entry_type* currently_viewed_entry = nullptr;
+	std::vector<asset_entry_type>* range_of_currently_viewed = nullptr;
+
+	auto look_for_current_in = [&](auto& paths) {
+		for (auto& e : paths) {
+			if (e.id == separate_properties.currently_viewed) {
+				currently_viewed_entry = std::addressof(e);
+				range_of_currently_viewed = std::addressof(paths);
+			}
+		}
+	};
+
+	look_for_current_in(orphaned_paths);
+	look_for_current_in(used_paths);
+
+	const auto prop_in = property_editor_input { settings, property_editor_data };
+
+	if (separate_properties.show && currently_viewed_entry != nullptr) {
+		const auto& path_entry = *currently_viewed_entry;
+
+		ImGui::SetNextWindowSize(ImVec2(350,560), ImGuiCond_FirstUseEver);
+		auto scope = scoped_window("Current image", std::addressof(separate_properties.show));
+
+		ImGui::Columns(2);
+
+		const auto& asset_entries = *range_of_currently_viewed;
+		const auto ticked_and_existing = get_all_ticked_and_existing(asset_entries);
+
+		thread_local std::vector<asset_id_type> ticked_ids;
+		ticked_ids.clear();
+
+		for (const auto& p : ticked_and_existing) {
+			ticked_ids.push_back(p.id);
+		}
+
+		const auto is_current_ticked = is_ticked(path_entry);
+
+		do_pathed_asset_properties(
+			tree_settings,
+			prop_in,
+			cmd_in,
+			path_entry, 
+			ticked_and_existing, 
+			ticked_ids,
+			is_current_ticked,
+			game_atlas,
+			preview,
+			2
+		);
+
+		ImGui::Columns(1);
+		ImGui::Separator();
+
+		const auto resolved_path = path_entry.get_full_path().resolve(cmd_in.folder.current_path);
+
+		if (ImGui::Button("Reveal in explorer")) {
+			window.reveal_in_explorer(resolved_path);
+		}
+
+		text_disabled(typesafe_sprintf("%x", resolved_path.string()));
+
+		if constexpr(is_image_type) {
+			const auto& entry = game_atlas.at(currently_viewed_entry->id);
+			const auto is = vec2i(entry.get_original_size());
+
+			text_disabled(typesafe_sprintf("%x x %x pixels", is.x, is.y));
+
+			game_image(entry.diffuse, is);
+			invisible_button("###imgpreview", is);
+		}
+
+	}
+
 	auto files_view = scoped_child("Files view");
 
 	const bool show_using_locations = path_browser_settings.show_using_locations;
-	const auto num_cols = 3 + (show_using_locations ? 1 : 0) - (separate_property_window ? 1 : 0);
+	const auto num_cols = 2 + (show_using_locations ? 1 : 0) + (show_properties_column ? 1 : 0);
 
 	if (tree_settings.linear_view) {
 		ImGui::Columns(num_cols);
 
 		bool official_separator = false;
 
-		auto do_image_properties = [&](const auto& path_entry, const auto& ticked_in_range, const auto& ticked_ids) {
-			const auto id = path_entry.id;
-			const auto displayed_name = tree_settings.get_prettified(path_entry.get_filename());
-			const auto is_current_ticked = is_ticked(path_entry);
-
-			auto sc = scoped_indent();
-
-			{
-				::read_write_defaults_buttons(
-					settings,
-					cmd_in,
-					definitions,
-					id,
-					is_current_ticked,
-					ticked_in_range
-				);
-
-				next_columns(num_cols);
-			}
-
-			const auto property_location = typesafe_sprintf(" (in %x)", displayed_name);
-
-			using command_type = change_asset_property_command<asset_id_type>;
-
-			auto post_new_change = [&](
-				const auto& description,
-				const auto field_id,
-				const auto& new_content
-			) {
-				command_type cmd;
-
-				if constexpr(source_path_widget::handles<remove_cref<decltype(new_content)>>) {
-					/* 
-						If we are changing the source path inside an asset that is ticked,
-						don't propagate the change throughout the rest of ticks
-						because we uniquely identify exactly by the source path.
-					*/
-
-					cmd.affected_assets = { id };
-				}
-				else {
-					if (is_current_ticked) {
-						cmd.affected_assets = ticked_ids;
-					}
-					else {
-						cmd.affected_assets = { id };
-					}
-				}
-
-				cmd.property_id.field = field_id;
-				cmd.value_after_change = augs::to_bytes(new_content);
-				cmd.built_description = description + property_location;
-
-				post_editor_command(cmd_in, std::move(cmd));
-			};
-
-			auto rewrite_last_change = [&](
-				const auto& description,
-				const auto& new_content
-			) {
-				auto& last = cmd_in.get_history().last_command();
-
-				if (auto* const cmd = std::get_if<command_type>(std::addressof(last))) {
-					cmd->built_description = description + property_location;
-					cmd->rewrite_change(augs::to_bytes(new_content), cmd_in);
-				}
-				else {
-					LOG("WARNING! There was some problem with tracking activity of editor controls.");
-				}
-			};
-
-			auto prop_in = property_editor_input { settings, property_editor_data };
-
-			const bool disable_path_chooser = is_current_ticked && ticked_ids.size() > 1;
-
-			/* 
-				Don't construct this widget for sounds and other pathed widgets. 
-				Image offsets apply only to... images.
-			*/
-
-			using offset_widget = 
-				std::conditional_t<
-					is_image_type,
-					image_offset_widget,
-					default_widget_provider
-				>
-			;
-
-			using color_widget =
-				std::conditional_t<
-					is_image_type,
-					image_color_picker_widget,
-					default_widget_provider
-				>
-			;
-
-			const auto& project_path = cmd_in.folder.current_path;
-
-			general_edit_properties(
-				prop_in,
-				definitions[id],
-				post_new_change,
-				rewrite_last_change,
-				[&](const auto& first, const field_address field_id) {
-					if (!is_current_ticked) {
-						return true;
-					}
-
-					return compare_all_fields_to(
-						first,
-						asset_property_id<asset_id_type> { field_id }, 
-						cmd_in, 
-						ticked_ids
-					);
-				},
-				special_widgets(
-					source_path_widget { viewables, project_path, settings, disable_path_chooser },
-					offset_widget { id, game_atlas },
-					color_widget { id, game_atlas, viewables.image_definitions, preview, project_path }
-				),
-				default_sane_default_provider(),
-				num_cols - 2
-			);
-		};
-
-		auto do_path = [&](const auto& path_entry, const auto& ticked_in_range, const auto& ticked_ids) {
+		auto do_asset_entry = [&](const auto& path_entry, const auto& ticked_in_range, const auto& ticked_ids) {
 			separator_if_unofficials_ended(path_entry.get_full_path(), official_separator);
 
 			const auto id = path_entry.id;
@@ -354,53 +286,41 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 			const auto is_current_ticked = is_ticked(path_entry);
 
-			const auto flags = do_selection_checkbox(ticked_assets, id, is_current_ticked, id);
+			const auto tick_flags = do_selection_checkbox(ticked_assets, id, is_current_ticked, id);
 
-			if (!path_entry.used()) {
-				const auto scoped_style = in_line_button_style();
-
-				if (ImGui::Button("F")) {
-					bool has_parent = false;
-
-					auto forget = [&](const auto& which) {
-						forget_asset_id_command<asset_id_type> cmd;
-						cmd.freed_id = which.id;
-						cmd.built_description = 
-							typesafe_sprintf("Stopped tracking %x", which.get_full_path().to_display())
-						;
-
-						cmd.common.has_parent = has_parent;
-						post_editor_command(cmd_in, std::move(cmd));
-
-						has_parent = true;
-					};
-
-					if (!is_current_ticked) {
-						forget(path_entry);
-					}
-					else {
-						for_each_in(ticked_in_range, forget);
-					}
-				}
-
-				if (ImGui::IsItemHovered()) {
-					if (is_current_ticked && ticked_in_range.size() > 1) {
-						text_tooltip("Forget %x %xs", ticked_in_range.size(), label);
-					}
-					else {
-						text_tooltip("Forget %x", path_entry.get_full_path().to_display());
-					}
-				}
-
-				ImGui::SameLine();
-			}
-
-			if (nullptr == mapped_or_nullptr(definitions, id)) {
+			if (do_forget_button(
+				cmd_in,
+				path_entry,
+				ticked_in_range,
+				is_current_ticked,
+				label
+			)) {
 				/* It has just been forgotten. */
 				return;
 			}
 
-			const auto node = scoped_tree_node_ex(displayed_name + "###Node", flags);
+			auto total_flags = tick_flags;
+		   
+			if (!show_properties_column) {
+				if (currently_viewed_entry == std::addressof(path_entry)) {
+					total_flags |= ImGuiTreeNodeFlags_Bullet;
+				}
+				else {
+					total_flags |= ImGuiTreeNodeFlags_Leaf;
+				}
+			}
+		
+			const auto node_label = displayed_name + "###" + (show_properties_column ? "Node" : "Leaf");
+			const auto node = scoped_tree_node_ex(node_label, total_flags);
+
+			if (!show_properties_column) {
+				if (ImGui::IsItemClicked()) {
+					separate_properties.currently_viewed = id;
+					separate_properties.show = true;
+
+					ImGui::SetWindowFocus("Current image");
+				}
+			}
 
 			if constexpr(is_image_type) {
 				if (ImGui::IsItemHovered()) {
@@ -411,9 +331,18 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 						game_image_button("###TooltipPreview", entry);
 					}
 				}
+
+				const auto& entry = game_atlas.at(id);
+
+				if (entry.diffuse.was_successfully_packed) {
+					ImGui::SameLine();
+					const auto size = entry.get_original_size();
+					const auto size_suffix = typesafe_sprintf("(%xx%x)", size.x, size.y);
+					text_disabled(size_suffix);
+				}
 			}
 
-			next_columns(2);
+			next_columns(show_properties_column ? 2 : 1);
 
 			text_disabled(displayed_dir);
 
@@ -423,7 +352,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 				if (path_entry.used()) {
 					const auto& using_locations = path_entry.using_locations;
 
-					if (auto node = scoped_tree_node(typesafe_sprintf("%x locations###locations", using_locations.size()).c_str())) {
+					if (auto locations_node = scoped_tree_node(typesafe_sprintf("%x locations###locations", using_locations.size()).c_str())) {
 						for (const auto& l : using_locations) {
 							text(l);
 						}
@@ -436,19 +365,32 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 			ImGui::NextColumn();
 
-			if (node) {
-				do_image_properties(path_entry, ticked_in_range, ticked_ids);
+			if (node && show_properties_column) {
+				auto sc = scoped_indent();
+
+				do_pathed_asset_properties(
+					tree_settings,
+					prop_in,
+					cmd_in,
+					path_entry, 
+					ticked_in_range, 
+					ticked_ids,
+					is_current_ticked,
+					game_atlas,
+					preview,
+					num_cols
+				);
 			}
 		};
 
 		int section_index = 0;
 		
 		auto do_section = [&](
-			const auto& paths,
+			const auto& asset_entries,
 			const std::array<std::string, 3> labels,
 			const std::optional<rgba> color = std::nullopt
 		) {
-			if (paths.empty()) {
+			if (asset_entries.empty()) {
 				return;
 			}
 
@@ -458,8 +400,8 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 				do_tick_all_checkbox(
 					settings,
 					ticked_assets,
-					[&paths](auto callback) {
-						for (const auto& p : paths) {
+					[&asset_entries](auto callback) {
+						for (const auto& p : asset_entries) {
 							callback(p.id);
 						}
 					},
@@ -474,8 +416,10 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 				}
 			}
 
-			ImGui::NextColumn();
-			text_disabled("Properties");
+			if (show_properties_column) {
+				ImGui::NextColumn();
+				text_disabled("Properties");
+			}
 
 			ImGui::NextColumn();
 			text_disabled(labels[1]);
@@ -488,7 +432,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 			ImGui::Separator();
 
-			const auto ticked_and_existing = get_all_ticked_and_existing(paths);
+			const auto ticked_and_existing = get_all_ticked_and_existing(asset_entries);
 
 			thread_local std::vector<asset_id_type> ticked_ids;
 			ticked_ids.clear();
@@ -497,8 +441,8 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 				ticked_ids.push_back(p.id);
 			}
 
-			for (const auto& p : paths) {
-				do_path(p, ticked_and_existing, ticked_ids);
+			for (const auto& p : asset_entries) {
+				do_asset_entry(p, ticked_and_existing, ticked_ids);
 			}
 
 			ImGui::Separator();
