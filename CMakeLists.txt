@@ -610,6 +610,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/gui/editor_unpathed_asset_gui.cpp"
 	"src/application/setups/editor/property_editor/widgets/frames_prologue_widget.cpp"
 	"src/application/setups/editor/property_editor/property_editor_structs.cpp"
+	"src/application/setups/editor/property_editor/update_size_if_tex_changed.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.
