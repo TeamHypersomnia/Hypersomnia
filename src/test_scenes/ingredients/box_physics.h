@@ -26,7 +26,7 @@ namespace test_flavours {
 	}
 
 	template <class E>
-	void add_see_through_dynamic_body(E& meta) {
+	auto& add_see_through_dynamic_body(E& meta) {
 		invariants::fixtures fixtures_def;
 		invariants::rigid_body body_def;
 
@@ -34,12 +34,14 @@ namespace test_flavours {
 		body_def.damping.angular = 6.5f;
 
 		fixtures_def.filter = filters::see_through_dynamic_object();
-		fixtures_def.density = 0.2f;
-		fixtures_def.restitution = 0.5f;
+		fixtures_def.density = .2f;
+		fixtures_def.restitution = .5f;
 		fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::METAL);
 
 		meta.set(fixtures_def);
 		meta.set(body_def);
+
+		return meta.template get<invariants::fixtures>();
 	}
 
 	template <class E>
