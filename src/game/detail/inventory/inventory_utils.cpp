@@ -234,8 +234,10 @@ bool can_stack_entities(
 	const const_entity_handle a,
 	const const_entity_handle b
 ) {
-	const auto name = a.get_name();
-	return name == b.get_name() && a.get<invariants::item>().stackable;
+	return 
+		a.get_flavour_id() == b.get_flavour_id() 
+		&& a.get<invariants::item>().stackable
+	;
 }
 
 unsigned to_space_units(const std::string& s) {

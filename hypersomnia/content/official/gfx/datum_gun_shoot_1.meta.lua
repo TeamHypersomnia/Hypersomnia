@@ -18,7 +18,7 @@ return {
   offsets = {
     gun = {
       bullet_spawn = {
-        x = -22,
+        x = 0,
         y = 0
       },
       detachable_magazine = {

@@ -6,7 +6,7 @@ struct asset_path_browser_settings {
 	path_tree_settings tree_settings;
 	bool show_orphaned = false;
 	bool show_using_locations = false;
-	bool show_properties_column = true;
+	bool show_properties_column = false;
 	// END GEN INTROSPECTOR
 
 	void do_tweakers();
