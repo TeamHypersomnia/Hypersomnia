@@ -157,6 +157,18 @@ auto tree_of_flavours(
 							);
 
 							if (fae_in.show_flavour_control_buttons) {
+								const auto scoped_style = in_line_button_style();
+
+								{
+									const auto button_label = "I##" + imgui_id;
+
+									if (ImGui::Button(button_label.c_str())) {
+										output.instantiate_id = flavour_id;
+									}
+								}
+
+								ImGui::SameLine();
+
 								if (dd_buttons_result::DELETE == duplicate_delete_buttons<
 									duplicate_flavour_command,
 									delete_flavour_command

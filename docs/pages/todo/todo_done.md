@@ -1009,3 +1009,5 @@ we consider whole type overrides too complex architeciturally:
 	- node'ize (instead of combo'ize) the offset/color pickers so that multiple offsets can be viewed at once
 
 
+- disallow removing last frame from the animation and always require to create an animation from an existing set of frames
+	- simplifies calculations
