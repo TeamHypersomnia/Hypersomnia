@@ -45,6 +45,10 @@ struct maybe_official_path {
 		return suffixed(augs::get_prettified_full(path));
 	}
 
+	auto get_prettified_filename() const {
+		return augs::get_prettified_filename(path);
+	}
+
 	template <class E>
 	static auto is_supported_extension(const E& ext) {
 		if constexpr(std::is_same_v<T, assets::image_id>) {

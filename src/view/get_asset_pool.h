@@ -48,16 +48,10 @@ auto& access_asset_pool(E&& cmd_in, cosmos_common_significant_access access) {
 template <class T>
 decltype(auto) get_displayed_name(const T& object) {
 	if constexpr(std::is_same_v<T, sound_definition>) {
-		auto displayed = format_field_name(object.get_source_path().path.stem());
-
-		/* This is for the trailing variation number. */
-		cut_trailing_number(displayed);
-		cut_trailing_spaces(displayed);
-
-		return displayed;
+		return cut_trailing_number_and_spaces(object.get_source_path().get_prettified_filename());
 	}
 	else {
-		return format_field_name(object.get_source_path().path.stem());
+		return object.get_source_path().get_prettified_filename();
 	}
 }
 
@@ -65,13 +59,7 @@ template <class T, class D>
 decltype(auto) get_displayed_name(const T& object, const D& image_defs) {
 	if constexpr(has_frames_v<T>) {
 		const auto image_id = object.frames[0].image_id;
-		auto displayed = ::get_displayed_name(image_defs[image_id]);
-
-		/* This is for the trailing frame number. */
-		cut_trailing_number(displayed);
-		cut_trailing_spaces(displayed);
-
-		return displayed;
+		return cut_trailing_number_and_spaces(::get_displayed_name(image_defs[image_id]));
 	}
 	else {
 		return object.name;

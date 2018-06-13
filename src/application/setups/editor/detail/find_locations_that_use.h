@@ -89,7 +89,7 @@ void find_locations_that_use(
 				p, 
 				[&](const auto&, const auto& asset) {
 					find_object_in_object<always_false, allow_conversion>(id, asset, [&](const auto& location) {
-						location_callback(preffix + get_displayed_name(asset, viewables.image_definitions) + " (" + location + ")");
+						location_callback(preffix + ::get_displayed_name(asset, viewables.image_definitions) + " (" + location + ")");
 					});
 				}
 			);

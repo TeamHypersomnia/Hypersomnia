@@ -40,16 +40,17 @@ struct pathed_asset_widget {
 
 		bool changed = false;
 
-		auto& definitions = get_viewable_pool<T>(defs);
+		const auto& definitions = get_viewable_pool<T>(defs);
 
 		auto on_choice = [&](const maybe_official_path<T>& chosen_path) {
 			object = ::get_id_or_import(chosen_path, project_path, definitions, in);
 			changed = true;
 		};
 		
-		const auto& current_source  = definitions[object].get_source_path();
-
 		thread_local asset_path_chooser<T> chooser;
+
+		/* Definitions might get altered so we need to keep a copy */
+		const auto current_source = definitions[object].get_source_path();
 
 		chooser.perform(identity_label, current_source, project_path, on_choice, true_returner());
 

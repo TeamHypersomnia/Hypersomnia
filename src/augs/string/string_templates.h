@@ -125,18 +125,27 @@ inline auto str_ops(const char* const s) {
 std::string& cut_preffix(std::string& value, const std::string& preffix);
 
 std::string& capitalize_first(std::string& value);
-std::string&& capitalize_first(std::string&& value);
-
 std::string& uncapitalize_first(std::string& value);
-std::string&& uncapitalize_first(std::string&& value);
+
+std::string& cut_trailing(std::string&, const char* const characters);
+
+std::string& cut_trailing_number(std::string&);
+std::string& cut_trailing_spaces(std::string&);
+std::string& cut_trailing_number_and_spaces(std::string&);
+
+std::string cut_preffix(std::string&&, const std::string& preffix);
+
+std::string capitalize_first(std::string&& value);
+std::string uncapitalize_first(std::string&& value);
+
+std::string cut_trailing(std::string&&, const char* const characters);
+
+std::string cut_trailing_number(std::string&&);
+std::string cut_trailing_spaces(std::string&&);
+std::string cut_trailing_number_and_spaces(std::string&&);
 
 bool begins_with(const std::string& value, const std::string& beginning);
 bool ends_with(const std::string& value, const std::string& ending);
-
-void cut_trailing(std::string&, const char* const characters);
-
-void cut_trailing_number(std::string&);
-void cut_trailing_spaces(std::string&);
 
 std::optional<unsigned long> get_trailing_number(const std::string&);
 

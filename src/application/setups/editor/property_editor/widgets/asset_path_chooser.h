@@ -40,11 +40,9 @@ public:
 				auto make_path_adder = [&](const bool official, const auto& root) {
 					return [official, this, &allow_path_predicate, &root](const auto& p) {
 						if (maybe_official_path<I>::is_supported_extension(p.extension())) {
-							auto cut_path = std::string(p.string());
-							cut_preffix(cut_path, root.string() + "/");
 							maybe_official_path<I> entry;
 
-							entry.path = cut_path;
+							entry.path = cut_preffix(p.string(), root.string() + "/");
 							entry.is_official = official;
 
 							if (allow_path_predicate(entry)) {

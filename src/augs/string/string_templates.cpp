@@ -17,11 +17,6 @@ std::string& uncapitalize_first(std::string& value) {
 	return value;
 }
 
-std::string&& uncapitalize_first(std::string&& value) {
-	uncapitalize_first(value);
-	return std::move(value);
-}
-
 std::string& capitalize_first(std::string& value) {
 	if (value.size() > 0) {
 		value[0] = ::toupper(value[0]);
@@ -30,14 +25,16 @@ std::string& capitalize_first(std::string& value) {
 	return value;
 }
 
-std::string&& capitalize_first(std::string&& value) {
-	capitalize_first(value);
-	return std::move(value);
+std::string capitalize_first(std::string&& value) {
+	return std::move(capitalize_first(value));
+}
+
+std::string uncapitalize_first(std::string&& value) {
+	return std::move(uncapitalize_first(value));
 }
 
 std::string format_field_name(std::string s) {
-	s[0] = ::toupper(s[0]);
-	return str_ops(s).multi_replace_all({ "_", "." }, " ").subject;
+	return str_ops(capitalize_first(s)).multi_replace_all({ "_", "." }, " ").subject;
 }
 
 std::string to_forward_slashes(std::string in_str) {
@@ -74,19 +71,45 @@ std::string& cut_preffix(std::string& value, const std::string& preffix) {
 	return value;
 }
 
-void cut_trailing(std::string& s, const char* const characters) {
+std::string& cut_trailing(std::string& s, const char* const characters) {
 	if (const auto it = s.find_last_not_of(characters); it != std::string::npos) {
 		const auto len = s.size() - 1 - it;
 		s.erase(s.end() - len, s.end());
 	}
+
+	return s;
 }
 
-void cut_trailing_number(std::string& s) {
-	cut_trailing(s, "0123456789");
+std::string& cut_trailing_number(std::string& s) {
+	return cut_trailing(s, "0123456789");
 }
 
-void cut_trailing_spaces(std::string& s) {
-	cut_trailing(s, " ");
+std::string& cut_trailing_spaces(std::string& s) {
+	return cut_trailing(s, " ");
+}
+
+std::string& cut_trailing_number_and_spaces(std::string& s) {
+	return cut_trailing(s, " 0123456789");
+}
+
+std::string cut_preffix(std::string&& value, const std::string& preffix) {
+	return std::move(cut_preffix(value, preffix));
+}
+
+std::string cut_trailing(std::string&& s, const char* const characters) {
+	return std::move(cut_trailing(s, characters));
+}
+
+std::string cut_trailing_number(std::string&& s) {
+	return std::move(cut_trailing_number(s));
+}
+
+std::string cut_trailing_spaces(std::string&& s) {
+	return std::move(cut_trailing_spaces(s));
+}
+
+std::string cut_trailing_number_and_spaces(std::string&& s) {
+	return std::move(cut_trailing_number_and_spaces(s));
 }
 
 std::optional<unsigned long> get_trailing_number(const std::string& s) {
