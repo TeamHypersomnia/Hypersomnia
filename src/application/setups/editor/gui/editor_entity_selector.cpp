@@ -277,7 +277,7 @@ std::optional<rgba> editor_entity_selector::find_highlight_color_of(
 	const entity_id id, 
 	const grouped_selector_op_input in
 ) const {
-	auto held_or_hovered = [in, id](auto& checked, const auto result_col) -> std::optional<rgba> {
+	auto held_or_hovered = [in, id](const entity_id checked, const rgba result_col) -> std::optional<rgba> {
 		if (checked.is_set()) {
 			if (checked == id) {
 				return result_col;

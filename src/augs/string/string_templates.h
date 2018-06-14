@@ -152,6 +152,10 @@ bool ends_with(const std::string& value, const std::string& ending);
 
 std::optional<unsigned long> get_trailing_number(const std::string&);
 
+namespace augs {
+	bool natural_order(const std::string& a, const std::string& b);
+}
+
 template <class T>
 auto format_as_bytes(const T& t) {
 	std::string output;

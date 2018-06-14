@@ -1,5 +1,13 @@
+#include "3rdparty/alphanum.hpp"
+
 #include "augs/string/string_templates.h"
 #include "augs/string/get_type_name.h"
+
+namespace augs {
+	bool natural_order(const std::string& a, const std::string& b) {
+		return doj::alphanum_less<std::string>()(a, b);
+	}
+}
 
 std::string to_lowercase(std::string s) {
 	return str_ops(s).to_lowercase().subject;

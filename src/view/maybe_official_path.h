@@ -4,6 +4,10 @@
 
 std::string format_field_name(std::string s);
 
+namespace augs {
+	bool natural_order(const std::string& a, const std::string& b);
+}
+
 template <class T>
 struct maybe_official_path {
 	using id_type = T;
@@ -23,7 +27,7 @@ struct maybe_official_path {
 
 	bool operator<(const maybe_official_path& b) const {
 		if (is_official == b.is_official) {
-			return path < b.path;
+			return augs::natural_order(path.string(), b.path.string());
 		}
 
 		return (is_official ? 1 : 0) < (b.is_official ? 1 : 0);
