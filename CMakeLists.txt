@@ -1279,9 +1279,9 @@ if(MSVC)
 endif()
 
 if(CLANG)
-	list(APPEND HYPERSOMNIA_LIBS c++experimental)
+	list(APPEND HYPERSOMNIA_LIBS c++experimental dl)
 elseif(GCC)
-	list(APPEND HYPERSOMNIA_LIBS stdc++fs)
+	list(APPEND HYPERSOMNIA_LIBS stdc++fs dl)
 endif()
 
 target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
