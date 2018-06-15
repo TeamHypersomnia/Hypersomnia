@@ -7,7 +7,9 @@
 #include <X11/Xlib-xcb.h>
 
 #include <xcb/xcb.h>
+#if TODO_FULLSCREEN
 #include <xcb/xcb_ewmh.h>
+#endif
 #include <xcb/xcb_keysyms.h>
 
 #include <GL/glx.h>
