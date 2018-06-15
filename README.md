@@ -96,6 +96,7 @@ Current platforms are actively supported:
 - ``libx11``
 - ``libxcb``
 - ``xcb-util-keysyms``
+- ``xcb-proto``
 
 #### Compiler toolchain
 
