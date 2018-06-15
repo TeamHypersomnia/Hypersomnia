@@ -14,6 +14,7 @@
 #define USE_BUFFER_SUB_DATA 0
 #endif
 
+#if BUILD_OPENGL
 void buffer_data(
 	GLenum target,
   	GLsizeiptr size,
@@ -26,6 +27,7 @@ void buffer_data(
 	GL_CHECK(glBufferData(target, size, data, usage));
 #endif
 }
+#endif
 
 namespace augs {
 	renderer::renderer() {
@@ -105,6 +107,7 @@ namespace augs {
 
 	void renderer::set_clear_color(const rgba col) {
 		const auto v = vec4(col);
+		(void)v;
 		GL_CHECK(glClearColor(v[0], v[1], v[2], v[3]));
 	}
 
@@ -122,6 +125,7 @@ namespace augs {
 
 	void renderer::set_active_texture(const unsigned n) {
 		GL_CHECK(glActiveTexture(GL_TEXTURE0 + n));
+		(void)n;
 	}
 
 	void renderer::call_triangles() {
@@ -161,6 +165,7 @@ namespace augs {
 
 	void renderer::set_viewport(const xywhi xywh) {
 		GL_CHECK(glViewport(xywh.x, xywh.y, xywh.w, xywh.h));
+		(void)xywh;
 	}
 
 	void renderer::clear_special_vertex_data() {
@@ -216,6 +221,7 @@ namespace augs {
 			0.f, 1.f,
 			1.f, 1.f
 		};
+		(void)vertices;
 
 		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, 0));
 		GL_CHECK(glDisableVertexAttribArray(static_cast<int>(vertex_attribute::texcoord)));
@@ -254,6 +260,7 @@ namespace augs {
 			ImGuiIO& io = ImGui::GetIO();
 			// const int fb_width = static_cast<int>(io.DisplaySize.x * io.DisplayFramebufferScale.x);
 			const int fb_height = static_cast<int>(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+			(void)fb_height;
 
 			GL_CHECK(glEnable(GL_SCISSOR_TEST));
 
@@ -357,6 +364,12 @@ namespace augs {
 		const auto result = glClientWaitSync(sync, GL_SYNC_FLUSH_COMMANDS_BIT, timeout);
 		return !(result == GL_TIMEOUT_EXPIRED || result == GL_WAIT_FAILED);
 #else
+		(void)sync;
+		(void)timeout;
+
+		(void)triangle_buffer_id;
+		(void)special_buffer_id;
+		(void)imgui_elements_id;
 		return false;
 #endif
 	}

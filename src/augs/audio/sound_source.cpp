@@ -93,6 +93,7 @@ namespace augs {
 	}
 	
 	void sound_source::seek_to(const float seconds) const {
+		(void)seconds;
 		AL_CHECK(alSourcef(id, AL_SEC_OFFSET, seconds));
 	}
 	
@@ -107,6 +108,7 @@ namespace augs {
 	}
 	
 	void sound_source::set_looping(const bool loop) const {
+		(void)loop;
 		AL_CHECK(alSourcei(id, AL_LOOPING, loop));
 #if TRACE_PARAMETERS
 		LOG_NVPS(loop);
@@ -114,6 +116,7 @@ namespace augs {
 	}
 
 	void sound_source::set_pitch(const float pitch) const {
+		(void)pitch;
 		AL_CHECK(alSourcef(id, AL_PITCH, pitch));
 #if TRACE_PARAMETERS
 		LOG_NVPS(pitch);
@@ -121,6 +124,7 @@ namespace augs {
 	}
 
 	void sound_source::set_gain(const float gain) const {
+		(void)gain;
 		AL_CHECK(alSourcef(id, AL_GAIN, gain));
 #if TRACE_PARAMETERS
 		LOG_NVPS(gain);
@@ -128,6 +132,7 @@ namespace augs {
 	}
 
 	void sound_source::set_air_absorption_factor(const float absorption) const {
+		(void)absorption;
 		AL_CHECK(alSourcef(id, AL_AIR_ABSORPTION_FACTOR, absorption));
 #if TRACE_PARAMETERS
 		LOG_NVPS(absorption);
@@ -162,6 +167,7 @@ namespace augs {
 	void sound_source::set_max_distance(const si_scaling si, const float distance) const {
 		const auto passed_distance = si.get_meters(distance);
 
+		(void)passed_distance;
 		AL_CHECK(alSourcef(id, AL_MAX_DISTANCE, passed_distance));
 #if TRACE_PARAMETERS
 		LOG_NVPS(passed_distance);
@@ -171,6 +177,7 @@ namespace augs {
 	void sound_source::set_reference_distance(const si_scaling si, const float distance) const {
 		const auto passed_distance = si.get_meters(distance);
 
+		(void)passed_distance;
 		AL_CHECK(alSourcef(id, AL_REFERENCE_DISTANCE, passed_distance));
 #if TRACE_PARAMETERS
 		LOG_NVPS(passed_distance);
@@ -178,6 +185,7 @@ namespace augs {
 	}
 
 	void sound_source::set_direct_channels(const bool flag) const {
+		(void)flag;
 		AL_CHECK(alSourcei(id, AL_DIRECT_CHANNELS_SOFT, flag ? 1 : 0));
 
 #if TRACE_PARAMETERS
@@ -285,6 +293,7 @@ namespace augs {
 	}
 
 	void set_listener_orientation(const std::array<float, 6> data) {
+		(void)data;
 		AL_CHECK(alListenerfv(AL_ORIENTATION, data.data()));
 	}
 }

@@ -21,6 +21,7 @@ namespace augs {
 				info_log.resize(info_log_length);
 
 				int chars_written = 0;
+				(void)chars_written;
 
 				GL_CHECK(glGetShaderInfoLog(
 					obj, 
@@ -33,6 +34,8 @@ namespace augs {
 
 				throw shader_compilation_error(shader_type, source_code, info_log);
 			}
+
+			(void)obj;
 		}
 
 		void log_shader_program(const GLuint obj) {
@@ -45,6 +48,7 @@ namespace augs {
 				info_log.resize(info_log_length);
 
 				int chars_written = 0;
+				(void)chars_written;
 
 				GL_CHECK(glGetProgramInfoLog(
 					obj, 
@@ -107,6 +111,7 @@ namespace augs {
 			}
 
 			auto* const source_ptr = source_code.c_str();
+			(void)source_ptr;
 			GL_CHECK(glShaderSource(id, 1, &source_ptr, nullptr));
 			GL_CHECK(glCompileShader(id));
 
@@ -210,12 +215,14 @@ namespace augs {
 #if BUILD_OPENGL
 			return glGetUniformLocation(id, uniform_name.c_str());
 #else
+			(void)uniform_name;
 			return 0xdeadbeef;
 #endif
 		}
 
 		void shader_program::set_projection(const std::array<float, 16> matrix) const {
 			GL_CHECK(glUniformMatrix4fv(get_uniform_location("projection_matrix"), 1, GL_FALSE, matrix.data()));
+			(void)matrix;
 		}
 
 		void shader_program::set_projection(const vec2 for_screen_size) const {
@@ -224,10 +231,14 @@ namespace augs {
 
 		void shader_program::set_uniform(const GLint id, const vec2 v) const {
 			GL_CHECK(glUniform2f(id, v.x, v.y));
+			(void)id;
+			(void)v;
 		}
 
 		void shader_program::set_uniform(const GLint id, const vec2i v) const {
 			GL_CHECK(glUniform2i(id, v.x, v.y));
+			(void)id;
+			(void)v;
 		}
 
 		void shader_program::set_uniform(const GLint id, const rgba r) const {
@@ -240,18 +251,26 @@ namespace augs {
 
 		void shader_program::set_uniform(const GLint id, const vec3 v) const {
 			GL_CHECK(glUniform3f(id, v[0], v[1], v[2]));
+			(void)id;
+			(void)v;
 		}
-		
+
 		void shader_program::set_uniform(const GLint id, const vec4 v) const {
 			GL_CHECK(glUniform4f(id, v[0], v[1], v[2], v[3]));
+			(void)id;
+			(void)v;
 		}
 
 		void shader_program::set_uniform(const GLint id, const float v) const {
 			GL_CHECK(glUniform1f(id, v));
+			(void)id;
+			(void)v;
 		}
 
 		void shader_program::set_uniform(const GLint id, const int v) const {
 			GL_CHECK(glUniform1i(id, v));
+			(void)id;
+			(void)v;
 		}
 	}
 }

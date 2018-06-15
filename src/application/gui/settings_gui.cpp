@@ -339,7 +339,11 @@ void settings_gui_state::perform(
 					); 
 				}
 
-				text("Test scenes (%x)", BUILD_TEST_SCENES ? "built-in" : "not built-in");
+#if BUILD_TEST_SCENES
+				text("Test scenes (%x)", "built-in");
+#else
+				text("Test scenes (%x)", "not built-in");
+#endif
 
 				{
 					auto indent = scoped_indent();

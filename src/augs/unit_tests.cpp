@@ -28,6 +28,7 @@ namespace Catch {
 
 namespace augs {
 	void run_unit_tests(const unit_tests_settings& settings) {
+		(void)settings;
 #if BUILD_UNIT_TESTS
 		if (!settings.run) {
 			return;

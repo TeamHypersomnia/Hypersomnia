@@ -24,12 +24,13 @@ namespace augs {
 
 		void texture::start_upload_from(const pbo& p) {
 			p.set_as_current();
-			glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, size.x, size.y, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+			GL_CHECK(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, size.x, size.y, GL_RGBA, GL_UNSIGNED_BYTE, 0));
 		}
 
 		void texture::texImage2D(const vec2u new_size, const unsigned char* const source) {
 			size = new_size;
 
+			(void)source;
 			GL_CHECK(glTexImage2D(
 				GL_TEXTURE_2D,
 				0,

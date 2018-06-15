@@ -13,6 +13,9 @@ test_scene_setup::test_scene_setup(
 ) {
 #if BUILD_TEST_SCENES
 	scene.make_test_scene(lua, settings);
+#else
+	(void)lua;
+	(void)settings;
 #endif
 
 	if (recording_type != input_recording_type::DISABLED) {

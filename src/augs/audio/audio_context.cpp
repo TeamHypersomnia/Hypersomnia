@@ -47,6 +47,8 @@ namespace augs {
 			output_path,
 			all_audio_devices
 		);
+#else
+		(void)output_path;
 #endif
 	}
 
@@ -59,6 +61,8 @@ namespace augs {
 		if (!alcIsExtensionPresent(device, "ALC_EXT_EFX")) {
 			LOG("Warning! ALC_EXT_EFX extension is not present.");
 		}
+#else
+		(void)device_name;
 #endif
 	}
 
@@ -124,6 +128,8 @@ namespace augs {
 		alcResetDeviceSOFT(device, attrs);
 		AL_CHECK_DEVICE(device);
 		log_hrtf_status();
+#else
+		(void)settings;
 #endif
 	}
 

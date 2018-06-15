@@ -15,6 +15,8 @@ namespace augs {
 #if BUILD_ENET
 			ip = addr.host;
 			port = addr.port;
+#else
+			(void)addr;
 #endif
 		}
 

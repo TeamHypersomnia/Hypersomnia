@@ -543,6 +543,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 	(void)settings;
 	(void)game_atlas;
 	(void)cmd_in;
+	(void)window;
 #endif
 }
 

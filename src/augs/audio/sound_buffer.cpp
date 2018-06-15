@@ -33,6 +33,7 @@ namespace augs {
 		ensure(!bad_format);
 		return AL_FORMAT_MONO8;
 #else
+		(void)d;
 		return 0xdeadbeef;
 #endif
 	}
@@ -109,6 +110,9 @@ namespace augs {
 		LOG("Passed format: %x\nPassed frequency: %x\nPassed bytesize: %x", passed_format, passed_frequency, passed_bytesize);
 #endif
 
+		(void)passed_bytesize;
+		(void)passed_frequency;
+		(void)passed_format;
 		AL_CHECK(alBufferData(id, passed_format, new_data.samples.data(), static_cast<ALsizei>(passed_bytesize), static_cast<ALsizei>(passed_frequency)));
 	}
 

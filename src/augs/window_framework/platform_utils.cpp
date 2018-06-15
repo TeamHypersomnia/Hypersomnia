@@ -87,7 +87,7 @@ namespace augs {
 
 #else
 namespace augs {
-	bool set_display(const vec2i v, const int bpp) {
+	bool set_display(const vec2i, const int) {
 		return true;
 	}
 

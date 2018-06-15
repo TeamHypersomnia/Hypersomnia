@@ -22,6 +22,8 @@ namespace augs {
 				0      /* assume any amount of incoming bandwidth */,
 				0);
 #else
+			(void)port;
+			(void)max_connections;
 			LOG("Warning! ENet wasn't built.");
 			return false;
 #endif
@@ -65,6 +67,9 @@ namespace augs {
 			enet_host_flush(host.get());
 
 			return result;
+#else
+			(void)payload;
+			(void)target;
 #endif
 			return false;
 		}
@@ -72,12 +77,16 @@ namespace augs {
 		void server::disconnect(const endpoint_address& target) {
 #if BUILD_ENET
 			enet_peer_disconnect(peer_map.at(target), 0);
+#else
+			(void)target;
 #endif
 		}
 
 		void server::forceful_disconnect(const endpoint_address& target) {
 #if BUILD_ENET
 			enet_peer_reset(peer_map.at(target));
+#else
+			(void)target;
 #endif
 			peer_map.erase(target);
 		}

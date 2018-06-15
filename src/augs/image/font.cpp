@@ -157,6 +157,8 @@ namespace augs {
 		catch (const augs::file_open_error& err) {
 
 		}
+#else
+		(void)in;
 #endif
 	}
 }

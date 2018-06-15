@@ -49,6 +49,9 @@ namespace augs {
 			}
 #else
 			LOG("Warning! ENet wasn't built.");
+			(void)host_address;
+			(void)port;
+			(void)timeout_ms;
 			return false;
 #endif
 		}
@@ -61,6 +64,7 @@ namespace augs {
 			packet stream = payload;
 			return redundancy.sender.post_message(stream);
 #else
+			(void)payload;
 			return false;
 #endif
 		}
@@ -97,6 +101,7 @@ namespace augs {
 
 			return result;
 #else
+			(void)payload;
 			return false;
 #endif
 		}
