@@ -1,6 +1,8 @@
 #pragma once
 #include <vector>
 #include <thread>
+#include <atomic>
+#include <mutex>
 
 #include "augs/templates/traits/function_traits.h"
 

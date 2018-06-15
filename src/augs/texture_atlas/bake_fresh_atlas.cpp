@@ -169,8 +169,7 @@ void bake_fresh_atlas(
 #endif
 	
 	{
-		static std::vector<std::vector<std::byte>> _all_loaded_bytes;
-		auto& all_loaded_bytes = _all_loaded_bytes;
+		static std::vector<std::vector<std::byte>> all_loaded_bytes;
 
 		{
 			auto scope = measure_scope(out.profiler.loading_images);
