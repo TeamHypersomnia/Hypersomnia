@@ -10,6 +10,7 @@ addons:
      - gcc-7
      - g++-7
      - cmake
+     - ninja-build
     sources:
      - ubuntu-toolchain-r-test
 
