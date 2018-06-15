@@ -98,6 +98,9 @@ Current platforms are actively supported:
 - ``xcb-util-keysyms``
 - ``xcb-proto``
 
+On Ubuntu:
+- ``libxcb-keysyms1-dev``
+
 #### Compiler toolchain
 
 You can go with:

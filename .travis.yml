@@ -12,6 +12,7 @@ addons:
      - cmake
      - ninja-build
      - libxcb-keysyms1
+     - libxcb-keysyms1-dev
     sources:
      - ubuntu-toolchain-r-test
 
