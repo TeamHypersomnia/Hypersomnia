@@ -11,8 +11,16 @@ struct basic_camera_cone {
 
 	// GEN INTROSPECTOR struct basic_camera_cone class T
 	basic_transform<T> transform;
-	T zoom = static_cast<T>(1);
+	T zoom;
 	// END GEN INTROSPECTOR
+
+	basic_camera_cone(
+		const basic_transform<T>& transform = basic_transform<T>(),
+		const T zoom = 1.f
+	) : 
+		transform(transform),
+		zoom(zoom)
+	{}
 
 	vec2_type to_screen_space(const vec2_type screen_size, const vec2_type world_pos) const {
 		// TODO: support rotation

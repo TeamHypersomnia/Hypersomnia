@@ -89,6 +89,10 @@ struct image_offset_widget {
 			if constexpr(!only_vec) {
 				draw_ray(image_space_old, object.rotation, rgba(white.rgb(), ray_alpha));
 			}
+			else {
+				(void)ray_alpha;
+				(void)draw_ray;
+			}
 
 			const bool pos_mode = only_vec || !io.KeyShift;
 

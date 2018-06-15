@@ -51,7 +51,7 @@ entity_id get_hovered_world_entity(
 
 	entities.reacquire_all_and_sort({
 		cosm,
-		{ world_cursor_position },
+		camera_cone(world_cursor_position, 1.f),
 		vec2(1, 1),
 		true // exact
 	});

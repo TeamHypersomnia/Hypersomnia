@@ -191,7 +191,7 @@ void editor_entity_selector::do_mousemotion(
 
 		const auto query = visible_entities_query{
 			cosm,
-			{ world_range.get_center(), 1.f },
+			camera_cone(world_range.get_center(), 1.f),
 			world_range.get_size()
 		};
 

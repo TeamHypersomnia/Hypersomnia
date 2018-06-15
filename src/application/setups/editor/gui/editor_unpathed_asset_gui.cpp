@@ -1,5 +1,9 @@
 #define INCLUDE_TYPES_IN 1
 
+#include "application/setups/editor/gui/editor_unpathed_asset_gui.h"
+
+#if BUILD_PROPERTY_EDITOR
+
 #include "augs/string/string_templates.h"
 
 #include "augs/templates/introspection_utils/field_name_tracker.h"
@@ -11,7 +15,6 @@
 
 #include "game/organization/for_each_entity_type.h"
 
-#include "application/setups/editor/gui/editor_unpathed_asset_gui.h"
 #include "application/setups/editor/editor_folder.h"
 #include "application/intercosm.h"
 
@@ -53,12 +56,15 @@ struct unpathed_asset_entry {
 	}
 };
 
+#endif
+
 template <class asset_id_type>
 void editor_unpathed_asset_gui<asset_id_type>::perform(
 	const property_editor_settings& settings,
 	const images_in_atlas_map& game_atlas,
    	const editor_command_input cmd_in
 ) {
+#if BUILD_PROPERTY_EDITOR
 	using namespace augs::imgui;
 
 	auto window = base::make_scoped_window();
@@ -126,7 +132,7 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 			new_entry.id = id;
 			new_entry.name = get_displayed_name(object, get_asset_pool<assets::image_id>(cmd_in));
 
-			find_locations_that_use(id, *folder.work, [&](const auto& location) {
+			find_locations_that_use(id, folder.work->world, folder.work->viewables, [&](const auto& location) {
 				new_entry.using_locations.push_back(location);
 			});
 
@@ -192,6 +198,8 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 		}
 
 		const auto node = scoped_tree_node_ex(displayed_name + "###Node", flags);
+
+		constexpr bool is_animation_type = std::is_same_v<asset_id_type, assets::plain_animation_id>;
 
 		if constexpr(is_animation_type) {
 			ImGui::SameLine();
@@ -371,6 +379,11 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 		used_assets,
 		{ capitalize_first(std::string(label)) + "s", "Used at" }
 	);
+#else
+	(void)settings;
+	(void)game_atlas;
+	(void)cmd_in;
+#endif
 }
 
 template struct editor_unpathed_asset_gui<assets::plain_animation_id>;
