@@ -3,6 +3,7 @@
 #include <thread>
 #include <atomic>
 #include <mutex>
+#include <condition_variable>
 
 #include "augs/templates/traits/function_traits.h"
 
