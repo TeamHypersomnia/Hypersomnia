@@ -84,15 +84,15 @@ Current platforms are actively supported:
 
 ### Dependencies
 
-
 #### Tools
 
 - ``git``
 - ``cmake``
 - ``ninja``
 
-#### Dependencies of the source code
+#### Build dependencies
 
+- ``pkg-config``
 - ``libx11``
 - ``libxcb``
 - ``xcb-util-keysyms``

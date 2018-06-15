@@ -24,7 +24,9 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 	work->to_bytes(intercosm_before_fill);
 	view_before_fill = augs::to_bytes(view);
 
+#if BUILD_TEST_SCENES
 	work->make_test_scene(in.lua, { minimal, 144 } );
+#endif
 	view = {};
 }
 
