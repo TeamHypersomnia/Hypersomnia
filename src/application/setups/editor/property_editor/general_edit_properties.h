@@ -21,7 +21,7 @@
 
 template <class T>
 static constexpr bool forbid_zero_elements_v = 
-	is_one_of_v<T, plain_animation_frames_type>
+	is_one_of_v<T, plain_animation_frames_type, std::vector<particles_emission>>
 ;
 
 template <class T>

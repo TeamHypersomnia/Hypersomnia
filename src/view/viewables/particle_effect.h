@@ -78,6 +78,11 @@ struct particles_emission {
 	void add_particle_definition(const T& t) {
 		get_definitions<T>().push_back(t);
 	}
+
+	template <class T>
+	bool has() const {
+		return get_definitions<T>().size() > 0;
+	}
 };
 
 struct particle_effect {

@@ -121,7 +121,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			const auto path = object.get_source_path();
 			auto new_entry = asset_entry_type(path, id);
 
-			find_locations_that_use(id, work->world, viewables, [&](const std::string& location) {
+			find_locations_that_use(id, work.world, viewables, [&](const std::string& location) {
 				new_entry.using_locations.push_back(location);
 			});
 

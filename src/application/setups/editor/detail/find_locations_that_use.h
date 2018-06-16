@@ -10,8 +10,63 @@ struct ignore_in_common : std::bool_constant<
 > {};
 
 template <class object_type, class F>
+void find_flavours_that_use(
+	const object_type& id,
+	const cosmos& cosm,
+	F&& location_callback
+) {
+	static constexpr bool allow_conversion = is_typed_flavour_id_v<object_type>;
+	using contains = detail_same_or_convertible<allow_conversion>;
+
+	using finder = object_in_object<always_false, allow_conversion>;
+
+	/* Scan all flavours. */
+
+	for_each_entity_type([&](auto e) { 
+		using E = decltype(e);
+		using Fl = entity_flavour<E>;
+
+		if constexpr(contains::template value<Fl, object_type>) {
+			cosm.for_each_id_and_flavour<E>([&](typed_entity_flavour_id<E>, const Fl& flavour) {
+				auto finder = [&](const auto& c) {
+					const auto& name = flavour.template get<invariants::text_details>().name;
+
+					auto report_in_flavour = [&](const std::string& location) {
+						const auto struct_name = format_struct_name(c);
+						const auto full_location = typesafe_sprintf("Flavour: %x (%x.%x)", name, struct_name, location);
+
+						location_callback(full_location);
+					};
+
+					finder::find(id, c, report_in_flavour);
+				};
+
+				auto for_each_through = [&](const auto& where) {
+					for_each_through_std_get(
+						where,
+						[&](const auto& c) {
+							using C = remove_cref<decltype(c)>;
+
+							if constexpr(contains::template value<C, object_type>) {
+								finder(c);
+							}
+							else {
+								(void)c;
+							}
+						}
+					);
+				};
+
+				for_each_through(flavour.initial_components);
+				for_each_through(flavour.invariants);
+			});
+		}
+	});
+}
+
+template <class object_type, class F>
 void find_locations_that_use(
-	const object_type id,
+	const object_type& id,
 	const cosmos& cosm,
 	const all_viewables_defs& viewables,
 	F location_callback
@@ -36,50 +91,9 @@ void find_locations_that_use(
 		});
 	}
 	
+	find_flavours_that_use(id, cosm, location_callback);
+
 	using finder = object_in_object<always_false, allow_conversion>;
-
-	/* Scan all flavours. */
-
-	for_each_entity_type([&](auto e) { 
-		using E = decltype(e);
-		using Fl = entity_flavour<E>;
-
-		if constexpr(contains::template value<Fl, object_type>) {
-			cosm.for_each_id_and_flavour<E>([&](const auto, const auto& flavour) {
-				const auto& name = flavour.template get<invariants::text_details>().name;
-
-				auto find_flavour_id_in = [&](const auto& c) {
-					auto report_in_flavour = [&](const std::string& location) {
-						const auto struct_name = format_struct_name(c);
-						const auto full_location = typesafe_sprintf("Flavour: %x (%x.%x)", name, struct_name, location);
-
-						location_callback(full_location);
-					};
-
-					finder::find(id, c, report_in_flavour);
-				};
-
-				auto for_each_through = [&](const auto& where) {
-					for_each_through_std_get(
-						where,
-						[&](const auto& c) {
-							using C = remove_cref<decltype(c)>;
-
-							if constexpr(contains::template value<C, object_type>) {
-								find_flavour_id_in(c);
-							}
-							else {
-								(void)c;
-							}
-						}
-					);
-				};
-
-				for_each_through(flavour.initial_components);
-				for_each_through(flavour.invariants);
-			});
-		}
-	});
 
 	/* Scan all assets. */
 

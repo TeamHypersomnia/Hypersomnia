@@ -85,32 +85,34 @@ void exploding_ring_system::advance(
 
 							{
 								const auto spawner = [&](auto dummy) {
-									auto new_p = particles.spawn_particle<decltype(dummy)>(
-										rng,
-										0.f,
-										{ 200.f, 220.f },
-										r.center + vec2(spawn_particle_along_line).set_length(
-											std::max(1.f, circle_radius - rng.randval(0.f, spawn_radius_width))
-										),
-										0.f,
-										360.f,
-										sparkles_emission
-									);
+									if (sparkles_emission.has<decltype(dummy)>()) {
+										auto new_p = particles.spawn_particle<decltype(dummy)>(
+											rng,
+											0.f,
+											{ 200.f, 220.f },
+											r.center + vec2(spawn_particle_along_line).set_length(
+												std::max(1.f, circle_radius - rng.randval(0.f, spawn_radius_width))
+											),
+											0.f,
+											360.f,
+											sparkles_emission
+										);
 
-									new_p.colorize(r.color.rgb());
-									new_p.acc /= 2;
-									new_p.linear_damping /= 2;
-									new_p.acc.rotate(rng.randval(0.f, 360.f), vec2{ 0, 0 });
+										new_p.colorize(r.color.rgb());
+										new_p.acc /= 2;
+										new_p.linear_damping /= 2;
+										new_p.acc.rotate(rng.randval(0.f, 360.f), vec2{ 0, 0 });
 
-									particles.add_particle(sparkles_emission.target_render_layer, new_p);
-									//new_p.max_lifetime_ms *= 1.4f;
+										particles.add_particle(sparkles_emission.target_render_layer, new_p);
+										//new_p.max_lifetime_ms *= 1.4f;
+									}
 								};
 
 								spawner(animated_particle());
 								spawner(general_particle());
 							}
 
-							{
+							if (smokes_emission.has<general_particle>()) {
 								auto new_p = particles.spawn_particle<general_particle>(
 									rng,
 									0.f,

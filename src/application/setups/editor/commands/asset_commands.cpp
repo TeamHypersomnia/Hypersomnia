@@ -17,6 +17,17 @@ struct has_get_name<T, decltype(std::declval<T&>().get_name(), void())> : std::t
 template <class T>
 constexpr bool has_get_name_v = has_get_name<T>::value; 
 
+
+template <class T, class = void>
+struct has_emissions : std::false_type {};
+
+template <class T>
+struct has_emissions<T, decltype(std::declval<T&>().emissions, void())> : std::true_type {};
+
+template <class T>
+constexpr bool has_emissions_v = has_emissions<T>::value; 
+
+
 template <class I>
 std::string create_unpathed_asset_id_command<I>::describe() const {
 	return typesafe_sprintf("Created a new %x", uncapitalize_first(format_field_name(get_type_name_strip_namespace<I>())));
@@ -39,6 +50,11 @@ void create_unpathed_asset_id_command<I>::redo(const editor_command_input in) {
 		frame_type_t<O> f;
 		f.image_id = in.get_viewable_defs().image_definitions.get_nth_id(0);
 		new_object.frames.push_back(f);
+	}
+
+	if constexpr(has_emissions_v<O>) {
+		/* Always create a single emission to avoid crashes */
+		new_object.emissions.emplace_back();
 	}
 }
 

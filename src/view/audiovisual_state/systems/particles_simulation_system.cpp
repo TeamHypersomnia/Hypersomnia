@@ -350,19 +350,19 @@ void particles_simulation_system::advance_visible_streams(
 					return ::apply_to_particle(modifier, particle);
 				};
 
-				if (emission.get_definitions<general_particle>().size() > 0) {
+				if (emission.has<general_particle>()) {
 					auto new_general = spawner(general_particle());
 					new_general.integrate(time_elapsed);
 					add_particle(emission.target_render_layer, new_general);
 				}
 
-				if (emission.get_definitions<animated_particle>().size() > 0) {
+				if (emission.has<animated_particle>()) {
 					auto new_animated = spawner(animated_particle());
 					new_animated.integrate(time_elapsed, anims);
 					add_particle(emission.target_render_layer, new_animated);
 				}
 
-				if (emission.get_definitions<homing_animated_particle>().size() > 0) {
+				if (emission.has<homing_animated_particle>()) {
 					auto new_homing_animated = spawner(homing_animated_particle());
 
 					new_homing_animated.homing_force = augs::interp(
