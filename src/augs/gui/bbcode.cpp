@@ -72,9 +72,9 @@ namespace augs {
 						if(std::equal(
 							current_token, tag_name_token_end,
 							corresp_entry.name.begin(), corresp_entry.name.end(),
-							[](const auto left, const auto right) -> bool {
-							return std::tolower(left) == right;
-						}
+							[](const auto left, const auto right) {
+								return std::tolower(left) == right;
+							}
 						)) {
 							result.type = corresp_entry.type;
 							return std::make_tuple(result, tag_name_token_end);
@@ -94,7 +94,7 @@ namespace augs {
 						result_channel <<= 4;
 
 						if(current_token == last) {
-							return std::make_tuple(0, first);
+							return { 0, first };
 						}
 
 						const auto digit = *current_token++;
@@ -107,13 +107,13 @@ namespace augs {
 						const auto lower_case_digit = std::tolower(digit);
 
 						if(lower_case_digit < 'a' || lower_case_digit > 'f') {
-							return std::make_tuple(0, first);
+							return { 0, first };
 						}
 
 						result_channel += rgba_channel(10 + (lower_case_digit - 'a'));
 					}
 
-					return std::make_tuple(result_channel, current_token);
+					return { result_channel, current_token };
 				}
 
 				std::tuple<rgba, input_iterator_t> parse_color(const input_iterator_t first, const input_iterator_t last) {
@@ -163,20 +163,21 @@ namespace augs {
 							std::begin(corresp_table),
 							std::end(corresp_table),
 							[=](const auto& corresp_entry) {
-							return std::equal(
-								first, alpha_token_end,
-								corresp_entry.name.begin(), corresp_entry.name.end(),
-								[](const auto left, const auto right) -> bool {
-								return std::tolower(left) == right;
+								return std::equal(
+									first, alpha_token_end,
+									corresp_entry.name.begin(), corresp_entry.name.end(),
+									[](const auto left, const auto right) {
+										return std::tolower(left) == right;
+									}
+								);
 							}
-							);
-						}
 						);
-						if(corresp_entry_iter == std::end(corresp_table)) {
-							return std::make_tuple(rgba{}, first);
+
+						if (corresp_entry_iter == std::end(corresp_table)) {
+							return { rgba(), first };
 						}
 
-						return std::make_tuple(corresp_entry_iter->color, alpha_token_end);
+						return { corresp_entry_iter->color, alpha_token_end };
 					}
 
 
@@ -185,44 +186,30 @@ namespace augs {
 					auto current_token = first;
 
 					// #
-					if(current_token == last || *current_token != '#') {
-						return {rgba{}, first};
+					if (current_token == last || *current_token != '#') {
+						return { rgba(), first };
 					}
+
 					++current_token;
 
 					rgba result_color;
 
-					{
-						// hh
+					for (
+						rgba_channel* channel = std::addressof(result_color.r); 
+						channel <= std::addressof(result_color.b);
+					   	++channel
+					) {
 						decltype(current_token) component_token_end;
-						std::tie(result_color.r, component_token_end) = parse_color_component(current_token, last);
-						if(component_token_end == current_token) {
-							return std::make_tuple(rgba{}, first);
-						}
-						current_token = component_token_end;
-					}
+						std::tie(*channel, component_token_end) = parse_color_component(current_token, last);
 
-					{
-						// hh
-						decltype(current_token) component_token_end;
-						std::tie(result_color.g, component_token_end) = parse_color_component(current_token, last);
-						if(component_token_end == current_token) {
-							return std::make_tuple(rgba{}, first);
+						if (component_token_end == current_token) {
+							return { rgba(), first };
 						}
-						current_token = component_token_end;
-					}
 
-					{
-						// hh
-						decltype(current_token) component_token_end;
-						std::tie(result_color.b, component_token_end) = parse_color_component(current_token, last);
-						if(component_token_end == current_token) {
-							return std::make_tuple(rgba{}, first);
-						}
 						current_token = component_token_end;
-					}
+					};
 
-					return std::make_tuple(result_color, current_token);
+					return { result_color, current_token };
 				}
 
 				struct format_alteration {
@@ -230,19 +217,18 @@ namespace augs {
 					std::optional<decltype(style::color)> color;
 
 					template <typename F>
-					static F foreach_member(F f) {
+					static void foreach_member(F f) {
 						f(&format_alteration::font, &style::font);
 						f(&format_alteration::color, &style::color);
-						return std::move(f);
 					};
 
-					void apply_to(style& style) const {
+					void apply_to(style& st) const {
 						foreach_member([&](const auto member, const auto style_member) {
-							if(this->*member == std::nullopt) {
+							if (this->*member == std::nullopt) {
 								return;
 							}
 
-							style.*style_member = *(this->*member);
+							st.*style_member = *(this->*member);
 						});
 					}
 				};
@@ -267,11 +253,11 @@ namespace augs {
 
 				const auto append_with_current_style = [&](const auto first, const auto last) {
 					std::transform(first, last, std::back_inserter(result), [&](const char character) -> formatted_char {
-						return {current_style, character};
+						return { current_style, character };
 					});
 				};
 
-				for(auto current_token = input_str_.begin(), input_end = input_str_.end(); current_token != input_str_.end(); ) {
+				for (auto current_token = input_str_.begin(), input_end = input_str_.end(); current_token != input_str_.end(); ) {
 					{
 						// parse normal text
 						const auto text_end = std::find(current_token, input_end, '[');
@@ -280,7 +266,7 @@ namespace augs {
 						current_token = text_end;
 					}
 
-					if(current_token == input_end) {
+					if (current_token == input_end) {
 						break;
 					}
 
@@ -295,14 +281,17 @@ namespace augs {
 
 					++current_token; // skip '['
 
+					using token_type = decltype(current_token);
+
 					// parse openning/closing tag name
 					tag_data current_tag;
 					{
-						decltype(current_token) tag_name_token_end;
+						token_type tag_name_token_end;
 						std::tie(current_tag, tag_name_token_end) = parse_tag(current_token, input_end);
-						if(tag_name_token_end == current_token) {
+
+						if (tag_name_token_end == current_token) {
 							continue;
-						};
+						}
 
 						current_token = tag_name_token_end;
 					}
@@ -339,7 +328,7 @@ namespace augs {
 									// color
 									rgba color;
 									{
-										remove_cref<decltype(current_token)> color_token_end;
+										token_type color_token_end;
 										std::tie(color, color_token_end) = parse_color(current_token, input_end);
 										if(color_token_end == current_token) {
 											continue;
@@ -407,7 +396,8 @@ namespace augs {
 							const auto& entry = variant.entry;
 							entry.alteration.apply_to(current_style);
 							tag_stack.push_back(entry);
-						} else if constexpr(std::is_same_v<variant_t, remove_entry_action>) {
+						}
+						else if constexpr(std::is_same_v<variant_t, remove_entry_action>) {
 							const auto& entry_to_remove = variant.entry;
 
 							format_alteration rollback_alteration;
@@ -445,7 +435,7 @@ namespace augs {
 							rollback_alteration.apply_to(current_style);
 							tag_stack.erase(std::next(entry_to_remove).base()); // revert reverse iterator
 						} else {
-							ensure(false);
+							static_assert(std::is_same_v<variant_t, std::monostate>);
 						}
 					}, final_action_variant);
 
