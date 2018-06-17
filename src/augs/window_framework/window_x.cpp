@@ -584,7 +584,7 @@ namespace augs {
 					&& generic_event->extension == xi_opcode 
 					&& generic_event->event_type == XI_RawMotion
 				) {
-					const auto mot = reinterpret_cast<xcb_input_raw_motion_event_t*>(generic_event);
+					const auto mot = reinterpret_cast<xcb_input_raw_button_press_event_t*>(generic_event);
 					const auto axis_n = xcb_input_raw_button_press_axisvalues_raw_length(mot);
 
 					if (2 == axis_n) {
