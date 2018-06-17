@@ -13,6 +13,7 @@ addons:
      - ninja-build
      - libxcb-keysyms1
      - libxcb-keysyms1-dev
+     - libxi-dev
     sources:
      - ubuntu-toolchain-r-test
 
