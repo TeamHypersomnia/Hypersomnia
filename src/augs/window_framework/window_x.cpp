@@ -18,6 +18,7 @@
 #include "augs/templates/container_templates.h"
 #include "augs/filesystem/file.h"
 
+#include "augs/window_framework/print_x_devices.h"
 #include "augs/window_framework/translate_x_enums.h"
 #include "augs/window_framework/shell.h"
 #include "augs/window_framework/window.h"
@@ -36,37 +37,38 @@ auto xfreed_unique(T* const ptr) {
 
 namespace augs {
 	window::window(const window_settings& settings) {
-		// setup raw mouse input
-		{
-			const char* const pDevice = "/dev/input/mice";
-
-			// Open Mouse
-			auto& fd = raw_mouse_input_fd;
-
-			fd = open(pDevice, O_RDONLY);
-
-			if (fd == -1) {
-				throw window_error(
-					"Failed to open %x for reading raw mouse input.\n"
-					"This might be due to insufficient permissions.\n"
-					"If you want to keep using raw mouse input,\n"
-				    "you will need to add your user to the input group.\n"
-					"Refer to this tutorial:\n"
-					"https://puredata.info/docs/faq/how-can-i-set-permissions-so-hid-can-read-devices-in-gnu-linux",
-					pDevice
-				);
-			}
-
-			const int flags = fcntl(fd, F_GETFL, 0);
-			fcntl(fd, F_SETFL, flags | O_NONBLOCK);
-		}
-
-		int default_screen = 0xdeadbeef;
-
 		/* Open Xlib Display */ 
 		display = XOpenDisplay(0);
 
-		default_screen = DefaultScreen(display);
+		/* XInput Extension available? */
+		{
+			int event;
+			int	error;
+
+			if (!XQueryExtension(display, "XInputExtension", &xi_opcode, &event, &error)) {
+				LOG("X Input extension not available.");
+			}
+			else {
+				LOG("X Input extension available.");
+			}
+		}
+
+		{
+			/* Which version of XI2? We support 2.0 */
+			int major = 2;
+			int	minor = 0;
+
+			if (XIQueryVersion(display, &major, &minor) == BadRequest) {
+				LOG("XI2 not available. Server supports %x.%x\n", major, minor);
+			}
+			else {
+				LOG("XI2 extension available.");
+			}
+		}
+
+		print_input_devices(display);
+
+		int default_screen = DefaultScreen(display);
 
 		/* Get the XCB connection from the display */
 		connection = XGetXCBConnection(display);
@@ -176,13 +178,13 @@ namespace augs {
 					return std::vector<total_config>(fbc.get(), fbc.get() + fbcount);
 				}();
 
-				LOG("Found %d matching FB configs.\n", fbc.size());
+				LOG("Found %x matching FB configs.\n", fbc.size());
 
 				erase_if (fbc, [](const auto& f) {
 					return f.depth != 24;
 				});
 
-				LOG("Found %d matching FB configs after filtering for depth.\n", fbc.size());
+				LOG("Found %x matching FB configs after filtering for depth.\n", fbc.size());
 
 				sort_range(fbc);
 
@@ -225,6 +227,7 @@ namespace augs {
 				| XCB_EVENT_MASK_BUTTON_PRESS
 				| XCB_EVENT_MASK_BUTTON_RELEASE
 				| XCB_EVENT_MASK_FOCUS_CHANGE
+				| XCB_INPUT_XI_EVENT_MASK_RAW_MOTION
 		   	;
 
 			uint32_t valuelist[] = { eventmask, colormap, 0 };
@@ -284,13 +287,30 @@ namespace augs {
 		apply(settings, true);
 
 		last_mouse_pos = get_screen_size() / 2;
+
+		{
+			auto dpy = display;
+
+			XIEventMask mask;
+
+			mask.deviceid = XIAllMasterDevices;
+			mask.mask_len = XIMaskLen(XI_RawMotion);
+			mask.mask = reinterpret_cast<unsigned char*>(std::calloc(mask.mask_len, sizeof(unsigned char)));
+
+			mask.deviceid = XIAllDevices;
+			memset(mask.mask, 0, mask.mask_len);
+			XISetMask(mask.mask, XI_RawMotion);
+
+			XISelectEvents(dpy, DefaultRootWindow(dpy), &mask, 1);
+
+			free(mask.mask);
+			XSync(dpy, True);
+		}
 	}
 
 	void window::destroy() {
 		if (display) {
 			unset_if_current();
-
-			close(raw_mouse_input_fd);
 
 			xcb_key_symbols_free(syms);	
 
@@ -353,6 +373,17 @@ namespace augs {
 		change ch;
 
 		switch (event->response_type & ~0x80) {
+			default:
+			{
+				auto i1 = static_cast<int>(event->response_type);
+				auto i2 = static_cast<int>(event->response_type & ~0x80);
+			LOG("Unknown: %x %x", i1, i2);
+			return std::nullopt;
+			}
+
+			case XCB_INPUT_RAW_MOTION:
+			LOG("NIEZLYMOTION");
+			return ch;
 			case XCB_CLIENT_MESSAGE:
 				{
 					if (wm_delete_window_atom == reinterpret_cast<const xcb_client_message_event_t*>(event)->data.data32[0]) {
@@ -507,29 +538,10 @@ namespace augs {
 									 }
 
 */
-			default:
-				return std::nullopt;
 		}
 	}
 
 	void window::collect_entropy(local_entropy& output) {
-		{
-			// handle raw mouse input separately
-
-			unsigned char data[3];
-
-			while (read(raw_mouse_input_fd, data, sizeof(data)) > 0) {
-				const signed char x = data[1];
-				const signed char y = data[2];
-
-				if (is_active() && (current_settings.raw_mouse_input || mouse_pos_paused)) {
-					output.push_back(do_raw_motion({
-						static_cast<short>(x),
-						static_cast<short>(y * (-1)) 
-					}));
-				}	
-			}
-		}
 
 		auto keysym_getter = [this](const xcb_keycode_t keycode){
 			return xcb_key_symbols_get_keysym(syms, keycode, 0);
@@ -562,6 +574,33 @@ namespace augs {
 		};
 		
 		while (const auto event = freed_unique(xcb_poll_for_event(connection))) {
+			{
+				xcb_ge_generic_event_t *generic_event = (xcb_ge_generic_event_t*)event.get();
+
+				if (generic_event->response_type == XCB_GE_GENERIC 
+					&& generic_event->extension == xi_opcode 
+					&& generic_event->event_type == XI_RawMotion
+				) {
+					const auto mot = reinterpret_cast<xcb_input_raw_motion_event_t*>(generic_event);
+
+					if (2 == xcb_input_raw_button_press_axisvalues_raw_length(mot)) {
+						const auto axes = xcb_input_raw_button_press_axisvalues(mot);
+
+						const auto x = axes[0].integral;
+						const auto y = axes[1].integral;
+
+						if (is_active() && (current_settings.raw_mouse_input || mouse_pos_paused)) {
+							output.push_back(do_raw_motion({
+								static_cast<short>(x),
+								static_cast<short>(y) 
+							}));
+						}
+					}
+
+					continue;
+				}
+			}
+
 			auto mousemotion_handler = [this](const basic_vec2<short> p) {
 				return handle_mousemove(p); 
 			};

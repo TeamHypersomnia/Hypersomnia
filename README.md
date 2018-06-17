@@ -96,9 +96,9 @@ Current platforms are actively supported:
 - ``libx11``
 - ``libxcb``
 - ``xcb-util-keysyms``
-- ``xcb-proto``
 
 On Ubuntu:
+- ``alsa-oss``
 - ``libxcb-keysyms1-dev``
 
 #### Compiler toolchain
@@ -106,7 +106,7 @@ On Ubuntu:
 You can go with:
 
 - ``gcc 7.3`` or newer, or...
-- ...[``llvm``](http://llvm.org/) toolchain
+- ...[``llvm``](http://llvm.org/) toolchain. Required components:
 	- ``clang 6.0.1`` or newer
 	- ``libc++``
 	- ``libc++abi``

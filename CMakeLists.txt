@@ -653,6 +653,7 @@ if(BUILD_WINDOW_FRAMEWORK)
 		list(APPEND HYPERSOMNIA_CODEBASE_CPPS
 			"src/augs/window_framework/window_x.cpp"
 			"src/augs/window_framework/translate_x_enums.cpp"
+			"src/augs/window_framework/print_x_devices.cpp"
 		)
 	endif()
 else()
@@ -1238,7 +1239,7 @@ if(BUILD_WINDOW_FRAMEWORK)
 	if(UNIX)
 		find_package(X11 REQUIRED)
 		list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/extra-cmake-modules/find-modules")
-		find_package(XCB REQUIRED COMPONENTS XCB GLX KEYSYMS)
+		find_package(XCB REQUIRED COMPONENTS XCB GLX KEYSYMS XINPUT)
 		find_package(X11_XCB REQUIRED)
 
 		include_directories(${X11_INCLUDE_DIR})
@@ -1279,9 +1280,9 @@ if(MSVC)
 endif()
 
 if(CLANG)
-	list(APPEND HYPERSOMNIA_LIBS c++experimental dl)
+	list(APPEND HYPERSOMNIA_LIBS c++experimental dl Xi)
 elseif(GCC)
-	list(APPEND HYPERSOMNIA_LIBS stdc++fs dl)
+	list(APPEND HYPERSOMNIA_LIBS stdc++fs dl Xi)
 endif()
 
 target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
