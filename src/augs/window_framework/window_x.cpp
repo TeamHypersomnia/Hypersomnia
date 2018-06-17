@@ -297,7 +297,7 @@ namespace augs {
 			mask.mask_len = XIMaskLen(XI_RawMotion);
 			mask.mask = reinterpret_cast<unsigned char*>(std::calloc(mask.mask_len, sizeof(unsigned char)));
 
-			mask.deviceid = XIAllDevices;
+			mask.deviceid = XIAllMasterDevices;
 			memset(mask.mask, 0, mask.mask_len);
 			XISetMask(mask.mask, XI_RawMotion);
 
@@ -582,8 +582,9 @@ namespace augs {
 					&& generic_event->event_type == XI_RawMotion
 				) {
 					const auto mot = reinterpret_cast<xcb_input_raw_motion_event_t*>(generic_event);
+					const auto axis_n = xcb_input_raw_button_press_axisvalues_raw_length(mot);
 
-					if (2 == xcb_input_raw_button_press_axisvalues_raw_length(mot)) {
+					if (2 == axis_n) {
 						const auto axes = xcb_input_raw_button_press_axisvalues(mot);
 
 						const auto x = axes[0].integral;
@@ -595,6 +596,9 @@ namespace augs {
 								static_cast<short>(y) 
 							}));
 						}
+					}
+					else {
+						LOG("WARNING! axis_n = %x (should be 2)", axis_n);
 					}
 
 					continue;
