@@ -100,6 +100,7 @@ Current platforms are actively supported:
 On Ubuntu:
 - ``alsa-oss``
 - ``libxcb-keysyms1-dev``
+- ``libxi6``
 - ``libxi-dev``
 
 #### Compiler toolchain
