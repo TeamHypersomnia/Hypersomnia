@@ -1239,7 +1239,7 @@ if(BUILD_WINDOW_FRAMEWORK)
 	if(UNIX)
 		find_package(X11 REQUIRED)
 		list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/extra-cmake-modules/find-modules")
-		find_package(XCB REQUIRED COMPONENTS XCB GLX KEYSYMS XINPUT)
+		find_package(XCB REQUIRED COMPONENTS XCB GLX KEYSYMS)
 		find_package(X11_XCB REQUIRED)
 
 		include_directories(${X11_INCLUDE_DIR})

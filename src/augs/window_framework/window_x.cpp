@@ -11,6 +11,7 @@
 #include <xcb/xcb_ewmh.h>
 #endif
 #include <xcb/xcb_keysyms.h>
+#include <xcb/xcbext.h>
 
 #include <GL/glx.h>
 #include <GL/gl.h>
@@ -22,6 +23,8 @@
 #include "augs/window_framework/translate_x_enums.h"
 #include "augs/window_framework/shell.h"
 #include "augs/window_framework/window.h"
+
+#include "augs/window_framework/detail_xinput.h"
 
 int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char* in_text_end);
 
