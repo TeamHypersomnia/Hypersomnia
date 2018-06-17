@@ -1,6 +1,5 @@
 #pragma once
 #include <string>
-#include <xcb/xinput.h>
 #include <X11/extensions/XInput2.h>
 
 void print_classes(std::string& total_info, Display *display, XIAnyClassInfo **classes, int num_classes);
