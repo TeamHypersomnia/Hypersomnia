@@ -243,7 +243,8 @@ void illuminated_rendering(
 
 	draw_layer(render_layer::UNDER_GROUND);
 	draw_layer(render_layer::GROUND);
-	draw_layer(render_layer::ON_GROUND);
+	draw_layer(render_layer::FLOOR_AND_ROAD);
+	draw_layer(render_layer::ON_FLOOR);
 
 	renderer.call_and_clear_triangles();
 

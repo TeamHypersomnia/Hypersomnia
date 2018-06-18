@@ -31,6 +31,7 @@
 #include "game/stateless_systems/sound_existence_system.h"
 #include "game/stateless_systems/hand_fuse_system.h"
 #include "game/stateless_systems/physics_system.h"
+#include "game/stateless_systems/movement_path_system.h"
 
 void standard_solve(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
@@ -51,6 +52,8 @@ void standard_solve(const logic_step step) {
 	intent_contextualization_system().contextualize_crosshair_action_intents(step);
 	intent_contextualization_system().contextualize_use_button_intents(step);
 	intent_contextualization_system().contextualize_movement_intents(step);
+
+	movement_path_system().advance_paths(step);
 
 	movement_system().set_movement_flags_from_input(step);
 	movement_system().apply_movement_forces(step);

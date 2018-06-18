@@ -233,10 +233,11 @@ void movement_system::apply_movement_forces(const logic_step step) {
 						vec2i(1, 1)
 					}).per_layer;
 
-					const std::array<render_layer, 5> checked_layers = {
+					const std::array<render_layer, 6> checked_layers = {
 						render_layer::CAR_WHEEL,
 						render_layer::CAR_INTERIOR,
-						render_layer::ON_GROUND,
+						render_layer::FLOOR_AND_ROAD,
+						render_layer::ON_FLOOR,
 						render_layer::GROUND,
 						render_layer::UNDER_GROUND
 					};

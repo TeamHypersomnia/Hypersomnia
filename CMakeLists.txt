@@ -305,6 +305,7 @@ set(HYPERSOMNIA_TEST_SCENES_CPPS
 	"src/test_scenes/ingredients/ingredients.cpp"
 	"src/test_scenes/ingredients/melee_weapons.cpp"
 	"src/test_scenes/ingredients/obstacles.cpp"
+	"src/test_scenes/ingredients/decorations.cpp"
 	"src/test_scenes/ingredients/wsad_player.cpp"
 	"src/test_scenes/ingredients/grenades.cpp"
 	
@@ -611,6 +612,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/property_editor/widgets/frames_prologue_widget.cpp"
 	"src/application/setups/editor/property_editor/property_editor_structs.cpp"
 	"src/application/setups/editor/property_editor/update_size_if_tex_changed.cpp"
+	"src/game/stateless_systems/movement_path_system.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

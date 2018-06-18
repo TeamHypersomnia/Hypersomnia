@@ -14,6 +14,7 @@ void populate_test_scene_flavours(const populate_flavours_input in) {
 	test_flavours::populate_other_flavours(in);
 	test_flavours::populate_car_flavours(in);
 	test_flavours::populate_crate_flavours(in);
+	test_flavours::populate_decoration_flavours(in);
 	test_flavours::populate_melee_flavours(in);
 	test_flavours::populate_backpack_flavours(in);
 }
@@ -108,7 +109,7 @@ namespace test_flavours {
 
 			{
 				invariants::render render_def;
-				render_def.layer = render_layer::ON_GROUND;
+				render_def.layer = render_layer::FLOOR_AND_ROAD;
 
 				meta.set(render_def);
 			}
@@ -121,7 +122,7 @@ namespace test_flavours {
 
 			{
 				invariants::render render_def;
-				render_def.layer = render_layer::ON_GROUND;
+				render_def.layer = render_layer::FLOOR_AND_ROAD;
 
 				meta.set(render_def);
 			}
@@ -133,7 +134,7 @@ namespace test_flavours {
 
 			{
 				invariants::render render_def;
-				render_def.layer = render_layer::ON_GROUND;
+				render_def.layer = render_layer::FLOOR_AND_ROAD;
 
 				meta.set(render_def);
 			}

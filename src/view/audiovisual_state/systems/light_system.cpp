@@ -268,7 +268,8 @@ void light_system::render_all_lights(const light_system_input in) const {
 	draw_neons(render_layer::CAR_INTERIOR);
 	draw_neons(render_layer::CAR_WHEEL);
 	draw_neons(render_layer::NEON_CAPTIONS);
-	draw_neons(render_layer::ON_GROUND);
+	draw_neons(render_layer::FLOOR_AND_ROAD);
+	draw_neons(render_layer::ON_FLOOR);
 
 	/* Draw neon maps */
 	particles.draw_particles(

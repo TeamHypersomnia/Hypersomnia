@@ -136,6 +136,14 @@ enum class test_explosive_missiles {
 
 };
 
+enum class test_complex_sprite_decorations {
+	// GEN INTROSPECTOR enum class test_complex_sprite_decorations
+	ROTATING_FAN,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
 using test_flavours_map = type_map<
 	type_pair<test_controlled_characters, controlled_character>,
 	type_pair<test_plain_invisible_bodys, plain_invisible_body>,
@@ -143,6 +151,7 @@ using test_flavours_map = type_map<
 	type_pair<test_shootable_weapons, shootable_weapon>,
 	type_pair<test_shootable_charges, shootable_charge>,
 	type_pair<test_sprite_decorations, sprite_decoration>,
+	type_pair<test_complex_sprite_decorations, complex_sprite_decoration>,
 	type_pair<test_wandering_pixels_decorations, wandering_pixels_decoration>,
 	type_pair<test_static_lights, static_light>,
 	type_pair<test_throwable_explosives, throwable_explosive>,
@@ -230,6 +239,7 @@ namespace test_flavours {
 	void populate_other_flavours(populate_flavours_input);
 	void populate_car_flavours(populate_flavours_input);
 	void populate_crate_flavours(populate_flavours_input);
+	void populate_decoration_flavours(populate_flavours_input);
 	void populate_melee_flavours(populate_flavours_input);
 	void populate_backpack_flavours(populate_flavours_input);
 	void populate_gun_flavours(populate_flavours_input);

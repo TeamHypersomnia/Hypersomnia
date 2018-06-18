@@ -22,7 +22,8 @@ enum class render_layer {
 	DYNAMIC_BODY,
 	CAR_WHEEL,
 	CAR_INTERIOR,
-	ON_GROUND,
+	ON_FLOOR,
+	FLOOR_AND_ROAD,
 	GROUND,
 	UNDER_GROUND,
 

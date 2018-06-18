@@ -38,6 +38,7 @@ namespace invariants {
 	struct torso;
 	struct head;
 	struct ground;
+	struct movement_path;
 }
 
 namespace components {
@@ -66,6 +67,7 @@ namespace components {
 	struct hand_fuse;
 	struct sender;
 	struct head;
+	struct movement_path;
 }
 
 using assert_always_together = type_list<
@@ -80,7 +82,8 @@ using assert_always_together = type_list<
 	type_pair<invariants::hand_fuse, components::hand_fuse>,
 	type_pair<invariants::movement, components::movement>,
 	type_pair<invariants::light, components::light>,
-	type_pair<invariants::crosshair, components::crosshair>
+	type_pair<invariants::crosshair, components::crosshair>,
+	type_pair<invariants::movement_path, components::movement_path>
 >;
 
 using assert_first_implies_second = type_list<
@@ -125,7 +128,8 @@ using component_list_t = List<
 	components::motor_joint,
 	components::hand_fuse,
 	components::sender,
-	components::head
+	components::head,
+	components::movement_path
 >;
 
 template <template <class...> class List>
@@ -156,7 +160,8 @@ using invariant_list_t = List<
 	invariants::item_slot_transfers,
 	invariants::torso,
 	invariants::head,
-	invariants::ground
+	invariants::ground,
+	invariants::movement_path
 >;
 
 template <class... Types>

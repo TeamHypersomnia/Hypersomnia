@@ -8,6 +8,7 @@ class component_synchronizer;
 template <class>
 class physics_mixin;
 
+class movement_path_system;
 class physics_system;
 struct contact_listener;
 class cosmic;
@@ -25,6 +26,7 @@ class cosmos_solvable_inferred_access {
 
 	/* Special processors */
 	friend physics_system;
+	friend movement_path_system;
 	friend contact_listener;
 
 	template <class>

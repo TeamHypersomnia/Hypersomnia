@@ -212,6 +212,8 @@ enum class test_scene_image_id {
 	INTERFERENCE_GRENADE_RELEASED,
 	FORCE_ROCKET,
 
+	FAN,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

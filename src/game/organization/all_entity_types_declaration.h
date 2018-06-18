@@ -8,6 +8,7 @@ struct plain_sprited_body;
 struct shootable_weapon;
 struct shootable_charge;
 struct sprite_decoration;
+struct complex_sprite_decoration;
 struct wandering_pixels_decoration;
 struct static_light;
 struct throwable_explosive;
@@ -23,6 +24,7 @@ using all_entity_types = type_list<
 	shootable_weapon,
 	shootable_charge,
 	sprite_decoration,
+	complex_sprite_decoration,
 	wandering_pixels_decoration,
 	static_light,
 	throwable_explosive,
