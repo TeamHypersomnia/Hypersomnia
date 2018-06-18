@@ -248,6 +248,8 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 				30.0f
 			);
 
+			anim.meta.flip_when_cycling = true;
+
 			alloc(test_id_type::SILVER_TROUSERS, anim);
 		} 
 
