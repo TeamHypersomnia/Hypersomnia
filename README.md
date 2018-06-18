@@ -99,6 +99,7 @@ Current platforms are actively supported:
 
 On Ubuntu:
 - ``alsa-oss``
+- ``pulseaudio``
 - ``libxcb-keysyms1-dev``
 - ``libxi6``
 - ``libxi-dev``
