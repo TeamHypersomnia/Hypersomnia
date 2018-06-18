@@ -43,6 +43,10 @@ namespace augs {
 		/* Open Xlib Display */ 
 		display = XOpenDisplay(0);
 
+		if (display == nullptr) {
+			throw window_error("Could open X Display.");
+		}
+
 		/* XInput Extension available? */
 		{
 			int event;
@@ -76,7 +80,7 @@ namespace augs {
 		/* Get the XCB connection from the display */
 		connection = XGetXCBConnection(display);
 
-		if(!connection) {
+		if (!connection) {
 			XCloseDisplay(display);
 			throw window_error("Can't get xcb connection from display");
 		}

@@ -167,9 +167,10 @@ int work(const int argc, const char* const * const argv) try {
 
 	static const augs::global_libraries libraries;
 	
-	static augs::window window(config.window);
 	static augs::audio_context audio(config.audio);
 	augs::log_all_audio_devices(LOG_FILES_DIR "/audio_devices.txt");
+
+	static augs::window window(config.window);
 
 	static augs::renderer renderer;
 	LOG_NVPS(renderer.get_max_texture_size());
