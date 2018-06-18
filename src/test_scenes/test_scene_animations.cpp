@@ -136,6 +136,8 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 				30.0f
 			);
 
+			anim.meta.flip_when_cycling = true;
+
 			alloc(test_id_type::METROPOLIS_CHARACTER_BARE, anim);
 		} 
 
@@ -149,8 +151,23 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 				30.0f
 			);
 
+			anim.meta.flip_when_cycling = true;
+
 			alloc(test_id_type::RESISTANCE_CHARACTER_BARE, anim);
 		}
+
+		{
+			torso_animation anim;
+
+			create_frames(
+				anim,
+				test_scene_image_id::METROPOLIS_CHARACTER_RIFLE_1,
+				test_scene_image_id::METROPOLIS_CHARACTER_RIFLE_20,
+				30.0f
+			);
+
+			alloc(test_id_type::METROPOLIS_CHARACTER_RIFLE, anim);
+		} 
 
 		{
 			torso_animation anim;
@@ -174,8 +191,6 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 				test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_5,
 				30.0f
 			);
-
-			anim.meta.flip_when_cycling = false;
 
 			alloc(test_id_type::RESISTANCE_CHARACTER_RIFLE, anim);
 		}
@@ -245,9 +260,6 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 				test_scene_image_id::SILVER_TROUSERS_STRAFE_10,
 				30.0f
 			);
-
-			anim.meta.specifies_backward_frames = true;
-			anim.meta.flip_when_cycling = false;
 
 			alloc(test_id_type::SILVER_TROUSERS_STRAFE, anim);
 		} 

@@ -192,11 +192,6 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			const auto current_speed = current_velocity.length();
 
 			const auto speed_mult = current_speed / conceptual_max_speed;
-			const auto animation_dt = delta_ms * speed_mult;
-
-			const bool anim_finishing = !propelling && current_speed <= conceptual_max_speed / 2;
-			auto& bd = movement.four_ways_animation.backward;
-			auto& amount = movement.animation_amount;
 
 			auto start_footstep_effect = [&]() {
 				const auto transform = it.get_logic_transform();
@@ -300,16 +295,22 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				}
 			};
 
-			if (anim_finishing) {
+			const auto animation_dt = delta_ms * speed_mult;
+
+			auto& backward = movement.four_ways_animation.backward;
+			auto& amount = movement.animation_amount;
+
+			if (!propelling && current_speed <= conceptual_max_speed / 2) {
+				/* Animation is finishing. */
 				const auto decreasing_dt = delta_ms * std::max(sqrt(sqrt(speed_mult)), 0.2f);
 				amount = std::max(0.f, amount - decreasing_dt);
 			}
 			else {
-				if (bd) {
+				if (backward) {
 					amount -= animation_dt;
 
 					if (augs::flip_if_lt(amount, 0.f)) {
-						bd = false;
+						backward = false;
 
 						auto& f = movement.four_ways_animation.flip;
 						f = !f;
@@ -319,10 +320,12 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					amount += animation_dt;
 
 					if (augs::flip_if_gt(amount, static_cast<float>(duration_bound))) {
-						bd = true;
+						backward = true;
 					}
 				}
 			}
+
+			movement.four_ways_animation.base_frames_n = num_frames;
 
 			auto& idx = movement.four_ways_animation.index;
 			const auto old_idx = idx;

@@ -305,6 +305,6 @@ namespace test_scenes {
 			perform_transfer(item_slot_transfer_request::standard(second_machete, character(2).get_primary_hand()), step);
 		}
 
-		return character(1);
+		return character(0);
 	}
 }

@@ -34,17 +34,11 @@ frame_and_flip<T> get_frame_and_flip(
 	const movement_animation_state& state, 
 	T& animation
 ) {
-	const auto frames_n = static_cast<unsigned>(animation.frames.size());
-
-	const auto index = state.index;
-	auto i = index;
-
-	if (animation.meta.specifies_backward_frames && state.backward) {
-		i = frames_n - index - 1;
-	}
+	const auto animation_frames_n = static_cast<unsigned>(animation.frames.size());
+	const auto index = state.get_multi_way_index(animation_frames_n);
 
 	return { 
-		animation.frames[std::min(frames_n - 1, i)], 
+		animation.frames[std::min(animation_frames_n - 1, index)], 
 		animation.meta.flip_when_cycling && state.flip
 	};
 }
@@ -80,7 +74,7 @@ template <class C, class T>
 auto calc_stance_info(
 	const C& cosm,
 	const stance_animations& stance,
-	const movement_animation_state& movement, 
+	const movement_animation_state& anim_state, 
 	const T& wielded_items
 ) {
 	using result_t = stance_frame_info<const torso_animation>;
@@ -120,7 +114,7 @@ auto calc_stance_info(
 	}
 
 	if (const auto carry_animation = logicals.find(stance.carry)) {
-		return result_t::carry(::get_frame_and_flip(movement, *carry_animation));
+		return result_t::carry(::get_frame_and_flip(anim_state, *carry_animation));
 	}
 
 	return result_t::none();

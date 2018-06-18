@@ -14,10 +14,45 @@ namespace invariants {
 struct movement_animation_state {
 	// GEN INTROSPECTOR struct movement_animation_state
 	unsigned index = 0;
+	unsigned base_frames_n = 5;
 	bool flip = false;
 	bool backward = false;
 	pad_bytes<2> pad;
 	// END GEN INTROSPECTOR
+
+	unsigned get_multi_way_index(const unsigned animation_frames_n) const {
+		if (animation_frames_n == base_frames_n) {
+			return index;
+		}
+
+		if (animation_frames_n == base_frames_n * 2) {
+			return get_two_ways_index();
+		}
+
+		if (animation_frames_n == base_frames_n * 4) {
+			return get_four_ways_index();
+		}
+
+		return 0;
+	}
+
+	unsigned get_two_ways_index() const {
+		if (backward) {
+			return 2 * base_frames_n - index - 1;
+		}
+
+		return index;
+	}
+
+	unsigned get_four_ways_index() const {
+		const auto two_ways = get_two_ways_index();
+
+		if (flip) {
+			return 4 * base_frames_n - two_ways - 1;
+		}
+
+		return two_ways;
+	}
 };
 
 namespace components {
