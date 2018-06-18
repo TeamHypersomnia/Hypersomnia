@@ -19,7 +19,8 @@ namespace augs {
 	enum class sprite_special_effect /* : unsigned char */ {
 		// GEN INTROSPECTOR enum class augs::sprite_special_effect
 		NONE = 0,
-		COLOR_WAVE
+		COLOR_WAVE,
+		CONTINUOUS_ROTATION
 		// END GEN INTROSPECTOR
 	};
 
@@ -85,6 +86,7 @@ namespace augs {
 		size_type size;
 		rgba color = white;
 		sprite_special_effect effect = sprite_special_effect::NONE;
+		real32 effect_speed_multiplier = 1.f;
 		// END GEN INTROSPECTOR
 
 		bool operator==(const sprite& b) const {
@@ -149,9 +151,13 @@ namespace augs {
 			const drawing_input in,
 			const atlas_entry considered_texture,
 			const vec2 target_position,
-			const float target_rotation,
+			float target_rotation,
 			const vec2i considered_size
 		) const {
+			if (effect == sprite_special_effect::CONTINUOUS_ROTATION) {
+				target_rotation += std::fmod(in.global_time_seconds * effect_speed_multiplier * 360.f, 360.f);
+			}
+
 			const auto points = make_sprite_points(target_position, considered_size, target_rotation);
 
 			/* rotate around the center of the screen */
@@ -177,8 +183,8 @@ namespace augs {
 			);
 
 			if (effect == sprite_special_effect::COLOR_WAVE) {
-				const auto left_col = rgba(hsv{ fmod(in.global_time_seconds / 2.f, 1.f), 1.0, 1.0 });
-				const auto right_col = rgba(hsv{ fmod(in.global_time_seconds / 2.f + 0.3f, 1.f), 1.0, 1.0 });
+				const auto left_col = rgba(hsv{ std::fmod(in.global_time_seconds * effect_speed_multiplier / 2.f, 1.f), 1.0, 1.0 });
+				const auto right_col = rgba(hsv{ std::fmod(in.global_time_seconds * effect_speed_multiplier / 2.f / 2.f + 0.3f, 1.f), 1.0, 1.0 });
 
 				auto& t1 = triangles[0];
 				auto& t2 = triangles[1];
