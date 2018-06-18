@@ -104,10 +104,10 @@ Mamy następujące rozwiązania dla artysty:
 
 - Artysta tworzy animację **n = 5** klatek w edytorze.
 	- Gra **samodzielnie** kontynuuje animację puszczając ją od tyłu, tworząc cykl **2n = 10** klatek.
-	- (Jeśli zaznaczono *flip_when_cycling*) Gra **samodzielnie** kontynuuje animację odbijając ją w pionie i puszczając jeszcze raz, tworząc cykl **4n = 20** klatek.
+	- (Jeśli zaznaczono *flip_when_cycling*) Potem, gra **samodzielnie** kontynuuje animację odbijając ją w pionie i puszczając jeszcze raz, tworząc cykl **4n = 20** klatek.
 - Artysta tworzy animację **2n = 10** klatek w edytorze - razem z animacją powrotną.
 	- Gra zawsze puszcza animację od nowa gdy ta się skończy.
-	- (Jeśli zaznaczono *flip_when_cycling*) Gra **samodzielnie** kontynuuje animację odbijając ją w pionie i puszczając jeszcze raz, tworząc cykl **4n = 20** klatek.
+	- (Jeśli zaznaczono *flip_when_cycling*) Potem, gra **samodzielnie** kontynuuje animację odbijając ją w pionie i puszczając jeszcze raz, tworząc cykl **4n = 20** klatek.
 - Artysta tworzy animację **4n = 20** klatek w edytorze - razem z animacją powrotną i animacją odbicia.
 	- Gra zawsze puszcza animację od nowa gdy ta się skończy.
 
@@ -121,6 +121,25 @@ To upraszcza nam ogromnie kalkulacje, ale również nie wygląda źle.
 {% include important.html content="Wszystkie klatki torsu powinny być **pozbawione głowy**. Ta jest dodana podczas rozgrywki. **Tors powinien wyglądać rozsądnie również bez głowy**, np. gdy zostanie odstrzelona. " %}
 
 - **TODO: Przykłady muszą być poprawione w myśl tej zasady!**
+
+#### Tors który trzyma długie bronie
+
+**Problem**: O ile w realistycznym chodzeniu z bronią może ona się kiwać do góry i na dół, o tyle w grze nie możemy tak jej huśtać - tutaj broń jest stale równoległa do podłoża i może się obracać tylko w jednej osi - na boki.  
+
+Dlatego odległości między dłońmi na animacji muszą być stałe, aby broń nie "pływała" nam po rękach:  
+
+{% include image.html file="pages/todo/pl_pages/plywanie.gif" %}
+
+Naturalnym jest, że lewa dłoń będzie robiła większe ruchy od prawej, jako że lewa jest bardziej wyciągnięta do przodu.  
+Oto sposób na to aby zachowywać stałą odległość między dłońmi podczas animowania, gdy chcemy aby jedna dłoń ruszała się mniej od drugiej:  
+
+Załóżmy że czarna kreska to linia w której idzie broń. Na zielono zaznaczono, gdzie wypada druga dłoń. Drugą taką samą linię zaczęto obracać wokół pierwszej dłoni. Tam, gdzie wypada teraz zielony punkt, powinna wypaść dłoń w następnej klatce - wtedy dłoń się poruszy, a odległość między dłońmi zostanie zachowana.  
+
+Dzięki temu będzie wizualnie uzasadnione to, że broń z rzutu ptaka ma ciągle taką samą długość.  
+
+{% include image.html file="pages/todo/pl_pages/linia_obrot.gif" %}
+
+Najlepiej stworzyć sobie takie linie w edytorze, z kolorowymi kropkami po obu stronach, i nadzorować czy odległość ciągle wypada taka sama.
 
 #### Lista
 
