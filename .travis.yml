@@ -79,6 +79,7 @@ script:
   - ninja tests -k 0
   - ls -l
   - popd
+  - ls -l hypersomnia
   - cmake/print_bt_if_core_found.sh hypersomnia/core
 
 notfications:
