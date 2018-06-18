@@ -94,11 +94,12 @@ Za pomocą tych właśnie zmiennych gra poprawnie oblicza relatywne pozycjonowan
 
 Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.  
   
-Dla każdej ruchowej ruchu, tj:
+Dla każdej animacji ruchu, tj:
 
-- Chodzenie nóg.
-- Chodzenie torsu.
-- Chodzenie podczas trzymania karabinu, pistoletu, czegokolwiek.
+- Chodzące nogi.
+- Chodzący tors.
+- Chodzący tors podczas trzymania karabinu, pistoletu, czegokolwiek.
+	- Ale już nie tors podczas strzelania!
 
 Mamy następujące rozwiązania dla artysty:
 
