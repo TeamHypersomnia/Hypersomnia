@@ -21,7 +21,7 @@ namespace augs {
 			invisible_button_reset_cursor("###ColorSelector", viewing_size);
 			game_image(entry, viewing_size);
 
-			const auto cross_alpha = 200;
+			const auto cross_alpha = 100;
 
 			auto draw_cross = [is, zoom](const vec2i where, const rgba col) {
 				draw_cross_overlay(is, where, zoom, col);

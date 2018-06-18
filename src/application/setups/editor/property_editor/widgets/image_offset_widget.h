@@ -56,7 +56,7 @@ struct image_offset_widget {
 			invisible_button_reset_cursor("###OffsetSelector", viewing_size);
 			game_image(entry.diffuse, viewing_size);
 
-			const auto cross_alpha = 200;
+			const auto cross_alpha = 100;
 			const auto ray_alpha = 120;
 
 			auto draw_ray = [is](const vec2i center, const int degrees, const rgba col) {

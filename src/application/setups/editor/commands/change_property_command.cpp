@@ -19,6 +19,22 @@ std::string change_property_command<D>::describe() const {
 }
 
 template <class D>
+void change_property_command<D>::refresh_other_state(const editor_command_input in) {
+	auto& self = *static_cast<D*>(this);
+
+	if constexpr(std::is_same_v<D, change_asset_property_command<assets::image_id>>) {
+		for (const auto& i : self.affected_assets) {
+			in.folder.work->update_offsets_of(i, changer_callback_result::DONT_REFRESH);
+		}
+
+		if (!self.affected_assets.empty()) {
+			/* Only for refreshing */
+			in.folder.work->update_offsets_of(self.affected_assets.front());
+		}	
+	}
+}
+
+template <class D>
 void change_property_command<D>::rewrite_change(
 	const std::vector<std::byte>& new_value,
 	const editor_command_input in
@@ -42,16 +58,7 @@ void change_property_command<D>::rewrite_change(
 		}
 	);
 
-	if constexpr(std::is_same_v<D, change_asset_property_command<assets::image_id>>) {
-		for (const auto& i : self.affected_assets) {
-			in.folder.work->update_offsets_of(i, changer_callback_result::DONT_REFRESH);
-		}
-
-		if (!self.affected_assets.empty()) {
-			/* Only for refreshing */
-			in.folder.work->update_offsets_of(self.affected_assets.front());
-		}	
-	}
+	refresh_other_state(in);
 }
 
 template <class Archive, class T>
@@ -141,6 +148,8 @@ void change_property_command<D>::undo(const editor_command_input in) {
 	);
 
 	values_before_change.clear();
+
+	refresh_other_state(in);
 }
 
 template class change_property_command<change_flavour_property_command>;
