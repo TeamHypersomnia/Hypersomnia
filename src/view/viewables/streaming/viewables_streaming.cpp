@@ -3,6 +3,16 @@
 #include "view/viewables/streaming/viewables_streaming.h"
 #include "view/audiovisual_state/systems/sound_system.h"
 
+void viewables_streaming::finalize_pending_tasks() {
+	if (future_loaded_buffers.valid()) {
+		future_loaded_buffers.get();
+	}
+
+	if (future_general_atlas.valid()) {
+		future_general_atlas.get();
+	}
+}
+
 viewables_streaming::viewables_streaming(augs::renderer& renderer) {
 	LOG_NVPS(std::thread::hardware_concurrency());
 

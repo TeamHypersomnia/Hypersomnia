@@ -163,10 +163,6 @@ int work(const int argc, const char* const * const argv) try {
 		augs::run_unit_tests(config.unit_tests);
 
 		LOG("All unit tests have passed.");
-
-		if (params.unit_tests_only) {
-			return EXIT_SUCCESS;
-		}
 	}
 
 	static const augs::global_libraries libraries;
@@ -234,6 +230,9 @@ int work(const int argc, const char* const * const argv) try {
 	*/
 
 	static viewables_streaming streaming(renderer);
+	auto streaming_finalize = augs::scope_guard([&]() {
+		streaming.finalize_pending_tasks();
+	});
 
 	static world_camera gameplay_camera;
 	static audiovisual_state audiovisuals;
@@ -1665,6 +1664,11 @@ int work(const int argc, const char* const * const argv) try {
 		{
 			auto scope = measure_scope(performance.swap_buffers);
 			window.swap_buffers();
+		}
+
+		if (params.unit_tests_only) {
+			LOG("Exiting the main loop after a single iteration as it is only a test.");
+			should_quit = true;
 		}
 	}
 

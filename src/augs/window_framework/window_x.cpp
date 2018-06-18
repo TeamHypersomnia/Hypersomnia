@@ -377,12 +377,14 @@ namespace augs {
 
 		switch (event->response_type & ~0x80) {
 			default:
+#if 0
 			{
 				auto i1 = static_cast<int>(event->response_type);
 				auto i2 = static_cast<int>(event->response_type & ~0x80);
-			LOG("Unknown: %x %x", i1, i2);
-			return std::nullopt;
+				LOG("Unknown: %x %x", i1, i2);
 			}
+#endif
+			return std::nullopt;
 
 			case XCB_INPUT_RAW_MOTION:
 			LOG("NIEZLYMOTION");

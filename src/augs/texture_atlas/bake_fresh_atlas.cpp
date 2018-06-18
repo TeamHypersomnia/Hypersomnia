@@ -130,7 +130,7 @@ void bake_fresh_atlas(
 				max_size,
 				1,
 				[](auto){ return true; },
-				[](auto){ ensure(false); return false; }
+				[](const auto& r){ LOG("ERROR: (%x;%x;%x;%x) didn't fit into atlas.", r.x, r.y, r.w, r.h); return false; }
 			)
 		);
 

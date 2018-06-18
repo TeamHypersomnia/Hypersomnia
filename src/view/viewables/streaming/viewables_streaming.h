@@ -79,4 +79,6 @@ public:
 	auto& get_loaded_gui_font() {
 		return loaded_gui_font;
 	}
+
+	void finalize_pending_tasks();
 };
