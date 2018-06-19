@@ -40,3 +40,4 @@
 #include "game/components/head_component.h"
 #include "game/components/ground_component.h"
 #include "game/components/movement_path_component.h"
+#include "game/components/animation_component.h"

@@ -5,6 +5,12 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Implement constrained handles and constrained entity ids
+	- Actually the generic handle could just take the required components.
+		- The entity handle and const entity handle would be typedefs for handles without constraints.
+	- because inventory slot handle item getters should return handles that guarantee presence of an item
+	- thanks to that we can avoid problems with having many entity types and enlarging the dispatch code
+
 - Performance of flavour ids
 	- right now they are just regular pool ids
 	- they are actually quite performance critical

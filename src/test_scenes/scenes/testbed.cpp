@@ -296,6 +296,8 @@ namespace test_scenes {
 		prefabs::create_brown_backpack(step, vec2(280, -750));
 
 		prefabs::create_rotating_fan(step, vec2(380, -750));
+		prefabs::create_yellow_fish(step, vec2(380, 50));
+		prefabs::create_yellow_fish(step, vec2(420, 50), 45);
 
 		prefabs::create_rifle(step, vec2(280, -750), test_shootable_weapons::DATUM_GUN, prefabs::create_sample_magazine(step, vec2(100, -650), prefabs::create_cyan_charge(step, vec2(0, 0)), 25));
 

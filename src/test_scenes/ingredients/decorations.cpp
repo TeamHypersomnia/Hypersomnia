@@ -2,6 +2,7 @@
 #include "game/assets/all_logical_assets.h"
 #include "game/transcendental/cosmos.h"
 #include "game/components/fixtures_component.h"
+#include "test_scenes/test_scene_animations.h"
 
 namespace test_flavours {
 	void populate_decoration_flavours(const populate_flavours_input in) {
@@ -9,7 +10,7 @@ namespace test_flavours {
 		auto& flavours = in.flavours;
 
 		{
-			auto& meta = get_test_flavour(flavours, test_complex_sprite_decorations::ROTATING_FAN);
+			auto& meta = get_test_flavour(flavours, test_complex_decorations::ROTATING_FAN);
 
 			invariants::render render_def;
 			render_def.layer = render_layer::ON_FLOOR;
@@ -38,13 +39,43 @@ namespace test_flavours {
 				meta.set(ground_def);
 			}
 		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_complex_decorations::YELLOW_FISH);
+
+			invariants::render render_def;
+			render_def.layer = render_layer::ON_FLOOR;
+
+			meta.set(render_def);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::YELLOW_FISH_1, white);
+
+			{
+				invariants::animation anim_def;
+				anim_def.id = to_animation_id(test_scene_plain_animation_id::YELLOW_FISH);
+				meta.set(anim_def);
+			}
+
+			{
+				invariants::movement_path movement_path_def;
+				auto& square = movement_path_def.square_bounded;
+				square.is_enabled = true;
+				square.value.square_size = vec2i(300, 300);
+				meta.set(movement_path_def);
+			}
+		}
 	}
 }
 
 namespace prefabs {
 	entity_handle create_rotating_fan(const logic_step step, const components::transform& pos) {
-		const auto decor = create_test_scene_entity(step.get_cosmos(), test_complex_sprite_decorations::ROTATING_FAN, pos);
+		const auto decor = create_test_scene_entity(step.get_cosmos(), test_complex_decorations::ROTATING_FAN, pos);
 		return decor;
 	}
 
+	entity_handle create_yellow_fish(const logic_step step, const components::transform& pos, const unsigned time_offset_ms) {
+		const auto decor = create_test_scene_entity(step.get_cosmos(), test_complex_decorations::YELLOW_FISH, pos);
+		decor.get<components::animation>().time_offset_ms = time_offset_ms;
+		return decor;
+	}
 }

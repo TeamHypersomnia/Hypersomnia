@@ -23,16 +23,6 @@ summary: Just a hidden scratchpad.
 - Bugfix: sometimes floor is not selectable but it's because it has the same layer as road
 	- some warning perhaps could be in order?
 
-- Property editor: Checkbox matrix for b2Filter
-	- for now sensible filters will be provided by the testbed
-		- we can add a combo for now?
-		- matrix could be cool though, even for debugging
-	- it appears that filters aren't really given any special roles.
-		- thus it makes sense that they be completely customizable in editor.
-		- we will perhaps make amount of categories limited so as to fit b2Filter.
-			- max: 16
-		- a simple matrix of checkboxes like in Unity.
-
 - Selection tabs
 	- Generalize editor_tab_gui to be also able to handle the selection tabs window
 	- Enter on selection opens relevant selection group in tabs
@@ -149,10 +139,6 @@ summary: Just a hidden scratchpad.
 		- and selection state isn't that small
 	- we could either set an "is_modified" flag or track it in history
 		- not much modification points for selections, so quite viable
-
-- implement constrained handles and entity ids
-	- because inventory slot handle item getters should return handles that guarantee presence of an item
-	- thanks to that we can avoid problems with having many entity types and enlarging the dispatch code
 
 - Entity groups will be useful later, not until we make a simple deathmatch where we can include some simple weapon/car creation logic etc
 	- Really?

@@ -325,11 +325,12 @@ struct explosive_missile {
 	>;
 };
 
-struct complex_sprite_decoration {
+struct complex_decoration {
 	static constexpr std::size_t statically_allocated_entities = 2000;
 	static constexpr std::size_t statically_allocated_flavours = 300;
 
 	using invariants = type_list<
+		invariants::animation,
 		invariants::sprite,
 		invariants::render,
 		invariants::ground,
@@ -337,6 +338,7 @@ struct complex_sprite_decoration {
 	>;
 
 	using components = type_list<
+		components::animation,
 		components::sprite,
 		components::transform,
 		components::movement_path

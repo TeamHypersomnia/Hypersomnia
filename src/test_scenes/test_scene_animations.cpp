@@ -265,5 +265,19 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 
 			alloc(test_id_type::SILVER_TROUSERS_STRAFE, anim);
 		} 
+
+
+		{
+			plain_animation anim;
+
+			create_frames(
+				anim,
+				test_scene_image_id::YELLOW_FISH_1,
+				test_scene_image_id::YELLOW_FISH_8,
+				40.0f
+			);
+
+			alloc(test_id_type::YELLOW_FISH, anim);
+		} 
 	}
 }

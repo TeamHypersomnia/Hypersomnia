@@ -29,7 +29,7 @@ auto get_total_duration(
 	return result;
 }
 
-template <class T>
+template <unsigned default_value_v = static_cast<unsigned>(-1), class T>
 auto calc_current_frame_index(
 	const T& frames, 
 	real32 total_time_ms
@@ -46,7 +46,7 @@ auto calc_current_frame_index(
 		++i;
 	}
 
-	return static_cast<unsigned>(-1);
+	return default_value_v;
 }
 
 template <class T>
@@ -63,4 +63,15 @@ frame_type_t<T>* calc_current_frame(
 	}
 
 	return nullptr;
+}
+
+template <class T>
+frame_type_t<T>& calc_current_frame_looped(
+	T& animation, 
+	const real32 total_time_ms
+) {
+	const auto& frames = animation.frames;
+	const auto idx = calc_current_frame_index<0>(frames, std::fmod(total_time_ms, ::get_total_duration(frames)));
+
+	return frames[idx];
 }

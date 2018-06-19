@@ -32,7 +32,8 @@ using entities_with_renderables = entity_types_with_any_of<
 	invariants::sprite,
 	invariants::torso,
 	invariants::gun,
-   	invariants::polygon
+   	invariants::polygon,
+	invariants::animation
 >;
 
 template <class E, class T>
@@ -40,25 +41,50 @@ FORCE_INLINE void detail_specific_entity_drawer(
 	const cref_typed_entity_handle<E> typed_handle,
 	const draw_renderable_input in,
 	T render_visitor,
-	transformr viewing_transform
+	const transformr viewing_transform
 ) {
 	if constexpr(typed_handle.template has<invariants::sprite>()) {
+		auto input = [&]() {
+			using input_type = invariants::sprite::drawing_input;
+
+			auto result = input_type(in.drawer);
+
+			if (const auto flips = typed_handle.calculate_flip_flags()) { 
+				result.flip = *flips;
+			}
+
+			result.renderable_transform = viewing_transform;
+			result.global_time_seconds = in.global_time_seconds;
+
+			return result;
+		}();
+
 		const auto& sprite = typed_handle.template get<invariants::sprite>();
-		using input_type = invariants::sprite::drawing_input;
 
-		auto input = input_type(in.drawer);
+		if constexpr(typed_handle.template has<invariants::animation>()) {
+			const auto& animation_def = typed_handle.template get<invariants::animation>();
+			const auto& animation = typed_handle.template get<components::animation>();
 
-		if (const auto flips = typed_handle.calculate_flip_flags()) { 
-			input.flip = *flips;
+			const auto& logicals = typed_handle.get_cosmos().get_logical_assets();
+
+			if (const auto displayed_animation = logicals.find(animation_def.id)) {
+				const auto animation_time_ms = in.global_time_seconds * 1000 + animation.time_offset_ms;
+				const auto image_id = ::calc_current_frame_looped(*displayed_animation, animation_time_ms).image_id;
+
+				auto animated = sprite;
+				animated.image_id = image_id;
+				animated.size = in.manager.at(image_id).get_original_size();
+
+				render_visitor(animated, in.manager, input);
+				return;
+			}
 		}
 
-		input.renderable_transform = viewing_transform;
-		input.global_time_seconds = in.global_time_seconds;
+		if constexpr(typed_handle.template has<components::trace>()) {
+			const auto trace = typed_handle.template get<components::trace>();
+			const auto tracified_size = vec2(sprite.size) * trace.last_size_mult;
 
-		if (const auto trace = typed_handle.template find<components::trace>()) {
-			const auto tracified_size = vec2(sprite.size) * trace->last_size_mult;
-
-			if (const auto center_offset = tracified_size * trace->last_center_offset_mult;
+			if (const auto center_offset = tracified_size * trace.last_center_offset_mult;
 				center_offset.non_zero()
 			) {
 				const auto final_rotation = input.renderable_transform.rotation;
@@ -95,7 +121,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 		return;
 	}
 
-	if (const auto polygon = typed_handle.template find<invariants::polygon>()) {
+	if constexpr(typed_handle.template has<invariants::polygon>()) {
 		using input_type = invariants::polygon::drawing_input;
 
 		auto input = input_type(in.drawer);
@@ -103,6 +129,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 		input.renderable_transform = viewing_transform;
 		input.global_time_seconds = in.global_time_seconds;
 
+		const auto& polygon = typed_handle.template get<invariants::polygon>();
 		render_visitor(*polygon, in.manager, input);
 		return;
 	}

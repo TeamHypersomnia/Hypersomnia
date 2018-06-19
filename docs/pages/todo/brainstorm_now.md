@@ -6,7 +6,23 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Property editor: Checkbox matrix for b2Filter
+	- might be useful once we come to glass walls 
+	- a list of predefined filters
+		- might choose a name, just like enums
+		- stored in common assets
+	- now sensible filters values will be provided by the testbed
+
 - Decorations
+	- Animations
+		- Shuffled
+			- We'll probably only calculate the few that are visible, statelessly
+				- We can as well make the shuffles, why not
+	- Square-bounded movement
+
+- Editor maximum ease of access
+	- Shift+Arrows shall duplicate the selection and select the new entities
+	- Fix problems with grouping on duplication?
 
 - Particles and flavours
 	- std::unordered_map<particle_flavour_id, vector of particles>
