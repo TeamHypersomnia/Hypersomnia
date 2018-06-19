@@ -174,7 +174,9 @@ namespace test_scenes {
 
 						w.colorize = light_cyan;
 						w.particles_count = 150;
-						w.set_reach(xywh(light_pos.x- 350, light_pos.y-350, 500, 500));
+						const auto reach = xywh(light_pos.x- 350, light_pos.y-350, 500, 500);
+						w.size = reach.get_size();
+						e.set_logic_transform(reach.get_center());
 					});
 				}
 			}
@@ -211,7 +213,8 @@ namespace test_scenes {
 
 						w.colorize = cyan;
 						w.particles_count = 50;
-						w.set_reach(left_reach);
+						w.size = left_reach.get_size();
+						e.set_logic_transform(left_reach.get_center());
 					});
 				}
 
@@ -222,7 +225,8 @@ namespace test_scenes {
 
 						w.colorize = orange;
 						w.particles_count = 50;
-						w.set_reach(right_reach);
+						w.size = right_reach.get_size();
+						e.set_logic_transform(right_reach.get_center());
 					});
 				}
 			}

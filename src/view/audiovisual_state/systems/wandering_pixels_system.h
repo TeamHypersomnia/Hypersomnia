@@ -13,6 +13,7 @@
 
 #include "game/components/wandering_pixels_component.h"
 #include "game/components/sprite_component.h"
+#include "game/assets/animation_math.h"
 #include "view/audiovisual_state/systems/audiovisual_cache_common.h"
 
 struct visible_entities;
@@ -31,7 +32,8 @@ public:
 	};
 
 	struct cache {
-		components::wandering_pixels recorded_component;
+		unsigned recorded_particle_count = 0;
+		xywh recorded_reach;
 
 		std::vector<particle> particles;
 		bool constructed = false;
@@ -68,13 +70,23 @@ public:
 			for (const auto& p : cache.particles) {
 				basic_input.renderable_transform = p.pos;
 
-				if (wandering_def.frames.size() > 0) {
-					{
-						const auto& wandering = subject.template get<components::wandering_pixels>();
-						basic_input.colorize = wandering.colorize;
-					}
+				{
+					const auto& wandering = subject.template get<components::wandering_pixels>();
+					basic_input.colorize = wandering.colorize;
+				}
 
-					wandering_def.get_face_after(p.current_lifetime_ms).draw(manager, basic_input);
+				const auto& cosm = subject_handle.get_cosmos();
+				const auto& logicals = cosm.get_logical_assets();
+
+				if (const auto displayed_animation = logicals.find(wandering_def.animation_id)) {
+					const auto animation_time_ms = p.current_lifetime_ms;
+					const auto image_id = ::calc_current_frame_looped(*displayed_animation, animation_time_ms).image_id;
+
+					invariants::sprite animated;
+					animated.image_id = image_id;
+					animated.size = manager.at(image_id).get_original_size();
+
+					animated.draw(manager, basic_input);
 				}
 			}
 		});

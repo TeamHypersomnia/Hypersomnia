@@ -23,7 +23,6 @@ namespace test_flavours {
 	void populate_other_flavours(const populate_flavours_input in) {
 		auto& flavours = in.flavours;
 		auto& caches = in.caches;
-		auto& plain_animations = in.plain_animations;
 
 		{
 			auto& meta = get_test_flavour(flavours, test_static_lights::STRONG_LAMP);
@@ -43,20 +42,7 @@ namespace test_flavours {
 			}
 
 			invariants::wandering_pixels wandering;
-
-			auto& frames = wandering.frames;
-			frames.resize(5);
-
-			const auto id = to_animation_id(test_scene_plain_animation_id::CAST_BLINK_ANIMATION);
-			const auto& cast_blink = plain_animations.find(id)->frames;
-
-			frames[0] = { to_image_id(test_scene_image_id::BLANK), vec2(1, 1), white };
-			frames[1] = { to_image_id(test_scene_image_id::BLANK), vec2(2, 2), white };
-			frames[2] = { (cast_blink[1].image_id), caches, white };
-			frames[3] = { (cast_blink[2].image_id), caches, white };
-			frames[4] = { to_image_id(test_scene_image_id::BLANK), vec2(2, 2), white };
-
-			wandering.frame_duration_ms = 6000.f;
+			wandering.animation_id = to_animation_id(test_scene_plain_animation_id::WANDERING_PIXELS_ANIMATION);
 			meta.set(wandering);
 		}
 

@@ -59,17 +59,32 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 			ensure_eq(new_allocation.key, id);
 		};
 
-		{
-			plain_animation anim;
+		plain_animation cast_blink;
 
+		{
 			create_frames(
-				anim,
+				cast_blink,
 				test_scene_image_id::CAST_BLINK_1,
 				test_scene_image_id::CAST_BLINK_19,
 				50.0f
 			);
 
-			alloc(test_id_type::CAST_BLINK_ANIMATION, anim);
+			alloc(test_id_type::CAST_BLINK_ANIMATION, cast_blink);
+		} 
+
+		{
+			plain_animation anim;
+
+			auto& frames = anim.frames;
+			frames.resize(5);
+
+			frames[0] = { to_image_id(test_scene_image_id::BLANK), 6000.f };
+			frames[1] = { to_image_id(test_scene_image_id::BLANK_2X2), 6000.f };
+			frames[2] = { cast_blink.frames[1].image_id, 6000.f };
+			frames[3] = { cast_blink.frames[2].image_id, 6000.f };
+			frames[4] = { to_image_id(test_scene_image_id::BLANK), 6000.f };
+
+			alloc(test_id_type::WANDERING_PIXELS_ANIMATION, anim);
 		} 
 
 		{

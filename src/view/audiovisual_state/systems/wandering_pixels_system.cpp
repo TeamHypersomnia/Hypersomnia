@@ -59,14 +59,24 @@ void wandering_pixels_system::advance_for(
 		const auto& wandering = it.template get<components::wandering_pixels>();
 		const auto& wandering_def = it.template get<invariants::wandering_pixels>();
 
-		if (cache.recorded_component.particles_count != wandering.particles_count) {
-			cache.particles.resize(wandering.particles_count);
-			cache.recorded_component.particles_count = wandering.particles_count;
+		const auto& cosm = it.get_cosmos();
+
+		const auto anim = cosm.get_logical_assets().find(wandering_def.animation_id);
+
+		if (anim == nullptr) {
+			return;
 		}
 
-		const auto new_reach = wandering.get_reach();
+		const auto total_animation_duration = ::get_total_duration(anim->frames);
 
-		if (cache.recorded_component.get_reach() != new_reach) {
+		if (cache.recorded_particle_count != wandering.particles_count) {
+			cache.particles.resize(wandering.particles_count);
+			cache.recorded_particle_count = wandering.particles_count;
+		}
+
+		const auto new_reach = xywh(*it.find_aabb());
+
+		if (cache.recorded_reach != new_reach) {
 			/* refresh_cache */ 
 			for (auto& p : cache.particles) {
 				p.pos.set(
@@ -74,10 +84,10 @@ void wandering_pixels_system::advance_for(
 					new_reach.y + used_rng.randval(0u, static_cast<unsigned>(new_reach.h))
 				);
 
-				p.current_lifetime_ms = used_rng.randval(0.f, wandering_def.frame_duration_ms);
+				p.current_lifetime_ms = used_rng.randval(0.f, total_animation_duration);
 			}
 
-			cache.recorded_component.set_reach(new_reach);
+			cache.recorded_reach = new_reach;
 		}
 
 		constexpr unsigned max_direction_time = 4000u;

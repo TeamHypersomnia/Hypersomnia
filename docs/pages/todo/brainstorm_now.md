@@ -9,6 +9,9 @@ summary: That which we are brainstorming at the moment.
 - Transform design
 	- We shouldn't make a separate case for wandering pixels, really
 		- just as in the case of light.
+	- movement path component will have an origin transform which will automatically be moved by the editor
+		- the transform component will be kept up to date and it will be the logical transform
+		- the rendering code will also only touch this transform
 
 - Property editor: Checkbox matrix for b2Filter
 	- might be useful once we come to glass walls 
