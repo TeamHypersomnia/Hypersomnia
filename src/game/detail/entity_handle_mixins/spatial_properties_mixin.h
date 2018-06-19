@@ -47,9 +47,6 @@ public:
 			else if constexpr(E::template has<components::transform>()) {
 				callback(std::get<components::transform>(components));
 			}
-			else if constexpr(E::template has<components::wandering_pixels>()) {
-				callback(std::get<components::wandering_pixels>(components).center);
-			}
 		}
 		else {
 			static_assert(always_false_v<E>, "Not implemented for non-specific handles.");
@@ -230,10 +227,6 @@ std::optional<transformr> spatial_properties_mixin<E>::find_logic_transform() co
 		return cosmos[item->get_current_slot()].get_container().find_logic_transform();
 	}
 
-	if (const auto wandering_pixels = handle.template find<components::wandering_pixels>()) {
-		return transformr(wandering_pixels->center, 0);
-	}
-
 	if (const auto transform = handle.template find<components::transform>()) {
 		return *transform;
 	}	
@@ -281,10 +274,6 @@ void spatial_properties_mixin<E>::set_logic_transform(const transformr t) const 
 	}
 	else if (const auto tr = handle.template find<components::transform>()) {
 		*tr = t;
-		// TODO: reinfer the npo cache where necessary
-	}
-	else if (const auto wp = handle.template find<components::wandering_pixels>()) {
-		wp->center = t.pos;
 		// TODO: reinfer the npo cache where necessary
 	}
 }

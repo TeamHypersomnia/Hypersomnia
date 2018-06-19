@@ -5,7 +5,6 @@
 namespace components {
 	struct wandering_pixels {
 		// GEN INTROSPECTOR struct components::wandering_pixels
-		vec2 center;
 		vec2 size;
 		rgba colorize = white;
 		unsigned particles_count = 0u;
