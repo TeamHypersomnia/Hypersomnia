@@ -69,7 +69,7 @@ namespace invariants {
 
 		float shell_spread_degrees = 20.f;
 
-		components::transform shell_spawn_offset;
+		transformr shell_spawn_offset;
 
 		float gunshot_adds_heat = 0.05f;
 		float heat_cooldown_speed_mult = 1.f;

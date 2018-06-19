@@ -4,7 +4,7 @@
 namespace components {
 	struct interpolation {
 		// GEN INTROSPECTOR struct components::interpolation
-		components::transform place_of_birth;
+		transformr place_of_birth;
 		// END GEN INTROSPECTOR
 	};
 }

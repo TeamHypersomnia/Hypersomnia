@@ -4,6 +4,6 @@
 
 namespace messages {
 	struct exhausted_cast : message {
-		components::transform transform;
+		transformr transform;
 	};
 }

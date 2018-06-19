@@ -45,7 +45,7 @@ class sound_system {
 		absolute_or_local positioning;
 
 		/* For calculating sound's velocity */
-		std::optional<components::transform> previous_transform;
+		std::optional<transformr> previous_transform;
 
 		generic_sound_cache() = default;
 		generic_sound_cache(

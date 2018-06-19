@@ -16,7 +16,7 @@
 
 struct misprediction_candidate_entry {
 	entity_id id;
-	components::transform transform;
+	transformr transform;
 };
 
 struct step_to_simulate {

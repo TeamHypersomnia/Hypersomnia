@@ -23,6 +23,6 @@ void packaged_particle_effect::post(const logic_step step) const {
 	input.start(step, start);
 }
 
-particle_effect_start_input particle_effect_start_input::orbit_absolute(const const_entity_handle h, components::transform world_transform) {
+particle_effect_start_input particle_effect_start_input::orbit_absolute(const const_entity_handle h, transformr world_transform) {
 	return orbit_local(h.get_id(), augs::get_relative_offset(h.get_logic_transform(), world_transform));
 }

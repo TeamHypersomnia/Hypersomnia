@@ -32,7 +32,7 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 #if TODO
 			const auto chased_transform = ::find_transform(force_joint.chasing, cosmos);
 #endif
-			components::transform chased_transform;
+			transformr chased_transform;
 
 			auto direction = chased_transform.pos - rigid_body.get_position();
 			const auto distance = direction.length();
@@ -75,7 +75,7 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 				}
 				//else if (is_force_epsilon && rigid_body.get_velocity().is_epsilon(1.f)) {
 				//	rigid_body.set_velocity(vec2(0, 0));
-				//	//rigid_body.set_transform(components::transform(chased_transform.pos, rigid_body.get_degrees()));
+				//	//rigid_body.set_transform(transformr(chased_transform.pos, rigid_body.get_degrees()));
 				//	LOG("Zeroed");
 				//}
 

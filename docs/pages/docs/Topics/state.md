@@ -147,7 +147,7 @@ We will list here all possible corner cases and what code is expected to correct
 - Strategies to decrease amount of associated state:
 	- Remove the associated state and calculate it from other unassociated state, just where it is needed.
 		- Example: the container component does not store the amount of space it's got left, but rather it is calculated any time it is needed, from the existing items and tree of their current slots.
-		- Example: make position_copying be considered in get_logic_transform calculations instead of transform being cached in components::transform (this component should probably not exist)
+		- Example: make position_copying be considered in get_logic_transform calculations instead of transform being cached in transformr (this component should probably not exist)
 		- Example: instead of having ``apply_base_offsets_to_crosshair_transforms``, let get_logic_transform perform this logic on its own
 		- Make density and damping calculations be always dependent on the current driver ownership or sprint state? Performance might suffer, though.
 - Strategies to make state associated only by virtue of having an inferred part:

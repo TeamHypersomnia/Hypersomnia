@@ -241,7 +241,7 @@ namespace test_flavours {
 namespace prefabs {
 	entity_handle create_metropolis_soldier(
 		const logic_step step, 
-		const components::transform spawn_transform, 
+		const transformr spawn_transform, 
 		const std::string /* name */
 	) {
 		auto& world = step.get_cosmos();
@@ -250,7 +250,7 @@ namespace prefabs {
 
 	entity_handle create_resistance_soldier(
 		const logic_step step, 
-		const components::transform spawn_transform, 
+		const transformr spawn_transform, 
 		const std::string /* name */
 	) {
 		auto& world = step.get_cosmos();

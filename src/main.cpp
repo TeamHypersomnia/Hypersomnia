@@ -1477,7 +1477,7 @@ int work(const int argc, const char* const * const argv) try {
 					renderer.call_and_clear_lines();
 
 					editor.for_each_icon(
-						[&](const auto typed_handle, const auto image_id, const components::transform world_transform, const rgba color){
+						[&](const auto typed_handle, const auto image_id, const transformr world_transform, const rgba color){
 							const auto screen_space_pos = vec2i(on_screen(world_transform.pos));
 
 							const auto aabb = xywh::center_and_size(screen_space_pos, streaming.necessary_images_in_atlas[image_id].get_original_size());

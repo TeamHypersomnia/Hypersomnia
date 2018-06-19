@@ -50,14 +50,14 @@ struct physics_engine_transforms {
 	b2Sweep m_sweep;
 	// END GEN INTROSPECTOR
 
-	void set(const components::transform&);
+	void set(const transformr&);
 	void set(
 		const si_scaling,
-		const components::transform&
+		const transformr&
 	);
 
-	components::transform get(const si_scaling) const;
-	components::transform get() const;
+	transformr get(const si_scaling) const;
+	transformr get() const;
 };
 
 namespace components {
@@ -66,7 +66,7 @@ namespace components {
 
 		rigid_body(
 			const si_scaling = si_scaling(),
-			const components::transform t = components::transform()
+			const transformr t = transformr()
 		);
 
 		// GEN INTROSPECTOR struct components::rigid_body
@@ -150,7 +150,7 @@ public:
 	void set_velocity(const vec2) const;
 	void set_angular_velocity(const float) const;
 
-	void set_transform(const components::transform&) const;
+	void set_transform(const transformr&) const;
 	
 	template <class id_type>
 	void set_transform(const id_type id) const {
@@ -193,7 +193,7 @@ public:
 	float get_radian_velocity() const;
 	float get_inertia() const;
 	vec2 get_position() const;
-	components::transform get_transform() const;
+	transformr get_transform() const;
 	vec2 get_mass_position() const;
 	vec2 get_world_center() const;
 	bool test_point(const vec2) const;
@@ -237,7 +237,7 @@ vec2 component_synchronizer<E, components::rigid_body>::get_position() const {
 }
 
 template <class E>
-components::transform component_synchronizer<E, components::rigid_body>::get_transform() const {
+transformr component_synchronizer<E, components::rigid_body>::get_transform() const {
 	return { get_position(), get_degrees() };
 }
 
@@ -427,7 +427,7 @@ void component_synchronizer<E, components::rigid_body>::apply_angular_impulse(co
 }
 
 template <class E>
-void component_synchronizer<E, components::rigid_body>::set_transform(const components::transform& transform) const {
+void component_synchronizer<E, components::rigid_body>::set_transform(const transformr& transform) const {
 	auto& data = get_raw_component({});
 
 	data.physics_transforms.set(

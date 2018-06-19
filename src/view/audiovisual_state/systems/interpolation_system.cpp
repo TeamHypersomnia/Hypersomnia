@@ -12,14 +12,14 @@ void interpolation_system::set_interpolation_enabled(const bool flag) {
 	enabled = flag;
 }
 
-components::transform& interpolation_system::get_interpolated(const const_entity_handle id) {
+transformr& interpolation_system::get_interpolated(const const_entity_handle id) {
 	return per_entity_cache[id].interpolated_transform;
 }
 
-std::optional<components::transform> interpolation_system::find_interpolated(const const_entity_handle handle) const {
+std::optional<transformr> interpolation_system::find_interpolated(const const_entity_handle handle) const {
 	const auto id = handle.get_id();
 
-	auto result = [&]() -> std::optional<components::transform> {
+	auto result = [&]() -> std::optional<transformr> {
 		if (enabled) {
 			if (const auto cache = mapped_or_nullptr(per_entity_cache, id)) {
 				return cache->interpolated_transform;
@@ -64,7 +64,7 @@ void interpolation_system::clear() {
 
 void interpolation_system::set_updated_interpolated_transform(
 	const const_entity_handle subject,
-	const components::transform updated_value
+	const transformr updated_value
 ) {
 	auto& cache = per_entity_cache[subject];
 	const auto& info = subject.get<components::interpolation>();

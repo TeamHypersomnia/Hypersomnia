@@ -20,8 +20,8 @@ class interpolation_system {
 
 public:
 	struct cache {
-		components::transform recorded_place_of_birth;
-		components::transform interpolated_transform;
+		transformr recorded_place_of_birth;
+		transformr interpolated_transform;
 		decltype(entity_id().raw.version) recorded_version = entity_id().raw.version;
 		float rotational_slowdown_multiplier = 1.f;
 		float positional_slowdown_multiplier = 1.f;
@@ -42,8 +42,8 @@ public:
 		const augs::delta fixed_delta_for_slowdowns
 	);
 
-	std::optional<components::transform> find_interpolated(const const_entity_handle) const;
-	components::transform& get_interpolated(const const_entity_handle);
+	std::optional<transformr> find_interpolated(const const_entity_handle) const;
+	transformr& get_interpolated(const const_entity_handle);
 
 	void reserve_caches_for_entities(const size_t);
 	void clear();
@@ -52,6 +52,6 @@ public:
 
 	void set_updated_interpolated_transform(
 		const const_entity_handle subject,
-		const components::transform updated_value
+		const transformr updated_value
 	);
 };

@@ -26,19 +26,19 @@ struct sound_effect_start_input {
 	entity_id direct_listener;
 	std::size_t variation_number = static_cast<std::size_t>(-1);
 
-	static sound_effect_start_input fire_and_forget(const components::transform where) {
+	static sound_effect_start_input fire_and_forget(const transformr where) {
 		sound_effect_start_input in;
 		in.positioning.offset = where;
 		return in; 
 	}
 
-	static sound_effect_start_input orbit_local(const entity_id id, const components::transform offset) {
+	static sound_effect_start_input orbit_local(const entity_id id, const transformr offset) {
 		sound_effect_start_input in;
 		in.positioning = { id, offset };
 		return in; 
 	}
 
-	static sound_effect_start_input orbit_absolute(const const_entity_handle h, components::transform offset);
+	static sound_effect_start_input orbit_absolute(const const_entity_handle h, transformr offset);
 
 	auto& set_listener(const entity_id id) {
 		direct_listener = id;

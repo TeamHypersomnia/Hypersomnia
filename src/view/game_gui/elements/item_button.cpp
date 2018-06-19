@@ -131,7 +131,7 @@ item_button::layout_with_attachments item_button::calc_button_layout(
 	const bool include_attachments
 ) {
 	layout_with_attachments output;
-	output.push(component_owner.get_aabb(components::transform()));
+	output.push(component_owner.get_aabb(transformr()));
 
 	if (include_attachments) {
 		component_owner.for_each_contained_item_recursive(

@@ -11,27 +11,27 @@
 
 components::rigid_body::rigid_body(
 	const si_scaling si,
-	const components::transform t
+	const transformr t
 ) {
 	physics_transforms.set(si, t);
 }
 
-components::transform physics_engine_transforms::get(const si_scaling si) const {
+transformr physics_engine_transforms::get(const si_scaling si) const {
 	return get().to_user_space(si);
 }
 
-components::transform physics_engine_transforms::get() const {
+transformr physics_engine_transforms::get() const {
 	return { m_xf.p, m_sweep.a };
 }
 
 void physics_engine_transforms::set(
 	const si_scaling si,
-	const components::transform& t
+	const transformr& t
 ) {
 	set(t.to_si_space(si));
 }
 
-void physics_engine_transforms::set(const components::transform& t) {
+void physics_engine_transforms::set(const transformr& t) {
 	const auto pos = t.pos;
 	const auto rotation = t.rotation;
 

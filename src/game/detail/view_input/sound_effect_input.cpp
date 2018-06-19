@@ -26,6 +26,6 @@ void packaged_sound_effect::post(const logic_step step) const {
 	input.start(step, start);
 }
 
-sound_effect_start_input sound_effect_start_input::orbit_absolute(const const_entity_handle h, components::transform world_transform) {
+sound_effect_start_input sound_effect_start_input::orbit_absolute(const const_entity_handle h, transformr world_transform) {
 	return orbit_local(h.get_id(), augs::get_relative_offset(h.get_logic_transform(), world_transform));
 }

@@ -13,19 +13,19 @@ struct particle_effect_start_input {
 	absolute_or_local positioning;
 	entity_id homing_target;
 
-	static particle_effect_start_input fire_and_forget(const components::transform where) {
+	static particle_effect_start_input fire_and_forget(const transformr where) {
 		particle_effect_start_input	in;
 		in.positioning.offset = where;
 		return in; 
 	}
 
-	static particle_effect_start_input orbit_local(const entity_id id, const components::transform offset) {
+	static particle_effect_start_input orbit_local(const entity_id id, const transformr offset) {
 		particle_effect_start_input	in;
 		in.positioning = { id, offset };
 		return in; 
 	}
 
-	static particle_effect_start_input orbit_absolute(const const_entity_handle h, components::transform offset);
+	static particle_effect_start_input orbit_absolute(const const_entity_handle h, transformr offset);
 
 	static particle_effect_start_input at_entity(const entity_id id) {
 		return orbit_local(id, {});

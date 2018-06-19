@@ -85,7 +85,7 @@ namespace test_flavours {
 
 #if TODO
 namespace prefabs {
-	entity_handle create_car(const logic_step step, const components::transform& spawn_transform) {
+	entity_handle create_car(const logic_step step, const transformr& spawn_transform) {
 		auto& world = step.get_cosmos();
 		const auto& metas = step.get_logical_assets();
 
@@ -162,14 +162,14 @@ namespace prefabs {
 
 		{
 			for (int i = 0; i < 4; ++i) {
-				components::transform this_engine_transform;
+				transformr this_engine_transform;
 				const auto engine_physical = create_test_scene_entity(world, test_scene_flavour::TRUCK_ENGINE_BODY);
 
 				{
 
 					auto sprite = engine_physical.get<invariants::sprite>();
 
-					components::transform offset;
+					transformr offset;
 
 					if (i == 0) {
 						offset.pos.set((front_size.x / 2 + interior_size.x + sprite.get_size(/*metas*/).x / 2 - 5.f) * -1, (-interior_size.y / 2 + sprite.get_size(/*metas*/).y / 2));

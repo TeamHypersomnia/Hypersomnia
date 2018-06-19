@@ -37,13 +37,13 @@ namespace test_scenes {
 		auto& world = step.get_cosmos();
 		
 #if TODO
-		const auto car = prefabs::create_car(step, components::transform( { 1490, 340 }, -180));
-		const auto car2 = prefabs::create_car(step, components::transform({ 1490, 340 + 400 }, -180));
-		const auto car3 = prefabs::create_car(step, components::transform({ 1490, 340 + 800 }, -180));
+		const auto car = prefabs::create_car(step, transformr( { 1490, 340 }, -180));
+		const auto car2 = prefabs::create_car(step, transformr({ 1490, 340 + 400 }, -180));
+		const auto car3 = prefabs::create_car(step, transformr({ 1490, 340 + 800 }, -180));
 
-		const auto riding_car = prefabs::create_car(step, components::transform({ 850, 1000 }, -90));
+		const auto riding_car = prefabs::create_car(step, transformr({ 850, 1000 }, -90));
 
-		const auto riding_car2 = prefabs::create_car(step, components::transform({ -850 + 1000, -8200 }, -90 + 180));
+		const auto riding_car2 = prefabs::create_car(step, transformr({ -850 + 1000, -8200 }, -90 + 180));
 #endif
 
 		const int num_characters = 10;
@@ -60,7 +60,7 @@ namespace test_scenes {
 			prefabs::create_interference_grenade(step, { 554, -811 + i * 100.f });
 		}
 
-		std::vector<components::transform> character_transforms = {
+		std::vector<transformr> character_transforms = {
 			{ { 0, 300 }, 0 },
 			{ { 254, 211 }, 68 },
 			{ { 1102, 213 }, 110 },
@@ -161,7 +161,7 @@ namespace test_scenes {
 
 				{
 					const auto l = create_test_scene_entity(world, test_static_lights::STRONG_LAMP);
-					l.set_logic_transform(components::transform(light_pos));
+					l.set_logic_transform(transformr(light_pos));
 
 					auto& light = l.get<components::light>();
 
@@ -183,19 +183,19 @@ namespace test_scenes {
 		{
 			{
 				const auto l = create_test_scene_entity(world, test_static_lights::STRONG_LAMP);
-				l.set_logic_transform(components::transform(vec2(-44, 270)));
+				l.set_logic_transform(transformr(vec2(-44, 270)));
 				auto& light = l.get<components::light>();
 				light.color = cyan;
 			}
 			{
 				const auto l = create_test_scene_entity(world, test_static_lights::STRONG_LAMP);
-				l.set_logic_transform(components::transform(vec2(1098, 220)));
+				l.set_logic_transform(transformr(vec2(1098, 220)));
 				auto& light = l.get<components::light>();
 				light.color = orange;
 			}
 			{
 				const auto l = create_test_scene_entity(world, test_static_lights::STRONG_LAMP);
-				l.set_logic_transform(components::transform(vec2(223, -47)));
+				l.set_logic_transform(transformr(vec2(223, -47)));
 				auto& light = l.get<components::light>();
 				light.color = cyan;
 			}
@@ -229,9 +229,9 @@ namespace test_scenes {
 
 
 			{
-				create_test_scene_entity(world, test_sprite_decorations::HAVE_A_PLEASANT, components::transform(vec2(-42, -32)));
-				create_test_scene_entity(world, test_sprite_decorations::AWAKENING, components::transform(vec2(-42, 8)));
-				create_test_scene_entity(world, test_sprite_decorations::METROPOLIS, components::transform(vec2(1106, 3)));
+				create_test_scene_entity(world, test_sprite_decorations::HAVE_A_PLEASANT, transformr(vec2(-42, -32)));
+				create_test_scene_entity(world, test_sprite_decorations::AWAKENING, transformr(vec2(-42, 8)));
+				create_test_scene_entity(world, test_sprite_decorations::METROPOLIS, transformr(vec2(1106, 3)));
 
 				auto half = vec2(-64, -64);
 				prefabs::create_brick_wall(step, half + vec2(0, 0));
@@ -247,8 +247,8 @@ namespace test_scenes {
 				prefabs::create_brick_wall(step, half +vec2(horioff, 0) + vec2(0, 128));
 
 				for (int b = 0; b < 10; ++b) {
-					prefabs::create_brick_wall(step, components::transform(half +vec2(-128, -128 - b*128) + vec2(0, 256), 90));
-					prefabs::create_brick_wall(step, components::transform(half +vec2(horioff + 256, -128 - b*128) + vec2(0, 256), 90));
+					prefabs::create_brick_wall(step, transformr(half +vec2(-128, -128 - b*128) + vec2(0, 256), 90));
+					prefabs::create_brick_wall(step, transformr(half +vec2(horioff + 256, -128 - b*128) + vec2(0, 256), 90));
 				}
 
 				{
@@ -259,17 +259,17 @@ namespace test_scenes {
 
 					for (int x = -side; x < side; ++x) {
 						for (int y = -side; y < side * 16; ++y) {
-							create_test_scene_entity(world, test_sprite_decorations::SOIL, components::transform{ bg_size * vec2i(x, y) });
+							create_test_scene_entity(world, test_sprite_decorations::SOIL, transformr{ bg_size * vec2i(x, y) });
 						}
 					}
 				}
 
-				create_test_scene_entity(world, test_sprite_decorations::ROAD_DIRT, components::transform(vec2(468, 112)));
+				create_test_scene_entity(world, test_sprite_decorations::ROAD_DIRT, transformr(vec2(468, 112)));
 
 				for (int r = 0; r < 38; ++r) {
 					const vec2 size = caches.at(to_image_id(test_scene_image_id::ROAD)).get_original_size();
 
-					create_test_scene_entity(world, test_sprite_decorations::ROAD, components::transform{ vec2(468, 832+ size.y * r ) });
+					create_test_scene_entity(world, test_sprite_decorations::ROAD, transformr{ vec2(468, 832+ size.y * r ) });
 				}
 
 				{
@@ -277,7 +277,7 @@ namespace test_scenes {
 
 					for (int x = 0; x < 10; ++x) {
 						for (int y = 0; y < 10; ++y) {
-							create_test_scene_entity(world, test_sprite_decorations::FLOOR, components::transform(vec2(-64, -192) + size * vec2i(x, -y)));
+							create_test_scene_entity(world, test_sprite_decorations::FLOOR, transformr(vec2(-64, -192) + size * vec2i(x, -y)));
 						}
 					}
 				}

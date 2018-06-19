@@ -131,13 +131,13 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 				const auto vertical_axis_x = source_aabb->r;
 
 				duplicate_with_flip(
-					[vertical_axis_x](const components::transform source) {
+					[vertical_axis_x](const transformr source) {
 						const auto new_rotation = vec2::from_degrees(source.rotation).negate_y().degrees();
 
 						const auto dist_to_axis = vertical_axis_x - source.pos.x;
 						const auto new_pos = source.pos + vec2(dist_to_axis, 0.f) * 2;
 
-						return components::transform(new_pos, new_rotation);
+						return transformr(new_pos, new_rotation);
 					},
 					true,
 					false
@@ -148,13 +148,13 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 				const auto vertical_axis_x = source_aabb->l;
 
 				duplicate_with_flip(
-					[vertical_axis_x](const components::transform source) {
+					[vertical_axis_x](const transformr source) {
 						const auto new_rotation = vec2::from_degrees(source.rotation).negate_y().degrees();
 
 						const auto dist_to_axis = source.pos.x - vertical_axis_x;
 						const auto new_pos = source.pos - vec2(dist_to_axis, 0.f) * 2;
 
-						return components::transform(new_pos, new_rotation);
+						return transformr(new_pos, new_rotation);
 					},
 					true,
 					false
@@ -165,13 +165,13 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 				const auto horizontal_axis_y = source_aabb->b;
 
 				duplicate_with_flip(
-					[horizontal_axis_y](const components::transform source) {
+					[horizontal_axis_y](const transformr source) {
 						const auto new_rotation = vec2::from_degrees(source.rotation).negate_y().degrees();
 
 						const auto dist_to_axis = horizontal_axis_y - source.pos.y;
 						const auto new_pos = source.pos + vec2(0.f, dist_to_axis) * 2;
 
-						return components::transform(new_pos, new_rotation);
+						return transformr(new_pos, new_rotation);
 					},
 					false,
 					true
@@ -182,13 +182,13 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 				const auto horizontal_axis_y = source_aabb->t;
 
 				duplicate_with_flip(
-					[horizontal_axis_y](const components::transform source) {
+					[horizontal_axis_y](const transformr source) {
 						const auto new_rotation = vec2::from_degrees(source.rotation).negate_y().degrees();
 
 						const auto dist_to_axis = source.pos.y - horizontal_axis_y;
 						const auto new_pos = source.pos - vec2(0.f, dist_to_axis) * 2;
 
-						return components::transform(new_pos, new_rotation);
+						return transformr(new_pos, new_rotation);
 					},
 					false,
 					true

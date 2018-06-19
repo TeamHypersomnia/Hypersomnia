@@ -242,7 +242,7 @@ void particles_simulation_system::advance_visible_streams(
 
 	auto advance_emissions = [&](
 		emission_instances& instances, 
-		const components::transform current_transform,
+		const transformr current_transform,
 		const bool visible_in_camera,
 		const packaged_particle_effect& effect
 	) {

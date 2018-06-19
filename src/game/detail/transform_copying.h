@@ -7,11 +7,11 @@
 struct absolute_or_local {
 	// GEN INTROSPECTOR struct absolute_or_local
 	entity_id target;
-	components::transform offset;
+	transformr offset;
 	// END GEN INTROSPECTOR
 
 	template <class S, class C, class I>
-	static std::optional<components::transform> find_transform_impl(S& self, C& cosm, I& interp) {
+	static std::optional<transformr> find_transform_impl(S& self, C& cosm, I& interp) {
 		if (self.target.is_set()) {
 			const auto target_handle = cosm[self.target];
 
@@ -43,7 +43,7 @@ struct absolute_or_local {
 };
 
 template <class C, class... I>
-std::optional<components::transform> find_transform(const absolute_or_local& l, C& cosm, I&&... interp) {
+std::optional<transformr> find_transform(const absolute_or_local& l, C& cosm, I&&... interp) {
 	return l.find_transform(cosm, std::forward<I>(interp)...);
 }	
 

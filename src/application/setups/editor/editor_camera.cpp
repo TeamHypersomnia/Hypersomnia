@@ -12,7 +12,7 @@ namespace editor_detail {
 		const_entity_handle matching_go_to_entity,
 		const intercosm& icm
 	) {
-		std::optional<components::transform> viewed_transform;
+		std::optional<transformr> viewed_transform;
 
 		const auto panning = view.panned_camera;
 		const auto viewed_character = icm.get_viewed_character();

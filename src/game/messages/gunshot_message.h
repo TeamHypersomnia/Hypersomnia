@@ -5,7 +5,7 @@
 
 namespace messages {
 	struct gunshot_message : message {
-		components::transform muzzle_transform;
+		transformr muzzle_transform;
 		invariants::cartridge cartridge_definition;
 
 		std::vector<entity_id> spawned_rounds;

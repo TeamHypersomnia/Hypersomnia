@@ -24,7 +24,7 @@ namespace test_scenes {
 		new_characters.resize(num_characters);
 
 		for (int i = 0; i < num_characters; ++i) {
-			components::transform transform;
+			transformr transform;
 
 			if (i == 0) {
 			}

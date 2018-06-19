@@ -424,7 +424,7 @@ we consider whole type overrides too complex architeciturally:
 					- actually, not...
 					- consider removing trivial marker completely
 						- no: too much pain in the ass with various type ids and various trivial types overall
-					- then we'll have a type id with just max 2 options (b2Transform, components::transform)
+					- then we'll have a type id with just max 2 options (b2Transform, transformr)
 			- readwrite of before_change data could be used
 				- because we will always store all old values for determinism
 		- really watch out for the changes in "si", they can later affect how the box2d detail structs are redone
@@ -438,7 +438,7 @@ we consider whole type overrides too complex architeciturally:
 				- what format?
 				- new transform of the reference entity?
 					- then calculate delta and apply to other entities
-				- the delta components::transform itself?
+				- the delta transformr itself?
 					- no referential entity to look up to
 					- always calculate pixel-wise delta during mousemotion
 						- SI-independent

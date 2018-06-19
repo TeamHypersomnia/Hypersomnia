@@ -37,7 +37,7 @@ struct line_of_sight_request_input {
 
 namespace messages {
 	struct visibility_information_request : message, visibility_information_request_input {
-		components::transform eye_transform;
+		transformr eye_transform;
 		visibility_type layer = visibility_type::NONE;
 	};
 

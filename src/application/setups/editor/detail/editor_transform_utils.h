@@ -24,7 +24,7 @@ void on_each_independent_transform(
 
 template <class T>
 void fix_pixel_imperfections(T& in) {
-	if constexpr(std::is_same_v<T, components::transform>) {
+	if constexpr(std::is_same_v<T, transformr>) {
 		if (augs::to_near_90_multiple(in.rotation)) {
 			in.pos.round_fract();
 		}
@@ -34,7 +34,7 @@ void fix_pixel_imperfections(T& in) {
 	}
 }
 
-inline void fix_pixel_imperfections(components::transform& in, const si_scaling si) {
+inline void fix_pixel_imperfections(transformr& in, const si_scaling si) {
 	auto degrees = RAD_TO_DEG<real32> * in.rotation;
 
 	if (augs::to_near_90_multiple(degrees)) {

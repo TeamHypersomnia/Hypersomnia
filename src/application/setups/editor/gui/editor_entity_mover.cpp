@@ -56,7 +56,7 @@ void editor_entity_mover::start_rotating_selection(const input_type in) {
 
 void editor_entity_mover::rotate_selection_once_by(const input_type in, const int degrees) {
 	if (const auto aabb = in.setup.find_selection_aabb()) {
-		transform_selection(in, aabb->get_center(), components::transform(vec2::zero, degrees));
+		transform_selection(in, aabb->get_center(), transformr(vec2::zero, degrees));
 	}
 }
 
@@ -112,7 +112,7 @@ bool editor_entity_mover::do_mousemotion(const input_type in, vec2 world_cursor_
 
 				if (old_vector.non_zero() && new_vector.non_zero()) {
 					const auto degrees = old_vector.full_degrees_between(new_vector);
-					auto new_delta = components::transform(vec2::zero, degrees);
+					auto new_delta = transformr(vec2::zero, degrees);
 
 					if (v.snapping_enabled) {
 						auto& r = new_delta.rotation;

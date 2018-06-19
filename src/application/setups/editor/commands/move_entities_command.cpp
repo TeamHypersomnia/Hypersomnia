@@ -70,7 +70,7 @@ static void move_entities(
 
 					tr.set(new_transform);
 				}
-				else if constexpr(std::is_same_v<T, components::transform>) {
+				else if constexpr(std::is_same_v<T, transformr>) {
 					tr.rotate_degrees_with_90_multiples(dt.rotation, center);
 					fix_pixel_imperfections(tr);
 				}
@@ -94,7 +94,7 @@ static void move_entities(
 				if constexpr(std::is_same_v<T, physics_engine_transforms>) {
 					tr.set(tr.get() + dt_si);
 				}
-				else if constexpr(std::is_same_v<T, components::transform>) {
+				else if constexpr(std::is_same_v<T, transformr>) {
 					tr += dt;
 				}
 				else if constexpr(std::is_same_v<T, vec2>) {

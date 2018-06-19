@@ -18,7 +18,7 @@
 
 void standard_explosion_input::instantiate(
 	const logic_step step,
-	const components::transform explosion_location,
+	const transformr explosion_location,
 	const entity_id subject_if_any
 ) const {
 	if (create_thunders_effect) {

@@ -14,7 +14,7 @@ struct thunder_input {
 	unsigned max_branch_children = 4;
 	unsigned max_all_spawned_branches = 40;
 
-	components::transform first_branch_root;
+	transformr first_branch_root;
 	float branch_angle_spread = 0.f;
 
 	rgba color = cyan;

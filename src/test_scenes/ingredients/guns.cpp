@@ -842,7 +842,7 @@ namespace prefabs {
 }
 
 namespace prefabs {
-	entity_handle create_magazine(const logic_step step, const components::transform pos, const test_container_items flav, const entity_id charge_inside_id, const int force_num_charges) {
+	entity_handle create_magazine(const logic_step step, const transformr pos, const test_container_items flav, const entity_id charge_inside_id, const int force_num_charges) {
 		auto& cosmos = step.get_cosmos();
 		auto charge_inside = cosmos[charge_inside_id];
 
@@ -861,7 +861,7 @@ namespace prefabs {
 	}
 
 
-	entity_handle create_sample_magazine(const logic_step step, const components::transform pos, const entity_id charge_inside_id, const int force_num_charges) {
+	entity_handle create_sample_magazine(const logic_step step, const transformr pos, const entity_id charge_inside_id, const int force_num_charges) {
 		return create_magazine(step, pos, test_container_items::SAMPLE_MAGAZINE, charge_inside_id, force_num_charges);
 	}
 

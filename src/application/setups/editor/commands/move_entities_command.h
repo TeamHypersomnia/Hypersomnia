@@ -19,7 +19,7 @@ class move_entities_command {
 
 public:
 	using moved_entities_type = per_entity_type_container<make_data_vector>;
-	using delta_type = components::transform;
+	using delta_type = transformr;
 
 	// GEN INTROSPECTOR class move_entities_command
 	editor_command_common common;

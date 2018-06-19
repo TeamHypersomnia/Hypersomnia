@@ -5,6 +5,6 @@
 namespace messages {
 	struct interpolation_correction_request : message {
 		entity_id set_previous_transform_from;
-		components::transform set_previous_transform_value;
+		transformr set_previous_transform_value;
 	};
 }

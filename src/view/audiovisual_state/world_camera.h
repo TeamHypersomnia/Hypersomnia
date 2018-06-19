@@ -25,7 +25,7 @@ struct world_camera_settings {
 struct world_camera {
 	bool dont_smooth_once = false;
 
-	components::transform last_interpolant;
+	transformr last_interpolant;
 
 	vec2 player_position_previously_seen;
 	vec2 player_position_at_previous_step;

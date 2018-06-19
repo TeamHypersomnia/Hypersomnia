@@ -49,7 +49,7 @@ namespace components {
 
 		spell_id currently_casted_spell;
 		
-		components::transform transform_when_spell_casted;
+		transformr transform_when_spell_casted;
 		augs::stepped_timestamp time_of_last_spell_cast;
 		augs::stepped_timestamp time_of_last_exhausted_cast;
 

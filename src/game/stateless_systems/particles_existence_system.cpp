@@ -69,7 +69,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 		if (d.inflictor_destructed) {
 			const auto inflictor = cosmos[d.inflictor];
 
-			auto place_of_birth = components::transform(d.point_of_impact);
+			auto place_of_birth = transformr(d.point_of_impact);
 
 			if (d.amount > 0) {
 				place_of_birth.rotation = (-d.impact_velocity).degrees();

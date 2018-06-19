@@ -65,12 +65,12 @@ namespace ingredients {
 }
 
 namespace prefabs {
-	entity_handle create_car(const logic_step, const components::transform&);
+	entity_handle create_car(const logic_step, const transformr&);
 
 	// guns
-	entity_handle create_magazine(const logic_step, components::transform pos, test_container_items, entity_id charge_inside = entity_id(), int force_num_charges = -1);
+	entity_handle create_magazine(const logic_step, transformr pos, test_container_items, entity_id charge_inside = entity_id(), int force_num_charges = -1);
 
-	entity_handle create_sample_magazine(const logic_step, components::transform pos, entity_id charge_inside = entity_id(), int force_num_charges = -1);
+	entity_handle create_sample_magazine(const logic_step, transformr pos, entity_id charge_inside = entity_id(), int force_num_charges = -1);
 	entity_handle create_sample_rifle(const logic_step, vec2 pos, entity_id load_mag = entity_id());
 	entity_handle create_rifle(const logic_step, vec2 pos, test_shootable_weapons, entity_id load_mag = entity_id());
 	entity_handle create_vindicator(const logic_step, vec2 pos, entity_id load_mag = entity_id());
@@ -87,18 +87,18 @@ namespace prefabs {
 
 	entity_handle create_metropolis_soldier(
 		const logic_step,
-		const components::transform pos, 
+		const transformr pos, 
 		const std::string name = "character_unnamed"
 	);
 
 	entity_handle create_resistance_soldier(
 		const logic_step,
-		const components::transform pos, 
+		const transformr pos, 
 		const std::string name = "character_unnamed"
 	);
 
-	entity_handle create_crate(const logic_step, const components::transform pos);
-	entity_handle create_brick_wall(const logic_step, const components::transform pos);
+	entity_handle create_crate(const logic_step, const transformr pos);
+	entity_handle create_brick_wall(const logic_step, const transformr pos);
 
 	entity_handle create_cyan_urban_machete(const logic_step, const vec2 pos);
 
@@ -106,7 +106,7 @@ namespace prefabs {
 	entity_handle create_ped_grenade(const logic_step, const vec2 pos);
 	entity_handle create_interference_grenade(const logic_step, const vec2 pos);
 
-	entity_handle create_rotating_fan(const logic_step, const components::transform&);
-	entity_handle create_yellow_fish(const logic_step, const components::transform&, unsigned time_offset_ms = 0);
+	entity_handle create_rotating_fan(const logic_step, const transformr&);
+	entity_handle create_yellow_fish(const logic_step, const transformr&, unsigned time_offset_ms = 0);
 }
 #endif

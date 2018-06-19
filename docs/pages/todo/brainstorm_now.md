@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Transform design
+	- We shouldn't make a separate case for wandering pixels, really
+		- just as in the case of light.
+
 - Property editor: Checkbox matrix for b2Filter
 	- might be useful once we come to glass walls 
 	- a list of predefined filters

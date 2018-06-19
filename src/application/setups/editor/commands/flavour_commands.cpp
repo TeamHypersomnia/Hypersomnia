@@ -147,7 +147,7 @@ void instantiate_flavour_command::redo(const editor_command_input in) {
 				cosm,
 			   	flavour_id,
 			   	[this](const auto typed_handle) {
-					typed_handle.set_logic_transform(components::transform(where));
+					typed_handle.set_logic_transform(transformr(where));
 				}
 			).get_id();
 

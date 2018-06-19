@@ -199,7 +199,7 @@ auto create_test_scene_entity(C& cosm, const E enum_flavour, const vec2 pos) {
 }
 
 template <class C, class E>
-auto create_test_scene_entity(C& cosm, const E enum_flavour, const components::transform where) {
+auto create_test_scene_entity(C& cosm, const E enum_flavour, const transformr where) {
 	return cosmic::specific_create_entity(cosm, to_entity_flavour_id(enum_flavour), transform_setter(where));
 }
 

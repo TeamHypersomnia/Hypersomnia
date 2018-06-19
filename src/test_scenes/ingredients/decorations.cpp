@@ -68,12 +68,12 @@ namespace test_flavours {
 }
 
 namespace prefabs {
-	entity_handle create_rotating_fan(const logic_step step, const components::transform& pos) {
+	entity_handle create_rotating_fan(const logic_step step, const transformr& pos) {
 		const auto decor = create_test_scene_entity(step.get_cosmos(), test_complex_decorations::ROTATING_FAN, pos);
 		return decor;
 	}
 
-	entity_handle create_yellow_fish(const logic_step step, const components::transform& pos, const unsigned time_offset_ms) {
+	entity_handle create_yellow_fish(const logic_step step, const transformr& pos, const unsigned time_offset_ms) {
 		const auto decor = create_test_scene_entity(step.get_cosmos(), test_complex_decorations::YELLOW_FISH, pos);
 		decor.get<components::animation>().time_offset_ms = time_offset_ms;
 		return decor;

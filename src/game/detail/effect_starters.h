@@ -7,7 +7,7 @@
 void fire_and_forget_particle_effect(
 	particle_effect_input,
 	logic_step,  
-	components::transform,
+	transformr,
 	entity_id homing_target = {}
 );
 
@@ -21,7 +21,7 @@ void start_orbital_particle_effect(
 void start_orbital_particle_effect(
 	particle_effect_input,
 	logic_step,  
-	components::transform world_transform,
+	transformr world_transform,
 	entity_id,
 	entity_id homing_target = {}
 );

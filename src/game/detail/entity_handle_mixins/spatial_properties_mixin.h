@@ -14,7 +14,7 @@ template <class entity_handle_type>
 class spatial_properties_mixin {
 public:
 	bool has_independent_transform() const;
-	void set_logic_transform(const components::transform t) const;
+	void set_logic_transform(const transformr t) const;
 
 	std::optional<real32> find_logical_width() const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
@@ -56,11 +56,11 @@ public:
 		}
 	}
 
-	components::transform get_logic_transform() const;
-	std::optional<components::transform> find_logic_transform() const;
+	transformr get_logic_transform() const;
+	std::optional<transformr> find_logic_transform() const;
 
 	template <class interpolation_system_type>
-	std::optional<components::transform> find_viewing_transform(const interpolation_system_type& sys) const {
+	std::optional<transformr> find_viewing_transform(const interpolation_system_type& sys) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 		const auto& cosmos = handle.get_cosmos();
 
@@ -108,7 +108,7 @@ public:
 		return std::nullopt;
 	}
 
-	std::optional<ltrb> find_aabb(const components::transform transform) const {
+	std::optional<ltrb> find_aabb(const transformr transform) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 
 		if (const auto* const sprite = handle.template find<invariants::sprite>()) {
@@ -161,14 +161,14 @@ public:
 };
 
 template <class E>
-components::transform spatial_properties_mixin<E>::get_logic_transform() const {
+transformr spatial_properties_mixin<E>::get_logic_transform() const {
 	const auto t = find_logic_transform();
 	ensure(t.has_value());
 	return *find_logic_transform();
 }
 
 template <class E>
-std::optional<components::transform> spatial_properties_mixin<E>::find_logic_transform() const {
+std::optional<transformr> spatial_properties_mixin<E>::find_logic_transform() const {
 	const auto handle = *static_cast<const E*>(this);
 
 #if MORE_LOGS
@@ -231,7 +231,7 @@ std::optional<components::transform> spatial_properties_mixin<E>::find_logic_tra
 	}
 
 	if (const auto wandering_pixels = handle.template find<components::wandering_pixels>()) {
-		return components::transform(wandering_pixels->center, 0);
+		return transformr(wandering_pixels->center, 0);
 	}
 
 	if (const auto transform = handle.template find<components::transform>()) {
@@ -269,7 +269,7 @@ bool spatial_properties_mixin<E>::has_independent_transform() const {
 }
 
 template <class E>
-void spatial_properties_mixin<E>::set_logic_transform(const components::transform t) const {
+void spatial_properties_mixin<E>::set_logic_transform(const transformr t) const {
 	const auto handle = *static_cast<const E*>(this);
 
 	if (!has_independent_transform()) {
