@@ -29,8 +29,8 @@ void fix_pixel_imperfections(T& in) {
 			in.pos.round_fract();
 		}
 	}
-	else if constexpr(std::is_same_v<T, vec2>) {
-		in.round_fract();
+	else {
+		static_assert(always_false_v<T>, "Unknown transform type");
 	}
 }
 

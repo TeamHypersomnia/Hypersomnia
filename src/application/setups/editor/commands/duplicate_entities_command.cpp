@@ -100,7 +100,7 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 			duplicate([&](const auto typed_handle) {
 				if (const auto source_transform = typed_handle.find_logic_transform()) {
 					if (typed_handle.has_independent_transform()) {
-						const auto mirrored_transform = transformation(typed_handle.get_logic_transform());
+						auto mirrored_transform = transformation(typed_handle.get_logic_transform());
 						fix_pixel_imperfections(mirrored_transform);
 						typed_handle.set_logic_transform(mirrored_transform);
 
