@@ -10,15 +10,21 @@
 #include "application/setups/editor/commands/change_flavour_property_command.h"
 #include "application/setups/editor/detail/field_address.h"
 
-template <class T, class C>
+template <class T>
 void update_size_if_tex_changed(
 	const edit_invariant_input,
-	const T&,
-	const C& 
+	const field_address&,
+	const T&
 ) {}
 
 void update_size_if_tex_changed(
 	const edit_invariant_input in,
-	const invariants::sprite&,
-	const assets::image_id new_id
+	const field_address&,
+	const invariants::sprite&
+);
+
+void update_size_if_tex_changed(
+	const edit_invariant_input in,
+	const field_address&,
+	const invariants::animation&
 );

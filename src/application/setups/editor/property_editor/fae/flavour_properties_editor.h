@@ -69,9 +69,11 @@ void edit_invariant(
 		const auto& new_content
 	) {
 		{
+			const auto property_id = flavour_property_id { in.edited_invariant_id, field_id };
+
 			auto cmd = in.command;
 
-			cmd.property_id = flavour_property_id { in.invariant_id, field_id };
+			cmd.property_id = property_id;
 			cmd.value_after_change = augs::to_bytes(new_content);
 			cmd.built_description = description + property_location;
 			describe_if_rename(cmd, old_description, field_id, invariant, new_content);
@@ -79,7 +81,7 @@ void edit_invariant(
 			history.execute_new(std::move(cmd), cmd_in);
 		}
 
-		update_size_if_tex_changed(in, invariant, new_content);
+		update_size_if_tex_changed(in, field_id, invariant);
 	};
 
 	auto rewrite_last_change = [&](
@@ -110,7 +112,7 @@ void edit_invariant(
 		[&](const auto& first, const field_address field_id) {
 			return compare_all_fields_to(
 				first,
-				flavour_property_id { in.invariant_id, field_id }, 
+				flavour_property_id { in.edited_invariant_id, field_id }, 
 				cosm, 
 				in.command.type_id, 
 				in.command.affected_flavours
@@ -152,6 +154,12 @@ void edit_flavour(
 		shape_polygon_invariant_id = static_cast<unsigned>(get_index(invariants::shape_polygon()));
 	}
 
+	std::optional<unsigned> sprite_invariant_id;
+	
+	if constexpr(entity_flavour<E>::template has<invariants::sprite>()) {
+		sprite_invariant_id = static_cast<unsigned>(get_index(invariants::sprite()));
+	}
+
 	const auto text_details_invariant_id = static_cast<unsigned>(get_index(invariants::text_details()));
 
 	auto do_edit_invariant = [&](const auto& invariant) {
@@ -160,6 +168,7 @@ void edit_flavour(
 			static_cast<unsigned>(get_index(invariant)),
 			text_details_invariant_id,
 			shape_polygon_invariant_id,
+			sprite_invariant_id,
 			source_flavour_name,
 			command
 		});

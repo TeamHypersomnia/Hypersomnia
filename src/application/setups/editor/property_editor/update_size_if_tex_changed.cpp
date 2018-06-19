@@ -6,9 +6,8 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/memory_stream.h"
 
-void update_size_if_tex_changed(
+void update_size_for_new_image(
 	const edit_invariant_input in,
-	const invariants::sprite&,
 	const assets::image_id new_id
 ) {
 	const auto fae_in = in.fae_in;
@@ -18,7 +17,9 @@ void update_size_if_tex_changed(
 	const auto& viewables = cmd_in.get_viewable_defs();
 	const auto& image_defs = viewables.image_definitions;
 
-	auto& folder = cmd_in.folder;
+	const auto& folder = cmd_in.folder;
+	ensure(in.sprite_invariant_id.has_value());
+	const auto invariant_id = in.sprite_invariant_id.value();
 
 	const auto cache = image_cache(image_definition_view(folder.current_path, image_defs[new_id]));
 
@@ -27,7 +28,7 @@ void update_size_if_tex_changed(
 
 		{
 			const auto addr = MACRO_MAKE_FIELD_ADDRESS(invariants::sprite, size);
-			cmd.property_id = flavour_property_id { in.invariant_id, addr };
+			cmd.property_id = flavour_property_id { invariant_id, addr };
 		}
 
 		{
@@ -35,20 +36,20 @@ void update_size_if_tex_changed(
 			const auto original_size = T(cache.original_image_size);
 
 			cmd.value_after_change = augs::to_bytes(original_size);
+			cmd.built_description = typesafe_sprintf("Set sprite size to image dimensions: %x", original_size);
 		}
 
-		cmd.built_description = "Set sprite size to image dimensions";
 		cmd.common.has_parent = true;
 
 		post_editor_command(cmd_in, std::move(cmd));
 	}
 
-	if (const auto invariant_id = in.shape_polygon_invariant_id) {
+	if (const auto shape_invariant_id = in.shape_polygon_invariant_id) {
 		auto cmd = in.command;
 
 		{
 			const auto addr = MACRO_MAKE_FIELD_ADDRESS(invariants::shape_polygon, shape);
-			cmd.property_id = flavour_property_id { *invariant_id, addr };
+			cmd.property_id = flavour_property_id { *shape_invariant_id, addr };
 		}
 
 		{
@@ -118,5 +119,64 @@ void update_size_if_tex_changed(
 				post_editor_command(cmd_in, std::move(cmd));
 			}
 		});
+	}
+}
+
+void update_size_if_tex_changed(
+	const edit_invariant_input in,
+	const field_address& address,
+	const invariants::animation& animation_def
+) {
+	if (address != MACRO_MAKE_FIELD_ADDRESS(invariants::animation, id)) {
+		return;
+	}
+
+	const auto new_id = animation_def.id;
+
+	const auto fae_in = in.fae_in;
+	const auto cpe_in = fae_in.cpe_in;
+	const auto cmd_in = cpe_in.command_in;
+
+	const auto& cosm = cmd_in.get_cosmos();
+	const auto anim = cosm.get_logical_assets().find(new_id);
+
+	if (anim == nullptr) {
+		return;
+	}
+
+	ensure(in.sprite_invariant_id.has_value());
+
+	const auto first_image = anim->frames[0].image_id;
+
+	{
+		auto cmd = in.command;
+
+		{
+			const auto addr = MACRO_MAKE_FIELD_ADDRESS(invariants::sprite, image_id);
+			cmd.property_id = flavour_property_id { *in.sprite_invariant_id, addr };
+		}
+
+		{
+			cmd.value_after_change = augs::to_bytes(first_image);
+			cmd.built_description = typesafe_sprintf("Set sprite image id first frame of animation");
+		}
+
+		cmd.common.has_parent = true;
+
+		post_editor_command(cmd_in, std::move(cmd));
+	}
+
+	update_size_for_new_image(in, first_image);
+}
+
+void update_size_if_tex_changed(
+	const edit_invariant_input in,
+	const field_address& address,
+	const invariants::sprite& spr
+) {
+	const auto new_id = spr.image_id;
+
+	if (address == MACRO_MAKE_FIELD_ADDRESS(invariants::sprite, image_id)) {
+		update_size_for_new_image(in, new_id);
 	}
 }

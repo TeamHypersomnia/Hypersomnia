@@ -50,6 +50,10 @@ struct field_address {
 	bool operator==(const field_address& b) const {
 		return offset == b.offset && element_index && b.element_index && type_id == b.type_id;
 	}
+
+	bool operator!=(const field_address& b) const {
+		return !operator==(b);
+	}
 };
 
 template <class M>
