@@ -65,7 +65,7 @@ namespace test_flavours {
 				invariants::movement_path movement_path_def;
 				auto& square = movement_path_def.rect_bounded;
 				square.is_enabled = true;
-				square.value.rect_size = vec2i(368, 403);
+				square.value.rect_size = vec2i(368, 403) * 2;
 				meta.set(movement_path_def);
 			}
 		}
@@ -95,7 +95,7 @@ namespace test_flavours {
 				invariants::movement_path movement_path_def;
 				auto& square = movement_path_def.rect_bounded;
 				square.is_enabled = true;
-				square.value.rect_size = vec2i(368, 403);
+				square.value.rect_size = vec2i(368, 403) * 2;
 				meta.set(movement_path_def);
 			}
 		}

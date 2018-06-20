@@ -73,6 +73,10 @@ namespace test_scenes {
 			{ { -500, -2000 }, 0 }
 		};
 
+		auto get_size_of = [&caches](const auto id) {
+			return caches.at(to_image_id(id)).get_original_size();
+		};
+
 		std::vector<entity_id> new_characters;
 		new_characters.resize(num_characters);
 
@@ -256,7 +260,7 @@ namespace test_scenes {
 				}
 
 				{
-					const vec2 bg_size = caches.at(to_image_id(test_scene_image_id::SOIL)).get_original_size();
+					const vec2 bg_size = get_size_of(test_scene_image_id::SOIL);
 
 					const auto num_roads = 10 * 10;
 					const auto side = static_cast<int>(sqrt(num_roads) / 2);
@@ -271,13 +275,13 @@ namespace test_scenes {
 				create_test_scene_entity(world, test_sprite_decorations::ROAD_DIRT, transformr(vec2(468, 112)));
 
 				for (int r = 0; r < 38; ++r) {
-					const vec2 size = caches.at(to_image_id(test_scene_image_id::ROAD)).get_original_size();
+					const vec2 size = get_size_of(test_scene_image_id::ROAD);
 
 					create_test_scene_entity(world, test_sprite_decorations::ROAD, transformr{ vec2(468, 832+ size.y * r ) });
 				}
 
 				{
-					const vec2 size = caches.at(to_image_id(test_scene_image_id::FLOOR)).get_original_size();
+					const vec2 size = get_size_of(test_scene_image_id::FLOOR);
 
 					for (int x = 0; x < 10; ++x) {
 						for (int y = 0; y < 10; ++y) {
@@ -306,21 +310,27 @@ namespace test_scenes {
 		prefabs::create_rifle(step, vec2(300, -100), test_shootable_weapons::LEWSII, prefabs::create_magazine(step, vec2(100, -650), test_container_items::LEWSII_MAG, prefabs::create_steel_charge(step, vec2(0, 0)), 100));
 		prefabs::create_rifle(step, vec2(400, -100), test_shootable_weapons::LEWSII, prefabs::create_magazine(step, vec2(100, -650), test_container_items::LEWSII_MAG, prefabs::create_steel_charge(step, vec2(0, 0)), 100));
 
-		const auto aquarium_tr = transformr{vec2( -500, 300) };
+		const auto aquarium_tr = transformr{vec2( -800, 300) };
+		const auto aquarium_size = get_size_of(test_scene_image_id::AQUARIUM_SAND);
+
+		const auto aquarium_origin = aquarium_tr + transformr(aquarium_size / 2);
 
 		create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND, aquarium_tr);
+		create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND, aquarium_tr + transformr(vec2(aquarium_size.x, 0)));
+		create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND, aquarium_tr + transformr(vec2(aquarium_size.x, aquarium_size.y)));
+		create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND, aquarium_tr + transformr(vec2(0, aquarium_size.y)));
 
-		prefabs::create_yellow_fish(step, aquarium_tr - vec2(80, 10), aquarium_tr);
-		prefabs::create_yellow_fish(step, aquarium_tr + components::transform(vec2(80, 10), -180), aquarium_tr, 1);
+		prefabs::create_yellow_fish(step, aquarium_tr - vec2(80, 10), aquarium_origin);
+		prefabs::create_yellow_fish(step, aquarium_tr + components::transform(vec2(80, 10), -180), aquarium_origin, 1);
 
-		prefabs::create_yellow_fish(step, aquarium_tr - vec2(80, 30), aquarium_tr);
-		prefabs::create_yellow_fish(step, aquarium_tr + components::transform(vec2(80, 50), -180), aquarium_tr, 2);
+		prefabs::create_yellow_fish(step, aquarium_tr - vec2(80, 30), aquarium_origin);
+		prefabs::create_yellow_fish(step, aquarium_tr + components::transform(vec2(80, 50), -180), aquarium_origin, 2);
 
-		prefabs::create_yellow_fish(step, aquarium_tr - vec2(120, 30), aquarium_tr);
-		prefabs::create_yellow_fish(step, aquarium_tr + components::transform(vec2(90, 40), -180), aquarium_tr, 3);
+		prefabs::create_yellow_fish(step, aquarium_tr - vec2(120, 30), aquarium_origin);
+		prefabs::create_yellow_fish(step, aquarium_tr + components::transform(vec2(90, 40), -180), aquarium_origin, 3);
 
-		prefabs::create_jellyfish(step, aquarium_tr - vec2(180, 30), aquarium_tr);
-		prefabs::create_jellyfish(step, aquarium_tr + components::transform(vec2(190, 40), -180), aquarium_tr, 3);
+		prefabs::create_jellyfish(step, aquarium_tr - vec2(180, 30), aquarium_origin);
+		prefabs::create_jellyfish(step, aquarium_tr + components::transform(vec2(190, 40), -180), aquarium_origin, 3);
 
 		if (character(2).alive()) {
 			const auto second_machete = prefabs::create_cyan_urban_machete(step, vec2(0, 300));

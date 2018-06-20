@@ -23,11 +23,11 @@ void movement_path_system::advance_paths(const logic_step step) const {
 	auto& npo = cosm.get_solvable_inferred({}).tree_of_npo;
 
 	cosm.for_each_having<components::movement_path>(
-		[&](const auto t) {
-			auto& movement_path = t.template get<components::movement_path>();
-			const auto& movement_path_def = t.template get<invariants::movement_path>();
+		[&](const auto subject) {
+			auto& movement_path = subject.template get<components::movement_path>();
+			const auto& movement_path_def = subject.template get<invariants::movement_path>();
 
-			auto& transform = t.template get<components::transform>();
+			auto& transform = subject.template get<components::transform>();
 
 			const auto& rotation_speed = movement_path_def.continuous_rotation_speed;
 
@@ -37,7 +37,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 			if (movement_path_def.rect_bounded.is_enabled) {
 				const auto& pos = transform.pos;
-				const auto tip_pos = *t.find_logical_tip();
+				const auto tip_pos = *subject.find_logical_tip();
 
 				const auto& data = movement_path_def.rect_bounded.value;
 				const auto size = data.rect_size;
@@ -45,113 +45,127 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				const auto origin = movement_path.origin;
 				const auto bound = xywh::center_and_size(origin.pos, size);
 
-				const auto global_time = cosm.get_total_seconds_passed() + real32(t.get_guid());
+				const auto global_time = cosm.get_total_seconds_passed() + real32(subject.get_guid());
 				const auto global_time_sine = std::sin(global_time * 2);
 
 				const auto max_speed_boost = 100;
 				const auto speed_boost = static_cast<real32>(global_time_sine * global_time_sine * max_speed_boost);
 
 				const auto max_avoidance_speed = 20 + speed_boost / 2;
-				const auto max_cohesion_speed = 2.f;
+				const auto cohesion_mult = 0.06f;
+				const auto alignment_mult = 0.2f;
 				const auto min_speed = 80 + speed_boost;
 				const auto max_speed = 80 + max_speed_boost;
 
 				const auto current_dir = vec2::from_degrees(transform.rotation);
 
-				const float comfort_zone_radius = 100.f;
-				const float cohesion_zone_radius = 50.f;
+				const float comfort_zone_radius = 40.f;
+				const float cohesion_zone_radius = 60.f;
 
-				thread_local visible_entities neighbors;
+				auto for_each_neighbor_within = [&](const auto radius, auto callback) {
+					thread_local visible_entities neighbors;
 
-				auto velocity = current_dir * min_speed;
-
-				{
 					neighbors.clear();
 					neighbors.acquire_non_physical({
 						cosm,
 						camera_cone(pos),
-						vec2::square(comfort_zone_radius * 2),
+						vec2::square(radius * 2),
 
 						false
 					});
 
-
-					auto greatest_avoidance = vec2::zero;
-
 					for (const auto& a : neighbors.all) {
 						cosm[a].dispatch_on_having<components::movement_path>([&](const auto typed_neighbor) {
-							if (typed_neighbor.get_id() == t.get_id()) {
-								/* Don't measure against itself */
-								return;
+							if (typed_neighbor.get_id() != subject.get_id()) {
+								callback(typed_neighbor);
 							}
-
-							const auto& neighbor_path_def = typed_neighbor.template get<invariants::movement_path>();
-							const auto& neighbor_path = typed_neighbor.template get<components::movement_path>();
-						   
-							if (neighbor_path_def.rect_bounded.is_enabled) {
-								const auto neighbor_transform = typed_neighbor.get_logic_transform();
-								const auto neighbor_vel = vec2::from_degrees(neighbor_transform.rotation) * neighbor_path.last_speed;
-								const auto neighbor_tip = *typed_neighbor.find_logical_tip();
-
-								const auto avoidance = max_avoidance_speed * augs::calc_danger_avoidance_proportional(
-									pos,
-									neighbor_tip,
-									neighbor_vel,
-									comfort_zone_radius,
-									neighbor_path.last_speed / max_speed
-								);
-
-								greatest_avoidance = std::max(avoidance, greatest_avoidance);
-							}
+							/* Otherwise, don't measure against itself */
 						});
 					}
+				};
+
+				auto velocity = current_dir * min_speed;
+
+
+				{
+					auto greatest_avoidance = vec2::zero;
+
+					for_each_neighbor_within(comfort_zone_radius, [&](const auto typed_neighbor) {
+						const auto& neighbor_path_def = typed_neighbor.template get<invariants::movement_path>();
+						const auto& neighbor_path = typed_neighbor.template get<components::movement_path>();
+
+						if (neighbor_path_def.rect_bounded.is_enabled) {
+							const auto neighbor_transform = typed_neighbor.get_logic_transform();
+							const auto neighbor_vel = vec2::from_degrees(neighbor_transform.rotation) * neighbor_path.last_speed;
+							const auto neighbor_tip = *typed_neighbor.find_logical_tip();
+
+							const auto avoidance = max_avoidance_speed * augs::calc_danger_avoidance_proportional(
+								pos,
+								neighbor_tip,
+								neighbor_vel,
+								comfort_zone_radius,
+								neighbor_path.last_speed / max_speed
+							);
+
+							greatest_avoidance = std::max(avoidance, greatest_avoidance);
+						}
+					});
 
 					velocity += greatest_avoidance;
 				}
 
+
 				{
-					neighbors.clear();
-					neighbors.acquire_non_physical({
-						cosm,
-						camera_cone(pos),
-						vec2::square(cohesion_zone_radius * 2),
-
-						false
-					});
-
 					vec2 average_pos;
+					vec2 average_vel;
 
 					unsigned counted_neighbors = 0;
 
-					for (const auto& a : neighbors.all) {
-						cosm[a].dispatch_on_having<components::movement_path>([&](const auto typed_neighbor) {
-							if (typed_neighbor.get_id() == t.get_id()) {
-								/* Don't measure against itself */
-								return;
-							}
+					for_each_neighbor_within(comfort_zone_radius, [&](const auto typed_neighbor) {
+						if (typed_neighbor.get_flavour_id() != subject.get_flavour_id()) {
+							return;
+						}
 
-							if (typed_neighbor.get_flavour_id() != t.get_flavour_id()) {
-								return;
-							}
+						const auto& neighbor_path_def = typed_neighbor.template get<invariants::movement_path>();
 
-							const auto& neighbor_path_def = typed_neighbor.template get<invariants::movement_path>();
-
-							if (neighbor_path_def.rect_bounded.is_enabled) {
-								average_pos += typed_neighbor.get_logic_transform().pos;
-								++counted_neighbors;
-							}
-						});
-					}
+						if (neighbor_path_def.rect_bounded.is_enabled) {
+							const auto neighbor_transform = typed_neighbor.get_logic_transform();
+							const auto& neighbor_path = typed_neighbor.template get<components::movement_path>();
+							average_pos += neighbor_transform.pos;
+							average_vel += vec2::from_degrees(neighbor_transform.rotation) * neighbor_path.last_speed;
+							++counted_neighbors;
+						}
+					});
 
 					if (counted_neighbors) {
 						average_pos /= counted_neighbors;
-						const auto dist_from_center = (average_pos - pos).length();
-						velocity += (average_pos - pos).set_length(max_cohesion_speed * dist_from_center/cohesion_zone_radius);
+						average_vel /= counted_neighbors;
+
+						{
+							const auto target_vector = average_pos - pos;
+							const auto dist_from_center = target_vector.length();
+
+							//velocity += vec2(target_vector).set_length(max_cohesion_speed * dist_from_center/cohesion_zone_radius);
+
+							velocity += augs::calc_homing_correction_vel(
+								velocity * std::min(1.f, dist_from_center / cohesion_zone_radius) * cohesion_mult,
+								target_vector
+							);
+						}
+
+						{
+							const auto target_vector = average_vel;
+
+							velocity += augs::calc_homing_correction_vel(
+								velocity * alignment_mult,
+								target_vector
+							);
+						}
 					}
 				}
 
 
-				auto& anim_state = t.template get<components::animation>().state;
+				auto& anim_state = subject.template get<components::animation>().state;
 
 				const auto total_speed = velocity.length();
 
@@ -196,7 +210,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				anim_state.frame_elapsed_ms += delta.in_milliseconds() * speed_mult;
 			}
 
-			npo.infer_cache_for(t);
+			npo.infer_cache_for(subject);
 		}
 	);
 }
