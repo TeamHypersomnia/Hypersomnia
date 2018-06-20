@@ -22,6 +22,7 @@ enum class test_scene_plain_animation_id {
 	SILVER_TROUSERS_STRAFE,
 
 	YELLOW_FISH,
+	DARKBLUE_FISH,
 	JELLYFISH,
 
 	COUNT

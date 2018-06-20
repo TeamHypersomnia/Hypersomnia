@@ -141,6 +141,7 @@ enum class test_complex_decorations {
 	// GEN INTROSPECTOR enum class test_complex_decorations
 	ROTATING_FAN,
 	YELLOW_FISH,
+	DARKBLUE_FISH,
 	JELLYFISH,
 
 	COUNT
