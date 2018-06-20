@@ -182,17 +182,16 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 					particular_homing_target.alive() ? particular_homing_target : cosmos[get_closest_hostile(it, sender_attitude, detection_radius, filters::bullet())]
 				;
 
-				const auto current_velocity = it.template get<components::rigid_body>().get_velocity();
+				const auto current_vel = it.template get<components::rigid_body>().get_velocity();
+				const auto current_pos = it.get_logic_transform().pos;
 
-				it.set_logic_transform({ it.get_logic_transform().pos, current_velocity.degrees() });
+				it.set_logic_transform({ current_pos, current_vel.degrees() });
 
 				if (closest_hostile.alive()) {
-					const auto homing_force = augs::homing_correction_in_radius(
-						current_velocity,
-						it.get_logic_transform().pos,
-						closest_hostile.get_logic_transform().pos,
-						detection_radius
-					);
+					const auto hostile_pos = closest_hostile.get_logic_transform().pos;
+
+					const auto desired_vel = (hostile_pos - current_pos).set_length(missile.initial_speed);
+					const auto homing_force = desired_vel - current_vel;
 
 					it.template get<components::rigid_body>().apply_force(
 						homing_force * missile_def.homing_towards_hostile_strength

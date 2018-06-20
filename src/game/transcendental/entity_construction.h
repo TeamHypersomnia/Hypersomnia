@@ -28,6 +28,10 @@ void construct_post_inference(const handle_type h) {
 		}
 	}
 
+	if (const auto missile = h.template find<components::missile>()) {
+		missile->initial_speed = h.get_effective_velocity().length();
+	}
+
 	if (const auto trace = h.template find<components::trace>()) {
 		auto rng = cosmos.get_rng_for(h.get_id());
 		trace->reset(*h.template find<invariants::trace>(), rng);
