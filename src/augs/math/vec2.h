@@ -304,6 +304,10 @@ struct basic_vec2 {
 		return radians_between(v) * RAD_TO_DEG<real>;
 	}
 
+	bool apart_by_less_than_90_degrees(const basic_vec2& b) const {
+		return dot(b) >= 0;
+	}
+
 	template<class A, class B>
 	basic_vec2& set(const A& vx, const B& vy) {
 		x = static_cast<type>(vx); y = static_cast<type>(vy);

@@ -45,8 +45,6 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				const auto origin = movement_path.origin;
 				const auto bound = xywh::center_and_size(origin.pos, size);
 
-				const auto edges = bound.make_edges();
-
 				const auto global_time = cosm.get_total_seconds_passed() + real32(t.get_guid());
 				const auto global_time_sine = std::sin(global_time * 2);
 
@@ -54,63 +52,112 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				const auto speed_boost = static_cast<real32>(global_time_sine * global_time_sine * max_speed_boost);
 
 				const auto max_avoidance_speed = 20 + speed_boost / 2;
-				const auto min_speed = 100 + speed_boost;
-				const auto max_speed = min_speed + max_speed_boost;
+				const auto max_cohesion_speed = 2.f;
+				const auto min_speed = 80 + speed_boost;
+				const auto max_speed = 80 + max_speed_boost;
 
 				const auto current_dir = vec2::from_degrees(transform.rotation);
 
-				const float comfort_zone_radius = 80.f;
+				const float comfort_zone_radius = 100.f;
+				const float cohesion_zone_radius = 50.f;
 
 				thread_local visible_entities neighbors;
 
-				neighbors.clear();
-				neighbors.acquire_non_physical({
-					cosm,
-					camera_cone(pos),
-					vec2::square(comfort_zone_radius),
-
-					false
-				});
-
 				auto velocity = current_dir * min_speed;
 
-				auto greatest_avoidance = vec2::zero;
+				{
+					neighbors.clear();
+					neighbors.acquire_non_physical({
+						cosm,
+						camera_cone(pos),
+						vec2::square(comfort_zone_radius * 2),
 
-				for (const auto& a : neighbors.all) {
-					cosm[a].dispatch_on_having<components::movement_path>([&](const auto typed_neighbor) {
-						if (typed_neighbor.get_id() == t.get_id()) {
-							/* Don't measure against itself */
-							return;
-						}
-
-						const auto& neighbor_path_def = typed_neighbor.template get<invariants::movement_path>();
-						const auto& neighbor_path = typed_neighbor.template get<components::movement_path>();
-					   
-						if (neighbor_path_def.rect_bounded.is_enabled) {
-							const auto neighbor_transform = typed_neighbor.get_logic_transform();
-							const auto neighbor_vel = vec2::from_degrees(neighbor_transform.rotation) * neighbor_path.last_speed;
-							const auto neighbor_tip = *typed_neighbor.find_logical_tip();
-
-							const auto avoidance = max_avoidance_speed * augs::calc_danger_avoidance_proportional(
-								pos,
-								neighbor_tip,
-								neighbor_vel,
-								comfort_zone_radius,
-								neighbor_path.last_speed / max_speed
-							);
-
-							greatest_avoidance = std::max(avoidance, greatest_avoidance);
-						}
+						false
 					});
+
+
+					auto greatest_avoidance = vec2::zero;
+
+					for (const auto& a : neighbors.all) {
+						cosm[a].dispatch_on_having<components::movement_path>([&](const auto typed_neighbor) {
+							if (typed_neighbor.get_id() == t.get_id()) {
+								/* Don't measure against itself */
+								return;
+							}
+
+							const auto& neighbor_path_def = typed_neighbor.template get<invariants::movement_path>();
+							const auto& neighbor_path = typed_neighbor.template get<components::movement_path>();
+						   
+							if (neighbor_path_def.rect_bounded.is_enabled) {
+								const auto neighbor_transform = typed_neighbor.get_logic_transform();
+								const auto neighbor_vel = vec2::from_degrees(neighbor_transform.rotation) * neighbor_path.last_speed;
+								const auto neighbor_tip = *typed_neighbor.find_logical_tip();
+
+								const auto avoidance = max_avoidance_speed * augs::calc_danger_avoidance_proportional(
+									pos,
+									neighbor_tip,
+									neighbor_vel,
+									comfort_zone_radius,
+									neighbor_path.last_speed / max_speed
+								);
+
+								greatest_avoidance = std::max(avoidance, greatest_avoidance);
+							}
+						});
+					}
+
+					velocity += greatest_avoidance;
 				}
 
-				velocity += greatest_avoidance;
+				{
+					neighbors.clear();
+					neighbors.acquire_non_physical({
+						cosm,
+						camera_cone(pos),
+						vec2::square(cohesion_zone_radius * 2),
+
+						false
+					});
+
+					vec2 average_pos;
+
+					unsigned counted_neighbors = 0;
+
+					for (const auto& a : neighbors.all) {
+						cosm[a].dispatch_on_having<components::movement_path>([&](const auto typed_neighbor) {
+							if (typed_neighbor.get_id() == t.get_id()) {
+								/* Don't measure against itself */
+								return;
+							}
+
+							if (typed_neighbor.get_flavour_id() != t.get_flavour_id()) {
+								return;
+							}
+
+							const auto& neighbor_path_def = typed_neighbor.template get<invariants::movement_path>();
+
+							if (neighbor_path_def.rect_bounded.is_enabled) {
+								average_pos += typed_neighbor.get_logic_transform().pos;
+								++counted_neighbors;
+							}
+						});
+					}
+
+					if (counted_neighbors) {
+						average_pos /= counted_neighbors;
+						const auto dist_from_center = (average_pos - pos).length();
+						velocity += (average_pos - pos).set_length(max_cohesion_speed * dist_from_center/cohesion_zone_radius);
+					}
+				}
+
 
 				auto& anim_state = t.template get<components::animation>().state;
 
 				const auto total_speed = velocity.length();
 
 				{
+					const auto edges = bound.make_edges();
+
 					auto min_dist = std::numeric_limits<real32>::max();
 
 					for (auto& e : edges) {
@@ -125,7 +172,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 					/* Finally, correct velocities against the walls */
 
-					auto dir_mult = std::max(0.f, 1.f - min_dist / 20.f) / 5;
+					auto dir_mult = std::max(0.f, 1.f - min_dist / 30.f) / 5;
 
 					if (!bound.hover(tip_pos)) {
 						/* Protect from going outside */
@@ -133,17 +180,17 @@ void movement_path_system::advance_paths(const logic_step step) const {
 					}
 
 					velocity +=
-						augs::calc_homing_dir(
+						augs::calc_homing_correction_vel(
 							velocity,
 							origin.pos - pos
-						).set_length(max_avoidance_speed * 2 * dir_mult);
+						) * dir_mult;
 					;
 				}
 
 				movement_path.last_speed = total_speed;
 
 				transform.pos += velocity * delta.in_seconds();
-				transform.rotation = velocity.degrees();
+				transform.rotation = velocity.degrees();//augs::interp(transform.rotation, velocity.degrees(), 50.f * delta.in_seconds());
 
 				const auto speed_mult = total_speed / max_speed;
 				anim_state.frame_elapsed_ms += delta.in_milliseconds() * speed_mult;

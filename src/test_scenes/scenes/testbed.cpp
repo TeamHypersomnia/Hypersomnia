@@ -319,6 +319,9 @@ namespace test_scenes {
 		prefabs::create_yellow_fish(step, aquarium_tr - vec2(120, 30), aquarium_tr);
 		prefabs::create_yellow_fish(step, aquarium_tr + components::transform(vec2(90, 40), -180), aquarium_tr, 3);
 
+		prefabs::create_jellyfish(step, aquarium_tr - vec2(180, 30), aquarium_tr);
+		prefabs::create_jellyfish(step, aquarium_tr + components::transform(vec2(190, 40), -180), aquarium_tr, 3);
+
 		if (character(2).alive()) {
 			const auto second_machete = prefabs::create_cyan_urban_machete(step, vec2(0, 300));
 			perform_transfer(item_slot_transfer_request::standard(second_machete, character(2).get_primary_hand()), step);

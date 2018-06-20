@@ -69,6 +69,36 @@ namespace test_flavours {
 				meta.set(movement_path_def);
 			}
 		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_complex_decorations::JELLYFISH);
+
+			invariants::render render_def;
+			render_def.layer = render_layer::ON_ON_FLOOR;
+
+			meta.set(render_def);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::JELLYFISH_1, white);
+
+			{
+				invariants::animation anim_def;
+				anim_def.id = to_animation_id(test_scene_plain_animation_id::JELLYFISH);
+				meta.set(anim_def);
+
+				components::animation anim;
+				anim.speed_factor = 0.2f;
+
+				meta.set(anim);
+			}
+
+			{
+				invariants::movement_path movement_path_def;
+				auto& square = movement_path_def.rect_bounded;
+				square.is_enabled = true;
+				square.value.rect_size = vec2i(368, 403);
+				meta.set(movement_path_def);
+			}
+		}
 	}
 }
 
@@ -80,6 +110,13 @@ namespace prefabs {
 
 	entity_handle create_yellow_fish(const logic_step step, const transformr& pos, const transformr& origin, const unsigned frame_offset) {
 		const auto decor = create_test_scene_entity(step.get_cosmos(), test_complex_decorations::YELLOW_FISH, pos);
+		decor.get<components::animation>().state.frame_num = frame_offset;
+		decor.get<components::movement_path>().origin = origin;
+		return decor;
+	}
+
+	entity_handle create_jellyfish(const logic_step step, const transformr& pos, const transformr& origin, const unsigned frame_offset) {
+		const auto decor = create_test_scene_entity(step.get_cosmos(), test_complex_decorations::JELLYFISH, pos);
 		decor.get<components::animation>().state.frame_num = frame_offset;
 		decor.get<components::movement_path>().origin = origin;
 		return decor;

@@ -294,5 +294,18 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 
 			alloc(test_id_type::YELLOW_FISH, anim);
 		} 
+
+		{
+			plain_animation anim;
+
+			create_frames(
+				anim,
+				test_scene_image_id::JELLYFISH_1,
+				test_scene_image_id::JELLYFISH_14,
+				50.0f
+			);
+
+			alloc(test_id_type::JELLYFISH, anim);
+		} 
 	}
 }
