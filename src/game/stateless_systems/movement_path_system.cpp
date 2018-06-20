@@ -51,6 +51,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				const auto max_speed_boost = 100;
 				const auto speed_boost = static_cast<real32>(global_time_sine * global_time_sine * max_speed_boost);
 
+				const auto fov_half_degrees = real32((360 - 90) / 2);
 				const auto max_avoidance_speed = 20 + speed_boost / 2;
 				//const auto cohesion_mult = 0.f;
 				//const auto alignment_mult = 0.f;
@@ -79,7 +80,12 @@ void movement_path_system::advance_paths(const logic_step step) const {
 					for (const auto& a : neighbors.all) {
 						cosm[a].dispatch_on_having<components::movement_path>([&](const auto typed_neighbor) {
 							if (typed_neighbor.get_id() != subject.get_id()) {
-								callback(typed_neighbor);
+								const auto neighbor_tip = *typed_neighbor.find_logical_tip();
+								const auto offset = neighbor_tip - tip_pos;
+
+								if (current_dir.degrees_between(offset) < fov_half_degrees) {
+									callback(typed_neighbor);
+								}
 							}
 							/* Otherwise, don't measure against itself */
 						});
