@@ -613,6 +613,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/property_editor/property_editor_structs.cpp"
 	"src/application/setups/editor/property_editor/update_size_if_tex_changed.cpp"
 	"src/game/stateless_systems/movement_path_system.cpp"
+	"src/game/stateless_systems/animation_system.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

@@ -3,6 +3,7 @@
 #include "augs/drawing/flip.h"
 #include "augs/drawing/sprite.h"
 
+#include "game/assets/animation.h"
 #include "game/assets/ids/asset_ids.h"
 
 namespace invariants {
@@ -18,7 +19,8 @@ namespace invariants {
 namespace components {
 	struct animation {
 		// GEN INTROSPECTOR struct components::animation
-		unsigned time_offset_ms = 0u;
+		float speed_factor = 1.f;
+		simple_animation_state state;
 		// END GEN INTROSPECTOR
 	};
 }

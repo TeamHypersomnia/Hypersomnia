@@ -311,9 +311,9 @@ namespace test_scenes {
 		create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND, aquarium_tr);
 
 		prefabs::create_yellow_fish(step, aquarium_tr + vec2(20, 50), aquarium_tr);
-		prefabs::create_yellow_fish(step, aquarium_tr + vec2(40, 30), aquarium_tr, 45);
-		prefabs::create_yellow_fish(step, aquarium_tr + vec2(20, 80), aquarium_tr, 120);
-		prefabs::create_yellow_fish(step, aquarium_tr + vec2(60, 30), aquarium_tr, 95);
+		prefabs::create_yellow_fish(step, aquarium_tr + vec2(40, 30), aquarium_tr, 1);
+		prefabs::create_yellow_fish(step, aquarium_tr + vec2(20, 80), aquarium_tr, 2);
+		prefabs::create_yellow_fish(step, aquarium_tr + vec2(60, 30), aquarium_tr, 3);
 
 		if (character(2).alive()) {
 			const auto second_machete = prefabs::create_cyan_urban_machete(step, vec2(0, 300));

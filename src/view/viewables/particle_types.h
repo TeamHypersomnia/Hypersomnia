@@ -111,7 +111,6 @@ struct general_particle {
 
 struct animation_in_particle {
 	// GEN INTROSPECTOR struct animation_in_particle
-	unsigned starting_frame_num = 0;
 	float speed_factor = 1.f;
 
 	assets::plain_animation_id id;
@@ -119,17 +118,17 @@ struct animation_in_particle {
 	// END GEN INTROSPECTOR
 
 	void advance(const real32 dt, const plain_animations_pool& anims) {
-		if (state.advance(dt * speed_factor, anims[id].frames, starting_frame_num)) {
-			starting_frame_num = -1;
+		if (state.advance(dt * speed_factor, anims[id].frames)) {
+			speed_factor = -1.f;
 		}
 	}
 
 	auto get_image_id(const plain_animations_pool& anims) const {
-		return anims[id].get_image_id(state, starting_frame_num);
+		return anims[id].get_image_id(state);
 	}
 
 	bool is_dead() const {
-		return starting_frame_num == static_cast<unsigned>(-1);
+		return speed_factor <= 0.f;
 	}
 };
 

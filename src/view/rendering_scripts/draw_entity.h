@@ -67,9 +67,8 @@ FORCE_INLINE void detail_specific_entity_drawer(
 
 			const auto& logicals = typed_handle.get_cosmos().get_logical_assets();
 
-			if (const auto displayed_animation = logicals.find(animation_def.id)) {
-				const auto animation_time_ms = in.global_time_seconds * 1000 + animation.time_offset_ms;
-				const auto image_id = ::calc_current_frame_looped(*displayed_animation, animation_time_ms).image_id;
+			if (const auto displayed_frame = ::find_frame(animation_def, animation, logicals)) {
+				const auto image_id = displayed_frame->image_id;
 
 				auto animated = sprite;
 				animated.image_id = image_id;
@@ -106,7 +105,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 			const auto& logicals = cosm.get_logical_assets();
 
 			if (const auto shoot_animation = logicals.find(gun_def.shoot_animation)) {
-				if (const auto* const frame = ::get_frame(gun, *shoot_animation, cosm)) {
+				if (const auto* const frame = ::find_frame(gun, *shoot_animation, cosm)) {
 					auto animated = sprite;
 					animated.image_id = frame->image_id;
 					animated.size = in.manager.at(frame->image_id).get_original_size();

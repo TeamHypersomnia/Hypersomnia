@@ -3,8 +3,22 @@
 #include "game/components/movement_component.h"
 #include "game/assets/animation_math.h"
 
+template <class L>
+const plain_animation_frame* find_frame(
+	const invariants::animation& anim_def,
+	const components::animation& anim_state,
+	const L& logicals
+) {
+	if (const auto anim = logicals.find(anim_def.id)) {
+		const auto n = static_cast<unsigned>(anim->frames.size());
+		return std::addressof(anim->frames[std::min(n - 1, anim_state.state.frame_num)]);
+	}
+
+	return nullptr;
+}
+
 template <class T>
-frame_type_t<T>* get_frame(
+frame_type_t<T>* find_frame(
 	const components::gun& gun,
 	T& anim, 
 	const augs::stepped_timestamp now, 
@@ -15,12 +29,12 @@ frame_type_t<T>* get_frame(
 }
 
 template <class T, class C>
-frame_type_t<T>* get_frame(
+frame_type_t<T>* find_frame(
 	const components::gun& gun,
 	T& anim, 
 	const C& cosm
 ) {
-	return ::get_frame(gun, anim, cosm.get_timestamp(), cosm.get_fixed_delta());
+	return ::find_frame(gun, anim, cosm.get_timestamp(), cosm.get_fixed_delta());
 }
 
 template <class T>
@@ -87,11 +101,11 @@ auto calc_stance_info(
 
 		if (n > 0) {
 			if (const auto gun = cosm[wielded_items[0]].template find<components::gun>()) {
-				const auto frame = ::get_frame(*gun, *shoot_animation, cosm);
+				const auto frame = ::find_frame(*gun, *shoot_animation, cosm);
 				const auto second_frame = [n, &cosm, shoot_animation, &wielded_items]() -> decltype(frame) {
 					if (n == 2) {
 						if (const auto second_gun = cosm[wielded_items[1]].template find<components::gun>()) {
-							return ::get_frame(*second_gun, *shoot_animation, cosm);
+							return ::find_frame(*second_gun, *shoot_animation, cosm);
 						}
 					}
 

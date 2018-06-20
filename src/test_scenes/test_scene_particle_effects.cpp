@@ -376,7 +376,7 @@ void load_test_scene_particle_effects(
 			homing_animated_particle particle_definition;
 
 			particle_definition.linear_damping = 0;
-			particle_definition.animation.starting_frame_num = i;
+			particle_definition.animation.state.frame_num = i;
 			particle_definition.animation.id = cast_blink_id;
 			particle_definition.animation.speed_factor = 4.f;
 			particle_definition.color = white;
@@ -389,7 +389,7 @@ void load_test_scene_particle_effects(
 			homing_animated_particle particle_definition;
 
 			particle_definition.linear_damping = 0;
-			particle_definition.animation.starting_frame_num = i;
+			particle_definition.animation.state.frame_num = i;
 			particle_definition.animation.speed_factor = 4.f;
 			particle_definition.animation.id = cast_blink_id;
 			particle_definition.color = white;
@@ -402,7 +402,7 @@ void load_test_scene_particle_effects(
 			homing_animated_particle particle_definition;
 
 			particle_definition.linear_damping = 0;
-			particle_definition.animation.starting_frame_num = 2;
+			particle_definition.animation.state.frame_num = 2;
 			particle_definition.animation.speed_factor = 4.f;
 			particle_definition.animation.id = cast_blink_id;
 			particle_definition.color = white;
@@ -452,7 +452,7 @@ void load_test_scene_particle_effects(
 					homing_animated_particle particle_definition;
 
 					particle_definition.linear_damping = 300;
-					particle_definition.animation.starting_frame_num = i;
+					particle_definition.animation.state.frame_num = i;
 					particle_definition.animation.speed_factor = 2.f;
 					particle_definition.animation.id = cast_blink_id;
 					particle_definition.color = white;
@@ -467,7 +467,7 @@ void load_test_scene_particle_effects(
 					homing_animated_particle particle_definition;
 
 					particle_definition.linear_damping = 300;
-					particle_definition.animation.starting_frame_num = i;
+					particle_definition.animation.state.frame_num = i;
 					particle_definition.animation.speed_factor = 2.f;
 					particle_definition.animation.id = cast_blink_id;
 					particle_definition.color = white;
@@ -588,7 +588,7 @@ void load_test_scene_particle_effects(
 				animated_particle particle_definition;
 
 				particle_definition.linear_damping = 1000;
-				particle_definition.animation.starting_frame_num = i;
+				particle_definition.animation.state.frame_num = i;
 				particle_definition.animation.speed_factor = 2.f;
 				particle_definition.animation.id = cast_blink_id;
 				particle_definition.acc.set(900, -900);
@@ -702,7 +702,7 @@ void load_test_scene_particle_effects(
 				animated_particle particle_definition;
 
 				particle_definition.linear_damping = 1000;
-				particle_definition.animation.starting_frame_num = i;
+				particle_definition.animation.state.frame_num = i;
 				particle_definition.animation.speed_factor = 2.f;
 				particle_definition.animation.id = cast_blink_id;
 				particle_definition.acc.set(900, -900);
@@ -1027,7 +1027,7 @@ void load_test_scene_particle_effects(
 			animated_particle particle_definition;
 
 			particle_definition.linear_damping = 0;
-			particle_definition.animation.starting_frame_num = i;
+			particle_definition.animation.state.frame_num = i;
 			particle_definition.animation.speed_factor = 3.f;
 			particle_definition.animation.id = cast_blink_id;
 			particle_definition.color = white;
@@ -1460,7 +1460,7 @@ void load_test_scene_particle_effects(
 			animated_particle particle_definition;
 
 			particle_definition.linear_damping = 0;
-			particle_definition.animation.starting_frame_num = i;
+			particle_definition.animation.state.frame_num = i;
 			particle_definition.animation.speed_factor = 2.5f;
 			particle_definition.animation.id = cast_blink_id;
 			particle_definition.color = white;

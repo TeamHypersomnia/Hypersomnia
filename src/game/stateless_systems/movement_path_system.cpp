@@ -1,17 +1,11 @@
 #include "augs/misc/randomization.h"
 
-#include "game/debug_utils.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
-#include "game/transcendental/data_living_one_step.h"
 
-#include "game/components/render_component.h"
 #include "game/components/transform_component.h"
 #include "game/components/sprite_component.h"
-#include "game/components/missile_component.h"
-#include "game/components/rigid_body_component.h"
-#include "game/components/interpolation_component.h"
 
 #include "game/messages/interpolation_correction_request.h"
 #include "game/messages/queue_destruction.h"
@@ -31,14 +25,16 @@ void movement_path_system::advance_paths(const logic_step step) const {
 			const auto& movement_path_def = t.template get<invariants::movement_path>();
 
 			auto& transform = t.template get<components::transform>();
-			transform.rotation += movement_path_def.continuous_rotation_speed * delta.in_seconds();
 
-			npo.infer_cache_for(t);
+			const auto& rotation_speed = movement_path_def.continuous_rotation_speed;
+
+			if (!augs::is_epsilon(rotation_speed)) {
+				transform.rotation += rotation_speed * delta.in_seconds();
+			}
 
 			if (movement_path_def.rect_bounded.is_enabled) {
-				//std::vector<std::pair<vec2, vec2>> edges;
-
-				auto& pos = transform.pos;
+				const auto& pos = transform.pos;
+				const auto tip_pos = pos + vec2(*t.find_logical_width(), 0).rotate(transform.rotation, vec2());
 
 				const auto& data = movement_path_def.rect_bounded.value;
 				const auto size = data.rect_size;
@@ -48,10 +44,10 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 				const auto edges = bound.make_edges();
 
-				real32 min_dist = pos.distance_from_segment_sq(edges[0][0], edges[0][1]);
+				auto min_dist = std::numeric_limits<real32>::max();
 				
 				for (auto& e : edges) {
-					const auto dist = pos.distance_from_segment_sq(e[0], e[1]);
+					const auto dist = tip_pos.distance_from_segment_sq(e[0], e[1]);
 
 					if (dist < min_dist) {
 						min_dist = dist;
@@ -72,22 +68,23 @@ void movement_path_system::advance_paths(const logic_step step) const {
 					target_dir.x = 1;
 				}
 
-				const auto& anim = t.template get<components::animation>();
-				const auto time_offset = double(anim.time_offset_ms) / 100;
+				auto& anim_state = t.template get<components::animation>().state;
 
-				const auto global_time = cosm.get_total_seconds_passed() + time_offset;
+				const auto global_time = cosm.get_total_seconds_passed() + real32(t.get_guid());
 				const auto global_time_sine = std::sin(global_time);
 
-				const real32 speed = global_time_sine * global_time_sine * 100 + 40;
+				const auto min_speed = 40;
+				const auto max_speed = 100 + min_speed;
+				const auto speed = static_cast<real32>(global_time_sine * global_time_sine * 100 + 40);
+				const auto speed_mult = speed / max_speed;
+
 				transform.pos += target_dir * speed * delta.in_seconds();
 				transform.rotation = target_dir.degrees();
 
-				//const auto target_bound = xywh(transform.pos, );
-
-/* 				if () { */
-
-/* 				} */
+				anim_state.frame_elapsed_ms += delta.in_milliseconds() * speed_mult;
 			}
+
+			npo.infer_cache_for(t);
 		}
 	);
 }

@@ -39,6 +39,28 @@ struct simple_animation_state {
 		}
 	}
 
+	template <class F, class C>
+	void advance_looped(
+		const simple_animation_advance in,
+		F nth_frame_duration_ms,
+		C exit_frame_callback
+	) {
+		frame_elapsed_ms += in.delta_ms;
+
+		while (true) {
+			const auto current_frame_duration = nth_frame_duration_ms(frame_num);
+
+			if (frame_elapsed_ms > current_frame_duration) {
+				frame_elapsed_ms -= current_frame_duration;
+				exit_frame_callback(frame_num);
+				frame_num = (frame_num + 1) % in.frame_count;
+			}
+			else {
+				break;
+			}
+		}
+	}
+
 	template <class F>
 	void advance(
 		const simple_animation_advance in,
@@ -50,14 +72,27 @@ struct simple_animation_state {
 	template <class T>
 	bool advance(
 		const real32 dt,
-		const T& source_frames,
-		const unsigned frame_offset = 0
+		const T& source_frames
 	) {
-		advance({ dt, static_cast<unsigned>(source_frames.size()) - frame_offset }, [&](const auto i) { 
+		advance({ dt, static_cast<unsigned>(source_frames.size()) }, [&](const auto i) { 
 			return source_frames[i].duration_milliseconds; 
 		});
 
-		return frame_offset + frame_num >= source_frames.size();
+		return frame_num >= source_frames.size();
+	}
+
+	template <class T>
+	void advance_looped(
+		const real32 dt,
+		const T& source_frames
+	) {
+		advance_looped(
+			{ dt, static_cast<unsigned>(source_frames.size()) },
+		   	[&](const auto i) { 
+				return source_frames[i].duration_milliseconds; 
+			},
+			[](auto){}
+		);
 	}
 };
 
@@ -68,11 +103,10 @@ struct animation_mixin {
 	}
 
 	auto get_image_id(
-		const simple_animation_state& state,
-	   	const unsigned frame_offset
+		const simple_animation_state& state
 	) const {
 		const auto& frames = reinterpret_cast<const D*>(this)->frames;
-		return get_image_id(std::min(static_cast<unsigned>(frames.size() - 1), state.frame_num + frame_offset));
+		return get_image_id(std::min(static_cast<unsigned>(frames.size() - 1), state.frame_num));
 	}
 };
 

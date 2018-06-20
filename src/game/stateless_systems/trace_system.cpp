@@ -1,7 +1,5 @@
-#include "trace_system.h"
 #include "augs/misc/randomization.h"
 
-#include "game/debug_utils.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
@@ -18,6 +16,8 @@
 #include "game/messages/interpolation_correction_request.h"
 #include "game/messages/queue_destruction.h"
 #include "game/messages/will_soon_be_deleted.h"
+
+#include "game/stateless_systems/trace_system.h"
 
 void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 	auto& cosmos = step.get_cosmos();
