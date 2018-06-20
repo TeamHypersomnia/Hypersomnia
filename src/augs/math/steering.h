@@ -66,7 +66,40 @@ namespace augs {
 		return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
 	}
 
-	inline auto homing_vel(
+	inline auto seek(
+		const vec2 current_vel,
+		const vec2 current_pos,
+		const vec2 target_pos
+	) {
+		const auto desired_vel = target_pos - current_pos;
+		return desired_vel - current_vel;
+	}
+
+	inline auto seek(
+		const vec2 current_vel,
+		const vec2 current_pos,
+		const vec2 hostile_pos,
+		const real32 desired_speed
+	) {
+		const auto desired_vel = (hostile_pos - current_pos).set_length(desired_speed);
+		return desired_vel - current_vel;
+	}
+
+	inline auto furthest_perpendicular(
+		const vec2 current_vel,
+		const vec2 target_vector
+	) {
+		const auto right_hand = current_vel.perpendicular_cw();
+		const auto left_hand = -current_vel.perpendicular_cw();
+
+		if (right_hand.dot(target_vector) < left_hand.dot(target_vector)) {
+			return right_hand;
+		}
+
+		return left_hand;
+	}
+
+	inline auto closest_perpendicular(
 		const vec2 current_vel,
 		const vec2 target_vector
 	) {
@@ -78,6 +111,23 @@ namespace augs {
 		}
 
 		return left_hand;
+	}
+
+	inline auto immediate_avoidance(
+		const vec2 victim_pos,
+		const vec2 victim_vel,
+		const vec2 danger_pos,
+		const vec2,
+		const real32 comfort_zone,
+		const real32 desired_speed
+	) {
+		const auto danger_dist = (danger_pos - victim_pos).length();
+		const auto comfort_disturbance = std::max(0.f, 1.f - danger_dist / comfort_zone);
+
+		const auto target_vector = danger_pos - victim_pos;
+		const auto desired_vel = furthest_perpendicular(victim_vel, target_vector).set_length(desired_speed);
+
+		return (desired_vel - victim_vel) * comfort_disturbance;
 	}
 
 	inline auto ease_against_projection(
@@ -103,7 +153,7 @@ namespace augs {
 		const vec2 current_vel,
 		const vec2 target_vector
 	) {
-		const auto best_perpendicular_vel = homing_vel(current_vel, target_vector);
+		const auto best_perpendicular_vel = closest_perpendicular(current_vel, target_vector);
 		return ease_against_projection(current_vel, best_perpendicular_vel, target_vector);
 	}
 

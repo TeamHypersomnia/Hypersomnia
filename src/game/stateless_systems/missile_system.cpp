@@ -190,8 +190,12 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 				if (closest_hostile.alive()) {
 					const auto hostile_pos = closest_hostile.get_logic_transform().pos;
 
-					const auto desired_vel = (hostile_pos - current_pos).set_length(missile.initial_speed);
-					const auto homing_force = desired_vel - current_vel;
+					const auto homing_force = augs::seek( 
+						current_vel,
+						current_pos,
+						hostile_pos,
+						missile.initial_speed
+					);
 
 					it.template get<components::rigid_body>().apply_force(
 						homing_force * missile_def.homing_towards_hostile_strength
