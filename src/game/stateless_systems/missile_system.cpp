@@ -187,15 +187,15 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 				it.set_logic_transform({ it.get_logic_transform().pos, current_velocity.degrees() });
 
 				if (closest_hostile.alive()) {
-					const auto target_vector = closest_hostile.get_logic_transform().pos - it.get_logic_transform().pos;
-
-					const auto homing = augs::calc_homing_correction_vel(
-						current_velocity * std::min(1.f, target_vector.length() / detection_radius),
-						target_vector
+					const auto homing_force = augs::homing_correction_in_radius(
+						current_velocity,
+						it.get_logic_transform().pos,
+						closest_hostile.get_logic_transform().pos,
+						detection_radius
 					);
 
 					it.template get<components::rigid_body>().apply_force(
-						homing * missile_def.homing_towards_hostile_strength
+						homing_force * missile_def.homing_towards_hostile_strength
 					);
 				}
 			}

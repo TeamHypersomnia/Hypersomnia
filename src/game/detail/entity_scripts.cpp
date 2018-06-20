@@ -60,7 +60,7 @@ identified_danger assess_danger(
 	const auto danger_dir = (danger_pos - victim_pos);
 	const float danger_distance = danger_dir.length();
 
-	result.recommended_evasion = augs::calc_danger_avoidance(victim_pos, danger_pos, danger_vel);
+	result.recommended_evasion = augs::danger_avoidance(victim_pos, danger_pos, danger_vel);
 	result.recommended_evasion.normalize();
 
 	const auto& sentience_def = victim.get<invariants::sentience>();

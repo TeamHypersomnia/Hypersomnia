@@ -52,8 +52,8 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				const auto speed_boost = static_cast<real32>(global_time_sine * global_time_sine * max_speed_boost);
 
 				const auto max_avoidance_speed = 20 + speed_boost / 2;
-				const auto cohesion_mult = 0.06f;
-				const auto alignment_mult = 0.2f;
+				const auto cohesion_mult = 0.05f;
+				const auto alignment_mult = 0.08f;
 				const auto min_speed = 80 + speed_boost;
 				const auto max_speed = 80 + max_speed_boost;
 
@@ -99,7 +99,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 							const auto neighbor_vel = vec2::from_degrees(neighbor_transform.rotation) * neighbor_path.last_speed;
 							const auto neighbor_tip = *typed_neighbor.find_logical_tip();
 
-							const auto avoidance = max_avoidance_speed * augs::calc_danger_avoidance_proportional(
+							const auto avoidance = max_avoidance_speed * augs::danger_avoidance_in_comfort_zone(
 								pos,
 								neighbor_tip,
 								neighbor_vel,
@@ -147,7 +147,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 							//velocity += vec2(target_vector).set_length(max_cohesion_speed * dist_from_center/cohesion_zone_radius);
 
-							velocity += augs::calc_homing_correction_vel(
+							velocity += augs::homing_correction(
 								velocity * std::min(1.f, dist_from_center / cohesion_zone_radius) * cohesion_mult,
 								target_vector
 							);
@@ -156,7 +156,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 						{
 							const auto target_vector = average_vel;
 
-							velocity += augs::calc_homing_correction_vel(
+							velocity += augs::homing_correction(
 								velocity * alignment_mult,
 								target_vector
 							);
@@ -194,7 +194,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 					}
 
 					velocity +=
-						augs::calc_homing_correction_vel(
+						augs::homing_correction(
 							velocity,
 							origin.pos - pos
 						) * dir_mult;

@@ -66,7 +66,7 @@ namespace augs {
 		return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
 	}
 
-	inline auto calc_homing_vel(
+	inline auto homing_vel(
 		const vec2 current_vel,
 		const vec2 target_vector
 	) {
@@ -80,36 +80,48 @@ namespace augs {
 		return left_hand;
 	}
 
-	inline auto calc_homing_correction_vel(
+	inline auto ease_against_projection(
 		const vec2 current_vel,
+		const vec2 best_perpendicular_vel,
 		const vec2 target_vector
 	) {
-		const auto best_perpendicular = calc_homing_vel(current_vel, target_vector);
-
 		if (current_vel.apart_by_less_than_90_degrees(target_vector)) {
 			if (const auto intersect = line_line_intersect(
 				current_vel, current_vel + current_vel.perpendicular_cw(),
 				vec2::zero, target_vector
 			)) {
 				const auto to_intersection_vel = *intersect - current_vel;
-				//LOG_NVPS(current_vel, best_perpendicular, target_vector, *intersect, to_intersection_vel);
-				return std::min(best_perpendicular, to_intersection_vel);
+				//LOG_NVPS(current_vel, best_perpendicular_vel, target_vector, *intersect, to_intersection_vel);
+				return std::min(best_perpendicular_vel, to_intersection_vel);
 			}
 		}
 
-		return best_perpendicular;
+		return best_perpendicular_vel;
 	}
 
-	inline auto calc_homing(
+	inline auto homing_correction(
+		const vec2 current_vel,
+		const vec2 target_vector
+	) {
+		const auto best_perpendicular_vel = homing_vel(current_vel, target_vector);
+		return ease_against_projection(current_vel, best_perpendicular_vel, target_vector);
+	}
+
+	inline auto homing_correction_in_radius(
 		const vec2 current_vel,
 		const vec2 current_pos,
-		const vec2 target_pos
+		const vec2 target_pos,
+		const real32 detection_radius
 	) {
 		const auto target_vector = target_pos - current_pos;
-		return calc_homing_vel(current_vel, target_vector).set_length(target_vector.length());
+
+		return homing_correction(
+			current_vel * std::min(1.f, target_vector.length() / detection_radius),
+			target_vector
+		);
 	}
 
-	inline auto calc_danger_avoidance(
+	inline auto danger_avoidance(
 		const vec2 victim_pos,
 		const vec2 danger_pos,
 		const vec2 danger_vel
@@ -124,14 +136,14 @@ namespace augs {
 		return -danger_dir;
 	}
 
-	inline auto calc_danger_avoidance_proportional(
+	inline auto danger_avoidance_in_comfort_zone(
 		const vec2 victim_pos,
 		const vec2 danger_pos,
 		const vec2 danger_vel,
 		const real32 comfort_zone,
 		const real32 avoidance_force
 	) {
-		const auto avoidance = calc_danger_avoidance(victim_pos, danger_pos, danger_vel);
+		const auto avoidance = danger_avoidance(victim_pos, danger_pos, danger_vel);
 		const auto danger_dist = (victim_pos - danger_pos).length();
 
 		return vec2(avoidance).set_length(avoidance_force * std::max(0.f, 1.f - (danger_dist / comfort_zone)));
