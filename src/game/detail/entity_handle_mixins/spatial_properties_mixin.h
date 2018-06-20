@@ -26,6 +26,18 @@ public:
 		return std::nullopt;
 	}
 
+	std::optional<vec2> find_logical_tip() const {
+		const auto handle = *static_cast<const entity_handle_type*>(this);
+
+		if (const auto w = handle.find_logical_width()) {
+			if (const auto t = handle.find_logic_transform()) {
+				return t->pos + vec2(*w, 0.f).rotate(t->rotation, vec2());
+			}
+		}
+
+		return std::nullopt;
+	}
+
 	template <class F, class... K>
 	void access_independent_transform(
 		F callback,

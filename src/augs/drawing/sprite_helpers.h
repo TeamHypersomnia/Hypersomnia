@@ -3,6 +3,7 @@
 #include "augs/math/vec2.h"
 #include "augs/graphics/vertex.h"
 #include "augs/graphics/rgba.h"
+#include "augs/drawing/make_sprite.h"
 
 namespace augs {
 	template <class M, class I>

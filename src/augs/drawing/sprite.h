@@ -9,6 +9,7 @@
 
 #include "augs/graphics/vertex.h"
 
+#include "augs/drawing/make_sprite.h"
 #include "augs/drawing/drawing_input_base.h"
 #include "augs/drawing/drawing.h"
 

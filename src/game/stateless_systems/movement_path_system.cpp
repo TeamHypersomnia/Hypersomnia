@@ -1,4 +1,5 @@
 #include "augs/misc/randomization.h"
+#include "augs/drawing/make_sprite_points.h"
 #include "augs/math/steering.h"
 
 #include "game/transcendental/cosmos.h"
@@ -36,7 +37,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 			if (movement_path_def.rect_bounded.is_enabled) {
 				const auto& pos = transform.pos;
-				const auto tip_pos = pos + vec2(*t.find_logical_width(), 0).rotate(transform.rotation, vec2());
+				const auto tip_pos = *t.find_logical_tip();
 
 				const auto& data = movement_path_def.rect_bounded.value;
 				const auto size = data.rect_size;
@@ -52,13 +53,13 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				const auto max_speed_boost = 100;
 				const auto speed_boost = static_cast<real32>(global_time_sine * global_time_sine * max_speed_boost);
 
-				const auto max_avoidance_speed = 30 + speed_boost / 2;
+				const auto max_avoidance_speed = 20 + speed_boost / 2;
 				const auto min_speed = 100 + speed_boost;
 				const auto max_speed = min_speed + max_speed_boost;
 
 				const auto current_dir = vec2::from_degrees(transform.rotation);
 
-				const float comfort_zone_radius = 70.f;
+				const float comfort_zone_radius = 80.f;
 
 				thread_local visible_entities neighbors;
 
@@ -88,22 +89,15 @@ void movement_path_system::advance_paths(const logic_step step) const {
 						if (neighbor_path_def.rect_bounded.is_enabled) {
 							const auto neighbor_transform = typed_neighbor.get_logic_transform();
 							const auto neighbor_vel = vec2::from_degrees(neighbor_transform.rotation) * neighbor_path.last_speed;
+							const auto neighbor_tip = *typed_neighbor.find_logical_tip();
 
-							const auto avoidance = augs::calc_danger_avoidance_proportional(
+							const auto avoidance = max_avoidance_speed * augs::calc_danger_avoidance_proportional(
 								pos,
-								neighbor_transform.pos,
+								neighbor_tip,
 								neighbor_vel,
 								comfort_zone_radius,
 								neighbor_path.last_speed / max_speed
-							) * max_avoidance_speed;
-
-							/* const auto avoidance = augs::calc_homing( */
-							/* 	velocity, */
-							/* 	pos, */
-							/* 	neighbor_transform.pos */
-							/* ); */
-
-							LOG_NVPS(t.get_guid(), velocity, pos, neighbor_transform.pos, avoidance);
+							);
 
 							greatest_avoidance = std::max(avoidance, greatest_avoidance);
 						}
@@ -129,12 +123,8 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 					min_dist = std::sqrt(min_dist);
 
-					//const auto new_current_dir = vec2(velocity).normalize();
-					//const auto new_current_degrees = new_current_dir.degrees();
-
 					/* Finally, correct velocities against the walls */
 
-					//const auto center_dir = (origin.pos - pos).normalize();
 					auto dir_mult = std::max(0.f, 1.f - min_dist / 20.f) / 5;
 
 					if (!bound.hover(tip_pos)) {
@@ -146,19 +136,8 @@ void movement_path_system::advance_paths(const logic_step step) const {
 						augs::calc_homing_dir(
 							velocity,
 							origin.pos - pos
-						).set_length(max_avoidance_speed * dir_mult);
+						).set_length(max_avoidance_speed * 2 * dir_mult);
 					;
-						/* const auto center_homing_dir = augs::calc_homing_dir( */
-						/* 	velocity, */
-						/* 	origin.pos - pos */
-						/* ); */
-
-						/* const auto center_homing_degrees = center_homing_dir.degrees(); */
-
-					/* const auto lerped_degrees = augs::interp(new_current_degrees, center_homing_degrees, dir_mult); */
-					/* const auto target_dir = vec2::from_degrees(lerped_degrees); */
-
-					/* velocity = target_dir * velocity.length(); */
 				}
 
 				movement_path.last_speed = total_speed;
