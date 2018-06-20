@@ -71,7 +71,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 					neighbors.clear();
 					neighbors.acquire_non_physical({
 						cosm,
-						camera_cone(pos),
+						camera_cone(tip_pos),
 						vec2::square(radius * 2),
 
 						false
@@ -83,7 +83,9 @@ void movement_path_system::advance_paths(const logic_step step) const {
 								const auto neighbor_tip = *typed_neighbor.find_logical_tip();
 								const auto offset = neighbor_tip - tip_pos;
 
-								if (current_dir.degrees_between(offset) < fov_half_degrees) {
+								const auto facing = current_dir.degrees_between(offset);
+
+								if (facing < fov_half_degrees) {
 									callback(typed_neighbor);
 								}
 							}
@@ -150,7 +152,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 						average_pos /= counted_neighbors;
 						average_vel /= counted_neighbors;
 
-						{
+						if (cohesion_mult != 0.f) {
 							const auto target_vector = average_pos - pos;
 							const auto dist_from_center = target_vector.length();
 
@@ -162,7 +164,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 							);
 						}
 
-						{
+						if (alignment_mult != 0.f) {
 							const auto target_vector = average_vel;
 
 							velocity += augs::homing_correction(

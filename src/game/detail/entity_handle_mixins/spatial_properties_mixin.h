@@ -31,7 +31,7 @@ public:
 
 		if (const auto w = handle.find_logical_width()) {
 			if (const auto t = handle.find_logic_transform()) {
-				return t->pos + vec2(*w, 0.f).rotate(t->rotation, vec2());
+				return t->pos + vec2(*w / 2, 0.f).rotate(t->rotation, vec2());
 			}
 		}
 
