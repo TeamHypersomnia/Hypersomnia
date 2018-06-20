@@ -84,20 +84,20 @@ namespace augs {
 		const vec2 current_vel,
 		const vec2 target_vector
 	) {
-		const auto vel = calc_homing_vel(current_vel, target_vector);
+		const auto best_perpendicular = calc_homing_vel(current_vel, target_vector);
 
 		if (current_vel.apart_by_less_than_90_degrees(target_vector)) {
 			if (const auto intersect = line_line_intersect(
-				current_vel, current_vel.perpendicular_cw(),
+				current_vel, current_vel + current_vel.perpendicular_cw(),
 				vec2::zero, target_vector
 			)) {
 				const auto to_intersection_vel = *intersect - current_vel;
-				LOG_NVPS(current_vel, vel, target_vector, *intersect, to_intersection_vel);
-				return std::min(vel, to_intersection_vel);
+				//LOG_NVPS(current_vel, best_perpendicular, target_vector, *intersect, to_intersection_vel);
+				return std::min(best_perpendicular, to_intersection_vel);
 			}
 		}
 
-		return vel;
+		return best_perpendicular;
 	}
 
 	inline auto calc_homing(
