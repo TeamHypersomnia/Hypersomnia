@@ -46,6 +46,10 @@ public:
 			}
 			else if constexpr(E::template has<components::transform>()) {
 				callback(std::get<components::transform>(components));
+				
+				if constexpr(E::template has<components::movement_path>()) {
+					callback(std::get<components::movement_path>(components).origin);
+				}
 			}
 		}
 		else {
@@ -274,6 +278,11 @@ void spatial_properties_mixin<E>::set_logic_transform(const transformr t) const 
 	}
 	else if (const auto tr = handle.template find<components::transform>()) {
 		*tr = t;
+
+		if (const auto movement_path = handle.template find<components::movement_path>()) {
+			movement_path->origin = t;
+		}
+
 		// TODO: reinfer the npo cache where necessary
 	}
 }

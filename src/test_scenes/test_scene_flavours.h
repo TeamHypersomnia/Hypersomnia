@@ -32,6 +32,7 @@ enum class test_sprite_decorations {
 	FLOOR,
 	AWAKENING,
 	METROPOLIS,
+	AQUARIUM_SAND,
 
 	COUNT
 	// END GEN INTROSPECTOR

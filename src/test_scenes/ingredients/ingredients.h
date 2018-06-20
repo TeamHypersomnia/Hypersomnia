@@ -107,6 +107,6 @@ namespace prefabs {
 	entity_handle create_interference_grenade(const logic_step, const vec2 pos);
 
 	entity_handle create_rotating_fan(const logic_step, const transformr&);
-	entity_handle create_yellow_fish(const logic_step, const transformr&, unsigned time_offset_ms = 0);
+	entity_handle create_yellow_fish(const logic_step, const transformr&, const transformr& origin, unsigned time_offset_ms = 0);
 }
 #endif

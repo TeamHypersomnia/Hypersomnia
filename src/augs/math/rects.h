@@ -518,6 +518,24 @@ struct basic_xywh {
 	basic_xywh operator+(const P& p) const {
 		return basic_xywh(x + T(p.x), y + T(p.y), this->w, this->h);
 	}
+
+	auto make_edges() const {
+		std::array<std::array<vec2_type, 2>, 4> result;
+
+		result[0][0] = vec2_type(x, y);
+		result[0][1] = vec2_type(x + w, y);
+
+		result[1][0] = vec2_type(x + w, y);
+		result[1][1] = vec2_type(x + w, y + h);
+
+		result[2][0] = vec2_type(x + w, y + h);
+		result[2][1] = vec2_type(x, y + h);
+
+		result[3][0] = vec2_type(x, y + h);
+		result[3][1] = vec2_type(x, y);
+
+		return result;
+	}
 };
 
 template<class T>

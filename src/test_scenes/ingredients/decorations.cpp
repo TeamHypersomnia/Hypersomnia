@@ -44,7 +44,7 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_complex_decorations::YELLOW_FISH);
 
 			invariants::render render_def;
-			render_def.layer = render_layer::ON_FLOOR;
+			render_def.layer = render_layer::ON_ON_FLOOR;
 
 			meta.set(render_def);
 
@@ -58,9 +58,9 @@ namespace test_flavours {
 
 			{
 				invariants::movement_path movement_path_def;
-				auto& square = movement_path_def.square_bounded;
+				auto& square = movement_path_def.rect_bounded;
 				square.is_enabled = true;
-				square.value.square_size = vec2i(300, 300);
+				square.value.rect_size = vec2i(300, 300);
 				meta.set(movement_path_def);
 			}
 		}
@@ -73,9 +73,10 @@ namespace prefabs {
 		return decor;
 	}
 
-	entity_handle create_yellow_fish(const logic_step step, const transformr& pos, const unsigned time_offset_ms) {
+	entity_handle create_yellow_fish(const logic_step step, const transformr& pos, const transformr& origin, const unsigned time_offset_ms) {
 		const auto decor = create_test_scene_entity(step.get_cosmos(), test_complex_decorations::YELLOW_FISH, pos);
 		decor.get<components::animation>().time_offset_ms = time_offset_ms;
+		decor.get<components::movement_path>().origin = origin;
 		return decor;
 	}
 }

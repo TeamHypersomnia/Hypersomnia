@@ -300,13 +300,20 @@ namespace test_scenes {
 		prefabs::create_brown_backpack(step, vec2(280, -750));
 
 		prefabs::create_rotating_fan(step, vec2(380, -750));
-		prefabs::create_yellow_fish(step, vec2(380, 50));
-		prefabs::create_yellow_fish(step, vec2(420, 50), 45);
 
 		prefabs::create_rifle(step, vec2(280, -750), test_shootable_weapons::DATUM_GUN, prefabs::create_sample_magazine(step, vec2(100, -650), prefabs::create_cyan_charge(step, vec2(0, 0)), 25));
 
 		prefabs::create_rifle(step, vec2(300, -100), test_shootable_weapons::LEWSII, prefabs::create_magazine(step, vec2(100, -650), test_container_items::LEWSII_MAG, prefabs::create_steel_charge(step, vec2(0, 0)), 100));
 		prefabs::create_rifle(step, vec2(400, -100), test_shootable_weapons::LEWSII, prefabs::create_magazine(step, vec2(100, -650), test_container_items::LEWSII_MAG, prefabs::create_steel_charge(step, vec2(0, 0)), 100));
+
+		const auto aquarium_tr = transformr{vec2( -500, 300) };
+
+		create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND, aquarium_tr);
+
+		prefabs::create_yellow_fish(step, aquarium_tr + vec2(20, 50), aquarium_tr);
+		prefabs::create_yellow_fish(step, aquarium_tr + vec2(40, 30), aquarium_tr, 45);
+		prefabs::create_yellow_fish(step, aquarium_tr + vec2(20, 80), aquarium_tr, 120);
+		prefabs::create_yellow_fish(step, aquarium_tr + vec2(60, 30), aquarium_tr, 95);
 
 		if (character(2).alive()) {
 			const auto second_machete = prefabs::create_cyan_urban_machete(step, vec2(0, 300));

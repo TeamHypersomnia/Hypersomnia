@@ -157,6 +157,7 @@ namespace test_flavours {
 			augs::sprite_special_effect::COLOR_WAVE
 		);
 		}
+
 		{
 			auto& meta = get_test_flavour(flavours, test_sprite_decorations::METROPOLIS);
 
@@ -169,6 +170,20 @@ namespace test_flavours {
 			test_flavours::add_sprite(meta, caches,
 					test_scene_image_id::METROPOLIS,
 					white);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_sprite_decorations::AQUARIUM_SAND);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::ON_FLOOR;
+
+				meta.set(render_def);
+			}
+			test_flavours::add_sprite(meta, caches,
+			test_scene_image_id::AQUARIUM_SAND,
+			white);
 		}
 	}
 }

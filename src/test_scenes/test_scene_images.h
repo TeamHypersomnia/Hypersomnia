@@ -192,6 +192,8 @@ enum class test_scene_image_id {
 	YELLOW_FISH_7,
 	YELLOW_FISH_8,
 
+	AQUARIUM_SAND,
+
 	METROPOLIS_HEAD,
 	RESISTANCE_HEAD,
 

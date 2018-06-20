@@ -12,6 +12,9 @@ summary: That which we are brainstorming at the moment.
 	- movement path component will have an origin transform which will automatically be moved by the editor
 		- the transform component will be kept up to date and it will be the logical transform
 		- the rendering code will also only touch this logical transform
+	- for editor, the origin could just also be accessed as an independent transform
+		- so access_independent_transform -> access_independent_transforms
+		- con: more memory wasted? who gives a heck, though...
 
 - Property editor: Checkbox matrix for b2Filter
 	- might be useful once we come to glass walls 
