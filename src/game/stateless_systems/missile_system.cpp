@@ -1,4 +1,5 @@
 #include "missile_system.h"
+#include "augs/math/steering.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_id.h"
 
@@ -185,16 +186,14 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 				it.set_logic_transform({ it.get_logic_transform().pos, current_velocity.degrees() });
 
 				if (closest_hostile.alive()) {
-					vec2 dirs[] = { current_velocity.perpendicular_cw(), -current_velocity.perpendicular_cw() };
-
-					auto homing_vector = closest_hostile.get_logic_transform().pos - it.get_logic_transform().pos;
-
-					if (dirs[1].dot(homing_vector) > dirs[0].dot(homing_vector)) {
-						std::swap(dirs[0], dirs[1]);
-					}
+					const auto homing = augs::calc_homing(
+						current_velocity,
+						it.get_logic_transform().pos,
+						closest_hostile.get_logic_transform().pos
+					);
 
 					it.template get<components::rigid_body>().apply_force(
-						dirs[0].set_length(homing_vector.length()) * missile_def.homing_towards_hostile_strength
+						homing * missile_def.homing_towards_hostile_strength
 					);
 				}
 			}

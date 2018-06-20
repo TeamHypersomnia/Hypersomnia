@@ -192,13 +192,17 @@ struct basic_vec2 {
 		};
 	}
 
-	static basic_vec2<type> from_degrees(const real degrees) {
-		const auto radians = degrees * DEG_TO_RAD<real>;
-		return { static_cast<type>(cos(radians)), static_cast<type>(sin(radians)) };
+	static auto square(const type side) {
+		return basic_vec2<type>(side, side);
 	}
 
-	static basic_vec2<type> from_radians(const real radians) {
-		return { static_cast<type>(cos(radians)), static_cast<type>(sin(radians)) };
+	static auto from_degrees(const real degrees) {
+		const auto radians = degrees * DEG_TO_RAD<real>;
+		return basic_vec2<type>(static_cast<type>(cos(radians)), static_cast<type>(sin(radians)));
+	}
+
+	static auto from_radians(const real radians) {
+		return basic_vec2<type>(static_cast<type>(cos(radians)), static_cast<type>(sin(radians)));
 	}
 
 	/* from http://stackoverflow.com/a/1501725 */
@@ -535,6 +539,10 @@ struct basic_vec2 {
 
 	bool operator<(const basic_vec2& b) const {
 		return length_sq() < b.length_sq();
+	}
+
+	bool operator>(const basic_vec2& b) const {
+		return length_sq() > b.length_sq();
 	}
 
 	template <class v> bool operator==(const v& p) const { return x == p.x && y == p.y; }

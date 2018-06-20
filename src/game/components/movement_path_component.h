@@ -23,6 +23,7 @@ namespace components {
 		// GEN INTROSPECTOR struct components::movement_path
 		transformr origin;
 		real32 path_time = 0.f;
+		real32 last_speed = 0.f;
 		// END GEN INTROSPECTOR
 	};
 }

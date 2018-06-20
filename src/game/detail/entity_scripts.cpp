@@ -1,4 +1,5 @@
 #include <Box2D/Dynamics/b2WorldCallbacks.h>
+#include "augs/math/steering.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/algorithm_templates.h"
 #include "game/detail/physics/physics_queries.h"
@@ -35,10 +36,6 @@ void unset_input_flags_of_orphaned_entity(entity_handle e) {
 	}
 }
 
-bool isLeft(const vec2 a, const vec2 b, const vec2 c) {
-	return ((b.x - a.x)*(c.y - a.y) - (b.y - a.y)*(c.x - a.x)) > 0;
-}
-
 identified_danger assess_danger(
 	const const_entity_handle victim, 
 	const const_entity_handle danger
@@ -60,20 +57,11 @@ identified_danger assess_danger(
 	const auto victim_pos = victim.get_logic_transform().pos;
 	const auto danger_pos = danger.get_logic_transform().pos;
 	const auto danger_vel = danger.get_owner_of_colliders().get_effective_velocity();
-	const auto danger_speed = danger_vel.length();
 	const auto danger_dir = (danger_pos - victim_pos);
 	const float danger_distance = danger_dir.length();
 
-	if (danger_speed > 10) {
-		result.recommended_evasion = isLeft(danger_pos, danger_pos + danger_vel, victim_pos) ? danger_vel.perpendicular_cw() : -danger_vel.perpendicular_cw();
-	}
-	else {
-		result.recommended_evasion = -danger_dir;
-	}
-
+	result.recommended_evasion = augs::calc_danger_avoidance(victim_pos, danger_pos, danger_vel);
 	result.recommended_evasion.normalize();
-
-	//-danger_dir / danger_distance;
 
 	const auto& sentience_def = victim.get<invariants::sentience>();
 	const auto comfort_zone = sentience_def.comfort_zone;
