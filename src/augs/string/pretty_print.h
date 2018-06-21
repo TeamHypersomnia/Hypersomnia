@@ -1,5 +1,9 @@
 #pragma once
 #include "augs/templates/can_stream.h"
+#include "augs/string/get_type_name.h"
+#include "augs/templates/traits/is_optional.h"
+#include "augs/templates/traits/container_traits.h"
+#include "augs/templates/traits/is_variant.h"
 #include "augs/templates/traits/has_begin_and_end.h"
 #include "augs/templates/identity_templates.h"
 
@@ -17,14 +21,41 @@ S& pretty_print(S& os, const T& val) {
 	if constexpr(can_stream_left_v<S, T> && !has_string_v<T>) {
 		os << val;
 	}
+	else if constexpr(is_optional_v<T>) {
+		if (val.has_value()) {
+			pretty_print(os, val.value());
+		}
+		else {
+			os << "std::nullopt";
+		}
+	}	
+	else if constexpr(is_variant_v<T>) {
+		std::visit(
+			[&](const auto& resolved) {
+				os << "variant (" << get_type_name(resolved) << "): ";
+				pretty_print(os, resolved);
+			},
+			val
+		);
+	}	
 	else if constexpr(has_string_v<T>) {
 		os << val.string();
 	}	
 	else if constexpr(has_begin_and_end_v<T>) {
 		os << "\n";
+		os << "Size: " << val.size() << "\n";
 
-		for (const auto& elem : val) {
-			pretty_print(os, elem) << "\n";
+		if constexpr(is_associative_v<T>) {
+			for (const auto& elem : val) {
+				os << "[";
+				pretty_print(os, elem.first) << "] = ";
+				pretty_print(os, elem.second) << "\n";
+			}
+		}
+		else {
+			for (const auto& elem : val) {
+				pretty_print(os, elem) << "\n";
+			}
 		}
 	}
 	else if constexpr(std::is_enum_v<T>) {

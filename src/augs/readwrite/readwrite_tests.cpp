@@ -100,6 +100,7 @@ TEST_CASE("Byte readwrite Arrays") {
 
 TEST_CASE("Byte readwrite Containers") {
 	std::vector<float> abc;
+	std::vector<float> abcf;
 	std::vector<int> abcd;
 	std::vector<std::vector<int>> abcde;
 	std::vector<std::unordered_map<int, std::vector<int>>> abcdef;
@@ -114,7 +115,8 @@ TEST_CASE("Byte readwrite Containers") {
 	mm[4287] = 455.2;
 	mm[16445] = 4.0;
 
-	abc.resize(2);
+	abc.resize(2, 9.f);
+	abcf.resize(2);
 	abcd.resize(2);
 	abcde.resize(2);
 	abcdef.resize(2);
@@ -123,6 +125,7 @@ TEST_CASE("Byte readwrite Containers") {
 
 	readwrite_test_cycle(mm);
 	readwrite_test_cycle(abc);
+	readwrite_test_cycle(abcf);
 	readwrite_test_cycle(abcd);
 	readwrite_test_cycle(abcde);
 	readwrite_test_cycle(abcdef);

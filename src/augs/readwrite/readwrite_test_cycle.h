@@ -9,7 +9,7 @@ const auto test_file_path = GENERATED_FILES_DIR "/test_byte_readwrite.bin";
 
 template <class T>
 void report(const T& v, const T& reloaded) {
-	if constexpr(can_stream_left_v<std::ostringstream, T>) {
+	if constexpr(!augs::is_pool_v<T>) {
 		LOG("Original %x\nReloaded: %x", v, reloaded);
 	}
 }
@@ -27,6 +27,12 @@ bool report_compare(const T& tmp, const T& v) {
 
 template <class T>
 bool try_to_reload_with_file(T& v) {
+	if constexpr(!augs::is_pool_v<T>) {
+		if (!report_compare(v, v)) {
+			return false;
+		}
+	}
+
 	const auto& path = test_file_path;
 
 	const T tmp = v;
@@ -46,6 +52,12 @@ bool try_to_reload_with_file(T& v) {
 
 template <class T>
 bool try_to_reload_with_bytes(T& v) {
+	if constexpr(!augs::is_pool_v<T>) {
+		if (!report_compare(v, v)) {
+			return false;
+		}
+	}
+
 	const auto& path = test_file_path;
 
 	const T tmp = v;
@@ -70,6 +82,12 @@ bool try_to_reload_with_bytes(T& v) {
 
 template <class T>
 bool try_to_reload_with_memory_stream(T& v) {
+	if constexpr(!augs::is_pool_v<T>) {
+		if (!report_compare(v, v)) {
+			return false;
+		}
+	}
+
 	const auto& path = test_file_path;
 
 	const T tmp = v;
