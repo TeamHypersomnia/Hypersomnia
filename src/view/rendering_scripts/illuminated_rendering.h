@@ -247,6 +247,10 @@ void illuminated_rendering(
 	draw_layer(render_layer::ON_FLOOR);
 	draw_layer(render_layer::ON_ON_FLOOR);
 
+	draw_layer(render_layer::AQUARIUM_FLOWERS);
+	draw_layer(render_layer::BOTTOM_FISH);
+	draw_layer(render_layer::UPPER_FISH);
+
 	renderer.call_and_clear_triangles();
 
 	set_shader_with_matrix(shaders.specular_highlights);

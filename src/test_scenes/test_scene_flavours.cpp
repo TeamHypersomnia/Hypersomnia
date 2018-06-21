@@ -172,18 +172,5 @@ namespace test_flavours {
 					white);
 		}
 
-		{
-			auto& meta = get_test_flavour(flavours, test_sprite_decorations::AQUARIUM_SAND);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::ON_FLOOR;
-
-				meta.set(render_def);
-			}
-			test_flavours::add_sprite(meta, caches,
-			test_scene_image_id::AQUARIUM_SAND,
-			white);
-		}
 	}
 }

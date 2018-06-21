@@ -44,7 +44,7 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_complex_decorations::YELLOW_FISH);
 
 			invariants::render render_def;
-			render_def.layer = render_layer::ON_ON_FLOOR;
+			render_def.layer = render_layer::UPPER_FISH;
 
 			meta.set(render_def);
 
@@ -74,7 +74,7 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_complex_decorations::DARKBLUE_FISH);
 
 			invariants::render render_def;
-			render_def.layer = render_layer::ON_ON_FLOOR;
+			render_def.layer = render_layer::UPPER_FISH;
 
 			meta.set(render_def);
 
@@ -104,7 +104,7 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_complex_decorations::JELLYFISH);
 
 			invariants::render render_def;
-			render_def.layer = render_layer::ON_ON_FLOOR;
+			render_def.layer = render_layer::UPPER_FISH;
 
 			meta.set(render_def);
 
@@ -128,6 +128,62 @@ namespace test_flavours {
 				square.value.rect_size = vec2i(368, 403) * 2;
 				meta.set(movement_path_def);
 			}
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_sprite_decorations::AQUARIUM_SAND_1);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::ON_FLOOR;
+
+				meta.set(render_def);
+			}
+			test_flavours::add_sprite(meta, caches,
+			test_scene_image_id::AQUARIUM_SAND_1,
+			white);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_sprite_decorations::AQUARIUM_SAND_2);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::ON_FLOOR;
+
+				meta.set(render_def);
+			}
+			test_flavours::add_sprite(meta, caches,
+			test_scene_image_id::AQUARIUM_SAND_2,
+			white);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_sprite_decorations::DUNE_SMALL);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::ON_ON_FLOOR;
+
+				meta.set(render_def);
+			}
+			test_flavours::add_sprite(meta, caches,
+			test_scene_image_id::DUNE_SMALL,
+			white);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_sprite_decorations::DUNE_BIG);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::ON_ON_FLOOR;
+
+				meta.set(render_def);
+			}
+			test_flavours::add_sprite(meta, caches,
+			test_scene_image_id::DUNE_BIG,
+			white);
 		}
 	}
 }

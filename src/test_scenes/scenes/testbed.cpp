@@ -310,15 +310,20 @@ namespace test_scenes {
 		prefabs::create_rifle(step, vec2(300, -100), test_shootable_weapons::LEWSII, prefabs::create_magazine(step, vec2(100, -650), test_container_items::LEWSII_MAG, prefabs::create_steel_charge(step, vec2(0, 0)), 100));
 		prefabs::create_rifle(step, vec2(400, -100), test_shootable_weapons::LEWSII, prefabs::create_magazine(step, vec2(100, -650), test_container_items::LEWSII_MAG, prefabs::create_steel_charge(step, vec2(0, 0)), 100));
 
-		const auto aquarium_tr = transformr{vec2( -800, 300) };
-		const auto aquarium_size = get_size_of(test_scene_image_id::AQUARIUM_SAND);
+		const auto aquarium_tr = transformr{vec2( -900, 400) };
+		const auto aquarium_size = get_size_of(test_scene_image_id::AQUARIUM_SAND_1);
 
 		const auto aquarium_origin = aquarium_tr + transformr(aquarium_size / 2);
 
-		create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND, aquarium_tr);
-		create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND, aquarium_tr + transformr(vec2(aquarium_size.x, 0)));
-		create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND, aquarium_tr + transformr(vec2(aquarium_size.x, aquarium_size.y)));
-		create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND, aquarium_tr + transformr(vec2(0, aquarium_size.y)));
+		create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND_1, aquarium_tr);
+		create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND_1, aquarium_tr + transformr(vec2(aquarium_size.x, 0)));
+		create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND_2, aquarium_tr + transformr(vec2(aquarium_size.x, aquarium_size.y)));
+		create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND_2, aquarium_tr + transformr(vec2(0, aquarium_size.y)));
+
+		create_test_scene_entity(world, test_sprite_decorations::DUNE_SMALL, transformr(aquarium_origin.pos + vec2(-193, -193)));
+		create_test_scene_entity(world, test_sprite_decorations::DUNE_SMALL, transformr(aquarium_origin.pos + vec2(-237, 255)));
+		create_test_scene_entity(world, test_sprite_decorations::DUNE_BIG, transformr(aquarium_origin.pos + vec2(-74, -48)));
+		create_test_scene_entity(world, test_sprite_decorations::DUNE_BIG, transformr(aquarium_origin.pos + vec2(161, 126)));
 
 		const auto yellowfish = test_complex_decorations::YELLOW_FISH;
 		const auto darkbluefish = test_complex_decorations::DARKBLUE_FISH;
