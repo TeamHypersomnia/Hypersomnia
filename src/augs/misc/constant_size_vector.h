@@ -189,6 +189,11 @@ namespace augs {
 			count += new_elements_count;
 		}
 
+		void resize_no_init(const std::size_t s) {
+			static_assert(is_trivially_copyable);
+			count = s;
+		}
+
 		void resize(const std::size_t s) {
 			ensure_leq(s, capacity());
 

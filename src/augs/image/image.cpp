@@ -1,5 +1,6 @@
 #include <cstring>
 
+#define LODEPNG_NO_COMPILE_ALLOCATORS
 #include "3rdparty/lodepng/lodepng.h"
 #include "augs/ensure.h"
 
@@ -8,12 +9,77 @@
 #include "augs/filesystem/file.h"
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/image/blit.h"
+#include "augs/readwrite/byte_file.h"
 
 #if PLATFORM_UNIX
 #include <arpa/inet.h>
 #else
 #include <winsock.h>
 #endif
+
+/* 
+	We write manual encoding/decoding wrappers to be able to pass our own rgba vectors,
+	instead of vectors of unsigned chars.
+*/
+
+void* lodepng_malloc(size_t size)
+{
+  return malloc(size);
+}
+
+void* lodepng_realloc(void* ptr, size_t new_size)
+{
+  return realloc(ptr, new_size);
+}
+
+void lodepng_free(void* ptr)
+{
+  free(ptr);
+}
+
+unsigned decode_rgba(std::vector<rgba>& out, unsigned& w, unsigned& h, const unsigned char* in,
+                size_t insize, LodePNGColorType colortype = LCT_RGBA, unsigned bitdepth = 8)
+{
+	using namespace lodepng;
+  unsigned char* buffer;
+  unsigned error = lodepng_decode_memory(&buffer, &w, &h, in, insize, colortype, bitdepth);
+  if(buffer && !error)
+  {
+    State state;
+    state.info_raw.colortype = colortype;
+    state.info_raw.bitdepth = bitdepth;
+    size_t buffersize = lodepng_get_raw_size(w, h, &state.info_raw);
+
+	const auto elems_written = buffersize / sizeof(rgba);
+	out.resize(out.size() + elems_written);
+	std::memcpy(&out[out.size() - elems_written], &buffer[0], buffersize);
+    lodepng_free(buffer);
+  }
+  return error;
+}
+
+unsigned decode_rgba(std::vector<rgba>& out, unsigned& w, unsigned& h, const std::vector<std::byte>& from) {
+	return decode_rgba(out, w, h, reinterpret_cast<const unsigned char*>(from.data()), from.size());
+}
+
+unsigned encode_rgba(std::vector<std::byte>& out, const std::vector<rgba>& in_v, unsigned w, unsigned h,
+                LodePNGColorType colortype = LCT_RGBA, unsigned bitdepth = 8)
+{
+
+	const auto in = reinterpret_cast<const unsigned char*>(in_v.data());
+
+  unsigned char* buffer;
+  size_t buffersize;
+  unsigned error = lodepng_encode_memory(&buffer, &buffersize, in, w, h, colortype, bitdepth);
+  if(buffer)
+  {
+	const auto elems_written = buffersize;
+	out.resize(out.size() + elems_written);
+	std::memcpy(&out[out.size() - elems_written], &buffer[0], buffersize);
+    lodepng_free(buffer);
+  }
+  return error;
+}
 
 template<class C>
 static void Line(
@@ -192,16 +258,8 @@ namespace augs {
 
 		unsigned width;
 		unsigned height;
-		using lodepng_vec = std::vector<unsigned char>;
 
-		if (const auto lodepng_result =
-			lodepng::decode(
-				reinterpret_cast<lodepng_vec&>(v), 
-				width, 
-				height, 
-				reinterpret_cast<const lodepng_vec&>(from)
-			)
-		) {
+		if (const auto lodepng_result = decode_rgba(v, width, height, from)) {
 			throw image_loading_error(
 				"Failed to load image %x (earlier loaded into memory):\nlodepng returned %x", reported_path, lodepng_result
 			);
@@ -219,9 +277,11 @@ namespace augs {
 		unsigned width;
 		unsigned height;
 
-		if (const auto lodepng_result =
-			lodepng::decode(*reinterpret_cast<std::vector<unsigned char>*>(&v), width, height, path.string())
-		) {
+		thread_local std::vector<std::byte> loaded_bytes;
+		loaded_bytes.clear();
+		augs::file_to_bytes(path, loaded_bytes);
+
+		if (const auto lodepng_result = decode_rgba(v, width, height, loaded_bytes)) {
 			throw image_loading_error(
 				"Failed to load image %x:\nlodepng returned %x", path, lodepng_result
 			);
@@ -393,11 +453,14 @@ namespace augs {
 	void image::save_as_png(const path_type& path) const {
 		augs::create_directories_for(path);
 
-		if (
-			const auto lodepng_result = 
-			lodepng::encode(path.string(), *reinterpret_cast<const std::vector<unsigned char>*>(&v), size.x, size.y)
-		) {
+		thread_local std::vector<std::byte> saved_bytes;
+		saved_bytes.clear();
+
+		if (const auto lodepng_result = encode_rgba(saved_bytes, v, size.x, size.y)) {
 			LOG("Failed to save %x: lodepng returned %x. Ensure that the target directory exists.", path, lodepng_result);
+		}
+		else {
+			augs::save_as_bytes(saved_bytes, path);
 		}
 	}
 
