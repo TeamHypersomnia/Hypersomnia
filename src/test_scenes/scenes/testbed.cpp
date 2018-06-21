@@ -310,7 +310,7 @@ namespace test_scenes {
 		prefabs::create_rifle(step, vec2(300, -100), test_shootable_weapons::LEWSII, prefabs::create_magazine(step, vec2(100, -650), test_container_items::LEWSII_MAG, prefabs::create_steel_charge(step, vec2(0, 0)), 100));
 		prefabs::create_rifle(step, vec2(400, -100), test_shootable_weapons::LEWSII, prefabs::create_magazine(step, vec2(100, -650), test_container_items::LEWSII_MAG, prefabs::create_steel_charge(step, vec2(0, 0)), 100));
 
-		const auto aquarium_tr = transformr{vec2( -900, 400) };
+		const auto aquarium_tr = transformr{vec2( -1024, 512) };
 		const auto aquarium_size = get_size_of(test_scene_image_id::AQUARIUM_SAND_1);
 
 		const auto aquarium_origin = aquarium_tr + transformr(aquarium_size / 2);

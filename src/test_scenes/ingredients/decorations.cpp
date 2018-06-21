@@ -10,6 +10,7 @@ namespace test_flavours {
 		auto& flavours = in.flavours;
 
 		const auto aquarium_size = caches.at(to_image_id(test_scene_image_id::AQUARIUM_SAND_1)).get_original_size();
+		const auto sand_color = rgba(129, 129, 129, 255);
 
 		{
 			auto& meta = get_test_flavour(flavours, test_complex_decorations::ROTATING_FAN);
@@ -175,7 +176,7 @@ namespace test_flavours {
 			}
 			test_flavours::add_sprite(meta, caches,
 			test_scene_image_id::AQUARIUM_SAND_1,
-			white);
+			sand_color);
 		}
 
 		{
@@ -189,7 +190,7 @@ namespace test_flavours {
 			}
 			test_flavours::add_sprite(meta, caches,
 			test_scene_image_id::AQUARIUM_SAND_2,
-			white);
+			sand_color);
 		}
 
 		{
@@ -203,7 +204,7 @@ namespace test_flavours {
 			}
 			test_flavours::add_sprite(meta, caches,
 			test_scene_image_id::DUNE_SMALL,
-			white);
+			sand_color);
 		}
 
 		{
@@ -217,7 +218,7 @@ namespace test_flavours {
 			}
 			test_flavours::add_sprite(meta, caches,
 			test_scene_image_id::DUNE_BIG,
-			white);
+			sand_color);
 		}
 	}
 }
