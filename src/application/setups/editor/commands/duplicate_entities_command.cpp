@@ -96,13 +96,23 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 	};
 
 	if (does_mirroring) {
-		auto duplicate_with_flip = [&](auto transformation, const bool hori, const bool vert) {
+		auto duplicate_with_flip = [&](auto calc_mirror_offset, const bool hori, const bool vert) {
 			duplicate([&](const auto typed_handle) {
 				if (const auto source_transform = typed_handle.find_logic_transform()) {
 					if (typed_handle.has_independent_transform()) {
-						auto mirrored_transform = transformation(typed_handle.get_logic_transform());
-						fix_pixel_imperfections(mirrored_transform);
-						typed_handle.set_logic_transform(mirrored_transform);
+						{
+							const auto source_transform = typed_handle.get_logic_transform();
+							const auto new_rotation = vec2::from_degrees(source_transform.rotation).negate_y().degrees();
+
+							const auto mirror_offset = calc_mirror_offset(
+								source_transform.pos, 
+								typed_handle.find_aabb()
+							);
+
+							auto mirrored_transform = transformr(mirror_offset + source_transform.pos, new_rotation);
+							fix_pixel_imperfections(mirrored_transform);
+							typed_handle.set_logic_transform(mirrored_transform);
+						}
 
 						if (const auto sprite = typed_handle.template find<components::sprite>()) {
 							if (hori) {
@@ -131,13 +141,15 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 				const auto vertical_axis_x = source_aabb->r;
 
 				duplicate_with_flip(
-					[vertical_axis_x](const transformr source) {
-						const auto new_rotation = vec2::from_degrees(source.rotation).negate_y().degrees();
-
-						const auto dist_to_axis = vertical_axis_x - source.pos.x;
-						const auto new_pos = source.pos + vec2(dist_to_axis, 0.f) * 2;
-
-						return transformr(new_pos, new_rotation);
+					[vertical_axis_x](const transformr& source, const std::optional<ltrb>& aabb) {
+						if (aabb) {
+							const auto dist_from_right_to_axis = vertical_axis_x - aabb->r;
+							return vec2(aabb->w() + dist_from_right_to_axis * 2, 0.f);
+						}
+						else {
+							const auto dist_to_axis = vertical_axis_x - source.pos.x;
+							return vec2(dist_to_axis * 2, 0.f);
+						}
 					},
 					true,
 					false
@@ -148,13 +160,15 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 				const auto vertical_axis_x = source_aabb->l;
 
 				duplicate_with_flip(
-					[vertical_axis_x](const transformr source) {
-						const auto new_rotation = vec2::from_degrees(source.rotation).negate_y().degrees();
-
-						const auto dist_to_axis = source.pos.x - vertical_axis_x;
-						const auto new_pos = source.pos - vec2(dist_to_axis, 0.f) * 2;
-
-						return transformr(new_pos, new_rotation);
+					[vertical_axis_x](const transformr& source, const std::optional<ltrb>& aabb) {
+						if (aabb) {
+							const auto dist_from_left_to_axis = aabb->l - vertical_axis_x;
+							return vec2(-(aabb->w() + dist_from_left_to_axis * 2), 0.f);
+						}
+						else {
+							const auto dist_to_axis = source.pos.x - vertical_axis_x;
+							return vec2(-(dist_to_axis * 2), 0.f);
+						}
 					},
 					true,
 					false
@@ -163,15 +177,18 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 
 			if (mirror_direction == vec2i(0, 1)) {
 				const auto horizontal_axis_y = source_aabb->b;
+				LOG_NVPS(horizontal_axis_y);
 
 				duplicate_with_flip(
-					[horizontal_axis_y](const transformr source) {
-						const auto new_rotation = vec2::from_degrees(source.rotation).negate_y().degrees();
-
-						const auto dist_to_axis = horizontal_axis_y - source.pos.y;
-						const auto new_pos = source.pos + vec2(0.f, dist_to_axis) * 2;
-
-						return transformr(new_pos, new_rotation);
+					[horizontal_axis_y](const transformr& source, const std::optional<ltrb>& aabb) {
+						if (aabb) {
+							const auto dist_from_bottom_to_axis = horizontal_axis_y - aabb->b;
+							return vec2(0.f, aabb->h() + dist_from_bottom_to_axis * 2);
+						}
+						else {
+							const auto dist_to_axis = horizontal_axis_y - source.pos.y;
+							return vec2(0.f, dist_to_axis * 2);
+						}
 					},
 					false,
 					true
@@ -182,13 +199,15 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 				const auto horizontal_axis_y = source_aabb->t;
 
 				duplicate_with_flip(
-					[horizontal_axis_y](const transformr source) {
-						const auto new_rotation = vec2::from_degrees(source.rotation).negate_y().degrees();
-
-						const auto dist_to_axis = source.pos.y - horizontal_axis_y;
-						const auto new_pos = source.pos - vec2(0.f, dist_to_axis) * 2;
-
-						return transformr(new_pos, new_rotation);
+					[horizontal_axis_y](const transformr& source, const std::optional<ltrb>& aabb) {
+						if (aabb) {
+							const auto dist_from_top_to_axis = aabb->t - horizontal_axis_y;
+							return vec2(0.f, -(aabb->h() + dist_from_top_to_axis * 2));
+						}
+						else {
+							const auto dist_to_axis = source.pos.y - horizontal_axis_y;
+							return vec2(0.f, -(dist_to_axis * 2));
+						}
 					},
 					false,
 					true

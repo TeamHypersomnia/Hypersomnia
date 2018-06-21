@@ -133,7 +133,7 @@ void editor_coordinates_gui::perform(
 
 		if (const auto aabb = setup.find_selection_aabb()) {
 			const auto size = aabb->get_size();
-			text("AABB:   %x x %x pixels\ncenter: %x\nlt:     %x", size.x, size.y, aabb->get_center(), aabb->left_top());
+			text("AABB:   %x x %x pixels\ncenter: %x\nlt:     %x\nrb:     %x", size.x, size.y, aabb->get_center(), aabb->left_top(), aabb->right_bottom());
 		}
 	}
 	else {

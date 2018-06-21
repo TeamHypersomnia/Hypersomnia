@@ -1011,3 +1011,6 @@ we consider whole type overrides too complex architeciturally:
 
 - disallow removing last frame from the animation and always require to create an animation from an existing set of frames
 	- simplifies calculations
+- Fix imperfection when duplicating vertically
+	- will b problematic for both axes
+
