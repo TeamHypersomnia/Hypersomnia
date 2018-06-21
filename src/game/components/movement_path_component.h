@@ -5,6 +5,8 @@
 struct rect_bounded_movement {
 	// GEN INTROSPECTOR struct rect_bounded_movement
 	vec2 rect_size;
+	real32 sine_speed_boost = 100.f;
+	real32 base_speed = 80.f;
 	unsigned seed_offset = 0u;
 	// END GEN INTROSPECTOR
 };

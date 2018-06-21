@@ -39,8 +39,8 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				const auto& pos = transform.pos;
 				const auto tip_pos = *subject.find_logical_tip();
 
-				const auto& data = movement_path_def.rect_bounded.value;
-				const auto size = data.rect_size;
+				const auto& def = movement_path_def.rect_bounded.value;
+				const auto size = def.rect_size;
 
 				const auto origin = movement_path.origin;
 				const auto bound = xywh::center_and_size(origin.pos, size);
@@ -48,17 +48,18 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				const auto global_time = cosm.get_total_seconds_passed() + real32(subject.get_guid());
 				const auto global_time_sine = std::sin(global_time * 2);
 
-				const auto max_speed_boost = 100;
+				const auto max_speed_boost = def.sine_speed_boost;
 				const auto speed_boost = static_cast<real32>(global_time_sine * global_time_sine * max_speed_boost);
 
 				const auto fov_half_degrees = real32((360 - 90) / 2);
 				const auto max_avoidance_speed = 20 + speed_boost / 2;
-				//const auto cohesion_mult = 0.f;
-				//const auto alignment_mult = 0.f;
 				const auto cohesion_mult = 0.05f;
 				const auto alignment_mult = 0.08f;
-				const auto min_speed = 80 + speed_boost;
-				const auto max_speed = 80 + max_speed_boost;
+
+				const auto base_speed = def.base_speed;
+
+				const auto min_speed = base_speed + speed_boost;
+				const auto max_speed = base_speed + max_speed_boost;
 
 				const auto current_dir = vec2::from_degrees(transform.rotation);
 
