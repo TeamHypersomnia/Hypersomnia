@@ -24,6 +24,7 @@ enum class test_scene_plain_animation_id {
 	YELLOW_FISH,
 	DARKBLUE_FISH,
 	JELLYFISH,
+	DRAGON_FISH,
 
 	COUNT
 	// END GEN INTROSPECTOR

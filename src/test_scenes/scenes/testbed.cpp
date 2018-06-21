@@ -328,15 +328,21 @@ namespace test_scenes {
 		const auto yellowfish = test_complex_decorations::YELLOW_FISH;
 		const auto darkbluefish = test_complex_decorations::DARKBLUE_FISH;
 		const auto jellyfish = test_complex_decorations::JELLYFISH;
+		const auto dragon_fish = test_complex_decorations::DRAGON_FISH;
 
 		prefabs::create_fish(step, yellowfish, aquarium_tr - vec2(80, 10), aquarium_origin);
 		prefabs::create_fish(step, yellowfish, aquarium_tr + components::transform(vec2(80, 10), -180), aquarium_origin, 1);
-
 		prefabs::create_fish(step, yellowfish, aquarium_tr - vec2(80, 30), aquarium_origin);
 		prefabs::create_fish(step, yellowfish, aquarium_tr + components::transform(vec2(80, 50), -180), aquarium_origin, 2);
-
 		prefabs::create_fish(step, yellowfish, aquarium_tr - vec2(120, 30), aquarium_origin);
 		prefabs::create_fish(step, yellowfish, aquarium_tr + components::transform(vec2(90, 40), -180), aquarium_origin, 3);
+
+		prefabs::create_fish(step, yellowfish, aquarium_tr + vec2(20, 20) - vec2(80, 10), aquarium_origin);
+		prefabs::create_fish(step, yellowfish, aquarium_tr + vec2(20, 20) + components::transform(vec2(80, 10), -180), aquarium_origin, 1);
+		prefabs::create_fish(step, yellowfish, aquarium_tr + vec2(20, 20) - vec2(80, 30), aquarium_origin);
+		prefabs::create_fish(step, yellowfish, aquarium_tr + vec2(20, 20) + components::transform(vec2(80, 50), -180), aquarium_origin, 2);
+		prefabs::create_fish(step, yellowfish, aquarium_tr + vec2(20, 20) - vec2(120, 30), aquarium_origin);
+		prefabs::create_fish(step, yellowfish, aquarium_tr + vec2(20, 20) + components::transform(vec2(90, 40), -180), aquarium_origin, 3);
 
 		const auto jellyfishtr = aquarium_tr + components::transform(vec2(100, 100), -45);
 		prefabs::create_fish(step, darkbluefish, jellyfishtr - vec2(80, 10), aquarium_origin);
@@ -350,6 +356,15 @@ namespace test_scenes {
 
 		prefabs::create_fish(step, jellyfish, aquarium_tr - vec2(180, 30), aquarium_origin);
 		prefabs::create_fish(step, jellyfish, aquarium_tr + components::transform(vec2(190, 40), -180), aquarium_origin, 3);
+		prefabs::create_fish(step, jellyfish, aquarium_tr - vec2(180, 50), aquarium_origin);
+		prefabs::create_fish(step, jellyfish, aquarium_tr + components::transform(vec2(190, 60), -180), aquarium_origin, 3);
+		prefabs::create_fish(step, jellyfish, aquarium_tr - vec2(180, 70), aquarium_origin);
+		prefabs::create_fish(step, jellyfish, aquarium_tr + components::transform(vec2(190, 80), -180), aquarium_origin, 3);
+
+		prefabs::create_fish(step, dragon_fish, aquarium_tr - vec2(280, 130), aquarium_origin);
+		prefabs::create_fish(step, dragon_fish, aquarium_tr + components::transform(vec2(290, 40), -180), aquarium_origin, 3);
+		prefabs::create_fish(step, dragon_fish, aquarium_tr - vec2(280, 150), aquarium_origin);
+		prefabs::create_fish(step, dragon_fish, aquarium_tr + components::transform(vec2(290, 60), -180), aquarium_origin, 3);
 
 		if (character(2).alive()) {
 			const auto second_machete = prefabs::create_cyan_urban_machete(step, vec2(0, 300));

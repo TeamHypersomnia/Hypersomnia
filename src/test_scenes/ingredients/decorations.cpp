@@ -9,6 +9,8 @@ namespace test_flavours {
 		auto& caches = in.caches;
 		auto& flavours = in.flavours;
 
+		const auto aquarium_size = caches.at(to_image_id(test_scene_image_id::AQUARIUM_SAND_1)).get_original_size();
+
 		{
 			auto& meta = get_test_flavour(flavours, test_complex_decorations::ROTATING_FAN);
 
@@ -65,7 +67,7 @@ namespace test_flavours {
 				invariants::movement_path movement_path_def;
 				auto& square = movement_path_def.rect_bounded;
 				square.is_enabled = true;
-				square.value.rect_size = vec2i(368, 403) * 2;
+				square.value.rect_size = aquarium_size * 2;
 				meta.set(movement_path_def);
 			}
 		}
@@ -95,7 +97,7 @@ namespace test_flavours {
 				invariants::movement_path movement_path_def;
 				auto& square = movement_path_def.rect_bounded;
 				square.is_enabled = true;
-				square.value.rect_size = vec2i(368, 403) * 2;
+				square.value.rect_size = aquarium_size * 2;
 				meta.set(movement_path_def);
 			}
 		}
@@ -125,7 +127,39 @@ namespace test_flavours {
 				invariants::movement_path movement_path_def;
 				auto& square = movement_path_def.rect_bounded;
 				square.is_enabled = true;
-				square.value.rect_size = vec2i(368, 403) * 2;
+				square.value.rect_size = aquarium_size * 2;
+				meta.set(movement_path_def);
+			}
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_complex_decorations::DRAGON_FISH);
+
+			invariants::render render_def;
+			render_def.layer = render_layer::BOTTOM_FISH;
+
+			meta.set(render_def);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::DRAGON_FISH_1, white);
+
+			{
+				invariants::animation anim_def;
+				anim_def.id = to_animation_id(test_scene_plain_animation_id::DRAGON_FISH);
+				meta.set(anim_def);
+
+				components::animation anim;
+				anim.speed_factor = 0.2f;
+
+				meta.set(anim);
+			}
+
+			{
+				invariants::movement_path movement_path_def;
+				auto& square = movement_path_def.rect_bounded;
+				square.is_enabled = true;
+				square.value.rect_size = aquarium_size * 2;
+				square.value.base_speed = 160.f;
+				square.value.sine_speed_boost = 200.f;
 				meta.set(movement_path_def);
 			}
 		}
