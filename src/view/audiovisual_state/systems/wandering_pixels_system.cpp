@@ -1,3 +1,4 @@
+#include "augs/math/steering.h"
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
@@ -41,6 +42,10 @@ void wandering_pixels_system::advance_for(
 	for (const auto e : visible.per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {
 		advance_for(cosm[e], dt);
 	}
+
+	for (const auto e : visible.per_layer[render_layer::DIM_WANDERING_PIXELS_EFFECTS]) {
+		advance_for(cosm[e], dt);
+	}
 }
 
 void wandering_pixels_system::advance_for(
@@ -74,39 +79,39 @@ void wandering_pixels_system::advance_for(
 			cache.recorded_particle_count = wandering.particles_count;
 		}
 
-		const auto new_reach = xywh(*it.find_aabb());
+		const auto current_reach = xywh(*it.find_aabb());
 
-		if (cache.recorded_reach != new_reach) {
+		if (cache.recorded_reach != current_reach) {
 			/* refresh_cache */ 
 			for (auto& p : cache.particles) {
 				p.pos.set(
-					new_reach.x + used_rng.randval(0u, static_cast<unsigned>(new_reach.w)), 
-					new_reach.y + used_rng.randval(0u, static_cast<unsigned>(new_reach.h))
+					current_reach.x + used_rng.randval(0u, static_cast<unsigned>(current_reach.w)), 
+					current_reach.y + used_rng.randval(0u, static_cast<unsigned>(current_reach.h))
 				);
 
 				p.current_lifetime_ms = used_rng.randval(0.f, total_animation_duration);
 			}
 
-			cache.recorded_reach = new_reach;
+			cache.recorded_reach = current_reach;
 		}
 
-		constexpr unsigned max_direction_time = 4000u;
-		constexpr float interp_time = 700.f;
+		const auto max_direction_ms = wandering_def.max_direction_ms;
+		const auto direction_interp_ms  = wandering_def.direction_interp_ms;
 
 		for (auto& p : cache.particles) {
-			p.current_lifetime_ms += dt_ms + dt_ms * (p.direction_ms_left / max_direction_time) + dt_ms * p.current_direction.radians();
+			p.current_lifetime_ms += dt_ms + dt_ms * (p.direction_ms_left / max_direction_ms) + dt_ms * p.current_direction.radians();
 
 			if (p.direction_ms_left <= 0.f) {
-				p.direction_ms_left = static_cast<float>(used_rng.randval(max_direction_time, max_direction_time + 800u));
+				p.direction_ms_left = static_cast<float>(used_rng.randval(max_direction_ms, max_direction_ms + 800u));
 
 				p.current_direction = p.current_direction.perpendicular_cw();
 
 				const auto dir = p.current_direction;
-				const auto reach = new_reach;
+				const auto reach = current_reach;
 
 				float chance_to_flip = 0.f;
 
-				p.current_velocity = static_cast<float>(used_rng.randval(3, 3 + 35));
+				p.current_velocity = static_cast<float>(used_rng.randval(wandering_def.base_velocity));
 
 				if (dir.x > 0) {
 					chance_to_flip = (p.pos.x - reach.x) / reach.w;
@@ -139,11 +144,11 @@ void wandering_pixels_system::advance_for(
 
 			vec2 considered_direction;
 
-			if (p.direction_ms_left <= interp_time) {
-				considered_direction = augs::interp(vec2(), p.current_direction, p.direction_ms_left / interp_time);
+			if (p.direction_ms_left <= direction_interp_ms) {
+				considered_direction = augs::interp(vec2(), p.current_direction, p.direction_ms_left / direction_interp_ms);
 			}
-			else if (p.direction_ms_left >= max_direction_time - interp_time) {
-				considered_direction = augs::interp(vec2(), p.current_direction, (max_direction_time - p.direction_ms_left) / interp_time);
+			else if (p.direction_ms_left >= max_direction_ms - direction_interp_ms) {
+				considered_direction = augs::interp(vec2(), p.current_direction, (max_direction_ms - p.direction_ms_left) / direction_interp_ms);
 			}
 			else {
 				considered_direction = p.current_direction;

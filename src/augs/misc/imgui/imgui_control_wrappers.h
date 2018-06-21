@@ -28,6 +28,12 @@ namespace augs {
 				if constexpr(std::is_same_v<T, Target>) {
 					return callback(into);
 				}
+				else if constexpr(has_first_and_second_types_v<T>){
+					auto input = Target(into.first, into.second);
+					auto result = callback(input);
+					into = T(input.first, input.second);
+					return result;
+				}
 				else {
 					Target input = static_cast<Target>(into);
 					auto result = callback(input);
