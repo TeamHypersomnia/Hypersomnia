@@ -16,7 +16,7 @@ static constexpr bool should_reinfer_after_change(const T&) {
 
 template <class derived>
 class change_property_command {
-	void refresh_other_state(const editor_command_input in);
+	void refresh_other_state(const editor_command_input);
 public:
 	// GEN INTROSPECTOR class change_property_command class derived
 	editor_command_common common;

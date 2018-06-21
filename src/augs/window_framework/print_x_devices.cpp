@@ -89,6 +89,9 @@ void print_input_devices(Display* const display) {
 
 		XIFreeDeviceInfo(info);
 	}
+	else {
+		total_info += "Couldn't query input device info.\n";
+	}
 
 	total_info += "\nDevice info end.";
 

@@ -20,9 +20,11 @@ std::string change_property_command<D>::describe() const {
 
 template <class D>
 void change_property_command<D>::refresh_other_state(const editor_command_input in) {
-	auto& self = *static_cast<D*>(this);
+	(void)in;
 
 	if constexpr(std::is_same_v<D, change_asset_property_command<assets::image_id>>) {
+		auto& self = *static_cast<D*>(this);
+
 		for (const auto& i : self.affected_assets) {
 			in.folder.work->update_offsets_of(i, changer_callback_result::DONT_REFRESH);
 		}

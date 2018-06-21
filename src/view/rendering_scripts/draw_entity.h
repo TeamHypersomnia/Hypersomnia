@@ -43,6 +43,11 @@ FORCE_INLINE void detail_specific_entity_drawer(
 	T render_visitor,
 	const transformr viewing_transform
 ) {
+	/* Might or might not be used depending on if constexpr flow */
+	(void)render_visitor;
+	(void)viewing_transform;
+	(void)in;
+
 	if constexpr(typed_handle.template has<invariants::sprite>()) {
 		auto input = [&]() {
 			using input_type = invariants::sprite::drawing_input;
@@ -141,6 +146,11 @@ FORCE_INLINE void specific_entity_drawer(
 	const interpolation_system& interp,
 	T render_visitor
 ) {
+	/* Might or might not be used depending on if constexpr flow */
+	(void)render_visitor;
+	(void)interp;
+	(void)in;
+
 	const auto viewing_transform = typed_handle.get_viewing_transform(interp);
 
 	if (typed_handle.template has<invariants::item>()) {

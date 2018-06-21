@@ -162,16 +162,22 @@ void edit_flavour(
 
 	const auto text_details_invariant_id = static_cast<unsigned>(get_index(invariants::text_details()));
 
-	auto do_edit_invariant = [&](const auto& invariant) {
-		edit_invariant(invariant, edit_invariant_input {
+	auto make_edit_invariant_input = [&](const unsigned index) -> edit_invariant_input {
+		return {
 			in,
-			static_cast<unsigned>(get_index(invariant)),
+			index,
 			text_details_invariant_id,
 			shape_polygon_invariant_id,
 			sprite_invariant_id,
 			source_flavour_name,
 			command
-		});
+		};
+	};
+
+	auto do_edit_invariant = [&](const auto& invariant) {
+		const auto index = static_cast<unsigned>(get_index(invariant));
+		const auto input = make_edit_invariant_input(index);
+		edit_invariant(invariant, input);
 	};
 
 	do_edit_invariant(text_details_invariant);
