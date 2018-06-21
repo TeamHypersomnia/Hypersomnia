@@ -154,15 +154,13 @@ void movement_path_system::advance_paths(const logic_step step) const {
 						average_vel /= counted_neighbors;
 
 						if (cohesion_mult != 0.f) {
-							const auto target_vector = average_pos - pos;
-							const auto dist_from_center = target_vector.length();
-
-							//velocity += vec2(target_vector).set_length(max_cohesion_speed * dist_from_center/cohesion_zone_radius);
-
-							velocity += augs::homing_correction(
-								velocity * std::min(1.f, dist_from_center / cohesion_zone_radius) * cohesion_mult,
-								target_vector
-							);
+							velocity += augs::arrive(
+								velocity,
+								pos,
+								average_pos,
+								velocity.length(),
+								cohesion_zone_radius
+							) * cohesion_mult;
 						}
 
 						if (alignment_mult != 0.f) {

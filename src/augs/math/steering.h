@@ -85,6 +85,23 @@ namespace augs {
 		return desired_vel - current_vel;
 	}
 
+	inline auto arrive(
+		const vec2 current_vel,
+		const vec2 current_pos,
+		const vec2 arrival_pos,
+		const real32 max_desired_speed,
+		const real32 easing_zone
+	) {
+		const auto target_vector = arrival_pos - current_pos;
+		const auto dist_from_target = target_vector.length();
+
+		const auto desired_speed = std::min(1.f, dist_from_target / easing_zone) * max_desired_speed;
+		const auto target_dir = target_vector / dist_from_target;
+		const auto desired_vel = target_dir * desired_speed;
+
+		return desired_vel - current_vel;
+	}
+
 	inline auto furthest_perpendicular(
 		const vec2 current_vel,
 		const vec2 target_vector
