@@ -54,42 +54,43 @@ void print_classes(std::string& total_info, Display *display, XIAnyClassInfo **c
 }
 
 void print_input_devices(Display* const display) {
-	std::string total_info;
+	std::string total_info = "Device info start.\n";
 
-	auto pf = [&total_info](auto&&... args){
-		total_info += typesafe_sprintf(std::forward<decltype(args)>(args)...);
-	};
-
-	XIDeviceInfo *info, *dev;
 	int ndevices;
-	int i;
-	const char *type = "";
 
-	info = XIQueryDevice(display, XIAllDevices, &ndevices);
+	if (const auto info = XIQueryDevice(display, XIAllDevices, &ndevices)) {
+		const char *type = "";
 
-	for(i = 0; i < ndevices; i++) {
-		dev = &info[i];
+		auto pf = [&total_info](auto&&... args){
+			total_info += typesafe_sprintf(std::forward<decltype(args)>(args)...);
+		};
 
-		pf("'%x' (%x)\n", dev->name, dev->deviceid);
-		switch(dev->use) {
-			case XIMasterPointer: type = "master pointer"; break;
-			case XIMasterKeyboard: type = "master keyboard"; break;
-			case XISlavePointer: type = "slave pointer"; break;
-			case XISlaveKeyboard: type = "slave keyboard"; break;
-			case XIFloatingSlave: type = "floating slave"; break;
+		for(int i = 0; i < ndevices; i++) {
+			auto dev = &info[i];
+
+			pf("'%x' (%x)\n", dev->name, dev->deviceid);
+			switch(dev->use) {
+				case XIMasterPointer: type = "master pointer"; break;
+				case XIMasterKeyboard: type = "master keyboard"; break;
+				case XISlavePointer: type = "slave pointer"; break;
+				case XISlaveKeyboard: type = "slave keyboard"; break;
+				case XIFloatingSlave: type = "floating slave"; break;
+			}
+
+			pf(" - is a %x\n", type);
+			pf(" - current pairing/attachment: %x\n", dev->attachment);
+
+			if (!dev->enabled) {
+				pf(" - this device is disabled!\n");
+			}
+
+			print_classes(total_info, display, dev->classes, dev->num_classes);
 		}
 
-		pf(" - is a %x\n", type);
-		pf(" - current pairing/attachment: %x\n", dev->attachment);
-
-		if (!dev->enabled) {
-			pf(" - this device is disabled!\n");
-		}
-
-		print_classes(total_info, display, dev->classes, dev->num_classes);
+		XIFreeDeviceInfo(info);
 	}
 
-	XIFreeDeviceInfo(info);
+	total_info += "\nDevice info end.";
 
-	augs::save_as_text(augs::path_type(LOG_FILES_DIR "/input_devices.txt"), total_info);
+	augs::save_as_text(LOG_FILES_DIR "/input_devices.txt", total_info);
 }
