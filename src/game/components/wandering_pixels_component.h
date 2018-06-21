@@ -1,6 +1,7 @@
 #pragma once
 #include "game/components/sprite_component.h"
 #include "augs/misc/constant_size_vector.h"
+#include "augs/pad_bytes.h"
 
 namespace components {
 	struct wandering_pixels {
@@ -8,6 +9,8 @@ namespace components {
 		vec2 size;
 		rgba colorize = white;
 		unsigned particles_count = 0u;
+		bool keep_particles_within_bounds = false;
+		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 	};
 }
