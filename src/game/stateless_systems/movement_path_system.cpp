@@ -54,7 +54,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				const auto fov_half_degrees = real32((360 - 90) / 2);
 				const auto max_avoidance_speed = 20 + speed_boost / 2;
 				const auto cohesion_mult = 0.05f;
-				const auto alignment_mult = 0.08f;
+				const auto alignment_mult = 0.05f;
 
 				const auto base_speed = def.base_speed;
 
@@ -164,12 +164,10 @@ void movement_path_system::advance_paths(const logic_step step) const {
 						}
 
 						if (alignment_mult != 0.f) {
-							const auto target_vector = average_vel;
+							const auto desired_vel = average_vel.set_length(velocity.length());
+							const auto steering = desired_vel - velocity;
 
-							velocity += augs::homing_correction(
-								velocity * alignment_mult,
-								target_vector
-							);
+							velocity += steering * alignment_mult;
 						}
 					}
 				}
