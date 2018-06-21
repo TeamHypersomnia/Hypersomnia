@@ -54,7 +54,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				const auto fov_half_degrees = real32((360 - 90) / 2);
 				const auto max_avoidance_speed = 20 + speed_boost / 2;
 				const auto cohesion_mult = 0.05f;
-				const auto alignment_mult = 0.05f;
+				const auto alignment_mult = 0.08f;
 
 				const auto base_speed = def.base_speed;
 
@@ -101,7 +101,16 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				{
 					auto greatest_avoidance = vec2::zero;
 
+					const auto subject_layer = subject.template get<invariants::render>().layer;
+
 					for_each_neighbor_within(comfort_zone_radius, [&](const auto typed_neighbor) {
+						const auto neighbor_layer = typed_neighbor.template get<invariants::render>().layer;
+
+						if (int(subject_layer) > int(neighbor_layer)) {
+							/* Don't avoid smaller species. */
+							return;
+						}
+
 						const auto& neighbor_path_def = typed_neighbor.template get<invariants::movement_path>();
 						const auto& neighbor_path = typed_neighbor.template get<components::movement_path>();
 
