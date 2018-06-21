@@ -215,4 +215,42 @@ namespace augs {
 
 		return vec2(avoidance).set_length(avoidance_force * std::max(0.f, 1.f - (danger_dist / comfort_zone)));
 	}
+
+	inline auto steer_to_avoid_bounds(
+		const vec2 velocity,
+		const vec2 position,
+		const xywh& bound,
+		const real32 max_dist_to_avoid,
+		const real32 force_multiplier
+	) {
+		const auto edges = bound.make_edges();
+		auto dist_to_closest = std::numeric_limits<real32>::max();
+
+		for (const auto& e : edges) {
+			const auto dist = position.distance_from_segment_sq(e[0], e[1]);
+
+			if (dist < dist_to_closest) {
+				dist_to_closest = dist;
+			}
+		}
+
+		dist_to_closest = std::sqrt(dist_to_closest);
+
+		/* Finally, correct velocities against the walls */
+
+		auto dir_mult = std::max(0.f, 1.f - dist_to_closest / max_dist_to_avoid) * force_multiplier;
+
+		if (!bound.hover(position)) {
+			/* Protect from going outside */
+			dir_mult = 1.f;
+		}
+
+		return augs::seek(
+			velocity,
+			position,
+			bound.get_center(),
+			velocity.length()
+		) * dir_mult;
+	}
+
 }

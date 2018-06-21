@@ -182,43 +182,15 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				}
 
 
-				auto& anim_state = subject.template get<components::animation>().state;
-
 				const auto total_speed = velocity.length();
 
-				{
-					const auto edges = bound.make_edges();
-
-					auto min_dist = std::numeric_limits<real32>::max();
-
-					for (auto& e : edges) {
-						const auto dist = tip_pos.distance_from_segment_sq(e[0], e[1]);
-
-						if (dist < min_dist) {
-							min_dist = dist;
-						}
-					}
-
-					min_dist = std::sqrt(min_dist);
-
-					/* Finally, correct velocities against the walls */
-
-					auto dir_mult = std::max(0.f, 1.f - min_dist / 30.f) / 5;
-
-					if (!bound.hover(tip_pos)) {
-						/* Protect from going outside */
-						dir_mult = 1.f;
-					}
-
-					velocity +=
-						augs::seek(
-							velocity,
-							pos,
-							origin.pos,
-							velocity.length()
-						) * dir_mult;
-					;
-				}
+				velocity += augs::steer_to_avoid_bounds(
+					velocity,
+					tip_pos,
+					bound,
+					30.f,
+					0.2f
+				);
 
 				movement_path.last_speed = total_speed;
 
@@ -226,6 +198,8 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				transform.rotation = velocity.degrees();//augs::interp(transform.rotation, velocity.degrees(), 50.f * delta.in_seconds());
 
 				const auto speed_mult = total_speed / max_speed;
+
+				auto& anim_state = subject.template get<components::animation>().state;
 				anim_state.frame_elapsed_ms += delta.in_milliseconds() * speed_mult;
 			}
 

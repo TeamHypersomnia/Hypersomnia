@@ -178,43 +178,15 @@ void wandering_pixels_system::advance_for(
 			//p.pos.x += cos(global_time_seconds) * 20 * dt_secs * 1.2;
 
 			if (wandering.keep_particles_within_bounds) {
-				auto velocity = p.pos - prev_pos;
+				const auto velocity = p.pos - prev_pos;
 
-				const auto tip_pos = p.pos;
-				const auto bound = current_reach;
-				const auto edges = bound.make_edges();
-
-				auto min_dist = std::numeric_limits<real32>::max();
-
-				for (auto& e : edges) {
-					const auto dist = tip_pos.distance_from_segment_sq(e[0], e[1]);
-
-					if (dist < min_dist) {
-						min_dist = dist;
-					}
-				}
-
-				min_dist = std::sqrt(min_dist);
-
-				/* Finally, correct velocities against the walls */
-
-				auto dir_mult = std::max(0.f, 1.f - min_dist / 30.f);
-
-				if (!bound.hover(tip_pos)) {
-					/* Protect from going outside */
-					dir_mult = 1.f;
-				}
-
-				velocity +=
-					augs::seek(
-						velocity,
-						p.pos,
-						current_reach.get_center(),
-						velocity.length()
-					) * dir_mult
-				;
-
-				p.pos += velocity;
+				p.pos += augs::steer_to_avoid_bounds(
+					velocity,
+					p.pos,
+					current_reach,
+					30.f,
+					1.f
+				);
 			}
 		}
 	});
