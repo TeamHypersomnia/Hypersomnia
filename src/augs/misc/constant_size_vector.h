@@ -1,6 +1,8 @@
 #pragma once
 #include <array>
 #include <iterator>
+#include <new>
+#include <utility>
 #include "augs/ensure.h"
 
 #include "augs/misc/simple_pair.h"

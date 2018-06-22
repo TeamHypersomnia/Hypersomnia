@@ -5,6 +5,8 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- GCC relwithdebinfo does not properly set the physical shapes
+
 - fix freetype charsets
 
 - There was a crash due to dead entity in driver setup finding a component

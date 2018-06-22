@@ -13,7 +13,7 @@ template <class object_type, class F>
 void find_flavours_that_use(
 	const object_type& id,
 	const cosmos& cosm,
-	F&& location_callback
+	F location_callback
 ) {
 	static constexpr bool allow_conversion = is_typed_flavour_id_v<object_type>;
 	using contains = detail_same_or_convertible<allow_conversion>;
@@ -21,6 +21,10 @@ void find_flavours_that_use(
 	using finder = object_in_object<always_false, allow_conversion>;
 
 	/* Scan all flavours. */
+
+	(void)id;
+	(void)cosm;
+	(void)location_callback;
 
 	for_each_entity_type([&](auto e) { 
 		using E = decltype(e);
