@@ -1,6 +1,7 @@
 #pragma once
 #include <optional>
 #include "augs/math/vec2.h"
+#include "augs/math/arithmetical.h"
 #include "augs/log.h"
 
 namespace augs {
@@ -80,13 +81,12 @@ namespace augs {
 		const real32 comfort_zone,
 		const real32 desired_speed
 	) {
-		const auto danger_dist = (danger_pos - victim_pos).length();
-		const auto comfort_disturbance = std::max(0.f, 1.f - danger_dist / comfort_zone);
-
 		const auto target_vector = danger_pos - victim_pos;
+		const auto danger_dist = target_vector.length();
+
 		const auto desired_vel = furthest_perpendicular(victim_vel, target_vector).set_length(desired_speed);
 
-		return (desired_vel - victim_vel) * comfort_disturbance;
+		return (desired_vel - victim_vel) * disturbance(danger_dist, comfort_zone);
 	}
 
 	inline auto danger_avoidance(

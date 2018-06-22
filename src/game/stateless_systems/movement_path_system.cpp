@@ -24,7 +24,6 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 	cosm.for_each_having<components::movement_path>(
 		[&](const auto subject) {
-			auto& movement_path = subject.template get<components::movement_path>();
 			const auto& movement_path_def = subject.template get<invariants::movement_path>();
 
 			auto& transform = subject.template get<components::transform>();
@@ -36,6 +35,8 @@ void movement_path_system::advance_paths(const logic_step step) const {
 			}
 
 			if (movement_path_def.rect_bounded.is_enabled) {
+				auto& movement_path = subject.template get<components::movement_path>();
+
 				const auto& pos = transform.pos;
 				const auto tip_pos = *subject.find_logical_tip();
 
@@ -53,6 +54,8 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 				const auto fov_half_degrees = real32((360 - 90) / 2);
 				const auto max_avoidance_speed = 20 + speed_boost / 2;
+				const auto max_startle_speed = 250 + 4*speed_boost;
+
 				const auto cohesion_mult = 0.05f;
 				const auto alignment_mult = 0.08f;
 
@@ -97,6 +100,9 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 				auto velocity = current_dir * min_speed;
 
+				auto& startle = movement_path.startle;
+				velocity += vec2(startle).trim_length(max_startle_speed);
+				startle.damp(delta.in_seconds(), vec2::square(10.f));
 
 				{
 					auto greatest_avoidance = vec2::zero;
@@ -184,13 +190,19 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 				const auto total_speed = velocity.length();
 
-				velocity += augs::steer_to_avoid_bounds(
+				const auto bound_avoidance = augs::steer_to_avoid_bounds(
 					velocity,
 					tip_pos,
 					bound,
 					30.f,
 					0.2f
 				);
+
+				velocity += bound_avoidance;
+
+				if (startle > bound_avoidance && (startle + bound_avoidance) < startle) {
+					startle += bound_avoidance;
+				}
 
 				movement_path.last_speed = total_speed;
 

@@ -17,6 +17,11 @@ constexpr T PI = static_cast<T>(3.1415926535897932384626433832795);
 
 namespace augs {
 	template <class T>
+	auto disturbance(const T& danger_distance, const T& comfort_zone) {
+		return std::max(static_cast<T>(0), static_cast<T>(1) - danger_distance / comfort_zone);
+	}
+
+	template <class T>
 	bool flip_if_gt(T& value, const T& bound) {
 		const auto diff = value - bound;
 
@@ -89,7 +94,7 @@ namespace augs {
 		}
 	}
 
-	template <typename T> 
+	template <class T> 
 	int sgn(const T val) {
 		constexpr auto zero = static_cast<T>(0);
 		return (zero < val) - (val < zero);

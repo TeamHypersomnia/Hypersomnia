@@ -98,7 +98,7 @@ void crosshair_system::integrate_crosshair_recoils(const logic_step step) {
 			recoil.integrate(secs);
 			recoil.damp(secs, crosshair_def.recoil_damping);
 
-			recoil.position.damp(secs, vec2(60.f, 60.f));
+			recoil.position.damp(secs, vec2::square(60.f));
 			recoil.rotation = augs::damp(recoil.rotation, secs, 60.f);
 		}
 	);

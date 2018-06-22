@@ -26,6 +26,7 @@ namespace components {
 		transformr origin;
 		real32 path_time = 0.f;
 		real32 last_speed = 0.f;
+		vec2 startle;
 		// END GEN INTROSPECTOR
 	};
 }

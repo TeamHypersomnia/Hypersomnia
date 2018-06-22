@@ -341,10 +341,20 @@ struct basic_vec2 {
 		return (*this) *= len;
 	}
 
-	basic_vec2& add_length(const real len) {
-		real actual_length = length();
+	basic_vec2& trim_length(const real maximum) {
+		const auto actual_length = length();
 		normalize_hint(actual_length);
-		return (*this) *= (actual_length + len);
+
+		const auto required_length = std::min(maximum, actual_length);
+		return (*this) *= required_length;
+	}
+
+	basic_vec2& add_length(const real len) {
+		const auto actual_length = length();
+		normalize_hint(actual_length);
+
+		const auto required_length = actual_length + len;
+		return (*this) *= required_length;
 	}
 
 	basic_vec2& normalize_hint(const real suggested_length) {

@@ -65,11 +65,7 @@ identified_danger assess_danger(
 
 	const auto& sentience_def = victim.get<invariants::sentience>();
 	const auto comfort_zone = sentience_def.comfort_zone;
-	const float comfort_zone_disturbance_ratio = (comfort_zone - danger_distance)/comfort_zone;
-
-	if (comfort_zone_disturbance_ratio < 0) {
-		return result;
-	}
+	const auto comfort_zone_disturbance_ratio = augs::disturbance(danger_distance, comfort_zone);
 
 	if (missile) {
 		result.amount += comfort_zone_disturbance_ratio * missile->damage_amount*4;

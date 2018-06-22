@@ -15,6 +15,7 @@
 #include "game/debug_drawing_settings.h"
 #include "game/messages/thunder_input.h"
 #include "game/transcendental/data_living_one_step.h"
+#include "game/detail/visible_entities.h"
 
 void standard_explosion_input::instantiate(
 	const logic_step step,
@@ -44,26 +45,64 @@ void standard_explosion_input::instantiate(
 		}
 	}
 
-	sound_effect_input effect;
-	effect.id = sound_effect; 
-	effect.modifier.gain = sound_gain;
+	{
+		sound_effect_input effect;
+		effect.id = sound_effect; 
+		effect.modifier.gain = sound_gain;
 
-	effect.start(
-		step,
-		sound_effect_start_input::fire_and_forget(explosion_location).set_listener(subject_if_any)
-	);
+		effect.start(
+			step,
+			sound_effect_start_input::fire_and_forget(explosion_location).set_listener(subject_if_any)
+		);
+	}
 
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 
-	const auto now = cosmos.get_timestamp();
+	const auto now = cosm.get_timestamp();
 
 	const auto effective_radius_sq = effective_radius*effective_radius;
-	const auto subject = cosmos[subject_if_any];
+	const auto subject = cosm[subject_if_any];
 	const auto subject_alive = subject.alive();
 
 	if (subject_alive) {
 		if (const auto sentience = subject.find<components::sentience>()) {
 			subject_shake.apply(now, *sentience);
+		}
+	}
+
+	const auto explosion_pos = explosion_location.pos;
+
+	if (this->type != adverse_element_type::PED) {
+		/* Startle nearby living organisms */
+
+		thread_local visible_entities neighbors;
+
+		const auto startle_radius = effective_radius * 1.5f;
+
+		neighbors.clear();
+		neighbors.acquire_non_physical({
+			cosm,
+			camera_cone(explosion_pos),
+			vec2::square(startle_radius * 2),
+
+			false
+		});
+
+		for (const auto& a : neighbors.all) {
+			cosm[a].dispatch_on_having<components::movement_path>([&](const auto typed_neighbor) {
+				const auto neighbor_tip = *typed_neighbor.find_logical_tip();
+				const auto target_offset = neighbor_tip - explosion_pos;
+				const auto target_dist = target_offset.length();
+
+				const auto startle_amount = startle_radius - target_dist;
+
+				if (startle_amount > 0.f) {
+					const auto target_dir = target_offset / target_dist;
+					const auto startle_impulse = target_dir * startle_amount;
+
+					typed_neighbor.template get<components::movement_path>().startle += startle_impulse * 30;
+				}
+			});
 		}
 	}
 
@@ -74,12 +113,12 @@ void standard_explosion_input::instantiate(
 	request.subject = subject_if_any;
 
 	const auto response = visibility_system(DEBUG_LOGIC_STEP_LINES).respond_to_visibility_information_requests(
-		cosmos,
+		cosm,
 		{},
 		{ request }
 	);
 
-	const auto& physics = cosmos.get_solvable_inferred().physics;
+	const auto& physics = cosm.get_solvable_inferred().physics;
 
 	std::unordered_set<unversioned_entity_id> affected_entities_of_bodies;
 
@@ -89,7 +128,7 @@ void standard_explosion_input::instantiate(
 		damaging_triangle[2] += (damaging_triangle[2] - damaging_triangle[0]).set_length(5);
 
 		physics.for_each_intersection_with_triangle(
-			cosmos.get_si(),
+			cosm.get_si(),
 			damaging_triangle,
 			filters::dynamic_object(),
 			[&](
@@ -102,7 +141,7 @@ void standard_explosion_input::instantiate(
 					subject_alive
 					&& (
 						body_entity_id == FixtureUserdata(subject.get_id())
-						|| cosmos[body_entity_id].get_owning_transfer_capability() == subject.get_id()
+						|| cosm[body_entity_id].get_owning_transfer_capability() == subject.get_id()
 					)
 				;
 
@@ -111,8 +150,8 @@ void standard_explosion_input::instantiate(
 				}
 
 				const bool in_range =
-					(explosion_location.pos - point_a).length_sq() <= effective_radius_sq
-					|| (explosion_location.pos - point_b).length_sq() <= effective_radius_sq
+					(explosion_pos - point_a).length_sq() <= effective_radius_sq
+					|| (explosion_pos - point_b).length_sq() <= effective_radius_sq
 				;
 
 				const bool should_be_affected = in_range;
@@ -122,18 +161,18 @@ void standard_explosion_input::instantiate(
 					const bool is_yet_unaffected = it.second;
 
 					if (is_yet_unaffected) {
-						const auto body_entity = cosmos[body_entity_id];
+						const auto body_entity = cosm[body_entity_id];
 						const auto& affected_physics = body_entity.get<components::rigid_body>();
 						const auto affected_physics_mass_pos = affected_physics.get_mass_position();
 
 						const auto center_offset = (point_b - affected_physics_mass_pos) * 0.8f;
 
 						messages::damage_message damage_msg;
-						damage_msg.type = type;
+						damage_msg.type = this->type;
 						damage_msg.inflictor = subject;
 						damage_msg.subject = body_entity;
 						damage_msg.amount = damage;
-						damage_msg.impact_velocity = (point_b - explosion_location.pos).normalize();
+						damage_msg.impact_velocity = (point_b - explosion_pos).normalize();
 						damage_msg.point_of_impact = point_b;
 						damage_msg.victim_shake = victim_shake;
 
@@ -180,7 +219,7 @@ void standard_explosion_input::instantiate(
 		ring.maximum_duration_seconds = 0.20f;
 
 		ring.color = inner_ring_color;
-		ring.center = request.eye_transform.pos;
+		ring.center = explosion_pos;
 		ring.visibility = std::move(response.vis[0]);
 
 		step.post_message(ring);
@@ -200,7 +239,7 @@ void standard_explosion_input::instantiate(
 		ring.maximum_duration_seconds = 0.20f;
 
 		ring.color = outer_ring_color;
-		ring.center = request.eye_transform.pos;
+		ring.center = explosion_pos;
 		ring.visibility = std::move(response.vis[0]);
 
 		step.post_message(ring);
