@@ -1,5 +1,6 @@
 #pragma once
 #include <array>
+#include <iterator>
 #include "augs/ensure.h"
 
 #include "augs/misc/simple_pair.h"
@@ -31,34 +32,32 @@ namespace augs {
 
 		static constexpr bool is_trivially_copyable = std::is_trivially_copyable_v<value_type>;
 
-		using value_array = std::array<T, const_count>;
-
-		using storage_type = std::aligned_storage_t<
-			sizeof(value_type) * const_count, alignof(value_type)
+		using aligned_storage_type = std::aligned_storage_t<
+			sizeof(value_type) , alignof(value_type)
 		>;
-		
-		size_type count = 0;
-		storage_type raw;
 
-		auto& as_value_array() {
-			return reinterpret_cast<value_array&>(raw);
+		size_type count = 0;
+		aligned_storage_type raw[const_count];
+
+		auto* nth_ptr(const size_type n) {
+			return std::launder(reinterpret_cast<T*>(raw + n));
 		}
 
-		const auto& as_value_array() const {
-			return reinterpret_cast<const value_array&>(raw);
+		const auto* nth_ptr(const size_type n) const {
+			return std::launder(reinterpret_cast<const T*>(raw + n));
 		}
 
 		auto& nth(const size_type n) {
-			return as_value_array()[n];
+			return *std::launder(reinterpret_cast<T*>(raw + n));
 		}
 
 		const auto& nth(const size_type n) const {
-			return as_value_array()[n];
+			return *std::launder(reinterpret_cast<const T*>(raw + n));
 		}
 
 		template <class... Args>
 		void construct_at(const size_type n, Args&&... args) {
-			new (&nth(n)) value_type(std::forward<Args>(args)...);
+			new (raw + n) value_type(std::forward<Args>(args)...);
 		}
 
 		void _pop_back() {
@@ -70,8 +69,10 @@ namespace augs {
 		}
 
 	public:
-		using iterator = typename value_array::iterator;
-		using const_iterator = typename value_array::const_iterator;
+		using iterator = T*;
+		using const_iterator = const T*;
+		using reverse_iterator = std::reverse_iterator<T*>;
+		using const_reverse_iterator = std::reverse_iterator<const T*>;
 
 		constant_size_vector_base() = default;
 
@@ -198,7 +199,8 @@ namespace augs {
 			ensure_leq(s, capacity());
 
 			while (count < s) {
-				new (std::addressof(nth(count++))) value_type;
+				new (raw + count) value_type;
+				++count;
 			}
 
 			if constexpr(!is_trivially_copyable) {
@@ -212,43 +214,43 @@ namespace augs {
 		}
 
 		value_type* data() {
-			return &nth(0);
+			return nth_ptr(0);
 		}
 
 		const value_type* data() const {
-			return &nth(0);
+			return nth_ptr(0);
 		}
 
 		iterator begin() {
-			return as_value_array().begin();
+			return nth_ptr(0);
 		}
 
 		iterator end() {
-			return as_value_array().begin() + size();
+			return begin() + size();
 		}
 
 		const_iterator begin() const {
-			return as_value_array().begin();
+			return nth_ptr(0);
 		}
 
 		const_iterator end() const {
-			return as_value_array().begin() + size();
+			return begin() + size();
 		}
 
-		auto rbegin() {
-			return as_value_array().rbegin() + (max_size() - size());
+		reverse_iterator rbegin() {
+			return nth_ptr(size() - 1);
 		}
 
-		auto rend() {
-			return as_value_array().rend();
+		reverse_iterator rend() {
+			return rbegin() + size();
 		}
 
-		auto rbegin() const {
-			return as_value_array().rbegin() + (max_size() - size());
+		const_reverse_iterator rbegin() const {
+			return nth_ptr(size() - 1);
 		}
 
-		auto rend() const {
-			return as_value_array().rend();
+		const_reverse_iterator rend() const {
+			return rbegin() + size();
 		}
 
 		std::size_t size() const {
