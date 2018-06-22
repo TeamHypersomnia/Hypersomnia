@@ -32,6 +32,8 @@ matrix:
     compiler: clang
   - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=Debug other_cmake_flags=""
     compiler: gcc
+  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=RelWithDebInfo other_cmake_flags=""
+    compiler: gcc
 
 before_install:
  - ulimit -c
@@ -77,7 +79,7 @@ script:
   - ${c_compiler} -v && ${cxx_compiler} -v && cmake --version && make --version && python --version
   - export CC=${c_compiler}
   - export CXX=${cxx_compiler}
-  - cmake/build.sh ${config} x64 ${c_compiler} ${cxx_compiler} "-DBUILD_IN_CONSOLE_MODE=1 -DBUILD_WINDOW_FRAMEWORK=1 ${other_cmake_flags}"
+  - cmake/build.sh ${config} x64 ${c_compiler} ${cxx_compiler} "-DBUILD_IN_CONSOLE_MODE=1 ${other_cmake_flags}"
   - ulimit -c unlimited -S
   - pushd build/current
   - ninja tests -k 0
