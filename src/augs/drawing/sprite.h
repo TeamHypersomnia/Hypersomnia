@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/pad_bytes.h"
 
+#include "augs/templates/value_with_flag.h"
 #include "augs/math/vec2.h"
 #include "augs/math/rects.h"
 
@@ -86,6 +87,7 @@ namespace augs {
 		id_type image_id;
 		size_type size;
 		rgba color = white;
+		augs::value_with_flag<rgba> neon_color = augs::value_with_flag<rgba>(white, false);
 		sprite_special_effect effect = sprite_special_effect::NONE;
 		real32 effect_speed_multiplier = 1.f;
 		// END GEN INTROSPECTOR
@@ -133,7 +135,8 @@ namespace augs {
 						transform_pos,
 						final_rotation,
 						vec2(maybe_neon_map.get_original_size())
-						/ entry.diffuse.get_original_size() * drawn_size
+						/ entry.diffuse.get_original_size() * drawn_size,
+						neon_color.is_enabled ? neon_color.value : color
 					);
 				}
 			}
@@ -143,17 +146,20 @@ namespace augs {
 					manager.at(image_id).diffuse,
 					transform_pos,
 					final_rotation,
-					drawn_size
+					drawn_size,
+					color
 				);
 			}
 		}
 		
+	private:
 		FORCE_INLINE void draw(
 			const drawing_input in,
 			const atlas_entry considered_texture,
 			const vec2 target_position,
 			float target_rotation,
-			const vec2i considered_size
+			const vec2i considered_size,
+			rgba target_color
 		) const {
 			if (effect == sprite_special_effect::CONTINUOUS_ROTATION) {
 				target_rotation += std::fmod(in.global_time_seconds * effect_speed_multiplier * 360.f, 360.f);
@@ -169,8 +175,6 @@ namespace augs {
 			//		vert.rotate(in.camera.transform.rotation, center);
 			//	}
 			//}
-
-			auto target_color = color;
 
 			if (in.colorize != white) {
 				target_color *= in.colorize;

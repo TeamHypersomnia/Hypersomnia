@@ -14,6 +14,9 @@ namespace augs {
 		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 
+		value_with_flag() = default;
+		value_with_flag(const T& value, const bool is_enabled) : value(value), is_enabled(is_enabled) {}
+
 		template <class A>
 		void emplace(A&& a) {
 			value = std::forward<A>(a);
