@@ -16,29 +16,54 @@
 #include "application/setups/editor/detail/duplicate_delete_buttons.h"
 #include "application/setups/editor/property_editor/fae/ex_on_buttons.h"
 
-template <class E>
+template <class O, class I>
+auto obtain_raw_id_vector(
+	O& out,
+	const I& from
+) {
+	if constexpr(has_begin_and_end_v<I>) {
+		if constexpr(can_access_data_v<I>) {
+			out.assign(
+				std::addressof(from.front().raw), 
+				std::addressof(from.back().raw)
+			);
+		}
+		else {
+			out.clear();
+			out.reserve(from.size());
+
+			for (const auto& e : from) {
+				out.emplace_back(e.raw);
+			}
+		}
+	}
+	else {
+		out.clear();
+		out.emplace_back(from.raw);
+	}
+}
+
+template <class E, class I>
 void do_edit_entities_gui(
 	const fae_property_editor_input in,
 	const cref_typed_entity_handle<E>& entity,
-	std::vector<typed_entity_id<E>>&& ids
+	const I& ids
 ) {
 	change_entity_property_command cmd;
 	cmd.type_id.set<E>();
-	cmd.set_affected_entities(std::move(ids));
-
+	obtain_raw_id_vector(cmd.affected_entities, ids);
 	edit_entity(in, entity, cmd);
 }
 
-template <class E>
+template <class E, class I>
 void do_edit_flavours_gui(
 	const fae_property_editor_input in,
 	const entity_flavour<E>& flavour,
-	std::vector<typed_entity_flavour_id<E>>&& ids
+	const I& ids
 ) {
 	change_flavour_property_command cmd;
 	cmd.type_id.set<E>();
-	cmd.set_affected_flavours(std::move(ids));
-
+	obtain_raw_id_vector(cmd.affected_flavours, ids);
 	edit_flavour(in, flavour, cmd);
 }
 
@@ -221,10 +246,10 @@ auto tree_of_flavours(
 								ImGui::Separator();
 
 								if (is_flavour_selected) {
-									do_edit_flavours_gui(fae_in, flavour, { ticked_flavours.begin(), ticked_flavours.end() });
+									do_edit_flavours_gui(fae_in, flavour, ticked_flavours);
 								}
 								else {
-									do_edit_flavours_gui(fae_in, flavour, { flavour_id });
+									do_edit_flavours_gui(fae_in, flavour, flavour_id);
 								}
 
 								ImGui::Separator();
@@ -421,10 +446,10 @@ auto tree_of_entities(
 										ImGui::Separator();
 
 										if (is_entity_selected) {
-											do_edit_entities_gui(fae_in, typed_handle, { ticked_entities.begin(), ticked_entities.end() });
+											do_edit_entities_gui(fae_in, typed_handle, ticked_entities);
 										}
 										else {
-											do_edit_entities_gui(fae_in, typed_handle, { e });
+											do_edit_entities_gui(fae_in, typed_handle, e);
 										}
 
 										ImGui::Separator();

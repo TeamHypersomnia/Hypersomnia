@@ -73,12 +73,6 @@ struct change_entity_property_command : change_property_command<change_entity_pr
 	entity_property_id property_id;
 	// END GEN INTROSPECTOR
 
-	template <class E>
-	void set_affected_entities(std::vector<typed_entity_id<E>>&& typed) {
-		/* YOLO */
-		reinterpret_cast<std::vector<typed_entity_id<E>>&>(affected_entities) = std::move(typed);
-	}
-
 	auto count_affected() const {
 		return affected_entities.size();
 	}

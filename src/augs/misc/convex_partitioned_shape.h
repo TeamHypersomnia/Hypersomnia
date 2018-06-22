@@ -24,18 +24,19 @@ struct basic_convex_partitioned_shape {
 	// END GEN INTROSPECTOR
 
 	static auto from_box(const vec2 size) {
-		this_type result;
-		result.convex_polys.emplace_back();
-		auto& new_poly = result.convex_polys.back();
-
 		const auto hx = size.x / 2;
 		const auto hy = size.y / 2;
 
+		this_type result;
+		result.convex_polys.emplace_back();
+
+		auto& new_poly = result.convex_polys.back();
 		new_poly.resize(4);
-		new_poly[0].set(-hx, -hy);
-		new_poly[1].set( hx, -hy);
-		new_poly[2].set( hx,  hy);
-		new_poly[3].set(-hx,  hy);
+
+		new_poly[0] = { -hx, -hy };
+		new_poly[1] = {  hx, -hy };
+		new_poly[2] = {  hx,  hy };
+		new_poly[3] = { -hx,  hy };
 
 		return result;
 	}

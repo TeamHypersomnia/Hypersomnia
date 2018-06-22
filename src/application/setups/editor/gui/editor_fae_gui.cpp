@@ -225,9 +225,9 @@ fae_tree_output editor_selected_fae_gui::perform(
 
 		if (const auto handle = cosm[id]) {
 			handle.dispatch([&](const auto typed_handle) {
-				do_edit_flavours_gui(fae_in, typed_handle.get_flavour(), { typed_handle.get_flavour_id() });
+				do_edit_flavours_gui(fae_in, typed_handle.get_flavour(), typed_handle.get_flavour_id());
 				ImGui::Separator();
-				do_edit_entities_gui(fae_in, typed_handle, { typed_handle.get_id() });
+				do_edit_entities_gui(fae_in, typed_handle, typed_handle.get_id());
 			});
 		}
 

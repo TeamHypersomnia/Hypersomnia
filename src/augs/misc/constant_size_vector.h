@@ -61,11 +61,11 @@ namespace augs {
 		}
 
 		void _pop_back() {
-			if constexpr(!is_trivially_copyable) {
-				nth(count - 1).~value_type();
-			}
-
 			--count;
+
+			if constexpr(!is_trivially_copyable) {
+				nth_ptr(count)->~value_type();
+			}
 		}
 
 	public:
