@@ -45,32 +45,42 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			const auto* const subject_coll_material = logicals.find(subject_coll.material);
 			const auto* const collider_coll_material = logicals.find(collider_coll.material);
 
-			if (
-				subject_coll_material != nullptr
+			if (subject_coll_material != nullptr
 				&& collider_coll_material != nullptr
 			) {
-				const auto sound_id = subject_coll_material->collision_sound_matrix.at(collider_coll.material);
+				auto play_sound = [&](const auto sound_id) {
+					if (sound_id) {
+						const auto impulse = (c.normal_impulse) * subject_coll.collision_sound_gain_mult * collider_coll.collision_sound_gain_mult;
 
-				const auto impulse = (c.normal_impulse) * subject_coll.collision_sound_gain_mult * collider_coll.collision_sound_gain_mult;
+						// LOG("Cnorm/scgain/ccgain:\n%f4,%f4,%f4", c.normal_impulse, subject_coll.collision_sound_gain_mult, collider_coll.collision_sound_gain_mult);
 
-				// LOG("Cnorm/scgain/ccgain:\n%f4,%f4,%f4", c.normal_impulse, subject_coll.collision_sound_gain_mult, collider_coll.collision_sound_gain_mult);
+						const auto gain_mult = (impulse / 15.f) * (impulse / 15.f);
+						const auto pitch_mult = impulse / 185.f;
 
-				const auto gain_mult = (impulse / 15.f) * (impulse / 15.f);
-				const auto pitch_mult = impulse / 185.f;
+						if (gain_mult > 0.01f) {
+							sound_effect_input effect;
+							effect.modifier.pitch = std::min(1.5f, 0.85f + pitch_mult);
+							
+							effect.modifier.gain = gain_mult;
+							effect.id = *sound_id;
 
-				if (gain_mult > 0.01f) {
-					sound_effect_input effect;
-					effect.modifier.pitch = std::min(1.5f, 0.85f + pitch_mult);
-					
-					effect.modifier.gain = gain_mult;
-					effect.id = sound_id;
+							// LOG("Coll. gain/pitch: %f3/%f3", in.effect.modifier.gain, in.effect.modifier.pitch);
 
-					// LOG("Coll. gain/pitch: %f3/%f3", in.effect.modifier.gain, in.effect.modifier.pitch);
+							effect.start(
+								step, 
+								sound_effect_start_input::fire_and_forget(c.point)
+							);
+						}
+					}
+				};
 
-					effect.start(
-						step, 
-						sound_effect_start_input::fire_and_forget(c.point)
-					);
+				const auto first_id = mapped_or_nullptr(subject_coll_material->collision_sound_matrix, collider_coll.material);
+				const auto second_id = mapped_or_nullptr(collider_coll_material->collision_sound_matrix, subject_coll.material);
+
+				play_sound(first_id);
+
+				if (second_id != first_id) {
+					play_sound(second_id);
 				}
 			}
 
@@ -183,6 +193,21 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 				step,
 				sound_effect_start_input::orbit_absolute(cosmos[d.subject], d.point_of_impact).set_listener(d.subject)
 			);
+		}
+
+		if (d.type == adverse_element_type::FORCE) {
+			if (const auto subject = cosmos[d.subject]; subject.alive()) {
+				const auto& fixtures = subject.get<invariants::fixtures>();
+
+				if (const auto* const subject_coll_material = logicals.find(fixtures.material)) {
+					const auto& effect = subject_coll_material->standard_damage_sound;
+
+					effect.start(
+						step,
+						sound_effect_start_input::orbit_absolute(cosmos[d.subject], d.point_of_impact).set_listener(d.subject)
+					);
+				}
+			}
 		}
 	}
 

@@ -6,6 +6,7 @@ enum class test_scene_physical_material_id {
 	WOOD,
 	METAL,
 	GRENADE,
+	GLASS,
 	COUNT
 	// END GEN INTROSPECTOR
 };
