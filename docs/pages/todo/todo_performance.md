@@ -5,6 +5,9 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Implement std::vector<byte_no_init>
+	- Some casts will need fixing then
+
 - Implement constrained handles and constrained entity ids
 	- Actually the generic handle could just take the required components.
 		- The entity handle and const entity handle would be typedefs for handles without constraints.

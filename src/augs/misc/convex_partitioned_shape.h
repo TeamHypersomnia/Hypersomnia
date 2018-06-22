@@ -12,6 +12,7 @@ template <
 	std::size_t convex_poly_vertex_count
 >
 struct basic_convex_partitioned_shape {
+	using this_type = basic_convex_partitioned_shape<T, convex_polys_count, convex_poly_vertex_count>;
 	using vec2 = basic_vec2<T>;
 	using transform = basic_transform<T>;
 
@@ -22,17 +23,21 @@ struct basic_convex_partitioned_shape {
 	poly_vector_type convex_polys = {};
 	// END GEN INTROSPECTOR
 
-	void make_box(const vec2 size) {
-		auto hx = size.x / 2;
-		auto hy = size.y / 2;
+	static auto from_box(const vec2 size) {
+		this_type result;
+		result.convex_polys.emplace_back();
+		auto& new_poly = result.convex_polys.back();
 
-		convex_poly new_poly;
+		const auto hx = size.x / 2;
+		const auto hy = size.y / 2;
+
 		new_poly.resize(4);
 		new_poly[0].set(-hx, -hy);
 		new_poly[1].set( hx, -hy);
 		new_poly[2].set( hx,  hy);
 		new_poly[3].set(-hx,  hy);
-		convex_polys.push_back(new_poly);
+
+		return result;
 	}
 
 	void offset_vertices(const transformr transform) {
