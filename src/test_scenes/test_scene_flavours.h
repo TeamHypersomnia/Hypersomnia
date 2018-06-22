@@ -61,6 +61,7 @@ enum class test_plain_sprited_bodys {
 	CYAN_SHELL,
 	STEEL_SHELL,
 	BRICK_WALL,
+	AQUARIUM_GLASS,
 
 	COUNT
 	// END GEN INTROSPECTOR

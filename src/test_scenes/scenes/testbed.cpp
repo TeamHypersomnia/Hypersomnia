@@ -74,7 +74,7 @@ namespace test_scenes {
 		};
 
 		auto get_size_of = [&caches](const auto id) {
-			return caches.at(to_image_id(id)).get_original_size();
+			return vec2i(caches.at(to_image_id(id)).get_original_size());
 		};
 
 		std::vector<entity_id> new_characters;
@@ -310,10 +310,20 @@ namespace test_scenes {
 		prefabs::create_rifle(step, vec2(300, -100), test_shootable_weapons::LEWSII, prefabs::create_magazine(step, vec2(100, -650), test_container_items::LEWSII_MAG, prefabs::create_steel_charge(step, vec2(0, 0)), 100));
 		prefabs::create_rifle(step, vec2(400, -100), test_shootable_weapons::LEWSII, prefabs::create_magazine(step, vec2(100, -650), test_container_items::LEWSII_MAG, prefabs::create_steel_charge(step, vec2(0, 0)), 100));
 
+		const auto glass_size = get_size_of(test_scene_image_id::AQUARIUM_GLASS);
 		const auto aquarium_tr = transformr{vec2( -1024, 512) };
 		const auto aquarium_size = get_size_of(test_scene_image_id::AQUARIUM_SAND_1);
 
 		const auto aquarium_origin = aquarium_tr + transformr(aquarium_size / 2);
+
+		{
+			const auto gs = glass_size;
+			const auto gsh = glass_size / 2;
+
+			for (int g = 0; g < (aquarium_size * 2).x / gs.x; ++g) {
+				create_test_scene_entity(world, test_plain_sprited_bodys::AQUARIUM_GLASS, aquarium_origin.pos + aquarium_size + vec2(-gsh.x, gsh.y) - vec2(gs.x * g, 0));
+			}
+		}
 
 		create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND_1, aquarium_tr);
 		create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND_1, aquarium_tr + transformr(vec2(aquarium_size.x, 0)));

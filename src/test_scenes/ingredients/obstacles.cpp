@@ -47,6 +47,26 @@ namespace test_flavours {
 			fixtures_def.density = 100.f;
 			fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::WOOD);
 		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_plain_sprited_bodys::AQUARIUM_GLASS);
+
+			invariants::render render_def;
+			render_def.layer = render_layer::DYNAMIC_BODY;
+
+			meta.set(render_def);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::AQUARIUM_GLASS, rgba(white.rgb(), 200));
+			add_shape_invariant_from_renderable(meta, caches);
+
+			test_flavours::add_standard_static_body(meta);
+
+			auto& fixtures_def = meta.get<invariants::fixtures>();
+
+			fixtures_def.restitution = 0.5f;
+			fixtures_def.density = 100.f;
+			fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::WOOD);
+		}
 	}
 }
 

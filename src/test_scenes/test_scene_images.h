@@ -230,6 +230,8 @@ enum class test_scene_image_id {
 	AQUARIUM_SAND_1,
 	AQUARIUM_SAND_2,
 
+	AQUARIUM_GLASS,
+
 	DUNE_BIG,
 	DUNE_SMALL,
 
