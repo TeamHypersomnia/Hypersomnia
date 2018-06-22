@@ -356,13 +356,8 @@ void item_button::draw_proc(
 						trim_zero = true;
 					}
 
-					label_color.rgb() = cyan.rgb();
+					label_color.set_rgb(cyan.rgb());
 				}
-
-				//if (item[slot_function::ITEM_DEPOSIT]->category_allowed != item_category::GENERAL)
-				//	label_color.rgb() = pink.rgb();
-				//else
-				//	label_color.rgb() = cyan.rgb();
 			}
 
 			if (bottom_number_val > -1.f) {
@@ -370,7 +365,7 @@ void item_button::draw_proc(
 
 				if (printing_charge_count) {
 					//label_str = 'x';
-					label_color.rgb() = white.rgb();
+					label_color.set_rgb(white.rgb());
 					label_str += to_string_ex(bottom_number_val);
 				}
 				else

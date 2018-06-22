@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <variant>
+#include <memory>
 
 #include "augs/pad_bytes.h"
 #include "augs/templates/exception_templates.h"
@@ -125,7 +126,7 @@ namespace augs {
 		*/
 
 		const rgba_channel* get_data() const {
-			return reinterpret_cast<const rgba_channel*>(v.data());
+			return std::addressof(v.data()->r);
 		}
 
 		vec2u get_size() const {

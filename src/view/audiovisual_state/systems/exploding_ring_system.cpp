@@ -125,7 +125,7 @@ void exploding_ring_system::advance(
 									smokes_emission
 								);
 
-								new_p.color.rgb() = r.color.rgb();
+								new_p.color.set_rgb(r.color.rgb());
 								new_p.color.a *= 2;
 
 								particles.add_particle(smokes_emission.target_render_layer, new_p);

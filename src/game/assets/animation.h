@@ -99,13 +99,13 @@ struct simple_animation_state {
 template <class D>
 struct animation_mixin {
 	auto get_image_id(const unsigned index) const {
-		return reinterpret_cast<const D*>(this)->frames[index].image_id;
+		return static_cast<const D*>(this)->frames[index].image_id;
 	}
 
 	auto get_image_id(
 		const simple_animation_state& state
 	) const {
-		const auto& frames = reinterpret_cast<const D*>(this)->frames;
+		const auto& frames = static_cast<const D*>(this)->frames;
 		return get_image_id(std::min(static_cast<unsigned>(frames.size() - 1), state.frame_num));
 	}
 };

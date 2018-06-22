@@ -14,7 +14,7 @@ namespace augs {
 
 		texture::texture(const vec2u new_size, const rgba* const source) {
 			create();
-			texImage2D(new_size, reinterpret_cast<const unsigned char*>(source));
+			texImage2D(new_size, std::addressof(source->r));
 		}
 
 		texture::texture(const image& source) {

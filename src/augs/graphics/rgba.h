@@ -84,10 +84,10 @@ struct rgba {
 	rgba_channel& operator[](const size_t index);
 	const rgba_channel& operator[](const size_t index) const;
 
-	rgb_type& rgb();
-	const rgb_type& rgb() const;
-
+	rgba& set_rgb(const rgb_type&);
 	rgba& set_hsv(const hsv);
+
+	rgb_type rgb() const;
 
 	template <class T>
 	T& stream_to(T& out) const {
@@ -129,7 +129,7 @@ struct hsv {
 	hsv operator*(float) const;
 	hsv operator+(hsv b) const;
 
-	operator rgba::rgb_type() const;
+	explicit operator rgba::rgb_type() const;
 };
 
 inline auto to_0_1(const rgba_channel c) {
@@ -359,16 +359,19 @@ FORCE_INLINE const rgba_channel& rgba::operator[](const size_t index) const {
 	return (&r)[index];
 }
 
-FORCE_INLINE rgba::rgb_type& rgba::rgb() {
-	return *reinterpret_cast<rgb_type*>(this);
+FORCE_INLINE rgba& rgba::set_rgb(const rgb_type& right) {
+	r = right.r;
+	g = right.g;
+	b = right.b;
+	return *this;
 }
 
-FORCE_INLINE const rgba::rgb_type& rgba::rgb() const {
-	return *reinterpret_cast<const rgb_type*>(this);
+FORCE_INLINE rgba::rgb_type rgba::rgb() const {
+	return { r, g, b };
 }
 
 FORCE_INLINE rgba& rgba::set_hsv(const hsv hsv) {
-	rgb() = hsv;
+	set_rgb(hsv.operator rgb_type());
 	return *this;
 }
 

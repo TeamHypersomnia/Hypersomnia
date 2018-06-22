@@ -9,40 +9,26 @@
 
 #include "game/transcendental/entity_flavour_id.h"
 
-namespace components {
-	struct type;
-}
-
 class flavour_id_cache {
-	using caches_type = per_entity_type_array<
-		std::unordered_map<
-			raw_entity_flavour_id, 
-			std::unordered_set<entity_id_base>
-		>
+	template <class T>
+	using make_flavour_map = std::unordered_map<
+		typed_entity_flavour_id<T>, 
+		std::unordered_set<typed_entity_id<T>>
 	>;
 
+	using caches_type = per_entity_type_container<make_flavour_map>;
+
 	caches_type caches;
-
-	auto& get_entities_by_flavour_map(const entity_id id) {
-		return caches[id.type_id.get_index()];
-	}
-
-	const auto& get_entities_by_flavour_map(const entity_flavour_id id) const {
-		return caches[id.type_id.get_index()];
-	}
-
-	const std::unordered_set<entity_id_base>& detail_get_entities_by_flavour_id(const entity_flavour_id) const;
-
 public:
-	/* TODO: templatize whole cache? */
-
 	template <class E>
 	const auto& get_entities_by_flavour_id(const typed_entity_flavour_id<E> id) const {
-		using return_type = const std::unordered_set<typed_entity_id<E>>&;
-		const auto& result = detail_get_entities_by_flavour_id(entity_flavour_id(id));
+		thread_local const std::unordered_set<typed_entity_id<E>> detail_none;
 
-		/* YOLO cast */
-		return reinterpret_cast<return_type>(result);
+		if (const auto mapped = mapped_or_nullptr(caches.get_for<E>(), id)) {
+			return *mapped;
+		}
+
+		return detail_none;
 	}
 
 	void infer_cache_for(const const_entity_handle);

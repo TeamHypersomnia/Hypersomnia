@@ -66,7 +66,7 @@ unsigned encode_rgba(std::vector<std::byte>& out, const std::vector<rgba>& in_v,
                 LodePNGColorType colortype = LCT_RGBA, unsigned bitdepth = 8)
 {
 
-	const auto in = reinterpret_cast<const unsigned char*>(in_v.data());
+	const auto in = std::addressof(in_v.data()->r);
 
   unsigned char* buffer;
   size_t buffersize;
