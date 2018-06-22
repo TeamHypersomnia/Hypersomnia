@@ -73,7 +73,7 @@ void standard_explosion_input::instantiate(
 	const auto explosion_pos = explosion_location.pos;
 
 	if (this->type != adverse_element_type::PED) {
-		startle_nearby_organisms(cosm, explosion_pos, effective_radius * 1.5f);
+		startle_nearby_organisms(cosm, explosion_pos, effective_radius * 1.8f, 60.f, startle_type::IMMEDIATE);
 	}
 
 	messages::visibility_information_request request;

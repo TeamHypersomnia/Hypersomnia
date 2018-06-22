@@ -1,6 +1,8 @@
 #pragma once
+#include "augs/misc/enum/enum_array.h"
 #include "augs/misc/constant_size_vector.h"
 #include "augs/templates/value_with_flag.h"
+#include "game/enums/startle_type.h"
 
 struct rect_bounded_movement {
 	// GEN INTROSPECTOR struct rect_bounded_movement
@@ -26,7 +28,11 @@ namespace components {
 		transformr origin;
 		real32 path_time = 0.f;
 		real32 last_speed = 0.f;
-		vec2 startle;
+		augs::enum_array<vec2, startle_type> startle;
 		// END GEN INTROSPECTOR
+
+		void add_startle(const startle_type type, const vec2 amount) {
+			startle[type] += amount;
+		}
 	};
 }

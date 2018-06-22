@@ -32,6 +32,7 @@
 #include "game/enums/filters.h"
 
 #include "game/stateless_systems/sound_existence_system.h"
+#include "game/detail/organisms/startle_nearbly_organisms.h"
 
 using namespace augs;
 
@@ -46,9 +47,9 @@ static void detonate_if_explosive(
 }
 
 void missile_system::detonate_colliding_missiles(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 	const auto delta = step.get_delta();
-	const auto now = cosmos.get_timestamp();
+	const auto now = cosm.get_timestamp();
 	const auto& events = step.get_queue<messages::collision_message>();
 
 	for (const auto& it : events) {
@@ -56,8 +57,8 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			continue;
 		}
 
-		const auto subject_handle = cosmos[it.subject];
-		const auto missile_handle = cosmos[it.collider];
+		const auto subject_handle = cosm[it.subject];
+		const auto missile_handle = cosm[it.collider];
 
 		if (auto missile = missile_handle.find<components::missile>()) {
 			const auto& missile_def = missile_handle.get<invariants::missile>();
@@ -111,10 +112,19 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 					);
 				}
 
+				const auto total_damage_amount = 
+					missile_def.damage_amount * 
+					missile->power_multiplier_of_sender
+				;
+
 				if (!is_victim_an_item && missile_def.destroy_upon_damage) {
 					missile->damage_charges_before_destruction--;
 					
 					detonate_if_explosive(step, it.point, missile_handle);
+
+					if (augs::is_positive_epsilon(total_damage_amount)) {
+						startle_nearby_organisms(cosm, it.point, total_damage_amount * 12.f, 27.f, startle_type::LIGHTER);
+					}
 
 					// delete only once
 					if (missile->damage_charges_before_destruction == 0) {
@@ -125,7 +135,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 				damage_msg.inflictor = it.collider;
 				damage_msg.subject = it.subject;
-				damage_msg.amount = missile_def.damage_amount * missile->power_multiplier_of_sender;
+				damage_msg.amount = total_damage_amount;
 				damage_msg.victim_shake = missile_def.victim_shake;
 				damage_msg.impact_velocity = impact_velocity;
 				damage_msg.point_of_impact = it.point;
@@ -136,11 +146,11 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 }
 
 void missile_system::detonate_expired_missiles(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
-	const auto now = cosmos.get_timestamp();
+	auto& cosm = step.get_cosmos();
+	const auto now = cosm.get_timestamp();
 	const auto& delta = step.get_delta();
 
-	cosmos.for_each_having<components::missile>(
+	cosm.for_each_having<components::missile>(
 		[&](const auto it) {
 			auto& missile = it.template get<components::missile>();
 			auto& missile_def = it.template get<invariants::missile>();
@@ -170,16 +180,16 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 			const auto* const maybe_sender = it.template find<components::sender>();
 
 			if (maybe_sender != nullptr && missile_def.homing_towards_hostile_strength > 0.f) {
-				const auto sender_capability = cosmos[maybe_sender->capability_of_sender];
+				const auto sender_capability = cosm[maybe_sender->capability_of_sender];
 				const auto sender_attitude = 
-					sender_capability && sender_capability.template has<components::attitude>() ? sender_capability : entity_handle::dead_handle(cosmos)
+					sender_capability && sender_capability.template has<components::attitude>() ? sender_capability : entity_handle::dead_handle(cosm)
 				;
 
-				const auto particular_homing_target = cosmos[missile.particular_homing_target];
+				const auto particular_homing_target = cosm[missile.particular_homing_target];
 				
 				const auto detection_radius = 250.f;
 				const auto closest_hostile = 
-					particular_homing_target.alive() ? particular_homing_target : cosmos[get_closest_hostile(it, sender_attitude, detection_radius, filters::bullet())]
+					particular_homing_target.alive() ? particular_homing_target : cosm[get_closest_hostile(it, sender_attitude, detection_radius, filters::bullet())]
 				;
 
 				const auto current_vel = it.template get<components::rigid_body>().get_velocity();

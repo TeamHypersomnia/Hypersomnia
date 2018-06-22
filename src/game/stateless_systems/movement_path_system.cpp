@@ -50,11 +50,13 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				const auto global_time_sine = std::sin(global_time * 2);
 
 				const auto max_speed_boost = def.sine_speed_boost;
-				const auto speed_boost = static_cast<real32>(global_time_sine * global_time_sine * max_speed_boost);
+				const auto boost_mult = static_cast<real32>(global_time_sine * global_time_sine);
+				const auto speed_boost = boost_mult * max_speed_boost;
 
 				const auto fov_half_degrees = real32((360 - 90) / 2);
 				const auto max_avoidance_speed = 20 + speed_boost / 2;
-				const auto max_startle_speed = 250 + 4*speed_boost;
+				//const auto max_startle_speed = 250 + 4*speed_boost;
+				//const auto max_lighter_startle_speed = 150 + 4*speed_boost;
 
 				const auto cohesion_mult = 0.05f;
 				const auto alignment_mult = 0.08f;
@@ -100,9 +102,23 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 				auto velocity = current_dir * min_speed;
 
-				auto& startle = movement_path.startle;
-				velocity += vec2(startle).trim_length(max_startle_speed);
-				startle.damp(delta.in_seconds(), vec2::square(10.f));
+				real32 total_startle_applied = 0.f;
+
+				auto do_startle = [&](const auto type, const auto damping, const auto steer_mult) {
+					auto& startle = movement_path.startle[type];
+					//const auto desired_vel = vec2(startle).trim_length(max_speed);
+					const auto desired_vel = startle;
+					const auto total_steering = (desired_vel - velocity) * steer_mult * (0.02f + (0.16f * boost_mult));
+
+					total_startle_applied += total_steering.length() / velocity.length();
+
+					velocity += total_steering;
+
+					startle.damp(delta.in_seconds(), vec2::square(damping));
+				};
+
+				do_startle(startle_type::LIGHTER, 0.2f, 0.1f);
+				do_startle(startle_type::IMMEDIATE, 5.f, 1.f);
 
 				{
 					auto greatest_avoidance = vec2::zero;
@@ -169,13 +185,15 @@ void movement_path_system::advance_paths(const logic_step step) const {
 						average_vel /= counted_neighbors;
 
 						if (cohesion_mult != 0.f) {
+							const auto total_cohesion = cohesion_mult * total_startle_applied;
+
 							velocity += augs::arrive(
 								velocity,
 								pos,
 								average_pos,
 								velocity.length(),
 								cohesion_zone_radius
-							) * cohesion_mult;
+							) * total_cohesion;
 						}
 
 						if (alignment_mult != 0.f) {
@@ -200,8 +218,15 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 				velocity += bound_avoidance;
 
-				if (startle > bound_avoidance && (startle + bound_avoidance) < startle) {
-					startle += bound_avoidance;
+				for (auto& startle : movement_path.startle) {
+					/* 
+						Decrease startle vectors when nearing the bounds,
+						to avoid a glitch where fish is conflicted about where to go.
+					*/
+
+					if (startle > bound_avoidance && (startle + bound_avoidance) < startle) {
+						startle += bound_avoidance;
+					}
 				}
 
 				movement_path.last_speed = total_speed;

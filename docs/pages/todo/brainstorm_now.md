@@ -7,6 +7,10 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - Transform design
+	- It is the case that many entities might share identical origin, in which case it would be unwieldy to update origins for all entities to a new one.
+		- E.g. fish in aquarium.
+	- It is also the case that the origins might be tied to decorational entities.
+		- E.g. aquarium sand.
 	- We shouldn't make a separate case for wandering pixels, really
 		- just as in the case of light.
 	- movement path component will have an origin transform which will automatically be moved by the editor

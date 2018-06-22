@@ -51,6 +51,11 @@ namespace augs {
 	}
 
 	template <class T>
+	bool is_positive_epsilon(const T& t) {
+		return t > AUGS_EPSILON<T>;
+	}
+
+	template <class T>
 	auto zigzag(const T current_time, const T cycle) {
 		static_assert(std::is_floating_point_v<T>);
 		const auto m = current_time / cycle;

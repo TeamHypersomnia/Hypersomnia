@@ -7,7 +7,9 @@
 void startle_nearby_organisms(
 	cosmos& cosm,
 	const vec2 startle_origin,
-	const real32 startle_radius
+	const real32 startle_radius,
+	const real32 startle_force,
+	const startle_type type
 ) {
 	thread_local visible_entities neighbors;
 
@@ -30,9 +32,9 @@ void startle_nearby_organisms(
 
 			if (startle_amount > 0.f) {
 				const auto target_dir = target_offset / target_dist;
-				const auto startle_impulse = target_dir * startle_amount;
+				const auto startle_impulse = target_dir * startle_amount * startle_force;
 
-				typed_neighbor.template get<components::movement_path>().startle += startle_impulse * 30;
+				typed_neighbor.template get<components::movement_path>().add_startle(type, startle_impulse);
 			}
 		});
 	}
