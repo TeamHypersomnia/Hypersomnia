@@ -55,8 +55,8 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 				const auto fov_half_degrees = real32((360 - 90) / 2);
 				const auto max_avoidance_speed = 20 + speed_boost / 2;
-				//const auto max_startle_speed = 250 + 4*speed_boost;
-				//const auto max_lighter_startle_speed = 150 + 4*speed_boost;
+				const auto max_startle_speed = 250 + 4*speed_boost;
+				const auto max_lighter_startle_speed = 200 + 4*speed_boost;
 
 				const auto cohesion_mult = 0.05f;
 				const auto alignment_mult = 0.08f;
@@ -104,11 +104,11 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 				real32 total_startle_applied = 0.f;
 
-				auto do_startle = [&](const auto type, const auto damping, const auto steer_mult) {
+				auto do_startle = [&](const auto type, const auto damping, const auto steer_mult, const auto max_speed) {
 					auto& startle = movement_path.startle[type];
 					//const auto desired_vel = vec2(startle).trim_length(max_speed);
 					const auto desired_vel = startle;
-					const auto total_steering = (desired_vel - velocity) * steer_mult * (0.02f + (0.16f * boost_mult));
+					const auto total_steering = vec2((desired_vel - velocity) * steer_mult * (0.02f + (0.16f * boost_mult))).trim_length(max_speed);
 
 					total_startle_applied += total_steering.length() / velocity.length();
 
@@ -117,8 +117,8 @@ void movement_path_system::advance_paths(const logic_step step) const {
 					startle.damp(delta.in_seconds(), vec2::square(damping));
 				};
 
-				do_startle(startle_type::LIGHTER, 0.2f, 0.1f);
-				do_startle(startle_type::IMMEDIATE, 5.f, 1.f);
+				do_startle(startle_type::LIGHTER, 0.2f, 0.1f, max_lighter_startle_speed);
+				do_startle(startle_type::IMMEDIATE, 5.f, 1.f, max_startle_speed);
 
 				{
 					auto greatest_avoidance = vec2::zero;
@@ -212,7 +212,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 					velocity,
 					tip_pos,
 					bound,
-					30.f,
+					40.f,
 					0.2f
 				);
 
@@ -224,8 +224,8 @@ void movement_path_system::advance_paths(const logic_step step) const {
 						to avoid a glitch where fish is conflicted about where to go.
 					*/
 
-					if (startle > bound_avoidance && (startle + bound_avoidance) < startle) {
-						startle += bound_avoidance;
+					if (startle + bound_avoidance * 6 < startle) {
+						startle += bound_avoidance * 6;
 					}
 				}
 

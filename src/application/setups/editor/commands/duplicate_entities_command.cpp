@@ -92,7 +92,8 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 			}
 		});
 
-		created_grouping.redo(in);
+		// FIXME: Parametrize this?
+		//created_grouping.redo(in);
 	};
 
 	if (does_mirroring) {
@@ -225,7 +226,8 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 }
 
 void duplicate_entities_command::undo(const editor_command_input in) {
-	created_grouping.undo(in);
+	// FIXME: Parametrize this?
+	//created_grouping.undo(in);
 
 	in.purge_selections();
 	in.interrupt_tweakers();

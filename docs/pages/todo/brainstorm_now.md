@@ -6,6 +6,15 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Marker entities
+	- Special-purpose components:
+		- shape_aabb
+			- can be used by wandering pixels!
+				- and thus the editor will allow us to change reach easily
+		- shape_polygon can be used both for marking and for physical bodies
+	- separation between visible shapes and physical shapes is described elsewhere
+		- but the same logic would be used nevertheless
+
 - Transform design
 	- It is the case that many entities might share identical origin, in which case it would be unwieldy to update origins for all entities to a new one.
 		- E.g. fish in aquarium.
@@ -32,7 +41,6 @@ summary: That which we are brainstorming at the moment.
 		- Shuffled
 			- We'll probably only calculate the few that are visible, statelessly
 				- We can as well make the shuffles, why not
-	- Square-bounded movement
 
 - Editor maximum ease of access
 	- Shift+Arrows shall duplicate the selection and select the new entities
