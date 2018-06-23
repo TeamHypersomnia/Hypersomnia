@@ -333,5 +333,18 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 
 			alloc(test_id_type::DRAGON_FISH, anim);
 		} 
+
+		{
+			plain_animation anim;
+
+			create_frames(
+				anim,
+				test_scene_image_id::WATER_SURFACE_1,
+				test_scene_image_id::WATER_SURFACE_33,
+				20.f
+			);
+
+			alloc(test_id_type::WATER_SURFACE, anim);
+		} 
 	}
 }

@@ -324,7 +324,7 @@ namespace test_scenes {
 			};
 
 			rgba light_cols[3] = { 
-				rgba(0, 187, 190, 255),
+				rgba(0, 132, 190, 255),
 				rgba(0, 99, 126, 255),
 				rgba(0, 180, 59, 255)
 			};
@@ -336,6 +336,56 @@ namespace test_scenes {
 				light.color = light_cols[i];
 			}
 		}
+
+		{
+			constexpr int N = 9;
+			constexpr int DN = 4;
+
+			transformr caustics[N] = {
+				{ { 16, 496 }, 0 },
+				{ { 16, 369 }, -75 },
+				{ { -26, 250 }, 45 },
+
+				{ { 2, 98 }, 75 },
+				{ { 96, 74 }, 0 },
+				{ { 151, -88 }, 120 },
+
+				{ { 296, -104 }, 150 },
+				{ { 357, -26 }, 45 },
+				{ { 513, -1 }, 195 }
+			};
+
+			int caustics_offsets [N] =  {
+				28, 2, 11,
+				28, 2, 11,
+				28, 2, 11
+			};
+
+			transformr dim_caustics[DN] = {
+				{ { 225, 446 }, -75 },
+				{ { 241, 238 }, -15 },
+				{ { 449, 414 }, -75 },
+				{ { 465, 238 }, -135 }
+			};
+
+			int dim_caustics_offsets [DN] = {
+				31, 20, 10, 13
+			};
+
+			for (int i = 0; i < N; ++i) {
+				const auto target = caustics[i] + aquarium_tr;
+				auto ent = create_test_scene_entity(world, test_complex_decorations::WATER_SURFACE, target);
+				ent.get<components::animation>().state.frame_num = caustics_offsets[i];
+			}
+
+			for (int i = 0; i < DN; ++i) {
+				const auto target = dim_caustics[i] + aquarium_tr;
+				auto ent = create_test_scene_entity(world, test_complex_decorations::WATER_SURFACE, target);
+				ent.get<components::animation>().state.frame_num = dim_caustics_offsets[i];
+				ent.get<components::sprite>().colorize.a = 79;
+			}
+		}
+
 
 		create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
 			auto& w = e.template get<components::wandering_pixels>();

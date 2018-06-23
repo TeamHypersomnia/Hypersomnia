@@ -5,6 +5,9 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- Possibly disallow some editor ops when in gameplay/gui mode?
+	- E.g. there was a crash after instantiating cause the world cursor pos could not be found in gameplay mode
+
 - GCC relwithdebinfo does not properly set the physical shapes
 
 - fix freetype charsets

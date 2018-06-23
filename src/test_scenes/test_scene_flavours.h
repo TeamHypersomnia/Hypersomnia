@@ -156,6 +156,7 @@ enum class test_complex_decorations {
 	JELLYFISH,
 	DRAGON_FISH,
 	RAINBOW_DRAGON_FISH,
+	WATER_SURFACE,
 
 	COUNT
 	// END GEN INTROSPECTOR

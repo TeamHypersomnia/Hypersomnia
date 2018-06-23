@@ -268,6 +268,26 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BLANK, rgba(0, 75, 255, 46)).size = aquarium_size * 2;
 		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_complex_decorations::WATER_SURFACE);
+
+			invariants::render render_def;
+			render_def.layer = render_layer::CAR_WHEEL;
+
+			meta.set(render_def);
+
+			{
+				auto& spr = test_flavours::add_sprite(meta, caches, test_scene_image_id::WATER_SURFACE_1, white);
+				spr.color.a = 0;
+			}
+
+			{
+				invariants::animation anim_def;
+				anim_def.id = to_animation_id(test_scene_plain_animation_id::WATER_SURFACE);
+				meta.set(anim_def);
+			}
+		}
 	}
 }
 
