@@ -115,16 +115,11 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 							typed_handle.set_logic_transform(mirrored_transform);
 						}
 
-						if (const auto sprite = typed_handle.template find<components::sprite>()) {
-							if (hori) {
-								auto& f = sprite->flip.horizontally;
-								f = !f;
-							}
-
-							if (vert) {
-								auto& f = sprite->flip.vertically;
-								f = !f;
-							}
+						if (hori) {
+							typed_handle.flip_horizontally();
+						}
+						if (vert) {
+							typed_handle.flip_vertically();
 						}
 					}
 				}

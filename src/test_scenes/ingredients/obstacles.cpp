@@ -6,17 +6,15 @@
 namespace test_flavours {
 	void populate_crate_flavours(const populate_flavours_input in) {
 		auto& caches = in.caches;
-		auto& flavours = in.flavours;
+		auto flavour_with_sprite = in.flavour_with_sprite_maker();
 
 		{
-			auto& meta = get_test_flavour(flavours, test_plain_sprited_bodys::CRATE);
+			auto& meta = flavour_with_sprite(
+				test_plain_sprited_bodys::CRATE,
+				test_scene_image_id::CRATE,
+				render_layer::DYNAMIC_BODY
+			);
 
-			invariants::render render_def;
-			render_def.layer = render_layer::DYNAMIC_BODY;
-
-			meta.set(render_def);
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::CRATE, white);
 			add_shape_invariant_from_renderable(meta, caches);
 
 			test_flavours::add_standard_dynamic_body(meta);
@@ -29,14 +27,12 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_plain_sprited_bodys::BRICK_WALL);
+			auto& meta = flavour_with_sprite(
+				test_plain_sprited_bodys::BRICK_WALL,
+				test_scene_image_id::BRICK_WALL,
+				render_layer::DYNAMIC_BODY
+			);
 
-			invariants::render render_def;
-			render_def.layer = render_layer::DYNAMIC_BODY;
-
-			meta.set(render_def);
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::BRICK_WALL, white);
 			add_shape_invariant_from_renderable(meta, caches);
 
 			test_flavours::add_standard_static_body(meta);
@@ -49,14 +45,50 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_plain_sprited_bodys::AQUARIUM_GLASS);
+			auto& meta = flavour_with_sprite(
+				test_plain_sprited_bodys::LAB_WALL_SMOOTH_END,
+				test_scene_image_id::LAB_WALL_SMOOTH_END,
+				render_layer::DYNAMIC_BODY
+			);
 
-			invariants::render render_def;
-			render_def.layer = render_layer::DYNAMIC_BODY;
+			add_shape_invariant_from_renderable(meta, caches);
 
-			meta.set(render_def);
+			test_flavours::add_standard_static_body(meta);
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::AQUARIUM_GLASS, rgba(white.rgb(), 200));
+			auto& fixtures_def = meta.get<invariants::fixtures>();
+
+			fixtures_def.restitution = 0.0f;
+			fixtures_def.density = 100.f;
+			fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::METAL);
+		}
+
+		{
+			auto& meta = flavour_with_sprite(
+				test_plain_sprited_bodys::AQUARIUM_GLASS,
+				test_scene_image_id::AQUARIUM_GLASS,
+				render_layer::DYNAMIC_BODY,
+				rgba(white.rgb(), 200)
+			);
+
+			add_shape_invariant_from_renderable(meta, caches);
+
+			test_flavours::add_standard_static_body(meta);
+
+			auto& fixtures_def = meta.get<invariants::fixtures>();
+
+			fixtures_def.restitution = 0.5f;
+			fixtures_def.density = 100.f;
+			fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::GLASS);
+		}
+
+		{
+			auto& meta = flavour_with_sprite(
+				test_plain_sprited_bodys::AQUARIUM_GLASS_START,
+				test_scene_image_id::AQUARIUM_GLASS_START,
+				render_layer::DYNAMIC_BODY,
+				rgba(white.rgb(), 200)
+			);
+
 			add_shape_invariant_from_renderable(meta, caches);
 
 			test_flavours::add_standard_static_body(meta);

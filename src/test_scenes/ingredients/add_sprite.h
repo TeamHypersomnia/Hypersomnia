@@ -8,6 +8,8 @@
 #include "game/transcendental/cosmos.h"
 
 #include "game/enums/filters.h"
+#include "view/viewables/image_cache.h"
+#include "test_scenes/test_scene_images.h"
 
 namespace test_flavours {
 	template <class E>
@@ -37,7 +39,7 @@ namespace test_flavours {
 	}
 
 	template <class T, class C>
-	auto make_flavour_with_sprite(T& flavours, C& caches) {
+	auto flavour_with_sprite_maker(T& flavours, C& caches) {
 		auto lbd = [&](
 			const auto flavour_id,
 			const auto image_id,

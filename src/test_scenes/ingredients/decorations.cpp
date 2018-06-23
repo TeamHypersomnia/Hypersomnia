@@ -7,9 +7,7 @@
 namespace test_flavours {
 	void populate_decoration_flavours(const populate_flavours_input in) {
 		auto& caches = in.caches;
-		auto& flavours = in.flavours;
-
-		auto flavour_with_sprite = make_flavour_with_sprite(flavours, caches);
+		auto flavour_with_sprite = in.flavour_with_sprite_maker();
 
 		const auto aquarium_size = caches.at(to_image_id(test_scene_image_id::AQUARIUM_SAND_1)).get_original_size();
 		const auto sand_color = rgba(129, 129, 129, 255);

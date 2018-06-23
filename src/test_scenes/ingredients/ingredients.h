@@ -20,7 +20,7 @@
 #include "test_scenes/test_scene_recoil_players.h"
 
 #include "test_scenes/ingredients/box_physics.h"
-#include "test_scenes/ingredients/sprite.h"
+#include "test_scenes/ingredients/add_sprite.h"
 
 #include "view/viewables/image_cache.h"
 

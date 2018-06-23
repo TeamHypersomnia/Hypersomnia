@@ -13,6 +13,7 @@
 
 #include "augs/string/format_enum.h"
 
+#include "test_scenes/ingredients/add_sprite.h"
 #include "view/viewables/image_cache.h"
 
 enum class test_static_lights {
@@ -75,6 +76,9 @@ enum class test_plain_sprited_bodys {
 	STEEL_SHELL,
 	BRICK_WALL,
 	AQUARIUM_GLASS,
+
+	AQUARIUM_GLASS_START,
+	LAB_WALL_SMOOTH_END,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -261,6 +265,10 @@ struct populate_flavours_input {
 	const loaded_image_caches_map& caches;
 	const plain_animations_pool& plain_animations;
 	all_entity_flavours& flavours;
+
+	auto flavour_with_sprite_maker() const {
+		return test_flavours::flavour_with_sprite_maker(flavours, caches);
+	}
 };
 
 namespace test_flavours {

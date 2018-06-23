@@ -40,6 +40,24 @@ public:
 		return std::nullopt;
 	}
 
+	void flip_horizontally() const {
+		const auto self = *static_cast<const E*>(this);
+
+		if (const auto sprite = self.template find<components::sprite>()) {
+			auto& f = sprite->flip.horizontally;
+			f = !f;
+		}
+	}
+
+	void flip_vertically() const {
+		const auto self = *static_cast<const E*>(this);
+
+		if (const auto sprite = self.template find<components::sprite>()) {
+			auto& f = sprite->flip.vertically;
+			f = !f;
+		}
+	}
+
 	auto* find_crosshair() const {
 		/* If it were other entity for some reason */
 		const auto self = *static_cast<const E*>(this);

@@ -54,8 +54,15 @@ void standard_solve(const logic_step step) {
 	intent_contextualization_system().contextualize_use_button_intents(step);
 	intent_contextualization_system().contextualize_movement_intents(step);
 
-	movement_path_system().advance_paths(step);
-	animation_system().advance_stateful_animations(step);
+	{
+		auto scope = measure_scope(performance.movement_paths);
+		movement_path_system().advance_paths(step);
+	}
+
+	{
+		auto scope = measure_scope(performance.stateful_animations);
+		animation_system().advance_stateful_animations(step);
+	}
 
 	movement_system().set_movement_flags_from_input(step);
 	movement_system().apply_movement_forces(step);

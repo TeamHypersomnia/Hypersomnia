@@ -22,9 +22,7 @@ void populate_test_scene_flavours(const populate_flavours_input in) {
 namespace test_flavours {
 	void populate_other_flavours(const populate_flavours_input in) {
 		auto& flavours = in.flavours;
-		auto& caches = in.caches;
-
-		auto flavour_with_sprite = make_flavour_with_sprite(flavours, caches);
+		auto flavour_with_sprite = in.flavour_with_sprite_maker();
 
 		{
 			auto& meta = get_test_flavour(flavours, test_static_lights::STRONG_LAMP);
