@@ -432,7 +432,7 @@ public:
 		}
 	}
 
-	vec2 get_world_cursor_pos() const;
+	std::optional<vec2> find_world_cursor_pos() const;
 	vec2 get_world_cursor_pos(const camera_cone) const;
 
 	augs::path_type get_unofficial_content_dir() const;

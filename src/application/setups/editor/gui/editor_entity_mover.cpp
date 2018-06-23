@@ -36,7 +36,7 @@ void editor_entity_mover::transform_selection(
 			}
 			else {
 				active = true;
-				initial_world_cursor_pos = s.get_world_cursor_pos().discard_fract();
+				initial_world_cursor_pos = s.find_world_cursor_pos().value().discard_fract();
 			}
 
 			s.folder().history.execute_new(std::move(command), s.make_command_input());

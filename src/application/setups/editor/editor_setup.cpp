@@ -419,10 +419,14 @@ void editor_setup::perform_custom_imgui(
 			const auto output = fae_gui.perform(make_fae_gui_input(), view().selected_entities);
 
 			if (const auto id = output.instantiate_id) {
+				if (!is_editing_mode()) {
+					/* Go back to editing */
+					player.paused = true;
+				}
+
 				instantiate_flavour_command cmd;
 				cmd.instantiated_id = *id;
-				cmd.where.pos = get_world_cursor_pos();
-
+				cmd.where.pos = *find_world_cursor_pos();
 				const auto& executed = post_editor_command(make_command_input(), std::move(cmd));
 				const auto created_id = executed.get_created_id();
 				view().selected_entities = { created_id };
@@ -1090,8 +1094,12 @@ bool editor_setup::handle_input_before_game(
 	return false;
 }
 
-vec2 editor_setup::get_world_cursor_pos() const {
-	return get_world_cursor_pos(find_current_camera().value());
+std::optional<vec2> editor_setup::find_world_cursor_pos() const {
+	if (const auto camera = find_current_camera()) {
+		return get_world_cursor_pos(camera.value());
+	}
+
+	return std::nullopt;
 }
 
 vec2 editor_setup::get_world_cursor_pos(const camera_cone cone) const {
