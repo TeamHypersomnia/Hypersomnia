@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Add slight, disappearing (by shrinking) particles for glass impact
+	- What if we could sometime make it so that they stay? And we could synchronize permanently sitting particles through the network?
+
+- Add humming sound effect for the aquarium
+
 - Marker entities
 	- Special-purpose components:
 		- shape_aabb

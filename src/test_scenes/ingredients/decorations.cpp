@@ -201,6 +201,36 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_sprite_decorations::AQUARIUM_HALOGEN_1_BODY);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::ON_ON_FLOOR;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches,
+			test_scene_image_id::AQUARIUM_HALOGEN_1_BODY,
+			white);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_sprite_decorations::AQUARIUM_HALOGEN_1_LIGHT);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::ON_ON_FLOOR;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches,
+			test_scene_image_id::AQUARIUM_HALOGEN_1_LIGHT,
+			white);
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_sprite_decorations::AQUARIUM_SAND_1);
 
 			{
@@ -233,7 +263,7 @@ namespace test_flavours {
 
 			{
 				invariants::render render_def;
-				render_def.layer = render_layer::ON_ON_FLOOR;
+				render_def.layer = render_layer::AQUARIUM_DUNES;
 
 				meta.set(render_def);
 			}
@@ -247,7 +277,7 @@ namespace test_flavours {
 
 			{
 				invariants::render render_def;
-				render_def.layer = render_layer::ON_ON_FLOOR;
+				render_def.layer = render_layer::AQUARIUM_DUNES;
 
 				meta.set(render_def);
 			}

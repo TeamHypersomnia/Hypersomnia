@@ -355,8 +355,17 @@ FORCE_INLINE void specific_draw_neon_map(
 		}
 	}
 
-	auto neon_maker  = [](const auto& renderable, const auto& manager, auto& input) {
+	auto neon_maker  = [&](const auto& renderable, const auto& manager, auto& input) {
 		input.use_neon_map = true;
+
+		if constexpr(typed_handle.template has<components::sprite>()) {
+			const auto colorize = typed_handle.template get<components::sprite>().colorize_neon;
+
+			if (colorize != white) {
+				input.colorize *= colorize;
+			}
+		}
+
 		renderable.draw(manager, input);
 	};
 

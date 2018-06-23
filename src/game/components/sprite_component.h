@@ -13,6 +13,7 @@ namespace components {
 		pad_bytes<1> pad;
 		float effect_offset_secs = 0.f;
 		rgba colorize = white;
+		rgba colorize_neon = white;
 		// END GEN INTROSPECTOR
 	};
 };

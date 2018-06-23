@@ -311,7 +311,7 @@ namespace test_scenes {
 		prefabs::create_rifle(step, vec2(400, -100), test_shootable_weapons::LEWSII, prefabs::create_magazine(step, vec2(100, -650), test_container_items::LEWSII_MAG, prefabs::create_steel_charge(step, vec2(0, 0)), 100));
 
 		const auto glass_size = get_size_of(test_scene_image_id::AQUARIUM_GLASS);
-		const auto aquarium_tr = transformr{vec2( -1024, -1024) };
+		const auto aquarium_tr = transformr{ vec2(-1024, 1024) };
 		const auto aquarium_size = get_size_of(test_scene_image_id::AQUARIUM_SAND_1);
 
 		const auto aquarium_origin = aquarium_tr + transformr(aquarium_size / 2);
@@ -386,12 +386,44 @@ namespace test_scenes {
 			}
 		}
 
+		{
+			constexpr int N = 2;
+
+			transformr halogens[N] = {
+				{ { -174, 417 }, 90 },
+				{ { 463, -174 }, 180 }
+			};
+
+			rgba halogens_light_cols[N] = {
+				rgba(96, 255, 255, 255),
+				rgba(103, 255, 69, 255)
+			};
+
+			rgba halogens_bodies_cols[N] = {
+				rgba(0, 122, 255, 255),
+				rgba(0, 180, 59, 255)
+			};
+
+			for (int i = 0; i < N; ++i) {
+				const auto target = halogens[i] + aquarium_tr;
+				
+				{
+					auto ent = create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_HALOGEN_1_BODY, target);
+					ent.get<components::sprite>().colorize = halogens_bodies_cols[i];
+				}
+
+				{
+					auto ent = create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_HALOGEN_1_LIGHT, target);
+					ent.get<components::sprite>().colorize = halogens_light_cols[i];
+				}
+			}
+		}
 
 		create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
 			auto& w = e.template get<components::wandering_pixels>();
 
 			w.colorize = cyan;
-			w.particles_count = 50;
+			w.particles_count = 40;
 			w.size = { 750, 750 };
 			w.keep_particles_within_bounds = true;
 			e.set_logic_transform(aquarium_origin);

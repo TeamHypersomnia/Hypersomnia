@@ -107,7 +107,7 @@ namespace test_flavours {
 				components::wandering_pixels wandering;
 				wandering.keep_particles_within_bounds = true;
 				wandering.colorize = { 234, 228, 201, 255 };
-				wandering.particles_count = 320;
+				wandering.particles_count = 500;
 				wandering.size = { 750, 750 };
 				meta.set(wandering);
 			}
