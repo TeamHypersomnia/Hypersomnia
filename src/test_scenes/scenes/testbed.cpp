@@ -419,6 +419,23 @@ namespace test_scenes {
 			}
 		}
 
+		{
+			const auto bottom_lamp_tr = transformr(vec2(193, 161) - vec2(160, 206), -45.f);
+
+			const auto target = bottom_lamp_tr + aquarium_tr;
+
+			{
+				auto ent = create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_BOTTOM_LAMP_BODY, target);
+				ent.get<components::sprite>().colorize = rgba(0, 122, 255, 255);
+			}
+
+			{
+				auto ent = create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_BOTTOM_LAMP_LIGHT, target);
+				ent.get<components::sprite>().colorize = rgba(96, 255, 255, 255);
+			}
+		}
+
+
 		create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
 			auto& w = e.template get<components::wandering_pixels>();
 
@@ -453,7 +470,7 @@ namespace test_scenes {
 		create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND_2, aquarium_tr + transformr(vec2(aquarium_size.x, aquarium_size.y)));
 		create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND_2, aquarium_tr + transformr(vec2(0, aquarium_size.y)));
 
-		create_test_scene_entity(world, test_sprite_decorations::DUNE_SMALL, transformr(aquarium_origin.pos + vec2(-193, -193)));
+		create_test_scene_entity(world, test_sprite_decorations::DUNE_SMALL, transformr(aquarium_origin.pos + vec2(-193, -193) + vec2(52, -22)));
 		create_test_scene_entity(world, test_sprite_decorations::DUNE_SMALL, transformr(aquarium_origin.pos + vec2(-237, 255)));
 		create_test_scene_entity(world, test_sprite_decorations::DUNE_BIG, transformr(aquarium_origin.pos + vec2(-74, -48)));
 		create_test_scene_entity(world, test_sprite_decorations::DUNE_BIG, transformr(aquarium_origin.pos + vec2(161, 126)));

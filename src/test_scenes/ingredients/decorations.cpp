@@ -201,6 +201,36 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_sprite_decorations::AQUARIUM_BOTTOM_LAMP_BODY);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::ON_ON_FLOOR;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches,
+			test_scene_image_id::AQUARIUM_BOTTOM_LAMP_BODY,
+			white);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_sprite_decorations::AQUARIUM_BOTTOM_LAMP_LIGHT);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::ON_ON_FLOOR;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches,
+			test_scene_image_id::AQUARIUM_BOTTOM_LAMP_LIGHT,
+			white);
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_sprite_decorations::AQUARIUM_HALOGEN_1_BODY);
 
 			{
