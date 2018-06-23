@@ -61,6 +61,15 @@ FORCE_INLINE void detail_specific_entity_drawer(
 			result.renderable_transform = viewing_transform;
 			result.global_time_seconds = in.global_time_seconds;
 
+			if constexpr(typed_handle.template has<components::sprite>()) {
+				const auto& sprite_comp = typed_handle.template get<components::sprite>();
+				result.global_time_seconds += sprite_comp.effect_offset_secs;
+
+				if (sprite_comp.colorize != white) {
+					result.colorize *= sprite_comp.colorize;
+				}
+			}
+
 			return result;
 		}();
 

@@ -11,7 +11,7 @@
 
 namespace test_flavours {
 	template <class E>
-	void add_sprite(
+	auto& add_sprite(
 		E& t, 
 		const loaded_image_caches_map& caches,
 		const assets::image_id id, 
@@ -22,16 +22,17 @@ namespace test_flavours {
 		sprite_def.set(id, caches, col);
 		sprite_def.effect = effect;
 		t.set(sprite_def);
+		return t.template get<invariants::sprite>();
 	}
 
 	template <class E>
-	void add_sprite(
+	auto& add_sprite(
 		E& t, 
 		const loaded_image_caches_map& caches,
 		const test_scene_image_id id, 
 		const rgba col = white,
 		const augs::sprite_special_effect effect = augs::sprite_special_effect::NONE
 	) {
-		add_sprite(t, caches, to_image_id(id), col, effect); 
+		return add_sprite(t, caches, to_image_id(id), col, effect); 
 	}
 }

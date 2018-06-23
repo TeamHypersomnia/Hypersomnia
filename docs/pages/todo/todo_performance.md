@@ -5,6 +5,9 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Let render layers be tied to native entity types so that we don't have to dispatch each time
+	- Actually all visible entities could just be array of vectors per native type
+
 - Implement std::vector<byte_no_init>
 	- Some casts will need fixing then
 

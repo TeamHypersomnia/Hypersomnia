@@ -45,7 +45,8 @@ namespace augs {
 		) :
 			image_id(image_id),
 			size(size),
-			color(color)
+			color(color),
+			neon_color(color)
 		{}
 
 		template <class M>
@@ -66,6 +67,7 @@ namespace augs {
 			this->image_id = image_id;
 			this->size = manager.at(image_id).get_original_size();
 			this->color = color;
+			this->neon_color = color;
 		}
 
 		template <class T>
@@ -77,6 +79,7 @@ namespace augs {
 			this->image_id = image_id;
 			this->size = size;
 			this->color = color;
+			this->neon_color = color;
 		}
 		
 		void set_color(const rgba col) {
@@ -87,7 +90,7 @@ namespace augs {
 		id_type image_id;
 		size_type size;
 		rgba color = white;
-		augs::value_with_flag<rgba> neon_color = augs::value_with_flag<rgba>(white, false);
+		rgba neon_color = white;
 		sprite_special_effect effect = sprite_special_effect::NONE;
 		real32 effect_speed_multiplier = 1.f;
 		// END GEN INTROSPECTOR
@@ -136,7 +139,7 @@ namespace augs {
 						final_rotation,
 						vec2(maybe_neon_map.get_original_size())
 						/ entry.diffuse.get_original_size() * drawn_size,
-						neon_color.is_enabled ? neon_color.value : color
+						neon_color
 					);
 				}
 			}
@@ -165,20 +168,11 @@ namespace augs {
 				target_rotation += std::fmod(in.global_time_seconds * effect_speed_multiplier * 360.f, 360.f);
 			}
 
-			const auto points = make_sprite_points(target_position, considered_size, target_rotation);
-
-			/* rotate around the center of the screen */
-			//if (in.camera.transform.rotation != 0.f) {
-			//	const auto center = in.camera.visible_world_area / 2;
-			//
-			//	for (auto& vert : v) {
-			//		vert.rotate(in.camera.transform.rotation, center);
-			//	}
-			//}
-
 			if (in.colorize != white) {
 				target_color *= in.colorize;
 			}
+
+			const auto points = make_sprite_points(target_position, considered_size, target_rotation);
 
 			auto triangles = make_sprite_triangles(
 				considered_texture,
@@ -188,8 +182,11 @@ namespace augs {
 			);
 
 			if (effect == sprite_special_effect::COLOR_WAVE) {
-				const auto left_col = rgba(hsv{ std::fmod(in.global_time_seconds * effect_speed_multiplier / 2.f, 1.f), 1.0, 1.0 });
-				const auto right_col = rgba(hsv{ std::fmod(in.global_time_seconds * effect_speed_multiplier / 2.f / 2.f + 0.3f, 1.f), 1.0, 1.0 });
+				auto left_col = rgba(hsv{ std::fmod(in.global_time_seconds * effect_speed_multiplier / 2.f, 1.f), 1.0, 1.0 });
+				auto right_col = rgba(hsv{ std::fmod(in.global_time_seconds * effect_speed_multiplier / 2.f / 2.f + 0.3f, 1.f), 1.0, 1.0 });
+
+				left_col.avoid_dark_blue_for_color_wave();
+				right_col.avoid_dark_blue_for_color_wave();
 
 				auto& t1 = triangles[0];
 				auto& t2 = triangles[1];

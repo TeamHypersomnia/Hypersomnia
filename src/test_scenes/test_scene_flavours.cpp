@@ -32,6 +32,15 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_static_lights::AQUARIUM_LAMP);
+
+			invariants::light light; 
+			light.constant.base_value = 75;
+			light.quadratic.base_value = 631;
+			meta.set(light);
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_wandering_pixels_decorations::WANDERING_PIXELS);
 
 			{
@@ -44,6 +53,64 @@ namespace test_flavours {
 			invariants::wandering_pixels wandering;
 			wandering.animation_id = to_animation_id(test_scene_plain_animation_id::WANDERING_PIXELS_ANIMATION);
 			meta.set(wandering);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_wandering_pixels_decorations::AQUARIUM_PIXELS_LIGHT);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::WANDERING_PIXELS_EFFECTS;
+
+				meta.set(render_def);
+			}
+
+			{
+				invariants::wandering_pixels wandering;
+				wandering.animation_id = to_animation_id(test_scene_plain_animation_id::WANDERING_PIXELS_ANIMATION);
+				wandering.max_direction_ms = 2000;
+				wandering.max_direction_ms = 700;
+				wandering.base_velocity = { 2, 20 };
+				meta.set(wandering);
+			}
+
+			{
+				components::wandering_pixels wandering;
+				wandering.keep_particles_within_bounds = true;
+				wandering.colorize = { 234, 228, 201, 255 };
+				wandering.particles_count = 15;
+				wandering.size = { 750, 750 };
+				meta.set(wandering);
+			}
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_wandering_pixels_decorations::AQUARIUM_PIXELS_DIM);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::DIM_WANDERING_PIXELS_EFFECTS;
+
+				meta.set(render_def);
+			}
+
+			{
+				invariants::wandering_pixels wandering;
+				wandering.animation_id = to_animation_id(test_scene_plain_animation_id::WANDERING_PIXELS_ANIMATION);
+				wandering.max_direction_ms = 500;
+				wandering.direction_interp_ms = 300;
+				wandering.base_velocity = { 40, 120 };
+				meta.set(wandering);
+			}
+
+			{
+				components::wandering_pixels wandering;
+				wandering.keep_particles_within_bounds = true;
+				wandering.colorize = { 234, 228, 201, 255 };
+				wandering.particles_count = 320;
+				wandering.size = { 750, 750 };
+				meta.set(wandering);
+			}
 		}
 
 		{

@@ -18,6 +18,7 @@
 enum class test_static_lights {
 	// GEN INTROSPECTOR enum class test_static_lights
 	STRONG_LAMP,
+	AQUARIUM_LAMP,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -37,6 +38,8 @@ enum class test_sprite_decorations {
 
 	DUNE_BIG,
 	DUNE_SMALL,
+
+	WATER_COLOR_OVERLAY,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -92,6 +95,9 @@ enum class test_shootable_charges {
 enum class test_wandering_pixels_decorations {
 	// GEN INTROSPECTOR enum class test_wandering_pixels_decorations
 	WANDERING_PIXELS,
+
+	AQUARIUM_PIXELS_LIGHT,
+	AQUARIUM_PIXELS_DIM,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -149,6 +155,7 @@ enum class test_complex_decorations {
 	DARKBLUE_FISH,
 	JELLYFISH,
 	DRAGON_FISH,
+	RAINBOW_DRAGON_FISH,
 
 	COUNT
 	// END GEN INTROSPECTOR

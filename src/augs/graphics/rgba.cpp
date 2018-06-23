@@ -126,3 +126,23 @@ rgba::operator ImVec4() const {
 		to_0_1(a)
 	};
 }
+
+#include "augs/log.h"
+
+void rgba::avoid_dark_blue_for_color_wave() {
+	if (b == 255) {
+		auto& f1 = g;
+		auto& f2 = r;
+		const auto threshold = 100;
+
+		if (f1 == 0) {
+			f2 = std::max(threshold, int(f2));
+		}
+		else {
+			if (f1 < threshold) {
+				f2 = threshold - f1 / 3;
+			}
+		}
+	}
+}
+

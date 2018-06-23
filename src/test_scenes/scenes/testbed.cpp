@@ -311,10 +311,49 @@ namespace test_scenes {
 		prefabs::create_rifle(step, vec2(400, -100), test_shootable_weapons::LEWSII, prefabs::create_magazine(step, vec2(100, -650), test_container_items::LEWSII_MAG, prefabs::create_steel_charge(step, vec2(0, 0)), 100));
 
 		const auto glass_size = get_size_of(test_scene_image_id::AQUARIUM_GLASS);
-		const auto aquarium_tr = transformr{vec2( -1024, 512) };
+		const auto aquarium_tr = transformr{vec2( -1024, -1024) };
 		const auto aquarium_size = get_size_of(test_scene_image_id::AQUARIUM_SAND_1);
 
 		const auto aquarium_origin = aquarium_tr + transformr(aquarium_size / 2);
+
+		{
+			vec2 lights[3] = {
+				{ -145, 417 },
+				vec2(193, 161) - vec2(160, 206),
+				{ 463, -145 }
+			};
+
+			rgba light_cols[3] = { 
+				rgba(0, 187, 190, 255),
+				rgba(0, 99, 126, 255),
+				rgba(0, 180, 59, 255)
+			};
+
+			for (int i = 0; i < 3; ++i) {
+				const auto l = create_test_scene_entity(world, test_static_lights::AQUARIUM_LAMP);
+				l.set_logic_transform(aquarium_tr + transformr(lights[i]));
+				auto& light = l.get<components::light>();
+				light.color = light_cols[i];
+			}
+		}
+
+		create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
+			auto& w = e.template get<components::wandering_pixels>();
+
+			w.colorize = cyan;
+			w.particles_count = 50;
+			w.size = { 750, 750 };
+			w.keep_particles_within_bounds = true;
+			e.set_logic_transform(aquarium_origin);
+		});
+
+		create_test_scene_entity(world, test_wandering_pixels_decorations::AQUARIUM_PIXELS_LIGHT, [&](const auto e){
+			e.set_logic_transform(aquarium_origin);
+		});
+
+		create_test_scene_entity(world, test_wandering_pixels_decorations::AQUARIUM_PIXELS_DIM, [&](const auto e){
+			e.set_logic_transform(aquarium_origin);
+		});
 
 		{
 			const auto gs = glass_size;
@@ -324,6 +363,8 @@ namespace test_scenes {
 				create_test_scene_entity(world, test_plain_sprited_bodys::AQUARIUM_GLASS, aquarium_origin.pos + aquarium_size + vec2(-gsh.x, gsh.y) - vec2(gs.x * g, 0));
 			}
 		}
+
+		create_test_scene_entity(world, test_sprite_decorations::WATER_COLOR_OVERLAY, aquarium_origin);
 
 		create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND_1, aquarium_tr);
 		create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND_1, aquarium_tr + transformr(vec2(aquarium_size.x, 0)));
@@ -339,6 +380,7 @@ namespace test_scenes {
 		const auto darkbluefish = test_complex_decorations::DARKBLUE_FISH;
 		const auto jellyfish = test_complex_decorations::JELLYFISH;
 		const auto dragon_fish = test_complex_decorations::DRAGON_FISH;
+		const auto rainbow_dragon_fish = test_complex_decorations::RAINBOW_DRAGON_FISH;
 
 		prefabs::create_fish(step, yellowfish, aquarium_tr - vec2(80, 10), aquarium_origin);
 		prefabs::create_fish(step, yellowfish, aquarium_tr + components::transform(vec2(80, 10), -180), aquarium_origin, 1);
@@ -375,6 +417,11 @@ namespace test_scenes {
 		prefabs::create_fish(step, dragon_fish, aquarium_tr + components::transform(vec2(290, 40), -180), aquarium_origin, 3);
 		prefabs::create_fish(step, dragon_fish, aquarium_tr - vec2(280, 150), aquarium_origin);
 		prefabs::create_fish(step, dragon_fish, aquarium_tr + components::transform(vec2(290, 60), -180), aquarium_origin, 3);
+
+		prefabs::create_fish(step, rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos - vec2(280, 130), aquarium_origin, 1);
+		prefabs::create_fish(step, rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos + vec2(290, 40), aquarium_origin, 4);
+		prefabs::create_fish(step, rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos - vec2(280, 150), aquarium_origin, 2);
+		prefabs::create_fish(step, rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos + vec2(290, 60), aquarium_origin, 3);
 
 		if (character(2).alive()) {
 			const auto second_machete = prefabs::create_cyan_urban_machete(step, vec2(0, 300));

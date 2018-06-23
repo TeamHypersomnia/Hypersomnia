@@ -166,6 +166,41 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_complex_decorations::RAINBOW_DRAGON_FISH);
+
+			invariants::render render_def;
+			render_def.layer = render_layer::BOTTOM_FISH;
+
+			meta.set(render_def);
+
+			{
+				auto& spr = test_flavours::add_sprite(meta, caches, test_scene_image_id::DRAGON_FISH_1, white, augs::sprite_special_effect::COLOR_WAVE);
+				spr.effect_speed_multiplier = 0.1f;
+			}
+
+			{
+				invariants::animation anim_def;
+				anim_def.id = to_animation_id(test_scene_plain_animation_id::DRAGON_FISH);
+				meta.set(anim_def);
+
+				components::animation anim;
+				anim.speed_factor = 0.2f;
+
+				meta.set(anim);
+			}
+
+			{
+				invariants::movement_path movement_path_def;
+				auto& square = movement_path_def.rect_bounded;
+				square.is_enabled = true;
+				square.value.rect_size = aquarium_size * 2;
+				square.value.base_speed = 200.f;
+				square.value.sine_speed_boost = 240.f;
+				meta.set(movement_path_def);
+			}
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_sprite_decorations::AQUARIUM_SAND_1);
 
 			{
@@ -220,6 +255,19 @@ namespace test_flavours {
 			test_scene_image_id::DUNE_BIG,
 			sand_color);
 		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_sprite_decorations::WATER_COLOR_OVERLAY);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::CAR_INTERIOR;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::BLANK, rgba(0, 75, 255, 46)).size = aquarium_size * 2;
+		}
 	}
 }
 
@@ -233,6 +281,8 @@ namespace prefabs {
 		const auto decor = create_test_scene_entity(step.get_cosmos(), t, pos);
 		decor.get<components::animation>().state.frame_num = frame_offset;
 		decor.get<components::movement_path>().origin = origin;
+		const auto secs = real32(frame_offset) * 7.23f;
+		decor.get<components::sprite>().effect_offset_secs = secs;
 		return decor;
 	}
 }

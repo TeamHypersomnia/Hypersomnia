@@ -89,6 +89,8 @@ struct rgba {
 
 	rgb_type rgb() const;
 
+	void avoid_dark_blue_for_color_wave();
+
 	template <class T>
 	T& stream_to(T& out) const {
 		const int ir = r;
