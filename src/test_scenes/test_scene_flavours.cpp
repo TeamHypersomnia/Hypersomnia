@@ -24,6 +24,8 @@ namespace test_flavours {
 		auto& flavours = in.flavours;
 		auto& caches = in.caches;
 
+		auto flavour_with_sprite = make_flavour_with_sprite(flavours, caches);
+
 		{
 			auto& meta = get_test_flavour(flavours, test_static_lights::STRONG_LAMP);
 
@@ -114,130 +116,75 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_sprite_decorations::HAVE_A_PLEASANT);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::NEON_CAPTIONS;
-
-				meta.set(render_def);
-			}
-
-			test_flavours::add_sprite(
-				meta, 
-				caches,
-				test_scene_image_id::HAVE_A_PLEASANT,
-				white
+			auto& meta = flavour_with_sprite(
+				test_sprite_decorations::SOIL,
+				test_scene_image_id::SOIL,
+				render_layer::GROUND,
+				gray1
 			);
+
+			invariants::ground ground_def;
+
+			footstep_effect_input dirt;
+			dirt.sound.id = to_sound_id(test_scene_sound_id::FOOTSTEP_DIRT);
+			dirt.sound.modifier.gain = .35f;
+			dirt.particles.id = to_particle_effect_id(test_scene_particle_effect_id::FOOTSTEP_SMOKE);
+
+			ground_def.footstep_effect.emplace(dirt);
+
+			meta.set(ground_def);
 		}
 
+		flavour_with_sprite(
+			test_sprite_decorations::ROAD_DIRT,
+			test_scene_image_id::ROAD_FRONT_DIRT,
+			render_layer::FLOOR_AND_ROAD
+		);
+
+		flavour_with_sprite(
+			test_sprite_decorations::ROAD,
+			test_scene_image_id::ROAD,
+			render_layer::FLOOR_AND_ROAD
+		);
+
 		{
-			auto& meta = get_test_flavour(flavours, test_sprite_decorations::SOIL);
+			auto& meta = flavour_with_sprite(
+				test_sprite_decorations::FLOOR,
+				test_scene_image_id::FLOOR,
+				render_layer::FLOOR_AND_ROAD
+			);
 
-			{
-				invariants::ground ground_def;
+			invariants::ground ground_def;
 
-				footstep_effect_input dirt;
-				dirt.sound.id = to_sound_id(test_scene_sound_id::FOOTSTEP_DIRT);
-				dirt.sound.modifier.gain = .35f;
-				dirt.particles.id = to_particle_effect_id(test_scene_particle_effect_id::FOOTSTEP_SMOKE);
+			footstep_effect_input dirt;
+			dirt.sound.id = to_sound_id(test_scene_sound_id::FOOTSTEP_FLOOR);
+			dirt.sound.modifier.gain = .6f;
+			dirt.sound.modifier.pitch = .9f;
+			dirt.particles.id = to_particle_effect_id(test_scene_particle_effect_id::FOOTSTEP_SMOKE);
 
-				ground_def.footstep_effect.emplace(dirt);
+			ground_def.footstep_effect.emplace(dirt);
 
-				meta.set(ground_def);
-			}
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::GROUND;
-
-				meta.set(render_def);
-			}
-
-			test_flavours::add_sprite(meta, caches,
-			test_scene_image_id::SOIL, gray1);
+			meta.set(ground_def);
 		}
-		{
-			auto& meta = get_test_flavour(flavours, test_sprite_decorations::ROAD_DIRT);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLOOR_AND_ROAD;
+		flavour_with_sprite(
+			test_sprite_decorations::HAVE_A_PLEASANT,
+			test_scene_image_id::HAVE_A_PLEASANT,
+			render_layer::NEON_CAPTIONS
+		);
 
-				meta.set(render_def);
-			}
-
-			test_flavours::add_sprite(meta, caches,
-			test_scene_image_id::ROAD_FRONT_DIRT, white);
-		}
-		{
-			auto& meta = get_test_flavour(flavours, test_sprite_decorations::ROAD);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLOOR_AND_ROAD;
-
-				meta.set(render_def);
-			}
-			test_flavours::add_sprite(meta, caches,
-						test_scene_image_id::ROAD, white);
-		}
-		{
-			auto& meta = get_test_flavour(flavours, test_sprite_decorations::FLOOR);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::FLOOR_AND_ROAD;
-
-				meta.set(render_def);
-			}
-
-			{
-				invariants::ground ground_def;
-
-				footstep_effect_input dirt;
-				dirt.sound.id = to_sound_id(test_scene_sound_id::FOOTSTEP_FLOOR);
-				dirt.sound.modifier.gain = .6f;
-				dirt.sound.modifier.pitch = .9f;
-				dirt.particles.id = to_particle_effect_id(test_scene_particle_effect_id::FOOTSTEP_SMOKE);
-
-				ground_def.footstep_effect.emplace(dirt);
-
-				meta.set(ground_def);
-			}
-
-			test_flavours::add_sprite(meta, caches,
-			test_scene_image_id::FLOOR, white);
-		}
-		{
-			auto& meta = get_test_flavour(flavours, test_sprite_decorations::AWAKENING);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::NEON_CAPTIONS;
-
-				meta.set(render_def);
-			}
-			test_flavours::add_sprite(meta, caches,
+		flavour_with_sprite(
+			test_sprite_decorations::AWAKENING,
 			test_scene_image_id::AWAKENING,
+			render_layer::NEON_CAPTIONS,
 			white,
 			augs::sprite_special_effect::COLOR_WAVE
 		);
-		}
 
-		{
-			auto& meta = get_test_flavour(flavours, test_sprite_decorations::METROPOLIS);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::NEON_CAPTIONS;
-
-				meta.set(render_def);
-			}
-			test_flavours::add_sprite(meta, caches,
-					test_scene_image_id::METROPOLIS,
-					white);
-		}
-
+		flavour_with_sprite(
+			test_sprite_decorations::METROPOLIS,
+			test_scene_image_id::METROPOLIS,
+			render_layer::NEON_CAPTIONS
+		);
 	}
 }

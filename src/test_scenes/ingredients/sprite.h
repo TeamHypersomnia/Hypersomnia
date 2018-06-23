@@ -35,4 +35,30 @@ namespace test_flavours {
 	) {
 		return add_sprite(t, caches, to_image_id(id), col, effect); 
 	}
+
+	template <class T, class C>
+	auto make_flavour_with_sprite(T& flavours, C& caches) {
+		auto lbd = [&](
+			const auto flavour_id,
+			const auto image_id,
+			const render_layer layer,
+			const rgba color = white,
+			const augs::sprite_special_effect effect = augs::sprite_special_effect::NONE
+		) -> auto& {
+			auto& meta = get_test_flavour(flavours, flavour_id);
+
+			{
+				invariants::render render_def;
+				render_def.layer = layer;
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, image_id, color, effect);
+
+			return meta;
+		};
+
+		return lbd;
+	}
+
 }

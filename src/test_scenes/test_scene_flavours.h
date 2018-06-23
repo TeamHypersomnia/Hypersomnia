@@ -46,6 +46,9 @@ enum class test_sprite_decorations {
 	DUNE_BIG,
 	DUNE_SMALL,
 
+	AQUARIUM_SAND_EDGE,
+	AQUARIUM_SAND_CORNER,
+
 	WATER_COLOR_OVERLAY,
 
 	COUNT

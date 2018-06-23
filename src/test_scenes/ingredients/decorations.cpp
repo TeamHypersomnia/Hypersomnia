@@ -9,18 +9,17 @@ namespace test_flavours {
 		auto& caches = in.caches;
 		auto& flavours = in.flavours;
 
+		auto flavour_with_sprite = make_flavour_with_sprite(flavours, caches);
+
 		const auto aquarium_size = caches.at(to_image_id(test_scene_image_id::AQUARIUM_SAND_1)).get_original_size();
 		const auto sand_color = rgba(129, 129, 129, 255);
 
 		{
-			auto& meta = get_test_flavour(flavours, test_complex_decorations::ROTATING_FAN);
-
-			invariants::render render_def;
-			render_def.layer = render_layer::ON_FLOOR;
-
-			meta.set(render_def);
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::FAN, white);
+			auto& meta = flavour_with_sprite(
+				test_complex_decorations::ROTATING_FAN,
+				test_scene_image_id::FAN,
+				render_layer::ON_FLOOR
+			);
 
 			{
 				invariants::movement_path movement_path_def;
@@ -43,19 +42,27 @@ namespace test_flavours {
 			}
 		}
 
-		{
-			auto& meta = get_test_flavour(flavours, test_complex_decorations::YELLOW_FISH);
-
-			invariants::render render_def;
-			render_def.layer = render_layer::UPPER_FISH;
-
-			meta.set(render_def);
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::YELLOW_FISH_1, white);
+		auto fish_flavour = [&](
+			const auto flavour_id,
+			const auto sprite_id,
+			const auto animation_id,
+			const auto layer,
+			const int base_speed = 80,
+			const int sine_speed_boost = 100,
+			const augs::sprite_special_effect effect = augs::sprite_special_effect::NONE
+		
+		) {
+			auto& meta = flavour_with_sprite(
+				flavour_id,
+				sprite_id,
+				layer,
+				white,
+				effect
+			);
 
 			{
 				invariants::animation anim_def;
-				anim_def.id = to_animation_id(test_scene_plain_animation_id::YELLOW_FISH);
+				anim_def.id = to_animation_id(animation_id);
 				meta.set(anim_def);
 
 				components::animation anim;
@@ -69,278 +76,136 @@ namespace test_flavours {
 				auto& square = movement_path_def.rect_bounded;
 				square.is_enabled = true;
 				square.value.rect_size = aquarium_size * 2;
+				square.value.base_speed = base_speed;
+				square.value.sine_speed_boost = sine_speed_boost;
 				meta.set(movement_path_def);
 			}
-		}
+		};
 
-		{
-			auto& meta = get_test_flavour(flavours, test_complex_decorations::DARKBLUE_FISH);
+		fish_flavour(
+			test_complex_decorations::YELLOW_FISH,
+			test_scene_image_id::YELLOW_FISH_1,
+			test_scene_plain_animation_id::YELLOW_FISH,
+			render_layer::UPPER_FISH
+		);
 
-			invariants::render render_def;
-			render_def.layer = render_layer::UPPER_FISH;
+		fish_flavour(
+			test_complex_decorations::DARKBLUE_FISH,
+			test_scene_image_id::DARKBLUE_FISH_1,
+			test_scene_plain_animation_id::DARKBLUE_FISH,
+			render_layer::UPPER_FISH
+		);
 
-			meta.set(render_def);
+		fish_flavour(
+			test_complex_decorations::JELLYFISH,
+			test_scene_image_id::JELLYFISH_1,
+			test_scene_plain_animation_id::JELLYFISH,
+			render_layer::UPPER_FISH
+		);
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::DARKBLUE_FISH_1, white);
+		fish_flavour(
+			test_complex_decorations::DRAGON_FISH,
+			test_scene_image_id::DRAGON_FISH_1,
+			test_scene_plain_animation_id::DRAGON_FISH,
+			render_layer::BOTTOM_FISH,
+			160,
+			200
+		);
 
-			{
-				invariants::animation anim_def;
-				anim_def.id = to_animation_id(test_scene_plain_animation_id::DARKBLUE_FISH);
-				meta.set(anim_def);
+		fish_flavour(
+			test_complex_decorations::RAINBOW_DRAGON_FISH,
+			test_scene_image_id::DRAGON_FISH_1,
+			test_scene_plain_animation_id::DRAGON_FISH,
+			render_layer::BOTTOM_FISH,
+			160,
+			200,
+			augs::sprite_special_effect::COLOR_WAVE
+		);
 
-				components::animation anim;
-				anim.speed_factor = 0.2f;
-
-				meta.set(anim);
-			}
-
-			{
-				invariants::movement_path movement_path_def;
-				auto& square = movement_path_def.rect_bounded;
-				square.is_enabled = true;
-				square.value.rect_size = aquarium_size * 2;
-				meta.set(movement_path_def);
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_complex_decorations::JELLYFISH);
-
-			invariants::render render_def;
-			render_def.layer = render_layer::UPPER_FISH;
-
-			meta.set(render_def);
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::JELLYFISH_1, white);
-
-			{
-				invariants::animation anim_def;
-				anim_def.id = to_animation_id(test_scene_plain_animation_id::JELLYFISH);
-				meta.set(anim_def);
-
-				components::animation anim;
-				anim.speed_factor = 0.2f;
-
-				meta.set(anim);
-			}
-
-			{
-				invariants::movement_path movement_path_def;
-				auto& square = movement_path_def.rect_bounded;
-				square.is_enabled = true;
-				square.value.rect_size = aquarium_size * 2;
-				meta.set(movement_path_def);
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_complex_decorations::DRAGON_FISH);
-
-			invariants::render render_def;
-			render_def.layer = render_layer::BOTTOM_FISH;
-
-			meta.set(render_def);
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::DRAGON_FISH_1, white);
-
-			{
-				invariants::animation anim_def;
-				anim_def.id = to_animation_id(test_scene_plain_animation_id::DRAGON_FISH);
-				meta.set(anim_def);
-
-				components::animation anim;
-				anim.speed_factor = 0.2f;
-
-				meta.set(anim);
-			}
-
-			{
-				invariants::movement_path movement_path_def;
-				auto& square = movement_path_def.rect_bounded;
-				square.is_enabled = true;
-				square.value.rect_size = aquarium_size * 2;
-				square.value.base_speed = 160.f;
-				square.value.sine_speed_boost = 200.f;
-				meta.set(movement_path_def);
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_complex_decorations::RAINBOW_DRAGON_FISH);
-
-			invariants::render render_def;
-			render_def.layer = render_layer::BOTTOM_FISH;
-
-			meta.set(render_def);
-
-			{
-				auto& spr = test_flavours::add_sprite(meta, caches, test_scene_image_id::DRAGON_FISH_1, white, augs::sprite_special_effect::COLOR_WAVE);
-				spr.effect_speed_multiplier = 0.1f;
-			}
-
-			{
-				invariants::animation anim_def;
-				anim_def.id = to_animation_id(test_scene_plain_animation_id::DRAGON_FISH);
-				meta.set(anim_def);
-
-				components::animation anim;
-				anim.speed_factor = 0.2f;
-
-				meta.set(anim);
-			}
-
-			{
-				invariants::movement_path movement_path_def;
-				auto& square = movement_path_def.rect_bounded;
-				square.is_enabled = true;
-				square.value.rect_size = aquarium_size * 2;
-				square.value.base_speed = 200.f;
-				square.value.sine_speed_boost = 240.f;
-				meta.set(movement_path_def);
-			}
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_sprite_decorations::AQUARIUM_BOTTOM_LAMP_BODY);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::ON_ON_FLOOR;
-
-				meta.set(render_def);
-			}
-
-			test_flavours::add_sprite(meta, caches,
+		flavour_with_sprite(
+			test_sprite_decorations::AQUARIUM_BOTTOM_LAMP_BODY,
 			test_scene_image_id::AQUARIUM_BOTTOM_LAMP_BODY,
-			white);
-		}
+			render_layer::ON_ON_FLOOR
+		);
 
-		{
-			auto& meta = get_test_flavour(flavours, test_sprite_decorations::AQUARIUM_BOTTOM_LAMP_LIGHT);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::ON_ON_FLOOR;
-
-				meta.set(render_def);
-			}
-
-			test_flavours::add_sprite(meta, caches,
+		flavour_with_sprite(
+			test_sprite_decorations::AQUARIUM_BOTTOM_LAMP_LIGHT,
 			test_scene_image_id::AQUARIUM_BOTTOM_LAMP_LIGHT,
-			white);
-		}
+			render_layer::ON_ON_FLOOR
+		);
 
-		{
-			auto& meta = get_test_flavour(flavours, test_sprite_decorations::AQUARIUM_HALOGEN_1_BODY);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::ON_ON_FLOOR;
-
-				meta.set(render_def);
-			}
-
-			test_flavours::add_sprite(meta, caches,
+		flavour_with_sprite(
+			test_sprite_decorations::AQUARIUM_HALOGEN_1_BODY,
 			test_scene_image_id::AQUARIUM_HALOGEN_1_BODY,
-			white);
-		}
+			render_layer::ON_ON_FLOOR
+		);
 
-		{
-			auto& meta = get_test_flavour(flavours, test_sprite_decorations::AQUARIUM_HALOGEN_1_LIGHT);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::ON_ON_FLOOR;
-
-				meta.set(render_def);
-			}
-
-			test_flavours::add_sprite(meta, caches,
+		flavour_with_sprite(
+			test_sprite_decorations::AQUARIUM_HALOGEN_1_LIGHT,
 			test_scene_image_id::AQUARIUM_HALOGEN_1_LIGHT,
-			white);
-		}
+			render_layer::ON_ON_FLOOR
+		);
 
-		{
-			auto& meta = get_test_flavour(flavours, test_sprite_decorations::AQUARIUM_SAND_1);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::ON_FLOOR;
-
-				meta.set(render_def);
-			}
-			test_flavours::add_sprite(meta, caches,
+		flavour_with_sprite(
+			test_sprite_decorations::AQUARIUM_SAND_1,
 			test_scene_image_id::AQUARIUM_SAND_1,
-			sand_color);
-		}
+			render_layer::ON_FLOOR,
+			sand_color
+		);
 
-		{
-			auto& meta = get_test_flavour(flavours, test_sprite_decorations::AQUARIUM_SAND_2);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::ON_FLOOR;
-
-				meta.set(render_def);
-			}
-			test_flavours::add_sprite(meta, caches,
+		flavour_with_sprite(
+			test_sprite_decorations::AQUARIUM_SAND_2,
 			test_scene_image_id::AQUARIUM_SAND_2,
-			sand_color);
-		}
+			render_layer::ON_FLOOR,
+			sand_color
+		);
 
-		{
-			auto& meta = get_test_flavour(flavours, test_sprite_decorations::DUNE_SMALL);
+		flavour_with_sprite(
+			test_sprite_decorations::AQUARIUM_SAND_EDGE,
+			test_scene_image_id::AQUARIUM_SAND_EDGE,
+			render_layer::AQUARIUM_DUNES,
+			sand_color
+		);
 
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::AQUARIUM_DUNES;
+		flavour_with_sprite(
+			test_sprite_decorations::AQUARIUM_SAND_CORNER,
+			test_scene_image_id::AQUARIUM_SAND_CORNER,
+			render_layer::SMALL_DYNAMIC_BODY,
+			sand_color
+		);
 
-				meta.set(render_def);
-			}
-			test_flavours::add_sprite(meta, caches,
+		flavour_with_sprite(
+			test_sprite_decorations::DUNE_SMALL,
 			test_scene_image_id::DUNE_SMALL,
-			sand_color);
-		}
+			render_layer::AQUARIUM_DUNES,
+			sand_color
+		);
 
-		{
-			auto& meta = get_test_flavour(flavours, test_sprite_decorations::DUNE_BIG);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::AQUARIUM_DUNES;
-
-				meta.set(render_def);
-			}
-			test_flavours::add_sprite(meta, caches,
+		flavour_with_sprite(
+			test_sprite_decorations::DUNE_BIG,
 			test_scene_image_id::DUNE_BIG,
-			sand_color);
+			render_layer::AQUARIUM_DUNES,
+			sand_color
+		);
+
+		{
+			auto& meta = flavour_with_sprite(
+				test_sprite_decorations::WATER_COLOR_OVERLAY,
+				test_scene_image_id::BLANK,
+				render_layer::CAR_INTERIOR,
+				rgba(0, 75, 255, 46)
+			);
+
+			meta.get<invariants::sprite>().size = aquarium_size * 2;
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_sprite_decorations::WATER_COLOR_OVERLAY);
-
-			{
-				invariants::render render_def;
-				render_def.layer = render_layer::CAR_INTERIOR;
-
-				meta.set(render_def);
-			}
-
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::BLANK, rgba(0, 75, 255, 46)).size = aquarium_size * 2;
-		}
-
-		{
-			auto& meta = get_test_flavour(flavours, test_complex_decorations::WATER_SURFACE);
-
-			invariants::render render_def;
-			render_def.layer = render_layer::CAR_WHEEL;
-
-			meta.set(render_def);
-
-			{
-				auto& spr = test_flavours::add_sprite(meta, caches, test_scene_image_id::WATER_SURFACE_1, white);
-				spr.color.a = 0;
-			}
+			auto& meta = flavour_with_sprite(
+				test_complex_decorations::WATER_SURFACE,
+				test_scene_image_id::WATER_SURFACE_1,
+				render_layer::CAR_WHEEL,
+				rgba(white.rgb(), 0)
+			);
 
 			{
 				invariants::animation anim_def;
