@@ -1014,3 +1014,6 @@ we consider whole type overrides too complex architeciturally:
 - Fix imperfection when duplicating vertically
 	- will b problematic for both axes
 
+- Add slight, disappearing (by shrinking) particles for glass impact
+	- What if we could sometime make it so that they stay? And we could synchronize permanently sitting particles through the network?
+
