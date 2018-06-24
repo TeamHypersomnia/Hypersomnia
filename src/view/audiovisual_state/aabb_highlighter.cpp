@@ -20,6 +20,7 @@ bool aabb_highlighter::is_hoverable(const const_entity_handle e) {
 			case render_layer::SMALL_DYNAMIC_BODY: return true;
 			case render_layer::SENTIENCES: return true;
 			case render_layer::DYNAMIC_BODY: return true;
+			case render_layer::GLASS_BODY: return true;
 			case render_layer::CAR_INTERIOR: return true;
 			case render_layer::CAR_WHEEL: return true;
 			default: return false;

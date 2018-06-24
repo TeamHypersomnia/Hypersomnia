@@ -262,6 +262,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	standard_shader.set_as_current();
 
 	draw_neons(render_layer::DYNAMIC_BODY);
+	draw_neons(render_layer::GLASS_BODY);
 	draw_neons(render_layer::SMALL_DYNAMIC_BODY);
 	draw_neons(render_layer::SENTIENCES);
 	draw_neons(render_layer::FLYING_BULLETS);

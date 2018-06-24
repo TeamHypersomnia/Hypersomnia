@@ -39,59 +39,66 @@ namespace filters {
 		return out;
 	}
 
-	b2Filter line_of_sight_candidates() {
-		b2Filter out;
-		out.categoryBits = RENDERABLE_QUERY;
-		out.maskBits = DYNAMIC_OBJECT | BULLET;
-		return out;
-	}
+	/* b2Filter line_of_sight_candidates() { */
+	/* 	b2Filter out; */
+	/* 	out.categoryBits = RENDERABLE_QUERY; */
+	/* 	out.maskBits = DYNAMIC_OBJECT | BULLET; */
+	/* 	return out; */
+	/* } */
 
 	b2Filter controlled_character() {
 		b2Filter out;
 		out.categoryBits = RENDERABLE | CONTROLLED_CHARACTER | DYNAMIC_OBJECT;
-		out.maskBits = RENDERABLE_QUERY | CONTROLLED_CHARACTER | STATIC_OBJECT | DYNAMIC_OBJECT | FRICTION_GROUND | TRIGGER | BULLET | SHELL;
+		out.maskBits = RENDERABLE_QUERY | CONTROLLED_CHARACTER | STATIC_OBJECT | DYNAMIC_OBJECT | FRICTION_GROUND | TRIGGER | BULLET | SHELL | GLASS_OBSTACLE;
 		return out;
 	}
 	
 	b2Filter friction_ground() {
 		b2Filter out;
 		out.categoryBits = RENDERABLE | FRICTION_GROUND;
-		out.maskBits = RENDERABLE_QUERY | CONTROLLED_CHARACTER | STATIC_OBJECT | DYNAMIC_OBJECT | FRICTION_GROUND | SHELL;
+		out.maskBits = RENDERABLE_QUERY | CONTROLLED_CHARACTER | STATIC_OBJECT | DYNAMIC_OBJECT | FRICTION_GROUND | SHELL | GLASS_OBSTACLE;
 		return out;
 	}
 
 	b2Filter dynamic_object() {
 		b2Filter out;
 		out.categoryBits = SIGHT_OBSTRUCTION | PATHFINDING_OBSTRUCTION | RENDERABLE | DYNAMIC_OBJECT;
-		out.maskBits = SIGHT_QUERY | PATHFINDING_QUERY | RENDERABLE_QUERY | CONTROLLED_CHARACTER | STATIC_OBJECT | DYNAMIC_OBJECT | FRICTION_GROUND | BULLET | SHELL;
+		out.maskBits = SIGHT_QUERY | PATHFINDING_QUERY | RENDERABLE_QUERY | CONTROLLED_CHARACTER | STATIC_OBJECT | DYNAMIC_OBJECT | FRICTION_GROUND | BULLET | SHELL | GLASS_OBSTACLE;
 		return out;
 	}
 
 	b2Filter see_through_dynamic_object() {
 		b2Filter out;
 		out.categoryBits = RENDERABLE | DYNAMIC_OBJECT;
-		out.maskBits = RENDERABLE_QUERY | CONTROLLED_CHARACTER | STATIC_OBJECT | DYNAMIC_OBJECT | FRICTION_GROUND | BULLET | SHELL;
+		out.maskBits = RENDERABLE_QUERY | CONTROLLED_CHARACTER | STATIC_OBJECT | DYNAMIC_OBJECT | FRICTION_GROUND | BULLET | SHELL | GLASS_OBSTACLE;
 		return out;
 	}
 
-	b2Filter static_object() {
-		b2Filter out;
-		out.categoryBits = SIGHT_OBSTRUCTION | PATHFINDING_OBSTRUCTION | RENDERABLE | STATIC_OBJECT;
-		out.maskBits = SIGHT_QUERY | PATHFINDING_QUERY | RENDERABLE_QUERY | CONTROLLED_CHARACTER | DYNAMIC_OBJECT | FRICTION_GROUND | BULLET | SHELL;
-		return out;
-	}
+	/* b2Filter static_object() { */
+	/* 	b2Filter out; */
+	/* 	out.categoryBits = SIGHT_OBSTRUCTION | PATHFINDING_OBSTRUCTION | RENDERABLE | STATIC_OBJECT; */
+	/* 	out.maskBits = SIGHT_QUERY | PATHFINDING_QUERY | RENDERABLE_QUERY | CONTROLLED_CHARACTER | DYNAMIC_OBJECT | FRICTION_GROUND | BULLET | SHELL | GLASS_OBSTACLE; */
+	/* 	return out; */
+	/* } */
 
 	b2Filter shell() {
 		b2Filter out;
 		out.categoryBits = RENDERABLE | SHELL;
-		out.maskBits = RENDERABLE_QUERY | CONTROLLED_CHARACTER | STATIC_OBJECT | DYNAMIC_OBJECT | FRICTION_GROUND | SHELL;
+		out.maskBits = RENDERABLE_QUERY | CONTROLLED_CHARACTER | STATIC_OBJECT | DYNAMIC_OBJECT | FRICTION_GROUND | SHELL | GLASS_OBSTACLE;
+		return out;
+	}
+
+	b2Filter glass_obstacle() {
+		b2Filter out;
+		out.categoryBits = PATHFINDING_OBSTRUCTION | RENDERABLE | GLASS_OBSTACLE;
+		out.maskBits = PATHFINDING_QUERY | RENDERABLE_QUERY | CONTROLLED_CHARACTER | DYNAMIC_OBJECT | FRICTION_GROUND | BULLET | SHELL;
 		return out;
 	}
 
 	b2Filter bullet() {
 		b2Filter out;
 		out.categoryBits = RENDERABLE | BULLET;
-		out.maskBits = RENDERABLE_QUERY | CONTROLLED_CHARACTER | STATIC_OBJECT | DYNAMIC_OBJECT;
+		out.maskBits = RENDERABLE_QUERY | CONTROLLED_CHARACTER | STATIC_OBJECT | DYNAMIC_OBJECT | GLASS_OBSTACLE;
 		return out;
 	}
 

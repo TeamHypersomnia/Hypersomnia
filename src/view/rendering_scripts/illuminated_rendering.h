@@ -307,6 +307,7 @@ void illuminated_rendering(
 	
 	draw_layer(render_layer::DYNAMIC_BODY);
 	draw_layer(render_layer::SMALL_DYNAMIC_BODY);
+	draw_layer(render_layer::GLASS_BODY);
 	draw_layer(render_layer::SENTIENCES);
 	
 	renderer.call_and_clear_triangles();

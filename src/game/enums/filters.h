@@ -13,9 +13,10 @@ namespace filters {
 		RENDERABLE = 1 << 9,
 		RENDERABLE_QUERY = 1 << 10,
 		SHELL = 1 << 11,
-		PATHFINDING_OBSTRUCTION = 1 << 13,
-		PATHFINDING_QUERY = 1 << 14,
-		SIGHT_QUERY = 1 << 14,
+		GLASS_OBSTACLE = 1 << 12,
+		PATHFINDING_OBSTRUCTION = 1 << 14,
+		PATHFINDING_QUERY = 1 << 15,
+		SIGHT_QUERY = 1 << 15,
 	};
 
 	b2Filter none();
@@ -28,6 +29,7 @@ namespace filters {
 	b2Filter see_through_dynamic_object();
 	b2Filter static_object();
 	b2Filter shell();
+	b2Filter glass_obstacle();
 	b2Filter bullet();
 	b2Filter pathfinding_query();
 	b2Filter line_of_sight_query();

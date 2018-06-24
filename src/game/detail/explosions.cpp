@@ -78,7 +78,7 @@ void standard_explosion_input::instantiate(
 
 	messages::visibility_information_request request;
 	request.eye_transform = explosion_location;
-	request.filter = filters::line_of_sight_query();
+	request.filter = filters::pathfinding_query();
 	request.square_side = effective_radius * 2;
 	request.subject = subject_if_any;
 

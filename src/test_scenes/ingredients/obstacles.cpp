@@ -62,12 +62,14 @@ namespace test_flavours {
 			fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::METAL);
 		}
 
+		const auto glass_alpha = 130;
+
 		{
 			auto& meta = flavour_with_sprite(
 				test_plain_sprited_bodys::AQUARIUM_GLASS,
 				test_scene_image_id::AQUARIUM_GLASS,
-				render_layer::DYNAMIC_BODY,
-				rgba(white.rgb(), 200)
+				render_layer::GLASS_BODY,
+				rgba(white.rgb(), glass_alpha)
 			);
 
 			add_shape_invariant_from_renderable(meta, caches);
@@ -76,6 +78,7 @@ namespace test_flavours {
 
 			auto& fixtures_def = meta.get<invariants::fixtures>();
 
+			fixtures_def.filter = filters::glass_obstacle();
 			fixtures_def.restitution = 0.5f;
 			fixtures_def.density = 100.f;
 			fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::GLASS);
@@ -85,8 +88,8 @@ namespace test_flavours {
 			auto& meta = flavour_with_sprite(
 				test_plain_sprited_bodys::AQUARIUM_GLASS_START,
 				test_scene_image_id::AQUARIUM_GLASS_START,
-				render_layer::DYNAMIC_BODY,
-				rgba(white.rgb(), 200)
+				render_layer::GLASS_BODY,
+				rgba(white.rgb(), glass_alpha)
 			);
 
 			add_shape_invariant_from_renderable(meta, caches);
@@ -95,6 +98,7 @@ namespace test_flavours {
 
 			auto& fixtures_def = meta.get<invariants::fixtures>();
 
+			fixtures_def.filter = filters::glass_obstacle();
 			fixtures_def.restitution = 0.5f;
 			fixtures_def.density = 100.f;
 			fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::GLASS);
