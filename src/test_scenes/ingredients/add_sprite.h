@@ -45,7 +45,8 @@ namespace test_flavours {
 			const auto image_id,
 			const render_layer layer,
 			const rgba color = white,
-			const augs::sprite_special_effect effect = augs::sprite_special_effect::NONE
+			const augs::sprite_special_effect effect = augs::sprite_special_effect::NONE,
+			const float effect_speed = 1.f
 		) -> auto& {
 			auto& meta = get_test_flavour(flavours, flavour_id);
 
@@ -55,7 +56,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, image_id, color, effect);
+			test_flavours::add_sprite(meta, caches, image_id, color, effect).effect_speed_multiplier = effect_speed;
 
 			return meta;
 		};

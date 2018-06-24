@@ -55,7 +55,8 @@ namespace test_flavours {
 				sprite_id,
 				layer,
 				white,
-				effect
+				effect,
+				0.15f
 			);
 
 			{
@@ -201,9 +202,10 @@ namespace test_flavours {
 			auto& meta = flavour_with_sprite(
 				test_complex_decorations::WATER_SURFACE,
 				test_scene_image_id::WATER_SURFACE_1,
-				render_layer::CAR_WHEEL,
-				rgba(white.rgb(), 0)
+				render_layer::CAR_WHEEL
 			);
+
+			meta.get<invariants::sprite>().color.a = 0;
 
 			{
 				invariants::animation anim_def;

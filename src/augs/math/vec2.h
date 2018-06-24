@@ -72,13 +72,13 @@ namespace augs {
 		}
 		if (augs::compare(degrees, static_cast<d>(180))) {
 			v -= origin;
-			v = v.opposite();
+			v.neg();
 			v += origin;
 			return static_cast<d>(180);
 		}
 		if (augs::compare(degrees, static_cast<d>(-180))) {
 			v -= origin;
-			v = v.opposite();
+			v.neg();
 			v += origin;
 			return static_cast<d>(-180);
 		}
@@ -408,8 +408,10 @@ struct basic_vec2 {
 		return basic_vec2(-y, x);
 	}
 
-	basic_vec2 opposite() const {
-		return basic_vec2(-x, -y);
+	basic_vec2& neg() {
+		x = -x;
+		y = -y;
+		return *this;
 	}
 
 	template<class t>
@@ -475,13 +477,18 @@ struct basic_vec2 {
 		return *this;
 	}
 
-	basic_vec2& negate_x() {
+	basic_vec2& neg_x() {
 		x = -x;
 		return *this;
 	}
 
-	basic_vec2& negate_y() {
+	basic_vec2& neg_y() {
 		y = -y;
+		return *this;
+	}
+
+	basic_vec2& flip() {
+		std::swap(x, y);
 		return *this;
 	}
 

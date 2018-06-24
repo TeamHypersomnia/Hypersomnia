@@ -5,6 +5,7 @@
 #pragma warning(disable : 4244)
 #endif
 #include "augs/templates/algorithm_templates.h"
+#include "augs/math/cascade_aligner.h"
 #include "game/assets/ids/asset_ids.h"
 #include "game/assets/all_logical_assets.h"
 
@@ -314,6 +315,11 @@ namespace test_scenes {
 		const auto aquarium_size = get_size_of(test_scene_image_id::AQUARIUM_SAND_1);
 
 		const auto aquarium_origin = aquarium_tr + transformr(aquarium_size / 2);
+		const auto whole_aquarium_size = aquarium_size * 2;
+
+		auto aquarium_align = [&](vec2i size) {
+			return make_cascade_aligner(aquarium_origin.pos, whole_aquarium_size, size);
+		};
 
 		{
 			vec2 lights[3] = {
@@ -455,13 +461,34 @@ namespace test_scenes {
 
 		{
 			const auto glass_size = get_size_of(test_scene_image_id::AQUARIUM_GLASS);
+			const auto glass_start_size = get_size_of(test_scene_image_id::AQUARIUM_GLASS_START);
 
-			const auto s = glass_size;
-			const auto h = glass_size / 2;
+			auto glasses = aquarium_align(glass_size);
 
-			for (int g = 0; g < (aquarium_size * 2).x / s.x; ++g) {
-				create_test_scene_entity(world, test_plain_sprited_bodys::AQUARIUM_GLASS, aquarium_origin.pos + aquarium_size + vec2(-h.x, h.y) - vec2(s.x * g, 0));
+			glasses.li().bo().nr();
+
+			auto left_glass_edge = glasses.clone();
+			left_glass_edge.next(glass_start_size).lo();
+
+			glasses.push().fill_ri().pop();
+
+			auto right_glass_edge = glasses.clone();
+			right_glass_edge.next(glass_start_size).ro();
+
+			for (const auto p : glasses) {
+				create_test_scene_entity(world, test_plain_sprited_bodys::AQUARIUM_GLASS, p.result());
 			}
+
+			create_test_scene_entity(world, test_plain_sprited_bodys::AQUARIUM_GLASS_START, left_glass_edge.result());
+			create_test_scene_entity(world, test_plain_sprited_bodys::AQUARIUM_GLASS_START, right_glass_edge.result()).flip_horizontally();
+
+			const auto wall_end_size = get_size_of(test_scene_image_id::LAB_WALL_SMOOTH_END);
+
+			auto left_wall_end = aquarium_align(wall_end_size).li().bo();
+			auto right_wall_end = aquarium_align(wall_end_size).ri().bo();
+
+			create_test_scene_entity(world, test_plain_sprited_bodys::LAB_WALL_SMOOTH_END, left_wall_end.result());
+			create_test_scene_entity(world, test_plain_sprited_bodys::LAB_WALL_SMOOTH_END, right_wall_end.result()).flip_horizontally();
 		}
 
 		{
