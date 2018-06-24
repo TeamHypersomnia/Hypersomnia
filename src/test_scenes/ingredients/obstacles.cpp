@@ -62,7 +62,8 @@ namespace test_flavours {
 			fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::METAL);
 		}
 
-		const auto glass_alpha = 130;
+		const auto glass_alpha = 60;
+		const auto glass_neon_alpha = 130;
 
 		{
 			auto& meta = flavour_with_sprite(
@@ -71,6 +72,9 @@ namespace test_flavours {
 				render_layer::GLASS_BODY,
 				rgba(white.rgb(), glass_alpha)
 			);
+
+			meta.get<invariants::sprite>().color.a = glass_alpha;
+			meta.get<invariants::sprite>().neon_color.a = glass_neon_alpha;
 
 			add_shape_invariant_from_renderable(meta, caches);
 
@@ -89,8 +93,10 @@ namespace test_flavours {
 				test_plain_sprited_bodys::AQUARIUM_GLASS_START,
 				test_scene_image_id::AQUARIUM_GLASS_START,
 				render_layer::GLASS_BODY,
-				rgba(white.rgb(), glass_alpha)
+				rgba(white.rgb())
 			);
+			meta.get<invariants::sprite>().color.a = glass_alpha;
+			meta.get<invariants::sprite>().neon_color.a = glass_neon_alpha;
 
 			add_shape_invariant_from_renderable(meta, caches);
 
