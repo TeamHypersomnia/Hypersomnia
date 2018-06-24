@@ -77,8 +77,8 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 		) {
 			const auto& trace_def = deleted_entity.get<invariants::trace>();
 
+			// TODO: Rely on create entity returning dead handle
 			if (!trace_def.finishing_trace_flavour.is_set()) {
-				warning_unset_field(deleted_entity, "invariants::trace::finishing_trace_flavour");
 				continue;
 			}
 		
@@ -92,14 +92,13 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 				;
 			}
 
-			const auto finishing_trace = cosmic::create_entity(
+			if (const auto finishing_trace = cosmic::create_entity(
 				cosmos, 
 				trace_def.finishing_trace_flavour,
 				[&](const auto typed_handle) {
 					typed_handle.set_logic_transform(transform_of_finishing);
 				},
 				[&](const auto typed_handle) {
-
 					{
 						auto& interp = typed_handle.template get<components::interpolation>();
 						interp.place_of_birth = transform_of_finishing;
@@ -113,13 +112,13 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 						copied_trace.is_it_a_finishing_trace = true;
 					}
 				}
-			);
+			)) {
+				messages::interpolation_correction_request request;
+				request.subject = finishing_trace;
+				request.set_previous_transform_from = deleted_entity;
 
-			messages::interpolation_correction_request request;
-			request.subject = finishing_trace;
-			request.set_previous_transform_from = deleted_entity;
-
-			step.post_message(request);
+				step.post_message(request);
+			}
 		}
 	}
 }

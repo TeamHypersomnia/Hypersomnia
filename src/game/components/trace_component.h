@@ -23,7 +23,8 @@ namespace components {
 		vec2 last_center_offset_mult;
 
 		bool is_it_a_finishing_trace = false;
-		pad_bytes<3> pad;
+		bool enabled = true;
+		pad_bytes<2> pad;
 		// END GEN INTROSPECTOR
 
 		void reset(

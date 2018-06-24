@@ -94,21 +94,24 @@ FORCE_INLINE void detail_specific_entity_drawer(
 		}
 
 		if constexpr(typed_handle.template has<components::trace>()) {
-			const auto trace = typed_handle.template get<components::trace>();
-			const auto tracified_size = vec2(sprite.size) * trace.last_size_mult;
+			const auto& trace = typed_handle.template get<components::trace>();
 
-			if (const auto center_offset = tracified_size * trace.last_center_offset_mult;
-				center_offset.non_zero()
-			) {
-				const auto final_rotation = input.renderable_transform.rotation;
-				input.renderable_transform.pos -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
+			if (trace.enabled) {
+				const auto tracified_size = vec2(sprite.size) * trace.last_size_mult;
+
+				if (const auto center_offset = tracified_size * trace.last_center_offset_mult;
+					center_offset.non_zero()
+				) {
+					const auto final_rotation = input.renderable_transform.rotation;
+					input.renderable_transform.pos -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
+				}
+
+				auto tracified_sprite = sprite;
+				tracified_sprite.size = tracified_size;
+
+				render_visitor(tracified_sprite, in.manager, input);
+				return;
 			}
-
-			auto tracified_sprite = sprite;
-			tracified_sprite.size = tracified_size;
-
-			render_visitor(tracified_sprite, in.manager, input);
-			return;
 		}
 
 		if constexpr(typed_handle.template has<components::gun>()) {
