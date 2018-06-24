@@ -25,6 +25,7 @@ enum class test_scene_particle_effect_id {
 	PICKUP_SPARKLES,
 	STEAM_BURST,
 	HASTE_FOOTSTEP,
+	GLASS_DAMAGE,
 
 	COUNT
 	// END GEN INTROSPECTOR

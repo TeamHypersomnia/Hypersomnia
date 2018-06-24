@@ -7,6 +7,8 @@
 #include "game/assets/all_logical_assets.h"
 #include "augs/string/format_enum.h"
 
+#include "test_scenes/test_scene_particle_effects.h"
+
 void load_test_scene_physical_materials(physical_materials_pool& all_definitions) {
 	using test_id_type = test_scene_physical_material_id;
 
@@ -53,5 +55,7 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 	{
 		auto& glass = all_definitions[to_physical_material_id(test_scene_physical_material_id::GLASS)];
 		glass.standard_damage_sound.id = to_sound_id(test_scene_sound_id::GLASS_DAMAGE);
+		glass.standard_damage_particles.id = to_particle_effect_id(test_scene_particle_effect_id::GLASS_DAMAGE);
+		glass.standard_damage_particles.modifier.colorize = rgba(142, 186, 197, 255);
 	}
 }

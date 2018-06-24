@@ -24,6 +24,7 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 	const auto& damages = step.get_queue<messages::damage_message>();
 	const auto& healths = step.get_queue<messages::health_event>();
 	const auto& exhausted_casts = step.get_queue<messages::exhausted_cast>();
+	const auto& logicals = step.get_logical_assets();
 	auto& cosmos = step.get_cosmos();
 
 	for (const auto& g : gunshots) {
@@ -66,25 +67,28 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 	}
 
 	for (const auto& d : damages) {
+		const auto impact_transform = [&]() {
+			auto result = transformr(d.point_of_impact);			
+
+			if (d.amount > 0) {
+				result.rotation = (-d.impact_velocity).degrees();
+			}
+			else {
+				result.rotation = (d.impact_velocity).degrees();
+			}
+
+			return result;
+		}();
+
 		if (d.inflictor_destructed) {
 			const auto inflictor = cosmos[d.inflictor];
 
-			auto place_of_birth = transformr(d.point_of_impact);
-
-			if (d.amount > 0) {
-				place_of_birth.rotation = (-d.impact_velocity).degrees();
-			}
-			else {
-				place_of_birth.rotation = (d.impact_velocity).degrees();
-			}
-
-			place_of_birth.rotation = 0;
 			const auto& effect = inflictor.get<invariants::missile>().destruction_particles;
 
 			{
 				effect.start(
 					step,
-					particle_effect_start_input::orbit_absolute(cosmos[d.subject], place_of_birth ) 
+					particle_effect_start_input::orbit_absolute(cosmos[d.subject], transformr{impact_transform.pos, 0} ) 
 				);
 			}
 
@@ -104,9 +108,30 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 				ring.maximum_duration_seconds = 0.16f;
 
 				ring.color = effect.modifier.colorize;
-				ring.center = place_of_birth.pos;
+				ring.center = impact_transform.pos;
 
 				step.post_message(ring);
+			}
+		}
+
+		if (d.type == adverse_element_type::FORCE && d.amount > 0) {
+			if (const auto subject = cosmos[d.subject]; subject.alive()) {
+				const auto& fixtures = subject.get<invariants::fixtures>();
+
+				if (const auto* const mat = logicals.find(fixtures.material)) {
+					const auto unit = mat->unit_effect_damage;
+					const auto mult = d.amount / unit;
+
+					auto effect = mat->standard_damage_particles;
+
+					effect.modifier.scale_amounts *= mult;
+					effect.modifier.scale_lifetimes *= std::min(1.3f, mult);
+
+					effect.start(
+						step,
+						particle_effect_start_input::orbit_absolute(cosmos[d.subject], impact_transform)
+					);
+				}
 			}
 		}
 	}

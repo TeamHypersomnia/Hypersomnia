@@ -199,8 +199,12 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			if (const auto subject = cosmos[d.subject]; subject.alive()) {
 				const auto& fixtures = subject.get<invariants::fixtures>();
 
-				if (const auto* const subject_coll_material = logicals.find(fixtures.material)) {
-					const auto& effect = subject_coll_material->standard_damage_sound;
+				if (const auto* const mat = logicals.find(fixtures.material)) {
+					const auto unit = mat->unit_effect_damage;
+					const auto mult = d.amount / unit;
+					
+					auto effect = mat->standard_damage_sound;
+					effect.modifier.gain = std::min(1.f, mult);
 
 					effect.start(
 						step,
