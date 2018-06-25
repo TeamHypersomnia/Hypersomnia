@@ -487,6 +487,14 @@ struct basic_vec2 {
 		return *this;
 	}
 
+	basic_vec2& reflect(const basic_vec2& around_normal) {
+		const auto& d = *this;
+		const auto& n = around_normal;
+
+		*this = (d - 2 * d.dot(n) * n);
+		return *this;
+	}
+
 	basic_vec2& flip() {
 		std::swap(x, y);
 		return *this;
