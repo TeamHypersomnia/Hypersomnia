@@ -40,11 +40,13 @@ namespace invariants {
 
 		assets::physical_material_id material;
 
-		float collision_sound_gain_mult = 1.f;
+		real32 collision_sound_gain_mult = 1.f;
 
-		float density = 1.f;
-		float friction = 0.f;
-		float restitution = 0.f;
+		real32 density = 1.f;
+		real32 friction = 0.f;
+		real32 restitution = 0.f;
+
+		real32 max_ricochet_angle = 10.f;
 		// END GEN INTROSPECTOR
 
 		/*

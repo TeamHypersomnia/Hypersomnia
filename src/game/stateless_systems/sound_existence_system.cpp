@@ -22,6 +22,60 @@
 #include "game/messages/health_event.h"
 #include "game/messages/exhausted_cast_message.h"
 
+void play_collision_sound(
+	const real32 strength,
+	const vec2 location,
+	const const_entity_handle sub,
+	const const_entity_handle col,
+	const logic_step step
+) {
+	const auto& logicals = step.get_cosmos().get_logical_assets();
+	const auto subject_coll = sub.get<invariants::fixtures>();
+	const auto collider_coll = col.get<invariants::fixtures>();
+
+	const auto* const subject_coll_material = logicals.find(subject_coll.material);
+	const auto* const collider_coll_material = logicals.find(collider_coll.material);
+
+	if (subject_coll_material != nullptr
+		&& collider_coll_material != nullptr
+	) {
+		auto play_sound = [&](const auto sound_id) {
+			if (sound_id) {
+				const auto impulse = strength * subject_coll.collision_sound_gain_mult * collider_coll.collision_sound_gain_mult;
+
+				// LOG("Cnorm/scgain/ccgain:\n%f4,%f4,%f4", c.normal_impulse, subject_coll.collision_sound_gain_mult, collider_coll.collision_sound_gain_mult);
+
+				const auto gain_mult = (impulse / 15.f) * (impulse / 15.f);
+				const auto pitch_mult = impulse / 185.f;
+
+				if (gain_mult > 0.01f) {
+					sound_effect_input effect;
+					effect.modifier.pitch = std::min(1.5f, 0.85f + pitch_mult);
+					
+					effect.modifier.gain = gain_mult;
+					effect.id = *sound_id;
+
+					// LOG("Coll. gain/pitch: %f3/%f3", in.effect.modifier.gain, in.effect.modifier.pitch);
+
+					effect.start(
+						step, 
+						sound_effect_start_input::fire_and_forget(location)
+					);
+				}
+			}
+		};
+
+		const auto first_id = mapped_or_nullptr(subject_coll_material->collision_sound_matrix, collider_coll.material);
+		const auto second_id = mapped_or_nullptr(collider_coll_material->collision_sound_matrix, subject_coll.material);
+
+		play_sound(first_id);
+
+		if (second_id != first_id) {
+			play_sound(second_id);
+		}
+	}
+}
+
 void sound_existence_system::create_sounds_from_game_events(const logic_step step) const {
 	const auto& collisions = step.get_queue<messages::collision_message>();
 	const auto& gunshots = step.get_queue<messages::gunshot_message>();
@@ -39,50 +93,9 @@ void sound_existence_system::create_sounds_from_game_events(const logic_step ste
 			const auto subject = cosmos[c.subject];
 			const auto collider = cosmos[c.collider];
 
-			const auto subject_coll = subject.get<invariants::fixtures>();
-			const auto collider_coll = collider.get<invariants::fixtures>();
+			const auto collision_sound_strength = c.normal_impulse;
 
-			const auto* const subject_coll_material = logicals.find(subject_coll.material);
-			const auto* const collider_coll_material = logicals.find(collider_coll.material);
-
-			if (subject_coll_material != nullptr
-				&& collider_coll_material != nullptr
-			) {
-				auto play_sound = [&](const auto sound_id) {
-					if (sound_id) {
-						const auto impulse = (c.normal_impulse) * subject_coll.collision_sound_gain_mult * collider_coll.collision_sound_gain_mult;
-
-						// LOG("Cnorm/scgain/ccgain:\n%f4,%f4,%f4", c.normal_impulse, subject_coll.collision_sound_gain_mult, collider_coll.collision_sound_gain_mult);
-
-						const auto gain_mult = (impulse / 15.f) * (impulse / 15.f);
-						const auto pitch_mult = impulse / 185.f;
-
-						if (gain_mult > 0.01f) {
-							sound_effect_input effect;
-							effect.modifier.pitch = std::min(1.5f, 0.85f + pitch_mult);
-							
-							effect.modifier.gain = gain_mult;
-							effect.id = *sound_id;
-
-							// LOG("Coll. gain/pitch: %f3/%f3", in.effect.modifier.gain, in.effect.modifier.pitch);
-
-							effect.start(
-								step, 
-								sound_effect_start_input::fire_and_forget(c.point)
-							);
-						}
-					}
-				};
-
-				const auto first_id = mapped_or_nullptr(subject_coll_material->collision_sound_matrix, collider_coll.material);
-				const auto second_id = mapped_or_nullptr(collider_coll_material->collision_sound_matrix, subject_coll.material);
-
-				play_sound(first_id);
-
-				if (second_id != first_id) {
-					play_sound(second_id);
-				}
-			}
+			::play_collision_sound(collision_sound_strength, c.point, subject, collider, step);
 
 			// skip the next, swapped collision message
 			++i;

@@ -163,9 +163,17 @@ namespace test_flavours {
 			add_shape_invariant_from_renderable(meta, caches);
 
 			{
-				components::trace trace_def;
-				trace_def.enabled = false;
-				meta.set(trace_def);
+				{
+					components::trace trace_def;
+					trace_def.enabled = false;
+					meta.set(trace_def);
+				}
+
+				{
+					invariants::trace trace_def;
+					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::STEEL_ROUND_FINISHING_TRACE);
+					meta.set(trace_def);
+				}
 			}
 
 			test_flavours::add_bullet_round_physics(meta);

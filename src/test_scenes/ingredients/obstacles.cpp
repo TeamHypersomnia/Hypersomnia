@@ -85,6 +85,7 @@ namespace test_flavours {
 			fixtures_def.filter = filters::glass_obstacle();
 			fixtures_def.restitution = 0.5f;
 			fixtures_def.density = 100.f;
+			fixtures_def.max_ricochet_angle = 40.f;
 			fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::GLASS);
 		}
 
@@ -107,6 +108,7 @@ namespace test_flavours {
 			fixtures_def.filter = filters::glass_obstacle();
 			fixtures_def.restitution = 0.5f;
 			fixtures_def.density = 100.f;
+			fixtures_def.max_ricochet_angle = 20.f;
 			fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::GLASS);
 		}
 	}

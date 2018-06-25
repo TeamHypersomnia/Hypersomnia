@@ -36,6 +36,14 @@
 
 using namespace augs;
 
+void play_collision_sound(
+	const real32 strength,
+	const vec2 location,
+	const const_entity_handle sub,
+	const const_entity_handle col,
+	const logic_step step
+);
+
 static void detonate_if_explosive(
 	const logic_step step,
 	const vec2 location,
@@ -68,140 +76,181 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			const bool bullet_colliding_with_any_subject_of_sender = sender.is_sender_subject(subject_handle);
 			const auto collision_normal = vec2(it.normal).normalize();
 			
+			const bool should_collide = !bullet_colliding_with_any_subject_of_sender;
+
+			if (!should_collide) {
+				return;
+			}
+
+			const auto impact_velocity = typed_missile.get_effective_velocity();
+
+			{
+				const auto hit_facing = impact_velocity.degrees_between(collision_normal);
+
+				const auto& collider_fixtures = subject_handle.get<invariants::fixtures>();
+				const auto max_ricochet_angle = collider_fixtures.max_ricochet_angle;
+
+				const auto left_b = 90 - max_ricochet_angle;
+				const auto right_b = 90 + max_ricochet_angle;
+
+				if (hit_facing > left_b && hit_facing < right_b) {
+					const auto d = impact_velocity;
+					const auto n = collision_normal;
+					const auto reflected = d - 2 * d.dot(n) * n;
+					const auto& rigid_body = typed_missile.template get<components::rigid_body>();
+
+					const auto new_transform = transformr(rigid_body.get_transform().pos + vec2(reflected).set_length(10.f), reflected.degrees());
+
+					rigid_body.set_velocity(reflected);
+					rigid_body.set_transform(new_transform);
+
+					const auto angle = std::min(hit_facing - left_b, right_b - hit_facing);
+					const auto angle_mult = angle / max_ricochet_angle;
+
+					::play_collision_sound(angle_mult, reflected, subject_handle, typed_missile, step);
+
+					return;
+				}
+			}
+
 			const bool should_send_damage =
-				!bullet_colliding_with_any_subject_of_sender
-				&& missile_def.damage_upon_collision
+				missile_def.damage_upon_collision
 				&& missile.damage_charges_before_destruction > 0
 			;
 
-			const auto impact_velocity = typed_missile.get_effective_velocity();
-			const auto hit_facing = impact_velocity.degrees_between(collision_normal);
-
-			LOG_NVPS(hit_facing);
-
-			if (hit_facing > 80 && hit_facing < 100) {
-				LOG("RICO");
+			if (!should_send_damage) {
+				return;
 			}
 
-			if (should_send_damage) {
-				if (missile_def.impulse_upon_hit > 0.f) {
-					auto considered_impulse = missile_def.impulse_upon_hit * missile.power_multiplier_of_sender;
+			if (missile_def.impulse_upon_hit > 0.f) {
+				auto considered_impulse = missile_def.impulse_upon_hit * missile.power_multiplier_of_sender;
 
-					if (const auto sentience = subject_handle.find<components::sentience>()) {
-						const auto& shield_of_victim = sentience->get<electric_shield_perk_instance>();
+				if (const auto sentience = subject_handle.find<components::sentience>()) {
+					const auto& shield_of_victim = sentience->get<electric_shield_perk_instance>();
 
-						if (!shield_of_victim.timing.is_enabled(now, delta)) {
-							considered_impulse *= missile_def.impulse_multiplier_against_sentience;
-						}
+					if (!shield_of_victim.timing.is_enabled(now, delta)) {
+						considered_impulse *= missile_def.impulse_multiplier_against_sentience;
 					}
-
-					const auto subject_of_impact = subject_handle.get_owner_of_colliders().get<components::rigid_body>();
-					const auto subject_of_impact_mass_pos = subject_of_impact.get_mass_position(); 
-
-					const auto impact = vec2(impact_velocity).set_length(considered_impulse);
-
-					subject_of_impact.apply_impulse(impact, it.point - subject_of_impact_mass_pos);
 				}
 
-				missile.saved_point_of_impact_before_death = it.point;
+				const auto subject_of_impact = subject_handle.get_owner_of_colliders().get<components::rigid_body>();
+				const auto subject_of_impact_mass_pos = subject_of_impact.get_mass_position(); 
 
-				const auto owning_capability = subject_handle.get_owning_transfer_capability();
+				const auto impact = vec2(impact_velocity).set_length(considered_impulse);
 
-				const bool is_victim_an_item = subject_handle.has<components::item>();
-				const bool is_victim_a_held_item = is_victim_an_item && owning_capability.alive() && owning_capability != it.subject;
+				subject_of_impact.apply_impulse(impact, it.point - subject_of_impact_mass_pos);
+			}
 
-				messages::damage_message damage_msg;
-				damage_msg.subject_b2Fixture_index = it.subject_b2Fixture_index;
-				damage_msg.collider_b2Fixture_index = it.collider_b2Fixture_index;
+			missile.saved_point_of_impact_before_death = it.point;
 
-				if (is_victim_a_held_item) {
-					missile_def.pass_through_held_item_sound.start(
-						step,
-						sound_effect_start_input::fire_and_forget( { it.point, 0.f } ).set_listener(owning_capability)
-					);
+			const auto owning_capability = subject_handle.get_owning_transfer_capability();
+
+			const bool is_victim_an_item = subject_handle.has<components::item>();
+			const bool is_victim_a_held_item = is_victim_an_item && owning_capability.alive() && owning_capability != it.subject;
+
+			messages::damage_message damage_msg;
+			damage_msg.subject_b2Fixture_index = it.subject_b2Fixture_index;
+			damage_msg.collider_b2Fixture_index = it.collider_b2Fixture_index;
+
+			if (is_victim_a_held_item) {
+				missile_def.pass_through_held_item_sound.start(
+					step,
+					sound_effect_start_input::fire_and_forget( { it.point, 0.f } ).set_listener(owning_capability)
+				);
+			}
+
+			const auto total_damage_amount = 
+				missile_def.damage_amount * 
+				missile.power_multiplier_of_sender
+			;
+
+			if (!is_victim_an_item && missile_def.destroy_upon_damage) {
+				missile.damage_charges_before_destruction--;
+				
+				detonate_if_explosive(step, it.point, missile_handle);
+
+				if (augs::is_positive_epsilon(total_damage_amount)) {
+					startle_nearby_organisms(cosm, it.point, total_damage_amount * 12.f, 27.f, startle_type::LIGHTER);
 				}
 
-				const auto total_damage_amount = 
-					missile_def.damage_amount * 
-					missile.power_multiplier_of_sender
-				;
+				// delete only once
+				if (0 == missile.damage_charges_before_destruction) {
+					step.post_message(messages::queue_destruction(it.collider));
+					damage_msg.inflictor_destructed = true;
 
-				if (!is_victim_an_item && missile_def.destroy_upon_damage) {
-					missile.damage_charges_before_destruction--;
+					auto rng = cosm.get_rng_for(typed_missile);
+					auto flavours = missile_def.remnant_flavours;
 					
-					detonate_if_explosive(step, it.point, missile_handle);
+					shuffle_range(flavours, rng.generator);
+					auto how_many_along_normal = rng.randval(2u, 3u);
 
-					if (augs::is_positive_epsilon(total_damage_amount)) {
-						startle_nearby_organisms(cosm, it.point, total_damage_amount * 12.f, 27.f, startle_type::LIGHTER);
-					}
+					for (const auto& r_id : flavours) {
+						if (r_id.is_set()) {
+							const auto speed = rng.randval(1000.f, 4800.f);
+							const auto impact_dir = vec2(impact_velocity).normalize();
 
-					// delete only once
-					if (0 == missile.damage_charges_before_destruction) {
-						step.post_message(messages::queue_destruction(it.collider));
-						damage_msg.inflictor_destructed = true;
+							vec2 vel;
 
-						auto rng = cosm.get_rng_for(typed_missile);
-						auto flavours = missile_def.remnant_flavours;
-						
-						shuffle_range(flavours, rng.generator);
-						auto how_many_along_normal = 3;//rng.randval(2u, 3u);
+							if (how_many_along_normal) {
+								const auto sgn = rng.randval(0, 1);
 
-						for (const auto& r_id : flavours) {
-							if (r_id.is_set()) {
-								const auto speed = rng.randval(1000.f, 4800.f);
-								const auto impact_dir = vec2(impact_velocity).normalize();
+								auto amount_rotated = rng.randval(70.f, 87.f);
 
-								vec2 vel;
-
-								if (how_many_along_normal) {
-									const auto sgn = rng.randval(0, 1);
-
-									vel = vec2(collision_normal).rotate(rng.randval(70.f, 80.f), vec2()) * speed;
-
-									if (sgn == 1) {
-										vel = -vel;
-									}
-									--how_many_along_normal;
-								}
-								else {
-									vel = vec2(impact_dir).rotate(rng.randval(-40.f, 40.f), vec2()) * speed;
+								if (sgn == 1) {
+									amount_rotated = -amount_rotated;
 								}
 
-								cosmic::create_entity(
-									cosm,
-									r_id,
-									[&](const auto typed_remnant) {
-										auto spawn_offset = vec2(vel).normalize() * rng.randval(35.f, 50.f);
-										const auto rot = rng.randval(0, 360);
-										
-										typed_remnant.set_logic_transform(transformr(it.point + spawn_offset, rot));
-									},
-									[&](const auto typed_remnant) {
+								vel = vec2(collision_normal).rotate(amount_rotated, vec2()) * speed;
 
-										typed_remnant.template get<components::rigid_body>().set_velocity(vel);
-										typed_remnant.template get<components::rigid_body>().set_angular_velocity(rng.randval(1060.f, 4000.f));
-
-										const auto& effect = typed_remnant.template get<invariants::remnant>().trace_particles;
-
-										effect.start(
-											step,
-											particle_effect_start_input::orbit_local(typed_remnant, { vec2::zero, 180 } )
-										);
-									}
-								);
+								--how_many_along_normal;
 							}
+							else {
+								vel = -1 * vec2(impact_dir).rotate(rng.randval(-40.f, 40.f), vec2()) * speed;
+							}
+
+							if (DEBUG_DRAWING.draw_forces) {
+								DEBUG_PERSISTENT_LINES.emplace_back(yellow, it.point, it.point + vel);
+								DEBUG_PERSISTENT_LINES.emplace_back(white, it.point, it.point + collision_normal * 200);
+							}
+
+							cosmic::create_entity(
+								cosm,
+								r_id,
+								[&](const auto typed_remnant) {
+									auto spawn_offset = vec2(vel).normalize() * rng.randval(55.f, 60.f);
+									const auto rot = rng.randval(0, 360);
+									
+									if (DEBUG_DRAWING.draw_forces) {
+										DEBUG_PERSISTENT_LINES.emplace_back(cyan, it.point, it.point + spawn_offset);
+									}
+
+									typed_remnant.set_logic_transform(transformr(it.point + spawn_offset, rot));
+								},
+								[&](const auto typed_remnant) {
+
+									typed_remnant.template get<components::rigid_body>().set_velocity(vel);
+									typed_remnant.template get<components::rigid_body>().set_angular_velocity(rng.randval(1060.f, 4000.f));
+
+									const auto& effect = typed_remnant.template get<invariants::remnant>().trace_particles;
+
+									effect.start(
+										step,
+										particle_effect_start_input::orbit_local(typed_remnant, { vec2::zero, 180 } )
+									);
+								}
+							);
 						}
 					}
 				}
-
-				damage_msg.inflictor = it.collider;
-				damage_msg.subject = it.subject;
-				damage_msg.amount = total_damage_amount;
-				damage_msg.victim_shake = missile_def.victim_shake;
-				damage_msg.impact_velocity = impact_velocity;
-				damage_msg.point_of_impact = it.point;
-				step.post_message(damage_msg);
 			}
+
+			damage_msg.inflictor = it.collider;
+			damage_msg.subject = it.subject;
+			damage_msg.amount = total_damage_amount;
+			damage_msg.victim_shake = missile_def.victim_shake;
+			damage_msg.impact_velocity = impact_velocity;
+			damage_msg.point_of_impact = it.point;
+			step.post_message(damage_msg);
 		});
 	}
 }
