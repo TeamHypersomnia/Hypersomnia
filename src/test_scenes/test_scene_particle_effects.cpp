@@ -1940,4 +1940,62 @@ void load_test_scene_particle_effects(
 			effect.emissions.push_back(em);
 		}
 	}
+
+	{
+		auto& effect = acquire_effect(test_scene_particle_effect_id::ELECTRIC_RICOCHET);
+
+		particles_emission em;
+		em.spread_degrees = float_range(0, 1);
+		em.particles_per_sec = float_range(70, 80);
+		em.stream_lifetime_ms = float_range(100, 200);
+		em.num_of_particles_to_spawn_initially.set(5, 8);
+		em.base_speed = float_range(100, 300);
+		em.rotation_speed = float_range(0, 0);
+		em.particle_lifetime_ms = float_range(500, 700);
+
+		em.randomize_spawn_point_within_circle_of_inner_radius = float_range(9.f, 9.f);
+		em.randomize_spawn_point_within_circle_of_outer_radius = float_range(15.f, 15.f);
+
+		em.starting_spawn_circle_size_multiplier = float_range(1.f, 1.f);
+		em.ending_spawn_circle_size_multiplier = float_range(2.f, 2.f);
+
+		for (int i = 0; i < 5; ++i) {
+			general_particle particle_definition;
+
+			particle_definition.angular_damping = 0;
+			particle_definition.linear_damping = 0;
+			
+			set_with_size(particle_definition,
+				to_image_id(test_scene_image_id::BLANK), 
+				vec2i(2, 2), 
+				rgba(255, 255, 255, 255)
+			);
+
+			particle_definition.alpha_levels = 1;
+
+			em.add_particle_definition(particle_definition);
+		}
+
+		for (size_t i = 0; i < anim.frames.size() - 1; ++i) {
+			animated_particle particle_definition;
+
+			particle_definition.linear_damping = 0;
+			particle_definition.animation.state.frame_num = i;
+			particle_definition.animation.speed_factor = 3.f;
+			particle_definition.animation.id = cast_blink_id;
+			particle_definition.color = white;
+
+			em.add_particle_definition(particle_definition);
+		}
+
+		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+		em.initial_rotation_variation = 0;
+
+		effect.emissions.push_back(em);
+	}
+
+	{
+		auto& effect = acquire_effect(test_scene_particle_effect_id::STEEL_RICOCHET);
+		effect.emissions = acquire_effect(test_scene_particle_effect_id::METAL_DAMAGE).emissions;
+	}
 }

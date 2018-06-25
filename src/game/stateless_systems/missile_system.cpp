@@ -117,6 +117,29 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 					::play_collision_sound(angle_mult * 150.f, it.point, typed_missile, subject_handle, step);
 
+					const auto effect_transform = transformr(it.point, reflected_dir.degrees());
+
+					{
+						const auto& effect = missile_def.ricochet_particles;
+
+						effect.start(
+							step,
+							particle_effect_start_input::fire_and_forget(effect_transform)
+						);
+					}
+
+					{
+						const auto pitch = 0.7f + angle_mult / 1.5f;
+
+						auto effect = missile_def.ricochet_sound;
+						effect.modifier.pitch = pitch;
+
+						effect.start(
+							step,
+							sound_effect_start_input::fire_and_forget(effect_transform)
+						);
+					}
+
 					return;
 				}
 			}

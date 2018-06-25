@@ -29,6 +29,8 @@ enum class test_scene_particle_effect_id {
 	GLASS_DAMAGE,
 	METAL_DAMAGE,
 	WOOD_DAMAGE,
+	ELECTRIC_RICOCHET,
+	STEEL_RICOCHET,
 
 	COUNT
 	// END GEN INTROSPECTOR

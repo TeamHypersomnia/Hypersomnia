@@ -66,8 +66,10 @@ namespace invariants {
 
 		sound_effect_input trace_sound;
 		sound_effect_input destruction_sound;
+		sound_effect_input ricochet_sound;
 		sound_effect_input pass_through_held_item_sound;
 
+		particle_effect_input ricochet_particles;
 		particle_effect_input muzzle_leave_particles;
 		bool trace_particles_fly_backwards = false;
 		bool spawn_exploding_ring = true;

@@ -191,6 +191,9 @@ namespace test_flavours {
 			missile.muzzle_leave_particles.modifier.colorize = white;//{ 255, 218, 5, 255 };
 			missile.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
+			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::STEEL_RICOCHET);
+			missile.ricochet_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_RICOCHET);
+
 			missile.destruction_sound.id = to_sound_id(test_scene_sound_id::STEEL_PROJECTILE_DESTRUCTION);
 
 			missile.remnant_flavours[0] = to_entity_flavour_id(test_remnant_bodies::STEEL_ROUND_REMNANT_1);
@@ -255,6 +258,10 @@ namespace test_flavours {
 			missile.trace_particles_fly_backwards = true;
 			missile.muzzle_leave_particles.modifier.colorize = cyan;
 			missile.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+
+			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_RICOCHET);
+			missile.ricochet_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_RICOCHET);
+			missile.ricochet_particles.modifier.colorize = cyan;
 
 			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
 			missile.destruction_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
