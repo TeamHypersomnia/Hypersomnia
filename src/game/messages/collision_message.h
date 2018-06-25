@@ -9,6 +9,7 @@ namespace messages {
 		vec2 collider_impact_velocity;
 		vec2 subject_impact_velocity;
 		vec2 point;
+		vec2 normal;
 
 		b2Fixture_index_in_component collider_b2Fixture_index;
 		b2Fixture_index_in_component subject_b2Fixture_index;

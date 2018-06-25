@@ -180,6 +180,7 @@ void contact_listener::BeginContact(b2Contact* contact) {
 
 		msg.point = worldManifold.points[0];
 		msg.point = si.get_pixels(msg.point);
+		msg.normal = si.get_pixels(worldManifold.normal);
 
 		msg.subject_impact_velocity = body_a->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
 		msg.collider_impact_velocity = body_b->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
@@ -438,6 +439,7 @@ void contact_listener::PostSolve(b2Contact* contact, const b2ContactImpulse* imp
 		const auto* const normals = impulse->normalImpulses;
 		const auto* const tangents = impulse->normalImpulses;
 
+		msg.normal = si.get_pixels(manifold.normal);
 		msg.normal_impulse = si.get_pixels(*std::max_element(normals, normals + count));
 		msg.tangent_impulse = si.get_pixels(*std::max_element(tangents, tangents + count));
 	}

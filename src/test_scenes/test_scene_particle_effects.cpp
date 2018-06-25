@@ -1151,8 +1151,8 @@ void load_test_scene_particle_effects(
 
 		particles_emission em;
 		em.spread_degrees = float_range(0, 1);
-		em.particles_per_sec = float_range(50, 60);
-		em.stream_lifetime_ms = float_range(450, 800);
+		em.particles_per_sec = float_range(60, 80);
+		em.stream_lifetime_ms = float_range(750, 1200);
 		em.base_speed = float_range(4, 30);
 		em.rotation_speed = float_range(0, 0);
 		em.particle_lifetime_ms = float_range(300, 400);
@@ -1165,11 +1165,30 @@ void load_test_scene_particle_effects(
 			
 			set_with_size(particle_definition,
 				to_image_id(test_scene_image_id::BLANK), 
-				vec2i(1, 1), 
+				vec2i(i % 2 + 1, i % 2 + 1), 
 				rgba(255, 255, 255, 255)
 			);
 
 			particle_definition.alpha_levels = 1;
+			particle_definition.shrink_when_ms_remaining = 100.f;
+
+			em.add_particle_definition(particle_definition);
+		}
+
+		{
+			general_particle particle_definition;
+
+			particle_definition.angular_damping = 0;
+			particle_definition.linear_damping = 0;
+			particle_definition.acc = { 40, -40 };
+			
+			set(particle_definition,
+				to_image_id(test_scene_image_id::CAST_BLINK_3), 
+				rgba(255, 255, 255, 255)
+			);
+
+			particle_definition.alpha_levels = 1;
+			particle_definition.shrink_when_ms_remaining = 100.f;
 
 			em.add_particle_definition(particle_definition);
 		}
@@ -1177,6 +1196,7 @@ void load_test_scene_particle_effects(
 		em.size_multiplier = float_range(1, 2.0);
 		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
+		em.should_particles_look_towards_velocity = false;
 
 		effect.emissions.push_back(em);
 	}
@@ -1585,6 +1605,8 @@ void load_test_scene_particle_effects(
 			em.num_of_particles_to_spawn_initially.set(35, 40);
 			em.base_speed = float_range(20, 1157);
 			em.spread_degrees = float_range(20, 45);
+
+			em.should_particles_look_towards_velocity = false;
 
 			{
 				general_particle particle_definition;

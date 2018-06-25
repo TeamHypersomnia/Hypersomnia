@@ -60,23 +60,32 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 		const auto subject_handle = cosm[it.subject];
 		const auto missile_handle = cosm[it.collider];
 
-		if (auto missile = missile_handle.find<components::missile>()) {
-			const auto& missile_def = missile_handle.get<invariants::missile>();
-			const auto& sender = missile_handle.get<components::sender>();
+		missile_handle.dispatch_on_having<invariants::missile>([&](const auto typed_missile) {
+			const auto& missile_def = typed_missile.template get<invariants::missile>();
+			const auto& sender = typed_missile.template get<components::sender>();
+			auto& missile = typed_missile.template get<components::missile>();
 
 			const bool bullet_colliding_with_any_subject_of_sender = sender.is_sender_subject(subject_handle);
+			const auto collision_normal = vec2(it.normal).normalize();
 			
 			const bool should_send_damage =
 				!bullet_colliding_with_any_subject_of_sender
 				&& missile_def.damage_upon_collision
-				&& missile->damage_charges_before_destruction > 0
+				&& missile.damage_charges_before_destruction > 0
 			;
 
-			if (should_send_damage) {
-				const auto impact_velocity = missile_handle.get_effective_velocity();
+			const auto impact_velocity = typed_missile.get_effective_velocity();
+			const auto hit_facing = impact_velocity.degrees_between(collision_normal);
 
+			LOG_NVPS(hit_facing);
+
+			if (hit_facing > 80 && hit_facing < 100) {
+				LOG("RICO");
+			}
+
+			if (should_send_damage) {
 				if (missile_def.impulse_upon_hit > 0.f) {
-					auto considered_impulse = missile_def.impulse_upon_hit * missile->power_multiplier_of_sender;
+					auto considered_impulse = missile_def.impulse_upon_hit * missile.power_multiplier_of_sender;
 
 					if (const auto sentience = subject_handle.find<components::sentience>()) {
 						const auto& shield_of_victim = sentience->get<electric_shield_perk_instance>();
@@ -94,7 +103,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 					subject_of_impact.apply_impulse(impact, it.point - subject_of_impact_mass_pos);
 				}
 
-				missile->saved_point_of_impact_before_death = it.point;
+				missile.saved_point_of_impact_before_death = it.point;
 
 				const auto owning_capability = subject_handle.get_owning_transfer_capability();
 
@@ -114,11 +123,11 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 				const auto total_damage_amount = 
 					missile_def.damage_amount * 
-					missile->power_multiplier_of_sender
+					missile.power_multiplier_of_sender
 				;
 
 				if (!is_victim_an_item && missile_def.destroy_upon_damage) {
-					missile->damage_charges_before_destruction--;
+					missile.damage_charges_before_destruction--;
 					
 					detonate_if_explosive(step, it.point, missile_handle);
 
@@ -127,9 +136,61 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 					}
 
 					// delete only once
-					if (missile->damage_charges_before_destruction == 0) {
+					if (0 == missile.damage_charges_before_destruction) {
 						step.post_message(messages::queue_destruction(it.collider));
 						damage_msg.inflictor_destructed = true;
+
+						auto rng = cosm.get_rng_for(typed_missile);
+						auto flavours = missile_def.remnant_flavours;
+						
+						shuffle_range(flavours, rng.generator);
+						auto how_many_along_normal = 3;//rng.randval(2u, 3u);
+
+						for (const auto& r_id : flavours) {
+							if (r_id.is_set()) {
+								const auto speed = rng.randval(1000.f, 4800.f);
+								const auto impact_dir = vec2(impact_velocity).normalize();
+
+								vec2 vel;
+
+								if (how_many_along_normal) {
+									const auto sgn = rng.randval(0, 1);
+
+									vel = vec2(collision_normal).rotate(rng.randval(70.f, 80.f), vec2()) * speed;
+
+									if (sgn == 1) {
+										vel = -vel;
+									}
+									--how_many_along_normal;
+								}
+								else {
+									vel = vec2(impact_dir).rotate(rng.randval(-40.f, 40.f), vec2()) * speed;
+								}
+
+								cosmic::create_entity(
+									cosm,
+									r_id,
+									[&](const auto typed_remnant) {
+										auto spawn_offset = vec2(vel).normalize() * rng.randval(35.f, 50.f);
+										const auto rot = rng.randval(0, 360);
+										
+										typed_remnant.set_logic_transform(transformr(it.point + spawn_offset, rot));
+									},
+									[&](const auto typed_remnant) {
+
+										typed_remnant.template get<components::rigid_body>().set_velocity(vel);
+										typed_remnant.template get<components::rigid_body>().set_angular_velocity(rng.randval(1060.f, 4000.f));
+
+										const auto& effect = typed_remnant.template get<invariants::remnant>().trace_particles;
+
+										effect.start(
+											step,
+											particle_effect_start_input::orbit_local(typed_remnant, { vec2::zero, 180 } )
+										);
+									}
+								);
+							}
+						}
 					}
 				}
 
@@ -141,7 +202,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 				damage_msg.point_of_impact = it.point;
 				step.post_message(damage_msg);
 			}
-		}
+		});
 	}
 }
 

@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/pad_bytes.h"
 
+#include "augs/misc/constant_size_vector.h"
 #include "augs/misc/value_meter.h"
 #include "augs/misc/timing/stepped_timing.h"
 
@@ -13,6 +14,7 @@
 
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
+#include "game/transcendental/entity_flavour_id.h"
 
 #include "game/detail/sentience_shake.h"
 #include "game/detail/view_input/sound_effect_input.h"
@@ -36,6 +38,10 @@ namespace components {
 
 namespace invariants {
 	struct missile {
+		using remnant_flavour_id = constrained_entity_flavour_id<
+			invariants::remnant
+		>;
+
 		// GEN INTROSPECTOR struct invariants::missile
 		meter_value_type damage_amount = 12;
 
@@ -68,6 +74,8 @@ namespace invariants {
 		pad_bytes<2> pad;
 		particle_effect_input trace_particles;
 		particle_effect_input destruction_particles;
+
+		std::array<remnant_flavour_id, 4> remnant_flavours;
 		// END GEN INTROSPECTOR
 	};
 }

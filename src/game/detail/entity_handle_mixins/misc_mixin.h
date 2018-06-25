@@ -135,6 +135,11 @@ public:
 		return self.get_meta().flavour_id;
 	}
 
+	auto when_born() const {
+		const auto self = *static_cast<const E*>(this);
+		return self.get_meta().when_born;
+	}
+
 	auto get_flavour_id() const {
 		const auto self = *static_cast<const E*>(this);
 

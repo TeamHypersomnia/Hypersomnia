@@ -46,6 +46,12 @@ auto& sort_range(Container& v, T&& l) {
 	return v;
 }
 
+template<class Container, class... T>
+auto& shuffle_range(Container& v, T&&... args) {
+	std::shuffle(v.begin(), v.end(), std::forward<T>(args)...);
+	return v;
+}
+
 template<class Container>
 auto& sort_range(Container& v) {
 	std::sort(v.begin(), v.end());

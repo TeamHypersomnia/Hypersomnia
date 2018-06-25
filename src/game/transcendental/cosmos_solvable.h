@@ -48,7 +48,7 @@ class cosmos_solvable {
 			throw std::runtime_error("Entities should be controllably reserved to avoid invalidation of entity_handles.");
 		}
 
-		const auto result = pool.allocate(new_guid, std::forward<Args>(args)...);
+		const auto result = pool.allocate(new_guid, std::forward<Args>(args)..., get_timestamp());
 
 		allocation_result<typed_entity_id<E>, decltype(result.object)> output {
 			typed_entity_id<E>(result.key), result.object

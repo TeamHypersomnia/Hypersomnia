@@ -53,10 +53,27 @@ namespace test_flavours {
 		body_def.damping.angular = 6.5f;
 
 		fixtures_def.filter = filters::shell();
-		fixtures_def.density = 1;
 		fixtures_def.restitution = 1.4f;
 		fixtures_def.density = 0.001f;
 		fixtures_def.collision_sound_gain_mult = 100.f;
+		fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::METAL);
+
+		meta.set(fixtures_def);
+		meta.set(body_def);
+	}
+
+	template <class E>
+	void add_remnant_dynamic_body(E& meta) {
+		invariants::fixtures fixtures_def;
+		invariants::rigid_body body_def;
+
+		body_def.damping.linear = 6.5f;
+		body_def.damping.angular = 6.5f;
+
+		fixtures_def.filter = filters::shell();
+		fixtures_def.restitution = 1.8f;
+		fixtures_def.density = 0.0001f;
+		fixtures_def.collision_sound_gain_mult = 1000.f;
 		fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::METAL);
 
 		meta.set(fixtures_def);

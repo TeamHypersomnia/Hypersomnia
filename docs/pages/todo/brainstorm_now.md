@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Bullet destruction remnants
+	- Simplest solution: spawn some particles
+		- Pro: lots of already implemented control over spawning offsets and rotations
+		- Pro: less of things to do in physics
+
 - Simple rect node classes for automatic positioning of scene elements from code
 	- Simple struct, cascade nodes, some state?
 	- Can later create entities from nodes returned at some point

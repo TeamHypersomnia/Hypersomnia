@@ -6,9 +6,6 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/logic_step.h"
 
-#include "game/components/transform_component.h"
-#include "game/components/sprite_component.h"
-
 #include "game/messages/interpolation_correction_request.h"
 #include "game/messages/queue_destruction.h"
 #include "game/messages/will_soon_be_deleted.h"

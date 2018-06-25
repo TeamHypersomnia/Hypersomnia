@@ -61,7 +61,7 @@ struct plain_invisible_body {
 	>;
 };
 
-/* E.g. a crate, a wall, a bullet shell */
+/* E.g. a crate, a wall */
 
 struct plain_sprited_body {
 	static constexpr std::size_t statically_allocated_entities = 3000;
@@ -343,5 +343,32 @@ struct complex_decoration {
 		components::sprite,
 		components::transform,
 		components::movement_path
+	>;
+};
+
+/* E.g. a bullet shell, a round remnant */
+
+struct remnant_body {
+	static constexpr std::size_t statically_allocated_entities = 3000;
+	static constexpr std::size_t statically_allocated_flavours = 300;
+
+	using invariants = type_list<
+		invariants::rigid_body,
+		invariants::fixtures,
+		invariants::shape_polygon,
+		invariants::sprite,
+		invariants::render,
+		invariants::ground,
+
+		invariants::interpolation,
+		invariants::remnant
+	>;
+
+	using components = type_list<
+		components::sprite,
+		components::rigid_body,
+
+		components::interpolation,
+		components::remnant
 	>;
 };

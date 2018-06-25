@@ -16,6 +16,7 @@ struct plain_missile;
 struct finishing_trace;
 struct container_item;
 struct explosive_missile;
+struct remnant_body;
 
 using all_entity_types = type_list<
 	controlled_character,
@@ -31,7 +32,8 @@ using all_entity_types = type_list<
 	plain_missile,
 	finishing_trace,
 	container_item,
-	explosive_missile
+	explosive_missile,
+	remnant_body
 >;
 
 using entity_type_id = type_in_list_id<all_entity_types>;

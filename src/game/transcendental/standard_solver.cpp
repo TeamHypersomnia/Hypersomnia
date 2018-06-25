@@ -33,6 +33,7 @@
 #include "game/stateless_systems/physics_system.h"
 #include "game/stateless_systems/movement_path_system.h"
 #include "game/stateless_systems/animation_system.h"
+#include "game/stateless_systems/remnant_system.h"
 
 void standard_solve(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
@@ -139,6 +140,7 @@ void standard_solve(const logic_step step) {
 	}
 
 	trace_system().destroy_outdated_traces(step);
+	remnant_system().shrink_and_destroy_remnants(step);
 
 	const auto queued_before_marking_num = step.get_queue<messages::queue_destruction>().size();
 

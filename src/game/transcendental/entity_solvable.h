@@ -11,16 +11,19 @@ struct entity_solvable_meta {
 	// GEN INTROSPECTOR struct entity_solvable_meta
 	raw_entity_flavour_id flavour_id;
 	entity_guid guid;
+	augs::stepped_timestamp when_born;
 	// END GEN INTROSPECTOR
 
 	entity_solvable_meta() = default;
 
 	entity_solvable_meta(
 		const entity_guid guid,
-		const raw_entity_flavour_id flavour_id
+		const raw_entity_flavour_id flavour_id,
+		const augs::stepped_timestamp when_born
 	) :
 		flavour_id(flavour_id),
-		guid(guid)
+		guid(guid),
+		when_born(when_born)
 	{}
 };
 

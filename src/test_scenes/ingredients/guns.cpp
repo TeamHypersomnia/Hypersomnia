@@ -99,6 +99,50 @@ namespace test_flavours {
 		};
 	
 		{
+			auto make_round_remnant_flavour = [&](
+				const auto flavour_id,
+				const auto image_id
+			) {
+				auto& meta = get_test_flavour(flavours, flavour_id);
+
+				{
+					invariants::render render_def;
+					render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+					meta.set(render_def);
+				}
+
+				{
+					invariants::remnant remnant_def;
+					remnant_def.lifetime_secs = 1.f;
+					remnant_def.start_shrinking_when_remaining_ms = 350.f;
+					remnant_def.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::CONCENTRATED_WANDERING_PIXELS);
+					remnant_def.trace_particles.modifier.colorize = orange;
+					meta.set(remnant_def);
+				}
+
+				test_flavours::add_sprite(meta, caches, image_id, white);
+				add_shape_invariant_from_renderable(meta, caches);
+				test_flavours::add_remnant_dynamic_body(meta);
+			};
+
+			make_round_remnant_flavour(
+				test_remnant_bodies::STEEL_ROUND_REMNANT_1,
+				test_scene_image_id::STEEL_ROUND_REMNANT_1
+			);
+
+			make_round_remnant_flavour(
+				test_remnant_bodies::STEEL_ROUND_REMNANT_2,
+				test_scene_image_id::STEEL_ROUND_REMNANT_2
+			);
+
+			make_round_remnant_flavour(
+				test_remnant_bodies::STEEL_ROUND_REMNANT_3,
+				test_scene_image_id::STEEL_ROUND_REMNANT_3
+			);
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::STEEL_ROUND);
 
 			{
@@ -140,6 +184,10 @@ namespace test_flavours {
 			missile.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
 			missile.destruction_sound.id = to_sound_id(test_scene_sound_id::STEEL_PROJECTILE_DESTRUCTION);
+
+			missile.remnant_flavours[0] = to_entity_flavour_id(test_remnant_bodies::STEEL_ROUND_REMNANT_1);
+			missile.remnant_flavours[1] = to_entity_flavour_id(test_remnant_bodies::STEEL_ROUND_REMNANT_2);
+			missile.remnant_flavours[2] = to_entity_flavour_id(test_remnant_bodies::STEEL_ROUND_REMNANT_3);
 
 			auto& trace_modifier = missile.trace_sound.modifier;
 
@@ -365,7 +413,7 @@ namespace test_flavours {
 				invariants::cartridge cartridge; 
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::CONCENTRATED_WANDERING_PIXELS);
-				cartridge.shell_trace_particles.modifier.colorize = white;
+				cartridge.shell_trace_particles.modifier.colorize = rgba(202, 186, 89, 255);
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_plain_sprited_bodys::STEEL_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::STEEL_ROUND);

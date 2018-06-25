@@ -12,6 +12,7 @@
 #include "game/components/sprite_component.h"
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/components/render_component.h"
+#include "game/components/remnant_component.h"
 
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/frame_calculation.h"
@@ -112,6 +113,16 @@ FORCE_INLINE void detail_specific_entity_drawer(
 				render_visitor(tracified_sprite, in.manager, input);
 				return;
 			}
+		}
+
+		if constexpr(typed_handle.template has<components::remnant>()) {
+			const auto& remnant = typed_handle.template get<components::remnant>();
+
+			auto remnanted_sprite = sprite;
+			remnanted_sprite.size *= remnant.last_size_mult;
+
+			render_visitor(remnanted_sprite, in.manager, input);
+			return;
 		}
 
 		if constexpr(typed_handle.template has<components::gun>()) {
