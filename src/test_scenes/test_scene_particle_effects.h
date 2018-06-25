@@ -27,6 +27,7 @@ enum class test_scene_particle_effect_id {
 	STEAM_BURST,
 	HASTE_FOOTSTEP,
 	GLASS_DAMAGE,
+	METAL_DAMAGE,
 	WOOD_DAMAGE,
 
 	COUNT
