@@ -820,6 +820,52 @@ void load_test_scene_particle_effects(
 	}
 
 	{
+		auto& effect = acquire_effect(test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION);
+
+		{
+			particles_emission em;
+			default_bounds(em);
+
+			em.swing_spread.set(0, 0);
+			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
+			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
+
+			em.spread_degrees = float_range(2, 10);
+			em.num_of_particles_to_spawn_initially.set(20, 80);
+			em.stream_lifetime_ms = float_range(0, 0);
+
+			em.base_speed = float_range(500, 4000);
+			em.base_speed_variation = float_range(10.f, 12.f);
+
+			em.rotation_speed = float_range(4.5f*RAD_TO_DEG<float>, 4.8f*RAD_TO_DEG<float>);
+			em.particle_lifetime_ms = float_range(35, 40);
+
+			em.randomize_spawn_point_within_circle_of_inner_radius = float_range(20.f, 25.f);
+			em.randomize_spawn_point_within_circle_of_outer_radius = float_range(40.f, 45.f);
+
+			for (int i = 0; i < 3; ++i) {
+				general_particle particle_definition;
+
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 80;
+				particle_definition.acc.set(300, -300);
+				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(orange.rgb(), 15));
+				particle_definition.unshrinking_time_ms = 10.f;
+				particle_definition.shrink_when_ms_remaining = 10.f;
+
+				em.add_particle_definition(particle_definition);
+			}
+
+			em.size_multiplier = float_range(0.40, 0.50);
+			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
+			em.initial_rotation_variation = 180;
+			em.scale_damping_to_velocity = true;
+
+			effect.emissions.push_back(em);
+		}
+	}
+
+	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
 
 		particles_emission em;
@@ -889,31 +935,6 @@ void load_test_scene_particle_effects(
 	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
 
-		particles_emission em;
-		em.spread_degrees = float_range(150, 360);
-		em.num_of_particles_to_spawn_initially = float_range(40, 120);
-		em.base_speed = float_range(500, 900);
-		em.rotation_speed = float_range(0, 0);
-		em.particle_lifetime_ms = float_range(32, 90);
-
-		for (int i = 0; i < 5; ++i) {
-			general_particle particle_definition;
-
-			particle_definition.angular_damping = 0;
-			particle_definition.linear_damping = 5000;
-			set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::PIXEL_THUNDER_1) + i)), rgba(255, 255, 255, 255));
-			particle_definition.size.x *= 1.3f;
-			particle_definition.alpha_levels = 1;
-
-			em.add_particle_definition(particle_definition);
-		}
-
-		em.size_multiplier = float_range(1.0, 1.3);
-		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
-		em.initial_rotation_variation = 0;
-
-		effect.emissions.push_back(em);
-
 		{
 			particles_emission em;
 			default_bounds(em);
@@ -922,32 +943,34 @@ void load_test_scene_particle_effects(
 			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
 			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
 
-			em.spread_degrees = float_range(360, 360);
-			em.num_of_particles_to_spawn_initially.set(18, 20);
+			em.spread_degrees = float_range(1, 20);
+			em.num_of_particles_to_spawn_initially.set(70, 80);
 			em.stream_lifetime_ms = float_range(0, 0);
 
-			em.base_speed = float_range(250, 350);
-			em.base_speed_variation = float_range(10.f, 12.f);
+			em.base_speed = float_range(50, 650);
+			em.base_speed_variation = float_range(4.f, 8.f);
 
 			em.rotation_speed = float_range(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
-			em.particle_lifetime_ms = float_range(700, 800);
+			em.particle_lifetime_ms = float_range(600, 800);
 
 			for (int i = 0; i < 3; ++i) {
 				general_particle particle_definition;
 
 				particle_definition.angular_damping = 0;
-				particle_definition.linear_damping = 20;
-				particle_definition.acc.set(600, -600);
-				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 15));
-				particle_definition.unshrinking_time_ms = 30.f;
-				particle_definition.shrink_when_ms_remaining = 50.f;
+				particle_definition.linear_damping = 100;
+				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 30));
+				particle_definition.unshrinking_time_ms = 100.f;
+				particle_definition.shrink_when_ms_remaining = 300.f;
+				particle_definition.acc.set(40, -40);
 
 				em.add_particle_definition(particle_definition);
 			}
 
-			em.size_multiplier = float_range(0.40, 0.50);
-			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
+			em.size_multiplier = float_range(0.25, 0.25);
+			em.target_render_layer = render_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
+			em.scale_damping_to_velocity = 180;
+			em.randomize_acceleration = true;
 
 			effect.emissions.push_back(em);
 		}
@@ -956,14 +979,14 @@ void load_test_scene_particle_effects(
 			particles_emission em;
 			em.rotation_speed = float_range(0, 0);
 			em.particle_lifetime_ms = float_range(100, 349);
-			em.num_of_particles_to_spawn_initially.set(25, 30);
-			em.base_speed = float_range(80, 357);
-			em.spread_degrees = float_range(60, 70);
+			em.num_of_particles_to_spawn_initially.set(35, 40);
+			em.base_speed = float_range(20, 1157);
+			em.spread_degrees = float_range(30, 40);
 
 			for (int i = 0; i < 5; ++i) {
 				general_particle particle_definition;
 
-				particle_definition.angular_damping = 0;
+				particle_definition.angular_damping = 3473;
 				particle_definition.linear_damping = 473;
 				particle_definition.acc = { 40, -40 };
 				

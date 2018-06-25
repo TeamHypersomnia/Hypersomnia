@@ -83,34 +83,36 @@ void particles_existence_system::game_responses_to_particle_effects(const logic_
 		if (d.inflictor_destructed) {
 			const auto inflictor = cosmos[d.inflictor];
 
-			const auto& effect = inflictor.get<invariants::missile>().destruction_particles;
+			if (const auto missile = inflictor.find<invariants::missile>()) {
+				const auto& effect = missile->destruction_particles;
 
-			{
-				effect.start(
-					step,
-					particle_effect_start_input::orbit_absolute(cosmos[d.subject], transformr{impact_transform.pos, 0} ) 
-				);
-			}
+				{
+					effect.start(
+						step,
+						particle_effect_start_input::orbit_absolute(cosmos[d.subject], impact_transform) 
+					);
+				}
 
-			{
-				const auto max_radius = d.amount * 1.5f;
+				if (missile->spawn_exploding_ring) {
+					const auto max_radius = d.amount * 1.5f;
 
-				exploding_ring_input ring;
+					exploding_ring_input ring;
 
-				ring.outer_radius_start_value = max_radius;
-				ring.outer_radius_end_value = max_radius / 1.2f;
+					ring.outer_radius_start_value = max_radius;
+					ring.outer_radius_end_value = max_radius / 1.2f;
 
-				ring.inner_radius_start_value = max_radius / 1.4f;
-				ring.inner_radius_end_value = max_radius / 1.2f;
+					ring.inner_radius_start_value = max_radius / 1.4f;
+					ring.inner_radius_end_value = max_radius / 1.2f;
 
-				ring.emit_particles_on_ring = false;
+					ring.emit_particles_on_ring = false;
 
-				ring.maximum_duration_seconds = 0.16f;
+					ring.maximum_duration_seconds = 0.16f;
 
-				ring.color = effect.modifier.colorize;
-				ring.center = impact_transform.pos;
+					ring.color = effect.modifier.colorize;
+					ring.center = impact_transform.pos;
 
-				step.post_message(ring);
+					step.post_message(ring);
+				}
 			}
 		}
 

@@ -4,7 +4,9 @@ return {
       alpha_multiplier = 1,
       amplification = 60,
       light_colors = {
-        "255 255 255 255"
+        "255 255 255 255",
+        "193 177 85 255",
+        "202 185 89 255"
       },
       radius = {
         x = 80,

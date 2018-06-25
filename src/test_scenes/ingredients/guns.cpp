@@ -128,18 +128,18 @@ namespace test_flavours {
 
 			invariants::missile missile;
 
-			missile.destruction_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
+			missile.destruction_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
+			missile.spawn_exploding_ring = false;
 			missile.destruction_particles.modifier.colorize = white;
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::MISSILE_SMOKE_TRAIL);
 			missile.trace_particles.modifier.colorize = white;
 
-			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
+			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION);
 			missile.muzzle_leave_particles.modifier.colorize = white;//{ 255, 218, 5, 255 };
 			missile.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
-			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
-			missile.destruction_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
+			missile.destruction_sound.id = to_sound_id(test_scene_sound_id::STEEL_PROJECTILE_DESTRUCTION);
 
 			auto& trace_modifier = missile.trace_sound.modifier;
 

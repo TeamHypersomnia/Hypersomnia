@@ -71,6 +71,8 @@ enum class test_scene_sound_id {
 	GLASS_DAMAGE,
 	COLLISION_GLASS,
 
+	STEEL_PROJECTILE_DESTRUCTION,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };
