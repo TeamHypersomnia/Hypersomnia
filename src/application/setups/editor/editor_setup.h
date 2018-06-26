@@ -108,6 +108,7 @@ class editor_setup : private current_access_cache<editor_setup> {
 	std::optional<editor_popup> ok_only_popup;
 
 	editor_destructor_input destructor_input;
+	int additional_steps = 0;
 
 	const_entity_handle get_matching_go_to_entity() const;
 
@@ -241,7 +242,7 @@ public:
 			timer.advance(frame_delta *= player.speed);
 		}
 
-		auto steps = timer.extract_num_of_logic_steps(get_viewed_cosmos().get_fixed_delta());
+		auto steps = additional_steps + timer.extract_num_of_logic_steps(get_viewed_cosmos().get_fixed_delta());
 
 		while (steps--) {
 			total_collected_entropy.clear_dead_entities(work().world);
@@ -253,6 +254,8 @@ public:
 
 			total_collected_entropy.clear();
 		}
+
+		additional_steps = 0;
 	}
 
 	void control(const cosmic_entropy&);

@@ -1084,6 +1084,7 @@ bool editor_setup::handle_input_before_game(
 				case key::DEL: delete_selection(); return true;
 				case key::T: mover.start_moving_selection(make_mover_input()); return true;
 				case key::R: mover.start_rotating_selection(make_mover_input()); return true;
+				case key::ADD: ++additional_steps; return true;
 				default: break;
 			}
 
