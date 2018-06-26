@@ -32,6 +32,8 @@
 
 using namespace augs;
 
+#define ENABLE_RECOIL 1
+
 void components::gun::set_cocking_handle_pulling(
 	const bool enabled,
 	const augs::stepped_timestamp now
@@ -366,6 +368,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			auto& heat = gun.current_heat;
 
 			if (total_recoil != 0.f) {
+#if ENABLE_RECOIL
 				if (const auto* const recoil_player = logicals.find(gun_def.recoil.id)) {
 					if (sentience) {
 						const auto recoil_value = gun.recoil.shoot_and_get_impulse(gun_def.recoil, *recoil_player);
@@ -393,6 +396,9 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 					gun.steam_burst_scheduled = true;
 				}
+#else
+				(void)logicals;
+#endif
 			}
 			else if (decrease_heat_in_aftermath && is_ready(gun_def.shot_cooldown_ms, gun.when_last_fired, now, delta)) {
 				/* Apply idle cooldown */
