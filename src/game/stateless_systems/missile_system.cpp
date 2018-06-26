@@ -54,6 +54,31 @@ static void detonate_if_explosive(
 	}
 }
 
+struct missile_surface_info {
+	bool collide;
+	bool collision_detonates;
+	bool ricochetable;
+	bool surface_is_item;
+
+	template <class A, class B>
+	missile_surface_info(
+		const A missile,
+		const B surface
+	) {
+		const auto& sender = missile.template get<components::sender>();
+		const bool bullet_colliding_with_any_subject_of_sender = sender.is_sender_subject(surface);
+
+		surface_is_item = surface.template has<components::item>();
+		collide = !bullet_colliding_with_any_subject_of_sender;
+		ricochetable = !surface_is_item;
+		collision_detonates = !surface_is_item;
+	}
+};
+
+void missile_system::ricochet_missiles(const logic_step) {
+
+}
+
 void missile_system::detonate_colliding_missiles(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	const auto delta = step.get_delta();
@@ -70,15 +95,12 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 		missile_handle.dispatch_on_having<invariants::missile>([&](const auto typed_missile) {
 			const auto& missile_def = typed_missile.template get<invariants::missile>();
-			const auto& sender = typed_missile.template get<components::sender>();
 			auto& missile = typed_missile.template get<components::missile>();
 
-			const bool bullet_colliding_with_any_subject_of_sender = sender.is_sender_subject(subject_handle);
 			const auto collision_normal = vec2(it.normal).normalize();
-			
-			const bool should_collide = !bullet_colliding_with_any_subject_of_sender;
+			const auto info = missile_surface_info(typed_missile, subject_handle);
 
-			if (!should_collide) {
+			if (!info.collide) {
 				return;
 			}
 
@@ -87,7 +109,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			const auto impact_dir = impact_velocity / impact_speed;
 			const auto impact_dot_normal = impact_dir.dot(collision_normal);
 
-			if (impact_dot_normal <= 0.f) {
+			if (info.ricochetable && impact_dot_normal <= 0.f) {
 				/* 
 					If the collision normal and velocity point in opposite directions,
 				   	check if ricochet happens
@@ -175,9 +197,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			missile.saved_point_of_impact_before_death = it.point;
 
 			const auto owning_capability = subject_handle.get_owning_transfer_capability();
-
-			const bool is_victim_an_item = subject_handle.has<components::item>();
-			const bool is_victim_a_held_item = is_victim_an_item && owning_capability.alive() && owning_capability != it.subject;
+			const bool is_victim_a_held_item = info.surface_is_item && owning_capability.alive() && owning_capability != it.subject;
 
 			messages::damage_message damage_msg;
 			damage_msg.subject_b2Fixture_index = it.subject_b2Fixture_index;
@@ -195,7 +215,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 				missile.power_multiplier_of_sender
 			;
 
-			if (!is_victim_an_item && missile_def.destroy_upon_damage) {
+			if (info.collision_detonates && missile_def.destroy_upon_damage) {
 				missile.damage_charges_before_destruction--;
 				
 				detonate_if_explosive(step, it.point, missile_handle);

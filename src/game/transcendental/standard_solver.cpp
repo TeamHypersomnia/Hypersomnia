@@ -99,6 +99,7 @@ void standard_solve(const logic_step step) {
 	item_system().start_picking_up_items(step);
 	item_system().pick_up_touching_items(step);
 
+	missile_system().ricochet_missiles(step);
 	missile_system().detonate_colliding_missiles(step);
 	missile_system().detonate_expired_missiles(step);
 
