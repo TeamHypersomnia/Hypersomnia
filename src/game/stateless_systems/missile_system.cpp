@@ -75,8 +75,110 @@ struct missile_surface_info {
 	}
 };
 
-void missile_system::ricochet_missiles(const logic_step) {
+void missile_system::ricochet_missiles(const logic_step step) {
+	auto& cosm = step.get_cosmos();
+	const auto delta = step.get_delta();
+	const auto now = cosm.get_timestamp();
+	const auto& events = step.get_queue<messages::collision_message>();
 
+	for (const auto& it : events) {
+		if (it.type != messages::collision_message::event_type::BEGIN_CONTACT || it.one_is_sensor) {
+			continue;
+		}
+
+		const auto subject_handle = cosm[it.subject];
+		const auto missile_handle = cosm[it.collider];
+
+		missile_handle.dispatch_on_having<invariants::missile>([&](const auto typed_missile) {
+			const auto& missile_def = typed_missile.template get<invariants::missile>();
+			auto& missile = typed_missile.template get<components::missile>();
+
+			{
+				const bool ricochet_cooldown = augs::lasts(
+					missile_def.ricochet_cooldown_ms,
+					missile.when_last_ricocheted,
+					now,
+					delta
+				);
+
+				if (ricochet_cooldown) {
+					return;
+				}
+			}
+
+			const auto info = missile_surface_info(typed_missile, subject_handle);
+
+			if (!info.collide || !info.ricochetable) {
+				return;
+			}
+
+			const auto collision_normal = vec2(it.normal).normalize();
+
+			const auto impact_velocity = typed_missile.get_effective_velocity();
+			const auto impact_speed = impact_velocity.length();
+			const auto impact_dir = impact_velocity / impact_speed;
+			const auto impact_dot_normal = impact_dir.dot(collision_normal);
+
+			if (impact_dot_normal >= 0.f) {
+				return;
+			}
+
+			/* 
+				If the collision normal and velocity point in opposite directions,
+				check if ricochet happens.
+			*/
+
+			const auto hit_facing = impact_dir.degrees_between(collision_normal);
+
+			const auto& collider_fixtures = subject_handle.get<invariants::fixtures>();
+			const auto max_ricochet_angle = collider_fixtures.max_ricochet_angle;
+
+			const auto left_b = 90 - max_ricochet_angle;
+			const auto right_b = 90 + max_ricochet_angle;
+
+			if (hit_facing > left_b && hit_facing < right_b) {
+				missile.when_last_ricocheted = now;
+
+				const auto reflected_dir = vec2(impact_dir).reflect(collision_normal);
+				const auto& rigid_body = typed_missile.template get<components::rigid_body>();
+
+				const auto separation = reflected_dir * 5.f;
+				const auto target_position = rigid_body.get_transform().pos + separation;
+				const auto new_transform = transformr(target_position, reflected_dir.degrees());
+
+				rigid_body.set_velocity(reflected_dir * impact_speed);
+				rigid_body.set_transform(new_transform);
+
+				const auto angle = std::min(hit_facing - left_b, right_b - hit_facing);
+				const auto angle_mult = angle / max_ricochet_angle;
+
+				::play_collision_sound(angle_mult * 150.f, it.point, typed_missile, subject_handle, step);
+
+				const auto effect_transform = transformr(it.point, reflected_dir.degrees());
+
+				{
+					const auto& effect = missile_def.ricochet_particles;
+
+					effect.start(
+						step,
+						particle_effect_start_input::fire_and_forget(effect_transform)
+					);
+				}
+
+				{
+					const auto pitch = 0.7f + angle_mult / 1.5f;
+
+					auto effect = missile_def.ricochet_sound;
+					effect.modifier.pitch = pitch;
+
+					effect.start(
+						step,
+						sound_effect_start_input::fire_and_forget(effect_transform)
+					);
+				}
+			}
+		});
+	}
 }
 
 void missile_system::detonate_colliding_missiles(const logic_step step) {
@@ -97,73 +199,24 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			const auto& missile_def = typed_missile.template get<invariants::missile>();
 			auto& missile = typed_missile.template get<components::missile>();
 
+			{
+				const bool ricochet_cooldown = augs::lasts(
+					missile_def.ricochet_cooldown_ms,
+					missile.when_last_ricocheted,
+					now,
+					delta
+				);
+
+				if (ricochet_cooldown) {
+					return;
+				}
+			}
+
 			const auto collision_normal = vec2(it.normal).normalize();
 			const auto info = missile_surface_info(typed_missile, subject_handle);
 
 			if (!info.collide) {
 				return;
-			}
-
-			const auto impact_velocity = typed_missile.get_effective_velocity();
-			const auto impact_speed = impact_velocity.length();
-			const auto impact_dir = impact_velocity / impact_speed;
-			const auto impact_dot_normal = impact_dir.dot(collision_normal);
-
-			if (info.ricochetable && impact_dot_normal <= 0.f) {
-				/* 
-					If the collision normal and velocity point in opposite directions,
-				   	check if ricochet happens
-				*/
-
-				const auto hit_facing = impact_velocity.degrees_between(collision_normal);
-
-				const auto& collider_fixtures = subject_handle.get<invariants::fixtures>();
-				const auto max_ricochet_angle = collider_fixtures.max_ricochet_angle;
-
-				const auto left_b = 90 - max_ricochet_angle;
-				const auto right_b = 90 + max_ricochet_angle;
-
-				if (hit_facing > left_b && hit_facing < right_b) {
-					const auto reflected_dir = vec2(impact_dir).reflect(collision_normal);
-					const auto& rigid_body = typed_missile.template get<components::rigid_body>();
-
-					const auto separation = reflected_dir * 5.f;
-					const auto target_position = rigid_body.get_transform().pos + separation;
-					const auto new_transform = transformr(target_position, reflected_dir.degrees());
-
-					rigid_body.set_velocity(reflected_dir * impact_speed);
-					rigid_body.set_transform(new_transform);
-
-					const auto angle = std::min(hit_facing - left_b, right_b - hit_facing);
-					const auto angle_mult = angle / max_ricochet_angle;
-
-					::play_collision_sound(angle_mult * 150.f, it.point, typed_missile, subject_handle, step);
-
-					const auto effect_transform = transformr(it.point, reflected_dir.degrees());
-
-					{
-						const auto& effect = missile_def.ricochet_particles;
-
-						effect.start(
-							step,
-							particle_effect_start_input::fire_and_forget(effect_transform)
-						);
-					}
-
-					{
-						const auto pitch = 0.7f + angle_mult / 1.5f;
-
-						auto effect = missile_def.ricochet_sound;
-						effect.modifier.pitch = pitch;
-
-						effect.start(
-							step,
-							sound_effect_start_input::fire_and_forget(effect_transform)
-						);
-					}
-
-					return;
-				}
 			}
 
 			const bool should_send_damage =
@@ -174,6 +227,9 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			if (!should_send_damage) {
 				return;
 			}
+
+			const auto impact_velocity = typed_missile.get_effective_velocity();
+			const auto impact_dir = vec2(impact_velocity).normalize();
 
 			if (missile_def.impulse_upon_hit > 0.f) {
 				auto considered_impulse = missile_def.impulse_upon_hit * missile.power_multiplier_of_sender;

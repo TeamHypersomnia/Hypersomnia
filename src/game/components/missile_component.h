@@ -27,6 +27,7 @@ namespace components {
 		real32 power_multiplier_of_sender = 1.f;
 		real32 initial_speed = 0.f;
 
+		augs::stepped_timestamp when_last_ricocheted;
 		augs::stepped_timestamp when_fired;
 
 		signi_entity_id particular_homing_target;
@@ -78,6 +79,7 @@ namespace invariants {
 		particle_effect_input destruction_particles;
 
 		std::array<remnant_flavour_id, 4> remnant_flavours;
+		real32 ricochet_cooldown_ms = 24.f;
 		// END GEN INTROSPECTOR
 	};
 }

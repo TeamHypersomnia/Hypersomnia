@@ -36,7 +36,6 @@ using friction_connection_vector =
 struct special_physics {
 	// GEN INTROSPECTOR struct special_physics
 	augs::stepped_cooldown dropped_or_created_cooldown;
-	augs::stepped_timestamp when_last_ricocheted;
 	signi_entity_id during_cooldown_ignore_collision_with;
 	signi_entity_id owner_friction_ground;
 	friction_connection_vector owner_friction_grounds = {};
@@ -95,7 +94,6 @@ namespace invariants {
 		pad_bytes<1> pad;
 
 		damping_mults damping;
-		real32 ricochet_cooldown_ms = 24.f;
 		// END GEN INTROSPECTOR
 	};
 };
