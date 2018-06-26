@@ -63,6 +63,8 @@ void missile_system::ricochet_missiles(const logic_step step) {
 
 	const auto steps = cosm.get_total_steps_passed();
 	(void)steps;
+	(void)delta;
+	(void)now;
 
 	for (const auto& it : events) {
 		if (it.type != messages::collision_message::event_type::BEGIN_CONTACT || it.one_is_sensor) {
@@ -115,7 +117,14 @@ void missile_system::ricochet_missiles(const logic_step step) {
 						delta
 					);
 
-					if (ricochet_cooldown) {
+					const bool born_cooldown = augs::lasts(
+						missile_def.ricochet_cooldown_ms,
+						missile_handle.when_born(),
+						now,
+						delta
+					);
+
+					if (ricochet_cooldown || born_cooldown) {
 						return;
 					}
 				}
@@ -171,6 +180,8 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 	const auto steps = cosm.get_total_steps_passed();
 	(void)steps;
+	(void)delta;
+	(void)now;
 
 	for (const auto& it : events) {
 		if (it.type != messages::collision_message::event_type::BEGIN_CONTACT || it.one_is_sensor) {
