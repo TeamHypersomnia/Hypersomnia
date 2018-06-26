@@ -33,6 +33,7 @@
 
 #include "game/stateless_systems/sound_existence_system.h"
 #include "game/detail/organisms/startle_nearbly_organisms.h"
+#include "game/detail/physics/missile_surface_info.h"
 
 using namespace augs;
 
@@ -54,32 +55,14 @@ static void detonate_if_explosive(
 	}
 }
 
-struct missile_surface_info {
-	bool collide;
-	bool collision_detonates;
-	bool ricochetable;
-	bool surface_is_item;
-
-	template <class A, class B>
-	missile_surface_info(
-		const A missile,
-		const B surface
-	) {
-		const auto& sender = missile.template get<components::sender>();
-		const bool bullet_colliding_with_any_subject_of_sender = sender.is_sender_subject(surface);
-
-		surface_is_item = surface.template has<components::item>();
-		collide = !bullet_colliding_with_any_subject_of_sender;
-		ricochetable = !surface_is_item;
-		collision_detonates = !surface_is_item;
-	}
-};
-
 void missile_system::ricochet_missiles(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	const auto delta = step.get_delta();
 	const auto now = cosm.get_timestamp();
 	const auto& events = step.get_queue<messages::collision_message>();
+
+	const auto steps = cosm.get_total_steps_passed();
+	(void)steps;
 
 	for (const auto& it : events) {
 		if (it.type != messages::collision_message::event_type::BEGIN_CONTACT || it.one_is_sensor) {
@@ -93,28 +76,15 @@ void missile_system::ricochet_missiles(const logic_step step) {
 			const auto& missile_def = typed_missile.template get<invariants::missile>();
 			auto& missile = typed_missile.template get<components::missile>();
 
-			{
-				const bool ricochet_cooldown = augs::lasts(
-					missile_def.ricochet_cooldown_ms,
-					missile.when_last_ricocheted,
-					now,
-					delta
-				);
-
-				if (ricochet_cooldown) {
-					return;
-				}
-			}
-
 			const auto info = missile_surface_info(typed_missile, subject_handle);
 
-			if (!info.collide || !info.ricochetable) {
+			if (!info.is_ricochetable()) {
 				return;
 			}
 
 			const auto collision_normal = vec2(it.normal).normalize();
 
-			const auto impact_velocity = typed_missile.get_effective_velocity();
+			const auto impact_velocity = it.collider_impact_velocity;
 			const auto impact_speed = impact_velocity.length();
 			const auto impact_dir = impact_velocity / impact_speed;
 			const auto impact_dot_normal = impact_dir.dot(collision_normal);
@@ -137,20 +107,32 @@ void missile_system::ricochet_missiles(const logic_step step) {
 			const auto right_b = 90 + max_ricochet_angle;
 
 			if (hit_facing > left_b && hit_facing < right_b) {
+				{
+					const bool ricochet_cooldown = augs::lasts(
+						missile_def.ricochet_cooldown_ms,
+						missile.when_last_ricocheted,
+						now,
+						delta
+					);
+
+					if (ricochet_cooldown) {
+						return;
+					}
+				}
+
+				const auto angle = std::min(hit_facing - left_b, right_b - hit_facing);
+				const auto angle_mult = angle / max_ricochet_angle;
+
 				missile.when_last_ricocheted = now;
 
 				const auto reflected_dir = vec2(impact_dir).reflect(collision_normal);
 				const auto& rigid_body = typed_missile.template get<components::rigid_body>();
 
-				const auto separation = reflected_dir * 5.f;
-				const auto target_position = rigid_body.get_transform().pos + separation;
+				const auto target_position = rigid_body.get_transform().pos;
 				const auto new_transform = transformr(target_position, reflected_dir.degrees());
 
 				rigid_body.set_velocity(reflected_dir * impact_speed);
 				rigid_body.set_transform(new_transform);
-
-				const auto angle = std::min(hit_facing - left_b, right_b - hit_facing);
-				const auto angle_mult = angle / max_ricochet_angle;
 
 				::play_collision_sound(angle_mult * 150.f, it.point, typed_missile, subject_handle, step);
 
@@ -187,6 +169,9 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 	const auto now = cosm.get_timestamp();
 	const auto& events = step.get_queue<messages::collision_message>();
 
+	const auto steps = cosm.get_total_steps_passed();
+	(void)steps;
+
 	for (const auto& it : events) {
 		if (it.type != messages::collision_message::event_type::BEGIN_CONTACT || it.one_is_sensor) {
 			continue;
@@ -198,6 +183,22 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 		missile_handle.dispatch_on_having<invariants::missile>([&](const auto typed_missile) {
 			const auto& missile_def = typed_missile.template get<invariants::missile>();
 			auto& missile = typed_missile.template get<components::missile>();
+
+			const auto collision_normal = vec2(it.normal).normalize();
+			const auto info = missile_surface_info(typed_missile, subject_handle);
+
+			if (info.should_ignore_altogether()) {
+				return;
+			}
+
+			const bool should_send_damage =
+				missile_def.damage_upon_collision
+				&& missile.damage_charges_before_destruction > 0
+			;
+
+			if (!should_send_damage) {
+				return;
+			}
 
 			{
 				const bool ricochet_cooldown = augs::lasts(
@@ -212,23 +213,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 				}
 			}
 
-			const auto collision_normal = vec2(it.normal).normalize();
-			const auto info = missile_surface_info(typed_missile, subject_handle);
-
-			if (!info.collide) {
-				return;
-			}
-
-			const bool should_send_damage =
-				missile_def.damage_upon_collision
-				&& missile.damage_charges_before_destruction > 0
-			;
-
-			if (!should_send_damage) {
-				return;
-			}
-
-			const auto impact_velocity = typed_missile.get_effective_velocity();
+			const auto impact_velocity = it.collider_impact_velocity;
 			const auto impact_dir = vec2(impact_velocity).normalize();
 
 			if (missile_def.impulse_upon_hit > 0.f) {
@@ -250,7 +235,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 				subject_of_impact.apply_impulse(impact, it.point - subject_of_impact_mass_pos);
 			}
 
-			missile.saved_point_of_impact_before_death = it.point;
+			missile.saved_point_of_impact_before_death = { it.point, impact_dir.degrees() };
 
 			const auto owning_capability = subject_handle.get_owning_transfer_capability();
 			const bool is_victim_a_held_item = info.surface_is_item && owning_capability.alive() && owning_capability != it.subject;
@@ -271,7 +256,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 				missile.power_multiplier_of_sender
 			;
 
-			if (info.collision_detonates && missile_def.destroy_upon_damage) {
+			if (info.should_detonate() && missile_def.destroy_upon_damage) {
 				missile.damage_charges_before_destruction--;
 				
 				detonate_if_explosive(step, it.point, missile_handle);
@@ -314,11 +299,6 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 								vel = -1 * vec2(impact_dir).rotate(rng.randval(-40.f, 40.f), vec2()) * speed;
 							}
 
-							if (DEBUG_DRAWING.draw_forces) {
-								DEBUG_PERSISTENT_LINES.emplace_back(yellow, it.point, it.point + vel);
-								DEBUG_PERSISTENT_LINES.emplace_back(white, it.point, it.point + collision_normal * 200);
-							}
-
 							cosmic::create_entity(
 								cosm,
 								r_id,
@@ -326,10 +306,6 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 									auto spawn_offset = vec2(vel).normalize() * rng.randval(55.f, 60.f);
 									const auto rot = rng.randval(0, 360);
 									
-									if (DEBUG_DRAWING.draw_forces) {
-										DEBUG_PERSISTENT_LINES.emplace_back(cyan, it.point, it.point + spawn_offset);
-									}
-
 									typed_remnant.set_logic_transform(transformr(it.point + spawn_offset, rot));
 								},
 								[&](const auto typed_remnant) {
@@ -384,10 +360,10 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 					const auto when_detonates = missile.when_fired.step + fuse_delay_steps;
 
 					if (/* should_already_detonate */ now.step >= when_detonates) {
-						const auto current_pos = it.get_logic_transform().pos;
+						const auto current_tr = it.get_logic_transform();
 
-						missile.saved_point_of_impact_before_death = current_pos;
-						detonate_if_explosive(step, current_pos, it);
+						missile.saved_point_of_impact_before_death = current_tr;
+						detonate_if_explosive(step, current_tr.pos, it);
 						step.post_message(messages::queue_destruction(it));
 					}
 				}

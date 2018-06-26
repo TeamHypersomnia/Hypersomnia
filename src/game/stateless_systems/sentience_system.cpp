@@ -429,7 +429,9 @@ void sentience_system::cooldown_aimpunches(const logic_step step) const {
 
 void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic_step step) const {
 	auto debug_line_drawer = [](const rgba col, const vec2 a, const vec2 b){
-		DEBUG_LOGIC_STEP_LINES.emplace_back(col, a, b);
+		if (DEBUG_DRAWING.draw_colinearization) {
+			DEBUG_LOGIC_STEP_LINES.emplace_back(col, a, b);
+		}
 	};
 
 	auto& cosmos = step.get_cosmos();

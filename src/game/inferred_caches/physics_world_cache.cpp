@@ -136,6 +136,10 @@ void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h
 			body.SetLinearDampingVec(b2Vec2(damping.linear_axis_aligned));
 			body.SetAngledDampingEnabled(def.angled_damping);
 	
+			if (handle.template has<components::missile>()) {
+				body.SetFixedRotation(true);
+			}
+
 			/* These have side-effects, thus we guard */
 			if (body.IsSleepingAllowed() != def.allow_sleep) {
 				body.SetSleepingAllowed(def.allow_sleep);
@@ -196,6 +200,10 @@ void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h
 
 		def.linearVelocity = b2Vec2(physics_data.velocity);
 		def.angularVelocity = physics_data.angular_velocity;
+
+		if (handle.template has<components::missile>()) {
+			def.fixedRotation = true;
+		}
 
 		def.active = true;
 

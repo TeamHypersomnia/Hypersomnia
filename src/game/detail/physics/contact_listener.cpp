@@ -15,6 +15,7 @@
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/physics/contact_listener.h"
 
+#include "game/detail/physics/missile_surface_info.h"
 #include "game/inferred_caches/physics_world_cache.h"
 
 #define FRICTION_FIELDS_COLLIDE 0
@@ -182,8 +183,8 @@ void contact_listener::BeginContact(b2Contact* contact) {
 		msg.point = si.get_pixels(msg.point);
 		msg.normal = si.get_pixels(worldManifold.normal);
 
-		msg.subject_impact_velocity = body_a->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
-		msg.collider_impact_velocity = body_b->GetLinearVelocityFromWorldPoint(worldManifold.points[0]);
+		msg.subject_impact_velocity = si.get_pixels(body_a->GetLinearVelocity());
+		msg.collider_impact_velocity = si.get_pixels(body_b->GetLinearVelocity());
 	}
 
 	if (post_collision_messages) {
@@ -195,6 +196,7 @@ void contact_listener::BeginContact(b2Contact* contact) {
 void contact_listener::EndContact(b2Contact* contact) {
 	auto& sys = get_sys();
 	auto& cosmos = cosm;
+	const auto si = cosmos.get_si();
 
 	for (int i = 0; i < 2; ++i) {
 		auto fix_a = contact->GetFixtureA();
@@ -253,8 +255,8 @@ void contact_listener::EndContact(b2Contact* contact) {
 			}
 		}
 
-		msg.subject_impact_velocity = -body_a->GetLinearVelocity();
-		msg.collider_impact_velocity = -body_b->GetLinearVelocity();
+		msg.subject_impact_velocity = si.get_pixels(body_a->GetLinearVelocity());
+		msg.collider_impact_velocity = si.get_pixels(body_b->GetLinearVelocity());
 		sys.accumulated_messages.push_back(msg);
 	}
 }
@@ -368,21 +370,29 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 			break;
 		}
 
-		if (
-			subject_fixtures.standard_collision_resolution_disabled() 
+		if (subject_fixtures.standard_collision_resolution_disabled() 
 			|| collider_fixtures.standard_collision_resolution_disabled()
 		) {
 			contact->SetEnabled(false);
 		}
 
+		if (subject.has<components::missile>()) {
+			const auto info = missile_surface_info(subject, collider);
+
+			if (info.ignore_standard_impulse()) {
+				contact->SetEnabled(false);
+			}
+		}
+
 		msg.subject_b2Fixture_index = sys.get_index_in_component(fix_a, subject);
 		msg.collider_b2Fixture_index = sys.get_index_in_component(fix_b, collider);
 
+		msg.normal = si.get_pixels(manifold.normal);
 		msg.point = manifold.points[0];
 		msg.point = si.get_pixels(msg.point);
 
-		msg.subject_impact_velocity = body_a->GetLinearVelocityFromWorldPoint(manifold.points[0]);
-		msg.collider_impact_velocity = body_b->GetLinearVelocityFromWorldPoint(manifold.points[0]);
+		msg.subject_impact_velocity = si.get_pixels(body_a->GetLinearVelocity());
+		msg.collider_impact_velocity = si.get_pixels(body_b->GetLinearVelocity());
 	}
 
 	if (post_collision_messages) {
@@ -431,8 +441,8 @@ void contact_listener::PostSolve(b2Contact* contact, const b2ContactImpulse* imp
 		msg.point = manifold.points[0];
 		msg.point = si.get_pixels(msg.point);
 
-		msg.subject_impact_velocity = body_a->GetLinearVelocityFromWorldPoint(manifold.points[0]);
-		msg.collider_impact_velocity = body_b->GetLinearVelocityFromWorldPoint(manifold.points[0]);
+		msg.subject_impact_velocity = si.get_pixels(body_a->GetLinearVelocity());
+		msg.collider_impact_velocity = si.get_pixels(body_b->GetLinearVelocity());
 		
 		const auto count = impulse->count;
 

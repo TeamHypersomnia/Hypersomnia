@@ -110,7 +110,6 @@ namespace test_flavours {
 		
 		fixtures_def.filter = filters::bullet();
 		fixtures_def.density = 1;
-		fixtures_def.disable_standard_collision_resolution = true;
 		fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::METAL);
 
 		meta.set(fixtures_def);

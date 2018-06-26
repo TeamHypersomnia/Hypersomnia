@@ -32,7 +32,7 @@ namespace components {
 
 		signi_entity_id particular_homing_target;
 		
-		vec2 saved_point_of_impact_before_death;
+		transformr saved_point_of_impact_before_death;
 		// END GEN INTROSPECTOR
 	};
 }

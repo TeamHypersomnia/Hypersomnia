@@ -85,11 +85,16 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 			auto transform_of_finishing = deleted_entity.get_logic_transform();
 
 			if (const auto missile = deleted_entity.find<components::missile>()) {
-				transform_of_finishing.pos = 
-					missile->saved_point_of_impact_before_death
-					- vec2(deleted_entity.get<invariants::sprite>().get_size() / 2)
-					.rotate(transform_of_finishing.rotation, vec2i(0, 0))
-				;
+				transform_of_finishing = missile->saved_point_of_impact_before_death;
+
+				if (const auto w = deleted_entity.find_logical_width()) {
+					transform_of_finishing.pos -= vec2(*w / 2, 0).rotate(transform_of_finishing.rotation, vec2());
+				}
+				/* transform_of_finishing */
+
+				/* 	- vec2(deleted_entity.get<invariants::sprite>().get_size() / 2) */
+				/* 	.rotate(transform_of_finishing.rotation, vec2i(0, 0)) */
+				/* ; */
 			}
 
 			if (const auto finishing_trace = cosmic::create_entity(
