@@ -58,7 +58,8 @@ std::vector<physics_raycast_output> physics_world_cache::ray_cast_all_intersecti
 	callback.save_all = true;
 
 	if (!((p1_meters - p2_meters).length_sq() > 0.f)) {
-		LOG("Ray casting error: X: %x %x", p1_meters, p2_meters);
+		//LOG("Ray casting error: X: %x %x", p1_meters, p2_meters);
+		return callback.outputs;
 	}
 
 	b2world->RayCast(&callback, b2Vec2(p1_meters), b2Vec2(p2_meters));
@@ -141,7 +142,7 @@ physics_raycast_output physics_world_cache::ray_cast(const vec2 p1_meters, const
 	callback.subject_filter = filter;
 
 	if (!((p1_meters - p2_meters).length_sq() > 0.f)) {
-		LOG("Ray casting error: X: %x %x", p1_meters, p2_meters);
+		//LOG("Ray casting error: X: %x %x", p1_meters, p2_meters);
 		return callback.output;
 	}
 
