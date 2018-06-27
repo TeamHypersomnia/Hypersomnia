@@ -313,6 +313,19 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 
 			create_frames(
 				anim,
+				test_scene_image_id::CYANVIOLET_FISH_1,
+				test_scene_image_id::CYANVIOLET_FISH_8,
+				40.0f
+			);
+
+			alloc(test_id_type::CYANVIOLET_FISH, anim);
+		} 
+
+		{
+			plain_animation anim;
+
+			create_frames(
+				anim,
 				test_scene_image_id::JELLYFISH_1,
 				test_scene_image_id::JELLYFISH_14,
 				50.0f

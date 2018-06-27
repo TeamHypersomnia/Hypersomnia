@@ -563,6 +563,7 @@ namespace test_scenes {
 
 			const auto yellowfish = test_complex_decorations::YELLOW_FISH;
 			const auto darkbluefish = test_complex_decorations::DARKBLUE_FISH;
+			const auto cyanvioletfish = test_complex_decorations::CYANVIOLET_FISH;
 			const auto jellyfish = test_complex_decorations::JELLYFISH;
 			const auto dragon_fish = test_complex_decorations::DRAGON_FISH;
 			const auto rainbow_dragon_fish = test_complex_decorations::RAINBOW_DRAGON_FISH;
@@ -573,6 +574,13 @@ namespace test_scenes {
 			prefabs::create_fish(step, yellowfish, aquarium_tr + components::transform(vec2(80, 50), -180), aquarium_origin, 2);
 			prefabs::create_fish(step, yellowfish, aquarium_tr - vec2(120, 30), aquarium_origin);
 			prefabs::create_fish(step, yellowfish, aquarium_tr + components::transform(vec2(90, 40), -180), aquarium_origin, 3);
+
+			prefabs::create_fish(step, cyanvioletfish, aquarium_tr - vec2(40, 10), aquarium_origin);
+			prefabs::create_fish(step, cyanvioletfish, aquarium_tr + components::transform(vec2(40, 10), -180), aquarium_origin, 1);
+			prefabs::create_fish(step, cyanvioletfish, aquarium_tr - vec2(40, 30), aquarium_origin);
+			prefabs::create_fish(step, cyanvioletfish, aquarium_tr + components::transform(vec2(40, 50), -180), aquarium_origin, 2);
+			prefabs::create_fish(step, cyanvioletfish, aquarium_tr - vec2(70, 30), aquarium_origin);
+			prefabs::create_fish(step, cyanvioletfish, aquarium_tr + components::transform(vec2(40, 40), -180), aquarium_origin, 3);
 
 			prefabs::create_fish(step, yellowfish, aquarium_tr + vec2(20, 20) - vec2(80, 10), aquarium_origin);
 			prefabs::create_fish(step, yellowfish, aquarium_tr + vec2(20, 20) + components::transform(vec2(80, 10), -180), aquarium_origin, 1);

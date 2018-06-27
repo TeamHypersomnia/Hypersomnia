@@ -1022,3 +1022,9 @@ we consider whole type overrides too complex architeciturally:
 		- Pro: lots of already implemented control over spawning offsets and rotations
 		- Pro: less of things to do in physics
 
+- Simple rect node classes for automatic positioning of scene elements from code
+	- Create metadata along with each size passed
+		- Later it can be instantiated
+	- Simple struct, cascade nodes, some state?
+	- Can later create entities from nodes returned at some point
+

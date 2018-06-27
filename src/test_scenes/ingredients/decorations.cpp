@@ -94,6 +94,13 @@ namespace test_flavours {
 			test_scene_plain_animation_id::DARKBLUE_FISH,
 			render_layer::UPPER_FISH
 		);
+		
+		fish_flavour(
+			test_complex_decorations::CYANVIOLET_FISH,
+			test_scene_image_id::CYANVIOLET_FISH_1,
+			test_scene_plain_animation_id::CYANVIOLET_FISH,
+			render_layer::UPPER_FISH
+		);
 
 		fish_flavour(
 			test_complex_decorations::JELLYFISH,

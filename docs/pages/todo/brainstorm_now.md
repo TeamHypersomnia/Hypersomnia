@@ -6,12 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Simple rect node classes for automatic positioning of scene elements from code
-	- Create metadata along with each size passed
-		- Later it can be instantiated
-	- Simple struct, cascade nodes, some state?
-	- Can later create entities from nodes returned at some point
-
 - Marker entities
 	- Special-purpose components:
 		- shape_aabb
