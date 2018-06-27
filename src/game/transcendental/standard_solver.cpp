@@ -151,7 +151,11 @@ void standard_solve(const logic_step step) {
 
 	listener.~contact_listener();
 
-	performance.raycasts.measure(cosmos.get_solvable_inferred().physics.ray_casts_since_last_step);
+	{
+		auto& num_ray_casts = cosmos.get_solvable_inferred().physics.ray_casts_since_last_step;
+		performance.raycasts.measure(num_ray_casts);
+		num_ray_casts = 0;
+	}
 
 	cosmic::increment_step(cosmos);
 

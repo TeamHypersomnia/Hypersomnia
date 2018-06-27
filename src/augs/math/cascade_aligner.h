@@ -78,6 +78,12 @@ struct cascade_aligner_node {
 		const auto ar = ap.x + as.x / 2;
 		return int((r - ar) / as.x);
 	}
+
+	auto fill_times_ti() const {
+		const auto t = p.y - s.y / 2;
+		const auto at = ap.y - as.y / 2;
+		return int((at - t) / as.y);
+	}
 };
 
 template <class P, class S, class M>
@@ -137,6 +143,12 @@ public:
 	auto& fill_ri(int limit = 0) {
 		auto times = top().fill_times_ri() + limit;
 		while (times-- > 0) { dup().nr(); }
+		return *this;
+	}
+
+	auto& fill_ti(int limit = 0) {
+		auto times = top().fill_times_ti() + limit;
+		while (times-- > 0) { dup().nu(); }
 		return *this;
 	}
 

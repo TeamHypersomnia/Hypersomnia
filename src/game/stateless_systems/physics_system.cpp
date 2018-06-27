@@ -31,8 +31,6 @@ void physics_system::step_and_set_new_transforms(const logic_step step) {
 		const int32 velocityIterations = 8;
 		const int32 positionIterations = 3;
 
-		physics.ray_casts_since_last_step = 0;
-
 		physics.b2world->Step(
 			static_cast<float32>(delta.in_seconds()),
 			velocityIterations,

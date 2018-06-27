@@ -105,6 +105,15 @@ namespace test_flavours {
 			test_scene_physical_material_id::METAL
 		);
 
+		static_obstacle(
+			flavour_with_sprite(
+				test_plain_sprited_bodys::LAB_WALL,
+				test_scene_image_id::LAB_WALL,
+				render_layer::DYNAMIC_BODY
+			),
+			test_scene_physical_material_id::METAL
+		);
+
 		static_glass_obstacle(
 			flavour_with_sprite(
 				test_plain_sprited_bodys::AQUARIUM_GLASS,

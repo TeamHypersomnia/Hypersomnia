@@ -386,6 +386,16 @@ namespace test_scenes {
 				.lo().bo().create_pop()
 				.ro().bo().flip_h().create_pop()
 			;
+
+			aquarium_align(test_plain_sprited_bodys::LAB_WALL)
+				.lo().bi()
+				.create_all()
+			;
+
+			aquarium_align(test_plain_sprited_bodys::LAB_WALL)
+				.ro().bi().flip_h().fill_ti()
+				.create_all()
+			;
 		}
 
 		{
