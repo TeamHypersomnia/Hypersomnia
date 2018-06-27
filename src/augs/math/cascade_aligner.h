@@ -152,6 +152,35 @@ public:
 		return *this;
 	}
 
+	auto& rot_90() {
+		top().as.flip();
+
+		auto& r = meta().rotation;
+
+		if (r == 0.f) {
+			r = 90.f;
+		}
+		else if (r == 90.f) {
+			r = 180.f;
+		}
+		else if (r == 180.f) {
+			r = 270.f;
+		}
+		else if (r == 270.f) {
+			r = 0.f;
+		}
+
+		return *this;
+	}
+
+	auto& rot_minus_90() {
+		rot_90();
+		rot_90();
+		rot_90();
+
+		return *this;
+	}
+
 	template <class... Args>
 	auto& stretch_r(Args&&... args) { top().stretch_r(std::forward<Args>(args)...); return *this; }
 

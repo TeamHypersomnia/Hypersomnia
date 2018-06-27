@@ -84,7 +84,9 @@ namespace test_flavours {
 				test_scene_image_id::LAB_WALL_SMOOTH_END,
 				render_layer::DYNAMIC_BODY
 			),
-			test_scene_physical_material_id::METAL
+			test_scene_physical_material_id::METAL,
+			0.2f,
+			20.f
 		);
 
 		static_obstacle(
@@ -93,7 +95,9 @@ namespace test_flavours {
 				test_scene_image_id::LAB_WALL_CORNER_CUT,
 				render_layer::DYNAMIC_BODY
 			),
-			test_scene_physical_material_id::METAL
+			test_scene_physical_material_id::METAL,
+			0.2f,
+			20.f
 		);
 
 		static_obstacle(
@@ -102,7 +106,9 @@ namespace test_flavours {
 				test_scene_image_id::LAB_WALL_CORNER_SQUARE,
 				render_layer::DYNAMIC_BODY
 			),
-			test_scene_physical_material_id::METAL
+			test_scene_physical_material_id::METAL,
+			0.2f,
+			20.f
 		);
 
 		static_obstacle(
@@ -111,7 +117,9 @@ namespace test_flavours {
 				test_scene_image_id::LAB_WALL,
 				render_layer::DYNAMIC_BODY
 			),
-			test_scene_physical_material_id::METAL
+			test_scene_physical_material_id::METAL,
+			0.2f,
+			20.f
 		);
 
 		static_glass_obstacle(

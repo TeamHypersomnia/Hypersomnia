@@ -54,6 +54,7 @@ public:
 	{}
 
 	flip_flags flip;
+	real32 rotation = 0.f;
 
 	template <class E>
 	auto next(const E e) const {
@@ -71,7 +72,7 @@ public:
 
 	void create(const vec2 resolved_pos) const {
 		on_enum([&](const auto id) {
-			create_test_scene_entity(*cosm, id, resolved_pos).do_flip(flip);
+			create_test_scene_entity(*cosm, id, transformr(resolved_pos, rotation)).do_flip(flip);
 		});
 	}
 };
@@ -388,12 +389,12 @@ namespace test_scenes {
 			;
 
 			aquarium_align(test_plain_sprited_bodys::LAB_WALL)
-				.lo().bi()
+				.rot_90().lo().bi().fill_ti()
 				.create_all()
 			;
 
 			aquarium_align(test_plain_sprited_bodys::LAB_WALL)
-				.ro().bi().flip_h().fill_ti()
+				.flip_v().rot_90().ro().bi().fill_ti()
 				.create_all()
 			;
 		}
