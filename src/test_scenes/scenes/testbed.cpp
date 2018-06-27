@@ -47,6 +47,9 @@ class testbed_node {
 		test_sprite_decorations
 	> enum_id;
 public:
+	testbed_node() = default;
+	testbed_node(const testbed_node&) = default;
+
 	template <class E>
 	testbed_node(cosmos& csm, const E e) : 
 		cosm(&csm),
@@ -375,27 +378,25 @@ namespace test_scenes {
 				.next(test_plain_sprited_bodys::AQUARIUM_GLASS_START).lo().create_pop()
 				.fill_ri(-1)
 				.next(test_plain_sprited_bodys::AQUARIUM_GLASS_START).ro().flip_h()
-				.create_all()
 			;
 
-			aquarium_align(test_plain_sprited_bodys::LAB_WALL_SMOOTH_END).dup()
-				.li().bo().create_pop()
-				.ri().bo().flip_h().create_pop()
+			aquarium_align(test_plain_sprited_bodys::LAB_WALL_SMOOTH_END)
+				.li().bo().again()
+				.ri().bo().flip_h()
 			;
 
-			aquarium_align(test_plain_sprited_bodys::LAB_WALL_CORNER_SQUARE).dup()
-				.lo().bo().create_pop()
-				.ro().bo().flip_h().create_pop()
-			;
+			aquarium_align(test_plain_sprited_bodys::LAB_WALL_CORNER_SQUARE)
+				.lo().bo().again()
+				.ro().bo().flip_h().again()
 
-			aquarium_align(test_plain_sprited_bodys::LAB_WALL)
-				.rot_90().lo().bi().fill_ti()
-				.create_all()
+				.to().lo().flip_v().again()
+				.to().ro().flip_v().flip_h()
 			;
 
 			aquarium_align(test_plain_sprited_bodys::LAB_WALL)
-				.flip_v().rot_90().ro().bi().fill_ti()
-				.create_all()
+				.rot_90().lo().bi().fill_ti().again()
+				.flip_v().rot_90().ro().bi().fill_ti().again()
+				.flip_v().to().li().fill_ri()
 			;
 		}
 

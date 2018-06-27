@@ -12,6 +12,9 @@ struct cascade_aligner_node {
 
 	M meta;
 
+	cascade_aligner_node() = default;
+	cascade_aligner_node(const cascade_aligner_node&) = default;
+
 	cascade_aligner_node(
 		const P& p, 
 		const S& s, 
@@ -94,10 +97,16 @@ public:
 
 private:
 	PV written;
+	node_type last_emplacement;
 public:
 
 	cascade_aligner(const node_type& n) {
+		last_emplacement = n;
 		written = { n };
+	}
+
+	~cascade_aligner() {
+		create_all();
 	}
 
 	auto& top() {
@@ -215,17 +224,24 @@ public:
 		return *this;
 	}
 
+	auto& again() {
+		written.emplace_back(last_emplacement);
+		return *this;
+	}
+
 	template <class... Args>
 	auto& next(Args&&... args) {
 		auto cloned_meta = meta().next(std::forward<Args>(args)...);
 		const auto top_ap = top().ap;
 		const auto top_as = top().as;
 
-		written.emplace_back(
+		last_emplacement = node_type(
 			top_ap,
 			top_as,
 			std::move(cloned_meta)
 		);
+
+		written.emplace_back(last_emplacement);
 
 		return *this;
 	}
