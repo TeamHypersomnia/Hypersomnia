@@ -379,8 +379,12 @@ namespace test_scenes {
 
 			aquarium_align(test_plain_sprited_bodys::LAB_WALL_SMOOTH_END).dup()
 				.li().bo().create_pop()
-				.ri().bo().flip_h()
-				.create_all()
+				.ri().bo().flip_h().create_pop()
+			;
+
+			aquarium_align(test_plain_sprited_bodys::LAB_WALL_CORNER_SQUARE).dup()
+				.lo().bo().create_pop()
+				.ro().bo().flip_h().create_pop()
 			;
 		}
 
