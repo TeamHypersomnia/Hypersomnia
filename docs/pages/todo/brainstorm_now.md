@@ -6,16 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Bullet destruction remnants
-	- Simplest solution: spawn some particles
-		- Pro: lots of already implemented control over spawning offsets and rotations
-		- Pro: less of things to do in physics
-
 - Simple rect node classes for automatic positioning of scene elements from code
+	- Create metadata along with each size passed
+		- Later it can be instantiated
 	- Simple struct, cascade nodes, some state?
 	- Can later create entities from nodes returned at some point
-
-- Add humming sound effect for the aquarium
 
 - Marker entities
 	- Special-purpose components:
@@ -25,6 +20,8 @@ summary: That which we are brainstorming at the moment.
 		- shape_polygon can be used both for marking and for physical bodies
 	- separation between visible shapes and physical shapes is described elsewhere
 		- but the same logic would be used nevertheless
+
+- Add humming sound effect for the aquarium
 
 - Transform design
 	- It is the case that many entities might share identical origin, in which case it would be unwieldy to update origins for all entities to a new one.

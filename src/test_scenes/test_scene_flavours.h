@@ -251,6 +251,15 @@ auto create_test_scene_entity(C& cosm, const E enum_flavour) {
 }
 
 template <class T>
+auto& get_test_flavour(const all_entity_flavours& flavours, const T enum_id) {
+	using E = test_flavours_map::at<T>;
+
+	auto& into = flavours.get_for<E>();
+	const auto flavour_id = to_raw_flavour_id(enum_id);
+	return into[flavour_id];
+}
+
+template <class T>
 auto& get_test_flavour(all_entity_flavours& flavours, const T enum_id) {
 	using E = test_flavours_map::at<T>;
 

@@ -24,8 +24,6 @@ struct has_specific_entity_type<A, decltype(typename A::used_entity_type(), void
 template <class A>
 constexpr bool has_specific_entity_type_v = has_specific_entity_type<A>::value;
 
-struct simple_body;
-
 template <class E>
 class misc_mixin {
 public:
@@ -55,6 +53,17 @@ public:
 		if (const auto sprite = self.template find<components::sprite>()) {
 			auto& f = sprite->flip.vertically;
 			f = !f;
+		}
+	}
+
+	void do_flip(const flip_flags f) const {
+		const auto self = *static_cast<const E*>(this);
+
+		if (f.horizontally) {
+			self.flip_horizontally();
+		}
+		if (f.vertically) {
+			self.flip_vertically();
 		}
 	}
 

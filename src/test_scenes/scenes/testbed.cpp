@@ -33,6 +33,49 @@
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmic_delta.h"
 
+class testbed_node {
+	template <class F>
+	decltype(auto) on_enum(F&& f) const {
+		return std::visit(std::forward<F>(f), enum_id);
+	}
+
+	cosmos* cosm;
+
+	std::variant<
+		test_plain_sprited_bodys,
+		test_complex_decorations,
+		test_sprite_decorations
+	> enum_id;
+public:
+	template <class E>
+	testbed_node(cosmos& csm, const E e) : 
+		cosm(&csm),
+		enum_id(e)
+	{}
+
+	flip_flags flip;
+
+	template <class E>
+	auto next(const E e) const {
+		auto cloned = *this;
+		cloned.enum_id = e;
+		return cloned;
+	}
+
+	auto get_size() const {
+		return on_enum([&](const auto id) {
+			const auto& f = ::get_test_flavour(cosm->get_common_significant().flavours, id);
+			return f.template get<invariants::sprite>().size;
+		});
+	}
+
+	void create(const vec2 resolved_pos) const {
+		on_enum([&](const auto id) {
+			create_test_scene_entity(*cosm, id, resolved_pos).do_flip(flip);
+		});
+	}
+};
+
 namespace test_scenes {
 	entity_id testbed::populate(const loaded_image_caches_map& caches, const logic_step step) const {
 		auto& world = step.get_cosmos();
@@ -317,9 +360,29 @@ namespace test_scenes {
 		const auto aquarium_origin = aquarium_tr + transformr(aquarium_size / 2);
 		const auto whole_aquarium_size = aquarium_size * 2;
 
-		auto aquarium_align = [&](vec2i size) {
-			return make_cascade_aligner(aquarium_origin.pos, whole_aquarium_size, size);
+		auto aquarium_align = [&](const auto flavour_id) {
+			return make_cascade_aligner(
+				aquarium_origin.pos, 
+				whole_aquarium_size, 
+				testbed_node { world, flavour_id }
+			);
 		};
+
+		{
+			aquarium_align(test_plain_sprited_bodys::AQUARIUM_GLASS)
+				.li().bo().nr()
+				.next(test_plain_sprited_bodys::AQUARIUM_GLASS_START).lo().create_pop()
+				.fill_ri(-1)
+				.next(test_plain_sprited_bodys::AQUARIUM_GLASS_START).ro().flip_h()
+				.create_all()
+			;
+
+			aquarium_align(test_plain_sprited_bodys::LAB_WALL_SMOOTH_END).dup()
+				.li().bo().create_pop()
+				.ri().bo().flip_h()
+				.create_all()
+			;
+		}
 
 		{
 			vec2 lights[3] = {
@@ -458,38 +521,6 @@ namespace test_scenes {
 		create_test_scene_entity(world, test_wandering_pixels_decorations::AQUARIUM_PIXELS_DIM, [&](const auto e){
 			e.set_logic_transform(aquarium_origin);
 		});
-
-		{
-			const auto glass_size = get_size_of(test_scene_image_id::AQUARIUM_GLASS);
-			const auto glass_start_size = get_size_of(test_scene_image_id::AQUARIUM_GLASS_START);
-
-			auto glasses = aquarium_align(glass_size);
-
-			glasses.li().bo().nr();
-
-			auto left_glass_edge = glasses.clone();
-			left_glass_edge.next(glass_start_size).lo();
-
-			glasses.push().fill_ri().pop();
-
-			auto right_glass_edge = glasses.clone();
-			right_glass_edge.next(glass_start_size).ro();
-
-			for (const auto p : glasses) {
-				create_test_scene_entity(world, test_plain_sprited_bodys::AQUARIUM_GLASS, p.result());
-			}
-
-			create_test_scene_entity(world, test_plain_sprited_bodys::AQUARIUM_GLASS_START, left_glass_edge.result());
-			create_test_scene_entity(world, test_plain_sprited_bodys::AQUARIUM_GLASS_START, right_glass_edge.result()).flip_horizontally();
-
-			const auto wall_end_size = get_size_of(test_scene_image_id::LAB_WALL_SMOOTH_END);
-
-			auto left_wall_end = aquarium_align(wall_end_size).li().bo();
-			auto right_wall_end = aquarium_align(wall_end_size).ri().bo();
-
-			create_test_scene_entity(world, test_plain_sprited_bodys::LAB_WALL_SMOOTH_END, left_wall_end.result());
-			create_test_scene_entity(world, test_plain_sprited_bodys::LAB_WALL_SMOOTH_END, right_wall_end.result()).flip_horizontally();
-		}
 
 		{
 			const auto edge_size = get_size_of(test_scene_image_id::AQUARIUM_SAND_EDGE);

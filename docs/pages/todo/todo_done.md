@@ -1017,3 +1017,8 @@ we consider whole type overrides too complex architeciturally:
 - Add slight, disappearing (by shrinking) particles for glass impact
 	- What if we could sometime make it so that they stay? And we could synchronize permanently sitting particles through the network?
 
+- Bullet destruction remnants
+	- Simplest solution: spawn some particles
+		- Pro: lots of already implemented control over spawning offsets and rotations
+		- Pro: less of things to do in physics
+

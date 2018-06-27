@@ -115,12 +115,10 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 							typed_handle.set_logic_transform(mirrored_transform);
 						}
 
-						if (hori) {
-							typed_handle.flip_horizontally();
-						}
-						if (vert) {
-							typed_handle.flip_vertically();
-						}
+						flip_flags f;
+						f.horizontally = hori;
+						f.vertically = vert;
+						typed_handle.do_flip(f);
 					}
 				}
 			});
