@@ -119,17 +119,12 @@ bool sound_system::generic_sound_cache::update_properties(const update_propertie
 		source.set_air_absorption_factor(absorption);
 	}
 
-	if (previous_transform) {
-		if (is_direct_listener) {
-			source.set_velocity(si, vec2::zero);
-		}
-		else {
-			const auto displacement = current_transform - *previous_transform;
-			previous_transform = current_transform;
+	if (previous_transform && !is_direct_listener) {
+		const auto displacement = current_transform - *previous_transform;
+		previous_transform = current_transform;
 
-			const auto effective_velocity = displacement.pos * in.dt.in_seconds();
-			source.set_velocity(si, effective_velocity);
-		}
+		const auto effective_velocity = displacement.pos * in.dt.in_seconds();
+		source.set_velocity(si, effective_velocity);
 	}
 
 	const auto& input = original.input;
@@ -142,7 +137,7 @@ bool sound_system::generic_sound_cache::update_properties(const update_propertie
 	source.set_looping(m.repetitions == -1);
 
 	if (is_direct_listener) {
-		source.set_position(si, listener_pos);
+		source.set_relative_and_zero_vel_pos();
 	}
 	else {
 		source.set_position(si, current_transform.pos);

@@ -38,6 +38,9 @@ namespace augs {
 		sound_source(const sound_source&) = delete;
 		sound_source& operator=(const sound_source& b) = delete;
 
+		void set_relative(bool) const;
+		void set_relative_and_zero_vel_pos() const;
+
 		void play() const;
 		void seek_to(const float seconds) const;
 		void stop() const;

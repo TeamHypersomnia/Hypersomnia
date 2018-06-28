@@ -174,6 +174,17 @@ namespace augs {
 #endif
 	}
 
+	void sound_source::set_relative(const bool f) const {
+		AL_CHECK(alSourcei(id, AL_SOURCE_RELATIVE, f ? 1 : 0));
+		(void)f;
+	}
+
+	void sound_source::set_relative_and_zero_vel_pos() const {
+		set_relative(true);
+		AL_CHECK(alSource3f(id, AL_POSITION, 0.0f, 0.0f, 0.0f));
+		AL_CHECK(alSource3f(id, AL_VELOCITY, 0.0f, 0.0f, 0.0f));
+	}
+
 	void sound_source::set_reference_distance(const si_scaling si, const float distance) const {
 		const auto passed_distance = si.get_meters(distance);
 

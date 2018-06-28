@@ -1028,3 +1028,10 @@ we consider whole type overrides too complex architeciturally:
 	- Simple struct, cascade nodes, some state?
 	- Can later create entities from nodes returned at some point
 
+- Set direct listener for mono sources like this:
+	alSourcei (sourceName, AL_SOURCE_RELATIVE, AL_TRUE);
+	alSource3f (sourceName, AL_POSITION, 0.0f, 0.0f, 0.0f);
+	alSource3f (sourceName, AL_VELOCITY, 0.0f, 0.0f, 0.0f);
+	- Though I guess it's easier to just set the position to listener position?
+		- How about doppler?
+
