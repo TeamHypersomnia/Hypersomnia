@@ -115,6 +115,10 @@ namespace invariants {
 
 		sound_effect_input death_sound;
 		sound_effect_input loss_of_consciousness_sound;
+
+		sound_effect_input humming_sound;
+		real32 speed_contribution_to_pitch = 0.3f;
+
 		impulse_mults drop_impulse_on_knockout = { 2000.0f, 1.5f };
 
 		particle_effect_input health_decrease_particles;

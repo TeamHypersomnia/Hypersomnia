@@ -45,6 +45,7 @@ namespace augs {
 		void seek_to(const float seconds) const;
 		void stop() const;
 		void set_looping(const bool) const;
+		void set_doppler_factor(const float) const;
 		void set_pitch(const float) const;
 		void set_gain(const float) const;
 		void set_air_absorption_factor(const float) const;

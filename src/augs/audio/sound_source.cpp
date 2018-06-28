@@ -115,6 +115,11 @@ namespace augs {
 #endif
 	}
 
+	void sound_source::set_doppler_factor(const float factor) const {
+		(void)factor;
+		AL_CHECK(alSourcef(id, AL_DOPPLER_FACTOR, factor));
+	}
+
 	void sound_source::set_pitch(const float pitch) const {
 		(void)pitch;
 		AL_CHECK(alSourcef(id, AL_PITCH, pitch));
