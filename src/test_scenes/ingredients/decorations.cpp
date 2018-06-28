@@ -114,6 +114,13 @@ namespace test_flavours {
 			render_layer::AQUARIUM_FLOWERS
 		);
 
+		flavour_with_animation(
+			test_complex_decorations::CONSOLE_LIGHT,
+			test_scene_image_id::CONSOLE_LIGHT_1,
+			test_scene_plain_animation_id::CONSOLE_LIGHT,
+			render_layer::ON_ON_FLOOR
+		);
+
 		fish_flavour(
 			test_complex_decorations::YELLOW_FISH,
 			test_scene_image_id::YELLOW_FISH_1,

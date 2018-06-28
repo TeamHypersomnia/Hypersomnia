@@ -30,6 +30,8 @@ enum class test_scene_plain_animation_id {
 	FLOWER_PINK,
 	FLOWER_CYAN,
 
+	CONSOLE_LIGHT,
+
 	WATER_SURFACE,
 
 	COUNT

@@ -365,11 +365,11 @@ namespace test_scenes {
 		prefabs::create_rifle(step, vec2(300, -100), test_shootable_weapons::LEWSII, prefabs::create_magazine(step, vec2(100, -650), test_container_items::LEWSII_MAG, prefabs::create_steel_charge(step, vec2(0, 0)), 100));
 		prefabs::create_rifle(step, vec2(400, -100), test_shootable_weapons::LEWSII, prefabs::create_magazine(step, vec2(100, -650), test_container_items::LEWSII_MAG, prefabs::create_steel_charge(step, vec2(0, 0)), 100));
 
-		auto create_aquarium = [&](const transformr aquarium_tr) {
-			const auto aquarium_size = get_size_of(test_scene_image_id::AQUARIUM_SAND_1);
+		const auto aquarium_size = get_size_of(test_scene_image_id::AQUARIUM_SAND_1);
+		const auto whole_aquarium_size = aquarium_size * 2;
 
+		auto create_aquarium = [&](const transformr aquarium_tr) {
 			const auto aquarium_origin = aquarium_tr + transformr(aquarium_size / 2);
-			const auto whole_aquarium_size = aquarium_size * 2;
 
 			auto aquarium_align = [&](const auto flavour_id) {
 				return make_cascade_aligner(
@@ -640,7 +640,16 @@ namespace test_scenes {
 			prefabs::create_fish(step, rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos + vec2(290, 60), aquarium_origin);
 		};
 
-		create_aquarium(vec2(-1024, 1024));
+		const auto orig1 = vec2(-1024, 1024);
+		create_aquarium(orig1);
+
+		const auto lab_wall_size = get_size_of(test_scene_image_id::LAB_WALL);
+
+		make_cascade_aligner(
+			orig1 + aquarium_size / 2, 
+			whole_aquarium_size + vec2i::square(2 * lab_wall_size.y),
+			testbed_node { world, test_complex_decorations::CONSOLE_LIGHT }
+		).ro();
 
 		if (character(2).alive()) {
 			const auto second_machete = prefabs::create_cyan_urban_machete(step, vec2(0, 300));

@@ -384,6 +384,19 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 
 			create_frames(
 				anim,
+				test_scene_image_id::CONSOLE_LIGHT_1,
+				test_scene_image_id::CONSOLE_LIGHT_3,
+				50.f
+			);
+
+			alloc(test_id_type::CONSOLE_LIGHT, anim);
+		} 
+
+		{
+			plain_animation anim;
+
+			create_frames(
+				anim,
 				test_scene_image_id::WATER_SURFACE_1,
 				test_scene_image_id::WATER_SURFACE_33,
 				20.f
