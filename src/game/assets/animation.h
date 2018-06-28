@@ -48,6 +48,8 @@ struct simple_animation_state {
 		frame_elapsed_ms += in.delta_ms;
 
 		while (true) {
+			frame_num %= in.frame_count;
+
 			const auto current_frame_duration = nth_frame_duration_ms(frame_num);
 
 			if (frame_elapsed_ms > current_frame_duration) {
@@ -106,7 +108,7 @@ struct animation_mixin {
 		const simple_animation_state& state
 	) const {
 		const auto& frames = static_cast<const D*>(this)->frames;
-		return get_image_id(std::min(static_cast<unsigned>(frames.size() - 1), state.frame_num));
+		return get_image_id(state.frame_num % frames.size());
 	}
 };
 

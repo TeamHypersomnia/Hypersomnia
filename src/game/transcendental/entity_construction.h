@@ -36,6 +36,11 @@ void construct_post_inference(const handle_type h) {
 		auto rng = cosmos.get_rng_for(h.get_id());
 		trace->reset(*h.template find<invariants::trace>(), rng);
 	}
+
+	if (const auto animation = h.template find<components::animation>()) {
+		auto rng = cosmos.get_rng_for(h.get_id());
+		animation->state.frame_num = rng.randval(0u, 100u);
+	}
 }
 
 template <class handle_type>

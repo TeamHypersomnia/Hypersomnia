@@ -286,11 +286,10 @@ namespace prefabs {
 		return decor;
 	}
 
-	entity_handle create_fish(const logic_step step, const test_complex_decorations t, const transformr& pos, const transformr& origin, const unsigned frame_offset) {
+	entity_handle create_fish(const logic_step step, const test_complex_decorations t, const transformr& pos, const transformr& origin) {
 		const auto decor = create_test_scene_entity(step.get_cosmos(), t, pos);
-		decor.get<components::animation>().state.frame_num = frame_offset;
 		decor.get<components::movement_path>().origin = origin;
-		const auto secs = real32(frame_offset) * 7.23f;
+		const auto secs = real32(decor.get<components::animation>().state.frame_num) * 12.23f;
 		decor.get<components::sprite>().effect_offset_secs = secs;
 		return decor;
 	}

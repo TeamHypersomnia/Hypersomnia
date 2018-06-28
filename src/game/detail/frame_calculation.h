@@ -11,7 +11,7 @@ const plain_animation_frame* find_frame(
 ) {
 	if (const auto anim = logicals.find(anim_def.id)) {
 		const auto n = static_cast<unsigned>(anim->frames.size());
-		return std::addressof(anim->frames[std::min(n - 1, anim_state.state.frame_num)]);
+		return std::addressof(anim->frames[anim_state.state.frame_num % n]);
 	}
 
 	return nullptr;
@@ -52,7 +52,7 @@ frame_and_flip<T> get_frame_and_flip(
 	const auto index = state.get_multi_way_index(animation_frames_n);
 
 	return { 
-		animation.frames[std::min(animation_frames_n - 1, index)], 
+		animation.frames[index % animation_frames_n], 
 		animation.meta.flip_when_cycling && state.flip
 	};
 }
