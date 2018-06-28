@@ -228,6 +228,9 @@ namespace test_flavours {
 
 			invariants::continuous_sound sound_def;
 			sound_def.effect.id = to_sound_id(test_scene_sound_id::AQUARIUM_AMBIENCE_LEFT);
+			sound_def.effect.modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
+			sound_def.effect.modifier.reference_distance = 530.f;
+			sound_def.effect.modifier.max_distance = 2000.f;
 			meta.set(sound_def);
 		}
 
@@ -236,6 +239,9 @@ namespace test_flavours {
 
 			invariants::continuous_sound sound_def;
 			sound_def.effect.id = to_sound_id(test_scene_sound_id::AQUARIUM_AMBIENCE_RIGHT);
+			sound_def.effect.modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
+			sound_def.effect.modifier.reference_distance = 530.f;
+			sound_def.effect.modifier.max_distance = 2000.f;
 			meta.set(sound_def);
 		}
 	}

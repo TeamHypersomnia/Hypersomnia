@@ -1,5 +1,5 @@
 #pragma once
-
+#include "augs/audio/distance_model.h"
 #include "augs/pad_bytes.h"
 #include "game/assets/ids/asset_ids.h"
 #include "augs/templates/hash_templates.h"
@@ -11,13 +11,15 @@
 
 struct sound_effect_modifier {
 	// GEN INTROSPECTOR struct sound_effect_modifier
-	float gain = 1.f;
-	float pitch = 1.f;
-	float max_distance = 1920.f * 3.f;
-	float reference_distance = 0.f;
+	real32 gain = 1.f;
+	real32 pitch = 1.f;
+	real32 max_distance = 1920.f * 3.f;
+	real32 reference_distance = 0.f;
+	real32 rolloff_factor = 1.f;
 	short repetitions = 1;
 	bool fade_on_exit = true;
 	bool sync_against_born_time = false;
+	augs::distance_model distance_model = augs::distance_model::LINEAR_DISTANCE_CLAMPED;
 	// END GEN INTROSPECTOR
 };
 

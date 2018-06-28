@@ -4,6 +4,7 @@
 
 #include "augs/math/vec2.h"
 #include "augs/math/si_scaling.h"
+#include "augs/audio/distance_model.h"
 
 typedef unsigned int ALuint;
 
@@ -42,18 +43,20 @@ namespace augs {
 		void set_relative_and_zero_vel_pos() const;
 
 		void play() const;
-		void seek_to(const float seconds) const;
+		void seek_to(float seconds) const;
 		void stop() const;
-		void set_looping(const bool) const;
-		void set_doppler_factor(const float) const;
-		void set_pitch(const float) const;
-		void set_gain(const float) const;
-		void set_air_absorption_factor(const float) const;
-		void set_velocity(const si_scaling, vec2) const;
-		void set_position(const si_scaling, vec2) const;
-		void set_max_distance(const si_scaling, const float) const;
-		void set_reference_distance(const si_scaling, const float) const;
-		void set_direct_channels(const bool) const;
+		void set_looping(bool) const;
+		void set_doppler_factor(float) const;
+		void set_rolloff_factor(float) const;
+		void set_pitch(float) const;
+		void set_gain(float) const;
+		void set_air_absorption_factor(float) const;
+		void set_velocity(si_scaling, vec2) const;
+		void set_position(si_scaling, vec2) const;
+		void set_max_distance(si_scaling, float) const;
+		void set_reference_distance(si_scaling, float) const;
+		void set_direct_channels(bool) const;
+		void set_distance_model(distance_model);
 
 		float get_time_in_seconds() const;
 		float get_gain() const;

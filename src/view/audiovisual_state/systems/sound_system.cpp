@@ -142,11 +142,31 @@ bool sound_system::generic_sound_cache::update_properties(const update_propertie
 	const auto& input = original.input;
 	const auto& m = input.modifier;
 
+	auto g_mult = 1.f;
+	
+	if (m.distance_model != augs::distance_model::LINEAR_DISTANCE
+		&& m.distance_model != augs::distance_model::LINEAR_DISTANCE_CLAMPED
+	) {
+		/* Correct the gain of non-linear sources so that they eventually become silent. */
+		const auto d = (listener_pos - current_transform.pos).length();
+
+		const auto md = m.max_distance;
+		const auto rd = m.reference_distance ;
+
+		const auto thres = md - rd;
+
+		if (rd > 0.f && d > thres) {
+			g_mult = std::max(0.f, 1.f - ((d - thres) / rd));
+		}
+	}
+
 	source.set_pitch(m.pitch);
-	source.set_gain(m.gain * in.settings.sound_effects);
-	source.set_max_distance(si, m.max_distance);
-	source.set_reference_distance(si, m.reference_distance);
+	source.set_gain(g_mult * m.gain * in.settings.sound_effects);
+	source.set_max_distance(si, std::max(0.f, m.max_distance));
+	source.set_reference_distance(si, std::max(0.f, m.reference_distance));
 	source.set_looping(m.repetitions == -1);
+	source.set_distance_model(m.distance_model);
+	source.set_rolloff_factor(std::max(0.f, m.rolloff_factor));
 
 	if (is_direct_listener) {
 		source.set_relative_and_zero_vel_pos();
@@ -278,6 +298,10 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 	});
 
 	auto can_have_continuous_sound = [&](const auto handle) {
+		if (handle.dead()) {
+			return false;
+		}
+
 		if (const auto c = handle.template find<invariants::continuous_sound>()) {
 			return c->effect.id.is_set();
 		}

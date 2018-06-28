@@ -115,6 +115,31 @@ namespace augs {
 #endif
 	}
 
+	void sound_source::set_distance_model(const distance_model model) {
+#if BUILD_OPENAL
+		ALint resolved;
+
+		switch (model) {
+			case distance_model::INVERSE_DISTANCE: resolved = AL_INVERSE_DISTANCE; break;
+			case distance_model::INVERSE_DISTANCE_CLAMPED: resolved = AL_INVERSE_DISTANCE_CLAMPED; break;
+			case distance_model::LINEAR_DISTANCE: resolved = AL_LINEAR_DISTANCE; break;
+			case distance_model::LINEAR_DISTANCE_CLAMPED: resolved = AL_LINEAR_DISTANCE_CLAMPED; break;
+			case distance_model::EXPONENT_DISTANCE: resolved = AL_EXPONENT_DISTANCE; break;
+			case distance_model::EXPONENT_DISTANCE_CLAMPED: resolved = AL_EXPONENT_DISTANCE_CLAMPED; break;
+			default: resolved = AL_NONE; break;
+		}
+
+		AL_CHECK(alSourcei(id, AL_DISTANCE_MODEL, resolved));
+#else
+		(void)model;
+#endif
+	}
+
+	void sound_source::set_rolloff_factor(const float factor) const {
+		(void)factor;
+		AL_CHECK(alSourcef(id, AL_ROLLOFF_FACTOR, factor));
+	}
+
 	void sound_source::set_doppler_factor(const float factor) const {
 		(void)factor;
 		AL_CHECK(alSourcef(id, AL_DOPPLER_FACTOR, factor));
