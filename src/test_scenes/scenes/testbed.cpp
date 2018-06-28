@@ -649,7 +649,8 @@ namespace test_scenes {
 			orig1 + aquarium_size / 2, 
 			whole_aquarium_size + vec2i::square(2 * lab_wall_size.y),
 			testbed_node { world, test_complex_decorations::CONSOLE_LIGHT }
-		).ro();
+		).ro()
+		.next(test_sound_decorations::HUMMING_DISABLED);
 
 		if (character(2).alive()) {
 			const auto second_machete = prefabs::create_cyan_urban_machete(step, vec2(0, 300));

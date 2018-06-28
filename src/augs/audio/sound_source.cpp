@@ -145,6 +145,10 @@ namespace augs {
 		AL_CHECK(alSourcef(id, AL_DOPPLER_FACTOR, factor));
 	}
 
+	void sound_source::set_spatialize(const bool f) const {
+		AL_CHECK(alSourcei(id, AL_SOURCE_SPATIALIZE_SOFT, f ? AL_TRUE : AL_FALSE));
+	}
+
 	void sound_source::set_pitch(const float pitch) const {
 		(void)pitch;
 		AL_CHECK(alSourcef(id, AL_PITCH, pitch));

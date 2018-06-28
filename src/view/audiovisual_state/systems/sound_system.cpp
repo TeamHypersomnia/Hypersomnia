@@ -166,7 +166,10 @@ bool sound_system::generic_sound_cache::update_properties(const update_propertie
 	source.set_reference_distance(si, std::max(0.f, m.reference_distance));
 	source.set_looping(m.repetitions == -1);
 	source.set_distance_model(m.distance_model);
+	source.set_doppler_factor(std::max(0.f, m.doppler_factor));
 	source.set_rolloff_factor(std::max(0.f, m.rolloff_factor));
+
+	source.set_spatialize(!is_direct_listener);
 
 	if (is_direct_listener) {
 		source.set_relative_and_zero_vel_pos();

@@ -57,6 +57,7 @@ namespace augs {
 		void set_reference_distance(si_scaling, float) const;
 		void set_direct_channels(bool) const;
 		void set_distance_model(distance_model);
+		void set_spatialize(bool) const;
 
 		float get_time_in_seconds() const;
 		float get_gain() const;

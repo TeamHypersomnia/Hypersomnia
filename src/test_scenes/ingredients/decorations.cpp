@@ -263,27 +263,60 @@ namespace test_flavours {
 
 		auto& flavours = in.flavours;
 
-		{
-			auto& meta = get_test_flavour(flavours, test_sound_decorations::AQUARIUM_AMBIENCE_LEFT);
+		auto flavour_with_sound = [&](
+			const auto flavour_id,
+			const auto sound_id,
+			const auto distance_model,
+			const auto ref_distance,
+			const auto max_distance,
+			const float doppler = 1.f
+		) {
+			auto& meta = get_test_flavour(flavours, flavour_id);
 
 			invariants::continuous_sound sound_def;
-			sound_def.effect.id = to_sound_id(test_scene_sound_id::AQUARIUM_AMBIENCE_LEFT);
-			sound_def.effect.modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
-			sound_def.effect.modifier.reference_distance = 530.f;
-			sound_def.effect.modifier.max_distance = 2000.f;
+			sound_def.effect.id = to_sound_id(sound_id);
+			sound_def.effect.modifier.distance_model = distance_model;
+			sound_def.effect.modifier.reference_distance = ref_distance;
+			sound_def.effect.modifier.max_distance = max_distance;
+			sound_def.effect.modifier.doppler_factor = doppler;
 			meta.set(sound_def);
-		}
+		};
 
-		{
-			auto& meta = get_test_flavour(flavours, test_sound_decorations::AQUARIUM_AMBIENCE_RIGHT);
+		flavour_with_sound(
+			test_sound_decorations::AQUARIUM_AMBIENCE_LEFT,
+			test_scene_sound_id::AQUARIUM_AMBIENCE_LEFT,
+			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
+			530.f,
+			2000.f,
+			0.f
+		);
 
-			invariants::continuous_sound sound_def;
-			sound_def.effect.id = to_sound_id(test_scene_sound_id::AQUARIUM_AMBIENCE_RIGHT);
-			sound_def.effect.modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
-			sound_def.effect.modifier.reference_distance = 530.f;
-			sound_def.effect.modifier.max_distance = 2000.f;
-			meta.set(sound_def);
-		}
+		flavour_with_sound(
+			test_sound_decorations::AQUARIUM_AMBIENCE_RIGHT,
+			test_scene_sound_id::AQUARIUM_AMBIENCE_RIGHT,
+			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
+			530.f,
+			2000.f,
+			0.f
+		);
+
+		flavour_with_sound(
+			test_sound_decorations::HUMMING_DISABLED,
+			test_scene_sound_id::HUMMING_DISABLED,
+			augs::distance_model::LINEAR_DISTANCE_CLAMPED,
+			50.f,
+			100.f,
+			0.f
+		);
+
+		flavour_with_sound(
+			test_sound_decorations::LOUDY_FAN,
+			test_scene_sound_id::LOUDY_FAN,
+			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
+			530.f,
+			2000.f,
+			0.f
+		);
 	}
 }
 

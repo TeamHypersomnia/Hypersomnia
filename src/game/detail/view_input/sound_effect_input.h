@@ -16,6 +16,7 @@ struct sound_effect_modifier {
 	real32 max_distance = 1920.f * 3.f;
 	real32 reference_distance = 0.f;
 	real32 rolloff_factor = 1.f;
+	real32 doppler_factor = 1.f;
 	short repetitions = 1;
 	bool fade_on_exit = true;
 	bool sync_against_born_time = false;
