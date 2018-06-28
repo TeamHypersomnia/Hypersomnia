@@ -352,6 +352,38 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 
 			create_frames(
 				anim,
+				test_scene_image_id::FLOWER_PINK_1,
+				test_scene_image_id::FLOWER_PINK_9,
+				50.f
+			);
+
+			anim.frames[4].duration_milliseconds *= 2;
+			anim.frames[8].duration_milliseconds *= 4;
+
+			alloc(test_id_type::FLOWER_PINK, anim);
+		} 
+
+		{
+			plain_animation anim;
+
+			create_frames(
+				anim,
+				test_scene_image_id::FLOWER_CYAN_1,
+				test_scene_image_id::FLOWER_CYAN_9,
+				50.f
+			);
+
+			anim.frames[4].duration_milliseconds *= 2;
+			anim.frames[8].duration_milliseconds *= 4;
+
+			alloc(test_id_type::FLOWER_CYAN, anim);
+		} 
+
+		{
+			plain_animation anim;
+
+			create_frames(
+				anim,
 				test_scene_image_id::WATER_SURFACE_1,
 				test_scene_image_id::WATER_SURFACE_33,
 				20.f

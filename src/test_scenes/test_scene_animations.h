@@ -27,6 +27,9 @@ enum class test_scene_plain_animation_id {
 	JELLYFISH,
 	DRAGON_FISH,
 
+	FLOWER_PINK,
+	FLOWER_CYAN,
+
 	WATER_SURFACE,
 
 	COUNT

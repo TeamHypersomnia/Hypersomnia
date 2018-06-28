@@ -40,6 +40,25 @@ namespace test_flavours {
 			}
 		}
 
+		auto flavour_with_animation = [&](
+			const auto flavour_id,
+			const auto sprite_id,
+			const auto animation_id,
+			const auto layer
+		) {
+			auto& meta = flavour_with_sprite(
+				flavour_id,
+				sprite_id,
+				layer
+			);
+
+			{
+				invariants::animation anim_def;
+				anim_def.id = to_animation_id(animation_id);
+				meta.set(anim_def);
+			}
+		};
+
 		auto fish_flavour = [&](
 			const auto flavour_id,
 			const auto sprite_id,
@@ -80,6 +99,20 @@ namespace test_flavours {
 				meta.set(movement_path_def);
 			}
 		};
+
+		flavour_with_animation(
+			test_complex_decorations::FLOWER_PINK,
+			test_scene_image_id::FLOWER_PINK_1,
+			test_scene_plain_animation_id::FLOWER_PINK,
+			render_layer::AQUARIUM_FLOWERS
+		);
+
+		flavour_with_animation(
+			test_complex_decorations::FLOWER_CYAN,
+			test_scene_image_id::FLOWER_CYAN_1,
+			test_scene_plain_animation_id::FLOWER_CYAN,
+			render_layer::AQUARIUM_FLOWERS
+		);
 
 		fish_flavour(
 			test_complex_decorations::YELLOW_FISH,

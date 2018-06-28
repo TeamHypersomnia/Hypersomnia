@@ -380,6 +380,16 @@ namespace test_scenes {
 			};
 
 			{
+				aquarium_align(test_complex_decorations::FLOWER_PINK)
+					.li().ti().nr().nr().nd().dup()
+					.nd().nd().dup()
+					.nl().nd()
+					.again(test_complex_decorations::FLOWER_CYAN)
+					.ri().ti().nl().nd().nd().nd().dup()
+					.nl().nd().dup()
+					.nd()
+				;
+
 				aquarium_align(test_sound_decorations::AQUARIUM_AMBIENCE_LEFT)
 					.lo().bo()
 					.again(test_sound_decorations::AQUARIUM_AMBIENCE_RIGHT)

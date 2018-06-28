@@ -177,6 +177,9 @@ enum class test_complex_decorations {
 	RAINBOW_DRAGON_FISH,
 	WATER_SURFACE,
 
+	FLOWER_PINK,
+	FLOWER_CYAN,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

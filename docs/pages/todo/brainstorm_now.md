@@ -30,9 +30,6 @@ summary: That which we are brainstorming at the moment.
 			- Simply disable doppler for this kind of sounds and the first solution applies in this case
 				- set_doppler_factor for a source
 	
-- Add humming sound effect for the aquarium
-- Fading implementation is not necessary for now, just overlaying
-
 - Sound should be loaded from the smallest to the biggest
 	- So that effects are loaded first
 	- New synchronization
