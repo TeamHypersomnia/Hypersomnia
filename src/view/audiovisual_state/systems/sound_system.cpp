@@ -92,14 +92,13 @@ void sound_system::update_listener(
 	augs::set_listener_orientation({ 0.f, -1.f, 0.f, 0.f, 0.f, -1.f });
 }
 
-void sound_system::generic_sound_cache::bind(const augs::sound_buffer& buf, const entity_id listener) {
-	const bool is_direct_listener = listener == original.start.direct_listener;
-	source.bind_buffer(buf, original.start.variation_number, is_direct_listener);
+void sound_system::generic_sound_cache::bind(const augs::sound_buffer& buf) {
+	source.bind_buffer(buf, original.start.variation_number);
 }
 
 bool sound_system::generic_sound_cache::rebind_buffer(const update_properties_input in) {
 	if (auto buf = mapped_or_nullptr(in.manager, original.input.id)) {
-		bind(*buf, in.get_listener());
+		bind(*buf);
 		return true;
 	}
 

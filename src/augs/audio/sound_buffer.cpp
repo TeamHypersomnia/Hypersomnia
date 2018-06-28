@@ -38,9 +38,11 @@ namespace augs {
 #endif
 	}
 
-	single_sound_buffer::single_sound_buffer(const sound_data& data) {
+	single_sound_buffer::single_sound_buffer(const sound_data& data, const sound_buffer_loading_settings) {
 		set_data(data);
 	}
+
+	single_sound_buffer::single_sound_buffer(const sound_data& data) : single_sound_buffer(data, sound_buffer_loading_settings()) {}
 
 	single_sound_buffer::~single_sound_buffer() {
 		destroy();
@@ -120,30 +122,6 @@ namespace augs {
 		return computed_length_in_seconds;
 	}
 
-	const single_sound_buffer& sound_buffer::variation::stereo_or_mono() const {
-		return stereo ? *stereo : *mono;
-	}
-
-	const single_sound_buffer& sound_buffer::variation::mono_or_stereo() const {
-		return mono ? *mono : *stereo;
-	}
-
-	sound_buffer::variation::variation(const sound_data& data, const sound_buffer_loading_settings settings) {
-		if (data.channels == 1) {
-			mono = data;
-		}
-		else if (data.channels == 2) {
-			stereo = data;
-
-			if (settings.generate_mono) {
-				mono = sound_data(data).to_mono();
-			}
-		}
-		else {
-			ensure(false && "Bad format");
-		}
-	}
-
 	sound_buffer::sound_buffer(const sound_buffer_loading_input input) {
 		from_file(input);
 	}
@@ -171,13 +149,8 @@ namespace augs {
 		}
 	}
 
-	const single_sound_buffer& sound_buffer::get_buffer(
-		const std::size_t variation_index,
-		const bool direct
-	) const {
+	const single_sound_buffer& sound_buffer::get_buffer(const std::size_t variation_index) const {
 		const auto chosen_variation = variation_index % variations.size();
-		const auto& buffer = variations[chosen_variation];
-
-		return direct ? buffer.stereo_or_mono() : buffer.mono_or_stereo();
+		return variations[chosen_variation];
 	}
 }

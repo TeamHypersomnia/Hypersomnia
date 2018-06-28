@@ -67,7 +67,7 @@ class sound_system {
 		bool rebind_buffer(update_properties_input in);
 		bool update_properties(update_properties_input in);
 
-		void bind(const augs::sound_buffer&, entity_id listener);
+		void bind(const augs::sound_buffer&);
 	};
 
 	struct fading_source {

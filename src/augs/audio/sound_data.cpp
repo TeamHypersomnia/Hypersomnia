@@ -135,20 +135,4 @@ namespace augs {
 	double sound_data::compute_length_in_seconds() const {
 		return static_cast<double>(samples.size()) / (frequency * channels);
 	}
-
-	sound_data& sound_data::to_mono() {
-		ensure_eq(samples.size() % 2, 0);
-
-		std::vector<sound_sample_type> output;
-		output.resize(samples.size() / 2);
-
-		for (size_t i = 0; i < samples.size(); i += 2) {
-			output[i / 2] = (static_cast<int>(samples[i]) + samples[i + 1]) / 2;
-		}
-
-		samples = output;
-		channels = 1;
-
-		return *this;
-	}
 }

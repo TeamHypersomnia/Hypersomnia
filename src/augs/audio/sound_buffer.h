@@ -22,6 +22,8 @@ namespace augs {
 
 	public:
 		single_sound_buffer(const sound_data&);
+		single_sound_buffer(const sound_data&, sound_buffer_loading_settings);
+
 		~single_sound_buffer();
 
 		single_sound_buffer(single_sound_buffer&& b);
@@ -40,26 +42,9 @@ namespace augs {
 		void from_file(const sound_buffer_loading_input);
 
 	public:
-		struct variation {
-			std::optional<single_sound_buffer> mono;
-			std::optional<single_sound_buffer> stereo;
-
-			variation(
-				const sound_data&, 
-				const sound_buffer_loading_settings
-			);
-
-			const single_sound_buffer& stereo_or_mono() const;
-			const single_sound_buffer& mono_or_stereo() const;
-		};
-
 		sound_buffer(const sound_buffer_loading_input);
+		std::vector<single_sound_buffer> variations;
 
-		std::vector<variation> variations;
-
-		const single_sound_buffer& get_buffer(
-			std::size_t variation_index,
-			bool direct
-		) const;
+		const single_sound_buffer& get_buffer(std::size_t variation_index) const;
 	};
 }

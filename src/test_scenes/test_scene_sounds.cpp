@@ -37,8 +37,6 @@ void load_test_scene_sounds(sound_definitions_map& all_definitions) {
 
 			if (augs::exists(m.resolve({}))) {
 				definition.set_source_path(m);
-				definition.meta.loading_settings.generate_mono = false;
-
 				return;
 			}
 
@@ -46,8 +44,6 @@ void load_test_scene_sounds(sound_definitions_map& all_definitions) {
 
 			if (augs::exists(m.resolve({}))) {
 				definition.set_source_path(m);
-				definition.meta.loading_settings.generate_mono = true;
-
 				return;
 			}
 		};

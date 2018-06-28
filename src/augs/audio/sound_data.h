@@ -18,6 +18,5 @@ namespace augs {
 		sound_data(const path_type& path);
 
 		double compute_length_in_seconds() const;
-		sound_data& to_mono();
 	};
 }

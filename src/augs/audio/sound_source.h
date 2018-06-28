@@ -68,8 +68,7 @@ namespace augs {
 
 		void bind_buffer(
 			const sound_buffer&, 
-			std::size_t variation_index,
-			bool direct
+			std::size_t variation_index
 		);
 
 		void unbind_buffer();

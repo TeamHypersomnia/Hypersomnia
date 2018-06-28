@@ -4,11 +4,11 @@
 namespace augs {
 	struct sound_buffer_loading_settings {
 		// GEN INTROSPECTOR struct augs::sound_buffer_loading_settings
-		bool generate_mono = true;
+		bool dummy = true;
 		// END GEN INTROSPECTOR
 
 		bool operator==(const sound_buffer_loading_settings& b) const {
-			return generate_mono == b.generate_mono;
+			return dummy == b.dummy;
 		}
 
 		bool operator!=(const sound_buffer_loading_settings& b) const {

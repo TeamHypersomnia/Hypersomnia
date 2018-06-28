@@ -294,11 +294,9 @@ namespace augs {
 
 	void sound_source::bind_buffer(
 		const sound_buffer& source_buffer, 
-		const std::size_t variation_index,
-		const bool direct
+		const std::size_t variation_index
 	) {
-		bind_buffer(source_buffer.get_buffer(variation_index, direct));
-		set_direct_channels(direct);
+		bind_buffer(source_buffer.get_buffer(variation_index));
 	}
 
 	void sound_source::unbind_buffer() {
