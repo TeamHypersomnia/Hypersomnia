@@ -230,6 +230,21 @@ public:
 	}
 
 	template <class... Args>
+	auto& again(Args&&... args) {
+		auto cloned_meta = meta().next(std::forward<Args>(args)...);
+		const auto top_p = top().p;
+		const auto top_s = top().s;
+
+		written.emplace_back(
+			top_p,
+			top_s,
+			std::move(cloned_meta)
+		);
+
+		return *this;
+	}
+
+	template <class... Args>
 	auto& next(Args&&... args) {
 		auto cloned_meta = meta().next(std::forward<Args>(args)...);
 		const auto top_ap = top().ap;

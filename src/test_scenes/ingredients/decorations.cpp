@@ -220,6 +220,24 @@ namespace test_flavours {
 				meta.set(anim_def);
 			}
 		}
+
+		auto& flavours = in.flavours;
+
+		{
+			auto& meta = get_test_flavour(flavours, test_sound_decorations::AQUARIUM_AMBIENCE_LEFT);
+
+			invariants::continuous_sound sound_def;
+			sound_def.effect.id = to_sound_id(test_scene_sound_id::AQUARIUM_AMBIENCE_LEFT);
+			meta.set(sound_def);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_sound_decorations::AQUARIUM_AMBIENCE_RIGHT);
+
+			invariants::continuous_sound sound_def;
+			sound_def.effect.id = to_sound_id(test_scene_sound_id::AQUARIUM_AMBIENCE_RIGHT);
+			meta.set(sound_def);
+		}
 	}
 }
 

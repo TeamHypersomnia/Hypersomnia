@@ -24,6 +24,8 @@ std::optional<transformr> sound_system::update_properties_input::find_transform(
 void sound_system::clear() {
 	short_sounds.clear();
 	fading_sources.clear();
+	firearm_engine_caches.clear();
+	continuous_sound_caches.clear();
 }
 
 void sound_system::start_fading(generic_sound_cache& cache, const float fade_per_sec) {
@@ -39,14 +41,17 @@ void sound_system::clear_sources_playing(const assets::sound_id id) {
 		return id == source.id;
 	});
 	
-	auto erase_pred = [id](const generic_sound_cache& it) {
+	auto linear_erase = [id](const generic_sound_cache& it) {
 		return id == it.original.input.id;
 	};
 
-	erase_if(short_sounds, erase_pred);
-	erase_if(firearm_engine_caches, [erase_pred](const auto& it) {
-		return erase_pred(it.second);
-	});
+	auto map_erase = [linear_erase](const auto& it) {
+		return linear_erase(it.second);
+	};
+
+	erase_if(short_sounds, linear_erase);
+	erase_if(firearm_engine_caches, map_erase);
+	erase_if(continuous_sound_caches, map_erase);
 }
 
 void sound_system::clear_dead_entities(const cosmos& new_cosmos) {
@@ -66,6 +71,13 @@ void sound_system::clear_dead_entities(const cosmos& new_cosmos) {
 
 		return false;
 	});
+
+	auto map_erase = [&](const auto& it) {
+		return new_cosmos[it.first].dead();
+	};
+
+	erase_if(firearm_engine_caches, map_erase);
+	erase_if(continuous_sound_caches, map_erase);
 }
 
 void sound_system::update_listener(
@@ -226,10 +238,59 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		}
 	);
 
+	cosm.for_each_having<invariants::continuous_sound>(
+		[&](const auto sound_entity) {
+			const auto id = sound_entity.get_id().to_unversioned();
+			const auto& continuous_sound = sound_entity.template get<invariants::continuous_sound>();
+
+			packaged_sound_effect sound;
+
+			sound.start = sound_effect_start_input::at_entity(sound_entity);
+			sound.input = continuous_sound.effect;
+
+			if (auto* const existing = mapped_or_nullptr(continuous_sound_caches, id)) {
+				existing->original = sound;
+
+				if (!existing->rebind_buffer(in)) {
+					fade_and_erase(continuous_sound_caches, id);
+				}
+			}
+			else {
+				try {
+					continuous_sound_caches.try_emplace(id, sound, in);
+				}
+				catch (...) {
+
+				}
+			}
+		}
+	);
+
 	erase_if(firearm_engine_caches, [&](auto& it) {
 		auto& cache = it.second;
 
 		if (!can_have_firearm_engine_effect(cosm[it.first])) {
+			start_fading(cache);
+			return true;
+		}
+
+		return cache.update_properties(in);
+	});
+
+	auto can_have_continuous_sound = [&](const auto handle) {
+		if (const auto c = handle.template find<invariants::continuous_sound>()) {
+			return c->effect.id.is_set();
+		}
+
+		return false;
+	};
+
+	erase_if(continuous_sound_caches, [&](auto& it) {
+		auto& cache = it.second;
+
+		const auto handle = cosm[it.first];
+
+		if (!can_have_continuous_sound(handle)) {
 			start_fading(cache);
 			return true;
 		}

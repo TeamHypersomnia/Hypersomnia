@@ -170,3 +170,12 @@ summary: Just a hidden scratchpad.
 			- Tick state storage is problematic here
 				- We could store an unordered set of integers and map it after the imgui id.
 		- Or at least have a tick to say that we want a constant frame rate
+
+- Solution: If overlaying, always calc timing from the actual remaining source time, not against when_born
+	- Actually we shouldn't care about overlays...
+		- easy enough in audacity
+	- Overlay time a property of the modifier?
+	- Manual looping will be required and the % operation will have to take the shorter duration into account
+	- Pitch both layers
+		- Overall set same properties to both
+		- Two sources in a cache!

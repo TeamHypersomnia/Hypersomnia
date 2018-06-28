@@ -41,6 +41,7 @@ namespace invariants {
 	struct movement_path;
 	struct animation;
 	struct remnant;
+	struct continuous_sound;
 }
 
 namespace components {
@@ -172,7 +173,8 @@ using invariant_list_t = List<
 	invariants::ground,
 	invariants::movement_path,
 	invariants::animation,
-	invariants::remnant
+	invariants::remnant,
+	invariants::continuous_sound
 >;
 
 template <class... Types>

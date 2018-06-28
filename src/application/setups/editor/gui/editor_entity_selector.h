@@ -34,6 +34,15 @@ void for_each_iconed_entity(const cosmos& cosm, F callback) {
 			typed_handle.template get<components::wandering_pixels>().colorize
 		);
 	});
+
+	cosm.for_each_having<invariants::continuous_sound>([&](const auto typed_handle) {
+		callback(
+			typed_handle,
+			assets::necessary_image_id::EDITOR_ICON_SOUND, 
+			typed_handle.get_logic_transform(),
+			white
+		);
+	});
 }
 
 

@@ -42,3 +42,4 @@
 #include "game/components/movement_path_component.h"
 #include "game/components/animation_component.h"
 #include "game/components/remnant_component.h"
+#include "game/components/continuous_sound_component.h"

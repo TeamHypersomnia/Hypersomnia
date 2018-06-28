@@ -77,9 +77,10 @@ class sound_system {
 	};
 
 	std::vector<generic_sound_cache> short_sounds;
-	std::vector<fading_source> fading_sources;
-
 	audiovisual_cache_map<generic_sound_cache> firearm_engine_caches;
+	audiovisual_cache_map<generic_sound_cache> continuous_sound_caches;
+
+	std::vector<fading_source> fading_sources;
 
 	template <class T>
 	void fade_and_erase(T& caches, const unversioned_entity_id id, const float fade_per_sec = 3.f) {

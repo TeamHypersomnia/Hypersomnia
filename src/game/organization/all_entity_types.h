@@ -349,7 +349,7 @@ struct complex_decoration {
 /* E.g. a bullet shell, a round remnant */
 
 struct remnant_body {
-	static constexpr std::size_t statically_allocated_entities = 3000;
+	static constexpr std::size_t statically_allocated_entities = 4000;
 	static constexpr std::size_t statically_allocated_flavours = 300;
 
 	using invariants = type_list<
@@ -370,5 +370,18 @@ struct remnant_body {
 
 		components::interpolation,
 		components::remnant
+	>;
+};
+
+struct sound_decoration {
+	static constexpr std::size_t statically_allocated_entities = 1000;
+	static constexpr std::size_t statically_allocated_flavours = 500;
+
+	using invariants = type_list<
+		invariants::continuous_sound
+	>;
+
+	using components = type_list<
+		components::transform
 	>;
 };

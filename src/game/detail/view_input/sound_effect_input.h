@@ -17,7 +17,7 @@ struct sound_effect_modifier {
 	float reference_distance = 0.f;
 	short repetitions = 1;
 	bool fade_on_exit = true;
-	pad_bytes<1> pad;
+	bool sync_against_born_time = false;
 	// END GEN INTROSPECTOR
 };
 

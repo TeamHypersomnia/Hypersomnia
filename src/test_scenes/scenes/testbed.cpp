@@ -44,7 +44,8 @@ class testbed_node {
 	std::variant<
 		test_plain_sprited_bodys,
 		test_complex_decorations,
-		test_sprite_decorations
+		test_sprite_decorations,
+		test_sound_decorations
 	> enum_id;
 public:
 	testbed_node() = default;
@@ -69,7 +70,13 @@ public:
 	auto get_size() const {
 		return on_enum([&](const auto id) {
 			const auto& f = ::get_test_flavour(cosm->get_common_significant().flavours, id);
-			return f.template get<invariants::sprite>().size;
+
+			if constexpr(remove_cref<decltype(f)>::template has<invariants::sprite>()) {
+				return f.template get<invariants::sprite>().size;
+			}
+			else {
+				return vec2i(1, 1);
+			}
 		});
 	}
 
@@ -373,6 +380,12 @@ namespace test_scenes {
 			};
 
 			{
+				aquarium_align(test_sound_decorations::AQUARIUM_AMBIENCE_LEFT)
+					.lo().bo()
+					.again(test_sound_decorations::AQUARIUM_AMBIENCE_RIGHT)
+					.ro().bo()
+				;
+
 				aquarium_align(test_plain_sprited_bodys::AQUARIUM_GLASS)
 					.li().bo().nr()
 					.next(test_plain_sprited_bodys::AQUARIUM_GLASS_START).lo().create_pop()

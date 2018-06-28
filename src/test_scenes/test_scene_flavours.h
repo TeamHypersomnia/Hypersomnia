@@ -191,6 +191,15 @@ enum class test_remnant_bodies {
 	// END GEN INTROSPECTOR
 };
 
+enum class test_sound_decorations {
+	// GEN INTROSPECTOR enum class test_sound_decorations
+	AQUARIUM_AMBIENCE_LEFT,
+	AQUARIUM_AMBIENCE_RIGHT,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
 using test_flavours_map = type_map<
 	type_pair<test_controlled_characters, controlled_character>,
 	type_pair<test_plain_invisible_bodys, plain_invisible_body>,
@@ -206,7 +215,8 @@ using test_flavours_map = type_map<
 	type_pair<test_finishing_traces, finishing_trace>,
 	type_pair<test_container_items, container_item>,
 	type_pair<test_explosive_missiles, explosive_missile>,
-	type_pair<test_remnant_bodies, remnant_body>
+	type_pair<test_remnant_bodies, remnant_body>,
+	type_pair<test_sound_decorations, sound_decoration>
 >;
 
 #if TODO
