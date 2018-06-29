@@ -7,8 +7,11 @@ struct cosmic_profiler : public augs::profiler_mixin<cosmic_profiler> {
 	// GEN INTROSPECTOR struct cosmic_profiler
 	augs::time_measurements reinferring_all_entities = 1;
 
-	augs::amount_measurements<std::size_t> raycasts;
-	augs::amount_measurements<std::size_t> entropy_length;
+	augs::amount_measurements<std::size_t> visibility_raycasts = 1;
+	augs::amount_measurements<std::size_t> pathfinding_raycasts = 1;
+	augs::amount_measurements<std::size_t> total_step_raycasts = 1;
+
+	augs::amount_measurements<std::size_t> entropy_length = 1;
 
 	augs::time_measurements logic;
 	augs::time_measurements rendering;

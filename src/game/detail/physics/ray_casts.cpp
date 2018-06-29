@@ -50,7 +50,7 @@ std::vector<physics_raycast_output> physics_world_cache::ray_cast_all_intersecti
 	const b2Filter filter, 
 	const entity_id ignore_entity
 ) const {
-	++ray_casts_since_last_step;
+	++ray_cast_counter;
 
 	raycast_input callback;
 	callback.subject = ignore_entity;
@@ -135,7 +135,7 @@ vec2 physics_world_cache::push_away_from_walls(
 }
 
 physics_raycast_output physics_world_cache::ray_cast(const vec2 p1_meters, const vec2 p2_meters, const b2Filter filter, const entity_id ignore_entity) const {
-	++ray_casts_since_last_step;
+	++ray_cast_counter;
 
 	raycast_input callback;
 	callback.subject = ignore_entity;

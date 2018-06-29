@@ -320,6 +320,17 @@ public:
 	const auto& get_logical_assets(cosmos_common_significant_access k) const {
 		return get_common_significant(k).logical_assets;
 	}
+
+	template <class M>
+	auto measure_raycasts(M& measurement) const {
+		const auto& num_ray_casts = get_solvable_inferred().physics.ray_cast_counter;
+		const auto before = num_ray_casts;
+
+		return augs::scope_guard([&num_ray_casts, &measurement, before](){
+			const auto surplus = num_ray_casts - before;
+			measurement.measure(surplus);
+		});
+	}
 };
 
 inline si_scaling cosmos::get_si() const {

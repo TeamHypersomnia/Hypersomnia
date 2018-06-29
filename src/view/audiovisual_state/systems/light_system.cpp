@@ -70,13 +70,15 @@ void light_system::advance_attenuation_variations(
 void light_system::render_all_lights(const light_system_input in) const {
 	auto& renderer = in.renderer;
 	auto& performance = in.profiler;
-	
+
 	const auto global_time_seconds = in.global_time_seconds;
 	const auto output = augs::drawer{ renderer.get_triangle_buffer() };
 	const auto& light_shader = in.light_shader;
 	const auto& standard_shader = in.standard_shader;
 
 	const auto& cosmos = in.cosm;
+
+	auto light_raycasts_scope = cosmos.measure_raycasts(performance.light_raycasts);
 
 	ensure_eq(0, renderer.get_triangle_count());
 

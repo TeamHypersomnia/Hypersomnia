@@ -469,7 +469,7 @@ physics_world_cache::physics_world_cache(const physics_world_cache& b) {
 }
 
 physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b) {
-	ray_casts_since_last_step = b.ray_casts_since_last_step;
+	ray_cast_counter = b.ray_cast_counter;
 	accumulated_messages = b.accumulated_messages;
 
 	b2World& migrated_b2World = *b2world.get();

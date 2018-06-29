@@ -41,6 +41,8 @@ void standard_solve(const logic_step step) {
 
 	auto logic_scope = measure_scope(performance.logic);
 
+	auto total_raycasts_scope = cosmos.measure_raycasts(performance.total_step_raycasts);
+
 	contact_listener listener(cosmos);
 
 	perform_transfers(step.get_entropy().transfer_requests, step);
@@ -122,6 +124,8 @@ void standard_solve(const logic_step step) {
 
 	{
 		auto scope = measure_scope(performance.visibility);
+		auto visibility_raycasts_scope = cosmos.measure_raycasts(performance.visibility_raycasts);
+
 		visibility_system(DEBUG_LOGIC_STEP_LINES).respond_to_visibility_information_requests(step);
 	}
 
@@ -131,6 +135,8 @@ void standard_solve(const logic_step step) {
 	}
 
 	{
+		auto pathfinding_raycasts_scope = cosmos.measure_raycasts(performance.pathfinding_raycasts);
+
 		auto scope = measure_scope(performance.pathfinding);
 		pathfinding_system().advance_pathfinding_sessions(step);
 	}
@@ -150,12 +156,6 @@ void standard_solve(const logic_step step) {
 	trace_system().spawn_finishing_traces_for_deleted_entities(step);
 
 	listener.~contact_listener();
-
-	{
-		auto& num_ray_casts = cosmos.get_solvable_inferred().physics.ray_casts_since_last_step;
-		performance.raycasts.measure(num_ray_casts);
-		num_ray_casts = 0;
-	}
 
 	cosmic::increment_step(cosmos);
 
