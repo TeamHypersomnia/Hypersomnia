@@ -93,12 +93,6 @@ perform_transfer_result perform_transfer(
 
 	const auto initial_transform_of_transferred = transferred_item.get_logic_transform();
 
-	const auto previous_container_transform = 
-		previous_slot.alive() ?
-		previous_slot_container.get_logic_transform() 
-		: transformr()
-	;  
-
 	const bool whole_item_grabbed = 
 		item.charges == static_cast<int>(result.transferred_charges)
 	;
@@ -242,7 +236,7 @@ perform_transfer_result perform_transfer(
 
 		const auto total_impulse = r.additional_drop_impulse + standard_drop_impulse;
 		const auto impulse = 
-			total_impulse.linear * vec2::from_degrees(previous_container_transform.rotation)
+			total_impulse.linear * vec2::from_degrees(initial_transform_of_transferred.rotation)
 		;
 
 		rigid_body.apply_impulse(impulse * rigid_body.get_mass());
