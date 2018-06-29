@@ -79,7 +79,7 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 
 	{
 		auto& cast_blink = make_plain(
-			test_id_type::CAST_BLINK_ANIMATION,
+			test_id_type::CAST_BLINK,
 			test_scene_image_id::CAST_BLINK_1,
 			test_scene_image_id::CAST_BLINK_19,
 			50.0f

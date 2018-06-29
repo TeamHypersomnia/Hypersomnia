@@ -48,7 +48,7 @@ void load_test_scene_particle_effects(
 		target.set_image(id, sz, col);
 	};
 
-	const auto cast_blink_id = to_animation_id(test_scene_plain_animation_id::CAST_BLINK_ANIMATION);
+	const auto cast_blink_id = to_animation_id(test_scene_plain_animation_id::CAST_BLINK);
 	const auto& anim = anims[cast_blink_id];
 
 	auto default_bounds = [](particles_emission& em) {
@@ -602,7 +602,7 @@ void load_test_scene_particle_effects(
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 1000;
-				set(particle_definition, to_image_id(test_scene_image_id::CAST_BLINK_3), white);
+				set(particle_definition, anim.frames[2].image_id, white);
 				particle_definition.acc.set(900, -900);
 				particle_definition.alpha_levels = 1;
 
@@ -716,7 +716,7 @@ void load_test_scene_particle_effects(
 
 				particle_definition.angular_damping = 0;
 				particle_definition.linear_damping = 1000;
-				set(particle_definition, to_image_id(test_scene_image_id::CAST_BLINK_3), white);
+				set(particle_definition, anim.frames[2].image_id, white);
 				particle_definition.acc.set(900, -900);
 				particle_definition.alpha_levels = 1;
 
@@ -1183,7 +1183,7 @@ void load_test_scene_particle_effects(
 			particle_definition.acc = { 40, -40 };
 			
 			set(particle_definition,
-				to_image_id(test_scene_image_id::CAST_BLINK_3), 
+			anim.frames[2].image_id, 
 				rgba(255, 255, 255, 255)
 			);
 
@@ -1616,7 +1616,7 @@ void load_test_scene_particle_effects(
 				particle_definition.acc = { 40, -40 };
 				
 				set(particle_definition,
-					to_image_id(test_scene_image_id::CAST_BLINK_3), 
+				anim.frames[2].image_id, 
 					rgba(255, 255, 255, 255)
 				);
 
@@ -1634,7 +1634,7 @@ void load_test_scene_particle_effects(
 				particle_definition.acc = { 40, -40 };
 				
 				set(particle_definition,
-					to_image_id(test_scene_image_id::CAST_BLINK_4), 
+					anim.frames[3].image_id, 
 					rgba(255, 255, 255, 255)
 				);
 
