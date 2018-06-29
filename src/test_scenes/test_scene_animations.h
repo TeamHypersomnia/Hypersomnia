@@ -34,6 +34,11 @@ enum class test_scene_plain_animation_id {
 
 	WATER_SURFACE,
 
+	SMALL_BUBBLE_LB,
+	SMALL_BUBBLE_LT,
+	SMALL_BUBBLE_RB,
+	SMALL_BUBBLE_RT,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

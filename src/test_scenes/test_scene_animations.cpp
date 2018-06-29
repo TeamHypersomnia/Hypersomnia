@@ -7,7 +7,7 @@
 #include "view/get_asset_pool.h"
 
 #include "test_scenes/test_scene_images.h"
-#include "augs/string/format_enum.h"
+#include "augs/templates/enum_introspect.h"
 
 template <class T>
 void create_frames(
@@ -45,32 +45,45 @@ void create_frames(
 }
 
 void load_test_scene_animations(all_logical_assets& logicals) {
+	using test_id_type = test_scene_plain_animation_id;
+	using id_type = decltype(to_animation_id(test_id_type()));
+
+	auto& defs = get_logicals_pool<id_type>(logicals);
+	defs.reserve(enum_count(test_id_type()));
+
+	augs::for_each_enum_except_bounds([&](const test_id_type test_id) {
+		const auto id = to_animation_id(test_id);
+		const auto new_allocation = defs.allocate();
+
+		ensure_eq(new_allocation.key, id);
+	});
+
+	auto alloc = [&](auto test_id, auto& anim) -> auto& {
+		const auto id = to_animation_id(test_id);
+		defs[id] = anim;
+		return defs[id];
+	};
+
+	auto make_plain = [&](
+		const test_id_type a,
+		const test_scene_image_id f,
+		const test_scene_image_id s,
+		const float d
+	) -> auto& {
+		plain_animation anim;
+
+		create_frames(anim, f, s, d);
+
+		return alloc(a, anim);
+	};
+
 	{
-		using test_id_type = test_scene_plain_animation_id;
-		using id_type = decltype(to_animation_id(test_id_type()));
-
-		auto& defs = get_logicals_pool<id_type>(logicals);
-		defs.reserve(enum_count(test_id_type()));
-
-		auto alloc = [&](auto test_id, auto& anim) {
-			const auto id = to_animation_id(test_id);
-			const auto new_allocation = defs.allocate(std::move(anim));
-
-			ensure_eq(new_allocation.key, id);
-		};
-
-		plain_animation cast_blink;
-
-		{
-			create_frames(
-				cast_blink,
-				test_scene_image_id::CAST_BLINK_1,
-				test_scene_image_id::CAST_BLINK_19,
-				50.0f
-			);
-
-			alloc(test_id_type::CAST_BLINK_ANIMATION, cast_blink);
-		} 
+		auto& cast_blink = make_plain(
+			test_id_type::CAST_BLINK_ANIMATION,
+			test_scene_image_id::CAST_BLINK_1,
+			test_scene_image_id::CAST_BLINK_19,
+			50.0f
+		);
 
 		{
 			plain_animation anim;
@@ -88,25 +101,19 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 		} 
 
 		{
-			plain_animation anim;
-
-			create_frames(
-				anim,
+			auto& anim = make_plain(
+				test_id_type::VINDICATOR_SHOOT,
 				test_scene_image_id::VINDICATOR_SHOOT_19,
 				test_scene_image_id::VINDICATOR_SHOOT_1,
 				40.0f
 			);
 
 			anim.frames[0].duration_milliseconds = 50.f;
-
-			alloc(test_id_type::VINDICATOR_SHOOT, anim);
 		} 
 
 		{
-			plain_animation anim;
-
-			create_frames(
-				anim,
+			auto& anim = make_plain(
+				test_id_type::DATUM_GUN_SHOOT,
 				test_scene_image_id::DATUM_GUN_SHOOT_1,
 				test_scene_image_id::DATUM_GUN_SHOOT_8,
 				10.0f
@@ -122,93 +129,46 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 			anim.frames[5].duration_milliseconds = 25.f;
 			anim.frames[6].duration_milliseconds = 25.f;
 			anim.frames[7].duration_milliseconds = 30.f;
-
-			alloc(test_id_type::DATUM_GUN_SHOOT, anim);
 		} 
 	}
 
 	{
-		using test_id_type = test_scene_torso_animation_id;
-		using id_type = decltype(to_animation_id(test_id_type()));
+		auto make_torso = make_plain;
 
-		auto& defs = get_logicals_pool<id_type>(logicals);
-		defs.reserve(enum_count(test_id_type()));
+		make_torso(
+			test_id_type::METROPOLIS_CHARACTER_BARE,
+			test_scene_image_id::METROPOLIS_CHARACTER_BARE_1,
+			test_scene_image_id::METROPOLIS_CHARACTER_BARE_5,
+			30.0f
+		).meta.flip_when_cycling = true;
 
-		auto alloc = [&](auto test_id, auto& anim) {
-			const auto id = to_animation_id(test_id);
-			const auto new_allocation = defs.allocate(std::move(anim));
+		make_torso(
+			test_id_type::RESISTANCE_CHARACTER_BARE,
+			test_scene_image_id::RESISTANCE_CHARACTER_BARE_1,
+			test_scene_image_id::RESISTANCE_CHARACTER_BARE_5,
+			30.0f
+		).meta.flip_when_cycling = true;
 
-			ensure_eq(new_allocation.key, id);
-		};
+		make_torso(
+			test_id_type::METROPOLIS_CHARACTER_RIFLE,
+			test_scene_image_id::METROPOLIS_CHARACTER_RIFLE_1,
+			test_scene_image_id::METROPOLIS_CHARACTER_RIFLE_20,
+			30.0f
+		);
 
-		{
-			torso_animation anim;
+		make_torso(
+			test_id_type::METROPOLIS_CHARACTER_AKIMBO,
+			test_scene_image_id::METROPOLIS_CHARACTER_AKIMBO_1,
+			test_scene_image_id::METROPOLIS_CHARACTER_AKIMBO_5,
+			30.0f
+		);
 
-			create_frames(
-				anim,
-				test_scene_image_id::METROPOLIS_CHARACTER_BARE_1,
-				test_scene_image_id::METROPOLIS_CHARACTER_BARE_5,
-				30.0f
-			);
-
-			anim.meta.flip_when_cycling = true;
-
-			alloc(test_id_type::METROPOLIS_CHARACTER_BARE, anim);
-		} 
-
-		{
-			torso_animation anim;
-
-			create_frames(
-				anim,
-				test_scene_image_id::RESISTANCE_CHARACTER_BARE_1,
-				test_scene_image_id::RESISTANCE_CHARACTER_BARE_5,
-				30.0f
-			);
-
-			anim.meta.flip_when_cycling = true;
-
-			alloc(test_id_type::RESISTANCE_CHARACTER_BARE, anim);
-		}
-
-		{
-			torso_animation anim;
-
-			create_frames(
-				anim,
-				test_scene_image_id::METROPOLIS_CHARACTER_RIFLE_1,
-				test_scene_image_id::METROPOLIS_CHARACTER_RIFLE_20,
-				30.0f
-			);
-
-			alloc(test_id_type::METROPOLIS_CHARACTER_RIFLE, anim);
-		} 
-
-		{
-			torso_animation anim;
-
-			create_frames(
-				anim,
-				test_scene_image_id::METROPOLIS_CHARACTER_AKIMBO_1,
-				test_scene_image_id::METROPOLIS_CHARACTER_AKIMBO_5,
-				30.0f
-			);
-
-			alloc(test_id_type::METROPOLIS_CHARACTER_AKIMBO, anim);
-		}
-
-		{
-			torso_animation anim;
-
-			create_frames(
-				anim,
-				test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_1,
-				test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_5,
-				30.0f
-			);
-
-			alloc(test_id_type::RESISTANCE_CHARACTER_RIFLE, anim);
-		}
+		make_torso(
+			test_id_type::RESISTANCE_CHARACTER_RIFLE,
+			test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_1,
+			test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_5,
+			30.0f
+		);
 
 		{
 			torso_animation anim;
@@ -240,169 +200,121 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 	}
 
 	{
-		using test_id_type = test_scene_legs_animation_id;
-		using id_type = decltype(to_animation_id(test_id_type()));
+		auto make_legs = make_plain;
 
-		auto& defs = get_logicals_pool<id_type>(logicals);
-		defs.reserve(enum_count(test_id_type()));
+		make_legs(
+			test_id_type::SILVER_TROUSERS,
+			test_scene_image_id::SILVER_TROUSERS_1,
+			test_scene_image_id::SILVER_TROUSERS_5,
+			30.0f
+		).meta.flip_when_cycling = true;
 
-		auto alloc = [&](auto test_id, auto& anim) {
-			const auto id = to_animation_id(test_id);
-			const auto new_allocation = defs.allocate(std::move(anim));
+		make_legs(
+			test_id_type::SILVER_TROUSERS_STRAFE,
+			test_scene_image_id::SILVER_TROUSERS_STRAFE_1,
+			test_scene_image_id::SILVER_TROUSERS_STRAFE_10,
+			30.0f
+		);
 
-			ensure_eq(new_allocation.key, id);
-		};
+		make_plain(
+			test_id_type::YELLOW_FISH,
+			test_scene_image_id::YELLOW_FISH_1,
+			test_scene_image_id::YELLOW_FISH_8,
+			40.0f
+		);
 
-		{
-			legs_animation anim;
+		make_plain(
+			test_id_type::DARKBLUE_FISH,
+			test_scene_image_id::DARKBLUE_FISH_1,
+			test_scene_image_id::DARKBLUE_FISH_8,
+			40.0f
+		);
 
-			create_frames(
-				anim,
-				test_scene_image_id::SILVER_TROUSERS_1,
-				test_scene_image_id::SILVER_TROUSERS_5,
-				30.0f
-			);
+		make_plain(
+			test_id_type::CYANVIOLET_FISH,
+			test_scene_image_id::CYANVIOLET_FISH_1,
+			test_scene_image_id::CYANVIOLET_FISH_8,
+			40.0f
+		);
 
-			anim.meta.flip_when_cycling = true;
+		make_plain(
+			test_id_type::JELLYFISH,
+			test_scene_image_id::JELLYFISH_1,
+			test_scene_image_id::JELLYFISH_14,
+			40.0f
+		);
 
-			alloc(test_id_type::SILVER_TROUSERS, anim);
-		} 
-
-		{
-			legs_animation anim;
-
-			create_frames(
-				anim,
-				test_scene_image_id::SILVER_TROUSERS_STRAFE_1,
-				test_scene_image_id::SILVER_TROUSERS_STRAFE_10,
-				30.0f
-			);
-
-			alloc(test_id_type::SILVER_TROUSERS_STRAFE, anim);
-		} 
-
-
-		{
-			plain_animation anim;
-
-			create_frames(
-				anim,
-				test_scene_image_id::YELLOW_FISH_1,
-				test_scene_image_id::YELLOW_FISH_8,
-				40.0f
-			);
-
-			alloc(test_id_type::YELLOW_FISH, anim);
-		} 
+		make_plain(
+			test_id_type::DRAGON_FISH,
+			test_scene_image_id::DRAGON_FISH_1,
+			test_scene_image_id::DRAGON_FISH_12,
+			50.0f
+		);
 
 		{
-			plain_animation anim;
-
-			create_frames(
-				anim,
-				test_scene_image_id::DARKBLUE_FISH_1,
-				test_scene_image_id::DARKBLUE_FISH_8,
-				40.0f
-			);
-
-			alloc(test_id_type::DARKBLUE_FISH, anim);
-		} 
-
-		{
-			plain_animation anim;
-
-			create_frames(
-				anim,
-				test_scene_image_id::CYANVIOLET_FISH_1,
-				test_scene_image_id::CYANVIOLET_FISH_8,
-				40.0f
-			);
-
-			alloc(test_id_type::CYANVIOLET_FISH, anim);
-		} 
-
-		{
-			plain_animation anim;
-
-			create_frames(
-				anim,
-				test_scene_image_id::JELLYFISH_1,
-				test_scene_image_id::JELLYFISH_14,
-				50.0f
-			);
-
-			alloc(test_id_type::JELLYFISH, anim);
-		} 
-
-		{
-			plain_animation anim;
-
-			create_frames(
-				anim,
-				test_scene_image_id::DRAGON_FISH_1,
-				test_scene_image_id::DRAGON_FISH_12,
-				50.0f
-			);
-
-			alloc(test_id_type::DRAGON_FISH, anim);
-		} 
-
-		{
-			plain_animation anim;
-
-			create_frames(
-				anim,
+			auto& anim = make_plain(
+				test_id_type::FLOWER_PINK,
 				test_scene_image_id::FLOWER_PINK_1,
 				test_scene_image_id::FLOWER_PINK_9,
-				50.f
+				50.0f
 			);
 
 			anim.frames[4].duration_milliseconds *= 2;
 			anim.frames[8].duration_milliseconds *= 4;
-
-			alloc(test_id_type::FLOWER_PINK, anim);
-		} 
+		}
 
 		{
-			plain_animation anim;
-
-			create_frames(
-				anim,
+			auto& anim = make_plain(
+				test_id_type::FLOWER_CYAN,
 				test_scene_image_id::FLOWER_CYAN_1,
 				test_scene_image_id::FLOWER_CYAN_9,
-				50.f
+				50.0f
 			);
 
 			anim.frames[4].duration_milliseconds *= 2;
 			anim.frames[8].duration_milliseconds *= 4;
+		}
 
-			alloc(test_id_type::FLOWER_CYAN, anim);
-		} 
+		make_plain(
+			test_id_type::CONSOLE_LIGHT,
+			test_scene_image_id::CONSOLE_LIGHT_1,
+			test_scene_image_id::CONSOLE_LIGHT_3,
+			50.0f
+		);
 
-		{
-			plain_animation anim;
+		make_plain(
+			test_id_type::WATER_SURFACE,
+			test_scene_image_id::WATER_SURFACE_1,
+			test_scene_image_id::WATER_SURFACE_33,
+			20.0f
+		);
 
-			create_frames(
-				anim,
-				test_scene_image_id::CONSOLE_LIGHT_1,
-				test_scene_image_id::CONSOLE_LIGHT_3,
-				50.f
-			);
+		make_plain(
+			test_id_type::SMALL_BUBBLE_LB,
+			test_scene_image_id::SMALL_BUBBLE_LB_1,
+			test_scene_image_id::SMALL_BUBBLE_LB_7,
+			20.0f
+		);
 
-			alloc(test_id_type::CONSOLE_LIGHT, anim);
-		} 
+		make_plain(
+			test_id_type::SMALL_BUBBLE_LT,
+			test_scene_image_id::SMALL_BUBBLE_LT_1,
+			test_scene_image_id::SMALL_BUBBLE_LT_9,
+			20.0f
+		);
 
-		{
-			plain_animation anim;
+		make_plain(
+			test_id_type::SMALL_BUBBLE_RB,
+			test_scene_image_id::SMALL_BUBBLE_RB_1,
+			test_scene_image_id::SMALL_BUBBLE_RB_9,
+			20.0f
+		);
 
-			create_frames(
-				anim,
-				test_scene_image_id::WATER_SURFACE_1,
-				test_scene_image_id::WATER_SURFACE_33,
-				20.f
-			);
-
-			alloc(test_id_type::WATER_SURFACE, anim);
-		} 
+		make_plain(
+			test_id_type::SMALL_BUBBLE_RT,
+			test_scene_image_id::SMALL_BUBBLE_RT_1,
+			test_scene_image_id::SMALL_BUBBLE_RT_9,
+			20.0f
+		);
 	}
 }

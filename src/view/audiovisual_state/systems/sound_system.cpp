@@ -169,6 +169,7 @@ bool sound_system::generic_sound_cache::update_properties(const update_propertie
 	source.set_rolloff_factor(std::max(0.f, m.rolloff_factor));
 
 	source.set_spatialize(!is_direct_listener);
+	source.set_direct_channels(is_direct_listener);
 
 	if (is_direct_listener) {
 		source.set_relative_and_zero_vel_pos();

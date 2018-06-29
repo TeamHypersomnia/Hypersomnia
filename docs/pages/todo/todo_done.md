@@ -1038,3 +1038,26 @@ we consider whole type overrides too complex architeciturally:
 - Add humming sound effect for the aquarium
 - Fading implementation is not necessary for now, just overlaying
 
+- Continuous sound design
+	- State
+		- invariants::continuous_sound
+		- Pro having an immaterial, sprite-less sound type:
+			- There will be a lot more plain sprite decorations than sounds, so it makes no sense to attach a sound to each sprite
+			- Even if it is connected with a decoration, the origin of the sound might not always necessarily equal the sprite origin
+			- It might be nice to have a separate sound icon to distinguish sound entities
+			- Anyways we can always group them in the editor
+		- Pro having a sound next to sprite decoration:
+			- Origin is the same? Which is sort of a con, actually.
+		- Add it to the complex decoration as well? Or should it just have a humming sound like sentience?
+	- Solution: a simple audiovisual cache that just plays the sound when it sees it for the first time
+		- How does logic differ here from firearm engine caches or sentience humming caches?
+	- Solution: an audiovisual cache synchronized against when_born of an entity
+		- Proper for music synchronization
+			- Would only periodically check if the music hasn't diverged from the timing
+		- Proper for continuous spatial sounds whose doppler is disabled
+			- Could be considered music as well?
+		- Problem: some continuous sounds might be subject to doppler, so when_born of an entity no longer applies
+			- Notice that network synchronization is more or less impossible with doppler sources, because each client listener has its own frame of reference
+				- Which is not a problem because these sounds will mostly be short FaFs
+			- Simply disable doppler for this kind of sounds and the first solution applies in this case
+				- set_doppler_factor for a source
