@@ -10,11 +10,19 @@ struct frame_profiler : public augs::profiler_mixin<frame_profiler> {
 	augs::amount_measurements<std::size_t> light_raycasts = 1;
 
 	augs::time_measurements rendering_script;
+	augs::time_measurements drawing_layers;
+	augs::time_measurements imgui;
+	augs::time_measurements menu_gui;
+	augs::time_measurements game_gui;
+	augs::time_measurements debug_details;
+	augs::time_measurements debug_lines;
 	augs::time_measurements light_visibility;
 	augs::time_measurements light_rendering;
-	augs::amount_measurements<std::size_t> num_visible_lights = 1;
-
 	augs::time_measurements particles_rendering;
+
+	augs::time_measurements camera_visibility_query;
+	augs::amount_measurements<std::size_t> num_visible_lights = 1;
+	augs::amount_measurements<std::size_t> num_visible_entities = 1;
 	// END GEN INTROSPECTOR
 };
 

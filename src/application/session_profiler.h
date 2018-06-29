@@ -10,9 +10,6 @@ struct session_profiler : public augs::profiler_mixin<session_profiler> {
 	augs::time_measurements swap_buffers;
 	augs::time_measurements local_entropy;
 	augs::time_measurements until_first_swap = std::size_t(1);
-
-	augs::time_measurements camera_visibility_query;
-	augs::amount_measurements<std::size_t> num_visible_entities;
 	// END GEN INTROSPECTOR
 };
 

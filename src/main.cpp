@@ -608,14 +608,14 @@ int work(const int argc, const char* const * const argv) try {
 		);
 
 		{
-			auto scope = measure_scope(performance.camera_visibility_query);
+			auto scope = measure_scope(frame_performance.camera_visibility_query);
 
 			auto queried_camera = get_camera();
 			queried_camera.zoom /= viewing_config.session.camera_query_aabb_mult;
 
 			all_visible.reacquire_all_and_sort({ viewed_character.get_cosmos(), queried_camera, screen_size, false });
 
-			performance.num_visible_entities.measure(all_visible.all.size());
+			frame_performance.num_visible_entities.measure(all_visible.all.size());
 		}
 
 		audiovisuals.advance({
@@ -1409,44 +1409,53 @@ int work(const int argc, const char* const * const argv) try {
 		if (const auto& viewed_cosmos = viewed_character.get_cosmos();
 			std::addressof(viewed_cosmos) != std::addressof(cosmos::zero)
 		) {
-			/* #1 */
-			illuminated_rendering(
-				{
-					{ viewed_character, get_camera(), screen_size },
-					audiovisuals,
-					new_viewing_config.drawing,
-					streaming.necessary_images_in_atlas,
-					streaming.get_loaded_gui_font(),
-					streaming.images_in_atlas,
-					interpolation_ratio,
+			{
+				/* #1 */
+				auto scope = measure_scope(frame_performance.rendering_script);
+
+				illuminated_rendering(
+					{
+						{ viewed_character, get_camera(), screen_size },
+						audiovisuals,
+						new_viewing_config.drawing,
+						streaming.necessary_images_in_atlas,
+						streaming.get_loaded_gui_font(),
+						streaming.images_in_atlas,
+						interpolation_ratio,
+						renderer,
+						frame_performance,
+						streaming.general_atlas,
+						necessary_fbos,
+						necessary_shaders,
+						all_visible
+					},
+					false,
+					[](const const_entity_handle) -> std::optional<rgba> { return std::nullopt; },
+					[&](auto callback) {
+						visit_current_setup([&](auto& setup) {
+							using T = remove_cref<decltype(setup)>;
+
+							if constexpr(T::has_additional_highlights) {
+								setup.for_each_highlight(callback);
+							}
+						});
+					}
+				);
+			}
+
+			if (DEBUG_DRAWING.enabled) {
+				/* #2 */
+				auto scope = measure_scope(frame_performance.debug_lines);
+
+				draw_debug_lines(
+					viewed_cosmos,
 					renderer,
-					frame_performance,
-					streaming.general_atlas,
-					necessary_fbos,
-					necessary_shaders,
-					all_visible
-				},
-				false,
-				[](const const_entity_handle) -> std::optional<rgba> { return std::nullopt; },
-				[&](auto callback) {
-					visit_current_setup([&](auto& setup) {
-						using T = remove_cref<decltype(setup)>;
+					interpolation_ratio,
+					get_drawer().default_texture
+				);
+			}
 
-						if constexpr(T::has_additional_highlights) {
-							setup.for_each_highlight(callback);
-						}
-					});
-				}
-			);
-
-			/* #2 */
-
-			draw_debug_lines(
-				viewed_cosmos,
-			   	renderer,
-			   	interpolation_ratio,
-				get_drawer().default_texture
-			);
+			auto scope = measure_scope(frame_performance.game_gui);
 
 			necessary_shaders.standard->set_projection(augs::orthographic_projection(vec2(screen_size)));
 
@@ -1567,6 +1576,8 @@ int work(const int argc, const char* const * const argv) try {
 		}
 
 		const auto menu_chosen_cursor = [&](){
+			auto scope = measure_scope(frame_performance.menu_gui);
+
 			if (current_setup.has_value()) {
 				if (ingame_menu.show) {
 					const auto context = create_menu_context(ingame_menu);
@@ -1599,12 +1610,16 @@ int work(const int argc, const char* const * const argv) try {
 		
 		renderer.call_and_clear_triangles();
 
-		/* #5 */
-		if (streaming.general_atlas.has_value()) {
-			renderer.draw_call_imgui(imgui_atlas, std::addressof(streaming.general_atlas.value()));
-		}
-		else {
-			renderer.draw_call_imgui(imgui_atlas, nullptr);
+		{
+			/* #5 */
+			auto scope = measure_scope(frame_performance.imgui);
+
+			if (streaming.general_atlas.has_value()) {
+				renderer.draw_call_imgui(imgui_atlas, std::addressof(streaming.general_atlas.value()));
+			}
+			else {
+				renderer.draw_call_imgui(imgui_atlas, nullptr);
+			}
 		}
 
 		/* #6 */
@@ -1644,6 +1659,8 @@ int work(const int argc, const char* const * const argv) try {
 		}
 
 		if (new_viewing_config.session.show_developer_console) {
+			auto scope = measure_scope(frame_performance.debug_details);
+
 			draw_debug_details(
 				get_drawer(),
 				streaming.get_loaded_gui_font(),

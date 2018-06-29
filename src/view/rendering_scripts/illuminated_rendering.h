@@ -71,7 +71,6 @@ void illuminated_rendering(
 	const H& for_each_additional_highlight
 ) {
 	auto& profiler = in.frame_performance;
-	auto scope = measure_scope(profiler.rendering_script);
 
 	auto& renderer = in.renderer;
 	
@@ -127,7 +126,12 @@ void illuminated_rendering(
 	
 	const auto draw_particles_in = draw_particles_input{ output, false };
 
+	auto total_particles_scope = measure_scope_additive(profiler.particles_rendering);
+	auto total_layer_scope = measure_scope_additive(profiler.drawing_layers);
+
 	auto draw_particles = [&](const render_layer layer) {
+		auto scope = measure_scope(total_particles_scope);
+
 		particles.draw_particles(
 			game_images,
 			anims,
@@ -230,6 +234,8 @@ void illuminated_rendering(
 	set_shader_with_matrix(shaders.illuminated);
 
 	auto draw_layer = [&](const render_layer r) {
+		auto scope = measure_scope(total_layer_scope);
+
 		for (const auto e : visible.per_layer[r]) {
 			draw_entity(cosmos[e], { output, game_images, global_time_seconds, flip_flags() }, interp);
 		}

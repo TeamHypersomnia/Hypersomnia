@@ -65,6 +65,8 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 				anims,
 				interp
 			);
+
+			performance.num_particles.measure(particles.count_all_particles());
 		}
 
 		{

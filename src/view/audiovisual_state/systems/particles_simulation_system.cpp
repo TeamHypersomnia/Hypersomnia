@@ -80,6 +80,20 @@ particles_simulation_system::basic_cache::basic_cache(
 	}
 }
 
+std::size_t particles_simulation_system::count_all_particles() const {
+	std::size_t total = 0;
+
+	auto adder = [&](const auto& s) {
+		total += s.size();
+	};
+
+	adder(general_particles);
+	adder(animated_particles);
+	adder(homing_animated_particles);
+
+	return total;
+}
+
 void particles_simulation_system::clear() {
 	orbital_emissions.clear();
 	fire_and_forget_emissions.clear();

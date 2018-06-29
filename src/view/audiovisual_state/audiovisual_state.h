@@ -24,7 +24,6 @@
 
 class cosmos;
 struct visible_entities;
-struct session_profiler;
 
 struct audiovisual_post_solve_input {
 	const particle_effects_map& particle_effects;

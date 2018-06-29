@@ -147,6 +147,8 @@ public:
 	void add_particle(const render_layer, const animated_particle&);
 	void add_particle(const render_layer, const entity_id, const homing_animated_particle&);
 
+	std::size_t count_all_particles() const;
+
 	template <class particle_type, class rng_type>
 	auto spawn_particle(
 		rng_type& rng,

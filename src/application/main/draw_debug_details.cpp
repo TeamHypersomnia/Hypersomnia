@@ -46,11 +46,13 @@ void draw_debug_details(
 		rgba(yellow.rgb(), 150)
 	);
 
+#if 0
 	total_details += {
 		hypersomnia_version().get_summary() + static_allocations_info(),
 		
 		text_style
 	};
+#endif
 
 	if (viewed_character.alive()) {
 		if (const auto transform = viewed_character.find_logic_transform()) {
@@ -90,17 +92,21 @@ void draw_debug_details(
 	total_details += { session_performance.summary(), text_style };
 	total_details += { "Frame\n", category_style };
 	total_details += { frame_performance.summary(), text_style };
-	total_details += { "Viewables streaming\n", category_style };
-	total_details += { streaming_performance.summary(), text_style };
-	total_details += { "General atlas\n", category_style };
-	total_details += { general_atlas_performance.summary(), text_style };
-	total_details += { "Audiovisual\n", category_style };
-	total_details += { audiovisual_performance.summary(), text_style };
+
 	total_details += { "Cosmos\n", category_style };
 
 	if (viewed_character.alive()) {
 		total_details += { viewed_character.get_cosmos().profiler.summary(), text_style };
 	}
+
+	total_details += { "Audiovisual\n", category_style };
+	total_details += { audiovisual_performance.summary(), text_style };
+
+	total_details += { "Viewables streaming\n", category_style };
+	total_details += { streaming_performance.summary(), text_style };
+
+	total_details += { "General atlas\n", category_style };
+	total_details += { general_atlas_performance.summary(), text_style };
 
 	print(output, { 0, 0 }, total_details);
 }

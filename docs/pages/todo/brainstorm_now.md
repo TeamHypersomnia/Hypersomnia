@@ -8,6 +8,11 @@ summary: That which we are brainstorming at the moment.
 
 - Bubbles appearing from fish
 
+- Remove the need to specify all frames in test scene images
+	- As well as in test animations
+
+- Make a tree out of time measurement profiler calls and get summary just from "fps" or "whole regeneration"
+
 - Sound should be loaded from the smallest to the biggest
 	- So that effects are loaded first
 	- New synchronization

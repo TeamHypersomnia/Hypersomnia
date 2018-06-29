@@ -14,5 +14,7 @@ struct audiovisual_profiler : public augs::profiler_mixin<audiovisual_profiler> 
 
 	augs::time_measurements post_solve;
 	augs::time_measurements post_cleanup;
+
+	augs::amount_measurements<std::size_t> num_particles = 1;
 	// END GEN INTROSPECTOR
 };
