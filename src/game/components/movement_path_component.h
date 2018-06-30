@@ -3,13 +3,19 @@
 #include "augs/misc/constant_size_vector.h"
 #include "augs/templates/value_with_flag.h"
 #include "game/enums/startle_type.h"
+#include "game/transcendental/entity_flavour_id.h"
 
-struct rect_bounded_movement {
-	// GEN INTROSPECTOR struct rect_bounded_movement
+using bubble_flavour_type = constrained_entity_flavour_id<invariants::animation>;
+using bubble_flavour_vector = augs::constant_size_vector<bubble_flavour_type, 4>;
+
+struct fish_movement_def {
+	// GEN INTROSPECTOR struct fish_movement_def
 	vec2 rect_size;
 	real32 sine_speed_boost = 100.f;
 	real32 base_speed = 80.f;
+	real32 base_bubble_interval_ms = 1000.f;
 	unsigned seed_offset = 0u;
+	bubble_flavour_vector bubble_flavours;
 	// END GEN INTROSPECTOR
 };
 
@@ -17,7 +23,7 @@ namespace invariants {
 	struct movement_path {
 		// GEN INTROSPECTOR struct invariants::movement_path
 		real32 continuous_rotation_speed = 0.f;
-		augs::value_with_flag<rect_bounded_movement> rect_bounded;
+		augs::value_with_flag<fish_movement_def> fish_movement;
 		// END GEN INTROSPECTOR
 	};
 }
@@ -29,6 +35,7 @@ namespace components {
 		real32 path_time = 0.f;
 		real32 last_speed = 0.f;
 		augs::enum_array<vec2, startle_type> startle;
+		real32 next_bubble_in_ms = -1.f;
 		// END GEN INTROSPECTOR
 
 		void add_startle(const startle_type type, const vec2 amount) {

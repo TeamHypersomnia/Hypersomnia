@@ -197,9 +197,9 @@ namespace test_flavours {
 
 			missile.destruction_sound.id = to_sound_id(test_scene_sound_id::STEEL_PROJECTILE_DESTRUCTION);
 
-			missile.remnant_flavours[0] = to_entity_flavour_id(test_remnant_bodies::STEEL_ROUND_REMNANT_1);
-			missile.remnant_flavours[1] = to_entity_flavour_id(test_remnant_bodies::STEEL_ROUND_REMNANT_2);
-			missile.remnant_flavours[2] = to_entity_flavour_id(test_remnant_bodies::STEEL_ROUND_REMNANT_3);
+			missile.remnant_flavours.emplace_back(to_entity_flavour_id(test_remnant_bodies::STEEL_ROUND_REMNANT_1));
+			missile.remnant_flavours.emplace_back(to_entity_flavour_id(test_remnant_bodies::STEEL_ROUND_REMNANT_2));
+			missile.remnant_flavours.emplace_back(to_entity_flavour_id(test_remnant_bodies::STEEL_ROUND_REMNANT_3));
 
 			auto& trace_modifier = missile.trace_sound.modifier;
 

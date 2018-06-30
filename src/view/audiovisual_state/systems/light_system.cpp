@@ -277,6 +277,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	draw_neons(render_layer::AQUARIUM_FLOWERS);
 	draw_neons(render_layer::BOTTOM_FISH);
 	draw_neons(render_layer::UPPER_FISH);
+	draw_neons(render_layer::AQUARIUM_BUBBLES);
 
 	/* Draw neon maps */
 	particles.draw_particles(

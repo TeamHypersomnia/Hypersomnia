@@ -288,51 +288,49 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 					auto how_many_along_normal = rng.randval(2u, 3u);
 
 					for (const auto& r_id : flavours) {
-						if (r_id.is_set()) {
-							const auto speed = rng.randval(1000.f, 4800.f);
+						const auto speed = rng.randval(1000.f, 4800.f);
 
-							vec2 vel;
+						vec2 vel;
 
-							if (how_many_along_normal) {
-								const auto sgn = rng.randval(0, 1);
+						if (how_many_along_normal) {
+							const auto sgn = rng.randval(0, 1);
 
-								auto amount_rotated = rng.randval(70.f, 87.f);
+							auto amount_rotated = rng.randval(70.f, 87.f);
 
-								if (sgn == 1) {
-									amount_rotated = -amount_rotated;
-								}
-
-								vel = vec2(collision_normal).rotate(amount_rotated, vec2()) * speed;
-
-								--how_many_along_normal;
-							}
-							else {
-								vel = -1 * vec2(impact_dir).rotate(rng.randval(-40.f, 40.f), vec2()) * speed;
+							if (sgn == 1) {
+								amount_rotated = -amount_rotated;
 							}
 
-							cosmic::create_entity(
-								cosm,
-								r_id,
-								[&](const auto typed_remnant) {
-									auto spawn_offset = vec2(vel).normalize() * rng.randval(55.f, 60.f);
-									const auto rot = rng.randval(0, 360);
-									
-									typed_remnant.set_logic_transform(transformr(it.point + spawn_offset, rot));
-								},
-								[&](const auto typed_remnant) {
+							vel = vec2(collision_normal).rotate(amount_rotated, vec2()) * speed;
 
-									typed_remnant.template get<components::rigid_body>().set_velocity(vel);
-									typed_remnant.template get<components::rigid_body>().set_angular_velocity(rng.randval(1060.f, 4000.f));
-
-									const auto& effect = typed_remnant.template get<invariants::remnant>().trace_particles;
-
-									effect.start(
-										step,
-										particle_effect_start_input::orbit_local(typed_remnant, { vec2::zero, 180 } )
-									);
-								}
-							);
+							--how_many_along_normal;
 						}
+						else {
+							vel = -1 * vec2(impact_dir).rotate(rng.randval(-40.f, 40.f), vec2()) * speed;
+						}
+
+						cosmic::create_entity(
+							cosm,
+							r_id,
+							[&](const auto typed_remnant) {
+								auto spawn_offset = vec2(vel).normalize() * rng.randval(55.f, 60.f);
+								const auto rot = rng.randval(0, 360);
+								
+								typed_remnant.set_logic_transform(transformr(it.point + spawn_offset, rot));
+							},
+							[&](const auto typed_remnant) {
+
+								typed_remnant.template get<components::rigid_body>().set_velocity(vel);
+								typed_remnant.template get<components::rigid_body>().set_angular_velocity(rng.randval(1060.f, 4000.f));
+
+								const auto& effect = typed_remnant.template get<invariants::remnant>().trace_particles;
+
+								effect.start(
+									step,
+									particle_effect_start_input::orbit_local(typed_remnant, { vec2::zero, 180 } )
+								);
+							}
+						);
 					}
 				}
 			}

@@ -293,28 +293,28 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 			test_id_type::SMALL_BUBBLE_LB,
 			test_scene_image_id::SMALL_BUBBLE_LB_1,
 			test_scene_image_id::SMALL_BUBBLE_LB_7,
-			20.0f
+			50.0f
 		);
 
 		make_plain(
 			test_id_type::SMALL_BUBBLE_LT,
 			test_scene_image_id::SMALL_BUBBLE_LT_1,
 			test_scene_image_id::SMALL_BUBBLE_LT_9,
-			20.0f
+			50.0f
 		);
 
 		make_plain(
 			test_id_type::SMALL_BUBBLE_RB,
 			test_scene_image_id::SMALL_BUBBLE_RB_1,
 			test_scene_image_id::SMALL_BUBBLE_RB_9,
-			20.0f
+			50.0f
 		);
 
 		make_plain(
 			test_id_type::SMALL_BUBBLE_RT,
 			test_scene_image_id::SMALL_BUBBLE_RT_1,
 			test_scene_image_id::SMALL_BUBBLE_RT_9,
-			20.0f
+			50.0f
 		);
 	}
 }

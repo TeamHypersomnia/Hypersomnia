@@ -20,6 +20,9 @@
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
 
+using remnant_flavour_id = constrained_entity_flavour_id<invariants::remnant>;
+using remnant_flavour_vector = augs::constant_size_vector<remnant_flavour_id, 4>;
+
 namespace components {
 	struct missile {
 		// GEN INTROSPECTOR struct components::missile
@@ -39,10 +42,6 @@ namespace components {
 
 namespace invariants {
 	struct missile {
-		using remnant_flavour_id = constrained_entity_flavour_id<
-			invariants::remnant
-		>;
-
 		// GEN INTROSPECTOR struct invariants::missile
 		meter_value_type damage_amount = 12;
 
@@ -78,7 +77,7 @@ namespace invariants {
 		particle_effect_input trace_particles;
 		particle_effect_input destruction_particles;
 
-		std::array<remnant_flavour_id, 4> remnant_flavours;
+		remnant_flavour_vector remnant_flavours;
 		real32 ricochet_cooldown_ms = 24.f;
 		// END GEN INTROSPECTOR
 	};

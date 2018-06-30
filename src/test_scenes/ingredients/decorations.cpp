@@ -44,8 +44,9 @@ namespace test_flavours {
 			const auto flavour_id,
 			const auto sprite_id,
 			const auto animation_id,
-			const auto layer
-		) {
+			const auto layer,
+			const bool one_shot = false
+			) -> auto& {
 			auto& meta = flavour_with_sprite(
 				flavour_id,
 				sprite_id,
@@ -55,8 +56,15 @@ namespace test_flavours {
 			{
 				invariants::animation anim_def;
 				anim_def.id = to_animation_id(animation_id);
+
+				if (one_shot) {
+					anim_def.delete_entity_after_loops = 1;
+				}
+
 				meta.set(anim_def);
 			}
+
+			return meta;
 		};
 
 		auto fish_flavour = [&](
@@ -91,14 +99,61 @@ namespace test_flavours {
 
 			{
 				invariants::movement_path movement_path_def;
-				auto& square = movement_path_def.rect_bounded;
-				square.is_enabled = true;
-				square.value.rect_size = aquarium_size * 2;
-				square.value.base_speed = base_speed;
-				square.value.sine_speed_boost = sine_speed_boost;
+				auto& fish = movement_path_def.fish_movement;
+				auto& def = fish.value;
+				fish.is_enabled = true;
+				def.rect_size = aquarium_size * 2;
+				def.base_speed = base_speed;
+				def.sine_speed_boost = sine_speed_boost;
+				def.bubble_flavours.emplace_back(to_entity_flavour_id(test_complex_decorations::SMALL_BUBBLE_LB));
+				def.bubble_flavours.emplace_back(to_entity_flavour_id(test_complex_decorations::SMALL_BUBBLE_LT));
+				def.bubble_flavours.emplace_back(to_entity_flavour_id(test_complex_decorations::SMALL_BUBBLE_RB));
+				def.bubble_flavours.emplace_back(to_entity_flavour_id(test_complex_decorations::SMALL_BUBBLE_RT));
+				def.base_bubble_interval_ms = 200.f;
 				meta.set(movement_path_def);
 			}
 		};
+
+		auto bubble_flavour = [&](
+			const auto flavour_id,
+			const auto image_id,
+			const auto anim_id
+		) {
+			auto& f = flavour_with_animation(
+				flavour_id,
+				image_id,
+				anim_id,
+				render_layer::AQUARIUM_BUBBLES,
+				true
+			);
+
+			f.template get<invariants::sprite>().color.a = 73;
+			f.template get<invariants::sprite>().neon_color = { 131, 255, 228, 255 };
+		};
+
+		bubble_flavour(
+			test_complex_decorations::SMALL_BUBBLE_LB,
+			test_scene_image_id::SMALL_BUBBLE_LB_1,
+			test_scene_plain_animation_id::SMALL_BUBBLE_LB
+		);
+
+		bubble_flavour(
+			test_complex_decorations::SMALL_BUBBLE_LT,
+			test_scene_image_id::SMALL_BUBBLE_LT_1,
+			test_scene_plain_animation_id::SMALL_BUBBLE_LT
+		);
+
+		bubble_flavour(
+			test_complex_decorations::SMALL_BUBBLE_RB,
+			test_scene_image_id::SMALL_BUBBLE_RB_1,
+			test_scene_plain_animation_id::SMALL_BUBBLE_RB
+		);
+
+		bubble_flavour(
+			test_complex_decorations::SMALL_BUBBLE_RT,
+			test_scene_image_id::SMALL_BUBBLE_RT_1,
+			test_scene_plain_animation_id::SMALL_BUBBLE_RT
+		);
 
 		flavour_with_animation(
 			test_complex_decorations::FLOWER_PINK,

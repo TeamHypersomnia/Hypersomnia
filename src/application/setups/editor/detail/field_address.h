@@ -10,6 +10,8 @@
 #include "game/components/sentience_component.h"
 #include "game/components/wandering_pixels_component.h"
 #include "game/components/item_slot_transfers_component.h"
+#include "game/components/movement_path_component.h"
+#include "game/components/missile_component.h"
 #include "game/components/attitude_component.h"
 
 #include "application/setups/editor/property_editor/property_editor_structs.h"
@@ -30,6 +32,8 @@ using edited_field_type_id = type_in_list_id<
 		only_pick_these_items_vector,
 		specific_hostile_entities_vector,
 		friction_connection_vector,
+		bubble_flavour_vector,
+		remnant_flavour_vector,
 
 		plain_animation_frames_type,
 

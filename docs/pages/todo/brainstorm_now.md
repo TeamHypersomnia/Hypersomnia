@@ -6,12 +6,19 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Bubbles appearing from fish
+- Priority: Finishing aquarium showcase
+	- Bubbles appearing from fish
+		- Complex decorations that get deleted after animation passes
+			- Pro: high amount of control when they are spawned
+			- Con: more entities? Who cares, though.
+			- Solution: delete_entity_after_loops in invariants::animation
+	- Directional bubble stream at top of the aquarium indicating the water source
+
+	
+- Make a tree out of time measurement profiler calls and get summary just from "fps" or "whole regeneration"
 
 - Remove the need to specify all frames in test scene images
 	- As well as in test animations
-
-- Make a tree out of time measurement profiler calls and get summary just from "fps" or "whole regeneration"
 
 - Sound should be loaded from the smallest to the biggest
 	- So that effects are loaded first

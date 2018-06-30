@@ -38,8 +38,12 @@ void construct_post_inference(const handle_type h) {
 	}
 
 	if (const auto animation = h.template find<components::animation>()) {
-		auto rng = cosmos.get_rng_for(h.get_id());
-		animation->state.frame_num = rng.randval(0u, 100u);
+		const auto def = h.template find<invariants::animation>();
+
+		if (def && def->loops_infinitely()) {
+			auto rng = cosmos.get_rng_for(h.get_id());
+			animation->state.frame_num = rng.randval(0u, 100u);
+		}
 	}
 }
 

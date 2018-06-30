@@ -30,10 +30,22 @@ void animation_system::advance_stateful_animations(const logic_step step) const 
 			const auto& animation_def = t.template get<invariants::animation>();
 
 			if (const auto displayed_animation = logicals.find(animation_def.id)) {
-				animation.state.advance_looped(
-					delta.in_milliseconds() * animation.speed_factor,
-				   	displayed_animation->frames
-				);
+				if (animation_def.loops_infinitely()) {
+					animation.state.advance_looped(
+						delta.in_milliseconds() * animation.speed_factor,
+						displayed_animation->frames
+					);
+				}
+				else {
+					const bool finished = animation.state.advance(
+						delta.in_milliseconds() * animation.speed_factor,
+						displayed_animation->frames
+					);
+
+					if (finished) {
+						step.post_message(messages::queue_destruction(t.get_id()));
+					}
+				}
 			}
 		}
 	);
