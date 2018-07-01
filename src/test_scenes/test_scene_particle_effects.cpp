@@ -1958,7 +1958,7 @@ void load_test_scene_particle_effects(
 
 		{
 			animated_particle particle_definition;
-			particle_definition.linear_damping = 200;
+			particle_definition.linear_damping = 100;
 			particle_definition.animation.id = to_animation_id(test_scene_plain_animation_id::MEDIUM_BUBBLE);
 			em.add_particle_definition(particle_definition);
 		}
@@ -1967,6 +1967,40 @@ void load_test_scene_particle_effects(
 			animated_particle particle_definition;
 			particle_definition.linear_damping = 300;
 			particle_definition.animation.id = to_animation_id(test_scene_plain_animation_id::BIG_BUBBLE);
+			em.add_particle_definition(particle_definition);
+		}
+
+		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+		em.should_particles_look_towards_velocity = false;
+		em.scale_damping_to_velocity = true;
+
+		effect.emissions.push_back(em);
+	}
+
+	{
+		auto& effect = acquire_effect(test_scene_particle_effect_id::FLOWER_BUBBLES);
+
+		particles_emission em;
+		em.spread_degrees = float_range(360, 360);
+		em.particles_per_sec = float_range(4.f, 4.f);
+		em.base_speed = float_range(0, 40);
+
+		em.randomize_spawn_point_within_circle_of_inner_radius = float_range(9.f, 9.f);
+		em.randomize_spawn_point_within_circle_of_outer_radius = float_range(15.f, 15.f);
+
+		{
+			animated_particle particle_definition;
+			particle_definition.linear_damping = 5;
+			particle_definition.animation.id = to_animation_id(test_scene_plain_animation_id::MEDIUM_BUBBLE);
+			particle_definition.animation.speed_factor = 0.6f;
+			em.add_particle_definition(particle_definition);
+		}
+
+		{
+			animated_particle particle_definition;
+			particle_definition.linear_damping = 10;
+			particle_definition.animation.id = to_animation_id(test_scene_plain_animation_id::BIG_BUBBLE);
+			particle_definition.animation.speed_factor = 0.6f;
 			em.add_particle_definition(particle_definition);
 		}
 

@@ -381,15 +381,19 @@ namespace test_scenes {
 			};
 
 			{
-				aquarium_align(test_complex_decorations::FLOWER_PINK)
-					.li().ti().nr().nr().nd().dup()
-					.nd().nd().dup()
-					.nl().nd()
-					.again(test_complex_decorations::FLOWER_CYAN)
-					.ri().ti().nl().nd().nd().nd().dup()
-					.nl().nd().dup()
-					.nd()
-				;
+				{
+					const auto bub = test_particles_decorations::FLOWER_BUBBLES;
+
+					aquarium_align(test_complex_decorations::FLOWER_PINK)
+						.li().ti().nr().nr().nd().prepend(bub).dup()
+						.nd().nd().prepend(bub).dup()
+						.nl().nd().prepend(bub)
+						.again(test_complex_decorations::FLOWER_CYAN)
+						.ri().ti().nl().nd().nd().nd().prepend(bub).dup()
+						.nl().nd().prepend(bub).dup()
+						.nd().prepend(bub)
+					;
+				}
 
 				aquarium_align(test_sound_decorations::AQUARIUM_AMBIENCE_LEFT)
 					.lo().bo()

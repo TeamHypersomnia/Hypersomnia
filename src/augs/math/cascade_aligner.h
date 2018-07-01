@@ -268,6 +268,22 @@ public:
 
 		return *this;
 	}
+
+	template <class... Args>
+	auto& prepend(Args&&... args) {
+		auto cloned_meta = meta().next(std::forward<Args>(args)...);
+
+		const auto top_ap = top().ap;
+		const auto top_as = top().as;
+
+		written.emplace(written.begin(), node_type(
+			top_ap,
+			top_as,
+			std::move(cloned_meta)
+		));
+
+		return *this;
+	}
 };
 
 template <class P, class S, class M>

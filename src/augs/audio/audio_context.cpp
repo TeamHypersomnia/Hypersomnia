@@ -150,7 +150,7 @@ namespace augs {
 			);
 		}
 
-		AL_CHECK(alSpeedOfSound(100.f));
+		AL_CHECK(alSpeedOfSound(130.f));
 		AL_CHECK(alEnable(AL_SOURCE_DISTANCE_MODEL));
 
 		device.log_hrtf_status();

@@ -402,6 +402,12 @@ namespace test_flavours {
 			test_scene_particle_effect_id::AQUARIUM_BUBBLES,
 			rgba(bubble_neon.rgb(), 200)
 		);
+
+		flavour_with_particles(
+			test_particles_decorations::FLOWER_BUBBLES,
+			test_scene_particle_effect_id::FLOWER_BUBBLES,
+			rgba(bubble_neon.rgb(), 255)
+		);
 	}
 }
 

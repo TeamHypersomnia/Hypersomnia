@@ -218,6 +218,7 @@ enum class test_sound_decorations {
 enum class test_particles_decorations {
 	// GEN INTROSPECTOR enum class test_particles_decorations
 	AQUARIUM_BUBBLES,
+	FLOWER_BUBBLES,
 	COUNT
 	// END GEN INTROSPECTOR
 };
