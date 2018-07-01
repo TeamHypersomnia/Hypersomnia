@@ -42,6 +42,7 @@ namespace invariants {
 	struct animation;
 	struct remnant;
 	struct continuous_sound;
+	struct continuous_particles;
 }
 
 namespace components {
@@ -73,6 +74,7 @@ namespace components {
 	struct movement_path;
 	struct animation;
 	struct remnant;
+	struct continuous_particles;
 }
 
 using assert_always_together = type_list<
@@ -90,7 +92,8 @@ using assert_always_together = type_list<
 	type_pair<invariants::crosshair, components::crosshair>,
 	type_pair<invariants::movement_path, components::movement_path>,
 	type_pair<invariants::animation, components::animation>,
-	type_pair<invariants::remnant, components::remnant>
+	type_pair<invariants::remnant, components::remnant>,
+	type_pair<invariants::continuous_particles, components::continuous_particles>
 >;
 
 using assert_first_implies_second = type_list<
@@ -139,7 +142,8 @@ using component_list_t = List<
 	components::head,
 	components::movement_path,
 	components::animation,
-	components::remnant
+	components::remnant,
+	components::continuous_particles
 >;
 
 template <template <class...> class List>
@@ -174,7 +178,8 @@ using invariant_list_t = List<
 	invariants::movement_path,
 	invariants::animation,
 	invariants::remnant,
-	invariants::continuous_sound
+	invariants::continuous_sound,
+	invariants::continuous_particles
 >;
 
 template <class... Types>

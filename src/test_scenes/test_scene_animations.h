@@ -39,6 +39,9 @@ enum class test_scene_plain_animation_id {
 	SMALL_BUBBLE_RB,
 	SMALL_BUBBLE_RT,
 
+	MEDIUM_BUBBLE,
+	BIG_BUBBLE,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

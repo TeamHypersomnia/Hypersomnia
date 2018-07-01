@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/math/declare_math.h"
+#include "game/detail/view_input/sound_effect_input.h"
 
 namespace invariants {
 	struct continuous_sound {

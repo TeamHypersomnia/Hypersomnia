@@ -116,7 +116,7 @@ namespace test_flavours {
 					invariants::remnant remnant_def;
 					remnant_def.lifetime_secs = 1.f;
 					remnant_def.start_shrinking_when_remaining_ms = 350.f;
-					remnant_def.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::CONCENTRATED_WANDERING_PIXELS);
+					remnant_def.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
 					remnant_def.trace_particles.modifier.colorize = orange;
 					meta.set(remnant_def);
 				}
@@ -252,7 +252,7 @@ namespace test_flavours {
 			missile.destruction_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
 			missile.destruction_particles.modifier.colorize = cyan;
 
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::WANDERING_PIXELS_DIRECTED);
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
 			missile.trace_particles.modifier.colorize = cyan;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
@@ -311,7 +311,7 @@ namespace test_flavours {
 			missile.destruction_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
 			missile.destruction_particles.modifier.colorize = cyan;
 
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::WANDERING_PIXELS_DIRECTED);
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
 			missile.trace_particles.modifier.colorize = cyan;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
@@ -392,7 +392,7 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::CONCENTRATED_WANDERING_PIXELS);
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
 				cartridge.shell_trace_particles.modifier.colorize = cyan;
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_plain_sprited_bodys::CYAN_SHELL);
@@ -430,7 +430,7 @@ namespace test_flavours {
 			{
 				invariants::cartridge cartridge; 
 
-				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::CONCENTRATED_WANDERING_PIXELS);
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
 				cartridge.shell_trace_particles.modifier.colorize = rgba(202, 186, 89, 255);
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_plain_sprited_bodys::STEEL_SHELL);

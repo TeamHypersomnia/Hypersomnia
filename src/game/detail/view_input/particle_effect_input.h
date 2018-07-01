@@ -12,6 +12,7 @@
 struct particle_effect_start_input {
 	absolute_or_local positioning;
 	entity_id homing_target;
+	bool stream_infinitely = false;
 
 	static particle_effect_start_input fire_and_forget(const transformr where) {
 		particle_effect_start_input	in;

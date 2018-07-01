@@ -18,6 +18,7 @@ struct container_item;
 struct explosive_missile;
 struct remnant_body;
 struct sound_decoration;
+struct particles_decoration;
 
 using all_entity_types = type_list<
 	controlled_character,
@@ -35,7 +36,8 @@ using all_entity_types = type_list<
 	container_item,
 	explosive_missile,
 	remnant_body,
-	sound_decoration
+	sound_decoration,
+	particles_decoration
 >;
 
 using entity_type_id = type_in_list_id<all_entity_types>;

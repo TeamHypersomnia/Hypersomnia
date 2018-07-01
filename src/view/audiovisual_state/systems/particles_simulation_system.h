@@ -26,7 +26,11 @@ public:
 		float angular_offset = 0.f;
 
 		float stream_lifetime_ms = 0.0;
-		float stream_max_lifetime_ms = 0.0;
+
+	private:
+		float stream_max_lifetime_ms = 0.f;
+	public:
+
 		float stream_particles_to_spawn = 0.f;
 
 		float spread = 0.f;
@@ -48,15 +52,15 @@ public:
 		float starting_spawn_circle_size_multiplier = 0.f;
 		float ending_spawn_circle_size_multiplier = 0.f;
 
-		augs::minmax<float> particle_speed;
+		minmax particle_speed;
 
 		float fade_when_ms_remaining = 0.f;
 
 		particles_emission source_emission;
 
-		bool is_over() const {
-			return stream_lifetime_ms >= stream_max_lifetime_ms;
-		}
+		bool is_over() const;
+		float calc_alivity_mult() const;
+		float advance_lifetime_get_dt(const augs::delta& dt, bool stream_infinitely);
 
 		void init_bounds(
 			const particles_emission& emission,
@@ -139,6 +143,7 @@ public:
 	std::vector<faf_cache> fire_and_forget_emissions;
 
 	audiovisual_cache_map<orbital_cache> firearm_engine_caches;
+	audiovisual_cache_map<orbital_cache> continuous_particles_caches;
 
 	void clear();
 	void clear_dead_entities(const cosmos&);

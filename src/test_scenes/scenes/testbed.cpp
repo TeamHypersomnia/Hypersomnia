@@ -45,7 +45,8 @@ class testbed_node {
 		test_plain_sprited_bodys,
 		test_complex_decorations,
 		test_sprite_decorations,
-		test_sound_decorations
+		test_sound_decorations,
+		test_particles_decorations
 	> enum_id;
 public:
 	testbed_node() = default;
@@ -75,7 +76,7 @@ public:
 				return f.template get<invariants::sprite>().size;
 			}
 			else {
-				return vec2i(1, 1);
+				return vec2i(5, 5);
 			}
 		});
 	}
@@ -394,6 +395,8 @@ namespace test_scenes {
 					.lo().bo()
 					.again(test_sound_decorations::AQUARIUM_AMBIENCE_RIGHT)
 					.ro().bo()
+					.again(test_particles_decorations::AQUARIUM_BUBBLES)
+					.ti().rot_90().top().ap.y += 20;
 				;
 
 				aquarium_align(test_plain_sprited_bodys::AQUARIUM_GLASS)

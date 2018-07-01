@@ -385,3 +385,17 @@ struct sound_decoration {
 		components::transform
 	>;
 };
+
+struct particles_decoration {
+	static constexpr std::size_t statically_allocated_entities = 1000;
+	static constexpr std::size_t statically_allocated_flavours = 500;
+
+	using invariants = type_list<
+		invariants::continuous_particles
+	>;
+
+	using components = type_list<
+		components::continuous_particles,
+		components::transform
+	>;
+};

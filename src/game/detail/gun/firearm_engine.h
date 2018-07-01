@@ -32,6 +32,8 @@ auto calc_firearm_engine_particles(const T& gun_handle)
 		gun_handle, calc_muzzle_transform(gun_handle, {})
 	);
 
+	particles.start.stream_infinitely = true;
+
 	return particles;
 }
 
@@ -74,9 +76,4 @@ auto calc_firearm_engine_sound(const T& gun_handle)
 	}
 
 	return std::nullopt;
-}
-
-template <class T>
-auto can_have_firearm_engine_effect(const T& gun_handle) {
-	return gun_handle.alive() && gun_handle.template has<components::gun>();
 }

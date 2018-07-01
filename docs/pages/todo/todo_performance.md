@@ -5,6 +5,11 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Let bubbles simply be particle stream off-shots
+	- Might even better parametrize positioning
+	- We will still have fine control over the existence
+	- Less strain on the server
+
 - Let render layers be tied to native entity types so that we don't have to dispatch each time
 	- Actually all visible entities could just be array of vectors per native type
 

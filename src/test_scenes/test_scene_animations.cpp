@@ -316,5 +316,30 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 			test_scene_image_id::SMALL_BUBBLE_RT_9,
 			50.0f
 		);
+
+		make_plain(
+			test_id_type::MEDIUM_BUBBLE,
+			test_scene_image_id::MEDIUM_BUBBLE_1,
+			test_scene_image_id::MEDIUM_BUBBLE_16,
+			40.0f
+		).meta.stop_movement_at_frame.emplace(12);
+
+		{
+			auto& anim = make_plain(
+				test_id_type::BIG_BUBBLE,
+				test_scene_image_id::BIG_BUBBLE_1,
+				test_scene_image_id::BIG_BUBBLE_23,
+				40.0f
+			);
+
+			anim.meta.stop_movement_at_frame.emplace(17);
+			auto& f = anim.frames;
+			f[18].duration_milliseconds = 30;
+			f[19].duration_milliseconds = 30;
+			f[20].duration_milliseconds = 30;
+			f[21].duration_milliseconds = 50;
+			f[22].duration_milliseconds = 60;
+		}
+
 	}
 }

@@ -270,7 +270,6 @@ void load_test_scene_particle_effects(
 
 			em.spread_degrees = float_range(360, 360);
 			em.num_of_particles_to_spawn_initially.set(150, 170);
-			em.stream_lifetime_ms = float_range(0, 0);
 
 			em.base_speed = float_range(350, 400);
 			em.base_speed_variation = float_range(100.f, 120.f);
@@ -311,7 +310,6 @@ void load_test_scene_particle_effects(
 
 			em.spread_degrees = float_range(40, 60);
 			em.num_of_particles_to_spawn_initially.set(10, 20);
-			em.stream_lifetime_ms = float_range(0, 0);
 
 			em.base_speed = float_range(50, 250);
 			em.base_speed_variation = float_range(4.f, 8.f);
@@ -494,7 +492,6 @@ void load_test_scene_particle_effects(
 
 		em.spread_degrees = float_range(360, 360);
 		em.num_of_particles_to_spawn_initially.set(150, 170);
-		em.stream_lifetime_ms = float_range(0, 0);
 
 		//em.randomize_spawn_point_within_circle_of_inner_radius = float_range(90.f, 90.f);
 		//em.randomize_spawn_point_within_circle_of_outer_radius = float_range(115.f, 115.f);
@@ -537,7 +534,6 @@ void load_test_scene_particle_effects(
 
 			em.spread_degrees = float_range(360, 360);
 			em.num_of_particles_to_spawn_initially.set(150, 170);
-			em.stream_lifetime_ms = float_range(0, 0);
 
 			em.base_speed = float_range(350, 400);
 			em.base_speed_variation = float_range(100.f, 120.f);
@@ -575,7 +571,6 @@ void load_test_scene_particle_effects(
 
 			em.spread_degrees = float_range(360, 360);
 			em.num_of_particles_to_spawn_initially.set(300, 340);
-			em.stream_lifetime_ms = float_range(0, 0);
 
 			em.base_speed = float_range(320, 600);
 			em.base_speed_variation = float_range(10.f, 20.f);
@@ -647,7 +642,6 @@ void load_test_scene_particle_effects(
 
 			em.spread_degrees = float_range(360, 360);
 			em.num_of_particles_to_spawn_initially.set(150, 170);
-			em.stream_lifetime_ms = float_range(0, 0);
 
 			em.base_speed = float_range(350, 400);
 			em.base_speed_variation = float_range(100.f, 120.f);
@@ -689,7 +683,6 @@ void load_test_scene_particle_effects(
 
 			em.spread_degrees = float_range(360, 360);
 			em.num_of_particles_to_spawn_initially.set(300, 340);
-			em.stream_lifetime_ms = float_range(0, 0);
 
 			em.base_speed = float_range(320, 600);
 			em.base_speed_variation = float_range(10.f, 20.f);
@@ -761,7 +754,6 @@ void load_test_scene_particle_effects(
 
 			em.spread_degrees = float_range(360, 360);
 			em.num_of_particles_to_spawn_initially.set(18, 20);
-			em.stream_lifetime_ms = float_range(0, 0);
 
 			em.base_speed = float_range(100, 150);
 			em.base_speed_variation = float_range(10.f, 12.f);
@@ -833,7 +825,6 @@ void load_test_scene_particle_effects(
 			em.angular_offset = float_range(0, 30);
 			em.spread_degrees = float_range(2, 20);
 			em.num_of_particles_to_spawn_initially.set(20, 90);
-			em.stream_lifetime_ms = float_range(0, 0);
 
 			em.base_speed = float_range(500, 4000);
 			em.base_speed_variation = float_range(10.f, 12.f);
@@ -875,7 +866,6 @@ void load_test_scene_particle_effects(
 
 			em.spread_degrees = float_range(2, 20);
 			em.num_of_particles_to_spawn_initially.set(20, 40);
-			em.stream_lifetime_ms = float_range(0, 0);
 
 			em.angular_offset = float_range(0, 40);
 			em.base_speed = float_range(1000, 6000);
@@ -947,7 +937,6 @@ void load_test_scene_particle_effects(
 
 			em.spread_degrees = float_range(360, 360);
 			em.num_of_particles_to_spawn_initially.set(18, 20);
-			em.stream_lifetime_ms = float_range(0, 0);
 
 			em.base_speed = float_range(250, 350);
 			em.base_speed_variation = float_range(10.f, 12.f);
@@ -989,7 +978,6 @@ void load_test_scene_particle_effects(
 
 			em.spread_degrees = float_range(1, 20);
 			em.num_of_particles_to_spawn_initially.set(70, 80);
-			em.stream_lifetime_ms = float_range(0, 0);
 
 			em.base_speed = float_range(50, 650);
 			em.base_speed_variation = float_range(4.f, 8.f);
@@ -1057,7 +1045,7 @@ void load_test_scene_particle_effects(
 	}
 
 	{
-		auto& effect = acquire_effect(test_scene_particle_effect_id::WANDERING_PIXELS_DIRECTED);
+		auto& effect = acquire_effect(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
 
 		particles_emission em;
 		em.spread_degrees = float_range(0, 1);
@@ -1104,50 +1092,13 @@ void load_test_scene_particle_effects(
 
 		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
+		em.should_particles_look_towards_velocity = false;
 
 		effect.emissions.push_back(em);
 	}
 
 	{
-		auto& effect = acquire_effect(test_scene_particle_effect_id::WANDERING_PIXELS_SPREAD);
-
-		particles_emission em;
-		em.spread_degrees = float_range(0, 10);
-		em.num_of_particles_to_spawn_initially = float_range(30, 40);
-		em.base_speed = float_range(350, 550);
-		em.rotation_speed = float_range(0, 0);
-		em.particle_lifetime_ms = float_range(200, 400);
-
-		for (int i = 0; i < 5; ++i) {
-			general_particle particle_definition;
-
-			particle_definition.angular_damping = 0;
-			particle_definition.linear_damping = 1000;
-			
-			set_with_size(particle_definition,
-				to_image_id(test_scene_image_id::BLANK), 
-				vec2i(1, 1), 
-				rgba(255, 255, 255, 255)
-			);
-
-			particle_definition.alpha_levels = 1;
-
-			em.add_particle_definition(particle_definition);
-		}
-
-		em.size_multiplier = float_range(1, 1.5);
-		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
-		em.initial_rotation_variation = 0;
-
-		effect.emissions.push_back(em);
-		auto wandering = acquire_effect(test_scene_particle_effect_id::WANDERING_PIXELS_DIRECTED).emissions[0];
-		wandering.spread_degrees = float_range(10, 30);
-		wandering.base_speed = float_range(160, 330);
-		effect.emissions.push_back(wandering);
-	}
-
-	{
-		auto& effect = acquire_effect(test_scene_particle_effect_id::CONCENTRATED_WANDERING_PIXELS);
+		auto& effect = acquire_effect(test_scene_particle_effect_id::SHELL_FIRE);
 
 		particles_emission em;
 		em.spread_degrees = float_range(0, 1);
@@ -1373,7 +1324,6 @@ void load_test_scene_particle_effects(
 			em.base_speed_variation = float_range(20.f, 40.f);
 
 			em.num_of_particles_to_spawn_initially.set(30, 40);
-			em.stream_lifetime_ms = float_range(0, 0);
 
 			em.rotation_speed = float_range(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
 			em.particle_lifetime_ms = float_range(900, 900);
@@ -1417,7 +1367,6 @@ void load_test_scene_particle_effects(
 
 			em.spread_degrees = float_range(90, 100);
 			em.num_of_particles_to_spawn_initially.set(60, 60);
-			em.stream_lifetime_ms = float_range(0, 0);
 
 			em.base_speed = float_range(50, 100);
 			em.base_speed_variation = float_range(0.f, 0.f);
@@ -1462,7 +1411,6 @@ void load_test_scene_particle_effects(
 			em.base_speed_variation = float_range(20.f, 40.f);
 
 			em.num_of_particles_to_spawn_initially.set(30, 40);
-			em.stream_lifetime_ms = float_range(0, 0);
 
 			em.rotation_speed = float_range(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
 			em.particle_lifetime_ms = float_range(900, 900);
@@ -1686,7 +1634,6 @@ void load_test_scene_particle_effects(
 			em.base_speed_variation = float_range(20.f, 40.f);
 
 			em.num_of_particles_to_spawn_initially.set(10, 20);
-			em.stream_lifetime_ms = float_range(0, 0);
 
 			em.rotation_speed = float_range(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
 			em.particle_lifetime_ms = float_range(900, 900);
@@ -1790,7 +1737,6 @@ void load_test_scene_particle_effects(
 			em.base_speed_variation = float_range(20.f, 40.f);
 
 			em.num_of_particles_to_spawn_initially.set(10, 15);
-			em.stream_lifetime_ms = float_range(0, 0);
 
 			em.rotation_speed = float_range(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
 			em.particle_lifetime_ms = float_range(900, 900);
@@ -1911,7 +1857,6 @@ void load_test_scene_particle_effects(
 			em.base_speed_variation = float_range(20.f, 40.f);
 
 			em.num_of_particles_to_spawn_initially.set(10, 20);
-			em.stream_lifetime_ms = float_range(0, 0);
 
 			em.rotation_speed = float_range(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
 			em.particle_lifetime_ms = float_range(900, 900);
@@ -1997,5 +1942,38 @@ void load_test_scene_particle_effects(
 	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::STEEL_RICOCHET);
 		effect.emissions = acquire_effect(test_scene_particle_effect_id::METAL_DAMAGE).emissions;
+	}
+
+	{
+		auto& effect = acquire_effect(test_scene_particle_effect_id::AQUARIUM_BUBBLES);
+
+		particles_emission em;
+		em.spread_degrees = float_range(70, 70);
+		em.particles_per_sec = float_range(70, 80);
+		em.stream_lifetime_ms = float_range(300, 500);
+		em.base_speed = float_range(20, 250);
+
+		em.randomize_spawn_point_within_circle_of_inner_radius = float_range(9.f, 9.f);
+		em.randomize_spawn_point_within_circle_of_outer_radius = float_range(15.f, 15.f);
+
+		{
+			animated_particle particle_definition;
+			particle_definition.linear_damping = 200;
+			particle_definition.animation.id = to_animation_id(test_scene_plain_animation_id::MEDIUM_BUBBLE);
+			em.add_particle_definition(particle_definition);
+		}
+
+		{
+			animated_particle particle_definition;
+			particle_definition.linear_damping = 300;
+			particle_definition.animation.id = to_animation_id(test_scene_plain_animation_id::BIG_BUBBLE);
+			em.add_particle_definition(particle_definition);
+		}
+
+		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+		em.should_particles_look_towards_velocity = false;
+		em.scale_damping_to_velocity = true;
+
+		effect.emissions.push_back(em);
 	}
 }

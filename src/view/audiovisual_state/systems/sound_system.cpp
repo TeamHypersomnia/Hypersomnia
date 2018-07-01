@@ -292,7 +292,7 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 	erase_if(firearm_engine_caches, [&](auto& it) {
 		auto& cache = it.second;
 
-		if (!can_have_firearm_engine_effect(cosm[it.first])) {
+		if (cosm[it.first].dead()) {
 			start_fading(cache);
 			return true;
 		}

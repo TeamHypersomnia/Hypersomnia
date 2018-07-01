@@ -130,6 +130,18 @@ struct animation_in_particle {
 	bool is_dead() const {
 		return speed_factor <= 0.f;
 	}
+
+	bool should_integrate(const plain_animations_pool& anims) const {
+		const auto& stop = anims[id].meta.stop_movement_at_frame;
+
+		if (stop.is_enabled) {
+			if (state.frame_num >= stop.value) {
+				return false;
+			}
+		}
+
+		return true;
+	}
 };
 
 struct animated_particle {

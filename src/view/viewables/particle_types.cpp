@@ -77,7 +77,9 @@ void general_particle::set_image(
 }
 
 void animated_particle::integrate(const float dt, const plain_animations_pool& anims) {
-	generic_integrate_particle(*this, dt);
+	if (animation.should_integrate(anims)) {
+		generic_integrate_particle(*this, dt);
+	}
 
 	animation.advance(dt * 1000, anims);
 }

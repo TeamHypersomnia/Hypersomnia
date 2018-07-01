@@ -20,6 +20,39 @@
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "game/detail/gun/firearm_engine.h"
 
+using emi_inst = particles_simulation_system::emission_instance;
+
+bool emi_inst::is_over() const {
+	return stream_lifetime_ms >= stream_max_lifetime_ms;
+}
+
+float emi_inst::calc_alivity_mult() const {
+	if (stream_max_lifetime_ms == 0.f) {
+		return 1.f;
+	}
+
+	return stream_lifetime_ms / stream_max_lifetime_ms;
+}
+
+float emi_inst::advance_lifetime_get_dt(const augs::delta& delta, const bool stream_infinitely) {
+	const auto dt = delta.in_milliseconds();
+
+	if (stream_infinitely) {
+		stream_lifetime_ms += dt;
+		return dt;
+	}
+
+	if (const auto remaining = stream_max_lifetime_ms - stream_lifetime_ms;
+		dt >= remaining
+	) {
+		stream_lifetime_ms = stream_max_lifetime_ms;
+		return remaining;
+	}
+
+	stream_lifetime_ms += dt;
+	return dt;
+}
+
 void particles_simulation_system::emission_instance::init_bounds(
 	const particles_emission& emission,
 	randomization& rng
@@ -243,6 +276,42 @@ void particles_simulation_system::integrate_all_particles(
 	}
 }
 
+template <class Component, class Caches, class EffectProvider>
+void update_component_related_cache(
+	randomization& rng,
+	const particle_effects_map& manager,
+	const cosmos& cosm,
+	Caches& caches,
+	EffectProvider effect_provider
+) {
+	cosm.for_each_having<Component>(
+		[&](const auto gun_entity) {
+			const auto id = gun_entity.get_id().to_unversioned();
+
+			if (const auto particles = effect_provider(gun_entity)) {
+				if (auto* const existing = mapped_or_nullptr(caches, id)) {
+					existing->original = *particles;
+				}
+				else {
+					try {
+						caches.try_emplace(id, particles->start.positioning, *particles, manager, rng);
+					}
+					catch (const particles_simulation_system::effect_not_found&) {
+
+					}
+				}
+			}
+			else {
+				caches.erase(id);
+			}
+		}
+	);
+
+	erase_if(caches, [&](auto& it) {
+		return cosm[it.first].dead();
+	});
+}
+
 void particles_simulation_system::advance_visible_streams(
 	const camera_cone current_cone, 
 	const vec2 screen_size,
@@ -262,25 +331,11 @@ void particles_simulation_system::advance_visible_streams(
 	) {
 		const auto& modifier = effect.input.modifier;
 		const auto homing_target = effect.start.homing_target;
+		const auto infinitely = effect.start.stream_infinitely;
 
 		for (auto& instance : instances) {
-			const auto stream_alivity_mult = 
-				instance.stream_max_lifetime_ms == 0.f ? 1.f : instance.stream_lifetime_ms / instance.stream_max_lifetime_ms
-			;
-
-			const auto stream_delta = [&]() mutable {
-				const auto dt = delta.in_milliseconds();
-				const auto remaining = instance.stream_max_lifetime_ms - instance.stream_lifetime_ms;
-
-				if (dt >= remaining) {
-					instance.stream_lifetime_ms = instance.stream_max_lifetime_ms;
-					return remaining;
-				}
-				else {
-					instance.stream_lifetime_ms += dt;
-					return dt;
-				}
-			}();
+			const auto stream_alivity_mult = infinitely ? 1.f : instance.calc_alivity_mult();
+			const auto stream_delta = instance.advance_lifetime_get_dt(delta, infinitely);
 
 			if (!visible_in_camera) {
 				continue;
@@ -423,39 +478,47 @@ void particles_simulation_system::advance_visible_streams(
 
 			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
 		}
+		
+		for (auto& it : continuous_particles_caches) { 
+			auto& c = it.second;
+
+			const auto chase = c.chasing;
+			const auto where = find_transform(chase, cosm, interp);
+			const bool visible_in_camera = where && checked_cone.get_visible_world_rect_aabb(screen_size).hover(where->pos);
+
+			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
+		}
 	}
 
 	erase_if(fire_and_forget_emissions, [](const faf_cache& c){ return c.is_over(); });
 	erase_if(orbital_emissions, [](const orbital_cache& c){ return c.is_over(); });
 
-	cosm.for_each_having<components::gun>(
-		[&](const auto gun_entity) {
-			const auto id = gun_entity.get_id().to_unversioned();
-
-			if (const auto particles = ::calc_firearm_engine_particles(gun_entity)) {
-				if (auto* const existing = mapped_or_nullptr(firearm_engine_caches, id)) {
-					existing->original = *particles;
-				}
-				else {
-					try {
-						firearm_engine_caches.try_emplace(id, particles->start.positioning, *particles, manager, rng);
-					}
-					catch (const effect_not_found&) {
-
-					}
-				}
-			}
-			else {
-				firearm_engine_caches.erase(id);
-			}
+	update_component_related_cache<components::gun>(
+		rng,
+		manager,
+		cosm,
+		firearm_engine_caches,
+		[](const auto h) {
+			return ::calc_firearm_engine_particles(h);
 		}
 	);
 
-	erase_if(firearm_engine_caches, [&](auto& it) {
-		if (!can_have_firearm_engine_effect(cosm[it.first])) {
-			return true;
-		}
+	update_component_related_cache<components::continuous_particles>(
+		rng,
+		manager,
+		cosm,
+		continuous_particles_caches,
+		[](const auto h) {
+			const auto& continuous_particles = h.template get<invariants::continuous_particles>();
 
-		return false;
-	});
+			packaged_particle_effect particles;
+
+			particles.start = particle_effect_start_input::at_entity(h);
+			particles.start.stream_infinitely = true;
+
+			particles.input = continuous_particles.effect;
+
+			return std::make_optional(particles);
+		}
+	);
 }

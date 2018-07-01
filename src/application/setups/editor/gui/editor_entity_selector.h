@@ -43,6 +43,15 @@ void for_each_iconed_entity(const cosmos& cosm, F callback) {
 			white
 		);
 	});
+
+	cosm.for_each_having<invariants::continuous_particles>([&](const auto typed_handle) {
+		callback(
+			typed_handle,
+			assets::necessary_image_id::EDITOR_ICON_WANDERING_PIXELS, 
+			typed_handle.get_logic_transform(),
+			typed_handle.template get<invariants::continuous_particles>().effect.modifier.colorize
+		);
+	});
 }
 
 

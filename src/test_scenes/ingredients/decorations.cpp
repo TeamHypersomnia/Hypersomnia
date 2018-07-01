@@ -114,6 +114,9 @@ namespace test_flavours {
 			}
 		};
 
+		const auto bubble_alpha = 73;
+		const auto bubble_neon = rgba(131, 255, 228, 255);
+
 		auto bubble_flavour = [&](
 			const auto flavour_id,
 			const auto image_id,
@@ -127,8 +130,8 @@ namespace test_flavours {
 				true
 			);
 
-			f.template get<invariants::sprite>().color.a = 73;
-			f.template get<invariants::sprite>().neon_color = { 131, 255, 228, 255 };
+			f.template get<invariants::sprite>().color.a = bubble_alpha;
+			f.template get<invariants::sprite>().neon_color = bubble_neon;
 		};
 
 		bubble_flavour(
@@ -371,6 +374,27 @@ namespace test_flavours {
 			530.f,
 			2000.f,
 			0.f
+		);
+
+		auto flavour_with_particles = [&](
+			const auto flavour_id,
+			const auto particles_id,
+			const auto col
+		) -> auto& {
+			auto& meta = get_test_flavour(flavours, flavour_id);
+
+			invariants::continuous_particles particles_def;
+			particles_def.effect.id = to_particle_effect_id(particles_id);
+			particles_def.effect.modifier.colorize = col;
+			meta.set(particles_def);
+
+			return meta;
+		};
+
+		flavour_with_particles(
+			test_particles_decorations::AQUARIUM_BUBBLES,
+			test_scene_particle_effect_id::AQUARIUM_BUBBLES,
+			rgba(bubble_neon.rgb(), 200)
 		);
 	}
 }
