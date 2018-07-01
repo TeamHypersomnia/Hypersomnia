@@ -207,6 +207,14 @@ public:
 	auto& lo() { top().lo(); return *this; }
 	auto& li() { top().li(); return *this; }
 
+	template <class X, class Y>
+	auto& mv(X&& x, Y&& y) { 
+		top().ap.x += std::forward<X>(x);
+		top().ap.y += std::forward<Y>(y);
+
+		return *this;
+	}
+
 	auto& flip_h() {
 		auto& f = meta().flip.horizontally;
 		f = !f;

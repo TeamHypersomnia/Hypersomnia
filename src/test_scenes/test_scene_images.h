@@ -361,6 +361,7 @@ enum class test_scene_image_id {
 
 	LAB_WALL_SMOOTH_END,
 	LAB_WALL,
+	LAB_WALL_A2,
 
 	LAB_WALL_CORNER_CUT,
 	LAB_WALL_CORNER_SQUARE,

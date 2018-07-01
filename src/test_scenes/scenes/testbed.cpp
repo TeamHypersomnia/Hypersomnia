@@ -395,9 +395,11 @@ namespace test_scenes {
 					.lo().bo()
 					.again(test_sound_decorations::AQUARIUM_AMBIENCE_RIGHT)
 					.ro().bo()
-					.again(test_particles_decorations::AQUARIUM_BUBBLES)
-					.ti().rot_90().top().ap.y += 20;
+					.again(test_sprite_decorations::LAB_WALL_A2).flip_v()
+					.to()
 				;
+
+				aquarium_align(test_particles_decorations::AQUARIUM_BUBBLES).ti().rot_90().mv(0, 15);
 
 				aquarium_align(test_plain_sprited_bodys::AQUARIUM_GLASS)
 					.li().bo().nr()

@@ -51,6 +51,7 @@ enum class test_sprite_decorations {
 	AQUARIUM_SAND_CORNER,
 
 	WATER_COLOR_OVERLAY,
+	LAB_WALL_A2,
 
 	COUNT
 	// END GEN INTROSPECTOR

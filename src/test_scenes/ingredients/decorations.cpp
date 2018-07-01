@@ -227,6 +227,12 @@ namespace test_flavours {
 		);
 
 		flavour_with_sprite(
+			test_sprite_decorations::LAB_WALL_A2,
+			test_scene_image_id::LAB_WALL_A2,
+			render_layer::OVER_DYNAMIC_BODY
+		);
+
+		flavour_with_sprite(
 			test_sprite_decorations::AQUARIUM_BOTTOM_LAMP_BODY,
 			test_scene_image_id::AQUARIUM_BOTTOM_LAMP_BODY,
 			render_layer::ON_ON_FLOOR

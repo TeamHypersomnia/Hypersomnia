@@ -313,6 +313,7 @@ void illuminated_rendering(
 	shaders.illuminated->set_as_current();
 	
 	draw_layer(render_layer::DYNAMIC_BODY);
+	draw_layer(render_layer::OVER_DYNAMIC_BODY);
 	draw_layer(render_layer::SMALL_DYNAMIC_BODY);
 	draw_layer(render_layer::GLASS_BODY);
 	draw_layer(render_layer::SENTIENCES);

@@ -251,6 +251,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 		);
 		
 		draw_layer(render_layer::DYNAMIC_BODY);
+		draw_layer(render_layer::OVER_DYNAMIC_BODY);
 
 		renderer.call_triangles();
 		renderer.clear_triangles();
@@ -264,6 +265,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	standard_shader.set_as_current();
 
 	draw_neons(render_layer::DYNAMIC_BODY);
+	draw_neons(render_layer::OVER_DYNAMIC_BODY);
 	draw_neons(render_layer::GLASS_BODY);
 	draw_neons(render_layer::SMALL_DYNAMIC_BODY);
 	draw_neons(render_layer::SENTIENCES);
