@@ -341,5 +341,11 @@ void load_test_scene_animations(all_logical_assets& logicals) {
 			f[22].duration_milliseconds = 60;
 		}
 
+		make_plain(
+			test_id_type::PINK_CORAL,
+			test_scene_image_id::PINK_CORAL_1,
+			test_scene_image_id::PINK_CORAL_13,
+			68.0f
+		);
 	}
 }

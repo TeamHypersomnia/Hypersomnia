@@ -189,6 +189,8 @@ enum class test_complex_decorations {
 	SMALL_BUBBLE_RB,
 	SMALL_BUBBLE_RT,
 
+	PINK_CORAL,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

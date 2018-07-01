@@ -166,6 +166,13 @@ namespace test_flavours {
 		);
 
 		flavour_with_animation(
+			test_complex_decorations::PINK_CORAL,
+			test_scene_image_id::PINK_CORAL_1,
+			test_scene_plain_animation_id::PINK_CORAL,
+			render_layer::AQUARIUM_FLOWERS
+		);
+
+		flavour_with_animation(
 			test_complex_decorations::FLOWER_CYAN,
 			test_scene_image_id::FLOWER_CYAN_1,
 			test_scene_plain_animation_id::FLOWER_CYAN,
@@ -377,9 +384,8 @@ namespace test_flavours {
 			test_sound_decorations::LOUDY_FAN,
 			test_scene_sound_id::LOUDY_FAN,
 			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
-			530.f,
-			2000.f,
-			0.f
+			150.f,
+			400.f
 		);
 
 		auto flavour_with_particles = [&](

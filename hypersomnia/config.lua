@@ -259,7 +259,7 @@ return {
   },
   interpolation = {
     enabled = true,
-    speed = 525
+    speed = 1000
   },
   launch_mode = "MAIN_MENU",
   main_menu = {

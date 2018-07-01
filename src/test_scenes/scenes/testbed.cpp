@@ -383,8 +383,9 @@ namespace test_scenes {
 			{
 				{
 					const auto bub = test_particles_decorations::FLOWER_BUBBLES;
+					const auto flpink = test_complex_decorations::FLOWER_PINK;
 
-					aquarium_align(test_complex_decorations::FLOWER_PINK)
+					aquarium_align(flpink)
 						.li().ti().nr().nr().nd().prepend(bub).dup()
 						.nd().nd().prepend(bub).dup()
 						.nl().nd().prepend(bub)
@@ -393,12 +394,19 @@ namespace test_scenes {
 						.nl().nd().prepend(bub).dup()
 						.nd().prepend(bub)
 					;
+
+					aquarium_align(test_complex_decorations::PINK_CORAL)
+						.ti().nl().nd().nd().nd().dup()
+						.nd().nl().nl().rot_90().next(flpink).ro().prepend(bub).dup().nu().prepend(bub)
+					;
 				}
 
 				aquarium_align(test_sound_decorations::AQUARIUM_AMBIENCE_LEFT)
 					.lo().bo()
 					.again(test_sound_decorations::AQUARIUM_AMBIENCE_RIGHT)
 					.ro().bo()
+					.again(test_sound_decorations::LOUDY_FAN)
+					.to()
 					.again(test_sprite_decorations::LAB_WALL_A2).flip_v()
 					.to()
 				;
