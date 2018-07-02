@@ -385,7 +385,7 @@ namespace test_flavours {
 			test_scene_sound_id::LOUDY_FAN,
 			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
 			150.f,
-			400.f
+			500.f
 		);
 
 		auto flavour_with_particles = [&](

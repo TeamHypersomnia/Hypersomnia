@@ -184,7 +184,10 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 	(void)now;
 
 	for (const auto& it : events) {
-		if (it.type != messages::collision_message::event_type::BEGIN_CONTACT || it.one_is_sensor) {
+		const bool contact_start = it.type == messages::collision_message::event_type::BEGIN_CONTACT;
+		const bool pre_solve = it.type == messages::collision_message::event_type::PRE_SOLVE;
+
+		if ((!contact_start && !pre_solve) || it.one_is_sensor) {
 			continue;
 		}
 
@@ -209,6 +212,23 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 			if (!should_send_damage) {
 				return;
+			}
+
+			if (pre_solve) {
+				/* 
+					With a PreSolve must have happened a PostSolve. 
+					Correct velocity direction. 
+				*/
+				const auto body = typed_missile.template get<components::rigid_body>();
+				const auto current_vel = body.get_velocity();
+				const auto tr = body.get_transform();
+
+				const auto current_dir = vec2::from_degrees(tr.rotation);
+
+				//const auto new_tr = transformr(tr.pos, current_vel.degrees());
+				const auto new_vel = current_dir * current_vel.length();
+
+				body.set_velocity(new_vel);
 			}
 
 			{
@@ -255,7 +275,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			damage_msg.subject_b2Fixture_index = it.subject_b2Fixture_index;
 			damage_msg.collider_b2Fixture_index = it.collider_b2Fixture_index;
 
-			if (is_victim_a_held_item) {
+			if (is_victim_a_held_item && contact_start) {
 				missile_def.pass_through_held_item_sound.start(
 					step,
 					sound_effect_start_input::fire_and_forget( { it.point, 0.f } ).set_listener(owning_capability)
@@ -267,8 +287,11 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 				missile.power_multiplier_of_sender
 			;
 
+			auto& charges = missile.damage_charges_before_destruction;
+			const bool send_damage = charges > 0;
+
 			if (info.should_detonate() && missile_def.destroy_upon_damage) {
-				missile.damage_charges_before_destruction--;
+				--charges;
 				
 				detonate_if_explosive(step, it.point, missile_handle);
 
@@ -277,7 +300,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 				}
 
 				// delete only once
-				if (0 == missile.damage_charges_before_destruction) {
+				if (charges == 0) {
 					step.post_message(messages::queue_destruction(it.collider));
 					damage_msg.inflictor_destructed = true;
 
@@ -335,13 +358,15 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 				}
 			}
 
-			damage_msg.inflictor = it.collider;
-			damage_msg.subject = it.subject;
-			damage_msg.amount = total_damage_amount;
-			damage_msg.victim_shake = missile_def.victim_shake;
-			damage_msg.impact_velocity = impact_velocity;
-			damage_msg.point_of_impact = it.point;
-			step.post_message(damage_msg);
+			if (send_damage && contact_start) {
+				damage_msg.inflictor = it.collider;
+				damage_msg.subject = it.subject;
+				damage_msg.amount = total_damage_amount;
+				damage_msg.victim_shake = missile_def.victim_shake;
+				damage_msg.impact_velocity = impact_velocity;
+				damage_msg.point_of_impact = it.point;
+				step.post_message(damage_msg);
+			}
 		});
 	}
 }
