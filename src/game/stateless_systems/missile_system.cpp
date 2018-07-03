@@ -247,7 +247,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			const auto impact_velocity = it.collider_impact_velocity;
 			const auto impact_dir = vec2(impact_velocity).normalize();
 
-			if (missile_def.impulse_upon_hit > 0.f) {
+			if (missile_def.impulse_upon_hit > 0.f && contact_start) {
 				auto considered_impulse = missile_def.impulse_upon_hit * missile.power_multiplier_of_sender;
 
 				if (const auto sentience = subject_handle.find<components::sentience>()) {
