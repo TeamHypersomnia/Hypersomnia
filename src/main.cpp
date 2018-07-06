@@ -704,6 +704,8 @@ int work(const int argc, const char* const * const argv) try {
 			},
 			setup_post_cleanup
 		);
+
+		audiovisuals.randomizing.last_frame_delta = frame_delta;
 	};
 
 	static auto advance_current_setup = [](

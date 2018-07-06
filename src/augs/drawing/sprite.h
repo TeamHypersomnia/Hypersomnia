@@ -102,7 +102,10 @@ namespace augs {
 		rgba neon_color = white;
 		sprite_special_effect effect = sprite_special_effect::NONE;
 		real32 effect_speed_multiplier = 1.f;
+
 		augs::value_with_flag<intensity_vibration_input> neon_intensity_vibration;
+		bool vibrate_diffuse_as_well = true;
+		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 
 		bool operator==(const sprite& b) const {
@@ -197,6 +200,9 @@ namespace augs {
 
 				left_col.avoid_dark_blue_for_color_wave();
 				right_col.avoid_dark_blue_for_color_wave();
+
+				left_col.a = target_color.a;
+				right_col.a = target_color.a;
 
 				auto& t1 = triangles[0];
 				auto& t2 = triangles[1];

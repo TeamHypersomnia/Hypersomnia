@@ -56,6 +56,8 @@ FORCE_INLINE void detail_specific_entity_drawer(
 	(void)in;
 
 	if constexpr(typed_handle.template has<invariants::sprite>()) {
+		const auto& sprite = typed_handle.template get<invariants::sprite>();
+
 		auto input = [&]() {
 			using input_type = invariants::sprite::drawing_input;
 
@@ -68,6 +70,17 @@ FORCE_INLINE void detail_specific_entity_drawer(
 			result.renderable_transform = viewing_transform;
 			result.global_time_seconds = in.global_time_seconds;
 
+			{
+				const auto& v = sprite.neon_intensity_vibration;
+
+				if (v.is_enabled && sprite.vibrate_diffuse_as_well) {
+					const auto id = typed_handle.get_id();
+					const auto mult = in.randomizing.advance_and_get_neon_mult(id, v.value);
+
+					result.colorize.multiply_alpha(mult);
+				}
+			}
+
 			if constexpr(typed_handle.template has<components::sprite>()) {
 				const auto& sprite_comp = typed_handle.template get<components::sprite>();
 				result.global_time_seconds += sprite_comp.effect_offset_secs;
@@ -79,8 +92,6 @@ FORCE_INLINE void detail_specific_entity_drawer(
 
 			return result;
 		}();
-
-		const auto& sprite = typed_handle.template get<invariants::sprite>();
 
 		if constexpr(typed_handle.template has<invariants::animation>()) {
 			const auto& animation_def = typed_handle.template get<invariants::animation>();

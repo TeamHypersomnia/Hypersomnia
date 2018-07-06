@@ -18,6 +18,8 @@ struct randomizing_system {
 	struct walk_cache {
 		randomization rng;
 		real32 walk_state = 0.5f;
+
+		walk_cache(const std::size_t seed) : rng(seed) {}
 	};
 
 	augs::delta last_frame_delta = augs::delta::zero;
