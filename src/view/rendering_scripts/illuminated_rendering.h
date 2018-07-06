@@ -87,13 +87,14 @@ void illuminated_rendering(
 	
 	const auto& anims = cosmos.get_logical_assets().plain_animations;
 
-	const auto& interp = in.audiovisuals.get<interpolation_system>();
-	const auto& particles = in.audiovisuals.get<particles_simulation_system>();
-	const auto& wandering_pixels = in.audiovisuals.get<wandering_pixels_system>();
-	const auto& exploding_rings = in.audiovisuals.get<exploding_ring_system>();
-	const auto& flying_numbers = in.audiovisuals.get<flying_number_indicator_system>();
-	const auto& highlights = in.audiovisuals.get<pure_color_highlight_system>();
-	const auto& thunders = in.audiovisuals.get<thunder_system>();
+	const auto& av = in.audiovisuals;
+	const auto& interp = av.get<interpolation_system>();
+	const auto& particles = av.get<particles_simulation_system>();
+	const auto& wandering_pixels = av.get<wandering_pixels_system>();
+	const auto& exploding_rings = av.get<exploding_ring_system>();
+	const auto& flying_numbers = av.get<flying_number_indicator_system>();
+	const auto& highlights = av.get<pure_color_highlight_system>();
+	const auto& thunders = av.get<thunder_system>();
 	const auto global_time_seconds = cosmos.get_total_seconds_passed(in.interpolation_ratio);
 	const auto settings = in.drawing;
 	const auto matrix = camera.get_projection_matrix(screen_size);
@@ -156,12 +157,23 @@ void illuminated_rendering(
 
 	augs::graphics::fbo::set_current_to_none();
 
-	const auto& light = in.audiovisuals.get<light_system>();
+	const auto& light = av.get<light_system>();
 	
 	const auto laser_glow = necessarys.at(assets::necessary_image_id::LASER_GLOW);
 	const auto glow_edge_tex = necessarys.at(assets::necessary_image_id::LASER_GLOW_EDGE);
 
 	const auto cast_highlight = necessarys.at(assets::necessary_image_id::CAST_HIGHLIGHT);
+
+	const auto drawing_input = draw_renderable_input { 
+		{
+			output, 
+			game_images, 
+			global_time_seconds,
+			flip_flags(),
+			av.randomizing
+		},
+		interp
+	};
 
 	light.render_all_lights({
 		renderer,
@@ -223,12 +235,10 @@ void illuminated_rendering(
 		},
 		camera,
 		screen_size,
-		interp,
 		particles,
 		anims,
 		visible.per_layer,
-		game_images,
-		global_time_seconds
+		drawing_input
 	});
 
 	set_shader_with_matrix(shaders.illuminated);
@@ -237,13 +247,13 @@ void illuminated_rendering(
 		auto scope = measure_scope(total_layer_scope);
 
 		for (const auto e : visible.per_layer[r]) {
-			draw_entity(cosmos[e], { output, game_images, global_time_seconds, flip_flags() }, interp);
+			draw_entity(cosmos[e], drawing_input);
 		}
 	};
 
 	auto draw_borders = [&](const render_layer r, auto provider) {
 		for (const auto e : visible.per_layer[r]) {
-			draw_border(cosmos[e], { output, game_images, global_time_seconds, flip_flags() }, interp, provider);
+			draw_border(cosmos[e], drawing_input, provider);
 		}
 	};
 
@@ -451,28 +461,13 @@ void illuminated_rendering(
 
 	shaders.pure_color_highlight->set_as_current();
 
-	highlights.draw_highlights(
-		output,
-		cosmos,
-		interp,
-		game_images
-	);
+	highlights.draw_highlights(cosmos, drawing_input);
 
 	for_each_additional_highlight([&](
 		const entity_id subject, 
 		const rgba color
-	){
-		draw_color_highlight(
-			cosmos[subject],
-			color,
-			{
-				output,
-				game_images,
-				global_time_seconds,
-				flip_flags()
-			},
-			interp
-		);
+	) {
+		draw_color_highlight(cosmos[subject], color, drawing_input);
 	});
 
 	thunders.draw_thunders(

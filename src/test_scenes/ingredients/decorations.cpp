@@ -46,7 +46,7 @@ namespace test_flavours {
 			const auto animation_id,
 			const auto layer,
 			const bool one_shot = false
-			) -> auto& {
+		) -> auto& {
 			auto& meta = flavour_with_sprite(
 				flavour_id,
 				sprite_id,
@@ -179,12 +179,16 @@ namespace test_flavours {
 			render_layer::AQUARIUM_FLOWERS
 		);
 
-		flavour_with_animation(
-			test_complex_decorations::CONSOLE_LIGHT,
-			test_scene_image_id::CONSOLE_LIGHT_1,
-			test_scene_plain_animation_id::CONSOLE_LIGHT,
-			render_layer::ON_ON_FLOOR
-		);
+		{
+			auto& meta = flavour_with_animation(
+				test_complex_decorations::CONSOLE_LIGHT,
+				test_scene_image_id::CONSOLE_LIGHT_1,
+				test_scene_plain_animation_id::CONSOLE_LIGHT,
+				render_layer::ON_ON_FLOOR
+			);
+
+			meta.get<invariants::sprite>().neon_intensity_vibration.is_enabled = true;
+		}
 
 		fish_flavour(
 			test_complex_decorations::YELLOW_FISH,

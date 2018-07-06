@@ -21,6 +21,7 @@
 #include "view/audiovisual_state/systems/interpolation_settings.h"
 
 #include "view/audiovisual_state/all_audiovisual_systems.h"
+#include "view/audiovisual_state/systems/randomizing_system.h"
 
 class cosmos;
 struct visible_entities;
@@ -51,6 +52,8 @@ struct audiovisual_state {
 	all_audiovisual_systems systems;
 
 	audiovisual_profiler performance;
+
+	mutable randomizing_system randomizing;
 	
 	template <class T>
 	auto& get() {

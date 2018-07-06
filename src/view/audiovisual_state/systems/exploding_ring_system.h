@@ -3,6 +3,7 @@
 #include "augs/misc/timing/delta.h"
 #include "augs/math/camera_cone.h"
 
+#include "augs/drawing/sprite.h"
 #include "augs/drawing/drawing.h"
 
 #include "game/messages/exploding_ring_input.h"

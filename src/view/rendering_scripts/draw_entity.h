@@ -19,14 +19,20 @@
 
 #include "view/viewables/all_viewables_declarations.h"
 #include "view/viewables/images_in_atlas_map.h"
+#include "view/audiovisual_state/systems/randomizing_system.h"
 
 class interpolation_system;
 
-struct draw_renderable_input {
+struct specific_draw_input {
 	const augs::drawer drawer;
 	const images_in_atlas_map& manager;
 	const double global_time_seconds;
 	const flip_flags flip;
+	randomizing_system& randomizing;
+};
+
+struct draw_renderable_input : specific_draw_input {
+	const interpolation_system& interp;
 };
 
 using entities_with_renderables = entity_types_with_any_of<
@@ -40,7 +46,7 @@ using entities_with_renderables = entity_types_with_any_of<
 template <class E, class T>
 FORCE_INLINE void detail_specific_entity_drawer(
 	const cref_typed_entity_handle<E> typed_handle,
-	const draw_renderable_input in,
+	const specific_draw_input& in,
 	T render_visitor,
 	const transformr viewing_transform
 ) {
@@ -165,16 +171,14 @@ FORCE_INLINE void detail_specific_entity_drawer(
 template <class E, class T>
 FORCE_INLINE void specific_entity_drawer(
 	const cref_typed_entity_handle<E> typed_handle,
-	const draw_renderable_input in,
-	const interpolation_system& interp,
+	const draw_renderable_input& in,
 	T render_visitor
 ) {
 	/* Might or might not be used depending on if constexpr flow */
 	(void)render_visitor;
-	(void)interp;
 	(void)in;
 
-	const auto viewing_transform = typed_handle.get_viewing_transform(interp);
+	const auto viewing_transform = typed_handle.get_viewing_transform(in.interp);
 
 	if (typed_handle.template has<invariants::item>()) {
 		if (typed_handle.get_owning_transfer_capability().alive()) {
@@ -306,21 +310,19 @@ FORCE_INLINE void specific_entity_drawer(
 template <class E>
 FORCE_INLINE void specific_draw_entity(
 	const cref_typed_entity_handle<E> typed_handle,
-	const draw_renderable_input in,
-	const interpolation_system& interp
+	const draw_renderable_input& in
 ) {
 	auto callback = [](const auto& renderable, auto&&... args) {
 		renderable.draw(std::forward<decltype(args)>(args)...);
 	};
 
-	specific_entity_drawer(typed_handle, in, interp, callback);
+	specific_entity_drawer(typed_handle, in, callback);
 }
 
 template <class E, class border_provider>
 FORCE_INLINE void specific_draw_border(
 	const cref_typed_entity_handle<E> typed_handle,
-	const draw_renderable_input in,
-	const interpolation_system& interp,
+	const draw_renderable_input& in,
 	const border_provider& borders
 ) {
 	if (const auto border_info = borders(typed_handle)) {
@@ -338,7 +340,7 @@ FORCE_INLINE void specific_draw_border(
 			}
 		};
 
-		specific_entity_drawer(typed_handle, in, interp, border_maker);
+		specific_entity_drawer(typed_handle, in, border_maker);
 	}
 }
 
@@ -346,22 +348,20 @@ template <class E>
 FORCE_INLINE void specific_draw_color_highlight(
 	const cref_typed_entity_handle<E> typed_handle,
 	const rgba color,
-	const draw_renderable_input in,
-	const interpolation_system& interp
+	const draw_renderable_input& in
 ) {
 	auto highlight_maker = [color](auto renderable, const auto& manager, const auto& input) {
 		renderable.set_color(color);
 		renderable.draw(manager, input);
 	};
 
-	specific_entity_drawer(typed_handle, in, interp, highlight_maker);
+	specific_entity_drawer(typed_handle, in, highlight_maker);
 }
 
 template <class E>
 FORCE_INLINE void specific_draw_neon_map(
 	const cref_typed_entity_handle<E> typed_handle,
-	const draw_renderable_input in,
-	const interpolation_system& interp
+	const draw_renderable_input& in
 ) {
 	if constexpr(typed_handle.template has<components::sprite>()) {
 		if (typed_handle.template get<components::sprite>().disable_neon_map) {
@@ -380,53 +380,60 @@ FORCE_INLINE void specific_draw_neon_map(
 			}
 		}
 
+		{
+			const auto& v = renderable.neon_intensity_vibration;
+
+			if (v.is_enabled) {
+				const auto id = typed_handle.get_id();
+				const auto mult = in.randomizing.advance_and_get_neon_mult(id, v.value);
+
+				input.colorize.multiply_alpha(mult);
+			}
+		}
+
 		renderable.draw(manager, input);
 	};
 
-	specific_entity_drawer(typed_handle, in, interp, neon_maker);
+	specific_entity_drawer(typed_handle, in, neon_maker);
 }
 
 /* Dispatching helpers */
 
 FORCE_INLINE void draw_entity(
 	const const_entity_handle handle,
-	const draw_renderable_input in,
-	const interpolation_system& interp
+	const draw_renderable_input& in
 ) {
-	handle.conditional_dispatch<entities_with_renderables>([&in, &interp](const auto typed_handle) {
-		specific_draw_entity(typed_handle, in, interp);
+	handle.conditional_dispatch<entities_with_renderables>([&in](const auto typed_handle) {
+		specific_draw_entity(typed_handle, in);
 	});
 }
 
 FORCE_INLINE void draw_neon_map(
 	const const_entity_handle handle,
-	const draw_renderable_input in,
-	const interpolation_system& interp
+	const draw_renderable_input& in
 ) {
-	handle.conditional_dispatch<entities_with_renderables>([&in, &interp](const auto typed_handle) {
-		specific_draw_neon_map(typed_handle, in, interp);
+	handle.conditional_dispatch<entities_with_renderables>([&in](const auto typed_handle) {
+		specific_draw_neon_map(typed_handle, in);
 	});
 }
 
 FORCE_INLINE void draw_color_highlight(
 	const const_entity_handle handle,
 	const rgba color,
-	const draw_renderable_input in,
-	const interpolation_system& interp
+	const draw_renderable_input& in
 ) {
-	handle.conditional_dispatch<entities_with_renderables>([&in, &interp, color](const auto typed_handle) {
-		specific_draw_color_highlight(typed_handle, color, in, interp);
+	handle.conditional_dispatch<entities_with_renderables>([&in, color](const auto typed_handle) {
+		specific_draw_color_highlight(typed_handle, color, in);
 	});
 }
 
 template <class B>
 FORCE_INLINE void draw_border(
 	const const_entity_handle handle,
-	const draw_renderable_input in,
-	const interpolation_system& interp,
+	const draw_renderable_input& in,
 	B&& borders
 ) {
-	handle.conditional_dispatch<entities_with_renderables>([&in, &interp, &borders](const auto typed_handle) {
-		specific_draw_border(typed_handle, in, interp, std::forward<B>(borders));
+	handle.conditional_dispatch<entities_with_renderables>([&in, &borders](const auto typed_handle) {
+		specific_draw_border(typed_handle, in, std::forward<B>(borders));
 	});
 }

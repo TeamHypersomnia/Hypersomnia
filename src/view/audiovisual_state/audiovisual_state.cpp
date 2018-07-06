@@ -50,6 +50,8 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 
 	interp.id_to_integerize = viewed_character;
 
+	randomizing.last_frame_delta = dt;
+
 	thunders.advance(cosm, input.particle_effects, dt, particles);
 	exploding_rings.advance(cosm, input.particle_effects, dt, particles);
 	flying_numbers.advance(dt);

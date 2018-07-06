@@ -17,6 +17,15 @@
 #include "augs/texture_atlas/atlas_entry.h"
 #include "augs/build_settings/platform_defines.h"
 
+struct intensity_vibration_input {
+	// GEN INTROSPECTOR struct intensity_vibration_input
+	real32 change_per_sec = 100.f;
+	rgba_channel lower = 150;
+	rgba_channel upper = 255;
+	pad_bytes<2> pad;
+	// END GEN INTROSPECTOR
+};
+
 namespace augs {
 	enum class sprite_special_effect /* : unsigned char */ {
 		// GEN INTROSPECTOR enum class augs::sprite_special_effect
@@ -93,6 +102,7 @@ namespace augs {
 		rgba neon_color = white;
 		sprite_special_effect effect = sprite_special_effect::NONE;
 		real32 effect_speed_multiplier = 1.f;
+		augs::value_with_flag<intensity_vibration_input> neon_intensity_vibration;
 		// END GEN INTROSPECTOR
 
 		bool operator==(const sprite& b) const {

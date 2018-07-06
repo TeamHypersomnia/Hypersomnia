@@ -15,6 +15,9 @@ namespace augs {
 	struct drawer;
 }
 
+
+struct draw_renderable_input;
+
 class pure_color_highlight_system {
 public:
 	struct highlight {
@@ -38,10 +41,8 @@ public:
 	void advance(const augs::delta dt);
 	
 	void draw_highlights(
-		const augs::drawer output,
 		const cosmos& cosmos,
-		const interpolation_system& interp,
-		const images_in_atlas_map& game_images
+		const draw_renderable_input&
 	) const;
 
 	void reserve_caches_for_entities(const size_t) const {}

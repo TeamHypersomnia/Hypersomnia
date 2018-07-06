@@ -6,6 +6,8 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Make a tree out of time measurement profiler calls and get summary just from "fps" or "whole regeneration"
+
 - Fix this: due to a filter, the node disappears during renaming
 	- just when constructing a filter, save a name with which it was remembered in cached fae selections
 		- i guess we will still be able to do for eaches and all flav id getters even with changed state structure

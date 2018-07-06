@@ -71,7 +71,8 @@ void light_system::render_all_lights(const light_system_input in) const {
 	auto& renderer = in.renderer;
 	auto& performance = in.profiler;
 
-	const auto global_time_seconds = in.global_time_seconds;
+	const auto drawing_in = in.drawing_in;
+	const auto global_time_seconds = drawing_in.global_time_seconds;
 	const auto output = augs::drawer{ renderer.get_triangle_buffer() };
 	const auto& light_shader = in.light_shader;
 	const auto& standard_shader = in.standard_shader;
@@ -94,7 +95,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	const auto light_distance_mult_uniform = light_shader.get_uniform_location("distance_mult");
 	const auto light_attenuation_uniform = light_shader.get_uniform_location("light_attenuation");
 	const auto light_multiply_color_uniform = light_shader.get_uniform_location("multiply_color");
-	const auto& interp = in.interpolation;
+	const auto& interp = drawing_in.interp;
 	const auto& particles = in.particles;
 	
 	const auto& visible_per_layer = in.visible_per_layer;
@@ -109,13 +110,13 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	auto draw_layer = [&](const render_layer r) {
 		for (const auto e : visible_per_layer[r]) {
-			draw_entity(cosmos[e], { output, in.game_images, global_time_seconds, flip_flags() }, in.interpolation);
+			draw_entity(cosmos[e], drawing_in);
 		}
 	};
 	
 	auto draw_neons = [&](const render_layer r) {
 		for (const auto e : visible_per_layer[r]) {
-			draw_neon_map(cosmos[e], { output, in.game_images, global_time_seconds, flip_flags() }, in.interpolation);
+			draw_neon_map(cosmos[e], drawing_in);
 		}
 	};
 
@@ -283,7 +284,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	/* Draw neon maps */
 	particles.draw_particles(
-		in.game_images,
+		drawing_in.manager,
 		in.plain_animations,
 		draw_particles_input { output, true },
 		render_layer::ILLUMINATING_PARTICLES

@@ -49,10 +49,8 @@ void pure_color_highlight_system::advance(const augs::delta dt) {
 }
 
 void pure_color_highlight_system::draw_highlights(
-	const augs::drawer output,
 	const cosmos& cosmos,
-	const interpolation_system& interp,
-	const images_in_atlas_map& game_images
+	const draw_renderable_input& in
 ) const {
 	for (const auto& r : highlights) {
 		const auto subject = cosmos[r.in.target];
@@ -69,16 +67,6 @@ void pure_color_highlight_system::draw_highlights(
 			static_cast<rgba_channel>(255.f * sqrt(sqrt(ratio)) * r.in.starting_alpha_ratio)
 		};
 
-		draw_color_highlight(
-			subject,
-			target_color,
-			{
-				output,
-				game_images,
-				global_time_seconds,
-				flip_flags {}
-			},
-			interp
-		);
+		draw_color_highlight(subject, target_color, in);
 	}
 }

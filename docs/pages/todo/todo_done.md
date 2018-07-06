@@ -1061,3 +1061,12 @@ we consider whole type overrides too complex architeciturally:
 				- Which is not a problem because these sounds will mostly be short FaFs
 			- Simply disable doppler for this kind of sounds and the first solution applies in this case
 				- set_doppler_factor for a source
+- Priority: Finishing aquarium showcase
+	- Bubbles appearing from fish
+		- Complex decorations that get deleted after animation passes
+			- Pro: high amount of control when they are spawned
+			- Con: more entities? Who cares, though.
+			- Solution: delete_entity_after_loops in invariants::animation
+	- Directional bubble stream at top of the aquarium indicating the water source
+
+	

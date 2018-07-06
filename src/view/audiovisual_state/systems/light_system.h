@@ -24,6 +24,7 @@ namespace augs {
 }
 
 struct frame_profiler;
+struct draw_renderable_input;
 
 struct light_system_input {
 	augs::renderer& renderer;
@@ -37,12 +38,11 @@ struct light_system_input {
 	std::function<void()> neon_callback;
 	const camera_cone camera;
 	const vec2 screen_size;
-	const interpolation_system& interpolation;
 	const particles_simulation_system& particles;
 	const plain_animations_pool& plain_animations;
 	const visible_entities::per_layer_type& visible_per_layer;
-	const images_in_atlas_map& game_images;
-	const double global_time_seconds;
+
+	const draw_renderable_input& drawing_in;
 };
 
 struct light_system {
