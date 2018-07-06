@@ -2010,4 +2010,29 @@ void load_test_scene_particle_effects(
 
 		effect.emissions.push_back(em);
 	}
+
+	{
+		auto& effect = acquire_effect(test_scene_particle_effect_id::FISH_BUBBLE);
+
+		particles_emission em;
+		em.num_of_particles_to_spawn_initially.set(1, 2);
+
+		{
+			animated_particle particle_definition;
+
+			particle_definition.animation.id = to_animation_id(test_scene_plain_animation_id::SMALL_BUBBLE_LB);
+			em.add_particle_definition(particle_definition);
+			particle_definition.animation.id = to_animation_id(test_scene_plain_animation_id::SMALL_BUBBLE_LT);
+			em.add_particle_definition(particle_definition);
+			particle_definition.animation.id = to_animation_id(test_scene_plain_animation_id::SMALL_BUBBLE_RB);
+			em.add_particle_definition(particle_definition);
+			particle_definition.animation.id = to_animation_id(test_scene_plain_animation_id::SMALL_BUBBLE_RT);
+			em.add_particle_definition(particle_definition);
+		}
+
+		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+		em.should_particles_look_towards_velocity = false;
+
+		effect.emissions.push_back(em);
+	}
 }

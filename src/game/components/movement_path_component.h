@@ -4,9 +4,7 @@
 #include "augs/templates/value_with_flag.h"
 #include "game/enums/startle_type.h"
 #include "game/transcendental/entity_flavour_id.h"
-
-using bubble_flavour_type = constrained_entity_flavour_id<invariants::animation>;
-using bubble_flavour_vector = augs::constant_size_vector<bubble_flavour_type, 4>;
+#include "game/detail/view_input/particle_effect_input.h"
 
 struct fish_movement_def {
 	// GEN INTROSPECTOR struct fish_movement_def
@@ -15,7 +13,7 @@ struct fish_movement_def {
 	real32 base_speed = 80.f;
 	real32 base_bubble_interval_ms = 1000.f;
 	unsigned seed_offset = 0u;
-	bubble_flavour_vector bubble_flavours;
+	particle_effect_input bubble_effect;
 	// END GEN INTROSPECTOR
 };
 

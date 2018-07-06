@@ -32,6 +32,7 @@ enum class test_scene_particle_effect_id {
 	STEEL_RICOCHET,
 	AQUARIUM_BUBBLES,
 	FLOWER_BUBBLES,
+	FISH_BUBBLE,
 
 	COUNT
 	// END GEN INTROSPECTOR

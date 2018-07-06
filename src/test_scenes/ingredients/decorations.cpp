@@ -67,6 +67,9 @@ namespace test_flavours {
 			return meta;
 		};
 
+		//const auto bubble_alpha = 73;
+		const auto bubble_neon = rgba(131, 255, 228, 255);
+
 		auto fish_flavour = [&](
 			const auto flavour_id,
 			const auto sprite_id,
@@ -75,7 +78,6 @@ namespace test_flavours {
 			const int base_speed = 80,
 			const int sine_speed_boost = 100,
 			const augs::sprite_special_effect effect = augs::sprite_special_effect::NONE
-		
 		) {
 			auto& meta = flavour_with_sprite(
 				flavour_id,
@@ -105,58 +107,12 @@ namespace test_flavours {
 				def.rect_size = aquarium_size * 2;
 				def.base_speed = base_speed;
 				def.sine_speed_boost = sine_speed_boost;
-				def.bubble_flavours.emplace_back(to_entity_flavour_id(test_complex_decorations::SMALL_BUBBLE_LB));
-				def.bubble_flavours.emplace_back(to_entity_flavour_id(test_complex_decorations::SMALL_BUBBLE_LT));
-				def.bubble_flavours.emplace_back(to_entity_flavour_id(test_complex_decorations::SMALL_BUBBLE_RB));
-				def.bubble_flavours.emplace_back(to_entity_flavour_id(test_complex_decorations::SMALL_BUBBLE_RT));
+				def.bubble_effect.id = to_particle_effect_id(test_scene_particle_effect_id::FISH_BUBBLE);
+				def.bubble_effect.modifier.colorize = bubble_neon;
 				def.base_bubble_interval_ms = 200.f;
 				meta.set(movement_path_def);
 			}
 		};
-
-		const auto bubble_alpha = 73;
-		const auto bubble_neon = rgba(131, 255, 228, 255);
-
-		auto bubble_flavour = [&](
-			const auto flavour_id,
-			const auto image_id,
-			const auto anim_id
-		) {
-			auto& f = flavour_with_animation(
-				flavour_id,
-				image_id,
-				anim_id,
-				render_layer::AQUARIUM_BUBBLES,
-				true
-			);
-
-			f.template get<invariants::sprite>().color.a = bubble_alpha;
-			f.template get<invariants::sprite>().neon_color = bubble_neon;
-		};
-
-		bubble_flavour(
-			test_complex_decorations::SMALL_BUBBLE_LB,
-			test_scene_image_id::SMALL_BUBBLE_LB_1,
-			test_scene_plain_animation_id::SMALL_BUBBLE_LB
-		);
-
-		bubble_flavour(
-			test_complex_decorations::SMALL_BUBBLE_LT,
-			test_scene_image_id::SMALL_BUBBLE_LT_1,
-			test_scene_plain_animation_id::SMALL_BUBBLE_LT
-		);
-
-		bubble_flavour(
-			test_complex_decorations::SMALL_BUBBLE_RB,
-			test_scene_image_id::SMALL_BUBBLE_RB_1,
-			test_scene_plain_animation_id::SMALL_BUBBLE_RB
-		);
-
-		bubble_flavour(
-			test_complex_decorations::SMALL_BUBBLE_RT,
-			test_scene_image_id::SMALL_BUBBLE_RT_1,
-			test_scene_plain_animation_id::SMALL_BUBBLE_RT
-		);
 
 		flavour_with_animation(
 			test_complex_decorations::FLOWER_PINK,
@@ -240,7 +196,7 @@ namespace test_flavours {
 		flavour_with_sprite(
 			test_sprite_decorations::LAB_WALL_A2,
 			test_scene_image_id::LAB_WALL_A2,
-			render_layer::OVER_DYNAMIC_BODY
+			render_layer::SMALL_DYNAMIC_BODY
 		);
 
 		flavour_with_sprite(

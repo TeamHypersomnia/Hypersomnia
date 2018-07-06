@@ -234,9 +234,9 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				const auto speed_mult = total_speed / max_speed;
 				const auto elapsed_anim_ms = delta.in_milliseconds() * speed_mult;
 
-				const auto& bubble_flavours = def.bubble_flavours;
+				const auto& bubble_effect = def.bubble_effect;
 
-				if (bubble_flavours.size() > 0) {
+				if (bubble_effect.id.is_set()) {
 					/* Resolve bubbles and bubble intervals */
 
 					auto& next_in_ms = movement_path.next_bubble_in_ms;
@@ -256,24 +256,10 @@ void movement_path_system::advance_paths(const logic_step step) const {
 						next_in_ms -= elapsed_anim_ms;
 
 						if (next_in_ms < 0.f) {
-							const auto n = bubble_flavours.size();
-							const auto chosen_i = rng.randval(0u, n - 1);
-							const auto chosen_n = rng.randval(1, 2);
-
-							for (int i = 0; i < chosen_n; ++i) {
-								const auto& chosen_flavour = bubble_flavours[(chosen_i + i) % n];
-
-								cosmic::create_entity(
-									cosm,
-									chosen_flavour,
-									[&](const auto typed_bubble) {
-										typed_bubble.set_logic_transform(tip_pos);
-									},
-									[](auto){}
-								);
-
-								choose_new_interval();
-							}
+							bubble_effect.start(
+								step,
+								particle_effect_start_input::fire_and_forget(tip_pos)
+							);
 						}
 					}
 				}

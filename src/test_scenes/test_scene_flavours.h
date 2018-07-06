@@ -184,11 +184,6 @@ enum class test_complex_decorations {
 	CONSOLE_BODY,
 	CONSOLE_LIGHT,
 
-	SMALL_BUBBLE_LB,
-	SMALL_BUBBLE_LT,
-	SMALL_BUBBLE_RB,
-	SMALL_BUBBLE_RT,
-
 	PINK_CORAL,
 
 	COUNT
