@@ -1070,3 +1070,26 @@ we consider whole type overrides too complex architeciturally:
 	- Directional bubble stream at top of the aquarium indicating the water source
 
 	
+- Statefulness in case of sprites
+	- Processing them all in the game logic:
+		- Pro: easy peasy
+		- Con: server has loads of unnecessary work to do
+		- Con: visuals dependent on tickrate
+		- Overall, sucks
+	- State immutable at drawing stage, advancing only visible along with other audiovisuals
+		- Pro: works and architecturally pure
+'		- Con: Performance hit: we must dispatch logic twice to all visible entities
+			- Don't we do that anyway?
+			- This happens with wandering pixels but they have dedicated layers
+				- Sprites can be pretty much on all layers and only several will have the special effects enabled
+		- Con: Must somehow get rid of invisible ones or caches will grow?
+			- Must anyway be prepared for the worst case
+			- Currently the case for wandering pixels as well anyway
+	- State mutable at drawing stage, advancing while drawing
+		- Pro: best performance, don't have to iterate twice through the entire 
+		- Pro: even easier than with state-immutable approach, less funcs
+		- Con: architecturally impure, has to pass delta for illuminated rendering
+		- Con: Still has to somehow clear unused caches? It will only affect memory, though, and will never be more than max number of entities of all cosmoi
+			- Same problem as if the state was immutable
+
+

@@ -104,7 +104,7 @@ namespace augs {
 		real32 effect_speed_multiplier = 1.f;
 
 		augs::value_with_flag<intensity_vibration_input> neon_intensity_vibration;
-		bool vibrate_diffuse_as_well = true;
+		bool vibrate_diffuse_as_well = false;
 		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 

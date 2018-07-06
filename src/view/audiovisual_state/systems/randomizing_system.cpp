@@ -28,11 +28,10 @@ float randomizing_system::advance_and_get_neon_mult(
 
 	auto& mult = walk.walk_state;
 
-	LOG_NVPS(dt.in_seconds());
-	/* const auto lower_dt = std::max(-h, -mult); */
-	/* const auto upper_dt = std::min(h, 1.f - mult); */
+	const auto lower_dt = std::max(-h, -mult);
+	const auto upper_dt = std::min(h, 1.f - mult);
 
-	/* mult += walk.rng.randval(lower_dt, upper_dt); */
+	mult += walk.rng.randval(lower_dt, upper_dt);
 
 	mult += walk.rng.randval(-h, h);
 	mult = std::clamp(mult, 0.f, 1.f);
