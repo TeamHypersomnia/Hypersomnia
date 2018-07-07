@@ -14,6 +14,8 @@ namespace test_flavours {
 			const float restitution = 0.f,
 			const float max_ricochet_angle = 10.f
 		) {
+			meta.template get<invariants::sprite>().tile_excess_size = true;
+
 			add_shape_invariant_from_renderable(meta, caches);
 
 			test_flavours::add_standard_static_body(meta);

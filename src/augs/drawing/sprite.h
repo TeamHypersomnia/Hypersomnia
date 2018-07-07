@@ -105,14 +105,15 @@ namespace augs {
 
 		augs::value_with_flag<intensity_vibration_input> neon_intensity_vibration;
 		bool vibrate_diffuse_as_well = false;
-		pad_bytes<3> pad;
+		bool tile_excess_size = false;
+		pad_bytes<2> pad;
 		// END GEN INTROSPECTOR
 
 		bool operator==(const sprite& b) const {
 			return introspective_equal(*this, b);
 		}
 
-		vec2i get_size() const {
+		size_type get_size() const {
 			return size;
 		}
 
@@ -174,7 +175,7 @@ namespace augs {
 			const atlas_entry considered_texture,
 			const vec2 target_position,
 			float target_rotation,
-			const vec2i considered_size,
+			const size_type considered_size,
 			rgba target_color
 		) const {
 			if (effect == sprite_special_effect::CONTINUOUS_ROTATION) {
