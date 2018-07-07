@@ -221,21 +221,17 @@ void item_button::draw_proc(
 	if (f.draw_item) {
 		{
 			const bool draw_attachments = !this_id->is_container_open || f.draw_attachments_even_if_open;
-			auto item_sprite = item.get<invariants::sprite>();
-			const auto gui_def = context.get_image_metas().at(item_sprite.image_id).meta.usage_as_button;
-
 			const auto layout = calc_button_layout(item, context.get_image_metas(), draw_attachments);
 			
 			vec2 expansion_offset;
 
 			if (f.expand_size_to_grid) {
+				const auto gui_def = context.get_image_metas().at(item.get<invariants::sprite>().image_id).meta.usage_as_button;
 				const auto size = vec2i(layout.get_size());
 				const auto rounded_size = griddify_size(size, gui_def.bbox_expander);
 
 				expansion_offset = (rounded_size - size) / 2;
 			}
-
-			auto state = invariants::sprite::drawing_input{ augs::drawer (output) };
 
 			const auto rc_pos = this_absolute_rect.get_position();
 
@@ -251,7 +247,7 @@ void item_button::draw_proc(
 				const transformr where
 			) {
 				attachment_handle.dispatch_on_having<invariants::item>([&](const auto typed_attachment_handle) {
-					detail_specific_entity_drawer(
+					detail_specific_entity_drawer<true>(
 						typed_attachment_handle,
 						drawing_in,
 						render_visitor,
@@ -273,7 +269,7 @@ void item_button::draw_proc(
 					[]() {
 						return torso_offsets();
 					},
-					attachment_offset_settings::for_rendering()
+					attachment_offset_settings::for_logic()
 				);
 			}
 		}

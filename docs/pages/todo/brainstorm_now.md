@@ -16,8 +16,6 @@ summary: That which we are brainstorming at the moment.
 		- Sprite component shall contain the size multiplier or an overridden size.
 			- Just two ints per entity won't make a difference.
 		- In crosshair component, size for appearance is anyway not needed and the original one will be passed in the drawing code.
-	- Fix: item rendering in GUI, as it uses some sprite internals so it could break
-		- Use draw_entity somehow for drawing items along with attachments
 	- tiling_mult for sprite_component?
 		- **No**, that makes it even more data to handle. Let's just keep a mult and a bool for tiling.
 		- Makes it explicit that it will be used for tiling

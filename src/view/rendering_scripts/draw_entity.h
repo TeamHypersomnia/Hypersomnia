@@ -30,7 +30,7 @@ using entities_with_renderables = entity_types_with_any_of<
 	invariants::animation
 >;
 
-template <class E, class T>
+template <bool for_gui = false, class E, class T>
 FORCE_INLINE void detail_specific_entity_drawer(
 	const cref_typed_entity_handle<E> typed_handle,
 	const specific_draw_input& in,
@@ -80,70 +80,72 @@ FORCE_INLINE void detail_specific_entity_drawer(
 			return result;
 		}();
 
-		if constexpr(typed_handle.template has<invariants::animation>()) {
-			const auto& animation_def = typed_handle.template get<invariants::animation>();
-			const auto& animation = typed_handle.template get<components::animation>();
+		if constexpr(!for_gui) {
+			if constexpr(typed_handle.template has<invariants::animation>()) {
+				const auto& animation_def = typed_handle.template get<invariants::animation>();
+				const auto& animation = typed_handle.template get<components::animation>();
 
-			const auto& logicals = typed_handle.get_cosmos().get_logical_assets();
+				const auto& logicals = typed_handle.get_cosmos().get_logical_assets();
 
-			if (const auto displayed_frame = ::find_frame(animation_def, animation, logicals)) {
-				const auto image_id = displayed_frame->image_id;
+				if (const auto displayed_frame = ::find_frame(animation_def, animation, logicals)) {
+					const auto image_id = displayed_frame->image_id;
 
-				auto animated = sprite;
-				animated.image_id = image_id;
-				animated.size = in.manager.at(image_id).get_original_size();
-
-				render_visitor(animated, in.manager, input);
-				return;
-			}
-		}
-
-		if constexpr(typed_handle.template has<components::trace>()) {
-			const auto& trace = typed_handle.template get<components::trace>();
-
-			if (trace.enabled) {
-				const auto tracified_size = vec2(sprite.size) * trace.last_size_mult;
-
-				if (const auto center_offset = tracified_size * trace.last_center_offset_mult;
-					center_offset.non_zero()
-				) {
-					const auto final_rotation = input.renderable_transform.rotation;
-					input.renderable_transform.pos -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
-				}
-
-				auto tracified_sprite = sprite;
-				tracified_sprite.size = tracified_size;
-
-				render_visitor(tracified_sprite, in.manager, input);
-				return;
-			}
-		}
-
-		if constexpr(typed_handle.template has<components::remnant>()) {
-			const auto& remnant = typed_handle.template get<components::remnant>();
-
-			auto remnanted_sprite = sprite;
-			remnanted_sprite.size *= remnant.last_size_mult;
-
-			render_visitor(remnanted_sprite, in.manager, input);
-			return;
-		}
-
-		if constexpr(typed_handle.template has<components::gun>()) {
-			const auto& gun = typed_handle.template get<components::gun>();
-			const auto& gun_def = typed_handle.template get<invariants::gun>();
-
-			const auto& cosm = typed_handle.get_cosmos();
-			const auto& logicals = cosm.get_logical_assets();
-
-			if (const auto shoot_animation = logicals.find(gun_def.shoot_animation)) {
-				if (const auto* const frame = ::find_frame(gun, *shoot_animation, cosm)) {
 					auto animated = sprite;
-					animated.image_id = frame->image_id;
-					animated.size = in.manager.at(frame->image_id).get_original_size();
+					animated.image_id = image_id;
+					animated.size = in.manager.at(image_id).get_original_size();
 
 					render_visitor(animated, in.manager, input);
 					return;
+				}
+			}
+
+			if constexpr(typed_handle.template has<components::trace>()) {
+				const auto& trace = typed_handle.template get<components::trace>();
+
+				if (trace.enabled) {
+					const auto tracified_size = vec2(sprite.size) * trace.last_size_mult;
+
+					if (const auto center_offset = tracified_size * trace.last_center_offset_mult;
+						center_offset.non_zero()
+					) {
+						const auto final_rotation = input.renderable_transform.rotation;
+						input.renderable_transform.pos -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
+					}
+
+					auto tracified_sprite = sprite;
+					tracified_sprite.size = tracified_size;
+
+					render_visitor(tracified_sprite, in.manager, input);
+					return;
+				}
+			}
+
+			if constexpr(typed_handle.template has<components::remnant>()) {
+				const auto& remnant = typed_handle.template get<components::remnant>();
+
+				auto remnanted_sprite = sprite;
+				remnanted_sprite.size *= remnant.last_size_mult;
+
+				render_visitor(remnanted_sprite, in.manager, input);
+				return;
+			}
+
+			if constexpr(typed_handle.template has<components::gun>()) {
+				const auto& gun = typed_handle.template get<components::gun>();
+				const auto& gun_def = typed_handle.template get<invariants::gun>();
+
+				const auto& cosm = typed_handle.get_cosmos();
+				const auto& logicals = cosm.get_logical_assets();
+
+				if (const auto shoot_animation = logicals.find(gun_def.shoot_animation)) {
+					if (const auto* const frame = ::find_frame(gun, *shoot_animation, cosm)) {
+						auto animated = sprite;
+						animated.image_id = frame->image_id;
+						animated.size = in.manager.at(frame->image_id).get_original_size();
+
+						render_visitor(animated, in.manager, input);
+						return;
+					}
 				}
 			}
 		}
