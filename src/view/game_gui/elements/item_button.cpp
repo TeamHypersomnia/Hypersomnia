@@ -129,35 +129,20 @@ void item_button::draw_complete_dragged_ghost(
 	draw_dragged_ghost_inside(context, this_id, absolute_xy_offset);
 }
 
-item_button::layout_with_attachments item_button::calc_button_layout(
+ltrb item_button::calc_button_layout(
 	const const_entity_handle component_owner,
 	const image_definitions_map& defs,
 	const bool include_attachments
 ) {
 	(void)defs;
 
-	layout_with_attachments output;
-	output.push(component_owner.get_aabb(transformr()));
-
-	if (include_attachments) {
-		component_owner.for_each_contained_item_recursive(
-			[&](const const_entity_handle desc) {
-				if (desc.get_owner_of_colliders()) {
-					output.push(desc.get_aabb(desc.calc_connection_until_container(component_owner)->shape_offset));
-				}
-
-				return recursive_callback_result::CONTINUE_AND_RECURSE;
-			}
-		);
-	}
+	auto aabb = component_owner.get_aabb(transformr());
 	
-	const auto origin = output.aabb.left_top();
-
-	for (auto& b : output.boxes) {
-		b += -origin;
+	if (include_attachments) {
+		aabb.contain(component_owner.calc_attachments_aabb([](){ return torso_offsets(); }));
 	}
 
-	return output;
+	return aabb;
 }
 
 vec2 item_button::griddify_size(const vec2 size, const vec2 expander) {
@@ -244,7 +229,7 @@ void item_button::draw_proc(
 			vec2 expansion_offset;
 
 			if (f.expand_size_to_grid) {
-				const auto size = vec2i(layout.aabb.get_size());
+				const auto size = vec2i(layout.get_size());
 				const auto rounded_size = griddify_size(size, gui_def.bbox_expander);
 
 				expansion_offset = (rounded_size - size) / 2;
@@ -254,7 +239,7 @@ void item_button::draw_proc(
 
 			const auto rc_pos = this_absolute_rect.get_position();
 
-			const auto viewing_pos = vec2i(layout.get_base_item_pos().get_center()) + rc_pos + expansion_offset;
+			const auto viewing_pos = vec2i(-layout.left_top()) + rc_pos + expansion_offset;
 			const auto viewing_transform = transformr(viewing_pos, 0);
 
 			auto render_visitor = [](const auto& renderable, auto&&... args) {
@@ -421,7 +406,7 @@ void item_button::rebuild_layouts(const game_gui_context context, const this_in_
 	const auto& manager = context.get_image_metas();
 
 	if (sprite) {
-		vec2i rounded_size = calc_button_layout(item, manager, !this_id->is_container_open).aabb.get_size();
+		vec2i rounded_size = calc_button_layout(item, manager, !this_id->is_container_open).get_size();
 		rounded_size = griddify_size(rounded_size, manager.at(item.get<invariants::sprite>().image_id).meta.usage_as_button.bbox_expander);
 		this_id->rc.set_size(rounded_size);
 	}

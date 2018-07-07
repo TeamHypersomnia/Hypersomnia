@@ -70,7 +70,7 @@ vec2i hotbar_button::get_bbox(
 
 	return get_button_corners_info().internal_size_to_cornered_size(
 		necessarys,
-		item_button::calc_button_layout(ent, defs, true).aabb.get_size()
+		item_button::calc_button_layout(ent, defs, true).get_size()
 	);
 }
 

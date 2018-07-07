@@ -25,21 +25,7 @@ struct item_button : game_gui_rect_node {
 
 	vec2i drag_offset_in_item_deposit;
 
-	struct layout_with_attachments {
-		augs::constant_size_vector<ltrb, 10> boxes;
-		ltrb aabb;
-		
-		auto get_base_item_pos() const {
-			return boxes[0];
-		}
-
-		void push(const ltrb l) {
-			aabb.contain(l);
-			boxes.push_back(l);
-		}
-	};
-
-	static layout_with_attachments calc_button_layout(
+	static ltrb calc_button_layout(
 		const const_entity_handle component_owner,
 		const image_definitions_map&,
 		const bool include_attachments = true

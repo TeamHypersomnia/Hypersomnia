@@ -400,6 +400,24 @@ public:
 			[](auto...) { return recursive_callback_result::CONTINUE_AND_RECURSE; }
 		);
 	}
+
+	template <class G>
+	ltrb calc_attachments_aabb(G&& get_offsets_by_torso) const {
+		ltrb result;
+
+		for_each_attachment_recursive(
+			[&result](
+				const auto attachment_entity,
+				const auto attachment_offset
+			) {
+				result.contain(attachment_entity.get_aabb(attachment_offset));
+			},
+			std::forward<G>(get_offsets_by_torso),
+			attachment_offset_settings::for_logic()
+		);
+
+		return result;
+	}
 };
 
 template <class E>
