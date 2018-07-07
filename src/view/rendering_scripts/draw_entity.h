@@ -20,20 +20,7 @@
 #include "view/viewables/all_viewables_declarations.h"
 #include "view/viewables/images_in_atlas_map.h"
 #include "view/audiovisual_state/systems/randomizing_system.h"
-
-class interpolation_system;
-
-struct specific_draw_input {
-	const augs::drawer drawer;
-	const images_in_atlas_map& manager;
-	const double global_time_seconds;
-	const flip_flags flip;
-	randomizing_system& randomizing;
-};
-
-struct draw_renderable_input : specific_draw_input {
-	const interpolation_system& interp;
-};
+#include "view/rendering_scripts/draw_entity_input.h"
 
 using entities_with_renderables = entity_types_with_any_of<
 	invariants::sprite,
@@ -266,7 +253,7 @@ FORCE_INLINE void specific_entity_drawer(
 						const auto attachment_entity,
 						const auto attachment_offset
 					) {
-						attachment_entity.dispatch(
+						attachment_entity.template dispatch_on_having<invariants::item>(
 							[&](const auto typed_attachment_handle) {
 								detail_specific_entity_drawer(
 									typed_attachment_handle,

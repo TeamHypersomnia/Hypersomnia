@@ -373,11 +373,12 @@ int work(const int argc, const char* const * const argv) try {
 	};
 
 	static auto create_game_gui_deps = []() {
-		return game_gui_context_dependencies{
+		return game_gui_context_dependencies {
 			get_viewable_defs().image_definitions,
 			streaming.images_in_atlas,
 			streaming.necessary_images_in_atlas,
-			streaming.get_loaded_gui_font()
+			streaming.get_loaded_gui_font(),
+			audiovisuals.randomizing
 		};
 	};
 

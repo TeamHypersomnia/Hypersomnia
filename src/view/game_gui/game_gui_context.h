@@ -14,6 +14,8 @@
 #include "view/game_gui/game_gui_element_location.h"
 #include "view/game_gui/viewing_game_gui_context_dependencies.h"
 
+#include "view/rendering_scripts/draw_entity_input.h"
+
 class game_gui_root;
 class game_gui_system;
 using game_gui_rect_tree = augs::gui::rect_tree<game_gui_element_location>;
@@ -111,6 +113,16 @@ public:
 	const auto& get_image_metas() const {
 		return dependencies.image_definitions;
 	}
+
+	auto make_specific_draw_input(const augs::drawer output) const {
+		return specific_draw_input {
+			output,
+			get_game_images(),
+			0.0,
+			flip_flags(),
+			dependencies.randomizing
+		};
+	}
 };
 
 using game_gui_context = basic_game_gui_context<false>;
@@ -155,4 +167,16 @@ public:
 	auto get_input_information() const {
 		return dependencies.input_information;
 	}
+
+	auto make_specific_draw_input() const {
+		return base::make_specific_draw_input(get_output());
+	}
+
+	auto make_draw_renderable_input() const {
+		return draw_renderable_input {
+			{ make_specific_draw_input() },
+			get_interpolation_system()
+		};
+	}
+
 };

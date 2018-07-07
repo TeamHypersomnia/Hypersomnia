@@ -28,6 +28,10 @@
 #include "view/game_gui/elements/character_gui.h"
 #include "view/game_gui/elements/slot_button.h"
 
+#include "view/audiovisual_state/systems/interpolation_system.h"
+#include "view/audiovisual_state/systems/randomizing_system.h"
+
+#include "view/rendering_scripts/draw_entity.h"
 #include "view/viewables/images_in_atlas_map.h"
 
 using namespace augs::gui::text;
@@ -130,6 +134,8 @@ item_button::layout_with_attachments item_button::calc_button_layout(
 	const image_definitions_map& defs,
 	const bool include_attachments
 ) {
+	(void)defs;
+
 	layout_with_attachments output;
 	output.push(component_owner.get_aabb(transformr()));
 
@@ -149,24 +155,6 @@ item_button::layout_with_attachments item_button::calc_button_layout(
 
 	for (auto& b : output.boxes) {
 		b += -origin;
-	}
-
-	const auto flip = defs.at(component_owner.get<invariants::sprite>().image_id).meta.usage_as_button.flip;
-
-	if (flip.horizontally) {
-		for (auto& b : output.boxes) {
-			const auto old_b = b;
-			b.l = output.aabb.w() - old_b.r;
-			b.r = output.aabb.w() - old_b.l;
-		}
-	}
-
-	if (flip.vertically) {
-		for (auto& b : output.boxes) {
-			const auto old_b = b;
-			b.t = output.aabb.h() - old_b.b;
-			b.b = output.aabb.h() - old_b.t;
-		}
 	}
 
 	return output;
@@ -199,6 +187,8 @@ void item_button::draw_proc(
 	const auto& element = context.get_character_gui();
 	const auto output = context.get_output();
 	const auto& necessarys = context.get_necessary_images();
+	const auto& drawing_in = context.make_draw_renderable_input();
+
 	auto this_tree_entry = context.get_tree_entry(this_id);
 	
 	this_tree_entry.set_absolute_pos(
@@ -260,64 +250,47 @@ void item_button::draw_proc(
 				expansion_offset = (rounded_size - size) / 2;
 			}
 
-			const auto flip = gui_def.flip;
-
-			item_sprite.color.a = 255;
-			//item_sprite.color.a = border_col.a;
-
-			if (f.always_full_item_alpha) {
-				item_sprite.color.a = 255;
-			}
-
 			auto state = invariants::sprite::drawing_input{ augs::drawer (output) };
 
 			const auto rc_pos = this_absolute_rect.get_position();
-			state.renderable_transform.pos = vec2i(layout.get_base_item_pos().get_center()) + rc_pos + expansion_offset;
+
+			const auto viewing_pos = vec2i(layout.get_base_item_pos().get_center()) + rc_pos + expansion_offset;
+			const auto viewing_transform = transformr(viewing_pos, 0);
+
+			auto render_visitor = [](const auto& renderable, auto&&... args) {
+				renderable.draw(std::forward<decltype(args)>(args)...);
+			};
+
+			auto drawer = [&](
+				const const_entity_handle attachment_handle, 
+				const transformr where
+			) {
+				attachment_handle.dispatch_on_having<invariants::item>([&](const auto typed_attachment_handle) {
+					detail_specific_entity_drawer(
+						typed_attachment_handle,
+						drawing_in,
+						render_visitor,
+						where
+					);
+				});
+			};
+
+			drawer(item, viewing_transform);
 
 			if (draw_attachments) {
-				size_t attachment_index = 1;
-
-				const auto iteration_lambda = [&](const const_entity_handle desc) {
-					const auto parent_slot = cosmos[desc.get<components::item>().get_current_slot()];
-
-					if (!(attachment_index < layout.boxes.size())) {
-						// LOG("Excuse me, but something's gone haywire.");
-						return recursive_callback_result::ABORT;
-					}
-
-					if (parent_slot.is_physically_connected_until(item)) {
-						auto attachment_sprite = desc.get<invariants::sprite>();
-
-						attachment_sprite.color.a = item_sprite.color.a;
-
-						auto attachment_state = invariants::sprite::drawing_input(output);
-
-						attachment_state.renderable_transform.pos = rc_pos + layout.boxes[attachment_index].get_center() + expansion_offset;
-						attachment_state.renderable_transform.rotation = desc.calc_connection_until_container(item)->shape_offset.rotation;
-
-						// TODO: what the hell is this flip_rotation?
-						if (flip.horizontally) {
-							attachment_state.renderable_transform.flip_rotation();
-						}
-
-						if (flip.vertically) {
-							attachment_state.renderable_transform.flip_rotation();
-						}
-
-						attachment_state.flip = flip;
-
-						attachment_sprite.draw(context.get_game_images(), attachment_state);
-
-						++attachment_index;
-					}
-
-					return recursive_callback_result::CONTINUE_AND_RECURSE;
-				};
-
-				item.for_each_contained_item_recursive(iteration_lambda);
+				item.for_each_attachment_recursive(
+					[&](
+						const auto attachment_entity,
+						const auto attachment_offset
+					) {
+						drawer(attachment_entity, viewing_transform * attachment_offset);
+					},
+					[]() {
+						return torso_offsets();
+					},
+					attachment_offset_settings::for_rendering()
+				);
 			}
-
-			item_sprite.draw(context.get_game_images(), state);
 		}
 
 		if (f.draw_charges) {
