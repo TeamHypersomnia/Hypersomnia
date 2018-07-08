@@ -199,20 +199,6 @@ auto first_free_key(const Container& in) {
 	}
 }
 
-/* Thanks to https://stackoverflow.com/a/28139075/503776 */
-
-template <typename T>
-struct reversion_wrapper { T& iterable; };
-
-template <typename T>
-auto begin(reversion_wrapper<T> w) { return std::rbegin(w.iterable); }
-
-template <typename T>
-auto end(reversion_wrapper<T> w) { return std::rend(w.iterable); }
-
-template <typename T>
-reversion_wrapper<T> reverse(T&& iterable) { return { iterable }; }
-
 template <class T, class C>
 std::size_t index_in(C& container, T& object) {
 	return std::addressof(object) - std::addressof(container[0]);

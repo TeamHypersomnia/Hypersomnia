@@ -1095,3 +1095,7 @@ we consider whole type overrides too complex architeciturally:
 
 - Fix: item rendering in GUI, as it uses some sprite internals so it could break
 	- Use draw_entity somehow for drawing items along with attachments
+
+- Remove the need to specify all frames in test scene images
+	- As well as in test animations
+

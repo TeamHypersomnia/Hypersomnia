@@ -2,6 +2,7 @@
 #include <tuple>
 #include <array>
 
+#include "augs/templates/reversion_wrapper.h"
 #include "augs/templates/for_each_std_get.h"
 #include "augs/templates/type_mod_templates.h"
 #include "augs/templates/transform_types.h"

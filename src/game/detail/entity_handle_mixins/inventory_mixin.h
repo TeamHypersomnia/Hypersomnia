@@ -1,6 +1,7 @@
 #pragma once
 #include <optional>
 
+#include "augs/templates/reversion_wrapper.h"
 #include "game/assets/image_offsets.h"
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/container_templates.h"

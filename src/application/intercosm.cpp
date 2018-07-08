@@ -39,7 +39,7 @@ void intercosm::make_test_scene(
 	const auto caches = populate_test_scene_images_and_sounds(lua, viewables);
 
 	all_logical_assets logicals;
-	populate_test_scene_logical_assets(logicals);
+	populate_test_scene_logical_assets(viewables.image_definitions, logicals);
 	populate_test_scene_viewables(caches, logicals.plain_animations, viewables);
 
 	auto reloader = [&](auto populator){

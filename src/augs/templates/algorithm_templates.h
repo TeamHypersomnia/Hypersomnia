@@ -2,6 +2,7 @@
 #include <vector>
 #include <algorithm>
 #include <type_traits>
+#include "augs/templates/reversion_wrapper.h"
 
 template <class Container, class T>
 decltype(auto) minimum_of(const Container& v, T&& pred) {
@@ -98,6 +99,21 @@ void sort_range_by(T& output, F&& value_callback) {
 template<class Container>
 auto& reverse_range(Container& v) {
 	std::reverse(v.begin(), v.end());
+	return v;
+}
+
+template<class Container>
+auto& ping_pong_range(Container& v) {
+	auto second_half = v;
+
+	for (auto& elem : reverse(second_half)) {
+		if (container_full(v)) {
+			break;
+		}
+
+		v.emplace(v.end(), std::move(elem));
+	}
+
 	return v;
 }
 

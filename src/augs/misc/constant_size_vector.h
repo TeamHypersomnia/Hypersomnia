@@ -161,6 +161,19 @@ namespace augs {
 			return position;
 		}
 
+		template <class... Args>
+		void emplace(const iterator where, Args&&... args) {
+			const auto new_elements_count = 1;
+
+			ensure_geq(where, begin());
+			ensure_leq(count + new_elements_count, capacity());
+
+			std::move(where, end(), where + 1);
+			construct_at(static_cast<size_type>(where - begin()), std::forward<Args>(args)...);
+
+			count += new_elements_count;
+		}
+
 		void insert(const iterator where, const value_type& obj) {
 			const auto new_elements_count = 1;
 
@@ -223,35 +236,35 @@ namespace augs {
 			return nth_ptr(0);
 		}
 
-		iterator begin() {
-			return nth_ptr(0);
+		auto begin() {
+			return iterator(nth_ptr(0));
 		}
 
-		iterator end() {
+		auto end() {
 			return begin() + size();
 		}
 
-		const_iterator begin() const {
-			return nth_ptr(0);
+		auto begin() const {
+			return const_iterator(nth_ptr(0));
 		}
 
-		const_iterator end() const {
+		auto end() const {
 			return begin() + size();
 		}
 
-		reverse_iterator rbegin() {
-			return nth_ptr(size() - 1);
+		auto rbegin() {
+			return reverse_iterator(nth_ptr(size()));
 		}
 
-		reverse_iterator rend() {
+		auto rend() {
 			return rbegin() + size();
 		}
 
-		const_reverse_iterator rbegin() const {
-			return nth_ptr(size() - 1);
+		auto rbegin() const {
+			return const_reverse_iterator(nth_ptr(size()));
 		}
 
-		const_reverse_iterator rend() const {
+		auto rend() const {
 			return rbegin() + size();
 		}
 

@@ -24,9 +24,6 @@ summary: That which we are brainstorming at the moment.
 - Remove the need to keep shape polygon for most entities
 	- Less work for size updater, we'll just reinfer
 
-- Remove the need to specify all frames in test scene images
-	- As well as in test animations
-
 - Sound should be loaded from the smallest to the biggest
 	- So that effects are loaded first
 	- New synchronization

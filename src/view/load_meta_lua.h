@@ -7,7 +7,7 @@ inline auto get_meta_lua_path(augs::path_type resolved) {
 }
 
 template <class T>
-void try_load_meta_lua(sol::state& lua, T& meta, augs::path_type resolved) {
+void load_meta_lua_if_exists(sol::state& lua, T& meta, augs::path_type resolved) {
 	try {
 		augs::load_from_lua_table(lua, meta, get_meta_lua_path(resolved));
 	}

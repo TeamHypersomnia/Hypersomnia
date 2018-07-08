@@ -2,7 +2,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 
-#include "view/try_load_meta_lua.h"
+#include "view/load_meta_lua.h"
 
 #include "application/setups/editor/property_editor/property_editor_settings.h"
 #include "application/setups/editor/detail/maybe_different_colors.h"
@@ -33,7 +33,7 @@ void read_write_defaults_buttons(
 		if (ImGui::Button("Read defaults")) {
 			try {
 				decltype(definition_object.meta) new_meta;
-				try_load_meta_lua(cmd_in.lua, new_meta, resolved);
+				load_meta_lua_if_exists(cmd_in.lua, new_meta, resolved);
 
 				command_type cmd;
 

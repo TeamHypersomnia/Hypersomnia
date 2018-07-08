@@ -33,7 +33,11 @@ void load_test_scene_images(
 	image_definitions_map&
 );
 
-void load_test_scene_animations(all_logical_assets&);
+void load_test_scene_animations(
+	const image_definitions_map& images,
+	all_logical_assets&
+);
+
 void load_test_scene_physical_materials(physical_materials_pool&);
 void load_test_scene_recoil_players(recoil_players_pool&);
 
@@ -47,6 +51,7 @@ loaded_image_caches_map populate_test_scene_images_and_sounds(
 ); 
 
 void populate_test_scene_logical_assets(
+	const image_definitions_map& images,
 	all_logical_assets& output_logicals
 ); 
 

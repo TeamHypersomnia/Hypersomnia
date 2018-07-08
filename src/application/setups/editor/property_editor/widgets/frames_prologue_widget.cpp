@@ -160,20 +160,7 @@ bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation
 		auto reverse_frames = [&](const auto& id) {
 			const auto& source_animation = *logicals.find(id);
 			auto new_frames = source_animation.frames;
-
-			{
-				auto second_half = new_frames;
-				reverse_range(second_half);
-				//second_half.erase(second_half.begin());
-
-				for (auto& s : second_half) {
-					if (container_full(new_frames)) {
-						break;
-					}
-
-					new_frames.push_back(s);
-				}
-			}
+			ping_pong_range(new_frames);
 
 			auto description = typesafe_sprintf("Ping-ponged frames in %x", get_displayed_name(source_animation, image_defs));
 			post_new_frames(id, new_frames, description);

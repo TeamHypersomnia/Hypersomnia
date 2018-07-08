@@ -35,9 +35,10 @@ loaded_image_caches_map populate_test_scene_images_and_sounds(
 }
 
 void populate_test_scene_logical_assets(
+	const image_definitions_map& images,
 	all_logical_assets& output_logicals
 ) {
-	load_test_scene_animations(output_logicals);
+	load_test_scene_animations(images, output_logicals);
 	load_test_scene_physical_materials(output_logicals.physical_materials);
 	load_test_scene_recoil_players(output_logicals.recoils);
 }
