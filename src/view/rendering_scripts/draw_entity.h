@@ -245,7 +245,8 @@ FORCE_INLINE void specific_entity_drawer(
 			}
 
 			const auto wielded_items = typed_handle.get_wielded_items();
-			const auto& stance = maybe_torso->calc_stance(cosm, wielded_items);
+			const auto stance_id = ::calc_stance_id(cosm, wielded_items);
+			const auto& stance = maybe_torso->stances[stance_id];
 
 			if (const auto stance_info = calc_stance_info(
 				cosm,
@@ -253,20 +254,64 @@ FORCE_INLINE void specific_entity_drawer(
 				movement->four_ways_animation,
 				wielded_items
 			)) {
-				render_frame(stance_info.get_with_flip(), face_degrees);
+				const auto stance_offsets = [&stance_info, &logicals]() {
+					const auto stance_image_id = stance_info.frame->image_id;
 
-				const auto stance_image_id = stance_info.frame->image_id;
-				auto stance_offsets = logicals.get_offsets(stance_image_id).torso;
+					auto result = logicals.get_offsets(stance_image_id).torso;
 
-				if (stance_info.flip) {
-					stance_offsets.flip_vertically();
+					if (stance_info.flip) {
+						result.flip_vertically();
+					}
+
+					return result;
+				}();
+
+				/* Draw heavy items first. */
+
+				std::optional<entity_id> drawn_heavy_item;
+
+				if (stance_id == item_holding_stance::HEAVY_LIKE) {
+					const auto heavy_item = cosm[wielded_items[0]];
+
+					typed_handle.for_each_attachment_recursive(
+						[&](
+							const auto attachment_entity,
+							const auto attachment_offset
+						) {
+							if (heavy_item.get_id() == attachment_entity.get_id()) {
+								attachment_entity.template dispatch_on_having<invariants::item>(
+									[&](const auto typed_attachment_handle) {
+										detail_specific_entity_drawer(
+											typed_attachment_handle,
+											in,
+											render_visitor,
+											viewing_transform * attachment_offset
+										);
+									}
+								);
+
+								drawn_heavy_item = heavy_item.get_id();
+								return;
+							}
+						},
+						[stance_offsets]() {
+							return stance_offsets;
+						},
+						attachment_offset_settings::for_rendering()
+					);
 				}
+
+				render_frame(stance_info.get_with_flip(), face_degrees);
 
 				typed_handle.for_each_attachment_recursive(
 					[&](
 						const auto attachment_entity,
 						const auto attachment_offset
 					) {
+						if (drawn_heavy_item != std::nullopt && drawn_heavy_item.value() == attachment_entity.get_id()) {
+							return;
+						}
+
 						attachment_entity.template dispatch_on_having<invariants::item>(
 							[&](const auto typed_attachment_handle) {
 								detail_specific_entity_drawer(

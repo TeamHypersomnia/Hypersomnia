@@ -126,6 +126,17 @@ void load_test_scene_animations(
 	}
 
 	{
+		auto make_shoot_durations = [](auto& f) {
+			ping_pong_range(f);
+
+			f[4].duration_milliseconds = 10;
+			f[5].duration_milliseconds = 10;
+			f[6].duration_milliseconds = 30;
+			f[7].duration_milliseconds = 35;
+			f[8].duration_milliseconds = 35;
+			f[9].duration_milliseconds = 40;
+		};
+
 		auto make_torso = make_plain;
 
 		make_torso(
@@ -147,6 +158,22 @@ void load_test_scene_animations(
 		);
 
 		make_torso(
+			test_id_type::METROPOLIS_CHARACTER_HEAVY,
+			test_scene_image_id::METROPOLIS_CHARACTER_HEAVY_1,
+			30.0f
+		);
+
+		{
+			auto& anim = make_torso(
+				test_id_type::METROPOLIS_CHARACTER_HEAVY_SHOOT,
+				test_scene_image_id::METROPOLIS_CHARACTER_HEAVY_SHOOT_1,
+				20.0f
+			);
+
+			make_shoot_durations(anim.frames);
+		}
+
+		make_torso(
 			test_id_type::METROPOLIS_CHARACTER_AKIMBO,
 			test_scene_image_id::METROPOLIS_CHARACTER_AKIMBO_1,
 			30.0f
@@ -165,16 +192,7 @@ void load_test_scene_animations(
 				20.0f
 			);
 
-			auto& f = anim.frames;
-
-			ping_pong_range(f);
-
-			f[4].duration_milliseconds = 10;
-			f[5].duration_milliseconds = 10;
-			f[6].duration_milliseconds = 30;
-			f[7].duration_milliseconds = 35;
-			f[8].duration_milliseconds = 35;
-			f[9].duration_milliseconds = 40;
+			make_shoot_durations(anim.frames);
 		}
 	}
 
