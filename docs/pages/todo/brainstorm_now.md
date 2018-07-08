@@ -7,18 +7,19 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - it would be nice to store the sprite size information per entity
-	- Solution: Refactor the invariants::sprite to not contain the size information.
-		- Subsolution: Store original image sizes in all logical assets.
-			- Pro: less data kept/written on changing the image in editor.
-				- Which implies less logic as well and less opportunity for errors
-		- Subsolution: Reinfer physical shape from the image size and/or specified shape.
-			- Just partition into convexes when writing to logical assets, to speed up reinference.
-		- Sprite component shall contain the size multiplier or an overridden size.
-			- Just two ints per entity won't make a difference.
-		- In crosshair component, size for appearance is anyway not needed and the original one will be passed in the drawing code.
-	- tiling_mult for sprite_component?
-		- **No**, that makes it even more data to handle. Let's just keep a mult and a bool for tiling.
-		- Makes it explicit that it will be used for tiling
+	- Solution: Store overridden size as a value with flag in a separate component.
+		- Pro: On changed texture, size in invariant is updated as always, whereas overridden sizes are left untouched.
+			- Pro: literally no change to the update logic!
+		- Pro: fastest condition resolution as it it will require only a boolean check.
+		- Will be set in editor whenever dragging happens.
+	- Solution: Infer physical shape from overridden size, invariants::sprite::size and polygonal shape specified in the image's logical asset.
+		- Just partition image's polygonal shapes into convexes when writing to logical assets, to speed up reinference.
+		- Only infer from shape polygon if it exists as a component.
+			- Then it will probably also be a vector.
+		- Don't store shape invariant in things like character, item, plain sprited body.
+	- In crosshair component, size for appearance is anyway not needed and the original one will be passed in the drawing code.
+
+- Light optimization: remove vertices that are determined to be behind some convex shape.
 
 - Remove the need to keep shape polygon for most entities
 	- Less work for size updater, we'll just reinfer

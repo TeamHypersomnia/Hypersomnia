@@ -16,4 +16,12 @@ namespace components {
 		rgba colorize_neon = white;
 		// END GEN INTROSPECTOR
 	};
+
+	struct overridden_size {
+		static constexpr bool reinfer_when_tweaking = true;
+
+		// GEN INTROSPECTOR struct components::overridden_size
+		augs::value_with_flag<vec2i> size;
+		// END GEN INTROSPECTOR
+	};
 };

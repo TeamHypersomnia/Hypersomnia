@@ -117,14 +117,8 @@ namespace augs {
 			return size;
 		}
 
-		ltrb get_aabb(const transformr transform) const {
-			return augs::get_aabb(
-				make_sprite_points(
-					transform.pos, 
-					get_size(),
-					transform.rotation //+ rotation_offset
-				)
-			);
+		ltrb get_aabb(const transformr where) const {
+			return augs::sprite_aabb(where, size);
 		}
 		
 		template <class M>

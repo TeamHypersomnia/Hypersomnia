@@ -87,9 +87,9 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 			if (const auto missile = deleted_entity.find<components::missile>()) {
 				transform_of_finishing = missile->saved_point_of_impact_before_death;
 
-				if (const auto w = deleted_entity.find_logical_width()) {
-					transform_of_finishing.pos -= vec2(*w / 2, 0).rotate(transform_of_finishing.rotation, vec2());
-				}
+				const auto w = deleted_entity.get_logical_size().x;
+				transform_of_finishing.pos -= vec2(w / 2, 0).rotate(transform_of_finishing.rotation, vec2());
+
 				/* transform_of_finishing */
 
 				/* 	- vec2(deleted_entity.get<invariants::sprite>().get_size() / 2) */

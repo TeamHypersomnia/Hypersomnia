@@ -66,10 +66,6 @@ enum class test_controlled_characters {
 	// END GEN INTROSPECTOR
 };
 
-enum class test_plain_invisible_bodys {
-
-};
-
 enum class test_plain_sprited_bodys {
 	// GEN INTROSPECTOR enum class test_plain_sprited_bodys
 	CRATE,
@@ -222,7 +218,6 @@ enum class test_particles_decorations {
 
 using test_flavours_map = type_map<
 	type_pair<test_controlled_characters, controlled_character>,
-	type_pair<test_plain_invisible_bodys, plain_invisible_body>,
 	type_pair<test_plain_sprited_bodys, plain_sprited_body>,
 	type_pair<test_shootable_weapons, shootable_weapon>,
 	type_pair<test_shootable_charges, shootable_charge>,

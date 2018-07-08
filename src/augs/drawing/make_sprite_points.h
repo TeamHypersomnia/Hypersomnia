@@ -2,6 +2,7 @@
 #include <array>
 #include "augs/math/vec2.h"
 #include "augs/build_settings/platform_defines.h"
+#include "augs/math/transform.h"
 
 namespace augs {
 	FORCE_INLINE auto make_sprite_points(
@@ -27,5 +28,14 @@ namespace augs {
 		v[3].rotate(rotation_degrees, pos);
 
 		return v;
+	}
+
+	inline ltrb sprite_aabb(
+		const transformr where,
+		const vec2i size
+	) {
+		return augs::get_aabb(
+			augs::make_sprite_points(where.pos, size, where.rotation)
+		);
 	}
 }

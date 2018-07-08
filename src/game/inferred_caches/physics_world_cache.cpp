@@ -357,12 +357,11 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h)
 		auto& all_fixtures_in_component = cache.all_fixtures_in_component;
 		ensure(all_fixtures_in_component.empty());
 
-		if (const auto* const shape_polygon = handle.template find<invariants::shape_polygon>()) {
-			auto transformed_shape = shape_polygon->shape;
-			transformed_shape.offset_vertices(get_calculated_connection().shape_offset);
+		auto from_polygon_shape = [&](auto shape) {
+			shape.offset_vertices(get_calculated_connection().shape_offset);
 
-			for (std::size_t ci = 0; ci < transformed_shape.convex_polys.size(); ++ci) {
-				const auto& convex = transformed_shape.convex_polys[ci];
+			for (std::size_t ci = 0; ci < shape.convex_polys.size(); ++ci) {
+				const auto& convex = shape.convex_polys[ci];
 				std::vector<b2Vec2> b2verts(convex.begin(), convex.end());
 
 				for (auto& v : b2verts) {
@@ -380,7 +379,10 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h)
 
 				all_fixtures_in_component.emplace_back(new_fix);
 			}
+		};
 
+		if (const auto* const shape_polygon = handle.template find<invariants::shape_polygon>()) {
+			from_polygon_shape(shape_polygon->shape);
 			return;
 		}
 
@@ -396,6 +398,13 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h)
 
 			new_fix->index_in_component = 0u;
 			all_fixtures_in_component.emplace_back(new_fix);
+
+			return;
+		}
+
+		if (const auto* const sprite = handle.template find<invariants::sprite>()) {
+			const auto size = handle.get_logical_size();
+			from_polygon_shape(convex_partitioned_shape::from_box(size));
 
 			return;
 		}

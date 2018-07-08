@@ -23,11 +23,8 @@ transformr calc_muzzle_transform(
 ) {
 	const auto bullet_spawn_offset = get_bullet_spawn_offset(gun_handle);
 
-	if (const auto logical_width = gun_handle.find_logical_width()) {
-		return gun_transform * transformr(bullet_spawn_offset + vec2(*logical_width / 2, 0));
-	}
-
-	return {};
+	const auto w = gun_handle.get_logical_size().x;
+	return gun_transform * transformr(bullet_spawn_offset + vec2(w / 2, 0));
 }
 
 template <class T>

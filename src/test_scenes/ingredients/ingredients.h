@@ -24,41 +24,6 @@
 
 #include "view/viewables/image_cache.h"
 
-template <class E>
-void add_shape_invariant_from_renderable(
-	E& into,
-	const loaded_image_caches_map& caches
-) {
-	static_assert(E::template has<invariants::shape_polygon>());
-
-	if (const auto sprite = into.template find<invariants::sprite>()) {
-		const auto image_size = caches.at(sprite->image_id).get_original_size();
-		vec2 scale = sprite->get_size() / image_size;
-
-		invariants::shape_polygon shape_polygon_def;
-
-		shape_polygon_def.shape = caches.at(sprite->image_id).make_box();
-		shape_polygon_def.shape.scale(scale);
-
-		into.template set(shape_polygon_def);
-	}
-
-	if (const auto polygon = into.template find<invariants::polygon>()) {
-		std::vector<vec2> input;
-
-		input.reserve(polygon->vertices.size());
-
-		for (const auto& v : polygon->vertices) {
-			input.push_back(v.pos);
-		}
-
-		invariants::shape_polygon shape_polygon_def;
-		shape_polygon_def.shape.add_concave_polygon(input);
-
-		into.template set(shape_polygon_def);
-	}
-}
-
 namespace ingredients {
 	void add_standard_pathfinding_capability(entity_handle);
 	void add_soldier_intelligence(entity_handle);

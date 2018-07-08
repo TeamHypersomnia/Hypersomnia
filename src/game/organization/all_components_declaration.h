@@ -75,6 +75,7 @@ namespace components {
 	struct animation;
 	struct remnant;
 	struct continuous_particles;
+	struct overridden_size;
 }
 
 using assert_always_together = type_list<
@@ -143,7 +144,8 @@ using component_list_t = List<
 	components::movement_path,
 	components::animation,
 	components::remnant,
-	components::continuous_particles
+	components::continuous_particles,
+	components::overridden_size
 >;
 
 template <template <class...> class List>

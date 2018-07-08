@@ -14,7 +14,6 @@ struct controlled_character {
 		invariants::rigid_body,
 		invariants::fixtures,
 		invariants::movement,
-		invariants::shape_polygon,
 
 		invariants::crosshair,
 		invariants::sentience,
@@ -45,22 +44,6 @@ struct controlled_character {
 	>;
 };
 
-struct plain_invisible_body {
-	static constexpr std::size_t statically_allocated_entities = 300;
-	static constexpr std::size_t statically_allocated_flavours = 20;
-
-	using invariants = type_list<
-		invariants::rigid_body,
-		invariants::fixtures,
-		invariants::shape_polygon
-	>;
-
-	using components = type_list<
-		components::rigid_body,
-		components::force_joint
-	>;
-};
-
 /* E.g. a crate, a wall */
 
 struct plain_sprited_body {
@@ -70,7 +53,6 @@ struct plain_sprited_body {
 	using invariants = type_list<
 		invariants::rigid_body,
 		invariants::fixtures,
-		invariants::shape_polygon,
 		invariants::sprite,
 		invariants::render,
 		invariants::ground,
@@ -80,8 +62,8 @@ struct plain_sprited_body {
 
 	using components = type_list<
 		components::sprite,
+		components::overridden_size,
 		components::rigid_body,
-
 		components::interpolation
 	>;
 };
@@ -100,7 +82,6 @@ struct shootable_weapon {
 
 		invariants::rigid_body,
 		invariants::fixtures,
-		invariants::shape_polygon,
 		invariants::sprite,
 		invariants::render,
 
@@ -130,7 +111,6 @@ struct shootable_charge {
 
 		invariants::rigid_body,
 		invariants::fixtures,
-		invariants::shape_polygon,
 		invariants::sprite,
 		invariants::render,
 
@@ -145,7 +125,7 @@ struct shootable_charge {
 	>;
 };
 
-/* E.g. neon captions like "Welcome to metropolis" */
+/* E.g. floors, neon captions like "Welcome to metropolis" */
 
 struct sprite_decoration {
 	static constexpr std::size_t statically_allocated_entities = 20000;
@@ -159,6 +139,7 @@ struct sprite_decoration {
 
 	using components = type_list<
 		components::sprite,
+		components::overridden_size,
 		components::transform
 	>;
 };
@@ -204,7 +185,6 @@ struct throwable_explosive {
 		invariants::explosive,
 		invariants::rigid_body,
 		invariants::fixtures,
-		invariants::shape_polygon,
 
 		invariants::interpolation
 	>;
@@ -226,7 +206,6 @@ struct plain_missile {
 	using invariants = type_list<
 		invariants::rigid_body,
 		invariants::fixtures,
-		invariants::shape_polygon,
 
 		invariants::sprite,
 		invariants::render,
@@ -273,7 +252,6 @@ struct container_item {
 	using invariants = type_list<
 		invariants::rigid_body,
 		invariants::fixtures,
-		invariants::shape_polygon,
 
 		invariants::sprite,
 		invariants::render,
@@ -299,7 +277,6 @@ struct explosive_missile {
 	using invariants = type_list<
 		invariants::rigid_body,
 		invariants::fixtures,
-		invariants::shape_polygon,
 
 		invariants::sprite,
 		invariants::render,
@@ -355,7 +332,6 @@ struct remnant_body {
 	using invariants = type_list<
 		invariants::rigid_body,
 		invariants::fixtures,
-		invariants::shape_polygon,
 		invariants::sprite,
 		invariants::render,
 		invariants::ground,

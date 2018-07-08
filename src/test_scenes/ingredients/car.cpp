@@ -40,7 +40,6 @@ namespace test_flavours {
 
 			meta.set(poly);
 
-			add_shape_invariant_from_renderable(meta, caches);
 		}
 		{
 			auto& meta = get_test_flavour(flavours, test_scene_flavour::TRUCK_INTERIOR);
@@ -51,7 +50,6 @@ namespace test_flavours {
 			meta.set(render_def);
 
 			add_sprite(meta, caches, test_scene_image_id::TRUCK_INSIDE);
-						add_shape_invariant_from_renderable(meta, caches);
 
 		}
 
@@ -65,7 +63,6 @@ namespace test_flavours {
 			invariants::sprite sprite_def;
 			sprite_def.set(to_image_id(test_scene_image_id::BLANK), vec2 ( 40, 20 ), rgba(255, 255, 255, 0));
 			meta.set(sprite_def);
-			add_shape_invariant_from_renderable(meta, caches);
 		}
 
 		{
@@ -77,7 +74,6 @@ namespace test_flavours {
 			meta.set(render_def);
 
 			add_sprite(meta, caches, test_scene_image_id::TRUCK_ENGINE);
-			add_shape_invariant_from_renderable(meta, caches);
 		}
 #endif
 	}

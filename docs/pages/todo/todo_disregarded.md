@@ -179,3 +179,14 @@ summary: Just a hidden scratchpad.
 	- Pitch both layers
 		- Overall set same properties to both
 		- Two sources in a cache!
+
+- Btw: Remove sprite component from entities for whom it makes little sense to have it.
+	- Actually, no. Has some useful information and the heaviest use case will anyway require it.
+	- Player character.
+
+	- tiling_mult for sprite_component?
+		- **No**, that makes it even more data to handle. Let's just keep a mult and a bool for tiling.
+		- Makes it explicit that it will be used for tiling
+
+- Solution: Refactor the invariants::sprite to not contain the size information.
+	- Actually, the default size will be there

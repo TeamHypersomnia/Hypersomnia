@@ -8,6 +8,8 @@ namespace test_flavours {
 		auto& caches = in.caches;
 		auto flavour_with_sprite = in.flavour_with_sprite_maker();
 
+		(void)caches;
+
 		auto static_obstacle = [&](
 			auto& meta,
 			const auto material,
@@ -16,7 +18,6 @@ namespace test_flavours {
 		) {
 			meta.template get<invariants::sprite>().tile_excess_size = true;
 
-			add_shape_invariant_from_renderable(meta, caches);
 
 			test_flavours::add_standard_static_body(meta);
 
@@ -50,7 +51,6 @@ namespace test_flavours {
 			auto& meta,
 			const auto material
 		) {
-			add_shape_invariant_from_renderable(meta, caches);
 
 			test_flavours::add_standard_dynamic_body(meta);
 

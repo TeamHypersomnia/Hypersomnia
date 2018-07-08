@@ -75,7 +75,6 @@ namespace test_flavours {
 			}
 
 			add_sprite(meta, caches, test_scene_image_id::METROPOLIS_CHARACTER_BARE_1);
-			add_shape_invariant_from_renderable(meta, caches);
 
 			{
 				invariants::flags flags_def;

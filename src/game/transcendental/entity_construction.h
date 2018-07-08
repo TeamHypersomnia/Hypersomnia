@@ -13,6 +13,12 @@ void construct_pre_inference(const handle_type h) {
 	if (const auto rigid_body = h.template find<components::rigid_body>()) {
 		rigid_body.get_special().dropped_or_created_cooldown.set(200, cosmos.get_timestamp());
 	}
+
+	if (const auto overridden = h.template find<components::overridden_size>()) {
+		if (const auto sprite = h.template find<invariants::sprite>()) {
+			overridden->size.value = sprite->size;
+		}
+	}
 }
 
 template <class handle_type>

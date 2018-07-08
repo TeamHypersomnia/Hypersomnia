@@ -16,28 +16,6 @@ public:
 	bool has_independent_transform() const;
 	void set_logic_transform(const transformr t) const;
 
-	std::optional<real32> find_logical_width() const {
-		const auto handle = *static_cast<const entity_handle_type*>(this);
-
-		if (const auto* const sprite = handle.template find<invariants::sprite>()) {
-			return static_cast<real32>(sprite->size.x);
-		}
-
-		return std::nullopt;
-	}
-
-	std::optional<vec2> find_logical_tip() const {
-		const auto handle = *static_cast<const entity_handle_type*>(this);
-
-		if (const auto w = handle.find_logical_width()) {
-			if (const auto t = handle.find_logic_transform()) {
-				return t->pos + vec2(*w / 2, 0.f).rotate(t->rotation, vec2());
-			}
-		}
-
-		return std::nullopt;
-	}
-
 	template <class F, class... K>
 	void access_independent_transform(
 		F callback,
@@ -120,6 +98,14 @@ public:
 	std::optional<ltrb> find_aabb(const transformr transform) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 
+		if (const auto* const overridden_size = handle.template find<components::overridden_size>()) {
+			const auto& s = overridden_size->size;
+
+			if (s.is_enabled) {
+				return augs::sprite_aabb(transform, s.value);
+			}
+		}
+
 		if (const auto* const sprite = handle.template find<invariants::sprite>()) {
 			return sprite->get_aabb(transform);
 		}
@@ -155,6 +141,26 @@ public:
 		return std::nullopt;
 	}
 
+
+	vec2 get_logical_size() const {
+		if (const auto aabb = find_aabb(transformr())) {
+			return aabb->get_size();
+		}
+
+		return vec2::zero;
+	}
+
+	std::optional<vec2> find_logical_tip() const {
+		const auto handle = *static_cast<const entity_handle_type*>(this);
+
+		const auto w = handle.get_logical_size().x;
+
+		if (const auto t = handle.find_logic_transform()) {
+			return t->pos + vec2(w / 2, 0.f).rotate(t->rotation, vec2());
+		}
+
+		return std::nullopt;
+	}
 
 	/* Compatibility shortcuts. Their use is not recommended henceforth. */
 

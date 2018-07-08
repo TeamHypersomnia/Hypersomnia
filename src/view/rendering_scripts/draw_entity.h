@@ -43,7 +43,19 @@ FORCE_INLINE void detail_specific_entity_drawer(
 	(void)in;
 
 	if constexpr(typed_handle.template has<invariants::sprite>()) {
-		const auto& sprite = typed_handle.template get<invariants::sprite>();
+		const auto sprite = [&typed_handle]() {
+			auto result = typed_handle.template get<invariants::sprite>();
+
+			if constexpr(typed_handle.template has<components::overridden_size>()) {
+				const auto& s = typed_handle.template get<components::overridden_size>().size;
+
+				if (s.is_enabled) {
+					result.size = s.value;
+				}
+			}
+
+			return result;
+		}();
 
 		auto input = [&]() {
 			using input_type = invariants::sprite::drawing_input;

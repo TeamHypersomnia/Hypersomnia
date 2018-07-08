@@ -641,3 +641,10 @@ Memory is somewhat safe because it can only grow as far as the children grow.
 
 					- ~~this and the shoot animation should always be positioned so that the attachment offsets for rifles don't have to be rotated~~
 						- ~~we can trivially make detailed fixture shape around the first animation frame, and we'll be good~~
+
+- Subsolution: Store original image sizes in all logical assets.
+	- Pro: less data kept/written on changing the image in editor.
+		- Which implies less logic as well and less opportunity for errors
+- Subsolution: Reinfer physical shape from the image size and/or specified shape.
+- Sprite component shall contain the size multiplier or an overridden size.
+	- Just two ints per entity won't make a difference.

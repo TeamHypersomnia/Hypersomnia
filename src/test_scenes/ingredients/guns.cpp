@@ -122,7 +122,6 @@ namespace test_flavours {
 				}
 
 				test_flavours::add_sprite(meta, caches, image_id, white);
-				add_shape_invariant_from_renderable(meta, caches);
 				test_flavours::add_remnant_dynamic_body(meta);
 			};
 
@@ -160,7 +159,6 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_ROUND, white);
-			add_shape_invariant_from_renderable(meta, caches);
 
 			{
 				{
@@ -233,7 +231,6 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ROUND_TRACE, cyan);
-			add_shape_invariant_from_renderable(meta, caches);
 
 			{
 				{
@@ -294,7 +291,6 @@ namespace test_flavours {
 
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ELECTRIC_MISSILE, cyan);
-			add_shape_invariant_from_renderable(meta, caches);
 			{
 				invariants::trace trace_def;
 
@@ -349,7 +345,6 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::CYAN_SHELL, white);
-			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_shell_dynamic_body(meta);
 		}
 
@@ -364,7 +359,6 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_SHELL, white);
-			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_shell_dynamic_body(meta);
 		}
 
@@ -379,7 +373,6 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::CYAN_CHARGE, white);
-			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 
 			invariants::item item;
@@ -417,7 +410,6 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_CHARGE, white);
-			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 
 			invariants::item item;
@@ -455,7 +447,6 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SAMPLE_MAGAZINE, white);
-			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 
 			invariants::container container; 
@@ -487,7 +478,6 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::LEWSII_MAG, white);
-			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 
 			invariants::container container; 
@@ -599,7 +589,6 @@ namespace test_flavours {
 			meta.set(gun_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BILMER2000, white);
-			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta).density = 0.1f;
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE);
 		}
@@ -648,7 +637,6 @@ namespace test_flavours {
 			meta.set(gun_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::VINDICATOR_SHOOT_1, white);
-			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE);
 		}
@@ -704,7 +692,6 @@ namespace test_flavours {
 			meta.set(gun_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::LEWSII, white);
-			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta).density = 0.5f;
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE);
 
@@ -756,7 +743,6 @@ namespace test_flavours {
 			meta.set(gun_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::DATUM_GUN_SHOOT_1, white);
-			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::PLASMA_DRAW);
@@ -799,7 +785,6 @@ namespace test_flavours {
 			meta.set(gun_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::KEK9, white);
-			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
@@ -831,7 +816,6 @@ namespace test_flavours {
 			meta.set(gun_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::AMPLIFIER_ARM, white);
-			add_shape_invariant_from_renderable(meta, caches);
 			test_flavours::add_see_through_dynamic_body(meta);
 
 			invariants::item item;
