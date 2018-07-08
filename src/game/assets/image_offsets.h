@@ -8,6 +8,7 @@ struct torso_offsets {
 	transformi secondary_hand;
 	transformi back;
 	transformi head;
+	transformi legs;
 	// END GEN INTROSPECTOR
 
 	void flip_vertically() {

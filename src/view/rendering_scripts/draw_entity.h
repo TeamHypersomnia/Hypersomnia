@@ -206,12 +206,11 @@ FORCE_INLINE void specific_entity_drawer(
 
 			const auto velocity = typed_handle.get_effective_velocity();
 
-			const auto legs_degrees = velocity.degrees();
 			const auto face_degrees = viewing_transform.rotation;
 
-			auto render_frame = [&in, &render_visitor, &viewing_transform](
+			auto render_frame = [&in, &render_visitor](
 				const auto& frame,
-				const real32 rotation
+				const transformr where
 			) {
 				invariants::sprite sprite;
 				sprite.set(frame.frame.image_id, in.manager);
@@ -219,30 +218,11 @@ FORCE_INLINE void specific_entity_drawer(
 				using input_type = invariants::sprite::drawing_input;
 
 				auto input = input_type(in.drawer);
-				input.renderable_transform = viewing_transform;
-				input.renderable_transform.rotation = rotation;
+				input.renderable_transform = where;
 
 				input.flip.vertically = frame.flip;
 				render_visitor(sprite, in.manager, input);
 			};
-
-			{
-				auto do_movement_animation = [&](
-					const auto* const animation,
-					const real32 rotation
-				) {
-					if (animation != nullptr) {
-						render_frame(
-							::get_frame_and_flip(movement->four_ways_animation, *animation),
-							rotation
-						);
-					}
-				};
-
-				const auto leg_animation_id = maybe_torso->calc_leg_anim(velocity, face_degrees);
-
-				do_movement_animation(logicals.find(leg_animation_id), legs_degrees);
-			}
 
 			const auto wielded_items = typed_handle.get_wielded_items();
 			const auto stance_id = ::calc_stance_id(cosm, wielded_items);
@@ -265,6 +245,24 @@ FORCE_INLINE void specific_entity_drawer(
 
 					return result;
 				}();
+
+				{
+					const auto leg_animation_id = maybe_torso->calc_leg_anim(velocity, face_degrees);
+
+					if (const auto animation = logicals.find(leg_animation_id);
+						animation != nullptr
+					) {
+						const auto legs_degrees = velocity.degrees();
+
+						const auto& legs = stance_offsets.legs;
+						const auto leg_offset = transformr(legs.pos, legs.rotation);
+
+						render_frame(
+							::get_frame_and_flip(movement->four_ways_animation, *animation),
+							{ (viewing_transform * leg_offset).pos, legs_degrees }
+						);
+					}
+				}
 
 				/* Draw heavy items first. */
 
@@ -301,7 +299,7 @@ FORCE_INLINE void specific_entity_drawer(
 					);
 				}
 
-				render_frame(stance_info.get_with_flip(), face_degrees);
+				render_frame(stance_info.get_with_flip(), { viewing_transform.pos, face_degrees });
 
 				typed_handle.for_each_attachment_recursive(
 					[&](
