@@ -67,6 +67,13 @@ return {
         },
         rotation = 0
       },
+      legs = {
+        pos = {
+          x = -7,
+          y = -2
+        },
+        rotation = 0
+      },
       primary_hand = {
         pos = {
           x = 5,
