@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/ensure.h"
 #include "augs/drawing/drawing.h"
+#include "augs/drawing/sprite_draw.h"
 #include "augs/build_settings/platform_defines.h"
 
 #include "game/enums/render_layer.h"
@@ -368,7 +369,7 @@ FORCE_INLINE void specific_draw_entity(
 	const draw_renderable_input& in
 ) {
 	auto callback = [](const auto& renderable, auto&&... args) {
-		renderable.draw(std::forward<decltype(args)>(args)...);
+		augs::draw(renderable, std::forward<decltype(args)>(args)...);
 	};
 
 	specific_entity_drawer(typed_handle, in, callback);
@@ -391,7 +392,7 @@ FORCE_INLINE void specific_draw_border(
 
 			for (const auto o : offsets) {
 				input.renderable_transform.pos = source_pos + o;
-				renderable.draw(manager, input);
+				augs::draw(renderable, manager, input);
 			}
 		};
 
@@ -407,7 +408,7 @@ FORCE_INLINE void specific_draw_color_highlight(
 ) {
 	auto highlight_maker = [color](auto renderable, const auto& manager, const auto& input) {
 		renderable.set_color(color);
-		renderable.draw(manager, input);
+		augs::draw(renderable, manager, input);
 	};
 
 	specific_entity_drawer(typed_handle, in, highlight_maker);
@@ -446,7 +447,7 @@ FORCE_INLINE void specific_draw_neon_map(
 			}
 		}
 
-		renderable.draw(manager, input);
+		augs::draw(renderable, manager, input);
 	};
 
 	specific_entity_drawer(typed_handle, in, neon_maker);

@@ -10,7 +10,7 @@
 
 #include "augs/drawing/sprite.h"
 
-#include "augs/texture_atlas/atlas_entry.h"
+struct polygon_drawing_input;
 
 enum class uv_mapping_mode {
 	STRETCH
@@ -58,11 +58,7 @@ void map_uv(vertex_container& vertices, const uv_mapping_mode mapping_mode) {
 namespace augs {
 	template <std::size_t vertex_count, std::size_t index_count>
 	struct polygon {
-		struct drawing_input : drawing_input_base {
-			using drawing_input_base::drawing_input_base;
-
-			double global_time_seconds = 0.0;
-		};
+		using drawing_input = polygon_drawing_input;
 
 		// The texture coordinates in vertices are in the local 0.0 - 1.0 space of the texture,
 		// and are remapped to global atlas coordinates per every draw,
@@ -169,38 +165,7 @@ namespace augs {
 
 			return out;
 		}
-		
-		void draw(
-			const augs::drawer output,
-			const atlas_entry texture,
-			const transformr target_transform
-		) const {
-			vertex_triangle new_tri;
 
-			auto model_transformed = vertices;
-
-			for (auto& v : model_transformed) {
-				if (std::abs(target_transform.rotation) > 0.f) {
-					v.pos.rotate(target_transform.rotation, vec2(0, 0));
-				}
-
-				v.pos += target_transform.pos;
-
-				v.pos.x = static_cast<float>(static_cast<int>(v.pos.x));
-				v.pos.y = static_cast<float>(static_cast<int>(v.pos.y));
-
-				v.set_texcoord(v.texcoord, texture);
-			}
-
-			for (std::size_t i = 0; i < triangulation_indices.size(); i += 3) {
-				new_tri.vertices[0] = model_transformed[triangulation_indices[i]];
-				new_tri.vertices[1] = model_transformed[triangulation_indices[i + 1]];
-				new_tri.vertices[2] = model_transformed[triangulation_indices[i + 2]];
-
-				output.push(new_tri);
-			}
-		}
-		
 		ltrb get_aabb(const transformr transform) const {
 			auto model_transformed = vertices;
 
@@ -232,40 +197,6 @@ namespace augs {
 		// END GEN INTROSPECTOR
 
 		using base = polygon<vertex_count, index_count>;
-		using base::draw;
 		using typename base::drawing_input;
-
-		template <class M>
-		void draw(
-			const M& manager,
-			const drawing_input& in
-		) const {
-			const auto texture = manager.at(texture_map_id);
-
-			if (in.use_neon_map) {
-				using sprite_type = sprite<id_type>;
-
-				auto neon_in = typename sprite_type::drawing_input{ in.output };
-
-				neon_in.renderable_transform = in.renderable_transform;
-				neon_in.colorize = in.colorize;
-
-				neon_in.global_time_seconds = in.global_time_seconds;
-				neon_in.use_neon_map = true;
-
-				sprite_type neon_sprite;
-				neon_sprite.set(texture_map_id, texture.get_original_size());
-
-				neon_sprite.draw(manager, neon_in);
-
-				return;
-			}
-
-			draw(
-				in.output,
-				texture,
-				in.renderable_transform
-			);
-		}
 	};
 }

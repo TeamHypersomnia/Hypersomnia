@@ -30,7 +30,7 @@ namespace augs {
 		return v;
 	}
 
-	inline ltrb sprite_aabb(
+	FORCE_INLINE ltrb sprite_aabb(
 		const transformr where,
 		const vec2i size
 	) {

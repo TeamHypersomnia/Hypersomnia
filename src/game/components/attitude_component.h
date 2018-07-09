@@ -1,5 +1,4 @@
 #pragma once
-#include <set>
 #include "game/transcendental/entity_id.h"
 #include "game/enums/attitude_type.h"
 

@@ -1,6 +1,5 @@
 #pragma once
 #include "message.h"
-#include <set>
 #include <unordered_set>
 #include <vector>
 #include "augs/graphics/rgba.h"

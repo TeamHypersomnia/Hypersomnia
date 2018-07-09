@@ -1,7 +1,4 @@
 #pragma once
-#include <set>
-#include <unordered_set>
-
 #include "3rdparty/Box2D/Box2D.h"
 
 #include "augs/misc/constant_size_vector.h"

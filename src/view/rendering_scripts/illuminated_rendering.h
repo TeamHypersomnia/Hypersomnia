@@ -351,7 +351,7 @@ void illuminated_rendering(
 					in.global_time_seconds = global_time_seconds;
 					in.renderable_transform = it.get_world_crosshair_transform(interp);
 
-					s->appearance.draw(game_images, in);
+					augs::draw(s->appearance, game_images, in);
 				}
 			}
 		);

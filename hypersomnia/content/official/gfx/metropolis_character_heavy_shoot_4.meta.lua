@@ -74,8 +74,8 @@ return {
       },
       primary_hand = {
         pos = {
-          x = -5,
-          y = 34
+          x = -6,
+          y = 35
         },
         rotation = -51.859607696533203
       },

@@ -239,7 +239,7 @@ void item_button::draw_proc(
 			const auto viewing_transform = transformr(viewing_pos, 0);
 
 			auto render_visitor = [](const auto& renderable, auto&&... args) {
-				renderable.draw(std::forward<decltype(args)>(args)...);
+				augs::draw(renderable, std::forward<decltype(args)>(args)...);
 			};
 
 			auto drawer = [&](

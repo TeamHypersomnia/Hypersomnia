@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/math/camera_cone.h"
 #include "augs/graphics/vertex.h"
+#include "augs/drawing/drawing.h"
 
 #include "game/transcendental/entity_handle_declaration.h"
 

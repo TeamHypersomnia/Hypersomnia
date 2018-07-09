@@ -1,5 +1,6 @@
 #include "3rdparty/polypartition/src/polypartition.h"
 
+#include "augs/drawing/polygon_draw.h"
 #include "augs/math/math.h"
 #include "augs/drawing/drawing.h"
 #include "augs/drawing/grid_render_settings.h"
@@ -280,7 +281,7 @@ namespace augs {
 
 				map_uv(poly.vertices, uv_mapping_mode::STRETCH);
 
-				poly.draw(*this, tex, {});
+				augs::draw(poly, *this, tex, {});
 			}
 		}
 

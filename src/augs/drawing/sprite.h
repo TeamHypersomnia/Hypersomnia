@@ -2,20 +2,14 @@
 #include "augs/pad_bytes.h"
 
 #include "augs/templates/value_with_flag.h"
-#include "augs/math/vec2.h"
+#include "augs/drawing/make_sprite_points.h"
+#include "augs/math/transform.h"
 #include "augs/math/rects.h"
 
 #include "augs/templates/introspect_declaration.h"
 #include "augs/templates/traits/container_traits.h"
 
-#include "augs/graphics/vertex.h"
-
-#include "augs/drawing/make_sprite.h"
-#include "augs/drawing/drawing_input_base.h"
-#include "augs/drawing/drawing.h"
-
-#include "augs/texture_atlas/atlas_entry.h"
-#include "augs/build_settings/platform_defines.h"
+#include "augs/graphics/rgba.h"
 
 struct intensity_vibration_input {
 	// GEN INTROSPECTOR struct intensity_vibration_input
@@ -25,6 +19,10 @@ struct intensity_vibration_input {
 	pad_bytes<2> pad;
 	// END GEN INTROSPECTOR
 };
+
+struct sprite_drawing_input;
+
+using sprite_size_type = vec2i;
 
 namespace augs {
 	enum class sprite_special_effect /* : unsigned char */ {
@@ -38,14 +36,9 @@ namespace augs {
 	template <class id_type>
 	struct sprite {
 		static constexpr bool reinfer_when_tweaking = true;
-		using size_type = vec2i;
+		using size_type = sprite_size_type;
 
-		struct drawing_input : drawing_input_base {
-			using drawing_input_base::drawing_input_base;
-			
-			double global_time_seconds = 0.0;
-			flip_flags flip;
-		};
+		using drawing_input = sprite_drawing_input;
 
 		sprite(
 			const id_type image_id = {},
@@ -119,97 +112,6 @@ namespace augs {
 
 		ltrb get_aabb(const transformr where) const {
 			return augs::sprite_aabb(where, size);
-		}
-		
-		template <class M>
-		FORCE_INLINE void draw(
-			const M& manager,
-			const drawing_input in
-		) const {
-			static_assert(
-				!has_member_find_v<M, id_type>,
-			   	"Here we assume it is always found, or a harmless default returned."
-			);
-
-			const auto transform_pos = in.renderable_transform.pos;
-			const auto final_rotation = in.renderable_transform.rotation; //+ rotation_offset;
-			const auto drawn_size = get_size();
-
-			if (in.use_neon_map) {
-				const auto& entry = manager.at(image_id);
-				const auto& maybe_neon_map = entry.neon_map;
-
-				if (maybe_neon_map.exists()) {
-					draw(
-						in,
-						maybe_neon_map,
-						transform_pos,
-						final_rotation,
-						vec2(maybe_neon_map.get_original_size())
-						/ entry.diffuse.get_original_size() * drawn_size,
-						neon_color
-					);
-				}
-			}
-			else {
-				draw(
-					in,
-					manager.at(image_id).diffuse,
-					transform_pos,
-					final_rotation,
-					drawn_size,
-					color
-				);
-			}
-		}
-		
-	private:
-		FORCE_INLINE void draw(
-			const drawing_input in,
-			const atlas_entry considered_texture,
-			const vec2 target_position,
-			float target_rotation,
-			const size_type considered_size,
-			rgba target_color
-		) const {
-			if (effect == sprite_special_effect::CONTINUOUS_ROTATION) {
-				target_rotation += std::fmod(in.global_time_seconds * effect_speed_multiplier * 360.f, 360.f);
-			}
-
-			if (in.colorize != white) {
-				target_color *= in.colorize;
-			}
-
-			const auto points = make_sprite_points(target_position, considered_size, target_rotation);
-
-			auto triangles = make_sprite_triangles(
-				considered_texture,
-				points,
-				target_color, 
-				in.flip 
-			);
-
-			if (effect == sprite_special_effect::COLOR_WAVE) {
-				auto left_col = rgba(hsv{ std::fmod(in.global_time_seconds * effect_speed_multiplier / 2.f, 1.f), 1.0, 1.0 });
-				auto right_col = rgba(hsv{ std::fmod(in.global_time_seconds * effect_speed_multiplier / 2.f / 2.f + 0.3f, 1.f), 1.0, 1.0 });
-
-				left_col.avoid_dark_blue_for_color_wave();
-				right_col.avoid_dark_blue_for_color_wave();
-
-				left_col.a = target_color.a;
-				right_col.a = target_color.a;
-
-				auto& t1 = triangles[0];
-				auto& t2 = triangles[1];
-
-				t1.vertices[0].color = t2.vertices[0].color = left_col;
-				t2.vertices[1].color = right_col;
-				t1.vertices[1].color = t2.vertices[2].color = right_col;
-				t1.vertices[2].color = left_col;
-			}
-
-			in.output.push(triangles[0]);
-			in.output.push(triangles[1]);
 		}
 	};
 }

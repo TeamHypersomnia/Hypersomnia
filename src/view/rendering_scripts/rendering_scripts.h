@@ -7,6 +7,8 @@
 #include "game/transcendental/entity_handle.h"
 #include "augs/texture_atlas/atlas_entry.h"
 
+#include "augs/drawing/drawing.h"
+
 namespace augs {
 	struct baked_font;
 }

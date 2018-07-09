@@ -1,6 +1,5 @@
 #pragma once
 #include "augs/math/transform.h"
-
 #include "augs/drawing/drawing.h"
 
 template <class T>
@@ -17,3 +16,16 @@ struct basic_drawing_input_base {
 };
 
 using drawing_input_base = basic_drawing_input_base<real32>;
+
+struct polygon_drawing_input : drawing_input_base {
+	using drawing_input_base::drawing_input_base;
+
+	double global_time_seconds = 0.0;
+};
+
+struct sprite_drawing_input : drawing_input_base {
+	using drawing_input_base::drawing_input_base;
+
+	double global_time_seconds = 0.0;
+	flip_flags flip;
+};

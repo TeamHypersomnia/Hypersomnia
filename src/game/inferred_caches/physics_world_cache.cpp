@@ -1,4 +1,6 @@
 #include <cstring>
+#include <unordered_set>
+
 #include "physics_world_cache.h"
 
 #include "augs/build_settings/offsetof.h"

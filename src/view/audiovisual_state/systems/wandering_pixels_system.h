@@ -2,6 +2,7 @@
 #include <array>
 #include <unordered_map>
 
+#include "augs/drawing/sprite_draw.h"
 #include "augs/misc/timing/delta.h"
 #include "augs/misc/randomization.h"
 
@@ -63,7 +64,7 @@ public:
 		const M& manager,
 		invariants::sprite::drawing_input basic_input
 	) const {
-		subject_handle.template dispatch_on_having<invariants::wandering_pixels>([&](const auto subject){
+		subject_handle.template dispatch_on_having<invariants::wandering_pixels>([&](const auto subject) {
 			const auto& wandering_def = subject.template get<invariants::wandering_pixels>();
 			const auto& cache = get_cache(subject);
 
@@ -86,7 +87,7 @@ public:
 					animated.image_id = image_id;
 					animated.size = manager.at(image_id).get_original_size();
 
-					animated.draw(manager, basic_input);
+					augs::draw(animated, manager, basic_input);
 				}
 			}
 		});
