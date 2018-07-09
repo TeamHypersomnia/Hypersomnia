@@ -24,6 +24,12 @@ namespace test_flavours {
 		auto& flavours = in.flavours;
 		auto flavour_with_sprite = in.flavour_with_sprite_maker();
 
+		auto flavour_with_tiled_sprite = [&](auto&&... args) -> auto& {
+			auto& meta = flavour_with_sprite(std::forward<decltype(args)>(args)...);
+			meta.template get<invariants::sprite>().tile_excess_size = true;
+			return meta;
+		};
+
 		{
 			auto& meta = get_test_flavour(flavours, test_static_lights::STRONG_LAMP);
 
@@ -79,8 +85,11 @@ namespace test_flavours {
 				wandering.keep_particles_within_bounds = true;
 				wandering.colorize = { 234, 228, 201, 255 };
 				wandering.particles_count = 15;
-				wandering.size = { 750, 750 };
 				meta.set(wandering);
+
+				components::overridden_size s;
+				s.size.emplace(vec2(750, 750));
+				meta.set(s);
 			}
 		}
 
@@ -108,13 +117,16 @@ namespace test_flavours {
 				wandering.keep_particles_within_bounds = true;
 				wandering.colorize = { 234, 228, 201, 255 };
 				wandering.particles_count = 500;
-				wandering.size = { 750, 750 };
 				meta.set(wandering);
+
+				components::overridden_size s;
+				s.size.emplace(vec2(750, 750));
+				meta.set(s);
 			}
 		}
 
 		{
-			auto& meta = flavour_with_sprite(
+			auto& meta = flavour_with_tiled_sprite(
 				test_sprite_decorations::SOIL,
 				test_scene_image_id::SOIL,
 				render_layer::GROUND,
@@ -139,14 +151,14 @@ namespace test_flavours {
 			render_layer::FLOOR_AND_ROAD
 		);
 
-		flavour_with_sprite(
+		flavour_with_tiled_sprite(
 			test_sprite_decorations::ROAD,
 			test_scene_image_id::ROAD,
 			render_layer::FLOOR_AND_ROAD
 		);
 
 		{
-			auto& meta = flavour_with_sprite(
+			auto& meta = flavour_with_tiled_sprite(
 				test_sprite_decorations::FLOOR,
 				test_scene_image_id::FLOOR,
 				render_layer::FLOOR_AND_ROAD

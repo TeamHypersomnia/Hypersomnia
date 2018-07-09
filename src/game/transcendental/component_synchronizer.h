@@ -7,12 +7,18 @@ class component_synchronizer;
 template <class, class>
 class synchronizer_base;
 
+template <class H>
+void construct_pre_inference(H);
+
 class write_synchronized_component_access {
 	template <class, class>
 	friend class synchronizer_base;
 
 	template <class, class>
 	friend class component_synchronizer;
+
+	template <class H>
+	friend void construct_pre_inference(H);
 
 	write_synchronized_component_access() {}
 };

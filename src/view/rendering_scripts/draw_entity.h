@@ -48,7 +48,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 			auto result = typed_handle.template get<invariants::sprite>();
 
 			if constexpr(typed_handle.template has<components::overridden_size>()) {
-				const auto& s = typed_handle.template get<components::overridden_size>().size;
+				const auto& s = typed_handle.template get<components::overridden_size>().get();
 
 				if (s.is_enabled) {
 					result.size = s.value;

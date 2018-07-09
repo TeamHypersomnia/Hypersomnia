@@ -234,8 +234,9 @@ namespace test_scenes {
 
 						w.colorize = light_cyan;
 						w.particles_count = 150;
+
 						const auto reach = xywh(light_pos.x- 350, light_pos.y-350, 500, 500);
-						w.size = reach.get_size();
+						e.set_logical_size(reach.get_size());
 						e.set_logic_transform(reach.get_center());
 					});
 				}
@@ -273,7 +274,7 @@ namespace test_scenes {
 
 						w.colorize = cyan;
 						w.particles_count = 50;
-						w.size = left_reach.get_size();
+						e.set_logical_size(left_reach.get_size());
 						e.set_logic_transform(left_reach.get_center());
 					});
 				}
@@ -285,7 +286,7 @@ namespace test_scenes {
 
 						w.colorize = orange;
 						w.particles_count = 50;
-						w.size = right_reach.get_size();
+						e.set_logical_size(right_reach.get_size());
 						e.set_logic_transform(right_reach.get_center());
 					});
 				}
@@ -338,14 +339,11 @@ namespace test_scenes {
 
 				{
 					const vec2 size = get_size_of(test_scene_image_id::FLOOR);
+					const auto floor_origin = vec2(512, -768);
+					const auto floor_size = size * 10;
 
-					for (int x = 0; x < 10; ++x) {
-						for (int y = 0; y < 10; ++y) {
-							create_test_scene_entity(world, test_sprite_decorations::FLOOR, transformr(vec2(-64, -192) + size * vec2i(x, -y)));
-						}
-					}
+					create_test_scene_entity(world, test_sprite_decorations::FLOOR, transformr(floor_origin)).set_logical_size(floor_size);
 				}
-
 			}
 		}
 
@@ -565,8 +563,8 @@ namespace test_scenes {
 
 				w.colorize = cyan;
 				w.particles_count = 40;
-				w.size = { 750, 750 };
 				w.keep_particles_within_bounds = true;
+				e.set_logical_size(vec2(750, 750));
 				e.set_logic_transform(aquarium_origin);
 			});
 

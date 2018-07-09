@@ -98,8 +98,8 @@ public:
 	std::optional<ltrb> find_aabb(const transformr transform) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 
-		if (const auto* const overridden_size = handle.template find<components::overridden_size>()) {
-			const auto& s = overridden_size->size;
+		if (const auto overridden_size = handle.template find<components::overridden_size>()) {
+			const auto& s = overridden_size.get();
 
 			if (s.is_enabled) {
 				return augs::sprite_aabb(transform, s.value);
@@ -112,13 +112,6 @@ public:
 
 		if (const auto* const polygon = handle.template find<invariants::polygon>()) {
 			return polygon->get_aabb(transform);
-		}
-
-		if (const auto* const wandering_pixels = handle.template find<components::wandering_pixels>()) {
-			return xywh::center_and_size(
-				transform.pos, 
-				wandering_pixels->size
-			);
 		}
 
 		if (const auto* const light = handle.template find<components::light>()) {
@@ -148,6 +141,17 @@ public:
 		}
 
 		return vec2::zero;
+	}
+
+	auto& set_logical_size(const vec2 new_size) const {
+		const auto handle = *static_cast<const entity_handle_type*>(this);
+
+		if (const auto overridden_size = handle.template find<components::overridden_size>()) {
+			overridden_size.set(new_size);
+			return *this;
+		}
+
+		return *this;
 	}
 
 	std::optional<vec2> find_logical_tip() const {
