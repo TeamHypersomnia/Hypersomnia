@@ -104,7 +104,7 @@ namespace augs {
 			const auto& maybe_neon_map = entry.neon_map;
 
 			if (maybe_neon_map.exists()) {
-				const auto neon_size_mult = vec2(drawn_size) / original_size;
+				const auto original_neon_size = vec2(maybe_neon_map.get_original_size());
 
 				if (spr.tile_excess_size && drawn_size > original_size) {
 					for_each_tile(
@@ -116,7 +116,7 @@ namespace augs {
 								maybe_neon_map,
 								pos + piece_offset,
 								final_rotation,
-								vec2(maybe_neon_map.get_original_size()) * neon_size_mult,
+								original_neon_size,
 								spr.neon_color
 							);
 						},
@@ -125,13 +125,15 @@ namespace augs {
 					);
 				}
 				else {
+					const auto neon_size_mult = vec2(drawn_size) / original_size;
+
 					detail_draw(
 						spr,
 						in,
 						maybe_neon_map,
 						pos,
 						final_rotation,
-						vec2(maybe_neon_map.get_original_size()) * neon_size_mult,
+						original_neon_size * neon_size_mult,
 						spr.neon_color
 					);
 				}
