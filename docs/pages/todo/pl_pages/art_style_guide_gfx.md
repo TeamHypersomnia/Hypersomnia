@@ -133,9 +133,10 @@ Np. licząc od zera, w przypadku obrazka 3x3, jest to piksel o koordynatach (1, 
 W przypadku obrazka 2x2 jest to piksel w samym lewym górnym rogu - (0, 0).  
 
 Aby postać nie przeskakiwała podczas gwałtownego przełączania animacji - np. strzał, chodzenie, strzał, chodzenie - należy upewnić się,  
-że...
-- Element wizualny, który wypada na *środkowym pikselu* pierwszej klatki jednej animacji, np. chodzenia...
-- ...zawsze wypada na *środkowym pikselu*, pierwszej klatki drugiej animacji, np. strzelania.
+że:
+
+- Element wizualny, który wypada na *środkowym pikselu* pierwszej klatki **jednej** animacji, np. chodzenia...
+- ...zawsze wypada na *środkowym pikselu* pierwszej klatki **drugiej** animacji, np. strzelania.
 
 Świetnym kandydatem na taki element wizualny jest **dokładny środek głowy postaci**.  
 Warto, dla ułatwienia pracy, zaznaczyć sobie ten środek czarnym pikselem - on i tak nie będzie widoczny pod głową postaci.  
