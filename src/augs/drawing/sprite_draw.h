@@ -15,9 +15,9 @@ namespace augs {
 		const augs::atlas_entry& diffuse
 	) {
 		const auto drawn_size = spr.get_size();
-		const auto h = vec2(drawn_size) / 2;
 
 		const auto original_size = diffuse.get_original_size();
+		const auto h = vec2(original_size) / 2;
 
 		const auto times = drawn_size / original_size;
 

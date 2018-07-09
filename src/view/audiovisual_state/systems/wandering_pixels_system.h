@@ -1,20 +1,13 @@
 #pragma once
-#include <array>
-#include <unordered_map>
-
-#include "augs/drawing/sprite_draw.h"
 #include "augs/misc/timing/delta.h"
 #include "augs/misc/randomization.h"
-
-#include "game/enums/render_layer.h"
 
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"
 
 #include "game/components/wandering_pixels_component.h"
-#include "game/components/sprite_component.h"
-#include "game/assets/animation_math.h"
+
 #include "view/audiovisual_state/systems/audiovisual_cache_common.h"
 
 struct visible_entities;
@@ -57,41 +50,6 @@ public:
 		const const_entity_handle subject,
 		const augs::delta dt
 	);
-
-	template <class E, class M>
-	void draw_wandering_pixels_as_sprites(
-		const E subject_handle,
-		const M& manager,
-		invariants::sprite::drawing_input basic_input
-	) const {
-		subject_handle.template dispatch_on_having<invariants::wandering_pixels>([&](const auto subject) {
-			const auto& wandering_def = subject.template get<invariants::wandering_pixels>();
-			const auto& cache = get_cache(subject);
-
-			for (const auto& p : cache.particles) {
-				basic_input.renderable_transform = p.pos;
-
-				{
-					const auto& wandering = subject.template get<components::wandering_pixels>();
-					basic_input.colorize = wandering.colorize;
-				}
-
-				const auto& cosm = subject_handle.get_cosmos();
-				const auto& logicals = cosm.get_logical_assets();
-
-				if (const auto displayed_animation = logicals.find(wandering_def.animation_id)) {
-					const auto animation_time_ms = p.current_lifetime_ms;
-					const auto image_id = ::calc_current_frame_looped(*displayed_animation, animation_time_ms).image_id;
-
-					invariants::sprite animated;
-					animated.image_id = image_id;
-					animated.size = manager.at(image_id).get_original_size();
-
-					augs::draw(animated, manager, basic_input);
-				}
-			}
-		});
-	}
 
 	void reserve_caches_for_entities(const size_t) const {}
 

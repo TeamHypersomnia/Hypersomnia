@@ -2,6 +2,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 
+#include "game/assets/animation_math.h"
 #include "game/detail/visible_entities.h"
 
 #include "view/audiovisual_state/systems/wandering_pixels_system.h"

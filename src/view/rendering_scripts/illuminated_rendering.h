@@ -24,6 +24,7 @@
 #include "view/viewer_eye.h"
 #include "view/rendering_scripts/rendering_scripts.h"
 #include "view/rendering_scripts/illuminated_rendering.h"
+#include "view/rendering_scripts/draw_wandering_pixels_as_sprites.h"
 
 #include "view/necessary_resources.h"
 #include "view/game_drawing_settings.h"
@@ -270,7 +271,7 @@ void illuminated_rendering(
 	draw_layer(render_layer::AQUARIUM_BUBBLES);
 
 	for (const auto e : visible.per_layer[render_layer::DIM_WANDERING_PIXELS_EFFECTS]) {
-		wandering_pixels.draw_wandering_pixels_as_sprites(cosmos[e], game_images, invariants::sprite::drawing_input(output));
+		draw_wandering_pixels_as_sprites(wandering_pixels, cosmos[e], game_images, invariants::sprite::drawing_input(output));
 	}
 
 	renderer.call_and_clear_triangles();
@@ -393,7 +394,7 @@ void illuminated_rendering(
 	draw_particles(render_layer::ILLUMINATING_PARTICLES);
 
 	for (const auto e : visible.per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {
-		wandering_pixels.draw_wandering_pixels_as_sprites(cosmos[e], game_images, invariants::sprite::drawing_input(output));
+		draw_wandering_pixels_as_sprites(wandering_pixels, cosmos[e], game_images, invariants::sprite::drawing_input(output));
 	}
 
 	renderer.call_and_clear_triangles();
