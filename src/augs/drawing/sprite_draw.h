@@ -17,13 +17,12 @@ namespace augs {
 		const auto drawn_size = spr.get_size();
 
 		const auto original_size = diffuse.get_original_size();
-		const auto h = vec2(original_size) / 2;
-
 		const auto times = drawn_size / original_size;
+		const auto lt = -vec2(original_size * (times - vec2i(1, 1))) / 2;
 
 		for (int y = 0; y < times.y; ++y) {
 			for (int x = 0; x < times.x; ++x) {
-				auto piece_offset = vec2(original_size * vec2i(x, y)) + h;
+				auto piece_offset = lt + vec2(original_size * vec2i(x, y));
 				piece_offset.rotate(final_rotation, vec2());
 
 				callback(piece_offset);
