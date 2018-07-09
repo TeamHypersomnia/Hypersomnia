@@ -42,8 +42,8 @@ return {
         y = 0
       },
       hand_anchor = {
-        x = -28,
-        y = 0
+        x = -25,
+        y = -6
       },
       head_anchor = {
         x = 0,

@@ -85,21 +85,22 @@ Każda kolekcja utworzona z tej listy jest uniwersalna, w tym sensie, że będzi
 
 Edytor umożliwia bardzo łatwe ustawianie metryk dla każdego obrazka postaci, np. gdzie ma głowę, plecy i dłonie.  
 Dodatkowo, każdy item ma ustawiane offsety - "kotwice" - za które powinien być trzymany, np. dla broni można ustawić lokację spustu, a dla plecaka można ustawić jego wewnętrzną krawędź.  
-Za pomocą tych właśnie zmiennych gra poprawnie oblicza relatywne pozycjonowanie itemów do obrazka postaci.  
 
+Dzięki temu wystarczy tylko raz ustawić pozycję spustu dla broni - od tej pory będzie ona poprawnie trzymana już przez wszystkie rodzaje torsów którym poprawnie jest ustawiona pozycja dłoni.  
+ 
 {% include important.html content="Jeden i ten sam *obrazek* może być używany przez wiele *klatek*. Jeśli artysta ustawia 20 klatek dla pełnego cyklu ruchu, może przydatnym być aby ustawić ten sam obrazek dla klatek nr 5 i 6, 10 i 11, 20 i 1." %}
 {% include important.html content="Należy przestrzegać ustalanych poniżej liczb rysowanych obrazków, aby klatki poszczególnych części ciała perfekcyjnie współgrały ze sobą na ekranie." %}
 
-{% include tip.html content="Niektóre podpunkty mogą się powtarzać co do słowa. To nie jest pomyłka, a zabieg celowy, aby uprościć pracę nad pojedynczą sekwencją." %}
+{% include tip.html content="Niektóre podpunkty mogą się powtarzać co do słowa. To nie jest pomyłka, a zabieg celowy, aby uprościć pracę nad konkretną sekwencją." %}
 
 Załóżmy bazową liczbę klatek animacji ruchu, **n = 5**.  
   
 Dla każdej animacji ruchu, tj:
 
 - Chodzące nogi.
-- Chodzący tors.
+- Chodzący tors z pustymi rękoma.
 - Chodzący tors podczas trzymania karabinu, pistoletu, czegokolwiek.
-	- Ale już nie tors podczas strzelania!
+- **Ale już nie tors podczas strzelania!**
 
 Mamy następujące rozwiązania dla artysty:
 
@@ -123,20 +124,42 @@ To upraszcza nam ogromnie kalkulacje, ale również nie wygląda źle.
 
 - **TODO: Przykłady muszą być poprawione w myśl tej zasady!**
 
+#### Pozycjonowanie środka
+
+Pozycja obrazka w grze jest zawsze zawieszona na *środkowym pikselu*.  
+Koordynaty tego piksela określane są wzorem ``(floor(szerokość / 2), floor(wysokość / 2))``.  
+
+Np. licząc od zera, w przypadku obrazka 3x3, jest to piksel o koordynatach (1, 1).  
+W przypadku obrazka 2x2 jest to piksel w samym lewym górnym rogu - (0, 0).  
+
+Aby postać nie przeskakiwała podczas gwałtownego przełączania animacji - np. strzał, chodzenie, strzał, chodzenie - należy upewnić się,  
+że...
+- Element wizualny, który wypada na *środkowym pikselu* pierwszej klatki jednej animacji, np. chodzenia...
+- ...zawsze wypada na *środkowym pikselu*, pierwszej klatki drugiej animacji, np. strzelania.
+
+Świetnym kandydatem na taki element wizualny jest **dokładny środek głowy postaci**.  
+Warto, dla ułatwienia pracy, zaznaczyć sobie ten środek czarnym pikselem - on i tak nie będzie widoczny pod głową postaci.  
+
+Między klatkami pojedynczej animacji, środek wizualny może już trochę się przesunąć, np. naturalnym jest, że głowa może lekko odchylić się podczas strzału.
+
+**TODO:** Dodać obrazki!
+
 #### Tors który trzyma długie bronie
 
 **Problem**: O ile w realistycznym chodzeniu z bronią może ona się kiwać do góry i na dół, o tyle w grze nie możemy tak jej huśtać - tutaj broń jest stale równoległa do podłoża i może się obracać tylko w jednej osi - na boki.  
 
-Dlatego odległości między dłońmi na animacji muszą być stałe, aby broń nie "pływała" nam po rękach:  
+Dlatego odległości między dłońmi na animacji muszą być **stałe**, aby broń nie "pływała" nam po rękach:  
 
 {% include image.html file="pages/todo/pl_pages/plywanie.gif" %}
 
 Naturalnym jest, że lewa dłoń będzie robiła większe ruchy od prawej, jako że lewa jest bardziej wyciągnięta do przodu.  
 Oto sposób na to aby zachowywać stałą odległość między dłońmi podczas animowania, gdy chcemy aby jedna dłoń ruszała się mniej od drugiej:  
 
-Załóżmy że czarna kreska to linia w której idzie broń. Na zielono zaznaczono, gdzie wypada druga dłoń. Drugą taką samą linię zaczęto obracać wokół pierwszej dłoni. Tam, gdzie wypada teraz zielony punkt, powinna wypaść dłoń w następnej klatce - wtedy dłoń się poruszy, a odległość między dłońmi zostanie zachowana.  
+Załóżmy że czarna kreska to linia na której rysowana jest broń.  
+Na zielono zaznaczono, gdzie wypada druga dłoń.  
+Drugą taką samą linię zaczęto obracać wokół pierwszej dłoni. Tam, gdzie wypada teraz zielony punkt, powinna wypaść dłoń w następnej klatce - wtedy dłoń się poruszy, a odległość między dłońmi zostanie zachowana.  
 
-Dzięki temu będzie wizualnie uzasadnione to, że broń z rzutu ptaka ma ciągle taką samą długość.  
+Dzięki temu będzie wizualnie uzasadnione to, że broń w rzucie z lotu ptaka ma ciągle taką samą długość.  
 
 {% include image.html file="pages/todo/pl_pages/linia_obrot.gif" %}
 
@@ -179,7 +202,10 @@ Najlepiej stworzyć sobie takie linie w edytorze, z kolorowymi kropkami po obu s
 	{% include image.html file="pages/todo/pl_pages/torso_rifle_shoot.png" %}
 
 	- Uwaga: artysta musi **samodzielnie ustawić klatki powrotne** w edytorze.
-		- To robi sens, ponieważ ramię może szybciej odskoczyć przy strzale niż powrócić na miejsce.
+		- To robi sens, ponieważ przy strzale ramię szybciej odskoczy niż powróci na miejsce.
+	- Uwaga: pierwsza klatka strzelania zawsze powinna być **unikalna**, w szczególności: nie powinna być skopiowana z którejś klatki chodzenia.  
+		- Na przykład: jeśli skopiujemy pierwszy obraz chodzenia z karabinem do pierwszej klatki strzału z karabinu...
+			- ...to jeśli nasza postać strzeli podczas stania w miejscu, będziemy mieli opóźnienie od momentu strzału do jakiejkolwiek widocznej zmiany na ekranie (pierwsza klatka będzie taka sama).
 
 5. Animacja strzelania podczas gdy w obu rękach trzymamy bronie - **akimbo**.
 	- Wszystko **tak samo** jak w punkcie 4 (strzelanie z karabinu), tylko...
