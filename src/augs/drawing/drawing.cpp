@@ -1,4 +1,4 @@
-#include "3rdparty/polypartition/src/polypartition.h"
+#include "augs/misc/add_concave_polygon.h"
 
 #include "augs/drawing/polygon_draw.h"
 #include "augs/math/math.h"
@@ -277,7 +277,7 @@ namespace augs {
 
 				augs::polygon<20, 20> poly;
 
-				poly.add_concave_polygon({ concave.begin(), concave.end() });
+				augs::add_concave_polygon(poly, { concave.begin(), concave.end() });
 
 				map_uv(poly.vertices, uv_mapping_mode::STRETCH);
 

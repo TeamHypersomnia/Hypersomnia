@@ -252,7 +252,7 @@ struct tests_of_traits {
 
 	static_assert(can_access_data_v<std::string>, "Trait has failed");
 	static_assert(can_access_data_v<std::vector<int>>, "Trait has failed");
-	static_assert(!can_access_data_v<std::set<int>>, "Trait has failed");
+	static_assert(!can_access_data_v<std::map<int, int>>, "Trait has failed");
 	static_assert(can_reserve_v<std::vector<int>>, "Trait has failed");
 	static_assert(!can_reserve_v<std::map<int, int>>, "Trait has failed");
 

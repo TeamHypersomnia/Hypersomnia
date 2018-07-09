@@ -1,6 +1,4 @@
 #pragma once
-#include "augs/drawing/polygon.h"
-
 #include "augs/math/vec2.h"
 #include "augs/math/transform.h"
 
@@ -111,36 +109,6 @@ struct basic_convex_partitioned_shape {
 			convex_poly new_poly;
 			new_poly.assign(new_convex.begin(), new_convex.end());
 			convex_polys.push_back(new_poly);
-		}
-	}
-
-	template <class C>
-	void add_concave_polygon(const C& verts) {
-		std::list<TPPLPoly> inpolys, outpolys;
-		TPPLPoly subject_poly;
-		subject_poly.Init(static_cast<long>(verts.size()));
-		subject_poly.SetHole(false);
-
-		for (std::size_t i = 0; i < verts.size(); ++i) {
-			vec2 p(verts[i]);
-			subject_poly[static_cast<int>(i)].x = p.x;
-			subject_poly[static_cast<int>(i)].y = -p.y;
-		}
-
-		inpolys.push_back(subject_poly);
-
-		TPPLPartition partition;
-		partition.ConvexPartition_HM(&inpolys, &outpolys);
-
-		for (auto& out : outpolys) {
-			std::vector <vec2> new_convex;
-
-			for (long j = 0; j < out.GetNumPoints(); ++j) {
-				new_convex.push_back(vec2(static_cast<float>(out[j].x), static_cast<float>(-out[j].y)));
-			}
-
-			std::reverse(new_convex.begin(), new_convex.end());
-			add_convex_polygon(new_convex);
 		}
 	}
 };

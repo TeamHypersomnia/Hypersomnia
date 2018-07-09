@@ -1,6 +1,4 @@
 #pragma once
-#include "3rdparty/polypartition/src/polypartition.h"
-
 #include "augs/templates/algorithm_templates.h"
 #include "augs/math/vec2.h"
 #include "augs/misc/constant_size_vector.h"
@@ -76,83 +74,6 @@ namespace augs {
 		void set_color(const rgba col) {
 			for (auto& v : vertices) {
 				v.color = col;
-			}
-		}
-
-		template <class C>
-		void add_convex_polygons(const C& convexes) {
-			for (const auto& c : convexes) {
-				std::vector<vertex> new_concave;
-
-				for (auto v : c) {
-					vertex new_v;
-					new_v.pos = v;
-					new_concave.push_back(new_v);
-				}
-
-				add_concave_polygon(new_concave);
-			}
-
-			map_uv(vertices, uv_mapping_mode::STRETCH);
-		}
-
-		void add_concave_polygon(std::vector<vertex> polygon) {
-			if (polygon.empty()) {
-				return;
-			}
-
-			size_t i1, i2;
-
-			float area = 0;
-			const auto& vs = polygon;
-
-			for (i1 = 0; i1 < vs.size(); i1++) {
-				i2 = i1 + 1;
-				if (i2 == vs.size()) i2 = 0;
-				area += vs[i1].pos.x * vs[i2].pos.y - vs[i1].pos.y * vs[i2].pos.x;
-			}
-
-			/* ensure proper winding */
-			if (area > 0) {
-				std::reverse(polygon.begin(), polygon.end());
-			}
-
-			TPPLPoly inpoly;
-			std::list<TPPLPoly> out_tris;
-
-			TPPLPoly subject_poly;
-			inpoly.Init(static_cast<long>(polygon.size()));
-			inpoly.SetHole(false);
-
-			vertices.reserve(vertices.size() + polygon.size());
-
-			const auto offset = vertices.size();
-			
-			for (std::size_t i = 0; i < polygon.size(); ++i) {
-				vertices.push_back(polygon[i]);
-				//original_polygon.push_back(polygon[i].pos);
-			}
-
-			for (std::size_t i = 0; i < polygon.size(); ++i) {
-				vec2 p(polygon[i].pos);
-				inpoly[static_cast<int>(i)].x = p.x;
-				inpoly[static_cast<int>(i)].y = -p.y;
-			}
-
-			TPPLPartition partition;
-			partition.Triangulate_EC(&inpoly, &out_tris);
-
-			for (auto& out : out_tris) {
-				for (int i = 0; i < 3; ++i) {
-					auto new_tri_point = out.GetPoint(i);
-
-					for (std::size_t j = offset; j < polygon.size(); ++j) {
-						if (polygon[j].pos.compare(vec2(static_cast<float>(new_tri_point.x), static_cast<float>(-new_tri_point.y)), 1.f)) {
-							triangulation_indices.push_back(static_cast<unsigned>(j));
-							break;
-						}
-					}
-				}
 			}
 		}
 
