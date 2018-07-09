@@ -77,7 +77,7 @@ return {
           x = -3,
           y = 27
         },
-        rotation = -52.431407928466797
+        rotation = -52
       },
       secondary_hand = {
         pos = {

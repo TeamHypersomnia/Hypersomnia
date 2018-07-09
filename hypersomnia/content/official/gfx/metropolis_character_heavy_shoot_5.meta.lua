@@ -74,10 +74,10 @@ return {
       },
       primary_hand = {
         pos = {
-          x = -9,
-          y = 35
+          x = -8,
+          y = 42
         },
-        rotation = -48.7001953125
+        rotation = -56.504817962646484
       },
       secondary_hand = {
         pos = {

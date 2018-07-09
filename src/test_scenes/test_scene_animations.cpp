@@ -170,7 +170,10 @@ void load_test_scene_animations(
 				20.0f
 			);
 
-			make_shoot_durations(anim.frames);
+			auto& f = anim.frames;
+			make_shoot_durations(f);
+			f.erase(f.begin());
+			f.pop_back();
 		}
 
 		make_torso(
