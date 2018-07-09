@@ -405,7 +405,11 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h)
 		}
 
 		if (const auto* const sprite = handle.template find<invariants::sprite>()) {
-			const auto size = handle.get_logical_size();
+			auto size = handle.get_logical_size();
+
+			size.x = std::max(1.f, size.x);
+			size.y = std::max(1.f, size.y);
+
 			from_polygon_shape(convex_partitioned_shape::from_box(size));
 
 			return;

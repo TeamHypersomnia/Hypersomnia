@@ -15,8 +15,10 @@ void construct_pre_inference(const handle_type h) {
 	}
 
 	if (const auto overridden = h.template find<components::overridden_size>()) {
-		if (const auto sprite = h.template find<invariants::sprite>()) {
-			overridden->size.value = sprite->size;
+		if (!overridden->size.is_enabled) {
+			if (const auto sprite = h.template find<invariants::sprite>()) {
+				overridden->size.value = sprite->size;
+			}
 		}
 	}
 }

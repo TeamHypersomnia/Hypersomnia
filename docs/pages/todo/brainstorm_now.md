@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- sprite will have to know which tiles exactly are visible in the camera
+
 - it would be nice to store the sprite size information per entity
 	- Solution: Store overridden size as a value with flag in a separate component.
 		- Pro: On changed texture, size in invariant is updated as always, whereas overridden sizes are left untouched.
