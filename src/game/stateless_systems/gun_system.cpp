@@ -329,7 +329,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 								const auto spread_component = rng.randval(gun_def.shell_spread_degrees) + gun_def.shell_spawn_offset.rotation;
 
 								auto shell_transform = gun_transform;
-								shell_transform.pos += vec2(gun_def.shell_spawn_offset.pos).rotate(gun_transform.rotation, vec2());
+								shell_transform.pos += vec2(gun_def.shell_spawn_offset.pos).rotate(gun_transform.rotation);
 								shell_transform.rotation += spread_component;
 
 								shell_entity.set_logic_transform(shell_transform);

@@ -21,102 +21,10 @@ struct has_x_and_y<T, decltype(std::declval<T&>().x, std::declval<T&>().y, void(
 template <class T>
 constexpr bool has_x_and_y_v = has_x_and_y<T>::value;
 
-namespace augs {
-	template <class T, class D>
-	basic_ltrb<T> get_aabb_rotated(const basic_vec2<T> initial_size, const D degrees) {
-		auto verts = basic_ltrb<T>(0, 0, initial_size.x, initial_size.y).template get_vertices<T>();
-
-		for (auto& v : verts) {
-			v.rotate(degrees, initial_size / 2);
-		}
-
-		/* expanded aabb that takes rotation into consideration */
-		return get_aabb(verts);
-	}
-
-	template <class T, class d>
-	basic_vec2<T>& rotate_radians(basic_vec2<T>& v, const basic_vec2<T>& origin, const d radians) {
-		v -= origin;
-		basic_vec2<T> rotated;
-
-		{
-			const auto s = static_cast<typename basic_vec2<T>::real>(sin(radians));
-			const auto c = static_cast<typename basic_vec2<T>::real>(cos(radians));
-
-			rotated.x = static_cast<T>(v.x * c - v.y * s);
-			rotated.y = static_cast<T>(v.x * s + v.y * c);
-		}
-
-		v = rotated + origin;
-
-		return v;
-	}
-
-	template <class T, class d>
-	auto rotate_by_90_multiples(basic_vec2<T>& v, const basic_vec2<T>& origin, const d degrees) {
-		if (augs::compare(degrees, static_cast<d>(0))) {
-			return static_cast<d>(0);
-		}
-
-		if (augs::compare(degrees, static_cast<d>(-90))) {
-			v -= origin;
-			v = v.perpendicular_ccw();
-			v += origin;
-			return static_cast<d>(-90);
-		}
-		if (augs::compare(degrees, static_cast<d>(90))) {
-			v -= origin;
-			v = v.perpendicular_cw();
-			v += origin;
-			return static_cast<d>(90);
-		}
-		if (augs::compare(degrees, static_cast<d>(180))) {
-			v -= origin;
-			v.neg();
-			v += origin;
-			return static_cast<d>(180);
-		}
-		if (augs::compare(degrees, static_cast<d>(-180))) {
-			v -= origin;
-			v.neg();
-			v += origin;
-			return static_cast<d>(-180);
-		}
-
-		return static_cast<d>(0);
-	}
-
-	template <class T, class d>
-	auto rotate_degrees_with_90_multiples(basic_vec2<T>& v, const basic_vec2<T>& origin, const d degrees) {
-		if (const auto result = rotate_by_90_multiples(v, origin, degrees); result != 0.f) {
-			return result;
-		}
-
-		const auto radians = DEG_TO_RAD<d> * degrees;
-		augs::rotate_radians(v, origin, radians);
-		return degrees;
-	}
-
-	template <class T, class d>
-	auto rotate_radians_with_90_multiples(basic_vec2<T>& v, const basic_vec2<T>& origin, const d radians) {
-		const auto degrees = RAD_TO_DEG<d> * radians;
-
-		if (const auto result = rotate_by_90_multiples(v, origin, degrees); result != 0.f) {
-			return result * DEG_TO_RAD<d>;
-		}
-
-		augs::rotate_radians(v, origin, radians);
-		return radians;
-	}
-
-	template <class vec, class d>
-	vec& rotate(vec& v, const vec& origin, const d angle) {
-		return rotate_radians(v, origin, angle * DEG_TO_RAD<d>);
-	}
-}
-
 template <class type>
 struct basic_vec2 {
+	using coordinate_type = type;
+
 	// GEN INTROSPECTOR struct basic_vec2 class type
 	type x = static_cast<type>(0);
 	type y = static_cast<type>(0);
@@ -320,18 +228,6 @@ struct basic_vec2 {
 		return *this;
 	}
 
-	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
-	basic_vec2& rotate(const A angle, const basic_vec2 origin) {
-		augs::rotate(*this, origin, angle);
-		return *this;
-	}
-
-	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
-	basic_vec2& rotate_radians(const A angle, const basic_vec2 origin) {
-		augs::rotate_radians(*this, origin, angle);
-		return *this;
-	}
-
 	basic_vec2 lerp(const basic_vec2& bigger, const real ratio) const {
 		return augs::interp(*this, bigger, ratio);
 	}
@@ -498,6 +394,105 @@ struct basic_vec2 {
 	basic_vec2& flip() {
 		std::swap(x, y);
 		return *this;
+	}
+
+	template <class R>
+	auto& rotate_radians(const R radians) {
+		static_assert(std::is_floating_point_v<R>);
+
+		const auto s = static_cast<real>(sin(radians));
+		const auto c = static_cast<real>(cos(radians));
+
+		const auto new_x = x * c - y * s;
+		const auto new_y = x * s + y * c;
+
+		x = new_x;
+		y = new_y;
+
+		return *this;
+	}
+
+	template <class R>
+	auto& rotate_radians(const R radians, const basic_vec2& origin) {
+		static_assert(std::is_floating_point_v<R>);
+
+		*this -= origin;
+		rotate_radians(radians);
+		*this += origin;
+		return *this;
+	}
+
+	template <class D>
+	auto rotate_by_90_multiples(const D degrees, const basic_vec2& origin) {
+		auto& v = *this;
+
+		if (augs::compare(degrees, static_cast<D>(0))) {
+			return static_cast<D>(0);
+		}
+
+		if (augs::compare(degrees, static_cast<D>(-90))) {
+			v -= origin;
+			v = perpendicular_ccw();
+			v += origin;
+			return static_cast<D>(-90);
+		}
+		if (augs::compare(degrees, static_cast<D>(90))) {
+			v -= origin;
+			v = perpendicular_cw();
+			v += origin;
+			return static_cast<D>(90);
+		}
+		if (augs::compare(degrees, static_cast<D>(180))) {
+			v -= origin;
+			neg();
+			v += origin;
+			return static_cast<D>(180);
+		}
+		if (augs::compare(degrees, static_cast<D>(-180))) {
+			v -= origin;
+			neg();
+			v += origin;
+			return static_cast<D>(-180);
+		}
+
+		return static_cast<D>(0);
+	}
+
+	template <class D>
+	auto rotate_degrees_with_90_multiples(const D degrees, const basic_vec2& origin) {
+		if (const auto result = rotate_by_90_multiples(degrees, origin); result != 0.f) {
+			return result;
+		}
+
+		const auto radians = DEG_TO_RAD<D> * degrees;
+		rotate_radians(radians, origin);
+		return degrees;
+	}
+
+	template <class D>
+	auto rotate_radians_with_90_multiples(const D radians, const basic_vec2& origin) {
+		const auto degrees = RAD_TO_DEG<D> * radians;
+
+		if (const auto result = rotate_by_90_multiples(degrees, origin); result != 0.f) {
+			return result * DEG_TO_RAD<D>;
+		}
+
+		rotate_radians(radians, origin);
+		return radians;
+	}
+
+	template <class D>
+	auto& rotate(const D degrees) {
+		using mult_type = std::conditional_t<std::is_floating_point_v<D>, D, real>;
+
+		return rotate_radians(degrees * DEG_TO_RAD<mult_type>);
+	}
+
+	template <class D>
+	auto& rotate(const D degrees, const basic_vec2& origin) {
+		using mult_type = std::conditional_t<std::is_floating_point_v<D>, D, real>;
+
+		return rotate_radians(degrees * DEG_TO_RAD<mult_type>, origin);
 	}
 
 	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>

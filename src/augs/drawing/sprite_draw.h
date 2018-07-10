@@ -23,7 +23,7 @@ namespace augs {
 		for (int y = 0; y < times.y; ++y) {
 			for (int x = 0; x < times.x; ++x) {
 				auto piece_offset = lt + vec2(original_size * vec2i(x, y));
-				piece_offset.rotate(final_rotation, vec2());
+				piece_offset.rotate(final_rotation);
 
 				callback(piece_offset);
 			}

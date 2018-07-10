@@ -1,8 +1,10 @@
 #pragma once
 #include <algorithm>
+#include "augs/math/vec2.h"
 #include "augs/math/transform.h"
 #include "augs/math/rects.h"
 #include "augs/math/matrix.h"
+#include "augs/math/make_rect_points.h"
 
 template <class T>
 struct basic_camera_eye {
@@ -55,7 +57,11 @@ struct camera_cone {
 
 	ltrb get_visible_world_rect_aabb() const {
 		const auto visible_world_area = get_visible_world_area();
-		return augs::get_aabb_rotated(visible_world_area, eye.transform.rotation) + eye.transform.pos - visible_world_area / 2;
+
+		const auto rotated_rect_verts = augs::make_rect_points<vec2>(visible_world_area, eye.transform.rotation);
+		const auto rotated_rect_aabb = augs::get_aabb(rotated_rect_verts);
+
+		return rotated_rect_aabb + eye.transform.pos;
 	}
 	
 	auto get_projection_matrix() const {

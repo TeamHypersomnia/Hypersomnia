@@ -101,7 +101,7 @@ public:
 			}
 
 			considered_base_offset += recoil.position;
-			considered_base_offset.rotate(recoil.rotation, vec2());
+			considered_base_offset.rotate(recoil.rotation);
 
 			return considered_base_offset;
 		}

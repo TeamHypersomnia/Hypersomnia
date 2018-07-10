@@ -324,12 +324,12 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 								amount_rotated = -amount_rotated;
 							}
 
-							vel = vec2(collision_normal).rotate(amount_rotated, vec2()) * speed;
+							vel = vec2(collision_normal).rotate(amount_rotated) * speed;
 
 							--how_many_along_normal;
 						}
 						else {
-							vel = -1 * vec2(impact_dir).rotate(rng.randval(-40.f, 40.f), vec2()) * speed;
+							vel = -1 * vec2(impact_dir).rotate(rng.randval(-40.f, 40.f)) * speed;
 						}
 
 						cosmic::create_entity(

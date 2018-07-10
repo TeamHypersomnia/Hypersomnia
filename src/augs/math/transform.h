@@ -29,13 +29,13 @@ struct basic_transform {
 
 	transform operator*(const transform& offset) const {
 		return {
-			pos + vec2(offset.pos).rotate(rotation, vec2()),
+			pos + vec2(offset.pos).rotate(rotation),
 			rotation + offset.rotation
 		};
 	}
 
 	transform& operator*=(const transform& offset) {
-		pos += vec2(offset.pos).rotate(rotation, vec2()); 
+		pos += vec2(offset.pos).rotate(rotation); 
 		rotation += offset.rotation;
 		return *this;
 	}
@@ -175,13 +175,13 @@ struct basic_transform {
 	}
 
 	auto rotate_degrees_with_90_multiples(const R degrees, const vec2 origin) {
-		const auto delta = augs::rotate_degrees_with_90_multiples(pos, origin, degrees);
+		const auto delta = pos.rotate_degrees_with_90_multiples(degrees, origin);
 		rotation += delta;
 		return delta;
 	}
 
 	auto rotate_radians_with_90_multiples(const R radians, const vec2 origin) {
-		const auto delta = augs::rotate_radians_with_90_multiples(pos, origin, radians);
+		const auto delta = pos.rotate_radians_with_90_multiples(radians, origin);
 		rotation += delta;
 		return delta;
 	}

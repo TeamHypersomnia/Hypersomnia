@@ -36,7 +36,7 @@ void crosshair_system::generate_crosshair_intents(const logic_step step) {
 			const auto subject = cosmos[it.subject];
 
 			if (const auto crosshair = subject.find_crosshair()) {
-				const vec2 delta = vec2(vec2(it.offset) * crosshair->sensitivity).rotate(crosshair->rotation_offset, vec2());
+				const vec2 delta = vec2(vec2(it.offset) * crosshair->sensitivity).rotate(crosshair->rotation_offset);
 
 				vec2& base_offset = crosshair->base_offset;
 				const vec2 old_base_offset = base_offset;
