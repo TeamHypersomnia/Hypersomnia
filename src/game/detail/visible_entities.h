@@ -6,8 +6,7 @@
 
 struct visible_entities_query {
 	const cosmos& cosm;
-	const camera_eye cone;
-	const vec2 screen_size;
+	const camera_cone cone;
 
 	bool exact = false;
 };
@@ -51,8 +50,7 @@ entity_id get_hovered_world_entity(
 
 	entities.reacquire_all_and_sort({
 		cosm,
-		camera_eye(world_cursor_position, 1.f),
-		vec2(1, 1),
+		camera_cone(camera_eye(world_cursor_position, 1.f), vec2(1, 1)),
 		true // exact
 	});
 

@@ -72,8 +72,7 @@ public:
 	template <class F>
 	void for_each_in_camera(
 		F callback,
-		const camera_eye camera,
-		const vec2 screen_size,
+		const camera_cone cone,
 		const tree_of_npo_type type
 	) const {
 		const auto& tree = trees[type];
@@ -92,7 +91,7 @@ public:
 		};
 
 		const auto aabb_listener = render_listener{ &tree.nodes, callback };
-		const auto visible_aabb = camera.get_visible_world_rect_aabb(screen_size);
+		const auto visible_aabb = cone.get_visible_world_rect_aabb();
 
 		b2AABB input;
 		input.lowerBound = b2Vec2(visible_aabb.left_top());

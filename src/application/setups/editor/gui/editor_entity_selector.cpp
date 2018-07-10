@@ -15,14 +15,13 @@ void editor_entity_selector::clear() {
 };
 
 std::optional<ltrb> editor_entity_selector::find_screen_space_rect_selection(
-	const camera_eye& camera,
-	vec2i screen_size,
-	vec2i mouse_pos
+	const camera_cone& cone,
+	const vec2i mouse_pos
 ) const {
 	if (rectangular_drag_origin.has_value()) {
 		return ltrb::from_points(
 			mouse_pos,
-			camera.to_screen_space(screen_size, *rectangular_drag_origin)
+			cone.to_screen_space(*rectangular_drag_origin)
 		);
 	}
 
@@ -161,13 +160,13 @@ void editor_entity_selector::do_mousemotion(
 	const cosmos& cosm,
 	const editor_rect_select_type rect_select_mode,
 	const vec2 world_cursor_pos,
-	const camera_eye current_cone,
+	const camera_eye eye,
 	const bool left_button_pressed
 ) {
 	hovered = {};
 
 	auto get_world_xywh = [&](const auto icon_id, const transformr where) {
-		return xywh::center_and_size(where.pos, vec2(sizes_for_icons.at(icon_id).get_original_size()) / current_cone.zoom).expand_to_square();
+		return xywh::center_and_size(where.pos, vec2(sizes_for_icons.at(icon_id).get_original_size()) / eye.zoom).expand_to_square();
 	};
 
 	{
@@ -191,8 +190,7 @@ void editor_entity_selector::do_mousemotion(
 
 		const auto query = visible_entities_query{
 			cosm,
-			camera_eye(world_range.get_center(), 1.f),
-			world_range.get_size()
+			camera_cone(camera_eye(world_range.get_center(), 1.f), world_range.get_size())
 		};
 
 		in_rectangular_selection.acquire_non_physical(query);

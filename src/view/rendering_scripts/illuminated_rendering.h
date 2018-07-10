@@ -21,7 +21,7 @@
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
 
-#include "view/viewer_eye.h"
+#include "view/character_camera.h"
 #include "view/rendering_scripts/rendering_scripts.h"
 #include "view/rendering_scripts/illuminated_rendering.h"
 #include "view/rendering_scripts/draw_wandering_pixels_as_sprites.h"
@@ -49,7 +49,7 @@ using illuminated_rendering_fbos = all_necessary_fbos;
 using illuminated_rendering_shaders = all_necessary_shaders;
 
 struct illuminated_rendering_input {
-	const viewer_eye eye;
+	const character_camera camera;
 	const audiovisual_state& audiovisuals;
 	const game_drawing_settings drawing;
 	const necessary_images_in_atlas_map& necessary_images;
@@ -75,12 +75,11 @@ void illuminated_rendering(
 
 	auto& renderer = in.renderer;
 	
-	const auto viewed_character = in.eye.viewed_character;
-	const auto screen_size = in.eye.screen_size;
+	const auto viewed_character = in.camera.viewed_character;
 
-	const auto camera = [&in](){ 
-		auto result = in.eye.cone;
-		result.transform.pos.discard_fract();
+	const auto cone = [&in](){ 
+		auto result = in.camera.cone;
+		result.eye.transform.pos.discard_fract();
 		return result;
 	}();
 
@@ -98,7 +97,7 @@ void illuminated_rendering(
 	const auto& thunders = av.get<thunder_system>();
 	const auto global_time_seconds = cosmos.get_total_seconds_passed(in.interpolation_ratio);
 	const auto settings = in.drawing;
-	const auto matrix = camera.get_projection_matrix(screen_size);
+	const auto matrix = cone.get_projection_matrix();
 	const auto& visible = in.all_visible;
 	const auto& shaders = in.shaders;
 	const auto& fbos = in.fbos;
@@ -230,12 +229,10 @@ void illuminated_rendering(
 				output,
 				cast_highlight,
 				cosmos,
-				camera,
-				screen_size
+				cone
 			);
 		},
-		camera,
-		screen_size,
+		cone,
 		particles,
 		anims,
 		visible.per_layer,
@@ -454,8 +451,7 @@ void illuminated_rendering(
 		output,
 		renderer.specials,
 		cosmos,
-		camera,
-		screen_size
+		cone
 	);
 
 	renderer.call_and_clear_triangles();
@@ -483,8 +479,7 @@ void illuminated_rendering(
 	flying_numbers.draw_numbers(
 		gui_font,
 		output, 
-		camera,
-		screen_size
+		cone
 	);
 
 	renderer.call_and_clear_triangles();

@@ -435,16 +435,16 @@ int work(const int argc, const char* const * const argv) try {
 		return true;
 	};
 
-	static auto get_camera = []() {		
+	static auto get_camera_eye = []() {		
 		if(const auto custom = visit_current_setup(
 			[](const auto& setup) { 
-				return setup.find_current_camera(); 
+				return setup.find_current_camera_eye(); 
 			}
 		)) {
 			return *custom;
 		}
 		
-		return gameplay_camera.get_current_cone();
+		return gameplay_camera.get_current_eye();
 	};
 
 	static auto handle_app_intent = [](const app_intent_type intent) {
@@ -572,8 +572,8 @@ int work(const int argc, const char* const * const argv) try {
 
 	static visible_entities all_visible;
 
-	static auto get_viewer_eye = []() -> viewer_eye {
-		return { get_viewed_character(), get_camera(), window.get_screen_size() };
+	static auto get_character_camera = []() -> character_camera {
+		return { get_viewed_character(), { get_camera_eye(), window.get_screen_size() } };
 	};
 
 	static auto audiovisual_step = [](
@@ -611,10 +611,12 @@ int work(const int argc, const char* const * const argv) try {
 		{
 			auto scope = measure_scope(frame_performance.camera_visibility_query);
 
-			auto queried_camera = get_camera();
-			queried_camera.zoom /= viewing_config.session.camera_query_aabb_mult;
+			auto queried_eye = get_camera_eye();
+			queried_eye.zoom /= viewing_config.session.camera_query_aabb_mult;
 
-			all_visible.reacquire_all_and_sort({ viewed_character.get_cosmos(), queried_camera, screen_size, false });
+			const auto queried_cone = camera_cone(queried_eye, screen_size);
+
+			all_visible.reacquire_all_and_sort({ viewed_character.get_cosmos(), queried_cone, false });
 
 			frame_performance.num_visible_entities.measure(all_visible.all.size());
 		}
@@ -623,7 +625,7 @@ int work(const int argc, const char* const * const argv) try {
 			frame_delta,
 			speed_multiplier,
 
-			get_viewer_eye(),
+			get_character_camera(),
 			all_visible,
 
 			get_viewable_defs().particle_effects,
@@ -643,7 +645,7 @@ int work(const int argc, const char* const * const argv) try {
 				defs.particle_effects, 
 				streaming.loaded_sounds,
 				viewing_config.audio_volume,
-				get_viewer_eye()
+				get_character_camera()
 			});
 		}
 
@@ -1370,7 +1372,7 @@ int work(const int argc, const char* const * const argv) try {
 				new_viewing_config.hotbar,
 				new_viewing_config.drawing,
 				new_viewing_config.game_gui_controls,
-				get_camera(),
+				get_camera_eye(),
 				get_drawer()
 			}
 		};
@@ -1418,7 +1420,7 @@ int work(const int argc, const char* const * const argv) try {
 
 				illuminated_rendering(
 					{
-						{ viewed_character, get_camera(), screen_size },
+						{ viewed_character, camera_cone(get_camera_eye(), screen_size) },
 						audiovisuals,
 						new_viewing_config.drawing,
 						streaming.necessary_images_in_atlas,
@@ -1471,10 +1473,11 @@ int work(const int argc, const char* const * const argv) try {
 
 			if (current_setup) {
 				on_specific_setup([&](editor_setup& editor) {
-					const auto cam = get_camera();
+					const auto eye = get_camera_eye();
+					const auto cone = camera_cone(eye, screen_size);
 
-					auto on_screen = [screen_size, cam](const auto p) {
-						return cam.to_screen_space(screen_size, p);
+					auto on_screen = [cone](const auto p) {
+						return cone.to_screen_space(p);
 					};
 
 					const auto drawer = get_drawer();
@@ -1530,15 +1533,15 @@ int work(const int argc, const char* const * const argv) try {
 
 					const auto& editor_cfg = new_viewing_config.editor;
 
-					if (auto cone = editor.find_current_camera()) {
-						cone->transform.pos.discard_fract();
+					if (auto eye = editor.find_current_camera_eye()) {
+						eye->transform.pos.discard_fract();
 
 						if (const auto view = editor.find_view()) {
 							if (view->show_grid) {
 								drawer.grid(
 									screen_size,
 									view->grid.unit_pixels,
-									*cone,
+									*eye,
 									editor_cfg.grid.render
 								);
 							}
@@ -1546,7 +1549,7 @@ int work(const int argc, const char* const * const argv) try {
 
 						if (const auto selection_aabb = editor.find_selection_aabb()) {
 							drawer.border(
-								cone->to_screen_space(screen_size, *selection_aabb),
+								camera_cone(*eye, screen_size).to_screen_space(*selection_aabb),
 								white,
 								border_input { 1, -1 }
 							);

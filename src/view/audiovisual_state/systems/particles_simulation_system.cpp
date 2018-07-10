@@ -313,8 +313,7 @@ void update_component_related_cache(
 }
 
 void particles_simulation_system::advance_visible_streams(
-	const camera_eye current_cone, 
-	const vec2 screen_size,
+	const camera_cone current_cone, 
 	const cosmos& cosm,
 	const particle_effects_map& manager,
 	const plain_animations_pool& anims,
@@ -452,11 +451,13 @@ void particles_simulation_system::advance_visible_streams(
 
 	{
 		auto checked_cone = current_cone;
-		checked_cone.zoom /= 2.5f;
+		checked_cone.eye.zoom /= 2.5f;
+
+		const auto cam_aabb = checked_cone.get_visible_world_rect_aabb();
 
 		for (auto& c : fire_and_forget_emissions) { 
 			const auto where = c.transform;
-			const bool visible_in_camera = checked_cone.get_visible_world_rect_aabb(screen_size).hover(where.pos);
+			const bool visible_in_camera = cam_aabb.hover(where.pos);
 
 			advance_emissions(c.emission_instances, where, visible_in_camera, c.original);
 		}
@@ -464,7 +465,7 @@ void particles_simulation_system::advance_visible_streams(
 		for (auto& c : orbital_emissions) { 
 			const auto chase = c.chasing;
 			const auto where = find_transform(chase, cosm, interp);
-			const bool visible_in_camera = where && checked_cone.get_visible_world_rect_aabb(screen_size).hover(where->pos);
+			const bool visible_in_camera = where && cam_aabb.hover(where->pos);
 
 			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
 		}
@@ -474,7 +475,7 @@ void particles_simulation_system::advance_visible_streams(
 
 			const auto chase = c.chasing;
 			const auto where = find_transform(chase, cosm, interp);
-			const bool visible_in_camera = where && checked_cone.get_visible_world_rect_aabb(screen_size).hover(where->pos);
+			const bool visible_in_camera = where && cam_aabb.hover(where->pos);
 
 			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
 		}
@@ -484,7 +485,7 @@ void particles_simulation_system::advance_visible_streams(
 
 			const auto chase = c.chasing;
 			const auto where = find_transform(chase, cosm, interp);
-			const bool visible_in_camera = where && checked_cone.get_visible_world_rect_aabb(screen_size).hover(where->pos);
+			const bool visible_in_camera = where && cam_aabb.hover(where->pos);
 
 			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
 		}

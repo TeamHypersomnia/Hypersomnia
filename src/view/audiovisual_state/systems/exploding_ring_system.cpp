@@ -149,26 +149,27 @@ void exploding_ring_system::draw_rings(
 	const augs::drawer_with_default output,
 	augs::special_buffer& specials,
 	const cosmos&,
-	const camera_eye cone,
-	const vec2 screen_size
+	const camera_cone cone
 ) const {
+	const auto& eye = cone.eye;
+
 	for (const auto& e : rings) {
 		const auto& r = e.in;
 
 		const auto passed = global_time_seconds - e.time_of_occurence_seconds;
 		auto ratio = passed / r.maximum_duration_seconds;
 
-		const auto inner_radius_now = augs::interp(r.inner_radius_start_value, r.inner_radius_end_value, ratio) / cone.zoom;
-		const auto outer_radius_now = augs::interp(r.outer_radius_start_value, r.outer_radius_end_value, ratio) / cone.zoom;
+		const auto inner_radius_now = augs::interp(r.inner_radius_start_value, r.inner_radius_end_value, ratio) / eye.zoom;
+		const auto outer_radius_now = augs::interp(r.outer_radius_start_value, r.outer_radius_end_value, ratio) / eye.zoom;
 
 		const auto world_explosion_center = r.center;
 
 		augs::special sp;
-		sp.v1 = cone.to_screen_space(screen_size, world_explosion_center);
-		sp.v1.y = screen_size.y - sp.v1.y;
+		sp.v1 = cone.to_screen_space(world_explosion_center);
+		sp.v1.y = cone.screen_size.y - sp.v1.y;
 
-		sp.v2.x = inner_radius_now * cone.zoom * cone.zoom;
-		sp.v2.y = outer_radius_now * cone.zoom * cone.zoom;
+		sp.v2.x = inner_radius_now * eye.zoom * eye.zoom;
+		sp.v2.y = outer_radius_now * eye.zoom * eye.zoom;
 
 		const auto& vis = r.visibility;
 
@@ -213,14 +214,13 @@ void exploding_ring_system::draw_highlights_of_rings(
 	const augs::drawer output,
 	const augs::atlas_entry highlight_tex,
 	const cosmos&,
-	const camera_eye cone,
-	const vec2 /* screen_size */
+	const camera_cone cone
 ) const {
 	for (const auto& r : rings) {
 		const auto passed = global_time_seconds - r.time_of_occurence_seconds;
 		auto ratio = passed / (r.in.maximum_duration_seconds * 1.2);
 
-		const auto radius = std::max(r.in.outer_radius_end_value, r.in.outer_radius_start_value) / cone.zoom;
+		const auto radius = std::max(r.in.outer_radius_end_value, r.in.outer_radius_start_value) / cone.eye.zoom;
 		auto highlight_col = r.in.color;
 
 		const auto highlight_amount = 1.f - ratio;

@@ -13,7 +13,7 @@
 #include "game/detail/view_input/sound_effect_input.h"
 
 #include "view/audiovisual_state/systems/audiovisual_cache_common.h"
-#include "view/viewer_eye.h"
+#include "view/character_camera.h"
 #include "view/viewables/all_viewables_declarations.h"
 
 class interpolation_system;
@@ -28,7 +28,7 @@ class sound_system {
 		const augs::audio_volume_settings& settings;
 		const loaded_sounds_map& manager;
 		const interpolation_system& interp;
-		const viewer_eye ear;
+		const character_camera ear;
 		const augs::delta dt;
 
 		auto get_listener() const {

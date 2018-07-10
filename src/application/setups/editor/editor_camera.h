@@ -19,11 +19,10 @@ namespace editor_detail {
 
 	bool handle_camera_input(
 		const editor_camera_settings& settings,
-		camera_eye current_cone,
+		camera_cone current_cone,
 		const augs::event::state& common_input_state,
 		const augs::event::change e,
 		vec2 world_cursor_pos,
-		vec2i screen_size,
 		std::optional<camera_eye>& panned_camera
 	);
 }

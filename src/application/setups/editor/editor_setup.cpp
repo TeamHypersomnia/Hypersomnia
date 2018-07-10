@@ -25,8 +25,8 @@ std::optional<ltrb> editor_setup::find_screen_space_rect_selection(
 	const vec2i screen_size,
 	const vec2i mouse_pos
 ) const {
-	if (const auto cam = find_current_camera()) {
-		return selector.find_screen_space_rect_selection(*cam, screen_size, mouse_pos);
+	if (const auto eye = find_current_camera_eye()) {
+		return selector.find_screen_space_rect_selection(camera_cone(*eye, screen_size), mouse_pos);
 	}
 
 	return std::nullopt;
@@ -69,7 +69,7 @@ bool editor_setup::is_editing_mode() const {
 	return player.is_editing_mode();
 }
 
-std::optional<camera_eye> editor_setup::find_current_camera() const {
+std::optional<camera_eye> editor_setup::find_current_camera_eye() const {
 	if (anything_opened()) {
 		return editor_detail::calculate_camera(player, view(), get_matching_go_to_entity(), work());
 	}
@@ -948,14 +948,14 @@ bool editor_setup::handle_input_before_game(
 	using namespace augs::event;
 	using namespace augs::event::keys;
 
-	const auto maybe_cone = find_current_camera();
+	const auto maybe_eye = find_current_camera_eye();
 
-	if (!maybe_cone || !anything_opened()) {
+	if (!maybe_eye || !anything_opened()) {
 		return false;
 	}
 
-	const auto current_cone = *maybe_cone;
-	const auto world_cursor_pos = get_world_cursor_pos(current_cone);
+	const auto current_eye = *maybe_eye;
+	const auto world_cursor_pos = get_world_cursor_pos(current_eye);
 
 	const bool has_ctrl{ common_input_state[key::LCTRL] };
 	const bool has_shift{ common_input_state[key::LSHIFT] };
@@ -963,6 +963,7 @@ bool editor_setup::handle_input_before_game(
 	if (is_editing_mode()) {
 		auto& cosm = work().world;
 		const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
+		const auto current_cone = camera_cone(current_eye, screen_size);
 
 		if (e.was_any_key_pressed()) {
 			const auto k = e.data.key.key;
@@ -984,7 +985,6 @@ bool editor_setup::handle_input_before_game(
 			common_input_state,
 			e,
 			world_cursor_pos,
-			screen_size,
 			view().panned_camera
 		)) {
 			return true;
@@ -1000,7 +1000,7 @@ bool editor_setup::handle_input_before_game(
 				cosm,
 				view().rect_select_mode,
 				world_cursor_pos,
-				current_cone,
+				current_eye,
 				common_input_state[key::LMOUSE]
 			);
 
@@ -1096,18 +1096,18 @@ bool editor_setup::handle_input_before_game(
 }
 
 std::optional<vec2> editor_setup::find_world_cursor_pos() const {
-	if (const auto camera = find_current_camera()) {
+	if (const auto camera = find_current_camera_eye()) {
 		return get_world_cursor_pos(camera.value());
 	}
 
 	return std::nullopt;
 }
 
-vec2 editor_setup::get_world_cursor_pos(const camera_eye cone) const {
+vec2 editor_setup::get_world_cursor_pos(const camera_eye eye) const {
 	const auto mouse_pos = vec2i(ImGui::GetIO().MousePos);
 	const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
 
-	return cone.to_world_space(screen_size, mouse_pos);
+	return camera_cone(eye, screen_size).to_world_space(mouse_pos);
 }
 
 const editor_view* editor_setup::find_view() const {

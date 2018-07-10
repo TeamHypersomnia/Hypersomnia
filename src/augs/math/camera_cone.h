@@ -21,38 +21,50 @@ struct basic_camera_eye {
 		transform(transform),
 		zoom(zoom)
 	{}
-
-	vec2_type to_screen_space(const vec2_type screen_size, const vec2_type world_pos) const {
-		// TODO: support rotation
-		return zoom * (world_pos - transform.pos) + screen_size / 2;
-	}
-
-	ltrb to_screen_space(const vec2_type screen_size, const ltrb r) const {
-		// TODO: support rotation
-		return { to_screen_space(screen_size, r.get_position()), r.get_size() * zoom };
-	}
-
-	auto get_visible_world_area(const vec2_type screen_size) const {
-		return screen_size / zoom;
-	}
-
-	ltrb get_visible_world_rect_aabb(const vec2_type screen_size) const {
-		const auto visible_world_area = get_visible_world_area(screen_size);
-		return augs::get_aabb_rotated(visible_world_area, transform.rotation) + transform.pos - visible_world_area / 2;
-	}
-	
-	auto get_projection_matrix(const vec2_type screen_size) const {
-		// TODO: support rotation
-		return augs::orthographic_projection(get_visible_world_rect_aabb(screen_size));
-	}
-
-	vec2_type to_world_space(
-		const vec2_type screen_size,
-		const vec2_type cursor_pos
-	) const {
-		// TODO: support rotation
-		return transform.pos + (cursor_pos - screen_size / 2) / zoom;
-	}
 };
 
 using camera_eye = basic_camera_eye<float>;
+
+struct camera_cone {
+	using vec2_type = camera_eye::vec2_type;
+
+	camera_eye eye;
+	vec2i screen_size;
+
+	camera_cone(
+		const camera_eye eye,
+		const vec2i screen_size
+	) : 
+		eye(eye),
+		screen_size(screen_size)
+	{}
+
+	vec2_type to_screen_space(const vec2_type world_pos) const {
+		// TODO: support rotation
+		return eye.zoom * (world_pos - eye.transform.pos) + screen_size / 2;
+	}
+
+	ltrb to_screen_space(const ltrb r) const {
+		// TODO: support rotation
+		return { to_screen_space(r.get_position()), r.get_size() * eye.zoom };
+	}
+
+	auto get_visible_world_area() const {
+		return vec2_type(screen_size) / eye.zoom;
+	}
+
+	ltrb get_visible_world_rect_aabb() const {
+		const auto visible_world_area = get_visible_world_area();
+		return augs::get_aabb_rotated(visible_world_area, eye.transform.rotation) + eye.transform.pos - visible_world_area / 2;
+	}
+	
+	auto get_projection_matrix() const {
+		// TODO: support rotation
+		return augs::orthographic_projection(get_visible_world_rect_aabb());
+	}
+
+	vec2_type to_world_space(const vec2_type cursor_pos) const {
+		// TODO: support rotation
+		return eye.transform.pos + (cursor_pos - screen_size / 2) / eye.zoom;
+	}
+};

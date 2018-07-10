@@ -22,12 +22,12 @@ template <class T>
 constexpr bool has_x_and_y_v = has_x_and_y<T>::value;
 
 namespace augs {
-	template <class T>
-	basic_ltrb<T> get_aabb_rotated(const basic_vec2<T> initial_size, const T rotation) {
+	template <class T, class D>
+	basic_ltrb<T> get_aabb_rotated(const basic_vec2<T> initial_size, const D degrees) {
 		auto verts = basic_ltrb<T>(0, 0, initial_size.x, initial_size.y).template get_vertices<T>();
 
 		for (auto& v : verts) {
-			v.rotate(rotation, initial_size / 2);
+			v.rotate(degrees, initial_size / 2);
 		}
 
 		/* expanded aabb that takes rotation into consideration */

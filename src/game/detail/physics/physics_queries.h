@@ -117,11 +117,10 @@ template <class F>
 void for_each_in_camera(
 	const b2World& b2world,
 	const si_scaling si,
-	const camera_eye camera,
-	const vec2 screen_size,
+	const camera_cone cone,
 	F callback
 ) {
-	const auto visible_aabb = camera.get_visible_world_rect_aabb(screen_size);
+	const auto visible_aabb = cone.get_visible_world_rect_aabb();
 
 	for_each_in_aabb(
 		b2world,

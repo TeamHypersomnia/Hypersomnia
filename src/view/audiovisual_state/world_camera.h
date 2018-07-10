@@ -32,8 +32,8 @@ struct world_camera {
 
 	augs::smooth_value_field additional_position_smoothing;
 
-	auto get_current_cone() const {
-		return current_cone;
+	auto get_current_eye() const {
+		return current_eye;
 	}
 
 	void tick(
@@ -51,5 +51,5 @@ struct world_camera {
 	) const;
 
 private:
-	camera_eye current_cone;
+	camera_eye current_eye;
 };

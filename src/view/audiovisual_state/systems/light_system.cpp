@@ -103,10 +103,13 @@ void light_system::render_all_lights(const light_system_input in) const {
 	std::vector<messages::visibility_information_request> requests;
 	std::vector<messages::visibility_information_response> responses;
 
-	light_shader.set_projection(in.camera.get_projection_matrix(in.screen_size));
-	light_shader.set_uniform(light_distance_mult_uniform, 1.f / in.camera.zoom);
+	const auto cone = in.cone;
+	const auto eye = cone.eye;
 
-	const auto camera_aabb = in.camera.get_visible_world_rect_aabb(in.screen_size);
+	light_shader.set_projection(in.cone.get_projection_matrix());
+	light_shader.set_uniform(light_distance_mult_uniform, 1.f / eye.zoom);
+
+	const auto camera_aabb = cone.get_visible_world_rect_aabb();
 
 	auto draw_layer = [&](const render_layer r) {
 		for (const auto e : visible_per_layer[r]) {
@@ -214,8 +217,8 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 		const auto& cache = per_entity_cache.at(light_entity);
 
-		auto light_frag_pos = in.camera.to_screen_space(in.screen_size, world_light_pos);
-		light_frag_pos.y = in.screen_size.y - light_frag_pos.y;
+		auto light_frag_pos = cone.to_screen_space(world_light_pos);
+		light_frag_pos.y = cone.screen_size.y - light_frag_pos.y;
 
 		light_shader.set_uniform(light_pos_uniform, light_frag_pos);
 		

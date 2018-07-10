@@ -17,7 +17,7 @@
 
 #include "augs/audio/audio_settings.h"
 
-#include "view/viewer_eye.h"
+#include "view/character_camera.h"
 #include "view/audiovisual_state/systems/interpolation_settings.h"
 
 #include "view/audiovisual_state/all_audiovisual_systems.h"
@@ -30,14 +30,14 @@ struct audiovisual_post_solve_input {
 	const particle_effects_map& particle_effects;
 	const loaded_sounds_map& sounds;
 	const augs::audio_volume_settings audio_volume;
-	const viewer_eye eye;
+	const character_camera camera;
 };
 
 struct audiovisual_advance_input {
 	const augs::delta frame_delta;
 	const double speed_multiplier;
 
-	const viewer_eye eye;
+	const character_camera camera;
 
 	const visible_entities& all_visible;
 	const particle_effects_map& particle_effects;

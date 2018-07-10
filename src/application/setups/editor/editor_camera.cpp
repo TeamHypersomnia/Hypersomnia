@@ -66,17 +66,17 @@ namespace editor_detail {
 
 	bool handle_camera_input(
 		const editor_camera_settings& settings,
-		camera_eye current_cone,
+		camera_cone cone,
 		const augs::event::state& common_input_state,
 		const augs::event::change e,
 		const vec2 world_cursor_pos,
-		const vec2i screen_size,
 		std::optional<camera_eye>& panned_camera
 	) {
 		using namespace augs::event;
 		using namespace augs::event::keys;
 
-		const auto world_screen_center = current_cone.to_world_space(screen_size, screen_size/2);
+		const auto screen_size = cone.screen_size;
+		const auto world_screen_center = cone.to_world_space(screen_size/2);
 
 		const bool has_shift{ common_input_state[key::LSHIFT] };
 		const bool has_alt{ common_input_state[key::LALT] };
@@ -111,7 +111,7 @@ namespace editor_detail {
 
 		auto pan_scene = [&](const auto amount) {
 			if (!panned_camera.has_value()) {
-				panned_camera = current_cone;
+				panned_camera = cone.eye;
 			}
 
 			auto& camera = *panned_camera;
@@ -119,9 +119,9 @@ namespace editor_detail {
 			camera.transform.pos -= pan_mult * amount / camera.zoom;
 		};
 
-		auto zoom_scene = [&panned_camera, &current_cone, zoom_mult](const auto zoom_amount, const auto zoom_point) {
+		auto zoom_scene = [&panned_camera, &cone, zoom_mult](const auto zoom_amount, const auto zoom_point) {
 			if (!panned_camera.has_value()) {
-				panned_camera = current_cone;
+				panned_camera = cone.eye;
 			}
 
 			auto& camera = *panned_camera;

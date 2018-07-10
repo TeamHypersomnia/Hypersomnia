@@ -104,20 +104,21 @@ void editor_coordinates_gui::perform(
 	const auto settings = setup.settings;
 	auto& v = setup.view();
 
-	if (const auto current_cone = setup.find_current_camera()) {
-		const auto world_cursor_pos = current_cone->to_world_space(screen_size, mouse_pos);
+	if (const auto current_eye = setup.find_current_camera_eye()) {
+		const auto cone = camera_cone(*current_eye, screen_size);
+		const auto world_cursor_pos = cone.to_world_space(mouse_pos);
 
 		text("Grid size: %x/%x", v.grid.unit_pixels, settings.grid.render.get_maximum_unit());
 
 		text("Cursor: %x", world_cursor_pos);
-		text("View center: %x", vec2(current_cone->transform.pos).discard_fract());
+		text("View center: %x", vec2(current_eye->transform.pos).discard_fract());
 
 		{
-			auto zoom = current_cone->zoom * 100.f;
+			auto zoom = current_eye->zoom * 100.f;
 
 			if (slider("Zoom: ", zoom, 1.f, 1000.f, "%.3f%%")) {
 				if (!v.panned_camera.has_value()) {
-					v.panned_camera = current_cone;
+					v.panned_camera = current_eye;
 				}
 
 				zoom = std::clamp(zoom, 1.f, 1000.f);

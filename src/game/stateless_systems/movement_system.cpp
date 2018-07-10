@@ -224,13 +224,13 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				auto chosen_effect = common_assets.standard_footstep;
 				
 				{
-					const auto queried_camera = camera_eye { effect_transform, 1.f };
+					const auto queried_eye = camera_eye { effect_transform, 1.f };
+					const auto queried_camera = camera_cone(queried_eye, vec2i(1, 1));
 
 					/* Choose effect based on where the foot has landed */
 					const auto visible = visible_entities().reacquire_all_and_sort({
 						cosmos,
-						queried_camera,
-						vec2i(1, 1)
+						queried_camera
 					}).per_layer;
 
 					const std::array<render_layer, 7> checked_layers = {

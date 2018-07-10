@@ -36,13 +36,13 @@ void world_camera::tick(
 			return cone;
 		}
 
-		return current_cone;
+		return current_eye;
 	}();
 
 	const vec2 camera_crosshair_offset = get_camera_offset_due_to_character_crosshair(entity_to_chase, settings, screen_size);
 
-	current_cone = target_cone;
-	current_cone.transform.pos += camera_crosshair_offset;
+	current_eye = target_cone;
+	current_eye.transform.pos += camera_crosshair_offset;
 
 	if (enable_smoothing) {
 		/* variable time step target_cone smoothing by averaging last position with the current */
@@ -69,15 +69,15 @@ void world_camera::tick(
 		//if (int(calculated_smoothed_rotation) == int(smoothed_camera_eye.rotation))
 		//	last_interpolant.rotation = smoothed_camera_eye.rotation;
 
-		if (calculated_smoothed_pos.compare_abs(current_cone.transform.pos, 1.f)) {
+		if (calculated_smoothed_pos.compare_abs(current_eye.transform.pos, 1.f)) {
 			last_interpolant.pos = smoothed_part;
 		}
-		if (std::abs(calculated_smoothed_rotation - current_cone.transform.rotation) < 1.f) {
-			last_interpolant.rotation = current_cone.transform.rotation;
+		if (std::abs(calculated_smoothed_rotation - current_eye.transform.rotation) < 1.f) {
+			last_interpolant.rotation = current_eye.transform.rotation;
 		}
 
-		current_cone.transform.pos = calculated_smoothed_pos;
-		current_cone.transform.rotation = static_cast<float>(calculated_smoothed_rotation);
+		current_eye.transform.pos = calculated_smoothed_pos;
+		current_eye.transform.rotation = static_cast<float>(calculated_smoothed_rotation);
 	}
 
 	if (entity_to_chase.alive()) {
@@ -121,10 +121,10 @@ void world_camera::tick(
 	}
 
 	if (enable_smoothing) {
-		current_cone.transform.pos = vec2(current_cone.transform.pos + additional_position_smoothing.value);
+		current_eye.transform.pos = vec2(current_eye.transform.pos + additional_position_smoothing.value);
 	}
 	else {
-		current_cone.transform.pos = vec2(current_cone.transform.pos);
+		current_eye.transform.pos = vec2(current_eye.transform.pos);
 	}
 
 	dont_smooth_once = false;
@@ -152,7 +152,7 @@ vec2 world_camera::get_camera_offset_due_to_character_crosshair(
 			if (crosshair->orbit_mode == crosshair_orbit_type::LOOK) {
 				/* simple proportion */
 				camera_crosshair_offset /= crosshair->base_offset_bound;
-				camera_crosshair_offset *= current_cone.get_visible_world_area(screen_size) * settings.look_bound_expand;
+				camera_crosshair_offset *= camera_cone(current_eye, screen_size).get_visible_world_area() * settings.look_bound_expand;
 			}
 		}
 	}

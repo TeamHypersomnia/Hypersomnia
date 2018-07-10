@@ -310,7 +310,7 @@ public:
 	void finish_rectangular_selection();
 	void unhover();
 	bool is_editing_mode() const;
-	std::optional<camera_eye> find_current_camera() const; 
+	std::optional<camera_eye> find_current_camera_eye() const; 
 
 	std::optional<ltrb> find_screen_space_rect_selection(vec2i screen_size, vec2i mouse_pos) const;
 

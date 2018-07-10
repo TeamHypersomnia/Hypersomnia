@@ -36,16 +36,14 @@ public:
 		const augs::drawer_with_default output,
 		augs::special_buffer& specials,
 		const cosmos& cosmos,
-		const camera_eye cone,
-		const vec2 screen_size
+		const camera_cone cone
 	) const;
 
 	void draw_highlights_of_rings(
 		const augs::drawer output,
 		const augs::atlas_entry highlight_tex,
 		const cosmos& cosmos,
-		const camera_eye cone,
-		const vec2 screen_size
+		const camera_cone cone
 	) const;
 
 	void reserve_caches_for_entities(const size_t) const {}

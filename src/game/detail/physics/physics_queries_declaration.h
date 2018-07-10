@@ -42,8 +42,7 @@ template <class F>
 void for_each_in_camera(
 	const b2World& b2world,
 	const si_scaling si,
-	const camera_eye camera,
-	const vec2 screen_size,
+	const camera_cone cone,
 	F callback
 );
 

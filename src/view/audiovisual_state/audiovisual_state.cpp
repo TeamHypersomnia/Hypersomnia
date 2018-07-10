@@ -34,9 +34,8 @@ void audiovisual_state::reserve_caches_for_entities(const std::size_t n) {
 void audiovisual_state::advance(const audiovisual_advance_input input) {
 	auto scope = measure_scope(performance.advance);
 
-	const auto screen_size = input.eye.screen_size;
-	const auto viewed_character = input.eye.viewed_character;
-	const auto cone = input.eye.cone;
+	const auto viewed_character = input.camera.viewed_character;
+	const auto cone = input.camera.cone;
 	const auto& cosm = viewed_character.get_cosmos();
 	const auto dt = augs::delta(input.frame_delta) *= input.speed_multiplier;
 	const auto& anims = input.plain_animations;
@@ -74,7 +73,6 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 
 			particles.advance_visible_streams(
 				cone,
-				screen_size,
 				cosm,
 				input.particle_effects,
 				anims,
@@ -104,8 +102,8 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	if (viewed_character) {
 		auto scope = measure_scope(performance.sound_logic);
 
-		auto ear = input.eye;
-		ear.cone.transform = viewed_character.get_viewing_transform(interp);
+		auto ear = input.camera;
+		ear.cone.eye.transform = viewed_character.get_viewing_transform(interp);
 		
 		sounds.update_sound_properties(
 			{
@@ -187,24 +185,26 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 
 	particles.update_effects_from_messages(step, input.particle_effects, interp);
 
-	auto ear = input.eye;
+	{
+		auto ear = input.camera;
 
-	if (const auto viewed_character = ear.viewed_character) {
-		if (const auto transform = viewed_character.find_viewing_transform(interp)) {
-			ear.cone.transform = *transform;
+		if (const auto viewed_character = ear.viewed_character) {
+			if (const auto transform = viewed_character.find_viewing_transform(interp)) {
+				ear.cone.eye.transform = *transform;
+			}
 		}
+
+		sounds.update_effects_from_messages(
+			step, 
+			{
+				input.audio_volume,
+				input.sounds, 
+				interp, 
+				ear,
+				augs::delta::zero
+			}
+		);
 	}
-
-	sounds.update_effects_from_messages(
-		step, 
-		{
-			input.audio_volume,
-			input.sounds, 
-			interp, 
-			ear,
-			augs::delta::zero
-		}
-	);
 
 	for (const auto& h : healths) {
 		flying_number_indicator_system::number::input vn;
