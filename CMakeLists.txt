@@ -617,6 +617,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/detail/organisms/startle_nearbly_organisms.cpp"
 	"src/game/stateless_systems/remnant_system.cpp"
 	"src/view/audiovisual_state/systems/randomizing_system.cpp"
+	"src/application/main/draw_debug_lines.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

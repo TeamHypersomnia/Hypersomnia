@@ -1414,13 +1414,15 @@ int work(const int argc, const char* const * const argv) try {
 		if (const auto& viewed_cosmos = viewed_character.get_cosmos();
 			std::addressof(viewed_cosmos) != std::addressof(cosmos::zero)
 		) {
+			const auto cone = camera_cone(get_camera_eye(), screen_size);
+
 			{
 				/* #1 */
 				auto scope = measure_scope(frame_performance.rendering_script);
 
 				illuminated_rendering(
 					{
-						{ viewed_character, camera_cone(get_camera_eye(), screen_size) },
+						{ viewed_character, cone },
 						audiovisuals,
 						new_viewing_config.drawing,
 						streaming.necessary_images_in_atlas,
@@ -1456,7 +1458,9 @@ int work(const int argc, const char* const * const argv) try {
 					viewed_cosmos,
 					renderer,
 					interpolation_ratio,
-					get_drawer().default_texture
+					get_drawer().default_texture,
+					new_viewing_config,
+					cone
 				);
 			}
 
@@ -1473,9 +1477,6 @@ int work(const int argc, const char* const * const argv) try {
 
 			if (current_setup) {
 				on_specific_setup([&](editor_setup& editor) {
-					const auto eye = get_camera_eye();
-					const auto cone = camera_cone(eye, screen_size);
-
 					auto on_screen = [cone](const auto p) {
 						return cone.to_screen_space(p);
 					};
