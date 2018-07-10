@@ -51,5 +51,5 @@ struct world_camera {
 	) const;
 
 private:
-	camera_cone current_cone;
+	camera_eye current_cone;
 };

@@ -156,7 +156,7 @@ public:
 		return dependencies.interpolation;
 	}
 
-	camera_cone get_camera_cone() const {
+	camera_eye get_camera_eye() const {
 		return dependencies.camera;
 	}
 

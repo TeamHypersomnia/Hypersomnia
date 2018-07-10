@@ -30,7 +30,7 @@ void editor_view::reset_zoom_at(vec2 pos) {
 
 void editor_view::center_at(vec2 pos) {
 	if (!panned_camera) {
-		panned_camera = camera_cone();
+		panned_camera = camera_eye();
 	}
 
 	panned_camera->transform.pos = pos.discard_fract();

@@ -33,7 +33,7 @@ struct editor_view {
 	editor_selection_groups selection_groups;
 	current_selections_type selected_entities;
 
-	std::optional<camera_cone> panned_camera;
+	std::optional<camera_eye> panned_camera;
 	// END GEN INTROSPECTOR
 
 	void reset_zoom();

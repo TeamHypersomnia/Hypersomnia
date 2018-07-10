@@ -16,7 +16,7 @@ void startle_nearby_organisms(
 	neighbors.clear();
 	neighbors.acquire_non_physical({
 		cosm,
-		camera_cone(startle_origin),
+		camera_eye(startle_origin),
 		vec2::square(startle_radius * 2),
 
 		false

@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/drawing/flip.h"
 #include "augs/drawing/drawing.h"
+#include "augs/math/camera_cone.h"
 
 class interpolation_system;
 struct randomizing_system;

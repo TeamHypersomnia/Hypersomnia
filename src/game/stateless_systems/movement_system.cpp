@@ -224,7 +224,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				auto chosen_effect = common_assets.standard_footstep;
 				
 				{
-					const auto queried_camera = camera_cone { effect_transform, 1.f };
+					const auto queried_camera = camera_eye { effect_transform, 1.f };
 
 					/* Choose effect based on where the foot has landed */
 					const auto visible = visible_entities().reacquire_all_and_sort({

@@ -33,7 +33,7 @@ void flying_number_indicator_system::advance(const augs::delta dt) {
 void flying_number_indicator_system::draw_numbers(
 	const augs::baked_font& font,
 	const augs::drawer output,
-	const camera_cone camera,
+	const camera_eye camera,
 	const vec2 screen_size
 ) const {
 	for (const auto& r : numbers) {

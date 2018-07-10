@@ -5,16 +5,16 @@
 #include "augs/math/matrix.h"
 
 template <class T>
-struct basic_camera_cone {
+struct basic_camera_eye {
 	using vec2_type = basic_vec2<T>;
 	using ltrb = basic_ltrb<T>;
 
-	// GEN INTROSPECTOR struct basic_camera_cone class T
+	// GEN INTROSPECTOR struct basic_camera_eye class T
 	basic_transform<T> transform;
 	T zoom;
 	// END GEN INTROSPECTOR
 
-	basic_camera_cone(
+	basic_camera_eye(
 		const basic_transform<T>& transform = basic_transform<T>(),
 		const T zoom = 1.f
 	) : 
@@ -55,4 +55,4 @@ struct basic_camera_cone {
 	}
 };
 
-using camera_cone = basic_camera_cone<float>;
+using camera_eye = basic_camera_eye<float>;

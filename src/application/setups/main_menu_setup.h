@@ -141,7 +141,7 @@ public:
 		return;
 	}
 
-	std::optional<camera_cone> find_current_camera() const {
+	std::optional<camera_eye> find_current_camera() const {
 		return std::nullopt;
 	}
 

@@ -1099,3 +1099,16 @@ we consider whole type overrides too complex architeciturally:
 - Remove the need to specify all frames in test scene images
 	- As well as in test animations
 
+
+- it would be nice to store the sprite size information per entity
+	- Solution: Store overridden size as a value with flag in a separate component.
+		- Pro: On changed texture, size in invariant is updated as always, whereas overridden sizes are left untouched.
+			- Pro: literally no change to the update logic!
+		- Pro: fastest condition resolution as it it will require only a boolean check.
+		- Will be set in editor whenever dragging happens.
+	- Solution: Infer physical shape from overridden size, invariants::sprite::size and polygonal shape specified in the image's logical asset.
+		- Just partition image's polygonal shapes into convexes when writing to logical assets, to speed up reinference.
+		- Only infer from shape polygon if it exists as a component.
+			- Then it will probably also be a vector.
+		- Don't store shape invariant in things like character, item, plain sprited body.
+	- In crosshair component, size for appearance is anyway not needed and the original one will be passed in the drawing code.

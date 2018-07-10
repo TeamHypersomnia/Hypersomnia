@@ -149,7 +149,7 @@ void exploding_ring_system::draw_rings(
 	const augs::drawer_with_default output,
 	augs::special_buffer& specials,
 	const cosmos&,
-	const camera_cone cone,
+	const camera_eye cone,
 	const vec2 screen_size
 ) const {
 	for (const auto& e : rings) {
@@ -213,7 +213,7 @@ void exploding_ring_system::draw_highlights_of_rings(
 	const augs::drawer output,
 	const augs::atlas_entry highlight_tex,
 	const cosmos&,
-	const camera_cone cone,
+	const camera_eye cone,
 	const vec2 /* screen_size */
 ) const {
 	for (const auto& r : rings) {

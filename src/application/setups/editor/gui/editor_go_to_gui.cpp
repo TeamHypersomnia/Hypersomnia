@@ -45,7 +45,7 @@ void standard_confirm_go_to(const const_entity_handle match, const bool has_ctrl
 		}
 
 		if (!view.panned_camera.has_value()) {
-			view.panned_camera = camera_cone();
+			view.panned_camera = camera_eye();
 		}
 
 		if (const auto transform = match.find_logic_transform()) {

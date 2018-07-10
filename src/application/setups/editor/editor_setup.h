@@ -310,7 +310,7 @@ public:
 	void finish_rectangular_selection();
 	void unhover();
 	bool is_editing_mode() const;
-	std::optional<camera_cone> find_current_camera() const; 
+	std::optional<camera_eye> find_current_camera() const; 
 
 	std::optional<ltrb> find_screen_space_rect_selection(vec2i screen_size, vec2i mouse_pos) const;
 
@@ -436,7 +436,7 @@ public:
 	}
 
 	std::optional<vec2> find_world_cursor_pos() const;
-	vec2 get_world_cursor_pos(const camera_cone) const;
+	vec2 get_world_cursor_pos(const camera_eye) const;
 
 	augs::path_type get_unofficial_content_dir() const;
 };

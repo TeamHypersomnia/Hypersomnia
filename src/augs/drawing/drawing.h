@@ -153,7 +153,7 @@ namespace augs {
 			atlas_entry,
 			vec2i screen_size,
 			unsigned unit,
-			camera_cone,
+			camera_eye,
 			const grid_render_settings&
 		) const;
 

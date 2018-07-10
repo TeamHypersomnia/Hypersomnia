@@ -36,7 +36,7 @@ public:
 		const augs::drawer_with_default output,
 		augs::special_buffer& specials,
 		const cosmos& cosmos,
-		const camera_cone cone,
+		const camera_eye cone,
 		const vec2 screen_size
 	) const;
 
@@ -44,7 +44,7 @@ public:
 		const augs::drawer output,
 		const augs::atlas_entry highlight_tex,
 		const cosmos& cosmos,
-		const camera_cone cone,
+		const camera_eye cone,
 		const vec2 screen_size
 	) const;
 

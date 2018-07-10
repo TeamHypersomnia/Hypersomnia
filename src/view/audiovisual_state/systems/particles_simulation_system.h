@@ -218,7 +218,7 @@ public:
 	);
 
 	void advance_visible_streams(
-		camera_cone,
+		camera_eye,
 		vec2 screen_size,
 		const cosmos&,
 		const particle_effects_map&,

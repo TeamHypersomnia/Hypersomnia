@@ -313,7 +313,7 @@ namespace augs {
 		const atlas_entry tex,
 		const vec2i screen_size,
 		const unsigned minimum_unit,
-		const camera_cone cone,
+		const camera_eye cone,
 		const grid_render_settings& settings
 	) const {
 		const auto cols = [&settings]() {

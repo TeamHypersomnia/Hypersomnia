@@ -69,7 +69,7 @@ bool editor_setup::is_editing_mode() const {
 	return player.is_editing_mode();
 }
 
-std::optional<camera_cone> editor_setup::find_current_camera() const {
+std::optional<camera_eye> editor_setup::find_current_camera() const {
 	if (anything_opened()) {
 		return editor_detail::calculate_camera(player, view(), get_matching_go_to_entity(), work());
 	}
@@ -1103,7 +1103,7 @@ std::optional<vec2> editor_setup::find_world_cursor_pos() const {
 	return std::nullopt;
 }
 
-vec2 editor_setup::get_world_cursor_pos(const camera_cone cone) const {
+vec2 editor_setup::get_world_cursor_pos(const camera_eye cone) const {
 	const auto mouse_pos = vec2i(ImGui::GetIO().MousePos);
 	const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
 

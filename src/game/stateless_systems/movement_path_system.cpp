@@ -74,7 +74,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 					neighbors.clear();
 					neighbors.acquire_non_physical({
 						cosm,
-						camera_cone(tip_pos),
+						camera_eye(tip_pos),
 						vec2::square(radius * 2),
 
 						false

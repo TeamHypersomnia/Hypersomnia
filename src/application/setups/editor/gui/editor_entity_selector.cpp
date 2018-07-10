@@ -15,7 +15,7 @@ void editor_entity_selector::clear() {
 };
 
 std::optional<ltrb> editor_entity_selector::find_screen_space_rect_selection(
-	const camera_cone& camera,
+	const camera_eye& camera,
 	vec2i screen_size,
 	vec2i mouse_pos
 ) const {
@@ -161,7 +161,7 @@ void editor_entity_selector::do_mousemotion(
 	const cosmos& cosm,
 	const editor_rect_select_type rect_select_mode,
 	const vec2 world_cursor_pos,
-	const camera_cone current_cone,
+	const camera_eye current_cone,
 	const bool left_button_pressed
 ) {
 	hovered = {};
@@ -191,7 +191,7 @@ void editor_entity_selector::do_mousemotion(
 
 		const auto query = visible_entities_query{
 			cosm,
-			camera_cone(world_range.get_center(), 1.f),
+			camera_eye(world_range.get_center(), 1.f),
 			world_range.get_size()
 		};
 

@@ -537,7 +537,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 		);
 	}
 	else {
-		const auto camera = context.get_camera_cone();
+		const auto camera = context.get_camera_eye();
 		const auto world_cursor_pos = camera.to_world_space(screen_size, context.get_input_state().mouse.pos);
 
 		const auto hovered = cosmos[get_hovered_world_entity(cosmos, world_cursor_pos)];
@@ -548,7 +548,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 					output, 
 					hovered, 
 					context.get_interpolation_system(), 
-					context.get_camera_cone(),
+					context.get_camera_eye(),
 					screen_size
 				});
 			}

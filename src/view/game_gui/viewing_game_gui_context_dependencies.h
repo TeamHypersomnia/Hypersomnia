@@ -19,6 +19,6 @@ struct viewing_game_gui_context_dependencies {
 	const hotbar_settings hotbar;
 	const game_drawing_settings settings;
 	const game_gui_intent_map input_information;
-	const camera_cone camera;
+	const camera_eye camera;
 	const augs::drawer_with_default output;
 };

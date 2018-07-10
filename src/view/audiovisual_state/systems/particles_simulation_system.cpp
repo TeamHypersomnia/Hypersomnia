@@ -313,7 +313,7 @@ void update_component_related_cache(
 }
 
 void particles_simulation_system::advance_visible_streams(
-	const camera_cone current_cone, 
+	const camera_eye current_cone, 
 	const vec2 screen_size,
 	const cosmos& cosm,
 	const particle_effects_map& manager,

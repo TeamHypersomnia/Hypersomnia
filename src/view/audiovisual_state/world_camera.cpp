@@ -28,7 +28,7 @@ void world_camera::tick(
 	const auto target_cone = [&]() {
 		/* we obtain transform as a copy because we'll be now offsetting it by crosshair position */
 		if (entity_to_chase.alive()) {
-			auto cone = camera_cone();
+			auto cone = camera_eye();
 
 			cone.transform = entity_to_chase.get_viewing_transform(interp);
 			cone.transform.rotation = 0;
@@ -60,14 +60,14 @@ void world_camera::tick(
 		last_interpolant.pos = augs::interp(vec2d(last_interpolant.pos), vec2d(smoothed_part), averaging_constant);
 		last_interpolant.rotation = augs::interp(last_interpolant.rotation, target_cone.transform.rotation, averaging_constant);
 
-																	   //if ((smoothed_camera_transform.pos - last_interpolant.pos).length() > 5)
+																	   //if ((smoothed_camera_eye.pos - last_interpolant.pos).length() > 5)
 		const vec2 calculated_smoothed_pos = static_cast<vec2>(target_pos - smoothed_part) + last_interpolant.pos;
 		const int calculated_smoothed_rotation = static_cast<int>(last_interpolant.rotation);
 
-		//if (vec2(calculated_smoothed_pos) == vec2(smoothed_camera_transform.pos))
+		//if (vec2(calculated_smoothed_pos) == vec2(smoothed_camera_eye.pos))
 		//	last_interpolant.pos = smoothed_part;
-		//if (int(calculated_smoothed_rotation) == int(smoothed_camera_transform.rotation))
-		//	last_interpolant.rotation = smoothed_camera_transform.rotation;
+		//if (int(calculated_smoothed_rotation) == int(smoothed_camera_eye.rotation))
+		//	last_interpolant.rotation = smoothed_camera_eye.rotation;
 
 		if (calculated_smoothed_pos.compare_abs(current_cone.transform.pos, 1.f)) {
 			last_interpolant.pos = smoothed_part;

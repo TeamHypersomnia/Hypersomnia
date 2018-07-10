@@ -6,7 +6,7 @@
 #include "application/setups/editor/editor_settings.h"
 
 namespace editor_detail {
-	std::optional<camera_cone> calculate_camera(
+	std::optional<camera_eye> calculate_camera(
 		const editor_player& player,
 		const editor_view& view,
 		const_entity_handle matching_go_to_entity,
@@ -23,7 +23,7 @@ namespace editor_detail {
 
 		if (player.is_editing_mode()) {
 			if (const auto match = matching_go_to_entity) {
-				camera_cone centered_on_match;
+				camera_eye centered_on_match;
 
 				if (panning) {
 					/* Propagate zoom taken from custom panning */
@@ -44,13 +44,13 @@ namespace editor_detail {
 			}
 
 			if (viewed_transform) {
-				camera_cone centered_on_viewed;
+				camera_eye centered_on_viewed;
 				centered_on_viewed.transform.pos = viewed_transform->pos;
 
 				return centered_on_viewed;
 			}
 
-			return camera_cone();
+			return camera_eye();
 		}
 
 		if (panning) {
@@ -58,7 +58,7 @@ namespace editor_detail {
 		}
 
 		if (!viewed_character) {
-			return camera_cone();
+			return camera_eye();
 		}
 
 		return std::nullopt;
@@ -66,12 +66,12 @@ namespace editor_detail {
 
 	bool handle_camera_input(
 		const editor_camera_settings& settings,
-		camera_cone current_cone,
+		camera_eye current_cone,
 		const augs::event::state& common_input_state,
 		const augs::event::change e,
 		const vec2 world_cursor_pos,
 		const vec2i screen_size,
-		std::optional<camera_cone>& panned_camera
+		std::optional<camera_eye>& panned_camera
 	) {
 		using namespace augs::event;
 		using namespace augs::event::keys;

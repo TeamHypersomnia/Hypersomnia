@@ -11,7 +11,7 @@ struct aabb_highlighter_drawing_input {
 	const augs::drawer_with_default output;
 	const const_entity_handle subject;
 	const interpolation_system& interp;
-	const camera_cone camera;
+	const camera_eye camera;
 	const vec2 screen_size;
 };
 

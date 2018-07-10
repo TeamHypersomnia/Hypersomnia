@@ -72,7 +72,7 @@ public:
 	template <class F>
 	void for_each_in_camera(
 		F callback,
-		const camera_cone camera,
+		const camera_eye camera,
 		const vec2 screen_size,
 		const tree_of_npo_type type
 	) const {

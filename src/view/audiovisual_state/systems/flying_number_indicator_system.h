@@ -44,7 +44,7 @@ public:
 	void draw_numbers(
 		const augs::baked_font& font,
 		const augs::drawer output,
-		const camera_cone,
+		const camera_eye,
 		const vec2 screen_size
 	) const;
 };

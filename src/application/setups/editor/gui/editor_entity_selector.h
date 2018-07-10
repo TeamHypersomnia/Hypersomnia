@@ -94,7 +94,7 @@ public:
 	}
 
 	std::optional<ltrb> find_screen_space_rect_selection(
-		const camera_cone& in,
+		const camera_eye& in,
 		vec2i screen_size,
 		vec2i mouse_pos
 	) const;
@@ -105,7 +105,7 @@ public:
 		const cosmos& cosm,
 		const editor_rect_select_type rect_select_mode,
 		vec2 world_cursor_pos,
-		camera_cone current_cone,
+		camera_eye current_cone,
 		bool left_button_pressed
 	);
 
