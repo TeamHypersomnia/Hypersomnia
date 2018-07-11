@@ -104,6 +104,13 @@ namespace test_scenes {
 	entity_id testbed::populate(const loaded_image_caches_map& caches, const logic_step step) const {
 		auto& world = step.get_cosmos();
 		
+		auto create = [&](auto&&... args) {
+			return create_test_scene_entity(world, std::forward<decltype(args)>(args)...);
+		};
+
+		const auto sample_backpack = test_container_items::SAMPLE_BACKPACK;
+		const auto brown_backpack = test_container_items::BROWN_BACKPACK;
+
 #if TODO
 		const auto car = prefabs::create_car(step, transformr( { 1490, 340 }, -180));
 		const auto car2 = prefabs::create_car(step, transformr({ 1490, 340 + 400 }, -180));
@@ -206,7 +213,7 @@ namespace test_scenes {
 					perform_transfer(item_slot_transfer_request::standard(rifle, new_character.get_primary_hand()), step);
 				}
 
-				const auto backpack = (is_metropolis ? prefabs::create_sample_backpack : prefabs::create_brown_backpack)(step, vec2(200, -650));
+				auto backpack = create(is_metropolis ? sample_backpack : brown_backpack, vec2(200, -650));
 				perform_transfer(item_slot_transfer_request::standard(backpack, new_character[slot_function::SHOULDER]), step);
 			}
 
@@ -232,16 +239,13 @@ namespace test_scenes {
 				const auto light_cyan = c.x < 0 ? orange : rgba(30, 255, 255, 255);
 
 				{
-					const auto l = create_test_scene_entity(world, test_static_lights::STRONG_LAMP);
-					l.set_logic_transform(transformr(light_pos));
-
+					const auto l = create(test_static_lights::STRONG_LAMP, transformr(light_pos));
 					auto& light = l.get<components::light>();
-
 					light.color = light_cyan;
 				}
 
 				{
-					create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
+					create(test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
 						auto& w = e.template get<components::wandering_pixels>();
 
 						w.colorize = light_cyan;
@@ -257,20 +261,17 @@ namespace test_scenes {
 
 		{
 			{
-				const auto l = create_test_scene_entity(world, test_static_lights::STRONG_LAMP);
-				l.set_logic_transform(transformr(vec2(-44, 270)));
+				const auto l = create(test_static_lights::STRONG_LAMP, transformr(vec2(-44, 270)));
 				auto& light = l.get<components::light>();
 				light.color = cyan;
 			}
 			{
-				const auto l = create_test_scene_entity(world, test_static_lights::STRONG_LAMP);
-				l.set_logic_transform(transformr(vec2(1098, 220)));
+				const auto l = create(test_static_lights::STRONG_LAMP, transformr(vec2(1098, 220)));
 				auto& light = l.get<components::light>();
 				light.color = orange;
 			}
 			{
-				const auto l = create_test_scene_entity(world, test_static_lights::STRONG_LAMP);
-				l.set_logic_transform(transformr(vec2(223, -47)));
+				const auto l = create(test_static_lights::STRONG_LAMP, transformr(vec2(223, -47)));
 				auto& light = l.get<components::light>();
 				light.color = cyan;
 			}
@@ -280,7 +281,7 @@ namespace test_scenes {
 				const auto right_reach = xywh(1164.f - 8.f + 90.f - 600, 220 - 250, 1000, 600);
 
 				{
-					create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
+					create(test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
 
 						auto& w = e.template get<components::wandering_pixels>();
 
@@ -292,7 +293,7 @@ namespace test_scenes {
 				}
 
 				{
-					create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
+					create(test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
 
 						auto& w = e.template get<components::wandering_pixels>();
 
@@ -306,9 +307,9 @@ namespace test_scenes {
 
 
 			{
-				create_test_scene_entity(world, test_sprite_decorations::HAVE_A_PLEASANT, transformr(vec2(-42, -32)));
-				create_test_scene_entity(world, test_sprite_decorations::AWAKENING, transformr(vec2(-42, 8)));
-				create_test_scene_entity(world, test_sprite_decorations::METROPOLIS, transformr(vec2(1106, 3)));
+				create(test_sprite_decorations::HAVE_A_PLEASANT, transformr(vec2(-42, -32)));
+				create(test_sprite_decorations::AWAKENING, transformr(vec2(-42, 8)));
+				create(test_sprite_decorations::METROPOLIS, transformr(vec2(1106, 3)));
 
 				const vec2 floor_size = get_size_of(test_scene_image_id::FLOOR);
 				const auto total_floor_size = floor_size * 10;
@@ -331,24 +332,18 @@ namespace test_scenes {
 				;
 
 				{
-					const vec2 bg_size = get_size_of(test_scene_image_id::SOIL);
+					const auto soil_origin = vec2(-750, 37000);
+					const auto total_soil_size = vec2i(15000, 85000);
 
-					const auto num_roads = 10 * 10;
-					const auto side = static_cast<int>(sqrt(num_roads) / 2);
-
-					for (int x = -side; x < side; ++x) {
-						for (int y = -side; y < side * 16; ++y) {
-							create_test_scene_entity(world, test_sprite_decorations::SOIL, transformr{ bg_size * vec2i(x, y) });
-						}
-					}
+					create(test_sprite_decorations::SOIL, transformr(soil_origin)).set_logical_size(total_soil_size);
 				}
 
-				create_test_scene_entity(world, test_sprite_decorations::ROAD_DIRT, transformr(vec2(468, 112)));
+				create(test_sprite_decorations::ROAD_DIRT, transformr(vec2(468, 112)));
 
 				for (int r = 0; r < 38; ++r) {
 					const vec2 size = get_size_of(test_scene_image_id::ROAD);
 
-					create_test_scene_entity(world, test_sprite_decorations::ROAD, transformr{ vec2(468, 832+ size.y * r ) });
+					create(test_sprite_decorations::ROAD, transformr{ vec2(468, 832+ size.y * r ) });
 				}
 			}
 		}
@@ -360,10 +355,9 @@ namespace test_scenes {
 		prefabs::create_amplifier_arm(step, vec2(-300, -500 + 50));
 		prefabs::create_cyan_urban_machete(step, vec2(100, 100));
 
-		prefabs::create_sample_backpack(step, vec2(200, -750));
-		prefabs::create_brown_backpack(step, vec2(280, -750));
-
-		prefabs::create_rotating_fan(step, vec2(380, -750));
+		create(sample_backpack, vec2(200, -750));
+		create(brown_backpack, vec2(280, -750));
+		create(test_complex_decorations::ROTATING_FAN, vec2(380, -750));
 
 		prefabs::create_rifle(step, vec2(280, -750), test_shootable_weapons::DATUM_GUN, prefabs::create_sample_magazine(step, vec2(100, -650), prefabs::create_cyan_charge(step, vec2(0, 0)), 25));
 
@@ -458,7 +452,7 @@ namespace test_scenes {
 				};
 
 				for (int i = 0; i < 3; ++i) {
-					const auto l = create_test_scene_entity(world, test_static_lights::AQUARIUM_LAMP);
+					const auto l = create(test_static_lights::AQUARIUM_LAMP);
 					l.set_logic_transform(aquarium_tr + transformr(lights[i]));
 					auto& light = l.get<components::light>();
 					light.color = light_cols[i];
@@ -502,13 +496,13 @@ namespace test_scenes {
 
 				for (int i = 0; i < N; ++i) {
 					const auto target = caustics[i] + aquarium_tr;
-					auto ent = create_test_scene_entity(world, test_complex_decorations::WATER_SURFACE, target);
+					auto ent = create(test_complex_decorations::WATER_SURFACE, target);
 					ent.get<components::animation>().state.frame_num = caustics_offsets[i];
 				}
 
 				for (int i = 0; i < DN; ++i) {
 					const auto target = dim_caustics[i] + aquarium_tr;
-					auto ent = create_test_scene_entity(world, test_complex_decorations::WATER_SURFACE, target);
+					auto ent = create(test_complex_decorations::WATER_SURFACE, target);
 					ent.get<components::animation>().state.frame_num = dim_caustics_offsets[i];
 					ent.get<components::sprite>().colorize.a = 79;
 				}
@@ -536,12 +530,12 @@ namespace test_scenes {
 					const auto target = halogens[i] + aquarium_tr;
 					
 					{
-						auto ent = create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_HALOGEN_1_BODY, target);
+						auto ent = create(test_sprite_decorations::AQUARIUM_HALOGEN_1_BODY, target);
 						ent.get<components::sprite>().colorize = halogens_bodies_cols[i];
 					}
 
 					{
-						auto ent = create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_HALOGEN_1_LIGHT, target);
+						auto ent = create(test_sprite_decorations::AQUARIUM_HALOGEN_1_LIGHT, target);
 						ent.get<components::sprite>().colorize = halogens_light_cols[i];
 					}
 				}
@@ -553,18 +547,18 @@ namespace test_scenes {
 				const auto target = bottom_lamp_tr + aquarium_tr;
 
 				{
-					auto ent = create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_BOTTOM_LAMP_BODY, target);
+					auto ent = create(test_sprite_decorations::AQUARIUM_BOTTOM_LAMP_BODY, target);
 					ent.get<components::sprite>().colorize = rgba(0, 122, 255, 255);
 				}
 
 				{
-					auto ent = create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_BOTTOM_LAMP_LIGHT, target);
+					auto ent = create(test_sprite_decorations::AQUARIUM_BOTTOM_LAMP_LIGHT, target);
 					ent.get<components::sprite>().colorize = rgba(96, 255, 255, 255);
 				}
 			}
 
 
-			create_test_scene_entity(world, test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
+			create(test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
 				auto& w = e.template get<components::wandering_pixels>();
 
 				w.colorize = cyan;
@@ -574,11 +568,11 @@ namespace test_scenes {
 				e.set_logic_transform(aquarium_origin);
 			});
 
-			create_test_scene_entity(world, test_wandering_pixels_decorations::AQUARIUM_PIXELS_LIGHT, [&](const auto e){
+			create(test_wandering_pixels_decorations::AQUARIUM_PIXELS_LIGHT, [&](const auto e){
 				e.set_logic_transform(aquarium_origin);
 			});
 
-			create_test_scene_entity(world, test_wandering_pixels_decorations::AQUARIUM_PIXELS_DIM, [&](const auto e){
+			create(test_wandering_pixels_decorations::AQUARIUM_PIXELS_DIM, [&](const auto e){
 				e.set_logic_transform(aquarium_origin);
 			});
 
@@ -589,21 +583,21 @@ namespace test_scenes {
 				const auto h = edge_size / 2;
 
 				for (int g = 0; g < (aquarium_size * 2).x / s.x; ++g) {
-					create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND_EDGE, aquarium_origin.pos + aquarium_size + vec2(-h.x, -h.y) - vec2(s.x * g, 0));
+					create(test_sprite_decorations::AQUARIUM_SAND_EDGE, aquarium_origin.pos + aquarium_size + vec2(-h.x, -h.y) - vec2(s.x * g, 0));
 				}
 			}
 
-			create_test_scene_entity(world, test_sprite_decorations::WATER_COLOR_OVERLAY, aquarium_origin);
+			create(test_sprite_decorations::WATER_COLOR_OVERLAY, aquarium_origin);
 
-			create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND_1, aquarium_tr);
-			create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND_1, aquarium_tr + transformr(vec2(aquarium_size.x, 0)));
-			create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND_2, aquarium_tr + transformr(vec2(aquarium_size.x, aquarium_size.y)));
-			create_test_scene_entity(world, test_sprite_decorations::AQUARIUM_SAND_2, aquarium_tr + transformr(vec2(0, aquarium_size.y)));
+			create(test_sprite_decorations::AQUARIUM_SAND_1, aquarium_tr);
+			create(test_sprite_decorations::AQUARIUM_SAND_1, aquarium_tr + transformr(vec2(aquarium_size.x, 0)));
+			create(test_sprite_decorations::AQUARIUM_SAND_2, aquarium_tr + transformr(vec2(aquarium_size.x, aquarium_size.y)));
+			create(test_sprite_decorations::AQUARIUM_SAND_2, aquarium_tr + transformr(vec2(0, aquarium_size.y)));
 
-			create_test_scene_entity(world, test_sprite_decorations::DUNE_SMALL, transformr(aquarium_origin.pos + vec2(-193, -193) + vec2(52, -22)));
-			create_test_scene_entity(world, test_sprite_decorations::DUNE_SMALL, transformr(aquarium_origin.pos + vec2(-237, 255)));
-			create_test_scene_entity(world, test_sprite_decorations::DUNE_BIG, transformr(aquarium_origin.pos + vec2(-74, -48)));
-			create_test_scene_entity(world, test_sprite_decorations::DUNE_BIG, transformr(aquarium_origin.pos + vec2(161, 126)));
+			create(test_sprite_decorations::DUNE_SMALL, transformr(aquarium_origin.pos + vec2(-193, -193) + vec2(52, -22)));
+			create(test_sprite_decorations::DUNE_SMALL, transformr(aquarium_origin.pos + vec2(-237, 255)));
+			create(test_sprite_decorations::DUNE_BIG, transformr(aquarium_origin.pos + vec2(-74, -48)));
+			create(test_sprite_decorations::DUNE_BIG, transformr(aquarium_origin.pos + vec2(161, 126)));
 
 			const auto yellowfish = test_complex_decorations::YELLOW_FISH;
 			const auto darkbluefish = test_complex_decorations::DARKBLUE_FISH;
@@ -612,53 +606,57 @@ namespace test_scenes {
 			const auto dragon_fish = test_complex_decorations::DRAGON_FISH;
 			const auto rainbow_dragon_fish = test_complex_decorations::RAINBOW_DRAGON_FISH;
 
-			prefabs::create_fish(step, yellowfish, aquarium_tr - vec2(80, 10), aquarium_origin);
-			prefabs::create_fish(step, yellowfish, aquarium_tr + components::transform(vec2(80, 10), -180), aquarium_origin);
-			prefabs::create_fish(step, yellowfish, aquarium_tr - vec2(80, 30), aquarium_origin);
-			prefabs::create_fish(step, yellowfish, aquarium_tr + components::transform(vec2(80, 50), -180), aquarium_origin);
-			prefabs::create_fish(step, yellowfish, aquarium_tr - vec2(120, 30), aquarium_origin);
-			prefabs::create_fish(step, yellowfish, aquarium_tr + components::transform(vec2(90, 40), -180), aquarium_origin);
+			auto create_fish = [&](auto&&... args) {
+				return prefabs::create_fish(step, std::forward<decltype(args)>(args)...);
+			};
 
-			prefabs::create_fish(step, cyanvioletfish, aquarium_tr - vec2(40, 10), aquarium_origin);
-			prefabs::create_fish(step, cyanvioletfish, aquarium_tr + components::transform(vec2(40, 10), -180), aquarium_origin);
-			prefabs::create_fish(step, cyanvioletfish, aquarium_tr - vec2(40, 30), aquarium_origin);
-			prefabs::create_fish(step, cyanvioletfish, aquarium_tr + components::transform(vec2(40, 50), -180), aquarium_origin);
-			prefabs::create_fish(step, cyanvioletfish, aquarium_tr - vec2(70, 30), aquarium_origin);
-			prefabs::create_fish(step, cyanvioletfish, aquarium_tr + components::transform(vec2(40, 40), -180), aquarium_origin);
+			create_fish(yellowfish, aquarium_tr - vec2(80, 10), aquarium_origin);
+			create_fish(yellowfish, aquarium_tr + components::transform(vec2(80, 10), -180), aquarium_origin);
+			create_fish(yellowfish, aquarium_tr - vec2(80, 30), aquarium_origin);
+			create_fish(yellowfish, aquarium_tr + components::transform(vec2(80, 50), -180), aquarium_origin);
+			create_fish(yellowfish, aquarium_tr - vec2(120, 30), aquarium_origin);
+			create_fish(yellowfish, aquarium_tr + components::transform(vec2(90, 40), -180), aquarium_origin);
 
-			prefabs::create_fish(step, yellowfish, aquarium_tr + vec2(20, 20) - vec2(80, 10), aquarium_origin);
-			prefabs::create_fish(step, yellowfish, aquarium_tr + vec2(20, 20) + components::transform(vec2(80, 10), -180), aquarium_origin);
-			prefabs::create_fish(step, yellowfish, aquarium_tr + vec2(20, 20) - vec2(80, 30), aquarium_origin);
-			prefabs::create_fish(step, yellowfish, aquarium_tr + vec2(20, 20) + components::transform(vec2(80, 50), -180), aquarium_origin);
-			prefabs::create_fish(step, yellowfish, aquarium_tr + vec2(20, 20) - vec2(120, 30), aquarium_origin);
-			prefabs::create_fish(step, yellowfish, aquarium_tr + vec2(20, 20) + components::transform(vec2(90, 40), -180), aquarium_origin);
+			create_fish(cyanvioletfish, aquarium_tr - vec2(40, 10), aquarium_origin);
+			create_fish(cyanvioletfish, aquarium_tr + components::transform(vec2(40, 10), -180), aquarium_origin);
+			create_fish(cyanvioletfish, aquarium_tr - vec2(40, 30), aquarium_origin);
+			create_fish(cyanvioletfish, aquarium_tr + components::transform(vec2(40, 50), -180), aquarium_origin);
+			create_fish(cyanvioletfish, aquarium_tr - vec2(70, 30), aquarium_origin);
+			create_fish(cyanvioletfish, aquarium_tr + components::transform(vec2(40, 40), -180), aquarium_origin);
+
+			create_fish(yellowfish, aquarium_tr + vec2(20, 20) - vec2(80, 10), aquarium_origin);
+			create_fish(yellowfish, aquarium_tr + vec2(20, 20) + components::transform(vec2(80, 10), -180), aquarium_origin);
+			create_fish(yellowfish, aquarium_tr + vec2(20, 20) - vec2(80, 30), aquarium_origin);
+			create_fish(yellowfish, aquarium_tr + vec2(20, 20) + components::transform(vec2(80, 50), -180), aquarium_origin);
+			create_fish(yellowfish, aquarium_tr + vec2(20, 20) - vec2(120, 30), aquarium_origin);
+			create_fish(yellowfish, aquarium_tr + vec2(20, 20) + components::transform(vec2(90, 40), -180), aquarium_origin);
 
 			const auto jellyfishtr = aquarium_tr + components::transform(vec2(100, 100), -45);
-			prefabs::create_fish(step, darkbluefish, jellyfishtr - vec2(80, 10), aquarium_origin);
-			prefabs::create_fish(step, darkbluefish, jellyfishtr + components::transform(vec2(80, 10), -180), aquarium_origin);
+			create_fish(darkbluefish, jellyfishtr - vec2(80, 10), aquarium_origin);
+			create_fish(darkbluefish, jellyfishtr + components::transform(vec2(80, 10), -180), aquarium_origin);
 
-			prefabs::create_fish(step, darkbluefish, jellyfishtr - vec2(80, 30), aquarium_origin);
-			prefabs::create_fish(step, darkbluefish, jellyfishtr + components::transform(vec2(80, 50), -180), aquarium_origin);
+			create_fish(darkbluefish, jellyfishtr - vec2(80, 30), aquarium_origin);
+			create_fish(darkbluefish, jellyfishtr + components::transform(vec2(80, 50), -180), aquarium_origin);
 
-			prefabs::create_fish(step, darkbluefish, jellyfishtr - vec2(120, 30), aquarium_origin);
-			prefabs::create_fish(step, darkbluefish, jellyfishtr + components::transform(vec2(90, 40), -180), aquarium_origin);
+			create_fish(darkbluefish, jellyfishtr - vec2(120, 30), aquarium_origin);
+			create_fish(darkbluefish, jellyfishtr + components::transform(vec2(90, 40), -180), aquarium_origin);
 
-			prefabs::create_fish(step, jellyfish, aquarium_tr - vec2(180, 30), aquarium_origin);
-			prefabs::create_fish(step, jellyfish, aquarium_tr + components::transform(vec2(190, 40), -180), aquarium_origin);
-			prefabs::create_fish(step, jellyfish, aquarium_tr - vec2(180, 50), aquarium_origin);
-			prefabs::create_fish(step, jellyfish, aquarium_tr + components::transform(vec2(190, 60), -180), aquarium_origin);
-			prefabs::create_fish(step, jellyfish, aquarium_tr - vec2(180, 70), aquarium_origin);
-			prefabs::create_fish(step, jellyfish, aquarium_tr + components::transform(vec2(190, 80), -180), aquarium_origin);
+			create_fish(jellyfish, aquarium_tr - vec2(180, 30), aquarium_origin);
+			create_fish(jellyfish, aquarium_tr + components::transform(vec2(190, 40), -180), aquarium_origin);
+			create_fish(jellyfish, aquarium_tr - vec2(180, 50), aquarium_origin);
+			create_fish(jellyfish, aquarium_tr + components::transform(vec2(190, 60), -180), aquarium_origin);
+			create_fish(jellyfish, aquarium_tr - vec2(180, 70), aquarium_origin);
+			create_fish(jellyfish, aquarium_tr + components::transform(vec2(190, 80), -180), aquarium_origin);
 
-			prefabs::create_fish(step, dragon_fish, aquarium_tr - vec2(280, 130), aquarium_origin);
-			prefabs::create_fish(step, dragon_fish, aquarium_tr + components::transform(vec2(290, 40), -180), aquarium_origin);
-			prefabs::create_fish(step, dragon_fish, aquarium_tr - vec2(280, 150), aquarium_origin);
-			prefabs::create_fish(step, dragon_fish, aquarium_tr + components::transform(vec2(290, 60), -180), aquarium_origin);
+			create_fish(dragon_fish, aquarium_tr - vec2(280, 130), aquarium_origin);
+			create_fish(dragon_fish, aquarium_tr + components::transform(vec2(290, 40), -180), aquarium_origin);
+			create_fish(dragon_fish, aquarium_tr - vec2(280, 150), aquarium_origin);
+			create_fish(dragon_fish, aquarium_tr + components::transform(vec2(290, 60), -180), aquarium_origin);
 
-			prefabs::create_fish(step, rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos - vec2(280, 130), aquarium_origin);
-			prefabs::create_fish(step, rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos + vec2(290, 40), aquarium_origin);
-			prefabs::create_fish(step, rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos - vec2(280, 150), aquarium_origin);
-			prefabs::create_fish(step, rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos + vec2(290, 60), aquarium_origin);
+			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos - vec2(280, 130), aquarium_origin);
+			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos + vec2(290, 40), aquarium_origin);
+			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos - vec2(280, 150), aquarium_origin);
+			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos + vec2(290, 60), aquarium_origin);
 		};
 
 		const auto orig1 = vec2(-1024, 1024);

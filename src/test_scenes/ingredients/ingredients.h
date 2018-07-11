@@ -47,9 +47,6 @@ namespace prefabs {
 	entity_handle create_cyan_charge(const logic_step, vec2 pos);
 	entity_handle create_steel_charge(const logic_step, vec2 pos);
 
-	entity_handle create_sample_backpack(const logic_step, vec2 pos);
-	entity_handle create_brown_backpack(const logic_step, vec2 pos);
-
 	entity_handle create_metropolis_soldier(
 		const logic_step,
 		const transformr pos, 
@@ -63,7 +60,6 @@ namespace prefabs {
 	);
 
 	entity_handle create_crate(const logic_step, const transformr pos);
-	entity_handle create_brick_wall(const logic_step, const transformr pos);
 
 	entity_handle create_cyan_urban_machete(const logic_step, const vec2 pos);
 
@@ -71,7 +67,6 @@ namespace prefabs {
 	entity_handle create_ped_grenade(const logic_step, const vec2 pos);
 	entity_handle create_interference_grenade(const logic_step, const vec2 pos);
 
-	entity_handle create_rotating_fan(const logic_step, const transformr&);
 	entity_handle create_fish(const logic_step, const test_complex_decorations, const transformr&, const transformr& origin);
 }
 #endif

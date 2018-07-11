@@ -378,11 +378,6 @@ namespace test_flavours {
 }
 
 namespace prefabs {
-	entity_handle create_rotating_fan(const logic_step step, const transformr& pos) {
-		const auto decor = create_test_scene_entity(step.get_cosmos(), test_complex_decorations::ROTATING_FAN, pos);
-		return decor;
-	}
-
 	entity_handle create_fish(const logic_step step, const test_complex_decorations t, const transformr& pos, const transformr& origin) {
 		const auto decor = create_test_scene_entity(step.get_cosmos(), t, pos);
 		decor.get<components::movement_path>().origin = origin;

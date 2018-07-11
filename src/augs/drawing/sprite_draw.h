@@ -141,7 +141,7 @@ namespace augs {
 		const auto& entry = manager.at(spr.image_id);
 		const auto& diffuse = entry.diffuse;
 
-		const auto original_size = diffuse.get_original_size();
+		const auto original_size = vec2i(diffuse.get_original_size());
 
 		if (in.use_neon_map) {
 			const auto& maybe_neon_map = entry.neon_map;
@@ -149,7 +149,7 @@ namespace augs {
 			if (maybe_neon_map.exists()) {
 				const auto original_neon_size = vec2(maybe_neon_map.get_original_size());
 
-				if (spr.tile_excess_size && drawn_size > original_size) {
+				if (spr.tile_excess_size && drawn_size != original_size) {
 					for_each_tile(
 						spr,
 						pos,
@@ -185,7 +185,7 @@ namespace augs {
 			}
 		}
 		else {
-			if (spr.tile_excess_size && drawn_size > original_size) {
+			if (spr.tile_excess_size && drawn_size != original_size) {
 				for_each_tile(
 					spr,
 					pos,
