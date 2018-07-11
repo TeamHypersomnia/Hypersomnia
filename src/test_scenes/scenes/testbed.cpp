@@ -68,6 +68,11 @@ public:
 		return cloned;
 	}
 
+	auto next() const {
+		auto cloned = *this;
+		return cloned;
+	}
+
 	auto get_size() const {
 		return on_enum([&](const auto id) {
 			const auto& f = ::get_test_flavour(cosm->get_common_significant().flavours, id);
@@ -81,9 +86,16 @@ public:
 		});
 	}
 
-	void create(const vec2 resolved_pos) const {
+	void create(const vec2 resolved_pos, const vec2i resolved_size) const {
 		on_enum([&](const auto id) {
-			create_test_scene_entity(*cosm, id, transformr(resolved_pos, rotation)).do_flip(flip);
+			create_test_scene_entity(*cosm, id, [&](const auto typed_handle) {
+				typed_handle.set_logic_transform(transformr(resolved_pos, rotation));
+				typed_handle.do_flip(flip);
+
+				if (resolved_size != get_size()) {
+					typed_handle.set_logical_size(resolved_size);
+				}
+			});
 		});
 	}
 };
@@ -298,23 +310,25 @@ namespace test_scenes {
 				create_test_scene_entity(world, test_sprite_decorations::AWAKENING, transformr(vec2(-42, 8)));
 				create_test_scene_entity(world, test_sprite_decorations::METROPOLIS, transformr(vec2(1106, 3)));
 
-				auto half = vec2(-64, -64);
-				prefabs::create_brick_wall(step, half + vec2(0, 0));
-				prefabs::create_brick_wall(step, half +vec2(128, 128));
-				prefabs::create_brick_wall(step, half +vec2(128, 0));
-				prefabs::create_brick_wall(step, half +vec2(0, 128));
+				const vec2 floor_size = get_size_of(test_scene_image_id::FLOOR);
+				const auto total_floor_size = floor_size * 10;
+				const auto floor_origin = vec2(512, -768);
 
-				const auto horioff = 8 * 128;
+				auto floor_align = [&](const auto flavour_id) {
+					return make_cascade_aligner(
+						floor_origin,
+						total_floor_size, 
+						testbed_node { world, flavour_id }
+					);
+				};
 
-				prefabs::create_brick_wall(step, half +vec2(horioff, 0) + vec2(0, 0));
-				prefabs::create_brick_wall(step, half +vec2(horioff, 0) + vec2(128, 128));
-				prefabs::create_brick_wall(step, half +vec2(horioff, 0) + vec2(128, 0));
-				prefabs::create_brick_wall(step, half +vec2(horioff, 0) + vec2(0, 128));
-
-				for (int b = 0; b < 10; ++b) {
-					prefabs::create_brick_wall(step, transformr(half +vec2(-128, -128 - b*128) + vec2(0, 256), 90));
-					prefabs::create_brick_wall(step, transformr(half +vec2(horioff + 256, -128 - b*128) + vec2(0, 256), 90));
-				}
+				floor_align(test_sprite_decorations::FLOOR).set_size(total_floor_size);
+				floor_align(test_plain_sprited_bodys::BRICK_WALL)
+					.lo().ti().stretch_b().again()
+					.lo().bo().extend_r(2).extend_b(1).again()
+					.ro().ti().stretch_b()//.again()
+					//.ro().bo().extend_l(2).extend_b(1).again()
+				;
 
 				{
 					const vec2 bg_size = get_size_of(test_scene_image_id::SOIL);
@@ -335,14 +349,6 @@ namespace test_scenes {
 					const vec2 size = get_size_of(test_scene_image_id::ROAD);
 
 					create_test_scene_entity(world, test_sprite_decorations::ROAD, transformr{ vec2(468, 832+ size.y * r ) });
-				}
-
-				{
-					const vec2 size = get_size_of(test_scene_image_id::FLOOR);
-					const auto floor_origin = vec2(512, -768);
-					const auto floor_size = size * 10;
-
-					create_test_scene_entity(world, test_sprite_decorations::FLOOR, transformr(floor_origin)).set_logical_size(floor_size);
 				}
 			}
 		}

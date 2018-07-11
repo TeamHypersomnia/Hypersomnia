@@ -42,9 +42,9 @@ static auto comparable_angle(const vec2 diff) {
 	);
 }
 
-typedef visibility_information_response::edge edge;
-typedef visibility_information_response::discontinuity discontinuity;
-typedef visibility_information_response::triangle triangle;
+using edge = visibility_information_response::edge;
+using discontinuity = visibility_information_response::discontinuity;
+using triangle = visibility_information_response::triangle;
 
 size_t visibility_information_response::get_num_triangles() const {
 	return edges.size();

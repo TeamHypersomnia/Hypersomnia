@@ -12,6 +12,8 @@ struct cascade_aligner_node {
 
 	M meta;
 
+	bool was_flipped = false;
+
 	cascade_aligner_node() = default;
 	cascade_aligner_node(const cascade_aligner_node&) = default;
 
@@ -34,7 +36,13 @@ struct cascade_aligner_node {
 	}
 
 	void create() {
-		meta.create(ap);
+		auto ars = as;
+
+		if (was_flipped) {
+			ars.flip();
+		}
+
+		meta.create(ap, ars);
 	}
 
 	operator P() const {
@@ -45,17 +53,58 @@ struct cascade_aligner_node {
 		return transformr(ap, 0);
 	}
 
-	void stretch_r(int limit = 0) {
-		const auto r = p.x + s.x / 2;
-		const auto target_r = r + (limit * as.x);
-
-		const auto al = ap.x;
-		const auto ar = al + as.x / 2;
+	template <class T>
+	void stretch_r_to(const T target_r) {
+		const auto al = ap.x - as.x / 2;
+		const auto ar = al + as.x;
 
 		if (const auto dt = target_r - ar; dt > 0) {
 			as.x = target_r - al;
 			ap.x = target_r - as.x / 2;
 		}
+	}
+
+	template <class T>
+	void stretch_b_to(const T target_b) {
+		const auto at = ap.y - as.y / 2;
+		const auto ab = at + as.y;
+
+		if (const auto dt = target_b - ab; dt > 0) {
+			as.y = target_b - at;
+			ap.y = target_b - as.y / 2;
+		}
+	}
+
+	void extend_r(const int times) {
+		const auto al = ap.x - as.x / 2;
+		const auto ar = al + as.x;
+
+		const auto target_r = ar + as.x * times;
+
+		stretch_r_to(target_r);
+	}
+
+	void extend_b(const int times) {
+		const auto at = ap.y - as.y / 2;
+		const auto ab = at + as.y;
+
+		const auto target_b = ab + as.y * times;
+
+		stretch_b_to(target_b);
+	}
+
+	void stretch_r(const int limit = 0) {
+		const auto r = p.x + s.x / 2;
+		const auto target_r = r + (limit * as.x);
+
+		stretch_r_to(target_r);
+	}
+
+	void stretch_b(const int limit = 0) {
+		const auto b = p.y + s.y / 2;
+		const auto target_b = b + (limit * as.y);
+
+		stretch_b_to(target_b);
 	}
 
 	auto result() const {
@@ -86,6 +135,11 @@ struct cascade_aligner_node {
 		const auto t = p.y - s.y / 2;
 		const auto at = ap.y - as.y / 2;
 		return int((at - t) / as.y);
+	}
+
+	void rot_size() {
+		as.flip();
+		was_flipped = !was_flipped;
 	}
 };
 
@@ -161,8 +215,26 @@ public:
 		return *this;
 	}
 
+	auto& set_size(S s) {
+		if (top().was_flipped) {
+			s.flip();
+		}
+
+		top().as = s;
+		return *this;
+	}
+
+	auto& mult_size(S s) {
+		if (top().was_flipped) {
+			s.flip();
+		}
+
+		top().as *= s;
+		return *this;
+	}
+
 	auto& rot_90() {
-		top().as.flip();
+		top().rot_size();
 
 		auto& r = meta().rotation;
 
@@ -192,6 +264,15 @@ public:
 
 	template <class... Args>
 	auto& stretch_r(Args&&... args) { top().stretch_r(std::forward<Args>(args)...); return *this; }
+
+	template <class... Args>
+	auto& stretch_b(Args&&... args) { top().stretch_b(std::forward<Args>(args)...); return *this; }
+
+	template <class... Args>
+	auto& extend_r(Args&&... args) { top().extend_r(std::forward<Args>(args)...); return *this; }
+
+	template <class... Args>
+	auto& extend_b(Args&&... args) { top().extend_b(std::forward<Args>(args)...); return *this; }
 
 	auto& nr() { top().nr(); return *this; }
 	auto& nl() { top().nl(); return *this; }
