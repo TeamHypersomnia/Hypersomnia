@@ -450,13 +450,15 @@ void visibility_system::respond_to_visibility_information_requests(
 		sort_range(all_vertices_transformed);
 		remove_duplicates_from_sorted(all_vertices_transformed);
 
-		/* by now we have ensured that all_vertices_transformed is non-empty
+		/* 
+			all_vertices_transformed cannot be empty by now.
 
-		debugging:
-		red ray - ray that intersected with obstacle, these are ignored
-		yellow ray - ray that hit the same vertex
-		violet ray - ray that passed through vertex and hit another obstacle
-		blue ray - ray that passed through vertex and hit boundary
+			Debug line colors legend:
+
+			red ray - ray that intersected with obstacle, these are ignored
+			yellow ray - ray that hit the same vertex
+			violet ray - ray that passed through vertex and hit another obstacle
+			blue ray - ray that passed through vertex and hit boundary
 		*/
 
 		/* double_ray pair for holding both left-epsilon and right-epsilon rays */
@@ -525,11 +527,6 @@ void visibility_system::respond_to_visibility_information_requests(
 
 		/* for every vertex to cast the ray to */
 		for (const auto& vertex : all_vertices_transformed) {
-			/* create two vectors in direction of vertex with length equal to the half of diagonal of the visibility square
-			(majority of rays will SLIGHTLY go beyond visibility square, but that's not important now)
-			ray_callbacks[0] and ray_callbacks[1] differ ONLY by an epsilon added / substracted to the angle
-			*/
-
 			/* calculate the perpendicular direction to properly apply epsilon_ray_distance_variation */
 			const vec2 perpendicular_cw = (vertex.pos - position_meters).normalize().perpendicular_cw();
 
@@ -543,7 +540,7 @@ void visibility_system::respond_to_visibility_information_requests(
 				position_meters + directions[1] * vision_side_meters / 2 * 1.5f
 			};
 
-			/* clamp the ray to the bound */
+			/* Clamp the ray against the visibility square */
 			for (const auto& bound : bounds) {
 				bool continue_checking = true;
 
@@ -582,7 +579,7 @@ void visibility_system::respond_to_visibility_information_requests(
 		}
 
 		/* process all raycast inputs at once to improve cache coherency */
-		for (size_t j = 0; j < all_ray_inputs.size(); ++j) {
+		for (std::size_t j = 0; j < all_ray_inputs.size(); ++j) {
 			all_ray_outputs.emplace_back(
 				physics.ray_cast(position_meters, all_ray_inputs[j].targets[0], request.filter, ignored_entity),
 				all_vertices_transformed[j].is_on_a_bound ?
@@ -590,7 +587,7 @@ void visibility_system::respond_to_visibility_information_requests(
 			);
 		}
 
-		for (size_t i = 0; i < all_ray_outputs.size(); ++i) {
+		for (std::size_t i = 0; i < all_ray_outputs.size(); ++i) {
 			physics_raycast_output ray_callbacks[2] = { all_ray_outputs[i].first, all_ray_outputs[i].second };
 			auto& vertex = all_vertices_transformed[i];
 
