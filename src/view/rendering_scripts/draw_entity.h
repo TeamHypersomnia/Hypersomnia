@@ -120,7 +120,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 						center_offset.non_zero()
 					) {
 						const auto final_rotation = input.renderable_transform.rotation;
-						input.renderable_transform.pos -= vec2(center_offset).rotate(final_rotation, vec2(0, 0));
+						input.renderable_transform.pos -= vec2(center_offset).rotate(final_rotation);
 					}
 
 					auto tracified_sprite = sprite;

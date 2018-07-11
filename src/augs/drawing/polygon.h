@@ -91,7 +91,7 @@ namespace augs {
 			auto model_transformed = vertices;
 
 			for (auto& v : model_transformed) {
-				v.pos.rotate(transform.rotation, vec2(0, 0));
+				v.pos.rotate(transform.rotation);
 				v.pos += transform.pos;
 			}
 

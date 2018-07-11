@@ -88,7 +88,7 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 				transform_of_finishing = missile->saved_point_of_impact_before_death;
 
 				const auto w = deleted_entity.get_logical_size().x;
-				transform_of_finishing.pos -= vec2(w / 2, 0).rotate(transform_of_finishing.rotation);
+				transform_of_finishing.pos -= vec2::from_degrees(transform_of_finishing.rotation) * (w / 2);
 
 				/* transform_of_finishing */
 

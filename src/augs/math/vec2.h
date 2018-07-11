@@ -351,8 +351,8 @@ struct basic_vec2 {
 
 	template<class t>
 	basic_vec2& clamp_rotated(basic_vec2<t> rect, const t current_angle) {
-		rect.rotate(-current_angle, vec2(0, 0));
-		auto unrotated_this = vec2(*this).rotate(-current_angle, vec2(0, 0));
+		rect.rotate(-current_angle);
+		auto unrotated_this = vec2(*this).rotate(-current_angle);
 
 		if (unrotated_this.x > rect.x) unrotated_this.x = rect.x;
 		if (unrotated_this.y > rect.y) unrotated_this.y = rect.y;
@@ -360,7 +360,7 @@ struct basic_vec2 {
 		if (unrotated_this.y < -rect.y) unrotated_this.y = -rect.y;
 
 		*this = unrotated_this;
-		rotate(current_angle, vec2(0, 0));
+		rotate(current_angle);
 
 		return *this;
 	}

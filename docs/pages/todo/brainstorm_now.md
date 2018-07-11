@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- vec2::from_degrees(rotation) * w / 2
 - sprite will have to know which tiles exactly are visible in the camera
 
 - Light optimization: remove vertices that are determined to be behind some convex shape.

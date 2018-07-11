@@ -160,7 +160,7 @@ public:
 		const auto w = handle.get_logical_size().x;
 
 		if (const auto t = handle.find_logic_transform()) {
-			return t->pos + vec2(w / 2, 0.f).rotate(t->rotation);
+			return t->pos + vec2::from_degrees(t->rotation) * (w / 2);
 		}
 
 		return std::nullopt;
@@ -219,7 +219,7 @@ std::optional<transformr> spatial_properties_mixin<E>::find_logic_transform() co
 			auto displacement = connection->shape_offset;
 
 			if (!displacement.pos.is_zero()) {
-				displacement.pos.rotate(body_transform.rotation, vec2(0, 0));
+				displacement.pos.rotate(body_transform.rotation);
 			}
 
 			return body_transform + displacement;

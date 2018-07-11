@@ -18,7 +18,7 @@ namespace augs {
 
 		for (auto& v : model_transformed) {
 			if (std::abs(target_transform.rotation) > 0.f) {
-				v.pos.rotate(target_transform.rotation, vec2(0, 0));
+				v.pos.rotate(target_transform.rotation);
 			}
 
 			v.pos += target_transform.pos;

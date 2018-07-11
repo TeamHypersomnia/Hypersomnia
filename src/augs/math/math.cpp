@@ -153,8 +153,7 @@ vec2 position_rectangle_around_a_circle(
 
 			if (target_angular_distance >= 0.0 && c.cross(v) <= 0.0) {
 				return vec2(quadrants_on_circle[i]).rotate(
-					(target_angular_distance / bound_angular_distance) * 90, 
-					vec2(0, 0)
+					(target_angular_distance / bound_angular_distance) * 90
 				) * circle_radius + quadrant_multipliers[i] * rectangle_size / 2;
 			}
 		}

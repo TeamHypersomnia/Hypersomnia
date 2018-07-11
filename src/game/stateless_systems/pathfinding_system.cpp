@@ -40,7 +40,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 			auto rotation = b.get_degrees();
 
 			/* transform vertex to current entity's position and rotation */
-			vec2 out_vert = (vec2(v).rotate(rotation, vec2(0, 0)) + position);
+			vec2 out_vert = vec2(v).rotate(rotation) + position;
 
 			if (meters) {
 				out_vert = si.get_meters(out_vert);
@@ -182,7 +182,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 								/* rotate a bit to prevent non-reachable sensors */
 								float rotation = pathfinding.rotate_navpoints;
 								if (disc.winding == disc.LEFT) rotation = -rotation;
-								sensor_direction.rotate(rotation, vec2(0, 0));
+								sensor_direction.rotate(rotation);
 								//sensor_direction = transform.pos - vert.location;
 								sensor_direction.normalize();
 

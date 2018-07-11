@@ -101,7 +101,7 @@ void exploding_ring_system::advance(
 										new_p.colorize(r.color.rgb());
 										new_p.acc /= 2;
 										new_p.linear_damping /= 2;
-										new_p.acc.rotate(rng.randval(0.f, 360.f), vec2{ 0, 0 });
+										new_p.acc.rotate(rng.randval(0.f, 360.f));
 
 										particles.add_particle(sparkles_emission.target_render_layer, new_p);
 										//new_p.max_lifetime_ms *= 1.4f;
@@ -131,7 +131,7 @@ void exploding_ring_system::advance(
 								particles.add_particle(smokes_emission.target_render_layer, new_p);
 
 								//new_p.acc /= 2;
-								//new_p.acc.rotate(rng.randval(0.f, 360.f), vec2{ 0, 0 });
+								//new_p.acc.rotate(rng.randval(0.f, 360.f));
 								//new_p.max_lifetime_ms *= 1.4f;
 							}
 						}

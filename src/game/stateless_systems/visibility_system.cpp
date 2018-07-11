@@ -370,7 +370,7 @@ void visibility_system::respond_to_visibility_information_requests(
 						const auto rotation = f->GetBody()->GetAngle();
 
 						/* transform vertex to current entity's position and rotation */
-						push_vertex(vec2(vv).rotate_radians(rotation, vec2(0, 0)) + vec2(position), true);
+						push_vertex(vec2(vv).rotate_radians(rotation) + vec2(position), true);
 					}
 				}
 
