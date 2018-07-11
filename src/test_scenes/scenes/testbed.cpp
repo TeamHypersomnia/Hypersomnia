@@ -325,10 +325,12 @@ namespace test_scenes {
 
 				floor_align(test_sprite_decorations::FLOOR).set_size(total_floor_size);
 				floor_align(test_plain_sprited_bodys::BRICK_WALL)
-					.lo().ti().stretch_b().again()
-					.lo().bo().extend_r(2).extend_b(1).again()
 					.ro().ti().stretch_b().again()
-					.ro().bo().extend_l(2).extend_b(1)
+					.ro().bo().extend_l(2).extend_b(1).again()
+					.lo().ti().stretch_b().again()
+					.lo().bo().extend_r(2).extend_b(1).next(test_sprite_decorations::ROAD_DIRT)
+					.ro().bi().next(test_sprite_decorations::ROAD)
+					.mult_size({ 1, 38 }).bo()
 				;
 
 				{
@@ -336,14 +338,6 @@ namespace test_scenes {
 					const auto total_soil_size = vec2i(15000, 85000);
 
 					create(test_sprite_decorations::SOIL, transformr(soil_origin)).set_logical_size(total_soil_size);
-				}
-
-				create(test_sprite_decorations::ROAD_DIRT, transformr(vec2(468, 112)));
-
-				for (int r = 0; r < 38; ++r) {
-					const vec2 size = get_size_of(test_scene_image_id::ROAD);
-
-					create(test_sprite_decorations::ROAD, transformr{ vec2(468, 832+ size.y * r ) });
 				}
 			}
 		}
