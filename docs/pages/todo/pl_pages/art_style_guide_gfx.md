@@ -130,7 +130,7 @@ Pozycja obrazka w grze jest zawsze zawieszona na *środkowym pikselu*.
 Koordynaty tego piksela określane są wzorem ``(floor(szerokość / 2), floor(wysokość / 2))``.  
 
 Np. licząc od zera, w przypadku obrazka 3x3, jest to piksel o koordynatach (1, 1).  
-W przypadku obrazka 2x2 jest to piksel w samym lewym górnym rogu - (0, 0).  
+W przypadku obrazka 2x2 jest to piksel w samym prawym dolnym rogu - też (1, 1).  
 
 Aby postać nie przeskakiwała podczas gwałtownego przełączania animacji - np. strzał, chodzenie, strzał, chodzenie - należy upewnić się,  
 że:
