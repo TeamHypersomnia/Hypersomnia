@@ -173,19 +173,16 @@ void visibility_system::calc_visibility(
 	const auto epsilon_threshold_obstacle_hit_meters = si.get_meters(settings.epsilon_threshold_obstacle_hit);
 
 	/* we'll need a reference to physics system for raycasting */
-	const physics_world_cache& physics = cosmos.get_solvable_inferred().physics;
+	const auto& physics = cosmos.get_solvable_inferred().physics;
 
 	struct ray_input {
 		vec2 targets[2];
 	};
 
-	std::vector<
-		augs::simple_pair<
-			physics_raycast_output, 
-			physics_raycast_output
-		>
-	> all_ray_outputs;
-	std::vector<ray_input> all_ray_inputs;
+	using ray_output = augs::simple_pair<
+		physics_raycast_output, 
+		physics_raycast_output
+	>;
 
 	for (const auto& request : vis_requests) {
 		const auto ignored_entity = request.subject;
@@ -280,73 +277,78 @@ void visibility_system::calc_visibility(
 			}
 		);
 
-		/* extract the actual vertices from visibility AABB to cast rays to */
-		const b2Vec2 whole_vision[] = {
-			aabb.lowerBound,
-			aabb.lowerBound + b2Vec2(vision_side_meters, 0),
-			aabb.upperBound,
-			aabb.upperBound - b2Vec2(vision_side_meters, 0)
-		};
+		const auto visibility_bounds = [&](){
+			/* extract the actual vertices from visibility AABB to cast rays to */
+			const b2Vec2 whole_vision[] = {
+				aabb.lowerBound,
+				aabb.lowerBound + b2Vec2(vision_side_meters, 0),
+				aabb.upperBound,
+				aabb.upperBound - b2Vec2(vision_side_meters, 0)
+			};
 
-		/* prepare edge shapes given above vertices to cast rays against when no obstacle was hit
-		note we lengthen them a bit and add/substract 1.f to avoid undeterministic vertex cases
-		*/
-		b2EdgeShape bounds[4];
-		const auto moving_epsilon = si.get_meters(1.f);
-		bounds[0].Set(b2Vec2(whole_vision[0]) + b2Vec2(-moving_epsilon, 0.f), b2Vec2(whole_vision[1]) + b2Vec2(moving_epsilon, 0.f));
-		bounds[1].Set(b2Vec2(whole_vision[1]) + b2Vec2(0.f, -moving_epsilon), b2Vec2(whole_vision[2]) + b2Vec2(0.f, moving_epsilon));
-		bounds[2].Set(b2Vec2(whole_vision[2]) + b2Vec2(moving_epsilon, 0.f), b2Vec2(whole_vision[3]) + b2Vec2(-moving_epsilon, 0.f));
-		bounds[3].Set(b2Vec2(whole_vision[3]) + b2Vec2(0.f, moving_epsilon), b2Vec2(whole_vision[0]) + b2Vec2(0.f, -moving_epsilon));
+			/* prepare edge shapes given above vertices to cast rays against when no obstacle was hit
+			note we lengthen them a bit and add/substract 1.f to avoid undeterministic vertex cases
+			*/
+			std::array<b2EdgeShape, 4> b;
 
-		/* debug drawing of the visibility square */
-		if (DEBUG_DRAWING.draw_cast_rays || DEBUG_DRAWING.draw_triangle_edges) {
-			lines.emplace_back(white, si.get_pixels(vec2(whole_vision[0]) + vec2(-moving_epsilon, 0.f)), si.get_pixels(vec2(whole_vision[1]) + vec2(moving_epsilon, 0.f)));
-			lines.emplace_back(white, si.get_pixels(vec2(whole_vision[1]) + vec2(0.f, -moving_epsilon)), si.get_pixels(vec2(whole_vision[2]) + vec2(0.f, moving_epsilon)));
-			lines.emplace_back(white, si.get_pixels(vec2(whole_vision[2]) + vec2(moving_epsilon, 0.f)),  si.get_pixels(vec2(whole_vision[3]) + vec2(-moving_epsilon, 0.f)));
-			lines.emplace_back(white, si.get_pixels(vec2(whole_vision[3]) + vec2(0.f, moving_epsilon)),  si.get_pixels(vec2(whole_vision[0]) + vec2(0.f, -moving_epsilon)));
-		}
+			const auto moving_epsilon = si.get_meters(1.f);
+			b[0].Set(b2Vec2(whole_vision[0]) + b2Vec2(-moving_epsilon, 0.f), b2Vec2(whole_vision[1]) + b2Vec2(moving_epsilon, 0.f));
+			b[1].Set(b2Vec2(whole_vision[1]) + b2Vec2(0.f, -moving_epsilon), b2Vec2(whole_vision[2]) + b2Vec2(0.f, moving_epsilon));
+			b[2].Set(b2Vec2(whole_vision[2]) + b2Vec2(moving_epsilon, 0.f), b2Vec2(whole_vision[3]) + b2Vec2(-moving_epsilon, 0.f));
+			b[3].Set(b2Vec2(whole_vision[3]) + b2Vec2(0.f, moving_epsilon), b2Vec2(whole_vision[0]) + b2Vec2(0.f, -moving_epsilon));
 
-		/* raycast through the bounds to add another vertices where the shapes go beyond visibility square */
-		for (const auto& bound : bounds) {
-			/* have to raycast both directions because Box2D ignores the second side of the fixture */
-			const auto output1 = physics.ray_cast_all_intersections(bound.m_vertex1, bound.m_vertex2, request.filter, ignored_entity);
-			const auto output2 = physics.ray_cast_all_intersections(bound.m_vertex2, bound.m_vertex1, request.filter, ignored_entity);
-
-			/* check for duplicates */
-			std::vector<vec2> output;
-
-			for (const auto& inter : output1) {
-				output.push_back(inter.intersection);
+			if (DEBUG_DRAWING.draw_cast_rays || DEBUG_DRAWING.draw_triangle_edges) {
+				/* Draw the visibility square for debugging */
+				lines.emplace_back(white, si.get_pixels(vec2(whole_vision[0]) + vec2(-moving_epsilon, 0.f)), si.get_pixels(vec2(whole_vision[1]) + vec2(moving_epsilon, 0.f)));
+				lines.emplace_back(white, si.get_pixels(vec2(whole_vision[1]) + vec2(0.f, -moving_epsilon)), si.get_pixels(vec2(whole_vision[2]) + vec2(0.f, moving_epsilon)));
+				lines.emplace_back(white, si.get_pixels(vec2(whole_vision[2]) + vec2(moving_epsilon, 0.f)),  si.get_pixels(vec2(whole_vision[3]) + vec2(-moving_epsilon, 0.f)));
+				lines.emplace_back(white, si.get_pixels(vec2(whole_vision[3]) + vec2(0.f, moving_epsilon)),  si.get_pixels(vec2(whole_vision[0]) + vec2(0.f, -moving_epsilon)));
 			}
 
-			for (const auto& v : output2) {
-				bool duplicate_found = false;
+			/* raycast through the b to add another vertices where the shapes go beyond visibility square */
+			for (const auto& bound : b) {
+				/* have to raycast both directions because Box2D ignores the second side of the fixture */
+				const auto output1 = physics.ray_cast_all_intersections(bound.m_vertex1, bound.m_vertex2, request.filter, ignored_entity);
+				const auto output2 = physics.ray_cast_all_intersections(bound.m_vertex2, bound.m_vertex1, request.filter, ignored_entity);
 
-				for (auto& duplicate : output1) {
-					if (v.intersection.compare(duplicate.intersection)) {
-						duplicate_found = true;
-						break;
+				/* check for duplicates */
+				std::vector<vec2> output;
+
+				for (const auto& inter : output1) {
+					output.push_back(inter.intersection);
+				}
+
+				for (const auto& v : output2) {
+					bool duplicate_found = false;
+
+					for (auto& duplicate : output1) {
+						if (v.intersection.compare(duplicate.intersection)) {
+							duplicate_found = true;
+							break;
+						}
+					}
+
+					if (!duplicate_found) {
+						output.push_back(v.intersection);
 					}
 				}
 
-				if (!duplicate_found) {
-					output.push_back(v.intersection);
+				if (DEBUG_DRAWING.draw_cast_rays) {
+					lines.emplace_back(si.get_pixels(bound.m_vertex1), si.get_pixels(bound.m_vertex2), rgba(255, 0, 0, 255));
+				}
+
+				for (const auto v : output) {
+					push_vertex(v, false);
 				}
 			}
 
-			if (DEBUG_DRAWING.draw_cast_rays) {
-				lines.emplace_back(si.get_pixels(bound.m_vertex1), si.get_pixels(bound.m_vertex2), rgba(255, 0, 0, 255));
-			}
-
-			for (const auto v : output) {
+			/* add the visibility square to the vertices that we cast rays to, computing comparable angle in place */
+			for (const auto v : whole_vision) {
 				push_vertex(v, false);
 			}
-		}
 
-		/* add the visibility square to the vertices that we cast rays to, computing comparable angle in place */
-		for (const auto v : whole_vision) {
-			push_vertex(v, false);
-		}
+			return b;
+		}();
 
 		/* SORT ALL VERTICES BY ANGLE */
 		sort_range(all_vertices_transformed);
@@ -387,7 +389,8 @@ void visibility_system::calc_visibility(
 		};
 
 		/* container for these */
-		std::vector<double_ray> double_rays;
+		thread_local std::vector<double_ray> double_rays;
+		double_rays.clear();
 
 		const auto push_double_ray = [&](const double_ray& ray_b) -> bool {
 			bool is_same_as_previous = false;
@@ -415,17 +418,15 @@ void visibility_system::calc_visibility(
 			return false;
 		};
 
-
 		/* helper debugging lambda */
 		const auto draw_line = [&](const vec2 point, const rgba col) {
 			lines.emplace_back(si.get_pixels(position_meters), si.get_pixels(point), col);
 		};
 
-		all_ray_inputs.clear();
-		all_ray_outputs.clear();
+		thread_local std::vector<ray_input> all_ray_inputs;
 
+		all_ray_inputs.clear();
 		all_ray_inputs.reserve(all_vertices_transformed.size());
-		all_ray_outputs.reserve(all_vertices_transformed.size());
 
 		/* for every vertex to cast the ray to */
 		for (const auto& vertex : all_vertices_transformed) {
@@ -443,7 +444,7 @@ void visibility_system::calc_visibility(
 			};
 
 			/* Clamp the ray against the visibility square */
-			for (const auto& bound : bounds) {
+			for (const auto& bound : visibility_bounds) {
 				bool continue_checking = true;
 
 				for (int j = 0; j < 2; ++j) {
@@ -479,6 +480,11 @@ void visibility_system::calc_visibility(
 			new_ray_input.targets[1] = targets[1];
 			all_ray_inputs.push_back(new_ray_input);
 		}
+
+		thread_local std::vector<ray_output> all_ray_outputs;
+
+		all_ray_outputs.clear();
+		all_ray_outputs.reserve(all_vertices_transformed.size());
 
 		/* process all raycast inputs at once to improve cache coherency */
 		for (std::size_t j = 0; j < all_ray_inputs.size(); ++j) {
@@ -622,7 +628,7 @@ void visibility_system::calc_visibility(
 					for (size_t k = 0; k < 2; ++k) {
 						if (!ray_callbacks[k].hit) {
 							/* for every edge from 4 edges forming visibility square */
-							for (const auto& bound : bounds) {
+							for (const auto& bound : visibility_bounds) {
 								const auto ray_edge_output = segment_segment_intersection(
 									position_meters, 
 									all_ray_inputs[i].targets[k], 
