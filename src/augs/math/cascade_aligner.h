@@ -31,6 +31,30 @@ struct cascade_aligner_node {
 		meta(meta)
 	{}
 
+	auto r() const {
+		return p.x + s.x / 2;
+	}
+
+	auto b() const {
+		return p.y + s.y / 2;
+	}
+
+	auto at() const {
+		return ap.y - as.y / 2;
+	}
+
+	auto ab() const {
+		return at() + as.y;
+	}
+
+	auto al() const {
+		return ap.x - as.x / 2;
+	}
+
+	auto ar() const {
+		return al() + as.x;
+	}
+
 	auto* operator->() {
 		return &meta;
 	}
@@ -55,72 +79,53 @@ struct cascade_aligner_node {
 
 	template <class T>
 	void stretch_r_to(const T target_r) {
-		const auto al = ap.x - as.x / 2;
-		const auto ar = al + as.x;
-
-		if (const auto dt = target_r - ar; dt > 0) {
-			as.x = target_r - al;
+		if (const auto dt = target_r - ar(); dt > 0) {
+			as.x = target_r - al();
 			ap.x = target_r - as.x / 2;
 		}
 	}
 
 	template <class T>
 	void stretch_l_to(const T target_l) {
-		const auto al = ap.x - as.x / 2;
-		const auto ar = al + as.x;
-
-		if (const auto dt = al - target_l; dt > 0) {
-			as.x = ar - target_l;
+		if (const auto dt = al() - target_l; dt > 0) {
+			as.x = ar() - target_l;
 			ap.x = target_l + as.x / 2;
 		}
 	}
 
 	template <class T>
 	void stretch_b_to(const T target_b) {
-		const auto at = ap.y - as.y / 2;
-		const auto ab = at + as.y;
-
-		if (const auto dt = target_b - ab; dt > 0) {
-			as.y = target_b - at;
+		if (const auto dt = target_b - ab(); dt > 0) {
+			as.y = target_b - at();
 			ap.y = target_b - as.y / 2;
 		}
 	}
 
 	void extend_l(const int times) {
-		const auto al = ap.x - as.x / 2;
-		const auto target_l = al - as.x * times;
-
+		const auto target_l = al() - as.x * times;
 		stretch_l_to(target_l);
 	}
 
 	void extend_r(const int times) {
-		const auto al = ap.x - as.x / 2;
-		const auto ar = al + as.x;
-
-		const auto target_r = ar + as.x * times;
+		const auto target_r = ar() + as.x * times;
 
 		stretch_r_to(target_r);
 	}
 
 	void extend_b(const int times) {
-		const auto at = ap.y - as.y / 2;
-		const auto ab = at + as.y;
-
-		const auto target_b = ab + as.y * times;
+		const auto target_b = ab() + as.y * times;
 
 		stretch_b_to(target_b);
 	}
 
 	void stretch_r(const int limit = 0) {
-		const auto r = p.x + s.x / 2;
-		const auto target_r = r + (limit * as.x);
+		const auto target_r = r() + limit * as.x;
 
 		stretch_r_to(target_r);
 	}
 
 	void stretch_b(const int limit = 0) {
-		const auto b = p.y + s.y / 2;
-		const auto target_b = b + (limit * as.y);
+		const auto target_b = b() + limit * as.y;
 
 		stretch_b_to(target_b);
 	}
@@ -221,13 +226,13 @@ public:
 		return *this;
 	}
 
-	auto& fill_ri(int limit = 0) {
+	auto& fill_r(int limit = 0) {
 		auto times = top().fill_times_ri() + limit;
 		while (times-- > 0) { dup().nr(); }
 		return *this;
 	}
 
-	auto& fill_ti(int limit = 0) {
+	auto& fill_t(int limit = 0) {
 		auto times = top().fill_times_ti() + limit;
 		while (times-- > 0) { dup().nu(); }
 		return *this;

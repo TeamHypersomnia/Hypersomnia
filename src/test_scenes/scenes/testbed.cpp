@@ -420,7 +420,7 @@ namespace test_scenes {
 				aquarium_align(test_plain_sprited_bodys::AQUARIUM_GLASS)
 					.li().bo().nr()
 					.next(test_plain_sprited_bodys::AQUARIUM_GLASS_START).lo().create_pop()
-					.fill_ri(-1)
+					.stretch_r(-1)
 					.next(test_plain_sprited_bodys::AQUARIUM_GLASS_START).ro().flip_h()
 				;
 
@@ -438,9 +438,9 @@ namespace test_scenes {
 				;
 
 				aquarium_align(test_plain_sprited_bodys::LAB_WALL)
-					.rot_90().lo().bi().fill_ti().again()
-					.flip_v().rot_90().ro().bi().fill_ti().again()
-					.flip_v().to().li().fill_ri()
+					.rot_90().lo().bi().fill_t().again()
+					.flip_v().rot_90().ro().bi().fill_t().again()
+					.flip_v().to().li().fill_r()
 				;
 			}
 
