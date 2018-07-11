@@ -5,9 +5,14 @@
 template <class T>
 struct basic_drawing_input_base {
 	const augs::drawer output;
+	const camera_cone cone;
 	
-	basic_drawing_input_base(const augs::drawer output)	: 
-		output(output)
+	basic_drawing_input_base(
+		const augs::drawer output,
+		const camera_cone cone
+	) : 
+		output(output),
+		cone(cone)
 	{}
 
 	basic_transform<T> renderable_transform;

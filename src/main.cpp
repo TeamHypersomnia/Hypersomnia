@@ -1423,6 +1423,7 @@ int work(const int argc, const char* const * const argv) try {
 				illuminated_rendering(
 					{
 						{ viewed_character, cone },
+						new_viewing_config.session.camera_query_aabb_mult,
 						audiovisuals,
 						new_viewing_config.drawing,
 						streaming.necessary_images_in_atlas,

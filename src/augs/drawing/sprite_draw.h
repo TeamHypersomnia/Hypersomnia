@@ -10,22 +10,65 @@ namespace augs {
 	template <class I, class F>
 	FORCE_INLINE void for_each_tile(
 		const sprite<I>& spr, 
+		const vec2 pos,
 		F callback, 
 		const real32 final_rotation, 
-		const augs::atlas_entry& diffuse
+		const augs::atlas_entry& diffuse,
+		const camera_cone& cone
 	) {
-		const auto drawn_size = spr.get_size();
+		const auto total_size = spr.get_size();
+		const auto tile_size = diffuse.get_original_size();
+		const auto times = total_size / tile_size;
 
-		const auto original_size = diffuse.get_original_size();
-		const auto times = drawn_size / original_size;
-		const auto lt = -vec2(original_size * (times - vec2i(1, 1))) / 2;
+		const auto vis = [&]() {
+			/* Rotate the tiled sprite so that it becomes axis aligned */
+			const auto rotated_pos = vec2(pos).rotate(-final_rotation, cone.eye.transform.pos);
+			auto rotated_camera = cone;
 
-		for (int y = 0; y < times.y; ++y) {
-			for (int x = 0; x < times.x; ++x) {
-				auto piece_offset = lt + vec2(original_size * vec2i(x, y));
+			/* Rotate the camera to the same space */
+			rotated_camera.eye.transform.rotation -= final_rotation;
+
+			const auto c = ltrbi(rotated_camera.get_visible_world_rect_aabb());
+			const auto s = ltrbi(vec2i(rotated_pos) - total_size / 2, total_size);
+
+			/* We start from assumption that the sprite is completely within the camera */
+			auto v = ltrbi(vec2i(0, 0), times);
+
+			/* But, right edge of the object might exceed right bound of camera */
+			{
+				const auto diff = s.r - c.r;
+
+				if (diff > 0) {
+					/* If the difference exceeds the tile size, the result of integer division becomes bigger than 0, in which case we already take 1 from times.x */
+					v.r -= diff / tile_size.x;
+				}
+			}
+
+			v.b -= std::max(0, s.b - c.b) / tile_size.y;
+
+			/* But, left edge of the camera might exceed left bound of object */
+			{
+				const auto diff = c.l - s.l;
+
+				if (diff > 0) {
+					/* If the difference exceeds the tile size, the result of integer division becomes bigger than 0, in which case we already put 1 as the beginning point. */
+					v.l = diff / tile_size.x;
+				}
+			}
+
+			v.t = std::max(0, c.t - s.t) / tile_size.y;
+
+			return v;
+		}();
+
+		const auto lt_center = -vec2(tile_size * (times - vec2i(1, 1))) / 2;
+
+		for (int y = vis.t; y < vis.b; ++y) {
+			for (int x = vis.l; x < vis.r; ++x) {
+				auto piece_offset = lt_center + vec2(tile_size * vec2i(x, y));
 				piece_offset.rotate(final_rotation);
 
-				callback(piece_offset);
+				callback(pos + piece_offset);
 			}
 		}
 	}
@@ -109,19 +152,21 @@ namespace augs {
 				if (spr.tile_excess_size && drawn_size > original_size) {
 					for_each_tile(
 						spr,
-						[&](const auto piece_offset) {
+						pos,
+						[&](const auto piece_pos) {
 							detail_draw(
 								spr,
 								in,
 								maybe_neon_map,
-								pos + piece_offset,
+								piece_pos,
 								final_rotation,
 								original_neon_size,
 								spr.neon_color
 							);
 						},
 						final_rotation,
-						diffuse
+						diffuse,
+						in.cone
 					);
 				}
 				else {
@@ -143,9 +188,8 @@ namespace augs {
 			if (spr.tile_excess_size && drawn_size > original_size) {
 				for_each_tile(
 					spr,
-					[&](const auto piece_offset) {
-						const auto piece_pos = pos + piece_offset;
-
+					pos,
+					[&](const auto piece_pos ) {
 						detail_draw(
 							spr,
 							in,
@@ -157,7 +201,8 @@ namespace augs {
 						);
 					},
 					final_rotation,
-					diffuse
+					diffuse,
+					in.cone
 				);
 			}
 			else {

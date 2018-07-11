@@ -59,9 +59,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 		}();
 
 		auto input = [&]() {
-			using input_type = invariants::sprite::drawing_input;
-
-			auto result = input_type(in.drawer);
+			auto result = in.make_input_for<invariants::sprite>();
 
 			if (const auto flips = typed_handle.calculate_flip_flags()) { 
 				result.flip = *flips;
@@ -168,9 +166,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 	}
 
 	if constexpr(typed_handle.template has<invariants::polygon>()) {
-		using input_type = invariants::polygon::drawing_input;
-
-		auto input = input_type(in.drawer);
+		auto input = in.make_input_for<invariants::polygon>();
 
 		input.renderable_transform = viewing_transform;
 		input.global_time_seconds = in.global_time_seconds;
@@ -216,9 +212,7 @@ FORCE_INLINE void specific_entity_drawer(
 				invariants::sprite sprite;
 				sprite.set(frame.frame.image_id, in.manager);
 
-				using input_type = invariants::sprite::drawing_input;
-
-				auto input = input_type(in.drawer);
+				auto input = in.make_input_for<invariants::sprite>();
 				input.renderable_transform = where;
 
 				input.flip.vertically = frame.flip;
@@ -341,9 +335,7 @@ FORCE_INLINE void specific_entity_drawer(
 					invariants::sprite sprite;
 					sprite.set(target_image, in.manager);
 
-					using input_type = invariants::sprite::drawing_input;
-
-					auto input = input_type(in.drawer);
+					auto input = in.make_input_for<invariants::sprite>();
 					input.renderable_transform = target_transform;
 					input.renderable_transform.rotation += head.shake_rotation_amount;
 

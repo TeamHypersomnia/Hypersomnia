@@ -112,6 +112,7 @@ void editor_coordinates_gui::perform(
 
 		text("Cursor: %x", world_cursor_pos);
 		text("View center: %x", vec2(current_eye->transform.pos).discard_fract());
+		text("Camera AABB: %x", cone.get_visible_world_rect_aabb());
 
 		{
 			auto zoom = current_eye->zoom * 100.f;

@@ -50,6 +50,7 @@ using illuminated_rendering_shaders = all_necessary_shaders;
 
 struct illuminated_rendering_input {
 	const character_camera camera;
+	const float camera_query_mult;
 	const audiovisual_state& audiovisuals;
 	const game_drawing_settings drawing;
 	const necessary_images_in_atlas_map& necessary_images;
@@ -164,13 +165,17 @@ void illuminated_rendering(
 
 	const auto cast_highlight = necessarys.at(assets::necessary_image_id::CAST_HIGHLIGHT);
 
+	auto queried_cone = cone;
+	queried_cone.eye.zoom /= in.camera_query_mult;
+
 	const auto drawing_input = draw_renderable_input { 
 		{
 			output, 
 			game_images, 
 			global_time_seconds,
 			flip_flags(),
-			av.randomizing
+			av.randomizing,
+			queried_cone
 		},
 		interp
 	};
@@ -268,7 +273,7 @@ void illuminated_rendering(
 	draw_layer(render_layer::AQUARIUM_BUBBLES);
 
 	for (const auto e : visible.per_layer[render_layer::DIM_WANDERING_PIXELS_EFFECTS]) {
-		draw_wandering_pixels_as_sprites(wandering_pixels, cosmos[e], game_images, invariants::sprite::drawing_input(output));
+		draw_wandering_pixels_as_sprites(wandering_pixels, cosmos[e], game_images, drawing_input.make_input_for<invariants::sprite>());
 	}
 
 	renderer.call_and_clear_triangles();
@@ -345,7 +350,8 @@ void illuminated_rendering(
 		cosmos.template for_each_having<components::sentience>(
 			[&](const auto it) {
 				if (const auto s = it.find_crosshair_def()) {
-					invariants::sprite::drawing_input in = output;
+					auto in = drawing_input.make_input_for<invariants::sprite>();
+					
 					in.global_time_seconds = global_time_seconds;
 					in.renderable_transform = it.get_world_crosshair_transform(interp);
 
@@ -391,7 +397,7 @@ void illuminated_rendering(
 	draw_particles(render_layer::ILLUMINATING_PARTICLES);
 
 	for (const auto e : visible.per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {
-		draw_wandering_pixels_as_sprites(wandering_pixels, cosmos[e], game_images, invariants::sprite::drawing_input(output));
+		draw_wandering_pixels_as_sprites(wandering_pixels, cosmos[e], game_images, drawing_input.make_input_for<invariants::sprite>());
 	}
 
 	renderer.call_and_clear_triangles();

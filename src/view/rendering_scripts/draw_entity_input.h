@@ -13,6 +13,12 @@ struct specific_draw_input {
 	const double global_time_seconds;
 	const flip_flags flip;
 	randomizing_system& randomizing;
+	const camera_cone cone;
+
+	template <class T>
+	auto make_input_for() const {
+		return typename T::drawing_input(drawer, cone);
+	}
 };
 
 struct draw_renderable_input : specific_draw_input {

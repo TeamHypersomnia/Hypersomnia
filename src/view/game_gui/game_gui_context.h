@@ -113,16 +113,6 @@ public:
 	const auto& get_image_metas() const {
 		return dependencies.image_definitions;
 	}
-
-	auto make_specific_draw_input(const augs::drawer output) const {
-		return specific_draw_input {
-			output,
-			get_game_images(),
-			0.0,
-			flip_flags(),
-			dependencies.randomizing
-		};
-	}
 };
 
 using game_gui_context = basic_game_gui_context<false>;
@@ -168,8 +158,19 @@ public:
 		return dependencies.input_information;
 	}
 
+	auto make_specific_draw_input(const augs::drawer output) const {
+		return specific_draw_input {
+			output,
+			get_game_images(),
+			0.0,
+			flip_flags(),
+			base::dependencies.randomizing,
+			camera_cone(get_camera_eye(), this->get_screen_size())
+		};
+	}
+
 	auto make_specific_draw_input() const {
-		return base::make_specific_draw_input(get_output());
+		return make_specific_draw_input(get_output());
 	}
 
 	auto make_draw_renderable_input() const {

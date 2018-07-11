@@ -6,6 +6,7 @@
 #include <cmath>
 #include "declare_math.h"
 #include "augs/math/si_scaling.h"
+#include "augs/string/typesafe_sprintf.h"
 
 enum rectangle_sticking {
 	LEFT,
