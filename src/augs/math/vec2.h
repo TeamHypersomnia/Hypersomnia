@@ -507,17 +507,17 @@ struct basic_vec2 {
 
 	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
 	bool non_zero(const real eps = AUGS_EPSILON<real>) const {
-		return x_non_zero(eps) || y_non_zero(eps);
+		return std::abs(x) > eps || std::abs(y) > eps;
 	}
 
 	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
 	bool neither_zero(const real eps = AUGS_EPSILON<real>) const {
-		return x_non_zero(eps) && y_non_zero(eps);
+		return std::abs(x) > eps && std::abs(y) > eps;
 	}
 
 	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
 	bool is_zero(const real eps = AUGS_EPSILON<real>) const {
-		return !non_zero(eps);
+		return std::abs(x) <= eps && std::abs(y) <= eps;
 	}
 
 	template <class A = type, class = std::enable_if_t<std::is_integral_v<A>>>

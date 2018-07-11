@@ -211,9 +211,7 @@ std::optional<transformr> spatial_properties_mixin<E>::find_logic_transform() co
 		const auto& cosmos = handle.get_cosmos();
 		const auto owner = cosmos[connection->owner];
 
-		if (const auto body = owner.template get<components::rigid_body>();
-			body.is_constructed()
-		) {
+		auto calc_transform = [&](const auto& body) {
 			const auto body_transform = body.get_transform();
 
 			auto displacement = connection->shape_offset;
@@ -223,6 +221,25 @@ std::optional<transformr> spatial_properties_mixin<E>::find_logic_transform() co
 			}
 
 			return body_transform + displacement;
+		};
+
+		if constexpr(has_specific_entity_type_v<E>) {
+			if constexpr(E::template has<components::rigid_body>()) {
+				if (owner.get_id() == handle.get_id()) {
+					/* Use the already dispatched handle in case it owns itself, which is the most probable occurence. */
+					if (const auto body = handle.template get<components::rigid_body>();
+						body.is_constructed()
+					) {
+						return calc_transform(body);
+					}
+				}
+			}
+		}
+
+		if (const auto body = owner.template get<components::rigid_body>();
+			body.is_constructed()
+		) {
+			return calc_transform(body);
 		}
 	}
 
