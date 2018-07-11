@@ -438,9 +438,9 @@ namespace test_scenes {
 				;
 
 				aquarium_align(test_plain_sprited_bodys::LAB_WALL)
-					.rot_90().lo().bi().fill_t().again()
-					.flip_v().rot_90().ro().bi().fill_t().again()
-					.flip_v().to().li().fill_r()
+					.rot_90().lo().bi().stretch_t().again()
+					.flip_v().rot_90().ro().bi().stretch_t().again()
+					.flip_v().to().li().stretch_r()
 				;
 			}
 
