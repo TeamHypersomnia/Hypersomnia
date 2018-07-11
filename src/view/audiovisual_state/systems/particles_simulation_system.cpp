@@ -117,12 +117,19 @@ std::size_t particles_simulation_system::count_all_particles() const {
 	std::size_t total = 0;
 
 	auto adder = [&](const auto& s) {
-		total += s.size();
+		for (const auto& v : s) {
+			total += v.size();
+		}
 	};
 
 	adder(general_particles);
 	adder(animated_particles);
-	adder(homing_animated_particles);
+
+	for (const auto& m : homing_animated_particles) {
+		for (const auto& v : m) {
+			total += v.second.size();
+		}
+	}
 
 	return total;
 }
