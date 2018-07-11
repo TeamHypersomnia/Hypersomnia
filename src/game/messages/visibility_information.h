@@ -23,24 +23,9 @@ struct visibility_information_request_input {
 	vec2 offset;
 };
 
-struct line_of_sight_request_input {
-	b2Filter obstruction_filter;
-	b2Filter candidate_filter;
-	float maximum_distance = 0.f;
-
-	bool test_items = false;
-	bool test_sentiences = false;
-	bool test_attitudes = false;
-	bool test_dangers = false;
-};
-
 namespace messages {
 	struct visibility_information_request : message, visibility_information_request_input {
 		transformr eye_transform;
-		visibility_type layer = visibility_type::NONE;
-	};
-
-	struct line_of_sight_request : message, line_of_sight_request_input {
 		visibility_type layer = visibility_type::NONE;
 	};
 
@@ -95,14 +80,5 @@ namespace messages {
 
 		triangle get_world_triangle(const size_t index, const vec2 origin) const;
 		std::vector<vec2> get_world_polygon(const float distance_epsilon, const vec2 expand_origin, const float expand_mult) const;
-	};
-
-	struct line_of_sight_response {
-		std::unordered_set<entity_id> visible_items;
-		std::unordered_set<entity_id> visible_sentiences;
-		std::unordered_set<entity_id> visible_attitudes;
-		std::unordered_set<entity_id> visible_dangers;
-
-		bool sees(const entity_id) const;
 	};
 }

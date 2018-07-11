@@ -26,26 +26,27 @@ namespace behaviours {
 		auto subject = t.get_subject();
 		const auto subject_transform = subject.get_logic_transform();
 		const auto pos = subject_transform.pos;
-		auto& los = t.step.transient.calculated_line_of_sight.at(subject);
+		/* auto& los = t.step.transient.calculated_line_of_sight.at(subject); */
 		auto& attitude = subject.get<components::attitude>();
 
 		entity_id closest_hostile_raw;
 
 		float min_distance = std::numeric_limits<float>::max();
 
-		for (auto s_raw : los.visible_sentiences) {
-			auto s = cosmos[s_raw];
-			const auto calculated_attitude = calc_attitude(s, subject);
+		(void)min_distance;
+		/* for (auto s_raw : los.visible_sentiences) { */
+		/* 	auto s = cosmos[s_raw]; */
+		/* 	const auto calculated_attitude = calc_attitude(s, subject); */
 
-			if (is_hostile(calculated_attitude)) {
-				auto dist = (s.get_logic_transform().pos - pos).length_sq();
+		/* 	if (is_hostile(calculated_attitude)) { */
+		/* 		auto dist = (s.get_logic_transform().pos - pos).length_sq(); */
 
-				if (dist < min_distance) {
-					closest_hostile_raw = s;
-					min_distance = dist;
-				}
-			}
-		}
+		/* 		if (dist < min_distance) { */
+		/* 			closest_hostile_raw = s; */
+		/* 			min_distance = dist; */
+		/* 		} */
+		/* 	} */
+		/* } */
 
 		auto closest_hostile = cosmos[closest_hostile_raw];
 

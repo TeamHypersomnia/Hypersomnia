@@ -33,12 +33,13 @@ using namespace augs;
 using namespace messages;
 
 /*
-source:
-http://stackoverflow.com/questions/16542042/fastest-way-to-sort-vectors-by-angle-without-actually-computing-that-angle
+	Thanks to:
+	http://stackoverflow.com/questions/16542042/fastest-way-to-sort-vectors-by-angle-without-actually-computing-that-angle
 */
+
 FORCE_INLINE auto comparable_angle(const vec2 diff) {
 	return augs::sgn(diff.y) * (
-		1 - (diff.x / (std::abs(diff.x) + std::abs(diff.y)))
+		1 - diff.x / (std::abs(diff.x) + std::abs(diff.y))
 	);
 }
 
@@ -95,8 +96,7 @@ std::vector<vec2> visibility_information_response::get_world_polygon(
 			std::isnan(edges[i].first.y) ||
 			std::isnan(edges[i].second.x) ||
 			std::isnan(edges[i].second.y)
-			)
-		{
+		) {
 			break;
 		}
 
@@ -110,14 +110,6 @@ std::vector<vec2> visibility_information_response::get_world_polygon(
 	}
 
 	return output;
-}
-
-bool line_of_sight_response::sees(const entity_id id) const {
-	return visible_items.find(id) != visible_items.end()
-		|| visible_sentiences.find(id) != visible_sentiences.end()
-		|| visible_attitudes.find(id) != visible_attitudes.end()
-		|| visible_dangers.find(id) != visible_dangers.end()
-		;
 }
 
 void visibility_system::calc_visibility(const logic_step step) const {

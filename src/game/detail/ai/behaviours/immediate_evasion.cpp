@@ -14,20 +14,22 @@
 namespace behaviours {
 	tree::goal_availability immediate_evasion::goal_resolution(tree::state_of_traversal& t) const {
 		const auto subject = t.get_subject();
-		const auto& los = t.step.transient.calculated_line_of_sight.at(subject);
+		//const auto& los = t.step.transient.calculated_line_of_sight.at(subject);
 		const auto& cosmos = t.step.get_cosmos();
 
 		immediate_evasion_goal goal;
 
 		float total_danger = 0.f;
 
-		for (auto s : los.visible_dangers) {
-			const auto danger = assess_danger(subject, cosmos[s]);
-			ensure(danger.amount > 0);
+		(void)cosmos;
 
-			total_danger += danger.amount;
-			goal.dangers.push_back(danger);
-		}
+		/* for (auto s : los.visible_dangers) { */
+		/* 	const auto danger = assess_danger(subject, cosmos[s]); */
+		/* 	ensure(danger.amount > 0); */
+
+		/* 	total_danger += danger.amount; */
+		/* 	goal.dangers.push_back(danger); */
+		/* } */
 
 		if (total_danger < subject.get<invariants::sentience>().minimum_danger_amount_to_evade) {
 			return tree::goal_availability::ALREADY_ACHIEVED;

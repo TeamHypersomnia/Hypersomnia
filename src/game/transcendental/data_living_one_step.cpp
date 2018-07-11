@@ -5,5 +5,4 @@ void data_living_one_step::clear() {
 	messages.flush_queues();
 
 	calculated_visibility.clear();
-	calculated_line_of_sight.clear();
 }

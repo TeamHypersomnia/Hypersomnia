@@ -19,8 +19,6 @@ namespace messages {
 	struct melee_swing_response;
 	struct health_event;
 	struct visibility_information_request;
-	struct line_of_sight_request;
-	struct line_of_sight_response;
 	struct item_picked_up_message;
 	struct start_particle_effect;
 	struct stop_particle_effect;
@@ -45,8 +43,6 @@ typedef augs::storage_for_message_queues <
 	messages::melee_swing_response,
 	messages::health_event,
 	messages::visibility_information_request,
-	messages::line_of_sight_request,
-	messages::line_of_sight_response,
 	messages::item_picked_up_message,
 	messages::exhausted_cast,
 	messages::start_particle_effect,
