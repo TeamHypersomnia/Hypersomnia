@@ -5,7 +5,7 @@
 #include "augs/math/transform.h"
 #include "game/assets/ids/asset_ids.h"
 #include "game/container_sizes.h"
-#include "augs/templates/value_with_flag.h"
+#include "augs/templates/maybe.h"
 
 struct simple_animation_advance {
 	const real32 delta_ms;
@@ -129,11 +129,11 @@ using make_animation_frames = augs::constant_size_vector<T, ANIMATION_FRAME_COUN
 using plain_animation_frames_type = make_animation_frames<plain_animation_frame>;
 
 struct plain_animation_meta {
-	using vwf_u = augs::value_with_flag<unsigned>;
+	using maybe_u = augs::maybe<unsigned>;
 	// GEN INTROSPECTOR struct plain_animation_meta
 	bool flip_when_cycling = false;
 	pad_bytes<2> pad;
-	vwf_u stop_movement_at_frame = vwf_u(0, false);
+	maybe_u stop_movement_at_frame = maybe_u(0, false);
 	// END GEN INTROSPECTOR
 };
 

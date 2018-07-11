@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/pad_bytes.h"
 
-#include "augs/templates/value_with_flag.h"
+#include "augs/templates/maybe.h"
 #include "augs/drawing/make_sprite_points.h"
 #include "augs/math/transform.h"
 #include "augs/math/rects.h"
@@ -96,7 +96,7 @@ namespace augs {
 		sprite_special_effect effect = sprite_special_effect::NONE;
 		real32 effect_speed_multiplier = 1.f;
 
-		augs::value_with_flag<intensity_vibration_input> neon_intensity_vibration;
+		augs::maybe<intensity_vibration_input> neon_intensity_vibration;
 		bool vibrate_diffuse_as_well = false;
 		bool tile_excess_size = false;
 		pad_bytes<2> pad;

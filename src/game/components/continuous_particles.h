@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/math/declare_math.h"
-#include "augs/templates/value_with_flag.h"
+#include "augs/templates/maybe.h"
 #include "augs/misc/minmax.h"
 #include "game/detail/view_input/particle_effect_input.h"
 
@@ -23,7 +23,7 @@ namespace invariants {
 	struct continuous_particles {
 		// GEN INTROSPECTOR struct invariants::continuous_particles
 		particle_effect_input effect;
-		augs::value_with_flag<stream_displacement> displacement;
+		augs::maybe<stream_displacement> displacement;
 		real32 max_lifetime_ms = -1.f;
 		// END GEN INTROSPECTOR
 	};

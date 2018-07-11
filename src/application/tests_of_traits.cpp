@@ -401,7 +401,7 @@ struct tests_of_traits {
 		int
 	>);
 
-	static_assert(std::is_trivially_copyable_v<augs::value_with_flag<int>>);
+	static_assert(std::is_trivially_copyable_v<augs::maybe<int>>);
 
 	static_assert(is_minmax_v<augs::minmax<float>>);
 	static_assert(is_minmax_v<augs::minmax<int>>);

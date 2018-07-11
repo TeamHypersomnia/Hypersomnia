@@ -7,7 +7,7 @@
 #include "augs/string/get_type_name.h"
 #include "augs/templates/traits/is_variant.h"
 #include "augs/templates/traits/is_optional.h"
-#include "augs/templates/traits/is_value_with_flag.h"
+#include "augs/templates/traits/is_maybe.h"
 #include "augs/templates/traits/is_pair.h"
 #include "augs/readwrite/lua_readwrite_errors.h"
 #include "augs/templates/container_templates.h"
@@ -78,8 +78,8 @@ namespace augs {
 	template <class Serialized>
 	void read_lua(sol::object input_object, Serialized& into) {
 		static_assert(
-			!is_optional_v<Serialized> && !is_value_with_flag_v<Serialized>,
-			"std::optional and value_with_flag can only be serialized as a member object."
+			!is_optional_v<Serialized> && !is_maybe_v<Serialized>,
+			"std::optional and maybe can only be serialized as a member object."
 		);
 
 		static_assert(!std::is_const_v<Serialized>, "Trying to read into a const object.");
@@ -235,7 +235,7 @@ namespace augs {
 								field.emplace(std::move(value));
 							}
 						}
-						else if constexpr(is_value_with_flag_v<T>) {
+						else if constexpr(is_maybe_v<T>) {
 							if (sol::object enabled_field = input_table[std::string("enabled_") + label];
 								enabled_field.valid()
 							) {
@@ -326,7 +326,7 @@ namespace augs {
 		);
 
 		static_assert(
-			!is_optional_v<Serialized> && !is_value_with_flag_v<Serialized>,
+			!is_optional_v<Serialized> && !is_maybe_v<Serialized>,
 			"std::optional can only be serialized as a member object."
 		);
 
@@ -417,7 +417,7 @@ namespace augs {
 							write_table_or_field(output_table, field.value(), label);
 						}
 					}
-					else if constexpr(is_value_with_flag_v<T>) {
+					else if constexpr(is_maybe_v<T>) {
 						if (field) {
 							write_table_or_field(output_table, field.value, std::string("enabled_") + label);
 						}

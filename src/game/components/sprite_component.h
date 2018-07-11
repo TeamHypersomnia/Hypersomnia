@@ -22,7 +22,7 @@ namespace components {
 		static constexpr bool is_synchronized = true;
 
 		// GEN INTROSPECTOR struct components::overridden_size
-		augs::value_with_flag<vec2i> size;
+		augs::maybe<vec2i> size;
 		// END GEN INTROSPECTOR
 	};
 };

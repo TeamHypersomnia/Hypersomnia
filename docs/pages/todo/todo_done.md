@@ -857,7 +857,7 @@ we consider whole type overrides too complex architeciturally:
 - Specyfing hotspots on the images
 	- State considerations
 		- Image definition shall store image_logical_meta 
-			- Each metric type will be specified with value_with_flag
+			- Each metric type will be specified with maybe
 		- On modification in Images GUI, they will be rewritten into cosmos common state
 			- And cosmos will be thus reinferred
 		- Our state will be duplicated, but it is not really bad
@@ -949,7 +949,7 @@ we consider whole type overrides too complex architeciturally:
 					- Frame state
 						- We won't implement these just yet. Won't matter until after deathmatch stage
 						- leg metrics
-							- value_with_flag<vec2i> foot_position[2]
+							- maybe<vec2i> foot_position[2]
 						- is step, or just assume that the last frame denotes a step
 					- Then the sentience invariant specifies particle effect to play on step
 						- Or the common state holds a map of ground material types to step sounds

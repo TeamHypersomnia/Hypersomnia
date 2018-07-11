@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/pad_bytes.h"
-#include "augs/templates/traits/is_value_with_flag.h"
+#include "augs/templates/traits/is_maybe.h"
 #include "augs/templates/folded_finders.h"
 #include "augs/string/string_templates_declaration.h"
 #include "augs/drawing/flip.h"
@@ -210,7 +210,7 @@ void detail_general_edit_properties(
 			}
 		}
 		else {
-			if constexpr(is_value_with_flag_v<T>) {
+			if constexpr(is_maybe_v<T>) {
 				const auto all_equal = equality_predicate(altered.is_enabled, std::nullopt);
 
 				{
