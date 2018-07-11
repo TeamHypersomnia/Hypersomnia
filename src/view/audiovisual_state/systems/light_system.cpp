@@ -100,8 +100,8 @@ void light_system::render_all_lights(const light_system_input in) const {
 	
 	const auto& visible_per_layer = in.visible_per_layer;
 
-	std::vector<messages::visibility_information_request> requests;
-	std::vector<messages::visibility_information_response> responses;
+	visibility_requests requests;
+	visibility_responses responses;
 
 	const auto cone = in.cone;
 	const auto eye = cone.eye;
@@ -147,8 +147,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 			}
 		);
 
-		std::vector<messages::line_of_sight_response> dummy;
-		visibility_system(DEBUG_FRAME_LINES).respond_to_visibility_information_requests(cosmos, {}, requests, dummy, responses);
+		visibility_system(DEBUG_FRAME_LINES).calc_visibility(cosmos, requests, responses);
 
 		performance.num_visible_lights.measure(requests.size());
 	}

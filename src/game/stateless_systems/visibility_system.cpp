@@ -36,7 +36,7 @@ using namespace messages;
 source:
 http://stackoverflow.com/questions/16542042/fastest-way-to-sort-vectors-by-angle-without-actually-computing-that-angle
 */
-static auto comparable_angle(const vec2 diff) {
+FORCE_INLINE auto comparable_angle(const vec2 diff) {
 	return augs::sgn(diff.y) * (
 		1 - (diff.x / (std::abs(diff.x) + std::abs(diff.y)))
 	);
@@ -120,52 +120,38 @@ bool line_of_sight_response::sees(const entity_id id) const {
 		;
 }
 
-void visibility_system::respond_to_visibility_information_requests(const logic_step step) const {
-	const auto& los_requests = step.get_queue<messages::line_of_sight_request>();
+void visibility_system::calc_visibility(const logic_step step) const {
 	const auto& vis_requests = step.get_queue<messages::visibility_information_request>();
-	auto& los_responses = step.get_queue<messages::line_of_sight_response>();
-	auto& vis_responses = step.get_queue<messages::visibility_information_response>();
 
-	respond_to_visibility_information_requests(step.get_cosmos(),
-		los_requests,
-		vis_requests,
-		los_responses,
-		vis_responses
+	const auto vis_responses = calc_visibility(
+		step.get_cosmos(),
+		vis_requests
 	);
-
-	for (size_t i = 0; i < los_requests.size(); ++i) {
-		step.transient.calculated_line_of_sight[los_requests[i].subject] = los_responses[i];
-	}
 
 	for (size_t i = 0; i < vis_requests.size(); ++i) {
 		step.transient.calculated_visibility[vis_requests[i].subject] = vis_responses[i];
 	}
 }
 
-visibility_system::visibility_responses visibility_system::respond_to_visibility_information_requests(
+visibility_responses visibility_system::calc_visibility(
 	const cosmos& cosmos,
-	const std::vector<messages::line_of_sight_request>& los_requests,
-	const std::vector<messages::visibility_information_request>& vis_requests
-) {
-	visibility_system::visibility_responses output;
+	const visibility_requests& vis_requests
+) const {
+	visibility_responses output;
 
-	respond_to_visibility_information_requests(
+	calc_visibility(
 		cosmos,
-		los_requests,
 		vis_requests,
-		output.los,
-		output.vis
+		output
 	);
 	
 	return output;
 }
 
-void visibility_system::respond_to_visibility_information_requests(
+void visibility_system::calc_visibility(
 	const cosmos& cosmos,
-	const std::vector<messages::line_of_sight_request>& los_requests,
-	const std::vector<messages::visibility_information_request>& vis_requests,
-	std::vector<messages::line_of_sight_response>& los_responses,
-	std::vector<messages::visibility_information_response>& vis_responses
+	const visibility_requests& vis_requests,
+	visibility_responses& vis_responses
 ) const {
 	const auto si = cosmos.get_si();
 
@@ -208,82 +194,6 @@ void visibility_system::respond_to_visibility_information_requests(
 		>
 	> all_ray_outputs;
 	std::vector<ray_input> all_ray_inputs;
-
-	for (const auto& request : los_requests) {
-		const auto it = cosmos[request.subject];
-		const auto transform = it.get_logic_transform();
-
-		line_of_sight_response response;
-
-		const auto d = request.maximum_distance;
-		
-		physics.for_each_in_aabb(
-			si,
-			transform.pos - vec2(d, d), 
-			transform.pos + vec2(d, d), 
-			request.candidate_filter, 
-			[&](const b2Fixture* const fix) {
-				const auto candidate = cosmos[get_entity_that_owns(fix)];
-				
-				if (candidate.get_owner_of_colliders() == it) {
-					return callback_result::CONTINUE;
-				}
-
-				const auto target_pos = candidate.get_logic_transform().pos;
-
-				if ((target_pos - transform.pos).length_sq() <= d*d) {
-					thread_local std::vector<std::unordered_set<entity_id>*> target_sets;
-					target_sets.clear();
-
-					if (request.test_items) {
-						if (candidate.has<components::item>()) {
-							target_sets.push_back(&response.visible_items);
-						}
-					}
-
-					if (request.test_sentiences) {
-						if (candidate.has<components::sentience>()) {
-							target_sets.push_back(&response.visible_sentiences);
-						}
-					}
-
-					if (request.test_attitudes) {
-						if (candidate.has<components::attitude>()) {
-							target_sets.push_back(&response.visible_attitudes);
-						}
-					}
-
-					if (request.test_dangers) {
-						if (assess_danger(it, candidate).amount > 0) {
-							target_sets.push_back(&response.visible_dangers);
-						}
-					}
-
-					if (target_sets.size() > 0) {
-						const auto out = physics.ray_cast_px(
-							cosmos.get_si(), 
-							transform.pos, 
-							target_pos, 
-							request.obstruction_filter, 
-							it
-						);
-
-						const auto line_of_sight_unobstructed = !out.hit;
-
-						if (line_of_sight_unobstructed) {
-							for (const auto& t : target_sets) {
-								t->insert(candidate);
-							}
-						}
-					}
-				}
-
-				return callback_result::CONTINUE;
-			}
-		);
-
-		los_responses.emplace_back(std::move(response));
-	}
 
 	for (const auto& request : vis_requests) {
 		const auto ignored_entity = request.subject;
@@ -923,6 +833,5 @@ void visibility_system::respond_to_visibility_information_requests(
 		vis_responses.push_back(response);
 	}
 
-	ensure_eq(los_requests.size(), los_responses.size());
 	ensure_eq(vis_requests.size(), vis_responses.size());
 }

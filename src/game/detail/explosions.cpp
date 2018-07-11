@@ -82,18 +82,23 @@ void standard_explosion_input::instantiate(
 	request.square_side = effective_radius * 2;
 	request.subject = subject_if_any;
 
-	const auto response = visibility_system(DEBUG_LOGIC_STEP_LINES).respond_to_visibility_information_requests(
+	const auto responses = visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(
 		cosm,
-		{},
 		{ request }
 	);
+
+	if (responses.empty()) {
+		return;
+	}
+
+	const auto& response = responses[0];
 
 	const auto& physics = cosm.get_solvable_inferred().physics;
 
 	std::unordered_set<unversioned_entity_id> affected_entities_of_bodies;
 
-	for (auto i = 0u; i < response.vis[0].get_num_triangles(); ++i) {
-		auto damaging_triangle = response.vis[0].get_world_triangle(i, request.eye_transform.pos);
+	for (auto i = 0u; i < response.get_num_triangles(); ++i) {
+		auto damaging_triangle = response.get_world_triangle(i, request.eye_transform.pos);
 		damaging_triangle[1] += (damaging_triangle[1] - damaging_triangle[0]).set_length(5);
 		damaging_triangle[2] += (damaging_triangle[2] - damaging_triangle[0]).set_length(5);
 
@@ -190,7 +195,7 @@ void standard_explosion_input::instantiate(
 
 		ring.color = inner_ring_color;
 		ring.center = explosion_pos;
-		ring.visibility = std::move(response.vis[0]);
+		ring.visibility = response;
 
 		step.post_message(ring);
 	}
@@ -210,7 +215,7 @@ void standard_explosion_input::instantiate(
 
 		ring.color = outer_ring_color;
 		ring.center = explosion_pos;
-		ring.visibility = std::move(response.vis[0]);
+		ring.visibility = response;
 
 		step.post_message(ring);
 	}

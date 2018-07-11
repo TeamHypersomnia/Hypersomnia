@@ -19,7 +19,6 @@ namespace messages {
 	struct melee_swing_response;
 	struct health_event;
 	struct visibility_information_request;
-	struct visibility_information_response;
 	struct line_of_sight_request;
 	struct line_of_sight_response;
 	struct item_picked_up_message;
@@ -46,7 +45,6 @@ typedef augs::storage_for_message_queues <
 	messages::melee_swing_response,
 	messages::health_event,
 	messages::visibility_information_request,
-	messages::visibility_information_response,
 	messages::line_of_sight_request,
 	messages::line_of_sight_response,
 	messages::item_picked_up_message,

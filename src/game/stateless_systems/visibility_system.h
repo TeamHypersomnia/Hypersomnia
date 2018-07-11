@@ -5,6 +5,9 @@
 #include "game/debug_drawing_settings.h"
 #include "game/transcendental/step_declaration.h"
 
+using visibility_requests = std::vector<messages::visibility_information_request>;
+using visibility_responses = std::vector<messages::visibility_information_response>;
+
 class visibility_system {
 	using lines_ref = std::vector<debug_line>&;
 
@@ -12,24 +15,13 @@ public:
 	lines_ref DEBUG_LINES_TARGET;
 	visibility_system(lines_ref ref) : DEBUG_LINES_TARGET(ref) {}
 
-	struct visibility_responses {
-		std::vector<messages::line_of_sight_response> los;
-		std::vector<messages::visibility_information_response> vis;
-	};
-	
-	visibility_responses respond_to_visibility_information_requests(
-		const cosmos&,
-		const std::vector<messages::line_of_sight_request>&,
-		const std::vector<messages::visibility_information_request>&
-	);
+	visibility_responses calc_visibility(const cosmos&, const visibility_requests&) const;
 
-	void respond_to_visibility_information_requests(
+	void calc_visibility(
 		const cosmos&,
-		const std::vector<messages::line_of_sight_request>&,
-		const std::vector<messages::visibility_information_request>&,
-		std::vector<messages::line_of_sight_response>&,
-		std::vector<messages::visibility_information_response>&
+		const visibility_requests&,
+		visibility_responses&
 	) const;
 
-	void respond_to_visibility_information_requests(const logic_step) const;
+	void calc_visibility(const logic_step) const;
 };
