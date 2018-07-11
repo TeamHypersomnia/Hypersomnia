@@ -65,6 +65,17 @@ struct cascade_aligner_node {
 	}
 
 	template <class T>
+	void stretch_l_to(const T target_l) {
+		const auto al = ap.x - as.x / 2;
+		const auto ar = al + as.x;
+
+		if (const auto dt = al - target_l; dt > 0) {
+			as.x = ar - target_l;
+			ap.x = target_l + as.x / 2;
+		}
+	}
+
+	template <class T>
 	void stretch_b_to(const T target_b) {
 		const auto at = ap.y - as.y / 2;
 		const auto ab = at + as.y;
@@ -73,6 +84,13 @@ struct cascade_aligner_node {
 			as.y = target_b - at;
 			ap.y = target_b - as.y / 2;
 		}
+	}
+
+	void extend_l(const int times) {
+		const auto al = ap.x - as.x / 2;
+		const auto target_l = al - as.x * times;
+
+		stretch_l_to(target_l);
 	}
 
 	void extend_r(const int times) {
@@ -267,6 +285,9 @@ public:
 
 	template <class... Args>
 	auto& stretch_b(Args&&... args) { top().stretch_b(std::forward<Args>(args)...); return *this; }
+
+	template <class... Args>
+	auto& extend_l(Args&&... args) { top().extend_l(std::forward<Args>(args)...); return *this; }
 
 	template <class... Args>
 	auto& extend_r(Args&&... args) { top().extend_r(std::forward<Args>(args)...); return *this; }

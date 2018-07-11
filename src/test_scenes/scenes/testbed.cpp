@@ -326,8 +326,8 @@ namespace test_scenes {
 				floor_align(test_plain_sprited_bodys::BRICK_WALL)
 					.lo().ti().stretch_b().again()
 					.lo().bo().extend_r(2).extend_b(1).again()
-					.ro().ti().stretch_b()//.again()
-					//.ro().bo().extend_l(2).extend_b(1).again()
+					.ro().ti().stretch_b().again()
+					.ro().bo().extend_l(2).extend_b(1)
 				;
 
 				{
