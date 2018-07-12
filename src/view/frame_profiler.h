@@ -21,7 +21,8 @@ struct frame_profiler : public augs::profiler_mixin<frame_profiler> {
 	augs::time_measurements particles_rendering;
 
 	augs::time_measurements camera_visibility_query;
-	augs::amount_measurements<std::size_t> num_visible_lights = 1;
+	augs::amount_measurements<std::size_t> num_drawn_lights = 1;
+	augs::amount_measurements<std::size_t> num_drawn_wall_lights = 1;
 	augs::amount_measurements<std::size_t> num_visible_entities = 1;
 	// END GEN INTROSPECTOR
 };

@@ -3,7 +3,7 @@
 #include <functional>
 
 #include "augs/misc/timing/delta.h"
-
+#include "augs/misc/randomization.h"
 #include "augs/math/camera_cone.h"
 
 #include "view/viewables/all_viewables_declarations.h"
@@ -37,6 +37,7 @@ struct light_system_input {
 	const augs::graphics::shader_program& standard_shader;
 	std::function<void()> neon_callback;
 	const camera_cone cone;
+	const float camera_query_mult;
 	const particles_simulation_system& particles;
 	const plain_animations_pool& plain_animations;
 	const visible_entities::per_layer_type& visible_per_layer;

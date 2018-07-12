@@ -357,21 +357,29 @@ public:
 						const auto handle = world[id];
 
 						handle.dispatch_on_having<invariants::light>([&](const auto typed_handle) {
-							const auto max_distance = typed_handle.template get<invariants::light>().get_max_distance();
 							const auto center = typed_handle.get_logic_transform().pos;
 
-							const auto light_color = typed_handle.template get<components::light>().color;
+							const auto& light_def = typed_handle.template get<invariants::light>();
+							const auto& light = typed_handle.template get<components::light>();
 
-							const auto reach = vec2(max_distance, max_distance);
-							callback(center, center + reach, light_color);
+							const auto light_color = light.color;
 
-							augs::general_border_from_to(
-								ltrb(xywh::center_and_size(center, reach * 2)),
-								0,
-								[&](const vec2 from, const vec2 to) {
-									callback(from, to, light_color);
-								}
-							);
+							auto draw_reach_indicator = [&](const auto reach, const auto col) {
+								const auto size = vec2::square(reach * 2);
+
+								callback(center, center + reach, col);
+
+								augs::general_border_from_to(
+									ltrb(xywh::center_and_size(center, size)),
+									0,
+									[&](const vec2 from, const vec2 to) {
+										callback(from, to, col);
+									}
+								);
+							};
+
+							draw_reach_indicator(light_def.calc_reach_trimmed(), light_color);
+							draw_reach_indicator(light_def.calc_wall_reach_trimmed(), rgba(light_color).multiply_alpha(0.7f));
 						});
 					}
 				);

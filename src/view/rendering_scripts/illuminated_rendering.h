@@ -165,8 +165,11 @@ void illuminated_rendering(
 
 	const auto cast_highlight = necessarys.at(assets::necessary_image_id::CAST_HIGHLIGHT);
 
-	auto queried_cone = cone;
-	queried_cone.eye.zoom /= in.camera_query_mult;
+	const auto queried_cone = [&]() {
+		auto c = cone;
+		c.eye.zoom /= in.camera_query_mult;
+		return c;
+	}();
 
 	const auto drawing_input = draw_renderable_input { 
 		{
@@ -238,6 +241,7 @@ void illuminated_rendering(
 			);
 		},
 		cone,
+		in.camera_query_mult,
 		particles,
 		anims,
 		visible.per_layer,

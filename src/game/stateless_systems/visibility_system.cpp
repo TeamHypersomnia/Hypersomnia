@@ -191,6 +191,11 @@ void visibility_system::calc_visibility(
 
 		response.source_square_side = request.square_side;
 
+		if (request.square_side < 1.f) {
+			vis_responses.emplace_back();
+			continue;
+		}
+
 		/* prepare container for all the vertices that we will cast the ray to */
 		struct target_vertex {
 			bool is_on_a_bound;

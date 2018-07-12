@@ -9,10 +9,6 @@
 #include "augs/math/vec2.h"
 #include "augs/pad_bytes.h"
 
-enum class visibility_type {
-	NONE,
-};
-
 struct visibility_information_request_input {
 	b2Filter filter;
 	pad_bytes<2> pad;
@@ -25,8 +21,11 @@ struct visibility_information_request_input {
 
 namespace messages {
 	struct visibility_information_request : message, visibility_information_request_input {
+		static auto empty() {
+			return visibility_information_request();
+		}
+
 		transformr eye_transform;
-		visibility_type layer = visibility_type::NONE;
 	};
 
 	struct visibility_information_response {
@@ -77,6 +76,10 @@ namespace messages {
 		}
 
 		size_t get_num_triangles() const;
+
+		bool empty() const {
+			return edges.empty() && vertex_hits.empty() && discontinuities.empty() && marked_holes.empty();
+		}
 
 		triangle get_world_triangle(const size_t index, const vec2 origin) const;
 		std::vector<vec2> get_world_polygon(const float distance_epsilon, const vec2 expand_origin, const float expand_mult) const;

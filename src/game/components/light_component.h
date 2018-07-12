@@ -1,61 +1,66 @@
 #pragma once
 #include <array>
 #include "augs/graphics/rgba.h"
+#include "augs/templates/maybe.h"
 
 struct randomization;
 
+using atten_t = real32;
+
 struct light_value_variation {
 	// GEN INTROSPECTOR struct light_value_variation
-	float min_variation = 0.f;
-	float max_variation = 0.f;
-	float change_speed = 0.f;
+	atten_t magnitude = 0.f;
+	atten_t change_speed = 0.f;
 	// END GEN INTROSPECTOR
 
-	void update_value(randomization&, float& val, const float dt_seconds) const;
+	void update_value(randomization&, atten_t& val, const float dt_seconds) const;
 };
 
-struct light_attenuation {
-	// GEN INTROSPECTOR struct light_attenuation
-	float base_value = 0.f;
-	light_value_variation variation;
+struct attenuation_variations {
+	// GEN INTROSPECTOR struct attenuation_variations
+	light_value_variation constant;
+	light_value_variation linear;
+	light_value_variation quadratic;
+	// END GEN INTROSPECTOR
+};
+
+struct attenuation_properties {
+	// GEN INTROSPECTOR struct attenuation_properties
+	atten_t constant = 0.f;
+	atten_t linear = 0.f;
+	atten_t quadratic = 0.f;
+
+	augs::maybe<real32> trim_reach = augs::maybe<real32>(300.f, false);
 	// END GEN INTROSPECTOR
 
-	auto get_max() const {
-		return base_value + variation.max_variation;
-	}
+	real32 calc_reach() const;
+	real32 calc_reach_trimmed() const;
+
+	void add_max(const attenuation_variations&);
 };
+
+namespace invariants {
+	struct light {
+		// GEN INTROSPECTOR struct invariants::light
+		attenuation_properties attenuation;
+		attenuation_properties wall_attenuation;
+
+		augs::maybe<attenuation_variations> variation;
+		augs::maybe<attenuation_variations> wall_variation;
+		augs::maybe<std::array<light_value_variation, 2>> position_variations;
+		// END GEN INTROSPECTOR
+
+		light();
+
+		real32 calc_reach_trimmed() const;
+		real32 calc_wall_reach_trimmed() const;
+	};
+}
 
 namespace components {
 	struct light {
 		// GEN INTROSPECTOR struct components::light
 		rgba color = white;
 		// END GEN INTROSPECTOR
-	};
-}
-
-namespace invariants {
-	struct light {
-		// GEN INTROSPECTOR struct invariants::light
-		light_attenuation constant;
-		light_attenuation linear;
-		light_attenuation quadratic;
-		float max_distance = -1.f;
-
-		light_attenuation wall_constant;
-		light_attenuation wall_linear;
-		light_attenuation wall_quadratic;
-		float wall_max_distance = -1.f;
-
-		std::array<light_value_variation, 2> position_variations;
-		// END GEN INTROSPECTOR
-
-		light();
-
-		float get_max_distance() const;
-
-		float calc_pixel_distance() const;
-		float calc_pixel_wall_distance() const;
-
-		float calc_max_pixel_distance() const;
 	};
 }

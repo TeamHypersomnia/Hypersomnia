@@ -116,11 +116,14 @@ public:
 
 		if (const auto* const light = handle.template find<components::light>()) {
 			if (const auto* const def = handle.template find<invariants::light>()) {
-				const auto range = def->get_max_distance();
+				const auto range = std::max(
+					def->calc_reach_trimmed(),
+					def->calc_wall_reach_trimmed()
+				);
 
 				return xywh::center_and_size(
 					transform.pos, 
-					vec2(range, range) * 2
+					vec2::square(range * 2)
 				);
 			}
 		}

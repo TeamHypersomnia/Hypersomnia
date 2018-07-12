@@ -1,5 +1,3 @@
-#include "augs/misc/randomization.h"
-
 #include "augs/graphics/vertex.h"
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/shader.h"
@@ -53,16 +51,39 @@ void light_system::advance_attenuation_variations(
 
 			const auto delta = dt.in_seconds();
 
-			light.constant.variation.update_value(rng, cache.all_variation_values[0], delta);
-			light.linear.variation.update_value(rng, cache.all_variation_values[1], delta);
-			light.quadratic.variation.update_value(rng, cache.all_variation_values[2], delta);
+			auto& vals = cache.all_variation_values;
 
-			light.wall_constant.variation.update_value(rng, cache.all_variation_values[3], delta);
-			light.wall_linear.variation.update_value(rng, cache.all_variation_values[4], delta);
-			light.wall_quadratic.variation.update_value(rng, cache.all_variation_values[5], delta);
+			if (light.variation.is_enabled) {
+				auto& v = light.variation.value;
 
-			light.position_variations[0].update_value(rng, cache.all_variation_values[6], delta);
-			light.position_variations[1].update_value(rng, cache.all_variation_values[7], delta);
+				v.constant.update_value(rng, vals[0], delta);
+				v.linear.update_value(rng, vals[1], delta);
+				v.quadratic.update_value(rng, vals[2], delta);
+			}
+			else {
+				vals[0] = vals[1] = vals[2] = 0.f;
+			}
+
+			if (light.wall_variation.is_enabled) {
+				auto& v = light.wall_variation.value;
+
+				v.constant.update_value(rng, vals[3], delta);
+				v.linear.update_value(rng, vals[4], delta);
+				v.quadratic.update_value(rng, vals[5], delta);
+			}
+			else {
+				vals[3] = vals[4] = vals[5] = 0.f;
+			}
+
+			if (light.position_variations.is_enabled) {
+				auto& v = light.position_variations.value;
+
+				v[0].update_value(rng, vals[6], delta);
+				v[1].update_value(rng, vals[7], delta);
+			}
+			else {
+				vals[6] = vals[7] = 0.f;
+			}
 		}
 	);
 }
@@ -109,7 +130,12 @@ void light_system::render_all_lights(const light_system_input in) const {
 	light_shader.set_projection(in.cone.get_projection_matrix());
 	light_shader.set_uniform(light_distance_mult_uniform, 1.f / eye.zoom);
 
-	const auto camera_aabb = cone.get_visible_world_rect_aabb();
+	const auto queried_camera_aabb = [&]() {
+		auto c = cone;
+		c.eye.zoom /= in.camera_query_mult;
+
+		return c.get_visible_world_rect_aabb();
+	}();
 
 	auto draw_layer = [&](const render_layer r) {
 		for (const auto e : visible_per_layer[r]) {
@@ -128,33 +154,44 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 		cosmos.for_each_having<components::light>(
 			[&](const auto light_entity) {
-				if (!camera_aabb.hover(*light_entity.find_aabb())) {
-					return;
-				}
+				const auto light_transform = light_entity.get_viewing_transform(interp);
+				const auto& light_def = light_entity.template get<invariants::light>();
+
+				const auto reach = light_def.calc_reach_trimmed();
+				const auto light_aabb = xywh::center_and_size(light_transform.pos, vec2::square(reach * 2));
 
 				if (const auto cache = mapped_or_nullptr(per_entity_cache, unversioned_entity_id(light_entity))) {
 					const auto light_displacement = vec2(cache->all_variation_values[6], cache->all_variation_values[7]);
 
 					messages::visibility_information_request request;
-					request.eye_transform = light_entity.get_viewing_transform(interp);
+
+					request.eye_transform = light_transform;
 					request.eye_transform.pos += light_displacement;
-					request.filter = filters::line_of_sight_query();
-					request.square_side = light_entity.template get<invariants::light>().get_max_distance();
+
+					if (queried_camera_aabb.hover(light_aabb)) {
+						request.filter = filters::line_of_sight_query();
+						request.square_side = reach;
+					}
+					else {
+						request.square_side = -1.f;
+					}
+
 					request.subject = light_entity;
 
-					requests.push_back(request);
+					requests.emplace_back(std::move(request));
 				}
 			}
 		);
 
 		visibility_system(DEBUG_FRAME_LINES).calc_visibility(cosmos, requests, responses);
-
-		performance.num_visible_lights.measure(requests.size());
 	}
 
 	auto scope = measure_scope(performance.light_rendering);
 
 	renderer.set_additive_blending();
+
+	std::size_t num_lights = 0;
+	std::size_t num_wall_lights = 0;
 
 	for (size_t i = 0; i < responses.size(); ++i) {
 		const auto& r = responses[i];
@@ -162,110 +199,112 @@ void light_system::render_all_lights(const light_system_input in) const {
 		const auto& light = light_entity.get<components::light>();
 		const auto& light_def = light_entity.get<invariants::light>();
 		const auto world_light_pos = requests[i].eye_transform.pos;
+		
+		const auto& cache = per_entity_cache.at(light_entity);
+		const auto& variation_vals = cache.all_variation_values;
 
-		for (size_t t = 0; t < r.get_num_triangles(); ++t) {
-			const auto world_light_tri = r.get_world_triangle(t, world_light_pos);
-			augs::vertex_triangle renderable_light_tri;
+		{
+			const auto light_frag_pos = [&]() {
+				auto screen_space = cone.to_screen_space(world_light_pos);	
+				screen_space.y = cone.screen_size.y - screen_space.y;
+				return screen_space;
+			}();
 
-			renderable_light_tri.vertices[0].pos = world_light_tri[0];
-			renderable_light_tri.vertices[1].pos = world_light_tri[1];
-			renderable_light_tri.vertices[2].pos = world_light_tri[2];
-
-			auto considered_color = light.color;
-			
-			if (considered_color == black) {
-				considered_color.set_hsv({ fmod(global_time_seconds / 16.f, 1.f), 1.0, 1.0 });
-			}
-
-			renderable_light_tri.vertices[0].color = considered_color;
-			renderable_light_tri.vertices[1].color = considered_color;
-			renderable_light_tri.vertices[2].color = considered_color;
-
-			renderer.push_triangle(renderable_light_tri);
+			light_shader.set_uniform(light_pos_uniform, light_frag_pos);
 		}
 
-		//for (size_t d = 0; d < r.get_num_discontinuities(); ++d) {
-		//	const auto world_discontinuity = *r.get_discontinuity(d);
-		//	
-		//	if (!world_discontinuity.is_boundary) {
-		//		vertex_triangle renderable_light_tri;
-		//
-		//		const float distance_from_light = (requests[i].eye_transform.pos - world_discontinuity.points.first).length();
-		//		const float angle = 80.f / ((distance_from_light+0.1f)/50.f);
-		//		
-		//		//(requests[i].eye_transform.pos - world_discontinuity.points.first).length();
-		//
-		//		if (world_discontinuity.winding == world_discontinuity.RIGHT) {
-		//			renderable_light_tri.vertices[0].pos = world_discontinuity.points.first + camera_offset;
-		//			renderable_light_tri.vertices[1].pos = world_discontinuity.points.second + camera_offset;
-		//			renderable_light_tri.vertices[2].pos = vec2(world_discontinuity.points.second).rotate(-angle, world_discontinuity.points.first) + camera_offset;
-		//		}
-		//		else {
-		//			renderable_light_tri.vertices[0].pos = world_discontinuity.points.first + camera_offset;
-		//			renderable_light_tri.vertices[1].pos = world_discontinuity.points.second + camera_offset;
-		//			renderable_light_tri.vertices[2].pos = vec2(world_discontinuity.points.second).rotate(angle, world_discontinuity.points.first) + camera_offset;
-		//		}
-		//
-		//		renderable_light_tri.vertices[0].color = light.color;
-		//		renderable_light_tri.vertices[1].color = light.color;
-		//		renderable_light_tri.vertices[2].color = light.color;
-		//
-		//		renderer.push_triangle(renderable_light_tri);
-		//	}
-		//}
+		const bool was_visibility_calculated = !r.empty();
 
-		const auto& cache = per_entity_cache.at(light_entity);
+		if (was_visibility_calculated) {
+			++num_lights;
 
-		auto light_frag_pos = cone.to_screen_space(world_light_pos);
-		light_frag_pos.y = cone.screen_size.y - light_frag_pos.y;
+			for (std::size_t t = 0; t < r.get_num_triangles(); ++t) {
+				const auto world_light_tri = r.get_world_triangle(t, world_light_pos);
+				augs::vertex_triangle renderable_light_tri;
 
-		light_shader.set_uniform(light_pos_uniform, light_frag_pos);
-		
-		light_shader.set_uniform(
-			light_attenuation_uniform,
-			vec3 {
-				(cache.all_variation_values[0] + light_def.constant.base_value) / CONST_MULT,
-				(cache.all_variation_values[1] + light_def.linear.base_value) / LINEAR_MULT,
-				(cache.all_variation_values[2] + light_def.quadratic.base_value) / QUADRATIC_MULT
+				renderable_light_tri.vertices[0].pos = world_light_tri[0];
+				renderable_light_tri.vertices[1].pos = world_light_tri[1];
+				renderable_light_tri.vertices[2].pos = world_light_tri[2];
+
+				auto considered_color = light.color;
+
+				if (considered_color == black) {
+					/* Easter egg: a completely black light gives a color wave. Pretty suitable for parties. */
+					considered_color.set_hsv({ fmod(global_time_seconds / 16.f, 1.f), 1.0, 1.0 });
+				}
+
+				renderable_light_tri.vertices[0].color = considered_color;
+				renderable_light_tri.vertices[1].color = considered_color;
+				renderable_light_tri.vertices[2].color = considered_color;
+
+				renderer.push_triangle(renderable_light_tri);
 			}
-		);
-		
-		light_shader.set_uniform(
-			light_multiply_color_uniform,
-			white.rgb()
-		);
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
-		
-		light_shader.set_as_current();
+			{
+				const auto& a = light_def.attenuation;
 
-		light_shader.set_uniform(light_attenuation_uniform,
-			vec3 {
-				(cache.all_variation_values[3] + light_def.wall_constant.base_value) / CONST_MULT,
-				(cache.all_variation_values[4] + light_def.wall_linear.base_value) / LINEAR_MULT,
-				(cache.all_variation_values[5] + light_def.wall_quadratic.base_value) / QUADRATIC_MULT
+				const auto attenuations = vec3 {
+					(variation_vals[0] + a.constant) / CONST_MULT,
+					(variation_vals[1] + a.linear) / LINEAR_MULT,
+					(variation_vals[2] + a.quadratic) / QUADRATIC_MULT
+				};
+
+				light_shader.set_uniform(light_attenuation_uniform, attenuations);
 			}
-		);
-		
-		light_shader.set_uniform(
-			light_multiply_color_uniform,
-			light.color.rgb()
-		);
-		
-		draw_layer(render_layer::DYNAMIC_BODY);
-		draw_layer(render_layer::OVER_DYNAMIC_BODY);
 
-		renderer.call_triangles();
-		renderer.clear_triangles();
+			light_shader.set_uniform(
+				light_multiply_color_uniform,
+				white.rgb()
+			);
 
-		light_shader.set_uniform(
-			light_multiply_color_uniform,
-			white.rgb()
-		);
+			renderer.call_triangles();
+			renderer.clear_triangles();
+		}
+
+		const auto wall_light_aabb = [&]() {
+			const auto wall_reach = light_def.calc_wall_reach_trimmed();
+			return xywh::center_and_size(world_light_pos, vec2::square(wall_reach * 2));
+		}();
+
+		if (queried_camera_aabb.hover(wall_light_aabb)) {
+			++num_wall_lights;
+
+			{
+				const auto& a = light_def.wall_attenuation;
+
+				const auto attenuations = vec3 {
+					(variation_vals[3] + a.constant) / CONST_MULT,
+					(variation_vals[4] + a.linear) / LINEAR_MULT,
+					(variation_vals[5] + a.quadratic) / QUADRATIC_MULT
+				};
+
+				light_shader.set_uniform(light_attenuation_uniform, attenuations);
+			}
+
+			light_shader.set_uniform(
+				light_multiply_color_uniform,
+				light.color.rgb()
+			);
+
+			draw_layer(render_layer::DYNAMIC_BODY);
+			draw_layer(render_layer::OVER_DYNAMIC_BODY);
+
+			renderer.call_triangles();
+			renderer.clear_triangles();
+
+			light_shader.set_uniform(
+				light_multiply_color_uniform,
+				white.rgb()
+			);
+		}
 	}
 
+	performance.num_drawn_lights.measure(num_lights);
+	performance.num_drawn_wall_lights.measure(num_wall_lights);
+
 	standard_shader.set_as_current();
+
+	/* Draw neon maps */
 
 	draw_neons(render_layer::DYNAMIC_BODY);
 	draw_neons(render_layer::OVER_DYNAMIC_BODY);
@@ -284,7 +323,6 @@ void light_system::render_all_lights(const light_system_input in) const {
 	draw_neons(render_layer::UPPER_FISH);
 	draw_neons(render_layer::AQUARIUM_BUBBLES);
 
-	/* Draw neon maps */
 	particles.draw_particles(
 		drawing_in.manager,
 		in.plain_animations,
