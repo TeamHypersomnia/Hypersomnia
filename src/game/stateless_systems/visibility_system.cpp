@@ -215,42 +215,43 @@ void visibility_system::calc_visibility(
 		all_vertices_transformed.clear();
 
 		/* transform entity position to Box2D coordinates and take offset into account */
-		const vec2 position_meters = si.get_meters(transform.pos + request.offset);
+		const vec2 eye_meters = si.get_meters(transform.pos + request.offset);
 
 		/* to Box2D coordinates */
 		const auto vision_side_meters = si.get_meters(request.square_side);
 
 		/* prepare maximum visibility square */
 		b2AABB aabb;
-		aabb.lowerBound = b2Vec2(position_meters - vision_side_meters / 2);
-		aabb.upperBound = b2Vec2(position_meters + vision_side_meters / 2);
+		aabb.lowerBound = b2Vec2(eye_meters - vision_side_meters / 2);
+		aabb.upperBound = b2Vec2(eye_meters + vision_side_meters / 2);
 
 		ltrb ltrb(aabb.lowerBound.x, aabb.lowerBound.y, aabb.upperBound.x, aabb.upperBound.y);
 
-		const auto push_vertex = [position_meters, ltrb](
-			const vec2 v, 
-			const bool check_against_aabb
-		) {
-			/* don't bother if it does not hover the aabb */
-			if (check_against_aabb && !ltrb.hover(vec2(v))) {
+		auto push_vertex_if_in_aabb = [eye_meters, ltrb](const vec2 v) {
+			if (!ltrb.hover(vec2(v))) {
 				return;
 			}
 
 			target_vertex new_vertex;
 			new_vertex.pos = v;
 
-			/* calculate difference vector */
-			vec2 diff = new_vertex.pos - position_meters;
-			/*
-			compute angle to be compared while sorting
-			source:
-			http://stackoverflow.com/questions/16542042/fastest-way-to-sort-vectors-by-angle-without-actually-computing-that-angle
+			const auto diff = new_vertex.pos - eye_meters;
 
-			save the angle in pair next to the vertex position, we will then sort the "angle-vertex" pairs by angle */
 			new_vertex.angle = comparable_angle(diff);
-			new_vertex.is_on_a_bound = !check_against_aabb;
+			new_vertex.is_on_a_bound = false;
 
-			/* save transformed vertex */
+			all_vertices_transformed.push_back(new_vertex);
+		};
+
+		auto push_boundary_vertex = [&](const vec2 v) {
+			target_vertex new_vertex;
+			new_vertex.pos = v;
+
+			const auto diff = new_vertex.pos - eye_meters;
+
+			new_vertex.angle = comparable_angle(diff);
+			new_vertex.is_on_a_bound = true;
+
 			all_vertices_transformed.push_back(new_vertex);
 		};
 
@@ -274,7 +275,7 @@ void visibility_system::calc_visibility(
 						const auto rotation = f->GetBody()->GetAngle();
 
 						/* transform vertex to current entity's position and rotation */
-						push_vertex(vec2(vv).rotate_radians(rotation) + vec2(position), true);
+						push_vertex_if_in_aabb(vec2(vv).rotate_radians(rotation) + vec2(position));
 					}
 				}
 
@@ -310,7 +311,7 @@ void visibility_system::calc_visibility(
 				lines.emplace_back(white, si.get_pixels(vec2(whole_vision[3]) + vec2(0.f, moving_epsilon)),  si.get_pixels(vec2(whole_vision[0]) + vec2(0.f, -moving_epsilon)));
 			}
 
-			/* raycast through the b to add another vertices where the shapes go beyond visibility square */
+			/* raycast through the bounds to add another vertices where the shapes go beyond visibility square */
 			for (const auto& bound : b) {
 				/* have to raycast both directions because Box2D ignores the second side of the fixture */
 				const auto output1 = physics.ray_cast_all_intersections(bound.m_vertex1, bound.m_vertex2, request.filter, ignored_entity);
@@ -343,13 +344,13 @@ void visibility_system::calc_visibility(
 				}
 
 				for (const auto v : output) {
-					push_vertex(v, false);
+					push_boundary_vertex(v);
 				}
 			}
 
 			/* add the visibility square to the vertices that we cast rays to, computing comparable angle in place */
 			for (const auto v : whole_vision) {
-				push_vertex(v, false);
+				push_boundary_vertex(v);
 			}
 
 			return b;
@@ -425,7 +426,7 @@ void visibility_system::calc_visibility(
 
 		/* helper debugging lambda */
 		const auto draw_line = [&](const vec2 point, const rgba col) {
-			lines.emplace_back(si.get_pixels(position_meters), si.get_pixels(point), col);
+			lines.emplace_back(si.get_pixels(eye_meters), si.get_pixels(point), col);
 		};
 
 		thread_local std::vector<ray_input> all_ray_inputs;
@@ -436,16 +437,16 @@ void visibility_system::calc_visibility(
 		/* for every vertex to cast the ray to */
 		for (const auto& vertex : all_vertices_transformed) {
 			/* calculate the perpendicular direction to properly apply epsilon_ray_distance_variation */
-			const vec2 perpendicular_cw = (vertex.pos - position_meters).normalize().perpendicular_cw();
+			const vec2 perpendicular_cw = (vertex.pos - eye_meters).normalize().perpendicular_cw();
 
 			const vec2 directions[2] = {
-				((vertex.pos - perpendicular_cw * si.get_meters(settings.epsilon_ray_distance_variation)) - position_meters).normalize(),
-				((vertex.pos + perpendicular_cw * si.get_meters(settings.epsilon_ray_distance_variation)) - position_meters).normalize()
+				((vertex.pos - perpendicular_cw * si.get_meters(settings.epsilon_ray_distance_variation)) - eye_meters).normalize(),
+				((vertex.pos + perpendicular_cw * si.get_meters(settings.epsilon_ray_distance_variation)) - eye_meters).normalize()
 			};
 
 			vec2 targets[2] = {
-				position_meters + directions[0] * vision_side_meters / 2 * 1.5f,
-				position_meters + directions[1] * vision_side_meters / 2 * 1.5f
+				eye_meters + directions[0] * vision_side_meters / 2 * 1.5f,
+				eye_meters + directions[1] * vision_side_meters / 2 * 1.5f
 			};
 
 			/* Clamp the ray against the visibility square */
@@ -454,7 +455,7 @@ void visibility_system::calc_visibility(
 
 				for (int j = 0; j < 2; ++j) {
 					const auto edge_ray_output = segment_segment_intersection(
-						position_meters, 
+						eye_meters, 
 						targets[j], 
 						bound.m_vertex1, 
 						bound.m_vertex2
@@ -494,9 +495,9 @@ void visibility_system::calc_visibility(
 		/* process all raycast inputs at once to improve cache coherency */
 		for (std::size_t j = 0; j < all_ray_inputs.size(); ++j) {
 			all_ray_outputs.emplace_back(
-				physics.ray_cast(position_meters, all_ray_inputs[j].targets[0], request.filter, ignored_entity),
+				physics.ray_cast(eye_meters, all_ray_inputs[j].targets[0], request.filter, ignored_entity),
 				all_vertices_transformed[j].is_on_a_bound ?
-				physics_raycast_output() : physics.ray_cast(position_meters, all_ray_inputs[j].targets[1], request.filter, ignored_entity)
+				physics_raycast_output() : physics.ray_cast(eye_meters, all_ray_inputs[j].targets[1], request.filter, ignored_entity)
 			);
 		}
 
@@ -524,7 +525,7 @@ void visibility_system::calc_visibility(
 				new_discontinuity.points.second = ray_callbacks[0].intersection;
 				new_discontinuity.normal = actual_normal;
 
-				new_discontinuity.winding = actual_normal.cross(position_meters - actual_intersection) > 0 ?
+				new_discontinuity.winding = actual_normal.cross(eye_meters - actual_intersection) > 0 ?
 					discontinuity::RIGHT : discontinuity::LEFT;
 
 				/* if it is clockwise, we take previous edge as subject */
@@ -555,10 +556,10 @@ void visibility_system::calc_visibility(
 				if (ray_callbacks[0].hit && ray_callbacks[1].hit) {
 					/* if distance between both intersections and position is less than distance from target to position
 					then rays must have intersected with an obstacle BEFORE reaching the vertex, ignoring intersection completely */
-					const auto distance_from_origin = (vertex.pos - position_meters).length();
+					const auto distance_from_origin = (vertex.pos - eye_meters).length();
 
-					if ((ray_callbacks[0].intersection - position_meters).length() + epsilon_threshold_obstacle_hit_meters < distance_from_origin &&
-						(ray_callbacks[1].intersection - position_meters).length() + epsilon_threshold_obstacle_hit_meters < distance_from_origin) {
+					if ((ray_callbacks[0].intersection - eye_meters).length() + epsilon_threshold_obstacle_hit_meters < distance_from_origin &&
+						(ray_callbacks[1].intersection - eye_meters).length() + epsilon_threshold_obstacle_hit_meters < distance_from_origin) {
 						if (DEBUG_DRAWING.draw_cast_rays) draw_line(vertex.pos, rgba(255, 0, 0, 255));
 					}
 					/* distance between both intersections fit in epsilon which means ray intersected with the same vertex */
@@ -635,7 +636,7 @@ void visibility_system::calc_visibility(
 							/* for every edge from 4 edges forming visibility square */
 							for (const auto& bound : visibility_bounds) {
 								const auto ray_edge_output = segment_segment_intersection(
-									position_meters, 
+									eye_meters, 
 									all_ray_inputs[i].targets[k], 
 									bound.m_vertex1, 
 									bound.m_vertex2
