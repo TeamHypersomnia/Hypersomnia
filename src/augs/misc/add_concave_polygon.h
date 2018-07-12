@@ -59,8 +59,12 @@ namespace augs {
 
 		for (i1 = 0; i1 < vs.size(); i1++) {
 			i2 = i1 + 1;
-			if (i2 == vs.size()) i2 = 0;
-			area += vs[i1].pos.x * vs[i2].pos.y - vs[i1].pos.y * vs[i2].pos.x;
+
+			if (i2 == vs.size()) {
+				i2 = 0;
+			}
+
+			area += vs[i1].pos.cross(vs[i2].pos);
 		}
 
 		/* ensure proper winding */

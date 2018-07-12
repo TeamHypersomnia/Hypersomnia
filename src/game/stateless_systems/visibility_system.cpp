@@ -140,6 +140,21 @@ visibility_responses visibility_system::calc_visibility(
 	return output;
 }
 
+struct target_vertex {
+	real32 angle;
+	vec2 pos;
+	bool is_on_a_bound;
+	int vision_extends = 0;
+
+	bool operator<(const target_vertex& b) const {
+		return angle < b.angle;
+	}
+
+	bool operator==(const target_vertex& b) const {
+		return pos.compare(b.pos) || (b.angle - angle) <= std::numeric_limits<decltype(angle)>::epsilon();
+	}
+};
+
 void visibility_system::calc_visibility(
 	const cosmos& cosmos,
 	const visibility_requests& vis_requests,
@@ -196,21 +211,6 @@ void visibility_system::calc_visibility(
 			continue;
 		}
 
-		/* prepare container for all the vertices that we will cast the ray to */
-		struct target_vertex {
-			bool is_on_a_bound;
-			real32 angle;
-			vec2 pos;
-
-			bool operator<(const target_vertex& b) const {
-				return angle < b.angle;
-			}
-
-			bool operator==(const target_vertex& b) const {
-				return pos.compare(b.pos) || (b.angle - angle) <= std::numeric_limits<decltype(angle)>::epsilon();
-			}
-		};
-
 		thread_local std::vector <target_vertex> all_vertices_transformed;
 		all_vertices_transformed.clear();
 
@@ -225,11 +225,12 @@ void visibility_system::calc_visibility(
 		aabb.lowerBound = b2Vec2(eye_meters - vision_side_meters / 2);
 		aabb.upperBound = b2Vec2(eye_meters + vision_side_meters / 2);
 
-		ltrb ltrb(aabb.lowerBound.x, aabb.lowerBound.y, aabb.upperBound.x, aabb.upperBound.y);
-
-		auto push_vertex_if_in_aabb = [eye_meters, ltrb](const vec2 v) {
-			if (!ltrb.hover(vec2(v))) {
-				return;
+		auto push_vertex_if_in_boundary = [
+			eye_meters, 
+			boundary = ltrb(aabb.lowerBound.x, aabb.lowerBound.y, aabb.upperBound.x, aabb.upperBound.y)
+		](const vec2 v) -> target_vertex* {
+			if (!boundary.hover(vec2(v))) {
+				return nullptr;
 			}
 
 			target_vertex new_vertex;
@@ -241,9 +242,10 @@ void visibility_system::calc_visibility(
 			new_vertex.is_on_a_bound = false;
 
 			all_vertices_transformed.push_back(new_vertex);
+			return std::addressof(all_vertices_transformed.back());
 		};
 
-		auto push_boundary_vertex = [&](const vec2 v) {
+		auto push_vertex_on_boundary = [&](const vec2 v) {
 			target_vertex new_vertex;
 			new_vertex.pos = v;
 
@@ -255,6 +257,9 @@ void visibility_system::calc_visibility(
 			all_vertices_transformed.push_back(new_vertex);
 		};
 
+		thread_local std::vector<vec2> surely_invisible_positions;
+		surely_invisible_positions.clear();
+
 		/* for every fixture that intersected with the visibility square */
 		physics.for_each_in_aabb_meters(
 			aabb, 
@@ -264,18 +269,52 @@ void visibility_system::calc_visibility(
 					return callback_result::CONTINUE;
 				}
 
-				const auto* const shape = f->m_shape;
-				/* get shape vertices from misc that transforms them to current entity's position and rotation in Box2D space */
-				if (shape->GetType() == b2Shape::e_polygon) {
-					const auto* const poly = static_cast<const b2PolygonShape*>(shape);
+				const auto& shape = *f->m_shape;
+				const auto xf = f->GetBody()->GetTransform();
+				const auto eye_local = vec2(b2MulT(xf.q, eye_meters.operator b2Vec2() - xf.p));
 
-					for (int32 vp = 0; vp < poly->GetVertexCount(); ++vp) {
-						const auto vv = poly->GetVertex(vp);
-						const auto position = f->GetBody()->GetPosition();
-						const auto rotation = f->GetBody()->GetAngle();
+				if (shape.GetType() == b2Shape::e_polygon) {
+					const auto& poly = static_cast<const b2PolygonShape&>(shape);
 
-						/* transform vertex to current entity's position and rotation */
-						push_vertex_if_in_aabb(vec2(vv).rotate_radians(rotation) + vec2(position));
+					std::array<bool, b2_maxPolygonVertices> visibles = {};
+					//std::array<int, b2_maxPolygonVertices> visions = {};
+
+					const auto vn = poly.GetVertexCount();
+
+					for (int vp = 0; vp < vn; ++vp) {
+						const auto vert = poly.GetVertex(vp);
+						const auto next_vert = poly.GetVertex((vp + 1) % vn);
+
+						visibles[vp] = eye_local.to_left_of(vert, next_vert);
+					}
+
+					auto idx = [vn](int i) {
+						return i < 0 ? vn + i : i % vn;
+					};
+
+					for (int vp = 0; vp < vn; ++vp) {
+						const bool this_vis = visibles[vp];
+						const bool prev_vis = visibles[idx(vp - 1)];
+
+						const auto vert = poly.GetVertex(vp);
+						const auto vv = static_cast<vec2>(b2Mul(xf, vert));
+
+						if (!this_vis && !prev_vis) {
+							surely_invisible_positions.emplace_back(vv);
+							continue;
+						}
+
+						if (const auto entry = push_vertex_if_in_boundary(vv)) {
+							if (this_vis && !prev_vis) {
+								entry->vision_extends = 1;
+							}
+							else if (!this_vis && prev_vis) {
+								entry->vision_extends = -1;
+							}
+							else {
+								entry->vision_extends = 0;
+							}
+						}
 					}
 				}
 
@@ -344,24 +383,23 @@ void visibility_system::calc_visibility(
 				}
 
 				for (const auto v : output) {
-					push_boundary_vertex(v);
+					push_vertex_on_boundary(v);
 				}
 			}
 
 			/* add the visibility square to the vertices that we cast rays to, computing comparable angle in place */
 			for (const auto v : whole_vision) {
-				push_boundary_vertex(v);
+				push_vertex_on_boundary(v);
 			}
 
 			return b;
 		}();
 
-		/* SORT ALL VERTICES BY ANGLE */
 		sort_range(all_vertices_transformed);
 		remove_duplicates_from_sorted(all_vertices_transformed);
 
 		/* 
-			all_vertices_transformed cannot be empty by now.
+			all_vertices_transformed cannot be empty by now, since the boundary itself has four vertices.
 
 			Debug line colors legend:
 

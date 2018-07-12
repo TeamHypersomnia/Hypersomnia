@@ -20,7 +20,7 @@ namespace behaviours {
 			if (currently_attacked_visible_entity.alive()) {
 				minimize_recoil_through_movement_goal goal;
 
-				const auto subject_orientation = subject.get_logic_transform().get_orientation();
+				const auto subject_orientation = subject.get_logic_transform().get_direction();
 
 				goal.movement_direction = (c->base_offset - subject_orientation * c->base_offset.length());
 

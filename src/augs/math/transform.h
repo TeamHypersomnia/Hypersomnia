@@ -145,7 +145,7 @@ struct basic_transform {
 		return pos - previous.pos;
 	}
 
-	auto get_orientation() const {
+	auto get_direction() const {
 		return vec2::from_degrees(rotation);
 	}
 

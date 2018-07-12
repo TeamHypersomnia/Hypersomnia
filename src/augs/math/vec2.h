@@ -571,6 +571,14 @@ struct basic_vec2 {
 		return length_sq() < b.length_sq();
 	}
 
+	bool to_left_of(const basic_vec2& a, const basic_vec2& b) const {
+		return (*this - a).cross(b - a) > 0.f;
+	}
+
+	bool to_right_of(const basic_vec2& a, const basic_vec2& b) const {
+		return (*this - a).cross(b - a) < 0.f;
+	}
+
 	bool operator>(const basic_vec2& b) const {
 		return length_sq() > b.length_sq();
 	}
