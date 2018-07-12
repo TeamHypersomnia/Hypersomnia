@@ -162,6 +162,14 @@ void visibility_system::calc_visibility(
 ) const {
 	const auto si = cosmos.get_si();
 
+	static const auto vtx_hit_col = yellow;
+	static const auto ray_obstructed_col = red;
+	static const auto extended_vision_hit_col = blue;
+	static const auto discontinuity_col = rgba(0, 127, 255, 255);
+	static const auto vis_rect_col = white;
+	static const auto free_area_col = pink;
+	static const auto unreachable_area_col = white;
+
 	const auto settings = [&cosmos](){ 
 		auto absolutize = [](float& f) {
 			f = std::fabs(f);
@@ -344,10 +352,10 @@ void visibility_system::calc_visibility(
 
 			if (DEBUG_DRAWING.draw_cast_rays || DEBUG_DRAWING.draw_triangle_edges) {
 				/* Draw the visibility square for debugging */
-				lines.emplace_back(white, si.get_pixels(vec2(whole_vision[0]) + vec2(-moving_epsilon, 0.f)), si.get_pixels(vec2(whole_vision[1]) + vec2(moving_epsilon, 0.f)));
-				lines.emplace_back(white, si.get_pixels(vec2(whole_vision[1]) + vec2(0.f, -moving_epsilon)), si.get_pixels(vec2(whole_vision[2]) + vec2(0.f, moving_epsilon)));
-				lines.emplace_back(white, si.get_pixels(vec2(whole_vision[2]) + vec2(moving_epsilon, 0.f)),  si.get_pixels(vec2(whole_vision[3]) + vec2(-moving_epsilon, 0.f)));
-				lines.emplace_back(white, si.get_pixels(vec2(whole_vision[3]) + vec2(0.f, moving_epsilon)),  si.get_pixels(vec2(whole_vision[0]) + vec2(0.f, -moving_epsilon)));
+				lines.emplace_back(vis_rect_col, si.get_pixels(vec2(whole_vision[0]) + vec2(-moving_epsilon, 0.f)), si.get_pixels(vec2(whole_vision[1]) + vec2(moving_epsilon, 0.f)));
+				lines.emplace_back(vis_rect_col, si.get_pixels(vec2(whole_vision[1]) + vec2(0.f, -moving_epsilon)), si.get_pixels(vec2(whole_vision[2]) + vec2(0.f, moving_epsilon)));
+				lines.emplace_back(vis_rect_col, si.get_pixels(vec2(whole_vision[2]) + vec2(moving_epsilon, 0.f)),  si.get_pixels(vec2(whole_vision[3]) + vec2(-moving_epsilon, 0.f)));
+				lines.emplace_back(vis_rect_col, si.get_pixels(vec2(whole_vision[3]) + vec2(0.f, moving_epsilon)),  si.get_pixels(vec2(whole_vision[0]) + vec2(0.f, -moving_epsilon)));
 			}
 
 			/* raycast through the bounds to add another vertices where the shapes go beyond visibility square */
@@ -379,7 +387,7 @@ void visibility_system::calc_visibility(
 				}
 
 				if (DEBUG_DRAWING.draw_cast_rays) {
-					lines.emplace_back(si.get_pixels(bound.m_vertex1), si.get_pixels(bound.m_vertex2), rgba(255, 0, 0, 255));
+					lines.emplace_back(si.get_pixels(bound.m_vertex1), si.get_pixels(bound.m_vertex2), ray_obstructed_col);
 				}
 
 				for (const auto v : output) {
@@ -573,8 +581,11 @@ void visibility_system::calc_visibility(
 
 				new_discontinuity.is_boundary = true;
 				//request.discontinuities.push_back(new_discontinuity);
-				if (push_double_ray(double_ray(vertex.pos, vertex.pos, true, true)))
-					if (DEBUG_DRAWING.draw_cast_rays) draw_line(vertex.pos, rgba(255, 255, 0, 255));
+				if (push_double_ray(double_ray(vertex.pos, vertex.pos, true, true))) {
+					if (DEBUG_DRAWING.draw_cast_rays) {
+						draw_line(vertex.pos, vtx_hit_col);
+					}
+				}
 			}
 			else if (!vertex.is_on_a_bound) {
 				/* if we did not intersect with anything */
@@ -598,7 +609,10 @@ void visibility_system::calc_visibility(
 
 					if ((ray_callbacks[0].intersection - eye_meters).length() + epsilon_threshold_obstacle_hit_meters < distance_from_origin &&
 						(ray_callbacks[1].intersection - eye_meters).length() + epsilon_threshold_obstacle_hit_meters < distance_from_origin) {
-						if (DEBUG_DRAWING.draw_cast_rays) draw_line(vertex.pos, rgba(255, 0, 0, 255));
+
+						if (DEBUG_DRAWING.draw_cast_rays) {
+							draw_line(vertex.pos, ray_obstructed_col);
+						}
 					}
 					/* distance between both intersections fit in epsilon which means ray intersected with the same vertex */
 					else if ((ray_callbacks[0].intersection - ray_callbacks[1].intersection).length_sq() < epsilon_distance_vertex_hit_sq) {
@@ -611,7 +625,9 @@ void visibility_system::calc_visibility(
 								si.get_pixels(vertex.pos)
 							);
 
-							if (DEBUG_DRAWING.draw_cast_rays) draw_line(vertex.pos, rgba(255, 255, 0, 255));
+							if (DEBUG_DRAWING.draw_cast_rays) {
+								draw_line(vertex.pos, vtx_hit_col);
+							}
 						}
 					}
 					/* we're here so:
@@ -643,7 +659,10 @@ void visibility_system::calc_visibility(
 							new_discontinuity.points.second = ray_callbacks[1].intersection;
 							new_discontinuity.winding = discontinuity::RIGHT;
 							new_discontinuity.edge_index = static_cast<int>(double_rays.size() - 1);
-							if (DEBUG_DRAWING.draw_cast_rays) draw_line(ray_callbacks[1].intersection, rgba(255, 0, 255, 255));
+
+							if (DEBUG_DRAWING.draw_cast_rays) {
+								draw_line(ray_callbacks[1].intersection, free_area_col);
+							}
 						}
 						/* otherwise the free area is to the left */
 						else {
@@ -655,7 +674,10 @@ void visibility_system::calc_visibility(
 							new_discontinuity.points.second = ray_callbacks[0].intersection;
 							new_discontinuity.winding = discontinuity::LEFT;
 							new_discontinuity.edge_index = static_cast<int>(double_rays.size());
-							if (DEBUG_DRAWING.draw_cast_rays) draw_line(ray_callbacks[0].intersection, rgba(255, 0, 255, 255));
+
+							if (DEBUG_DRAWING.draw_cast_rays) {
+								draw_line(ray_callbacks[0].intersection, free_area_col);
+							}
 						}
 
 						/* save new double ray */
@@ -708,7 +730,10 @@ void visibility_system::calc_visibility(
 									/* save new double ray */
 									if (push_double_ray(new_double_ray)) {
 										response.discontinuities.push_back(new_discontinuity);
-										if (DEBUG_DRAWING.draw_cast_rays) draw_line(actual_intersection, rgba(0, 0, 255, 255));
+
+										if (DEBUG_DRAWING.draw_cast_rays) {
+											draw_line(actual_intersection, extended_vision_hit_col);
+										}
 									}
 								}
 							}
@@ -728,12 +753,6 @@ void visibility_system::calc_visibility(
 			/* transform intersection locations to pixels */
 			vec2 p1 = si.get_pixels(ray_a.second);
 			vec2 p2 = si.get_pixels(ray_b.first);
-
-			//if (DEBUG_DRAWING.draw_triangle_edges) {
-			//	draw_line(si.get_pixels(p1), request.color);
-			//	draw_line(si.get_pixels(p2), request.color);
-			//	lines.emplace_back(p1, p2, request.color);
-			//}
 
 			response.edges.emplace_back(p1, p2);
 		}
@@ -818,8 +837,9 @@ void visibility_system::calc_visibility(
 					/* denote the unreachable area by saving an edge from the closest point to the discontinuity */
 					marked_holes.push_back(edge(closest_point, d.points.first));
 
-					if (DEBUG_DRAWING.draw_discontinuities)
-						lines.emplace_back(white, closest_point, d.points.first);
+					if (DEBUG_DRAWING.draw_discontinuities) {
+						lines.emplace_back(unreachable_area_col, closest_point, d.points.first);
+					}
 
 					/* remove this discontinuity */
 					return true;
@@ -868,7 +888,7 @@ void visibility_system::calc_visibility(
 
 		if (DEBUG_DRAWING.draw_discontinuities) {
 			for (const auto& disc : response.discontinuities) {
-				lines.emplace_back(disc.points.first, disc.points.second, rgba(0, 127, 255, 255));
+				lines.emplace_back(disc.points.first, disc.points.second, discontinuity_col);
 			}
 		}
 
