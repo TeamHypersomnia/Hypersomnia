@@ -199,13 +199,10 @@ void visibility_system::calc_visibility(
 	const auto& physics = cosmos.get_solvable_inferred().physics;
 
 	struct ray_input {
-		vec2 targets[2];
+		vec2 destination;
 	};
 
-	using ray_output = augs::simple_pair<
-		physics_raycast_output, 
-		physics_raycast_output
-	>;
+	using ray_output = physics_raycast_output;
 
 	for (const auto& request : vis_requests) {
 		const auto ignored_entity = request.subject;
@@ -421,21 +418,18 @@ void visibility_system::calc_visibility(
 		struct double_ray {
 			vec2 first;
 			vec2 second;
-			bool first_reached_destination = false;
-			bool second_reached_destination = false;
 
 			double_ray() = default;
 
-			double_ray(
-				const vec2 first,
-				const vec2 second, 
-				const bool a, 
-				const bool b
-			) : 
-				first(first), 
-				second(second), 
-				first_reached_destination(a), 
-				second_reached_destination(b) 
+			double_ray(const vec2 first, const vec2 second) : 
+				first(first),
+				second(second)
+			{
+			}
+
+			double_ray(const vec2 first) : 
+				first(first),
+				second(first)
 			{
 			}
 		};
@@ -444,21 +438,20 @@ void visibility_system::calc_visibility(
 		thread_local std::vector<double_ray> double_rays;
 		double_rays.clear();
 
-		const auto push_double_ray = [&](const double_ray& ray_b) -> bool {
-			bool is_same_as_previous = false;
-			const vec2 p2 = si.get_pixels(ray_b.first);
+		const auto push_double_ray = [&](auto... args) -> bool {
+			const auto ray_b = double_ray(args...);
+			const auto p2 = si.get_pixels(ray_b.first);
 
 			if (!double_rays.empty()) {
-				const auto& ray_a = *double_rays.rbegin();
-				const vec2 p1 = si.get_pixels(ray_a.second);
+				const auto p1 = si.get_pixels(double_rays.back().first);
 
-				is_same_as_previous = p1.compare(p2);
+				if (p1.compare(p2)) {
+					return false;
+				}
 			}
 
 			/* save new double_ray if it is not degenerate */
-			if (
-				!is_same_as_previous
-				&& (std::fpclassify(p2.x) == FP_NORMAL || std::fpclassify(p2.x) == FP_ZERO)
+			if ((std::fpclassify(p2.x) == FP_NORMAL || std::fpclassify(p2.x) == FP_ZERO)
 				&& (std::fpclassify(p2.y) == FP_NORMAL || std::fpclassify(p2.y) == FP_ZERO)
 				&& p2.x == p2.x
 				&& p2.y == p2.y
@@ -483,43 +476,37 @@ void visibility_system::calc_visibility(
 		/* for every vertex to cast the ray to */
 		for (const auto& vertex : all_vertices_transformed) {
 			/* calculate the perpendicular direction to properly apply epsilon_ray_distance_variation */
-			const vec2 perpendicular_cw = (vertex.pos - eye_meters).normalize().perpendicular_cw();
+			const auto perp = (vertex.pos - eye_meters).normalize().perpendicular_cw();
 
-			const vec2 directions[2] = {
-				((vertex.pos - perpendicular_cw * si.get_meters(settings.epsilon_ray_distance_variation)) - eye_meters).normalize(),
-				((vertex.pos + perpendicular_cw * si.get_meters(settings.epsilon_ray_distance_variation)) - eye_meters).normalize()
-			};
+			const auto direction = [&]() {
+				vec2 result;
 
-			vec2 targets[2] = {
-				eye_meters + directions[0] * vision_side_meters / 2 * 1.5f,
-				eye_meters + directions[1] * vision_side_meters / 2 * 1.5f
-			};
+				if (!vertex.vision_extends) {
+					result = (vertex.pos - eye_meters).normalize();
+				}
+				else {
+					const auto perp_offset = perp * vertex.vision_extends * si.get_meters(settings.epsilon_ray_distance_variation);
+					const auto shifted_vert = vertex.pos + perp_offset;
 
-			/* Clamp the ray against the visibility square */
-			for (const auto& bound : visibility_bounds) {
-				bool continue_checking = true;
-
-				for (int j = 0; j < 2; ++j) {
-					const auto edge_ray_output = segment_segment_intersection(
-						eye_meters, 
-						targets[j], 
-						bound.m_vertex1, 
-						bound.m_vertex2
-					);
-
-					if (edge_ray_output.hit) {
-						/* move the target further by epsilon */
-						targets[j] = edge_ray_output.intersection + directions[j] * si.get_meters(1.f);
-						continue_checking = false;
-					}
-				/*
-					else {
-						bool breakpoint = true;
-					}
-				*/
+					result = (shifted_vert - eye_meters).normalize();
 				}
 
-				if (!continue_checking) {
+				return result;
+			}();
+
+			vec2 destination = eye_meters + direction * vision_side_meters / 2 * 1.5f;
+
+			for (const auto& bound : visibility_bounds) {
+				const auto edge_ray_output = segment_segment_intersection(
+					eye_meters, 
+					destination, 
+					bound.m_vertex1, 
+					bound.m_vertex2
+				);
+
+				if (edge_ray_output.hit) {
+					/* Clamp the ray against the visibility square */
+					destination = edge_ray_output.intersection + direction * si.get_meters(1.f);
 					break;
 				}
 			}
@@ -527,9 +514,7 @@ void visibility_system::calc_visibility(
 			/* cast both rays starting from the player position and ending in targets[x].target,
 			ignoring subject entity ("it") completely, save results in ray_callbacks[2] */
 			ray_input new_ray_input;
-
-			new_ray_input.targets[0] = vertex.is_on_a_bound ? vertex.pos : targets[0];
-			new_ray_input.targets[1] = targets[1];
+			new_ray_input.destination = vertex.is_on_a_bound ? vertex.pos : destination;
 			all_ray_inputs.push_back(new_ray_input);
 		}
 
@@ -538,17 +523,14 @@ void visibility_system::calc_visibility(
 		all_ray_outputs.clear();
 		all_ray_outputs.reserve(all_vertices_transformed.size());
 
-		/* process all raycast inputs at once to improve cache coherency */
+		/* All raycast inputs are processed at once to improve cache coherency. */
 		for (std::size_t j = 0; j < all_ray_inputs.size(); ++j) {
-			all_ray_outputs.emplace_back(
-				physics.ray_cast(eye_meters, all_ray_inputs[j].targets[0], request.filter, ignored_entity),
-				all_vertices_transformed[j].is_on_a_bound ?
-				physics_raycast_output() : physics.ray_cast(eye_meters, all_ray_inputs[j].targets[1], request.filter, ignored_entity)
-			);
+			auto result = physics.ray_cast(eye_meters, all_ray_inputs[j].destination, request.filter, ignored_entity);
+			all_ray_outputs.emplace_back(std::move(result));
 		}
 
 		for (std::size_t i = 0; i < all_ray_outputs.size(); ++i) {
-			physics_raycast_output ray_callbacks[2] = { all_ray_outputs[i].first, all_ray_outputs[i].second };
+			const auto& ray_callback = all_ray_outputs[i];
 			auto& vertex = all_vertices_transformed[i];
 
 			/* const b2Vec2* from_aabb = nullptr; */
@@ -560,7 +542,7 @@ void visibility_system::calc_visibility(
 			/* 	} */
 			/* } */
 
-			if (vertex.is_on_a_bound && (!ray_callbacks[0].hit || (ray_callbacks[0].intersection - vertex.pos).length_sq() < epsilon_distance_vertex_hit_sq)) {
+			if (vertex.is_on_a_bound && (!ray_callback.hit || (ray_callback.intersection - vertex.pos).length_sq() < epsilon_distance_vertex_hit_sq)) {
 				/* if it is a vertex on the boundary, handle it accordingly - interpret it as a new discontinuity (e.g. for pathfinding) */
 				discontinuity new_discontinuity;
 				new_discontinuity.edge_index = static_cast<int>(double_rays.size());
@@ -568,7 +550,7 @@ void visibility_system::calc_visibility(
 
 				vec2 actual_normal;// = (ray_callbacks[0].normal / 2;
 				vec2 actual_intersection;// = (+ray_callbacks[1].intersection) / 2;
-				new_discontinuity.points.second = ray_callbacks[0].intersection;
+				new_discontinuity.points.second = ray_callback.intersection;
 				new_discontinuity.normal = actual_normal;
 
 				new_discontinuity.winding = actual_normal.cross(eye_meters - actual_intersection) > 0 ?
@@ -581,45 +563,27 @@ void visibility_system::calc_visibility(
 
 				new_discontinuity.is_boundary = true;
 				//request.discontinuities.push_back(new_discontinuity);
-				if (push_double_ray(double_ray(vertex.pos, vertex.pos, true, true))) {
+				if (push_double_ray(vertex.pos)) {
 					if (DEBUG_DRAWING.draw_cast_rays) {
 						draw_line(vertex.pos, vtx_hit_col);
 					}
 				}
 			}
 			else if (!vertex.is_on_a_bound) {
-				/* if we did not intersect with anything */
-				//if (!(ray_callbacks[0].hit || ray_callbacks[1].hit)) {
-				//	/* we could have cast the ray against bounding square, so if it in fact comes from there */
-				//	if (from_aabb)
-				//		/* interpret as both rays hit the square */
-				//		double_rays.push_back(double_ray(*from_aabb, *from_aabb, true, true));
-				//
-				//	/* should never happen (but who knows) */
-				//	else {
-				//		bool breakpoint = true;
-				//	}
-				//}
-				///* both rays intersect with something */
-				//else 
-				if (ray_callbacks[0].hit && ray_callbacks[1].hit) {
-					/* if distance between both intersections and position is less than distance from target to position
-					then rays must have intersected with an obstacle BEFORE reaching the vertex, ignoring intersection completely */
+				if (ray_callback.hit) {
+					/* 
+						If distance between intersection and position is less than distance from target to position
+						then ray must have intersected with an obstacle BEFORE reaching the vertex, ignoring intersection completely 
+					*/
 					const auto distance_from_origin = (vertex.pos - eye_meters).length();
 
-					if ((ray_callbacks[0].intersection - eye_meters).length() + epsilon_threshold_obstacle_hit_meters < distance_from_origin &&
-						(ray_callbacks[1].intersection - eye_meters).length() + epsilon_threshold_obstacle_hit_meters < distance_from_origin) {
-
+					if ((ray_callback.intersection - eye_meters).length() + epsilon_threshold_obstacle_hit_meters < distance_from_origin) {
 						if (DEBUG_DRAWING.draw_cast_rays) {
 							draw_line(vertex.pos, ray_obstructed_col);
 						}
 					}
-					/* distance between both intersections fit in epsilon which means ray intersected with the same vertex */
-					else if ((ray_callbacks[0].intersection - ray_callbacks[1].intersection).length_sq() < epsilon_distance_vertex_hit_sq) {
-						/* interpret it as both rays hit the same vertex
-						for maximum accuracy, push the vertex coordinates instead of the actual intersections */
-
-						if (push_double_ray(double_ray(vertex.pos, vertex.pos, true, true))) {
+					else if ((ray_callback.intersection - vertex.pos).length_sq() < epsilon_distance_vertex_hit_sq) {
+						if (push_double_ray(vertex.pos)) {
 							response.vertex_hits.emplace_back(
 								static_cast<int>(double_rays.size()) - 1, 
 								si.get_pixels(vertex.pos)
@@ -630,54 +594,39 @@ void visibility_system::calc_visibility(
 							}
 						}
 					}
-					/* we're here so:
-					they reached the target or even further (guaranteed by first condition),
-					and they are not close to each other (guaranteed by condition 2),
-					so either one of them hit the vertex and the second one went further or we have a pathological case
-					that both wen't further and still intersected somewhere close - this is something we either way cannot handle and occurs
-					when a body is pathologically thin
+					else if (vertex.vision_extends) {
+						/* 
+							Here: ray reached the target or even further (guaranteed by first condition),
+							and they are not close to each other (guaranteed by condition 2),
+							so either one of them hit the vertex and the second one went further or we have a pathological case
+							that both went further and still intersected somewhere close - this is something we either way cannot handle and occurs
+							when a body is pathologically thin
 
-					so this is the case where the ray is cast at the lateral vertex,
-					here we also detect the discontinuity */
-					else {
-						/* save both intersection points, this is what we introduced "double_ray" pair for */
-						double_ray new_double_ray(ray_callbacks[0].intersection, ray_callbacks[1].intersection, false, false);
+							so this is the case where the ray is cast at the lateral vertex,
+							here we also detect the discontinuity 
+						*/
 
+						double_ray new_double_ray; 
 
-						/* save new discontinuity */
 						discontinuity new_discontinuity;
+						new_discontinuity.points.first = vertex.pos;
+						new_discontinuity.points.second = ray_callback.intersection;
 
-						/* if the ray that we substracted the epsilon from intersected closer (and thus with the vertex), then the free space is to the right */
-						if ((ray_callbacks[0].intersection - vertex.pos).length_sq() <
-							(ray_callbacks[1].intersection - vertex.pos).length_sq()) {
-							/* it was "first" one that directly reached its destination */
-							new_double_ray.first_reached_destination = true;
-							new_double_ray.first = vertex.pos;
-
-							/* save discontinuity info and edge_index to associate discontinuity with current edge */
-							new_discontinuity.points.first = vertex.pos;
-							new_discontinuity.points.second = ray_callbacks[1].intersection;
-							new_discontinuity.winding = discontinuity::RIGHT;
-							new_discontinuity.edge_index = static_cast<int>(double_rays.size() - 1);
-
-							if (DEBUG_DRAWING.draw_cast_rays) {
-								draw_line(ray_callbacks[1].intersection, free_area_col);
-							}
-						}
-						/* otherwise the free area is to the left */
-						else {
-							/* it was "second" one that directly reached its destination */
-							new_double_ray.second_reached_destination = true;
+						if (vertex.vision_extends == -1) {
+							new_double_ray.first = ray_callback.intersection;
 							new_double_ray.second = vertex.pos;
-
-							new_discontinuity.points.first = vertex.pos;
-							new_discontinuity.points.second = ray_callbacks[0].intersection;
 							new_discontinuity.winding = discontinuity::LEFT;
 							new_discontinuity.edge_index = static_cast<int>(double_rays.size());
+						}
+						else if (vertex.vision_extends == 1) {
+							new_double_ray.first = vertex.pos;
+							new_double_ray.second = ray_callback.intersection;
+							new_discontinuity.winding = discontinuity::RIGHT;
+							new_discontinuity.edge_index = static_cast<int>(double_rays.size() - 1);
+						}
 
-							if (DEBUG_DRAWING.draw_cast_rays) {
-								draw_line(ray_callbacks[0].intersection, free_area_col);
-							}
+						if (DEBUG_DRAWING.draw_cast_rays) {
+							draw_line(ray_callback.intersection, free_area_col);
 						}
 
 						/* save new double ray */
@@ -687,57 +636,53 @@ void visibility_system::calc_visibility(
 						}
 					}
 				}
-				/* the case where exactly one of the rays did not hit anything so we cast it against boundaries,
-				we also detect discontinuity here */
 				else {
-					/* for every callback that didn't detect hit (there will be only one) */
-					for (size_t k = 0; k < 2; ++k) {
-						if (!ray_callbacks[k].hit) {
-							/* for every edge from 4 edges forming visibility square */
-							for (const auto& bound : visibility_bounds) {
-								const auto ray_edge_output = segment_segment_intersection(
-									eye_meters, 
-									all_ray_inputs[i].targets[k], 
-									bound.m_vertex1, 
-									bound.m_vertex2
-								);
+					/* 
+						If the ray didn't hit anything, it must have reached the boundary.
+						Of course, we also consider this a discontinuity.
+					*/
 
-								/* if we hit against boundaries (must happen for at least 1 of them) */
-								if (ray_edge_output.hit) {
-									/* prepare new discontinuity data */
-									discontinuity new_discontinuity;
+					/* For every edge from 4 edges forming visibility square */
+					for (const auto& bound : visibility_bounds) {
+						const auto ray_edge_output = segment_segment_intersection(
+							eye_meters, 
+							all_ray_inputs[i].destination,
+							bound.m_vertex1, 
+							bound.m_vertex2
+						);
 
-									/* compute the actual intersection point from b2RayCastOutput data */
-									auto actual_intersection = ray_edge_output.intersection;
+						/* if we hit against boundaries (must happen for at least 1 of them) */
+						if (ray_edge_output.hit) {
+							/* prepare new discontinuity data */
+							discontinuity new_discontinuity;
 
-									new_discontinuity.points.first = vertex.pos;
-									new_discontinuity.points.second = actual_intersection;
+							/* compute the actual intersection point from b2RayCastOutput data */
+							const auto boundary_intersection = ray_edge_output.intersection;
 
-									double_ray new_double_ray;
-									/* if the left-handed ray intersected with boundary and thus the right-handed intersected with an obstacle */
-									if (k == 0) {
-										new_discontinuity.winding = discontinuity::LEFT;
-										new_discontinuity.edge_index = static_cast<int>(double_rays.size());
-										new_double_ray = double_ray(actual_intersection, vertex.pos, false, true);
-									}
-									/* if the right-handed ray intersected with boundary and thus the left-handed intersected with an obstacle */
-									else if (k == 1) {
-										new_discontinuity.winding = discontinuity::RIGHT;
-										new_discontinuity.edge_index = static_cast<int>(double_rays.size()) - 1;
-										new_double_ray = double_ray(vertex.pos, actual_intersection, true, false);
-									}
+							new_discontinuity.points.first = vertex.pos;
+							new_discontinuity.points.second = boundary_intersection;
 
-									/* save new double ray */
-									if (push_double_ray(new_double_ray)) {
-										response.discontinuities.push_back(new_discontinuity);
+							double_ray new_double_ray;
 
-										if (DEBUG_DRAWING.draw_cast_rays) {
-											draw_line(actual_intersection, extended_vision_hit_col);
-										}
-									}
+							if (vertex.vision_extends == -1) {
+								new_discontinuity.winding = discontinuity::LEFT;
+								new_discontinuity.edge_index = static_cast<int>(double_rays.size());
+								new_double_ray = double_ray(boundary_intersection, vertex.pos);
+							}
+							else if (vertex.vision_extends == 1) {
+								new_discontinuity.winding = discontinuity::RIGHT;
+								new_discontinuity.edge_index = static_cast<int>(double_rays.size()) - 1;
+								new_double_ray = double_ray(vertex.pos, boundary_intersection);
+							}
+
+							/* save new double ray */
+							if (push_double_ray(new_double_ray)) {
+								response.discontinuities.push_back(new_discontinuity);
+
+								if (DEBUG_DRAWING.draw_cast_rays) {
+									draw_line(boundary_intersection, extended_vision_hit_col);
 								}
 							}
-							break;
 						}
 					}
 				}
@@ -745,7 +690,7 @@ void visibility_system::calc_visibility(
 		}
 
 		/* now propagate the output */
-		for (size_t i = 0; i < double_rays.size(); ++i) {
+		for (std::size_t i = 0; i < double_rays.size(); ++i) {
 			/* (i + 1)%double_rays.size() ensures the cycle */
 			const auto& ray_a = double_rays[i];
 			const auto& ray_b = double_rays[(i + 1) % double_rays.size()];
