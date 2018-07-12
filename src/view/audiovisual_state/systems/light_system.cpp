@@ -170,7 +170,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 					if (queried_camera_aabb.hover(light_aabb)) {
 						request.filter = filters::line_of_sight_query();
-						request.square_side = reach;
+						request.square_side = reach * 2;
 					}
 					else {
 						request.square_side = -1.f;

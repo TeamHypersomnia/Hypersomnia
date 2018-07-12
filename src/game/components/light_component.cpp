@@ -64,7 +64,7 @@ namespace invariants {
 	}
 }
 
-FORCE_INLINE double light_max_pixel_distance(const double a, const double b, const double c) {
+FORCE_INLINE double light_max_pixel_distance(const double a, const double b, const double c, const double d) {
 	/* 
 		Derived from:
 		http://www.wolframalpha.com/input/?i=1%2F(a+%2B+b+*+x+%2B+c+*+x+*+x)+%3E%3D+(1+%2F+255),+a+%3E+0,+b+%3E+0,+c+%3E+0,+solve+x
@@ -72,16 +72,19 @@ FORCE_INLINE double light_max_pixel_distance(const double a, const double b, con
 		(query: 1/(a + b * x + c * x * x) >= (1 / 255), a > 0, b > 0, c > 0, solve x)
 
 		Despite knowing next to none of what happens here, I will forever respect mathematics henceforth.
+
+		return (c * sqrt( (-4*a*c+b*b+1020*c) / (c*c) ) - b)/(2*c);
 	*/
 
-	return (c * sqrt( (-4*a*c+b*b+1020*c) / (c*c) ) - b)/(2*c);
+	return (c * sqrt( (-4*a*c*d+b*b*d+1020*c) / (c*c*d) ) - b)/(2*c);
 };
 
 real32 attenuation_properties::calc_reach() const {
 	return static_cast<real32>(light_max_pixel_distance(
 		constant / CONST_MULT,
 		linear / LINEAR_MULT,
-		quadratic / QUADRATIC_MULT
+		quadratic / QUADRATIC_MULT,
+		static_cast<double>(trim_alpha)
 	));
 }
 

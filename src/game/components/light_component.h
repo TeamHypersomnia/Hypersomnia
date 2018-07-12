@@ -2,6 +2,7 @@
 #include <array>
 #include "augs/graphics/rgba.h"
 #include "augs/templates/maybe.h"
+#include "augs/pad_bytes.h"
 
 struct randomization;
 
@@ -29,6 +30,9 @@ struct attenuation_properties {
 	atten_t constant = 0.f;
 	atten_t linear = 0.f;
 	atten_t quadratic = 0.f;
+
+	rgba_channel trim_alpha = 3;
+	pad_bytes<3> pad;
 
 	augs::maybe<real32> trim_reach = augs::maybe<real32>(300.f, false);
 	// END GEN INTROSPECTOR

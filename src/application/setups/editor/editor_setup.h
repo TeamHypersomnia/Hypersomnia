@@ -365,9 +365,10 @@ public:
 							const auto light_color = light.color;
 
 							auto draw_reach_indicator = [&](const auto reach, const auto col) {
+								const auto h_size = vec2::square(reach);
 								const auto size = vec2::square(reach * 2);
 
-								callback(center, center + reach, col);
+								callback(center, center + h_size, col);
 
 								augs::general_border_from_to(
 									ltrb(xywh::center_and_size(center, size)),
