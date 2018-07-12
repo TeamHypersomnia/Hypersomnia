@@ -166,7 +166,7 @@ void visibility_system::calc_visibility(
 	static const auto ray_obstructed_col = red;
 	static const auto extended_vision_hit_col = blue;
 	static const auto discontinuity_col = rgba(0, 127, 255, 255);
-	static const auto vis_rect_col = white;
+	static const auto vis_rect_col = rgba(white).multiply_alpha(0.7f);
 	static const auto free_area_col = pink;
 	static const auto unreachable_area_col = white;
 
@@ -347,14 +347,6 @@ void visibility_system::calc_visibility(
 			b[2].Set(b2Vec2(whole_vision[2]) + b2Vec2(moving_epsilon, 0.f), b2Vec2(whole_vision[3]) + b2Vec2(-moving_epsilon, 0.f));
 			b[3].Set(b2Vec2(whole_vision[3]) + b2Vec2(0.f, moving_epsilon), b2Vec2(whole_vision[0]) + b2Vec2(0.f, -moving_epsilon));
 
-			if (DEBUG_DRAWING.draw_cast_rays || DEBUG_DRAWING.draw_triangle_edges) {
-				/* Draw the visibility square for debugging */
-				lines.emplace_back(vis_rect_col, si.get_pixels(vec2(whole_vision[0]) + vec2(-moving_epsilon, 0.f)), si.get_pixels(vec2(whole_vision[1]) + vec2(moving_epsilon, 0.f)));
-				lines.emplace_back(vis_rect_col, si.get_pixels(vec2(whole_vision[1]) + vec2(0.f, -moving_epsilon)), si.get_pixels(vec2(whole_vision[2]) + vec2(0.f, moving_epsilon)));
-				lines.emplace_back(vis_rect_col, si.get_pixels(vec2(whole_vision[2]) + vec2(moving_epsilon, 0.f)),  si.get_pixels(vec2(whole_vision[3]) + vec2(-moving_epsilon, 0.f)));
-				lines.emplace_back(vis_rect_col, si.get_pixels(vec2(whole_vision[3]) + vec2(0.f, moving_epsilon)),  si.get_pixels(vec2(whole_vision[0]) + vec2(0.f, -moving_epsilon)));
-			}
-
 			/* raycast through the bounds to add another vertices where the shapes go beyond visibility square */
 			for (const auto& bound : b) {
 				/* have to raycast both directions because Box2D ignores the second side of the fixture */
@@ -384,7 +376,7 @@ void visibility_system::calc_visibility(
 				}
 
 				if (DEBUG_DRAWING.draw_cast_rays) {
-					lines.emplace_back(si.get_pixels(bound.m_vertex1), si.get_pixels(bound.m_vertex2), ray_obstructed_col);
+					lines.emplace_back(si.get_pixels(bound.m_vertex1), si.get_pixels(bound.m_vertex2), vis_rect_col);
 				}
 
 				for (const auto v : output) {
