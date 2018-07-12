@@ -113,41 +113,47 @@ struct basic_vec2 {
 		return basic_vec2<type>(static_cast<type>(cos(radians)), static_cast<type>(sin(radians)));
 	}
 
-	/* from http://stackoverflow.com/a/1501725 */
-	real distance_from_segment_sq(const basic_vec2 v, const basic_vec2 w) const {
-		const auto& p = *this;
-		// Return minimum distance between line segment vw and point p
-		const real l2 = (v - w).length_sq();  // i.e. |w-v|^2 -  avoid a sqrt
-		if (l2 == 0.0) return (p - v).length_sq();   // v == w case
-		// Consider the line extending the segment, parameterized as v + t (w - v).
-		// We find projection of point p onto the line. 
-		// It falls where t = [(p-v) . (w-v)] / |w-v|^2
-		const real tt = (p - v).dot(w - v) / l2;
-		if (tt < 0.f) return (p - v).length_sq();       // Beyond the 'v' end of the segment
-		else if (tt > 1.f) return (p - w).length_sq();  // Beyond the 'w' end of the segment
-		const basic_vec2 projection = v + tt * (w - v);  // Projection falls on the segment
-		return (p - projection).length_sq();
-	}
-
-	real distance_from_segment(const basic_vec2 v, const basic_vec2 w) const {
-		return sqrt(distance_from_segment_sq(v, w));
+	real distance_from_segment(const basic_vec2 start, const basic_vec2 end) const {
+		return std::sqrt(distance_from_segment_sq(start, end));
 	}
 
 	real get_projection_multiplier(const basic_vec2 start, const basic_vec2 end) const {
-		return ((*this) - start).dot(end - start) / (start - end).length_sq();
+		const auto segment = end - start;
+		const auto proj_mult = ((*this) - start).dot(segment) / segment.length_sq();
+
+		return proj_mult;
 	}
 
-	basic_vec2 project_onto(const basic_vec2 start, const basic_vec2 end) const {
-		return start + get_projection_multiplier(start, end) * (end - start);
+	auto project_onto(const basic_vec2 start, const basic_vec2 end) const {
+		const auto segment = end - start;
+		const auto proj_mult = ((*this) - start).dot(segment) / segment.length_sq();
+
+		return start + proj_mult * segment;
 	}
 
-	basic_vec2 closest_point_on_segment(const basic_vec2 v, const basic_vec2 w) const {
-		const real t = ((*this) - v).dot(w - v) / (v - w).length_sq();
+	auto closest_point_on_segment(const basic_vec2 start, const basic_vec2 end) const {
+		const auto segment = end - start;
+		const auto proj_mult = ((*this) - start).dot(segment) / segment.length_sq();
 
-		if (t < 0.f) return v;
-		else if (t > 1.f) return w;
+		if (proj_mult <= 0.f) {
+			return start;
+		}
 
-		return v + t * (w - v);
+		if (proj_mult >= 1.f) {
+			return end;
+		}
+
+		return start + proj_mult * segment;
+	}
+
+	real distance_from_segment_sq(const basic_vec2 start, const basic_vec2 end) const {
+		const auto& p = *this;
+
+		if (start.compare(end)) {
+			return (p - start).length_sq();
+		}
+
+		return (p - closest_point_on_segment(start, end)).length_sq();
 	}
 
 	type dot(const basic_vec2 v) const {
