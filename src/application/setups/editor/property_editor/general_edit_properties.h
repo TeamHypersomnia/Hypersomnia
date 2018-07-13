@@ -19,6 +19,8 @@
 #include "application/setups/editor/detail/field_address.h"
 #include "augs/templates/introspection_utils/count_members.h"
 
+#define HIDE_DISABLED_MAYBES 1
+
 template <class T>
 static constexpr bool forbid_zero_elements_v = 
 	is_one_of_v<T, plain_animation_frames_type, std::vector<particles_emission>>
@@ -26,7 +28,7 @@ static constexpr bool forbid_zero_elements_v =
 
 template <class T>
 static constexpr bool inline_with_members_v = 
-	is_one_of_v<T, plain_animation_frame>
+	is_one_of_v<T, plain_animation_frame, light_value_variation>
 ;
 
 template <class T>
@@ -222,9 +224,22 @@ void detail_general_edit_properties(
 					}
 				}
 
-				auto colors = maybe_disabled_cols(input.settings, !all_equal || !altered.is_enabled);
+				const bool value_enabled = all_equal && altered.is_enabled;
+				const bool nodify = false;
 
-				detail_general_edit_properties<Behaviour, pass_notifier_through, inline_properties>(input, equality_predicate, notify_change_of, label, altered.value, false);
+#if HIDE_DISABLED_MAYBES
+				if (value_enabled) {
+					auto id = augs::imgui::scoped_id(formatted_label + "maybe");
+
+					detail_general_edit_properties<Behaviour, pass_notifier_through, inline_properties>(input, equality_predicate, notify_change_of, label, altered.value, nodify);
+				}
+#else
+				auto colors = maybe_disabled_cols(input.settings, !value_enabled);
+
+				auto id = augs::imgui::scoped_id(formatted_label + "maybe");
+
+				detail_general_edit_properties<Behaviour, pass_notifier_through, inline_properties>(input, equality_predicate, notify_change_of, label, altered.value, nodify);
+#endif
 			}
 			else if constexpr(is_std_array_v<T> || is_enum_array_v<T>) {
 				auto further = [&]() {

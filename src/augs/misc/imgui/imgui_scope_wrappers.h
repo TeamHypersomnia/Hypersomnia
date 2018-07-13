@@ -184,6 +184,12 @@ namespace augs {
 			return scope_guard([]() { ImGui::PopID(); });
 		}
 
+		inline auto scoped_id(const std::string& v) {
+			ImGui::PushID(v.c_str());
+
+			return scope_guard([]() { ImGui::PopID(); });
+		}
+
 		inline auto scoped_id(const void* const v) {
 			ImGui::PushID(v);
 

@@ -1118,3 +1118,6 @@ we consider whole type overrides too complex architeciturally:
 - Remove the need to keep shape polygon for most entities
 	- Less work for size updater, we'll just reinfer
 
+- ltrb_grid_intersection
+- move rng to the audiovisual state to avoid having so many tls variables
+

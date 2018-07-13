@@ -6,12 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- ltrb_grid_intersection
 - find closest point pairs for fish?
 	- firstly determine if the setting of the new npo node isn't actually the bottleneck
 	- tho probably it's the false positives
-
-- move rng to the audiovisual state to avoid having so many tls variables
 
 - Sound should be loaded from the smallest to the biggest
 	- So that effects are loaded first

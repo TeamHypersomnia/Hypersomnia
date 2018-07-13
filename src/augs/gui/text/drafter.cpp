@@ -197,13 +197,12 @@ namespace augs {
 				for (unsigned i = 0; i < source.size(); ++i) {
 					const auto& ff = getf(source, i);
 
-					const auto* const g = ff.find_glyph(password_mode ? password_character : source[i].utf_unit);
-
-					/* if we allowed a null glyph in string, it must be newline */
-					const auto* const final_ptr = g ? g : ff.find_glyph(' ');
-
-					if (final_ptr != nullptr) {
-						cached.push_back(final_ptr);
+					if (const auto g = ff.find_glyph(password_mode ? password_character : source[i].utf_unit)) {
+						cached.push_back(g);
+					}
+					else if (const auto g = ff.find_glyph(' ')) {
+						/* if we allowed a null glyph in string, it must be newline */
+						cached.push_back(g);
 					}
 				}
 
