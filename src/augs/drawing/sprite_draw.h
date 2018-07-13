@@ -5,6 +5,7 @@
 #include "augs/texture_atlas/atlas_entry.h"
 #include "augs/build_settings/platform_defines.h"
 #include "augs/drawing/sprite.h"
+#include "augs/math/grid_math.h"
 
 namespace augs {
 	template <class I, class F>
@@ -28,37 +29,15 @@ namespace augs {
 			/* Rotate the camera to the same space */
 			rotated_camera.eye.transform.rotation -= final_rotation;
 
-			const auto c = ltrbi(rotated_camera.get_visible_world_rect_aabb());
-			const auto s = ltrbi(vec2i(rotated_pos) - total_size / 2, total_size);
+			const auto camera_aabb = ltrbi(rotated_camera.get_visible_world_rect_aabb());
+			const auto tile_grid_aabb = ltrbi(vec2i(rotated_pos) - total_size / 2, total_size);
 
-			/* We start from assumption that the sprite is completely within the camera */
-			auto v = ltrbi(vec2i(0, 0), times);
-
-			/* But, right edge of the object might exceed right bound of camera */
-			{
-				const auto diff = s.r - c.r;
-
-				if (diff > 0) {
-					/* If the difference exceeds the tile size, the result of integer division becomes bigger than 0, in which case we already take 1 from times.x */
-					v.r -= diff / tile_size.x;
-				}
-			}
-
-			v.b -= std::max(0, s.b - c.b) / tile_size.y;
-
-			/* But, left edge of the camera might exceed left bound of object */
-			{
-				const auto diff = c.l - s.l;
-
-				if (diff > 0) {
-					/* If the difference exceeds the tile size, the result of integer division becomes bigger than 0, in which case we already put 1 as the beginning point. */
-					v.l = diff / tile_size.x;
-				}
-			}
-
-			v.t = std::max(0, c.t - s.t) / tile_size.y;
-
-			return v;
+			return augs::visible_grid_cells_detail(
+				tile_size, 
+				times, 
+				tile_grid_aabb, 
+				camera_aabb
+			);
 		}();
 
 		const auto lt_center = -vec2(tile_size * (times - vec2i(1, 1))) / 2;

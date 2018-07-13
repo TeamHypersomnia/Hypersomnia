@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- ltrb_grid_intersection
 - find closest point pairs for fish?
 	- firstly determine if the setting of the new npo node isn't actually the bottleneck
 	- tho probably it's the false positives
