@@ -298,7 +298,6 @@ void visibility_system::calc_visibility(
 					const auto& poly = static_cast<const b2PolygonShape&>(shape);
 
 					std::array<bool, b2_maxPolygonVertices> visibles = {};
-					//std::array<int, b2_maxPolygonVertices> visions = {};
 
 					const auto vn = poly.GetVertexCount();
 

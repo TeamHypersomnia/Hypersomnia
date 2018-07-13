@@ -64,7 +64,7 @@ namespace invariants {
 	}
 }
 
-FORCE_INLINE double light_max_pixel_distance(const double a, const double b, const double c, const double d) {
+FORCE_INLINE double light_max_pixel_distance(double a, double b, double c, double d) {
 	/* 
 		Derived from:
 		http://www.wolframalpha.com/input/?i=1%2F(a+%2B+b+*+x+%2B+c+*+x+*+x)+%3E%3D+(1+%2F+255),+a+%3E+0,+b+%3E+0,+c+%3E+0,+solve+x
@@ -76,7 +76,16 @@ FORCE_INLINE double light_max_pixel_distance(const double a, const double b, con
 		return (c * sqrt( (-4*a*c+b*b+1020*c) / (c*c) ) - b)/(2*c);
 	*/
 
-	return (c * sqrt( (-4*a*c*d+b*b*d+1020*c) / (c*c*d) ) - b)/(2*c);
+	auto at_least_epsilon = [](auto& v) {
+		v = std::max(v, 0.0000000001);
+	};
+
+	at_least_epsilon(a);
+	at_least_epsilon(b);
+	at_least_epsilon(c);
+	at_least_epsilon(d);
+
+	return (c * sqrt( (-4*a*c*d+b*b*d+1020*c) / c/c/d ) - b)/2/c;
 };
 
 real32 attenuation_properties::calc_reach() const {
@@ -84,7 +93,7 @@ real32 attenuation_properties::calc_reach() const {
 		constant / CONST_MULT,
 		linear / LINEAR_MULT,
 		quadratic / QUADRATIC_MULT,
-		static_cast<double>(trim_alpha)
+		static_cast<double>(std::max(rgba_channel(1), trim_alpha))
 	));
 }
 
