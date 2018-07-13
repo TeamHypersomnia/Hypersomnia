@@ -240,7 +240,7 @@ namespace augs {
 
 			io.Fonts->TexID = reinterpret_cast<void*>(0);
 
-			return { pixels, 4, 0, vec2i{ width, height } };
+			return { pixels, vec2i{ width, height } };
 		}
 
 		graphics::texture create_atlas(const font_loading_input& in) {

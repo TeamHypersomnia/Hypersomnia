@@ -124,12 +124,12 @@ namespace augs {
 
 							g_img = augs::image(
 								face->glyph->bitmap.buffer, 
-								1, 
-								face->glyph->bitmap.pitch, 
 								vec2u(
 									face->glyph->bitmap.width, 
 									face->glyph->bitmap.rows
-								)
+								),
+								1, 
+								face->glyph->bitmap.pitch
 							);
 						}
 					}

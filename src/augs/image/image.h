@@ -73,9 +73,9 @@ namespace augs {
 		
 		image(
 			const rgba_channel* const ptr,
-			const unsigned channels,
-			const unsigned pitch,
-			const vec2u size
+			const vec2u size,
+			const unsigned channels = 4,
+			const unsigned pitch = 0
 		);
 		
 		image(const path_type& file_path);
@@ -203,5 +203,17 @@ namespace augs {
 		}
 
 		void fill(const rgba fill_color);
+
+		auto* get_data() {
+			return std::addressof(v->r);
+		}
+
+		const auto* get_data() const {
+			return std::addressof(v->r);
+		}
+
+		auto get_size() const {
+			return size;
+		}
 	};
 }

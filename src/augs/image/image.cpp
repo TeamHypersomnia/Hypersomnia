@@ -181,9 +181,9 @@ namespace augs {
 	
 	image::image(
 		const unsigned char* const ptr, 
+		const vec2u new_size,
 		const unsigned channels,
-		const unsigned pitch, 
-		const vec2u new_size
+		const unsigned pitch 
 	) {
 		resize_no_fill(new_size);
 
