@@ -262,8 +262,24 @@ void visibility_system::calc_visibility(
 			all_vertices_transformed.push_back(new_vertex);
 		};
 
-		thread_local std::vector<vec2> surely_invisible_positions;
+		thread_local std::unordered_set<vec2i> surely_invisible_positions;
 		surely_invisible_positions.clear();
+
+		const auto invisible_eps = si.get_meters(settings.epsilon_distance_vertex_hit);
+
+		auto add_surely_invisible = [invisible_eps](const vec2 v) {
+			const auto x = static_cast<int>(std::round(v.x / invisible_eps));
+			const auto y = static_cast<int>(std::round(v.y / invisible_eps));
+
+			surely_invisible_positions.emplace(x, y);
+		};
+
+		auto is_invisible = [invisible_eps](const vec2 v) {
+			const auto x = static_cast<int>(std::round(v.x / invisible_eps));
+			const auto y = static_cast<int>(std::round(v.y / invisible_eps));
+
+			return found_in(surely_invisible_positions, vec2i(x, y));
+		};
 
 		/* for every fixture that intersected with the visibility square */
 		physics.for_each_in_aabb_meters(
@@ -305,7 +321,7 @@ void visibility_system::calc_visibility(
 						const auto vv = static_cast<vec2>(b2Mul(xf, vert));
 
 						if (!this_vis && !prev_vis) {
-							surely_invisible_positions.emplace_back(vv);
+							add_surely_invisible(vv);
 							continue;
 						}
 
@@ -324,6 +340,13 @@ void visibility_system::calc_visibility(
 				}
 
 				return callback_result::CONTINUE;
+			}
+		);
+
+		erase_if(
+			all_vertices_transformed,
+			[&](const auto& v) {
+				return is_invisible(v.pos);
 			}
 		);
 
