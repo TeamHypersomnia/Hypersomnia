@@ -1112,3 +1112,9 @@ we consider whole type overrides too complex architeciturally:
 			- Then it will probably also be a vector.
 		- Don't store shape invariant in things like character, item, plain sprited body.
 	- In crosshair component, size for appearance is anyway not needed and the original one will be passed in the drawing code.
+
+- sprite will have to know which tiles exactly are visible in the camera
+- Light optimization: remove vertices that are determined to be behind some convex shape.
+- Remove the need to keep shape polygon for most entities
+	- Less work for size updater, we'll just reinfer
+

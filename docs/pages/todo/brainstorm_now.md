@@ -6,13 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- vec2::from_degrees(rotation) * w / 2
-- sprite will have to know which tiles exactly are visible in the camera
+- find closest point pairs for fish?
+	- firstly determine if the setting of the new npo node isn't actually the bottleneck
+	- tho probably it's the false positives
 
-- Light optimization: remove vertices that are determined to be behind some convex shape.
-
-- Remove the need to keep shape polygon for most entities
-	- Less work for size updater, we'll just reinfer
+- move rng to the audiovisual state to avoid having so many tls variables
 
 - Sound should be loaded from the smallest to the biggest
 	- So that effects are loaded first

@@ -115,6 +115,11 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				do_startle(startle_type::LIGHTER, 0.2f, 0.1f, max_lighter_startle_speed);
 				do_startle(startle_type::IMMEDIATE, 5.f, 1.f, max_startle_speed);
 
+				vec2 average_pos;
+				vec2 average_vel;
+
+				unsigned counted_neighbors = 0;
+
 				{
 					auto greatest_avoidance = vec2::zero;
 
@@ -146,60 +151,41 @@ void movement_path_system::advance_paths(const logic_step step) const {
 							);
 
 							greatest_avoidance = std::max(avoidance, greatest_avoidance);
+
+							if (typed_neighbor.get_flavour_id() == subject.get_flavour_id()) {
+								average_pos += neighbor_transform.pos;
+								average_vel += vec2::from_degrees(neighbor_transform.rotation) * neighbor_path.last_speed;
+								++counted_neighbors;
+							}
 						}
 					});
 
 					velocity += greatest_avoidance;
 				}
 
+				if (counted_neighbors) {
+					average_pos /= counted_neighbors;
+					average_vel /= counted_neighbors;
 
-				{
-					vec2 average_pos;
-					vec2 average_vel;
+					if (cohesion_mult != 0.f) {
+						const auto total_cohesion = cohesion_mult * total_startle_applied;
 
-					unsigned counted_neighbors = 0;
+						velocity += augs::arrive(
+							velocity,
+							pos,
+							average_pos,
+							velocity.length(),
+							cohesion_zone_radius
+						) * total_cohesion;
+					}
 
-					for_each_neighbor_within(comfort_zone_radius, [&](const auto typed_neighbor) {
-						if (typed_neighbor.get_flavour_id() != subject.get_flavour_id()) {
-							return;
-						}
+					if (alignment_mult != 0.f) {
+						const auto desired_vel = average_vel.set_length(velocity.length());
+						const auto steering = desired_vel - velocity;
 
-						const auto& neighbor_path_def = typed_neighbor.template get<invariants::movement_path>();
-
-						if (neighbor_path_def.fish_movement.is_enabled) {
-							const auto neighbor_transform = typed_neighbor.get_logic_transform();
-							const auto& neighbor_path = typed_neighbor.template get<components::movement_path>();
-							average_pos += neighbor_transform.pos;
-							average_vel += vec2::from_degrees(neighbor_transform.rotation) * neighbor_path.last_speed;
-							++counted_neighbors;
-						}
-					});
-
-					if (counted_neighbors) {
-						average_pos /= counted_neighbors;
-						average_vel /= counted_neighbors;
-
-						if (cohesion_mult != 0.f) {
-							const auto total_cohesion = cohesion_mult * total_startle_applied;
-
-							velocity += augs::arrive(
-								velocity,
-								pos,
-								average_pos,
-								velocity.length(),
-								cohesion_zone_radius
-							) * total_cohesion;
-						}
-
-						if (alignment_mult != 0.f) {
-							const auto desired_vel = average_vel.set_length(velocity.length());
-							const auto steering = desired_vel - velocity;
-
-							velocity += steering * alignment_mult;
-						}
+						velocity += steering * alignment_mult;
 					}
 				}
-
 
 				const auto total_speed = velocity.length();
 
