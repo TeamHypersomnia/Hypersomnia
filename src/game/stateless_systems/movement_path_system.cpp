@@ -17,6 +17,8 @@ void movement_path_system::advance_paths(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
 	const auto delta = step.get_delta();
 
+	auto rng = randomization(cosm.get_total_steps_passed());
+
 	auto& npo = cosm.get_solvable_inferred({}).tree_of_npo;
 
 	cosm.for_each_having<components::movement_path>(
@@ -224,7 +226,6 @@ void movement_path_system::advance_paths(const logic_step step) const {
 					/* Resolve bubbles and bubble intervals */
 
 					auto& next_in_ms = movement_path.next_bubble_in_ms;
-					auto rng = cosm.get_rng_for(subject);
 					
 					auto choose_new_interval = [&rng, &next_in_ms, &def]() {
 						const auto interval = def.base_bubble_interval_ms;
