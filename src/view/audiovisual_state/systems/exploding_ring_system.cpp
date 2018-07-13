@@ -26,6 +26,7 @@ void exploding_ring_system::acquire_new_rings(const std::vector<exploding_ring_i
 }
 
 void exploding_ring_system::advance(
+	randomization& rng,
 	const cosmos& cosmos,
 	const particle_effects_map& manager,
 	const augs::delta dt,
@@ -34,7 +35,6 @@ void exploding_ring_system::advance(
 	auto& particles = particles_output_for_effects;
 
 	global_time_seconds += dt.in_seconds();
-	thread_local randomization rng;
 
 	erase_if(rings, [&](ring& e) {
 		auto& r = e.in;

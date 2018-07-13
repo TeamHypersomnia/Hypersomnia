@@ -11,6 +11,7 @@
 
 class cosmos;
 class particles_simulation_system;
+struct randomization;
 
 class exploding_ring_system {
 public:
@@ -26,6 +27,7 @@ public:
 	void acquire_new_rings(const std::vector<exploding_ring_input>& rings);
 
 	void advance(
+		randomization& rng,
 		const cosmos& cosmos,
 		const particle_effects_map&,
 		const augs::delta dt,

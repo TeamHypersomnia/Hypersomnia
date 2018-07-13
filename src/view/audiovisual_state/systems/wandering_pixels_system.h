@@ -14,6 +14,7 @@ struct visible_entities;
 
 class interpolation_system;
 struct particles_emission;
+struct randomization;
 
 class wandering_pixels_system {
 public:
@@ -41,12 +42,14 @@ public:
 	const cache& get_cache(const const_entity_handle) const;
 
 	void advance_for(
+		randomization& rng,
 		const visible_entities& subjects,
 		const cosmos&,
 		const augs::delta dt
 	);
 
 	void advance_for(
+		randomization& rng,
 		const const_entity_handle subject,
 		const augs::delta dt
 	);

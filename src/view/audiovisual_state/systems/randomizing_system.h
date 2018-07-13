@@ -1,8 +1,8 @@
 #pragma once
 #include "augs/misc/timing/delta.h"
 #include "augs/drawing/sprite.h"
-#include "view/audiovisual_state/systems/audiovisual_cache_common.h"
 #include "augs/misc/randomization.h"
+#include "view/audiovisual_state/systems/audiovisual_cache_common.h"
 #include "augs/graphics/rgba.h"
 
 namespace augs {
@@ -16,10 +16,7 @@ namespace augs {
 
 struct randomizing_system {
 	struct walk_cache {
-		randomization rng;
 		real32 walk_state = 0.5f;
-
-		walk_cache(const std::size_t seed) : rng(seed) {}
 	};
 
 	augs::delta last_frame_delta = augs::delta::zero;
@@ -33,4 +30,6 @@ struct randomizing_system {
 		const entity_id id,
 		const intensity_vibration_input& in
 	);
+
+	randomization rng;
 };

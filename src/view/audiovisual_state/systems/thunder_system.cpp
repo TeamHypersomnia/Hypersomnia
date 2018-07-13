@@ -19,9 +19,7 @@ void thunder_system::clear() {
 	thunders.clear();
 }
 
-void thunder_system::thunder::create_root_branch() {
-	thread_local randomization rng;
-
+void thunder_system::thunder::create_root_branch(randomization& rng) {
 	thunder::branch b;
 	b.current_lifetime_ms = 0.f;
 
@@ -38,24 +36,26 @@ void thunder_system::thunder::create_root_branch() {
 	branches.push_back(b);
 }
 
-void thunder_system::add(const thunder_input in) {
+void thunder_system::add(
+	randomization& rng,
+	const thunder_input in
+) {
 	ensure(in.max_all_spawned_branches > 0);
 
 	thunder new_thunder;
 	new_thunder.in = in;
-	new_thunder.create_root_branch();
+	new_thunder.create_root_branch(rng);
 
 	thunders.push_back(new_thunder);
 }
 
 void thunder_system::advance(
+	randomization& rng,
 	const cosmos& cosmos,
 	const particle_effects_map& manager,
 	const augs::delta dt,
 	particles_simulation_system& particles_output_for_effects
 ) {
-	thread_local randomization rng;
-
 	for (thunder& t : thunders) {
 		t.until_next_branching_ms -= dt.in_milliseconds();
 
@@ -113,7 +113,7 @@ void thunder_system::advance(
 			}
 
 			if (!found_suitable_parent) {
-				t.create_root_branch();
+				t.create_root_branch(rng);
 			}
 		}
 

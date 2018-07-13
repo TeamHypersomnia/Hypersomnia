@@ -14,6 +14,8 @@ namespace augs {
 	struct line_drawer_with_default;
 }
 
+struct randomization;
+
 class thunder_system {
 public:
 	struct thunder {
@@ -36,14 +38,15 @@ public:
 
 		std::vector<branch> branches;
 
-		void create_root_branch();
+		void create_root_branch(randomization&);
 	};
 
 	std::vector<thunder> thunders;
 
-	void add(const thunder_input);
+	void add(randomization&, const thunder_input);
 
 	void advance(
+		randomization&,
 		const cosmos&,
 		const particle_effects_map&,
 		const augs::delta dt,

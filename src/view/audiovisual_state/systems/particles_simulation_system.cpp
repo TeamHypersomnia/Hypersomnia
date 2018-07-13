@@ -165,12 +165,11 @@ void particles_simulation_system::add_particle(const render_layer l, const entit
 }
 
 void particles_simulation_system::update_effects_from_messages(
+	randomization& rng,
 	const const_logic_step step,
 	const particle_effects_map& manager,
 	const interpolation_system& 
 ) {
-	thread_local randomization rng;
-
 	{
 		const auto& events = step.get_queue<messages::stop_particle_effect>();
 
@@ -320,6 +319,7 @@ void update_component_related_cache(
 }
 
 void particles_simulation_system::advance_visible_streams(
+	randomization& rng,
 	const camera_cone current_cone, 
 	const cosmos& cosm,
 	const particle_effects_map& manager,
@@ -327,8 +327,6 @@ void particles_simulation_system::advance_visible_streams(
 	const augs::delta delta,
 	const interpolation_system& interp
 ) {
-	thread_local randomization rng;
-
 	auto advance_emissions = [&](
 		emission_instances& instances, 
 		const transformr current_transform,

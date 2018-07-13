@@ -34,6 +34,7 @@ const wandering_pixels_system::cache& wandering_pixels_system::get_cache(const c
 }
 
 void wandering_pixels_system::advance_for(
+	randomization& rng,
 	const visible_entities& visible,
 	const cosmos& cosm,
 	const augs::delta dt
@@ -41,22 +42,21 @@ void wandering_pixels_system::advance_for(
 	global_time_seconds += dt.in_seconds();
 
 	for (const auto e : visible.per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {
-		advance_for(cosm[e], dt);
+		advance_for(rng, cosm[e], dt);
 	}
 
 	for (const auto e : visible.per_layer[render_layer::DIM_WANDERING_PIXELS_EFFECTS]) {
-		advance_for(cosm[e], dt);
+		advance_for(rng, cosm[e], dt);
 	}
 }
 
 void wandering_pixels_system::advance_for(
+	randomization& rng,
 	const const_entity_handle handle, 
 	const augs::delta dt
 ) {
 	const auto dt_secs = dt.in_seconds();
 	const auto dt_ms = dt.in_milliseconds();
-
-	thread_local randomization rng;
 
 	handle.dispatch_on_having<invariants::wandering_pixels>([&](const auto it) {
 		auto& cache = get_cache(it);

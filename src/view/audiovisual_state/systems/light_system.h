@@ -25,6 +25,7 @@ namespace augs {
 
 struct frame_profiler;
 struct draw_renderable_input;
+struct randomization;
 
 struct light_system_input {
 	augs::renderer& renderer;
@@ -56,6 +57,7 @@ struct light_system {
 	void clear();
 
 	void advance_attenuation_variations(
+		randomization& rng,
 		const cosmos& cosmos,
 		const augs::delta
 	);

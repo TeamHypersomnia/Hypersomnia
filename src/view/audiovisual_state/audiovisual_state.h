@@ -76,4 +76,9 @@ struct audiovisual_state {
 
 	void clear();
 	void clear_dead_entities(const cosmos&);
+
+private:
+	randomization& get_rng() const {
+		return randomizing.rng;
+	}
 };

@@ -218,6 +218,7 @@ public:
 	);
 
 	void advance_visible_streams(
+		randomization& rng,
 		camera_cone,
 		const cosmos&,
 		const particle_effects_map&,
@@ -227,6 +228,7 @@ public:
 	);
 
 	void update_effects_from_messages(
+		randomization& rng,
 		const_logic_step step,
 		const particle_effects_map& manager,
 		const interpolation_system& interp

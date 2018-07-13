@@ -40,6 +40,8 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	const auto dt = augs::delta(input.frame_delta) *= input.speed_multiplier;
 	const auto& anims = input.plain_animations;
 
+	auto& rng = get_rng();
+
 	auto& thunders = get<thunder_system>();
 	auto& exploding_rings = get<exploding_ring_system>();
 	auto& flying_numbers = get<flying_number_indicator_system>();
@@ -49,8 +51,8 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 
 	interp.id_to_integerize = viewed_character;
 
-	thunders.advance(cosm, input.particle_effects, dt, particles);
-	exploding_rings.advance(cosm, input.particle_effects, dt, particles);
+	thunders.advance(rng, cosm, input.particle_effects, dt, particles);
+	exploding_rings.advance(rng, cosm, input.particle_effects, dt, particles);
 	flying_numbers.advance(dt);
 	highlights.advance(dt);
 
@@ -72,6 +74,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			auto scope = measure_scope(performance.advance_particle_streams);
 
 			particles.advance_visible_streams(
+				rng,
 				cone,
 				cosm,
 				input.particle_effects,
@@ -82,12 +85,13 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		}
 	}
 
-	get<light_system>().advance_attenuation_variations(cosm, dt);
+	get<light_system>().advance_attenuation_variations(rng, cosm, dt);
 
 	{
 		auto scope = measure_scope(performance.wandering_pixels);
 
 		get<wandering_pixels_system>().advance_for(
+			rng,
 			input.all_visible,
 			cosm,
 			dt
@@ -176,6 +180,8 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 		}
 	}
 
+	auto& rng = get_rng();
+
 	auto& thunders = get<thunder_system>();
 	auto& exploding_rings = get<exploding_ring_system>();
 	auto& flying_numbers = get<flying_number_indicator_system>();
@@ -183,7 +189,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 	auto& particles = get<particles_simulation_system>();
 	auto& sounds = get<sound_system>();
 
-	particles.update_effects_from_messages(step, input.particle_effects, interp);
+	particles.update_effects_from_messages(rng, step, input.particle_effects, interp);
 
 	{
 		auto ear = input.camera;
@@ -288,7 +294,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 
 					th.color = highlight_col;
 
-					thunders.add(th);
+					thunders.add(rng, th);
 				}
 			}
 			else {
@@ -433,7 +439,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 	}
 
 	for (const auto& t : new_thunders) {
-		thunders.add(t);
+		thunders.add(rng, t);
 	}
 
 	exploding_rings.acquire_new_rings(new_rings);
