@@ -429,8 +429,10 @@ struct basic_vec2 {
 	}
 
 	template <class D>
-	auto rotate_by_90_multiples(const D degrees, const basic_vec2& origin) {
+	auto rotate_by_90_multiples(const D in_degrees, const basic_vec2& origin) {
 		auto& v = *this;
+
+		const auto degrees = augs::normalize_degrees(in_degrees);
 
 		if (augs::compare(degrees, static_cast<D>(0))) {
 			return static_cast<D>(0);
@@ -626,13 +628,6 @@ namespace std {
 			return augs::simple_two_hash(v.x, v.y);
 		}
 	};
-}
-
-namespace augs {
-	template<class T>
-	T normalize_degrees(const T degrees) {
-		return basic_vec2<T>::from_degrees(degrees).degrees();
-	}
 }
 
 template<class T>

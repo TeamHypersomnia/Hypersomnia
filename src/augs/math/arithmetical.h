@@ -16,6 +16,11 @@ template <class T>
 constexpr T PI = static_cast<T>(3.1415926535897932384626433832795);
 
 namespace augs {
+	template<class T>
+	T normalize_degrees(const T degrees) {
+		return std::fmod(degrees + 180, 360) - 180;
+	}
+
 	template <class T>
 	auto disturbance(const T& danger_distance, const T& comfort_zone) {
 		return std::max(static_cast<T>(0), static_cast<T>(1) - danger_distance / comfort_zone);

@@ -6,6 +6,15 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Marker entities
+	- Special-purpose components:
+		- shape_aabb
+			- can be used by wandering pixels!
+				- and thus the editor will allow us to change reach easily
+		- shape_polygon can be used both for marking and for physical bodies
+	- separation between visible shapes and physical shapes is described elsewhere
+		- but the same logic would be used nevertheless
+
 - find closest point pairs for fish?
 	- firstly determine if the setting of the new npo node isn't actually the bottleneck
 	- tho probably it's the false positives
@@ -21,22 +30,11 @@ summary: That which we are brainstorming at the moment.
 	- Sentience humming caches
 	- These don't need their playing pos synchronized
 
-- Marker entities
-	- Special-purpose components:
-		- shape_aabb
-			- can be used by wandering pixels!
-				- and thus the editor will allow us to change reach easily
-		- shape_polygon can be used both for marking and for physical bodies
-	- separation between visible shapes and physical shapes is described elsewhere
-		- but the same logic would be used nevertheless
-
 - Transform design
 	- It is the case that many entities might share identical origin, in which case it would be unwieldy to update origins for all entities to a new one.
 		- E.g. fish in aquarium.
 	- It is also the case that the origins might be tied to decorational entities.
 		- E.g. aquarium sand.
-	- We shouldn't make a separate case for wandering pixels, really
-		- just as in the case of light.
 	- movement path component will have an origin transform which will automatically be moved by the editor
 		- the transform component will be kept up to date and it will be the logical transform
 		- the rendering code will also only touch this logical transform

@@ -1,5 +1,6 @@
 #pragma once
 #include <optional>
+#include "augs/drawing/make_sprite_points.h"
 #include "augs/build_settings/platform_defines.h"
 
 #include "game/transcendental/entity_handle_declaration.h"

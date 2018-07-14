@@ -230,7 +230,8 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					/* Choose effect based on where the foot has landed */
 					const auto visible = visible_entities().reacquire_all_and_sort({
 						cosmos,
-						queried_camera
+						queried_camera,
+						true
 					}).per_layer;
 
 					const std::array<render_layer, 7> checked_layers = {

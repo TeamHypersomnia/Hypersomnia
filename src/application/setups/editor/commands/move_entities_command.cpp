@@ -123,7 +123,6 @@ void move_entities_command::push_entry(const const_entity_handle handle) {
 void move_entities_command::unmove_entities(cosmos& cosm) {
 	auto before_change_data = augs::cref_memory_stream(values_before_change);
 
-	/* For improved determinism, unmove the entities first... */
 	::unmove_entities({}, cosm, moved_entities, before_change_data);
 }
 
