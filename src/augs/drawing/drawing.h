@@ -8,7 +8,6 @@
 #include "augs/math/camera_cone.h"
 
 #include "augs/texture_atlas/atlas_entry.h"
-#include "augs/drawing/make_sprite.h"
 #include "augs/drawing/flip.h"
 #include "augs/drawing/border.h"
 

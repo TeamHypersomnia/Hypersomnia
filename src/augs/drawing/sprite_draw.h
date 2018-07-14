@@ -40,14 +40,21 @@ namespace augs {
 			);
 		}();
 
-		const auto lt_center = -vec2(tile_size * (times - vec2i(1, 1))) / 2;
+		const auto first_center = (-vec2d(tile_size * (times - vec2i(1, 1))) / 2).rotate(final_rotation);
 
+		const auto dir = vec2d::from_degrees(final_rotation);
+		const auto dir_perp = dir.perpendicular_cw();
+
+		const auto tile_off = dir * tile_size.x;
+		const auto tile_off_perp = dir_perp * tile_size.y;
+	   
 		for (int y = vis.t; y < vis.b; ++y) {
 			for (int x = vis.l; x < vis.r; ++x) {
-				auto piece_offset = lt_center + vec2(tile_size * vec2i(x, y));
-				piece_offset.rotate(final_rotation);
+				const auto x_off = tile_off * x;
+				const auto y_off = tile_off_perp * y;
+				const auto piece_offset = first_center + x_off + y_off;
 
-				callback(pos + piece_offset);
+				callback(vec2(vec2d(pos) + piece_offset));
 			}
 		}
 	}

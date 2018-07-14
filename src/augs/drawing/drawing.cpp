@@ -8,6 +8,7 @@
 #include "augs/drawing/polygon.h"
 #include "augs/drawing/general_border.h"
 #include "augs/misc/constant_size_vector.h"
+#include "augs/drawing/make_sprite.h"
 
 namespace augs {
 
