@@ -33,72 +33,7 @@
 #include "game/transcendental/logic_step.h"
 #include "game/transcendental/cosmic_delta.h"
 
-class testbed_node {
-	template <class F>
-	decltype(auto) on_enum(F&& f) const {
-		return std::visit(std::forward<F>(f), enum_id);
-	}
-
-	cosmos* cosm;
-
-	std::variant<
-		test_plain_sprited_bodys,
-		test_complex_decorations,
-		test_sprite_decorations,
-		test_sound_decorations,
-		test_particles_decorations
-	> enum_id;
-public:
-	testbed_node() = default;
-	testbed_node(const testbed_node&) = default;
-
-	template <class E>
-	testbed_node(cosmos& csm, const E e) : 
-		cosm(&csm),
-		enum_id(e)
-	{}
-
-	flip_flags flip;
-	real32 rotation = 0.f;
-
-	template <class E>
-	auto next(const E e) const {
-		auto cloned = *this;
-		cloned.enum_id = e;
-		return cloned;
-	}
-
-	auto next() const {
-		auto cloned = *this;
-		return cloned;
-	}
-
-	auto get_size() const {
-		return on_enum([&](const auto id) {
-			const auto& f = ::get_test_flavour(cosm->get_common_significant().flavours, id);
-
-			if constexpr(remove_cref<decltype(f)>::template has<invariants::sprite>()) {
-				return f.template get<invariants::sprite>().size;
-			}
-			else {
-				return vec2i(5, 5);
-			}
-		});
-	}
-
-	void create(const vec2 resolved_pos, const vec2i resolved_size) const {
-		on_enum([&](const auto id) {
-			create_test_scene_entity(*cosm, id, [&](const auto typed_handle) {
-				typed_handle.set_logic_transform(transformr(resolved_pos, rotation));
-				typed_handle.do_flip(flip);
-
-				if (resolved_size != get_size()) {
-					typed_handle.set_logical_size(resolved_size);
-				}
-			});
-		});
-	}
-};
+#include "test_scenes/scenes/test_scene_node.h"
 
 namespace test_scenes {
 	entity_id testbed::populate(const loaded_image_caches_map& caches, const logic_step step) const {
@@ -319,7 +254,7 @@ namespace test_scenes {
 					return make_cascade_aligner(
 						floor_origin,
 						total_floor_size, 
-						testbed_node { world, flavour_id }
+						test_scene_node { world, flavour_id }
 					);
 				};
 
@@ -368,7 +303,7 @@ namespace test_scenes {
 				return make_cascade_aligner(
 					aquarium_origin.pos, 
 					whole_aquarium_size, 
-					testbed_node { world, flavour_id }
+					test_scene_node { world, flavour_id }
 				);
 			};
 
@@ -661,7 +596,7 @@ namespace test_scenes {
 		make_cascade_aligner(
 			orig1 + aquarium_size / 2, 
 			whole_aquarium_size + vec2i::square(2 * lab_wall_size.y),
-			testbed_node { world, test_complex_decorations::CONSOLE_LIGHT }
+			test_scene_node { world, test_complex_decorations::CONSOLE_LIGHT }
 		).ro()
 		.next(test_sound_decorations::HUMMING_DISABLED);
 
