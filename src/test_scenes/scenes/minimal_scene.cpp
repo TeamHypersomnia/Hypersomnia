@@ -16,8 +16,23 @@
 #include "game/detail/inventory/perform_transfer.h"
 #include "view/viewables/image_cache.h"
 
+#include "test_scenes/scenes/test_scene_node.h"
+#include "augs/math/cascade_aligner.h"
+
 namespace test_scenes {
-	entity_id minimal_scene::populate(const loaded_image_caches_map&, const logic_step step) const {
+	entity_id minimal_scene::populate(const loaded_image_caches_map& caches, const logic_step step) const {
+		auto& world = step.get_cosmos();
+
+#if 0
+		auto create = [&](auto&&... args) {
+			return create_test_scene_entity(world, std::forward<decltype(args)>(args)...);
+		};
+#endif
+
+		auto get_size_of = [&caches](const auto id) {
+			return vec2i(caches.at(to_image_id(id)).get_original_size());
+		};
+
 		const int num_characters = 1;
 
 		std::vector<entity_id> new_characters;
@@ -55,6 +70,7 @@ namespace test_scenes {
 			fill_range(sentience.learned_spells, true);
 		}
 
+#if 0
 		prefabs::create_sample_rifle(step, vec2(100, -500 + 50),
 			prefabs::create_sample_magazine(step, vec2(100, -650),
 				prefabs::create_cyan_charge(step, vec2(0, 0))));
@@ -66,8 +82,25 @@ namespace test_scenes {
 		/* Test: create cyan charges first, only then magazine, and reinfer. */
 		const auto charge = prefabs::create_cyan_charge(step, vec2(0, 0));
 		prefabs::create_sample_magazine(step, vec2(100, -650), charge);
+#endif
 
-		cosmic::reinfer_all_entities(step.get_cosmos());
+		{
+			const vec2 floor_size = get_size_of(test_scene_image_id::FLOOR);
+			const auto total_floor_size = floor_size * 10;
+			const auto floor_origin = vec2(512, -768);
+
+			auto floor_align = [&](const auto flavour_id) {
+				return make_cascade_aligner(
+					floor_origin,
+					total_floor_size, 
+					test_scene_node { world, flavour_id }
+				);
+			};
+
+			floor_align(test_sprite_decorations::FLOOR).set_size(total_floor_size);
+		}
+
+		cosmic::reinfer_all_entities(world);
 
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 		return new_characters[0];
