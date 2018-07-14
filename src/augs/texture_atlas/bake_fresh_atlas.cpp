@@ -18,6 +18,7 @@
 #include "augs/templates/range_workers.h"
 
 #define DEBUG_FILL_IMGS_WITH_COLOR 0
+#define TEST_SAVE_ATLAS 0
 
 #if DEBUG_FILL_IMGS_WITH_COLOR
 #include "augs/misc/randomization.h"
@@ -101,7 +102,7 @@ void bake_fresh_atlas(
 
 #if DEBUG_FILL_IMGS_WITH_COLOR
 			for (auto& img : (*it.first).second.glyph_bitmaps) {
-				img.fill(white.set_hsv({ rng.randval(0.0f, 1.0f), rng.randval(0.3f, 1.0f), rng.randval(0.3f, 1.0f) }));
+				img.fill(rgba(white).set_hsv({ rng.randval(0.0f, 1.0f), rng.randval(0.3f, 1.0f), rng.randval(0.3f, 1.0f) }));
 			}
 #endif
 		}
@@ -129,8 +130,9 @@ void bake_fresh_atlas(
 			make_finder_input(
 				max_size,
 				1,
-				[](auto){ return true; },
-				[](const auto& r){ LOG("ERROR: (%x;%x;%x;%x) didn't fit into atlas.", r.x, r.y, r.w, r.h); return false; }
+				[](auto){ return rectpack2D::callback_result::CONTINUE_PACKING; },
+				[](const auto& r){ LOG("ERROR: (%x;%x;%x;%x) didn't fit into atlas.", r.x, r.y, r.w, r.h); return rectpack2D::callback_result::ABORT_PACKING; },
+				flipping_option::ENABLED
 			)
 		);
 
@@ -276,7 +278,7 @@ void bake_fresh_atlas(
 			}
 
 #if DEBUG_FILL_IMGS_WITH_COLOR
-			loaded_image.fill(white.set_hsv({ rng.randval(0.0f, 1.0f), rng.randval(0.3f, 1.0f), rng.randval(0.3f, 1.0f) }));
+			loaded_image.fill(rgba(white).set_hsv({ rng.randval(0.0f, 1.0f), rng.randval(0.3f, 1.0f), rng.randval(0.3f, 1.0f) }));
 #endif
 			augs::blit(
 				output_image,
@@ -339,4 +341,8 @@ void bake_fresh_atlas(
 			current_rect += n;
 		}
 	}
+
+#if TEST_SAVE_ATLAS
+	augs::image(output_image.get_data(), output_image.get_size()).save_as_png("/tmp/atl.png");
+#endif
 }
