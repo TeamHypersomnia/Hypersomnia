@@ -5,12 +5,14 @@
 #include "augs/math/transform.h"
 
 namespace augs {
+	using sprite_points = std::array<vec2, 4>;
+
 	FORCE_INLINE auto make_sprite_points(
 		const vec2 pos, 
 		const vec2i size, 
 		const float degrees
 	) {
-		std::array<vec2, 4> v;
+		sprite_points v;
 
 		v[0] = v[1] = v[2] = v[3] = pos - size / 2;
 

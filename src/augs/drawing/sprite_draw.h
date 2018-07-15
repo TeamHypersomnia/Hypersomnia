@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/templates/traits/function_traits.h"
 #include "augs/drawing/drawing.h"
 #include "augs/drawing/drawing_input_base.h"
 #include "augs/drawing/make_sprite.h"
@@ -40,9 +41,12 @@ namespace augs {
 			);
 		}();
 
-		const auto first_center = (-vec2d(tile_size * (times - vec2i(1, 1))) / 2).rotate(final_rotation);
+		const auto first_center_local = -vec2(tile_size * (times - vec2i(1, 1))) / 2;
 
-		const auto dir = vec2d::from_degrees(final_rotation);
+		const auto first_center = pos + vec2(first_center_local).rotate(final_rotation);
+		const auto first_lt = pos + (first_center_local - tile_size / 2).rotate(final_rotation);
+
+		const auto dir = vec2::from_degrees(final_rotation);
 		const auto dir_perp = dir.perpendicular_cw();
 
 		const auto tile_off = dir * tile_size.x;
@@ -50,34 +54,42 @@ namespace augs {
 	   
 		for (int y = vis.t; y < vis.b; ++y) {
 			for (int x = vis.l; x < vis.r; ++x) {
-				const auto x_off = tile_off * x;
-				const auto y_off = tile_off_perp * y;
-				const auto piece_offset = first_center + x_off + y_off;
+				using T = argument_t<F, 0>;
 
-				callback(vec2(vec2d(pos) + piece_offset));
+				if constexpr(std::is_same_v<T, vec2>) {
+					const auto x_off = tile_off * x;
+					const auto y_off = tile_off_perp * y;
+
+					callback(first_center + x_off + y_off);
+
+					(void)first_lt;
+				}
+				else {
+					const auto lt = first_lt + tile_off * x + tile_off_perp * y;
+					const auto rt = first_lt + tile_off * (x + 1) + tile_off_perp * y;
+					const auto rb = first_lt + tile_off * (x + 1) + tile_off_perp * (y + 1);
+					const auto lb = first_lt + tile_off * x + tile_off_perp * (y + 1);
+
+					callback({lt, rt, rb, lb});
+
+					(void)first_center;
+				}
 			}
 		}
 	}
+
 
 	template <class id_type>
 	FORCE_INLINE void detail_draw(
 		const sprite<id_type>& spr,
 		const sprite_drawing_input in,
 		const atlas_entry considered_texture,
-		const vec2 target_position,
-		float target_rotation,
-		const sprite_size_type considered_size,
+		const sprite_points& points,
 		rgba target_color
 	) {
-		if (spr.effect == sprite_special_effect::CONTINUOUS_ROTATION) {
-			target_rotation += std::fmod(in.global_time_seconds * spr.effect_speed_multiplier * 360.f, 360.f);
-		}
-
 		if (in.colorize != white) {
 			target_color *= in.colorize;
 		}
-
-		const auto points = make_sprite_points(target_position, considered_size, target_rotation);
 
 		auto triangles = make_sprite_triangles(
 			considered_texture,
@@ -107,6 +119,29 @@ namespace augs {
 
 		in.output.push(triangles[0]);
 		in.output.push(triangles[1]);
+	}
+
+	template <class id_type>
+	FORCE_INLINE void detail_draw(
+		const sprite<id_type>& spr,
+		const sprite_drawing_input in,
+		const atlas_entry considered_texture,
+		const vec2 target_position,
+		float target_rotation,
+		const sprite_size_type considered_size,
+		rgba target_color
+	) {
+		if (spr.effect == sprite_special_effect::CONTINUOUS_ROTATION) {
+			target_rotation += std::fmod(in.global_time_seconds * spr.effect_speed_multiplier * 360.f, 360.f);
+		}
+
+		detail_draw(
+			spr,
+			in,
+			considered_texture,
+			make_sprite_points(target_position, considered_size, target_rotation),
+			target_color
+		);
 	}
 
 	template <class id_type, class M>
@@ -139,7 +174,7 @@ namespace augs {
 					for_each_tile(
 						spr,
 						pos,
-						[&](const auto piece_pos) {
+						[&](const vec2 piece_pos) {
 							detail_draw(
 								spr,
 								in,
@@ -175,14 +210,12 @@ namespace augs {
 				for_each_tile(
 					spr,
 					pos,
-					[&](const auto piece_pos ) {
+					[&](const sprite_points& piece_points) {
 						detail_draw(
 							spr,
 							in,
 							diffuse,
-							piece_pos,
-							final_rotation,
-							original_size,
+							piece_points,
 							spr.color
 						);
 					},

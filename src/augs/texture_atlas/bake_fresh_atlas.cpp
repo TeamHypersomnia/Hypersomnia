@@ -112,7 +112,7 @@ void bake_fresh_atlas(
 		auto scope = measure_scope(out.profiler.packing);
 
 		const auto max_size = static_cast<int>(in.max_atlas_size);
-		const auto rect_padding_amount = 0;
+		const auto rect_padding_amount = 2;
 
 		out.profiler.subjects_count.measure(rects_for_packer.size());
 
@@ -169,7 +169,7 @@ void bake_fresh_atlas(
 #if DEBUG_FILL_IMGS_WITH_COLOR
 	output_image.fill({0, 0, 0, 255});
 #endif
-	
+
 	{
 		static std::vector<std::vector<std::byte>> all_loaded_bytes;
 
@@ -253,8 +253,8 @@ void bake_fresh_atlas(
 			}
 
 			output_entry.atlas_space.set(
-				static_cast<float>(packed_rect.x) / output_image_size.x,
-				static_cast<float>(packed_rect.y) / output_image_size.y,
+				static_cast<float>(packed_rect.x + 1) / output_image_size.x,
+				static_cast<float>(packed_rect.y + 1) / output_image_size.y,
 				static_cast<float>(packed_rect.w) / output_image_size.x,
 				static_cast<float>(packed_rect.h) / output_image_size.y
 			);
@@ -284,8 +284,18 @@ void bake_fresh_atlas(
 				output_image,
 				loaded_image,
 				{
-					static_cast<unsigned>(packed_rect.x),
-					static_cast<unsigned>(packed_rect.y)
+					static_cast<unsigned>(packed_rect.x + 1),
+					static_cast<unsigned>(packed_rect.y + 1)
+				},
+				packed_rect.flipped
+			);
+
+			augs::blit_border(
+				output_image,
+				loaded_image,
+				{
+					static_cast<unsigned>(packed_rect.x + 1),
+					static_cast<unsigned>(packed_rect.y + 1)
 				},
 				packed_rect.flipped
 			);
