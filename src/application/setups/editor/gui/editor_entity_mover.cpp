@@ -11,8 +11,34 @@ bool editor_entity_mover::escape() {
 	return false;
 }
 
-void editor_entity_mover::transform_selection(
+void editor_entity_mover::start_transforming_selection(
 	const input_type in,
+	const std::optional<vec2> rotation_center
+) {
+	auto& s = in.setup;
+
+	if (s.anything_opened()) {
+		s.finish_rectangular_selection();
+
+		auto command = s.make_command_from_selections<move_entities_command>(
+			"",
+			[](const auto typed_handle) {
+				return typed_handle.has_independent_transform();
+			}	
+		);
+
+		if (!command.empty()) {
+			command.rotation_center = rotation_center;
+			active = true;
+			s.folder().history.execute_new(std::move(command), s.make_command_input());
+
+			initial_world_cursor_pos = s.find_world_cursor_pos().value().discard_fract();
+		}
+	}
+}
+
+void editor_entity_mover::transform_selection(
+	const entity_mover_input in,
 	const std::optional<vec2> rotation_center,
 	const std::optional<transformr> one_shot_delta
 ) {
@@ -30,27 +56,21 @@ void editor_entity_mover::transform_selection(
 
 		if (!command.empty()) {
 			command.rotation_center = rotation_center;
-
-			if (one_shot_delta) {
-				command.move_by = *one_shot_delta;
-			}
-			else {
-				active = true;
-				initial_world_cursor_pos = s.find_world_cursor_pos().value().discard_fract();
-			}
+			command.move_by = *one_shot_delta;
 
 			s.folder().history.execute_new(std::move(command), s.make_command_input());
 		}
 	}
 }
 
+
 void editor_entity_mover::start_moving_selection(const input_type in) {
-	transform_selection(in, std::nullopt);
+	start_transforming_selection(in, std::nullopt);
 }
 
 void editor_entity_mover::start_rotating_selection(const input_type in) {
 	if (const auto aabb = in.setup.find_selection_aabb()) {
-		transform_selection(in, aabb->get_center());
+		start_transforming_selection(in, aabb->get_center());
 	}
 }
 

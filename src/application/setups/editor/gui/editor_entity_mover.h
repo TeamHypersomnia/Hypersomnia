@@ -18,7 +18,12 @@ class editor_entity_mover {
 	void transform_selection(
 		entity_mover_input in,
 		std::optional<vec2> rotation_center,
-		std::optional<transformr> one_shot_delta = std::nullopt
+		std::optional<transformr> one_shot_delta
+	);
+
+	void start_transforming_selection(
+		entity_mover_input in,
+		std::optional<vec2> rotation_center
 	);
 
 public:
