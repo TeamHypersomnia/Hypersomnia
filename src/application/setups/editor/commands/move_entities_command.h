@@ -13,19 +13,29 @@
 
 struct editor_command_input;
 
+namespace augs {
+	struct introspection_access;
+}
+
+template <class T>
+using typed_entity_id_vector = std::vector<typed_entity_id<T>>;
+
 class move_entities_command {
-	template <class T>
-	using make_data_vector = std::vector<typed_entity_id<T>>;
+	friend augs::introspection_access;
+
+	void move_entities(cosmos& cosm);
 
 public:
-	using moved_entities_type = per_entity_type_container<make_data_vector>;
+	using moved_entities_type = per_entity_type_container<typed_entity_id_vector>;
 	using delta_type = transformr;
 
 	// GEN INTROSPECTOR class move_entities_command
 	editor_command_common common;
-	moved_entities_type moved_entities;
 
+private:
+	moved_entities_type moved_entities;
 	std::vector<std::byte> values_before_change;
+public:
 
 	delta_type move_by;
 	std::optional<vec2> rotation_center;
@@ -53,6 +63,53 @@ public:
 	void unmove_entities(cosmos& cosm);
 	void reinfer_moved(cosmos& cosm);
 
+	void redo(const editor_command_input in);
+	void undo(const editor_command_input in);
+};
+
+class resize_entities_command {
+	friend augs::introspection_access;
+
+	void unresize_entities(cosmos& cosm);
+
+	void resize_entities(cosmos& cosm);
+	void reinfer_resized(cosmos& cosm);
+
+public:
+	using resized_entities_type = per_entity_type_container<typed_entity_id_vector>;
+	using point_type = vec2;
+
+	// GEN INTROSPECTOR class resize_entities_command
+	editor_command_common common;
+
+private:
+	resized_entities_type resized_entities;
+	std::vector<std::byte> values_before_change;
+public:
+
+	point_type reference_point;
+	bool both_axes_simultaneously = false;
+
+	std::string built_description;
+	// END GEN INTROSPECTOR
+
+	std::string describe() const;
+
+	void push_entry(const_entity_handle);
+
+	auto size() const {
+		return resized_entities.size();
+	}
+
+	bool empty() const {
+		return size() == 0;
+	}
+
+	void rewrite_change(
+		const point_type& new_reference_point,
+		const editor_command_input in
+	);
+	
 	void redo(const editor_command_input in);
 	void undo(const editor_command_input in);
 };

@@ -13,8 +13,9 @@
 
 using delta_type = move_entities_command::delta_type;
 using moved_entities_type = move_entities_command::moved_entities_type;
+using resized_entities_type = resize_entities_command::resized_entities_type;
 
-static void save_old_values(
+static void save_transforms(
 	cosmos& cosm,
 	const moved_entities_type& subjects,
 	augs::ref_memory_stream& into
@@ -41,6 +42,43 @@ static void unmove_entities(
 			augs::read_bytes(from, tr);
 		},
 		key
+	);
+}
+
+static void save_sizes(
+	cosmos& cosm,
+	const resized_entities_type& subjects,
+	augs::ref_memory_stream& into
+) {
+	subjects.for_each(
+		[&](const auto& i) {
+			const auto typed_handle = cosm[i];
+
+			if constexpr(typed_handle.template has<components::overridden_size>()) {
+				const auto& overridden_size = typed_handle.get().template get<components::overridden_size>();
+
+				augs::write_bytes(into, overridden_size.size);
+			}
+		}
+	);
+}
+
+static void unresize_entities(
+	const cosmos_solvable_access key,
+	cosmos& cosm,
+	const resized_entities_type& subjects,
+	augs::cref_memory_stream& from
+) {
+	subjects.for_each(
+		[&](const auto& i) {
+			const auto typed_handle = cosm[i];
+
+			if constexpr(typed_handle.template has<components::overridden_size>()) {
+				auto& overridden_size = typed_handle.get(key).template get<components::overridden_size>();
+
+				augs::read_bytes(from, overridden_size.size);
+			}
+		}
 	);
 }
 
@@ -103,6 +141,20 @@ static void move_entities(
 	}
 }
 
+static void resize_entities(
+	const cosmos_solvable_access key,
+	cosmos& cosm,
+	const resized_entities_type& subjects,
+	const vec2& reference_point,
+	const bool both_axes_simultaneously
+) {
+	(void)key;
+	(void)cosm;
+	(void)subjects;
+	(void)reference_point;
+	(void)both_axes_simultaneously;
+}
+
 std::string move_entities_command::describe() const {
 	if (rotation_center) {
 		return typesafe_sprintf("Rotated by %x*: %x", static_cast<int>(move_by.rotation), built_description);
@@ -114,7 +166,7 @@ std::string move_entities_command::describe() const {
 void move_entities_command::push_entry(const const_entity_handle handle) {
 	handle.dispatch([&](const auto typed_handle) {
 		using E = entity_type_of<decltype(typed_handle)>;
-		using vector_type = make_data_vector<E>;
+		using vector_type = typed_entity_id_vector<E>;
 
 		moved_entities.get<vector_type>().push_back({ typed_handle.get_id() });
 	});
@@ -133,23 +185,21 @@ void move_entities_command::reinfer_moved(cosmos& cosm) {
 	});
 }
 
+void move_entities_command::move_entities(cosmos& cosm) {
+	::move_entities({}, cosm, moved_entities, move_by, rotation_center);
+}
+
 void move_entities_command::rewrite_change(
 	const delta_type& new_value,
 	const editor_command_input in
 ) {
-	/* 
-		Reproducing delta from existent values is not immediately obvious,
-		so let's just store the delta. 
-	*/
-
-	move_by = new_value;
-
 	auto& cosm = in.get_cosmos();
 
 	/* For improved determinism, client of this function should unmove the entities first... */
 	/* ...and only now move by the new delta, exactly as if we were moving the entities for the first time. */
+	move_by = new_value;
+	move_entities(cosm);
 
-	move_entities({}, cosm, moved_entities, new_value, rotation_center);
 	reinfer_moved(cosm);
 }
 
@@ -159,8 +209,8 @@ void move_entities_command::redo(const editor_command_input in) {
 	auto before_change_data = augs::ref_memory_stream(values_before_change);
 	ensure(values_before_change.empty());
 
-	save_old_values(cosm, moved_entities, before_change_data);
-	move_entities({}, cosm, moved_entities, move_by, rotation_center);
+	save_transforms(cosm, moved_entities, before_change_data);
+	move_entities(cosm);
 
 	cosmic::reinfer_all_entities(cosm);
 
@@ -175,16 +225,87 @@ void move_entities_command::redo(const editor_command_input in) {
 void move_entities_command::undo(const editor_command_input in) {
 	auto& cosm = in.get_cosmos();
 
-	auto before_change_data = augs::cref_memory_stream(values_before_change);
-	::unmove_entities({}, cosm, moved_entities, before_change_data);
+	unmove_entities(cosm);
 	values_before_change.clear();
 
 	cosmic::reinfer_all_entities(cosm);
 
-	auto& selections = in.folder.view.selected_entities;
-	selections.clear();
+	in.folder.view.select_ids(moved_entities);
+}
 
-	moved_entities.for_each([&](const auto id) {
-		selections.emplace(id);
+
+std::string resize_entities_command::describe() const {
+	return typesafe_sprintf("Resized %x", built_description);
+}
+
+void resize_entities_command::push_entry(const const_entity_handle handle) {
+	handle.dispatch([&](const auto typed_handle) {
+		using E = entity_type_of<decltype(typed_handle)>;
+		using vector_type = typed_entity_id_vector<E>;
+
+		resized_entities.get<vector_type>().push_back({ typed_handle.get_id() });
 	});
+}
+
+void resize_entities_command::unresize_entities(cosmos& cosm) {
+	auto before_change_data = augs::cref_memory_stream(values_before_change);
+
+	::unresize_entities({}, cosm, resized_entities, before_change_data);
+	::unmove_entities({}, cosm, resized_entities, before_change_data);
+}
+
+void resize_entities_command::reinfer_resized(cosmos& cosm) {
+	resized_entities.for_each([&](const auto id){
+		const auto handle = cosm[id];	
+		handle.infer_transform();
+	});
+}
+
+void resize_entities_command::resize_entities(cosmos& cosm) {
+	::resize_entities({}, cosm, resized_entities, reference_point, both_axes_simultaneously);
+}
+
+void resize_entities_command::rewrite_change(
+	const point_type& new_reference_point,
+	const editor_command_input in
+) {
+	auto& cosm = in.get_cosmos();
+
+	/* For improved determinism, unresize the entities first... */
+	unresize_entities(cosm);
+
+	/* ...and only now move by the new delta, exactly as if we were moving the entities for the first time. */
+	reference_point = new_reference_point;
+	resize_entities(cosm);
+
+	reinfer_resized(cosm);
+}
+
+void resize_entities_command::redo(const editor_command_input in) {
+	auto& cosm = in.get_cosmos();
+
+	auto before_change_data = augs::ref_memory_stream(values_before_change);
+	ensure(values_before_change.empty());
+
+	::save_sizes(cosm, resized_entities, before_change_data);
+	::save_transforms(cosm, resized_entities, before_change_data);
+
+	resize_entities(cosm);
+
+	cosmic::reinfer_all_entities(cosm);
+
+	in.folder.view.select_ids(resized_entities);
+}
+
+void resize_entities_command::undo(const editor_command_input in) {
+	auto& cosm = in.get_cosmos();
+
+	auto before_change_data = augs::cref_memory_stream(values_before_change);
+
+	unresize_entities(cosm);
+	values_before_change.clear();
+
+	cosmic::reinfer_all_entities(cosm);
+
+	in.folder.view.select_ids(resized_entities);
 }

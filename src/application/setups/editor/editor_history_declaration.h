@@ -9,6 +9,8 @@ namespace augs {
 struct fill_with_test_scene_command;
 
 class move_entities_command;
+class resize_entities_command;
+
 struct paste_entities_command;
 struct delete_entities_command;
 struct duplicate_entities_command;
@@ -44,6 +46,8 @@ using editor_history_base = augs::history_with_marks<
 	fill_with_test_scene_command,
 
 	move_entities_command,
+	resize_entities_command,
+
 	paste_entities_command,
 	delete_entities_command,
 	duplicate_entities_command,

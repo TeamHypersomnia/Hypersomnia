@@ -9,6 +9,7 @@
 #include "augs/templates/container_templates.h"
 
 #include "game/transcendental/entity_id.h"
+#include "game/transcendental/per_entity_type.h"
 
 #include "application/setups/editor/editor_selection_groups.h"
 #include "application/setups/editor/gui/editor_rect_select_type.h"
@@ -44,4 +45,13 @@ struct editor_view {
 	void toggle_ignore_groups();
 	void toggle_grid();
 	void toggle_flavour_rect_selection();
+
+	template <template <class> class Mod>
+	void select_ids(const per_entity_type_container<Mod>& new_selections) {
+		selected_entities.clear();
+
+		new_selections.for_each([&](const auto id) {
+			selected_entities.emplace(id);
+		});
+	}
 };
