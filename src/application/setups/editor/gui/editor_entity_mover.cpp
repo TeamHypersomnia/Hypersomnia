@@ -76,7 +76,18 @@ void editor_entity_mover::start_rotating_selection(const input_type in) {
 
 void editor_entity_mover::rotate_selection_once_by(const input_type in, const int degrees) {
 	if (const auto aabb = in.setup.find_selection_aabb()) {
+		const bool reinvoke_positional_moving = current_mover_pos_delta(in) != nullptr;
+		const bool reinvoke_rotational_moving = current_mover_rot_delta(in) != nullptr;
+
 		transform_selection(in, aabb->get_center(), transformr(vec2::zero, degrees));
+
+		if (reinvoke_positional_moving) {
+			start_moving_selection(in);
+		}
+
+		if (reinvoke_rotational_moving) {
+			start_rotating_selection(in);
+		}
 	}
 }
 

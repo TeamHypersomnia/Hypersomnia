@@ -1051,14 +1051,14 @@ bool editor_setup::handle_input_before_game(
 
 					case key::G: group_selection(); return true;
 					case key::U: ungroup_selection(); return true;
-					case key::R: mover.rotate_selection_once_by(make_mover_input(), 90); return true;
+					case key::R: mover.rotate_selection_once_by(make_mover_input(), -90); return true;
 					default: break;
 				}
 			}
 
 			if (has_shift) {
 				switch (k) {
-					case key::R: mover.rotate_selection_once_by(make_mover_input(), -90); return true;
+					case key::R: mover.rotate_selection_once_by(make_mover_input(), 90); return true;
 					default: break;
 				}
 			}

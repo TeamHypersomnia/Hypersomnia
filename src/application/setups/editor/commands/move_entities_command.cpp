@@ -105,10 +105,10 @@ static void move_entities(
 
 std::string move_entities_command::describe() const {
 	if (rotation_center) {
-		return "Rotated by " + std::to_string(move_by.rotation) + "*: " + built_description;
+		return typesafe_sprintf("Rotated by %x*: %x", static_cast<int>(move_by.rotation), built_description);
 	}
 
-	return typesafe_sprintf("Moved by %x: ", move_by.pos) + built_description;
+	return typesafe_sprintf("Moved by %x: %x", move_by.pos, built_description);
 }
 
 void move_entities_command::push_entry(const const_entity_handle handle) {
