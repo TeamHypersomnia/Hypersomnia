@@ -413,7 +413,7 @@ void move_entities_command::undo(const editor_command_input in) {
 }
 
 
-active_edges::active_edges(const transformr tr, const vec2 rect_size, vec2 reference_point) {
+active_edges::active_edges(const transformr tr, const vec2 rect_size, vec2 reference_point, const bool both_axes) {
 	reference_point.rotate(-tr.rotation, tr.pos);
 
 	const auto edges = ltrb::center_and_size(tr.pos, rect_size).make_edges(); 
@@ -425,22 +425,28 @@ active_edges::active_edges(const transformr tr, const vec2 rect_size, vec2 refer
 		;
 	};
 
-	if (segment_closer(edges[0], edges[2])) {
-		top = true;
-		bottom = false;
-	}
-	else {
-		top = false;
-		bottom = true;
-	}
+	if (both_axes) {
+		if (segment_closer(edges[0], edges[2])) {
+			top = true;
+			bottom = false;
+		}
+		else {
+			top = false;
+			bottom = true;
+		}
 
-	if (segment_closer(edges[1], edges[3])) {
-		right = true;
-		left = false;
+		if (segment_closer(edges[1], edges[3])) {
+			right = true;
+			left = false;
+		}
+		else {
+			right = false;
+			left = true;
+		}
 	}
 	else {
-		right = false;
-		left = true;
+		const auto idx = std::addressof(minimum_of(edges, segment_closer)) - std::addressof(edges[0]);
+		*(std::addressof(top) + idx) = true;
 	}
 }
 
@@ -479,13 +485,13 @@ void resize_entities_command::resize_entities(cosmos& cosm) {
 				const auto typed_handle = cosm[i];
 
 				if (const auto tr = typed_handle.find_logic_transform()) {
-					edges = active_edges(*tr, typed_handle.get_logical_size(), reference_point);
+					edges = active_edges(*tr, typed_handle.get_logical_size(), reference_point.actual, both_axes_simultaneously);
 				}
 			}
 		);
 	}
 
-	::resize_entities({}, cosm, resized_entities, reference_point, edges, both_axes_simultaneously);
+	::resize_entities({}, cosm, resized_entities, reference_point.snapped, edges, both_axes_simultaneously);
 }
 
 void resize_entities_command::rewrite_change(

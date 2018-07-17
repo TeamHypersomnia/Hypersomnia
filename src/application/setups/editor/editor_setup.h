@@ -401,7 +401,7 @@ public:
 									const auto edges = ltrb::center_and_size(tr.pos, s).make_edges();
 
 									auto draw_edge = [&](auto e) {
-										callback(e[0].mult(tr), e[1].mult(tr), red, global_time_seconds * 2);
+										callback(e[0].mult(tr), e[1].mult(tr), red, global_time_seconds * 8, true);
 									};
 
 									if (active.top) {

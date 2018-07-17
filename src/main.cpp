@@ -1557,8 +1557,18 @@ int work(const int argc, const char* const * const argv) try {
 					}
 
 					editor.for_each_dashed_line(
-						[&](vec2 from, vec2 to, const rgba color, const double secs = 0.0) {
-							line_drawer.dashed_line(on_screen(from.round_fract()), on_screen(to.round_fract()), color, 5.f, 5.f, secs);
+						[&](vec2 from, vec2 to, const rgba color, const double secs = 0.0, bool fatten = false) {
+							const auto a = on_screen(from.round_fract());
+							const auto b = on_screen(to.round_fract());
+
+							line_drawer.dashed_line(a, b, color, 5.f, 5.f, secs);
+
+							if (fatten) {
+								const auto ba = b - a;
+								const auto perp = ba.perpendicular_cw().normalize();
+								line_drawer.dashed_line(a + perp, b + perp, color, 5.f, 5.f, secs);
+								line_drawer.dashed_line(a + perp * 2, b + perp * 2, color, 5.f, 5.f, secs);
+							}
 						}	
 					);
 

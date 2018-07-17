@@ -38,6 +38,15 @@ void editor_entity_mover::start_transforming_selection(
 	}
 }
 
+resizing_reference_point get_reference_point(entity_mover_input in, std::optional<vec2> world_cursor_pos = std::nullopt) {
+	const auto& s = in.setup;
+	const auto& v = s.view();
+
+	const auto new_reference_point = world_cursor_pos.has_value() ? world_cursor_pos.value() : s.find_world_cursor_pos().value().discard_fract();
+	const auto snapped_reference_point = v.snapping_enabled ? vec2(v.grid.get_snapping_corner(new_reference_point)) : new_reference_point;
+
+	return { new_reference_point, snapped_reference_point };
+}
 
 void editor_entity_mover::start_resizing_selection(
 	const entity_mover_input in,
@@ -58,17 +67,11 @@ void editor_entity_mover::start_resizing_selection(
 		if (!command.empty()) {
 			active = true;
 
-			auto new_reference_point = s.find_world_cursor_pos().value().discard_fract();
+			const auto rr = get_reference_point(in);
 
-			const auto& v = s.view();
+			initial_world_cursor_pos = rr.actual;
 
-			if (v.snapping_enabled) {
-				new_reference_point = v.grid.get_snapping_corner(new_reference_point);
-			}
-
-			initial_world_cursor_pos = new_reference_point;
-
-			command.reference_point = new_reference_point;
+			command.reference_point = rr;
 			command.both_axes_simultaneously = both_axes_simultaneously;
 
 			s.folder().history.execute_new(std::move(command), s.make_command_input());
@@ -172,12 +175,7 @@ bool editor_entity_mover::do_mousemotion(const input_type in, vec2 world_cursor_
 		const auto& v = s.view();
 
 		if (auto* const cmd = std::get_if<resize_entities_command>(std::addressof(last))) {
-			auto new_reference_point = world_cursor_pos.discard_fract();
-
-			if (v.snapping_enabled) {
-				new_reference_point = v.grid.get_snapping_corner(new_reference_point);
-			}
-
+			const auto new_reference_point = get_reference_point(in, world_cursor_pos.discard_fract());
 			cmd->rewrite_change(new_reference_point, s.make_command_input());
 		}
 		else if (auto* const cmd = std::get_if<move_entities_command>(std::addressof(last))) {

@@ -69,18 +69,25 @@ public:
 
 struct active_edges {
 	// GEN INTROSPECTOR struct active_edges
-	bool left = false;
 	bool top = false;
 	bool right = false;
 	bool bottom = false;
+	bool left = false;
 	// END GEN INTROSPECTOR
 
 	active_edges() = default;
-	active_edges(transformr, vec2 rect_size, vec2 reference_point);
+	active_edges(transformr, vec2 rect_size, vec2 reference_point, bool both_axes);
 
 	bool operator==(const active_edges b) const {
 		return left == b.left && top == b.top && right == b.right && bottom == b.bottom;
 	}
+};
+
+struct resizing_reference_point {
+	// GEN INTROSPECTOR struct resizing_reference_point
+	vec2 actual;
+	vec2 snapped;
+	// END GEN INTROSPECTOR
 };
 
 class resize_entities_command {
@@ -93,7 +100,7 @@ class resize_entities_command {
 
 public:
 	using resized_entities_type = per_entity_type_container<typed_entity_id_vector>;
-	using point_type = vec2;
+	using point_type = resizing_reference_point;
 
 	// GEN INTROSPECTOR class resize_entities_command
 	editor_command_common common;
