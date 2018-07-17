@@ -24,6 +24,7 @@ constexpr bool has_x_and_y_v = has_x_and_y<T>::value;
 template <class type>
 struct basic_vec2 {
 	using coordinate_type = type;
+	using segment_type = std::array<basic_vec2, 2>;
 
 	// GEN INTROSPECTOR struct basic_vec2 class type
 	type x = static_cast<type>(0);
@@ -154,6 +155,10 @@ struct basic_vec2 {
 		}
 
 		return (p - closest_point_on_segment(start, end)).length_sq();
+	}
+
+	auto distance_from_segment_sq(const segment_type segment) const {
+		return distance_from_segment_sq(segment[0], segment[1]);
 	}
 
 	type dot(const basic_vec2 v) const {

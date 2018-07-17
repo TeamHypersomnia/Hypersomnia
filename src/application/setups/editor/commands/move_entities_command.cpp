@@ -371,27 +371,34 @@ void move_entities_command::undo(const editor_command_input in) {
 }
 
 
-active_edges::active_edges(const transformr tr, vec2 reference_point) {
+active_edges::active_edges(const transformr tr, const vec2 rect_size, vec2 reference_point) {
 	reference_point.rotate(-tr.rotation, tr.pos);
 
-	const auto r = reference_point - tr.pos;
+	const auto edges = ltrb::center_and_size(tr.pos, rect_size).make_edges(); 
 
-	if (r.x > 0) {
+	auto segment_closer = [&reference_point](const auto& a, const auto& b) {
+		return 
+			reference_point.distance_from_segment_sq(a)
+		   	< reference_point.distance_from_segment_sq(b)
+		;
+	};
+
+	if (segment_closer(edges[0], edges[2])) {
+		top = true;
+		bottom = false;
+	}
+	else {
+		top = false;
+		bottom = true;
+	}
+
+	if (segment_closer(edges[1], edges[3])) {
 		right = true;
 		left = false;
 	}
 	else {
 		right = false;
 		left = true;
-	}
-
-	if (r.y > 0) {
-		bottom = true;
-		top = false;
-	}
-	else {
-		bottom = false;
-		top = true;
 	}
 }
 
@@ -430,7 +437,7 @@ void resize_entities_command::resize_entities(cosmos& cosm) {
 				const auto typed_handle = cosm[i];
 
 				if (const auto tr = typed_handle.find_logic_transform()) {
-					edges = active_edges(*tr, reference_point);
+					edges = active_edges(*tr, typed_handle.get_logical_size(), reference_point);
 				}
 			}
 		);

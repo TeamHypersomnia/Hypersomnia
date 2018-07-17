@@ -76,7 +76,7 @@ struct active_edges {
 	// END GEN INTROSPECTOR
 
 	active_edges() = default;
-	active_edges(transformr, vec2 reference_point);
+	active_edges(transformr, vec2 rect_size, vec2 reference_point);
 
 	bool operator==(const active_edges b) const {
 		return left == b.left && top == b.top && right == b.right && bottom == b.bottom;

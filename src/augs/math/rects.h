@@ -360,6 +360,24 @@ struct basic_ltrb {
 	bool operator!=(const basic_ltrb& a) const {
 		return l != a.l || r != a.r || t != a.t || b != a.b;
 	}
+
+	auto make_edges() const {
+		std::array<typename vec2_type::segment_type, 4> result;
+
+		result[0][0] = vec2_type(l, t);
+		result[0][1] = vec2_type(r, t);
+
+		result[1][0] = vec2_type(r, t);
+		result[1][1] = vec2_type(r, b);
+
+		result[2][0] = vec2_type(r, b);
+		result[2][1] = vec2_type(l, b);
+
+		result[3][0] = vec2_type(l, b);
+		result[3][1] = vec2_type(l, t);
+
+		return result;
+	}
 };
 
 template <class T>
@@ -530,7 +548,7 @@ struct basic_xywh {
 	}
 
 	auto make_edges() const {
-		std::array<std::array<vec2_type, 2>, 4> result;
+		std::array<typename vec2_type::segment_type, 4> result;
 
 		result[0][0] = vec2_type(x, y);
 		result[0][1] = vec2_type(x + w, y);
