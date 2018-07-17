@@ -130,5 +130,7 @@ public:
 	void redo(const editor_command_input in);
 	void undo(const editor_command_input in);
 
-	void set_active_edges_from();
+	auto get_active_edges() const {
+		return edges;
+	}
 };

@@ -1485,14 +1485,6 @@ int work(const int argc, const char* const * const argv) try {
 					const auto drawer = get_drawer();
 					const auto line_drawer = get_line_drawer();
 
-					editor.for_each_dashed_line(
-						[&](vec2 from, vec2 to, const rgba color) {
-							line_drawer.dashed_line(on_screen(from.round_fract()), on_screen(to.round_fract()), color, 5.f, 0.f, 0.0);
-						}	
-					);
-
-					renderer.call_and_clear_lines();
-
 					editor.for_each_icon(
 						[&](const auto typed_handle, const auto image_id, const transformr world_transform, const rgba color) {
 							const auto screen_space_pos = vec2i(on_screen(world_transform.pos));
@@ -1550,13 +1542,27 @@ int work(const int argc, const char* const * const argv) try {
 						}
 
 						if (const auto selection_aabb = editor.find_selection_aabb()) {
+							auto col = white;
+
+							if (editor.is_mover_active()) {
+								col.a = 120;
+							}
+
 							drawer.border(
 								camera_cone(*eye, screen_size).to_screen_space(*selection_aabb),
-								white,
+								col,
 								border_input { 1, -1 }
 							);
 						}
 					}
+
+					editor.for_each_dashed_line(
+						[&](vec2 from, vec2 to, const rgba color, const double secs = 0.0) {
+							line_drawer.dashed_line(on_screen(from.round_fract()), on_screen(to.round_fract()), color, 5.f, 5.f, secs);
+						}	
+					);
+
+					renderer.call_and_clear_lines();
 
 					const auto mouse = common_input_state.mouse.pos;
 

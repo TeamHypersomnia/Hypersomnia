@@ -28,6 +28,9 @@ class editor_entity_mover {
 
 public:
 	bool escape();
+	bool is_active() const {
+		return active;
+	}
 
 	void start_moving_selection(entity_mover_input in);
 	void start_rotating_selection(entity_mover_input in);

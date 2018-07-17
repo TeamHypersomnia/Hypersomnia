@@ -508,6 +508,11 @@ struct basic_vec2 {
 		return rotate_radians(degrees * DEG_TO_RAD<mult_type>, origin);
 	}
 
+	template <class T>
+	auto& mult(const T& transform) {
+		return rotate(transform.rotation, transform.pos);
+	}
+
 	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
 	bool x_non_zero(const real eps = AUGS_EPSILON<real>) const {
 		return std::abs(x) > eps;

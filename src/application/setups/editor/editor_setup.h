@@ -310,6 +310,11 @@ public:
 	void finish_rectangular_selection();
 	void unhover();
 	bool is_editing_mode() const;
+
+	bool is_mover_active() const {
+		return mover.is_active();
+	}
+
 	std::optional<camera_eye> find_current_camera_eye() const; 
 
 	std::optional<ltrb> find_screen_space_rect_selection(vec2i screen_size, vec2i mouse_pos) const;
@@ -382,6 +387,38 @@ public:
 							draw_reach_indicator(light_def.calc_reach_trimmed(), light_color);
 							draw_reach_indicator(light_def.calc_wall_reach_trimmed(), rgba(light_color).multiply_alpha(0.7f));
 						});
+
+						if (mover.is_active()) {
+							handle.dispatch_on_having<components::overridden_size>([&](const auto typed_handle) {
+								const auto s = typed_handle.get_logical_size();
+								const auto tr = typed_handle.get_logic_transform();
+
+								const auto& history = folder().history;
+								const auto& last = history.last_command();
+
+								if (const auto* const cmd = std::get_if<resize_entities_command>(std::addressof(last))) {
+									const auto active = cmd->get_active_edges();
+									const auto edges = ltrb::center_and_size(tr.pos, s).make_edges();
+
+									auto draw_edge = [&](auto e) {
+										callback(e[0].mult(tr), e[1].mult(tr), red, global_time_seconds * 2);
+									};
+
+									if (active.top) {
+										draw_edge(edges[0]);
+									}
+									if (active.right) {
+										draw_edge(edges[1]);
+									}
+									if (active.bottom) {
+										draw_edge(edges[2]);
+									}
+									if (active.left) {
+										draw_edge(edges[3]);
+									}
+								}
+							});
+						}
 					}
 				);
 			}

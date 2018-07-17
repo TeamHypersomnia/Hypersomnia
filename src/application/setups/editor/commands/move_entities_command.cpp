@@ -319,7 +319,7 @@ static void resize_entities(
 							set_size(desired_size);
 
 							if (!augs::is_epsilon(rot)) {
-								desired_pos.rotate(rot, pos);
+								desired_pos.mult(original_transform);
 							}
 
 							set_pos(desired_pos);
