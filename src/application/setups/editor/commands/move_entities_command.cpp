@@ -249,6 +249,38 @@ static void resize_entities(
 							return diff_x;
 						};
 
+						auto set_diffs_y = [&](const real32 size_diff_y, const real32 pos_diff_y) {
+							desired_pos.y = (rect.t + rect.b + pos_diff_y) / 2;
+							desired_size.y = current_size.y + size_diff_y;
+
+							found_reference_point = true;
+						};
+
+						auto unitize_diff_y = [&](const real32 diff_y) {
+							const auto would_be_h = static_cast<int>(current_size.y + diff_y);
+
+							if (size_unit.has_value()) {
+								auto snapped_h = would_be_h;
+
+								snapped_h /= size_unit->y;
+								snapped_h *= size_unit->y;
+
+								snapped_h = std::max(snapped_h, size_unit->y);
+
+								return snapped_h - current_size.y;
+							}
+
+							if (would_be_h < 1.f) {
+								/* Be sensible */
+								return 1.f - current_size.y;
+							}
+
+							return diff_y;
+						};
+
+						auto sref = ref;
+						rect.snap_point(sref);
+
 						if (const auto diff_x = ref.x - rect.r; edges.right && diff_x > 0) {
 							const auto d = unitize_diff_x(diff_x);
 							set_diffs_x(d, d);
@@ -257,20 +289,30 @@ static void resize_entities(
 							const auto d = unitize_diff_x(diff_x);
 							set_diffs_x(d, -d);
 						}
+						else if (const auto diff_x = rect.r - sref.x; edges.right && diff_x > 0) {
+							const auto d = unitize_diff_x(-diff_x);
+							set_diffs_x(d, d);
+						}
+						else if (const auto diff_x = sref.x - rect.l; edges.left && diff_x > 0) {
+							const auto d = unitize_diff_x(-diff_x);
+							set_diffs_x(d, -d);
+						}
 
-						if (!found_reference_point) {
-							/* Shrink. Reference point might be inside the rectangle. */
-							auto sref = ref;
-							rect.snap_point(sref);
-
-							if (const auto diff_x = rect.r - sref.x; edges.right && diff_x > 0) {
-								const auto d = unitize_diff_x(-diff_x);
-								set_diffs_x(d, d);
-							}
-							else if (const auto diff_x = sref.x - rect.l; edges.left && diff_x > 0) {
-								const auto d = unitize_diff_x(-diff_x);
-								set_diffs_x(d, -d);
-							}
+						if (const auto diff_y = ref.y - rect.b; edges.bottom && diff_y > 0) {
+							const auto d = unitize_diff_y(diff_y);
+							set_diffs_y(d, d);
+						}
+						else if (const auto diff_y = rect.t - ref.y; edges.top && diff_y > 0) {
+							const auto d = unitize_diff_y(diff_y);
+							set_diffs_y(d, -d);
+						}
+						else if (const auto diff_y = rect.b - sref.y; edges.bottom && diff_y > 0) {
+							const auto d = unitize_diff_y(-diff_y);
+							set_diffs_y(d, d);
+						}
+						else if (const auto diff_y = sref.y - rect.t; edges.top && diff_y > 0) {
+							const auto d = unitize_diff_y(-diff_y);
+							set_diffs_y(d, -d);
 						}
 
 						if (found_reference_point) {
