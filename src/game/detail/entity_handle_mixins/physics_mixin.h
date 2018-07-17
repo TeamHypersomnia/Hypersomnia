@@ -34,6 +34,7 @@ public:
 	) const;
 
 	void infer_colliders() const;
+	void infer_colliders_from_scratch() const;
 	void infer_transform() const;
 };
 
@@ -147,7 +148,15 @@ void physics_mixin<E>::infer_colliders() const {
 	const auto self = *static_cast<const E*>(this);
 	auto& cosmos = self.get_cosmos();
 
-	cosmos.get_solvable_inferred({}).physics.infer_cache_for_colliders(self);
+	cosmos.get_solvable_inferred({}).physics.infer_colliders(self);
+}
+
+template <class E>
+void physics_mixin<E>::infer_colliders_from_scratch() const {
+	const auto self = *static_cast<const E*>(this);
+	auto& cosmos = self.get_cosmos();
+
+	cosmos.get_solvable_inferred({}).physics.infer_colliders_from_scratch(self);
 }
 
 template <class E>
@@ -155,6 +164,6 @@ void physics_mixin<E>::infer_transform() const {
 	const auto self = *static_cast<const E*>(this);
 	auto& cosmos = self.get_cosmos();
 
-	cosmos.get_solvable_inferred({}).physics.infer_cache_for_rigid_body(self);
+	cosmos.get_solvable_inferred({}).physics.infer_rigid_body(self);
 	cosmos.get_solvable_inferred({}).tree_of_npo.infer_cache_for(self);
 }

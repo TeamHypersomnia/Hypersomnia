@@ -67,6 +67,11 @@ class physics_world_cache {
 	inferred_cache_map<colliders_cache> colliders_caches;
 	inferred_cache_map<joint_cache> joint_caches;
 
+	void infer_colliders_from_scratch(
+		const const_entity_handle, 
+		const colliders_connection&
+	);
+
 public:
 	// b2World on stack causes a stack overflow due to a large stack allocator, therefore it must be dynamically allocated
 	std::unique_ptr<b2World> b2world;
@@ -193,12 +198,13 @@ public:
 			return;
 		}
 
-		infer_cache_for_rigid_body(handle);
+		infer_rigid_body(handle);
 	}
 
-	void infer_cache_for_colliders(const const_entity_handle);
-	void infer_cache_for_rigid_body(const const_entity_handle);
-	void infer_cache_for_joint(const const_entity_handle);
+	void infer_colliders_from_scratch(const const_entity_handle);
+	void infer_colliders(const const_entity_handle);
+	void infer_rigid_body(const const_entity_handle);
+	void infer_joint(const const_entity_handle);
 
 	void destroy_colliders_cache(const const_entity_handle);
 	void destroy_rigid_body_cache(const const_entity_handle);

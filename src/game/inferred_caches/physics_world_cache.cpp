@@ -108,7 +108,7 @@ void physics_world_cache::destroy_cache_of(const const_entity_handle handle) {
 	destroy_joint_cache(handle);
 }
 
-void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h) {
+void physics_world_cache::infer_rigid_body(const const_entity_handle h) {
 	h.dispatch_on_having<components::rigid_body>([this](const auto handle) {
 		const auto it = rigid_body_caches.try_emplace(unversioned_entity_id(handle));
 		auto& cache = (*it.first).second;
@@ -225,26 +225,13 @@ void physics_world_cache::infer_cache_for_rigid_body(const const_entity_handle h
 }
 
 void physics_world_cache::infer_cache_for(const const_entity_handle handle) {
-	infer_cache_for_rigid_body(handle);
-	infer_cache_for_colliders(handle);
-	infer_cache_for_joint(handle);
+	infer_rigid_body(handle);
+	infer_colliders(handle);
+	infer_joint(handle);
 }
 
-void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h) {
+void physics_world_cache::infer_colliders(const const_entity_handle h) {
 	h.dispatch_on_having<invariants::fixtures>([this](const auto handle) {
-		/*
-			Algorithm:
-	
-			If the cache exists, check if it must be rebuilt.
-				Lazy-init new values for rebuild-triggering fields.
-					If no change, only update relevant fields in place.
-					If there are changes, save those new values and perform full rebuild.
-			If the cache does not exist, perform full rebuild.
-				If some rebuild-triggering values were already calculated, use them.
-		*/
-	
-		const auto& cosmos = handle.get_cosmos();
-	
 		std::optional<colliders_connection> calculated_connection;
 	
 		auto get_calculated_connection = [&](){
@@ -261,22 +248,21 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h)
 			return *calculated_connection;
 		};
 	
-		const auto it = colliders_caches.try_emplace(handle);
+		const auto it = colliders_caches.try_emplace(handle.get_id().to_unversioned());
 		auto& cache = (*it.first).second;
 	
 		if (/* cache_existed */ !it.second) {
-			bool needs_full_rebuild = false;
+			bool only_update_properties = true;
 			
 			if (get_calculated_connection() != cache.connection) {
-				needs_full_rebuild = true;
+				only_update_properties = false;
 			}
 
 			if (cache.all_fixtures_in_component.empty()) {
-				/* nothing to compare against */
-				needs_full_rebuild = true;
+				only_update_properties = false;
 			}
 	
-			if (!needs_full_rebuild) {
+			if (only_update_properties) {
 				auto& compared = *cache.all_fixtures_in_component[0].get();
 				const auto& colliders_data = handle.template get<invariants::fixtures>();
 	
@@ -308,16 +294,22 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h)
 				
 				return;
 			}
-			else {
-				cache.clear(*this);
-			}
 		}
-		
-		/*
-			Here the cache is not constructed, or needs full rebuild, so we do it from scratch.
-		*/
+
+		infer_colliders_from_scratch(handle, get_calculated_connection());
+	});
+}
+
+void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle h, const colliders_connection& connection) {
+	h.dispatch_on_having<invariants::fixtures>([this, connection](const auto handle) {
+		const auto& cosmos = handle.get_cosmos();
 	
-		const auto new_owner = cosmos[get_calculated_connection().owner];
+		const auto it = colliders_caches.try_emplace(handle.get_id().to_unversioned());
+
+		auto& cache = (*it.first).second;
+		cache.clear(*this);
+
+		const auto new_owner = cosmos[connection.owner];
 
 		if (new_owner.dead()) {
 			colliders_caches.erase(it.first);
@@ -347,20 +339,20 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h)
 
 		fixdef.userData = handle;
 
-		fixdef.density = handle.calc_density(get_calculated_connection(), colliders_data);
+		fixdef.density = handle.calc_density(connection, colliders_data);
 
 		fixdef.friction = colliders_data.friction;
 		fixdef.restitution = colliders_data.restitution;
 		fixdef.isSensor = colliders_data.sensor;
 		fixdef.filter = colliders_data.filter;
 
-		cache.connection = get_calculated_connection();
+		cache.connection = connection;
 
 		auto& all_fixtures_in_component = cache.all_fixtures_in_component;
 		ensure(all_fixtures_in_component.empty());
 
 		auto from_polygon_shape = [&](auto shape) {
-			shape.offset_vertices(get_calculated_connection().shape_offset);
+			shape.offset_vertices(connection.shape_offset);
 
 			for (std::size_t ci = 0; ci < shape.convex_polys.size(); ++ci) {
 				const auto& convex = shape.convex_polys[ci];
@@ -419,7 +411,16 @@ void physics_world_cache::infer_cache_for_colliders(const const_entity_handle h)
 	});
 }
 
-void physics_world_cache::infer_cache_for_joint(const const_entity_handle /* handle */) {
+void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle handle) {
+	if (const auto connection = handle.calc_colliders_connection()) {
+		infer_colliders_from_scratch(handle, *connection);
+	}
+	else {
+		infer_colliders_from_scratch(handle, colliders_connection());
+	}
+}
+
+void physics_world_cache::infer_joint(const const_entity_handle /* handle */) {
 #if TODO
 	const auto& cosmos = handle.get_cosmos();
 

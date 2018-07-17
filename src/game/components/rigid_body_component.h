@@ -309,7 +309,7 @@ damping_mults component_synchronizer<E, components::rigid_body>::calc_damping_mu
 
 template <class E>
 void component_synchronizer<E, components::rigid_body>::infer_caches() const {
-	handle.get_cosmos().get_solvable_inferred({}).physics.infer_cache_for_rigid_body(handle);
+	handle.get_cosmos().get_solvable_inferred({}).physics.infer_rigid_body(handle);
 }
 
 template <class E>

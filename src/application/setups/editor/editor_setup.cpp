@@ -1059,6 +1059,7 @@ bool editor_setup::handle_input_before_game(
 			if (has_shift) {
 				switch (k) {
 					case key::R: mover.rotate_selection_once_by(make_mover_input(), 90); return true;
+					case key::E: mover.start_resizing_selection(make_mover_input(), true); return true;
 					default: break;
 				}
 			}
@@ -1074,6 +1075,7 @@ bool editor_setup::handle_input_before_game(
 				case key::A: view().toggle_ignore_groups(); return true;
 				case key::Z: center_view_at_selection(); if (has_shift) { view().reset_zoom(); } return true;
 				case key::I: play(); return true;
+				case key::E: mover.start_resizing_selection(make_mover_input(), false); return true;
 				case key::F: view().toggle_flavour_rect_selection(); return true;
 				case key::G: view().toggle_grid(); return true;
 				case key::S: view().toggle_snapping(); return true;
