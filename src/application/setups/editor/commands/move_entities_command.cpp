@@ -165,107 +165,126 @@ static void resize_entities(
 			}
 
 			if constexpr(typed_handle.template has<components::overridden_size>()) {
-				if (const auto transform = typed_handle.find_logic_transform()) {
-					const auto& pos = transform->pos;
-					const auto& rot = transform->rotation;
-					const auto current_size = typed_handle.get_logical_size();
+				typed_handle.access_independent_transform(
+					[&](auto& transform) {
+						using T = remove_cref<decltype(transform)>;
 
-					const auto ref = vec2(world_ref).rotate(-rot, pos);
-					const auto rect = ltrb::center_and_size(pos, current_size);
+						const auto original_transform = [si, transform]() {
+							if constexpr(std::is_same_v<T, physics_engine_transforms>) {
+								return transform.get(si);
+							}
+							else if constexpr(std::is_same_v<T, transformr>) {
+								(void)si;
+								return transform;
+							}
+							else {
+								static_assert(always_false_v<T>, "Unknown transform type.");
+								return transformr();
+							}
+						}();
 
-					auto set_size = [&](const vec2 new_size) {
-						auto& overridden_size = typed_handle.get(key).template get<components::overridden_size>();
+						const auto pos = original_transform.pos;
+						const auto rot = original_transform.rotation;
+						const auto current_size = typed_handle.get_logical_size();
 
-						if (size_unit.has_value()) {
-							vec2i s = new_size;
-							s /= size_unit.value();
-							s *= size_unit.value();
-							overridden_size.size.emplace(s);
-						}
-						else {
-							overridden_size.size.emplace(new_size);
-						}
-					};
+						const auto ref = vec2(world_ref).rotate(-rot, pos);
+						const auto rect = ltrb::center_and_size(pos, current_size);
 
-					auto set_pos = [&](const vec2 new_pos) {
-						typed_handle.access_independent_transform(
-							[&](auto& tr) {
-								using T = remove_cref<decltype(tr)>;
+						auto set_size = [&](const vec2 new_size) {
+							auto& overridden_size = typed_handle.get(key).template get<components::overridden_size>();
 
-								if constexpr(std::is_same_v<T, physics_engine_transforms>) {
-									auto t = tr.get();
-									t.pos = si.get_meters(new_pos);
-									tr.set(t);
-								}
-								else if constexpr(std::is_same_v<T, transformr>) {
-									tr.pos = new_pos;
-								}
-								else {
-									static_assert(always_false_v<T>, "Unknown transform type.");
-								}
-							},
-							key
-						);
-					};
+							if (size_unit.has_value()) {
+								vec2i s = new_size;
+								s /= size_unit.value();
+								s *= size_unit.value();
+								overridden_size.size.emplace(s);
+							}
+							else {
+								overridden_size.size.emplace(new_size);
+							}
+						};
 
-					vec2 desired_size = current_size;
-					vec2 desired_pos = pos;
+						auto set_pos = [&](const vec2 new_pos) {
+							if constexpr(std::is_same_v<T, physics_engine_transforms>) {
+								auto t = transform.get();
+								t.pos = si.get_meters(new_pos);
+								transform.set(t);
+							}
+							else if constexpr(std::is_same_v<T, transformr>) {
+								transform.pos = new_pos;
+							}
+						};
 
-					bool found_reference_point = false;
+						vec2 desired_size = current_size;
+						vec2 desired_pos = pos;
 
-					auto set_diffs_x = [&](const real32 size_diff_x, const real32 pos_diff_x) {
-						desired_pos.x = (rect.l + rect.r + pos_diff_x) / 2;
-						desired_size.x = current_size.x + size_diff_x;
+						bool found_reference_point = false;
 
-						found_reference_point = true;
-					};
+						auto set_diffs_x = [&](const real32 size_diff_x, const real32 pos_diff_x) {
+							desired_pos.x = (rect.l + rect.r + pos_diff_x) / 2;
+							desired_size.x = current_size.x + size_diff_x;
 
-					auto unitize_diff_x = [&](const real32 diff_x) {
-						if (size_unit) {
+							found_reference_point = true;
+						};
+
+						auto unitize_diff_x = [&](const real32 diff_x) {
 							const auto would_be_w = static_cast<int>(current_size.x + diff_x);
 
-							auto snapped_w = would_be_w;
-							snapped_w = std::max(snapped_w, size_unit->x);
+							if (size_unit.has_value()) {
+								auto snapped_w = would_be_w;
 
-							snapped_w /= size_unit->x;
-							snapped_w *= size_unit->x;
+								snapped_w /= size_unit->x;
+								snapped_w *= size_unit->x;
 
-							return snapped_w - current_size.x;
+								snapped_w = std::max(snapped_w, size_unit->x);
+
+								return snapped_w - current_size.x;
+							}
+
+							if (would_be_w < 1.f) {
+								/* Be sensible */
+								return 1.f - current_size.x;
+							}
+
+							return diff_x;
+						};
+
+						if (const auto diff_x = ref.x - rect.r; edges.right && diff_x > 0) {
+							const auto d = unitize_diff_x(diff_x);
+							set_diffs_x(d, d);
+						}
+						else if (const auto diff_x = rect.l - ref.x; edges.left && diff_x > 0) {
+							const auto d = unitize_diff_x(diff_x);
+							set_diffs_x(d, -d);
 						}
 
-						return diff_x;
-					};
+						if (!found_reference_point) {
+							/* Shrink. Reference point might be inside the rectangle. */
+							auto sref = ref;
+							rect.snap_point(sref);
 
-					if (const auto diff_x = unitize_diff_x(ref.x - rect.r); edges.right && diff_x > 0) {
-						set_diffs_x(diff_x, diff_x);
-					}
-					else if (const auto diff_x = unitize_diff_x(rect.l - ref.x); edges.left && diff_x > 0) {
-						set_diffs_x(diff_x, -diff_x);
-					}
-
-					if (!found_reference_point) {
-						/* Shrink. Reference point must be inside the rectangle. */
-
-						if (edges.right) {
-							const auto diff_x = unitize_diff_x(ref.x - rect.r);
-							set_diffs_x(diff_x, diff_x);
-						}
-						else if (edges.left) {
-							const auto diff_x = unitize_diff_x(rect.l - ref.x);
-							set_diffs_x(diff_x, -diff_x);
-						}
-					}
-
-					if (found_reference_point) {
-						set_size(desired_size);
-
-						if (!augs::is_epsilon(rot)) {
-							desired_pos.rotate(rot, pos);
+							if (const auto diff_x = rect.r - sref.x; edges.right && diff_x > 0) {
+								const auto d = unitize_diff_x(-diff_x);
+								set_diffs_x(d, d);
+							}
+							else if (const auto diff_x = sref.x - rect.l; edges.left && diff_x > 0) {
+								const auto d = unitize_diff_x(-diff_x);
+								set_diffs_x(d, -d);
+							}
 						}
 
-						set_pos(desired_pos);
-					}
-				}
+						if (found_reference_point) {
+							set_size(desired_size);
+
+							if (!augs::is_epsilon(rot)) {
+								desired_pos.rotate(rot, pos);
+							}
+
+							set_pos(desired_pos);
+						}
+					},
+					key
+				);
 			}
 		}
 	);
@@ -352,14 +371,28 @@ void move_entities_command::undo(const editor_command_input in) {
 }
 
 
-active_edges::active_edges(const transformr tr, vec2 r) {
-	r.rotate(-tr.rotation, tr.pos);
+active_edges::active_edges(const transformr tr, vec2 reference_point) {
+	reference_point.rotate(-tr.rotation, tr.pos);
 
-	left = r.x < 0;
-	right = r.x > 0;
+	const auto r = reference_point - tr.pos;
 
-	top = r.y < 0;
-	bottom = r.y > 0;
+	if (r.x > 0) {
+		right = true;
+		left = false;
+	}
+	else {
+		right = false;
+		left = true;
+	}
+
+	if (r.y > 0) {
+		bottom = true;
+		top = false;
+	}
+	else {
+		bottom = false;
+		top = true;
+	}
 }
 
 std::string resize_entities_command::describe() const {

@@ -51,16 +51,27 @@ void editor_entity_mover::start_resizing_selection(
 		auto command = s.make_command_from_selections<resize_entities_command>(
 			"",
 			[](const auto typed_handle) {
-				return typed_handle.has_independent_transform();
+				return typed_handle.template has<components::overridden_size>() && typed_handle.has_independent_transform();
 			}	
 		);
 
 		if (!command.empty()) {
-			command.both_axes_simultaneously = both_axes_simultaneously;
 			active = true;
-			s.folder().history.execute_new(std::move(command), s.make_command_input());
 
-			initial_world_cursor_pos = s.find_world_cursor_pos().value().discard_fract();
+			auto new_reference_point = s.find_world_cursor_pos().value().discard_fract();
+
+			const auto& v = s.view();
+
+			if (v.snapping_enabled) {
+				new_reference_point = v.grid.get_snapping_corner(new_reference_point);
+			}
+
+			initial_world_cursor_pos = new_reference_point;
+
+			command.reference_point = new_reference_point;
+			command.both_axes_simultaneously = both_axes_simultaneously;
+
+			s.folder().history.execute_new(std::move(command), s.make_command_input());
 		}
 	}
 }
@@ -158,7 +169,7 @@ bool editor_entity_mover::do_mousemotion(const input_type in, vec2 world_cursor_
 		auto& history = s.folder().history;
 		auto& last = history.last_command();
 		auto& cosm = s.work().world;
-		auto& v = s.view();
+		const auto& v = s.view();
 
 		if (auto* const cmd = std::get_if<resize_entities_command>(std::addressof(last))) {
 			auto new_reference_point = world_cursor_pos.discard_fract();
