@@ -36,7 +36,7 @@ protected:
 
 	void infer_caches() const {
 		handle.get_cosmos().get_solvable_inferred({}).tree_of_npo.infer_cache_for(handle);
-		handle.infer_colliders();
+		handle.infer_colliders_from_scratch();
 	}
 
 public:

@@ -67,6 +67,22 @@ public:
 	void undo(const editor_command_input in);
 };
 
+struct active_edges {
+	// GEN INTROSPECTOR struct active_edges
+	bool left = false;
+	bool top = false;
+	bool right = false;
+	bool bottom = false;
+	// END GEN INTROSPECTOR
+
+	active_edges() = default;
+	active_edges(transformr, vec2 reference_point);
+
+	bool operator==(const active_edges b) const {
+		return left == b.left && top == b.top && right == b.right && bottom == b.bottom;
+	}
+};
+
 class resize_entities_command {
 	friend augs::introspection_access;
 
@@ -85,6 +101,7 @@ public:
 private:
 	resized_entities_type resized_entities;
 	std::vector<std::byte> values_before_change;
+	active_edges edges;
 public:
 
 	point_type reference_point;
@@ -112,4 +129,6 @@ public:
 	
 	void redo(const editor_command_input in);
 	void undo(const editor_command_input in);
+
+	void set_active_edges_from();
 };

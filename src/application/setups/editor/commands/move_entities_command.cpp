@@ -145,13 +145,131 @@ static void resize_entities(
 	const cosmos_solvable_access key,
 	cosmos& cosm,
 	const resized_entities_type& subjects,
-	const vec2& reference_point,
+	const vec2& world_ref,
+	const active_edges& edges,
 	const bool both_axes_simultaneously
 ) {
-	(void)key;
-	(void)cosm;
-	(void)subjects;
-	(void)reference_point;
+	const auto si = cosm.get_si();
+
+	subjects.for_each(
+		[&](const auto& i) {
+			const auto typed_handle = cosm[i];
+			std::optional<vec2i> size_unit;
+
+			if constexpr(typed_handle.template has<invariants::sprite>()) {
+				const auto& spr = typed_handle.template get<invariants::sprite>();
+
+				if (spr.tile_excess_size) { 
+					size_unit = spr.size;
+				}
+			}
+
+			if constexpr(typed_handle.template has<components::overridden_size>()) {
+				if (const auto transform = typed_handle.find_logic_transform()) {
+					const auto& pos = transform->pos;
+					const auto& rot = transform->rotation;
+					const auto current_size = typed_handle.get_logical_size();
+
+					const auto ref = vec2(world_ref).rotate(-rot, pos);
+					const auto rect = ltrb::center_and_size(pos, current_size);
+
+					auto set_size = [&](const vec2 new_size) {
+						auto& overridden_size = typed_handle.get(key).template get<components::overridden_size>();
+
+						if (size_unit.has_value()) {
+							vec2i s = new_size;
+							s /= size_unit.value();
+							s *= size_unit.value();
+							overridden_size.size.emplace(s);
+						}
+						else {
+							overridden_size.size.emplace(new_size);
+						}
+					};
+
+					auto set_pos = [&](const vec2 new_pos) {
+						typed_handle.access_independent_transform(
+							[&](auto& tr) {
+								using T = remove_cref<decltype(tr)>;
+
+								if constexpr(std::is_same_v<T, physics_engine_transforms>) {
+									auto t = tr.get();
+									t.pos = si.get_meters(new_pos);
+									tr.set(t);
+								}
+								else if constexpr(std::is_same_v<T, transformr>) {
+									tr.pos = new_pos;
+								}
+								else {
+									static_assert(always_false_v<T>, "Unknown transform type.");
+								}
+							},
+							key
+						);
+					};
+
+					vec2 desired_size = current_size;
+					vec2 desired_pos = pos;
+
+					bool found_reference_point = false;
+
+					auto set_diffs_x = [&](const real32 size_diff_x, const real32 pos_diff_x) {
+						desired_pos.x = (rect.l + rect.r + pos_diff_x) / 2;
+						desired_size.x = current_size.x + size_diff_x;
+
+						found_reference_point = true;
+					};
+
+					auto unitize_diff_x = [&](const real32 diff_x) {
+						if (size_unit) {
+							const auto would_be_w = static_cast<int>(current_size.x + diff_x);
+
+							auto snapped_w = would_be_w;
+							snapped_w = std::max(snapped_w, size_unit->x);
+
+							snapped_w /= size_unit->x;
+							snapped_w *= size_unit->x;
+
+							return snapped_w - current_size.x;
+						}
+
+						return diff_x;
+					};
+
+					if (const auto diff_x = unitize_diff_x(ref.x - rect.r); edges.right && diff_x > 0) {
+						set_diffs_x(diff_x, diff_x);
+					}
+					else if (const auto diff_x = unitize_diff_x(rect.l - ref.x); edges.left && diff_x > 0) {
+						set_diffs_x(diff_x, -diff_x);
+					}
+
+					if (!found_reference_point) {
+						/* Shrink. Reference point must be inside the rectangle. */
+
+						if (edges.right) {
+							const auto diff_x = unitize_diff_x(ref.x - rect.r);
+							set_diffs_x(diff_x, diff_x);
+						}
+						else if (edges.left) {
+							const auto diff_x = unitize_diff_x(rect.l - ref.x);
+							set_diffs_x(diff_x, -diff_x);
+						}
+					}
+
+					if (found_reference_point) {
+						set_size(desired_size);
+
+						if (!augs::is_epsilon(rot)) {
+							desired_pos.rotate(rot, pos);
+						}
+
+						set_pos(desired_pos);
+					}
+				}
+			}
+		}
+	);
+
 	(void)both_axes_simultaneously;
 }
 
@@ -234,6 +352,16 @@ void move_entities_command::undo(const editor_command_input in) {
 }
 
 
+active_edges::active_edges(const transformr tr, vec2 r) {
+	r.rotate(-tr.rotation, tr.pos);
+
+	left = r.x < 0;
+	right = r.x > 0;
+
+	top = r.y < 0;
+	bottom = r.y > 0;
+}
+
 std::string resize_entities_command::describe() const {
 	return typesafe_sprintf("Resized %x", built_description);
 }
@@ -257,12 +385,25 @@ void resize_entities_command::unresize_entities(cosmos& cosm) {
 void resize_entities_command::reinfer_resized(cosmos& cosm) {
 	resized_entities.for_each([&](const auto id){
 		const auto handle = cosm[id];	
+		handle.infer_colliders_from_scratch();
 		handle.infer_transform();
 	});
 }
 
 void resize_entities_command::resize_entities(cosmos& cosm) {
-	::resize_entities({}, cosm, resized_entities, reference_point, both_axes_simultaneously);
+	if (edges == active_edges()) {
+		resized_entities.for_each(
+			[&](const auto& i) {
+				const auto typed_handle = cosm[i];
+
+				if (const auto tr = typed_handle.find_logic_transform()) {
+					edges = active_edges(*tr, reference_point);
+				}
+			}
+		);
+	}
+
+	::resize_entities({}, cosm, resized_entities, reference_point, edges, both_axes_simultaneously);
 }
 
 void resize_entities_command::rewrite_change(

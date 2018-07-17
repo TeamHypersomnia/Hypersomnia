@@ -20,6 +20,8 @@ template <class T> struct basic_xywh;
 
 template <class T>
 struct basic_ltrb {
+	using vec2_type = basic_vec2<T>;
+
 	// GEN INTROSPECTOR struct basic_ltrb class T
 	T l;
 	T t;
@@ -55,6 +57,13 @@ struct basic_ltrb {
 		const auto size = rt - lt;
 
 		return { lt, size };
+	}
+
+	static basic_ltrb<T> center_and_size(
+		const vec2_type center, 
+		const vec2_type size
+	) {
+		return { center - size / 2, size };
 	}
 
 	void x(const T xx) {

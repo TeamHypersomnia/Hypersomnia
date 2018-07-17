@@ -38,6 +38,7 @@ void editor_entity_mover::start_transforming_selection(
 	}
 }
 
+
 void editor_entity_mover::start_resizing_selection(
 	const entity_mover_input in,
    	const bool both_axes_simultaneously
