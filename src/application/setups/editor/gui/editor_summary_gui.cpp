@@ -65,6 +65,26 @@ void editor_summary_gui::perform(editor_setup& setup) {
 
 		add_sorted_lines();
 		text(content);
+
+		lines.clear();
+		content.clear();
+
+		text("Total percentages: ");
+
+		s.for_each_entity_pool([&](const auto& p){
+			using T = entity_type_of<typename remove_cref<decltype(p)>::mapped_type>;
+
+			const auto si = p.size();
+			const auto ca = cosm.get_entities_count();
+			const auto percent = static_cast<float>(si) / static_cast<float>(ca) * 100;
+
+			lines.push_back(
+				typesafe_sprintf("%x (%1f", si, percent) + "%) - "  + format_field_name(get_type_name<T>()) + "\n"
+			);
+		});
+
+		add_sorted_lines();
+		text(content);
 	}
 
 	text("World time: %x (%x steps at %x Hz)",
