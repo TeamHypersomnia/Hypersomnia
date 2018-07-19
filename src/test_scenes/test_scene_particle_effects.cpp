@@ -106,7 +106,7 @@ void load_test_scene_particle_effects(
 		}
 
 		em.size_multiplier.set(1.0, 1.0);
-		em.target_render_layer = render_layer::DIM_SMOKES;
+		em.target_layer = particle_layer::DIM_SMOKES;
 		em.initial_rotation_variation = 180;
 
 		effect.emissions.push_back(em);
@@ -149,7 +149,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(1.0, 1.0);
-			em.target_render_layer = render_layer::DIM_SMOKES;
+			em.target_layer = particle_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 
 			effect.emissions.push_back(em);
@@ -174,7 +174,7 @@ void load_test_scene_particle_effects(
 			em.add_particle_definition(particle_definition);
 
 			em.size_multiplier = float_range(1.0, 1.0);
-			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 
 			effect.emissions.push_back(em);
@@ -214,7 +214,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(0.35, 0.65);
-			em.target_render_layer = render_layer::DIM_SMOKES;
+			em.target_layer = particle_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 
 			effect.emissions.push_back(em);
@@ -250,7 +250,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(0.1, 0.1);
-			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
+			em.target_layer = particle_layer::ILLUMINATING_SMOKES;
 			em.initial_rotation_variation = 180;
 
 			effect.emissions.push_back(em);
@@ -290,7 +290,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(0.35, 0.35);
-			em.target_render_layer = render_layer::DIM_SMOKES;
+			em.target_layer = particle_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 
 			effect.emissions.push_back(em);
@@ -331,7 +331,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(0.25, 0.25);
-			em.target_render_layer = render_layer::DIM_SMOKES;
+			em.target_layer = particle_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 			em.randomize_acceleration = true;
 
@@ -409,7 +409,7 @@ void load_test_scene_particle_effects(
 		}
 
 		em.size_multiplier = float_range(1, 1);
-		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+		em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 		em.should_particles_look_towards_velocity = false;
 		em.randomize_acceleration = true;
@@ -475,7 +475,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(1, 1);
-			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 			em.should_particles_look_towards_velocity = false;
 			em.randomize_acceleration = true;
@@ -515,7 +515,7 @@ void load_test_scene_particle_effects(
 		}
 
 		em.size_multiplier = float_range(0.40, 0.40);
-		em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
+		em.target_layer = particle_layer::ILLUMINATING_SMOKES;
 		em.initial_rotation_variation = 180;
 
 		effect.emissions.push_back(em);
@@ -555,7 +555,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(0.40, 0.40);
-			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
+			em.target_layer = particle_layer::ILLUMINATING_SMOKES;
 			em.initial_rotation_variation = 180;
 
 			effect.emissions.push_back(em);
@@ -621,7 +621,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(1, 1);
-			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 			em.should_particles_look_towards_velocity = false;
 
@@ -663,7 +663,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(0.40, 0.40);
-			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
+			em.target_layer = particle_layer::ILLUMINATING_SMOKES;
 			em.initial_rotation_variation = 180;
 
 			effect.emissions.push_back(em);
@@ -733,7 +733,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(1, 1);
-			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 			em.should_particles_look_towards_velocity = false;
 
@@ -778,7 +778,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(0.40, 0.50);
-			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
+			em.target_layer = particle_layer::ILLUMINATING_SMOKES;
 			em.initial_rotation_variation = 180;
 
 			effect.emissions.push_back(em);
@@ -804,7 +804,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(0.5, 1);
-			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 
 			effect.emissions.push_back(em);
@@ -849,7 +849,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(0.40, 0.50);
-			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
+			em.target_layer = particle_layer::ILLUMINATING_SMOKES;
 			em.initial_rotation_variation = 180;
 			em.scale_damping_to_velocity = true;
 
@@ -891,7 +891,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(0.25, 0.30);
-			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
+			em.target_layer = particle_layer::ILLUMINATING_SMOKES;
 			em.initial_rotation_variation = 180;
 			em.scale_damping_to_velocity = true;
 
@@ -922,7 +922,7 @@ void load_test_scene_particle_effects(
 		}
 
 		em.size_multiplier = float_range(1.0, 1.3);
-		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+		em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 
 		effect.emissions.push_back(em);
@@ -958,7 +958,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(0.40, 0.50);
-			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
+			em.target_layer = particle_layer::ILLUMINATING_SMOKES;
 			em.initial_rotation_variation = 180;
 
 			effect.emissions.push_back(em);
@@ -999,7 +999,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(0.25, 0.25);
-			em.target_render_layer = render_layer::DIM_SMOKES;
+			em.target_layer = particle_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 			em.scale_damping_to_velocity = 180;
 			em.randomize_acceleration = true;
@@ -1037,7 +1037,7 @@ void load_test_scene_particle_effects(
 
 			em.scale_damping_to_velocity = true;
 			em.size_multiplier = float_range(1, 1);
-			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 
 			effect.emissions.push_back(em);
@@ -1090,7 +1090,7 @@ void load_test_scene_particle_effects(
 			em.add_particle_definition(particle_definition);
 		}
 
-		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+		em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 		em.should_particles_look_towards_velocity = false;
 
@@ -1145,7 +1145,7 @@ void load_test_scene_particle_effects(
 		}
 
 		em.size_multiplier = float_range(1, 2.0);
-		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+		em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 		em.should_particles_look_towards_velocity = false;
 
@@ -1182,7 +1182,7 @@ void load_test_scene_particle_effects(
 		}
 
 		em.size_multiplier = float_range(0.2, 0.5);
-		em.target_render_layer = render_layer::DIM_SMOKES;
+		em.target_layer = particle_layer::DIM_SMOKES;
 		em.initial_rotation_variation = 180;
 		//em.fade_when_ms_remaining = float_range(10, 50);
 
@@ -1219,7 +1219,7 @@ void load_test_scene_particle_effects(
 		}
 
 		em.size_multiplier = float_range(1.f, 1.5f);
-		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+		em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 		em.randomize_acceleration = true;
 
@@ -1260,7 +1260,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(0.15, 0.25);
-			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
+			em.target_layer = particle_layer::ILLUMINATING_SMOKES;
 			em.initial_rotation_variation = 180;
 			em.randomize_acceleration = true;
 			em.acceleration = float_range(100.f, 200.f);
@@ -1305,7 +1305,7 @@ void load_test_scene_particle_effects(
 
 			em.scale_damping_to_velocity = true;
 			em.size_multiplier = float_range(1, 1);
-			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 
 			effect.emissions.push_back(em);
@@ -1345,7 +1345,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(0.35, 0.35);
-			em.target_render_layer = render_layer::DIM_SMOKES;
+			em.target_layer = particle_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 			em.randomize_acceleration = false;
 
@@ -1392,7 +1392,7 @@ void load_test_scene_particle_effects(
 			em.size_multiplier = float_range(0.2, 0.2);
 			em.randomize_acceleration = true;
 			em.scale_damping_to_velocity = true;
-			em.target_render_layer = render_layer::ILLUMINATING_SMOKES;
+			em.target_layer = particle_layer::ILLUMINATING_SMOKES;
 			em.initial_rotation_variation = 180;
 
 			effect.emissions.push_back(em);
@@ -1432,7 +1432,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(0.3, 0.3);
-			em.target_render_layer = render_layer::DIM_SMOKES;
+			em.target_layer = particle_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 			em.randomize_acceleration = false;
 			em.should_particles_look_towards_velocity = false;
@@ -1470,7 +1470,7 @@ void load_test_scene_particle_effects(
 
 			em.scale_damping_to_velocity = true;
 			em.size_multiplier = float_range(1, 1);
-			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 
 			effect.emissions.push_back(em);
@@ -1503,7 +1503,7 @@ void load_test_scene_particle_effects(
 				em.add_particle_definition(particle_definition);
 			}
 
-			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 
 			effect.emissions.push_back(em);
@@ -1536,7 +1536,7 @@ void load_test_scene_particle_effects(
 			em.add_particle_definition(particle_definition);
 		}
 
-		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+		em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 
 		effect.emissions.push_back(em);
@@ -1615,7 +1615,7 @@ void load_test_scene_particle_effects(
 
 			em.scale_damping_to_velocity = true;
 			em.size_multiplier = float_range(1, 1);
-			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 
 			effect.emissions.push_back(em);
@@ -1655,7 +1655,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(0.35, 0.35);
-			em.target_render_layer = render_layer::DIM_SMOKES;
+			em.target_layer = particle_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 			em.randomize_acceleration = false;
 
@@ -1718,7 +1718,7 @@ void load_test_scene_particle_effects(
 
 			em.scale_damping_to_velocity = true;
 			em.size_multiplier = float_range(1, 1);
-			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 20;
 
 			effect.emissions.push_back(em);
@@ -1758,7 +1758,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(0.35, 0.35);
-			em.target_render_layer = render_layer::DIM_SMOKES;
+			em.target_layer = particle_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 			em.randomize_acceleration = false;
 
@@ -1838,7 +1838,7 @@ void load_test_scene_particle_effects(
 
 			em.scale_damping_to_velocity = true;
 			em.size_multiplier = float_range(1, 1);
-			em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 			em.initial_rotation_variation = 0;
 
 			effect.emissions.push_back(em);
@@ -1878,7 +1878,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(0.35, 0.35);
-			em.target_render_layer = render_layer::DIM_SMOKES;
+			em.target_layer = particle_layer::DIM_SMOKES;
 			em.initial_rotation_variation = 180;
 			em.randomize_acceleration = false;
 
@@ -1933,7 +1933,7 @@ void load_test_scene_particle_effects(
 			em.add_particle_definition(particle_definition);
 		}
 
-		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+		em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 		em.initial_rotation_variation = 0;
 
 		effect.emissions.push_back(em);
@@ -1970,7 +1970,7 @@ void load_test_scene_particle_effects(
 			em.add_particle_definition(particle_definition);
 		}
 
-		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+		em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 		em.should_particles_look_towards_velocity = false;
 		em.scale_damping_to_velocity = true;
 
@@ -2004,7 +2004,7 @@ void load_test_scene_particle_effects(
 			em.add_particle_definition(particle_definition);
 		}
 
-		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+		em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 		em.should_particles_look_towards_velocity = false;
 		em.scale_damping_to_velocity = true;
 
@@ -2030,7 +2030,7 @@ void load_test_scene_particle_effects(
 			em.add_particle_definition(particle_definition);
 		}
 
-		em.target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+		em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
 		em.should_particles_look_towards_velocity = false;
 
 		effect.emissions.push_back(em);

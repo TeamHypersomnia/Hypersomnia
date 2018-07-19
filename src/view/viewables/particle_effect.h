@@ -4,7 +4,7 @@
 #include "augs/templates/transform_types.h"
 
 #include "augs/misc/minmax.h"
-#include "game/enums/render_layer.h"
+#include "game/enums/particle_layer.h"
 #include "view/viewables/particle_types.h"
 
 struct particle_effect_modifier;
@@ -61,7 +61,7 @@ struct particles_emission {
 	pad_bytes<1> pad;
 
 	tuple_of_particle_definitions_vectors particle_definitions;
-	render_layer target_render_layer = render_layer::ILLUMINATING_PARTICLES;
+	particle_layer target_layer = particle_layer::ILLUMINATING_PARTICLES;
 	// END GEN INTROSPECTOR
 
 	template <class T>

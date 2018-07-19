@@ -8,7 +8,7 @@
 #include "game/transcendental/entity_handle_declaration.h"
 #include "game/transcendental/step_declaration.h"
 
-#include "game/enums/render_layer.h"
+#include "game/enums/particle_layer.h"
 #include "game/detail/view_input/particle_effect_input.h"
 
 #include "view/audiovisual_state/systems/audiovisual_cache_common.h"
@@ -134,9 +134,9 @@ public:
 	};
 
 	/* Particle vectors */
-	per_render_layer_t<std::vector<general_particle>> general_particles;
-	per_render_layer_t<std::vector<animated_particle>> animated_particles;
-	per_render_layer_t<std::unordered_map<entity_id, std::vector<homing_animated_particle>>> homing_animated_particles;
+	per_particle_layer_t<std::vector<general_particle>> general_particles;
+	per_particle_layer_t<std::vector<animated_particle>> animated_particles;
+	per_particle_layer_t<std::unordered_map<entity_id, std::vector<homing_animated_particle>>> homing_animated_particles;
 
 	/* Current streams vectors */
 	std::vector<orbital_cache> orbital_emissions;
@@ -148,9 +148,9 @@ public:
 	void clear();
 	void clear_dead_entities(const cosmos&);
 
-	void add_particle(const render_layer, const general_particle&);
-	void add_particle(const render_layer, const animated_particle&);
-	void add_particle(const render_layer, const entity_id, const homing_animated_particle&);
+	void add_particle(const particle_layer, const general_particle&);
+	void add_particle(const particle_layer, const animated_particle&);
+	void add_particle(const particle_layer, const entity_id, const homing_animated_particle&);
 
 	std::size_t count_all_particles() const;
 
@@ -239,7 +239,7 @@ public:
 		const M& manager,
 		const plain_animations_pool& anims,
 		const draw_particles_input input,
-		const render_layer layer
+		const particle_layer layer
 	) const {
 		for (const auto& it : general_particles[layer]) {
 			it.draw_as_sprite(manager, input);

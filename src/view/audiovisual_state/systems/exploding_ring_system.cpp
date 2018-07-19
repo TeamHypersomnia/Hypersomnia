@@ -58,7 +58,7 @@ void exploding_ring_system::advance(
 
 				if (ring_smoke != nullptr && ring_sparkles != nullptr) {
 					auto smokes_emission = ring_smoke->emissions.at(0);
-					smokes_emission.target_render_layer = render_layer::DIM_SMOKES;
+					smokes_emission.target_layer = particle_layer::DIM_SMOKES;
 					const auto& sparkles_emission = ring_sparkles->emissions.at(0);
 
 					for (auto i = 0u; i < vis.get_num_triangles(); ++i) {
@@ -103,7 +103,7 @@ void exploding_ring_system::advance(
 										new_p.linear_damping /= 2;
 										new_p.acc.rotate(rng.randval(0.f, 360.f));
 
-										particles.add_particle(sparkles_emission.target_render_layer, new_p);
+										particles.add_particle(sparkles_emission.target_layer, new_p);
 										//new_p.max_lifetime_ms *= 1.4f;
 									}
 								};
@@ -128,7 +128,7 @@ void exploding_ring_system::advance(
 								new_p.color.set_rgb(r.color.rgb());
 								new_p.color.a *= 2;
 
-								particles.add_particle(smokes_emission.target_render_layer, new_p);
+								particles.add_particle(smokes_emission.target_layer, new_p);
 
 								//new_p.acc /= 2;
 								//new_p.acc.rotate(rng.randval(0.f, 360.f));

@@ -143,7 +143,7 @@ void thunder_system::advance(
 
 								new_p.colorize(t.in.color.rgb());
 
-								particles_output_for_effects.add_particle(remnants_emission.target_render_layer, new_p);
+								particles_output_for_effects.add_particle(remnants_emission.target_layer, new_p);
 							};
 
 							for (std::size_t i = 0; i < rng.randval(2u, 16u); ++i) {

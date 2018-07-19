@@ -131,7 +131,7 @@ void illuminated_rendering(
 	auto total_particles_scope = measure_scope_additive(profiler.particles_rendering);
 	auto total_layer_scope = measure_scope_additive(profiler.drawing_layers);
 
-	auto draw_particles = [&](const render_layer layer) {
+	auto draw_particles = [&](const particle_layer layer) {
 		auto scope = measure_scope(total_particles_scope);
 
 		particles.draw_particles(
@@ -142,15 +142,15 @@ void illuminated_rendering(
 		);
 	};
 
-	draw_particles(render_layer::DIM_SMOKES);
-	draw_particles(render_layer::ILLUMINATING_SMOKES);
+	draw_particles(particle_layer::DIM_SMOKES);
+	draw_particles(particle_layer::ILLUMINATING_SMOKES);
 
 	renderer.call_and_clear_triangles();
 
 	fbos.illuminating_smoke->set_as_current();
 	renderer.clear_current_fbo();
 
-	draw_particles(render_layer::ILLUMINATING_SMOKES);
+	draw_particles(particle_layer::ILLUMINATING_SMOKES);
 
 	renderer.call_and_clear_triangles();
 	
@@ -400,7 +400,7 @@ void illuminated_rendering(
 		renderer.clear_lines();
 	}
 
-	draw_particles(render_layer::ILLUMINATING_PARTICLES);
+	draw_particles(particle_layer::ILLUMINATING_PARTICLES);
 
 	for (const auto e : visible.per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {
 		draw_wandering_pixels_as_sprites(wandering_pixels, cosmos[e], game_images, drawing_input.make_input_for<invariants::sprite>());

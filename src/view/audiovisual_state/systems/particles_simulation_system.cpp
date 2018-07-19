@@ -152,15 +152,15 @@ void particles_simulation_system::clear_dead_entities(const cosmos& new_cosmos) 
 	});
 }
 
-void particles_simulation_system::add_particle(const render_layer l, const general_particle& p) {
+void particles_simulation_system::add_particle(const particle_layer l, const general_particle& p) {
 	general_particles[l].push_back(p);
 }
 
-void particles_simulation_system::add_particle(const render_layer l, const animated_particle& p) {
+void particles_simulation_system::add_particle(const particle_layer l, const animated_particle& p) {
 	animated_particles[l].push_back(p);
 }
 
-void particles_simulation_system::add_particle(const render_layer l, const entity_id id, const homing_animated_particle& p) {
+void particles_simulation_system::add_particle(const particle_layer l, const entity_id id, const homing_animated_particle& p) {
 	homing_animated_particles[l][id].push_back(p);
 }
 
@@ -426,13 +426,13 @@ void particles_simulation_system::advance_visible_streams(
 				if (emission.has<general_particle>()) {
 					auto new_general = spawner(general_particle());
 					new_general.integrate(time_elapsed);
-					add_particle(emission.target_render_layer, new_general);
+					add_particle(emission.target_layer, new_general);
 				}
 
 				if (emission.has<animated_particle>()) {
 					auto new_animated = spawner(animated_particle());
 					new_animated.integrate(time_elapsed, anims);
-					add_particle(emission.target_render_layer, new_animated);
+					add_particle(emission.target_layer, new_animated);
 				}
 
 				if (emission.has<homing_animated_particle>()) {
@@ -445,7 +445,7 @@ void particles_simulation_system::advance_visible_streams(
 					);
 
 					new_homing_animated.integrate(time_elapsed, homing_target_pos, anims);
-					add_particle(emission.target_render_layer, homing_target, new_homing_animated);
+					add_particle(emission.target_layer, homing_target, new_homing_animated);
 				}
 			}
 
