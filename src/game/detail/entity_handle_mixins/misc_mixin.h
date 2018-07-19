@@ -13,17 +13,6 @@
 #include "game/detail/sentience_shake.h"
 #include "augs/math/physics_structs.h"
 
-template <class A, class = void>
-struct has_specific_entity_type : std::false_type {};
-
-template <class A>
-struct has_specific_entity_type<A, decltype(typename A::used_entity_type(), void())> 
-	: std::true_type
-{};
-
-template <class A>
-constexpr bool has_specific_entity_type_v = has_specific_entity_type<A>::value;
-
 template <class E>
 class misc_mixin {
 public:
@@ -152,7 +141,7 @@ public:
 	auto get_flavour_id() const {
 		const auto self = *static_cast<const E*>(this);
 
-		if constexpr(has_specific_entity_type_v<E>) {
+		if constexpr(E::is_specific) {
 			return typed_entity_flavour_id<entity_type_of<E>>(self.get_raw_flavour_id());
 		}
 		else {
@@ -166,7 +155,7 @@ public:
 	}
 
 	auto& get_flavour() const {
-		if constexpr(has_specific_entity_type_v<E>) {
+		if constexpr(E::is_specific) {
 			const auto self = *static_cast<const E*>(this);
 			auto& cosm = self.get_cosmos();
 			return cosm.template get_flavour<entity_type_of<E>>(get_flavour_id());
@@ -182,7 +171,7 @@ public:
 
 		auto& cosm = self.get_cosmos();
 
-		if constexpr(has_specific_entity_type_v<E>) {
+		if constexpr(E::is_specific) {
 			return get_flavour().template get<invariants::text_details>().name;
 		}
 		else {
@@ -195,7 +184,7 @@ public:
 
 		auto& cosm = self.get_cosmos();
 
-		if constexpr(has_specific_entity_type_v<E>) {
+		if constexpr(E::is_specific) {
 			return get_flavour().template get<invariants::text_details>().description;
 		}
 		else {

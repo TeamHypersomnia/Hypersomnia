@@ -91,5 +91,35 @@ namespace augs {
 			reset();
 			(set(setters), ...);
 		}
+
+		auto begin() {
+			return flags.begin();
+		}
+
+		auto end() {
+			return flags.end();
+		}
+
+		auto begin() const {
+			return flags.begin();
+		}
+
+		auto end() const {
+			return flags.end();
+		}
 	};
+}
+
+template <class _enum, std::size_t alignment = 4>
+auto operator&(
+	const augs::enum_boolset<_enum, alignment>& a,
+	const augs::enum_boolset<_enum, alignment>& b
+) {
+	augs::enum_boolset<_enum, alignment> result;
+	
+	for (std::size_t i = 0; i < result.size(); ++i) {
+		result[i] = a[i] && b[i];
+	}
+
+	return result;
 }

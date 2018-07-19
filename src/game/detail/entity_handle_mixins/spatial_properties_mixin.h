@@ -24,7 +24,7 @@ public:
 	) const {
 		using E = entity_handle_type;
 
-		if constexpr(has_specific_entity_type_v<E>) {
+		if constexpr(E::is_specific) {
 			const auto handle = *static_cast<const entity_handle_type*>(this);
 			auto& components = handle.get(keys...).components;
 
@@ -227,7 +227,7 @@ std::optional<transformr> spatial_properties_mixin<E>::find_logic_transform() co
 			return body_transform + displacement;
 		};
 
-		if constexpr(has_specific_entity_type_v<E>) {
+		if constexpr(E::is_specific) {
 			if constexpr(E::template has<components::rigid_body>()) {
 				if (owner.get_id() == handle.get_id()) {
 					/* Use the already dispatched handle in case it owns itself, which is the most probable occurence. */

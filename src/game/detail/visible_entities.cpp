@@ -12,6 +12,10 @@
 #include "game/inferred_caches/tree_of_npo_cache.h"
 #include "game/inferred_caches/physics_world_cache.h"
 
+#include "game/detail/passes_filter.h"
+
+static constexpr auto EXACT = visible_entities_query::accuracy_type::EXACT;
+
 static void get_visible_per_layer(
 	const cosmos& cosmos,
 	const visible_entities::all_type& entities,
@@ -24,7 +28,6 @@ static void get_visible_per_layer(
 	for (const auto it_id : entities) {
 		if (const auto it = cosmos[it_id]) {
 			const auto layer = it.get<invariants::render>().layer;
-			// ensure(layer < static_cast<render_layer>(output_layers.size()));
 			output_layers[layer].push_back(it);
 		}
 	}
@@ -71,7 +74,7 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 	thread_local std::unordered_set<entity_id> unique_from_physics;
 	unique_from_physics.clear();
 
-	if (input.exact) {
+	if (input.accuracy == EXACT) {
 		const auto camera_aabb = camera.get_visible_world_rect_aabb();
 		
 		physics.for_each_intersection_with_polygon(
@@ -79,7 +82,12 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 			camera_aabb.get_vertices<real32>(),
 			filters::renderable_query(),
 			[&](const b2Fixture* const fix, auto, auto) {
-				unique_from_physics.insert(cosmos.to_versioned(get_entity_that_owns(fix)));
+				const auto owning_entity_id = cosmos.to_versioned(get_entity_that_owns(fix));
+
+				if (::passes_filter(input.filter, cosmos, owning_entity_id)) {
+					unique_from_physics.insert(owning_entity_id);
+				}
+
 				return callback_result::CONTINUE;
 			}
 		);
@@ -89,13 +97,29 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 			cosmos.get_si(),
 			camera,
 			[&](const b2Fixture* const fix) {
-				unique_from_physics.insert(cosmos.to_versioned(get_entity_that_owns(fix)));
+				const auto owning_entity_id = cosmos.to_versioned(get_entity_that_owns(fix));
+
+				if (::passes_filter(input.filter, cosmos, owning_entity_id)) {
+					unique_from_physics.insert(owning_entity_id);
+				}
+
 				return callback_result::CONTINUE;
 			}
 		);
 	}
 
 	concatenate(all, unique_from_physics);
+}
+
+inline bool point_in_rect(
+	const vec2 center,
+	const real32 rotation,
+	const vec2 size,
+	vec2 point
+) {
+	point.rotate(-rotation, center);
+
+	return ltrb::center_and_size(center, size).hover(point);
 }
 
 void visible_entities::acquire_non_physical(const visible_entities_query input) {
@@ -109,15 +133,51 @@ void visible_entities::acquire_non_physical(const visible_entities_query input) 
 		[&](const unversioned_entity_id unversioned_id) {
 			const auto id = cosmos.to_versioned(unversioned_id);
 			
-			if (input.exact) {
-				if (const auto aabb = cosmos[id].find_aabb(); 
-					!aabb || !camera_aabb.hover(*aabb)
-				) {
-					return;
-				}
+			if (!::passes_filter(input.filter, cosmos, id)) {
+				return;
 			}
 
-			all.push_back(id);
+			if (input.accuracy == EXACT) {
+				const bool visible = cosmos[id].dispatch([&](const auto typed_handle) {
+					const auto aabb = typed_handle.find_aabb();
+
+					if (aabb == std::nullopt) {
+						return false;
+					}
+
+					if (!camera_aabb.hover(*aabb)) {
+						return false;
+					}
+
+					if (camera.screen_size == vec2i::square(1)) {
+						/* This is an infinitely small point. */
+						if (const auto transform = typed_handle.find_logic_transform()) {
+							const auto size = typed_handle.get_logical_size();
+
+							if (!point_in_rect(
+								transform->pos,
+								transform->rotation,
+								size,
+								camera.eye.transform.pos
+							)) {
+								return false;
+							}
+						}
+						else {
+							return false;
+						}
+					}
+
+					return true;
+				});
+
+				if (visible) {
+					all.push_back(id);
+				}
+			}
+			else {
+				all.push_back(id);
+			}
 		},
 		camera,
 		tree_of_npo_type::RENDERABLES

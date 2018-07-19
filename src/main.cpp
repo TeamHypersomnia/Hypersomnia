@@ -281,6 +281,10 @@ int work(const int argc, const char* const * const argv) try {
 		return visit_current_setup([](const auto& s) { return s.get_unofficial_content_dir(); });
 	};
 
+	static auto get_render_layer_filter = []() {
+		return visit_current_setup([](const auto& s) { return s.get_render_layer_filter(); });
+	};
+
 	/* TODO: We need to have one game gui per cosmos. */
 	static game_gui_system game_gui;
 	static bool game_gui_mode = false;
@@ -616,7 +620,12 @@ int work(const int argc, const char* const * const argv) try {
 
 			const auto queried_cone = camera_cone(queried_eye, screen_size);
 
-			all_visible.reacquire_all_and_sort({ viewed_character.get_cosmos(), queried_cone, false });
+			all_visible.reacquire_all_and_sort({ 
+				viewed_character.get_cosmos(), 
+				queried_cone, 
+				visible_entities_query::accuracy_type::PROXIMATE,
+				get_render_layer_filter()
+			});
 
 			frame_performance.num_visible_entities.measure(all_visible.all.size());
 		}

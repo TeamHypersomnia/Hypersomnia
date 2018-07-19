@@ -249,6 +249,8 @@ class specific_entity_handle :
 	using used_identifier_provider::find_subject;
 
 public:
+	static constexpr bool is_specific = true;
+
 	using const_type = specific_entity_handle<true, entity_type, identifier_provider>;
 	using misc_base::get_flavour;
 	using used_identifier_provider::get;

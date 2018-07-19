@@ -17,7 +17,11 @@ void startle_nearby_organisms(
 	neighbors.acquire_non_physical({
 		cosm,
 		{ camera_eye(startle_origin), vec2::square(startle_radius * 2) },
-		false
+		visible_entities_query::accuracy_type::PROXIMATE,
+		render_layer_filter::whitelist(
+			render_layer::UPPER_FISH,
+			render_layer::BOTTOM_FISH
+		)
 	});
 
 	for (const auto& a : neighbors.all) {

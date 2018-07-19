@@ -836,7 +836,13 @@ entity_mover_input editor_setup::make_mover_input() {
 
 void editor_setup::select_all_entities(const bool has_ctrl) {
 	if (anything_opened()) {
-		selector.select_all(work().world, view().rect_select_mode, has_ctrl, view().selected_entities);
+		selector.select_all(
+			work().world,
+			view().rect_select_mode,
+		   	has_ctrl,
+			view().selected_entities,
+			view().get_effective_selecting_filter()
+		);
 	}
 }
 
@@ -1001,7 +1007,8 @@ bool editor_setup::handle_input_before_game(
 				view().rect_select_mode,
 				world_cursor_pos,
 				current_eye,
-				common_input_state[key::LMOUSE]
+				common_input_state[key::LMOUSE],
+				view().get_effective_selecting_filter()
 			);
 
 			return true;
@@ -1144,4 +1151,12 @@ augs::path_type editor_setup::get_unofficial_content_dir() const {
 	}
 
 	return {};
+}
+
+augs::maybe<render_layer_filter> editor_setup::get_render_layer_filter() const {
+	if (const auto v = find_view()) {
+		return v->viewing_filter;
+	}
+
+	return render_layer_filter::disabled();
 }

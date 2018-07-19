@@ -1121,3 +1121,6 @@ we consider whole type overrides too complex architeciturally:
 - ltrb_grid_intersection
 - move rng to the audiovisual state to avoid having so many tls variables
 
+- rename the flavour on setting an image
+	- if it is detected that it is yet unnamed
+

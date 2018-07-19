@@ -105,14 +105,16 @@ public:
 		const editor_rect_select_type rect_select_mode,
 		vec2 world_cursor_pos,
 		camera_eye eye,
-		bool left_button_pressed
+		bool left_button_pressed,
+		const maybe_layer_filter& filter
 	);
 
 	void select_all(
 		const cosmos& cosm,
 		editor_rect_select_type rect_select_mode,
 		bool has_ctrl,
-		std::unordered_set<entity_id>& current_selections
+		std::unordered_set<entity_id>& current_selections,
+		const maybe_layer_filter& filter
 	);
 
 	template <class F>

@@ -10,6 +10,7 @@
 
 #include "game/transcendental/entity_id.h"
 #include "game/transcendental/per_entity_type.h"
+#include "game/detail/render_layer_filter.h"
 
 #include "application/setups/editor/editor_selection_groups.h"
 #include "application/setups/editor/gui/editor_rect_select_type.h"
@@ -21,6 +22,8 @@ struct editor_folder_meta {
 };
 
 using current_selections_type = std::unordered_set<entity_id>;
+
+using maybe_layer_filter = augs::maybe<render_layer_filter>;
 
 struct editor_view {
 	// GEN INTROSPECTOR struct editor_view
@@ -34,6 +37,9 @@ struct editor_view {
 	editor_selection_groups selection_groups;
 	current_selections_type selected_entities;
 
+	maybe_layer_filter selecting_filter = maybe_layer_filter(render_layer_filter::all(), true);
+	maybe_layer_filter viewing_filter = maybe_layer_filter(render_layer_filter::all(), true);
+
 	std::optional<camera_eye> panned_camera;
 	// END GEN INTROSPECTOR
 
@@ -45,6 +51,8 @@ struct editor_view {
 	void toggle_ignore_groups();
 	void toggle_grid();
 	void toggle_flavour_rect_selection();
+
+	maybe_layer_filter get_effective_selecting_filter() const;
 
 	template <template <class> class Mod>
 	void select_ids(const per_entity_type_container<Mod>& new_selections) {

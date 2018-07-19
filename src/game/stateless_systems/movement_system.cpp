@@ -32,23 +32,24 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 				if (auto* const movement = subject.template find<components::movement>()) {
 					switch (it.intent) {
 						case game_intent_type::MOVE_FORWARD:
-						movement->moving_forward = it.was_pressed();
-						break;
+							movement->moving_forward = it.was_pressed();
+							break;
 						case game_intent_type::MOVE_BACKWARD:
-						movement->moving_backward = it.was_pressed();
-						break;
+							movement->moving_backward = it.was_pressed();
+							break;
 						case game_intent_type::MOVE_LEFT:
-						movement->moving_left = it.was_pressed();
-						break;
+							movement->moving_left = it.was_pressed();
+							break;
 						case game_intent_type::MOVE_RIGHT:
-						movement->moving_right = it.was_pressed();
-						break;
+							movement->moving_right = it.was_pressed();
+							break;
 						case game_intent_type::WALK:
-						movement->walking_enabled = it.was_pressed();
-						break;
+							movement->walking_enabled = it.was_pressed();
+							break;
 						case game_intent_type::SPRINT:
-						movement->sprint_enabled = it.was_pressed();
-						break;
+							movement->sprint_enabled = it.was_pressed();
+							break;
+
 						default: break;
 					}
 				}
@@ -224,34 +225,29 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				auto chosen_effect = common_assets.standard_footstep;
 				
 				{
-					const auto queried_eye = camera_eye { effect_transform, 1.f };
-					const auto queried_camera = camera_cone(queried_eye, vec2i(1, 1));
-
 					/* Choose effect based on where the foot has landed */
-					const auto visible = visible_entities().reacquire_all_and_sort({
+
+					const auto ground_id = get_hovered_world_entity(
 						cosmos,
-						queried_camera,
-						true
-					}).per_layer;
+						effect_transform.pos,
+						[&cosmos](const auto id) {
+							return cosmos[id].template has<invariants::ground>();
+						},
+						render_layer_filter::whitelist(
+							render_layer::CAR_INTERIOR,
+							render_layer::ON_ON_FLOOR,
+							render_layer::ON_FLOOR,
+							render_layer::FLOOR_AND_ROAD,
+							render_layer::GROUND,
+							render_layer::UNDER_GROUND
+						)
+					);
 
-					const std::array<render_layer, 7> checked_layers = {
-						render_layer::CAR_INTERIOR,
-						render_layer::ON_ON_FLOOR,
-						render_layer::ON_FLOOR,
-						render_layer::FLOOR_AND_ROAD,
-						render_layer::GROUND,
-						render_layer::UNDER_GROUND
-					};
+					if (const auto ground_entity = cosmos[ground_id]) {
+						const auto& ground = ground_entity.template get<invariants::ground>();
 
-					for (const auto& l : checked_layers) {
-						if (visible[l].size() > 0) {
-							if (const auto ground = cosmos[visible[l][0]].find<invariants::ground>()) {
-								if (ground->footstep_effect.is_enabled) {
-									chosen_effect = ground->footstep_effect.value;
-								}
-
-								break;
-							}
+						if (ground.footstep_effect.is_enabled) {
+							chosen_effect = ground.footstep_effect.value;
 						}
 					}
 				}

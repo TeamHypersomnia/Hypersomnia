@@ -4,8 +4,11 @@
 #include "augs/graphics/vertex.h"
 
 #include "augs/math/camera_cone.h"
+#include "game/detail/render_layer_filter.h"
 
 class interpolation_system;
+
+struct render_layer_filter;
 
 struct aabb_highlighter_drawing_input {
 	const augs::drawer_with_default output;
@@ -24,6 +27,7 @@ struct aabb_highlighter {
 	float biggest_length = 16.f;
 	float scale_down_when_aabb_no_bigger_than = 40.f;
 
+	static render_layer_filter get_filter();
 	static bool is_hoverable(const const_entity_handle);
 
 	void update(const augs::delta);

@@ -1,7 +1,9 @@
 #include "application/setups/editor/gui/editor_entity_selector.h"
+#include "game/detail/render_layer_filter.h"
 
 #include "application/setups/editor/gui/find_aabb_of.h"
 #include "game/transcendental/cosmos.h"
+#include "game/detail/passes_filter.h"
 
 void editor_entity_selector::clear_selection_of(const entity_id id) {
 	erase_element(in_rectangular_selection.all, id);
@@ -110,7 +112,8 @@ void editor_entity_selector::select_all(
 	const cosmos& cosm,
 	const editor_rect_select_type rect_select_mode,
 	const bool has_ctrl,
-	std::unordered_set<entity_id>& current_selections
+	std::unordered_set<entity_id>& current_selections,
+	const maybe_layer_filter& filter
 ) {
 	const auto compared_flavour = flavour_of_held;
 	finish_rectangular(current_selections);
@@ -122,6 +125,10 @@ void editor_entity_selector::select_all(
 	current_selections.reserve(current_selections.size() + cosm.get_entities_count());
 
 	cosmic::for_each_entity(cosm, [&](const auto handle) {
+		if (!::passes_filter(filter, handle)) {
+			return;
+		}
+
 		const auto id = handle.get_id();
 
 		if (compared_flavour.is_set() && rect_select_mode == editor_rect_select_type::SAME_FLAVOUR) {
@@ -161,7 +168,8 @@ void editor_entity_selector::do_mousemotion(
 	const editor_rect_select_type rect_select_mode,
 	const vec2 world_cursor_pos,
 	const camera_eye eye,
-	const bool left_button_pressed
+	const bool left_button_pressed,
+	const maybe_layer_filter& filter
 ) {
 	hovered = {};
 
@@ -188,9 +196,11 @@ void editor_entity_selector::do_mousemotion(
 
 		in_rectangular_selection.clear();
 
-		const auto query = visible_entities_query{
+		const auto query = visible_entities_query {
 			cosm,
-			camera_cone(camera_eye(world_range.get_center(), 1.f), world_range.get_size())
+			camera_cone(camera_eye(world_range.get_center(), 1.f), world_range.get_size()),
+			visible_entities_query::accuracy_type::PROXIMATE,
+			filter
 		};
 
 		in_rectangular_selection.acquire_non_physical(query);
@@ -239,7 +249,8 @@ void editor_entity_selector::do_mousemotion(
 				world_cursor_pos, 
 				[&](const entity_id id) { 
 					return should_hover_standard_aabb(cosm, id);
-				}
+				},
+				filter
 			);
 		}
 	}

@@ -8,6 +8,17 @@
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/audiovisual_state/aabb_highlighter.h"
 
+render_layer_filter aabb_highlighter::get_filter() {
+	return render_layer_filter::whitelist(
+		render_layer::SMALL_DYNAMIC_BODY,
+		render_layer::SENTIENCES,
+		render_layer::OVER_DYNAMIC_BODY,
+		render_layer::DYNAMIC_BODY,
+		render_layer::GLASS_BODY,
+		render_layer::CAR_INTERIOR,
+		render_layer::CAR_WHEEL
+	);
+}
 
 void aabb_highlighter::update(const augs::delta dt) {
 	timer += dt.in_milliseconds();
@@ -15,22 +26,7 @@ void aabb_highlighter::update(const augs::delta dt) {
 }
 
 bool aabb_highlighter::is_hoverable(const const_entity_handle e) {
-	if (const auto maybe_render = e.find<invariants::render>()) {
-		switch (maybe_render->layer) {
-			case render_layer::SMALL_DYNAMIC_BODY: return true;
-			case render_layer::SENTIENCES: return true;
-			case render_layer::OVER_DYNAMIC_BODY: return true;
-			case render_layer::DYNAMIC_BODY: return true;
-			case render_layer::GLASS_BODY: return true;
-			case render_layer::CAR_INTERIOR: return true;
-			case render_layer::CAR_WHEEL: return true;
-			default: return false;
-		}
-	
-		return false;
-	}
-
-	return false;
+	return get_filter().passes(e);
 }
 
 void aabb_highlighter::draw(const aabb_highlighter_drawing_input in) const {

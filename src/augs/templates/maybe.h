@@ -15,6 +15,7 @@ namespace augs {
 		// END GEN INTROSPECTOR
 
 		maybe() = default;
+		maybe(const T& value) : value(value), is_enabled(true) {}
 		maybe(const T& value, const bool is_enabled) : value(value), is_enabled(is_enabled) {}
 
 		template <class A>

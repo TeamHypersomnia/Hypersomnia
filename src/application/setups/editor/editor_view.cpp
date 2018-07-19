@@ -1,5 +1,13 @@
 #include "application/setups/editor/editor_view.h"
 
+maybe_layer_filter editor_view::get_effective_selecting_filter() const {
+	if (!viewing_filter.is_enabled) {
+		return selecting_filter;
+	}
+
+	return viewing_filter.value & selecting_filter.value;
+}
+
 void editor_view::toggle_grid() {
 	auto& f = show_grid;
 	f = !f;

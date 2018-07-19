@@ -586,14 +586,7 @@ entity_id character_gui::get_hovered_world_entity(const cosmos& cosm, const vec2
 	return ::get_hovered_world_entity(
 		cosm,
 		world_cursor_position,
-		[&](const entity_id id) {
-			const auto handle = cosm[id];
-
-			if (aabb_highlighter::is_hoverable(handle)) {
-				return true;
-			}
-
-			return false;
-		}
+		true_returner(),
+		aabb_highlighter::get_filter()
 	);
 }

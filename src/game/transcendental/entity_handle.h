@@ -74,6 +74,8 @@ class basic_entity_handle :
 	}
 
 public:
+	static constexpr bool is_specific = false;
+
 	using const_type = basic_entity_handle<!is_const>;
 	using misc_base::get_raw_flavour_id;
 	friend const_type;

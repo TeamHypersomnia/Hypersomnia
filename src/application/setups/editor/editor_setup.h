@@ -485,4 +485,6 @@ public:
 	vec2 get_world_cursor_pos(const camera_eye) const;
 
 	augs::path_type get_unofficial_content_dir() const;
+
+	augs::maybe<render_layer_filter> get_render_layer_filter() const;
 };

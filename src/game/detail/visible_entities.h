@@ -1,14 +1,26 @@
 #pragma once
+#include "augs/templates/maybe.h"
 #include "augs/math/camera_cone.h"
 
 #include "game/enums/render_layer.h"
 #include "game/transcendental/entity_id.h"
 
+#include "game/detail/render_layer_filter.h"
+
 struct visible_entities_query {
+	enum class accuracy_type {
+		PROXIMATE,
+		EXACT
+	};
+
 	const cosmos& cosm;
 	const camera_cone cone;
+	const accuracy_type accuracy;
+	const augs::maybe<render_layer_filter> filter;
 
-	bool exact = false;
+	static auto dont_filter() {
+		return augs::maybe<render_layer_filter>();
+	}
 };
 
 struct visible_entities {
@@ -44,14 +56,16 @@ template <class F>
 entity_id get_hovered_world_entity(
 	const cosmos& cosm,
 	const vec2 world_cursor_position,
-	F is_hoverable
+	F is_hoverable,
+	const augs::maybe<render_layer_filter>& filter
 ) {
 	thread_local visible_entities entities;
 
 	entities.reacquire_all_and_sort({
 		cosm,
-		camera_cone(camera_eye(world_cursor_position, 1.f), vec2(1, 1)),
-		true // exact
+		camera_cone(camera_eye(world_cursor_position, 1.f), vec2i::square(1)),
+		visible_entities_query::accuracy_type::EXACT,
+		filter
 	});
 
 	for (const auto& layer : entities.per_layer) {

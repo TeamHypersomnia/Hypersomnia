@@ -19,6 +19,7 @@
 #include "game/transcendental/entity_handle.h"
 #include "game/transcendental/cosmic_movie_director.h"
 #include "game/organization/all_component_includes.h"
+#include "game/detail/render_layer_filter.h"
 
 #include "view/viewables/all_viewables_defs.h"
 
@@ -147,5 +148,9 @@ public:
 
 	augs::path_type get_unofficial_content_dir() const {
 		return {};
+	}
+
+	auto get_render_layer_filter() const {
+		return render_layer_filter::disabled();
 	}
 };
