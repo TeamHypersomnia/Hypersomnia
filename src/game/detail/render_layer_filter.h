@@ -37,6 +37,8 @@ struct render_layer_filter {
 	}
 };
 
+using maybe_layer_filter = augs::maybe<render_layer_filter>;
+
 inline auto operator&(
 	const render_layer_filter& a,
 	const render_layer_filter& b
@@ -46,3 +48,4 @@ inline auto operator&(
 
 	return result;
 }
+

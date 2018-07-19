@@ -19,6 +19,8 @@ namespace augs {
 		alignas(alignment) std::array<bool, aligned_flag_count> flags = {};
 		// END GEN INTROSPECTOR
 	public:
+		using enum_type = _enum;
+
 		bool operator==(const enum_boolset<_enum, alignment>& b) const {
 			return ranges_equal(flags, b.flags, flag_count);
 		}
@@ -122,4 +124,19 @@ auto operator&(
 	}
 
 	return result;
+}
+
+template <class _enum, std::size_t alignment = 4>
+bool found_in(const augs::enum_boolset<_enum, alignment>& v, const _enum e) {
+	return v[e];
+}
+
+template <class _enum, std::size_t alignment = 4>
+void erase_element(augs::enum_boolset<_enum, alignment>& v, const _enum e) {
+	v[e] = false;
+}
+
+template <class _enum, std::size_t alignment = 4>
+void emplace_element(augs::enum_boolset<_enum, alignment>& v, const _enum e) {
+	v[e] = true;
 }

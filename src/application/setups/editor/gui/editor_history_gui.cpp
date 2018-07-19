@@ -30,7 +30,7 @@ void editor_history_gui::perform(const editor_command_input in) {
 	thread_local ImGuiTextFilter filter;
 	filter.Draw();
 
-	ImGui::Columns(2); // 4-ways, with border
+	ImGui::Columns(2);
 	text_disabled("Operation");
 	ImGui::NextColumn();
 	text_disabled("When");

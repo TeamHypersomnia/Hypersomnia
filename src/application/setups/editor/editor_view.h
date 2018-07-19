@@ -23,8 +23,6 @@ struct editor_folder_meta {
 
 using current_selections_type = std::unordered_set<entity_id>;
 
-using maybe_layer_filter = augs::maybe<render_layer_filter>;
-
 struct editor_view {
 	// GEN INTROSPECTOR struct editor_view
 	editor_folder_meta meta;

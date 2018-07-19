@@ -14,10 +14,10 @@ inline auto selection_checkbox_spacing() {
 	);
 }
 
-template <class C, class T>
+template <class C, class V, class T>
 ImGuiTreeNodeFlags do_selection_checkbox(
 	C& current_selections, 
-	const typename C::value_type& current_id, 
+	const V& current_id, 
 	const bool current_selected,
 	const T& checkbox_id
 ) {
@@ -26,14 +26,14 @@ ImGuiTreeNodeFlags do_selection_checkbox(
 	const auto scoped_style = selection_checkbox_spacing();
 	
 	{
-		bool altered = current_selected;
+		bool now_current_selected = current_selected;
 
-		if (checkbox(typesafe_sprintf("###%x", checkbox_id).c_str(), altered)) {
-			if (current_selected && !altered) {
+		if (checkbox(typesafe_sprintf("###%x", checkbox_id).c_str(), now_current_selected)) {
+			if (current_selected && !now_current_selected) {
 				erase_element(current_selections, current_id);
 			}
-			else if (!current_selected && altered) {
-				current_selections.emplace(current_id);
+			else if (!current_selected && now_current_selected) {
+				emplace_element(current_selections, current_id);
 			}
 		}
 	}
@@ -80,24 +80,24 @@ ImGuiTreeNodeFlags do_tick_all_checkbox(
 				any_selected && !all_selected
 			);
 
-			bool altered = all_selected;
+			bool now_all_altered = all_selected;
 
-			if (checkbox(typesafe_sprintf("###all-checkbox%x", checkbox_id).c_str(), altered)) {
-				if (all_selected && !altered) {
+			if (checkbox(typesafe_sprintf("###all-checkbox%x", checkbox_id).c_str(), now_all_altered)) {
+				if (all_selected && !now_all_altered) {
 					for_each_item([&](const auto& item) {
 						erase_element(current_selections, item);
 					});
 				}
-				else if (!all_selected && altered) {
+				else if (!all_selected && now_all_altered) {
 					for_each_item([&](const auto& item) {
-						current_selections.insert(item);
+						emplace_element(current_selections, item);
 					});
 				}
 			}
 		}
 		else {
-			bool altered = false;
-			checkbox(typesafe_sprintf("###all-checkbox%x", checkbox_id).c_str(), altered);
+			bool dummy = false;
+			checkbox(typesafe_sprintf("###all-checkbox%x", checkbox_id).c_str(), dummy);
 		}
 	}
 

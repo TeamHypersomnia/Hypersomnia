@@ -618,6 +618,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/stateless_systems/remnant_system.cpp"
 	"src/view/audiovisual_state/systems/randomizing_system.cpp"
 	"src/application/main/draw_debug_lines.cpp"
+	"src/application/setups/editor/gui/editor_filters_gui.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

@@ -62,6 +62,11 @@ auto erase_element(Container& v, const T& l) {
 	}
 }
 
+template <class Container, class T>
+auto emplace_element(Container& v, T&& l) {
+	v.emplace(std::forward<T>(l));
+}
+
 template <class Container>
 void erase_from_to(
 	Container& v,
@@ -104,8 +109,8 @@ auto find_in_if(Container& v, C callback) {
 	return std::find_if(v.begin(), v.end(), callback);
 }
 
-template<class Container, class K>
-bool found_in(Container& v, const K& l) {
+template <class Container, class K>
+bool found_in(const Container& v, const K& l) {
 	if constexpr(has_member_find_v<Container, K>) {
 		if constexpr (member_find_returns_ptr_v<Container, K>) {
 			return v.find(l) != nullptr;

@@ -375,6 +375,7 @@ void editor_setup::perform_custom_imgui(
 
 					do_window_entry(summary_gui);
 					do_window_entry(coordinates_gui);
+					do_window_entry(filters_gui);
 
 					if (item_if_tabs("Player")) {
 						player.show = true;
@@ -438,6 +439,11 @@ void editor_setup::perform_custom_imgui(
 		selection_groups_gui.perform(has_ctrl, make_command_input());
 
 		summary_gui.perform(*this);
+		filters_gui.perform(
+			settings.property_editor,
+			view().viewing_filter,
+			view().selecting_filter
+		);
 
 		images_gui.perform(owner, settings.property_editor, game_atlas, make_command_input());
 		sounds_gui.perform(owner, settings.property_editor, game_atlas, make_command_input());
@@ -892,6 +898,7 @@ bool editor_setup::handle_input_before_imgui(
 				case key::P: player.show = true; return true;
 				case key::U: summary_gui.open(); return true;
 				case key::O: coordinates_gui.open(); return true;
+				case key::F: filters_gui.open(); return true;
 				case key::I: images_gui.open(); return true;
 				case key::N: sounds_gui.open(); return true;
 				case key::R: particle_effects_gui.open(); return true;
