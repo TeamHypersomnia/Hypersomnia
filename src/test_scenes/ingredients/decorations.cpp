@@ -269,7 +269,7 @@ namespace test_flavours {
 			auto& meta = flavour_with_sprite(
 				test_sprite_decorations::WATER_COLOR_OVERLAY,
 				test_scene_image_id::BLANK,
-				render_layer::CAR_INTERIOR,
+				render_layer::WATER_COLOR_OVERLAYS,
 				rgba(0, 75, 255, 46)
 			);
 
@@ -280,7 +280,7 @@ namespace test_flavours {
 			auto& meta = flavour_with_sprite(
 				test_complex_decorations::WATER_SURFACE,
 				test_scene_image_id::WATER_SURFACE_1,
-				render_layer::CAR_WHEEL
+				render_layer::WATER_SURFACES
 			);
 
 			meta.get<invariants::sprite>().color.a = 0;

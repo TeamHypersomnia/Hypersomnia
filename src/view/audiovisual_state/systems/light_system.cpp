@@ -311,6 +311,8 @@ void light_system::render_all_lights(const light_system_input in) const {
 	draw_neons(render_layer::SMALL_DYNAMIC_BODY);
 	draw_neons(render_layer::SENTIENCES);
 	draw_neons(render_layer::FLYING_BULLETS);
+	draw_neons(render_layer::WATER_COLOR_OVERLAYS);
+	draw_neons(render_layer::WATER_SURFACES);
 	draw_neons(render_layer::CAR_INTERIOR);
 	draw_neons(render_layer::CAR_WHEEL);
 	draw_neons(render_layer::NEON_CAPTIONS);

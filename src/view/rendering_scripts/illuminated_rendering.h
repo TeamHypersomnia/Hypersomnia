@@ -288,6 +288,8 @@ void illuminated_rendering(
 
 	shaders.illuminated->set_as_current();
 
+	draw_layer(render_layer::WATER_COLOR_OVERLAYS);
+	draw_layer(render_layer::WATER_SURFACES);
 	draw_layer(render_layer::CAR_INTERIOR);
 	draw_layer(render_layer::CAR_WHEEL);
 

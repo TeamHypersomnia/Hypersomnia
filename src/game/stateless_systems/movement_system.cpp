@@ -235,7 +235,6 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					}).per_layer;
 
 					const std::array<render_layer, 7> checked_layers = {
-						render_layer::CAR_WHEEL,
 						render_layer::CAR_INTERIOR,
 						render_layer::ON_ON_FLOOR,
 						render_layer::ON_FLOOR,
