@@ -6,30 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Marker entities
-	- Special-purpose components:
-		- shape_aabb
-			- can be used by wandering pixels!
-				- and thus the editor will allow us to change reach easily
-		- shape_polygon can be used both for marking and for physical bodies
-	- separation between visible shapes and physical shapes is described elsewhere
-		- but the same logic would be used nevertheless
-
-- find closest point pairs for fish?
-	- firstly determine if the setting of the new npo node isn't actually the bottleneck
-	- tho probably it's the false positives
-
-- Sound should be loaded from the smallest to the biggest
-	- So that effects are loaded first
-	- New synchronization
-		- store std::atomic<bool> next to sound_buffer in loaded_sounds_map
-			- set it to false whenever definition changes or it is to be loaded
-			- check if future is implemented same way
-
-- Note: drone sound (sentience sounds overall) will be calculated exactly as the firing engine sound
-	- Sentience humming caches
-	- These don't need their playing pos synchronized
-
 - Transform design
 	- It is the case that many entities might share identical origin, in which case it would be unwieldy to update origins for all entities to a new one.
 		- E.g. fish in aquarium.
@@ -42,6 +18,31 @@ summary: That which we are brainstorming at the moment.
 		- so access_independent_transform -> access_independent_transforms
 		- con: more memory wasted? who gives a heck, though...
 
+- Marker entities
+	- Special-purpose components:
+		- shape_aabb
+			- can be used by wandering pixels!
+				- and thus the editor will allow us to change reach easily
+		- shape_polygon can be used both for marking and for physical bodies
+	- separation between visible shapes and physical shapes is described elsewhere
+		- but the same logic would be used nevertheless
+
+
+- Sound should be loaded from the smallest to the biggest
+	- So that effects are loaded first
+	- New synchronization
+		- store std::atomic<bool> next to sound_buffer in loaded_sounds_map
+			- set it to false whenever definition changes or it is to be loaded
+			- check if future is implemented same way
+
+- find closest point pairs for fish?
+	- firstly determine if the setting of the new npo node isn't actually the bottleneck
+	- tho probably it's the false positives
+
+- Note: drone sound (sentience sounds overall) will be calculated exactly as the firing engine sound
+	- Sentience humming caches
+	- These don't need their playing pos synchronized
+
 - Property editor: Checkbox matrix for b2Filter
 	- might be useful once we come to glass walls 
 	- a list of predefined filters
@@ -49,14 +50,10 @@ summary: That which we are brainstorming at the moment.
 		- stored in common assets
 	- now sensible filters values will be provided by the testbed
 
-- Decorations
-	- Animations
-		- Shuffled
-			- We'll probably only calculate the few that are visible, statelessly
-				- We can as well make the shuffles, why not
+- Shuffled animations
+	- Inside randomizing system?
 
 - Editor maximum ease of access
-	- Shift+Arrows shall duplicate the selection and select the new entities
 	- Fix problems with grouping on duplication?
 
 - Particles and flavours

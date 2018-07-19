@@ -16,9 +16,11 @@ struct entity_id;
 struct all_viewables_defs;
 struct all_logical_assets;
 struct editor_history;
+struct editor_settings;
 
 struct editor_command_input {
 	sol::state& lua;
+	const editor_settings& settings;
 	editor_folder& folder;
 	editor_entity_selector& selector;
 

@@ -87,8 +87,10 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 
 			selections.emplace(e.duplicated_id);
 
-			if (does_mirroring) {
-				selections.emplace(e.source_id);
+			if (in.settings.keep_source_entities_selected_on_mirroring) {
+				if (does_mirroring) {
+					selections.emplace(e.source_id);
+				}
 			}
 		});
 
@@ -210,8 +212,10 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 		}
 	}
 	else {
-		/* Standard duplication in-place. Editor will usually initiate the move command immediately. */
-		selections.clear();
+		/* 
+			Standard duplication in-place. 
+			Editor initiates the move command immediately. 
+		*/
 		duplicate([](auto&&...) {});
 	}
 

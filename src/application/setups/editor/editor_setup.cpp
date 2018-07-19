@@ -819,7 +819,7 @@ void editor_setup::close_folder() {
 
 
 editor_command_input editor_setup::make_command_input() {
-	return { destructor_input.lua, folder(), selector, fae_gui, mover };
+	return { destructor_input.lua, settings, folder(), selector, fae_gui, mover };
 }
 
 grouped_selector_op_input editor_setup::make_grouped_selector_op_input() const {

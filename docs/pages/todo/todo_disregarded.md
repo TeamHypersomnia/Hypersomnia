@@ -190,3 +190,6 @@ summary: Just a hidden scratchpad.
 
 - Solution: Refactor the invariants::sprite to not contain the size information.
 	- Actually, the default size will be there
+
+- Shift+Arrows shall duplicate the selection and select the new entities
+	- Pointless, now that we have the resizing

@@ -259,6 +259,11 @@ void settings_gui_state::perform(
 						revertable_slider("Width", config.editor.go_to.dialog_width, 30u, static_cast<unsigned>(screen_size.x));
 						revertable_slider("Number of lines to show", config.editor.go_to.num_lines, 1u, 300u);
 					}
+
+					if (auto node = scoped_tree_node("Entity selections")) {
+						auto& scope_cfg = config.editor;
+						revertable_checkbox(SCOPE_CFG_NVP(keep_source_entities_selected_on_mirroring));
+					}
 				}
 
 				if (auto node = scoped_tree_node("Appearance")) {

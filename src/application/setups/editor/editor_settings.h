@@ -48,6 +48,7 @@ struct editor_grid_settings {
 struct editor_settings {
 	// GEN INTROSPECTOR struct editor_settings
 	editor_autosave_settings autosave;
+	bool keep_source_entities_selected_on_mirroring = false;
 	
 #if TODO
 	unsigned remember_last_n_commands = 200;
