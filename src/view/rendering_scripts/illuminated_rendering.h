@@ -276,7 +276,7 @@ void illuminated_rendering(
 	draw_layer(render_layer::UPPER_FISH);
 	draw_layer(render_layer::AQUARIUM_BUBBLES);
 
-	for (const auto e : visible.per_layer[render_layer::DIM_WANDERING_PIXELS_EFFECTS]) {
+	for (const auto e : visible.per_layer[render_layer::DIM_WANDERING_PIXELS]) {
 		draw_wandering_pixels_as_sprites(wandering_pixels, cosmos[e], game_images, drawing_input.make_input_for<invariants::sprite>());
 	}
 
@@ -402,7 +402,7 @@ void illuminated_rendering(
 
 	draw_particles(particle_layer::ILLUMINATING_PARTICLES);
 
-	for (const auto e : visible.per_layer[render_layer::WANDERING_PIXELS_EFFECTS]) {
+	for (const auto e : visible.per_layer[render_layer::ILLUMINATING_WANDERING_PIXELS]) {
 		draw_wandering_pixels_as_sprites(wandering_pixels, cosmos[e], game_images, drawing_input.make_input_for<invariants::sprite>());
 	}
 

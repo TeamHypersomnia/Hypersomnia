@@ -51,7 +51,7 @@ namespace test_flavours {
 
 			{
 				invariants::render render_def;
-				render_def.layer = render_layer::WANDERING_PIXELS_EFFECTS;
+				render_def.layer = render_layer::ILLUMINATING_WANDERING_PIXELS;
 
 				meta.set(render_def);
 			}
@@ -66,7 +66,7 @@ namespace test_flavours {
 
 			{
 				invariants::render render_def;
-				render_def.layer = render_layer::WANDERING_PIXELS_EFFECTS;
+				render_def.layer = render_layer::ILLUMINATING_WANDERING_PIXELS;
 
 				meta.set(render_def);
 			}
@@ -98,7 +98,7 @@ namespace test_flavours {
 
 			{
 				invariants::render render_def;
-				render_def.layer = render_layer::DIM_WANDERING_PIXELS_EFFECTS;
+				render_def.layer = render_layer::DIM_WANDERING_PIXELS;
 
 				meta.set(render_def);
 			}

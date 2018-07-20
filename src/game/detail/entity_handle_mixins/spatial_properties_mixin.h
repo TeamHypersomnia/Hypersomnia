@@ -115,20 +115,6 @@ public:
 			return polygon->get_aabb(transform);
 		}
 
-		if (const auto* const light = handle.template find<components::light>()) {
-			if (const auto* const def = handle.template find<invariants::light>()) {
-				const auto range = std::max(
-					def->calc_reach_trimmed(),
-					def->calc_wall_reach_trimmed()
-				);
-
-				return xywh::center_and_size(
-					transform.pos, 
-					vec2::square(range * 2)
-				);
-			}
-		}
-
 		if (const auto rigid_body = handle.template find<components::rigid_body>()) {
 			return rigid_body.find_aabb();
 		}
