@@ -15,46 +15,6 @@
 #include "application/setups/editor/editor_settings.h"
 #include "application/setups/editor/editor_view.h"
 
-template <class F>
-void for_each_iconed_entity(const cosmos& cosm, F callback) {
-	cosm.for_each_having<components::light>([&](const auto typed_handle) {
-		callback(
-			typed_handle,
-			assets::necessary_image_id::EDITOR_ICON_LIGHT, 
-			typed_handle.get_logic_transform(),
-			typed_handle.template get<components::light>().color
-		);
-	});
-
-	cosm.for_each_having<components::wandering_pixels>([&](const auto typed_handle) {
-		callback(
-			typed_handle,
-			assets::necessary_image_id::EDITOR_ICON_WANDERING_PIXELS, 
-			typed_handle.get_logic_transform(),
-			typed_handle.template get<components::wandering_pixels>().colorize
-		);
-	});
-
-	cosm.for_each_having<invariants::continuous_sound>([&](const auto typed_handle) {
-		callback(
-			typed_handle,
-			assets::necessary_image_id::EDITOR_ICON_SOUND, 
-			typed_handle.get_logic_transform(),
-			white
-		);
-	});
-
-	cosm.for_each_having<invariants::continuous_particles>([&](const auto typed_handle) {
-		callback(
-			typed_handle,
-			assets::necessary_image_id::EDITOR_ICON_WANDERING_PIXELS, 
-			typed_handle.get_logic_transform(),
-			typed_handle.template get<invariants::continuous_particles>().effect.modifier.colorize
-		);
-	});
-}
-
-
 struct grouped_selector_op_input {
 	const current_selections_type& signi_selections;
 	const editor_selection_groups& groups;
@@ -65,7 +25,7 @@ class editor_entity_selector {
 	entity_id hovered;
 	entity_id held;
 	vec2 last_ldown_position;
-	visible_entities in_rectangular_selection;
+	current_selections_type in_rectangular_selection;
 	std::optional<vec2> rectangular_drag_origin;
 
 	entity_flavour_id flavour_of_held;
@@ -123,12 +83,12 @@ public:
 	   	const current_selections_type& signi_selections
 	) const {
 		for (const auto e : signi_selections) {
-			if (!found_in(in_rectangular_selection.all, e)) {
+			if (!found_in(in_rectangular_selection, e)) {
 				callback(e);
 			}
 		}
 
-		for (const auto e : in_rectangular_selection.all) {
+		for (const auto e : in_rectangular_selection) {
 			if (!found_in(signi_selections, e)) {
 				callback(e);
 			}

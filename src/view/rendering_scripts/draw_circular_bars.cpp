@@ -14,6 +14,7 @@
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
+#include "game/detail/visible_entities.h"
 
 using namespace augs::gui::text;
 
@@ -29,13 +30,11 @@ augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const draw_
 	const auto timestamp_ms = static_cast<unsigned>(in.global_time_seconds * 1000);
 	augs::vertex_triangle_buffer circular_bars_information;
 
-	for (const auto v_id : visible_entities) {
-		const auto v = cosmos[v_id];
-
-		if (const auto* const sentience = v.find<components::sentience>();
+	visible_entities.for_each<render_layer::SENTIENCES>(cosmos, [&](const auto v) {
+		if (const auto* const sentience = v.template find<components::sentience>();
 			sentience && sentience->is_conscious()
 		) {
-			const auto& health = sentience->get<health_meter_instance>();
+			const auto& health = sentience->template get<health_meter_instance>();
 			const auto hr = health.get_ratio();
 
 			const auto pulse_duration = static_cast<int>(1250 - 1000 * (1 - hr));
@@ -172,7 +171,7 @@ augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const draw_
 				);
 			}
 		}
-	}
+	});
 
 	return circular_bars_information;
 }

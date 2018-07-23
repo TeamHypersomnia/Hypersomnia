@@ -24,7 +24,7 @@
 #include "view/audiovisual_state/systems/randomizing_system.h"
 
 class cosmos;
-struct visible_entities;
+class visible_entities;
 
 struct audiovisual_post_solve_input {
 	const particle_effects_map& particle_effects;

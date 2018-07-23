@@ -3,6 +3,7 @@
 #include "game/transcendental/cosmos.h"
 #include "game/transcendental/entity_handle.h"
 #include "game/enums/filters.h"
+#include "game/detail/calc_render_layer.h"
 
 template <class E>
 std::optional<tree_of_npo_node_input> create_default_for(const E handle) {
@@ -11,12 +12,37 @@ std::optional<tree_of_npo_node_input> create_default_for(const E handle) {
 		|| handle.template has<components::rigid_body>() 
 	;
 
-	if (!has_physical) {
-		if (const auto aabb = handle.find_aabb()) {
-			tree_of_npo_node_input result;
-			result.aabb = *aabb;
-			return result;
+	if (has_physical) {
+		return std::nullopt;
+	}
+
+	const auto layer = calc_render_layer(handle);
+
+	if (const auto aabb = handle.find_aabb()) {
+		tree_of_npo_node_input result;
+
+		result.aabb = *aabb;
+
+		if (
+			layer == render_layer::UPPER_FISH 
+			|| layer == render_layer::BOTTOM_FISH
+		) {
+			result.type = tree_of_npo_type::ORGANISMS;
 		}
+		else if (layer == render_layer::CONTINUOUS_PARTICLES) {
+			result.type = tree_of_npo_type::PARTICLE_STREAMS;
+		}
+		else if (layer == render_layer::CONTINUOUS_SOUNDS) {
+			result.type = tree_of_npo_type::SOUND_SOURCES;
+		}
+		else if (layer == render_layer::LIGHTS) {
+			result.type = tree_of_npo_type::LIGHTS;
+		}
+		else {
+			result.type = tree_of_npo_type::RENDERABLES;
+		}
+
+		return result;
 	}
 
 	return std::nullopt;
@@ -31,7 +57,7 @@ const tree_of_npo_cache::cache* tree_of_npo_cache::find_cache(const unversioned_
 }
 
 tree_of_npo_cache::tree& tree_of_npo_cache::get_tree(const cache& c) {
-	return trees[static_cast<size_t>(c.type)];
+	return trees[static_cast<std::size_t>(c.type)];
 }
 
 void tree_of_npo_cache::cache::clear(tree_of_npo_cache& owner) {
@@ -51,8 +77,9 @@ void tree_of_npo_cache::destroy_cache_of(const const_entity_handle handle) {
 }
 
 void tree_of_npo_cache::infer_cache_for(const const_entity_handle e) {
-	e.dispatch_on_having<invariants::render>([this](const auto handle) {
-		const auto it = per_entity_cache.try_emplace(unversioned_entity_id(handle));
+	e.conditional_dispatch<entities_with_render_layer>([this](const auto handle) {
+		const auto id = handle.get_id().to_unversioned();
+		const auto it = per_entity_cache.try_emplace(id);
 
 		auto& cache = (*it.first).second;
 		const bool cache_existed = !it.second;
@@ -77,7 +104,7 @@ void tree_of_npo_cache::infer_cache_for(const const_entity_handle e) {
 				cache.recorded_aabb = new_aabb;
 
 				tree_of_npo_node new_node;
-				new_node.payload = unversioned_entity_id(handle);
+				new_node.payload = id;
 
 				cache.tree_proxy_id = get_tree(cache).nodes.CreateProxy(new_b2AABB, new_node.bytes);
 			}
@@ -93,6 +120,6 @@ void tree_of_npo_cache::infer_cache_for(const const_entity_handle e) {
 	});
 }
 
-void tree_of_npo_cache::reserve_caches_for_entities(const size_t n) {
+void tree_of_npo_cache::reserve_caches_for_entities(const std::size_t n) {
 	per_entity_cache.reserve(n);
 }

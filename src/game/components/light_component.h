@@ -56,6 +56,8 @@ namespace invariants {
 
 		light();
 
+		real32 calc_effective_reach() const;
+
 		real32 calc_reach_trimmed() const;
 		real32 calc_wall_reach_trimmed() const;
 	};

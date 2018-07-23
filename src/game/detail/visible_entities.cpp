@@ -13,44 +13,16 @@
 #include "game/inferred_caches/physics_world_cache.h"
 
 #include "game/detail/passes_filter.h"
+#include "game/detail/calc_render_layer.h"
+#include "augs/templates/enum_introspect.h"
 
 static constexpr auto EXACT = visible_entities_query::accuracy_type::EXACT;
-
-static void get_visible_per_layer(
-	const cosmos& cosmos,
-	const visible_entities::all_type& entities,
-	visible_entities::per_layer_type& output_layers
-) {
-	if (entities.empty()) {
-		return;
-	}
-
-	for (const auto it_id : entities) {
-		if (const auto it = cosmos[it_id]) {
-			const auto layer = it.get<invariants::render>().layer;
-			output_layers[layer].push_back(it);
-		}
-	}
-
-	auto& car_interior_layer = output_layers[render_layer::CAR_INTERIOR];
-
-	if (car_interior_layer.size() > 1) {
-		sort_range(
-			car_interior_layer, 
-			[&cosmos](const auto b, const auto a) {
-				return are_connected_by_friction(cosmos[a], cosmos[b]);
-			}
-		);
-	}
-}
 
 visible_entities::visible_entities(const visible_entities_query input) {
 	reacquire_all_and_sort(input);
 }
 
 void visible_entities::clear() {
-	all.clear();
-
 	for (auto& layer : per_layer) {
 		layer.clear();
 	}
@@ -60,7 +32,7 @@ visible_entities& visible_entities::reacquire_all_and_sort(const visible_entitie
 	clear();
 	acquire_non_physical(input);
 	acquire_physical(input);
-	sort_per_layer(input.cosm);
+	sort_car_interiors(input.cosm);
 
 	return *this;
 }
@@ -108,7 +80,9 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 		);
 	}
 
-	concatenate(all, unique_from_physics);
+	for (const auto& a : unique_from_physics) {
+		register_visible(cosmos, a);
+	}
 }
 
 inline bool point_in_rect(
@@ -129,58 +103,68 @@ void visible_entities::acquire_non_physical(const visible_entities_query input) 
 
 	const auto& tree_of_npo = cosmos.get_solvable_inferred().tree_of_npo;
 	
-	tree_of_npo.for_each_in_camera(
-		[&](const unversioned_entity_id unversioned_id) {
-			const auto id = cosmos.to_versioned(unversioned_id);
-			
-			if (!::passes_filter(input.filter, cosmos, id)) {
-				return;
-			}
+	auto acquire_from = [&](const tree_of_npo_type type) {
+		tree_of_npo.for_each_in_camera(
+			[&](const unversioned_entity_id unversioned_id) {
+				const auto id = cosmos.to_versioned(unversioned_id);
+				
+				if (!::passes_filter(input.filter, cosmos, id)) {
+					return;
+				}
 
-			if (input.accuracy == EXACT) {
-				const bool visible = cosmos[id].dispatch([&](const auto typed_handle) {
-					const auto aabb = typed_handle.find_aabb();
+				if (input.accuracy == EXACT) {
+					const bool visible = cosmos[id].dispatch([&](const auto typed_handle) {
+						const auto aabb = typed_handle.find_aabb();
 
-					if (aabb == std::nullopt) {
-						return false;
-					}
+						if (aabb == std::nullopt) {
+							return false;
+						}
 
-					if (!camera_aabb.hover(*aabb)) {
-						return false;
-					}
+						if (!camera_aabb.hover(*aabb)) {
+							return false;
+						}
 
-					if (camera.screen_size == vec2i::square(1)) {
-						/* This is an infinitely small point. */
-						if (const auto transform = typed_handle.find_logic_transform()) {
-							const auto size = typed_handle.get_logical_size();
+						if (camera.screen_size == vec2i::square(1)) {
+							/* This is an infinitely small point. */
+							if (const auto transform = typed_handle.find_logic_transform()) {
+								const auto size = typed_handle.get_logical_size();
 
-							if (!point_in_rect(
-								transform->pos,
-								transform->rotation,
-								size,
-								camera.eye.transform.pos
-							)) {
+								if (!point_in_rect(
+									transform->pos,
+									transform->rotation,
+									size,
+									camera.eye.transform.pos
+								)) {
+									return false;
+								}
+							}
+							else {
 								return false;
 							}
 						}
-						else {
-							return false;
-						}
+
+						return true;
+					});
+
+					if (visible) {
+						register_visible(cosmos, id);
 					}
-
-					return true;
-				});
-
-				if (visible) {
-					all.push_back(id);
 				}
+				else {
+					register_visible(cosmos, id);
+				}
+			},
+			camera,
+			type
+		);
+	};
+
+	augs::for_each_enum_except_bounds(
+		[&](const tree_of_npo_type type){ 
+			if (input.types.types[type]) {
+				acquire_from(type);
 			}
-			else {
-				all.push_back(id);
-			}
-		},
-		camera,
-		tree_of_npo_type::RENDERABLES
+		}
 	);
 }
 
@@ -189,13 +173,24 @@ void visible_entities::clear_dead_entities(const cosmos& cosm) {
 		return cosm[e].dead();
 	};
 
-	erase_if(all, dead_deleter);
-
 	for (auto& layer : per_layer) {
 		erase_if(layer, dead_deleter);
 	}
 }
 
-void visible_entities::sort_per_layer(const cosmos& cosm) {
-	get_visible_per_layer(cosm, all, per_layer);
+void visible_entities::register_visible(const cosmos& cosm, const entity_id id) {
+	per_layer[::calc_render_layer(cosm[id])].push_back(id);
+}
+
+void visible_entities::sort_car_interiors(const cosmos& cosm) {
+	auto& car_interior_layer = per_layer[render_layer::CAR_INTERIOR];
+
+	if (car_interior_layer.size() > 1) {
+		sort_range(
+			car_interior_layer, 
+			[&cosm](const auto b, const auto a) {
+				return are_connected_by_friction(cosm[a], cosm[b]);
+			}
+		);
+	}
 }

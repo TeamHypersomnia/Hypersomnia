@@ -4,6 +4,7 @@
 #include "augs/templates/maybe.h"
 
 #include "game/components/render_component.h"
+#include "game/detail/calc_render_layer.h"
 
 struct render_layer_filter {
 	// GEN INTROSPECTOR struct render_layer_filter
@@ -29,11 +30,7 @@ struct render_layer_filter {
 
 	template <class E>
 	bool passes(const E& handle) const {
-		if (const auto r = handle.template find<invariants::render>()) {
-			return layers[r->layer];
-		}
-
-		return false;
+		return layers[calc_render_layer(handle)];
 	}
 };
 

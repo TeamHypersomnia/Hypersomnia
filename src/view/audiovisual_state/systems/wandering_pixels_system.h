@@ -10,7 +10,7 @@
 
 #include "view/audiovisual_state/systems/audiovisual_cache_common.h"
 
-struct visible_entities;
+class visible_entities;
 
 class interpolation_system;
 struct particles_emission;

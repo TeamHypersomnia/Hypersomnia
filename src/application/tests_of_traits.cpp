@@ -85,6 +85,17 @@ struct tests_of_traits {
 			return 20.0;	
 		};
 
+		auto nopt_tester = [](const auto& a) -> decltype(auto) {
+			using T = remove_cref<decltype(a)>;
+
+			if constexpr(same<T, std::nullopt_t>) {
+				return 10.0;
+			}
+			else {
+				return double(num_types_in_list_v<typename T::components>);
+			}
+		};
+
 		auto okay3 = conditional_get_by_dynamic_index<candidates>(t, std::size_t(0), tester);
 		auto okay4 = conditional_get_by_dynamic_id<candidates>(t, type_in_list_id<all_entity_types>(), tester);
 
@@ -92,6 +103,11 @@ struct tests_of_traits {
 		static_assert(same<double, decltype(okay2)>);
 		static_assert(same<double, decltype(okay3)>);
 		static_assert(same<double, decltype(okay4)>);
+
+		{
+			auto okay5 = conditional_find_by_dynamic_id<candidates>(t, type_in_list_id<all_entity_types>(), nopt_tester);
+			static_assert(same<double, decltype(okay5)>);
+		}
 	}
 
 	/* One-shot asserts. */

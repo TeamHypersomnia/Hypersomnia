@@ -62,6 +62,10 @@ namespace invariants {
 
 		return props.calc_reach_trimmed();
 	}
+
+	real32 light::calc_effective_reach() const {
+		return std::max(calc_wall_reach_trimmed(), calc_reach_trimmed());
+	}
 }
 
 FORCE_INLINE double light_max_pixel_distance(double a, double b, double c, double d) {

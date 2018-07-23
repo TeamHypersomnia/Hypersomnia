@@ -4,6 +4,7 @@
 
 #include "augs/build_settings/platform_defines.h"
 #include "augs/templates/get_by_dynamic_id.h"
+#include "augs/build_settings/platform_defines.h"
 
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/traits/component_traits.h"
@@ -180,14 +181,34 @@ public:
 	}
 
 	template <class List, class F>
-	void conditional_dispatch(F&& callback) const {
-		for_each_through_std_get(List(), [&](auto t) { 
-			using E = decltype(t);
+	FORCE_INLINE decltype(auto) conditional_dispatch_ret(F&& callback) const {
+		return conditional_find_by_dynamic_id<List>(
+			all_entity_types(), 
+			raw_id.type_id,
+			[&](auto t) -> decltype(auto) { 
+				using E = decltype(t);
 
-			if (raw_id.type_id == entity_type_id::of<E>()) {
-				callback(this->get_specific<E>());
+				if constexpr(std::is_same_v<E, std::nullopt_t>) {
+					return callback(std::nullopt);
+				}
+				else {
+					return callback(this->get_specific<E>());
+				}
 			}
-		});
+		);
+	}
+
+	template <class List, class F>
+	FORCE_INLINE void conditional_dispatch(F&& callback) const {
+		this->conditional_dispatch_ret<List>(
+			[&](const auto& typed_handle) {
+				using E = remove_cref<decltype(typed_handle)>;
+
+				if constexpr(!std::is_same_v<E, std::nullopt_t>) {
+					callback(typed_handle);
+				}
+			}
+		);
 	}
 
 	template <class... List, class F>

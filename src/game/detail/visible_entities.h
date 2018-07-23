@@ -6,6 +6,7 @@
 #include "game/transcendental/entity_id.h"
 
 #include "game/detail/render_layer_filter.h"
+#include "game/detail/tree_of_npo_filter.h"
 
 struct visible_entities_query {
 	enum class accuracy_type {
@@ -17,21 +18,23 @@ struct visible_entities_query {
 	const camera_cone cone;
 	const accuracy_type accuracy;
 	const augs::maybe<render_layer_filter> filter;
+	const tree_of_npo_filter types;
 
 	static auto dont_filter() {
 		return augs::maybe<render_layer_filter>();
 	}
 };
 
-struct visible_entities {
+class visible_entities {
 	using id_type = entity_id;
 	
 	using per_layer_type = per_render_layer_t<std::vector<id_type>>;
-	using all_type = std::vector<id_type>;
-
-	all_type all;
 	per_layer_type per_layer;
 
+	void register_visible(const cosmos&, entity_id);
+	void sort_car_interiors(const cosmos&);
+
+public:
 	visible_entities() = default;
 
 	visible_entities(const visible_entities_query);
@@ -46,17 +49,76 @@ struct visible_entities {
 	
 	void acquire_physical(const visible_entities_query);
 	void acquire_non_physical(const visible_entities_query);
+	
 	void sort_per_layer(const cosmos&);
 
 	void clear_dead_entities(const cosmos&);
 	void clear();
+
+	template <class F>
+	auto for_all_ids(F&& callback) const {
+		for (const auto& layer : per_layer) {
+			for (const auto id : layer) {
+				callback(id);
+			}
+		}
+	}
+
+	auto count_all() const {
+		return ::accumulate_sizes(per_layer);
+	}
+
+	template <class C>
+	auto make_all() const {
+		C result;
+
+		for_all_ids([&result](const auto id) {
+			emplace_element(result, id);
+		});
+
+		return result;
+	}
+
+	template <class C, class F>
+	void for_all(C& cosm, F&& callback) const {
+		for (const auto& layer : per_layer) {
+			for (const auto id : layer) {
+				callback(cosm[id]);
+			}
+		}
+	}
+
+	template <render_layer... Args, class C, class F>
+	void for_each(C& cosm, F&& callback) const {
+		auto looper = [&](const render_layer l) {
+			for (const auto& e : per_layer[l]) {
+				callback(cosm[e]);
+			}
+		};
+
+		(looper(Args), ...);
+	}
+
+
+	template <class F>
+	entity_id get_first_fulfilling(F condition) const {
+		for (const auto& layer : per_layer) {
+			for (const auto candidate : layer) {
+				if (condition(candidate)) {
+					return candidate;
+				}
+			}
+		}
+
+		return {};
+	}
 };
 
 template <class F>
 entity_id get_hovered_world_entity(
 	const cosmos& cosm,
 	const vec2 world_cursor_position,
-	F is_hoverable,
+	F&& is_hoverable,
 	const augs::maybe<render_layer_filter>& filter
 ) {
 	thread_local visible_entities entities;
@@ -65,16 +127,9 @@ entity_id get_hovered_world_entity(
 		cosm,
 		camera_cone(camera_eye(world_cursor_position, 1.f), vec2i::square(1)),
 		visible_entities_query::accuracy_type::EXACT,
-		filter
+		filter,
+		tree_of_npo_filter::all_drawables()
 	});
 
-	for (const auto& layer : entities.per_layer) {
-		for (const auto candidate : layer) {
-			if (is_hoverable(candidate)) {
-				return candidate;
-			}
-		}
-	}
-
-	return {};
+	return entities.get_first_fulfilling(std::forward<F>(is_hoverable));
 }

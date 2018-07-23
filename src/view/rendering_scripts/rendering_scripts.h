@@ -2,7 +2,6 @@
 #include <functional>
 
 #include "augs/graphics/vertex.h"
-#include "game/detail/visible_entities.h"
 #include "game/components/sentience_component.h"
 #include "game/transcendental/entity_handle.h"
 #include "augs/texture_atlas/atlas_entry.h"
@@ -16,8 +15,10 @@ namespace augs {
 class cosmos;
 class interpolation_system;
 
+class visible_entities;
+
 struct draw_circular_bars_input {
-	const visible_entities::all_type& all;
+	const visible_entities& all;
 	
 	const augs::drawer output;
 	augs::special_buffer& specials;

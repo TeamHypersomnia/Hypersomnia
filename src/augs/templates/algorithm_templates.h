@@ -141,3 +141,14 @@ template <class Container, class Container2, class Pred>
 bool ranges_equal(const Container& c1, const Container2& c2, Pred&& pred) {
 	return c1.size() == c2.size() && std::equal(c1.begin(), c1.end(), c2.begin(), std::forward<Pred>(pred));
 }
+
+template <class Container>
+auto accumulate_sizes(const Container& c) {
+	std::size_t total = 0;
+
+	for (const auto& v : c) {
+		total += v.size();
+	}
+
+	return total;
+}

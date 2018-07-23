@@ -29,13 +29,8 @@ union tree_of_npo_node {
 };
 
 struct tree_of_npo_node_input {		
-	static constexpr bool is_synchronized = true;
-
-	// GEN INTROSPECTOR struct tree_of_npo_node_input
 	tree_of_npo_type type = tree_of_npo_type::RENDERABLES;
 	ltrb aabb;
-	// END GEN INTROSPECTOR
-
 };
 
 class tree_of_npo_cache {

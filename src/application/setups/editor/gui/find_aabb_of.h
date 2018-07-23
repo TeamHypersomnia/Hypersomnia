@@ -1,14 +1,26 @@
 #pragma once
 #include <optional>
+#include "game/detail/calc_render_layer.h"
 
 template <class T>
 std::optional<ltrb> find_editor_aabb_of(const T handle) {
-	if (handle.template find<components::light>() && handle.template find<invariants::light>()) {
-		/* Light-like */
-		return xywh::center_and_size(handle.get_logic_transform().pos, vec2(2, 2));	
-	}
+	if (const auto tr = handle.find_logic_transform()) {
+		const auto pos = tr->pos;
+		const auto layer = calc_render_layer(handle);
 
-	return handle.find_aabb();
+		if (
+			layer == render_layer::LIGHTS
+			|| layer == render_layer::CONTINUOUS_PARTICLES
+			|| layer == render_layer::CONTINUOUS_SOUNDS
+		) {
+			return xywh::center_and_size(pos, vec2(2, 2));	
+		}
+
+		return handle.find_aabb();
+	}
+	else {
+		return std::nullopt;
+	}
 };
 
 template <class C>

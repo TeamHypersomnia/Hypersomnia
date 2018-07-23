@@ -21,6 +21,7 @@
 #include "view/viewables/image_in_atlas.h"
 #include "view/viewables/images_in_atlas_map.h"
 #include "view/rendering_scripts/draw_entity.h"
+#include "view/rendering_scripts/helper_drawer.h"
 
 #include "view/audiovisual_state/systems/light_system.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
@@ -118,7 +119,12 @@ void light_system::render_all_lights(const light_system_input in) const {
 	const auto& interp = drawing_in.interp;
 	const auto& particles = in.particles;
 	
-	const auto& visible_per_layer = in.visible_per_layer;
+	const auto helper = helper_drawer {
+		in.visible,
+		cosmos,
+		drawing_in,
+		in.total_layer_scope
+	};
 
 	visibility_requests requests;
 	visibility_responses responses;
@@ -135,18 +141,6 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 		return c.get_visible_world_rect_aabb();
 	}();
-
-	auto draw_layer = [&](const render_layer r) {
-		for (const auto e : visible_per_layer[r]) {
-			draw_entity(cosmos[e], drawing_in);
-		}
-	};
-	
-	auto draw_neons = [&](const render_layer r) {
-		for (const auto e : visible_per_layer[r]) {
-			draw_neon_map(cosmos[e], drawing_in);
-		}
-	};
 
 	{
 		auto scope = measure_scope(performance.light_visibility);
@@ -285,8 +279,10 @@ void light_system::render_all_lights(const light_system_input in) const {
 				light.color.rgb()
 			);
 
-			draw_layer(render_layer::DYNAMIC_BODY);
-			draw_layer(render_layer::OVER_DYNAMIC_BODY);
+			helper.draw<
+				render_layer::DYNAMIC_BODY,
+				render_layer::OVER_DYNAMIC_BODY
+			>();
 
 			renderer.call_triangles();
 			renderer.clear_triangles();
@@ -305,24 +301,26 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	/* Draw neon maps */
 
-	draw_neons(render_layer::DYNAMIC_BODY);
-	draw_neons(render_layer::OVER_DYNAMIC_BODY);
-	draw_neons(render_layer::GLASS_BODY);
-	draw_neons(render_layer::SMALL_DYNAMIC_BODY);
-	draw_neons(render_layer::SENTIENCES);
-	draw_neons(render_layer::FLYING_BULLETS);
-	draw_neons(render_layer::WATER_COLOR_OVERLAYS);
-	draw_neons(render_layer::WATER_SURFACES);
-	draw_neons(render_layer::CAR_INTERIOR);
-	draw_neons(render_layer::CAR_WHEEL);
-	draw_neons(render_layer::NEON_CAPTIONS);
-	draw_neons(render_layer::FLOOR_AND_ROAD);
-	draw_neons(render_layer::ON_FLOOR);
-	draw_neons(render_layer::ON_ON_FLOOR);
-	draw_neons(render_layer::AQUARIUM_FLOWERS);
-	draw_neons(render_layer::BOTTOM_FISH);
-	draw_neons(render_layer::UPPER_FISH);
-	draw_neons(render_layer::AQUARIUM_BUBBLES);
+	helper.draw_neons<
+		render_layer::DYNAMIC_BODY,
+		render_layer::OVER_DYNAMIC_BODY,
+		render_layer::GLASS_BODY,
+		render_layer::SMALL_DYNAMIC_BODY,
+		render_layer::SENTIENCES,
+		render_layer::FLYING_BULLETS,
+		render_layer::WATER_COLOR_OVERLAYS,
+		render_layer::WATER_SURFACES,
+		render_layer::CAR_INTERIOR,
+		render_layer::CAR_WHEEL,
+		render_layer::NEON_CAPTIONS,
+		render_layer::FLOOR_AND_ROAD,
+		render_layer::ON_FLOOR,
+		render_layer::ON_ON_FLOOR,
+		render_layer::AQUARIUM_FLOWERS,
+		render_layer::BOTTOM_FISH,
+		render_layer::UPPER_FISH,
+		render_layer::AQUARIUM_BUBBLES
+	>();
 
 	particles.draw_particles(
 		drawing_in.manager,

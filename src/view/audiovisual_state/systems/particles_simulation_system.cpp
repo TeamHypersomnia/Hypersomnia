@@ -116,14 +116,8 @@ particles_simulation_system::basic_cache::basic_cache(
 std::size_t particles_simulation_system::count_all_particles() const {
 	std::size_t total = 0;
 
-	auto adder = [&](const auto& s) {
-		for (const auto& v : s) {
-			total += v.size();
-		}
-	};
-
-	adder(general_particles);
-	adder(animated_particles);
+	total += ::accumulate_sizes(general_particles);
+	total += ::accumulate_sizes(animated_particles);
 
 	for (const auto& m : homing_animated_particles) {
 		for (const auto& v : m) {

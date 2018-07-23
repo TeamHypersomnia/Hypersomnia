@@ -41,13 +41,12 @@ void wandering_pixels_system::advance_for(
 ) {
 	global_time_seconds += dt.in_seconds();
 
-	for (const auto e : visible.per_layer[render_layer::ILLUMINATING_WANDERING_PIXELS]) {
-		advance_for(rng, cosm[e], dt);
-	}
-
-	for (const auto e : visible.per_layer[render_layer::DIM_WANDERING_PIXELS]) {
-		advance_for(rng, cosm[e], dt);
-	}
+	visible.for_each<
+		render_layer::ILLUMINATING_WANDERING_PIXELS,
+		render_layer::DIM_WANDERING_PIXELS
+	>(cosm, [&](const auto& handle) {
+		advance_for(rng, handle, dt);
+	});
 }
 
 void wandering_pixels_system::advance_for(

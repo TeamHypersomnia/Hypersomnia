@@ -48,6 +48,8 @@
 #include "application/setups/editor/gui/editor_pathed_asset_gui.h"
 #include "application/setups/editor/gui/editor_unpathed_asset_gui.h"
 
+#include "application/setups/editor/gui/for_each_iconed_entity.h"
+
 #include "application/setups/editor/detail/current_access_cache.h"
 #include "application/setups/editor/detail/make_command_from_selections.h"
 
@@ -428,13 +430,20 @@ public:
 	}
 
 	template <class F>
-	void for_each_icon(F callback) const {
+	void for_each_icon(
+		const visible_entities& entities, 
+		F callback
+	) const {
 		if (anything_opened() && player.paused) {
 			const auto& world = work().world;
 
-			::for_each_iconed_entity(world, [&](auto&&... args) {
-				callback(std::forward<decltype(args)>(args)...);
-			});
+			::for_each_iconed_entity(
+				world, 
+				entities,
+				[&](auto&&... args) {
+					callback(std::forward<decltype(args)>(args)...);
+				}
+			);
 		}
 	}
 

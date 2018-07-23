@@ -30,6 +30,7 @@ struct randomization;
 struct light_system_input {
 	augs::renderer& renderer;
 	frame_profiler& profiler;
+	additive_time_scope& total_layer_scope;
 
 	const cosmos& cosm;
 	std::array<float, 16> projection_matrix;
@@ -41,7 +42,7 @@ struct light_system_input {
 	const float camera_query_mult;
 	const particles_simulation_system& particles;
 	const plain_animations_pool& plain_animations;
-	const visible_entities::per_layer_type& visible_per_layer;
+	const visible_entities& visible;
 
 	const draw_renderable_input& drawing_in;
 };

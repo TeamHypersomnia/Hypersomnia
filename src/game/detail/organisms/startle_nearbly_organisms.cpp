@@ -21,11 +21,12 @@ void startle_nearby_organisms(
 		render_layer_filter::whitelist(
 			render_layer::UPPER_FISH,
 			render_layer::BOTTOM_FISH
-		)
+		),
+		{ tree_of_npo_type::ORGANISMS }
 	});
 
-	for (const auto& a : neighbors.all) {
-		cosm[a].dispatch_on_having<components::movement_path>([&](const auto typed_neighbor) {
+	neighbors.for_all(cosm, [&](const auto handle) {
+		handle.template dispatch_on_having<components::movement_path>([&](const auto typed_neighbor) {
 			const auto neighbor_tip = *typed_neighbor.find_logical_tip();
 			const auto target_offset = neighbor_tip - startle_origin;
 			const auto target_dist = target_offset.length();
@@ -39,5 +40,5 @@ void startle_nearby_organisms(
 				typed_neighbor.template get<components::movement_path>().add_startle(type, startle_impulse);
 			}
 		});
-	}
+	});
 }

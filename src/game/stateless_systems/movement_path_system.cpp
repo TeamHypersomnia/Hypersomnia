@@ -81,11 +81,12 @@ void movement_path_system::advance_paths(const logic_step step) const {
 						render_layer_filter::whitelist(
 							render_layer::UPPER_FISH,
 							render_layer::BOTTOM_FISH
-						)
+						),
+						{ tree_of_npo_type::ORGANISMS }
 					});
 
-					for (const auto& a : neighbors.all) {
-						cosm[a].dispatch_on_having<components::movement_path>([&](const auto typed_neighbor) {
+					neighbors.for_all(cosm, [&](const auto handle) {
+						handle.template dispatch_on_having<components::movement_path>([&](const auto typed_neighbor) {
 							if (typed_neighbor.get_id() != subject.get_id()) {
 								const auto neighbor_tip = *typed_neighbor.find_logical_tip();
 								const auto offset = neighbor_tip - tip_pos;
@@ -98,7 +99,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 							}
 							/* Otherwise, don't measure against itself */
 						});
-					}
+					});
 				};
 
 				auto velocity = current_dir * min_speed;

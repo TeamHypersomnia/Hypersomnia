@@ -119,6 +119,31 @@ public:
 			return rigid_body.find_aabb();
 		}
 
+		if (const auto* const light = handle.template find<components::light>()) {
+			if (const auto* const def = handle.template find<invariants::light>()) {
+				return xywh::center_and_size(
+					transform.pos, 
+					vec2::square(def->calc_effective_reach() * 2)
+				);
+			}
+		}
+
+		/* Small icons are visual representations for immaterial objects like sound sources and particle effects */
+
+		if (const auto* const sound_def = handle.template find<invariants::continuous_sound>()) {
+			return xywh::center_and_size(
+				transform.pos, 
+				vec2::square(32)
+			);
+		}
+
+		if (const auto* const particles_def = handle.template find<invariants::continuous_particles>()) {
+			return xywh::center_and_size(
+				transform.pos, 
+				vec2::square(32)
+			);
+		}
+
 		// ensure_eq(nullptr, handle.template find<invariants::fixtures>());
 
 		return std::nullopt;

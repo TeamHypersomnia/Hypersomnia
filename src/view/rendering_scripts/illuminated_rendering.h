@@ -25,6 +25,7 @@
 #include "view/rendering_scripts/rendering_scripts.h"
 #include "view/rendering_scripts/illuminated_rendering.h"
 #include "view/rendering_scripts/draw_wandering_pixels_as_sprites.h"
+#include "view/rendering_scripts/helper_drawer.h"
 
 #include "view/necessary_resources.h"
 #include "view/game_drawing_settings.h"
@@ -186,6 +187,7 @@ void illuminated_rendering(
 	light.render_all_lights({
 		renderer,
 		profiler,
+		total_layer_scope,
 		cosmos, 
 		matrix,
 		fbos.light.value(),
@@ -244,41 +246,36 @@ void illuminated_rendering(
 		in.camera_query_mult,
 		particles,
 		anims,
-		visible.per_layer,
+		visible,
 		drawing_input
 	});
 
 	set_shader_with_matrix(shaders.illuminated);
 
-	auto draw_layer = [&](const render_layer r) {
-		auto scope = measure_scope(total_layer_scope);
-
-		for (const auto e : visible.per_layer[r]) {
-			draw_entity(cosmos[e], drawing_input);
-		}
+	const auto helper = helper_drawer {
+		visible,
+		cosmos,
+		drawing_input,
+		total_layer_scope
 	};
 
-	auto draw_borders = [&](const render_layer r, auto provider) {
-		for (const auto e : visible.per_layer[r]) {
-			draw_border(cosmos[e], drawing_input, provider);
-		}
-	};
+	helper.draw<
+		render_layer::UNDER_GROUND,
+		render_layer::GROUND,
+		render_layer::FLOOR_AND_ROAD,
+		render_layer::ON_FLOOR,
+		render_layer::ON_ON_FLOOR,
 
-	draw_layer(render_layer::UNDER_GROUND);
-	draw_layer(render_layer::GROUND);
-	draw_layer(render_layer::FLOOR_AND_ROAD);
-	draw_layer(render_layer::ON_FLOOR);
-	draw_layer(render_layer::ON_ON_FLOOR);
+		render_layer::AQUARIUM_FLOWERS,
+		render_layer::AQUARIUM_DUNES,
+		render_layer::BOTTOM_FISH,
+		render_layer::UPPER_FISH,
+		render_layer::AQUARIUM_BUBBLES
+	>();
 
-	draw_layer(render_layer::AQUARIUM_FLOWERS);
-	draw_layer(render_layer::AQUARIUM_DUNES);
-	draw_layer(render_layer::BOTTOM_FISH);
-	draw_layer(render_layer::UPPER_FISH);
-	draw_layer(render_layer::AQUARIUM_BUBBLES);
-
-	for (const auto e : visible.per_layer[render_layer::DIM_WANDERING_PIXELS]) {
-		draw_wandering_pixels_as_sprites(wandering_pixels, cosmos[e], game_images, drawing_input.make_input_for<invariants::sprite>());
-	}
+	visible.for_each<render_layer::DIM_WANDERING_PIXELS>(cosmos, [&](const auto e) {
+		draw_wandering_pixels_as_sprites(wandering_pixels, e, game_images, drawing_input.make_input_for<invariants::sprite>());
+	});
 
 	renderer.call_and_clear_triangles();
 
@@ -288,10 +285,12 @@ void illuminated_rendering(
 
 	shaders.illuminated->set_as_current();
 
-	draw_layer(render_layer::WATER_COLOR_OVERLAYS);
-	draw_layer(render_layer::WATER_SURFACES);
-	draw_layer(render_layer::CAR_INTERIOR);
-	draw_layer(render_layer::CAR_WHEEL);
+	helper.draw<
+		render_layer::WATER_COLOR_OVERLAYS,
+		render_layer::WATER_SURFACES,
+		render_layer::CAR_INTERIOR,
+		render_layer::CAR_WHEEL
+	>();
 
 	renderer.call_and_clear_triangles();
 
@@ -312,8 +311,7 @@ void illuminated_rendering(
 	};
 
 	if (has_additional_borders) {
-		draw_borders(
-			render_layer::SMALL_DYNAMIC_BODY,
+		helper.draw_border<render_layer::SMALL_DYNAMIC_BODY>(
 			[&](const const_entity_handle sentience) -> std::optional<rgba> {
 				if (const auto maybe_border = get_additional_border(sentience)) {
 					return maybe_border;
@@ -324,18 +322,20 @@ void illuminated_rendering(
 		);
 	}
 	else {
-		draw_borders(render_layer::SENTIENCES, standard_border_provider);
+		helper.draw_border<render_layer::SENTIENCES>(standard_border_provider);
 	}
 
 	renderer.call_and_clear_triangles();
 	
 	shaders.illuminated->set_as_current();
 	
-	draw_layer(render_layer::DYNAMIC_BODY);
-	draw_layer(render_layer::OVER_DYNAMIC_BODY);
-	draw_layer(render_layer::SMALL_DYNAMIC_BODY);
-	draw_layer(render_layer::GLASS_BODY);
-	draw_layer(render_layer::SENTIENCES);
+	helper.draw<
+		render_layer::DYNAMIC_BODY,
+		render_layer::OVER_DYNAMIC_BODY,
+		render_layer::SMALL_DYNAMIC_BODY,
+		render_layer::GLASS_BODY,
+		render_layer::SENTIENCES
+	>();
 	
 	renderer.call_and_clear_triangles();
 
@@ -349,8 +349,10 @@ void illuminated_rendering(
 
 	shaders.standard->set_as_current();
 	
-	draw_layer(render_layer::FLYING_BULLETS);
-	draw_layer(render_layer::NEON_CAPTIONS);
+	helper.draw<
+		render_layer::FLYING_BULLETS,
+		render_layer::NEON_CAPTIONS
+	>();
 	
 	if (settings.draw_crosshairs) {
 		cosmos.template for_each_having<components::sentience>(
@@ -402,9 +404,9 @@ void illuminated_rendering(
 
 	draw_particles(particle_layer::ILLUMINATING_PARTICLES);
 
-	for (const auto e : visible.per_layer[render_layer::ILLUMINATING_WANDERING_PIXELS]) {
-		draw_wandering_pixels_as_sprites(wandering_pixels, cosmos[e], game_images, drawing_input.make_input_for<invariants::sprite>());
-	}
+	visible.for_each<render_layer::ILLUMINATING_WANDERING_PIXELS>(cosmos, [&](const auto e) {
+		draw_wandering_pixels_as_sprites(wandering_pixels, e, game_images, drawing_input.make_input_for<invariants::sprite>());
+	});
 
 	renderer.call_and_clear_triangles();
 
@@ -422,7 +424,7 @@ void illuminated_rendering(
 		set_center_uniform(tex);
 
 		textual_infos = draw_circular_bars_and_get_textual_info({
-			visible.all,
+			visible,
 			output,
 			renderer.get_special_buffer(),
 			cosmos,

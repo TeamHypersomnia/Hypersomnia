@@ -6,6 +6,46 @@
 
 #if !STATICALLY_ALLOCATE_ENTITIES
 
+TEST_CASE("GetByDynamicId") {
+	all_entity_types t;
+
+	REQUIRE(20.0 == get_by_dynamic_index(t, std::size_t(0), [](auto){
+		return 20.0;	
+	}));
+
+	REQUIRE(20.0 == get_by_dynamic_id(t, type_in_list_id<all_entity_types>(), [](auto){
+		return 20.0;	
+	}));
+
+	using candidates = type_list<plain_missile, explosive_missile>;
+
+	auto tester = [](auto a) -> decltype(auto) {
+		using T = remove_cref<decltype(a)>;
+		static_assert( || same<T, explosive_missile>);
+
+		if constexpr(std::is_same_v<T, plain_missile>) {
+			return 4;
+		}
+		else if constexpr(std::is_same_v<T, explosive_missile>) {
+			return 8949;
+		}
+		else if constexpr(std::is_same_v<T, std::nullopt_t>) {
+			return -1;
+		}
+		else {
+			static_assert(always_false_v<T>, "Non-exhaustive tester");
+			return 0;
+		}
+	};
+
+	using id_type = type_in_list_id<all_entity_types>;
+
+	REQUIRE(4 == conditional_get_by_dynamic_id<candidates>(t, id_type::of<plain_missile>(), tester));
+	REQUIRE(8949 == conditional_get_by_dynamic_id<candidates>(t, id_type::of<explosive_missile>(), tester));
+
+	REQUIRE(-1 == conditional_find_by_dynamic_id<candidates>(t, id_type::of<controlled_character>(), tester));
+}
+
 TEST_CASE("Ca TriviallyCopyableTuple") {
 	struct a {
 		int mem = 1;

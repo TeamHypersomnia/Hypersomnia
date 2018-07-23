@@ -624,10 +624,11 @@ int work(const int argc, const char* const * const argv) try {
 				viewed_character.get_cosmos(), 
 				queried_cone, 
 				visible_entities_query::accuracy_type::PROXIMATE,
-				get_render_layer_filter()
+				get_render_layer_filter(),
+				tree_of_npo_filter::all()
 			});
 
-			frame_performance.num_visible_entities.measure(all_visible.all.size());
+			frame_performance.num_visible_entities.measure(all_visible.count_all());
 		}
 
 		audiovisuals.advance({
@@ -1495,6 +1496,7 @@ int work(const int argc, const char* const * const argv) try {
 					const auto line_drawer = get_line_drawer();
 
 					editor.for_each_icon(
+						all_visible,
 						[&](const auto typed_handle, const auto image_id, const transformr world_transform, const rgba color) {
 							const auto screen_space_pos = vec2i(on_screen(world_transform.pos));
 
