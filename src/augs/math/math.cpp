@@ -4,6 +4,17 @@
 #include <3rdparty/Box2D/Collision/Shapes/b2EdgeShape.h>
 #include "augs/ensure.h"
 
+bool point_in_rect(
+	const vec2 center,
+	const real32 rotation,
+	const vec2 size,
+	vec2 point
+) {
+	point.rotate(-rotation, center);
+
+	return ltrb::center_and_size(center, size).hover(point);
+}
+
 intersection_output circle_ray_intersection(
 	const vec2 a, 
 	const vec2 b, 

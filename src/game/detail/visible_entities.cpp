@@ -1,3 +1,4 @@
+#include "augs/math/math.h"
 #include "augs/templates/algorithm_templates.h"
 #include "augs/templates/container_templates.h"
 #include "game/detail/physics/physics_queries.h"
@@ -83,17 +84,6 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 	for (const auto& a : unique_from_physics) {
 		register_visible(cosmos, a);
 	}
-}
-
-inline bool point_in_rect(
-	const vec2 center,
-	const real32 rotation,
-	const vec2 size,
-	vec2 point
-) {
-	point.rotate(-rotation, center);
-
-	return ltrb::center_and_size(center, size).hover(point);
 }
 
 void visible_entities::acquire_non_physical(const visible_entities_query input) {

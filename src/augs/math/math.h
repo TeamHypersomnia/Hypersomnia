@@ -9,6 +9,13 @@ struct intersection_output {
 	vec2 intersection;
 };
 
+bool point_in_rect(
+	vec2 center,
+	real32 rotation,
+	vec2 size,
+	vec2 point
+);
+
 intersection_output rectangle_ray_intersection(
 	const vec2 a,
 	const vec2 b,

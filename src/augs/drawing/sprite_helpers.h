@@ -6,17 +6,16 @@
 #include "augs/drawing/make_sprite.h"
 
 namespace augs {
-	template <class M, class I>
+	template <class T>
 	void detail_sprite(
 		vertex_triangle_buffer& output_buffer,
-		const M& manager,
-		const I image_id,
+		const T& entry,
 		const vec2i size,
 		const vec2 pos,
 		const float rotation_degrees,
 		const rgba color
 	) {
-		const auto considered_texture = static_cast<augs::atlas_entry>(manager.at(image_id));
+		const auto considered_texture = static_cast<augs::atlas_entry>(entry);
 		const auto points = make_sprite_points(pos, size, rotation_degrees);
 		const auto triangles = make_sprite_triangles(considered_texture, points, color);
 
@@ -24,16 +23,15 @@ namespace augs {
 		output_buffer.push_back(triangles[1]);
 	}
 
-	template <class M, class I>
+	template <class T>
 	void detail_sprite(
 		vertex_triangle_buffer& output_buffer,
-		const M& manager,
-		const I image_id,
+		const T& entry,
 		const vec2 pos,
 		const float rotation_degrees,
 		const rgba color
 	) {
-		const auto considered_texture = static_cast<augs::atlas_entry>(manager.at(image_id));
+		const auto considered_texture = static_cast<augs::atlas_entry>(entry);
 		const auto points = make_sprite_points(pos, considered_texture.get_original_size(), rotation_degrees);
 		const auto triangles = make_sprite_triangles(considered_texture, points, color);
 
@@ -41,18 +39,15 @@ namespace augs {
 		output_buffer.push_back(triangles[1]);
 	}
 
-	template <class M, class I>
+	template <class T>
 	void detail_neon_sprite(
 		vertex_triangle_buffer& output_buffer,
-		const M& manager,
-		const I image_id,
+		const T& entry,
 		const vec2i size,
 		const vec2 pos,
 		const float rotation_degrees,
 		const rgba color
 	) {
-		const auto& entry = manager.at(image_id);
-
 		if (const auto considered_texture = entry.neon_map;
 			considered_texture.exists()
 		) {
@@ -68,17 +63,14 @@ namespace augs {
 		}
 	}
 
-	template <class M, class I>
+	template <class T>
 	void detail_neon_sprite(
 		vertex_triangle_buffer& output_buffer,
-		const M& manager,
-		const I image_id,
+		const T& entry,
 		const vec2 pos,
 		const float rotation_degrees,
 		const rgba color
 	) {
-		const auto& entry = manager.at(image_id);
-
 		if (const auto considered_texture = entry.neon_map;
 			considered_texture.exists()
 		) {

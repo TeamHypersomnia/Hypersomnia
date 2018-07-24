@@ -78,10 +78,10 @@ struct general_particle {
 
 		auto draw = [&](const vec2i drawn_size) {
 			if (in.use_neon_map) {
-				augs::detail_neon_sprite(in.output.output_buffer, manager, image_id, drawn_size, pos, rotation, color);
+				augs::detail_neon_sprite(in.output.output_buffer, manager.at(image_id), drawn_size, pos, rotation, color);
 			}
 			else {
-				augs::detail_sprite(in.output.output_buffer, manager, image_id, drawn_size, pos, rotation, color);
+				augs::detail_sprite(in.output.output_buffer, manager.at(image_id), drawn_size, pos, rotation, color);
 			}
 		};
 
@@ -166,10 +166,10 @@ struct animated_particle {
 		const auto image_id = animation.get_image_id(anims);
 
 		if (in.use_neon_map) {
-			augs::detail_neon_sprite(in.output.output_buffer, manager, image_id, pos, 0, color);
+			augs::detail_neon_sprite(in.output.output_buffer, manager.at(image_id), pos, 0, color);
 		}
 		else {
-			augs::detail_sprite(in.output.output_buffer, manager, image_id, pos, 0, color);
+			augs::detail_sprite(in.output.output_buffer, manager.at(image_id), pos, 0, color);
 		}
 	}
 
@@ -217,10 +217,10 @@ struct homing_animated_particle {
 		const auto image_id = animation.get_image_id(anims);
 
 		if (in.use_neon_map) {
-			augs::detail_neon_sprite(in.output.output_buffer, manager, image_id, pos, 0, color);
+			augs::detail_neon_sprite(in.output.output_buffer, manager.at(image_id), pos, 0, color);
 		}
 		else {
-			augs::detail_sprite(in.output.output_buffer, manager, image_id, pos, 0, color);
+			augs::detail_sprite(in.output.output_buffer, manager.at(image_id), pos, 0, color);
 		}
 	}
 

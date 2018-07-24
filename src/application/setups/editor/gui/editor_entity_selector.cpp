@@ -6,6 +6,7 @@
 #include "game/detail/passes_filter.h"
 
 #include "application/setups/editor/gui/for_each_iconed_entity.h"
+#include "augs/math/math.h"
 
 void editor_entity_selector::clear_selection_of(const entity_id id) {
 	erase_element(in_rectangular_selection, id);
@@ -172,10 +173,6 @@ void editor_entity_selector::do_mousemotion(
 ) {
 	hovered = {};
 
-	auto get_icon_aabb = [&](const auto icon_id, const transformr where) {
-		return xywh::center_and_size(where.pos, vec2(sizes_for_icons.at(icon_id).get_original_size()) / eye.zoom).expand_to_square();
-	};
-
 	{
 		const bool drag_just_left_dead_area = [&]() {
 			const auto drag_dead_area = 3.f;
@@ -193,6 +190,10 @@ void editor_entity_selector::do_mousemotion(
 	thread_local visible_entities vis;
 
 	auto remove_non_hovering_icons_from = [&](auto& container, const auto world_range) {
+		auto get_icon_aabb = [&](const auto icon_id, const transformr where) {
+			return xywh::center_and_size(where.pos, vec2(sizes_for_icons.at(icon_id).get_original_size()) / eye.zoom).expand_to_square();
+		};
+
 		for_each_iconed_entity(
 			cosm, 
 			vis,
@@ -201,8 +202,22 @@ void editor_entity_selector::do_mousemotion(
 			   	const auto where,
 				const auto
 			) {
-				if (!get_icon_aabb(tex_id, where).hover(world_range)) {
-					erase_element(container, handle.get_id());
+				using W = remove_cref<decltype(world_range)>;
+
+				if constexpr(std::is_same_v<W, ltrb>) {
+					if (!get_icon_aabb(tex_id, where).hover(world_range)) {
+						erase_element(container, handle.get_id());
+					}
+				}
+				else if constexpr(std::is_same_v<W, vec2>) {
+					const auto size = sizes_for_icons.at(tex_id).get_original_size();
+
+					if (!::point_in_rect(where.pos, where.rotation, size, world_range)) {
+						erase_element(container, handle.get_id());
+					}
+				}
+				else {
+					static_assert(always_false_v<W>);
 				}
 			}
 		);
@@ -254,8 +269,7 @@ void editor_entity_selector::do_mousemotion(
 			ids.emplace_back(id);
 		});
 
-		const auto world_range = xywh(world_cursor_pos, vec2i::square(1));
-		remove_non_hovering_icons_from(ids, world_range);
+		remove_non_hovering_icons_from(ids, world_cursor_pos);
 
 		if (ids.size() > 0) {
 			hovered = ids[0];

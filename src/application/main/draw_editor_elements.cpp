@@ -21,16 +21,22 @@ void draw_editor_elements(
 		[&](const auto typed_handle, const auto image_id, const transformr world_transform, const rgba color) {
 			const auto screen_space = transformr(vec2i(on_screen(world_transform.pos)), world_transform.rotation);
 
-			const auto aabb = xywh::center_and_size(screen_space.pos, necessary_images[image_id].get_original_size());
-			const auto expanded_square = aabb.expand_to_square();
+			const auto image_size = necessary_images[image_id].get_original_size();
+			const auto image_rect = xywh::center_and_size(screen_space.pos, image_size);
+
+			const auto blank_tex = drawer.default_texture;
 
 			if (auto active_color = editor.find_highlight_color_of(typed_handle.get_id())) {
 				active_color->a = static_cast<rgba_channel>(std::min(1.8 * active_color->a, 255.0));
 
-				const auto selection_indicator_aabb = expanded_square.expand_from_center(vec2(5, 5));
+				const auto selection_indicator_aabb = image_rect.expand_from_center(vec2(5, 5));
 
-				drawer.aabb(
-					selection_indicator_aabb,
+				augs::detail_sprite(
+					drawer.output_buffer,
+					blank_tex,
+					image_size + vec2i(10, 10),
+					screen_space.pos,
+					screen_space.rotation,
 					*active_color
 				);
 
@@ -45,15 +51,14 @@ void draw_editor_elements(
 
 			augs::detail_sprite(
 				drawer.output_buffer,
-				necessary_images,
-				image_id,
+				necessary_images.at(image_id),
 				screen_space.pos,
 				screen_space.rotation,
 				color
 			);
 
 			drawer.border(
-				expanded_square,
+				image_rect,
 				color,
 				border_input { 1, 2 }
 			);
