@@ -6,7 +6,7 @@ struct image_in_atlas {
 	augs::atlas_entry neon_map;
 	augs::atlas_entry desaturated;
 
-	operator augs::atlas_entry() const {
+	explicit operator augs::atlas_entry() const {
 		return diffuse;
 	}
 

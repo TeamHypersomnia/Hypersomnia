@@ -1,3 +1,4 @@
+#pragma once
 #include "augs/math/declare_math.h"
 #include "game/transcendental/entity_handle_declaration.h"
 

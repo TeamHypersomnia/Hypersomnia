@@ -50,6 +50,7 @@
 #include "application/setups/editor/editor_setup.h"
 
 #include "application/main/imgui_pass.h"
+#include "application/main/draw_editor_elements.h"
 #include "application/main/draw_debug_details.h"
 #include "application/main/draw_debug_lines.h"
 #include "application/main/release_flags.h"
@@ -1487,113 +1488,20 @@ int work(const int argc, const char* const * const argv) try {
 			*/
 
 			if (current_setup) {
-				on_specific_setup([&](editor_setup& editor) {
-					auto on_screen = [cone](const auto p) {
-						return cone.to_screen_space(p);
-					};
-
-					const auto drawer = get_drawer();
-					const auto line_drawer = get_line_drawer();
-
-					editor.for_each_icon(
+				on_specific_setup([&](const editor_setup& editor) {
+					draw_editor_elements(
+						editor,
 						all_visible,
-						[&](const auto typed_handle, const auto image_id, const transformr world_transform, const rgba color) {
-							const auto screen_space_pos = vec2i(on_screen(world_transform.pos));
-
-							const auto aabb = xywh::center_and_size(screen_space_pos, streaming.necessary_images_in_atlas[image_id].get_original_size());
-							const auto expanded_square = aabb.expand_to_square();
-
-							if (auto active_color = editor.find_highlight_color_of(typed_handle.get_id())) {
-								active_color->a = static_cast<rgba_channel>(std::min(1.8 * active_color->a, 255.0));
-
-								const auto selection_indicator_aabb = expanded_square.expand_from_center(vec2(5, 5));
-
-								drawer.aabb(
-									selection_indicator_aabb,
-									*active_color
-								);
-
-								active_color->a = static_cast<rgba_channel>(std::min(2.2 * active_color->a, 255.0));
-
-								drawer.border(
-									selection_indicator_aabb,
-									*active_color,
-									border_input { 1, 0 }
-								);
-							}
-
-							drawer.base::aabb_centered(
-								streaming.necessary_images_in_atlas[image_id],
-								screen_space_pos,
-								color
-							);
-
-							drawer.border(
-								expanded_square,
-								color,
-								border_input { 1, 2 }
-							);
-						}	
-					);
-
-					const auto& editor_cfg = new_viewing_config.editor;
-
-					if (auto eye = editor.find_current_camera_eye()) {
-						eye->transform.pos.discard_fract();
-
-						if (const auto view = editor.find_view()) {
-							if (view->show_grid) {
-								drawer.grid(
-									screen_size,
-									view->grid.unit_pixels,
-									*eye,
-									editor_cfg.grid.render
-								);
-							}
-						}
-
-						if (const auto selection_aabb = editor.find_selection_aabb()) {
-							auto col = white;
-
-							if (editor.is_mover_active()) {
-								col.a = 120;
-							}
-
-							drawer.border(
-								camera_cone(*eye, screen_size).to_screen_space(*selection_aabb),
-								col,
-								border_input { 1, -1 }
-							);
-						}
-					}
-
-					editor.for_each_dashed_line(
-						[&](vec2 from, vec2 to, const rgba color, const double secs = 0.0, bool fatten = false) {
-							const auto a = on_screen(from.round_fract());
-							const auto b = on_screen(to.round_fract());
-
-							line_drawer.dashed_line(a, b, color, 5.f, 5.f, secs);
-
-							if (fatten) {
-								const auto ba = b - a;
-								const auto perp = ba.perpendicular_cw().normalize();
-								line_drawer.dashed_line(a + perp, b + perp, color, 5.f, 5.f, secs);
-								line_drawer.dashed_line(a + perp * 2, b + perp * 2, color, 5.f, 5.f, secs);
-							}
-						}	
+						cone,
+						get_drawer(),
+						get_line_drawer(),
+						new_viewing_config.editor,
+						streaming.necessary_images_in_atlas,
+						common_input_state.mouse.pos,
+						screen_size
 					);
 
 					renderer.call_and_clear_lines();
-
-					const auto mouse = common_input_state.mouse.pos;
-
-					if (const auto r = editor.find_screen_space_rect_selection(screen_size, mouse)) {
-						drawer.aabb_with_border(
-							*r,
-							editor_cfg.rectangular_selection_color,
-							editor_cfg.rectangular_selection_border_color
-						);
-					}
 				});
 			}
 

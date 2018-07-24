@@ -16,7 +16,7 @@ namespace augs {
 		const float rotation_degrees,
 		const rgba color
 	) {
-		const auto considered_texture = manager.at(image_id).diffuse;
+		const auto considered_texture = static_cast<augs::atlas_entry>(manager.at(image_id));
 		const auto points = make_sprite_points(pos, size, rotation_degrees);
 		const auto triangles = make_sprite_triangles(considered_texture, points, color);
 
@@ -33,7 +33,7 @@ namespace augs {
 		const float rotation_degrees,
 		const rgba color
 	) {
-		const auto considered_texture = manager.at(image_id).diffuse;
+		const auto considered_texture = static_cast<augs::atlas_entry>(manager.at(image_id));
 		const auto points = make_sprite_points(pos, considered_texture.get_original_size(), rotation_degrees);
 		const auto triangles = make_sprite_triangles(considered_texture, points, color);
 
