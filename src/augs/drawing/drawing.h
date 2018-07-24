@@ -107,6 +107,15 @@ namespace augs {
 			const border_input = border_input()
 		) const;
 
+		self border(
+			atlas_entry,
+			vec2 size,
+			vec2 pos,
+			float rotation,
+			rgba color,
+			border_input = border_input()
+		) const;
+
 		self aabb_with_border(
 			const atlas_entry,
 			const ltrb origin,

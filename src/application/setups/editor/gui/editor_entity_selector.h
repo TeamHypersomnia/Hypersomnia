@@ -31,6 +31,8 @@ class editor_entity_selector {
 	entity_flavour_id flavour_of_held;
 	render_layer layer_of_held = render_layer::INVALID;
 
+	void reset_held_params();
+
 public:
 	void clear();
 	void unhover();

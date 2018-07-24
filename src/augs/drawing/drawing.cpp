@@ -188,7 +188,7 @@ namespace augs {
 		const atlas_entry tex,
 		ltrb bordered,
 		const rgba color,
-		border_input in
+		const border_input in
 	) const {
 		augs::general_border(
 			bordered.round_fract(),
@@ -196,6 +196,37 @@ namespace augs {
 			in.width,
 			[this, tex, color](const ltrb line) {
 				aabb(tex, line, color);
+			}
+		);
+
+		return *this;
+	}
+
+	const drawer& drawer::border(
+		const atlas_entry tex,
+		const vec2 size,
+		const vec2 pos,
+		const float rotation,
+		const rgba color,
+		const border_input in
+	) const {
+		auto bordered = ltrb::center_and_size(pos, size);
+
+		augs::general_border(
+			bordered.round_fract(),
+			in.get_total_expansion(),
+			in.width,
+			[&](const ltrb line) {
+				auto verts = line.get_vertices<real32>();
+
+				for (auto& v : verts) {
+					v.rotate(rotation, pos);
+				}
+
+				const auto triangles = make_sprite_triangles(tex, verts, color);
+
+				output_buffer.push_back(triangles[0]);
+				output_buffer.push_back(triangles[1]);
 			}
 		);
 

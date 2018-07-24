@@ -607,7 +607,7 @@ namespace augs {
 						}
 					}
 					else {
-						LOG("WARNING! axis_n = %x (should be 2)", axis_n);
+						/* LOG("WARNING! axis_n = %x (should be 2)", axis_n); */
 					}
 
 					continue;
