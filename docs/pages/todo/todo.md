@@ -6,6 +6,7 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Possibly use b2TestOverlap for checking against the camera selection?
 - Make a tree out of time measurement profiler calls and get summary just from "fps" or "whole regeneration"
 
 - Fix this: due to a filter, the node disappears during renaming
@@ -21,9 +22,6 @@ summary: Just a hidden scratchpad.
 
 - Improve wielding transfers calculation so that less transfers are made
 	- Transfer effects will be fixed automagically then
-
-- Bugfix: sometimes floor is not selectable but it's because it has the same layer as road
-	- some warning perhaps could be in order?
 
 - Selection tabs
 	- Generalize editor_tab_gui to be also able to handle the selection tabs window

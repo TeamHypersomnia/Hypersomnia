@@ -216,3 +216,7 @@ summary: Just a hidden scratchpad.
 				- less template code generated, though
 			- ideal solution would be to have for_each_kind or something inside visible_entities and filters?
 
+- Bugfix: sometimes floor is not selectable but it's because it has the same layer as road
+	- some warning perhaps could be in order?
+	- I guess we should just create separate layers if this is so important
+

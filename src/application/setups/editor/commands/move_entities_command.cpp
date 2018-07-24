@@ -112,6 +112,12 @@ static void move_entities(
 					tr.rotate_degrees_with_90_multiples(dt.rotation, center);
 					fix_pixel_imperfections(tr);
 				}
+				else if constexpr(std::is_same_v<T, vec2>) {
+					auto t = transformr(tr, 0);
+					t.rotate_degrees_with_90_multiples(dt.rotation, center);
+					fix_pixel_imperfections(t);
+					tr = t.pos;
+				}
 				else {
 					static_assert(always_false_v<T>, "Unknown transform type.");
 				}
@@ -130,6 +136,9 @@ static void move_entities(
 				}
 				else if constexpr(std::is_same_v<T, transformr>) {
 					tr += dt;
+				}
+				else if constexpr(std::is_same_v<T, vec2>) {
+					tr += dt.pos;
 				}
 				else {
 					static_assert(always_false_v<T>, "Unknown transform type.");
@@ -176,6 +185,10 @@ static void resize_entities(
 							else if constexpr(std::is_same_v<T, transformr>) {
 								(void)si;
 								return transform;
+							}
+							else if constexpr(std::is_same_v<T, vec2>) {
+								(void)si;
+								return transformr(transform, 0);
 							}
 							else {
 								static_assert(always_false_v<T>, "Unknown transform type.");

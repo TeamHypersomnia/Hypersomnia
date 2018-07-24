@@ -38,6 +38,9 @@ public:
 			else if constexpr(E::template has<components::transform>()) {
 				callback(std::get<components::transform>(components));
 			}
+			else if constexpr(E::template has<components::position>()) {
+				callback(std::get<components::position>(components));
+			}
 		}
 		else {
 			static_assert(always_false_v<E>, "Not implemented for non-specific handles.");
@@ -285,6 +288,10 @@ std::optional<transformr> spatial_properties_mixin<E>::find_logic_transform() co
 		return *transform;
 	}	
 
+	if (const auto pos = handle.template find<components::position>()) {
+		return transformr(*pos, 0);
+	}	
+
 	return std::nullopt;
 }
 
@@ -328,6 +335,10 @@ void spatial_properties_mixin<E>::set_logic_transform(const transformr t) const 
 	}
 	else if (const auto tr = handle.template find<components::transform>()) {
 		*tr = t;
+		// TODO: reinfer the npo cache where necessary
+	}
+	else if (const auto pos = handle.template find<components::position>()) {
+		*pos = t.pos;
 		// TODO: reinfer the npo cache where necessary
 	}
 }

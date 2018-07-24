@@ -99,12 +99,14 @@ using assert_always_together = type_list<
 
 using assert_first_implies_second = type_list<
 	type_pair<invariants::item, invariants::sprite>,
-	type_pair<invariants::wandering_pixels, components::transform>,
+	type_pair<invariants::wandering_pixels, components::position>,
 	type_pair<invariants::light, components::transform>
 >;
 
 using assert_never_together = type_list<
 	type_pair<components::rigid_body, components::transform>,
+	type_pair<components::rigid_body, components::position>,
+	type_pair<components::position, components::transform>,
 	type_pair<components::rigid_body, components::wandering_pixels>
 >;
 
@@ -125,6 +127,7 @@ using component_list_t = List<
 	components::rigid_body,
 	components::specific_colliders_connection,
 	components::transform,
+	components::position,
 	components::car,
 	components::driver,
 	components::item,

@@ -21,6 +21,10 @@ auto format_struct_name(const T&) {
 		result = "Transform";
 	}	
 
+	if constexpr(std::is_same_v<T, components::position>) {
+		result = "Position";
+	}	
+
 	return result;
 }
 

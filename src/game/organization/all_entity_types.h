@@ -154,7 +154,7 @@ struct wandering_pixels_decoration {
 	>;
 
 	using components = type_list<
-		components::transform,
+		components::position,
 		components::overridden_size,
 		components::wandering_pixels
 	>;
