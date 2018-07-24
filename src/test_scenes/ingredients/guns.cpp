@@ -163,15 +163,15 @@ namespace test_flavours {
 			{
 				{
 					components::trace trace_def;
-					trace_def.enabled = false;
+					trace_def.enabled = true;
 					meta.set(trace_def);
 				}
 
 				{
 					invariants::trace trace_def;
-					trace_def.max_multiplier_x = {0.670f, 1.8f};
+					trace_def.max_multiplier_x = {0.370f, 1.0f};
 					trace_def.max_multiplier_y = {0.f, 0.09f};
-					trace_def.lengthening_duration_ms = {36.f, 466.f};
+					trace_def.lengthening_duration_ms = {36.f, 366.f};
 					trace_def.additional_multiplier = vec2(1.f, 1.f);
 					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::STEEL_ROUND_FINISHING_TRACE);
 					meta.set(trace_def);

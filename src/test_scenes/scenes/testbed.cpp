@@ -23,7 +23,7 @@
 #include "game/stateless_systems/car_system.h"
 #include "game/stateless_systems/driver_system.h"
 
-#include "game/enums/party_category.h"
+#include "game/enums/faction_type.h"
 #include "game/detail/describers.h"
 
 #include "game/messages/intent_message.h"

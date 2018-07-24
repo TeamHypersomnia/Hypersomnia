@@ -41,6 +41,26 @@ namespace augs {
 			return c;
 		}
 	
+		auto all() const {
+			for (const auto f : flags) {
+				if (!f) {
+					return false;
+				}
+			}
+
+			return true;
+		}
+
+		auto any() const {
+			for (const auto f : flags) {
+				if (f) {
+					return true;
+				}
+			}
+
+			return false;
+		}
+
 		auto none() const {
 			for (const auto f : flags) {
 				if (f) {

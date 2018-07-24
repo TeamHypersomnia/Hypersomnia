@@ -19,7 +19,7 @@
 #include "test_scenes/test_scene_animations.h"
 
 #include "game/enums/filters.h"
-#include "game/enums/party_category.h"
+#include "game/enums/faction_type.h"
 #include "game/detail/inventory/perform_transfer.h"
 
 namespace test_flavours {
@@ -179,8 +179,8 @@ namespace test_flavours {
 			{
 				components::attitude attitude;
 
-				attitude.parties = party_category::METROPOLIS_CITIZEN;
-				attitude.hostile_parties = party_category::RESISTANCE_CITIZEN;
+				attitude.parties = faction_type::METROPOLIS;
+				attitude.hostile_parties = faction_type::RESISTANCE;
 
 				meta.set(attitude);
 			}
@@ -234,8 +234,8 @@ namespace test_flavours {
 			{
 				components::attitude attitude;
 
-				attitude.parties = party_category::RESISTANCE_CITIZEN;
-				attitude.hostile_parties = party_category::METROPOLIS_CITIZEN;
+				attitude.parties = faction_type::RESISTANCE;
+				attitude.hostile_parties = faction_type::METROPOLIS;
 
 				meta.set(attitude);
 			}

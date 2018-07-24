@@ -1,6 +1,8 @@
 #pragma once
+#include "augs/misc/enum/enum_boolset.h"
 #include "game/transcendental/entity_id.h"
 #include "game/enums/attitude_type.h"
+#include "game/enums/faction_type.h"
 
 #include "game/container_sizes.h"
 #include "augs/misc/constant_size_vector.h"
@@ -16,8 +18,8 @@ namespace components {
 		// GEN INTROSPECTOR struct components::attitude
 		float maximum_divergence_angle_before_shooting = 10.0;
 
-		unsigned parties = 0;
-		unsigned hostile_parties = 0;
+		augs::enum_boolset<faction_type> parties;
+		augs::enum_boolset<faction_type> hostile_parties;
 
 		specific_hostile_entities_vector specific_hostile_entities = {};
 		

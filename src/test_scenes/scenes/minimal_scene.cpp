@@ -2,7 +2,7 @@
 
 #include "augs/templates/algorithm_templates.h"
 
-#include "game/enums/party_category.h"
+#include "game/enums/faction_type.h"
 
 #include "test_scenes/test_scene_flavours.h"
 #include "test_scenes/ingredients/ingredients.h"
@@ -54,14 +54,14 @@ namespace test_scenes {
 			if (i == 0) {
 				new_character.get<components::sentience>().get<health_meter_instance>().set_value(100);
 				new_character.get<components::sentience>().get<health_meter_instance>().set_maximum_value(100);
-				new_character.get<components::attitude>().parties = party_category::RESISTANCE_CITIZEN;
-				new_character.get<components::attitude>().hostile_parties = party_category::METROPOLIS_CITIZEN;
+				new_character.get<components::attitude>().parties = faction_type::RESISTANCE;
+				new_character.get<components::attitude>().hostile_parties = faction_type::METROPOLIS;
 			}
 			else if (i == 1) {
 				new_character.get<components::sentience>().get<health_meter_instance>().set_value(100);
 				new_character.get<components::sentience>().get<health_meter_instance>().set_maximum_value(100);
-				new_character.get<components::attitude>().parties = party_category::METROPOLIS_CITIZEN;
-				new_character.get<components::attitude>().hostile_parties = party_category::RESISTANCE_CITIZEN;
+				new_character.get<components::attitude>().parties = faction_type::METROPOLIS;
+				new_character.get<components::attitude>().hostile_parties = faction_type::RESISTANCE;
 			}
 
 			auto& sentience = new_character.get<components::sentience>();
