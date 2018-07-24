@@ -4,6 +4,8 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Use constexpr max_element in msvc if it works
+
 - Create messages::holster_item_message that will add a selection to hotbar
 
 - Implement ctrl+tab for settings window

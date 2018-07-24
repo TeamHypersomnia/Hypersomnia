@@ -30,7 +30,7 @@ struct editor_view {
 	bool show_grid = true;
 	bool snapping_enabled = true;
 	bool ignore_groups = false;
-	editor_rect_select_type rect_select_mode = editor_rect_select_type::SAME_FLAVOUR;
+	editor_rect_select_type rect_select_mode = editor_rect_select_type::SAME_LAYER;
 
 	editor_selection_groups selection_groups;
 	current_selections_type selected_entities;
@@ -48,7 +48,6 @@ struct editor_view {
 	void toggle_snapping();
 	void toggle_ignore_groups();
 	void toggle_grid();
-	void toggle_flavour_rect_selection();
 
 	maybe_layer_filter get_effective_selecting_filter() const;
 

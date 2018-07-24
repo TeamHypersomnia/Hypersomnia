@@ -43,6 +43,7 @@ void editor_entity_selector::do_left_press(
 
 	if (const auto held_entity = cosm[held]) {
 		flavour_of_held = held_entity.get_flavour_id();
+		layer_of_held = ::calc_render_layer(held_entity);
 	}
 
 	if (!has_ctrl) {
@@ -118,6 +119,9 @@ void editor_entity_selector::select_all(
 	const maybe_layer_filter& filter
 ) {
 	const auto compared_flavour = flavour_of_held;
+	const auto compared_layer = layer_of_held;
+	LOG_NVPS(int(compared_layer));
+
 	finish_rectangular(current_selections);
 
 	if (!has_ctrl) {
@@ -131,15 +135,23 @@ void editor_entity_selector::select_all(
 			return;
 		}
 
-		const auto id = handle.get_id();
+		auto add_to_selection = [&]() {
+			const auto id = handle.get_id();
+			current_selections.emplace(id);
+		};
 
-		if (compared_flavour.is_set() && rect_select_mode == editor_rect_select_type::SAME_FLAVOUR) {
-			if (entity_flavour_id(handle.get_flavour_id()) == compared_flavour) {
-				current_selections.emplace(id);
+		if (rect_select_mode == editor_rect_select_type::SAME_FLAVOUR) {
+			if (compared_flavour.is_set() && entity_flavour_id(handle.get_flavour_id()) == compared_flavour) {
+				add_to_selection();
+			}
+		}
+		else if (rect_select_mode == editor_rect_select_type::SAME_LAYER) {
+			if (compared_layer != render_layer::INVALID && ::calc_render_layer(handle) == compared_layer) {
+				add_to_selection();
 			}
 		}
 		else {
-			current_selections.emplace(id);
+			add_to_selection();
 		}
 	});
 }
@@ -217,7 +229,12 @@ void editor_entity_selector::do_mousemotion(
 
 		if (rect_select_mode == editor_rect_select_type::SAME_FLAVOUR) {
 			erase_if(in_rectangular_selection, [&](const entity_id id) {
-				return !(cosm[id].get_flavour_id() == flavour_of_held);
+				return cosm[id].get_flavour_id() != flavour_of_held;
+			});
+		}
+		else if (rect_select_mode == editor_rect_select_type::SAME_LAYER) {
+			erase_if(in_rectangular_selection, [&](const entity_id id) {
+				return ::calc_render_layer(cosm[id]) != layer_of_held;
 			});
 		}
 	}

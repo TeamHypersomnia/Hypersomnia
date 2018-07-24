@@ -6,127 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Special render layers?
-	- Every possibly visible entity kind will have a render layer
-		- LIGHTS
-		- WANDERING_PIXELS
-			- might as well have render layer for dim, why not
-		- SOUNDS
-			- why not? maybe later we'll derive some graphics effect for them?
-		- Some of these can be derived from the layout, e.g. having light invariant qualifies
-		- It is to tonpo/visible_entities discretion from which tonpo types we'll acquire particular render layers
-		- It will be to other audiovisual systems discretion how and if they want to use more specialized layers, e.g. dim/illuminating wandering pixels
-		- sort per layer shall dispatch first and then infer render layers
-		- For now though we might want to iterate through all of these lights/wandering pixels
-			- For each inside the visible_entities?
-				- templatized by enum type
-				- in any case, will be possible
-				- and makes the code more generic
-		- from for_each_iconed, call for_each from visible entities
-		- It's only bad because we're not heterogenous enough with the enums
-			- e.g. illuminating particles could be assigned to some completely unrelated entity
-				- less template code generated, though
-			- ideal solution would be to have for_each_kind or something inside visible_entities and filters?
-
-- Use constexpr max_element in msvc if it works
-
-- Transform design
-	- It is the case that many entities might share identical origin, in which case it would be unwieldy to update origins for all entities to a new one.
-		- E.g. fish in aquarium.
-	- It is also the case that the origins might be tied to decorational entities.
-		- E.g. aquarium sand.
-	- movement path component will have an origin transform which will automatically be moved by the editor
-		- the transform component will be kept up to date and it will be the logical transform
-		- the rendering code will also only touch this logical transform
-	- for editor, the origin could just also be accessed as an independent transform
-		- so access_independent_transform -> access_independent_transforms
-		- con: more memory wasted? who gives a heck, though...
-
-- Marker entities
-	- Special-purpose components:
-		- shape_aabb
-			- can be used by wandering pixels!
-				- and thus the editor will allow us to change reach easily
-		- shape_polygon can be used both for marking and for physical bodies
-	- separation between visible shapes and physical shapes is described elsewhere
-		- but the same logic would be used nevertheless
-
-
-- Sound should be loaded from the smallest to the biggest
-	- So that effects are loaded first
-	- New synchronization
-		- store std::atomic<bool> next to sound_buffer in loaded_sounds_map
-			- set it to false whenever definition changes or it is to be loaded
-			- check if future is implemented same way
-
-- find closest point pairs for fish?
-	- firstly determine if the setting of the new npo node isn't actually the bottleneck
-	- tho probably it's the false positives
-
-- Note: drone sound (sentience sounds overall) will be calculated exactly as the firing engine sound
-	- Sentience humming caches
-	- These don't need their playing pos synchronized
-
-- Property editor: Checkbox matrix for b2Filter
-	- might be useful once we come to glass walls 
-	- a list of predefined filters
-		- might choose a name, just like enums
-		- stored in common assets
-	- now sensible filters values will be provided by the testbed
-
-- Shuffled animations
-	- Inside randomizing system?
-
-- Editor maximum ease of access
-	- Fix problems with grouping on duplication?
-
-- Particles and flavours
-	- std::unordered_map<particle_flavour_id, vector of particles>
-		- We will always simulate all particles that we have in memory.
-		- This will add a nice speedup, and also we will easily invalidate particles when particle flavour changes or is deleted.
-		- Particle types will also be pooled and will be a separate viewable.
-
-- Fix what happens when too many entities are created
-	- **Let the game work when a new entity cannot be created.**
-		- Just return a dead handle.
-
-- Probably somehow disallow arbitrary inferring of relational cache?
-	- There was some unresolved crash problem with this.
-
-- Persistence of entity ids in editor and clearing them
-	- Cases of storage:
-		- Selection
-			- Rectangular
-			- Significant
-		- Groups
-	- Cases of invalidation:
-		- **Undoing a command that introduces new entities**
-			- E.g. one that creates an entity from nothing
-			- Look for both undo_last_create and "delete_entity"
-		- Commands whose undoing or redoing should automatically select affected entities
-			- Purge is justified in this case
-			- shouldn't this be pretty much all commands that affect entity existence?
-				- No. Redoing delete has no reason to purge selections of some other entities.
-					- Clear individually, also for the groups.
-			- problem: if, on delete, we remove an entity from the group it belongs to, the undoing of delete doesn't know what to do
-				- grouping will be tracked by history
-				- thus let the delete command just store its own "ungroup entities" command and invoke it beforehand on all entries
-		- Delete command
-		- Gameplay mode
-			- For now we won't support editor operations inside gameplay mode?
-				- Should be easy enough though, we can always just read the deletion commands
-			- To ensure space efficiency even with static allocations, we'll just serialize the cosmos to bytes instead of making a full clone
-				- Should even be faster considering that recreating some associative containers' structure might be already costly
-	- mover should be deactivated when?
-		- corner case: delete while move?
-		- should work anyway and yeah, deactivate it then
-
-- Grenades shall change shape to circle so that throws can be precise
-	- Let hand fuse invariant have an optional radius for the thrown grenade
-		- should we reinfer when tweaking?
-	- the physics world cache will simply take into consideration if the hand fuse was released, when calculating shape
-		- so hand fuse component might want to become a synchronizable
-
 - game mode property is a part of game mode definition
 - game mode definition = all game mode properties
 - a **game mode marker** is a game mode property of game mode definition that has a spatial representation
@@ -210,6 +89,102 @@ summary: That which we are brainstorming at the moment.
 		- In lua format only.
 		- Will be named like ``ProjectName.compat.lua``
 			- Contains the intercosm and rulesets, all important things.
+
+- Transform design
+	- It is the case that many entities might share identical origin, in which case it would be unwieldy to update origins for all entities to a new one.
+		- E.g. fish in aquarium.
+	- It is also the case that the origins might be tied to decorational entities.
+		- E.g. aquarium sand.
+	- movement path component will have an origin transform which will automatically be moved by the editor
+		- the transform component will be kept up to date and it will be the logical transform
+		- the rendering code will also only touch this logical transform
+	- for editor, the origin could just also be accessed as an independent transform
+		- so access_independent_transform -> access_independent_transforms
+		- con: more memory wasted? who gives a heck, though...
+
+- Marker entities
+	- Special-purpose components:
+		- shape_aabb
+			- can be used by wandering pixels!
+				- and thus the editor will allow us to change reach easily
+		- shape_polygon can be used both for marking and for physical bodies
+	- separation between visible shapes and physical shapes is described elsewhere
+		- but the same logic would be used nevertheless
+
+- Sound should be loaded from the smallest to the biggest
+	- So that effects are loaded first
+	- New synchronization
+		- store std::atomic<bool> next to sound_buffer in loaded_sounds_map
+			- set it to false whenever definition changes or it is to be loaded
+			- check if future is implemented same way
+
+- find closest point pairs for fish?
+	- firstly determine if the setting of the new npo node isn't actually the bottleneck
+	- tho probably it's the false positives
+
+- Note: drone sound (sentience sounds overall) will be calculated exactly as the firing engine sound
+	- Sentience humming caches
+	- These don't need their playing pos synchronized
+
+- Property editor: Checkbox matrix for b2Filter
+	- might be useful once we come to glass walls 
+	- a list of predefined filters
+		- might choose a name, just like enums
+		- stored in common assets
+	- now sensible filters values will be provided by the testbed
+
+- Shuffled animations
+	- Inside randomizing system?
+
+- Editor maximum ease of access
+	- Fix problems with grouping on duplication?
+
+- Particles and flavours
+	- std::unordered_map<particle_flavour_id, vector of particles>
+		- We will always simulate all particles that we have in memory.
+		- This will add a nice speedup, and also we will easily invalidate particles when particle flavour changes or is deleted.
+		- Particle types will also be pooled and will be a separate viewable.
+
+- Fix what happens when too many entities are created
+	- **Let the game work when a new entity cannot be created.**
+		- Just return a dead handle.
+
+- Probably somehow disallow arbitrary inferring of relational cache?
+	- There was some unresolved crash problem with this.
+
+- Persistence of entity ids in editor and clearing them
+	- Cases of storage:
+		- Selection
+			- Rectangular
+			- Significant
+		- Groups
+	- Cases of invalidation:
+		- **Undoing a command that introduces new entities**
+			- E.g. one that creates an entity from nothing
+			- Look for both undo_last_create and "delete_entity"
+		- Commands whose undoing or redoing should automatically select affected entities
+			- Purge is justified in this case
+			- shouldn't this be pretty much all commands that affect entity existence?
+				- No. Redoing delete has no reason to purge selections of some other entities.
+					- Clear individually, also for the groups.
+			- problem: if, on delete, we remove an entity from the group it belongs to, the undoing of delete doesn't know what to do
+				- grouping will be tracked by history
+				- thus let the delete command just store its own "ungroup entities" command and invoke it beforehand on all entries
+		- Delete command
+		- Gameplay mode
+			- For now we won't support editor operations inside gameplay mode?
+				- Should be easy enough though, we can always just read the deletion commands
+			- To ensure space efficiency even with static allocations, we'll just serialize the cosmos to bytes instead of making a full clone
+				- Should even be faster considering that recreating some associative containers' structure might be already costly
+	- mover should be deactivated when?
+		- corner case: delete while move?
+		- should work anyway and yeah, deactivate it then
+
+- Grenades shall change shape to circle so that throws can be precise
+	- Let hand fuse invariant have an optional radius for the thrown grenade
+		- should we reinfer when tweaking?
+	- the physics world cache will simply take into consideration if the hand fuse was released, when calculating shape
+		- so hand fuse component might want to become a synchronizable
 
 - check in editor if the saving/opening path is a valid folder?
 - make reveal in explorer work for both files and folders

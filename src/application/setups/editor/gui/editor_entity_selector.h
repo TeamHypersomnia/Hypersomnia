@@ -29,6 +29,7 @@ class editor_entity_selector {
 	std::optional<vec2> rectangular_drag_origin;
 
 	entity_flavour_id flavour_of_held;
+	render_layer layer_of_held = render_layer::INVALID;
 
 public:
 	void clear();

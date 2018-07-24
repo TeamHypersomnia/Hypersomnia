@@ -193,3 +193,26 @@ summary: Just a hidden scratchpad.
 
 - Shift+Arrows shall duplicate the selection and select the new entities
 	- Pointless, now that we have the resizing
+
+- Special render layers?
+	- Every possibly visible entity kind will have a render layer
+		- LIGHTS
+		- WANDERING_PIXELS
+			- might as well have render layer for dim, why not
+		- SOUNDS
+			- why not? maybe later we'll derive some graphics effect for them?
+		- Some of these can be derived from the layout, e.g. having light invariant qualifies
+		- It is to tonpo/visible_entities discretion from which tonpo types we'll acquire particular render layers
+		- It will be to other audiovisual systems discretion how and if they want to use more specialized layers, e.g. dim/illuminating wandering pixels
+		- sort per layer shall dispatch first and then infer render layers
+		- For now though we might want to iterate through all of these lights/wandering pixels
+			- For each inside the visible_entities?
+				- templatized by enum type
+				- in any case, will be possible
+				- and makes the code more generic
+		- from for_each_iconed, call for_each from visible entities
+		- It's only bad because we're not heterogenous enough with the enums
+			- e.g. illuminating particles could be assigned to some completely unrelated entity
+				- less template code generated, though
+			- ideal solution would be to have for_each_kind or something inside visible_entities and filters?
+
