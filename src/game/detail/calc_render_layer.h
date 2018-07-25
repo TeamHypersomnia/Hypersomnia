@@ -8,7 +8,9 @@ using entities_with_render_layer = entity_types_with_any_of<
 	invariants::render,
 	invariants::light,
 	invariants::continuous_particles,
-	invariants::continuous_sound
+	invariants::continuous_sound,
+	invariants::point_marker,
+	invariants::box_marker
 >;
 
 template <class H>
@@ -16,6 +18,12 @@ FORCE_INLINE auto calc_render_layer(const H& handle) {
 	if constexpr(H::is_specific) {
 		if constexpr(H::template has<invariants::render>()) {
 			return handle.template get<invariants::render>().layer;
+		}
+		else if constexpr(H::template has<invariants::point_marker>()) {
+			return render_layer::POINT_MARKERS;
+		}
+		else if constexpr(H::template has<invariants::box_marker>()) {
+			return render_layer::AREA_MARKERS;
 		}
 		else if constexpr(H::template has<invariants::light>()) {
 			return render_layer::LIGHTS;

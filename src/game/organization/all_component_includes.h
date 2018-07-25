@@ -44,3 +44,4 @@
 #include "game/components/remnant_component.h"
 #include "game/components/continuous_sound_component.h"
 #include "game/components/continuous_particles.h"
+#include "game/components/marker_component.h"

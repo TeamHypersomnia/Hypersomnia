@@ -21,6 +21,12 @@ void construct_pre_inference(const handle_type h) {
 			if (const auto sprite = h.template find<invariants::sprite>()) {
 				s.value = sprite->size;
 			}
+
+			if (const auto marker = h.template find<invariants::box_marker>()) {
+				s.is_enabled = true;
+				/* Set a sensible value */
+				s.value.set(128, 128);
+			}
 		}
 	}
 }

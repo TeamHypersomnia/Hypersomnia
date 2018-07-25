@@ -196,5 +196,26 @@ namespace test_flavours {
 			test_scene_image_id::METROPOLIS,
 			render_layer::NEON_CAPTIONS
 		);
+
+		{
+			auto& meta = get_test_flavour(flavours, test_point_markers::FFA_SPAWN);
+			invariants::point_marker marker;
+			marker.type = point_marker_type::FFA_SPAWN;
+			meta.set(marker);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_box_markers::BOMBSITE_A);
+			invariants::box_marker marker;
+			marker.type = area_marker_type::BOMBSITE_A;
+			meta.set(marker);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_box_markers::BOMBSITE_B);
+			invariants::box_marker marker;
+			marker.type = area_marker_type::BOMBSITE_B;
+			meta.set(marker);
+		}
 	}
 }

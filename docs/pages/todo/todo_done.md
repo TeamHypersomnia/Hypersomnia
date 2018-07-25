@@ -1124,3 +1124,6 @@ we consider whole type overrides too complex architeciturally:
 - rename the flavour on setting an image
 	- if it is detected that it is yet unnamed
 
+- Icons: let them be rotated.
+	- drawer should have a routine for drawing rotated aabb border?
+

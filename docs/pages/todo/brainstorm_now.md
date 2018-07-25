@@ -6,8 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Icons: let them be rotated.
-	- drawer should have a routine for drawing rotated aabb border?
+- Game-mode profiles
+	- Each map can specify a "profile" with sensible values for a deathmatch, tdm, etc.
+		- At the same time, it will be documenting the proper use of the map
+	- Will be useful for a built-in test scene
+			
+- Gameplay mode logic shall detect if a map has enough information to be played in a specific mode
+
+- Test scene game mode
 
 - Editor: Game-mode specific information
 	- Whichever has a spatial representation shall be represented by an entity.
@@ -20,12 +26,14 @@ summary: That which we are brainstorming at the moment.
 				- Useful for spawns
 			- icon should rotate along the rotation
 				- aabb will be enlarged then
-		- Box marker
-		- Shape marker
-		- Circle marker
+		- Area marker types
+			- Shape
+			- Circle
+		- marker_meta
+			- associated_faction
 		- invariants::point_marker
 			- point_marker_purpose enum
-				- metropolis_spawn
+				- spawnpoint
 				- resistance_spawn
 				- atlantis_spawn
 		- invariants::area_marker

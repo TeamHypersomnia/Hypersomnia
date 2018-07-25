@@ -43,6 +43,8 @@ namespace invariants {
 	struct remnant;
 	struct continuous_sound;
 	struct continuous_particles;
+	struct point_marker;
+	struct box_marker;
 }
 
 namespace components {
@@ -184,7 +186,9 @@ using invariant_list_t = List<
 	invariants::animation,
 	invariants::remnant,
 	invariants::continuous_sound,
-	invariants::continuous_particles
+	invariants::continuous_particles,
+	invariants::point_marker,
+	invariants::box_marker
 >;
 
 template <class... Types>

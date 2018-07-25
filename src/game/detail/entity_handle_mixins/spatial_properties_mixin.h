@@ -136,14 +136,21 @@ public:
 		if (const auto* const sound_def = handle.template find<invariants::continuous_sound>()) {
 			return xywh::center_and_size(
 				transform.pos, 
-				vec2::square(32)
+				vec2::square(100)
 			);
 		}
 
 		if (const auto* const particles_def = handle.template find<invariants::continuous_particles>()) {
 			return xywh::center_and_size(
 				transform.pos, 
-				vec2::square(32)
+				vec2::square(100)
+			);
+		}
+
+		if (const auto* const marker = handle.template find<invariants::point_marker>()) {
+			return xywh::center_and_size(
+				transform.pos, 
+				vec2::square(100)
 			);
 		}
 

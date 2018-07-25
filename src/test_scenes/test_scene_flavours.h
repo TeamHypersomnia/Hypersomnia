@@ -216,6 +216,21 @@ enum class test_particles_decorations {
 	// END GEN INTROSPECTOR
 };
 
+enum class test_point_markers {
+	// GEN INTROSPECTOR enum class test_point_markers
+	FFA_SPAWN,
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+enum class test_box_markers {
+	// GEN INTROSPECTOR enum class test_box_markers
+	BOMBSITE_A,
+	BOMBSITE_B,
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
 using test_flavours_map = type_map<
 	type_pair<test_controlled_characters, controlled_character>,
 	type_pair<test_plain_sprited_bodys, plain_sprited_body>,
@@ -232,7 +247,9 @@ using test_flavours_map = type_map<
 	type_pair<test_explosive_missiles, explosive_missile>,
 	type_pair<test_remnant_bodies, remnant_body>,
 	type_pair<test_sound_decorations, sound_decoration>,
-	type_pair<test_particles_decorations, particles_decoration>
+	type_pair<test_particles_decorations, particles_decoration>,
+	type_pair<test_point_markers, point_marker>,
+	type_pair<test_box_markers, box_marker>
 >;
 
 #if TODO

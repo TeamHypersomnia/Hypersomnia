@@ -376,3 +376,30 @@ struct particles_decoration {
 		components::transform
 	>;
 };
+
+struct point_marker {
+	static constexpr std::size_t statically_allocated_entities = 1000;
+	static constexpr std::size_t statically_allocated_flavours = 50;
+
+	using invariants = type_list<
+		invariants::point_marker
+	>;
+
+	using components = type_list<
+		components::transform
+	>;
+};
+
+struct box_marker {
+	static constexpr std::size_t statically_allocated_entities = 1000;
+	static constexpr std::size_t statically_allocated_flavours = 50;
+
+	using invariants = type_list<
+		invariants::box_marker
+	>;
+
+	using components = type_list<
+		components::transform,
+		components::overridden_size
+	>;
+};

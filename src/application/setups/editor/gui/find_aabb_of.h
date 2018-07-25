@@ -12,6 +12,7 @@ std::optional<ltrb> find_editor_aabb_of(const T handle) {
 			layer == render_layer::LIGHTS
 			|| layer == render_layer::CONTINUOUS_PARTICLES
 			|| layer == render_layer::CONTINUOUS_SOUNDS
+			|| layer == render_layer::POINT_MARKERS
 		) {
 			return xywh::center_and_size(pos, vec2(2, 2));	
 		}
