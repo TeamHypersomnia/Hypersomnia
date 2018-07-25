@@ -6,50 +6,25 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Test scene game mode
+	- The first to be implemented as an architectural draft
+- FFA game mode
+	- Win condition: None, there is only time limit.
+- Team deathmatch game mode
+	- Win condition: Consciousness status of any entity of CT side
+- Bomb defuse game mode
+	- Win condition: Existence of any entity of C4 flavour
+		- A bomb can only stop existing due to being detonated
+	- Win condition: Consciousness status of any entity of CT side
+
+- Game modes shall be separated into immutable & instance
+
 - Game-mode profiles
 	- Each map can specify a "profile" with sensible values for a deathmatch, tdm, etc.
 		- At the same time, it will be documenting the proper use of the map
 	- Will be useful for a built-in test scene
 			
 - Gameplay mode logic shall detect if a map has enough information to be played in a specific mode
-
-- Test scene game mode
-
-- Editor: Game-mode specific information
-	- Whichever has a spatial representation shall be represented by an entity.
-		- Pro: Re-uses the logic for resizing, moving and rotating.
-			- Perhaps even for shapes later on.
-		- Pro: Re-uses logic for icons.
-	- New entity types:
-		- Point marker
-			- Has a transform so it can be rotated as well
-				- Useful for spawns
-			- icon should rotate along the rotation
-				- aabb will be enlarged then
-		- Area marker types
-			- Shape
-			- Circle
-		- marker_meta
-			- associated_faction
-		- invariants::point_marker
-			- point_marker_purpose enum
-				- spawnpoint
-				- resistance_spawn
-				- atlantis_spawn
-		- invariants::area_marker
-			- area_marker_purpose
-				- bombsite_a
-				- bombsite_b
-		- Additional metadata for a marker
-			- We'll for now stick with a struct that holds all possible properties
-			- There are several problems with using a variant:
-				- We would have to implement it ourselves to guarantee:
-					- Portability
-					- Preservation of destroyed values on later revival
-						- Like with augs::maybe
-					- Well, technically, we could revive the trivially_copyable_variant from deleted files
-				- Quite a lot of bloat for types
-				- Thus we'd lose a lot of valuable time
 
 - game mode property is a part of game mode definition
 - game mode definition = all game mode properties

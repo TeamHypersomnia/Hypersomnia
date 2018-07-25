@@ -1,5 +1,6 @@
 #include "application/main/draw_editor_elements.h"
 #include "application/setups/editor/editor_setup.h"
+#include "view/rendering_scripts/draw_marker_borders.h"
 
 void draw_editor_elements(
 	const editor_setup& editor,
@@ -64,20 +65,7 @@ void draw_editor_elements(
 				border_input { 1, 2 }
 			);
 
-			if (const auto marker = typed_handle.template find<invariants::box_marker>()) {
-				const auto size = typed_handle.get_logical_size();
-
-				line_drawer.border_dashed(
-					size * cone.eye.zoom,
-					screen_space.pos,
-					screen_space.rotation,
-					color,
-					5.0,
-					0.0,
-					0.0,
-					border_input { 1, 0 }
-				);
-			}
+			::draw_marker_borders(typed_handle, line_drawer, screen_space, cone.eye.zoom, color);
 		}	
 	);
 

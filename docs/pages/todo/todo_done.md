@@ -1127,3 +1127,39 @@ we consider whole type overrides too complex architeciturally:
 - Icons: let them be rotated.
 	- drawer should have a routine for drawing rotated aabb border?
 
+- Editor: Markers
+	- Whichever has a spatial representation shall be represented by an entity.
+		- Pro: Re-uses the logic for resizing, moving and rotating.
+			- Perhaps even for shapes later on.
+		- Pro: Re-uses logic for icons.
+	- New entity types:
+		- Point marker
+			- Has a transform so it can be rotated as well
+				- Useful for spawns
+			- icon should rotate along the rotation
+				- aabb will be enlarged then
+		- Area marker types
+			- Shape
+			- Circle
+		- marker_meta
+			- associated_faction
+		- invariants::point_marker
+			- point_marker_purpose enum
+				- spawnpoint
+				- resistance_spawn
+				- atlantis_spawn
+		- invariants::area_marker
+			- area_marker_purpose
+				- bombsite_a
+				- bombsite_b
+		- Additional metadata for a marker
+			- We'll for now stick with a struct that holds all possible properties
+			- There are several problems with using a variant:
+				- We would have to implement it ourselves to guarantee:
+					- Portability
+					- Preservation of destroyed values on later revival
+						- Like with augs::maybe
+					- Well, technically, we could revive the trivially_copyable_variant from deleted files
+				- Quite a lot of bloat for types
+				- Thus we'd lose a lot of valuable time
+

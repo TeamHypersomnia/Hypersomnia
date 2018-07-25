@@ -26,6 +26,7 @@
 #include "view/rendering_scripts/illuminated_rendering.h"
 #include "view/rendering_scripts/draw_wandering_pixels_as_sprites.h"
 #include "view/rendering_scripts/helper_drawer.h"
+#include "view/rendering_scripts/draw_marker_borders.h"
 
 #include "view/necessary_resources.h"
 #include "view/game_drawing_settings.h"
@@ -326,9 +327,20 @@ void illuminated_rendering(
 	}
 
 	renderer.call_and_clear_triangles();
-	
+
+	if (settings.draw_area_markers) {
+		visible.for_each<render_layer::AREA_MARKERS>(cosmos, [&](const auto e) {
+			e.dispatch([&](const auto typed_handle){ 
+				const auto where = typed_handle.get_logic_transform();
+				::draw_marker_borders(typed_handle, line_output, where, cone.eye.zoom);
+			});
+		});
+
+		renderer.call_and_clear_lines();
+	}
+
 	shaders.illuminated->set_as_current();
-	
+
 	helper.draw<
 		render_layer::DYNAMIC_BODY,
 		render_layer::OVER_DYNAMIC_BODY,
@@ -398,8 +410,7 @@ void illuminated_rendering(
 			viewed_character
 		});
 
-		renderer.call_lines();
-		renderer.clear_lines();
+		renderer.call_and_clear_lines();
 	}
 
 	draw_particles(particle_layer::ILLUMINATING_PARTICLES);

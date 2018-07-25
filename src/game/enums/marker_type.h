@@ -14,3 +14,12 @@ enum class area_marker_type {
 	BOMBSITE_C
 	// END GEN INTROSPECTOR
 };
+
+inline bool is_bombsite(const area_marker_type t) {
+	switch(t) {
+		case area_marker_type::BOMBSITE_A: return true;
+		case area_marker_type::BOMBSITE_B: return true;
+		case area_marker_type::BOMBSITE_C: return true;
+		default: return false;
+	}
+}

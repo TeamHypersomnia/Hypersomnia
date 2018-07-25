@@ -29,6 +29,7 @@ using camera_eye = basic_camera_eye<float>;
 
 struct camera_cone {
 	using vec2_type = camera_eye::vec2_type;
+	using transform_type = transformr;
 
 	camera_eye eye;
 	vec2i screen_size;
@@ -44,6 +45,11 @@ struct camera_cone {
 	vec2_type to_screen_space(const vec2_type world_pos) const {
 		// TODO: support rotation
 		return eye.zoom * (world_pos - eye.transform.pos) + screen_size / 2;
+	}
+
+	transform_type to_screen_space(transform_type world) const {
+		world.pos = to_screen_space(world.pos);
+		return world;
 	}
 
 	ltrb to_screen_space(const ltrb r) const {
