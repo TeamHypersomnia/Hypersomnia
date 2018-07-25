@@ -39,7 +39,7 @@ void draw_editor_elements(
 
 				active_color->a = static_cast<rgba_channel>(std::min(2.2 * active_color->a, 255.0));
 
-				drawer.border(
+				line_drawer.border(
 					image_size,
 					screen_space.pos,
 					screen_space.rotation,
@@ -56,13 +56,28 @@ void draw_editor_elements(
 				color
 			);
 
-			drawer.border(
+			line_drawer.border(
 				image_size,
 				screen_space.pos,
 				screen_space.rotation,
 				color,
 				border_input { 1, 2 }
 			);
+
+			if (const auto marker = typed_handle.template find<invariants::box_marker>()) {
+				const auto size = typed_handle.get_logical_size();
+
+				line_drawer.border_dashed(
+					size * cone.eye.zoom,
+					screen_space.pos,
+					screen_space.rotation,
+					color,
+					5.0,
+					0.0,
+					0.0,
+					border_input { 1, 0 }
+				);
+			}
 		}	
 	);
 

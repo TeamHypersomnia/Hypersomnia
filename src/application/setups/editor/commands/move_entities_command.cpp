@@ -226,6 +226,12 @@ static void resize_entities(
 							else if constexpr(std::is_same_v<T, transformr>) {
 								transform.pos = new_pos;
 							}
+							else if constexpr(std::is_same_v<T, vec2>) {
+								transform = new_pos;
+							}
+							else {
+								static_assert(always_false_v<T>);
+							}
 						};
 
 						vec2 desired_size = current_size;

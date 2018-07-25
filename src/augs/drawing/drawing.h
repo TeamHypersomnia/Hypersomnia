@@ -292,6 +292,29 @@ namespace augs {
 			float dash_velocity,
 			double global_time_seconds
 		) const;
+
+		self border(
+			atlas_entry,
+			vec2 size,
+			vec2 pos,
+			float rotation,
+			rgba color,
+			border_input = border_input()
+		) const;
+
+		self border_dashed(
+			atlas_entry,
+			vec2 size,
+			vec2 pos,
+			float rotation,
+			rgba color,
+
+			float dash_length,
+			float dash_velocity,
+			double global_time_seconds,
+
+			border_input = border_input()
+		) const;
 	};
 
 	struct line_drawer_with_default : public line_drawer {
@@ -320,6 +343,18 @@ namespace augs {
 		template <class... Args>
 		self dashed_line(Args&&... args) const {
 			base::dashed_line(default_texture, std::forward<Args>(args)...);
+			return *this;
+		}
+
+		template <class... Args>
+		self border(Args&&... args) const {
+			base::border(default_texture, std::forward<Args>(args)...);
+			return *this;
+		}
+
+		template <class... Args>
+		self border_dashed(Args&&... args) const {
+			base::border_dashed(default_texture, std::forward<Args>(args)...);
 			return *this;
 		}
 	};

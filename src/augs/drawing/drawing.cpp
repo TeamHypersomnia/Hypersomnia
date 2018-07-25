@@ -515,4 +515,62 @@ namespace augs {
 
 		return *this;
 	}
+
+	const line_drawer& line_drawer::border(
+		const atlas_entry tex,
+		const vec2 size,
+		const vec2 pos,
+		const float rotation,
+		const rgba color,
+		const border_input in
+	) const {
+		auto bordered = ltrb::center_and_size(pos, size);
+
+		augs::general_border(
+			bordered.round_fract(),
+			in.get_total_expansion(),
+			in.width,
+			[&](const ltrb line) {
+				auto verts = line.get_vertices<real32>();
+
+				for (auto& v : verts) {
+					v.rotate(rotation, pos);
+				}
+
+				const auto tris = make_sprite_triangles(tex, verts, color);
+
+				output_buffer.push_back({ tris[0].vertices[0], tris[0].vertices[1] });
+			}
+		);
+
+		return *this;
+	}
+
+	const line_drawer& line_drawer::border_dashed(
+		const atlas_entry tex,
+		const vec2 size,
+		const vec2 pos,
+		const float rotation,
+		const rgba color,
+
+		float dash_length,
+		float dash_velocity,
+		double global_time_seconds,
+
+		const border_input in
+	) const {
+		auto bordered = ltrb::center_and_size(pos, size);
+
+		augs::general_border_from_to(
+			bordered.round_fract(),
+			in.get_total_expansion(),
+			[&](vec2 from, vec2 to) {
+				from.rotate(rotation, pos);
+				to.rotate(rotation, pos);
+				dashed_line(tex, from, to, color, dash_length, dash_velocity, global_time_seconds);
+			}
+		);
+
+		return *this;
+	}
 }
