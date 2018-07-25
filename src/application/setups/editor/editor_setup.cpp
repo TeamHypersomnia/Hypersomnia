@@ -177,9 +177,6 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 		config.interpolation.enabled = false;
 		config.drawing.draw_area_markers = false;
 	}
-	else {
-		config.drawing.draw_area_markers = true;
-	}
 
 	return;
 }

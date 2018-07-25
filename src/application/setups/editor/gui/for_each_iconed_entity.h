@@ -28,7 +28,7 @@ struct marker_icon {
 	}
 
 	marker_icon(const invariants::point_marker& p) {
-		if (p.type == point_marker_type::SPAWN) {
+		if (p.type == point_marker_type::TEAM_SPAWN) {
 			id = I::EDITOR_ICON_SPAWN;
 			col = get_faction_color(p.meta.associated_faction);
 		}

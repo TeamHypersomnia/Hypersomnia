@@ -205,6 +205,7 @@ void settings_gui_state::perform(
 
 				revertable_checkbox("Draw weapon laser", config.drawing.draw_weapon_laser);
 				revertable_checkbox("Draw crosshairs", config.drawing.draw_crosshairs);
+				revertable_checkbox("Draw area markers", config.drawing.draw_area_markers);
 				// revertable_checkbox("Draw gameplay GUI", config.drawing.draw_character_gui); revert(config.drawing.draw_character_gui);
 				break;
 			}

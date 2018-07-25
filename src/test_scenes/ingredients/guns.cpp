@@ -591,6 +591,7 @@ namespace test_flavours {
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BILMER2000, white);
 			test_flavours::add_see_through_dynamic_body(meta).density = 0.1f;
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE);
+			meta.get<invariants::item>().standard_price = 3100;
 		}
 
 		{
@@ -639,6 +640,7 @@ namespace test_flavours {
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::VINDICATOR_SHOOT_1, white);
 			test_flavours::add_see_through_dynamic_body(meta);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE);
+			meta.get<invariants::item>().standard_price = 2900;
 		}
 
 		{
@@ -697,6 +699,7 @@ namespace test_flavours {
 
 			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].only_allow_flavour = ::to_entity_flavour_id(test_container_items::LEWSII_MAG);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::LEWSII_DRAW);
+			meta.get<invariants::item>().standard_price = 5000;
 		}
 
 		{
@@ -746,6 +749,7 @@ namespace test_flavours {
 			test_flavours::add_see_through_dynamic_body(meta);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::PLASMA_DRAW);
+			meta.get<invariants::item>().standard_price = 4000;
 		}
 
 		{
@@ -788,6 +792,7 @@ namespace test_flavours {
 			test_flavours::add_see_through_dynamic_body(meta);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
+			meta.get<invariants::item>().standard_price = 500;
 		}
 
 		{
@@ -822,6 +827,7 @@ namespace test_flavours {
 			item.space_occupied_per_charge = to_space_units("3.0");
 			item.holding_stance = item_holding_stance::RIFLE_LIKE;
 			meta.set(item);
+			meta.get<invariants::item>().standard_price = 2500;
 		}
 	}
 }

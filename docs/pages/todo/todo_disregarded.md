@@ -220,3 +220,6 @@ summary: Just a hidden scratchpad.
 	- some warning perhaps could be in order?
 	- I guess we should just create separate layers if this is so important
 
+
+- Each team game mode exposes functions: add_player(faction_type), remove_player(faction_type)
+	- statically dispatching it

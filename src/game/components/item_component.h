@@ -21,6 +21,7 @@
 
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
+#include "game/detail/economy/money_type.h"
 
 struct perform_transfer_result {
 	std::optional<messages::queue_destruction> destructed;
@@ -129,6 +130,7 @@ namespace invariants {
 		sound_effect_input wear_sound;
 
 		item_category_flagset categories_for_slot_compatibility = { item_category::GENERAL };
+		money_type standard_price = 1000;
 		// END GEN INTROSPECTOR
 	};
 }

@@ -6,10 +6,36 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Modes aren't concerned with the currently viewed entity
+	- except test scene mode
+
+- Testbed should populate the test scene mode profile that it is passed
+
+- "I" in editor invokes initialization routine of the chosen game mode
+	- Just starts advancing it from the beginning.
+
+- Who spawns the initial player entities?
+	- And who synchronizes it with all connected endpoints?
+		- Modes accept messages and handle it in the next step
+			- So we have another kind of a cosmos
+		- mode_messages::player_existence
+			- For FFA, we just ignore the associated faction
+
+- team & ffa matches should get different logic altogether
+
+- basic_team_mode
+	- round time
+	- number of rounds
+
 - Test scene game mode
 	- The first to be implemented as an architectural draft
 - FFA game mode
 	- Win condition: None, there is only time limit.
+- Duel game mode
+	- Win condition: same as TDM, just will be less players
+	- Just different kinds of spawns
+	- **Actually, we won't create special purpose logic for duels.**
+		- There will just be specific maps for playing TDM as duel.
 - Team deathmatch game mode
 	- Win condition: Consciousness status of any entity of CT side
 - Bomb defuse game mode
@@ -18,6 +44,14 @@ summary: That which we are brainstorming at the moment.
 	- Win condition: Consciousness status of any entity of CT side
 
 - Game modes shall be separated into immutable & instance
+	- The instance will probably have a mutable copy of the immutable, anyway, for admin tweaks
+
+- Map won't define that "a weapon can't be bought here".
+	- It will only provide a list of ready-to-be-used profiles where this could be specified.
+
+- To avoid transmitting some server-decided seed for the beginning of each round (e.g. to position players around)...
+	- ...we can just derive a hash of all inputs from the previous round, or just hash entire cosmos state
+	- this way we are unpredictable about it but still deterministic
 
 - Game-mode profiles
 	- Each map can specify a "profile" with sensible values for a deathmatch, tdm, etc.

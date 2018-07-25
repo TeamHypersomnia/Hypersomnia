@@ -11,7 +11,7 @@ struct marker_meta {
 namespace invariants {
 	struct point_marker {
 		// GEN INTROSPECTOR struct invariants::point_marker
-		point_marker_type type = point_marker_type::SPAWN;
+		point_marker_type type = point_marker_type::TEAM_SPAWN;
 		marker_meta meta;
 		// END GEN INTROSPECTOR
 	};
