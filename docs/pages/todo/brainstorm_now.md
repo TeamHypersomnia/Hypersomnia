@@ -6,6 +6,17 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Bomb logic
+	- Arming counter is increased when:
+		- Player is inside the bombsite area
+		- Player has all movement flags unset (except shift for sprint)
+	- Arming counter is reset when any of WSAD flags goes true
+	- Unarming counter is increased when:
+		- Player is inside the bombsite area
+		- Player has all movement flags unset (except shift for sprint)
+	- arming/unarming durations inside explosive invariant
+	- defusable_by boolset with factions
+
 - Modes aren't concerned with the currently viewed entity
 	- except test scene mode
 

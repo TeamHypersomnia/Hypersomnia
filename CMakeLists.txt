@@ -576,7 +576,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/imgui/imgui_controls.cpp"
 	"src/augs/readwrite/readwrite_tests.cpp"
 	"src/game/components/trace_component.cpp"
-	"src/game/cosmos/standard_solver.cpp"
+	"src/game/cosmos/solvers/standard_solver.cpp"
 	"src/game/cosmos/cosmos_solvable.cpp"
 	"src/game/cosmos/cosmos_common.cpp"
 	"src/game/detail/inventory/perform_transfer.cpp"

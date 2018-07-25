@@ -1,7 +1,7 @@
 #include "game/organization/all_messages_includes.h"
 #include "game/organization/all_component_includes.h"
 
-#include "game/cosmos/standard_solver.h"
+#include "game/cosmos/solvers/standard_solver.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/data_living_one_step.h"
