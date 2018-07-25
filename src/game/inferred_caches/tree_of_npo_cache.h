@@ -7,7 +7,7 @@
 
 #include "game/enums/tree_of_npo_type.h"
 #include "game/inferred_caches/inferred_cache_common.h"
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_handle_declaration.h"
 
 #include "augs/math/camera_cone.h"
 /* NPO stands for "non-physical objects" */

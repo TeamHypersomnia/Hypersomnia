@@ -3,7 +3,7 @@
 #include "augs/pad_bytes.h"
 #include "augs/math/vec2.h"
 
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 #include "game/components/transform_component.h"
 
 namespace components {

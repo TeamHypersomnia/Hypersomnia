@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/misc/constant_size_vector.h"
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_handle_declaration.h"
 #include "game/enums/slot_function.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
 #include "game/detail/inventory/item_transfer_result.h"

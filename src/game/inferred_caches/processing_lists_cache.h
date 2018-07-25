@@ -6,8 +6,8 @@
 
 #include "game/enums/processing_subjects.h"
 
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_id.h"
+#include "game/cosmos/entity_handle_declaration.h"
 
 using all_processing_flags = augs::enum_boolset<processing_subjects>;
 

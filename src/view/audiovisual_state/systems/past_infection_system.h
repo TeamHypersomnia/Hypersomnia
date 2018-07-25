@@ -1,7 +1,7 @@
 #pragma once
 #include <vector>
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_handle_declaration.h"
+#include "game/cosmos/entity_id.h"
 #include <unordered_set>
 
 class past_infection_system {

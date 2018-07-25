@@ -2,8 +2,8 @@
 #include "game/container_sizes.h"
 
 #include "augs/math/vec2.h"
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_id.h"
+#include "game/cosmos/entity_handle_declaration.h"
 
 #include "augs/pad_bytes.h"
 

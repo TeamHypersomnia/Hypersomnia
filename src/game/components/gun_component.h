@@ -8,9 +8,9 @@
 
 #include "game/enums/gun_action_type.h"
 
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/step_declaration.h"
-#include "game/transcendental/entity_flavour_id.h"
+#include "game/cosmos/entity_id.h"
+#include "game/cosmos/step_declaration.h"
+#include "game/cosmos/entity_flavour_id.h"
 
 #include "game/components/render_component.h"
 

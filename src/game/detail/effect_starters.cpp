@@ -1,6 +1,6 @@
 #include "game/detail/effect_starters.h"
 #include "game/messages/start_particle_effect.h"
-#include "game/transcendental/logic_step.h"
+#include "game/cosmos/logic_step.h"
 
 void fire_and_forget_particle_effect(
 	const particle_effect_input in,

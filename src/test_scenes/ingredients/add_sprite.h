@@ -4,8 +4,8 @@
 #include "game/components/sprite_component.h"
 #include "game/components/render_component.h"
 
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/cosmos.h"
 
 #include "game/enums/filters.h"
 #include "view/viewables/image_cache.h"

@@ -3,7 +3,7 @@
 #include "game/messages/message.h"
 #include "augs/math/vec2.h"
 
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 #include "game/components/transform_component.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/assets/ids/asset_ids.h"

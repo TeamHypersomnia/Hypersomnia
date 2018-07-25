@@ -1,8 +1,8 @@
 #pragma once
 #include "augs/misc/timing/stepped_timing.h"
 #include "game/detail/spells/spell_structs.h"
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/entity_flavour_id.h"
+#include "game/cosmos/entity_handle_declaration.h"
+#include "game/cosmos/entity_flavour_id.h"
 
 struct spell_logic_input;
 

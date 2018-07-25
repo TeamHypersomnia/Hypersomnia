@@ -3,7 +3,7 @@
 
 #include "augs/graphics/vertex.h"
 #include "game/components/sentience_component.h"
-#include "game/transcendental/entity_handle.h"
+#include "game/cosmos/entity_handle.h"
 #include "augs/texture_atlas/atlas_entry.h"
 
 #include "augs/drawing/drawing.h"

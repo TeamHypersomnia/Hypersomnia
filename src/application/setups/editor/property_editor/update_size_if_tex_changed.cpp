@@ -1,5 +1,5 @@
 #include "augs/string/string_templates.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "application/setups/editor/property_editor/update_size_if_tex_changed.h"
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/detail/find_free_name.h"

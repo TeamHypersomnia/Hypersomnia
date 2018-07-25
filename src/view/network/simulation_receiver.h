@@ -5,7 +5,7 @@
 #include "augs/network/jitter_buffer.h"
 
 #include "game/components/transform_component.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 
 #include "view/network/network_commands.h"
 #include "view/network/step_packaged_for_network.h"

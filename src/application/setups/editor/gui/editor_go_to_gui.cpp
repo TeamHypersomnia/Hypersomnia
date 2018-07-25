@@ -4,8 +4,8 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "3rdparty/imgui/imgui_internal.h"
 
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/cosmos.h"
 
 #include "application/setups/editor/editor_view.h"
 #include "application/setups/editor/editor_settings.h"

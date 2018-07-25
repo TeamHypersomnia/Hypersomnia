@@ -1,6 +1,6 @@
 #pragma once
 #include <thread>
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "augs/network/reliable_channel.h"
 
 class entropy_accepter {

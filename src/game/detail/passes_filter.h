@@ -2,7 +2,7 @@
 
 #include "augs/templates/maybe.h"
 #include "game/detail/render_layer_filter.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 
 inline bool passes_filter(
 	const augs::maybe<render_layer_filter>& filter, 

@@ -20,7 +20,7 @@
 #define B2_JOINT_H
 
 #include <Box2D/Common/b2Math.h>
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 
 typedef unversioned_entity_id joint_userdata;
 

@@ -5,8 +5,8 @@
 #include "game/components/driver_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/movement_component.h"
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/cosmos.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 
 bool are_connected_by_friction(

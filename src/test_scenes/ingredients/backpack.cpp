@@ -1,6 +1,6 @@
 #include "test_scenes/ingredients/ingredients.h"
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/cosmos.h"
 
 #include "game/enums/item_category.h"
 #include "game/assets/all_logical_assets.h"
@@ -9,7 +9,7 @@
 #include "game/components/container_component.h"
 #include "game/components/item_component.h"
 
-#include "game/transcendental/entity_handle.h"
+#include "game/cosmos/entity_handle.h"
 
 namespace test_flavours {
 	void populate_backpack_flavours(const populate_flavours_input in) {

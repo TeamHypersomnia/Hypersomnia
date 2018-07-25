@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/enums/callback_result.h"
 #include "game/organization/all_components_declaration.h"
-#include "game/transcendental/entity_flavour_id.h"
+#include "game/cosmos/entity_flavour_id.h"
 
 #include "application/setups/editor/commands/editor_command_structs.h"
 #include "application/setups/editor/commands/change_property_command.h"

@@ -3,8 +3,8 @@
 
 #include "augs/misc/timing/delta.h"
 
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/cosmic_entropy.h"
+#include "game/cosmos/entity_handle_declaration.h"
+#include "game/cosmos/cosmic_entropy.h"
 
 #include "game/detail/inventory/item_slot_transfer_request.h"
 #include "game/detail/spells/all_spells.h"

@@ -1,7 +1,7 @@
 #include "augs/misc/randomization.h"
 #include "augs/templates/container_templates.h"
 
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 
 #include "view/viewables/all_viewables_declarations.h"
 #include "view/viewables/particle_effect.h"

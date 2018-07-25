@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/misc/enum/enum_boolset.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 #include "game/enums/attitude_type.h"
 #include "game/enums/faction_type.h"
 

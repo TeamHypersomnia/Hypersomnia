@@ -1,8 +1,8 @@
 #include "augs/gui/text/printer.h"
 #include "augs/templates/introspect.h"
 
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/cosmos.h"
 
 #include "view/frame_profiler.h"
 #include "view/audiovisual_state/audiovisual_profiler.h"

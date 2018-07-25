@@ -1,9 +1,9 @@
 #include "pathfinding_system.h"
 #include "game/detail/physics/physics_queries.h"
 
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/logic_step.h"
-#include "game/transcendental/data_living_one_step.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/logic_step.h"
+#include "game/cosmos/data_living_one_step.h"
 
 #include "game/inferred_caches/physics_world_cache.h"
 
@@ -12,7 +12,7 @@
 #include "game/components/fixtures_component.h"
 #include "game/messages/visibility_information.h"
 
-#include "game/transcendental/entity_handle.h"
+#include "game/cosmos/entity_handle.h"
 #include "game/detail/physics/physics_scripts.h"
 #include "game/messages/visibility_information.h"
 #include "game/debug_drawing_settings.h"

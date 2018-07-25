@@ -1,6 +1,6 @@
 #include "augs/math/steering.h"
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/entity_handle.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
 
 #include "game/assets/animation_math.h"
 #include "game/detail/visible_entities.h"

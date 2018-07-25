@@ -1,10 +1,10 @@
 #include "game/messages/queue_destruction.h"
 #include "game/stateless_systems/remnant_system.h"
 
-#include "game/transcendental/data_living_one_step.h"
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/logic_step.h"
+#include "game/cosmos/data_living_one_step.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/logic_step.h"
 
 void remnant_system::shrink_and_destroy_remnants(const logic_step step) const {
 	auto& cosm = step.get_cosmos();

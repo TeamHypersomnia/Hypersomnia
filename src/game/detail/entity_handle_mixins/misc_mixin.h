@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/templates/identity_templates.h"
 
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 
 #include "game/enums/entity_flag.h"
 
@@ -9,7 +9,7 @@
 #include "game/components/sentience_component.h"
 #include "game/components/crosshair_component.h"
 
-#include "game/transcendental/specific_entity_handle_declaration.h"
+#include "game/cosmos/specific_entity_handle_declaration.h"
 #include "game/detail/sentience_shake.h"
 #include "augs/math/physics_structs.h"
 

@@ -1,7 +1,7 @@
 #include "game/detail/describers.h"
 
 #include "augs/templates/container_templates.h"
-#include "game/transcendental/entity_handle.h"
+#include "game/cosmos/entity_handle.h"
 
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/components/melee_component.h"
@@ -14,7 +14,7 @@
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/detail/inventory/inventory_slot_id.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 
 entity_name_str describe_names_of(const name_accumulator& counts) {
 	if (counts.empty()) {

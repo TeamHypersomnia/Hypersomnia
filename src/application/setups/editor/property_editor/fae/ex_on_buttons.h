@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
-#include "game/transcendental/entity_flavour_id.h"
+#include "game/cosmos/entity_flavour_id.h"
 #include "application/setups/editor/property_editor/fae/fae_tree_structs.h"
 
 template <class E>

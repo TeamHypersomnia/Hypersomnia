@@ -10,10 +10,10 @@
 #include "game/messages/health_event.h"
 #include "game/messages/exhausted_cast_message.h"
 
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/logic_step.h"
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/data_living_one_step.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/logic_step.h"
+#include "game/cosmos/entity_id.h"
+#include "game/cosmos/data_living_one_step.h"
 
 #include "game/components/rigid_body_component.h"
 #include "game/components/container_component.h"

@@ -1,4 +1,4 @@
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "game/assets/all_logical_assets.h"
 #include "game/components/rigid_body_component.h"
 #include "game/components/fixtures_component.h"
@@ -6,7 +6,7 @@
 #include "game/components/sprite_component.h"
 
 #include "game/enums/filters.h"
-#include "game/transcendental/entity_handle.h"
+#include "game/cosmos/entity_handle.h"
 
 namespace test_flavours {
 	template <class E>

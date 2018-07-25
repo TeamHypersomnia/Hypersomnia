@@ -1,5 +1,5 @@
 #pragma once
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_handle_declaration.h"
 
 template <class> 
 class basic_inventory_slot_handle;

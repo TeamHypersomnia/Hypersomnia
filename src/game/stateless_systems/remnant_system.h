@@ -1,5 +1,5 @@
 #pragma once
-#include "game/transcendental/step_declaration.h"
+#include "game/cosmos/step_declaration.h"
 
 class remnant_system {
 public:

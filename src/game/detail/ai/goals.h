@@ -2,7 +2,7 @@
 #include <tuple>
 #include <vector>
 
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 #include "game/detail/entity_scripts.h"
 
 namespace behaviours {

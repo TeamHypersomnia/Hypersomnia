@@ -1,5 +1,5 @@
 #pragma once
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 #include "augs/math/vec2.h"
 #include "augs/pad_bytes.h"
 #include "augs/misc/timing/stepped_timing.h"

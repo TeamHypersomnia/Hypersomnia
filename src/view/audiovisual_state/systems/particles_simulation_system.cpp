@@ -3,9 +3,9 @@
 
 #include "augs/misc/randomization.h"
 
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/data_living_one_step.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/data_living_one_step.h"
 
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"

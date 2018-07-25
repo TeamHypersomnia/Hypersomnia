@@ -1,5 +1,5 @@
 #pragma once
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "application/setups/editor/property_editor/widgets/keyboard_acquiring_popup.h"
 #include "application/setups/editor/detail/maybe_different_colors.h"
 #include "application/setups/editor/property_editor/tweaker_type.h"

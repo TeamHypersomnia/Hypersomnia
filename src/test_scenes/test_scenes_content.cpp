@@ -1,5 +1,5 @@
 #include "game/assets/all_logical_assets.h"
-#include "game/transcendental/cosmos_common_significant.h"
+#include "game/cosmos/cosmos_common_significant.h"
 #include "view/viewables/all_viewables_defs.h"
 #include "test_scenes/test_scenes_content.h"
 #include "test_scenes/test_scene_flavours.h"

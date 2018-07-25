@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 #include "application/setups/editor/commands/change_property_command.h"
 #include "application/setups/editor/commands/editor_command_structs.h"
 #include "application/setups/editor/editor_command_input.h"

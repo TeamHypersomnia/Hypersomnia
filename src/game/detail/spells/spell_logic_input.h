@@ -1,7 +1,7 @@
 #pragma once
-#include "game/transcendental/logic_step.h"
+#include "game/cosmos/logic_step.h"
 #include "augs/misc/timing/stepped_timing.h"
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_handle_declaration.h"
 
 namespace components {
 	struct sentience;

@@ -1,6 +1,6 @@
 #pragma once
 #include "game/assets/ids/asset_ids.h"
-#include "game/transcendental/entity_flavour_id.h"
+#include "game/cosmos/entity_flavour_id.h"
 
 namespace invariants {
 	struct cartridge {

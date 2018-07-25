@@ -1,8 +1,8 @@
 #pragma once
-#include "game/transcendental/cosmic_entropy.h"
-#include "game/transcendental/step_declaration.h"
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/standard_solver.h"
+#include "game/cosmos/cosmic_entropy.h"
+#include "game/cosmos/step_declaration.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/standard_solver.h"
 
 class cosmos;
 class loaded_image_caches_map;

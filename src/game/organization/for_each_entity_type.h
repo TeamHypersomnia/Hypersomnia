@@ -2,7 +2,7 @@
 #include "augs/templates/for_each_type.h"
 #include "augs/templates/type_list.h"
 
-#include "game/transcendental/entity_solvable.h"
+#include "game/cosmos/entity_solvable.h"
 
 template <class F>
 void for_each_entity_type(F&& callback) {

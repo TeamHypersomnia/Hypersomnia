@@ -6,10 +6,10 @@
 
 #include "augs/misc/pool/pool_structs.h"
 
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/entity_id_declaration.h"
-#include "game/transcendental/per_entity_type.h"
-#include "game/transcendental/entity_solvable.h"
+#include "game/cosmos/entity_handle_declaration.h"
+#include "game/cosmos/entity_id_declaration.h"
+#include "game/cosmos/per_entity_type.h"
+#include "game/cosmos/entity_solvable.h"
 
 #include "application/setups/editor/commands/editor_command_structs.h"
 

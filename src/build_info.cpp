@@ -3,11 +3,11 @@
 #include "augs/templates/algorithm_templates.h"
 #include "augs/filesystem/file.h"
 
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "game/organization/for_each_component_type.h"
 #include "game/organization/all_component_includes.h"
 #include "game/organization/all_entity_types.h"
-#include "game/transcendental/entity_solvable.h"
+#include "game/cosmos/entity_solvable.h"
 #include "game/organization/for_each_entity_type.h"
 #include "augs/misc/readable_bytesize.h"
 

@@ -9,9 +9,9 @@
 
 #include "game/detail/inventory/inventory_slot_id.h"
 
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/component_synchronizer.h"
-#include "game/transcendental/cosmos_solvable_inferred_access.h"
+#include "game/cosmos/entity_handle_declaration.h"
+#include "game/cosmos/component_synchronizer.h"
+#include "game/cosmos/cosmos_solvable_inferred_access.h"
 
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/detail/inventory/item_slot_transfer_request_declaration.h"

@@ -1,13 +1,13 @@
 #include "game/detail/ai/behaviours.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 
 #include "game/components/attitude_component.h"
 #include "game/components/movement_component.h"
 #include "game/components/pathfinding_component.h"
 #include "game/detail/entity_scripts.h"
 
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/logic_step.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/logic_step.h"
 
 namespace behaviours {
 	tree::goal_availability explore_in_search_for_last_seen_target::goal_resolution(tree::state_of_traversal& t) const {

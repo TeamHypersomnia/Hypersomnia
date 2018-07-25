@@ -1,8 +1,8 @@
 #include "augs/templates/container_templates.h"
 #include "game/inferred_caches/physics_world_cache.h"
 #include "game/components/fixtures_component.h"
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/logic_step.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/logic_step.h"
 #include "physics_scripts.h"
 
 void physics_world_cache::rechoose_owner_friction_body(const entity_handle entity) {

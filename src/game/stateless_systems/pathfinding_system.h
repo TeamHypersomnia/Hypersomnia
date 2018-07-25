@@ -1,6 +1,6 @@
 #pragma once
 class cosmos;
-#include "game/transcendental/step_declaration.h"
+#include "game/cosmos/step_declaration.h"
 
 class pathfinding_system {
 public:

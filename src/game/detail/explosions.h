@@ -6,8 +6,8 @@
 
 #include "game/assets/ids/asset_ids.h"
 #include "game/components/transform_component.h"
-#include "game/transcendental/step_declaration.h"
-#include "game/transcendental/entity_id_declaration.h"
+#include "game/cosmos/step_declaration.h"
+#include "game/cosmos/entity_id_declaration.h"
 #include "game/enums/adverse_element_type.h"
 #include "game/detail/sentience_shake.h"
 

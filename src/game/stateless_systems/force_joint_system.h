@@ -1,5 +1,5 @@
 #pragma once
-#include "game/transcendental/step_declaration.h"
+#include "game/cosmos/step_declaration.h"
 
 class force_joint_system {
 public:

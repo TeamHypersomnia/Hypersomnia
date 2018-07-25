@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/pad_bytes.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 
 namespace components {
 	struct driver {

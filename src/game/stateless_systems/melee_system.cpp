@@ -1,6 +1,6 @@
 #include "melee_system.h"
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_id.h"
 
 #include "game/messages/intent_message.h"
 #include "game/messages/melee_swing_response.h"
@@ -10,9 +10,9 @@
 #include "game/components/missile_component.h"
 #include "game/components/fixtures_component.h"
 
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/logic_step.h"
-#include "game/transcendental/data_living_one_step.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/logic_step.h"
+#include "game/cosmos/data_living_one_step.h"
 
 using namespace augs;
 

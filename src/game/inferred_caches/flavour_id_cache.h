@@ -2,12 +2,12 @@
 #include <unordered_set>
 #include <unordered_map>
 
-#include "game/transcendental/per_entity_type.h"
+#include "game/cosmos/per_entity_type.h"
 
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_id.h"
+#include "game/cosmos/entity_handle_declaration.h"
 
-#include "game/transcendental/entity_flavour_id.h"
+#include "game/cosmos/entity_flavour_id.h"
 
 class flavour_id_cache {
 	template <class T>

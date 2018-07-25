@@ -1,6 +1,6 @@
 #include "rendering_scripts.h"
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/cosmos.h"
 #include "game/components/gun_component.h"
 #include "game/components/explosive_component.h"
 #include "augs/drawing/drawing.h"

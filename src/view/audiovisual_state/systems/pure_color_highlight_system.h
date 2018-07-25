@@ -5,7 +5,7 @@
 #include "augs/graphics/vertex.h"
 
 #include "view/viewables/all_viewables_declarations.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 #include "game/components/transform_component.h"
 
 class cosmos;

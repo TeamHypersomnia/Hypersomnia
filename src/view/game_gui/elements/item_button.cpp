@@ -3,8 +3,8 @@
 #include "augs/gui/text/printer.h"
 #include "augs/string/string_templates.h"
 
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/entity_handle.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
 
 #include "game/enums/item_category.h"
 #include "game/detail/inventory/inventory_slot.h"

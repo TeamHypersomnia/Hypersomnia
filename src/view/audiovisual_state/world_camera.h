@@ -3,7 +3,7 @@
 #include "game/components/transform_component.h"
 #include "augs/misc/smooth_value_field.h"
 #include "augs/math/camera_cone.h"
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_handle_declaration.h"
 
 namespace augs {
 	class delta;

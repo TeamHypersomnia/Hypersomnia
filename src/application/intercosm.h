@@ -1,9 +1,9 @@
 #pragma once
 #include "game/assets/all_logical_assets.h"
 
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/cosmic_entropy.h"
-#include "game/transcendental/standard_solver.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/cosmic_entropy.h"
+#include "game/cosmos/standard_solver.h"
 
 #include "view/viewables/all_viewables_defs.h"
 #include "hypersomnia_version.h"

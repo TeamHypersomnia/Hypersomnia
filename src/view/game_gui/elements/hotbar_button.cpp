@@ -1,7 +1,7 @@
 #include "augs/templates/container_templates.h"
 #include "hotbar_button.h"
 #include "augs/gui/button_corners.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "view/game_gui/elements/item_button.h"
 #include "game/components/item_component.h"
 #include "view/game_gui/elements/character_gui.h"

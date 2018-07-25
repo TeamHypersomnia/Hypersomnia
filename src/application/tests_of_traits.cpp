@@ -7,7 +7,7 @@
 
 #include "augs/readwrite/memory_stream.h"
 
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "game/organization/all_component_includes.h"
 
 #include "augs/templates/get_index_type_for_size_of.h"

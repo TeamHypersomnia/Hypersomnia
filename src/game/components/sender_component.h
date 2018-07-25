@@ -1,6 +1,6 @@
 #pragma once
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_id.h"
+#include "game/cosmos/entity_handle_declaration.h"
 
 namespace components {
 	struct sender {

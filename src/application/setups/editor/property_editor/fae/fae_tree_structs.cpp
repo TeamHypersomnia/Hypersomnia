@@ -1,4 +1,4 @@
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 
 #include "application/setups/editor/property_editor/fae/fae_tree_structs.h"
 

@@ -4,9 +4,9 @@
 
 #include "augs/ensure.h"
 
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/logic_step.h"
+#include "game/cosmos/entity_id.h"
+#include "game/cosmos/entity_handle_declaration.h"
+#include "game/cosmos/logic_step.h"
 
 #include "game/detail/ai/goals.h"
 

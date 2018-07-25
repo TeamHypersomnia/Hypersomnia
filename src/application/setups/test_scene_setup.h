@@ -6,8 +6,8 @@
 #include "game/detail/render_layer_filter.h"
 #include "game/assets/all_logical_assets.h"
 #include "game/organization/all_component_includes.h"
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/entity_handle.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
 
 #include "view/viewables/all_viewables_defs.h"
 #include "test_scenes/test_scene_settings.h"

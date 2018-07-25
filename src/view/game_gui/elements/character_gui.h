@@ -11,7 +11,7 @@
 #include "game/enums/slot_function.h"
 
 #include "game/container_sizes.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 #include "view/game_gui/elements/drag_and_drop_target_drop_item.h"
 #include "view/game_gui/elements/hotbar_button.h"
 #include "view/game_gui/elements/action_button.h"

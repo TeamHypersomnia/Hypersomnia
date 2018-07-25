@@ -4,7 +4,7 @@
 
 #include "game/enums/filters.h"
 
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 
 #include "game/inferred_caches/physics_world_cache.h"
 

@@ -4,7 +4,7 @@ namespace messages {
 	struct health_event;
 }
 
-#include "game/transcendental/step_declaration.h"
+#include "game/cosmos/step_declaration.h"
 
 class sentience_system {
 public:

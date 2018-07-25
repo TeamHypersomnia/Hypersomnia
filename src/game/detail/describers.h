@@ -2,14 +2,14 @@
 #include <string>
 #include <map>
 
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_handle_declaration.h"
 #include "game/enums/slot_function.h"
 #include "game/enums/item_category.h"
 
-#include "game/transcendental/entity_flavour_id.h"
+#include "game/cosmos/entity_flavour_id.h"
 #include "game/common_state/entity_flavours.h"
 
 /*

@@ -1,6 +1,6 @@
 #include "rendering_scripts.h"
 #include "augs/drawing/drawing.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "game/components/sprite_component.h"
 #include "game/components/hand_fuse_component.h"
 #include "game/components/fixtures_component.h"

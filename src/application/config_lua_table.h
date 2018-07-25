@@ -7,7 +7,7 @@
 #include "augs/graphics/rgba.h"
 #include "augs/image/font.h"
 
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_handle_declaration.h"
 #include "game/enums/game_intent_type.h"
 #include "view/game_drawing_settings.h"
 #include "view/audiovisual_state/world_camera.h"

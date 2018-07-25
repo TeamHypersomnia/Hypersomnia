@@ -3,8 +3,8 @@
 #include "augs/math/rects.h"
 #include "augs/math/simple_physics.h"
 
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_id.h"
+#include "game/cosmos/entity_handle_declaration.h"
 #include "game/components/sprite_component.h"
 
 enum class crosshair_orbit_type {

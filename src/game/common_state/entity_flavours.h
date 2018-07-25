@@ -8,8 +8,8 @@
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/traits/component_traits.h"
 
-#include "game/transcendental/entity_flavour_id.h"
-#include "game/transcendental/per_entity_type.h"
+#include "game/cosmos/entity_flavour_id.h"
+#include "game/cosmos/per_entity_type.h"
 
 #include "game/organization/all_component_includes.h"
 #include "game/organization/all_entity_types_declaration.h"

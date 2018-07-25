@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/templates/introspection_utils/find_object_in_object.h"
 #include "augs/templates/introspection_utils/types_in.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "view/viewables/all_viewables_defs.h"
 
 template <class T>

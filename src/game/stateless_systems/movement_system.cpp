@@ -1,6 +1,6 @@
 #include "augs/math/vec2.h"
 #include "movement_system.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "game/messages/intent_message.h"
 
 #include "game/components/gun_component.h"
@@ -9,9 +9,9 @@
 #include "game/components/movement_component.h"
 #include "game/components/sentience_component.h"
 
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/logic_step.h"
-#include "game/transcendental/data_living_one_step.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/logic_step.h"
+#include "game/cosmos/data_living_one_step.h"
 
 #include "game/stateless_systems/sentience_system.h"
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 
 namespace messages {
 	struct message {

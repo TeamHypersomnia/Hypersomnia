@@ -8,8 +8,8 @@
 
 #include "augs/templates/container_templates.h"
 
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/per_entity_type.h"
+#include "game/cosmos/entity_id.h"
+#include "game/cosmos/per_entity_type.h"
 #include "game/detail/render_layer_filter.h"
 
 #include "application/setups/editor/editor_selection_groups.h"

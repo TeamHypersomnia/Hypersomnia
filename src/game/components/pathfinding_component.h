@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/math/vec2.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 #include "3rdparty/Box2D/Dynamics/b2Fixture.h"
 #include "augs/pad_bytes.h"
 

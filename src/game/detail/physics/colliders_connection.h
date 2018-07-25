@@ -1,5 +1,5 @@
 #pragma once
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 #include "game/components/transform_component.h"
 
 struct colliders_connection {

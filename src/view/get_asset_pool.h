@@ -3,7 +3,7 @@
 #include "game/assets/animation_templates.h"
 #include "game/assets/get_logicals_pool.h"
 
-#include "game/transcendental/cosmos_common_significant_access.h"
+#include "game/cosmos/cosmos_common_significant_access.h"
 
 struct image_definition;
 struct sound_definition;

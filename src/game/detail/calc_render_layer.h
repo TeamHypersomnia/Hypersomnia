@@ -2,7 +2,7 @@
 #include "game/components/render_component.h"
 #include "augs/build_settings/platform_defines.h"
 #include "game/organization/all_component_includes.h"
-#include "game/transcendental/entity_type_traits.h"
+#include "game/cosmos/entity_type_traits.h"
 
 using entities_with_render_layer = entity_types_with_any_of<
 	invariants::render,

@@ -1,6 +1,6 @@
 #include "slot_button.h"
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/cosmos.h"
 
 #include "view/game_gui/elements/item_button.h"
 

@@ -3,7 +3,7 @@
 #include "augs/math/vec2.h"
 #include "view/viewables/particle_types_declaration.h"
 #include "augs/graphics/rgba.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 
 #include "game/detail/view_input/particle_effect_modifier.h"
 #include "game/assets/all_logical_assets.h"

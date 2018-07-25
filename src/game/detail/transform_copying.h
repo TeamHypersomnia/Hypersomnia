@@ -1,7 +1,7 @@
 #pragma once
 #include <variant>
 #include <optional>
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 #include "game/components/transform_component.h"
 
 struct absolute_or_local {

@@ -1,6 +1,6 @@
 #include "test_scenes/ingredients/ingredients.h"
 #include "game/assets/all_logical_assets.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "game/components/fixtures_component.h"
 #include "test_scenes/test_scene_animations.h"
 

@@ -1,4 +1,4 @@
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "game/assets/behaviour_tree.h"
 #include "game/detail/ai/behaviours.h"
 

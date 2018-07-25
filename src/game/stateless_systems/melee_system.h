@@ -1,9 +1,9 @@
 #pragma once
 #include "game/enums/melee_state.h"
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_handle_declaration.h"
 
 class cosmos;
-#include "game/transcendental/step_declaration.h"
+#include "game/cosmos/step_declaration.h"
 
 namespace components {
 	struct melee;

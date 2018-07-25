@@ -2,7 +2,7 @@
 #include <optional>
 
 #include "augs/math/camera_cone.h"
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_handle_declaration.h"
 
 struct intercosm;
 struct editor_view;

@@ -2,7 +2,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 
 namespace augs {
 	struct introspection_access;

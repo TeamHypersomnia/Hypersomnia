@@ -5,8 +5,8 @@
 #include "augs/templates/propagate_const.h"
 
 #include "game/inferred_caches/inferred_cache_common.h"
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/step_declaration.h"
+#include "game/cosmos/entity_handle_declaration.h"
+#include "game/cosmos/step_declaration.h"
 
 #include "game/messages/collision_message.h"
 

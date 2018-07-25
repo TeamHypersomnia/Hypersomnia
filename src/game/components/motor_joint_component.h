@@ -4,8 +4,8 @@
 #include "augs/math/vec2.h"
 #include "augs/math/rects.h"
 
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/component_synchronizer.h"
+#include "game/cosmos/entity_id.h"
+#include "game/cosmos/component_synchronizer.h"
 
 #include "game/enums/colliders_offset_type.h"
 #include "game/assets/ids/asset_ids.h"

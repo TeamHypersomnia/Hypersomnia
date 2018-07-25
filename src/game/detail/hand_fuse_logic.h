@@ -1,7 +1,7 @@
 #pragma once
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/step_declaration.h"
+#include "game/cosmos/entity_handle_declaration.h"
+#include "game/cosmos/entity_id.h"
+#include "game/cosmos/step_declaration.h"
 
 void release_or_throw_fused_object(
 	const logic_step,

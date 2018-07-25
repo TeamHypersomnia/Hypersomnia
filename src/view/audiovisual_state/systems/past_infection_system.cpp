@@ -1,7 +1,7 @@
 #include "augs/templates/container_templates.h"
 #include "past_infection_system.h"
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/cosmos.h"
 #include "game/components/flags_component.h"
 
 void past_infection_system::clear() {

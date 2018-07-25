@@ -5,9 +5,9 @@
 
 #include "game/assets/ids/asset_ids.h"
 
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/step_declaration.h"
-#include "game/transcendental/entity_handle.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/step_declaration.h"
+#include "game/cosmos/entity_handle.h"
 
 #include "game/components/render_component.h"
 #include "game/components/sprite_component.h"

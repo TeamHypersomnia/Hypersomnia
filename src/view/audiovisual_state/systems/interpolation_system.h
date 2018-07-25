@@ -5,8 +5,8 @@
 #include "augs/misc/timing/delta.h"
 #include "augs/misc/pool/pooled_object_id.h"
 
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_id.h"
+#include "game/cosmos/entity_handle_declaration.h"
 
 #include "game/components/transform_component.h"
 

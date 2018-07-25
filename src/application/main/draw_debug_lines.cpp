@@ -1,7 +1,7 @@
 #include "application/main/draw_debug_lines.h"
 
 #include "game/debug_drawing_settings.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "augs/math/camera_cone.h"
 #include "application/config_lua_table.h"
 #include "augs/drawing/drawing.h"

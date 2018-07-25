@@ -1,4 +1,4 @@
-#include "game/transcendental/cosmos_solvable_access.h"
+#include "game/cosmos/cosmos_solvable_access.h"
 
 #include "application/intercosm.h"
 #include "application/setups/editor/editor_folder.h"

@@ -6,7 +6,7 @@
 #include "augs/math/camera_cone.h"
 
 #include "game/enums/game_intent_type.h"
-#include "game/transcendental/entity_handle.h"
+#include "game/cosmos/entity_handle.h"
 
 #include "view/necessary_resources.h"
 

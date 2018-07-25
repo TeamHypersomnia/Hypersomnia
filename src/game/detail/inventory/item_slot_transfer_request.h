@@ -3,7 +3,7 @@
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/traits/triviality_traits.h"
 
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_handle_declaration.h"
 
 #include "game/detail/inventory/item_slot_transfer_request_declaration.h"
 #include "game/detail/inventory/inventory_slot_handle.h"

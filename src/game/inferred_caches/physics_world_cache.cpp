@@ -19,9 +19,9 @@
 #include "game/messages/queue_destruction.h"
 #include "game/messages/will_soon_be_deleted.h"
 
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/logic_step.h"
-#include "game/transcendental/entity_handle.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/logic_step.h"
+#include "game/cosmos/entity_handle.h"
 
 #include "augs/templates/dynamic_cast_dispatch.h"
 #include "augs/build_settings/setting_debug_physics_world_cache_copy.h"

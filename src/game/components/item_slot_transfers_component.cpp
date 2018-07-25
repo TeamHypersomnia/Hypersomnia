@@ -1,7 +1,7 @@
 #include "item_slot_transfers_component.h"
 #include "item_component.h"
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/entity_handle.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
 
 namespace components {
 #if TODO_MOUNTING

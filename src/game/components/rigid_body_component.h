@@ -8,10 +8,10 @@
 #include "augs/misc/timing/stepped_timing.h"
 #include "augs/templates/maybe_const.h"
 
-#include "game/transcendental/entity_type_traits.h"
-#include "game/transcendental/component_synchronizer.h"
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_type_traits.h"
+#include "game/cosmos/component_synchronizer.h"
+#include "game/cosmos/entity_handle_declaration.h"
+#include "game/cosmos/entity_id.h"
 #include "game/debug_drawing_settings.h"
 
 #include "augs/math/si_scaling.h"

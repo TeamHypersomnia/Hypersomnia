@@ -1,15 +1,15 @@
 #include "force_joint_system.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 #include "augs/log.h"
 
 #include "game/components/force_joint_component.h"
 #include "game/components/rigid_body_component.h"
 #include "game/components/transform_component.h"
 
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/logic_step.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/logic_step.h"
 
 void force_joint_system::apply_forces_towards_target_entities(const logic_step step) {
 	auto& cosmos = step.get_cosmos();

@@ -15,8 +15,8 @@
 #include "game/components/sender_component.h"
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/inventory/inventory_slot.h"
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/cosmos.h"
 
 void unset_input_flags_of_orphaned_entity(entity_handle e) {
 	if (auto* const car = e.find<components::car>()) {

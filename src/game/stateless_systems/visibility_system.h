@@ -3,7 +3,7 @@
 #include "game/messages/visibility_information.h"
 
 #include "game/debug_drawing_settings.h"
-#include "game/transcendental/step_declaration.h"
+#include "game/cosmos/step_declaration.h"
 
 using visibility_requests = std::vector<messages::visibility_information_request>;
 using visibility_responses = std::vector<messages::visibility_information_response>;

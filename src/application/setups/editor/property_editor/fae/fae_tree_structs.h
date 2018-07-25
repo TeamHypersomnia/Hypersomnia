@@ -2,10 +2,10 @@
 #include <optional>
 #include <unordered_set>
 
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/entity_flavour_id.h"
+#include "game/cosmos/entity_id.h"
+#include "game/cosmos/entity_flavour_id.h"
 #include "application/setups/editor/property_editor/commanding_property_editor_input.h"
-#include "game/transcendental/per_entity_type.h"
+#include "game/cosmos/per_entity_type.h"
 
 enum class fae_view_type {
 	// GEN INTROSPECTOR enum class fae_view_type

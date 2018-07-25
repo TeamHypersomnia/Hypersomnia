@@ -1,5 +1,5 @@
 #include "crosshair_system.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 
 #include "game/messages/intent_message.h"
 #include "game/messages/motion_message.h"
@@ -11,9 +11,9 @@
 #include "game/components/transform_component.h"
 #include "game/messages/intent_message.h"
 
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/logic_step.h"
-#include "game/transcendental/data_living_one_step.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/logic_step.h"
+#include "game/cosmos/data_living_one_step.h"
 
 vec2 components::crosshair::get_bounds_in_this_look() const {
 	if (orbit_mode == crosshair_orbit_type::ANGLED) {

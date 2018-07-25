@@ -1,6 +1,6 @@
 #pragma once
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/entity_handle.h"
+#include "game/cosmos/entity_handle_declaration.h"
+#include "game/cosmos/entity_handle.h"
 #include "augs/graphics/vertex.h"
 
 #include "augs/math/camera_cone.h"

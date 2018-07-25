@@ -1,6 +1,6 @@
 #pragma once
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_id.h"
+#include "game/cosmos/entity_handle_declaration.h"
 #include "game/components/transform_component.h"
 #include "augs/math/rects.h"
 
@@ -9,7 +9,7 @@
 
 #include "game/enums/item_category.h"
 #include "game/enums/slot_physical_behaviour.h"
-#include "game/transcendental/entity_flavour_id.h"
+#include "game/cosmos/entity_flavour_id.h"
 
 class cosmos;
 

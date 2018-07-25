@@ -7,7 +7,7 @@
 
 #if WAS_VERSION_GENERATOR_BUILT
 #include "augs/string/typesafe_sprintf.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 
 hypersomnia_version::hypersomnia_version() :
 	commit_number(%x),

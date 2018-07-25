@@ -4,7 +4,7 @@
 #include "augs/drawing/sprite.h"
 
 #include "game/components/sprite_component_declaration.h"
-#include "game/transcendental/component_synchronizer.h"
+#include "game/cosmos/component_synchronizer.h"
 
 namespace components {
 	struct sprite {

@@ -4,7 +4,7 @@
 #include "game/detail/physics/physics_queries.h"
 #include "game/detail/visible_entities.h"
 
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "game/components/render_component.h"
 
 #include "game/enums/filters.h"

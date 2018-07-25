@@ -1,6 +1,6 @@
 #pragma once
-#include "game/transcendental/step_declaration.h"
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/step_declaration.h"
+#include "game/cosmos/entity_handle_declaration.h"
 #include "game/components/container_component.h"
 #include "game/detail/inventory/inventory_utils.h"
 #include "game/components/item_component.h"

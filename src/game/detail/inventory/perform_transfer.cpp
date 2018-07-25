@@ -8,11 +8,11 @@
 #include "game/components/motor_joint_component.h"
 #include "game/detail/view_input/sound_effect_input.h"
 
-#include "game/transcendental/logic_step.h"
-#include "game/transcendental/data_living_one_step.h"
+#include "game/cosmos/logic_step.h"
+#include "game/cosmos/data_living_one_step.h"
 
 #include "augs/templates/container_templates.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 
 void drop_from_all_slots(const invariants::container& container, const entity_handle handle, const impulse_mults impulse, const logic_step step) {
 	drop_from_all_slots(container, handle, impulse, [step](const auto& result) { result.notify(step); });

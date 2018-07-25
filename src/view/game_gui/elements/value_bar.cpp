@@ -2,8 +2,8 @@
 #include "augs/templates/get_by_dynamic_id.h"
 #include "augs/gui/text/printer.h"
 
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/cosmos.h"
 
 #include "game/components/sentience_component.h"
 

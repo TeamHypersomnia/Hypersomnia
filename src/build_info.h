@@ -8,8 +8,8 @@
 #include "augs/string/typesafe_sprintf.h"
 
 #include "game/organization/for_each_entity_type.h"
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/entity_id.h"
+#include "game/cosmos/cosmos.h"
 #include "augs/misc/readable_bytesize.h"
 
 inline auto static_allocations_info() {

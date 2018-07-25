@@ -1,6 +1,6 @@
 #pragma once
 #include "game/messages/start_particle_effect.h"
-#include "game/transcendental/step_declaration.h"
+#include "game/cosmos/step_declaration.h"
 
 class particles_existence_system {
 public:

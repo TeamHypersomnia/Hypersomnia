@@ -1,6 +1,6 @@
 #pragma once
 #include "game/enums/slot_function.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 
 #include "augs/templates/hash_templates.h"
 

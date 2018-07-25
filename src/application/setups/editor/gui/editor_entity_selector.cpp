@@ -2,7 +2,7 @@
 #include "game/detail/render_layer_filter.h"
 
 #include "application/setups/editor/gui/find_aabb_of.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "game/detail/passes_filter.h"
 
 #include "application/setups/editor/gui/for_each_iconed_entity.h"

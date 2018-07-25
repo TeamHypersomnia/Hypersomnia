@@ -6,8 +6,8 @@
 #include "game/components/gun_component.h"
 #include "game/components/item_component.h"
 
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/entity_handle.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
 
 #include "game/detail/inventory/inventory_slot_handle.h"
 

@@ -1,7 +1,7 @@
 #pragma once
 #include "game/organization/all_components_declaration.h"
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/cosmic_functions.h"
+#include "game/cosmos/entity_id.h"
+#include "game/cosmos/cosmic_functions.h"
 
 #include "application/setups/editor/commands/editor_command_structs.h"
 #include "application/setups/editor/commands/change_property_command.h"

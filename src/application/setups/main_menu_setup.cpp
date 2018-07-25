@@ -16,11 +16,11 @@
 
 #include "game/organization/all_component_includes.h"
 #include "view/network/step_packaged_for_network.h"
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/logic_step.h"
-#include "game/transcendental/cosmic_movie_director.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/logic_step.h"
+#include "game/cosmos/cosmic_movie_director.h"
 #include "game/organization/all_messages_includes.h"
-#include "game/transcendental/data_living_one_step.h"
+#include "game/cosmos/data_living_one_step.h"
 
 #include "game/detail/visible_entities.h"
 

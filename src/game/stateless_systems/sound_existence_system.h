@@ -1,7 +1,7 @@
 #pragma once
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/step_declaration.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_handle_declaration.h"
+#include "game/cosmos/step_declaration.h"
+#include "game/cosmos/entity_id.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/components/transform_component.h"
 

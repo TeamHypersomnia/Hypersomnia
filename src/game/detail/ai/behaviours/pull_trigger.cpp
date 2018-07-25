@@ -1,12 +1,12 @@
 #include "game/detail/ai/behaviours.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 
 #include "game/components/attitude_component.h"
 #include "game/components/crosshair_component.h"
 #include "game/components/gun_component.h"
 #include "game/detail/entity_scripts.h"
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/logic_step.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/logic_step.h"
 
 namespace behaviours {
 	tree::goal_availability pull_trigger::goal_resolution(tree::state_of_traversal& t) const {

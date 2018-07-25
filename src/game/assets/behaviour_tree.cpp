@@ -1,6 +1,6 @@
 #include "augs/ensure.h"
 #include "game/assets/behaviour_tree.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 
 behaviour_tree::state_of_traversal::state_of_traversal(
 	const logic_step step,

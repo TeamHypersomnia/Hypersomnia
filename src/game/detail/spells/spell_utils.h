@@ -1,7 +1,7 @@
 #pragma once
 #include "game/components/transform_component.h"
-#include "game/transcendental/step_declaration.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/step_declaration.h"
+#include "game/cosmos/entity_id.h"
 
 template <class T>
 void ignite_cast_sparkles(

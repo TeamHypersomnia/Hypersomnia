@@ -1,5 +1,5 @@
 #pragma once
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "test_scenes/test_scene_flavours.h"
 
 class test_scene_node {

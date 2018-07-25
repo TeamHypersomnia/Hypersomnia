@@ -1,4 +1,4 @@
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "game/components/sentience_component.h"
 
 #include "augs/drawing/drawing.h"

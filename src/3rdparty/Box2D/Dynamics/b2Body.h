@@ -23,7 +23,7 @@
 #include <Box2D/Collision/Shapes/b2Shape.h>
 #include <memory>
 
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 typedef unversioned_entity_id Userdata;
 
 class b2Fixture;

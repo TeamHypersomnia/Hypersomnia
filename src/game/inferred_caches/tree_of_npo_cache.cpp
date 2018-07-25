@@ -1,7 +1,7 @@
 #include "tree_of_npo_cache.h"
-#include "game/transcendental/logic_step.h"
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/entity_handle.h"
+#include "game/cosmos/logic_step.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
 #include "game/enums/filters.h"
 #include "game/detail/calc_render_layer.h"
 

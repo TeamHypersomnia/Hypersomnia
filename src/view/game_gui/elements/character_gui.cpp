@@ -5,8 +5,8 @@
 #include "augs/gui/text/printer.h"
 #include "augs/templates/identity_templates.h"
 
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/entity_handle.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
 #include "view/game_gui/elements/game_gui_root.h"
 #include "view/game_gui/elements/drag_and_drop_target_drop_item.h"
 #include "view/game_gui/elements/item_button.h"

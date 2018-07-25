@@ -4,7 +4,7 @@
 #include "augs/gui/rect.h"
 #include "augs/gui/appearance_detector.h"
 
-#include "game/transcendental/entity_handle.h"
+#include "game/cosmos/entity_handle.h"
 #include "game/detail/inventory/inventory_slot_id.h"
 
 #include "view/viewables/all_viewables_declarations.h"

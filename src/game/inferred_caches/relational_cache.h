@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/misc/children_vector_tracker.h"
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_id.h"
+#include "game/cosmos/entity_handle_declaration.h"
 
 #include "game/detail/inventory/inventory_slot_id.h"
 

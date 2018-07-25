@@ -1,7 +1,7 @@
 #include "missile_system.h"
 #include "augs/math/steering.h"
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_id.h"
 
 #include "game/messages/collision_message.h"
 #include "game/messages/queue_destruction.h"
@@ -21,9 +21,9 @@
 #include "game/components/sender_component.h"
 #include "game/components/explosive_component.h"
 
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/logic_step.h"
-#include "game/transcendental/data_living_one_step.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/logic_step.h"
+#include "game/cosmos/data_living_one_step.h"
 
 #include "game/detail/physics/physics_scripts.h"
 

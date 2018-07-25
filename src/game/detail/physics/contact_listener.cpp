@@ -9,8 +9,8 @@
 
 #include "game/messages/collision_message.h"
 
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/logic_step.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/logic_step.h"
 
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/physics/contact_listener.h"

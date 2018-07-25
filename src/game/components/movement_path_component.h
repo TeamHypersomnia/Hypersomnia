@@ -3,7 +3,7 @@
 #include "augs/misc/constant_size_vector.h"
 #include "augs/templates/maybe.h"
 #include "game/enums/startle_type.h"
-#include "game/transcendental/entity_flavour_id.h"
+#include "game/cosmos/entity_flavour_id.h"
 #include "game/detail/view_input/particle_effect_input.h"
 
 struct fish_movement_def {

@@ -2,11 +2,11 @@
 #include "game/container_sizes.h"
 #include "augs/misc/constant_size_vector.h"
 
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 #include "game/detail/inventory/inventory_slot_id.h"
 
 #include "augs/math/physics_structs.h"
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_handle_declaration.h"
 #include "augs/misc/timing/stepped_timing.h"
 #include "augs/pad_bytes.h"
 

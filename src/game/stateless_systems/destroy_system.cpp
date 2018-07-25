@@ -1,14 +1,14 @@
 #include "augs/templates/introspect.h"
 #include "destroy_system.h"
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_id.h"
 
 #include "game/messages/queue_destruction.h"
 #include "game/messages/will_soon_be_deleted.h"
 
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/logic_step.h"
-#include "game/transcendental/data_living_one_step.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/logic_step.h"
+#include "game/cosmos/data_living_one_step.h"
 
 #include "game/organization/all_component_includes.h"
 

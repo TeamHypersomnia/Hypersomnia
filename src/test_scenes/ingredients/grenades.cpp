@@ -1,6 +1,6 @@
 #include "test_scenes/ingredients/ingredients.h"
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/entity_handle.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
 
 #include "game/assets/ids/asset_ids.h"
 

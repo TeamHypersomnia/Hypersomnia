@@ -12,9 +12,9 @@
 #include "game/assets/ids/asset_ids.h"
 #include "game/assets/ids/asset_ids.h"
 
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/entity_flavour_id.h"
+#include "game/cosmos/entity_id.h"
+#include "game/cosmos/entity_handle_declaration.h"
+#include "game/cosmos/entity_flavour_id.h"
 
 #include "game/detail/sentience_shake.h"
 #include "game/detail/view_input/sound_effect_input.h"

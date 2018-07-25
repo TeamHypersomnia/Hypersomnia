@@ -1,6 +1,6 @@
 #pragma once
 #include "view/rendering_scripts/draw_entity.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "game/detail/visible_entities.h"
 
 struct helper_drawer {

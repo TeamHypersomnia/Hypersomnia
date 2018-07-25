@@ -5,4 +5,4 @@
 #include "view/game_gui/elements/character_gui.h"
 #include "game/components/item_component.h"
 #include "game/components/container_component.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"

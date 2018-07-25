@@ -2,9 +2,9 @@
 #include "augs/misc/timing/delta.h"
 #include "augs/misc/randomization.h"
 
-#include "game/transcendental/entity_id.h"
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/step_declaration.h"
+#include "game/cosmos/entity_id.h"
+#include "game/cosmos/entity_handle_declaration.h"
+#include "game/cosmos/step_declaration.h"
 
 #include "game/components/wandering_pixels_component.h"
 

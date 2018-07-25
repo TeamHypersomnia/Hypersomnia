@@ -3,7 +3,7 @@
 #include "augs/math/camera_cone.h"
 
 #include "game/enums/render_layer.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 
 #include "game/detail/render_layer_filter.h"
 #include "game/detail/tree_of_npo_filter.h"

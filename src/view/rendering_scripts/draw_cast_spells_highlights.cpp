@@ -1,7 +1,7 @@
 #include "rendering_scripts.h"
 #include "augs/drawing/drawing.h"
 #include "augs/templates/get_by_dynamic_id.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "game/components/sprite_component.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"

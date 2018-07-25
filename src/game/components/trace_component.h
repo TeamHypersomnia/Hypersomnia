@@ -3,7 +3,7 @@
 #include "augs/misc/minmax.h"
 #include "augs/pad_bytes.h"
 
-#include "game/transcendental/entity_flavour_id.h"
+#include "game/cosmos/entity_flavour_id.h"
 #include "game/organization/all_entity_types.h"
 
 struct randomization;

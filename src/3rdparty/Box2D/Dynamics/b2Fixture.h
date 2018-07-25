@@ -28,7 +28,7 @@ class b2Body;
 class b2BroadPhase;
 class b2Fixture;
 
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_id.h"
 typedef unversioned_entity_id FixtureUserdata;
 
 /// This holds contact filtering data.

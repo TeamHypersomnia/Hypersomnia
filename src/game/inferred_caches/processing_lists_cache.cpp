@@ -1,8 +1,8 @@
 #include "augs/templates/container_templates.h"
 #include "augs/templates/enum_introspect.h"
 
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/entity_handle.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
 
 #include "game/inferred_caches/processing_lists_cache.h"
 

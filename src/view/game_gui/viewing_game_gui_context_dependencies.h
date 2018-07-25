@@ -3,7 +3,7 @@
 #include "augs/graphics/vertex.h"
 #include "augs/drawing/drawing.h"
 
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_handle_declaration.h"
 
 #include "view/game_gui/game_gui_intent_type.h"
 #include "view/game_gui/elements/hotbar_settings.h"

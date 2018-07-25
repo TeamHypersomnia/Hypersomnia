@@ -2,9 +2,9 @@
 #include "augs/drawing/make_sprite_points.h"
 #include "augs/math/steering.h"
 
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/logic_step.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/logic_step.h"
 
 #include "game/messages/interpolation_correction_request.h"
 #include "game/messages/queue_destruction.h"

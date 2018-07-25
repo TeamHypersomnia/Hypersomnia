@@ -3,7 +3,7 @@
 #include "augs/drawing/make_sprite_points.h"
 #include "augs/build_settings/platform_defines.h"
 
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_handle_declaration.h"
 
 #include "game/components/transform_component.h"
 #include "game/components/polygon_component.h"

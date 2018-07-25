@@ -5,8 +5,8 @@
 #include "augs/misc/timing/delta.h"
 #include "augs/misc/minmax.h"
 
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/step_declaration.h"
+#include "game/cosmos/entity_handle_declaration.h"
+#include "game/cosmos/step_declaration.h"
 
 #include "game/enums/particle_layer.h"
 #include "game/detail/view_input/particle_effect_input.h"

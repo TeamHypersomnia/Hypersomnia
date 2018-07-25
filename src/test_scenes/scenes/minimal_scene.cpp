@@ -8,10 +8,10 @@
 #include "test_scenes/ingredients/ingredients.h"
 #include "test_scenes/test_scenes_content.h"
 
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "game/organization/all_component_includes.h"
 #include "game/organization/all_messages_includes.h"
-#include "game/transcendental/logic_step.h"
+#include "game/cosmos/logic_step.h"
 
 #include "game/detail/inventory/perform_transfer.h"
 #include "view/viewables/image_cache.h"

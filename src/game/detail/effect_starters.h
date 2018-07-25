@@ -1,6 +1,6 @@
 #pragma once
-#include "game/transcendental/step_declaration.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/step_declaration.h"
+#include "game/cosmos/entity_id.h"
 #include "game/detail/transform_copying.h"
 #include "src/game/components/transform_component.h"
 

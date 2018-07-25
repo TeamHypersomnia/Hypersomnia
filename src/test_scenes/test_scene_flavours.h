@@ -3,8 +3,8 @@
 #include "augs/templates/type_map.h"
 #include "test_scenes/test_id_to_pool_id.h"
 
-#include "game/transcendental/entity_flavour_id.h"
-#include "game/transcendental/cosmic_functions.h"
+#include "game/cosmos/entity_flavour_id.h"
+#include "game/cosmos/cosmic_functions.h"
 
 #include "game/assets/all_logical_assets.h"
 #include "game/common_state/entity_flavours.h"

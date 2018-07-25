@@ -1,6 +1,6 @@
 #include "test_scenes/ingredients/ingredients.h"
 #include "augs/drawing/polygon.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 #include "game/stateless_systems/particles_existence_system.h"
 #include "game/stateless_systems/sound_existence_system.h"
 
@@ -15,7 +15,7 @@
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/components/polygon_component.h"
 #include "game/components/shape_polygon_component.h"
-#include "game/transcendental/cosmos.h"
+#include "game/cosmos/cosmos.h"
 
 #include "game/assets/all_logical_assets.h"
 

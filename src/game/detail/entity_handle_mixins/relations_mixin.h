@@ -9,8 +9,8 @@
 
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 
-#include "game/transcendental/entity_handle_declaration.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/entity_handle_declaration.h"
+#include "game/cosmos/entity_id.h"
 
 #include "game/enums/slot_function.h"
 #include "game/enums/child_entity_name.h"

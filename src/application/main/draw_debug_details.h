@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/math/declare_math.h"
-#include "game/transcendental/entity_handle_declaration.h"
+#include "game/cosmos/entity_handle_declaration.h"
 
 struct session_profiler;
 struct cosmic_profiler;

@@ -2,8 +2,8 @@
 #include "augs/entity_system/storage_for_systems.h"
 #include "augs/math/camera_cone.h"
 
-#include "game/transcendental/step_declaration.h"
-#include "game/transcendental/entity_id.h"
+#include "game/cosmos/step_declaration.h"
+#include "game/cosmos/entity_id.h"
 
 #include "view/viewables/all_viewables_declarations.h"
 

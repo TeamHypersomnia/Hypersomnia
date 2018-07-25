@@ -1,6 +1,6 @@
-#include "game/transcendental/cosmos.h"
-#include "game/transcendental/entity_handle.h"
-#include "game/transcendental/logic_step.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
+#include "game/cosmos/logic_step.h"
 
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/components/rigid_body_component.h"
