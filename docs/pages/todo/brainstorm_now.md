@@ -17,6 +17,16 @@ summary: That which we are brainstorming at the moment.
 	- arming/unarming durations inside explosive invariant
 	- defusable_by boolset with factions
 
+- Who spawns the initial player entities?
+	- And who synchronizes it with all connected endpoints?
+		- Modes accept messages and handle it in the next step
+			- So we have another kind of a cosmos
+		- mode_messages::player_existence
+			- For FFA, we just ignore the associated faction
+	- Mode entropy shall 
+	- Mode shall step in parallel to the cosmos, actually it should invoke the step
+		- And the solver! It will be to the mode's discretion how the cosmos is to be advanced.
+
 - Modes aren't concerned with the currently viewed entity
 	- except test scene mode
 
@@ -25,12 +35,6 @@ summary: That which we are brainstorming at the moment.
 - "I" in editor invokes initialization routine of the chosen game mode
 	- Just starts advancing it from the beginning.
 
-- Who spawns the initial player entities?
-	- And who synchronizes it with all connected endpoints?
-		- Modes accept messages and handle it in the next step
-			- So we have another kind of a cosmos
-		- mode_messages::player_existence
-			- For FFA, we just ignore the associated faction
 
 - team & ffa matches should get different logic altogether
 

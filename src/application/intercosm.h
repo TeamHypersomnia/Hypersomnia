@@ -67,12 +67,12 @@ struct intercosm {
 
 	const_entity_handle get_viewed_character() const;
 
-	template <class... Callbacks>
+	template <class CosmosSolver = standard_solver, class... Callbacks>
 	void advance(
 		const cosmic_entropy& entropy,
 		Callbacks&&... callbacks
 	) {
-		standard_solver(
+		CosmosSolver()(
 			make_logic_step_input(entropy),
 			std::forward<Callbacks>(callbacks)...
 		);
