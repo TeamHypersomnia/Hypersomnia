@@ -261,11 +261,13 @@ fae_tree_output editor_selected_fae_gui::perform(
 		all_matched_flavours.clear();
 
 		for_each_match([&](const auto typed_handle) {
-			all_matched_flavours.get_for<entity_type_of<decltype(typed_handle)>>().emplace(typed_handle.get_flavour_id());
+			using E = decltype(typed_handle);
+			all_matched_flavours.get_for<entity_type_of<E>>().emplace(typed_handle.get_flavour_id());
 		});
 
 		erase_if(ticked_flavours, [&](const auto& id) {
-			return !found_in(all_matched_flavours.get_for<entity_type_of<decltype(id)>>(), id);
+			using E = entity_type_of<decltype(id)>;
+			return !found_in(all_matched_flavours.get_for<E>(), id);
 		});
 	}
 

@@ -30,6 +30,7 @@
 #include "application/gui/menu/creators_screen.h"
 #include "application/gui/main_menu_gui.h"
 #include "application/setups/main_menu_settings.h"
+#include "game/modes/test_scene_mode.h"
 
 struct config_lua_table;
 
@@ -42,6 +43,9 @@ class main_menu_setup : public default_setup_settings {
 	vec2 latest_news_pos = { 0.f, 0.f };
 
 	intercosm intro;
+	test_scene_mode mode;
+	test_scene_mode_vars mode_vars;
+	entity_id controlled_character_id;
 
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 	cosmic_entropy total_collected_entropy;
@@ -84,7 +88,7 @@ public:
 	}
 
 	auto get_viewed_character_id() const {
-		return intro.local_test_subject;
+		return controlled_character_id;
 	}
 
 	auto get_viewed_character() const {
@@ -118,8 +122,9 @@ public:
 		while (steps--) {
 			total_collected_entropy.clear_dead_entities(intro.world);
 
-			intro.advance(
-				{ total_collected_entropy },
+			mode.advance(
+				{ mode_vars, intro.world },
+				{ total_collected_entropy  },
 				std::forward<Callbacks>(callbacks)...
 			);
 

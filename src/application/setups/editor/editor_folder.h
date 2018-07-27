@@ -7,6 +7,9 @@
 
 #include "application/setups/editor/editor_history.h"
 #include "application/setups/editor/editor_view.h"
+#include "application/setups/editor/editor_player.h"
+
+#include "game/modes/all_mode_includes.h"
 
 using folder_index = unsigned;
 
@@ -29,6 +32,8 @@ struct editor_folder {
 	editor_view view;
 	std::unique_ptr<intercosm> work;
 	editor_history history;
+	editor_player player;
+	all_mode_vars_maps mode_vars;
 
 	/* Opened game mode definitions go here */
 

@@ -6,7 +6,6 @@
 #include "application/setups/editor/gui/editor_history_gui.h"
 
 void editor_history_gui::perform(const editor_command_input in) {
-	using namespace ImGui;
 	using namespace augs::imgui;
 	using index_type = editor_history::index_type;
 
@@ -20,7 +19,7 @@ void editor_history_gui::perform(const editor_command_input in) {
 
 	acquire_keyboard_once();
 
-	const auto& style = GetStyle();
+	const auto& style = ImGui::GetStyle();
 
 	if (acquire_once) {
 		ImGui::SetKeyboardFocusHere();

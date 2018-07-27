@@ -18,9 +18,14 @@
 
 #include "test_scenes/scenes/test_scene_node.h"
 #include "augs/math/cascade_aligner.h"
+#include "game/modes/test_scene_mode.h"
 
 namespace test_scenes {
-	entity_id minimal_scene::populate(const loaded_image_caches_map& caches, const logic_step step) const {
+	void minimal_scene::setup(test_scene_mode_vars& vars) {
+		vars.spawned_faction = faction_type::METROPOLIS;
+	}
+
+	void minimal_scene::populate(const loaded_image_caches_map& caches, const logic_step step) const {
 		auto& world = step.get_cosmos();
 
 #if 0
@@ -54,14 +59,12 @@ namespace test_scenes {
 			if (i == 0) {
 				new_character.get<components::sentience>().get<health_meter_instance>().set_value(100);
 				new_character.get<components::sentience>().get<health_meter_instance>().set_maximum_value(100);
-				new_character.get<components::attitude>().parties = faction_type::RESISTANCE;
-				new_character.get<components::attitude>().hostile_parties = faction_type::METROPOLIS;
+				new_character.get<components::attitude>().official_faction = faction_type::RESISTANCE;
 			}
 			else if (i == 1) {
 				new_character.get<components::sentience>().get<health_meter_instance>().set_value(100);
 				new_character.get<components::sentience>().get<health_meter_instance>().set_maximum_value(100);
-				new_character.get<components::attitude>().parties = faction_type::METROPOLIS;
-				new_character.get<components::attitude>().hostile_parties = faction_type::RESISTANCE;
+				new_character.get<components::attitude>().official_faction = faction_type::METROPOLIS;
 			}
 
 			auto& sentience = new_character.get<components::sentience>();
@@ -103,6 +106,5 @@ namespace test_scenes {
 		cosmic::reinfer_all_entities(world);
 
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
-		return new_characters[0];
 	}
 }

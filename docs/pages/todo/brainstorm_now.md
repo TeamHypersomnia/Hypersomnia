@@ -6,26 +6,78 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- optimize cosmos headers
+	- separate handle getters
+
+- Mode vars gui
+	- Can set the current one, resetting the cosmos
+
+- Storage of pre-defined mode informations inside a map
+	- ``.modes`` file
+		- A map is still functional without modes and modes can always be later specified, so a separate file is justified
+		- As flavour ids aren't human readable, makes sense to use binary format for now
+	- Each should also have a name, e.g. "test scene", "bomb", "ffa", "tdm", "duel"
+		- For easy choosing from the admin console
+	- unordered map of ints for each defined profile
+		- player stores the current int and a variant of mode instances
+		- we std::visit by the mode instance on advancing and then acquire the vars by it
+	- Editor view shall keep track of current mode instance?
+		- We thought about the player, but we must serialize this per-opened folder.
+		- Editor view is suitable because:
+			- It is the part of the state that is specific to the editor session, but will never be used during gameplay.
+			- This actually implies that the **player should be found within the view**.
+			- No problem having player state per-view, just that we'll pause it whenever we switch a tab or quit the editor.
+		- What about history of changes made during the mode?
+		- Probably player as well.
+		- The work won't store any 
+
+- all_components_declaration.h -> all_component_declarations.h
+
+- However it is to the discretion of a mode *how* the creation and removal of players happen...
+	- ...it is already outside of their scope *when* they happen.
+	- Therefore, each mode shall expose add_player and remove_player functions to be called by literally anybody, anytime.
+		- As for serialization, these will be some "choreographic events" inserted between steps, or in a case of a network session, "network event"
+	- Similarly, change_var shall not be something that the mode bothers with, especially that the calling logic would be pretty much duplicated.
+	- There will still be much use of the messages; e.g. mode_messages::game_completed to determine the result
+
+- Mode helpers
+	- for_each_character?
+		- actually we'll just for now iterate over all sentiences
+	- find_player_flavour(faction_type) for player creation
+
+- Test scene game mode
+	- The first to be implemented as an architectural draft
+	- Test functionality: respawns every character every time it dies or loses consciousness (e.g. after 3 secs), just to a different spawn point
+
+- There will ALWAYS be some game mode whenever a game is running
+	- E.g. test scene mode
+
 - Bomb logic
 	- Arming counter is increased when:
 		- Player is inside the bombsite area
 		- Player has all movement flags unset (except shift for sprint)
 	- Arming counter is reset when any of WSAD flags goes true
+	- When placed, change C4 to a static body with filter that only collides with bullet shells
 	- Unarming counter is increased when:
 		- Player is inside the bombsite area
 		- Player has all movement flags unset (except shift for sprint)
 	- arming/unarming durations inside explosive invariant
 	- defusable_by boolset with factions
 
-- Who spawns the initial player entities?
-	- And who synchronizes it with all connected endpoints?
-		- Modes accept messages and handle it in the next step
-			- So we have another kind of a cosmos
-		- mode_messages::player_existence
+- Mode entropy 
+	- As it steps together with the cosmos, will necessarily contain cosmic entropy
+	- Mode messages:
+		- mode_messages::add_player	
 			- For FFA, we just ignore the associated faction
-	- Mode entropy shall 
-	- Mode shall step in parallel to the cosmos, actually it should invoke the step
-		- And the solver! It will be to the mode's discretion how the cosmos is to be advanced.
+		- mode_messages::remove_player	
+		- mode_messages::change_property
+			- e.g. for changing round times on the fly
+			- could be implemented similarly to editor properties
+				- especially since we'll create a property editor for the game mode properties
+		- mode_messages::create_entity
+			- For admin playing
+		- mode_messages::apply_impulse
+			- For admin playing
 
 - Modes aren't concerned with the currently viewed entity
 	- except test scene mode
@@ -42,8 +94,6 @@ summary: That which we are brainstorming at the moment.
 	- round time
 	- number of rounds
 
-- Test scene game mode
-	- The first to be implemented as an architectural draft
 - FFA game mode
 	- Win condition: None, there is only time limit.
 - Duel game mode

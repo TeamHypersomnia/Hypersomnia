@@ -14,7 +14,7 @@ struct standard_solver {
 		PostCleanup post_cleanup
 	) {
 		thread_local data_living_one_step queues;
-		const logic_step step(input, queues);
+		const auto step = logic_step(input, queues);
 
 		auto scope = augs::scope_guard([](){
 			queues.clear();

@@ -1,12 +1,11 @@
 #pragma once
-
 #include "augs/templates/maybe.h"
 #include "game/detail/render_layer_filter.h"
-#include "game/cosmos/cosmos.h"
 
+template <class C>
 inline bool passes_filter(
 	const augs::maybe<render_layer_filter>& filter, 
-	const cosmos& cosm, 
+	const C& cosm, 
 	const entity_id id
 ) {
 	if (filter.is_enabled) {

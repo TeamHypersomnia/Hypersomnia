@@ -87,15 +87,15 @@ attitude_type calc_attitude(const const_entity_handle targeter, const const_enti
 	const auto* const target_attitude = target.find<components::attitude>();
 
 	if (target_attitude) {
-		if ((targeter_attitude.hostile_parties & target_attitude->parties).any()) {
+		if (targeter_attitude.official_faction == target_attitude->official_faction) {
 			return attitude_type::WANTS_TO_KILL;
 		}
-		else if ((targeter_attitude.parties & target_attitude->parties).any()) {
+		else {
 			return attitude_type::WANTS_TO_HEAL;
 		}
 	}
 
-	if(found_in(targeter_attitude.specific_hostile_entities, target)) {
+	if (found_in(targeter_attitude.specific_hostile_entities, target)) {
 		return attitude_type::WANTS_TO_KILL;
 	}
 

@@ -6,6 +6,14 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- refactor: stepped_clock
+	- has delta + now
+	- passed everywhere where now and dt are required
+	- cosmos::get_clock() instead of timestamp & fixed delta
+	- this prepares us for a possibility that the delta might change and we'll need some history of delta changes
+
+- alt+scroll could disable/enable layers starting from the topmost one
+
 - Possibly use b2TestOverlap for checking against the camera selection?
 - Make a tree out of time measurement profiler calls and get summary just from "fps" or "whole regeneration"
 

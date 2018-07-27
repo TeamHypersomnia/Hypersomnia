@@ -30,7 +30,7 @@ namespace messages {
 struct exploding_ring_input;
 struct thunder_input;
 
-typedef augs::storage_for_message_queues <
+using all_message_queues = augs::storage_for_message_queues<
 	messages::intent_message,
 	messages::motion_message,
 	messages::interpolation_correction_request,
@@ -52,4 +52,4 @@ typedef augs::storage_for_message_queues <
 	exploding_ring_input,
 	thunder_input,
 	item_slot_transfer_request
-> all_message_queues;
+>;

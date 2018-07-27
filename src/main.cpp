@@ -413,7 +413,7 @@ int work(const int argc, const char* const * const argv) try {
 			bool should = true;
 
 			on_specific_setup([&](editor_setup& setup) {
-				if (setup.is_editing_mode()) {
+				if (!setup.anything_opened() || setup.is_editing_mode()) {
 					should = false;
 				}
 			});
@@ -433,7 +433,7 @@ int work(const int argc, const char* const * const argv) try {
 			return false;
 		}
 
-		if (!get_viewed_character().has<components::item_slot_transfers>()) {
+		if (!viewed.has<components::item_slot_transfers>()) {
 			return false;
 		}
 
@@ -1207,40 +1207,36 @@ int work(const int argc, const char* const * const argv) try {
 
 				const auto viewed_character = get_viewed_character();
 
-				const bool direct_gameplay_or_game_gui =
-					viewed_character.alive()
-					&& (
-						current_setup.has_value()
-						&& !ingame_menu.show
-					)
-				;
+				if (was_released || (current_setup.has_value() && !ingame_menu.show)) {
+					const bool direct_gameplay = viewed_character.alive() && !game_gui_mode;
+					const bool game_gui_effective = viewed_character.alive() && game_gui_mode;
 
-				const bool direct_gameplay = direct_gameplay_or_game_gui && !game_gui_mode; 
+					if (was_released || was_pressed) {
+						const auto key = e.get_key();
 
-				if (was_pressed || was_released) {
-					const auto key = e.get_key();
-
-					if (direct_gameplay_or_game_gui || was_released) {
-						if (const auto it = mapped_or_nullptr(viewing_config.app_ingame_controls, key)) {
-							if (was_pressed) {
-								handle_app_ingame_intent(*it);
-								continue;
-							}
-						}
-						if (const auto it = mapped_or_nullptr(viewing_config.game_gui_controls, key)) {
-							if (should_draw_game_gui()) {
-								game_gui.control_hotbar_and_action_button(viewed_character, { *it, *key_change });
-
+						if (was_released || direct_gameplay || game_gui_effective) {
+							if (const auto it = mapped_or_nullptr(viewing_config.app_ingame_controls, key)) {
 								if (was_pressed) {
+									handle_app_ingame_intent(*it);
 									continue;
 								}
 							}
+							if (const auto it = mapped_or_nullptr(viewing_config.game_gui_controls, key)) {
+								if (should_draw_game_gui()) {
+									game_gui.control_hotbar_and_action_button(viewed_character, { *it, *key_change });
+
+									if (was_pressed) {
+										continue;
+									}
+								}
+							}
 						}
+
 						if (const auto it = mapped_or_nullptr(viewing_config.game_controls, key)) {
-							if (
-								const bool leave_it_for_game_gui = e.uses_mouse() && game_gui_mode;
-								!leave_it_for_game_gui
-							) {
+							if (e.uses_mouse() && game_gui_effective) {
+								/* Leave it for the game gui */
+							}
+							else {
 								game_intents.push_back({ *it, *key_change });
 
 								if (was_pressed) {
@@ -1249,15 +1245,16 @@ int work(const int argc, const char* const * const argv) try {
 							}
 						}
 					}
-				}
-				if (e.msg == message::mousemotion && direct_gameplay) {
-					game_motions.push_back({ game_motion_type::MOVE_CROSSHAIR, e.data.mouse.rel });
-					continue;
-				}
 
-				if (should_draw_game_gui() && (direct_gameplay_or_game_gui || was_released)) {
-					if (game_gui.control_gui_world(create_game_gui_context(), e)) {
+					if (direct_gameplay && e.msg == message::mousemotion) {
+						game_motions.push_back({ game_motion_type::MOVE_CROSSHAIR, e.data.mouse.rel });
 						continue;
+					}
+
+					if (was_released || should_draw_game_gui()) {
+						if (game_gui.control_gui_world(create_game_gui_context(), e)) {
+							continue;
+						}
 					}
 				}
 			}
@@ -1267,14 +1264,19 @@ int work(const int argc, const char* const * const argv) try {
 				beyond the closing of this scope.
 			*/
 
-			return {
-				cosmic_entropy(
-					get_viewed_character(),
-					game_intents,
-					game_motions
-				),
-				viewing_config
-			};
+			const auto result_entropy = [&]() {
+				if (const auto viewed = get_viewed_character()) {
+					return cosmic_entropy(
+						viewed,
+						game_intents,
+						game_motions
+					);
+				}
+				
+				return cosmic_entropy();
+			}();
+
+			return { result_entropy, viewing_config };
 		}();
 
 		const auto& new_viewing_config = result.viewing_config;

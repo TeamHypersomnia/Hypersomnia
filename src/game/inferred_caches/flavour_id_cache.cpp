@@ -1,7 +1,6 @@
 #include "augs/templates/container_templates.h"
-#include "flavour_id_cache.h"
 #include "game/cosmos/entity_handle.h"
-#include "game/cosmos/cosmos.h"
+#include "game/inferred_caches/flavour_id_cache.h"
 
 void flavour_id_cache::infer_cache_for(const const_entity_handle h) {
 	h.dispatch(

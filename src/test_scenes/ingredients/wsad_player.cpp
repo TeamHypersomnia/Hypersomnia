@@ -94,7 +94,7 @@ namespace test_flavours {
 			body.damping.linear = 6.5f;
 			body.damping.angular = 6.5f;
 
-			fixtures_invariant.filter = filters::controlled_character();
+			fixtures_invariant.filter = filters::local_character();
 			fixtures_invariant.density = 1.0;
 
 			meta.set(body);
@@ -178,10 +178,7 @@ namespace test_flavours {
 
 			{
 				components::attitude attitude;
-
-				attitude.parties = faction_type::METROPOLIS;
-				attitude.hostile_parties = faction_type::RESISTANCE;
-
+				attitude.official_faction = faction_type::METROPOLIS;
 				meta.set(attitude);
 			}
 
@@ -233,10 +230,7 @@ namespace test_flavours {
 
 			{
 				components::attitude attitude;
-
-				attitude.parties = faction_type::RESISTANCE;
-				attitude.hostile_parties = faction_type::METROPOLIS;
-
+				attitude.official_faction = faction_type::RESISTANCE;
 				meta.set(attitude);
 			}
 		}

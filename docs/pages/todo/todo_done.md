@@ -213,10 +213,6 @@ we consider whole type overrides too complex architeciturally:
 	- we load as if there were a real file
 	- but we're emitting a warning
 
-- rename local_test_subject to local_test_subject
-	- even choreographic data will have their own viewers specified
-	- useful to always have one
-
 - timestamp all logs for convenience
 - delete untitled folder on saving
 
@@ -1162,4 +1158,7 @@ we consider whole type overrides too complex architeciturally:
 					- Well, technically, we could revive the trivially_copyable_variant from deleted files
 				- Quite a lot of bloat for types
 				- Thus we'd lose a lot of valuable time
+
+- get_max_charges_in
+	- num_fitting_in
 

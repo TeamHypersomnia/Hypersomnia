@@ -39,18 +39,18 @@ void perform_transfer(
 	const item_slot_transfer_request r,
 	const logic_step step
 ) {
-	const auto result = perform_transfer(r, step.get_cosmos());
+	const auto result = perform_transfer_no_step(r, step.get_cosmos());
 	result.notify(step);
 }
 
-perform_transfer_result perform_transfer(
+perform_transfer_result perform_transfer_no_step(
 	const item_slot_transfer_request r, 
 	cosmos& cosmos
 ) {
 	return cosmos[r.item].get<components::item>().perform_transfer(r, cosmos);
 }
 
-perform_transfer_result perform_transfer(
+perform_transfer_result perform_transfer_impl(
 	const write_synchronized_component_access access,
 	const cosmos_solvable_inferred_access inferred_access,
 	const item_slot_transfer_request r, 

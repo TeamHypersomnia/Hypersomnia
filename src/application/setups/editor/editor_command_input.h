@@ -17,6 +17,7 @@ struct all_viewables_defs;
 struct all_logical_assets;
 struct editor_history;
 struct editor_settings;
+struct editor_player;
 
 struct editor_command_input {
 	sol::state& lua;
@@ -30,6 +31,7 @@ struct editor_command_input {
 	cosmos& get_cosmos() const; 
 
 	editor_history& get_history() const;
+	editor_player& get_player() const;
 	all_viewables_defs& get_viewable_defs() const;
 	const all_logical_assets& get_logical_assets() const;
 

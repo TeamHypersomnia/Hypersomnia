@@ -1,10 +1,6 @@
 #pragma once
 #include "game/assets/all_logical_assets.h"
-
 #include "game/cosmos/cosmos.h"
-#include "game/cosmos/cosmic_entropy.h"
-#include "game/cosmos/solvers/standard_solver.h"
-
 #include "view/viewables/all_viewables_defs.h"
 #include "hypersomnia_version.h"
 
@@ -24,6 +20,7 @@ struct intercosm_path_op {
 };
 
 struct test_scene_settings;
+struct test_scene_mode_vars;
 
 struct intercosm {
 	// GEN INTROSPECTOR struct intercosm
@@ -31,8 +28,6 @@ struct intercosm {
 
 	cosmos world;
 	all_viewables_defs viewables;
-	
-	entity_id local_test_subject;
 	// END GEN INTROSPECTOR
 
 	intercosm() = default;
@@ -44,7 +39,11 @@ struct intercosm {
 	intercosm& operator=(const intercosm&) = delete;
 
 #if BUILD_TEST_SCENES
-	void make_test_scene(sol::state&, test_scene_settings);
+	void make_test_scene(
+		sol::state&, 
+		test_scene_settings,
+		test_scene_mode_vars&
+	);
 #endif
 
 	void load(const intercosm_path_op);
@@ -59,24 +58,6 @@ struct intercosm {
 	void to_bytes(std::vector<std::byte>&) const;
 	void from_bytes(const std::vector<std::byte>&);
 
-	logic_step_input make_logic_step_input(const cosmic_entropy& entropy) {
-		return { world, entropy };	
-	}
-
 	void clear();
-
-	const_entity_handle get_viewed_character() const;
-
-	template <class CosmosSolver = standard_solver, class... Callbacks>
-	void advance(
-		const cosmic_entropy& entropy,
-		Callbacks&&... callbacks
-	) {
-		CosmosSolver()(
-			make_logic_step_input(entropy),
-			std::forward<Callbacks>(callbacks)...
-		);
-	}
-
 	void update_offsets_of(const assets::image_id&, changer_callback_result = changer_callback_result::REFRESH);
 };

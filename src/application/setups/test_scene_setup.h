@@ -8,6 +8,7 @@
 #include "game/organization/all_component_includes.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
+#include "game/modes/test_scene_mode.h"
 
 #include "view/viewables/all_viewables_defs.h"
 #include "test_scenes/test_scene_settings.h"
@@ -25,9 +26,13 @@ namespace sol {
 }
 
 class test_scene_setup : public default_setup_settings {
+	test_scene_mode mode;
+	test_scene_mode_vars mode_vars;
+
 	intercosm scene;
 	cosmic_entropy total_collected_entropy;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
+	entity_id controlled_character_id;
 
 public:
 	test_scene_setup(
@@ -49,7 +54,7 @@ public:
 	}
 
 	auto get_viewed_character_id() const {
-		return scene.local_test_subject;
+		return controlled_character_id;
 	}
 
 	auto get_viewed_character() const {
@@ -83,7 +88,8 @@ public:
 			
 			// player.advance_player_and_biserialize(total_collected_entropy);
 
-			scene.advance(
+			mode.advance(
+				{ mode_vars, scene.world },
 				{ total_collected_entropy },
 				std::forward<Callbacks>(callbacks)...
 			);

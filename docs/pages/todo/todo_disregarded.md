@@ -223,3 +223,34 @@ summary: Just a hidden scratchpad.
 
 - Each team game mode exposes functions: add_player(faction_type), remove_player(faction_type)
 	- statically dispatching it
+
+- Along with the reason of disconnect (timeout, ban, kick)
+	- Maybe even with the string
+	- Solely for viewing for the clients (e.g. "abc was banned from the server")
+	- Actually, these should be implemented by means of chat
+
+- Do we have to use a mode_message for player creation?
+	- A direct call would simplify retrieval of the entity guid - we need it to route the client's inputs to specific entity
+		- Additionally, it would take a step less for the player creation to take effect
+	- Problem is, some creation logic might require a step
+		- architecturally, not really, especially now that we have a step-less perform_transfer
+
+- Who spawns the initial player entities?
+	- And who synchronizes it with all connected endpoints?
+		- Modes accept messages and handle it in the next step
+			- So we have another kind of a cosmos
+		- mode_messages::add_player
+	- Mode shall step in parallel to the cosmos, actually it should invoke the step
+		- And the solver! It will be to the mode's discretion how the cosmos is to be advanced.
+	- The network endpoint code posts player_existence messages
+		- the game mode creates player entities and stores new ids in player_created_message
+
+- Can be copied around maps for easy transferring
+	- Flavour ids are untransferrable, though
+	- Or do we assume that there won't be any flavour ids specifiable?
+		- Well actually even requested initial eq has flavour ids, so it's a no-go.
+
+	- lua vs binary files
+		- The write time will be negliglible for such small amounts of information
+		- Well... anyway let's store it as binary for now, because flavour ids won't be human readable anyway
+			- Predefined configs might as well be edited in editor instead of a text file

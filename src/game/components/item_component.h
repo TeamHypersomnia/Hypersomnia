@@ -35,7 +35,7 @@ struct perform_transfer_result {
 	void play_effects(logic_step) const;
 };
 
-perform_transfer_result perform_transfer(
+perform_transfer_result perform_transfer_impl(
 	write_synchronized_component_access,
 	cosmos_solvable_inferred_access,
 	const item_slot_transfer_request r, 
@@ -85,7 +85,7 @@ public:
 
 	template <class... Args>
 	decltype(auto) perform_transfer(Args&&... args) const {
-		return ::perform_transfer(
+		return ::perform_transfer_impl(
 			write_synchronized_component_access(),
 		   	cosmos_solvable_inferred_access(),
 		   	std::forward<Args>(args)...

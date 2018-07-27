@@ -7,6 +7,6 @@ struct cosmos_clock {
 	augs::delta delta = augs::delta::steps_per_second(60);
 	augs::stepped_timestamp now = 0;
 
-	entity_guid next_entity_guid = 1;
+	entity_guid next_entity_guid = entity_guid::first();
 	// END GEN INTROSPECTOR
 };

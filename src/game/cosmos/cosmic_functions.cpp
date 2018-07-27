@@ -3,9 +3,32 @@
 #include "game/detail/inventory/perform_transfer.h"
 #include "augs/templates/introspect.h"
 
+entity_handle just_create_entity(
+	cosmos& cosm,
+	const entity_flavour_id id
+) {
+	return cosmic::create_entity(cosm, id);
+}
+
 void cosmic::clear(cosmos& cosm) {
 	cosm.get_solvable({}).clear();
 	cosm.change_common_significant([](auto& c) { c = {}; return changer_callback_result::DONT_REFRESH; });
+}
+
+entity_handle cosmic::create_entity(
+	cosmos& cosm,
+	const entity_flavour_id id
+) {
+	return create_entity(
+		cosm,
+		id,
+		[&](auto&&...) {
+
+		},
+		[&](auto&&...) {
+
+		}
+	);
 }
 
 void cosmic::infer_caches_for(const entity_handle h) {
@@ -100,7 +123,7 @@ entity_handle cosmic::create_entity_with_specific_guid(
 template <class F>
 void entity_deleter(
 	const entity_handle handle,
-	F actual_deleter
+	F entity_deallocator
 ) {
 	auto& cosmos = handle.get_cosmos();
 
@@ -130,10 +153,12 @@ void entity_deleter(
 	cosmic::destroy_caches_of(handle);
 
 	/* #3: finally, deallocate */
-	actual_deleter();
+	entity_deallocator();
 
-	/* After identity is destroyed, reinfer entities dependent on the identity */
+	/* After identity is destroyed, reinfer caches dependent on some identities */
+
 	for (const auto& d : dependent_items) {
+		/* The items that were once assigned to the deleted entity now have no owner */
 		cosmos[d].infer_change_of_current_slot();
 	}
 }

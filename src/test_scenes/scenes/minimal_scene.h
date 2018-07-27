@@ -6,22 +6,21 @@
 
 class cosmos;
 class loaded_image_caches_map;
+struct test_scene_mode_vars;
 
 namespace test_scenes {
 	class minimal_scene {
-		entity_id populate(const loaded_image_caches_map&, const logic_step) const;
+		void populate(const loaded_image_caches_map&, const logic_step) const;
 	public:
-		entity_id populate_with_entities(const loaded_image_caches_map& caches, const logic_step_input input) {
-			entity_id controlled;
-
+		void populate_with_entities(const loaded_image_caches_map& caches, const logic_step_input input) {
 			standard_solver()(
 				input,
-				[&](const logic_step step) { controlled = populate(caches, step); }, 
+				[&](const logic_step step) { populate(caches, step); }, 
 				[](auto) {},
 				[](auto) {}
 			);
-
-			return controlled;
 		}
+
+		void setup(test_scene_mode_vars&);
 	};
 }

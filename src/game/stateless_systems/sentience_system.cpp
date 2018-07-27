@@ -193,6 +193,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 
 void sentience_system::consume_health_event(messages::health_event h, const logic_step step) const {
 	auto& cosmos = step.get_cosmos();
+	const auto now = cosmos.get_timestamp();
 	const auto subject = cosmos[h.subject];
 	auto& sentience = subject.get<components::sentience>();
 	auto& sentience_def = subject.get<invariants::sentience>();
@@ -242,27 +243,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		break;
 	}
 
-	bool knockout = false;
-
-	if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION) {
-		sentience.get<electric_shield_perk_instance>() = electric_shield_perk_instance();
-
-		personal_electricity.value = 0.f;
-	}
-	else if (h.special_result == messages::health_event::result_type::DEATH) {
-		knockout = true;
-
-		health.value = 0.f;
-		personal_electricity.value = 0.f;
-		consciousness.value = 0.f;
-	}
-	else if (h.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS) {
-		knockout = true;
-
-		consciousness.value = 0.f;
-	}
-
-	if (knockout) {
+	auto knockout = [&]() {
 		const auto* const container = subject.find<invariants::container>();
 
 		if (container) {
@@ -272,7 +253,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 
 		auto& driver = subject.get<components::driver>();
 		
-		if(cosmos[driver.owned_vehicle].alive()) {
+		if (cosmos[driver.owned_vehicle].alive()) {
 			driver_system().release_car_ownership(subject);
 		}
 		
@@ -282,6 +263,24 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 
 		const auto knocked_out_body = subject.get<components::rigid_body>();
 		knocked_out_body.apply(knockout_impulse * sentience_def.knockout_impulse);
+
+		sentience.when_knocked_out = now;
+	};
+
+	if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION) {
+		sentience.get<electric_shield_perk_instance>() = electric_shield_perk_instance();
+
+		personal_electricity.value = 0.f;
+	}
+	else if (h.special_result == messages::health_event::result_type::DEATH) {
+		health.value = 0.f;
+		personal_electricity.value = 0.f;
+		consciousness.value = 0.f;
+		knockout();
+	}
+	else if (h.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS) {
+		consciousness.value = 0.f;
+		knockout();
 	}
 
 	step.post_message(h);

@@ -14,7 +14,7 @@ namespace editor_detail {
 		const editor_player& player,
 		const editor_view& view,
 		const_entity_handle matching_go_to_entity,
-		const intercosm& icm
+		const_entity_handle viewed_character
 	);
 
 	bool handle_camera_input(

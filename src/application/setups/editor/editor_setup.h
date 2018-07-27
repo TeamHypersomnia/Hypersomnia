@@ -2,7 +2,6 @@
 #include <future>
 #include <map>
 
-#include "augs/misc/timing/fixed_delta_timer.h"
 #include "augs/drawing/general_border.h"
 
 #include "game/assets/all_logical_assets.h"
@@ -25,6 +24,7 @@
 #include "application/setups/setup_common.h"
 
 #include "application/setups/editor/editor_player.h"
+#include "application/setups/editor/editor_player_logic.h"
 #include "application/setups/editor/editor_popup.h"
 #include "application/setups/editor/editor_significant.h"
 #include "application/setups/editor/editor_autosave.h"
@@ -44,6 +44,7 @@
 #include "application/setups/editor/gui/editor_selection_groups_gui.h"
 #include "application/setups/editor/gui/editor_summary_gui.h"
 #include "application/setups/editor/gui/editor_filters_gui.h"
+#include "application/setups/editor/gui/editor_player_gui.h"
 
 #include "application/setups/editor/gui/editor_pathed_asset_gui.h"
 #include "application/setups/editor/gui/editor_unpathed_asset_gui.h"
@@ -86,13 +87,13 @@ class editor_setup : private current_access_cache<editor_setup> {
 	editor_autosave autosave;
 	editor_recent_paths recent;
 	editor_settings settings;
-	editor_player player;
 	editor_entity_selector selector;
 	editor_entity_mover mover;
 
 	editor_go_to_entity_gui go_to_entity_gui;
 
 	// GEN INTROSPECTOR class editor_setup
+	editor_player_gui player_gui = std::string("Player");
 	editor_history_gui history_gui = std::string("History");
 	editor_fae_gui fae_gui = std::string("Scene hierarchy");
 	editor_selected_fae_gui selected_fae_gui = std::string("Selection hierarchy");
@@ -112,7 +113,6 @@ class editor_setup : private current_access_cache<editor_setup> {
 	std::optional<editor_popup> ok_only_popup;
 
 	editor_destructor_input destructor_input;
-	int additional_steps = 0;
 
 	const_entity_handle get_matching_go_to_entity() const;
 
@@ -156,9 +156,6 @@ class editor_setup : private current_access_cache<editor_setup> {
 
 	void play();
 	void pause();
-
-	cosmic_entropy total_collected_entropy;
-	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 
 	std::future<std::optional<std::string>> open_folder_dialog;
 	std::future<std::optional<std::string>> save_project_dialog;
@@ -242,24 +239,15 @@ public:
 	) {
 		global_time_seconds += frame_delta.in_seconds();
 
-		if (!player.paused) {
-			timer.advance(frame_delta *= player.speed);
-		}
-
-		auto steps = additional_steps + timer.extract_num_of_logic_steps(get_viewed_cosmos().get_fixed_delta());
-
-		while (steps--) {
-			total_collected_entropy.clear_dead_entities(work().world);
-
-			work().advance(
-				{ total_collected_entropy },
+		if (anything_opened()) {
+			::advance_player(
+				player(),
+				frame_delta,
+				folder().mode_vars,
+				work().world,
 				std::forward<Callbacks>(callbacks)...
 			);
-
-			total_collected_entropy.clear();
 		}
-
-		additional_steps = 0;
 	}
 
 	void control(const cosmic_entropy&);
@@ -314,6 +302,7 @@ public:
 	void finish_rectangular_selection();
 	void unhover();
 	bool is_editing_mode() const;
+	bool is_gameplay_mode() const;
 
 	bool is_mover_active() const {
 		return mover.is_active();
@@ -357,75 +346,73 @@ public:
 
 	template <class F>
 	void for_each_dashed_line(F callback) const {
-		if (anything_opened()) {
+		if (is_editing_mode()) {
 			const auto& world = work().world;
 
-			if (player.paused) {
-				for_each_selected_entity(
-					[&](const entity_id id) {
-						const auto handle = world[id];
+			for_each_selected_entity(
+				[&](const entity_id id) {
+					const auto handle = world[id];
 
-						handle.dispatch_on_having<invariants::light>([&](const auto typed_handle) {
-							const auto center = typed_handle.get_logic_transform().pos;
+					handle.dispatch_on_having<invariants::light>([&](const auto typed_handle) {
+						const auto center = typed_handle.get_logic_transform().pos;
 
-							const auto& light_def = typed_handle.template get<invariants::light>();
-							const auto& light = typed_handle.template get<components::light>();
+						const auto& light_def = typed_handle.template get<invariants::light>();
+						const auto& light = typed_handle.template get<components::light>();
 
-							const auto light_color = light.color;
+						const auto light_color = light.color;
 
-							auto draw_reach_indicator = [&](const auto reach, const auto col) {
-								const auto h_size = vec2::square(reach);
-								const auto size = vec2::square(reach * 2);
+						auto draw_reach_indicator = [&](const auto reach, const auto col) {
+							const auto h_size = vec2::square(reach);
+							const auto size = vec2::square(reach * 2);
 
-								callback(center, center + h_size, col);
+							callback(center, center + h_size, col);
 
-								augs::general_border_from_to(
-									ltrb(xywh::center_and_size(center, size)),
-									0,
-									[&](const vec2 from, const vec2 to) {
-										callback(from, to, col);
-									}
-								);
-							};
-
-							draw_reach_indicator(light_def.calc_reach_trimmed(), light_color);
-							draw_reach_indicator(light_def.calc_wall_reach_trimmed(), rgba(light_color).multiply_alpha(0.7f));
-						});
-
-						if (mover.is_active()) {
-							handle.dispatch_on_having<components::overridden_size>([&](const auto typed_handle) {
-								const auto s = typed_handle.get_logical_size();
-								const auto tr = typed_handle.get_logic_transform();
-
-								const auto& history = folder().history;
-								const auto& last = history.last_command();
-
-								if (const auto* const cmd = std::get_if<resize_entities_command>(std::addressof(last))) {
-									const auto active = cmd->get_active_edges();
-									const auto edges = ltrb::center_and_size(tr.pos, s).make_edges();
-
-									auto draw_edge = [&](auto e) {
-										callback(e[0].mult(tr), e[1].mult(tr), red, global_time_seconds * 8, true);
-									};
-
-									if (active.top) {
-										draw_edge(edges[0]);
-									}
-									if (active.right) {
-										draw_edge(edges[1]);
-									}
-									if (active.bottom) {
-										draw_edge(edges[2]);
-									}
-									if (active.left) {
-										draw_edge(edges[3]);
-									}
+							augs::general_border_from_to(
+								ltrb(xywh::center_and_size(center, size)),
+								0,
+								[&](const vec2 from, const vec2 to) {
+									callback(from, to, col);
 								}
-							});
-						}
+							);
+						};
+
+						draw_reach_indicator(light_def.calc_reach_trimmed(), light_color);
+						draw_reach_indicator(light_def.calc_wall_reach_trimmed(), rgba(light_color).multiply_alpha(0.7f));
+					});
+
+					if (mover.is_active()) {
+						handle.dispatch_on_having<components::overridden_size>([&](const auto typed_handle) {
+							const auto s = typed_handle.get_logical_size();
+							const auto tr = typed_handle.get_logic_transform();
+
+							const auto& history = folder().history;
+							const auto& last = history.last_command();
+
+							if (const auto* const cmd = std::get_if<resize_entities_command>(std::addressof(last))) {
+								const auto active = cmd->get_active_edges();
+								const auto edges = ltrb::center_and_size(tr.pos, s).make_edges();
+
+								auto draw_edge = [&](auto e) {
+									callback(e[0].mult(tr), e[1].mult(tr), red, global_time_seconds * 8, true);
+								};
+
+								if (active.top) {
+									draw_edge(edges[0]);
+								}
+								if (active.right) {
+									draw_edge(edges[1]);
+								}
+								if (active.bottom) {
+									draw_edge(edges[2]);
+								}
+								if (active.left) {
+									draw_edge(edges[3]);
+								}
+							}
+						});
 					}
-				);
-			}
+				}
+			);
 		}
 	}
 
@@ -434,7 +421,7 @@ public:
 		const visible_entities& entities, 
 		F callback
 	) const {
-		if (anything_opened() && player.paused) {
+		if (is_editing_mode()) {
 			const auto& world = work().world;
 
 			::for_each_iconed_entity(
@@ -452,14 +439,14 @@ public:
 
 	template <class F>
 	void for_each_highlight(F callback) const {
-		if (anything_opened() && player.paused) {
+		if (is_editing_mode()) {
 			const auto& world = work().world;
 
-			if (get_viewed_character().alive()) {
+			if (const auto viewed_character = get_viewed_character()) {
 				auto color = settings.controlled_entity_color;
 				color.a += static_cast<rgba_channel>(augs::zigzag(global_time_seconds, 1.0 / 2) * 25);
 
-				callback(work().local_test_subject, color);
+				callback(viewed_character.get_id(), color);
 			}
 
 			selector.for_each_highlight(

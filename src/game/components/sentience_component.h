@@ -54,6 +54,7 @@ namespace components {
 		augs::stepped_timestamp time_of_last_exhausted_cast;
 
 		augs::stepped_timestamp time_of_last_shake;
+		augs::stepped_timestamp when_knocked_out;
 		sentience_shake shake;
 
 		// END GEN INTROSPECTOR

@@ -5,7 +5,7 @@ namespace filters {
 	enum categories {
 		STATIC_OBJECT		= 1 << 0,
 		SIGHT_OBSTRUCTION = 1 << 1,
-		CONTROLLED_CHARACTER = 1 << 2,
+		LOCAL_CHARACTER = 1 << 2,
 		BULLET			= 1 << 4,
 		DYNAMIC_OBJECT = 1 << 6,
 		TRIGGER = 1 << 7,
@@ -23,7 +23,7 @@ namespace filters {
 
 	b2Filter renderable_query();
 	b2Filter renderable();
-	b2Filter controlled_character();
+	b2Filter local_character();
 	b2Filter friction_ground();
 	b2Filter dynamic_object();
 	b2Filter see_through_dynamic_object();

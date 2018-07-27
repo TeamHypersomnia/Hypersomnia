@@ -55,6 +55,14 @@ protected:
 		return *current_work;
 	}
 
+	FORCE_INLINE auto& player() {
+		return current_folder->player;
+	}
+
+	FORCE_INLINE const auto& player() const {
+		return current_folder->player;
+	}
+
 	FORCE_INLINE auto& folder() {
 		return *current_folder;
 	}

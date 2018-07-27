@@ -138,16 +138,19 @@ main_menu_setup::main_menu_setup(
 	// TODO: actually load a cosmos with its resources from a file/folder
 	const bool is_intro_scene_available = settings.menu_intro_scene_intercosm_path.string().size() > 0;
 
+	auto& cosm = intro.world;
+
 	if (is_intro_scene_available) {
 #if BUILD_TEST_SCENES
-		intro.make_test_scene(lua, { false, 60 } );
+		intro.make_test_scene(lua, { false, 60 }, mode_vars);
+		controlled_character_id = cosm[mode.add_player({ mode_vars, cosm }, faction_type::RESISTANCE)].get_id();
 #endif
 	}
 
 	// director.load_recording_from_file(settings.menu_intro_scene_entropy_path);
 
 	const bool is_recording_available = is_intro_scene_available && director.is_recording_available();
-	initial_step_number = intro.world.get_total_steps_passed();
+	initial_step_number = cosm.get_total_steps_passed();
 
 	for (auto& m : gui.root.buttons) {
 		m.hover_highlight_maximum_distance = 10.f;
@@ -165,14 +168,15 @@ main_menu_setup::main_menu_setup(
 	gui.root.buttons[main_menu_button_type::QUIT].set_appearing_caption("Quit");
 
 	if (is_recording_available) {
-		while (intro.world.get_total_seconds_passed() < settings.rewind_intro_scene_by_secs) {
-			const auto entropy = cosmic_entropy(director.get_entropy_for_step(intro.world.get_total_steps_passed() - initial_step_number), intro.world);
+		while (cosm.get_total_seconds_passed() < settings.rewind_intro_scene_by_secs) {
+			const auto entropy = cosmic_entropy(director.get_entropy_for_step(cosm.get_total_steps_passed() - initial_step_number), cosm);
 
-			intro.advance(
-				entropy,
-				[](auto) {},
-				[](auto) {},
-				[](auto) {}
+			mode.advance(
+				{ mode_vars, cosm },
+				{ entropy },
+				[](auto&&...) {},
+				[](auto&&...) {},
+				[](auto&&...) {}
 			);
 		}
 	}

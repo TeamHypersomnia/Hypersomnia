@@ -12,6 +12,10 @@ editor_history& editor_command_input::get_history() const {
 	return folder.history;
 }
 
+editor_player& editor_command_input::get_player() const {
+	return folder.player;
+}
+
 all_viewables_defs& editor_command_input::get_viewable_defs() const {
 	return folder.work->viewables;
 }

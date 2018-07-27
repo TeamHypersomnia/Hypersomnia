@@ -96,14 +96,17 @@ public:
 	{}
 
 	const auto& get_meta() const {
+		ensure(alive());
 		return *reinterpret_cast<const entity_solvable_meta*>(ptr);
-	};
+	}
 
 	auto& get(cosmos_solvable_access) const {
+		ensure(alive());
 		return *ptr;
 	}
 
 	const auto& get() const {
+		ensure(alive());
 		return *ptr;
 	}
 
@@ -182,6 +185,8 @@ public:
 
 	template <class List, class F>
 	FORCE_INLINE decltype(auto) conditional_dispatch_ret(F&& callback) const {
+		ensure(alive());
+
 		return conditional_find_by_dynamic_id<List>(
 			all_entity_types(), 
 			raw_id.type_id,
@@ -218,6 +223,8 @@ public:
 
 	template <class F>
 	decltype(auto) dispatch(F&& callback) const {
+		ensure(alive());
+
 		return get_by_dynamic_id(
 			all_entity_types(),
 			raw_id.type_id,

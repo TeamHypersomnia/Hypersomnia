@@ -102,6 +102,11 @@ public:
 		);
 	}
 
+	static entity_handle create_entity(
+		cosmos& cosm,
+		entity_flavour_id
+	);
+
 	template <class C, class... Types, class Pre, class Post>
 	static entity_handle create_entity(
 		C& cosm,
@@ -220,15 +225,15 @@ public:
 		status = callback(cosm.get_solvable({}).significant);
 	}
 
-	template <class... Constraints, class C, class F>
+	template <class... MustHaveComponents, class C, class F>
 	static void for_each_entity(C& self, F callback) {
-		self.get_solvable({}).template for_each_entity<Constraints...>(
-			[&](auto& object, const auto iteration_index) {
+		self.get_solvable({}).template for_each_entity<MustHaveComponents...>(
+			[&](auto& object, const auto iteration_index) -> decltype(auto) {
 				using O = decltype(object);
 				using E = entity_type_of<O>;
 				using iterated_handle_type = basic_iterated_entity_handle<is_const_ref_v<O>, E>;
 				
-				callback(iterated_handle_type(self, { object, iteration_index } ));
+				return callback(iterated_handle_type(self, { object, iteration_index } ));
 			}
 		);
 	}

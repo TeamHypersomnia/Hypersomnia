@@ -191,7 +191,7 @@ public:
 	void for_each_id_and_flavour(F&& callback) const {
 		for_each_id_and_object(
 			get_flavours<E>(), 
-			[&callback](auto& id, auto& flavour) {
+			[&callback](const raw_entity_flavour_id& id, const entity_flavour<E>& flavour) {
 				callback(typed_entity_flavour_id<E>(id), flavour);
 			}
 		);
@@ -211,14 +211,14 @@ public:
 		return nullptr;
 	}
 
-	template <class... Constraints, class F>
+	template <class... MustHaveComponents, class F>
 	void for_each_having(F&& callback) {
-		cosmic::for_each_entity<Constraints...>(*this, std::forward<F>(callback));
+		cosmic::for_each_entity<MustHaveComponents...>(*this, std::forward<F>(callback));
 	}
 
-	template <class... Constraints, class F>
+	template <class... MustHaveComponents, class F>
 	void for_each_having(F&& callback) const {
-		cosmic::for_each_entity<Constraints...>(*this, std::forward<F>(callback));
+		cosmic::for_each_entity<MustHaveComponents...>(*this, std::forward<F>(callback));
 	}
 
 	template <class F>

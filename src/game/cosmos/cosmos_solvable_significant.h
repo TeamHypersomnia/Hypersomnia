@@ -35,13 +35,13 @@ struct cosmos_solvable_significant {
 	}
 
 	template <class F>
-	void for_each_entity_pool(F&& callback) {
-		entity_pools.for_each_container(std::forward<F>(callback));
+	decltype(auto) for_each_entity_pool(F&& callback) {
+		return entity_pools.for_each_container(std::forward<F>(callback));
 	}
 
 	template <class F>
-	void for_each_entity_pool(F&& callback) const {
-		entity_pools.for_each_container(std::forward<F>(callback));
+	decltype(auto) for_each_entity_pool(F&& callback) const {
+		return entity_pools.for_each_container(std::forward<F>(callback));
 	}
 
 	void clear();

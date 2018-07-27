@@ -5,7 +5,7 @@
 #include "game/detail/inventory/inventory_utils.h"
 #include "game/components/item_component.h"
 
-perform_transfer_result perform_transfer(
+perform_transfer_result perform_transfer_no_step(
 	const item_slot_transfer_request, 
 	cosmos& cosm
 );
@@ -25,7 +25,7 @@ template <class F, class E>
 void drop_from_all_slots(const invariants::container& container, const E handle, const impulse_mults impulse, F result_callback) {
 	for (const auto& s : container.slots) {
 		for (const auto item : get_items_inside(handle, s.first)) {
-			result_callback(perform_transfer(item_slot_transfer_request::drop(item, impulse), handle.get_cosmos()));
+			result_callback(perform_transfer_no_step(item_slot_transfer_request::drop(item, impulse), handle.get_cosmos()));
 		}
 	}
 }

@@ -18,8 +18,7 @@ namespace components {
 		// GEN INTROSPECTOR struct components::attitude
 		float maximum_divergence_angle_before_shooting = 10.0;
 
-		augs::enum_boolset<faction_type> parties;
-		augs::enum_boolset<faction_type> hostile_parties;
+		faction_type official_faction;
 
 		specific_hostile_entities_vector specific_hostile_entities = {};
 		

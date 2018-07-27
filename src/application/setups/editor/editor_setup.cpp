@@ -38,7 +38,7 @@ void editor_setup::open_last_folders(sol::state& lua) {
 }
 
 double editor_setup::get_audiovisual_speed() const {
-	return player.get_speed();
+	return anything_opened() ? player().get_speed() : 1.0;
 }
 
 const cosmos& editor_setup::get_viewed_cosmos() const {
@@ -46,11 +46,11 @@ const cosmos& editor_setup::get_viewed_cosmos() const {
 }
 
 real32 editor_setup::get_interpolation_ratio() const {
-	return timer.fraction_of_step_until_next_step(get_viewed_cosmos().get_fixed_delta());
+	return anything_opened() ? player().timer.fraction_of_step_until_next_step(get_viewed_cosmos().get_fixed_delta()) : 1.0;
 }
 
 entity_id editor_setup::get_viewed_character_id() const {
-	return anything_opened() ? work().local_test_subject : entity_id();
+	return anything_opened() ? view().controlled_character_id : entity_id();
 }
 
 const_entity_handle editor_setup::get_viewed_character() const {
@@ -66,12 +66,16 @@ void editor_setup::unhover() {
 }
 
 bool editor_setup::is_editing_mode() const {
-	return player.is_editing_mode();
+	return anything_opened() ? player().is_editing_mode() : false;
+}
+
+bool editor_setup::is_gameplay_mode() const {
+	return anything_opened() && !is_editing_mode();
 }
 
 std::optional<camera_eye> editor_setup::find_current_camera_eye() const {
 	if (anything_opened()) {
-		return editor_detail::calculate_camera(player, view(), get_matching_go_to_entity(), work());
+		return editor_detail::calculate_camera(player(), view(), get_matching_go_to_entity(), get_viewed_character());
 	}
 
 	return std::nullopt;
@@ -82,7 +86,10 @@ const_entity_handle editor_setup::get_matching_go_to_entity() const {
 }
 
 void editor_setup::on_folder_changed() {
-	player.paused = true;
+	if (anything_opened()) {
+		player().paused = true;
+	}
+
 	selector.clear();
 }
 
@@ -100,8 +107,7 @@ void editor_setup::set_popup(const editor_popup p) {
 }
 
 void editor_setup::set_locally_viewed(const entity_id id) {
-	work().local_test_subject = id;
-	//view().panned_camera = std::nullopt;
+	view().controlled_character_id = id;
 }
 
 editor_setup::editor_setup(
@@ -155,7 +161,9 @@ void editor_setup::force_autosave_now() const {
 void editor_setup::control(
 	const cosmic_entropy& entropy
 ) {
-	total_collected_entropy += entropy;
+	if (anything_opened()) {
+		player().control(entropy);
+	}
 }
 
 void editor_setup::accept_game_gui_events(
@@ -172,7 +180,7 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 		config.window.name = "Editor";
 	}
 
-	if (player.paused) {
+	if (!anything_opened() || is_editing_mode()) {
 		config.drawing.draw_aabb_highlighter = false;
 		config.interpolation.enabled = false;
 		config.drawing.draw_area_markers = false;
@@ -379,7 +387,7 @@ void editor_setup::perform_custom_imgui(
 					do_window_entry(filters_gui);
 
 					if (item_if_tabs("Player")) {
-						player.show = true;
+						player_gui.show = true;
 					}
 
 					do_window_entry(selection_groups_gui);
@@ -421,9 +429,9 @@ void editor_setup::perform_custom_imgui(
 			const auto output = fae_gui.perform(make_fae_gui_input(), view().selected_entities);
 
 			if (const auto id = output.instantiate_id) {
-				if (!is_editing_mode()) {
+				if (is_gameplay_mode()) {
 					/* Go back to editing */
-					player.paused = true;
+					player().paused = true;
 				}
 
 				instantiate_flavour_command cmd;
@@ -480,23 +488,7 @@ void editor_setup::perform_custom_imgui(
 
 		coordinates_gui.perform(*this, screen_size, mouse_pos, all_selected);
 
-		if (player.show) {
-			auto player_window = scoped_window("Player", &player.show, ImGuiWindowFlags_AlwaysAutoResize);
-
-			if (ImGui::Button("Play")) {
-				play();
-			}
-			ImGui::SameLine();
-			
-			if (ImGui::Button("Pause")) {
-				pause();
-			}
-			ImGui::SameLine();
-			
-			if (ImGui::Button("Stop")) {
-				stop();
-			}
-		}
+		player_gui.perform(make_command_input());
 
 		const auto go_to_dialog_pos = vec2 { static_cast<float>(screen_size.x / 2), menu_bar_size.y * 2 + 1 };
 
@@ -564,8 +556,8 @@ std::optional<setup_escape_result> editor_setup::escape() {
 		ok_only_popup = std::nullopt;
 		return setup_escape_result::JUST_FETCH;
 	}
-	else if (!player.paused) {
-		player.paused = true;
+	else if (anything_opened() && !player().paused) {
+		player().paused = true;
 		return setup_escape_result::SWITCH_TO_GAME_GUI;
 	}
 	else if (mover.escape()) {
@@ -750,28 +742,40 @@ void editor_setup::reveal_in_explorer(const augs::window& owner) {
 }
 
 void editor_setup::play() {
-	player.paused = false;
+	if (anything_opened()) {
+		player().paused = false;
+	}
 }
 
 void editor_setup::pause() {
-	player.paused = true;
+	if (anything_opened()) {
+		player().paused = true;
+	}
 }
 
 void editor_setup::play_pause() {
-	bool& f = player.paused;
-	f = !f;
+	if (anything_opened()) {
+		bool& f = player().paused;
+		f = !f;
+	}
 }
 
 void editor_setup::stop() {
-	player.paused = true;
+	if (anything_opened()) {
+		player().paused = true;
+	}
 }
 
 void editor_setup::prev() {
-	player.paused = true;
+	if (anything_opened()) {
+		player().paused = true;
+	}
 }
 
 void editor_setup::next() {
-	player.paused = true;
+	if (anything_opened()) {
+		player().paused = true;
+	}
 }
 
 void editor_setup::new_tab() {
@@ -888,6 +892,8 @@ bool editor_setup::handle_input_before_imgui(
 		}
 
 		const bool has_alt{ common_input_state[key::LALT] };
+		const bool has_ctrl{ common_input_state[key::LCTRL] };
+		const bool has_shift{ common_input_state[key::LSHIFT] };
 
 		if (has_alt) {
 			switch (k) {
@@ -896,7 +902,7 @@ bool editor_setup::handle_input_before_imgui(
 				case key::S: selected_fae_gui.open(); return true;
 				case key::C: common_state_gui.open(); return true;
 				case key::G: selection_groups_gui.open(); return true;
-				case key::P: player.show = true; return true;
+				case key::P: player_gui.show = true; return true;
 				case key::U: summary_gui.open(); return true;
 				case key::O: coordinates_gui.open(); return true;
 				case key::F: filters_gui.open(); return true;
@@ -908,31 +914,41 @@ bool editor_setup::handle_input_before_imgui(
 			}
 		}
 
-		if (player.paused) {
-			const bool has_ctrl{ common_input_state[key::LCTRL] };
-			const bool has_shift{ common_input_state[key::LSHIFT] };
+		if (has_ctrl) {
+			switch (k) {
+				case key::N: new_tab(); return true;
+				case key::O: open(window); return true;
+				case key::ENTER: return confirm_modal_popup();
+				default: break;
+			}
+		}
 
+		if (anything_opened()) {
 			if (has_ctrl) {
 				if (has_shift) {
 					switch (k) {
 						case key::E: reveal_in_explorer(window); return true;
 						case key::TAB: prev_tab(); return true;
-						case key::F5: fill_with_minimal_scene(); return true;
 						default: break;
 					}
 				}
 
 				switch (k) {
 					case key::S: save(window); return true;
-					case key::O: open(window); return true;
 					case key::COMMA: go_to_all(); return true;
-					case key::N: new_tab(); return true;
 					case key::W: close_folder(); return true;
 					case key::TAB: next_tab(); return true;
 					default: break;
 				}
 			}
 
+			switch (k) {
+				case key::F12: save_as(window); return true;
+				default: break;
+			}
+		}
+
+		if (is_editing_mode()) {
 			if (has_shift) {
 				switch (k) {
 					case key::F5: fill_with_test_scene(); return true;
@@ -940,10 +956,11 @@ bool editor_setup::handle_input_before_imgui(
 				}
 			}
 
-			switch (k) {
-				case key::F12: save_as(window); return true;
-				case key::ENTER: return confirm_modal_popup();
-				default: break;
+			if (has_ctrl && has_shift) {
+				switch (k) {
+					case key::F5: fill_with_minimal_scene(); return true;
+					default: break;
+				}
 			}
 		}
 	}
@@ -1104,7 +1121,7 @@ bool editor_setup::handle_input_before_game(
 				case key::DEL: delete_selection(); return true;
 				case key::T: mover.start_moving_selection(make_mover_input()); return true;
 				case key::R: mover.start_rotating_selection(make_mover_input()); return true;
-				case key::ADD: ++additional_steps; return true;
+				case key::ADD: player().request_step(); return true;
 				default: break;
 			}
 
@@ -1139,7 +1156,7 @@ const editor_view* editor_setup::find_view() const {
 }
 
 std::optional<ltrb> editor_setup::find_selection_aabb() const {
-	if (anything_opened() && player.paused) {
+	if (is_editing_mode()) {
 		return selector.find_selection_aabb(work().world, make_grouped_selector_op_input());
 	}
 
@@ -1147,7 +1164,7 @@ std::optional<ltrb> editor_setup::find_selection_aabb() const {
 }
 
 std::optional<rgba> editor_setup::find_highlight_color_of(const entity_id id) const {
-	if (anything_opened() && player.paused) {
+	if (is_editing_mode()) {
 		return selector.find_highlight_color_of(
 			settings.entity_selector, id, make_grouped_selector_op_input()
 		);

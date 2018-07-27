@@ -13,6 +13,14 @@ struct entity_guid {
 	guid_value_type value = 0u;
 	// END GEN INTROSPECTOR
 
+	static auto dead() {
+		return entity_guid(0);
+	}
+
+	static auto first() {
+		return entity_guid(1);
+	}
+
 	entity_guid() = default;
 	entity_guid(const guid_value_type b) : value(b) {}
 	

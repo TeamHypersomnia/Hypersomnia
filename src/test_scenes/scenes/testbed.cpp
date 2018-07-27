@@ -34,9 +34,18 @@
 #include "game/cosmos/cosmic_delta.h"
 
 #include "test_scenes/scenes/test_scene_node.h"
+#include "game/modes/test_scene_mode.h"
 
 namespace test_scenes {
-	entity_id testbed::populate(const loaded_image_caches_map& caches, const logic_step step) const {
+	void testbed::setup(test_scene_mode_vars& vars) {
+		vars.spawned_faction = faction_type::RESISTANCE;
+
+		vars.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::VINDICATOR);
+		vars.initial_eq.magazine = to_entity_flavour_id(test_container_items::SAMPLE_MAGAZINE);
+		vars.initial_eq.charge = to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE);
+	}
+
+	void testbed::populate(const loaded_image_caches_map& caches, const logic_step step) const {
 		auto& world = step.get_cosmos();
 		
 		auto create = [&](auto&&... args) {
@@ -72,7 +81,7 @@ namespace test_scenes {
 
 		std::vector<transformr> character_transforms = {
 			{ { 0, 300 }, 0 },
-			{ { 254, 211 }, 68 },
+			{ { -1540, 211 }, 68 },
 			{ { 1102, 213 }, 110 },
 			{ { 1102, 413 }, 110 },
 			{ { -100, 20000 }, 0 },
@@ -604,7 +613,5 @@ namespace test_scenes {
 			const auto second_machete = prefabs::create_cyan_urban_machete(step, vec2(0, 300));
 			perform_transfer(item_slot_transfer_request::standard(second_machete, character(2).get_primary_hand()), step);
 		}
-
-		return character(1);
 	}
 }

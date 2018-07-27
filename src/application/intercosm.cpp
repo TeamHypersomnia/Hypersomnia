@@ -21,14 +21,13 @@ void intercosm::clear() {
 
 	augs::recursive_clear(version);
 	version.commit_number = 0;
-
-	local_test_subject.unset();
 }
 
 #if BUILD_TEST_SCENES
 void intercosm::make_test_scene(
 	sol::state& lua, 
-	const test_scene_settings settings
+	const test_scene_settings settings,
+	test_scene_mode_vars& mode
 ) {
 	clear();
 
@@ -42,7 +41,7 @@ void intercosm::make_test_scene(
 	populate_test_scene_logical_assets(viewables.image_definitions, logicals);
 	populate_test_scene_viewables(caches, logicals.plain_animations, viewables);
 
-	auto reloader = [&](auto populator){
+	auto reloader = [&](auto populator) {
 		world.change_common_significant([&](cosmos_common_significant& common){
 			common.logical_assets = logicals;
 			viewables.update_relevant(common.logical_assets);
@@ -56,7 +55,8 @@ void intercosm::make_test_scene(
 			return changer_callback_result::REFRESH;
 		});
 
-		local_test_subject = populator.populate_with_entities(caches, make_logic_step_input({}));
+		populator.populate_with_entities(caches, { world, {} });
+		populator.setup(mode);
 	};
 
 	if (settings.create_minimal) {
@@ -67,10 +67,6 @@ void intercosm::make_test_scene(
 	}
 }
 #endif
-
-const_entity_handle intercosm::get_viewed_character() const {
-	return world[local_test_subject];
-}
 
 void intercosm::save(const intercosm_path_op op) const {
 	const auto effective_extension = op.path.extension();

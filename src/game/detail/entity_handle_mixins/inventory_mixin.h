@@ -82,6 +82,8 @@ public:
 	}
 
 	std::optional<unsigned> find_space_occupied() const;	
+	int num_charges_fitting_in(const inventory_slot_handle_type&) const;
+	void set_charges(int) const;
 
 	generic_handle_type get_owning_transfer_capability() const;
 	generic_handle_type get_topmost_container() const;
@@ -430,6 +432,25 @@ std::optional<unsigned> inventory_mixin<E>::find_space_occupied() const {
 	}
 
 	return std::nullopt;
+}
+template <class E>
+int inventory_mixin<E>::num_charges_fitting_in(const inventory_slot_handle_type& where) const {
+	const auto& self = *static_cast<const E*>(this);
+
+	if (const auto per_charge = self.template get<invariants::item>().space_occupied_per_charge; per_charge != 0) {
+		const auto free_space = where.calc_real_space_available();
+
+		return free_space / per_charge;
+	}
+
+	return 0;
+}
+
+template <class E>
+void inventory_mixin<E>::set_charges(const int n) const {
+	const auto& self = *static_cast<const E*>(this);
+
+	self.template get<components::item>().set_charges(n);
 }
 
 template <class E>

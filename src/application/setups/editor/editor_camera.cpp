@@ -9,13 +9,12 @@ namespace editor_detail {
 	std::optional<camera_eye> calculate_camera(
 		const editor_player& player,
 		const editor_view& view,
-		const_entity_handle matching_go_to_entity,
-		const intercosm& icm
+		const const_entity_handle matching_go_to_entity,
+		const const_entity_handle viewed_character
 	) {
 		std::optional<transformr> viewed_transform;
 
 		const auto panning = view.panned_camera;
-		const auto viewed_character = icm.get_viewed_character();
 
 		if (viewed_character) {
 			viewed_transform = viewed_character.find_logic_transform();

@@ -61,6 +61,8 @@ void editor_folder::save_folder(const augs::path_type& to, const augs::path_type
 	work->save_as_int(paths.int_file);
 	augs::save_as_bytes(view, paths.view_file);
 	augs::save_as_bytes(history, paths.hist_file);
+	augs::save_as_bytes(mode_vars, paths.modes_file);
+	augs::save_as_bytes(player, paths.player_file);
 
 	const auto old_autosave_path = paths.autosave_path;
 	augs::remove_directory(old_autosave_path);
@@ -124,6 +126,8 @@ void editor_folder::load_folder(const augs::path_type& from, const augs::path_ty
 	try {
 		augs::load_from_bytes(view, paths.view_file);
 		augs::load_from_bytes(history, paths.hist_file);
+		augs::load_from_bytes(mode_vars, paths.modes_file);
+		augs::load_from_bytes(player, paths.player_file);
 	}
 	catch (const augs::file_open_error&) {
 		/* We just let it happen. These files are not necessary. */

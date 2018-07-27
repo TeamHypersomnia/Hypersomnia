@@ -261,7 +261,7 @@ return {
     enabled = true,
     speed = 1000
   },
-  launch_mode = "MAIN_MENU",
+  launch_mode = "EDITOR",
   main_menu = {
     latest_news_url = "http://hypersomnia.xyz/latest_post/",
     menu_intro_scene_entropy_path = "abc",
