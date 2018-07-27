@@ -25,7 +25,13 @@ void test_scene_mode::teleport_to_next_spawn(const input in, const entity_id id)
 	handle.dispatch([&](const auto typed_handle) {
 		if (const auto faction = typed_handle.find_official_faction()) {
 			if (const auto spawn = ::find_faction_spawn(in.cosm, *faction, current_spawn_index)) {
-				typed_handle.set_logic_transform(spawn.get_logic_transform());
+				const auto spawn_transform = spawn.get_logic_transform();
+				typed_handle.set_logic_transform(spawn_transform);
+
+				if (const auto crosshair = typed_handle.find_crosshair()) {
+					crosshair->base_offset = vec2::from_degrees(spawn_transform.rotation) * 200;
+				}
+
 				current_spawn_index = (current_spawn_index + 1) % get_num_faction_spawns(in.cosm, *faction);
 			}
 		}
