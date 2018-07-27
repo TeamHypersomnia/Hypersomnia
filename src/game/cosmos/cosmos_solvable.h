@@ -13,7 +13,6 @@
 #include "augs/entity_system/storage_for_systems.h"
 
 #include "game/assets/ids/behaviour_tree_id.h"
-#include "game/assets/behaviour_tree.h"
 
 #include "game/cosmos/cosmic_profiler.h"
 
@@ -28,8 +27,6 @@
 #include "game/cosmos/cosmos_solvable_significant.h"
 #include "game/cosmos/specific_entity_handle_declaration.h"
 #include "game/cosmos/entity_id.h"
-
-#include "game/assets/behaviour_tree.h"
 
 class cosmos_solvable {
 	using guid_cache = std::map<entity_guid, entity_id>;

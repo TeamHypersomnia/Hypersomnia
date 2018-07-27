@@ -6,7 +6,6 @@
 #include "game/detail/visible_entities.h"
 
 #include "game/cosmos/cosmos.h"
-#include "game/cosmos/entity_handle.h"
 
 #include "view/necessary_image_id.h"
 #include "view/necessary_resources.h"

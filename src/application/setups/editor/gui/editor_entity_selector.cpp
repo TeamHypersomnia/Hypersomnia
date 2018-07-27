@@ -8,6 +8,7 @@
 #include "application/setups/editor/gui/for_each_iconed_entity.h"
 #include "augs/math/math.h"
 
+#include "game/cosmos/entity_handle.h"
 #include "application/setups/editor/gui/editor_entity_selector.inl"
 
 void editor_entity_selector::reset_held_params() {

@@ -33,8 +33,6 @@ void editor_command_input::interrupt_tweakers() const {
 }
 
 void editor_command_input::purge_selections() const {
-	/* static_assert(decltype(cosmos()[typed_entity_id<controlled_character>()])::is_specific); */
-	/* static_assert(!decltype(cosmos()[entity_id()])::is_specific); */
 	folder.view.selected_entities.clear();
 	selector.clear();
 	mover.escape();

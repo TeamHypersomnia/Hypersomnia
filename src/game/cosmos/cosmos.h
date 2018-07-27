@@ -14,8 +14,6 @@
 
 #include "game/enums/processing_subjects.h"
 
-#include "game/assets/behaviour_tree.h"
-
 #include "game/cosmos/handle_getters_declaration.h"
 
 struct cosmos_loading_error : error_with_typesafe_sprintf {

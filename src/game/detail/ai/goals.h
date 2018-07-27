@@ -14,8 +14,8 @@ namespace behaviours {
 		vec2 movement_direction;
 	};
 
-	typedef std::tuple<
+	using goal_tuple = std::tuple<
 		behaviours::immediate_evasion_goal,
 		behaviours::minimize_recoil_through_movement_goal
-	> goal_tuple;
+	>;
 }

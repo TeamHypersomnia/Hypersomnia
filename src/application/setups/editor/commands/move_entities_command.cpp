@@ -10,6 +10,7 @@
 
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
+#include "game/cosmos/entity_handle.h"
 
 using delta_type = move_entities_command::delta_type;
 using moved_entities_type = move_entities_command::moved_entities_type;
