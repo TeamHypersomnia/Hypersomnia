@@ -9,7 +9,6 @@
 #include "game/cosmos/entity_flavour_id.h"
 #include "game/cosmos/entity_handle_declaration.h"
 #include "game/cosmos/specific_entity_handle.h"
-#include "game/cosmos/entity_handle.h"
 #include "game/cosmos/entity_construction.h"
 #include "game/cosmos/specific_entity_handle_declaration.h"
 
@@ -108,7 +107,7 @@ public:
 	);
 
 	template <class C, class... Types, class Pre, class Post>
-	static entity_handle create_entity(
+	static auto create_entity(
 		C& cosm,
 		const constrained_entity_flavour_id<Types...> flavour_id,
 		Pre&& pre_construction,

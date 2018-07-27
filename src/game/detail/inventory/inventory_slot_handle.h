@@ -82,6 +82,13 @@ public:
 	}
 };
 
+template <class C>
+auto subscript_handle_getter(C& cosm, const inventory_slot_id id) 
+	-> basic_inventory_slot_handle<basic_entity_handle<std::is_const_v<C>>>
+{
+	return { cosm, id };
+}
+
 template <class E>
 const auto& get_items_inside(const E h, const slot_function s) {
 	return h.get_cosmos()[inventory_slot_id{s, h.get_id()}].get_items_inside();  
@@ -136,10 +143,6 @@ inline basic_inventory_slot_handle<E>::operator inventory_slot_id() const {
 	return get_id();
 }
 
-template <class C>
-auto subscript_handle_getter(C& cosm, const inventory_slot_id id) {
-	return basic_inventory_slot_handle<basic_entity_handle<std::is_const_v<C>>>{ cosm, id };
-}
 template <class E>
 void basic_inventory_slot_handle<E>::unset() {
 	raw_id.unset();

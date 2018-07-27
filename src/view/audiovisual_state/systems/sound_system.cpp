@@ -16,9 +16,14 @@
 #include "view/viewables/loaded_sounds_map.h"
 
 #include "augs/audio/audio_settings.h"
+#include "view/character_camera.h"
 
 std::optional<transformr> sound_system::update_properties_input::find_transform(const absolute_or_local& positioning) const {
 	return ::find_transform(positioning, get_listener().get_cosmos(), interp);
+}
+
+const_entity_handle sound_system::update_properties_input::get_listener() const {
+	return ear.viewed_character;
 }
 
 void sound_system::clear() {

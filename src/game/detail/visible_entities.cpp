@@ -5,6 +5,7 @@
 #include "game/detail/visible_entities.h"
 
 #include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
 #include "game/components/render_component.h"
 
 #include "game/enums/filters.h"

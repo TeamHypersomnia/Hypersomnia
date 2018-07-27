@@ -284,3 +284,35 @@ template <bool is_const>
 std::ostream& operator<<(std::ostream& out, const basic_entity_handle<is_const> &x) {
 	return out << typesafe_sprintf("%x-%x", x.get_name(), x.get_id());
 }
+
+template <class C>
+auto subscript_handle_getter(C& cosm, const entity_id id) 
+	-> basic_entity_handle<std::is_const_v<C>>
+{
+	const auto ptr = cosm.get_solvable({}).on_entity_meta(id, [&](auto* const agg) {
+		return reinterpret_cast<maybe_const_ptr_t<std::is_const_v<C>, void>>(agg);	
+	});
+
+	return { ptr, cosm, id };
+}
+
+template <class C>
+auto subscript_handle_getter(C& cosm, const child_entity_id id)
+	-> basic_entity_handle<std::is_const_v<C>>
+{
+	return subscript_handle_getter(cosm, entity_id(id));
+}
+
+template <class C>
+auto subscript_handle_getter(C& cosm, const unversioned_entity_id id)
+	-> basic_entity_handle<std::is_const_v<C>>
+{
+	return subscript_handle_getter(cosm, cosm.to_versioned(id));
+}
+
+template <class C>
+auto subscript_handle_getter(C& cosm, const entity_guid guid)
+	-> basic_entity_handle<std::is_const_v<C>>
+{
+	return subscript_handle_getter(cosm, cosm.get_solvable().get_entity_id_by(guid));
+}

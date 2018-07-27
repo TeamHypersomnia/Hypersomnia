@@ -8,11 +8,12 @@
 
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/logic_step.h"
+#include "game/cosmos/entity_handle.h"
 
 namespace behaviours {
 	tree::goal_availability minimize_recoil_through_movement::goal_resolution(tree::state_of_traversal& t) const {
-		const auto subject = t.get_subject();
 		const auto& cosmos = t.step.get_cosmos();
+		const auto subject = cosmos[t.subject];
 		const auto& attitude = subject.get<components::attitude>();
 		const auto currently_attacked_visible_entity = cosmos[attitude.currently_attacked_visible_entity];
 
@@ -33,7 +34,8 @@ namespace behaviours {
 	}
 
 	void minimize_recoil_through_movement::execute_leaf_goal_callback(tree::execution_occurence o, tree::state_of_traversal& t) const {
-		const auto subject = t.get_subject();
+		auto& cosmos = t.step.get_cosmos();
+		const auto subject = cosmos[t.subject];
 		auto& movement = subject.get<components::movement>();
 
 		if (o == tree::execution_occurence::LAST) {

@@ -5,6 +5,8 @@
 #include "application/setups/editor/editor_player.h"
 #include "application/setups/editor/editor_settings.h"
 
+#include "game/cosmos/entity_handle.h"
+
 namespace editor_detail {
 	std::optional<camera_eye> calculate_camera(
 		const editor_player& player,

@@ -43,8 +43,6 @@ public:
 		state_of_behaviour_tree_instance& instance;
 		const behaviour_tree& original_tree;
 
-		entity_handle get_subject() const;
-
 		behaviours::goal_tuple resolved_goals;
 		std::array<bool, std::tuple_size_v<decltype(resolved_goals)>> goals_set;
 

@@ -19,6 +19,7 @@
 #include "game/components/pathfinding_component.h"
 #include "game/organization/for_each_entity_type.h"
 #include "game/organization/for_each_component_type.h"
+#include "game/cosmos/entity_handle.h"
 
 #include "augs/pad_bytes.h"
 

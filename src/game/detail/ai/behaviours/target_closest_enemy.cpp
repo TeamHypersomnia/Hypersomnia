@@ -10,6 +10,7 @@
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/logic_step.h"
+#include "game/cosmos/entity_handle.h"
 #include "game/cosmos/data_living_one_step.h"
 
 namespace behaviours {
@@ -23,7 +24,7 @@ namespace behaviours {
 			return;
 
 		auto& cosmos = t.step.get_cosmos();
-		auto subject = t.get_subject();
+		auto subject = cosmos[t.subject];
 		const auto subject_transform = subject.get_logic_transform();
 		const auto pos = subject_transform.pos;
 		/* auto& los = t.step.transient.calculated_line_of_sight.at(subject); */

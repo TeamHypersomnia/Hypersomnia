@@ -7,10 +7,12 @@
 #include "game/detail/entity_scripts.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/logic_step.h"
+#include "game/cosmos/entity_handle.h"
 
 namespace behaviours {
 	tree::goal_availability pull_trigger::goal_resolution(tree::state_of_traversal& t) const {
-		const auto subject = t.get_subject();
+		const auto& cosmos = t.step.get_cosmos();
+		const auto subject = cosmos[t.subject];
 		const auto& attitude = subject.get<components::attitude>();
 		const auto currently_attacked_visible_entity = t.step.get_cosmos()[attitude.currently_attacked_visible_entity];
 
@@ -24,9 +26,9 @@ namespace behaviours {
 	}
 
 	void pull_trigger::execute_leaf_goal_callback(const tree::execution_occurence o, tree::state_of_traversal& t) const {
-		const auto subject = t.get_subject();
-		const auto wielded = subject.get_wielded_guns();
 		auto& cosmos = t.step.get_cosmos();
+		const auto subject = cosmos[t.subject];
+		const auto wielded = subject.get_wielded_guns();
 
 		for (const auto w_id : wielded) {
 			const auto w = cosmos[w_id];

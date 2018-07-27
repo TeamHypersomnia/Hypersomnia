@@ -5,6 +5,7 @@
 #include "augs/templates/hash_templates.h"
 
 #include "game/components/transform_component.h"
+#include "game/detail/inventory/inventory_slot_id_declaration.h"
 
 template <class id_type>
 struct basic_inventory_slot_id {
@@ -23,9 +24,6 @@ struct basic_inventory_slot_id {
 	bool operator==(const basic_inventory_slot_id b) const;
 	bool operator!=(const basic_inventory_slot_id b) const;
 };
-
-using inventory_slot_id = basic_inventory_slot_id<entity_id>;
-using signi_inventory_slot_id = basic_inventory_slot_id<signi_entity_id>;
 
 struct inventory_item_address {
 	entity_id root_container;

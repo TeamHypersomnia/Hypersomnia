@@ -64,3 +64,21 @@ inline auto complete_build_info() {
 }
 
 void dump_detailed_sizeof_information(const augs::path_type& where);
+
+inline auto get_help_section() {
+return
+	std::string("Hypersomnia\nA community-centered shooter released as free software.\n") 
+	+ R"(
+usage: Hypersomnia [flag|file_path]
+
+Flags:
+    -h, --help                  Show this help and quit
+    --unit-tests-only           Perform unit tests only and quit
+
+If file_path is supplied and its extension is either lua or wp,
+the file will be automatically opened in the editor.
+
+)"
++ complete_build_info()
+;
+}

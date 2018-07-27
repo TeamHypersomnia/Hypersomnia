@@ -11,6 +11,7 @@
 
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/logic_step.h"
+#include "game/cosmos/entity_handle.h"
 
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/physics/contact_listener.h"

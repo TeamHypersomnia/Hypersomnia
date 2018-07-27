@@ -131,7 +131,7 @@ class cosmos_solvable {
 		);
 	}
 
-	entity_guid get_guid(const entity_id) const;
+	entity_guid get_guid(const entity_id&) const;
 
 	guid_cache guid_to_id;
 
@@ -175,9 +175,9 @@ public:
 
 	void set_steps_per_second(const unsigned steps_per_second);
 
-	entity_id to_versioned(const unversioned_entity_id) const;
+	entity_id to_versioned(const unversioned_entity_id&) const;
 
-	entity_id get_entity_id_by(const entity_guid) const;
+	entity_id get_entity_id_by(const entity_guid&) const;
 
 	template <template <class> class Guidized>
 	Guidized<entity_guid> guidize(const Guidized<entity_guid>& id_source) const {
@@ -274,7 +274,7 @@ public:
 	}	
 };
 
-inline entity_id cosmos_solvable::get_entity_id_by(const entity_guid guid) const {
+inline entity_id cosmos_solvable::get_entity_id_by(const entity_guid& guid) const {
 	if (const auto id = mapped_or_nullptr(guid_to_id, guid)) {
 		return *id;
 	}
@@ -282,7 +282,7 @@ inline entity_id cosmos_solvable::get_entity_id_by(const entity_guid guid) const
 	return {};
 }
 
-inline entity_id cosmos_solvable::to_versioned(const unversioned_entity_id id) const {
+inline entity_id cosmos_solvable::to_versioned(const unversioned_entity_id& id) const {
 	return { 
 		significant.on_pool(
 			id.type_id, 
@@ -292,7 +292,7 @@ inline entity_id cosmos_solvable::to_versioned(const unversioned_entity_id id) c
 	};
 }
 
-inline entity_guid cosmos_solvable::get_guid(const entity_id id) const {
+inline entity_guid cosmos_solvable::get_guid(const entity_id& id) const {
 	return on_entity_meta(
 		id, 
 		[](const entity_solvable_meta* const e) { 

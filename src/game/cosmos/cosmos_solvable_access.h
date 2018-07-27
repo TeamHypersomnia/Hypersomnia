@@ -1,7 +1,7 @@
 #pragma once
 #include "game/cosmos/entity_handle_declaration.h"
-#include "game/cosmos/specific_entity_handle_declaration.h"
 #include "game/cosmos/entity_id_declaration.h"
+#include "game/cosmos/handle_getters_declaration.h"
 
 class cosmic_delta;
 class cosmic;
@@ -12,12 +12,6 @@ struct entity_property_id;
 
 template <class derived_handle_type>
 struct stored_id_provider;
-
-template <class C, class E>
-auto subscript_handle_getter(C& cosm, const typed_entity_id<E> id);
-
-template <class C>
-auto subscript_handle_getter(C& cosm, const entity_id id);
 
 class cosmos_solvable_access {
 	/*
@@ -34,10 +28,14 @@ class cosmos_solvable_access {
 	friend entity_property_id;
 
 	template <class C, class E>
-	friend auto subscript_handle_getter(C& cosm, const typed_entity_id<E> id);
+	friend auto subscript_handle_getter(C& cosm, typed_entity_id<E>) 
+		-> basic_typed_entity_handle<std::is_const_v<C>, E>
+	;
 
 	template <class C>
-	friend auto subscript_handle_getter(C& cosm, const entity_id id);
+	friend auto subscript_handle_getter(C&, entity_id) 
+		-> basic_entity_handle<std::is_const_v<C>>
+	;
 
 	cosmos_solvable_access() {}
 };

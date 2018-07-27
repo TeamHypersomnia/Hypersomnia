@@ -342,7 +342,6 @@ set(HYPERSOMNIA_CPU_INTENSIVE_CPPS
 set(HYPERSOMNIA_CODEBASE_CPPS
 	${HYPERSOMNIA_CPU_INTENSIVE_CPPS}
 
-	"src/help_section.cpp"
 	"src/application/setups/editor/gui/editor_history_gui.cpp"
 	"src/application/setups/editor/gui/editor_go_to_gui.cpp"
 	"src/application/setups/editor/editor_camera.cpp"

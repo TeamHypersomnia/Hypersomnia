@@ -31,6 +31,7 @@
 
 #include "game/detail/gun/gun_math.h"
 #include "game/stateless_systems/driver_system.h"
+#include "game/cosmos/entity_handle.h"
 
 void sentience_system::cast_spells(const logic_step step) const {
 	auto& cosmos = step.get_cosmos();

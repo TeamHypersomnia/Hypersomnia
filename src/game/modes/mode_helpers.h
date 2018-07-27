@@ -3,6 +3,7 @@
 #include "game/components/attitude_component.h"
 #include "game/common_state/entity_flavours.h"
 #include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
 
 using player_character_type = controlled_character;
 

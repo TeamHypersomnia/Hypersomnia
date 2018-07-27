@@ -1,4 +1,5 @@
 #include "game/cosmos/cosmic_functions.h"
+#include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"
 #include "game/detail/inventory/perform_transfer.h"
 #include "augs/templates/introspect.h"

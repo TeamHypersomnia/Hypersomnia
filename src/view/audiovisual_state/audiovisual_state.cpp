@@ -15,6 +15,8 @@
 #include "view/audiovisual_state/audiovisual_state.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 
+#include "view/character_camera.h"
+
 void audiovisual_state::clear() {
 	systems.for_each([](auto& sys) {
 		sys.clear();

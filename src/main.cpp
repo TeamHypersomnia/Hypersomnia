@@ -58,8 +58,6 @@
 #include "cmd_line_params.h"
 #include "build_info.h"
 
-extern std::string help_contents;
-
 int work(const int argc, const char* const * const argv);
 
 #if PLATFORM_WINDOWS
@@ -78,7 +76,7 @@ int main(const int argc, const char* const * const argv) {
 	std::setlocale(LC_ALL, "");
 
 	if (cmd_line_params(argc, argv).help_only) {
-		std::cout << help_contents << std::endl;
+		std::cout << get_help_section() << std::endl;
 		
 		return EXIT_SUCCESS;
 	}

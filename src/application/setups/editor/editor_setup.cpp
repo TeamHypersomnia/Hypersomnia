@@ -923,7 +923,7 @@ bool editor_setup::handle_input_before_imgui(
 			}
 		}
 
-		if (anything_opened()) {
+		if (is_editing_mode()) {
 			if (has_ctrl) {
 				if (has_shift) {
 					switch (k) {
@@ -946,9 +946,7 @@ bool editor_setup::handle_input_before_imgui(
 				case key::F12: save_as(window); return true;
 				default: break;
 			}
-		}
 
-		if (is_editing_mode()) {
 			if (has_shift) {
 				switch (k) {
 					case key::F5: fill_with_test_scene(); return true;

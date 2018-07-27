@@ -1,6 +1,7 @@
 #include "augs/ensure.h"
 #include "game/assets/behaviour_tree.h"
 #include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
 
 behaviour_tree::state_of_traversal::state_of_traversal(
 	const logic_step step,
@@ -14,10 +15,6 @@ behaviour_tree::state_of_traversal::state_of_traversal(
 	original_tree(original_tree)
 {
 	std::fill(goals_set.begin(), goals_set.end(), false);
-}
-
-entity_handle behaviour_tree::state_of_traversal::get_subject() const {
-	return step.get_cosmos()[subject]; 
 }
 
 const behaviour_tree::node& behaviour_tree::get_node_by_id(const int i) const {

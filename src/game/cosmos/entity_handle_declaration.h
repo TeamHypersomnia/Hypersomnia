@@ -1,5 +1,4 @@
 #pragma once
-#include "game/organization/all_components_declaration.h"
 
 template <bool is_const>
 class basic_entity_handle;

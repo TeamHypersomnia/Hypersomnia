@@ -438,3 +438,15 @@ std::ostream& operator<<(
 ) {
 	return out << typesafe_sprintf("%x-%x", x.get_name(), x.get_id());
 }
+
+template <class C, class E>
+auto subscript_handle_getter(C& cosm, const typed_entity_id<E> id)
+	-> basic_typed_entity_handle<std::is_const_v<C>, E>
+{
+	const auto ptr = cosm.get_solvable({}).dereference_entity(id);
+
+	return { 
+		cosm, 
+		{ ptr, id } 
+	};
+}

@@ -10,12 +10,13 @@
 
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/logic_step.h"
+#include "game/cosmos/entity_handle.h"
 
 namespace behaviours {
 	tree::goal_availability immediate_evasion::goal_resolution(tree::state_of_traversal& t) const {
-		const auto subject = t.get_subject();
 		//const auto& los = t.step.transient.calculated_line_of_sight.at(subject);
 		const auto& cosmos = t.step.get_cosmos();
+		const auto subject = cosmos[t.subject];
 
 		immediate_evasion_goal goal;
 
@@ -41,7 +42,9 @@ namespace behaviours {
 	}
 
 	void immediate_evasion::execute_leaf_goal_callback(const tree::execution_occurence o, tree::state_of_traversal& t) const {
-		const auto subject = t.get_subject();
+		auto& cosmos = t.step.get_cosmos();
+		const auto subject = cosmos[t.subject];
+
 		auto& movement = subject.get<components::movement>();
 
 		if (o == tree::execution_occurence::LAST) {

@@ -2,6 +2,7 @@
 #include "augs/templates/introspect.h"
 #include "cosmic_entropy.h"
 #include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
 
 #include "augs/misc/machine_entropy.h"
 #include "augs/templates/introspection_utils/rewrite_members.h"

@@ -1,12 +1,5 @@
 #pragma once
-#include <map>
-
 #include "augs/build_settings/platform_defines.h"
-
-#include "augs/templates/exception_templates.h"
-
-#include "augs/readwrite/memory_stream.h"
-#include "augs/misc/enum/enum_boolset.h"
 #include "augs/misc/randomization_declaration.h"
 
 #include "game/organization/all_entity_types_declaration.h"
@@ -15,7 +8,6 @@
 #include "game/cosmos/cosmos_common_significant_access.h"
 
 #include "game/cosmos/private_cosmos_solvable.h"
-#include "game/cosmos/specific_entity_handle.h"
 
 #include "game/cosmos/entity_id.h"
 #include "game/cosmos/cosmic_functions.h"
@@ -24,45 +16,11 @@
 
 #include "game/assets/behaviour_tree.h"
 
+#include "game/cosmos/handle_getters_declaration.h"
+
 struct cosmos_loading_error : error_with_typesafe_sprintf {
 	using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
 };
-
-template <class C>
-auto subscript_handle_getter(C& cosm, const entity_id id) {
-	static constexpr bool is_const = std::is_const_v<C>;
-
-	const auto ptr = cosm.get_solvable({}).on_entity_meta(id, [&](auto* const agg) {
-		return reinterpret_cast<maybe_const_ptr_t<is_const, void>>(agg);	
-	});
-
-	return basic_entity_handle<is_const>{ ptr, cosm, id };
-}
-
-template <class C, class E>
-auto subscript_handle_getter(C& cosm, const typed_entity_id<E> id) {
-	const auto ptr = cosm.get_solvable({}).dereference_entity(id);
-
-	return basic_typed_entity_handle<std::is_const_v<C>, E>{ 
-		cosm, 
-		{ ptr, id } 
-	};
-}
-
-template <class C>
-auto subscript_handle_getter(C& cosm, const child_entity_id id) {
-	return subscript_handle_getter(cosm, entity_id(id));
-}
-
-template <class C>
-auto subscript_handle_getter(C& cosm, const unversioned_entity_id id) {
-	return subscript_handle_getter(cosm, cosm.to_versioned(id));
-}
-
-template <class C>
-auto subscript_handle_getter(C& cosm, const entity_guid guid) {
-	return subscript_handle_getter(cosm, cosm.get_solvable().get_entity_id_by(guid));
-}
 
 class cosmos {
 	template <class C, class F>
@@ -241,13 +199,13 @@ public:
 		return subscript_handle_getter(*this, id);
 	}
 
-	template <class F>
-	decltype(auto) operator()(const entity_id subject, F callback) {
+	template <class id_type, class F>
+	decltype(auto) operator()(const id_type& subject, F callback) {
 		callback(operator[](subject));
 	}
 
-	template <class F>
-	decltype(auto) operator()(const entity_id subject, F callback) const {
+	template <class id_type, class F>
+	decltype(auto) operator()(const id_type& subject, F callback) const {
 		callback(operator[](subject));
 	}
 	
@@ -305,7 +263,7 @@ public:
 		return get_solvable().get_fixed_delta();
 	}
 
-	auto to_versioned(const unversioned_entity_id id) const {
+	auto to_versioned(const unversioned_entity_id& id) const {
 		return get_solvable().to_versioned(id);
 	}
 	

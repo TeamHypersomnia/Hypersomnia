@@ -1,6 +1,5 @@
 #pragma once
 #include "game/cosmos/entity_handle_declaration.h"
-#include "game/cosmos/entity_handle.h"
 #include "augs/graphics/vertex.h"
 
 #include "augs/math/camera_cone.h"
@@ -12,7 +11,7 @@ struct render_layer_filter;
 
 struct aabb_highlighter_drawing_input {
 	const augs::drawer_with_default output;
-	const const_entity_handle subject;
+	const const_entity_handle& subject;
 	const interpolation_system& interp;
 	const camera_eye camera;
 	const vec2 screen_size;

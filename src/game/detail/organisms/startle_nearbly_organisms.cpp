@@ -3,6 +3,7 @@
 #include "game/detail/organisms/startle_nearbly_organisms.h"
 #include "game/components/movement_path_component.h"
 #include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
 
 void startle_nearby_organisms(
 	cosmos& cosm,

@@ -8,6 +8,8 @@
 #include "application/setups/editor/gui/for_each_iconed_entity.h"
 #include "augs/math/math.h"
 
+#include "application/setups/editor/gui/editor_entity_selector.inl"
+
 void editor_entity_selector::reset_held_params() {
 	flavour_of_held = {};
 	layer_of_held = render_layer::INVALID;
@@ -217,6 +219,7 @@ void editor_entity_selector::do_mousemotion(
 					}
 				}
 				else if constexpr(std::is_same_v<W, vec2>) {
+					(void)get_icon_aabb;
 					const auto size = vec2(sizes_for_icons.at(tex_id).get_original_size()) / eye.zoom;
 
 					if (!::point_in_rect(where.pos, where.rotation, size, world_range)) {
@@ -224,6 +227,7 @@ void editor_entity_selector::do_mousemotion(
 					}
 				}
 				else {
+					(void)get_icon_aabb;
 					static_assert(always_false_v<W>);
 				}
 			}
