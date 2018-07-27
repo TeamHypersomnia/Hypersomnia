@@ -65,8 +65,6 @@ namespace test_scenes {
 		const auto riding_car2 = prefabs::create_car(step, transformr({ -850 + 1000, -8200 }, -90 + 180));
 #endif
 
-		const int num_characters = 10;
-
 		for (int i = 0; i < 10; ++i) {
 			prefabs::create_force_grenade(step, { 254, 611 + i *100.f });
 			prefabs::create_ped_grenade(step, { 204, 611 + i * 100.f });
@@ -77,6 +75,15 @@ namespace test_scenes {
 			prefabs::create_force_grenade(step, { 654, -811 + i *100.f });
 			prefabs::create_ped_grenade(step, { 604, -811 + i * 100.f });
 			prefabs::create_interference_grenade(step, { 554, -811 + i * 100.f });
+		}
+
+		std::vector<transformr> spawn_transforms = {
+			{ { 318, 267 }, -90 },
+			{ { 638, 267 }, -90 }
+		};
+
+		for (const auto& s : spawn_transforms) {
+			create(test_point_markers::RESISTANCE_SPAWN, s);
 		}
 
 		std::vector<transformr> character_transforms = {
@@ -92,6 +99,8 @@ namespace test_scenes {
 			{ { -500, -2000 }, 0 }
 		};
 
+		const auto num_characters = character_transforms.size();
+
 		auto get_size_of = [&caches](const auto id) {
 			return vec2i(caches.at(to_image_id(id)).get_original_size());
 		};
@@ -103,7 +112,7 @@ namespace test_scenes {
 			return i < new_characters.size() ? world[new_characters.at(i)] : world[entity_id()];
 		};
 
-		for (int i = 0; i < num_characters; ++i) {
+		for (std::size_t i = 0; i < num_characters; ++i) {
 			auto transform = character_transforms[i];
 
 			const bool is_metropolis = i % 2 == 0;

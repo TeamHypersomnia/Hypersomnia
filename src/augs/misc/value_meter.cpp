@@ -64,3 +64,7 @@ value_meter::damage_result value_meter::calc_damage_result(
 
 	return result;
 }
+
+void value_meter::make_full() {
+	value = maximum;
+}

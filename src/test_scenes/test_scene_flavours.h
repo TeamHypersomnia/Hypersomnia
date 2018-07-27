@@ -219,6 +219,8 @@ enum class test_particles_decorations {
 enum class test_point_markers {
 	// GEN INTROSPECTOR enum class test_point_markers
 	FFA_SPAWN,
+	METROPOLIS_SPAWN,
+	RESISTANCE_SPAWN,
 	COUNT
 	// END GEN INTROSPECTOR
 };

@@ -28,4 +28,5 @@ struct value_meter {
 	void set_maximum_value(const meter_value_type);
 
 	float get_ratio() const;
+	void make_full();
 };
