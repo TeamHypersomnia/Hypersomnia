@@ -539,18 +539,18 @@ namespace augs {
 
 		template <class Archive>
 		void write_object_lua(Archive& ar) const {
-			write_lua(ar, objects);
-			write_lua(ar, slots);
-			write_lua(ar, indirectors);
-			write_lua(ar, free_indirectors);
+			write_lua_table(ar, objects);
+			write_lua_table(ar, slots);
+			write_lua_table(ar, indirectors);
+			write_lua_table(ar, free_indirectors);
 		}
 
 		template <class Archive>
 		void read_object_lua(Archive& ar) {
-			read_lua(ar, objects);
-			read_lua(ar, slots);
-			read_lua(ar, indirectors);
-			read_lua(ar, free_indirectors);
+			read_lua_table(ar, objects);
+			read_lua_table(ar, slots);
+			read_lua_table(ar, indirectors);
+			read_lua_table(ar, free_indirectors);
 		}
 
 		/* Synonyms for compatibility with other containers */

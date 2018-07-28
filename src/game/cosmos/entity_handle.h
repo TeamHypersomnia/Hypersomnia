@@ -1,7 +1,5 @@
 #pragma once
 #include <ostream>
-#include "3rdparty/sol2/sol/forward.hpp"
-
 #include "augs/build_settings/platform_defines.h"
 #include "augs/templates/get_by_dynamic_id.h"
 #include "augs/build_settings/platform_defines.h"

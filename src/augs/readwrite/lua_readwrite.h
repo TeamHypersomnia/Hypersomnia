@@ -272,8 +272,8 @@ namespace augs {
 		when the archive type is sol::table - obviously.
 	*/
 
-	template <class Serialized>
-	void read_lua(sol::table input_table, Serialized& into) {
+	template <class Table, class Serialized>
+	void read_lua_table(Table input_table, Serialized& into) {
 		read_lua(sol::object(input_table), into);
 	}
 
@@ -314,12 +314,12 @@ namespace augs {
 		else {
 			auto new_table = output_table.create();
 			output_table[std::forward<K>(key)] = new_table;
-			write_lua(new_table, from);
+			write_lua_table(new_table, from);
 		}
 	}
 
-	template <class Serialized>
-	void write_lua(sol::table output_table, const Serialized& from) {
+	template <class Table, class Serialized>
+	void write_lua_table(Table output_table, const Serialized& from) {
 		static_assert(
 			!representable_as_lua_value_v<Serialized>, 
 			"Directly representable, but no key (label) provided! Use write_representable_field to directly serialize this object."

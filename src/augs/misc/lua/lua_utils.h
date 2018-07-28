@@ -1,6 +1,4 @@
 #pragma once
-#include <sol/forward.hpp>
-
 #include "augs/templates/exception_templates.h"
 
 namespace sol {

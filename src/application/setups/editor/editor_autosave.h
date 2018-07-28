@@ -1,10 +1,12 @@
 #pragma once
-#include "3rdparty/sol2/sol/forward.hpp"
-
 #include "augs/misc/timing/timer.h"
 #include "application/setups/editor/editor_settings.h"
 
 struct editor_significant;
+
+namespace sol {
+	class state;
+}
 
 void open_last_folders(
 	sol::state& lua,

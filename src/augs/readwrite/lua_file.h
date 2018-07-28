@@ -11,7 +11,7 @@ namespace augs {
 		SaverArgs&&... args
 	) {
 		auto output_table = lua.create_named_table("my_table");
-		write_lua(output_table, std::forward<T>(object));
+		write_lua_table(output_table, std::forward<T>(object));
 
 		const std::string serialized_table = lua["table_to_string"](
 			output_table,
@@ -41,7 +41,7 @@ namespace augs {
 		}
 
 		sol::table input_table = pfr;
-		read_lua(input_table, object);
+		read_lua_table(input_table, object);
 	}
 
 	template <class T>
