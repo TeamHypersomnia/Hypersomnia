@@ -5,6 +5,7 @@
 #include "view/load_meta_lua.h"
 #include "application/setups/editor/editor_history.h"
 #include "application/setups/editor/editor_command_input.h"
+#include "application/setups/editor/editor_history.hpp"
 
 template <class I, class P>
 I get_id_or_import(

@@ -5,6 +5,7 @@
 
 #include "augs/misc/simple_pair.h"
 #include "augs/templates/for_each_std_get.h"
+#include "application/setups/editor/editor_history.hpp"
 
 #include "augs/readwrite/memory_stream.h"
 

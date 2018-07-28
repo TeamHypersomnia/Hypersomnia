@@ -29,7 +29,7 @@ namespace augs {
 
 	public:
 		template <class T, class... RedoArgs>
-		T& execute_new(T&& command, RedoArgs&&... redo_args) {
+		const T& execute_new(T&& command, RedoArgs&&... redo_args) {
 			/* 
 				Remove all redoable entries past the current revision.
 				Later we might support branches. 

@@ -21,6 +21,7 @@
 #include "view/viewables/images_in_atlas_map.h"
 
 #include "application/setups/editor/editor_folder.h"
+#include "application/setups/editor/editor_history.hpp"
 #include "application/intercosm.h"
 
 #include "application/setups/editor/detail/other_styles.h"

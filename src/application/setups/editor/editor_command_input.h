@@ -41,6 +41,6 @@ struct editor_command_input {
 };
 
 template <class E, class T>
-decltype(auto) post_editor_command(const E& in, T&& cmd) {
+const T& post_editor_command(const E& in, T&& cmd) {
 	return in.get_history().execute_new(std::forward<T>(cmd), in);
 }

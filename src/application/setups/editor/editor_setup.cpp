@@ -15,6 +15,7 @@
 #include "application/setups/editor/editor_setup.h"
 #include "application/setups/editor/editor_paths.h"
 #include "application/setups/editor/editor_camera.h"
+#include "application/setups/editor/editor_history.hpp"
 
 #include "application/setups/editor/gui/editor_tab_gui.h"
 

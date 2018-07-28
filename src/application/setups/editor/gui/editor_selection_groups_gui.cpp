@@ -6,6 +6,7 @@
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/gui/editor_selection_groups_gui.h"
 #include "application/setups/editor/editor_command_input.h"
+#include "application/setups/editor/editor_history.hpp"
 
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/memory_stream.h"
