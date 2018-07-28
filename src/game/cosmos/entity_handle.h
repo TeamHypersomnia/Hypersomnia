@@ -3,6 +3,7 @@
 #include "augs/build_settings/platform_defines.h"
 #include "augs/templates/get_by_dynamic_id.h"
 #include "augs/build_settings/platform_defines.h"
+#include "game/cosmos/on_entity_meta.h"
 
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/traits/component_traits.h"

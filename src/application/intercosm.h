@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/enums/callback_result.h"
 #include "game/assets/all_logical_assets.h"
 #include "game/cosmos/cosmos.h"
 #include "view/viewables/all_viewables_defs.h"

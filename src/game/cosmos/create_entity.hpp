@@ -147,3 +147,53 @@ template <class handle_type>
 auto cosmic::specific_clone_entity(const handle_type source_entity) {
 	return specific_clone_entity(source_entity, [](auto&&...) {});
 }
+
+template <class E, class... Args>
+auto cosmos_solvable::allocate_new_entity(const entity_guid new_guid, Args&&... args) {
+	auto& pool = significant.get_pool<E>();
+
+	if (pool.full_capacity()) {
+		throw std::runtime_error("Entities should be controllably reserved to avoid invalidation of entity_handles.");
+	}
+
+	const auto result = pool.allocate(new_guid, std::forward<Args>(args)..., get_timestamp());
+
+	allocation_result<typed_entity_id<E>, decltype(result.object)> output {
+		typed_entity_id<E>(result.key), result.object
+	};
+
+	return output;
+}
+
+template <class E, class... Args>
+auto cosmos_solvable::detail_undo_free_entity(Args&&... args) {
+	auto& pool = significant.get_pool<E>();
+	const auto result = pool.undo_free(std::forward<Args>(args)...);
+
+	allocation_result<typed_entity_id<E>, decltype(result.object)> output {
+		typed_entity_id<E>(result.key), result.object
+	};
+
+	return output;
+}
+
+template <class E, class... Args>
+auto cosmos_solvable::allocate_next_entity(Args&&... args) {
+	const auto next_guid = significant.clock.next_entity_guid.value++;
+	return allocate_entity_with_specific_guid<E>(next_guid, std::forward<Args>(args)...);
+}
+
+template <class E, class... Args>
+auto cosmos_solvable::undo_free_entity(Args&&... undo_free_args) {
+	const auto result = detail_undo_free_entity<E>(std::forward<Args>(undo_free_args)...);
+	const auto it = guid_to_id.emplace(result.object.guid, result.key);
+	ensure(it.second);
+	return result;
+}
+
+template <class E, class... Args>
+auto cosmos_solvable::allocate_entity_with_specific_guid(const entity_guid specific_guid, Args&&... args) {
+	const auto result = allocate_new_entity<E>(specific_guid, std::forward<Args>(args)...);
+	guid_to_id[specific_guid] = result.key;
+	return result;
+}

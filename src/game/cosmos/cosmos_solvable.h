@@ -1,20 +1,7 @@
 #pragma once
 #include <map>
 
-#include "augs/enums/callback_result.h"
-#include "augs/templates/traits/is_optional.h"
 #include "augs/misc/timing/delta.h"
-#include "augs/misc/randomization_declaration.h"
-
-#include "augs/templates/type_templates.h"
-#include "augs/templates/introspection_utils/rewrite_members.h"
-#include "augs/templates/for_each_std_get.h"
-
-#include "augs/entity_system/storage_for_systems.h"
-
-#include "game/assets/ids/behaviour_tree_id.h"
-
-#include "game/cosmos/cosmic_profiler.h"
 
 #if STATICALLY_ALLOCATE_ENTITIES
 #include "game/organization/all_component_includes.h"
@@ -22,10 +9,8 @@
 #include "game/organization/all_components_declaration.h"
 #endif
 
-#include "game/organization/all_messages_declaration.h"
 #include "game/cosmos/cosmos_solvable_inferred.h"
 #include "game/cosmos/cosmos_solvable_significant.h"
-#include "game/cosmos/specific_entity_handle_declaration.h"
 #include "game/cosmos/entity_id.h"
 
 class cosmos_solvable {
@@ -40,33 +25,10 @@ class cosmos_solvable {
 	};
 
 	template <class E, class... Args>
-	auto allocate_new_entity(const entity_guid new_guid, Args&&... args) {
-		auto& pool = significant.get_pool<E>();
-
-		if (pool.full_capacity()) {
-			throw std::runtime_error("Entities should be controllably reserved to avoid invalidation of entity_handles.");
-		}
-
-		const auto result = pool.allocate(new_guid, std::forward<Args>(args)..., get_timestamp());
-
-		allocation_result<typed_entity_id<E>, decltype(result.object)> output {
-			typed_entity_id<E>(result.key), result.object
-		};
-
-		return output;
-	}
+	auto allocate_new_entity(const entity_guid new_guid, Args&&... args);
 
 	template <class E, class... Args>
-	auto detail_undo_free_entity(Args&&... args) {
-		auto& pool = significant.get_pool<E>();
-		const auto result = pool.undo_free(std::forward<Args>(args)...);
-
-		allocation_result<typed_entity_id<E>, decltype(result.object)> output {
-			typed_entity_id<E>(result.key), result.object
-		};
-
-		return output;
-	}
+	auto detail_undo_free_entity(Args&&... args);
 
 	entity_guid clear_guid(const entity_id);
 
@@ -75,21 +37,7 @@ class cosmos_solvable {
 		C& self,
 		const entity_id id,
 		F callback	
-	) {
-		using meta_ptr = maybe_const_ptr_t<std::is_const_v<C>, entity_solvable_meta>;
-
-		if (id.type_id.is_set()) {
-			return self.significant.entity_pools.visit(
-				id.type_id,
-				[&](auto& pool) -> decltype(auto) {	
-					return callback(static_cast<meta_ptr>(pool.find(id.raw)));
-				}
-			);
-		}
-		else {
-			return callback(static_cast<meta_ptr>(nullptr));
-		}
-	}
+	);
 
 	template <class... MustHaveComponents, class S, class F>
 	static void for_each_entity_impl(S& self, F callback);
@@ -108,25 +56,13 @@ public:
 	void reserve_storage_for_entities(const cosmic_pool_size_type);
 
 	template <class E, class... Args>
-	auto allocate_next_entity(Args&&... args) {
-		const auto next_guid = significant.clock.next_entity_guid.value++;
-		return allocate_entity_with_specific_guid<E>(next_guid, std::forward<Args>(args)...);
-	}
+	auto allocate_next_entity(Args&&... args);
 
 	template <class E, class... Args>
-	auto undo_free_entity(Args&&... undo_free_args) {
-		const auto result = detail_undo_free_entity<E>(std::forward<Args>(undo_free_args)...);
-		const auto it = guid_to_id.emplace(result.object.guid, result.key);
-		ensure(it.second);
-		return result;
-	}
+	auto undo_free_entity(Args&&... undo_free_args);
 
 	template <class E, class... Args>
-	auto allocate_entity_with_specific_guid(const entity_guid specific_guid, Args&&... args) {
-		const auto result = allocate_new_entity<E>(specific_guid, std::forward<Args>(args)...);
-		guid_to_id[specific_guid] = result.key;
-		return result;
-	}
+	auto allocate_entity_with_specific_guid(const entity_guid specific_guid, Args&&... args);
 
 	std::optional<cosmic_pool_undo_free_input> free_entity(entity_id);
 	void undo_last_allocate_entity(entity_id);
@@ -213,24 +149,16 @@ public:
 	}
 
 	template <class F>
-	decltype(auto) on_entity_meta(const entity_id id, F&& callback) {
-		return on_entity_meta_impl(*this, id, std::forward<F>(callback));
-	}	
+	decltype(auto) on_entity_meta(const entity_id id, F&& callback);
 
 	template <class F>
-	decltype(auto) on_entity_meta(const entity_id id, F&& callback) const {
-		return on_entity_meta_impl(*this, id, std::forward<F>(callback));
-	}	
+	decltype(auto) on_entity_meta(const entity_id id, F&& callback) const;
 
 	template <class F>
-	decltype(auto) on_entity_meta(const entity_guid id, F&& callback) {
-		return on_entity_meta_impl(*this, get_entity_id_by(id), std::forward<F>(callback));
-	}	
+	decltype(auto) on_entity_meta(const entity_guid id, F&& callback);
 
 	template <class F>
-	decltype(auto) on_entity_meta(const entity_guid id, F&& callback) const {
-		return on_entity_meta_impl(*this, get_entity_id_by(id), std::forward<F>(callback));
-	}	
+	decltype(auto) on_entity_meta(const entity_guid id, F&& callback) const;
 };
 
 inline entity_id cosmos_solvable::get_entity_id_by(const entity_guid& guid) const {
@@ -250,17 +178,3 @@ inline entity_id cosmos_solvable::to_versioned(const unversioned_entity_id& id) 
 		id.type_id 
 	};
 }
-
-inline entity_guid cosmos_solvable::get_guid(const entity_id& id) const {
-	return on_entity_meta(
-		id, 
-		[](const entity_solvable_meta* const e) { 
-			if (e) {
-				return e->guid;
-			}	 
-
-			return entity_guid();
-		}
-	);
-}
-

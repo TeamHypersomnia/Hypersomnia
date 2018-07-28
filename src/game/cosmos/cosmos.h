@@ -5,6 +5,7 @@
 #include "game/organization/all_entity_types_declaration.h"
 
 #include "game/cosmos/cosmos_common.h"
+#include "game/cosmos/cosmic_profiler.h"
 #include "game/cosmos/cosmos_common_significant_access.h"
 
 #include "game/cosmos/private_cosmos_solvable.h"

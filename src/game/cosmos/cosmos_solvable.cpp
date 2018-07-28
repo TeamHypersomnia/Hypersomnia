@@ -3,6 +3,8 @@
 #include "augs/templates/introspect.h"
 #include "game/cosmos/specific_entity_handle_declaration.h"
 #include "game/cosmos/cosmos_solvable.hpp"
+#include "game/cosmos/on_entity_meta.h"
+#include "augs/templates/introspection_utils/rewrite_members.h"
 
 const cosmos_solvable cosmos_solvable::zero;
 
@@ -144,6 +146,19 @@ Deguidized<entity_id> cosmos_solvable::deguidize(const Deguidized<source_id_type
 			if (guid_member != entity_guid()) {
 				id_member = guid_to_id.at(guid_member);
 			}
+		}
+	);
+}
+
+entity_guid cosmos_solvable::get_guid(const entity_id& id) const {
+	return on_entity_meta(
+		id, 
+		[](const entity_solvable_meta* const e) { 
+			if (e) {
+				return e->guid;
+			}	 
+
+			return entity_guid();
 		}
 	);
 }
