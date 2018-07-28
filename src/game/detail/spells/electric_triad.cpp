@@ -1,4 +1,4 @@
-#include "electric_triad.h"
+#include "game/detail/spells/electric_triad.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"
 #include "game/components/sentience_component.h"
@@ -9,6 +9,7 @@
 #include "game/detail/spells/spell_logic_input.h"
 #include "game/detail/spells/spell_utils.h"
 #include "game/enums/filters.h"
+#include "game/cosmos/create_entity.hpp"
 
 bool electric_triad_instance::are_additional_conditions_for_casting_fulfilled(const const_entity_handle caster) const {
 	constexpr float standard_triad_radius = 800.f;

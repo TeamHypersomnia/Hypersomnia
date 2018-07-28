@@ -5,6 +5,7 @@
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/data_living_one_step.h"
 #include "game/cosmos/for_each_entity.h"
+#include "game/cosmos/create_entity.hpp"
 
 #include "game/assets/all_logical_assets.h"
 #include "game/messages/intent_message.h"

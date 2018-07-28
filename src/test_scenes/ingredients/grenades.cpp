@@ -165,27 +165,3 @@ namespace test_flavours {
 		}
 	}
 }
-
-namespace prefabs {
-	entity_handle create_force_grenade(const logic_step step, vec2 pos) {
-		auto& world = step.get_cosmos();
-		const auto grenade_entity = create_test_scene_entity(world, test_throwable_explosives::FORCE_GRENADE, pos);
-
-		return grenade_entity;
-	}
-
-	entity_handle create_ped_grenade(const logic_step step, vec2 pos) {
-		auto& world = step.get_cosmos();
-		const auto grenade_entity = create_test_scene_entity(world, test_throwable_explosives::PED_GRENADE, pos);
-
-		return grenade_entity;
-	}
-
-	entity_handle create_interference_grenade(const logic_step step, vec2 pos) {
-		auto& world = step.get_cosmos();
-		const auto grenade_entity = create_test_scene_entity(world, test_throwable_explosives::INTERFERENCE_GRENADE, pos);
-
-		return grenade_entity;
-	}
-}
-

@@ -46,27 +46,5 @@ namespace prefabs {
 	);
 	entity_handle create_cyan_charge(const logic_step, vec2 pos);
 	entity_handle create_steel_charge(const logic_step, vec2 pos);
-
-	entity_handle create_metropolis_soldier(
-		const logic_step,
-		const transformr pos, 
-		const std::string name = "character_unnamed"
-	);
-
-	entity_handle create_resistance_soldier(
-		const logic_step,
-		const transformr pos, 
-		const std::string name = "character_unnamed"
-	);
-
-	entity_handle create_crate(const logic_step, const transformr pos);
-
-	entity_handle create_cyan_urban_machete(const logic_step, const vec2 pos);
-
-	entity_handle create_force_grenade(const logic_step, const vec2 pos);
-	entity_handle create_ped_grenade(const logic_step, const vec2 pos);
-	entity_handle create_interference_grenade(const logic_step, const vec2 pos);
-
-	entity_handle create_fish(const logic_step, const test_complex_decorations, const transformr&, const transformr& origin);
 }
 #endif

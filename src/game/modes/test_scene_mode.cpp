@@ -4,6 +4,7 @@
 #include "game/modes/mode_helpers.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
+#include "game/cosmos/create_entity.hpp"
 #include "game/detail/inventory/generate_equipment.h"
 
 using input_type = test_scene_mode::input;

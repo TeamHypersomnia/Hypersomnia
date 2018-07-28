@@ -141,10 +141,3 @@ namespace test_flavours {
 		);
 	}
 }
-
-namespace prefabs {
-	entity_handle create_crate(const logic_step step, const transformr pos) {
-		const auto crate = create_test_scene_entity(step.get_cosmos(), test_plain_sprited_bodys::CRATE, pos);
-		return crate;
-	}
-}

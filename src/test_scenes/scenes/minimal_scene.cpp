@@ -28,11 +28,9 @@ namespace test_scenes {
 	void minimal_scene::populate(const loaded_image_caches_map& caches, const logic_step step) const {
 		auto& world = step.get_cosmos();
 
-#if 0
 		auto create = [&](auto&&... args) {
 			return create_test_scene_entity(world, std::forward<decltype(args)>(args)...);
 		};
-#endif
 
 		auto get_size_of = [&caches](const auto id) {
 			return vec2i(caches.at(to_image_id(id)).get_original_size());
@@ -52,7 +50,8 @@ namespace test_scenes {
 				transform.pos.x += 200;
 			}
 
-			const auto new_character = prefabs::create_metropolis_soldier(step, transform, typesafe_sprintf("player%x", i));
+			const auto metropolis_type = test_controlled_characters::METROPOLIS_SOLDIER;
+			const auto new_character = create(metropolis_type, transform);
 
 			new_characters[i] = new_character;
 
@@ -78,9 +77,14 @@ namespace test_scenes {
 			prefabs::create_sample_magazine(step, vec2(100, -650),
 				prefabs::create_cyan_charge(step, vec2(0, 0))));
 
-		prefabs::create_force_grenade(step, { 100, 100 });
-		prefabs::create_force_grenade(step, { 200, 100 });
-		prefabs::create_force_grenade(step, { 300, 100});
+
+		const auto force_type = test_throwable_explosives::FORCE_GRENADE;
+		const auto ped_type = test_throwable_explosives::PED_GRENADE;
+		const auto interference_type = test_throwable_explosives::INTERFERENCE_GRENADE;
+
+		create(force_type, { 100, 100 });
+		create(force_type, { 200, 100 });
+		create(force_type, { 300, 100});
 
 		/* Test: create cyan charges first, only then magazine, and reinfer. */
 		const auto charge = prefabs::create_cyan_charge(step, vec2(0, 0));

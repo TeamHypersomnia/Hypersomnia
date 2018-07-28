@@ -52,6 +52,11 @@ namespace test_scenes {
 			return create_test_scene_entity(world, std::forward<decltype(args)>(args)...);
 		};
 
+		const auto crate_type = test_plain_sprited_bodys::CRATE;
+		const auto force_type = test_throwable_explosives::FORCE_GRENADE;
+		const auto ped_type = test_throwable_explosives::PED_GRENADE;
+		const auto interference_type = test_throwable_explosives::INTERFERENCE_GRENADE;
+
 		const auto sample_backpack = test_container_items::SAMPLE_BACKPACK;
 		const auto brown_backpack = test_container_items::BROWN_BACKPACK;
 
@@ -66,15 +71,15 @@ namespace test_scenes {
 #endif
 
 		for (int i = 0; i < 10; ++i) {
-			prefabs::create_force_grenade(step, { 254, 611 + i *100.f });
-			prefabs::create_ped_grenade(step, { 204, 611 + i * 100.f });
-			prefabs::create_interference_grenade(step, { 154, 611 + i * 100.f });
+			create(force_type, vec2{ 254, 611 + i *100.f });
+			create(ped_type, vec2{ 204, 611 + i * 100.f });
+			create(interference_type, vec2{ 154, 611 + i * 100.f });
 		}
 
 		for (int i = 0; i < 10; ++i) {
-			prefabs::create_force_grenade(step, { 654, -811 + i *100.f });
-			prefabs::create_ped_grenade(step, { 604, -811 + i * 100.f });
-			prefabs::create_interference_grenade(step, { 554, -811 + i * 100.f });
+			create(force_type, vec2{ 654, -811 + i *100.f });
+			create(ped_type, vec2{ 604, -811 + i * 100.f });
+			create(interference_type, vec2{ 554, -811 + i * 100.f });
 		}
 
 		std::vector<transformr> spawn_transforms = {
@@ -112,11 +117,14 @@ namespace test_scenes {
 			return i < new_characters.size() ? world[new_characters.at(i)] : world[entity_id()];
 		};
 
+		const auto metropolis_type = test_controlled_characters::METROPOLIS_SOLDIER;
+		const auto resistance_type = test_controlled_characters::RESISTANCE_SOLDIER;
+
 		for (std::size_t i = 0; i < num_characters; ++i) {
 			auto transform = character_transforms[i];
 
 			const bool is_metropolis = i % 2 == 0;
-			const auto new_character = (is_metropolis ? prefabs::create_metropolis_soldier : prefabs::create_resistance_soldier)(step, transform, typesafe_sprintf("player%x", i));
+			const auto new_character = create(is_metropolis ? metropolis_type : resistance_type, transform);
 
 			new_characters[i] = new_character;
 
@@ -184,9 +192,9 @@ namespace test_scenes {
 			};
 
 			for (const auto c : coords) {
-				prefabs::create_crate(step, c + vec2(-100, 400) );
-				prefabs::create_crate(step, c + vec2(300, 300) );
-				prefabs::create_crate(step, c + vec2(100, -200) );
+				create(crate_type, c + vec2(-100, 400) );
+				create(crate_type, c + vec2(300, 300) );
+				create(crate_type, c + vec2(100, -200) );
 
 				const auto light_pos = c + vec2(0, 100);
 				const auto light_cyan = c.x < 0 ? orange : rgba(30, 255, 255, 255);
@@ -300,7 +308,11 @@ namespace test_scenes {
 				prefabs::create_cyan_charge(step, vec2(0, 0))));
 
 		prefabs::create_amplifier_arm(step, vec2(-300, -500 + 50));
-		prefabs::create_cyan_urban_machete(step, vec2(100, 100));
+		
+		/* TODO: Spawn a machete actually */
+		const auto machete_type = force_type;
+
+		create(machete_type, vec2(100, 100));
 
 		create(sample_backpack, vec2(200, -750));
 		create(brown_backpack, vec2(280, -750));
@@ -553,8 +565,12 @@ namespace test_scenes {
 			const auto dragon_fish = test_complex_decorations::DRAGON_FISH;
 			const auto rainbow_dragon_fish = test_complex_decorations::RAINBOW_DRAGON_FISH;
 
-			auto create_fish = [&](auto&&... args) {
-				return prefabs::create_fish(step, std::forward<decltype(args)>(args)...);
+			auto create_fish = [&](auto t, auto where, auto origin) {
+				const auto decor = create(t, where);
+				decor.template get<components::movement_path>().origin = origin;
+				const auto secs = real32(decor.template get<components::animation>().state.frame_num) * 12.23f;
+				decor.template get<components::sprite>().effect_offset_secs = secs;
+				return decor;
 			};
 
 			create_fish(yellowfish, aquarium_tr - vec2(80, 10), aquarium_origin);
@@ -619,7 +635,7 @@ namespace test_scenes {
 		.next(test_sound_decorations::HUMMING_DISABLED);
 
 		if (character(2).alive()) {
-			const auto second_machete = prefabs::create_cyan_urban_machete(step, vec2(0, 300));
+			const auto second_machete = create(machete_type, vec2(0, 300));
 			perform_transfer(item_slot_transfer_request::standard(second_machete, character(2).get_primary_hand()), step);
 		}
 	}

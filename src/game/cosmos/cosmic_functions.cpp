@@ -1,6 +1,7 @@
 #include "game/cosmos/cosmic_functions.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"
+#include "game/cosmos/create_entity.hpp"
 #include "game/detail/inventory/perform_transfer.h"
 #include "augs/templates/introspect.h"
 
@@ -99,7 +100,7 @@ void cosmic::reinfer_solvable(cosmos& cosm) {
 	reinfer_all_entities(cosm);
 }
 
-entity_handle cosmic::clone_entity(const entity_handle source_entity) {
+entity_handle just_clone_entity(const entity_handle source_entity) {
 	auto& cosmos = source_entity.get_cosmos();
 
 	if (source_entity.dead()) {

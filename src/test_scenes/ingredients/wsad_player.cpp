@@ -236,23 +236,3 @@ namespace test_flavours {
 		}
 	}
 }
-
-namespace prefabs {
-	entity_handle create_metropolis_soldier(
-		const logic_step step, 
-		const transformr spawn_transform, 
-		const std::string /* name */
-	) {
-		auto& world = step.get_cosmos();
-		return create_test_scene_entity(world, test_controlled_characters::METROPOLIS_SOLDIER, spawn_transform);
-	}
-
-	entity_handle create_resistance_soldier(
-		const logic_step step, 
-		const transformr spawn_transform, 
-		const std::string /* name */
-	) {
-		auto& world = step.get_cosmos();
-		return create_test_scene_entity(world, test_controlled_characters::RESISTANCE_SOLDIER, spawn_transform);
-	}
-}

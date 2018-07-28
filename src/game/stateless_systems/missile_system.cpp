@@ -25,6 +25,7 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/data_living_one_step.h"
+#include "game/cosmos/create_entity.hpp"
 
 #include "game/detail/physics/physics_scripts.h"
 

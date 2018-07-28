@@ -11,6 +11,7 @@
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/data_living_one_step.h"
 #include "game/cosmos/entity_handle.h"
+#include "game/cosmos/just_create_entity.h"
 
 #include "augs/templates/container_templates.h"
 #include "game/cosmos/cosmos.h"
@@ -159,7 +160,7 @@ perform_transfer_result perform_transfer_impl(
 		grabbed_item_part = transferred_item;
 	}
 	else {
-		const auto cloned_stack = cosmic::clone_entity(transferred_item);
+		const auto cloned_stack = just_clone_entity(transferred_item);
 		get_item_of(cloned_stack).charges = result.transferred_charges;
 
 		item.charges -= result.transferred_charges;

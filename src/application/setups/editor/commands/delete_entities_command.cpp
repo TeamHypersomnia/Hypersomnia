@@ -3,6 +3,7 @@
 #include "application/intercosm.h"
 #include "application/setups/editor/editor_command_input.h"
 #include "application/setups/editor/editor_folder.h"
+#include "game/cosmos/create_entity.hpp"
 
 #include "application/setups/editor/commands/delete_entities_command.h"
 

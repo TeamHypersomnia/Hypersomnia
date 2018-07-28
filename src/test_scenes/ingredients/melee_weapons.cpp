@@ -41,13 +41,3 @@ namespace test_flavours {
 		}
 	}
 }
-
-namespace prefabs {
-	entity_handle create_cyan_urban_machete(const logic_step step, vec2 pos) {
-		// TODO: spawn a machete actually
-
-		const auto machete = create_test_scene_entity(step.get_cosmos(), test_throwable_explosives::FORCE_GRENADE, pos);
-		return machete;
-	}
-}
-

@@ -1,6 +1,7 @@
 #pragma once
 #include "game/cosmos/cosmos.h"
 #include "test_scenes/test_scene_flavours.h"
+#include "test_scenes/create_test_scene_entity.h"
 
 class test_scene_node {
 	template <class F>
