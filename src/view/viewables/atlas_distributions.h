@@ -2,7 +2,7 @@
 #include "augs/texture_atlas/bake_fresh_atlas.h"
 
 #include "view/necessary_resources.h"
-#include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/all_viewables_declaration.h"
 #include "view/viewables/images_in_atlas_map.h"
 #include "view/viewables/regeneration/content_regeneration_settings.h"
 

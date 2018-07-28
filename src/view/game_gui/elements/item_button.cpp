@@ -15,7 +15,7 @@
 #include "game/components/fixtures_component.h"
 #include "game/stateless_systems/input_system.h"
 
-#include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/all_viewables_declaration.h"
 #include "view/viewables/image_in_atlas.h"
 #include "view/viewables/image_meta.h"
 

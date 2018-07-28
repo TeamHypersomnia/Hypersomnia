@@ -6,7 +6,7 @@
 #include "augs/misc/randomization.h"
 #include "augs/math/camera_cone.h"
 
-#include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/all_viewables_declaration.h"
 #include "view/audiovisual_state/systems/audiovisual_cache_common.h"
 
 #include "game/detail/visible_entities.h"

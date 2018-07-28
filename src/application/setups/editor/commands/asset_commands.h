@@ -10,7 +10,7 @@
 #include "view/viewables/all_viewables_defs.h"
 #include "view/get_asset_pool.h"
 
-#include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/all_viewables_declaration.h"
 #include "view/maybe_official_path.h"
 #include "augs/enums/callback_result.h"
 

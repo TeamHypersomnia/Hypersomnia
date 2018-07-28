@@ -28,8 +28,6 @@ summary: That which we are brainstorming at the moment.
 		- Probably player as well.
 		- The work won't store any 
 
-- all_components_declaration.h -> all_component_declarations.h
-
 - However it is to the discretion of a mode *how* the creation and removal of players happen...
 	- ...it is already outside of their scope *when* they happen.
 	- Therefore, each mode shall expose add_player and remove_player functions to be called by literally anybody, anytime.

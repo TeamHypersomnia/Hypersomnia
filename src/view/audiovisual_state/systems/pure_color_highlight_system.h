@@ -4,7 +4,7 @@
 
 #include "augs/graphics/vertex.h"
 
-#include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/all_viewables_declaration.h"
 #include "game/cosmos/entity_id.h"
 #include "game/components/transform_component.h"
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/all_viewables_declaration.h"
 #include "view/necessary_resources.h"
 
 namespace augs {

@@ -12,7 +12,7 @@
 #include "game/detail/view_input/particle_effect_input.h"
 
 #include "view/audiovisual_state/systems/audiovisual_cache_common.h"
-#include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/all_viewables_declaration.h"
 #include "view/viewables/particle_effect.h"
 
 class interpolation_system;

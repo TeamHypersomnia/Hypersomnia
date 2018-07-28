@@ -3,7 +3,7 @@
 #include "augs/templates/exception_templates.h"
 
 #include "game/assets/all_logical_assets.h"
-#include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/all_viewables_declaration.h"
 
 struct all_logical_assets;
 struct all_viewables_defs;

@@ -7,7 +7,7 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/detail/inventory/inventory_slot_id.h"
 
-#include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/all_viewables_declaration.h"
 #include "view/game_gui/game_gui_context.h"
 
 struct item_button : game_gui_rect_node {

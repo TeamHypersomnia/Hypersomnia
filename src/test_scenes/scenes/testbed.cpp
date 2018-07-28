@@ -8,6 +8,7 @@
 #include "augs/math/cascade_aligner.h"
 #include "game/assets/ids/asset_ids.h"
 #include "game/assets/all_logical_assets.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 
 #include "test_scenes/test_scene_flavours.h"
 #include "test_scenes/scenes/testbed.h"

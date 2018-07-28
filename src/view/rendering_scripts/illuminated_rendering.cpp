@@ -26,7 +26,7 @@
 #include "view/rendering_scripts/helper_drawer.h"
 #include "view/rendering_scripts/draw_marker_borders.h"
 
-#include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/all_viewables_declaration.h"
 #include "view/viewables/image_in_atlas.h"
 #include "view/viewables/images_in_atlas_map.h"
 

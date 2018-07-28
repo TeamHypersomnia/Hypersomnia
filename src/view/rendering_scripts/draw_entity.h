@@ -20,7 +20,7 @@
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/frame_calculation.h"
 
-#include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/all_viewables_declaration.h"
 #include "view/viewables/images_in_atlas_map.h"
 #include "view/audiovisual_state/systems/randomizing_system.h"
 #include "view/rendering_scripts/draw_entity_input.h"

@@ -1,5 +1,5 @@
 #pragma once
-#include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/all_viewables_declaration.h"
 #include "application/setups/editor/detail/editor_image_preview.h"
 #include "application/setups/editor/property_editor/tweaker_type.h"
 

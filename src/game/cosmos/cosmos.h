@@ -7,14 +7,11 @@
 #include "game/cosmos/cosmos_common.h"
 #include "game/cosmos/cosmic_profiler.h"
 #include "game/cosmos/cosmos_common_significant_access.h"
-
 #include "game/cosmos/private_cosmos_solvable.h"
-
 #include "game/cosmos/entity_id.h"
+#include "game/cosmos/handle_getters_declaration.h"
 
 #include "game/enums/processing_subjects.h"
-
-#include "game/cosmos/handle_getters_declaration.h"
 
 struct cosmos_loading_error : error_with_typesafe_sprintf {
 	using error_with_typesafe_sprintf::error_with_typesafe_sprintf;

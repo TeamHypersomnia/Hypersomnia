@@ -5,7 +5,7 @@
 
 #include "game/messages/thunder_input.h"
 #include "game/components/transform_component.h"
-#include "view/viewables/all_viewables_declarations.h"
+#include "view/viewables/all_viewables_declaration.h"
 
 class particles_simulation_system;
 class cosmos;
