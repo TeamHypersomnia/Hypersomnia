@@ -8,6 +8,7 @@
 #include "game/detail/entity_handle_mixins/get_current_slot.hpp"
 #include "game/detail/entity_handle_mixins/calc_connection.hpp"
 #include "game/components/fixtures_component.h"
+#include "game/components/rigid_body_sync.h"
 
 struct rigid_body_cache_info;
 
