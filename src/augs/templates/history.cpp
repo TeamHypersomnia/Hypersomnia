@@ -1,6 +1,7 @@
 #if BUILD_UNIT_TESTS
 #include <catch.hpp>
 #include "augs/templates/history.h"
+#include "augs/templates/history.hpp"
 
 struct command_context {
 	int a_value = 0;

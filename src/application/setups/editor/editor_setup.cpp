@@ -1123,8 +1123,6 @@ bool editor_setup::handle_input_before_game(
 				case key::ADD: player().request_step(); return true;
 				default: break;
 			}
-
-			// history.seek_to_revision(has_shift ? history.get_commands().size() - 1 : 0, make_command_input()); 
 		}
 	}
 

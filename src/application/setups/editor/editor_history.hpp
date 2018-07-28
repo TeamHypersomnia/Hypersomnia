@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/templates/history.hpp"
 #include "application/setups/editor/editor_history.h"
 
 inline bool editor_history::next_command_has_parent() const {
