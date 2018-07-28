@@ -1,6 +1,7 @@
 #include "rendering_scripts.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/components/gun_component.h"
 #include "game/components/explosive_component.h"
 #include "augs/drawing/drawing.h"

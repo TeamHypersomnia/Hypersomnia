@@ -2,6 +2,7 @@
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
+#include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 #include "game/cosmos/data_living_one_step.h"
 #include "game/messages/queue_destruction.h"
 

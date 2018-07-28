@@ -5,6 +5,7 @@
 #include "game/cosmos/cosmos.h"
 #include "game/detail/entity_scripts.h"
 #include "game/cosmos/entity_handle.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 
 #include "augs/string/string_templates.h"
 

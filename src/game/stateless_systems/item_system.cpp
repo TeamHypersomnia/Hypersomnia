@@ -9,6 +9,8 @@
 
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/for_each_entity.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
+#include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 
 #include "game/components/item_component.h"
 #include "game/components/rigid_body_component.h"

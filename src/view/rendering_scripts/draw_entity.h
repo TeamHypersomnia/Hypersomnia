@@ -8,6 +8,8 @@
 
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
+#include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 
 #include "game/components/polygon_component.h"
 #include "game/components/sprite_component.h"

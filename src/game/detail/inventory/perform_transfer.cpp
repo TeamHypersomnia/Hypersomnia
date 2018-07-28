@@ -7,6 +7,8 @@
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/motor_joint_component.h"
 #include "game/detail/view_input/sound_effect_input.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
+#include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/data_living_one_step.h"

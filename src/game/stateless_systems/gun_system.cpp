@@ -15,6 +15,7 @@
 
 #include "game/detail/inventory/item_slot_transfer_request.h"
 #include "game/detail/inventory/perform_transfer.h"
+#include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 #include "game/detail/gun/gun_math.h"
 
 #include "game/components/rigid_body_component.h"

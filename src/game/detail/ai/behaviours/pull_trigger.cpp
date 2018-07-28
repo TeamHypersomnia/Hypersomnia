@@ -2,6 +2,7 @@
 #include "game/cosmos/entity_id.h"
 
 #include "game/components/attitude_component.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/components/crosshair_component.h"
 #include "game/components/gun_component.h"
 #include "game/detail/entity_scripts.h"

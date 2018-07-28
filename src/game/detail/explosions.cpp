@@ -4,6 +4,7 @@
 #include "game/assets/ids/asset_ids.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/messages/exploding_ring_input.h"
 #include "game/messages/damage_message.h"
 #include "game/stateless_systems/visibility_system.h"

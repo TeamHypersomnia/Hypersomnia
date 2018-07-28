@@ -1,5 +1,6 @@
 #pragma once
 #include "game/detail/gun/gun_math.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 
 template <class T>
 auto calc_firearm_engine_particles(const T& gun_handle)

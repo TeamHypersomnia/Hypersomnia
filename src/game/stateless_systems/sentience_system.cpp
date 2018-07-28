@@ -15,6 +15,7 @@
 #include "game/cosmos/entity_id.h"
 #include "game/cosmos/data_living_one_step.h"
 #include "game/cosmos/for_each_entity.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 
 #include "game/components/rigid_body_component.h"
 #include "game/components/container_component.h"

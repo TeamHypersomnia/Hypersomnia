@@ -1,5 +1,6 @@
 #pragma once
 #include "game/detail/inventory/inventory_slot_id.h"
+#include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 #include "augs/ensure.h"
 
 struct slot_button;

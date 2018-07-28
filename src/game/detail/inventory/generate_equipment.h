@@ -3,6 +3,7 @@
 #include "game/enums/slot_function.h"
 #include "game/cosmos/just_create_entity.h"
 #include "game/detail/inventory/perform_transfer.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 
 template <class E>
 void generate_equipment(const requested_equipment& eq, const E& character) {

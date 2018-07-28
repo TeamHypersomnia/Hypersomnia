@@ -4,6 +4,7 @@
 #include "game/components/sprite_component.h"
 #include "game/components/gun_component.h"
 #include "game/detail/gun/gun_math.h"
+#include "game/assets/image_offsets.h"
 
 inline transformr get_anchored_offset(
 	const transformi attachment_offset,

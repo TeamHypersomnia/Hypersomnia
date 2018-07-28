@@ -5,6 +5,8 @@
 #include "augs/build_settings/platform_defines.h"
 #include "game/organization/all_components_declaration.h"
 #include "game/detail/physics/colliders_connection.h"
+#include "game/detail/entity_handle_mixins/get_current_slot.hpp"
+#include "game/detail/entity_handle_mixins/calc_connection.hpp"
 #include "game/components/fixtures_component.h"
 
 struct rigid_body_cache_info;

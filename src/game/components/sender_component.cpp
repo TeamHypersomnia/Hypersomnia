@@ -5,6 +5,7 @@
 #include "game/components/fixtures_component.h"
 #include "game/components/driver_component.h"
 #include "game/components/car_component.h"
+#include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 
 namespace components {
 	void sender::set(const const_entity_handle new_direct_sender) {

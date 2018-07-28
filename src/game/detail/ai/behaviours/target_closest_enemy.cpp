@@ -5,6 +5,7 @@
 #include "game/components/crosshair_component.h"
 #include "game/messages/visibility_information.h"
 #include "game/components/gun_component.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/detail/entity_scripts.h"
 
 #include "game/detail/inventory/perform_transfer.h"

@@ -4,6 +4,7 @@
 #include "game/cosmos/entity_id.h"
 
 #include "game/enums/entity_flag.h"
+#include "game/enums/faction_type.h"
 
 #include "game/components/flags_component.h"
 #include "game/components/sentience_component.h"

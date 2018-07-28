@@ -8,9 +8,11 @@
 #include "augs/gui/button_corners.h"
 #include "augs/gui/text/printer.h"
 #include "view/game_gui/elements/drag_and_drop.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "view/game_gui/game_gui_system.h"
 
 #include "view/game_gui/elements/hotbar_settings.h"
+#include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 
 using namespace augs::gui::text;
 using namespace augs::gui;

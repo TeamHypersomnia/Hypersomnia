@@ -6,6 +6,7 @@
 #include "game/components/driver_component.h"
 #include "game/components/flags_component.h"
 #include "game/components/missile_component.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 
 #include "game/messages/collision_message.h"
 

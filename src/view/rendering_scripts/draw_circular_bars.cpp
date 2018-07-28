@@ -1,5 +1,6 @@
 #include "rendering_scripts.h"
 #include "game/cosmos/cosmos.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/inferred_caches/tree_of_npo_cache.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "game/components/sentience_component.h"

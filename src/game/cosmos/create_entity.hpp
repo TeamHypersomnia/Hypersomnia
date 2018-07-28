@@ -2,6 +2,7 @@
 #include "game/cosmos/entity_construction.h"
 #include "augs/misc/pool/pool_allocate.h"
 #include "game/cosmos/cosmic_functions.h"
+#include "game/detail/entity_handle_mixins/get_current_slot.hpp"
 
 template <class E, class C, class I, class P>
 ref_typed_entity_handle<E> cosmic::specific_create_entity_detail(

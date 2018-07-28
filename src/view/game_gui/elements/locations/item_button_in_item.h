@@ -1,5 +1,6 @@
 #pragma once
 #include "game/cosmos/entity_id.h"
+#include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 #include "augs/ensure.h"
 
 struct item_button;

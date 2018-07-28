@@ -5,6 +5,7 @@
 #include "game/components/crosshair_component.h"
 #include "game/components/gun_component.h"
 #include "game/components/item_component.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
