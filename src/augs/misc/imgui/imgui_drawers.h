@@ -1,6 +1,6 @@
 #pragma once
 #include <array>
-#include <imgui/imgui.h>
+#include "3rdparty/imgui/imgui.h"
 #include "augs/graphics/rgba.h"
 #include "augs/math/rects.h"
 #include "augs/math/vec2.h"

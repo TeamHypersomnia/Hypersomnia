@@ -1,5 +1,6 @@
 #include "test_scenes/test_scenes_content.h"
 #include "test_scenes/test_scene_animations.h"
+#include "augs/misc/pool/pool_allocate.h"
 
 #include "game/assets/ids/asset_ids.h"
 #include "game/assets/all_logical_assets.h"

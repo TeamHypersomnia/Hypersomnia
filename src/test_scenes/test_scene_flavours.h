@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/templates/enum_introspect.h"
 #include "augs/templates/type_map.h"
+#include "augs/misc/pool/pool_allocate.h"
 #include "test_scenes/test_id_to_pool_id.h"
 
 #include "game/cosmos/entity_flavour_id.h"

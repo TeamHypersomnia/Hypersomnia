@@ -2,6 +2,7 @@
 #include "test_scenes/test_scene_physical_materials.h"
 #include "test_scenes/test_scenes_content.h"
 #include "test_scenes/test_scene_sounds.h"
+#include "augs/misc/pool/pool_allocate.h"
 
 #include "game/assets/physical_material.h"
 #include "game/assets/all_logical_assets.h"

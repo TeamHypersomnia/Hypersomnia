@@ -1,6 +1,6 @@
 #pragma once
 #include <string>
-#include <imgui/imgui.h>
+#include "3rdparty/imgui/imgui.h"
 
 #include "augs/pad_bytes.h"
 #include "augs/math/vec2.h"

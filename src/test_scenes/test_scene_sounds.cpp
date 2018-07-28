@@ -1,4 +1,5 @@
 #include "augs/misc/enum/enum_map.h"
+#include "augs/misc/pool/pool_allocate.h"
 #include "augs/templates/enum_introspect.h"
 #include "augs/string/string_templates_declaration.h"
 #include "augs/filesystem/file.h"

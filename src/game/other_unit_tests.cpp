@@ -2,6 +2,7 @@
 #if BUILD_UNIT_TESTS
 #include <catch.hpp>
 #include "game/cosmos/cosmos.h"
+#include "augs/misc/pool/pool_allocate.h"
 #include "augs/misc/trivially_copyable_tuple.h"
 
 #if !STATICALLY_ALLOCATE_ENTITIES

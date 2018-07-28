@@ -8,6 +8,7 @@
 
 #include "augs/misc/enum/enum_map.h"
 #include "augs/string/format_enum.h"
+#include "augs/misc/pool/pool_allocate.h"
 
 #include "game/assets/ids/asset_ids.h"
 #include "game/assets/animation.h"

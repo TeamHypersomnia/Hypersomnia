@@ -1,5 +1,6 @@
 #include "augs/filesystem/file.h"
 #include "augs/misc/pool/pool.h"
+#include "augs/misc/pool/pool_allocate.h"
 
 #include "view/viewables/image_meta.h"
 #include "view/viewables/image_definition.h"

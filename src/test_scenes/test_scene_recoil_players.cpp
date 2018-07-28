@@ -1,6 +1,7 @@
 #include "augs/string/format_enum.h"
 #include "test_scenes/test_scene_recoil_players.h"
 #include "test_scenes/test_scenes_content.h"
+#include "augs/misc/pool/pool_allocate.h"
 
 #include "game/assets/recoil_player.h"
 #include "game/assets/ids/asset_ids.h"

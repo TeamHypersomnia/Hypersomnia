@@ -10,6 +10,7 @@
 #include "application/setups/editor/property_editor/widgets/asset_sane_default_provider.h"
 #include "application/setups/editor/property_editor/widgets/pathed_asset_widget.h"
 #include "application/setups/editor/detail/find_free_name.h"
+#include "augs/misc/pool/pool_allocate.h"
 
 std::string create_flavour_command::describe() const {
 	return built_description;

@@ -6,6 +6,7 @@
 #include "application/intercosm.h"
 #include "application/setups/editor/detail/find_free_name.h"
 
+#include "augs/misc/pool/pool_allocate.h"
 #include "augs/readwrite/byte_readwrite.h"
 
 template <class T, class = void>
