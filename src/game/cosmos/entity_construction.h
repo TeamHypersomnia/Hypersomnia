@@ -1,3 +1,4 @@
+#pragma once
 #include "augs/misc/randomization.h"
 
 #include "game/components/trace_component.h"
@@ -5,6 +6,7 @@
 #include "game/components/rigid_body_component.h"
 
 #include "game/debug_utils.h"
+#include "game/enums/render_layer.h"
 
 template <class handle_type>
 void construct_pre_inference(const handle_type h) {

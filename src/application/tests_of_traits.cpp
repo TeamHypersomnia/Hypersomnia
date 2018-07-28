@@ -1,5 +1,6 @@
 #define INCLUDE_TYPES_IN 1
 #include "augs/filesystem/path.h"
+#include "augs/templates/type_templates.h"
 
 #include "augs/templates/traits/is_comparable.h"
 #include "augs/templates/type_map.h"

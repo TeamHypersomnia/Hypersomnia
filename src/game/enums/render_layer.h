@@ -1,6 +1,4 @@
 #pragma once
-#include "augs/misc/enum/enum_array.h"
-
 /*
 
 	TODO: Some render layers might correspond to distinct entity types.
@@ -49,6 +47,3 @@ enum class render_layer {
 	COUNT
 	// END GEN INTROSPECTOR
 };
-
-template <class T>
-using per_render_layer_t = augs::enum_array<T, render_layer>;

@@ -1,4 +1,6 @@
 #pragma once
+#include "augs/misc/enum/enum_array.h"
+
 #include "augs/templates/maybe.h"
 #include "augs/math/camera_cone.h"
 
@@ -24,6 +26,9 @@ struct visible_entities_query {
 		return augs::maybe<render_layer_filter>();
 	}
 };
+
+template <class T>
+using per_render_layer_t = augs::enum_array<T, render_layer>;
 
 class visible_entities {
 	using id_type = entity_id;

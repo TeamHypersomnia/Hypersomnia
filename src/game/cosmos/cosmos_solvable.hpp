@@ -1,5 +1,6 @@
 #pragma once
 #include "game/cosmos/cosmos_solvable.h"
+#include "game/cosmos/entity_type_traits.h"
 
 template <class... MustHaveComponents, class S, class F>
 void cosmos_solvable::for_each_entity_impl(S& self, F callback) {

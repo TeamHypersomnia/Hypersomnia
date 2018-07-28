@@ -1,12 +1,9 @@
 #pragma once
 #include "augs/enums/callback_result.h"
 #include "augs/misc/scope_guard.h"
-#include "augs/templates/type_templates.h"
 
-#include "game/cosmos/entity_type_traits.h"
 #include "game/cosmos/entity_flavour_id.h"
 #include "game/cosmos/entity_handle_declaration.h"
-#include "game/cosmos/specific_entity_handle.h"
 #include "game/cosmos/entity_construction.h"
 #include "game/cosmos/specific_entity_handle_declaration.h"
 
@@ -27,6 +24,9 @@ enum class reinference_type {
 	ONLY_AFFECTED,
 	ENTIRE_COSMOS
 };
+
+template <class E>
+struct entity_solvable;
 
 class cosmic {
 	static void destroy_caches_of(const entity_handle h);
@@ -53,11 +53,11 @@ public:
 
 	static void clear(cosmos& cosm);
 
-	template <class C, class E>
+	template <class C, class I, class E>
 	static ref_typed_entity_handle<E> specific_paste_entity(
 		C& cosm, 
 		const typed_entity_flavour_id<E> flavour_id,
-		const typename entity_flavour<E>::initial_components_type& initial_components
+		const I& initial_components
 	);
 
 	template <class C, class E, class P>

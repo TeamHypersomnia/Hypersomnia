@@ -1,5 +1,6 @@
 #include "augs/enums/callback_result.h"
 
+#include "game/cosmos/specific_entity_handle.h"
 #include "application/intercosm.h"
 #include "application/setups/editor/editor_folder.h"
 

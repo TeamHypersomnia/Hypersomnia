@@ -24,11 +24,11 @@ ref_typed_entity_handle<E> cosmic::specific_create_entity_detail(
 	return handle;
 }
 
-template <class C, class E>
+template <class C, class I, class E>
 ref_typed_entity_handle<E> cosmic::specific_paste_entity(
 	C& cosm, 
 	const typed_entity_flavour_id<E> flavour_id,
-	const typename entity_flavour<E>::initial_components_type& initial_components
+	const I& initial_components
 ) {
 	return specific_create_entity_detail(
 		cosm,
