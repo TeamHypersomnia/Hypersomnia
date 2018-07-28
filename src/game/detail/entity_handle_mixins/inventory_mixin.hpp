@@ -1,6 +1,7 @@
 #pragma once
 #include "game/detail/entity_handle_mixins/inventory_mixin.h"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
+#include "game/components/item_sync.h"
 
 template <class E>
 std::optional<unsigned> inventory_mixin<E>::find_space_occupied() const {

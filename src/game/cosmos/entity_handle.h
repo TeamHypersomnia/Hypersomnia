@@ -23,6 +23,9 @@
 #include "game/cosmos/step_declaration.h"
 #include "game/components/flags_component.h"
 
+#include "game/components/sprite_sync.h"
+#include "game/components/motor_joint_sync.h"
+
 class cosmos;
 
 template <class, class>

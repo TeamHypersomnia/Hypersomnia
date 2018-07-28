@@ -5,6 +5,8 @@
 #include "game/detail/inventory/inventory_utils.h"
 #include "game/components/item_component.h"
 
+#include "game/detail/inventory/perform_transfer_result.h"
+
 perform_transfer_result perform_transfer_no_step(
 	const item_slot_transfer_request, 
 	cosmos& cosm

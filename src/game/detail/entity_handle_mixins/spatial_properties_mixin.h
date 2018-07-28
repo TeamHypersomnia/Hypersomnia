@@ -11,6 +11,7 @@
 #include "game/components/sprite_component.h"
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/components/wandering_pixels_component.h"
+#include "game/components/item_sync.h"
 
 template <class entity_handle_type>
 class spatial_properties_mixin {
