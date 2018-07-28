@@ -27,7 +27,6 @@
 
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/detail/inventory/inventory_slot_id.h"
-#include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/spells/spell_logic_input.h"
 

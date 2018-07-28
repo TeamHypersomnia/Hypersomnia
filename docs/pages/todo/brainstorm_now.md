@@ -6,9 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- optimize cosmos headers
-	- separate handle getters
-
 - Mode vars gui
 	- Can set the current one, resetting the cosmos
 

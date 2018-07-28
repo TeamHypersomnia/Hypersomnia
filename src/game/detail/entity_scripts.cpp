@@ -87,7 +87,7 @@ attitude_type calc_attitude(const const_entity_handle targeter, const const_enti
 	const auto* const target_attitude = target.find<components::attitude>();
 
 	if (target_attitude) {
-		if (targeter_attitude.official_faction == target_attitude->official_faction) {
+		if (targeter_attitude.official_faction != target_attitude->official_faction) {
 			return attitude_type::WANTS_TO_KILL;
 		}
 		else {

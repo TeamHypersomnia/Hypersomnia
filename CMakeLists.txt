@@ -332,6 +332,7 @@ set(HYPERSOMNIA_TEST_SCENES_CPPS
 set(HYPERSOMNIA_CPU_INTENSIVE_CPPS
 	# This should be the first one to build to catch errors early
 	"src/main.cpp"
+	"src/view/rendering_scripts/illuminated_rendering.cpp"
 	"src/application/tests_of_traits.cpp"
 
 	"src/application/setups/editor/gui/editor_fae_gui.cpp"

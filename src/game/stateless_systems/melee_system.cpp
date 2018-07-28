@@ -4,7 +4,6 @@
 
 #include "game/messages/intent_message.h"
 #include "game/messages/melee_swing_response.h"
-#include "game/detail/inventory/perform_transfer.h"
 
 #include "game/components/melee_component.h"
 #include "game/components/missile_component.h"

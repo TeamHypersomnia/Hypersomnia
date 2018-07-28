@@ -8,8 +8,6 @@
 #include "game/cosmos/data_living_one_step.h"
 #include "game/cosmos/delete_entity.h"
 
-#include "game/organization/all_component_includes.h"
-
 #include "game/detail/inventory/perform_transfer.h"
 
 void destroy_system::mark_queued_entities_and_their_children_for_deletion(const logic_step step) {

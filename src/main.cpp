@@ -38,6 +38,8 @@
 #include "view/rendering_scripts/illuminated_rendering.h"
 #include "view/viewables/images_in_atlas_map.h"
 #include "view/viewables/streaming/viewables_streaming.h"
+#include "view/frame_profiler.h"
+
 
 #include "application/session_profiler.h"
 #include "application/config_lua_table.h"
@@ -1431,6 +1433,19 @@ int work(const int argc, const char* const * const argv) try {
 				/* #1 */
 				auto scope = measure_scope(frame_performance.rendering_script);
 
+				thread_local std::vector<additional_highlight> highlights;
+				highlights.clear();
+
+				visit_current_setup([&](auto& setup) {
+					using T = remove_cref<decltype(setup)>;
+
+					if constexpr(T::has_additional_highlights) {
+						setup.for_each_highlight([](auto&&... args) {
+							highlights.push_back({ std::forward<decltype(args)>(args)... });
+						});
+					}
+				});
+
 				illuminated_rendering(
 					{
 						{ viewed_character, cone },
@@ -1448,17 +1463,7 @@ int work(const int argc, const char* const * const argv) try {
 						necessary_shaders,
 						all_visible
 					},
-					false,
-					[](const const_entity_handle) -> std::optional<rgba> { return std::nullopt; },
-					[&](auto callback) {
-						visit_current_setup([&](auto& setup) {
-							using T = remove_cref<decltype(setup)>;
-
-							if constexpr(T::has_additional_highlights) {
-								setup.for_each_highlight(callback);
-							}
-						});
-					}
+					highlights
 				);
 			}
 

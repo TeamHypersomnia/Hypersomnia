@@ -4,7 +4,6 @@
 #include "game/enums/slot_function.h"
 
 #include "game/detail/inventory/inventory_slot_handle.h"
-#include "game/detail/inventory/perform_transfer.h"
 
 #include "game/cosmos/entity_handle.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
