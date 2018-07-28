@@ -9,6 +9,7 @@
 
 #include "application/setups/editor/editor_view.h"
 #include "application/setups/editor/editor_settings.h"
+#include "game/cosmos/for_each_entity.h"
 
 const_entity_handle editor_go_to_entity_gui::get_matching_go_to_entity(const cosmos& cosm) const {
 	if (last_input.empty() && !moved_since_opening) {

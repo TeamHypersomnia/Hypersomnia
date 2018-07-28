@@ -70,17 +70,7 @@ public:
 		status = callback(common.significant);
 	}
 
-	void set(const cosmos_solvable_significant& signi) {
-		cosmic::change_solvable_significant(*this, [&](cosmos_solvable_significant& s){ 
-			{
-				auto scope = measure_scope(profiler.duplication);
-				s = signi; 
-			}
-
-			return changer_callback_result::REFRESH; 
-		});
-	}
-
+	void set(const cosmos_solvable_significant& signi); 
 	si_scaling get_si() const;
 
 	randomization get_rng_for(const entity_id) const;
@@ -168,14 +158,10 @@ public:
 	}
 
 	template <class... MustHaveComponents, class F>
-	void for_each_having(F&& callback) {
-		cosmic::for_each_entity<MustHaveComponents...>(*this, std::forward<F>(callback));
-	}
+	void for_each_having(F&& callback);
 
 	template <class... MustHaveComponents, class F>
-	void for_each_having(F&& callback) const {
-		cosmic::for_each_entity<MustHaveComponents...>(*this, std::forward<F>(callback));
-	}
+	void for_each_having(F&& callback) const;
 
 	template <class F>
 	void for_each_in(const processing_subjects f, F&& callback) {

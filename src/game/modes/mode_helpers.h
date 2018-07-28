@@ -4,6 +4,7 @@
 #include "game/common_state/entity_flavours.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
+#include "game/cosmos/for_each_entity.h"
 
 using player_character_type = controlled_character;
 

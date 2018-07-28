@@ -30,9 +30,7 @@ enum class reinference_type {
 
 class cosmic {
 	static void destroy_caches_of(const entity_handle h);
-
 	static void infer_all_entities(cosmos& cosm);
-
 	static void reinfer_solvable(cosmos&);
 
 	template <class F>
@@ -223,17 +221,7 @@ public:
 	}
 
 	template <class... MustHaveComponents, class C, class F>
-	static void for_each_entity(C& self, F callback) {
-		self.get_solvable({}).template for_each_entity<MustHaveComponents...>(
-			[&](auto& object, const auto iteration_index) -> decltype(auto) {
-				using O = decltype(object);
-				using E = entity_type_of<O>;
-				using iterated_handle_type = basic_iterated_entity_handle<is_const_ref_v<O>, E>;
-				
-				return callback(iterated_handle_type(self, { object, iteration_index } ));
-			}
-		);
-	}
+	static void for_each_entity(C& self, F callback);
 };
 
 /* Helper functions */

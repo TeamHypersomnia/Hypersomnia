@@ -2,6 +2,7 @@
 #include "augs/math/steering.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_id.h"
+#include "game/cosmos/for_each_entity.h"
 
 #include "game/messages/collision_message.h"
 #include "game/messages/queue_destruction.h"

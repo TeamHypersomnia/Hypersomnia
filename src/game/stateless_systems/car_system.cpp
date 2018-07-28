@@ -12,6 +12,7 @@
 #include "game/components/transform_component.h"
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/detail/view_input/sound_effect_input.h"
+#include "game/cosmos/for_each_entity.h"
 
 #include "game/stateless_systems/car_system.h"
 

@@ -9,6 +9,7 @@
 
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"
+#include "game/cosmos/for_each_entity.h"
 
 #include "view/frame_profiler.h"
 #include "view/rendering_scripts/draw_entity.h"

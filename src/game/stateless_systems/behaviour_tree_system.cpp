@@ -6,6 +6,7 @@
 
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/logic_step.h"
+#include "game/cosmos/for_each_entity.h"
 
 using namespace augs;
 

@@ -3,6 +3,7 @@
 #include "game/components/interpolation_component.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
+#include "game/cosmos/for_each_entity.h"
 
 void interpolation_system::set_interpolation_enabled(const bool flag) {
 	if (!enabled && flag) {

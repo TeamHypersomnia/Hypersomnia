@@ -10,6 +10,7 @@
 
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/logic_step.h"
+#include "game/cosmos/for_each_entity.h"
 
 void force_joint_system::apply_forces_towards_target_entities(const logic_step step) {
 	auto& cosmos = step.get_cosmos();

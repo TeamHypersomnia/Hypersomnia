@@ -4,6 +4,7 @@
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/data_living_one_step.h"
+#include "game/cosmos/for_each_entity.h"
 
 #include "game/inferred_caches/physics_world_cache.h"
 

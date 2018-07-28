@@ -42,6 +42,17 @@ bool cosmos::empty() const {
 	return get_solvable().empty();
 }
 
+void cosmos::set(const cosmos_solvable_significant& signi) {
+	cosmic::change_solvable_significant(*this, [&](cosmos_solvable_significant& s){ 
+		{
+			auto scope = measure_scope(profiler.duplication);
+			s = signi; 
+		}
+
+		return changer_callback_result::REFRESH; 
+	});
+}
+
 namespace augs {
 	template <class Archive>
 	void write_object_bytes(Archive& into, const cosmos& cosm) {

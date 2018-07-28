@@ -6,6 +6,7 @@
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/data_living_one_step.h"
+#include "game/cosmos/for_each_entity.h"
 
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"

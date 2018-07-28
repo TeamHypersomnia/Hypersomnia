@@ -20,6 +20,7 @@ void editor_fae_gui_base::interrupt_tweakers() {
 #include "augs/misc/imgui/imgui_enum_radio.h"
 
 #include "game/cosmos/entity_handle.h"
+#include "game/cosmos/for_each_entity.h"
 
 #include "application/intercosm.h"
 #include "application/setups/editor/editor_folder.h"

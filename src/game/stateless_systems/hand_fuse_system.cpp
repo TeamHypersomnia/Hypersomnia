@@ -6,6 +6,7 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/data_living_one_step.h"
+#include "game/cosmos/for_each_entity.h"
 
 #include "game/detail/hand_fuse_logic.h"
 #include "game/detail/explosions.h"

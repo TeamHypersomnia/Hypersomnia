@@ -1162,3 +1162,5 @@ we consider whole type overrides too complex architeciturally:
 - get_max_charges_in
 	- num_fitting_in
 
+- move access_each_property definition to change_property_command with if constexprs to remove cosmic function dependency
+

@@ -5,6 +5,7 @@
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/logic_step.h"
+#include "game/cosmos/for_each_entity.h"
 
 void remnant_system::shrink_and_destroy_remnants(const logic_step step) const {
 	auto& cosm = step.get_cosmos();

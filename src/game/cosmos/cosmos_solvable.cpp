@@ -2,6 +2,7 @@
 
 #include "augs/templates/introspect.h"
 #include "game/cosmos/specific_entity_handle_declaration.h"
+#include "game/cosmos/cosmos_solvable.hpp"
 
 const cosmos_solvable cosmos_solvable::zero;
 
