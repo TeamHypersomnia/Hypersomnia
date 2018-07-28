@@ -10,17 +10,14 @@ namespace augs {
 		std::chrono::high_resolution_clock::time_point ticks;
 		// END GEN INTROSPECTOR
 
-		static auto now() {
-			return std::chrono::high_resolution_clock::now();
-		}
-
 	public:
 		timer();
 
 		template <class resolution>
 		double get() const {
 			using namespace std::chrono;
-			return duration_cast<duration<double, typename resolution::period>>(now() - ticks).count();
+			const auto now = std::chrono::high_resolution_clock::now();
+			return duration_cast<duration<double, typename resolution::period>>(now - ticks).count();
 		}
 
 		void reset();

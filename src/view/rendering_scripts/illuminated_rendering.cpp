@@ -178,7 +178,7 @@ void illuminated_rendering(
 						output.line(glow_edge_tex, to, to + edge_offset, edge_size.y / 3.f, col);
 						output.line(glow_edge_tex, from - edge_offset + edge_dir, from + edge_dir, edge_size.y / 3.f, col, flip_flags::make_horizontally());
 					},
-					[](const vec2, const vec2) {},
+					[](const vec2, const vec2, const rgba) {},
 					interp,
 					viewed_character
 				});
@@ -338,27 +338,8 @@ void illuminated_rendering(
 		const auto laser = necessarys.at(assets::necessary_image_id::LASER);
 		
 		draw_crosshair_lasers({
-			[&](const vec2 from, const vec2 to, const rgba col) {
-				line_output.line(
-					laser,
-					from,
-					to, 
-					col
-				);
-			},
-
-			[&](const vec2 from, const vec2 to) {
-				line_output.dashed_line(
-					laser,
-					from,
-					to,
-					white,
-					10.f,
-					40.f, 
-					global_time_seconds
-				);
-			},
-
+			line_output_wrapper { line_output, laser },
+			dashed_line_output_wrapper  { line_output, laser, 10.f, 40.f, global_time_seconds },
 			interp, 
 			viewed_character
 		});

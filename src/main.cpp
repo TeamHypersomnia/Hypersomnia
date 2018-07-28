@@ -40,7 +40,6 @@
 #include "view/viewables/streaming/viewables_streaming.h"
 #include "view/frame_profiler.h"
 
-
 #include "application/session_profiler.h"
 #include "application/config_lua_table.h"
 

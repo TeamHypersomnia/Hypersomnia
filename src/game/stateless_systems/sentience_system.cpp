@@ -9,6 +9,7 @@
 #include "game/messages/health_event.h"
 #include "game/messages/health_event.h"
 #include "game/messages/exhausted_cast_message.h"
+#include "game/detail/inventory/perform_transfer.h"
 
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/logic_step.h"

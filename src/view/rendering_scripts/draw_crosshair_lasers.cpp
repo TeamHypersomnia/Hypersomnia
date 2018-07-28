@@ -15,6 +15,14 @@
 #include "game/components/fixtures_component.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 
+void line_output_wrapper::operator()(const vec2 from, const vec2 to, const rgba col) const {
+	output.line(line_tex, from, to, col);
+}
+
+void dashed_line_output_wrapper::operator()(const vec2 from, const vec2 to, const rgba col) const {
+	output.dashed_line(line_tex, from, to, col, len, vel, global_time_seconds);
+}
+
 void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 	if (in.character.alive()) {
 		const auto subject_with_crosshair = in.character; 
@@ -52,7 +60,7 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 			);
 
 			if (raycast.hit) {
-				in.dashed_line_callback(raycast.intersection, line_to);
+				in.dashed_line_callback(raycast.intersection, line_to, white);
 
 				in.callback(
 					line_from, 

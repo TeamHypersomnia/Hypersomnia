@@ -17,6 +17,23 @@ class interpolation_system;
 
 class visible_entities;
 
+struct line_output_wrapper {
+	augs::line_drawer_with_default output;
+	const augs::atlas_entry line_tex;
+
+	void operator()(vec2 from, vec2 to, rgba col) const;
+};
+
+struct dashed_line_output_wrapper {
+	augs::line_drawer_with_default output;
+	const augs::atlas_entry line_tex;
+	const float len;
+	const float vel;
+	const double global_time_seconds;
+
+	void operator()(vec2 from, vec2 to, rgba col) const;
+};
+
 struct draw_circular_bars_input {
 	const visible_entities& all;
 	
@@ -52,7 +69,7 @@ struct draw_hud_for_released_explosives_input {
 
 struct draw_crosshair_lasers_input {
 	const std::function<void(vec2, vec2, rgba)> callback;
-	const std::function<void(vec2, vec2)> dashed_line_callback;
+	const std::function<void(vec2, vec2, rgba)> dashed_line_callback;
 	const interpolation_system& interpolation;
 	const const_entity_handle character;
 };
