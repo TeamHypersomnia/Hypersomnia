@@ -3,6 +3,8 @@
 #include "augs/templates/introspection_utils/recursive_clear.h"
 
 #include "game/organization/all_messages_includes.h"
+#include "game/cosmos/change_common_significant.hpp"
+#include "game/cosmos/change_solvable_significant.h"
 #include "game/organization/all_component_includes.h"
 #include "view/viewables/image_cache.h"
 

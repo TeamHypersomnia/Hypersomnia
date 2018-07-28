@@ -10,7 +10,6 @@
 #include "game/cosmos/private_cosmos_solvable.h"
 
 #include "game/cosmos/entity_id.h"
-#include "game/cosmos/cosmic_functions.h"
 
 #include "game/enums/processing_subjects.h"
 
@@ -52,23 +51,7 @@ public:
 	*/
 
 	template <class F>
-	void change_common_significant(F&& callback) {
-		auto status = changer_callback_result::INVALID;
-		auto& self = *this;
-
-		auto refresh_when_done = augs::scope_guard([&]() {
-			if (status != changer_callback_result::DONT_REFRESH) {
-				/*	
-					Always first reinfer the common,
-				   	only later the entities, as they might use the common inferred during their own reinference. 
-				*/
-				common.reinfer();
-				cosmic::reinfer_all_entities(self);
-			}
-		});
-
-		status = callback(common.significant);
-	}
+	void change_common_significant(F&& callback);
 
 	void set(const cosmos_solvable_significant& signi); 
 	si_scaling get_si() const;

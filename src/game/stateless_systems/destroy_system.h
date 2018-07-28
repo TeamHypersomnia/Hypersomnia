@@ -1,8 +1,4 @@
 #pragma once
-#include <vector>
-#include "game/messages/queue_destruction.h"
-#include "game/messages/will_soon_be_deleted.h"
-
 #include "game/cosmos/step_declaration.h"
 
 struct destroy_system {

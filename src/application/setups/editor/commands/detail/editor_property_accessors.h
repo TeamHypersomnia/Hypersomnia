@@ -1,5 +1,7 @@
 #pragma once
 #include "application/setups/editor/property_editor/on_field_address.h"
+#include "game/cosmos/change_common_significant.hpp"
+#include "game/cosmos/cosmic_functions.h"
 
 template <class T>
 static constexpr bool should_reinfer_after_change(const T&) {

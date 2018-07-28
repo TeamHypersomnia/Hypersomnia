@@ -461,19 +461,6 @@ namespace augs {
 			}
 		}
 
-		template <class F>
-		void for_each_id(F f) const {
-			for (size_type i = 0; i < size(); ++i) {
-				key_type id;
-
-				const auto& s = slots[i];
-				id.indirection_index = s.pointing_indirector;
-				id.version = indirectors[s.pointing_indirector].version;
-
-				f(id);
-			}
-		}
-
 		auto begin() {
 			return objects.begin();
 		}

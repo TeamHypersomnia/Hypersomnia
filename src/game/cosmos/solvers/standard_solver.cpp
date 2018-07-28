@@ -3,6 +3,7 @@
 
 #include "game/cosmos/solvers/standard_solver.h"
 #include "game/cosmos/cosmos.h"
+#include "game/cosmos/cosmic_functions.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/data_living_one_step.h"
 

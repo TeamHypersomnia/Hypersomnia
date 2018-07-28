@@ -1,14 +1,8 @@
 #pragma once
-#include "augs/enums/callback_result.h"
-#include "augs/misc/scope_guard.h"
-
 #include "game/cosmos/entity_flavour_id.h"
 #include "game/cosmos/entity_handle_declaration.h"
-#include "game/cosmos/entity_construction.h"
+#include "game/cosmos/entity_id_declaration.h"
 #include "game/cosmos/specific_entity_handle_declaration.h"
-
-#include "game/messages/will_soon_be_deleted.h"
-#include "game/messages/queue_destruction.h"
 
 class cosmic_delta;
 class cosmos;
@@ -110,30 +104,8 @@ public:
 	static void infer_caches_for(const entity_handle h);
 
 	template <class C, class F>
-	static void change_solvable_significant(C& cosm, F&& callback) {
-		auto status = changer_callback_result::INVALID;
-
-		auto refresh_when_done = augs::scope_guard([&]() {
-			if (status != changer_callback_result::DONT_REFRESH) {
-				reinfer_solvable(cosm);
-			}
-		});
-
-		status = callback(cosm.get_solvable({}).significant);
-	}
+	static void change_solvable_significant(C& cosm, F&& callback);
 
 	template <class... MustHaveComponents, class C, class F>
 	static void for_each_entity(C& self, F callback);
 };
-
-/* Helper functions */
-
-void make_deletion_queue(const const_entity_handle, deletion_queue& q);
-void make_deletion_queue(const destruction_queue&, deletion_queue&, const cosmos& cosm);
-
-deletion_queue make_deletion_queue(const const_entity_handle);
-deletion_queue make_deletion_queue(const destruction_queue&, const cosmos& cosm);
-
-void reverse_perform_deletions(const deletion_queue&, cosmos& cosm);
-void delete_entity_with_children(const entity_handle);
-

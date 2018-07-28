@@ -4,6 +4,8 @@
 #include "game/cosmos/create_entity.hpp"
 #include "game/detail/inventory/perform_transfer.h"
 #include "augs/templates/introspect.h"
+#include "game/cosmos/change_common_significant.hpp"
+#include "game/cosmos/delete_entity.h"
 
 entity_handle just_create_entity(
 	cosmos& cosm,

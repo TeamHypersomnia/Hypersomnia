@@ -3,12 +3,10 @@
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_id.h"
 
-#include "game/messages/queue_destruction.h"
-#include "game/messages/will_soon_be_deleted.h"
-
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/data_living_one_step.h"
+#include "game/cosmos/delete_entity.h"
 
 #include "game/organization/all_component_includes.h"
 

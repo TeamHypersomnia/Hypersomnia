@@ -1,3 +1,5 @@
+#pragma once
+#include "game/cosmos/entity_construction.h"
 #include "game/cosmos/cosmic_functions.h"
 
 template <class E, class C, class I, class P>

@@ -1,4 +1,5 @@
 #include "application/setups/editor/editor_setup.h"
+#include "game/cosmos/cosmic_functions.h"
 
 using input_type = entity_mover_input;
 
