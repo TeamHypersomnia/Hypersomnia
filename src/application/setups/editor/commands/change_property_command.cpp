@@ -11,6 +11,8 @@
 #include "application/setups/editor/commands/change_property_command.h"
 #include "application/setups/editor/commands/asset_commands.h"
 
+#include "application/setups/editor/commands/detail/editor_property_accessors.h"
+
 #include "augs/readwrite/byte_readwrite.h"
 
 template <class D>
@@ -52,7 +54,8 @@ void change_property_command<D>::rewrite_change(
 
 	ensure(value_after_change.empty());
 
-	self.access_each_property(
+	editor_property_accessors::access_each_property(
+		self,
 		in,
 		[&](auto& field) {
 			augs::from_bytes(new_value, field);
@@ -98,7 +101,8 @@ void change_property_command<D>::redo(const editor_command_input in) {
 	auto before_change_data = augs::ref_memory_stream(values_before_change);
 	auto after_change_data = augs::cref_memory_stream(value_after_change);
 
-	self.access_each_property(
+	editor_property_accessors::access_each_property(
+		self,
 		in,
 		[&](auto& field) {
 			write_object_or_trivial_marker(before_change_data, field, trivial_element_size);
@@ -136,7 +140,8 @@ void change_property_command<D>::undo(const editor_command_input in) {
 	auto before_change_data = augs::cref_memory_stream(values_before_change);
 	auto after_change_data = augs::ref_memory_stream(value_after_change);
 
-	self.access_each_property(
+	editor_property_accessors::access_each_property(
+		self,
 		in,
 		[&](auto& field) {
 			if (read_once) {

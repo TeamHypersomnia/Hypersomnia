@@ -37,14 +37,4 @@ struct change_group_property_command : change_property_command<change_group_prop
 	auto count_affected() const {
 		return 1u;
 	}
-
-	template <class T, class F>
-	void access_each_property(
-		T in,
-		F callback
-	) const {
-		auto& groups = in.folder.view.selection_groups.groups;
-
-		callback(groups[group_index].name);
-	}
 };

@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- move access_each_property definition to change_property_command with if constexprs to remove cosmic function dependency
+
 - optimize cosmos headers
 	- separate handle getters
 

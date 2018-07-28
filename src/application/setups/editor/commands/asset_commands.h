@@ -82,29 +82,6 @@ struct forget_asset_id_command : id_freeing_command<id_type> {
 template <class id_type>
 struct asset_property_id {
 	field_address field;
-
-	template <class C, class Container, class F>
-	void access(
-		C& in,
-		const Container& asset_ids,
-		F callback
-	) const {
-		auto& definitions = access_asset_pool<id_type>(in, {});
-
-		for (const auto& id : asset_ids) {
-			const auto result = on_field_address(
-				definitions[id],
-				field,
-				[&](auto& resolved_field) -> callback_result {
-					return callback(resolved_field);
-				}
-			);
-
-			if (callback_result::ABORT == result) {
-				break;
-			}
-		}
-	}
 };
 
 template <class id_type>
@@ -120,18 +97,6 @@ struct change_asset_property_command : change_property_command<change_asset_prop
 
 	auto count_affected() const {
 		return affected_assets.size();
-	}
-
-	template <class T, class F>
-	void access_each_property(
-		T in,
-		F&& callback
-	) const {
-		property_id.access(
-			in,
-		   	affected_assets,
-			continue_if_nullptr(std::forward<F>(callback))
-		);
 	}
 };
 

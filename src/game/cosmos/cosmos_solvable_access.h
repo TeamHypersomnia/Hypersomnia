@@ -8,7 +8,7 @@ class cosmic;
 class move_entities_command;
 class resize_entities_command;
 
-struct entity_property_id;
+struct editor_property_accessors;
 
 template <class derived_handle_type>
 struct stored_id_provider;
@@ -25,7 +25,7 @@ class cosmos_solvable_access {
 	friend move_entities_command;
 	friend resize_entities_command;
 
-	friend entity_property_id;
+	friend editor_property_accessors;
 
 	template <class C, class E>
 	friend auto subscript_handle_getter(C& cosm, typed_entity_id<E>) 

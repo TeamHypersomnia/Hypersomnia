@@ -20,11 +20,13 @@ struct editor_selection_group {
 	// END GEN INTROSPECTOR
 };
 
+struct editor_property_accessors;
+
 class editor_selection_groups {
 	using selection_groups_type = std::vector<editor_selection_group>;
 
 	friend augs::introspection_access;
-	friend change_group_property_command;
+	friend editor_property_accessors;
 
 	template <class C, class F>
 	static bool on_group_entry_of_impl(C& self, const selection_group_unit id, F callback) {

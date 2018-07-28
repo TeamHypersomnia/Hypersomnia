@@ -1,5 +1,4 @@
 #pragma once
-#include <optional>
 #include "augs/misc/time_utils.h"
 
 struct editor_command_common {

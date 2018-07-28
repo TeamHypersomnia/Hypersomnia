@@ -5,6 +5,7 @@
 #include "augs/templates/traits/container_traits.h"
 #include "augs/enums/callback_result.h"
 #include "augs/templates/introspection_utils/introspective_equal.h"
+#include "application/setups/editor/commands/detail/editor_property_accessors.h"
 
 namespace augs {
 	struct trivial_type_marker;
@@ -66,7 +67,8 @@ bool compare_all_serialized_fields_to(
 ) {
 	bool equal = true;
 
-	property_id.access(
+	editor_property_accessors::access(
+		property_id,
 		std::forward<Args>(args)...,
 		[&first_bytes, &equal](const auto& resolved) -> callback_result {
 			if (detail_compare(first_bytes, resolved)) {

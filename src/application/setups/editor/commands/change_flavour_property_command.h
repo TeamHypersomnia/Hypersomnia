@@ -7,58 +7,10 @@
 #include "application/setups/editor/commands/change_property_command.h"
 
 #include "application/setups/editor/detail/field_address.h"
-#include "application/setups/editor/property_editor/on_field_address.h"
 
 struct flavour_property_id {
 	unsigned invariant_id = static_cast<unsigned>(-1);
 	field_address field;
-
-	template <class C, class Container, class F>
-	bool access(
-		C& cosm,
-		const entity_type_id type_id,
-		const Container& flavour_ids,
-		F callback
-	) const {
-		bool result = false;
-
-		get_by_dynamic_id(
-			all_entity_types(),
-			type_id,
-			[&](auto e) {
-				using E = decltype(e);
-
-				get_by_dynamic_index(
-					invariants_of<E> {},
-					invariant_id,
-					[&](const auto& i) {
-						using Invariant = remove_cref<decltype(i)>;
-
-						for (const auto& f : flavour_ids) {
-							const auto result = on_field_address(
-								std::get<Invariant>(cosm.get_flavour({}, typed_entity_flavour_id<E>(f)).invariants),
-								field,
-
-								[&](auto& resolved_field) -> callback_result {
-									return callback(resolved_field);
-								}
-							);
-
-							if (callback_result::ABORT == result) {
-								break;
-							}
-						}
-
-						if (should_reinfer_after_change(i)) {
-							result = true;
-						}
-					}
-				);
-			}
-		);
-
-		return result;
-	}
 };
 
 using affected_flavours_type = std::vector<raw_entity_flavour_id>;
@@ -76,17 +28,5 @@ struct change_flavour_property_command : change_property_command<change_flavour_
 
 	auto count_affected() const {
 		return affected_flavours.size();
-	}
-
-	template <class T, class F>
-	void access_each_property(
-		T in,
-		F&& callback
-	) const {
-		auto& cosm = in.get_cosmos();
-
-		if (property_id.access(cosm, type_id, affected_flavours, continue_if_nullptr(std::forward<F>(callback)))) {
-			cosm.change_common_significant([&](auto&) { return changer_callback_result::REFRESH; });
-		}
 	}
 };
