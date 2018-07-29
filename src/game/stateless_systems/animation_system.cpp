@@ -14,7 +14,7 @@
 #include "game/components/interpolation_component.h"
 
 #include "game/messages/interpolation_correction_request.h"
-#include "game/messages/queue_destruction.h"
+#include "game/messages/queue_deletion.h"
 #include "game/messages/will_soon_be_deleted.h"
 
 #include "game/stateless_systems/animation_system.h"
@@ -44,7 +44,7 @@ void animation_system::advance_stateful_animations(const logic_step step) const 
 					);
 
 					if (finished) {
-						step.post_message(messages::queue_destruction(t.get_id()));
+						step.post_message(messages::queue_deletion(t.get_id()));
 					}
 				}
 			}

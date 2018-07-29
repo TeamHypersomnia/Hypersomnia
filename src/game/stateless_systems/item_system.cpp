@@ -5,7 +5,7 @@
 #include "game/messages/collision_message.h"
 
 #include "game/detail/inventory/item_slot_transfer_request.h"
-#include "game/messages/queue_destruction.h"
+#include "game/messages/queue_deletion.h"
 
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/for_each_entity.h"

@@ -1,6 +1,6 @@
 #pragma once
 #include "game/messages/will_soon_be_deleted.h"
-#include "game/messages/queue_destruction.h"
+#include "game/messages/queue_deletion.h"
 
 /* Helper functions */
 

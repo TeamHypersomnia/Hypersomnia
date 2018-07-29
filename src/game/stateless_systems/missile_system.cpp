@@ -5,7 +5,7 @@
 #include "game/cosmos/for_each_entity.h"
 
 #include "game/messages/collision_message.h"
-#include "game/messages/queue_destruction.h"
+#include "game/messages/queue_deletion.h"
 #include "game/messages/damage_message.h"
 
 #include "game/detail/inventory/perform_transfer.h"
@@ -304,7 +304,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 				// delete only once
 				if (charges == 0) {
-					step.post_message(messages::queue_destruction(it.collider));
+					step.post_message(messages::queue_deletion(it.collider));
 					damage_msg.inflictor_destructed = true;
 
 					auto rng = cosm.get_rng_for(typed_missile);
@@ -401,7 +401,7 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 
 						missile.saved_point_of_impact_before_death = current_tr;
 						detonate_if_explosive(step, current_tr.pos, it);
-						step.post_message(messages::queue_destruction(it));
+						step.post_message(messages::queue_deletion(it));
 					}
 				}
 			}

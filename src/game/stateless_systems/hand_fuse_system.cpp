@@ -13,7 +13,7 @@
 
 #include "game/components/explosive_component.h"
 #include "game/components/hand_fuse_component.h"
-#include "game/messages/queue_destruction.h"
+#include "game/messages/queue_deletion.h"
 
 void hand_fuse_system::detonate_fuses(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
@@ -36,7 +36,7 @@ void hand_fuse_system::detonate_fuses(const logic_step step) {
 						/* Note: this assumes that an item inside a backpack returns a transform of the backpack. */
 						const auto explosion_location = it.get_logic_transform();
 						explosive->explosion.instantiate(step, explosion_location, entity_id());
-						step.post_message(messages::queue_destruction(it));
+						step.post_message(messages::queue_deletion(it));
 					}
 				}
 			}

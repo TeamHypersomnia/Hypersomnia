@@ -11,7 +11,7 @@ namespace messages {
 	struct motion_message;
 	struct interpolation_correction_request;
 	struct damage_message;
-	struct queue_destruction;
+	struct queue_deletion;
 	struct will_soon_be_deleted;
 	struct collision_message;
 	struct gunshot_message;
@@ -35,7 +35,7 @@ using all_message_queues = augs::storage_for_message_queues<
 	messages::motion_message,
 	messages::interpolation_correction_request,
 	messages::damage_message,
-	messages::queue_destruction,
+	messages::queue_deletion,
 	messages::will_soon_be_deleted,
 	messages::collision_message,
 	messages::gunshot_message,

@@ -7,5 +7,5 @@
 
 class sound_existence_system {
 public:
-	void create_sounds_from_game_events(const logic_step) const;
+	void play_sounds_from_events(const logic_step) const;
 };

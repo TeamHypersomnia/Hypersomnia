@@ -16,7 +16,7 @@
 #include "game/components/motor_joint_component.h"
 
 #include "game/messages/collision_message.h"
-#include "game/messages/queue_destruction.h"
+#include "game/messages/queue_deletion.h"
 #include "game/messages/will_soon_be_deleted.h"
 
 #include "game/cosmos/cosmos.h"

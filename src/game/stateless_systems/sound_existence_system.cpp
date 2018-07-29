@@ -4,7 +4,7 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 #include "game/cosmos/data_living_one_step.h"
-#include "game/messages/queue_destruction.h"
+#include "game/messages/queue_deletion.h"
 
 #include "game/detail/entity_scripts.h"
 #include "game/assets/all_logical_assets.h"
@@ -18,7 +18,7 @@
 #include "game/messages/start_sound_effect.h"
 #include "game/messages/collision_message.h"
 #include "game/messages/gunshot_message.h"
-#include "game/messages/queue_destruction.h"
+#include "game/messages/queue_deletion.h"
 #include "game/messages/damage_message.h"
 #include "game/messages/melee_swing_response.h"
 #include "game/messages/health_event.h"
@@ -78,7 +78,7 @@ void play_collision_sound(
 	}
 }
 
-void sound_existence_system::create_sounds_from_game_events(const logic_step step) const {
+void sound_existence_system::play_sounds_from_events(const logic_step step) const {
 	const auto& collisions = step.get_queue<messages::collision_message>();
 	const auto& gunshots = step.get_queue<messages::gunshot_message>();
 	const auto& damages = step.get_queue<messages::damage_message>();

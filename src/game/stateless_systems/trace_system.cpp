@@ -16,7 +16,7 @@
 #include "game/components/interpolation_component.h"
 
 #include "game/messages/interpolation_correction_request.h"
-#include "game/messages/queue_destruction.h"
+#include "game/messages/queue_deletion.h"
 #include "game/messages/will_soon_be_deleted.h"
 
 #include "game/stateless_systems/trace_system.h"
@@ -60,7 +60,7 @@ void trace_system::destroy_outdated_traces(const logic_step step) const {
 				trace.lengthening_time_passed_ms = trace.chosen_lengthening_duration_ms;
 
 				if (trace.is_it_a_finishing_trace) {
-					step.post_message(messages::queue_destruction(t));
+					step.post_message(messages::queue_deletion(t));
 				}
 			}
 		}

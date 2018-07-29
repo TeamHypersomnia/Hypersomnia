@@ -1,4 +1,4 @@
-#include "game/messages/queue_destruction.h"
+#include "game/messages/queue_deletion.h"
 #include "game/stateless_systems/remnant_system.h"
 
 #include "game/cosmos/data_living_one_step.h"
@@ -28,7 +28,7 @@ void remnant_system::shrink_and_destroy_remnants(const logic_step step) const {
 			const auto size_mult = remaining_ms / def.start_shrinking_when_remaining_ms;
 
 			if (size_mult <= 0.f) {
-				step.post_message(messages::queue_destruction(subject.get_id()));
+				step.post_message(messages::queue_deletion(subject.get_id()));
 			}
 			else if (size_mult < 1.f) {
 				state.last_size_mult = size_mult;

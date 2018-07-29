@@ -8,7 +8,7 @@
 #include "game/cosmos/for_each_entity.h"
 
 #include "game/messages/interpolation_correction_request.h"
-#include "game/messages/queue_destruction.h"
+#include "game/messages/queue_deletion.h"
 #include "game/messages/will_soon_be_deleted.h"
 #include "game/detail/visible_entities.h"
 

@@ -98,7 +98,6 @@ void standard_solve(const logic_step step) {
 	crosshair_system().integrate_crosshair_recoils(step);
 	crosshair_system().apply_crosshair_intents_to_base_offsets(step);
 
-	//	item_system().translate_gui_intents_to_transfer_requests(step);
 	item_system().start_picking_up_items(step);
 	item_system().pick_up_touching_items(step);
 
@@ -118,10 +117,8 @@ void standard_solve(const logic_step step) {
 	driver_system().assign_drivers_who_touch_wheels(step);
 	driver_system().release_drivers_due_to_ending_contact_with_wheel(step);
 
-	particles_existence_system().game_responses_to_particle_effects(step);
-
-	sound_existence_system().create_sounds_from_game_events(step);
-	// gui_system().translate_game_events_for_hud(step);
+	particles_existence_system().play_particles_from_events(step);
+	sound_existence_system().play_sounds_from_events(step);
 
 	{
 		auto scope = measure_scope(performance.visibility);
@@ -150,7 +147,7 @@ void standard_solve(const logic_step step) {
 	trace_system().destroy_outdated_traces(step);
 	remnant_system().shrink_and_destroy_remnants(step);
 
-	const auto queued_before_marking_num = step.get_queue<messages::queue_destruction>().size();
+	const auto queued_before_marking_num = step.get_queue<messages::queue_deletion>().size();
 
 	destroy_system().mark_queued_entities_and_their_children_for_deletion(step);
 
@@ -160,7 +157,7 @@ void standard_solve(const logic_step step) {
 
 	cosmic::increment_step(cosmos);
 
-	const auto queued_at_end_num = step.get_queue<messages::queue_destruction>().size();
+	const auto queued_at_end_num = step.get_queue<messages::queue_deletion>().size();
 
 	ensure_eq(queued_at_end_num, queued_before_marking_num);
 }

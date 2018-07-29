@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Propagating sounds from the mode logic
+	- 
+
+	
 - Mode vars gui
 	- Can set the current one, resetting the cosmos
 

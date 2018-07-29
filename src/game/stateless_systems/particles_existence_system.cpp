@@ -11,7 +11,7 @@
 
 #include "game/messages/gunshot_message.h"
 #include "game/messages/start_particle_effect.h"
-#include "game/messages/queue_destruction.h"
+#include "game/messages/queue_deletion.h"
 #include "game/messages/damage_message.h"
 #include "game/messages/melee_swing_response.h"
 #include "game/messages/health_event.h"
@@ -20,7 +20,7 @@
 
 #include "game/stateless_systems/particles_existence_system.h"
 
-void particles_existence_system::game_responses_to_particle_effects(const logic_step step) const {
+void particles_existence_system::play_particles_from_events(const logic_step step) const {
 	const auto& gunshots = step.get_queue<messages::gunshot_message>();
 	const auto& damages = step.get_queue<messages::damage_message>();
 	const auto& healths = step.get_queue<messages::health_event>();

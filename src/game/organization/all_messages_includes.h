@@ -3,7 +3,7 @@
 #include "game/messages/motion_message.h"
 #include "game/messages/interpolation_correction_request.h"
 #include "game/messages/damage_message.h"
-#include "game/messages/queue_destruction.h"
+#include "game/messages/queue_deletion.h"
 #include "game/messages/will_soon_be_deleted.h"
 #include "game/messages/collision_message.h"
 #include "game/messages/start_particle_effect.h"

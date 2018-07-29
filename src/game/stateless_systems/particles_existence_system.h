@@ -4,5 +4,5 @@
 
 class particles_existence_system {
 public:
-	void game_responses_to_particle_effects(const logic_step) const;
+	void play_particles_from_events(const logic_step) const;
 };
