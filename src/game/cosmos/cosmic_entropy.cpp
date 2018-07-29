@@ -102,6 +102,10 @@ void basic_cosmic_entropy<key>::clear_dead_entities(const cosmos& cosm) {
 		},
 		*this
 	);
+
+	erase_if(transfer_requests, [&](const auto& request) {
+		return cosm[request.item].dead();
+	});
 }
 
 bool guid_mapped_entropy::operator!=(const guid_mapped_entropy& b) const {

@@ -54,7 +54,7 @@ std::optional<colliders_connection> physics_mixin<E>::calc_colliders_connection(
 	
 	std::optional<colliders_connection> result;
 
-	self.template dispatch_on_having<invariants::fixtures>([&cosmos, &result](const auto typed_self) {
+	self.template dispatch_on_having_all<invariants::fixtures>([&cosmos, &result](const auto typed_self) {
 		if (const auto overridden = typed_self.template find<components::specific_colliders_connection>()) {
 			result = overridden->connection;
 			return;

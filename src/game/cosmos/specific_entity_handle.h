@@ -411,8 +411,13 @@ public:
 	}
 
 	template <class... List, class F>
-	void dispatch_on_having(F&& callback) const {
+	void dispatch_on_having_all(F&& callback) const {
 		conditional_dispatch<entity_types_having_all_of<List...>>(std::forward<F>(callback));
+	}
+
+	template <class... List, class F>
+	void dispatch_on_having_any(F&& callback) const {
+		conditional_dispatch<entity_types_having_any_of<List...>>(std::forward<F>(callback));
 	}
 
 	template <class F>

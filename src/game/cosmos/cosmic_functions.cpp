@@ -138,7 +138,7 @@ void entity_deleter(
 	/* Collect dependent entities so that we might reinfer them */
 	std::vector<entity_id> dependent_items;
 
-	handle.dispatch_on_having<invariants::container>([&](const auto typed_handle){
+	handle.dispatch_on_having_all<invariants::container>([&](const auto typed_handle){
 		const auto& container = typed_handle.template get<invariants::container>();
 
 		for (const auto& s : container.slots) {

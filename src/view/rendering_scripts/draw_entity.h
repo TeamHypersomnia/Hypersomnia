@@ -25,7 +25,7 @@
 #include "view/audiovisual_state/systems/randomizing_system.h"
 #include "view/rendering_scripts/draw_entity_input.h"
 
-using entities_with_renderables = entity_types_with_any_of<
+using entities_with_renderables = entity_types_having_any_of<
 	invariants::sprite,
 	invariants::torso,
 	invariants::gun,
@@ -274,7 +274,7 @@ FORCE_INLINE void specific_entity_drawer(
 							const auto attachment_offset
 						) {
 							if (heavy_item.get_id() == attachment_entity.get_id()) {
-								attachment_entity.template dispatch_on_having<invariants::item>(
+								attachment_entity.template dispatch_on_having_all<invariants::item>(
 									[&](const auto typed_attachment_handle) {
 										detail_specific_entity_drawer(
 											typed_attachment_handle,
@@ -307,7 +307,7 @@ FORCE_INLINE void specific_entity_drawer(
 							return;
 						}
 
-						attachment_entity.template dispatch_on_having<invariants::item>(
+						attachment_entity.template dispatch_on_having_all<invariants::item>(
 							[&](const auto typed_attachment_handle) {
 								detail_specific_entity_drawer(
 									typed_attachment_handle,

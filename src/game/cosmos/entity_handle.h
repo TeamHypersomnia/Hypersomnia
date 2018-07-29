@@ -64,16 +64,34 @@ class basic_entity_handle :
 
 	template <class T>
 	auto* find_invariant_ptr() const {
-		return dispatch([](const auto typed_handle) { 
-			return typed_handle.get_flavour().template find<T>(); 
-		});
+		return conditional_dispatch_ret<entity_types_having_all_of<T>>(
+			[&](auto t) -> const T* { 
+				using E = decltype(t);
+
+				if constexpr(std::is_same_v<E, std::nullopt_t>) {
+					return nullptr;
+				}
+				else {
+					return t.get_flavour().template find<T>(); 
+				}
+			}
+		);
 	}
 
 	template <class T>
 	auto* find_component_ptr() const {
-		return dispatch([](const auto typed_handle) { 
-			return typed_handle.template find_component_ptr<T>(); 
-		});
+		return conditional_dispatch_ret<entity_types_having_all_of<T>>(
+			[&](auto t) -> maybe_const_ptr_t<is_const, T> { 
+				using E = decltype(t);
+
+				if constexpr(std::is_same_v<E, std::nullopt_t>) {
+					return nullptr;
+				}
+				else {
+					return t.template find_component_ptr<T>(); 
+				}
+			}
+		);
 	}
 
 public:
@@ -180,7 +198,6 @@ public:
 		using specific_ptr_type = maybe_const_ptr_t<is_const, entity_solvable<E>>;
 
 		const auto specific_ptr = reinterpret_cast<specific_ptr_type>(ptr);
-		ensure(specific_ptr != nullptr);
 		const auto stored_id = ref_stored_id_provider<handle_type>( *specific_ptr, typed_entity_id<E>(raw_id.raw) );
 		return handle_type(owner, stored_id);
 	}
@@ -209,9 +226,7 @@ public:
 	FORCE_INLINE void conditional_dispatch(F&& callback) const {
 		this->conditional_dispatch_ret<List>(
 			[&](const auto& typed_handle) {
-				using E = remove_cref<decltype(typed_handle)>;
-
-				if constexpr(!std::is_same_v<E, std::nullopt_t>) {
+				if constexpr(!std::is_same_v<const std::nullopt_t&, decltype(typed_handle)>) {
 					callback(typed_handle);
 				}
 			}
@@ -219,8 +234,25 @@ public:
 	}
 
 	template <class... List, class F>
-	void dispatch_on_having(F&& callback) const {
-		conditional_dispatch<entity_types_having_all_of<List...>>(std::forward<F>(callback));
+	void dispatch_on_having_all(F&& callback) const {
+		this->conditional_dispatch_ret<entity_types_having_all_of<List...>>(
+			[&](const auto& typed_handle) {
+				if constexpr(!std::is_same_v<const std::nullopt_t&, decltype(typed_handle)>) {
+					callback(typed_handle);
+				}
+			}
+		);
+	}
+
+	template <class... List, class F>
+	void dispatch_on_having_any(F&& callback) const {
+		this->conditional_dispatch_ret<entity_types_having_any_of<List...>>(
+			[&](const auto& typed_handle) {
+				if constexpr(!std::is_same_v<const std::nullopt_t&, decltype(typed_handle)>) {
+					callback(typed_handle);
+				}
+			}
+		);
 	}
 
 	template <class F>
@@ -239,9 +271,11 @@ public:
 
 	template <class T>
 	bool has() const {
-		return dispatch([](const auto typed_handle) { 
-			return typed_handle.template has<T>(); 
-		});
+		return this->conditional_dispatch_ret<entity_types_having_any_of<T>>(
+			[&](const auto& typed_handle) {
+				return !std::is_same_v<const std::nullopt_t&, decltype(typed_handle)>;
+			}
+		);
 	}
 
 	template<class T>

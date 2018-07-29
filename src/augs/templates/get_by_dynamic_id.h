@@ -152,11 +152,15 @@ decltype(auto) conditional_find_by_dynamic_id(
 	F&& generic_call
 ) {
 	static_assert(num_types_in_list_v<remove_cref<T>> > 0, "Can't find from an empty list.");
-	static_assert(num_types_in_list_v<OnlyCandidates> > 0, "Candidate list is empty.");
 
-	return conditional_get_by_dynamic_index<OnlyCandidates, 0, true>(
-		std::forward<T>(index_findable_object), 
-		static_cast<std::size_t>(dynamic_type_index.get_index()),
-		std::forward<F>(generic_call)
-	);
+	if constexpr(std::is_same_v<OnlyCandidates, type_list<>>) {
+		return generic_call(std::nullopt);
+	}
+	else {
+		return conditional_get_by_dynamic_index<OnlyCandidates, 0, true>(
+			std::forward<T>(index_findable_object), 
+			static_cast<std::size_t>(dynamic_type_index.get_index()),
+			std::forward<F>(generic_call)
+		);
+	}
 }

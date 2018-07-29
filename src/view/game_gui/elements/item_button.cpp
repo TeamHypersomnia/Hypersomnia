@@ -247,7 +247,7 @@ void item_button::draw_proc(
 				const const_entity_handle attachment_handle, 
 				const transformr where
 			) {
-				attachment_handle.dispatch_on_having<invariants::item>([&](const auto typed_attachment_handle) {
+				attachment_handle.dispatch_on_having_all<invariants::item>([&](const auto typed_attachment_handle) {
 					detail_specific_entity_drawer<true>(
 						typed_attachment_handle,
 						drawing_in,

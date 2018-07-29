@@ -268,7 +268,7 @@ void illuminated_rendering(
 	auto standard_border_provider = [timestamp_ms](const const_entity_handle sentience) {
 		std::optional<rgba> result;
 
-		sentience.dispatch_on_having<components::sentience>(
+		sentience.dispatch_on_having_all<components::sentience>(
 			[&](const auto typed_handle) {
 				result = typed_handle.template get<components::sentience>().find_low_health_border(timestamp_ms);
 			}
@@ -283,7 +283,7 @@ void illuminated_rendering(
 
 	if (settings.draw_area_markers) {
 		visible.for_each<render_layer::AREA_MARKERS>(cosmos, [&](const auto e) {
-			e.dispatch([&](const auto typed_handle){ 
+			e.template dispatch_on_having_all<invariants::box_marker>([&](const auto typed_handle){ 
 				const auto where = typed_handle.get_logic_transform();
 				::draw_marker_borders(typed_handle, line_output, where, cone.eye.zoom);
 			});

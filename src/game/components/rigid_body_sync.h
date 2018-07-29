@@ -176,7 +176,7 @@ template <class E>
 damping_mults component_synchronizer<E, components::rigid_body>::calc_damping_mults(const invariants::rigid_body& def) const {
 	damping_mults damping = def.damping;
 
-	handle.template dispatch_on_having<components::movement>([&damping](const auto typed_handle) {
+	handle.template dispatch_on_having_all<components::movement>([&damping](const auto typed_handle) {
 		const auto& movement = typed_handle.template get<components::movement>();
 		const auto& movement_def = typed_handle.template get<invariants::movement>();
 

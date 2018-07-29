@@ -12,7 +12,7 @@ void draw_wandering_pixels_as_sprites(
 	const M& manager,
 	invariants::sprite::drawing_input basic_input
 ) {
-	subject_handle.template dispatch_on_having<invariants::wandering_pixels>([&](const auto subject) {
+	subject_handle.template dispatch_on_having_all<invariants::wandering_pixels>([&](const auto subject) {
 		const auto& wandering_def = subject.template get<invariants::wandering_pixels>();
 		const auto& cache = sys.get_cache(subject);
 

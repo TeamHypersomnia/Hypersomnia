@@ -929,6 +929,7 @@ bool editor_setup::handle_input_before_imgui(
 				if (has_shift) {
 					switch (k) {
 						case key::E: reveal_in_explorer(window); return true;
+						case key::F5: fill_with_minimal_scene(); return true;
 						case key::TAB: prev_tab(); return true;
 						default: break;
 					}
@@ -951,13 +952,6 @@ bool editor_setup::handle_input_before_imgui(
 			if (has_shift) {
 				switch (k) {
 					case key::F5: fill_with_test_scene(); return true;
-					default: break;
-				}
-			}
-
-			if (has_ctrl && has_shift) {
-				switch (k) {
-					case key::F5: fill_with_minimal_scene(); return true;
 					default: break;
 				}
 			}

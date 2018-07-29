@@ -7,7 +7,7 @@
 #include "augs/templates/enum_introspect.h"
 
 void relational_cache::infer_cache_for(const const_entity_handle handle) {
-	handle.dispatch_on_having<components::item>([this](const auto typed_handle) {
+	handle.dispatch_on_having_all<components::item>([this](const auto typed_handle) {
 		/*
 			WHEN ORDER OF ITEMS IN THE CONTAINER BECOMES RELEVANT,
 			This procedure should be fixed or otherwise the reinference might break the order of items!
@@ -29,7 +29,7 @@ void relational_cache::infer_cache_for(const const_entity_handle handle) {
 }
 
 void relational_cache::destroy_cache_of(const const_entity_handle handle) {
-	handle.dispatch_on_having<components::item>([this](const auto typed_handle) {
+	handle.dispatch_on_having_all<components::item>([this](const auto typed_handle) {
 		const auto& item = typed_handle.template get<components::item>();
 		const auto current_slot = item->get_current_slot();
 

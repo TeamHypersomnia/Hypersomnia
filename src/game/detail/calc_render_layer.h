@@ -4,7 +4,7 @@
 #include "game/organization/all_component_includes.h"
 #include "game/cosmos/entity_type_traits.h"
 
-using entities_with_render_layer = entity_types_with_any_of<
+using entities_with_render_layer = entity_types_having_any_of<
 	invariants::render,
 	invariants::light,
 	invariants::continuous_particles,

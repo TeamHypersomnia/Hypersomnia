@@ -109,7 +109,7 @@ void physics_world_cache::destroy_cache_of(const const_entity_handle handle) {
 }
 
 void physics_world_cache::infer_rigid_body(const const_entity_handle h) {
-	h.dispatch_on_having<components::rigid_body>([this](const auto handle) {
+	h.dispatch_on_having_all<components::rigid_body>([this](const auto handle) {
 		const auto it = rigid_body_caches.try_emplace(unversioned_entity_id(handle));
 		auto& cache = (*it.first).second;
 	
@@ -231,7 +231,7 @@ void physics_world_cache::infer_cache_for(const const_entity_handle handle) {
 }
 
 void physics_world_cache::infer_colliders(const const_entity_handle h) {
-	h.dispatch_on_having<invariants::fixtures>([this](const auto handle) {
+	h.dispatch_on_having_all<invariants::fixtures>([this](const auto handle) {
 		std::optional<colliders_connection> calculated_connection;
 	
 		auto get_calculated_connection = [&](){
@@ -301,7 +301,7 @@ void physics_world_cache::infer_colliders(const const_entity_handle h) {
 }
 
 void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle h, const colliders_connection& connection) {
-	h.dispatch_on_having<invariants::fixtures>([this, connection](const auto handle) {
+	h.dispatch_on_having_all<invariants::fixtures>([this, connection](const auto handle) {
 		const auto& cosmos = handle.get_cosmos();
 	
 		const auto it = colliders_caches.try_emplace(handle.get_id().to_unversioned());

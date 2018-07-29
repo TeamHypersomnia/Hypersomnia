@@ -85,4 +85,4 @@ template <class E, class... Args>
 constexpr bool has_any_of_v = has_any_of<Args...>::template type<E>::value;
 
 template <class... Types>
-using entity_types_with_any_of = entity_types_passing<has_any_of<Types...>::template type>;
+using entity_types_having_any_of = entity_types_passing<has_any_of<Types...>::template type>;

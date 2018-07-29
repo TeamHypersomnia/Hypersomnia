@@ -44,6 +44,8 @@ void standard_solve(const logic_step step) {
 
 	auto total_raycasts_scope = cosmos.measure_raycasts(performance.total_step_raycasts);
 
+	cosmic::increment_step(cosmos);
+
 	contact_listener listener(cosmos);
 
 	perform_transfers(step.get_entropy().transfer_requests, step);
@@ -154,8 +156,6 @@ void standard_solve(const logic_step step) {
 	trace_system().spawn_finishing_traces_for_deleted_entities(step);
 
 	listener.~contact_listener();
-
-	cosmic::increment_step(cosmos);
 
 	const auto queued_at_end_num = step.get_queue<messages::queue_deletion>().size();
 

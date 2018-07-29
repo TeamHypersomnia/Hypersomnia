@@ -9,9 +9,7 @@ inline bool passes_filter(
 	const entity_id id
 ) {
 	if (filter.is_enabled) {
-		return cosm[id].dispatch([&filter](const auto typed_handle) {
-			return filter.value.passes(typed_handle);
-		});	
+		return filter.value.passes(cosm[id]);
 	}
 
 	return true;
@@ -23,14 +21,7 @@ inline bool passes_filter(
 	const E& handle
 ) {
 	if (filter.is_enabled) {
-		if constexpr(E::is_specific) {
-			return filter.value.passes(handle);
-		}
-		else {
-			return handle.dispatch([&filter](const auto typed_handle) {
-				return filter.value.passes(typed_handle);
-			});	
-		}
+		return filter.value.passes(handle);
 	}
 
 	return true;

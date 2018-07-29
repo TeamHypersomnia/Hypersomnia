@@ -23,8 +23,7 @@
 
 #include "application/setups/setup_common.h"
 
-#include "application/setups/editor/editor_player.h"
-#include "application/setups/editor/editor_player_logic.h"
+#include "application/setups/editor/editor_player.hpp"
 #include "application/setups/editor/editor_popup.h"
 #include "application/setups/editor/editor_significant.h"
 #include "application/setups/editor/editor_autosave.h"
@@ -353,7 +352,7 @@ public:
 				[&](const entity_id id) {
 					const auto handle = world[id];
 
-					handle.dispatch_on_having<invariants::light>([&](const auto typed_handle) {
+					handle.dispatch_on_having_all<invariants::light>([&](const auto typed_handle) {
 						const auto center = typed_handle.get_logic_transform().pos;
 
 						const auto& light_def = typed_handle.template get<invariants::light>();
@@ -381,7 +380,7 @@ public:
 					});
 
 					if (mover.is_active()) {
-						handle.dispatch_on_having<components::overridden_size>([&](const auto typed_handle) {
+						handle.dispatch_on_having_all<components::overridden_size>([&](const auto typed_handle) {
 							const auto s = typed_handle.get_logical_size();
 							const auto tr = typed_handle.get_logic_transform();
 

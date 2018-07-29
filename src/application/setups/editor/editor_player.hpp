@@ -1,3 +1,4 @@
+#pragma once
 #include "application/setups/editor/editor_player.h"
 
 template <class C, class... Callbacks>
@@ -21,6 +22,8 @@ void advance_player(
 			
 			if (const auto vars = mapped_or_nullptr(all_vars.get_for<V>(), self.current_mode_vars_id)) {
 				while (steps--) {
+					self.total_collected_entropy.clear_dead_entities(cosm);
+
 					typed_mode.advance(
 						{ *vars, cosm },
 						{ self.total_collected_entropy },

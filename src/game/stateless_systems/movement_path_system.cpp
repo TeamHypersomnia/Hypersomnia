@@ -87,7 +87,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 					});
 
 					neighbors.for_all(cosm, [&](const auto handle) {
-						handle.template dispatch_on_having<components::movement_path>([&](const auto typed_neighbor) {
+						handle.template dispatch_on_having_all<components::movement_path>([&](const auto typed_neighbor) {
 							if (typed_neighbor.get_id() != subject.get_id()) {
 								const auto neighbor_tip = *typed_neighbor.find_logical_tip();
 								const auto offset = neighbor_tip - tip_pos;

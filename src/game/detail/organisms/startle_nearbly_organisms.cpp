@@ -27,7 +27,7 @@ void startle_nearby_organisms(
 	});
 
 	neighbors.for_all(cosm, [&](const auto handle) {
-		handle.template dispatch_on_having<components::movement_path>([&](const auto typed_neighbor) {
+		handle.template dispatch_on_having_all<components::movement_path>([&](const auto typed_neighbor) {
 			const auto neighbor_tip = *typed_neighbor.find_logical_tip();
 			const auto target_offset = neighbor_tip - startle_origin;
 			const auto target_dist = target_offset.length();

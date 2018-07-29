@@ -46,7 +46,7 @@ void for_each_iconed_entity(
 	F callback
 ) {
 	visible.for_each<render_layer::POINT_MARKERS, render_layer::AREA_MARKERS>(cosm, [&](const auto handle) {
-		handle.dispatch([&](const auto typed_handle) {
+		handle.template dispatch_on_having_any<invariants::point_marker, invariants::box_marker>([&](const auto typed_handle) {
 			using E = remove_cref<decltype(typed_handle)>;
 
 			if constexpr(E::template has<invariants::point_marker>()) {
@@ -68,6 +68,9 @@ void for_each_iconed_entity(
 					typed_handle.get_logic_transform(),
 					m.col
 				);
+			}
+			else {
+				static_assert(always_false_v<E>);
 			}
 		});
 	});

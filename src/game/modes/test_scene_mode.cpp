@@ -12,7 +12,7 @@ using input_type = test_scene_mode::input;
 void test_scene_mode::init_spawned(const input in, const entity_id id) {
 	const auto handle = in.cosm[id];
 
-	handle.dispatch_on_having<components::sentience>([&](const auto typed_handle) {
+	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
 		::generate_equipment(in.vars.initial_eq, typed_handle);
 
 		auto& sentience = typed_handle.template get<components::sentience>();
@@ -24,7 +24,7 @@ void test_scene_mode::init_spawned(const input in, const entity_id id) {
 void test_scene_mode::teleport_to_next_spawn(const input in, const entity_id id) {
 	const auto handle = in.cosm[id];
 
-	handle.dispatch([&](const auto typed_handle) {
+	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
 		if (const auto faction = typed_handle.find_official_faction()) {
 			if (const auto spawn = ::find_faction_spawn(in.cosm, *faction, current_spawn_index)) {
 				const auto spawn_transform = spawn.get_logic_transform();

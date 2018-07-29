@@ -77,7 +77,7 @@ void missile_system::ricochet_missiles(const logic_step step) {
 		const auto subject_handle = cosm[it.subject];
 		const auto missile_handle = cosm[it.collider];
 
-		missile_handle.dispatch_on_having<invariants::missile>([&](const auto typed_missile) {
+		missile_handle.dispatch_on_having_all<invariants::missile>([&](const auto typed_missile) {
 			const auto& missile_def = typed_missile.template get<invariants::missile>();
 			auto& missile = typed_missile.template get<components::missile>();
 
@@ -197,7 +197,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 		const auto subject_handle = cosm[it.subject];
 		const auto missile_handle = cosm[it.collider];
 
-		missile_handle.dispatch_on_having<invariants::missile>([&](const auto typed_missile) {
+		missile_handle.dispatch_on_having_all<invariants::missile>([&](const auto typed_missile) {
 			const auto& missile_def = typed_missile.template get<invariants::missile>();
 			auto& missile = typed_missile.template get<components::missile>();
 

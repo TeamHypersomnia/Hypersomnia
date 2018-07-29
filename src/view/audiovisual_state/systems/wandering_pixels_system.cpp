@@ -57,7 +57,7 @@ void wandering_pixels_system::advance_for(
 	const auto dt_secs = dt.in_seconds();
 	const auto dt_ms = dt.in_milliseconds();
 
-	handle.dispatch_on_having<invariants::wandering_pixels>([&](const auto it) {
+	handle.dispatch_on_having_all<invariants::wandering_pixels>([&](const auto it) {
 		auto& cache = get_cache(it);
 		auto& used_rng = rng;
 

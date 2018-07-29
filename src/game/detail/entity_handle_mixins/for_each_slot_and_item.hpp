@@ -80,7 +80,7 @@ void inventory_mixin<E>::for_each_attachment_recursive(
 		const auto it = container_stack.back();
 		container_stack.pop_back();
 
-		cosm[it.child].dispatch(
+		cosm[it.child].template dispatch_on_having_any<invariants::container, components::item>(
 			[&](const auto this_attachment) {
 				auto current_offset = it.offset;
 
