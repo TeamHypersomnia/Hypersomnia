@@ -1,5 +1,15 @@
 #pragma once
 
+enum class capability_relation {
+	UNMATCHING,
+	THE_SAME,
+	PICKUP,
+	STORING_DROP,
+	DROP,
+	ANONYMOUS_TRANSFER,
+	ANONYMOUS_DROP
+};
+
 enum class containment_result_type {
 	INVALID_RESULT,
 	THE_SAME_SLOT,
@@ -23,9 +33,5 @@ enum class item_transfer_result_type {
 	INSUFFICIENT_SPACE,
 	THE_SAME_SLOT,
 
-	SUCCESSFUL_TRANSFER,
-	SUCCESSFUL_PICKUP,
-	SUCCESSFUL_DROP
+	SUCCESSFUL_TRANSFER
 };
-
-bool is_successful(const item_transfer_result_type t);

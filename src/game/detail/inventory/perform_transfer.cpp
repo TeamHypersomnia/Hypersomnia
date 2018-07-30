@@ -62,7 +62,7 @@ perform_transfer_result perform_transfer_impl(
 ) {
 	const auto result = query_transfer_result(cosmos, r);
 
-	if (!is_successful(result.result)) {
+	if (!result.is_successful()) {
 		LOG("Warning: an item-slot transfer was not successful.");
 		return {};
 	}
@@ -91,9 +91,7 @@ perform_transfer_result perform_transfer_impl(
 	const auto previous_root = previous_slot_container.get_topmost_container();
 	const auto target_root = target_slot_container.get_topmost_container();
 
-	const bool is_pickup = result.result == item_transfer_result_type::SUCCESSFUL_PICKUP;
-	const bool target_slot_exists = result.result == item_transfer_result_type::SUCCESSFUL_TRANSFER || is_pickup;
-	const bool is_drop_request = result.result == item_transfer_result_type::SUCCESSFUL_DROP;
+	const bool target_slot_exists = target_slot.alive();
 
 	const auto initial_transform_of_transferred = transferred_item.get_logic_transform();
 
@@ -214,6 +212,8 @@ perform_transfer_result perform_transfer_impl(
 	}
 #endif
 
+	const bool is_drop_request = result.relation == capability_relation::DROP;
+
 	if (is_drop_request) {
 		ensure(previous_slot_container.alive());
 
@@ -255,6 +255,8 @@ perform_transfer_result perform_transfer_impl(
 
 		special_physics.during_cooldown_ignore_collision_with = previous_slot_container;
 	}
+
+	const bool is_pickup = result.relation == capability_relation::PICKUP;
 
 	if (r.play_transfer_sounds) {
 		if (is_drop_request) {

@@ -9,18 +9,6 @@
 
 #include "augs/string/string_templates.h"
 
-bool capability_comparison::is_legal() const {
-	return
-		relation_type == capability_relation::DROP
-		|| relation_type == capability_relation::PICKUP
-		|| relation_type == capability_relation::THE_SAME
-	;
-}
-
-bool capability_comparison::is_authorized(const entity_id h) const {
-	return is_legal() && authorized_capability == h;
-}
-
 capability_comparison match_transfer_capabilities(
 	const cosmos& cosm,
 	item_slot_transfer_request r
@@ -34,32 +22,39 @@ capability_comparison match_transfer_capabilities(
 	const auto item_owning_capability = transferred_item.get_owning_transfer_capability();
 	const auto target_slot_owning_capability = target_slot_container.get_owning_transfer_capability();
 
-	if (/* both_dead */ target_slot_owning_capability.dead() && item_owning_capability.dead()) {
-		if (target_slot_container) {
-			return { capability_relation::PICKUP, dead_entity };
+	const auto& source = item_owning_capability;
+	const auto& target = target_slot_owning_capability;
+
+	if (source.dead() && target.dead()) {
+		if (target_slot_container.dead()) {
+			return { capability_relation::ANONYMOUS_DROP, dead_entity };
 		}
 
-		return { capability_relation::DROP, dead_entity };
+		return { capability_relation::ANONYMOUS_TRANSFER, dead_entity };
 	}
 
-	if (/* both_alive */ item_owning_capability && target_slot_owning_capability) {
-		if (item_owning_capability == target_slot_owning_capability) {
-			return { capability_relation::THE_SAME, item_owning_capability };
+	if (source.alive() && target.dead()) {
+		if (target_slot_container.dead()) {
+			return { capability_relation::DROP, source };
 		}
 
-		return { capability_relation::UNMATCHING, dead_entity };
+		return { capability_relation::STORING_DROP, source };
 	}
 
-	if (target_slot_owning_capability.dead() && item_owning_capability.alive()) {
-		return { capability_relation::DROP, item_owning_capability };
+	if (source.alive() && target.alive()) {
+		if (source != target) {
+			return { capability_relation::UNMATCHING, dead_entity };
+		}
+
+		return { capability_relation::THE_SAME, source };
 	}
 
-	if (target_slot_owning_capability.alive() && item_owning_capability.dead()) {
-		return { capability_relation::PICKUP, target_slot_owning_capability };
+	if (source.dead() && target.alive()) {
+		return { capability_relation::PICKUP, target };
 	}
 
 	ensure(false);
-	return { capability_relation::PICKUP, target_slot_owning_capability };
+	return { capability_relation::PICKUP, target };
 }
 
 item_transfer_result query_transfer_result(
@@ -74,13 +69,15 @@ item_transfer_result query_transfer_result(
 	ensure(r.specified_quantity != 0);
 
 	const auto capabilities_compared = match_transfer_capabilities(transferred_item.get_cosmos(), r);
-	const auto result = capabilities_compared.relation_type;
+	const auto relation = capabilities_compared.relation_type;
 
-	if (result == capability_relation::UNMATCHING) {
+	output.relation = relation;
+
+	if (relation == capability_relation::UNMATCHING) {
 		output.result = item_transfer_result_type::INVALID_CAPABILITIES;
 	}
-	else if (result == capability_relation::DROP) {
-		output.result = item_transfer_result_type::SUCCESSFUL_DROP;
+	else if (relation == capability_relation::DROP || relation == capability_relation::ANONYMOUS_DROP) {
+		output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER;
 
 		if (r.specified_quantity == -1) {
 			output.transferred_charges = item.get_charges();
@@ -90,8 +87,6 @@ item_transfer_result query_transfer_result(
 		}
 	}
 	else {
-		ensure(capabilities_compared.is_legal());
-
 		const bool trying_to_insert_inside_the_transferred_item = target_slot.is_child_of(transferred_item);
 		ensure(!trying_to_insert_inside_the_transferred_item);
 
@@ -117,12 +112,7 @@ item_transfer_result query_transfer_result(
 				break;
 
 			case containment_result_type::SUCCESSFUL_CONTAINMENT:
-				if (result == capability_relation::PICKUP) {
-					output.result = item_transfer_result_type::SUCCESSFUL_PICKUP;
-				}
-				else {
-					output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER; 
-				}
+				output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER; 
 				break;
 
 			case containment_result_type::TOO_MANY_ITEMS:

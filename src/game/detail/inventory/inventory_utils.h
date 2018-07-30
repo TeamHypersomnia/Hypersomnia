@@ -19,19 +19,9 @@ containment_result query_containment_result(
 	bool allow_replacement = true
 );
 
-enum class capability_relation {
-	UNMATCHING,
-	THE_SAME,
-	PICKUP,
-	DROP
-};
-
 struct capability_comparison {
 	capability_relation relation_type;
 	entity_id authorized_capability;
-
-	bool is_legal() const;
-	bool is_authorized(const entity_id) const;
 };
 
 capability_comparison match_transfer_capabilities(

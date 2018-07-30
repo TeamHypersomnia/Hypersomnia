@@ -479,7 +479,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/detail/inventory/wielding_result.cpp"
 	"src/game/enums/attitude_type.cpp"
 	"src/game/enums/item_category.cpp"
-	"src/game/enums/item_transfer_result_type.cpp"
 	"src/game/enums/slot_physical_behaviour.cpp"
 	"src/game/detail/ai/create_standard_behaviour_trees.cpp"
 	"src/game/inferred_caches/physics_world_cache.cpp"

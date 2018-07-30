@@ -2,6 +2,7 @@
 #include "augs/misc/scope_guard.h"
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/data_living_one_step.h"
+#include "game/cosmos/cosmic_functions.h"
 
 void standard_solve(const logic_step step);
 
@@ -20,6 +21,7 @@ struct standard_solver {
 			queues.clear();
 		});
 
+		cosmic::increment_step(input.cosm);
 		pre_solve(step);
 		standard_solve(step);
 		post_solve(const_logic_step(step));

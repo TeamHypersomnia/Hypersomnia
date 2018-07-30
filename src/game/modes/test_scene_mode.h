@@ -29,22 +29,24 @@ public:
 
 private:
 	void teleport_to_next_spawn(input, entity_id character);
-	void init_spawned(input, entity_id character);
+	void init_spawned(input, entity_id character, logic_step);
 
-	void advance_mode(input, const mode_entropy&);
+	void mode_pre_solve(input, const mode_entropy&, logic_step);
 
 public:
 	// GEN INTROSPECTOR class test_scene_mode
 	unsigned current_spawn_index = 0;
+	std::vector<entity_guid> pending_inits;
 	// END GEN INTROSPECTOR
 
 	entity_guid add_player(input, const faction_type);
 	void remove_player(input, entity_guid);
 
-	template <class... Callbacks>
+	template <class PreSolve, class... Callbacks>
 	void advance(
 		const input in, 
 		const mode_entropy& entropy, 
+		PreSolve&& pre_solve,
 		Callbacks&&... callbacks
 	) {
 		{
@@ -52,10 +54,12 @@ public:
 
 			standard_solver()(
 				input,
+				[&](const logic_step step) {
+					pre_solve(step);
+					mode_pre_solve(in, entropy, step);
+				},
 				std::forward<Callbacks>(callbacks)...
 			);
 		}
-
-		advance_mode(in, entropy);
 	}
 };

@@ -44,8 +44,6 @@ void standard_solve(const logic_step step) {
 
 	auto total_raycasts_scope = cosmos.measure_raycasts(performance.total_step_raycasts);
 
-	cosmic::increment_step(cosmos);
-
 	contact_listener listener(cosmos);
 
 	perform_transfers(step.get_entropy().transfer_requests, step);

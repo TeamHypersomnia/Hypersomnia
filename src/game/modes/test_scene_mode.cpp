@@ -9,11 +9,11 @@
 
 using input_type = test_scene_mode::input;
 
-void test_scene_mode::init_spawned(const input in, const entity_id id) {
+void test_scene_mode::init_spawned(const input in, const entity_id id, const logic_step step) {
 	const auto handle = in.cosm[id];
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
-		::generate_equipment(in.vars.initial_eq, typed_handle);
+		::generate_equipment(in.vars.initial_eq, typed_handle, step);
 
 		auto& sentience = typed_handle.template get<components::sentience>();
 
@@ -49,7 +49,7 @@ entity_guid test_scene_mode::add_player(input_type in, const faction_type factio
 			entity_flavour_id(flavour), 
 			[&](const auto new_character) {
 				teleport_to_next_spawn(in, new_character);
-				init_spawned(in, new_character);
+				pending_inits.push_back(new_character.get_guid());
 			},
 			[](auto&&...) {}
 		);
@@ -62,12 +62,18 @@ void test_scene_mode::remove_player(input_type in, const entity_guid guid) {
 	cosmic::delete_entity(in.cosm[guid]);
 }
 
-void test_scene_mode::advance_mode(input_type in, const mode_entropy& entropy) {
+void test_scene_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic_step step) {
 	(void)entropy;
 	auto& cosm = in.cosm;
 
 	const auto now = cosm.get_timestamp();
 	const auto dt = cosm.get_fixed_delta();
+
+	for (const auto& p : pending_inits) {
+		init_spawned(in, cosm[p], step);
+	}
+
+	pending_inits.clear();
 
 	cosm.for_each_having<components::sentience>([&](const auto typed_handle) {
 		auto& sentience = typed_handle.template get<components::sentience>();
@@ -79,7 +85,7 @@ void test_scene_mode::advance_mode(input_type in, const mode_entropy& entropy) {
 			dt
 		)) {
 			teleport_to_next_spawn(in, typed_handle);
-			init_spawned(in, typed_handle);
+			init_spawned(in, typed_handle, step);
 
 			sentience.when_knocked_out = {};
 		}

@@ -430,13 +430,15 @@ void character_gui::draw_cursor_with_tooltip(
 
 					const auto& transfer_result = transfer_data.result.result;
 
-					if (transfer_result == item_transfer_result_type::SUCCESSFUL_DROP) {
-						gui_cursor = assets::necessary_image_id::GUI_CURSOR_MINUS;
-						gui_cursor_color = red;
-					}
-					else if (transfer_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-						gui_cursor = assets::necessary_image_id::GUI_CURSOR_ADD;
-						gui_cursor_color = green;
+					if (transfer_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
+						if (transfer_data.result.relation == capability_relation::DROP) {
+							gui_cursor = assets::necessary_image_id::GUI_CURSOR_MINUS;
+							gui_cursor_color = red;
+						}
+						else {
+							gui_cursor = assets::necessary_image_id::GUI_CURSOR_ADD;
+							gui_cursor_color = green;
+						}
 					}
 					else if (transfer_result != item_transfer_result_type::THE_SAME_SLOT) {
 						gui_cursor = assets::necessary_image_id::GUI_CURSOR_ERROR;

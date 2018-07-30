@@ -252,7 +252,6 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 					case item_transfer_result_type::INVALID_CAPABILITIES: drop.hint_text = "Impossible"; break;
 					case item_transfer_result_type::INCOMPATIBLE_CATEGORIES: drop.hint_text = "Incompatible item"; break;
 					case item_transfer_result_type::TOO_MANY_ITEMS: drop.hint_text = "Too many items"; break;
-					case item_transfer_result_type::SUCCESSFUL_DROP: drop.hint_text = "Drop to ground"; break;
 					default: drop.hint_text = "Unknown problem"; break;
 					}
 				}
