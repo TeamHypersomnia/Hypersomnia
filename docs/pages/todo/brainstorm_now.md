@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Implementing the bomb
+	- Global solvable
+		- Priority queue with scheduled explosions
+		- Universal solve that is used by all solvers, standard or others
+	- Bomb should have a backpack category and be too heavy to be put into backpack
+
 - Mode vars gui
 	- Can set the current one, resetting the cosmos
 

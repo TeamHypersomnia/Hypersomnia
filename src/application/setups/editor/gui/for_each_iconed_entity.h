@@ -12,12 +12,15 @@ struct marker_icon {
 	) {
 		if (type == area_marker_type::BOMBSITE_A) {
 			id = I::EDITOR_ICON_BOMBSITE_A;
+			col = get_faction_color(meta.associated_faction);
 		}
 		else if (type == area_marker_type::BOMBSITE_B) {
 			id = I::EDITOR_ICON_BOMBSITE_B;
+			col = get_faction_color(meta.associated_faction);
 		}
 		else if (type == area_marker_type::BOMBSITE_C) {
 			id = I::EDITOR_ICON_BOMBSITE_C;
+			col = get_faction_color(meta.associated_faction);
 		}
 
 		(void)meta;

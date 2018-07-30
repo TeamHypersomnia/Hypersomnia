@@ -119,8 +119,8 @@ enum class test_wandering_pixels_decorations {
 	// END GEN INTROSPECTOR
 };
 
-enum class test_throwable_explosives {
-	// GEN INTROSPECTOR enum class test_throwable_explosives
+enum class test_hand_explosives {
+	// GEN INTROSPECTOR enum class test_hand_explosives
 	FORCE_GRENADE,
 	PED_GRENADE,
 	INTERFERENCE_GRENADE,
@@ -243,7 +243,7 @@ using test_flavours_map = type_map<
 	type_pair<test_complex_decorations, complex_decoration>,
 	type_pair<test_wandering_pixels_decorations, wandering_pixels_decoration>,
 	type_pair<test_static_lights, static_light>,
-	type_pair<test_throwable_explosives, throwable_explosive>,
+	type_pair<test_hand_explosives, hand_explosive>,
 	type_pair<test_plain_missiles, plain_missile>,
 	type_pair<test_finishing_traces, finishing_trace>,
 	type_pair<test_container_items, container_item>,

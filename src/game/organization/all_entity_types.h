@@ -174,7 +174,7 @@ struct static_light {
 	>;
 };
 
-struct throwable_explosive {
+struct hand_explosive {
 	static constexpr std::size_t statically_allocated_entities = 1500;
 	static constexpr std::size_t statically_allocated_flavours = 150;
 

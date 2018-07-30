@@ -54,9 +54,9 @@ namespace test_scenes {
 		};
 
 		const auto crate_type = test_plain_sprited_bodys::CRATE;
-		const auto force_type = test_throwable_explosives::FORCE_GRENADE;
-		const auto ped_type = test_throwable_explosives::PED_GRENADE;
-		const auto interference_type = test_throwable_explosives::INTERFERENCE_GRENADE;
+		const auto force_type = test_hand_explosives::FORCE_GRENADE;
+		const auto ped_type = test_hand_explosives::PED_GRENADE;
+		const auto interference_type = test_hand_explosives::INTERFERENCE_GRENADE;
 
 		const auto sample_backpack = test_container_items::SAMPLE_BACKPACK;
 		const auto brown_backpack = test_container_items::BROWN_BACKPACK;
@@ -75,12 +75,6 @@ namespace test_scenes {
 			create(force_type, vec2{ 254, 611 + i *100.f });
 			create(ped_type, vec2{ 204, 611 + i * 100.f });
 			create(interference_type, vec2{ 154, 611 + i * 100.f });
-		}
-
-		for (int i = 0; i < 10; ++i) {
-			create(force_type, vec2{ 654, -811 + i *100.f });
-			create(ped_type, vec2{ 604, -811 + i * 100.f });
-			create(interference_type, vec2{ 554, -811 + i * 100.f });
 		}
 
 		std::vector<transformr> spawn_transforms = {

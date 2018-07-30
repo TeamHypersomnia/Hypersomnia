@@ -236,6 +236,7 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_box_markers::BOMBSITE_A);
 			invariants::box_marker marker;
 			marker.type = area_marker_type::BOMBSITE_A;
+			marker.meta.associated_faction = faction_type::RESISTANCE;
 			meta.set(marker);
 		}
 
@@ -243,6 +244,7 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_box_markers::BOMBSITE_B);
 			invariants::box_marker marker;
 			marker.type = area_marker_type::BOMBSITE_B;
+			marker.meta.associated_faction = faction_type::RESISTANCE;
 			meta.set(marker);
 		}
 	}

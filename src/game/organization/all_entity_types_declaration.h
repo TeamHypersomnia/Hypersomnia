@@ -10,7 +10,7 @@ struct sprite_decoration;
 struct complex_decoration;
 struct wandering_pixels_decoration;
 struct static_light;
-struct throwable_explosive;
+struct hand_explosive;
 struct plain_missile;
 struct finishing_trace;
 struct container_item;
@@ -30,7 +30,7 @@ using all_entity_types = type_list<
 	complex_decoration,
 	wandering_pixels_decoration,
 	static_light,
-	throwable_explosive,
+	hand_explosive,
 	plain_missile,
 	finishing_trace,
 	container_item,

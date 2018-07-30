@@ -78,9 +78,9 @@ namespace test_scenes {
 				prefabs::create_cyan_charge(step, vec2(0, 0))));
 
 
-		const auto force_type = test_throwable_explosives::FORCE_GRENADE;
-		const auto ped_type = test_throwable_explosives::PED_GRENADE;
-		const auto interference_type = test_throwable_explosives::INTERFERENCE_GRENADE;
+		const auto force_type = test_hand_explosives::FORCE_GRENADE;
+		const auto ped_type = test_hand_explosives::PED_GRENADE;
+		const auto interference_type = test_hand_explosives::INTERFERENCE_GRENADE;
 
 		create(force_type, { 100, 100 });
 		create(force_type, { 200, 100 });

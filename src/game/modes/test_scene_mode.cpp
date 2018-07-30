@@ -18,6 +18,8 @@ void test_scene_mode::init_spawned(const input in, const entity_id id, const log
 		auto& sentience = typed_handle.template get<components::sentience>();
 
 		for_each_through_std_get(sentience.meters, [](auto& m) { m.make_full(); });
+
+		fill_range(sentience.learned_spells, true);
 	});
 }
 
