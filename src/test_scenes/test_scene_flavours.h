@@ -32,6 +32,7 @@ enum class test_sprite_decorations {
 	ROAD_DIRT,
 	ROAD,
 	FLOOR,
+	WATER_ROOM_FLOOR,
 	AWAKENING,
 	METROPOLIS,
 

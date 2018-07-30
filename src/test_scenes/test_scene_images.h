@@ -45,6 +45,7 @@ enum class test_scene_image_id {
 
 	SOIL,
 	FLOOR,
+	WATER_ROOM_FLOOR,
 
 	SAMPLE_MAGAZINE,
 	SMALL_MAGAZINE,

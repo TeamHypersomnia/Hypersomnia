@@ -1167,3 +1167,14 @@ we consider whole type overrides too complex architeciturally:
 - optimize cosmos headers
 	- separate handle getters
 
+- Propagating sounds from the mode logic
+	- MidStep callback?
+		- How do we define where it is called?
+		- Just before deletions?
+		- What we might want to post?
+			- Is it important?
+		- For greatest flexibility, shouldn't we, in the mode, process the cosmos in presolve?
+			- That means we input messages for the cosmos.
+		- And check win conditions in post solve.
+
+	

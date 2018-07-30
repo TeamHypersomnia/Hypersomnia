@@ -175,6 +175,18 @@ namespace test_flavours {
 			ground_def.footstep_effect.emplace(dirt);
 
 			meta.set(ground_def);
+
+			{
+				auto& meta = flavour_with_tiled_sprite(
+					test_sprite_decorations::WATER_ROOM_FLOOR,
+					test_scene_image_id::WATER_ROOM_FLOOR,
+					render_layer::FLOOR_AND_ROAD
+				);
+
+				meta.get<invariants::sprite>().color = { 132, 132, 132, 255 };
+				meta.get<invariants::sprite>().neon_color = { 255, 255, 255, 106 };
+				meta.set(ground_def);
+			}
 		}
 
 		flavour_with_sprite(

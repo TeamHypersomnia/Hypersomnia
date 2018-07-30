@@ -6,17 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Propagating sounds from the mode logic
-	- MidStep callback?
-		- How do we define where it is called?
-		- Just before deletions?
-		- What we might want to post?
-			- Is it important?
-		- For greatest flexibility, shouldn't we, in the mode, process the cosmos in presolve?
-			- That means we input messages for the cosmos.
-		- And check win conditions in post solve.
-
-	
 - Mode vars gui
 	- Can set the current one, resetting the cosmos
 

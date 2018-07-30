@@ -273,8 +273,8 @@ namespace test_scenes {
 				create(test_sprite_decorations::AWAKENING, transformr(vec2(-42, 8)));
 				create(test_sprite_decorations::METROPOLIS, transformr(vec2(1106, 3)));
 
-				const vec2 floor_size = get_size_of(test_scene_image_id::FLOOR);
-				const auto total_floor_size = floor_size * 10;
+				//const vec2 floor_size = get_size_of(test_scene_image_id::FLOOR);
+				const auto total_floor_size = vec2i(1280, 1280);
 				const auto floor_origin = vec2(512, -768);
 
 				auto floor_align = [&](const auto flavour_id) {
@@ -285,7 +285,7 @@ namespace test_scenes {
 					);
 				};
 
-				floor_align(test_sprite_decorations::FLOOR).set_size(total_floor_size);
+				floor_align(test_sprite_decorations::WATER_ROOM_FLOOR).set_size(total_floor_size);
 				floor_align(test_plain_sprited_bodys::BRICK_WALL)
 					.ro().ti().stretch_b().again()
 					.ro().bo().extend_l(2).extend_b(1).again()
@@ -623,8 +623,10 @@ namespace test_scenes {
 			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos + vec2(290, 60), aquarium_origin);
 		};
 
-		const auto orig1 = vec2(-1024, 1024);
+		const auto orig1 = vec2(380, -1524);
 		create_aquarium(orig1);
+
+		create(test_box_markers::BOMBSITE_A, vec2(580, -800)).set_logical_size(vec2(600, 200));
 
 		const auto lab_wall_size = get_size_of(test_scene_image_id::LAB_WALL);
 
