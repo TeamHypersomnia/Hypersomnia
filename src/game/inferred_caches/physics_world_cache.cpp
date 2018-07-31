@@ -31,23 +31,11 @@ template <class E>
 auto calc_filters(const E& handle) {
 	const auto& colliders_data = handle.template get<invariants::fixtures>();
 
-	if (is_a_planted_bomb(handle)) {
+	if (handle.is_like_planted_bomb()) {
 		return filters::planted_explosive();
 	}
 
 	return colliders_data.filter;
-}
-
-template <class E>
-bool is_a_planted_bomb(const E& handle) {
-	if (const auto fuse = handle.template find<components::hand_fuse>()) {
-		if (const auto fuse_def = handle.template find<invariants::hand_fuse>()) {
-			LOG_NVPS(fuse->armed(), fuse_def->is_like_plantable_bomb());
-			return fuse->armed() && fuse_def->is_like_plantable_bomb();
-		}
-	}
-
-	return false;
 }
 
 rigid_body_cache* physics_world_cache::find_rigid_body_cache(const entity_id id) {
@@ -153,7 +141,7 @@ void physics_world_cache::infer_rigid_body(const const_entity_handle h) {
 		};
 
 		const auto body_type = [&]() {
-			return is_a_planted_bomb(handle) ? rigid_body_type::STATIC : physics_def.body_type;
+			return handle.is_like_planted_bomb() ? rigid_body_type::STATIC : physics_def.body_type;
 		}();
 
 		if (!it.second) {

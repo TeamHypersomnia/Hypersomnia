@@ -38,6 +38,8 @@ enum class render_layer {
 	AQUARIUM_DUNES,
 	AQUARIUM_FLOWERS,
 
+	PLANTED_BOMBS,
+
 	ON_ON_FLOOR,
 	ON_FLOOR,
 	FLOOR_AND_ROAD,

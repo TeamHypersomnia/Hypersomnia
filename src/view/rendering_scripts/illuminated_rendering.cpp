@@ -240,6 +240,8 @@ void illuminated_rendering(
 		render_layer::ON_FLOOR,
 		render_layer::ON_ON_FLOOR,
 
+		render_layer::PLANTED_BOMBS,
+
 		render_layer::AQUARIUM_FLOWERS,
 		render_layer::AQUARIUM_DUNES,
 		render_layer::BOTTOM_FISH,

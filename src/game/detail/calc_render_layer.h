@@ -17,6 +17,12 @@ template <class H>
 FORCE_INLINE auto calc_render_layer(const H& handle) {
 	if constexpr(H::is_specific) {
 		if constexpr(H::template has<invariants::render>()) {
+			if constexpr(H::template has<invariants::hand_fuse>()) {
+				if (handle.is_like_planted_bomb()) {
+					return render_layer::PLANTED_BOMBS;
+				} 
+			}
+
 			return handle.template get<invariants::render>().layer;
 		}
 		else if constexpr(H::template has<invariants::point_marker>()) {

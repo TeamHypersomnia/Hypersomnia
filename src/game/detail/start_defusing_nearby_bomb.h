@@ -14,13 +14,13 @@ bool start_defusing_nearby_bomb(const logic_step step, const E& subject) {
 		cosm,
 		camera_cone(camera_eye(where, 1.f), vec2i::square(max_defuse_radius)),
 		visible_entities_query::accuracy_type::EXACT,
-		render_layer_filter::whitelist(render_layer::SMALL_DYNAMIC_BODY),
+		render_layer_filter::whitelist(render_layer::PLANTED_BOMBS),
 		{ { tree_of_npo_type::RENDERABLES } }
 	});
 
 	bool found_one = false;
 
-	entities.for_each<render_layer::SMALL_DYNAMIC_BODY>(cosm, [&](const auto typed_handle) {
+	entities.for_each<render_layer::PLANTED_BOMBS>(cosm, [&](const auto typed_handle) {
 		typed_handle.template dispatch_on_having_all<components::hand_fuse>([&](const auto typed_bomb) -> callback_result {
 			auto& fuse = typed_bomb.template get<components::hand_fuse>();
 

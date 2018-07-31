@@ -317,6 +317,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 		render_layer::FLOOR_AND_ROAD,
 		render_layer::ON_FLOOR,
 		render_layer::ON_ON_FLOOR,
+		render_layer::PLANTED_BOMBS,
 		render_layer::AQUARIUM_FLOWERS,
 		render_layer::BOTTOM_FISH,
 		render_layer::UPPER_FISH,
