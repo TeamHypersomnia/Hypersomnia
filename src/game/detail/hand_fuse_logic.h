@@ -81,7 +81,14 @@ struct fuse_logic_provider {
 			return impulse;
 		}();
 
-		perform_transfer(item_slot_transfer_request::drop(fused_entity, total_impulse), step);
+		auto request = item_slot_transfer_request::drop(fused_entity, total_impulse);
+
+		if (fuse_def.override_release_impulse) {
+			request.apply_standard_impulse = false;
+			request.additional_drop_impulse = fuse_def.additional_release_impulse;
+		}
+
+		perform_transfer(request, step);
 
 		fuse_def.release_sound.start(
 			step,

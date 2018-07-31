@@ -229,7 +229,7 @@ perform_transfer_result perform_transfer_impl(
 		const auto capability_def = previous_root.find<invariants::item_slot_transfers>();
 
 		const auto disable_collision_for_ms = capability_def ? capability_def->disable_collision_on_drop_for_ms : 300;
-		const auto standard_drop_impulse = capability_def ? capability_def->standard_drop_impulse : impulse_mults();
+		const auto standard_drop_impulse = (capability_def && r.apply_standard_impulse) ? capability_def->standard_drop_impulse : impulse_mults();
 
 		// LOG_NVPS(rigid_body.get_velocity());
 		// ensure(rigid_body.get_velocity().is_epsilon());

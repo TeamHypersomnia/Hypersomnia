@@ -35,7 +35,7 @@ namespace invariants {
 		bool can_only_arm_at_bombsites = false;
 		bool always_release_when_armed = false;
 		bool must_stand_still_to_arm = false;
-		pad_bytes<1> pad;
+		bool override_release_impulse = false;
 
 		real32 arming_duration_ms = -1.f;
 		real32 defusing_duration_ms = -1.f;

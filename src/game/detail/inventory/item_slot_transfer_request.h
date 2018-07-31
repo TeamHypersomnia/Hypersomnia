@@ -20,11 +20,15 @@ struct basic_item_slot_transfer_request {
 
 	int specified_quantity = -1;
 	impulse_mults additional_drop_impulse;
+	bool apply_standard_impulse = true;
+
 	bool force_immediate_mount = false;
 	bool allow_unauthorized_transfers = false;
 
 	bool play_transfer_sounds = true;
 	bool play_transfer_particles = true;
+
+	pad_bytes<3> pad;
 	// END GEN INTROSPECTOR
 
 	static auto standard(const id_type item, const target_slot_type target) {

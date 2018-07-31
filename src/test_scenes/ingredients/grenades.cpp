@@ -191,6 +191,7 @@ namespace test_flavours {
 			fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
 			fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
 			fuse.fuse_delay_ms = 30000.f;
+			fuse.override_release_impulse = true;
 			fuse.additional_release_impulse = {};
 			fuse.set_bomb_vars(2000.f, 10000.f);
 			meta.set(fuse);
