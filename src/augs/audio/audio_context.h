@@ -54,6 +54,7 @@ namespace augs {
 
 		void destroy();
 		bool set_as_current();
+		void speed_of_sound(float);
 
 	public:
 		audio_context(const audio_settings& device_name);

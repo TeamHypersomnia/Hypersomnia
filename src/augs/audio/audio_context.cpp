@@ -150,7 +150,6 @@ namespace augs {
 			);
 		}
 
-		AL_CHECK(alSpeedOfSound(160.f));
 		AL_CHECK(alEnable(AL_SOURCE_DISTANCE_MODEL));
 
 		device.log_hrtf_status();
@@ -212,6 +211,10 @@ namespace augs {
 #endif
 	}
 
+	void audio_context::speed_of_sound(const float meters_per_sec) {
+		AL_CHECK(alSpeedOfSound(meters_per_sec));
+	}
+
 	void audio_context::apply(const audio_settings& settings, const bool force) {
 		auto changed = [&](auto& field) {
 			return !(field == augs::get_corresponding_field(field, settings, current_settings));
@@ -222,6 +225,10 @@ namespace augs {
 			|| changed(settings.max_number_of_sound_sources)
 		) {
 			device.reset_device(settings);
+		}
+
+		if (force || changed(settings.sound_meters_per_second)) {
+			speed_of_sound(settings.sound_meters_per_second);
 		}
 
 		current_settings = settings;

@@ -184,6 +184,7 @@ void settings_gui_state::perform(
 				revertable_slider("GUI volume", config.audio_volume.gui, 0.f, 1.f);
 
 				revertable_checkbox("Enable HRTF", config.audio.enable_hrtf);
+				revertable_slider("Speed of sound (m/s)", config.audio.sound_meters_per_second, 50.f, 400.f);
 
 				break;
 			}
