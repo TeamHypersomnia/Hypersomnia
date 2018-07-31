@@ -84,6 +84,8 @@ enum class test_scene_sound_id {
 	HUMMING_DISABLED,
 	LOUDY_FAN,
 
+	BEEP,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

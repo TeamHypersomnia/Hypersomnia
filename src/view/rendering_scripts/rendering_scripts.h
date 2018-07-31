@@ -87,3 +87,12 @@ augs::vertex_triangle_buffer draw_sentiences_hud(const draw_sentiences_hud_input
 void draw_cast_spells_highlights(const draw_cast_spells_highlights_input);
 void draw_hud_for_explosives(const draw_hud_for_explosives_input);
 void draw_crosshair_lasers(const draw_crosshair_lasers_input);
+
+struct draw_beep_lights {
+	const augs::drawer output;
+	const interpolation_system& interpolation;
+	const cosmos& cosm;
+	const augs::atlas_entry cast_highlight_tex;
+
+	void operator()();
+};

@@ -192,6 +192,13 @@ void illuminated_rendering(
 				cast_highlight
 			});
 
+			draw_beep_lights({
+				output,
+				interp,
+				cosmos,
+				cast_highlight
+			})();
+
 			renderer.set_active_texture(3);
 			fbos.illuminating_smoke->get_texture().bind();
 			renderer.set_active_texture(0);

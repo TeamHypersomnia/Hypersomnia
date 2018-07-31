@@ -11,6 +11,8 @@
 #include "game/detail/hand_fuse_logic.h"
 #include "game/detail/explosions.h"
 
+#include "game/detail/hand_fuse_math.h"
+
 #include "game/components/explosive_component.h"
 #include "game/components/hand_fuse_component.h"
 #include "game/messages/queue_deletion.h"
@@ -26,10 +28,31 @@ void hand_fuse_system::detonate_fuses(const logic_step step) {
 			fuse_logic.advance_arming_and_defusing();
 
 			auto& fuse = fuse_logic.fuse;
+			const auto& fuse_def = fuse_logic.fuse_def;
 
-			const auto when_armed = fuse.when_armed;
+			if (fuse.armed()) {
+				{
+					auto& when_beep = fuse.when_last_beep;
 
-			if (when_armed.was_set()) {
+					if (!when_beep.was_set()) {
+						when_beep = now;
+						/* Don't play the beep effect for the first time. */
+					}
+					else {
+						const auto beep = beep_math { fuse, fuse_def, now, delta };
+
+						if (beep.should_beep_again()) {
+							fuse_def.beep_sound.start(
+								step,
+								sound_effect_start_input::fire_and_forget(fuse_logic.fused_transform)
+							);
+
+							when_beep = now;
+						}
+					}
+				}
+
+				const auto when_armed = fuse.when_armed;
 				const auto& fuse_def = it.template get<invariants::hand_fuse>();
 
 				if (augs::is_ready(fuse_def.fuse_delay_ms, when_armed, now, delta)) {

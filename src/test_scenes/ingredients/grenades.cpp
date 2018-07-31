@@ -1,4 +1,5 @@
 #include "test_scenes/ingredients/ingredients.h"
+#include "test_scenes/test_scene_sounds.h"
 #include "test_scenes/test_scene_animations.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
@@ -185,6 +186,8 @@ namespace test_flavours {
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("1000");
 			item.categories_for_slot_compatibility = { item_category::GENERAL, item_category::SHOULDER_CONTAINER };
+			item.wear_sound.id = to_sound_id(test_scene_sound_id::BACKPACK_WEAR);
+
 			meta.set(item);
 
 			invariants::hand_fuse fuse; 
@@ -194,6 +197,9 @@ namespace test_flavours {
 			fuse.override_release_impulse = true;
 			fuse.additional_release_impulse = {};
 			fuse.set_bomb_vars(2000.f, 10000.f);
+			fuse.beep_sound.id = to_sound_id(test_scene_sound_id::BEEP);
+			fuse.beep_color = red;
+			fuse.beep_time_mult = 0.02f;
 			meta.set(fuse);
 
 			invariants::explosive explosive; 

@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/graphics/rgba.h"
 #include "augs/misc/timing/stepped_timing.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "augs/math/physics_structs.h"
@@ -11,19 +12,16 @@ namespace components {
 		augs::stepped_timestamp when_started_defusing;
 		augs::stepped_timestamp when_started_arming;
 
+		augs::stepped_timestamp when_last_beep;
+
 		bool arming_requested = false;
 		pad_bytes<3> pad;
 
 		signi_entity_id character_now_defusing;
 		// END GEN INTROSPECTOR
 
-		bool armed() const {
-			return when_armed.was_set();
-		}
-
-		bool defused() const {
-			return !when_armed.was_set() && when_started_defusing.was_set();
-		}
+		bool armed() const;
+		bool defused() const;
 	};
 }
 
@@ -43,6 +41,8 @@ namespace invariants {
 		impulse_mults additional_release_impulse;
 
 		sound_effect_input beep_sound;
+		real32 beep_time_mult = 0.05f;
+		rgba beep_color = rgba(0, 0, 0, 0);
 
 		sound_effect_input started_arming_sound;
 		sound_effect_input started_defusing_sound;
@@ -51,21 +51,8 @@ namespace invariants {
 		sound_effect_input release_sound;
 		// END GEN INTROSPECTOR
 
-		bool has_delayed_arming() const {
-			return arming_duration_ms > 0.f;
-		}
-
-		bool defusing_enabled() const {
-			return defusing_duration_ms > 0.f;
-		}
-
-		void set_bomb_vars(const float arm_ms, const float defuse_ms) {
-			arming_duration_ms = arm_ms;
-			defusing_duration_ms = defuse_ms;
-
-			can_only_arm_at_bombsites = true;
-			always_release_when_armed = true;
-			must_stand_still_to_arm = true;
-		}
+		bool has_delayed_arming() const;
+		bool defusing_enabled() const;
+		void set_bomb_vars(const float arm_ms, const float defuse_ms);
 	};
 }

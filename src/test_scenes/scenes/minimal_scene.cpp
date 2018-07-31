@@ -107,6 +107,7 @@ namespace test_scenes {
 			floor_align(test_sprite_decorations::FLOOR).set_size(total_floor_size);
 		}
 
+		create(test_hand_explosives::BOMB, vec2(580, 200));
 		cosmic::reinfer_all_entities(world);
 
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);

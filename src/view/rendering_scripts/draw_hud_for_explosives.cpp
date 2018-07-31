@@ -9,6 +9,7 @@
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
+#include "game/detail/hand_fuse_math.h"
 
 void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 	const auto dt = in.cosm.get_fixed_delta();
@@ -89,6 +90,37 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 					);
 
 					draw_circle(highlight_amount, white, red_violet);
+				}
+			}
+		}
+	);
+}
+
+void draw_beep_lights::operator()() {
+	const auto dt = cosm.get_fixed_delta();
+	const auto now = cosm.get_timestamp();
+
+	cosm.for_each_having<components::hand_fuse>(
+		[&](const auto it) {
+			const auto& fuse = it.template get<components::hand_fuse>();
+
+			if (fuse.armed()) {
+				const auto& fuse_def = it.template get<invariants::hand_fuse>();
+				auto beep_col = fuse_def.beep_color;
+
+				if (beep_col.a) {
+					const auto beep = beep_math { fuse, fuse_def, now, dt };
+
+					if (const auto mult = beep.get_beep_light_mult(); mult > AUGS_EPSILON<real32>) {
+						beep_col.multiply_alpha(mult);
+						if (const auto tr = it.find_viewing_transform(interpolation)) {
+							output.aabb_centered(
+								cast_highlight_tex,
+								tr->pos,
+								beep_col
+							);
+						}
+					}
 				}
 			}
 		}

@@ -466,7 +466,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/components/rigid_body_component.cpp"
 	"src/game/components/sentience_component.cpp"
 	"src/game/detail/explosions.cpp"
-	"src/game/detail/hand_fuse_logic.cpp"
 	"src/game/detail/inventory/inventory_slot.cpp"
 	"src/game/detail/inventory/inventory_slot_id.cpp"
 	"src/game/detail/inventory/inventory_utils.cpp"
@@ -621,6 +620,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/audiovisual_state/systems/randomizing_system.cpp"
 	"src/game/modes/test_scene_mode.cpp"
 	"src/application/setups/editor/gui/editor_player_gui.cpp"
+	"src/game/components/hand_fuse_component.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.
