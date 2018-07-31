@@ -8,14 +8,14 @@
 
 inline transformr get_anchored_offset(
 	const transformi attachment_offset,
-	const vec2i anchor
+	const transformi anchor
 ) {
 	const auto rotation = attachment_offset.rotation;
 
 	const auto old_center = attachment_offset.pos;
-	const auto new_center = (old_center - anchor).rotate(rotation, old_center);
+	const auto new_center = (old_center - anchor.pos).rotate(rotation, old_center);
 
-	return { new_center, rotation };
+	return { new_center, rotation + anchor.rotation };
 }
 
 struct attachment_offset_settings {
