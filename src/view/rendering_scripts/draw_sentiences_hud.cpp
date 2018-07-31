@@ -19,7 +19,7 @@
 
 using namespace augs::gui::text;
 
-augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const draw_circular_bars_input in) {
+augs::vertex_triangle_buffer draw_sentiences_hud(const draw_sentiences_hud_input in) {
 	const auto& visible_entities = in.all;
 	const auto& cosmos = in.cosm;
 	const auto& interp = in.interpolation;

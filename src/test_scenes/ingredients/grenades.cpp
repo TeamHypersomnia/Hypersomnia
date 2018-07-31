@@ -190,7 +190,9 @@ namespace test_flavours {
 			invariants::hand_fuse fuse; 
 			fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
 			fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
-			fuse.set_bomb_vars(3000.f, 10000.f);
+			fuse.fuse_delay_ms = 30000.f;
+			fuse.additional_release_impulse = {};
+			fuse.set_bomb_vars(2000.f, 10000.f);
 			meta.set(fuse);
 
 			invariants::explosive explosive; 

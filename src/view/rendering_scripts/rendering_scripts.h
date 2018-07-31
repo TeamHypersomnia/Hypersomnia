@@ -34,7 +34,7 @@ struct dashed_line_output_wrapper {
 	void operator()(vec2 from, vec2 to, rgba col) const;
 };
 
-struct draw_circular_bars_input {
+struct draw_sentiences_hud_input {
 	const visible_entities& all;
 	
 	const augs::drawer output;
@@ -57,14 +57,23 @@ struct draw_cast_spells_highlights_input {
 	const augs::atlas_entry cast_highlight_tex;
 };
 
-struct draw_hud_for_released_explosives_input {
+enum class circular_bar_type {
+	SMALL,
+	MEDIUM,
+	OVER_MEDIUM,
+	LARGE
+};
+
+struct draw_hud_for_explosives_input {
 	const augs::drawer output;
 	augs::special_buffer& specials;
 
 	const interpolation_system& interpolation;
 	const cosmos& cosm;
 	const double global_time_seconds;
+
 	const augs::atlas_entry circular_bar_tex;
+	const circular_bar_type only_type;
 };
 
 struct draw_crosshair_lasers_input {
@@ -74,7 +83,7 @@ struct draw_crosshair_lasers_input {
 	const const_entity_handle character;
 };
 
-augs::vertex_triangle_buffer draw_circular_bars_and_get_textual_info(const draw_circular_bars_input);
+augs::vertex_triangle_buffer draw_sentiences_hud(const draw_sentiences_hud_input);
 void draw_cast_spells_highlights(const draw_cast_spells_highlights_input);
-void draw_hud_for_unpinned_explosives(const draw_hud_for_released_explosives_input);
+void draw_hud_for_explosives(const draw_hud_for_explosives_input);
 void draw_crosshair_lasers(const draw_crosshair_lasers_input);

@@ -364,11 +364,11 @@ void illuminated_rendering(
 	augs::vertex_triangle_buffer textual_infos;
 
 	if (viewed_character) {
-		const auto tex = necessarys.at(assets::necessary_image_id::CIRCULAR_BAR_MEDIUM);
+		const auto tex = necessarys.at(assets::necessary_image_id::CIRCULAR_BAR_LARGE);
 
 		set_center_uniform(tex);
 
-		textual_infos = draw_circular_bars_and_get_textual_info({
+		textual_infos = draw_sentiences_hud({
 			visible,
 			output,
 			renderer.get_special_buffer(),
@@ -384,20 +384,38 @@ void illuminated_rendering(
 	}
 	
 	{
-		const auto tex = necessarys.at(assets::necessary_image_id::CIRCULAR_BAR_SMALL);
+		auto draw_explosives_hud = [&](const auto tex_id, const auto type) {
+			const auto tex = necessarys.at(tex_id);
 
-		set_center_uniform(tex);
+			set_center_uniform(tex);
 
-		draw_hud_for_unpinned_explosives({
-			output,
-			renderer.get_special_buffer(),
-			interp,
-			cosmos,
-			global_time_seconds,
-			tex
-		});
+			draw_hud_for_explosives({
+				output,
+				renderer.get_special_buffer(),
+				interp,
+				cosmos,
+				global_time_seconds,
+				tex,
+				type
+			});
 
-		renderer.call_and_clear_triangles();
+			renderer.call_and_clear_triangles();
+		};
+
+		draw_explosives_hud(
+			assets::necessary_image_id::CIRCULAR_BAR_SMALL,
+			circular_bar_type::SMALL
+		);
+
+		draw_explosives_hud(
+			assets::necessary_image_id::CIRCULAR_BAR_MEDIUM,
+			circular_bar_type::MEDIUM
+		);
+
+		draw_explosives_hud(
+			assets::necessary_image_id::CIRCULAR_BAR_OVER_MEDIUM,
+			circular_bar_type::OVER_MEDIUM
+		);
 	}
 
 	shaders.standard->set_as_current();
