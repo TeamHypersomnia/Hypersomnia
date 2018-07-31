@@ -184,7 +184,7 @@ namespace test_flavours {
 
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("1000");
-			item.categories_for_slot_compatibility = { item_category::SHOULDER_CONTAINER };
+			item.categories_for_slot_compatibility = { item_category::GENERAL, item_category::SHOULDER_CONTAINER };
 			meta.set(item);
 
 			invariants::hand_fuse fuse; 

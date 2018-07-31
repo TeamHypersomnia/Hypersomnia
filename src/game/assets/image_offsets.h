@@ -36,11 +36,11 @@ struct legs_offsets {
 
 struct item_offsets {
 	// GEN INTROSPECTOR struct item_offsets
-	vec2i hand_anchor;
-	vec2i back_anchor;
-	vec2i head_anchor;
-	vec2i attachment_anchor;
-	vec2i beep_offset;
+	transformi hand_anchor;
+	transformi back_anchor;
+	transformi head_anchor;
+	transformi attachment_anchor;
+	transformi beep_offset;
 	// END GEN INTROSPECTOR
 };
 

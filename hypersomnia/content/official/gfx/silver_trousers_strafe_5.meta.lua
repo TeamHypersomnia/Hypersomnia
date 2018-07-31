@@ -21,12 +21,18 @@ return {
     },
     item = {
       back_anchor = {
+		  pos = {
         x = 0,
         y = 0
+	},
+	rotation = 0
       },
       hand_anchor = {
+		  pos = {
         x = 0,
         y = 0
+	},
+	rotation = 0
       }
     },
     legs = {

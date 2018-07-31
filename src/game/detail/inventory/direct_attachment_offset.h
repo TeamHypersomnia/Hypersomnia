@@ -68,7 +68,7 @@ transformr direct_attachment_offset(
 	};
 
 	transformi attachment_offset;
-	vec2i anchor;
+	transformi anchor;
 
 	switch (type) {
 		case slot_function::PRIMARY_HAND: 

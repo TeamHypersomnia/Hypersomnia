@@ -334,13 +334,13 @@ void load_test_scene_animations(
 		make_plain(
 			test_id_type::BOMB,
 			test_scene_image_id::BOMB_1,
-			20.0f
+			30.0f
 		);
 
 		make_plain(
 			test_id_type::BOMB_ARMED,
 			test_scene_image_id::BOMB_ARMED_1,
-			20.0f
+			30.0f
 		);
 	}
 }
