@@ -34,6 +34,10 @@ void unset_input_flags_of_orphaned_entity(entity_handle e) {
 	if (auto* const melee = e.find<components::melee>()) {
 		melee->reset_weapon(e);
 	}
+
+	if (auto* const hand_fuse = e.find<components::hand_fuse>()) {
+		hand_fuse->arming_requested = false;
+	}
 }
 
 identified_danger assess_danger(
