@@ -15,7 +15,7 @@ struct beep_math {
 			dt
 		);
 
-		return std::max(16.f * 4, remaining_time_ms * fuse_def.beep_time_mult);
+		return std::clamp(remaining_time_ms * fuse_def.beep_time_mult, 16.f * 4, 2000.f);
 	}
 
 	auto get_beep_light_mult() const {

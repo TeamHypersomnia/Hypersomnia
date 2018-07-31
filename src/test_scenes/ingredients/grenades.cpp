@@ -199,7 +199,7 @@ namespace test_flavours {
 			fuse.set_bomb_vars(2000.f, 10000.f);
 			fuse.beep_sound.id = to_sound_id(test_scene_sound_id::BEEP);
 			fuse.beep_color = red;
-			fuse.beep_time_mult = 0.02f;
+			fuse.beep_time_mult = 0.08f;
 			meta.set(fuse);
 
 			invariants::explosive explosive; 
