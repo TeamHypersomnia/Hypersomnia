@@ -166,6 +166,10 @@ enum class test_scene_image_id {
 	INTERFERENCE_GRENADE_RELEASED,
 	FORCE_ROCKET,
 
+	BOMB_1,
+	BOMB_ARMED_1,
+	BOMB_DEFUSED,
+
 	FAN,
 
 	COUNT

@@ -198,7 +198,7 @@ void editor_entity_selector::do_mousemotion(
 		}
 	}
 
-	thread_local visible_entities vis;
+	auto& vis = thread_local_visible_entities();
 
 	auto remove_non_hovering_icons_from = [&](auto& container, const auto world_range) {
 		auto get_icon_aabb = [&](const auto icon_id, const transformr where) {

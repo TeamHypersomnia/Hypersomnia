@@ -9,6 +9,7 @@
 
 #include "game/detail/render_layer_filter.h"
 #include "game/detail/tree_of_npo_filter.h"
+#include "augs/enums/callback_result.h"
 
 struct visible_entities_query {
 	enum class accuracy_type {
@@ -95,9 +96,23 @@ public:
 
 	template <render_layer... Args, class C, class F>
 	void for_each(C& cosm, F&& callback) const {
+		bool broken = false;
+
 		auto looper = [&](const render_layer l) {
+			if (broken) {
+				return;
+			}
+
 			for (const auto& e : per_layer[l]) {
-				callback(cosm[e]);
+				if constexpr(std::is_same_v<callback_result, decltype(callback(cosm[e]))>) {
+					if (callback_result::ABORT == callback(cosm[e])) {
+						broken = true;
+						break;
+					}
+				}
+				else {
+					callback(cosm[e]);
+				}
 			}
 		};
 
@@ -119,6 +134,12 @@ public:
 	}
 };
 
+inline auto& thread_local_visible_entities() {
+	thread_local visible_entities entities;
+	entities.clear();
+	return entities;
+}
+
 template <class F>
 entity_id get_hovered_world_entity(
 	const cosmos& cosm,
@@ -126,7 +147,7 @@ entity_id get_hovered_world_entity(
 	F&& is_hoverable,
 	const augs::maybe<render_layer_filter>& filter
 ) {
-	thread_local visible_entities entities;
+	auto& entities = thread_local_visible_entities();
 
 	entities.reacquire_all_and_sort({
 		cosm,

@@ -7,8 +7,6 @@ namespace components {
 		// GEN INTROSPECTOR struct components::driver
 		entity_id owned_vehicle;
 		float density_multiplier_while_driving = 0.02f;
-		bool take_hold_of_wheel_when_touched = false;
-		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 	};
 }

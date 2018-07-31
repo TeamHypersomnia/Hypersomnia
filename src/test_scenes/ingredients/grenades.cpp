@@ -1,4 +1,5 @@
 #include "test_scenes/ingredients/ingredients.h"
+#include "test_scenes/test_scene_animations.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 
@@ -48,8 +49,8 @@ namespace test_flavours {
 			meta.set(item);
 
 			invariants::hand_fuse fuse; 
-			fuse.throw_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
-			fuse.unpin_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
+			fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
+			fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
 			meta.set(fuse);
 
 			invariants::explosive explosive; 
@@ -94,8 +95,8 @@ namespace test_flavours {
 			meta.set(item);
 
 			invariants::hand_fuse fuse; 
-			fuse.throw_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
-			fuse.unpin_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
+			fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
+			fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
 			meta.set(fuse);
 
 			invariants::explosive explosive; 
@@ -141,8 +142,8 @@ namespace test_flavours {
 			meta.set(item);
 
 			invariants::hand_fuse fuse; 
-			fuse.throw_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
-			fuse.unpin_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
+			fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
+			fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
 			meta.set(fuse);
 
 			invariants::explosive explosive; 
@@ -162,6 +163,60 @@ namespace test_flavours {
 			explosive.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 
 			meta.set(explosive);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_hand_explosives::BOMB);
+
+			meta.get<invariants::text_details>().description =
+				"Can be planted. Deals massive damage nearby."
+			;
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::BOMB_1, white);
+			test_flavours::add_see_through_dynamic_body(meta);
+
+			invariants::item item;
+			item.space_occupied_per_charge = to_space_units("1000");
+			item.categories_for_slot_compatibility = { item_category::SHOULDER_CONTAINER };
+			meta.set(item);
+
+			invariants::hand_fuse fuse; 
+			fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
+			fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
+			fuse.set_bomb_vars(3000.f, 10000.f);
+			meta.set(fuse);
+
+			invariants::explosive explosive; 
+
+			auto& in = explosive.explosion;
+			in.type = adverse_element_type::FORCE;
+			in.damage = 348.f;
+			in.inner_ring_color = rgba(255, 37, 0, 255);
+			in.outer_ring_color = orange;
+			in.effective_radius = 500.f;
+			in.impact_impulse = 950.f;
+			in.sound_gain = 2.f;
+			in.sound_effect = to_sound_id(test_scene_sound_id::EXPLOSION);
+
+			in.victim_shake.duration_ms = 700.f;
+			in.victim_shake.mult = 1.4f;
+
+			explosive.armed_animation_id = to_animation_id(test_scene_plain_animation_id::BOMB_ARMED);
+			explosive.defused_image_id = to_image_id(test_scene_image_id::BOMB_DEFUSED);
+			explosive.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
+
+			meta.set(explosive);
+
+			invariants::animation anim;
+			anim.id = to_animation_id(test_scene_plain_animation_id::BOMB);
+			meta.set(anim);
 		}
 	}
 }

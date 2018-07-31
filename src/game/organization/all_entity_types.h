@@ -180,6 +180,7 @@ struct hand_explosive {
 
 	using invariants = type_list<
 		invariants::sprite,
+		invariants::animation,
 		invariants::item,
 		invariants::render,
 		invariants::hand_fuse,
@@ -191,6 +192,7 @@ struct hand_explosive {
 	>;
 
 	using components = type_list<
+		components::animation,
 		components::rigid_body,
 		components::hand_fuse,
 		components::item,
@@ -276,10 +278,12 @@ struct explosive_missile {
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariants = type_list<
+		invariants::sprite,
+		invariants::animation,
+
 		invariants::rigid_body,
 		invariants::fixtures,
 
-		invariants::sprite,
 		invariants::render,
 
 		invariants::trace,
@@ -293,6 +297,7 @@ struct explosive_missile {
 	>;
 
 	using components = type_list<
+		components::animation,
 		components::rigid_body,
 		components::hand_fuse,
 		components::item,
@@ -309,16 +314,16 @@ struct complex_decoration {
 	static constexpr std::size_t statically_allocated_flavours = 300;
 
 	using invariants = type_list<
-		invariants::animation,
 		invariants::sprite,
+		invariants::animation,
 		invariants::render,
 		invariants::ground,
 		invariants::movement_path
 	>;
 
 	using components = type_list<
-		components::animation,
 		components::sprite,
+		components::animation,
 		components::transform,
 		components::movement_path
 	>;

@@ -125,6 +125,8 @@ enum class test_hand_explosives {
 	PED_GRENADE,
 	INTERFERENCE_GRENADE,
 
+	BOMB,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

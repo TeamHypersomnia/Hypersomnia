@@ -5,16 +5,25 @@
 
 template <class L>
 const plain_animation_frame* find_frame(
-	const invariants::animation& anim_def,
+	const assets::plain_animation_id& anim_id,
 	const components::animation& anim_state,
 	const L& logicals
 ) {
-	if (const auto anim = logicals.find(anim_def.id)) {
+	if (const auto anim = logicals.find(anim_id)) {
 		const auto n = static_cast<unsigned>(anim->frames.size());
 		return std::addressof(anim->frames[anim_state.state.frame_num % n]);
 	}
 
 	return nullptr;
+}
+
+template <class L>
+decltype(auto) find_frame(
+	const invariants::animation& anim_def,
+	const components::animation& anim_state,
+	const L& logicals
+) {
+	return find_frame(anim_def.id, anim_state, logicals);
 }
 
 template <class T>

@@ -72,9 +72,8 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				const float cohesion_zone_radius = 60.f;
 
 				auto for_each_neighbor_within = [&](const auto radius, auto callback) {
-					thread_local visible_entities neighbors;
+					auto& neighbors = thread_local_visible_entities();
 
-					neighbors.clear();
 					neighbors.acquire_non_physical({
 						cosm,
 						camera_cone(camera_eye(tip_pos), vec2::square(radius * 2)),

@@ -22,20 +22,23 @@ void hand_fuse_system::detonate_fuses(const logic_step step) {
 
 	cosmos.for_each_having<components::hand_fuse>(
 		[&](const auto it) {
-			const auto& fuse = it.template get<components::hand_fuse>();
-			const auto when_unpinned = fuse.when_unpinned;
+			const auto fuse_logic = fuse_logic_provider(it, step);
+			fuse_logic.advance_arming_and_defusing();
 
-			if (when_unpinned.was_set()) {
+			auto& fuse = fuse_logic.fuse;
+
+			const auto when_armed = fuse.when_armed;
+
+			if (when_armed.was_set()) {
 				const auto& fuse_def = it.template get<invariants::hand_fuse>();
-				const auto fuse_delay_steps = static_cast<unsigned>(fuse_def.fuse_delay_ms / delta.in_milliseconds());
 
-				if (const auto when_detonates = when_unpinned.step + fuse_delay_steps;
-					now.step >= when_detonates
-				) {
-					if (const auto* const explosive = it.template find<invariants::explosive>()) {
+				if (augs::is_ready(fuse_def.fuse_delay_ms, when_armed, now, delta)) {
+					if constexpr(it.template has<invariants::explosive>()) {
+						const auto& explosive = it.template get<invariants::explosive>();
+
 						/* Note: this assumes that an item inside a backpack returns a transform of the backpack. */
 						const auto explosion_location = it.get_logic_transform();
-						explosive->explosion.instantiate(step, explosion_location, entity_id());
+						explosive.explosion.instantiate(step, explosion_location, entity_id());
 						step.post_message(messages::queue_deletion(it));
 					}
 				}

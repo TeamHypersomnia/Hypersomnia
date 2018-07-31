@@ -55,8 +55,10 @@ void standard_solve(const logic_step step) {
 	input_system().make_input_messages(step);
 
 	intent_contextualization_system().contextualize_crosshair_action_intents(step);
-	intent_contextualization_system().contextualize_use_button_intents(step);
 	intent_contextualization_system().contextualize_movement_intents(step);
+
+	intent_contextualization_system().set_use_button_flags(step);
+	intent_contextualization_system().handle_use_button(step);
 
 	{
 		auto scope = measure_scope(performance.movement_paths);

@@ -28,8 +28,6 @@ enum class game_intent_type {
 	START_PICKING_UP_ITEMS,
 
 	USE_BUTTON,
-	TAKE_HOLD_OF_WHEEL,
-	RELEASE_CAR,
 
 	SPACE_BUTTON,
 	HAND_BRAKE,

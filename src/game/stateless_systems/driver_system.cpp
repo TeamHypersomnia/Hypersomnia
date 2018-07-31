@@ -23,6 +23,8 @@
 #include "game/cosmos/data_living_one_step.h"
 
 void driver_system::assign_drivers_who_touch_wheels(const logic_step step) {
+	(void)step;
+#if TODO_CARS
 	auto& cosmos = step.get_cosmos();
 	const auto& contacts = step.get_queue<messages::collision_message>();
 
@@ -50,6 +52,7 @@ void driver_system::assign_drivers_who_touch_wheels(const logic_step step) {
 			}
 		}
 	}
+#endif
 }
 
 void driver_system::release_drivers_due_to_ending_contact_with_wheel(const logic_step step) {
@@ -72,7 +75,9 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel(const logic
 		}
 	}
 }
+
 void driver_system::release_drivers_due_to_requests(const logic_step step) {
+#if TODO_CARS
 	auto& cosmos = step.get_cosmos();
 	const auto& intents = step.get_queue<messages::intent_message>();
 
@@ -94,6 +99,8 @@ void driver_system::release_drivers_due_to_requests(const logic_step step) {
 			}
 		}
 	}
+#endif
+	(void)step;
 }
 
 bool driver_system::release_car_ownership(const entity_handle driver) {
@@ -123,7 +130,9 @@ bool driver_system::change_car_ownership(
 		}
 
 		// reset the input flag so it is necessary to press the key again
+#if TODO
 		driver.take_hold_of_wheel_when_touched = false;
+#endif
 
 		driver.owned_vehicle = car_entity;
 		car.current_driver = driver_entity;

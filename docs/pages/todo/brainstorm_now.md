@@ -6,6 +6,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Re-visit the use button system
+	- Use button should be queried continuously
+		- Different domains might interpret it on different occasions
+		- Centralize this completely?
+			- Treat is similarly to trigger
+			- Anyways we don't need the wheel handling for now
+				- Why would we respond to post-solves there anyway?
+		- Set use button to true inside sentience and perform some general logic upon it in sentience system, all in one place
+			- Prioritize bombs, obviously 
+
 - Implementing the bomb
 	- Global solvable
 		- Priority queue with scheduled explosions

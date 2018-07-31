@@ -330,5 +330,17 @@ void load_test_scene_animations(
 			test_scene_image_id::PINK_CORAL_1,
 			68.0f
 		);
+
+		make_plain(
+			test_id_type::BOMB,
+			test_scene_image_id::BOMB_1,
+			20.0f
+		);
+
+		make_plain(
+			test_id_type::BOMB_ARMED,
+			test_scene_image_id::BOMB_ARMED_1,
+			20.0f
+		);
 	}
 }

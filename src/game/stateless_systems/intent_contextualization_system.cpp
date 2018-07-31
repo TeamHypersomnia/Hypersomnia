@@ -11,11 +11,13 @@
 
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_id.h"
+#include "game/cosmos/for_each_entity.h"
 
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/hand_fuse_logic.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
+#include "game/detail/start_defusing_nearby_bomb.h"
 
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/logic_step.h"
@@ -23,7 +25,7 @@
 
 using namespace augs;
 
-void intent_contextualization_system::contextualize_use_button_intents(const logic_step step) {
+void intent_contextualization_system::set_use_button_flags(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	auto& intents = step.get_queue<messages::intent_message>();
 	
@@ -31,6 +33,25 @@ void intent_contextualization_system::contextualize_use_button_intents(const log
 		const auto subject = cosmos[e.subject];
 
 		if (e.intent == game_intent_type::USE_BUTTON) {
+			if (const auto sentience = subject.find<components::sentience>()) {
+				sentience->use_button_flag = e.was_pressed();
+			}
+		}
+	}
+}
+
+void intent_contextualization_system::handle_use_button(const logic_step step) {
+	auto& cosm = step.get_cosmos();
+
+	cosm.for_each_having<components::sentience>(
+		[&](const auto subject) {
+			if (const auto transform = subject.find_logic_transform()) {
+				if (start_defusing_nearby_bomb(step, subject)) {
+					return;
+				}
+			}
+
+#if TODO_CARS
 			auto* const maybe_driver = subject.find<components::driver>();
 
 			if (maybe_driver) {
@@ -49,8 +70,9 @@ void intent_contextualization_system::contextualize_use_button_intents(const log
 					e.intent = game_intent_type::TAKE_HOLD_OF_WHEEL;
 				}
 			}
+#endif
 		}
-	}
+	);
 }
 
 void intent_contextualization_system::contextualize_crosshair_action_intents(const logic_step step) {
@@ -107,12 +129,23 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 				it.subject = callee;
 				continue;
 			}
-			else if (callee_handle.has<components::hand_fuse>()) {
-				release_or_throw_fused_object(
-					step,
-					cosmos[callee],
-					subject,
-					it.was_pressed()
+			else {
+				callee_handle.dispatch_on_having_all<components::hand_fuse>(
+					[&](const auto typed_fused) {
+						const auto fuse_logic = fuse_logic_provider(typed_fused, step);
+
+						if (fuse_logic.fuse_def.has_delayed_arming()) {
+							fuse_logic.fuse.arming_requested = it.was_pressed();
+						}
+						else {
+							if (it.was_pressed()) {
+								fuse_logic.arm_explosive();
+							}
+							else {
+								fuse_logic.release_explosive_if_armed();
+							}
+						}
+					}
 				);
 			}
 		}

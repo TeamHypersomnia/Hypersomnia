@@ -40,6 +40,7 @@ struct item_offsets {
 	vec2i back_anchor;
 	vec2i head_anchor;
 	vec2i attachment_anchor;
+	vec2i beep_offset;
 	// END GEN INTROSPECTOR
 };
 

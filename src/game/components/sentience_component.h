@@ -57,6 +57,9 @@ namespace components {
 		augs::stepped_timestamp when_knocked_out;
 		sentience_shake shake;
 
+		bool use_button_flag = false;
+		pad_bytes<3> pad;
+
 		// END GEN INTROSPECTOR
 
 		bool is_learned(const spell_id id) const {
@@ -104,11 +107,13 @@ namespace components {
 namespace invariants {
 	struct sentience {
 		// GEN INTROSPECTOR struct invariants::sentience
-		float comfort_zone = 500.f;
-		float minimum_danger_amount_to_evade = 20.f;
-		float danger_amount_from_hostile_attitude = 100.f;
+		real32 comfort_zone = 500.f;
+		real32 minimum_danger_amount_to_evade = 20.f;
+		real32 danger_amount_from_hostile_attitude = 100.f;
 
-		float aimpunch_impact_mult = 0.001f;
+		real32 max_defuse_radius = 100.f;
+
+		real32 aimpunch_impact_mult = 0.001f;
 		impulse_mults knockout_impulse = { 1000.f, 80.f };
 
 		sound_effect_input health_decrease_sound;

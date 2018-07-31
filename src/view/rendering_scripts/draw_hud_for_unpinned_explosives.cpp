@@ -20,11 +20,11 @@ void draw_hud_for_unpinned_explosives(const draw_hud_for_released_explosives_inp
 			const components::hand_fuse& hand_fuse = it.template get<components::hand_fuse>();
 			const invariants::hand_fuse& hand_fuse_def = it.template get<invariants::hand_fuse>();
 
-			const auto when_unpinned = hand_fuse.when_unpinned;
+			const auto when_armed = hand_fuse.when_armed;
 
-			if (when_unpinned.was_set()) {
+			if (when_armed.was_set()) {
 				const auto highlight_amount = static_cast<float>(1 - (
-					(in.global_time_seconds - when_unpinned.in_seconds(dt))
+					(in.global_time_seconds - when_armed.in_seconds(dt))
 					/ (hand_fuse_def.fuse_delay_ms / 1000.f) 
 				));
 

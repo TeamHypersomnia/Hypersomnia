@@ -45,6 +45,9 @@ enum class test_scene_plain_animation_id {
 
 	PINK_CORAL,
 
+	BOMB,
+	BOMB_ARMED,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };
