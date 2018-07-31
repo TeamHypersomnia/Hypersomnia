@@ -37,6 +37,7 @@ public:
 	) const;
 
 	void infer_colliders() const;
+	void infer_rigid_body() const;
 	void infer_colliders_from_scratch() const;
 	void infer_transform() const;
 };
@@ -152,6 +153,14 @@ void physics_mixin<E>::infer_colliders() const {
 	auto& cosmos = self.get_cosmos();
 
 	cosmos.get_solvable_inferred({}).physics.infer_colliders(self);
+}
+
+template <class E>
+void physics_mixin<E>::infer_rigid_body() const {
+	const auto self = *static_cast<const E*>(this);
+	auto& cosmos = self.get_cosmos();
+
+	cosmos.get_solvable_inferred({}).physics.infer_rigid_body(self);
 }
 
 template <class E>

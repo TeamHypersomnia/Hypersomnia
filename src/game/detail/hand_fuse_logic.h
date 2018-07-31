@@ -132,6 +132,11 @@ struct fuse_logic_provider {
 		fused_entity.template get<components::shape_polygon>().set_activated(false);
 		fused_entity.template get<invariants::shape_circle>().set_activated(true);
 #endif
+
+		if (fuse_def.is_like_plantable_bomb()) {
+			fused_entity.infer_rigid_body();
+			fused_entity.infer_colliders();
+		}
 	}
 
 	void defuse() const {

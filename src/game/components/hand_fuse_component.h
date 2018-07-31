@@ -54,5 +54,6 @@ namespace invariants {
 		bool has_delayed_arming() const;
 		bool defusing_enabled() const;
 		void set_bomb_vars(const float arm_ms, const float defuse_ms);
+		bool is_like_plantable_bomb() const;
 	};
 }

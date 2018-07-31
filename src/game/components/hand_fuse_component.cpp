@@ -27,4 +27,8 @@ namespace invariants {
 		always_release_when_armed = true;
 		must_stand_still_to_arm = true;
 	}
+
+	bool hand_fuse::is_like_plantable_bomb() const {
+		return always_release_when_armed && must_stand_still_to_arm;
+	}
 }

@@ -29,6 +29,7 @@ namespace filters {
 	b2Filter see_through_dynamic_object();
 	b2Filter static_object();
 	b2Filter shell();
+	b2Filter planted_explosive();
 	b2Filter glass_obstacle();
 	b2Filter bullet();
 	b2Filter pathfinding_query();

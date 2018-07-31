@@ -88,6 +88,13 @@ namespace filters {
 		return out;
 	}
 
+	b2Filter planted_explosive() {
+		b2Filter out;
+		out.categoryBits = RENDERABLE | SHELL;
+		out.maskBits = RENDERABLE_QUERY | SHELL;
+		return out;
+	}
+
 	b2Filter glass_obstacle() {
 		b2Filter out;
 		out.categoryBits = PATHFINDING_OBSTRUCTION | RENDERABLE | GLASS_OBSTACLE;
