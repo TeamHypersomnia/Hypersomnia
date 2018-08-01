@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Draw use button range indicator with dashed lines
+	- wheel section
+		- check for collision just like with the explosions
+
 - Fix defusing logic
 	- Use button logic will need some improvement 
 	- Use button should be queried continuously

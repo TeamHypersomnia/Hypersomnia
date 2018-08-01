@@ -17,6 +17,7 @@
 #include "game/messages/thunder_input.h"
 #include "game/cosmos/data_living_one_step.h"
 #include "game/detail/organisms/startle_nearbly_organisms.h"
+#include "game/detail/physics/shape_overlapping.hpp"
 
 void standard_explosion_input::instantiate(
 	const logic_step step,
@@ -59,9 +60,9 @@ void standard_explosion_input::instantiate(
 
 	auto& cosm = step.get_cosmos();
 
+	const auto si = cosm.get_si();
 	const auto now = cosm.get_timestamp();
 
-	const auto effective_radius_sq = effective_radius*effective_radius;
 	const auto subject = cosm[subject_if_any];
 	const auto subject_alive = subject.alive();
 
@@ -112,6 +113,8 @@ void standard_explosion_input::instantiate(
 				const vec2 point_a,
 				const vec2 point_b
 			) {
+				(void)point_a;
+
 				const auto body_entity_id = get_body_entity_that_owns(fix);
 				const bool is_self = 
 					subject_alive
@@ -125,10 +128,16 @@ void standard_explosion_input::instantiate(
 					return callback_result::CONTINUE;
 				}
 
-				const bool in_range =
-					(explosion_pos - point_a).length_sq() <= effective_radius_sq
-					|| (explosion_pos - point_b).length_sq() <= effective_radius_sq
-				;
+				const bool in_range = [&]() {
+					b2CircleShape shape;
+					shape.m_radius = si.get_meters(effective_radius);
+
+					if (const auto result = shape_overlaps_fixture(&shape, si, explosion_pos, *fix)) {
+						return true;
+					}
+
+					return false;
+				}();
 
 				const bool should_be_affected = in_range;
 

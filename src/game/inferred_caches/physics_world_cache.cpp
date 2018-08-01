@@ -85,11 +85,11 @@ void rigid_body_cache::clear(physics_world_cache& owner) {
 void colliders_cache::clear(physics_world_cache& owner) {
 	auto owner_body_cache = owner.find_rigid_body_cache(connection.owner);
 
-	for (b2Fixture* f : all_fixtures_in_component) {
+	for (b2Fixture* f : constructed_fixtures) {
 		owner_body_cache->body->DestroyFixture(f);
 	}
 
-	all_fixtures_in_component.clear();
+	constructed_fixtures.clear();
 }
 
 void joint_cache::clear(physics_world_cache& owner) {
@@ -292,12 +292,12 @@ void physics_world_cache::infer_colliders(const const_entity_handle h) {
 				only_update_properties = false;
 			}
 
-			if (cache.all_fixtures_in_component.empty()) {
+			if (cache.constructed_fixtures.empty()) {
 				only_update_properties = false;
 			}
 	
 			if (only_update_properties) {
-				auto& compared = *cache.all_fixtures_in_component[0].get();
+				auto& compared = *cache.constructed_fixtures[0].get();
 				const auto& colliders_data = handle.template get<invariants::fixtures>();
 	
 				if (const auto new_density = handle.calc_density(
@@ -307,7 +307,7 @@ void physics_world_cache::infer_colliders(const const_entity_handle h) {
 	
 					compared.GetDensity() != new_density
 				) {
-					for (auto& f : cache.all_fixtures_in_component) {
+					for (auto& f : cache.constructed_fixtures) {
 						f.get()->SetDensity(new_density);
 					}
 	
@@ -317,7 +317,7 @@ void physics_world_cache::infer_colliders(const const_entity_handle h) {
 				const auto chosen_filters = calc_filters(handle);
 				const bool rebuild_filters = compared.GetFilterData() != chosen_filters;
 	
-				for (auto& f : cache.all_fixtures_in_component) {
+				for (auto& f : cache.constructed_fixtures) {
 					f.get()->SetRestitution(colliders_data.restitution);
 					f.get()->SetFriction(colliders_data.friction);
 					f.get()->SetSensor(colliders_data.sensor);
@@ -383,8 +383,8 @@ void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle
 
 		cache.connection = connection;
 
-		auto& all_fixtures_in_component = cache.all_fixtures_in_component;
-		ensure(all_fixtures_in_component.empty());
+		auto& constructed_fixtures = cache.constructed_fixtures;
+		ensure(constructed_fixtures.empty());
 
 		auto from_polygon_shape = [&](auto shape) {
 			shape.offset_vertices(connection.shape_offset);
@@ -406,7 +406,7 @@ void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle
 				ensure(static_cast<short>(ci) < std::numeric_limits<short>::max());
 				new_fix->index_in_component = static_cast<short>(ci);
 
-				all_fixtures_in_component.emplace_back(new_fix);
+				constructed_fixtures.emplace_back(new_fix);
 			}
 		};
 
@@ -426,7 +426,7 @@ void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle
 			b2Fixture* const new_fix = owner_b2Body.CreateFixture(&fixdef);
 
 			new_fix->index_in_component = 0u;
-			all_fixtures_in_component.emplace_back(new_fix);
+			constructed_fixtures.emplace_back(new_fix);
 
 			return;
 		}
@@ -503,7 +503,7 @@ b2Fixture_index_in_component physics_world_cache::get_index_in_component(
 	b2Fixture_index_in_component result;
 	result.convex_shape_index = static_cast<std::size_t>(f->index_in_component);
 
-	ensure_eq(f, find_colliders_cache(handle.get_id())->all_fixtures_in_component[result.convex_shape_index].get());
+	ensure_eq(f, find_colliders_cache(handle.get_id())->constructed_fixtures[result.convex_shape_index].get());
 
 	return result;
 }
@@ -820,8 +820,8 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 	joint_caches.reserve(b.joint_caches.size());
 
 	for (auto& it : colliders_caches) {
-		for (auto& f : b.colliders_caches[it.first].all_fixtures_in_component) {
-			colliders_caches[i].all_fixtures_in_component.emplace_back(
+		for (auto& f : b.colliders_caches[it.first].constructed_fixtures) {
+			colliders_caches[i].constructed_fixtures.emplace_back(
 				reinterpret_cast<b2Fixture*>(pointer_migrations.at(reinterpret_cast<const void*>(f.get())))
 			);
 		}

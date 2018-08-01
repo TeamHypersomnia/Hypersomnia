@@ -30,14 +30,14 @@ struct colliders_cache {
 	augs::constant_size_vector<
 		augs::propagate_const<b2Fixture*>, 
 		CONVEX_POLYS_COUNT
-	> all_fixtures_in_component;
+	> constructed_fixtures;
 
 	colliders_connection connection;
 
 	void clear(physics_world_cache&);
 
 	bool is_constructed() const {
-		return all_fixtures_in_component.size() > 0;
+		return constructed_fixtures.size() > 0;
 	}
 };
 
