@@ -4,6 +4,7 @@
 #include "game/cosmos/step_declaration.h"
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
+#include "game/messages/start_sound_effect.h"
 
 template <class E>
 struct fuse_logic_provider {
@@ -58,6 +59,7 @@ struct fuse_logic_provider {
 
 	void interrupt_arming() const {
 		fuse.when_started_arming = {};
+		stop_started_arming_sound();
 	}
 
 	void release_explosive_if_armed() const {
@@ -143,11 +145,26 @@ struct fuse_logic_provider {
 		fuse.when_armed = {};
 	}
 
+	void stop_started_arming_sound() const {
+		const auto id = fused_entity.get_id();
+		const auto& effect = fuse_def.started_arming_sound;
+
+		messages::stop_sound_effect stop;
+		stop.match_chased_subject = id;
+		stop.match_effect_id = effect.id;
+		step.post_message(stop);
+	}
+
 	void play_started_arming_sound() const {
-		fuse_def.started_arming_sound.start(
+		const auto id = fused_entity.get_id();
+		const auto& effect = fuse_def.started_arming_sound;
+
+		effect.start(
 			step,
-			sound_effect_start_input::fire_and_forget(fused_transform).set_listener(holder)
+			sound_effect_start_input::orbit_local(id, {}).set_listener(holder)
 		);
+
+		stop_started_arming_sound();
 	}
 
 	void play_started_defusing_sound() const {
@@ -201,13 +218,11 @@ struct fuse_logic_provider {
 	}
 
 	void interrupt_defusing() const {
-		LOG("interrupting");
 		if (character_now_defusing.alive()) {
 			if (const auto sentience = character_now_defusing.find<components::sentience>()) {
 				auto& u = sentience->use_button;
 
 				if (u == use_button_state::DEFUSING) {
-					LOG("QUERYING");
 					u = use_button_state::QUERYING;
 				}
 			}
@@ -292,7 +307,6 @@ struct fuse_logic_provider {
 
 					if (defusing_conditions_fulfilled()) {
 						if (!has_started_defusing()) {
-							LOG("PLAY!!!");
 							start_defusing();
 							play_started_defusing_sound();
 						}
