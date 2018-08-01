@@ -5,7 +5,7 @@
 template <class E>
 bool start_defusing_nearby_bomb(const logic_step step, const E& subject) {
 	auto& cosm = subject.get_cosmos();
-	const auto max_defuse_radius = subject.template get<invariants::sentience>().max_defuse_radius;
+	const auto max_defuse_radius = subject.template get<invariants::sentience>().use_button_radius;
 	const auto where = subject.get_logic_transform().pos;
 
 	auto& entities = thread_local_visible_entities();

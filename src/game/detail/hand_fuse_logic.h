@@ -237,7 +237,7 @@ struct fuse_logic_provider {
 			return false;
 		}
 
-		const auto max_defuse_radius = character_now_defusing.template get<invariants::sentience>().max_defuse_radius;
+		const auto max_defuse_radius = character_now_defusing.template get<invariants::sentience>().use_button_radius;
 
 		return (fused_transform.pos - character_now_defusing_pos).length_sq() < max_defuse_radius * max_defuse_radius;
 	}

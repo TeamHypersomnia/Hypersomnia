@@ -516,6 +516,55 @@ namespace augs {
 		return *this;
 	}
 
+	const line_drawer& line_drawer::dashed_circular_sector(
+		const atlas_entry tex,
+		const vec2 p,
+		const float r,
+		const rgba color,
+		const float rot,
+		const float a,
+		const float dash_len
+	) const {
+		auto draw_dash = [&](const auto from, const auto to) {
+			dashed_line(
+				tex,
+				from, 
+				to,
+				color,
+				dash_len,
+				dash_len,
+				0.f
+			);
+		};
+
+		const auto left_angle = rot - a / 2;
+		const auto right_angle = rot + a / 2;
+
+		draw_dash(
+			p, 
+			p + vec2::from_degrees(left_angle) * r
+		);
+
+		draw_dash(
+			p, 
+			p + vec2::from_degrees(right_angle) * r
+		);
+
+		const auto perim = 2 * PI<float> * r;
+		const auto fraction = dash_len / perim;
+		const auto df = 360.f * fraction;
+
+		for (float l = 0.f; l <= a; l += df * 2) {
+			const auto p1 = p + vec2::from_degrees(left_angle + l) * r;
+
+			const auto next_angle = std::min(right_angle, left_angle + l + df);
+			const auto p2 = p + vec2::from_degrees(next_angle) * r;
+
+			line(tex, p1, p2, color);
+		}
+		return *this;
+	}
+
 	const line_drawer& line_drawer::border(
 		const atlas_entry tex,
 		const vec2 size,

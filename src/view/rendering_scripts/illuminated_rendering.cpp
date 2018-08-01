@@ -297,9 +297,36 @@ void illuminated_rendering(
 				::draw_marker_borders(typed_handle, line_output, where, cone.eye.zoom);
 			});
 		});
-
-		renderer.call_and_clear_lines();
 	}
+
+	if (viewed_character) {
+		if (const auto sentience = viewed_character.find<components::sentience>()) {
+			if (const auto sentience_def = viewed_character.find<invariants::sentience>()) {
+				if (sentience->use_button == use_button_state::QUERYING) {
+					if (const auto tr = viewed_character.find_viewing_transform(interp)) {
+						const auto& a = sentience_def->use_button_angle;
+						const auto& r = sentience_def->use_button_radius;
+
+						if (r > 0.f) {
+							const auto& p = tr->pos;
+							const auto dash_len = 5.f;
+
+							line_output.dashed_circular_sector(
+								p,
+								r,
+								gray,
+								tr->rotation,
+								a,
+								dash_len
+							);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	renderer.call_and_clear_lines();
 
 	shaders.illuminated->set_as_current();
 

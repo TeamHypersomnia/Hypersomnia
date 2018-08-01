@@ -293,6 +293,16 @@ namespace augs {
 			double global_time_seconds
 		) const;
 
+		self dashed_circular_sector(
+			atlas_entry,
+			vec2 center,
+			float radius,
+			rgba color,
+			float sector_angle,
+			float sector_spread_degrees,
+			float dash_length
+		) const;
+
 		self border(
 			atlas_entry,
 			vec2 size,
@@ -343,6 +353,12 @@ namespace augs {
 		template <class... Args>
 		self dashed_line(Args&&... args) const {
 			base::dashed_line(default_texture, std::forward<Args>(args)...);
+			return *this;
+		}
+
+		template <class... Args>
+		self dashed_circular_sector(Args&&... args) const {
+			base::dashed_circular_sector(default_texture, std::forward<Args>(args)...);
 			return *this;
 		}
 

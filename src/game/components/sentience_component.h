@@ -58,9 +58,6 @@ namespace components {
 		augs::stepped_timestamp when_knocked_out;
 		sentience_shake shake;
 
-		bool use_button_flag = false;
-		pad_bytes<3> pad;
-
 		use_button_state use_button = use_button_state::IDLE;
 		// END GEN INTROSPECTOR
 
@@ -113,7 +110,8 @@ namespace invariants {
 		real32 minimum_danger_amount_to_evade = 20.f;
 		real32 danger_amount_from_hostile_attitude = 100.f;
 
-		real32 max_defuse_radius = 100.f;
+		real32 use_button_radius = 100.f;
+		real32 use_button_angle = 90.f;
 
 		real32 aimpunch_impact_mult = 0.001f;
 		impulse_mults knockout_impulse = { 1000.f, 80.f };
