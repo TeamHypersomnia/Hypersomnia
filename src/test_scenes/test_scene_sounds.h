@@ -86,6 +86,7 @@ enum class test_scene_sound_id {
 
 	BEEP,
 
+	BOMB_PLANTING,
 	STARTED_DEFUSING,
 	POWER_OUT,
 
