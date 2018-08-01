@@ -391,7 +391,6 @@ namespace augs {
 			return std::nullopt;
 
 			case XCB_INPUT_RAW_MOTION:
-			LOG("NIEZLYMOTION");
 			return ch;
 			case XCB_CLIENT_MESSAGE:
 				{
@@ -425,6 +424,7 @@ namespace augs {
 
 				ch.msg = message::keydown;
 				ch.data.key.key = translate_keysym({ keysym });
+				ch.timestamp = press->time;
 
 				character_event_emitter(press);	
 				return ch;
@@ -442,6 +442,7 @@ namespace augs {
 
 				ch.msg = message::keyup;
 				ch.data.key.key = translate_keysym({ keysym });
+				ch.timestamp = release->time;
 
 				return ch;
             }
@@ -451,6 +452,7 @@ namespace augs {
 			} 
 			case XCB_BUTTON_PRESS: {
            		const auto* const press = reinterpret_cast<const xcb_button_press_event_t*>(event);
+				ch.timestamp = press->time;
 
 				// LOG("DOWN.Det: %x; time: %x; st: %x", static_cast<int>(press->detail), press->time, static_cast<int>(press->state));
 		
@@ -506,6 +508,7 @@ namespace augs {
 
 			case XCB_BUTTON_RELEASE: {
            		const auto* const release = reinterpret_cast<const xcb_button_release_event_t*>(event);
+				ch.timestamp = release->time;
 
 				// LOG("UP.Det: %x; time: %x; st: %x", static_cast<int>(release->detail), release->time, static_cast<int>(release->state));
 			
@@ -551,7 +554,6 @@ namespace augs {
 	}
 
 	void window::collect_entropy(local_entropy& output) {
-
 		auto keysym_getter = [this](const xcb_keycode_t keycode){
 			return xcb_key_symbols_get_keysym(syms, keycode, 0);
 		};
@@ -561,6 +563,7 @@ namespace augs {
 			
 			change ch;
 			ch.msg = message::character;
+			ch.timestamp = press->time;
 
 			XKeyEvent keyev;
 			keyev.display = display;
@@ -600,10 +603,12 @@ namespace augs {
 						const auto y = axes[1].integral;
 
 						if (is_active() && (current_settings.raw_mouse_input || mouse_pos_paused)) {
-							output.push_back(do_raw_motion({
+							auto ch = do_raw_motion({
 								static_cast<short>(x),
 								static_cast<short>(y) 
-							}));
+							});
+
+							output.push_back(ch);
 						}
 					}
 					else {
@@ -631,6 +636,51 @@ namespace augs {
 				output.push_back(*ch);
 			}
 		}
+
+		local_entropy clean_entropy;
+
+		std::size_t i = 0;
+
+		while (i < output.size()) {
+			const auto& ch = output[i];
+
+			using k = event::key_change;
+
+			const auto ch_change = ch.get_key_change();
+
+			const bool add_this = [&]() {
+				if (ch.msg == event::message::character) {
+					return true;
+				}
+
+				if (ch_change != k::NO_CHANGE) {
+					for (std::size_t n = i + 1; n < output.size(); ++n) {
+						const auto& nx = output[n];
+						const auto nx_change = nx.get_key_change();
+
+						if (nx_change != k::NO_CHANGE) {
+							if (nx.timestamp == ch.timestamp) {
+								if (nx_change != ch_change) {
+									// LOG("Erase %x and %x", i, n);
+								   output.erase(output.begin() + n);
+								   return false;
+							   }
+						   }
+						}
+					}
+				}
+
+				return true;
+			}();
+
+			if (add_this) {
+				clean_entropy.emplace_back(ch);
+			}
+
+			++i;
+		}
+
+		output = std::move(clean_entropy);
 	}
 
 

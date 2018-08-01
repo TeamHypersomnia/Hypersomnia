@@ -226,6 +226,7 @@ namespace augs {
 
 				message msg = message::INVALID;
 				data_type data;
+				uint32_t timestamp = 0;
 
 				change();
 
