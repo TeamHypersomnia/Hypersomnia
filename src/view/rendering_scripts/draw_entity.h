@@ -57,17 +57,6 @@ FORCE_INLINE void detail_specific_entity_drawer(
 				}
 			}
 
-			if constexpr(typed_handle.template has<components::hand_fuse>()) {
-				if constexpr(typed_handle.template has<invariants::explosive>()) {
-					const auto& fuse = typed_handle.template get<components::hand_fuse>();
-					const auto& explosive = typed_handle.template get<invariants::explosive>();
-
-					if (fuse.defused() && explosive.defused_image_id.is_set()) {
-						result.image_id = explosive.defused_image_id;
-					}
-				}
-			}
-
 			return result;
 		}();
 
@@ -113,6 +102,17 @@ FORCE_INLINE void detail_specific_entity_drawer(
 					const auto& logicals = typed_handle.get_cosmos().get_logical_assets();
 
 					const auto& animation = typed_handle.template get<components::animation>();
+
+					if (fuse.defused()) {
+						if (explosive.defused_image_id.is_set()) {
+							auto defused = sprite;
+							defused.image_id = explosive.defused_image_id;
+
+							render_visitor(defused, in.manager, input);
+						}
+
+						return;
+					}
 
 					if (fuse.when_armed.was_set()) {
 						if (const auto displayed_frame = ::find_frame(explosive.armed_animation_id, animation, logicals)) {

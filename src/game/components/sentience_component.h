@@ -12,11 +12,12 @@
 #include "augs/templates/identity_templates.h"
 
 #include "game/assets/ids/asset_ids.h"
-#include "game/assets/ids/asset_ids.h"
 
 #include "game/cosmos/entity_id.h"
 
 #include "game/components/transform_component.h"
+
+#include "game/enums/use_button_state.h"
 
 #include "game/detail/all_sentience_meters.h"
 #include "augs/math/physics_structs.h"
@@ -60,6 +61,7 @@ namespace components {
 		bool use_button_flag = false;
 		pad_bytes<3> pad;
 
+		use_button_state use_button = use_button_state::IDLE;
 		// END GEN INTROSPECTOR
 
 		bool is_learned(const spell_id id) const {

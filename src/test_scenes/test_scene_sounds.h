@@ -86,6 +86,9 @@ enum class test_scene_sound_id {
 
 	BEEP,
 
+	STARTED_DEFUSING,
+	POWER_OUT,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

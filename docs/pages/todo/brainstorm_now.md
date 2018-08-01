@@ -6,15 +6,33 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Re-visit the use button system
+- Fix defusing logic
+	- Use button logic will need some improvement 
 	- Use button should be queried continuously
+		- Preoccupation tracking
+			- Once the use button has discovered something to use, it should be locked, i.e. it shouldn't take hold of a car wheel while it is defusing
+			- enum for the use button state?
+				- IDLE, QUERYING and current preoccupations, e.g.: DEFUSING
+				- Since there can be always just a single state at a time, a single enum is required
+				- When preoccupation is interrupted (e.g. due to distance), it is always set back to QUERYING
+				- When use button is released, it is set to IDLE
+				- In case of a single-shot action, e.g. taking hold of wheel, it is always set back to IDLE so that another press is required
 		- Different domains might interpret it on different occasions
 		- Centralize this completely?
 			- Treat is similarly to trigger
 			- Anyways we don't need the wheel handling for now
-				- Why would we respond to post-solves there anyway?
+				- Why would we respond to pre-solves there anyway?
 		- Set use button to true inside sentience and perform some general logic upon it in sentience system, all in one place
 			- Prioritize bombs, obviously 
+
+- Make the bomb non-pickupable by other factions
+	- For now just set infinite space occupied and don't iterate recursively to check if the item is forbidden
+
+- Implement bomb-bombsite overlap test
+
+- Add more sounds to the bomb
+- Interrupt the started arming/defusing sounds on every play request
+- Fix switching between the weapon and the bomb
 
 - Implementing the bomb
 	- Global solvable

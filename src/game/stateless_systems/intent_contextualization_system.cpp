@@ -25,7 +25,7 @@
 
 using namespace augs;
 
-void intent_contextualization_system::set_use_button_flags(const logic_step step) {
+void intent_contextualization_system::handle_use_button_presses(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	auto& intents = step.get_queue<messages::intent_message>();
 	
@@ -33,44 +33,64 @@ void intent_contextualization_system::set_use_button_flags(const logic_step step
 		const auto subject = cosmos[e.subject];
 
 		if (e.intent == game_intent_type::USE_BUTTON) {
+			LOG("use, %x", e.was_pressed());
 			if (const auto sentience = subject.find<components::sentience>()) {
-				sentience->use_button_flag = e.was_pressed();
+				auto& u = sentience->use_button;
+
+				if (e.was_pressed()) {
+					if (u == use_button_state::IDLE) {
+						LOG("Setting to querying");
+						u = use_button_state::QUERYING;
+					}
+				}
+				else {
+					LOG("Setting to idle");
+					u = use_button_state::IDLE;
+				}
 			}
 		}
 	}
 }
 
-void intent_contextualization_system::handle_use_button(const logic_step step) {
+void intent_contextualization_system::advance_use_button(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 
 	cosm.for_each_having<components::sentience>(
 		[&](const auto subject) {
-			if (const auto transform = subject.find_logic_transform()) {
-				if (start_defusing_nearby_bomb(step, subject)) {
-					return;
+			auto& sentience = subject.template get<components::sentience>();
+
+			if (sentience.use_button == use_button_state::QUERYING) {
+				if (const auto transform = subject.find_logic_transform()) {
+					if (start_defusing_nearby_bomb(step, subject)) {
+						LOG("Setting to defusing");
+						sentience.use_button = use_button_state::DEFUSING;
+						return;
+					}
 				}
 			}
 
+			{
 #if TODO_CARS
-			auto* const maybe_driver = subject.find<components::driver>();
+				auto* const maybe_driver = subject.find<components::driver>();
 
-			if (maybe_driver) {
-				const auto car_id = maybe_driver->owned_vehicle;
-				const auto car = cosmos[car_id];
+				if (maybe_driver) {
+					const auto car_id = maybe_driver->owned_vehicle;
+					const auto car = cosmos[car_id];
 
-				const bool is_now_driving = 
-					car.alive() 
-					&& car.get<components::car>().current_driver == e.subject
-				;
+					const bool is_now_driving = 
+						car.alive() 
+						&& car.get<components::car>().current_driver == e.subject
+					;
 
-				if (is_now_driving) {
-					e.intent = game_intent_type::RELEASE_CAR;
+					if (is_now_driving) {
+						e.intent = game_intent_type::RELEASE_CAR;
+					}
+					else {
+						e.intent = game_intent_type::TAKE_HOLD_OF_WHEEL;
+					}
 				}
-				else {
-					e.intent = game_intent_type::TAKE_HOLD_OF_WHEEL;
-				}
-			}
 #endif
+			}
 		}
 	);
 }

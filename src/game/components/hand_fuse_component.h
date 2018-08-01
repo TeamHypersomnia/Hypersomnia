@@ -3,6 +3,7 @@
 #include "augs/misc/timing/stepped_timing.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "augs/math/physics_structs.h"
+#include "game/detail/view_input/particle_effect_input.h"
 
 namespace components {
 	struct hand_fuse {
@@ -47,7 +48,8 @@ namespace invariants {
 		sound_effect_input started_arming_sound;
 		sound_effect_input started_defusing_sound;
 		sound_effect_input armed_sound;
-		sound_effect_input defused_sound;
+		std::array<sound_effect_input, 2> defused_sound;
+		particle_effect_input defused_particles;
 		sound_effect_input release_sound;
 		// END GEN INTROSPECTOR
 

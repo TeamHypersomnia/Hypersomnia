@@ -196,11 +196,17 @@ namespace test_flavours {
 			fuse.fuse_delay_ms = 30000.f;
 			fuse.override_release_impulse = true;
 			fuse.additional_release_impulse = {};
-			fuse.set_bomb_vars(2000.f, 10000.f);
+			fuse.set_bomb_vars(500.f, 1000.f);
 			fuse.beep_sound.id = to_sound_id(test_scene_sound_id::BEEP);
 			fuse.beep_sound.modifier.doppler_factor = 0.5f;
 			fuse.beep_color = red;
 			fuse.beep_time_mult = 0.08f;
+			fuse.started_defusing_sound.id = to_sound_id(test_scene_sound_id::STARTED_DEFUSING);
+			fuse.defused_sound[0].id = to_sound_id(test_scene_sound_id::STEAM_BURST);
+			fuse.defused_sound[1].id = to_sound_id(test_scene_sound_id::POWER_OUT);
+			fuse.defused_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEAM_BURST);
+			fuse.defused_particles.modifier.scale_amounts = 2.f;
+			fuse.defused_particles.modifier.scale_lifetimes = 2.f;
 			meta.set(fuse);
 
 			invariants::explosive explosive; 

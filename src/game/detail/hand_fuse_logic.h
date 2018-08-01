@@ -17,7 +17,7 @@ struct fuse_logic_provider {
 	const augs::delta dt;
 	const augs::stepped_timestamp now;
 
-	const const_entity_handle character_now_defusing;
+	const entity_handle character_now_defusing;
 	vec2 character_now_defusing_pos;
 
 	template <class T>
@@ -157,10 +157,17 @@ struct fuse_logic_provider {
 		);
 	}
 
-	void play_defused_sound() const {
-		fuse_def.defused_sound.start(
+	void play_defused_effects() const {
+		for (std::size_t i = 0; i < fuse_def.defused_sound.size(); ++i) {
+			fuse_def.defused_sound[i].start(
+				step,
+				sound_effect_start_input::fire_and_forget(fused_transform).set_listener(character_now_defusing)
+			);
+		}
+
+		fuse_def.defused_particles.start(
 			step,
-			sound_effect_start_input::fire_and_forget(fused_transform).set_listener(character_now_defusing)
+			particle_effect_start_input::fire_and_forget(fused_transform)
 		);
 	}
 
@@ -169,7 +176,7 @@ struct fuse_logic_provider {
 	}
 
 	void start_defusing() const {
-		fuse.when_started_arming = now;
+		fuse.when_started_defusing = now;
 	}
 
 	bool has_started_arming() const {
@@ -194,6 +201,18 @@ struct fuse_logic_provider {
 	}
 
 	void interrupt_defusing() const {
+		LOG("interrupting");
+		if (character_now_defusing.alive()) {
+			if (const auto sentience = character_now_defusing.find<components::sentience>()) {
+				auto& u = sentience->use_button;
+
+				if (u == use_button_state::DEFUSING) {
+					LOG("QUERYING");
+					u = use_button_state::QUERYING;
+				}
+			}
+		}
+
 		fuse.character_now_defusing = {}; 
 		fuse.when_started_defusing = {};
 	}
@@ -233,6 +252,10 @@ struct fuse_logic_provider {
 		return holder.alive() && fuse.arming_requested;
 	}
 
+	bool defusing_requested() const {
+		return character_now_defusing.alive() && character_now_defusing.get<components::sentience>().use_button == use_button_state::DEFUSING; 
+	}
+
 	void advance_arming_and_defusing() const {
 		if (fuse_def.has_delayed_arming()) {
 			if (!fuse.armed()) {
@@ -261,14 +284,15 @@ struct fuse_logic_provider {
 
 		if (fuse_def.defusing_enabled()) {
 			if (fuse.armed()) {
-				if (character_now_defusing.alive()) {
+				if (defusing_requested()) {
 					if (defusing_delay_complete()) {
 						defuse();
-						play_defused_sound();
+						play_defused_effects();
 					}
 
 					if (defusing_conditions_fulfilled()) {
 						if (!has_started_defusing()) {
+							LOG("PLAY!!!");
 							start_defusing();
 							play_started_defusing_sound();
 						}
@@ -276,6 +300,9 @@ struct fuse_logic_provider {
 					else {
 						interrupt_defusing();
 					}
+				}
+				else {
+					interrupt_defusing();
 				}
 			}
 		}

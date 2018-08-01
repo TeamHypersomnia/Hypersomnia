@@ -2,6 +2,7 @@
 #include "augs/misc/enum/enum_boolset.h"
 
 enum class item_category {
+	// GEN INTROSPECTOR enum class item_category
 	GENERAL,
 
 	RAIL_ATTACHMENT,
@@ -13,8 +14,9 @@ enum class item_category {
 	ROCKET,
 
 	COUNT
+	// END GEN INTROSPECTOR
 };
 
-typedef augs::enum_boolset<item_category> item_category_flagset;
+using item_category_flagset = augs::enum_boolset<item_category>;
 
 bool is_clothing(const item_category_flagset& category);
