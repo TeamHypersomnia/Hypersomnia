@@ -185,7 +185,7 @@ namespace test_flavours {
 
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("1000");
-			item.categories_for_slot_compatibility = { item_category::GENERAL, item_category::SHOULDER_CONTAINER };
+			item.categories_for_slot_compatibility = { item_category::GENERAL, item_category::SHOULDER_WEARABLE };
 			item.wear_sound.id = to_sound_id(test_scene_sound_id::BACKPACK_WEAR);
 
 			meta.set(item);
@@ -196,7 +196,7 @@ namespace test_flavours {
 			fuse.fuse_delay_ms = 30000.f;
 			fuse.override_release_impulse = true;
 			fuse.additional_release_impulse = {};
-			fuse.set_bomb_vars(1500.f, 1000.f);
+			fuse.set_bomb_vars(1500.f, 5000.f);
 			fuse.beep_sound.id = to_sound_id(test_scene_sound_id::BEEP);
 			fuse.beep_sound.modifier.doppler_factor = 0.5f;
 			fuse.beep_color = red;
@@ -206,8 +206,9 @@ namespace test_flavours {
 			fuse.defused_sound[0].id = to_sound_id(test_scene_sound_id::STEAM_BURST);
 			fuse.defused_sound[1].id = to_sound_id(test_scene_sound_id::POWER_OUT);
 			fuse.defused_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEAM_BURST);
-			fuse.defused_particles.modifier.scale_amounts = 2.f;
-			fuse.defused_particles.modifier.scale_lifetimes = 2.f;
+			fuse.defused_particles.modifier.colorize = cyan;
+			fuse.defused_particles.modifier.scale_amounts = 2.5f;
+			fuse.defused_particles.modifier.scale_lifetimes = 2.5f;
 			meta.set(fuse);
 
 			invariants::explosive explosive; 

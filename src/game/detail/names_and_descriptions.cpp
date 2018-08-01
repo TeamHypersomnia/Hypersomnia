@@ -17,7 +17,7 @@ entity_name_str get_bbcoded_item_categories(const item_category_flagset& flags) 
 	if (flags.test(item_category::SHOT_CHARGE)) {
 		result += "Shot charge, ";
 	}
-	if (flags.test(item_category::SHOULDER_CONTAINER)) {
+	if (flags.test(item_category::SHOULDER_WEARABLE)) {
 		result += "Shoulder container, ";
 	}
 	if (flags.test(item_category::TORSO_ARMOR)) {

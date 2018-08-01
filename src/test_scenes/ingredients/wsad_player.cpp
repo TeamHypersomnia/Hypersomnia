@@ -121,7 +121,7 @@ namespace test_flavours {
 
 				{
 					inventory_slot slot_def;
-					slot_def.category_allowed = item_category::SHOULDER_CONTAINER;
+					slot_def.category_allowed = item_category::SHOULDER_WEARABLE;
 					slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY;
 					slot_def.always_allow_exactly_one_item = true;
 					container.slots[slot_function::SHOULDER] = slot_def;
