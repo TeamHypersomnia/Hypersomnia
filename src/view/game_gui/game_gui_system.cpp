@@ -21,7 +21,7 @@
 #include "view/game_gui/elements/slot_button.h"
 #include "view/game_gui/elements/item_button.h"
 
-static char to_hotbar_index(const game_gui_intent_type type) {
+static int to_hotbar_index(const game_gui_intent_type type) {
 	switch (type) {
 	case game_gui_intent_type::HOTBAR_BUTTON_0: return 0;
 	case game_gui_intent_type::HOTBAR_BUTTON_1: return 1;
@@ -37,7 +37,7 @@ static char to_hotbar_index(const game_gui_intent_type type) {
 	}
 }
 
-static char to_special_action_index(const game_gui_intent_type type) {
+static int to_special_action_index(const game_gui_intent_type type) {
 	switch (type) {
 	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_1: return 0;
 	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_2: return 1;

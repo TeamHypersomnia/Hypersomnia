@@ -39,10 +39,10 @@ struct character_gui {
 	std::array<value_bar, value_bar_count> value_bars;
 
 	hotbar_selection_setup last_setups[2];
-	short currently_held_hotbar_button_index = -1;
-	short push_new_setup_when_index_released = -1;
+	int currently_held_hotbar_button_index = -1;
+	int push_new_setup_when_index_released = -1;
 
-	unsigned char current_hotbar_selection_setup_index = 0;
+	unsigned current_hotbar_selection_setup_index = 0;
 	bool is_gui_look_enabled = false;
 	bool preview_due_to_item_picking_request = false;
 	bool draw_space_available_inside_container_icons = true;
