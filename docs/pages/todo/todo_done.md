@@ -1178,3 +1178,7 @@ we consider whole type overrides too complex architeciturally:
 		- And check win conditions in post solve.
 
 	
+- Draw use button range indicator with dashed lines
+	- wheel section
+		- check for collision just like with the explosions
+

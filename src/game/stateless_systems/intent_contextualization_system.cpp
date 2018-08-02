@@ -62,7 +62,6 @@ void intent_contextualization_system::advance_use_button(const logic_step step) 
 			if (sentience.use_button == use_button_state::QUERYING) {
 				if (const auto transform = subject.find_logic_transform()) {
 					if (start_defusing_nearby_bomb(step, subject)) {
-						LOG("Setting to defusing");
 						sentience.use_button = use_button_state::DEFUSING;
 						return;
 					}

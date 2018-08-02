@@ -12,7 +12,7 @@ bool start_defusing_nearby_bomb(const logic_step step, const E& subject) {
 
 	entities.reacquire_all_and_sort({
 		cosm,
-		camera_cone(camera_eye(where, 1.f), vec2i::square(max_defuse_radius)),
+		camera_cone(camera_eye(where, 1.f), vec2i::square(max_defuse_radius * 2)),
 		visible_entities_query::accuracy_type::EXACT,
 		render_layer_filter::whitelist(render_layer::PLANTED_BOMBS),
 		{ { tree_of_npo_type::RENDERABLES } }

@@ -5,6 +5,7 @@
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 #include "game/messages/start_sound_effect.h"
+#include "game/detail/physics/shape_overlapping.hpp"
 
 template <class E>
 struct fuse_logic_provider {
@@ -232,16 +233,6 @@ struct fuse_logic_provider {
 		fuse.when_started_defusing = {};
 	}
 
-	bool defusing_character_in_range() const {
-		if (character_now_defusing.dead()) {
-			return false;
-		}
-
-		const auto max_defuse_radius = character_now_defusing.template get<invariants::sentience>().use_button_radius;
-
-		return (fused_transform.pos - character_now_defusing_pos).length_sq() < max_defuse_radius * max_defuse_radius;
-	}
-
 	bool arming_conditions_fulfilled() const {
 		if (holder.dead()) {
 			return false;
@@ -258,8 +249,8 @@ struct fuse_logic_provider {
 		return 
 			fuse_def.defusing_enabled()
 			&& character_now_defusing.alive() 
-			&& defusing_character_in_range() 
 			&& is_standing_still(character_now_defusing)
+			&& use_button_overlaps(character_now_defusing, fused_entity)
 		;
 	}
 
