@@ -372,9 +372,17 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			auto& heat = gun.current_heat;
 
 			if (total_recoil != 0.f) {
+				auto total_kickback = total_recoil;
+
 #if ENABLE_RECOIL
 				if (sentience && sentience->use_button == use_button_state::DEFUSING) {
 					total_recoil *= 1.5f;
+					total_kickback *= 1.5f;
+				}
+
+				if (owning_capability && owning_capability.get_wielded_items().size() == 2) {
+					total_recoil *= 2.2f;
+					total_kickback *= 1.5f;
 				}
 
 				if (const auto* const recoil_player = logicals.find(gun_def.recoil.id)) {
@@ -389,7 +397,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 				if (owning_capability) {
 					if (const auto body = owning_capability.template find<components::rigid_body>()) {
-						const auto total_kickback = total_recoil * gun_def.kickback_towards_wielder;
+						total_kickback *= gun_def.kickback_towards_wielder;
 						body.apply_impulse(
 							total_kickback * vec2::from_degrees(gun_transform.rotation) * -1
 						);
