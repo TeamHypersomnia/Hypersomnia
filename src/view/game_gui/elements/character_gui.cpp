@@ -235,7 +235,7 @@ wielding_result character_gui::make_wielding_transfers_for_previous_hotbar_selec
 	else {
 		const auto previous_setup_that_is_different = make_wielding_transfers_for(previous_setup, gui_entity);
 
-		if (previous_setup_that_is_different.result == wielding_result::type::SUCCESSFUL) {
+		if (previous_setup_that_is_different.transfers.size() > 0) {
 			current_setup_index = 1 - current_setup_index;
 			return previous_setup_that_is_different;
 		}

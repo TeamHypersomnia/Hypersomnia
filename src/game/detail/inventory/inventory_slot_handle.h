@@ -238,11 +238,15 @@ template <class E>
 E basic_inventory_slot_handle<E>::get_root_container_until(const entity_id container_entity) const {
 	const auto slot = get_container().get_current_slot();
 
-	if (slot.alive() && slot.get_container() != container_entity) {
-		return slot.get_root_container_until(container_entity);
+	if (slot.dead()) {
+		return get_container();
 	}
 
-	return get_container();
+	if (slot.get_container() == container_entity) {
+		return get_cosmos()[container_entity];
+	}
+
+	return slot.get_root_container_until(container_entity);
 }
 
 template <class E>

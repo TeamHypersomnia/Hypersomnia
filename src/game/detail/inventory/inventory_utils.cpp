@@ -87,41 +87,44 @@ item_transfer_result query_transfer_result(
 		}
 	}
 	else {
-		const bool trying_to_insert_inside_the_transferred_item = target_slot.is_child_of(transferred_item);
-		ensure(!trying_to_insert_inside_the_transferred_item);
+		if (target_slot.is_child_of(transferred_item)) {
+			/* Trying to insert inside the transferred item. */
+			output.result = item_transfer_result_type::THE_SAME_SLOT; 
+		}
+		else {
+			const auto containment_result = query_containment_result(
+				transferred_item, 
+				target_slot,
+				r.specified_quantity
+			);
 
-		const auto containment_result = query_containment_result(
-			transferred_item, 
-			target_slot,
-			r.specified_quantity
-		);
+			output.transferred_charges = containment_result.transferred_charges;
 
-		output.transferred_charges = containment_result.transferred_charges;
+			switch (containment_result.result) {
+				case containment_result_type::INCOMPATIBLE_CATEGORIES: 
+					output.result = item_transfer_result_type::INCOMPATIBLE_CATEGORIES; 
+					break;
 
-		switch (containment_result.result) {
-			case containment_result_type::INCOMPATIBLE_CATEGORIES: 
-				output.result = item_transfer_result_type::INCOMPATIBLE_CATEGORIES; 
-				break;
+				case containment_result_type::INSUFFICIENT_SPACE: 
+					output.result = item_transfer_result_type::INSUFFICIENT_SPACE; 
+					break;
 
-			case containment_result_type::INSUFFICIENT_SPACE: 
-				output.result = item_transfer_result_type::INSUFFICIENT_SPACE; 
-				break;
+				case containment_result_type::THE_SAME_SLOT: 
+					output.result = item_transfer_result_type::THE_SAME_SLOT; 
+					break;
 
-			case containment_result_type::THE_SAME_SLOT: 
-				output.result = item_transfer_result_type::THE_SAME_SLOT; 
-				break;
+				case containment_result_type::SUCCESSFUL_CONTAINMENT:
+					output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER; 
+					break;
 
-			case containment_result_type::SUCCESSFUL_CONTAINMENT:
-				output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER; 
-				break;
+				case containment_result_type::TOO_MANY_ITEMS:
+					output.result = item_transfer_result_type::TOO_MANY_ITEMS;
+					break;
 
-			case containment_result_type::TOO_MANY_ITEMS:
-				output.result = item_transfer_result_type::TOO_MANY_ITEMS;
-				break;
-
-			default: 
-				output.result = item_transfer_result_type::INVALID_RESULT; 
-				break;
+				default: 
+					output.result = item_transfer_result_type::INVALID_RESULT; 
+					break;
+			}
 		}
 	}
 
