@@ -206,7 +206,13 @@ void settings_gui_state::perform(
 
 				revertable_checkbox("Draw weapon laser", config.drawing.draw_weapon_laser);
 				revertable_checkbox("Draw crosshairs", config.drawing.draw_crosshairs);
-				revertable_checkbox("Draw area markers", config.drawing.draw_area_markers);
+				revertable_checkbox("Draw area markers", config.drawing.draw_area_markers.is_enabled);
+
+				if (config.drawing.draw_area_markers.is_enabled) {
+					auto indent = scoped_indent();
+					revertable_slider("Alpha", config.drawing.draw_area_markers.value, 0.f, 1.f);
+				}
+
 				// revertable_checkbox("Draw gameplay GUI", config.drawing.draw_character_gui); revert(config.drawing.draw_character_gui);
 				break;
 			}

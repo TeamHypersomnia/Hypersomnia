@@ -55,7 +55,8 @@ return {
   drawing = {
     draw_character_gui = true,
     draw_crosshairs = true,
-    draw_weapon_laser = true
+    draw_weapon_laser = true,
+	enabled_draw_area_markers = 0.85
   },
   editor = {
     grid = {

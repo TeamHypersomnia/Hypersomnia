@@ -65,7 +65,7 @@ void draw_editor_elements(
 				border_input { 1, 2 }
 			);
 
-			::draw_marker_borders(typed_handle, line_drawer, screen_space, cone.eye.zoom, color);
+			::draw_marker_borders(typed_handle, line_drawer, screen_space, cone.eye.zoom, 1.f, color);
 		}	
 	);
 

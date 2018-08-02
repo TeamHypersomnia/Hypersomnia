@@ -127,7 +127,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 					auto effect = mat->standard_damage_particles;
 
-					effect.modifier.scale_amounts *= mult;
+					effect.modifier.scale_amounts *= std::min(4.f, mult);
 					effect.modifier.scale_lifetimes *= std::min(1.3f, mult);
 
 					effect.start(

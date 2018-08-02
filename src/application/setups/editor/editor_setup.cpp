@@ -184,7 +184,7 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 	if (!anything_opened() || is_editing_mode()) {
 		config.drawing.draw_aabb_highlighter = false;
 		config.interpolation.enabled = false;
-		config.drawing.draw_area_markers = false;
+		config.drawing.draw_area_markers = {};
 	}
 
 	return;

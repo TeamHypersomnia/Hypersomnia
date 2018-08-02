@@ -25,10 +25,6 @@ summary: That which we are brainstorming at the moment.
 		- Set use button to true inside sentience and perform some general logic upon it in sentience system, all in one place
 			- Prioritize bombs, obviously 
 
-- Implement bomb-bombsite overlap test
-
-- Add more sounds to the bomb
-- Interrupt the started arming/defusing sounds on every play request
 - Fix switching between the weapon and the bomb
 
 - Implementing the bomb

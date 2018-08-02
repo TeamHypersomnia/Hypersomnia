@@ -290,13 +290,17 @@ void illuminated_rendering(
 
 	renderer.call_and_clear_triangles();
 
-	if (settings.draw_area_markers) {
-		visible.for_each<render_layer::AREA_MARKERS>(cosmos, [&](const auto e) {
-			e.template dispatch_on_having_all<invariants::box_marker>([&](const auto typed_handle){ 
-				const auto where = typed_handle.get_logic_transform();
-				::draw_marker_borders(typed_handle, line_output, where, cone.eye.zoom);
+	{
+		const auto& markers = settings.draw_area_markers;
+
+		if (markers.is_enabled) {
+			visible.for_each<render_layer::AREA_MARKERS>(cosmos, [&](const auto e) {
+				e.template dispatch_on_having_all<invariants::box_marker>([&](const auto typed_handle){ 
+					const auto where = typed_handle.get_logic_transform();
+					::draw_marker_borders(typed_handle, line_output, where, cone.eye.zoom, markers.value);
+				});
 			});
-		});
+		}
 	}
 
 	if (viewed_character) {

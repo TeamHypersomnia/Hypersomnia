@@ -9,18 +9,25 @@ void draw_marker_borders(
 	const augs::line_drawer_with_default& drawer,
 	const transformr where,
 	const float zoom,
+	const float alpha,
 	std::optional<rgba> color = std::nullopt
 ) {
 	if (const auto marker = typed_handle.template find<invariants::box_marker>()) {
 		const auto size = typed_handle.get_logical_size();
 
 		if (color == std::nullopt) {
-			const auto t = marker->type;
+			color = [&]() {
+				const auto t = marker->type;
 
-			if (::is_bombsite(t)) {
-				color = rgba(red.rgb(), 100);
-			}
+				if (::is_bombsite(t)) {
+					return red;
+				}
+
+				return white;
+			}();
 		}
+
+		color->multiply_alpha(alpha);
 
 		drawer.border_dashed(
 			size * zoom,

@@ -1182,3 +1182,7 @@ we consider whole type overrides too complex architeciturally:
 	- wheel section
 		- check for collision just like with the explosions
 
+- Implement bomb-bombsite overlap test
+- Add more sounds to the bomb
+
+- Interrupt the started arming sounds on every play request
