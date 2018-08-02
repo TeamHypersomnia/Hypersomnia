@@ -307,6 +307,12 @@ void illuminated_rendering(
 						const auto& a = sentience_def->use_button_angle;
 						const auto& r = sentience_def->use_button_radius;
 
+						auto col = gray;
+
+						if (sentience->last_use_result == use_button_query_result::IN_RANGE_BUT_CANT) {
+							col = green;
+						}
+
 						if (r > 0.f) {
 							const auto& p = tr->pos;
 							const auto dash_len = 5.f;
@@ -314,7 +320,7 @@ void illuminated_rendering(
 							line_output.dashed_circular_sector(
 								p,
 								r,
-								gray,
+								col,
 								tr->rotation,
 								a,
 								dash_len

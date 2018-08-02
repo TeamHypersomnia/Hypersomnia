@@ -245,12 +245,15 @@ struct fuse_logic_provider {
 		return true;
 	}
 
+	bool defusing_character_in_range() const {
+		return use_button_overlaps(character_now_defusing, fused_entity).has_value();
+	}
+
 	bool defusing_conditions_fulfilled() const {
 		return 
 			fuse_def.defusing_enabled()
 			&& character_now_defusing.alive() 
 			&& is_standing_still(character_now_defusing)
-			&& use_button_overlaps(character_now_defusing, fused_entity)
 		;
 	}
 
@@ -296,7 +299,7 @@ struct fuse_logic_provider {
 						play_defused_effects();
 					}
 
-					if (defusing_conditions_fulfilled()) {
+					if (defusing_conditions_fulfilled() && defusing_character_in_range()) {
 						if (!has_started_defusing()) {
 							start_defusing();
 							play_started_defusing_sound();

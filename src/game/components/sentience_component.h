@@ -28,6 +28,8 @@
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
 
+#include "game/enums/use_button_query_result.h"
+
 using learned_spells_array_type = std::array<
 	bool,
 	aligned_num_of_bytes_v<num_types_in_list_v<spell_instance_tuple>, 4>
@@ -59,6 +61,7 @@ namespace components {
 		sentience_shake shake;
 
 		use_button_state use_button = use_button_state::IDLE;
+		use_button_query_result last_use_result = use_button_query_result::NONE_FOUND;
 		// END GEN INTROSPECTOR
 
 		bool is_learned(const spell_id id) const {

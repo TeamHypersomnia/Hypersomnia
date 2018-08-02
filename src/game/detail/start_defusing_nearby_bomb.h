@@ -1,9 +1,10 @@
 #pragma once
 #include "game/detail/visible_entities.h"
 #include "game/detail/hand_fuse_logic.h"
+#include "game/enums/use_button_query_result.h"
 
 template <class E>
-bool start_defusing_nearby_bomb(const logic_step step, const E& subject) {
+auto start_defusing_nearby_bomb(const logic_step step, const E& subject) {
 	auto& cosm = subject.get_cosmos();
 	const auto max_defuse_radius = subject.template get<invariants::sentience>().use_button_radius;
 	const auto where = subject.get_logic_transform().pos;
@@ -18,7 +19,8 @@ bool start_defusing_nearby_bomb(const logic_step step, const E& subject) {
 		{ { tree_of_npo_type::RENDERABLES } }
 	});
 
-	bool found_one = false;
+	using U = use_button_query_result;
+	auto result = U::NONE_FOUND;
 
 	entities.for_each<render_layer::PLANTED_BOMBS>(cosm, [&](const auto typed_handle) {
 		typed_handle.template dispatch_on_having_all<components::hand_fuse>([&](const auto typed_bomb) -> callback_result {
@@ -31,19 +33,23 @@ bool start_defusing_nearby_bomb(const logic_step step, const E& subject) {
 
 				const auto fuse_logic = fuse_logic_provider(typed_bomb, step);
 
-				if (fuse_logic.defusing_conditions_fulfilled()) {
-					found_one = true;
-					return callback_result::ABORT;
+				if (fuse_logic.defusing_character_in_range()) {
+					if (fuse_logic.defusing_conditions_fulfilled()) {
+						result = U::SUCCESS;
+						return callback_result::ABORT;
+					}
+					else {
+						result = U::IN_RANGE_BUT_CANT;
+					}
 				}
-				else {
-					fuse.character_now_defusing = {};
-				}
+
+				fuse.character_now_defusing = {};
 			}
 
 			return callback_result::CONTINUE;
 		});
 	});
 
-	return found_one;
+	return result;
 }
 

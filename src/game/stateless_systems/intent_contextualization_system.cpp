@@ -33,18 +33,15 @@ void intent_contextualization_system::handle_use_button_presses(const logic_step
 		const auto subject = cosmos[e.subject];
 
 		if (e.intent == game_intent_type::USE_BUTTON) {
-			LOG("use, %x", e.was_pressed());
 			if (const auto sentience = subject.find<components::sentience>()) {
 				auto& u = sentience->use_button;
 
 				if (e.was_pressed()) {
 					if (u == use_button_state::IDLE) {
-						LOG("Setting to querying");
 						u = use_button_state::QUERYING;
 					}
 				}
 				else {
-					LOG("Setting to idle");
 					u = use_button_state::IDLE;
 				}
 			}
@@ -61,11 +58,17 @@ void intent_contextualization_system::advance_use_button(const logic_step step) 
 
 			if (sentience.use_button == use_button_state::QUERYING) {
 				if (const auto transform = subject.find_logic_transform()) {
-					if (start_defusing_nearby_bomb(step, subject)) {
+					auto& u = sentience.last_use_result;
+					u = start_defusing_nearby_bomb(step, subject);
+
+					if (u == use_button_query_result::SUCCESS) {
 						sentience.use_button = use_button_state::DEFUSING;
 						return;
 					}
 				}
+			}
+			else {
+				sentience.last_use_result = use_button_query_result::NONE_FOUND;
 			}
 
 			{
