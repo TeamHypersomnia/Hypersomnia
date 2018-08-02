@@ -660,8 +660,8 @@ namespace augs {
 
 						if (nx_change != k::NO_CHANGE) {
 							if (nx.timestamp == ch.timestamp) {
-								if (nx_change != ch_change) {
-									// LOG("Erase %x and %x", i, n);
+								if (nx.data.key.key == ch.data.key.key && nx_change != ch_change) {
+									//LOG("Erase %x and %x", i, n);
 								   output.erase(output.begin() + n);
 								   return false;
 							   }
