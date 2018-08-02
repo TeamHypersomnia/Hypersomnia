@@ -117,119 +117,22 @@ static b2Vec2 ComputeCentroid(const b2Vec2* vs, int32 count)
 	return c;
 }
 
-void b2PolygonShape::Set(const b2Vec2* vertices, int32 count)
+#include "augs/math/vec2.h"
+
+void b2PolygonShape::Set(const vec2* vertices, const int32 n)
 {
-	b2Assert(3 <= count && count <= b2_maxPolygonVertices);
-	if (count < 3)
-	{
-		SetAsBox(1.0f, 1.0f);
-		return;
-	}
-	
-	int32 n = b2Min(count, b2_maxPolygonVertices);
+	b2Assert(3 <= n && n <= b2_maxPolygonVertices);
+	m_count = n;
 
-	// Perform welding and copy vertices into local buffer.
-	b2Vec2 ps[b2_maxPolygonVertices];
-	int32 tempCount = 0;
-	for (int32 i = 0; i < n; ++i)
-	{
-		b2Vec2 v = vertices[i];
-
-		bool unique = true;
-		//for (int32 j = 0; j < tempCount; ++j)
-		//{
-		//	if (b2DistanceSquared(v, ps[j]) < 0.5f * b2_linearSlop)
-		//	{
-		//		unique = false;
-		//		break;
-		//	}
-		//}
-
-		if (unique)
-		{
-			ps[tempCount++] = v;
-		}
-	}
-
-	n = tempCount;
-	if (n < 3)
-	{
-		// Polygon is degenerate.
-		b2Assert(false);
-		SetAsBox(1.0f, 1.0f);
-		return;
-	}
-
-	// Create the convex hull using the Gift wrapping algorithm
-	// http://en.wikipedia.org/wiki/Gift_wrapping_algorithm
-
-	// Find the right most point on the hull
-	int32 i0 = 0;
-	float32 x0 = ps[0].x;
-	for (int32 i = 1; i < n; ++i)
-	{
-		float32 x = ps[i].x;
-		if (x > x0 || (x == x0 && ps[i].y < ps[i0].y))
-		{
-			i0 = i;
-			x0 = x;
-		}
-	}
-
-	int32 hull[b2_maxPolygonVertices];
-	int32 m = 0;
-	int32 ih = i0;
-
-	for (;;)
-	{
-		hull[m] = ih;
-
-		int32 ie = 0;
-		for (int32 j = 1; j < n; ++j)
-		{
-			if (ie == ih)
-			{
-				ie = j;
-				continue;
-			}
-
-			b2Vec2 r = ps[ie] - ps[hull[m]];
-			b2Vec2 v = ps[j] - ps[hull[m]];
-			float32 c = b2Cross(r, v);
-			if (c < 0.0f)
-			{
-				ie = j;
-			}
-
-			// Collinearity check
-			if (c == 0.0f && v.LengthSquared() > r.LengthSquared())
-			{
-				ie = j;
-			}
-		}
-
-		++m;
-		ih = ie;
-
-		if (ie == i0)
-		{
-			break;
-		}
-	}
-	
-	m_count = m;
-
-	// Copy vertices.
-	for (int32 i = 0; i < m; ++i)
-	{
-		m_vertices[i] = ps[hull[i]];
+	for (int32 i = 0; i < n; ++i) {
+		m_vertices[i] = vertices[i].operator b2Vec2();
 	}
 
 	// Compute normals. Ensure the edges have non-zero length.
-	for (int32 i = 0; i < m; ++i)
+	for (int32 i = 0; i < n; ++i)
 	{
 		int32 i1 = i;
-		int32 i2 = i + 1 < m ? i + 1 : 0;
+		int32 i2 = i + 1 < n ? i + 1 : 0;
 		b2Vec2 edge = m_vertices[i2] - m_vertices[i1];
 		b2Assert(edge.LengthSquared() > b2_epsilon * b2_epsilon);
 		m_normals[i] = b2Cross(edge, 1.0f);
@@ -237,7 +140,31 @@ void b2PolygonShape::Set(const b2Vec2* vertices, int32 count)
 	}
 
 	// Compute the polygon centroid.
-	m_centroid = ComputeCentroid(m_vertices, m);
+	m_centroid = ComputeCentroid(m_vertices, n);
+}
+
+void b2PolygonShape::Set(const b2Vec2* vertices, const int32 n)
+{
+	b2Assert(3 <= n && n <= b2_maxPolygonVertices);
+	m_count = n;
+
+	for (int32 i = 0; i < n; ++i) {
+		m_vertices[i] = vertices[i];
+	}
+
+	// Compute normals. Ensure the edges have non-zero length.
+	for (int32 i = 0; i < n; ++i)
+	{
+		int32 i1 = i;
+		int32 i2 = i + 1 < n ? i + 1 : 0;
+		b2Vec2 edge = m_vertices[i2] - m_vertices[i1];
+		b2Assert(edge.LengthSquared() > b2_epsilon * b2_epsilon);
+		m_normals[i] = b2Cross(edge, 1.0f);
+		m_normals[i].Normalize();
+	}
+
+	// Compute the polygon centroid.
+	m_centroid = ComputeCentroid(m_vertices, n);
 }
 
 bool b2PolygonShape::TestPoint(const b2Transform& xf, const b2Vec2& p) const

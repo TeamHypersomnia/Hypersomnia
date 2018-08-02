@@ -20,6 +20,7 @@
 #define B2_POLYGON_SHAPE_H
 
 #include <Box2D/Collision/Shapes/b2Shape.h>
+#include "augs/math/declare_math.h"
 
 /// A convex polygon. It is assumed that the interior of the polygon is to
 /// the left of each edge.
@@ -42,6 +43,7 @@ public:
 	/// @warning collinear points are handled but not removed. Collinear points
 	/// may lead to poor stacking behavior.
 	void Set(const b2Vec2* points, int32 count);
+	void Set(const vec2* points, int32 count);
 
 	/// Build vertices to represent an axis-aligned box centered on the local origin.
 	/// @param hx the half-width.
