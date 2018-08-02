@@ -61,6 +61,7 @@ struct character_gui {
 
 	vec2 initial_inventory_root_position(const vec2i screen_size) const;
 
+	void save_setup(const hotbar_selection_setup);
 	void push_setup(const hotbar_selection_setup);
 
 	const hotbar_selection_setup& get_current_hotbar_selection_setup() const;

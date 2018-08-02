@@ -61,8 +61,8 @@ wielding_result inventory_mixin<E>::make_wielding_transfers_for(hand_selections_
 
 	if (auto move_to_secondary_and_draw = 
 		is_akimbo(cosmos, selections)
-		&& self.get_hand_no(0).get_item_if_any() == selections[1]
-		&& !self.get_hand_no(1).has_items() 
+		&& first_held == selections[1]
+		&& second_held == entity_id()
 	) {
 		result.transfers.push_back(item_slot_transfer_request::standard(
 			self.get_hand_no(0).get_item_if_any(), 
@@ -82,10 +82,11 @@ wielding_result inventory_mixin<E>::make_wielding_transfers_for(hand_selections_
 	augs::constant_size_vector<item_slot_transfer_request, hand_count> holsters;
 	augs::constant_size_vector<item_slot_transfer_request, hand_count> draws;
 
+	std::size_t si = 0;
 	for (std::size_t i = 0; i < selections.size(); ++i) {
 		const auto hand = self.get_hand_no(i);
 
-		const auto item_for_hand = cosmos[selections[i]];
+		const auto item_for_hand = cosmos[selections[si]];
 		const auto item_in_hand = hand.get_item_if_any();
 
 		const bool identical_outcome =
@@ -94,22 +95,28 @@ wielding_result inventory_mixin<E>::make_wielding_transfers_for(hand_selections_
 		;
 
 		if (identical_outcome) {
+			++si;
 			continue;
 		}
+
+		auto insert_for_hand = [&]() {
+			if (item_for_hand.alive()) {
+				draws.push_back(item_slot_transfer_request::standard(item_for_hand, hand));
+			}
+
+			++si;
+		};
 
 		if (item_in_hand.alive()) {
 			const auto holstering_slot = self.determine_holstering_slot_for(item_in_hand);
 
-			if (holstering_slot.dead()) {
-				result.result = wielding_result::type::NO_SPACE_FOR_HOLSTER;
-				break;
+			if (holstering_slot.alive()) {
+				holsters.push_back(item_slot_transfer_request::standard(item_in_hand, holstering_slot));
+				insert_for_hand();
 			}
-
-			holsters.push_back(item_slot_transfer_request::standard(item_in_hand, holstering_slot));
 		}
-
-		if (item_for_hand.alive()) {
-			draws.push_back(item_slot_transfer_request::standard(item_for_hand, hand));
+		else {
+			insert_for_hand();
 		}
 
 		result.result = wielding_result::type::SUCCESSFUL;

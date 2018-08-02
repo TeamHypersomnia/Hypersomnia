@@ -263,7 +263,11 @@ void game_gui_system::control_hotbar_and_action_button(
 							hotbar_button_index
 						);
 
-						if (new_setup == gui.get_actual_selection_setup(gui_entity)) {
+						const auto actual_setup = gui.get_actual_selection_setup(gui_entity);
+
+						gui.save_setup(actual_setup);
+
+						if (new_setup == actual_setup) {
 							auto& ar = new_setup.hand_selections;
 							std::swap(ar[0], ar[1]);
 						}

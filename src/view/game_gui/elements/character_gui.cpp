@@ -245,6 +245,10 @@ wielding_result character_gui::make_wielding_transfers_for_previous_hotbar_selec
 	}
 }
 
+void character_gui::save_setup(const hotbar_selection_setup now_actual_setup) {
+	last_setups[current_hotbar_selection_setup_index] = now_actual_setup;
+}
+
 void character_gui::push_setup(const hotbar_selection_setup new_setup) {
 	auto& current = current_hotbar_selection_setup_index;
 	current = 1 - current;
@@ -265,6 +269,7 @@ wielding_result character_gui::make_and_push_hotbar_selection_setup(
 		out = make_wielding_transfers_for(new_setup, gui_entity);
 
 		if (out.successful()) {
+			//save_setup(get_actual_selection_setup(gui_entity));
 			push_setup(new_setup);
 		}
 	}
