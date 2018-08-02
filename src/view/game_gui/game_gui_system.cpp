@@ -21,6 +21,9 @@
 #include "view/game_gui/elements/slot_button.h"
 #include "view/game_gui/elements/item_button.h"
 
+#include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
+#include "game/detail/entity_handle_mixins/make_wielding_transfers.hpp"
+
 static int to_hotbar_index(const game_gui_intent_type type) {
 	switch (type) {
 	case game_gui_intent_type::HOTBAR_BUTTON_0: return 0;
@@ -255,12 +258,19 @@ void game_gui_system::control_hotbar_and_action_button(
 						gui.push_new_setup_when_index_released = -1;
 					}
 					else {
-						const auto setup = gui.get_setup_from_button_indices(
+						auto new_setup = gui.get_setup_from_button_indices(
 							gui_entity, 
 							hotbar_button_index
 						);
 
-						queue_transfers(gui.make_wielding_transfers_for(setup, gui_entity));
+						if (new_setup == gui.get_actual_selection_setup(gui_entity)) {
+							auto& ar = new_setup.hand_selections;
+							std::swap(ar[0], ar[1]);
+						}
+
+						queue_transfers(gui.make_wielding_transfers_for(new_setup, gui_entity));
+
+						gui.push_new_setup = new_setup;
 						gui.push_new_setup_when_index_released = hotbar_button_index;
 					}
 
@@ -272,9 +282,7 @@ void game_gui_system::control_hotbar_and_action_button(
 					}
 				
 					if (hotbar_button_index == gui.push_new_setup_when_index_released) {
-						const auto setup = gui.get_setup_from_button_indices(gui_entity, hotbar_button_index);
-						gui.push_setup(setup);
-				
+						gui.push_setup(gui.push_new_setup);
 						gui.push_new_setup_when_index_released = -1;
 					}
 				}
@@ -394,10 +402,41 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 	const auto& cosmos = step.get_cosmos();
 
 	for (const auto& pickup : step.get_queue<messages::item_picked_up_message>()) {
-		get_character_gui(pickup.subject).assign_item_to_first_free_hotbar_button(
-			cosmos[pickup.subject],
-			cosmos[pickup.item]
-		);
+		const auto picked_item = cosmos[pickup.item];
+		auto& gui = get_character_gui(pickup.subject);
+
+		auto add = [&](const auto handle) {
+			gui.assign_item_to_first_free_hotbar_button(
+				cosmos[pickup.subject],
+				handle
+			);
+		};
+
+		add(picked_item);
+
+		auto should_recurse = [](const auto item_entity) {
+			const auto& item = item_entity.template get<invariants::item>();
+
+			if (item.categories_for_slot_compatibility.test(item_category::SHOULDER_WEARABLE)) {
+				return true;
+			}
+
+			return false;
+		};
+
+		if (should_recurse(picked_item)) {
+			picked_item.for_each_contained_item_recursive(
+				[&add, should_recurse](const auto child_item) {
+					add(child_item);
+
+					if (should_recurse(child_item)) {
+						return recursive_callback_result::CONTINUE_AND_RECURSE;
+					}
+
+					return recursive_callback_result::CONTINUE_DONT_RECURSE;
+				}
+			);
+		}
 	}
 }
 

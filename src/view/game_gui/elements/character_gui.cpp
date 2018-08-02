@@ -38,6 +38,7 @@
 #include "augs/templates/get_by_dynamic_id.h"
 #include "game/detail/inventory/wielding_result.h"
 #include "game/detail/spells/spell_structs.h"
+#include "game/detail/entity_handle_mixins/make_wielding_transfers.hpp"
 
 using namespace augs;
 using namespace augs::gui;
@@ -184,7 +185,6 @@ wielding_result character_gui::make_wielding_transfers_for(
 	ensure_eq(new_setup, actually_available_setup);
 
 	const auto result = gui_entity.make_wielding_transfers_for(new_setup.hand_selections);
-	LOG_NVPS(result.transfers.size());
 	return result;
 }
 

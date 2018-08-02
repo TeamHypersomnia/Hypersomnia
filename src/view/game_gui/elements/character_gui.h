@@ -41,6 +41,7 @@ struct character_gui {
 	hotbar_selection_setup last_setups[2];
 	int currently_held_hotbar_button_index = -1;
 	int push_new_setup_when_index_released = -1;
+	hotbar_selection_setup push_new_setup;
 
 	unsigned current_hotbar_selection_setup_index = 0;
 	bool is_gui_look_enabled = false;

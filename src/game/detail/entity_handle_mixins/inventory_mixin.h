@@ -92,8 +92,7 @@ public:
 
 	inventory_item_address get_address_from_root(const entity_id until = entity_id()) const;
 
-	wielding_result make_wielding_transfers_for(const hand_selections_array) const;
-
+	wielding_result make_wielding_transfers_for(hand_selections_array) const;
 	wielding_result swap_wielded_items() const;
 
 private:
