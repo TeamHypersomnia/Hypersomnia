@@ -226,23 +226,21 @@ void game_gui_system::control_hotbar_and_action_button(
 	{
 		const auto& i = intent;
 
-		const auto hotbar_button_index = to_hotbar_index(i.intent);
-		const auto special_action_index = to_special_action_index(i.intent);
-
-		if (hotbar_button_index >= 0 && static_cast<std::size_t>(hotbar_button_index) < gui.hotbar_buttons.size()) {
+		if (const auto hotbar_button_index = to_hotbar_index(i.intent);
+			hotbar_button_index >= 0 && 
+			static_cast<std::size_t>(hotbar_button_index) < gui.hotbar_buttons.size()
+		) {
 			auto& currently_held_index = gui.currently_held_hotbar_button_index;
 
-			const bool clear_currently_held_index_because_nothing_is_assigned_already =
-				currently_held_index > -1 && gui.hotbar_buttons[currently_held_index].get_assigned_entity(gui_entity).dead()
-			;
-
-			if (clear_currently_held_index_because_nothing_is_assigned_already) {
-				currently_held_index = -1;
+			if (gui.hotbar_buttons[currently_held_index].get_assigned_entity(gui_entity).dead()) {
+				if (currently_held_index > -1) {
+					/* Clear currently held index because nothing is assigned already */
+					currently_held_index = -1;
+				}
 			}
 
-			const bool is_anything_assigned_to_that_button = gui.hotbar_buttons[hotbar_button_index].get_assigned_entity(gui_entity).alive();
-
-			if (is_anything_assigned_to_that_button) {
+			if (gui.hotbar_buttons[hotbar_button_index].get_assigned_entity(gui_entity)) {
+				/* Something is assigned to that button */
 				if (i.was_pressed()) {
 					const bool should_dual_wield = currently_held_index > -1;
 
@@ -282,7 +280,11 @@ void game_gui_system::control_hotbar_and_action_button(
 				}
 			}
 		}
-		else if (special_action_index >= 0 && static_cast<std::size_t>(special_action_index) < gui.action_buttons.size()) {
+		else if (
+			const auto special_action_index = to_special_action_index(i.intent);
+			special_action_index >= 0 && 
+			static_cast<std::size_t>(special_action_index) < gui.action_buttons.size()
+		) {
 			auto& action_b = gui.action_buttons[special_action_index];
 			action_b.detector.update_appearance(i.was_pressed() ? gui_event::ldown : gui_event::lup);
 

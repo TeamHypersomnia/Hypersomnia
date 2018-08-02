@@ -693,7 +693,7 @@ int work(const int argc, const char* const * const argv) try {
 			all_visible.clear_dead_entities(*now_sampled);
 
 			/* TODO: We need to have one game gui per cosmos. */
-			game_gui.clear_dead_entities(*now_sampled);
+			game_gui = {};//clear_dead_entities(*now_sampled);
 
 			last_sampled_cosmos = now_sampled;
 			audiovisual_step(augs::delta::zero, 0.0, viewing_config);

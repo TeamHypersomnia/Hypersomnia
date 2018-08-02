@@ -130,7 +130,6 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 				const auto subject = cosmos[r.subject];
 
 				if (subject.has<components::item_slot_transfers>()) {
-					LOG_NVPS(requested_index);
 					if (const auto item_inside = subject.map_acted_hand_item(requested_index)) {
 						perform_transfer(item_slot_transfer_request::drop(item_inside), step);
 					}
