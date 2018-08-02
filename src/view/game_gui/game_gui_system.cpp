@@ -402,6 +402,19 @@ void game_gui_system::rebuild_layouts(
 	world.rebuild_layouts(context);
 }
 
+template <class E>
+bool should_fill_hotbar_from_right(const E& handle) {
+	const auto& item = handle.template get<invariants::item>();
+
+	if (item.categories_for_slot_compatibility.test(item_category::SHOULDER_WEARABLE)) {
+		if (!handle.template has<invariants::explosive>()) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void game_gui_system::standard_post_solve(const const_logic_step step) {
 	const auto& cosmos = step.get_cosmos();
 
@@ -412,7 +425,8 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 		auto add = [&](const auto handle) {
 			gui.assign_item_to_first_free_hotbar_button(
 				cosmos[pickup.subject],
-				handle
+				handle,
+				should_fill_hotbar_from_right(handle)
 			);
 		};
 

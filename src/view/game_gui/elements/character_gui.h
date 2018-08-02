@@ -94,8 +94,9 @@ struct character_gui {
 	);
 
 	void assign_item_to_first_free_hotbar_button(
-		const const_entity_handle gui_entity,
-		const const_entity_handle item_entity
+		const_entity_handle gui_entity,
+		const_entity_handle item_entity,
+		bool from_the_right
 	);
 
 	wielding_result make_and_push_hotbar_selection_setup(

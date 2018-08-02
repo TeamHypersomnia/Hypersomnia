@@ -141,7 +141,8 @@ void character_gui::assign_item_to_hotbar_button(
 
 void character_gui::assign_item_to_first_free_hotbar_button(
 	const const_entity_handle gui_entity,
-	const const_entity_handle item_entity
+	const const_entity_handle item_entity,
+	const bool from_the_right
 ) {
 	/* const auto categories = item_entity.get<invariants::item>().categories_for_slot_compatibility; */
 
@@ -157,9 +158,18 @@ void character_gui::assign_item_to_first_free_hotbar_button(
 		return false;
 	};
 
-	for (size_t i = 0; i < hotbar_buttons.size(); ++i) {
-		if (try_assign(i)) {
-			return;
+	if (from_the_right) {
+		for (int i = hotbar_buttons.size() - 1; i >= 0; --i) {
+			if (try_assign(i)) {
+				return;
+			}
+		}
+	}
+	else {
+		for (size_t i = 0; i < hotbar_buttons.size(); ++i) {
+			if (try_assign(i)) {
+				return;
+			}
 		}
 	}
 }
