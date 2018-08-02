@@ -373,6 +373,10 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 			if (total_recoil != 0.f) {
 #if ENABLE_RECOIL
+				if (sentience && sentience->use_button == use_button_state::DEFUSING) {
+					total_recoil *= 1.5f;
+				}
+
 				if (const auto* const recoil_player = logicals.find(gun_def.recoil.id)) {
 					if (sentience) {
 						const auto recoil_value = gun.recoil.shoot_and_get_impulse(gun_def.recoil, *recoil_player);
