@@ -32,18 +32,13 @@ void physics_engine_transforms::set(
 }
 
 void physics_engine_transforms::set(const transformr& t) {
-	const auto pos = t.pos;
-	const auto rotation = t.rotation;
-
-	m_xf.p.x = pos.x;
-	m_xf.p.y = pos.y;
-	m_xf.q.Set(rotation);
+	m_xf = t.operator b2Transform();
 
 	m_sweep.localCenter.SetZero();
 	m_sweep.c0 = m_xf.p;
 	m_sweep.c = m_xf.p;
-	m_sweep.a0 = rotation;
-	m_sweep.a = rotation;
+	m_sweep.a0 = t.rotation;
+	m_sweep.a = t.rotation;
 	m_sweep.alpha0 = 0.0f;
 }
 

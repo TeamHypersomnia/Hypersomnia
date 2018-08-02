@@ -6,6 +6,9 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Optionally, make the bomb non-pickupable by other factions
+	- For now just set infinite space occupied and don't iterate recursively to check if the item is forbidden
+
 - refactor: stepped_clock
 	- has delta + now
 	- passed everywhere where now and dt are required

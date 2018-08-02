@@ -6,7 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Improve indicator experience, hide it as soon as it touches c4?
 - Fix defusing logic
 	- Use button logic will need some improvement 
 	- Use button should be queried continuously
@@ -25,9 +24,6 @@ summary: That which we are brainstorming at the moment.
 				- Why would we respond to pre-solves there anyway?
 		- Set use button to true inside sentience and perform some general logic upon it in sentience system, all in one place
 			- Prioritize bombs, obviously 
-
-- Make the bomb non-pickupable by other factions
-	- For now just set infinite space occupied and don't iterate recursively to check if the item is forbidden
 
 - Implement bomb-bombsite overlap test
 

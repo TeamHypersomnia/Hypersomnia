@@ -22,11 +22,9 @@ auto for_each_fixture(const E& handle, F callback) -> decltype(callback(std::dec
 inline auto shape_overlaps_fixture(
 	const b2Shape* const shape,
 	const si_scaling si,
-	const vec2 shape_pos,
+	const transformr shape_transform,
 	const b2Fixture& fixture
 ) -> std::optional<b2TestOverlapOutput> {
-	const auto queried_shape_transform = b2Transform(b2Vec2(si.get_meters(shape_pos)), b2Rot(0.f));
-
 	constexpr auto index_a = 0;
 	constexpr auto index_b = 0;
 
@@ -35,7 +33,7 @@ inline auto shape_overlaps_fixture(
 		index_a,
 		fixture.GetShape(),
 		index_b,
-		queried_shape_transform,
+		shape_transform.to<b2Transform>(si),
 		fixture.GetBody()->GetTransform()
 	); result.overlap) {
 		return result;
@@ -47,7 +45,7 @@ inline auto shape_overlaps_fixture(
 template <class E>
 auto shape_overlaps_entity(
 	const b2Shape* const shape,
-	const vec2 shape_pos,
+	const transformr shape_transform,
 	const E& handle
 ) {
 	const auto si = handle.get_cosmos().get_si();
@@ -56,7 +54,7 @@ auto shape_overlaps_entity(
 		if (const auto result = shape_overlaps_fixture(
 			shape,
 			si,
-			shape_pos,
+			shape_transform,
 			fixture
 		); result->overlap) {
 			return result;
@@ -66,9 +64,48 @@ auto shape_overlaps_entity(
 	});
 }
 
+template <class A, class F>
+auto on_shape_representation(
+	const A& shapized_entity,
+	F&& callback
+) {
+	if constexpr(A::template has<invariants::box_marker>()) {
+		const auto& b = shapized_entity.get_logical_size(); 
+		b2PolygonShape shape;
+		shape.SetAsBox(b.x / 2, b.y / 2);
+		return callback(shape);
+	}
+
+	return callback(std::nullopt);
+}
+
+template <class A, class B>
+auto entity_overlaps_entity(
+	const A& shapized_entity,
+	const B& queried_entity
+) -> std::optional<b2TestOverlapOutput> {
+	const auto shape_transform = shapized_entity.get_logic_transform();
+
+	if (shapized_entity.template has<invariants::fixtures>()) {
+		/* TODO */
+	}
+	else {
+		return on_shape_representation(shapized_entity, [&](const auto& shape) -> std::optional<b2TestOverlapOutput> {
+			if constexpr(std::is_same_v<decltype(shape), const std::nullopt_t&>) {
+				return std::nullopt;
+			}
+			else {
+				return shape_overlaps_entity(std::addressof(shape), shape_transform, queried_entity);
+			}
+		});
+	}
+
+	return std::nullopt;
+}
+
 template <class E>
 auto circular_sector_overlaps_entity(
-	const vec2 shape_pos,
+	const transformr shape_transform,
 	const real32 radius,
 	const real32 sector_angle,
 	const real32 sector_spread_degrees,
@@ -82,7 +119,7 @@ auto circular_sector_overlaps_entity(
 
 		if (const auto result = shape_overlaps_entity(
 			&shape,
-			shape_pos,
+			shape_transform,
 			handle
 		); result == std::nullopt) {
 			return std::nullopt;
@@ -125,7 +162,7 @@ auto circular_sector_overlaps_entity(
 
 	if (const auto result = shape_overlaps_entity(
 		&shape,
-		shape_pos,
+		shape_transform,
 		handle
 	); result && result->overlap) {
 		return result;

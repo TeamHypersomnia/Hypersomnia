@@ -4,6 +4,8 @@
 #include "augs/math/vec2.h"
 #include "augs/math/si_scaling.h"
 
+struct b2Transform;
+
 template <class T>
 struct basic_transform {
 	using transform = basic_transform<T>;
@@ -26,6 +28,26 @@ struct basic_transform {
 		pos(pos),
 		rotation(rotation)
 	{}
+
+	template <class V, class = std::enable_if_t<std::is_same_v<V, b2Transform>>>
+	explicit operator V() const {
+		if constexpr(std::is_same_v<V, b2Transform>) {
+			V t;
+			t.p.x = pos.x;
+			t.p.y = pos.y;
+			t.q.Set(rotation);
+			return t;
+		}
+		else {
+			static_assert(always_false_v<V>);
+		}
+	}
+
+	template <class V>
+	auto to(const si_scaling si) const {
+		auto si_space = to_si_space(si);
+		return si_space.operator V();
+	}
 
 	transform operator*(const transform& offset) const {
 		return {

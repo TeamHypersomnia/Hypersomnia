@@ -234,6 +234,15 @@ public:
 	}
 
 	template <class... List, class F>
+	decltype(auto) dispatch_on_having_all_ret(F&& callback) const {
+		return this->conditional_dispatch_ret<entity_types_having_all_of<List...>>(
+			[&](const auto& typed_handle) -> decltype(auto) {
+				return callback(typed_handle);
+			}
+		);
+	}
+
+	template <class... List, class F>
 	void dispatch_on_having_all(F&& callback) const {
 		this->conditional_dispatch_ret<entity_types_having_all_of<List...>>(
 			[&](const auto& typed_handle) {
