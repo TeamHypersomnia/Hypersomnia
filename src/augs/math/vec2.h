@@ -132,6 +132,17 @@ struct basic_vec2 {
 		return start + proj_mult * segment;
 	}
 
+	auto closest_point_on_line(const basic_vec2 start, const basic_vec2 end) const {
+		const auto segment = end - start;
+		const auto proj_mult = ((*this) - start).dot(segment) / segment.length_sq();
+
+		return start + proj_mult * segment;
+	}
+
+	auto closest_point_on_line(const segment_type s) const {
+		return closest_point_on_line(s[0], s[1]);
+	}
+
 	auto closest_point_on_segment(const basic_vec2 start, const basic_vec2 end) const {
 		const auto segment = end - start;
 		const auto proj_mult = ((*this) - start).dot(segment) / segment.length_sq();
