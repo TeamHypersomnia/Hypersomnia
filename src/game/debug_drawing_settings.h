@@ -44,3 +44,9 @@ extern debug_drawing_settings DEBUG_DRAWING;
 extern std::vector<debug_line> DEBUG_LOGIC_STEP_LINES;
 extern std::vector<debug_line> DEBUG_PERSISTENT_LINES;
 extern std::vector<debug_line> DEBUG_FRAME_LINES;
+
+class b2PolygonShape;
+struct si_scaling;
+
+void debug_draw_shape(std::vector<debug_line>&, rgba, const b2PolygonShape&, vec2 pos, si_scaling);
+void debug_draw_shape(std::vector<debug_line>&, rgba, const b2PolygonShape&, vec2 pos);
