@@ -1,6 +1,8 @@
 #pragma once
 
 struct b2Vec2;
+class b2PolygonShape;
+class b2CircleShape;
 
 struct si_scaling {
 	// GEN INTROSPECTOR struct si_scaling
@@ -12,28 +14,40 @@ struct si_scaling {
 	}
 
 	template <class T>
-	auto get_meters(const T pixels) const {
+	auto get_meters(T r) const {
 		if constexpr(std::is_same_v<T, b2Vec2>) {
-			auto r = pixels;
 			r.x /= to_pixels_multiplier;
 			r.y /= to_pixels_multiplier;
 			return r;
 		}
+		else if constexpr(std::is_same_v<T, b2PolygonShape>) {
+			for (int i = 0; i < r.GetVertexCount(); ++i) {
+				r.m_vertices[i] /= to_pixels_multiplier;
+			}
+
+			return r;
+		}
 		else {
-			return pixels / to_pixels_multiplier;
+			return r / to_pixels_multiplier;
 		}
 	}
 
 	template <class T>
-	auto get_pixels(const T meters) const {
+	auto get_pixels(T r) const {
 		if constexpr(std::is_same_v<T, b2Vec2>) {
-			auto r = meters;
 			r.x *= to_pixels_multiplier;
 			r.y *= to_pixels_multiplier;
 			return r;
 		}
+		else if constexpr(std::is_same_v<T, b2PolygonShape>) {
+			for (int i = 0; i < r.GetVertexCount(); ++i) {
+				r.m_vertices[i] *= to_pixels_multiplier;
+			}
+
+			return r;
+		}
 		else {
-			return meters * to_pixels_multiplier;
+			return r * to_pixels_multiplier;
 		}
 	}
 };
