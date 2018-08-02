@@ -42,6 +42,12 @@ struct camera_cone {
 		screen_size(screen_size)
 	{}
 
+	template <class E>
+	static auto from_aabb(const E& handle) {
+		const auto tr = handle.get_logic_transform();
+		return camera_cone(camera_eye(tr.pos, 1.f), handle.get_aabb(tr).get_size());
+	}
+
 	vec2_type to_screen_space(const vec2_type world_pos) const {
 		// TODO: support rotation
 		return eye.zoom * (world_pos - eye.transform.pos) + screen_size / 2;

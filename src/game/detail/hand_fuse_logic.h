@@ -7,6 +7,7 @@
 #include "game/messages/start_sound_effect.h"
 #include "game/detail/visible_entities.h"
 #include "game/detail/physics/shape_overlapping.hpp"
+#include "game/detail/bombsite_in_range.h"
 
 template <class E>
 struct fuse_logic_provider {
@@ -234,6 +235,10 @@ struct fuse_logic_provider {
 		fuse.when_started_defusing = {};
 	}
 
+	bool bombsite_in_range() const {
+		return ::bombsite_in_range(fused_entity);
+	}
+
 	bool arming_conditions_fulfilled() const {
 		if (holder.dead()) {
 			return false;
@@ -245,38 +250,8 @@ struct fuse_logic_provider {
 			}
 		}
 
-		if (fuse_def.can_only_arm_at_bombsites) {
-			auto& entities = thread_local_visible_entities();
-
-			entities.reacquire_all_and_sort({
-				cosm,
-				camera_cone(camera_eye(fused_transform, 1.f), fused_entity.get_aabb().get_size()),
-				visible_entities_query::accuracy_type::PROXIMATE,
-				render_layer_filter::whitelist(render_layer::AREA_MARKERS),
-				{ { tree_of_npo_type::RENDERABLES } }
-			});
-
-			bool found = false;
-
-			entities.for_each<render_layer::AREA_MARKERS>(cosm, [&](const auto& handle) {
-				return handle.template dispatch_on_having_all_ret<invariants::box_marker>([&](const auto& typed_handle) {
-					if constexpr(std::is_same_v<decltype(typed_handle), const std::nullopt_t&>) {
-						return callback_result::CONTINUE;
-					}
-					else {
-						if (entity_overlaps_entity(typed_handle, fused_entity)) {
-							found = true;
-							return callback_result::ABORT;
-						}
-
-						return callback_result::CONTINUE;
-					}
-				});
-			});
-
-			if (!found) {
-				return false;
-			}
+		if (!bombsite_in_range()) {
+			return false;
 		}
 
 		return true;

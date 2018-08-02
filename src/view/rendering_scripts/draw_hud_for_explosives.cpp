@@ -10,6 +10,7 @@
 #include "game/components/fixtures_component.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "game/detail/hand_fuse_math.h"
+#include "game/detail/bombsite_in_range.h"
 
 void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 	const auto dt = in.cosm.get_fixed_delta();
@@ -53,6 +54,14 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 
 			if (t == circular_bar_type::MEDIUM && fuse_def.has_delayed_arming()) {
 				if (fuse.arming_requested) {
+					auto first_col = white;
+					auto second_col = red_violet;
+
+					if (!::bombsite_in_range(it)) {
+						first_col = red;
+						second_col = red;
+					}
+
 					const auto when_started_arming = 
 						fuse.when_started_arming.was_set() ? 
 						fuse.when_started_arming.in_seconds(dt) :
@@ -64,7 +73,7 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 						/ (fuse_def.arming_duration_ms / 1000.f) 
 					);
 
-					draw_circle(highlight_amount, white, red_violet);
+					draw_circle(highlight_amount, first_col, second_col);
 				}
 			}
 
