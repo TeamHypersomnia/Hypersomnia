@@ -302,14 +302,15 @@ void illuminated_rendering(
 	if (viewed_character) {
 		if (const auto sentience = viewed_character.find<components::sentience>()) {
 			if (const auto sentience_def = viewed_character.find<invariants::sentience>()) {
-				if (sentience->use_button == use_button_state::QUERYING) {
+				if (sentience->use_button != use_button_state::IDLE) {
 					if (const auto tr = viewed_character.find_viewing_transform(interp)) {
 						const auto& a = sentience_def->use_button_angle;
 						const auto& r = sentience_def->use_button_radius;
 
-						auto col = gray;
+						const bool is_querying = sentience->use_button == use_button_state::QUERYING;
+						auto col = is_querying ? gray : rgba(255, 0, 0, 180);
 
-						if (sentience->last_use_result == use_button_query_result::IN_RANGE_BUT_CANT) {
+						if (is_querying && sentience->last_use_result == use_button_query_result::IN_RANGE_BUT_CANT) {
 							col = green;
 						}
 
