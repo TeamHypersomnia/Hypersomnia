@@ -1,5 +1,6 @@
 #pragma once
 #include "game/cosmos/entity_handle.h"
+#include "game/detail/physics/shape_helpers.h"
 
 template <class E, class F>
 auto for_each_fixture(const E& handle, F callback) -> decltype(callback(std::declval<b2Fixture&>())) {
@@ -92,18 +93,35 @@ auto circular_sector_overlaps_entity(
 	const auto& a = sector_spread_degrees;
 	const auto& r = radius;
 
-	b2Vec2 v[4];
-	v[0] = b2Vec2();
-	v[1] = b2Vec2(r * vec2::from_degrees(rot - a / 2));
-	v[2] = b2Vec2(r * vec2::from_degrees(rot));
-	v[3] = b2Vec2(r * vec2::from_degrees(rot + a / 2));
+	const auto sector_dir = vec2::from_degrees(rot);
+	const auto sector_tip = sector_dir * r;
 
-	for (auto& vv : v) {
-		vv = si.get_meters(vv);
-	}
+	const auto tangent = vec2::segment_type {
+		sector_tip,
+		sector_tip + sector_tip.perpendicular_cw()
+	};
 
-	b2PolygonShape shape;
-	shape.Set(v, 4);
+	const auto left_edge_off = r * vec2::from_degrees(rot - a / 2);
+	const auto right_edge_off = r * vec2::from_degrees(rot + a / 2);
+
+	const auto over_left_edge = left_edge_off.closest_point_on_line(tangent);
+	const auto over_right_edge = right_edge_off.closest_point_on_line(tangent);
+
+	std::array<vec2, 5> v;
+
+	v[0] = b2Vec2(0.f, 0.f);
+	v[1] = b2Vec2(left_edge_off);
+	v[2] = b2Vec2(over_left_edge);
+	v[3] = b2Vec2(over_right_edge);
+	v[4] = b2Vec2(right_edge_off);
+
+#if 0
+	debug_draw_verts(DEBUG_LOGIC_STEP_LINES, white, v, shape_pos);
+	debug_draw_verts(DEBUG_LOGIC_STEP_LINES, cyan, tangent, shape_pos);
+	debug_draw_verts(DEBUG_LOGIC_STEP_LINES, red, vec2::segment_type{ vec2::zero, sector_tip }, shape_pos);
+#endif
+
+	const auto shape = to_polygon_shape(v, si);
 
 	if (const auto result = shape_overlaps_entity(
 		&shape,
@@ -131,10 +149,8 @@ auto use_button_overlaps(
 		sentience_def.use_button_angle,
 		other
 	)) {
-		LOG("OVERLAPS");
 		return result;
 	}
-	LOG("NOT OVERLAPS");
 
 	return std::nullopt;
 }

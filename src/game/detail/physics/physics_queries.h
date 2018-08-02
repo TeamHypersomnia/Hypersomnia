@@ -14,6 +14,8 @@
 
 #include "game/detail/physics/physics_queries_declaration.h"
 
+#include "game/detail/physics/shape_helpers.h"
+
 template <class F>
 void for_each_in_aabb_meters(
 	const b2World& b2world,
@@ -141,15 +143,7 @@ void for_each_intersection_with_triangle(
 	F callback
 ) {
 	const b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
-	b2PolygonShape poly_shape;
-
-	std::array<b2Vec2, 3> verts;
-
-	verts[0] = b2Vec2(si.get_meters(vertices[0]));
-	verts[1] = b2Vec2(si.get_meters(vertices[1]));
-	verts[2] = b2Vec2(si.get_meters(vertices[2]));
-
-	poly_shape.Set(verts.data(), static_cast<int32>(verts.size()));
+	auto poly_shape = to_polygon_shape(vertices, si);
 
 	for_each_intersection_with_shape_meters(
 		b2world,
@@ -169,34 +163,36 @@ void for_each_intersection_with_polygon(
 	const b2Filter filter,
 	F callback
 ) {
-	const auto count = static_cast<unsigned>(vertices.size());
-	b2Assert(3 <= count && count <= b2_maxPolygonVertices);
+	const auto n = static_cast<unsigned>(vertices.size());
 	
-	b2PolygonShape poly_shape;
+	const auto average_meters = [&]() {
+		auto result = decltype(vertices[0]){};
 
-	auto average = decltype(vertices[0]){};
+		for (const auto& v : vertices) {
+			result += v;
+		}
 
-	for (const auto& v : vertices) {
-		average += v;
-	}
+		result /= n;
+		return si.get_meters(result);
+	}();
 
-	average /= count;
+	const auto poly_shape = [&]() {
+		b2PolygonShape poly_shape;
 
-	const auto average_meters = si.get_meters(average);
+		decltype(poly_shape.m_vertices) verts;
 
-	decltype(poly_shape.m_vertices) verts;
+		for (std::size_t i = 0; i < n; ++i) {
+			const auto meters = si.get_meters(vertices[i]);
 
-	for (std::size_t i = 0; i < count; ++i) {
-		const auto v = vertices[i];
-		const auto meters = si.get_meters(v);
+			verts[i] = b2Vec2(meters - average_meters);
+		}
+		
+		poly_shape.Set(verts, n);
+		return poly_shape;
+	}();
 
-		verts[i] = b2Vec2(meters - average_meters);
-	}
-	
 	const auto queried_transform = b2Transform(b2Vec2(average_meters), b2Rot(0.f));
 
-	poly_shape.Set(verts, count);
-	
 	for_each_intersection_with_shape_meters(
 		b2world,
 		si,
