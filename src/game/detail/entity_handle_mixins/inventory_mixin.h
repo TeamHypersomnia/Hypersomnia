@@ -78,8 +78,11 @@ public:
 	inventory_slot_handle_type get_primary_hand() const;
 	inventory_slot_handle_type get_secondary_hand() const;
 
-	inventory_slot_handle_type get_hand_no(const size_t) const;
-	generic_handle_type get_if_any_item_in_hand_no(const size_t) const;
+	inventory_slot_handle_type get_hand_no(std::size_t) const;
+	generic_handle_type get_if_any_item_in_hand_no(std::size_t) const;
+	generic_handle_type map_acted_hand_item(std::size_t requested_index) const;
+	std::size_t map_acted_hand_index(const std::size_t requested_index) const;
+	bool only_secondary_holds_item() const;
 
 	template <class F>
 	void for_each_hand(F callback) const;

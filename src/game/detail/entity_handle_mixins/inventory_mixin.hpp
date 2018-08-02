@@ -83,7 +83,7 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::get_
 }
 
 template <class E>
-typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::get_hand_no(const size_t index) const {
+typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::get_hand_no(const std::size_t index) const {
 	const auto& self = *static_cast<const E*>(this);
 
 	if (index == 0) {
@@ -99,7 +99,7 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::get_
 }
 
 template <class E>
-typename inventory_mixin<E>::generic_handle_type inventory_mixin<E>::get_if_any_item_in_hand_no(const size_t index) const {
+typename inventory_mixin<E>::generic_handle_type inventory_mixin<E>::get_if_any_item_in_hand_no(const std::size_t index) const {
 	const auto& self = *static_cast<const E*>(this);
 	const auto hand = self.get_hand_no(index);
 
@@ -110,6 +110,50 @@ typename inventory_mixin<E>::generic_handle_type inventory_mixin<E>::get_if_any_
 	}
 
 	return self.get_cosmos()[item];
+}
+
+template <class E>
+std::size_t inventory_mixin<E>::map_acted_hand_index(const std::size_t requested_index) const {
+	const auto& self = *static_cast<const E*>(this);
+
+	const auto in_primary = self.get_if_any_item_in_hand_no(0);
+	const auto in_secondary = self.get_if_any_item_in_hand_no(1);
+
+	if (in_primary.alive() && in_secondary.alive()) {
+		if (requested_index != static_cast<std::size_t>(-1)) {
+			return requested_index;
+		}
+	}
+	else if (in_primary.alive()) {
+		if (requested_index == 0) {
+			return 0;
+		}
+	}
+	else if (in_secondary.alive()) {
+		if (requested_index == 0) {
+			return 1;
+		}
+	}
+
+	return static_cast<std::size_t>(-1);
+}
+
+template <class E>
+typename inventory_mixin<E>::generic_handle_type inventory_mixin<E>::map_acted_hand_item(const std::size_t requested_index) const {
+	const auto& self = *static_cast<const E*>(this);
+	const auto idx = self.map_acted_hand_index(requested_index);
+
+	if (idx != static_cast<std::size_t>(-1)) {
+		return self.get_if_any_item_in_hand_no(idx);
+	}
+
+	return self.get_cosmos()[entity_id()];
+}
+
+template <class E>
+bool inventory_mixin<E>::only_secondary_holds_item() const {
+	const auto& self = *static_cast<const E*>(this);
+	return self.get_if_any_item_in_hand_no(0).dead() && self.get_if_any_item_in_hand_no(1).alive();
 }
 
 template <class E>
@@ -268,7 +312,7 @@ wielding_result inventory_mixin<E>::make_wielding_transfers_for(const hand_selec
 	augs::constant_size_vector<item_slot_transfer_request, hand_count> holsters;
 	augs::constant_size_vector<item_slot_transfer_request, hand_count> draws;
 
-	for (size_t i = 0; i < selections.size(); ++i) {
+	for (std::size_t i = 0; i < selections.size(); ++i) {
 		const auto hand = self.get_hand_no(i);
 
 		const auto item_for_hand = cosmos[selections[i]];
@@ -376,7 +420,7 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::dete
 template <class E>
 template <class F>
 void inventory_mixin<E>::for_each_hand(F callback) const {
-	for (size_t i = 0; i < hand_count; ++i) {
+	for (std::size_t i = 0; i < hand_count; ++i) {
 		const auto hand = get_hand_no(i);
 
 		if (hand.alive()) {

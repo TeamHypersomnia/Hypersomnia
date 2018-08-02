@@ -70,24 +70,29 @@ transformr direct_attachment_offset(
 	transformi attachment_offset;
 	transformi anchor;
 
+	auto get_actual_offsets_by_torso = [&]() {
+		auto offsets = get_offsets_by_torso();
+
+		if (container.only_secondary_holds_item()) {
+			offsets.flip_vertically();
+		}
+
+		return offsets;
+	};
+
 	switch (type) {
 		case slot_function::PRIMARY_HAND: 
-		attachment_offset = get_offsets_by_torso().primary_hand;
+		attachment_offset = get_actual_offsets_by_torso().primary_hand;
 		anchor = anchors.hand_anchor;
 		break;
 
 		case slot_function::SECONDARY_HAND: 
-		if (container.get_if_any_item_in_hand_no(0).alive()) {
-			attachment_offset = get_offsets_by_torso().secondary_hand;
-		}
-		else {
-			attachment_offset = get_offsets_by_torso().primary_hand;
-		}
+		attachment_offset = get_actual_offsets_by_torso().secondary_hand;
 		anchor = anchors.hand_anchor;
 		break;
 
 		case slot_function::SHOULDER: 
-		attachment_offset = get_offsets_by_torso().back;
+		attachment_offset = get_actual_offsets_by_torso().back;
 		anchor = anchors.back_anchor;
 		break;
 

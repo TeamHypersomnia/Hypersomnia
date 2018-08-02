@@ -118,17 +118,17 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 		const auto subject = cosmos[it.subject];
 
 		if (subject.find<invariants::container>()) {
-			int hand_index = -1;
+			auto requested_index = static_cast<std::size_t>(-1);
 
 			if (it.intent == game_intent_type::CROSSHAIR_PRIMARY_ACTION) {
-				hand_index = 0;
+				requested_index = 0;
 			}
 			else if (it.intent == game_intent_type::CROSSHAIR_SECONDARY_ACTION) {
-				hand_index = 1;
+				requested_index = 1;
 			}
 
-			if (hand_index >= 0) {
-				callee = subject.get_if_any_item_in_hand_no(static_cast<size_t>(hand_index));
+			if (requested_index >= 0) {
+				callee = subject.map_acted_hand_item(requested_index);
 			}
 		}
 

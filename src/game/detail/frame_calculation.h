@@ -67,21 +67,21 @@ frame_and_flip<T> get_frame_and_flip(
 }
 
 template <class T>
-struct stance_frame_info {
+struct stance_frame_usage {
 	const frame_type_t<T>* const frame;
-	const bool flip;
+	bool flip;
 	const bool is_shooting;
 
 	static auto none() {
-		return stance_frame_info<T> { nullptr, false, false };
+		return stance_frame_usage<T> { nullptr, false, false };
 	}
 
 	static auto carry(const frame_and_flip<T>& f) {
-		return stance_frame_info<T> { std::addressof(f.frame), f.flip, false };
+		return stance_frame_usage<T> { std::addressof(f.frame), f.flip, false };
 	}
 
 	static auto shoot(const frame_type_t<T>& f) {
-		return stance_frame_info<T> { std::addressof(f), false, true };
+		return stance_frame_usage<T> { std::addressof(f), false, true };
 	}
 
 	explicit operator bool() const {
@@ -94,13 +94,13 @@ struct stance_frame_info {
 };
 
 template <class C, class T>
-auto calc_stance_info(
+auto calc_stance_usage(
 	const C& cosm,
 	const stance_animations& stance,
 	const movement_animation_state& anim_state, 
 	const T& wielded_items
 ) {
-	using result_t = stance_frame_info<const torso_animation>;
+	using result_t = stance_frame_usage<const torso_animation>;
 
 	const auto& logicals = cosm.get_logical_assets();
 

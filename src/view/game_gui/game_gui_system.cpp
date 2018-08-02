@@ -204,30 +204,20 @@ void game_gui_system::control_hotbar_and_action_button(
 		auto r = intent;
 
 		if (r.was_pressed()) {
-			int hand_index = -1;
+			auto requested_index = static_cast<std::size_t>(-1);
 
 			if (r.intent == game_gui_intent_type::HOLSTER) {
-				if (gui_entity.get_if_any_item_in_hand_no(0).alive()) {
-					r.intent = game_gui_intent_type::HOLSTER_PRIMARY_ITEM;
-				}
-				else if (
-					gui_entity.get_if_any_item_in_hand_no(0).dead()
-					&& gui_entity.get_if_any_item_in_hand_no(1).alive()
-				) {
-					r.intent = game_gui_intent_type::HOLSTER_SECONDARY_ITEM;
-				}
+				requested_index = 0;
+			}
+			else if (r.intent == game_gui_intent_type::HOLSTER_SECONDARY) {
+				requested_index = 1;
 			}
 
-			if (r.intent == game_gui_intent_type::HOLSTER_PRIMARY_ITEM) {
-				hand_index = 0;
-			}
-			else if (r.intent == game_gui_intent_type::HOLSTER_SECONDARY_ITEM) {
-				hand_index = 1;
-			}
+			const auto resolved_index = gui_entity.map_acted_hand_index(requested_index);
 
-			if (hand_index >= 0) {
+			if (resolved_index != static_cast<std::size_t>(-1)) {
 				auto new_setup = gui.get_actual_selection_setup(gui_entity);
-				new_setup.hand_selections[static_cast<size_t>(hand_index)].unset();
+				new_setup.hand_selections[resolved_index].unset();
 				queue_transfers(gui.make_and_push_hotbar_selection_setup(new_setup, gui_entity));
 			}
 		}

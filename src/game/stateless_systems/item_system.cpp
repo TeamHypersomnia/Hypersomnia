@@ -117,36 +117,21 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 
 	for (auto r : requests) {
 		if (r.was_pressed()) {
-			int hand_index = -1;
+			auto requested_index = static_cast<std::size_t>(-1);
 
 			if (r.intent == game_intent_type::THROW) {
-				const auto subject = cosmos[r.subject];
-
-				if (subject.get_if_any_item_in_hand_no(0).alive()) {
-					r.intent = game_intent_type::THROW_PRIMARY_ITEM;
-				}
-				else if (
-					subject.get_if_any_item_in_hand_no(0).dead()
-					&& subject.get_if_any_item_in_hand_no(1).alive()
-				) {
-					r.intent = game_intent_type::THROW_SECONDARY_ITEM;
-				}
+				requested_index = 0;
+			}
+			else if (r.intent == game_intent_type::THROW_SECONDARY) {
+				requested_index = 1;
 			}
 
-			if (r.intent == game_intent_type::THROW_PRIMARY_ITEM) {
-				hand_index = 0;
-			}
-			else if (r.intent == game_intent_type::THROW_SECONDARY_ITEM) {
-				hand_index = 1;
-			}
-
-			if (hand_index >= 0) {
+			if (requested_index >= 0) {
 				const auto subject = cosmos[r.subject];
 
 				if (subject.has<components::item_slot_transfers>()) {
-					const auto item_inside = subject.get_hand_no(static_cast<size_t>(hand_index)).get_item_if_any();
-
-					if (item_inside.alive()) {
+					LOG_NVPS(requested_index);
+					if (const auto item_inside = subject.map_acted_hand_item(requested_index)) {
 						perform_transfer(item_slot_transfer_request::drop(item_inside), step);
 					}
 				}

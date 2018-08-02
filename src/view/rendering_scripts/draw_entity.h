@@ -260,18 +260,18 @@ FORCE_INLINE void specific_entity_drawer(
 			const auto stance_id = ::calc_stance_id(cosm, wielded_items);
 			const auto& stance = maybe_torso->stances[stance_id];
 
-			if (const auto stance_info = calc_stance_info(
+			if (const auto stance_usage = calc_stance_usage(
 				cosm,
 				stance, 
 				movement->four_ways_animation,
 				wielded_items
 			)) {
-				const auto stance_offsets = [&stance_info, &logicals]() {
-					const auto stance_image_id = stance_info.frame->image_id;
+				const auto stance_offsets = [&stance_usage, &logicals]() {
+					const auto stance_image_id = stance_usage.frame->image_id;
 
 					auto result = logicals.get_offsets(stance_image_id).torso;
 
-					if (stance_info.flip) {
+					if (stance_usage.flip) {
 						result.flip_vertically();
 					}
 
@@ -331,7 +331,17 @@ FORCE_INLINE void specific_entity_drawer(
 					);
 				}
 
-				render_frame(stance_info.get_with_flip(), { viewing_transform.pos, face_degrees });
+				{
+					/* Draw the actual torso */
+					auto usage = stance_usage;
+
+					if (typed_handle.only_secondary_holds_item()) {
+						auto& f = usage.flip;
+						f = !f;
+					}
+
+					render_frame(usage.get_with_flip(), { viewing_transform.pos, face_degrees });
+				}
 
 				typed_handle.for_each_attachment_recursive(
 					[&](
@@ -363,7 +373,7 @@ FORCE_INLINE void specific_entity_drawer(
 					const auto& head = typed_handle.template get<components::head>();
 					const auto& head_def = typed_handle.template get<invariants::head>();
 
-					const auto target_image = stance_info.is_shooting ? head_def.shooting_head_image : head_def.head_image;
+					const auto target_image = stance_usage.is_shooting ? head_def.shooting_head_image : head_def.head_image;
 
 					const auto& head_offsets = logicals.get_offsets(target_image);
 					const auto target_offset = ::get_anchored_offset(stance_offsets.head, head_offsets.item.head_anchor);
