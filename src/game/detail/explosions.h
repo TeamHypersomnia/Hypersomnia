@@ -24,14 +24,29 @@ struct standard_explosion_input {
 	rgba outer_ring_color = white;
 	assets::sound_id sound_effect;
 	float sound_gain = 1.f;
-	adverse_element_type type = adverse_element_type::INVALID;
+	adverse_element_type type = adverse_element_type::FORCE;
 	bool create_thunders_effect = false;
 	pad_bytes<3> pad;
 	// END GEN INTROSPECTOR
 
+	auto& operator*=(const real32 scalar) {
+		effective_radius *= scalar;
+		damage *= scalar;
+		impact_impulse *= scalar;
+
+		victim_shake *= scalar;
+		subject_shake *= scalar;
+		return *this;
+	}
+
 	void instantiate(
-		const logic_step step, 
-		const transformr explosion_location, 
-		const entity_id subject_if_any
+		logic_step step, 
+		transformr explosion_location, 
+		entity_id subject_if_any
+	) const;
+
+	void instantiate_no_subject(
+		logic_step step, 
+		transformr explosion_location
 	) const;
 };

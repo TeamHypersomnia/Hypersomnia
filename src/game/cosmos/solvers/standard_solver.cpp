@@ -30,7 +30,7 @@
 #include "game/stateless_systems/sentience_system.h"
 #include "game/stateless_systems/destruction_system.h"
 #include "game/stateless_systems/sound_existence_system.h"
-#include "game/stateless_systems/hand_fuse_system.h"
+#include "game/stateless_systems/demolitions_system.h"
 #include "game/stateless_systems/physics_system.h"
 #include "game/stateless_systems/movement_path_system.h"
 #include "game/stateless_systems/animation_system.h"
@@ -84,7 +84,8 @@ void standard_solve(const logic_step step) {
 
 	force_joint_system().apply_forces_towards_target_entities(step);
 	item_system().handle_throw_item_intents(step);
-	hand_fuse_system().detonate_fuses(step);
+	demolitions_system().detonate_fuses(step);
+	demolitions_system().advance_cascade_explosions(step);
 
 	{
 		listener.during_step = true;

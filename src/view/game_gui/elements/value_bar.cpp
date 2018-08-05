@@ -401,7 +401,7 @@ void value_bar::rebuild_layouts(
 		constexpr auto num_particles_to_spawn = 40u;
 
 		for (size_t i = 0; i < num_particles_to_spawn; ++i) {
-			const assets::necessary_image_id mats[3] = {
+			const auto mats = std::array<assets::necessary_image_id, 3> {
 				assets::necessary_image_id::WANDERING_CROSS,
 				assets::necessary_image_id::BLINK_1,
 				static_cast<assets::necessary_image_id>(static_cast<int>(assets::necessary_image_id::BLINK_1) + 2),
@@ -409,7 +409,7 @@ void value_bar::rebuild_layouts(
 
 			effect_particle new_part;
 			new_part.relative_pos = rng.randval(vec2(0, 0), value_bar_size);
-			new_part.image_id = mats[rng.randval(0, 2)];
+			new_part.image_id = rng.choose_from(mats);
 
 			this_id->particles.push_back(new_part);
 		}

@@ -6,6 +6,19 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- New entity type: Explosion body
+	- invariants::explosive shall contain a cascade explosion input parameters
+		- this will be adequately set for C4, leaving grenades intact
+		- several explosive_body flavours?
+			- each flavour might specify several explosion types from which to randomize
+			- plus a mult range for randomization of size
+	- Has a circle shape with high restitution
+		- Can even draw some highlights in place of the circle, for a cool effect
+	- Has a pathfinding_query filter that only collides with walls and other concrete objects
+	- Periodically spawns an explosion
+		- Applies a slight, random force each time
+	- removes the need to introduce global solvable, also will be more easily networkable in case of an MMO
+
 - Implementing the bomb
 	- Global solvable
 		- Priority queue with scheduled explosions

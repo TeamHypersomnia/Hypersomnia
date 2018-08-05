@@ -45,6 +45,7 @@ namespace invariants {
 	struct continuous_particles;
 	struct point_marker;
 	struct box_marker;
+	struct cascade_explosion;
 }
 
 namespace components {
@@ -78,6 +79,7 @@ namespace components {
 	struct remnant;
 	struct continuous_particles;
 	struct overridden_size;
+	struct cascade_explosion;
 }
 
 using assert_always_together = type_list<
@@ -96,7 +98,8 @@ using assert_always_together = type_list<
 	type_pair<invariants::movement_path, components::movement_path>,
 	type_pair<invariants::animation, components::animation>,
 	type_pair<invariants::remnant, components::remnant>,
-	type_pair<invariants::continuous_particles, components::continuous_particles>
+	type_pair<invariants::continuous_particles, components::continuous_particles>,
+	type_pair<invariants::cascade_explosion, components::cascade_explosion>
 >;
 
 using assert_first_implies_second = type_list<
@@ -150,7 +153,8 @@ using component_list_t = List<
 	components::animation,
 	components::remnant,
 	components::continuous_particles,
-	components::overridden_size
+	components::overridden_size,
+	components::cascade_explosion
 >;
 
 template <template <class...> class List>
@@ -188,7 +192,8 @@ using invariant_list_t = List<
 	invariants::continuous_sound,
 	invariants::continuous_particles,
 	invariants::point_marker,
-	invariants::box_marker
+	invariants::box_marker,
+	invariants::cascade_explosion
 >;
 
 template <class... Types>

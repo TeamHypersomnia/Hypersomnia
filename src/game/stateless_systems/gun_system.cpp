@@ -329,7 +329,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							cosmic::create_entity(cosmos, shell_flavour, [&](const auto shell_entity){
 								auto rng = cosmos.get_rng_for(shell_entity);
 
-								const auto spread_component = rng.randval(gun_def.shell_spread_degrees) + gun_def.shell_spawn_offset.rotation;
+								const auto spread_component = rng.randval_h(gun_def.shell_spread_degrees) + gun_def.shell_spawn_offset.rotation;
 
 								auto shell_transform = gun_transform;
 								shell_transform.pos += vec2(gun_def.shell_spawn_offset.pos).rotate(gun_transform.rotation);

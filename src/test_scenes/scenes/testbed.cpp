@@ -620,9 +620,9 @@ namespace test_scenes {
 		const auto orig1 = vec2(380, -1524);
 		create_aquarium(orig1);
 
-		create(test_box_markers::BOMBSITE_A, vec2(580, -800)).set_logical_size(vec2(600, 200));
+		create(test_box_markers::BOMBSITE_A, vec2(480, 200)).set_logical_size(vec2(600, 200));
 
-		create(test_hand_explosives::BOMB, vec2(580, 200));
+		create(test_hand_explosives::BOMB, vec2(280, 200));
 
 		const auto lab_wall_size = get_size_of(test_scene_image_id::LAB_WALL);
 

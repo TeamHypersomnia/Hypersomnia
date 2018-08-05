@@ -19,6 +19,31 @@
 #include "game/detail/organisms/startle_nearbly_organisms.h"
 #include "game/detail/physics/shape_overlapping.hpp"
 
+void standard_explosion_input::instantiate_no_subject(
+	const logic_step step, 
+	const transformr explosion_location
+) const {
+	instantiate(step, explosion_location, entity_id());
+}
+
+static bool triangle_degenerate(const std::array<vec2, 3>& v) {
+	constexpr auto eps_triangle_degenerate = 0.5f;
+
+	if (v[0].compare(v[1], eps_triangle_degenerate)) {
+		return true;
+	}
+
+	if (v[0].compare(v[2], eps_triangle_degenerate)) {
+		return true;
+	}
+
+	if (v[1].compare(v[2], eps_triangle_degenerate)) {
+		return true;
+	}
+
+	return false;
+}
+
 void standard_explosion_input::instantiate(
 	const logic_step step,
 	const transformr explosion_location,
@@ -103,6 +128,10 @@ void standard_explosion_input::instantiate(
 		auto damaging_triangle = response.get_world_triangle(i, request.eye_transform.pos);
 		damaging_triangle[1] += (damaging_triangle[1] - damaging_triangle[0]).set_length(5);
 		damaging_triangle[2] += (damaging_triangle[2] - damaging_triangle[0]).set_length(5);
+
+		if (triangle_degenerate(damaging_triangle)) {
+			continue;
+		}
 
 		physics.for_each_intersection_with_triangle(
 			cosm.get_si(),

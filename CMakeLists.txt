@@ -370,7 +370,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/audiovisual_state/systems/flying_number_indicator_system.cpp"
 	"src/view/audiovisual_state/systems/wandering_pixels_system.cpp"
 	"src/game/stateless_systems/destruction_system.cpp"
-	"src/game/stateless_systems/hand_fuse_system.cpp"
+	"src/game/stateless_systems/demolitions_system.cpp"
 	"src/game/stateless_systems/melee_system.cpp"
 	"src/game/stateless_systems/particles_existence_system.cpp"
 	"src/game/stateless_systems/sound_existence_system.cpp"
@@ -622,6 +622,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/gui/editor_player_gui.cpp"
 	"src/game/components/hand_fuse_component.cpp"
 	"src/game/debug_draw.cpp"
+	"src/game/detail/explosive/detonate.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

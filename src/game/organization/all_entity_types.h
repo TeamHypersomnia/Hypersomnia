@@ -408,3 +408,22 @@ struct box_marker {
 		components::overridden_size
 	>;
 };
+
+struct explosion_body {
+	static constexpr std::size_t statically_allocated_entities = 2000;
+	static constexpr std::size_t statically_allocated_flavours = 300;
+
+	using invariants = type_list<
+		invariants::rigid_body,
+		invariants::fixtures,
+		invariants::cascade_explosion,
+
+		invariants::interpolation
+	>;
+
+	using components = type_list<
+		components::rigid_body,
+		components::cascade_explosion,
+		components::interpolation
+	>;
+};

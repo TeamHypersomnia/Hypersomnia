@@ -3,6 +3,7 @@
 #include "game/enums/adverse_element_type.h"
 #include "game/assets/ids/asset_ids.h"
 #include "game/detail/explosions.h"
+#include "game/detail/explosive/cascade_explosion_input.h"
 
 namespace invariants {
 	struct explosive {
@@ -12,6 +13,7 @@ namespace invariants {
 		assets::image_id defused_image_id;
 		assets::image_id released_image_id;
 		assets::physical_material_id released_physical_material;
+		cascade_explosion_input cascade;
 		// END GEN INTROSPECTOR
 	};
 }

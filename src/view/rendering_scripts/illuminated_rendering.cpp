@@ -192,6 +192,14 @@ void illuminated_rendering(
 				cast_highlight
 			});
 
+			draw_explosion_body_highlights({
+				output,
+				interp,
+				cosmos,
+				global_time_seconds,
+				cast_highlight
+			});
+
 			draw_beep_lights({
 				output,
 				interp,

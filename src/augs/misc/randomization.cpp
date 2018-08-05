@@ -43,8 +43,52 @@ float basic_randomization<T>::randval(
 }
 
 template <class T>
-float basic_randomization<T>::randval(const float minmax) {
-	return randval(-minmax, minmax);
+std::size_t basic_randomization<T>::randval(
+	std::size_t min, 
+	std::size_t max
+) {
+	if (min == max) {
+		return min;
+	}
+
+	return std::uniform_int_distribution<std::size_t>(min, max)(generator);
+}
+
+template <class T>
+float basic_randomization<T>::randval_h(const float h) {
+	return randval(-h, h);
+}
+
+template <class T>
+float basic_randomization<T>::randval_v(
+	float base_value, 
+	float variation
+) {
+	return randval(base_value - variation, base_value + variation);
+}
+
+template <class T>
+int basic_randomization<T>::randval_v(
+	int base_value, 
+	int variation
+) {
+	return randval(base_value - variation, base_value + variation);
+}
+
+#include "augs/log.h"
+template <class T>
+float basic_randomization<T>::randval_vm(
+	float base_value, 
+	float variation_mult
+) {
+	const auto h = (base_value * variation_mult) / 2;
+	const auto result = randval(base_value - h, base_value + h);
+	return result;
+}
+
+template <class T>
+int basic_randomization<T>::randval_h(const int h) {
+	return randval(-h, h);
 }
 
 template <class T>

@@ -6,6 +6,7 @@
 
 #include "augs/misc/minmax.h"
 #include "augs/math/vec2.h"
+#include "augs/templates/variated.h"
 
 template <class generator_type>
 struct basic_randomization {
@@ -14,21 +15,57 @@ struct basic_randomization {
 	basic_randomization(const rng_seed_type seed = 0);
 
 	int randval(
-		const int min, 
-		const int max
+		int min, 
+		int max
+	);
+
+	int randval_v(
+		int base_value, 
+		int variation
 	);
 
 	unsigned randval(
-		const unsigned min, 
-		const unsigned max
+		unsigned min, 
+		unsigned max
+	);
+
+	std::size_t randval(
+		std::size_t min, 
+		std::size_t max
 	);
 
 	float randval(
-		const float min, 
-		const float max
+		float min, 
+		float max
 	);
 
-	float randval(const float minmax);
+	float randval_v(
+		float base_value, 
+		float variation
+	);
+
+	float randval_vm(
+		float base_value, 
+		float variation_mult
+	);
+
+	template <class T>
+	auto randval(const augs::variated<T>& v) {
+		if constexpr(std::is_same_v<T, unsigned>) {
+			return static_cast<unsigned>(randval_v(static_cast<int>(v.value), static_cast<int>(v.variation)));
+		}
+		else {
+			return randval_v(v.value, v.variation);
+		}
+	}
+
+	template <class T>
+	auto randval(const augs::mult_variated<T>& v) {
+		return randval_vm(v.value, v.variation);
+	}
+
+	float randval_h(float minmax);
+	int randval_h(int minmax);
 	
 	std::vector<float> make_random_intervals(
 		const std::size_t n, 
@@ -86,6 +123,11 @@ struct basic_randomization {
 			randval(min_a.x, max_a.x), 
 			randval(min_a.y, max_a.y) 
 		};
+	}
+
+	template <class C>
+	auto choose_from(C& container) {
+		return container[randval(static_cast<std::size_t>(0), container.size() - 1)];
 	}
 };
 

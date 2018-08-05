@@ -188,12 +188,6 @@ void particles_simulation_system::update_effects_from_messages(
 					}	
 				}
 
-#if MORE_LOGS
-				if (c.original.input.id == to_particle_effect_id(test_scene_particle_effect_id::HEALTH_DAMAGE_SPARKLES)) {
-					LOG("Removing health sparkles");
-				}
-#endif
-
 				return true;
 			});
 		}
@@ -347,8 +341,8 @@ void particles_simulation_system::advance_visible_streams(
 
 			instance.stream_particles_to_spawn += new_particles_to_spawn_by_time;
 
-			instance.swings_per_sec += rng.randval(-instance.swing_speed_change, instance.swing_speed_change);
-			instance.swing_spread += rng.randval(-instance.swing_spread_change, instance.swing_spread_change);
+			instance.swings_per_sec += rng.randval_h(instance.swing_speed_change);
+			instance.swing_spread += rng.randval_h(instance.swing_spread_change);
 
 			auto clamp = [](auto& val, const auto bound) {
 				val = std::clamp(val, bound.first, bound.second);

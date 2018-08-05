@@ -20,6 +20,7 @@ struct sound_decoration;
 struct particles_decoration;
 struct point_marker;
 struct box_marker;
+struct explosion_body;
 
 using all_entity_types = type_list<
 	controlled_character,
@@ -39,7 +40,8 @@ using all_entity_types = type_list<
 	sound_decoration,
 	particles_decoration,
 	point_marker,
-	box_marker
+	box_marker,
+	explosion_body
 >;
 
 using entity_type_id = type_in_list_id<all_entity_types>;

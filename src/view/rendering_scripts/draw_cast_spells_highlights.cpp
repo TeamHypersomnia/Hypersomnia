@@ -44,3 +44,23 @@ void draw_cast_spells_highlights(const draw_cast_spells_highlights_input in) {
 		}
 	);
 }
+
+void draw_explosion_body_highlights(const draw_explosion_body_highlights_input in) {
+	const auto& cosmos = in.cosm;
+
+	cosmos.for_each_having<invariants::cascade_explosion>(
+		[&](const auto it) {
+			if (const auto tr = it.find_viewing_transform(in.interpolation)) {
+				const auto& cascade_def = it.template get<invariants::cascade_explosion>();
+
+				const auto highlight_col = cascade_def.explosion.outer_ring_color;
+
+				in.output.aabb_centered(
+					in.cast_highlight_tex,
+					tr->pos,
+					highlight_col
+				);
+			}
+		}
+	);
+}

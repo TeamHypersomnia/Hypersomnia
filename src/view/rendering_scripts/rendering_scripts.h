@@ -57,6 +57,8 @@ struct draw_cast_spells_highlights_input {
 	const augs::atlas_entry cast_highlight_tex;
 };
 
+using draw_explosion_body_highlights_input = draw_cast_spells_highlights_input;
+
 enum class circular_bar_type {
 	SMALL,
 	MEDIUM,
@@ -85,6 +87,7 @@ struct draw_crosshair_lasers_input {
 
 augs::vertex_triangle_buffer draw_sentiences_hud(const draw_sentiences_hud_input);
 void draw_cast_spells_highlights(const draw_cast_spells_highlights_input);
+void draw_explosion_body_highlights(const draw_explosion_body_highlights_input);
 void draw_hud_for_explosives(const draw_hud_for_explosives_input);
 void draw_crosshair_lasers(const draw_crosshair_lasers_input);
 

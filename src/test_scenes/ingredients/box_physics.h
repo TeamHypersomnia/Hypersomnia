@@ -10,6 +10,24 @@
 
 namespace test_flavours {
 	template <class E>
+	void add_explosion_body(E& meta) {
+		invariants::fixtures fixtures_def;
+		invariants::rigid_body body_def;
+
+		body_def.damping.linear = 6.5f;
+		body_def.damping.angular = 6.5f;
+		body_def.bullet = true;
+
+		fixtures_def.filter = filters::pathfinding_query();
+		fixtures_def.density = 1;
+		fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::METAL);
+		fixtures_def.restitution = 1.6f;
+
+		meta.set(fixtures_def);
+		meta.set(body_def);
+	}
+
+	template <class E>
 	void add_standard_dynamic_body(E& meta) {
 		invariants::fixtures fixtures_def;
 		invariants::rigid_body body_def;

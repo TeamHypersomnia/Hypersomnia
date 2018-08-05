@@ -167,7 +167,7 @@ public:
 		const auto& templates = emission.get_definitions<particle_type>();
 		auto new_particle = templates[rng.randval(0u, static_cast<unsigned>(templates.size()) - 1)];
 		
-		const auto velocity_degrees = basic_velocity_degrees + angular_offset + rng.randval(spread);
+		const auto velocity_degrees = basic_velocity_degrees + angular_offset + rng.randval_h(spread);
 		const auto chosen_speed = rng.randval(speed);
 		const auto new_velocity = vec2::from_degrees(velocity_degrees) * chosen_speed;
 		
@@ -175,11 +175,15 @@ public:
 		new_particle.set_position(position);
 		new_particle.multiply_size(rng.randval(emission.size_multiplier));
 		
-		if (emission.should_particles_look_towards_velocity) {
-			new_particle.set_rotation(rng.randval(emission.initial_rotation_variation) + velocity_degrees);
-		}
-		else {
-			new_particle.set_rotation(rng.randval(emission.initial_rotation_variation));
+		{
+			const auto rot_offset = rng.randval_h(emission.initial_rotation_variation);
+
+			if (emission.should_particles_look_towards_velocity) {
+				new_particle.set_rotation(rot_offset + velocity_degrees);
+			}
+			else {
+				new_particle.set_rotation(rot_offset);
+			}
 		}
 
 		const auto chosen_rotation_speed = rng.randval(emission.rotation_speed);
@@ -190,7 +194,7 @@ public:
 		if (emission.randomize_acceleration) {
 			new_particle.set_acceleration(
 				vec2::from_degrees(
-					rng.randval(spread) + basic_velocity_degrees
+					rng.randval_h(spread) + basic_velocity_degrees
 				) * rng.randval(emission.acceleration)
 			);
 		}

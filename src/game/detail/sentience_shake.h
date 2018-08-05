@@ -17,4 +17,11 @@ struct sentience_shake {
 	}
 
 	void apply(const augs::stepped_timestamp now, components::sentience& sentience) const;
+
+	auto& operator*=(const real32 scalar) {
+		duration_ms *= scalar;
+		mult *= scalar;
+
+		return *this;
+	}
 };

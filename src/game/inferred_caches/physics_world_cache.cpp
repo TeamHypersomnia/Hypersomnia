@@ -410,6 +410,17 @@ void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle
 			}
 		};
 
+		auto from_circle_shape = [&](const real32 radius) {
+			b2CircleShape shape;
+			shape.m_radius = si.get_meters(radius);
+
+			fixdef.shape = &shape;
+			b2Fixture* const new_fix = owner_b2Body.CreateFixture(&fixdef);
+
+			new_fix->index_in_component = 0u;
+			constructed_fixtures.emplace_back(new_fix);
+		};
+
 		if (const auto* const shape_polygon = handle.template find<invariants::shape_polygon>()) {
 			from_polygon_shape(shape_polygon->shape);
 			return;
@@ -419,15 +430,12 @@ void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle
 		// can either have a separate definition in the hand fuse invariant or assume that the entity will have it
 
 		if (const auto shape_circle = handle.template find<invariants::shape_circle>()) {
-			b2CircleShape shape;
-			shape.m_radius = si.get_meters(shape_circle->get_radius());
+			from_circle_shape(shape_circle->get_radius());
+			return;
+		}
 
-			fixdef.shape = &shape;
-			b2Fixture* const new_fix = owner_b2Body.CreateFixture(&fixdef);
-
-			new_fix->index_in_component = 0u;
-			constructed_fixtures.emplace_back(new_fix);
-
+		if (const auto expl_body = handle.template find<invariants::cascade_explosion>()) {
+			from_circle_shape(expl_body->circle_collider_radius);
 			return;
 		}
 

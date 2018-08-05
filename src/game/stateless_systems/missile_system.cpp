@@ -37,6 +37,7 @@
 #include "game/stateless_systems/sound_existence_system.h"
 #include "game/detail/organisms/startle_nearbly_organisms.h"
 #include "game/detail/physics/missile_surface_info.h"
+#include "game/detail/explosive/detonate.h"
 
 using namespace augs;
 
@@ -47,16 +48,6 @@ void play_collision_sound(
 	const const_entity_handle col,
 	const logic_step step
 );
-
-static void detonate_if_explosive(
-	const logic_step step,
-	const vec2 location,
-	const const_entity_handle missile
-) {
-	if (const auto explosive = missile.find<invariants::explosive>()) {
-		explosive->explosion.instantiate(step, location, entity_id());
-	}
-}
 
 void missile_system::ricochet_missiles(const logic_step step) {
 	auto& cosm = step.get_cosmos();
@@ -296,7 +287,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			if (info.should_detonate() && missile_def.destroy_upon_damage) {
 				--charges;
 				
-				detonate_if_explosive(step, it.point, missile_handle);
+				detonate_if(missile_handle.get_id(), it.point, step);
 
 				if (augs::is_positive_epsilon(total_damage_amount)) {
 					startle_nearby_organisms(cosm, it.point, total_damage_amount * 12.f, 27.f, startle_type::LIGHTER);
@@ -400,7 +391,7 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 						const auto current_tr = it.get_logic_transform();
 
 						missile.saved_point_of_impact_before_death = current_tr;
-						detonate_if_explosive(step, current_tr.pos, it);
+						detonate_if(it, current_tr.pos, step);
 						step.post_message(messages::queue_deletion(it));
 					}
 				}

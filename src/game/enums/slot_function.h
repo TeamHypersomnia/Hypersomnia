@@ -17,6 +17,7 @@ enum class slot_function {
 	PRIMARY_HAND,
 	SECONDARY_HAND,
 
+	BELT,
 	SHOULDER,
 	TORSO_ARMOR,
 	HAT,

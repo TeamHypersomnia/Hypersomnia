@@ -166,6 +166,37 @@ namespace test_flavours {
 			meta.set(explosive);
 		}
 
+		const auto bomb_explosion = []() {
+			standard_explosion_input in;
+
+			in.type = adverse_element_type::FORCE;
+			in.damage = 348.f;
+			in.inner_ring_color = rgba(255, 37, 0, 255);
+			in.outer_ring_color = orange;
+			in.effective_radius = 500.f;
+			in.impact_impulse = 950.f;
+			in.sound_gain = 2.f;
+			in.sound_effect = to_sound_id(test_scene_sound_id::EXPLOSION);
+
+			in.victim_shake.duration_ms = 700.f;
+			in.victim_shake.mult = 1.4f;
+
+			return in;
+		}();
+
+		auto bomb_cascade_explosion = bomb_explosion;
+		bomb_cascade_explosion *= 0.7f;
+		bomb_cascade_explosion.sound_effect = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
+		bomb_cascade_explosion.inner_ring_color = yellow;
+		bomb_cascade_explosion.outer_ring_color = orange;
+
+		{
+			auto& meta = get_test_flavour(flavours, test_explosion_bodies::BOMB_CASCADE_EXPLOSION);
+			meta.get<invariants::cascade_explosion>().explosion = bomb_cascade_explosion;
+			meta.get<invariants::cascade_explosion>().explosion_interval_ms = { 150.f, 0.4f };
+			test_flavours::add_explosion_body(meta);
+		}
+
 		{
 			auto& meta = get_test_flavour(flavours, test_hand_explosives::BOMB);
 
@@ -193,10 +224,10 @@ namespace test_flavours {
 			invariants::hand_fuse fuse; 
 			fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
 			fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
-			fuse.fuse_delay_ms = 30000.f;
+			fuse.fuse_delay_ms = 2000.f;
 			fuse.override_release_impulse = true;
 			fuse.additional_release_impulse = {};
-			fuse.set_bomb_vars(1500.f, 5000.f);
+			fuse.set_bomb_vars(500.f, 5000.f);
 			fuse.beep_sound.id = to_sound_id(test_scene_sound_id::BEEP);
 			fuse.beep_sound.modifier.doppler_factor = 0.5f;
 			fuse.beep_color = red;
@@ -211,27 +242,23 @@ namespace test_flavours {
 			fuse.defused_particles.modifier.scale_lifetimes = 2.5f;
 			meta.set(fuse);
 
-			invariants::explosive explosive; 
+			{
+				invariants::explosive explosive; 
+				explosive.explosion = bomb_explosion;
 
-			auto& in = explosive.explosion;
-			in.type = adverse_element_type::FORCE;
-			in.damage = 348.f;
-			in.inner_ring_color = rgba(255, 37, 0, 255);
-			in.outer_ring_color = orange;
-			in.effective_radius = 500.f;
-			in.impact_impulse = 950.f;
-			in.sound_gain = 2.f;
-			in.sound_effect = to_sound_id(test_scene_sound_id::EXPLOSION);
+				explosive.armed_animation_id = to_animation_id(test_scene_plain_animation_id::BOMB_ARMED);
+				explosive.defused_image_id = to_image_id(test_scene_image_id::BOMB_DEFUSED);
+				explosive.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 
-			in.victim_shake.duration_ms = 700.f;
-			in.victim_shake.mult = 1.4f;
+				{
+					explosive.cascade.flavour_ids[0] = to_entity_flavour_id(test_explosion_bodies::BOMB_CASCADE_EXPLOSION);
+					explosive.cascade.num_spawned = 5;
+					explosive.cascade.num_explosions = { 2, 1 };
+					explosive.cascade.initial_speed = { 4000.f, 0.2f };
+				}
 
-			explosive.armed_animation_id = to_animation_id(test_scene_plain_animation_id::BOMB_ARMED);
-			explosive.defused_image_id = to_image_id(test_scene_image_id::BOMB_DEFUSED);
-			explosive.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
-
-			meta.set(explosive);
-
+				meta.set(explosive);
+			}
 			invariants::animation anim;
 			anim.id = to_animation_id(test_scene_plain_animation_id::BOMB);
 			meta.set(anim);

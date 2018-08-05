@@ -30,7 +30,7 @@ float randomizing_system::advance_and_get_neon_mult(
 
 	mult += rng.randval(lower_dt, upper_dt);
 
-	mult += rng.randval(-h, h);
+	mult += rng.randval_h(h);
 	mult = std::clamp(mult, 0.f, 1.f);
 
 	return (static_cast<real32>(in.lower) + static_cast<real32>(diff) * mult) / 255;

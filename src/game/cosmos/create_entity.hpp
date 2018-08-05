@@ -11,6 +11,7 @@ ref_typed_entity_handle<E> cosmic::specific_create_entity_detail(
 	const I& initial_components,
 	P pre_construction
 ) {
+	static_assert(!std::is_const_v<C>, "Can't create entity in a const cosmos.");
 	const auto new_allocation = cosm.get_solvable({}).template allocate_next_entity<E>(flavour_id.raw);
 	const auto handle = ref_typed_entity_handle<E> { cosm, { new_allocation.object, new_allocation.key } };
 
