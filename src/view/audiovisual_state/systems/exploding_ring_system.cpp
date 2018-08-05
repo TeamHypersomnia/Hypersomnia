@@ -50,7 +50,8 @@ void exploding_ring_system::advance(
 				const auto maximum_spawn_radius = std::max(r.outer_radius_start_value, r.outer_radius_end_value);
 				const auto spawn_radius_width = (maximum_spawn_radius - minimum_spawn_radius) / 2.4f;
 
-				const unsigned max_particles_to_spawn = 160;
+				const auto max_particles_to_spawn = static_cast<unsigned>(160.f * maximum_spawn_radius / 400.f);
+				LOG_NVPS(maximum_spawn_radius, max_particles_to_spawn);
 				const auto& common_assets = cosmos.get_common_assets();
 
 				const auto* const ring_smoke = mapped_or_nullptr(manager, common_assets.exploding_ring_smoke);

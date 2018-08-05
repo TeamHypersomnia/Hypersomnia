@@ -189,7 +189,7 @@ namespace test_flavours {
 		bomb_cascade_explosion.sound_effect = to_sound_id(test_scene_sound_id::CASCADE_EXPLOSION);
 		bomb_cascade_explosion.inner_ring_color = white;
 		bomb_cascade_explosion.outer_ring_color = cyan;
-		bomb_cascade_explosion.ring_duration_seconds = 0.4f;
+		bomb_cascade_explosion.ring_duration_seconds = 0.3f;
 
 		{
 			auto& meta = get_test_flavour(flavours, test_explosion_bodies::BOMB_CASCADE_EXPLOSION);
@@ -203,18 +203,18 @@ namespace test_flavours {
 		}
 
 		auto smaller_bomb_cascade_explosion = bomb_explosion;
-		smaller_bomb_cascade_explosion *= 0.1f;
+		smaller_bomb_cascade_explosion *= 0.07f;
 		smaller_bomb_cascade_explosion.sound_gain = 1.f;
 		smaller_bomb_cascade_explosion.sound_effect = to_sound_id(test_scene_sound_id::FIREWORK);
 		smaller_bomb_cascade_explosion.inner_ring_color = green;
 		smaller_bomb_cascade_explosion.outer_ring_color = dark_green;
-		smaller_bomb_cascade_explosion.ring_duration_seconds = 0.2f;
+		smaller_bomb_cascade_explosion.ring_duration_seconds = 0.3f;
 
 		{
 			auto& meta = get_test_flavour(flavours, test_explosion_bodies::BOMB_CASCADE_EXPLOSION_SMALLER);
 			auto& c = meta.get<invariants::cascade_explosion>();
 			c.explosion = smaller_bomb_cascade_explosion;
-			c.explosion_interval_ms = { 100.f, 0.8f };
+			c.explosion_interval_ms = { 60.f, 0.5f };
 			c.circle_collider_radius = 5.f;
 			c.max_explosion_angle_displacement = 30.f;
 
@@ -277,7 +277,7 @@ namespace test_flavours {
 				{
 					auto& c = explosive.cascade[0];
 					c.flavour_id = to_entity_flavour_id(test_explosion_bodies::BOMB_CASCADE_EXPLOSION);
-					c.num_spawned = 5;
+					c.num_spawned = 4;
 					c.num_explosions = { 2, 1 };
 					c.initial_speed = { 2000.f, 0.2f };
 				}
@@ -285,9 +285,9 @@ namespace test_flavours {
 				{
 					auto& c = explosive.cascade[1];
 					c.flavour_id = to_entity_flavour_id(test_explosion_bodies::BOMB_CASCADE_EXPLOSION_SMALLER);
-					c.num_spawned = 6;
+					c.num_spawned = 7;
 					c.num_explosions = { 7, 2 };
-					c.initial_speed = { 2500.f, 0.6f };
+					c.initial_speed = { 2200.f, 0.6f };
 					c.spawn_angle_variation = 0.5f;
 				}
 
