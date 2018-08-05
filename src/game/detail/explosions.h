@@ -23,7 +23,8 @@ struct standard_explosion_input {
 	rgba inner_ring_color = cyan;
 	rgba outer_ring_color = white;
 	assets::sound_id sound_effect;
-	float sound_gain = 1.f;
+	real32 sound_gain = 1.f;
+	real32 ring_duration_seconds = 0.20f;
 	adverse_element_type type = adverse_element_type::FORCE;
 	bool create_thunders_effect = false;
 	pad_bytes<3> pad;

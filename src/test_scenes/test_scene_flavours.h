@@ -239,6 +239,7 @@ enum class test_box_markers {
 enum class test_explosion_bodies {
 	// GEN INTROSPECTOR enum class test_explosion_bodies
 	BOMB_CASCADE_EXPLOSION,
+	BOMB_CASCADE_EXPLOSION_SMALLER,
 	COUNT
 	// END GEN INTROSPECTOR
 };

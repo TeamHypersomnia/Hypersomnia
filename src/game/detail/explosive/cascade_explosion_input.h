@@ -9,7 +9,7 @@ using cascade_explosion_flavour_id = constrained_entity_flavour_id<
 
 struct cascade_explosion_input {
 	// GEN INTROSPECTOR struct cascade_explosion_input
-	std::array<cascade_explosion_flavour_id, 3> flavour_ids;
+	cascade_explosion_flavour_id flavour_id;
 	unsigned num_spawned = 8;
 	augs::mult_variated<real32> initial_speed = { 1000.f, 0.2f };
 	augs::variated<int> num_explosions = { 14, 5 };

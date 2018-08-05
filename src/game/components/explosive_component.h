@@ -13,7 +13,7 @@ namespace invariants {
 		assets::image_id defused_image_id;
 		assets::image_id released_image_id;
 		assets::physical_material_id released_physical_material;
-		cascade_explosion_input cascade;
+		std::array<cascade_explosion_input, 3> cascade;
 		// END GEN INTROSPECTOR
 	};
 }

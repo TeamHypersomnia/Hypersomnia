@@ -171,12 +171,12 @@ namespace test_flavours {
 
 			in.type = adverse_element_type::FORCE;
 			in.damage = 348.f;
-			in.inner_ring_color = rgba(255, 37, 0, 255);
-			in.outer_ring_color = orange;
+			in.inner_ring_color = cyan;
+			in.outer_ring_color = white;
 			in.effective_radius = 500.f;
 			in.impact_impulse = 950.f;
 			in.sound_gain = 2.f;
-			in.sound_effect = to_sound_id(test_scene_sound_id::EXPLOSION);
+			in.sound_effect = to_sound_id(test_scene_sound_id::BOMB_EXPLOSION);
 
 			in.victim_shake.duration_ms = 700.f;
 			in.victim_shake.mult = 1.4f;
@@ -185,15 +185,39 @@ namespace test_flavours {
 		}();
 
 		auto bomb_cascade_explosion = bomb_explosion;
-		bomb_cascade_explosion *= 0.7f;
-		bomb_cascade_explosion.sound_effect = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
-		bomb_cascade_explosion.inner_ring_color = yellow;
-		bomb_cascade_explosion.outer_ring_color = orange;
+		//bomb_cascade_explosion *= 0.7f;
+		bomb_cascade_explosion.sound_effect = to_sound_id(test_scene_sound_id::CASCADE_EXPLOSION);
+		bomb_cascade_explosion.inner_ring_color = white;
+		bomb_cascade_explosion.outer_ring_color = cyan;
+		bomb_cascade_explosion.ring_duration_seconds = 0.4f;
 
 		{
 			auto& meta = get_test_flavour(flavours, test_explosion_bodies::BOMB_CASCADE_EXPLOSION);
-			meta.get<invariants::cascade_explosion>().explosion = bomb_cascade_explosion;
-			meta.get<invariants::cascade_explosion>().explosion_interval_ms = { 150.f, 0.4f };
+			auto& c = meta.get<invariants::cascade_explosion>();
+			c.explosion = bomb_cascade_explosion;
+			c.explosion_interval_ms = { 200.f, 0.4f };
+			c.circle_collider_radius = 50.f;
+			c.max_explosion_angle_displacement = 10.f;
+
+			test_flavours::add_explosion_body(meta);
+		}
+
+		auto smaller_bomb_cascade_explosion = bomb_explosion;
+		smaller_bomb_cascade_explosion *= 0.1f;
+		smaller_bomb_cascade_explosion.sound_gain = 1.f;
+		smaller_bomb_cascade_explosion.sound_effect = to_sound_id(test_scene_sound_id::FIREWORK);
+		smaller_bomb_cascade_explosion.inner_ring_color = green;
+		smaller_bomb_cascade_explosion.outer_ring_color = dark_green;
+		smaller_bomb_cascade_explosion.ring_duration_seconds = 0.2f;
+
+		{
+			auto& meta = get_test_flavour(flavours, test_explosion_bodies::BOMB_CASCADE_EXPLOSION_SMALLER);
+			auto& c = meta.get<invariants::cascade_explosion>();
+			c.explosion = smaller_bomb_cascade_explosion;
+			c.explosion_interval_ms = { 100.f, 0.8f };
+			c.circle_collider_radius = 5.f;
+			c.max_explosion_angle_displacement = 30.f;
+
 			test_flavours::add_explosion_body(meta);
 		}
 
@@ -251,10 +275,20 @@ namespace test_flavours {
 				explosive.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 
 				{
-					explosive.cascade.flavour_ids[0] = to_entity_flavour_id(test_explosion_bodies::BOMB_CASCADE_EXPLOSION);
-					explosive.cascade.num_spawned = 5;
-					explosive.cascade.num_explosions = { 2, 1 };
-					explosive.cascade.initial_speed = { 4000.f, 0.2f };
+					auto& c = explosive.cascade[0];
+					c.flavour_id = to_entity_flavour_id(test_explosion_bodies::BOMB_CASCADE_EXPLOSION);
+					c.num_spawned = 5;
+					c.num_explosions = { 2, 1 };
+					c.initial_speed = { 2000.f, 0.2f };
+				}
+
+				{
+					auto& c = explosive.cascade[1];
+					c.flavour_id = to_entity_flavour_id(test_explosion_bodies::BOMB_CASCADE_EXPLOSION_SMALLER);
+					c.num_spawned = 6;
+					c.num_explosions = { 7, 2 };
+					c.initial_speed = { 2500.f, 0.6f };
+					c.spawn_angle_variation = 0.5f;
 				}
 
 				meta.set(explosive);

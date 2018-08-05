@@ -145,15 +145,23 @@ void standard_explosion_input::instantiate(
 				(void)point_a;
 
 				const auto body_entity_id = get_body_entity_that_owns(fix);
+				const auto body_entity = cosm[body_entity_id];
+
 				const bool is_self = 
 					subject_alive
 					&& (
 						body_entity_id == FixtureUserdata(subject.get_id())
-						|| cosm[body_entity_id].get_owning_transfer_capability() == subject.get_id()
+						|| body_entity.get_owning_transfer_capability() == subject.get_id()
 					)
 				;
 
 				if (is_self) {
+					return callback_result::CONTINUE;
+				}
+
+				const bool is_explosion_body = body_entity.has<components::cascade_explosion>();
+
+				if (is_explosion_body) {
 					return callback_result::CONTINUE;
 				}
 
@@ -175,7 +183,6 @@ void standard_explosion_input::instantiate(
 					const bool is_yet_unaffected = it.second;
 
 					if (is_yet_unaffected) {
-						const auto body_entity = cosm[body_entity_id];
 						const auto& affected_physics = body_entity.get<components::rigid_body>();
 						const auto affected_physics_mass_pos = affected_physics.get_mass_position();
 
@@ -230,7 +237,7 @@ void standard_explosion_input::instantiate(
 		
 		ring.emit_particles_on_ring = true;
 
-		ring.maximum_duration_seconds = 0.20f;
+		ring.maximum_duration_seconds = ring_duration_seconds;
 
 		ring.color = inner_ring_color;
 		ring.center = explosion_pos;
@@ -250,7 +257,7 @@ void standard_explosion_input::instantiate(
 		
 		ring.emit_particles_on_ring = true;
 
-		ring.maximum_duration_seconds = 0.20f;
+		ring.maximum_duration_seconds = ring_duration_seconds;
 
 		ring.color = outer_ring_color;
 		ring.center = explosion_pos;

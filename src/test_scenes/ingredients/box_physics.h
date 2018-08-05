@@ -14,14 +14,14 @@ namespace test_flavours {
 		invariants::fixtures fixtures_def;
 		invariants::rigid_body body_def;
 
-		body_def.damping.linear = 6.5f;
-		body_def.damping.angular = 6.5f;
+		body_def.damping.linear = 0.5f;
+		body_def.damping.angular = 0.f;
 		body_def.bullet = true;
 
 		fixtures_def.filter = filters::pathfinding_query();
 		fixtures_def.density = 1;
 		fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::METAL);
-		fixtures_def.restitution = 1.6f;
+		fixtures_def.restitution = 1.2f;
 
 		meta.set(fixtures_def);
 		meta.set(body_def);

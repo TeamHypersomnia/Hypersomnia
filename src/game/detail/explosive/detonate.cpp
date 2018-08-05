@@ -29,10 +29,9 @@ void detonate(const detonate_input in) {
 	e.explosion.instantiate_no_subject(step, in.location);
 	step.post_message(messages::queue_deletion(in.subject));
 
-	const auto flavours = vectorize_array(e.cascade.flavour_ids, [](const auto& f) { return f.is_set(); });
+	const auto cascade_inputs = vectorize_array(e.cascade, [](const auto& f) { return f.flavour_id.is_set(); });
 
-	if (flavours.size() > 0) {
-		const auto& c_in = e.cascade;
+	for (const auto& c_in : cascade_inputs) {
 		const auto n = c_in.num_spawned;
 		auto rng = cosm.get_rng_for(in.subject);
 
@@ -53,7 +52,7 @@ void detonate(const detonate_input in) {
 
 			cosmic::create_entity(
 				cosm,
-				rng.choose_from(flavours),
+				c_in.flavour_id,
 				[&](const auto typed_handle) {
 					{
 						const auto target_transform = transformr(t.pos, vel_angle);
