@@ -7,6 +7,7 @@
 #include <Box2D/Dynamics/b2Body.h>
 #include <Box2D/Dynamics/b2World.h>
 #include <Box2D/Collision/Shapes/b2PolygonShape.h>
+#include "3rdparty/Box2D/Collision/Shapes/b2CircleShape.h"
 #include <Box2D/Collision/b2Collision.h>
 
 #include "game/enums/filters.h"
@@ -49,11 +50,11 @@ void for_each_in_aabb_meters(
 	b2world.QueryAABB(&in, aabb);
 }
 
-template <class F>
+template <class S, class F>
 void for_each_intersection_with_shape_meters(
 	const b2World& b2world,
 	const si_scaling si,
-	const b2Shape* const shape,
+	const S& shape,
 	const b2Transform queried_shape_transform,
 	const b2Filter filter,
 	F callback
@@ -62,7 +63,7 @@ void for_each_intersection_with_shape_meters(
 	
 	constexpr auto child_index = 0;
 
-	shape->ComputeAABB(
+	shape.ComputeAABB(
 		&shape_aabb, 
 		queried_shape_transform,
 		child_index
@@ -77,7 +78,7 @@ void for_each_intersection_with_shape_meters(
 			constexpr auto index_b = 0;
 
 			const auto result = b2TestOverlapInfo(
-				shape,
+				&shape,
 				index_a,
 				fixture->GetShape(),
 				index_b,
@@ -96,6 +97,28 @@ void for_each_intersection_with_shape_meters(
 				return callback_result::CONTINUE;
 			}
 		}
+	);
+}
+
+template <class F>
+void for_each_intersection_with_circle_meters(
+	const b2World& b2world,
+	const si_scaling si,
+	const real32 radius_meters,
+	const b2Transform queried_shape_transform,
+	const b2Filter filter,
+	F&& callback
+) {
+	b2CircleShape shape;
+	shape.m_radius = radius_meters;
+
+	for_each_intersection_with_shape_meters(
+		b2world,
+		si,
+		shape,
+		queried_shape_transform,
+		filter,
+		std::forward<F>(callback)
 	);
 }
 
@@ -142,13 +165,12 @@ void for_each_intersection_with_triangle(
 	const b2Filter filter,
 	F callback
 ) {
-	const b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
-	auto poly_shape = to_polygon_shape(vertices, si);
+	const auto null_transform = b2Transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
 
 	for_each_intersection_with_shape_meters(
 		b2world,
 		si,
-		&poly_shape,
+		to_polygon_shape(vertices, si),
 		null_transform,
 		filter, 
 		callback
@@ -196,7 +218,7 @@ void for_each_intersection_with_polygon(
 	for_each_intersection_with_shape_meters(
 		b2world,
 		si,
-		&poly_shape,
+		poly_shape,
 		queried_transform,
 		filter, 
 		callback

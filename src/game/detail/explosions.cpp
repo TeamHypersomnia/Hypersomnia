@@ -227,6 +227,36 @@ void standard_explosion_input::instantiate(
 	}
 
 	{
+		physics.for_each_intersection_with_circle_meters( 
+			si,
+			si.get_meters(effective_radius) * 2,
+			explosion_location.to<b2Transform>(si),
+			filters::local_character(),
+			[&](
+				const b2Fixture* const fix,
+				const vec2,
+				const vec2
+			) {
+				const auto body_entity_id = get_body_entity_that_owns(fix);
+				const auto it = affected_entities_of_bodies.insert(body_entity_id);
+				const bool is_yet_unaffected = it.second;
+
+				if (is_yet_unaffected) {
+					const auto body_entity = cosm[body_entity_id];
+
+					if (const auto sentience = body_entity.find<components::sentience>()) {
+						auto lesser_shake = victim_shake;
+						lesser_shake *= 0.4f;
+						lesser_shake.apply(now, *sentience);
+					}
+				}
+
+				return callback_result::CONTINUE;
+			}
+		);
+	}
+
+	{
 		exploding_ring_input ring;
 
 		ring.outer_radius_start_value = effective_radius / 2;

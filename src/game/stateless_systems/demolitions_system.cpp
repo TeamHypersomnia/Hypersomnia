@@ -83,7 +83,6 @@ void demolitions_system::advance_cascade_explosions(const logic_step step) {
 
 				{
 					const auto next_explosion_in_ms = rng.randval(cascade_def.explosion_interval_ms);
-					LOG_NVPS(next_explosion_in_ms);
 					when_next = now;
 					when_next.step += next_explosion_in_ms / delta.in_milliseconds();
 				}

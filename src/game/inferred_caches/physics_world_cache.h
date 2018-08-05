@@ -139,6 +139,11 @@ public:
 	}
 
 	template <class... Args>
+	void for_each_intersection_with_circle_meters(Args&&... args) const {
+		::for_each_intersection_with_circle_meters(get_b2world(), std::forward<Args>(args)...);
+	}
+
+	template <class... Args>
 	void for_each_in_aabb(Args&&... args) const {
 		::for_each_in_aabb(get_b2world(), std::forward<Args>(args)...);
 	}

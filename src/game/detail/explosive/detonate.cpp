@@ -73,7 +73,6 @@ void detonate(const detonate_input in) {
 						
 						const auto next_explosion_in_ms = rng.randval(0.f, cascade_def.explosion_interval_ms.value);
 
-						LOG_NVPS(next_explosion_in_ms);
 						const auto now = cosm.get_timestamp();
 						const auto dt = cosm.get_fixed_delta();
 

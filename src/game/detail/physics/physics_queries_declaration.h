@@ -28,6 +28,16 @@ void for_each_intersection_with_shape_meters(
 	F callback
 );
 
+template <class F>
+void for_each_intersection_with_circle_meters(
+	const b2World& b2world,
+	const si_scaling si,
+	const real32 radius,
+	const b2Transform queried_shape_transform,
+	const b2Filter filter,
+	F&& callback
+);
+
 template<class F>
 void for_each_in_aabb(
 	const b2World& b2world,
