@@ -180,6 +180,26 @@ struct editor_property_accessors {
 		});
 	}
 
+	template <class T, class F>
+	static void access_each_property(
+		const change_current_mode_property_command& self,
+		T in,
+		F callback
+	) {
+		std::visit(
+			[&](auto& typed_mode) {
+				on_field_address(
+					typed_mode,
+					self.field,
+					continue_if_nullptr([&](auto& resolved_field) {
+						return callback(resolved_field);
+					})
+				);
+			},
+			in.folder.player.current_mode
+		);
+	}
+
 	template <class id_type, class T, class F>
 	static void access_each_property(
 		const change_asset_property_command<id_type>& self,

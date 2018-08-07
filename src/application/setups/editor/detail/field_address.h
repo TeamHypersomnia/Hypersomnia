@@ -39,7 +39,8 @@ using edited_field_type_id = type_in_list_id<
 		std::vector<particles_emission>,
 
 		sound_meta,
-		image_meta
+		image_meta,
+		std::vector<entity_guid>
 	>
 >;
 

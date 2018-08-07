@@ -24,6 +24,7 @@ struct mode_field_address {
 		return !operator==(b);
 	}
 };
+
 namespace mode_messages {
 	struct change_var {
 		mode_field_address addr;

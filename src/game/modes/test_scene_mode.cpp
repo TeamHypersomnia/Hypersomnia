@@ -72,7 +72,9 @@ void test_scene_mode::mode_pre_solve(input_type in, const mode_entropy& entropy,
 	const auto dt = cosm.get_fixed_delta();
 
 	for (const auto& p : pending_inits) {
-		init_spawned(in, cosm[p], step);
+		if (const auto handle = cosm[p]) {
+			init_spawned(in, handle, step);
+		}
 	}
 
 	pending_inits.clear();

@@ -13,6 +13,7 @@
 #include "application/setups/editor/commands/paste_entities_command.h"
 #include "application/setups/editor/commands/duplicate_entities_command.h"
 #include "application/setups/editor/commands/change_grouping_command.h"
+#include "application/setups/editor/commands/mode_commands.h"
 
 #include "application/setups/editor/commands/asset_commands.h"
 #include "application/setups/editor/commands/flavour_commands.h"

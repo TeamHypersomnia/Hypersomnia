@@ -379,19 +379,23 @@ void editor_setup::perform_custom_imgui(
 						}
 					};
 
-					do_window_entry(history_gui);
-
-					ImGui::Separator();
+					ImGui::MenuItem("(Info)", NULL, false, false);
 
 					do_window_entry(summary_gui);
 					do_window_entry(coordinates_gui);
+
+					ImGui::Separator();
+					ImGui::MenuItem("(Editing)", NULL, false, false);
+
 					do_window_entry(filters_gui);
+					do_window_entry(history_gui);
 
 					if (item_if_tabs("Player")) {
 						player_gui.show = true;
 					}
 
 					do_window_entry(selection_groups_gui);
+					do_window_entry(modes_gui);
 
 					ImGui::Separator();
 					ImGui::MenuItem("(State)", NULL, false, false);
@@ -447,6 +451,7 @@ void editor_setup::perform_custom_imgui(
 		}
 
 		selection_groups_gui.perform(has_ctrl, make_command_input());
+		modes_gui.perform(settings, make_command_input());
 
 		summary_gui.perform(*this);
 		filters_gui.perform(
@@ -911,6 +916,7 @@ bool editor_setup::handle_input_before_imgui(
 				case key::N: sounds_gui.open(); return true;
 				case key::R: particle_effects_gui.open(); return true;
 				case key::M: plain_animations_gui.open(); return true;
+				case key::D: modes_gui.open(); return true;
 				default: break;
 			}
 		}

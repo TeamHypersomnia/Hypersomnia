@@ -16,7 +16,7 @@
 #include "application/intercosm.h"
 #include "application/setups/editor/editor_folder.h"
 
-#include "application/setups/editor/property_editor/general_edit_properties.h"
+#include "application/setups/editor/property_editor/singular_edit_properties.h"
 #include "application/setups/editor/detail/field_address.h"
 #include "application/setups/editor/property_editor/widgets/pathed_asset_widget.h"
 #include "application/setups/editor/property_editor/widgets/flavour_widget.h"
@@ -36,57 +36,20 @@ static void edit_common(
 	const commanding_property_editor_input& in,
 	const cosmos_common_significant& signi
 ) {
-	using namespace augs::imgui;
-
-	const auto property_location = [&]() {
-		return typesafe_sprintf(" (Common state)");
-	}();
-
 	auto& cmd_in = in.command_in;
-	/* Linker error fix */
-	auto& history = cmd_in.get_history();
-
-	auto post_new_change = [&](
-		const auto& description,
-		const field_address field,
-		const auto& new_content
-	) {
-		change_common_state_command cmd;
-		cmd.field = field;
-
-		cmd.value_after_change = augs::to_bytes(new_content);
-		cmd.built_description = description + property_location;
-
-		history.execute_new(cmd, cmd_in);
-	};
-
-	auto rewrite_last_change = [&](
-		const auto& description,
-		const auto& new_content
-	) {
-		auto& last = history.last_command();
-
-		if (auto* const cmd = std::get_if<change_common_state_command>(std::addressof(last))) {
-			cmd->built_description = description + property_location;
-			cmd->rewrite_change(augs::to_bytes(new_content), cmd_in);
-		}
-		else {
-			LOG("WARNING! There was some problem with tracking activity of editor controls.");
-		}
-	};
-
 	auto& defs = cmd_in.folder.work->viewables;
 	const auto project_path = cmd_in.folder.current_path;
 
 	auto& work = *cmd_in.folder.work;
 	auto& cosm = work.world;
 
-	general_edit_properties<common_state_editor_behaviour>(
-		in.prop_in, 
+	singular_edit_properties<
+		change_common_state_command,
+		common_state_editor_behaviour
+	>(
+		in,
 		signi,
-		post_new_change,
-		rewrite_last_change,
-		true_returner(),
+		" (Common state)",
 		special_widgets(
 			pathed_asset_widget { defs, project_path, cmd_in },
 			unpathed_asset_widget { defs, cosm.get_logical_assets() },

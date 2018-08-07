@@ -623,6 +623,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/components/hand_fuse_component.cpp"
 	"src/game/debug_draw.cpp"
 	"src/game/detail/explosive/detonate.cpp"
+	"src/application/setups/editor/gui/editor_modes_gui.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

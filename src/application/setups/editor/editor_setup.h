@@ -44,6 +44,7 @@
 #include "application/setups/editor/gui/editor_summary_gui.h"
 #include "application/setups/editor/gui/editor_filters_gui.h"
 #include "application/setups/editor/gui/editor_player_gui.h"
+#include "application/setups/editor/gui/editor_modes_gui.h"
 
 #include "application/setups/editor/gui/editor_pathed_asset_gui.h"
 #include "application/setups/editor/gui/editor_unpathed_asset_gui.h"
@@ -93,6 +94,7 @@ class editor_setup : private current_access_cache<editor_setup> {
 
 	// GEN INTROSPECTOR class editor_setup
 	editor_player_gui player_gui = std::string("Player");
+	editor_modes_gui modes_gui = std::string("Modes");
 	editor_history_gui history_gui = std::string("History");
 	editor_fae_gui fae_gui = std::string("Scene hierarchy");
 	editor_selected_fae_gui selected_fae_gui = std::string("Selection hierarchy");
