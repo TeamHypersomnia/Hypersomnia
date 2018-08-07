@@ -3,9 +3,9 @@
 #include "application/setups/editor/property_editor/commanding_property_editor_input.h"
 
 template <
-	class cmd_type,
 	class Behaviour = default_edit_properties_behaviour,
 	class T,
+	class cmd_type,
 	class S = default_widget_provider,
 	class D = default_sane_default_provider
 >
@@ -13,6 +13,7 @@ void singular_edit_properties(
 	const commanding_property_editor_input& in,
 	T&& parent_altered,
 	const std::string& property_location,
+	const cmd_type& cmd_pattern = cmd_type(),
 	S special_widget_provider = {},
 	D sane_defaults = {},
 	const int extra_columns = 0
@@ -29,7 +30,7 @@ void singular_edit_properties(
 		const field_address<field_type_id>& field,
 		const auto& new_content
 	) {
-		cmd_type cmd;
+		auto cmd = cmd_pattern;
 		cmd.field = field;
 
 		cmd.value_after_change = augs::to_bytes(new_content);

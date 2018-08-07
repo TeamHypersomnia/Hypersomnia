@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- For now, don't make commands for creating/deleting/duplicating mode vars
+	- Just in testbed populate all types with one vars instance
+
+- Player & modes
+	- Mode & mode vars will have no different relation to the player as the cosmos common state has 
+		- e.g. for replays, we can change it any time
+		- They should always more or less catch up
+
 - Mode vars gui
 	- Can set the current one, resetting the cosmos
 

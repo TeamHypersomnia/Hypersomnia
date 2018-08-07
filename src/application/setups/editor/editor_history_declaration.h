@@ -28,6 +28,7 @@ struct change_grouping_command;
 struct change_group_property_command;
 
 struct change_current_mode_property_command;
+struct change_mode_vars_property_command;
 
 template <class>
 struct create_pathed_asset_id_command;
@@ -67,6 +68,7 @@ using editor_history_base = augs::history_with_marks<
 	change_group_property_command,
 
 	change_current_mode_property_command,
+	change_mode_vars_property_command,
 
 	create_pathed_asset_id_command<assets::image_id>,
 	forget_asset_id_command<assets::image_id>,

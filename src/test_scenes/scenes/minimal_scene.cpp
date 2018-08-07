@@ -23,6 +23,7 @@
 namespace test_scenes {
 	void minimal_scene::setup(test_scene_mode_vars& vars) {
 		vars.spawned_faction = faction_type::METROPOLIS;
+		vars.name = "Minimal scene vars";
 	}
 
 	void minimal_scene::populate(const loaded_image_caches_map& caches, const logic_step step) const {

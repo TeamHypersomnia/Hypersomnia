@@ -12,6 +12,8 @@ class cosmos;
 
 struct test_scene_mode_vars {
 	// GEN INTROSPECTOR struct test_scene_mode_vars
+	std::string name;
+
 	real32 respawn_after_ms = 3000;
 	requested_equipment initial_eq;
 	faction_type spawned_faction = faction_type::RESISTANCE;

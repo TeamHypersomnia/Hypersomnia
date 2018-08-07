@@ -31,32 +31,88 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 	thread_local ImGuiTextFilter filter;
 	filter.Draw();
 
-	auto& current_mode = cmd_in.get_player().current_mode;
+	ImGui::Columns(2); // 4-ways, with border
+	next_column_text_disabled("Details");
 
-	std::visit(
-		[&](const auto& typed_mode) {
-			auto& work = *cmd_in.folder.work;
-			auto& cosm = work.world;
+	{
+		auto node = scoped_tree_node("Current mode");
 
-			auto in = commanding_property_editor_input {
-				{ settings.property_editor, property_editor_data }, { cmd_in }
-			};
+		next_columns(2);
 
-			singular_edit_properties<
-				change_current_mode_property_command
-			>(
-				in,
-				typed_mode,
-				" (Current mode)",
-				special_widgets(
-					flavour_widget { cosm }
-				)
+		if (node) {
+			auto& current_mode = cmd_in.get_player().current_mode;
+
+			std::visit(
+				[&](const auto& typed_mode) {
+					auto& work = *cmd_in.folder.work;
+					auto& cosm = work.world;
+
+					auto in = commanding_property_editor_input {
+						{ settings.property_editor, property_editor_data }, { cmd_in }
+					};
+
+					singular_edit_properties(
+						in,
+						typed_mode,
+						" (Current mode)",
+						change_current_mode_property_command(),
+						special_widgets(
+							flavour_widget { cosm }
+						)
+					);
+				}, 
+				current_mode
 			);
-		}, 
-		current_mode
-	);
+		}
+	}
 
 	ImGui::Separator();
 
-	//auto& all_vars = in.folder.mode_vars;
+	auto& all_vars = cmd_in.folder.mode_vars;
+
+	all_vars.for_each_container(
+		[&](const auto& modes) {
+			ImGui::Separator();
+			using vars_type = typename remove_cref<decltype(modes)>::mapped_type;
+
+			const auto type_node_label = format_field_name(get_type_name<vars_type>());
+			auto type_node = scoped_tree_node(type_node_label.c_str());
+
+			next_columns(2);
+
+			if (type_node) {
+				for (const auto& it : modes) {
+					const auto& typed_mode = it.second;
+					const auto vars_id = it.first;
+					const auto node_label = typed_mode.name + "###" + std::to_string(vars_id);
+					auto node = scoped_tree_node(node_label.c_str());
+
+					next_columns(2);
+
+					if (node) {
+						auto& work = *cmd_in.folder.work;
+						auto& cosm = work.world;
+
+						auto in = commanding_property_editor_input {
+							{ settings.property_editor, property_editor_data }, { cmd_in }
+						};
+
+						change_mode_vars_property_command cmd;
+						cmd.vars_type_id.set<vars_type>();
+						cmd.vars_id = vars_id;
+
+						singular_edit_properties(
+							in,
+							typed_mode,
+							" (Current mode)",
+							cmd,
+							special_widgets(
+								flavour_widget { cosm }
+							)
+						);
+					}
+				}
+			}
+		}
+	);
 }

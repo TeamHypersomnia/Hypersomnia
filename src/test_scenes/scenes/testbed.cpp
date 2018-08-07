@@ -39,6 +39,7 @@
 
 namespace test_scenes {
 	void testbed::setup(test_scene_mode_vars& vars) {
+		vars.name = "Testbed vars";
 		vars.spawned_faction = faction_type::RESISTANCE;
 
 		vars.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::VINDICATOR);

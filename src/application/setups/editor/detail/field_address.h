@@ -60,6 +60,7 @@ using asset_field_type_id = type_in_list_id<
 using mode_field_type_id  = type_in_list_id<
 	type_list<
 		augs::trivial_type_marker,
+		std::string,
 		std::vector<entity_guid>
 	>
 >;

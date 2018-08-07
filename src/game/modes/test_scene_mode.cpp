@@ -29,6 +29,12 @@ void test_scene_mode::teleport_to_next_spawn(const input in, const entity_id id)
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
 		const auto faction = typed_handle.get_official_faction();
 
+		auto normalize_spawn_index = [&]() {
+			current_spawn_index = (current_spawn_index + 1) % get_num_faction_spawns(in.cosm, faction);
+		};
+
+		normalize_spawn_index();
+
 		if (const auto spawn = ::find_faction_spawn(in.cosm, faction, current_spawn_index)) {
 			const auto spawn_transform = spawn.get_logic_transform();
 			typed_handle.set_logic_transform(spawn_transform);
@@ -37,7 +43,7 @@ void test_scene_mode::teleport_to_next_spawn(const input in, const entity_id id)
 				crosshair->base_offset = vec2::from_degrees(spawn_transform.rotation) * 200;
 			}
 
-			current_spawn_index = (current_spawn_index + 1) % get_num_faction_spawns(in.cosm, faction);
+			normalize_spawn_index();
 		}
 	});
 }

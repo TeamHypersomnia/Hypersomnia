@@ -43,13 +43,11 @@ static void edit_common(
 	auto& work = *cmd_in.folder.work;
 	auto& cosm = work.world;
 
-	singular_edit_properties<
-		change_common_state_command,
-		common_state_editor_behaviour
-	>(
+	singular_edit_properties<common_state_editor_behaviour>(
 		in,
 		signi,
 		" (Common state)",
+		change_common_state_command(),
 		special_widgets(
 			pathed_asset_widget { defs, project_path, cmd_in },
 			unpathed_asset_widget { defs, cosm.get_logical_assets() },

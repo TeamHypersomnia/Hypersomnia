@@ -200,6 +200,26 @@ struct editor_property_accessors {
 		);
 	}
 
+	template <class T, class F>
+	static void access_each_property(
+		const change_mode_vars_property_command& self,
+		T in,
+		F callback
+	) {
+		in.folder.mode_vars.visit(
+			self.vars_type_id,
+			[&](auto& typed_mode_vars) {
+				on_field_address(
+					typed_mode_vars.at(self.vars_id),
+					self.field,
+					continue_if_nullopt([&](auto& resolved_field) {
+						return callback(resolved_field);
+					})
+				);
+			}
+		);
+	}
+
 	template <class id_type, class T, class F>
 	static void access_each_property(
 		const change_asset_property_command<id_type>& self,
