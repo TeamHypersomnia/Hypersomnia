@@ -203,14 +203,14 @@ public:
 		return false;
 	}
 
-	std::optional<faction_type> find_official_faction() const {
+	faction_type get_official_faction() const {
 		const auto self = *static_cast<const E*>(this);
 
 		if (const auto attitude = self.template find<components::attitude>()) {
 			return attitude->official_faction;
 		}
 
-		return std::nullopt;
+		return faction_type::NONE;
 	}
 
 	bool is_like_planted_bomb() const {

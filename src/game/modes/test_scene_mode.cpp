@@ -27,17 +27,17 @@ void test_scene_mode::teleport_to_next_spawn(const input in, const entity_id id)
 	const auto handle = in.cosm[id];
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
-		if (const auto faction = typed_handle.find_official_faction()) {
-			if (const auto spawn = ::find_faction_spawn(in.cosm, *faction, current_spawn_index)) {
-				const auto spawn_transform = spawn.get_logic_transform();
-				typed_handle.set_logic_transform(spawn_transform);
+		const auto faction = typed_handle.get_official_faction();
 
-				if (const auto crosshair = typed_handle.find_crosshair()) {
-					crosshair->base_offset = vec2::from_degrees(spawn_transform.rotation) * 200;
-				}
+		if (const auto spawn = ::find_faction_spawn(in.cosm, faction, current_spawn_index)) {
+			const auto spawn_transform = spawn.get_logic_transform();
+			typed_handle.set_logic_transform(spawn_transform);
 
-				current_spawn_index = (current_spawn_index + 1) % get_num_faction_spawns(in.cosm, *faction);
+			if (const auto crosshair = typed_handle.find_crosshair()) {
+				crosshair->base_offset = vec2::from_degrees(spawn_transform.rotation) * 200;
 			}
+
+			current_spawn_index = (current_spawn_index + 1) % get_num_faction_spawns(in.cosm, faction);
 		}
 	});
 }

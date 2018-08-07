@@ -15,6 +15,7 @@ namespace components {
 
 		if (const auto capability = new_direct_sender.get_owning_transfer_capability()) {
 			capability_of_sender = capability;
+			faction_of_sender = capability.get_official_faction();
 
 			if (const auto maybe_driver = capability.find<components::driver>()) {
 				if (cosmos[maybe_driver->owned_vehicle]) {
