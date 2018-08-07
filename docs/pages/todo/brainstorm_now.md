@@ -6,25 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- New entity type: Explosion body
-	- invariants::explosive shall contain a cascade explosion input parameters
-		- this will be adequately set for C4, leaving grenades intact
-		- several explosive_body flavours?
-			- each flavour might specify several explosion types from which to randomize
-			- plus a mult range for randomization of size
-	- Has a circle shape with high restitution
-		- Can even draw some highlights in place of the circle, for a cool effect
-	- Has a pathfinding_query filter that only collides with walls and other concrete objects
-	- Periodically spawns an explosion
-		- Applies a slight, random force each time
-	- removes the need to introduce global solvable, also will be more easily networkable in case of an MMO
-
-- Implementing the bomb
-	- Global solvable
-		- Priority queue with scheduled explosions
-		- Universal solve that is used by all solvers, standard or others
-	- Bomb should have a backpack category and be too heavy to be put into backpack
-
 - Mode vars gui
 	- Can set the current one, resetting the cosmos
 
@@ -65,18 +46,6 @@ summary: That which we are brainstorming at the moment.
 
 - There will ALWAYS be some game mode whenever a game is running
 	- E.g. test scene mode
-
-- Bomb logic
-	- Arming counter is increased when:
-		- Player is inside the bombsite area
-		- Player has all movement flags unset (except shift for sprint)
-	- Arming counter is reset when any of WSAD flags goes true
-	- When placed, change C4 to a static body with filter that only collides with bullet shells
-	- Unarming counter is increased when:
-		- Player is inside the bombsite area
-		- Player has all movement flags unset (except shift for sprint)
-	- arming/unarming durations inside explosive invariant
-	- defusable_by boolset with factions
 
 - Mode entropy 
 	- As it steps together with the cosmos, will necessarily contain cosmic entropy

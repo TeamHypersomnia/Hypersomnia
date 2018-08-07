@@ -30,6 +30,7 @@ void detonate(const detonate_input in) {
 	step.post_message(messages::queue_deletion(in.subject));
 
 	const auto cascade_inputs = vectorize_array(e.cascade, [](const auto& f) { return f.flavour_id.is_set(); });
+	const auto sender_of_subject = cosm[in.subject].get<components::sender>();
 
 	for (const auto& c_in : cascade_inputs) {
 		const auto n = c_in.num_spawned;
@@ -54,6 +55,8 @@ void detonate(const detonate_input in) {
 				cosm,
 				c_in.flavour_id,
 				[&](const auto typed_handle) {
+					typed_handle.template get<components::sender>() = sender_of_subject;
+
 					{
 						const auto target_transform = transformr(t.pos, vel_angle);
 						typed_handle.set_logic_transform(target_transform);

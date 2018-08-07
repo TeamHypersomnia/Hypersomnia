@@ -12,15 +12,12 @@ namespace components {
 		const auto& cosmos = new_direct_sender.get_cosmos();
 
 		direct_sender = new_direct_sender;
-		const auto found_capability_of_sender = new_direct_sender.get_owning_transfer_capability();
 
-		if (found_capability_of_sender.alive()) {
-			capability_of_sender = found_capability_of_sender;
+		if (const auto capability = new_direct_sender.get_owning_transfer_capability()) {
+			capability_of_sender = capability;
 
-			const auto* const maybe_driver = found_capability_of_sender.find<components::driver>();
-
-			if (maybe_driver != nullptr) {
-				if (cosmos[maybe_driver->owned_vehicle].alive()) {
+			if (const auto maybe_driver = capability.find<components::driver>()) {
+				if (cosmos[maybe_driver->owned_vehicle]) {
 					vehicle_driven_by_capability = maybe_driver->owned_vehicle;
 				}
 			}

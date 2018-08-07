@@ -1208,3 +1208,35 @@ we consider whole type overrides too complex architeciturally:
 				- Why would we respond to pre-solves there anyway?
 		- Set use button to true inside sentience and perform some general logic upon it in sentience system, all in one place
 			- Prioritize bombs, obviously 
+
+- New entity type: Explosion body
+	- invariants::explosive shall contain a cascade explosion input parameters
+		- this will be adequately set for C4, leaving grenades intact
+		- several explosive_body flavours?
+			- each flavour might specify several explosion types from which to randomize
+			- plus a mult range for randomization of size
+	- Has a circle shape with high restitution
+		- Can even draw some highlights in place of the circle, for a cool effect
+	- Has a pathfinding_query filter that only collides with walls and other concrete objects
+	- Periodically spawns an explosion
+		- Applies a slight, random force each time
+	- removes the need to introduce global solvable, also will be more easily networkable in case of an MMO
+
+- Implementing the bomb
+	- Global solvable
+		- Priority queue with scheduled explosions
+		- Universal solve that is used by all solvers, standard or others
+	- Bomb should have a backpack category and be too heavy to be put into backpack
+
+- Bomb logic
+	- Arming counter is increased when:
+		- Player is inside the bombsite area
+		- Player has all movement flags unset (except shift for sprint)
+	- Arming counter is reset when any of WSAD flags goes true
+	- When placed, change C4 to a static body with filter that only collides with bullet shells
+	- Unarming counter is increased when:
+		- Player is inside the bombsite area
+		- Player has all movement flags unset (except shift for sprint)
+	- arming/unarming durations inside explosive invariant
+	- defusable_by boolset with factions
+

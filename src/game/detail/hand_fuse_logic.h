@@ -210,6 +210,8 @@ struct fuse_logic_provider {
 	void arm_explosive() const {
 		fuse.when_armed = now;
 
+		fused_entity.template get<components::sender>().set(holder);
+
 		fuse_def.armed_sound.start(
 			step,
 			sound_effect_start_input::fire_and_forget(fused_transform).set_listener(holder)

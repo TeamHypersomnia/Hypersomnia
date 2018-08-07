@@ -424,6 +424,7 @@ struct explosion_body {
 	using components = type_list<
 		components::rigid_body,
 		components::cascade_explosion,
+		components::sender,
 		components::interpolation
 	>;
 };

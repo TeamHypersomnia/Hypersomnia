@@ -11,6 +11,9 @@
 - title: ECS
   name: ECS
   description: Our flavour of Entity-component-system pattern.
+- title: Components
+  name: components
+  description: All of them.
 - title: Setups
   title_link: setup
   name: setups

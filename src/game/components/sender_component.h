@@ -4,10 +4,6 @@
 
 namespace components {
 	struct sender {
-		/*
-			We are only interested in the vehicle driven by capability at the time of sending.
-		*/
-		
 		// GEN INTROSPECTOR struct components::sender
 		signi_entity_id direct_sender;
 		signi_entity_id capability_of_sender;

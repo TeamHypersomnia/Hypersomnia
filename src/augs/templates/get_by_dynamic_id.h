@@ -28,11 +28,13 @@ decltype(auto) get_by_dynamic_index(
 				return generic_call(std::get<current_candidate>(std::forward<T>(index_gettable_object)));
 			}
 			else {
+				(void)dynamic_type_index;
 				return generic_call(std::nullopt);
 			}
 		}
 		else {
 			ensure_eq(dynamic_type_index, current_candidate);
+			(void)dynamic_type_index;
 			return generic_call(std::get<current_candidate>(std::forward<T>(index_gettable_object)));
 		}
 	}
@@ -78,11 +80,13 @@ decltype(auto) conditional_get_by_dynamic_index(
 				return generic_call(std::get<list_space_current>(std::forward<T>(index_gettable_object)));
 			}
 			else {
+				(void)dynamic_type_index;
 				return generic_call(std::nullopt);
 			}
 		}
 		else {
 			ensure_eq(dynamic_type_index, list_space_current);
+			(void)dynamic_type_index;
 			return generic_call(std::get<list_space_current>(std::forward<T>(index_gettable_object)));
 		}
 	}
@@ -154,6 +158,7 @@ decltype(auto) conditional_find_by_dynamic_id(
 	static_assert(num_types_in_list_v<remove_cref<T>> > 0, "Can't find from an empty list.");
 
 	if constexpr(std::is_same_v<OnlyCandidates, type_list<>>) {
+		(void)dynamic_type_index;
 		return generic_call(std::nullopt);
 	}
 	else {
