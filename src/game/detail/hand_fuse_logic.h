@@ -260,13 +260,17 @@ struct fuse_logic_provider {
 	}
 
 	bool defusing_character_in_range() const {
-		return use_button_overlaps(character_now_defusing, fused_entity).has_value();
+		return 
+			character_now_defusing.get_official_faction() != fused_entity.get_official_faction() 
+			&& use_button_overlaps(character_now_defusing, fused_entity).has_value()
+		;
 	}
 
 	bool defusing_conditions_fulfilled() const {
 		return 
 			fuse_def.defusing_enabled()
 			&& character_now_defusing.alive() 
+			&& character_now_defusing.get_official_faction() != fused_entity.get_official_faction()
 			&& is_standing_still(character_now_defusing)
 		;
 	}

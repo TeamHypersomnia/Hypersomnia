@@ -210,6 +210,10 @@ public:
 			return attitude->official_faction;
 		}
 
+		if (const auto sender = self.template find<components::sender>()) {
+			return sender->faction_of_sender;
+		}
+
 		return faction_type::NONE;
 	}
 
