@@ -230,14 +230,15 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 
 			const auto property_location = typesafe_sprintf(" (in %x)", displayed_name);
 
-			using command_type = change_asset_property_command<asset_id_type>;
+			using cmd_type = change_asset_property_command<asset_id_type>;
+			using field_type_id = property_field_type_id_t<cmd_type>;
 
 			auto post_new_change = [&](
 				const auto& description,
 				const auto field_id,
 				const auto& new_content
 			) {
-				command_type cmd;
+				cmd_type cmd;
 
 				if (is_current_ticked) {
 					cmd.affected_assets = ticked_ids;
@@ -259,7 +260,7 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 			) {
 				auto& last = cmd_in.get_history().last_command();
 
-				if (auto* const cmd = std::get_if<command_type>(std::addressof(last))) {
+				if (auto* const cmd = std::get_if<cmd_type>(std::addressof(last))) {
 					cmd->built_description = description + property_location;
 					cmd->rewrite_change(augs::to_bytes(new_content), cmd_in);
 				}
@@ -280,12 +281,12 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 				>
 			;
 
-			general_edit_properties(
+			general_edit_properties<field_type_id>(
 				prop_in,
 				definitions[id],
 				post_new_change,
 				rewrite_last_change,
-				[&](const auto& first, const field_address field_id) {
+				[&](const auto& first, const auto& field_id) {
 					if (!is_current_ticked) {
 						return true;
 					}

@@ -22,9 +22,9 @@ decltype(auto) get_name_of(const entity_flavour<T>& flavour) {
 }
 
 template <class C, class T, class N>
-void describe_if_rename(C& cmd, std::string& old, const field_address field, const T& invariant, const N& new_content) {
+void describe_if_renamed_flavour(C& cmd, std::string& old, const cosmic_field_address& field, const T& invariant, const N& new_content) {
 	if constexpr(std::is_same_v<T, invariants::text_details> && std::is_same_v<N, std::string>) {
-		if (field == MACRO_MAKE_FIELD_ADDRESS(invariants::text_details, name)) {
+		if (field == MACRO_MAKE_COSMIC_FIELD_ADDRESS(invariants::text_details, name)) {
 			if (old.empty()) {
 				old = "Renamed " + invariant.name;
 			}
@@ -42,8 +42,10 @@ void edit_invariant(
 	const T& invariant,
 	edit_invariant_input in
 ) {
-	using command_type = remove_cref<decltype(in.command)>;
 	using namespace augs::imgui;
+
+	using cmd_type = remove_cref<decltype(in.command)>;
+	using field_type_id = property_field_type_id_t<cmd_type>;
 
 	const auto fae_in = in.fae_in;
 
@@ -76,7 +78,7 @@ void edit_invariant(
 			cmd.property_id = property_id;
 			cmd.value_after_change = augs::to_bytes(new_content);
 			cmd.built_description = description + property_location;
-			describe_if_rename(cmd, old_description, field_id, invariant, new_content);
+			describe_if_renamed_flavour(cmd, old_description, field_id, invariant, new_content);
 
 			history.execute_new(std::move(cmd), cmd_in);
 		}
@@ -90,9 +92,9 @@ void edit_invariant(
 	) {
 		auto& last = history.last_command();
 
-		if (auto* const cmd = std::get_if<command_type>(std::addressof(last))) {
+		if (auto* const cmd = std::get_if<cmd_type>(std::addressof(last))) {
 			cmd->built_description = description + property_location;
-			describe_if_rename(*cmd, old_description, cmd->property_id.field, invariant, new_content);
+			describe_if_renamed_flavour(*cmd, old_description, cmd->property_id.field, invariant, new_content);
 			cmd->rewrite_change(augs::to_bytes(new_content), cmd_in);
 		}
 		else {
@@ -104,12 +106,12 @@ void edit_invariant(
 	
 	const auto project_path = cmd_in.folder.current_path;
 
-	general_edit_properties(
+	general_edit_properties<field_type_id>(
 		cpe_in.prop_in, 
 		invariant,
 		post_new_change,
 		rewrite_last_change,
-		[&](const auto& first, const field_address field_id) {
+		[&](const auto& first, const auto& field_id) {
 			return compare_all_fields_to(
 				first,
 				flavour_property_id { in.edited_invariant_id, field_id }, 

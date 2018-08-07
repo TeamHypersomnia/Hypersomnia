@@ -10,7 +10,7 @@
 
 struct flavour_property_id {
 	unsigned invariant_id = static_cast<unsigned>(-1);
-	field_address field;
+	cosmic_field_address field;
 };
 
 using affected_flavours_type = std::vector<raw_entity_flavour_id>;

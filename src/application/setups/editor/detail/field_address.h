@@ -19,7 +19,27 @@
 struct sound_meta;
 struct image_meta;
 
-using edited_field_type_id = type_in_list_id<
+template <class cmd_type>
+using field_type_id_t = decltype(decltype(cmd_type::field)::type_id);
+
+template <class cmd_type>
+using property_field_type_id_t = field_type_id_t<decltype(cmd_type::property_id)>;
+
+using cosmic_field_type_id = type_in_list_id<
+	type_list<
+		augs::trivial_type_marker,
+		std::string,
+		convex_partitioned_shape::poly_vector_type,
+		convex_partitioned_shape::convex_poly,
+		wandering_pixels_frames,
+		only_pick_these_items_vector,
+		specific_hostile_entities_vector,
+		friction_connection_vector,
+		remnant_flavour_vector
+	>
+>;
+
+using asset_field_type_id = type_in_list_id<
 	type_list<
 		augs::trivial_type_marker,
 		std::string,
@@ -28,27 +48,28 @@ using edited_field_type_id = type_in_list_id<
 		maybe_official_sound_path,
 		maybe_official_image_path,
 		std::vector<rgba>,
-		wandering_pixels_frames,
-		only_pick_these_items_vector,
-		specific_hostile_entities_vector,
-		friction_connection_vector,
-		remnant_flavour_vector,
-
 		plain_animation_frames_type,
 
 		std::vector<particles_emission>,
 
 		sound_meta,
-		image_meta,
+		image_meta
+	>
+>;
+
+using mode_field_type_id  = type_in_list_id<
+	type_list<
+		augs::trivial_type_marker,
 		std::vector<entity_guid>
 	>
 >;
 
+template <class field_type_id>
 struct field_address {
-	// GEN INTROSPECTOR struct field_address
+	// GEN INTROSPECTOR struct field_address class field_type_id
 	unsigned offset = static_cast<unsigned>(-1);
 	unsigned element_index = static_cast<unsigned>(-1);
-	edited_field_type_id type_id;
+	field_type_id type_id;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const field_address& b) const {
@@ -60,29 +81,33 @@ struct field_address {
 	}
 };
 
-template <class M>
+using cosmic_field_address = field_address<cosmic_field_type_id>;
+using asset_field_address = field_address<asset_field_type_id>;
+using mode_field_address = field_address<mode_field_type_id>;
+
+template <class I, class M>
 auto get_type_id_for_field() {
-	edited_field_type_id id;
+	I id;
 
 	if constexpr(can_access_data_v<M>) {
-		id.set<M>();
+		id.template set<M>();
 	}
-	else if constexpr(is_one_of_list_v<M, edited_field_type_id::list_type>) {
-		id.set<M>();
+	else if constexpr(is_one_of_list_v<M, typename I::list_type>) {
+		id.template set<M>();
 	}
 	else {
 		static_assert(std::is_trivially_copyable_v<M>);
-		id.set<augs::trivial_type_marker>();
+		id.template set<augs::trivial_type_marker>();
 	}
 
 	return id;
 }
 
-template <class O, class M>
+template <class I, class O, class M>
 auto make_field_address(const O& object, const M& member) {
-	field_address result;
+	field_address<I> result;
 
-	result.type_id = get_type_id_for_field<M>();
+	result.type_id = get_type_id_for_field<I, M>();
 	result.offset = static_cast<unsigned>(
 		reinterpret_cast<const std::byte*>(std::addressof(member))
 		- reinterpret_cast<const std::byte*>(std::addressof(object))
@@ -92,14 +117,15 @@ auto make_field_address(const O& object, const M& member) {
 }
 
 
-template <class M>
+template <class I, class M>
 auto make_field_address(const std::size_t offset) {
-	field_address result;
+	field_address<I> result;
 
-	result.type_id = get_type_id_for_field<M>();
+	result.type_id = get_type_id_for_field<I, M>();
 	result.offset = static_cast<unsigned>(offset);
 
 	return result;
 }
 
-#define MACRO_MAKE_FIELD_ADDRESS(a,b) make_field_address<decltype(a::b)>(augs_offsetof(a,b))
+#define MACRO_MAKE_COSMIC_FIELD_ADDRESS(a,b) make_field_address<cosmic_field_type_id, decltype(a::b)>(augs_offsetof(a,b))
+#define MACRO_MAKE_ASSET_FIELD_ADDRESS(a,b) make_field_address<asset_field_type_id, decltype(a::b)>(augs_offsetof(a,b))

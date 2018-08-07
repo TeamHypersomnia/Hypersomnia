@@ -74,7 +74,7 @@ bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation
 
 		cmd.common.has_parent = get_has_parent();
 		cmd.affected_assets = { id };
-		cmd.property_id.field = MACRO_MAKE_FIELD_ADDRESS(plain_animation, frames);
+		cmd.property_id.field = MACRO_MAKE_ASSET_FIELD_ADDRESS(plain_animation, frames);
 		cmd.value_after_change = augs::to_bytes(new_frames);
 		cmd.built_description = std::forward<decltype(description)>(description);
 

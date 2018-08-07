@@ -13,7 +13,9 @@ void edit_component(
 	const std::string& entity_name,
 	const change_entity_property_command& command
 ) {
-	using command_type = remove_cref<decltype(command)>;
+	using cmd_type = remove_cref<decltype(command)>;
+	using field_type_id = property_field_type_id_t<cmd_type>;
+
 	using namespace augs::imgui;
 
 	const auto property_location = [&]() {
@@ -29,7 +31,7 @@ void edit_component(
 
 	auto post_new_change = [&](
 		const auto& description,
-		const auto field_id,
+		const auto& field_id,
 		const auto& new_content
 	) {
 		auto cmd = command;
@@ -47,7 +49,7 @@ void edit_component(
 	) {
 		auto& last = history.last_command();
 
-		if (auto* const cmd = std::get_if<command_type>(std::addressof(last))) {
+		if (auto* const cmd = std::get_if<cmd_type>(std::addressof(last))) {
 			cmd->built_description = description + property_location;
 			cmd->rewrite_change(augs::to_bytes(new_content), cmd_in);
 		}
@@ -58,12 +60,12 @@ void edit_component(
 
 	const auto& cosm = cmd_in.get_cosmos();
 
-	general_edit_properties(
+	general_edit_properties<field_type_id>(
 		cpe_in.prop_in, 
 		component,
 		post_new_change,
 		rewrite_last_change,
-		[&](const auto& first, const field_address field_id) {
+		[&](const auto& first, const auto& field_id) {
 			return compare_all_fields_to(
 				first,
 				entity_property_id { component_id, field_id }, 

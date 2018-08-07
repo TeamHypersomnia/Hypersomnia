@@ -13,10 +13,10 @@ auto continue_if_nullopt(F callback) {
 	};
 }
 
-template <class O, class F>
+template <class O, class field_type_id, class F>
 decltype(auto) on_field_address(
 	O& object,
-	const field_address& address,
+	const field_address<field_type_id>& address,
 	F callback
 ) {
 	static constexpr bool is_const = std::is_const_v<O>;
@@ -48,7 +48,7 @@ decltype(auto) on_field_address(
 	};
 
 	return get_by_dynamic_id(
-		edited_field_type_id::list_type(),
+		typename field_type_id::list_type(),
 		address.type_id,
 		l
 	);

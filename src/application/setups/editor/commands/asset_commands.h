@@ -81,7 +81,7 @@ struct forget_asset_id_command : id_freeing_command<id_type> {
 
 template <class id_type>
 struct asset_property_id {
-	field_address field;
+	asset_field_address field;
 };
 
 template <class id_type>

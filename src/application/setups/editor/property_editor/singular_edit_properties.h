@@ -22,9 +22,11 @@ void singular_edit_properties(
 	auto& cmd_in = in.command_in;
 	auto& history = cmd_in.get_history();
 
+	using field_type_id = field_type_id_t<cmd_type>;
+
 	auto post_new_change = [&](
 		const auto& description,
-		const field_address& field,
+		const field_address<field_type_id>& field,
 		const auto& new_content
 	) {
 		cmd_type cmd;
@@ -51,7 +53,7 @@ void singular_edit_properties(
 		}
 	};
 
-	general_edit_properties<Behaviour>(
+	general_edit_properties<field_type_id, Behaviour>(
 		in.prop_in, 
 		std::forward<T>(parent_altered),
 		post_new_change,

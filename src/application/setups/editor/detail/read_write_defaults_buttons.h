@@ -17,7 +17,8 @@ void read_write_defaults_buttons(
 	const T& ticked_in_range
 ) {
 	using namespace augs::imgui;
-	using command_type = change_asset_property_command<I>;
+	using cmd_type = change_asset_property_command<I>;
+	using field_type_id = property_field_type_id_t<cmd_type>;
 
 	using D = remove_cref<decltype(definitions[id])>;
 	const D& definition_object = definitions[id];
@@ -35,10 +36,10 @@ void read_write_defaults_buttons(
 				decltype(definition_object.meta) new_meta;
 				load_meta_lua_if_exists(cmd_in.lua, new_meta, resolved);
 
-				command_type cmd;
+				cmd_type cmd;
 
 				cmd.affected_assets = { id };
-				cmd.property_id.field = make_field_address(definition_object, definition_object.meta);
+				cmd.property_id.field = make_field_address<field_type_id>(definition_object, definition_object.meta);
 				cmd.value_after_change = augs::to_bytes(new_meta);
 				cmd.built_description = "Read defaults from " + augs::filename_first(meta_lua_path);
 

@@ -107,11 +107,11 @@ std::optional<tweaker_type> detail_direct_edit(
 	return std::nullopt;
 }
 
-template <class M>
+template <class I, class M>
 struct tweaker_input {
 	const tweaker_type type;
 	const std::string& field_name;
-	field_address field_location;
+	field_address<I> field_location;
 	const M& new_value;
 };
 
@@ -411,6 +411,7 @@ struct default_edit_properties_behaviour {
 };
 
 template <
+	class field_type_id,
 	class Behaviour = default_edit_properties_behaviour,
    	class T,
    	class G,
@@ -469,7 +470,7 @@ void general_edit_properties(
 			[&parent_altered, &field_equality_predicate](const auto& modified, const auto index) {
 				using I = std::remove_const_t<decltype(index)>;
 
-				auto addr = ::make_field_address(parent_altered, modified);
+				auto addr = ::make_field_address<field_type_id>(parent_altered, modified);
 
 				if constexpr(std::is_same_v<I, unsigned>) {
 					addr.element_index = index;
@@ -482,17 +483,17 @@ void general_edit_properties(
 			[&parent_altered, &do_tweaker](const std::string& formatted_label, const tweaker_type t, const auto& modified, const auto index) {
 				using I = std::remove_const_t<decltype(index)>;
 
-				auto addr = ::make_field_address(parent_altered, modified);
+				auto addr = ::make_field_address<field_type_id>(parent_altered, modified);
 
 				if constexpr(std::is_same_v<I, unsigned>) {
 					addr.element_index = index;
 
-					do_tweaker(tweaker_input<remove_cref<decltype(modified[index])>>{
+					do_tweaker(tweaker_input<field_type_id, remove_cref<decltype(modified[index])>>{
 						t, formatted_label, addr, modified[index]
 					});
 				}
 				else {
-					do_tweaker(tweaker_input<remove_cref<decltype(modified)>>{
+					do_tweaker(tweaker_input<field_type_id, remove_cref<decltype(modified)>>{
 						t, formatted_label, addr, modified
 					});
 				}
