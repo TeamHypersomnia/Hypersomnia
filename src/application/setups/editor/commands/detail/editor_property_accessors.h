@@ -141,7 +141,7 @@ struct editor_property_accessors {
 	) {
 		auto& cosm = in.get_cosmos();
 
-		if (access(self.property_id, cosm, self.type_id, self.affected_flavours, continue_if_nullptr(std::forward<F>(callback)))) {
+		if (access(self.property_id, cosm, self.type_id, self.affected_flavours, continue_if_nullopt(std::forward<F>(callback)))) {
 			cosm.change_common_significant([&](auto&) { return changer_callback_result::REFRESH; });
 		}
 	}
@@ -154,7 +154,7 @@ struct editor_property_accessors {
 	) {
 		auto& cosm = in.get_cosmos();
 
-		if (access(self.property_id, cosm, self.type_id, self.affected_entities, continue_if_nullptr(std::forward<F>(callback)))) {
+		if (access(self.property_id, cosm, self.type_id, self.affected_entities, continue_if_nullopt(std::forward<F>(callback)))) {
 			cosmic::reinfer_all_entities(cosm);
 		}
 	}
@@ -171,7 +171,7 @@ struct editor_property_accessors {
 			on_field_address(
 				common_signi,
 				self.field,
-				continue_if_nullptr([&](auto& resolved_field) {
+				continue_if_nullopt([&](auto& resolved_field) {
 					return callback(resolved_field);
 				})
 			);
@@ -191,7 +191,7 @@ struct editor_property_accessors {
 				on_field_address(
 					typed_mode,
 					self.field,
-					continue_if_nullptr([&](auto& resolved_field) {
+					continue_if_nullopt([&](auto& resolved_field) {
 						return callback(resolved_field);
 					})
 				);
@@ -210,7 +210,7 @@ struct editor_property_accessors {
 			self.property_id,
 			in,
 			self.affected_assets,
-			continue_if_nullptr(std::forward<F>(callback))
+			continue_if_nullopt(std::forward<F>(callback))
 		);
 	}
 

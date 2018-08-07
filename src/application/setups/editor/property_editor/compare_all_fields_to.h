@@ -44,7 +44,7 @@ bool detail_compare(
 	const std::vector<std::byte>& first_bytes,
 	const T& resolved
 ) {
-	if constexpr(std::is_same_v<T, std::nullptr_t>) {
+	if constexpr(std::is_same_v<T, std::nullopt_t>) {
 		/* Not found! */
 		return false;
 	}

@@ -3,9 +3,9 @@
 #include "application/setups/editor/detail/field_address.h"
 
 template <class F>
-auto continue_if_nullptr(F callback) {
+auto continue_if_nullopt(F callback) {
 	return [callback](auto& resolved) -> callback_result {
-		if constexpr(!std::is_same_v<std::nullptr_t, remove_cref<decltype(resolved)>>) {
+		if constexpr(!std::is_same_v<std::nullopt_t, remove_cref<decltype(resolved)>>) {
 			return callback(resolved);
 		}
 
@@ -39,8 +39,7 @@ decltype(auto) on_field_address(
 				return callback(field_location->operator[](index));
 			}
 			else {
-				std::nullptr_t t;
-				return callback(t);
+				return callback(std::nullopt);
 			}
 		}
 		else {
