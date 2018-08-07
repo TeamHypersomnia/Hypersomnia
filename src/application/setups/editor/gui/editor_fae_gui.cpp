@@ -28,6 +28,7 @@ void editor_fae_gui_base::interrupt_tweakers() {
 #include "application/setups/editor/property_editor/fae/fae_tree.h"
 #include "application/setups/editor/property_editor/commanding_property_editor_input.h"
 #include "application/setups/editor/editor_history.hpp"
+#include "application/setups/editor/detail/sort_flavours_by_name.h"
 
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
@@ -41,19 +42,6 @@ void editor_fae_gui_base::do_view_mode_switch() {
 	auto child = scoped_child("fae-view-switch");
 	ImGui::Separator();
 	enum_radio(view_mode, true);
-}
-
-template <class C>
-void sort_flavours_by_name(const cosmos& cosm, C& ids) {
-	sort_range_by(
-		ids,
-		[&](const auto id) -> const std::string* { 
-			return std::addressof(cosm.get_flavour(id).template get<invariants::text_details>().name);
-		},
-		[](const auto& a, const auto& b) {
-			return *a.compared < *b.compared;
-		}
-	);
 }
 
 class in_selection_provider {

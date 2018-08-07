@@ -3,6 +3,7 @@
 #include "application/setups/editor/property_editor/widgets/keyboard_acquiring_popup.h"
 #include "application/setups/editor/detail/maybe_different_colors.h"
 #include "application/setups/editor/property_editor/tweaker_type.h"
+#include "application/setups/editor/detail/sort_flavours_by_name.h"
 
 struct flavour_widget {
 	const cosmos& cosm;
@@ -65,6 +66,26 @@ struct flavour_widget {
 
 			auto list_flavours_of_type = [&](auto e) {
 				using E = decltype(e);
+				using id_type = typed_entity_flavour_id<E>;
+
+				thread_local std::vector<id_type> matching_ids;
+				matching_ids.clear();
+
+				cosm.for_each_id_and_flavour<E>(
+					[&](const id_type& new_id, const auto& flavour) {
+						const auto& name = flavour.get_name();
+
+						if (filter.PassFilter(name.c_str())) {
+							matching_ids.push_back(new_id);
+						}
+					}
+				);
+
+				if (matching_ids.empty()) {
+					return;
+				}
+
+				sort_flavours_by_name(cosm, matching_ids);
 
 				static const auto entity_type_label = format_field_name(get_type_name<E>());
 
@@ -77,26 +98,21 @@ struct flavour_widget {
 
 				auto scope = scoped_indent();
 
-				cosm.for_each_id_and_flavour<E>(
-					[acquire_keyboard, &flavour_id, &result](const auto& new_id, const auto& flavour) {
-						const auto& name = flavour.get_name();
+				for (const auto& new_id : matching_ids) {
+					const auto& flavour = cosm.get_flavour(new_id);
 
-						if (!filter.PassFilter(name.c_str())) {
-							return;
-						}
+					const auto& name = flavour.get_name();
+					const bool is_current = flavour_id == new_id;
 
-						const bool is_current = flavour_id == new_id;
-
-						if (is_current && acquire_keyboard) {
-							ImGui::SetScrollHere();
-						}
-
-						if (ImGui::Selectable(name.c_str(), is_current)) {
-							flavour_id = new_id;
-							result = tweaker_type::DISCRETE;
-						}
+					if (is_current && acquire_keyboard) {
+						ImGui::SetScrollHere();
 					}
-				);
+
+					if (ImGui::Selectable(name.c_str(), is_current)) {
+						flavour_id = new_id;
+						result = tweaker_type::DISCRETE;
+					}
+				}
 			};
 
 			if constexpr(is_typed_flavour_id_v<T>) {

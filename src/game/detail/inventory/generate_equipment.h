@@ -52,6 +52,6 @@ void generate_equipment(const requested_equipment& eq, const E& character, const
 	if (eq.backpack.is_set()) {
 		const auto b = just_create_entity(cosm, eq.backpack);
 
-		transfer(b, character.get_primary_hand());
+		transfer(b, character[slot_function::SHOULDER]);
 	}
 }

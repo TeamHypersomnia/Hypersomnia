@@ -180,7 +180,6 @@ enum class test_complex_decorations {
 	FLOWER_PINK,
 	FLOWER_CYAN,
 
-	CONSOLE_BODY,
 	CONSOLE_LIGHT,
 
 	PINK_CORAL,
