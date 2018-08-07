@@ -1,6 +1,7 @@
 #pragma once
 #include "game/detail/visible_entities.h"
 #include "game/detail/physics/shape_overlapping.hpp"
+#include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 
 template <class E>
 bool bombsite_in_range(const E& fused_entity) {
@@ -8,6 +9,9 @@ bool bombsite_in_range(const E& fused_entity) {
 	const auto& fuse_def = fused_entity.template get<invariants::hand_fuse>();
 
 	if (fuse_def.can_only_arm_at_bombsites) {
+		const auto capability = fused_entity.get_owning_transfer_capability();
+		const auto matched_faction = capability.alive() ? capability.get_official_faction() : faction_type::NONE;
+
 		auto& entities = thread_local_visible_entities();
 
 		entities.reacquire_all_and_sort({
@@ -26,9 +30,11 @@ bool bombsite_in_range(const E& fused_entity) {
 					return callback_result::CONTINUE;
 				}
 				else {
-					if (entity_overlaps_entity(typed_handle, fused_entity)) {
-						found = true;
-						return callback_result::ABORT;
+					if (matched_faction == typed_handle.get_official_faction()) {
+						if (entity_overlaps_entity(typed_handle, fused_entity)) {
+							found = true;
+							return callback_result::ABORT;
+						}
 					}
 
 					return callback_result::CONTINUE;

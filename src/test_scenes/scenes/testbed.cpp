@@ -77,13 +77,26 @@ namespace test_scenes {
 			create(interference_type, vec2{ 154, 611 + i * 100.f });
 		}
 
-		std::vector<transformr> spawn_transforms = {
-			{ { 318, 267 }, -90 },
-			{ { 638, 267 }, -90 }
-		};
+		{
+			std::vector<transformr> spawn_transforms = {
+				{ { 318, 267 }, -90 },
+				{ { 638, 267 }, -90 }
+			};
 
-		for (const auto& s : spawn_transforms) {
-			create(test_point_markers::RESISTANCE_SPAWN, s);
+			for (const auto& s : spawn_transforms) {
+				create(test_point_markers::RESISTANCE_SPAWN, s);
+			}
+		}
+
+		{
+			std::vector<transformr> spawn_transforms = {
+				{ { 0, -930 }, 90 },
+				{ { 1041, -833 }, 90 }
+			};
+
+			for (const auto& s : spawn_transforms) {
+				create(test_point_markers::METROPOLIS_SPAWN, s);
+			}
 		}
 
 		std::vector<transformr> character_transforms = {
@@ -620,7 +633,8 @@ namespace test_scenes {
 		const auto orig1 = vec2(380, -1524);
 		create_aquarium(orig1);
 
-		create(test_box_markers::BOMBSITE_A, vec2(480, 200)).set_logical_size(vec2(600, 200));
+		create(test_box_markers::BOMBSITE_A, vec2(580, -800)).set_logical_size(vec2(600, 200));
+		create(test_box_markers::BOMBSITE_B, vec2(480, 200)).set_logical_size(vec2(600, 200));
 
 		create(test_hand_explosives::BOMB, vec2(280, 200));
 

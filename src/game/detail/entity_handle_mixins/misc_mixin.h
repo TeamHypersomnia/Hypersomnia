@@ -214,6 +214,14 @@ public:
 			return sender->faction_of_sender;
 		}
 
+		if (const auto marker = self.template find<invariants::box_marker>()) {
+			return marker->meta.associated_faction;
+		}
+
+		if (const auto marker = self.template find<invariants::point_marker>()) {
+			return marker->meta.associated_faction;
+		}
+
 		return faction_type::NONE;
 	}
 
