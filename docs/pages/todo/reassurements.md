@@ -5,6 +5,9 @@ permalink: reassurements
 summary: We don't need to do this yet, because...
 ---
 
+- For now, don't make commands for creating/deleting/duplicating mode vars
+	- Just in testbed populate all types with one vars instance
+
 - For now don't worry about maximum size, it's enough until DM
 	- In production, we will always reserve max used ever on startup
 		- we'll reserve the maximum (which will probably be half the maximum texture GPU size)

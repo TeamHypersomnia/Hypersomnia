@@ -31,7 +31,7 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 	thread_local ImGuiTextFilter filter;
 	filter.Draw();
 
-	ImGui::Columns(2); // 4-ways, with border
+	ImGui::Columns(2);
 	next_column_text_disabled("Details");
 
 	{

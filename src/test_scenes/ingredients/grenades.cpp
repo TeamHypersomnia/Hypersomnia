@@ -160,6 +160,8 @@ namespace test_flavours {
 			in.type = adverse_element_type::PED;
 			in.create_thunders_effect = true;
 
+			in.victim_shake = {};
+
 			explosive.released_image_id = to_image_id(test_scene_image_id::PED_GRENADE_RELEASED);
 			explosive.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 
@@ -248,7 +250,7 @@ namespace test_flavours {
 			invariants::hand_fuse fuse; 
 			fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
 			fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
-			fuse.fuse_delay_ms = 5000.f;
+			fuse.fuse_delay_ms = 35000.f;
 			fuse.override_release_impulse = true;
 			fuse.additional_release_impulse = {};
 			fuse.set_bomb_vars(1500.f, 10000.f);

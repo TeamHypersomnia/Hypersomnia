@@ -56,8 +56,7 @@ struct fuse_logic_provider {
 	}
 
 	bool defusing_delay_complete() const {
-		const auto when_started = fuse.when_started_defusing;
-		return when_started.was_set() && augs::is_ready(fuse_def.defusing_duration_ms, when_started, now, dt);
+		return fuse.amount_defused >= fuse_def.defusing_duration_ms;
 	}
 
 	void interrupt_arming() const {
@@ -196,7 +195,7 @@ struct fuse_logic_provider {
 	}
 
 	void start_defusing() const {
-		fuse.when_started_defusing = now;
+		fuse.amount_defused = 0.f;
 	}
 
 	bool has_started_arming() const {
@@ -204,7 +203,7 @@ struct fuse_logic_provider {
 	}
 
 	bool has_started_defusing() const {
-		return fuse.when_started_defusing.was_set();
+		return fuse.amount_defused >= 0.f;
 	}
 
 	void arm_explosive() const {
@@ -234,7 +233,7 @@ struct fuse_logic_provider {
 		}
 
 		fuse.character_now_defusing = {}; 
-		fuse.when_started_defusing = {};
+		fuse.amount_defused = -1.f;
 	}
 
 	bool bombsite_in_range() const {
@@ -322,6 +321,19 @@ struct fuse_logic_provider {
 							start_defusing();
 							play_started_defusing_sound();
 						}
+						
+						const auto n = character_now_defusing.get_wielded_items().size();
+
+						real32 defusing_speed_mult = 1.f;
+
+						if (n == 2) {
+							defusing_speed_mult = 0.5f;
+						}
+						else if (n == 0) {
+							defusing_speed_mult = 2.f;
+						}
+
+						fuse.amount_defused += defusing_speed_mult * dt.in_milliseconds();
 					}
 					else {
 						interrupt_defusing();

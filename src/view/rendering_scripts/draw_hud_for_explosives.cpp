@@ -92,10 +92,9 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 			}
 
 			if (t == circular_bar_type::OVER_MEDIUM && fuse_def.defusing_enabled()) {
-				if (const auto when_started_defusing = fuse.when_started_defusing; when_started_defusing.was_set()) {
+				if (const auto amount_defused = fuse.amount_defused; amount_defused >= 0.f) {
 					const auto highlight_amount = static_cast<float>(
-						(in.global_time_seconds - when_started_defusing.in_seconds(dt))
-						/ (fuse_def.defusing_duration_ms / 1000.f) 
+						amount_defused / fuse_def.defusing_duration_ms
 					);
 
 					draw_circle(highlight_amount, white, red_violet);

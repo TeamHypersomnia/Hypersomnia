@@ -6,7 +6,7 @@ namespace components {
 	}
 
 	bool hand_fuse::defused() const {
-		return !when_armed.was_set() && when_started_defusing.was_set();
+		return !when_armed.was_set() && amount_defused > 0.f;
 	}
 }
 

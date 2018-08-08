@@ -10,7 +10,7 @@ namespace components {
 		// GEN INTROSPECTOR struct components::hand_fuse
 		augs::stepped_timestamp when_armed;
 
-		augs::stepped_timestamp when_started_defusing;
+		real32 amount_defused = -1.f;
 		augs::stepped_timestamp when_started_arming;
 
 		augs::stepped_timestamp when_last_beep;
