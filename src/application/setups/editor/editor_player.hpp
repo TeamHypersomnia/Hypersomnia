@@ -24,11 +24,20 @@ void advance_player(
 				while (steps--) {
 					self.total_collected_entropy.clear_dead_entities(cosm);
 
-					typed_mode.advance(
-						{ *vars, cosm },
-						{ self.total_collected_entropy },
-						std::forward<Callbacks>(callbacks)...
-					);
+					if constexpr(M::needs_initial_solvable) {
+						typed_mode.advance(
+							{ *vars, cosm.get_solvable(), cosm },
+							{ self.total_collected_entropy },
+							std::forward<Callbacks>(callbacks)...
+						);
+					}
+					else {
+						typed_mode.advance(
+							{ *vars, cosm },
+							{ self.total_collected_entropy },
+							std::forward<Callbacks>(callbacks)...
+						);
+					}
 
 					self.total_collected_entropy.clear();
 				}

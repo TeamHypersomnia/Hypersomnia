@@ -36,6 +36,7 @@
 
 #include "test_scenes/scenes/test_scene_node.h"
 #include "game/modes/test_scene_mode.h"
+#include "game/modes/bomb_mode.h"
 
 namespace test_scenes {
 	void testbed::setup(test_scene_mode_vars& vars) {
@@ -45,6 +46,22 @@ namespace test_scenes {
 		vars.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::VINDICATOR);
 		vars.initial_eq.magazine = to_entity_flavour_id(test_container_items::SAMPLE_MAGAZINE);
 		vars.initial_eq.charge = to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE);
+	}
+
+	void testbed::setup(bomb_mode_vars& vars) {
+		vars.name = "Testbed bomb vars";
+
+		auto& resistance = vars.factions[faction_type::RESISTANCE];
+
+		resistance.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::VINDICATOR);
+		resistance.initial_eq.magazine = to_entity_flavour_id(test_container_items::SAMPLE_MAGAZINE);
+		resistance.initial_eq.charge = to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE);
+
+		auto& metropolis = vars.factions[faction_type::METROPOLIS];
+
+		metropolis.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SAMPLE_RIFLE);
+		metropolis.initial_eq.magazine = to_entity_flavour_id(test_container_items::SAMPLE_MAGAZINE);
+		metropolis.initial_eq.charge = to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE);
 	}
 
 	void testbed::populate(const loaded_image_caches_map& caches, const logic_step step) const {

@@ -17,6 +17,7 @@
 #include "view/viewables/image_cache.h"
 
 #include "test_scenes/scenes/test_scene_node.h"
+#include "game/modes/bomb_mode.h"
 #include "augs/math/cascade_aligner.h"
 #include "game/modes/test_scene_mode.h"
 
@@ -24,6 +25,10 @@ namespace test_scenes {
 	void minimal_scene::setup(test_scene_mode_vars& vars) {
 		vars.spawned_faction = faction_type::METROPOLIS;
 		vars.name = "Minimal scene vars";
+	}
+
+	void minimal_scene::setup(bomb_mode_vars& vars) {
+		vars.name = "Minimal scene bomb vars";
 	}
 
 	void minimal_scene::populate(const loaded_image_caches_map& caches, const logic_step step) const {
@@ -75,8 +80,8 @@ namespace test_scenes {
 
 #if 0
 		prefabs::create_sample_rifle(step, vec2(100, -500 + 50),
-			prefabs::create_sample_magazine(step, vec2(100, -650),
-				prefabs::create_cyan_charge(step, vec2(0, 0))));
+		prefabs::create_sample_magazine(step, vec2(100, -650),
+		prefabs::create_cyan_charge(step, vec2(0, 0))));
 
 
 		const auto force_type = test_hand_explosives::FORCE_GRENADE;

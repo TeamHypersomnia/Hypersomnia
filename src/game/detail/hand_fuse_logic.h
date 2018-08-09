@@ -137,6 +137,10 @@ struct fuse_logic_provider {
 		fused_entity.template get<invariants::shape_circle>().set_activated(true);
 #endif
 
+		refresh_fused_body();
+	}
+
+	void refresh_fused_body() const {
 		if (fuse_def.is_like_plantable_bomb()) {
 			fused_entity.infer_rigid_body();
 			fused_entity.infer_colliders();
@@ -314,6 +318,7 @@ struct fuse_logic_provider {
 					if (defusing_delay_complete()) {
 						defuse();
 						play_defused_effects();
+						refresh_fused_body();
 					}
 
 					if (defusing_conditions_fulfilled() && defusing_character_in_range()) {

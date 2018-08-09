@@ -5,6 +5,10 @@
 
 template <class E>
 bool bombsite_in_range(const E& fused_entity) {
+	if (fused_entity.template get<components::hand_fuse>().defused()) {
+		return false;
+	}
+
 	const auto& cosm = fused_entity.get_cosmos();
 	const auto& fuse_def = fused_entity.template get<invariants::hand_fuse>();
 

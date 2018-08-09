@@ -65,7 +65,8 @@ namespace components {
 		bool walking_enabled = false;
 		bool sprint_enabled = false;
 		bool was_sprint_effective = false;
-		pad_bytes<1> pad;
+		
+		bool freezed = false;
 
 		float make_inert_for_ms = 0.f;
 		float animation_amount = 0.f;

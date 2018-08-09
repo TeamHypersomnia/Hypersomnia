@@ -29,7 +29,8 @@ void intercosm::clear() {
 void intercosm::make_test_scene(
 	sol::state& lua, 
 	const test_scene_settings settings,
-	test_scene_mode_vars& mode
+	test_scene_mode_vars& test_mode,
+	bomb_mode_vars* const bomb_mode
 ) {
 	clear();
 
@@ -58,7 +59,11 @@ void intercosm::make_test_scene(
 		});
 
 		populator.populate_with_entities(caches, { world, {} });
-		populator.setup(mode);
+		populator.setup(test_mode);
+
+		if (bomb_mode != nullptr) {
+			populator.setup(*bomb_mode);
+		}
 	};
 
 	if (settings.create_minimal) {

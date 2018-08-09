@@ -5,6 +5,7 @@
 
 class loaded_image_caches_map;
 struct test_scene_mode_vars;
+struct bomb_mode_vars;
 
 namespace test_scenes {
 	class testbed {
@@ -20,5 +21,6 @@ namespace test_scenes {
 		}
 
 		void setup(test_scene_mode_vars&);
+		void setup(bomb_mode_vars&);
 	};
 }

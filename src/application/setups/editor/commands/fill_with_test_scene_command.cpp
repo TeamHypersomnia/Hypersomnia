@@ -21,31 +21,41 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 	auto& work = in.folder.work;
 	auto& view = in.folder.view;
 
-	auto& modes = in.folder.mode_vars;
+	auto& mode_vars = in.folder.mode_vars;
 	auto& player = in.folder.player;
 
 	work->to_bytes(intercosm_before_fill);
 	view_before_fill = augs::to_bytes(view);
-	modes_before_fill = augs::to_bytes(modes);
+	modes_before_fill = augs::to_bytes(mode_vars);
 	player_before_fill = augs::to_bytes(player);
 
 	test_scene_mode_vars test_vars;
+	bomb_mode_vars bomb_vars;
 
 #if BUILD_TEST_SCENES
-	work->make_test_scene(in.lua, { minimal, 144 }, test_vars);
+	work->make_test_scene(in.lua, { minimal, 144 }, test_vars, std::addressof(bomb_vars));
 #endif
 	view = {};
 
 	auto& cosm = work->world;
-	test_scene_mode test_mode;
-	view.controlled_character_id = cosm[test_mode.add_player({ test_vars, cosm }, faction_type::RESISTANCE)].get_id();
 
-	const auto test_vars_id = mode_vars_id(0);
-	modes.clear();
-	modes.get_for<test_scene_mode_vars>().try_emplace(test_vars_id, std::move(test_vars));
+	mode_vars.clear();
 
-	player.current_mode_vars_id = test_vars_id;
-	player.current_mode.emplace<test_scene_mode>(std::move(test_mode));
+	{
+		test_scene_mode test_mode;
+		view.controlled_character_id = cosm[test_mode.add_player({ test_vars, cosm }, faction_type::RESISTANCE)].get_id();
+
+		const auto test_vars_id = mode_vars_id(0);
+		mode_vars.get_for<test_scene_mode_vars>().try_emplace(test_vars_id, std::move(test_vars));
+
+		player.current_mode_vars_id = test_vars_id;
+		player.current_mode.emplace<test_scene_mode>(std::move(test_mode));
+	}
+
+	{
+		const auto bomb_vars_id = mode_vars_id(0);
+		mode_vars.get_for<bomb_mode_vars>().try_emplace(bomb_vars_id, std::move(bomb_vars));
+	}
 }
 
 void fill_with_test_scene_command::undo(const editor_command_input in) {
