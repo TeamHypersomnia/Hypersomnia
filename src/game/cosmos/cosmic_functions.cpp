@@ -14,6 +14,19 @@ entity_handle just_create_entity(
 	return cosmic::create_entity(cosm, id);
 }
 
+void cosmic::set_specific_name(const entity_handle& handle, const entity_name_str& name) {
+	const auto id = handle.get_id();
+	auto& cosm = handle.get_cosmos();
+	auto& signi = cosm.get_solvable({}).significant;
+
+	if (name.empty()) {
+		erase_element(signi.specific_names, id);
+		return;
+	}
+
+	signi.specific_names.try_emplace(id, name);
+}
+
 void cosmic::clear(cosmos& cosm) {
 	cosm.get_solvable({}).clear();
 	cosm.change_common_significant([](auto& c) { c = {}; return changer_callback_result::DONT_REFRESH; });

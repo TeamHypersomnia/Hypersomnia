@@ -172,6 +172,10 @@ public:
 
 		auto& cosm = self.get_cosmos();
 
+		if (const auto name = mapped_or_nullptr(cosm.get_solvable().significant.specific_names, self.get_id())) {
+			return *name;
+		}
+
 		if constexpr(E::is_specific) {
 			return get_flavour().template get<invariants::text_details>().name;
 		}

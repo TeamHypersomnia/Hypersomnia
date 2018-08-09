@@ -58,6 +58,8 @@ entity_guid test_scene_mode::add_player(input_type in, const faction_type factio
 			[&](const auto new_character) {
 				teleport_to_next_spawn(in, new_character);
 				pending_inits.push_back(new_character.get_guid());
+
+				cosmic::set_specific_name(new_character, "Player");
 			},
 			[](auto&&...) {}
 		);

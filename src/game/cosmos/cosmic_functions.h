@@ -3,6 +3,7 @@
 #include "game/cosmos/entity_handle_declaration.h"
 #include "game/cosmos/entity_id_declaration.h"
 #include "game/cosmos/specific_entity_handle_declaration.h"
+#include "game/common_state/entity_name_str.h"
 
 class cosmic_delta;
 class cosmos;
@@ -45,6 +46,7 @@ public:
 		specific_guid_creation_access() {}
 	};
 
+	static void set_specific_name(const entity_handle&, const entity_name_str&);
 	static void clear(cosmos& cosm);
 
 	template <class C, class I, class E>

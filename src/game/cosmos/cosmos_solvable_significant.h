@@ -1,4 +1,5 @@
 #pragma once
+#include <unordered_map>
 #include "augs/misc/constant_size_vector.h"
 #include "augs/misc/pool/pool.h"
 
@@ -7,6 +8,9 @@
 #include "game/cosmos/entity_pools.h"
 #include "game/cosmos/entity_solvable.h"
 
+#include "game/common_state/entity_name_str.h"
+#include "game/cosmos/entity_id.h"
+
 using cosmos_clock = augs::stepped_clock;
 
 struct cosmos_solvable_significant {
@@ -14,6 +18,8 @@ struct cosmos_solvable_significant {
 	all_entity_pools entity_pools;
 	cosmos_clock clock;
 	entity_guid next_entity_guid = entity_guid::first();
+
+	std::unordered_map<entity_id, entity_name_str> specific_names;
 
 	// END GEN INTROSPECTOR
 
