@@ -51,7 +51,24 @@ real32 editor_setup::get_interpolation_ratio() const {
 }
 
 entity_id editor_setup::get_viewed_character_id() const {
-	return anything_opened() ? view().controlled_character_id : entity_id();
+	if (anything_opened()) {
+		const auto& overridden = view().overridden_viewed_id;
+
+		if (overridden.is_set()) {
+			return overridden;
+		}
+
+		auto& cosm = work().world;
+
+		return std::visit(
+			[&](const auto& typed_mode) -> entity_id { 
+				return cosm[typed_mode.lookup(view().local_player_id)].get_id();
+			},
+			player().current_mode
+		);
+	}
+
+	return {};
 }
 
 const_entity_handle editor_setup::get_viewed_character() const {
@@ -107,8 +124,8 @@ void editor_setup::set_popup(const editor_popup p) {
 	augs::save_as_text(LOG_FILES_DIR "/last_editor_message.txt", augs::date_time().get_readable() + '\n' + logged);
 }
 
-void editor_setup::set_locally_viewed(const entity_id id) {
-	view().controlled_character_id = id;
+void editor_setup::override_viewed_entity(const entity_id id) {
+	view().overridden_viewed_id = id;
 }
 
 editor_setup::editor_setup(
@@ -1089,6 +1106,7 @@ bool editor_setup::handle_input_before_game(
 
 			if (has_shift) {
 				switch (k) {
+					case key::O: override_viewed_entity({}); view().reset_panning(); return true;
 					case key::R: mover.rotate_selection_once_by(make_mover_input(), 90); return true;
 					case key::E: mover.start_resizing_selection(make_mover_input(), true); return true;
 
@@ -1104,7 +1122,7 @@ bool editor_setup::handle_input_before_game(
 			switch (k) {
 				case key::O: 
 					if (view().selected_entities.size() == 1) { 
-						set_locally_viewed(*view().selected_entities.begin()); 
+						override_viewed_entity(*view().selected_entities.begin()); 
 					}
 					return true;
 				case key::A: view().toggle_ignore_groups(); return true;

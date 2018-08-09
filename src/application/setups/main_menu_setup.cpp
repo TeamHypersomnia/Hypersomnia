@@ -143,7 +143,7 @@ main_menu_setup::main_menu_setup(
 	if (is_intro_scene_available) {
 #if BUILD_TEST_SCENES
 		intro.make_test_scene(lua, { false, 60 }, mode_vars);
-		controlled_character_id = cosm[mode.add_player({ mode_vars, cosm }, faction_type::RESISTANCE)].get_id();
+		viewed_character_id = cosm[mode.lookup(mode.add_player({ mode_vars, cosm }, faction_type::RESISTANCE))].get_id();
 #endif
 	}
 

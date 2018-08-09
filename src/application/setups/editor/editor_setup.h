@@ -118,7 +118,7 @@ class editor_setup : private current_access_cache<editor_setup> {
 	const_entity_handle get_matching_go_to_entity() const;
 
 	void on_folder_changed();
-	void set_locally_viewed(const entity_id);
+	void override_viewed_entity(const entity_id);
 
 	void clear_id_caches();
 
@@ -192,7 +192,6 @@ class editor_setup : private current_access_cache<editor_setup> {
 	void make_last_command_a_child();
 
 	void center_view_at_selection();
-	void reset_zoom();
 
 	auto make_for_each_selected_entity() const {
 		return [this](auto callback) {

@@ -45,7 +45,7 @@ class main_menu_setup : public default_setup_settings {
 	intercosm intro;
 	test_scene_mode mode;
 	test_scene_mode_vars mode_vars;
-	entity_id controlled_character_id;
+	entity_id viewed_character_id;
 
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 	cosmic_entropy total_collected_entropy;
@@ -88,7 +88,7 @@ public:
 	}
 
 	auto get_viewed_character_id() const {
-		return controlled_character_id;
+		return viewed_character_id;
 	}
 
 	auto get_viewed_character() const {

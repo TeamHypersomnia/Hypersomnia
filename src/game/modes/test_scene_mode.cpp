@@ -9,6 +9,14 @@
 
 using input_type = test_scene_mode::input;
 
+entity_guid test_scene_mode::lookup(const mode_player_id& id) const {
+	if (const auto entry = mapped_or_nullptr(players, id)) {
+		return entry->guid;
+	}
+
+	return entity_guid::dead();
+}
+
 void test_scene_mode::init_spawned(const input in, const entity_id id, const logic_step step) {
 	const auto handle = in.cosm[id];
 
@@ -48,11 +56,13 @@ void test_scene_mode::teleport_to_next_spawn(const input in, const entity_id id)
 	});
 }
 
-entity_guid test_scene_mode::add_player(input_type in, const faction_type faction) {
+mode_player_id test_scene_mode::add_player(input_type in, const faction_type faction) {
 	auto& cosm = in.cosm;
 
 	if (const auto flavour = ::find_faction_character_flavour(cosm, faction); flavour.is_set()) {
-		return cosmic::create_entity(
+		const auto new_id = first_free_key(players);
+
+		if (cosmic::create_entity(
 			cosm, 
 			entity_flavour_id(flavour), 
 			[&](const auto new_character) {
@@ -60,16 +70,23 @@ entity_guid test_scene_mode::add_player(input_type in, const faction_type factio
 				pending_inits.push_back(new_character.get_guid());
 
 				cosmic::set_specific_name(new_character, "Player");
+
+				players.try_emplace(new_id, new_character.get_guid());
 			},
 			[](auto&&...) {}
-		);
+		)) {
+			return new_id;
+		}
 	}
 
-	return entity_guid::dead();
+	return mode_player_id::dead();
 }
 
-void test_scene_mode::remove_player(input_type in, const entity_guid guid) {
+void test_scene_mode::remove_player(input_type in, const mode_player_id id) {
+	const auto guid = lookup(id);
 	cosmic::delete_entity(in.cosm[guid]);
+
+	erase_element(players, id);
 }
 
 void test_scene_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic_step step) {

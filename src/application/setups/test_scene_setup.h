@@ -32,7 +32,7 @@ class test_scene_setup : public default_setup_settings {
 	intercosm scene;
 	cosmic_entropy total_collected_entropy;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
-	entity_id controlled_character_id;
+	entity_id viewed_character_id;
 
 public:
 	test_scene_setup(
@@ -54,7 +54,7 @@ public:
 	}
 
 	auto get_viewed_character_id() const {
-		return controlled_character_id;
+		return viewed_character_id;
 	}
 
 	auto get_viewed_character() const {

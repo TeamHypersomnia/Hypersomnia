@@ -11,6 +11,7 @@
 #include "game/cosmos/entity_id.h"
 #include "game/cosmos/per_entity_type.h"
 #include "game/detail/render_layer_filter.h"
+#include "game/modes/mode_player_id.h"
 
 #include "application/setups/editor/editor_selection_groups.h"
 #include "application/setups/editor/gui/editor_rect_select_type.h"
@@ -39,10 +40,12 @@ struct editor_view {
 	maybe_layer_filter viewing_filter = maybe_layer_filter(render_layer_filter::all(), true);
 
 	std::optional<camera_eye> panned_camera;
-	entity_id controlled_character_id;
+	mode_player_id local_player_id;
+	entity_id overridden_viewed_id;
 	// END GEN INTROSPECTOR
 
 	void reset_zoom();
+	void reset_panning();
 	void reset_zoom_at(vec2);
 	void center_at(vec2);
 

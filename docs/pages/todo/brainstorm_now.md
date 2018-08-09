@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Should editor player hold viewed character specific name?
+	- What if it is non-specific?
+	- mode_player_id
+	- overridden_viewed_character_id
+
 - Mode round ecology
 	- Example procedure:
 		- Server starts with no players, the mode gets initialized and just advances.

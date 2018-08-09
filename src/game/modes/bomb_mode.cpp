@@ -51,24 +51,32 @@ void bomb_mode::teleport_to_next_spawn(const input in, const entity_id id) {
 	});
 }
 
-void bomb_mode::add_player(input_type in, const faction_type faction) {
+mode_player_id bomb_mode::add_player(input_type in, const entity_name_str& chosen_name) {
 	auto& cosm = in.cosm;
+	(void)cosm;
 
-	if (const auto flavour = ::find_faction_character_flavour(cosm, faction); flavour.is_set()) {
-		cosmic::create_entity(
-			cosm, 
-			entity_flavour_id(flavour), 
-			[&](const auto new_character) {
-				teleport_to_next_spawn(in, new_character);
-				pending_inits.push_back(new_character.get_guid());
-			},
-			[](auto&&...) {}
-		);
-	}
+	const auto new_id = first_free_key(players);
+	players.try_emplace(new_id, chosen_name);
+
+	return mode_player_id::dead();
 }
 
-void bomb_mode::remove_player(input_type in, const entity_guid guid) {
-	cosmic::delete_entity(in.cosm[guid]);
+void bomb_mode::remove_player(input_type in, const mode_player_id& id) {
+	const auto guid = lookup(id);
+
+	if (const auto handle = in.cosm[guid]) {
+		cosmic::delete_entity(handle);
+	}
+
+	erase_element(players, id);
+}
+
+entity_guid bomb_mode::lookup(const mode_player_id& id) const {
+	if (const auto entry = mapped_or_nullptr(players, id)) {
+		return entry->guid;
+	}
+
+	return entity_guid::dead();
 }
 
 void bomb_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic_step step) {

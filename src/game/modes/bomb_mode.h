@@ -6,6 +6,7 @@
 #include "game/modes/mode_entropy.h"
 #include "game/detail/economy/money_type.h"
 #include "augs/misc/enum/enum_array.h"
+#include "game/modes/mode_player_id.h"
 
 struct entity_guid;
 struct entity_id;
@@ -40,6 +41,18 @@ struct bomb_mode_faction_state {
 	// END GEN INTROSPECTOR
 };
 
+struct bomb_mode_player {
+	// GEN INTROSPECTOR struct bomb_mode_player
+	entity_guid guid;
+	entity_name_str chosen_name;
+	faction_type faction = faction_type::NONE;
+	// END GEN INTROSPECTOR
+
+	bomb_mode_player(const entity_name_str& chosen_name = {}) : 
+		chosen_name(chosen_name) 
+	{}
+};
+
 class bomb_mode {
 public:
 	using vars_type = bomb_mode_vars;
@@ -64,10 +77,13 @@ public:
 	// GEN INTROSPECTOR class bomb_mode
 	per_faction_t<bomb_mode_faction_state> factions;
 	std::vector<entity_guid> pending_inits;
+	std::unordered_map<mode_player_id, bomb_mode_player> players;
 	// END GEN INTROSPECTOR
 
-	void add_player(input, const faction_type);
-	void remove_player(input, entity_guid);
+	mode_player_id add_player(input, const entity_name_str& chosen_name);
+	void remove_player(input, const mode_player_id&);
+
+	entity_guid lookup(const mode_player_id&) const;
 
 	template <class PreSolve, class... Callbacks>
 	void advance(

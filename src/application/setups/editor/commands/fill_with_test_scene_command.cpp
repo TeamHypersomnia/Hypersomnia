@@ -43,7 +43,7 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 
 	{
 		test_scene_mode test_mode;
-		view.controlled_character_id = cosm[test_mode.add_player({ test_vars, cosm }, faction_type::RESISTANCE)].get_id();
+		view.local_player_id = test_mode.add_player({ test_vars, cosm }, faction_type::RESISTANCE);
 
 		const auto test_vars_id = mode_vars_id(0);
 		mode_vars.get_for<test_scene_mode_vars>().try_emplace(test_vars_id, std::move(test_vars));

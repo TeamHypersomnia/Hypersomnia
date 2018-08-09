@@ -29,6 +29,10 @@ void editor_view::reset_zoom() {
 	}
 }
 
+void editor_view::reset_panning() {
+	panned_camera = std::nullopt;
+}
+
 void editor_view::reset_zoom_at(vec2 pos) {
 	if (panned_camera) {
 		panned_camera->zoom = 1.f;
