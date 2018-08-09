@@ -36,15 +36,16 @@
 #include "game/cosmos/entity_handle.h"
 
 void sentience_system::cast_spells(const logic_step step) const {
-	auto& cosmos = step.get_cosmos();
-	const auto& spell_metas = cosmos.get_common_significant().spells;
-	const auto now = cosmos.get_timestamp();
-	const auto delta = cosmos.get_fixed_delta();
+	auto& cosm = step.get_cosmos();
+	const auto& spell_metas = cosm.get_common_significant().spells;
+	const auto& clk = cosm.get_clock();	
+	const auto now = clk.now;
+	const auto dt = clk.dt;
 
 	constexpr float standard_cooldown_for_all_spells_ms = 2000.f;
 
 	for (const auto& cast : step.get_entropy().cast_spells_per_entity) {
-		const auto subject = cosmos[cast.first];
+		const auto subject = cosm[cast.first];
 		const auto spell = cast.second;
 
 		auto& sentience = subject.get<components::sentience>();
@@ -67,8 +68,8 @@ void sentience_system::cast_spells(const logic_step step) const {
 
 					const bool can_cast_already =
 						personal_electricity.value >= static_cast<meter_value_type>(common.personal_electricity_required)
-						&& spell_instance_data.cast_cooldown.is_ready(now, delta)
-						&& sentience.cast_cooldown_for_all_spells.is_ready(now, delta)
+						&& spell_instance_data.cast_cooldown.is_ready(clk)
+						&& sentience.cast_cooldown_for_all_spells.is_ready(clk)
 						&& spell_instance_data.are_additional_conditions_for_casting_fulfilled(subject)
 					;
 					
@@ -90,7 +91,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 						);
 					}
 					else {
-						if ((now - sentience.time_of_last_exhausted_cast).in_milliseconds(delta) >= 150.f) {
+						if ((now - sentience.time_of_last_exhausted_cast).in_milliseconds(dt) >= 150.f) {
 							messages::exhausted_cast msg;
 							msg.subject = subject;
 							msg.transform = subject.get_logic_transform();
@@ -108,14 +109,14 @@ void sentience_system::cast_spells(const logic_step step) const {
 
 void sentience_system::regenerate_values_and_advance_spell_logic(const logic_step step) const {
 	const auto now = step.get_cosmos().get_timestamp();
-	auto& cosmos = step.get_cosmos();
-	const auto delta = cosmos.get_fixed_delta();
+	auto& cosm = step.get_cosmos();
+	const auto delta = cosm.get_fixed_delta();
 
 	const auto regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 3);
 	const auto consciousness_regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 2);
 	const auto pe_regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 3);
 
-	cosmos.for_each_having<components::sentience>(
+	cosm.for_each_having<components::sentience>(
 		[&](const auto subject) {
 			components::sentience& sentience = subject.template get<components::sentience>();
 			auto& health = sentience.get<health_meter_instance>();
@@ -156,7 +157,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 			if (shake_amount > 0.f) {
 				const auto shake_mult = shake_amount * shake_amount * sentience.shake.mult;
 
-				auto rng = cosmos.get_rng_for(subject);
+				auto rng = cosm.get_rng_for(subject);
 				impulse_input in;
 
 				in.linear = shake_mult * rng.template random_point_in_unit_circle<real32>();
@@ -171,7 +172,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 					sentience.spells, 
 					sentience.currently_casted_spell,
 					[&](auto& spell){
-						const auto spell_meta = get_meta_of(spell, cosmos.get_common_significant().spells);
+						const auto spell_meta = get_meta_of(spell, cosm.get_common_significant().spells);
 						const auto spell_logic_duration_ms = spell_meta.get_spell_logic_duration_ms();
 						
 						const auto when_casted = sentience.time_of_last_spell_cast;
@@ -195,9 +196,9 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 }
 
 void sentience_system::consume_health_event(messages::health_event h, const logic_step step) const {
-	auto& cosmos = step.get_cosmos();
-	const auto now = cosmos.get_timestamp();
-	const auto subject = cosmos[h.subject];
+	auto& cosm = step.get_cosmos();
+	const auto now = cosm.get_timestamp();
+	const auto subject = cosm[h.subject];
 	auto& sentience = subject.get<components::sentience>();
 	auto& sentience_def = subject.get<invariants::sentience>();
 	auto& health = sentience.get<health_meter_instance>();
@@ -210,7 +211,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 
 		health.value -= h.effective_amount;
 		ensure(health.value >= 0);
-		sentience.time_of_last_received_damage = cosmos.get_timestamp();
+		sentience.time_of_last_received_damage = cosm.get_timestamp();
 
 		auto& movement = subject.get<components::movement>();
 		movement.make_inert_for_ms += h.effective_amount*2;
@@ -256,7 +257,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 
 		auto& driver = subject.get<components::driver>();
 		
-		if (cosmos[driver.owned_vehicle].alive()) {
+		if (cosm[driver.owned_vehicle].alive()) {
 			driver_system().release_car_ownership(subject);
 		}
 		
@@ -291,12 +292,12 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 
 void sentience_system::apply_damage_and_generate_health_events(const logic_step step) const {
 	const auto& damages = step.get_queue<messages::damage_message>();
-	auto& cosmos = step.get_cosmos();
-	const auto now = cosmos.get_timestamp();
-	const auto delta = cosmos.get_fixed_delta();
+	auto& cosm = step.get_cosmos();
+	const auto& clk = cosm.get_clock();
+	const auto now = clk.now;
 
 	for (const auto& d : damages) {
-		const auto subject = cosmos[d.subject];
+		const auto subject = cosm[d.subject];
 
 		auto* const sentience = subject.find<components::sentience>();
 
@@ -314,7 +315,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 			auto& consciousness = s.get<consciousness_meter_instance>();
 			auto& personal_electricity = s.get<personal_electricity_meter_instance>();
 
-			const bool is_shield_enabled = s.get<electric_shield_perk_instance>().timing.is_enabled(now, delta);
+			const bool is_shield_enabled = s.get<electric_shield_perk_instance>().timing.is_enabled(clk);
 
 			auto apply_ped = [this, step, event_template, &personal_electricity](const meter_value_type amount) {
 				auto event = event_template;
@@ -413,10 +414,10 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 }
 
 void sentience_system::cooldown_aimpunches(const logic_step step) const {
-	auto& cosmos = step.get_cosmos();
-	const auto dt = cosmos.get_fixed_delta();
+	auto& cosm = step.get_cosmos();
+	const auto dt = cosm.get_fixed_delta();
 
-	cosmos.for_each_having<components::head>(
+	cosm.for_each_having<components::head>(
 		[&](const auto typed_handle) {
 			const auto& head_def = typed_handle.template get<invariants::head>();
 			auto& head = typed_handle.template get<components::head>();
@@ -436,9 +437,9 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 		}
 	};
 
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 
-	cosmos.for_each_having<components::sentience>(
+	cosm.for_each_having<components::sentience>(
 		[&](const auto subject) {
 			components::sentience& sentience = subject.template get<components::sentience>();
 
@@ -467,7 +468,7 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 				}
 
 				if (items.size() > 0) {
-					const auto subject_item = cosmos[items[0]];
+					const auto subject_item = cosm[items[0]];
 
 					if (const auto* const maybe_gun_def = subject_item.template find<invariants::gun>()) {
 						const auto rifle_transform = subject_item.get_logic_transform();
@@ -499,7 +500,7 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 			}
 
 			if (const auto driver = subject.template find<components::driver>()) {
-				if (const auto vehicle = cosmos[driver->owned_vehicle]) {
+				if (const auto vehicle = cosm[driver->owned_vehicle]) {
 					const auto target_transform = vehicle.get_logic_transform();
 					const auto diff = target_transform.pos - subject_transform.pos;
 					requested_angle = diff.degrees();

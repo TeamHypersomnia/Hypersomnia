@@ -37,10 +37,9 @@ contact_listener::~contact_listener() {
 void contact_listener::BeginContact(b2Contact* contact) {
 	auto& sys = get_sys();
 	auto& cosmos = cosm;
-	
-	const auto delta = cosm.get_fixed_delta();
-	const auto now = cosm.get_timestamp();
+
 	const auto si = cosmos.get_si();
+	const auto clk = cosm.get_clock();	
 	
 	std::array<messages::collision_message, 2> msgs;
 
@@ -100,7 +99,7 @@ void contact_listener::BeginContact(b2Contact* contact) {
 				if (are_connected_by_friction(collider, subject)) {
 					found_suitable = true;
 				}
-				else if (collider_physics.dropped_or_created_cooldown.lasts(now, delta)) {
+				else if (collider_physics.dropped_or_created_cooldown.lasts(clk)) {
 					collider_physics.dropped_or_created_cooldown = augs::stepped_cooldown();
 					found_suitable = true;
 				}
@@ -268,8 +267,7 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 	auto& cosmos = cosm;
 
 	const auto si = cosmos.get_si();
-	const auto delta = cosm.get_fixed_delta();
-	const auto now = cosm.get_timestamp();
+	const auto clk = cosm.get_clock();
 
 	std::array<messages::collision_message, 2> msgs;
 
@@ -346,7 +344,7 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 		const auto& collider_special_physics = collider_owner_body.get_special_physics();
 
 		const bool dropped_item_colliding_with_container =
-			collider_special_physics.dropped_or_created_cooldown.lasts(now, delta)
+			collider_special_physics.dropped_or_created_cooldown.lasts(clk)
 			&& collider_special_physics.during_cooldown_ignore_collision_with == subject_owner_body
 		;
 

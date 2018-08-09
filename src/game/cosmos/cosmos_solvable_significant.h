@@ -5,13 +5,16 @@
 #include "augs/templates/get_by_dynamic_id.h"
 
 #include "game/cosmos/entity_pools.h"
-#include "game/cosmos/cosmos_clock.h"
 #include "game/cosmos/entity_solvable.h"
+
+using cosmos_clock = augs::stepped_clock;
 
 struct cosmos_solvable_significant {
 	// GEN INTROSPECTOR struct cosmos_solvable_significant
 	all_entity_pools entity_pools;
 	cosmos_clock clock;
+	entity_guid next_entity_guid = entity_guid::first();
+
 	// END GEN INTROSPECTOR
 
 	template <class E>

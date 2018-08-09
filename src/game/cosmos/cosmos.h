@@ -220,6 +220,10 @@ public:
 		return get_solvable().get_total_steps_passed();
 	}
 
+	decltype(auto) get_clock() const {
+		return get_solvable().get_clock();
+	}
+
 	auto get_timestamp() const {
 		return get_solvable().get_timestamp();
 	}

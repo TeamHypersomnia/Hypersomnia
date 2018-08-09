@@ -107,8 +107,7 @@ void value_bar::draw(
 	const const_this_pointer this_id
 ) {
 	const auto& cosmos = context.get_cosmos();
-	const auto dt = cosmos.get_fixed_delta();
-	const auto now = cosmos.get_timestamp();
+	const auto& clk = cosmos.get_clock();
 	const auto& game_images = context.get_game_images();
 
 	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
@@ -155,8 +154,8 @@ void value_bar::draw(
 				return meter.get_ratio();
 			},
 
-			[now, dt](const auto& perk, auto){
-				return perk.timing.get_ratio(now, dt);
+			[clk](const auto& perk, auto){
+				return perk.timing.get_ratio(clk);
 			}
 		);
 
@@ -337,9 +336,7 @@ bool value_bar::is_enabled(
 
 	if (const auto sentience = context.get_subject_entity().find<components::sentience>()) {
 		const auto& cosm = context.get_cosmos();
-
-		const auto dt = cosm.get_fixed_delta();
-		const auto now = cosm.get_timestamp();
+		const auto& clk = cosm.get_clock();
 
 		result =
 			visit_by_vertical_index(
@@ -351,8 +348,8 @@ bool value_bar::is_enabled(
 					return meter.is_enabled();
 				},
 
-				[now, dt](const auto& perk, auto){
-					return perk.timing.is_enabled(now, dt);
+				[clk](const auto& perk, auto){
+					return perk.timing.is_enabled(clk);
 				}
 			)
 		;

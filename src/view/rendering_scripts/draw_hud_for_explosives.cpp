@@ -105,8 +105,7 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 }
 
 void draw_beep_lights::operator()() {
-	const auto dt = cosm.get_fixed_delta();
-	const auto now = cosm.get_timestamp();
+	const auto clk = cosm.get_clock();
 
 	cosm.for_each_having<components::hand_fuse>(
 		[&](const auto it) {
@@ -117,7 +116,7 @@ void draw_beep_lights::operator()() {
 				auto beep_col = fuse_def.beep_color;
 
 				if (beep_col.a) {
-					const auto beep = beep_math { fuse, fuse_def, now, dt };
+					const auto beep = beep_math { fuse, fuse_def, clk };
 
 					if (const auto mult = beep.get_beep_light_mult(); mult > AUGS_EPSILON<real32>) {
 						beep_col.multiply_alpha(mult);

@@ -18,8 +18,7 @@ struct fuse_logic_provider {
 	const transformr fused_transform;
 	const entity_handle holder;
 	cosmos& cosm;
-	const augs::delta dt;
-	const augs::stepped_timestamp now;
+	const augs::stepped_clock& clk;
 
 	const entity_handle character_now_defusing;
 	vec2 character_now_defusing_pos;
@@ -41,8 +40,7 @@ struct fuse_logic_provider {
 		fused_transform(fused_entity.get_logic_transform()),
 		holder(fused_entity.get_owning_transfer_capability()),
 		cosm(step.get_cosmos()),
-		dt(cosm.get_fixed_delta()),
-		now(cosm.get_timestamp()),
+		clk(cosm.get_clock()),
 		character_now_defusing(cosm[fuse.character_now_defusing])
 	{
 		if (const auto t = character_now_defusing.find_logic_transform()) {
@@ -52,7 +50,7 @@ struct fuse_logic_provider {
 
 	bool arming_delay_complete() const {
 		const auto when_started = fuse.when_started_arming;
-		return when_started.was_set() && augs::is_ready(fuse_def.arming_duration_ms, when_started, now, dt);
+		return when_started.was_set() && clk.is_ready(fuse_def.arming_duration_ms, when_started);
 	}
 
 	bool defusing_delay_complete() const {
@@ -195,7 +193,7 @@ struct fuse_logic_provider {
 	}
 
 	void start_arming() const {
-		fuse.when_started_arming = now;
+		fuse.when_started_arming = clk.now;
 	}
 
 	void start_defusing() const {
@@ -211,7 +209,7 @@ struct fuse_logic_provider {
 	}
 
 	void arm_explosive() const {
-		fuse.when_armed = now;
+		fuse.when_armed = clk.now;
 
 		fused_entity.template get<components::sender>().set(holder);
 
@@ -338,7 +336,7 @@ struct fuse_logic_provider {
 							defusing_speed_mult = 2.f;
 						}
 
-						fuse.amount_defused += defusing_speed_mult * dt.in_milliseconds();
+						fuse.amount_defused += defusing_speed_mult * clk.dt.in_milliseconds();
 					}
 					else {
 						interrupt_defusing();

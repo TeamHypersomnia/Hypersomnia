@@ -14,17 +14,11 @@ struct perk_timing {
 		duration.set(ms, now);
 	}
 
-	float get_ratio(
-		const augs::stepped_timestamp now,
-		const augs::delta dt
-	) const {
-		return duration.get_ratio_of_remaining_time(now, dt);
+	float get_ratio(const augs::stepped_clock& clk) const {
+		return duration.get_ratio_of_remaining_time(clk);
 	}
 
-	bool is_enabled(
-		const augs::stepped_timestamp now,
-		const augs::delta dt
-	) const {
-		return duration.lasts(now, dt);
+	bool is_enabled(const augs::stepped_clock& clk) const {
+		return duration.lasts(clk);
 	}
 };

@@ -24,6 +24,66 @@ namespace augs {
 		bool was_set() const;
 	};
 
+	struct stepped_clock {
+		// GEN INTROSPECTOR struct augs::stepped_clock
+		stepped_timestamp now;
+		delta dt = delta::steps_per_second(60);
+		// END GEN INTROSPECTOR
+
+		template <class T>
+		bool is_ready(
+			const T cooldown_ms, 
+			const stepped_timestamp stamp
+		) const {
+			return !stamp.step || (now - stamp).in_milliseconds(dt) > cooldown_ms;
+		}
+
+		template <class T>
+		bool lasts(
+			const T cooldown_ms, 
+			const stepped_timestamp stamp
+		) const {
+			return !is_ready(cooldown_ms, stamp);
+		}
+
+		template <class T>
+		bool try_to_fire_and_reset(
+			const T cooldown_ms, 
+			stepped_timestamp& stamp
+		) const {
+			if (is_ready(cooldown_ms, stamp)) {
+				stamp = now;
+				return true;
+			}
+
+			return false;
+		}
+
+		template <class T>
+		auto get_ratio_of_remaining_time(
+			const T cooldown_ms, 
+			const stepped_timestamp stamp
+		) const {
+			if (!stamp.step) {
+				return 0.f;
+			}
+
+			return 1.f - ((now - stamp).in_milliseconds(dt) / cooldown_ms);
+		}
+
+		template <class T>
+		auto get_remaining_time_ms(
+			const T cooldown_ms, 
+			const stepped_timestamp stamp
+		) const {
+			if (!stamp.step) {
+				return 0.f;
+			}
+
+			return cooldown_ms - (now - stamp).in_milliseconds(dt);
+		}
+	};
+
 	struct stepped_cooldown {
 		// GEN INTROSPECTOR struct augs::stepped_cooldown
 		stepped_timestamp when_last_fired;
@@ -33,78 +93,16 @@ namespace augs {
 		stepped_cooldown(const float cooldown_duration_ms = 1000.f);
 		void set(const float cooldown_duration_ms, const stepped_timestamp now);
 		
-		float get_remaining_time_ms(const stepped_timestamp, const delta t) const;
-		float get_ratio_of_remaining_time(const stepped_timestamp, const delta t) const;
+		float get_remaining_time_ms(const stepped_clock&) const;
+		float get_ratio_of_remaining_time(const stepped_clock&) const;
 
-		bool lasts(const stepped_timestamp, const delta t) const;
-		bool is_ready(const stepped_timestamp, const delta t) const;
-		bool try_to_fire_and_reset(const stepped_timestamp, const delta t);
+		bool lasts(const stepped_clock&) const;
+		bool is_ready(const stepped_clock&) const;
+		bool try_to_fire_and_reset(const stepped_clock&);
 
 		bool operator==(const stepped_cooldown& b) const {
 			return when_last_fired == b.when_last_fired && cooldown_duration_ms == b.cooldown_duration_ms;
 		}
 	};
 
-	template <class T>
-	bool is_ready(
-		const T cooldown_ms, 
-		const stepped_timestamp stamp, 
-		const stepped_timestamp now,
-		const delta dt
-	) {
-		return !stamp.step || (now - stamp).in_milliseconds(dt) > cooldown_ms;
-	}
-
-	template <class T>
-	bool lasts(
-		const T cooldown_ms, 
-		const stepped_timestamp stamp, 
-		const stepped_timestamp now,
-		const delta dt
-	) {
-		return !is_ready(cooldown_ms, stamp, now, dt);
-	}
-
-	template <class T>
-	bool try_to_fire_and_reset(
-		const T cooldown_ms, 
-		stepped_timestamp& stamp, 
-		const stepped_timestamp now,
-		const delta dt
-	) {
-		if (is_ready(cooldown_ms, stamp, now, dt)) {
-			stamp = now;
-			return true;
-		}
-
-		return false;
-	}
-
-	template <class T>
-	auto get_ratio_of_remaining_time(
-		const T cooldown_ms, 
-		const stepped_timestamp stamp, 
-		const stepped_timestamp now,
-		const delta dt
-	) {
-		if (!stamp.step) {
-			return 0.f;
-		}
-
-		return 1.f - ((now - stamp).in_milliseconds(dt) / cooldown_ms);
-	}
-
-	template <class T>
-	auto get_remaining_time_ms(
-		const T cooldown_ms, 
-		const stepped_timestamp stamp, 
-		const stepped_timestamp now,
-		const delta dt
-	) {
-		if (!stamp.step) {
-			return 0.f;
-		}
-
-		return cooldown_ms - (now - stamp).in_milliseconds(dt);
-	}
 }

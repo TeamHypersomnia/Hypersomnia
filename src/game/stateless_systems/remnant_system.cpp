@@ -10,19 +10,16 @@
 void remnant_system::shrink_and_destroy_remnants(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
 
-	const auto now = cosm.get_timestamp();
-	const auto delta = step.get_delta();
+	const auto& clk = cosm.get_clock();
 
 	cosm.for_each_having<components::remnant>(
 		[&](const auto subject) {
 			const auto& def = subject.template get<invariants::remnant>();
 			auto& state = subject.template get<components::remnant>();
 
-			const auto remaining_ms = augs::get_remaining_time_ms(
+			const auto remaining_ms = clk.get_remaining_time_ms(
 				def.lifetime_secs * 1000,
-				subject.when_born(),
-				now,
-				delta
+				subject.when_born()
 			);
 
 			const auto size_mult = remaining_ms / def.start_shrinking_when_remaining_ms;

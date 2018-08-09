@@ -76,11 +76,10 @@ void detonate(const detonate_input in) {
 						
 						const auto next_explosion_in_ms = rng.randval(0.f, cascade_def.explosion_interval_ms.value);
 
-						const auto now = cosm.get_timestamp();
-						const auto dt = cosm.get_fixed_delta();
+						const auto& clk = cosm.get_clock();	
 
-						cascade.when_next_explosion = now;
-						cascade.when_next_explosion.step += next_explosion_in_ms / dt.in_milliseconds();
+						cascade.when_next_explosion = clk.now;
+						cascade.when_next_explosion.step += next_explosion_in_ms / clk.dt.in_milliseconds();
 					}
 				},
 				[&](auto&) {}

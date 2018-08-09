@@ -54,7 +54,7 @@ void intercosm::make_test_scene(
 		});
 
 		cosmic::change_solvable_significant(world, [settings](auto& s){
-			s.clock.delta = augs::delta::steps_per_second(settings.scene_tickrate); 
+			s.clock.dt = augs::delta::steps_per_second(settings.scene_tickrate); 
 			return changer_callback_result::REFRESH;
 		});
 

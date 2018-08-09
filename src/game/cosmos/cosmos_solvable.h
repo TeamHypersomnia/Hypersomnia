@@ -120,6 +120,7 @@ public:
 	decltype(augs::stepped_timestamp::step) get_total_steps_passed() const;
 
 	augs::stepped_timestamp get_timestamp() const;
+	const augs::stepped_clock& get_clock() const;
 
 	augs::delta get_fixed_delta() const;
 	unsigned get_steps_per_second() const;

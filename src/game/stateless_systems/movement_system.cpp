@@ -62,7 +62,8 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 void movement_system::apply_movement_forces(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 
-	const auto delta = cosmos.get_fixed_delta();
+	const auto& clk = cosmos.get_clock();
+	const auto delta = clk.dt;
 	const auto delta_ms = delta.in_milliseconds();
 
 	cosmos.for_each_having<components::movement>(
@@ -101,7 +102,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				if (is_sentient) {
 					const auto& haste = sentience->get<haste_perk_instance>();
 
-					if (haste.timing.is_enabled(cosmos.get_timestamp(), cosmos.get_fixed_delta())) {
+					if (haste.timing.is_enabled(clk)) {
 						if (haste.is_greater) {
 							return haste_type::GREATER;
 						}

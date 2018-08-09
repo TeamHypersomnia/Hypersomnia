@@ -58,7 +58,7 @@ void item_system::start_picking_up_items(const logic_step step) {
 
 void item_system::pick_up_touching_items(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
-	const auto& delta = step.get_delta();
+	const auto& clk = cosmos.get_clock();
 	const auto& collisions = step.get_queue<messages::collision_message>();
 
 	for (const auto& c : collisions) {
@@ -99,7 +99,7 @@ void item_system::pick_up_touching_items(const logic_step step) {
 					const auto pickup_slot = actual_picker.determine_pickup_target_slot_for(cosmos[item_to_pick]);
 
 					if (pickup_slot.alive()) {
-						const bool can_pick_already = transfers->pickup_timeout.try_to_fire_and_reset(cosmos.get_timestamp(), delta);
+						const bool can_pick_already = transfers->pickup_timeout.try_to_fire_and_reset(clk);
 
 						if (can_pick_already) {
 							perform_transfer(item_slot_transfer_request::standard(item_to_pick, pickup_slot), step);

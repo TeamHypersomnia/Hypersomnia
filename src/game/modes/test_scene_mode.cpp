@@ -74,8 +74,7 @@ void test_scene_mode::mode_pre_solve(input_type in, const mode_entropy& entropy,
 	(void)entropy;
 	auto& cosm = in.cosm;
 
-	const auto now = cosm.get_timestamp();
-	const auto dt = cosm.get_fixed_delta();
+	const auto& clk = cosm.get_clock();
 
 	for (const auto& p : pending_inits) {
 		if (const auto handle = cosm[p]) {
@@ -88,11 +87,9 @@ void test_scene_mode::mode_pre_solve(input_type in, const mode_entropy& entropy,
 	cosm.for_each_having<components::sentience>([&](const auto typed_handle) {
 		auto& sentience = typed_handle.template get<components::sentience>();
 
-		if (sentience.when_knocked_out.was_set() && augs::is_ready(
+		if (sentience.when_knocked_out.was_set() && clk.is_ready(
 			in.vars.respawn_after_ms,
-			sentience.when_knocked_out,
-			now,
-			dt
+			sentience.when_knocked_out
 		)) {
 			teleport_to_next_spawn(in, typed_handle);
 			init_spawned(in, typed_handle, step);

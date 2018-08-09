@@ -92,12 +92,16 @@ augs::stepped_timestamp cosmos_solvable::get_timestamp() const {
 	return significant.clock.now;
 }
 
+const augs::stepped_clock& cosmos_solvable::get_clock() const {
+	return significant.clock;
+}
+
 augs::delta cosmos_solvable::get_fixed_delta() const {
-	return significant.clock.delta;
+	return significant.clock.dt;
 }
 
 void cosmos_solvable::set_steps_per_second(const unsigned steps) {
-	significant.clock.delta = augs::delta::steps_per_second(steps);
+	significant.clock.dt = augs::delta::steps_per_second(steps);
 }
 
 unsigned cosmos_solvable::get_steps_per_second() const {
@@ -113,7 +117,7 @@ std::optional<cosmic_pool_undo_free_input> cosmos_solvable::free_entity(const en
 void cosmos_solvable::undo_last_allocate_entity(const entity_id id) {
 	const auto erased_guid = clear_guid(id);
 
-	auto& next_entity_guid = significant.clock.next_entity_guid.value;
+	auto& next_entity_guid = significant.next_entity_guid.value;
 	--next_entity_guid;
 
 	ensure_eq(next_entity_guid, erased_guid);

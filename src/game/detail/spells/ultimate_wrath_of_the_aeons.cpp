@@ -12,13 +12,14 @@ bool ultimate_wrath_of_the_aeons_instance::are_additional_conditions_for_casting
 }
 
 void ultimate_wrath_of_the_aeons_instance::perform_logic(const spell_logic_input in) {
-	auto& cosmos = in.step.get_cosmos();
-	const auto& spell_data = std::get<ultimate_wrath_of_the_aeons>(cosmos.get_common_significant().spells);
+	auto& cosm = in.step.get_cosmos();
+	const auto& spell_data = std::get<ultimate_wrath_of_the_aeons>(cosm.get_common_significant().spells);
 	const auto caster = in.get_subject();
 	const auto caster_transform = caster.get_logic_transform();
 	const auto step = in.step;
-	const auto dt = cosmos.get_fixed_delta();
-	const auto now = in.now;
+	const auto clk = cosm.get_clock();	
+	const auto now = clk.now;
+	const auto dt = clk.dt;
 	const auto when_casted = in.when_casted;
 
 	const auto first_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(1.3f / dt.in_seconds()) };

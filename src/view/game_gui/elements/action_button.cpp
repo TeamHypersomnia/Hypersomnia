@@ -37,8 +37,7 @@ void action_button::draw(
 		const auto& cosmos = context.get_cosmos();
 
 		const auto output = context.get_output();
-		const auto now = cosmos.get_timestamp();
-		const auto dt = cosmos.get_fixed_delta();
+		const auto clk = cosmos.get_clock();
 
 		const auto& necessarys = context.get_necessary_images();
 		const auto& game_images = context.get_game_images();
@@ -121,9 +120,9 @@ void action_button::draw(
 							const auto this_cooldown = spell.cast_cooldown;
 
 							const auto effective_cooldown_ratio =
-								all_cooldown.get_remaining_time_ms(now, dt) > this_cooldown.get_remaining_time_ms(now, dt)
+								all_cooldown.get_remaining_time_ms(clk) > this_cooldown.get_remaining_time_ms(clk)
 								?
-								all_cooldown.get_ratio_of_remaining_time(now, dt) : this_cooldown.get_ratio_of_remaining_time(now, dt);
+								all_cooldown.get_ratio_of_remaining_time(clk) : this_cooldown.get_ratio_of_remaining_time(clk);
 
 							if (effective_cooldown_ratio > 0.f) {
 								output.rectangular_clock(ltrb(absolute_icon_rect), rgba { 0, 0, 0, 200 }, effective_cooldown_ratio);

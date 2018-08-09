@@ -51,13 +51,12 @@ void play_collision_sound(
 
 void missile_system::ricochet_missiles(const logic_step step) {
 	auto& cosm = step.get_cosmos();
-	const auto delta = step.get_delta();
-	const auto now = cosm.get_timestamp();
+	const auto clk = cosm.get_clock();
+	const auto now = clk.now;
 	const auto& events = step.get_queue<messages::collision_message>();
 
 	const auto steps = cosm.get_total_steps_passed();
 	(void)steps;
-	(void)delta;
 	(void)now;
 
 	for (const auto& it : events) {
@@ -104,18 +103,14 @@ void missile_system::ricochet_missiles(const logic_step step) {
 
 			if (hit_facing > left_b && hit_facing < right_b) {
 				{
-					const bool ricochet_cooldown = augs::lasts(
+					const bool ricochet_cooldown = clk.lasts(
 						missile_def.ricochet_cooldown_ms,
-						missile.when_last_ricocheted,
-						now,
-						delta
+						missile.when_last_ricocheted
 					);
 
-					const bool born_cooldown = augs::lasts(
+					const bool born_cooldown = clk.lasts(
 						missile_def.ricochet_cooldown_ms,
-						missile_handle.when_born(),
-						now,
-						delta
+						missile_handle.when_born()
 					);
 
 					if (ricochet_cooldown || born_cooldown) {
@@ -168,14 +163,11 @@ void missile_system::ricochet_missiles(const logic_step step) {
 
 void missile_system::detonate_colliding_missiles(const logic_step step) {
 	auto& cosm = step.get_cosmos();
-	const auto delta = step.get_delta();
-	const auto now = cosm.get_timestamp();
+	const auto& clk = cosm.get_clock();
 	const auto& events = step.get_queue<messages::collision_message>();
 
 	const auto steps = cosm.get_total_steps_passed();
 	(void)steps;
-	(void)delta;
-	(void)now;
 
 	for (const auto& it : events) {
 		const bool contact_start = it.type == messages::collision_message::event_type::BEGIN_CONTACT;
@@ -226,11 +218,9 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			}
 
 			{
-				const bool ricochet_cooldown = augs::lasts(
+				const bool ricochet_cooldown = clk.lasts(
 					missile_def.ricochet_cooldown_ms,
-					missile.when_last_ricocheted,
-					now,
-					delta
+					missile.when_last_ricocheted
 				);
 
 				if (ricochet_cooldown) {
@@ -247,7 +237,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 				if (const auto sentience = subject_handle.find<components::sentience>()) {
 					const auto& shield_of_victim = sentience->get<electric_shield_perk_instance>();
 
-					if (!shield_of_victim.timing.is_enabled(now, delta)) {
+					if (!shield_of_victim.timing.is_enabled(clk)) {
 						considered_impulse *= missile_def.impulse_multiplier_against_sentience;
 					}
 				}

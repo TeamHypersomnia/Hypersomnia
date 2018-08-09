@@ -111,8 +111,8 @@ void gun_system::consume_gun_intents(const logic_step step) {
 
 void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
-	const auto delta = step.get_delta();
-	const auto now = cosmos.get_timestamp();
+	const auto& clk = cosmos.get_clock();
+	const auto delta = clk.dt;
 	const auto& logicals = step.get_logical_assets();
 
 	cosmos.for_each_having<components::gun>(
@@ -144,7 +144,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 			auto try_to_fire_interval = [&]() -> bool {
 				if (gun.is_trigger_pressed) {
-					if (augs::try_to_fire_and_reset(gun_def.shot_cooldown_ms, gun.when_last_fired, now, delta)) {
+					if (clk.try_to_fire_and_reset(gun_def.shot_cooldown_ms, gun.when_last_fired)) {
 						if (gun_def.action_mode != gun_action_type::AUTOMATIC) {
 							gun.is_trigger_pressed = false;
 						}
@@ -226,7 +226,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 						const auto trigger_effect_cooldown_ms = 100.f;
 
-						if (gun.play_trigger_effect_once && augs::try_to_fire_and_reset(trigger_effect_cooldown_ms, gun.when_last_played_trigger_effect, now, delta)) {
+						if (gun.play_trigger_effect_once && clk.try_to_fire_and_reset(trigger_effect_cooldown_ms, gun.when_last_played_trigger_effect)) {
 							if (heat <= 2.f) {
 								gun.magazine.apply(50000.5f * delta.in_seconds());
 
@@ -415,7 +415,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				(void)logicals;
 #endif
 			}
-			else if (decrease_heat_in_aftermath && is_ready(gun_def.shot_cooldown_ms, gun.when_last_fired, now, delta)) {
+			else if (decrease_heat_in_aftermath && clk.is_ready(gun_def.shot_cooldown_ms, gun.when_last_fired)) {
 				/* Apply idle cooldown */
 				gun.recoil.cooldown(gun_def.recoil, delta.in_milliseconds());
 				heat = std::max(0.f, heat - (gun_def.heat_cooldown_speed_mult * delta.in_seconds()) / gun_def.maximum_heat);

@@ -21,8 +21,7 @@
 
 void demolitions_system::detonate_fuses(const logic_step step) {
 	auto& cosm = step.get_cosmos();
-	const auto delta = step.get_delta();
-	const auto now = cosm.get_timestamp();
+	const auto& clk = cosm.get_clock();
 
 	cosm.for_each_having<components::hand_fuse>(
 		[&](const auto it) {
@@ -37,11 +36,11 @@ void demolitions_system::detonate_fuses(const logic_step step) {
 					auto& when_beep = fuse.when_last_beep;
 
 					if (!when_beep.was_set()) {
-						when_beep = now;
+						when_beep = clk.now;
 						/* Don't play the beep effect for the first time. */
 					}
 					else {
-						const auto beep = beep_math { fuse, fuse_def, now, delta };
+						const auto beep = beep_math { fuse, fuse_def, clk };
 
 						if (beep.should_beep_again()) {
 							fuse_def.beep_sound.start(
@@ -49,7 +48,7 @@ void demolitions_system::detonate_fuses(const logic_step step) {
 								sound_effect_start_input::fire_and_forget(fuse_logic.fused_transform)
 							);
 
-							when_beep = now;
+							when_beep = clk.now;
 						}
 					}
 				}
@@ -57,7 +56,7 @@ void demolitions_system::detonate_fuses(const logic_step step) {
 				const auto when_armed = fuse.when_armed;
 				const auto& fuse_def = it.template get<invariants::hand_fuse>();
 
-				if (augs::is_ready(fuse_def.fuse_delay_ms, when_armed, now, delta)) {
+				if (clk.is_ready(fuse_def.fuse_delay_ms, when_armed)) {
 					detonate_if(it, step);
 				}
 			}
@@ -68,8 +67,7 @@ void demolitions_system::detonate_fuses(const logic_step step) {
 
 void demolitions_system::advance_cascade_explosions(const logic_step step) {
 	auto& cosm = step.get_cosmos();
-	const auto delta = step.get_delta();
-	const auto now = cosm.get_timestamp();
+	const auto& clk = cosm.get_clock();
 
 	cosm.for_each_having<components::cascade_explosion>(
 		[&](const auto it) {
@@ -78,13 +76,13 @@ void demolitions_system::advance_cascade_explosions(const logic_step step) {
 
 			auto& when_next = cascade.when_next_explosion;
 
-			if (now >= when_next) {
+			if (clk.now >= when_next) {
 				auto rng = cosm.get_rng_for(it);
 
 				{
 					const auto next_explosion_in_ms = rng.randval(cascade_def.explosion_interval_ms);
-					when_next = now;
-					when_next.step += next_explosion_in_ms / delta.in_milliseconds();
+					when_next = clk.now;
+					when_next.step += next_explosion_in_ms / clk.dt.in_milliseconds();
 				}
 
 				{

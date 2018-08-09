@@ -182,7 +182,7 @@ auto cosmos_solvable::detail_undo_free_entity(Args&&... args) {
 
 template <class E, class... Args>
 auto cosmos_solvable::allocate_next_entity(Args&&... args) {
-	const auto next_guid = significant.clock.next_entity_guid.value++;
+	const auto next_guid = significant.next_entity_guid.value++;
 	return allocate_entity_with_specific_guid<E>(next_guid, std::forward<Args>(args)...);
 }
 

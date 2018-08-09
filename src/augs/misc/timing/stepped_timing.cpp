@@ -1,5 +1,5 @@
-#include "stepped_timing.h"
-#include "delta.h"
+#include "augs/misc/timing/stepped_timing.h"
+#include "augs/misc/timing/delta.h"
 
 namespace augs {
 	stepped_timestamp stepped_timestamp::operator-(const stepped_timestamp b) const {
@@ -48,37 +48,32 @@ namespace augs {
 	}
 
 	bool stepped_cooldown::lasts(
-		const stepped_timestamp s,
-		const delta t
+		const stepped_clock& clk
 	) const {
-		return augs::lasts(cooldown_duration_ms, when_last_fired, s, t);
+		return clk.lasts(cooldown_duration_ms, when_last_fired);
 	}
 
 	bool stepped_cooldown::try_to_fire_and_reset(
-		const stepped_timestamp s, 
-		const delta t
+		const stepped_clock& clk
 	) {
-		return augs::try_to_fire_and_reset(cooldown_duration_ms, when_last_fired, s, t);
+		return clk.try_to_fire_and_reset(cooldown_duration_ms, when_last_fired);
 	}
 
 	bool stepped_cooldown::is_ready(
-		const stepped_timestamp s,
-		const delta t
+		const stepped_clock& clk
 	) const {
-		return augs::is_ready(cooldown_duration_ms, when_last_fired, s, t);
+		return clk.is_ready(cooldown_duration_ms, when_last_fired);
 	}
 
 	float stepped_cooldown::get_remaining_time_ms(
-		const stepped_timestamp s, 
-		const delta t
+		const stepped_clock& clk
 	) const {
-		return augs::get_remaining_time_ms(cooldown_duration_ms, when_last_fired, s, t);
+		return clk.get_remaining_time_ms(cooldown_duration_ms, when_last_fired);
 	}
 
 	float stepped_cooldown::get_ratio_of_remaining_time(
-		const stepped_timestamp s, 
-		const delta t
+		const stepped_clock& clk
 	) const {
-		return augs::get_ratio_of_remaining_time(cooldown_duration_ms, when_last_fired, s, t);
+		return clk.get_ratio_of_remaining_time(cooldown_duration_ms, when_last_fired);
 	}
 }
