@@ -51,6 +51,11 @@ namespace invariants {
 		std::array<sound_effect_input, 2> defused_sound;
 		particle_effect_input defused_particles;
 		sound_effect_input release_sound;
+
+		assets::plain_animation_id armed_animation_id;
+		assets::image_id defused_image_id;
+		assets::image_id released_image_id;
+		assets::physical_material_id released_physical_material;
 		// END GEN INTROSPECTOR
 
 		bool has_delayed_arming() const;

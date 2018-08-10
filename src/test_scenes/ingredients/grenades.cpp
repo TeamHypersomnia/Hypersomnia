@@ -49,10 +49,16 @@ namespace test_flavours {
 			item.space_occupied_per_charge = to_space_units("0.6");
 			meta.set(item);
 
-			invariants::hand_fuse fuse; 
-			fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
-			fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
-			meta.set(fuse);
+			{
+				invariants::hand_fuse fuse; 
+				fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
+				fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
+
+				fuse.released_image_id = to_image_id(test_scene_image_id::FORCE_GRENADE_RELEASED);
+				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
+
+				meta.set(fuse);
+			}
 
 			invariants::explosive explosive; 
 
@@ -68,9 +74,6 @@ namespace test_flavours {
 
 			in.victim_shake.duration_ms = 500.f;
 			in.victim_shake.mult = 1.2f;
-
-			explosive.released_image_id = to_image_id(test_scene_image_id::FORCE_GRENADE_RELEASED);
-			explosive.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 
 			meta.set(explosive);
 		}
@@ -95,10 +98,15 @@ namespace test_flavours {
 			item.space_occupied_per_charge = to_space_units("0.6");
 			meta.set(item);
 
-			invariants::hand_fuse fuse; 
-			fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
-			fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
-			meta.set(fuse);
+			{
+				invariants::hand_fuse fuse; 
+				fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
+				fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
+				fuse.released_image_id = to_image_id(test_scene_image_id::INTERFERENCE_GRENADE_RELEASED);
+				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
+
+				meta.set(fuse);
+			}
 
 			invariants::explosive explosive; 
 
@@ -115,9 +123,6 @@ namespace test_flavours {
 
 			in.victim_shake.duration_ms = 800.f;
 			in.victim_shake.mult = 1.5f;
-
-			explosive.released_image_id = to_image_id(test_scene_image_id::INTERFERENCE_GRENADE_RELEASED);
-			explosive.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 
 			meta.set(explosive);
 		}
@@ -142,10 +147,17 @@ namespace test_flavours {
 			item.space_occupied_per_charge = to_space_units("0.6");
 			meta.set(item);
 
-			invariants::hand_fuse fuse; 
-			fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
-			fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
-			meta.set(fuse);
+			{
+				invariants::hand_fuse fuse; 
+
+				fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
+				fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
+
+				fuse.released_image_id = to_image_id(test_scene_image_id::PED_GRENADE_RELEASED);
+				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
+
+				meta.set(fuse);
+			}
 
 			invariants::explosive explosive; 
 
@@ -161,9 +173,6 @@ namespace test_flavours {
 			in.create_thunders_effect = true;
 
 			in.victim_shake = {};
-
-			explosive.released_image_id = to_image_id(test_scene_image_id::PED_GRENADE_RELEASED);
-			explosive.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 
 			meta.set(explosive);
 		}
@@ -266,15 +275,16 @@ namespace test_flavours {
 			fuse.defused_particles.modifier.colorize = cyan;
 			fuse.defused_particles.modifier.scale_amounts = 2.5f;
 			fuse.defused_particles.modifier.scale_lifetimes = 2.5f;
+
+			fuse.armed_animation_id = to_animation_id(test_scene_plain_animation_id::BOMB_ARMED);
+			fuse.defused_image_id = to_image_id(test_scene_image_id::BOMB_DEFUSED);
+			fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
+
 			meta.set(fuse);
 
 			{
 				invariants::explosive explosive; 
 				explosive.explosion = bomb_explosion;
-
-				explosive.armed_animation_id = to_animation_id(test_scene_plain_animation_id::BOMB_ARMED);
-				explosive.defused_image_id = to_image_id(test_scene_image_id::BOMB_DEFUSED);
-				explosive.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 
 				{
 					auto& c = explosive.cascade[0];

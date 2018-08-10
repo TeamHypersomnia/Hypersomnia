@@ -97,44 +97,6 @@ struct fuse_logic_provider {
 			sound_effect_start_input::fire_and_forget(fused_transform).set_listener(holder)
 		);
 
-		/* const auto rigid_body = fused_entity.get<components::rigid_body>(); */
-
-		/* 			//ensure(rigid_body.get_velocity().is_epsilon()); */
-
-		/* 			rigid_body.set_velocity({ 0.f, 0.f }); */
-		/* 			rigid_body.set_angular_velocity(0.f); */
-		/* 			rigid_body.apply_angular_impulse(1.5f * rigid_body.get_mass()); */
-		/* 			rigid_body.apply_impulse(vec2::from_degrees(fused_entity.get_logic_transform().rotation) * fuse_def.standard_release_impulse * rigid_body.get_mass()); */
-
-#if TODO
-		rigid_body.set_linear_damping(3.0f);
-		rigid_body.set_bullet_body(true);
-
-		// TODO: this information will be specified by another type
-		fused_entity.template get<components::sprite>().set(
-			explosive.released_image_id, metas
-		);
-
-		const auto fixtures = fused_entity.template get<components::fixtures>();
-
-		auto new_def = fixtures.get_raw_component();
-		new_def.restitution = 0.6f;
-		new_def.density = 10.f;
-
-		const bool overwrite_physical_material = 
-			explosive.released_physical_material.is_set()
-		;
-
-		if (overwrite_physical_material) {
-			new_def.material = explosive.released_physical_material;
-		}
-
-		fixtures = new_def;
-
-		fused_entity.template get<components::shape_polygon>().set_activated(false);
-		fused_entity.template get<invariants::shape_circle>().set_activated(true);
-#endif
-
 		refresh_fused_body();
 	}
 

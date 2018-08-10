@@ -37,7 +37,6 @@ auto calc_filters(const E& handle) {
 	}
 
 	if (handle.is_like_thrown_explosive()) {
-		LOG("FLYING!!");
 		return filters::flying();
 	}
 

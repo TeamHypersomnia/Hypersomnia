@@ -95,36 +95,34 @@ FORCE_INLINE void detail_specific_entity_drawer(
 
 		if constexpr(!for_gui) {
 			if constexpr(typed_handle.template has<components::hand_fuse>()) {
-				if constexpr(typed_handle.template has<invariants::explosive>()) {
-					const auto& fuse = typed_handle.template get<components::hand_fuse>();
-					const auto& explosive = typed_handle.template get<invariants::explosive>();
+				const auto& fuse = typed_handle.template get<components::hand_fuse>();
+				const auto& fuse_def = typed_handle.template get<invariants::hand_fuse>();
 
-					const auto& logicals = typed_handle.get_cosmos().get_logical_assets();
+				const auto& logicals = typed_handle.get_cosmos().get_logical_assets();
 
-					const auto& animation = typed_handle.template get<components::animation>();
+				const auto& animation = typed_handle.template get<components::animation>();
 
-					if (fuse.defused()) {
-						if (explosive.defused_image_id.is_set()) {
-							auto defused = sprite;
-							defused.image_id = explosive.defused_image_id;
+				if (fuse.defused()) {
+					if (fuse_def.defused_image_id.is_set()) {
+						auto defused = sprite;
+						defused.image_id = fuse_def.defused_image_id;
 
-							render_visitor(defused, in.manager, input);
-						}
-
-						return;
+						render_visitor(defused, in.manager, input);
 					}
 
-					if (fuse.when_armed.was_set()) {
-						if (const auto displayed_frame = ::find_frame(explosive.armed_animation_id, animation, logicals)) {
-							const auto image_id = displayed_frame->image_id;
+					return;
+				}
 
-							auto animated = sprite;
-							animated.image_id = image_id;
-							animated.size = in.manager.at(image_id).get_original_size();
+				if (fuse.when_armed.was_set()) {
+					if (const auto displayed_frame = ::find_frame(fuse_def.armed_animation_id, animation, logicals)) {
+						const auto image_id = displayed_frame->image_id;
 
-							render_visitor(animated, in.manager, input);
-							return;
-						}
+						auto animated = sprite;
+						animated.image_id = image_id;
+						animated.size = in.manager.at(image_id).get_original_size();
+
+						render_visitor(animated, in.manager, input);
+						return;
 					}
 				}
 			}
