@@ -25,7 +25,7 @@ namespace test_flavours {
 			meta.set(render_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BACKPACK, white);
-			test_flavours::add_see_through_dynamic_body(meta);
+			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::container container; 
 			inventory_slot slot_def;

@@ -136,7 +136,7 @@ void standard_explosion_input::instantiate(
 		physics.for_each_intersection_with_triangle(
 			cosm.get_si(),
 			damaging_triangle,
-			filters::dynamic_object(),
+			filters::wall(),
 			[&](
 				const b2Fixture* const fix,
 				const vec2 point_a,
@@ -231,7 +231,7 @@ void standard_explosion_input::instantiate(
 			si,
 			si.get_meters(effective_radius) * 2,
 			explosion_location.to<b2Transform>(si),
-			filters::local_character(),
+			filters::character(),
 			[&](
 				const b2Fixture* const fix,
 				const vec2,

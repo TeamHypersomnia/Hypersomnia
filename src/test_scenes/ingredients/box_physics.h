@@ -35,7 +35,7 @@ namespace test_flavours {
 		body_def.damping.linear = 6.5f;
 		body_def.damping.angular = 6.5f;
 
-		fixtures_def.filter = filters::dynamic_object();
+		fixtures_def.filter = filters::wall();
 		fixtures_def.density = 1;
 		fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::METAL);
 
@@ -44,14 +44,14 @@ namespace test_flavours {
 	}
 
 	template <class E>
-	auto& add_see_through_dynamic_body(E& meta) {
+	auto& add_lying_item_dynamic_body(E& meta) {
 		invariants::fixtures fixtures_def;
 		invariants::rigid_body body_def;
 
 		body_def.damping.linear = 6.5f;
 		body_def.damping.angular = 6.5f;
 
-		fixtures_def.filter = filters::see_through_dynamic_object();
+		fixtures_def.filter = filters::lying_item();
 		fixtures_def.density = .2f;
 		fixtures_def.restitution = .5f;
 		fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::METAL);
@@ -108,7 +108,7 @@ namespace test_flavours {
 
 		body_def.body_type = rigid_body_type::STATIC;
 
-		fixtures_def.filter = filters::dynamic_object();
+		fixtures_def.filter = filters::wall();
 		fixtures_def.density = 1;
 		fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::METAL);
 
@@ -126,7 +126,7 @@ namespace test_flavours {
 		body_def.damping.linear = 0.f,
 		body_def.angled_damping = false;
 		
-		fixtures_def.filter = filters::bullet();
+		fixtures_def.filter = filters::flying();
 		fixtures_def.density = 1;
 		fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::METAL);
 

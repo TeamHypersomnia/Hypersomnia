@@ -7,12 +7,13 @@ namespace augs {
 		using base = std::bitset<static_cast<size_t>(_enum::COUNT)>;
 		
 	public:
-		using base::reset;
 		using base::any;
 		using base::all;
 		using base::operator==;
 		using base::operator!=;
 		using base::size;
+		using base::to_ulong;
+		using base::to_ullong;
 
 		bool operator==(const enum_bitset& b) const {
 			return base::operator==(b);
@@ -32,6 +33,10 @@ namespace augs {
 
 		decltype(auto) set(const _enum f, const bool value = true) {
 			return base::set(static_cast<size_t>(f), value);
+		}
+
+		decltype(auto) reset(const _enum f) {
+			return base::reset(static_cast<size_t>(f));
 		}
 
 		using base::base;

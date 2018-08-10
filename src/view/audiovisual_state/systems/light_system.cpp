@@ -307,6 +307,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 		render_layer::OVER_DYNAMIC_BODY,
 		render_layer::GLASS_BODY,
 		render_layer::SMALL_DYNAMIC_BODY,
+		render_layer::OVER_SMALL_DYNAMIC_BODY,
 		render_layer::SENTIENCES,
 		render_layer::FLYING_BULLETS,
 		render_layer::WATER_COLOR_OVERLAYS,

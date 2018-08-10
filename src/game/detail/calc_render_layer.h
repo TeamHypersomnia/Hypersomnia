@@ -3,6 +3,7 @@
 #include "augs/build_settings/platform_defines.h"
 #include "game/organization/all_component_includes.h"
 #include "game/cosmos/entity_type_traits.h"
+#include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 
 using entities_with_render_layer = entity_types_having_any_of<
 	invariants::render,
@@ -20,6 +21,10 @@ FORCE_INLINE auto calc_render_layer(const H& handle) {
 			if constexpr(H::template has<invariants::hand_fuse>()) {
 				if (handle.is_like_planted_bomb()) {
 					return render_layer::PLANTED_BOMBS;
+				} 
+
+				if (handle.is_like_thrown_explosive()) {
+					return render_layer::OVER_SMALL_DYNAMIC_BODY;
 				} 
 			}
 

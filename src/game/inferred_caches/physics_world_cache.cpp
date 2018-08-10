@@ -25,6 +25,7 @@
 
 #include "augs/templates/dynamic_cast_dispatch.h"
 #include "augs/build_settings/setting_debug_physics_world_cache_copy.h"
+#include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 #include "game/enums/filters.h"
 
 template <class E>
@@ -33,6 +34,11 @@ auto calc_filters(const E& handle) {
 
 	if (handle.is_like_planted_bomb()) {
 		return filters::planted_explosive();
+	}
+
+	if (handle.is_like_thrown_explosive()) {
+		LOG("FLYING!!");
+		return filters::flying();
 	}
 
 	return colliders_data.filter;
@@ -425,9 +431,6 @@ void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle
 			from_polygon_shape(shape_polygon->shape);
 			return;
 		}
-
-		// TODO: let shape circle be chosen over the polygon shape when grenade is thrown
-		// can either have a separate definition in the hand fuse invariant or assume that the entity will have it
 
 		if (const auto shape_circle = handle.template find<invariants::shape_circle>()) {
 			from_circle_shape(shape_circle->get_radius());

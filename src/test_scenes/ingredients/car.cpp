@@ -111,7 +111,7 @@ namespace prefabs {
 
 			components::fixtures fixtures_invariant;
 
-			fixtures_invariant.filter = filters::dynamic_object();
+			fixtures_invariant.filter = filters::wall();
 			fixtures_invariant.density = 0.6f;
 			fixtures_invariant.material = to_physical_material_id(test_scene_physical_material_id::METAL);
 
@@ -128,7 +128,7 @@ namespace prefabs {
 
 			components::fixtures fixtures_invariant;
 
-			fixtures_invariant.filter = filters::friction_ground();
+			fixtures_invariant.filter = filters::ground();
 			fixtures_invariant.density = 0.6f;
 			fixtures_invariant.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET].pos = offset;
 			fixtures_invariant.friction_ground = true;
@@ -184,7 +184,7 @@ namespace prefabs {
 					
 					components::fixtures fixtures_invariant;
 
-					fixtures_invariant.filter = filters::see_through_dynamic_object();
+					fixtures_invariant.filter = filters::lying_item();
 					fixtures_invariant.density = 1.0f;
 					fixtures_invariant.sensor = true;
 					fixtures_invariant.offsets_for_created_shapes[colliders_offset_type::SHAPE_OFFSET] = offset;

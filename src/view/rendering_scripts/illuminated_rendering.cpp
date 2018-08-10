@@ -353,6 +353,7 @@ void illuminated_rendering(
 		render_layer::DYNAMIC_BODY,
 		render_layer::OVER_DYNAMIC_BODY,
 		render_layer::SMALL_DYNAMIC_BODY,
+		render_layer::OVER_SMALL_DYNAMIC_BODY,
 		render_layer::GLASS_BODY,
 		render_layer::SENTIENCES
 	>();
