@@ -6,22 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Starting a mode
-	- test mode
-
-- Mode round ecology
-	- Example procedure:
-		- Server starts with no players, the mode gets initialized and just advances.
-			- Special win condition logic for when there are no players.
-		- Somebody connects mid-round.
-			- They have to choose a faction, if so the server allows.
-				- Should this also be mode logic?
-				- We might later introduce auto-balance, in which case it might be good for it to stay deterministic.
-			- Changing of faction shall be part of mode entropy.
-			- Mode could keep track of names to be spawned.
-			- Simply add_player({ ... }, nickname) on connection.
-				- This first makes them a spectator.
-
 - Player & modes
 	- Mode & mode vars will have no different relation to the player as the cosmos common state has 
 		- e.g. for replays, we can change it any time
@@ -40,6 +24,26 @@ summary: That which we are brainstorming at the moment.
 					- instance name
 					- actually a map would be better as it will be a frequent use case and we shouldn't add this to all entities
 					- clients will simply query the map to find the viewing character
+
+- Mode round ecology
+	- Example procedure:
+		- Server starts with no players, the mode gets initialized and just advances.
+			- Special win condition logic for when there are no players.
+		- Somebody connects mid-round.
+			- They have to choose a faction, if so the server allows.
+				- Should this also be mode logic?
+				- We might later introduce auto-balance, in which case it might be good for it to stay deterministic.
+			- Changing of faction shall be part of mode entropy.
+			- Mode could keep track of names to be spawned.
+			- Simply add_player({ ... }, nickname) on connection.
+				- This first makes them a spectator.
+
+- Starting a mode
+	- test mode
+		- does nothing, really
+	- bomb mode
+		- needs complete input with the initial solvable as well, so let's first implement this
+
 
 - Mode vars gui
 	- Can set the current one, resetting the cosmos

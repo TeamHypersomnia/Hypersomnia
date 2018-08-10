@@ -2,7 +2,7 @@ return {
   extra_loadables = {
     enabled_generate_neon_map = {
       alpha_multiplier = 1,
-      amplification = 600,
+      amplification = 150,
       light_colors = {
         "255 255 255 255",
         "167 167 167 255",
@@ -14,7 +14,7 @@ return {
         x = 100,
         y = 100
       },
-      standard_deviation = 11.079999923706055
+      standard_deviation = 6
     },
     generate_desaturation = false
   },
@@ -34,32 +34,39 @@ return {
     },
     item = {
       attachment_anchor = {
-		  pos = {
-        x = 0,
-        y = 0
-	},
-	rotation = 0
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       },
       back_anchor = {
-		  pos = {
-        x = 0,
-        y = 0
-	},
-	rotation = 0
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      beep_offset = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       },
       hand_anchor = {
-		  pos = {
-        x = 0,
-        y = 0
-	},
-	rotation = 0
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       },
       head_anchor = {
-		  pos = {
-        x = 0,
-        y = 0
-	},
-	rotation = 0
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       }
     },
     legs = {
@@ -77,6 +84,13 @@ return {
         rotation = 0
       },
       head = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      legs = {
         pos = {
           x = 0,
           y = 0

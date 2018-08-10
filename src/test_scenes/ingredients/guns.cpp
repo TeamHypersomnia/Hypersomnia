@@ -189,7 +189,7 @@ namespace test_flavours {
 			missile.destruction_particles.modifier.colorize = white;
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::MISSILE_SMOKE_TRAIL);
-			missile.trace_particles.modifier.colorize = white;
+			missile.trace_particles.modifier.colorize = rgba(202, 185, 89, 255);
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION);
 			missile.muzzle_leave_particles.modifier.colorize = white;//{ 255, 218, 5, 255 };
