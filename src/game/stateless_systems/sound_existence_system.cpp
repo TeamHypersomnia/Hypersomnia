@@ -35,8 +35,8 @@ void play_collision_sound(
 	const auto subject_coll = sub.get<invariants::fixtures>();
 	const auto collider_coll = col.get<invariants::fixtures>();
 
-	const auto* const subject_coll_material = logicals.find(subject_coll.material);
-	const auto* const collider_coll_material = logicals.find(collider_coll.material);
+	const auto* const subject_coll_material = logicals.find(sub.calc_physical_material());
+	const auto* const collider_coll_material = logicals.find(col.calc_physical_material());
 
 	if (subject_coll_material != nullptr
 		&& collider_coll_material != nullptr

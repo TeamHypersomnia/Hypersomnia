@@ -56,6 +56,8 @@ namespace invariants {
 		assets::image_id defused_image_id;
 		assets::image_id released_image_id;
 		assets::physical_material_id released_physical_material;
+
+		real32 circle_shape_radius_when_released = 9.f;
 		// END GEN INTROSPECTOR
 
 		bool has_delayed_arming() const;

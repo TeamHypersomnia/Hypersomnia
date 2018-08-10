@@ -436,6 +436,14 @@ void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle
 			return;
 		}
 
+		if (handle.is_like_thrown_explosive()) {
+			if (const auto fuse = handle.template find<invariants::hand_fuse>()) {
+				from_circle_shape(fuse->circle_shape_radius_when_released);
+			}
+
+			return;
+		}
+
 		if (const auto expl_body = handle.template find<invariants::cascade_explosion>()) {
 			from_circle_shape(expl_body->circle_collider_radius);
 			return;

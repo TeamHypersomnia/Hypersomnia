@@ -278,7 +278,6 @@ namespace test_flavours {
 
 			fuse.armed_animation_id = to_animation_id(test_scene_plain_animation_id::BOMB_ARMED);
 			fuse.defused_image_id = to_image_id(test_scene_image_id::BOMB_DEFUSED);
-			fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 
 			meta.set(fuse);
 
