@@ -37,7 +37,7 @@ auto calc_filters(const E& handle) {
 	}
 
 	if (handle.is_like_thrown_explosive()) {
-		return filters::flying();
+		return filters::flying_item();
 	}
 
 	return colliders_data.filter;

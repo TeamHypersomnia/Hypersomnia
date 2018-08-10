@@ -126,7 +126,7 @@ namespace test_flavours {
 		body_def.damping.linear = 0.f,
 		body_def.angled_damping = false;
 		
-		fixtures_def.filter = filters::flying();
+		fixtures_def.filter = filters::flying_bullet();
 		fixtures_def.density = 1;
 		fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::METAL);
 

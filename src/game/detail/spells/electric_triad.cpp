@@ -18,7 +18,7 @@ bool electric_triad_instance::are_additional_conditions_for_casting_fulfilled(co
 		caster,
 		caster,
 		standard_triad_radius,
-		filters::flying()
+		filters::flying_item()
 	).size() > 0;
 
 	return is_any_hostile_in_proximity;
@@ -44,7 +44,7 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 		caster,
 		caster,
 		standard_triad_radius,
-		filters::flying()
+		filters::flying_item()
 	);
 
 	for (unsigned i = 0; i < 3 && i < static_cast<unsigned>(hostiles.size()); ++i) {

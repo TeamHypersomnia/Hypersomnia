@@ -28,7 +28,8 @@ namespace filters {
 	b2Filter character();
 	b2Filter ground();
 	b2Filter lying_item();
-	b2Filter flying();
+	b2Filter flying_bullet();
+	b2Filter flying_item();
 	b2Filter shell();
 	b2Filter planted_explosive();
 	b2Filter glass_obstacle();

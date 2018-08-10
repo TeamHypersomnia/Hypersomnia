@@ -94,7 +94,7 @@ void thunder_system::advance(
 							cosmos.get_si(),
 							child.from,
 							child.to,
-							filters::flying()
+							filters::flying_item()
 						);
 
 						if (raycast.hit) {

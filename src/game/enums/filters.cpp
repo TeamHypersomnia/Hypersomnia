@@ -72,10 +72,17 @@ namespace filters {
 		return out;
 	}
 
-	b2Filter flying() {
+	b2Filter flying_item() {
 		b2Filter out;
 		out.categoryBits = make_flags(C::FLYING);
 		out.maskBits = standard_participation_except(C::LYING_ITEM);
+		return out;
+	}
+
+	b2Filter flying_bullet() {
+		b2Filter out;
+		out.categoryBits = make_flags(C::FLYING);
+		out.maskBits = standard_participation();
 		return out;
 	}
 
