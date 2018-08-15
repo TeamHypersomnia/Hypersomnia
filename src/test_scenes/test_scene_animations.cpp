@@ -141,33 +141,33 @@ void load_test_scene_animations(
 		auto make_torso = make_plain;
 
 		make_torso(
-			test_id_type::METROPOLIS_CHARACTER_BARE,
-			test_scene_image_id::METROPOLIS_CHARACTER_BARE_1,
+			test_id_type::METROPOLIS_TORSO_BARE,
+			test_scene_image_id::METROPOLIS_TORSO_BARE_1,
 			30.0f
 		).meta.flip_when_cycling = true;
 
 		make_torso(
-			test_id_type::RESISTANCE_CHARACTER_BARE,
-			test_scene_image_id::RESISTANCE_CHARACTER_BARE_1,
+			test_id_type::RESISTANCE_TORSO_BARE,
+			test_scene_image_id::RESISTANCE_TORSO_BARE_1,
 			30.0f
 		).meta.flip_when_cycling = true;
 
 		make_torso(
-			test_id_type::METROPOLIS_CHARACTER_RIFLE,
-			test_scene_image_id::METROPOLIS_CHARACTER_RIFLE_1,
+			test_id_type::METROPOLIS_TORSO_RIFLE,
+			test_scene_image_id::METROPOLIS_TORSO_RIFLE_1,
 			30.0f
 		);
 
 		make_torso(
-			test_id_type::METROPOLIS_CHARACTER_HEAVY,
-			test_scene_image_id::METROPOLIS_CHARACTER_HEAVY_1,
+			test_id_type::METROPOLIS_TORSO_HEAVY,
+			test_scene_image_id::METROPOLIS_TORSO_HEAVY_1,
 			30.0f
 		);
 
 		{
 			auto& anim = make_torso(
-				test_id_type::METROPOLIS_CHARACTER_HEAVY_SHOOT,
-				test_scene_image_id::METROPOLIS_CHARACTER_HEAVY_SHOOT_1,
+				test_id_type::METROPOLIS_TORSO_HEAVY_SHOOT,
+				test_scene_image_id::METROPOLIS_TORSO_HEAVY_SHOOT_1,
 				20.0f
 			);
 
@@ -178,21 +178,21 @@ void load_test_scene_animations(
 		}
 
 		make_torso(
-			test_id_type::METROPOLIS_CHARACTER_AKIMBO,
-			test_scene_image_id::METROPOLIS_CHARACTER_AKIMBO_1,
+			test_id_type::METROPOLIS_TORSO_AKIMBO,
+			test_scene_image_id::METROPOLIS_TORSO_AKIMBO_1,
 			30.0f
 		);
 
 		make_torso(
-			test_id_type::RESISTANCE_CHARACTER_RIFLE,
-			test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_1,
+			test_id_type::RESISTANCE_TORSO_RIFLE,
+			test_scene_image_id::RESISTANCE_TORSO_RIFLE_1,
 			30.0f
 		);
 
 		{
 			auto& anim = make_torso(
-				test_id_type::RESISTANCE_CHARACTER_RIFLE_SHOOT,
-				test_scene_image_id::RESISTANCE_CHARACTER_RIFLE_SHOOT_1,
+				test_id_type::RESISTANCE_TORSO_RIFLE_SHOOT,
+				test_scene_image_id::RESISTANCE_TORSO_RIFLE_SHOOT_1,
 				20.0f
 			);
 
