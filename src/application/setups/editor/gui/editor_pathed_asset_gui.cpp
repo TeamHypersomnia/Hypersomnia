@@ -35,12 +35,21 @@
 #include "application/setups/editor/detail/do_pathed_asset_properties.h"
 #include "application/setups/editor/detail/do_forget_button.h"
 
+#if IS_PRODUCTION_BUILD
+#define BUILD_LOCATION_FINDERS 1
+#else
+#define BUILD_LOCATION_FINDERS 0
+#endif
+
+#if BUILD_LOCATION_FINDERS
 #include "application/setups/editor/detail/find_locations_that_use.h"
+#endif
 #include "application/setups/editor/detail/checkbox_selection.h"
 #include "application/setups/editor/property_editor/compare_all_fields_to.h"
 #include "augs/readwrite/byte_readwrite.h"
 
 #endif
+
 template <class asset_id_type>
 void editor_pathed_asset_gui<asset_id_type>::set_currently_viewed(const asset_id_type id) {
 	property_editor_data.reset();
@@ -122,9 +131,13 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			const auto path = object.get_source_path();
 			auto new_entry = asset_entry_type(path, id);
 
+#if BUILD_LOCATION_FINDERS
 			find_locations_that_use(id, work.world, viewables, [&](const std::string& location) {
 				new_entry.using_locations.push_back(location);
 			});
+#else
+			new_entry.using_locations.emplace_back();
+#endif
 
 			auto push_missing = [&]() {
 				auto& target_range = new_entry.used() ? missing_paths : missing_orphaned_paths;
@@ -333,7 +346,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 	auto files_view = scoped_child("Files view");
 
-	const bool show_using_locations = path_browser_settings.show_using_locations;
+	const bool show_using_locations = BUILD_LOCATION_FINDERS && path_browser_settings.show_using_locations;
 	const auto num_cols = 2 + (show_using_locations ? 1 : 0) + (show_properties_column ? 1 : 0);
 
 	if (tree_settings.linear_view) {
