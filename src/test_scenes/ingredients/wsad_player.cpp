@@ -152,7 +152,7 @@ namespace test_flavours {
 			invariants::movement movement;
 
 			movement.input_acceleration_axes.set(1, 1);
-			movement.acceleration_length = 4300;
+			movement.acceleration_length = 3569;
 			movement.braking_damping = 12.5f;
 			movement.standard_linear_damping = 20.f;
 
@@ -211,8 +211,8 @@ namespace test_flavours {
 				torso_def.stances[item_holding_stance::HEAVY_LIKE].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_HEAVY_WALK);
 				torso_def.stances[item_holding_stance::HEAVY_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_HEAVY_WALK);
 
-				torso_def.stances[item_holding_stance::AKIMBO].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_BARE);
-				torso_def.stances[item_holding_stance::AKIMBO].shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_BARE);
+				torso_def.stances[item_holding_stance::AKIMBO].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_AKIMBO_WALK);
+				torso_def.stances[item_holding_stance::AKIMBO].shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_AKIMBO_SHOOT);
 
 				meta.set(torso_def);
 			}

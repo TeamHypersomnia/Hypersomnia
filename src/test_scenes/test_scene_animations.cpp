@@ -204,6 +204,26 @@ void load_test_scene_animations(
 			test_scene_image_id::RESISTANCE_TORSO_HEAVY_WALK_1,
 			30.0f
 		);
+
+		{
+			auto& anim = make_torso(
+				test_id_type::RESISTANCE_TORSO_AKIMBO_WALK,
+				test_scene_image_id::RESISTANCE_TORSO_AKIMBO_SHOOT_1,
+				30.0f
+			);
+
+			anim.meta.flip_when_cycling = true;
+		}
+
+		{
+			auto& anim = make_torso(
+				test_id_type::RESISTANCE_TORSO_AKIMBO_SHOOT,
+				test_scene_image_id::RESISTANCE_TORSO_AKIMBO_SHOOT_1,
+				30.0f
+			);
+
+			make_shoot_durations(anim.frames);
+		}
 	}
 
 	{

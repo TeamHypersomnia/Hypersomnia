@@ -29,7 +29,7 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 					const auto highlight_color = augs::interp(first_col, second_col, (1 - highlight_amount)* (1 - highlight_amount));
 
 					if (const auto tr = it.find_viewing_transform(in.interpolation)) {
-						in.output.aabb_centered(tex, tr->pos, highlight_color);
+						in.output.aabb_centered(tex, vec2(tr->pos).discard_fract(), highlight_color);
 
 						augs::special s;
 

@@ -45,7 +45,7 @@ augs::vertex_triangle_buffer draw_sentiences_hud(const draw_sentiences_hud_input
 
 			const auto transform = v.get_viewing_transform(interp);
 
-			output.aabb_centered(in.circular_bar_tex, (transform.pos), health_col);
+			output.aabb_centered(in.circular_bar_tex, vec2(transform.pos).discard_fract(), health_col);
 
 			const auto watched_character_transform = watched_character.get_viewing_transform(interp);
 			float starting_health_angle = 0.f;
@@ -108,7 +108,7 @@ augs::vertex_triangle_buffer draw_sentiences_hud(const draw_sentiences_hud_input
 							auto ammo_color = augs::interp(white, red_violet, (1 - ammo_ratio)* (1 - ammo_ratio));
 							ammo_color.a = 200;
 
-							output.aabb_centered(in.circular_bar_tex, (transform.pos), ammo_color);
+							output.aabb_centered(in.circular_bar_tex, vec2(transform.pos).discard_fract(), ammo_color);
 
 							circle_info new_info;
 
