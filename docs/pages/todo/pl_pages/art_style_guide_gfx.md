@@ -308,6 +308,24 @@ To jest za to idealny przykład animacji która zmienia kształt broni i będzie
 - Może być kuszące, aby dużym dekoracjom robić animacje na całym ich obszarze. Niestety musimy liczyć się z ograniczoną przestrzenią atlasu.
 
 
+## Konwencje nazewnictwa
+
+- Ogólnie: ``[co_to_jest]_[indeks_klatki].png``
+	- Torsy: ``[frakcja]_torso_[trzymana_rzecz]_[czynność]_[indeks].png``, np.:
+		- ``resistance_torso_rifle_shoot_1.png`` - Pierwsza klatka animacji strzału z karabinu dla żołnierza Oporu.
+		- ``metropolis_torso_heavy_walk_2.png`` - Druga klatka animacji chodzenia z ciężkim karabinem dla żołnierza Metropolii.
+		- ``metropolis_torso_akimbo_walk_2.png`` - Druga klatka animacji chodzenia akimbo dla żołnierza Metropolii.
+	- Głowy: ``[frakcja]_head.png``
+		- Np.: ``resistance_head.png``
+	- Naboje: 
+		- Kartridż: ``[rodzaj]_charge.png``
+		- Łuska: ``[rodzaj]_shell.png``
+		- Pocisk: ``[rodzaj]_round.png``
+		- Przykładowy zestaw:
+			- ``steel_charge.png``
+			- ``steel_shell.png``
+			- ``steel_round.png``
+
 ## Wskazówki ogólne
 
 - Jeśli rysujemy jakieś urządzenie elektroniczne...
