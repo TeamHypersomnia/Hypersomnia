@@ -84,6 +84,10 @@ struct stance_frame_usage {
 		return stance_frame_usage<T> { std::addressof(f), false, true };
 	}
 
+	static auto shoot_flipped(const frame_type_t<T>& f) {
+		return stance_frame_usage<T> { std::addressof(f), true, true };
+	}
+
 	explicit operator bool() const {
 		return frame != nullptr;
 	}
@@ -122,7 +126,11 @@ auto calc_stance_usage(
 				}();
 				
 				if (frame && second_frame) {
-					return result_t::shoot(*std::min(frame, second_frame));
+					if (frame < second_frame) {
+						return result_t::shoot(*frame);
+					}
+					
+					return result_t::shoot_flipped(*second_frame);
 				}
 
 				if (frame) {
@@ -130,7 +138,7 @@ auto calc_stance_usage(
 				}
 
 				if (second_frame) {
-					return result_t::shoot(*second_frame);
+					return result_t::shoot_flipped(*second_frame);
 				}
 			}
 		}
