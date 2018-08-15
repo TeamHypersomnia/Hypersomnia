@@ -70,10 +70,12 @@ transformr direct_attachment_offset(
 	transformi attachment_offset;
 	transformi anchor;
 
+	const bool shall_flip = is_torso_attachment(type) && container.only_secondary_holds_item();
+
 	auto get_actual_offsets_by_torso = [&]() {
 		auto offsets = get_offsets_by_torso();
 
-		if (container.only_secondary_holds_item()) {
+		if (shall_flip) {
 			offsets.flip_vertically();
 		}
 
@@ -110,6 +112,10 @@ transformr direct_attachment_offset(
 		attachment_offset = {};
 		anchor = {};
 		break;
+	}
+
+	if (shall_flip) {
+		anchor.flip_vertically();
 	}
 
 	return get_anchored_offset(attachment_offset, anchor);

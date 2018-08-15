@@ -24,3 +24,16 @@ enum class slot_function {
 	// END GEN INTROSPECTOR
 	COUNT
 };
+
+inline bool is_torso_attachment(const slot_function f) {
+	switch (f) {
+		case slot_function::PRIMARY_HAND: return true;
+		case slot_function::SECONDARY_HAND: return true;
+
+		case slot_function::BELT: return true;
+		case slot_function::SHOULDER: return true;
+		case slot_function::TORSO_ARMOR: return true;
+		case slot_function::HAT: return true;
+		default: return false;
+	}
+};
