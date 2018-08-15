@@ -198,6 +198,12 @@ void load_test_scene_animations(
 
 			make_shoot_durations(anim.frames);
 		}
+
+		make_torso(
+			test_id_type::RESISTANCE_TORSO_HEAVY_WALK,
+			test_scene_image_id::RESISTANCE_TORSO_HEAVY_WALK_1,
+			30.0f
+		);
 	}
 
 	{
