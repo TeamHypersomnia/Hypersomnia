@@ -1400,14 +1400,17 @@ int work(const int argc, const char* const * const argv) try {
 			3.	Draw the game GUI, if so is appropriate.
 				Game GUI involves things like inventory buttons, hotbar and health bars.
 
-			4.	Draw either the main menu buttons, or the in-game menu overlay accessed by ESC.
+			4.  Draw the mode GUI.
+				Mode GUI involves things like team selection, weapon shop, round time remaining etc.
+
+			5.	Draw either the main menu buttons, or the in-game menu overlay accessed by ESC.
 				These two are almost identical, except the layouts of the first (e.g. tweened buttons) 
 				may also be influenced by a playing intro.
 
-			5.	Draw IMGUI, which is the highest priority GUI. 
+			6.	Draw IMGUI, which is the highest priority GUI. 
 				This involves settings window, developer console and the like.
 
-			6.	Draw the GUI cursor. It may be:
+			7.	Draw the GUI cursor. It may be:
 					- The cursor of the IMGUI, if it wants to capture the mouse.
 					- Or, the cursor of the main menu or the in-game menu overlay, if either is currently active.
 					- Or, the cursor of the game gui, with maybe tooltip, with maybe dragged item's ghost, if we're in-game in GUI mode.
@@ -1530,7 +1533,7 @@ int work(const int argc, const char* const * const argv) try {
 					const auto context = create_menu_context(ingame_menu);
 					ingame_menu.advance(context, frame_delta);
 
-					/* #4 */
+					/* #5 */
 					return ingame_menu.draw({ context, get_drawer() });
 				}
 
@@ -1541,7 +1544,7 @@ int work(const int argc, const char* const * const argv) try {
 
 				main_menu->gui.advance(context, frame_delta);
 
-				/* #4 */
+				/* #5 */
 				const auto cursor = main_menu->gui.draw({ context, get_drawer() });
 
 				main_menu.value().draw_overlays(
@@ -1558,7 +1561,7 @@ int work(const int argc, const char* const * const argv) try {
 		renderer.call_and_clear_triangles();
 
 		{
-			/* #5 */
+			/* #6 */
 			auto scope = measure_scope(frame_performance.imgui);
 
 			if (streaming.general_atlas.has_value()) {
@@ -1569,7 +1572,7 @@ int work(const int argc, const char* const * const argv) try {
 			}
 		}
 
-		/* #6 */
+		/* #7 */
 		const bool should_draw_our_cursor = new_viewing_config.window.raw_mouse_input && !window.is_mouse_pos_paused();
 
 		{

@@ -2,12 +2,15 @@
 #include <optional>
 
 #include "augs/ensure.h"
-#include "augs/misc/pool/pool_structs.h"
-#include "augs/misc/pool/pooled_object_id.h"
 
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/traits/container_traits.h"
 #include "augs/templates/container_templates.h"
+
+#include "augs/misc/pool/pool_structs.h"
+#include "augs/misc/pool/pooled_object_id.h"
+
+#include "augs/misc/prevent_trivial_copy.h"
 
 #include "augs/readwrite/byte_readwrite_declaration.h"
 #include "augs/readwrite/lua_readwrite_declaration.h"
@@ -15,17 +18,7 @@
 namespace augs {
 	template <class T, template <class> class make_container_type, class size_type, class... id_keys>
 	class pool {
-		struct A {
-			A() {}
-
-			A(const A&) {}
-			A(A&&) {}
-
-			A& operator=(const A&) { return *this; }
-			A& operator=(A&&) { return *this; }
-		};
-		
-		A prevent_trivial_copies;
+		prevent_trivial_copy guard;
 
 	public:
 		using value_type = T;

@@ -172,7 +172,7 @@ namespace test_flavours {
 			in.type = adverse_element_type::PED;
 			in.create_thunders_effect = true;
 
-			in.victim_shake = {};
+			in.victim_shake = { 0.f, 0.f };
 
 			meta.set(explosive);
 		}

@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Fix smoke traces for steel bullets
+
+- Mode interaction with GUI
+	- Setups expose current mode?
+		- Then an if constexpr happens
+
 - Player & modes
 	- A mode shall operate without crash on virtually any cosmos
 		- Should catch up with changes
