@@ -173,7 +173,7 @@ entity_id get_closest_hostile(
 			[&](const b2Fixture* const fix) {
 				const const_entity_handle s = cosmos[get_body_entity_that_owns(fix)];
 
-				if (s != subject && s.has<components::attitude>()) {
+				if (s != subject && s.has<components::attitude>() && !s.sentient_and_unconscious()) {
 					const auto calculated_attitude = calc_attitude(s, subject_attitude);
 
 					if (is_hostile(calculated_attitude)) {
