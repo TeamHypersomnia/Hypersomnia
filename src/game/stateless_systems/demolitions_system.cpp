@@ -17,6 +17,7 @@
 #include "game/components/hand_fuse_component.h"
 #include "game/messages/queue_deletion.h"
 #include "game/detail/explosive/detonate.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "augs/misc/randomization.h"
 
 void demolitions_system::detonate_fuses(const logic_step step) {

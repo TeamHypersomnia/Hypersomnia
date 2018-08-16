@@ -3,6 +3,7 @@
 #include "application/setups/editor/property_editor/update_size_if_tex_changed.h"
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/detail/find_free_name.h"
+#include "application/setups/editor/editor_history.hpp"
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/memory_stream.h"
 
