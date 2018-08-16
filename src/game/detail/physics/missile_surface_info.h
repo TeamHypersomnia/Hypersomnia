@@ -14,6 +14,18 @@ public:
 		const B surface
 	) {
 		const auto& sender = missile.template get<components::sender>();
+
+		if (const auto surface_sender = surface.template find<components::sender>()) {
+			if (sender.direct_sender == surface_sender->direct_sender
+				|| sender.capability_of_sender == surface_sender->capability_of_sender
+			) {
+				ignore_altogether = true;
+				is_fly_through = true;
+				surface_is_item = false;
+				return;
+			}
+		}
+
 		const bool bullet_colliding_with_any_subject_of_sender = sender.is_sender_subject(surface);
 
 		surface_is_item = surface.template has<components::item>();
