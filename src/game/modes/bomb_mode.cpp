@@ -9,6 +9,27 @@
 
 using input_type = bomb_mode::input;
 
+bool bomb_mode::choose_faction(const mode_player_id& id, const faction_type faction) {
+	if (const auto entry = mapped_or_nullptr(players, id)) {
+		if (entry->faction == faction) {
+			return true;
+		}
+
+		entry->faction = faction;
+		return true;
+	}
+
+	return false;
+}
+
+faction_type bomb_mode::get_player_faction(const mode_player_id& id) const {
+	if (const auto entry = mapped_or_nullptr(players, id)) {
+		return entry->faction;
+	}
+
+	return faction_type::NONE;
+}
+
 void bomb_mode::init_spawned(const input in, const entity_id id, const logic_step step) {
 	const auto handle = in.cosm[id];
 	const auto& faction_vars = in.vars.factions[handle.get_official_faction()];

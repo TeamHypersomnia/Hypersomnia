@@ -16,11 +16,10 @@ using cosmos_clock = augs::stepped_clock;
 struct cosmos_solvable_significant {
 	// GEN INTROSPECTOR struct cosmos_solvable_significant
 	all_entity_pools entity_pools;
-	cosmos_clock clock;
+	cosmos_clock clk;
 	entity_guid next_entity_guid = entity_guid::first();
 
 	std::unordered_map<entity_id, entity_name_str> specific_names;
-
 	// END GEN INTROSPECTOR
 
 	template <class E>

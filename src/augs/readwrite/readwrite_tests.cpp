@@ -165,6 +165,20 @@ TEST_CASE("Byte readwrite Optionals") {
 	readwrite_test_cycle(abcdef);
 }
 
+TEST_CASE("Byte readwrite Pointers") {
+	std::unique_ptr<std::vector<float>> abc(new std::vector<float>());
+	std::unique_ptr<std::vector<int>> abcd(new std::vector<int>());
+	std::unique_ptr<std::vector<std::vector<int>>> abcde(new std::vector<std::vector<int>>());
+
+	abc->resize(2);
+	abcd->resize(2);
+	abcde->resize(2);
+
+	readwrite_test_cycle(abc);
+	readwrite_test_cycle(abcd);
+	readwrite_test_cycle(abcde);
+}
+
 TEST_CASE("Byte readwrite Variants and optionals") {
 	const auto& path = test_file_path;
 

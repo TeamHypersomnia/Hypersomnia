@@ -15,11 +15,24 @@ void report(const T& v, const T& reloaded) {
 }
 
 template <class T>
-bool report_compare(const T& tmp, const T& v) {
-	const auto success = tmp == v;
+auto& ref_or_get(T& v) {
+	if constexpr(is_unique_ptr_v<std::remove_const_t<T>>) {
+		return *v.get();
+	}
+	else {
+		return v;
+	}
+}
+
+static_assert(std::is_same_v<decltype(ref_or_get(std::declval<std::unique_ptr<std::vector<int>>&>())), std::vector<int>&>);
+
+template <class A, class B>
+bool report_compare(const A& tmp, const B& v) {
+	const auto& vv = ref_or_get(v);
+	const auto success = vv == tmp;
 
 	if (!success) {
-		report(tmp, v);
+		report(tmp, vv);
 	}
 
 	return success;
@@ -28,14 +41,14 @@ bool report_compare(const T& tmp, const T& v) {
 template <class T>
 bool try_to_reload_with_file(T& v) {
 	if constexpr(!augs::is_pool_v<T>) {
-		if (!report_compare(v, v)) {
+		if (!(v == v)) {
 			return false;
 		}
 	}
 
 	const auto& path = test_file_path;
+	const auto tmp = ref_or_get(v);
 
-	const T tmp = v;
 	augs::save_as_bytes(v, path);
 	augs::load_from_bytes(v, path);
 
@@ -53,14 +66,15 @@ bool try_to_reload_with_file(T& v) {
 template <class T>
 bool try_to_reload_with_bytes(T& v) {
 	if constexpr(!augs::is_pool_v<T>) {
-		if (!report_compare(v, v)) {
+		if (!(v == v)) {
 			return false;
 		}
 	}
 
 	const auto& path = test_file_path;
 
-	const T tmp = v;
+	const auto tmp = ref_or_get(v);
+
 	{
 		std::vector<std::byte> bytes;
 		bytes = augs::to_bytes(v);
@@ -83,14 +97,15 @@ bool try_to_reload_with_bytes(T& v) {
 template <class T>
 bool try_to_reload_with_memory_stream(T& v) {
 	if constexpr(!augs::is_pool_v<T>) {
-		if (!report_compare(v, v)) {
+		if (!(v == v)) {
 			return false;
 		}
 	}
 
 	const auto& path = test_file_path;
 
-	const T tmp = v;
+	const auto tmp = ref_or_get(v);
+
 	{
 		std::vector<std::byte> bytes;
 		bytes = augs::to_bytes(v);

@@ -12,7 +12,7 @@ struct entity_guid;
 struct entity_id;
 
 class cosmos;
-class cosmos_solvable;
+struct cosmos_solvable_significant;
 
 template <class T>
 using per_faction_t = augs::enum_array<T, faction_type>;
@@ -56,11 +56,11 @@ struct bomb_mode_player {
 class bomb_mode {
 public:
 	using vars_type = bomb_mode_vars;
-	static constexpr bool needs_initial_solvable = true;
+	static constexpr bool needs_initial_signi = true;
 
 	struct input {
 		const bomb_mode_vars& vars;
-		const cosmos_solvable& initial_solvable;
+		const cosmos_solvable_significant& initial_solvable;
 		cosmos& cosm;
 	};
 
@@ -82,6 +82,9 @@ public:
 
 	mode_player_id add_player(input, const entity_name_str& chosen_name);
 	void remove_player(input, const mode_player_id&);
+
+	bool choose_faction(const mode_player_id&, const faction_type faction);
+	faction_type get_player_faction(const mode_player_id&) const;
 
 	entity_guid lookup(const mode_player_id&) const;
 

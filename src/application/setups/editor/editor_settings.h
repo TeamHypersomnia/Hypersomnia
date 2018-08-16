@@ -45,6 +45,13 @@ struct editor_grid_settings {
 	// END GEN INTROSPECTOR
 };
 
+struct editor_test_scene_settings {
+	// GEN INTROSPECTOR struct editor_test_scene_settings
+	float scene_tickrate = 144.f;
+	bool start_bomb_mode = false; 
+	// END GEN INTROSPECTOR
+};
+
 struct editor_settings {
 	// GEN INTROSPECTOR struct editor_settings
 	editor_autosave_settings autosave;
@@ -59,6 +66,7 @@ struct editor_settings {
 	editor_go_to_settings go_to;
 	editor_entity_selector_settings entity_selector;
 	property_editor_settings property_editor;
+	editor_test_scene_settings test_scene;
 
 	rgba controlled_entity_color = { 255, 255, 0, 120 };
 	rgba matched_entity_color = { 0, 255, 0, 80 };

@@ -10,6 +10,7 @@
 
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/memory_stream.h"
+#include "application/setups/editor/editor_settings.h"
 
 std::string fill_with_test_scene_command::describe() const {
 	return typesafe_sprintf("Filled with %x", minimal ? "minimal test scene" : "test scene");
@@ -32,8 +33,10 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 	test_scene_mode_vars test_vars;
 	bomb_mode_vars bomb_vars;
 
+	const auto& settings = in.settings.test_scene;
+
 #if BUILD_TEST_SCENES
-	work->make_test_scene(in.lua, { minimal, 144 }, test_vars, std::addressof(bomb_vars));
+	work->make_test_scene(in.lua, { minimal, settings.scene_tickrate }, test_vars, std::addressof(bomb_vars));
 #endif
 	view = {};
 
@@ -42,20 +45,32 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 	mode_vars.clear();
 
 	{
-		test_scene_mode test_mode;
-		view.local_player_id = test_mode.add_player({ test_vars, cosm }, faction_type::RESISTANCE);
-
 		const auto test_vars_id = mode_vars_id(0);
 		mode_vars.get_for<test_scene_mode_vars>().try_emplace(test_vars_id, std::move(test_vars));
 
-		player.current_mode_vars_id = test_vars_id;
-		player.current_mode.emplace<test_scene_mode>(std::move(test_mode));
+		if (!settings.start_bomb_mode) {
+			test_scene_mode mode;
+			view.local_player_id = mode.add_player({ test_vars, cosm }, faction_type::RESISTANCE);
+
+			player.current_mode_vars_id = test_vars_id;
+			player.current_mode.emplace<test_scene_mode>(std::move(mode));
+		}
 	}
 
 	{
 		const auto bomb_vars_id = mode_vars_id(0);
 		mode_vars.get_for<bomb_mode_vars>().try_emplace(bomb_vars_id, std::move(bomb_vars));
+
+		if (settings.start_bomb_mode) {
+			bomb_mode mode;
+			view.local_player_id = mode.add_player({ bomb_vars, cosm.get_solvable().significant, cosm }, "Editor-player");
+
+			player.current_mode_vars_id = bomb_vars_id;
+			player.current_mode.emplace<bomb_mode>(std::move(mode));
+		}
 	}
+
+	player.mode_initial_signi = std::make_unique<cosmos_solvable_significant>(work->world.get_solvable().significant);
 }
 
 void fill_with_test_scene_command::undo(const editor_command_input in) {

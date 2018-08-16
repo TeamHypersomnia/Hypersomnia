@@ -32,7 +32,7 @@ struct test_mode_player {
 class test_scene_mode {
 public:
 	using vars_type = test_scene_mode_vars;
-	static constexpr bool needs_initial_solvable = false;
+	static constexpr bool needs_initial_signi = false;
 
 	struct input {
 		const test_scene_mode_vars& vars;

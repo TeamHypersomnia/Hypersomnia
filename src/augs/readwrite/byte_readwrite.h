@@ -9,6 +9,7 @@
 #include "augs/templates/byte_type_for.h"
 #include "augs/templates/traits/is_variant.h"
 #include "augs/templates/traits/is_optional.h"
+#include "augs/templates/traits/is_unique_ptr.h"
 #include "augs/templates/for_each_type.h"
 
 #include "augs/readwrite/byte_readwrite_declaration.h"
@@ -61,14 +62,34 @@ namespace augs {
 		else if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
 			detail::read_raw_bytes(ar, &storage, 1);
 		}
+		else if constexpr(is_unique_ptr_v<Serialized>) {
+			bool has_value = false;
+			read_bytes(ar, has_value);
+
+			if (has_value) {
+				if (storage == nullptr) {
+					storage = std::make_unique<typename Serialized::element_type>();
+				}
+
+				read_bytes(ar, *storage);
+			}
+			else {
+				storage.release();
+			}
+		}
 		else if constexpr(is_optional_v<Serialized>) {
 			bool has_value = false;
 			read_bytes(ar, has_value);
 
 			if (has_value) {
-				typename Serialized::value_type value;
-				read_bytes(ar, value);
-				storage.emplace(std::move(value));
+				if (storage == std::nullopt) {
+					storage.emplace();
+				}
+
+				read_bytes(ar, *storage);
+			}
+			else {
+				storage.reset();
 			}
 		}
 		else if constexpr(is_variant_v<Serialized>) {
@@ -126,6 +147,13 @@ namespace augs {
 		}
 		else if constexpr(is_optional_v<Serialized>) {
 			write_bytes(ar, storage.has_value());
+
+			if (storage) {
+				write_bytes(ar, *storage);
+			}
+		}
+		else if constexpr(is_unique_ptr_v<Serialized>) {
+			write_bytes(ar, storage != nullptr);
 
 			if (storage) {
 				write_bytes(ar, *storage);
@@ -218,7 +246,7 @@ namespace augs {
 
 		if constexpr(can_access_data_v<Container>) {
 			resize_no_init(storage, s);
-			detail::read_bytes_n(ar, storage.data(), storage.size());
+			detail::read_bytes_n(ar, storage.data(), s);
 		}
 		else {
 			if constexpr(can_reserve_v<Container>) {
@@ -258,8 +286,12 @@ namespace augs {
 		ensure(s <= std::numeric_limits<container_size_type>::max());
 		write_bytes(ar, static_cast<container_size_type>(s));
 
+		if (s == 0) {
+			return;
+		}
+
 		if constexpr(can_access_data_v<Container>) {
-			detail::write_bytes_n(ar, storage.data(), storage.size());
+			detail::write_bytes_n(ar, storage.data(), s);
 		}
 		else {
 			if constexpr(is_associative_v<Container>) {

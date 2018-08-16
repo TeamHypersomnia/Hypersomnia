@@ -557,4 +557,13 @@ struct game_state_checks {
 
 	static_assert(!can_type_contain_constructible_from_v<invariants::fixtures, typed_entity_flavour_id<plain_missile>>);
 	static_assert(!can_type_contain_constructible_from_v<invariants::flags, typed_entity_flavour_id<plain_missile>>);
+
+	using S = int;
+	using some_pool_type = augs::pool<S, of_size<200>::template make_constant_vector, cosmic_pool_size_type>;
+
+	/* Ensures that the byte-wise writer is not invoked for a pool */
+	static_assert(!std::is_trivially_copyable_v<some_pool_type>);
+
+	static_assert(is_unique_ptr_v<std::unique_ptr<int>>);
+	static_assert(!is_unique_ptr_v<std::optional<int>>);
 };

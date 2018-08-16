@@ -22,8 +22,8 @@ S& pretty_print(S& os, const T& val) {
 		os << val;
 	}
 	else if constexpr(is_optional_v<T>) {
-		if (val.has_value()) {
-			pretty_print(os, val.value());
+		if (val != std::nullopt) {
+			pretty_print(os, *val);
 		}
 		else {
 			os << "std::nullopt";

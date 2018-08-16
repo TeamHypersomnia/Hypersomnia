@@ -7,9 +7,11 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - Player & modes
-	- A mode shall be able to operate without crash on virtually any cosmos
+	- A mode shall operate without crash on virtually any cosmos
 		- Should catch up with changes
-	- A player stores initial solvable every time a 
+	- A player stores initial signi. It updates it every time:
+		- A scene is filled.
+		- A special button is pressed.
 	- For resetting a round, the modes will need to have an initial comos solvable
 		- For round-less modes, e.g. test scene mode, we can simply pass the same cosmos
 			- Actually just have a constexpr bool for each

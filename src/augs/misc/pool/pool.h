@@ -15,6 +15,18 @@
 namespace augs {
 	template <class T, template <class> class make_container_type, class size_type, class... id_keys>
 	class pool {
+		struct A {
+			A() {}
+
+			A(const A&) {}
+			A(A&&) {}
+
+			A& operator=(const A&) { return *this; }
+			A& operator=(A&&) { return *this; }
+		};
+		
+		A prevent_trivial_copies;
+
 	public:
 		using value_type = T;
 

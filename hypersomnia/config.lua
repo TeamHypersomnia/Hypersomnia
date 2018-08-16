@@ -86,6 +86,10 @@ return {
       dialog_width = 400,
       num_lines = 15,
     },
+    test_scene = {
+      scene_tickrate = 144,
+      start_bomb_mode = true
+    },
     camera = {
       panning_speed = 1
     },
@@ -280,7 +284,7 @@ return {
   },
   test_scene = {
     create_minimal_test_scene = false,
-	scene_tickrate = 144
+    scene_tickrate = 144
   },
   simulation_receiver = {
     misprediction_smoothing_multiplier = 1.2000000476837158

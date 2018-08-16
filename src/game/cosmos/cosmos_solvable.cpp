@@ -13,7 +13,7 @@ void cosmos_solvable::clear() {
 	destroy_all_caches();
 	significant.entity_pools.clear();
 	guid_to_id.clear();
-	significant.clock = {};
+	significant.clk = {};
 }
 
 std::size_t cosmos_solvable::get_entities_count() const {
@@ -73,7 +73,7 @@ void cosmos_solvable::remap_guids() {
 }
 
 void cosmos_solvable::increment_step() {
-	++significant.clock.now.step;
+	++significant.clk.now.step;
 }
 
 double cosmos_solvable::get_total_seconds_passed(const double view_interpolation_ratio) const {
@@ -81,27 +81,27 @@ double cosmos_solvable::get_total_seconds_passed(const double view_interpolation
 }
 
 double cosmos_solvable::get_total_seconds_passed() const {
-	return significant.clock.now.step * get_fixed_delta().in_seconds<double>();
+	return significant.clk.now.step * get_fixed_delta().in_seconds<double>();
 }
 
 decltype(augs::stepped_timestamp::step) cosmos_solvable::get_total_steps_passed() const {
-	return significant.clock.now.step;
+	return significant.clk.now.step;
 }
 
 augs::stepped_timestamp cosmos_solvable::get_timestamp() const {
-	return significant.clock.now;
+	return significant.clk.now;
 }
 
 const augs::stepped_clock& cosmos_solvable::get_clock() const {
-	return significant.clock;
+	return significant.clk;
 }
 
 augs::delta cosmos_solvable::get_fixed_delta() const {
-	return significant.clock.dt;
+	return significant.clk.dt;
 }
 
 void cosmos_solvable::set_steps_per_second(const unsigned steps) {
-	significant.clock.dt = augs::delta::steps_per_second(steps);
+	significant.clk.dt = augs::delta::steps_per_second(steps);
 }
 
 unsigned cosmos_solvable::get_steps_per_second() const {
