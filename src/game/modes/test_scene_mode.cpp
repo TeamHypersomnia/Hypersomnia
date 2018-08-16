@@ -36,9 +36,14 @@ void test_scene_mode::teleport_to_next_spawn(const input in, const entity_id id)
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
 		const auto faction = typed_handle.get_official_faction();
+		const auto num_spawns = get_num_faction_spawns(in.cosm, faction);
+
+		if (0 == num_spawns) {
+			return;
+		}
 
 		auto normalize_spawn_index = [&]() {
-			current_spawn_index = (current_spawn_index + 1) % get_num_faction_spawns(in.cosm, faction);
+			current_spawn_index = (current_spawn_index + 1) % num_spawns;
 		};
 
 		normalize_spawn_index();
