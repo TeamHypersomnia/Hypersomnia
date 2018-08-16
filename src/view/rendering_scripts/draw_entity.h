@@ -329,11 +329,13 @@ FORCE_INLINE void specific_entity_drawer(
 					);
 				}
 
+				const bool only_secondary = typed_handle.only_secondary_holds_item();
+
 				{
 					/* Draw the actual torso */
 					auto usage = stance_usage;
 
-					if (typed_handle.only_secondary_holds_item()) {
+					if (only_secondary) {
 						auto& f = usage.flip;
 						f = !f;
 					}
@@ -374,7 +376,16 @@ FORCE_INLINE void specific_entity_drawer(
 					const auto target_image = stance_usage.is_shooting ? head_def.shooting_head_image : head_def.head_image;
 
 					const auto& head_offsets = logicals.get_offsets(target_image);
-					const auto target_offset = ::get_anchored_offset(stance_offsets.head, head_offsets.item.head_anchor);
+
+					auto stance_offsets_for_head = stance_offsets;
+					auto anchor_for_head = head_offsets.item.head_anchor;
+
+					if (only_secondary) {
+						stance_offsets_for_head.flip_vertically();
+						anchor_for_head.flip_vertically();
+					}
+
+					const auto target_offset = ::get_anchored_offset(stance_offsets_for_head.head, anchor_for_head);
 					const auto target_transform = viewing_transform * target_offset;
 
 					invariants::sprite sprite;
