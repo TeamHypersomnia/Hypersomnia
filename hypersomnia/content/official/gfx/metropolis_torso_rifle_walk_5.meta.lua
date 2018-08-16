@@ -28,32 +28,39 @@ return {
     },
     item = {
       attachment_anchor = {
-		  pos = {
-        x = 0,
-        y = 0
-	},
-	rotation = 0
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       },
       back_anchor = {
-		  pos = {
-        x = 0,
-        y = 0
-	},
-	rotation = 0
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      beep_offset = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       },
       hand_anchor = {
-		  pos = {
-        x = 0,
-        y = 0
-	},
-	rotation = 0
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       },
       head_anchor = {
-		  pos = {
-        x = 0,
-        y = 0
-	},
-	rotation = 0
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       }
     },
     legs = {
@@ -73,9 +80,9 @@ return {
       head = {
         pos = {
           x = -14,
-          y = -6
+          y = -4
         },
-        rotation = 3
+        rotation = 1.5
       },
       legs = {
         pos = {
@@ -86,10 +93,10 @@ return {
       },
       primary_hand = {
         pos = {
-          x = -6,
-          y = 17
+          x = -5,
+          y = 15
         },
-        rotation = -17.915775299072266
+        rotation = -9.7096548080444336
       },
       secondary_hand = {
         pos = {

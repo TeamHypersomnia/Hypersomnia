@@ -17,22 +17,50 @@ return {
       bullet_spawn = {
         x = 0,
         y = 0
+      },
+      detachable_magazine = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       }
     },
     item = {
+      attachment_anchor = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
       back_anchor = {
-		  pos = {
-        x = 0,
-        y = 0
-	},
-	rotation = 0
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      beep_offset = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       },
       hand_anchor = {
-		  pos = {
-        x = 0,
-        y = 0
-	},
-	rotation = 0
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      head_anchor = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       }
     },
     legs = {
@@ -43,20 +71,39 @@ return {
     },
     torso = {
       back = {
-        x = 0,
-        y = 0
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       },
       head = {
-        x = 0,
-        y = 0
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      legs = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       },
       primary_hand = {
-        x = 0,
-        y = 0
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       },
       secondary_hand = {
-        x = 0,
-        y = 0
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       }
     }
   },

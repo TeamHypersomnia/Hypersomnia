@@ -7,9 +7,9 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - Player & modes
-	- Mode & mode vars will have no different relation to the player as the cosmos common state has 
-		- e.g. for replays, we can change it any time
-		- They should always more or less catch up
+	- A mode shall be able to operate without crash on virtually any cosmos
+		- Should catch up with changes
+	- A player stores initial solvable every time a 
 	- For resetting a round, the modes will need to have an initial comos solvable
 		- For round-less modes, e.g. test scene mode, we can simply pass the same cosmos
 			- Actually just have a constexpr bool for each
