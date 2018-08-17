@@ -9,8 +9,18 @@ summary: That which we are brainstorming at the moment.
 - Fix smoke traces for steel bullets
 
 - Mode interaction with GUI
+	- Our GUI or ImGui?
+		- Do we want to interact with the tab gui?
+			- Perhaps? E.g. to view player profile or stats
+			- ImGui could be better suited for this
+				- Also, it is not gameplay GUI so we don't have accuracy needs
+			- We still might want to use our custom drawers e.g. for last kills
 	- Setups expose current mode?
-		- Then an if constexpr happens
+		- if constexpr has round time
+		- main would also have to know the arguments like initial cosmos
+			- so perhaps it would be better for a setup to interact with main, not the mode itself
+	- Setup: on_mode_with_input
+		- Used internally, as well
 
 - Player & modes
 	- A mode shall operate without crash on virtually any cosmos

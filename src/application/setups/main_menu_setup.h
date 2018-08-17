@@ -31,6 +31,7 @@
 #include "application/gui/main_menu_gui.h"
 #include "application/setups/main_menu_settings.h"
 #include "game/modes/test_scene_mode.h"
+#include "application/setups/setup_common.h"
 
 struct config_lua_table;
 
@@ -101,6 +102,10 @@ public:
 
 	void perform_custom_imgui() {
 		return;
+	}
+
+	auto escape() {
+		return setup_escape_result::IGNORE;
 	}
 
 	void launch_creators_screen();

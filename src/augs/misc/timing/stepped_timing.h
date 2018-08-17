@@ -37,7 +37,7 @@ namespace augs {
 			const T cooldown_ms, 
 			const stepped_timestamp stamp
 		) const {
-			return !stamp.step || (now - stamp).in_milliseconds(dt) > cooldown_ms;
+			return !stamp.was_set() || (now - stamp).in_milliseconds(dt) > cooldown_ms;
 		}
 
 		template <class T>
@@ -66,7 +66,7 @@ namespace augs {
 			const T cooldown_ms, 
 			const stepped_timestamp stamp
 		) const {
-			if (!stamp.step) {
+			if (!stamp.was_set()) {
 				return 0.f;
 			}
 
@@ -78,7 +78,7 @@ namespace augs {
 			const T cooldown_ms, 
 			const stepped_timestamp stamp
 		) const {
-			if (!stamp.step) {
+			if (!stamp.was_set()) {
 				return 0.f;
 			}
 

@@ -46,9 +46,7 @@
 #include "application/gui/settings_gui.h"
 #include "application/gui/ingame_menu_gui.h"
 
-#include "application/setups/main_menu_setup.h"
-#include "application/setups/test_scene_setup.h"
-#include "application/setups/editor/editor_setup.h"
+#include "application/setups/all_setups.h"
 
 #include "application/main/imgui_pass.h"
 #include "application/main/draw_editor_elements.h"
@@ -215,11 +213,6 @@ int work(const int argc, const char* const * const argv) try {
 		Main menu setup state may be preserved, 
 		therefore it resides in a separate optional.
 	*/
-
-	using setup_variant = std::variant<
-		test_scene_setup,
-		editor_setup
-	>;
 
 	static std::optional<main_menu_setup> main_menu;
 	static std::optional<setup_variant> current_setup;
@@ -865,13 +858,13 @@ int work(const int argc, const char* const * const argv) try {
 			*/
 			
 			{
-				auto simulated_state = common_input_state;
+				auto simulated_input_state = common_input_state;
 
 				erase_if(new_window_entropy, [&](const augs::event::change e) {
 					using namespace augs::event;
 					using namespace augs::event::keys;
 
-					simulated_state.apply(e);
+					simulated_input_state.apply(e);
 
 					if (e.msg == message::deactivate) {
 						releases.set_all();
@@ -890,7 +883,7 @@ int work(const int argc, const char* const * const argv) try {
 
 					if (!ingame_menu.show) {
 						/* MSVC ICE workaround */
-						auto& _simulated_state = simulated_state;
+						auto& _simulated_state = simulated_input_state;
 						auto& _window = window;
 
 						if (visit_current_setup([&](auto& setup) {
@@ -899,7 +892,7 @@ int work(const int argc, const char* const * const argv) try {
 							if constexpr(T::handles_window_input) {
 								/* 
 									Lets a setup fetch an input before IMGUI does,
-									For example when IMGUI wants to capture keyboard input.	
+									if for example IMGUI wants to capture keyboard input.	
 								*/
 
 								return setup.handle_input_before_imgui(
@@ -926,7 +919,7 @@ int work(const int argc, const char* const * const argv) try {
 
 			/*
 				We "pause" the mouse cursor's position when we are in direct gameplay,
-				so that when switching to GUI, the cursor appears where it disappeared.
+				so that when switching to GUI, the cursor appears exactly where it had disappeared.
 				(it does not physically freeze the cursor, it just remembers the position)
 			*/
 
@@ -1023,9 +1016,10 @@ int work(const int argc, const char* const * const argv) try {
 
 			if (ImGui::GetIO().WantCaptureMouse) {
 				/* 
-					If mouse enters IMGUI element, sync back its position. 
-					Mousemotions are eaten from the vector already,
-					so the common_input_state would otherwise not get updated.
+					If mouse enters any IMGUI element, rewrite ImGui's mouse position to common_input_state.
+
+					This allows us to keep common_input_state up to date, 
+					because mousemotions are eaten from the vector already due to ImGui wanting mouse.
 				*/
 
 				common_input_state.mouse.pos = ImGui::GetIO().MousePos;
@@ -1047,7 +1041,7 @@ int work(const int argc, const char* const * const argv) try {
 
 			/*
 				We also need inter-op between our own GUIs, 
-				because we have quite a lot of them.
+				since we have more than just one.
 			*/
 
 			if (game_gui.world.wants_to_capture_mouse(create_game_gui_context())) {
@@ -1058,55 +1052,34 @@ int work(const int argc, const char* const * const argv) try {
 				}
 			}
 
-			/* Maybe the game GUI was deactivated while the button was still hovered */
+			/* Maybe the game GUI was deactivated while the button was still hovered. */
 
 			else if (!game_gui_mode && current_setup.has_value()) {
 				game_gui.world.unhover_and_undrag(create_game_gui_context());
 			}
 
-			/* 
-				Distribution of all the remaining input happens here.
-			*/
+			/* Distribution of all the remaining input happens here. */
 
 			for (const auto e : new_window_entropy) {
 				using namespace augs::event;
 				using namespace keys;
 				
-				/*
-					Now is the time to actually track the input state
-					and use the mouse position for GUI contexts or the key states
-					for key combinations.
-				*/
-
+				/* Now is the time to actually track the input state. */
 				common_input_state.apply(e);
 
-				if (current_setup.has_value()
-					&& e.was_pressed(key::ESC)
-				) {
+				if (e.was_pressed(key::ESC) && current_setup.has_value()) {
 					if (ingame_menu.show) {
 						ingame_menu.show = false;
 					}
 					else if (!visit_current_setup([&](auto& setup) {
-						using T = remove_cref<decltype(setup)>;
-
-						if constexpr(T::handles_escape) {
-							const auto result = setup.escape();
-
-							if (result) {
-								switch (*result) {
-									case setup_escape_result::LAUNCH_INGAME_MENU: ingame_menu.show = true; break;
-									case setup_escape_result::SWITCH_TO_GAME_GUI: game_gui_mode = true; break;
-									case setup_escape_result::JUST_FETCH: break;
-									default: break;
-								}
-
-								return true;
-							}
+						switch (setup.escape()) {
+							case setup_escape_result::LAUNCH_INGAME_MENU: ingame_menu.show = true; return true;
+							case setup_escape_result::SWITCH_TO_GAME_GUI: game_gui_mode = true; return true;
+							case setup_escape_result::JUST_FETCH: return true;
+							default: return false;
 						}
-
-						return false;
 					})) {
-						/* Setup does not handle ESC */
+						/* Setup ignored the ESC button */
 						ingame_menu.show = true;
 					}
 

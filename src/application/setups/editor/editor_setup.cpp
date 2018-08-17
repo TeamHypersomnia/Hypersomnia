@@ -574,7 +574,7 @@ void editor_setup::finish_rectangular_selection() {
 	}
 }
 
-std::optional<setup_escape_result> editor_setup::escape() {
+setup_escape_result editor_setup::escape() {
 	if (ok_only_popup) {
 		ok_only_popup = std::nullopt;
 		return setup_escape_result::JUST_FETCH;

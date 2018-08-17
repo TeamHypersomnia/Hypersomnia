@@ -18,6 +18,7 @@
 #include "application/setups/default_setup_settings.h"
 
 #include "application/debug_settings.h"
+#include "application/setups/setup_common.h"
 
 struct config_lua_table;
 
@@ -73,6 +74,10 @@ public:
 
 	void apply(const config_lua_table&) {
 		return;
+	}
+
+	auto escape() {
+		return setup_escape_result::IGNORE;
 	}
 
 	template <class... Callbacks>

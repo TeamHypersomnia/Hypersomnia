@@ -207,7 +207,6 @@ public:
 
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
-	static constexpr bool handles_escape = true;
 	static constexpr bool has_additional_highlights = true;
 
 	editor_setup(sol::state& lua);
@@ -269,7 +268,7 @@ public:
 		augs::window& window
 	);
 
-	std::optional<setup_escape_result> escape();
+	setup_escape_result escape();
 	bool confirm_modal_popup();
 
 	void open(const augs::window& owner);
