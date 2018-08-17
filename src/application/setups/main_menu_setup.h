@@ -34,6 +34,7 @@
 #include "application/setups/setup_common.h"
 
 struct config_lua_table;
+struct draw_setup_gui_input;
 
 namespace sol {
 	class state;
@@ -163,4 +164,6 @@ public:
 	auto get_render_layer_filter() const {
 		return render_layer_filter::disabled();
 	}
+
+	void draw_custom_gui(const draw_setup_gui_input&) {}
 };

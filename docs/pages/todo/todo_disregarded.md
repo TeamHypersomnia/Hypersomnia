@@ -254,3 +254,8 @@ summary: Just a hidden scratchpad.
 		- The write time will be negliglible for such small amounts of information
 		- Well... anyway let's store it as binary for now, because flavour ids won't be human readable anyway
 			- Predefined configs might as well be edited in editor instead of a text file
+
+- Setups expose current mode?
+	- if constexpr has round time
+	- main would also have to know the arguments like initial cosmos
+		- so perhaps it would be better for a setup to interact with main, not the mode itself

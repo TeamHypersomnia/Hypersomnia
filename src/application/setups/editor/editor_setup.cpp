@@ -18,6 +18,8 @@
 #include "application/setups/editor/editor_history.hpp"
 
 #include "application/setups/editor/gui/editor_tab_gui.h"
+#include "application/setups/draw_setup_gui_input.h"
+#include "view/rendering_scripts/draw_marker_borders.h"
 
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/lua_file.h"
@@ -1202,4 +1204,120 @@ augs::maybe<render_layer_filter> editor_setup::get_render_layer_filter() const {
 	}
 
 	return render_layer_filter::disabled();
+}
+
+void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
+	auto on_screen = [in](const auto p) {
+		return in.cone.to_screen_space(p);
+	};
+
+	auto& triangles = in.drawer;
+	auto& lines = in.line_drawer;
+	const auto screen_size = in.screen_size;
+	auto& editor_cfg = in.config.editor;
+
+	for_each_icon(
+		in.all_visible,
+		[&](const auto typed_handle, const auto image_id, const transformr world_transform, const rgba color) {
+			const auto screen_space = transformr(vec2i(on_screen(world_transform.pos)), world_transform.rotation);
+
+			const auto image_size = in.necessary_images[image_id].get_original_size();
+
+			const auto blank_tex = triangles.default_texture;
+
+			if (auto active_color = find_highlight_color_of(typed_handle.get_id())) {
+				active_color->a = static_cast<rgba_channel>(std::min(1.8 * active_color->a, 255.0));
+
+				augs::detail_sprite(
+					triangles.output_buffer,
+					blank_tex,
+					image_size + vec2i(10, 10),
+					screen_space.pos,
+					screen_space.rotation,
+					*active_color
+				);
+
+				active_color->a = static_cast<rgba_channel>(std::min(2.2 * active_color->a, 255.0));
+
+				lines.border(
+					image_size,
+					screen_space.pos,
+					screen_space.rotation,
+					*active_color,
+					border_input { 1, 0 }
+				);
+			}
+
+			augs::detail_sprite(
+				triangles.output_buffer,
+				in.necessary_images.at(image_id),
+				screen_space.pos,
+				screen_space.rotation,
+				color
+			);
+
+			lines.border(
+				image_size,
+				screen_space.pos,
+				screen_space.rotation,
+				color,
+				border_input { 1, 2 }
+			);
+
+			::draw_marker_borders(typed_handle, lines, screen_space, in.cone.eye.zoom, 1.f, color);
+		}	
+	);
+
+	if (auto eye = find_current_camera_eye()) {
+		eye->transform.pos.discard_fract();
+
+		if (const auto view = find_view()) {
+			if (view->show_grid) {
+				triangles.grid(
+					screen_size,
+					view->grid.unit_pixels,
+					*eye,
+					editor_cfg.grid.render
+				);
+			}
+		}
+
+		if (const auto selection_aabb = find_selection_aabb()) {
+			auto col = white;
+
+			if (is_mover_active()) {
+				col.a = 120;
+			}
+
+			triangles.border(
+				camera_cone(*eye, screen_size).to_screen_space(*selection_aabb),
+				col,
+				border_input { 1, -1 }
+			);
+		}
+	}
+
+	for_each_dashed_line(
+		[&](vec2 from, vec2 to, const rgba color, const double secs = 0.0, bool fatten = false) {
+			const auto a = on_screen(from.round_fract());
+			const auto b = on_screen(to.round_fract());
+
+			lines.dashed_line(a, b, color, 5.f, 5.f, secs);
+
+			if (fatten) {
+				const auto ba = b - a;
+				const auto perp = ba.perpendicular_cw().normalize();
+				lines.dashed_line(a + perp, b + perp, color, 5.f, 5.f, secs);
+				lines.dashed_line(a + perp * 2, b + perp * 2, color, 5.f, 5.f, secs);
+			}
+		}	
+	);
+
+	if (const auto r = find_screen_space_rect_selection(screen_size, in.mouse_pos)) {
+		triangles.aabb_with_border(
+			*r,
+			editor_cfg.rectangular_selection_color,
+			editor_cfg.rectangular_selection_border_color
+		);
+	}
 }

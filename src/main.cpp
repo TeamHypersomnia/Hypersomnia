@@ -49,10 +49,11 @@
 #include "application/setups/all_setups.h"
 
 #include "application/main/imgui_pass.h"
-#include "application/main/draw_editor_elements.h"
 #include "application/main/draw_debug_details.h"
 #include "application/main/draw_debug_lines.h"
 #include "application/main/release_flags.h"
+
+#include "application/setups/draw_setup_gui_input.h"
 
 #include "cmd_line_params.h"
 #include "build_info.h"
@@ -1461,28 +1462,26 @@ int work(const int argc, const char* const * const argv) try {
 				It is the configuration required for further viewing of GUI.
 			*/
 
-			if (current_setup) {
-				on_specific_setup([&](const editor_setup& editor) {
-					draw_editor_elements(
-						editor,
-						all_visible,
-						cone,
-						get_drawer(),
-						get_line_drawer(),
-						new_viewing_config.editor,
-						streaming.necessary_images_in_atlas,
-						common_input_state.mouse.pos,
-						screen_size
-					);
-
-					renderer.call_and_clear_lines();
-				});
-			}
-
 			if (should_draw_game_gui()) {
 				/* #3 */
 				game_gui.world.draw(context);
 			}
+
+			/* #4 */
+			visit_current_setup([&](auto& setup) {
+				setup.draw_custom_gui({
+					all_visible,
+					cone,
+					get_drawer(),
+					get_line_drawer(),
+					new_viewing_config,
+					streaming.necessary_images_in_atlas,
+					common_input_state.mouse.pos,
+					screen_size
+				});
+
+				renderer.call_and_clear_lines();
+			});
 		}
 		else {
 			streaming.general_atlas->bind();

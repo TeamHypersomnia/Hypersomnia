@@ -6,21 +6,27 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Fix smoke traces for steel bullets
+- GUI required by modes
+	- Round time
+		- Read only
+	- Recent kills
+		- Read only
+	- TAB menu
+		- Interactive
+	- Team selection
+		- Interactive
+	- General
+		- draw_additional_gui
+		- Alternative solution: setup exposes on_mode_with_input
+			- Used internally, as well
+		- Our GUI or ImGui?
+			- Do we want to interact with the tab gui?
+				- Perhaps? E.g. to view player profile or stats
+				- ImGui could be better suited for this
+					- Also, it is not gameplay GUI so we don't have accuracy needs
+				- We still might want to use our custom drawers e.g. for last kills
 
-- Mode interaction with GUI
-	- Our GUI or ImGui?
-		- Do we want to interact with the tab gui?
-			- Perhaps? E.g. to view player profile or stats
-			- ImGui could be better suited for this
-				- Also, it is not gameplay GUI so we don't have accuracy needs
-			- We still might want to use our custom drawers e.g. for last kills
-	- Setups expose current mode?
-		- if constexpr has round time
-		- main would also have to know the arguments like initial cosmos
-			- so perhaps it would be better for a setup to interact with main, not the mode itself
-	- Setup: on_mode_with_input
-		- Used internally, as well
+- Fix smoke traces for steel bullets
 
 - Player & modes
 	- A mode shall operate without crash on virtually any cosmos

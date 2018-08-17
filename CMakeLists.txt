@@ -564,7 +564,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/cosmos/cosmic_profiler.cpp"
 	"src/application/main/draw_debug_lines.cpp"
 	"src/application/setups/editor/gui/editor_filters_gui.cpp"
-	"src/application/main/draw_editor_elements.cpp"
 	"src/application/main/draw_debug_details.cpp"
 	"src/application/main/imgui_pass.cpp"
 	"src/application/main/release_flags.cpp"

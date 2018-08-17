@@ -55,6 +55,7 @@
 #include "application/setups/editor/detail/make_command_from_selections.h"
 
 struct config_lua_table;
+struct draw_setup_gui_input;
 
 namespace augs {
 	class window;
@@ -484,4 +485,6 @@ public:
 	augs::path_type get_unofficial_content_dir() const;
 
 	augs::maybe<render_layer_filter> get_render_layer_filter() const;
+
+	void draw_custom_gui(const draw_setup_gui_input&);
 };
