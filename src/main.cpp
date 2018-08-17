@@ -1067,39 +1067,33 @@ int work(const int argc, const char* const * const argv) try {
 				/* Now is the time to actually track the input state. */
 				common_input_state.apply(e);
 
-				if (e.was_pressed(key::ESC) && current_setup.has_value()) {
-					if (ingame_menu.show) {
-						ingame_menu.show = false;
-					}
-					else if (!visit_current_setup([&](auto& setup) {
-						switch (setup.escape()) {
-							case setup_escape_result::LAUNCH_INGAME_MENU: ingame_menu.show = true; return true;
-							case setup_escape_result::SWITCH_TO_GAME_GUI: game_gui_mode = true; return true;
-							case setup_escape_result::JUST_FETCH: return true;
-							default: return false;
+				if (e.was_pressed(key::ESC)) {
+					if (current_setup.has_value()) {
+						if (ingame_menu.show) {
+							ingame_menu.show = false;
 						}
-					})) {
-						/* Setup ignored the ESC button */
-						ingame_menu.show = true;
+						else if (!visit_current_setup([&](auto& setup) {
+							switch (setup.escape()) {
+								case setup_escape_result::LAUNCH_INGAME_MENU: ingame_menu.show = true; return true;
+								case setup_escape_result::SWITCH_TO_GAME_GUI: game_gui_mode = true; return true;
+								case setup_escape_result::JUST_FETCH: return true;
+								default: return false;
+							}
+						})) {
+							/* Setup ignored the ESC button */
+							ingame_menu.show = true;
+						}
+
+						releases.set_all();
 					}
 
-					releases.set_all();
-					
 					continue;
 				}
 
-				std::optional<intent_change> key_change;
+				const auto key_change = ::to_intent_change(e.get_key_change());
 
-				if (e.was_any_key_pressed()) {
-					key_change = intent_change::PRESSED;
-				}
-
-				if (e.was_any_key_released()) {
-					key_change = intent_change::RELEASED;
-				}
-
-				const bool was_pressed = key_change && *key_change == intent_change::PRESSED;
-				const bool was_released = key_change && *key_change == intent_change::RELEASED;
+				const bool was_pressed = key_change == intent_change::PRESSED;
+				const bool was_released = key_change == intent_change::RELEASED;
 				
 				if (was_pressed || was_released) {
 					const auto key = e.get_key();
