@@ -2,6 +2,7 @@
 #include <catch.hpp>
 #include "augs/misc/pool/pool.h"
 #include "augs/misc/constant_size_vector.h"
+#include "augs/misc/enum/enum_array.h"
 
 #include "augs/string/string_templates.h"
 #include "augs/readwrite/readwrite_test_cycle.h"
@@ -93,9 +94,23 @@ TEST_CASE("Byte readwrite Arrays") {
 	std::array<std::array<float, 12>, 12> some_more{};
 	std::array<std::array<std::array<std::array<std::array<float, 2>, 2>, 2>, 2>, 2> even_more{};
 
+	enum ttt {
+		A, B, C, COUNT
+	};
+
+	augs::enum_array<std::vector<int>, ttt> eee = {};
+	eee[ttt::C] = { 43 };
+	eee[ttt::A] = { 143 };
+
+	std::array<std::vector<int>, 4> ahaha = {};
+	ahaha[0] = {};
+	ahaha[2] = { 24, 444 };
+
 	readwrite_test_cycle(some);
 	readwrite_test_cycle(some_more);
 	readwrite_test_cycle(even_more);
+	readwrite_test_cycle(eee);
+	readwrite_test_cycle(ahaha);
 }
 
 TEST_CASE("Byte readwrite Containers") {

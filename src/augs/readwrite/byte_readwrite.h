@@ -10,6 +10,7 @@
 #include "augs/templates/traits/is_variant.h"
 #include "augs/templates/traits/is_optional.h"
 #include "augs/templates/traits/is_unique_ptr.h"
+#include "augs/templates/traits/is_std_array.h"
 #include "augs/templates/for_each_type.h"
 
 #include "augs/readwrite/byte_readwrite_declaration.h"
@@ -45,6 +46,22 @@ namespace augs {
 			const auto* const byte_location = reinterpret_cast<const byte_type_for_t<Archive>*>(location);
 
 			ar.write(byte_location, byte_count);
+		}
+
+		template <class Archive, class Serialized>
+		void read_bytes_n(
+			Archive& ar,
+			Serialized* const storage,
+			const std::size_t n
+		) {
+			if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
+				detail::read_raw_bytes(ar, storage, n);
+			}
+			else {
+				for (std::size_t i = 0; i < n; ++i) {
+					augs::read_bytes(ar, storage[i]);
+				}
+			}
 		}
 	}
 
@@ -113,6 +130,9 @@ namespace augs {
 				storage = {};
 			}
 		}
+		else if constexpr(is_std_array_v<Serialized> || is_enum_array_v<Serialized>) {
+			detail::read_bytes_n(ar, storage.data(), storage.size());
+		}
 		else if constexpr(is_container_v<Serialized>) {
 			read_container_bytes(ar, storage);
 		}
@@ -129,6 +149,24 @@ namespace augs {
 				},
 				storage
 			);
+		}
+	}
+
+	namespace detail {
+		template <class Archive, class Serialized>
+		void write_bytes_n(
+			Archive& ar,
+			const Serialized* const storage,
+			const std::size_t n
+		) {
+			if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
+				detail::write_raw_bytes(ar, storage, n);
+			}
+			else {
+				for (std::size_t i = 0; i < n; ++i) {
+					augs::write_bytes(ar, storage[i]);
+				}
+			}
 		}
 	}
 
@@ -176,6 +214,9 @@ namespace augs {
 				);
 			}
 		}
+		else if constexpr(is_std_array_v<Serialized> || is_enum_array_v<Serialized>) {
+			detail::write_bytes_n(ar, storage.data(), storage.size());
+		}
 		else if constexpr(is_container_v<Serialized>) {
 			write_container_bytes(ar, storage);
 		}
@@ -192,40 +233,6 @@ namespace augs {
 				},
 				storage
 			);
-		}
-	}
-	
-	namespace detail {
-		template <class Archive, class Serialized>
-		void read_bytes_n(
-			Archive& ar,
-			Serialized* const storage,
-			const std::size_t n
-		) {
-			if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
-				detail::read_raw_bytes(ar, storage, n);
-			}
-			else {
-				for (std::size_t i = 0; i < n; ++i) {
-					augs::read_bytes(ar, storage[i]);
-				}
-			}
-		}
-
-		template <class Archive, class Serialized>
-		void write_bytes_n(
-			Archive& ar,
-			const Serialized* const storage,
-			const std::size_t n
-		) {
-			if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
-				detail::write_raw_bytes(ar, storage, n);
-			}
-			else {
-				for (std::size_t i = 0; i < n; ++i) {
-					augs::write_bytes(ar, storage[i]);
-				}
-			}
 		}
 	}
 
