@@ -5,6 +5,51 @@
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/for_each_entity.h"
+#include "game/modes/mode_common.h"
+
+template <class F>
+void for_each_faction(F callback) {
+	callback(faction_type::METROPOLIS);
+	callback(faction_type::ATLANTIS);
+	callback(faction_type::RESISTANCE);
+}
+
+inline auto calc_participating_factions(const cosmos& cosm) {
+	per_faction_t<bool> result = {};
+
+	for_each_faction([&](const auto faction) {
+		for_each_faction_spawn(cosm, faction, [&](const auto&) {
+			result[faction] = true;
+			return callback_result::ABORT;
+		});
+	});
+
+	return result;
+}
+
+template <class F>
+faction_type calc_weakest_faction(const cosmos& cosm, F num_players_in_faction) {
+	const auto participating = calc_participating_factions(cosm);
+
+	struct {
+		faction_type type = faction_type::NONE;
+		std::size_t count = static_cast<std::size_t>(-1);
+	} weakest;
+
+	for_each_faction([&](const auto f) { 
+		if (!participating[f]) {
+			return;
+		}
+
+		const auto n = num_players_in_faction(f);
+
+		if (n <= weakest.count) {
+			weakest = { f, n };
+		}
+	});
+
+	return weakest.type;
+}
 
 using player_character_type = controlled_character;
 

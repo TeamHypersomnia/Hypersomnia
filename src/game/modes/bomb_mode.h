@@ -5,17 +5,14 @@
 #include "game/cosmos/solvers/standard_solver.h"
 #include "game/modes/mode_entropy.h"
 #include "game/detail/economy/money_type.h"
-#include "augs/misc/enum/enum_array.h"
 #include "game/modes/mode_player_id.h"
+#include "game/modes/mode_common.h"
 
 struct entity_guid;
 struct entity_id;
 
 class cosmos;
 struct cosmos_solvable_significant;
-
-template <class T>
-using per_faction_t = augs::enum_array<T, faction_type>;
 
 struct bomb_mode_faction_vars {
 	// GEN INTROSPECTOR struct bomb_mode_faction_vars
@@ -38,6 +35,7 @@ struct bomb_mode_faction_state {
 	// GEN INTROSPECTOR struct bomb_mode_faction_state
 	unsigned current_spawn_index = 0;
 	unsigned score = 0;
+	std::vector<entity_guid> shuffled_spawns;
 	// END GEN INTROSPECTOR
 };
 
@@ -60,7 +58,7 @@ public:
 
 	struct input {
 		const bomb_mode_vars& vars;
-		const cosmos_solvable_significant& initial_solvable;
+		const cosmos_solvable_significant& initial_signi;
 		cosmos& cosm;
 	};
 
@@ -73,20 +71,32 @@ private:
 
 	void mode_pre_solve(input, const mode_entropy&, logic_step);
 
+	void setup_round(input, logic_step);
+	void reshuffle_spawns(const cosmos&, faction_type);
+
+	bomb_mode_player* find(const mode_player_id&);
+	const bomb_mode_player* find(const mode_player_id&) const;
+
+	std::size_t num_players_in_faction(faction_type) const;
+
 public:
 	// GEN INTROSPECTOR class bomb_mode
 	per_faction_t<bomb_mode_faction_state> factions;
-	std::vector<entity_guid> pending_inits;
 	std::unordered_map<mode_player_id, bomb_mode_player> players;
 	// END GEN INTROSPECTOR
 
 	mode_player_id add_player(input, const entity_name_str& chosen_name);
 	void remove_player(input, const mode_player_id&);
 
+	bool auto_assign_faction(const cosmos&, const mode_player_id&);
 	bool choose_faction(const mode_player_id&, const faction_type faction);
 	faction_type get_player_faction(const mode_player_id&) const;
 
 	entity_guid lookup(const mode_player_id&) const;
+
+	unsigned get_round_num() const;
+	float get_round_seconds(input) const;
+	float get_round_seconds_left(input) const;
 
 	template <class PreSolve, class... Callbacks>
 	void advance(

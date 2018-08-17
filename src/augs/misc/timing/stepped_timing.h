@@ -6,11 +6,8 @@ namespace augs {
 
 	struct stepped_timestamp {
 		// GEN INTROSPECTOR struct augs::stepped_timestamp
-		unsigned step;
+		unsigned step = static_cast<unsigned>(-1);
 		// END GEN INTROSPECTOR
-
-		stepped_timestamp(const unsigned step = 0u)
-			: step(step) {}
 
 		stepped_timestamp operator-(const stepped_timestamp b) const;
 
@@ -29,6 +26,11 @@ namespace augs {
 		stepped_timestamp now;
 		delta dt = delta::steps_per_second(60);
 		// END GEN INTROSPECTOR
+
+		float diff_seconds(const stepped_clock& lesser) const {
+			/* TODO: Account for different deltas when they can change. */
+			return (now - lesser.now).in_seconds(dt);
+		}
 
 		template <class T>
 		bool is_ready(

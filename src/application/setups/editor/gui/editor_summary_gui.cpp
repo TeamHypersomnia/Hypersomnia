@@ -88,7 +88,7 @@ void editor_summary_gui::perform(editor_setup& setup) {
 	}
 
 	text("World time: %x (%x steps at %x Hz)",
-		standard_format_seconds(cosm.get_total_seconds_passed()),
+		format_min_secs_ms(cosm.get_total_seconds_passed()),
 		cosm.get_total_steps_passed(),
 		1.0f / cosm.get_fixed_delta().in_seconds()
 	);

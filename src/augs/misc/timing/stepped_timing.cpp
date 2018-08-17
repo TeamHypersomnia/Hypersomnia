@@ -29,7 +29,7 @@ namespace augs {
 	}
 	
 	bool stepped_timestamp::was_set() const {
-		return step != 0u;
+		return step != static_cast<unsigned>(-1);
 	}
 
 	stepped_cooldown::stepped_cooldown(
