@@ -1538,10 +1538,10 @@ int work(const int argc, const char* const * const argv) try {
 			}
 		}
 
-		/* #7 */
-		const bool should_draw_our_cursor = new_viewing_config.window.raw_mouse_input && !window.is_mouse_pos_paused();
-
 		{
+			/* #7 */
+
+			const bool should_draw_our_cursor = new_viewing_config.window.raw_mouse_input && !window.is_mouse_pos_paused();
 			const auto cursor_drawing_pos = common_input_state.mouse.pos;
 
 			if (ImGui::GetIO().WantCaptureMouse) {

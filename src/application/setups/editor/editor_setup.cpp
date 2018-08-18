@@ -13,6 +13,7 @@
 
 #include "application/config_lua_table.h"
 #include "application/setups/editor/editor_setup.h"
+#include "application/setups/editor/editor_player.hpp"
 #include "application/setups/editor/editor_paths.h"
 #include "application/setups/editor/editor_camera.h"
 #include "application/setups/editor/editor_history.hpp"
@@ -1319,5 +1320,17 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 			editor_cfg.rectangular_selection_color,
 			editor_cfg.rectangular_selection_border_color
 		);
+	}
+
+	draw_mode_gui(in);
+}
+
+void editor_setup::draw_mode_gui(const draw_setup_gui_input& in) const {
+	if (anything_opened()) {
+		(void)in;
+		/* const auto& p = player(); */
+		/* on_mode_with_input( */
+
+		/* ); */
 	}
 }

@@ -200,6 +200,8 @@ class editor_setup : private current_access_cache<editor_setup> {
 		};
 	}
 
+	void draw_mode_gui(const draw_setup_gui_input&) const;
+
 public:
 	using base::anything_opened;
 	using base::folder;

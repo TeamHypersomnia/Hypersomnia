@@ -7,6 +7,9 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - GUI required by modes
+	- Mode gui state
+		- It's not synchronized, nor is it performance critical...
+			- ...so let's screw that strong typing
 	- Round time
 		- Read only
 	- Recent kills
