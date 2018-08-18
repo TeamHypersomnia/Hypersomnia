@@ -55,6 +55,7 @@ class bomb_mode {
 public:
 	using vars_type = bomb_mode_vars;
 	static constexpr bool needs_initial_signi = true;
+	static constexpr bool round_based = true;
 
 	struct input {
 		const bomb_mode_vars& vars;
@@ -81,6 +82,7 @@ private:
 
 public:
 	// GEN INTROSPECTOR class bomb_mode
+	bool start_scheduled = true;
 	per_faction_t<bomb_mode_faction_state> factions;
 	std::unordered_map<mode_player_id, bomb_mode_player> players;
 	// END GEN INTROSPECTOR

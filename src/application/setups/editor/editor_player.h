@@ -3,6 +3,7 @@
 #include "game/modes/all_mode_includes.h"
 #include "game/cosmos/cosmic_entropy.h"
 #include "augs/misc/timing/fixed_delta_timer.h"
+#include "view/mode_gui/arena_gui.h"
 
 struct cosmos_solvable_significant;
 
@@ -17,6 +18,7 @@ struct editor_player {
 	cosmic_entropy total_collected_entropy;
 	std::unique_ptr<cosmos_solvable_significant> mode_initial_signi;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
+	arena_gui_state arena_gui;
 	// END GEN INTROSPECTOR
 
 	auto get_speed() const {

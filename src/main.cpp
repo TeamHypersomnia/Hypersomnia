@@ -945,15 +945,13 @@ int work(const int argc, const char* const * const argv) try {
 					auto& _lua = lua;
 					auto& _window = window;
 					
-					const bool in_direct_gameplay = !game_gui_mode;
-
 					visit_current_setup([&](auto& setup) {
 						using T = remove_cref<decltype(setup)>;
 
 						if constexpr(std::is_same_v<T, editor_setup>) {
 							/* Editor needs more goods */
 							setup.perform_custom_imgui(
-								_lua, _window, in_direct_gameplay, streaming.images_in_atlas
+								_lua, _window, streaming.images_in_atlas
 							);
 						}
 						else {
@@ -1477,7 +1475,8 @@ int work(const int argc, const char* const * const argv) try {
 					new_viewing_config,
 					streaming.necessary_images_in_atlas,
 					common_input_state.mouse.pos,
-					screen_size
+					screen_size,
+					streaming.get_loaded_gui_font()
 				});
 
 				renderer.call_and_clear_lines();

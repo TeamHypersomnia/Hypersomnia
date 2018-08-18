@@ -192,12 +192,11 @@ bool bomb_mode::auto_assign_faction(const cosmos& cosm, const mode_player_id& id
 
 void bomb_mode::setup_round(input_type in, const logic_step step) {
 	auto& cosm = in.cosm;
+	cosm.set(in.initial_signi);
 
 	for_each_faction([&](const auto faction) {
 		reshuffle_spawns(cosm, faction);
 	});
-
-	cosm.set(in.initial_signi);
 
 	auto create_player = [&](const auto faction) {
 		if (const auto flavour = ::find_faction_character_flavour(cosm, faction); flavour.is_set()) {
@@ -230,8 +229,9 @@ void bomb_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, const
 	const auto& start_clk = in.initial_signi.clk;
 	const auto& clk = cosm.get_clock();
 
-	if (clk.now.step == start_clk.now.step + 1 || clk.is_ready(in.vars.round_secs * 1000.f, start_clk.now)) {
+	if (start_scheduled || clk.is_ready(in.vars.round_secs * 1000.f, start_clk.now)) {
 		setup_round(in, step);
+		start_scheduled = false;
 	}
 
 	(void)entropy;

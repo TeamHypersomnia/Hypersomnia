@@ -49,6 +49,7 @@ void flying_number_indicator_system::draw_numbers(
 			output,
 			cone.to_world_space(text_pos),
 			{ r.in.text, { font, r.in.color } },
+			{},
 			black
 		);
 	}

@@ -4,8 +4,15 @@
 #include "augs/misc/timing/timer.h"
 #include "augs/drawing/drawing.h"
 #include "augs/gui/formatted_string.h"
+#include "augs/misc/enum/enum_boolset.h"
 
 namespace augs {
+	enum class center {
+		X, Y, COUNT
+	};
+
+	using center_flags = augs::enum_boolset<center>;
+
 	namespace gui {
 		namespace text {
 			struct caret_info;
@@ -73,6 +80,7 @@ namespace augs {
 				const drawer out,
 				const vec2i pos,
 				const formatted_string& str,
+				const center_flags = {},
 				const rgba stroke_color = black,
 				const unsigned wrapping_width = 0,
 				const ltrbi clipper = ltrbi(),

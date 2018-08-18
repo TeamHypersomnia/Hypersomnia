@@ -27,7 +27,7 @@ auto break_down_durations(DurationIn d) {
 	return retval;
 }
 
-inline std::string format_min_secs_ms(const double seconds) {
+inline std::string format_mins_secs_ms(const double seconds) {
 	auto clean_duration = break_down_durations<std::chrono::minutes, std::chrono::seconds, std::chrono::milliseconds>(
 		std::chrono::duration<double>(seconds)
 	);
@@ -41,7 +41,7 @@ inline std::string format_min_secs_ms(const double seconds) {
 	;
 }
 
-inline std::string format_min_secs(const double seconds) {
+inline std::string format_mins_secs(const double seconds) {
 	auto clean_duration = break_down_durations<std::chrono::minutes, std::chrono::seconds>(
 		std::chrono::duration<double>(seconds)
 	);

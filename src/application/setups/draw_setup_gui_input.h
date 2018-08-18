@@ -7,6 +7,10 @@
 class visible_entities;
 struct config_lua_table;
 
+namespace augs {
+	struct baked_font;
+}
+
 struct draw_setup_gui_input {
 	const visible_entities& all_visible;
 	const camera_cone cone;
@@ -16,4 +20,5 @@ struct draw_setup_gui_input {
 	const necessary_images_in_atlas_map& necessary_images;
 	const vec2i mouse_pos;
 	const vec2i screen_size;
+	const augs::baked_font& gui_font;
 };

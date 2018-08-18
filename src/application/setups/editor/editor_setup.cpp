@@ -21,6 +21,8 @@
 #include "application/setups/editor/gui/editor_tab_gui.h"
 #include "application/setups/draw_setup_gui_input.h"
 #include "view/rendering_scripts/draw_marker_borders.h"
+#include "augs/templates/chrono_templates.h"
+#include "augs/gui/text/printer.h"
 
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/lua_file.h"
@@ -264,10 +266,22 @@ void editor_setup::fill_with_test_scene() {
 	}
 }
 
+float editor_setup::get_menu_bar_height() const {
+	const auto& g = *ImGui::GetCurrentContext();
+	return g.FontBaseSize + g.Style.FramePadding.y * 2.0f;
+}
+
+float editor_setup::get_game_screen_top() const {
+	if (is_editing_mode()) {
+		return get_menu_bar_height() * 2;
+	}
+
+	return 0.f;
+}
+
 void editor_setup::perform_custom_imgui(
 	sol::state& lua,
 	augs::window& owner,
-	const bool in_direct_gameplay,
 	const images_in_atlas_map& game_atlas
 ) {
 	using namespace augs::imgui;
@@ -289,12 +303,11 @@ void editor_setup::perform_custom_imgui(
 	const auto mouse_pos = vec2i(ImGui::GetIO().MousePos);
 	const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
 
-	const auto& g = *ImGui::GetCurrentContext();
-	const auto menu_bar_size = ImVec2(g.IO.DisplaySize.x, g.FontBaseSize + g.Style.FramePadding.y * 2.0f);
+	const auto menu_bar_height = get_menu_bar_height();
 
 	const bool has_ctrl = ImGui::GetIO().KeyCtrl;
 
-	if (!in_direct_gameplay) {
+	if (is_editing_mode()) {
 		{
 			/* We don't want ugly borders in our menu bar */
 			auto window_border_size = scoped_style_var(ImGuiStyleVar_WindowBorderSize, 0.0f);
@@ -440,7 +453,7 @@ void editor_setup::perform_custom_imgui(
 				[&](const auto index_to_close){ close_folder(index_to_close); },
 				[&](const auto index_to_set){ set_current(index_to_set); },
 				signi,
-				menu_bar_size.y
+				menu_bar_height
 			);
 		}
 	}
@@ -516,7 +529,7 @@ void editor_setup::perform_custom_imgui(
 
 		player_gui.perform(make_command_input());
 
-		const auto go_to_dialog_pos = vec2 { static_cast<float>(screen_size.x / 2), menu_bar_size.y * 2 + 1 };
+		const auto go_to_dialog_pos = vec2 { static_cast<float>(screen_size.x / 2), menu_bar_height * 2 + 1 };
 
 		if (const auto confirmation = 
 			go_to_entity_gui.perform(settings.go_to, work().world, go_to_dialog_pos)
@@ -1325,12 +1338,52 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 	draw_mode_gui(in);
 }
 
+template <class F>
+void editor_setup::on_mode_with_input(F&& callback) const {
+	if (anything_opened()) {
+		auto& f = folder();
+
+		::on_mode_with_input(
+			player(),
+			f.mode_vars,
+			f.work->world,
+			std::forward<F>(callback)
+		);
+	}
+}
+
 void editor_setup::draw_mode_gui(const draw_setup_gui_input& in) const {
 	if (anything_opened()) {
-		(void)in;
-		/* const auto& p = player(); */
-		/* on_mode_with_input( */
+		on_mode_with_input(
+			[&](const auto& typed_mode, const auto& mode_input) {
+				using M = remove_cref<decltype(typed_mode)>;
 
-		/* ); */
+				if constexpr(M::round_based) {
+					using namespace augs::gui::text;
+
+					const auto time_left = typed_mode.get_round_seconds_left(mode_input);
+					const auto time_left_str = format_mins_secs(time_left);
+
+					const auto text_style = style(
+						in.gui_font,
+						rgba(255, 255, 255, 255)
+					);
+
+					const auto t = get_game_screen_top();
+					const auto s = in.screen_size;
+
+					print_stroked(
+						in.drawer,
+						{ s.x / 2, static_cast<int>(t + 2) },
+						formatted_string(time_left_str, text_style),
+						{ augs::center::X }
+					);
+				}
+				else {
+					(void)typed_mode;
+					(void)in;
+				}
+			}
+		);
 	}
 }

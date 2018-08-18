@@ -33,6 +33,7 @@ class test_scene_mode {
 public:
 	using vars_type = test_scene_mode_vars;
 	static constexpr bool needs_initial_signi = false;
+	static constexpr bool round_based = false;
 
 	struct input {
 		const test_scene_mode_vars& vars;

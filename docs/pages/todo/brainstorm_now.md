@@ -7,27 +7,36 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - GUI required by modes
-	- Mode gui state
+	- Arena GUI
+		- Used by bomb modes, TDM modes etc.
+			- May use some if constexprs internally
 		- It's not synchronized, nor is it performance critical...
-			- ...so let's screw that strong typing
-	- Round time
-		- Read only
-	- Recent kills
-		- Read only
-	- TAB menu
-		- Interactive
-	- Team selection
-		- Interactive
-	- General
-		- draw_additional_gui
-		- Alternative solution: setup exposes on_mode_with_input
-			- Used internally, as well
-		- Our GUI or ImGui?
-			- Do we want to interact with the tab gui?
-				- Perhaps? E.g. to view player profile or stats
-				- ImGui could be better suited for this
-					- Also, it is not gameplay GUI so we don't have accuracy needs
-				- We still might want to use our custom drawers e.g. for last kills
+			- ...so let's screw that strong typing and have just one arena_gui type
+		- Elements
+			- Round time
+				- Read only
+			- Recent kills
+				- Read only
+			- TAB menu
+				- State: bool show
+				- Interactive
+			- Team selection
+				- State: bool show
+				- Interactive
+			- General
+				- Read-onlies are drawn with our own GUI, from within draw_custom_gui of each setup concerned
+				- Our GUI or ImGui?
+					- Do we want to interact with the tab gui?
+						- Perhaps? E.g. to view player profile or stats
+						- ImGui could be better suited for this
+							- Also, it is not gameplay GUI so we don't have accuracy needs
+						- We still might want to use our custom drawers e.g. for last kills
+
+- Delta controls for property editor
+	- Will be useful for offsets
+	- New tweaker_type?
+		- Based on this, set is_delta boolean in change_property_command
+		- can_accumulate_v trait
 
 - Fix smoke traces for steel bullets
 

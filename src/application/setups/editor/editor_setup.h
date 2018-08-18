@@ -202,6 +202,12 @@ class editor_setup : private current_access_cache<editor_setup> {
 
 	void draw_mode_gui(const draw_setup_gui_input&) const;
 
+	template <class F>
+	void on_mode_with_input(F&& callback) const;
+
+	float get_menu_bar_height() const;
+	float get_game_screen_top() const;
+
 public:
 	using base::anything_opened;
 	using base::folder;
@@ -227,7 +233,6 @@ public:
 	void perform_custom_imgui(
 		sol::state& lua,
 		augs::window& owner,
-		bool in_direct_gameplay,
 		const images_in_atlas_map&
 	);
 

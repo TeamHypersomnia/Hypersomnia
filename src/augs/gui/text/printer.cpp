@@ -258,8 +258,9 @@ namespace augs {
 
 			vec2i print_stroked(
 				const drawer out,
-				const vec2i pos,
+				vec2i pos,
 				const formatted_string& str,
+				const center_flags c,
 				const rgba stroke_color,
 				const unsigned wrapping_width,
 				const ltrbi clipper,
@@ -283,6 +284,14 @@ namespace augs {
 				prev = draft.cached_str;
 
 				draft.cached_str = coloured_str;
+
+				if (c.test(center::X)) {
+					pos.x -= draft.get_bbox().x / 2;
+				}
+
+				if (c.test(center::Y)) {
+					pos.y -= draft.get_bbox().y / 2;
+				}
 
 				print.draw_text(out, pos + vec2i(-1, 0), draft, clipper);
 				print.draw_text(out, pos + vec2i(1, 0), draft, clipper);
