@@ -48,13 +48,6 @@ void change_property_command<D>::rewrite_change(
 
 	common.reset_timestamp();
 
-	/* 
-		At this point, the command can only be undone or rewritten,  
-		so it makes sense that the storage for value after change is empty.
-	*/
-
-	ensure(value_after_change.empty());
-
 	editor_property_accessors::access_each_property(
 		self,
 		in,
@@ -114,8 +107,6 @@ void change_property_command<D>::redo(const editor_command_input in) {
 		}	
 	);
 
-	value_after_change.clear();
-
 	if constexpr(std::is_same_v<D, change_asset_property_command<assets::image_id>>) {
 		for (const auto& i : self.affected_assets) {
 			in.folder.work->update_offsets_of(i, changer_callback_result::DONT_REFRESH);
@@ -132,24 +123,14 @@ template <class D>
 void change_property_command<D>::undo(const editor_command_input in) {
 	auto& self = *static_cast<D*>(this);
 
-	bool read_once = true;
-
-	ensure(value_after_change.empty());
-
 	const auto trivial_element_size = values_before_change.size() / self.count_affected();
 
 	auto before_change_data = augs::cref_memory_stream(values_before_change);
-	auto after_change_data = augs::ref_memory_stream(value_after_change);
 
 	editor_property_accessors::access_each_property(
 		self,
 		in,
 		[&](auto& field) {
-			if (read_once) {
-				write_object_or_trivial_marker(after_change_data, field, trivial_element_size); 
-				read_once = false;
-			}
-
 			read_object_or_trivial_marker(before_change_data, field, trivial_element_size);
 			return callback_result::CONTINUE;
 		}	
