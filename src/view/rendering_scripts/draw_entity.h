@@ -240,12 +240,14 @@ FORCE_INLINE void specific_entity_drawer(
 
 			const auto face_degrees = viewing_transform.rotation;
 
-			auto render_frame = [&in, &render_visitor](
+			auto render_frame = [&in, &render_visitor, &typed_handle](
 				const auto& frame,
 				const transformr where
 			) {
 				invariants::sprite sprite;
 				sprite.set(frame.frame.image_id, in.manager);
+				const auto& original_sprite = typed_handle.template get<invariants::sprite>();
+				sprite.color = original_sprite.color;
 
 				auto input = in.make_input_for<invariants::sprite>();
 				input.renderable_transform = where;
