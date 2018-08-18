@@ -19,6 +19,9 @@ void load_test_scene_animations(
 	using test_id_type = test_scene_plain_animation_id;
 	using id_type = decltype(to_animation_id(test_id_type()));
 
+	using T = test_id_type;
+	using I = test_scene_image_id;
+
 	auto& defs = get_logicals_pool<id_type>(logicals);
 	defs.reserve(enum_count(test_id_type()));
 
@@ -36,8 +39,8 @@ void load_test_scene_animations(
 	};
 
 	auto make_plain = [&](
-		const test_id_type animation_id,
-		const test_scene_image_id first,
+		const T animation_id,
+		const I first,
 		const float frame_duration_ms
 	) -> auto& {
 		plain_animation anim;
@@ -128,101 +131,132 @@ void load_test_scene_animations(
 
 	{
 		auto make_shoot_durations = [](auto& f, const float m = 1.f) {
-			ping_pong_range(f);
+			if (f.size() == 3) {
+				ping_pong_range(f);
 
-			f[4].duration_milliseconds = m * 10;
-			f[5].duration_milliseconds = m * 10;
-			f[6].duration_milliseconds = m * 30;
-			f[7].duration_milliseconds = m * 35;
-			f[8].duration_milliseconds = m * 35;
-			f[9].duration_milliseconds = m * 40;
+				f[2].duration_milliseconds = m * 10;
+				f[3].duration_milliseconds = m * 10;
+				f[4].duration_milliseconds = m * 30;
+				f[5].duration_milliseconds = m * 35;
+			}
+			else if (f.size() == 4) {
+				ping_pong_range(f);
+
+				f[3].duration_milliseconds = m * 10;
+				f[4].duration_milliseconds = m * 10;
+				f[5].duration_milliseconds = m * 30;
+				f[6].duration_milliseconds = m * 35;
+				f[7].duration_milliseconds = m * 35;
+			}
+			else if (f.size() == 5) {
+				ping_pong_range(f);
+
+				f[4].duration_milliseconds = m * 10;
+				f[5].duration_milliseconds = m * 10;
+				f[6].duration_milliseconds = m * 30;
+				f[7].duration_milliseconds = m * 35;
+				f[8].duration_milliseconds = m * 35;
+				f[9].duration_milliseconds = m * 40;
+			}
 		};
 
 		auto make_torso = make_plain;
 
-		make_torso(
-			test_id_type::METROPOLIS_TORSO_BARE_WALK,
-			test_scene_image_id::METROPOLIS_TORSO_BARE_WALK_1,
-			30.0f
-		).meta.flip_when_cycling = true;
+		auto standard_walk = [&](const T test_id, const I first_frame_id) {
+			make_torso(test_id, first_frame_id, 30.0f);
+		};
 
-		make_torso(
-			test_id_type::RESISTANCE_TORSO_BARE_WALK,
-			test_scene_image_id::RESISTANCE_TORSO_BARE_WALK_1,
-			30.0f
-		).meta.flip_when_cycling = true;
-
-		make_torso(
-			test_id_type::METROPOLIS_TORSO_RIFLE_WALK,
-			test_scene_image_id::METROPOLIS_TORSO_RIFLE_WALK_1,
-			30.0f
-		);
-
-		make_torso(
-			test_id_type::METROPOLIS_TORSO_HEAVY_WALK,
-			test_scene_image_id::METROPOLIS_TORSO_HEAVY_WALK_1,
-			30.0f
-		);
-
-		{
-			auto& anim = make_torso(
-				test_id_type::METROPOLIS_TORSO_HEAVY_SHOOT,
-				test_scene_image_id::METROPOLIS_TORSO_HEAVY_SHOOT_1,
-				20.0f
-			);
-
-			auto& f = anim.frames;
-			make_shoot_durations(f);
-			f.erase(f.begin());
-			f.pop_back();
-		}
-
-		make_torso(
-			test_id_type::METROPOLIS_TORSO_AKIMBO_WALK,
-			test_scene_image_id::METROPOLIS_TORSO_AKIMBO_WALK_1,
-			30.0f
-		);
-
-		make_torso(
-			test_id_type::RESISTANCE_TORSO_RIFLE_WALK,
-			test_scene_image_id::RESISTANCE_TORSO_RIFLE_WALK_1,
-			30.0f
-		);
-
-		{
-			auto& anim = make_torso(
-				test_id_type::RESISTANCE_TORSO_RIFLE_SHOOT,
-				test_scene_image_id::RESISTANCE_TORSO_RIFLE_SHOOT_1,
-				20.0f
-			);
-
+		auto standard_shoot = [&](const T test_id, const I first_frame_id) {
+			auto& anim = make_torso(test_id, first_frame_id, 20.0f);
 			make_shoot_durations(anim.frames);
-		}
+		};
 
-		make_torso(
-			test_id_type::RESISTANCE_TORSO_HEAVY_WALK,
-			test_scene_image_id::RESISTANCE_TORSO_HEAVY_WALK_1,
-			30.0f
-		);
+		auto walk_with_flip = [&](const T test_id, const I first_frame_id) {
+			make_torso(test_id, first_frame_id, 30.0f).meta.flip_when_cycling = true;
+		};
 
 		{
-			auto& anim = make_torso(
-				test_id_type::RESISTANCE_TORSO_AKIMBO_WALK,
-				test_scene_image_id::RESISTANCE_TORSO_AKIMBO_SHOOT_1,
-				30.0f
+			walk_with_flip(
+				T::METROPOLIS_TORSO_BARE_WALK,
+				I::METROPOLIS_TORSO_BARE_WALK_SHOOT_1
 			);
 
-			anim.meta.flip_when_cycling = true;
+			standard_shoot(
+				T::METROPOLIS_TORSO_BARE_SHOOT,
+				I::METROPOLIS_TORSO_BARE_WALK_SHOOT_1
+			);
+
+			standard_walk(
+				T::METROPOLIS_TORSO_RIFLE_WALK,
+				I::METROPOLIS_TORSO_RIFLE_WALK_1
+			);
+
+			standard_shoot(
+				T::METROPOLIS_TORSO_RIFLE_SHOOT,
+				I::METROPOLIS_TORSO_RIFLE_SHOOT_1
+			);
+
+			standard_walk(
+				T::METROPOLIS_TORSO_HEAVY_WALK,
+				I::METROPOLIS_TORSO_HEAVY_WALK_1
+			);
+
+			standard_shoot(
+				T::METROPOLIS_TORSO_HEAVY_SHOOT,
+				I::METROPOLIS_TORSO_HEAVY_SHOOT_1
+			);
+
+			walk_with_flip(
+				T::METROPOLIS_TORSO_AKIMBO_WALK,
+				I::METROPOLIS_TORSO_AKIMBO_WALK_SHOOT_1
+			);
+
+			standard_shoot(
+				T::METROPOLIS_TORSO_AKIMBO_SHOOT,
+				I::METROPOLIS_TORSO_AKIMBO_WALK_SHOOT_1
+			);
 		}
 
 		{
-			auto& anim = make_torso(
-				test_id_type::RESISTANCE_TORSO_AKIMBO_SHOOT,
-				test_scene_image_id::RESISTANCE_TORSO_AKIMBO_SHOOT_1,
-				20.0f
+			walk_with_flip(
+				T::RESISTANCE_TORSO_BARE_WALK,
+				I::RESISTANCE_TORSO_BARE_WALK_SHOOT_1
 			);
 
-			make_shoot_durations(anim.frames);
+			standard_shoot(
+				T::RESISTANCE_TORSO_BARE_SHOOT,
+				I::RESISTANCE_TORSO_BARE_WALK_SHOOT_1
+			);
+
+			standard_walk(
+				T::RESISTANCE_TORSO_RIFLE_WALK,
+				I::RESISTANCE_TORSO_RIFLE_WALK_1
+			);
+
+			standard_shoot(
+				T::RESISTANCE_TORSO_RIFLE_SHOOT,
+				I::RESISTANCE_TORSO_RIFLE_SHOOT_1
+			);
+
+			standard_walk(
+				T::RESISTANCE_TORSO_HEAVY_WALK,
+				I::RESISTANCE_TORSO_HEAVY_WALK_1
+			);
+
+			standard_shoot(
+				T::RESISTANCE_TORSO_HEAVY_SHOOT,
+				I::RESISTANCE_TORSO_HEAVY_SHOOT_1
+			);
+
+			walk_with_flip(
+				T::RESISTANCE_TORSO_AKIMBO_WALK,
+				I::RESISTANCE_TORSO_AKIMBO_WALK_SHOOT_1
+			);
+
+			standard_shoot(
+				T::RESISTANCE_TORSO_AKIMBO_SHOOT,
+				I::RESISTANCE_TORSO_AKIMBO_WALK_SHOOT_1
+			);
 		}
 	}
 

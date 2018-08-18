@@ -311,11 +311,12 @@ To jest za to idealny przykład animacji która zmienia kształt broni i będzie
 ## Konwencje nazewnictwa
 
 - Ogólnie: ``[co_to_jest]_[indeks_klatki].png``
-	- Torsy: ``[frakcja]_torso_[trzymana_rzecz]_[czynność]_[indeks].png``, np.:
+	- Torsy: ``[frakcja]_torso_[trzymana_rzecz]_[czynności]_[indeks].png``, np.:
 		- ``resistance_torso_rifle_shoot_1.png`` - Pierwsza klatka animacji strzału z karabinu dla żołnierza Oporu.
 		- ``metropolis_torso_heavy_walk_2.png`` - Druga klatka animacji chodzenia z ciężkim karabinem dla żołnierza Metropolii.
-		- ``metropolis_torso_akimbo_walk_2.png`` - Druga klatka animacji chodzenia akimbo dla żołnierza Metropolii.
-		- ``metropolis_torso_bare_walk_1.png`` - Pierwsza klatka animacji chodzenia bez niczego dla żołnierza Metropolii.
+		- Dla akimbo oraz bare, do strzelania wykorzystywana jest ta sama animacja, co do chodzenia.
+			- ``metropolis_torso_akimbo_walk_shoot_2.png`` - Druga klatka animacji chodzenia/strzelania akimbo dla żołnierza Metropolii.
+			- ``metropolis_torso_bare_walk_shoot_1.png`` - Pierwsza klatka animacji chodzenia/strzelania bez niczego dla żołnierza Metropolii.
 	- Głowy: ``[frakcja]_head.png``
 		- Np.: ``resistance_head.png``
 	- Naboje: 
