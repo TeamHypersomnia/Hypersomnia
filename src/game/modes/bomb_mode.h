@@ -83,6 +83,7 @@ private:
 public:
 	// GEN INTROSPECTOR class bomb_mode
 	bool start_scheduled = true;
+	bool unfrozen_already = false;
 	per_faction_t<bomb_mode_faction_state> factions;
 	std::unordered_map<mode_player_id, bomb_mode_player> players;
 	// END GEN INTROSPECTOR
@@ -97,7 +98,10 @@ public:
 	entity_guid lookup(const mode_player_id&) const;
 
 	unsigned get_round_num() const;
-	float get_round_seconds(input) const;
+
+	float get_total_seconds(input) const;
+
+	float get_freeze_seconds_left(input) const;
 	float get_round_seconds_left(input) const;
 
 	template <class PreSolve, class... Callbacks>

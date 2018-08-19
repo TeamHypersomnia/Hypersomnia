@@ -200,36 +200,51 @@ void bomb_mode::setup_round(input_type in, const logic_step step) {
 
 	auto create_player = [&](const auto faction) {
 		if (const auto flavour = ::find_faction_character_flavour(cosm, faction); flavour.is_set()) {
-			return cosmic::create_entity(
+			auto new_player = cosmic::create_entity(
 				cosm, 
 				entity_flavour_id(flavour), 
+				[](auto&&...) {},
 				[&](const auto new_character) {
 					teleport_to_next_spawn(in, new_character);
 					init_spawned(in, new_character, step);
-				},
-				[](auto&&...) {}
+				}
 			);
+
+			return new_player;
 		}
 
 		return cosm[entity_id()];
 	};
 
-	for (const auto& it : players) {
-		const auto& player_data = it.second;
+	for (auto& it : players) {
+		auto& player_data = it.second;
 
 		if (const auto handle = create_player(player_data.faction)) {
 			cosmic::set_specific_name(handle, player_data.chosen_name);
+			
+			if (in.vars.freeze_secs > 0.f) {
+				handle.set_frozen(true);
+			}
+
+			player_data.guid = handle.get_guid();
 		}
 	}
+
+	unfrozen_already = false;
 }
 
 void bomb_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, const logic_step step) {
 	auto& cosm = in.cosm;
 
-	const auto& start_clk = in.initial_signi.clk;
-	const auto& clk = cosm.get_clock();
+	if (!unfrozen_already && get_freeze_seconds_left(in) <= 0.f) {
+		for (const auto& it : players) {
+			cosm[it.second.guid].set_frozen(false);
+		}
 
-	if (start_scheduled || clk.is_ready(in.vars.round_secs * 1000.f, start_clk.now)) {
+		unfrozen_already = true;
+	}
+
+	if (start_scheduled || get_round_seconds_left(in) <= 0.f) {
 		setup_round(in, step);
 		start_scheduled = false;
 	}
@@ -237,15 +252,19 @@ void bomb_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, const
 	(void)entropy;
 }
 
-float bomb_mode::get_round_seconds(const input_type in) const {
+float bomb_mode::get_total_seconds(const input_type in) const {
 	const auto& start_clk = in.initial_signi.clk;
 	const auto& clk = in.cosm.get_clock();
 
 	return clk.diff_seconds(start_clk);
 }
 
+float bomb_mode::get_freeze_seconds_left(const input_type in) const {
+	return in.vars.freeze_secs - get_total_seconds(in);
+}
+
 float bomb_mode::get_round_seconds_left(const input_type in) const {
-	return in.vars.round_secs - get_round_seconds(in);
+	return in.vars.round_secs + in.vars.freeze_secs - get_total_seconds(in);
 }
 
 unsigned bomb_mode::get_round_num() const {

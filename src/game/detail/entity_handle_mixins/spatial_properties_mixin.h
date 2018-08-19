@@ -250,10 +250,11 @@ std::optional<transformr> spatial_properties_mixin<E>::find_logic_transform() co
 			return body_transform + displacement;
 		};
 
+		/* OPTIMIZATION: If the handle is already dispatched, check if it owns itself - which is the most probable occurence. */
+
 		if constexpr(E::is_specific) {
 			if constexpr(E::template has<components::rigid_body>()) {
 				if (owner.get_id() == handle.get_id()) {
-					/* Use the already dispatched handle in case it owns itself, which is the most probable occurence. */
 					if (const auto body = handle.template get<components::rigid_body>();
 						body.is_constructed()
 					) {

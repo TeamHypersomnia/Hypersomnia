@@ -63,7 +63,16 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 
 		if (settings.start_bomb_mode) {
 			bomb_mode mode;
-			view.local_player_id = mode.add_player({ bomb_vars, cosm.get_solvable().significant, cosm }, "Editor-player");
+
+			auto& player_id = view.local_player_id;
+
+			{
+				const auto in = bomb_mode::input { bomb_vars, cosm.get_solvable().significant, cosm };
+				player_id = mode.add_player(in, "Editor-player");
+			}
+
+			//mode.auto_assign_faction(cosm, player_id);
+			mode.choose_faction(player_id, faction_type::RESISTANCE);
 
 			player.current_mode_vars_id = bomb_vars_id;
 			player.current_mode.emplace<bomb_mode>(std::move(mode));

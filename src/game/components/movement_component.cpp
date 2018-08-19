@@ -56,7 +56,7 @@ namespace components {
 	}
 
 	vec2 movement::get_force_requested_by_input(const vec2& axes) const {
-		if (freezed) {
+		if (frozen) {
 			return vec2::zero;
 		}
 

@@ -14,6 +14,8 @@
 #include "game/detail/sentience_shake.h"
 #include "augs/math/physics_structs.h"
 
+void unset_input_flags_of_orphaned_entity(const entity_handle);
+
 template <class E>
 class misc_mixin {
 public:
@@ -120,7 +122,6 @@ public:
 
 	bool get_flag(const entity_flag f) const {
 		const auto self = *static_cast<const E*>(this);
-		ensure(self.alive());
 		return self.template get<invariants::flags>().values.test(f);
 	}
 
@@ -251,5 +252,27 @@ public:
 		}
 
 		return false;
+	}
+
+	bool is_frozen() const {
+		const auto self = *static_cast<const E*>(this);
+
+		if (const auto movement = self.template find<components::movement>()) {
+			return movement->frozen;
+		}
+
+		return false;
+	}
+
+	void set_frozen(const bool flag) const {
+		const auto self = *static_cast<const E*>(this);
+
+		if (const auto movement = self.template find<components::movement>()) {
+			movement->frozen = flag;
+
+			if (flag) {
+				unset_input_flags_of_orphaned_entity(self);
+			}
+		}
 	}
 };

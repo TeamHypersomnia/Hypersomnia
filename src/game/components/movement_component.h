@@ -66,7 +66,7 @@ namespace components {
 		bool sprint_enabled = false;
 		bool was_sprint_effective = false;
 		
-		bool freezed = false;
+		bool frozen = false;
 
 		float make_inert_for_ms = 0.f;
 		float animation_amount = 0.f;

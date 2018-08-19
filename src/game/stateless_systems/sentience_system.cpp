@@ -54,6 +54,13 @@ void sentience_system::cast_spells(const logic_step step) const {
 			continue;
 		}
 
+		if (subject.is_frozen()) {
+			if (!spell.is<haste_instance>()) {
+				/* Make exception for a haste spell. */
+				continue;
+			}
+		}
+
 		ensure(spell.is_set());
 
 		get_by_dynamic_id(

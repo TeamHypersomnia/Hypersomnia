@@ -1361,23 +1361,30 @@ void editor_setup::draw_mode_gui(const draw_setup_gui_input& in) const {
 				if constexpr(M::round_based) {
 					using namespace augs::gui::text;
 
-					const auto time_left = typed_mode.get_round_seconds_left(mode_input);
-					const auto time_left_str = format_mins_secs(time_left);
+					auto draw_time_at_top = [&](const std::string& val, const rgba& col) {
+						const auto text_style = style(
+							in.gui_font,
+							col
+						);
 
-					const auto text_style = style(
-						in.gui_font,
-						rgba(255, 255, 255, 255)
-					);
+						const auto t = get_game_screen_top();
+						const auto s = in.screen_size;
 
-					const auto t = get_game_screen_top();
-					const auto s = in.screen_size;
+						print_stroked(
+							in.drawer,
+							{ s.x / 2, static_cast<int>(t + 2) },
+							formatted_string(val, text_style),
+							{ augs::center::X }
+						);
+					};
 
-					print_stroked(
-						in.drawer,
-						{ s.x / 2, static_cast<int>(t + 2) },
-						formatted_string(time_left_str, text_style),
-						{ augs::center::X }
-					);
+					if (const auto freeze_left = typed_mode.get_freeze_seconds_left(mode_input); freeze_left > 0.f) {
+						draw_time_at_top(format_mins_secs(std::ceil(freeze_left)), red);
+					}
+					else {
+						const auto time_left = std::ceil(typed_mode.get_round_seconds_left(mode_input));
+						draw_time_at_top(format_mins_secs(time_left), time_left <= 10.f ? red : white);
+					}
 				}
 				else {
 					(void)typed_mode;

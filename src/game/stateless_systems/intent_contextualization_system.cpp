@@ -117,6 +117,10 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 
 		const auto subject = cosmos[it.subject];
 
+		if (subject.is_frozen()) {
+			continue;
+		}
+
 		if (subject.find<invariants::container>()) {
 			auto requested_index = static_cast<std::size_t>(-1);
 
