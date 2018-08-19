@@ -79,14 +79,14 @@ return {
           x = -12,
           y = 0
         },
-        rotation = -1
+        rotation = 1
       },
       head = {
         pos = {
           x = 0,
-          y = -1
+          y = 1
         },
-        rotation = 0
+        rotation = -0
       },
       legs = {
         pos = {
@@ -97,17 +97,17 @@ return {
       },
       primary_hand = {
         pos = {
-          x = 15,
-          y = 20
+          x = 13,
+          y = 19
         },
-        rotation = 0
+        rotation = -0
       },
       secondary_hand = {
         pos = {
-          x = 13,
-          y = -19
+          x = 15,
+          y = -20
         },
-        rotation = 0
+        rotation = -0
       }
     }
   },
