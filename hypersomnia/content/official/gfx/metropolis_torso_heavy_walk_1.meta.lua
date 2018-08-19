@@ -1,9 +1,11 @@
 return {
   extra_loadables = {
-    disabled_generate_neon_map = {
-      alpha_multiplier = 1,
-      amplification = 60,
-      light_colors = {},
+    enabled_generate_neon_map = {
+      alpha_multiplier = 0.40000000596046448,
+      amplification = 100,
+      light_colors = {
+        "223 113 38 255"
+      },
       radius = {
         x = 80,
         y = 80
@@ -72,31 +74,31 @@ return {
     torso = {
       back = {
         pos = {
-          x = -26,
+          x = -13,
           y = -8
         },
-        rotation = 22.988716125488281
+        rotation = 29.744880676269531
       },
       head = {
         pos = {
-          x = -11,
-          y = -2
+          x = 0,
+          y = 0
         },
-        rotation = -33.111343383789062
+        rotation = 0
       },
       legs = {
         pos = {
-          x = -12,
-          y = -2
+          x = 0,
+          y = 0
         },
         rotation = 0
       },
       primary_hand = {
         pos = {
-          x = -3,
-          y = 28
+          x = 7,
+          y = 30
         },
-        rotation = -53.130104064941406
+        rotation = -51
       },
       secondary_hand = {
         pos = {

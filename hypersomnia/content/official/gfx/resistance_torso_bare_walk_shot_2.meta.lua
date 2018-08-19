@@ -74,7 +74,7 @@ return {
     torso = {
       back = {
         pos = {
-          x = -15,
+          x = -12,
           y = 0
         },
         rotation = -1

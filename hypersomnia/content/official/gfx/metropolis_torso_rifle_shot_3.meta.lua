@@ -1,9 +1,11 @@
 return {
   extra_loadables = {
-    disabled_generate_neon_map = {
-      alpha_multiplier = 1,
-      amplification = 60,
-      light_colors = {},
+    enabled_generate_neon_map = {
+      alpha_multiplier = 0.40000000596046448,
+      amplification = 100,
+      light_colors = {
+        "223 113 38 255"
+      },
       radius = {
         x = 80,
         y = 80
@@ -28,32 +30,39 @@ return {
     },
     item = {
       attachment_anchor = {
-		  pos = {
-        x = 0,
-        y = 0
-	},
-	rotation = 0
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       },
       back_anchor = {
-		  pos = {
-        x = 0,
-        y = 0
-	},
-	rotation = 0
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      beep_offset = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       },
       hand_anchor = {
-		  pos = {
-        x = 0,
-        y = 0
-	},
-	rotation = 0
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       },
       head_anchor = {
-		  pos = {
-        x = 0,
-        y = 0
-	},
-	rotation = 0
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       }
     },
     legs = {
@@ -65,24 +74,31 @@ return {
     torso = {
       back = {
         pos = {
-          x = 0,
-          y = 0
+          x = -14,
+          y = -11
         },
-        rotation = 0
+        rotation = 37
       },
       head = {
         pos = {
-          x = -13,
-          y = -4
+          x = -2,
+          y = 0
+        },
+        rotation = 1.5
+      },
+      legs = {
+        pos = {
+          x = -6,
+          y = -1
         },
         rotation = 0
       },
       primary_hand = {
         pos = {
-          x = -8,
-          y = 21
+          x = 1,
+          y = 18
         },
-        rotation = -10.30484676361084
+        rotation = -1.5
       },
       secondary_hand = {
         pos = {
