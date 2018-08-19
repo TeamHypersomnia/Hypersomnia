@@ -634,11 +634,11 @@ namespace test_flavours {
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
-			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::VINDICATOR_SHOOT);
+			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::VINDICATOR_SHOT);
 
 			meta.set(gun_def);
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::VINDICATOR_SHOOT_1, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::VINDICATOR_SHOT_1, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE);
 			meta.get<invariants::item>().standard_price = 2900;
@@ -690,7 +690,7 @@ namespace test_flavours {
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
-			//gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::VINDICATOR_SHOOT);
+			//gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::VINDICATOR_SHOT);
 
 			meta.set(gun_def);
 
@@ -742,11 +742,11 @@ namespace test_flavours {
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
-			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::DATUM_GUN_SHOOT);
+			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::DATUM_GUN_SHOT);
 
 			meta.set(gun_def);
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::DATUM_GUN_SHOOT_1, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::DATUM_GUN_SHOT_1, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::PLASMA_DRAW);

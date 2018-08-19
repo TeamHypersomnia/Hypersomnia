@@ -251,9 +251,6 @@ Jednakże, ponieważ nogi mogą być obracane dowolnie, musimy założyć że ka
 Obrazki nóg muszą być ciągłe, nie mogą być w środku puste ani mieć w środku przerywających krawędzi.  
 Jako bonus, to sprawi, że nasze nogi będą kompatybilne również z "chudszymi" torsami.  
 
-Artysta **nie rysuje obrazka dla pierwszej klatki nóg**, ponieważ ta jest zawsze niewidoczna pod stojącym torsem.  
-Trzeba dodać w edytorze jakiś pusty obrazek na pierwszą klatkę.  
-
 **TODO:** Poprawić animacje nóg w myśl tej zasady.
 
 #### Lista
@@ -263,6 +260,9 @@ Trzeba dodać w edytorze jakiś pusty obrazek na pierwszą klatkę.
 	{% include tip.html content="Oprócz tego, że nie rysujemy pierwszej klatki, procedura dla tej animacji jest analogiczna do animacji chodzenia z pustymi rękoma." %}
 	**Ilość klatek: n, 2n lub 4n (5, 10 lub 20).** 
 
+	Artysta **nie rysuje obrazka dla pierwszej klatki nóg**, ponieważ ta jest zawsze niewidoczna pod stojącym torsem.  
+	Trzeba dodać w edytorze jakiś pusty obrazek na pierwszą klatkę.  
+
 	Przykład poprawnej animacji:  
 
 	{% include image.html file="pages/todo/pl_pages/legs_forward.png" %}
@@ -270,6 +270,9 @@ Trzeba dodać w edytorze jakiś pusty obrazek na pierwszą klatkę.
 2. Animacja nóg podczas chodzenia **prostopadłego** do kierunku patrzenia.  
 	**Ilość klatek: 2n lub 4n (10 lub 20).** 
 	Długość kompletnego cyklu ruchu: **4n = 20** *klatek*.  
+
+	Artysta **nie rysuje obrazka dla pierwszej i ostatniej klatki nóg**, ponieważ te są zawsze niewidoczne pod stojącym torsem.  
+	Trzeba dodać w edytorze jakiś pusty obrazek na pierwszą i ostatnią klatkę.  
 
 	Przykład poprawnej animacji:  
 

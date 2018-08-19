@@ -99,8 +99,8 @@ void load_test_scene_animations(
 
 		{
 			auto& anim = make_plain(
-				test_id_type::VINDICATOR_SHOOT,
-				test_scene_image_id::VINDICATOR_SHOOT_1,
+				test_id_type::VINDICATOR_SHOT,
+				test_scene_image_id::VINDICATOR_SHOT_1,
 				40.0f
 			);
 
@@ -111,8 +111,8 @@ void load_test_scene_animations(
 
 		{
 			auto& anim = make_plain(
-				test_id_type::DATUM_GUN_SHOOT,
-				test_scene_image_id::DATUM_GUN_SHOOT_1,
+				test_id_type::DATUM_GUN_SHOT,
+				test_scene_image_id::DATUM_GUN_SHOT_1,
 				10.0f
 			);
 
@@ -194,12 +194,12 @@ void load_test_scene_animations(
 		{
 			walk_with_flip(
 				T::METROPOLIS_TORSO_BARE_WALK,
-				I::METROPOLIS_TORSO_BARE_WALK_SHOOT_1
+				I::METROPOLIS_TORSO_BARE_WALK_SHOT_1
 			);
 
 			bare_or_akimbo_shoot(
-				T::METROPOLIS_TORSO_BARE_SHOOT,
-				I::METROPOLIS_TORSO_BARE_WALK_SHOOT_1
+				T::METROPOLIS_TORSO_BARE_SHOT,
+				I::METROPOLIS_TORSO_BARE_WALK_SHOT_1
 			);
 
 			standard_walk(
@@ -208,8 +208,8 @@ void load_test_scene_animations(
 			);
 
 			standard_shoot(
-				T::METROPOLIS_TORSO_RIFLE_SHOOT,
-				I::METROPOLIS_TORSO_RIFLE_SHOOT_1
+				T::METROPOLIS_TORSO_RIFLE_SHOT,
+				I::METROPOLIS_TORSO_RIFLE_SHOT_1
 			);
 
 			standard_walk(
@@ -218,30 +218,30 @@ void load_test_scene_animations(
 			);
 
 			standard_shoot(
-				T::METROPOLIS_TORSO_HEAVY_SHOOT,
-				I::METROPOLIS_TORSO_HEAVY_SHOOT_1
+				T::METROPOLIS_TORSO_HEAVY_SHOT,
+				I::METROPOLIS_TORSO_HEAVY_SHOT_1
 			);
 
 			walk_with_flip(
 				T::METROPOLIS_TORSO_AKIMBO_WALK,
-				I::METROPOLIS_TORSO_AKIMBO_WALK_SHOOT_1
+				I::METROPOLIS_TORSO_AKIMBO_WALK_SHOT_1
 			);
 
 			bare_or_akimbo_shoot(
-				T::METROPOLIS_TORSO_AKIMBO_SHOOT,
-				I::METROPOLIS_TORSO_AKIMBO_WALK_SHOOT_1
+				T::METROPOLIS_TORSO_AKIMBO_SHOT,
+				I::METROPOLIS_TORSO_AKIMBO_WALK_SHOT_1
 			);
 		}
 
 		{
 			walk_with_flip(
 				T::RESISTANCE_TORSO_BARE_WALK,
-				I::RESISTANCE_TORSO_BARE_WALK_SHOOT_1
+				I::RESISTANCE_TORSO_BARE_WALK_SHOT_1
 			);
 
 			bare_or_akimbo_shoot(
-				T::RESISTANCE_TORSO_BARE_SHOOT,
-				I::RESISTANCE_TORSO_BARE_WALK_SHOOT_1
+				T::RESISTANCE_TORSO_BARE_SHOT,
+				I::RESISTANCE_TORSO_BARE_WALK_SHOT_1
 			);
 
 			standard_walk(
@@ -250,8 +250,8 @@ void load_test_scene_animations(
 			);
 
 			standard_shoot(
-				T::RESISTANCE_TORSO_RIFLE_SHOOT,
-				I::RESISTANCE_TORSO_RIFLE_SHOOT_1
+				T::RESISTANCE_TORSO_RIFLE_SHOT,
+				I::RESISTANCE_TORSO_RIFLE_SHOT_1
 			);
 
 			standard_walk(
@@ -260,18 +260,18 @@ void load_test_scene_animations(
 			);
 
 			standard_shoot(
-				T::RESISTANCE_TORSO_HEAVY_SHOOT,
-				I::RESISTANCE_TORSO_HEAVY_SHOOT_1
+				T::RESISTANCE_TORSO_HEAVY_SHOT,
+				I::RESISTANCE_TORSO_HEAVY_SHOT_1
 			);
 
 			walk_with_flip(
 				T::RESISTANCE_TORSO_AKIMBO_WALK,
-				I::RESISTANCE_TORSO_AKIMBO_WALK_SHOOT_1
+				I::RESISTANCE_TORSO_AKIMBO_WALK_SHOT_1
 			);
 
 			bare_or_akimbo_shoot(
-				T::RESISTANCE_TORSO_AKIMBO_SHOOT,
-				I::RESISTANCE_TORSO_AKIMBO_WALK_SHOOT_1
+				T::RESISTANCE_TORSO_AKIMBO_SHOT,
+				I::RESISTANCE_TORSO_AKIMBO_WALK_SHOT_1
 			);
 		}
 	}
