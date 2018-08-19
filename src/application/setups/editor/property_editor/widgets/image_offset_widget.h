@@ -105,7 +105,7 @@ struct image_offset_widget {
 				if (ImGui::IsItemHovered()) {
 					draw_cross(image_space_new, rgba(green.rgb(), cross_alpha));
 
-					text_tooltip("Chosen offset: %x\nImage space: %x", chosen_new_offset, image_space_new);
+					text_tooltip("Chosen offset: %x\nImage space: %x\ndt: %x", chosen_new_offset, image_space_new, chosen_new_offset - current_pos);
 				}
 			}
 			else {
@@ -121,7 +121,7 @@ struct image_offset_widget {
 						draw_cross(image_space_new, rgba(green.rgb(), ray_alpha));
 						draw_ray(image_space_old, degrees_new, rgba(green.rgb(), cross_alpha));
 
-						text_tooltip("Chosen rotation: %x", degrees_new);
+						text_tooltip("Chosen rotation: %x\ndt: %x", degrees_new, degrees_new - object.rotation);
 					}
 				}
 			}
