@@ -292,9 +292,13 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 					auto flavours = missile_def.remnant_flavours;
 					
 					shuffle_range(flavours, rng.generator);
-					auto how_many_along_normal = rng.randval(2u, 3u);
 
-					for (const auto& r_id : flavours) {
+					int total_spawned = std::min(static_cast<int>(flavours.size()), 2);
+
+					auto how_many_along_normal = rng.randval(total_spawned - 1, total_spawned);
+
+					for (int i = 0; i < total_spawned; ++i) {
+						const auto& r_id = flavours[i];
 						const auto speed = rng.randval(1000.f, 4800.f);
 
 						vec2 vel;
