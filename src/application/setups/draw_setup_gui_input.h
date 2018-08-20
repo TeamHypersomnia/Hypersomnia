@@ -9,6 +9,7 @@ struct config_lua_table;
 
 namespace augs {
 	struct baked_font;
+	struct all_necessary_sounds;
 }
 
 struct draw_setup_gui_input {
@@ -21,4 +22,5 @@ struct draw_setup_gui_input {
 	const vec2i mouse_pos;
 	const vec2i screen_size;
 	const augs::baked_font& gui_font;
+	const all_necessary_sounds& sounds;
 };

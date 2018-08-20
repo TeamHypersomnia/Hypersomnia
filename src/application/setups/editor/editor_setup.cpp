@@ -10,6 +10,7 @@
 
 #include "game/detail/visible_entities.h"
 #include "view/viewables/images_in_atlas_map.h"
+#include "view/mode_gui/arena_gui.hpp"
 
 #include "application/config_lua_table.h"
 #include "application/setups/editor/editor_setup.h"
@@ -21,8 +22,6 @@
 #include "application/setups/editor/gui/editor_tab_gui.h"
 #include "application/setups/draw_setup_gui_input.h"
 #include "view/rendering_scripts/draw_marker_borders.h"
-#include "augs/templates/chrono_templates.h"
-#include "augs/gui/text/printer.h"
 
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/lua_file.h"
@@ -1024,6 +1023,10 @@ bool editor_setup::handle_input_before_game(
 	const bool has_shift{ common_input_state[key::LSHIFT] };
 
 	if (is_editing_mode()) {
+		if (arena_gui.control(common_input_state, e)) { 
+			return true;
+		}
+
 		auto& cosm = work().world;
 		const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
 		const auto current_cone = camera_cone(current_eye, screen_size);
@@ -1356,40 +1359,7 @@ void editor_setup::draw_mode_gui(const draw_setup_gui_input& in) const {
 	if (anything_opened()) {
 		on_mode_with_input(
 			[&](const auto& typed_mode, const auto& mode_input) {
-				using M = remove_cref<decltype(typed_mode)>;
-
-				if constexpr(M::round_based) {
-					using namespace augs::gui::text;
-
-					auto draw_time_at_top = [&](const std::string& val, const rgba& col) {
-						const auto text_style = style(
-							in.gui_font,
-							col
-						);
-
-						const auto t = get_game_screen_top();
-						const auto s = in.screen_size;
-
-						print_stroked(
-							in.drawer,
-							{ s.x / 2, static_cast<int>(t + 2) },
-							formatted_string(val, text_style),
-							{ augs::center::X }
-						);
-					};
-
-					if (const auto freeze_left = typed_mode.get_freeze_seconds_left(mode_input); freeze_left > 0.f) {
-						draw_time_at_top(format_mins_secs(std::ceil(freeze_left)), red);
-					}
-					else {
-						const auto time_left = std::ceil(typed_mode.get_round_seconds_left(mode_input));
-						draw_time_at_top(format_mins_secs(time_left), time_left <= 10.f ? red : white);
-					}
-				}
-				else {
-					(void)typed_mode;
-					(void)in;
-				}
+				arena_gui.draw_mode_gui(in, get_game_screen_top(), typed_mode, mode_input);
 			}
 		);
 	}

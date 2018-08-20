@@ -16,6 +16,7 @@
 
 #include "view/viewables/all_viewables_defs.h"
 #include "view/viewables/viewables_loading_type.h"
+#include "view/mode_gui/arena_gui.h"
 
 #include "application/intercosm.h"
 
@@ -110,6 +111,8 @@ class editor_setup : private current_access_cache<editor_setup> {
 
 	editor_plain_animations_gui plain_animations_gui = std::string("Animations");
 	editor_particle_effects_gui particle_effects_gui = std::string("Particle effects");
+
+	arena_gui_state arena_gui;
 	// END GEN INTROSPECTOR
 
 	std::optional<editor_popup> ok_only_popup;

@@ -119,7 +119,8 @@ all_necessary_sounds::all_necessary_sounds(
 	const augs::path_type& directory
 ) try :
 	button_click(augs::sound_data(typesafe_sprintf("%x/button_click.wav", directory))),
-	button_hover(augs::sound_data(typesafe_sprintf("%x/button_hover.wav", directory)))
+	button_hover(augs::sound_data(typesafe_sprintf("%x/button_hover.wav", directory))),
+	round_clock_tick(augs::sound_data(typesafe_sprintf("%x/round_clock_tick.wav", directory)))
 {}
 catch (const augs::sound_decoding_error& err) {
 	throw necessary_resource_loading_error(err.what());

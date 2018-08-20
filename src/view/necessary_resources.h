@@ -76,6 +76,7 @@ struct all_necessary_shaders {
 struct all_necessary_sounds {
 	augs::single_sound_buffer button_click;
 	augs::single_sound_buffer button_hover;
+	augs::single_sound_buffer round_clock_tick;
 
 	all_necessary_sounds(const augs::path_type& directory);
 };

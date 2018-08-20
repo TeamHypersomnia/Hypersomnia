@@ -1476,7 +1476,8 @@ int work(const int argc, const char* const * const argv) try {
 					streaming.necessary_images_in_atlas,
 					common_input_state.mouse.pos,
 					screen_size,
-					streaming.get_loaded_gui_font()
+					streaming.get_loaded_gui_font(),
+					necessary_sounds
 				});
 
 				renderer.call_and_clear_lines();
