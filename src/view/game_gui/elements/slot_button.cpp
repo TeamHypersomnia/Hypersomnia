@@ -32,15 +32,15 @@ void slot_button::draw(
 
 	const auto& cosmos = context.get_cosmos();
 
-	const auto slot_id = cosmos[this_id.get_location().slot_id];
-	const auto hand_index = slot_id.get_hand_index();
+	const auto slot_handle = cosmos[this_id.get_location().slot_id];
+	const auto hand_index = slot_handle.get_hand_index();
 	const auto& detector = this_id->detector;
 	const auto output = context.get_output();
 	const auto& necessarys = context.get_necessary_images();
 
 	rgba inside_col, border_col;
 	
-	if (slot_id->category_allowed == item_category::GENERAL) {
+	if (slot_handle->category_allowed == item_category::GENERAL) {
 		inside_col = cyan;
 	}
 	else {
@@ -61,11 +61,11 @@ void slot_button::draw(
 	const auto inside_tex = necessarys.at(necessary_image_id::ATTACHMENT_CIRCLE_FILLED);
 	const auto border_tex = necessarys.at(necessary_image_id::ATTACHMENT_CIRCLE_BORDER);
 
-	if (slot_id->always_allow_exactly_one_item) {
+	if (slot_handle->always_allow_exactly_one_item) {
 		output.gui_box_center_tex(inside_tex, context, this_id, inside_col);
 		output.gui_box_center_tex(border_tex, context, this_id, border_col);
 
-		const auto slot_type = slot_id.get_id().type;
+		const auto slot_type = slot_handle.get_type();
 
 		auto draw_icon = [&](necessary_image_id id, const vec2i offset = vec2i(0, 0)) {
 			output.gui_box_center_tex(necessarys.at(id), context, this_id, border_col, offset);
@@ -100,11 +100,11 @@ void slot_button::draw(
 		}
 	}
 
-	const bool is_child_of_root = slot_id.get_container() == context.get_subject_entity();
+	const bool is_child_of_root = slot_handle.get_container() == context.get_subject_entity();
 
 	if (!is_child_of_root) {
 		const_dereferenced_location<item_button_in_item> child_item_button
-			= context.dereference_location(item_button_in_item{ slot_id.get_container().get_id() });
+			= context.dereference_location(item_button_in_item{ slot_handle.get_container().get_id() });
 
 		draw_pixel_line_connector(
 			output,
@@ -136,13 +136,13 @@ void slot_button::rebuild_layouts(const game_gui_context context, const this_in_
 void slot_button::update_rc(const game_gui_context context, const this_in_container this_id) {
 	const auto& cosmos = context.get_cosmos();
 
-	const auto slot_id = cosmos[this_id.get_location().slot_id];
+	const auto slot_handle = cosmos[this_id.get_location().slot_id];
 
-	if (slot_id->always_allow_exactly_one_item) {
+	if (slot_handle->always_allow_exactly_one_item) {
 		this_id->set_flag(augs::gui::flag::ENABLE_DRAWING);
 
-		if (slot_id.has_items()) {
-			const_dereferenced_location<item_button_in_item> child_item_button = context.dereference_location(item_button_in_item{ slot_id.get_items_inside()[0] });
+		if (slot_handle.has_items()) {
+			const_dereferenced_location<item_button_in_item> child_item_button = context.dereference_location(item_button_in_item{ slot_handle.get_items_inside()[0] });
 
 			if (child_item_button->is_being_wholely_dragged_or_pending_finish(context, child_item_button)) {
 				this_id->set_flag(augs::gui::flag::ENABLE_DRAWING);
@@ -160,7 +160,7 @@ void slot_button::update_rc(const game_gui_context context, const this_in_contai
 	
 	vec2 inventory_root_offset;
 
-	if (slot_id.get_container().has<components::item_slot_transfers>()) {
+	if (slot_handle.get_container().has<components::item_slot_transfers>()) {
 		inventory_root_offset = context.get_screen_size();
 		inventory_root_offset.x -= 250;
 		inventory_root_offset.y -= 200;

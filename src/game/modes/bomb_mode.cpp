@@ -63,18 +63,24 @@ void bomb_mode::init_spawned(
 					entity_id(typed_handle.get_id())
 				;
 
-				cosmic::create_entity(
+				const auto target_slot = inventory_slot_id { i.slot_type, target_container };
+
+				const auto new_item = cosmic::create_entity(
 					cosm,
 					i.flavour,
 					[&](const auto&, auto& raw_entity) {
 						auto& item = raw_entity.template get<components::item>();
 						item.charges = i.charges;
-						item.current_slot = { i.slot_type, target_container };
+						//item.current_slot = target_slot;
 					},
 					[&](const auto&) {
 
 					}
 				);
+
+				const auto result = perform_transfer_no_step(item_slot_transfer_request::standard(new_item.get_id(), target_slot), cosm);
+				result.notify_logical(step);
+				created_items.push_back(new_item.get_id());
 			}
 		}
 		else {

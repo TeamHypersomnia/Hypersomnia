@@ -16,6 +16,7 @@ struct perform_transfer_result {
 	std::optional<packaged_sound_effect> transfer_sound;
 	std::optional<packaged_particle_effect> transfer_particles;
 
+	void notify_logical(logic_step) const;
 	void notify(logic_step) const;
 	void play_effects(logic_step) const;
 };

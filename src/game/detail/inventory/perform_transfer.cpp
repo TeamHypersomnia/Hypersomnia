@@ -19,14 +19,17 @@
 #include "game/cosmos/cosmos.h"
 
 void drop_from_all_slots(const invariants::container& container, const entity_handle handle, const impulse_mults impulse, const logic_step step) {
-	drop_from_all_slots(container, handle, impulse, [step](const auto& result) { result.notify(step); });
+	drop_from_all_slots(container, handle, impulse, [step](const auto& result) { result.notify(step); result.play_effects(step); });
+}
+
+void perform_transfer_result::notify_logical(const logic_step step) const {
+	step.post_message_if(destructed);
 }
 
 void perform_transfer_result::notify(const logic_step step) const {
 	step.post_message_if(picked);
 	step.post_messages(interpolation_corrected);
-	step.post_message_if(destructed);
-	play_effects(step);
+	notify_logical(step);
 }
 
 void perform_transfer_result::play_effects(const logic_step step) const {
@@ -45,6 +48,7 @@ void perform_transfer(
 ) {
 	const auto result = perform_transfer_no_step(r, step.get_cosmos());
 	result.notify(step);
+	result.play_effects(step);
 }
 
 perform_transfer_result perform_transfer_no_step(
