@@ -152,10 +152,10 @@ return {
       { 0x0020, 0x00FF }, -- Basic Latin + Latin Supplement
       { 0x0100, 0x017F }  -- Latin Extended-A
     },
-    size_in_pixels = 13,
+    size_in_pixels = 16,
 	add_japanese_ranges = false,
     settings = {},
-    source_font_path = "content/necessary/fonts/ProggyClean.ttf"
+    source_font_path = "content/necessary/fonts/unifont.ttf"
   },
   gui_style = {
     Alpha = 1,

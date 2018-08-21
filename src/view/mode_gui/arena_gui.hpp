@@ -54,12 +54,12 @@ void arena_gui_state::draw_mode_gui(
 			);
 		};
 
-		auto play_tick_if_soon = [&](const auto& val, const auto& when_ticking_starts) {
+		auto play_tick_if_soon = [&](const auto& val, const auto& when_ticking_starts, const bool alarm) {
 			auto play_tick = [&]() {
 				auto& vol = in.config.audio_volume;
 
 				tick_sound.just_play(
-					in.sounds.round_clock_tick, 
+					alarm ? in.sounds.alarm_tick : in.sounds.round_clock_tick, 
 					vol.sound_effects
 				);
 			};
@@ -95,7 +95,7 @@ void arena_gui_state::draw_mode_gui(
 		if (const auto warmup_left = typed_mode.get_warmup_seconds_left(mode_input); warmup_left > 0.f) {
 			const auto c = std::ceil(warmup_left);
 
-			play_tick_if_soon(c, 5.f);
+			play_tick_if_soon(c, 5.f, true);
 			draw_warmup_indicator("WARMUP\n" + format_mins_secs(c), white);
 			return;
 		}
@@ -117,7 +117,7 @@ void arena_gui_state::draw_mode_gui(
 			const auto c = std::ceil(freeze_left);
 			const auto col = c <= 10.f ? red : white;
 
-			play_tick_if_soon(c, 3.f);
+			play_tick_if_soon(c, 3.f, false);
 			draw_time_at_top(format_mins_secs(c), col);
 
 			return;
