@@ -20,7 +20,7 @@ ref_typed_entity_handle<E> cosmic::specific_create_entity_detail(
 		object.components = initial_components;
 	}
 
-	pre_construction(handle);
+	pre_construction(handle, handle.get({}));
 	construct_pre_inference(handle);
 	infer_caches_for(handle);
 	construct_post_inference(handle);
@@ -124,7 +124,7 @@ auto cosmic::specific_clone_entity(
 ) {
 	auto& cosmos = source_entity.get_cosmos();
 
-	return cosmic::specific_create_entity(cosmos, source_entity.get_flavour_id(), [&](const auto new_entity) {
+	return cosmic::specific_create_entity(cosmos, source_entity.get_flavour_id(), [&](const auto new_entity, auto&&...) {
 		const auto& source_components = source_entity.get({}).components;
 		auto& new_solvable = new_entity.get({});
 		auto& new_components = new_solvable.components;

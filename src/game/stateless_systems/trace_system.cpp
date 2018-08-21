@@ -102,7 +102,7 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 			if (const auto finishing_trace = cosmic::create_entity(
 				cosmos, 
 				trace_def.finishing_trace_flavour,
-				[&](const auto typed_handle) {
+				[&](const auto typed_handle, auto&&...) {
 					typed_handle.set_logic_transform(transform_of_finishing);
 				},
 				[&](const auto typed_handle) {

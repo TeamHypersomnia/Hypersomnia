@@ -304,6 +304,17 @@ namespace augs {
 		AL_CHECK(alSourcei(id, AL_BUFFER, 0));
 	}
 	
+	void sound_source::just_play(const single_sound_buffer& buffer, const float gain) {
+		if (gain >= 0.f) {
+			set_gain(gain);
+		}
+
+		stop();
+		bind_buffer(buffer);
+		set_direct_channels(true);
+		play();
+	}
+
 	const single_sound_buffer* sound_source::get_bound_buffer() const {
 		return attached_buffer;
 	}

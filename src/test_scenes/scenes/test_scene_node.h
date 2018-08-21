@@ -58,7 +58,7 @@ public:
 
 	void create(const vec2 resolved_pos, const vec2i resolved_size) const {
 		on_enum([&](const auto id) {
-			create_test_scene_entity(*cosm, id, [&](const auto typed_handle) {
+			create_test_scene_entity(*cosm, id, [&](const auto typed_handle, auto&&...) {
 				typed_handle.set_logic_transform(transformr(resolved_pos, rotation));
 				typed_handle.do_flip(flip);
 

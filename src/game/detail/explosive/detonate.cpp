@@ -54,7 +54,7 @@ void detonate(const detonate_input in) {
 			cosmic::create_entity(
 				cosm,
 				c_in.flavour_id,
-				[&](const auto typed_handle) {
+				[&](const auto typed_handle, auto&&...) {
 					typed_handle.template get<components::sender>() = sender_of_subject;
 
 					{

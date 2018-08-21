@@ -6,6 +6,24 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- After round restart,
+	- Propagate movement flags!
+	- Propagate all owned items
+		- Keeping GUI buttons intact
+			- messages::refresh_gui
+				- map of items to new items
+					- new_identities
+			- posted by 
+		- Actually transfering the items to the new cosmos
+			- **Chosen Solution #2**: Serialize inventory tree and rewrite.
+				- Pro: Most performant.
+				- Pro: separation of concerns?
+				- Maybe even less error prone.
+				- Later might be handy to iterate through the already generated tree.
+	- Different strategy for restarting?
+		- Just reset transforms of all players
+		- Set them to full
+
 - GUI required by modes
 	- Arena GUI
 		- Used by bomb modes, TDM modes etc.

@@ -323,7 +323,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 						cosmic::create_entity(
 							cosm,
 							r_id,
-							[&](const auto typed_remnant) {
+							[&](const auto typed_remnant, auto&&...) {
 								auto spawn_offset = vec2(vel).normalize() * rng.randval(55.f, 60.f);
 								const auto rot = rng.randval(0, 360);
 								

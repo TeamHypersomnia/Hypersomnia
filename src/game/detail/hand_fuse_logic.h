@@ -26,7 +26,7 @@ struct fuse_logic_provider {
 	template <class T>
 	static bool is_standing_still(const T& who) {
 		if (const auto movement = who.template find<components::movement>()) {
-			return !movement->any_moving_requested();
+			return !movement->flags.any_moving_requested();
 		}
 
 		return false;

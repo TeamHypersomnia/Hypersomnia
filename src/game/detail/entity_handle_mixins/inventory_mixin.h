@@ -95,14 +95,11 @@ public:
 	wielding_result make_wielding_transfers_for(hand_selections_array) const;
 	wielding_result swap_wielded_items() const;
 
-private:
 	template <class S, class I>
 	callback_result for_each_contained_slot_and_item_recursive(
 		S slot_callback, 
 		I item_callback
 	) const;
-
-public:
 
 	template <class A, class G>
 	void for_each_attachment_recursive(

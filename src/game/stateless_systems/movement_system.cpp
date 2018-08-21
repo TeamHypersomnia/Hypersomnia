@@ -33,22 +33,22 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 				if (auto* const movement = subject.template find<components::movement>()) {
 					switch (it.intent) {
 						case game_intent_type::MOVE_FORWARD:
-							movement->moving_forward = it.was_pressed();
+							movement->flags.forward = it.was_pressed();
 							break;
 						case game_intent_type::MOVE_BACKWARD:
-							movement->moving_backward = it.was_pressed();
+							movement->flags.backward = it.was_pressed();
 							break;
 						case game_intent_type::MOVE_LEFT:
-							movement->moving_left = it.was_pressed();
+							movement->flags.left = it.was_pressed();
 							break;
 						case game_intent_type::MOVE_RIGHT:
-							movement->moving_right = it.was_pressed();
+							movement->flags.right = it.was_pressed();
 							break;
 						case game_intent_type::WALK:
-							movement->walking_enabled = it.was_pressed();
+							movement->flags.walking = it.was_pressed();
 							break;
 						case game_intent_type::SPRINT:
-							movement->sprint_enabled = it.was_pressed();
+							movement->flags.sprint = it.was_pressed();
 							break;
 
 						default: break;
@@ -87,7 +87,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 			auto movement_force_mult = 1.f;
 
-			movement.was_sprint_effective = movement.sprint_enabled;
+			movement.was_sprint_effective = movement.flags.sprint;
 
 			value_meter::damage_result consciousness_damage_by_sprint;
 			float minimum_consciousness_to_sprint = 0.f;
@@ -159,7 +159,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					}
 				}
 
-				if (movement.walking_enabled) {
+				if (movement.flags.walking) {
 					movement_force_mult /= 2.f;
 				}
 

@@ -56,7 +56,7 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 		cosmic::create_entity(
 			cosmos, 
 			spell_data.missile_flavour,
-			[&](const auto new_energy_ball){
+			[&](const auto new_energy_ball, auto&&...) {
 				auto new_energy_ball_transform = caster_transform;
 
 				new_energy_ball_transform.rotation = 

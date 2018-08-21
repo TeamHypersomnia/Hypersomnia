@@ -32,6 +32,7 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 
 	test_scene_mode_vars test_vars;
 	bomb_mode_vars bomb_vars;
+	bomb_vars.warmup_secs = 7;
 
 	const auto& settings = in.settings.test_scene;
 

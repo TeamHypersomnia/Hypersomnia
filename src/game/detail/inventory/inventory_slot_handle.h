@@ -49,6 +49,7 @@ public:
 
 	entity_handle_type get_item_if_any() const;
 	entity_handle_type get_container() const;
+	slot_function get_type() const;
 
 	entity_handle_type get_root_container() const;
 	entity_handle_type get_root_container_until(const entity_id container_entity) const;
@@ -257,6 +258,11 @@ bool basic_inventory_slot_handle<E>::is_child_of(const entity_id container_entit
 template <class E>
 E basic_inventory_slot_handle<E>::get_container() const {
 	return get_cosmos()[raw_id.container_entity];
+}
+
+template <class E>
+slot_function basic_inventory_slot_handle<E>::get_type() const {
+	return raw_id.type;
 }
 
 template <class E>

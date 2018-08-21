@@ -149,7 +149,7 @@ void instantiate_flavour_command::redo(const editor_command_input in) {
 			created_id = cosmic::specific_create_entity(
 				cosm,
 			   	flavour_id,
-			   	[this](const auto typed_handle) {
+			   	[this](const auto typed_handle, auto&&...) {
 					typed_handle.set_logic_transform(transformr(where));
 				}
 			).get_id();

@@ -82,17 +82,11 @@ public:
 
 			if (info.is_ldown_or_double_or_triple()) {
 				this_id->click_callback_required = true;
-				this_id->click_sound.stop();
-				this_id->click_sound.bind_buffer(sounds.button_click);
-				this_id->click_sound.set_direct_channels(true);
-				this_id->click_sound.play();
+				this_id->click_sound.just_play(sounds.button_click);
 			}
 			if (info.msg == gui_event::hover) {
 				this_id->elapsed_hover_time_ms = 0.f;
-				this_id->hover_sound.stop();
-				this_id->hover_sound.bind_buffer(sounds.button_hover);
-				this_id->hover_sound.set_direct_channels(true);
-				this_id->hover_sound.play();
+				this_id->hover_sound.just_play(sounds.button_hover);
 			}
 		}
 	}

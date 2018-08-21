@@ -6,6 +6,7 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/create_entity.hpp"
 #include "game/detail/inventory/generate_equipment.h"
+#include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 
 using input_type = bomb_mode::input;
 
@@ -38,18 +39,57 @@ faction_type bomb_mode::get_player_faction(const mode_player_id& id) const {
 	return faction_type::NONE;
 }
 
-void bomb_mode::init_spawned(const input in, const entity_id id, const logic_step step) {
-	const auto handle = in.cosm[id];
+void bomb_mode::init_spawned(
+	const input in, 
+	const entity_id id, 
+	const logic_step step,
+	const bomb_mode::round_transferred_player* const transferred
+) {
+	auto& cosm = in.cosm;
+	const auto handle = cosm[id];
 	const auto& faction_vars = in.vars.factions[handle.get_official_faction()];
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
-		::generate_equipment(faction_vars.initial_eq, typed_handle, step);
+		if (transferred != nullptr && transferred->survived) {
+			const auto& eq = transferred->saved_eq;
+
+			std::vector<entity_id> created_items;
+
+			for (const auto& i : eq.items) {
+				const auto& idx = i.container_index;
+				const auto target_container = 
+					idx < created_items.size() ? 
+					created_items[idx] : 
+					entity_id(typed_handle.get_id())
+				;
+
+				cosmic::create_entity(
+					cosm,
+					i.flavour,
+					[&](const auto&, auto& raw_entity) {
+						auto& item = raw_entity.template get<components::item>();
+						item.charges = i.charges;
+						item.current_slot = { i.slot_type, target_container };
+					},
+					[&](const auto&) {
+
+					}
+				);
+			}
+		}
+		else {
+			::generate_equipment(faction_vars.initial_eq, typed_handle, step);
+		}
 
 		auto& sentience = typed_handle.template get<components::sentience>();
 
 		for_each_through_std_get(sentience.meters, [](auto& m) { m.make_full(); });
 
 		fill_range(sentience.learned_spells, true);
+
+		if (transferred != nullptr) {
+			typed_handle.template get<components::movement>().flags = transferred->movement;
+		}
 	});
 }
 
@@ -190,15 +230,36 @@ bool bomb_mode::auto_assign_faction(const cosmos& cosm, const mode_player_id& id
 	return false;
 }
 
-void bomb_mode::setup_round(input_type in, const logic_step step) {
+void bomb_mode::set_players_frozen(const input_type in, const bool flag) {
+	if (cache_players_frozen == flag) {
+		return;
+	}
+
+	cache_players_frozen = flag;
+
+	for (auto& it : players) {
+		auto& player_data = it.second;
+
+		if (const auto handle = in.cosm[player_data.guid]) {
+			handle.set_frozen(flag);
+		}
+	}
+}
+
+void bomb_mode::setup_round(
+	const input_type in, 
+	const logic_step step, 
+	const bomb_mode::round_transferred_players& transfers
+) {
 	auto& cosm = in.cosm;
 	cosm.set(in.initial_signi);
+	cache_players_frozen = false;
 
 	for_each_faction([&](const auto faction) {
 		reshuffle_spawns(cosm, faction);
 	});
 
-	auto create_player = [&](const auto faction) {
+	auto create_player = [&](const auto faction, const auto& id) {
 		if (const auto flavour = ::find_faction_character_flavour(cosm, faction); flavour.is_set()) {
 			auto new_player = cosmic::create_entity(
 				cosm, 
@@ -206,7 +267,7 @@ void bomb_mode::setup_round(input_type in, const logic_step step) {
 				[](auto&&...) {},
 				[&](const auto new_character) {
 					teleport_to_next_spawn(in, new_character);
-					init_spawned(in, new_character, step);
+					init_spawned(in, new_character, step, mapped_or_nullptr(transfers, id));
 				}
 			);
 
@@ -217,39 +278,155 @@ void bomb_mode::setup_round(input_type in, const logic_step step) {
 	};
 
 	for (auto& it : players) {
+		const auto id = it.first;
 		auto& player_data = it.second;
 
-		if (const auto handle = create_player(player_data.faction)) {
+		if (const auto handle = create_player(player_data.faction, id)) {
 			cosmic::set_specific_name(handle, player_data.chosen_name);
-			
-			if (in.vars.freeze_secs > 0.f) {
-				handle.set_frozen(true);
-			}
-
 			player_data.guid = handle.get_guid();
 		}
 	}
 
-	unfrozen_already = false;
+	if (in.vars.freeze_secs > 0.f) {
+		if (state != arena_mode_state::WARMUP) {
+			set_players_frozen(in, true);
+		}
+	}
 }
 
-void bomb_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, const logic_step step) {
-	auto& cosm = in.cosm;
+bomb_mode::round_transferred_players bomb_mode::make_transferred_players(const input_type in) const {
+	round_transferred_players result;
 
-	if (!unfrozen_already && get_freeze_seconds_left(in) <= 0.f) {
-		for (const auto& it : players) {
-			cosm[it.second.guid].set_frozen(false);
+	for (auto& it : players) {
+		const auto id = it.first;
+		auto& player_data = it.second;
+
+		if (const auto handle = in.cosm[player_data.guid]) {
+			auto& pm = result[id];
+			pm.movement = handle.get<components::movement>().flags;
+
+			if (handle.sentient_and_unconscious()) {
+				continue;
+			}
+
+			auto& eq = pm.saved_eq;
+			auto& items = eq.items;
+			pm.survived = true;
+
+			handle.for_each_contained_item_recursive(
+				[&](const auto typed_item) {
+					const auto flavour_id = typed_item.get_flavour_id();
+					const auto slot = typed_item.get_current_slot();
+					const auto container_id = slot.get_container().get_id();
+					const auto container_index = mapped_or_default(
+						eq.id_to_container_idx, 
+						container_id, 
+						static_cast<std::size_t>(-1)
+					);
+					
+					if (container_index == static_cast<std::size_t>(-1)) {
+						ensure_eq(handle.get_id(), container_id);
+					}
+
+					const auto charges = typed_item.template get<components::item>().get_charges();
+
+					if (typed_item.template has<invariants::container>()) {
+						const auto new_idx = eq.items.size();
+						eq.id_to_container_idx.try_emplace(typed_item.get_id(), new_idx);
+					}
+
+					items.push_back({ flavour_id, charges, container_index, slot.get_type() });
+
+					return recursive_callback_result::CONTINUE_AND_RECURSE;
+				}
+			);
+		}
+	}
+
+	return result;
+}
+
+void bomb_mode::start_next_round(const input_type in, const logic_step step) {
+	setup_round(in, step, make_transferred_players(in));
+}
+
+void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy, const logic_step step) {
+	(void)entropy;
+
+	if (state == arena_mode_state::INIT) {
+		if (in.vars.warmup_secs > 4) {
+			state = arena_mode_state::WARMUP;
+		}
+		else {
+			state = arena_mode_state::LIVE;
 		}
 
-		unfrozen_already = true;
-	}
-
-	if (start_scheduled || get_round_seconds_left(in) <= 0.f) {
 		setup_round(in, step);
-		start_scheduled = false;
+	}
+	else if (state == arena_mode_state::WARMUP) {
+		respawn_the_dead(in, step, in.vars.warmup_respawn_after_ms);
+
+		if (get_warmup_seconds_left(in) <= 0.f) {
+			set_players_frozen(in, true);
+
+			if (get_match_begins_in_seconds(in) <= 0.f) {
+				state = arena_mode_state::LIVE;
+				setup_round(in, step);
+			}
+		}
+	}
+	else if (state == arena_mode_state::LIVE) {
+		if (get_freeze_seconds_left(in) <= 0.f) {
+			set_players_frozen(in, false);
+		}
+
+		if (get_round_seconds_left(in) < 0.f) {
+			start_next_round(in, step);
+		}
+	}
+}
+
+void bomb_mode::respawn_the_dead(const input_type in, const logic_step step, const unsigned after_ms) {
+	auto& cosm = in.cosm;
+	const auto& clk = cosm.get_clock();
+
+	cosm.for_each_having<components::sentience>([&](const auto typed_handle) {
+		auto& sentience = typed_handle.template get<components::sentience>();
+
+		if (sentience.when_knocked_out.was_set() && clk.is_ready(
+			after_ms,
+			sentience.when_knocked_out
+		)) {
+			teleport_to_next_spawn(in, typed_handle);
+			init_spawned(in, typed_handle, step, nullptr);
+
+			sentience.when_knocked_out = {};
+		}
+	});
+}
+
+const float match_begins_in_secs = 4.f;
+
+float bomb_mode::get_warmup_seconds_left(const input_type in) const {
+	if (state == arena_mode_state::WARMUP) {
+		return static_cast<float>(in.vars.warmup_secs) - get_total_seconds(in);
 	}
 
-	(void)entropy;
+	return -1.f;
+}
+
+float bomb_mode::get_match_begins_in_seconds(const input_type in) const {
+	if (state == arena_mode_state::WARMUP) {
+		const auto secs = get_total_seconds(in);
+		const auto warmup_secs = static_cast<float>(in.vars.warmup_secs);
+
+		if (secs >= warmup_secs) {
+			/* It's after the warmup. */
+			return warmup_secs + match_begins_in_secs - secs;
+		}
+	}
+
+	return -1.f;
 }
 
 float bomb_mode::get_total_seconds(const input_type in) const {
@@ -260,11 +437,11 @@ float bomb_mode::get_total_seconds(const input_type in) const {
 }
 
 float bomb_mode::get_freeze_seconds_left(const input_type in) const {
-	return in.vars.freeze_secs - get_total_seconds(in);
+	return static_cast<float>(in.vars.freeze_secs) - get_total_seconds(in);
 }
 
 float bomb_mode::get_round_seconds_left(const input_type in) const {
-	return in.vars.round_secs + in.vars.freeze_secs - get_total_seconds(in);
+	return static_cast<float>(in.vars.round_secs) + in.vars.freeze_secs - get_total_seconds(in);
 }
 
 unsigned bomb_mode::get_round_num() const {

@@ -4,7 +4,7 @@
 
 template <class T>
 auto transform_setter(const T& where) {
-	return [where](const auto handle) {
+	return [where](const auto handle, auto&&...) {
 		handle.set_logic_transform(where);		
 	};
 }
@@ -26,6 +26,6 @@ auto create_test_scene_entity(C& cosm, const E enum_flavour, const transformr wh
 
 template <class C, class E>
 auto create_test_scene_entity(C& cosm, const E enum_flavour) {
-	return cosmic::specific_create_entity(cosm, to_entity_flavour_id(enum_flavour), [](const auto) {});
+	return cosmic::specific_create_entity(cosm, to_entity_flavour_id(enum_flavour), [](auto&&...) {});
 }
 

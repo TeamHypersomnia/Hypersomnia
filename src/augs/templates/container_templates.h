@@ -163,6 +163,19 @@ auto mapped_or_nullptr(
 	}
 }
 
+template <class C, class K, class T>
+T mapped_or_default(
+	C&& container,
+	K&& key,
+	T def
+) {
+	if (auto* const ptr = mapped_or_nullptr(std::forward<C>(container), std::forward<K>(key))) {
+		return *ptr;
+	}
+
+	return def;
+}
+
 template <class Container>
 auto accumulate_mapped_values(Container& container) {
 	using M = typename remove_cref<Container>::mapped_type;

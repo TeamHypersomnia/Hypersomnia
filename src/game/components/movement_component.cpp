@@ -2,7 +2,7 @@
 
 namespace components {
 	void movement::set_flags_from_closest_direction(vec2 d) {
-		moving_left = moving_right = moving_forward = moving_backward = false;
+		flags.left = flags.right = flags.forward = flags.backward = false;
 
 		static const vec2 dirs[] = {
 			vec2::from_degrees(0),
@@ -18,41 +18,41 @@ namespace components {
 		const auto dir_num = std::min_element(dirs, dirs + 8, [d](vec2 a, vec2 b) { return a.dot(d) > b.dot(d); }) - dirs;
 
 		if (dir_num == 0) {
-			moving_right = true;
+			flags.right = true;
 		}
 		else if (dir_num == 1) {
-			moving_right = true;
-			moving_backward = true;
+			flags.right = true;
+			flags.backward = true;
 		}
 		else if (dir_num == 2) {
-			moving_backward = true;
+			flags.backward = true;
 		}
 		else if (dir_num == 3) {
-			moving_left = true;
-			moving_backward = true;
+			flags.left = true;
+			flags.backward = true;
 		}
 		else if (dir_num == 4) {
-			moving_left = true;
+			flags.left = true;
 		}
 		else if (dir_num == 5) {
-			moving_left = true;
-			moving_forward = true;
+			flags.left = true;
+			flags.forward = true;
 		}
 		else if (dir_num == 6) {
-			moving_forward = true;
+			flags.forward = true;
 		}
 		else if (dir_num == 7) {
-			moving_right = true;
-			moving_forward = true;
+			flags.right = true;
+			flags.forward = true;
 		}
 	}
 
 	void movement::set_flags_from_target_direction(const vec2 d) {
-		moving_left = moving_right = moving_forward = moving_backward = false;
-		if (d.x > 0) moving_right = true;
-		if (d.y > 0) moving_backward = true;
-		if (d.x < 0) moving_left = true;
-		if (d.y < 0) moving_forward = true;
+		flags.left = flags.right = flags.forward = flags.backward = false;
+		if (d.x > 0) flags.right = true;
+		if (d.y > 0) flags.backward = true;
+		if (d.x < 0) flags.left = true;
+		if (d.y < 0) flags.forward = true;
 	}
 
 	vec2 movement::get_force_requested_by_input(const vec2& axes) const {
@@ -61,12 +61,12 @@ namespace components {
 		}
 
 		return {
-			moving_right * axes.x - moving_left * axes.x,
-			moving_backward * axes.y - moving_forward * axes.y
+			flags.right * axes.x - flags.left * axes.x,
+			flags.backward * axes.y - flags.forward * axes.y
 		};
 	}
 	
 	void movement::reset_movement_flags() {
-		moving_left = moving_right = moving_forward = moving_backward = walking_enabled = sprint_enabled = false;
+		flags = {};
 	}
 }

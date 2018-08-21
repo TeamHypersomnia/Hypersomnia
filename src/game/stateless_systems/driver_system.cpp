@@ -181,10 +181,10 @@ bool driver_system::change_car_ownership(
 			movement->enable_braking_damping = true;
 #endif
 
-			movement->moving_left = car.turning_left;
-			movement->moving_right = car.turning_right;
-			movement->moving_forward = car.accelerating;
-			movement->moving_backward = car.decelerating;
+			movement->flags.left = car.turning_left;
+			movement->flags.right = car.turning_right;
+			movement->flags.forward = car.accelerating;
+			movement->flags.backward = car.decelerating;
 		}
 		
 		car.reset_movement_flags();

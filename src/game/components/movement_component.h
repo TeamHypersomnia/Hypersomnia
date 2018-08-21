@@ -54,18 +54,28 @@ struct movement_animation_state {
 	}
 };
 
+struct movement_flags {
+	// GEN INTROSPECTOR struct movement_flags
+	bool left = false;
+	bool right = false;
+	bool forward = false;
+	bool backward = false;
+
+	bool walking = false;
+	bool sprint = false;
+	// END GEN INTROSPECTOR
+
+	bool any_moving_requested() const {
+		return left || right || forward || backward;
+	}
+};
+
 namespace components {
 	struct movement {
 		// GEN INTROSPECTOR struct components::movement
-		bool moving_left = false;
-		bool moving_right = false;
-		bool moving_forward = false;
-		bool moving_backward = false;
+		movement_flags flags;
 
-		bool walking_enabled = false;
-		bool sprint_enabled = false;
 		bool was_sprint_effective = false;
-		
 		bool frozen = false;
 
 		float make_inert_for_ms = 0.f;
@@ -73,15 +83,6 @@ namespace components {
 
 		movement_animation_state four_ways_animation;
 		// END GEN INTROSPECTOR
-
-		bool any_moving_requested() const {
-			return 
-				moving_left
-				|| moving_right
-				|| moving_forward
-				|| moving_backward
-			;
-		}
 
 		void reset_movement_flags();
 		vec2 get_force_requested_by_input(const vec2& axes) const;

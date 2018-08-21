@@ -72,11 +72,11 @@ void cosmic::infer_all_entities(cosmos& cosm) {
 	/* 
 		Infer domain-wise.
 
-		In normal circumstances, when an entity depends on caches of another entity,
-		the inferrers see all caches constructed for that entity, never just some.
+		In normal circumstances, when an entity A depends on caches of entity B,
+		the inferrers see all caches constructed for entity B, never just some.
 
 		This works because a dependency of an entity is always fully constructed
-		when a dependent entity comes into existence.
+		by the time a dependent entity comes into existence.
 
 		Here however, we have no idea which entity depends on which,
 		so we solve these dependencies by inferring domain-wise.

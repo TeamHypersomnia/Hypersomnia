@@ -232,7 +232,7 @@ namespace test_scenes {
 				}
 
 				{
-					create(test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
+					create(test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e, auto&&...){
 						auto& w = e.template get<components::wandering_pixels>();
 
 						w.colorize = light_cyan;
@@ -268,7 +268,7 @@ namespace test_scenes {
 				const auto right_reach = xywh(1164.f - 8.f + 90.f - 600, 220 - 250, 1000, 600);
 
 				{
-					create(test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
+					create(test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e, auto&&...){
 
 						auto& w = e.template get<components::wandering_pixels>();
 
@@ -280,7 +280,7 @@ namespace test_scenes {
 				}
 
 				{
-					create(test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
+					create(test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e, auto&&...){
 
 						auto& w = e.template get<components::wandering_pixels>();
 
@@ -549,7 +549,7 @@ namespace test_scenes {
 			}
 
 
-			create(test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e){
+			create(test_wandering_pixels_decorations::WANDERING_PIXELS, [&](const auto e, auto&&...){
 				auto& w = e.template get<components::wandering_pixels>();
 
 				w.colorize = cyan;
@@ -559,11 +559,11 @@ namespace test_scenes {
 				e.set_logic_transform(aquarium_origin);
 			});
 
-			create(test_wandering_pixels_decorations::AQUARIUM_PIXELS_LIGHT, [&](const auto e){
+			create(test_wandering_pixels_decorations::AQUARIUM_PIXELS_LIGHT, [&](const auto e, auto&&...){
 				e.set_logic_transform(aquarium_origin);
 			});
 
-			create(test_wandering_pixels_decorations::AQUARIUM_PIXELS_DIM, [&](const auto e){
+			create(test_wandering_pixels_decorations::AQUARIUM_PIXELS_DIM, [&](const auto e, auto&&...){
 				e.set_logic_transform(aquarium_origin);
 			});
 

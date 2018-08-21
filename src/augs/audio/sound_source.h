@@ -71,6 +71,8 @@ namespace augs {
 			std::size_t variation_index
 		);
 
+		void just_play(const single_sound_buffer&, float gain = -1.f);
+
 		void unbind_buffer();
 		const single_sound_buffer* get_bound_buffer() const;
 

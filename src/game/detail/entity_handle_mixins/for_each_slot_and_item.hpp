@@ -11,48 +11,59 @@ callback_result inventory_mixin<E>::for_each_contained_slot_and_item_recursive(
 	const auto this_container = *static_cast<const E*>(this);
 	auto& cosm = this_container.get_cosmos();
 
-	if (const auto container = this_container.template find<invariants::container>()) {
-		for (const auto& s : container->slots) {
-			const auto this_slot_id = inventory_slot_id(s.first, this_container.get_id());
-			const auto slot_callback_result = slot_callback(cosm[this_slot_id]);
+	return this_container.template dispatch_on_having_all_ret<invariants::container>([&](const auto typed_container) {
+		if constexpr(std::is_same_v<const std::nullopt_t, decltype(typed_container)>) {
+			return callback_result::CONTINUE;
+		}
+		else {
+			auto& container = typed_container.template get<invariants::container>();
 
-			if (slot_callback_result == recursive_callback_result::ABORT) {
-				return callback_result::ABORT;
-			}
-			else if (slot_callback_result == recursive_callback_result::CONTINUE_DONT_RECURSE) {
-				continue;
-			}
-			else if (slot_callback_result == recursive_callback_result::CONTINUE_AND_RECURSE) {
-				for (const auto& id : get_items_inside(this_container, s.first)) {
-					const auto child_item_handle = cosm[id];
-					const auto item_callback_result = item_callback(child_item_handle);
+			for (const auto& s : container.slots) {
+				const auto this_slot_id = inventory_slot_id(s.first, typed_container.get_id());
+				const auto slot_callback_result = slot_callback(cosm[this_slot_id]);
 
-					if (item_callback_result == recursive_callback_result::ABORT) {
-						return callback_result::ABORT;
-					}
-					else if (item_callback_result == recursive_callback_result::CONTINUE_DONT_RECURSE) {
-						continue;
-					}
-					else if (item_callback_result == recursive_callback_result::CONTINUE_AND_RECURSE) {
-						if (child_item_handle.for_each_contained_slot_and_item_recursive(
-							slot_callback,
-							item_callback
-						) == callback_result::ABORT) {
+				if (slot_callback_result == recursive_callback_result::ABORT) {
+					return callback_result::ABORT;
+				}
+				else if (slot_callback_result == recursive_callback_result::CONTINUE_DONT_RECURSE) {
+					continue;
+				}
+				else if (slot_callback_result == recursive_callback_result::CONTINUE_AND_RECURSE) {
+					for (const auto& id : get_items_inside(typed_container, s.first)) {
+						const auto result = cosm[id].template dispatch_on_having_all_ret<components::item>(
+							[&](const auto& child_item_handle) {
+								if constexpr(!std::is_same_v<decltype(child_item_handle), const std::nullopt_t&>) {
+									const auto r = item_callback(child_item_handle);
+
+									if (r == recursive_callback_result::CONTINUE_AND_RECURSE) {
+										const auto next_r = child_item_handle.for_each_contained_slot_and_item_recursive(slot_callback, item_callback);
+
+										if (callback_result::ABORT == next_r) {
+											return recursive_callback_result::ABORT;
+										}
+									}
+
+									return r;
+								}
+								else {
+									return recursive_callback_result::ABORT;
+								}
+							}
+						);
+
+						if (result == recursive_callback_result::ABORT) {
 							return callback_result::ABORT;
 						}
-					}
-					else {
-						ensure(false && "bad recursive_callback_result");
+						else if (result == recursive_callback_result::CONTINUE_DONT_RECURSE) {
+							continue;
+						}
 					}
 				}
 			}
-			else {
-				ensure(false && "bad recursive_callback_result");
-			}
-		}
-	}
 
-	return callback_result::CONTINUE;
+			return callback_result::CONTINUE;
+		}
+	});
 }
 
 template <class E>

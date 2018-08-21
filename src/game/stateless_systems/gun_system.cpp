@@ -181,7 +181,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							cosmic::create_entity(
 								cosmos, 
 								magic_missile_flavour_id,
-								[&](const auto round_entity) {
+								[&](const auto round_entity, auto&&...) {
 									round_entity.set_logic_transform(muzzle_transform);
 
 									auto& sender = round_entity.template get<components::sender>();
@@ -292,7 +292,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 						while (charges--) {
 							if (const auto round_flavour = single_bullet_or_pellet_stack.get<invariants::cartridge>().round_flavour; round_flavour.is_set()) {
-								cosmic::create_entity(cosmos, round_flavour, [&](const auto round_entity){
+								cosmic::create_entity(cosmos, round_flavour, [&](const auto round_entity, auto&&...){
 									auto& sender = round_entity.template get<components::sender>();
 									sender.set(gun_entity);
 
@@ -326,7 +326,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						}
 
 						if (const auto shell_flavour = single_bullet_or_pellet_stack.get<invariants::cartridge>().shell_flavour; shell_flavour.is_set()) {
-							cosmic::create_entity(cosmos, shell_flavour, [&](const auto shell_entity){
+							cosmic::create_entity(cosmos, shell_flavour, [&](const auto shell_entity, auto&&...){
 								auto rng = cosmos.get_rng_for(shell_entity);
 
 								const auto spread_component = rng.randval_h(gun_def.shell_spread_degrees) + gun_def.shell_spawn_offset.rotation;

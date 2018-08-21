@@ -70,7 +70,7 @@ mode_player_id test_scene_mode::add_player(input_type in, const faction_type fac
 		if (cosmic::create_entity(
 			cosm, 
 			entity_flavour_id(flavour), 
-			[&](const auto new_character) {
+			[&](const auto new_character, auto&&...) {
 				teleport_to_next_spawn(in, new_character);
 				pending_inits.push_back(new_character.get_guid());
 

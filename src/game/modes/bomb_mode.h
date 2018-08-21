@@ -1,4 +1,6 @@
 #pragma once
+#include <unordered_map>
+
 #include "augs/math/declare_math.h"
 #include "game/detail/inventory/requested_equipment.h"
 #include "game/enums/faction_type.h"
@@ -7,6 +9,7 @@
 #include "game/detail/economy/money_type.h"
 #include "game/modes/mode_player_id.h"
 #include "game/modes/mode_common.h"
+#include "game/components/movement_component.h"
 
 struct entity_guid;
 struct entity_id;
@@ -24,9 +27,11 @@ struct bomb_mode_vars {
 	// GEN INTROSPECTOR struct bomb_mode_vars
 	std::string name;
 	money_type initial_money = 800;
-	real32 round_secs = 120.f;
-	real32 freeze_secs = 5.f;
+	unsigned round_secs = 120;
+	unsigned freeze_secs = 5;
+	unsigned warmup_secs = 45;
 	unsigned max_rounds = 5;
+	unsigned warmup_respawn_after_ms = 2000;
 	per_faction_t<bomb_mode_faction_vars> factions;
 	// END GEN INTROSPECTOR
 };
@@ -44,11 +49,20 @@ struct bomb_mode_player {
 	entity_guid guid;
 	entity_name_str chosen_name;
 	faction_type faction = faction_type::NONE;
+	money_type money = 0;
 	// END GEN INTROSPECTOR
 
 	bomb_mode_player(const entity_name_str& chosen_name = {}) : 
 		chosen_name(chosen_name) 
 	{}
+};
+
+enum class arena_mode_state {
+	// GEN INTROSPECTOR enum class arena_mode_state
+	INIT,
+	WARMUP,
+	LIVE
+	// END GEN INTROSPECTOR
 };
 
 class bomb_mode {
@@ -64,26 +78,51 @@ public:
 	};
 
 private:
+	struct transferred_inventory {
+		struct item {
+			constrained_entity_flavour_id<components::item> flavour;
+
+			int charges = -1;
+			std::size_t container_index = static_cast<std::size_t>(-1);
+			slot_function slot_type = slot_function::INVALID;
+		};
+
+		std::unordered_map<entity_id, std::size_t> id_to_container_idx;
+		std::vector<item> items;
+	};
+
+	struct round_transferred_player {
+		movement_flags movement;
+		bool survived = false;
+		transferred_inventory saved_eq;
+	};
+
+	using round_transferred_players = std::unordered_map<mode_player_id, round_transferred_player>;
+	round_transferred_players make_transferred_players(input) const;
+
 	bool still_freezed() const;
 	unsigned get_round_index() const;
 
 	void teleport_to_next_spawn(input, entity_id character);
-	void init_spawned(input, entity_id character, logic_step);
+	void init_spawned(input, entity_id character, logic_step, const round_transferred_player* = nullptr);
 
 	void mode_pre_solve(input, const mode_entropy&, logic_step);
 
-	void setup_round(input, logic_step);
+	void start_next_round(input, logic_step);
+	void setup_round(input, logic_step, const round_transferred_players& = {});
 	void reshuffle_spawns(const cosmos&, faction_type);
 
 	bomb_mode_player* find(const mode_player_id&);
 	const bomb_mode_player* find(const mode_player_id&) const;
 
+	void set_players_frozen(input in, bool flag);
 	std::size_t num_players_in_faction(faction_type) const;
+	void respawn_the_dead(input, logic_step, unsigned after_ms);
 
 public:
 	// GEN INTROSPECTOR class bomb_mode
-	bool start_scheduled = true;
-	bool unfrozen_already = false;
+	arena_mode_state state = arena_mode_state::INIT;
+	bool cache_players_frozen = false;
 	per_faction_t<bomb_mode_faction_state> factions;
 	std::unordered_map<mode_player_id, bomb_mode_player> players;
 	// END GEN INTROSPECTOR
@@ -100,6 +139,9 @@ public:
 	unsigned get_round_num() const;
 
 	float get_total_seconds(input) const;
+
+	float get_warmup_seconds_left(input) const;
+	float get_match_begins_in_seconds(input) const;
 
 	float get_freeze_seconds_left(input) const;
 	float get_round_seconds_left(input) const;
