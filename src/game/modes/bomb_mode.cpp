@@ -258,6 +258,7 @@ void bomb_mode::setup_round(
 	const bomb_mode::round_transferred_players& transfers
 ) {
 	auto& cosm = in.cosm;
+	clock_before_setup = cosm.get_clock();
 	cosm.set(in.initial_signi);
 	cache_players_frozen = false;
 
@@ -383,11 +384,31 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 	}
 	else if (state == arena_mode_state::LIVE) {
 		if (get_freeze_seconds_left(in) <= 0.f) {
+			if (cache_players_frozen) {
+				const auto p = calc_participating_factions(in.cosm);
+
+				for_each_faction([&](const faction_type t) {
+					if (p[t]) {
+						if (const auto sound_id = in.vars.event_sounds[t][battle_event::START]; sound_id.is_set()) {
+							sound_effect_input effect;
+							effect.id = sound_id;
+
+							sound_effect_start_input input;
+							input.listener_faction = t;
+							input.variation_number = clock_before_setup.now.step + get_round_num();
+
+							effect.start(step, input);
+						}
+					}
+				});
+			}
+
 			set_players_frozen(in, false);
 		}
 
 		if (get_round_seconds_left(in) < 0.f) {
 			start_next_round(in, step);
+			++factions[faction_type::METROPOLIS].score;
 		}
 	}
 }

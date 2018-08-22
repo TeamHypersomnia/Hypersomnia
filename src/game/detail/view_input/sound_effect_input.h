@@ -8,6 +8,7 @@
 #include "game/detail/transform_copying.h"
 #include "game/cosmos/entity_handle_declaration.h"
 #include "game/cosmos/step_declaration.h"
+#include "game/enums/faction_type.h"
 
 struct sound_effect_modifier {
 	// GEN INTROSPECTOR struct sound_effect_modifier
@@ -27,6 +28,8 @@ struct sound_effect_modifier {
 struct sound_effect_start_input {
 	absolute_or_local positioning;
 	entity_id direct_listener;
+	bool always_direct_listener = false;
+	faction_type listener_faction = faction_type::NONE;
 	std::size_t variation_number = static_cast<std::size_t>(-1);
 
 	static sound_effect_start_input fire_and_forget(const transformr where) {

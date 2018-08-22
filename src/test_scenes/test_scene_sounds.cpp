@@ -12,6 +12,9 @@
 
 #include "view/viewables/sound_definition.h"
 
+#include "game/enums/battle_event.h"
+#include "game/enums/faction_type.h"
+
 void load_test_scene_sounds(sound_definitions_map& all_definitions) {
 	using test_id_type = test_scene_sound_id;
 

@@ -59,9 +59,13 @@ class sound_system {
 
 			update_properties(in);
 			previous_transform = in.find_transform(positioning);
-			source.play();
+
+			if (should_play(in)) {
+				source.play();
+			}
 		}
 
+		bool should_play(update_properties_input in) const;
 		bool rebind_buffer(update_properties_input in);
 		bool update_properties(update_properties_input in);
 

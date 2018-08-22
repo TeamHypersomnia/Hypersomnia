@@ -74,7 +74,7 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 			}
 
 			//mode.auto_assign_faction(cosm, player_id);
-			mode.choose_faction(player_id, faction_type::RESISTANCE);
+			mode.choose_faction(player_id, faction_type::METROPOLIS);
 
 			player.current_mode_vars_id = bomb_vars_id;
 			player.current_mode.emplace<bomb_mode>(std::move(mode));

@@ -306,7 +306,7 @@ void editor_setup::perform_custom_imgui(
 
 	const bool has_ctrl = ImGui::GetIO().KeyCtrl;
 
-	if (is_editing_mode()) {
+	if (!is_gameplay_mode()) {
 		{
 			/* We don't want ugly borders in our menu bar */
 			auto window_border_size = scoped_style_var(ImGuiStyleVar_WindowBorderSize, 0.0f);

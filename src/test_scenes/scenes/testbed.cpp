@@ -62,6 +62,15 @@ namespace test_scenes {
 		metropolis.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SAMPLE_RIFLE);
 		metropolis.initial_eq.magazine = to_entity_flavour_id(test_container_items::SAMPLE_MAGAZINE);
 		metropolis.initial_eq.charge = to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE);
+
+		{
+			auto& mt = vars.event_sounds[faction_type::METROPOLIS];
+
+			mt[battle_event::START] = to_sound_id(test_scene_sound_id::MT_START);
+			mt[battle_event::BOMB_PLANTED] = to_sound_id(test_scene_sound_id::MT_BOMB_PLANTED);
+			mt[battle_event::BOMB_DEFUSED] = to_sound_id(test_scene_sound_id::MT_BOMB_DEFUSED);
+			mt[battle_event::ITS_TOO_LATE_RUN] = to_sound_id(test_scene_sound_id::MT_ITS_TOO_LATE_RUN);
+		}
 	}
 
 	void testbed::populate(const loaded_image_caches_map& caches, const logic_step step) const {

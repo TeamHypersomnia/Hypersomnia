@@ -10,6 +10,9 @@
 #include "game/modes/mode_player_id.h"
 #include "game/modes/mode_common.h"
 #include "game/components/movement_component.h"
+#include "game/enums/battle_event.h"
+#include "augs/misc/enum/enum_array.h"
+#include "augs/misc/timing/stepped_timing.h"
 
 struct entity_guid;
 struct entity_id;
@@ -33,6 +36,9 @@ struct bomb_mode_vars {
 	unsigned max_rounds = 5;
 	unsigned warmup_respawn_after_ms = 2000;
 	per_faction_t<bomb_mode_faction_vars> factions;
+
+	per_faction_t<per_faction_t<assets::sound_id>> win_sounds;
+	per_faction_t<augs::enum_array<assets::sound_id, battle_event>> event_sounds;
 	// END GEN INTROSPECTOR
 };
 
@@ -64,6 +70,8 @@ enum class arena_mode_state {
 	LIVE
 	// END GEN INTROSPECTOR
 };
+
+using cosmos_clock = augs::stepped_clock;
 
 class bomb_mode {
 public:
@@ -121,6 +129,7 @@ private:
 
 public:
 	// GEN INTROSPECTOR class bomb_mode
+	cosmos_clock clock_before_setup;
 	arena_mode_state state = arena_mode_state::INIT;
 	bool cache_players_frozen = false;
 	per_faction_t<bomb_mode_faction_state> factions;

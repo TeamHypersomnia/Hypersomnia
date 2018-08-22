@@ -111,9 +111,26 @@ bool sound_system::generic_sound_cache::rebind_buffer(const update_properties_in
 	return false;
 }
 
+bool sound_system::generic_sound_cache::should_play(const update_properties_input in) const {
+	const auto listening_character = in.get_listener();
+
+	const auto faction = listening_character.get_official_faction();
+	const auto target_faction = original.start.listener_faction;
+
+	return target_faction == faction_type::NONE || faction == target_faction;
+}
+
 bool sound_system::generic_sound_cache::update_properties(const update_properties_input in) {
 	const auto listening_character = in.get_listener();
-	const bool is_direct_listener = listening_character == original.start.direct_listener;
+
+	const auto faction = listening_character.get_official_faction();
+	const auto target_faction = original.start.listener_faction;
+
+	const bool is_direct_listener = 
+		original.start.always_direct_listener 
+		|| listening_character == original.start.direct_listener
+		|| (target_faction != faction_type::NONE && faction == target_faction)
+	;
 
 	const auto listener_pos = listening_character.get_viewing_transform(in.interp).pos;
 
