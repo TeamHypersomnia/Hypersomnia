@@ -77,8 +77,17 @@ namespace test_scenes {
 			re = vars.event_sounds[faction_type::METROPOLIS];
 		}
 
-		vars.win_sounds[faction_type::METROPOLIS][faction_type::RESISTANCE] = to_sound_id(test_scene_sound_id::MT_RESISTANCE_WINS);
-		vars.win_sounds[faction_type::METROPOLIS][faction_type::METROPOLIS] = to_sound_id(test_scene_sound_id::MT_METROPOLIS_WINS);
+		{
+			auto& mt = vars.win_sounds[faction_type::METROPOLIS];
+
+			mt[faction_type::RESISTANCE] = to_sound_id(test_scene_sound_id::MT_RESISTANCE_WINS);
+			mt[faction_type::METROPOLIS] = to_sound_id(test_scene_sound_id::MT_METROPOLIS_WINS);
+		}
+
+		{
+			auto& re = vars.win_sounds[faction_type::RESISTANCE];
+			re = vars.win_sounds[faction_type::METROPOLIS];
+		}
 
 		vars.bomb_flavour = to_entity_flavour_id(test_hand_explosives::BOMB);
 	}

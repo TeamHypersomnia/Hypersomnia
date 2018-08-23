@@ -32,9 +32,9 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 
 	test_scene_mode_vars test_vars;
 	bomb_mode_vars bomb_vars;
-	bomb_vars.warmup_secs = 8;
+	bomb_vars.warmup_secs = 0;
 	bomb_vars.round_secs = 8;
-	bomb_vars.freeze_secs = 5;
+	bomb_vars.freeze_secs = 0;
 	bomb_vars.round_end_secs = 5;
 
 	const auto& settings = in.settings.test_scene;
@@ -73,10 +73,8 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 			{
 				const auto in = bomb_mode::input { bomb_vars, cosm.get_solvable().significant, cosm };
 				player_id = mode.add_player(in, "Editor-player");
+				mode.auto_assign_faction(in, player_id);
 			}
-
-			//mode.auto_assign_faction(cosm, player_id);
-			mode.choose_faction(player_id, faction_type::METROPOLIS);
 
 			player.current_mode_vars_id = bomb_vars_id;
 			player.current_mode.emplace<bomb_mode>(std::move(mode));

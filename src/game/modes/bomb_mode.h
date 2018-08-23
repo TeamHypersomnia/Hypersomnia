@@ -155,7 +155,6 @@ private:
 	const bomb_mode_player* find(const mode_player_id&) const;
 
 	void set_players_frozen(input in, bool flag);
-	std::size_t num_players_in_faction(faction_type) const;
 	void respawn_the_dead(input, logic_step, unsigned after_ms);
 
 	template <class F>
@@ -172,6 +171,15 @@ private:
 	void play_win_sound(input, const_logic_step, faction_type) const;
 
 	void play_bomb_defused_sound(input, const_logic_step, faction_type) const;
+
+	template <class F>
+	void for_each_player_in(faction_type, F callback) const;
+
+	template <class C, class F>
+	void for_each_player_handle_in(C&, faction_type, F callback) const;
+
+	std::size_t num_conscious_players_in(const cosmos&, faction_type) const;
+	std::size_t num_players_in(faction_type) const;
 
 public:
 

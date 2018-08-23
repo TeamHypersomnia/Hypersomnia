@@ -86,11 +86,11 @@ faction_type bomb_mode::calc_weakest_faction(const input_type in) const {
 		std::size_t count;
 	} weakest { 
 		participating.bombing,
-		num_players_in_faction(participating.bombing)
+		num_players_in(participating.bombing)
 	};
 
 	participating.for_each([&](const auto f) { 
-		const auto n = num_players_in_faction(f);
+		const auto n = num_players_in(f);
 
 		if (n < weakest.count) {
 			weakest = { f, n };
@@ -271,19 +271,43 @@ void bomb_mode::reshuffle_spawns(const cosmos& cosm, const faction_type faction)
 	faction_state.current_spawn_index = 0;
 }
 
-std::size_t bomb_mode::num_players_in_faction(const faction_type type) const {
-	auto for_each_player = [&](auto callback) {
-		for (auto& it : players) {
+template <class F>
+void bomb_mode::for_each_player_in(const faction_type faction, F callback) const {
+	for (auto& it : players) {
+		if (it.second.faction == faction) {
 			callback(it.first, it.second);
 		}
-	};
+	}
+}
 
-	std::size_t total = 0;
+template <class C, class F>
+void bomb_mode::for_each_player_handle_in(C& cosm, const faction_type faction, F callback) const {
+	for_each_player_in(faction, [&](const auto&, const auto& data) {
+		if (const auto handle = cosm[data.guid]) {
+			handle.template dispatch_on_having_all<components::sentience>([&](const auto& typed_player) {
+				callback(typed_player);
+			});
+		}
+	});
+}
 
-	for_each_player([&](const auto&, const auto& player_state) {
-		if (player_state.faction == type) {
+std::size_t bomb_mode::num_conscious_players_in(const cosmos& cosm, const faction_type faction) const {
+	auto total = std::size_t(0);
+
+	for_each_player_handle_in(cosm, faction, [&](const auto& handle) {
+		if (handle.template get<components::sentience>().is_conscious()) {
 			++total;
 		}
+	});
+
+	return total;
+}
+
+std::size_t bomb_mode::num_players_in(const faction_type faction) const {
+	auto total = std::size_t(0);
+
+	for_each_player_in(faction, [&](auto&&...) {
+		++total;
 	});
 
 	return total;
