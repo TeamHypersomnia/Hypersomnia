@@ -45,31 +45,32 @@ class sound_system {
 		/* For calculating sound's velocity */
 		std::optional<transformr> previous_transform;
 
+		std::vector<sound_effect_input> followup_inputs;
+
 		generic_sound_cache() = default;
+
 		generic_sound_cache(
 			const packaged_sound_effect& original,
-			const update_properties_input in
-		) : 
-			original(original),
-			positioning(original.start.positioning)
-		{
-			if (!rebind_buffer(in)) {
-				throw effect_not_found {}; 
-			}
+			update_properties_input
+		); 
 
-			update_properties(in);
-			previous_transform = in.find_transform(positioning);
-
-			if (should_play(in)) {
-				source.play();
-			}
-		}
+		generic_sound_cache(
+			const packaged_multi_sound_effect& original,
+			update_properties_input
+		); 
 
 		bool should_play(update_properties_input in) const;
 		bool rebind_buffer(update_properties_input in);
-		bool update_properties(update_properties_input in);
+		void update_properties(update_properties_input in);
 
 		void bind(const augs::sound_buffer&);
+
+		bool still_playing() const;
+		void maybe_play_next(update_properties_input in);
+
+	private:
+		void eat_followup();
+		void init(update_properties_input);
 	};
 
 	struct fading_source {

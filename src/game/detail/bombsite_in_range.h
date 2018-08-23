@@ -34,10 +34,14 @@ bool bombsite_in_range(const E& fused_entity) {
 					return callback_result::CONTINUE;
 				}
 				else {
-					if (matched_faction == typed_handle.get_official_faction()) {
-						if (entity_overlaps_entity(typed_handle, fused_entity)) {
-							found = true;
-							return callback_result::ABORT;
+					const auto& marker = typed_handle.template get<invariants::box_marker>();
+
+					if (::is_bombsite(marker.type)) {
+						if (matched_faction == typed_handle.get_official_faction()) {
+							if (entity_overlaps_entity(typed_handle, fused_entity)) {
+								found = true;
+								return callback_result::ABORT;
+							}
 						}
 					}
 

@@ -120,7 +120,7 @@ void action_button::draw(
 							const auto this_cooldown = spell.cast_cooldown;
 
 							const auto effective_cooldown_ratio =
-								all_cooldown.get_remaining_time_ms(clk) > this_cooldown.get_remaining_time_ms(clk)
+								all_cooldown.get_remaining_ms(clk) > this_cooldown.get_remaining_ms(clk)
 								?
 								all_cooldown.get_ratio_of_remaining_time(clk) : this_cooldown.get_ratio_of_remaining_time(clk);
 

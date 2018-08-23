@@ -6,7 +6,7 @@
 #include "game/cosmos/data_living_one_step.h"
 
 void particle_effect_input::start(
-	const logic_step step, 
+	const const_logic_step step, 
 	const particle_effect_start_input start
 ) const {
 	messages::start_particle_effect msg;
@@ -19,7 +19,7 @@ void particle_effect_input::start(
 	step.post_message(msg);
 }
 
-void packaged_particle_effect::post(const logic_step step) const {
+void packaged_particle_effect::post(const const_logic_step step) const {
 	input.start(step, start);
 }
 

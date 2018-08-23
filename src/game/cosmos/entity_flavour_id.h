@@ -40,6 +40,9 @@ struct constrained_entity_flavour_id {
 	operator entity_flavour_id() const {
 		return { raw, type_id };
 	}
+
+	template <class F>
+	decltype(auto) dispatch(F) const;
 };
 
 template <class... C>
@@ -82,6 +85,16 @@ struct typed_entity_flavour_id {
 		return { raw, entity_type_id::of<E>() };
 	}
 };
+
+template <class... C>
+template <class F>
+decltype(auto) constrained_entity_flavour_id<C...>::dispatch(F callback) const {
+	using M = typename constrained_entity_flavour_id<C...>::matching_types;
+
+	return type_id.conditional_dispatch<M>([&](auto e) {
+		return callback(typed_entity_flavour_id<decltype(e)>(this->raw));
+	});
+}
 
 template <class T>
 struct is_constrained_flavour_id : std::false_type {};

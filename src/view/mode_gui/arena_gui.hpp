@@ -100,6 +100,15 @@ void arena_gui_state::draw_mode_gui(
 			return;
 		}
 
+		{
+			auto& win = typed_mode.last_win;
+
+			if (win.was_set()) {
+				const auto one_fourth_t = in.screen_size.y / 6;
+				draw_indicator_at(format_enum(win.winner) + " wins!", yellow, one_fourth_t);
+			}
+		}
+
 		if (const auto match_begins_in_seconds = typed_mode.get_match_begins_in_seconds(mode_input); match_begins_in_seconds >= 0.f) {
 			const auto c = std::ceil(match_begins_in_seconds - 1.f);
 
@@ -123,8 +132,16 @@ void arena_gui_state::draw_mode_gui(
 			return;
 		}
 
-		{
-			const auto time_left = std::ceil(typed_mode.get_round_seconds_left(mode_input));
+		if (const auto critical_left = typed_mode.get_critical_seconds_left(mode_input); critical_left > 0.f) {
+			const auto c = std::ceil(critical_left);
+			const auto col = red;
+
+			draw_time_at_top(format_mins_secs(c), col);
+
+			return;
+		}
+
+		if (const auto time_left = std::ceil(typed_mode.get_round_seconds_left(mode_input)); time_left > 0.f) {
 			const auto c = std::ceil(time_left);
 			const auto col = time_left <= 10.f ? red : white;
 
@@ -132,6 +149,8 @@ void arena_gui_state::draw_mode_gui(
 
 			return;
 		}
+
+		/* If the code reaches here, it's probably the round end delay, so draw no timer. */
 	}
 	else {
 		(void)typed_mode;

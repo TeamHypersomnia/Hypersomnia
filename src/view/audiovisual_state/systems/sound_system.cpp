@@ -98,6 +98,46 @@ void sound_system::update_listener(
 	augs::set_listener_orientation({ 0.f, -1.f, 0.f, 0.f, 0.f, -1.f });
 }
 
+void sound_system::generic_sound_cache::init(update_properties_input in) {
+	if (!rebind_buffer(in)) {
+		throw effect_not_found {}; 
+	}
+
+	update_properties(in);
+	previous_transform = in.find_transform(positioning);
+
+	if (should_play(in)) {
+		source.play();
+	}
+}
+
+sound_system::generic_sound_cache::generic_sound_cache(
+	const packaged_sound_effect& original,
+	const update_properties_input in
+) : 
+	original(original),
+	positioning(original.start.positioning)
+{
+	init(in);
+}
+
+sound_system::generic_sound_cache::generic_sound_cache(
+	const packaged_multi_sound_effect& multi,
+	const update_properties_input in
+) :
+	positioning(multi.start.positioning),
+	followup_inputs(multi.inputs)
+{
+	original.start = multi.start;
+
+	if (multi.inputs.empty()) {
+		throw effect_not_found {}; 
+	}
+
+	eat_followup();
+	init(in);
+}
+
 void sound_system::generic_sound_cache::bind(const augs::sound_buffer& buf) {
 	source.bind_buffer(buf, original.start.variation_number);
 }
@@ -120,7 +160,12 @@ bool sound_system::generic_sound_cache::should_play(const update_properties_inpu
 	return target_faction == faction_type::NONE || faction == target_faction;
 }
 
-bool sound_system::generic_sound_cache::update_properties(const update_properties_input in) {
+void sound_system::generic_sound_cache::eat_followup() {
+	original.input = followup_inputs[0];
+	followup_inputs.erase(followup_inputs.begin());
+}
+
+void sound_system::generic_sound_cache::update_properties(const update_properties_input in) {
 	const auto listening_character = in.get_listener();
 
 	const auto faction = listening_character.get_official_faction();
@@ -200,8 +245,30 @@ bool sound_system::generic_sound_cache::update_properties(const update_propertie
 	else {
 		source.set_position(si, current_transform.pos);
 	}
+}
 
-	return !source.is_playing();
+void sound_system::generic_sound_cache::maybe_play_next(update_properties_input in) {
+	if (source.is_playing()) {
+		return;
+	}
+
+	if (followup_inputs.empty()) {
+		return;
+	}
+
+	eat_followup();
+	source.stop();
+
+	if (rebind_buffer(in)) {
+		if (should_play(in)) {
+			update_properties(in);
+			source.play();
+		}
+	}
+}
+
+bool sound_system::generic_sound_cache::still_playing() const {
+	return source.is_playing() || followup_inputs.size() > 0;
 }
 
 void sound_system::update_effects_from_messages(const const_logic_step step, const update_properties_input in) {
@@ -231,19 +298,26 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 		}
 	}
 
-	const auto& events = step.get_queue<messages::start_sound_effect>();
+	auto do_events = [&](auto dummy) {
+		using M = decltype(dummy);
 
-	for (auto& e : events) {
-		try {
-			short_sounds.emplace_back(e.payload, in);
-		}
-		catch (const effect_not_found&) {
+		const auto& events = step.get_queue<M>();
 
+		for (auto& e : events) {
+			try {
+				short_sounds.emplace_back(e.payload, in);
+			}
+			catch (const effect_not_found&) {
+
+			}
+			catch (const augs::too_many_sound_sources_error& err) {
+				LOG("Warning: maxmimum number of sound sources reached at sound_system.cpp.");
+			}
 		}
-		catch (const augs::too_many_sound_sources_error& err) {
-			LOG("Warning: maxmimum number of sound sources reached at sound_system.cpp.");
-		}
-	}
+	};
+
+	do_events(messages::start_sound_effect());
+	do_events(messages::start_multi_sound_effect());
 }
 
 void sound_system::update_sound_properties(const update_properties_input in) {
@@ -312,6 +386,13 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		}
 	);
 
+	auto update_facade = [&](auto& cache) {
+		cache.update_properties(in);
+		cache.maybe_play_next(in);
+
+		return !cache.still_playing();
+	};
+
 	erase_if(firearm_engine_caches, [&](auto& it) {
 		auto& cache = it.second;
 
@@ -320,7 +401,7 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 			return true;
 		}
 
-		return cache.update_properties(in);
+		return update_facade(cache);
 	});
 
 	auto can_have_continuous_sound = [&](const auto handle) {
@@ -345,11 +426,11 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 			return true;
 		}
 
-		return cache.update_properties(in);
+		return update_facade(cache);
 	});
 
 	erase_if(short_sounds, [&](generic_sound_cache& cache) {
-		return cache.update_properties(in);
+		return update_facade(cache);
 	});
 }
 

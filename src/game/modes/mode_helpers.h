@@ -14,7 +14,7 @@ void for_each_faction(F callback) {
 	callback(faction_type::RESISTANCE);
 }
 
-inline auto calc_participating_factions(const cosmos& cosm) {
+inline auto calc_spawnable_factions(const cosmos& cosm) {
 	per_faction_t<bool> result = {};
 
 	for_each_faction([&](const auto faction) {
@@ -25,30 +25,6 @@ inline auto calc_participating_factions(const cosmos& cosm) {
 	});
 
 	return result;
-}
-
-template <class F>
-faction_type calc_weakest_faction(const cosmos& cosm, F num_players_in_faction) {
-	const auto participating = calc_participating_factions(cosm);
-
-	struct {
-		faction_type type = faction_type::NONE;
-		std::size_t count = static_cast<std::size_t>(-1);
-	} weakest;
-
-	for_each_faction([&](const auto f) { 
-		if (!participating[f]) {
-			return;
-		}
-
-		const auto n = num_players_in_faction(f);
-
-		if (n <= weakest.count) {
-			weakest = { f, n };
-		}
-	});
-
-	return weakest.type;
 }
 
 using player_character_type = controlled_character;

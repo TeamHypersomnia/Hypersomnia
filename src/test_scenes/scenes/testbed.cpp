@@ -71,6 +71,11 @@ namespace test_scenes {
 			mt[battle_event::BOMB_DEFUSED] = to_sound_id(test_scene_sound_id::MT_BOMB_DEFUSED);
 			mt[battle_event::ITS_TOO_LATE_RUN] = to_sound_id(test_scene_sound_id::MT_ITS_TOO_LATE_RUN);
 		}
+
+		vars.win_sounds[faction_type::METROPOLIS][faction_type::RESISTANCE] = to_sound_id(test_scene_sound_id::MT_RESISTANCE_WINS);
+		vars.win_sounds[faction_type::METROPOLIS][faction_type::METROPOLIS] = to_sound_id(test_scene_sound_id::MT_METROPOLIS_WINS);
+
+		vars.bomb_flavour = to_entity_flavour_id(test_hand_explosives::BOMB);
 	}
 
 	void testbed::populate(const loaded_image_caches_map& caches, const logic_step step) const {

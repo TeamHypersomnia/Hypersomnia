@@ -6,7 +6,7 @@
 #include "game/cosmos/cosmos.h"
 
 void sound_effect_input::start(
-	const logic_step step, 
+	const const_logic_step step, 
 	const sound_effect_start_input start
 ) const {
 	messages::start_sound_effect msg;
@@ -22,7 +22,7 @@ void sound_effect_input::start(
 	step.post_message(msg);
 }
 
-void packaged_sound_effect::post(const logic_step step) const {
+void packaged_sound_effect::post(const const_logic_step step) const {
 	input.start(step, start);
 }
 

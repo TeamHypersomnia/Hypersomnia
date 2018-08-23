@@ -70,12 +70,19 @@ struct sound_effect_input {
 		return modifier.max_distance + modifier.reference_distance;
 	}
 
-	void start(logic_step, sound_effect_start_input) const;
+	void start(const_logic_step, sound_effect_start_input) const;
 };
 
 struct packaged_sound_effect {
 	sound_effect_input input;
 	sound_effect_start_input start;
 
-	void post(logic_step step) const;
+	void post(const_logic_step step) const;
+};
+
+struct packaged_multi_sound_effect {
+	std::vector<sound_effect_input> inputs;
+	sound_effect_start_input start;
+
+	void post(const_logic_step step) const;
 };

@@ -21,7 +21,7 @@ struct basic_logic_step_input {
 
 template <bool is_const>
 class basic_logic_step {
-	using data_living_one_step_ref = maybe_const_ref_t<is_const, data_living_one_step>;
+	using data_living_one_step_ref = maybe_const_ref_t<is_const && !is_const, data_living_one_step>;
 
 	const basic_logic_step_input<is_const> input;
 
@@ -65,17 +65,17 @@ public:
 		return transient.messages.template get_queue<T>();
 	}
 
-	template <class T, bool C = !is_const, class = std::enable_if_t<C>>
+	template <class T>
 	void post_message(const T& msg) const {
 		transient.messages.post(msg);
 	}
 
-	template <class T, bool C = !is_const, class = std::enable_if_t<C>>
+	template <class T>
 	void post_messages(const T& msgs) const {
 		transient.messages.post(msgs);
 	}
 
-	template <class T, bool C = !is_const, class = std::enable_if_t<C>>
+	template <class T>
 	void post_message_if(const std::optional<T>& msg) const {
 		if (msg.has_value()) {
 			transient.messages.post(*msg);

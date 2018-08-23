@@ -13,6 +13,10 @@ namespace messages {
 		packaged_sound_effect payload;
 	};
 
+	struct start_multi_sound_effect {
+		packaged_multi_sound_effect payload;
+	};
+
 	struct stop_sound_effect {
 		std::optional<entity_id> match_chased_subject;
 		std::optional<::assets::sound_id> match_effect_id;

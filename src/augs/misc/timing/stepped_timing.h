@@ -32,6 +32,10 @@ namespace augs {
 			return (now - lesser.now).in_seconds(dt);
 		}
 
+		bool was_set() const {
+			return now.was_set();
+		}
+
 		template <class T>
 		bool is_ready(
 			const T cooldown_ms, 
@@ -74,7 +78,7 @@ namespace augs {
 		}
 
 		template <class T>
-		auto get_remaining_time_ms(
+		auto get_remaining_ms(
 			const T cooldown_ms, 
 			const stepped_timestamp stamp
 		) const {
@@ -83,6 +87,14 @@ namespace augs {
 			}
 
 			return cooldown_ms - (now - stamp).in_milliseconds(dt);
+		}
+
+		template <class T>
+		auto get_remaining_secs(
+			const T cooldown_ms, 
+			const stepped_timestamp stamp
+		) const {
+			return get_remaining_ms(cooldown_ms, stamp) / 1000;
 		}
 	};
 
@@ -95,7 +107,7 @@ namespace augs {
 		stepped_cooldown(const float cooldown_duration_ms = 1000.f);
 		void set(const float cooldown_duration_ms, const stepped_timestamp now);
 		
-		float get_remaining_time_ms(const stepped_clock&) const;
+		float get_remaining_ms(const stepped_clock&) const;
 		float get_ratio_of_remaining_time(const stepped_clock&) const;
 
 		bool lasts(const stepped_clock&) const;

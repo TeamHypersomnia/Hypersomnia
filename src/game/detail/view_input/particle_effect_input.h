@@ -44,12 +44,12 @@ struct particle_effect_input {
 	particle_effect_modifier modifier;
 	// END GEN INTROSPECTOR
 
-	void start(logic_step, particle_effect_start_input) const;
+	void start(const_logic_step, particle_effect_start_input) const;
 };
 
 struct packaged_particle_effect {
 	particle_effect_input input;
 	particle_effect_start_input start;
 
-	void post(logic_step step) const;
+	void post(const_logic_step step) const;
 };

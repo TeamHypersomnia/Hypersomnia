@@ -17,7 +17,7 @@ void remnant_system::shrink_and_destroy_remnants(const logic_step step) const {
 			const auto& def = subject.template get<invariants::remnant>();
 			auto& state = subject.template get<components::remnant>();
 
-			const auto remaining_ms = clk.get_remaining_time_ms(
+			const auto remaining_ms = clk.get_remaining_ms(
 				def.lifetime_secs * 1000,
 				subject.when_born()
 			);

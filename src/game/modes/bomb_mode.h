@@ -31,6 +31,7 @@ struct bomb_mode_vars {
 	std::string name;
 	money_type initial_money = 800;
 	unsigned round_secs = 120;
+	unsigned round_end_secs = 5;
 	unsigned freeze_secs = 5;
 	unsigned warmup_secs = 45;
 	unsigned max_rounds = 5;
@@ -39,6 +40,8 @@ struct bomb_mode_vars {
 
 	per_faction_t<per_faction_t<assets::sound_id>> win_sounds;
 	per_faction_t<augs::enum_array<assets::sound_id, battle_event>> event_sounds;
+	
+	constrained_entity_flavour_id<invariants::explosive> bomb_flavour;
 	// END GEN INTROSPECTOR
 };
 
@@ -67,11 +70,23 @@ enum class arena_mode_state {
 	// GEN INTROSPECTOR enum class arena_mode_state
 	INIT,
 	WARMUP,
-	LIVE
+	LIVE,
+	ROUND_END_DELAY
 	// END GEN INTROSPECTOR
 };
 
 using cosmos_clock = augs::stepped_clock;
+
+struct bomb_mode_win {
+	// GEN INTROSPECTOR struct bomb_mode_win
+	augs::stepped_clock when;
+	faction_type winner = faction_type::NONE;
+	// END GEN INTROSPECTOR
+
+	bool was_set() const {
+		return winner != faction_type::NONE;
+	}
+};
 
 class bomb_mode {
 public:
@@ -84,6 +99,20 @@ public:
 		const cosmos_solvable_significant& initial_signi;
 		cosmos& cosm;
 	};
+
+	struct participating_factions {
+		faction_type bombing;
+		faction_type defusing;
+
+		template <class F>
+		void for_each(F callback) const {
+			callback(bombing);
+			callback(defusing);
+		}
+	};
+
+	participating_factions calc_participating_factions(input) const;
+	faction_type calc_weakest_faction(input) const;
 
 private:
 	struct transferred_inventory {
@@ -110,11 +139,13 @@ private:
 
 	bool still_freezed() const;
 	unsigned get_round_index() const;
+	void make_win(input, faction_type);
 
 	void teleport_to_next_spawn(input, entity_id character);
 	void init_spawned(input, entity_id character, logic_step, const round_transferred_player* = nullptr);
 
 	void mode_pre_solve(input, const mode_entropy&, logic_step);
+	void mode_post_solve(input, const mode_entropy&, const_logic_step);
 
 	void start_next_round(input, logic_step);
 	void setup_round(input, logic_step, const round_transferred_players& = {});
@@ -127,19 +158,36 @@ private:
 	std::size_t num_players_in_faction(faction_type) const;
 	void respawn_the_dead(input, logic_step, unsigned after_ms);
 
+	template <class F>
+	decltype(auto) on_bomb_entity(input, F) const;
+
+	bool bomb_exploded(input) const;
+	bool bomb_defused(input) const;
+	bool bomb_planted(input) const;
+
+	void play_faction_sound(const_logic_step, faction_type, assets::sound_id) const;
+	void play_faction_sound_for(input, const_logic_step, battle_event, faction_type) const;
+
+	void play_sound_for(input, const_logic_step, battle_event) const;
+	void play_win_sound(input, const_logic_step, faction_type) const;
+
+	void play_bomb_defused_sound(input, const_logic_step, faction_type) const;
+
 public:
+
 	// GEN INTROSPECTOR class bomb_mode
 	cosmos_clock clock_before_setup;
 	arena_mode_state state = arena_mode_state::INIT;
 	bool cache_players_frozen = false;
 	per_faction_t<bomb_mode_faction_state> factions;
 	std::unordered_map<mode_player_id, bomb_mode_player> players;
+	bomb_mode_win last_win;
 	// END GEN INTROSPECTOR
 
 	mode_player_id add_player(input, const entity_name_str& chosen_name);
 	void remove_player(input, const mode_player_id&);
 
-	bool auto_assign_faction(const cosmos&, const mode_player_id&);
+	bool auto_assign_faction(input, const mode_player_id&);
 	bool choose_faction(const mode_player_id&, const faction_type faction);
 	faction_type get_player_faction(const mode_player_id&) const;
 
@@ -154,12 +202,16 @@ public:
 
 	float get_freeze_seconds_left(input) const;
 	float get_round_seconds_left(input) const;
+	float get_round_end_seconds_left(input) const;
 
-	template <class PreSolve, class... Callbacks>
+	float get_critical_seconds_left(input) const;
+
+	template <class PreSolve, class PostSolve, class... Callbacks>
 	void advance(
 		const input in, 
 		const mode_entropy& entropy, 
 		PreSolve&& pre_solve,
+		PostSolve&& post_solve,
 		Callbacks&&... callbacks
 	) {
 		{
@@ -170,6 +222,10 @@ public:
 				[&](const logic_step step) {
 					pre_solve(step);
 					mode_pre_solve(in, entropy, step);
+				},
+				[&](const const_logic_step step) {
+					mode_post_solve(in, entropy, step);
+					post_solve(step);
 				},
 				std::forward<Callbacks>(callbacks)...
 			);

@@ -65,10 +65,10 @@ namespace augs {
 		return clk.is_ready(cooldown_duration_ms, when_last_fired);
 	}
 
-	float stepped_cooldown::get_remaining_time_ms(
+	float stepped_cooldown::get_remaining_ms(
 		const stepped_clock& clk
 	) const {
-		return clk.get_remaining_time_ms(cooldown_duration_ms, when_last_fired);
+		return clk.get_remaining_ms(cooldown_duration_ms, when_last_fired);
 	}
 
 	float stepped_cooldown::get_ratio_of_remaining_time(
