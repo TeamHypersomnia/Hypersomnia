@@ -72,6 +72,11 @@ namespace test_scenes {
 			mt[battle_event::ITS_TOO_LATE_RUN] = to_sound_id(test_scene_sound_id::MT_ITS_TOO_LATE_RUN);
 		}
 
+		{
+			auto& re = vars.event_sounds[faction_type::RESISTANCE];
+			re = vars.event_sounds[faction_type::METROPOLIS];
+		}
+
 		vars.win_sounds[faction_type::METROPOLIS][faction_type::RESISTANCE] = to_sound_id(test_scene_sound_id::MT_RESISTANCE_WINS);
 		vars.win_sounds[faction_type::METROPOLIS][faction_type::METROPOLIS] = to_sound_id(test_scene_sound_id::MT_METROPOLIS_WINS);
 

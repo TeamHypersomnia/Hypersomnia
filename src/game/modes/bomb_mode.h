@@ -205,6 +205,7 @@ public:
 	float get_round_end_seconds_left(input) const;
 
 	float get_critical_seconds_left(input) const;
+	float get_seconds_since_planting(input) const;
 
 	template <class PreSolve, class PostSolve, class... Callbacks>
 	void advance(

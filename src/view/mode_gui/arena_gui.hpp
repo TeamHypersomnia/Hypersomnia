@@ -87,10 +87,12 @@ void arena_gui_state::draw_mode_gui(
 			draw_indicator_at(val, col, game_screen_top);
 		};
 
-		auto draw_warmup_indicator = [&](const std::string& val, const rgba& col) {
+		auto draw_info_indicator = [&](const std::string& val, const rgba& col) {
 			const auto one_fourth_t = in.screen_size.y / 6;
 			draw_indicator_at(val, col, one_fourth_t);
 		};
+
+		auto draw_warmup_indicator = draw_info_indicator;
 
 		if (const auto warmup_left = typed_mode.get_warmup_seconds_left(mode_input); warmup_left > 0.f) {
 			const auto c = std::ceil(warmup_left);
@@ -104,8 +106,13 @@ void arena_gui_state::draw_mode_gui(
 			auto& win = typed_mode.last_win;
 
 			if (win.was_set()) {
-				const auto one_fourth_t = in.screen_size.y / 6;
-				draw_indicator_at(format_enum(win.winner) + " wins!", yellow, one_fourth_t);
+				draw_info_indicator(format_enum(win.winner) + " wins!", yellow);
+			}
+		}
+
+		{
+			if (const auto secs = typed_mode.get_seconds_since_planting(mode_input); secs >= 0.f && secs <= 3.f) {
+				draw_info_indicator("The bomb has been planted!", yellow);
 			}
 		}
 

@@ -718,6 +718,27 @@ float bomb_mode::get_critical_seconds_left(const input_type in) const {
 	});
 }
 
+float bomb_mode::get_seconds_since_planting(const input_type in) const {
+	if (!bomb_planted(in)) {
+		return -1.f;
+	}
+
+	auto& cosm = in.cosm;
+	const auto& clk = cosm.get_clock();
+
+	return on_bomb_entity(in, [&](const auto& typed_bomb) {
+		if constexpr(std::is_same_v<decltype(typed_bomb), const std::nullopt_t&>) {
+			return -1.f;
+		}
+		else {
+			const auto& fuse = typed_bomb.template get<components::hand_fuse>();
+			const auto when_armed = fuse.when_armed;
+
+			return (clk.now - when_armed).in_seconds(clk.dt);
+		}
+	});
+}
+
 unsigned bomb_mode::get_round_num() const {
 	unsigned total = 0;
 
