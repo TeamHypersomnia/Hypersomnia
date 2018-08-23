@@ -19,6 +19,8 @@
 #include "augs/audio/audio_settings.h"
 #include "view/character_camera.h"
 
+struct shouldnt_play {};
+
 std::optional<transformr> sound_system::update_properties_input::find_transform(const absolute_or_local& positioning) const {
 	return ::find_transform(positioning, get_listener().get_cosmos(), interp);
 }
@@ -99,6 +101,10 @@ void sound_system::update_listener(
 }
 
 void sound_system::generic_sound_cache::init(update_properties_input in) {
+	if (!should_play(in)) {
+		throw shouldnt_play {};
+	}
+
 	if (!rebind_buffer(in)) {
 		throw effect_not_found {}; 
 	}
@@ -106,9 +112,7 @@ void sound_system::generic_sound_cache::init(update_properties_input in) {
 	update_properties(in);
 	previous_transform = in.find_transform(positioning);
 
-	if (should_play(in)) {
-		source.play();
-	}
+	source.play();
 }
 
 sound_system::generic_sound_cache::generic_sound_cache(
@@ -260,10 +264,8 @@ void sound_system::generic_sound_cache::maybe_play_next(update_properties_input 
 	source.stop();
 
 	if (rebind_buffer(in)) {
-		if (should_play(in)) {
-			update_properties(in);
-			source.play();
-		}
+		update_properties(in);
+		source.play();
 	}
 }
 
@@ -308,6 +310,9 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 				short_sounds.emplace_back(e.payload, in);
 			}
 			catch (const effect_not_found&) {
+
+			}
+			catch (const shouldnt_play&) {
 
 			}
 			catch (const augs::too_many_sound_sources_error& err) {
