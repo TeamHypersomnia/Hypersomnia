@@ -541,6 +541,7 @@ void bomb_mode::play_bomb_defused_sound(const input_type in, const const_logic_s
 
 void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy, const logic_step step) {
 	(void)entropy;
+	auto& cosm = in.cosm;
 
 	if (state == arena_mode_state::INIT) {
 		if (in.vars.warmup_secs > 4) {
@@ -573,23 +574,43 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 			set_players_frozen(in, false);
 		}
 
-		if (bomb_exploded(in)) {
-			const auto winner = calc_participating_factions(in).bombing;
-			make_win(in, winner);
+		const auto p = calc_participating_factions(in);
 
+		auto standard_win = [&](const auto winner) {
+			make_win(in, winner);
 			play_win_sound(in, step, winner);
+		};
+
+		if (bomb_exploded(in)) {
+			standard_win(p.bombing);
 		}
 		else if (bomb_defused(in)) {
-			const auto winner = calc_participating_factions(in).defusing;
+			const auto winner = p.defusing;
 			make_win(in, winner);
 
 			play_bomb_defused_sound(in, step, winner);
 		}
 		else if (!bomb_planted(in) && get_round_seconds_left(in) <= 0.f) {
-			const auto winner = calc_participating_factions(in).defusing;
-			make_win(in, winner);
+			/* Time-out */
+			standard_win(p.defusing);
+		}
 
-			play_win_sound(in, step, winner);
+		/* Kill-based win-conditions */
+
+		if (num_players_in(p.bombing) > 0) {
+			if (!bomb_planted(in) && 0 == num_conscious_players_in(cosm, p.bombing)) {
+				/* All bombing players have been neutralized. */
+				standard_win(p.defusing);
+				return;
+			}
+		}
+
+		if (num_players_in(p.defusing) > 0) {
+			if (0 == num_conscious_players_in(cosm, p.defusing)) {
+				/* All defusing players have been neutralized. */
+				standard_win(p.defusing);
+				return;
+			}
 		}
 	}
 	else if (state == arena_mode_state::ROUND_END_DELAY) {
