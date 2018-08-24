@@ -181,6 +181,8 @@ private:
 	std::size_t num_conscious_players_in(const cosmos&, faction_type) const;
 	std::size_t num_players_in(faction_type) const;
 
+	void process_win_conditions(input, logic_step);
+
 public:
 
 	// GEN INTROSPECTOR class bomb_mode
