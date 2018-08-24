@@ -29,6 +29,16 @@ inline auto calc_spawnable_factions(const cosmos& cosm) {
 
 using player_character_type = controlled_character;
 
+inline auto remove_test_characters(cosmos& cosm) {
+	cosm.for_each_having<invariants::sentience>(
+		[&](const auto& typed_handle){
+			if constexpr(std::is_same_v<entity_type_of<decltype(typed_handle)>, player_character_type>) {
+				cosmic::delete_entity(typed_handle);
+			}
+		}
+	);
+}
+
 inline auto find_faction_character_flavour(const cosmos& cosm, const faction_type faction) {
 	using E = player_character_type;
 	using flavour_id_type = typed_entity_flavour_id<E>;

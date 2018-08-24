@@ -355,6 +355,7 @@ void bomb_mode::setup_round(
 	auto& cosm = in.cosm;
 	clock_before_setup = cosm.get_clock();
 	cosm.set(in.initial_signi);
+	remove_test_characters(cosm);
 	cache_players_frozen = false;
 	last_win = {};
 

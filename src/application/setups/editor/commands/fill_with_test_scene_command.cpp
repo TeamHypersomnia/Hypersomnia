@@ -32,9 +32,9 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 
 	test_scene_mode_vars test_vars;
 	bomb_mode_vars bomb_vars;
-	bomb_vars.warmup_secs = 0;
-	bomb_vars.round_secs = 8;
-	bomb_vars.freeze_secs = 0;
+	bomb_vars.warmup_secs = 8;
+	bomb_vars.round_secs = 10;
+	bomb_vars.freeze_secs = 5;
 	bomb_vars.round_end_secs = 5;
 
 	const auto& settings = in.settings.test_scene;
@@ -74,12 +74,15 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 				const auto in = bomb_mode::input { bomb_vars, cosm.get_solvable().significant, cosm };
 
 				{
+					mode.auto_assign_faction(in, mode.add_player(in, "kryS."));
+					mode.auto_assign_faction(in, mode.add_player(in, "FortesQ"));
 					const auto id = mode.add_player(in, "Editor-player");
+
 					mode.auto_assign_faction(in, id);
 				}
 
 				{
-					const auto id = mode.add_player(in, "Test-player");
+					const auto id = mode.add_player(in, "Pythagoras");
 					mode.auto_assign_faction(in, id);
 
 					player_id = id;
