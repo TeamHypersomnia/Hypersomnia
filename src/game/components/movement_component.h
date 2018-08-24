@@ -62,6 +62,7 @@ struct movement_flags {
 	bool backward = false;
 
 	bool walking = false;
+	bool picking = false;
 	bool sprint = false;
 	// END GEN INTROSPECTOR
 
@@ -75,8 +76,11 @@ namespace components {
 		// GEN INTROSPECTOR struct components::movement
 		movement_flags flags;
 
-		bool was_sprint_effective = false;
 		bool frozen = false;
+
+		bool was_sprint_effective = false;
+		bool was_walk_effective = false;
+		pad_bytes<2> pad;
 
 		float make_inert_for_ms = 0.f;
 		float animation_amount = 0.f;

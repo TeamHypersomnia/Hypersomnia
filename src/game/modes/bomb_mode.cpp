@@ -465,7 +465,7 @@ void bomb_mode::setup_round(
 			avg_dir /= n;
 
 			new_bomb_entity.set_logic_transform(transformr(avg_pos));
-			new_bomb_entity.get<components::rigid_body>().apply_impulse(avg_dir * 1000);
+			new_bomb_entity.get<components::rigid_body>().apply_impulse(avg_dir * 100);
 		}
 		else {
 			const auto chosen_bomber_idx = get_step_rng_seed(cosm) % viable_players.size();
@@ -473,7 +473,6 @@ void bomb_mode::setup_round(
 
 			for (const auto& t : tried_slots) {
 				if (typed_player[t].is_empty_slot()) {
-					LOG("Empty. perform");
 					perform_transfer(item_slot_transfer_request::standard(new_bomb_entity.get_id(), typed_player[t].get_id()), step);
 					break;
 				}

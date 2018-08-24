@@ -260,10 +260,16 @@ FORCE_INLINE void specific_entity_drawer(
 			const auto stance_id = ::calc_stance_id(cosm, wielded_items);
 			const auto& stance = maybe_torso->stances[stance_id];
 
+			auto four_ways = movement->four_ways_animation;
+
+			if (movement->was_walk_effective) {
+				four_ways.index = 0;
+			}
+
 			if (const auto stance_usage = calc_stance_usage(
 				cosm,
 				stance, 
-				movement->four_ways_animation,
+				four_ways,
 				wielded_items
 			)) {
 				const auto stance_offsets = [&stance_usage, &logicals]() {
@@ -290,7 +296,7 @@ FORCE_INLINE void specific_entity_drawer(
 						const auto leg_offset = transformr(legs.pos, legs.rotation);
 
 						render_frame(
-							::get_frame_and_flip(movement->four_ways_animation, *animation),
+							::get_frame_and_flip(four_ways, *animation),
 							{ (viewing_transform * leg_offset).pos, legs_degrees }
 						);
 					}

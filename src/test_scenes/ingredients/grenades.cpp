@@ -259,10 +259,15 @@ namespace test_flavours {
 			invariants::hand_fuse fuse; 
 			fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
 			fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
-			fuse.fuse_delay_ms = 10000.f;
 			fuse.override_release_impulse = true;
 			fuse.additional_release_impulse = {};
+#if 0
+			fuse.fuse_delay_ms = 35000.f;
+			fuse.set_bomb_vars(1500.f, 10000.f);
+#else
+			fuse.fuse_delay_ms = 10000.f;
 			fuse.set_bomb_vars(150.f, 1000.f);
+#endif
 			fuse.beep_sound.id = to_sound_id(test_scene_sound_id::BEEP);
 			fuse.beep_sound.modifier.doppler_factor = 0.5f;
 			fuse.beep_color = red;

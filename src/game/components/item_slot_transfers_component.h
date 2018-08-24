@@ -27,9 +27,9 @@ namespace components {
 		augs::stepped_cooldown pickup_timeout = augs::stepped_cooldown(200);
 
 		only_pick_these_items_vector only_pick_these_items = {};
+
 		bool pick_all_touched_items_if_list_to_pick_empty = true;
-		bool picking_up_touching_items_enabled = false;
-		pad_bytes<2> pad;
+		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 
 #if TODO_MOUNTING

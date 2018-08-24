@@ -50,6 +50,9 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 						case game_intent_type::SPRINT:
 							movement->flags.sprint = it.was_pressed();
 							break;
+						case game_intent_type::START_PICKING_UP_ITEMS:
+							movement->flags.picking = it.was_pressed();
+							break;
 
 						default: break;
 					}
@@ -147,8 +150,31 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				movement.make_inert_for_ms -= static_cast<float>(delta_ms);
 			}
 
+			const auto num_frames = movement_def.animation_frame_num;
+			const auto frame_ms = movement_def.animation_frame_ms;
+
+			auto calculate_frame_idx = [&]() {
+				auto idx = static_cast<unsigned>(movement.animation_amount / frame_ms);
+				idx = std::min(idx, num_frames - 1);
+				idx = std::max(idx, 0u);
+
+				return idx;
+			};
+
+			const bool is_walking = !movement.was_sprint_effective && [&]() {
+				if (movement.flags.picking) {
+					return true;
+				}
+
+				return movement.flags.walking;
+			}();
+
+			movement.was_walk_effective = is_walking;
+
+			const bool should_decelerate_due_to_walk = is_walking && movement.animation_amount >= num_frames * frame_ms - 60.f;
+
 			const auto requested_by_input = movement.get_force_requested_by_input(movement_def.input_acceleration_axes);
-			const bool propelling = requested_by_input.non_zero();
+			const bool propelling = !should_decelerate_due_to_walk && requested_by_input.non_zero();
 
 			if (propelling) {
 				if (movement.was_sprint_effective) {
@@ -157,10 +183,6 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					if (is_sentient) {
 						sentience->get<consciousness_meter_instance>().value -= consciousness_damage_by_sprint.effective;
 					}
-				}
-
-				if (movement.flags.walking) {
-					movement_force_mult /= 2.f;
 				}
 
 				if (is_inert) {
@@ -185,10 +207,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				);
 			}
 
-			const auto num_frames = movement_def.animation_frame_num;
-			const auto frame_ms = movement_def.animation_frame_ms;
-
-			const auto duration_bound = num_frames * frame_ms;
+			const auto duration_bound = static_cast<float>(num_frames * frame_ms);
 
 			const auto conceptual_max_speed = std::max(1.f, movement_def.max_speed_for_animation);
 			const auto current_velocity = rigid_body.get_velocity();
@@ -319,7 +338,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				else {
 					amount += animation_dt;
 
-					if (augs::flip_if_gt(amount, static_cast<float>(duration_bound))) {
+					if (augs::flip_if_gt(amount, duration_bound)) {
 						backward = true;
 					}
 				}
@@ -328,11 +347,9 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			movement.four_ways_animation.base_frames_n = num_frames;
 
 			auto& idx = movement.four_ways_animation.index;
-			const auto old_idx = idx;
 
-			idx = static_cast<unsigned>(amount / frame_ms);
-			idx = std::min(idx, num_frames - 1);
-			idx = std::max(idx, 0u);
+			const auto old_idx = idx;
+			idx = calculate_frame_idx();
 
 			if (old_idx == num_frames - 2 && idx == num_frames - 1) {
 				start_footstep_effect();

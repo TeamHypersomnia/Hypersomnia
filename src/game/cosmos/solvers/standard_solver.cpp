@@ -101,7 +101,6 @@ void standard_solve(const logic_step step) {
 	crosshair_system().integrate_crosshair_recoils(step);
 	crosshair_system().apply_crosshair_intents_to_base_offsets(step);
 
-	item_system().start_picking_up_items(step);
 	item_system().pick_up_touching_items(step);
 
 	missile_system().ricochet_missiles(step);

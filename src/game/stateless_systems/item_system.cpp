@@ -40,22 +40,6 @@
 
 #include "game/detail/physics/physics_scripts.h"
 
-
-void item_system::start_picking_up_items(const logic_step step) {
-	const auto& intents = step.get_queue<messages::intent_message>();
-	auto& cosm = step.get_cosmos();
-
-	for (const auto& i : intents) {
-		if (i.intent == game_intent_type::START_PICKING_UP_ITEMS) {
-			const auto it = cosm[i.subject];
-
-			if (const auto transfers = it.find<components::item_slot_transfers>()) {
-				transfers->picking_up_touching_items_enabled = i.was_pressed();
-			}
-		}
-	}
-}
-
 void item_system::pick_up_touching_items(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto& clk = cosmos.get_clock();
@@ -74,13 +58,16 @@ void item_system::pick_up_touching_items(const logic_step step) {
 		if (const auto item = item_entity.find<components::item>();
 			item && item_entity.get_owning_transfer_capability().dead()
 		) {
-			if (auto* const transfers = picker.find<components::item_slot_transfers>();
-				transfers && transfers->picking_up_touching_items_enabled	
-			) {
-				const auto actual_picker = cosmos[picker_id];
+			picker.dispatch_on_having_all<components::item_slot_transfers>([&](const auto& typed_picker) {
+				const auto& movement = typed_picker.template get<components::movement>();
+				auto& transfers = typed_picker.template get<components::item_slot_transfers>();
 
-				if (actual_picker.sentient_and_unconscious()) {
-					continue;
+				if (!movement.flags.picking) {
+					return;
+				}
+
+				if (typed_picker.sentient_and_unconscious()) {
+					return;
 				}
 
 				entity_id item_to_pick = item_entity;
@@ -89,24 +76,24 @@ void item_system::pick_up_touching_items(const logic_step step) {
 					item_to_pick = item_entity.get_current_slot().get_root_container();
 				}
 
-				const auto& pick_list = transfers->only_pick_these_items;
+				const auto& pick_list = transfers.only_pick_these_items;
 				const bool found_on_subscription_list = found_in(pick_list, item_to_pick);
 
 				if (/* item_subscribed */
-					(pick_list.empty() && transfers->pick_all_touched_items_if_list_to_pick_empty)
+					(pick_list.empty() && transfers.pick_all_touched_items_if_list_to_pick_empty)
 					|| found_on_subscription_list
 				) {
-					const auto pickup_slot = actual_picker.determine_pickup_target_slot_for(cosmos[item_to_pick]);
+					const auto pickup_slot = typed_picker.determine_pickup_target_slot_for(cosmos[item_to_pick]);
 
 					if (pickup_slot.alive()) {
-						const bool can_pick_already = transfers->pickup_timeout.try_to_fire_and_reset(clk);
+						const bool can_pick_already = transfers.pickup_timeout.try_to_fire_and_reset(clk);
 
 						if (can_pick_already) {
 							perform_transfer(item_slot_transfer_request::standard(item_to_pick, pickup_slot), step);
 						}
 					}
 				}
-			}
+			});
 		}
 	}
 }

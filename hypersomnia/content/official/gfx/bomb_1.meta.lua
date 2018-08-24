@@ -45,7 +45,7 @@ return {
           x = 18,
           y = -2
         },
-        rotation = -90
+        rotation = 90
       },
       beep_offset = {
         pos = {
