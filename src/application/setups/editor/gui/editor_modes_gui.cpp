@@ -14,6 +14,8 @@
 #include "application/setups/editor/property_editor/special_widgets.h"
 #include "application/setups/editor/property_editor/widgets/flavour_widget.h"
 
+#include "application/setups/editor/editor_player.hpp"
+
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/memory_stream.h"
 
@@ -34,16 +36,37 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 	ImGui::Columns(2);
 	next_column_text_disabled("Details");
 
+	thread_local std::string nickname = "Test-player";
+
 	{
 		auto node = scoped_tree_node("Current mode");
 
 		next_columns(2);
 
 		if (node) {
-			auto& current_mode = cmd_in.get_player().current_mode;
+			auto& folder = cmd_in.folder;
+			auto& player = cmd_in.get_player();
 
-			std::visit(
-				[&](const auto& typed_mode) {
+			::on_mode_with_input(
+				player,
+				folder.mode_vars,
+				folder.work->world,
+				[&](auto& typed_mode, const auto& mode_input) {
+					using M = remove_cref<decltype(typed_mode)>;
+
+					if constexpr(std::is_same_v<M, test_scene_mode>) {
+						(void)mode_input;
+					}
+					else {
+						if (ImGui::Button("Add player")) {
+							typed_mode.auto_assign_faction(mode_input, typed_mode.add_player(mode_input, nickname));
+						}
+
+						ImGui::SameLine();
+
+						input_text<256>("Nickname", nickname);
+					}
+
 					auto& work = *cmd_in.folder.work;
 					auto& cosm = work.world;
 
@@ -60,8 +83,7 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 							flavour_widget { cosm }
 						)
 					);
-				}, 
-				current_mode
+				}
 			);
 		}
 	}

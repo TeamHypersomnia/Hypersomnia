@@ -1240,3 +1240,25 @@ we consider whole type overrides too complex architeciturally:
 	- arming/unarming durations inside explosive invariant
 	- defusable_by boolset with factions
 
+
+- calc participating faction could calculate bombing and defusing right away
+	- we'll also avoid having three of them
+	- it could constexpr after the type of input (thus the type of the mode)
+
+- don't transfer bombs across rounds
+
+- 3 magazine slots on torso so we don't have to buy backpack for some already viable setups
+
+- bomb_mode is inherently two-faction, rules don't make sense for three
+	- but both factions can have bombs, why not! Let's code a generalization straight away.
+		- actually, let's not do this for now
+		- calculate the bombing faction by finding the first bombsite marker
+			- spawn a bomb per each round for a randomly selected player of the bombing faction
+			- bombing faction wins
+				- its bomb stops existing (it exploded)
+			- bombing faction loses if
+				- its bomb gets defused
+		- after time limit
+			- bombing faction loses
+
+

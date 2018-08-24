@@ -72,8 +72,18 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 
 			{
 				const auto in = bomb_mode::input { bomb_vars, cosm.get_solvable().significant, cosm };
-				player_id = mode.add_player(in, "Editor-player");
-				mode.auto_assign_faction(in, player_id);
+
+				{
+					const auto id = mode.add_player(in, "Editor-player");
+					mode.auto_assign_faction(in, id);
+				}
+
+				{
+					const auto id = mode.add_player(in, "Test-player");
+					mode.auto_assign_faction(in, id);
+
+					player_id = id;
+				}
 			}
 
 			player.current_mode_vars_id = bomb_vars_id;

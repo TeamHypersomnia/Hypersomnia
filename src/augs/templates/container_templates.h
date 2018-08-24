@@ -205,14 +205,13 @@ auto key_or_default(
 }
 
 
-template <class Container>
-auto first_free_key(const Container& in) {
-	for (std::size_t candidate = 0;;++candidate) {
-		const auto key = static_cast<typename Container::key_type>(candidate);
-		const auto it = in.find(key);
+template <class Container, class T = std::size_t>
+auto first_free_key(const Container& in, T candidate = static_cast<T>(0)) {
+	for (;;++candidate) {
+		const auto it = in.find(static_cast<typename Container::key_type>(candidate));
 
 		if (it == in.end()) {
-			return key;
+			return candidate;
 		}
 	}
 }

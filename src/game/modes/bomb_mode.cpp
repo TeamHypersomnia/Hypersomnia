@@ -219,10 +219,12 @@ mode_player_id bomb_mode::add_player(input_type in, const entity_name_str& chose
 	auto& cosm = in.cosm;
 	(void)cosm;
 
-	const auto new_id = first_free_key(players);
+	const auto f = mode_player_id::first();
+	const auto new_id = first_free_key(players, f.value);
+
 	players.try_emplace(new_id, chosen_name);
 
-	return mode_player_id::dead();
+	return new_id;
 }
 
 void bomb_mode::remove_player(input_type in, const mode_player_id& id) {
@@ -608,7 +610,7 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 		if (num_players_in(p.defusing) > 0) {
 			if (0 == num_conscious_players_in(cosm, p.defusing)) {
 				/* All defusing players have been neutralized. */
-				standard_win(p.defusing);
+				standard_win(p.bombing);
 				return;
 			}
 		}
