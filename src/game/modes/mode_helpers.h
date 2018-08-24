@@ -29,14 +29,56 @@ inline auto calc_spawnable_factions(const cosmos& cosm) {
 
 using player_character_type = controlled_character;
 
-inline auto remove_test_characters(cosmos& cosm) {
+inline void remove_test_characters(cosmos& cosm) {
+	std::vector<entity_id> q;
+
 	cosm.for_each_having<invariants::sentience>(
-		[&](const auto& typed_handle){
+		[&](const auto typed_handle) {
 			if constexpr(std::is_same_v<entity_type_of<decltype(typed_handle)>, player_character_type>) {
-				cosmic::delete_entity(typed_handle);
+				q.push_back(typed_handle.get_id());
+
+				typed_handle.for_each_contained_item_recursive(
+					[&](const auto& it) {
+						q.push_back(it.get_id());
+						return recursive_callback_result::CONTINUE_AND_RECURSE;
+					}
+				);
 			}
 		}
 	);
+
+
+	for (const auto& e : q) {
+		if (const auto h = cosm[e]) {
+			cosmic::delete_entity(h);
+		}
+	}
+}
+
+inline void remove_test_dropped_items(cosmos& cosm) {
+	std::vector<entity_id> q;
+
+	cosm.for_each_having<components::item>(
+		[&](const auto typed_handle) {
+			if (typed_handle.get_current_slot().dead()) {
+				q.push_back(typed_handle.get_id());
+
+				typed_handle.for_each_contained_item_recursive(
+					[&](const auto& it) {
+						q.push_back(it.get_id());
+						return recursive_callback_result::CONTINUE_AND_RECURSE;
+					}
+				);
+			}
+		}
+	);
+
+
+	for (const auto& e : q) {
+		if (const auto h = cosm[e]) {
+			cosmic::delete_entity(h);
+		}
+	}
 }
 
 inline auto find_faction_character_flavour(const cosmos& cosm, const faction_type faction) {
