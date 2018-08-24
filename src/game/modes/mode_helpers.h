@@ -14,6 +14,19 @@ void for_each_faction(F callback) {
 	callback(faction_type::RESISTANCE);
 }
 
+template <class F, class... Args>
+decltype(auto) continue_or_callback_result(F&& callback, Args&&... args) {
+	using R = decltype(callback(std::forward<Args>(args)...));
+	if constexpr(std::is_same_v<void, R>) {
+		callback(std::forward<Args>(args)...);
+		return callback_result::CONTINUE;
+	}
+	else {
+		static_assert(std::is_same_v<R, callback_result>, "Bad return type for a for_each callback.");
+		return callback(std::forward<Args>(args)...);
+	}
+}
+
 inline auto calc_spawnable_factions(const cosmos& cosm) {
 	per_faction_t<bool> result = {};
 
@@ -109,7 +122,7 @@ auto for_each_faction_spawn(const cosmos& cosm, const faction_type faction, F&& 
 
 			if (marker.type == point_marker_type::TEAM_SPAWN) {
 				if (marker.meta.associated_faction == faction) {
-					return callback(typed_handle);
+					return continue_or_callback_result(std::forward<F>(callback), typed_handle);
 				}
 			}
 
@@ -120,7 +133,7 @@ auto for_each_faction_spawn(const cosmos& cosm, const faction_type faction, F&& 
 
 inline auto get_num_faction_spawns(const cosmos& cosm, const faction_type faction) {
 	std::size_t total = 0;
-	for_each_faction_spawn(cosm, faction, [&](auto) { ++total; return callback_result::CONTINUE; } );
+	for_each_faction_spawn(cosm, faction, [&](auto) { ++total; } );
 	return total;
 }
 

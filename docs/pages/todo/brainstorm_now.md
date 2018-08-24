@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- add a match-global rng seed offset to mode state
+- let a random character pick the bomb
 - Make a command for adding a player in editor? 
 
 - After round restart,

@@ -173,15 +173,18 @@ private:
 	void play_bomb_defused_sound(input, const_logic_step, faction_type) const;
 
 	template <class F>
-	void for_each_player_in(faction_type, F callback) const;
+	void for_each_player_in(faction_type, F&& callback) const;
 
 	template <class C, class F>
-	void for_each_player_handle_in(C&, faction_type, F callback) const;
+	void for_each_player_handle_in(C&, faction_type, F&& callback) const;
 
 	std::size_t num_conscious_players_in(const cosmos&, faction_type) const;
 	std::size_t num_players_in(faction_type) const;
 
 	void process_win_conditions(input, logic_step);
+
+	std::size_t get_round_rng_seed(const cosmos&) const;
+	std::size_t get_step_rng_seed(const cosmos&) const;
 
 public:
 

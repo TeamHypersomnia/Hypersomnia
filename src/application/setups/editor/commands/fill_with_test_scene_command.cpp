@@ -32,10 +32,18 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 
 	test_scene_mode_vars test_vars;
 	bomb_mode_vars bomb_vars;
-	bomb_vars.warmup_secs = 8;
-	bomb_vars.round_secs = 10;
-	bomb_vars.freeze_secs = 5;
+
+#if IS_PRODUCTION_BUILD
+	bomb_vars.warmup_secs = 45;
+	bomb_vars.round_secs = 120;
+	bomb_vars.freeze_secs = 15;
 	bomb_vars.round_end_secs = 5;
+#else
+	bomb_vars.warmup_secs = 0;
+	bomb_vars.round_secs = 10;
+	bomb_vars.freeze_secs = 0;
+	bomb_vars.round_end_secs = 3;
+#endif
 
 	const auto& settings = in.settings.test_scene;
 

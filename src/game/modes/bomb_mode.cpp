@@ -19,6 +19,15 @@ const bomb_mode_player* bomb_mode::find(const mode_player_id& id) const {
 	return mapped_or_nullptr(players, id);
 }
 
+std::size_t bomb_mode::get_round_rng_seed(const cosmos& cosm) const {
+	(void)cosm;
+	return clock_before_setup.now.step + get_round_num(); 
+}
+
+std::size_t bomb_mode::get_step_rng_seed(const cosmos& cosm) const {
+	return get_round_rng_seed(cosm) + cosm.get_total_steps_passed();
+}
+
 bool bomb_mode::choose_faction(const mode_player_id& id, const faction_type faction) {
 	if (const auto entry = find(id)) {
 		if (entry->faction == faction) {
@@ -246,7 +255,7 @@ entity_guid bomb_mode::lookup(const mode_player_id& id) const {
 }
 
 void bomb_mode::reshuffle_spawns(const cosmos& cosm, const faction_type faction) {
-	auto rng = randomization(cosm.get_total_steps_passed() + static_cast<int>(faction));
+	auto rng = randomization(get_step_rng_seed(cosm) + static_cast<int>(faction));
 
 	auto& faction_state = factions[faction];
 
@@ -257,7 +266,6 @@ void bomb_mode::reshuffle_spawns(const cosmos& cosm, const faction_type faction)
 
 	auto adder = [&](const auto typed_spawn) {
 		spawns.push_back(typed_spawn.get_guid());
-		return callback_result::CONTINUE;
 	};
 
 	for_each_faction_spawn(cosm, faction, adder);
@@ -274,22 +282,31 @@ void bomb_mode::reshuffle_spawns(const cosmos& cosm, const faction_type faction)
 }
 
 template <class F>
-void bomb_mode::for_each_player_in(const faction_type faction, F callback) const {
+void bomb_mode::for_each_player_in(const faction_type faction, F&& callback) const {
 	for (auto& it : players) {
 		if (it.second.faction == faction) {
-			callback(it.first, it.second);
+			if (continue_or_callback_result(std::forward<F>(callback), it.first, it.second) == callback_result::ABORT) {
+				return;
+			}
 		}
 	}
 }
 
 template <class C, class F>
-void bomb_mode::for_each_player_handle_in(C& cosm, const faction_type faction, F callback) const {
+void bomb_mode::for_each_player_handle_in(C& cosm, const faction_type faction, F&& callback) const {
 	for_each_player_in(faction, [&](const auto&, const auto& data) {
 		if (const auto handle = cosm[data.guid]) {
-			handle.template dispatch_on_having_all<components::sentience>([&](const auto& typed_player) {
-				callback(typed_player);
+			return handle.template dispatch_on_having_all_ret<components::sentience>([&](const auto& typed_player) {
+				if constexpr(std::is_same_v<decltype(typed_player), const std::nullopt_t&>) {
+					return callback_result::CONTINUE;
+				}
+				else {
+					return continue_or_callback_result(std::forward<F>(callback), typed_player);
+				}
 			});
 		}
+
+		return callback_result::CONTINUE;
 	});
 }
 
@@ -401,6 +418,68 @@ void bomb_mode::setup_round(
 	else {
 		play_sound_for(in, step, battle_event::START);
 	}
+
+	if (state != arena_mode_state::WARMUP) {
+		static const auto tried_slots = std::array<slot_function, 3> {
+			slot_function::SHOULDER,
+
+			slot_function::PRIMARY_HAND,
+			slot_function::SECONDARY_HAND
+		};
+
+		const auto p = calc_participating_factions(in);
+
+		const auto viable_players = [&]() {
+			std::vector<typed_entity_id<player_character_type>> result;
+
+			for_each_player_handle_in(cosm, p.bombing, [&](const auto& typed_player) {
+				for (const auto& t : tried_slots) {
+					if (typed_player[t].is_empty_slot()) {
+						result.push_back(typed_player.get_id());
+						return;
+					}
+				}
+			});
+
+			return result;
+		}();
+
+		const auto new_bomb_entity = cosmic::create_entity(cosm, in.vars.bomb_flavour);
+
+		if (viable_players.empty()) {
+			vec2 avg_pos;
+			vec2 avg_dir;
+
+			std::size_t n = 0;
+
+			for_each_faction_spawn(cosm, p.bombing, [&](const auto& typed_spawn) {
+				const auto& tr = typed_spawn.get_logic_transform();
+
+				avg_pos += tr.pos;
+				avg_dir += tr.get_direction();
+
+				++n;
+			});
+
+			avg_pos /= n;
+			avg_dir /= n;
+
+			new_bomb_entity.set_logic_transform(transformr(avg_pos));
+			new_bomb_entity.get<components::rigid_body>().apply_impulse(avg_dir * 1000);
+		}
+		else {
+			const auto chosen_bomber_idx = get_step_rng_seed(cosm) % viable_players.size();
+			const auto typed_player = cosm[viable_players[chosen_bomber_idx]];
+
+			for (const auto& t : tried_slots) {
+				if (typed_player[t].is_empty_slot()) {
+					LOG("Empty. perform");
+					perform_transfer(item_slot_transfer_request::standard(new_bomb_entity.get_id(), typed_player[t].get_id()), step);
+					break;
+				}
+			}
+		}
+	}
 }
 
 bomb_mode::round_transferred_players bomb_mode::make_transferred_players(const input_type in) const {
@@ -481,7 +560,7 @@ void bomb_mode::play_faction_sound(const const_logic_step step, const faction_ty
 
 	sound_effect_start_input input;
 	input.listener_faction = f;
-	input.variation_number = clock_before_setup.now.step + get_round_num();
+	input.variation_number = get_step_rng_seed(step.get_cosmos());
 
 	effect.start(step, input);
 }
@@ -520,7 +599,7 @@ void bomb_mode::play_bomb_defused_sound(const input_type in, const const_logic_s
 			auto& start = msg.payload.start;
 
 			start.listener_faction = t;
-			start.variation_number = clock_before_setup.now.step + get_round_num();
+			start.variation_number = get_round_rng_seed(in.cosm);
 		}
 
 		auto& effects = msg.payload.inputs;
