@@ -82,10 +82,13 @@ void arena_gui_state::draw_mode_gui(
 				const auto assist = get_name(ko.assist);
 				const auto victim = get_name(ko.victim);
 
-				auto total_text = knockouter;
+				const bool is_suicide = ko.knockouter == ko.victim;
+
+				(void)is_suicide;
+				auto total_text = is_suicide ? "" : knockouter;
 
 				if (assist.size() > 0) {
-					total_text += " + " + assist;
+					total_text += " (+ " + assist + ")";
 				}
 
 				total_text += " ---->>>> " + victim;
@@ -185,16 +188,16 @@ void arena_gui_state::draw_mode_gui(
 		}
 
 		{
+			if (const auto secs = typed_mode.get_seconds_since_planting(mode_input); secs >= 0.f && secs <= 3.f) {
+				draw_info_indicator("The bomb has been planted!", yellow);
+				return;
+			}
+
 			auto& win = typed_mode.last_win;
 
 			if (win.was_set()) {
 				draw_info_indicator(format_enum(win.winner) + " wins!", yellow);
-			}
-		}
-
-		{
-			if (const auto secs = typed_mode.get_seconds_since_planting(mode_input); secs >= 0.f && secs <= 3.f) {
-				draw_info_indicator("The bomb has been planted!", yellow);
+				return;
 			}
 		}
 

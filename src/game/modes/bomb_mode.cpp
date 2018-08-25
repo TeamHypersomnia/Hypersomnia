@@ -9,6 +9,7 @@
 #include "game/detail/inventory/generate_equipment.h"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #include "game/messages/start_sound_effect.h"
+#include "game/detail/damage_origin.hpp"
 
 using input_type = bomb_mode::input;
 
@@ -229,8 +230,7 @@ mode_player_id bomb_mode::add_player(input_type in, const entity_name_str& chose
 	auto& cosm = in.cosm;
 	(void)cosm;
 
-	const auto f = mode_player_id::first();
-	const auto new_id = first_free_key(players, f.value);
+	const auto new_id = first_free_key(players, mode_player_id::first());
 
 	players.try_emplace(new_id, chosen_name);
 
@@ -375,7 +375,7 @@ void bomb_mode::setup_round(
 
 	cosm.set(in.initial_signi);
 	remove_test_characters(cosm);
-	remove_test_dropped_items(cosm);
+	//remove_test_dropped_items(cosm);
 
 	knockouts.clear();
 	cache_players_frozen = false;
@@ -560,19 +560,24 @@ void bomb_mode::count_knockout(const input_type in, const entity_guid victim, co
 	const auto& cosm = in.cosm;
 	const auto& clk = cosm.get_clock();
 	const auto& origin = sentience.knockout_origin;
-	const auto knockouter = cosm[origin.sender.capability_of_sender];
+	const auto knockouter = origin.get_guilty_of_damaging(cosm[victim]);
 
-	if (knockouter.dead()) {
-		return;
-	}
+	ensure(knockouter.alive());
 
 	auto assists = sentience.damage_owners;
 
-	erase_if(assists, [&](const auto& o) {
-		return o.who == knockouter || o.amount < in.vars.minimal_damage_for_assist;
-	});
-
 	bomb_mode_knockout ko;
+
+	for (const auto& candidate : assists) {
+		if (const auto who = cosm[candidate.who]) {
+			if (who != knockouter) {
+				if (candidate.amount >= in.vars.minimal_damage_for_assist) {
+					ko.assist = lookup(cosm[assists.front().who]);
+					break;
+				}
+			}
+		}
+	}
 
 	ko.when = clk;
 	ko.cause = origin.cause;
@@ -580,44 +585,40 @@ void bomb_mode::count_knockout(const input_type in, const entity_guid victim, co
 	ko.knockouter = lookup(knockouter);
 	ko.victim = lookup(victim);
 
-	if (assists.size() > 0) {
-		ko.assist = lookup(cosm[assists.front().who]);
-	}
-
 	count_knockout(in, ko);
 }
 
 void bomb_mode::count_knockout(const input_type in, const arena_mode_knockout ko) {
 	knockouts.push_back(ko);
 
-	int assists_dt = 1;
-	int knockouts_dt = 1;
-	int deaths_dt = 1;
-
-	auto same_faction = [&](const auto a, const auto b) {
-		const auto& cosm = in.cosm;
-
-		const auto a_h = cosm[lookup(a)];
-		const auto b_h = cosm[lookup(b)];
-
-		if (a_h.dead() || b_h.dead()) {
-			return false;
-		}
-
-		return a_h.get_official_faction() == b_h.get_official_faction();
+	auto faction_of = [&](const auto a) {
+		return in.cosm[lookup(a)].get_official_faction();
 	};
 
-	if (same_faction(ko.knockouter, ko.victim)) {
-		knockouts_dt = -1;
+	auto same_faction = [&](const auto a, const auto b) {
+		return faction_of(a) == faction_of(b);
+	};
+
+	{
+		int knockouts_dt = 1;
+
+		if (same_faction(ko.knockouter, ko.victim)) {
+			knockouts_dt = -1;
+		}
+
+		players[ko.knockouter].knockouts += knockouts_dt;
+		players[ko.victim].deaths += 1;
 	}
 
-	if (same_faction(ko.assist, ko.victim)) {
-		assists_dt = -1;
-	}
+	if (ko.assist.is_set()) {
+		int assists_dt = 1;
 
-	players[ko.knockouter].knockouts += knockouts_dt;
-	players[ko.assist].assists += assists_dt;
-	players[ko.victim].deaths += deaths_dt;
+		if (same_faction(ko.assist, ko.victim)) {
+			assists_dt = -1;
+		}
+
+		players[ko.assist].assists += assists_dt;
+	}
 }
 
 void bomb_mode::count_knockouts_for_unconscious_players_in(const input_type in, const faction_type faction) {
@@ -812,12 +813,15 @@ void bomb_mode::mode_post_solve(const input_type in, const mode_entropy& entropy
 	(void)entropy;
 	auto& cosm = in.cosm;
 
-	const auto& events = step.get_queue<messages::health_event>();
+	{
+		const auto& events = step.get_queue<messages::health_event>();
 
-	for (const auto& e : events) {
-		if (e.special_result == messages::health_event::result_type::DEATH) {
-			if (const auto victim = cosm[e.subject]) {
-				count_knockout(in, victim, victim.get<components::sentience>());
+		for (const auto& e : events) {
+			if (e.special_result == messages::health_event::result_type::DEATH) {
+				LOG("DEATH!!");
+				if (const auto victim = cosm[e.subject]) {
+					count_knockout(in, victim, victim.get<components::sentience>());
+				}
 			}
 		}
 	}

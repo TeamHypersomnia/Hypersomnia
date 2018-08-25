@@ -18,7 +18,7 @@
 #include "game/cosmos/data_living_one_step.h"
 #include "game/detail/organisms/startle_nearbly_organisms.h"
 #include "game/detail/physics/shape_overlapping.hpp"
-#include "game/detail/damage_origin.h"
+#include "game/detail/damage_origin.hpp"
 
 static bool triangle_degenerate(const std::array<vec2, 3>& v) {
 	constexpr auto eps_triangle_degenerate = 0.5f;

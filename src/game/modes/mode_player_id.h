@@ -15,7 +15,7 @@ struct mode_player_id {
 	}
 
 	mode_player_id() = default;
-	mode_player_id(const id_value_type b) : value(b) {}
+	explicit mode_player_id(const id_value_type b) : value(b) {}
 	
 	mode_player_id& operator=(const mode_player_id& b) = default;
 
@@ -25,6 +25,11 @@ struct mode_player_id {
 
 	bool operator!=(const mode_player_id& b) const {
 		return value != b.value;
+	}
+
+	auto& operator++() {
+		++value;
+		return *this;
 	}
 
 	operator id_value_type() const {

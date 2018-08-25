@@ -44,7 +44,8 @@ struct damage_owner {
 	// END GEN INTROSPECTOR
 
 	bool operator<(const damage_owner& b) const {
-		return amount < b.amount;
+		/* Bigger come first */
+		return amount > b.amount;
 	}
 };
 

@@ -26,18 +26,16 @@ void detonate(const detonate_input in) {
 	const auto& step = in.step;
 	auto& cosm = step.get_cosmos();
 
-	damage_cause cause;
-	cause.entity = in.subject;
+	const auto subject = cosm[in.subject];
 
-	e.explosion.instantiate(step, in.location, cause);
-	step.post_message(messages::queue_deletion(in.subject));
+	e.explosion.instantiate(step, in.location, damage_cause(subject));
+	step.post_message(messages::queue_deletion(subject));
 
 	const auto cascade_inputs = vectorize_array(e.cascade, [](const auto& f) { return f.flavour_id.is_set(); });
-	const auto sender_of_subject = cosm[in.subject].get<components::sender>();
 
 	for (const auto& c_in : cascade_inputs) {
 		const auto n = c_in.num_spawned;
-		auto rng = cosm.get_rng_for(in.subject);
+		auto rng = cosm.get_rng_for(subject);
 
 		const auto angle_dt = c_in.spawn_spread / n;
 
@@ -58,7 +56,9 @@ void detonate(const detonate_input in) {
 				cosm,
 				c_in.flavour_id,
 				[&](const auto typed_handle, auto&&...) {
-					typed_handle.template get<components::sender>() = sender_of_subject;
+					auto& cascade_sender = typed_handle.template get<components::sender>();
+					cascade_sender = subject.get<components::sender>();
+					cascade_sender.set_direct(subject);
 
 					{
 						const auto target_transform = transformr(t.pos, vel_angle);

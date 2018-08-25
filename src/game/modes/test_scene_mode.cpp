@@ -65,7 +65,7 @@ mode_player_id test_scene_mode::add_player(input_type in, const faction_type fac
 	auto& cosm = in.cosm;
 
 	if (const auto flavour = ::find_faction_character_flavour(cosm, faction); flavour.is_set()) {
-		const auto new_id = first_free_key(players);
+		const auto new_id = first_free_key(players, mode_player_id::first());
 
 		if (cosmic::create_entity(
 			cosm, 

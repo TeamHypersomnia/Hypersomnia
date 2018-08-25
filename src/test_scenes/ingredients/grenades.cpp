@@ -265,7 +265,7 @@ namespace test_flavours {
 			fuse.fuse_delay_ms = 35000.f;
 			fuse.set_bomb_vars(1500.f, 10000.f);
 #else
-			fuse.fuse_delay_ms = 10000.f;
+			fuse.fuse_delay_ms = 2000.f;
 			fuse.set_bomb_vars(150.f, 1000.f);
 #endif
 			fuse.beep_sound.id = to_sound_id(test_scene_sound_id::BEEP);

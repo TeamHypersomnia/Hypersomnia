@@ -34,6 +34,7 @@
 #include "game/detail/gun/gun_math.h"
 #include "game/stateless_systems/driver_system.h"
 #include "game/cosmos/entity_handle.h"
+#include "game/detail/damage_origin.hpp"
 
 damage_cause::damage_cause(const const_entity_handle& handle) {
 	entity = handle;
@@ -222,9 +223,10 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 	auto& health = sentience.get<health_meter_instance>();
 	auto& consciousness = sentience.get<consciousness_meter_instance>();
 	auto& personal_electricity = sentience.get<personal_electricity_meter_instance>();
+	const auto& origin = h.origin;
 
 	auto contribute_to_damage = [&](const auto contributed_amount) {
-		const auto inflicting_capability = cosm[h.origin.sender.capability_of_sender];
+		const auto inflicting_capability = origin.get_guilty_of_damaging(subject);
 
 		auto& owners = sentience.damage_owners;
 		bool found = false;
@@ -240,8 +242,8 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 			const auto new_one = damage_owner { inflicting_capability, contributed_amount };
 
 			if (owners.size() == owners.max_size()) {
-				if (owners.front() < new_one) {
-					owners.front() = new_one;
+				if (owners.back() < new_one) {
+					owners.back() = new_one;
 				}
 			}
 			else {
@@ -328,7 +330,9 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		knocked_out_body.apply(knockout_impulse * sentience_def.knockout_impulse);
 
 		sentience.when_knocked_out = now;
-		sentience.knockout_origin = h.origin;
+		sentience.knockout_origin = origin;
+		LOG_NVPS(origin.sender.direct_sender_flavour);
+		LOG_NVPS(origin.cause.flavour);
 	};
 
 	if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION) {

@@ -533,9 +533,10 @@ struct game_state_checks {
 	/*
 		Known exceptions:
 		damage_cause::flavour
+		damage_sender::direct_sender_flavour
 	*/
 
-	static_assert(1 == sum_matching_in_v<is_flavour_id, cosmos_solvable_significant>);
+	//static_assert(2 == sum_matching_in_v<is_flavour_id, cosmos_solvable_significant>);
 
 	static_assert(!sum_matching_in_v<is_asset_id, cosmos_solvable_significant>);
 

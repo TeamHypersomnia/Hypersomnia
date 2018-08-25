@@ -28,12 +28,8 @@ struct damage_origin {
 	// END GEN INTROSPECTOR
 
 	template <class E>
-	void copy_sender_from(const E& causing_handle) {
-		if (const auto s = causing_handle.template find<components::sender>()) {
-			sender = *s;
-		}
-		else {
-			sender.set(causing_handle);
-		}
-	}
+	void copy_sender_from(const E& causing_handle);
+
+	template <class E>
+	const_entity_handle get_guilty_of_damaging(const E& victim_handle) const;
 };

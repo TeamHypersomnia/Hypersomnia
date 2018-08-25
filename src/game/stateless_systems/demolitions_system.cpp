@@ -98,13 +98,10 @@ void demolitions_system::advance_cascade_explosions(const logic_step step) {
 				auto expl_in = cascade_def.explosion;
 				expl_in *= rng.randval_vm(1.f, cascade_def.explosion_scale_variation);
 
-				damage_cause cause;
-				cause.entity = it;
-
 				expl_in.instantiate(
 					step,
 					it.get_logic_transform(),
-					cause
+					damage_cause(it)
 				);
 
 				--cascade.explosions_left;

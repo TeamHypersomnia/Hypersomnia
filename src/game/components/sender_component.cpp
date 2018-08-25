@@ -8,10 +8,15 @@
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 
 namespace components {
+	void sender::set_direct(const const_entity_handle new_direct_sender) {
+		direct_sender = new_direct_sender;
+		direct_sender_flavour = new_direct_sender.get_flavour_id();
+	}
+
 	void sender::set(const const_entity_handle new_direct_sender) {
 		const auto& cosmos = new_direct_sender.get_cosmos();
 
-		direct_sender = new_direct_sender;
+		set_direct(new_direct_sender);
 
 		if (const auto capability = new_direct_sender.get_owning_transfer_capability()) {
 			capability_of_sender = capability;
