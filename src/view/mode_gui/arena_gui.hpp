@@ -45,12 +45,22 @@ void arena_gui_state::draw_mode_gui(
 
 		{
 			const auto& kos = typed_mode.knockouts;
+			const auto& clk = mode_input.cosm.get_clock();
 
 			const auto show_recent_knockouts_num = std::size_t(5);
 			const auto knockouts_to_show = std::min(kos.size(), show_recent_knockouts_num);
 
-			const auto starting_i = kos.size() - knockouts_to_show;
 			const auto font_height = in.gui_font.metrics.get_height();
+
+			const auto starting_i = [&]() {
+				auto i = kos.size() - knockouts_to_show;
+
+				while (i < kos.size() && clk.diff_seconds(kos[i].when) >= 5.f) {
+					++i;
+				}
+
+				return i;
+			}();
 
 			for (std::size_t i = starting_i; i < kos.size(); ++i) {
 				const auto& ko = kos[i];
