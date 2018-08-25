@@ -3,6 +3,8 @@
 #include "augs/audio/sound_source.h"
 #include "application/setups/draw_setup_gui_input.h"
 
+struct mode_player_id;
+
 struct arena_gui_state {
 	// GEN INTROSPECTOR struct arena_gui_state
 	bool show_scores = false;
@@ -21,6 +23,8 @@ struct arena_gui_state {
 		const draw_setup_gui_input& in,
 		const float game_screen_top,
 		const M& mode, 
-		const I& input
+		const I& input,
+
+		mode_player_id local_player
 	) const;
 };

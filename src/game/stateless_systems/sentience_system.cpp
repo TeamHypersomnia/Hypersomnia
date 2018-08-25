@@ -35,6 +35,15 @@
 #include "game/stateless_systems/driver_system.h"
 #include "game/cosmos/entity_handle.h"
 
+damage_cause::damage_cause(const const_entity_handle& handle) {
+	entity = handle;
+	flavour = handle.get_flavour_id();
+}
+
+damage_origin::damage_origin(const const_entity_handle& causing_handle) : cause(causing_handle) {
+	copy_sender_from(causing_handle);
+}
+
 void sentience_system::cast_spells(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
 	const auto& spell_metas = cosm.get_common_significant().spells;
@@ -190,7 +199,9 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 								subject,
 								sentience,
 								when_casted,
-								now
+								now,
+
+								sentience.currently_casted_spell
 							};
 
 							spell.perform_logic(input);
@@ -212,12 +223,44 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 	auto& consciousness = sentience.get<consciousness_meter_instance>();
 	auto& personal_electricity = sentience.get<personal_electricity_meter_instance>();
 
-	switch (h.target) {
-	case messages::health_event::target_type::HEALTH:
-	{
+	auto contribute_to_damage = [&](const auto contributed_amount) {
+		const auto inflicting_capability = cosm[h.origin.sender.capability_of_sender];
 
-		health.value -= h.effective_amount;
+		auto& owners = sentience.damage_owners;
+		bool found = false;
+
+		for (auto& o : owners) {
+			if (o.who == inflicting_capability) {
+				o.amount += contributed_amount;
+				found = true;
+			}
+		}
+
+		if (!found) {
+			const auto new_one = damage_owner { inflicting_capability, contributed_amount };
+
+			if (owners.size() == owners.max_size()) {
+				if (owners.front() < new_one) {
+					owners.front() = new_one;
+				}
+			}
+			else {
+				owners.push_back(new_one);
+			}
+		}
+
+		sort_range(owners);
+	};
+
+	switch (h.target) {
+	case messages::health_event::target_type::HEALTH: {
+		const auto amount = h.effective_amount;
+
+		contribute_to_damage(amount);
+		health.value -= amount;
+
 		ensure(health.value >= 0);
+
 		sentience.time_of_last_received_damage = cosm.get_timestamp();
 
 		auto& movement = subject.get<components::movement>();
@@ -231,24 +274,33 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		if (!health.is_positive()) {
 			h.special_result = messages::health_event::result_type::DEATH;
 		}
-	}
-		break;
 
-	case messages::health_event::target_type::CONSCIOUSNESS: 
-		consciousness.value -= h.effective_amount;
+		break;
+	}
+
+	case messages::health_event::target_type::CONSCIOUSNESS: {
+		const auto amount = h.effective_amount;
+		contribute_to_damage(amount / 5);
+		consciousness.value -= amount;
 
 		if (!consciousness.is_positive()) {
 			h.special_result = messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS;
 		}
-		break;
 
-	case messages::health_event::target_type::PERSONAL_ELECTRICITY: 
-		personal_electricity.value -= h.effective_amount;
+		break;
+	}
+
+	case messages::health_event::target_type::PERSONAL_ELECTRICITY: {
+		const auto amount = h.effective_amount;
+		personal_electricity.value -= amount;
+		contribute_to_damage(amount / 8);
 
 		if (!personal_electricity.is_positive()) {
 			h.special_result = messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION;
 		}
+
 		break;
+	}
 
 	case messages::health_event::target_type::INVALID:
 		break;
@@ -276,6 +328,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		knocked_out_body.apply(knockout_impulse * sentience_def.knockout_impulse);
 
 		sentience.when_knocked_out = now;
+		sentience.knockout_origin = h.origin;
 	};
 
 	if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION) {
@@ -314,6 +367,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 		event_template.impact_velocity = d.impact_velocity;
 		event_template.effective_amount = 0;
 		event_template.special_result = messages::health_event::result_type::NONE;
+		event_template.origin = d.origin;
 		
 		if (sentience) {
 			const auto& s = *sentience;

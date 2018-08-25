@@ -82,7 +82,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 		}();
 
 		if (d.inflictor_destructed) {
-			const auto inflictor = cosmos[d.inflictor];
+			const auto inflictor = cosmos[d.origin.cause.entity];
 
 			if (const auto missile = inflictor.find<invariants::missile>()) {
 				const auto& effect = missile->destruction_particles;

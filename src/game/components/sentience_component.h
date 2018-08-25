@@ -10,6 +10,7 @@
 #include "augs/templates/type_list.h"
 #include "augs/templates/constexpr_arithmetic.h"
 #include "augs/templates/identity_templates.h"
+#include "augs/misc/constant_size_vector.h"
 
 #include "game/assets/ids/asset_ids.h"
 
@@ -27,6 +28,7 @@
 
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
+#include "game/detail/damage_origin.h"
 
 #include "game/enums/use_button_query_result.h"
 
@@ -34,6 +36,19 @@ using learned_spells_array_type = std::array<
 	bool,
 	aligned_num_of_bytes_v<num_types_in_list_v<spell_instance_tuple>, 4>
 >;
+
+struct damage_owner {
+	// GEN INTROSPECTOR struct damage_owner
+	signi_entity_id who;
+	meter_value_type amount = 0;
+	// END GEN INTROSPECTOR
+
+	bool operator<(const damage_owner& b) const {
+		return amount < b.amount;
+	}
+};
+
+using damage_owners_vector = augs::constant_size_vector<damage_owner, 3>;
 
 namespace components {
 	struct sentience {
@@ -62,6 +77,9 @@ namespace components {
 
 		use_button_state use_button = use_button_state::IDLE;
 		use_button_query_result last_use_result = use_button_query_result::NONE_FOUND;
+
+		damage_owners_vector damage_owners;
+		damage_origin knockout_origin;
 		// END GEN INTROSPECTOR
 
 		bool is_learned(const spell_id id) const {
@@ -77,6 +95,7 @@ namespace components {
 		std::optional<rgba> find_low_health_border(const unsigned timestamp_ms) const;
 
 		bool is_conscious() const;
+		bool unconscious_but_alive() const;
 
 		template <class T>
 		auto& get() {

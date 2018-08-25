@@ -285,7 +285,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 				// delete only once
 				if (charges == 0) {
-					step.post_message(messages::queue_deletion(it.collider));
+					step.post_message(messages::queue_deletion(missile_handle));
 					damage_msg.inflictor_destructed = true;
 
 					auto rng = cosm.get_rng_for(typed_missile);
@@ -347,7 +347,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			}
 
 			if (send_damage && contact_start) {
-				damage_msg.inflictor = it.collider;
+				damage_msg.origin = damage_origin(missile_handle);
 				damage_msg.subject = it.subject;
 				damage_msg.amount = total_damage_amount;
 				damage_msg.victim_shake = missile_def.victim_shake;

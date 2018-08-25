@@ -200,7 +200,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 
 	for (const auto& d : damages) {
 		if (d.inflictor_destructed) {
-			const auto inflictor = cosmos[d.inflictor];
+			const auto inflictor = cosmos[d.origin.cause.entity];
 			
 			const auto& effect = inflictor.get<invariants::missile>().destruction_sound;
 

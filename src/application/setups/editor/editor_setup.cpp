@@ -1359,7 +1359,7 @@ void editor_setup::draw_mode_gui(const draw_setup_gui_input& in) const {
 	if (anything_opened()) {
 		on_mode_with_input(
 			[&](const auto& typed_mode, const auto& mode_input) {
-				arena_gui.draw_mode_gui(in, get_game_screen_top(), typed_mode, mode_input);
+				arena_gui.draw_mode_gui(in, get_game_screen_top(), typed_mode, mode_input, view().local_player_id);
 			}
 		);
 	}

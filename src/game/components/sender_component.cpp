@@ -23,6 +23,9 @@ namespace components {
 				}
 			}
 		}
+		else {
+			faction_of_sender = new_direct_sender.get_official_faction();
+		}
 	}
 
 	bool sender::is_sender_subject(const const_entity_handle potential_sender) const {

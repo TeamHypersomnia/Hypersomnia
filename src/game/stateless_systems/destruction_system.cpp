@@ -32,7 +32,7 @@ void destruction_system::generate_damages_from_forceful_collisions(const logic_s
 			damage_msg.subject_b2Fixture_index = it.subject_b2Fixture_index;
 			damage_msg.collider_b2Fixture_index = it.collider_b2Fixture_index;
 
-			damage_msg.inflictor = it.collider;
+			damage_msg.origin = damage_origin(cosmos[it.collider]);
 			damage_msg.subject = it.subject;
 			damage_msg.amount = 0.f;
 			damage_msg.impact_velocity = it.collider_impact_velocity;

@@ -11,6 +11,8 @@
 #include "game/enums/adverse_element_type.h"
 #include "game/detail/sentience_shake.h"
 
+struct damage_cause;
+
 struct standard_explosion_input {
 	// GEN INTROSPECTOR struct standard_explosion_input
 	float effective_radius = 250.f;
@@ -43,11 +45,6 @@ struct standard_explosion_input {
 	void instantiate(
 		logic_step step, 
 		transformr explosion_location, 
-		entity_id subject_if_any
-	) const;
-
-	void instantiate_no_subject(
-		logic_step step, 
-		transformr explosion_location
+		damage_cause cause
 	) const;
 };

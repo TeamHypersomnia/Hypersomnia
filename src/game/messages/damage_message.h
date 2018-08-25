@@ -5,13 +5,14 @@
 #include "game/detail/sentience_shake.h"
 #include "game/enums/adverse_element_type.h"
 #include "augs/misc/value_meter.h"
+#include "game/detail/damage_origin.h"
 
 namespace messages {
 	struct damage_message : public message {
 		bool inflictor_destructed = false;
 		meter_value_type amount = 0;
 		sentience_shake victim_shake;
-		entity_id inflictor;
+		damage_origin origin;
 		vec2 impact_velocity;
 		vec2 point_of_impact;
 		adverse_element_type type = adverse_element_type::FORCE;

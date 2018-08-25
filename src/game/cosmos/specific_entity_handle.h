@@ -383,6 +383,10 @@ public:
 		return operator typed_id_type();
 	}
 
+	operator entity_guid() const {
+		return this->get_guid();
+	}
+
 	operator unversioned_entity_id() const {
 		return operator entity_id().operator unversioned_entity_id();
 	}

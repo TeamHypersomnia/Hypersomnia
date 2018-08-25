@@ -13,6 +13,7 @@
 #include "game/components/movement_path_component.h"
 #include "game/components/missile_component.h"
 #include "game/components/attitude_component.h"
+#include "game/modes/arena_mode.h"
 
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
@@ -35,7 +36,8 @@ using cosmic_field_type_id = type_in_list_id<
 		only_pick_these_items_vector,
 		specific_hostile_entities_vector,
 		friction_connection_vector,
-		remnant_flavour_vector
+		remnant_flavour_vector,
+		damage_owners_vector
 	>
 >;
 
@@ -61,7 +63,8 @@ using mode_field_type_id  = type_in_list_id<
 	type_list<
 		augs::trivial_type_marker,
 		std::string,
-		std::vector<entity_guid>
+		std::vector<entity_guid>,
+		arena_mode_knockouts_vector
 	>
 >;
 

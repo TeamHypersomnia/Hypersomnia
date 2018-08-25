@@ -6,6 +6,20 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- damage_origin
+	- damage_sender
+		- direct sender
+			- e.g. a gun
+			- in case of a punch, the character
+	- damage_origin = damage_sender + []
+		- inflictor entity
+			- may be a bullet
+		- entity-less inflictor
+			- spell
+			- punch trigger
+
+- separate field address types in property editor
+
 - add a match-global rng seed offset to mode state
 - let a random character pick the bomb
 - Make a command for adding a player in editor? 

@@ -1,5 +1,6 @@
 #pragma once
 #include "game/messages/message.h"
+#include "game/detail/damage_origin.h"
 
 #include "augs/misc/value_meter.h"
 
@@ -21,6 +22,8 @@ namespace messages {
 
 		vec2 point_of_impact;
 		vec2 impact_velocity;
+
+		damage_origin origin;
 
 		float ratio_effective_to_maximum = 1.f;
 		meter_value_type effective_amount = 0;

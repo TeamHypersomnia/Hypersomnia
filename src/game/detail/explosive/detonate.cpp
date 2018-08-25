@@ -26,7 +26,10 @@ void detonate(const detonate_input in) {
 	const auto& step = in.step;
 	auto& cosm = step.get_cosmos();
 
-	e.explosion.instantiate_no_subject(step, in.location);
+	damage_cause cause;
+	cause.entity = in.subject;
+
+	e.explosion.instantiate(step, in.location, cause);
 	step.post_message(messages::queue_deletion(in.subject));
 
 	const auto cascade_inputs = vectorize_array(e.cascade, [](const auto& f) { return f.flavour_id.is_set(); });

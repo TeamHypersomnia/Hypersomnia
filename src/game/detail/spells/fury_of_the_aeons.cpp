@@ -19,5 +19,8 @@ void fury_of_the_aeons_instance::perform_logic(const spell_logic_input in) {
 	ignite_cast_sparkles(spell_data, in.step, subject);
 	play_cast_successful_sound(spell_data, in.step, subject);
 
-	spell_data.explosion.instantiate(in.step, caster_transform, subject);
+	auto cause = damage_cause(subject);
+	cause.spell = in.this_id;
+
+	spell_data.explosion.instantiate(in.step, caster_transform, cause);
 }

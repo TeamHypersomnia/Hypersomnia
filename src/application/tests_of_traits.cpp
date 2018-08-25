@@ -521,18 +521,22 @@ struct game_state_checks {
 	template <class T>
 	struct is_flavour_id {
 		static constexpr bool value = is_constrained_flavour_id_v<T> || is_typed_flavour_id_v<T>;
-		static_assert(!value);
 	};
 	
 	template <class T>
 	struct is_asset_id {
 		static constexpr bool value = is_pathed_asset<T> || is_unpathed_asset<T>;
-		static_assert(!value);
 	};
 
 	/* Components should not hold any flavour/asset ids because we could not afford to look at props of every entity, for now */
 
-	static_assert(!sum_matching_in_v<is_flavour_id, cosmos_solvable_significant>);
+	/*
+		Known exceptions:
+		damage_cause::flavour
+	*/
+
+	static_assert(1 == sum_matching_in_v<is_flavour_id, cosmos_solvable_significant>);
+
 	static_assert(!sum_matching_in_v<is_asset_id, cosmos_solvable_significant>);
 
 	/* 

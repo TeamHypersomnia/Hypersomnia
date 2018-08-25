@@ -26,6 +26,9 @@ void ultimate_wrath_of_the_aeons_instance::perform_logic(const spell_logic_input
 	const auto second_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(1.8f / dt.in_seconds()) };
 	const auto third_at = augs::stepped_timestamp{ when_casted.step + static_cast<unsigned>(2.3f / dt.in_seconds()) };
 
+	auto cause = damage_cause(caster);
+	cause.spell = in.this_id;
+
 	if (now == when_casted) {
 		play_cast_successful_sound(spell_data, in.step, caster);
 		ignite_cast_sparkles(spell_data, in.step, caster);
@@ -34,12 +37,12 @@ void ultimate_wrath_of_the_aeons_instance::perform_logic(const spell_logic_input
 		play_cast_charging_sound(spell_data, in.step, caster);
 	}
 	else if (now == first_at) {
-		spell_data.explosions[0].instantiate(step, caster_transform, caster);
+		spell_data.explosions[0].instantiate(step, caster_transform, cause);
 	}
 	else if (now == second_at) {
-		spell_data.explosions[1].instantiate(step, caster_transform, caster);
+		spell_data.explosions[1].instantiate(step, caster_transform, cause);
 	}
 	else if (now == third_at) {
-		spell_data.explosions[2].instantiate(step, caster_transform, caster);
+		spell_data.explosions[2].instantiate(step, caster_transform, cause);
 	}
 }

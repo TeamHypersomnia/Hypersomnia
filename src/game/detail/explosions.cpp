@@ -18,13 +18,7 @@
 #include "game/cosmos/data_living_one_step.h"
 #include "game/detail/organisms/startle_nearbly_organisms.h"
 #include "game/detail/physics/shape_overlapping.hpp"
-
-void standard_explosion_input::instantiate_no_subject(
-	const logic_step step, 
-	const transformr explosion_location
-) const {
-	instantiate(step, explosion_location, entity_id());
-}
+#include "game/detail/damage_origin.h"
 
 static bool triangle_degenerate(const std::array<vec2, 3>& v) {
 	constexpr auto eps_triangle_degenerate = 0.5f;
@@ -47,8 +41,10 @@ static bool triangle_degenerate(const std::array<vec2, 3>& v) {
 void standard_explosion_input::instantiate(
 	const logic_step step,
 	const transformr explosion_location,
-	const entity_id subject_if_any
+	const damage_cause cause
 ) const {
+	const auto subject_if_any = cause.entity;
+
 	if (create_thunders_effect) {
 		for (int t = 0; t < 4; ++t) {
 			static randomization rng;
@@ -190,7 +186,8 @@ void standard_explosion_input::instantiate(
 
 						messages::damage_message damage_msg;
 						damage_msg.type = this->type;
-						damage_msg.inflictor = subject;
+						damage_msg.origin.cause = cause;
+						damage_msg.origin.copy_sender_from(subject);
 						damage_msg.subject = body_entity;
 						damage_msg.amount = damage;
 						damage_msg.impact_velocity = (point_b - explosion_pos).normalize();
