@@ -22,6 +22,7 @@
 #include "view/viewables/regeneration/content_regeneration_settings.h"
 #include "view/audiovisual_state/systems/interpolation_settings.h"
 #include "view/network/simulation_receiver_settings.h"
+#include "view/mode_gui/arena_mode_gui_settings.h"
 
 #include "test_scenes/test_scene_settings.h"
 
@@ -98,6 +99,8 @@ struct config_lua_table {
 	test_scene_settings test_scene;
 	editor_settings editor;
 	augs::font_loading_input gui_font;
+
+	arena_mode_gui_settings arena_mode_gui;
 
 #if TODO
 	std::string connect_address;

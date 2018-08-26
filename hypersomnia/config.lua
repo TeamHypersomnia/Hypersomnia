@@ -257,6 +257,13 @@ return {
       y = 0.5
     }
   },
+  arena_mode_gui = {
+	between_knockout_boxes_pad = 4,
+	inside_knockout_box_pad = 4,
+	weapon_icon_horizontal_pad = 10,
+	show_recent_knockouts_num = 7,
+	keep_knockout_boxes_for_seconds = 8
+  },
   hotbar = {
     colorize_inside_when_selected = true,
     increase_inside_alpha_when_selected = false,

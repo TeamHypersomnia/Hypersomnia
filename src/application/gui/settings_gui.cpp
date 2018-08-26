@@ -72,7 +72,7 @@ void settings_gui_state::perform(
 						c_strs[s] = label_strs[s].c_str();
 					});
 
-					c_strs[settings_pane::GUI_STYLES] = "GUI styles";
+					c_strs[settings_pane::GUI_STYLES] = "GUI";
 
 					return c_strs;
 				}();
@@ -175,6 +175,17 @@ void settings_gui_state::perform(
 				}
 
 				revertable_checkbox("Highlight hovered world items", config.drawing.draw_aabb_highlighter);
+
+				if (auto node = scoped_tree_node("Arena mode GUI")) {
+					auto& scope_cfg = config.arena_mode_gui;
+					auto scope = scoped_indent();
+
+					revertable_slider(SCOPE_CFG_NVP(between_knockout_boxes_pad), 0u, 20u);
+					revertable_slider(SCOPE_CFG_NVP(inside_knockout_box_pad), 0u, 20u);
+					revertable_slider(SCOPE_CFG_NVP(weapon_icon_horizontal_pad), 0u, 20u);
+					revertable_slider(SCOPE_CFG_NVP(show_recent_knockouts_num), 0u, 20u);
+					revertable_slider(SCOPE_CFG_NVP(keep_knockout_boxes_for_seconds), 0.f, 20.f);
+				}
 
 				break;
 			}

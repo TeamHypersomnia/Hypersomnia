@@ -83,9 +83,9 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 
 				{
 					mode.auto_assign_faction(in, mode.add_player(in, "kryS."));
-					mode.auto_assign_faction(in, mode.add_player(in, "sbk1337"));
+					mode.auto_assign_faction(in, mode.add_player(in, "kartezjan"));
 
-					const auto id = mode.add_player(in, "Shuncio");
+					const auto id = mode.add_player(in, "pepsik");
 					mode.auto_assign_faction(in, id);
 					player_id = id;
 

@@ -38,6 +38,8 @@ void arena_gui_state::draw_mode_gui(
 
 	const mode_player_id local_player
 ) const {
+	const auto& cfg = in.config.arena_mode_gui;
+
 	if constexpr(M::round_based) {
 		using namespace augs::gui::text;
 
@@ -48,24 +50,28 @@ void arena_gui_state::draw_mode_gui(
 			const auto& kos = typed_mode.knockouts;
 			const auto& clk = cosm.get_clock();
 
-			const auto show_recent_knockouts_num = std::size_t(5);
-			const auto knockouts_to_show = std::min(kos.size(), show_recent_knockouts_num);
-
-			const auto font_height = in.gui_font.metrics.get_height();
+			const auto knockouts_to_show = std::min(
+				kos.size(), 
+				static_cast<std::size_t>(cfg.show_recent_knockouts_num)
+			);
 
 			const auto starting_i = [&]() {
 				auto i = kos.size() - knockouts_to_show;
 
-				while (i < kos.size() && clk.diff_seconds(kos[i].when) >= 5.f) {
+				while (i < kos.size() && clk.diff_seconds(kos[i].when) >= cfg.keep_knockout_boxes_for_seconds) {
 					++i;
 				}
 
 				return i;
 			}();
 
+			auto pen = vec2i(10, game_screen_top);
+
 			for (std::size_t i = starting_i; i < kos.size(); ++i) {
+				pen.x = 10;
+				pen.y += cfg.between_knockout_boxes_pad;
+
 				const auto& ko = kos[i];
-				const auto t = game_screen_top + font_height * 1.6f * (i - starting_i);
 
 				auto get_col = [&](const mode_player_id id) {
 					if (const auto p = mapped_or_nullptr(typed_mode.players, id)) {
@@ -87,13 +93,13 @@ void arena_gui_state::draw_mode_gui(
 					return "Disconnected";
 				};
 
-				auto colored = [&](const auto& t, const auto& c) {
+				auto colored = [&](const auto& text, const auto& c) {
 					const auto text_style = style(
 						in.gui_font,
 						c
 					);
 
-					return formatted_string(t, text_style);
+					return formatted_string(text, text_style);
 				};
 
 				const auto knockouter = get_name(ko.knockouter);
@@ -155,8 +161,8 @@ void arena_gui_state::draw_mode_gui(
 					};
 
 					if (ko.origin.cause.spell.is_set()) {
-						return ko.origin.cause.spell.dispatch([&](auto t){
-							const auto& meta = get_meta_of(t, cosm.get_common_significant().spells);
+						return ko.origin.cause.spell.dispatch([&](auto dummy){
+							const auto& meta = get_meta_of(dummy, cosm.get_common_significant().spells);
 							return meta.appearance.icon;
 						});
 					}
@@ -173,77 +179,67 @@ void arena_gui_state::draw_mode_gui(
 				}();
 
 				const auto& entry = tool_image_id.is_set() ? in.images_in_atlas.at(tool_image_id) : image_in_atlas();
-				const auto& original_tool_size = entry.get_original_size();
-
-				const auto knockout_box_padding = 2;
-				const auto max_tool_height = static_cast<int>(font_height + knockout_box_padding);
-				const auto tool_size = [&]() {
-					const auto m = vec2(100u, max_tool_height);
-
-					auto s = vec2(original_tool_size);
-
-					if (s.x > m.x) {
-						s.y *= m.x / s.x;
-						s.x = m.x;
-					}
-
-					if (s.y > m.y) {
-						s.x *= m.y / s.y;
-						s.y = m.y;
-					}
-
-					return s;
-				}();
-
-				const auto tool_img_padding = 10;
-				
-				auto pen = vec2i(10, static_cast<int>(t) + 10);
+				const auto& tool_size = static_cast<vec2i>(entry.get_original_size());
 
 				const auto total_bbox = xywhi(
 					pen.x,
 					pen.y,
-					tool_size.x + tool_img_padding * 2 + lhs_bbox.x + rhs_bbox.x, 
-					std::max(lhs_bbox.y, rhs_bbox.y)
-				).expand_from_center(vec2i::square(knockout_box_padding));
+					cfg.inside_knockout_box_pad * 2 + cfg.weapon_icon_horizontal_pad * 2 + tool_size.x + lhs_bbox.x + rhs_bbox.x, 
+					cfg.inside_knockout_box_pad * 2 + std::max(tool_size.y, std::max(lhs_bbox.y, rhs_bbox.y))
+				);
 
 				in.drawer.aabb_with_border(
 					total_bbox,
 					cols.background,
-					cols.border
+					cols.border,
+					border_input { 1, 0 }
 				);
+
+				pen.x += cfg.inside_knockout_box_pad;
+
+				const auto icon_drawn_aabb = [&]() {
+					auto r = ltrbi(vec2i(pen.x + lhs_bbox.x + cfg.weapon_icon_horizontal_pad, 0), tool_size);
+
+					auto temp = r;
+					temp.place_in_center_of(ltrb(total_bbox));
+
+					r.t = temp.t;
+					r.b = temp.b;
+
+					return r;
+				}();
+
+				pen.y = icon_drawn_aabb.get_center().y;
 
 				print_stroked(
 					in.drawer,
 					pen,
-					lhs_text
+					lhs_text,
+					{ augs::center::Y }
 				);
 
 				pen.x += lhs_bbox.x;
-				pen.x += tool_img_padding;
+				pen.x += cfg.weapon_icon_horizontal_pad;
 
 				{
-					auto drawn_aabb = ltrb(pen, tool_size);
-
-					auto huh = drawn_aabb;
-					huh.place_in_center_of(ltrb(total_bbox));
-					drawn_aabb.t = huh.t;
-					drawn_aabb.b = huh.b;
-
 					in.drawer.base::aabb(
 						entry.diffuse,
-						drawn_aabb,
+						icon_drawn_aabb,
 						white
 					);
 				}
 
 				pen.x += tool_size.x;
-				pen.x += tool_img_padding;
+				pen.x += cfg.weapon_icon_horizontal_pad;
 
 				print_stroked(
 					in.drawer,
 					pen,
-					rhs_text
+					rhs_text,
+					{ augs::center::Y }
 				);
+
+				pen.y = total_bbox.b();
 			}
 		}
 

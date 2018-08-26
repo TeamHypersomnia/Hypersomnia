@@ -1262,3 +1262,15 @@ we consider whole type overrides too complex architeciturally:
 			- bombing faction loses
 
 
+- damage_origin
+	- damage_sender
+		- direct sender
+			- e.g. a gun
+			- in case of a punch, the character
+	- damage_origin = damage_sender + []
+		- inflictor entity
+			- may be a bullet
+		- entity-less inflictor
+			- spell
+			- punch trigger
+
