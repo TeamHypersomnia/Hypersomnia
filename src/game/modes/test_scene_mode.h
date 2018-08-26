@@ -57,6 +57,7 @@ public:
 	void remove_player(input, mode_player_id);
 
 	entity_guid lookup(const mode_player_id&) const;
+	mode_player_id lookup(const entity_guid&) const;
 
 	template <class PreSolve, class... Callbacks>
 	void advance(

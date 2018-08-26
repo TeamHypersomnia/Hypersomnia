@@ -59,6 +59,7 @@ namespace augs {
 				self set_alpha(const rgba_channel);
 				self set_alpha(const float);
 
+				formatted_string operator+(const formatted_string&) const;
 				formatted_string& operator+=(const formatted_string&);
 
 				operator std::string() const;

@@ -97,6 +97,12 @@ namespace augs {
 				return *this;
 			}
 
+			formatted_string formatted_string::operator+(const formatted_string& other) const {
+				auto cpy = *this;
+				cpy += other;
+				return cpy;
+			}
+
 			formatted_string::formatted_string(
 				const std::string& str, 
 				const style s

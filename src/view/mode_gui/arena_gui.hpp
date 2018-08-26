@@ -64,7 +64,15 @@ void arena_gui_state::draw_mode_gui(
 
 			for (std::size_t i = starting_i; i < kos.size(); ++i) {
 				const auto& ko = kos[i];
-				const auto t = game_screen_top + font_height * 1.2f * (i - starting_i);
+				const auto t = game_screen_top + font_height * 1.6f * (i - starting_i);
+
+				auto get_col = [&](const mode_player_id id) {
+					if (const auto p = mapped_or_nullptr(typed_mode.players, id)) {
+						return ::get_faction_color(p->faction);
+					}
+
+					return gray;
+				};
 
 				auto get_name = [&](const auto id) -> entity_name_str {
 					if (!id.is_set()) {
@@ -78,47 +86,74 @@ void arena_gui_state::draw_mode_gui(
 					return "Disconnected";
 				};
 
+				auto colored = [&](const auto& t, const auto& c) {
+					const auto text_style = style(
+						in.gui_font,
+						c
+					);
+
+					return formatted_string(t, text_style);
+				};
+
 				const auto knockouter = get_name(ko.knockouter);
 				const auto assist = get_name(ko.assist);
 				const auto victim = get_name(ko.victim);
 
 				const bool is_suicide = ko.knockouter == ko.victim;
-
 				(void)is_suicide;
-				auto total_text = is_suicide ? "" : knockouter;
 
-				if (assist.size() > 0) {
-					total_text += " (+ " + assist + ")";
-				}
+				const auto lhs_text = 
+					colored(is_suicide ? "" : knockouter, get_col(ko.knockouter))
+					+ colored(assist.size() > 0 ? " (+ " + assist + ")" : "", get_col(ko.assist))
+				;
 
-				total_text += " ---->>>> " + victim;
+				const auto rhs_text = colored(victim, get_col(ko.victim));
+
+				const auto lhs_bbox = get_text_bbox(lhs_text);
+				const auto rhs_bbox = get_text_bbox(rhs_text);
+
+				const auto bg_alpha = 0.9f;
 
 				struct colors {
 					rgba background;
 					rgba border;
-				} const cols = [&]() -> colors {
-					if (local_player == ko.knockouter) {
-						return { black, red };
+				} cols = [&]() -> colors {
+					if (local_player == ko.victim) {
+						return { rgba(150, 0, 0, 170), rgba(0, 0, 0, 0) };
+					}
+
+					if (local_player == ko.knockouter || local_player == ko.assist) {
+						return { black, rgba(180, 0, 0, 255) };
 					}
 					
-					if (local_player == ko.victim) {
-						return { red, rgba(0, 0, 0, 0) };
-					}
-
-					return { darkgray, rgba(0, 0, 0, 0) };
+					return { { 0, 0, 0, 50 }, rgba(0, 0, 0, 0) };
 				}();
 
-				(void)cols;
+				cols.background.multiply_alpha(bg_alpha);
+				cols.border.multiply_alpha(bg_alpha);
 
-				const auto text_style = style(
-					in.gui_font,
-					white
+				auto pen = vec2i(10, static_cast<int>(t) + 10);
+
+				const auto total_bbox = xywhi(pen.x, pen.y, lhs_bbox.x + rhs_bbox.x + 10, std::max(lhs_bbox.y, rhs_bbox.y)).expand_from_center({ 2, 2 });
+
+				in.drawer.aabb_with_border(
+					total_bbox,
+					cols.background,
+					cols.border
 				);
 
 				print_stroked(
 					in.drawer,
-					{ 10, static_cast<int>(t) },
-					formatted_string(total_text, text_style)
+					pen,
+					lhs_text
+				);
+
+				pen.x += lhs_bbox.x + 10;
+
+				print_stroked(
+					in.drawer,
+					pen,
+					rhs_text
 				);
 			}
 		}

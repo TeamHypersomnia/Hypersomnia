@@ -128,8 +128,21 @@ void editor_setup::set_popup(const editor_popup p) {
 	augs::save_as_text(LOG_FILES_DIR "/last_editor_message.txt", augs::date_time().get_readable() + '\n' + logged);
 }
 
-void editor_setup::override_viewed_entity(const entity_id id) {
-	view().overridden_viewed_id = id;
+void editor_setup::override_viewed_entity(const entity_id overridden_id) {
+	if (anything_opened()) {
+		on_mode_with_input(
+			[&](const auto& typed_mode, const auto&) {
+				if (const auto id = typed_mode.lookup(work().world[overridden_id].get_guid()); id.is_set()) {
+					view().local_player_id = id;
+					view().overridden_viewed_id = {};
+				}
+				else {
+					view().local_player_id = {};
+					view().overridden_viewed_id = overridden_id;
+				}
+			}
+		);
+	}
 }
 
 editor_setup::editor_setup(

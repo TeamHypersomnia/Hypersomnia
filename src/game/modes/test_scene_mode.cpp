@@ -17,6 +17,16 @@ entity_guid test_scene_mode::lookup(const mode_player_id& id) const {
 	return entity_guid::dead();
 }
 
+mode_player_id test_scene_mode::lookup(const entity_guid& guid) const {
+	for (const auto& p : players) {
+		if (p.second.guid == guid) {
+			return p.first;
+		}
+	}
+
+	return mode_player_id::dead();
+}
+
 void test_scene_mode::init_spawned(const input in, const entity_id id, const logic_step step) {
 	const auto handle = in.cosm[id];
 
