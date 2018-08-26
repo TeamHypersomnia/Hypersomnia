@@ -252,7 +252,7 @@ FORCE_INLINE void specific_entity_drawer(
 				auto input = in.make_input_for<invariants::sprite>();
 				input.renderable_transform = where;
 
-				input.flip.vertically = frame.flip;
+				input.flip = frame.flip;
 				render_visitor(sprite, in.manager, input);
 			};
 
@@ -277,7 +277,7 @@ FORCE_INLINE void specific_entity_drawer(
 
 					auto result = logicals.get_offsets(stance_image_id).torso;
 
-					if (stance_usage.flip) {
+					if (stance_usage.flip.vertically) {
 						result.flip_vertically();
 					}
 
@@ -344,7 +344,7 @@ FORCE_INLINE void specific_entity_drawer(
 					auto usage = stance_usage;
 
 					if (only_secondary) {
-						auto& f = usage.flip;
+						auto& f = usage.flip.vertically;
 						f = !f;
 					}
 

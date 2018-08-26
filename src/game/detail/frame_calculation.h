@@ -49,7 +49,7 @@ frame_type_t<T>* find_frame(
 template <class T>
 struct frame_and_flip {
 	frame_type_t<T>& frame;
-	const bool flip;
+	const flip_flags flip;
 };
 
 template <class T>
@@ -62,18 +62,18 @@ frame_and_flip<T> get_frame_and_flip(
 
 	return { 
 		animation.frames[index % animation_frames_n], 
-		animation.meta.flip_when_cycling && state.flip
+		state.flip ? animation.meta.flip_when_cycling : flip_flags()
 	};
 }
 
 template <class T>
 struct stance_frame_usage {
 	const frame_type_t<T>* const frame;
-	bool flip;
+	flip_flags flip;
 	const bool is_shooting;
 
 	static auto none() {
-		return stance_frame_usage<T> { nullptr, false, false };
+		return stance_frame_usage<T> { nullptr, flip_flags(), false };
 	}
 
 	static auto carry(const frame_and_flip<T>& f) {
@@ -81,11 +81,11 @@ struct stance_frame_usage {
 	}
 
 	static auto shoot(const frame_type_t<T>& f) {
-		return stance_frame_usage<T> { std::addressof(f), false, true };
+		return stance_frame_usage<T> { std::addressof(f), flip_flags(), true };
 	}
 
 	static auto shoot_flipped(const frame_type_t<T>& f) {
-		return stance_frame_usage<T> { std::addressof(f), true, true };
+		return stance_frame_usage<T> { std::addressof(f), flip_flags::make_vertically(), true };
 	}
 
 	explicit operator bool() const {

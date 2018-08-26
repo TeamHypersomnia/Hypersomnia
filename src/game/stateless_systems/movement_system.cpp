@@ -235,8 +235,12 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 					auto offset = im_def.legs.foot;
 
-					if (frame.flip) {
+					if (frame.flip.vertically) {
 						offset.y *= -1;
+					}
+
+					if (frame.flip.horizontally) {
+						offset.x *= -1;
 					}
 
 					effect_transform *= transformr(offset);

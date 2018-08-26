@@ -6,6 +6,7 @@
 #include "game/assets/ids/asset_ids.h"
 #include "game/container_sizes.h"
 #include "augs/templates/maybe.h"
+#include "augs/drawing/flip.h"
 
 struct simple_animation_advance {
 	const real32 delta_ms;
@@ -131,7 +132,7 @@ using plain_animation_frames_type = make_animation_frames<plain_animation_frame>
 struct plain_animation_meta {
 	using maybe_u = augs::maybe<unsigned>;
 	// GEN INTROSPECTOR struct plain_animation_meta
-	bool flip_when_cycling = false;
+	flip_flags flip_when_cycling;
 	pad_bytes<2> pad;
 	maybe_u stop_movement_at_frame = maybe_u(0, false);
 	// END GEN INTROSPECTOR

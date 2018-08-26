@@ -188,7 +188,7 @@ void load_test_scene_animations(
 				anim.frames.pop_back();
 			}
 
-			anim.meta.flip_when_cycling = true;
+			anim.meta.flip_when_cycling.vertically = true;
 		};
 
 		{
@@ -283,13 +283,17 @@ void load_test_scene_animations(
 			test_id_type::SILVER_TROUSERS,
 			test_scene_image_id::SILVER_TROUSERS_1,
 			30.0f
-		).meta.flip_when_cycling = true;
+		).meta.flip_when_cycling.vertically = true;
 
-		make_legs(
-			test_id_type::SILVER_TROUSERS_STRAFE,
-			test_scene_image_id::SILVER_TROUSERS_STRAFE_1,
-			30.0f
-		);
+		{
+			auto& anim = make_legs(
+				test_id_type::SILVER_TROUSERS_STRAFE,
+				test_scene_image_id::SILVER_TROUSERS_STRAFE_1,
+				30.0f
+			);
+
+			anim.meta.flip_when_cycling.horizontally = true;
+		}
 
 		make_plain(
 			test_id_type::YELLOW_FISH,
