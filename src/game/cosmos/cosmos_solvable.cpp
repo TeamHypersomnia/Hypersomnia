@@ -14,6 +14,7 @@ void cosmos_solvable::clear() {
 	significant.entity_pools.clear();
 	guid_to_id.clear();
 	significant.clk = {};
+	significant.specific_names.clear();
 }
 
 std::size_t cosmos_solvable::get_entities_count() const {

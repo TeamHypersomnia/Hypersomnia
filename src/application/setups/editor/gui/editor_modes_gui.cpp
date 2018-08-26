@@ -2,6 +2,7 @@
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 
+#include "game/cosmos/entity_handle.h"
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/gui/editor_modes_gui.h"
 #include "application/setups/editor/editor_command_input.h"
@@ -54,6 +55,13 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 				[&](auto& typed_mode, const auto& mode_input) {
 					using M = remove_cref<decltype(typed_mode)>;
 
+					auto& work = *cmd_in.folder.work;
+					auto& cosm = work.world;
+
+					const auto in = commanding_property_editor_input {
+						{ settings.property_editor, property_editor_data }, { cmd_in }
+					};
+
 					if constexpr(std::is_same_v<M, test_scene_mode>) {
 						(void)mode_input;
 					}
@@ -65,14 +73,27 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 						ImGui::SameLine();
 
 						input_text<256>("Nickname", nickname);
+
+						const auto players_node_label = "Players";
+						auto players_node = scoped_tree_node(players_node_label);
+
+						if (players_node) {
+							for (const auto& p : typed_mode.players) {
+								const auto this_player_label = typesafe_sprintf("%x (id: %x)", p.second.chosen_name, p.first.value);
+
+								if (const auto this_player_node = scoped_tree_node(this_player_label.c_str())) {
+									text(typesafe_sprintf("Corresponding character name: %x", cosm[p.second.guid].get_name()));
+
+									singular_edit_properties(
+										in,
+										p.second,
+										this_player_label,
+										change_current_mode_property_command()
+									);
+								}
+							}
+						}
 					}
-
-					auto& work = *cmd_in.folder.work;
-					auto& cosm = work.world;
-
-					auto in = commanding_property_editor_input {
-						{ settings.property_editor, property_editor_data }, { cmd_in }
-					};
 
 					singular_edit_properties(
 						in,

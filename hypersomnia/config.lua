@@ -258,7 +258,7 @@ return {
     }
   },
   arena_mode_gui = {
-	between_knockout_boxes_pad = 4,
+	between_knockout_boxes_pad = 6,
 	inside_knockout_box_pad = 4,
 	weapon_icon_horizontal_pad = 10,
 	show_recent_knockouts_num = 7,

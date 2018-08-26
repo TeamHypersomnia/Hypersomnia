@@ -24,7 +24,7 @@ void cosmic::set_specific_name(const entity_handle& handle, const entity_name_st
 		return;
 	}
 
-	signi.specific_names.try_emplace(id, name);
+	signi.specific_names[id] = name;
 }
 
 void cosmic::clear(cosmos& cosm) {

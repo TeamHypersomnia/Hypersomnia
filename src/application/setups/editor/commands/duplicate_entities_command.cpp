@@ -174,7 +174,6 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 
 			if (mirror_direction == vec2i(0, 1)) {
 				const auto horizontal_axis_y = source_aabb->b;
-				LOG_NVPS(horizontal_axis_y);
 
 				duplicate_with_flip(
 					[horizontal_axis_y](const transformr& source, const std::optional<ltrb>& aabb) {
