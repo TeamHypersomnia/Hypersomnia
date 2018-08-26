@@ -185,6 +185,8 @@ void settings_gui_state::perform(
 					revertable_slider(SCOPE_CFG_NVP(weapon_icon_horizontal_pad), 0u, 20u);
 					revertable_slider(SCOPE_CFG_NVP(show_recent_knockouts_num), 0u, 20u);
 					revertable_slider(SCOPE_CFG_NVP(keep_knockout_boxes_for_seconds), 0.f, 20.f);
+					revertable_slider("Max weapon icon height (0 for no limit)", scope_cfg.max_weapon_icon_height, 0u, 100u);
+
 				}
 
 				break;

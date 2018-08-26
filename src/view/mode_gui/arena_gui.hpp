@@ -179,7 +179,26 @@ void arena_gui_state::draw_mode_gui(
 				}();
 
 				const auto& entry = tool_image_id.is_set() ? in.images_in_atlas.at(tool_image_id) : image_in_atlas();
-				const auto& tool_size = static_cast<vec2i>(entry.get_original_size());
+
+				const auto tool_size = [&]() {
+					const auto original_tool_size = static_cast<vec2i>(entry.get_original_size());
+					const auto max_tool_height = cfg.max_weapon_icon_height;
+
+					if (max_tool_height == 0) {
+						/* No limit */
+						return original_tool_size;
+					}
+
+					const auto m = vec2(0, max_tool_height);
+					auto s = vec2(original_tool_size);
+
+					if (s.y > m.y) {
+						s.x *= m.y / s.y;
+						s.y = m.y;
+					}
+
+					return static_cast<vec2i>(s);
+				}();
 
 				const auto total_bbox = xywhi(
 					pen.x,
