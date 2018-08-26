@@ -27,5 +27,7 @@ namespace messages {
 
 		float ratio_effective_to_maximum = 1.f;
 		meter_value_type effective_amount = 0;
+
+		bool was_conscious = true;
 	};
 }

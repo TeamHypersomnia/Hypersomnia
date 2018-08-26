@@ -224,6 +224,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 	auto& consciousness = sentience.get<consciousness_meter_instance>();
 	auto& personal_electricity = sentience.get<personal_electricity_meter_instance>();
 	const auto& origin = h.origin;
+	const bool was_conscious = consciousness.value > 0.f;
 
 	auto contribute_to_damage = [&](const auto contributed_amount) {
 		const auto inflicting_capability = origin.get_guilty_of_damaging(subject);
@@ -275,6 +276,7 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 
 		if (!health.is_positive()) {
 			h.special_result = messages::health_event::result_type::DEATH;
+			h.was_conscious = was_conscious;
 		}
 
 		break;
@@ -331,8 +333,6 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 
 		sentience.when_knocked_out = now;
 		sentience.knockout_origin = origin;
-		LOG_NVPS(origin.sender.direct_sender_flavour);
-		LOG_NVPS(origin.cause.flavour);
 	};
 
 	if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION) {
