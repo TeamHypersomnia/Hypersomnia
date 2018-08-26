@@ -142,6 +142,17 @@ key translate_keysym(const xcb_keysym_t m) {
 	case XK_backslash:											return key::BACKSLASH;
 	case XK_bracketright:											return key::CLOSE_SQUARE_BRACKET;
 	case XK_apostrophe:											return key::APOSTROPHE;
+
+	case XK_KP_Insert: return key::NUMPAD0;
+	case XK_KP_End: return key::NUMPAD1;
+	case XK_KP_Down: return key::NUMPAD2;
+	case XK_KP_Next: return key::NUMPAD3;
+	case XK_KP_Left: return key::NUMPAD4;
+	case XK_KP_Begin: return key::NUMPAD5;
+	case XK_KP_Right: return key::NUMPAD6;
+	case XK_KP_Home: return key::NUMPAD7;
+	case XK_KP_Up: return key::NUMPAD8;
+	case XK_KP_Prior: return key::NUMPAD9;
 	default:												return key::INVALID;
 	}
 }

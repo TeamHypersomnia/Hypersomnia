@@ -417,14 +417,15 @@ namespace augs {
 				const auto keycode = press->detail;	
 				const auto keysym = keysym_getter(keycode);
 
-				if (log_keystrokes) {
-					LOG("Keycode down: %x", static_cast<int>(keycode));
-					LOG("Keysym down: %x", static_cast<int>(keysym));
-				}
-
 				ch.msg = message::keydown;
 				ch.data.key.key = translate_keysym({ keysym });
 				ch.timestamp = press->time;
+
+				if (log_keystrokes) {
+					LOG("Keycode down: %x", static_cast<int>(keycode));
+					LOG("Keysym down: %x (%h)", static_cast<int>(keysym), static_cast<int>(keysym));
+					LOG("Output enum: %x", int(ch.data.key.key));
+				}
 
 				character_event_emitter(press);	
 				return ch;
@@ -435,13 +436,15 @@ namespace augs {
 				const auto keycode = release->detail;	
 				const auto keysym = keysym_getter(keycode);
 
+				ch.msg = message::keyup;
+				ch.data.key.key = translate_keysym({ keysym });
+
 				if (log_keystrokes) {
 					LOG("Keycode up: %x", static_cast<int>(keycode));
 					LOG("Keysym up: %x", static_cast<int>(keysym));
+					LOG("Output enum: %x", int(ch.data.key.key));
 				}
 
-				ch.msg = message::keyup;
-				ch.data.key.key = translate_keysym({ keysym });
 				ch.timestamp = release->time;
 
 				return ch;

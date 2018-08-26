@@ -1035,6 +1035,15 @@ bool editor_setup::handle_input_before_game(
 	const bool has_ctrl{ common_input_state[key::LCTRL] };
 	const bool has_shift{ common_input_state[key::LSHIFT] };
 
+	if (e.was_any_key_pressed()) {
+		switch (e.data.key.key) {
+			case key::NUMPAD0: player().speed = 1.0; return true;
+			case key::NUMPAD1: player().speed = 0.01; return true;
+			case key::NUMPAD2: player().speed = 0.05; return true;
+			default: break;
+		}
+	}
+
 	if (is_editing_mode()) {
 		if (arena_gui.control(common_input_state, e)) { 
 			return true;
