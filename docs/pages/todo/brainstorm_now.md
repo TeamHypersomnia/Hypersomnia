@@ -6,11 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- separate field address types in property editor
+- Commandize "Add player" and "Restart" in editor
 
+- separate field address types in property editor
 - add a match-global rng seed offset to mode state
-- let a random character pick the bomb
-- Make a command for adding a player in editor? 
 
 - After round restart,
 	- Propagate movement flags!

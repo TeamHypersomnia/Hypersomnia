@@ -74,6 +74,10 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 
 						input_text<256>("Nickname", nickname);
 
+						if (ImGui::Button("Restart")) {
+							typed_mode.request_restart();
+						}
+
 						const auto players_node_label = "Players";
 						auto players_node = scoped_tree_node(players_node_label);
 

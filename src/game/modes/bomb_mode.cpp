@@ -768,14 +768,7 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 	(void)entropy;
 
 	if (state == arena_mode_state::INIT) {
-		if (in.vars.warmup_secs > 4) {
-			state = arena_mode_state::WARMUP;
-		}
-		else {
-			state = arena_mode_state::LIVE;
-		}
-
-		setup_round(in, step);
+		restart(in, step);
 	}
 	else if (state == arena_mode_state::WARMUP) {
 		respawn_the_dead(in, step, in.vars.warmup_respawn_after_ms);
@@ -1014,3 +1007,28 @@ unsigned bomb_mode::get_round_num() const {
 
 	return total;
 }
+
+void bomb_mode::request_restart() {
+	state = arena_mode_state::INIT;
+}
+
+void bomb_mode::restart(const input_type in, const logic_step step) {
+	for (auto& it : players) {
+		auto& p = it.second;
+
+		p.money = in.vars.initial_money;
+		p.knockouts = p.assists = p.deaths = 0;
+	}
+
+	factions = {};
+
+	if (in.vars.warmup_secs > 4) {
+		state = arena_mode_state::WARMUP;
+	}
+	else {
+		state = arena_mode_state::LIVE;
+	}
+
+	setup_round(in, step);
+}
+

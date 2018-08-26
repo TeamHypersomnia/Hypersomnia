@@ -229,6 +229,9 @@ public:
 	float get_critical_seconds_left(input) const;
 	float get_seconds_since_planting(input) const;
 
+	void request_restart();
+	void restart(input, logic_step);
+
 	template <class PreSolve, class PostSolve, class... Callbacks>
 	void advance(
 		const input in, 

@@ -1274,3 +1274,6 @@ we consider whole type overrides too complex architeciturally:
 			- spell
 			- punch trigger
 
+- let a random character pick the bomb
+- Make a command for adding a player in editor? 
+

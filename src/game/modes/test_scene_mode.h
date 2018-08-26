@@ -59,6 +59,8 @@ public:
 	entity_guid lookup(const mode_player_id&) const;
 	mode_player_id lookup(const entity_guid&) const;
 
+	void request_restart() {}
+
 	template <class PreSolve, class... Callbacks>
 	void advance(
 		const input in, 
