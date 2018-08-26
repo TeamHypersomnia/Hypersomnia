@@ -24,6 +24,7 @@
 #include "view/viewables/images_in_atlas_map.h"
 #include "view/audiovisual_state/systems/randomizing_system.h"
 #include "view/rendering_scripts/draw_entity_input.h"
+#include "game/components/torso_component.hpp"
 
 using entities_with_renderables = entity_types_having_any_of<
 	invariants::sprite,
@@ -285,19 +286,24 @@ FORCE_INLINE void specific_entity_drawer(
 				}();
 
 				{
-					const auto leg_animation_id = maybe_torso->calc_leg_anim(velocity, face_degrees);
+					const auto leg_anim = maybe_torso->calc_leg_anim(velocity, face_degrees);
 
-					if (const auto animation = logicals.find(leg_animation_id);
+					if (const auto animation = logicals.find(leg_anim.id);
 						animation != nullptr
 					) {
-						const auto legs_degrees = velocity.degrees();
-
 						const auto& legs = stance_offsets.legs;
 						const auto leg_offset = transformr(legs.pos, legs.rotation);
 
+						auto frame_with_flip = ::get_frame_and_flip(four_ways, *animation);
+
+						if (leg_anim.flip_vertically) {
+							auto& f = frame_with_flip.flip.vertically;
+							f = !f;
+						}
+						
 						render_frame(
-							::get_frame_and_flip(four_ways, *animation),
-							{ (viewing_transform * leg_offset).pos, legs_degrees }
+							frame_with_flip,
+							{ (viewing_transform * leg_offset).pos, leg_anim.rotation }
 						);
 					}
 				}

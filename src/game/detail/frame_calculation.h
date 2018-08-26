@@ -49,7 +49,7 @@ frame_type_t<T>* find_frame(
 template <class T>
 struct frame_and_flip {
 	frame_type_t<T>& frame;
-	const flip_flags flip;
+	flip_flags flip;
 };
 
 template <class T>

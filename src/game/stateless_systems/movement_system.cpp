@@ -8,6 +8,7 @@
 #include "game/components/rigid_body_component.h"
 #include "game/components/movement_component.h"
 #include "game/components/sentience_component.h"
+#include "game/components/torso_component.hpp"
 
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/logic_step.h"
@@ -221,10 +222,12 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				const auto velocity_degrees = current_velocity.degrees();
 				auto effect_transform = transformr(transform.pos, velocity_degrees);
 
-				const auto anim_id = it.template get<invariants::torso>().calc_leg_anim(
+				const auto leg_anim = it.template get<invariants::torso>().calc_leg_anim(
 					current_velocity,
 					transform.rotation
 				);
+
+				const auto anim_id = leg_anim.id;
 
 				const auto& logicals = cosmos.get_logical_assets();
 

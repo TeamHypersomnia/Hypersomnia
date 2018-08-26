@@ -47,6 +47,9 @@ namespace test_flavours {
 
 				torso_def.forward_legs = to_animation_id(test_scene_legs_animation_id::SILVER_TROUSERS);
 				torso_def.strafe_legs = to_animation_id(test_scene_legs_animation_id::SILVER_TROUSERS_STRAFE);
+				torso_def.min_strafe_facing = 30;
+				torso_def.max_strafe_facing = 150;
+				torso_def.strafe_face_interp_mult = 0.5f;
 
 				torso_def.stances[item_holding_stance::BARE_LIKE].carry = to_animation_id(test_scene_torso_animation_id::METROPOLIS_TORSO_BARE_WALK);
 				torso_def.stances[item_holding_stance::BARE_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::METROPOLIS_TORSO_BARE_SHOT);
@@ -203,6 +206,9 @@ namespace test_flavours {
 
 				torso_def.forward_legs = to_animation_id(test_scene_legs_animation_id::SILVER_TROUSERS);
 				torso_def.strafe_legs = to_animation_id(test_scene_legs_animation_id::SILVER_TROUSERS_STRAFE);
+				torso_def.min_strafe_facing = 30;
+				torso_def.max_strafe_facing = 150;
+				torso_def.strafe_face_interp_mult = 0.5f;
 
 				torso_def.stances[item_holding_stance::BARE_LIKE].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_BARE_WALK);
 				torso_def.stances[item_holding_stance::BARE_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_BARE_SHOT);

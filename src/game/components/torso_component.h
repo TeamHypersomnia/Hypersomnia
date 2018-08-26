@@ -40,21 +40,14 @@ namespace invariants {
 
 		unsigned min_strafe_facing = 50;
 		unsigned max_strafe_facing = 130;
+
+		float strafe_face_interp_mult = 0.f;
 		// END GEN INTROSPECTOR
 
 		auto calc_leg_anim(
 			const vec2 velocity,
 			const real32 face_degrees
-		) const {
-			const auto facing = velocity.degrees_between(vec2::from_degrees(face_degrees));
-
-			if (facing >= min_strafe_facing && facing <= max_strafe_facing) {
-				return strafe_legs;
-			}
-			else {
-				return forward_legs;
-			}
-		}
+		) const; 
 
 		template <class... Args>
 		const auto& calc_stance(Args&&... args) const {
