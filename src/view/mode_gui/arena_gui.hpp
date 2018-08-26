@@ -44,8 +44,9 @@ void arena_gui_state::draw_mode_gui(
 		game_screen_top += 2;
 
 		{
+			const auto& cosm = mode_input.cosm;
 			const auto& kos = typed_mode.knockouts;
-			const auto& clk = mode_input.cosm.get_clock();
+			const auto& clk = cosm.get_clock();
 
 			const auto show_recent_knockouts_num = std::size_t(5);
 			const auto knockouts_to_show = std::min(kos.size(), show_recent_knockouts_num);
@@ -126,15 +127,84 @@ void arena_gui_state::draw_mode_gui(
 						return { black, rgba(180, 0, 0, 255) };
 					}
 					
-					return { { 0, 0, 0, 50 }, rgba(0, 0, 0, 0) };
+					return { { 0, 0, 0, 80 }, rgba(0, 0, 0, 0) };
 				}();
 
 				cols.background.multiply_alpha(bg_alpha);
 				cols.border.multiply_alpha(bg_alpha);
 
+				const auto tool_image_id = [&]() {
+					auto from_flavour = [&](const auto flavour_id) -> auto {
+						if (!flavour_id.is_set()) {
+							return assets::image_id();
+						}
+
+						return flavour_id.dispatch([&](const auto& typed_flavour_id) {
+							if (const auto flavour = cosm.find_flavour(typed_flavour_id)) {
+								if (const auto sentience = flavour->template find<invariants::sentience>()) {
+									return assets::image_id();
+								}
+
+								if (const auto sprite = flavour->template find<invariants::sprite>()) {
+									return sprite->image_id;
+								}
+							}
+
+							return assets::image_id();
+						});
+					};
+
+					if (ko.origin.cause.spell.is_set()) {
+						return ko.origin.cause.spell.dispatch([&](auto t){
+							const auto& meta = get_meta_of(t, cosm.get_common_significant().spells);
+							return meta.appearance.icon;
+						});
+					}
+
+					if (const auto img = from_flavour(ko.origin.sender.direct_sender_flavour); img.is_set()) {
+						return img;
+					}
+
+					if (const auto img = from_flavour(ko.origin.cause.flavour); img.is_set()) {
+						return img;
+					}
+
+					return assets::image_id();
+				}();
+
+				const auto& entry = tool_image_id.is_set() ? in.images_in_atlas.at(tool_image_id) : image_in_atlas();
+				const auto& original_tool_size = entry.get_original_size();
+
+				const auto knockout_box_padding = 2;
+				const auto max_tool_height = static_cast<int>(font_height + knockout_box_padding);
+				const auto tool_size = [&]() {
+					const auto m = vec2(100u, max_tool_height);
+
+					auto s = vec2(original_tool_size);
+
+					if (s.x > m.x) {
+						s.y *= m.x / s.x;
+						s.x = m.x;
+					}
+
+					if (s.y > m.y) {
+						s.x *= m.y / s.y;
+						s.y = m.y;
+					}
+
+					return s;
+				}();
+
+				const auto tool_img_padding = 10;
+				
 				auto pen = vec2i(10, static_cast<int>(t) + 10);
 
-				const auto total_bbox = xywhi(pen.x, pen.y, lhs_bbox.x + rhs_bbox.x + 10, std::max(lhs_bbox.y, rhs_bbox.y)).expand_from_center({ 2, 2 });
+				const auto total_bbox = xywhi(
+					pen.x,
+					pen.y,
+					tool_size.x + tool_img_padding * 2 + lhs_bbox.x + rhs_bbox.x, 
+					std::max(lhs_bbox.y, rhs_bbox.y)
+				).expand_from_center(vec2i::square(knockout_box_padding));
 
 				in.drawer.aabb_with_border(
 					total_bbox,
@@ -148,7 +218,26 @@ void arena_gui_state::draw_mode_gui(
 					lhs_text
 				);
 
-				pen.x += lhs_bbox.x + 10;
+				pen.x += lhs_bbox.x;
+				pen.x += tool_img_padding;
+
+				{
+					auto drawn_aabb = ltrb(pen, tool_size);
+
+					auto huh = drawn_aabb;
+					huh.place_in_center_of(ltrb(total_bbox));
+					drawn_aabb.t = huh.t;
+					drawn_aabb.b = huh.b;
+
+					in.drawer.base::aabb(
+						entry.diffuse,
+						drawn_aabb,
+						white
+					);
+				}
+
+				pen.x += tool_size.x;
+				pen.x += tool_img_padding;
 
 				print_stroked(
 					in.drawer,

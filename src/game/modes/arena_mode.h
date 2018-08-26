@@ -23,7 +23,7 @@ struct arena_mode_knockout {
 	mode_player_id assist;
 	mode_player_id victim;
 
-	damage_cause cause;
+	damage_origin origin;
 	// END GEN INTROSPECTOR
 };
 

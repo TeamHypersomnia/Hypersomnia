@@ -4,6 +4,7 @@
 #include "view/necessary_resources.h"
 #include "augs/math/vec2.h"
 
+class images_in_atlas_map;
 class visible_entities;
 struct config_lua_table;
 
@@ -19,6 +20,7 @@ struct draw_setup_gui_input {
 	const augs::line_drawer_with_default& line_drawer;
 	const config_lua_table& config;
 	const necessary_images_in_atlas_map& necessary_images;
+	const images_in_atlas_map& images_in_atlas;
 	const vec2i mouse_pos;
 	const vec2i screen_size;
 	const augs::baked_font& gui_font;

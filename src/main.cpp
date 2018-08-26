@@ -1474,6 +1474,7 @@ int work(const int argc, const char* const * const argv) try {
 					get_line_drawer(),
 					new_viewing_config,
 					streaming.necessary_images_in_atlas,
+					streaming.images_in_atlas,
 					common_input_state.mouse.pos,
 					screen_size,
 					streaming.get_loaded_gui_font(),

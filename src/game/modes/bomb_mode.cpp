@@ -580,7 +580,7 @@ void bomb_mode::count_knockout(const input_type in, const entity_guid victim, co
 	}
 
 	ko.when = clk;
-	ko.cause = origin.cause;
+	ko.origin = origin;
 
 	ko.knockouter = lookup(knockouter);
 	ko.victim = lookup(victim);
