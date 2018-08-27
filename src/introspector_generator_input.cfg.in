@@ -266,11 +266,11 @@ struct ImVec4;
 			imcol(ImGuiCol_PlotHistogram);
 			imcol(ImGuiCol_PlotHistogramHovered);
 			imcol(ImGuiCol_TextSelectedBg);
-			imcol(ImGuiCol_ModalWindowDarkening);  // darken entire screen when a modal window is active
-			imcol(ImGuiCol_DragDropTarget);
 			imcol(ImGuiCol_DragDropTarget);
 			imcol(ImGuiCol_NavHighlight);
 			imcol(ImGuiCol_NavWindowingHighlight);
+			imcol(ImGuiCol_NavWindowingDimBg);
+			imcol(ImGuiCol_ModalWindowDimBg);
 #undef imcol
 		}
 
