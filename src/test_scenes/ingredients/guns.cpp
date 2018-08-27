@@ -622,7 +622,7 @@ namespace test_flavours {
 			gun_def.shell_angular_velocity = {2.f, 14.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
-			gun_def.damage_multiplier = 2.4f;
+			gun_def.damage_multiplier = 2.5f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = 70.f;
@@ -776,7 +776,7 @@ namespace test_flavours {
 			gun_def.shell_angular_velocity = {2.f, 14.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
-			gun_def.damage_multiplier = 1.4f;
+			gun_def.damage_multiplier = 1.55f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 
@@ -790,6 +790,50 @@ namespace test_flavours {
 			meta.set(gun_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::KEK9, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 0.f, true);
+			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
+			meta.get<invariants::item>().standard_price = 500;
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_shootable_weapons::SN69);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			invariants::gun gun_def;
+
+			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::SN69_MUZZLE);
+
+			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
+			gun_def.muzzle_velocity = {3000.f, 3000.f};
+			gun_def.shot_cooldown_ms = 100.f;
+
+			gun_def.shell_spawn_offset.pos.set(0, 10);
+			gun_def.shell_spawn_offset.rotation = 45;
+			gun_def.shell_angular_velocity = {2.f, 10.f};
+			gun_def.shell_spread_degrees = 12.f;
+			gun_def.shell_velocity = {300.f, 1900.f};
+			gun_def.damage_multiplier = 1.2f;
+			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
+			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
+			gun_def.recoil_multiplier = 0.9f;
+
+			gun_def.maximum_heat = 2.f;
+			gun_def.gunshot_adds_heat = 0.072f;
+			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
+			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
+
+			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+
+			meta.set(gun_def);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::SN69, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
@@ -871,6 +915,23 @@ namespace prefabs {
 		auto load_mag = cosmos[load_mag_id];
 
 		auto weapon = create_test_scene_entity(cosmos, test_shootable_weapons::KEK9, pos);
+
+		if (load_mag.alive()) {
+			perform_transfer(item_slot_transfer_request::standard(load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE]), step);
+
+			if (load_mag[slot_function::ITEM_DEPOSIT].has_items()) {
+				perform_transfer(item_slot_transfer_request::standard(load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1), step);
+			}
+		}
+
+		return weapon;
+	}
+
+	entity_handle create_sn69(const logic_step step, vec2 pos, entity_id load_mag_id) {
+		auto& cosmos = step.get_cosmos();
+		auto load_mag = cosmos[load_mag_id];
+
+		auto weapon = create_test_scene_entity(cosmos, test_shootable_weapons::SN69, pos);
 
 		if (load_mag.alive()) {
 			perform_transfer(item_slot_transfer_request::standard(load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE]), step);

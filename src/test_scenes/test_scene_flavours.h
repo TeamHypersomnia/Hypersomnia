@@ -92,6 +92,7 @@ enum class test_shootable_weapons {
 	VINDICATOR,
 	LEWSII,
 	KEK9,
+	SN69,
 	AMPLIFIER_ARM,
 	DATUM_GUN,
 

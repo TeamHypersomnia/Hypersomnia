@@ -40,6 +40,7 @@ namespace prefabs {
 	entity_handle create_rifle(const logic_step, vec2 pos, test_shootable_weapons, entity_id load_mag = entity_id());
 	entity_handle create_vindicator(const logic_step, vec2 pos, entity_id load_mag = entity_id());
 	entity_handle create_kek9(const logic_step step, vec2 pos, entity_id load_mag_id);
+	entity_handle create_sn69(const logic_step step, vec2 pos, entity_id load_mag_id);
 	entity_handle create_amplifier_arm(
 		const logic_step,
 		const vec2 pos 

@@ -361,6 +361,10 @@ namespace test_scenes {
 			prefabs::create_kek9(step, vec2(-800 - k * 150, -200),
 				prefabs::create_sample_magazine(step, vec2(100, -650),
 					prefabs::create_cyan_charge(step, vec2(0, 0))));
+
+			prefabs::create_sn69(step, vec2(-800 - k * 150, 0),
+				prefabs::create_sample_magazine(step, vec2(100, -650),
+					prefabs::create_cyan_charge(step, vec2(0, 0))));
 		}
 
 		prefabs::create_amplifier_arm(step, vec2(-300, -500 + 50));
