@@ -2,6 +2,7 @@
 #include <optional>
 #include "augs/audio/sound_source.h"
 #include "application/setups/draw_setup_gui_input.h"
+#include "augs/window_framework/event.h"
 
 struct mode_player_id;
 

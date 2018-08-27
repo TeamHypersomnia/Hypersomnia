@@ -1,9 +1,15 @@
-#pragma once
 #include "view/mode_gui/arena_gui.h"
+#include "view/viewables/images_in_atlas_map.h"
 #include "augs/gui/text/printer.h"
 #include "augs/templates/chrono_templates.h"
 #include "application/config_lua_table.h"
 #include "game/modes/mode_player_id.h"
+#include "augs/window_framework/event.h"
+
+#include "game/cosmos/cosmos.h"
+#include "game/modes/test_scene_mode.h"
+#include "game/modes/bomb_mode.h"
+#include "augs/string/format_enum.h"
 
 bool arena_gui_state::control(
 	const augs::event::state& common_input_state,
@@ -388,3 +394,19 @@ void arena_gui_state::draw_mode_gui(
 		(void)in;
 	}
 }
+
+template void arena_gui_state::draw_mode_gui(
+	const draw_setup_gui_input&,
+	float,
+	const bomb_mode&, 
+	const bomb_mode::input&,
+	const mode_player_id
+) const;
+
+template void arena_gui_state::draw_mode_gui(
+	const draw_setup_gui_input&,
+	float,
+	const test_scene_mode&, 
+	const test_scene_mode::input&,
+	const mode_player_id
+) const;

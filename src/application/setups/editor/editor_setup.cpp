@@ -10,7 +10,6 @@
 
 #include "game/detail/visible_entities.h"
 #include "view/viewables/images_in_atlas_map.h"
-#include "view/mode_gui/arena_gui.hpp"
 
 #include "application/config_lua_table.h"
 #include "application/setups/editor/editor_setup.h"
