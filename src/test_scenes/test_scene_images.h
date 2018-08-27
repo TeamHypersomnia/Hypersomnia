@@ -33,6 +33,7 @@ enum class test_scene_image_id {
 	BILMER2000,
 	KEK9,
 	SN69,
+	AO44,
 	URBAN_CYAN_MACHETE,
 
 	LEWSII,
@@ -50,6 +51,7 @@ enum class test_scene_image_id {
 
 	SAMPLE_MAGAZINE,
 	SMALL_MAGAZINE,
+	AO44_MAGAZINE,
 	ROUND_TRACE,
 	ELECTRIC_MISSILE,
 	PINK_CHARGE,
@@ -58,8 +60,14 @@ enum class test_scene_image_id {
 	CYAN_SHELL,
 	RED_CHARGE,
 	RED_SHELL,
+
 	GREEN_CHARGE,
 	GREEN_SHELL,
+
+	AO44_CHARGE,
+	AO44_SHELL,
+	AO44_ROUND,
+
 	STEEL_CHARGE,
 	STEEL_SHELL,
 	STEEL_ROUND,

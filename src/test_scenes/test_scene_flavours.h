@@ -72,6 +72,7 @@ enum class test_plain_sprited_bodys {
 	CRATE,
 	CYAN_SHELL,
 	STEEL_SHELL,
+	AO44_SHELL,
 	BRICK_WALL,
 	AQUARIUM_GLASS,
 
@@ -93,6 +94,7 @@ enum class test_shootable_weapons {
 	LEWSII,
 	KEK9,
 	SN69,
+	AO44,
 	AMPLIFIER_ARM,
 	DATUM_GUN,
 
@@ -104,6 +106,7 @@ enum class test_shootable_charges {
 	// GEN INTROSPECTOR enum class test_shootable_charges
 	CYAN_CHARGE,
 	STEEL_CHARGE,
+	AO44_CHARGE,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -136,6 +139,7 @@ enum class test_plain_missiles {
 	// GEN INTROSPECTOR enum class test_plain_missiles
 	CYAN_ROUND,
 	STEEL_ROUND,
+	AO44_ROUND,
 	ELECTRIC_MISSILE,
 
 	COUNT
@@ -146,6 +150,7 @@ enum class test_finishing_traces {
 	// GEN INTROSPECTOR enum class test_finishing_traces
 	CYAN_ROUND_FINISHING_TRACE,
 	STEEL_ROUND_FINISHING_TRACE,
+	AO44_ROUND_FINISHING_TRACE,
 	ELECTRIC_MISSILE_FINISHING_TRACE,
 
 	COUNT
@@ -157,6 +162,7 @@ enum class test_container_items {
 	SAMPLE_BACKPACK,
 	BROWN_BACKPACK,
 	SAMPLE_MAGAZINE,
+	AO44_MAGAZINE,
 	LEWSII_MAG,
 
 	COUNT

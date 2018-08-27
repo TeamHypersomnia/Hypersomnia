@@ -34,7 +34,7 @@ namespace test_flavours {
 
 		/* Types for bullets etc. */
 
-		auto make_default_gun_container = [](auto& meta, const item_holding_stance stance, const float /* mag_rotation */ = -90.f, const bool magazine_hidden = false){
+		auto make_default_gun_container = [](auto& meta, const item_holding_stance stance, const float /* mag_rotation */ = -90.f, const bool magazine_hidden = false, const std::string& chamber_space = "0.01"){
 			invariants::container container; 
 
 			{
@@ -61,7 +61,7 @@ namespace test_flavours {
 				slot_def.physical_behaviour = slot_physical_behaviour::DEACTIVATE_BODIES;
 				slot_def.always_allow_exactly_one_item = true;
 				slot_def.category_allowed = item_category::SHOT_CHARGE;
-				slot_def.space_available = to_space_units("0.01");
+				slot_def.space_available = to_space_units(chamber_space);
 
 				container.slots[slot_function::GUN_CHAMBER] = slot_def;
 			}
@@ -203,6 +203,77 @@ namespace test_flavours {
 			missile.remnant_flavours.emplace_back(to_entity_flavour_id(test_remnant_bodies::STEEL_ROUND_REMNANT_1));
 			missile.remnant_flavours.emplace_back(to_entity_flavour_id(test_remnant_bodies::STEEL_ROUND_REMNANT_2));
 			missile.remnant_flavours.emplace_back(to_entity_flavour_id(test_remnant_bodies::STEEL_ROUND_REMNANT_3));
+
+			auto& trace_modifier = missile.trace_sound.modifier;
+
+			trace_modifier.max_distance = 1020.f;
+			trace_modifier.reference_distance = 100.f;
+			trace_modifier.gain = 1.3f;
+			trace_modifier.fade_on_exit = false;
+
+			meta.set(missile);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_plain_missiles::AO44_ROUND);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::FLYING_BULLETS;
+
+				meta.set(render_def);
+			}
+
+
+			{
+				invariants::flags flags_def;
+				flags_def.values.set(entity_flag::IS_IMMUNE_TO_PAST);
+				meta.set(flags_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_ROUND, white);
+
+			{
+				{
+					components::trace trace_def;
+					trace_def.enabled = true;
+					meta.set(trace_def);
+				}
+
+				{
+					invariants::trace trace_def;
+					trace_def.max_multiplier_x = {0.370f, 1.0f};
+					trace_def.max_multiplier_y = {0.f, 0.09f};
+					trace_def.lengthening_duration_ms = {36.f, 366.f};
+					trace_def.additional_multiplier = vec2(1.f, 1.f);
+					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::AO44_ROUND_FINISHING_TRACE);
+					meta.set(trace_def);
+				}
+			}
+
+			test_flavours::add_bullet_round_physics(meta);
+
+			invariants::missile missile;
+
+			missile.ricochet_cooldown_ms = 17.f;
+			missile.destruction_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
+			missile.spawn_exploding_ring = false;
+			missile.destruction_particles.modifier.colorize = white;
+
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
+			missile.trace_particles.modifier.colorize = rgba(255, 50, 0, 255);
+
+			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION);
+			missile.muzzle_leave_particles.modifier.colorize = white;//{ 255, 218, 5, 255 };
+			missile.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+
+			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::STEEL_RICOCHET);
+			missile.ricochet_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_RICOCHET);
+
+			missile.destruction_sound.id = to_sound_id(test_scene_sound_id::STEEL_PROJECTILE_DESTRUCTION);
+
+			missile.remnant_flavours.emplace_back(to_entity_flavour_id(test_remnant_bodies::STEEL_ROUND_REMNANT_1));
+			missile.damage_amount = 47;
 
 			auto& trace_modifier = missile.trace_sound.modifier;
 
@@ -364,6 +435,20 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_plain_sprited_bodys::AO44_SHELL);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_SHELL, white);
+			test_flavours::add_shell_dynamic_body(meta);
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::CYAN_CHARGE);
 
 			{
@@ -438,6 +523,43 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_shootable_charges::AO44_CHARGE);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_CHARGE, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+
+			invariants::item item;
+			item.space_occupied_per_charge = to_space_units("0.1");
+			item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
+			item.stackable = true;
+
+			meta.set(item);
+
+			components::item item_inst;
+			item_inst.charges = 8;
+			meta.set(item_inst);
+
+			{
+				invariants::cartridge cartridge; 
+
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
+				cartridge.shell_trace_particles.modifier.colorize = rgba(202, 186, 89, 255);
+
+				cartridge.shell_flavour = to_entity_flavour_id(test_plain_sprited_bodys::AO44_SHELL);
+				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::AO44_ROUND);
+
+				meta.set(cartridge);
+			}
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_container_items::SAMPLE_MAGAZINE);
 
 			{
@@ -455,6 +577,37 @@ namespace test_flavours {
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
 			charge_deposit_def.space_available = to_space_units("0.3");
+
+			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
+			meta.set(container);
+
+			{
+				invariants::item item;
+
+				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				item.space_occupied_per_charge = to_space_units("0.5");
+				meta.set(item);
+			}
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_container_items::AO44_MAGAZINE);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_MAGAZINE, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+
+			invariants::container container; 
+
+			inventory_slot charge_deposit_def;
+			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
+			charge_deposit_def.space_available = to_space_units("0.8");
 
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
 			meta.set(container);
@@ -528,6 +681,22 @@ namespace test_flavours {
 
 			{
 				meta.set(get_test_flavour(flavours, test_plain_missiles::STEEL_ROUND).get<invariants::trace>());
+			}
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_finishing_traces::AO44_ROUND_FINISHING_TRACE);
+			
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::FLYING_BULLETS;
+
+				meta.set(render_def);
+				test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_ROUND, white);
+			}
+
+			{
+				meta.set(get_test_flavour(flavours, test_plain_missiles::AO44_ROUND).get<invariants::trace>());
 			}
 		}
 
@@ -614,7 +783,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::VINDICATOR_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {4200.f, 4400.f};
+			gun_def.muzzle_velocity = {4500.f, 4500.f};
 			gun_def.shot_cooldown_ms = 100.f;
 
 			gun_def.shell_spawn_offset.pos.set(0, 10);
@@ -841,6 +1010,50 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_shootable_weapons::AO44);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			invariants::gun gun_def;
+
+			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::AO44_MUZZLE);
+
+			gun_def.action_mode = gun_action_type::AUTOMATIC;
+			gun_def.muzzle_velocity = {4100.f, 4100.f};
+			gun_def.shot_cooldown_ms = 300.f;
+
+			gun_def.shell_spawn_offset.pos.set(0, 10);
+			gun_def.shell_spawn_offset.rotation = 45;
+			gun_def.shell_angular_velocity = {2.f, 10.f};
+			gun_def.shell_spread_degrees = 12.f;
+			gun_def.shell_velocity = {500.f, 2500.f};
+			gun_def.damage_multiplier = 1.f;
+			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 2;
+			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
+			gun_def.recoil_multiplier = 1.7f;
+
+			gun_def.maximum_heat = 2.f;
+			gun_def.gunshot_adds_heat = 0.092f;
+			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
+			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
+
+			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+
+			meta.set(gun_def);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 0.f, false, "0.1");
+			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
+			meta.get<invariants::item>().standard_price = 700;
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::AMPLIFIER_ARM);
 
 			{
@@ -910,11 +1123,11 @@ namespace prefabs {
 		return weapon;
 	}
 
-	entity_handle create_kek9(const logic_step step, vec2 pos, entity_id load_mag_id) {
+	entity_handle create_weapon(const logic_step step, test_shootable_weapons flav, vec2 pos, entity_id load_mag_id) {
 		auto& cosmos = step.get_cosmos();
 		auto load_mag = cosmos[load_mag_id];
 
-		auto weapon = create_test_scene_entity(cosmos, test_shootable_weapons::KEK9, pos);
+		auto weapon = create_test_scene_entity(cosmos, flav, pos);
 
 		if (load_mag.alive()) {
 			perform_transfer(item_slot_transfer_request::standard(load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE]), step);
@@ -927,21 +1140,16 @@ namespace prefabs {
 		return weapon;
 	}
 
+	entity_handle create_ao44(const logic_step step, vec2 pos, entity_id load_mag_id) {
+		return create_weapon(step, test_shootable_weapons::AO44, pos, load_mag_id);
+	}
+
+	entity_handle create_kek9(const logic_step step, vec2 pos, entity_id load_mag_id) {
+		return create_weapon(step, test_shootable_weapons::KEK9, pos, load_mag_id);
+	}
+
 	entity_handle create_sn69(const logic_step step, vec2 pos, entity_id load_mag_id) {
-		auto& cosmos = step.get_cosmos();
-		auto load_mag = cosmos[load_mag_id];
-
-		auto weapon = create_test_scene_entity(cosmos, test_shootable_weapons::SN69, pos);
-
-		if (load_mag.alive()) {
-			perform_transfer(item_slot_transfer_request::standard(load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE]), step);
-
-			if (load_mag[slot_function::ITEM_DEPOSIT].has_items()) {
-				perform_transfer(item_slot_transfer_request::standard(load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1), step);
-			}
-		}
-
-		return weapon;
+		return create_weapon(step, test_shootable_weapons::SN69, pos, load_mag_id);
 	}
 
 	entity_handle create_amplifier_arm(
@@ -979,15 +1187,25 @@ namespace prefabs {
 		return create_magazine(step, pos, test_container_items::SAMPLE_MAGAZINE, charge_inside_id, force_num_charges);
 	}
 
+	entity_handle create_ao44_magazine(const logic_step step, const transformr pos, const entity_id charge_inside_id, const int force_num_charges) {
+		return create_magazine(step, pos, test_container_items::AO44_MAGAZINE, charge_inside_id, force_num_charges);
+	}
+
 	entity_handle create_cyan_charge(const logic_step step, const vec2 pos) {
 		auto& cosmos = step.get_cosmos();
-		const auto cyan_charge = create_test_scene_entity(cosmos, test_shootable_charges::CYAN_CHARGE, pos);
-		return cyan_charge;
+		const auto charge = create_test_scene_entity(cosmos, test_shootable_charges::CYAN_CHARGE, pos);
+		return charge;
+	}
+
+	entity_handle create_ao44_charge(const logic_step step, const vec2 pos) {
+		auto& cosmos = step.get_cosmos();
+		const auto charge = create_test_scene_entity(cosmos, test_shootable_charges::AO44_CHARGE, pos);
+		return charge;
 	}
 
 	entity_handle create_steel_charge(const logic_step step, const vec2 pos) {
 		auto& cosmos = step.get_cosmos();
-		const auto steel_charge = create_test_scene_entity(cosmos, test_shootable_charges::STEEL_CHARGE, pos);
-		return steel_charge;
+		const auto charge = create_test_scene_entity(cosmos, test_shootable_charges::STEEL_CHARGE, pos);
+		return charge;
 	}
 }
