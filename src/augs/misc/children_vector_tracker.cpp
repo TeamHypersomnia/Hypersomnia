@@ -1,6 +1,6 @@
 #if BUILD_UNIT_TESTS
 #include "augs/misc/children_vector_tracker.h"
-#include <catch.hpp>
+#include <Catch/single_include/catch2/catch.hpp>
 
 TEST_CASE("ChildrenVectorTracker Tests") {
 	augs::children_vector_tracker<int, int> abc;

@@ -1,5 +1,5 @@
 #if BUILD_UNIT_TESTS
-#include <catch.hpp>
+#include <Catch/single_include/catch2/catch.hpp>
 
 #include "augs/math/vec2.h"
 #include "augs/string/typesafe_sprintf.h"

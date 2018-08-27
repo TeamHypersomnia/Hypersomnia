@@ -1,6 +1,6 @@
 
 #if BUILD_UNIT_TESTS
-#include <catch.hpp>
+#include <Catch/single_include/catch2/catch.hpp>
 #include "game/cosmos/cosmos.h"
 #include "augs/misc/pool/pool_allocate.h"
 #include "augs/misc/trivially_copyable_tuple.h"

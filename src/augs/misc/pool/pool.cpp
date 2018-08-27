@@ -1,5 +1,5 @@
 #if BUILD_UNIT_TESTS
-#include <catch.hpp>
+#include <Catch/single_include/catch2/catch.hpp>
 #include "augs/misc/pool/pool.h"
 #include "augs/misc/pool/pool_allocate.h"
 #include "augs/misc/constant_size_vector.h"

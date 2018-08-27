@@ -208,7 +208,7 @@ namespace augs {
 
 
 #if BUILD_UNIT_TESTS
-#include <catch.hpp>
+#include <Catch/single_include/catch2/catch.hpp>
 
 using namespace augs;
 using namespace network;

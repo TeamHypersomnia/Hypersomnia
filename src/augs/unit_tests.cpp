@@ -1,7 +1,7 @@
 #if BUILD_UNIT_TESTS
 #define CATCH_CONFIG_RUNNER
 #define CATCH_CONFIG_NOSTDOUT
-#include <catch.hpp>
+#include <Catch/single_include/catch2/catch.hpp>
 #endif
 
 #include <sstream>

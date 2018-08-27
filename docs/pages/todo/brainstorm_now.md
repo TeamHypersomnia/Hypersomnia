@@ -6,6 +6,17 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Expanding the arena mode gui
+	- This GUI might want to send some messages for the mode.
+	- Buy menu
+	- Team selection menu
+	- TAB menu
+		- State: bool show
+		- Since, in the future, this menu is going to be interacted with, it makes sense to use ImGui
+			- E.g. to view player profile or stats, or to kick a player
+
+- Send a notification to the game gui about the change in entity ids of hotbar-assigned items
+
 - Commandize "Add player" and "Restart" in editor
 
 - separate field address types in property editor
@@ -48,12 +59,6 @@ summary: That which we are brainstorming at the moment.
 				- Interactive
 			- General
 				- Read-onlies are drawn with our own GUI, from within draw_custom_gui of each setup concerned
-				- Our GUI or ImGui?
-					- Do we want to interact with the tab gui?
-						- Perhaps? E.g. to view player profile or stats
-						- ImGui could be better suited for this
-							- Also, it is not gameplay GUI so we don't have accuracy needs
-						- We still might want to use our custom drawers e.g. for last kills
 
 - Delta controls for property editor
 	- Will be useful for offsets

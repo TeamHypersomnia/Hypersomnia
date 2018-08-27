@@ -1,5 +1,5 @@
 #if BUILD_UNIT_TESTS
-#include <catch.hpp>
+#include <Catch/single_include/catch2/catch.hpp>
 #include "augs/templates/history.h"
 #include "augs/templates/history.hpp"
 

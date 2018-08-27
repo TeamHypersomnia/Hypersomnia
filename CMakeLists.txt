@@ -837,12 +837,6 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/imgui"
 )
 
-if(BUILD_UNIT_TESTS)
-	list(APPEND HYPERSOMNIA_INCLUDE_DIRS
-		"${PROJECT_SOURCE_DIR}/src/3rdparty/Catch/single_include"
-	)
-endif()
-
 # We configure additional flags for the compiler.
 
 if(GCC OR CLANG)

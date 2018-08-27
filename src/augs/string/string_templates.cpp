@@ -153,7 +153,7 @@ std::optional<unsigned long> get_trailing_number(const std::string& s) {
 }
 
 #if BUILD_UNIT_TESTS
-#include <catch.hpp>
+#include <Catch/single_include/catch2/catch.hpp>
 
 namespace dummy_nmsp {
 	struct dummy {

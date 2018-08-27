@@ -1,6 +1,6 @@
 #if BUILD_UNIT_TESTS
 #include <vector>
-#include <catch.hpp>
+#include <Catch/single_include/catch2/catch.hpp>
 #include "augs/templates/container_templates.h"
 #include "augs/templates/reversion_wrapper.h"
 #include "augs/misc/constant_size_vector.h"

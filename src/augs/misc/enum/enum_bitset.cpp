@@ -1,7 +1,7 @@
 
 #if BUILD_UNIT_TESTS
 #include "augs/misc/enum/enum_bitset.h"
-#include <catch.hpp>
+#include <Catch/single_include/catch2/catch.hpp>
 
 TEST_CASE("CustomContainers EnumBitsetTest") {
 	enum class aa {
