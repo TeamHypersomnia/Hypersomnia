@@ -14,6 +14,7 @@
 #include "game/components/missile_component.h"
 #include "game/components/attitude_component.h"
 #include "game/modes/arena_mode.h"
+#include "view/maybe_official_path_declaration.h"
 
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 

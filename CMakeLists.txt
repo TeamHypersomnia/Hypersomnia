@@ -624,7 +624,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/detail/explosive/detonate.cpp"
 	"src/application/setups/editor/gui/editor_modes_gui.cpp"
 	"src/game/modes/bomb_mode.cpp"
-	"src/view/mode_gui/arena_gui.cpp"
+	"src/view/mode_gui/arena/arena_mode_gui.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

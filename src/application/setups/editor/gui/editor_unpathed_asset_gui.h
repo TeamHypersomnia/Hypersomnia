@@ -4,6 +4,7 @@
 #include "application/setups/editor/editor_command_input.h"
 #include "application/setups/editor/gui/standard_window_mixin.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
+#include "game/assets/ids/asset_ids.h"
 
 class images_in_atlas_map;
 

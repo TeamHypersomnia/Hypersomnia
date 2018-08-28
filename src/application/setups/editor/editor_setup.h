@@ -16,7 +16,7 @@
 
 #include "view/viewables/all_viewables_defs.h"
 #include "view/viewables/viewables_loading_type.h"
-#include "view/mode_gui/arena_gui.h"
+#include "view/mode_gui/arena/arena_mode_gui.h"
 
 #include "application/intercosm.h"
 

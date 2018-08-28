@@ -22,7 +22,7 @@
 #include "view/viewables/regeneration/content_regeneration_settings.h"
 #include "view/audiovisual_state/systems/interpolation_settings.h"
 #include "view/network/simulation_receiver_settings.h"
-#include "view/mode_gui/arena_mode_gui_settings.h"
+#include "view/mode_gui/arena/arena_mode_gui_settings.h"
 
 #include "test_scenes/test_scene_settings.h"
 

@@ -3,7 +3,7 @@
 #include "game/modes/all_mode_includes.h"
 #include "game/cosmos/cosmic_entropy.h"
 #include "augs/misc/timing/fixed_delta_timer.h"
-#include "view/mode_gui/arena_gui.h"
+#include "view/mode_gui/arena/arena_mode_gui.h"
 
 struct cosmos_solvable_significant;
 

@@ -1,4 +1,4 @@
-#include "view/mode_gui/arena_gui.h"
+#include "view/mode_gui/arena/arena_mode_gui.h"
 #include "view/viewables/images_in_atlas_map.h"
 #include "augs/gui/text/printer.h"
 #include "augs/templates/chrono_templates.h"
