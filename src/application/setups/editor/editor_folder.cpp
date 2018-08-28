@@ -5,7 +5,7 @@
 #include "application/setups/editor/editor_paths.h"
 #include "application/setups/editor/editor_recent_paths.h"
 #include "application/setups/editor/editor_popup.h"
-#include "view/maybe_official_path.h"
+#include "augs/misc/maybe_official_path.h"
 
 #include "augs/readwrite/byte_file.h"
 

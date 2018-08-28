@@ -11,7 +11,7 @@
 
 #include "view/asset_location_context.h"
 #include "view/viewables/regeneration/neon_maps.h"
-#include "view/maybe_official_path.h"
+#include "view/maybe_official_path_types.h"
 #include "view/viewables/asset_definition_view.h"
 
 augs::path_type get_neon_map_path(augs::path_type from_source_image_path);

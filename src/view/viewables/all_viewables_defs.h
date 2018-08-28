@@ -16,7 +16,7 @@
 #include "game/assets/ids/asset_ids.h"
 
 #include "view/viewables/all_viewables_declaration.h"
-#include "view/maybe_official_path.h"
+#include "augs/misc/maybe_official_path.h"
 
 struct all_logical_assets;
 

@@ -5,7 +5,7 @@
 #include "augs/filesystem/directory.h"
 #include "augs/misc/imgui/simple_browse_path_tree.h"
 #include "augs/misc/imgui/path_tree_structs.h"
-#include "view/maybe_official_path.h"
+#include "augs/misc/maybe_official_path.h"
 #include "application/setups/editor/property_editor/browsed_path_entry_base.h"
 #include "application/setups/editor/property_editor/widgets/keyboard_acquiring_popup.h"
 #include "view/asset_funcs.h"

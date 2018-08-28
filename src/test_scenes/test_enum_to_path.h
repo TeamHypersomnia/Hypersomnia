@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/templates/enum_introspect.h"
 #include "game/assets/ids/asset_ids.h"
-#include "view/maybe_official_path.h"
+#include "augs/misc/maybe_official_path.h"
 
 template <class T>
 auto enum_to_image_stem(const T& enum_id) {

@@ -31,6 +31,8 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "view/viewables/all_viewables_defs.h"
 
+#include "augs/misc/maybe_official_path.h"
+
 #include "3rdparty/imgui/imgui.h"
 
 /* Define several other traits which will validate properties of some other types. */

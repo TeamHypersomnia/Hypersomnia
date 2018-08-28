@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/audio/sound_buffer_structs.h"
-#include "view/maybe_official_path.h"
+#include "view/maybe_official_path_types.h"
 #include "view/viewables/asset_definition_view.h"
 
 struct sound_meta {

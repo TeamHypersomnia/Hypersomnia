@@ -1,6 +1,5 @@
 #pragma once
 #include "augs/filesystem/path.h"
-#include "view/maybe_official_path_declaration.h"
 
 std::string format_field_name(std::string s);
 

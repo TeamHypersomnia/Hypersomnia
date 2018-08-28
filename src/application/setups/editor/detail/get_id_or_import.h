@@ -1,6 +1,6 @@
 #pragma once
 #include "view/viewables/all_viewables_defs.h"
-#include "view/maybe_official_path.h"
+#include "augs/misc/maybe_official_path.h"
 
 #include "view/load_meta_lua.h"
 #include "application/setups/editor/editor_history.h"
