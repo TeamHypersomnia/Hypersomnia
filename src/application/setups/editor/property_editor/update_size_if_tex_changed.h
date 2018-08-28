@@ -12,18 +12,18 @@
 template <class T>
 void update_size_if_tex_changed(
 	const edit_invariant_input,
-	const cosmic_field_address&,
+	const flavour_field_address&,
 	const T&
 ) {}
 
 void update_size_if_tex_changed(
 	const edit_invariant_input in,
-	const cosmic_field_address&,
+	const flavour_field_address&,
 	const invariants::sprite&
 );
 
 void update_size_if_tex_changed(
 	const edit_invariant_input in,
-	const cosmic_field_address&,
+	const flavour_field_address&,
 	const invariants::animation&
 );

@@ -10,7 +10,7 @@ struct change_common_state_command : change_property_command<change_common_state
 	using introspect_base = change_property_command<change_common_state_command>;
 
 	// GEN INTROSPECTOR struct change_common_state_command
-	cosmic_field_address field;
+	cosmos_common_field_address field;
 	// END GEN INTROSPECTOR
 
 	auto count_affected() const {

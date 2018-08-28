@@ -8,7 +8,7 @@
 
 struct entity_property_id {
 	unsigned component_id = static_cast<unsigned>(-1);
-	cosmic_field_address field;
+	entity_field_address field;
 };
 
 using affected_entities_type = std::vector<entity_id_base>;

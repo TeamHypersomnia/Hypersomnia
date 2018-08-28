@@ -27,18 +27,31 @@ using field_type_id_t = decltype(decltype(cmd_type::field)::type_id);
 template <class cmd_type>
 using property_field_type_id_t = field_type_id_t<decltype(cmd_type::property_id)>;
 
-using cosmic_field_type_id = type_in_list_id<
+using entity_field_type_id = type_in_list_id<
+	type_list<
+		augs::trivial_type_marker,
+		only_pick_these_items_vector,
+		specific_hostile_entities_vector,
+		friction_connection_vector,
+		damage_owners_vector
+	>
+>;
+
+using flavour_field_type_id = type_in_list_id<
 	type_list<
 		augs::trivial_type_marker,
 		std::string,
 		convex_partitioned_shape::poly_vector_type,
 		convex_partitioned_shape::convex_poly,
 		wandering_pixels_frames,
-		only_pick_these_items_vector,
-		specific_hostile_entities_vector,
-		friction_connection_vector,
-		remnant_flavour_vector,
-		damage_owners_vector
+		remnant_flavour_vector
+	>
+>;
+
+using cosmos_common_field_type_id = type_in_list_id<
+	type_list<
+		augs::trivial_type_marker,
+		std::string
 	>
 >;
 
@@ -86,7 +99,9 @@ struct field_address {
 	}
 };
 
-using cosmic_field_address = field_address<cosmic_field_type_id>;
+using cosmos_common_field_address = field_address<cosmos_common_field_type_id>;
+using flavour_field_address = field_address<flavour_field_type_id>;
+using entity_field_address = field_address<entity_field_type_id>;
 using asset_field_address = field_address<asset_field_type_id>;
 using mode_field_address = field_address<mode_field_type_id>;
 
@@ -132,5 +147,5 @@ auto make_field_address(const std::size_t offset) {
 	return result;
 }
 
-#define MACRO_MAKE_COSMIC_FIELD_ADDRESS(a,b) make_field_address<cosmic_field_type_id, decltype(a::b)>(augs_offsetof(a,b))
+#define MACRO_MAKE_FLAVOUR_FIELD_ADDRESS(a,b) make_field_address<flavour_field_type_id, decltype(a::b)>(augs_offsetof(a,b))
 #define MACRO_MAKE_ASSET_FIELD_ADDRESS(a,b) make_field_address<asset_field_type_id, decltype(a::b)>(augs_offsetof(a,b))

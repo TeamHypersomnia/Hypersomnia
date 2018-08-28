@@ -28,7 +28,7 @@ void update_size_for_new_image(
 		auto cmd = in.command;
 
 		{
-			const auto addr = MACRO_MAKE_COSMIC_FIELD_ADDRESS(invariants::sprite, size);
+			const auto addr = MACRO_MAKE_FLAVOUR_FIELD_ADDRESS(invariants::sprite, size);
 			cmd.property_id = flavour_property_id { invariant_id, addr };
 		}
 
@@ -49,7 +49,7 @@ void update_size_for_new_image(
 		auto cmd = in.command;
 
 		{
-			const auto addr = MACRO_MAKE_COSMIC_FIELD_ADDRESS(invariants::shape_polygon, shape);
+			const auto addr = MACRO_MAKE_FLAVOUR_FIELD_ADDRESS(invariants::shape_polygon, shape);
 			cmd.property_id = flavour_property_id { *shape_invariant_id, addr };
 		}
 
@@ -112,7 +112,7 @@ void update_size_for_new_image(
 				auto cmd = in.command;
 				cmd.affected_flavours = { raw_flavour_id };
 				cmd.property_id.invariant_id = in.text_details_invariant_id;
-				cmd.property_id.field = MACRO_MAKE_COSMIC_FIELD_ADDRESS(invariants::text_details, name);
+				cmd.property_id.field = MACRO_MAKE_FLAVOUR_FIELD_ADDRESS(invariants::text_details, name);
 				cmd.common.has_parent = true;
 				cmd.built_description = "Updated flavour name to name of the chosen image";
 				cmd.value_after_change = augs::to_bytes(new_name);
@@ -125,10 +125,10 @@ void update_size_for_new_image(
 
 void update_size_if_tex_changed(
 	const edit_invariant_input in,
-	const cosmic_field_address& address,
+	const flavour_field_address& address,
 	const invariants::animation& animation_def
 ) {
-	if (address != MACRO_MAKE_COSMIC_FIELD_ADDRESS(invariants::animation, id)) {
+	if (address != MACRO_MAKE_FLAVOUR_FIELD_ADDRESS(invariants::animation, id)) {
 		return;
 	}
 
@@ -153,7 +153,7 @@ void update_size_if_tex_changed(
 		auto cmd = in.command;
 
 		{
-			const auto addr = MACRO_MAKE_COSMIC_FIELD_ADDRESS(invariants::sprite, image_id);
+			const auto addr = MACRO_MAKE_FLAVOUR_FIELD_ADDRESS(invariants::sprite, image_id);
 			cmd.property_id = flavour_property_id { *in.sprite_invariant_id, addr };
 		}
 
@@ -172,12 +172,12 @@ void update_size_if_tex_changed(
 
 void update_size_if_tex_changed(
 	const edit_invariant_input in,
-	const cosmic_field_address& address,
+	const flavour_field_address& address,
 	const invariants::sprite& spr
 ) {
 	const auto new_id = spr.image_id;
 
-	if (address == MACRO_MAKE_COSMIC_FIELD_ADDRESS(invariants::sprite, image_id)) {
+	if (address == MACRO_MAKE_FLAVOUR_FIELD_ADDRESS(invariants::sprite, image_id)) {
 		update_size_for_new_image(in, new_id);
 	}
 }

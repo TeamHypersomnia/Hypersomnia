@@ -20,14 +20,10 @@ summary: That which we are brainstorming at the moment.
 
 - $illicoins
 
-- Expanding the arena mode gui
-	- This GUI might want to send some messages for the mode.
-	- Buy menu
-	- Team selection menu
-	- TAB menu
-		- State: bool show
-		- Since, in the future, this menu is going to be interacted with, it makes sense to use ImGui
-			- E.g. to view player profile or stats, or to kick a player
+- Fixing the arena mode GUI
+	- We'll moving from ImGui to our own GUI to have finer control.
+		- We can offload the work to ImGui when the player is actually selected.
+		- The buttons for the players will be highly deterministic since it is really an easy layout.
 
 - Send a notification to the game gui about the change in entity ids of hotbar-assigned items
 
