@@ -124,7 +124,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 		last_seen_missing_paths.clear();
 	}
 
-	const auto label = std::string(maybe_official_path<asset_id_type>::get_label());
+	const auto label = std::string(assets::get_label<asset_id_type>());
 
 	for_each_id_and_object(definitions,
 		[&](const asset_id_type id, const def_type& object) mutable {

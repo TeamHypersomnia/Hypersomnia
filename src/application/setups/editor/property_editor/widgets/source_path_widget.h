@@ -4,6 +4,7 @@
 #include "application/setups/editor/property_editor/tweaker_type.h"
 #include "application/setups/editor/property_editor/widgets/asset_path_chooser.h"
 #include "application/setups/editor/property_editor/property_editor_settings.h"
+#include "view/asset_funcs.h"
 
 struct source_path_widget {
 	all_viewables_defs& defs;
@@ -22,7 +23,7 @@ struct source_path_widget {
 		const std::string& /* formatted_label */,
 		const T& to
 	) const {
-		return typesafe_sprintf("Changed %x path to %x", to.get_label(), to.path);
+		return typesafe_sprintf("Changed %x path to %x", assets::get_label<typename T::id_type>(), to.path);
 	}
 
 	template <class T>

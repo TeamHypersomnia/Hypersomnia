@@ -8,6 +8,7 @@
 #include "view/maybe_official_path.h"
 #include "application/setups/editor/property_editor/browsed_path_entry_base.h"
 #include "application/setups/editor/property_editor/widgets/keyboard_acquiring_popup.h"
+#include "view/asset_funcs.h"
 
 template <class I>
 class asset_path_chooser : keyboard_acquiring_popup {
@@ -39,7 +40,7 @@ public:
 
 				auto make_path_adder = [&](const bool official, const auto& root) {
 					return [official, this, &allow_path_predicate, &root](const auto& p) {
-						if (maybe_official_path<I>::is_supported_extension(p.extension())) {
+						if (assets::is_supported_extension<I>(p.extension())) {
 							maybe_official_path<I> entry;
 
 							entry.path = cut_preffix(p.string(), root.string() + "/");

@@ -9,6 +9,9 @@ namespace augs {
 }
 
 template <class T>
+std::string get_content_suffix();
+
+template <class T>
 struct maybe_official_path {
 	using id_type = T;
 
@@ -53,41 +56,8 @@ struct maybe_official_path {
 		return augs::get_prettified_filename(path);
 	}
 
-	template <class E>
-	static auto is_supported_extension(const E& ext) {
-		if constexpr(std::is_same_v<T, assets::image_id>) {
-			return ext == ".png";
-		}
-		else if constexpr(std::is_same_v<T, assets::sound_id>) {
-			return ext == ".wav" || ext == ".ogg";
-		}
-		else {
-			static_assert(always_false_v<T>, "Unsupported id type.");
-		}
-	}
-
-	static auto get_label() {
-		if constexpr(std::is_same_v<T, assets::image_id>) {
-			return "image";
-		}
-		else if constexpr(std::is_same_v<T, assets::sound_id>) {
-			return "sound";
-		}
-		else {
-			static_assert(always_false_v<T>, "Unsupported id type.");
-		}
-	}
-
 	static auto get_content_suffix() {
-		if constexpr(std::is_same_v<T, assets::image_id>) {
-			return "gfx";
-		}
-		else if constexpr(std::is_same_v<T, assets::sound_id>) {
-			return "sfx";
-		}
-		else {
-			static_assert(always_false_v<T>, "Unsupported id type.");
-		}
+		return ::get_content_suffix<T>();
 	}
 
 	static auto get_in_official() {
