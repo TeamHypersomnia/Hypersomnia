@@ -65,11 +65,17 @@ struct bomb_mode_player {
 	int knockouts = 0;
 	int assists = 0;
 	int deaths = 0;
+
+	int plants = 0;
+	int defuses = 0;
 	// END GEN INTROSPECTOR
 
 	bomb_mode_player(const entity_name_str& chosen_name = {}) : 
 		chosen_name(chosen_name) 
 	{}
+
+	int calc_score() const;
+	bool operator<(const bomb_mode_player& b) const;
 };
 
 enum class arena_mode_state {
@@ -171,15 +177,6 @@ private:
 
 	void play_bomb_defused_sound(input, const_logic_step, faction_type) const;
 
-	template <class F>
-	void for_each_player_in(faction_type, F&& callback) const;
-
-	template <class C, class F>
-	void for_each_player_handle_in(C&, faction_type, F&& callback) const;
-
-	std::size_t num_conscious_players_in(const cosmos&, faction_type) const;
-	std::size_t num_players_in(faction_type) const;
-
 	void process_win_conditions(input, logic_step);
 
 	std::size_t get_round_rng_seed(const cosmos&) const;
@@ -229,8 +226,17 @@ public:
 	float get_critical_seconds_left(input) const;
 	float get_seconds_since_planting(input) const;
 
+	std::size_t num_conscious_players_in(const cosmos&, faction_type) const;
+	std::size_t num_players_in(faction_type) const;
+
 	void request_restart();
 	void restart(input, logic_step);
+
+	template <class F>
+	void for_each_player_in(faction_type, F&& callback) const;
+
+	template <class C, class F>
+	void for_each_player_handle_in(C&, faction_type, F&& callback) const;
 
 	template <class PreSolve, class PostSolve, class... Callbacks>
 	void advance(

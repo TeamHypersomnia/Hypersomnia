@@ -281,9 +281,9 @@ FORCE_INLINE rgba& rgba::multiply_alpha(const float s) {
 }
 
 FORCE_INLINE rgba& rgba::multiply_rgb(const float s) {
-	r = static_cast<rgba_channel>(s * r);
-	g =	static_cast<rgba_channel>(s * g);
-	b =	static_cast<rgba_channel>(s * b);
+	r = static_cast<rgba_channel>(std::clamp(s * r, 0.f, 255.f));
+	g =	static_cast<rgba_channel>(std::clamp(s * g, 0.f, 255.f));
+	b =	static_cast<rgba_channel>(std::clamp(s * b, 0.f, 255.f));
 
 	return *this;
 }

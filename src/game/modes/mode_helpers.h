@@ -6,25 +6,13 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/for_each_entity.h"
 #include "game/modes/mode_common.h"
+#include "augs/templates/continue_or_callback_result.h"
 
 template <class F>
 void for_each_faction(F callback) {
 	callback(faction_type::METROPOLIS);
 	callback(faction_type::ATLANTIS);
 	callback(faction_type::RESISTANCE);
-}
-
-template <class F, class... Args>
-decltype(auto) continue_or_callback_result(F&& callback, Args&&... args) {
-	using R = decltype(callback(std::forward<Args>(args)...));
-	if constexpr(std::is_same_v<void, R>) {
-		callback(std::forward<Args>(args)...);
-		return callback_result::CONTINUE;
-	}
-	else {
-		static_assert(std::is_same_v<R, callback_result>, "Bad return type for a for_each callback.");
-		return callback(std::forward<Args>(args)...);
-	}
 }
 
 inline auto calc_spawnable_factions(const cosmos& cosm) {

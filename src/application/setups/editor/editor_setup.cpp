@@ -554,6 +554,18 @@ void editor_setup::perform_custom_imgui(
 		else if (const auto pos = mover.current_mover_pos_delta(make_mover_input())) {
 			text_tooltip("x: %x\ny: %x", pos->x, pos->y);
 		}
+
+		on_mode_with_input(
+			[&](const auto& typed_mode, const auto& mode_input) {
+				const auto draw_mode_in = draw_mode_gui_input { get_game_screen_top(), view().local_player_id, game_atlas };
+
+				arena_gui.perform_imgui(
+					draw_mode_in, 
+					typed_mode, 
+					mode_input
+				);
+			}
+		);
 	}
 
 	if (open_folder_dialog.valid() && is_ready(open_folder_dialog)) {
@@ -1022,14 +1034,9 @@ bool editor_setup::handle_input_before_game(
 	using namespace augs::event;
 	using namespace augs::event::keys;
 
-	const auto maybe_eye = find_current_camera_eye();
-
-	if (!maybe_eye || !anything_opened()) {
+	if (!anything_opened()) {
 		return false;
 	}
-
-	const auto current_eye = *maybe_eye;
-	const auto world_cursor_pos = get_world_cursor_pos(current_eye);
 
 	const bool has_ctrl{ common_input_state[key::LCTRL] };
 	const bool has_shift{ common_input_state[key::LSHIFT] };
@@ -1043,15 +1050,11 @@ bool editor_setup::handle_input_before_game(
 		}
 	}
 
+	if (arena_gui.control(common_input_state, e)) { 
+		return true;
+	}
+
 	if (is_editing_mode()) {
-		if (arena_gui.control(common_input_state, e)) { 
-			return true;
-		}
-
-		auto& cosm = work().world;
-		const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
-		const auto current_cone = camera_cone(current_eye, screen_size);
-
 		if (e.was_any_key_pressed()) {
 			const auto k = e.data.key.key;
 
@@ -1066,56 +1069,65 @@ bool editor_setup::handle_input_before_game(
 			}
 		}
 
-		if (editor_detail::handle_camera_input(
-			settings.camera,
-			current_cone,
-			common_input_state,
-			e,
-			world_cursor_pos,
-			view().panned_camera
-		)) {
-			return true;
-		}
+		if (const auto maybe_eye = find_current_camera_eye()) {
+			const auto current_eye = *maybe_eye;
+			const auto world_cursor_pos = get_world_cursor_pos(current_eye);
 
-		if (e.msg == message::mousemotion) {
-			if (mover.do_mousemotion(make_mover_input(), world_cursor_pos)) {
+			auto& cosm = work().world;
+			const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
+			const auto current_cone = camera_cone(current_eye, screen_size);
+
+			if (editor_detail::handle_camera_input(
+				settings.camera,
+				current_cone,
+				common_input_state,
+				e,
+				world_cursor_pos,
+				view().panned_camera
+			)) {
 				return true;
 			}
 
-			selector.do_mousemotion(
-				sizes_for_icons,
-				cosm,
-				view().rect_select_mode,
-				world_cursor_pos,
-				current_eye,
-				common_input_state[key::LMOUSE],
-				view().get_effective_selecting_filter()
-			);
+			if (e.msg == message::mousemotion) {
+				if (mover.do_mousemotion(make_mover_input(), world_cursor_pos)) {
+					return true;
+				}
 
-			return true;
+				selector.do_mousemotion(
+					sizes_for_icons,
+					cosm,
+					view().rect_select_mode,
+					world_cursor_pos,
+					current_eye,
+					common_input_state[key::LMOUSE],
+					view().get_effective_selecting_filter()
+				);
+
+				return true;
+			}
+
+			if (e.was_pressed(key::LMOUSE)) {
+				if (mover.do_left_press(make_mover_input())) {
+					return true;	
+				}
+			}
+
+			{
+				auto& selections = view().selected_entities;
+
+				if (e.was_pressed(key::LMOUSE)) {
+					selector.do_left_press(cosm, has_ctrl, world_cursor_pos, selections);
+					return true;
+				}
+				else if (e.was_released(key::LMOUSE)) {
+					selections = selector.do_left_release(has_ctrl, make_grouped_selector_op_input());
+				}
+			}
 		}
 
 		if (e.was_pressed(key::SLASH)) {
 			go_to_entity();
 			return true;
-		}
-
-		if (e.was_pressed(key::LMOUSE)) {
-			if (mover.do_left_press(make_mover_input())) {
-				return true;	
-			}
-		}
-
-		{
-			auto& selections = view().selected_entities;
-
-			if (e.was_pressed(key::LMOUSE)) {
-				selector.do_left_press(cosm, has_ctrl, world_cursor_pos, selections);
-				return true;
-			}
-			else if (e.was_released(key::LMOUSE)) {
-				selections = selector.do_left_release(has_ctrl, make_grouped_selector_op_input());
-			}
 		}
 
 		if (e.was_any_key_pressed()) {
@@ -1380,7 +1392,8 @@ void editor_setup::draw_mode_gui(const draw_setup_gui_input& in) const {
 	if (anything_opened()) {
 		on_mode_with_input(
 			[&](const auto& typed_mode, const auto& mode_input) {
-				arena_gui.draw_mode_gui(in, get_game_screen_top(), typed_mode, mode_input, view().local_player_id);
+				const auto draw_mode_in = draw_mode_gui_input { get_game_screen_top(), view().local_player_id, in.images_in_atlas };
+				arena_gui.draw_mode_gui(in, draw_mode_in, typed_mode, mode_input);
 			}
 		);
 	}

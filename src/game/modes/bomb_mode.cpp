@@ -1,6 +1,6 @@
 #include "game/cosmos/solvers/standard_solver.h"
 #include "game/messages/health_event.h"
-#include "game/modes/bomb_mode.h"
+#include "game/modes/bomb_mode.hpp"
 #include "game/modes/mode_entropy.h"
 #include "game/modes/mode_helpers.h"
 #include "game/cosmos/cosmos.h"
@@ -19,6 +19,25 @@ bomb_mode_player* bomb_mode::find(const mode_player_id& id) {
 
 const bomb_mode_player* bomb_mode::find(const mode_player_id& id) const {
 	return mapped_or_nullptr(players, id);
+}
+
+int bomb_mode_player::calc_score() const {
+	return 
+		knockouts * 2 
+		+ assists + plants * 2 
+		+ defuses * 2
+	;
+}
+
+bool bomb_mode_player::operator<(const bomb_mode_player& b) const {
+	const auto as = calc_score();
+	const auto bs = b.calc_score();
+
+	if (as == bs) {
+		return chosen_name < b.chosen_name;
+	}
+
+	return as > bs;
 }
 
 std::size_t bomb_mode::get_round_rng_seed(const cosmos& cosm) const {
@@ -280,17 +299,6 @@ void bomb_mode::reshuffle_spawns(const cosmos& cosm, const faction_type faction)
 	}
 
 	faction_state.current_spawn_index = 0;
-}
-
-template <class F>
-void bomb_mode::for_each_player_in(const faction_type faction, F&& callback) const {
-	for (auto& it : players) {
-		if (it.second.faction == faction) {
-			if (continue_or_callback_result(std::forward<F>(callback), it.first, it.second) == callback_result::ABORT) {
-				return;
-			}
-		}
-	}
 }
 
 template <class C, class F>
