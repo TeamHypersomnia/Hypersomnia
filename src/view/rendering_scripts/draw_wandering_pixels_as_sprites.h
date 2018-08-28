@@ -3,7 +3,7 @@
 #include "game/components/sprite_component.h"
 #include "game/enums/render_layer.h"
 #include "game/assets/animation_math.h"
-#include "augs/drawing/sprite_draw.h"
+#include "augs/drawing/sprite.hpp"
 
 template <class E, class M>
 void draw_wandering_pixels_as_sprites(

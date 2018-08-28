@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/ensure.h"
 #include "augs/drawing/drawing.h"
-#include "augs/drawing/sprite_draw.h"
+#include "augs/drawing/sprite.hpp"
 #include "augs/build_settings/platform_defines.h"
 
 #include "game/enums/render_layer.h"
