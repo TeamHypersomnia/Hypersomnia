@@ -52,6 +52,8 @@ void arena_scoreboard_gui::perform_imgui(
 
 	ImGui::SetNextWindowPosCenter();
 
+	ImGui::SetNextWindowSize((vec2(ImGui::GetIO().DisplaySize) * 0.6f).operator ImVec2(), ImGuiCond_FirstUseEver);
+
 	const auto window_name = "Scoreboard";
 	auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar);
 
@@ -63,11 +65,29 @@ void arena_scoreboard_gui::perform_imgui(
 	}
 
 
+	auto spacing = ImGui::GetStyle().ItemSpacing;
+	spacing.y *= 1.9;
+	auto spacing_scope = scoped_style_var(ImGuiStyleVar_ItemSpacing, spacing);
+
 	const auto p = typed_mode.calc_participating_factions(mode_input);
 
-	const auto num_columns = 7;
+	const auto num_columns = 8;
 
-	ImGui::Columns(num_columns);
+	const auto ping_col_w = ImGui::CalcTextSize("9999", nullptr, true).x;
+	const auto point_col_w = ImGui::CalcTextSize("999", nullptr, true).x;
+	const auto score_col_w = ImGui::CalcTextSize("999999", nullptr, true).x;
+	const auto money_col_w = ImGui::CalcTextSize("999999", nullptr, true).x;
+
+	ImGui::Columns(num_columns, nullptr, false);
+
+	const auto w_off = 12;
+
+	ImGui::SetColumnWidth(0, ping_col_w + w_off);
+	ImGui::SetColumnWidth(2, money_col_w + w_off);
+	ImGui::SetColumnWidth(3, point_col_w + w_off);
+	ImGui::SetColumnWidth(4, point_col_w + w_off);
+	ImGui::SetColumnWidth(5, point_col_w + w_off);
+	ImGui::SetColumnWidth(6, score_col_w + w_off);
 
 	text_disabled("Ping");
 	ImGui::NextColumn();
@@ -83,19 +103,21 @@ void arena_scoreboard_gui::perform_imgui(
 	ImGui::NextColumn();
 	text_disabled("Score");
 	ImGui::NextColumn();
+	ImGui::NextColumn();
 
 	ImGui::Columns(1);
 
 	auto print_faction = [&](const faction_type faction, const bool on_top) {
-		const auto faction_color = get_faction_color(faction);
-		const auto disabled_faction_color = rgba(faction_color).multiply_rgb(.7f);
+		const auto orig_faction_col = get_faction_color(faction);
+		const auto faction_color = rgba(orig_faction_col).multiply_rgb(1.2f);
+		const auto disabled_faction_color = rgba(orig_faction_col).multiply_rgb(.6f);
 
-		const auto faction_bg = rgba(faction_color).multiply_rgb(.25f);
-		const auto disabled_faction_bg = rgba(faction_color).multiply_rgb(.085f);
+		const auto faction_bg = rgba(orig_faction_col).multiply_rgb(.25f);
+		const auto disabled_faction_bg = rgba(orig_faction_col).multiply_rgb(.085f);
 
-		auto scope_separator = scoped_style_color(ImGuiCol_Separator, faction_color);
+		auto scope_separator = scoped_style_color(ImGuiCol_Separator, disabled_faction_bg);
 
-		ImGui::Columns(num_columns);
+		ImGui::Columns(num_columns, nullptr, false);
 
 		const auto& cosm = mode_input.cosm;
 
@@ -133,15 +155,17 @@ void arena_scoreboard_gui::perform_imgui(
 				return std::make_pair(l1, l2);
 			}();
 
-			{
-				auto scope_header = scoped_style_color(ImGuiCol_Header, disabled_faction_bg);
-				auto scope_header_hovered = scoped_style_color(ImGuiCol_HeaderHovered, disabled_faction_bg);
-				auto scope_header_active = scoped_style_color(ImGuiCol_HeaderActive, disabled_faction_bg);
+			auto scope_header = scoped_style_color(ImGuiCol_Header, disabled_faction_bg);
+			auto scope_header_hovered = scoped_style_color(ImGuiCol_HeaderHovered, disabled_faction_bg);
+			auto scope_header_active = scoped_style_color(ImGuiCol_HeaderActive, disabled_faction_bg);
 
-				auto scope_text = scoped_text_color(faction_color);
+			auto scope_text = scoped_text_color(faction_color);
 
-				ImGui::Selectable(headline.first.c_str(), true);
+			if (on_top) {
+				ImGui::Selectable(" ", true);
 			}
+
+			ImGui::Selectable(headline.first.c_str(), true);
 
 			{
 				const auto w = ImGui::CalcTextSize(headline.second.c_str(), nullptr, true);
@@ -149,14 +173,16 @@ void arena_scoreboard_gui::perform_imgui(
 			}
 
 			text_color(headline.second, faction_color);
+
+			if (!on_top) {
+				ImGui::Selectable(" ", true);
+			}
 		};
 
 		if (!on_top) {
 			draw_headline();
-			ImGui::Columns(num_columns);
+			ImGui::Columns(num_columns, nullptr, false);
 		}
-
-		ImGui::Separator();
 
 		for (const auto& s : sorted_players) {
 			const auto& id = s.second;
@@ -170,8 +196,8 @@ void arena_scoreboard_gui::perform_imgui(
 			auto color = is_conscious ? faction_color : disabled_faction_color;
 
 			if (id == draw_in.local_player) {
-				bg_color.multiply_rgb(2.5f);
-				color.multiply_rgb(2.5f);
+				bg_color.multiply_rgb(1.9f);
+				color.multiply_rgb(1.6f);
 			}
 
 			auto scope = scoped_style_color(ImGuiCol_Button, bg_color);
@@ -200,8 +226,34 @@ void arena_scoreboard_gui::perform_imgui(
 
 			text(typesafe_sprintf("%x", player.calc_score()));
 			ImGui::NextColumn();
+			ImGui::NextColumn();
 
-			ImGui::Separator();
+			/* auto& sepcol = ImGui::GetStyle().Colors[ImGuiCol_Separator]; */
+			/* auto prev = sepcol; */
+			/* sepcol = white; */
+
+			/* { */
+			{
+				auto spacing_sep_scope = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(spacing.x, 0));
+				auto b_scope_header = scoped_style_color(ImGuiCol_Header, disabled_faction_bg);
+				auto b_scope_header_hovered = scoped_style_color(ImGuiCol_HeaderHovered, disabled_faction_bg);
+				auto b_scope_header_active = scoped_style_color(ImGuiCol_HeaderActive, disabled_faction_bg);
+				auto b_sep = scoped_style_color(ImGuiCol_Separator, disabled_faction_bg);
+
+			/* 	auto idd = scoped_id(id.value); */
+			//ImGui::Selectable("##dummy", true, ImGuiSelectableFlags_SpanAllColumns, ImVec2(0, 0));
+				ImGui::Separator();
+			}
+
+				next_columns(num_columns);
+			/* } */
+			/* auto bss = ImVec2(ImGui::GetWindowContentRegionMax().x, 2); */
+			/* ImGui::Button("", bss); */
+
+			/* auto spacing_sep_scope = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(spacing.x, 1)); */
+			/* ImGui::Separator(); */
+			/* ImGui::Separator(); */
+			/* sepcol = prev; */
 		}
 
 		if (on_top) {
