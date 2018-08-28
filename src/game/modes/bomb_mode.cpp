@@ -647,10 +647,6 @@ void bomb_mode::make_win(const input_type in, const faction_type winner) {
 
 	state = arena_mode_state::ROUND_END_DELAY;
 	last_win = { in.cosm.get_clock(), winner };
-
-	for_each_faction([&](const faction_type f) {
-		count_knockouts_for_unconscious_players_in(in, f);
-	});
 }
 
 void bomb_mode::play_faction_sound(const const_logic_step step, const faction_type f, const assets::sound_id id) const {
@@ -821,24 +817,12 @@ void bomb_mode::mode_post_solve(const input_type in, const mode_entropy& entropy
 					count_knockout(in, victim, victim.get<components::sentience>());
 				};
 
-				const bool count_consciousness_loss_instantly = 
-					state == arena_mode_state::ROUND_END_DELAY || state == arena_mode_state::WARMUP 
-				;
-
-				if (e.special_result == messages::health_event::result_type::DEATH) {
-					if (count_consciousness_loss_instantly) {
-						/* Don't count two kills on a single character. */
-						if (e.was_conscious) {
-							make_it_count();
-						}
-					}
-					else if (state == arena_mode_state::LIVE) {
-						/* Always make it count in LIVE. LIVE never counts consciousness losses. */
-						make_it_count();
-					}
+				if (e.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS) {
+					make_it_count();
 				}
-				else if (e.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS) {
-					if (count_consciousness_loss_instantly) {
+				else if (e.special_result == messages::health_event::result_type::DEATH) {
+					/* Don't count two kills on a single character. */
+					if (e.was_conscious) {
 						make_it_count();
 					}
 				}

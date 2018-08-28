@@ -150,8 +150,8 @@ namespace test_flavours {
 			sentience_inst.get<health_meter_instance>().set_maximum_value(100);
 			sentience_inst.get<personal_electricity_meter_instance>().set_value(260);
 			sentience_inst.get<personal_electricity_meter_instance>().set_maximum_value(260);
-			sentience_inst.get<consciousness_meter_instance>().set_value(400);
-			sentience_inst.get<consciousness_meter_instance>().set_maximum_value(400);
+			sentience_inst.get<consciousness_meter_instance>().set_value(100);
+			sentience_inst.get<consciousness_meter_instance>().set_maximum_value(100);
 
 			meta.set(sentience);
 			meta.set(sentience_inst);

@@ -76,7 +76,7 @@ void arena_scoreboard_gui::perform_imgui(
 	const auto ping_col_w = ImGui::CalcTextSize("9999", nullptr, true).x;
 	const auto point_col_w = ImGui::CalcTextSize("999", nullptr, true).x;
 	const auto score_col_w = ImGui::CalcTextSize("999999", nullptr, true).x;
-	const auto money_col_w = ImGui::CalcTextSize("999999", nullptr, true).x;
+	const auto money_col_w = ImGui::CalcTextSize("999999$", nullptr, true).x;
 
 	ImGui::Columns(num_columns, nullptr, false);
 
@@ -196,8 +196,8 @@ void arena_scoreboard_gui::perform_imgui(
 			auto color = is_conscious ? faction_color : disabled_faction_color;
 
 			if (id == draw_in.local_player) {
-				bg_color.multiply_rgb(1.9f);
-				color.multiply_rgb(1.6f);
+				bg_color.multiply_rgb(1.6f);
+				color.multiply_rgb(1.9f);
 			}
 
 			auto scope = scoped_style_color(ImGuiCol_Button, bg_color);
@@ -215,7 +215,7 @@ void arena_scoreboard_gui::perform_imgui(
 			ImGui::NextColumn();
 			text(player.chosen_name);
 			ImGui::NextColumn();
-			text(typesafe_sprintf("%x", player.money));
+			text(typesafe_sprintf("%x$", player.money));
 			ImGui::NextColumn();
 			text(typesafe_sprintf("%x", player.knockouts));
 			ImGui::NextColumn();

@@ -6,6 +6,20 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Knockouts should be counted instantly, just cancel them when the player is revived
+	- For killing a knocked out player, there is only an assist without killer - which is only +1 point
+		- E.g. (+ Pythagoras) m4a1 Shuncio
+	- So at most, one can get a single KO and an assist for a player
+		- Actually don't count it as an assist if you knocked it out earlier
+			- So how do we display it?
+		- In total, a killed player can give away a single ko and two assists
+
+- Dashing
+	- Assigned to space, since we don't have jumping anyway
+	- pure color highlight system could be used to add highlight the dashing entity
+
+- $illicoins
+
 - Expanding the arena mode gui
 	- This GUI might want to send some messages for the mode.
 	- Buy menu
