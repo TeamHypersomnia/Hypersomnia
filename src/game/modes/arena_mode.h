@@ -7,11 +7,11 @@
 struct arena_mode_win {
 	// GEN INTROSPECTOR struct arena_mode_win
 	augs::stepped_clock when;
-	faction_type winner = faction_type::NONE;
+	faction_type winner = faction_type::SPECTATOR;
 	// END GEN INTROSPECTOR
 
 	bool was_set() const {
-		return winner != faction_type::NONE;
+		return winner != faction_type::SPECTATOR;
 	}
 };
 

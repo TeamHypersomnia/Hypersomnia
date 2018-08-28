@@ -59,7 +59,7 @@ struct bomb_mode_player {
 	// GEN INTROSPECTOR struct bomb_mode_player
 	entity_guid guid;
 	entity_name_str chosen_name;
-	faction_type faction = faction_type::NONE;
+	faction_type faction = faction_type::SPECTATOR;
 	money_type money = 0;
 
 	int knockouts = 0;

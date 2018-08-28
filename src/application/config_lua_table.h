@@ -23,6 +23,7 @@
 #include "view/audiovisual_state/systems/interpolation_settings.h"
 #include "view/network/simulation_receiver_settings.h"
 #include "view/mode_gui/arena/arena_mode_gui_settings.h"
+#include "view/faction_view_settings.h"
 
 #include "test_scenes/test_scene_settings.h"
 
@@ -101,6 +102,7 @@ struct config_lua_table {
 	augs::font_loading_input gui_font;
 
 	arena_mode_gui_settings arena_mode_gui;
+	faction_view_settings faction_view;
 
 #if TODO
 	std::string connect_address;

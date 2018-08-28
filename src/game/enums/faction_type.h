@@ -3,7 +3,7 @@
 
 enum class faction_type {
 	// GEN INTROSPECTOR enum class faction_type
-	NONE,
+	SPECTATOR,
 
 	METROPOLIS,
 	ATLANTIS,
@@ -13,12 +13,10 @@ enum class faction_type {
 	// END GEN INTROSPECTOR
 };
 
-inline auto get_faction_color(const faction_type f) {
-	switch (f) {
-		case faction_type::NONE: return gray;
-		case faction_type::METROPOLIS: return metropolis_color;
-		case faction_type::ATLANTIS: return atlantis_color;
-		case faction_type::RESISTANCE: return resistance_color;
-		default: return white;
-	}
+namespace augs {
+	template <class T, class _enum>
+	class enum_array;
 }
+
+template <class T>
+using per_faction_t = augs::enum_array<T, faction_type>;

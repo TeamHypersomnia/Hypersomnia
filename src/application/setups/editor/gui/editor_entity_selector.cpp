@@ -205,9 +205,10 @@ void editor_entity_selector::do_mousemotion(
 			return xywh::center_and_size(where.pos, vec2(sizes_for_icons.at(icon_id).get_original_size()) / eye.zoom);
 		};
 
-		for_each_iconed_entity(
+		::for_each_iconed_entity(
 			cosm, 
 			vis,
+			faction_view_settings(),
 			[&](const auto handle, 
 				const auto tex_id,
 			   	const auto where,

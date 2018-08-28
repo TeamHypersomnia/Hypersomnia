@@ -29,7 +29,7 @@ struct sound_effect_start_input {
 	absolute_or_local positioning;
 	entity_id direct_listener;
 	bool always_direct_listener = false;
-	faction_type listener_faction = faction_type::NONE;
+	faction_type listener_faction = faction_type::SPECTATOR;
 	std::size_t variation_number = static_cast<std::size_t>(-1);
 
 	static sound_effect_start_input fire_and_forget(const transformr where) {

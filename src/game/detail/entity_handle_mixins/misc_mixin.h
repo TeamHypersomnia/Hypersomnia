@@ -227,7 +227,7 @@ public:
 			return marker->meta.associated_faction;
 		}
 
-		return faction_type::NONE;
+		return faction_type::SPECTATOR;
 	}
 
 	bool is_like_planted_bomb() const {

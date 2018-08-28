@@ -135,7 +135,7 @@ faction_type bomb_mode::get_player_faction(const mode_player_id& id) const {
 		return entry->faction;
 	}
 
-	return faction_type::NONE;
+	return faction_type::SPECTATOR;
 }
 
 void bomb_mode::init_spawned(
@@ -345,7 +345,7 @@ bool bomb_mode::auto_assign_faction(const input_type in, const mode_player_id& i
 	if (const auto entry = find(id)) {
 		auto& f = entry->faction;
 		const auto previous_faction = f;
-		f = faction_type::NONE;
+		f = faction_type::SPECTATOR;
 
 		/* Now if factions were all even, it will assign to the same faction and return false for "no change" */
 		f = calc_weakest_faction(in);

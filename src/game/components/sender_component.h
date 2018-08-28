@@ -12,7 +12,7 @@ namespace components {
 
 		signi_entity_id capability_of_sender;
 		signi_entity_id vehicle_driven_by_capability;
-		faction_type faction_of_sender = faction_type::NONE;
+		faction_type faction_of_sender = faction_type::SPECTATOR;
 		// END GEN INTROSPECTOR
 
 		void set(const const_entity_handle direct_sender);

@@ -429,6 +429,7 @@ public:
 	template <class F>
 	void for_each_icon(
 		const visible_entities& entities, 
+		const faction_view_settings& settings,
 		F callback
 	) const {
 		if (is_editing_mode()) {
@@ -437,6 +438,8 @@ public:
 			::for_each_iconed_entity(
 				world, 
 				entities,
+				settings,
+
 				[&](auto&&... args) {
 					callback(std::forward<decltype(args)>(args)...);
 				}

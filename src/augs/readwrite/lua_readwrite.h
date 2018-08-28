@@ -160,7 +160,11 @@ namespace augs {
 				}
 				else if constexpr(is_enum_array_v<Container>) {
 					augs::for_each_enum_except_bounds([&](typename Container::enum_type e) {
-						read_lua(input_table[augs::enum_to_string(e)], into[e]);
+						auto maybe_entry = input_table[augs::enum_to_string(e)];
+
+						if (maybe_entry.valid()) {
+							read_lua(maybe_entry, into[e]);
+						}
 					});
 				}
 				else if constexpr(is_std_array_v<Container>) {

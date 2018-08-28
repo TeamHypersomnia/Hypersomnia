@@ -1,15 +1,17 @@
 #pragma once
 #include "game/detail/visible_entities.h"
+#include "view/faction_view_settings.h"
 
 struct marker_icon {
 	using I = assets::necessary_image_id;
 	I id = I::INVALID;
 	rgba col = white;
 
-	void from_area_marker(
-		const area_marker_type& type, 
-		const marker_meta& meta
-	) {
+	template <class F>
+	marker_icon(const invariants::box_marker& p, F get_faction_color) {
+		const auto type = p.type;
+		const auto meta = p.meta;
+
 		if (type == area_marker_type::BOMBSITE_A) {
 			id = I::EDITOR_ICON_BOMBSITE_A;
 			col = get_faction_color(meta.associated_faction);
@@ -22,15 +24,10 @@ struct marker_icon {
 			id = I::EDITOR_ICON_BOMBSITE_C;
 			col = get_faction_color(meta.associated_faction);
 		}
-
-		(void)meta;
 	}
 
-	marker_icon(const invariants::box_marker& p) {
-		from_area_marker(p.type, p.meta);
-	}
-
-	marker_icon(const invariants::point_marker& p) {
+	template <class F>
+	marker_icon(const invariants::point_marker& p, F get_faction_color) {
 		if (p.type == point_marker_type::TEAM_SPAWN) {
 			id = I::EDITOR_ICON_SPAWN;
 			col = get_faction_color(p.meta.associated_faction);
@@ -46,14 +43,19 @@ template <class C, class F>
 void for_each_iconed_entity(
 	const C& cosm, 
 	const visible_entities& visible,
+	const faction_view_settings& settings,
 	F callback
 ) {
+	auto get_faction_color = [&settings](const faction_type f) {
+		return settings.colors[f].standard;
+	};
+
 	visible.for_each<render_layer::POINT_MARKERS, render_layer::AREA_MARKERS>(cosm, [&](const auto handle) {
 		handle.template dispatch_on_having_any<invariants::point_marker, invariants::box_marker>([&](const auto typed_handle) {
 			using E = remove_cref<decltype(typed_handle)>;
 
 			if constexpr(E::template has<invariants::point_marker>()) {
-				const auto m = marker_icon(typed_handle.template get<invariants::point_marker>());
+				const auto m = marker_icon(typed_handle.template get<invariants::point_marker>(), get_faction_color);
 
 				callback(
 					typed_handle,
@@ -63,7 +65,7 @@ void for_each_iconed_entity(
 				);
 			}
 			else if constexpr(E::template has<invariants::box_marker>()) {
-				const auto m = marker_icon(typed_handle.template get<invariants::box_marker>());
+				const auto m = marker_icon(typed_handle.template get<invariants::box_marker>(), get_faction_color);
 
 				callback(
 					typed_handle,

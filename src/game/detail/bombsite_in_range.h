@@ -14,7 +14,7 @@ bool bombsite_in_range(const E& fused_entity) {
 
 	if (fuse_def.can_only_arm_at_bombsites) {
 		const auto capability = fused_entity.get_owning_transfer_capability();
-		const auto matched_faction = capability.alive() ? capability.get_official_faction() : faction_type::NONE;
+		const auto matched_faction = capability.alive() ? capability.get_official_faction() : faction_type::SPECTATOR;
 
 		auto& entities = thread_local_visible_entities();
 

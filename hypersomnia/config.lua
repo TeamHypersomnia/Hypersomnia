@@ -318,5 +318,21 @@ return {
       x = 1200,
       y = 700
     }
+  },
+  faction_view = {
+	colors = {
+      SPECTATOR = {
+		  standard = "200 200 200 255"
+	  },
+      METROPOLIS = {
+		  standard = "200 0 255 255"
+	  },
+      ATLANTIS = {
+		  standard = "0 255 0 255"
+	  },
+      RESISTANCE = {
+		  standard = "255 37 0 255"
+	  }
+	}
   }
 }

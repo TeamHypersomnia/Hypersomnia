@@ -108,7 +108,7 @@ void arena_scoreboard_gui::perform_imgui(
 	ImGui::Columns(1);
 
 	auto print_faction = [&](const faction_type faction, const bool on_top) {
-		const auto orig_faction_col = get_faction_color(faction);
+		const auto orig_faction_col = white;
 		const auto faction_color = rgba(orig_faction_col).multiply_rgb(1.2f);
 		const auto disabled_faction_color = rgba(orig_faction_col).multiply_rgb(.6f);
 
@@ -336,7 +336,7 @@ void arena_gui_state::draw_mode_gui(
 
 				auto get_col = [&](const mode_player_id id) {
 					if (const auto p = mapped_or_nullptr(typed_mode.players, id)) {
-						return ::get_faction_color(p->faction);
+						return in.config.faction_view.colors[p->faction].standard;
 					}
 
 					return gray;

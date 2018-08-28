@@ -186,7 +186,43 @@ void settings_gui_state::perform(
 					revertable_slider(SCOPE_CFG_NVP(show_recent_knockouts_num), 0u, 20u);
 					revertable_slider(SCOPE_CFG_NVP(keep_knockout_boxes_for_seconds), 0.f, 20.f);
 					revertable_slider("Max weapon icon height (0 for no limit)", scope_cfg.max_weapon_icon_height, 0u, 100u);
+				}
 
+				if (auto node = scoped_tree_node("Faction view")) {
+					auto nha = [&](auto& f) {
+						auto& scope_cfg = f;
+
+						revertable_color_edit(SCOPE_CFG_NVP(normal));
+						revertable_color_edit(SCOPE_CFG_NVP(hovered));
+						revertable_color_edit(SCOPE_CFG_NVP(active));
+					};
+
+					auto for_faction = [&](const faction_type f) {
+						auto& scope_cfg = config.faction_view.colors[f];
+
+						revertable_color_edit(SCOPE_CFG_NVP(standard));
+						revertable_color_edit(SCOPE_CFG_NVP(current_player_text));
+
+						text("Background");
+
+						{
+							auto scope = scoped_indent();
+							nha(scope_cfg.background);
+						}
+
+						text("Dark background");
+
+						{
+							auto scope = scoped_indent();
+							nha(scope_cfg.background_dark);
+						}
+					};
+
+					augs::for_each_enum_except_bounds([&](const faction_type f) {
+						text(format_enum(f));
+						auto scope = scoped_indent();
+						for_faction(f);
+					});
 				}
 
 				break;

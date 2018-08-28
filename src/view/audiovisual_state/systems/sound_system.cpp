@@ -161,7 +161,7 @@ bool sound_system::generic_sound_cache::should_play(const update_properties_inpu
 	const auto faction = listening_character.get_official_faction();
 	const auto target_faction = original.start.listener_faction;
 
-	return target_faction == faction_type::NONE || faction == target_faction;
+	return target_faction == faction_type::SPECTATOR || faction == target_faction;
 }
 
 void sound_system::generic_sound_cache::eat_followup() {
@@ -178,7 +178,7 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 	const bool is_direct_listener = 
 		original.start.always_direct_listener 
 		|| listening_character == original.start.direct_listener
-		|| (target_faction != faction_type::NONE && faction == target_faction)
+		|| (target_faction != faction_type::SPECTATOR && faction == target_faction)
 	;
 
 	const auto listener_pos = listening_character.get_viewing_transform(in.interp).pos;
