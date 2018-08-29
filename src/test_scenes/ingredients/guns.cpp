@@ -937,7 +937,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::KEK9_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
-			gun_def.muzzle_velocity = {3000.f, 3000.f};
+			gun_def.muzzle_velocity = {3500.f, 3500.f};
 			gun_def.shot_cooldown_ms = 100.f;
 
 			gun_def.shell_spawn_offset.pos.set(0, 10);
@@ -980,7 +980,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::SN69_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
-			gun_def.muzzle_velocity = {3000.f, 3000.f};
+			gun_def.muzzle_velocity = {3500.f, 3500.f};
 			gun_def.shot_cooldown_ms = 100.f;
 
 			gun_def.shell_spawn_offset.pos.set(0, 10);
@@ -1035,10 +1035,11 @@ namespace test_flavours {
 			gun_def.damage_multiplier = 1.f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 2;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
-			gun_def.recoil_multiplier = 1.7f;
+			gun_def.recoil_multiplier = 2.f;
+			gun_def.kickback_towards_wielder = 40.f;
 
 			gun_def.maximum_heat = 2.f;
-			gun_def.gunshot_adds_heat = 0.092f;
+			gun_def.gunshot_adds_heat = 0.202f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 

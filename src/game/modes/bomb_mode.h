@@ -46,6 +46,7 @@ struct bomb_mode_vars {
 	constrained_entity_flavour_id<invariants::explosive> bomb_flavour;
 
 	per_faction_t<assets::image_id> logos;
+	bool clear_dropped_items = false;
 	// END GEN INTROSPECTOR
 };
 

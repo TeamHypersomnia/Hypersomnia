@@ -383,7 +383,10 @@ void bomb_mode::setup_round(
 
 	cosm.set(in.initial_signi);
 	remove_test_characters(cosm);
-	//remove_test_dropped_items(cosm);
+
+	if (in.vars.clear_dropped_items) {
+		remove_test_dropped_items(cosm);
+	}
 
 	knockouts.clear();
 	cache_players_frozen = false;

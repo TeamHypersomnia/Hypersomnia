@@ -2,6 +2,7 @@
 #include "augs/templates/thread_templates.h"
 #include "view/viewables/streaming/viewables_streaming.h"
 #include "view/audiovisual_state/systems/sound_system.h"
+#include "augs/templates/introspection_utils/introspective_equal.h"
 
 void viewables_streaming::finalize_pending_tasks() {
 	if (future_loaded_buffers.valid()) {

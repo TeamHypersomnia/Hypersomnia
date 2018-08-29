@@ -41,10 +41,11 @@ void arena_scoreboard_gui::draw_gui(
 	const M& typed_mode, 
 	const typename M::input& mode_input
 ) const {
-	(void)typed_mode;
-	(void)mode_input;
-
 	using namespace augs::gui::text;
+
+	if (!show) {
+		return;
+	}
 
 	const auto& cfg = in.config.arena_mode_gui.scoreboard_settings;
 
