@@ -90,6 +90,10 @@ namespace test_scenes {
 		}
 
 		vars.bomb_flavour = to_entity_flavour_id(test_hand_explosives::BOMB);
+
+		vars.logos[faction_type::METROPOLIS] = to_image_id(test_scene_image_id::METROPOLIS_LOGO);
+		vars.logos[faction_type::ATLANTIS] = to_image_id(test_scene_image_id::ATLANTIS_LOGO);
+		vars.logos[faction_type::RESISTANCE] = to_image_id(test_scene_image_id::RESISTANCE_LOGO);
 	}
 
 	void testbed::populate(const loaded_image_caches_map& caches, const logic_step step) const {

@@ -249,10 +249,10 @@ void arena_scoreboard_gui::draw_gui(
 
 			auto prev_pen_x = pen.x;
 
-			if (sorted_players.size() > 0) {
-				if (const auto flavour = cosm.find_flavour(find_faction_character_flavour(cosm, faction))) {
-					const auto& head_image = flavour->template get<invariants::head>().head_image;
+			pen.x += cell_pad.x * 2;
 
+			if (sorted_players.size() > 0) {
+				if (const auto& head_image = mode_input.vars.logos[faction]; head_image.is_set()) {
 					if (const auto& entry = draw_in.images_in_atlas.at(head_image).diffuse; entry.exists()) {
 						const auto size = entry.get_original_size();
 						auto head_orig = ltrbi(vec2i::zero, size).place_in_center_of(faction_bg_orig);

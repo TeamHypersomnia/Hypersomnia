@@ -44,6 +44,8 @@ struct bomb_mode_vars {
 	per_faction_t<augs::enum_array<assets::sound_id, battle_event>> event_sounds;
 	
 	constrained_entity_flavour_id<invariants::explosive> bomb_flavour;
+
+	per_faction_t<assets::image_id> logos;
 	// END GEN INTROSPECTOR
 };
 
