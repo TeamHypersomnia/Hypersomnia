@@ -110,6 +110,11 @@ void settings_gui_state::perform(
 			revert(f);
 		};
 
+		auto revertable_drag_vec2 = [&](auto l, auto& f, auto&&... args) {
+			drag_vec2(l, f, std::forward<decltype(args)>(args)...);
+			revert(f);
+		};
+
 		auto revertable_color_edit = [&](auto l, auto& f, auto&&... args) {
 			color_edit(l, f, std::forward<decltype(args)>(args)...);
 			revert(f);
@@ -177,6 +182,17 @@ void settings_gui_state::perform(
 				revertable_checkbox("Highlight hovered world items", config.drawing.draw_aabb_highlighter);
 
 				if (auto node = scoped_tree_node("Arena mode GUI")) {
+					if (auto node = scoped_tree_node("Scoreboard")) {
+						auto& scope_cfg = config.arena_mode_gui.scoreboard_settings;
+
+						revertable_slider(SCOPE_CFG_NVP(elements_alpha), rgba_channel(0), rgba_channel(255));
+						
+						revertable_drag_vec2(SCOPE_CFG_NVP(player_box_inner_padding), 0, 20);
+
+						revertable_color_edit(SCOPE_CFG_NVP(background_color));
+						revertable_color_edit(SCOPE_CFG_NVP(border_color));
+					}
+
 					auto& scope_cfg = config.arena_mode_gui;
 					auto scope = scoped_indent();
 
@@ -202,6 +218,7 @@ void settings_gui_state::perform(
 
 						revertable_color_edit(SCOPE_CFG_NVP(standard));
 						revertable_color_edit(SCOPE_CFG_NVP(current_player_text));
+						revertable_color_edit(SCOPE_CFG_NVP(background_darker));
 
 						text("Background");
 

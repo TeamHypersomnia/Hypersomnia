@@ -148,7 +148,7 @@ struct basic_ltrb {
 		return true;
 	}
 
-	basic_ltrb& expand_from_center(const basic_vec2<T> amount) {
+	auto& expand_from_center(const basic_vec2<T> amount) {
 		l -= amount.x;
 		t -= amount.y;
 		r += amount.x;
@@ -157,7 +157,13 @@ struct basic_ltrb {
 		return *this;
 	}
 
-	basic_ltrb& snap_to_bounds(const basic_ltrb rc) {
+	template <class S>
+	auto& expand_from_center_mult(const S scalar) {
+		*this = center_and_size(get_center(), static_cast<basic_vec2<S>>(get_size()) * scalar);
+		return *this;
+	}
+
+	auto& snap_to_bounds(const basic_ltrb rc) {
 		basic_vec2<T> offset(0, 0);
 
 		if (l < rc.l) offset.x += rc.l - l;
@@ -170,7 +176,7 @@ struct basic_ltrb {
 		return *this;
 	}
 
-	basic_ltrb& place_in_center_of(basic_ltrb bigger) {
+	auto& place_in_center_of(basic_ltrb bigger) {
 		bigger.l += static_cast<T>(bigger.w() / 2.f - w() / 2.f);
 		bigger.t += static_cast<T>(bigger.h() / 2.f - h() / 2.f);
 		bigger.w(w());
@@ -464,7 +470,13 @@ struct basic_xywh {
 		return *this;
 	}
 
-	auto expand_from_center(const basic_vec2<T> amount) const {
+	template <class S>
+	auto& expand_from_center_mult(const S scalar) {
+		*this = center_and_size(get_center(), static_cast<basic_vec2<S>>(get_size()) * scalar);
+		return *this;
+	}
+
+	auto& expand_from_center(const basic_vec2<T> amount) {
 		basic_xywh result = *this;
 
 		result.x -= amount.x;

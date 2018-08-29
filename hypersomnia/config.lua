@@ -258,11 +258,20 @@ return {
     }
   },
   arena_mode_gui = {
-	between_knockout_boxes_pad = 6,
-	inside_knockout_box_pad = 4,
-	weapon_icon_horizontal_pad = 10,
-	show_recent_knockouts_num = 7,
-	keep_knockout_boxes_for_seconds = 8
+    between_knockout_boxes_pad = 6,
+    inside_knockout_box_pad = 4,
+    weapon_icon_horizontal_pad = 10,
+    show_recent_knockouts_num = 7,
+    keep_knockout_boxes_for_seconds = 8,
+
+    scoreboard_settings = {
+      player_box_inner_padding = {
+        x = 2,
+        y = 4
+      },
+      background_color =  "15 15 15 239",
+      border_color = "109 109 127 127"
+    }
   },
   hotbar = {
     colorize_inside_when_selected = true,
@@ -325,7 +334,14 @@ return {
 		  standard = "200 200 200 255"
 	  },
       METROPOLIS = {
-		  standard = "200 0 255 255"
+		  standard = "200 0 255 255",
+		  background_darker = "20 0 75 255",
+
+		  background = {
+			  normal = "100 0 155 255",
+			  hovered = "120 0 175 255",
+			  active = "l40 0 195 255"
+		  }
 	  },
       ATLANTIS = {
 		  standard = "0 255 0 255"

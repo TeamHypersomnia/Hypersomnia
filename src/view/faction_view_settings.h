@@ -17,6 +17,8 @@ struct faction_color_settings {
 
 	colors_nha background;
 	colors_nha background_dark;
+
+	rgba background_darker;
 	// END GEN INTROSPECTOR
 };
 
