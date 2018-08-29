@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/texture_atlas/bake_fresh_atlas.h"
 
+#include "view/gui_fonts.h"
 #include "view/necessary_resources.h"
 #include "view/viewables/all_viewables_declaration.h"
 #include "view/viewables/images_in_atlas_map.h"
@@ -25,7 +26,7 @@ struct subjects_gathering_input {
 	const necessary_image_definitions_map& necessary_image_definitions;
 
 	const image_definitions_map image_definitions;
-	const augs::font_loading_input& gui_font_input;
+	const all_gui_fonts_inputs& gui_font_inputs;
 	const augs::path_type unofficial_project_dir;
 };
 
@@ -40,7 +41,7 @@ struct general_atlas_input {
 struct general_atlas_output {
 	images_in_atlas_map atlas_entries;
 	necessary_images_in_atlas_map necessary_atlas_entries;
-	augs::baked_font gui_font;
+	all_loaded_gui_fonts gui_fonts;
 	vec2u atlas_size;
 };
 

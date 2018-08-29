@@ -4,6 +4,7 @@
 #include "view/viewables/images_in_atlas_map.h"
 #include "view/viewables/image_definition.h"
 #include "augs/templates/range_workers.h"
+#include "augs/templates/introspect.h"
 
 void regenerate_and_gather_subjects(
 	const subjects_gathering_input in,
@@ -70,7 +71,9 @@ void regenerate_and_gather_subjects(
 			add_if(def.find_desaturation_path());
 		}
 
-		output.fonts.emplace_back(in.gui_font_input);
+		augs::introspect([&](auto, auto& in) {
+			output.fonts.emplace_back(in);	
+		}, in.gui_font_inputs);
 	}
 }
 
@@ -112,7 +115,14 @@ general_atlas_output create_general_atlas(
 	general_atlas_output out;
 
 	out.atlas_size = baked.atlas_image_size;
-	out.gui_font.unpack_from(baked.fonts.at(subjects.gui_font_input));
+
+	augs::introspect(
+		[](auto, auto& output, const auto& input) {
+			output.unpack_from(baked.fonts.at(input));
+		}, 
+		out.gui_fonts, 
+		subjects.gui_font_inputs
+	);
 
 	{
 		for (const auto& r : subjects.necessary_image_definitions) {

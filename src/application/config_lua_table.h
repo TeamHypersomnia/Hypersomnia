@@ -24,6 +24,7 @@
 #include "view/network/simulation_receiver_settings.h"
 #include "view/mode_gui/arena/arena_mode_gui_settings.h"
 #include "view/faction_view_settings.h"
+#include "view/gui_fonts.h"
 
 #include "test_scenes/test_scene_settings.h"
 
@@ -99,7 +100,7 @@ struct config_lua_table {
 	session_settings session;
 	test_scene_settings test_scene;
 	editor_settings editor;
-	augs::font_loading_input gui_font;
+	all_gui_fonts_inputs gui_fonts;
 
 	arena_mode_gui_settings arena_mode_gui;
 	faction_view_settings faction_view;

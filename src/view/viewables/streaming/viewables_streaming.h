@@ -26,7 +26,7 @@ namespace augs {
 struct viewables_load_input {
 	const all_viewables_defs& new_defs;
 	const necessary_image_definitions_map& necessary_image_definitions;
-	const augs::font_loading_input& gui_font;
+	const all_gui_fonts_inputs& gui_fonts;
 	const content_regeneration_settings settings;
 	const augs::path_type& unofficial_content_dir;
 
@@ -46,15 +46,15 @@ class viewables_streaming {
 	std::vector<rgba> pbo_fallback;
 	bool pbo_ready_to_use = false;
 
-	augs::baked_font loaded_gui_font;
+	all_loaded_gui_fonts loaded_gui_fonts;
 
 	image_definitions_map future_image_definitions;
-	augs::font_loading_input future_gui_font;
+	all_gui_fonts_inputs future_gui_fonts;
 
 	std::future<general_atlas_output> future_general_atlas;
 
 	all_viewables_defs now_loaded_viewables_defs;
-	augs::font_loading_input now_loaded_gui_font_def;
+	all_gui_fonts_inputs now_loaded_gui_font_defs;
 
 	sound_definitions_map future_sound_definitions;
 	std::vector<std::pair<assets::sound_id, augs::sound_buffer_loading_input>> sound_requests;
@@ -76,8 +76,8 @@ public:
 	void load_all(viewables_load_input);
 	void finalize_load(viewables_finalize_input);
 
-	auto& get_loaded_gui_font() {
-		return loaded_gui_font;
+	auto& get_loaded_gui_fonts() {
+		return loaded_gui_fonts;
 	}
 
 	void finalize_pending_tasks();

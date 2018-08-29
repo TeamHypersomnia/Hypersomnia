@@ -103,7 +103,7 @@ void arena_gui_state::draw_mode_gui(
 
 				auto colored = [&](const auto& text, const auto& c) {
 					const auto text_style = style(
-						in.gui_font,
+						in.gui_fonts.gui,
 						c
 					);
 
@@ -272,7 +272,7 @@ void arena_gui_state::draw_mode_gui(
 
 		auto draw_indicator_at = [&](const std::string& val, const rgba& col, const auto t) {
 			const auto text_style = style(
-				in.gui_font,
+				in.gui_fonts.gui,
 				col
 			);
 

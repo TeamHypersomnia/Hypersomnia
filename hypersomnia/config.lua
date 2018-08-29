@@ -147,24 +147,26 @@ return {
     X = "SPECIAL_ACTION_BUTTON_2",
     Z = "SPECIAL_ACTION_BUTTON_1"
   },
-  gui_font = {
-    unicode_ranges = {
-      { 0x0020, 0x00FF }, -- Basic Latin + Latin Supplement
-      { 0x0100, 0x017F }  -- Latin Extended-A
-    },
-    size_in_pixels = 16,
-	add_japanese_ranges = false,
-    settings = {},
-    source_font_path = "content/necessary/fonts/unifont.ttf"
-  },
-  large_number_font = {
-    unicode_ranges = {
-      { 0x0030, 0x0039 }, -- Only numbers
-    },
-    size_in_pixels = 48,
-	add_japanese_ranges = false,
-    settings = {},
-    source_font_path = "content/necessary/fonts/unifont.ttf"
+  gui_fonts = {
+	  gui = {
+		unicode_ranges = {
+		  { 0x0020, 0x00FF }, -- Basic Latin + Latin Supplement
+		  { 0x0100, 0x017F }  -- Latin Extended-A
+		},
+		size_in_pixels = 16,
+		add_japanese_ranges = false,
+		settings = {},
+		source_font_path = "content/necessary/fonts/unifont.ttf"
+	  },
+	  large_numbers = {
+		unicode_ranges = {
+		  { 0x0030, 0x0039 }, -- Only numbers
+		},
+		size_in_pixels = 64,
+		add_japanese_ranges = false,
+		settings = {},
+		source_font_path = "content/necessary/fonts/unifont.ttf"
+	  }
   },
   gui_style = {
     Alpha = 1,
@@ -275,20 +277,22 @@ return {
 
     scoreboard_settings = {
       background_color = "15 15 15 200",
+      bg_lumi_mult = 0.69999998807907104,
       border_color = "109 109 127 100",
-      bg_lumi_mult = 0.5,
-      current_player_bg_lumi_mult = 2.4,
-      current_player_text_lumi_mult = 1.7,
-      dead_player_bg_alpha_mult = 0.3,
+      current_player_bg_lumi_mult = 1.6000000238418579,
+      current_player_text_lumi_mult = 1.7000000476837158,
+      dead_player_bg_alpha_mult = 0.30000001192092896,
       dead_player_bg_lumi_mult = 0.5,
-      dead_player_text_alpha_mult = 0.6,
-      dead_player_text_lumi_mult = 0.8,
-      elements_alpha = 0.7,
+      dead_player_text_alpha_mult = 0.60000002384185791,
+      dead_player_text_lumi_mult = 0.80000001192092896,
+      elements_alpha = 0.56000000238418579,
+      faction_logo_alpha_mult = 0.80000001192092896,
       player_row_inner_padding = {
         x = 4,
         y = 4
       },
-      text_lumi_mult = 1.6,
+      text_lumi_mult = 1.7000000476837158,
+      text_stroke_lumi_mult = 0.5,
       window_padding = {
         x = 4,
         y = 8

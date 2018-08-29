@@ -3,6 +3,7 @@
 #include "augs/drawing/drawing.h"
 #include "view/necessary_resources.h"
 #include "augs/math/vec2.h"
+#include "view/gui_fonts.h"
 
 class images_in_atlas_map;
 class visible_entities;
@@ -23,6 +24,6 @@ struct draw_setup_gui_input {
 	const images_in_atlas_map& images_in_atlas;
 	const vec2i mouse_pos;
 	const vec2i screen_size;
-	const augs::baked_font& gui_font;
+	const all_loaded_gui_fonts& gui_fonts;
 	const all_necessary_sounds& sounds;
 };

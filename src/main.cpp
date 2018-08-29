@@ -199,7 +199,7 @@ int work(const int argc, const char* const * const argv) try {
 		config.content_regeneration.regenerate_every_time
 	);
 	
-	static const auto imgui_atlas = augs::imgui::create_atlas(config.gui_font);
+	static const auto imgui_atlas = augs::imgui::create_atlas(config.gui_fonts.gui);
 
 	static const auto configurables = configuration_subscribers {
 		window,
@@ -287,7 +287,7 @@ int work(const int argc, const char* const * const argv) try {
 		streaming.load_all({
 			new_defs,
 			necessary_image_definitions,
-			config.gui_font,
+			config.gui_fonts,
 			config.content_regeneration,
 			get_unofficial_content_dir(),
 			renderer,
@@ -375,7 +375,7 @@ int work(const int argc, const char* const * const argv) try {
 			get_viewable_defs().image_definitions,
 			streaming.images_in_atlas,
 			streaming.necessary_images_in_atlas,
-			streaming.get_loaded_gui_font(),
+			streaming.get_loaded_gui_fonts().gui,
 			audiovisuals.randomizing
 		};
 	};
@@ -383,7 +383,7 @@ int work(const int argc, const char* const * const argv) try {
 	static auto create_menu_context_deps = [](const auto& viewing_config) {
 		return menu_context_dependencies{
 			streaming.necessary_images_in_atlas,
-			streaming.get_loaded_gui_font(),
+			streaming.get_loaded_gui_fonts().gui,
 			necessary_sounds,
 			viewing_config.audio_volume
 		};
@@ -1421,7 +1421,7 @@ int work(const int argc, const char* const * const argv) try {
 						audiovisuals,
 						new_viewing_config.drawing,
 						streaming.necessary_images_in_atlas,
-						streaming.get_loaded_gui_font(),
+						streaming.get_loaded_gui_fonts().gui,
 						streaming.images_in_atlas,
 						interpolation_ratio,
 						renderer,
@@ -1477,7 +1477,7 @@ int work(const int argc, const char* const * const argv) try {
 					streaming.images_in_atlas,
 					common_input_state.mouse.pos,
 					screen_size,
-					streaming.get_loaded_gui_font(),
+					streaming.get_loaded_gui_fonts(),
 					necessary_sounds
 				});
 
@@ -1517,7 +1517,7 @@ int work(const int argc, const char* const * const argv) try {
 				main_menu.value().draw_overlays(
 					get_drawer(),
 					streaming.necessary_images_in_atlas,
-					streaming.get_loaded_gui_font(),
+					streaming.get_loaded_gui_fonts().gui,
 					screen_size
 				);
 
@@ -1580,7 +1580,7 @@ int work(const int argc, const char* const * const argv) try {
 
 			draw_debug_details(
 				get_drawer(),
-				streaming.get_loaded_gui_font(),
+				streaming.get_loaded_gui_fonts().gui,
 				screen_size,
 				viewed_character,
 				frame_performance,
