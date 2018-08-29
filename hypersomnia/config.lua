@@ -335,19 +335,14 @@ return {
 	  },
       METROPOLIS = {
 		  standard = "200 0 255 255",
-		  background_darker = "20 0 75 255",
-
-		  background = {
-			  normal = "100 0 155 255",
-			  hovered = "120 0 175 255",
-			  active = "l40 0 195 255"
-		  }
+		  background_dark = "20 0 75 255"
 	  },
       ATLANTIS = {
 		  standard = "0 255 0 255"
 	  },
       RESISTANCE = {
-		  standard = "255 37 0 255"
+		  standard = "255 37 0 255",
+		  background_dark = "47 10 0 255"
 	  }
 	}
   }

@@ -1,5 +1,6 @@
 #include "augs/gui/text/printer.h"
 #include "view/mode_gui/arena/arena_scoreboard_gui.h"
+#include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/modes/bomb_mode.hpp"
 #include "application/setups/draw_setup_gui_input.h"
@@ -32,12 +33,11 @@ bool arena_scoreboard_gui::control(
 template <class M>
 void arena_scoreboard_gui::draw_gui(
 	const draw_setup_gui_input& in,
-	const draw_mode_gui_input& mode_in,
+	const draw_mode_gui_input& draw_in,
 
 	const M& typed_mode, 
 	const typename M::input& mode_input
 ) const {
-	(void)mode_in;
 	(void)typed_mode;
 	(void)mode_input;
 
@@ -45,7 +45,7 @@ void arena_scoreboard_gui::draw_gui(
 
 	const auto& cfg = in.config.arena_mode_gui.scoreboard_settings;
 
-	const auto content_pad = vec2i(12, 8);
+	const auto content_pad = vec2i(4, 8);
 	const auto cell_pad = vec2i(4, 4);
 
 	const auto& o = in.drawer;
@@ -118,7 +118,7 @@ void arena_scoreboard_gui::draw_gui(
 	};
 
 	std::vector<column> columns = {
-		{ calc_size("9999").x, "Ping" },
+		{ calc_size("9999").x, "Ping", true },
 		{ 22, " " },
 		{ sz.x, "Player" },
 		{ calc_size("999999$").x, "Money", true },
@@ -138,11 +138,8 @@ void arena_scoreboard_gui::draw_gui(
 	auto& player_col = columns[2];
 
 	for (auto& c : columns) {
-		c.w += cell_pad.x * 2;
-	}
-
-	for (const auto& c : columns) {
 		if (&c != &player_col) {
+			c.w += cell_pad.x * 2;
 			player_col.w -= c.w;
 		}
 	}
@@ -158,13 +155,19 @@ void arena_scoreboard_gui::draw_gui(
 		}
 	}
 
-	for (const auto& c : columns) {
+	auto print_col_text = [&](const column& c, const auto& text, const auto& col) {
+		const auto& pp = cell_pad;
+
 		if (c.align_right) {
-			text_stroked(c.label, gray, vec2i(c.r - calc_size(c.label).x, 0));
+			text_stroked(text, col, vec2i(c.r - pp.x - calc_size(text).x, pp.y));
 		}
 		else {
-			text_stroked(c.label, gray, vec2i(c.l, 0));
+			text_stroked(text, col, vec2i(c.l + pp.x, pp.y));
 		}
+	};
+
+	for (const auto& c : columns) {
+		print_col_text(c, c.label, gray);
 	}
 
 	pen.y += cell_h;
@@ -181,10 +184,9 @@ void arena_scoreboard_gui::draw_gui(
 
 	auto print_faction = [&](const faction_type faction, const bool on_top) {
 		(void)on_top;
-		auto& cols = in.config.faction_view.colors[faction];
+		auto& colors = in.config.faction_view.colors[faction];
 
 		const auto& cosm = mode_input.cosm;
-		(void)cosm;
 
 		std::vector<std::pair<bomb_mode_player, mode_player_id>> sorted_players;
 
@@ -197,42 +199,126 @@ void arena_scoreboard_gui::draw_gui(
 
 		sort_range(sorted_players);
 
+		const auto& bg_dark = colors.background_dark;
+
+		auto draw_headline = [&]() {
+			const auto bg_height = cell_h * 4;
+			const auto faction_bg_orig = ltrbi(vec2i::zero, vec2i(sz.x, bg_height));
+
+			aabb(faction_bg_orig, bg_dark);
+
+			pen.y += bg_height;
+		};
+
+		if (!on_top) {
+			draw_headline();
+		}
+
 		const auto h = sorted_players.size() * cell_h;
 
 		for (const auto& c : columns) {
-			aabb(
-				ltrbi(c.l, 0, c.l + 1, h - 1),
-				cols.background_darker
-			);
+			const auto col_border_orig = ltrbi(c.l, 0, c.l + 1, h - 1);
+			aabb(col_border_orig, bg_dark);
 		}
 
 		for (const auto& p : sorted_players) {
-			const auto i = index_in(sorted_players, p);
-			const auto y = i * cell_h;
+			const auto& player_id = p.second;
+			const auto& player_data = p.first;
 
-			const auto cell_top = y;
+			const auto player_handle = cosm[player_data.guid];
+			const auto is_conscious = player_handle.alive() && player_handle.template get<components::sentience>().is_conscious();
 
-			auto draw_cell_bg = [&](const rgba col) {
-				for (const auto& c : columns) {
-					const auto orig = ltrbi(c.l + 1, cell_top + 1, c.r, cell_top + cell_h);
+			const auto bg_lumi_mult = 0.5f;
+			const auto text_lumi_mult = 1.f;
 
-					aabb(orig, col);
+			const auto current_player_lumi_mult = 1.7f;
+			const auto dead_player_bg_lumi_mult = 0.5f;
+			const auto dead_player_bg_alpha_mult = 0.3f;
+			const auto dead_player_text_alpha_mult = 0.8f;
 
-					aabb(
-						ltrbi(c.l + 1, cell_top, c.r, cell_top + 1),
-						cols.background_darker
-					);
+			const auto faction_bg_col = [&]() {
+				auto col = colors.standard;
+
+				auto total_lumi = bg_lumi_mult;
+				auto total_alpha = 1.f;
+
+				if (player_id == draw_in.local_player) {
+					total_lumi *= current_player_lumi_mult;
 				}
+
+				if (!is_conscious) {
+					total_lumi *= dead_player_bg_lumi_mult;
+					total_alpha *= dead_player_bg_alpha_mult;
+				}
+
+				return col.mult_luminance(total_lumi).mult_alpha(total_alpha);
+			}();	
+
+			const auto faction_text_col = [&]() {
+				auto col = colors.standard;
+
+				auto total_lumi = text_lumi_mult;
+				auto total_alpha = 1.f;
+
+				if (player_id == draw_in.local_player) {
+					total_lumi *= current_player_lumi_mult;
+				}
+
+				if (!is_conscious) {
+					total_alpha *= dead_player_text_alpha_mult;
+				}
+
+				return col.mult_luminance(total_lumi).mult_alpha(total_alpha);
+			}();	
+
+			for (const auto& c : columns) {
+				const auto cell_body_origin = ltrbi(c.l + 1, 1, c.r, cell_h);
+				aabb(cell_body_origin, faction_bg_col);
+
+				const auto cell_upper_border_origin = ltrbi(c.l + 1, 0, c.r, 1);
+				aabb(cell_upper_border_origin, bg_dark);
+			}
+
+			auto* current_column = columns.data();
+
+			auto next_col = [&]() {
+				++current_column;
 			};
 
-			draw_cell_bg(cols.background.normal);
+			auto col_text = [&](const auto& text) {
+				print_col_text(*current_column, text, faction_text_col);
+			};
+
+			const auto ping = 0;
+			const auto ping_str = typesafe_sprintf("%x", ping);
+
+			col_text(ping_str);
+			next_col();
+			next_col();
+			col_text(player_data.chosen_name);
+			next_col();
+			col_text(typesafe_sprintf("%x$", player_data.money));
+			next_col();
+			col_text(typesafe_sprintf("%x", player_data.knockouts));
+			next_col();
+			col_text(typesafe_sprintf("%x", player_data.assists));
+			next_col();
+			col_text(typesafe_sprintf("%x", player_data.deaths));
+			next_col();
+			col_text(typesafe_sprintf("%x", player_data.calc_score()));
+
+			pen.y += cell_h;
+		}
+
+		if (on_top) {
+			draw_headline();
 		}
 	};
 
 	const auto participants = typed_mode.calc_participating_factions(mode_input);
 
 	print_faction(participants.defusing, true);
-	//print_faction(participants.bombing, false);
+	print_faction(participants.bombing, false);
 
 #if GGWP
 	if (!show) {

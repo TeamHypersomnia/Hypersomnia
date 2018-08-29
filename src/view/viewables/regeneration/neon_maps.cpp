@@ -172,7 +172,7 @@ void make_neon(
 	cut_empty_edges(source);
 
 	for (auto& p : source) {
-		p.multiply_alpha(input.alpha_multiplier);
+		p.mult_alpha(input.alpha_multiplier);
 	}
 }
 

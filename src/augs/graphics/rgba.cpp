@@ -146,3 +146,116 @@ void rgba::avoid_dark_blue_for_color_wave() {
 	}
 }
 
+rgba& rgba::mult_luminance(const float scalar) {
+	auto hsl = get_hsl();
+	hsl.l *= scalar;
+	return set_hsl(hsl);
+}
+
+static float Min(float a, float b) {
+	return a <= b ? a : b;
+}
+
+static float Max(float a, float b) {
+	return a >= b ? a : b;
+}
+
+static hsl RGBToHSL(rgba::rgb_type rgb) {
+	auto output = hsl(0, 0, 0);
+
+	float r = (rgb.r / 255.0f);
+	float g = (rgb.g / 255.0f);
+	float b = (rgb.b / 255.0f);
+
+	float min = Min(Min(r, g), b);
+	float max = Max(Max(r, g), b);
+	float delta = max - min;
+
+	output.l = (max + min) / 2;
+
+	if (delta == 0)
+	{
+		output.h = 0;
+		output.s = 0.0f;
+	}
+	else
+	{
+		output.s = (output.l <= 0.5) ? (delta / (max + min)) : (delta / (2 - max - min));
+
+		float hue;
+
+		if (r == max)
+		{
+			hue = ((g - b) / 6) / delta;
+		}
+		else if (g == max)
+		{
+			hue = (1.0f / 3) + ((b - r) / 6) / delta;
+		}
+		else
+		{
+			hue = (2.0f / 3) + ((r - g) / 6) / delta;
+		}
+
+		if (hue < 0)
+			hue += 1;
+		if (hue > 1)
+			hue -= 1;
+
+		output.h = (int)(hue * 360);
+	}
+
+	return output;
+}
+static float HueToRGB(float v1, float v2, float vH) {
+	if (vH < 0)
+		vH += 1;
+
+	if (vH > 1)
+		vH -= 1;
+
+	if ((6 * vH) < 1)
+		return (v1 + (v2 - v1) * 6 * vH);
+
+	if ((2 * vH) < 1)
+		return v2;
+
+	if ((3 * vH) < 2)
+		return (v1 + (v2 - v1) * ((2.0f / 3) - vH) * 6);
+
+	return v1;
+}
+
+static rgba::rgb_type HSLToRGB(hsl input) {
+	unsigned char r = 0;
+	unsigned char g = 0;
+	unsigned char b = 0;
+
+	if (input.s == 0)
+	{
+		r = g = b = (unsigned char)(input.l * 255);
+	}
+	else
+	{
+		float v1, v2;
+		float hue = (float)input.h / 360;
+
+		v2 = (input.l < 0.5) ? (input.l * (1 + input.s)) : ((input.l + input.s) - (input.l * input.s));
+		v1 = 2 * input.l - v2;
+
+		r = (unsigned char)(255 * HueToRGB(v1, v2, hue + (1.0f / 3)));
+		g = (unsigned char)(255 * HueToRGB(v1, v2, hue));
+		b = (unsigned char)(255 * HueToRGB(v1, v2, hue - (1.0f / 3)));
+	}
+
+	return rgba::rgb_type(r, g, b);
+}
+
+FORCE_INLINE rgba& rgba::set_hsl(const hsl input) {
+	set_rgb(HSLToRGB(input));
+	return *this;
+}
+
+FORCE_INLINE hsl rgba::get_hsl() const {
+	return RGBToHSL(rgb());
+}

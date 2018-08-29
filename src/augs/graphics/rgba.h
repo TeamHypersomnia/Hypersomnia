@@ -5,10 +5,19 @@
 
 struct ImVec4;
 struct hsv;
+struct hsl;
 
 using vec3 = std::array<float, 3>;
 using vec4 = std::array<float, 4>;
 using rgba_channel = unsigned char;
+
+struct hsl {
+	int h;
+	float s;
+	float l;
+
+	hsl(int h, float s, float l) : h(h), s(s), l(l) {}
+};
 
 struct rgba {
 	struct rgb_type {
@@ -66,7 +75,7 @@ struct rgba {
 
 	void set(const rgba);
 
-	rgba& multiply_alpha(float);
+	rgba& mult_alpha(float);
 	rgba& multiply_rgb(float);
 
 	rgba operator*(const float) const;
@@ -79,6 +88,7 @@ struct rgba {
 	bool operator==(const rgba b) const;
 	bool operator!=(const rgba b) const;
 	hsv get_hsv() const;
+	hsl get_hsl() const;
 	rgba& desaturate();
 
 	rgba_channel& operator[](const size_t index);
@@ -86,6 +96,9 @@ struct rgba {
 
 	rgba& set_rgb(const rgb_type&);
 	rgba& set_hsv(const hsv);
+	rgba& set_hsl(const hsl);
+
+	rgba& mult_luminance(const float scalar);
 
 	rgb_type rgb() const;
 
@@ -275,7 +288,7 @@ FORCE_INLINE void rgba::set(const rgba col) {
 	*this = col;
 }
 
-FORCE_INLINE rgba& rgba::multiply_alpha(const float s) {
+FORCE_INLINE rgba& rgba::mult_alpha(const float s) {
 	a = static_cast<rgba_channel>(s * a);
 	return *this;
 }

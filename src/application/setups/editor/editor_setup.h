@@ -387,7 +387,7 @@ public:
 						};
 
 						draw_reach_indicator(light_def.calc_reach_trimmed(), light_color);
-						draw_reach_indicator(light_def.calc_wall_reach_trimmed(), rgba(light_color).multiply_alpha(0.7f));
+						draw_reach_indicator(light_def.calc_wall_reach_trimmed(), rgba(light_color).mult_alpha(0.7f));
 					});
 
 					if (mover.is_active()) {

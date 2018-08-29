@@ -72,7 +72,7 @@ namespace augs {
 				return out;
 			}
 
-			formatted_string& formatted_string::multiply_alpha(const float m) {
+			formatted_string& formatted_string::mult_alpha(const float m) {
 				for (auto& c : *this) {
 					c.format.color.a = static_cast<unsigned char>(c.format.color.a * m);
 				}

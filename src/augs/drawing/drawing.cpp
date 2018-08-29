@@ -352,7 +352,7 @@ namespace augs {
 			auto result = settings.line_colors;
 
 			for (auto& c : result) {
-				c.multiply_alpha(settings.alpha_multiplier);
+				c.mult_alpha(settings.alpha_multiplier);
 			}
 
 			return result;

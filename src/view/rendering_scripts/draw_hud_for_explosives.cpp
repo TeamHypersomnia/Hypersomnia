@@ -119,7 +119,7 @@ void draw_beep_lights::operator()() {
 					const auto beep = beep_math { fuse, fuse_def, clk };
 
 					if (const auto mult = beep.get_beep_light_mult(); mult > AUGS_EPSILON<real32>) {
-						beep_col.multiply_alpha(mult);
+						beep_col.mult_alpha(mult);
 						if (const auto tr = it.find_viewing_transform(interpolation)) {
 							output.aabb_centered(
 								cast_highlight_tex,

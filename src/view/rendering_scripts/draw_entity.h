@@ -78,7 +78,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 					const auto id = typed_handle.get_id();
 					const auto mult = in.randomizing.advance_and_get_neon_mult(id, v.value);
 
-					result.colorize.multiply_alpha(mult);
+					result.colorize.mult_alpha(mult);
 				}
 			}
 
@@ -505,7 +505,7 @@ FORCE_INLINE void specific_draw_neon_map(
 				const auto id = typed_handle.get_id();
 				const auto mult = in.randomizing.advance_and_get_neon_mult(id, v.value);
 
-				input.colorize.multiply_alpha(mult);
+				input.colorize.mult_alpha(mult);
 			}
 		}
 

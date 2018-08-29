@@ -27,7 +27,7 @@ void draw_marker_borders(
 			}();
 		}
 
-		color->multiply_alpha(alpha);
+		color->mult_alpha(alpha);
 
 		drawer.border_dashed(
 			size * zoom,

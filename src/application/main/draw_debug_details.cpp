@@ -29,7 +29,7 @@ void draw_debug_details(
 	print(
 		output, 
 		vec2i(screen_size.x - 300, 0),
-		augs::gui::text::format_recent_program_log(gui_font).multiply_alpha(150.f / 255),
+		augs::gui::text::format_recent_program_log(gui_font).mult_alpha(150.f / 255),
 		300
 	);
 

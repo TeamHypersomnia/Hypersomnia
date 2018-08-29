@@ -14,11 +14,13 @@ struct faction_color_settings {
 	// GEN INTROSPECTOR struct faction_color_settings
 	rgba standard;
 	rgba current_player_text;
+	rgba current_player_dead_text;
+	rgba player_dead_text;
 
 	colors_nha background;
-	colors_nha background_dark;
+	colors_nha background_current;
 
-	rgba background_darker;
+	rgba background_dark;
 	// END GEN INTROSPECTOR
 };
 

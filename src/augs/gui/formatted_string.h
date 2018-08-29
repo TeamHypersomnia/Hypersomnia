@@ -55,7 +55,7 @@ namespace augs {
 				formatted_string() = default;
 				formatted_string(const std::string&, const style);
 
-				self multiply_alpha(const float);
+				self mult_alpha(const float);
 				self set_alpha(const rgba_channel);
 				self set_alpha(const float);
 

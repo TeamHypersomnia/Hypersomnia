@@ -166,7 +166,7 @@ void visibility_system::calc_visibility(
 	static const auto ray_obstructed_col = red;
 	static const auto extended_vision_hit_col = blue;
 	static const auto discontinuity_col = rgba(0, 127, 255, 255);
-	static const auto vis_rect_col = rgba(white).multiply_alpha(0.7f);
+	static const auto vis_rect_col = rgba(white).mult_alpha(0.7f);
 	static const auto free_area_col = pink;
 	static const auto unreachable_area_col = white;
 

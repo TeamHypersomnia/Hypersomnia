@@ -144,8 +144,8 @@ void arena_gui_state::draw_mode_gui(
 					return { { 0, 0, 0, 80 }, rgba(0, 0, 0, 0) };
 				}();
 
-				cols.background.multiply_alpha(bg_alpha);
-				cols.border.multiply_alpha(bg_alpha);
+				cols.background.mult_alpha(bg_alpha);
+				cols.border.mult_alpha(bg_alpha);
 
 				const auto tool_image_id = [&]() {
 					auto from_flavour = [&](const auto flavour_id) -> auto {

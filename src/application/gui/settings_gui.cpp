@@ -183,11 +183,12 @@ void settings_gui_state::perform(
 
 				if (auto node = scoped_tree_node("Arena mode GUI")) {
 					if (auto node = scoped_tree_node("Scoreboard")) {
+						auto scope = scoped_indent();
 						auto& scope_cfg = config.arena_mode_gui.scoreboard_settings;
 
 						revertable_slider(SCOPE_CFG_NVP(elements_alpha), rgba_channel(0), rgba_channel(255));
 						
-						revertable_drag_vec2(SCOPE_CFG_NVP(player_box_inner_padding), 0, 20);
+						revertable_drag_vec2(SCOPE_CFG_NVP(player_box_inner_padding), 1.f, 0, 20);
 
 						revertable_color_edit(SCOPE_CFG_NVP(background_color));
 						revertable_color_edit(SCOPE_CFG_NVP(border_color));
@@ -218,20 +219,13 @@ void settings_gui_state::perform(
 
 						revertable_color_edit(SCOPE_CFG_NVP(standard));
 						revertable_color_edit(SCOPE_CFG_NVP(current_player_text));
-						revertable_color_edit(SCOPE_CFG_NVP(background_darker));
+						revertable_color_edit(SCOPE_CFG_NVP(background_dark));
 
 						text("Background");
 
 						{
 							auto scope = scoped_indent();
 							nha(scope_cfg.background);
-						}
-
-						text("Dark background");
-
-						{
-							auto scope = scoped_indent();
-							nha(scope_cfg.background_dark);
 						}
 					};
 
