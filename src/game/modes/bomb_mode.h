@@ -226,6 +226,8 @@ public:
 	float get_critical_seconds_left(input) const;
 	float get_seconds_since_planting(input) const;
 
+	unsigned calc_max_faction_score() const;
+
 	std::size_t num_conscious_players_in(const cosmos&, faction_type) const;
 	std::size_t num_players_in(faction_type) const;
 

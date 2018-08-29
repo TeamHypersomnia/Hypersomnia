@@ -1024,3 +1024,13 @@ void bomb_mode::restart(const input_type in, const logic_step step) {
 	setup_round(in, step);
 }
 
+
+unsigned bomb_mode::calc_max_faction_score() const {
+	unsigned maximal = 0;
+
+	for_each_faction([&](const auto f) {
+		maximal = std::max(maximal, factions[f].score);
+	});
+
+	return maximal;
+}

@@ -109,7 +109,6 @@ void arena_scoreboard_gui::draw_gui(
 		where += pen;
 
 		auto stroke_col = black;
-		stroke_col.mult_alpha(cfg.text_stroke_lumi_mult);
 
 		print_stroked(
 			o,
@@ -219,6 +218,8 @@ void arena_scoreboard_gui::draw_gui(
 		o.base::aabb(img, orig, col);
 	};
 
+	const auto max_score = typed_mode.calc_max_faction_score();
+
 	auto print_faction = [&](const faction_type faction, const bool on_top) {
 		(void)on_top;
 		auto& colors = in.config.faction_view.colors[faction];
@@ -244,17 +245,9 @@ void arena_scoreboard_gui::draw_gui(
 			const auto bg_height = cell_h * 3;
 			const auto faction_bg_orig = ltrbi(vec2i::zero, vec2i(sz.x, bg_height));
 
-			const auto score_text_max_w = calc_size(fmt_large("99")).x;
-			const auto score_text = typesafe_sprintf("%x", faction_state.score);
-			const auto score_text_size = calc_size(fmt_large(score_text));
-
 			aabb(faction_bg_orig, bg_dark);
 
-			const auto score_text_pos = vec2i(cell_pad.x + score_text_max_w - score_text_size.x, 0);
-
-			text_stroked_large(score_text, colors.standard, score_text_pos);
-
-			const auto score_text_r = score_text_pos.x + score_text_size.x;
+			auto prev_pen_x = pen.x;
 
 			if (sorted_players.size() > 0) {
 				if (const auto flavour = cosm.find_flavour(find_faction_character_flavour(cosm, faction))) {
@@ -264,8 +257,8 @@ void arena_scoreboard_gui::draw_gui(
 						const auto size = entry.get_original_size();
 						auto head_orig = ltrbi(vec2i::zero, size).place_in_center_of(faction_bg_orig);
 
-						head_orig.l = score_text_r + cell_pad.x;
-						head_orig.r = size.x + score_text_r;
+						head_orig.l = 0;
+						head_orig.r = size.x;
 
 						/* if (!on_top) { */
 						/* 	head_orig.t = faction_bg_orig.b - size.y - cell_pad.y * 2; */
@@ -278,12 +271,34 @@ void arena_scoreboard_gui::draw_gui(
 
 						aabb_img(entry, head_orig, rgba(white).mult_alpha(cfg.faction_logo_alpha_mult));
 
-						text_stroked(std::string("for ") + format_enum(faction), colors.standard, vec2i { head_orig.r + cell_pad.x * 2, head_orig.get_center().y } , { augs::center::Y });
+						pen.x += size.x + cell_pad.x * 2;
 					}
 				}
 			}
 
+			const auto score_text_max_w = calc_size(fmt_large((max_score >= 10 ? "99" : "9"))).x;
+			auto score_text = typesafe_sprintf("%x", faction_state.score);
+
+			if (max_score >= 10 && score_text.size() == 1) {
+				score_text = "0" + score_text;
+			}
+
+			//const auto score_text_size = calc_size(fmt_large(score_text));
+
+			const auto score_text_pos = vec2i(cell_pad.x, 0);
+			//+ score_text_max_w - score_text_size.x
+
+			text_stroked_large(score_text, colors.standard, score_text_pos);
+
+			//const auto score_text_r = score_text_pos.x + score_text_size.x;
+
+			pen.x += score_text_max_w + cell_pad.x * 4;
+			//head_orig.r + cell_pad.x * 2
+
+			text_stroked(std::string("for ") + format_enum(faction), colors.standard, vec2i { 0, faction_bg_orig.get_center().y } , { augs::center::Y });
+
 			pen.y += bg_height;
+			pen.x = prev_pen_x;
 		};
 
 		if (!on_top) {

@@ -184,6 +184,10 @@ enum class test_scene_image_id {
 
 	FAN,
 
+	METROPOLIS_LOGO,
+	RESISTANCE_LOGO,
+	ATLANTIS_LOGO,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };
