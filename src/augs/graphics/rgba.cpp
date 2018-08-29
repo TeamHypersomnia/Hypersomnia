@@ -227,6 +227,8 @@ static float HueToRGB(float v1, float v2, float vH) {
 }
 
 static rgba::rgb_type HSLToRGB(hsl input) {
+	input.l = std::min(input.l, 1.f);
+
 	unsigned char r = 0;
 	unsigned char g = 0;
 	unsigned char b = 0;

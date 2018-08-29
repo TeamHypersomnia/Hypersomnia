@@ -157,6 +157,15 @@ return {
     settings = {},
     source_font_path = "content/necessary/fonts/unifont.ttf"
   },
+  large_number_font = {
+    unicode_ranges = {
+      { 0x0030, 0x0039 }, -- Only numbers
+    },
+    size_in_pixels = 48,
+	add_japanese_ranges = false,
+    settings = {},
+    source_font_path = "content/necessary/fonts/unifont.ttf"
+  },
   gui_style = {
     Alpha = 1,
     AntiAliasedLines = true,
@@ -265,13 +274,26 @@ return {
     keep_knockout_boxes_for_seconds = 8,
 
     scoreboard_settings = {
-      player_box_inner_padding = {
-        x = 2,
+      background_color = "15 15 15 200",
+      border_color = "109 109 127 100",
+      bg_lumi_mult = 0.5,
+      current_player_bg_lumi_mult = 2.4,
+      current_player_text_lumi_mult = 1.7,
+      dead_player_bg_alpha_mult = 0.3,
+      dead_player_bg_lumi_mult = 0.5,
+      dead_player_text_alpha_mult = 0.6,
+      dead_player_text_lumi_mult = 0.8,
+      elements_alpha = 0.7,
+      player_row_inner_padding = {
+        x = 4,
         y = 4
       },
-      background_color =  "15 15 15 239",
-      border_color = "109 109 127 127"
-    }
+      text_lumi_mult = 1.6,
+      window_padding = {
+        x = 4,
+        y = 8
+      }
+    },
   },
   hotbar = {
     colorize_inside_when_selected = true,

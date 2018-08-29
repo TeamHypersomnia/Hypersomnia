@@ -5,6 +5,8 @@
 #include "game/modes/bomb_mode.hpp"
 #include "application/setups/draw_setup_gui_input.h"
 #include "application/config_lua_table.h"
+#include "game/modes/mode_helpers.h"
+#include "view/viewables/images_in_atlas_map.h"
 
 bool arena_scoreboard_gui::control(
 	const augs::event::state& common_input_state,
@@ -45,8 +47,8 @@ void arena_scoreboard_gui::draw_gui(
 
 	const auto& cfg = in.config.arena_mode_gui.scoreboard_settings;
 
-	const auto content_pad = vec2i(4, 8);
-	const auto cell_pad = vec2i(4, 4);
+	const auto content_pad = cfg.window_padding;
+	const auto cell_pad = cfg.player_row_inner_padding;
 
 	const auto& o = in.drawer;
 
@@ -82,14 +84,18 @@ void arena_scoreboard_gui::draw_gui(
 	};
 	(void)text;
 
-	auto text_stroked = [&](const auto& ss, const rgba col, vec2i where, auto... args) {
+	auto text_stroked = [&](const auto& ss, const rgba col, vec2i where, augs::center_flags flags = {}) {
 		where += pen;
+
+		auto stroke_col = black;
+		stroke_col.mult_alpha(cfg.text_stroke_lumi_mult);
 
 		print_stroked(
 			o,
 			where,
 			fmt(ss, col),
-			args...
+			flags,
+			stroke_col
 		);
 	};
 
@@ -177,9 +183,19 @@ void arena_scoreboard_gui::draw_gui(
 		orig.t += pen.y;
 		orig.r += pen.x;
 		orig.b += pen.y;
-		col.a = cfg.elements_alpha;
+		col.a *= cfg.elements_alpha;
 
 		o.aabb(orig, col);
+	};
+
+	auto aabb_img = [&](auto img, auto orig, rgba col = white) {
+		orig.l += pen.x;
+		orig.t += pen.y;
+		orig.r += pen.x;
+		orig.b += pen.y;
+		col.a *= cfg.elements_alpha;
+
+		o.base::aabb(img, orig, col);
 	};
 
 	auto print_faction = [&](const faction_type faction, const bool on_top) {
@@ -207,6 +223,22 @@ void arena_scoreboard_gui::draw_gui(
 
 			aabb(faction_bg_orig, bg_dark);
 
+			if (sorted_players.size() > 0) {
+				if (const auto flavour = cosm.find_flavour(find_faction_character_flavour(cosm, faction))) {
+					const auto& head_image = flavour->template get<invariants::head>().head_image;
+
+					if (const auto& entry = draw_in.images_in_atlas.at(head_image).diffuse; entry.exists()) {
+						const auto size = entry.get_original_size();
+						auto head_orig = ltrbi(vec2i::zero, size).place_in_center_of(faction_bg_orig);
+
+						head_orig.l = 0;
+						head_orig.r = size.x;
+
+						aabb_img(entry, head_orig, rgba(white).mult_alpha(cfg.faction_logo_alpha_mult));
+					}
+				}
+			}
+
 			pen.y += bg_height;
 		};
 
@@ -228,44 +260,52 @@ void arena_scoreboard_gui::draw_gui(
 			const auto player_handle = cosm[player_data.guid];
 			const auto is_conscious = player_handle.alive() && player_handle.template get<components::sentience>().is_conscious();
 
-			const auto bg_lumi_mult = 0.5f;
-			const auto text_lumi_mult = 1.f;
-
-			const auto current_player_lumi_mult = 1.7f;
-			const auto dead_player_bg_lumi_mult = 0.5f;
-			const auto dead_player_bg_alpha_mult = 0.3f;
-			const auto dead_player_text_alpha_mult = 0.8f;
-
 			const auto faction_bg_col = [&]() {
 				auto col = colors.standard;
 
-				auto total_lumi = bg_lumi_mult;
+				auto total_lumi = cfg.bg_lumi_mult;
 				auto total_alpha = 1.f;
 
-				if (player_id == draw_in.local_player) {
-					total_lumi *= current_player_lumi_mult;
+				const bool is_local = player_id == draw_in.local_player;
+
+				if (is_local) {
+					col.mult_luminance(cfg.current_player_bg_lumi_mult);
+
+					if (!is_conscious) {
+						col.mult_alpha(cfg.dead_player_bg_alpha_mult);
+					}
+
+					return col;
+				}
+				else {
+					if (!is_conscious) {
+						return bg_dark;
+						//return is_local ? rgba(bg_dark).multiply_rgb(1.5f) : bg_dark;
+						col = bg_dark;
+						total_lumi = 1.f;
+						total_alpha = 1.f;
+						/* total_lumi *= cfg.dead_player_bg_lumi_mult; */
+						/* total_alpha *= cfg.dead_player_bg_alpha_mult; */
+					}
 				}
 
-				if (!is_conscious) {
-					total_lumi *= dead_player_bg_lumi_mult;
-					total_alpha *= dead_player_bg_alpha_mult;
-				}
-
-				return col.mult_luminance(total_lumi).mult_alpha(total_alpha);
+				return col.multiply_rgb(total_lumi).mult_alpha(total_alpha);
 			}();	
 
 			const auto faction_text_col = [&]() {
 				auto col = colors.standard;
 
-				auto total_lumi = text_lumi_mult;
+				auto total_lumi = cfg.text_lumi_mult;
 				auto total_alpha = 1.f;
 
 				if (player_id == draw_in.local_player) {
-					total_lumi *= current_player_lumi_mult;
+					//return white;
+					total_lumi *= cfg.current_player_text_lumi_mult;
 				}
 
 				if (!is_conscious) {
-					total_alpha *= dead_player_text_alpha_mult;
+					total_alpha *= cfg.dead_player_text_alpha_mult;
+					total_lumi *= cfg.dead_player_text_lumi_mult;
 				}
 
 				return col.mult_luminance(total_lumi).mult_alpha(total_alpha);

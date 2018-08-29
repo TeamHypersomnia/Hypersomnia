@@ -2,10 +2,27 @@
 
 struct scoreboard_gui_settings {
 	// GEN INTROSPECTOR struct scoreboard_gui_settings
-	vec2i player_box_inner_padding = vec2i(2, 4);
+	vec2i player_row_inner_padding = vec2i(2, 4);
+	vec2i window_padding = vec2i(4, 8);
 	rgba background_color;
 	rgba border_color;
-	rgba_channel elements_alpha = 200;
+	float elements_alpha = 0.8f;
+
+	float bg_lumi_mult = 0.5f;
+	float text_lumi_mult = 1.f;
+
+	float text_stroke_lumi_mult = 0.15f;
+
+	float current_player_bg_lumi_mult = 1.7f;
+	float current_player_text_lumi_mult = 1.7f;
+
+	float dead_player_bg_lumi_mult = 0.5f;
+	float dead_player_text_lumi_mult = 0.8f;
+
+	float dead_player_bg_alpha_mult = 0.3f;
+	float dead_player_text_alpha_mult = 0.8f;
+
+	float faction_logo_alpha_mult = 0.8f;
 	// END GEN INTROSPECTOR
 };
 
