@@ -54,12 +54,6 @@ void arena_scoreboard_gui::draw_gui(
 
 	const auto& o = in.drawer;
 
-	const auto window_bg_rect = ltrbi(vec2i::zero, in.screen_size).expand_from_center_mult(0.6f);
-	o.aabb_with_border(window_bg_rect, cfg.background_color, cfg.border_color);
-
-	const auto sz = window_bg_rect.get_size() - content_pad * 2;
-	const auto lt = window_bg_rect.left_top() + content_pad;
-
 	auto fmt = [&](const auto& text, const rgba col = white) {
 		return formatted_string(text, style(in.gui_fonts.gui, col));
 	};
@@ -76,6 +70,39 @@ void arena_scoreboard_gui::draw_gui(
 			return get_text_bbox(fmt(text));
 		}
 	};
+
+	const auto font_h = in.gui_fonts.gui.metrics.get_height();
+	const auto cell_h = font_h + cell_pad.y * 2;
+
+	const auto window_name = "Scoreboard";
+	const auto window_name_size = calc_size(window_name);
+
+	const auto participants = typed_mode.calc_participating_factions(mode_input);
+
+	auto estimated_window_height = [&]() {
+		const auto player_cells_h = cell_h * typed_mode.players.size();
+		const auto headline_cells_h = cell_h * 3 * participants.size();
+
+		const auto num_spectators = typed_mode.num_players_in(faction_type::SPECTATOR);
+
+		const auto separating_cells_h = cell_h * ((num_spectators > 0 ? 1 : 0) + 1);
+		const auto column_labels_cells_h = cell_h * ((num_spectators > 0 ? 1 : 0) + 1);
+
+		return 
+			player_cells_h + 
+			headline_cells_h + 
+			separating_cells_h + 
+			column_labels_cells_h +
+			window_name_size.y +
+			content_pad.y * 2
+		;
+	}();
+
+	const auto window_bg_rect = ltrbi::center_and_size(in.screen_size / 2, vec2i(in.screen_size.x * 0.6f, estimated_window_height));
+	o.aabb_with_border(window_bg_rect, cfg.background_color, cfg.border_color);
+
+	const auto sz = window_bg_rect.get_size() - content_pad * 2;
+	const auto lt = window_bg_rect.left_top() + content_pad;
 
 	vec2i pen = lt;
 
@@ -120,8 +147,6 @@ void arena_scoreboard_gui::draw_gui(
 		);
 	};
 
-	const auto window_name = "Scoreboard";
-	const auto window_name_size = calc_size(window_name);
 
 	{
 		text_stroked(window_name, white, { sz.x / 2 - window_name_size.x / 2, 0 });
@@ -156,9 +181,6 @@ void arena_scoreboard_gui::draw_gui(
 
 		{ calc_size("999999").x, "Score", true },
 	};
-
-	const auto font_h = in.gui_fonts.gui.metrics.get_height();
-	const auto cell_h = font_h + cell_pad.y * 2;
 
 	pen.y += cell_h;
 
@@ -434,8 +456,6 @@ void arena_scoreboard_gui::draw_gui(
 			draw_headline();
 		}
 	};
-
-	const auto participants = typed_mode.calc_participating_factions(mode_input);
 
 	print_faction(participants.defusing, true);
 	print_faction(participants.bombing, false);

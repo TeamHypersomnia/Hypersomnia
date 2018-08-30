@@ -155,6 +155,10 @@ public:
 			callback(bombing);
 			callback(defusing);
 		}
+
+		std::size_t size() const {
+			return 2;
+		}
 	};
 
 	participating_factions calc_participating_factions(input) const;
