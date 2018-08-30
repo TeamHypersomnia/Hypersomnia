@@ -1278,3 +1278,8 @@ we consider whole type overrides too complex architeciturally:
 - Make a command for adding a player in editor? 
 
 - add large_number_font with just numbers
+
+- Fixing the arena mode GUI
+	- We'll moving from ImGui to our own GUI to have finer control.
+		- We can offload the work to ImGui when the player is actually selected.
+		- The buttons for the players will be highly deterministic since it is really an easy layout.

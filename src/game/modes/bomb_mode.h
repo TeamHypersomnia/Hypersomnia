@@ -58,6 +58,7 @@ struct bomb_mode_vars {
 
 	per_faction_t<assets::image_id> logos;
 	bool clear_dropped_items = false;
+	bool hide_money_of_opposing_factions = true;
 	// END GEN INTROSPECTOR
 };
 

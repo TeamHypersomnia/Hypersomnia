@@ -399,7 +399,23 @@ void arena_scoreboard_gui::draw_gui(
 			next_col();
 			col_text(player_data.chosen_name);
 			next_col();
-			col_text(typesafe_sprintf("%x$", stats.money));
+
+			{
+				const auto local_player_faction = [&]() {
+					if (const auto p = typed_mode.find(draw_in.local_player)) {
+						return p->faction;
+					}
+
+					return faction_type::SPECTATOR;
+				}();
+
+				const bool hide_money = mode_input.vars.hide_money_of_opposing_factions && faction != local_player_faction;
+
+				if (!hide_money) {
+					col_text(typesafe_sprintf("%x$", stats.money));
+				}
+			}
+
 			next_col();
 			col_text(typesafe_sprintf("%x", stats.knockouts));
 			next_col();
