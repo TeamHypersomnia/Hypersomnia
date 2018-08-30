@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Halftime
 - Knockouts should be counted instantly, just cancel them when the player is revived
 	- For killing a knocked out player, there is only an assist without killer - which is only +1 point
 		- E.g. (+ Pythagoras) m4a1 Shuncio

@@ -34,13 +34,18 @@ struct bomb_mode_vars {
 	money_type maximum_money = 16000;
 
 	money_type losing_faction_award = 1500;
-	money_type winning_faction_award = 3000;
+	money_type winning_faction_award = 3250;
+	money_type consecutive_loss_bonus = 500;
+	unsigned max_consecutive_loss_bonuses = 4;
 
 	money_type team_kill_penalty = 500;
 
-	money_type bomb_plant_award = 500;
-	money_type bomb_explosion_award = 500;
-	money_type bomb_defuse_award = 1000;
+	money_type lost_but_bomb_planted_team_bonus = 500;
+	money_type defused_team_bonus = 800;
+
+	money_type bomb_plant_award = 250;
+	money_type bomb_explosion_award = 350;
+	money_type bomb_defuse_award = 500;
 
 	unsigned round_secs = 120;
 	unsigned round_end_secs = 5;
@@ -66,6 +71,7 @@ struct bomb_mode_faction_state {
 	// GEN INTROSPECTOR struct bomb_mode_faction_state
 	unsigned current_spawn_index = 0;
 	unsigned score = 0;
+	unsigned consecutive_losses = 0;
 	std::vector<entity_guid> shuffled_spawns;
 	// END GEN INTROSPECTOR
 };

@@ -712,16 +712,40 @@ void bomb_mode::count_knockouts_for_unconscious_players_in(const input_type in, 
 }
 
 void bomb_mode::make_win(const input_type in, const faction_type winner) {
+	const auto p = calc_participating_factions(in);
+	const auto loser = winner == p.defusing ? p.bombing : p.defusing;
+
 	++factions[winner].score;
+	factions[winner].consecutive_losses = 0;
 
 	state = arena_mode_state::ROUND_END_DELAY;
 	current_round.last_win = { in.cosm.get_clock(), winner };
 
+	auto& consecutive_losses = factions[loser].consecutive_losses;
+	++consecutive_losses;
+
+	auto winner_award = in.vars.winning_faction_award;
+	auto loser_award = in.vars.losing_faction_award;
+
+	if (consecutive_losses > 1) {
+		loser_award += std::min(
+			consecutive_losses - 1, 
+			in.vars.max_consecutive_loss_bonuses
+		) * in.vars.consecutive_loss_bonus;
+	}
+
+	if (loser == p.bombing) {
+		if (current_round.bomb_planter.is_set()) {
+			loser_award += in.vars.lost_but_bomb_planted_team_bonus;
+			winner_award += in.vars.defused_team_bonus;
+		}
+	}
+	
 	for (auto& p : players) {
 		const auto& player_id = p.first;
 		const auto faction = p.second.faction;
 
-		post_award(in, player_id, faction == winner ? in.vars.winning_faction_award : in.vars.losing_faction_award);
+		post_award(in, player_id, faction == winner ? winner_award : loser_award);
 	}
 }
 
