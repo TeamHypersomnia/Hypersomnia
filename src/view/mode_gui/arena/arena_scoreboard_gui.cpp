@@ -193,8 +193,10 @@ void arena_scoreboard_gui::draw_gui(
 		}
 	};
 
+	const auto column_label_color = gray;
+
 	for (const auto& c : columns) {
-		print_col_text(c, c.label, gray);
+		print_col_text(c, c.label, column_label_color);
 	}
 
 	pen.y += cell_h;
@@ -437,6 +439,41 @@ void arena_scoreboard_gui::draw_gui(
 
 	print_faction(participants.defusing, true);
 	print_faction(participants.bombing, false);
+
+
+	{
+		const auto faction = faction_type::SPECTATOR;
+
+		std::vector<std::pair<bomb_mode_player, mode_player_id>> sorted_players;
+
+		typed_mode.for_each_player_in(faction, [&](
+			const auto& id, 
+			const auto& player
+		) {
+			sorted_players.emplace_back(player, id);
+		});
+
+		if (const auto num_spectators = sorted_players.size(); num_spectators > 0) {
+			pen.y += cell_h;
+
+			const auto bg_height = sorted_players.size() * cell_h;
+			const auto faction_bg_orig = ltrbi(vec2i::zero, vec2i(sz.x, bg_height));
+
+			auto& colors = in.config.faction_view.colors[faction];
+			const auto& bg_dark = colors.background_dark;
+
+			aabb(faction_bg_orig, bg_dark);
+
+			print_col_text(columns[2], typesafe_sprintf("Spectators (%x)", num_spectators), column_label_color);
+
+			pen.y += cell_h;
+
+			for (const auto& p : sorted_players) {
+				print_col_text(columns[2], p.first.chosen_name, column_label_color);
+				pen.y += cell_h;
+			}
+		}
+	}
 }
 
 

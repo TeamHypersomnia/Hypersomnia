@@ -368,7 +368,8 @@ return {
   faction_view = {
 	colors = {
       SPECTATOR = {
-		  standard = "200 200 200 255"
+		  standard = "200 200 200 255",
+		  background_dark = "0 0 0 0"
 	  },
       METROPOLIS = {
 		  standard = "200 0 255 255",

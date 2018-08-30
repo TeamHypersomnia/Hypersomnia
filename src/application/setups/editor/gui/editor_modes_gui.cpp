@@ -72,6 +72,12 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 
 						ImGui::SameLine();
 
+						if (ImGui::Button("Add spectator")) {
+							typed_mode.add_player(mode_input, nickname);
+						}
+
+						ImGui::SameLine();
+
 						input_text<256>("Nickname", nickname);
 
 						if (ImGui::Button("Restart")) {
