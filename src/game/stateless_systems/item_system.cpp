@@ -113,11 +113,11 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 				requested_index = 1;
 			}
 
-			if (requested_index >= 0) {
+			if (requested_index != static_cast<std::size_t>(-1)) {
 				const auto subject = cosmos[r.subject];
 
 				if (subject.has<components::item_slot_transfers>()) {
-					if (const auto item_inside = subject.map_acted_hand_item(requested_index)) {
+					if (const auto item_inside = subject.calc_hand_action(requested_index).held_item; item_inside.is_set()) {
 						perform_transfer(item_slot_transfer_request::drop(item_inside), step);
 					}
 				}

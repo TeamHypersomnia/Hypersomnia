@@ -13,6 +13,12 @@
 
 struct attachment_offset_settings;
 
+struct hand_action {
+	const std::size_t hand_index;
+	const entity_id held_item;
+	const bool is_secondary;
+};
+
 template <class derived_handle_type>
 class inventory_mixin {
 	using offset_vector = std::vector<transformr>;
@@ -80,8 +86,7 @@ public:
 
 	inventory_slot_handle_type get_hand_no(std::size_t) const;
 	generic_handle_type get_if_any_item_in_hand_no(std::size_t) const;
-	generic_handle_type map_acted_hand_item(std::size_t requested_index) const;
-	std::size_t map_acted_hand_index(const std::size_t requested_index) const;
+	hand_action calc_hand_action(std::size_t requested_index) const;
 	bool only_secondary_holds_item() const;
 
 	template <class F>

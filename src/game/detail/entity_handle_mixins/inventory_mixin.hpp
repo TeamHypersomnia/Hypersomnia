@@ -113,41 +113,35 @@ typename inventory_mixin<E>::generic_handle_type inventory_mixin<E>::get_if_any_
 }
 
 template <class E>
-std::size_t inventory_mixin<E>::map_acted_hand_index(const std::size_t requested_index) const {
+hand_action inventory_mixin<E>::calc_hand_action(const std::size_t requested_index) const {
 	const auto& self = *static_cast<const E*>(this);
 
 	const auto in_primary = self.get_if_any_item_in_hand_no(0);
 	const auto in_secondary = self.get_if_any_item_in_hand_no(1);
 
 	if (in_primary.alive() && in_secondary.alive()) {
-		if (requested_index != static_cast<std::size_t>(-1)) {
-			return requested_index;
-		}
+		return {
+			requested_index,
+			(requested_index == 0 ? in_primary : in_secondary).get_id(),
+			false
+		};
 	}
 	else if (in_primary.alive()) {
-		if (requested_index == 0) {
-			return 0;
-		}
+		return {
+			requested_index,
+			in_primary.get_id(),
+			requested_index == 1
+		};
 	}
 	else if (in_secondary.alive()) {
-		if (requested_index == 0) {
-			return 1;
-		}
+		return {
+			requested_index,
+			in_secondary.get_id(),
+			requested_index == 1
+		};
 	}
 
-	return static_cast<std::size_t>(-1);
-}
-
-template <class E>
-typename inventory_mixin<E>::generic_handle_type inventory_mixin<E>::map_acted_hand_item(const std::size_t requested_index) const {
-	const auto& self = *static_cast<const E*>(this);
-	const auto idx = self.map_acted_hand_index(requested_index);
-
-	if (idx != static_cast<std::size_t>(-1)) {
-		return self.get_if_any_item_in_hand_no(idx);
-	}
-
-	return self.get_cosmos()[entity_id()];
+	return { static_cast<std::size_t>(-1), entity_id(), false };
 }
 
 template <class E>

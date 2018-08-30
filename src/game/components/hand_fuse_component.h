@@ -16,7 +16,8 @@ namespace components {
 		augs::stepped_timestamp when_last_beep;
 
 		bool arming_requested = false;
-		pad_bytes<3> pad;
+		bool armed_as_secondary_action = false;
+		pad_bytes<2> pad;
 
 		signi_entity_id character_now_defusing;
 		// END GEN INTROSPECTOR

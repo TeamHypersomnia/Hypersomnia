@@ -77,7 +77,13 @@ struct fuse_logic_provider {
 			auto impulse = fuse_def.additional_release_impulse;
 
 			if (const auto capability = holder.template find<invariants::item_slot_transfers>()) {
-				impulse = impulse + capability->standard_throw_impulse;
+				const auto considered_impulse = 
+					fuse.armed_as_secondary_action ? 
+					capability->standard_drop_impulse :
+					capability->standard_throw_impulse
+				;
+
+				impulse = impulse + considered_impulse;
 			}
 
 			return impulse;

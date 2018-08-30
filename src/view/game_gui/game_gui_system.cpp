@@ -216,7 +216,7 @@ void game_gui_system::control_hotbar_and_action_button(
 				requested_index = 1;
 			}
 
-			const auto resolved_index = gui_entity.map_acted_hand_index(requested_index);
+			const auto resolved_index = gui_entity.calc_hand_action(requested_index).hand_index;
 
 			if (resolved_index != static_cast<std::size_t>(-1)) {
 				auto new_setup = gui.get_actual_selection_setup(gui_entity);

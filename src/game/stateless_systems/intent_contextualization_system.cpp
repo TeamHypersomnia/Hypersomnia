@@ -121,7 +121,9 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 			continue;
 		}
 
-		if (subject.find<invariants::container>()) {
+		bool is_secondary = false;
+
+		if (subject.has<invariants::container>()) {
 			auto requested_index = static_cast<std::size_t>(-1);
 
 			if (it.intent == game_intent_type::CROSSHAIR_PRIMARY_ACTION) {
@@ -131,8 +133,10 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 				requested_index = 1;
 			}
 
-			if (requested_index >= 0) {
-				callee = subject.map_acted_hand_item(requested_index);
+			if (requested_index != static_cast<std::size_t>(-1)) {
+				const auto action = subject.calc_hand_action(requested_index);
+				callee = action.held_item;
+				is_secondary = action.is_secondary;
 			}
 		}
 
@@ -166,6 +170,7 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 						else {
 							if (it.was_pressed()) {
 								fuse_logic.arm_explosive();
+								fuse_logic.fuse.armed_as_secondary_action = is_secondary;
 							}
 							else {
 								fuse_logic.release_explosive_if_armed();
