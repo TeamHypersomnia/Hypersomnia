@@ -377,6 +377,20 @@ void bomb_mode::set_players_frozen(const input_type in, const bool flag) {
 	}
 }
 
+void bomb_mode::release_triggers_of_weapons_of_players(const input_type in) {
+	for (auto& it : players) {
+		auto& player_data = it.second;
+
+		if (const auto handle = in.cosm[player_data.guid]) {
+			handle.for_each_contained_item_recursive(
+				[&](const auto contained_item) {
+					unset_input_flags_of_orphaned_entity(contained_item);
+				}
+			);
+		}
+	}
+}
+
 void bomb_mode::setup_round(
 	const input_type in, 
 	const logic_step step, 
@@ -429,6 +443,8 @@ void bomb_mode::setup_round(
 	if (in.vars.freeze_secs > 0.f) {
 		if (state != arena_mode_state::WARMUP) {
 			set_players_frozen(in, true);
+
+			release_triggers_of_weapons_of_players(in);
 		}
 	}
 	else {
@@ -793,7 +809,12 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 		respawn_the_dead(in, step, in.vars.warmup_respawn_after_ms);
 
 		if (get_warmup_seconds_left(in) <= 0.f) {
-			set_players_frozen(in, true);
+			if (!current_round.cache_players_frozen) {
+				set_players_frozen(in, true);
+#if CLEAR_TRIGGERS_AFTER_WARMUP_ENDS
+				release_triggers_of_weapons_of_players(in);
+#endif
+			}
 
 			if (get_match_begins_in_seconds(in) <= 0.f) {
 				state = arena_mode_state::LIVE;

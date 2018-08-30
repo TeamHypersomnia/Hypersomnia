@@ -1,6 +1,7 @@
 #pragma once
 #include "game/detail/entity_handle_mixins/inventory_mixin.h"
 #include "game/detail/inventory/direct_attachment_offset.h"
+#include "augs/templates/continue_or_callback_result.h"
 
 template <class E>
 template <class S, class I>
@@ -20,7 +21,7 @@ callback_result inventory_mixin<E>::for_each_contained_slot_and_item_recursive(
 
 			for (const auto& s : container.slots) {
 				const auto this_slot_id = inventory_slot_id(s.first, typed_container.get_id());
-				const auto slot_callback_result = slot_callback(cosm[this_slot_id]);
+				const auto slot_callback_result = continue_or_recursive_callback_result(slot_callback, cosm[this_slot_id]);
 
 				if (slot_callback_result == recursive_callback_result::ABORT) {
 					return callback_result::ABORT;
@@ -33,7 +34,7 @@ callback_result inventory_mixin<E>::for_each_contained_slot_and_item_recursive(
 						const auto result = cosm[id].template dispatch_on_having_all_ret<components::item>(
 							[&](const auto& child_item_handle) {
 								if constexpr(!std::is_same_v<decltype(child_item_handle), const std::nullopt_t&>) {
-									const auto r = item_callback(child_item_handle);
+									const auto r = continue_or_recursive_callback_result(item_callback, child_item_handle);
 
 									if (r == recursive_callback_result::CONTINUE_AND_RECURSE) {
 										const auto next_r = child_item_handle.for_each_contained_slot_and_item_recursive(slot_callback, item_callback);
@@ -133,7 +134,7 @@ template <class E>
 template <class I>
 void inventory_mixin<E>::for_each_contained_item_recursive(I&& item_callback) const {
 	for_each_contained_slot_and_item_recursive(
-		[](auto) { return recursive_callback_result::CONTINUE_AND_RECURSE; }, 
+		[](auto) {}, 
 		std::forward<I>(item_callback)
 	);
 }
@@ -143,7 +144,7 @@ template <class S>
 void inventory_mixin<E>::for_each_contained_slot_recursive(S&& slot_callback) const {
 	for_each_contained_slot_and_item_recursive(
 		std::forward<S>(slot_callback), 
-		[](auto...) { return recursive_callback_result::CONTINUE_AND_RECURSE; }
+		[](auto...) {}
 	);
 }
 

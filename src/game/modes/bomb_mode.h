@@ -181,6 +181,8 @@ private:
 	const bomb_mode_player* find(const mode_player_id&) const;
 
 	void set_players_frozen(input in, bool flag);
+	void release_triggers_of_weapons_of_players(input in);
+
 	void respawn_the_dead(input, logic_step, unsigned after_ms);
 
 	template <class F>

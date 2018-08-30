@@ -41,7 +41,6 @@ inline void remove_test_characters(cosmos& cosm) {
 				typed_handle.for_each_contained_item_recursive(
 					[&](const auto& it) {
 						q.push_back(it.get_id());
-						return recursive_callback_result::CONTINUE_AND_RECURSE;
 					}
 				);
 			}
@@ -67,7 +66,6 @@ inline void remove_test_dropped_items(cosmos& cosm) {
 				typed_handle.for_each_contained_item_recursive(
 					[&](const auto& it) {
 						q.push_back(it.get_id());
-						return recursive_callback_result::CONTINUE_AND_RECURSE;
 					}
 				);
 			}
