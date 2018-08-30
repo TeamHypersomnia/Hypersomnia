@@ -12,7 +12,7 @@ void damage_origin::copy_sender_from(const E& causing_handle) {
 }
 
 template <class E>
-const_entity_handle damage_origin::get_guilty_of_damaging(const E& victim_handle) const {
+auto damage_origin::get_guilty_of_damaging(const E& victim_handle) const {
 	const auto faction = victim_handle.get_official_faction();
 	auto& cosm = victim_handle.get_cosmos();
 
@@ -53,4 +53,48 @@ const_entity_handle damage_origin::get_guilty_of_damaging(const E& victim_handle
 	}
 
 	return cosm[sender.capability_of_sender];
+}
+
+
+template <class C, class F>
+auto damage_origin::on_tool_used(C& cosm, F callback) const {
+	using R = decltype(callback(haste()));
+	using opt_R = std::optional<R>;
+
+	if (cause.spell.is_set()) {
+		return cause.spell.dispatch([&](auto dummy) -> opt_R {
+			return callback(get_meta_of(dummy, cosm.get_common_significant().spells));
+		});
+	}
+
+	auto from_flavour = [&](const auto flavour_id) -> opt_R {
+		if (!flavour_id.is_set()) {
+			return std::nullopt;
+		}
+
+		return flavour_id.dispatch([&](const auto& typed_flavour_id) -> opt_R {
+			if (const auto flavour = cosm.find_flavour(typed_flavour_id)) {
+				if constexpr(remove_cref<decltype(*flavour)>::template has<invariants::sentience>()) {
+					return std::nullopt;
+				}
+				else {
+					return callback(*flavour);
+				}
+			}
+
+			return std::nullopt;
+		});
+	};
+
+	;
+
+	if (const auto result = from_flavour(sender.direct_sender_flavour)) {
+		return result;
+	}
+
+	if (const auto result = from_flavour(cause.flavour)) {
+		return result;
+	}
+
+	return opt_R(std::nullopt);
 }

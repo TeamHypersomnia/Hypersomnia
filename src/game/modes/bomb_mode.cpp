@@ -10,6 +10,8 @@
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #include "game/messages/start_sound_effect.h"
 #include "game/detail/damage_origin.hpp"
+#include "game/detail/get_knockout_award.h"
+#include "game/detail/damage_origin.hpp"
 
 using input_type = bomb_mode::input;
 
@@ -391,11 +393,89 @@ void bomb_mode::release_triggers_of_weapons_of_players(const input_type in) {
 	}
 }
 
+void bomb_mode::spawn_bomb_near_players(const input_type in) {
+	vec2 avg_pos;
+	vec2 avg_dir;
+
+	std::size_t n = 0;
+
+	const auto p = calc_participating_factions(in);
+	auto& cosm = in.cosm;
+
+	for_each_faction_spawn(cosm, p.bombing, [&](const auto& typed_spawn) {
+		const auto& tr = typed_spawn.get_logic_transform();
+
+		avg_pos += tr.pos;
+		avg_dir += tr.get_direction();
+
+		++n;
+	});
+
+	avg_pos /= n;
+	avg_dir /= n;
+
+	const auto new_bomb_entity = spawn_bomb(in);
+
+	new_bomb_entity.set_logic_transform(transformr(avg_pos));
+	new_bomb_entity.get<components::rigid_body>().apply_impulse(avg_dir * 100);
+}
+
+
+entity_handle bomb_mode::spawn_bomb(const input_type in) {
+	return cosmic::create_entity(in.cosm, in.vars.bomb_flavour);
+}
+
+bool bomb_mode::give_bomb_to_random_player(const input_type in, const logic_step step) {
+	static const auto tried_slots = std::array<slot_function, 3> {
+		slot_function::SHOULDER,
+
+		slot_function::PRIMARY_HAND,
+		slot_function::SECONDARY_HAND
+	};
+
+	const auto p = calc_participating_factions(in);
+
+	auto& cosm = in.cosm;
+
+	const auto viable_players = [&]() {
+		std::vector<typed_entity_id<player_character_type>> result;
+
+		for_each_player_handle_in(cosm, p.bombing, [&](const auto& typed_player) {
+			for (const auto& t : tried_slots) {
+				if (typed_player[t].is_empty_slot()) {
+					result.push_back(typed_player.get_id());
+					return;
+				}
+			}
+		});
+
+		return result;
+	}();
+
+	if (viable_players.empty()) {
+		return false;
+	}
+
+	const auto chosen_bomber_idx = get_step_rng_seed(cosm) % viable_players.size();
+	const auto typed_player = cosm[viable_players[chosen_bomber_idx]];
+
+	for (const auto& t : tried_slots) {
+		if (typed_player[t].is_empty_slot()) {
+			perform_transfer(item_slot_transfer_request::standard(spawn_bomb(in).get_id(), typed_player[t].get_id()), step);
+			break;
+		}
+	}
+
+	return true;
+}
+
 void bomb_mode::setup_round(
 	const input_type in, 
 	const logic_step step, 
 	const bomb_mode::round_transferred_players& transfers
 ) {
+	clear_players_round_state(in);
+
 	auto& cosm = in.cosm;
 	clock_before_setup = cosm.get_clock();
 
@@ -452,63 +532,8 @@ void bomb_mode::setup_round(
 	}
 
 	if (state != arena_mode_state::WARMUP) {
-		static const auto tried_slots = std::array<slot_function, 3> {
-			slot_function::SHOULDER,
-
-			slot_function::PRIMARY_HAND,
-			slot_function::SECONDARY_HAND
-		};
-
-		const auto p = calc_participating_factions(in);
-
-		const auto viable_players = [&]() {
-			std::vector<typed_entity_id<player_character_type>> result;
-
-			for_each_player_handle_in(cosm, p.bombing, [&](const auto& typed_player) {
-				for (const auto& t : tried_slots) {
-					if (typed_player[t].is_empty_slot()) {
-						result.push_back(typed_player.get_id());
-						return;
-					}
-				}
-			});
-
-			return result;
-		}();
-
-		const auto new_bomb_entity = cosmic::create_entity(cosm, in.vars.bomb_flavour);
-
-		if (viable_players.empty()) {
-			vec2 avg_pos;
-			vec2 avg_dir;
-
-			std::size_t n = 0;
-
-			for_each_faction_spawn(cosm, p.bombing, [&](const auto& typed_spawn) {
-				const auto& tr = typed_spawn.get_logic_transform();
-
-				avg_pos += tr.pos;
-				avg_dir += tr.get_direction();
-
-				++n;
-			});
-
-			avg_pos /= n;
-			avg_dir /= n;
-
-			new_bomb_entity.set_logic_transform(transformr(avg_pos));
-			new_bomb_entity.get<components::rigid_body>().apply_impulse(avg_dir * 100);
-		}
-		else {
-			const auto chosen_bomber_idx = get_step_rng_seed(cosm) % viable_players.size();
-			const auto typed_player = cosm[viable_players[chosen_bomber_idx]];
-
-			for (const auto& t : tried_slots) {
-				if (typed_player[t].is_empty_slot()) {
-					perform_transfer(item_slot_transfer_request::standard(new_bomb_entity.get_id(), typed_player[t].get_id()), step);
-					break;
-				}
-			}
+		if (!give_bomb_to_random_player(in, step)) {
+			spawn_bomb_near_players(in);
 		}
 	}
 }
@@ -635,12 +660,30 @@ void bomb_mode::count_knockout(const input_type in, const arena_mode_knockout ko
 	{
 		int knockouts_dt = 1;
 
-		if (same_faction(ko.knockouter, ko.victim)) {
-			knockouts_dt = -1;
-		}
-
 		if (ko.knockouter == ko.victim) {
 			knockouts_dt = 0;
+		}
+		else if (same_faction(ko.knockouter, ko.victim)) {
+			knockouts_dt = -1;
+			LOG("penalty");
+			post_award(in, ko.knockouter, in.vars.team_kill_penalty * -1);
+		}
+
+		if (knockouts_dt > 0) {
+			auto& cosm = in.cosm;
+
+			const auto award = ko.origin.on_tool_used(cosm, [&](const auto& tool) {
+				if constexpr(is_spell_v<decltype(tool)>) {
+					return tool.common.adversarial.knockout_award;
+				}
+				else {
+					return ::get_knockout_award(tool);
+				}
+			});
+
+			if (award != std::nullopt) {
+				post_award(in, ko.knockouter, *award);
+			}
 		}
 
 		stats_of(ko.knockouter).knockouts += knockouts_dt;
@@ -669,13 +712,17 @@ void bomb_mode::count_knockouts_for_unconscious_players_in(const input_type in, 
 }
 
 void bomb_mode::make_win(const input_type in, const faction_type winner) {
-	const auto p = calc_participating_factions(in);
-	(void)p;
-
 	++factions[winner].score;
 
 	state = arena_mode_state::ROUND_END_DELAY;
 	current_round.last_win = { in.cosm.get_clock(), winner };
+
+	for (auto& p : players) {
+		const auto& player_id = p.first;
+		const auto faction = p.second.faction;
+
+		post_award(in, player_id, faction == winner ? in.vars.winning_faction_award : in.vars.losing_faction_award);
+	}
 }
 
 void bomb_mode::play_faction_sound(const const_logic_step step, const faction_type f, const assets::sound_id id) const {
@@ -760,14 +807,18 @@ void bomb_mode::process_win_conditions(const input_type in, const logic_step ste
 	/* Bomb-based win-conditions */
 
 	if (bomb_exploded(in)) {
-		++players[current_round.bomb_planter].stats.bomb_explosions;
+		const auto planting_player = current_round.bomb_planter;
+		++players[planting_player].stats.bomb_explosions;
+		post_award(in, planting_player, in.vars.bomb_explosion_award);
 		standard_win(p.bombing);
 		return;
 	}
 
 	if (const auto character_who_defused = cosm[get_character_who_defused_bomb(in)]) {
 		const auto winner = p.defusing;
-		++players[lookup(character_who_defused.get_guid())].stats.bomb_defuses;
+		const auto defusing_player = lookup(character_who_defused.get_guid());
+		++players[defusing_player].stats.bomb_defuses;
+		post_award(in, defusing_player, in.vars.bomb_defuse_award);
 		make_win(in, winner);
 
 		play_bomb_defused_sound(in, step, winner);
@@ -879,6 +930,8 @@ void bomb_mode::mode_post_solve(const input_type in, const mode_entropy& entropy
 						auto& planter = current_round.bomb_planter;
 						planter = lookup(cosm[typed_bomb.template get<components::sender>().capability_of_sender].get_guid());
 						++players[planter].stats.bomb_plants;
+
+						post_award(in, planter, in.vars.bomb_plant_award);
 					}
 				}
 			});
@@ -1078,6 +1131,15 @@ unsigned bomb_mode::calc_max_faction_score() const {
 	return maximal;
 }
 
+
+void bomb_mode::clear_players_round_state(const input_type in) {
+	(void)in;
+
+	for (auto& it : players) {
+		it.second.stats.round_state = {};
+	}
+}
+
 void bomb_mode::reset_players_stats(const input_type in) {
 	for (auto& it : players) {
 		auto& p = it.second;
@@ -1085,5 +1147,23 @@ void bomb_mode::reset_players_stats(const input_type in) {
 
 		stats = {};
 		stats.money = in.vars.initial_money;
+	}
+
+	clear_players_round_state(in);
+}
+
+void bomb_mode::post_award(const input_type in, const mode_player_id id, money_type amount) {
+	auto& stats = players[id].stats;
+	auto& current_money = stats.money;
+	amount = std::clamp(amount, -current_money, in.vars.maximum_money - current_money);
+
+	if (amount != 0) {
+		current_money += amount;
+
+		const auto award = arena_mode_award {
+			in.cosm.get_clock(), id, amount 
+		};
+
+		stats.round_state.awards.emplace_back(award);
 	}
 }

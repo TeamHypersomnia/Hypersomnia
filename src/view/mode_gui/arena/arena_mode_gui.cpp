@@ -11,6 +11,7 @@
 #include "game/modes/test_scene_mode.h"
 #include "game/modes/bomb_mode.h"
 #include "augs/string/format_enum.h"
+#include "game/detail/damage_origin.hpp"
 
 bool arena_gui_state::control(
 	const augs::event::state& common_input_state,
@@ -51,7 +52,104 @@ void arena_gui_state::draw_mode_gui(
 
 		const auto local_player = mode_in.local_player;
 		auto game_screen_top = mode_in.game_screen_top;
+
 		game_screen_top += 2;
+
+		auto colored = [&](const auto& text, const auto& c) {
+			const auto text_style = style(
+				in.gui_fonts.gui,
+				c
+			);
+
+			return formatted_string(text, text_style);
+		};
+
+		auto calc_size = [&](const auto& text) { 
+			return get_text_bbox(colored(text, white));;
+		};
+
+		{
+			// TODO: fix this for varying icon sizes
+
+			if (const auto p = typed_mode.find(local_player)) {
+				const auto& stats = p->stats;
+
+				auto drawn_current_money = stats.money;
+
+				const auto money_indicator_pos = [&]() {
+					// const auto max_money_indicator_w = calc_size("999999$").x;
+
+					const auto& off = cfg.money_indicator_pos;
+
+					auto x = off.x;
+
+					if (x < 0) {
+						x = in.screen_size.x + x;
+					}
+
+					auto y = off.y;
+
+					if (y < 0) {
+						y = in.screen_size.y + y;
+					}
+					else {
+						y += game_screen_top;
+					}
+
+					return vec2i(x, y);
+				}();
+
+				{
+					const auto& cosm = mode_input.cosm;
+					const auto& awards = stats.round_state.awards;
+					const auto& clk = cosm.get_clock();
+
+					const auto awards_to_show = std::min(
+						awards.size(), 
+						static_cast<std::size_t>(cfg.show_recent_awards_num)
+					);
+
+					const auto starting_i = [&]() {
+						auto i = awards.size() - awards_to_show;
+
+						while (i < awards.size() && clk.diff_seconds(awards[i].when) >= cfg.keep_recent_awards_for_seconds) {
+							++i;
+						}
+
+						return i;
+					}();
+
+					const auto line_height = in.gui_fonts.gui.metrics.get_height();
+
+					for (std::size_t i = starting_i; i < awards.size(); ++i) {
+						const auto& a = awards[i].amount;
+						drawn_current_money -= a;
+
+						const auto award_color = a > 0 ? cfg.award_indicator_color : red;
+						const auto award_text = a > 0 ? typesafe_sprintf("+ %x$", a) : typesafe_sprintf("- %x$", -a);
+						const auto award_text_w = calc_size(award_text).x;
+
+						auto award_indicator_pos = money_indicator_pos;
+						award_indicator_pos.y += line_height * (i + 1 - starting_i);
+
+						print_stroked(
+							in.drawer,
+							award_indicator_pos - vec2i(award_text_w, 0),
+							colored(award_text, award_color)
+						);
+					}
+				}
+
+				const auto money_text = typesafe_sprintf("%x$", drawn_current_money);
+				const auto money_text_w = calc_size(money_text).x;
+
+				print_stroked(
+					in.drawer,
+					money_indicator_pos - vec2i(money_text_w, 0),
+					colored(money_text, cfg.money_indicator_color)
+				);
+			}
+		}
 
 		{
 			const auto& cosm = mode_input.cosm;
@@ -66,7 +164,7 @@ void arena_gui_state::draw_mode_gui(
 			const auto starting_i = [&]() {
 				auto i = kos.size() - knockouts_to_show;
 
-				while (i < kos.size() && clk.diff_seconds(kos[i].when) >= cfg.keep_knockout_boxes_for_seconds) {
+				while (i < kos.size() && clk.diff_seconds(kos[i].when) >= cfg.keep_recent_knockouts_for_seconds) {
 					++i;
 				}
 
@@ -82,7 +180,7 @@ void arena_gui_state::draw_mode_gui(
 				const auto& ko = kos[i];
 
 				auto get_col = [&](const mode_player_id id) {
-					if (const auto p = mapped_or_nullptr(typed_mode.players, id)) {
+					if (const auto p = typed_mode.find(id)) {
 						return in.config.faction_view.colors[p->faction].standard;
 					}
 
@@ -94,20 +192,11 @@ void arena_gui_state::draw_mode_gui(
 						return "";
 					}
 
-					if (const auto p = mapped_or_nullptr(typed_mode.players, id)) {
+					if (const auto p = typed_mode.find(id)) {
 						return p->chosen_name;
 					}
 
 					return "Disconnected";
-				};
-
-				auto colored = [&](const auto& text, const auto& c) {
-					const auto text_style = style(
-						in.gui_fonts.gui,
-						c
-					);
-
-					return formatted_string(text, text_style);
 				};
 
 				const auto knockouter = get_name(ko.knockouter);
@@ -147,46 +236,20 @@ void arena_gui_state::draw_mode_gui(
 				cols.background.mult_alpha(bg_alpha);
 				cols.border.mult_alpha(bg_alpha);
 
-				const auto tool_image_id = [&]() {
-					auto from_flavour = [&](const auto flavour_id) -> auto {
-						if (!flavour_id.is_set()) {
-							return assets::image_id();
+				const auto tool_image_id = ko.origin.on_tool_used(cosm, [&](const auto& tool) -> assets::image_id {
+					if constexpr(is_spell_v<decltype(tool)>) {
+						return tool.appearance.icon;
+					}
+					else {
+						if (const auto sprite = tool.template find<invariants::sprite>()) {
+							return sprite->image_id;
 						}
-
-						return flavour_id.dispatch([&](const auto& typed_flavour_id) {
-							if (const auto flavour = cosm.find_flavour(typed_flavour_id)) {
-								if (const auto sentience = flavour->template find<invariants::sentience>()) {
-									return assets::image_id();
-								}
-
-								if (const auto sprite = flavour->template find<invariants::sprite>()) {
-									return sprite->image_id;
-								}
-							}
-
-							return assets::image_id();
-						});
-					};
-
-					if (ko.origin.cause.spell.is_set()) {
-						return ko.origin.cause.spell.dispatch([&](auto dummy){
-							const auto& meta = get_meta_of(dummy, cosm.get_common_significant().spells);
-							return meta.appearance.icon;
-						});
 					}
 
-					if (const auto img = from_flavour(ko.origin.sender.direct_sender_flavour); img.is_set()) {
-						return img;
-					}
+					return {};
+				});
 
-					if (const auto img = from_flavour(ko.origin.cause.flavour); img.is_set()) {
-						return img;
-					}
-
-					return assets::image_id();
-				}();
-
-				const auto& entry = tool_image_id.is_set() ? in.images_in_atlas.at(tool_image_id) : image_in_atlas();
+				const auto& entry = tool_image_id != std::nullopt ? in.images_in_atlas.at(*tool_image_id) : image_in_atlas();
 
 				const auto tool_size = [&]() {
 					const auto original_tool_size = static_cast<vec2i>(entry.get_original_size());

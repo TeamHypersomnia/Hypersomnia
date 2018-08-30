@@ -32,10 +32,16 @@ struct arena_mode_gui_settings {
 	unsigned inside_knockout_box_pad = 4;
 	unsigned weapon_icon_horizontal_pad = 10;
 	unsigned show_recent_knockouts_num = 5;
-	float keep_knockout_boxes_for_seconds = 7.f;
+	float keep_recent_knockouts_for_seconds = 8.f;
 	unsigned max_weapon_icon_height = 0;
 
 	scoreboard_gui_settings scoreboard_settings;
+	rgba money_indicator_color = rgba(249, 133, 255, 255);
+	rgba award_indicator_color = yellow;
+	vec2i money_indicator_pos = vec2i(-40, 20 + 16 * 4);
+
+	unsigned show_recent_awards_num = 5;
+	float keep_recent_awards_for_seconds = 8.f;
 	// END GEN INTROSPECTOR
 };
 

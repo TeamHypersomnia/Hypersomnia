@@ -206,14 +206,27 @@ void settings_gui_state::perform(
 					}
 
 					auto& scope_cfg = config.arena_mode_gui;
-					auto scope = scoped_indent();
 
-					revertable_slider(SCOPE_CFG_NVP(between_knockout_boxes_pad), 0u, 20u);
-					revertable_slider(SCOPE_CFG_NVP(inside_knockout_box_pad), 0u, 20u);
-					revertable_slider(SCOPE_CFG_NVP(weapon_icon_horizontal_pad), 0u, 20u);
-					revertable_slider(SCOPE_CFG_NVP(show_recent_knockouts_num), 0u, 20u);
-					revertable_slider(SCOPE_CFG_NVP(keep_knockout_boxes_for_seconds), 0.f, 20.f);
-					revertable_slider("Max weapon icon height (0 for no limit)", scope_cfg.max_weapon_icon_height, 0u, 100u);
+					if (auto node = scoped_tree_node("Knockouts indicators")) {
+						auto scope = scoped_indent();
+
+						revertable_slider(SCOPE_CFG_NVP(between_knockout_boxes_pad), 0u, 20u);
+						revertable_slider(SCOPE_CFG_NVP(inside_knockout_box_pad), 0u, 20u);
+						revertable_slider(SCOPE_CFG_NVP(weapon_icon_horizontal_pad), 0u, 20u);
+						revertable_slider(SCOPE_CFG_NVP(show_recent_knockouts_num), 0u, 20u);
+						revertable_slider(SCOPE_CFG_NVP(keep_recent_knockouts_for_seconds), 0.f, 20.f);
+						revertable_slider("Max weapon icon height (0 for no limit)", scope_cfg.max_weapon_icon_height, 0u, 100u);
+					}
+
+					if (auto node = scoped_tree_node("Money indicator")) {
+						auto scope = scoped_indent();
+
+						revertable_drag_rect_bounded_vec2i("Money indicator position", scope_cfg.money_indicator_pos, 0.3f, -vec2i(screen_size), vec2i(screen_size));
+						revertable_color_edit("Money indicator color", scope_cfg.money_indicator_color);
+						revertable_color_edit("Award indicator color", scope_cfg.award_indicator_color);
+						revertable_slider(SCOPE_CFG_NVP(show_recent_awards_num), 0u, 20u);
+						revertable_slider(SCOPE_CFG_NVP(keep_recent_awards_for_seconds), 0.f, 20.f);
+					}
 				}
 
 				if (auto node = scoped_tree_node("Faction view")) {

@@ -31,6 +31,17 @@ struct bomb_mode_vars {
 	// GEN INTROSPECTOR struct bomb_mode_vars
 	std::string name;
 	money_type initial_money = 800;
+	money_type maximum_money = 16000;
+
+	money_type losing_faction_award = 1500;
+	money_type winning_faction_award = 3000;
+
+	money_type team_kill_penalty = 500;
+
+	money_type bomb_plant_award = 500;
+	money_type bomb_explosion_award = 500;
+	money_type bomb_defuse_award = 1000;
+
 	unsigned round_secs = 120;
 	unsigned round_end_secs = 5;
 	unsigned freeze_secs = 5;
@@ -58,6 +69,12 @@ struct bomb_mode_faction_state {
 	// END GEN INTROSPECTOR
 };
 
+struct arena_mode_player_round_state {
+	// GEN INTROSPECTOR struct arena_mode_player_round_state
+	arena_mode_awards_vector awards;
+	// END GEN INTROSPECTOR
+};
+
 struct bomb_mode_player_stats {
 	// GEN INTROSPECTOR struct bomb_mode_player_stats
 	money_type money = 0;
@@ -70,6 +87,8 @@ struct bomb_mode_player_stats {
 	int bomb_explosions = 0;
 
 	int bomb_defuses = 0;
+
+	arena_mode_player_round_state round_state;
 	// END GEN INTROSPECTOR
 
 	int calc_score() const;
@@ -177,9 +196,6 @@ private:
 	void setup_round(input, logic_step, const round_transferred_players& = {});
 	void reshuffle_spawns(const cosmos&, faction_type);
 
-	bomb_mode_player* find(const mode_player_id&);
-	const bomb_mode_player* find(const mode_player_id&) const;
-
 	void set_players_frozen(input in, bool flag);
 	void release_triggers_of_weapons_of_players(input in);
 
@@ -209,6 +225,10 @@ private:
 
 	void count_knockout(input, entity_guid victim, const components::sentience&);
 	void count_knockout(input, arena_mode_knockout);
+
+	entity_handle spawn_bomb(input);
+	bool give_bomb_to_random_player(input, logic_step);
+	void spawn_bomb_near_players(input);
 
 public:
 	// GEN INTROSPECTOR class bomb_mode
@@ -254,6 +274,12 @@ public:
 	void restart(input, logic_step);
 
 	void reset_players_stats(input);
+	void clear_players_round_state(input);
+
+	void post_award(input, mode_player_id, money_type amount);
+
+	bomb_mode_player* find(const mode_player_id&);
+	const bomb_mode_player* find(const mode_player_id&) const;
 
 	template <class F>
 	void for_each_player_in(faction_type, F&& callback) const;

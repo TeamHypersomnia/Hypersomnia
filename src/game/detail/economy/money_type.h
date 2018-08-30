@@ -1,3 +1,3 @@
 #pragma once
 
-using money_type = unsigned;
+using money_type = int;

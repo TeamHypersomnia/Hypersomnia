@@ -748,6 +748,7 @@ namespace test_flavours {
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = 40.f;
+			gun_def.adversarial.knockout_award = static_cast<money_type>(250);
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.052f;
@@ -800,6 +801,7 @@ namespace test_flavours {
 			gun_def.gunshot_adds_heat = 0.062f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.recoil_multiplier = 1.3f;
+			gun_def.adversarial.knockout_award = static_cast<money_type>(400);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
@@ -856,6 +858,7 @@ namespace test_flavours {
 			gun_def.gunshot_adds_heat = 0.2f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.4f;
 			gun_def.recoil_multiplier = 1.7f;
+			gun_def.adversarial.knockout_award = static_cast<money_type>(150);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
@@ -912,6 +915,7 @@ namespace test_flavours {
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::DATUM_GUN_SHOT);
+			gun_def.adversarial.knockout_award = static_cast<money_type>(350);
 
 			meta.set(gun_def);
 
@@ -963,6 +967,7 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 500;
+			gun_def.adversarial.knockout_award = static_cast<money_type>(350);
 		}
 
 		{
@@ -992,6 +997,7 @@ namespace test_flavours {
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.recoil_multiplier = 0.9f;
+			gun_def.adversarial.knockout_award = static_cast<money_type>(350);
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.072f;
@@ -1042,6 +1048,7 @@ namespace test_flavours {
 			gun_def.gunshot_adds_heat = 0.202f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
+			gun_def.adversarial.knockout_award = static_cast<money_type>(700);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 
@@ -1076,6 +1083,7 @@ namespace test_flavours {
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.magic_missile_flavour = to_entity_flavour_id(test_plain_missiles::ELECTRIC_MISSILE);
+			gun_def.adversarial.knockout_award = static_cast<money_type>(150);
 
 			meta.set(gun_def);
 

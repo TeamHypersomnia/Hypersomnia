@@ -4,6 +4,8 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- add a slider for vec2 and use it in settings gui
+
 - Use constexpr max_element in msvc if it works
 
 - Create messages::holster_item_message that will add a selection to hotbar

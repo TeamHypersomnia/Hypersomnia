@@ -273,7 +273,18 @@ return {
     inside_knockout_box_pad = 4,
     weapon_icon_horizontal_pad = 10,
     show_recent_knockouts_num = 7,
-    keep_knockout_boxes_for_seconds = 8,
+    keep_recent_knockouts_for_seconds = 8,
+
+	money_indicator_color = "255 249 133 255",
+	award_indicator_color = "255 255 0 255",
+
+	show_recent_awards_num = 8,
+	keep_recent_awards_for_seconds = 3,
+
+	money_indicator_pos = {
+		x = -50,
+		y = 20 + 16 * 8
+	},
 
     scoreboard_settings = {
       background_color = "15 15 15 200",

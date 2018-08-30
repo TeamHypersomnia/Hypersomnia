@@ -17,6 +17,7 @@
 #include "game/assets/ids/asset_ids.h"
 #include "game/assets/recoil_player.h"
 
+#include "game/detail/adversarial_meta.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
 
@@ -100,6 +101,7 @@ namespace invariants {
 		recoil_player_instance_def recoil;
 
 		assets::plain_animation_id shoot_animation;
+		adversarial_meta adversarial = { static_cast<money_type>(500) };
 		// END GEN INTROSPECTOR
 
 		auto get_steam_schedule_heat() const {

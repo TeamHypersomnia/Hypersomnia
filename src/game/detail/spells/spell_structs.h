@@ -10,11 +10,13 @@
 #include "game/detail/view_input/particle_effect_input.h"
 
 #include "game/common_state/entity_name_str.h"
+#include "game/detail/adversarial_meta.h"
 
 struct spell_common_data {
 	// GEN INTROSPECTOR struct spell_common_data
 	particle_effect_input cast_sparkles;
 	sound_effect_input cast_successful_sound;
+	adversarial_meta adversarial = { static_cast<money_type>(700) };
 
 	unsigned personal_electricity_required = 40u;
 	unsigned cooldown_ms = 5000u;

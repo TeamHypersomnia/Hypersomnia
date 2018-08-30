@@ -31,5 +31,8 @@ struct damage_origin {
 	void copy_sender_from(const E& causing_handle);
 
 	template <class E>
-	const_entity_handle get_guilty_of_damaging(const E& victim_handle) const;
+	auto get_guilty_of_damaging(const E& victim_handle) const;
+
+	template <class C, class F>
+	auto on_tool_used(C& cosm, F callback) const;
 };
