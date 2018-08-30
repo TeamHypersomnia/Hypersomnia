@@ -55,7 +55,7 @@ void arena_gui_state::draw_mode_gui(
 
 		{
 			const auto& cosm = mode_input.cosm;
-			const auto& kos = typed_mode.knockouts;
+			const auto& kos = typed_mode.current_round.knockouts;
 			const auto& clk = cosm.get_clock();
 
 			const auto knockouts_to_show = std::min(
@@ -340,7 +340,7 @@ void arena_gui_state::draw_mode_gui(
 				return;
 			}
 
-			auto& win = typed_mode.last_win;
+			const auto& win = typed_mode.current_round.last_win;
 
 			if (win.was_set()) {
 				draw_info_indicator(format_enum(win.winner) + " wins!", yellow);

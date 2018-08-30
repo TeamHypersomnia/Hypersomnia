@@ -285,12 +285,14 @@ struct fuse_logic_provider {
 						defuse();
 						play_defused_effects();
 						refresh_fused_body();
+						return;
 					}
 
 					if (defusing_conditions_fulfilled() && defusing_character_in_range()) {
 						if (!has_started_defusing()) {
 							start_defusing();
 							play_started_defusing_sound();
+							return;
 						}
 						
 						const auto n = character_now_defusing.get_wielded_items().size();

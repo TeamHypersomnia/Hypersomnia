@@ -24,8 +24,10 @@ const bomb_mode_player* bomb_mode::find(const mode_player_id& id) const {
 int bomb_mode_player_stats::calc_score() const {
 	return 
 		knockouts * 2 
-		+ assists + plants * 2 
-		+ defuses * 2
+		+ assists 
+		+ bomb_plants * 2
+		+ bomb_explosions * 2
+		+ bomb_defuses * 4
 	;
 }
 
@@ -358,11 +360,13 @@ bool bomb_mode::auto_assign_faction(const input_type in, const mode_player_id& i
 }
 
 void bomb_mode::set_players_frozen(const input_type in, const bool flag) {
-	if (cache_players_frozen == flag) {
+	auto& current_flag = current_round.cache_players_frozen;
+
+	if (current_flag == flag) {
 		return;
 	}
 
-	cache_players_frozen = flag;
+	current_flag = flag;
 
 	for (auto& it : players) {
 		auto& player_data = it.second;
@@ -388,9 +392,7 @@ void bomb_mode::setup_round(
 		remove_test_dropped_items(cosm);
 	}
 
-	knockouts.clear();
-	cache_players_frozen = false;
-	last_win = {};
+	current_round = {};
 
 	for_each_faction([&](const auto faction) {
 		reshuffle_spawns(cosm, faction);
@@ -600,7 +602,7 @@ void bomb_mode::count_knockout(const input_type in, const entity_guid victim, co
 }
 
 void bomb_mode::count_knockout(const input_type in, const arena_mode_knockout ko) {
-	knockouts.push_back(ko);
+	current_round.knockouts.push_back(ko);
 
 	auto faction_of = [&](const auto a) {
 		return in.cosm[lookup(a)].get_official_faction();
@@ -619,6 +621,10 @@ void bomb_mode::count_knockout(const input_type in, const arena_mode_knockout ko
 
 		if (same_faction(ko.knockouter, ko.victim)) {
 			knockouts_dt = -1;
+		}
+
+		if (ko.knockouter == ko.victim) {
+			knockouts_dt = 0;
 		}
 
 		stats_of(ko.knockouter).knockouts += knockouts_dt;
@@ -653,7 +659,7 @@ void bomb_mode::make_win(const input_type in, const faction_type winner) {
 	++factions[winner].score;
 
 	state = arena_mode_state::ROUND_END_DELAY;
-	last_win = { in.cosm.get_clock(), winner };
+	current_round.last_win = { in.cosm.get_clock(), winner };
 }
 
 void bomb_mode::play_faction_sound(const const_logic_step step, const faction_type f, const assets::sound_id id) const {
@@ -738,12 +744,14 @@ void bomb_mode::process_win_conditions(const input_type in, const logic_step ste
 	/* Bomb-based win-conditions */
 
 	if (bomb_exploded(in)) {
+		++players[current_round.bomb_planter].stats.bomb_explosions;
 		standard_win(p.bombing);
 		return;
 	}
 
-	if (bomb_defused(in)) {
+	if (const auto character_who_defused = cosm[get_character_who_defused_bomb(in)]) {
 		const auto winner = p.defusing;
+		++players[lookup(character_who_defused.get_guid())].stats.bomb_defuses;
 		make_win(in, winner);
 
 		play_bomb_defused_sound(in, step, winner);
@@ -796,7 +804,7 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 	}
 	else if (state == arena_mode_state::LIVE) {
 		if (get_freeze_seconds_left(in) <= 0.f) {
-			if (cache_players_frozen) {
+			if (current_round.cache_players_frozen) {
 				play_sound_for(in, step, battle_event::START);
 			}
 
@@ -846,6 +854,10 @@ void bomb_mode::mode_post_solve(const input_type in, const mode_entropy& entropy
 
 					if (typed_bomb.template get<components::hand_fuse>().when_armed == clk.now) {
 						play_sound_for(in, step, battle_event::BOMB_PLANTED);
+
+						auto& planter = current_round.bomb_planter;
+						planter = lookup(cosm[typed_bomb.template get<components::sender>().capability_of_sender].get_guid());
+						++players[planter].stats.bomb_plants;
 					}
 				}
 			});
@@ -912,6 +924,8 @@ float bomb_mode::get_round_seconds_left(const input_type in) const {
 }
 
 float bomb_mode::get_round_end_seconds_left(const input_type in) const {
+	const auto& last_win = current_round.last_win;
+
 	if (!last_win.was_set()) {
 		return -1.f;
 	}
@@ -932,13 +946,19 @@ bool bomb_mode::bomb_exploded(const input_type in) const {
 	});
 }
 
-bool bomb_mode::bomb_defused(const input_type in) const {
+entity_id bomb_mode::get_character_who_defused_bomb(const input_type in) const {
 	return on_bomb_entity(in, [&](const auto& typed_bomb) {
 		if constexpr(std::is_same_v<decltype(typed_bomb), const std::nullopt_t&>) {
-			return false;
+			return entity_id();
 		}
 		else {
-			return typed_bomb.template get<components::hand_fuse>().defused();
+			const auto& fuse = typed_bomb.template get<components::hand_fuse>();
+			
+			if (fuse.defused()) {
+				return fuse.character_now_defusing;
+			}
+
+			return entity_id();
 		}
 	});
 }

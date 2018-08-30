@@ -66,8 +66,10 @@ struct bomb_mode_player_stats {
 	int assists = 0;
 	int deaths = 0;
 
-	int plants = 0;
-	int defuses = 0;
+	int bomb_plants = 0;
+	int bomb_explosions = 0;
+
+	int bomb_defuses = 0;
 	// END GEN INTROSPECTOR
 
 	int calc_score() const;
@@ -102,6 +104,15 @@ using cosmos_clock = augs::stepped_clock;
 using bomb_mode_win = arena_mode_win;
 using bomb_mode_knockout = arena_mode_knockout;
 using bomb_mode_knockouts_vector = arena_mode_knockouts_vector;
+
+struct bomb_mode_round_state {
+	// GEN INTROSPECTOR struct bomb_mode_round_state
+	bool cache_players_frozen = false;
+	bomb_mode_win last_win;
+	arena_mode_knockouts_vector knockouts;
+	mode_player_id bomb_planter;
+	// END GEN INTROSPECTOR
+};
 
 class bomb_mode {
 public:
@@ -176,7 +187,7 @@ private:
 	decltype(auto) on_bomb_entity(input, F) const;
 
 	bool bomb_exploded(input) const;
-	bool bomb_defused(input) const;
+	entity_id get_character_who_defused_bomb(input) const;
 	bool bomb_planted(input) const;
 
 	void play_faction_sound(const_logic_step, faction_type, assets::sound_id) const;
@@ -198,18 +209,14 @@ private:
 	void count_knockout(input, arena_mode_knockout);
 
 public:
-
 	// GEN INTROSPECTOR class bomb_mode
 	unsigned rng_seed_offset = 0;
 
 	cosmos_clock clock_before_setup;
 	arena_mode_state state = arena_mode_state::INIT;
-	bool cache_players_frozen = false;
 	per_faction_t<bomb_mode_faction_state> factions;
 	std::unordered_map<mode_player_id, bomb_mode_player> players;
-	bomb_mode_win last_win;
-
-	arena_mode_knockouts_vector knockouts;
+	bomb_mode_round_state current_round;
 	// END GEN INTROSPECTOR
 
 	mode_player_id add_player(input, const entity_name_str& chosen_name);

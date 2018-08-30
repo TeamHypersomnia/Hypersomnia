@@ -256,58 +256,59 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 	};
 
 	switch (h.target) {
-	case messages::health_event::target_type::HEALTH: {
-		const auto amount = h.effective_amount;
+		case messages::health_event::target_type::HEALTH: {
+			const auto amount = h.effective_amount;
 
-		contribute_to_damage(amount);
-		health.value -= amount;
+			contribute_to_damage(amount);
+			health.value -= amount;
 
-		ensure(health.value >= 0);
+			ensure(health.value >= 0);
 
-		sentience.time_of_last_received_damage = cosm.get_timestamp();
+			sentience.time_of_last_received_damage = cosm.get_timestamp();
 
-		auto& movement = subject.get<components::movement>();
-		movement.make_inert_for_ms += h.effective_amount*2;
+			auto& movement = subject.get<components::movement>();
+			movement.make_inert_for_ms += h.effective_amount*2;
 
-		const auto consciousness_ratio = consciousness.get_ratio();
-		const auto health_ratio = health.get_ratio();
+			const auto consciousness_ratio = consciousness.get_ratio();
+			const auto health_ratio = health.get_ratio();
 
-		consciousness.value = static_cast<meter_value_type>(std::min(consciousness_ratio, health_ratio) * consciousness.maximum);
+			consciousness.value = static_cast<meter_value_type>(std::min(consciousness_ratio, health_ratio) * consciousness.maximum);
 
-		if (!health.is_positive()) {
-			h.special_result = messages::health_event::result_type::DEATH;
-			h.was_conscious = was_conscious;
+			if (!health.is_positive()) {
+				h.special_result = messages::health_event::result_type::DEATH;
+				h.was_conscious = was_conscious;
+			}
+
+			break;
 		}
 
-		break;
-	}
+		case messages::health_event::target_type::CONSCIOUSNESS: {
+			const auto amount = h.effective_amount;
+			contribute_to_damage(amount / 5);
+			consciousness.value -= amount;
 
-	case messages::health_event::target_type::CONSCIOUSNESS: {
-		const auto amount = h.effective_amount;
-		contribute_to_damage(amount / 5);
-		consciousness.value -= amount;
+			if (!consciousness.is_positive()) {
+				h.special_result = messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS;
+			}
 
-		if (!consciousness.is_positive()) {
-			h.special_result = messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS;
+			break;
 		}
 
-		break;
-	}
+		case messages::health_event::target_type::PERSONAL_ELECTRICITY: {
+			const auto amount = h.effective_amount;
+			personal_electricity.value -= amount;
+			contribute_to_damage(amount / 8);
 
-	case messages::health_event::target_type::PERSONAL_ELECTRICITY: {
-		const auto amount = h.effective_amount;
-		personal_electricity.value -= amount;
-		contribute_to_damage(amount / 8);
+			if (!personal_electricity.is_positive()) {
+				h.special_result = messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION;
+			}
 
-		if (!personal_electricity.is_positive()) {
-			h.special_result = messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION;
+			break;
 		}
 
-		break;
-	}
-
-	case messages::health_event::target_type::INVALID:
-		break;
+		case messages::health_event::target_type::INVALID: {
+			break;
+		}
 	}
 
 	auto knockout = [&]() {
