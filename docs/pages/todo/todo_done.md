@@ -1283,3 +1283,19 @@ we consider whole type overrides too complex architeciturally:
 	- We'll moving from ImGui to our own GUI to have finer control.
 		- We can offload the work to ImGui when the player is actually selected.
 		- The buttons for the players will be highly deterministic since it is really an easy layout.
+
+- separate field address types in property editor
+- Fix smoke traces for steel bullets
+
+- Mode helpers
+	- for_each_character?
+		- actually we'll just for now iterate over all sentiences
+	- find_player_flavour(faction_type) for player creation
+
+- Test scene game mode
+	- The first to be implemented as an architectural draft
+	- Test functionality: respawns every character every time it dies or loses consciousness (e.g. after 3 secs), just to a different spawn point
+
+- There will ALWAYS be some game mode whenever a game is running
+	- E.g. test scene mode
+

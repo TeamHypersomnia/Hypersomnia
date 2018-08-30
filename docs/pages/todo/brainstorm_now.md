@@ -27,7 +27,6 @@ summary: That which we are brainstorming at the moment.
 
 - Commandize "Add player" and "Restart" in editor
 
-- separate field address types in property editor
 - add a match-global rng seed offset to mode state
 
 - After round restart,
@@ -73,8 +72,6 @@ summary: That which we are brainstorming at the moment.
 	- New tweaker_type?
 		- Based on this, set is_delta boolean in change_property_command
 		- can_accumulate_v trait
-
-- Fix smoke traces for steel bullets
 
 - Player & modes
 	- A mode shall operate without crash on virtually any cosmos
@@ -145,18 +142,6 @@ summary: That which we are brainstorming at the moment.
 		- As for serialization, these will be some "choreographic events" inserted between steps, or in a case of a network session, "network event"
 	- Similarly, change_var shall not be something that the mode bothers with, especially that the calling logic would be pretty much duplicated.
 	- There will still be much use of the messages; e.g. mode_messages::game_completed to determine the result
-
-- Mode helpers
-	- for_each_character?
-		- actually we'll just for now iterate over all sentiences
-	- find_player_flavour(faction_type) for player creation
-
-- Test scene game mode
-	- The first to be implemented as an architectural draft
-	- Test functionality: respawns every character every time it dies or loses consciousness (e.g. after 3 secs), just to a different spawn point
-
-- There will ALWAYS be some game mode whenever a game is running
-	- E.g. test scene mode
 
 - Mode entropy 
 	- As it steps together with the cosmos, will necessarily contain cosmic entropy
