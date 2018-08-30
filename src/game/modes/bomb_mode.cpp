@@ -21,7 +21,7 @@ const bomb_mode_player* bomb_mode::find(const mode_player_id& id) const {
 	return mapped_or_nullptr(players, id);
 }
 
-int bomb_mode_player::calc_score() const {
+int bomb_mode_player_stats::calc_score() const {
 	return 
 		knockouts * 2 
 		+ assists + plants * 2 
@@ -30,8 +30,8 @@ int bomb_mode_player::calc_score() const {
 }
 
 bool bomb_mode_player::operator<(const bomb_mode_player& b) const {
-	const auto as = calc_score();
-	const auto bs = b.calc_score();
+	const auto as = stats.calc_score();
+	const auto bs = b.stats.calc_score();
 
 	if (as == bs) {
 		return chosen_name < b.chosen_name;
@@ -610,6 +610,10 @@ void bomb_mode::count_knockout(const input_type in, const arena_mode_knockout ko
 		return faction_of(a) == faction_of(b);
 	};
 
+	auto stats_of = [&](const auto& id) -> auto& {
+		return players[id].stats;
+	};
+
 	{
 		int knockouts_dt = 1;
 
@@ -617,8 +621,8 @@ void bomb_mode::count_knockout(const input_type in, const arena_mode_knockout ko
 			knockouts_dt = -1;
 		}
 
-		players[ko.knockouter].knockouts += knockouts_dt;
-		players[ko.victim].deaths += 1;
+		stats_of(ko.knockouter).knockouts += knockouts_dt;
+		stats_of(ko.victim).deaths += 1;
 	}
 
 	if (ko.assist.is_set()) {
@@ -628,7 +632,7 @@ void bomb_mode::count_knockout(const input_type in, const arena_mode_knockout ko
 			assists_dt = -1;
 		}
 
-		players[ko.assist].assists += assists_dt;
+		stats_of(ko.assist).assists += assists_dt;
 	}
 }
 
@@ -785,6 +789,7 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 
 			if (get_match_begins_in_seconds(in) <= 0.f) {
 				state = arena_mode_state::LIVE;
+				reset_players_stats(in);
 				setup_round(in, step);
 			}
 		}
@@ -1008,13 +1013,7 @@ void bomb_mode::request_restart() {
 }
 
 void bomb_mode::restart(const input_type in, const logic_step step) {
-	for (auto& it : players) {
-		auto& p = it.second;
-
-		p.money = in.vars.initial_money;
-		p.knockouts = p.assists = p.deaths = 0;
-	}
-
+	reset_players_stats(in);
 	factions = {};
 
 	if (in.vars.warmup_secs > 4) {
@@ -1036,4 +1035,14 @@ unsigned bomb_mode::calc_max_faction_score() const {
 	});
 
 	return maximal;
+}
+
+void bomb_mode::reset_players_stats(const input_type in) {
+	for (auto& it : players) {
+		auto& p = it.second;
+		auto& stats = p.stats;
+
+		stats = {};
+		stats.money = in.vars.initial_money;
+	}
 }

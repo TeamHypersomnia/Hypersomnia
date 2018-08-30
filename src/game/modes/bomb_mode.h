@@ -58,11 +58,8 @@ struct bomb_mode_faction_state {
 	// END GEN INTROSPECTOR
 };
 
-struct bomb_mode_player {
-	// GEN INTROSPECTOR struct bomb_mode_player
-	entity_guid guid;
-	entity_name_str chosen_name;
-	faction_type faction = faction_type::SPECTATOR;
+struct bomb_mode_player_stats {
+	// GEN INTROSPECTOR struct bomb_mode_player_stats
 	money_type money = 0;
 
 	int knockouts = 0;
@@ -73,11 +70,21 @@ struct bomb_mode_player {
 	int defuses = 0;
 	// END GEN INTROSPECTOR
 
+	int calc_score() const;
+};
+
+struct bomb_mode_player {
+	// GEN INTROSPECTOR struct bomb_mode_player
+	entity_guid guid;
+	entity_name_str chosen_name;
+	faction_type faction = faction_type::SPECTATOR;
+	bomb_mode_player_stats stats;
+	// END GEN INTROSPECTOR
+
 	bomb_mode_player(const entity_name_str& chosen_name = {}) : 
 		chosen_name(chosen_name) 
 	{}
 
-	int calc_score() const;
 	bool operator<(const bomb_mode_player& b) const;
 };
 
@@ -236,6 +243,8 @@ public:
 
 	void request_restart();
 	void restart(input, logic_step);
+
+	void reset_players_stats(input);
 
 	template <class F>
 	void for_each_player_in(faction_type, F&& callback) const;

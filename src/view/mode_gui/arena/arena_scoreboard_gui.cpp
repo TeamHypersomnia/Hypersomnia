@@ -392,20 +392,22 @@ void arena_scoreboard_gui::draw_gui(
 			const auto ping = 0;
 			const auto ping_str = typesafe_sprintf("%x", ping);
 
+			const auto& stats = player_data.stats;
+
 			col_text(ping_str);
 			next_col();
 			next_col();
 			col_text(player_data.chosen_name);
 			next_col();
-			col_text(typesafe_sprintf("%x$", player_data.money));
+			col_text(typesafe_sprintf("%x$", stats.money));
 			next_col();
-			col_text(typesafe_sprintf("%x", player_data.knockouts));
+			col_text(typesafe_sprintf("%x", stats.knockouts));
 			next_col();
-			col_text(typesafe_sprintf("%x", player_data.assists));
+			col_text(typesafe_sprintf("%x", stats.assists));
 			next_col();
-			col_text(typesafe_sprintf("%x", player_data.deaths));
+			col_text(typesafe_sprintf("%x", stats.deaths));
 			next_col();
-			col_text(typesafe_sprintf("%x", player_data.calc_score()));
+			col_text(typesafe_sprintf("%x", stats.calc_score()));
 
 			pen.y += cell_h;
 		}
