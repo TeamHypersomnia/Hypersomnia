@@ -178,6 +178,7 @@ private:
 			int charges = -1;
 			std::size_t container_index = static_cast<std::size_t>(-1);
 			slot_function slot_type = slot_function::INVALID;
+			entity_id source_entity_id;
 		};
 
 		std::unordered_map<entity_id, std::size_t> id_to_container_idx;
@@ -190,6 +191,11 @@ private:
 		transferred_inventory saved_eq;
 	};
 
+	struct transfer_meta {
+		const round_transferred_player& player;
+		messages::changed_identities_message& msg;
+	};
+
 	using round_transferred_players = std::unordered_map<mode_player_id, round_transferred_player>;
 	round_transferred_players make_transferred_players(input) const;
 
@@ -198,7 +204,12 @@ private:
 	void make_win(input, faction_type);
 
 	void teleport_to_next_spawn(input, entity_id character);
-	void init_spawned(input, entity_id character, logic_step, const round_transferred_player* = nullptr);
+	void init_spawned(
+		input, 
+		entity_id character, 
+		logic_step, 
+		std::optional<transfer_meta> = std::nullopt
+	);
 
 	void mode_pre_solve(input, const mode_entropy&, logic_step);
 	void mode_post_solve(input, const mode_entropy&, const_logic_step);

@@ -16,7 +16,6 @@ W kolejności:
 		- Strzałka z napisem "Winner!" na koniec
 	- GUI: Buy menu
 	- GUI: Wybór drużyny
-	- Fix: Transfer przypisanych itemów do GUI w hotbarze, przy starcie nowej rundy
 	- Ikonki obok nicka w scoreboardzie (def, paka, dead)
 - Poprawki do gameplayu
 	- Defuser kit
@@ -59,6 +58,7 @@ W kolejności:
 
 ## Roadmap (odfajkowane)
 
+- Fix: Transfer przypisanych itemów do GUI w hotbarze, przy starcie nowej rundy
 - Dekoracje
     - Animacje na scenie
     - Dźwięki przyklejone do obiektów

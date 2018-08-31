@@ -20,6 +20,7 @@
 #include "view/game_gui/elements/character_gui.h"
 #include "view/game_gui/elements/slot_button.h"
 #include "view/game_gui/elements/item_button.h"
+#include "game/messages/changed_identities_message.h"
 
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #include "game/detail/entity_handle_mixins/make_wielding_transfers.hpp"
@@ -417,6 +418,55 @@ bool should_fill_hotbar_from_right(const E& handle) {
 
 void game_gui_system::standard_post_solve(const const_logic_step step) {
 	const auto& cosmos = step.get_cosmos();
+
+	auto migrate_nodes = [&](auto& migrated, const auto& key_map) {
+		using M = remove_cref<decltype(migrated)>;
+
+		M result;
+
+		for (auto& it : migrated) {
+			if (const auto new_id = mapped_or_nullptr(key_map, it.first)) {
+				result.try_emplace(*new_id, std::move(it.second));
+			}
+			else {
+				result.try_emplace(it.first, std::move(it.second));
+			}
+		}
+
+		migrated = std::move(result);
+	};
+
+	for (const auto& changed : step.get_queue<messages::changed_identities_message>()) {
+		migrate_nodes(item_buttons, changed.changes);
+		migrate_nodes(character_guis, changed.changes);
+
+		auto migrate_id = [&](auto& id) {
+			if (const auto new_id = mapped_or_nullptr(changed.changes, id)) {
+				id = *new_id;
+			}
+			else {
+				id = {};
+			}
+		};
+
+		for (auto& it : character_guis) {
+			auto& ch = it.second;
+
+			for (auto& h : ch.hotbar_buttons) {
+				migrate_id(h.last_assigned_entity);
+			}
+
+			for (auto& l : ch.last_setups) {
+				for (auto& s : l.hand_selections) {
+					migrate_id(s);
+				}
+			}
+
+			for (auto& s : ch.push_new_setup.hand_selections) {
+				migrate_id(s);
+			}
+		}
+	}
 
 	for (const auto& pickup : step.get_queue<messages::item_picked_up_message>()) {
 		const auto picked_item = cosmos[pickup.item];

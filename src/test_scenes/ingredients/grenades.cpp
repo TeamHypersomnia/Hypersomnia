@@ -250,7 +250,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::item item;
-			item.space_occupied_per_charge = to_space_units("1000");
+			item.space_occupied_per_charge = to_space_units("40000");
 			item.categories_for_slot_compatibility = { item_category::GENERAL, item_category::SHOULDER_WEARABLE };
 			item.wear_sound.id = to_sound_id(test_scene_sound_id::BACKPACK_WEAR);
 

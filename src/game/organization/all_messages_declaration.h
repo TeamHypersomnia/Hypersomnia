@@ -26,6 +26,7 @@ namespace messages {
 	struct start_multi_sound_effect;
 	struct stop_sound_effect;
 	struct exhausted_cast;
+	struct changed_identities_message;
 }
 
 struct exploding_ring_input;
@@ -53,5 +54,6 @@ using all_message_queues = augs::storage_for_message_queues<
 	messages::stop_sound_effect,
 	exploding_ring_input,
 	thunder_input,
-	item_slot_transfer_request
+	item_slot_transfer_request,
+	messages::changed_identities_message
 >;

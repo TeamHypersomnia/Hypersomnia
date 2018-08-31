@@ -12,6 +12,7 @@
 #include "game/detail/damage_origin.hpp"
 #include "game/detail/get_knockout_award.h"
 #include "game/detail/damage_origin.hpp"
+#include "game/messages/changed_identities_message.h"
 
 using input_type = bomb_mode::input;
 
@@ -146,15 +147,15 @@ void bomb_mode::init_spawned(
 	const input in, 
 	const entity_id id, 
 	const logic_step step,
-	const bomb_mode::round_transferred_player* const transferred
+	const std::optional<transfer_meta> transferred
 ) {
 	auto& cosm = in.cosm;
 	const auto handle = cosm[id];
 	const auto& faction_vars = in.vars.factions[handle.get_official_faction()];
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
-		if (transferred != nullptr && transferred->survived) {
-			const auto& eq = transferred->saved_eq;
+		if (transferred != std::nullopt && transferred->player.survived) {
+			const auto& eq = transferred->player.saved_eq;
 
 			std::vector<entity_id> created_items;
 
@@ -183,7 +184,11 @@ void bomb_mode::init_spawned(
 
 				const auto result = perform_transfer_no_step(item_slot_transfer_request::standard(new_item.get_id(), target_slot), cosm);
 				result.notify_logical(step);
-				created_items.push_back(new_item.get_id());
+
+				const auto new_id = new_item.get_id();
+				transferred->msg.changes[i.source_entity_id] = new_id;
+
+				created_items.push_back(new_id);
 			}
 		}
 		else {
@@ -196,8 +201,8 @@ void bomb_mode::init_spawned(
 
 		fill_range(sentience.learned_spells, true);
 
-		if (transferred != nullptr) {
-			typed_handle.template get<components::movement>().flags = transferred->movement;
+		if (transferred != std::nullopt) {
+			typed_handle.template get<components::movement>().flags = transferred->player.movement;
 		}
 	});
 }
@@ -479,6 +484,20 @@ void bomb_mode::setup_round(
 	auto& cosm = in.cosm;
 	clock_before_setup = cosm.get_clock();
 
+	const auto former_ids = [&]() {
+		std::unordered_map<mode_player_id, entity_id> result;
+
+		for (const auto& p : players) {
+			const auto new_id = cosm[p.second.guid].get_id();
+
+			if (new_id.is_set()) {
+				result.try_emplace(p.first, new_id);
+			}
+		}
+
+		return result;
+	}();
+
 	cosm.set(in.initial_signi);
 	remove_test_characters(cosm);
 
@@ -492,6 +511,9 @@ void bomb_mode::setup_round(
 		reshuffle_spawns(cosm, faction);
 	});
 
+
+	messages::changed_identities_message msg;
+
 	auto create_player = [&](const auto faction, const auto& id) {
 		if (const auto flavour = ::find_faction_character_flavour(cosm, faction); flavour.is_set()) {
 			auto new_player = cosmic::create_entity(
@@ -500,7 +522,13 @@ void bomb_mode::setup_round(
 				[](auto&&...) {},
 				[&](const auto new_character) {
 					teleport_to_next_spawn(in, new_character);
-					init_spawned(in, new_character, step, mapped_or_nullptr(transfers, id));
+
+					if (auto transfer_input = mapped_or_nullptr(transfers, id)) {
+						init_spawned(in, new_character, step, transfer_meta { *transfer_input, msg });
+					}
+					else {
+						init_spawned(in, new_character, step);
+					}
 				}
 			);
 
@@ -514,10 +542,21 @@ void bomb_mode::setup_round(
 		const auto id = it.first;
 		auto& player_data = it.second;
 
+		entity_id new_id;
+
 		if (const auto handle = create_player(player_data.faction, id)) {
 			cosmic::set_specific_name(handle, player_data.chosen_name);
 			player_data.guid = handle.get_guid();
+			new_id = handle.get_id();
 		}
+
+		if (const auto former_id = mapped_or_nullptr(former_ids, id)) {
+			msg.changes.try_emplace(*former_id, new_id);
+		}
+	}
+
+	if (msg.changes.size() > 0) {
+		step.post_message(msg);
 	}
 
 	if (in.vars.freeze_secs > 0.f) {
@@ -584,7 +623,8 @@ bomb_mode::round_transferred_players bomb_mode::make_transferred_players(const i
 						eq.id_to_container_idx.try_emplace(typed_item.get_id(), new_idx);
 					}
 
-					items.push_back({ flavour_id, charges, container_index, slot.get_type() });
+					const auto source_entity_id = typed_item.get_id();
+					items.push_back({ flavour_id, charges, container_index, slot.get_type(), source_entity_id });
 
 					return recursive_callback_result::CONTINUE_AND_RECURSE;
 				}
@@ -975,7 +1015,7 @@ void bomb_mode::respawn_the_dead(const input_type in, const logic_step step, con
 			sentience.when_knocked_out
 		)) {
 			teleport_to_next_spawn(in, typed_handle);
-			init_spawned(in, typed_handle, step, nullptr);
+			init_spawned(in, typed_handle, step, std::nullopt);
 
 			sentience.when_knocked_out = {};
 		}

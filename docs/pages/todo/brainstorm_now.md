@@ -6,6 +6,23 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- After round restart,
+	- Propagate movement flags!
+	- Propagate all owned items
+		- Keeping GUI buttons intact
+			- messages::changed_identities
+				- A generalization. Might later be used for other things.
+					- In this case, a map of items to new items
+		- Actually transfering the items to the new cosmos
+			- **Chosen Solution #2**: Serialize inventory tree and rewrite.
+				- Pro: Most performant.
+				- Pro: separation of concerns?
+				- Maybe even less error prone.
+				- Later might be handy to iterate through the already generated tree.
+	- Different strategy for restarting?
+		- Just reset transforms of all players
+		- Set them to full
+
 - Send a notification to the game gui about the change in entity ids of hotbar-assigned items
 
 - Revival and undoing the knockouts
@@ -27,23 +44,6 @@ summary: That which we are brainstorming at the moment.
 
 - add a match-global rng seed offset to mode state
 
-- After round restart,
-	- Propagate movement flags!
-	- Propagate all owned items
-		- Keeping GUI buttons intact
-			- messages::refresh_gui
-				- map of items to new items
-					- new_identities
-			- posted by 
-		- Actually transfering the items to the new cosmos
-			- **Chosen Solution #2**: Serialize inventory tree and rewrite.
-				- Pro: Most performant.
-				- Pro: separation of concerns?
-				- Maybe even less error prone.
-				- Later might be handy to iterate through the already generated tree.
-	- Different strategy for restarting?
-		- Just reset transforms of all players
-		- Set them to full
 
 - GUI required by modes
 	- Arena GUI

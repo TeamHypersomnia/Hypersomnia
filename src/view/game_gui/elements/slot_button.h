@@ -9,9 +9,9 @@
 #include "augs/pad_bytes.h"
 
 struct slot_button : game_gui_rect_node {
-	typedef dereferenced_location<slot_button_in_container> this_in_container;
-	typedef const_dereferenced_location<slot_button_in_container> const_this_in_container;
-	typedef game_gui_rect_node::gui_entropy gui_entropy;
+	using this_in_container = dereferenced_location<slot_button_in_container>;
+	using const_this_in_container = const_dereferenced_location<slot_button_in_container>;
+	using gui_entropy = game_gui_rect_node::gui_entropy;
 
 	vec2i user_drag_offset;
 
