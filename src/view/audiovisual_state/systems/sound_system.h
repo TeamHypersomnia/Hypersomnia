@@ -30,6 +30,7 @@ class sound_system {
 		const interpolation_system& interp;
 		const character_camera& ear;
 		const augs::delta dt;
+		const double speed_multiplier;
 
 		const_entity_handle get_listener() const;
 		std::optional<transformr> find_transform(const absolute_or_local&) const;

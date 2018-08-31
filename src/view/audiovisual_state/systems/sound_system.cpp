@@ -231,7 +231,7 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 		}
 	}
 
-	source.set_pitch(m.pitch);
+	source.set_pitch(m.pitch * in.speed_multiplier);
 	source.set_gain(g_mult * m.gain * in.settings.sound_effects);
 	source.set_max_distance(si, std::max(0.f, m.max_distance));
 	source.set_reference_distance(si, std::max(0.f, m.reference_distance));

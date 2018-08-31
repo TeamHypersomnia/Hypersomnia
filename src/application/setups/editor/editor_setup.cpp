@@ -1050,6 +1050,7 @@ bool editor_setup::handle_input_before_game(
 			case key::NUMPAD0: player().speed = 1.0; return true;
 			case key::NUMPAD1: player().speed = 0.01; return true;
 			case key::NUMPAD2: player().speed = 0.05; return true;
+			case key::NUMPAD3: player().speed = 0.1; return true;
 			default: break;
 		}
 	}

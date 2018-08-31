@@ -117,7 +117,8 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 				input.sounds,
 				interp,
 				ear,
-				dt
+				dt,
+				input.speed_multiplier
 			}
 		);
 	}
@@ -209,7 +210,8 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 				input.sounds, 
 				interp, 
 				ear,
-				augs::delta::zero
+				augs::delta::zero,
+				1.0
 			}
 		);
 	}

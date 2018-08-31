@@ -690,7 +690,7 @@ int work(const int argc, const char* const * const argv) try {
 			game_gui = {};//clear_dead_entities(*now_sampled);
 
 			last_sampled_cosmos = now_sampled;
-			audiovisual_step(augs::delta::zero, 0.0, viewing_config);
+			audiovisual_step(augs::delta::zero, setup.get_audiovisual_speed(), viewing_config);
 		}
 
 		setup.control(new_game_entropy);
@@ -707,7 +707,7 @@ int work(const int argc, const char* const * const argv) try {
 			setup_pre_solve,
 			[&](const const_logic_step step) {
 				_setup_post_solve(step, viewing_config);
-				_audiovisual_step(augs::delta::zero, 0.0, viewing_config);
+				_audiovisual_step(augs::delta::zero, setup.get_audiovisual_speed(), viewing_config);
 			},
 			setup_post_cleanup
 		);

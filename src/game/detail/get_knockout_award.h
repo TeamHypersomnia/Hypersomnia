@@ -19,10 +19,8 @@ const adversarial_meta* find_adversarial_meta(const E& from) {
 template <class F>
 auto get_knockout_award(const F& flavour) {
 	if (const auto* adversarial = find_adversarial_meta(flavour)) {
-		LOG_NVPS(adversarial->knockout_award);
 		return adversarial->knockout_award;
 	}
-	LOG("ZERO");
 
 	return static_cast<money_type>(0);
 }
