@@ -21,6 +21,7 @@ W kolejności:
 - Poprawki do gameplayu
 	- Defuser kit
 	- Jakakolwiek forma przeładowywania broni
+	- Automatyczne załadowywanie pocisku do komory gdy jedna ręka trzyma niezaładowaną broń a druga jest pusta
 - Edytor
     - Wskrzeszenie odtwarzania rozgrywki do testów determinizmu (będzie konieczne do networkingu)
 	- Specyfikowanie offsetów wypadania łusek per-obrazek
@@ -56,7 +57,7 @@ W kolejności:
 
 - Ścieżki
 
-## Roadmap (zrobione)
+## Roadmap (odfajkowane)
 
 - Dekoracje
     - Animacje na scenie

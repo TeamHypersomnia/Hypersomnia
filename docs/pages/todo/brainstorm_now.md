@@ -6,26 +6,24 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Halftime
-- Knockouts should be counted instantly, just cancel them when the player is revived
-	- For killing a knocked out player, there is only an assist without killer - which is only +1 point
-		- E.g. (+ Pythagoras) m4a1 Shuncio
-	- So at most, one can get a single KO and an assist for a player
-		- Actually don't count it as an assist if you knocked it out earlier
-			- So how do we display it?
-		- In total, a killed player can give away a single ko and two assists
+- Send a notification to the game gui about the change in entity ids of hotbar-assigned items
+
+- Revival and undoing the knockouts
+
+- Reloading
+	- Essential to gameplay, really, so best to do it early
+	- Do we implement entire mounting system? Maybe it won't be so hard after all
+	- Also, cocking the gun
+		- Should have a separate sound in gun invariant
+		- Should always happen automatically when one hand is free and the other holds the gun
+			- Is an exception to the rule of mounting that both items need to be in hand
+			- For now, can play the shooting animation for cocking
 
 - Dashing
 	- Assigned to space, since we don't have jumping anyway
 	- pure color highlight system could be used to add highlight the dashing entity
 	- Gradually increase walking force over time
 	- The more the speed during dash, the stronger the dash
-
-- $illicoins
-
-- Send a notification to the game gui about the change in entity ids of hotbar-assigned items
-
-- Commandize "Add player" and "Restart" in editor
 
 - add a match-global rng seed offset to mode state
 
@@ -165,7 +163,6 @@ summary: That which we are brainstorming at the moment.
 
 - "I" in editor invokes initialization routine of the chosen game mode
 	- Just starts advancing it from the beginning.
-
 
 - team & ffa matches should get different logic altogether
 

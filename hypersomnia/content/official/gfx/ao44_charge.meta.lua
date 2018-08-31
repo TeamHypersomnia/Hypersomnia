@@ -3,7 +3,11 @@ return {
     enabled_generate_neon_map = {
       alpha_multiplier = 1,
       amplification = 80,
-      light_colors = {},
+      light_colors = {
+        "238 195 154 255",
+        "255 0 21 255",
+        "206 104 35 255"
+      },
       radius = {
         x = 80,
         y = 80

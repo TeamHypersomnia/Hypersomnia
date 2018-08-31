@@ -1299,3 +1299,10 @@ we consider whole type overrides too complex architeciturally:
 - There will ALWAYS be some game mode whenever a game is running
 	- E.g. test scene mode
 
+- Knockouts should be counted instantly, just cancel them when the player is revived
+	- For killing a knocked out player, there is only an assist without killer - which is only +1 point
+		- E.g. (+ Pythagoras) m4a1 Shuncio
+	- So at most, one can get a single KO and an assist for a player
+		- Actually don't count it as an assist if you knocked it out earlier
+			- So how do we display it?
+		- In total, a killed player can give away a single ko and two assists

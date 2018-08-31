@@ -4,6 +4,9 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Commandize "Add player" and "Restart" in editor
+- Halftime and round limit
+
 - add a slider for vec2 and use it in settings gui
 
 - Use constexpr max_element in msvc if it works
