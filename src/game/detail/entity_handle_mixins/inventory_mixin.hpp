@@ -128,14 +128,14 @@ hand_action inventory_mixin<E>::calc_hand_action(const std::size_t requested_ind
 	}
 	else if (in_primary.alive()) {
 		return {
-			requested_index,
+			0u,
 			in_primary.get_id(),
 			requested_index == 1
 		};
 	}
 	else if (in_secondary.alive()) {
 		return {
-			requested_index,
+			1u,
 			in_secondary.get_id(),
 			requested_index == 1
 		};

@@ -16,7 +16,6 @@ W kolejności:
 		- Strzałka z napisem "Winner!" na koniec
 	- GUI: Buy menu
 	- GUI: Wybór drużyny
-	- Ikonki obok nicka w scoreboardzie (def, paka, dead)
 - Poprawki do gameplayu
 	- Jakakolwiek forma przeładowywania broni
 	- Automatyczne załadowywanie pocisku do komory gdy jedna ręka trzyma niezaładowaną broń a druga jest pusta
@@ -57,6 +56,7 @@ W kolejności:
 
 ## Roadmap (odfajkowane)
 
+- Ikonki obok nicka w scoreboardzie (def, paka, dead)
 - Defuser kit
 - Fix: Transfer przypisanych itemów do GUI w hotbarze, przy starcie nowej rundy
 - Dekoracje

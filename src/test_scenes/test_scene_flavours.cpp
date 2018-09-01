@@ -262,6 +262,9 @@ namespace test_flavours {
 			item.space_occupied_per_charge = to_space_units("80000");
 			item.categories_for_slot_compatibility = { item_category::GENERAL, item_category::BELT_WEARABLE };
 
+			meta.template get<invariants::fixtures>().density /= 10.f;
+			meta.template get<invariants::fixtures>().restitution = 0.7f;
+
 			meta.set(item);
 		}
 	}
