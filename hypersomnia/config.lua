@@ -287,6 +287,7 @@ return {
 	},
 
     scoreboard_settings = {
+	  dark_color_overlay_under_score = true,
       background_color = "15 15 15 200",
       bg_lumi_mult = 0.69999998807907104,
       border_color = "109 109 127 100",
