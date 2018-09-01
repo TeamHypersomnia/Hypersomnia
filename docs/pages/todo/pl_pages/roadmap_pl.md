@@ -18,7 +18,6 @@ W kolejności:
 	- GUI: Wybór drużyny
 	- Ikonki obok nicka w scoreboardzie (def, paka, dead)
 - Poprawki do gameplayu
-	- Defuser kit
 	- Jakakolwiek forma przeładowywania broni
 	- Automatyczne załadowywanie pocisku do komory gdy jedna ręka trzyma niezaładowaną broń a druga jest pusta
 - Edytor
@@ -58,6 +57,7 @@ W kolejności:
 
 ## Roadmap (odfajkowane)
 
+- Defuser kit
 - Fix: Transfer przypisanych itemów do GUI w hotbarze, przy starcie nowej rundy
 - Dekoracje
     - Animacje na scenie

@@ -240,6 +240,7 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 						case slot_function::PRIMARY_HAND: drop.hint_text += "Wield"; break;
 						case slot_function::SECONDARY_HAND: drop.hint_text += "Wield"; break;
 						case slot_function::GUN_MUZZLE: drop.hint_text += "Install"; break;
+						case slot_function::BELT: drop.hint_text += "Wear"; break;
 						default: drop.hint_text += "Unknown slot"; break;
 						}
 

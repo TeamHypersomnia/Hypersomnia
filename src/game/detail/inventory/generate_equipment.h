@@ -54,4 +54,10 @@ void generate_equipment(const requested_equipment& eq, const E& character, const
 
 		transfer(b, character[slot_function::SHOULDER]);
 	}
+
+	if (eq.belt_wearable.is_set()) {
+		const auto b = just_create_entity(cosm, eq.belt_wearable);
+
+		transfer(b, character[slot_function::BELT]);
+	}
 }

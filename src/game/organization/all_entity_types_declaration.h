@@ -21,6 +21,7 @@ struct particles_decoration;
 struct point_marker;
 struct box_marker;
 struct explosion_body;
+struct tool_item;
 
 using all_entity_types = type_list<
 	controlled_character,
@@ -41,7 +42,8 @@ using all_entity_types = type_list<
 	particles_decoration,
 	point_marker,
 	box_marker,
-	explosion_body
+	explosion_body,
+	tool_item
 >;
 
 using entity_type_id = type_in_list_id<all_entity_types>;

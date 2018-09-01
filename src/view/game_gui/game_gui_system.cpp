@@ -413,6 +413,10 @@ bool should_fill_hotbar_from_right(const E& handle) {
 		}
 	}
 
+	if (item.categories_for_slot_compatibility.test(item_category::BELT_WEARABLE)) {
+		return true;
+	}
+
 	return false;
 }
 

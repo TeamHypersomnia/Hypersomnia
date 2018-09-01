@@ -83,6 +83,10 @@ void slot_button::draw(
 			draw_icon(necessary_image_id::SHOULDER_SLOT_ICON);
 		}
 
+		if (slot_type == slot_function::BELT) {
+			draw_icon(necessary_image_id::BELT_SLOT_ICON);
+		}
+
 		if (slot_type == slot_function::TORSO_ARMOR) {
 			draw_icon(necessary_image_id::ARMOR_SLOT_ICON);
 		}

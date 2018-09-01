@@ -25,6 +25,7 @@ struct gun_offsets {
 	// GEN INTROSPECTOR struct gun_offsets
 	vec2i bullet_spawn;
 	transformi detachable_magazine;
+	transformi shell_spawn;
 	// END GEN INTROSPECTOR
 };
 

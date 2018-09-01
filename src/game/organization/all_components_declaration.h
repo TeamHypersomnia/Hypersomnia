@@ -46,6 +46,7 @@ namespace invariants {
 	struct point_marker;
 	struct box_marker;
 	struct cascade_explosion;
+	struct tool;
 }
 
 namespace components {
@@ -193,7 +194,8 @@ using invariant_list_t = List<
 	invariants::continuous_particles,
 	invariants::point_marker,
 	invariants::box_marker,
-	invariants::cascade_explosion
+	invariants::cascade_explosion,
+	invariants::tool
 >;
 
 template <class... Types>

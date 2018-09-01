@@ -7,5 +7,6 @@ struct requested_equipment {
 	entity_flavour_id magazine;
 	entity_flavour_id charge;
 	entity_flavour_id backpack;
+	entity_flavour_id belt_wearable;
 	// END GEN INTROSPECTOR
 };

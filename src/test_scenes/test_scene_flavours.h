@@ -250,6 +250,14 @@ enum class test_explosion_bodies {
 	// END GEN INTROSPECTOR
 };
 
+enum class test_tool_items {
+	// GEN INTROSPECTOR enum class test_tool_items
+	DEFUSE_KIT,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
 using test_flavours_map = type_map<
 	type_pair<test_controlled_characters, controlled_character>,
 	type_pair<test_plain_sprited_bodys, plain_sprited_body>,
@@ -269,7 +277,8 @@ using test_flavours_map = type_map<
 	type_pair<test_particles_decorations, particles_decoration>,
 	type_pair<test_point_markers, point_marker>,
 	type_pair<test_box_markers, box_marker>,
-	type_pair<test_explosion_bodies, explosion_body>
+	type_pair<test_explosion_bodies, explosion_body>,
+	type_pair<test_tool_items, tool_item>
 >;
 
 #if TODO

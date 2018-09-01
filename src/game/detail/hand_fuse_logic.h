@@ -299,11 +299,17 @@ struct fuse_logic_provider {
 
 						real32 defusing_speed_mult = 1.f;
 
+						if (const auto maybe_defuser = character_now_defusing[slot_function::BELT].get_item_if_any()) {
+							if (const auto tool = maybe_defuser.template find<invariants::tool>()) {
+								defusing_speed_mult *= tool->defusing_speed_mult;
+							}
+						}
+
 						if (n == 2) {
-							defusing_speed_mult = 0.5f;
+							defusing_speed_mult *= 0.5f;
 						}
 						else if (n == 0) {
-							defusing_speed_mult = 2.f;
+							defusing_speed_mult *= 2.f;
 						}
 
 						fuse.amount_defused += defusing_speed_mult * clk.dt.in_milliseconds();

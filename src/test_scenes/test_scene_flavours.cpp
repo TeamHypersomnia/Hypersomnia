@@ -6,6 +6,7 @@
 
 #include "augs/templates/enum_introspect.h"
 #include "augs/string/format_enum.h"
+#include "game/detail/inventory/inventory_utils.h"
 
 void populate_test_scene_flavours(const populate_flavours_input in) {
 	test_flavours::populate_grenade_flavours(in);
@@ -246,6 +247,22 @@ namespace test_flavours {
 			marker.type = area_marker_type::BOMBSITE_B;
 			marker.meta.associated_faction = faction_type::RESISTANCE;
 			meta.set(marker);
+		}
+
+		{
+			auto& meta = flavour_with_sprite(
+				test_tool_items::DEFUSE_KIT,
+				test_scene_image_id::DEFUSE_KIT,
+				render_layer::SMALL_DYNAMIC_BODY
+			);
+
+			test_flavours::add_lying_item_dynamic_body(meta);
+
+			invariants::item item;
+			item.space_occupied_per_charge = to_space_units("80000");
+			item.categories_for_slot_compatibility = { item_category::GENERAL, item_category::BELT_WEARABLE };
+
+			meta.set(item);
 		}
 	}
 }

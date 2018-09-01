@@ -308,40 +308,48 @@ FORCE_INLINE void specific_entity_drawer(
 					}
 				}
 
-				/* Draw heavy items first. */
+				/* Draw items under the sentience first. */
 
 				std::optional<entity_id> drawn_heavy_item;
 
-				if (stance_id == item_holding_stance::HEAVY_LIKE) {
-					const auto heavy_item = cosm[wielded_items[0]];
+				typed_handle.for_each_attachment_recursive(
+					[&](
+						const auto attachment_entity,
+						const auto attachment_offset
+					) {
+						auto draw_now = [&]() {
+							attachment_entity.template dispatch_on_having_all<invariants::item>(
+								[&](const auto typed_attachment_handle) {
+									detail_specific_entity_drawer(
+										typed_attachment_handle,
+										in,
+										render_visitor,
+										viewing_transform * attachment_offset
+									);
+								}
+							);
+						};
 
-					typed_handle.for_each_attachment_recursive(
-						[&](
-							const auto attachment_entity,
-							const auto attachment_offset
-						) {
+						if (stance_id == item_holding_stance::HEAVY_LIKE) {
+							const auto heavy_item = cosm[wielded_items[0]];
+
 							if (heavy_item.get_id() == attachment_entity.get_id()) {
-								attachment_entity.template dispatch_on_having_all<invariants::item>(
-									[&](const auto typed_attachment_handle) {
-										detail_specific_entity_drawer(
-											typed_attachment_handle,
-											in,
-											render_visitor,
-											viewing_transform * attachment_offset
-										);
-									}
-								);
-
+								draw_now();
 								drawn_heavy_item = heavy_item.get_id();
 								return;
 							}
-						},
-						[stance_offsets]() {
-							return stance_offsets;
-						},
-						attachment_offset_settings::for_rendering()
-					);
-				}
+						}
+
+						if (attachment_entity.get_current_slot().get_type() == slot_function::BELT) {
+							draw_now();
+							return;
+						}
+					},
+					[stance_offsets]() {
+						return stance_offsets;
+					},
+					attachment_offset_settings::for_rendering()
+				);
 
 				const bool only_secondary = typed_handle.only_secondary_holds_item();
 
@@ -363,6 +371,10 @@ FORCE_INLINE void specific_entity_drawer(
 						const auto attachment_offset
 					) {
 						if (drawn_heavy_item != std::nullopt && drawn_heavy_item.value() == attachment_entity.get_id()) {
+							return;
+						}
+
+						if (attachment_entity.get_current_slot().get_type() == slot_function::BELT) {
 							return;
 						}
 

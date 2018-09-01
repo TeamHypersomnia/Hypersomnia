@@ -63,6 +63,8 @@ namespace test_scenes {
 		metropolis.initial_eq.magazine = to_entity_flavour_id(test_container_items::SAMPLE_MAGAZINE);
 		metropolis.initial_eq.charge = to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE);
 
+		metropolis.initial_eq.belt_wearable = to_entity_flavour_id(test_tool_items::DEFUSE_KIT);
+
 		{
 			auto& mt = vars.event_sounds[faction_type::METROPOLIS];
 

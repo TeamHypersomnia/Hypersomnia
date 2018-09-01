@@ -428,3 +428,29 @@ struct explosion_body {
 		components::interpolation
 	>;
 };
+
+struct tool_item {
+	static constexpr std::size_t statically_allocated_entities = 1500;
+	static constexpr std::size_t statically_allocated_flavours = 150;
+
+	using invariants = type_list<
+		invariants::sprite,
+		invariants::animation,
+		invariants::item,
+		invariants::render,
+		invariants::rigid_body,
+		invariants::fixtures,
+		invariants::tool,
+
+		invariants::interpolation
+	>;
+
+	using components = type_list<
+		components::animation,
+		components::rigid_body,
+		components::item,
+		components::sender,
+
+		components::interpolation
+	>;
+};

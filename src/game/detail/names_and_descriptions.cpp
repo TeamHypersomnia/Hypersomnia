@@ -20,6 +20,9 @@ entity_name_str get_bbcoded_item_categories(const item_category_flagset& flags) 
 	if (flags.test(item_category::SHOULDER_WEARABLE)) {
 		result += "Shoulder container, ";
 	}
+	if (flags.test(item_category::BELT_WEARABLE)) {
+		result += "Belt wearable, ";
+	}
 	if (flags.test(item_category::TORSO_ARMOR)) {
 		result += "Torso armor, ";
 	}
@@ -72,6 +75,10 @@ entity_name_str get_bbcoded_slot_function_name(const slot_function f) {
 		return{
 			"Shoulder",
 		};
+	case slot_function::BELT:
+		return{
+			"Belt",
+		};
 	default: return{ "Unknown" };
 	}
 }
@@ -112,7 +119,11 @@ entity_name_str get_bbcoded_slot_function_description(const slot_function f) {
 		};
 	case slot_function::SHOULDER:
 		return{
-			"For backpacks or items with belts."
+			"For backpacks."
+		};
+	case slot_function::BELT:
+		return{
+			"For defuser kits and other belt-wearables."
 		};
 	default: return{ "Unknown" };
 	}

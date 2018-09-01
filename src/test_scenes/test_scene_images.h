@@ -190,6 +190,8 @@ enum class test_scene_image_id {
 	RESISTANCE_SQUARE_LOGO,
 	ATLANTIS_LOGO,
 
+	DEFUSE_KIT,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

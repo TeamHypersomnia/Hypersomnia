@@ -98,6 +98,11 @@ transformr direct_attachment_offset(
 		anchor = anchors.back_anchor;
 		break;
 
+		case slot_function::BELT: 
+		attachment_offset = get_actual_offsets_by_torso().back;
+		anchor = anchors.back_anchor;
+		break;
+
 		case slot_function::GUN_DETACHABLE_MAGAZINE: 
 		attachment_offset = get_offsets_by_gun().detachable_magazine;
 		anchor = anchors.attachment_anchor;
