@@ -203,6 +203,8 @@ void settings_gui_state::perform(
 						revertable_slider(SCOPE_CFG_NVP(dead_player_text_lumi_mult), 0.f, 1.f);
 
 						revertable_slider(SCOPE_CFG_NVP(text_stroke_lumi_mult), 0.f, 1.f);
+						revertable_slider(SCOPE_CFG_NVP(faction_logo_alpha_mult), 0.f, 1.f);
+						revertable_checkbox(SCOPE_CFG_NVP(dark_color_overlay_under_score));
 					}
 
 					auto& scope_cfg = config.arena_mode_gui;

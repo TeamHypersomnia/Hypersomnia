@@ -238,7 +238,6 @@ void arena_scoreboard_gui::draw_gui(
 		orig.t += pen.y;
 		orig.r += pen.x;
 		orig.b += pen.y;
-		col.a *= cfg.elements_alpha;
 
 		o.base::aabb(img, orig, col);
 	};
@@ -270,7 +269,9 @@ void arena_scoreboard_gui::draw_gui(
 			const auto bg_height = cell_h * 3;
 			const auto faction_bg_orig = ltrbi(vec2i::zero, vec2i(sz.x, bg_height));
 
-			aabb(faction_bg_orig, bg_dark);
+			if (cfg.dark_color_overlay_under_score) {
+				aabb(faction_bg_orig, bg_dark);
+			}
 
 			auto prev_pen_x = pen.x;
 

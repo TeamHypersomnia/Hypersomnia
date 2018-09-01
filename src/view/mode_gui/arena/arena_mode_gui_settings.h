@@ -23,6 +23,7 @@ struct scoreboard_gui_settings {
 	float dead_player_text_alpha_mult = 0.8f;
 
 	float faction_logo_alpha_mult = 0.8f;
+	bool dark_color_overlay_under_score = false;
 	// END GEN INTROSPECTOR
 };
 
