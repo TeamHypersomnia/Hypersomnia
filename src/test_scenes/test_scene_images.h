@@ -192,6 +192,12 @@ enum class test_scene_image_id {
 
 	DEFUSE_KIT,
 
+	BOMB_ICON,
+	DEATH_ICON,
+	DEFUSE_KIT_ICON,
+	NO_AMMO_ICON,
+	UNCONSCIOUS_ICON,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

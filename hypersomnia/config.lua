@@ -297,8 +297,8 @@ return {
       dead_player_bg_lumi_mult = 0.5,
       dead_player_text_alpha_mult = 0.60000002384185791,
       dead_player_text_lumi_mult = 0.80000001192092896,
-      elements_alpha = 0.56000000238418579,
-      faction_logo_alpha_mult = 0.80000001192092896,
+      cell_bg_alpha = 0.56000000238418579,
+      faction_logo_alpha = 0.80000001192092896,
       player_row_inner_padding = {
         x = 4,
         y = 4

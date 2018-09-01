@@ -6,7 +6,7 @@ struct scoreboard_gui_settings {
 	vec2i window_padding = vec2i(4, 8);
 	rgba background_color;
 	rgba border_color;
-	float elements_alpha = 0.8f;
+	float cell_bg_alpha = 0.8f;
 
 	float bg_lumi_mult = 0.5f;
 	float text_lumi_mult = 1.f;
@@ -22,7 +22,8 @@ struct scoreboard_gui_settings {
 	float dead_player_bg_alpha_mult = 0.3f;
 	float dead_player_text_alpha_mult = 0.8f;
 
-	float faction_logo_alpha_mult = 0.8f;
+	float faction_logo_alpha = 0.8f;
+	float icon_alpha = 0.8f;
 	bool dark_color_overlay_under_score = false;
 	// END GEN INTROSPECTOR
 };

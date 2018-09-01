@@ -97,6 +97,7 @@ namespace components {
 
 		bool is_conscious() const;
 		bool unconscious_but_alive() const;
+		bool is_dead() const;
 
 		template <class T>
 		auto& get() {

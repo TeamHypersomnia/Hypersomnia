@@ -27,12 +27,8 @@ struct bomb_mode_faction_vars {
 	// END GEN INTROSPECTOR
 };
 
-struct bomb_mode_vars {
-	// GEN INTROSPECTOR struct bomb_mode_vars
-	std::string name;
-	money_type initial_money = 800;
-	money_type maximum_money = 16000;
-
+struct bomb_mode_economy_vars {
+	// GEN INTROSPECTOR struct bomb_mode_economy_vars
 	money_type losing_faction_award = 1500;
 	money_type winning_faction_award = 3250;
 	money_type consecutive_loss_bonus = 500;
@@ -46,6 +42,14 @@ struct bomb_mode_vars {
 	money_type bomb_plant_award = 250;
 	money_type bomb_explosion_award = 350;
 	money_type bomb_defuse_award = 500;
+	// END GEN INTROSPECTOR
+};
+
+struct bomb_mode_vars {
+	// GEN INTROSPECTOR struct bomb_mode_vars
+	std::string name;
+	money_type initial_money = 800;
+	money_type maximum_money = 16000;
 
 	unsigned round_secs = 120;
 	unsigned round_end_secs = 5;
@@ -56,14 +60,11 @@ struct bomb_mode_vars {
 	meter_value_type minimal_damage_for_assist = 41;
 	per_faction_t<bomb_mode_faction_vars> factions;
 
-	per_faction_t<per_faction_t<assets::sound_id>> win_sounds;
-	per_faction_t<augs::enum_array<assets::sound_id, battle_event>> event_sounds;
-	
 	constrained_entity_flavour_id<invariants::explosive> bomb_flavour;
-
-	per_faction_t<assets::image_id> logos;
 	bool clear_dropped_items = false;
-	bool hide_money_of_opposing_factions = true;
+
+	bomb_mode_economy_vars economy;
+	arena_mode_view_vars view;
 	// END GEN INTROSPECTOR
 };
 

@@ -8,6 +8,7 @@
 #include "game/modes/mode_helpers.h"
 #include "view/viewables/images_in_atlas_map.h"
 #include "augs/string/format_enum.h"
+#include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 
 bool arena_scoreboard_gui::control(
 	const augs::event::state& common_input_state,
@@ -228,7 +229,7 @@ void arena_scoreboard_gui::draw_gui(
 		orig.t += pen.y;
 		orig.r += pen.x;
 		orig.b += pen.y;
-		col.a *= cfg.elements_alpha;
+		col.a *= cfg.cell_bg_alpha;
 
 		o.aabb(orig, col);
 	};
@@ -278,7 +279,7 @@ void arena_scoreboard_gui::draw_gui(
 			pen.x += cell_pad.x * 2;
 
 			if (sorted_players.size() > 0) {
-				if (const auto& head_image = mode_input.vars.logos[faction]; head_image.is_set()) {
+				if (const auto& head_image = mode_input.vars.view.logos[faction]; head_image.is_set()) {
 					if (const auto& entry = draw_in.images_in_atlas.at(head_image).diffuse; entry.exists()) {
 						const auto size = entry.get_original_size();
 						auto head_orig = ltrbi(vec2i::zero, size).place_in_center_of(faction_bg_orig);
@@ -295,7 +296,7 @@ void arena_scoreboard_gui::draw_gui(
 						/* 	head_orig.b = head_orig.t + size.y; */
 						/* } */
 
-						aabb_img(entry, head_orig, rgba(white).mult_alpha(cfg.faction_logo_alpha_mult));
+						aabb_img(entry, head_orig, rgba(white).mult_alpha(cfg.faction_logo_alpha));
 
 						pen.x += size.x + cell_pad.x * 2;
 					}
@@ -344,6 +345,14 @@ void arena_scoreboard_gui::draw_gui(
 
 			const auto player_handle = cosm[player_data.guid];
 			const auto is_conscious = player_handle.alive() && player_handle.template get<components::sentience>().is_conscious();
+
+			const auto local_player_faction = [&]() {
+				if (const auto p = typed_mode.find(draw_in.local_player)) {
+					return p->faction;
+				}
+
+				return faction_type::SPECTATOR;
+			}();
 
 			const auto faction_bg_col = [&]() {
 				auto col = colors.standard;
@@ -421,23 +430,112 @@ void arena_scoreboard_gui::draw_gui(
 
 			col_text(ping_str);
 			next_col();
+
+			if (player_handle.alive()) {
+				using S = scoreboard_icon_type;
+				std::optional<S> icon;
+
+				auto set_if_more_important = [&](const auto new_icon) {
+					if (icon == std::nullopt) {
+						icon = new_icon;
+						return;
+					}
+					
+					using U = std::underlying_type_t<S>;
+					
+					if (static_cast<U>(new_icon) < static_cast<U>(*icon)) {
+						*icon = new_icon;
+					}
+				};
+
+				const auto& sentience = player_handle.template get<components::sentience>();
+
+				if (sentience.unconscious_but_alive()) {
+					set_if_more_important(S::UNCONSCIOUS_ICON);
+				}
+
+				if (sentience.is_dead()) {
+					set_if_more_important(S::DEATH_ICON);
+				}
+
+				player_handle.for_each_contained_item_recursive(
+					[&](const auto& typed_item) {
+						if (const auto tool = typed_item.template find<invariants::tool>()) {
+							if (tool->defusing_speed_mult > 1.f) {
+								set_if_more_important(S::DEFUSE_KIT_ICON);
+							}
+						}
+
+						if (const auto hand_fuse = typed_item.template find<invariants::hand_fuse>()) {
+							if (hand_fuse->is_like_plantable_bomb()) {
+								set_if_more_important(S::BOMB_ICON);
+							}
+						}
+					}
+				);
+
+				auto show_icon = [&]() {
+					if (icon != std::nullopt) {
+						const auto icon_image = mode_input.vars.view.icons.at(*icon);
+
+						if (const auto& entry = draw_in.images_in_atlas.at(icon_image).diffuse; entry.exists()) {
+							const auto size = entry.get_original_size();
+
+							const auto& c = *current_column;
+							const auto& cell_orig = ltrbi(c.l, 0, c.r, cell_h);
+
+							auto icon_orig = ltrbi(vec2i::zero, size);
+							icon_orig.place_in_center_of(cell_orig);
+
+							auto total_alpha = cfg.icon_alpha;
+								
+							if (!is_conscious) {
+								total_alpha *= cfg.dead_player_text_alpha_mult;
+							}
+
+							aabb_img(
+								entry,
+								icon_orig,
+								rgba(white).mult_alpha(total_alpha)
+							);
+						}
+					}
+				};
+
+				if (mode_input.vars.view.show_info_icons_of_opponents) {
+					show_icon();
+				}
+				else {
+					if (faction == local_player_faction) {
+						show_icon();
+					}
+					else {
+						if (
+							icon == scoreboard_icon_type::DEATH_ICON
+							|| icon == scoreboard_icon_type::UNCONSCIOUS_ICON
+						) {
+							show_icon();
+						}
+					}
+				}
+			}
+
 			next_col();
 			col_text(player_data.chosen_name);
 			next_col();
 
 			{
-				const auto local_player_faction = [&]() {
-					if (const auto p = typed_mode.find(draw_in.local_player)) {
-						return p->faction;
-					}
-
-					return faction_type::SPECTATOR;
-				}();
-
-				const bool hide_money = mode_input.vars.hide_money_of_opposing_factions && faction != local_player_faction;
-
-				if (!hide_money) {
+				auto do_money = [&]() {
 					col_text(typesafe_sprintf("%x$", stats.money));
+				};
+
+				if (mode_input.vars.view.show_money_of_opponents) {
+					do_money();
+				}
+				else {
+					if (faction == local_player_faction) {
+						do_money();
+					}
 				}
 			}
 

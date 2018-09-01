@@ -66,7 +66,7 @@ namespace test_scenes {
 		metropolis.initial_eq.belt_wearable = to_entity_flavour_id(test_tool_items::DEFUSE_KIT);
 
 		{
-			auto& mt = vars.event_sounds[faction_type::METROPOLIS];
+			auto& mt = vars.view.event_sounds[faction_type::METROPOLIS];
 
 			mt[battle_event::START] = to_sound_id(test_scene_sound_id::MT_START);
 			mt[battle_event::BOMB_PLANTED] = to_sound_id(test_scene_sound_id::MT_BOMB_PLANTED);
@@ -75,27 +75,35 @@ namespace test_scenes {
 		}
 
 		{
-			auto& re = vars.event_sounds[faction_type::RESISTANCE];
-			re = vars.event_sounds[faction_type::METROPOLIS];
+			auto& re = vars.view.event_sounds[faction_type::RESISTANCE];
+			re = vars.view.event_sounds[faction_type::METROPOLIS];
 		}
 
 		{
-			auto& mt = vars.win_sounds[faction_type::METROPOLIS];
+			auto& mt = vars.view.win_sounds[faction_type::METROPOLIS];
 
 			mt[faction_type::RESISTANCE] = to_sound_id(test_scene_sound_id::MT_RESISTANCE_WINS);
 			mt[faction_type::METROPOLIS] = to_sound_id(test_scene_sound_id::MT_METROPOLIS_WINS);
 		}
 
 		{
-			auto& re = vars.win_sounds[faction_type::RESISTANCE];
-			re = vars.win_sounds[faction_type::METROPOLIS];
+			auto& re = vars.view.win_sounds[faction_type::RESISTANCE];
+			re = vars.view.win_sounds[faction_type::METROPOLIS];
 		}
 
 		vars.bomb_flavour = to_entity_flavour_id(test_hand_explosives::BOMB);
 
-		vars.logos[faction_type::METROPOLIS] = to_image_id(test_scene_image_id::METROPOLIS_LOGO);
-		vars.logos[faction_type::ATLANTIS] = to_image_id(test_scene_image_id::ATLANTIS_LOGO);
-		vars.logos[faction_type::RESISTANCE] = to_image_id(test_scene_image_id::RESISTANCE_LOGO);
+		vars.view.logos[faction_type::METROPOLIS] = to_image_id(test_scene_image_id::METROPOLIS_LOGO);
+		vars.view.logos[faction_type::ATLANTIS] = to_image_id(test_scene_image_id::ATLANTIS_LOGO);
+		vars.view.logos[faction_type::RESISTANCE] = to_image_id(test_scene_image_id::RESISTANCE_LOGO);
+
+		{
+			vars.view.icons[scoreboard_icon_type::DEATH_ICON] = to_image_id(test_scene_image_id::DEATH_ICON);
+			vars.view.icons[scoreboard_icon_type::UNCONSCIOUS_ICON] = to_image_id(test_scene_image_id::UNCONSCIOUS_ICON);
+			vars.view.icons[scoreboard_icon_type::NO_AMMO_ICON] = to_image_id(test_scene_image_id::NO_AMMO_ICON);
+			vars.view.icons[scoreboard_icon_type::BOMB_ICON] = to_image_id(test_scene_image_id::BOMB_ICON);
+			vars.view.icons[scoreboard_icon_type::DEFUSE_KIT_ICON] = to_image_id(test_scene_image_id::DEFUSE_KIT_ICON);
+		}
 	}
 
 	void testbed::populate(const loaded_image_caches_map& caches, const logic_step step) const {

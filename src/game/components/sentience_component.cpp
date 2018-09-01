@@ -9,6 +9,10 @@ namespace components {
 		return get<health_meter_instance>().is_positive() && !get<consciousness_meter_instance>().is_positive();
 	}
 
+	bool sentience::is_dead() const {
+		return !get<health_meter_instance>().is_positive();
+	}
+
 	rgba sentience::calc_health_color(const float time_pulse_multiplier) const {
 		using namespace augs;
 		auto hr = get<health_meter_instance>().get_ratio();

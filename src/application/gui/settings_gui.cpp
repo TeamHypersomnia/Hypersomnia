@@ -186,7 +186,7 @@ void settings_gui_state::perform(
 						auto scope = scoped_indent();
 						auto& scope_cfg = config.arena_mode_gui.scoreboard_settings;
 
-						revertable_slider(SCOPE_CFG_NVP(elements_alpha), 0.f, 1.f);
+						revertable_slider(SCOPE_CFG_NVP(cell_bg_alpha), 0.f, 1.f);
 						
 						revertable_drag_vec2(SCOPE_CFG_NVP(player_row_inner_padding), 1.f, 0, 20);
 
@@ -203,7 +203,7 @@ void settings_gui_state::perform(
 						revertable_slider(SCOPE_CFG_NVP(dead_player_text_lumi_mult), 0.f, 1.f);
 
 						revertable_slider(SCOPE_CFG_NVP(text_stroke_lumi_mult), 0.f, 1.f);
-						revertable_slider(SCOPE_CFG_NVP(faction_logo_alpha_mult), 0.f, 1.f);
+						revertable_slider(SCOPE_CFG_NVP(faction_logo_alpha), 0.f, 1.f);
 						revertable_checkbox(SCOPE_CFG_NVP(dark_color_overlay_under_score));
 					}
 

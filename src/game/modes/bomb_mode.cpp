@@ -706,7 +706,7 @@ void bomb_mode::count_knockout(const input_type in, const arena_mode_knockout ko
 		else if (same_faction(ko.knockouter, ko.victim)) {
 			knockouts_dt = -1;
 			LOG("penalty");
-			post_award(in, ko.knockouter, in.vars.team_kill_penalty * -1);
+			post_award(in, ko.knockouter, in.vars.economy.team_kill_penalty * -1);
 		}
 
 		if (knockouts_dt > 0) {
@@ -764,20 +764,20 @@ void bomb_mode::make_win(const input_type in, const faction_type winner) {
 	auto& consecutive_losses = factions[loser].consecutive_losses;
 	++consecutive_losses;
 
-	auto winner_award = in.vars.winning_faction_award;
-	auto loser_award = in.vars.losing_faction_award;
+	auto winner_award = in.vars.economy.winning_faction_award;
+	auto loser_award = in.vars.economy.losing_faction_award;
 
 	if (consecutive_losses > 1) {
 		loser_award += std::min(
 			consecutive_losses - 1, 
-			in.vars.max_consecutive_loss_bonuses
-		) * in.vars.consecutive_loss_bonus;
+			in.vars.economy.max_consecutive_loss_bonuses
+		) * in.vars.economy.consecutive_loss_bonus;
 	}
 
 	if (loser == p.bombing) {
 		if (current_round.bomb_planter.is_set()) {
-			loser_award += in.vars.lost_but_bomb_planted_team_bonus;
-			winner_award += in.vars.defused_team_bonus;
+			loser_award += in.vars.economy.lost_but_bomb_planted_team_bonus;
+			winner_award += in.vars.economy.defused_team_bonus;
 		}
 	}
 	
@@ -804,7 +804,7 @@ void bomb_mode::play_win_sound(const input_type in, const const_logic_step step,
 	const auto p = calc_participating_factions(in);
 
 	p.for_each([&](const faction_type t) {
-		if (const auto sound_id = in.vars.win_sounds[t][winner]; sound_id.is_set()) {
+		if (const auto sound_id = in.vars.view.win_sounds[t][winner]; sound_id.is_set()) {
 			play_faction_sound(step, t, sound_id);
 		}
 	});
@@ -819,7 +819,7 @@ void bomb_mode::play_sound_for(const input_type in, const const_logic_step step,
 }
 
 void bomb_mode::play_faction_sound_for(const input_type in, const const_logic_step step, const battle_event event, const faction_type t) const {
-	if (const auto sound_id = in.vars.event_sounds[t][event]; sound_id.is_set()) {
+	if (const auto sound_id = in.vars.view.event_sounds[t][event]; sound_id.is_set()) {
 		play_faction_sound(step, t, sound_id);
 	}
 }
@@ -840,14 +840,14 @@ void bomb_mode::play_bomb_defused_sound(const input_type in, const const_logic_s
 		auto& effects = msg.payload.inputs;
 		effects.reserve(2);
 
-		if (const auto defused_id = in.vars.event_sounds[t][battle_event::BOMB_DEFUSED]; defused_id.is_set()) {
+		if (const auto defused_id = in.vars.view.event_sounds[t][battle_event::BOMB_DEFUSED]; defused_id.is_set()) {
 			sound_effect_input effect;
 			effect.id = defused_id;
 
 			effects.emplace_back(std::move(effect));
 		}
 
-		if (const auto win_id = in.vars.win_sounds[t][winner]; win_id.is_set()) {
+		if (const auto win_id = in.vars.view.win_sounds[t][winner]; win_id.is_set()) {
 			sound_effect_input effect;
 			effect.id = win_id;
 
@@ -873,7 +873,7 @@ void bomb_mode::process_win_conditions(const input_type in, const logic_step ste
 	if (bomb_exploded(in)) {
 		const auto planting_player = current_round.bomb_planter;
 		++players[planting_player].stats.bomb_explosions;
-		post_award(in, planting_player, in.vars.bomb_explosion_award);
+		post_award(in, planting_player, in.vars.economy.bomb_explosion_award);
 		standard_win(p.bombing);
 		return;
 	}
@@ -882,7 +882,7 @@ void bomb_mode::process_win_conditions(const input_type in, const logic_step ste
 		const auto winner = p.defusing;
 		const auto defusing_player = lookup(character_who_defused.get_guid());
 		++players[defusing_player].stats.bomb_defuses;
-		post_award(in, defusing_player, in.vars.bomb_defuse_award);
+		post_award(in, defusing_player, in.vars.economy.bomb_defuse_award);
 		make_win(in, winner);
 
 		play_bomb_defused_sound(in, step, winner);
@@ -995,7 +995,7 @@ void bomb_mode::mode_post_solve(const input_type in, const mode_entropy& entropy
 						planter = lookup(cosm[typed_bomb.template get<components::sender>().capability_of_sender].get_guid());
 						++players[planter].stats.bomb_plants;
 
-						post_award(in, planter, in.vars.bomb_plant_award);
+						post_award(in, planter, in.vars.economy.bomb_plant_award);
 					}
 				}
 			});
