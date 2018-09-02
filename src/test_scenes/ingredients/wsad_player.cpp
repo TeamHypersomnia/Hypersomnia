@@ -33,7 +33,7 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_controlled_characters::METROPOLIS_SOLDIER);
 
-			meta.get<invariants::text_details>().description = "Member of Atlantic nations.";
+			meta.get<invariants::text_details>().description = "Professional Metropolis Commando.";
 
 			{
 				invariants::render render_def;

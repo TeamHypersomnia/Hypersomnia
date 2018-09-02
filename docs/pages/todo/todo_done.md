@@ -1306,3 +1306,48 @@ we consider whole type overrides too complex architeciturally:
 		- Actually don't count it as an assist if you knocked it out earlier
 			- So how do we display it?
 		- In total, a killed player can give away a single ko and two assists
+
+- After round restart,
+	- Propagate movement flags!
+	- Propagate all owned items
+		- Keeping GUI buttons intact
+			- messages::changed_identities
+				- A generalization. Might later be used for other things.
+					- In this case, a map of items to new items
+		- Actually transfering the items to the new cosmos
+			- **Chosen Solution #2**: Serialize inventory tree and rewrite.
+				- Pro: Most performant.
+				- Pro: separation of concerns?
+				- Maybe even less error prone.
+				- Later might be handy to iterate through the already generated tree.
+	- Different strategy for restarting?
+		- Just reset transforms of all players
+		- Set them to full
+
+- Send a notification to the game gui about the change in entity ids of hotbar-assigned items
+
+- Modes aren't concerned with the currently viewed entity
+	- except test scene mode
+
+- Testbed should populate the test scene mode profile that it is passed
+
+- basic_team_mode
+	- round time
+	- number of rounds
+
+- Gameplay mode logic shall detect if a map has enough information to be played in a specific mode
+
+- special-purpose logic for markers vs entities
+	- it might anyway later come in handy to visualize rects and points
+	- so we might just as well reuse that logic for markers
+- a hotkey should toggle visibility of **game mode markers**
+- Editor maximum ease of access
+	- Fix problems with grouping on duplication?
+
+- Interoperation of cosmos logic and data defined in game mode properties
+
+- Starting a mode
+	- test mode
+		- does nothing, really
+	- bomb mode
+		- needs complete input with the initial solvable as well, so let's first implement this

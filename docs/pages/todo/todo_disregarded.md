@@ -259,3 +259,12 @@ summary: Just a hidden scratchpad.
 	- if constexpr has round time
 	- main would also have to know the arguments like initial cosmos
 		- so perhaps it would be better for a setup to interact with main, not the mode itself
+- Marker entities
+	- Special-purpose components:
+		- shape_aabb
+			- can be used by wandering pixels!
+				- and thus the editor will allow us to change reach easily
+		- shape_polygon can be used both for marking and for physical bodies
+	- separation between visible shapes and physical shapes is described elsewhere
+		- but the same logic would be used nevertheless
+
