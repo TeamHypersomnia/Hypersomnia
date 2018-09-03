@@ -56,7 +56,9 @@ struct arena_mode_view_vars {
 	// GEN INTROSPECTOR struct arena_mode_view_vars
 	per_faction_t<per_faction_t<assets::sound_id>> win_sounds;
 	per_faction_t<augs::enum_array<assets::sound_id, battle_event>> event_sounds;
+
 	per_faction_t<assets::image_id> logos;
+	per_faction_t<assets::image_id> square_logos;
 	bool show_money_of_opponents = false;
 	bool show_info_icons_of_opponents = false;
 

@@ -468,25 +468,21 @@ int work(const int argc, const char* const * const argv) try {
 		switch (intent) {
 			case T::CLEAR_DEBUG_LINES:
 				DEBUG_PERSISTENT_LINES.clear();
-				break;
+				return true;
 
 			case T::SWITCH_WEAPON_LASER: {
 				bool& f = config.drawing.draw_weapon_laser;
 				f = !f;
-				break;
+				return true;
 			}
 
 			case T::SWITCH_GAME_GUI_MODE: {
 				bool& f = game_gui_mode;
 				f = !f;
-				break;
+				return true;
 			}
 			
-			case T::SWITCH_CHARACTER: {
-
-			}
-
-			default: break;
+			default: return false;
 		}
 	};
 
@@ -951,7 +947,7 @@ int work(const int argc, const char* const * const argv) try {
 						if constexpr(std::is_same_v<T, editor_setup>) {
 							/* Editor needs more goods */
 							setup.perform_custom_imgui(
-								_lua, _window, streaming.images_in_atlas
+								_lua, _window, streaming.images_in_atlas, config
 							);
 						}
 						else {
@@ -1158,8 +1154,10 @@ int work(const int argc, const char* const * const argv) try {
 							if (!streaming.necessary_images_in_atlas.empty()) {
 								/* Viewables reloading happens later so it might not be ready yet */
 
+								const auto& app_ingame_controls = viewing_config.app_ingame_controls;
+
 								return setup.handle_input_before_game(
-									streaming.necessary_images_in_atlas, _common_input_state, e, _window
+									app_ingame_controls, streaming.necessary_images_in_atlas, _common_input_state, e, _window
 								);
 							}
 						}
@@ -1182,8 +1180,9 @@ int work(const int argc, const char* const * const argv) try {
 						if (was_released || direct_gameplay || game_gui_effective) {
 							if (const auto it = mapped_or_nullptr(viewing_config.app_ingame_controls, key)) {
 								if (was_pressed) {
-									handle_app_ingame_intent(*it);
-									continue;
+									if (handle_app_ingame_intent(*it)) {
+										continue;
+									}
 								}
 							}
 							if (const auto it = mapped_or_nullptr(viewing_config.game_gui_controls, key)) {

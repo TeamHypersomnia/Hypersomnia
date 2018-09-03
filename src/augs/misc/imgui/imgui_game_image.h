@@ -3,23 +3,26 @@
 
 #include "augs/graphics/imgui_payload.h"
 #include "augs/texture_atlas/atlas_entry.h"
+#include "augs/graphics/rgba.h"
 
 namespace augs {
 	namespace imgui {
 		template <class T>
-		void invisible_button(const std::string& id, const T& size) {
-			ImGui::InvisibleButton(id.c_str(), static_cast<ImVec2>(size));
+		bool invisible_button(const std::string& id, const T& size) {
+			return ImGui::InvisibleButton(id.c_str(), static_cast<ImVec2>(size));
 		}
 
 		template <class T>
-		void invisible_button_reset_cursor(const std::string& id, const T& size) {
+		bool invisible_button_reset_cursor(const std::string& id, const T& size) {
 			const auto local_pos = ImGui::GetCursorPos();
-			invisible_button(id, size);
+			const auto result = invisible_button(id, size);
 			ImGui::SetCursorPos(local_pos);
+
+			return result;
 		}
 
 		template <class T>
-		void game_image(const augs::atlas_entry& entry, const T& size, const vec2 offset = vec2::zero) {
+		void game_image(const augs::atlas_entry& entry, const T& size, const rgba col = white, const vec2 offset = vec2::zero) {
 			const auto imsize = static_cast<ImVec2>(size);
 
 			std::array<vec2, 4> texcoords = {
@@ -45,18 +48,50 @@ namespace augs {
 				static_cast<ImVec2>(texcoords[0]),
 				static_cast<ImVec2>(texcoords[1]),
 				static_cast<ImVec2>(texcoords[2]),
-				static_cast<ImVec2>(texcoords[3])
+				static_cast<ImVec2>(texcoords[3]),
+				ImGui::ColorConvertFloat4ToU32(col.operator ImVec4())
 			);
 		}
 
+		struct colors_nha {
+			rgba normal = white;
+			rgba hovered = white;
+			rgba active = white;
+
+			static auto all_white() {
+				return colors_nha { white, white, white };
+			}
+
+			static auto standard() {
+				return colors_nha { rgba(255, 255, 255, 220), rgba(255, 255, 255, 240), rgba(255, 255, 255, 255) };
+			}
+		};
+
 		template <class T>
-		inline auto game_image_button(const std::string& id, const augs::atlas_entry& entry, const T& size) {
-			invisible_button_reset_cursor(id, size);
-			game_image(entry, size);
+		inline bool game_image_button(const std::string& id, const augs::atlas_entry& entry, const T& size, const colors_nha cols = colors_nha{}) {
+			const auto local_pos = ImGui::GetCursorPos();
+			const auto result = invisible_button(id, size);
+			const auto after_pos = ImGui::GetCursorPos();
+
+			rgba target_color = cols.normal;
+
+			if (ImGui::IsItemHovered()) {
+				target_color = cols.hovered;
+			}
+
+			if (ImGui::IsItemActive()) {
+				target_color = cols.active;
+			}
+
+			ImGui::SetCursorPos(local_pos);
+			game_image(entry, size, target_color);
+			ImGui::SetCursorPos(after_pos);
+
+			return result;
 		}
 
-		inline auto game_image_button(const std::string& id, const augs::atlas_entry& entry) {
-			return game_image_button(id, entry, entry.get_original_size());
+		inline bool game_image_button(const std::string& id, const augs::atlas_entry& entry, const colors_nha cols = colors_nha{}) {
+			return game_image_button(id, entry, entry.get_original_size(), cols);
 		}
 	}
 }

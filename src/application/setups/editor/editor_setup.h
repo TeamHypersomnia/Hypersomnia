@@ -54,6 +54,7 @@
 
 #include "application/setups/editor/detail/current_access_cache.h"
 #include "application/setups/editor/detail/make_command_from_selections.h"
+#include "application/app_intent_type.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -111,9 +112,9 @@ class editor_setup : private current_access_cache<editor_setup> {
 
 	editor_plain_animations_gui plain_animations_gui = std::string("Animations");
 	editor_particle_effects_gui particle_effects_gui = std::string("Particle effects");
+	// END GEN INTROSPECTOR
 
 	arena_gui_state arena_gui;
-	// END GEN INTROSPECTOR
 
 	std::optional<editor_popup> ok_only_popup;
 
@@ -203,7 +204,7 @@ class editor_setup : private current_access_cache<editor_setup> {
 		};
 	}
 
-	void draw_mode_gui(const draw_setup_gui_input&) const;
+	void draw_mode_gui(const draw_setup_gui_input&);
 
 	template <class F>
 	void on_mode_with_input(F&& callback) const;
@@ -236,7 +237,9 @@ public:
 	void perform_custom_imgui(
 		sol::state& lua,
 		augs::window& owner,
-		const images_in_atlas_map&
+		const images_in_atlas_map&,
+
+		const config_lua_table& cfg
 	);
 
 	void customize_for_viewing(config_lua_table& cfg) const;
@@ -271,6 +274,7 @@ public:
 	);
 
 	bool handle_input_before_game(
+		const app_ingame_intent_map& app_controls,
 		const necessary_images_in_atlas_map& sizes_for_icons,
 
 		const augs::event::state& common_input_state,

@@ -1,7 +1,7 @@
 #pragma once
 #include <memory>
 #include "game/modes/all_mode_includes.h"
-#include "game/cosmos/cosmic_entropy.h"
+#include "game/modes/mode_entropy.h"
 #include "augs/misc/timing/fixed_delta_timer.h"
 #include "view/mode_gui/arena/arena_mode_gui.h"
 
@@ -15,10 +15,9 @@ struct editor_player {
 
 	all_modes_variant current_mode;
 	mode_vars_id current_mode_vars_id = mode_vars_id();
-	cosmic_entropy total_collected_entropy;
+	mode_entropy total_collected_entropy;
 	std::unique_ptr<cosmos_solvable_significant> mode_initial_signi;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
-	arena_gui_state arena_gui;
 	// END GEN INTROSPECTOR
 
 	auto get_speed() const {
@@ -30,9 +29,8 @@ struct editor_player {
 		return paused;
 	}
 
-	template <class E>
-	void control(const E& entropy) {
-		total_collected_entropy += entropy;
+	void control(const cosmic_entropy& entropy) {
+		total_collected_entropy.cosmic += entropy;
 	}
 
 	void request_step() {

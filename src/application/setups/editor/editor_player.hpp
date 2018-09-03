@@ -58,7 +58,7 @@ void advance_player(
 
 				typed_mode.advance(
 					in,
-					{ self.total_collected_entropy },
+					self.total_collected_entropy,
 					std::forward<Callbacks>(callbacks)...
 				);
 

@@ -51,6 +51,7 @@ struct bomb_mode_vars {
 	money_type initial_money = 800;
 	money_type maximum_money = 16000;
 
+	unsigned max_players = 10;
 	unsigned round_secs = 120;
 	unsigned round_end_secs = 5;
 	unsigned freeze_secs = 5;

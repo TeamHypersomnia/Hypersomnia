@@ -2,6 +2,7 @@
 #include "view/mode_gui/draw_mode_gui_input.h"
 #include "augs/window_framework/event.h"
 
+struct app_ingame_intent_input;
 struct draw_setup_gui_input;
 
 struct arena_scoreboard_gui {
@@ -9,10 +10,7 @@ struct arena_scoreboard_gui {
 	bool show = false;
 	// END GEN INTROSPECTOR
 
-	bool control(
-		const augs::event::state& common_input_state,
-		const augs::event::change change
-	);
+	bool control(app_ingame_intent_input);
 
 	template <class M>
 	void draw_gui(

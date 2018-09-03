@@ -96,7 +96,7 @@ public:
 
 			mode.advance(
 				{ mode_vars, scene.world },
-				{ total_collected_entropy },
+				{ total_collected_entropy, {} },
 				std::forward<Callbacks>(callbacks)...
 			);
 

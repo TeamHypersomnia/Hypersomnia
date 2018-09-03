@@ -7,10 +7,16 @@
 #include "augs/templates/container_templates.h"
 
 namespace augs {
+	struct introspection_access;
+
 	template<class... Queues>
 	class storage_for_message_queues {
 		using tuple_type = std::tuple<std::vector<Queues>...>;
+		friend introspection_access;
+
+		// GEN INTROSPECTOR class augs::storage_for_message_queues class... Queues
 		tuple_type queues;
+		// END GEN INTROSPECTOR
 
 		template <class T>
 		static void check_valid() {

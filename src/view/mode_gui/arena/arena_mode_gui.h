@@ -4,20 +4,18 @@
 #include "application/setups/draw_setup_gui_input.h"
 #include "augs/window_framework/event.h"
 #include "view/mode_gui/draw_mode_gui_input.h"
+
 #include "view/mode_gui/arena/arena_scoreboard_gui.h"
+#include "view/mode_gui/arena/arena_choose_team_gui.h"
 
 struct arena_gui_state {
-	// GEN INTROSPECTOR struct arena_gui_state
 	arena_scoreboard_gui scoreboard;
-	// END GEN INTROSPECTOR
+	arena_choose_team_gui choose_team;
 
 	mutable augs::sound_source tick_sound;
 	mutable std::optional<float> last_seconds_value;
 
-	bool control(
-		const augs::event::state& common_input_state,
-		const augs::event::change change
-	);
+	bool control(app_ingame_intent_input);
 
 	template <class M>
 	void perform_imgui(

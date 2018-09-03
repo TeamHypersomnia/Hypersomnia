@@ -10,25 +10,21 @@
 #include "augs/string/format_enum.h"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 
-bool arena_scoreboard_gui::control(
-	const augs::event::state& common_input_state,
-	const augs::event::change e
-) {
+bool arena_scoreboard_gui::control(app_ingame_intent_input in) {
 	using namespace augs::event;
 	using namespace augs::event::keys;
 
-	(void)common_input_state;
-	/* const bool has_ctrl{ common_input_state[key::LCTRL] }; */
-	/* const bool has_shift{ common_input_state[key::LSHIFT] }; */
+	const auto ch = in.e.get_key_change();
 
-	if (e.was_pressed(key::TAB)) {
-		show = true;
-		return true;
-	}
+	if (ch != key_change::NO_CHANGE) {
+		const auto key = in.e.get_key();
 
-	if (e.was_released(key::TAB)) {
-		show = false;
-		return true;
+		if (const auto it = mapped_or_nullptr(in.controls, key)) {
+			if (*it == app_ingame_intent_type::OPEN_SCOREBOARD) {
+				show = ch == key_change::PRESSED;
+				return true;
+			}
+		}
 	}
 
 	return false;

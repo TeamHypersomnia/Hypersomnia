@@ -14,10 +14,13 @@
 #include "game/detail/damage_origin.hpp"
 
 bool arena_gui_state::control(
-	const augs::event::state& common_input_state,
-	const augs::event::change e
+	const app_ingame_intent_input in
 ) {
-	if (scoreboard.control(common_input_state, e)) {
+	if (scoreboard.control(in)) {
+		return true;
+	}
+
+	if (choose_team.control(in)) {
 		return true;
 	}
 
@@ -26,13 +29,37 @@ bool arena_gui_state::control(
 
 template <class M>
 void arena_gui_state::perform_imgui(
-	draw_mode_gui_input in, 
+	draw_mode_gui_input mode_in, 
 	const M& typed_mode, 
 	const typename M::input& mode_input
 ) {
-	(void)in;
-	(void)typed_mode;
-	(void)mode_input;
+	if constexpr(M::round_based) {
+		const auto p = typed_mode.calc_participating_factions(mode_input);
+
+		using I = arena_choose_team_gui::input::faction_info;
+
+		const auto max_players_in_each = mode_input.vars.max_players / p.size();
+
+		std::vector<I> factions;
+
+		auto add = [&](const auto f) {
+			const auto col = mode_in.config.faction_view.colors[f].standard;
+			factions.push_back({ f, col, typed_mode.num_players_in(f), max_players_in_each });
+		};
+
+		add(p.defusing);
+		add(p.bombing);
+
+		const auto choice = choose_team.perform_imgui({
+			mode_input.vars.view.square_logos,
+			factions,
+			mode_in.images_in_atlas
+		});
+
+		if (choice != std::nullopt) {
+			mode_in.entropy.players[mode_in.local_player].team_choice = *choice;
+		}
+	}
 }
 
 template <class M>

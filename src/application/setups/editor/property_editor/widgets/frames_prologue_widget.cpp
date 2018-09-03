@@ -39,7 +39,7 @@ bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation
 
 		const auto max_aabb = ::get_max_frame_size(anim.frames, game_atlas);
 
-		game_image(entry.diffuse, is, max_aabb / 2 - is / 2);
+		game_image(entry.diffuse, is, white, max_aabb / 2 - is / 2);
 		invisible_button("###animpreview", max_aabb);
 	}
 

@@ -21,7 +21,9 @@ enum class app_ingame_intent_type {
 	CLEAR_DEBUG_LINES,
 	SWITCH_WEAPON_LASER,
 	SWITCH_GAME_GUI_MODE,
-	SWITCH_CHARACTER,
+
+	CHOOSE_TEAM,
+	OPEN_SCOREBOARD,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -40,3 +42,9 @@ using app_ingame_intent_map = augs::enum_map<
 	augs::event::keys::key, 
 	app_ingame_intent_type
 >;
+
+struct app_ingame_intent_input {
+	const app_ingame_intent_map& controls;
+	const augs::event::state& common_input_state;
+	const augs::event::change e;
+};
