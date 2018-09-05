@@ -6,6 +6,7 @@
 #include "game/modes/mode_player_id.h"
 #include "augs/window_framework/event.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
+#include "game/cosmos/entity_handle.h"
 
 #include "game/cosmos/cosmos.h"
 #include "game/modes/test_scene_mode.h"
@@ -208,7 +209,11 @@ void arena_gui_state::draw_mode_gui(
 
 				auto get_col = [&](const mode_player_id id) {
 					if (const auto p = typed_mode.find(id)) {
-						return in.config.faction_view.colors[p->faction].standard;
+						const auto guid = p->guid;
+
+						if (const auto this_player_handle = cosm[guid]) {
+							return in.config.faction_view.colors[this_player_handle.get_official_faction()].standard;
+						}
 					}
 
 					return gray;
@@ -276,7 +281,8 @@ void arena_gui_state::draw_mode_gui(
 					return {};
 				});
 
-				const auto& entry = tool_image_id != std::nullopt ? in.images_in_atlas.at(*tool_image_id) : image_in_atlas();
+				const auto death_fallback_icon = in.images_in_atlas.at(mode_input.vars.view.icons[scoreboard_icon_type::DEATH_ICON]);
+				const auto& entry = tool_image_id != std::nullopt ? in.images_in_atlas.at(*tool_image_id) : death_fallback_icon;
 
 				const auto tool_size = [&]() {
 					const auto original_tool_size = static_cast<vec2i>(entry.get_original_size());

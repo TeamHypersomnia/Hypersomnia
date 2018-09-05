@@ -9,7 +9,6 @@
 #include "game/messages/health_event.h"
 #include "game/messages/health_event.h"
 #include "game/messages/exhausted_cast_message.h"
-#include "game/detail/inventory/perform_transfer.h"
 
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/logic_step.h"
@@ -24,7 +23,6 @@
 #include "game/components/sentience_component.h"
 #include "game/components/render_component.h"
 #include "game/components/movement_component.h"
-#include "game/components/driver_component.h"
 
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/detail/inventory/inventory_slot_id.h"
@@ -32,9 +30,9 @@
 #include "game/detail/spells/spell_logic_input.h"
 
 #include "game/detail/gun/gun_math.h"
-#include "game/stateless_systems/driver_system.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/detail/damage_origin.hpp"
+#include "game/detail/sentience/sentience_logic.h"
 
 damage_cause::damage_cause(const const_entity_handle& handle) {
 	entity = handle;
@@ -214,12 +212,56 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 	);
 }
 
-void sentience_system::consume_health_event(messages::health_event h, const logic_step step) const {
+static void handle_special_result(const logic_step step, const messages::health_event& h) {
 	auto& cosm = step.get_cosmos();
-	const auto now = cosm.get_timestamp();
+	const auto impact_dir = vec2(h.impact_velocity).normalize();
+
 	const auto subject = cosm[h.subject];
 	auto& sentience = subject.get<components::sentience>();
-	auto& sentience_def = subject.get<invariants::sentience>();
+
+	auto& health = sentience.get<health_meter_instance>();
+	auto& consciousness = sentience.get<consciousness_meter_instance>();
+	auto& personal_electricity = sentience.get<personal_electricity_meter_instance>();
+
+	const auto& origin = h.origin;
+
+	auto knockout = [&]() {
+		perform_knockout(subject, step, impact_dir, origin);
+	};
+
+	if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION) {
+		sentience.get<electric_shield_perk_instance>() = electric_shield_perk_instance();
+
+		personal_electricity.value = 0.f;
+	}
+	else if (h.special_result == messages::health_event::result_type::DEATH) {
+		health.value = 0.f;
+		personal_electricity.value = 0.f;
+		consciousness.value = 0.f;
+		knockout();
+	}
+	else if (h.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS) {
+		consciousness.value = 0.f;
+		knockout();
+	}
+}
+
+void sentience_system::process_and_post_health_event(messages::health_event event, const logic_step step) const {
+	step.post_message(process_health_event(event, step));
+}
+
+void sentience_system::process_special_results_of_health_events(const logic_step step) const {
+	const auto& events = step.template get_queue<messages::health_event>();
+
+	for (const auto& h : events) {
+		handle_special_result(step, h);
+	}
+}
+
+messages::health_event sentience_system::process_health_event(messages::health_event h, const logic_step step) const {
+	auto& cosm = step.get_cosmos();
+	const auto subject = cosm[h.subject];
+	auto& sentience = subject.get<components::sentience>();
 	auto& health = sentience.get<health_meter_instance>();
 	auto& consciousness = sentience.get<consciousness_meter_instance>();
 	auto& personal_electricity = sentience.get<personal_electricity_meter_instance>();
@@ -311,48 +353,9 @@ void sentience_system::consume_health_event(messages::health_event h, const logi
 		}
 	}
 
-	auto knockout = [&]() {
-		const auto* const container = subject.find<invariants::container>();
+	handle_special_result(step, h);
 
-		if (container) {
-			const auto& container = subject.get<invariants::container>();
-			drop_from_all_slots(container, subject, sentience_def.drop_impulse_on_knockout, step);
-		}
-
-		auto& driver = subject.get<components::driver>();
-		
-		if (cosm[driver.owned_vehicle].alive()) {
-			driver_system().release_car_ownership(subject);
-		}
-		
-		impulse_input knockout_impulse;
-		knockout_impulse.linear = h.impact_velocity.normalize();
-		knockout_impulse.angular = 1.f;
-
-		const auto knocked_out_body = subject.get<components::rigid_body>();
-		knocked_out_body.apply(knockout_impulse * sentience_def.knockout_impulse);
-
-		sentience.when_knocked_out = now;
-		sentience.knockout_origin = origin;
-	};
-
-	if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION) {
-		sentience.get<electric_shield_perk_instance>() = electric_shield_perk_instance();
-
-		personal_electricity.value = 0.f;
-	}
-	else if (h.special_result == messages::health_event::result_type::DEATH) {
-		health.value = 0.f;
-		personal_electricity.value = 0.f;
-		consciousness.value = 0.f;
-		knockout();
-	}
-	else if (h.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS) {
-		consciousness.value = 0.f;
-		knockout();
-	}
-
-	step.post_message(h);
+	return h;
 }
 
 void sentience_system::apply_damage_and_generate_health_events(const logic_step step) const {
@@ -374,6 +377,10 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 		event_template.special_result = messages::health_event::result_type::NONE;
 		event_template.origin = d.origin;
 		
+		auto process_and_post_health = [&](const auto& event) {
+			process_and_post_health_event(event, step);
+		};
+
 		if (sentience) {
 			const auto& s = *sentience;
 
@@ -383,7 +390,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 
 			const bool is_shield_enabled = s.get<electric_shield_perk_instance>().timing.is_enabled(clk);
 
-			auto apply_ped = [this, step, event_template, &personal_electricity](const meter_value_type amount) {
+			auto apply_ped = [event_template, &personal_electricity, &process_and_post_health](const meter_value_type amount) {
 				auto event = event_template;
 
 				event.target = messages::health_event::target_type::PERSONAL_ELECTRICITY;
@@ -393,7 +400,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 				event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
 
 				if (event.effective_amount != 0) {
-					consume_health_event(event, step);
+					process_and_post_health(event);
 				}
 
 				return damaged;
@@ -416,7 +423,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 					event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
 
 					if (event.effective_amount != 0) {
-						consume_health_event(event, step);
+						process_and_post_health(event);
 					}
 				}
 			}
@@ -439,7 +446,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 					event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
 
 					if (event.effective_amount != 0) {
-						consume_health_event(event, step);
+						process_and_post_health(event);
 					}
 				}
 			}

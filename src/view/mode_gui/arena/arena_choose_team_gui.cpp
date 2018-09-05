@@ -81,7 +81,7 @@ std::optional<mode_commands::team_choice> arena_choose_team_gui::perform_imgui(c
 				}
 			}
 
-			const auto numbers = typesafe_sprintf("(%x/%x)", info.num_players, info.max_players);
+			const auto numbers = typesafe_sprintf("(players: %x/%x)", info.num_players, info.max_players);
 
 			text_color(faction_label, is_full ? rgba(255, 255, 255, 70) : info.color);
 			ImGui::SameLine();

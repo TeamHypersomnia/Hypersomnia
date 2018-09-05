@@ -110,6 +110,7 @@ void standard_solve(const logic_step step) {
 	destruction_system().generate_damages_from_forceful_collisions(step);
 	destruction_system().apply_damages_and_split_fixtures(step);
 
+	sentience_system().process_special_results_of_health_events(step);
 	sentience_system().regenerate_values_and_advance_spell_logic(step);
 	sentience_system().apply_damage_and_generate_health_events(step);
 	physics_system().post_and_clear_accumulated_collision_messages(step);

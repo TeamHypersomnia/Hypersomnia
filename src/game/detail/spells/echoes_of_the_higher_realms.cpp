@@ -41,5 +41,5 @@ void echoes_of_the_higher_realms_instance::perform_logic(const spell_logic_input
 	event.target = messages::health_event::target_type::CONSCIOUSNESS;
 	event.ratio_effective_to_maximum = result.ratio_effective_to_maximum;
 
-	sentience_system().consume_health_event(event, in.step);
+	sentience_system().process_and_post_health_event(event, in.step);
 }

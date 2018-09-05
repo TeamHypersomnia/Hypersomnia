@@ -1,5 +1,6 @@
 #pragma once
 #include "game/components/render_component.h"
+#include "augs/templates/traits/is_nullopt.h"
 #include "augs/build_settings/platform_defines.h"
 #include "game/organization/all_component_includes.h"
 #include "game/cosmos/entity_type_traits.h"
@@ -54,7 +55,7 @@ FORCE_INLINE auto calc_render_layer(const H& handle) {
 			[&](const auto& typed_handle) -> render_layer {
 				using E = remove_cref<decltype(typed_handle)>;
 
-				if constexpr(std::is_same_v<E, std::nullopt_t>) {
+				if constexpr(is_nullopt_v<E>) {
 					return render_layer::INVALID;
 				}
 				else {

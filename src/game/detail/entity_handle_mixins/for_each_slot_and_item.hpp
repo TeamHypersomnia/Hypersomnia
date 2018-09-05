@@ -2,6 +2,7 @@
 #include "game/detail/entity_handle_mixins/inventory_mixin.h"
 #include "game/detail/inventory/direct_attachment_offset.h"
 #include "augs/templates/continue_or_callback_result.h"
+#include "augs/templates/traits/is_nullopt.h"
 
 template <class E>
 template <class S, class I>
@@ -33,7 +34,7 @@ callback_result inventory_mixin<E>::for_each_contained_slot_and_item_recursive(
 					for (const auto& id : get_items_inside(typed_container, s.first)) {
 						const auto result = cosm[id].template dispatch_on_having_all_ret<components::item>(
 							[&](const auto& child_item_handle) {
-								if constexpr(!std::is_same_v<decltype(child_item_handle), const std::nullopt_t&>) {
+								if constexpr(!is_nullopt_v<decltype(child_item_handle)>) {
 									const auto r = continue_or_recursive_callback_result(item_callback, child_item_handle);
 
 									if (r == recursive_callback_result::CONTINUE_AND_RECURSE) {

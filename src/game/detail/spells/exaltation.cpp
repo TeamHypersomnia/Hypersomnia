@@ -41,5 +41,5 @@ void exaltation_instance::perform_logic(const spell_logic_input in) {
 	event.target = messages::health_event::target_type::HEALTH;
 	event.ratio_effective_to_maximum = result.ratio_effective_to_maximum;
 
-	sentience_system().consume_health_event(event, in.step);
+	sentience_system().process_and_post_health_event(event, in.step);
 }

@@ -422,24 +422,26 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 			continue;
 		}
 
-		const auto number_value = static_cast<int>(h.effective_amount);
+		if (!augs::is_epsilon(h.effective_amount)) {
+			const auto number_value = static_cast<int>(h.effective_amount);
 
-		vn.text = std::to_string(std::abs(number_value ? number_value : 1));
-		vn.color = number_col;
-		
-		vn.pos = h.point_of_impact;
+			vn.text = std::to_string(std::abs(number_value ? number_value : 1));
+			vn.color = number_col;
 
-		flying_numbers.add(vn);
+			vn.pos = h.point_of_impact;
 
-		pure_color_highlight_system::highlight::input new_highlight;
+			flying_numbers.add(vn);
 
-		new_highlight.target = h.subject;
-		new_highlight.starting_alpha_ratio = 1.f;// std::min(1.f, h.ratio_effective_to_maximum * 5);
+			pure_color_highlight_system::highlight::input new_highlight;
 
-		new_highlight.maximum_duration_seconds = 0.10f;
-		new_highlight.color = highlight_col;
+			new_highlight.target = h.subject;
+			new_highlight.starting_alpha_ratio = 1.f;// std::min(1.f, h.ratio_effective_to_maximum * 5);
 
-		highlights.add(new_highlight);
+			new_highlight.maximum_duration_seconds = 0.10f;
+			new_highlight.color = highlight_col;
+
+			highlights.add(new_highlight);
+		}
 	}
 
 	for (const auto& t : new_thunders) {

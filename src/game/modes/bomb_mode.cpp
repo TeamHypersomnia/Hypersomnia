@@ -13,6 +13,7 @@
 #include "game/detail/get_knockout_award.h"
 #include "game/detail/damage_origin.hpp"
 #include "game/messages/changed_identities_message.h"
+#include "game/messages/health_event.h"
 
 using input_type = bomb_mode::input;
 
@@ -54,17 +55,17 @@ std::size_t bomb_mode::get_step_rng_seed(const cosmos& cosm) const {
 	return get_round_rng_seed(cosm) + cosm.get_total_steps_passed();
 }
 
-bool bomb_mode::choose_faction(const mode_player_id& id, const faction_type faction) {
+faction_choice_result bomb_mode::choose_faction(const mode_player_id& id, const faction_type faction) {
 	if (const auto entry = find(id)) {
 		if (entry->faction == faction) {
-			return true;
+			return faction_choice_result::THE_SAME;
 		}
 
 		entry->faction = faction;
-		return true;
+		return faction_choice_result::CHANGED;
 	}
 
-	return false;
+	return faction_choice_result::FAILED;
 }
 
 template <class F>
@@ -315,7 +316,7 @@ void bomb_mode::for_each_player_handle_in(C& cosm, const faction_type faction, F
 	for_each_player_in(faction, [&](const auto&, const auto& data) {
 		if (const auto handle = cosm[data.guid]) {
 			return handle.template dispatch_on_having_all_ret<components::sentience>([&](const auto& typed_player) {
-				if constexpr(std::is_same_v<decltype(typed_player), const std::nullopt_t&>) {
+				if constexpr(is_nullopt_v<decltype(typed_player)>) {
 					return callback_result::CONTINUE;
 				}
 				else {
@@ -326,6 +327,17 @@ void bomb_mode::for_each_player_handle_in(C& cosm, const faction_type faction, F
 
 		return callback_result::CONTINUE;
 	});
+}
+
+template <class C, class F>
+decltype(auto) bomb_mode::on_player_handle(C& cosm, const mode_player_id& id, F&& callback) const {
+	if (const auto player_data = find(id)) {
+		if (const auto handle = cosm[player_data->guid]) {
+			return callback(handle);
+		}
+	}
+
+	return callback(std::nullopt);
 }
 
 std::size_t bomb_mode::num_conscious_players_in(const cosmos& cosm, const faction_type faction) const {
@@ -350,7 +362,7 @@ std::size_t bomb_mode::num_players_in(const faction_type faction) const {
 	return total;
 }
 
-bool bomb_mode::auto_assign_faction(const input_type in, const mode_player_id& id) {
+faction_choice_result bomb_mode::auto_assign_faction(const input_type in, const mode_player_id& id) {
 	if (const auto entry = find(id)) {
 		auto& f = entry->faction;
 		const auto previous_faction = f;
@@ -360,10 +372,10 @@ bool bomb_mode::auto_assign_faction(const input_type in, const mode_player_id& i
 		f = calc_weakest_faction(in);
 
 		const bool faction_changed = f != previous_faction;
-		return faction_changed;
+		return faction_changed ? faction_choice_result::CHANGED : faction_choice_result::BEST_BALANCE_ALREADY;
 	}
 
-	return false;
+	return faction_choice_result::FAILED;
 }
 
 void bomb_mode::set_players_frozen(const input_type in, const bool flag) {
@@ -914,9 +926,69 @@ void bomb_mode::process_win_conditions(const input_type in, const logic_step ste
 	}
 }
 
-void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy, const logic_step step) {
-	(void)entropy;
+void bomb_mode::execute_player_commands(const input_type in, const mode_entropy& entropy, const logic_step step) {
+	const auto current_round = get_round_num();
 
+	for (const auto& p : entropy.players) {
+		const auto& commands = p.second;
+		const auto id = p.first;
+
+		if (const auto player_data = find(id)) {
+			if (const auto& new_choice = commands.team_choice; new_choice != std::nullopt) {
+				const auto f = new_choice->target_team;
+
+				// TODO: Notify GUI about the result.
+
+				const auto result = [&]() {
+					if (f != faction_type::SPECTATOR) {
+						/* This is a serious choice */
+						if (player_data->round_when_chosen_faction == current_round) {
+							return faction_choice_result::CHOOSING_TOO_FAST;
+						}
+
+						player_data->round_when_chosen_faction = current_round;
+					}
+
+					if (f == faction_type::COUNT) {
+						/* Auto-select */
+						return auto_assign_faction(in, id);
+					}
+
+					return choose_faction(id, f);
+				}();
+
+				if (result == faction_choice_result::CHANGED) {
+					auto& cosm = in.cosm;
+
+					on_player_handle(cosm, id, [&](const auto& player_handle) {
+						if constexpr(!is_nullopt_v<decltype(player_handle)>) {
+							if (const auto tr = player_handle.find_logic_transform()) {
+								damage_origin origin;
+								origin.cause.flavour = player_handle.get_flavour_id();
+								origin.cause.entity = player_handle.get_id();
+								origin.sender.set(player_handle);
+
+								const auto death_request = messages::health_event::request_death(
+									player_handle.get_id(),
+									tr->get_direction(),
+									tr->pos,
+									origin
+								);
+
+								step.post_message(death_request);
+							}
+						}
+						else {
+							(void)player_handle;
+						}
+					});
+				}
+			}
+		}
+	}
+}
+
+void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy, const logic_step step) {
 	if (state == arena_mode_state::INIT) {
 		restart(in, step);
 	}
@@ -954,6 +1026,8 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 			start_next_round(in, step);
 		}
 	}
+
+	execute_player_commands(in, entropy, step);
 }
 
 void bomb_mode::mode_post_solve(const input_type in, const mode_entropy& entropy, const const_logic_step step) {
@@ -985,7 +1059,7 @@ void bomb_mode::mode_post_solve(const input_type in, const mode_entropy& entropy
 	if (state == arena_mode_state::LIVE) {
 		if (bomb_planted(in)) {
 			on_bomb_entity(in, [&](const auto& typed_bomb) {
-				if constexpr(!std::is_same_v<decltype(typed_bomb), const std::nullopt_t&>) {
+				if constexpr(!is_nullopt_v<decltype(typed_bomb)>) {
 					const auto& clk = cosm.get_clock();
 
 					if (typed_bomb.template get<components::hand_fuse>().when_armed == clk.now) {
@@ -1080,13 +1154,13 @@ bool bomb_mode::bomb_exploded(const input_type in) const {
 			it has exploded.
 		*/
 
-		return std::is_same_v<decltype(t), const std::nullopt_t&>;
+		return is_nullopt_v<decltype(t)>;
 	});
 }
 
 entity_id bomb_mode::get_character_who_defused_bomb(const input_type in) const {
 	return on_bomb_entity(in, [&](const auto& typed_bomb) {
-		if constexpr(std::is_same_v<decltype(typed_bomb), const std::nullopt_t&>) {
+		if constexpr(is_nullopt_v<decltype(typed_bomb)>) {
 			return entity_id();
 		}
 		else {
@@ -1103,7 +1177,7 @@ entity_id bomb_mode::get_character_who_defused_bomb(const input_type in) const {
 
 bool bomb_mode::bomb_planted(const input_type in) const {
 	return on_bomb_entity(in, [&](const auto& typed_bomb) {
-		if constexpr(std::is_same_v<decltype(typed_bomb), const std::nullopt_t&>) {
+		if constexpr(is_nullopt_v<decltype(typed_bomb)>) {
 			return false;
 		}
 		else {
@@ -1121,7 +1195,7 @@ float bomb_mode::get_critical_seconds_left(const input_type in) const {
 	const auto& clk = cosm.get_clock();
 
 	return on_bomb_entity(in, [&](const auto& typed_bomb) {
-		if constexpr(std::is_same_v<decltype(typed_bomb), const std::nullopt_t&>) {
+		if constexpr(is_nullopt_v<decltype(typed_bomb)>) {
 			return -1.f;
 		}
 		else {
@@ -1144,7 +1218,7 @@ float bomb_mode::get_seconds_since_planting(const input_type in) const {
 	const auto& clk = cosm.get_clock();
 
 	return on_bomb_entity(in, [&](const auto& typed_bomb) {
-		if constexpr(std::is_same_v<decltype(typed_bomb), const std::nullopt_t&>) {
+		if constexpr(is_nullopt_v<decltype(typed_bomb)>) {
 			return -1.f;
 		}
 		else {

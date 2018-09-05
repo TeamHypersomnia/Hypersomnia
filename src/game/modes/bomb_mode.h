@@ -109,6 +109,7 @@ struct bomb_mode_player {
 	entity_name_str chosen_name;
 	faction_type faction = faction_type::SPECTATOR;
 	bomb_mode_player_stats stats;
+	unsigned round_when_chosen_faction = static_cast<unsigned>(-1); 
 	// END GEN INTROSPECTOR
 
 	bomb_mode_player(const entity_name_str& chosen_name = {}) : 
@@ -140,6 +141,14 @@ struct bomb_mode_round_state {
 	arena_mode_knockouts_vector knockouts;
 	mode_player_id bomb_planter;
 	// END GEN INTROSPECTOR
+};
+
+enum class faction_choice_result {
+	FAILED,
+	THE_SAME,
+	CHOOSING_TOO_FAST,
+	BEST_BALANCE_ALREADY,
+	CHANGED
 };
 
 class bomb_mode {
@@ -254,7 +263,10 @@ private:
 	bool give_bomb_to_random_player(input, logic_step);
 	void spawn_bomb_near_players(input);
 
+	void execute_player_commands(input, const mode_entropy&, logic_step);
+
 public:
+
 	// GEN INTROSPECTOR class bomb_mode
 	unsigned rng_seed_offset = 0;
 
@@ -268,8 +280,8 @@ public:
 	mode_player_id add_player(input, const entity_name_str& chosen_name);
 	void remove_player(input, const mode_player_id&);
 
-	bool auto_assign_faction(input, const mode_player_id&);
-	bool choose_faction(const mode_player_id&, const faction_type faction);
+	faction_choice_result auto_assign_faction(input, const mode_player_id&);
+	faction_choice_result choose_faction(const mode_player_id&, const faction_type faction);
 	faction_type get_player_faction(const mode_player_id&) const;
 
 	entity_guid lookup(const mode_player_id&) const;
@@ -304,6 +316,9 @@ public:
 
 	bomb_mode_player* find(const mode_player_id&);
 	const bomb_mode_player* find(const mode_player_id&) const;
+
+	template <class C, class F>
+	decltype(auto) on_player_handle(C&, const mode_player_id&, F&& callback) const;
 
 	template <class F>
 	void for_each_player_in(faction_type, F&& callback) const;

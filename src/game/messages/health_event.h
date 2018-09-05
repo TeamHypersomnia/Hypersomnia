@@ -29,5 +29,22 @@ namespace messages {
 		meter_value_type effective_amount = 0;
 
 		bool was_conscious = true;
+
+		static auto request_death(
+			const entity_id of_whom,
+			const vec2 direction,
+			const vec2 point_of_impact,
+			const damage_origin& origin
+		) {
+			health_event output;
+			output.subject = of_whom;
+			output.point_of_impact = point_of_impact;
+			output.impact_velocity = direction;
+			output.effective_amount = 0;
+			output.special_result = result_type::DEATH;
+			output.origin = origin;
+			output.target = target_type::HEALTH;
+			return output;
+		}
 	};
 }

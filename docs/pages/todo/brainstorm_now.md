@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- explosions -> standard_explosion
+- let players spawn for a moment after beginning the round
+	- though not after changing a team
+
 - Remove the notion of container_with_small_size
 	- Interesting concept but we'll just handle it during actual serialization stage
 

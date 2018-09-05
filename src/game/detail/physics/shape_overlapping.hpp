@@ -1,6 +1,7 @@
 #pragma once
 #include "game/cosmos/entity_handle.h"
 #include "game/detail/physics/shape_helpers.h"
+#include "augs/templates/traits/is_nullopt.h"
 
 template <class E, class F>
 auto for_each_fixture(const E& handle, F callback) -> decltype(callback(std::declval<b2Fixture&>())) {
@@ -91,7 +92,7 @@ auto entity_overlaps_entity(
 	}
 	else {
 		return on_shape_representation(shapized_entity, [&](const auto& shape) -> std::optional<b2TestOverlapOutput> {
-			if constexpr(std::is_same_v<decltype(shape), const std::nullopt_t&>) {
+			if constexpr(is_nullopt_v<decltype(shape)>) {
 				return std::nullopt;
 			}
 			else {

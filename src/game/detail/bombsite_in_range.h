@@ -30,7 +30,7 @@ bool bombsite_in_range(const E& fused_entity) {
 
 		entities.for_each<render_layer::AREA_MARKERS>(cosm, [&](const auto& handle) {
 			return handle.template dispatch_on_having_all_ret<invariants::box_marker>([&](const auto& typed_handle) {
-				if constexpr(std::is_same_v<decltype(typed_handle), const std::nullopt_t&>) {
+				if constexpr(is_nullopt_v<decltype(typed_handle)>) {
 					return callback_result::CONTINUE;
 				}
 				else {

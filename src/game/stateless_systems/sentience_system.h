@@ -8,7 +8,10 @@ namespace messages {
 
 class sentience_system {
 public:
-	void consume_health_event(messages::health_event, const logic_step) const;
+	messages::health_event process_health_event(messages::health_event, const logic_step) const;
+	void process_and_post_health_event(messages::health_event, const logic_step) const;
+
+	void process_special_results_of_health_events(const logic_step) const;
 
 	void cast_spells(const logic_step) const;
 

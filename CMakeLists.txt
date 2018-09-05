@@ -628,6 +628,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/asset_funcs.cpp"
 	"src/view/mode_gui/arena/arena_scoreboard_gui.cpp"
 	"src/view/mode_gui/arena/arena_choose_team_gui.cpp"
+	"src/game/detail/sentience/sentience_logic.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.
