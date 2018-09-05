@@ -14,6 +14,7 @@
 #include "game/detail/damage_origin.hpp"
 #include "game/messages/changed_identities_message.h"
 #include "game/messages/health_event.h"
+#include "augs/string/format_enum.h"
 
 using input_type = bomb_mode::input;
 
@@ -527,6 +528,10 @@ void bomb_mode::setup_round(
 	messages::changed_identities_message msg;
 
 	auto create_player = [&](const auto faction, const auto& id) {
+		if (faction == faction_type::SPECTATOR) {
+			return cosm[entity_id()];
+		}
+
 		if (const auto flavour = ::find_faction_character_flavour(cosm, faction); flavour.is_set()) {
 			auto new_player = cosmic::create_entity(
 				cosm, 
@@ -560,6 +565,9 @@ void bomb_mode::setup_round(
 			cosmic::set_specific_name(handle, player_data.chosen_name);
 			player_data.guid = handle.get_guid();
 			new_id = handle.get_id();
+		}
+		else {
+			player_data.guid = {};
 		}
 
 		if (const auto former_id = mapped_or_nullptr(former_ids, id)) {
@@ -717,7 +725,6 @@ void bomb_mode::count_knockout(const input_type in, const arena_mode_knockout ko
 		}
 		else if (same_faction(ko.knockouter, ko.victim)) {
 			knockouts_dt = -1;
-			LOG("penalty");
 			post_award(in, ko.knockouter, in.vars.economy.team_kill_penalty * -1);
 		}
 
@@ -934,6 +941,8 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 		const auto id = p.first;
 
 		if (const auto player_data = find(id)) {
+			const auto previous_faction = player_data->faction;
+
 			if (const auto& new_choice = commands.team_choice; new_choice != std::nullopt) {
 				const auto f = new_choice->target_team;
 
@@ -957,25 +966,33 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 					return choose_faction(id, f);
 				}();
 
+				LOG(format_enum(result));
+
 				if (result == faction_choice_result::CHANGED) {
 					auto& cosm = in.cosm;
+
+					LOG("Changed from %x to %x", format_enum(previous_faction), format_enum(f));
 
 					on_player_handle(cosm, id, [&](const auto& player_handle) {
 						if constexpr(!is_nullopt_v<decltype(player_handle)>) {
 							if (const auto tr = player_handle.find_logic_transform()) {
-								damage_origin origin;
-								origin.cause.flavour = player_handle.get_flavour_id();
-								origin.cause.entity = player_handle.get_id();
-								origin.sender.set(player_handle);
+								if (const auto sentience = player_handle.template find<components::sentience>()) {
+									if (!sentience->is_dead()) {
+										damage_origin origin;
+										origin.cause.flavour = player_handle.get_flavour_id();
+										origin.cause.entity = player_handle.get_id();
+										origin.sender.set(player_handle);
 
-								const auto death_request = messages::health_event::request_death(
-									player_handle.get_id(),
-									tr->get_direction(),
-									tr->pos,
-									origin
-								);
+										const auto death_request = messages::health_event::request_death(
+											player_handle.get_id(),
+											tr->get_direction(),
+											tr->pos,
+											origin
+										);
 
-								step.post_message(death_request);
+										step.post_message(death_request);
+									}
+								}
 							}
 						}
 						else {

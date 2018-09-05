@@ -158,6 +158,10 @@ bool sound_system::generic_sound_cache::rebind_buffer(const update_properties_in
 bool sound_system::generic_sound_cache::should_play(const update_properties_input in) const {
 	const auto listening_character = in.get_listener();
 
+	if (listening_character.dead()) {
+		return false;
+	}
+
 	const auto faction = listening_character.get_official_faction();
 	const auto target_faction = original.start.listener_faction;
 
@@ -171,6 +175,10 @@ void sound_system::generic_sound_cache::eat_followup() {
 
 void sound_system::generic_sound_cache::update_properties(const update_properties_input in) {
 	const auto listening_character = in.get_listener();
+
+	if (listening_character.dead()) {
+		return;
+	}
 
 	const auto faction = listening_character.get_official_faction();
 	const auto target_faction = original.start.listener_faction;

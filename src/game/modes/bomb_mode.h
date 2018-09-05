@@ -144,11 +144,13 @@ struct bomb_mode_round_state {
 };
 
 enum class faction_choice_result {
+	// GEN INTROSPECTOR enum class faction_choice_result
 	FAILED,
 	THE_SAME,
 	CHOOSING_TOO_FAST,
 	BEST_BALANCE_ALREADY,
 	CHANGED
+	// END GEN INTROSPECTOR
 };
 
 class bomb_mode {

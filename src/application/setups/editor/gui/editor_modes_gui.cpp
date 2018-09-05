@@ -92,7 +92,9 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 								const auto this_player_label = typesafe_sprintf("%x (id: %x)", p.second.chosen_name, p.first.value);
 
 								if (const auto this_player_node = scoped_tree_node(this_player_label.c_str())) {
-									text(typesafe_sprintf("Corresponding character name: %x", cosm[p.second.guid].get_name()));
+									const auto player_handle = cosm[p.second.guid];
+									const auto character_name = player_handle.alive() ? player_handle.get_name() : "dead";
+									text(typesafe_sprintf("Corresponding character name: %x", character_name));
 
 									singular_edit_properties(
 										in,
