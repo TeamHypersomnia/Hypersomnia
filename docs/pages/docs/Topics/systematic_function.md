@@ -14,7 +14,7 @@ Systematic functions are high-level calls that solve an abstract problem.
 Care should be taken to name them so that there is little to no doubt what kind of problem that is.  
 
 Ideally, a systematic function should only be concerned with iteration and offload the more complex stuff to another source file, where other systematic functions are free to reuse that logic.  
-For example, a function that is concerned with detonatable entities - ``demolitions_system::detonate_fuses`` - ignites explosions using ``src/game/detail/explosions.h``, a header used in some other domains as well.
+For example, a function that is concerned with detonatable entities - ``demolitions_system::detonate_fuses`` - ignites explosions using ``src/game/detail/standard_explosion.h``, a header used in some other domains as well.
 
 ## Common types of systematic functions
 

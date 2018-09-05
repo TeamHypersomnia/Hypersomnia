@@ -51,6 +51,7 @@ struct bomb_mode_vars {
 	money_type initial_money = 800;
 	money_type maximum_money = 16000;
 
+	unsigned allow_spawn_after_secs_after_starting = 10;
 	unsigned max_players = 10;
 	unsigned round_secs = 120;
 	unsigned round_end_secs = 5;
@@ -216,6 +217,8 @@ private:
 	unsigned get_round_index() const;
 	void make_win(input, faction_type);
 
+	entity_id create_character_for_player(input, logic_step, mode_player_id, std::optional<transfer_meta> = std::nullopt);
+
 	void teleport_to_next_spawn(input, entity_id character);
 	void init_spawned(
 		input, 
@@ -266,6 +269,7 @@ private:
 	void spawn_bomb_near_players(input);
 
 	void execute_player_commands(input, const mode_entropy&, logic_step);
+	void spawn_recently_added_players(input, logic_step);
 
 public:
 
@@ -277,6 +281,8 @@ public:
 	per_faction_t<bomb_mode_faction_state> factions;
 	std::unordered_map<mode_player_id, bomb_mode_player> players;
 	bomb_mode_round_state current_round;
+
+	std::vector<mode_player_id> recently_added_players;
 	// END GEN INTROSPECTOR
 
 	mode_player_id add_player(input, const entity_name_str& chosen_name);
@@ -297,6 +303,7 @@ public:
 	float get_match_begins_in_seconds(input) const;
 
 	float get_freeze_seconds_left(input) const;
+	float get_round_seconds_passed(input) const;
 	float get_round_seconds_left(input) const;
 	float get_round_end_seconds_left(input) const;
 

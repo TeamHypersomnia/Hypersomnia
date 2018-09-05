@@ -12,6 +12,10 @@ void generate_equipment(const requested_equipment& eq, const E& character, const
 	const auto character_transform = character.get_logic_transform();
 
 	auto transfer = [&step](const auto from, const auto to) {
+		if (const auto tr = to.get_container().find_logic_transform()) {
+			from.set_logic_transform(*tr);
+		}
+
 		perform_transfer(item_slot_transfer_request::standard(from, to), step);
 	};
 

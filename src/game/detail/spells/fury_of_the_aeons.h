@@ -2,7 +2,7 @@
 #include "augs/misc/timing/stepped_timing.h"
 #include "game/detail/spells/spell_structs.h"
 #include "game/cosmos/entity_handle_declaration.h"
-#include "game/detail/explosions.h"
+#include "game/detail/standard_explosion.h"
 
 struct spell_logic_input;
 

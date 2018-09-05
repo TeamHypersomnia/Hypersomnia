@@ -9,9 +9,9 @@ summary: That which we are brainstorming at the moment.
 - Game events log and chat
 	- In the same window
 	- ImGui or own GUI?
-		- We actually have some textbox code
+		- We actually have some textbox code we can introduce later for chatting
+			- Better control over such an important feature
 
-- explosions -> standard_explosion
 - let players spawn for a moment after beginning the round
 	- though not after changing a team
 

@@ -1,6 +1,6 @@
 #include "augs/misc/randomization.h"
 #include "game/detail/physics/physics_queries.h"
-#include "game/detail/explosions.h"
+#include "game/detail/standard_explosion.h"
 #include "game/assets/ids/asset_ids.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"

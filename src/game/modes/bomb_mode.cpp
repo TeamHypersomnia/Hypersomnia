@@ -263,6 +263,7 @@ mode_player_id bomb_mode::add_player(input_type in, const entity_name_str& chose
 	const auto new_id = first_free_key(players, mode_player_id::first());
 
 	players.try_emplace(new_id, chosen_name);
+	recently_added_players.push_back(new_id);
 
 	return new_id;
 }
@@ -487,6 +488,54 @@ bool bomb_mode::give_bomb_to_random_player(const input_type in, const logic_step
 	return true;
 }
 
+
+entity_id bomb_mode::create_character_for_player(
+	const input_type in, 
+	const logic_step step,
+	const mode_player_id id,
+	const std::optional<transfer_meta> transferred
+) {
+	if (auto player_data = find(id)) {
+		auto& p = *player_data;
+		auto& cosm = in.cosm;
+
+		const auto handle = [&]() {
+			const auto faction = p.faction;
+
+			if (faction == faction_type::SPECTATOR) {
+				return cosm[entity_id()];
+			}
+
+			if (const auto flavour = ::find_faction_character_flavour(cosm, faction); flavour.is_set()) {
+				auto new_player = cosmic::create_entity(
+					cosm, 
+					entity_flavour_id(flavour), 
+					[](auto&&...) {},
+					[&](const auto new_character) {
+						teleport_to_next_spawn(in, new_character);
+						init_spawned(in, new_character, step, transferred);
+					}
+				);
+
+				return new_player;
+			}
+
+			return cosm[entity_id()];
+		}();
+
+		if (handle.alive()) {
+			cosmic::set_specific_name(handle, p.chosen_name);
+			p.guid = handle.get_guid();
+			return handle.get_id();
+		}
+		else {
+			p.guid = {};
+		}
+	}
+	
+	return {};
+}
+
 void bomb_mode::setup_round(
 	const input_type in, 
 	const logic_step step, 
@@ -527,48 +576,17 @@ void bomb_mode::setup_round(
 
 	messages::changed_identities_message msg;
 
-	auto create_player = [&](const auto faction, const auto& id) {
-		if (faction == faction_type::SPECTATOR) {
-			return cosm[entity_id()];
-		}
-
-		if (const auto flavour = ::find_faction_character_flavour(cosm, faction); flavour.is_set()) {
-			auto new_player = cosmic::create_entity(
-				cosm, 
-				entity_flavour_id(flavour), 
-				[](auto&&...) {},
-				[&](const auto new_character) {
-					teleport_to_next_spawn(in, new_character);
-
-					if (auto transfer_input = mapped_or_nullptr(transfers, id)) {
-						init_spawned(in, new_character, step, transfer_meta { *transfer_input, msg });
-					}
-					else {
-						init_spawned(in, new_character, step);
-					}
-				}
-			);
-
-			return new_player;
-		}
-
-		return cosm[entity_id()];
-	};
-
 	for (auto& it : players) {
 		const auto id = it.first;
-		auto& player_data = it.second;
+		const auto transferred = mapped_or_nullptr(transfers, id);
 
-		entity_id new_id;
+		const auto meta = 
+			transferred != nullptr ? 
+			std::make_optional(transfer_meta{ *transferred, msg }) :
+		   	std::optional<transfer_meta>()
+		;
 
-		if (const auto handle = create_player(player_data.faction, id)) {
-			cosmic::set_specific_name(handle, player_data.chosen_name);
-			player_data.guid = handle.get_guid();
-			new_id = handle.get_id();
-		}
-		else {
-			player_data.guid = {};
-		}
+		const auto new_id = create_character_for_player(in, step, id, meta);
 
 		if (const auto former_id = mapped_or_nullptr(former_ids, id)) {
 			msg.changes.try_emplace(*former_id, new_id);
@@ -1005,7 +1023,37 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 	}
 }
 
+void bomb_mode::spawn_recently_added_players(const input_type in, const logic_step step) {
+	for (const auto& id : recently_added_players) {
+		if (const auto player_data = find(id)) {
+			if (player_data->guid.is_set()) {
+				continue;
+			}
+
+			auto do_spawn = [&]() {
+				create_character_for_player(in, step, id);
+			};
+
+			if (state == arena_mode_state::WARMUP) {
+				/* Always spawn in warmup */
+				do_spawn();
+			}
+			else if (state == arena_mode_state::LIVE) {
+				const auto passed = get_round_seconds_passed(in);
+
+				if (passed <= in.vars.allow_spawn_after_secs_after_starting) {
+					do_spawn();
+				}
+			}
+		}
+	}
+
+	recently_added_players.clear();
+}
+
 void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy, const logic_step step) {
+	spawn_recently_added_players(in, step);
+
 	if (state == arena_mode_state::INIT) {
 		restart(in, step);
 	}
@@ -1142,6 +1190,10 @@ float bomb_mode::get_total_seconds(const input_type in) const {
 	const auto& clk = in.cosm.get_clock();
 
 	return clk.diff_seconds(start_clk);
+}
+
+float bomb_mode::get_round_seconds_passed(const input_type in) const {
+	return get_total_seconds(in) - static_cast<float>(in.vars.freeze_secs);
 }
 
 float bomb_mode::get_freeze_seconds_left(const input_type in) const {

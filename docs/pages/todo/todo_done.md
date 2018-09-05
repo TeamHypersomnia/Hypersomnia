@@ -1351,3 +1351,5 @@ we consider whole type overrides too complex architeciturally:
 		- does nothing, really
 	- bomb mode
 		- needs complete input with the initial solvable as well, so let's first implement this
+
+- explosions -> standard_explosion

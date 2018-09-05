@@ -9,7 +9,7 @@
 #include "game/cosmos/for_each_entity.h"
 
 #include "game/detail/hand_fuse_logic.h"
-#include "game/detail/explosions.h"
+#include "game/detail/standard_explosion.h"
 
 #include "game/detail/hand_fuse_math.h"
 
