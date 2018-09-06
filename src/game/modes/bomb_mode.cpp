@@ -673,9 +673,15 @@ bomb_mode::round_transferred_players bomb_mode::make_transferred_players(const i
 	return result;
 }
 
-void bomb_mode::start_next_round(const input_type in, const logic_step step) {
+void bomb_mode::start_next_round(const input_type in, const logic_step step, const round_start_type type) {
 	state = arena_mode_state::LIVE;
-	setup_round(in, step, make_transferred_players(in));
+
+	if (type == round_start_type::KEEP_EQUIPMENTS) {
+		setup_round(in, step, make_transferred_players(in));
+	}
+	else {
+		setup_round(in, step);
+	}
 }
 
 mode_player_id bomb_mode::lookup(const entity_guid& guid) const {
@@ -788,6 +794,30 @@ void bomb_mode::count_knockouts_for_unconscious_players_in(const input_type in, 
 	});
 }
 
+bool bomb_mode::is_halfway_round(const input_type in) const {
+	const auto n = in.vars.get_num_rounds();
+	const auto current_round = get_round_num();
+
+	return current_round == n / 2;
+}
+
+bool bomb_mode::is_final_round(const input_type in) const {
+	const auto n = in.vars.get_num_rounds();
+	const auto current_round = get_round_num();
+
+	bool someone_has_over_half = false;
+
+	const auto p = calc_participating_factions(in);
+	
+	p.for_each([&](const auto f) {
+		if (get_score(f) > n / 2) {
+			someone_has_over_half = true;
+		}
+	});
+
+	return someone_has_over_half || current_round == n;
+}
+
 void bomb_mode::make_win(const input_type in, const faction_type winner) {
 	const auto p = calc_participating_factions(in);
 	const auto loser = winner == p.defusing ? p.bombing : p.defusing;
@@ -823,6 +853,12 @@ void bomb_mode::make_win(const input_type in, const faction_type winner) {
 		const auto faction = p.second.faction;
 
 		post_award(in, player_id, faction == winner ? winner_award : loser_award);
+	}
+
+	if (is_halfway_round(in) || is_final_round(in)) {
+		state = arena_mode_state::MATCH_SUMMARY;
+		set_players_frozen(in, true);
+		release_triggers_of_weapons_of_players(in);
 	}
 }
 
@@ -1091,6 +1127,31 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 			start_next_round(in, step);
 		}
 	}
+	else if (state == arena_mode_state::MATCH_SUMMARY) {
+		if (get_match_summary_seconds_left(in) <= 0.f) {
+			const auto p = calc_participating_factions(in);
+
+			for (auto& it : players) {
+				auto& player_data = it.second;
+				p.make_swapped(player_data.faction);
+			}
+
+			if (is_final_round(in)) {
+				restart(in, step);
+			}
+			else {
+				/* Switch sides */
+				std::swap(factions[p.bombing].score, factions[p.defusing].score);
+
+				p.for_each([&](const auto f) {
+					factions[f].clear_for_next_half();
+				});
+
+				set_players_money_to_initial(in);
+				start_next_round(in, step, round_start_type::DONT_KEEP_EQUIPMENTS);
+			}
+		}
+	}
 
 	execute_player_commands(in, entropy, step);
 }
@@ -1204,7 +1265,7 @@ float bomb_mode::get_round_seconds_left(const input_type in) const {
 	return static_cast<float>(in.vars.round_secs) + in.vars.freeze_secs - get_total_seconds(in);
 }
 
-float bomb_mode::get_round_end_seconds_left(const input_type in) const {
+float bomb_mode::get_seconds_since_win(const input_type in) const {
 	const auto& last_win = current_round.last_win;
 
 	if (!last_win.was_set()) {
@@ -1213,7 +1274,23 @@ float bomb_mode::get_round_end_seconds_left(const input_type in) const {
 
 	const auto& clk = in.cosm.get_clock();
 
-	return static_cast<float>(in.vars.round_end_secs) - clk.diff_seconds(last_win.when);
+	return clk.diff_seconds(last_win.when);
+}
+
+float bomb_mode::get_match_summary_seconds_left(const input_type in) const {
+	if (const auto since_win = get_seconds_since_win(in); since_win != -1.f) {
+		return static_cast<float>(in.vars.match_summary_seconds) - since_win;
+	}
+
+	return -1.f;
+}
+
+float bomb_mode::get_round_end_seconds_left(const input_type in) const {
+	if (!current_round.last_win.was_set()) {
+		return -1.f;
+	}
+
+	return static_cast<float>(in.vars.round_end_secs) - get_seconds_since_win(in);
 }
 
 bool bomb_mode::bomb_exploded(const input_type in) const {
@@ -1303,10 +1380,30 @@ unsigned bomb_mode::get_round_num() const {
 	unsigned total = 0;
 
 	for_each_faction([&](const auto f) {
-		total += factions[f].score;
+		total += get_score(f);
 	});
 
 	return total;
+}
+
+unsigned bomb_mode::get_score(const faction_type f) const {
+	return factions[f].score;
+}
+
+std::optional<arena_mode_match_result> bomb_mode::calc_match_result(const input_type in) const {
+	if (state != arena_mode_state::MATCH_SUMMARY) {
+		return std::nullopt;
+	}
+
+	const auto p = calc_participating_factions(in);
+
+	if (get_score(p.bombing) == get_score(p.defusing)) {
+		return arena_mode_match_result::make_tie();
+	}
+
+	arena_mode_match_result result;
+	result.winner = get_score(p.bombing) > get_score(p.defusing) ? p.bombing : p.defusing;
+	return result;
 }
 
 void bomb_mode::request_restart() {
@@ -1327,7 +1424,6 @@ void bomb_mode::restart(const input_type in, const logic_step step) {
 	setup_round(in, step);
 }
 
-
 unsigned bomb_mode::calc_max_faction_score() const {
 	unsigned maximal = 0;
 
@@ -1347,15 +1443,20 @@ void bomb_mode::clear_players_round_state(const input_type in) {
 	}
 }
 
+void bomb_mode::set_players_money_to_initial(const input_type in) {
+	for (auto& it : players) {
+		auto& p = it.second;
+		p.stats.money = in.vars.initial_money;
+	}
+}
+
 void bomb_mode::reset_players_stats(const input_type in) {
 	for (auto& it : players) {
 		auto& p = it.second;
-		auto& stats = p.stats;
-
-		stats = {};
-		stats.money = in.vars.initial_money;
+		p.stats = {};
 	}
 
+	set_players_money_to_initial(in);
 	clear_players_round_state(in);
 }
 

@@ -57,8 +57,9 @@ struct bomb_mode_vars {
 	unsigned round_end_secs = 5;
 	unsigned freeze_secs = 5;
 	unsigned warmup_secs = 45;
-	unsigned max_rounds = 5;
 	unsigned warmup_respawn_after_ms = 2000;
+	unsigned max_rounds = 5;
+	unsigned match_summary_seconds = 15;
 	meter_value_type minimal_damage_for_assist = 41;
 	per_faction_t<bomb_mode_faction_vars> factions;
 
@@ -68,6 +69,11 @@ struct bomb_mode_vars {
 	bomb_mode_economy_vars economy;
 	arena_mode_view_vars view;
 	// END GEN INTROSPECTOR
+
+	auto get_num_rounds() const {
+		/* Make it even */
+		return std::max((max_rounds / 2) * 2, 2u);
+	}
 };
 
 struct bomb_mode_faction_state {
@@ -77,6 +83,12 @@ struct bomb_mode_faction_state {
 	unsigned consecutive_losses = 0;
 	std::vector<entity_guid> shuffled_spawns;
 	// END GEN INTROSPECTOR
+
+	void clear_for_next_half() {
+		current_spawn_index = 0;
+		consecutive_losses = 0;
+		shuffled_spawns.clear();
+	}
 };
 
 struct arena_mode_player_round_state {
@@ -125,7 +137,8 @@ enum class arena_mode_state {
 	INIT,
 	WARMUP,
 	LIVE,
-	ROUND_END_DELAY
+	ROUND_END_DELAY,
+	MATCH_SUMMARY
 	// END GEN INTROSPECTOR
 };
 
@@ -154,6 +167,11 @@ enum class faction_choice_result {
 	// END GEN INTROSPECTOR
 };
 
+enum class round_start_type {
+	KEEP_EQUIPMENTS,
+	DONT_KEEP_EQUIPMENTS
+};
+
 class bomb_mode {
 public:
 	using vars_type = bomb_mode_vars;
@@ -179,10 +197,25 @@ public:
 		std::size_t size() const {
 			return 2;
 		}
+
+		void make_swapped(faction_type& f) const {
+			if (f == bombing) {
+				f = defusing;
+				return;
+			}
+
+			if (f == defusing) {
+				f = bombing;
+				return;
+			}
+		}
 	};
 
 	participating_factions calc_participating_factions(input) const;
 	faction_type calc_weakest_faction(input) const;
+
+	bool is_halfway_round(input) const;
+	bool is_final_round(input) const;
 
 private:
 	struct transferred_inventory {
@@ -230,7 +263,7 @@ private:
 	void mode_pre_solve(input, const mode_entropy&, logic_step);
 	void mode_post_solve(input, const mode_entropy&, const_logic_step);
 
-	void start_next_round(input, logic_step);
+	void start_next_round(input, logic_step, round_start_type = round_start_type::KEEP_EQUIPMENTS);
 	void setup_round(input, logic_step, const round_transferred_players& = {});
 	void reshuffle_spawns(const cosmos&, faction_type);
 
@@ -305,6 +338,8 @@ public:
 	float get_freeze_seconds_left(input) const;
 	float get_round_seconds_passed(input) const;
 	float get_round_seconds_left(input) const;
+	float get_seconds_since_win(input) const;
+	float get_match_summary_seconds_left(input) const;
 	float get_round_end_seconds_left(input) const;
 
 	float get_critical_seconds_left(input) const;
@@ -315,10 +350,15 @@ public:
 	std::size_t num_conscious_players_in(const cosmos&, faction_type) const;
 	std::size_t num_players_in(faction_type) const;
 
+	std::optional<arena_mode_match_result> calc_match_result(input) const;
+
+	unsigned get_score(faction_type) const;
+
 	void request_restart();
 	void restart(input, logic_step);
 
 	void reset_players_stats(input);
+	void set_players_money_to_initial(input);
 	void clear_players_round_state(input);
 
 	void post_award(input, mode_player_id, money_type amount);

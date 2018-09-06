@@ -6,14 +6,22 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Halftime and end of match
+
+- Reloading
+	- Essential to gameplay, really, so best to do it early
+	- Do we implement entire mounting system? Maybe it won't be so hard after all
+	- Also, cocking the gun
+		- Should have a separate sound in gun invariant
+		- Should always happen automatically when one hand is free and the other holds the gun
+			- Is an exception to the rule of mounting that both items need to be in hand
+			- For now, can play the shooting animation for cocking
+
 - Game events log and chat
 	- In the same window
 	- ImGui or own GUI?
 		- We actually have some textbox code we can introduce later for chatting
 			- Better control over such an important feature
-
-- let players spawn for a moment after beginning the round
-	- though not after changing a team
 
 - Remove the notion of container_with_small_size
 	- Interesting concept but we'll just handle it during actual serialization stage
@@ -43,14 +51,6 @@ summary: That which we are brainstorming at the moment.
 
 - Revival and undoing the knockouts
 
-- Reloading
-	- Essential to gameplay, really, so best to do it early
-	- Do we implement entire mounting system? Maybe it won't be so hard after all
-	- Also, cocking the gun
-		- Should have a separate sound in gun invariant
-		- Should always happen automatically when one hand is free and the other holds the gun
-			- Is an exception to the rule of mounting that both items need to be in hand
-			- For now, can play the shooting animation for cocking
 
 - Dashing
 	- Assigned to space, since we don't have jumping anyway

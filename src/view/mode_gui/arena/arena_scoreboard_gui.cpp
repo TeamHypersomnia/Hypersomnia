@@ -40,9 +40,14 @@ void arena_scoreboard_gui::draw_gui(
 ) const {
 	using namespace augs::gui::text;
 
-	if (!show) {
+	const bool should_show = show || typed_mode.state == arena_mode_state::MATCH_SUMMARY;
+
+	if (!should_show) {
 		return;
 	}
+
+	const auto match_result = typed_mode.calc_match_result(mode_input);
+	const bool is_halftime = match_result != std::nullopt && typed_mode.is_halfway_round(mode_input);
 
 	const auto& cfg = in.config.arena_mode_gui.scoreboard_settings;
 
@@ -268,6 +273,39 @@ void arena_scoreboard_gui::draw_gui(
 
 			if (cfg.dark_color_overlay_under_score) {
 				aabb(faction_bg_orig, bg_dark);
+			}
+
+			if (match_result != std::nullopt) {
+				const bool tied = match_result->is_tie();
+				auto label = std::string(tied ? "TIED" : "WON");
+
+				if (is_halftime) {
+					label += " THE FIRST HALF";
+				}
+				else {
+					label += " THE MATCH";
+				}
+
+				auto text_pos = faction_bg_orig.get_center();
+
+				if (tied) {
+					text_pos -= vec2i(0, faction_bg_orig.get_size().y / 2);
+				}
+
+				auto do_draw = [&]() {
+					text_stroked(label, yellow, text_pos, { augs::center::X, augs::center::Y });
+				};
+
+				if (tied) {
+					if (!on_top) {
+						do_draw();
+					}
+				}
+				else {
+					if (match_result->winner == faction) {
+						do_draw();
+					}
+				}
 			}
 
 			auto prev_pen_x = pen.x;

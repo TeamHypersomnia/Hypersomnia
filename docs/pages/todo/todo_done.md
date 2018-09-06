@@ -1353,3 +1353,7 @@ we consider whole type overrides too complex architeciturally:
 		- needs complete input with the initial solvable as well, so let's first implement this
 
 - explosions -> standard_explosion
+
+- let players spawn for a moment after beginning the round
+	- though not after changing a team
+

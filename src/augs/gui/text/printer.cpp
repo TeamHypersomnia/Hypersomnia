@@ -276,8 +276,8 @@ namespace augs {
 
 				auto coloured_str = str;
 
-				for (auto& c : coloured_str) {
-					c.set_color(stroke_color);
+				for (auto& col : coloured_str) {
+					col.set_color(stroke_color);
 				}
 
 				thread_local formatted_utf32_string prev;

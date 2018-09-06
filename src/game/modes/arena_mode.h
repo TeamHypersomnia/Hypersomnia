@@ -66,5 +66,17 @@ struct arena_mode_view_vars {
 	// END GEN INTROSPECTOR
 };
 
+struct arena_mode_match_result {
+	std::optional<faction_type> winner;
+
+	static auto make_tie() {
+		return arena_mode_match_result();
+	}
+
+	bool is_tie() const {
+		return winner == std::nullopt;
+	}
+};
+
 using arena_mode_knockouts_vector = std::vector<arena_mode_knockout>;
 using arena_mode_awards_vector = std::vector<arena_mode_award>;

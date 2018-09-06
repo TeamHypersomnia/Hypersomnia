@@ -439,7 +439,21 @@ void arena_gui_state::draw_mode_gui(
 			const auto& win = typed_mode.current_round.last_win;
 
 			if (win.was_set()) {
-				draw_info_indicator(format_enum(win.winner) + " wins!", yellow);
+				auto indicator_text = format_enum(win.winner) + " wins!";
+
+				if (typed_mode.state == arena_mode_state::MATCH_SUMMARY) {
+					indicator_text += typed_mode.is_halfway_round(mode_input) ? "\n\nHalftime\n" : "\n\nIntermission\n";
+
+					{
+						const auto summary_secs_left = typed_mode.get_match_summary_seconds_left(mode_input);
+						const auto c = std::ceil(summary_secs_left);
+
+						indicator_text += format_mins_secs(c);
+					}
+				}
+
+				draw_info_indicator(indicator_text, yellow);
+
 				return;
 			}
 		}
