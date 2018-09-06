@@ -757,7 +757,8 @@ namespace test_flavours {
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
-			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::RIFLE_CHAMBERING);
+			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::BILMER_CHAMBERING);
+			gun_def.chambering_duration_ms = 400.f;
 
 			meta.set(gun_def);
 
@@ -915,11 +916,15 @@ namespace test_flavours {
 			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::DATUM_GUN_SHOT);
 			gun_def.adversarial.knockout_award = static_cast<money_type>(350);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_CHAMBERING);
+			gun_def.chambering_duration_ms = 900.f;
 
 			meta.set(gun_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::DATUM_GUN_SHOT_1, white);
-			test_flavours::add_lying_item_dynamic_body(meta);
+
+			auto& fix = test_flavours::add_lying_item_dynamic_body(meta);
+			fix.density *= 1.28f;
+
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::PLASMA_DRAW);
 			meta.get<invariants::item>().standard_price = 4000;
@@ -957,6 +962,7 @@ namespace test_flavours {
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::MEDIUM_PISTOL_CHAMBERING);
+			gun_def.chambering_duration_ms = 250.f;
 
 			meta.set(gun_def);
 
@@ -999,6 +1005,7 @@ namespace test_flavours {
 			gun_def.gunshot_adds_heat = 0.072f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
+			gun_def.chambering_duration_ms = 250.f;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::LIGHT_PISTOL_CHAMBERING);

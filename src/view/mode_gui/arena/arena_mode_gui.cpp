@@ -72,6 +72,7 @@ void arena_gui_state::draw_mode_gui(
 	const typename M::input& mode_input
 ) const {
 	const auto& cfg = in.config.arena_mode_gui;
+	const auto line_height = in.gui_fonts.gui.metrics.get_height();
 
 	if constexpr(M::round_based) {
 		scoreboard.draw_gui(in, mode_in, typed_mode, mode_input);
@@ -146,8 +147,6 @@ void arena_gui_state::draw_mode_gui(
 
 						return i;
 					}();
-
-					const auto line_height = in.gui_fonts.gui.metrics.get_height();
 
 					for (std::size_t i = starting_i; i < awards.size(); ++i) {
 						const auto& a = awards[i].amount;
@@ -366,18 +365,13 @@ void arena_gui_state::draw_mode_gui(
 			}
 		}
 
-		auto draw_indicator_at = [&](const std::string& val, const rgba& col, const auto t) {
-			const auto text_style = style(
-				in.gui_fonts.gui,
-				col
-			);
-
+		auto draw_indicator_at = [&](const auto& val, const auto t) {
 			const auto s = in.screen_size;
 
 			print_stroked(
 				in.drawer,
 				{ s.x / 2, static_cast<int>(t) },
-				formatted_string(val, text_style),
+				val,
 				{ augs::center::X }
 			);
 		};
@@ -412,12 +406,12 @@ void arena_gui_state::draw_mode_gui(
 		};
 
 		auto draw_time_at_top = [&](const std::string& val, const rgba& col) {
-			draw_indicator_at(val, col, game_screen_top);
+			draw_indicator_at(colored(val, col), game_screen_top);
 		};
 
-		auto draw_info_indicator = [&](const std::string& val, const rgba& col) {
+		auto draw_info_indicator = [&](const auto& val) {
 			const auto one_fourth_t = in.screen_size.y / 6;
-			draw_indicator_at(val, col, one_fourth_t);
+			draw_indicator_at(val, one_fourth_t);
 		};
 
 		auto draw_warmup_indicator = draw_info_indicator;
@@ -426,33 +420,33 @@ void arena_gui_state::draw_mode_gui(
 			const auto c = std::ceil(warmup_left);
 
 			play_tick_if_soon(c, 5.f, true);
-			draw_warmup_indicator("WARMUP\n" + format_mins_secs(c), white);
+			draw_warmup_indicator(colored("WARMUP\n" + format_mins_secs(c), white));
 			return;
 		}
 
 		{
 			if (const auto secs = typed_mode.get_seconds_since_planting(mode_input); secs >= 0.f && secs <= 3.f) {
-				draw_info_indicator("The bomb has been planted!", yellow);
+				draw_info_indicator(colored("The bomb has been planted!", yellow));
 				return;
 			}
 
 			const auto& win = typed_mode.current_round.last_win;
 
 			if (win.was_set()) {
-				auto indicator_text = format_enum(win.winner) + " wins!";
+				auto indicator_text = colored(format_enum(win.winner) + " wins!", yellow);
 
 				if (typed_mode.state == arena_mode_state::MATCH_SUMMARY) {
-					indicator_text += typed_mode.is_halfway_round(mode_input) ? "\n\nHalftime\n" : "\n\nIntermission\n";
+					indicator_text += colored(typed_mode.is_halfway_round(mode_input) ? "\n\nHalftime\n" : "\n\nIntermission\n", white);
 
 					{
 						const auto summary_secs_left = typed_mode.get_match_summary_seconds_left(mode_input);
 						const auto c = std::ceil(summary_secs_left);
 
-						indicator_text += format_mins_secs(c);
+						indicator_text += colored(format_mins_secs(c), white);
 					}
 				}
 
-				draw_info_indicator(indicator_text, yellow);
+				draw_info_indicator(indicator_text);
 
 				return;
 			}
@@ -462,10 +456,10 @@ void arena_gui_state::draw_mode_gui(
 			const auto c = std::ceil(match_begins_in_seconds - 1.f);
 
 			if (c > 0.f) {
-				draw_warmup_indicator("Match begins in\n" + format_mins_secs(match_begins_in_seconds), yellow);
+				draw_warmup_indicator(colored("Match begins in\n" + format_mins_secs(match_begins_in_seconds), yellow));
 			}
 			else {
-				draw_warmup_indicator("The match has begun", yellow);
+				draw_warmup_indicator(colored("The match has begun", yellow));
 			}
 
 			return;

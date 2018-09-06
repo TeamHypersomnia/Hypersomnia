@@ -186,7 +186,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 			auto try_to_play_trigger_sound = [&]() {
 				if (gun.is_trigger_pressed) {
-					if (clk.try_to_fire_and_reset(300.f, gun.when_last_played_trigger_effect)) {
+					if (clk.try_to_fire_and_reset(200.f, gun.when_last_played_trigger_effect)) {
 						const auto& chosen_effect = gun_def.trigger_pull_sound;
 						chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability));
 					}
