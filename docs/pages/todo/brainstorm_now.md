@@ -6,16 +6,21 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Halftime and end of match
+- Mounting
+	- As with always, implement representation early
+		- Or just small hud circle in its center
+			- For now, this
+			- Always draw small circle
+		- E.g. a magazine icon next to the reloaded mag
 
 - Reloading
 	- Essential to gameplay, really, so best to do it early
 	- Do we implement entire mounting system? Maybe it won't be so hard after all
-	- Also, cocking the gun
+	- Also, chambering the gun
 		- Should have a separate sound in gun invariant
 		- Should always happen automatically when one hand is free and the other holds the gun
 			- Is an exception to the rule of mounting that both items need to be in hand
-			- For now, can play the shooting animation for cocking
+			- For now, can play the shooting animation for chambering
 
 - Game events log and chat
 	- In the same window
@@ -50,7 +55,6 @@ summary: That which we are brainstorming at the moment.
 		- Zero-commands will be signified by a zero bit
 
 - Revival and undoing the knockouts
-
 
 - Dashing
 	- Assigned to space, since we don't have jumping anyway

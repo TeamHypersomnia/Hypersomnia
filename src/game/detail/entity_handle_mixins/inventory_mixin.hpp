@@ -308,3 +308,17 @@ void inventory_mixin<E>::for_each_hand(F callback) const {
 		}
 	}
 }
+
+template <class E>
+template <class handle_type>
+wielding_type inventory_mixin<E>::get_wielding_of(const handle_type item) const {
+	const auto& items = get_wielded_items();
+
+	for (const auto& i : items) {
+		if (i == item) {
+			return items.size() == 1 ? wielding_type::SINGLE_WIELDED : wielding_type::DUAL_WIELDED;
+		}
+	}
+
+	return wielding_type::NOT_WIELDED;
+}

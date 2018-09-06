@@ -1357,3 +1357,5 @@ we consider whole type overrides too complex architeciturally:
 - let players spawn for a moment after beginning the round
 	- though not after changing a team
 
+- Halftime and end of match
+

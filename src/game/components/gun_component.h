@@ -32,21 +32,22 @@ namespace components {
 		augs::stepped_timestamp when_last_played_trigger_effect;
 
 		bool is_trigger_pressed = false;
-		bool is_cocking_handle_being_pulled = false;
+		bool is_chambering_handle_being_pulled = false;
 		bool steam_burst_scheduled = false;
 		bool play_trigger_effect_once = false;
 
 		float current_heat = 0.f;
 		float max_heat_after_steam_schedule = 0.f;
+		float chambering_progress_ms = 0.f;
 
-		augs::stepped_timestamp when_began_pulling_cocking_handle;
+		augs::stepped_timestamp when_began_pulling_chambering_handle;
 
 		recoil_player_instance recoil;
 
 		simple_rot_vel magazine;
 		// END GEN INTROSPECTOR
 
-		void set_cocking_handle_pulling(
+		void set_chambering_handle_pulling(
 			const bool enabled,
 			const augs::stepped_timestamp now
 		);
@@ -86,6 +87,7 @@ namespace invariants {
 		sound_effect_input steam_burst_sound;
 		particle_effect_input steam_burst_particles;
 
+		sound_effect_input chambering_sound;
 		sound_effect_input muzzle_shot_sound;
 		sound_effect_input low_ammo_cue_sound;
 
@@ -95,7 +97,7 @@ namespace invariants {
 		real32 kickback_towards_wielder = 0.f;
 		real32 recoil_multiplier = 1.f;
 
-		float cocking_handle_pull_duration_ms = 500.f;
+		float chambering_duration_ms = 500.f;
 
 		constrained_entity_flavour_id<invariants::missile, components::sender> magic_missile_flavour;
 		recoil_player_instance_def recoil;

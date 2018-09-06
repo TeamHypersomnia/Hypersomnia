@@ -739,8 +739,6 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4500.f, 4500.f};
 			gun_def.shot_cooldown_ms = 92.f;
 
-			gun_def.shell_spawn_offset.pos.set(0, 10);
-			gun_def.shell_spawn_offset.rotation = 45;
 			gun_def.shell_angular_velocity = {2.f, 14.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
@@ -756,6 +754,7 @@ namespace test_flavours {
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
+			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::RIFLE_CHAMBERING);
 
 			meta.set(gun_def);
 
@@ -787,8 +786,6 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4500.f, 4500.f};
 			gun_def.shot_cooldown_ms = 100.f;
 
-			gun_def.shell_spawn_offset.pos.set(0, 10);
-			gun_def.shell_spawn_offset.rotation = 45;
 			gun_def.shell_angular_velocity = {2.f, 14.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
@@ -806,6 +803,7 @@ namespace test_flavours {
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::VINDICATOR_SHOT);
+			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::RIFLE_CHAMBERING);
 
 			meta.set(gun_def);
 
@@ -837,8 +835,6 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {3900.f, 3900.f};
 			gun_def.shot_cooldown_ms = 60.f;
 
-			gun_def.shell_spawn_offset.pos.set(0, 10);
-			gun_def.shell_spawn_offset.rotation = 45;
 			gun_def.shell_angular_velocity = {2.f, 14.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
@@ -863,6 +859,7 @@ namespace test_flavours {
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 			//gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::VINDICATOR_SHOT);
+			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::RIFLE_CHAMBERING);
 
 			meta.set(gun_def);
 
@@ -897,8 +894,6 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4400.f, 4400.f};
 			gun_def.shot_cooldown_ms = 120.f;
 
-			gun_def.shell_spawn_offset.pos.set(0, 10);
-			gun_def.shell_spawn_offset.rotation = 45;
 			gun_def.shell_angular_velocity = {2.f, 14.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
@@ -916,6 +911,7 @@ namespace test_flavours {
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::DATUM_GUN_SHOT);
 			gun_def.adversarial.knockout_award = static_cast<money_type>(350);
+			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_CHAMBERING);
 
 			meta.set(gun_def);
 
@@ -944,8 +940,6 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {3500.f, 3500.f};
 			gun_def.shot_cooldown_ms = 100.f;
 
-			gun_def.shell_spawn_offset.pos.set(0, 10);
-			gun_def.shell_spawn_offset.rotation = 45;
 			gun_def.shell_angular_velocity = {2.f, 14.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
@@ -959,6 +953,7 @@ namespace test_flavours {
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::MEDIUM_PISTOL_CHAMBERING);
 
 			meta.set(gun_def);
 
@@ -988,8 +983,6 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {3500.f, 3500.f};
 			gun_def.shot_cooldown_ms = 100.f;
 
-			gun_def.shell_spawn_offset.pos.set(0, 10);
-			gun_def.shell_spawn_offset.rotation = 45;
 			gun_def.shell_angular_velocity = {2.f, 10.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {300.f, 1900.f};
@@ -1005,6 +998,7 @@ namespace test_flavours {
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::LIGHT_PISTOL_CHAMBERING);
 
 			meta.set(gun_def);
 
@@ -1029,12 +1023,12 @@ namespace test_flavours {
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::AO44_MUZZLE);
 
-			gun_def.action_mode = gun_action_type::AUTOMATIC;
+			gun_def.action_mode = gun_action_type::BOLT_ACTION;
 			gun_def.muzzle_velocity = {4100.f, 4100.f};
-			gun_def.shot_cooldown_ms = 300.f;
+			gun_def.shot_cooldown_ms = 0.f;
+			gun_def.chambering_duration_ms = 300.f;
+			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::REVOLVER_CHAMBERING);
 
-			gun_def.shell_spawn_offset.pos.set(0, 10);
-			gun_def.shell_spawn_offset.rotation = 45;
 			gun_def.shell_angular_velocity = {2.f, 10.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {500.f, 2500.f};
@@ -1117,6 +1111,7 @@ namespace prefabs {
 		if (load_mag.alive()) {
 			perform_transfer(item_slot_transfer_request::standard(load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE]), step);
 
+#if LOAD_TO_CHAMBER
 			if (load_mag[slot_function::ITEM_DEPOSIT].has_items()) {
 				perform_transfer(
 					item_slot_transfer_request::standard(
@@ -1127,6 +1122,7 @@ namespace prefabs {
 					step
 				);
 			}
+#endif
 		}
 
 		return weapon;
@@ -1141,9 +1137,11 @@ namespace prefabs {
 		if (load_mag.alive()) {
 			perform_transfer(item_slot_transfer_request::standard(load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE]), step);
 
+#if LOAD_TO_CHAMBER
 			if (load_mag[slot_function::ITEM_DEPOSIT].has_items()) {
 				perform_transfer(item_slot_transfer_request::standard(load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1), step);
 			}
+#endif
 		}
 
 		return weapon;

@@ -28,8 +28,10 @@
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 #include "game/detail/gun/gun_math.h"
+#include "game/detail/gun/shell_offset.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 
+#include "game/messages/start_sound_effect.h"
 #include "game/stateless_systems/gun_system.h"
 #include "game/inferred_caches/physics_world_cache.h"
 
@@ -37,26 +39,24 @@ using namespace augs;
 
 #define ENABLE_RECOIL 1
 
-void components::gun::set_cocking_handle_pulling(
+void components::gun::set_chambering_handle_pulling(
 	const bool enabled,
 	const augs::stepped_timestamp now
 ) {
-	if (!is_cocking_handle_being_pulled) {
-		when_began_pulling_cocking_handle = now;
+	if (!is_chambering_handle_being_pulled) {
+		when_began_pulling_chambering_handle = now;
 	}
 
-	is_cocking_handle_being_pulled = enabled;
+	is_chambering_handle_being_pulled = enabled;
 }
 
-static void load_next_round(
-	const entity_id subject,
-	const logic_step step
+static entity_id find_next_cartridge(
+	const const_entity_handle gun_entity
 ) {
-	auto& cosmos = step.get_cosmos();
-	const auto gun_entity = step.get_cosmos()[subject];
-
 	thread_local std::vector<entity_id> next_cartridge_from;
 	next_cartridge_from.clear();
+
+	auto& cosm = gun_entity.get_cosmos();
 
 	const auto chamber_magazine_slot = gun_entity[slot_function::GUN_CHAMBER_MAGAZINE];
 
@@ -67,21 +67,45 @@ static void load_next_round(
 		const auto detachable_magazine_slot = gun_entity[slot_function::GUN_DETACHABLE_MAGAZINE];
 
 		if (detachable_magazine_slot.alive() && detachable_magazine_slot.has_items()) {
-			const auto magazine = cosmos[detachable_magazine_slot.get_items_inside()[0]];
+			const auto magazine = cosm[detachable_magazine_slot.get_items_inside()[0]];
 
 			next_cartridge_from = magazine[slot_function::ITEM_DEPOSIT].get_items_inside();
 		}
 	}
 
 	if (next_cartridge_from.size() > 0) {
-		item_slot_transfer_request into_chamber_transfer;
+		return next_cartridge_from.back();
+	}
 
-		into_chamber_transfer.item = next_cartridge_from[next_cartridge_from.size() - 1];
-		into_chamber_transfer.target_slot = gun_entity[slot_function::GUN_CHAMBER];
-		into_chamber_transfer.force_immediate_mount = true;
-		into_chamber_transfer.specified_quantity = 1;
-	   
-		perform_transfer(into_chamber_transfer, step);
+	return {};
+}
+
+static void load_next_cartridge(
+	const entity_id gun_entity_id,
+	const entity_id next_cartridge,
+	const logic_step step
+) {
+	const auto gun_entity = step.get_cosmos()[gun_entity_id];
+
+	item_slot_transfer_request into_chamber_transfer;
+
+	into_chamber_transfer.item = next_cartridge;
+	into_chamber_transfer.target_slot = gun_entity[slot_function::GUN_CHAMBER];
+	into_chamber_transfer.force_immediate_mount = true;
+	into_chamber_transfer.specified_quantity = 1;
+   
+	perform_transfer(into_chamber_transfer, step);
+}
+
+static void find_and_load_next_cartridge(
+	const entity_id gun_entity_id,
+	const logic_step step
+) {
+	auto& cosm = step.get_cosmos();
+	const auto gun_entity = cosm[gun_entity_id];
+
+	if (const auto next_cartridge = find_next_cartridge(gun_entity); next_cartridge.is_set()) {
+		load_next_cartridge(gun_entity, next_cartridge, step);
 	}
 }
 
@@ -120,6 +144,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			const auto gun_transform = gun_entity.get_logic_transform();
 			const auto owning_capability = gun_entity.get_owning_transfer_capability();
 			components::sentience* sentience = owning_capability ? owning_capability.template find<components::sentience>() : nullptr;
+
+			const auto wielding = owning_capability ? owning_capability.get_wielding_of(gun_entity) : wielding_type::NOT_WIELDED;
 
 			auto& gun = gun_entity.template get<components::gun>();
 			const auto& gun_def = gun_entity.template get<invariants::gun>();
@@ -213,156 +239,195 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					}
 				}
 			}
-			else if (gun_entity[slot_function::GUN_CHAMBER].get_items_inside().size() > 0) {
-				/* 
-					TODO: 
-					Properly parametrize all these magic numbers.
-					These serve purely for managing the rotating magazine - thus, aesthetic reasons.
-				*/
+			else {
+				auto get_num_in_chamber = [&]() {
+					return gun_entity[slot_function::GUN_CHAMBER].get_items_inside().size();
+				};
+				
+				if (get_num_in_chamber() == 0) {
+					if (const auto next_cartridge = find_next_cartridge(gun_entity); next_cartridge.is_set()) {
+						auto& progress = gun.chambering_progress_ms;
 
-				if (gun.current_heat < gun_def.minimum_heat_to_shoot) {
-					if (gun.is_trigger_pressed) {
-						auto& heat = gun.current_heat;
-
-						const auto trigger_effect_cooldown_ms = 100.f;
-
-						if (gun.play_trigger_effect_once && clk.try_to_fire_and_reset(trigger_effect_cooldown_ms, gun.when_last_played_trigger_effect)) {
-							if (heat <= 2.f) {
-								gun.magazine.apply(50000.5f * delta.in_seconds());
-
-								auto chosen_effect = gun_def.heavy_heat_start_sound;
-								chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability));
-							}
-							else {
-								auto chosen_effect = gun_def.light_heat_start_sound;
+						if (wielding == wielding_type::SINGLE_WIELDED) {
+							if (progress == 0.f) {
+								const auto& chosen_effect = gun_def.chambering_sound;
 								chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability));
 							}
 
-							gun.play_trigger_effect_once = false;
+							progress += delta.in_milliseconds();
+
+							if (progress >= gun_def.chambering_duration_ms) {
+								::load_next_cartridge(gun_entity, next_cartridge, step);
+								progress = 0.f;
+							}
 						}
+						else {
+							if (progress > 0.f) {
+								const auto& chosen_effect = gun_def.chambering_sound;
 
-						decrease_heat_in_aftermath = false;
+								messages::stop_sound_effect stop;
+								stop.match_chased_subject = gun_entity;
+								stop.match_effect_id = chosen_effect.id;
+								step.post_message(stop);
+							}
 
-						heat += gun_def.gunshot_adds_heat * (delta.in_milliseconds() / gun_def.shot_cooldown_ms);
-						heat = std::min(gun_def.maximum_heat, heat);
-
-						gun.magazine.apply(5000.5f * delta.in_seconds());
+							progress = 0.f;
+						}
 					}
 				}
-				else if (try_to_fire_interval()) {
-					if (gun_def.minimum_heat_to_shoot > 0.f && gun.magazine.angular_velocity < 5000) {
-						gun.magazine.angular_velocity = 5000;
+
+				if (get_num_in_chamber() > 0) {
+					/* 
+						TODO: 
+						Properly parametrize all these magic numbers.
+						These serve purely for managing the rotating magazine - thus, aesthetic reasons.
+					*/
+
+					if (gun.current_heat < gun_def.minimum_heat_to_shoot) {
+						if (gun.is_trigger_pressed) {
+							auto& heat = gun.current_heat;
+
+							const auto trigger_effect_cooldown_ms = 100.f;
+
+							if (gun.play_trigger_effect_once && clk.try_to_fire_and_reset(trigger_effect_cooldown_ms, gun.when_last_played_trigger_effect)) {
+								if (heat <= 2.f) {
+									gun.magazine.apply(50000.5f * delta.in_seconds());
+
+									const auto& chosen_effect = gun_def.heavy_heat_start_sound;
+									chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability));
+								}
+								else {
+									const auto& chosen_effect = gun_def.light_heat_start_sound;
+									chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability));
+								}
+
+								gun.play_trigger_effect_once = false;
+							}
+
+							decrease_heat_in_aftermath = false;
+
+							heat += gun_def.gunshot_adds_heat * (delta.in_milliseconds() / gun_def.shot_cooldown_ms);
+							heat = std::min(gun_def.maximum_heat, heat);
+
+							gun.magazine.apply(5000.5f * delta.in_seconds());
+						}
 					}
+					else if (try_to_fire_interval()) {
+						if (gun_def.minimum_heat_to_shoot > 0.f && gun.magazine.angular_velocity < 5000) {
+							gun.magazine.angular_velocity = 5000;
+						}
 
-					/* This is a normal gun */
-					const auto chamber_slot = gun_entity[slot_function::GUN_CHAMBER];
-					const auto cartridge_in_chamber = cosmos[chamber_slot.get_items_inside()[0]];
+						/* This is a normal gun */
+						const auto chamber_slot = gun_entity[slot_function::GUN_CHAMBER];
+						const auto cartridge_in_chamber = cosmos[chamber_slot.get_items_inside()[0]];
 
-					auto response = make_gunshot_message();
-					response.cartridge_definition = cartridge_in_chamber.template get<invariants::cartridge>();
+						auto response = make_gunshot_message();
+						response.cartridge_definition = cartridge_in_chamber.template get<invariants::cartridge>();
 
-					thread_local std::vector<entity_id> bullet_stacks;
-					bullet_stacks.clear();
+						thread_local std::vector<entity_id> bullet_stacks;
+						bullet_stacks.clear();
 
-					const auto pellets_slot = cartridge_in_chamber[slot_function::ITEM_DEPOSIT];
+						const auto pellets_slot = cartridge_in_chamber[slot_function::ITEM_DEPOSIT];
 
-					thread_local destruction_queue destructions;
-					destructions.clear();
+						thread_local destruction_queue destructions;
+						destructions.clear();
 
-					if (pellets_slot.alive()) {
-						bullet_stacks = pellets_slot.get_items_inside();
+						if (pellets_slot.alive()) {
+							bullet_stacks = pellets_slot.get_items_inside();
 
-						/* 
-							apart from the pellets stacks inside the cartridge,
-							we must additionally queue the cartridge itself
-						*/
+							/* 
+								apart from the pellets stacks inside the cartridge,
+								we must additionally queue the cartridge itself
+							*/
 
-						destructions.emplace_back(cartridge_in_chamber);
-					}
-					else {
-						bullet_stacks.push_back(cartridge_in_chamber);
-					}
+							destructions.emplace_back(cartridge_in_chamber);
+						}
+						else {
+							bullet_stacks.push_back(cartridge_in_chamber);
+						}
 
-					ensure(bullet_stacks.size() > 0);
+						ensure(bullet_stacks.size() > 0);
 
-					for (const auto single_bullet_or_pellet_stack_id : bullet_stacks) {
-						const auto single_bullet_or_pellet_stack = cosmos[single_bullet_or_pellet_stack_id];
+						for (const auto single_bullet_or_pellet_stack_id : bullet_stacks) {
+							const auto single_bullet_or_pellet_stack = cosmos[single_bullet_or_pellet_stack_id];
 
-						int charges = { single_bullet_or_pellet_stack.get<components::item>().get_charges() };
+							int charges = { single_bullet_or_pellet_stack.get<components::item>().get_charges() };
 
-						while (charges--) {
-							if (const auto round_flavour = single_bullet_or_pellet_stack.get<invariants::cartridge>().round_flavour; round_flavour.is_set()) {
-								cosmic::create_entity(cosmos, round_flavour, [&](const auto round_entity, auto&&...){
-									auto& sender = round_entity.template get<components::sender>();
-									sender.set(gun_entity);
+							while (charges--) {
+								if (const auto round_flavour = single_bullet_or_pellet_stack.get<invariants::cartridge>().round_flavour; round_flavour.is_set()) {
+									cosmic::create_entity(cosmos, round_flavour, [&](const auto round_entity, auto&&...){
+										auto& sender = round_entity.template get<components::sender>();
+										sender.set(gun_entity);
 
-									{
-										auto& missile = round_entity.template get<components::missile>();
-										missile.power_multiplier_of_sender = gun_def.damage_multiplier;
-									}
+										{
+											auto& missile = round_entity.template get<components::missile>();
+											missile.power_multiplier_of_sender = gun_def.damage_multiplier;
+										}
 
-									const auto& missile_def = round_entity.template get<invariants::missile>();
-									total_recoil += missile_def.recoil_multiplier * gun_def.recoil_multiplier;
+										const auto& missile_def = round_entity.template get<invariants::missile>();
+										total_recoil += missile_def.recoil_multiplier * gun_def.recoil_multiplier;
 
-									round_entity.set_logic_transform(muzzle_transform);
+										round_entity.set_logic_transform(muzzle_transform);
 
-									response.spawned_rounds.push_back(round_entity);
+										response.spawned_rounds.push_back(round_entity);
 
-									{
-										auto rng = cosmos.get_rng_for(round_entity);
+										{
+											auto rng = cosmos.get_rng_for(round_entity);
 
-										const auto missile_velocity = 
-											vec2::from_degrees(muzzle_transform.rotation)
-											* missile_def.muzzle_velocity_mult
-											* rng.randval(gun_def.muzzle_velocity)
-										;
+											const auto missile_velocity = 
+												vec2::from_degrees(muzzle_transform.rotation)
+												* missile_def.muzzle_velocity_mult
+												* rng.randval(gun_def.muzzle_velocity)
+											;
 
-										round_entity.template get<components::rigid_body>().set_velocity(missile_velocity);
-									}
+											round_entity.template get<components::rigid_body>().set_velocity(missile_velocity);
+										}
 
-									correct_interpolation_for(round_entity);
+										correct_interpolation_for(round_entity);
+									}, [&](const auto) {});
+								}
+							}
+
+							if (const auto shell_flavour = single_bullet_or_pellet_stack.get<invariants::cartridge>().shell_flavour; shell_flavour.is_set()) {
+								cosmic::create_entity(cosmos, shell_flavour, [&](const auto shell_entity, auto&&...){
+									auto rng = cosmos.get_rng_for(shell_entity);
+
+									const auto shell_spawn_offset = ::calc_shell_offset(gun_entity);
+									const auto spread_component = rng.randval_h(gun_def.shell_spread_degrees) + shell_spawn_offset.rotation;
+
+									auto shell_transform = gun_transform;
+									shell_transform.pos += vec2(shell_spawn_offset.pos).rotate(gun_transform.rotation);
+									shell_transform.rotation += spread_component;
+
+									shell_entity.set_logic_transform(shell_transform);
+
+									shell_entity.template get<components::rigid_body>().set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
+									response.spawned_shell = shell_entity;
 								}, [&](const auto) {});
 							}
+
+							destructions.emplace_back(single_bullet_or_pellet_stack);
 						}
 
-						if (const auto shell_flavour = single_bullet_or_pellet_stack.get<invariants::cartridge>().shell_flavour; shell_flavour.is_set()) {
-							cosmic::create_entity(cosmos, shell_flavour, [&](const auto shell_entity, auto&&...){
-								auto rng = cosmos.get_rng_for(shell_entity);
+						step.post_message(response);
 
-								const auto spread_component = rng.randval_h(gun_def.shell_spread_degrees) + gun_def.shell_spawn_offset.rotation;
+						/* 
+							by now every item inside the chamber is queued for destruction.
+							we do not clear items_inside by dropping them by perform_transfers 
+							to avoid unnecessary activation of the rigid bodies of the bullets, due to being dropped.
+						*/
 
-								auto shell_transform = gun_transform;
-								shell_transform.pos += vec2(gun_def.shell_spawn_offset.pos).rotate(gun_transform.rotation);
-								shell_transform.rotation += spread_component;
+						reverse_perform_deletions(make_deletion_queue(destructions, cosmos), cosmos);
 
-								shell_entity.set_logic_transform(shell_transform);
+						/*
+							Note that the above operation would happen automatically once all children entities are destroyed
+							(and thus their inferred relational caches are also destroyed)
+							But we need the result now so that the 
+						*/
 
-								shell_entity.template get<components::rigid_body>().set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
-								response.spawned_shell = shell_entity;
-							}, [&](const auto) {});
+						if (gun_def.action_mode >= gun_action_type::SEMI_AUTOMATIC) {
+							::find_and_load_next_cartridge(gun_entity, step);
 						}
-
-						destructions.emplace_back(single_bullet_or_pellet_stack);
-					}
-
-					step.post_message(response);
-
-					/* 
-						by now every item inside the chamber is queued for destruction.
-						we do not clear items_inside by dropping them by perform_transfers 
-						to avoid unnecessary activation of the rigid bodies of the bullets, due to being dropped.
-					*/
-
-					reverse_perform_deletions(make_deletion_queue(destructions, cosmos), cosmos);
-
-					/*
-						Note that the above operation would happen automatically once all children entities are destroyed
-						(and thus their inferred relational caches are also destroyed)
-						But we need the result now so that the 
-					*/
-
-					if (gun_def.action_mode >= gun_action_type::SEMI_AUTOMATIC) {
-						::load_next_round(gun_entity, step);
 					}
 				}
 			}

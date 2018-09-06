@@ -19,6 +19,12 @@ struct hand_action {
 	const bool is_secondary;
 };
 
+enum class wielding_type {
+	NOT_WIELDED,
+	SINGLE_WIELDED,
+	DUAL_WIELDED
+};
+
 template <class derived_handle_type>
 class inventory_mixin {
 	using offset_vector = std::vector<transformr>;
@@ -87,6 +93,9 @@ public:
 	generic_handle_type get_if_any_item_in_hand_no(std::size_t) const;
 	hand_action calc_hand_action(std::size_t requested_index) const;
 	bool only_secondary_holds_item() const;
+
+	template <class handle_type>
+	wielding_type get_wielding_of(const handle_type holstered_item) const;
 
 	template <class F>
 	void for_each_hand(F callback) const;
