@@ -343,10 +343,21 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 		
 		const auto& collider_special_physics = collider_owner_body.get_special_physics();
 
-		const bool dropped_item_colliding_with_container =
-			collider_special_physics.dropped_or_created_cooldown.lasts(clk)
-			&& collider_special_physics.during_cooldown_ignore_collision_with == subject_owner_body
-		;
+		const bool dropped_item_colliding_with_container = [&]() {
+			if (collider_special_physics.dropped_or_created_cooldown.lasts(clk)) {
+				const auto& ignored = collider_special_physics.during_cooldown_ignore_collision_with;
+
+				if (ignored == subject_owner_body) {
+					return true;
+				}
+
+				if (ignored == subject_capability) {
+					return true;
+				}
+			}
+
+			return false;
+		}();
 
 		// if (dropped_item_colliding_with_container) {
 		// 	LOG(

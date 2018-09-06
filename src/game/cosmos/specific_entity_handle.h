@@ -465,6 +465,10 @@ std::ostream& operator<<(
 	std::ostream& out,
    	const specific_entity_handle<is_const, entity_type, identifier_provider> x
 ) {
+	if (x.dead()) {
+		return out << "(dead handle)";
+	}
+
 	return out << typesafe_sprintf("%x-%x", x.get_name(), x.get_id());
 }
 

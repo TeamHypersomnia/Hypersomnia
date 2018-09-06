@@ -424,7 +424,18 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 									shell_entity.set_logic_transform(shell_transform);
 
-									shell_entity.template get<components::rigid_body>().set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
+									const auto& rigid_body = shell_entity.template get<components::rigid_body>();
+									rigid_body.set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
+
+									auto& ignored = rigid_body.get_special().during_cooldown_ignore_collision_with;
+
+									if (owning_capability.alive()) {
+										ignored = owning_capability;
+									}
+									else {
+										ignored = gun_entity;
+									}
+
 									response.spawned_shell = shell_entity;
 								}, [&](const auto) {});
 							}

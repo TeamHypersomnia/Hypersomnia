@@ -327,6 +327,10 @@ public:
 
 template <bool is_const>
 std::ostream& operator<<(std::ostream& out, const basic_entity_handle<is_const> &x) {
+	if (x.dead()) {
+		return out << "(dead handle)";
+	}
+
 	return out << typesafe_sprintf("%x-%x", x.get_name(), x.get_id());
 }
 
