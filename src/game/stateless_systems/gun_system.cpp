@@ -171,6 +171,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			auto try_to_fire_interval = [&]() -> bool {
 				if (gun.is_trigger_pressed) {
 					if (clk.try_to_fire_and_reset(gun_def.shot_cooldown_ms, gun.when_last_fired)) {
+						gun.when_last_played_trigger_effect = clk.now;
+
 						if (gun_def.action_mode != gun_action_type::AUTOMATIC) {
 							gun.is_trigger_pressed = false;
 						}
@@ -180,6 +182,15 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				}
 
 				return false;
+			};
+
+			auto try_to_play_trigger_sound = [&]() {
+				if (gun.is_trigger_pressed) {
+					if (clk.try_to_fire_and_reset(300.f, gun.when_last_played_trigger_effect)) {
+						const auto& chosen_effect = gun_def.trigger_pull_sound;
+						chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability));
+					}
+				}
 			};
 
 			/* For common aftermath */
@@ -237,6 +248,9 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							);
 						}
 					}
+					else {
+						try_to_play_trigger_sound();
+					}
 				}
 			}
 			else {
@@ -245,9 +259,13 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				};
 				
 				if (get_num_in_chamber() == 0) {
-					if (const auto next_cartridge = find_next_cartridge(gun_entity); next_cartridge.is_set()) {
-						auto& progress = gun.chambering_progress_ms;
+					auto& progress = gun.chambering_progress_ms;
 
+					if (progress == 0.f) {
+						try_to_play_trigger_sound();
+					}
+
+					if (const auto next_cartridge = find_next_cartridge(gun_entity); next_cartridge.is_set()) {
 						const bool feasible_wielding =
 							wielding == wielding_type::SINGLE_WIELDED
 							|| (wielding == wielding_type::DUAL_WIELDED && gun_def.allow_chambering_with_akimbo)

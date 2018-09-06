@@ -92,6 +92,7 @@ namespace invariants {
 		sound_effect_input low_ammo_cue_sound;
 
 		sound_effect_input firing_engine_sound;
+		sound_effect_input trigger_pull_sound;
 		particle_effect_input firing_engine_particles;
 
 		real32 kickback_towards_wielder = 0.f;

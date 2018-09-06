@@ -114,6 +114,8 @@ enum class test_scene_sound_id {
 	SHOTGUN_CHAMBERING,
 	ELECTRIC_CHAMBERING,
 
+	TRIGGER_PULL,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };
