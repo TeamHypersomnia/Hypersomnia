@@ -1028,6 +1028,7 @@ namespace test_flavours {
 			gun_def.shot_cooldown_ms = 0.f;
 			gun_def.chambering_duration_ms = 300.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::REVOLVER_CHAMBERING);
+			gun_def.allow_chambering_with_akimbo = true;
 
 			gun_def.shell_angular_velocity = {2.f, 10.f};
 			gun_def.shell_spread_degrees = 12.f;

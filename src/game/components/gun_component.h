@@ -98,6 +98,8 @@ namespace invariants {
 		real32 recoil_multiplier = 1.f;
 
 		float chambering_duration_ms = 500.f;
+		bool allow_chambering_with_akimbo = false;
+		pad_bytes<3> pad;
 
 		constrained_entity_flavour_id<invariants::missile, components::sender> magic_missile_flavour;
 		recoil_player_instance_def recoil;

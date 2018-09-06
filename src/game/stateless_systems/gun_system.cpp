@@ -248,7 +248,12 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					if (const auto next_cartridge = find_next_cartridge(gun_entity); next_cartridge.is_set()) {
 						auto& progress = gun.chambering_progress_ms;
 
-						if (wielding == wielding_type::SINGLE_WIELDED) {
+						const bool feasible_wielding =
+							wielding == wielding_type::SINGLE_WIELDED
+							|| (wielding == wielding_type::DUAL_WIELDED && gun_def.allow_chambering_with_akimbo)
+						;
+
+						if (feasible_wielding) {
 							if (progress == 0.f) {
 								const auto& chosen_effect = gun_def.chambering_sound;
 								chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability));

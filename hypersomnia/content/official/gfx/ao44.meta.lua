@@ -28,6 +28,13 @@ return {
           y = -6
         },
         rotation = 0
+      },
+      shell_spawn = {
+        pos = {
+          x = -8,
+          y = -6
+        },
+        rotation = -60.255115509033203
       }
     },
     item = {
