@@ -27,23 +27,36 @@ decltype(auto) find_frame(
 }
 
 template <class T>
-frame_type_t<T>* find_frame(
+frame_type_t<T>* find_shoot_frame(
 	const components::gun& gun,
 	T& anim, 
-	const augs::stepped_timestamp now, 
-	const augs::delta dt
+	const cosmos_clock& clk
 ) {
-	const auto animation_time_ms = (now - gun.when_last_fired).in_milliseconds(dt);
+	const auto animation_time_ms = (clk.now - gun.when_last_fired).in_milliseconds(clk.dt);
 	return calc_current_frame(anim, animation_time_ms);
 }
 
 template <class T, class C>
-frame_type_t<T>* find_frame(
+frame_type_t<T>* find_shoot_frame(
 	const components::gun& gun,
 	T& anim, 
 	const C& cosm
 ) {
-	return ::find_frame(gun, anim, cosm.get_timestamp(), cosm.get_fixed_delta());
+	return ::find_shoot_frame(gun, anim, cosm.get_clock());
+}
+
+template <class T>
+frame_type_t<T>* find_chambering_frame(
+	const components::gun& gun,
+	T& anim
+) {
+	const auto animation_time_ms = gun.chambering_progress_ms / 1.3f;
+
+	if (animation_time_ms == 0.f) {
+		return nullptr;
+	}
+
+	return calc_current_frame(anim, animation_time_ms);
 }
 
 template <class T>
@@ -84,6 +97,10 @@ struct stance_frame_usage {
 		return stance_frame_usage<T> { std::addressof(f), flip_flags(), true };
 	}
 
+	static auto chambering(const frame_type_t<T>& f) {
+		return stance_frame_usage<T> { std::addressof(f), flip_flags(), true };
+	}
+
 	static auto shoot_flipped(const frame_type_t<T>& f) {
 		return stance_frame_usage<T> { std::addressof(f), flip_flags::make_vertically(), true };
 	}
@@ -108,17 +125,17 @@ auto calc_stance_usage(
 
 	const auto& logicals = cosm.get_logical_assets();
 
+	const auto n = wielded_items.size();
+
 	if (const auto shoot_animation = logicals.find(stance.shoot)) {
 		/* Determine whether we want a carrying or a shooting animation */
-		const auto n = wielded_items.size();
-
 		if (n > 0) {
 			if (const auto gun = cosm[wielded_items[0]].template find<components::gun>()) {
-				const auto frame = ::find_frame(*gun, *shoot_animation, cosm);
+				const auto frame = ::find_shoot_frame(*gun, *shoot_animation, cosm);
 				const auto second_frame = [n, &cosm, shoot_animation, &wielded_items]() -> decltype(frame) {
 					if (n == 2) {
 						if (const auto second_gun = cosm[wielded_items[1]].template find<components::gun>()) {
-							return ::find_frame(*second_gun, *shoot_animation, cosm);
+							return ::find_shoot_frame(*second_gun, *shoot_animation, cosm);
 						}
 					}
 
@@ -139,6 +156,18 @@ auto calc_stance_usage(
 
 				if (second_frame) {
 					return result_t::shoot_flipped(*second_frame);
+				}
+			}
+		}
+	}
+
+	if (const auto chambering_animation = logicals.find(stance.get_chambering())) {
+		if (n == 1) {
+			if (const auto gun = cosm[wielded_items[0]].template find<components::gun>()) {
+				const auto frame = ::find_chambering_frame(*gun, *chambering_animation);
+
+				if (frame) {
+					return result_t::chambering(*frame);
 				}
 			}
 		}
