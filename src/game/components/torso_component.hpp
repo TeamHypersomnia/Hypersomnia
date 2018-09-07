@@ -7,6 +7,14 @@ struct leg_animation_usage {
 	float rotation = 0.f;
 };
 
+inline const assets::torso_animation_id& stance_animations::get_chambering() const {
+	return shoot;
+}
+
+inline const assets::torso_animation_id& stance_animations::get_reloading() const {
+	return shoot;
+}
+
 namespace invariants {
 	inline auto torso::calc_leg_anim(
 		vec2 legs_dir,

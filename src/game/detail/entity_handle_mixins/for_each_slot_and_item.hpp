@@ -108,7 +108,10 @@ void inventory_mixin<E>::for_each_attachment_recursive(
 					);
 
 					current_offset *= direct_offset;
-					attachment_callback(this_attachment, current_offset);
+
+					this_attachment.template dispatch_on_having_all<components::item>([&](const auto& typed_attachment) {
+						attachment_callback(typed_attachment, current_offset);
+					});
 				}
 
 				const auto& this_container = this_attachment;

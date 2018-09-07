@@ -310,46 +310,59 @@ FORCE_INLINE void specific_entity_drawer(
 
 				/* Draw items under the sentience first. */
 
-				std::optional<entity_id> drawn_heavy_item;
+				auto should_draw_under_torso = [&](const auto attachment_entity) {
+					const auto current_slot = attachment_entity.get_current_slot();
 
-				typed_handle.for_each_attachment_recursive(
-					[&](
-						const auto attachment_entity,
-						const auto attachment_offset
+					if (current_slot.get_type() == slot_function::BELT) {
+						return true;
+					}
+
+					const auto is_special_stance = 
+						stance_id == item_holding_stance::HEAVY_LIKE ||
+						stance_id == item_holding_stance::PISTOL_LIKE
+					;
+
+					if (is_special_stance && current_slot.is_hand_slot()) {
+						return true;
+					}
+
+					/* Draw pistols under hands in akimbo */
+					if (stance_id == item_holding_stance::AKIMBO 
+						&& attachment_entity.template get<invariants::item>().holding_stance == item_holding_stance::PISTOL_LIKE
 					) {
-						auto draw_now = [&]() {
-							attachment_entity.template dispatch_on_having_all<invariants::item>(
-								[&](const auto typed_attachment_handle) {
-									detail_specific_entity_drawer(
-										typed_attachment_handle,
-										in,
-										render_visitor,
-										viewing_transform * attachment_offset
-									);
-								}
-							);
-						};
+						return true;
+					}
 
-						if (stance_id == item_holding_stance::HEAVY_LIKE) {
-							const auto heavy_item = cosm[wielded_items[0]];
+					return false;
+				};
 
-							if (heavy_item.get_id() == attachment_entity.get_id()) {
-								draw_now();
-								drawn_heavy_item = heavy_item.get_id();
-								return;
+				auto draw_items_recursively = [&](const bool under_torso = true) {
+					typed_handle.for_each_attachment_recursive(
+						[&](
+							const auto attachment_entity,
+							const auto attachment_offset
+						) {
+							if (under_torso == should_draw_under_torso(attachment_entity)) {
+								attachment_entity.template dispatch_on_having_all<invariants::item>(
+									[&](const auto typed_attachment_handle) {
+										detail_specific_entity_drawer(
+											typed_attachment_handle,
+											in,
+											render_visitor,
+											viewing_transform * attachment_offset
+										);
+									}
+								);
 							}
-						}
+						},
+						[stance_offsets]() {
+							return stance_offsets;
+						},
+						attachment_offset_settings::for_rendering()
+					);
+				};
 
-						if (attachment_entity.get_current_slot().get_type() == slot_function::BELT) {
-							draw_now();
-							return;
-						}
-					},
-					[stance_offsets]() {
-						return stance_offsets;
-					},
-					attachment_offset_settings::for_rendering()
-				);
+				draw_items_recursively();
 
 				const bool only_secondary = typed_handle.only_secondary_holds_item();
 
@@ -365,35 +378,7 @@ FORCE_INLINE void specific_entity_drawer(
 					render_frame(usage.get_with_flip(), { viewing_transform.pos, face_degrees });
 				}
 
-				typed_handle.for_each_attachment_recursive(
-					[&](
-						const auto attachment_entity,
-						const auto attachment_offset
-					) {
-						if (drawn_heavy_item != std::nullopt && drawn_heavy_item.value() == attachment_entity.get_id()) {
-							return;
-						}
-
-						if (attachment_entity.get_current_slot().get_type() == slot_function::BELT) {
-							return;
-						}
-
-						attachment_entity.template dispatch_on_having_all<invariants::item>(
-							[&](const auto typed_attachment_handle) {
-								detail_specific_entity_drawer(
-									typed_attachment_handle,
-									in,
-									render_visitor,
-									viewing_transform * attachment_offset
-								);
-							}
-						);
-					},
-					[stance_offsets]() {
-						return stance_offsets;
-					},
-					attachment_offset_settings::for_rendering()
-				);
+				draw_items_recursively(false);
 
 				if constexpr(typed_handle.template has<components::head>()) {
 					const auto& head = typed_handle.template get<components::head>();

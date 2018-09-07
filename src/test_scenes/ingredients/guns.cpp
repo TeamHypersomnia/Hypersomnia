@@ -864,6 +864,7 @@ namespace test_flavours {
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 			//gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::VINDICATOR_SHOT);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::RIFLE_CHAMBERING);
+			gun_def.chambering_duration_ms = 700.f;
 
 			meta.set(gun_def);
 

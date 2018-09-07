@@ -9,6 +9,9 @@ struct stance_animations {
 	assets::torso_animation_id carry;
 	assets::torso_animation_id shoot;
 	// END GEN INTROSPECTORS
+
+	const assets::torso_animation_id& get_chambering() const;
+	const assets::torso_animation_id& get_reloading() const;
 };
 
 template <class C>
