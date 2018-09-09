@@ -184,7 +184,10 @@ void bomb_mode::init_spawned(
 					}
 				);
 
-				const auto result = perform_transfer_no_step(item_slot_transfer_request::standard(new_item.get_id(), target_slot), cosm);
+				auto request = item_slot_transfer_request::standard(new_item.get_id(), target_slot);
+				request.params.bypass_mounting_requirements = true;
+				
+				const auto result = perform_transfer_no_step(request, cosm);
 				result.notify_logical(step);
 
 				const auto new_id = new_item.get_id();
@@ -480,7 +483,9 @@ bool bomb_mode::give_bomb_to_random_player(const input_type in, const logic_step
 
 	for (const auto& t : tried_slots) {
 		if (typed_player[t].is_empty_slot()) {
-			perform_transfer(item_slot_transfer_request::standard(spawn_bomb(in).get_id(), typed_player[t].get_id()), step);
+			auto request = item_slot_transfer_request::standard(spawn_bomb(in).get_id(), typed_player[t].get_id());
+			request.params.bypass_mounting_requirements = true;
+			perform_transfer(request, step);
 			break;
 		}
 	}
