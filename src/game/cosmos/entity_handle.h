@@ -5,11 +5,11 @@
 #include "augs/build_settings/platform_defines.h"
 #include "game/cosmos/on_entity_meta.h"
 
+#include "game/detail/inventory/inventory_slot_handle.h"
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/traits/component_traits.h"
 #include "augs/templates/folded_finders.h"
 
-#include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/cosmos/entity_handle_declaration.h"
 #include "game/cosmos/cosmos_solvable_access.h"
 #include "game/cosmos/entity_id.h"

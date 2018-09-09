@@ -22,15 +22,11 @@ struct inventory_slot {
 	item_category category_allowed = item_category::GENERAL;
 	entity_flavour_id only_allow_flavour;
 
-#if TODO_MOUNTING
-	bool items_need_mounting = false;
-#else
-	pad_bytes<1> pad;
-#endif
-	bool only_last_inserted_is_movable = false;
-
+	real32 mounting_duration_ms = -1.f;
 	slot_physical_behaviour physical_behaviour = slot_physical_behaviour::DEACTIVATE_BODIES;
+	bool only_last_inserted_is_movable = false;
 	bool always_allow_exactly_one_item = false;
+	pad_bytes<2> pad;
 
 	unsigned space_available = 0;
 
@@ -44,4 +40,5 @@ struct inventory_slot {
 	bool makes_physical_connection() const;
 
 	bool is_category_compatible_with(const_entity_handle item) const;
+	bool is_mounted_slot() const;
 };

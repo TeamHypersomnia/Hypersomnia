@@ -92,8 +92,8 @@ struct fuse_logic_provider {
 		auto request = item_slot_transfer_request::drop(fused_entity, total_impulse);
 
 		if (fuse_def.override_release_impulse) {
-			request.apply_standard_impulse = false;
-			request.additional_drop_impulse = fuse_def.additional_release_impulse;
+			request.params.apply_standard_impulse = false;
+			request.params.additional_drop_impulse = fuse_def.additional_release_impulse;
 		}
 
 		perform_transfer(request, step);

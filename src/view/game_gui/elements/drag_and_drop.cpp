@@ -13,6 +13,7 @@
 #include "augs/ensure.h"
 #include "view/game_gui/game_gui_context.h"
 #include "view/game_gui/game_gui_system.h"
+#include "augs/string/format_enum.h"
 
 void drag_and_drop_callback(
 	game_gui_context context, 
@@ -162,7 +163,7 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 
 			auto& simulated_transfer = drop.simulated_transfer;
 			simulated_transfer.item = dragged_item_handle;
-			simulated_transfer.specified_quantity = element.dragged_charges == 0 ? -1 : element.dragged_charges;
+			simulated_transfer.params.specified_quantity = element.dragged_charges == 0 ? -1 : element.dragged_charges;
 
 			drop.source_hotbar_button_id = source_hotbar_button_id;
 
@@ -214,7 +215,7 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 					const auto item_charges = dragged_item_handle.template get<components::item>().get_charges();
 
 					if (item_charges > 1) {
-						if (simulated_transfer.specified_quantity == static_cast<int>(drop.result.transferred_charges)) {
+						if (simulated_transfer.params.specified_quantity == static_cast<int>(drop.result.transferred_charges)) {
 							charges_text = " all";
 						}
 						else {
@@ -230,18 +231,18 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 					}
 					else {
 						switch (simulated_transfer.target_slot.type) {
-						case slot_function::ITEM_DEPOSIT: drop.hint_text += "Insert"; break;
-						case slot_function::GUN_CHAMBER: drop.hint_text += "Place"; break;
-						case slot_function::GUN_CHAMBER_MAGAZINE: drop.hint_text += "Place"; break;
-						case slot_function::GUN_DETACHABLE_MAGAZINE: drop.hint_text += "Reload"; break;
-						case slot_function::GUN_RAIL: drop.hint_text += "Install"; break;
-						case slot_function::TORSO_ARMOR: drop.hint_text += "Wear"; break;
-						case slot_function::SHOULDER: drop.hint_text += "Wear"; break;
-						case slot_function::PRIMARY_HAND: drop.hint_text += "Wield"; break;
-						case slot_function::SECONDARY_HAND: drop.hint_text += "Wield"; break;
-						case slot_function::GUN_MUZZLE: drop.hint_text += "Install"; break;
-						case slot_function::BELT: drop.hint_text += "Wear"; break;
-						default: drop.hint_text += "Unknown slot"; break;
+							case slot_function::ITEM_DEPOSIT: drop.hint_text += "Insert"; break;
+							case slot_function::GUN_CHAMBER: drop.hint_text += "Place"; break;
+							case slot_function::GUN_CHAMBER_MAGAZINE: drop.hint_text += "Place"; break;
+							case slot_function::GUN_DETACHABLE_MAGAZINE: drop.hint_text += "Reload"; break;
+							case slot_function::GUN_RAIL: drop.hint_text += "Install"; break;
+							case slot_function::TORSO_ARMOR: drop.hint_text += "Wear"; break;
+							case slot_function::BACK: drop.hint_text += "Wear"; break;
+							case slot_function::PRIMARY_HAND: drop.hint_text += "Wield"; break;
+							case slot_function::SECONDARY_HAND: drop.hint_text += "Wield"; break;
+							case slot_function::GUN_MUZZLE: drop.hint_text += "Install"; break;
+							case slot_function::BELT: drop.hint_text += "Wear"; break;
+							default: drop.hint_text += "Unknown slot"; break;
 						}
 
 						drop.hint_text += charges_text;
@@ -249,11 +250,11 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 				}
 				else {
 					switch (predicted_result) {
-					case item_transfer_result_type::INSUFFICIENT_SPACE: drop.hint_text = "No space"; break;
-					case item_transfer_result_type::INVALID_CAPABILITIES: drop.hint_text = "Impossible"; break;
-					case item_transfer_result_type::INCOMPATIBLE_CATEGORIES: drop.hint_text = "Incompatible item"; break;
-					case item_transfer_result_type::TOO_MANY_ITEMS: drop.hint_text = "Too many items"; break;
-					default: drop.hint_text = "Unknown problem"; break;
+						case item_transfer_result_type::INSUFFICIENT_SPACE: drop.hint_text = "No space"; break;
+						case item_transfer_result_type::INVALID_CAPABILITIES: drop.hint_text = "Impossible"; break;
+						case item_transfer_result_type::INCOMPATIBLE_CATEGORIES: drop.hint_text = "Incompatible item"; break;
+						case item_transfer_result_type::TOO_MANY_ITEMS: drop.hint_text = "Too many items"; break;
+						default: drop.hint_text = format_enum(predicted_result); break;
 					}
 				}
 

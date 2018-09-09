@@ -17,7 +17,7 @@ entity_name_str get_bbcoded_item_categories(const item_category_flagset& flags) 
 	if (flags.test(item_category::SHOT_CHARGE)) {
 		result += "Shot charge, ";
 	}
-	if (flags.test(item_category::SHOULDER_WEARABLE)) {
+	if (flags.test(item_category::BACK_WEARABLE)) {
 		result += "Shoulder container, ";
 	}
 	if (flags.test(item_category::BELT_WEARABLE)) {
@@ -71,7 +71,7 @@ entity_name_str get_bbcoded_slot_function_name(const slot_function f) {
 		return{
 			"Torso",
 		};
-	case slot_function::SHOULDER:
+	case slot_function::BACK:
 		return{
 			"Shoulder",
 		};
@@ -117,7 +117,7 @@ entity_name_str get_bbcoded_slot_function_description(const slot_function f) {
 		return{
 			"Clothing or armors go here."
 		};
-	case slot_function::SHOULDER:
+	case slot_function::BACK:
 		return{
 			"For backpacks."
 		};

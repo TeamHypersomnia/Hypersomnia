@@ -6,12 +6,42 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Holstering logic needs to avoid mounted slots
+
 - Mounting
-	- As with always, implement representation early
-		- Or just small hud circle in its center
-			- For now, this
-			- Always draw small circle
-		- E.g. a magazine icon next to the reloaded mag
+	- Iteration
+		- **Solution:** unordered map from an item to a target slot & params for mounting
+			- Pro: best memory performance
+			- Pro: best time complexity
+			- Con: iterating map might be ineffective compared to a vector
+				- if we use vector, then rendering code is handicapped
+				- we'll go with a map for now
+	- Ensure that a single capability only ever mounts a single item at a time
+	- If an item is in a mounted slot, it is inferred that it is mounted.
+		- And it is inferred that the mounting_progress denotes the unmounting progress
+		- Since an item can only ever be mounted xor unmounted at the same time
+	- Can change target slot to dead without interrupting the progress
+	- As always, implement representation early
+		- Draw small hud circle in the center of a mounted and unmounted item
+		- Special icons? 
+			- A magazine icon next to the reloaded mag
+				- Not now, though
+
+- Reloading
+	- Finding the fullest magaizne should be easy enough task
+	- Just what if someone drops it during reload?
+		- Then that's their problem
+		- There's no way that an inventory structure can be altered without the user's intervention, except for player's death
+		- So it can be perfectly the job of GUI to select suitable transfers.
+
+- Melee combat
+	- Primary and secondary attacks for knives
+		- Akimbo is thus handicapped only to the primary
+			- But really it makes little sense to carry two knives
+	- A melee attack cannot be interrupted, except when a collision of two attacks occurs
+	- Attack collisions
+		- When hurt triggers of two or more players touch, they are pushed away opposite to their facing
+		
 
 - Reloading
 	- Essential to gameplay, really, so best to do it early

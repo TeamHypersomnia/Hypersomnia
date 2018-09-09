@@ -8,8 +8,4 @@ class item_system {
 public:
 	void pick_up_touching_items(const logic_step step);
 	void handle_throw_item_intents(const logic_step step);
-	
-#if TODO_MOUNTING
-	void process_mounting_and_unmounting(const logic_step step);
-#endif
 };

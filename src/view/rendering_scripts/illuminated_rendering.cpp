@@ -20,6 +20,8 @@
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
 
+#include "game/detail/inventory/inventory_slot_handle.h"
+
 #include "view/rendering_scripts/rendering_scripts.h"
 #include "view/rendering_scripts/illuminated_rendering.h"
 #include "view/rendering_scripts/draw_wandering_pixels_as_sprites.h"

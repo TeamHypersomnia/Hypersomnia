@@ -10,24 +10,24 @@ void wielding_result::apply(const logic_step step) {
 
 void wielding_result::play_effects_only_in_first() {
 	for (auto& r : transfers) {
-		r.play_transfer_sounds = false;
-		r.play_transfer_particles = false;
+		r.params.play_transfer_sounds = false;
+		r.params.play_transfer_particles = false;
 	}
 	
 	if (transfers.size() > 0) {
-		transfers.front().play_transfer_particles = true;
-		transfers.front().play_transfer_sounds = true;
+		transfers.front().params.play_transfer_particles = true;
+		transfers.front().params.play_transfer_sounds = true;
 	}
 }
 
 void wielding_result::play_effects_only_in_last() {
 	for (auto& r : transfers) {
-		r.play_transfer_sounds = false;
-		r.play_transfer_particles = false;
+		r.params.play_transfer_sounds = false;
+		r.params.play_transfer_particles = false;
 	}
 	
 	if (transfers.size() > 0) {
-		transfers.back().play_transfer_particles = true;
-		transfers.back().play_transfer_sounds = true;
+		transfers.back().params.play_transfer_particles = true;
+		transfers.back().params.play_transfer_sounds = true;
 	}
 }

@@ -31,7 +31,7 @@ wielding_result inventory_mixin<E>::swap_wielded_items() const {
 	result.play_effects_only_in_first();
 
 	for (auto& r : result.transfers) {
-		r.play_transfer_particles = false;
+		r.params.play_transfer_particles = false;
 	}
 
 	return result;

@@ -1,4 +1,5 @@
 #include "game/cosmos/entity_handle.h"
+#include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/cosmos/create_entity.hpp"
 
 #include "application/intercosm.h"

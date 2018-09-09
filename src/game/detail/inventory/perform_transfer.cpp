@@ -17,6 +17,7 @@
 
 #include "augs/templates/container_templates.h"
 #include "game/cosmos/cosmos.h"
+#include "augs/string/format_enum.h"
 
 void drop_from_all_slots(const invariants::container& container, const entity_handle handle, const impulse_mults impulse, const logic_step step) {
 	drop_from_all_slots(container, handle, impulse, [step](const auto& result) { result.notify(step); result.play_effects(step); });
@@ -53,41 +54,74 @@ void perform_transfer(
 
 perform_transfer_result perform_transfer_no_step(
 	const item_slot_transfer_request r, 
-	cosmos& cosmos
+	cosmos& cosm
 ) {
-	return cosmos[r.item].get<components::item>().perform_transfer(r, cosmos);
+	return cosm[r.item].get<components::item>().perform_transfer(r, cosm);
 }
 
 perform_transfer_result perform_transfer_impl(
 	const write_synchronized_component_access access,
 	const cosmos_solvable_inferred_access inferred_access,
 	const item_slot_transfer_request r, 
-	cosmos& cosmos
+	cosmos& cosm
 ) {
-	const auto result = query_transfer_result(cosmos, r);
+	const auto result = query_transfer_result(cosm, r);
 
 	if (!result.is_successful()) {
-		LOG("Warning: an item-slot transfer was not successful.");
+		LOG("perform_transfer failed: %x", format_enum(result.result));
 		return {};
 	}
 
 	perform_transfer_result output;
 
 	auto deguidize = [&](const auto s) {
-		return cosmos.get_solvable().deguidize(s);
+		return cosm.get_solvable().deguidize(s);
 	};
 
 	auto get_item_of = [access](auto handle) -> components::item& {
 		return handle.template get<components::item>().get_raw_component(access); 
 	};
 
-	const auto transferred_item = cosmos[r.item];
+	const auto transferred_item = cosm[r.item];
 
 	auto& item = get_item_of(transferred_item);
-	auto& items_of_slots = cosmos.get_solvable_inferred(inferred_access).relational.items_of_slots;
+	auto& items_of_slots = cosm.get_solvable_inferred(inferred_access).relational.items_of_slots;
 
-	const auto previous_slot = cosmos[deguidize(item.current_slot)];
-	const auto target_slot = cosmos[r.target_slot];
+	const auto previous_slot = cosm[deguidize(item.current_slot)];
+	const auto target_slot = cosm[r.target_slot];
+
+	if (!r.params.bypass_mounting_requirements) {
+		const bool source_mounted = previous_slot.alive() ? previous_slot->is_mounted_slot() : false;
+		const bool target_mounted = target_slot.alive() ? target_slot->is_mounted_slot() : false;
+
+		if (source_mounted != target_mounted) {
+			auto& global = cosm.get_global_solvable();
+			auto& mounts = global.pending_item_mounts;
+
+			if (target_slot.dead()) {
+				/* We can always override the target slot to the dead slot, for an existing pending unmount. */
+				if (auto* const existing_request = mapped_or_nullptr(mounts, r.item)) {
+					const auto previous_target = cosm[existing_request->target];
+					const bool previous_target_mounted = previous_target.alive() ? previous_target->is_mounted_slot() : false;
+					
+					if (!previous_target_mounted) {
+						existing_request->target = target_slot;
+
+						return {};
+					}
+				}
+			}
+
+			mounts.erase(r.item);
+
+			pending_item_mount new_mount;
+			new_mount.target = target_slot;
+			new_mount.params = r.params;
+
+			mounts.try_emplace(r.item, new_mount);
+			return {};
+		}
+	}
 
 	const auto previous_slot_container = previous_slot.get_container();
 	const auto target_slot_container = target_slot.get_container();
@@ -132,13 +166,13 @@ perform_transfer_result perform_transfer_impl(
 		entity_id stack_target_id;
 
 		for (const auto potential_stack_target : target_slot.get_items_inside()) {
-			if (can_stack_entities(transferred_item, cosmos[potential_stack_target])) {
+			if (can_stack_entities(transferred_item, cosm[potential_stack_target])) {
 				stack_target_id = potential_stack_target;
 				break;
 			}
 		}
 
-		if (const auto stack_target = cosmos[stack_target_id]) {
+		if (const auto stack_target = cosm[stack_target_id]) {
 			if (whole_item_grabbed) {
 				output.destructed.emplace(transferred_item);
 			}
@@ -171,7 +205,7 @@ perform_transfer_result perform_transfer_impl(
 		grabbed_item_part = cloned_stack;
 	}
 
-	const auto grabbed_item_part_handle = cosmos[grabbed_item_part];
+	const auto grabbed_item_part_handle = cosm[grabbed_item_part];
 
 	if (target_slot_exists) {
 		const auto moved_item = grabbed_item_part_handle;
@@ -202,20 +236,6 @@ perform_transfer_result perform_transfer_impl(
 		target_root.infer_item_colliders_recursive();
 	}
 
-#if TODO_MOUNTING
-	auto& grabbed_item = get_item_of(grabbed_item_part_handle);
-
-	if (target_slot_exists) {
-		if (target_slot->items_need_mounting) {
-			grabbed_item.intended_mounting = components::item::MOUNTED;
-
-			if (r.force_immediate_mount) {
-				grabbed_item.current_mounting = components::item::MOUNTED;
-			}
-		}
-	}
-#endif
-
 	const bool is_drop_request = result.relation == capability_relation::DROP;
 
 	if (is_drop_request) {
@@ -233,7 +253,7 @@ perform_transfer_result perform_transfer_impl(
 		const auto capability_def = previous_root.find<invariants::item_slot_transfers>();
 
 		const auto disable_collision_for_ms = capability_def ? capability_def->disable_collision_on_drop_for_ms : 300;
-		const auto standard_drop_impulse = (capability_def && r.apply_standard_impulse) ? capability_def->standard_drop_impulse : impulse_mults();
+		const auto standard_drop_impulse = (capability_def && r.params.apply_standard_impulse) ? capability_def->standard_drop_impulse : impulse_mults();
 
 		// LOG_NVPS(rigid_body.get_velocity());
 		// ensure(rigid_body.get_velocity().is_epsilon());
@@ -242,7 +262,7 @@ perform_transfer_result perform_transfer_impl(
 		rigid_body.set_angular_velocity(0.f);
 		rigid_body.set_transform(initial_transform_of_transferred);
 
-		const auto total_impulse = r.additional_drop_impulse + standard_drop_impulse;
+		const auto total_impulse = r.params.additional_drop_impulse + standard_drop_impulse;
 		const auto impulse = 
 			total_impulse.linear * vec2::from_degrees(initial_transform_of_transferred.rotation)
 		;
@@ -254,7 +274,7 @@ perform_transfer_result perform_transfer_impl(
 
 		special_physics.dropped_or_created_cooldown.set(
 			disable_collision_for_ms,
-		   	cosmos.get_timestamp()
+		   	cosm.get_timestamp()
 		);
 
 		special_physics.during_cooldown_ignore_collision_with = previous_slot_container;
@@ -262,11 +282,11 @@ perform_transfer_result perform_transfer_impl(
 
 	const bool is_pickup = result.relation == capability_relation::PICKUP;
 
-	if (r.play_transfer_sounds) {
+	if (r.params.play_transfer_sounds) {
 		if (is_drop_request) {
 			packaged_sound_effect dropped;
 
-			dropped.input = cosmos.get_common_assets().item_throw_sound;
+			dropped.input = cosm.get_common_assets().item_throw_sound;
 			dropped.start = sound_effect_start_input::orbit_absolute(
 				grabbed_item_part_handle, initial_transform_of_transferred
 			).set_listener(previous_root);
@@ -289,10 +309,10 @@ perform_transfer_result perform_transfer_impl(
 					packaged_sound_effect sound;
 
 					if (is_pickup) {
-						sound.input = cosmos.get_common_assets().item_pickup_to_deposit_sound;
+						sound.input = cosm.get_common_assets().item_pickup_to_deposit_sound;
 					}
 					else {
-						sound.input = cosmos.get_common_assets().item_holster_sound;
+						sound.input = cosm.get_common_assets().item_holster_sound;
 					}
 
 					sound.start = sound_effect_start_input::at_entity(target_root);
@@ -314,11 +334,11 @@ perform_transfer_result perform_transfer_impl(
 
 	}
 
-	if (r.play_transfer_particles) {
+	if (r.params.play_transfer_particles) {
 		if (is_pickup) {
 			packaged_particle_effect particles;
 
-			particles.input = cosmos.get_common_assets().item_pickup_particles;
+			particles.input = cosm.get_common_assets().item_pickup_particles;
 
 			auto effect_transform = initial_transform_of_transferred;
 

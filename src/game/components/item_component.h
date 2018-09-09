@@ -15,27 +15,6 @@ namespace components {
 		int charges = 1;
 		signi_inventory_slot_id current_slot;
 		// END GEN INTROSPECTOR
-
-#if TODO_MOUNTING
-		enum mounting_state : unsigned char {
-			MOUNTED,
-			UNMOUNTED,
-		};
-
-		inventory_slot_id target_slot_after_unmount;
-
-		mounting_state current_mounting = UNMOUNTED;
-		mounting_state intended_mounting = UNMOUNTED;
-
-		void set_mounted();
-		void request_mount();
-		void cancel_montage();
-		void request_unmount();
-		void request_unmount(inventory_slot_id target_slot_after_unmount);
-		void reset_mounting_timer();
-
-		bool is_mounted() const;
-#endif
 	};
 }
 
@@ -46,7 +25,7 @@ namespace invariants {
 		bool stackable = false;
 		pad_bytes<3> pad;
 
-		item_holding_stance holding_stance = item_holding_stance::PISTOL_LIKE;
+		item_holding_stance holding_stance = item_holding_stance::BARE_LIKE;
 
 		unsigned space_occupied_per_charge = 1;
 

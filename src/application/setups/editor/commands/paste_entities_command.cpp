@@ -4,6 +4,7 @@
 #include "game/cosmos/create_entity.hpp"
 #include "application/setups/editor/editor_command_input.h"
 #include "application/setups/editor/editor_folder.h"
+#include "game/detail/inventory/inventory_slot_handle.h"
 
 #include "application/setups/editor/commands/paste_entities_command.h"
 

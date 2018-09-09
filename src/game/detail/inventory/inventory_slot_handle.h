@@ -1,6 +1,7 @@
 #pragma once
 #include <optional>
 #include "augs/templates/maybe_const.h"
+#include "augs/misc/enum/enum_boolset.h"
 
 #include "game/cosmos/entity_handle_declaration.h"
 #include "game/cosmos/entity_id.h"
@@ -69,7 +70,10 @@ public:
 	unsigned calc_local_space_available() const;
 	unsigned calc_real_space_available() const;
 
-	bool is_physically_connected_until(const entity_id until_parent = entity_id()) const;
+	bool is_physically_connected_until(
+		const entity_id until_parent,
+	   	const std::optional<augs::enum_boolset<slot_function>>& bypass_slots = std::nullopt
+	) const;
 
 	inventory_slot_id get_id() const;
 	operator inventory_slot_id() const;
@@ -184,8 +188,12 @@ bool basic_inventory_slot_handle<E>::is_empty_slot() const {
 }
 
 template <class E>
-bool basic_inventory_slot_handle<E>::is_physically_connected_until(const entity_id until_parent) const {
-	const bool should_item_here_keep_physical_body = get().makes_physical_connection();
+bool basic_inventory_slot_handle<E>::is_physically_connected_until(
+	const entity_id until_parent,
+	const std::optional<augs::enum_boolset<slot_function>>& bypass_slots
+) const {
+	const bool passes_filter = bypass_slots != std::nullopt && bypass_slots->test(get_type());
+	const bool should_item_here_keep_physical_body = passes_filter || get().makes_physical_connection();
 
 	if (get_container() == until_parent) {
 		return should_item_here_keep_physical_body;
@@ -194,9 +202,6 @@ bool basic_inventory_slot_handle<E>::is_physically_connected_until(const entity_
 	const auto maybe_item = get_container().template find<components::item>();
 
 	if (maybe_item) {
-		//if (maybe_item->get_current_slot().get_container().alive() && maybe_item->get_current_slot().get_container() == until_parent)
-		//	return should_item_here_keep_physical_body;
-		//else 
 		const auto slot = owner[maybe_item->get_current_slot()];
 
 		if (slot.alive()) {

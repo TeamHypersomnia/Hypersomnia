@@ -22,16 +22,19 @@ enum class containment_result_type {
 };
 
 enum class item_transfer_result_type {
+	// GEN INTROSPECTOR enum class item_transfer_result_type
 	INVALID_RESULT,
 
 	INVALID_CAPABILITIES,
 
-	/* returned by query_containment_result */
 	TOO_MANY_ITEMS,
 
 	INCOMPATIBLE_CATEGORIES,
 	INSUFFICIENT_SPACE,
 	THE_SAME_SLOT,
 
+	MOUNTED_TO_MOUNTED,
+
 	SUCCESSFUL_TRANSFER
+	// END GEN INTROSPECTOR
 };

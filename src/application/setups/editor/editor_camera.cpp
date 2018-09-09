@@ -6,6 +6,7 @@
 #include "application/setups/editor/editor_settings.h"
 
 #include "game/cosmos/entity_handle.h"
+#include "game/detail/inventory/inventory_slot_handle.h"
 
 namespace editor_detail {
 	std::optional<camera_eye> calculate_camera(

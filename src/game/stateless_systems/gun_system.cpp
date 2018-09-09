@@ -91,8 +91,8 @@ static void load_next_cartridge(
 
 	into_chamber_transfer.item = next_cartridge;
 	into_chamber_transfer.target_slot = gun_entity[slot_function::GUN_CHAMBER];
-	into_chamber_transfer.force_immediate_mount = true;
-	into_chamber_transfer.specified_quantity = 1;
+	into_chamber_transfer.params.bypass_mounting_requirements = true;
+	into_chamber_transfer.params.specified_quantity = 1;
    
 	perform_transfer(into_chamber_transfer, step);
 }

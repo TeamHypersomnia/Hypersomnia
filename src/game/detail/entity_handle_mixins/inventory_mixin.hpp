@@ -249,7 +249,7 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::dete
 				return recursive_callback_result::CONTINUE_DONT_RECURSE;
 			}
 
-			if (!slot.is_hand_slot() && slot.can_contain(holstered_item)) {
+			if (!slot.is_hand_slot() && !slot->is_mounted_slot() && slot.can_contain(holstered_item)) {
 				target_slot = slot;
 				return recursive_callback_result::ABORT;
 			}

@@ -248,7 +248,7 @@ namespace test_scenes {
 				}
 
 				auto backpack = create(is_metropolis ? sample_backpack : brown_backpack, vec2(200, -650));
-				perform_transfer(item_slot_transfer_request::standard(backpack, new_character[slot_function::SHOULDER]), step);
+				perform_transfer(item_slot_transfer_request::standard(backpack, new_character[slot_function::BACK]), step);
 			}
 
 			fill_range(sentience.learned_spells, true);

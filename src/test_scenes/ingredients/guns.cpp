@@ -50,7 +50,14 @@ namespace test_flavours {
 			//gun_def.firing_engine_particles.modifier.scale_lifetimes = 0.5f;
 		};
 
-		auto make_default_gun_container = [&default_gun_props](auto& meta, const item_holding_stance stance, const float /* mag_rotation */ = -90.f, const bool magazine_hidden = false, const std::string& chamber_space = "0.01"){
+		auto make_default_gun_container = [&default_gun_props](
+			auto& meta, 
+			const item_holding_stance stance, 
+			const float mounting_duration_ms = 500.f, 
+			const float /* mag_rotation */ = -90.f,
+		   	const bool magazine_hidden = false,
+		   	const std::string& chamber_space = "0.01"
+		){
 			invariants::container container; 
 
 			{
@@ -68,6 +75,7 @@ namespace test_flavours {
 
 				slot_def.always_allow_exactly_one_item = true;
 				slot_def.category_allowed = item_category::MAGAZINE;
+				slot_def.mounting_duration_ms = mounting_duration_ms;
 
 				container.slots[slot_function::GUN_DETACHABLE_MAGAZINE] = slot_def;
 			}
@@ -764,7 +772,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BILMER2000, white);
 			test_flavours::add_lying_item_dynamic_body(meta).density = 0.1f;
-			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE);
+			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1000.f);
 			meta.get<invariants::item>().standard_price = 3100;
 		}
 
@@ -813,7 +821,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::VINDICATOR_SHOT_1, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE);
+			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1200.f);
 			meta.get<invariants::item>().standard_price = 2900;
 		}
 
@@ -870,7 +878,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::LEWSII, white);
 			test_flavours::add_lying_item_dynamic_body(meta).density = 0.5f;
-			make_default_gun_container(meta, item_holding_stance::HEAVY_LIKE);
+			make_default_gun_container(meta, item_holding_stance::HEAVY_LIKE, 2000.f);
 
 			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].only_allow_flavour = ::to_entity_flavour_id(test_container_items::LEWSII_MAG);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::LEWSII_DRAW);
@@ -926,7 +934,7 @@ namespace test_flavours {
 			auto& fix = test_flavours::add_lying_item_dynamic_body(meta);
 			fix.density *= 1.28f;
 
-			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 0.f, true);
+			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1500.f, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::PLASMA_DRAW);
 			meta.get<invariants::item>().standard_price = 4000;
 		}
@@ -969,7 +977,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::KEK9, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 0.f, true);
+			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 400.f, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 500;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(350);
@@ -1015,7 +1023,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SN69, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 0.f, true);
+			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 400.f, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 500;
 		}
@@ -1062,7 +1070,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 0.f, false, "0.1");
+			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 600.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 700;
 		}
@@ -1123,18 +1131,22 @@ namespace prefabs {
 		auto weapon = create_test_scene_entity(cosmos, flavour, pos);
 
 		if (load_mag.alive()) {
-			perform_transfer(item_slot_transfer_request::standard(load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE]), step);
+			auto request = item_slot_transfer_request::standard(load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE]);
+			request.params.bypass_mounting_requirements = true;
+
+			perform_transfer(request, step);
 
 #if LOAD_TO_CHAMBER
 			if (load_mag[slot_function::ITEM_DEPOSIT].has_items()) {
-				perform_transfer(
-					item_slot_transfer_request::standard(
-						load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], 
-						weapon[slot_function::GUN_CHAMBER], 
-						1
-					), 
-					step
+				auto request = item_slot_transfer_request::standard(
+					load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], 
+					weapon[slot_function::GUN_CHAMBER], 
+					1
 				);
+
+				request.params.bypass_mounting_requirements = true;
+
+				perform_transfer(request, step);
 			}
 #endif
 		}
@@ -1149,11 +1161,16 @@ namespace prefabs {
 		auto weapon = create_test_scene_entity(cosmos, flav, pos);
 
 		if (load_mag.alive()) {
-			perform_transfer(item_slot_transfer_request::standard(load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE]), step);
+			auto request = item_slot_transfer_request::standard(load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE]);
+			request.params.bypass_mounting_requirements = true;
+
+			perform_transfer(request, step);
 
 #if LOAD_TO_CHAMBER
 			if (load_mag[slot_function::ITEM_DEPOSIT].has_items()) {
-				perform_transfer(item_slot_transfer_request::standard(load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1), step);
+				auto request = item_slot_transfer_request::standard(load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1);
+				request.params.bypass_mounting_requirements = true;
+				perform_transfer(request, step);
 			}
 #endif
 		}
@@ -1192,7 +1209,9 @@ namespace prefabs {
 		auto sample_magazine = create_test_scene_entity(cosmos, flav, pos);
 
 		if (charge_inside.alive()) {
-			const auto load_charge = item_slot_transfer_request::standard(charge_inside, sample_magazine[slot_function::ITEM_DEPOSIT]);
+			auto load_charge = item_slot_transfer_request::standard(charge_inside, sample_magazine[slot_function::ITEM_DEPOSIT]);
+			load_charge.params.bypass_mounting_requirements = true;
+
 			perform_transfer(load_charge, step);
 
 			if (force_num_charges != -1) {

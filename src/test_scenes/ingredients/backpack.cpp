@@ -39,7 +39,7 @@ namespace test_flavours {
 			item.dual_wield_accuracy_loss_multiplier = 1;
 			item.dual_wield_accuracy_loss_percentage = 50;
 			item.space_occupied_per_charge = to_space_units("1");
-			item.categories_for_slot_compatibility.set(item_category::SHOULDER_WEARABLE);
+			item.categories_for_slot_compatibility.set(item_category::BACK_WEARABLE);
 
 			item.wear_sound.id = to_sound_id(test_scene_sound_id::BACKPACK_WEAR);
 

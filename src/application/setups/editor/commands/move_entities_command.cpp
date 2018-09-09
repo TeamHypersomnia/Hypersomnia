@@ -1,5 +1,6 @@
 #include "game/cosmos/cosmos_solvable_access.h"
 #include "game/cosmos/cosmic_functions.h"
+#include "game/detail/inventory/inventory_slot_handle.h"
 #include "application/intercosm.h"
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/editor_command_input.h"

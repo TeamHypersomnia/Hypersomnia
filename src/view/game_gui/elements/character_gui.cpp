@@ -48,7 +48,7 @@ xywh character_gui::get_rectangle_for_slot_function(const slot_function f) {
 	switch (f) {
 	case slot_function::PRIMARY_HAND: return xywh(100, 0, 33, 33);
 	case slot_function::SECONDARY_HAND: return xywh(-100, 0, 33, 33);
-	case slot_function::SHOULDER: return xywh(100, -100, 33, 33);
+	case slot_function::BACK: return xywh(100, -100, 33, 33);
 	case slot_function::BELT: return xywh(150, -100, 33, 33);
 	case slot_function::TORSO_ARMOR: return xywh(0, 0, 33, 33);
 

@@ -1,3 +1,4 @@
+#include "game/detail/inventory/inventory_slot_handle.h"
 #include "augs/string/string_templates.h"
 #include "augs/templates/algorithm_templates.h"
 #include "augs/misc/imgui/imgui_utils.h"

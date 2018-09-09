@@ -37,14 +37,15 @@
 #include "game/stateless_systems/remnant_system.h"
 
 void standard_solve(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
-	auto& performance = cosmos.profiler;
+	auto& cosm = step.get_cosmos();
+	auto& performance = cosm.profiler;
+	auto& global = cosm.get_global_solvable();
 
 	auto logic_scope = measure_scope(performance.logic);
 
-	auto total_raycasts_scope = cosmos.measure_raycasts(performance.total_step_raycasts);
+	auto total_raycasts_scope = cosm.measure_raycasts(performance.total_step_raycasts);
 
-	contact_listener listener(cosmos);
+	contact_listener listener(cosm);
 
 	perform_transfers(step.get_entropy().transfer_requests, step);
 
@@ -84,6 +85,7 @@ void standard_solve(const logic_step step) {
 
 	force_joint_system().apply_forces_towards_target_entities(step);
 	item_system().handle_throw_item_intents(step);
+	global.solve_item_mounting(step);
 	demolitions_system().detonate_fuses(step);
 	demolitions_system().advance_cascade_explosions(step);
 
@@ -125,7 +127,7 @@ void standard_solve(const logic_step step) {
 
 	{
 		auto scope = measure_scope(performance.visibility);
-		auto visibility_raycasts_scope = cosmos.measure_raycasts(performance.visibility_raycasts);
+		auto visibility_raycasts_scope = cosm.measure_raycasts(performance.visibility_raycasts);
 
 		visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(step);
 	}
@@ -136,7 +138,7 @@ void standard_solve(const logic_step step) {
 	}
 
 	{
-		auto pathfinding_raycasts_scope = cosmos.measure_raycasts(performance.pathfinding_raycasts);
+		auto pathfinding_raycasts_scope = cosm.measure_raycasts(performance.pathfinding_raycasts);
 
 		auto scope = measure_scope(performance.pathfinding);
 		pathfinding_system().advance_pathfinding_sessions(step);

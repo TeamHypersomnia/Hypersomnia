@@ -648,3 +648,7 @@ Memory is somewhat safe because it can only grow as far as the children grow.
 - Subsolution: Reinfer physical shape from the image size and/or specified shape.
 - Sprite component shall contain the size multiplier or an overridden size.
 	- Just two ints per entity won't make a difference.
+
+		- Iterating all items doesn't scale well
+		- But it's the easiest thing to do and least error prone
+		- So we'll go with this for now

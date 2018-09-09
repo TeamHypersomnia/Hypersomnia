@@ -126,6 +126,21 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 				}
 			}
 		);
+
+		const auto& global = cosm.get_global_solvable();
+
+		for (const auto& m : global.pending_item_mounts) {
+			const auto& item = cosm[m.first];
+			const auto& request = m.second;
+
+			const auto& progress = request.progress_ms;
+
+			if (progress > 0.f) {
+				const auto highlight_amount = 1.f - (progress / request.get_mounting_duration_ms(item));
+
+				draw_circle(item, highlight_amount, white, red_violet);
+			}
+		}
 	}
 }
 

@@ -9,6 +9,10 @@ item_category_flagset inventory_slot::get_allowed_categories() const {
 	return { category_allowed };
 }
 
+bool inventory_slot::is_mounted_slot() const {
+	return mounting_duration_ms > 0.f;
+}
+
 bool inventory_slot::makes_physical_connection() const {
 	return physical_behaviour != slot_physical_behaviour::DEACTIVATE_BODIES;
 }

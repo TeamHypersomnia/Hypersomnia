@@ -12,6 +12,7 @@
 #include "augs/enums/callback_result.h"
 
 struct attachment_offset_settings;
+struct colliders_connection;
 
 struct hand_action {
 	const std::size_t hand_index;

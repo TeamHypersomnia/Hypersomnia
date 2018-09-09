@@ -6,6 +6,7 @@
 #include "game/detail/entity_scripts.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
+#include "game/detail/inventory/inventory_slot_handle.h"
 
 #include "augs/string/string_templates.h"
 
@@ -42,7 +43,7 @@ capability_comparison match_transfer_capabilities(
 	}
 
 	if (source.alive() && target.alive()) {
-		if (source != target) {
+		if (!r.params.bypass_unmatching_capabilities && source != target) {
 			return { capability_relation::UNMATCHING, dead_entity };
 		}
 
@@ -66,7 +67,7 @@ item_transfer_result query_transfer_result(
 	const auto target_slot = cosm[r.target_slot];
 	const auto item = transferred_item.get<components::item>();
 
-	ensure(r.specified_quantity != 0);
+	ensure(r.params.specified_quantity != 0);
 
 	const auto capabilities_compared = match_transfer_capabilities(transferred_item.get_cosmos(), r);
 	const auto relation = capabilities_compared.relation_type;
@@ -79,11 +80,11 @@ item_transfer_result query_transfer_result(
 	else if (relation == capability_relation::DROP || relation == capability_relation::ANONYMOUS_DROP) {
 		output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER;
 
-		if (r.specified_quantity == -1) {
+		if (r.params.specified_quantity == -1) {
 			output.transferred_charges = item.get_charges();
 		}
 		else {
-			output.transferred_charges = std::min(r.specified_quantity, item.get_charges());
+			output.transferred_charges = std::min(r.params.specified_quantity, item.get_charges());
 		}
 	}
 	else {
@@ -95,7 +96,7 @@ item_transfer_result query_transfer_result(
 			const auto containment_result = query_containment_result(
 				transferred_item, 
 				target_slot,
-				r.specified_quantity
+				r.params.specified_quantity
 			);
 
 			output.transferred_charges = containment_result.transferred_charges;
@@ -128,13 +129,15 @@ item_transfer_result query_transfer_result(
 		}
 	}
 
-#if TODO_MOUNTING
-	 if (predicted_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
-	 	if (item.current_mounting == components::item::MOUNTED && !r.force_immediate_mount) {
-	 		predicted_result = item_transfer_result_type::UNMOUNT_BEFOREHAND;
-	 	}
-	 }
-#endif
+	if (!r.params.bypass_mounting_requirements) {
+		const auto current_slot = transferred_item.get_current_slot();
+		const bool current_mounted = current_slot.alive() ? current_slot->is_mounted_slot() : false;
+		const bool target_mounted = target_slot.alive() ? target_slot->is_mounted_slot() : false;
+
+		if (current_mounted && target_mounted) {
+			output.result = item_transfer_result_type::MOUNTED_TO_MOUNTED;
+		}
+	}
 
 	return output;
 }

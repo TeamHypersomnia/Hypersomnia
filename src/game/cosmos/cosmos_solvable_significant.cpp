@@ -7,4 +7,5 @@
 
 void cosmos_solvable_significant::clear() {
 	*this = cosmos_solvable_significant();
+	global.clear();
 }

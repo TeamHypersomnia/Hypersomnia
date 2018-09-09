@@ -10,6 +10,7 @@
 
 #include "game/common_state/entity_name_str.h"
 #include "game/cosmos/entity_id.h"
+#include "game/cosmos/cosmos_global_solvable.h"
 
 using cosmos_clock = augs::stepped_clock;
 
@@ -20,6 +21,7 @@ struct cosmos_solvable_significant {
 	entity_guid next_entity_guid = entity_guid::first();
 
 	std::unordered_map<entity_id, entity_name_str> specific_names;
+	cosmos_global_solvable global;
 	// END GEN INTROSPECTOR
 
 	template <class E>

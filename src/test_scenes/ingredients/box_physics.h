@@ -71,8 +71,8 @@ namespace test_flavours {
 		body_def.damping.angular = 6.5f;
 
 		fixtures_def.filter = filters::shell();
-		fixtures_def.restitution = 1.4f;
-		fixtures_def.density = 0.001f;
+		fixtures_def.restitution = 1.2f;
+		fixtures_def.density = 0.0005f;
 		fixtures_def.collision_sound_gain_mult = 100.f;
 		fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::METAL);
 

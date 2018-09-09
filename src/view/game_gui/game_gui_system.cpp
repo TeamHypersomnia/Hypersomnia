@@ -409,7 +409,7 @@ template <class E>
 bool should_fill_hotbar_from_right(const E& handle) {
 	const auto& item = handle.template get<invariants::item>();
 
-	if (item.categories_for_slot_compatibility.test(item_category::SHOULDER_WEARABLE)) {
+	if (item.categories_for_slot_compatibility.test(item_category::BACK_WEARABLE)) {
 		if (!handle.template has<invariants::explosive>()) {
 			return true;
 		}
@@ -491,7 +491,7 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 		auto should_recurse = [](const auto item_entity) {
 			const auto& item = item_entity.template get<invariants::item>();
 
-			if (item.categories_for_slot_compatibility.test(item_category::SHOULDER_WEARABLE)) {
+			if (item.categories_for_slot_compatibility.test(item_category::BACK_WEARABLE)) {
 				return true;
 			}
 

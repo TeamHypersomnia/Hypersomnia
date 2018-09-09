@@ -16,7 +16,9 @@ void generate_equipment(const requested_equipment& eq, const E& character, const
 			from.set_logic_transform(*tr);
 		}
 
-		perform_transfer(item_slot_transfer_request::standard(from, to), step);
+		auto request = item_slot_transfer_request::standard(from, to);
+		request.params.bypass_mounting_requirements = true;
+		perform_transfer(request, step);
 	};
 
 	if (eq.weapon.is_set()) {
@@ -56,7 +58,7 @@ void generate_equipment(const requested_equipment& eq, const E& character, const
 	if (eq.backpack.is_set()) {
 		const auto b = just_create_entity(cosm, eq.backpack);
 
-		transfer(b, character[slot_function::SHOULDER]);
+		transfer(b, character[slot_function::BACK]);
 	}
 
 	if (eq.belt_wearable.is_set()) {

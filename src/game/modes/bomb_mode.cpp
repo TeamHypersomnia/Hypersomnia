@@ -446,7 +446,7 @@ entity_handle bomb_mode::spawn_bomb(const input_type in) {
 
 bool bomb_mode::give_bomb_to_random_player(const input_type in, const logic_step step) {
 	static const auto tried_slots = std::array<slot_function, 3> {
-		slot_function::SHOULDER,
+		slot_function::BACK,
 
 		slot_function::PRIMARY_HAND,
 		slot_function::SECONDARY_HAND

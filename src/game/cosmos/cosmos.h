@@ -248,6 +248,14 @@ public:
 		return get_common_significant(k).logical_assets;
 	}
 
+	auto& get_global_solvable() {
+		return solvable.get_global_solvable();
+	}
+
+	const auto& get_global_solvable() const {
+		return solvable.get_global_solvable();
+	}
+
 	template <class M>
 	auto measure_raycasts(M& measurement) const {
 		const auto& num_ray_casts = get_solvable_inferred().physics.ray_cast_counter;

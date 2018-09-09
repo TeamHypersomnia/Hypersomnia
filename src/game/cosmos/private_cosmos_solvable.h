@@ -35,4 +35,12 @@ public:
 	const auto& get_solvable_inferred() const {
 		return solvable.inferred;
 	}
+
+	auto& get_global_solvable() {
+		return solvable.significant.global;
+	}
+
+	const auto& get_global_solvable() const {
+		return solvable.significant.global;
+	}
 };
