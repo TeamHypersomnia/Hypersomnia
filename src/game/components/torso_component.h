@@ -25,12 +25,22 @@ auto calc_stance_id(
 		return item_holding_stance::BARE_LIKE;
 	}
 
+	auto stance_of = [&](const auto i) {
+		const auto w = cosm[wielded_items[i]];
+		return w.template get<invariants::item>().holding_stance;
+	};
+
 	if (n == 2) {
+		if (stance_of(0) == item_holding_stance::BARE_LIKE
+			&& stance_of(1) == item_holding_stance::BARE_LIKE
+		) {
+			return item_holding_stance::BARE_LIKE;
+		}
+
 		return item_holding_stance::AKIMBO;
 	}
 
-	const auto w = cosm[wielded_items[0]];
-	return w.template get<invariants::item>().holding_stance;
+	return stance_of(0);
 }
 
 namespace invariants {
