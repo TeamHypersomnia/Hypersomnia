@@ -224,8 +224,8 @@ namespace test_flavours {
 				torso_def.stances[item_holding_stance::RIFLE_LIKE].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_RIFLE_WALK);
 				torso_def.stances[item_holding_stance::RIFLE_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_RIFLE_SHOT);
 
-				torso_def.stances[item_holding_stance::PISTOL_LIKE].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_BARE_WALK);
-				torso_def.stances[item_holding_stance::PISTOL_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_BARE_SHOT);
+				torso_def.stances[item_holding_stance::PISTOL_LIKE].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_PISTOL_WALK);
+				torso_def.stances[item_holding_stance::PISTOL_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_PISTOL_SHOT);
 
 				torso_def.stances[item_holding_stance::HEAVY_LIKE].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_HEAVY_WALK);
 				torso_def.stances[item_holding_stance::HEAVY_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_HEAVY_SHOT);

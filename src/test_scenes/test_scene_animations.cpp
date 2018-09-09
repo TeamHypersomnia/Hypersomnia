@@ -249,6 +249,16 @@ void load_test_scene_animations(
 				I::RESISTANCE_TORSO_RIFLE_WALK_1
 			);
 
+			standard_walk(
+				T::RESISTANCE_TORSO_PISTOL_WALK,
+				I::RESISTANCE_TORSO_PISTOL_WALK_1
+			);
+
+			standard_shoot(
+				T::RESISTANCE_TORSO_PISTOL_SHOT,
+				I::RESISTANCE_TORSO_PISTOL_SHOT_1
+			);
+
 			standard_shoot(
 				T::RESISTANCE_TORSO_RIFLE_SHOT,
 				I::RESISTANCE_TORSO_RIFLE_SHOT_1
