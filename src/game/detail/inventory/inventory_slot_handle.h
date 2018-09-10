@@ -75,6 +75,9 @@ public:
 	   	const std::optional<augs::enum_boolset<slot_function>>& bypass_slots = std::nullopt
 	) const;
 
+	bool is_ancestor_mounted() const;
+	bool is_this_or_ancestor_mounted() const;
+
 	inventory_slot_id get_id() const;
 	operator inventory_slot_id() const;
 
@@ -185,6 +188,38 @@ E basic_inventory_slot_handle<E>::get_item_if_any() const {
 template <class E>
 bool basic_inventory_slot_handle<E>::is_empty_slot() const {
 	return get_items_inside().size() == 0;
+}
+
+template <class E>
+bool basic_inventory_slot_handle<E>::is_this_or_ancestor_mounted() const {
+	if (dead()) {
+		return false;
+	}
+
+	if (get().is_mounted_slot()) {
+		return true;
+	}
+
+	return is_ancestor_mounted();
+}
+
+template <class E>
+bool basic_inventory_slot_handle<E>::is_ancestor_mounted() const {
+	if (dead()) {
+		return false;
+	}
+
+	const auto parent = get_container().get_current_slot();
+
+	if (parent.alive()) {
+		if (parent->is_mounted_slot()) {
+			return true;
+		}
+
+		return parent.is_ancestor_mounted();
+	}
+
+	return false;
 }
 
 template <class E>

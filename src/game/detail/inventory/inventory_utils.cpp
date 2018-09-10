@@ -7,6 +7,7 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/detail/inventory/inventory_slot_handle.h"
+#include "game/detail/inventory/item_mounting.hpp"
 
 #include "augs/string/string_templates.h"
 
@@ -76,8 +77,10 @@ item_transfer_result query_transfer_result(
 
 	if (relation == capability_relation::UNMATCHING) {
 		output.result = item_transfer_result_type::INVALID_CAPABILITIES;
+		return output;
 	}
-	else if (relation == capability_relation::DROP || relation == capability_relation::ANONYMOUS_DROP) {
+
+	if (relation == capability_relation::DROP || relation == capability_relation::ANONYMOUS_DROP) {
 		output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER;
 
 		if (r.params.specified_quantity == -1) {
@@ -129,13 +132,12 @@ item_transfer_result query_transfer_result(
 		}
 	}
 
-	if (!r.params.bypass_mounting_requirements) {
-		const auto current_slot = transferred_item.get_current_slot();
-		const bool current_mounted = current_slot.alive() ? current_slot->is_mounted_slot() : false;
-		const bool target_mounted = target_slot.alive() ? target_slot->is_mounted_slot() : false;
+	if (output.is_successful() && !r.params.bypass_mounting_requirements) {
+		/* Not so fast. Let's see if we can properly mount here. */
+		const auto mounting_result = calc_mounting_conditions(transferred_item, target_slot);
 
-		if (current_mounted && target_mounted) {
-			output.result = item_transfer_result_type::MOUNTED_TO_MOUNTED;
+		if (mounting_result == mounting_conditions_type::ABORT) {
+			output.result = item_transfer_result_type::MOUNTING_CONDITIONS_NOT_MET;
 		}
 	}
 

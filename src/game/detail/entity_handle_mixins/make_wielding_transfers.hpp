@@ -1,5 +1,6 @@
 #pragma once
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
+#include "game/detail/entity_handle_mixins/determine_target_slot_for.hpp"
 
 template <class E>
 wielding_result inventory_mixin<E>::swap_wielded_items() const {

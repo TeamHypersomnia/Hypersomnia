@@ -7,6 +7,7 @@
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
+#include "game/detail/inventory/item_mounting.hpp"
 
 real32 pending_item_mount::get_mounting_duration_ms(const const_entity_handle& handle) const {
 	if (const auto current_slot = handle.get_current_slot()) {
@@ -41,58 +42,37 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 	erase_if(pending_item_mounts, [&](auto& m) {
 		const auto& e_id = m.first;
 
+		const auto item_handle = cosm[e_id];
+
+		if (item_handle.dead()) {
+			return true;
+		}
+
 		bool should_be_erased = true;
 
-		cosm[e_id].template dispatch_on_having_all<components::item>([&](const auto& e) {
+		item_handle.template dispatch_on_having_all<components::item>([&](const auto& transferred_item) {
 			auto& request = m.second;
 			auto& progress = request.progress_ms;
 
-			if (const auto current_slot = e.get_current_slot()) {
-				const auto& target_mount = cosm[request.target];
+			const auto target_slot = cosm[request.target];
+			const auto conditions = calc_mounting_conditions(transferred_item, target_slot);
 
-				const bool source_mounted = current_slot->is_mounted_slot();
-				const bool target_mounted = target_mount.alive() ? target_mount->is_mounted_slot() : false;
+			if (conditions == mounting_conditions_type::PROGRESS) {
+				should_be_erased = false;
+				progress += delta.in_milliseconds();
 
-				if (source_mounted != target_mounted) {
-					/* (Un)mounting was requested */
-					if (const auto capability = e.get_owning_transfer_capability()) {
-						const bool both_in_reach_of_hands = [&]() {
-							const auto reachable_non_physical = augs::enum_boolset<slot_function> {
-								slot_function::GUN_CHAMBER,
-								slot_function::GUN_DETACHABLE_MAGAZINE,
-								slot_function::GUN_RAIL,
-								slot_function::GUN_MUZZLE,
-								slot_function::GUN_CHAMBER_MAGAZINE
-							};
+				const auto considered_max = request.get_mounting_duration_ms(transferred_item); 
 
-							if (!target_mounted) {
-								/* We're unmounting. Source must be physically connected to hands. */
-								return current_slot.is_physically_connected_until(capability, reachable_non_physical);
-							}
+				if (progress >= considered_max) {
+					item_slot_transfer_request transfer;
+					transfer.item = transferred_item;
+					transfer.target_slot = target_slot;
+					transfer.params = request.params;
+					transfer.params.bypass_mounting_requirements = true;
 
-							/* We're mounting. Source must be directly in hands, and target must be physically connected to hands. */
-							return current_slot.is_hand_slot() && target_mount.is_physically_connected_until(capability, reachable_non_physical);
-						}();
+					::perform_transfer(transfer, step);
 
-						if (both_in_reach_of_hands) {
-							should_be_erased = false;
-							progress += delta.in_milliseconds();
-
-							const auto considered_max = request.get_mounting_duration_ms(e); 
-
-							if (progress >= considered_max) {
-								item_slot_transfer_request request;
-								request.params.specified_quantity = 1;
-								request.item = e;
-								request.target_slot = target_mount;
-								request.params.bypass_mounting_requirements = true;
-
-								::perform_transfer(request, step);
-
-								should_be_erased = true;
-							}
-						}
-					}
+					should_be_erased = true;
 				}
 			}
 		});

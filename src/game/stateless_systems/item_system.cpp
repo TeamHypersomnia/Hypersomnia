@@ -39,6 +39,7 @@
 #include "game/enums/item_transfer_result_type.h"
 
 #include "game/detail/physics/physics_scripts.h"
+#include "game/detail/entity_handle_mixins/determine_target_slot_for.hpp"
 
 void item_system::pick_up_touching_items(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
