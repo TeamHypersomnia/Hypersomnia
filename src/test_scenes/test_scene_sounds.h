@@ -4,6 +4,7 @@
 enum class test_scene_sound_id {
 	// GEN INTROSPECTOR enum class test_scene_sound_id
 	BILMER2000_MUZZLE,
+	PRO90_MUZZLE,
 	ASSAULT_RIFLE_MUZZLE,
 	VINDICATOR_MUZZLE,
 	KEK9_MUZZLE,
@@ -61,6 +62,7 @@ enum class test_scene_sound_id {
 
 	STANDARD_GUN_DRAW,
 	STANDARD_PISTOL_DRAW,
+	STANDARD_SMG_DRAW,
 	LEWSII_DRAW,
 
 	BACKPACK_WEAR,
@@ -114,6 +116,7 @@ enum class test_scene_sound_id {
 	BILMER_CHAMBERING,
 	SHOTGUN_CHAMBERING,
 	ELECTRIC_CHAMBERING,
+	PRO90_CHAMBERING,
 
 	TRIGGER_PULL,
 

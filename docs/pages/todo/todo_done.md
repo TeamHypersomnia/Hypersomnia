@@ -1359,3 +1359,23 @@ we consider whole type overrides too complex architeciturally:
 
 - Halftime and end of match
 
+- Holstering logic needs to avoid mounted slots
+
+
+- Mounting
+	- Iteration
+		- **Solution:** unordered map from an item to a target slot & params for mounting
+			- Pro: best memory performance
+			- Pro: best time complexity
+			- Con: iterating map might be ineffective compared to a vector
+				- if we use vector, then rendering code is handicapped
+				- we'll go with a map for now
+	- If an item is in a mounted slot, it is inferred that it is mounted.
+		- And it is inferred that the mounting_progress denotes the unmounting progress
+		- Since an item can only ever be mounted xor unmounted at the same time
+	- Can change target slot to dead without interrupting the progress
+	- As always, implement representation early
+		- Draw small hud circle in the center of a mounted and unmounted item
+		- Special icons? 
+			- A magazine icon next to the reloaded mag
+				- Not now, though

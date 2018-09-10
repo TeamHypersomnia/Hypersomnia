@@ -606,6 +606,37 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_container_items::PRO90_MAGAZINE);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::PRO90_MAGAZINE, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+
+			invariants::container container; 
+
+			inventory_slot charge_deposit_def;
+			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
+			charge_deposit_def.space_available = to_space_units("0.5");
+
+			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
+			meta.set(container);
+
+			{
+				invariants::item item;
+
+				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				item.space_occupied_per_charge = to_space_units("0.5");
+				meta.set(item);
+			}
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_container_items::AO44_MAGAZINE);
 
 			{
@@ -780,6 +811,55 @@ namespace test_flavours {
 			set_chambering_duration_ms(meta, 400.f);
 		}
 
+		{
+			auto& meta = get_test_flavour(flavours, test_shootable_weapons::PRO90);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			meta.get<invariants::text_details>().description =
+				"Pretty good SMG."
+			;
+
+			invariants::gun gun_def;
+
+			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::PRO90_MUZZLE);
+
+			gun_def.action_mode = gun_action_type::AUTOMATIC;
+			gun_def.muzzle_velocity = {3800.f, 3800.f};
+			gun_def.shot_cooldown_ms = 70.f;
+
+			gun_def.shell_angular_velocity = {2.f, 14.f};
+			gun_def.shell_spread_degrees = 20.f;
+			gun_def.shell_velocity = {300.f, 1700.f};
+			gun_def.damage_multiplier = 1.2f;
+			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
+			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
+			gun_def.kickback_towards_wielder = 40.f;
+			gun_def.adversarial.knockout_award = static_cast<money_type>(500);
+
+			gun_def.maximum_heat = 2.f;
+			gun_def.gunshot_adds_heat = 0.052f;
+
+			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
+			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
+			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::PRO90_CHAMBERING);
+
+			meta.set(gun_def);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::PRO90, white);
+			test_flavours::add_lying_item_dynamic_body(meta).density = 0.1f;
+			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1000.f, 0.f, true);
+			meta.get<invariants::item>().standard_price = 2900;
+			set_chambering_duration_ms(meta, 400.f);
+
+			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_SMG_DRAW);
+		}
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::VINDICATOR);
 
@@ -1122,14 +1202,14 @@ namespace test_flavours {
 
 namespace prefabs {
 	entity_handle create_vindicator(const logic_step step, vec2 pos, entity_id load_mag_id) {
-		return create_rifle(step, pos, test_shootable_weapons::VINDICATOR, load_mag_id);
+		return create_gun(step, pos, test_shootable_weapons::VINDICATOR, load_mag_id);
 	}
 
 	entity_handle create_sample_rifle(const logic_step step, vec2 pos, entity_id load_mag_id) {
-		return create_rifle(step, pos, test_shootable_weapons::SAMPLE_RIFLE, load_mag_id);
+		return create_gun(step, pos, test_shootable_weapons::SAMPLE_RIFLE, load_mag_id);
 	}
 
-	entity_handle create_rifle(const logic_step step, vec2 pos, const test_shootable_weapons flavour, entity_id load_mag_id) {
+	entity_handle create_gun(const logic_step step, vec2 pos, const test_shootable_weapons flavour, entity_id load_mag_id) {
 		auto& cosmos = step.get_cosmos();
 		auto load_mag = cosmos[load_mag_id];
 
@@ -1230,6 +1310,10 @@ namespace prefabs {
 
 	entity_handle create_sample_magazine(const logic_step step, const transformr pos, const entity_id charge_inside_id, const int force_num_charges) {
 		return create_magazine(step, pos, test_container_items::SAMPLE_MAGAZINE, charge_inside_id, force_num_charges);
+	}
+
+	entity_handle create_pro90_magazine(const logic_step step, const transformr pos, const entity_id charge_inside_id, const int force_num_charges) {
+		return create_magazine(step, pos, test_container_items::PRO90_MAGAZINE, charge_inside_id, force_num_charges);
 	}
 
 	entity_handle create_ao44_magazine(const logic_step step, const transformr pos, const entity_id charge_inside_id, const int force_num_charges) {

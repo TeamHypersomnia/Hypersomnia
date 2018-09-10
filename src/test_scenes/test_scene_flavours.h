@@ -95,6 +95,7 @@ enum class test_shootable_weapons {
 	KEK9,
 	SN69,
 	AO44,
+	PRO90,
 	AMPLIFIER_ARM,
 	DATUM_GUN,
 
@@ -163,6 +164,7 @@ enum class test_container_items {
 	BROWN_BACKPACK,
 	SAMPLE_MAGAZINE,
 	AO44_MAGAZINE,
+	PRO90_MAGAZINE,
 	LEWSII_MAG,
 
 	COUNT

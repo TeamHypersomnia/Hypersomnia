@@ -6,33 +6,20 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Holstering logic needs to avoid mounted slots
+- Ensure that a single capability only ever mounts a single item at a time?
 
-- Mounting
-	- Iteration
-		- **Solution:** unordered map from an item to a target slot & params for mounting
-			- Pro: best memory performance
-			- Pro: best time complexity
-			- Con: iterating map might be ineffective compared to a vector
-				- if we use vector, then rendering code is handicapped
-				- we'll go with a map for now
-	- Ensure that a single capability only ever mounts a single item at a time
-	- If an item is in a mounted slot, it is inferred that it is mounted.
-		- And it is inferred that the mounting_progress denotes the unmounting progress
-		- Since an item can only ever be mounted xor unmounted at the same time
-	- Can change target slot to dead without interrupting the progress
-	- As always, implement representation early
-		- Draw small hud circle in the center of a mounted and unmounted item
-		- Special icons? 
-			- A magazine icon next to the reloaded mag
-				- Not now, though
+- Some additional slots for magazines in case we don't have a backpack
 
 - Reloading
+	- Solution: A bool reloading_intent in the capability
+		- Less traffic to the server
+		- Better resistance to lag, I guess
 	- Finding the fullest magaizne should be easy enough task
 	- Just what if someone drops it during reload?
 		- Then that's their problem
 		- There's no way that an inventory structure can be altered without the user's intervention, except for player's death
 		- So it can be perfectly the job of GUI to select suitable transfers.
+	- The first time that the mounting conditions fail for the reloading, we're resetting it to false
 
 - Melee combat
 	- Primary and secondary attacks for knives

@@ -34,6 +34,7 @@ enum class test_scene_image_id {
 	KEK9,
 	SN69,
 	AO44,
+	PRO90,
 	URBAN_CYAN_MACHETE,
 
 	LEWSII,
@@ -52,6 +53,7 @@ enum class test_scene_image_id {
 	SAMPLE_MAGAZINE,
 	SMALL_MAGAZINE,
 	AO44_MAGAZINE,
+	PRO90_MAGAZINE,
 	ROUND_TRACE,
 	ELECTRIC_MISSILE,
 	PINK_CHARGE,
