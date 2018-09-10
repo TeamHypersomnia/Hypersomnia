@@ -98,7 +98,6 @@ namespace invariants {
 		real32 kickback_towards_wielder = 0.f;
 		real32 recoil_multiplier = 1.f;
 
-		float chambering_duration_ms = 500.f;
 		bool allow_chambering_with_akimbo = false;
 		pad_bytes<3> pad;
 

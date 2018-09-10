@@ -254,8 +254,10 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				}
 			}
 			else {
+				const auto chamber_slot = gun_entity[slot_function::GUN_CHAMBER];
+
 				auto get_num_in_chamber = [&]() {
-					return gun_entity[slot_function::GUN_CHAMBER].get_items_inside().size();
+					return chamber_slot.get_items_inside().size();
 				};
 				
 				if (get_num_in_chamber() == 0) {
@@ -279,7 +281,9 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 							progress += delta.in_milliseconds();
 
-							if (progress >= gun_def.chambering_duration_ms) {
+							const auto chambering_duration_ms = chamber_slot->mounting_duration_ms;
+
+							if (progress >= chambering_duration_ms) {
 								::load_next_cartridge(gun_entity, next_cartridge, step);
 								progress = 0.f;
 							}

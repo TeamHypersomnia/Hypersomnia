@@ -111,17 +111,18 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 			[&](const auto it) {
 				if (const auto tr = it.find_viewing_transform(in.interpolation)) {
 					const auto& gun = it.template get<components::gun>();
-					const auto& gun_def = it.template get<invariants::gun>();
 
-					const auto& progress = gun.chambering_progress_ms;
+					if (const auto& chamber_slot = it[slot_function::GUN_CHAMBER]; chamber_slot.alive() && chamber_slot->is_mounted_slot()) {
+						const auto& progress = gun.chambering_progress_ms;
 
-					if (progress > 0.f) {
-						const auto highlight_amount = progress / gun_def.chambering_duration_ms;
+						if (progress > 0.f) {
+							const auto highlight_amount = progress / chamber_slot->mounting_duration_ms;
 
-						auto shell_spawn_offset = ::calc_shell_offset(it);
-						shell_spawn_offset.pos.rotate(tr->rotation);
+							auto shell_spawn_offset = ::calc_shell_offset(it);
+							shell_spawn_offset.pos.rotate(tr->rotation);
 
-						draw_circle(it, highlight_amount, white, red_violet, shell_spawn_offset.pos);
+							draw_circle(it, highlight_amount, white, red_violet, shell_spawn_offset.pos);
+						}
 					}
 				}
 			}

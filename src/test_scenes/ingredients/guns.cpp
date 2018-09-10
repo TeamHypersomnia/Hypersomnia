@@ -34,6 +34,10 @@ namespace test_flavours {
 
 		/* Types for bullets etc. */
 
+		auto set_chambering_duration_ms = [&](auto& meta, const auto duration_ms) {
+			meta.template get<invariants::container>().slots[slot_function::GUN_CHAMBER].mounting_duration_ms = duration_ms;
+		};
+
 		auto default_gun_props = [&](auto& meta) {
 			auto& gun_def = meta.template get<invariants::gun>();
 
@@ -766,7 +770,6 @@ namespace test_flavours {
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::BILMER_CHAMBERING);
-			gun_def.chambering_duration_ms = 400.f;
 
 			meta.set(gun_def);
 
@@ -774,6 +777,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta).density = 0.1f;
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1000.f);
 			meta.get<invariants::item>().standard_price = 3100;
+			set_chambering_duration_ms(meta, 400.f);
 		}
 
 		{
@@ -823,6 +827,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1200.f);
 			meta.get<invariants::item>().standard_price = 2900;
+			set_chambering_duration_ms(meta, 500.f);
 		}
 
 		{
@@ -872,7 +877,6 @@ namespace test_flavours {
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 			//gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::VINDICATOR_SHOT);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::RIFLE_CHAMBERING);
-			gun_def.chambering_duration_ms = 700.f;
 
 			meta.set(gun_def);
 
@@ -883,6 +887,7 @@ namespace test_flavours {
 			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].only_allow_flavour = ::to_entity_flavour_id(test_container_items::LEWSII_MAG);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::LEWSII_DRAW);
 			meta.get<invariants::item>().standard_price = 5000;
+			set_chambering_duration_ms(meta, 700.f);
 		}
 
 		{
@@ -925,7 +930,6 @@ namespace test_flavours {
 			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::DATUM_GUN_SHOT);
 			gun_def.adversarial.knockout_award = static_cast<money_type>(350);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_CHAMBERING);
-			gun_def.chambering_duration_ms = 900.f;
 
 			meta.set(gun_def);
 
@@ -937,6 +941,7 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1500.f, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::PLASMA_DRAW);
 			meta.get<invariants::item>().standard_price = 4000;
+			set_chambering_duration_ms(meta, 900.f);
 		}
 
 		{
@@ -971,7 +976,6 @@ namespace test_flavours {
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::MEDIUM_PISTOL_CHAMBERING);
-			gun_def.chambering_duration_ms = 250.f;
 
 			meta.set(gun_def);
 
@@ -981,6 +985,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 500;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(350);
+			set_chambering_duration_ms(meta, 250.f);
 		}
 
 		{
@@ -1014,7 +1019,6 @@ namespace test_flavours {
 			gun_def.gunshot_adds_heat = 0.072f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
-			gun_def.chambering_duration_ms = 250.f;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::LIGHT_PISTOL_CHAMBERING);
@@ -1026,6 +1030,7 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 400.f, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 500;
+			set_chambering_duration_ms(meta, 250.f);
 		}
 
 		{
@@ -1045,7 +1050,6 @@ namespace test_flavours {
 			gun_def.action_mode = gun_action_type::BOLT_ACTION;
 			gun_def.muzzle_velocity = {4100.f, 4100.f};
 			gun_def.shot_cooldown_ms = 0.f;
-			gun_def.chambering_duration_ms = 300.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::REVOLVER_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = true;
 
@@ -1073,6 +1077,7 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 600.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 700;
+			set_chambering_duration_ms(meta, 300.f);
 		}
 
 		{

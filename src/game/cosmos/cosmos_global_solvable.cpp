@@ -56,10 +56,23 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 				if (source_mounted != target_mounted) {
 					/* (Un)mounting was requested */
 					if (const auto capability = e.get_owning_transfer_capability()) {
-						const bool both_in_reach_of_hands = 
-							current_slot.is_physically_connected_until(capability)
-							&& (target_mount.dead() || target_mount.is_physically_connected_until(capability))
-						;
+						const bool both_in_reach_of_hands = [&]() {
+							const auto reachable_non_physical = augs::enum_boolset<slot_function> {
+								slot_function::GUN_CHAMBER,
+								slot_function::GUN_DETACHABLE_MAGAZINE,
+								slot_function::GUN_RAIL,
+								slot_function::GUN_MUZZLE,
+								slot_function::GUN_CHAMBER_MAGAZINE
+							};
+
+							if (!target_mounted) {
+								/* We're unmounting. Source must be physically connected to hands. */
+								return current_slot.is_physically_connected_until(capability, reachable_non_physical);
+							}
+
+							/* We're mounting. Source must be directly in hands, and target must be physically connected to hands. */
+							return current_slot.is_hand_slot() && target_mount.is_physically_connected_until(capability, reachable_non_physical);
+						}();
 
 						if (both_in_reach_of_hands) {
 							should_be_erased = false;
