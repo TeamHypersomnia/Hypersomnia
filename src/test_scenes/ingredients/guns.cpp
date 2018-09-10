@@ -831,16 +831,17 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {3800.f, 3800.f};
-			gun_def.shot_cooldown_ms = 70.f;
+			gun_def.shot_cooldown_ms = 69.f;
 
 			gun_def.shell_angular_velocity = {2.f, 14.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
-			gun_def.damage_multiplier = 1.2f;
+			gun_def.damage_multiplier = 1.35f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = 40.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(500);
+			gun_def.recoil_multiplier = 1.2f;
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.052f;

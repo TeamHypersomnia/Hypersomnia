@@ -7,6 +7,7 @@
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/detail/inventory/item_mounting.hpp"
 
 real32 pending_item_mount::get_mounting_duration_ms(const const_entity_handle& handle) const {

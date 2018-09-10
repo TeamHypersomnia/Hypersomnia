@@ -89,7 +89,7 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 					mode.auto_assign_faction(in, id);
 					player_id = id;
 
-					mode.auto_assign_faction(in, mode.add_player(in, "Spicmir"));
+					mode.auto_assign_faction(in, mode.add_player(in, "FortesQ"));
 				}
 
 				{
