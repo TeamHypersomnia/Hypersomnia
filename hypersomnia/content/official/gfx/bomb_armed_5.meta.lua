@@ -30,6 +30,13 @@ return {
           y = 0
         },
         rotation = 0
+      },
+      shell_spawn = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       }
     },
     item = {
@@ -45,7 +52,7 @@ return {
           x = 18,
           y = -2
         },
-        rotation = -90
+        rotation = 0
       },
       beep_offset = {
         pos = {
