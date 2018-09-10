@@ -286,7 +286,7 @@ FORCE_INLINE void specific_entity_drawer(
 				}();
 
 				{
-					const auto leg_anim = maybe_torso->calc_leg_anim(velocity, face_degrees);
+					const auto leg_anim = maybe_torso->calc_leg_anim(velocity, face_degrees + stance_offsets.strafe_facing_offset);
 
 					if (const auto animation = logicals.find(leg_anim.id);
 						animation != nullptr

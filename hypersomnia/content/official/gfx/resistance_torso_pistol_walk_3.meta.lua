@@ -113,7 +113,8 @@ return {
           y = 0
         },
         rotation = 0
-      }
+      },
+      strafe_facing_offset = -90
     }
   },
   usage_as_button = {

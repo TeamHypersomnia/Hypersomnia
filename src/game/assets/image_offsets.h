@@ -9,6 +9,7 @@ struct torso_offsets {
 	transformi back;
 	transformi head;
 	transformi legs;
+	real32 strafe_facing_offset = 0.f;
 	// END GEN INTROSPECTOR
 
 	void flip_vertically() {
@@ -16,6 +17,7 @@ struct torso_offsets {
 		secondary_hand.flip_vertically();
 		back.flip_vertically();
 		head.flip_vertically();
+		strafe_facing_offset *= -1;
 
 		std::swap(primary_hand, secondary_hand);
 	}
