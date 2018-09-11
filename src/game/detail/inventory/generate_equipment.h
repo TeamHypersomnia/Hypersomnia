@@ -55,21 +55,13 @@ void generate_equipment(const requested_equipment& eq, const E& character, const
 		transfer(weapon, character.get_primary_hand());
 	}
 
-	if (eq.backpack.is_set()) {
-		const auto b = just_create_entity(cosm, eq.backpack);
+	auto make_wearable = [&](const entity_flavour_id& from, const slot_function slot) {
+		if (const auto target_slot = character[slot]; target_slot.is_empty_slot() && from.is_set()) {
+			transfer(just_create_entity(cosm, from), target_slot);
+		}
+	};
 
-		transfer(b, character[slot_function::BACK]);
-	}
-
-	if (eq.belt_wearable.is_set()) {
-		const auto b = just_create_entity(cosm, eq.belt_wearable);
-
-		transfer(b, character[slot_function::BELT]);
-	}
-
-	if (eq.personal_deposit_wearable.is_set()) {
-		const auto b = just_create_entity(cosm, eq.personal_deposit_wearable);
-
-		transfer(b, character[slot_function::PERSONAL_DEPOSIT]);
-	}
+	make_wearable(eq.backpack, slot_function::BACK);
+	make_wearable(eq.backpack, slot_function::BELT);
+	make_wearable(eq.backpack, slot_function::PERSONAL_DEPOSIT);
 }
