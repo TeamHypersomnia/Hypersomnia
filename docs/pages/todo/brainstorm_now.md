@@ -9,7 +9,7 @@ summary: That which we are brainstorming at the moment.
 - Some additional slots for magazines in case we don't have a backpack
 	- Do we make it an item deposit of the player or a personal deposit item?
 		- PERSONAL_ITEM_DEPOSIT pros:
-			- Works out of box in GUI
+			- **(HUGE)** Works out of box in GUI
 			- Can later make it an actual item, purchasable
 		- PERSONAL_ITEM_DEPOSIT cons: 
 			- Have to create an additional, actual item entity for each player
@@ -26,7 +26,7 @@ summary: That which we are brainstorming at the moment.
 			- (negliglible) Works out of box with drop_from_all_slots
 			- Dont have to create any new item
 		- ITEM DEPOSIT cons:
-			- Some shit corner cases in GUI
+			- **(HUGE)** Some shit corner cases in GUI
 	- Option: Several additional actual magazine slots in the torso
 	- Option: A big pocket slot for the torso and several slots inside
 	- Either way, we introduce several additional item deposit slots

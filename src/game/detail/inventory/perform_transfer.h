@@ -22,14 +22,3 @@ void perform_transfers(const C requests, const step_type step) {
 		perform_transfer(r, step);
 	}
 }
-
-template <class F, class E>
-void drop_from_all_slots(const invariants::container& container, const E handle, const impulse_mults impulse, F result_callback) {
-	for (const auto& s : container.slots) {
-		for (const auto item : get_items_inside(handle, s.first)) {
-			result_callback(perform_transfer_no_step(item_slot_transfer_request::drop(item, impulse), handle.get_cosmos()));
-		}
-	}
-}
-
-void drop_from_all_slots(const invariants::container& container, const entity_handle handle, const impulse_mults impulse, const logic_step step);

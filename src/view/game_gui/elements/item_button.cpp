@@ -32,6 +32,7 @@
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/audiovisual_state/systems/randomizing_system.h"
 
+#include "game/detail/entity_scripts.h"
 #include "view/rendering_scripts/draw_entity.h"
 #include "view/viewables/images_in_atlas_map.h"
 
@@ -220,59 +221,57 @@ void item_button::draw_proc(
 	}
 
 	if (f.draw_item) {
-		{
-			const bool draw_attachments = !this_id->is_container_open || f.draw_attachments_even_if_open;
-			const auto layout = calc_button_layout(item, context.get_image_metas(), draw_attachments);
-			
-			vec2 expansion_offset;
+		const bool draw_attachments = !this_id->is_container_open || f.draw_attachments_even_if_open;
+		const auto layout = calc_button_layout(item, context.get_image_metas(), draw_attachments);
+		
+		vec2 expansion_offset;
 
-			if (f.expand_size_to_grid) {
-				const auto gui_def = context.get_image_metas().at(item.get<invariants::sprite>().image_id).meta.usage_as_button;
-				const auto size = vec2i(layout.get_size());
-				const auto rounded_size = griddify_size(size, gui_def.bbox_expander);
+		if (f.expand_size_to_grid) {
+			const auto gui_def = context.get_image_metas().at(item.get<invariants::sprite>().image_id).meta.usage_as_button;
+			const auto size = vec2i(layout.get_size());
+			const auto rounded_size = griddify_size(size, gui_def.bbox_expander);
 
-				expansion_offset = (rounded_size - size) / 2;
-			}
+			expansion_offset = (rounded_size - size) / 2;
+		}
 
-			const auto rc_pos = this_absolute_rect.get_position();
+		const auto rc_pos = this_absolute_rect.get_position();
 
-			const auto viewing_pos = vec2i(-layout.left_top()) + rc_pos + expansion_offset;
-			const auto viewing_transform = transformr(viewing_pos, 0);
+		const auto viewing_pos = vec2i(-layout.left_top()) + rc_pos + expansion_offset;
+		const auto viewing_transform = transformr(viewing_pos, 0);
 
-			auto render_visitor = [](const auto& renderable, auto&&... args) {
-				augs::draw(renderable, std::forward<decltype(args)>(args)...);
-			};
+		auto render_visitor = [](const auto& renderable, auto&&... args) {
+			augs::draw(renderable, std::forward<decltype(args)>(args)...);
+		};
 
-			auto drawer = [&](
-				const const_entity_handle attachment_handle, 
-				const transformr where
-			) {
-				attachment_handle.dispatch_on_having_all<invariants::item>([&](const auto typed_attachment_handle) {
-					detail_specific_entity_drawer<true>(
-						typed_attachment_handle,
-						drawing_in,
-						render_visitor,
-						where
-					);
-				});
-			};
-
-			drawer(item, viewing_transform);
-
-			if (draw_attachments) {
-				item.for_each_attachment_recursive(
-					[&](
-						const auto attachment_entity,
-						const auto attachment_offset
-					) {
-						drawer(attachment_entity, viewing_transform * attachment_offset);
-					},
-					[]() {
-						return torso_offsets();
-					},
-					attachment_offset_settings::for_logic()
+		auto drawer = [&](
+			const const_entity_handle attachment_handle, 
+			const transformr where
+		) {
+			attachment_handle.dispatch_on_having_all<invariants::item>([&](const auto typed_attachment_handle) {
+				detail_specific_entity_drawer<true>(
+					typed_attachment_handle,
+					drawing_in,
+					render_visitor,
+					where
 				);
-			}
+			});
+		};
+
+		drawer(item, viewing_transform);
+
+		if (draw_attachments) {
+			item.for_each_attachment_recursive(
+				[&](
+					const auto attachment_entity,
+					const auto attachment_offset
+				) {
+					drawer(attachment_entity, viewing_transform * attachment_offset);
+				},
+				[]() {
+					return torso_offsets();
+				},
+				attachment_offset_settings::for_logic()
+			);
 		}
 
 		if (f.draw_charges) {
@@ -294,24 +293,32 @@ void item_button::draw_proc(
 				bottom_number_val = considered_charges;
 				printing_charge_count = true;
 			}
-			else if (element.draw_space_available_inside_container_icons && item[slot_function::ITEM_DEPOSIT].alive()) {
-				if (item.get<invariants::item>().categories_for_slot_compatibility.test(item_category::MAGAZINE)) {
-					if (!this_id->is_container_open) {
-						printing_charge_count = true;
-					}
-				}
+			else if (element.draw_space_available_inside_container_icons) {
+				const auto ammo_info = get_ammunition_information(item);
 
-				if (printing_charge_count) {
-					bottom_number_val = count_charges_in_deposit(item);
+				if (ammo_info.total_ammunition_space_available > 0.f) {
+					printing_charge_count = true;
+					bottom_number_val = ammo_info.total_charges;
 				}
-				else {
-					bottom_number_val = item[slot_function::ITEM_DEPOSIT].calc_real_space_available() / double(SPACE_ATOMS_PER_UNIT);
-
-					if (bottom_number_val < 1.0 && bottom_number_val > 0.0) {
-						trim_zero = true;
+				else if (item[slot_function::ITEM_DEPOSIT].alive()) {
+					if (item.get<invariants::item>().categories_for_slot_compatibility.test(item_category::MAGAZINE)) {
+						if (f.always_draw_charges_as_closed || !this_id->is_container_open) {
+							printing_charge_count = true;
+						}
 					}
 
-					label_color.set_rgb(cyan.rgb());
+					if (printing_charge_count) {
+						bottom_number_val = count_charges_in_deposit(item);
+					}
+					else {
+						bottom_number_val = item[slot_function::ITEM_DEPOSIT].calc_real_space_available() / double(SPACE_ATOMS_PER_UNIT);
+
+						if (bottom_number_val < 1.0 && bottom_number_val > 0.0) {
+							trim_zero = true;
+						}
+
+						label_color.set_rgb(cyan.rgb());
+					}
 				}
 			}
 
@@ -337,10 +344,11 @@ void item_button::draw_proc(
 				};
 
 				const auto label_bbox = get_text_bbox(label_text);
+				const auto pos = f.overridden_charges_pos ? (*f.overridden_charges_pos + vec2(-label_bbox.x - 4, 4)) : this_tree_entry.get_absolute_rect().right_bottom() - label_bbox;
 
 				print_stroked(
 					output,
-					this_tree_entry.get_absolute_rect().right_bottom() - label_bbox,
+					pos,
 					label_text
 				);
 			}

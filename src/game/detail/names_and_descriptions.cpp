@@ -79,7 +79,7 @@ entity_name_str get_bbcoded_slot_function_name(const slot_function f) {
 		return{
 			"Belt",
 		};
-	case slot_function::ITEM_DEPOSIT:
+	case slot_function::PERSONAL_DEPOSIT:
 		return{
 			"Personal deposit",
 		};
@@ -129,7 +129,7 @@ entity_name_str get_bbcoded_slot_function_description(const slot_function f) {
 		return{
 			"For defuser kits and other belt-wearables."
 		};
-	case slot_function::ITEM_DEPOSIT:
+	case slot_function::PERSONAL_DEPOSIT:
 		return{
 			"For several items at most.",
 		};

@@ -1,6 +1,6 @@
 #pragma once
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
-#include "game/detail/entity_handle_mixins/determine_target_slot_for.hpp"
+#include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 
 template <class E>
 wielding_result inventory_mixin<E>::swap_wielded_items() const {
@@ -109,7 +109,7 @@ wielding_result inventory_mixin<E>::make_wielding_transfers_for(hand_selections_
 		};
 
 		if (item_in_hand.alive()) {
-			const auto holstering_slot = self.determine_holstering_slot_for(item_in_hand);
+			const auto holstering_slot = self.find_holstering_slot_for(item_in_hand);
 
 			if (holstering_slot.alive()) {
 				holsters.push_back(item_slot_transfer_request::standard(item_in_hand, holstering_slot));

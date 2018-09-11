@@ -8,5 +8,6 @@ struct requested_equipment {
 	entity_flavour_id charge;
 	entity_flavour_id backpack;
 	entity_flavour_id belt_wearable;
+	entity_flavour_id personal_deposit_wearable;
 	// END GEN INTROSPECTOR
 };

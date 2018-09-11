@@ -46,6 +46,7 @@ namespace test_scenes {
 		vars.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::VINDICATOR);
 		vars.initial_eq.magazine = to_entity_flavour_id(test_container_items::SAMPLE_MAGAZINE);
 		vars.initial_eq.charge = to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE);
+		vars.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 	}
 
 	void testbed::setup(bomb_mode_vars& vars) {
@@ -56,6 +57,7 @@ namespace test_scenes {
 		resistance.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::VINDICATOR);
 		resistance.initial_eq.magazine = to_entity_flavour_id(test_container_items::SAMPLE_MAGAZINE);
 		resistance.initial_eq.charge = to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE);
+		resistance.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 
 		auto& metropolis = vars.factions[faction_type::METROPOLIS];
 
@@ -64,6 +66,7 @@ namespace test_scenes {
 		metropolis.initial_eq.charge = to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE);
 
 		metropolis.initial_eq.belt_wearable = to_entity_flavour_id(test_tool_items::DEFUSE_KIT);
+		metropolis.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 
 		{
 			auto& mt = vars.view.event_sounds[faction_type::METROPOLIS];

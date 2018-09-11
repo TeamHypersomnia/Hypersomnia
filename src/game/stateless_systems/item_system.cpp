@@ -39,7 +39,7 @@
 #include "game/enums/item_transfer_result_type.h"
 
 #include "game/detail/physics/physics_scripts.h"
-#include "game/detail/entity_handle_mixins/determine_target_slot_for.hpp"
+#include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 
 void item_system::pick_up_touching_items(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
@@ -84,7 +84,7 @@ void item_system::pick_up_touching_items(const logic_step step) {
 					(pick_list.empty() && transfers.pick_all_touched_items_if_list_to_pick_empty)
 					|| found_on_subscription_list
 				) {
-					const auto pickup_slot = typed_picker.determine_pickup_target_slot_for(cosmos[item_to_pick]);
+					const auto pickup_slot = typed_picker.find_pickup_target_slot_for(cosmos[item_to_pick]);
 
 					if (pickup_slot.alive()) {
 						const bool can_pick_already = transfers.pickup_timeout.try_to_fire_and_reset(clk);

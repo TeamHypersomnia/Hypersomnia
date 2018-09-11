@@ -202,6 +202,8 @@ enum class test_scene_image_id {
 	NO_AMMO_ICON,
 	UNCONSCIOUS_ICON,
 
+	STANDARD_PERSONAL_DEPOSIT,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

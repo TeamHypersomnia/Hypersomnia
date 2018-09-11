@@ -102,15 +102,13 @@ void slot_button::draw(
 		if (slot_type == slot_function::GUN_DETACHABLE_MAGAZINE) {
 			draw_icon(necessary_image_id::DETACHABLE_MAGAZINE_SLOT_ICON);
 		}
-	}
 
-	const bool is_child_of_root = slot_handle.get_container() == context.get_subject_entity();
-
-	if (is_child_of_root) {
-		if (slot_type == slot_function::ITEM_DEPOSIT) {
+		if (slot_type == slot_function::PERSONAL_DEPOSIT) {
 			draw_icon(necessary_image_id::DETACHABLE_MAGAZINE_SLOT_ICON);
 		}
 	}
+
+	const bool is_child_of_root = slot_handle.get_container() == context.get_subject_entity();
 
 	if (!is_child_of_root) {
 		const auto child_item_button = context.const_dereference_location(item_button_in_item{ slot_handle.get_container().get_id() });

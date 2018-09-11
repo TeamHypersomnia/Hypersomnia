@@ -41,8 +41,10 @@ struct item_button : game_gui_rect_node {
 		bool decrease_border_alpha = false;
 		bool draw_container_opened_mark = false;
 		bool draw_charges = true;
+		bool always_draw_charges_as_closed = false;
 		bool expand_size_to_grid = true;
 		bool always_full_item_alpha = false;
+		std::optional<vec2> overridden_charges_pos;
 		vec2 absolute_xy_offset;
 	};
 

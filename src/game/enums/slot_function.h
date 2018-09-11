@@ -6,6 +6,7 @@ enum class slot_function {
 	INVALID,
 
 	// GEN INTROSPECTOR enum class slot_function
+	PERSONAL_DEPOSIT,
 	ITEM_DEPOSIT,
 
 	GUN_CHAMBER,

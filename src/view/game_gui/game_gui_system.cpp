@@ -476,6 +476,16 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 
 	for (const auto& pickup : step.get_queue<messages::item_picked_up_message>()) {
 		const auto picked_item = cosmos[pickup.item];
+		const auto target_slot = picked_item.get_current_slot();
+
+		if (target_slot.dead()) {
+			continue;
+		}
+
+		if (target_slot.get_type() == slot_function::PERSONAL_DEPOSIT) {
+			continue;
+		}
+
 		auto& gui = get_character_gui(pickup.subject);
 
 		auto add = [&](const auto handle) {

@@ -326,10 +326,12 @@ void hotbar_button::draw(
 		f.decrease_alpha = false;
 		f.decrease_border_alpha = false;
 		f.draw_container_opened_mark = false;
-		f.draw_charges = false;
+		f.draw_charges = true;
+		f.always_draw_charges_as_closed = true;
 		f.draw_attachments_even_if_open = true;
 		f.expand_size_to_grid = false;
 		f.always_full_item_alpha = true;
+		f.overridden_charges_pos = absolute_rc.right_top();
 
 		const auto height_excess = absolute_rc.h() - this_id->get_bbox(necessarys, image_defs, owner_transfer_capability).y;
 		

@@ -17,6 +17,7 @@
 
 #include "augs/templates/container_templates.h"
 #include "game/cosmos/cosmos.h"
+#include "game/detail/inventory/drop_from_all_slots.h"
 #include "augs/string/format_enum.h"
 
 void drop_from_all_slots(const invariants::container& container, const entity_handle handle, const impulse_mults impulse, const logic_step step) {
@@ -277,7 +278,7 @@ perform_transfer_result perform_transfer_impl(
 		   	cosm.get_timestamp()
 		);
 
-		special_physics.during_cooldown_ignore_collision_with = previous_slot_container;
+		special_physics.during_cooldown_ignore_collision_with = previous_root;
 	}
 
 	const bool is_pickup = result.relation == capability_relation::PICKUP;

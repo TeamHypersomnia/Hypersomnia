@@ -345,6 +345,14 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 
 		const bool dropped_item_colliding_with_container = [&]() {
 			if (collider_special_physics.dropped_or_created_cooldown.lasts(clk)) {
+				{
+					const auto& subject_special_physics = subject_owner_body.get_special_physics();
+
+					if (subject_special_physics.dropped_or_created_cooldown.lasts(clk)) {
+						return true;
+					}
+				}
+
 				const auto& ignored = collider_special_physics.during_cooldown_ignore_collision_with;
 
 				if (ignored == subject_owner_body) {

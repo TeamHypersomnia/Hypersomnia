@@ -66,4 +66,10 @@ void generate_equipment(const requested_equipment& eq, const E& character, const
 
 		transfer(b, character[slot_function::BELT]);
 	}
+
+	if (eq.personal_deposit_wearable.is_set()) {
+		const auto b = just_create_entity(cosm, eq.personal_deposit_wearable);
+
+		transfer(b, character[slot_function::PERSONAL_DEPOSIT]);
+	}
 }

@@ -3,6 +3,7 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/stateless_systems/driver_system.h"
+#include "game/detail/inventory/drop_from_all_slots.h"
 
 void perform_knockout(
 	const entity_id& subject_id, 

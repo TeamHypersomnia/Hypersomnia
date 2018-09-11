@@ -26,6 +26,16 @@ enum class wielding_type {
 	DUAL_WIELDED
 };
 
+enum class slot_finding_opt {
+	CHECK_WEARABLES,
+	CHECK_HANDS,
+	CHECK_CONTAINERS,
+
+	COUNT
+};
+
+using slot_finding_opts = augs::constant_size_vector<slot_finding_opt, 3>;
+
 template <class derived_handle_type>
 class inventory_mixin {
 	using offset_vector = std::vector<transformr>;
@@ -78,10 +88,16 @@ public:
 	std::optional<colliders_connection> calc_connection_until_container(const entity_id until) const;
 
 	template <class handle_type>
-	inventory_slot_handle_type determine_holstering_slot_for(const handle_type holstered_item) const;
+	inventory_slot_handle_type find_slot_for(
+		const handle_type picked_item,
+	   	const slot_finding_opts&
+	) const;
 
 	template <class handle_type>
-	inventory_slot_handle_type determine_pickup_target_slot_for(const handle_type picked_item) const;
+	inventory_slot_handle_type find_holstering_slot_for(const handle_type holstered_item) const;
+
+	template <class handle_type>
+	inventory_slot_handle_type find_pickup_target_slot_for(const handle_type picked_item) const;
 	
 	inventory_slot_handle_type get_current_slot() const;
 
