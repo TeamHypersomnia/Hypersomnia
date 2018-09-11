@@ -20,6 +20,9 @@ namespace invariants {
 		round_flavour_type round_flavour;
 
 		particle_effect_input shell_trace_particles;
+
+		int num_rounds_spawned = 1;
+		real32 rounds_spread_degrees = 0.f;
 		// END GEN INTROSPECTOR
 	};
 }

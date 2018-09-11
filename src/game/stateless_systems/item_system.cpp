@@ -41,6 +41,45 @@
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 
+template <class E>
+auto calc_reloading_context(
+	const E& capability
+) {
+	reloading_context ctx;
+	(void)capability;
+	return ctx;
+}
+
+void item_system::handle_reload_intents(const logic_step step) {
+	auto& cosm = step.get_cosmos();
+	const auto& requests = step.get_queue<messages::intent_message>();
+
+	for (auto r : requests) {
+		if (r.was_pressed()) {
+			if (r.intent == game_intent_type::RELOAD) {
+				const auto capability = cosm[r.subject];
+
+				if (auto transfers = capability.find<components::item_slot_transfers>()) {
+					auto& ctx = transfers->current_reloading_context;
+
+					if (const auto target_weapon = cosm[ctx.target_weapon]) {
+
+					}
+					else {
+						const auto new_context = calc_reloading_context(capability);
+						ctx = new_context;
+					}
+				}
+			}
+		}
+	}
+}
+
+void item_system::advance_reloading_contexts(const logic_step step) {
+	(void)step;
+
+}
+
 void item_system::pick_up_touching_items(const logic_step step) {
 	auto& cosmos = step.get_cosmos();
 	const auto& clk = cosmos.get_clock();

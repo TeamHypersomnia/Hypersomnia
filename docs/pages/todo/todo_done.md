@@ -1189,7 +1189,6 @@ we consider whole type overrides too complex architeciturally:
 - Fix switching between the weapon and the bomb
 
 
-
 - Fix defusing logic
 	- Use button logic will need some improvement 
 	- Use button should be queried continuously
@@ -1389,3 +1388,35 @@ we consider whole type overrides too complex architeciturally:
 			- Is an exception to the rule of mounting that both items need to be in hand
 			- For now, can play the shooting animation for chambering
 
+
+- Some additional slots for magazines in case we don't have a backpack
+	- Do we make it an item deposit of the player or a personal deposit item?
+		- PERSONAL_ITEM_DEPOSIT pros:
+			- **(HUGE)** Works out of box in GUI
+			- Can later make it an actual item, purchasable
+		- PERSONAL_ITEM_DEPOSIT cons: 
+			- Have to create an additional, actual item entity for each player
+				- Item without physical body?
+				- Cons
+					- More memory wasted
+						- Won't take more than a single shell, though
+			- Corner cases
+				- (negliglible) we don't want to assign it to hotbar nor want it to participate in selection setups
+					- actually that's easy because selection groups only ever look in hotbar items
+				- (negliglible) we want to drop all items from personal deposit, not the personal deposit item
+		- ITEM DEPOSIT pros:
+			- Works out of box with hotbar
+			- (negliglible) Works out of box with drop_from_all_slots
+			- Dont have to create any new item
+		- ITEM DEPOSIT cons:
+			- **(HUGE)** Some shit corner cases in GUI
+	- Option: Several additional actual magazine slots in the torso
+	- Option: A big pocket slot for the torso and several slots inside
+	- Either way, we introduce several additional item deposit slots
+	- Why not have a single item deposit?
+		- A basic player deposit
+		- Some small amount of space available
+
+- Solution: A bool reloading_intent in the capability
+	- Less traffic to the server
+	- Better resistance to lag, I guess

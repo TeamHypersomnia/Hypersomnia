@@ -127,9 +127,6 @@ void gun_system::consume_gun_intents(const logic_step step) {
 			gun.play_trigger_effect_once = true;
 		}
 
-		if (gun_entity.intent == game_intent_type::RELOAD && gun_entity.was_pressed()) {
-			
-		}
 	}
 }
 

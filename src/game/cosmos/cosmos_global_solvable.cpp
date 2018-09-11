@@ -53,6 +53,12 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 
 		item_handle.template dispatch_on_having_all<components::item>([&](const auto& transferred_item) {
 			auto& request = m.second;
+			auto& specified_charges = request.params.specified_quantity;
+
+			if (specified_charges == 0) {
+				return;
+			}
+
 			auto& progress = request.progress_ms;
 
 			const auto target_slot = cosm[request.target];
@@ -70,10 +76,26 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 					transfer.target_slot = target_slot;
 					transfer.params = request.params;
 					transfer.params.bypass_mounting_requirements = true;
+					transfer.params.specified_quantity = 1;
+
+					const auto previous_charges = transferred_item.template get<components::item>().get_charges();
 
 					::perform_transfer(transfer, step);
 
-					should_be_erased = true;
+					if (previous_charges == 1) {
+						should_be_erased = true;
+						return;
+					}
+
+					if (specified_charges != -1) {
+						--specified_charges;
+						progress = 0.f;
+
+						if (specified_charges == 0) {
+							should_be_erased = true;
+							return;
+						}
+					}
 				}
 			}
 		});

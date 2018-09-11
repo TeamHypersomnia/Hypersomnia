@@ -7,6 +7,7 @@
 
 #include "augs/math/physics_structs.h"
 #include "game/cosmos/entity_handle_declaration.h"
+#include "game/detail/inventory/weapon_reloading.h"
 #include "augs/misc/timing/stepped_timing.h"
 #include "augs/pad_bytes.h"
 
@@ -30,6 +31,8 @@ namespace components {
 
 		bool pick_all_touched_items_if_list_to_pick_empty = true;
 		pad_bytes<3> pad;
+
+		reloading_context current_reloading_context;
 		// END GEN INTROSPECTOR
 
 #if TODO_MOUNTING
