@@ -61,16 +61,16 @@ void slot_button::draw(
 	const auto inside_tex = necessarys.at(necessary_image_id::ATTACHMENT_CIRCLE_FILLED);
 	const auto border_tex = necessarys.at(necessary_image_id::ATTACHMENT_CIRCLE_BORDER);
 
-	if (slot_handle->always_allow_exactly_one_item) {
-		output.gui_box_center_tex(inside_tex, context, this_id, inside_col);
-		output.gui_box_center_tex(border_tex, context, this_id, border_col);
-
 		const auto slot_type = slot_handle.get_type();
 
 		auto draw_icon = [&](necessary_image_id id, const vec2i offset = vec2i(0, 0)) {
+		output.gui_box_center_tex(inside_tex, context, this_id, inside_col);
+		output.gui_box_center_tex(border_tex, context, this_id, border_col);
+
 			output.gui_box_center_tex(necessarys.at(id), context, this_id, border_col, offset);
 		};
 
+	if (slot_handle->always_allow_exactly_one_item) {
 		if (hand_index == 0) {
 			draw_icon(necessary_image_id::PRIMARY_HAND_ICON, vec2(1, 0));
 		}
@@ -142,35 +142,41 @@ void slot_button::update_rc(const game_gui_context context, const this_in_contai
 
 	const auto slot_handle = cosmos[this_id.get_location().slot_id];
 
+	bool should_draw = false;
+
+	const auto container_entity = slot_handle.get_container();
+	const bool is_capable = container_entity.has<components::item_slot_transfers>();
+
 	if (slot_handle->always_allow_exactly_one_item) {
-		this_id->set_flag(augs::gui::flag::ENABLE_DRAWING);
+		should_draw = false;
 
 		if (slot_handle.has_items()) {
 			const_dereferenced_location<item_button_in_item> child_item_button = context.dereference_location(item_button_in_item{ slot_handle.get_items_inside()[0] });
 
 			if (child_item_button->is_being_wholely_dragged_or_pending_finish(context, child_item_button)) {
-				this_id->set_flag(augs::gui::flag::ENABLE_DRAWING);
+				should_draw = true;
 			}
-			else {
-				this_id->unset_flag(augs::gui::flag::ENABLE_DRAWING);
 			}
+		else {
+			should_draw = true;
 		}
 	}
 	else {
-		this_id->unset_flag(augs::gui::flag::ENABLE_DRAWING);
+		should_draw = is_capable;
 	}
 
+	this_id->set_flag(augs::gui::flag::ENABLE_DRAWING, should_draw);
 	this_id->user_drag_offset = griddify(this_id->user_drag_offset);
 	
 	vec2 inventory_root_offset;
 
-	if (slot_handle.get_container().has<components::item_slot_transfers>()) {
+	if (is_capable) {
 		inventory_root_offset = context.get_screen_size();
 		inventory_root_offset.x -= 250;
 		inventory_root_offset.y -= 200;
 	}
 
-	const ltrb standard_relative_pos = character_gui::get_rectangle_for_slot_function(this_id.get_location().slot_id.type);
+	const auto standard_relative_pos = ltrb(character_gui::get_rectangle_for_slot_function(this_id.get_location().slot_id.type));
 
 	vec2i absolute_pos = griddify(standard_relative_pos.get_position()) + this_id->user_drag_offset + inventory_root_offset;
 
