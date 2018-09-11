@@ -99,6 +99,7 @@ void item_button::draw_complete_with_children(
 	f.decrease_border_alpha = false;
 	f.draw_container_opened_mark = true;
 	f.draw_charges = true;
+	f.draw_space_available_bar = true;
 
 	draw_children(context, this_id);
 	draw_proc(context, this_id, f);
@@ -300,24 +301,43 @@ void item_button::draw_proc(
 					printing_charge_count = true;
 					bottom_number_val = ammo_info.total_charges;
 				}
-				else if (item[slot_function::ITEM_DEPOSIT].alive()) {
+				else if (const auto depo = item[slot_function::ITEM_DEPOSIT]; depo.alive()) {
 					if (item.get<invariants::item>().categories_for_slot_compatibility.test(item_category::MAGAZINE)) {
 						if (f.always_draw_charges_as_closed || !this_id->is_container_open) {
 							printing_charge_count = true;
 						}
 					}
 
-					if (printing_charge_count) {
-						bottom_number_val = count_charges_in_deposit(item);
-					}
-					else {
-						bottom_number_val = item[slot_function::ITEM_DEPOSIT].calc_real_space_available() / double(SPACE_ATOMS_PER_UNIT);
+					if (depo->space_available) {
+						const auto rsa = depo.calc_real_space_available();
+						const auto space_ratio = static_cast<float>(rsa) / depo->space_available;
+						const auto empty_bar_amount = space_ratio;
 
-						if (bottom_number_val < 1.0 && bottom_number_val > 0.0) {
-							trim_zero = true;
+						if (f.draw_space_available_bar) {
+							auto origin = this_absolute_rect;
+							origin.r += 6;
+							origin.l = origin.r - 6;
+
+							origin.expand_from_center(vec2(-1, 0));
+
+							output.border(origin, border_col);
+
+							origin.t += origin.h() * empty_bar_amount;
+							output.aabb(origin, border_col);
 						}
 
-						label_color.set_rgb(cyan.rgb());
+						if (printing_charge_count) {
+							bottom_number_val = count_charges_in_deposit(item);
+						}
+						else {
+							bottom_number_val = rsa / double(SPACE_ATOMS_PER_UNIT);
+
+							if (bottom_number_val < 1.0 && bottom_number_val > 0.0) {
+								trim_zero = true;
+							}
+
+							label_color.set_rgb(cyan.rgb());
+						}
 					}
 				}
 			}
