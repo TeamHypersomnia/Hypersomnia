@@ -62,7 +62,7 @@ struct item_button : game_gui_rect_node {
 					generic_call(context.dereference_location(child_slot_location));
 				}
 
-				for (const auto in : get_items_inside(container_entity, s.first)) {
+				for (const auto in : ::get_items_inside(container_entity, s.first)) {
 					item_button_in_item child_item_location;
 					child_item_location.item_id = in;
 					generic_call(context.dereference_location(child_item_location));

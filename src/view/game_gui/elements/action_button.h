@@ -9,11 +9,11 @@
 
 class action_button : public game_gui_rect_node {
 public:
-	typedef game_gui_rect_node base;
-	typedef base::gui_entropy gui_entropy;
+	using base = game_gui_rect_node;
+	using gui_entropy = base::gui_entropy;
 
-	typedef dereferenced_location<action_button_in_character_gui> this_in_item;
-	typedef const_dereferenced_location<action_button_in_character_gui> const_this_in_item;
+	using this_in_item = dereferenced_location<action_button_in_character_gui>;
+	using const_this_in_item = const_dereferenced_location<action_button_in_character_gui>;
 
 	augs::gui::appearance_detector detector;
 

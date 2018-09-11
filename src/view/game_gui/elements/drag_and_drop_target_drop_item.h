@@ -5,9 +5,9 @@
 #include "view/game_gui/game_gui_context.h"
 
 struct drag_and_drop_target_drop_item : game_gui_rect_node {
-	typedef dereferenced_location<drag_and_drop_target_drop_item_in_character_gui> this_pointer;
-	typedef const_dereferenced_location<drag_and_drop_target_drop_item_in_character_gui> const_this_pointer;
-	typedef typename game_gui_rect_node::gui_entropy gui_entropy;
+	using this_pointer = dereferenced_location<drag_and_drop_target_drop_item_in_character_gui> ;
+	using const_this_pointer = const_dereferenced_location<drag_and_drop_target_drop_item_in_character_gui>;
+	using gui_entropy = typename game_gui_rect_node::gui_entropy;
 
 	drag_and_drop_target_drop_item();
 

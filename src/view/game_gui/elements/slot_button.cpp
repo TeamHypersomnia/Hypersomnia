@@ -61,14 +61,14 @@ void slot_button::draw(
 	const auto inside_tex = necessarys.at(necessary_image_id::ATTACHMENT_CIRCLE_FILLED);
 	const auto border_tex = necessarys.at(necessary_image_id::ATTACHMENT_CIRCLE_BORDER);
 
-		const auto slot_type = slot_handle.get_type();
+	const auto slot_type = slot_handle.get_type();
 
-		auto draw_icon = [&](necessary_image_id id, const vec2i offset = vec2i(0, 0)) {
+	auto draw_icon = [&](necessary_image_id id, const vec2i offset = vec2i(0, 0)) {
 		output.gui_box_center_tex(inside_tex, context, this_id, inside_col);
 		output.gui_box_center_tex(border_tex, context, this_id, border_col);
 
-			output.gui_box_center_tex(necessarys.at(id), context, this_id, border_col, offset);
-		};
+		output.gui_box_center_tex(necessarys.at(id), context, this_id, border_col, offset);
+	};
 
 	if (slot_handle->always_allow_exactly_one_item) {
 		if (hand_index == 0) {
@@ -106,9 +106,14 @@ void slot_button::draw(
 
 	const bool is_child_of_root = slot_handle.get_container() == context.get_subject_entity();
 
+	if (is_child_of_root) {
+		if (slot_type == slot_function::ITEM_DEPOSIT) {
+			draw_icon(necessary_image_id::DETACHABLE_MAGAZINE_SLOT_ICON);
+		}
+	}
+
 	if (!is_child_of_root) {
-		const_dereferenced_location<item_button_in_item> child_item_button
-			= context.dereference_location(item_button_in_item{ slot_handle.get_container().get_id() });
+		const auto child_item_button = context.const_dereference_location(item_button_in_item{ slot_handle.get_container().get_id() });
 
 		draw_pixel_line_connector(
 			output,
@@ -151,12 +156,12 @@ void slot_button::update_rc(const game_gui_context context, const this_in_contai
 		should_draw = false;
 
 		if (slot_handle.has_items()) {
-			const_dereferenced_location<item_button_in_item> child_item_button = context.dereference_location(item_button_in_item{ slot_handle.get_items_inside()[0] });
+			const auto child_item_button = context.const_dereference_location(item_button_in_item{ slot_handle.get_items_inside()[0] });
 
 			if (child_item_button->is_being_wholely_dragged_or_pending_finish(context, child_item_button)) {
 				should_draw = true;
 			}
-			}
+		}
 		else {
 			should_draw = true;
 		}

@@ -61,6 +61,7 @@ public:
 
 	bool has_items() const;
 	bool is_empty_slot() const;
+	bool is_personal_item_deposit() const;
 
 	bool is_hand_slot() const;
 	size_t get_hand_index() const;
@@ -188,6 +189,11 @@ E basic_inventory_slot_handle<E>::get_item_if_any() const {
 template <class E>
 bool basic_inventory_slot_handle<E>::is_empty_slot() const {
 	return get_items_inside().size() == 0;
+}
+
+template <class E>
+bool basic_inventory_slot_handle<E>::is_personal_item_deposit() const {
+	return get_type() == slot_function::ITEM_DEPOSIT && get_container().template has<components::item_slot_transfers>();
 }
 
 template <class E>

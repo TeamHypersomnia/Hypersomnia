@@ -64,11 +64,11 @@ template <class T>
 using const_dereferenced_location = basic_dereferenced_location<true, T>;
 
 template<class T>
-dereferenced_location<T> make_dereferenced_location(typename T::dereferenced_type* p, const T& l) {
+auto make_dereferenced_location(typename T::dereferenced_type* p, const T& l) {
 	return dereferenced_location<T>(p, l);
 }
 
 template<class T>
-const_dereferenced_location<T> make_dereferenced_location(const typename T::dereferenced_type* p, const T& l) {
+auto make_dereferenced_location(const typename T::dereferenced_type* p, const T& l) {
 	return const_dereferenced_location<T>(p, l);
 }

@@ -9,22 +9,13 @@ template<bool is_const, class T>
 using maybe_const_ptr_t = std::conditional_t<is_const, const T*, T*>;
 
 template <class T>
-struct is_const_ref 
-	: std::bool_constant<std::is_const_v<std::remove_reference_t<T>>>
-{
-};
+constexpr bool is_const_ptr_v = std::is_const_v<std::remove_pointer_t<T>>;
 
 template <class T>
-struct is_const_ptr 
-	: std::bool_constant<std::is_const_v<std::remove_pointer_t<T>>>
-{
-};
+constexpr bool is_const_ref_v = std::is_const_v<std::remove_reference_t<T>>;
 
 template <class T>
-constexpr bool is_const_ptr_v = is_const_ptr<T>::value;
-
-template <class T>
-constexpr bool is_const_ref_v = is_const_ref<T>::value;
+using ptr_add_const_t = const std::remove_pointer_t<T>*;
 
 template <class>
 struct is_handle_const;

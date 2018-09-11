@@ -7,9 +7,9 @@
 #include "view/game_gui/game_gui_context.h"
 
 struct value_bar : game_gui_rect_node {
-	typedef dereferenced_location<value_bar_in_character_gui> this_pointer;
-	typedef const_dereferenced_location<value_bar_in_character_gui> const_this_pointer;
-	typedef typename game_gui_rect_node::gui_entropy gui_entropy;
+	using this_pointer = dereferenced_location<value_bar_in_character_gui>;
+	using const_this_pointer = const_dereferenced_location<value_bar_in_character_gui>;
+	using gui_entropy = typename game_gui_rect_node::gui_entropy;
 
 	augs::gui::appearance_detector detector;
 	

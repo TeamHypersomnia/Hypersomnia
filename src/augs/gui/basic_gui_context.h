@@ -94,16 +94,17 @@ namespace augs {
 				return make_dereferenced_location(static_cast<dereferenced_ptr>(nullptr), location);
 			}
 
-			template <class L>
-			decltype(auto) operator()(const gui_element_variant_id& id, L generic_call) const {
-				return std::visit([&](const auto specific_loc) -> decltype(auto) {
-					return generic_call(dereference_location(specific_loc));
-				}, id);
-			}
+			template <class T>
+			auto const_dereference_location(const T& location) const {
+				const auto& self = *static_cast<const derived*>(this);
+				
+				using dereferenced_ptr = ptr_add_const_t<decltype(location.dereference(self))>;
 
-			template <bool _is_const, class T, class L>
-			decltype(auto) operator()(const basic_dereferenced_location<_is_const, T>& loc, L generic_call) const {
-				return generic_call(loc);
+				if (location.alive(self)) {
+					return make_dereferenced_location(static_cast<dereferenced_ptr>(location.dereference(self)), location);
+				}
+
+				return make_dereferenced_location(static_cast<dereferenced_ptr>(nullptr), location);
 			}
 
 			template <class T>
@@ -117,6 +118,31 @@ namespace augs {
 				}
 
 				return dereferenced_location_type();
+			}
+
+			template <class T>
+			auto cget_if(const gui_element_variant_id& variant_id) const {
+				auto* const maybe_t = std::get_if<T>(&variant_id);
+
+				using dereferenced_location_type = decltype(const_dereference_location(*maybe_t));
+
+				if (maybe_t) {
+					return const_dereference_location(*maybe_t);
+				}
+
+				return dereferenced_location_type();
+			}
+
+			template <class L>
+			decltype(auto) operator()(const gui_element_variant_id& id, L generic_call) const {
+				return std::visit([&](const auto specific_loc) -> decltype(auto) {
+					return generic_call(dereference_location(specific_loc));
+				}, id);
+			}
+
+			template <bool _is_const, class T, class L>
+			decltype(auto) operator()(const basic_dereferenced_location<_is_const, T>& loc, L generic_call) const {
+				return generic_call(loc);
 			}
 
 			template <class T = float>

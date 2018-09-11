@@ -351,13 +351,17 @@ void item_button::draw_proc(
 		output.border(this_absolute_rect, border_col);
 	}
 
-	if (f.draw_connector && parent_slot.get_container().get_owning_transfer_capability() != parent_slot.get_container()) {
-		draw_pixel_line_connector(
-			output, 
-			this_absolute_rect, 
-			context.get_tree_entry(item_button_in_item{ parent_slot.get_container() }).get_absolute_rect(),
-			border_col
-		);
+	const bool is_parent_capable = parent_slot.get_container().has<components::item_slot_transfers>();
+
+	if (f.draw_connector) {
+		if (!is_parent_capable || parent_slot.get_type() == slot_function::ITEM_DEPOSIT) {
+			draw_pixel_line_connector(
+				output, 
+				this_absolute_rect, 
+				context.get_tree_entry(item_button_in_item{ parent_slot.get_container() }).get_absolute_rect(),
+				border_col
+			);
+		}
 	}
 
 	if (f.draw_container_opened_mark) {
@@ -410,9 +414,9 @@ void item_button::rebuild_layouts(const game_gui_context context, const this_in_
 
 	auto parent_slot = cosmos[item.get<components::item>().get_current_slot()];
 
-	if (parent_slot->always_allow_exactly_one_item) {
-		const_dereferenced_location<slot_button_in_container> parent_button = context.dereference_location(slot_button_in_container{ parent_slot.get_id() });
+	const auto parent_button = context.const_dereference_location(slot_button_in_container{ parent_slot.get_id() });
 
+	if (parent_slot->always_allow_exactly_one_item) {
 		this_id->rc.set_position(parent_button->rc.get_position());
 	}
 	else {
