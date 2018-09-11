@@ -1379,3 +1379,13 @@ we consider whole type overrides too complex architeciturally:
 		- Special icons? 
 			- A magazine icon next to the reloaded mag
 				- Not now, though
+
+- Reloading
+	- Essential to gameplay, really, so best to do it early
+	- Do we implement entire mounting system? Maybe it won't be so hard after all
+	- Also, chambering the gun
+		- Should have a separate sound in gun invariant
+		- Should always happen automatically when one hand is free and the other holds the gun
+			- Is an exception to the rule of mounting that both items need to be in hand
+			- For now, can play the shooting animation for chambering
+

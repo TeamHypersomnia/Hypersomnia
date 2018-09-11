@@ -110,7 +110,7 @@ namespace test_flavours {
 			meta.set(container);
 
 			invariants::item item;
-			item.space_occupied_per_charge = to_space_units("3.5");
+			item.space_occupied_per_charge = to_space_units(typesafe_sprintf("%x", real32(meta.template get<invariants::sprite>().size.area()) / 200));
 			item.holding_stance = stance;
 			item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
 			meta.set(item);
@@ -635,7 +635,7 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
-				item.space_occupied_per_charge = to_space_units("0.5");
+				item.space_occupied_per_charge = to_space_units("1.0");
 				meta.set(item);
 			}
 		}

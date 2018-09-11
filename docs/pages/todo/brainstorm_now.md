@@ -6,9 +6,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Ensure that a single capability only ever mounts a single item at a time?
+- When holstering, we'll need to check if the item is in hotbar already and if not, assign a new slot
+	- That's because we'll remove the loaded mags from the hotbar
 
 - Some additional slots for magazines in case we don't have a backpack
+	- Option: Several additional actual magazine slots in the torso
+	- Option: A big pocket slot for the torso and several slots inside
+	- Either way, we introduce several additional item deposit slots
+	- Why not have a single item deposit?
+		- A basic player deposit
+		- Some small amount of space available
 
 - Reloading
 	- Solution: A bool reloading_intent in the capability
@@ -34,15 +41,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- Attack collisions
 		- When hurt triggers of two or more players touch, they are pushed away opposite to their facing
 		
-
-- Reloading
-	- Essential to gameplay, really, so best to do it early
-	- Do we implement entire mounting system? Maybe it won't be so hard after all
-	- Also, chambering the gun
-		- Should have a separate sound in gun invariant
-		- Should always happen automatically when one hand is free and the other holds the gun
-			- Is an exception to the rule of mounting that both items need to be in hand
-			- For now, can play the shooting animation for chambering
+- Ensure that a single capability only ever mounts a single item at a time?
 
 - Game events log and chat
 	- In the same window

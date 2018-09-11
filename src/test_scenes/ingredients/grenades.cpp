@@ -46,7 +46,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::item item;
-			item.space_occupied_per_charge = to_space_units("0.6");
+			item.space_occupied_per_charge = to_space_units("1.0");
 			meta.set(item);
 
 			{
@@ -95,7 +95,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::item item;
-			item.space_occupied_per_charge = to_space_units("0.6");
+			item.space_occupied_per_charge = to_space_units("1.0");
 			meta.set(item);
 
 			{
@@ -144,7 +144,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::item item;
-			item.space_occupied_per_charge = to_space_units("0.6");
+			item.space_occupied_per_charge = to_space_units("1.0");
 			meta.set(item);
 
 			{

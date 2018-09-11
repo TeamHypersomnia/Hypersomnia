@@ -18,7 +18,7 @@ entity_name_str get_bbcoded_item_categories(const item_category_flagset& flags) 
 		result += "Shot charge, ";
 	}
 	if (flags.test(item_category::BACK_WEARABLE)) {
-		result += "Shoulder container, ";
+		result += "Back container, ";
 	}
 	if (flags.test(item_category::BELT_WEARABLE)) {
 		result += "Belt wearable, ";
@@ -73,7 +73,7 @@ entity_name_str get_bbcoded_slot_function_name(const slot_function f) {
 		};
 	case slot_function::BACK:
 		return{
-			"Shoulder",
+			"Back",
 		};
 	case slot_function::BELT:
 		return{
