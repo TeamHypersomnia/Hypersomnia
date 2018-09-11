@@ -14,6 +14,11 @@ summary: That which we are brainstorming at the moment.
 	- Solution: A bool reloading_intent in the capability
 		- Less traffic to the server
 		- Better resistance to lag, I guess
+	- When to break the reloading intent? E.g. in CS, reloading stops when a weapon is switched
+		- Store entity_id last_reload_target
+		- Every step when reload intent is set, calculate the available reloading context
+			- if last_reload_target is unset/dead, overwrite
+i			- if the newly calculated target is different than last_reload_target, reset reloading_intent and unset last_reload_target
 	- Finding the fullest magaizne should be easy enough task
 	- Just what if someone drops it during reload?
 		- Then that's their problem

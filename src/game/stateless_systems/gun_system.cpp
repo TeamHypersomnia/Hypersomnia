@@ -301,6 +301,9 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							progress = 0.f;
 						}
 					}
+					else {
+						progress = 0.f;
+					}
 				}
 
 				if (get_num_in_chamber() > 0) {

@@ -1,9 +1,11 @@
 return {
   extra_loadables = {
-    disabled_generate_neon_map = {
+    enabled_generate_neon_map = {
       alpha_multiplier = 1,
       amplification = 60,
-      light_colors = {},
+      light_colors = {
+        "255 145 0 255"
+      },
       radius = {
         x = 80,
         y = 80

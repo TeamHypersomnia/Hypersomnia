@@ -34,6 +34,10 @@ namespace test_flavours {
 
 		/* Types for bullets etc. */
 
+		auto set_density_mult = [&](auto& meta, const auto density) {
+			meta.template get<invariants::fixtures>().density = .25f * density;
+		};
+
 		auto set_chambering_duration_ms = [&](auto& meta, const auto duration_ms) {
 			meta.template get<invariants::container>().slots[slot_function::GUN_CHAMBER].mounting_duration_ms = duration_ms;
 		};
@@ -806,6 +810,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BILMER2000, white);
 			test_flavours::add_lying_item_dynamic_body(meta).density = 0.1f;
+			set_density_mult(meta, 0.75f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1000.f);
 			meta.get<invariants::item>().standard_price = 3100;
 			set_chambering_duration_ms(meta, 400.f);
@@ -854,7 +859,8 @@ namespace test_flavours {
 			meta.set(gun_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::PRO90, white);
-			test_flavours::add_lying_item_dynamic_body(meta).density = 0.1f;
+			test_flavours::add_lying_item_dynamic_body(meta);
+			set_density_mult(meta, 0.6f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1000.f, 0.f, true);
 			meta.get<invariants::item>().standard_price = 2900;
 			set_chambering_duration_ms(meta, 400.f);
@@ -906,6 +912,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::VINDICATOR_SHOT_1, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
+			set_density_mult(meta, 1.15f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1200.f);
 			meta.get<invariants::item>().standard_price = 2900;
 			set_chambering_duration_ms(meta, 500.f);
@@ -962,8 +969,9 @@ namespace test_flavours {
 			meta.set(gun_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::LEWSII, white);
-			test_flavours::add_lying_item_dynamic_body(meta).density = 0.5f;
+			test_flavours::add_lying_item_dynamic_body(meta);
 			make_default_gun_container(meta, item_holding_stance::HEAVY_LIKE, 2000.f);
+			set_density_mult(meta, 1.25);
 
 			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].only_allow_flavour = ::to_entity_flavour_id(test_container_items::LEWSII_MAG);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::LEWSII_DRAW);
@@ -1016,8 +1024,8 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::DATUM_GUN_SHOT_1, white);
 
-			auto& fix = test_flavours::add_lying_item_dynamic_body(meta);
-			fix.density *= 1.28f;
+			test_flavours::add_lying_item_dynamic_body(meta);
+			set_density_mult(meta, 1.45f);
 
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1500.f, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::PLASMA_DRAW);
@@ -1067,6 +1075,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().standard_price = 500;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(350);
 			set_chambering_duration_ms(meta, 250.f);
+			set_density_mult(meta, 0.8f);
 		}
 
 		{
@@ -1112,6 +1121,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 500;
 			set_chambering_duration_ms(meta, 250.f);
+			set_density_mult(meta, 0.7f);
 		}
 
 		{
@@ -1159,6 +1169,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 700;
 			set_chambering_duration_ms(meta, 300.f);
+			set_density_mult(meta, 0.9f);
 		}
 
 		{
@@ -1197,6 +1208,7 @@ namespace test_flavours {
 			item.holding_stance = item_holding_stance::RIFLE_LIKE;
 			meta.set(item);
 			meta.get<invariants::item>().standard_price = 2500;
+			set_density_mult(meta, 0.8f);
 		}
 	}
 }
