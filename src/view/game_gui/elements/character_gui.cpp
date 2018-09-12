@@ -81,11 +81,19 @@ entity_id character_gui::get_hotbar_assigned_entity_if_available(
 	const const_entity_handle gui_entity,
 	const const_entity_handle assigned_entity
 ) {
-	if (assigned_entity.get_owning_transfer_capability() == gui_entity.get_owning_transfer_capability()) {
-		return assigned_entity.get_id();
+	const auto character_capability = gui_entity.get_owning_transfer_capability();
+
+	if (character_capability.dead()) {
+		return {};
 	}
 
-	return entity_id();
+	if (character_capability == assigned_entity.get_owning_transfer_capability()) {
+		if (!assigned_entity.get_current_slot()->is_mounted_slot()) {
+			return assigned_entity.get_id();
+		}
+	}
+
+	return {};
 }
 
 character_gui::hotbar_selection_setup character_gui::get_setup_from_button_indices(

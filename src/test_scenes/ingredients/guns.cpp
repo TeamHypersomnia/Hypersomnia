@@ -870,6 +870,7 @@ namespace test_flavours {
 			set_chambering_duration_ms(meta, 400.f);
 
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_SMG_DRAW);
+			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].only_allow_flavour = ::to_entity_flavour_id(test_container_items::PRO90_MAGAZINE);
 		}
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::VINDICATOR);

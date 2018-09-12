@@ -21,7 +21,11 @@ const_entity_handle hotbar_button::get_assigned_entity(const const_entity_handle
 	const auto& cosm = owner_transfer_capability.get_cosmos();
 	const auto handle = cosm[last_assigned_entity];
 
-	if (handle.alive() && handle.get_owning_transfer_capability() == owner_transfer_capability) {
+	if (
+		handle.alive() 
+		&& handle.get_owning_transfer_capability() == owner_transfer_capability
+		&& !handle.get_current_slot()->is_mounted_slot()
+	) {
 		return handle;
 	}
 
