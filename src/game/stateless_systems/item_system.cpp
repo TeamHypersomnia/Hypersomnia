@@ -141,6 +141,20 @@ auto calc_reloading_context(const E& capability) {
 	return ctx;
 }
 
+template <class E>
+void drop_mag_to_ground(const E& mag) {
+	auto& cosm = mag.get_cosmos();
+
+	auto& global = cosm.get_global_solvable();
+	auto& mounts = global.pending_item_mounts;
+
+	if (mag.alive()) {
+		if (const auto current_mounting = mapped_or_nullptr(mounts, mag)) {
+			current_mounting->target = {};
+		}
+	}
+}
+
 void item_system::handle_reload_intents(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	const auto& requests = step.get_queue<messages::intent_message>();
@@ -156,8 +170,6 @@ void item_system::handle_reload_intents(const logic_step step) {
 
 				if (auto transfers = capability.find<components::item_slot_transfers>()) {
 					auto& ctx = transfers->current_reloading_context;
-					auto& global = cosm.get_global_solvable();
-					auto& mounts = global.pending_item_mounts;
 
 					if (const auto concerned_slot = cosm[ctx.concerned_slot]) {
 						/* 
@@ -165,11 +177,7 @@ void item_system::handle_reload_intents(const logic_step step) {
 							Perform additional operation, e.g. command it to drop the magazine to the ground.
 						*/
 
-						if (const auto unmounted_ammo = cosm[ctx.old_ammo_source]) {
-							if (const auto current_mounting = mapped_or_nullptr(mounts, ctx.old_ammo_source)) {
-								current_mounting->target = {};
-							}
-						}
+						drop_mag_to_ground(cosm[ctx.old_ammo_source]);
 					}
 					else {
 						const auto new_context = calc_reloading_context(capability);
@@ -251,11 +259,18 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 				if (const auto old_mag = cosm[ctx.old_ammo_source]) {
 					const auto old_mag_slot = old_mag.get_current_slot();
 
+					auto drop_if_zero_ammo = [&]() {
+						if (count_charges_in_deposit(old_mag) <= 0) {
+							drop_mag_to_ground(old_mag);
+						}
+					};
+
 					if (old_mag_slot.get_id() == concerned_slot.get_id()) {
 						/* The old mag still resides in the concerned slot. */
 
 						if (const auto existing_progress = mounting_of(old_mag)) {
 							/* Continue the good work. */
+							drop_if_zero_ammo();
 							return true;
 						}
 
@@ -273,6 +288,7 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 							RLD_LOG("Free hand for the unmount found.");
 							auto unmount_ammo = item_slot_transfer_request::standard(old_mag, free_hand);
 							transfer(unmount_ammo);
+							drop_if_zero_ammo();
 							return true;
 						}
 

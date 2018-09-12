@@ -21,8 +21,8 @@ real32 pending_item_mount::get_mounting_duration_ms(const const_entity_handle& h
 			auto d = current_slot->mounting_duration_ms;
 
 			if (target_slot.dead()) {
-				/* We're dropping, so twice as fast */
-				d *= 0.5f;
+				/* We're dropping, so faster */
+				d *= 0.35f;
 			}
 
 			return d;
