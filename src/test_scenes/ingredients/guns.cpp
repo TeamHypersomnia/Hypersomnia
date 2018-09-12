@@ -1174,7 +1174,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().standard_price = 700;
 			set_chambering_duration_ms(meta, 300.f);
 			set_density_mult(meta, 0.9f);
-			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("3.7");
+			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("3.5");
 		}
 
 		{

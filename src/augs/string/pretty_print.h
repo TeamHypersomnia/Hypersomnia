@@ -41,21 +41,17 @@ S& pretty_print(S& os, const T& val) {
 	else if constexpr(has_string_v<T>) {
 		os << val.string();
 	}	
+	else if constexpr(has_first_and_second_types_v<T>) {
+		os << "[";
+		pretty_print(os, val.first) << "] = ";
+		pretty_print(os, val.second);
+	}
 	else if constexpr(has_begin_and_end_v<T>) {
 		os << "\n";
 		os << "Size: " << val.size() << "\n";
 
-		if constexpr(is_associative_v<T>) {
-			for (const auto& elem : val) {
-				os << "[";
-				pretty_print(os, elem.first) << "] = ";
-				pretty_print(os, elem.second) << "\n";
-			}
-		}
-		else {
-			for (const auto& elem : val) {
-				pretty_print(os, elem) << "\n";
-			}
+		for (const auto& elem : val) {
+			pretty_print(os, elem) << "\n";
 		}
 	}
 	else if constexpr(std::is_enum_v<T>) {

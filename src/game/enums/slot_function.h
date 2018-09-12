@@ -1,4 +1,6 @@
 #pragma once
+#include <optional>
+#include "augs/misc/enum/enum_boolset.h"
 
 constexpr unsigned SPACE_ATOMS_PER_UNIT = 1000;
 
@@ -38,3 +40,6 @@ inline bool is_torso_attachment(const slot_function f) {
 		default: return false;
 	}
 };
+
+using slot_flags = augs::enum_boolset<slot_function>;
+using optional_slot_flags = std::optional<slot_flags>;

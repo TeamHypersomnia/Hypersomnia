@@ -73,7 +73,7 @@ public:
 
 	bool is_physically_connected_until(
 		const entity_id until_parent,
-	   	const std::optional<augs::enum_boolset<slot_function>>& bypass_slots = std::nullopt
+	   	const optional_slot_flags& bypass_slots = std::nullopt
 	) const;
 
 	bool is_ancestor_mounted() const;
@@ -231,7 +231,7 @@ bool basic_inventory_slot_handle<E>::is_ancestor_mounted() const {
 template <class E>
 bool basic_inventory_slot_handle<E>::is_physically_connected_until(
 	const entity_id until_parent,
-	const std::optional<augs::enum_boolset<slot_function>>& bypass_slots
+	const optional_slot_flags& bypass_slots
 ) const {
 	const bool passes_filter = bypass_slots != std::nullopt && bypass_slots->test(get_type());
 	const bool should_item_here_keep_physical_body = passes_filter || get().makes_physical_connection();

@@ -15,6 +15,7 @@
 #include "game/components/attitude_component.h"
 #include "game/modes/arena_mode.h"
 #include "view/maybe_official_path_declaration.h"
+#include "game/detail/inventory/requested_equipment.h"
 
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
@@ -80,7 +81,9 @@ using mode_field_type_id  = type_in_list_id<
 		std::vector<entity_guid>,
 		arena_mode_knockouts_vector,
 		arena_mode_awards_vector,
-		std::vector<mode_player_id>
+		std::vector<mode_player_id>,
+		other_equipment_vector,
+		spare_ammo_vector
 	>
 >;
 

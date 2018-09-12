@@ -4,16 +4,12 @@
 
 struct reloading_context {
 	// GEN INTROSPECTOR struct reloading_context
-	signi_entity_id target_weapon;
 	std::array<signi_entity_id, 2> initial_setup;
-	signi_entity_id ammo_source;
+	signi_inventory_slot_id concerned_slot;
+	signi_entity_id new_ammo_source;
+	signi_entity_id old_ammo_source;
 	// END GEN INTROSPECTOR
 
-	bool equivalent_to(const reloading_context& b) const {
-		return target_weapon == b.target_weapon && ammo_source == b.ammo_source;
-	}
-
-	bool is_chambering() const {
-		return !ammo_source.is_set();
-	}
+	bool significantly_different_from(const reloading_context& b) const;
+	bool is_chambering() const;
 };

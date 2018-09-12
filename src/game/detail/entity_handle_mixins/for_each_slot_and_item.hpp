@@ -8,7 +8,8 @@ template <class E>
 template <class S, class I>
 callback_result inventory_mixin<E>::for_each_contained_slot_and_item_recursive(
 	S slot_callback, 
-	I item_callback
+	I item_callback,
+	const optional_slot_flags& filter
 ) const {
 	const auto this_container = *static_cast<const E*>(this);
 	auto& cosm = this_container.get_cosmos();
@@ -21,6 +22,10 @@ callback_result inventory_mixin<E>::for_each_contained_slot_and_item_recursive(
 			auto& container = typed_container.template get<invariants::container>();
 
 			for (const auto& s : container.slots) {
+				if (filter && !filter->test(s.first)) {
+					continue;
+				}
+
 				const auto this_slot_id = inventory_slot_id(s.first, typed_container.get_id());
 				const auto slot_callback_result = continue_or_recursive_callback_result(slot_callback, cosm[this_slot_id]);
 
@@ -38,7 +43,7 @@ callback_result inventory_mixin<E>::for_each_contained_slot_and_item_recursive(
 									const auto r = continue_or_recursive_callback_result(item_callback, child_item_handle);
 
 									if (r == recursive_callback_result::CONTINUE_AND_RECURSE) {
-										const auto next_r = child_item_handle.for_each_contained_slot_and_item_recursive(slot_callback, item_callback);
+										const auto next_r = child_item_handle.for_each_contained_slot_and_item_recursive(slot_callback, item_callback, filter);
 
 										if (callback_result::ABORT == next_r) {
 											return recursive_callback_result::ABORT;
@@ -136,19 +141,21 @@ void inventory_mixin<E>::for_each_attachment_recursive(
 
 template <class E>
 template <class I>
-void inventory_mixin<E>::for_each_contained_item_recursive(I&& item_callback) const {
+void inventory_mixin<E>::for_each_contained_item_recursive(I&& item_callback, const optional_slot_flags& filter) const {
 	for_each_contained_slot_and_item_recursive(
 		[](auto) {}, 
-		std::forward<I>(item_callback)
+		std::forward<I>(item_callback),
+		filter
 	);
 }
 
 template <class E>
 template <class S>
-void inventory_mixin<E>::for_each_contained_slot_recursive(S&& slot_callback) const {
+void inventory_mixin<E>::for_each_contained_slot_recursive(S&& slot_callback, const optional_slot_flags& filter) const {
 	for_each_contained_slot_and_item_recursive(
 		std::forward<S>(slot_callback), 
-		[](auto...) {}
+		[](auto...) {},
+		filter
 	);
 }
 

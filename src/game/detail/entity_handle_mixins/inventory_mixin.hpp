@@ -197,6 +197,20 @@ inventory_item_address inventory_mixin<E>::get_address_from_root(const entity_id
 }
 
 template <class E>
+typename inventory_mixin<E>::generic_handle_type inventory_mixin<E>::get_wielded_other_than(const entity_id id) const {
+	const auto& self = *static_cast<const E*>(this);
+	auto& cosm = self.get_cosmos();
+
+	for (const auto& i : get_wielded_items()) {
+		if (i != id) {
+			return cosm[i];
+		}
+	}
+
+	return cosm[entity_id()];
+}
+
+template <class E>
 augs::constant_size_vector<entity_id, 2> inventory_mixin<E>::get_wielded_guns() const {
 	const auto& self = *static_cast<const E*>(this);
 	auto result = self.get_wielded_items();

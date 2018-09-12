@@ -65,6 +65,7 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 			const auto conditions = calc_mounting_conditions(transferred_item, target_slot);
 
 			if (conditions == mounting_conditions_type::PROGRESS) {
+				LOG("progress co");
 				should_be_erased = false;
 				progress += delta.in_milliseconds();
 

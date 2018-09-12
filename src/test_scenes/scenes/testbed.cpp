@@ -43,10 +43,16 @@ namespace test_scenes {
 		vars.name = "Testbed vars";
 		vars.spawned_faction = faction_type::RESISTANCE;
 
+		const auto vindicator_mag = requested_ammo { 
+			to_entity_flavour_id(test_container_items::SAMPLE_MAGAZINE), 
+			to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE)
+		};
+
 		vars.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::VINDICATOR);
-		vars.initial_eq.magazine = to_entity_flavour_id(test_container_items::SAMPLE_MAGAZINE);
-		vars.initial_eq.charge = to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE);
+		vars.initial_eq.weapon_ammo = vindicator_mag;
 		vars.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+
+		vars.initial_eq.spare_mags.emplace_back(3, vindicator_mag);
 	}
 
 	void testbed::setup(bomb_mode_vars& vars) {
@@ -54,19 +60,28 @@ namespace test_scenes {
 
 		auto& resistance = vars.factions[faction_type::RESISTANCE];
 
+		const auto vindicator_mag = requested_ammo { 
+			to_entity_flavour_id(test_container_items::SAMPLE_MAGAZINE), 
+			to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE)
+		};
+
+		const auto bilmer_mag = requested_ammo { 
+			to_entity_flavour_id(test_container_items::SAMPLE_MAGAZINE), 
+			to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE)
+		};
+
 		resistance.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::VINDICATOR);
-		resistance.initial_eq.magazine = to_entity_flavour_id(test_container_items::SAMPLE_MAGAZINE);
-		resistance.initial_eq.charge = to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE);
+		resistance.initial_eq.weapon_ammo = vindicator_mag;
 		resistance.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+		resistance.initial_eq.spare_mags.emplace_back(3, vindicator_mag);
 
 		auto& metropolis = vars.factions[faction_type::METROPOLIS];
 
 		metropolis.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SAMPLE_RIFLE);
-		metropolis.initial_eq.magazine = to_entity_flavour_id(test_container_items::SAMPLE_MAGAZINE);
-		metropolis.initial_eq.charge = to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE);
-
-		metropolis.initial_eq.belt_wearable = to_entity_flavour_id(test_tool_items::DEFUSE_KIT);
+		metropolis.initial_eq.weapon_ammo = bilmer_mag;
 		metropolis.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+		metropolis.initial_eq.belt_wearable = to_entity_flavour_id(test_tool_items::DEFUSE_KIT);
+		metropolis.initial_eq.spare_mags.emplace_back(3, bilmer_mag);
 
 		{
 			auto& mt = vars.view.event_sounds[faction_type::METROPOLIS];

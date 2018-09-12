@@ -44,13 +44,14 @@ void perform_transfer_result::play_effects(const logic_step step) const {
 	}
 }
 
-void perform_transfer(
+perform_transfer_result perform_transfer(
 	const item_slot_transfer_request r,
 	const logic_step step
 ) {
 	const auto result = perform_transfer_no_step(r, step.get_cosmos());
 	result.notify(step);
 	result.play_effects(step);
+	return result;
 }
 
 perform_transfer_result perform_transfer_no_step(
@@ -68,12 +69,13 @@ perform_transfer_result perform_transfer_impl(
 ) {
 	const auto result = query_transfer_result(cosm, r);
 
+	perform_transfer_result output;
+	output.result = result;
+
 	if (!result.is_successful()) {
 		LOG("perform_transfer failed: %x", format_enum(result.result));
-		return {};
+		return output;
 	}
-
-	perform_transfer_result output;
 
 	auto deguidize = [&](const auto s) {
 		return cosm.get_solvable().deguidize(s);

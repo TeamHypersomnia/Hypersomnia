@@ -44,7 +44,7 @@ capability_comparison match_transfer_capabilities(
 	}
 
 	if (source.alive() && target.alive()) {
-		if (!r.params.bypass_unmatching_capabilities && source != target) {
+		if (source != target) {
 			return { capability_relation::UNMATCHING, dead_entity };
 		}
 
@@ -76,8 +76,13 @@ item_transfer_result query_transfer_result(
 	output.relation = relation;
 
 	if (relation == capability_relation::UNMATCHING) {
-		output.result = item_transfer_result_type::INVALID_CAPABILITIES;
-		return output;
+		if (r.params.bypass_unmatching_capabilities) {
+
+		}
+		else {
+			output.result = item_transfer_result_type::INVALID_CAPABILITIES;
+			return output;
+		}
 	}
 
 	if (relation == capability_relation::DROP || relation == capability_relation::ANONYMOUS_DROP) {

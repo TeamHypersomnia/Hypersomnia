@@ -120,7 +120,8 @@ return {
     RightMouseButton = "CROSSHAIR_SECONDARY_ACTION",
     S = "MOVE_BACKWARD",
     Space = "SPACE_BUTTON",
-    W = "MOVE_FORWARD"
+    W = "MOVE_FORWARD",
+	R = "RELOAD"
   },
   game_gui_controls = {
     ["0"] = "HOTBAR_BUTTON_9",

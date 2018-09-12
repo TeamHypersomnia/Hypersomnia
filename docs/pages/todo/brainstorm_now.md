@@ -6,11 +6,18 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Determinism: Fix pending mounts to have deterministic iteration order
+	- E.g. make it a map and iterate by entity GUID
 - Reloading
+	- Initialization
+		- An intent arrives
+			- If context exists, check if the mag can be dropped
+	- Advancing
+		- Check if the transfer is complete?
 	- After reloading
-	- The only moment that we restore some state after reloading is if we have akimbo
-		- The other item does not even have to be a weapon particularly
-			- it's enough that it's supposed to be hidden
+		- The only case when we restore some state after reloading is if we have akimbo
+			- The other item does not even have to be a weapon particularly
+				- it's enough that it's supposed to be hidden
 	- Storing reloading context
 		- When to break it?
 			- When the new calculated differs anyhow

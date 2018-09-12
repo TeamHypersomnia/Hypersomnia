@@ -119,6 +119,7 @@ public:
 
 	augs::constant_size_vector<entity_id, 2> get_wielded_guns() const;
 	augs::constant_size_vector<entity_id, 2> get_wielded_items() const;
+	generic_handle_type get_wielded_other_than(entity_id) const;
 
 	inventory_item_address get_address_from_root(const entity_id until = entity_id()) const;
 
@@ -128,7 +129,8 @@ public:
 	template <class S, class I>
 	callback_result for_each_contained_slot_and_item_recursive(
 		S slot_callback, 
-		I item_callback
+		I item_callback,
+		const optional_slot_flags& filter
 	) const;
 
 	template <class A, class G>
@@ -139,10 +141,10 @@ public:
 	) const;
 
 	template <class I>
-	void for_each_contained_item_recursive(I&& item_callback) const;
+	void for_each_contained_item_recursive(I&& item_callback, const optional_slot_flags& filter = std::nullopt) const;
 
 	template <class S>
-	void for_each_contained_slot_recursive(S&& slot_callback) const;
+	void for_each_contained_slot_recursive(S&& slot_callback, const optional_slot_flags& filter = std::nullopt) const;
 
 	template <class G>
 	ltrb calc_attachments_aabb(G&& get_offsets_by_torso) const;

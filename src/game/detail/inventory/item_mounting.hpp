@@ -11,23 +11,26 @@ mounting_conditions_type calc_mounting_conditions(
 	const A& item_entity,
 	const B& target_slot
 ) {
-	const auto capability = item_entity.get_owning_transfer_capability();
+	auto& cosm = item_entity.get_cosmos();
 
-	if (capability.dead()) {
-		/* 
-			We can't mount or unmount an item that has no capability (so also if it has no slot). 
-			First we have to hold it in our hands. 
-		*/
+	const auto source_slot = item_entity.alive() ? item_entity.get_current_slot() : cosm[inventory_slot_id()];
 
-		if (target_slot.is_this_or_ancestor_mounted()) {
-			/* Target slot can't be mounted or have a mounted ancestor. */
+	const auto target_capability = target_slot ? target_slot.get_container().get_owning_transfer_capability() : cosm[entity_id()];
+	const auto source_capability = item_entity.get_owning_transfer_capability();
+
+	const bool mounting_viable = target_capability.alive() && target_capability == source_capability;
+
+	if (!mounting_viable) {
+		if (source_slot.is_this_or_ancestor_mounted() || target_slot.is_this_or_ancestor_mounted()) {
+			/* Mounting required, but it is not viable due to inconsistent capabilities. Abort. */
 			return mounting_conditions_type::ABORT;
 		}
 
 		return mounting_conditions_type::NO_MOUNTING_REQUIRED;
 	}
 
-	const auto source_slot = item_entity.get_current_slot();
+	const auto& capability = source_capability;
+
 	const bool source_mounted = source_slot->is_mounted_slot();
 	const bool target_mounted = target_slot.alive() ? target_slot->is_mounted_slot() : false;
 
@@ -36,7 +39,7 @@ mounting_conditions_type calc_mounting_conditions(
 	}
 
 	const auto is_reachable = [&](const auto& slot) {
-		const auto reachable_non_physical = augs::enum_boolset<slot_function> {
+		const auto reachable_non_physical = slot_flags {
 			slot_function::GUN_CHAMBER,
 			slot_function::GUN_DETACHABLE_MAGAZINE,
 			slot_function::GUN_RAIL,
@@ -61,7 +64,7 @@ mounting_conditions_type calc_mounting_conditions(
 		}
 
 		/* Target must be reachable by the capability */
-		return progress_if(is_reachable(source_slot));
+		return progress_if(is_reachable(target_slot));
 	}
 
 	if (unmounting) {
