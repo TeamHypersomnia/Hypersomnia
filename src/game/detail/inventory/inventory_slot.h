@@ -10,6 +10,7 @@
 #include "game/enums/item_category.h"
 #include "game/enums/slot_physical_behaviour.h"
 #include "game/cosmos/entity_flavour_id.h"
+#include "game/detail/view_input/sound_effect_input.h"
 
 class cosmos;
 
@@ -32,6 +33,11 @@ struct inventory_slot {
 
 	float attachment_density_multiplier = 1.f;
 
+	sound_effect_input start_mounting_sound;
+	sound_effect_input finish_mounting_sound;
+
+	sound_effect_input start_unmounting_sound;
+	sound_effect_input finish_unmounting_sound;
 	// END GEN INTROSPECTOR
 
 	item_category_flagset get_allowed_categories() const;

@@ -116,6 +116,16 @@ namespace test_flavours {
 			meta.set(item);
 
 			default_gun_props(meta);
+
+			auto& mag = meta.template get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE];
+
+			if (stance == item_holding_stance::RIFLE_LIKE) {
+				mag.start_mounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_START_LOAD);
+				mag.finish_mounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_FINISH_LOAD);
+
+				mag.start_unmounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_START_UNLOAD);
+				mag.finish_unmounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_FINISH_UNLOAD);
+			}
 		};
 	
 		{
@@ -978,10 +988,10 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::HEAVY_LIKE, 2000.f);
 			set_density_mult(meta, 1.25);
 
-			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].only_allow_flavour = ::to_entity_flavour_id(test_container_items::LEWSII_MAGAZINE);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::LEWSII_DRAW);
 			meta.get<invariants::item>().standard_price = 5000;
 			set_chambering_duration_ms(meta, 700.f);
+			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].only_allow_flavour = ::to_entity_flavour_id(test_container_items::LEWSII_MAGAZINE);
 		}
 
 		{
@@ -1169,7 +1179,6 @@ namespace test_flavours {
 			meta.set(gun_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44, white);
-			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].only_allow_flavour = ::to_entity_flavour_id(test_container_items::AO44_MAGAZINE);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1200.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
@@ -1177,6 +1186,7 @@ namespace test_flavours {
 			set_chambering_duration_ms(meta, 300.f);
 			set_density_mult(meta, 0.9f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("3.5");
+			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].only_allow_flavour = ::to_entity_flavour_id(test_container_items::AO44_MAGAZINE);
 		}
 
 		{

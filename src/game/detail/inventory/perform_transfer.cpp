@@ -93,6 +93,8 @@ perform_transfer_result perform_transfer_impl(
 	const auto previous_slot = cosm[deguidize(item.current_slot)];
 	const auto target_slot = cosm[r.target_slot];
 
+	const auto& common_assets = cosm.get_common_assets();
+
 	if (!r.params.bypass_mounting_requirements) {
 		const bool source_mounted = previous_slot.alive() ? previous_slot->is_mounted_slot() : false;
 		const bool target_mounted = target_slot.alive() ? target_slot->is_mounted_slot() : false;
@@ -122,7 +124,7 @@ perform_transfer_result perform_transfer_impl(
 			new_mount.params = r.params;
 
 			mounts.try_emplace(r.item, new_mount);
-			return {};
+			return output;
 		}
 	}
 
@@ -289,7 +291,7 @@ perform_transfer_result perform_transfer_impl(
 		if (is_drop_request) {
 			packaged_sound_effect dropped;
 
-			dropped.input = cosm.get_common_assets().item_throw_sound;
+			dropped.input = common_assets.item_throw_sound;
 			dropped.start = sound_effect_start_input::orbit_absolute(
 				grabbed_item_part_handle, initial_transform_of_transferred
 			).set_listener(previous_root);
@@ -312,10 +314,10 @@ perform_transfer_result perform_transfer_impl(
 					packaged_sound_effect sound;
 
 					if (is_pickup) {
-						sound.input = cosm.get_common_assets().item_pickup_to_deposit_sound;
+						sound.input = common_assets.item_pickup_to_deposit_sound;
 					}
 					else {
-						sound.input = cosm.get_common_assets().item_holster_sound;
+						sound.input = common_assets.item_holster_sound;
 					}
 
 					sound.start = sound_effect_start_input::at_entity(target_root);
@@ -341,7 +343,7 @@ perform_transfer_result perform_transfer_impl(
 		if (is_pickup) {
 			packaged_particle_effect particles;
 
-			particles.input = cosm.get_common_assets().item_pickup_particles;
+			particles.input = common_assets.item_pickup_particles;
 
 			auto effect_transform = initial_transform_of_transferred;
 

@@ -6,8 +6,44 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Drop items from hotbar on pressing RPM
+
+- Alt + G throws secondary item
+
+- Alt + R only unloads the magazine
+	- Could also be used for scavenging
+
+- For now, players won't really care about removing magazines by hand
+	- We disregard it since it would make automatic reloading a lot harder
+		- Actually just pickup of new item
+		- And shot
+		- And wielding of unloaded weapon exclusively
+		- After chambering as well
+	- It takes too much time to have any meaning really
+		- Well maybe if they wanted to drop it for someone?
+
+- Separate sounds for starting of mounting and ending of mounting
+	- Same for unmounting
+
+- Also add some sounds for wielding magazines for even better quality audio feedback
+
+- Automatically reload only after shooting and when an unloaded gun is wielded while there is no other thing in hands
+
+- Reloading sounds
+	- Probably some delays for mounts?
+		- What about making the sound itself delayed?
+		- We'll be interrupting it anyway
+
+- Every frame, iterate whole inventory and check if the hotbar has it all?
+	- So that we don't have to post messages
+	- Not really. The player won't always want to have the entire hotbar loaded with items.
+		- Especially if they want to quickly use recent items.
+	- Actually, every frame check if hands have an unhotbared item
+	- And every time that find holstering slot is used, post a message
+
 - Determinism: Fix pending mounts to have deterministic iteration order
 	- E.g. make it a map and iterate by entity GUID
+
 - Reloading
 	- Initialization
 		- An intent arrives
