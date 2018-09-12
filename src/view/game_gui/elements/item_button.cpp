@@ -295,7 +295,7 @@ void item_button::draw_proc(
 				printing_charge_count = true;
 			}
 			else if (element.draw_space_available_inside_container_icons) {
-				const auto ammo_info = get_ammunition_information(item);
+				const auto ammo_info = calc_ammo_info(item);
 
 				if (ammo_info.total_ammunition_space_available > 0.f) {
 					printing_charge_count = true;

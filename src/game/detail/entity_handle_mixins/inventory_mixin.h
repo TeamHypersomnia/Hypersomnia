@@ -34,6 +34,8 @@ enum class slot_finding_opt {
 	COUNT
 };
 
+struct pending_item_mount;
+
 using slot_finding_opts = augs::constant_size_vector<slot_finding_opt, 3>;
 
 template <class derived_handle_type>
@@ -148,4 +150,6 @@ public:
 
 	template <class G>
 	ltrb calc_attachments_aabb(G&& get_offsets_by_torso) const;
+
+	maybe_const_ptr_t<is_const, pending_item_mount> find_mounting_progress() const;
 };

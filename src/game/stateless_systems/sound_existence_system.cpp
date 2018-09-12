@@ -125,7 +125,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			const auto cued_count = gun_def.num_last_bullets_to_trigger_low_ammo_cue;
 
 			if (cued_count > 0) {
-				const auto ammo_info = get_ammunition_information(subject);
+				const auto ammo_info = calc_ammo_info(subject);
 
 				if (ammo_info.total_charges < cued_count) {
 					auto effect = gun_def.low_ammo_cue_sound;

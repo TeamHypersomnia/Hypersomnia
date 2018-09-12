@@ -272,3 +272,11 @@ wielding_type inventory_mixin<E>::get_wielding_of(const handle_type item) const 
 
 	return wielding_type::NOT_WIELDED;
 }
+
+template <class E>
+maybe_const_ptr_t<inventory_mixin<E>::is_const, pending_item_mount> inventory_mixin<E>::find_mounting_progress() const {
+	const auto& self = *static_cast<const E*>(this);
+	auto& cosm = self.get_cosmos();
+
+	return mapped_or_nullptr(cosm.get_global_solvable().pending_item_mounts, self.get_id());
+}

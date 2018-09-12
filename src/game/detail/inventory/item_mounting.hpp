@@ -15,19 +15,23 @@ mounting_conditions_type calc_mounting_conditions(
 
 	const auto source_slot = item_entity.alive() ? item_entity.get_current_slot() : cosm[inventory_slot_id()];
 
-	const auto target_capability = target_slot ? target_slot.get_container().get_owning_transfer_capability() : cosm[entity_id()];
 	const auto source_capability = item_entity.get_owning_transfer_capability();
 
-	const bool mounting_viable = target_capability.alive() && target_capability == source_capability;
+	if (source_capability.dead()) {
+		/* 
+			We can't mount or unmount an item that has no capability (so also if it has no slot). 
+			First we have to hold it in our hands. 
+		*/
 
-	if (!mounting_viable) {
-		if (source_slot.is_this_or_ancestor_mounted() || target_slot.is_this_or_ancestor_mounted()) {
-			/* Mounting required, but it is not viable due to inconsistent capabilities. Abort. */
+		if (target_slot.is_this_or_ancestor_mounted()) {
+			/* Target slot can't be mounted or have a mounted ancestor. */
 			return mounting_conditions_type::ABORT;
 		}
 
 		return mounting_conditions_type::NO_MOUNTING_REQUIRED;
 	}
+
+	const auto target_capability = target_slot.get_container().get_owning_transfer_capability();
 
 	const auto& capability = source_capability;
 
@@ -58,6 +62,12 @@ mounting_conditions_type calc_mounting_conditions(
 	};
 
 	if (mounting) {
+		const bool viable = source_capability.alive() && target_capability == source_capability;
+
+		if (!viable) {
+			return mounting_conditions_type::ABORT;
+		}
+
 		if (!source_slot.is_hand_slot()) {
 			/* Source item must be directly in hand to perform mount */
 			return mounting_conditions_type::ABORT;
@@ -68,6 +78,15 @@ mounting_conditions_type calc_mounting_conditions(
 	}
 
 	if (unmounting) {
+		const bool viable = 
+			source_capability.alive() && 
+			(target_capability == source_capability || target_capability.dead())
+		;
+
+		if (!viable) {
+			return mounting_conditions_type::ABORT;
+		}
+
 		const bool target_is_valid = [&]() {
 			if (target_slot.dead()) {
 				/* If the target is dead, one of the hands must be free */

@@ -32,7 +32,8 @@ struct ammunition_information {
 	float total_lsa = 0.f;
 };
 
-ammunition_information get_ammunition_information(const const_entity_handle handle);
+ammunition_information calc_ammo_info(const const_entity_handle handle);
+ammunition_information calc_reloadable_ammo_info(const const_entity_handle handle);
 
 struct b2Filter;
 

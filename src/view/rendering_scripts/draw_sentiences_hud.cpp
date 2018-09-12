@@ -100,7 +100,7 @@ augs::vertex_triangle_buffer draw_sentiences_hud(const draw_sentiences_hud_input
 					if (id.alive() && id.has_items()) {
 						const auto item = cosmos[id.get_items_inside()[0]];
 
-						const auto ammo_info = get_ammunition_information(item);
+						const auto ammo_info = calc_ammo_info(item);
 
 						if (ammo_info.total_ammunition_space_available > 0) {
 							const auto ammo_ratio = 1 - (ammo_info.total_lsa / ammo_info.total_ammunition_space_available);

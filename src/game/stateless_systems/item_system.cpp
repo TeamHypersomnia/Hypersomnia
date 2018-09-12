@@ -81,7 +81,7 @@ auto calc_reloading_context(const E& capability) {
 			};
 
 			auto try_mag = [&](const auto& candidate_mag) {
-				if (candidate_mag.template get<invariants::item>().categories_for_slot_compatibility.test(item_category::MAGAZINE)) {
+				if (mag_slot->is_category_compatible_with(candidate_mag)) {
 					const auto candidate_charges = count_charges_in_deposit(candidate_mag);
 
 					if (is_better(candidate_charges, candidate_mag)) {
@@ -200,6 +200,23 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 		auto& transfers = it.template get<components::item_slot_transfers>();
 		auto& ctx = transfers.current_reloading_context;
 
+		if (const auto concerned_slot = cosm[ctx.concerned_slot]; concerned_slot.dead()) {
+			/* No current context. Automatically check if we should reload. */
+			const auto items = it.get_wielded_items();
+
+			unsigned total_charges = 0;
+
+			for (const auto& i : items) {
+				const auto ammo = calc_reloadable_ammo_info(cosm[i]);
+
+				total_charges += ammo.total_charges;
+			}
+
+			if (total_charges == 0) {
+				ctx = calc_reloading_context(it);
+			}
+		}
+
 		const bool result = [&]() {
 			if (const auto concerned_slot = cosm[ctx.concerned_slot]) {
 				{
@@ -211,8 +228,6 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 						return false;
 					}
 				}
-
-				/* Check correct states. If none could be determine, interrupt as well. */
 
 				auto try_hide_other_item = [&]() {
 					const auto redundant_item = it.get_wielded_other_than(concerned_slot.get_container());
@@ -233,86 +248,84 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 					return false;
 				};
 
-				if (const auto concerned_slot = cosm[ctx.concerned_slot]) {
-					if (const auto old_mag = cosm[ctx.old_ammo_source]) {
-						const auto old_mag_slot = old_mag.get_current_slot();
+				if (const auto old_mag = cosm[ctx.old_ammo_source]) {
+					const auto old_mag_slot = old_mag.get_current_slot();
 
-						if (old_mag_slot.get_id() == concerned_slot.get_id()) {
-							/* The old mag still resides in the concerned slot. */
+					if (old_mag_slot.get_id() == concerned_slot.get_id()) {
+						/* The old mag still resides in the concerned slot. */
 
-							if (const auto existing_progress = mounting_of(old_mag)) {
-								/* Continue the good work. */
-								return true;
-							}
-
-							/* Init the unmount. */
-
-							const auto items = it.get_wielded_items();
-
-							if (items.size() > 1) {
-								if (!try_hide_other_item()) {
-									return false;
-								}
-							}
-
-							if (const auto free_hand = it.get_first_free_hand()) {
-								RLD_LOG("Free hand for the unmount found.");
-								auto unmount_ammo = item_slot_transfer_request::standard(old_mag, free_hand);
-								transfer(unmount_ammo);
-								return true;
-							}
-
-							return false;
+						if (const auto existing_progress = mounting_of(old_mag)) {
+							/* Continue the good work. */
+							return true;
 						}
 
-						if (old_mag_slot.is_hand_slot()) {
-							RLD_LOG("Old mag unmounted.");
+						/* Init the unmount. */
 
-							return try_hide_other_item();
+						const auto items = it.get_wielded_items();
+
+						if (items.size() > 1) {
+							if (!try_hide_other_item()) {
+								return false;
+							}
 						}
+
+						if (const auto free_hand = it.get_first_free_hand()) {
+							RLD_LOG("Free hand for the unmount found.");
+							auto unmount_ammo = item_slot_transfer_request::standard(old_mag, free_hand);
+							transfer(unmount_ammo);
+							return true;
+						}
+
+						return false;
 					}
 
-					if (const auto new_mag = cosm[ctx.new_ammo_source]) {
-						const auto new_mag_slot = new_mag.get_current_slot();
+					if (old_mag_slot.is_hand_slot()) {
+						RLD_LOG("Old mag unmounted.");
 
-						if (new_mag_slot.get_id() == concerned_slot.get_id()) {
-							RLD_LOG("New mag already mounted. Reload complete.");
-							return false;
+						return try_hide_other_item();
+					}
+				}
+
+				if (const auto new_mag = cosm[ctx.new_ammo_source]) {
+					const auto new_mag_slot = new_mag.get_current_slot();
+
+					if (new_mag_slot.get_id() == concerned_slot.get_id()) {
+						RLD_LOG("New mag already mounted. Reload complete.");
+						return false;
+					}
+
+					RLD_LOG("New mag not yet mounted.");
+
+					if (new_mag_slot.is_hand_slot()) {
+						RLD_LOG("New mag is in hands already.");
+
+						if (const auto existing_progress = mounting_of(new_mag)) {
+							/* Continue the good work. */
+							return true;
 						}
 
-						RLD_LOG("New mag not yet mounted.");
+						const auto mount_new = item_slot_transfer_request::standard(new_mag, concerned_slot);
 
-						if (new_mag_slot.is_hand_slot()) {
-							RLD_LOG("New mag is in hands already.");
+						if (transfer(mount_new)) {
+							RLD_LOG("Started mounting new mag.");
+							return true;
+						}
+					}
+					else {
+						RLD_LOG("New mag not yet pulled out.");
+						if (const auto free_hand = it.get_first_free_hand()) {
+							RLD_LOG("Free hand found.");
 
-							if (const auto existing_progress = mounting_of(new_mag)) {
-								/* Continue the good work. */
-								return true;
-							}
+							const auto pull_new = item_slot_transfer_request::standard(new_mag, free_hand);
 
-							const auto mount_new = item_slot_transfer_request::standard(new_mag, concerned_slot);
-
-							if (transfer(mount_new)) {
-								RLD_LOG("Started mounting new mag.");
+							if (transfer(pull_new)) {
+								RLD_LOG("Pulled new mag.");
 								return true;
 							}
 						}
 						else {
-							RLD_LOG("New mag not yet pulled out.");
-							if (const auto free_hand = it.get_first_free_hand()) {
-								RLD_LOG("Free hand found.");
-
-								const auto pull_new = item_slot_transfer_request::standard(new_mag, free_hand);
-
-								if (transfer(pull_new)) {
-									RLD_LOG("Pulled new mag.");
-									return true;
-								}
-							}
-							else {
-								if (try_hide_other_item()) {
-									return true;
-								}
+							if (try_hide_other_item()) {
+								return true;
 							}
 						}
 					}

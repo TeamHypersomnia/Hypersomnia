@@ -69,7 +69,9 @@ static entity_id find_next_cartridge(
 		if (detachable_magazine_slot.alive() && detachable_magazine_slot.has_items()) {
 			const auto magazine = cosm[detachable_magazine_slot.get_items_inside()[0]];
 
-			next_cartridge_from = magazine[slot_function::ITEM_DEPOSIT].get_items_inside();
+			if (nullptr == magazine.find_mounting_progress()) {
+				next_cartridge_from = magazine[slot_function::ITEM_DEPOSIT].get_items_inside();
+			}
 		}
 	}
 

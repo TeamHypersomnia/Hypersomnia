@@ -120,7 +120,7 @@ float assess_projectile_velocity_of_weapon(const const_entity_handle weapon) {
 	return 0.f;
 }
 
-ammunition_information get_ammunition_information(const const_entity_handle item) {
+ammunition_information calc_reloadable_ammo_info(const const_entity_handle item) {
 	ammunition_information out;
 
 	const auto maybe_magazine_slot = item[slot_function::GUN_DETACHABLE_MAGAZINE];
@@ -133,6 +133,12 @@ ammunition_information get_ammunition_information(const const_entity_handle item
 		out.total_ammunition_space_available += ammo_depo->space_available;
 		out.total_lsa += ammo_depo.calc_local_space_available();
 	}
+
+	return out;
+}
+
+ammunition_information calc_ammo_info(const const_entity_handle item) {
+	auto out = calc_reloadable_ammo_info(item);
 
 	const auto chamber_slot = item[slot_function::GUN_CHAMBER];
 
