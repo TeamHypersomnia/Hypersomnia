@@ -6,6 +6,7 @@ namespace messages {
 	struct performed_transfer_message {
 		item_transfer_result result;
 
+		entity_id source_root;
 		entity_id target_root;
 		entity_id item;
 

@@ -77,6 +77,8 @@ struct character_gui {
 		const int hotbar_button_index_for_secondary_selection = -1
 	) const;
 
+	bool hotbar_assignment_exists_for(const entity_id) const;
+
 	void clear_hotbar_selection_for_item(
 		const const_entity_handle gui_entity,
 		const const_entity_handle item_entity

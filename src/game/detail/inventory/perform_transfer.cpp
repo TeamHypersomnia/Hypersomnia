@@ -67,17 +67,6 @@ perform_transfer_result perform_transfer_impl(
 	const item_slot_transfer_request r, 
 	cosmos& cosm
 ) {
-	const auto result = query_transfer_result(cosm, r);
-
-	perform_transfer_result output;
-	output.result.result = result;
-	output.result.item = r.item;
-
-	if (!result.is_successful()) {
-		LOG("perform_transfer failed: %x", format_enum(result.result));
-		return output;
-	}
-
 	auto deguidize = [&](const auto s) {
 		return cosm.get_solvable().deguidize(s);
 	};
@@ -89,15 +78,32 @@ perform_transfer_result perform_transfer_impl(
 	const auto transferred_item = cosm[r.item];
 
 	auto& item = get_item_of(transferred_item);
-	auto& items_of_slots = cosm.get_solvable_inferred(inferred_access).relational.items_of_slots;
 
-	const auto previous_slot = cosm[deguidize(item.current_slot)];
+	const auto source_slot = cosm[deguidize(item.current_slot)];
 	const auto target_slot = cosm[r.target_slot];
 
-	const auto& common_assets = cosm.get_common_assets();
+	const auto source_slot_container = source_slot.get_container();
+	const auto target_slot_container = target_slot.get_container();
+
+	const auto source_root = source_slot_container.get_topmost_container();
+	const auto target_root = target_slot_container.get_topmost_container();
+
+	const auto result = query_transfer_result(cosm, r);
+
+	perform_transfer_result output;
+
+	output.result.result = result;
+	output.result.item = r.item;
+	output.result.source_root = target_root;
+	output.result.target_root = target_root;
+
+	if (!result.is_successful()) {
+		LOG("perform_transfer failed: %x", format_enum(result.result));
+		return output;
+	}
 
 	if (!r.params.bypass_mounting_requirements) {
-		const bool source_mounted = previous_slot.alive() ? previous_slot->is_mounted_slot() : false;
+		const bool source_mounted = source_slot.alive() ? source_slot->is_mounted_slot() : false;
 		const bool target_mounted = target_slot.alive() ? target_slot->is_mounted_slot() : false;
 
 		if (source_mounted != target_mounted) {
@@ -130,12 +136,9 @@ perform_transfer_result perform_transfer_impl(
 		}
 	}
 
-	const auto previous_slot_container = previous_slot.get_container();
-	const auto target_slot_container = target_slot.get_container();
+	auto& items_of_slots = cosm.get_solvable_inferred(inferred_access).relational.items_of_slots;
 
-	const auto previous_root = previous_slot_container.get_topmost_container();
-	const auto target_root = target_slot_container.get_topmost_container();
-	output.result.target_root = target_root;
+	const auto& common_assets = cosm.get_common_assets();
 
 	const bool target_slot_exists = target_slot.alive();
 
@@ -145,25 +148,13 @@ perform_transfer_result perform_transfer_impl(
 		item.charges == static_cast<int>(result.transferred_charges)
 	;
 
-	/*
-		if (result.result == item_transfer_result_type::UNMOUNT_BEFOREHAND) {
-			ensure(false);
-			ensure(previous_slot.alive());
-
-			item.request_unmount(r.get_target_slot());
-			item.mark_parent_enclosing_containers_for_unmount();
-
-			return;
-		}
-	*/
-	
-	if (previous_slot && whole_item_grabbed) {
+	if (source_slot && whole_item_grabbed) {
 		/* The slot will no longer have this item. */
 
 		item.current_slot.unset();
-		items_of_slots.unset_parenthood(transferred_item, previous_slot);
+		items_of_slots.unset_parenthood(transferred_item, source_slot);
 
-		if (previous_slot.is_hand_slot()) {
+		if (source_slot.is_hand_slot()) {
 			unset_input_flags_of_orphaned_entity(transferred_item);
 		}
 	}
@@ -236,8 +227,8 @@ perform_transfer_result perform_transfer_impl(
    		because some stances might have changed completely. 
 	*/
 
-	if (previous_root) {
-		previous_root.infer_item_colliders_recursive();
+	if (source_root) {
+		source_root.infer_item_colliders_recursive();
 	}
 
 	if (target_root) {
@@ -247,7 +238,7 @@ perform_transfer_result perform_transfer_impl(
 	const bool is_drop_request = result.relation == capability_relation::DROP;
 
 	if (is_drop_request) {
-		ensure(previous_slot_container.alive());
+		ensure(source_slot_container.alive());
 
 		grabbed_item_part_handle.infer_change_of_current_slot();
 
@@ -258,7 +249,7 @@ perform_transfer_result perform_transfer_impl(
 
 		const auto rigid_body = grabbed_item_part_handle.get<components::rigid_body>();
 
-		const auto capability_def = previous_root.find<invariants::item_slot_transfers>();
+		const auto capability_def = source_root.find<invariants::item_slot_transfers>();
 
 		const auto disable_collision_for_ms = capability_def ? capability_def->disable_collision_on_drop_for_ms : 300;
 		const auto standard_drop_impulse = (capability_def && r.params.apply_standard_impulse) ? capability_def->standard_drop_impulse : impulse_mults();
@@ -285,7 +276,7 @@ perform_transfer_result perform_transfer_impl(
 		   	cosm.get_timestamp()
 		);
 
-		special_physics.during_cooldown_ignore_collision_with = previous_root;
+		special_physics.during_cooldown_ignore_collision_with = source_root;
 	}
 
 	const bool is_pickup = result.relation == capability_relation::PICKUP;
@@ -297,7 +288,7 @@ perform_transfer_result perform_transfer_impl(
 			dropped.input = common_assets.item_throw_sound;
 			dropped.start = sound_effect_start_input::orbit_absolute(
 				grabbed_item_part_handle, initial_transform_of_transferred
-			).set_listener(previous_root);
+			).set_listener(source_root);
 
 			output.transfer_sound.emplace(std::move(dropped));
 		}

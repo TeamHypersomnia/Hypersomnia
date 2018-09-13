@@ -117,6 +117,16 @@ character_gui::hotbar_selection_setup character_gui::get_setup_from_button_indic
 	return output;
 }
 
+bool character_gui::hotbar_assignment_exists_for(const entity_id id) const{
+	for (const auto& h : hotbar_buttons) {
+		if (h.last_assigned_entity == id) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 void character_gui::clear_hotbar_selection_for_item(
 	const const_entity_handle /* gui_entity */,
 	const const_entity_handle item_entity
@@ -142,8 +152,12 @@ void character_gui::assign_item_to_hotbar_button(
 ) {
 	clear_hotbar_selection_for_item(gui_entity, item);
 
-	if (item.get_owning_transfer_capability() != gui_entity) {
-		LOG("Warning! Assigned entity's owning capability is not the gui subject!");
+	{
+		const auto item_capability = item.get_owning_transfer_capability();
+
+		if (item_capability != gui_entity) {
+			LOG("Warning! Assigned entity's owning capability is not the gui subject (%x != %x)!", item_capability, gui_entity);
+		}
 	}
 
 	hotbar_buttons[button_index].last_assigned_entity = item;

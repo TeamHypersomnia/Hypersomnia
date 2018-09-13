@@ -475,22 +475,33 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 	}
 
 	for (const auto& transfer : step.get_queue<messages::performed_transfer_message>()) {
-		if (!transfer.result.is_pickup()) {
+		const auto transferred_item = cosmos[transfer.item];
+		const auto target_slot = transferred_item.get_current_slot();
+
+		const bool same_capability = transfer.result.relation == capability_relation::THE_SAME;
+
+		const bool interested =
+			target_slot.alive()
+			&& transferred_item.alive()
+			&& target_slot.get_type() != slot_function::PERSONAL_DEPOSIT
+			&& (transfer.result.is_pickup() || (same_capability && !target_slot->is_mounted_slot()))
+		;
+
+		if (!interested) {
 			continue;
 		}
 
-		const auto picked_item = cosmos[transfer.item];
-		const auto target_slot = picked_item.get_current_slot();
-
-		if (target_slot.dead()) {
-			continue;
-		}
-
-		if (target_slot.get_type() == slot_function::PERSONAL_DEPOSIT) {
-			continue;
-		}
+		const bool always_reassign_button = 
+			transfer.result.is_pickup()
+		;
 
 		auto& gui = get_character_gui(transfer.target_root);
+
+		if (!always_reassign_button) {
+			if (gui.hotbar_assignment_exists_for(transferred_item)) {
+				continue;
+			}
+		}
 
 		auto add = [&](const auto handle) {
 			gui.assign_item_to_first_free_hotbar_button(
@@ -500,7 +511,7 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 			);
 		};
 
-		add(picked_item);
+		add(transferred_item);
 
 		auto should_recurse = [](const auto item_entity) {
 			const auto& item = item_entity.template get<invariants::item>();
@@ -512,8 +523,8 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 			return false;
 		};
 
-		if (should_recurse(picked_item)) {
-			picked_item.for_each_contained_item_recursive(
+		if (should_recurse(transferred_item)) {
+			transferred_item.for_each_contained_item_recursive(
 				[&add, should_recurse](const auto child_item) {
 					add(child_item);
 

@@ -496,7 +496,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/components/missile_component.cpp"
 	"src/game/components/fixtures_component.cpp"
 	"src/game/components/item_component.cpp"
-	"src/game/components/item_slot_transfers_component.cpp"
 	"src/game/components/movement_component.cpp"
 	"src/game/components/pathfinding_component.cpp"
 	"src/game/cosmos/cosmos.cpp"

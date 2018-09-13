@@ -34,13 +34,6 @@ namespace components {
 
 		reloading_context current_reloading_context;
 		// END GEN INTROSPECTOR
-
-#if TODO_MOUNTING
-		item_slot_mounting_operation mounting;
-		
-		static item_slot_mounting_operation find_suitable_montage_operation(const_entity_handle parent_container);
-		void interrupt_mounting();
-#endif
 	};
 }
 
