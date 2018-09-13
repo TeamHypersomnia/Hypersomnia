@@ -1420,3 +1420,49 @@ we consider whole type overrides too complex architeciturally:
 - Solution: A bool reloading_intent in the capability
 	- Less traffic to the server
 	- Better resistance to lag, I guess
+
+- Every frame, iterate whole inventory and check if the hotbar has it all?
+	- So that we don't have to post messages
+	- Not really. The player won't always want to have the entire hotbar loaded with items.
+		- Especially if they want to quickly use recent items.
+	- Actually, every frame check if hands have an unhotbared item
+	- And every time that find holstering slot is used, post a message
+
+- Reloading sounds
+	- Probably some delays for mounts?
+		- What about making the sound itself delayed?
+		- We'll be interrupting it anyway
+
+- Reloading
+	- Initialization
+		- An intent arrives
+			- If context exists, check if the mag can be dropped
+	- Advancing
+		- Check if the transfer is complete?
+	- After reloading
+		- The only case when we restore some state after reloading is if we have akimbo
+			- The other item does not even have to be a weapon particularly
+				- it's enough that it's supposed to be hidden
+	- Storing reloading context
+		- When to break it?
+			- When the new calculated differs anyhow
+		- Followup weapon for akimbo
+	- When to break the reloading intent? E.g. in CS, reloading stops when a weapon is switched
+		- Store entity_id last_reload_target
+		- Every step when reload intent is set, calculate the available reloading context
+			- if last_reload_target is unset/dead, overwrite
+i			- if the newly calculated target is different than last_reload_target, reset reloading_intent and unset last_reload_target
+	- Finding the fullest magaizne should be easy enough task
+	- Just what if someone drops it during reload?
+		- Then that's their problem
+		- There's no way that an inventory structure can be altered without the user's intervention, except for player's death
+		- So it can be perfectly the job of GUI to select suitable transfers.
+	- The first time that the mounting conditions fail for the reloading, we're resetting it to false
+
+- Remove the loaded mags from the hotbar?
+	- So when holstering, we'll need to check if the item is in hotbar already and if not, assign a new slot
+	- Actually just don't show in hotbar the items that are not currently wieldable
+
+
+- Separate sounds for starting of mounting and ending of mounting
+	- Same for unmounting

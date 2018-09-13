@@ -160,6 +160,29 @@ perform_transfer_result perform_transfer_impl(
 		}
 	}
 
+	const bool is_pickup = result.relation == capability_relation::PICKUP;
+
+	auto play_pickup_or_holster_effect = [&]() {
+		if (target_slot_exists && target_slot.get_id().type == slot_function::ITEM_DEPOSIT) {
+			packaged_sound_effect sound;
+
+			if (is_pickup) {
+				sound.input = common_assets.item_pickup_to_deposit_sound;
+			}
+			else {
+				sound.input = common_assets.item_holster_sound;
+			}
+
+			sound.start = sound_effect_start_input::at_entity(target_root);
+
+			output.transfer_sound.emplace(std::move(sound));
+
+			return true;
+		}
+
+		return false;
+	};
+
 	if (target_slot_exists) {
 		/* Try to stack the item. */
 
@@ -185,8 +208,12 @@ perform_transfer_result perform_transfer_impl(
 			/* 
 				Mere alteration of charge numbers between two items
 				does not warrant any further inference of state, nor messages posted.
-				It is a transparent operation. (perhaps not so when we'll get to mounting?)
+
+			   	Except if it is a pickup, then play an effect.
+				Otherwise, it is a transparent operation.
 			*/
+
+			play_pickup_or_holster_effect();
 
 			return output;
 		}
@@ -280,8 +307,6 @@ perform_transfer_result perform_transfer_impl(
 		special_physics.during_cooldown_ignore_collision_with = source_root;
 	}
 
-	const bool is_pickup = result.relation == capability_relation::PICKUP;
-
 	if (r.params.play_transfer_sounds) {
 		if (is_drop_request) {
 			packaged_sound_effect dropped;
@@ -304,21 +329,8 @@ perform_transfer_result perform_transfer_impl(
 
 				output.transfer_sound.emplace(std::move(wielded));
 			}
-			else if (target_slot.get_id().type == slot_function::ITEM_DEPOSIT) {
-				{
-					packaged_sound_effect sound;
+			else if (play_pickup_or_holster_effect()) {
 
-					if (is_pickup) {
-						sound.input = common_assets.item_pickup_to_deposit_sound;
-					}
-					else {
-						sound.input = common_assets.item_holster_sound;
-					}
-
-					sound.start = sound_effect_start_input::at_entity(target_root);
-
-					output.transfer_sound.emplace(std::move(sound));
-				}
 			}
 			else {
 				packaged_sound_effect wielded;
