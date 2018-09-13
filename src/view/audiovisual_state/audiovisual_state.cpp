@@ -9,7 +9,7 @@
 #include "game/cosmos/cosmos.h"
 
 #include "game/messages/health_event.h"
-#include "game/messages/item_picked_up_message.h"
+#include "game/messages/performed_transfer_message.h"
 #include "game/messages/interpolation_correction_request.h"
 
 #include "view/audiovisual_state/audiovisual_state.h"

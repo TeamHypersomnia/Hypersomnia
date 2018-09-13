@@ -31,7 +31,7 @@ void drag_and_drop_callback(
 		using T = remove_cref<decltype(transfer_data)>;
 
 		if constexpr (std::is_same_v<T, drop_for_item_slot_transfer>) {
-			if (transfer_data.result.result >= item_transfer_result_type::SUCCESSFUL_TRANSFER) {
+			if (transfer_data.result.is_successful()) {
 				context.get_game_gui_system().queue_transfer(transfer_data.simulated_transfer);
 			}
 		}
@@ -203,12 +203,13 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 					drop.result = query_transfer_result(cosmos, simulated_transfer);
 				}
 
-				const auto predicted_result = drop.result.result;
+				const auto predicted_result = drop.result;
+				const auto predicted_result_type = predicted_result.result;
 
-				if (predicted_result == item_transfer_result_type::THE_SAME_SLOT) {
+				if (predicted_result_type == item_transfer_result_type::THE_SAME_SLOT) {
 					drop.hint_text = "Current slot";
 				}
-				else if (predicted_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
+				else if (predicted_result.is_successful()) {
 					// 	drop.hint_text += "Unmount & ";
 
 					std::string charges_text;
@@ -249,12 +250,12 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 					}
 				}
 				else {
-					switch (predicted_result) {
+					switch (predicted_result_type) {
 						case item_transfer_result_type::INSUFFICIENT_SPACE: drop.hint_text = "No space"; break;
 						case item_transfer_result_type::INVALID_CAPABILITIES: drop.hint_text = "Impossible"; break;
 						case item_transfer_result_type::INCOMPATIBLE_CATEGORIES: drop.hint_text = "Incompatible item"; break;
 						case item_transfer_result_type::TOO_MANY_ITEMS: drop.hint_text = "Too many items"; break;
-						default: drop.hint_text = format_enum(predicted_result); break;
+						default: drop.hint_text = format_enum(predicted_result_type); break;
 					}
 				}
 

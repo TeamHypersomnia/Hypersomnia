@@ -130,7 +130,7 @@ auto calc_reloading_context(const E& capability) {
 				return ctx;
 			}
 
-			LOG("Best is not good enough: %x", best_num_charges);
+			RLD_LOG("Best is not good enough: %x", best_num_charges);
 		}
 
 		/* if (const auto gun = candidate.template find<components::gun>()) { */
@@ -195,8 +195,8 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 	(void)step;
 	auto& cosm = step.get_cosmos();
 
-	auto transfer = [&](const auto& r) -> decltype(auto) {
-		return ::perform_transfer(r, step).is_successful();
+	auto transfer = [&](const auto& r) -> bool {
+		return ::perform_transfer(r, step).result.is_successful();
 	};
 
 	auto& global = cosm.get_global_solvable();

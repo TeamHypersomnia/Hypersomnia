@@ -29,7 +29,7 @@ void perform_transfer_result::notify_logical(const logic_step step) const {
 }
 
 void perform_transfer_result::notify(const logic_step step) const {
-	step.post_message_if(picked);
+	step.post_message(result);
 	step.post_messages(interpolation_corrected);
 	notify_logical(step);
 }
@@ -70,7 +70,8 @@ perform_transfer_result perform_transfer_impl(
 	const auto result = query_transfer_result(cosm, r);
 
 	perform_transfer_result output;
-	output.result = result;
+	output.result.result = result;
+	output.result.item = r.item;
 
 	if (!result.is_successful()) {
 		LOG("perform_transfer failed: %x", format_enum(result.result));
@@ -112,11 +113,12 @@ perform_transfer_result perform_transfer_impl(
 					if (!previous_target_mounted) {
 						existing_request->target = target_slot;
 
-						return {};
+						return output;
 					}
 				}
 			}
 
+			/* Initiate the mounting operation. */
 			mounts.erase(r.item);
 
 			pending_item_mount new_mount;
@@ -133,6 +135,7 @@ perform_transfer_result perform_transfer_impl(
 
 	const auto previous_root = previous_slot_container.get_topmost_container();
 	const auto target_root = target_slot_container.get_topmost_container();
+	output.result.target_root = target_root;
 
 	const bool target_slot_exists = target_slot.alive();
 
@@ -197,20 +200,20 @@ perform_transfer_result perform_transfer_impl(
 		}
 	}
 
-	entity_id grabbed_item_part;
+	const auto grabbed_item_part_handle = [&]() {
+		if (whole_item_grabbed) {
+			return transferred_item;
+		}
+		else {
+			const auto cloned_stack = just_clone_entity(transferred_item);
+			get_item_of(cloned_stack).charges = result.transferred_charges;
 
-	if (whole_item_grabbed) {
-		grabbed_item_part = transferred_item;
-	}
-	else {
-		const auto cloned_stack = just_clone_entity(transferred_item);
-		get_item_of(cloned_stack).charges = result.transferred_charges;
+			item.charges -= result.transferred_charges;
+			return cloned_stack;
+		}
+	}();
 
-		item.charges -= result.transferred_charges;
-		grabbed_item_part = cloned_stack;
-	}
-
-	const auto grabbed_item_part_handle = cosm[grabbed_item_part];
+	output.result.item = grabbed_item_part_handle;
 
 	if (target_slot_exists) {
 		const auto moved_item = grabbed_item_part_handle;
@@ -355,14 +358,6 @@ perform_transfer_result perform_transfer_impl(
 
 			output.transfer_particles.emplace(std::move(particles));
 		}
-	}
-
-	if (is_pickup) {
-		messages::item_picked_up_message message;
-		message.subject = target_root;
-		message.item = grabbed_item_part_handle;
-
-		output.picked = message;
 	}
 
 	return output;

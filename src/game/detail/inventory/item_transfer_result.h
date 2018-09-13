@@ -10,8 +10,13 @@ struct item_transfer_result {
 	item_transfer_result_type result = item_transfer_result_type::INVALID_RESULT;
 	capability_relation relation;
 	unsigned transferred_charges = 0;
+	bool only_initiated_mounting = false;
 
 	bool is_successful() const {
 		return result == item_transfer_result_type::SUCCESSFUL_TRANSFER;
+	}
+
+	bool is_pickup() const {
+		return is_successful() && relation == capability_relation::PICKUP;
 	}
 };

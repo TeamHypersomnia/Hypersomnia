@@ -13,7 +13,7 @@
 #include "game/components/container_component.h"
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/item_component.h"
-#include "game/messages/item_picked_up_message.h"
+#include "game/messages/performed_transfer_message.h"
 
 #include "view/game_gui/game_gui_system.h"
 #include "view/game_gui/game_gui_element_location.h"
@@ -474,8 +474,12 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 		}
 	}
 
-	for (const auto& pickup : step.get_queue<messages::item_picked_up_message>()) {
-		const auto picked_item = cosmos[pickup.item];
+	for (const auto& transfer : step.get_queue<messages::performed_transfer_message>()) {
+		if (!transfer.result.is_pickup()) {
+			continue;
+		}
+
+		const auto picked_item = cosmos[transfer.item];
 		const auto target_slot = picked_item.get_current_slot();
 
 		if (target_slot.dead()) {
@@ -486,11 +490,11 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 			continue;
 		}
 
-		auto& gui = get_character_gui(pickup.subject);
+		auto& gui = get_character_gui(transfer.target_root);
 
 		auto add = [&](const auto handle) {
 			gui.assign_item_to_first_free_hotbar_button(
-				cosmos[pickup.subject],
+				cosmos[transfer.target_root],
 				handle,
 				should_fill_hotbar_from_right(handle)
 			);

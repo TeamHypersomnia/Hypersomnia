@@ -453,9 +453,10 @@ void character_gui::draw_cursor_with_tooltip(
 						);
 					}
 
-					const auto& transfer_result = transfer_data.result.result;
+					const auto& transfer_result = transfer_data.result;
+					const auto& transfer_result_type = transfer_result.result;
 
-					if (transfer_result == item_transfer_result_type::SUCCESSFUL_TRANSFER) {
+					if (transfer_result.is_successful()) {
 						if (transfer_data.result.relation == capability_relation::DROP) {
 							gui_cursor = assets::necessary_image_id::GUI_CURSOR_MINUS;
 							gui_cursor_color = red;
@@ -465,7 +466,7 @@ void character_gui::draw_cursor_with_tooltip(
 							gui_cursor_color = green;
 						}
 					}
-					else if (transfer_result != item_transfer_result_type::THE_SAME_SLOT) {
+					else if (transfer_result_type != item_transfer_result_type::THE_SAME_SLOT) {
 						gui_cursor = assets::necessary_image_id::GUI_CURSOR_ERROR;
 						gui_cursor_color = red;
 					}

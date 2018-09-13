@@ -13,8 +13,7 @@ perform_transfer_result perform_transfer_no_step(
 );
 
 /* Handles all messages in place */
-
- perform_transfer_result perform_transfer(item_slot_transfer_request, logic_step step);
+perform_transfer_result perform_transfer(item_slot_transfer_request, logic_step step);
 
 template <class C, class step_type>
 void perform_transfers(const C requests, const step_type step) {

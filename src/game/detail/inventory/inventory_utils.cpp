@@ -141,8 +141,17 @@ item_transfer_result query_transfer_result(
 		/* Not so fast. Let's see if we can properly mount here. */
 		const auto mounting_result = calc_mounting_conditions(transferred_item, target_slot);
 
-		if (mounting_result == mounting_conditions_type::ABORT) {
-			output.result = item_transfer_result_type::MOUNTING_CONDITIONS_NOT_MET;
+		switch (mounting_result) {
+			case mounting_conditions_type::PROGRESS:
+				output.only_initiated_mounting = true;
+				break;
+
+			case mounting_conditions_type::ABORT:
+				output.result = item_transfer_result_type::MOUNTING_CONDITIONS_NOT_MET;
+				break;
+
+			case mounting_conditions_type::NO_MOUNTING_REQUIRED:
+				break;
 		}
 	}
 
