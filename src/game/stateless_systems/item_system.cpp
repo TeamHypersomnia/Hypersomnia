@@ -289,6 +289,7 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 						if (const auto free_hand = it.get_first_free_hand()) {
 							RLD_LOG("Free hand for the unmount found.");
 							auto unmount_ammo = item_slot_transfer_request::standard(old_mag, free_hand);
+							unmount_ammo.params.play_transfer_sounds = false;
 							transfer(unmount_ammo);
 							drop_if_zero_ammo();
 							return true;
