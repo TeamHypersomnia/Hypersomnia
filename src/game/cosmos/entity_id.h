@@ -42,6 +42,10 @@ struct entity_guid {
 		return *this != entity_guid();
 	}
 
+	bool operator<(const entity_guid& b) const {
+		return value < b.value;
+	}
+
 	void unset() {
 		*this = {};
 	}

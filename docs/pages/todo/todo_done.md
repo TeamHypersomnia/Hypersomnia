@@ -1466,3 +1466,8 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Separate sounds for starting of mounting and ending of mounting
 	- Same for unmounting
+- Also add some sounds for wielding magazines for even better quality audio feedback
+
+- Determinism: Fix pending mounts to have deterministic iteration order
+	- E.g. make it a map and iterate by entity GUID
+

@@ -22,12 +22,7 @@ summary: That which we are brainstorming at the moment.
 	- It takes too much time to have any meaning really
 		- Well maybe if they wanted to drop it for someone?
 
-- Also add some sounds for wielding magazines for even better quality audio feedback
-
 - Automatically reload only after shooting and when an unloaded gun is wielded while there is no other thing in hands
-
-- Determinism: Fix pending mounts to have deterministic iteration order
-	- E.g. make it a map and iterate by entity GUID
 
 - Melee combat
 	- Primary and secondary attacks for knives

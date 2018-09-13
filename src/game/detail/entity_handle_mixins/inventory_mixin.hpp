@@ -278,5 +278,5 @@ maybe_const_ptr_t<inventory_mixin<E>::is_const, pending_item_mount> inventory_mi
 	const auto& self = *static_cast<const E*>(this);
 	auto& cosm = self.get_cosmos();
 
-	return mapped_or_nullptr(cosm.get_global_solvable().pending_item_mounts, self.get_id());
+	return mapped_or_nullptr(cosm.get_global_solvable().pending_item_mounts, self.get_guid());
 }

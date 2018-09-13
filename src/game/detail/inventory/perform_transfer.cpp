@@ -76,6 +76,7 @@ perform_transfer_result perform_transfer_impl(
 	};
 
 	const auto transferred_item = cosm[r.item];
+	const auto transferred_item_guid = transferred_item.get_guid();
 
 	auto& item = get_item_of(transferred_item);
 
@@ -113,7 +114,7 @@ perform_transfer_result perform_transfer_impl(
 
 			if (target_slot.dead()) {
 				/* We can always override the target slot to the dead slot, for an existing pending unmount. */
-				if (auto* const existing_request = mapped_or_nullptr(mounts, r.item)) {
+				if (auto* const existing_request = mapped_or_nullptr(mounts, transferred_item_guid)) {
 					const auto previous_target = cosm[existing_request->target];
 					const bool previous_target_mounted = previous_target.alive() ? previous_target->is_mounted_slot() : false;
 					
@@ -126,13 +127,13 @@ perform_transfer_result perform_transfer_impl(
 			}
 
 			/* Initiate the mounting operation. */
-			mounts.erase(r.item);
+			mounts.erase(transferred_item_guid);
 
 			pending_item_mount new_mount;
 			new_mount.target = target_slot;
 			new_mount.params = r.params;
 
-			mounts.try_emplace(r.item, new_mount);
+			mounts.try_emplace(transferred_item_guid, new_mount);
 			return output;
 		}
 	}
