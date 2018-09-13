@@ -22,21 +22,20 @@ namespace invariants {
 	struct item {
 		static constexpr bool reinfer_when_tweaking = true;
 		// GEN INTROSPECTOR struct invariants::item
-		bool stackable = false;
-		pad_bytes<3> pad;
-
+		unsigned space_occupied_per_charge = 1;
+		item_category_flagset categories_for_slot_compatibility = { item_category::GENERAL };
 		item_holding_stance holding_stance = item_holding_stance::BARE_LIKE;
 
-		unsigned space_occupied_per_charge = 1;
-
-		unsigned dual_wield_accuracy_loss_percentage = 50;
-		unsigned dual_wield_accuracy_loss_multiplier = 1;
+		bool stackable = false;
+		pad_bytes<3> pad;
 
 		sound_effect_input wield_sound;
 		sound_effect_input wear_sound;
 
-		item_category_flagset categories_for_slot_compatibility = { item_category::GENERAL };
 		money_type standard_price = 1000;
+
+		bool flip_when_reloading = false;
+		pad_bytes<3> pad2;
 		// END GEN INTROSPECTOR
 	};
 }

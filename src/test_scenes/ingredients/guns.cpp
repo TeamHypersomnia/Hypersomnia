@@ -58,6 +58,10 @@ namespace test_flavours {
 			//gun_def.firing_engine_particles.modifier.scale_lifetimes = 0.5f;
 		};
 
+		auto only_allow_mag = [&](auto& meta, const test_container_items it) {
+			meta.template get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].only_allow_flavour = ::to_entity_flavour_id(it);
+		};
+
 		auto make_default_gun_container = [&default_gun_props](
 			auto& meta, 
 			const item_holding_stance stance, 
@@ -596,7 +600,7 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_container_items::SAMPLE_MAGAZINE);
+			auto& meta = get_test_flavour(flavours, test_container_items::STANDARD_MAGAZINE);
 
 			{
 				invariants::render render_def;
@@ -605,7 +609,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::SAMPLE_MAGAZINE, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::STANDARD_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::container container; 
@@ -623,6 +627,73 @@ namespace test_flavours {
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
 				item.space_occupied_per_charge = to_space_units("0.5");
+				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
+				meta.set(item);
+			}
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_container_items::KEK9_MAGAZINE);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::KEK9_MAGAZINE, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+
+			invariants::container container; 
+
+			inventory_slot charge_deposit_def;
+			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
+			charge_deposit_def.space_available = to_space_units("0.2");
+			charge_deposit_def.mounting_duration_ms = 500.f;
+
+			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
+			meta.set(container);
+
+			{
+				invariants::item item;
+
+				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				item.space_occupied_per_charge = to_space_units("0.4");
+				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
+				meta.set(item);
+			}
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_container_items::SN69_MAGAZINE);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::SN69_MAGAZINE, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+
+			invariants::container container; 
+
+			inventory_slot charge_deposit_def;
+			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
+			charge_deposit_def.space_available = to_space_units("0.2");
+			charge_deposit_def.mounting_duration_ms = 500.f;
+
+			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
+			meta.set(container);
+
+			{
+				invariants::item item;
+
+				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				item.space_occupied_per_charge = to_space_units("0.4");
+				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				meta.set(item);
 			}
 		}
@@ -655,6 +726,7 @@ namespace test_flavours {
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
 				item.space_occupied_per_charge = to_space_units("1.0");
+				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				meta.set(item);
 			}
 		}
@@ -687,6 +759,7 @@ namespace test_flavours {
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
 				item.space_occupied_per_charge = to_space_units("0.5");
+				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				meta.set(item);
 			}
 		}
@@ -719,6 +792,7 @@ namespace test_flavours {
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
 				item.space_occupied_per_charge = to_space_units("1.0");
+				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				meta.set(item);
 			}
 		}
@@ -887,7 +961,7 @@ namespace test_flavours {
 			set_chambering_duration_ms(meta, 400.f);
 
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_SMG_DRAW);
-			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].only_allow_flavour = ::to_entity_flavour_id(test_container_items::PRO90_MAGAZINE);
+			only_allow_mag(meta, test_container_items::PRO90_MAGAZINE);
 		}
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::VINDICATOR);
@@ -998,7 +1072,8 @@ namespace test_flavours {
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::LEWSII_DRAW);
 			meta.get<invariants::item>().standard_price = 5000;
 			set_chambering_duration_ms(meta, 700.f);
-			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].only_allow_flavour = ::to_entity_flavour_id(test_container_items::LEWSII_MAGAZINE);
+
+			only_allow_mag(meta, test_container_items::LEWSII_MAGAZINE);
 		}
 
 		{
@@ -1092,12 +1167,13 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::KEK9, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1000.f, 0.f, true);
+			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1000.f, 0.f, false);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 500;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(350);
 			set_chambering_duration_ms(meta, 250.f);
 			set_density_mult(meta, 0.8f);
+			only_allow_mag(meta, test_container_items::KEK9_MAGAZINE);
 		}
 
 		{
@@ -1144,6 +1220,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().standard_price = 500;
 			set_chambering_duration_ms(meta, 250.f);
 			set_density_mult(meta, 0.7f);
+			only_allow_mag(meta, test_container_items::SN69_MAGAZINE);
 		}
 
 		{
@@ -1193,7 +1270,7 @@ namespace test_flavours {
 			set_chambering_duration_ms(meta, 300.f);
 			set_density_mult(meta, 0.9f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("3.5");
-			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].only_allow_flavour = ::to_entity_flavour_id(test_container_items::AO44_MAGAZINE);
+			only_allow_mag(meta, test_container_items::AO44_MAGAZINE);
 		}
 
 		{
@@ -1331,14 +1408,25 @@ namespace prefabs {
 		auto sample_magazine = create_test_scene_entity(cosmos, flav, pos);
 
 		if (charge_inside.alive()) {
+			const auto num_fitting_in = charge_inside.num_charges_fitting_in(sample_magazine[slot_function::ITEM_DEPOSIT]);
+
+			int ch = 0;
+
+			if (force_num_charges != -1) {
+				ch = force_num_charges;
+			}
+			else {
+				ch = num_fitting_in;
+			}
+
+			if (ch) {
+				charge_inside.get<components::item>().set_charges(ch);
+			}
+
 			auto load_charge = item_slot_transfer_request::standard(charge_inside, sample_magazine[slot_function::ITEM_DEPOSIT]);
 			load_charge.params.bypass_mounting_requirements = true;
 
 			perform_transfer(load_charge, step);
-
-			if (force_num_charges != -1) {
-				charge_inside.get<components::item>().set_charges(force_num_charges);
-			}
 		}
 
 		return sample_magazine;
@@ -1346,7 +1434,7 @@ namespace prefabs {
 
 
 	entity_handle create_sample_magazine(const logic_step step, const transformr pos, const entity_id charge_inside_id, const int force_num_charges) {
-		return create_magazine(step, pos, test_container_items::SAMPLE_MAGAZINE, charge_inside_id, force_num_charges);
+		return create_magazine(step, pos, test_container_items::STANDARD_MAGAZINE, charge_inside_id, force_num_charges);
 	}
 
 	entity_handle create_pro90_magazine(const logic_step step, const transformr pos, const entity_id charge_inside_id, const int force_num_charges) {

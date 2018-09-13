@@ -89,7 +89,7 @@ return {
     },
     test_scene = {
       scene_tickrate = 144,
-      start_bomb_mode = true
+      start_bomb_mode = false
     },
     camera = {
       panning_speed = 1

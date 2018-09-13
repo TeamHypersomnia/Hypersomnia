@@ -44,7 +44,7 @@ namespace test_scenes {
 		vars.spawned_faction = faction_type::RESISTANCE;
 
 		const auto vindicator_mag = requested_ammo { 
-			to_entity_flavour_id(test_container_items::SAMPLE_MAGAZINE), 
+			to_entity_flavour_id(test_container_items::STANDARD_MAGAZINE), 
 			to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE)
 		};
 
@@ -61,12 +61,12 @@ namespace test_scenes {
 		auto& resistance = vars.factions[faction_type::RESISTANCE];
 
 		const auto vindicator_mag = requested_ammo { 
-			to_entity_flavour_id(test_container_items::SAMPLE_MAGAZINE), 
+			to_entity_flavour_id(test_container_items::STANDARD_MAGAZINE), 
 			to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE)
 		};
 
 		const auto bilmer_mag = requested_ammo { 
-			to_entity_flavour_id(test_container_items::SAMPLE_MAGAZINE), 
+			to_entity_flavour_id(test_container_items::STANDARD_MAGAZINE), 
 			to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE)
 		};
 
@@ -396,15 +396,15 @@ namespace test_scenes {
 
 		for (int k = 0; k < 2; ++k) {
 			prefabs::create_kek9(step, vec2(-800 - k * 150, -200),
-				prefabs::create_sample_magazine(step, vec2(100, -650),
+				prefabs::create_magazine(step, vec2(100, -650), test_container_items::KEK9_MAGAZINE,
 					prefabs::create_cyan_charge(step, vec2(0, 0))));
 
 			prefabs::create_sn69(step, vec2(-800 - k * 150, 0),
-				prefabs::create_sample_magazine(step, vec2(100, -650),
+				prefabs::create_magazine(step, vec2(100, -650), test_container_items::SN69_MAGAZINE,
 					prefabs::create_cyan_charge(step, vec2(0, 0))));
 
 			prefabs::create_ao44(step, vec2(-800 - k * 150, 200),
-				prefabs::create_ao44_magazine(step, vec2(100, -650),
+				prefabs::create_magazine(step, vec2(100, -650), test_container_items::AO44_MAGAZINE,
 					prefabs::create_ao44_charge(step, vec2(0, 0))));
 
 			prefabs::create_gun(step, vec2(-800 - k * 150, 400), 

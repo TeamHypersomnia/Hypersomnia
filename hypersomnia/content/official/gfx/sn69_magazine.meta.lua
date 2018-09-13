@@ -2,17 +2,18 @@ return {
   extra_loadables = {
     enabled_generate_neon_map = {
       alpha_multiplier = 1,
-      amplification = 60,
+      amplification = 120,
       light_colors = {
         "255 0 0 255",
-        "255 255 255 255",
-        "0 255 255 255"
+        "0 222 255 255",
+        "0 78 255 255",
+        "0 78 255 255"
       },
       radius = {
-        x = 100,
-        y = 100
+        x = 80,
+        y = 80
       },
-      standard_deviation = 5
+      standard_deviation = 6
     },
     generate_desaturation = false
   },
@@ -20,12 +21,12 @@ return {
     gun = {
       bullet_spawn = {
         x = 0,
-        y = -6
+        y = 0
       },
       detachable_magazine = {
         pos = {
-          x = 1,
-          y = 6
+          x = 0,
+          y = 0
         },
         rotation = 0
       },
@@ -61,8 +62,8 @@ return {
       },
       hand_anchor = {
         pos = {
-          x = -9,
-          y = 1
+          x = 0,
+          y = 0
         },
         rotation = 0
       },

@@ -36,8 +36,6 @@ namespace test_flavours {
 
 			invariants::item item;
 
-			item.dual_wield_accuracy_loss_multiplier = 1;
-			item.dual_wield_accuracy_loss_percentage = 50;
 			item.space_occupied_per_charge = to_space_units("1");
 			item.categories_for_slot_compatibility.set(item_category::BACK_WEARABLE);
 
@@ -73,8 +71,6 @@ namespace test_flavours {
 
 			invariants::item item;
 
-			item.dual_wield_accuracy_loss_multiplier = 1;
-			item.dual_wield_accuracy_loss_percentage = 50;
 			item.space_occupied_per_charge = to_space_units("1");
 			item.categories_for_slot_compatibility.set(item_category::PERSONAL_DEPOSIT_WEARABLE);
 
