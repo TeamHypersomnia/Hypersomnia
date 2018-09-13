@@ -42,12 +42,14 @@
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 #include "game/detail/inventory/weapon_reloading.hpp"
 
-#define LOG_RELOADING 1
+#define LOG_RELOADING 0
 
 template <class... Args>
 void RLD_LOG(Args&&... args) {
 #if LOG_RELOADING
 	LOG(std::forward<Args>(args)...);
+#else
+	((void)args, ...);
 #endif
 }
 

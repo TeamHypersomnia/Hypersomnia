@@ -119,12 +119,19 @@ namespace test_flavours {
 
 			auto& mag = meta.template get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE];
 
+			mag.start_unmounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_START_UNLOAD);
+
 			if (stance == item_holding_stance::RIFLE_LIKE) {
 				mag.start_mounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_START_LOAD);
 				mag.finish_mounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_FINISH_LOAD);
 
-				mag.start_unmounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_START_UNLOAD);
 				mag.finish_unmounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_FINISH_UNLOAD);
+			}
+			else if (stance == item_holding_stance::PISTOL_LIKE) {
+				mag.start_mounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_START_LOAD);
+				mag.finish_mounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_FINISH_LOAD);
+
+				mag.finish_unmounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_FINISH_UNLOAD);
 			}
 		};
 	
