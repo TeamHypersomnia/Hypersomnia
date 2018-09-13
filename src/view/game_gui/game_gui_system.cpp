@@ -138,12 +138,12 @@ bool game_gui_system::control_gui_world(
 		return false;
 	}
 
-	const auto& cosmos = root_entity.get_cosmos();
+	const auto& cosm = root_entity.get_cosmos();
 	auto& element = context.get_character_gui();
 
 	if (root_entity.has<components::item_slot_transfers>()) {
 		if (const auto held_rect = context.get_if<item_button_in_item>(world.rect_held_by_lmb)) {
-			const auto& item_entity = cosmos[held_rect.get_location().item_id];
+			const auto& item_entity = cosm[held_rect.get_location().item_id];
 			auto& dragged_charges = element.dragged_charges;
 
 			if (change.was_pressed(augs::event::keys::key::RMOUSE)) {
@@ -423,7 +423,7 @@ bool should_fill_hotbar_from_right(const E& handle) {
 }
 
 void game_gui_system::standard_post_solve(const const_logic_step step) {
-	const auto& cosmos = step.get_cosmos();
+	const auto& cosm = step.get_cosmos();
 
 	auto migrate_nodes = [&](auto& migrated, const auto& key_map) {
 		using M = remove_cref<decltype(migrated)>;
@@ -475,8 +475,8 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 	}
 
 	for (const auto& transfer : step.get_queue<messages::performed_transfer_message>()) {
-		const auto transferred_item = cosmos[transfer.item];
-		const auto target_slot = transferred_item.get_current_slot();
+		const auto transferred_item = cosm[transfer.item];
+		const auto target_slot = cosm[transfer.target_slot];
 
 		const bool same_capability = transfer.result.relation == capability_relation::THE_SAME;
 
@@ -505,7 +505,7 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 
 		auto add = [&](const auto handle) {
 			gui.assign_item_to_first_free_hotbar_button(
-				cosmos[transfer.target_root],
+				cosm[transfer.target_root],
 				handle,
 				should_fill_hotbar_from_right(handle)
 			);

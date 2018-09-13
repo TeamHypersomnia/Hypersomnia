@@ -68,7 +68,26 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find
 }
 
 template <class E>
+bool is_weapon_like(const E& typed_handle) {
+	return typed_handle.template has<components::gun>() || typed_handle.template has<components::hand_fuse>();
+}
+
+template <class E>
 template <class handle_type>
 typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find_pickup_target_slot_for(const handle_type picked_item) const {
-	return find_slot_for(picked_item, { slot_finding_opt::CHECK_WEARABLES, slot_finding_opt::CHECK_HANDS, slot_finding_opt::CHECK_CONTAINERS });
+	auto finding_order = slot_finding_opts { 
+		slot_finding_opt::CHECK_WEARABLES, 
+		slot_finding_opt::CHECK_CONTAINERS, 
+		slot_finding_opt::CHECK_HANDS 
+	};
+
+	{
+		if (is_weapon_like(picked_item)) {
+			/* If it is a weapon, try to hold them in hands before trying containers. */
+
+			std::swap(finding_order.front(), finding_order.back());
+		}
+	}
+
+	return find_slot_for(picked_item, finding_order);
 }

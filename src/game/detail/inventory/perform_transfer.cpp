@@ -94,6 +94,7 @@ perform_transfer_result perform_transfer_impl(
 
 	output.result.result = result;
 	output.result.item = r.item;
+	output.result.target_slot = target_slot;
 	output.result.source_root = target_root;
 	output.result.target_root = target_root;
 

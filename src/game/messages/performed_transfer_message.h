@@ -9,6 +9,7 @@ namespace messages {
 		entity_id source_root;
 		entity_id target_root;
 		entity_id item;
+		entity_id target_slot;
 
 		bool is_successful() const {
 			return result.is_successful();
