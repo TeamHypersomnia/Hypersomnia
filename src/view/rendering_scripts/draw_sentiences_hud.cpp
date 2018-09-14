@@ -11,6 +11,7 @@
 #include "augs/gui/text/printer.h"
 #include "augs/image/font.h"
 #include "augs/math/math.h"
+#include "view/game_drawing_settings.h"
 
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
@@ -27,11 +28,16 @@ augs::vertex_triangle_buffer draw_sentiences_hud(const draw_sentiences_hud_input
 	auto& specials = in.specials;
 
 	const auto& watched_character = cosmos[in.viewed_character_id];
+	const auto watched_character_faction = watched_character.get_official_faction();
 
 	const auto timestamp_ms = static_cast<unsigned>(in.global_time_seconds * 1000);
 	augs::vertex_triangle_buffer circular_bars_information;
 
 	visible_entities.for_each<render_layer::SENTIENCES>(cosmos, [&](const auto v) {
+		if (!in.settings.draw_enemy_hud && v.get_official_faction() != watched_character_faction) {
+			return;
+		}
+
 		if (const auto* const sentience = v.template find<components::sentience>();
 			sentience && sentience->is_conscious()
 		) {

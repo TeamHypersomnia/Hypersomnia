@@ -16,6 +16,7 @@ class cosmos;
 class interpolation_system;
 
 class visible_entities;
+struct game_drawing_settings;
 
 struct line_output_wrapper {
 	augs::line_drawer_with_default output;
@@ -36,6 +37,7 @@ struct dashed_line_output_wrapper {
 
 struct draw_sentiences_hud_input {
 	const visible_entities& all;
+	const game_drawing_settings& settings;
 	
 	const augs::drawer output;
 	augs::special_buffer& specials;

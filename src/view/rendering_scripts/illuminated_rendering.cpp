@@ -56,6 +56,8 @@ void illuminated_rendering(
 		return result;
 	}();
 
+	const auto screen_size = cone.screen_size;
+
 	const auto& cosm = viewed_character.get_cosmos();
 	
 	const auto& anims = cosm.get_logical_assets().plain_animations;
@@ -156,6 +158,61 @@ void illuminated_rendering(
 		interp
 	};
 
+	const bool fog_of_war_effective = 
+		viewed_character_transform != std::nullopt 
+		&& settings.fog_of_war
+	;
+
+	if (fog_of_war_effective) {
+		renderer.call_and_clear_triangles();
+
+		renderer.set_clear_color(rgba(0, 0, 0, 0));
+		renderer.enable_stencil();
+		renderer.start_writing_stencil();
+		renderer.clear_stencil();
+
+		auto fow_raycasts_scope = cosm.measure_raycasts(profiler.fog_of_war_raycasts);
+
+		messages::visibility_information_request request;
+		request.eye_transform = *viewed_character_transform;
+		request.filter = filters::pathfinding_query();
+		request.square_side = std::max(screen_size.x, screen_size.y) * 2;
+		request.subject = viewed_character;
+
+		const auto responses = visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(
+			cosm,
+			{ request }
+		);
+
+		const bool was_visibility_calculated = responses.size() == 1 && !responses.back().empty();
+
+		if (was_visibility_calculated) {
+			const auto& r = responses.back();
+
+			for (std::size_t t = 0; t < r.get_num_triangles(); ++t) {
+				const auto world_light_tri = r.get_world_triangle(t, viewed_character_transform->pos);
+				augs::vertex_triangle renderable_light_tri;
+
+				renderable_light_tri.vertices[0].pos = world_light_tri[0];
+				renderable_light_tri.vertices[1].pos = world_light_tri[1];
+				renderable_light_tri.vertices[2].pos = world_light_tri[2];
+
+				renderable_light_tri.vertices[0].color = white;
+				renderable_light_tri.vertices[1].color = white;
+				renderable_light_tri.vertices[2].color = white;
+
+				renderer.push_triangle(renderable_light_tri);
+			}
+
+			set_shader_with_matrix(shaders.pure_color_highlight);
+
+			renderer.call_and_clear_triangles();
+		}
+
+		renderer.start_testing_stencil();
+		renderer.disable_stencil();
+	}
+
 	light.render_all_lights({
 		renderer,
 		profiler,
@@ -230,6 +287,7 @@ void illuminated_rendering(
 			);
 		},
 		cone,
+		fog_of_war_effective ? viewed_character : std::optional<entity_id>(),
 		in.camera_query_mult,
 		particles,
 		anims,
@@ -299,7 +357,30 @@ void illuminated_rendering(
 		return result;
 	};
 
-	helper.draw_border<render_layer::SENTIENCES>(standard_border_provider);
+	if (fog_of_war_effective) {
+		renderer.call_and_clear_triangles();
+
+		renderer.enable_stencil();
+		renderer.stencil_positive_test();
+
+		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
+			if (handle.get_official_faction() != viewed_character.get_official_faction()) {
+				::draw_border(handle, drawing_input, standard_border_provider);
+			}
+		});
+
+		renderer.call_and_clear_triangles();
+		renderer.disable_stencil();
+
+		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
+			if (handle.get_official_faction() == viewed_character.get_official_faction()) {
+				::draw_border(handle, drawing_input, standard_border_provider);
+			}
+		});
+	}
+	else {
+		helper.draw_border<render_layer::SENTIENCES>(standard_border_provider);
+	}
 
 	renderer.call_and_clear_triangles();
 
@@ -362,75 +443,36 @@ void illuminated_rendering(
 		render_layer::GLASS_BODY
 	>();
 	
-	if (viewed_character_transform != std::nullopt && settings.fog_of_war) {
-		::draw_entity(viewed_character, drawing_input);
 
+	if (fog_of_war_effective) {
 		renderer.call_and_clear_triangles();
 
-		renderer.set_clear_color(rgba(0, 0, 0, 0));
 		renderer.enable_stencil();
-		renderer.start_writing_stencil();
-		renderer.clear_stencil();
+		renderer.stencil_reverse_test();
+		shaders.pure_color_highlight->set_as_current();
+		shaders.pure_color_highlight->set_projection(augs::orthographic_projection(vec2(screen_size)));
+		output.color_overlay(screen_size, settings.fog_of_war_color);
+		renderer.call_and_clear_triangles();
+		shaders.pure_color_highlight->set_projection(matrix);
 
-		auto fow_raycasts_scope = cosm.measure_raycasts(profiler.fog_of_war_raycasts);
+		renderer.stencil_positive_test();
 
-		const auto screen_size = in.camera.cone.screen_size;
+		shaders.illuminated->set_as_current();
 
-		messages::visibility_information_request request;
-		request.eye_transform = *viewed_character_transform;
-		request.filter = filters::pathfinding_query();
-		request.square_side = std::max(screen_size.x, screen_size.y) * 2;
-		request.subject = viewed_character;
-
-		const auto responses = visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(
-			cosm,
-			{ request }
-		);
-
-		const bool was_visibility_calculated = responses.size() == 1 && !responses.back().empty();
-
-		if (was_visibility_calculated) {
-			const auto& r = responses.back();
-
-			for (std::size_t t = 0; t < r.get_num_triangles(); ++t) {
-				const auto world_light_tri = r.get_world_triangle(t, viewed_character_transform->pos);
-				augs::vertex_triangle renderable_light_tri;
-
-				renderable_light_tri.vertices[0].pos = world_light_tri[0];
-				renderable_light_tri.vertices[1].pos = world_light_tri[1];
-				renderable_light_tri.vertices[2].pos = world_light_tri[2];
-
-				renderable_light_tri.vertices[0].color = white;
-				renderable_light_tri.vertices[1].color = white;
-				renderable_light_tri.vertices[2].color = white;
-
-				renderer.push_triangle(renderable_light_tri);
+		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
+			if (handle.get_official_faction() != viewed_character.get_official_faction()) {
+				::draw_entity(handle, drawing_input);
 			}
-
-			shaders.pure_color_highlight->set_as_current();
-
-			renderer.call_and_clear_triangles();
-
-			renderer.start_testing_stencil();
-
-			shaders.pure_color_highlight->set_projection(augs::orthographic_projection(vec2(screen_size)));
-			output.color_overlay(screen_size, settings.fog_of_war_color);
-			renderer.call_and_clear_triangles();
-			shaders.pure_color_highlight->set_projection(matrix);
-
-			renderer.stencil_positive_test();
-
-			shaders.illuminated->set_as_current();
-
-			helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
-				if (handle != viewed_character) {
-					::draw_entity(handle, drawing_input);
-				}
-			});
-		}
+		});
 
 		renderer.call_and_clear_triangles();
 		renderer.disable_stencil();
+
+		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
+			if (handle.get_official_faction() == viewed_character.get_official_faction()) {
+				::draw_entity(handle, drawing_input);
+			}
+		});
 	}
 	else {
 		helper.draw<render_layer::SENTIENCES>();
@@ -504,6 +546,7 @@ void illuminated_rendering(
 
 		textual_infos = draw_sentiences_hud({
 			visible,
+			settings,
 			output,
 			renderer.get_special_buffer(),
 			cosm,
