@@ -119,5 +119,15 @@ namespace augs {
 		vertex_triangle_buffer& get_triangle_buffer();
 		vertex_line_buffer& get_line_buffer();
 		special_buffer& get_special_buffer();
+
+		void enable_stencil();
+		void disable_stencil();
+		void clear_stencil();
+
+		void start_writing_stencil();
+		void start_testing_stencil();
+
+		void stencil_positive_test();
+		void stencil_reverse_test();
 	};
 }

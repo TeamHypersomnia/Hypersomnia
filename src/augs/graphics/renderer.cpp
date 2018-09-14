@@ -48,6 +48,8 @@ namespace augs {
 		GL_CHECK(glDisable(GL_LINE_SMOOTH));
 		GL_CHECK(glDisable(GL_POLYGON_SMOOTH));
 		GL_CHECK(glDisable(GL_MULTISAMPLE));
+		GL_CHECK(glDisable(GL_DEPTH_TEST));
+		GL_CHECK(glDepthMask(GL_FALSE));
 
 		GL_CHECK(glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST));
 		GL_CHECK(glHint(GL_TEXTURE_COMPRESSION_HINT, GL_FASTEST));
@@ -239,13 +241,6 @@ namespace augs {
 		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::position), 2, GL_FLOAT, GL_FALSE, sizeof(vertex), nullptr));
 		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::texcoord), 2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<char*>(sizeof(float) * 2)));
 		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::color), 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), reinterpret_cast<char*>(sizeof(float) * 2 + sizeof(float) * 2)));
-
-		//glBegin(GL_QUADS);
-		//glVertexAttrib2f(0u, 1.f, 1.f);
-		//glVertexAttrib2f(0u, 1.f, 0.f);
-		//glVertexAttrib2f(0u, 0.f, 0.f);
-		//glVertexAttrib2f(0u, 0.f, 1.f);
-		//glEnd();
 	}
 
 	void renderer::draw_call_imgui(
@@ -372,5 +367,38 @@ namespace augs {
 		(void)imgui_elements_id;
 		return false;
 #endif
+	}
+
+	void renderer::enable_stencil() {
+		GL_CHECK(glEnable(GL_STENCIL_TEST));
+	}
+
+	void renderer::disable_stencil() {
+		GL_CHECK(glDisable(GL_STENCIL_TEST));
+	}
+
+	void renderer::clear_stencil() {
+		GL_CHECK(glClear(GL_STENCIL_BUFFER_BIT));
+	}
+
+	void renderer::start_writing_stencil() {
+		GL_CHECK(glStencilFunc(GL_ALWAYS, 1, 0xFF));
+		GL_CHECK(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
+		GL_CHECK(glStencilMask(0xFF));
+		GL_CHECK(glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE));
+	}
+
+	void renderer::stencil_reverse_test() {
+		GL_CHECK(glStencilFunc(GL_EQUAL, 0, 0xFF));
+	}
+
+	void renderer::stencil_positive_test() {
+		GL_CHECK(glStencilFunc(GL_EQUAL, 1, 0xFF));
+	}
+
+	void renderer::start_testing_stencil() {
+		stencil_reverse_test();
+		GL_CHECK(glStencilMask(0x00));
+		GL_CHECK(glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE));
 	}
 }

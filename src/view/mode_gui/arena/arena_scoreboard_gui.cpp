@@ -45,6 +45,7 @@ void arena_scoreboard_gui::draw_gui(
 	if (!should_show) {
 		return;
 	}
+	return;
 
 	const auto match_result = typed_mode.calc_match_result(mode_input);
 	const bool is_halftime = match_result != std::nullopt && typed_mode.is_halfway_round(mode_input);

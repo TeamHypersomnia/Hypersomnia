@@ -156,7 +156,7 @@ namespace augs {
 							GLX_GREEN_SIZE      , 8,
 							GLX_BLUE_SIZE       , 8,
 							GLX_ALPHA_SIZE      , 8,
-							GLX_STENCIL_SIZE    , 0,
+							GLX_STENCIL_SIZE    , BUILD_STENCIL_BUFFER ? 8 : 0,
 							GLX_DOUBLEBUFFER    , True,
 							GLX_SAMPLE_BUFFERS  , 0,
 							GLX_SAMPLES         , 0,

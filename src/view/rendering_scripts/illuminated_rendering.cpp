@@ -9,6 +9,7 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/for_each_entity.h"
+#include "game/enums/filters.h"
 
 #include "view/frame_profiler.h"
 #include "view/rendering_scripts/draw_entity.h"
@@ -31,6 +32,7 @@
 #include "view/viewables/all_viewables_declaration.h"
 #include "view/viewables/image_in_atlas.h"
 #include "view/viewables/images_in_atlas_map.h"
+#include "game/stateless_systems/visibility_system.h"
 
 #include "view/audiovisual_state/audiovisual_state.h"
 
@@ -54,9 +56,9 @@ void illuminated_rendering(
 		return result;
 	}();
 
-	const auto& cosmos = viewed_character.get_cosmos();
+	const auto& cosm = viewed_character.get_cosmos();
 	
-	const auto& anims = cosmos.get_logical_assets().plain_animations;
+	const auto& anims = cosm.get_logical_assets().plain_animations;
 
 	const auto& av = in.audiovisuals;
 	const auto& interp = av.get<interpolation_system>();
@@ -66,7 +68,7 @@ void illuminated_rendering(
 	const auto& flying_numbers = av.get<flying_number_indicator_system>();
 	const auto& highlights = av.get<pure_color_highlight_system>();
 	const auto& thunders = av.get<thunder_system>();
-	const auto global_time_seconds = cosmos.get_total_seconds_passed(in.interpolation_ratio);
+	const auto global_time_seconds = cosm.get_total_seconds_passed(in.interpolation_ratio);
 	const auto settings = in.drawing;
 	const auto matrix = cone.get_projection_matrix();
 	const auto& visible = in.all_visible;
@@ -79,6 +81,7 @@ void illuminated_rendering(
 
 	const auto output = augs::drawer_with_default{ renderer.get_triangle_buffer(), blank };
 	const auto line_output = augs::line_drawer_with_default{ renderer.get_line_buffer(), blank };
+	const auto viewed_character_transform = viewed_character ? viewed_character.find_viewing_transform(interp) : std::optional<transformr>();
 
 	if (in.general_atlas) {
 		in.general_atlas->bind();
@@ -157,7 +160,7 @@ void illuminated_rendering(
 		renderer,
 		profiler,
 		total_layer_scope,
-		cosmos, 
+		cosm, 
 		matrix,
 		fbos.light.value(),
 		*shaders.light, 
@@ -189,7 +192,7 @@ void illuminated_rendering(
 			draw_cast_spells_highlights({
 				output,
 				interp,
-				cosmos,
+				cosm,
 				global_time_seconds,
 				cast_highlight
 			});
@@ -197,7 +200,7 @@ void illuminated_rendering(
 			draw_explosion_body_highlights({
 				output,
 				interp,
-				cosmos,
+				cosm,
 				global_time_seconds,
 				cast_highlight
 			});
@@ -205,7 +208,7 @@ void illuminated_rendering(
 			draw_beep_lights({
 				output,
 				interp,
-				cosmos,
+				cosm,
 				cast_highlight
 			})();
 
@@ -222,7 +225,7 @@ void illuminated_rendering(
 			exploding_rings.draw_highlights_of_rings(
 				output,
 				cast_highlight,
-				cosmos,
+				cosm,
 				cone
 			);
 		},
@@ -238,7 +241,7 @@ void illuminated_rendering(
 
 	const auto helper = helper_drawer {
 		visible,
-		cosmos,
+		cosm,
 		drawing_input,
 		total_layer_scope
 	};
@@ -259,7 +262,7 @@ void illuminated_rendering(
 		render_layer::AQUARIUM_BUBBLES
 	>();
 
-	visible.for_each<render_layer::DIM_WANDERING_PIXELS>(cosmos, [&](const auto e) {
+	visible.for_each<render_layer::DIM_WANDERING_PIXELS>(cosm, [&](const auto e) {
 		draw_wandering_pixels_as_sprites(wandering_pixels, e, game_images, drawing_input.make_input_for<invariants::sprite>());
 	});
 
@@ -304,7 +307,7 @@ void illuminated_rendering(
 		const auto& markers = settings.draw_area_markers;
 
 		if (markers.is_enabled) {
-			visible.for_each<render_layer::AREA_MARKERS>(cosmos, [&](const auto e) {
+			visible.for_each<render_layer::AREA_MARKERS>(cosm, [&](const auto e) {
 				e.template dispatch_on_having_all<invariants::box_marker>([&](const auto typed_handle){ 
 					const auto where = typed_handle.get_logic_transform();
 					::draw_marker_borders(typed_handle, line_output, where, cone.eye.zoom, markers.value);
@@ -356,10 +359,83 @@ void illuminated_rendering(
 		render_layer::OVER_DYNAMIC_BODY,
 		render_layer::SMALL_DYNAMIC_BODY,
 		render_layer::OVER_SMALL_DYNAMIC_BODY,
-		render_layer::GLASS_BODY,
-		render_layer::SENTIENCES
+		render_layer::GLASS_BODY
 	>();
 	
+	if (viewed_character_transform != std::nullopt && settings.fog_of_war) {
+		::draw_entity(viewed_character, drawing_input);
+
+		renderer.call_and_clear_triangles();
+
+		renderer.set_clear_color(rgba(0, 0, 0, 0));
+		renderer.enable_stencil();
+		renderer.start_writing_stencil();
+		renderer.clear_stencil();
+
+		auto fow_raycasts_scope = cosm.measure_raycasts(profiler.fog_of_war_raycasts);
+
+		const auto screen_size = in.camera.cone.screen_size;
+
+		messages::visibility_information_request request;
+		request.eye_transform = *viewed_character_transform;
+		request.filter = filters::pathfinding_query();
+		request.square_side = std::max(screen_size.x, screen_size.y) * 2;
+		request.subject = viewed_character;
+
+		const auto responses = visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(
+			cosm,
+			{ request }
+		);
+
+		const bool was_visibility_calculated = responses.size() == 1 && !responses.back().empty();
+
+		if (was_visibility_calculated) {
+			const auto& r = responses.back();
+
+			for (std::size_t t = 0; t < r.get_num_triangles(); ++t) {
+				const auto world_light_tri = r.get_world_triangle(t, viewed_character_transform->pos);
+				augs::vertex_triangle renderable_light_tri;
+
+				renderable_light_tri.vertices[0].pos = world_light_tri[0];
+				renderable_light_tri.vertices[1].pos = world_light_tri[1];
+				renderable_light_tri.vertices[2].pos = world_light_tri[2];
+
+				renderable_light_tri.vertices[0].color = white;
+				renderable_light_tri.vertices[1].color = white;
+				renderable_light_tri.vertices[2].color = white;
+
+				renderer.push_triangle(renderable_light_tri);
+			}
+
+			shaders.pure_color_highlight->set_as_current();
+
+			renderer.call_and_clear_triangles();
+
+			renderer.start_testing_stencil();
+
+			shaders.pure_color_highlight->set_projection(augs::orthographic_projection(vec2(screen_size)));
+			output.color_overlay(screen_size, settings.fog_of_war_color);
+			renderer.call_and_clear_triangles();
+			shaders.pure_color_highlight->set_projection(matrix);
+
+			renderer.stencil_positive_test();
+
+			shaders.illuminated->set_as_current();
+
+			helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
+				if (handle != viewed_character) {
+					::draw_entity(handle, drawing_input);
+				}
+			});
+		}
+
+		renderer.call_and_clear_triangles();
+		renderer.disable_stencil();
+	}
+	else {
+		helper.draw<render_layer::SENTIENCES>();
+	}
+
 	renderer.call_and_clear_triangles();
 
 	renderer.set_active_texture(1);
@@ -378,7 +454,7 @@ void illuminated_rendering(
 	>();
 	
 	if (settings.draw_crosshairs) {
-		cosmos.template for_each_having<components::sentience>(
+		cosm.template for_each_having<components::sentience>(
 			[&](const auto it) {
 				if (const auto s = it.find_crosshair_def()) {
 					auto in = drawing_input.make_input_for<invariants::sprite>();
@@ -407,7 +483,7 @@ void illuminated_rendering(
 
 	draw_particles(particle_layer::ILLUMINATING_PARTICLES);
 
-	visible.for_each<render_layer::ILLUMINATING_WANDERING_PIXELS>(cosmos, [&](const auto e) {
+	visible.for_each<render_layer::ILLUMINATING_WANDERING_PIXELS>(cosm, [&](const auto e) {
 		draw_wandering_pixels_as_sprites(wandering_pixels, e, game_images, drawing_input.make_input_for<invariants::sprite>());
 	});
 
@@ -430,7 +506,7 @@ void illuminated_rendering(
 			visible,
 			output,
 			renderer.get_special_buffer(),
-			cosmos,
+			cosm,
 			viewed_character,
 			interp,
 			global_time_seconds,
@@ -451,7 +527,7 @@ void illuminated_rendering(
 				output,
 				renderer.get_special_buffer(),
 				interp,
-				cosmos,
+				cosm,
 				global_time_seconds,
 				tex,
 				type
@@ -485,7 +561,7 @@ void illuminated_rendering(
 	exploding_rings.draw_rings(
 		output,
 		renderer.specials,
-		cosmos,
+		cosm,
 		cone
 	);
 
@@ -493,10 +569,10 @@ void illuminated_rendering(
 
 	shaders.pure_color_highlight->set_as_current();
 
-	highlights.draw_highlights(cosmos, drawing_input);
+	highlights.draw_highlights(cosm, drawing_input);
 
 	for (const auto& h : additional_highlights) {
-		draw_color_highlight(cosmos[h.id], h.col, drawing_input);
+		draw_color_highlight(cosm[h.id], h.col, drawing_input);
 	}
 
 	thunders.draw_thunders(

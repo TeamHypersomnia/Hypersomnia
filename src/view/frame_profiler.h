@@ -8,6 +8,7 @@ struct frame_profiler : public augs::profiler_mixin<frame_profiler> {
 	augs::time_measurements total;
 	augs::amount_measurements<std::size_t> num_triangles = 1;
 	augs::amount_measurements<std::size_t> light_raycasts = 1;
+	augs::amount_measurements<std::size_t> fog_of_war_raycasts = 1;
 
 	augs::time_measurements rendering_script;
 	augs::time_measurements drawing_layers;
