@@ -15,6 +15,7 @@
 #include "game/messages/changed_identities_message.h"
 #include "game/messages/health_event.h"
 #include "augs/string/format_enum.h"
+#include "game/messages/battle_event_message.h"
 
 using input_type = bomb_mode::input;
 
@@ -1164,6 +1165,33 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 void bomb_mode::mode_post_solve(const input_type in, const mode_entropy& entropy, const const_logic_step step) {
 	(void)entropy;
 	auto& cosm = in.cosm;
+
+	{
+		/* Request to play the battle event sounds */
+		const auto& events = step.get_queue<messages::battle_event_message>();
+
+		for (const auto& e : events) {
+			const auto event = e.event;
+
+			if (const auto subject = cosm[e.subject]) {
+				const auto faction = subject.get_official_faction();
+
+				if (event == battle_event::INTERRUPTED_DEFUSING) {
+					LOG("IOnter");
+					if (const auto sound_id = in.vars.view.event_sounds[faction][battle_event::IM_DEFUSING_THE_BOMB]; sound_id.is_set()) {
+						messages::stop_sound_effect stop;
+						stop.match_effect_id = sound_id;
+						step.post_message(stop);
+					}
+				}
+				else {
+					if (const auto sound_id = in.vars.view.event_sounds[faction][event]; sound_id.is_set()) {
+						play_faction_sound(step, faction, sound_id);
+					}
+				}
+			}
+		}
+	}
 
 	{
 		const auto& events = step.get_queue<messages::health_event>();

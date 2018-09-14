@@ -8,6 +8,7 @@
 #include "game/detail/visible_entities.h"
 #include "game/detail/physics/shape_overlapping.hpp"
 #include "game/detail/bombsite_in_range.h"
+#include "game/messages/battle_event_message.h"
 
 template <class E>
 struct fuse_logic_provider {
@@ -140,6 +141,12 @@ struct fuse_logic_provider {
 	}
 
 	void play_started_defusing_sound() const {
+		messages::battle_event_message msg;
+		msg.subject = character_now_defusing;
+		msg.event = battle_event::IM_DEFUSING_THE_BOMB;
+
+		step.post_message(msg);
+
 		fuse_def.started_defusing_sound.start(
 			step,
 			sound_effect_start_input::fire_and_forget(fused_transform).set_listener(character_now_defusing)
@@ -192,6 +199,11 @@ struct fuse_logic_provider {
 	}
 
 	void interrupt_defusing() const {
+		messages::battle_event_message msg;
+		msg.subject = character_now_defusing;
+		msg.event = battle_event::INTERRUPTED_DEFUSING;
+		step.post_message(msg);
+
 		if (character_now_defusing.alive()) {
 			if (const auto sentience = character_now_defusing.find<components::sentience>()) {
 				auto& u = sentience->use_button;

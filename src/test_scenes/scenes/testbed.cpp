@@ -89,12 +89,14 @@ namespace test_scenes {
 			mt[battle_event::START] = to_sound_id(test_scene_sound_id::MT_START);
 			mt[battle_event::BOMB_PLANTED] = to_sound_id(test_scene_sound_id::MT_BOMB_PLANTED);
 			mt[battle_event::BOMB_DEFUSED] = to_sound_id(test_scene_sound_id::MT_BOMB_DEFUSED);
+			mt[battle_event::IM_DEFUSING_THE_BOMB] = to_sound_id(test_scene_sound_id::RE_SECURING_OBJECTIVE);
 			mt[battle_event::ITS_TOO_LATE_RUN] = to_sound_id(test_scene_sound_id::MT_ITS_TOO_LATE_RUN);
 		}
 
 		{
 			auto& re = vars.view.event_sounds[faction_type::RESISTANCE];
 			re = vars.view.event_sounds[faction_type::METROPOLIS];
+			re[battle_event::BOMB_PLANTED] = to_sound_id(test_scene_sound_id::RE_BOMB_PLANTED);
 		}
 
 		{

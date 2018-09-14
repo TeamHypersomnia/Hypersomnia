@@ -1,5 +1,4 @@
 #pragma once
-#include "game/messages/message.h"
 #include "game/detail/inventory/item_transfer_result.h"
 #include "game/detail/inventory/inventory_slot_id.h"
 
