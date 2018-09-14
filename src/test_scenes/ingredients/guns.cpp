@@ -26,6 +26,7 @@
 #include "test_scenes/test_scene_animations.h"
 #include "test_scenes/ingredients/ingredients.h"
 #include "game/detail/inventory/perform_transfer.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 
 namespace test_flavours {
 	void populate_gun_flavours(const populate_flavours_input in) {
@@ -649,7 +650,7 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("0.2");
+			charge_deposit_def.space_available = to_space_units("0.25");
 			charge_deposit_def.mounting_duration_ms = 500.f;
 
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
@@ -682,7 +683,7 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("0.2");
+			charge_deposit_def.space_available = to_space_units("0.25");
 			charge_deposit_def.mounting_duration_ms = 500.f;
 
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;

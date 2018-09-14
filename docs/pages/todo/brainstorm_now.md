@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- FOV
+	- Stencil buffer
+	- We can even write a fov shader that makes a circle
+
 - Drop items from hotbar on pressing RPM
 
 - Alt + G throws secondary item

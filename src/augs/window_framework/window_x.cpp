@@ -109,6 +109,7 @@ namespace augs {
 					int samp_buf = -1; 
 					int samples = -1;
 					int	depth_size = -1;
+					int	stencil_size = -1;
 
 					GLXFBConfig fb;
 
@@ -123,6 +124,7 @@ namespace augs {
 						glXGetFBConfigAttrib(disp, fb, GLX_SAMPLE_BUFFERS, &samp_buf);
 						glXGetFBConfigAttrib(disp, fb, GLX_SAMPLES       , &samples);
 						glXGetFBConfigAttrib(disp, fb, GLX_DEPTH_SIZE    , &depth_size);
+						glXGetFBConfigAttrib(disp, fb, GLX_STENCIL_SIZE    , &stencil_size);
 					}
 
 					auto make_tup() const {
@@ -138,7 +140,7 @@ namespace augs {
 					}
 
 					void report(const int i) const {
-						LOG("  Matching fbconfig %x, visual ID %h: SAMPLE_BUFFERS = %x, SAMPLES = %x, DEPTH_SIZE = %x\n", i, visual_id, samp_buf, samples, depth_size);
+						LOG("  Matching fbconfig %x, visual ID %h: SAMPLE_BUFFERS = %x, SAMPLES = %x, DEPTH_SIZE = %x, STENCIL_SIZE = %x\n", i, visual_id, samp_buf, samples, depth_size, stencil_size);
 					}
 				};
 
