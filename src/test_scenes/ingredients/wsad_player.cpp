@@ -140,6 +140,14 @@ namespace test_flavours {
 
 				{
 					inventory_slot slot_def;
+					slot_def.category_allowed = item_category::SHOULDER_WEARABLE;
+					slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY;
+					slot_def.always_allow_exactly_one_item = true;
+					container.slots[slot_function::SHOULDER] = slot_def;
+				}
+
+				{
+					inventory_slot slot_def;
 					slot_def.category_allowed = item_category::PERSONAL_DEPOSIT_WEARABLE;
 					slot_def.physical_behaviour = slot_physical_behaviour::DEACTIVATE_BODIES;
 					slot_def.always_allow_exactly_one_item = true;
@@ -233,8 +241,14 @@ namespace test_flavours {
 				torso_def.stances[item_holding_stance::RIFLE_LIKE].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_RIFLE_WALK);
 				torso_def.stances[item_holding_stance::RIFLE_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_RIFLE_SHOT);
 
-				torso_def.stances[item_holding_stance::PISTOL_LIKE].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_PISTOL_WALK);
-				torso_def.stances[item_holding_stance::PISTOL_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_PISTOL_SHOT);
+				{
+					auto& pistol_like = torso_def.stances[item_holding_stance::PISTOL_LIKE];
+
+					pistol_like.carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_PISTOL_WALK);
+					pistol_like.shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_PISTOL_SHOT);
+					pistol_like.pocket_to_mag = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_PISTOL_PTM);
+					pistol_like.grip_to_mag = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_PISTOL_GTM);
+				}
 
 				torso_def.stances[item_holding_stance::HEAVY_LIKE].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_HEAVY_WALK);
 				torso_def.stances[item_holding_stance::HEAVY_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_HEAVY_SHOT);

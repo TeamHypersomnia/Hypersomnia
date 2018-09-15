@@ -104,6 +104,7 @@ auto calc_reloading_context(const E& capability) {
 
 			const auto traversed_slots = slot_flags {
 				slot_function::BACK,
+				slot_function::SHOULDER,
 				slot_function::PRIMARY_HAND,
 				slot_function::SECONDARY_HAND,
 				slot_function::ITEM_DEPOSIT,
@@ -227,7 +228,7 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 			}
 		}
 
-		const bool result = [&]() {
+		const bool context_advanced_successfully = [&]() {
 			if (const auto concerned_slot = cosm[ctx.concerned_slot]) {
 				{
 					const auto new_context = calc_reloading_context(it);
@@ -361,7 +362,7 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 			return false;
 		}();
 
-		if (!result) {
+		if (!context_advanced_successfully) {
 			ctx = {};
 		}
 	});

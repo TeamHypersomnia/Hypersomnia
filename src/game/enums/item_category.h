@@ -14,6 +14,7 @@ enum class item_category {
 	MAGAZINE,
 	SHOT_CHARGE,
 	ROCKET,
+	SHOULDER_WEARABLE,
 
 	COUNT
 	// END GEN INTROSPECTOR

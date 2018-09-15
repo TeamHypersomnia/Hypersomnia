@@ -75,6 +75,10 @@ entity_name_str get_bbcoded_slot_function_name(const slot_function f) {
 		return{
 			"Back",
 		};
+	case slot_function::SHOULDER:
+		return{
+			"Shoulder",
+		};
 	case slot_function::BELT:
 		return{
 			"Belt",
@@ -124,6 +128,10 @@ entity_name_str get_bbcoded_slot_function_description(const slot_function f) {
 	case slot_function::BACK:
 		return{
 			"For backpacks."
+		};
+	case slot_function::SHOULDER:
+		return{
+			"For knives."
 		};
 	case slot_function::BELT:
 		return{

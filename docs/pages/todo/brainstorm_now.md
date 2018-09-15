@@ -6,6 +6,20 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Reloading animation sequence
+	- Logical order
+		- Start unmounting mag
+		- After delay: 3 transfers at the same time
+			- Hide old
+			- Pull out new
+			- Start mounting new
+		- Problem: The mag, once unmounted, gets hidden instantaneously
+			- On the other hand, it would be nice to synchronize the end of unmounting with audio feedback for successul removal of the magazine
+	- Effect order:
+		- Start unmounting mag. Initiate unload animation.
+		- Until mag successfully unmounted, play last two animation frames (done on the animation level).
+		- Initiate load animation
+
 - Drop items from hotbar on pressing RPM
 
 - Alt + G throws secondary item

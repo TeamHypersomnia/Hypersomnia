@@ -6,6 +6,7 @@
 #include "game/assets/all_logical_assets.h"
 
 #include "view/get_asset_pool.h"
+#include "augs/misc/randomization.h"
 
 #include "test_scenes/test_enum_to_path.h"
 #include "test_scenes/test_scene_images.h"
@@ -166,6 +167,65 @@ void load_test_scene_animations(
 			make_torso(test_id, first_frame_id, 30.0f);
 		};
 
+		auto rng = randomization(1);
+
+		auto pistol_ptm = [&](const T test_id, const I first_frame_id) {
+			auto& anim = make_torso(test_id, first_frame_id, 50.0f);
+
+			while (anim.frames.size() < anim.frames.max_size()) {
+				auto push_if = [&](const auto n, const auto dur) {
+					if (anim.frames.size() == anim.frames.max_size()) {
+						return false;
+					}
+
+					anim.frames.push_back(anim.frames[n]);
+					anim.frames.back().duration_milliseconds = dur;
+					return true;
+				};
+
+				const auto prev_n =  anim.frames.size();
+
+				std::vector<std::size_t> new_frames = { prev_n - 2, prev_n - 1 };
+				shuffle_range(new_frames, rng.generator);
+
+				for (std::size_t i = 0; i < new_frames.size(); ++i) {
+					if (!push_if(new_frames[i], 40.f + i * 20)) {
+						break;
+					}
+				}
+			}
+
+			anim.frames.erase(anim.frames.begin());
+			anim.frames.erase(anim.frames.begin());
+		};
+
+		auto pistol_gtm = [&](const T test_id, const I first_frame_id) {
+			auto& anim = make_torso(test_id, first_frame_id, 50.0f);
+
+			while (anim.frames.size() < anim.frames.max_size()) {
+				auto push_if = [&](const auto n, const auto dur) {
+					if (anim.frames.size() == anim.frames.max_size()) {
+						return false;
+					}
+
+					anim.frames.push_back(anim.frames[n]);
+					anim.frames.back().duration_milliseconds = dur;
+					return true;
+				};
+
+				const auto prev_n =  anim.frames.size();
+
+				std::vector<std::size_t> new_frames = { prev_n - 2, prev_n - 1 };
+				shuffle_range(new_frames, rng.generator);
+
+				for (std::size_t i = 0; i < new_frames.size(); ++i) {
+					if (!push_if(new_frames[i], 40.f + i * 20)) {
+						break;
+					}
+				}
+			}
+		};
+
 		auto standard_shoot = [&](const T test_id, const I first_frame_id) {
 			auto& anim = make_torso(test_id, first_frame_id, 20.0f);
 			make_shoot_durations(anim.frames);
@@ -257,6 +317,16 @@ void load_test_scene_animations(
 			standard_shoot(
 				T::RESISTANCE_TORSO_PISTOL_SHOT,
 				I::RESISTANCE_TORSO_PISTOL_SHOT_1
+			);
+
+			pistol_ptm(
+				T::RESISTANCE_TORSO_PISTOL_PTM,
+				I::RESISTANCE_TORSO_PISTOL_PTM_1
+			);
+
+			pistol_gtm(
+				T::RESISTANCE_TORSO_PISTOL_GTM,
+				I::RESISTANCE_TORSO_PISTOL_PTM_1
 			);
 
 			standard_shoot(

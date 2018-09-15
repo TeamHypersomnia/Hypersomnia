@@ -31,6 +31,7 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find
 		if (o == slot_finding_opt::CHECK_WEARABLES) {
 			check_slot(searched_root_container[slot_function::BELT]);
 			check_slot(searched_root_container[slot_function::BACK]);
+			check_slot(searched_root_container[slot_function::SHOULDER]);
 			check_slot(searched_root_container[slot_function::TORSO_ARMOR]);
 			check_slot(searched_root_container[slot_function::HAT]);
 			check_slot(searched_root_container[slot_function::PERSONAL_DEPOSIT]);

@@ -77,6 +77,7 @@ void generate_equipment(const requested_equipment& eq, const E& character, const
 	make_wearable(eq.backpack, slot_function::BACK);
 	make_wearable(eq.belt_wearable, slot_function::BELT);
 	make_wearable(eq.personal_deposit_wearable, slot_function::PERSONAL_DEPOSIT);
+	make_wearable(eq.shoulder_wearable, slot_function::SHOULDER);
 
 	for (const auto& it : eq.other_equipment) {
 		auto n = it.first;

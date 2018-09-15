@@ -93,6 +93,14 @@ struct stance_frame_usage {
 		return stance_frame_usage<T> { std::addressof(f.frame), f.flip, false };
 	}
 
+	static auto grip_to_mag(const frame_type_t<T>& f) {
+		return stance_frame_usage<T> { std::addressof(f), flip_flags(), false };
+	}
+
+	static auto pocket_to_mag(const frame_type_t<T>& f) {
+		return stance_frame_usage<T> { std::addressof(f), flip_flags(), false };
+	}
+
 	static auto shoot(const frame_type_t<T>& f) {
 		return stance_frame_usage<T> { std::addressof(f), flip_flags(), true };
 	}
@@ -114,11 +122,12 @@ struct stance_frame_usage {
 	}
 };
 
-template <class C, class T>
+template <class C, class E, class T>
 auto calc_stance_usage(
 	const C& cosm,
 	const stance_animations& stance,
 	const movement_animation_state& anim_state, 
+	const E& capability,
 	const T& wielded_items
 ) {
 	using result_t = stance_frame_usage<const torso_animation>;
@@ -127,9 +136,41 @@ auto calc_stance_usage(
 
 	const auto n = wielded_items.size();
 
-	if (const auto shoot_animation = logicals.find(stance.shoot)) {
-		/* Determine whether we want a carrying or a shooting animation */
-		if (n > 0) {
+	if (n > 0) {
+		if (const auto transfers = capability.template find<components::item_slot_transfers>()) {
+			const auto& ctx = transfers->current_reloading_context;
+
+			if (const auto concerned_slot = cosm[ctx.concerned_slot]) {
+				if (n == 1) {
+					/* Reloading exists, but holds only one item. Play unmounting progress of the old ammo source. */
+					if (const auto gtm_animation = logicals.find(stance.grip_to_mag)) {
+						if (const auto old_source = cosm[ctx.old_ammo_source]) {
+							if (const auto progress = old_source.find_mounting_progress()) {
+								if (const auto found_frame = ::calc_current_frame(*gtm_animation, progress->progress_ms)) {
+									return result_t::grip_to_mag(*found_frame);
+								}
+							}
+						}
+					}
+				}
+
+				if (n == 2) {
+					if (const auto ptm_animation = logicals.find(stance.pocket_to_mag)) {
+						/* Reloading exists and holds two items. Play mounting progress of the new ammo source. */
+						if (const auto new_source = cosm[ctx.new_ammo_source]) {
+							if (const auto progress = new_source.find_mounting_progress()) {
+								if (const auto found_frame = ::calc_current_frame(*ptm_animation, progress->progress_ms)) {
+									return result_t::pocket_to_mag(*found_frame);
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+
+		if (const auto shoot_animation = logicals.find(stance.shoot)) {
+			/* Determine whether we want a carrying or a shooting animation */
 			if (const auto gun = cosm[wielded_items[0]].template find<components::gun>()) {
 				const auto frame = ::find_shoot_frame(*gun, *shoot_animation, cosm);
 				const auto second_frame = [n, &cosm, shoot_animation, &wielded_items]() -> decltype(frame) {
@@ -141,12 +182,12 @@ auto calc_stance_usage(
 
 					return nullptr;
 				}();
-				
+
 				if (frame && second_frame) {
 					if (frame < second_frame) {
 						return result_t::shoot(*frame);
 					}
-					
+
 					return result_t::shoot_flipped(*second_frame);
 				}
 
@@ -161,8 +202,8 @@ auto calc_stance_usage(
 		}
 	}
 
-	if (const auto chambering_animation = logicals.find(stance.get_chambering())) {
-		if (n == 1) {
+	if (n == 1) {
+		if (const auto chambering_animation = logicals.find(stance.get_chambering())) {
 			if (const auto gun = cosm[wielded_items[0]].template find<components::gun>()) {
 				const auto frame = ::find_chambering_frame(*gun, *chambering_animation);
 

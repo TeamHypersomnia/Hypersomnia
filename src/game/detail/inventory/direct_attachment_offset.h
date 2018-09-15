@@ -5,6 +5,7 @@
 #include "game/components/gun_component.h"
 #include "game/detail/gun/gun_math.h"
 #include "game/assets/image_offsets.h"
+#include "game/components/torso_component.hpp"
 
 inline transformr get_anchored_offset(
 	const transformi attachment_offset,
@@ -138,7 +139,7 @@ transformr direct_attachment_offset(
 
 	auto get_offsets_by_torso = [&]() {
 		if (const auto* const torso = container.template find<invariants::torso>()) {
-			const auto& stance = torso->calc_stance(cosm, container.get_wielded_items());
+			const auto& stance = torso->calc_stance(container, container.get_wielded_items());
 
 			if (const auto* const anim = logicals.find(stance.carry)) {
 				return logicals.get_offsets(anim->frames[0].image_id).torso;

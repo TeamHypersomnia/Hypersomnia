@@ -8,40 +8,13 @@ struct stance_animations {
 	// GEN INTROSPECTOR struct stance_animations
 	assets::torso_animation_id carry;
 	assets::torso_animation_id shoot;
+
+	assets::torso_animation_id grip_to_mag;
+	assets::torso_animation_id pocket_to_mag;
 	// END GEN INTROSPECTORS
 
 	const assets::torso_animation_id& get_chambering() const;
-	const assets::torso_animation_id& get_reloading() const;
 };
-
-template <class C>
-auto calc_stance_id(
-	const C& cosm,
-	const augs::constant_size_vector<entity_id, 2>& wielded_items
-) {
-	const auto n = wielded_items.size();
-
-	if (n == 0) {
-		return item_holding_stance::BARE_LIKE;
-	}
-
-	auto stance_of = [&](const auto i) {
-		const auto w = cosm[wielded_items[i]];
-		return w.template get<invariants::item>().holding_stance;
-	};
-
-	if (n == 2) {
-		if (stance_of(0) == item_holding_stance::BARE_LIKE
-			&& stance_of(1) == item_holding_stance::BARE_LIKE
-		) {
-			return item_holding_stance::BARE_LIKE;
-		}
-
-		return item_holding_stance::AKIMBO;
-	}
-
-	return stance_of(0);
-}
 
 namespace invariants {
 	struct torso {
@@ -63,9 +36,7 @@ namespace invariants {
 		) const; 
 
 		template <class... Args>
-		const auto& calc_stance(Args&&... args) const {
-			return stances[::calc_stance_id(std::forward<Args>(args)...)];
-		}
+		const stance_animations& calc_stance(Args&&... args) const;
 	};
 }
 

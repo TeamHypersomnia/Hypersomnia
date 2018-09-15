@@ -11,11 +11,54 @@ inline const assets::torso_animation_id& stance_animations::get_chambering() con
 	return shoot;
 }
 
-inline const assets::torso_animation_id& stance_animations::get_reloading() const {
-	return shoot;
+template <class E>
+auto calc_stance_id(
+	const E& typed_entity,
+	const augs::constant_size_vector<entity_id, 2>& wielded_items
+) {
+	const auto& cosm = typed_entity.get_cosmos();
+	const auto n = wielded_items.size();
+
+	if (n == 0) {
+		return item_holding_stance::BARE_LIKE;
+	}
+
+	auto stance_of = [&](const auto i) {
+		const auto w = cosm[wielded_items[i]];
+		return w.template get<invariants::item>().holding_stance;
+	};
+
+	if (n == 2) {
+		if (stance_of(0) == item_holding_stance::BARE_LIKE
+			&& stance_of(1) == item_holding_stance::BARE_LIKE
+		) {
+			return item_holding_stance::BARE_LIKE;
+		}
+
+		if (const auto transfers = typed_entity.template find<components::item_slot_transfers>()) {
+			if (cosm[transfers->current_reloading_context.concerned_slot]) {
+				if (const auto s0 = stance_of(0); s0 != item_holding_stance::BARE_LIKE) {
+					return s0;
+				}
+
+				if (const auto s1 = stance_of(1); s1 != item_holding_stance::BARE_LIKE) {
+					return s1;
+				}
+			}
+		}
+
+		return item_holding_stance::AKIMBO;
+	}
+
+	return stance_of(0);
 }
 
 namespace invariants {
+	template <class... Args>
+	const stance_animations& torso::calc_stance(Args&&... args) const {
+		return stances[::calc_stance_id(std::forward<Args>(args)...)];
+	}
+
 	inline auto torso::calc_leg_anim(
 		vec2 legs_dir,
 		const real32 face_degrees

@@ -9,6 +9,7 @@ struct torso_offsets {
 	transformi back;
 	transformi head;
 	transformi legs;
+	transformi shoulder;
 	real32 strafe_facing_offset = 0.f;
 	// END GEN INTROSPECTOR
 
