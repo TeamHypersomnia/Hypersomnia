@@ -557,18 +557,20 @@ void illuminated_rendering(
 	>();
 	
 	if (settings.draw_crosshairs) {
-		cosm.template for_each_having<components::sentience>(
-			[&](const auto it) {
-				if (const auto s = it.find_crosshair_def()) {
-					auto in = drawing_input.make_input_for<invariants::sprite>();
-					
-					in.global_time_seconds = global_time_seconds;
-					in.renderable_transform = it.get_world_crosshair_transform(interp);
+		auto draw_crosshair = [&](const auto it) {
+			if (const auto s = it.find_crosshair_def()) {
+				auto in = drawing_input.make_input_for<invariants::sprite>();
 
-					augs::draw(s->appearance, game_images, in);
-				}
+				in.global_time_seconds = global_time_seconds;
+				in.renderable_transform = it.get_world_crosshair_transform(interp);
+
+				augs::draw(s->appearance, game_images, in);
 			}
-		);
+		};
+
+		if (viewed_character) {
+			draw_crosshair(viewed_character);
+		}
 	}
 	
 	if (settings.draw_weapon_laser && viewed_character.alive()) {
