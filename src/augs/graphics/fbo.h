@@ -2,11 +2,19 @@
 #include "augs/math/vec2.h"
 #include "augs/templates/settable_as_current_mixin.h"
 #include "augs/graphics/texture.h"
+#include "augs/misc/enum/enum_boolset.h"
 
 using GLuint = unsigned int;
 
 namespace augs {
 	namespace graphics {
+		enum class fbo_opt {
+			WITH_STENCIL,
+			COUNT
+		};
+
+		using fbo_opts = enum_boolset<fbo_opt>;
+
 		class fbo : public settable_as_current_mixin<const fbo> {
 			bool created = false;
 			GLuint id = 0xdeadbeef;
@@ -22,7 +30,7 @@ namespace augs {
 
 			void destroy();
 		public:
-			fbo(const vec2u size);
+			fbo(const vec2u size, const fbo_opts&);
 			~fbo();
 
 			fbo(fbo&&);

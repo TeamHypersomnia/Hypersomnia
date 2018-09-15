@@ -29,15 +29,15 @@ void all_necessary_fbos::apply(
 		return;
 	}
 
-	auto reset = [screen_size](auto& fbo) {
+	auto reset = [screen_size](auto& fbo, auto... args) {
 		if (!fbo || fbo->get_size() != static_cast<vec2u>(screen_size)) {
-			fbo.emplace(screen_size);
+			fbo.emplace(screen_size, augs::graphics::fbo_opts { args... });
 		}
 	};
 
 	reset(illuminating_smoke);
 	reset(smoke);
-	reset(light);
+	reset(light, augs::graphics::fbo_opt::WITH_STENCIL);
 }
 
 all_necessary_shaders::all_necessary_shaders(

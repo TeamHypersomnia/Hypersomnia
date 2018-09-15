@@ -4,14 +4,16 @@
 
 namespace augs {
 	namespace graphics {
-		fbo::fbo(const vec2u size) : size(size), tex(size) {
+		fbo::fbo(const vec2u size, const fbo_opts& opts) : size(size), tex(size) {
 			GL_CHECK(glGenFramebuffers(1, &id));
 			created = true;
 			
 #if BUILD_STENCIL_BUFFER
-			GL_CHECK(glGenRenderbuffers(1, &stencil_id));
-			GL_CHECK(glBindRenderbuffer(GL_RENDERBUFFER, stencil_id));
-			GL_CHECK(glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8, size.x, size.y));
+			if (opts.test(fbo_opt::WITH_STENCIL)) {
+				GL_CHECK(glGenRenderbuffers(1, &stencil_id));
+				GL_CHECK(glBindRenderbuffer(GL_RENDERBUFFER, stencil_id));
+				GL_CHECK(glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8, size.x, size.y));
+			}
 #endif
 
 			set_as_current();
@@ -25,7 +27,9 @@ namespace augs {
 			));
 
 #if BUILD_STENCIL_BUFFER
-			GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, stencil_id));
+			if (opts.test(fbo_opt::WITH_STENCIL)) {
+				GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, stencil_id));
+			}
 #endif
 
 #if BUILD_STENCIL_BUFFER
