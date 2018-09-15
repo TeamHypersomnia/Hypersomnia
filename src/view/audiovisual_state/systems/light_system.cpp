@@ -42,10 +42,10 @@ void light_system::clear() {
 
 void light_system::advance_attenuation_variations(
 	randomization& rng,
-	const cosmos& cosmos,
+	const cosmos& cosm,
 	const augs::delta dt
 ) {
-	cosmos.for_each_having<components::light>(
+	cosm.for_each_having<components::light>(
 		[&](const auto it) {
 			const auto& light = it.template get<invariants::light>();
 			auto& cache = per_entity_cache[it];
@@ -99,15 +99,15 @@ void light_system::render_all_lights(const light_system_input in) const {
 	const auto& light_shader = in.light_shader;
 	const auto& standard_shader = in.standard_shader;
 
-	const auto& cosmos = in.cosm;
+	const auto& cosm = in.cosm;
 
-	auto light_raycasts_scope = cosmos.measure_raycasts(performance.light_raycasts);
+	auto light_raycasts_scope = cosm.measure_raycasts(performance.light_raycasts);
 
 	ensure_eq(0, renderer.get_triangle_count());
 
 	in.light_fbo.set_as_current();
 	
-	renderer.set_clear_color(cosmos.get_common_significant().ambient_light_color);
+	renderer.set_clear_color(cosm.get_common_significant().ambient_light_color);
 	renderer.clear_current_fbo();
 	renderer.set_clear_color({ 0, 0, 0, 0 });
 
@@ -122,7 +122,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	
 	const auto helper = helper_drawer {
 		in.visible,
-		cosmos,
+		cosm,
 		drawing_in,
 		in.total_layer_scope
 	};
@@ -146,7 +146,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	{
 		auto scope = measure_scope(performance.light_visibility);
 
-		cosmos.for_each_having<components::light>(
+		cosm.for_each_having<components::light>(
 			[&](const auto light_entity) {
 				const auto light_transform = light_entity.get_viewing_transform(interp);
 				const auto& light_def = light_entity.template get<invariants::light>();
@@ -177,7 +177,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 			}
 		);
 
-		visibility_system(DEBUG_FRAME_LINES).calc_visibility(cosmos, requests, responses);
+		visibility_system(DEBUG_FRAME_LINES).calc_visibility(cosm, requests, responses);
 	}
 
 	auto scope = measure_scope(performance.light_rendering);
@@ -189,7 +189,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	for (size_t i = 0; i < responses.size(); ++i) {
 		const auto& r = responses[i];
-		const auto& light_entity = cosmos[requests[i].subject];
+		const auto& light_entity = cosm[requests[i].subject];
 		const auto& light = light_entity.get<components::light>();
 		const auto& light_def = light_entity.get<invariants::light>();
 		const auto world_light_pos = requests[i].eye_transform.pos;
@@ -307,8 +307,40 @@ void light_system::render_all_lights(const light_system_input in) const {
 		render_layer::OVER_DYNAMIC_BODY,
 		render_layer::GLASS_BODY,
 		render_layer::SMALL_DYNAMIC_BODY,
-		render_layer::OVER_SMALL_DYNAMIC_BODY,
-		render_layer::SENTIENCES,
+		render_layer::OVER_SMALL_DYNAMIC_BODY
+	>();
+
+#if BUILD_STENCIL_BUFFER
+	if (const auto fog_of_war_character = cosm[in.fog_of_war_character ? *in.fog_of_war_character : entity_id()]) {
+		renderer.call_and_clear_triangles();
+		in.fill_stencil();
+		renderer.stencil_positive_test();
+		standard_shader.set_as_current();
+
+		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
+			if (handle.get_official_faction() != fog_of_war_character.get_official_faction()) {
+				::draw_neon_map(handle, drawing_in);
+			}
+		});
+
+		renderer.call_and_clear_triangles();
+
+		renderer.disable_stencil();
+
+		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
+			if (handle.get_official_faction() == fog_of_war_character.get_official_faction()) {
+				::draw_neon_map(handle, drawing_in);
+			}
+		});
+	}
+	else {
+		helper.draw_neons<render_layer::SENTIENCES>();
+	}
+#else
+	helper.draw_neons<render_layer::SENTIENCES>();
+#endif
+
+	helper.draw_neons<
 		render_layer::FLYING_BULLETS,
 		render_layer::WATER_COLOR_OVERLAYS,
 		render_layer::WATER_SURFACES,
@@ -334,8 +366,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	in.neon_callback();
 
-	renderer.call_triangles();
-	renderer.clear_triangles();
+	renderer.call_and_clear_triangles();
 
 	renderer.set_standard_blending();
 

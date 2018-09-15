@@ -38,6 +38,7 @@ struct light_system_input {
 	const augs::graphics::shader_program& light_shader;
 	const augs::graphics::shader_program& standard_shader;
 	std::function<void()> neon_callback;
+	std::function<void()> fill_stencil;
 	const camera_cone cone;
 	std::optional<entity_id> fog_of_war_character;
 	const float camera_query_mult;

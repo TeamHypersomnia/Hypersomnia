@@ -163,31 +163,41 @@ void illuminated_rendering(
 		&& settings.fog_of_war
 	;
 
-	if (fog_of_war_effective) {
-		renderer.call_and_clear_triangles();
+#if BUILD_STENCIL_BUFFER
+	const auto viewed_visibility = [&]() {
+		if (fog_of_war_effective) {
+			auto fow_raycasts_scope = cosm.measure_raycasts(profiler.fog_of_war_raycasts);
 
-		renderer.set_clear_color(rgba(0, 0, 0, 0));
-		renderer.enable_stencil();
-		renderer.start_writing_stencil();
-		renderer.clear_stencil();
+			messages::visibility_information_request request;
+			request.eye_transform = *viewed_character_transform;
+			request.filter = filters::pathfinding_query();
+			request.square_side = std::max(screen_size.x, screen_size.y) * 2;
+			request.subject = viewed_character;
 
-		auto fow_raycasts_scope = cosm.measure_raycasts(profiler.fog_of_war_raycasts);
+			auto responses = visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(
+				cosm,
+				{ request }
+			);
 
-		messages::visibility_information_request request;
-		request.eye_transform = *viewed_character_transform;
-		request.filter = filters::pathfinding_query();
-		request.square_side = std::max(screen_size.x, screen_size.y) * 2;
-		request.subject = viewed_character;
+			const bool was_visibility_calculated = responses.size() == 1 && !responses.back().empty();
 
-		const auto responses = visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(
-			cosm,
-			{ request }
-		);
+			if (was_visibility_calculated) {
+				return responses;
+			}
+		}
 
-		const bool was_visibility_calculated = responses.size() == 1 && !responses.back().empty();
+		return visibility_responses();
+	}();
 
-		if (was_visibility_calculated) {
-			const auto& r = responses.back();
+	auto fill_stencil = [&]() {
+		if (viewed_visibility.size() > 0) {
+			renderer.enable_stencil();
+
+			renderer.start_writing_stencil();
+			renderer.set_clear_color(rgba(0, 0, 0, 0));
+			renderer.clear_stencil();
+
+			const auto& r = viewed_visibility.back();
 
 			for (std::size_t t = 0; t < r.get_num_triangles(); ++t) {
 				const auto world_light_tri = r.get_world_triangle(t, viewed_character_transform->pos);
@@ -207,11 +217,20 @@ void illuminated_rendering(
 			set_shader_with_matrix(shaders.pure_color_highlight);
 
 			renderer.call_and_clear_triangles();
+			renderer.start_testing_stencil();
 		}
+	};
 
-		renderer.start_testing_stencil();
+	if (fog_of_war_effective) {
+		renderer.call_and_clear_triangles();
+		fill_stencil();
 		renderer.disable_stencil();
 	}
+#else
+	auto fill_stencil = [&]() {
+
+	};
+#endif
 
 	light.render_all_lights({
 		renderer,
@@ -286,6 +305,7 @@ void illuminated_rendering(
 				cone
 			);
 		},
+		fill_stencil,
 		cone,
 		fog_of_war_effective ? viewed_character : std::optional<entity_id>(),
 		in.camera_query_mult,
@@ -357,6 +377,7 @@ void illuminated_rendering(
 		return result;
 	};
 
+#if BUILD_STENCIL_BUFFER
 	if (fog_of_war_effective) {
 		renderer.call_and_clear_triangles();
 
@@ -381,6 +402,9 @@ void illuminated_rendering(
 	else {
 		helper.draw_border<render_layer::SENTIENCES>(standard_border_provider);
 	}
+#else
+	helper.draw_border<render_layer::SENTIENCES>(standard_border_provider);
+#endif
 
 	renderer.call_and_clear_triangles();
 
@@ -444,6 +468,7 @@ void illuminated_rendering(
 	>();
 	
 
+#if BUILD_STENCIL_BUFFER
 	if (fog_of_war_effective) {
 		renderer.call_and_clear_triangles();
 
@@ -477,6 +502,9 @@ void illuminated_rendering(
 	else {
 		helper.draw<render_layer::SENTIENCES>();
 	}
+#else
+	helper.draw<render_layer::SENTIENCES>();
+#endif
 
 	renderer.call_and_clear_triangles();
 

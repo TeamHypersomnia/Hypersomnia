@@ -8,6 +8,12 @@ namespace augs {
 			GL_CHECK(glGenFramebuffers(1, &id));
 			created = true;
 			
+#if BUILD_STENCIL_BUFFER
+			GL_CHECK(glGenRenderbuffers(1, &stencil_id));
+			GL_CHECK(glBindRenderbuffer(GL_RENDERBUFFER, stencil_id));
+			GL_CHECK(glRenderbufferStorage(GL_RENDERBUFFER, GL_STENCIL_INDEX8, size.x, size.y));
+#endif
+
 			set_as_current();
 
 			GL_CHECK(glFramebufferTexture2D(
@@ -18,7 +24,11 @@ namespace augs {
 				0
 			));
 
-#if BUILD_OPENGL
+#if BUILD_STENCIL_BUFFER
+			GL_CHECK(glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_STENCIL_ATTACHMENT, GL_RENDERBUFFER, stencil_id));
+#endif
+
+#if BUILD_STENCIL_BUFFER
 			// check FBO status
 
 			GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -35,6 +45,7 @@ namespace augs {
 			settable_as_current_base(static_cast<settable_as_current_base&&>(b)),
 			created(b.created),
 			id(b.id),
+			stencil_id(b.stencil_id),
 			size(b.size),
 			tex(std::move(b.tex))
 		{
@@ -48,6 +59,7 @@ namespace augs {
 
 			size = b.size;
 			id = b.id;
+			stencil_id = b.stencil_id;
 			created = b.created;
 			tex = std::move(b.tex);
 
@@ -68,6 +80,9 @@ namespace augs {
 		void fbo::destroy() {
 			if (created) {
 				GL_CHECK(glDeleteFramebuffers(1, &id));
+#if BUILD_STENCIL_BUFFER
+				GL_CHECK(glDeleteRenderbuffers(1, &stencil_id));
+#endif
 				created = false;
 			}
 		}

@@ -10,6 +10,7 @@ namespace augs {
 		class fbo : public settable_as_current_mixin<const fbo> {
 			bool created = false;
 			GLuint id = 0xdeadbeef;
+			GLuint stencil_id = 0xdeadbeef;
 			vec2u size;
 			texture tex;
 
