@@ -160,7 +160,7 @@ void illuminated_rendering(
 
 	const bool fog_of_war_effective = 
 		viewed_character_transform != std::nullopt 
-		&& settings.fog_of_war
+		&& settings.fog_of_war.enabled
 	;
 
 #if BUILD_STENCIL_BUFFER
@@ -215,7 +215,7 @@ void illuminated_rendering(
 				renderer.push_triangle(renderable_light_tri);
 			}
 
-			const auto& angle = settings.fog_of_war_angle;
+			const auto& angle = settings.fog_of_war.angle;
 
 			if (angle >= 360.f) {
 				set_shader_with_matrix(shaders.pure_color_highlight);
@@ -500,10 +500,16 @@ void illuminated_rendering(
 		renderer.call_and_clear_triangles();
 
 		renderer.enable_stencil();
-		renderer.stencil_reverse_test();
+		if (settings.fog_of_war.overlay_color_on_visible) {
+			renderer.stencil_positive_test();
+		}
+		else {
+			renderer.stencil_reverse_test();
+		}
+
 		shaders.pure_color_highlight->set_as_current();
 		shaders.pure_color_highlight->set_projection(augs::orthographic_projection(vec2(screen_size)));
-		output.color_overlay(screen_size, settings.fog_of_war_color);
+		output.color_overlay(screen_size, settings.fog_of_war.overlay_color);
 		renderer.call_and_clear_triangles();
 		shaders.pure_color_highlight->set_projection(matrix);
 

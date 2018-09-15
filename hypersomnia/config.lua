@@ -58,9 +58,12 @@ return {
     draw_crosshairs = true,
     draw_weapon_laser = true,
 	enabled_draw_area_markers = 0.85,
-	fog_of_war_color = "0 0 0 30",
-	fog_of_war = true,
-	fog_of_war_angle = 150,
+	fog_of_war = {
+	  overlay_color_on_visible = true,
+	  overlay_color = "255 255 255 2",
+	  enabled = true,
+	  angle = 150
+	},
 	draw_enemy_hud = false
   },
   editor = {

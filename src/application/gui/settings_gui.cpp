@@ -299,8 +299,11 @@ void settings_gui_state::perform(
 					revertable_slider("Alpha", config.drawing.draw_area_markers.value, 0.f, 1.f);
 				}
 
-				auto& scope_cfg = config.drawing;
-				revertable_color_edit(SCOPE_CFG_NVP(fog_of_war_color));
+				if (auto node = scoped_tree_node("Fog of war")) {
+					auto& scope_cfg = config.drawing.fog_of_war;
+					revertable_checkbox(SCOPE_CFG_NVP(overlay_color_on_visible));
+					revertable_color_edit(SCOPE_CFG_NVP(overlay_color));
+				}
 
 				// revertable_checkbox("Draw gameplay GUI", config.drawing.draw_character_gui); revert(config.drawing.draw_character_gui);
 				break;
