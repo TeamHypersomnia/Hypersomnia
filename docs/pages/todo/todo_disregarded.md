@@ -5,6 +5,16 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- Automatically reload only after shooting and when an unloaded gun is wielded while there is no other thing in hands
+	- For now, players won't really care about removing magazines by hand
+		- We disregard it since it would make automatic reloading a lot harder
+			- Actually just pickup of new item
+			- And shot
+			- And wielding of unloaded weapon exclusively
+			- After chambering as well
+		- It takes too much time to have any meaning really
+			- Well maybe if they wanted to drop it for someone?
+
 - Old thoughts about atlas
 	- Remove atlas saving for now.
 	- Separation

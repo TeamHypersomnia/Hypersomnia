@@ -1471,3 +1471,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - Determinism: Fix pending mounts to have deterministic iteration order
 	- E.g. make it a map and iterate by entity GUID
 
+- FOV
+	- Stencil buffer
+	- We can even write a fov shader that makes a circle
+

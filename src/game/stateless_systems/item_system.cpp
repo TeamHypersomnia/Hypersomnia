@@ -253,6 +253,13 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 					}
 					else {
 						RLD_LOG("Could not find holster for the redundant item. Leaving it in hands.");
+
+						const auto drop_redundant_item = item_slot_transfer_request::drop(redundant_item);
+
+						if (transfer(drop_redundant_item)) {
+							RLD_LOG("Dropped redundant item.");
+							return true;
+						}
 					}
 
 					return false;
