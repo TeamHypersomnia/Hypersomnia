@@ -197,10 +197,11 @@ void illuminated_rendering(
 			renderer.set_clear_color(rgba(0, 0, 0, 0));
 			renderer.clear_stencil();
 
+			const auto eye_pos = viewed_character_transform->pos;
 			const auto& r = viewed_visibility.back();
 
 			for (std::size_t t = 0; t < r.get_num_triangles(); ++t) {
-				const auto world_light_tri = r.get_world_triangle(t, viewed_character_transform->pos);
+				const auto world_light_tri = r.get_world_triangle(t, eye_pos);
 				augs::vertex_triangle renderable_light_tri;
 
 				renderable_light_tri.vertices[0].pos = world_light_tri[0];
@@ -214,7 +215,33 @@ void illuminated_rendering(
 				renderer.push_triangle(renderable_light_tri);
 			}
 
-			set_shader_with_matrix(shaders.pure_color_highlight);
+			const auto& angle = settings.fog_of_war_angle;
+
+			if (angle >= 360.f) {
+				set_shader_with_matrix(shaders.pure_color_highlight);
+			}
+			else {
+				set_shader_with_matrix(shaders.fog_of_war);
+
+				auto dir = viewed_character.calc_crosshair_displacement();
+
+				if (dir.is_zero()) {
+					dir.set(1, 0);
+				}
+
+				const auto left_dir = vec2(dir).rotate(-angle / 2).neg_y();
+				const auto right_dir = vec2(dir).rotate(angle / 2).neg_y();
+
+				const auto eye_frag_pos = [&]() {
+					auto screen_space = cone.to_screen_space(eye_pos);	
+					screen_space.y = cone.screen_size.y - screen_space.y;
+					return screen_space;
+				}();
+
+				shaders.fog_of_war->set_uniform("startingAngleVec", left_dir);
+				shaders.fog_of_war->set_uniform("endingAngleVec", right_dir);
+				shaders.fog_of_war->set_uniform("eye_frag_pos", eye_frag_pos);
+			}
 
 			renderer.call_and_clear_triangles();
 			renderer.start_testing_stencil();

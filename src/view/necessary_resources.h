@@ -59,6 +59,7 @@ struct all_necessary_shaders {
 	optional_shader illuminated;
 	optional_shader specular_highlights;
 	optional_shader pure_color_highlight;
+	optional_shader fog_of_war;
 	optional_shader circular_bars;
 	optional_shader smoke;
 	optional_shader illuminating_smoke;

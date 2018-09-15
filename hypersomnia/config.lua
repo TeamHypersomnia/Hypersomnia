@@ -60,6 +60,7 @@ return {
 	enabled_draw_area_markers = 0.85,
 	fog_of_war_color = "0 0 0 30",
 	fog_of_war = true,
+	fog_of_war_angle = 150,
 	draw_enemy_hud = false
   },
   editor = {

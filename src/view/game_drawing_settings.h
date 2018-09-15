@@ -13,5 +13,6 @@ struct game_drawing_settings {
 
 	bool fog_of_war = true;
 	rgba fog_of_war_color = rgba(255, 255, 255, 30);
+	float fog_of_war_angle = 180.f;
 	// END GEN INTROSPECTOR
 };
