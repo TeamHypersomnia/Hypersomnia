@@ -20,29 +20,34 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 	const auto tex = in.circular_bar_tex;
 	const auto t = in.only_type;
 
-	auto draw_circle = [&](const auto& it, const auto highlight_amount, const rgba first_col, const rgba second_col, const vec2 offset = vec2::zero) {
+	auto draw_circle_at = [&](const auto& tr, const auto highlight_amount, const rgba first_col, const rgba second_col) {
 		if (highlight_amount >= 0.f && highlight_amount <= 1.f) {
 			const auto highlight_color = augs::interp(first_col, second_col, (1 - highlight_amount)* (1 - highlight_amount));
 
-			if (const auto tr = it.find_viewing_transform(in.interpolation)) {
-				in.output.aabb_centered(tex, vec2(tr->pos + offset).discard_fract(), highlight_color);
+			in.output.aabb_centered(tex, vec2(tr.pos).discard_fract(), highlight_color);
 
-				augs::special s;
+			augs::special s;
 
-				const auto full_rot = 360;
-				const auto empty_angular_amount = full_rot * (1 - highlight_amount);
+			const auto full_rot = 360;
+			const auto empty_angular_amount = full_rot * (1 - highlight_amount);
 
-				s.v1.set(-90, -90 + full_rot) /= 180;
-				s.v2.set(-90 + empty_angular_amount, -90) /= 180;
+			s.v1.set(-90, -90 + full_rot) /= 180;
+			s.v2.set(-90 + empty_angular_amount, -90) /= 180;
 
-				in.specials.push_back(s);
-				in.specials.push_back(s);
-				in.specials.push_back(s);
+			in.specials.push_back(s);
+			in.specials.push_back(s);
+			in.specials.push_back(s);
 
-				in.specials.push_back(s);
-				in.specials.push_back(s);
-				in.specials.push_back(s);
-			}
+			in.specials.push_back(s);
+			in.specials.push_back(s);
+			in.specials.push_back(s);
+		}
+	};
+
+	auto draw_circle = [&](const auto& it, const auto highlight_amount, const rgba first_col, const rgba second_col, const vec2 offset = vec2::zero) {
+		if (auto tr = it.find_viewing_transform(in.interpolation)) {
+			tr->pos += offset;
+			draw_circle_at(*tr, highlight_amount, first_col, second_col);
 		}
 	};
 
@@ -139,7 +144,15 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 			if (progress > 0.f) {
 				const auto highlight_amount = 1.f - (progress / request.get_mounting_duration_ms(item));
 
-				draw_circle(item, highlight_amount, white, red_violet);
+				if (!request.is_unmounting(item)) {
+					if (const auto slot = cosm[request.target]) {
+						const auto tr = slot.get_container().find_viewing_transform(in.interpolation);
+						draw_circle_at(*tr, highlight_amount, white, red_violet);
+					}
+				}
+				else {
+					draw_circle(item, highlight_amount, white, red_violet);
+				}
 			}
 		}
 	}

@@ -12,6 +12,16 @@
 #include "game/messages/start_sound_effect.h"
 #include "game/cosmos/data_living_one_step.h"
 
+bool pending_item_mount::is_unmounting(const const_entity_handle& handle) const {
+	if (const auto current_slot = handle.get_current_slot()) {
+		if (const bool source_mounted = current_slot->is_mounted_slot()) {
+			return true;
+		}
+	}
+
+	return false;
+}
+
 real32 pending_item_mount::get_mounting_duration_ms(const const_entity_handle& handle) const {
 	if (const auto current_slot = handle.get_current_slot()) {
 		const auto& cosm = handle.get_cosmos();

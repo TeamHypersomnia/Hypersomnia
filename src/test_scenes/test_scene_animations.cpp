@@ -192,13 +192,8 @@ void load_test_scene_animations(
 			return indices;
 		};
 
-		auto standard_ptm = [&](const T test_id, const I first_frame_id, const float base_duration_ms, const int how_many_in_variation, int how_many_first_frames_to_erase) {
-			auto& anim = make_torso(test_id, first_frame_id, 50.0f);
-
-			auto push_if = [&](const auto n, const auto dur) {
-				anim.frames.push_back(anim.frames[n]);
-				anim.frames.back().duration_milliseconds = dur;
-			};
+		auto standard_ptm = [&](const T test_id, const I first_frame_id, const float base_duration_ms, const int how_many_in_variation, int how_many_first_frames_to_erase) -> auto& {
+			auto& anim = make_torso(test_id, first_frame_id, base_duration_ms);
 
 			const auto prev_n = anim.frames.size();
 
@@ -210,22 +205,19 @@ void load_test_scene_animations(
 			);
 
 			for (std::size_t i = 0; i < new_frames.size(); ++i) {
-				push_if(new_frames[i], base_duration_ms);
+				anim.frames.push_back(anim.frames[new_frames[i]]);
 			}
 
 			while (how_many_first_frames_to_erase--) {
 				anim.frames.erase(anim.frames.begin());
 				anim.frames.erase(anim.frames.begin());
 			}
+
+			return anim;
 		};
 
-		auto standard_gtm = [&](const T test_id, const I first_frame_id, const float base_duration_ms, const int how_many_in_variation = 2) {
-			auto& anim = make_torso(test_id, first_frame_id, 50.0f);
-
-			auto push_if = [&](const auto n, const auto dur) {
-				anim.frames.push_back(anim.frames[n]);
-				anim.frames.back().duration_milliseconds = dur;
-			};
+		auto standard_gtm = [&](const T test_id, const I first_frame_id, const float base_duration_ms, const int how_many_in_variation = 2) -> auto& {
+			auto& anim = make_torso(test_id, first_frame_id, base_duration_ms);
 
 			const auto prev_n = anim.frames.size();
 
@@ -237,8 +229,30 @@ void load_test_scene_animations(
 			);
 
 			for (std::size_t i = 0; i < new_frames.size(); ++i) {
-				push_if(new_frames[i], base_duration_ms);
+				anim.frames.push_back(anim.frames[new_frames[i]]);
 			}
+
+			return anim;
+		};
+
+		auto rifle_ptm = [&](auto... args) -> auto& {
+			auto& anim = standard_ptm(std::forward<decltype(args)>(args)...);
+			anim.frames[0].duration_milliseconds += 40.f;
+			anim.frames[1].duration_milliseconds += 30.f;
+			anim.frames[2].duration_milliseconds += 15.f;
+			anim.frames[3].duration_milliseconds += 5.f;
+			anim.frames[4].duration_milliseconds += 0.f;
+			return anim;
+		};
+
+		auto rifle_gtm = [&](auto&&... args) -> auto& {
+			auto& anim = standard_gtm(std::forward<decltype(args)>(args)...);
+			anim.frames[0].duration_milliseconds += 40.f;
+			anim.frames[1].duration_milliseconds += 30.f;
+			anim.frames[2].duration_milliseconds += 20.f;
+			anim.frames[3].duration_milliseconds += 10.f;
+			anim.frames[4].duration_milliseconds += 5.f;
+			return anim;
 		};
 
 		auto standard_shoot = [&](const T test_id, const I first_frame_id) {
@@ -352,7 +366,7 @@ void load_test_scene_animations(
 				I::RESISTANCE_TORSO_RIFLE_SHOT_1
 			);
 
-			standard_ptm(
+			rifle_ptm(
 				T::RESISTANCE_TORSO_RIFLE_PTM,
 				I::RESISTANCE_TORSO_RIFLE_PTM_1,
 				50.f,
@@ -360,10 +374,10 @@ void load_test_scene_animations(
 				0
 			);
 
-			standard_gtm(
+			rifle_gtm(
 				T::RESISTANCE_TORSO_RIFLE_GTM,
 				I::RESISTANCE_TORSO_RIFLE_GTM_1,
-				40.f
+				50.f
 			);
 
 			standard_walk(
@@ -379,7 +393,7 @@ void load_test_scene_animations(
 			standard_gtm(
 				T::RESISTANCE_TORSO_HEAVY_GTM,
 				I::RESISTANCE_TORSO_HEAVY_GTM_1,
-				40.f,
+				50.f,
 				3
 			);
 
