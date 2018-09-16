@@ -35,7 +35,8 @@ namespace invariants {
 		money_type standard_price = 1000;
 
 		bool flip_when_reloading = true;
-		pad_bytes<3> pad2;
+		bool draw_mag_over_when_reloading = true;
+		pad_bytes<2> pad2;
 		// END GEN INTROSPECTOR
 	};
 }

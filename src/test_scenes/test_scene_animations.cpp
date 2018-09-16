@@ -167,62 +167,75 @@ void load_test_scene_animations(
 			make_torso(test_id, first_frame_id, 30.0f);
 		};
 
-		auto rng = randomization(1);
+		auto rng = randomization(3);
 
-		auto standard_ptm = [&](const T test_id, const I first_frame_id) {
+		auto make_random_walk = [&](int s, const int l, const int r, int n) {
+			std::vector<int> indices;
+
+			indices.push_back(s);
+			n--;
+
+			while (n--) {
+				const auto dir = rng.randval(0, 1);
+
+				if (dir) {
+					++s;
+				}
+				else {
+					--s;
+				}
+
+				s = std::clamp(s, l, r);
+				indices.push_back(s);
+			}
+
+			return indices;
+		};
+
+		auto standard_ptm = [&](const T test_id, const I first_frame_id, const int how_many_in_variation = 2) {
 			auto& anim = make_torso(test_id, first_frame_id, 50.0f);
 
-			while (anim.frames.size() < anim.frames.max_size()) {
-				auto push_if = [&](const auto n, const auto dur) {
-					if (anim.frames.size() == anim.frames.max_size()) {
-						return false;
-					}
+			auto push_if = [&](const auto n, const auto dur) {
+				anim.frames.push_back(anim.frames[n]);
+				anim.frames.back().duration_milliseconds = dur;
+			};
 
-					anim.frames.push_back(anim.frames[n]);
-					anim.frames.back().duration_milliseconds = dur;
-					return true;
-				};
+			const auto prev_n = anim.frames.size();
 
-				const auto prev_n =  anim.frames.size();
+			const auto new_frames = make_random_walk(
+				prev_n - 2,
+				prev_n - how_many_in_variation,
+				prev_n - 1,
+				anim.frames.max_size() - anim.frames.size()
+			);
 
-				std::vector<std::size_t> new_frames = { prev_n - 2, prev_n - 1 };
-				shuffle_range(new_frames, rng.generator);
-
-				for (std::size_t i = 0; i < new_frames.size(); ++i) {
-					if (!push_if(new_frames[i], 40.f + i * 20)) {
-						break;
-					}
-				}
+			for (std::size_t i = 0; i < new_frames.size(); ++i) {
+				push_if(new_frames[i], 40.f );
 			}
 
 			anim.frames.erase(anim.frames.begin());
 			anim.frames.erase(anim.frames.begin());
 		};
 
-		auto standard_gtm = [&](const T test_id, const I first_frame_id) {
+		auto standard_gtm = [&](const T test_id, const I first_frame_id, const int how_many_in_variation = 2) {
 			auto& anim = make_torso(test_id, first_frame_id, 50.0f);
 
-			while (anim.frames.size() < anim.frames.max_size()) {
-				auto push_if = [&](const auto n, const auto dur) {
-					if (anim.frames.size() == anim.frames.max_size()) {
-						return false;
-					}
+			auto push_if = [&](const auto n, const auto dur) {
+				anim.frames.push_back(anim.frames[n]);
+				anim.frames.back().duration_milliseconds = dur;
+			};
 
-					anim.frames.push_back(anim.frames[n]);
-					anim.frames.back().duration_milliseconds = dur;
-					return true;
-				};
+			const auto prev_n = anim.frames.size();
 
-				const auto prev_n =  anim.frames.size();
+			const auto new_frames = make_random_walk(
+				prev_n - 2,
+				prev_n - how_many_in_variation,
+				prev_n - 1,
+				anim.frames.max_size() - anim.frames.size()
+			);
 
-				std::vector<std::size_t> new_frames = { prev_n - 2, prev_n - 1 };
-				shuffle_range(new_frames, rng.generator);
-
-				for (std::size_t i = 0; i < new_frames.size(); ++i) {
-					if (!push_if(new_frames[i], 40.f + i * 20)) {
-						break;
-					}
-				}
+			for (std::size_t i = 0; i < new_frames.size(); ++i) {
+				push_if(new_frames[i], 40.f);
 			}
 		};
 
@@ -236,7 +249,6 @@ void load_test_scene_animations(
 
 			if (anim.frames.size() == 6) {
 				anim.frames.erase(anim.frames.begin());
-				LOG("erasin");
 			}
 
 			make_shoot_durations(anim.frames);
@@ -346,7 +358,8 @@ void load_test_scene_animations(
 
 			standard_gtm(
 				T::RESISTANCE_TORSO_HEAVY_GTM,
-				I::RESISTANCE_TORSO_HEAVY_GTM_1
+				I::RESISTANCE_TORSO_HEAVY_GTM_1,
+				3
 			);
 
 			walk_with_flip(

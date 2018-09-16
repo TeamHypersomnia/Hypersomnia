@@ -630,6 +630,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/mode_gui/arena/arena_choose_team_gui.cpp"
 	"src/game/detail/sentience/sentience_logic.cpp"
 	"src/game/cosmos/cosmos_global_solvable.cpp"
+	"src/augs/misc/enum/enum_map.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

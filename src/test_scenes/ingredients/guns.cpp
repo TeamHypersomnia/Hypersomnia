@@ -118,7 +118,6 @@ namespace test_flavours {
 			item.space_occupied_per_charge = to_space_units(typesafe_sprintf("%x", real32(meta.template get<invariants::sprite>().size.area()) / 200));
 			item.holding_stance = stance;
 			item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
-			meta.set(item);
 
 			default_gun_props(meta);
 
@@ -131,19 +130,25 @@ namespace test_flavours {
 				mag.finish_mounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_FINISH_LOAD);
 
 				mag.finish_unmounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_FINISH_UNLOAD);
+				item.flip_when_reloading = true;
 			}
 			else if (stance == item_holding_stance::HEAVY_LIKE) {
 				mag.start_mounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_START_LOAD);
 				mag.finish_mounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_FINISH_LOAD);
 
 				mag.finish_unmounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_FINISH_UNLOAD);
+
+				item.flip_when_reloading = false;
 			}
 			else if (stance == item_holding_stance::PISTOL_LIKE) {
 				mag.start_mounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_START_LOAD);
 				mag.finish_mounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_FINISH_LOAD);
 
 				mag.finish_unmounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_FINISH_UNLOAD);
+				item.flip_when_reloading = true;
 			}
+
+			meta.set(item);
 		};
 	
 		{
@@ -967,9 +972,11 @@ namespace test_flavours {
 			meta.get<invariants::item>().standard_price = 2900;
 			set_chambering_duration_ms(meta, 400.f);
 
-			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_SMG_DRAW);
+			auto& item = meta.get<invariants::item>();
+			item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_SMG_DRAW);
 			only_allow_mag(meta, test_container_items::PRO90_MAGAZINE);
-			meta.get<invariants::item>().flip_when_reloading = false;
+			item.flip_when_reloading = false;
+			item.draw_mag_over_when_reloading = false;
 		}
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::VINDICATOR);
@@ -1182,6 +1189,7 @@ namespace test_flavours {
 			set_chambering_duration_ms(meta, 250.f);
 			set_density_mult(meta, 0.8f);
 			only_allow_mag(meta, test_container_items::KEK9_MAGAZINE);
+			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 		}
 
 		{
@@ -1229,6 +1237,7 @@ namespace test_flavours {
 			set_chambering_duration_ms(meta, 250.f);
 			set_density_mult(meta, 0.7f);
 			only_allow_mag(meta, test_container_items::SN69_MAGAZINE);
+			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 		}
 
 		{
@@ -1279,6 +1288,7 @@ namespace test_flavours {
 			set_density_mult(meta, 0.9f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("3.5");
 			only_allow_mag(meta, test_container_items::AO44_MAGAZINE);
+			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
 		}
 
 		{

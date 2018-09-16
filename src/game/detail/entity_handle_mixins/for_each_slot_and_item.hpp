@@ -78,7 +78,8 @@ template <class A, class G>
 void inventory_mixin<E>::for_each_attachment_recursive(
 	A attachment_callback,
 	G get_offsets_by_torso,
-	const attachment_offset_settings& settings
+	const attachment_offset_settings& settings,
+	const bool flip_hands_order
 ) const {
 	struct node {
 		inventory_slot_id parent;
@@ -94,9 +95,10 @@ void inventory_mixin<E>::for_each_attachment_recursive(
 
 	container_stack.push_back({ {}, root_container, transformr() });
 
-	while (!container_stack.empty()) {
-		const auto it = container_stack.back();
-		container_stack.pop_back();
+	std::size_t stack_i = 0;
+
+	while (stack_i < container_stack.size()) {
+		const auto it = container_stack[stack_i++];
 
 		cosm[it.child].template dispatch_on_having_any<invariants::container, components::item>(
 			[&](const auto this_attachment) {
@@ -129,7 +131,14 @@ void inventory_mixin<E>::for_each_attachment_recursive(
 							const auto this_container_id = this_container.get_id();
 
 							for (const auto& id : get_items_inside(this_container, type)) {
-								container_stack.push_back({ { s.first, this_container_id }, id, current_offset });
+								auto insert_where = container_stack.end();
+
+								if (flip_hands_order && type == slot_function::SECONDARY_HAND && container_stack.back().parent.type == slot_function::PRIMARY_HAND) {
+									LOG_NVPS("flipping");
+									insert_where--;
+								}
+
+								container_stack.insert(insert_where, { { type, this_container_id }, id, current_offset });
 							}
 						}
 					}

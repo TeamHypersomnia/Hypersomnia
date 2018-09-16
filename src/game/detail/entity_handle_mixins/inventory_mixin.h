@@ -139,7 +139,8 @@ public:
 	void for_each_attachment_recursive(
 		A attachment_callback,
 		G get_offsets_by_torso,
-		const attachment_offset_settings& settings
+		const attachment_offset_settings& settings,
+		const bool reverse_hand_order = false
 	) const;
 
 	template <class I>

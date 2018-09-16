@@ -62,6 +62,14 @@ namespace augs {
 			return from;
 		}
 
+		size_type reverse_find_first_set_index(size_type from) const {
+			while (from != static_cast<size_type>(-1) && !is_set(from)) {
+				--from;
+			}
+
+			return from;
+		}
+
 		auto& nth(const size_type n) {
 			return reinterpret_cast<mapped_type*>(&data)[n];
 		}
@@ -71,7 +79,7 @@ namespace augs {
 		}
 
 	public:
-		template <bool is_const>
+		template <bool is_const, bool R>
 		class basic_iterator {
 			using owner_ptr_type = maybe_const_ptr_t<is_const, enum_map_base>;
 			using pair_type = simple_pair<const key_type, maybe_const_ref_t<is_const, mapped_type>>;
@@ -85,7 +93,13 @@ namespace augs {
 			basic_iterator(const owner_ptr_type ptr, const size_type idx) : ptr(ptr), idx(idx) {}
 
 			basic_iterator& operator++() {
-				idx = ptr->find_first_set_index(idx + 1);
+				if constexpr(R) {
+					idx = ptr->reverse_find_first_set_index(idx - 2) + 1;
+				}
+				else {
+					idx = ptr->find_first_set_index(idx + 1);
+				}
+
 				return *this;
 			}
 
@@ -104,15 +118,23 @@ namespace augs {
 			}
 
 			pair_type operator*() const {
-				ensure(idx < ptr->capacity());
-				return { static_cast<key_type>(idx), ptr->nth(idx) };
+				if constexpr(R) {
+					ensure(idx != 0);
+					return { static_cast<key_type>(idx - 1), ptr->nth(idx - 1) };
+				}
+				else {
+					ensure(idx < ptr->capacity());
+					return { static_cast<key_type>(idx), ptr->nth(idx) };
+				}
 			}
 		};
 
-		using iterator = basic_iterator<false>;
-		using const_iterator = basic_iterator<true>;
+		using iterator = basic_iterator<false, false>;
+		using const_iterator = basic_iterator<true, false>;
+		using reverse_iterator = basic_iterator<false, true>;
+		using const_reverse_iterator = basic_iterator<true, true>;
 
-		template <bool>
+		template <bool, bool>
 		friend class basic_iterator;
 
 		iterator begin() {
@@ -129,6 +151,23 @@ namespace augs {
 
 		const_iterator end() const {
 			return { this, max_n };
+		}
+
+		reverse_iterator rbegin() {
+			const auto idx = 1 + reverse_find_first_set_index(max_size()); 
+			return { this, idx };
+		}
+
+		reverse_iterator rend() {
+			return { this, 0 };
+		}
+
+		const_reverse_iterator rbegin() const {
+			return { this, find_first_set_index(0u) };
+		}
+
+		const_reverse_iterator rend() const {
+			return { this, 0 };
 		}
 
 		iterator find(const key_type enum_idx) {

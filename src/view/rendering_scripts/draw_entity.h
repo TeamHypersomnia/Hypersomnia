@@ -315,7 +315,19 @@ FORCE_INLINE void specific_entity_drawer(
 
 				/* Draw items under the sentience first. */
 
-				const bool currently_reloading = ::is_currently_reloading(typed_handle.get_cosmos(), wielded_items);
+				const auto reloading_movement = ::calc_reloading_movement(typed_handle.get_cosmos(), wielded_items);
+				const bool currently_reloading = reloading_movement != std::nullopt;
+				const bool flip_for_reloading = 
+					currently_reloading
+					? cosm[reloading_movement->weapon].template get<invariants::item>().flip_when_reloading
+					: false
+				;
+
+				const bool draw_mag_over = 
+					currently_reloading
+					? cosm[reloading_movement->weapon].template get<invariants::item>().draw_mag_over_when_reloading
+					: false
+				;
 
 				auto should_draw_under_torso = [&](const auto attachment_entity) {
 					const auto current_slot = attachment_entity.get_current_slot();
@@ -325,7 +337,10 @@ FORCE_INLINE void specific_entity_drawer(
 					}
 
 					if (currently_reloading) {
-						return false;
+						if (stance_id != item_holding_stance::HEAVY_LIKE) {
+							/* Always reload heavies under the hands */
+							return false;
+						}
 					}
 
 					const auto is_special_stance = 
@@ -361,26 +376,15 @@ FORCE_INLINE void specific_entity_drawer(
 												return false;
 											}
 
-											auto has_flip_when_reloading = [&](const auto& reloading_container) {
-												if (const auto* const item = reloading_container.template find<invariants::item>()) {
-													if (item->flip_when_reloading) {
-														return true;
-													}
-												}
+											const auto type = typed_attachment_handle.get_current_slot().get_type();
 
-												return false;
-											};
-
-											const auto attachment_slot = typed_attachment_handle.get_current_slot();
-											const auto type = attachment_slot.get_type();
-
-											if (type == slot_function::PRIMARY_HAND || type == slot_function::SECONDARY_HAND) {
-												return has_flip_when_reloading(typed_attachment_handle);
-											}
-											else if (type == slot_function::GUN_DETACHABLE_MAGAZINE || type == slot_function::GUN_MUZZLE) {
-												if (const auto slot = attachment_slot.get_container().get_current_slot()) {
-													return has_flip_when_reloading(slot.get_container());
-												}
+											if (
+												type == slot_function::PRIMARY_HAND 
+												|| type == slot_function::SECONDARY_HAND
+												|| type == slot_function::GUN_DETACHABLE_MAGAZINE
+												|| type == slot_function::GUN_MUZZLE
+											) {
+												return flip_for_reloading;
 											}
 
 											return false;
@@ -400,7 +404,8 @@ FORCE_INLINE void specific_entity_drawer(
 						[stance_offsets]() {
 							return stance_offsets;
 						},
-						attachment_offset_settings::for_rendering()
+						attachment_offset_settings::for_rendering(),
+						!draw_mag_over
 					);
 				};
 
