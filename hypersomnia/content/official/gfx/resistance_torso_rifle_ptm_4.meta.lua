@@ -82,37 +82,37 @@ return {
       back = {
         pos = {
           x = -14,
-          y = -13
+          y = -11
         },
         rotation = 41
       },
       head = {
         pos = {
-          x = -2,
-          y = 2
+          x = -1,
+          y = 1
         },
-        rotation = 0
+        rotation = 33.690067291259766
       },
       legs = {
         pos = {
-          x = -2,
-          y = 2
+          x = 0,
+          y = 0
         },
         rotation = 0
       },
       primary_hand = {
         pos = {
-          x = 5,
-          y = 18
+          x = 8,
+          y = 22
         },
         rotation = 0
       },
       secondary_hand = {
         pos = {
-          x = 48,
-          y = 13
+          x = 16,
+          y = 10
         },
-        rotation = 0
+        rotation = 32
       },
       shoulder = {
         pos = {

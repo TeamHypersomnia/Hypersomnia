@@ -81,7 +81,7 @@ return {
     torso = {
       back = {
         pos = {
-          x = -14,
+          x = -13,
           y = -13
         },
         rotation = 41
@@ -95,22 +95,22 @@ return {
       },
       legs = {
         pos = {
-          x = -2,
-          y = 2
+          x = 0,
+          y = 0
         },
         rotation = 0
       },
       primary_hand = {
         pos = {
-          x = 5,
-          y = 18
+          x = 4,
+          y = 20
         },
         rotation = 0
       },
       secondary_hand = {
         pos = {
-          x = 48,
-          y = 13
+          x = 47,
+          y = 11
         },
         rotation = 0
       },

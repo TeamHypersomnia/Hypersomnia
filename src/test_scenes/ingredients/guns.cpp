@@ -921,6 +921,7 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1000.f);
 			meta.get<invariants::item>().standard_price = 3100;
 			set_chambering_duration_ms(meta, 400.f);
+			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 		}
 
 		{
@@ -1027,6 +1028,7 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1200.f);
 			meta.get<invariants::item>().standard_price = 2900;
 			set_chambering_duration_ms(meta, 500.f);
+			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 		}
 
 		{

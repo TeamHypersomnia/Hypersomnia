@@ -43,21 +43,21 @@ namespace test_scenes {
 		vars.name = "Testbed vars";
 		vars.spawned_faction = faction_type::RESISTANCE;
 
-		const auto pro90_mag = requested_ammo { 
-			to_entity_flavour_id(test_container_items::PRO90_MAGAZINE), 
-			to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE)
-		};
-
-		/* const auto vindicator_mag = requested_ammo { */ 
-		/* 	to_entity_flavour_id(test_container_items::STANDARD_MAGAZINE), */ 
+		/* const auto pro90_mag = requested_ammo { */ 
+		/* 	to_entity_flavour_id(test_container_items::PRO90_MAGAZINE), */ 
 		/* 	to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE) */
 		/* }; */
 
-		vars.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::PRO90);
-		vars.initial_eq.weapon_ammo = pro90_mag;
+		const auto vindicator_mag = requested_ammo { 
+			to_entity_flavour_id(test_container_items::STANDARD_MAGAZINE), 
+			to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE)
+		};
+
+		vars.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::VINDICATOR);
+		vars.initial_eq.weapon_ammo = vindicator_mag;
 		vars.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 
-		vars.initial_eq.spare_mags.emplace_back(3, pro90_mag);
+		vars.initial_eq.spare_mags.emplace_back(3, vindicator_mag);
 	}
 
 	void testbed::setup(bomb_mode_vars& vars) {

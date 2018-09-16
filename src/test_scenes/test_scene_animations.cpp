@@ -192,7 +192,7 @@ void load_test_scene_animations(
 			return indices;
 		};
 
-		auto standard_ptm = [&](const T test_id, const I first_frame_id, const int how_many_in_variation = 2) {
+		auto standard_ptm = [&](const T test_id, const I first_frame_id, const float base_duration_ms, const int how_many_in_variation, int how_many_first_frames_to_erase) {
 			auto& anim = make_torso(test_id, first_frame_id, 50.0f);
 
 			auto push_if = [&](const auto n, const auto dur) {
@@ -210,14 +210,16 @@ void load_test_scene_animations(
 			);
 
 			for (std::size_t i = 0; i < new_frames.size(); ++i) {
-				push_if(new_frames[i], 40.f );
+				push_if(new_frames[i], base_duration_ms);
 			}
 
-			anim.frames.erase(anim.frames.begin());
-			anim.frames.erase(anim.frames.begin());
+			while (how_many_first_frames_to_erase--) {
+				anim.frames.erase(anim.frames.begin());
+				anim.frames.erase(anim.frames.begin());
+			}
 		};
 
-		auto standard_gtm = [&](const T test_id, const I first_frame_id, const int how_many_in_variation = 2) {
+		auto standard_gtm = [&](const T test_id, const I first_frame_id, const float base_duration_ms, const int how_many_in_variation = 2) {
 			auto& anim = make_torso(test_id, first_frame_id, 50.0f);
 
 			auto push_if = [&](const auto n, const auto dur) {
@@ -235,7 +237,7 @@ void load_test_scene_animations(
 			);
 
 			for (std::size_t i = 0; i < new_frames.size(); ++i) {
-				push_if(new_frames[i], 40.f);
+				push_if(new_frames[i], base_duration_ms);
 			}
 		};
 
@@ -333,17 +335,35 @@ void load_test_scene_animations(
 
 			standard_ptm(
 				T::RESISTANCE_TORSO_PISTOL_PTM,
-				I::RESISTANCE_TORSO_PISTOL_PTM_1
+				I::RESISTANCE_TORSO_PISTOL_PTM_1,
+				40.f,
+				2,
+				2
 			);
 
 			standard_gtm(
 				T::RESISTANCE_TORSO_PISTOL_GTM,
-				I::RESISTANCE_TORSO_PISTOL_PTM_1
+				I::RESISTANCE_TORSO_PISTOL_PTM_1,
+				40.f
 			);
 
 			standard_shoot(
 				T::RESISTANCE_TORSO_RIFLE_SHOT,
 				I::RESISTANCE_TORSO_RIFLE_SHOT_1
+			);
+
+			standard_ptm(
+				T::RESISTANCE_TORSO_RIFLE_PTM,
+				I::RESISTANCE_TORSO_RIFLE_PTM_1,
+				50.f,
+				2,
+				0
+			);
+
+			standard_gtm(
+				T::RESISTANCE_TORSO_RIFLE_GTM,
+				I::RESISTANCE_TORSO_RIFLE_GTM_1,
+				40.f
 			);
 
 			standard_walk(
@@ -359,6 +379,7 @@ void load_test_scene_animations(
 			standard_gtm(
 				T::RESISTANCE_TORSO_HEAVY_GTM,
 				I::RESISTANCE_TORSO_HEAVY_GTM_1,
+				40.f,
 				3
 			);
 
