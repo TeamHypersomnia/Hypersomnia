@@ -271,7 +271,6 @@ FORCE_INLINE void specific_entity_drawer(
 				cosm,
 				stance, 
 				four_ways,
-				typed_handle,
 				wielded_items
 			)) {
 				const auto stance_offsets = [&stance_usage, &logicals]() {
@@ -311,11 +310,17 @@ FORCE_INLINE void specific_entity_drawer(
 
 				/* Draw items under the sentience first. */
 
+				const bool currently_reloading = ::calc_reloading_movement(typed_handle) != std::nullopt;
+
 				auto should_draw_under_torso = [&](const auto attachment_entity) {
 					const auto current_slot = attachment_entity.get_current_slot();
 
 					if (current_slot.get_type() == slot_function::BELT) {
 						return true;
+					}
+
+					if (currently_reloading) {
+						return false;
 					}
 
 					const auto is_special_stance = 

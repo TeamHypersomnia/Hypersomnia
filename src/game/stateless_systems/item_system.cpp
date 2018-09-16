@@ -228,7 +228,7 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 			}
 		}
 
-		const bool context_advanced_successfully = [&]() {
+		auto advance_context = [&]() {
 			if (const auto concerned_slot = cosm[ctx.concerned_slot]) {
 				{
 					const auto new_context = calc_reloading_context(it);
@@ -360,7 +360,9 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 			}
 
 			return false;
-		}();
+		};
+
+		const bool context_advanced_successfully = advance_context();
 
 		if (!context_advanced_successfully) {
 			ctx = {};

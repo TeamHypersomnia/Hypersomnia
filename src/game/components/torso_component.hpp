@@ -1,5 +1,6 @@
 #pragma once
 #include "game/components/torso_component.h"
+#include "game/detail/inventory/weapon_reloading.hpp"
 
 struct leg_animation_usage {
 	assets::legs_animation_id id;
@@ -35,15 +36,23 @@ auto calc_stance_id(
 			return item_holding_stance::BARE_LIKE;
 		}
 
-		if (const auto transfers = typed_entity.template find<components::item_slot_transfers>()) {
-			if (cosm[transfers->current_reloading_context.concerned_slot]) {
-				if (const auto s0 = stance_of(0); s0 != item_holding_stance::BARE_LIKE) {
-					return s0;
+		const auto is_reloading = [&]() {
+			if (const auto transfers = typed_entity.template find<components::item_slot_transfers>()) {
+				if (cosm[transfers->current_reloading_context.concerned_slot]) {
+					return true;
 				}
+			}
 
-				if (const auto s1 = stance_of(1); s1 != item_holding_stance::BARE_LIKE) {
-					return s1;
-				}
+			return ::calc_reloading_movement(cosm, wielded_items) != std::nullopt;
+		}();
+
+		if (is_reloading) {
+			if (const auto s0 = stance_of(0); s0 != item_holding_stance::BARE_LIKE) {
+				return s0;
+			}
+
+			if (const auto s1 = stance_of(1); s1 != item_holding_stance::BARE_LIKE) {
+				return s1;
 			}
 		}
 

@@ -2,6 +2,7 @@
 #include "game/components/gun_component.h"
 #include "game/components/movement_component.h"
 #include "game/assets/animation_math.h"
+#include "game/detail/inventory/weapon_reloading.hpp"
 
 template <class L>
 const plain_animation_frame* find_frame(
@@ -122,12 +123,11 @@ struct stance_frame_usage {
 	}
 };
 
-template <class C, class E, class T>
+template <class C, class T>
 auto calc_stance_usage(
 	const C& cosm,
 	const stance_animations& stance,
 	const movement_animation_state& anim_state, 
-	const E& capability,
 	const T& wielded_items
 ) {
 	using result_t = stance_frame_usage<const torso_animation>;
@@ -137,34 +137,17 @@ auto calc_stance_usage(
 	const auto n = wielded_items.size();
 
 	if (n > 0) {
-		if (const auto transfers = capability.template find<components::item_slot_transfers>()) {
-			const auto& ctx = transfers->current_reloading_context;
+		if (const auto rld = ::calc_reloading_movement(cosm, wielded_items)) {
+			const bool gtm = rld->type == reloading_movement_type::GRIP_TO_MAG;
+			const auto anim = 
+				gtm
+				? stance.grip_to_mag
+				: stance.pocket_to_mag
+			;
 
-			if (const auto concerned_slot = cosm[ctx.concerned_slot]) {
-				if (n == 1) {
-					/* Reloading exists, but holds only one item. Play unmounting progress of the old ammo source. */
-					if (const auto gtm_animation = logicals.find(stance.grip_to_mag)) {
-						if (const auto old_source = cosm[ctx.old_ammo_source]) {
-							if (const auto progress = old_source.find_mounting_progress()) {
-								if (const auto found_frame = ::calc_current_frame(*gtm_animation, progress->progress_ms)) {
-									return result_t::grip_to_mag(*found_frame);
-								}
-							}
-						}
-					}
-				}
-
-				if (n == 2) {
-					if (const auto ptm_animation = logicals.find(stance.pocket_to_mag)) {
-						/* Reloading exists and holds two items. Play mounting progress of the new ammo source. */
-						if (const auto new_source = cosm[ctx.new_ammo_source]) {
-							if (const auto progress = new_source.find_mounting_progress()) {
-								if (const auto found_frame = ::calc_current_frame(*ptm_animation, progress->progress_ms)) {
-									return result_t::pocket_to_mag(*found_frame);
-								}
-							}
-						}
-					}
+			if (const auto anim_ptr = logicals.find(anim)) {
+				if (const auto found_frame = ::calc_current_frame(*anim_ptr, rld->progress_ms)) {
+					return (gtm ? result_t::grip_to_mag : result_t::pocket_to_mag)(*found_frame);
 				}
 			}
 		}
