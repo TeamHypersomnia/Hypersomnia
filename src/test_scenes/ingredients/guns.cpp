@@ -1145,6 +1145,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::PLASMA_DRAW);
 			meta.get<invariants::item>().standard_price = 4000;
 			set_chambering_duration_ms(meta, 900.f);
+			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 		}
 
 		{

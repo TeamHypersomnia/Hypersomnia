@@ -210,7 +210,6 @@ void load_test_scene_animations(
 
 			while (how_many_first_frames_to_erase--) {
 				anim.frames.erase(anim.frames.begin());
-				anim.frames.erase(anim.frames.begin());
 			}
 
 			return anim;
@@ -232,6 +231,24 @@ void load_test_scene_animations(
 				anim.frames.push_back(anim.frames[new_frames[i]]);
 			}
 
+			return anim;
+		};
+
+		auto pistol_ptm = [&](auto... args) -> auto& {
+			auto& anim = standard_ptm(std::forward<decltype(args)>(args)...);
+			anim.frames[0].duration_milliseconds += 15.f;
+			anim.frames[1].duration_milliseconds += 10.f;
+			anim.frames[2].duration_milliseconds += 5.f;
+			anim.frames[3].duration_milliseconds += 2.f;
+			return anim;
+		};
+
+		auto pistol_gtm = [&](auto&&... args) -> auto& {
+			auto& anim = standard_gtm(std::forward<decltype(args)>(args)...);
+			anim.frames[0].duration_milliseconds += 15.f;
+			anim.frames[1].duration_milliseconds += 10.f;
+			anim.frames[2].duration_milliseconds += 5.f;
+			anim.frames[3].duration_milliseconds += 2.f;
 			return anim;
 		};
 
@@ -347,18 +364,18 @@ void load_test_scene_animations(
 				I::RESISTANCE_TORSO_PISTOL_SHOT_1
 			);
 
-			standard_ptm(
+			pistol_ptm(
 				T::RESISTANCE_TORSO_PISTOL_PTM,
 				I::RESISTANCE_TORSO_PISTOL_PTM_1,
-				40.f,
+				50.f,
 				2,
 				2
 			);
 
-			standard_gtm(
+			pistol_gtm(
 				T::RESISTANCE_TORSO_PISTOL_GTM,
 				I::RESISTANCE_TORSO_PISTOL_PTM_1,
-				40.f
+				50.f
 			);
 
 			standard_shoot(
