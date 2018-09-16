@@ -169,7 +169,7 @@ void load_test_scene_animations(
 
 		auto rng = randomization(1);
 
-		auto pistol_ptm = [&](const T test_id, const I first_frame_id) {
+		auto standard_ptm = [&](const T test_id, const I first_frame_id) {
 			auto& anim = make_torso(test_id, first_frame_id, 50.0f);
 
 			while (anim.frames.size() < anim.frames.max_size()) {
@@ -199,7 +199,7 @@ void load_test_scene_animations(
 			anim.frames.erase(anim.frames.begin());
 		};
 
-		auto pistol_gtm = [&](const T test_id, const I first_frame_id) {
+		auto standard_gtm = [&](const T test_id, const I first_frame_id) {
 			auto& anim = make_torso(test_id, first_frame_id, 50.0f);
 
 			while (anim.frames.size() < anim.frames.max_size()) {
@@ -319,12 +319,12 @@ void load_test_scene_animations(
 				I::RESISTANCE_TORSO_PISTOL_SHOT_1
 			);
 
-			pistol_ptm(
+			standard_ptm(
 				T::RESISTANCE_TORSO_PISTOL_PTM,
 				I::RESISTANCE_TORSO_PISTOL_PTM_1
 			);
 
-			pistol_gtm(
+			standard_gtm(
 				T::RESISTANCE_TORSO_PISTOL_GTM,
 				I::RESISTANCE_TORSO_PISTOL_PTM_1
 			);
@@ -342,6 +342,11 @@ void load_test_scene_animations(
 			standard_shoot(
 				T::RESISTANCE_TORSO_HEAVY_SHOT,
 				I::RESISTANCE_TORSO_HEAVY_SHOT_1
+			);
+
+			standard_gtm(
+				T::RESISTANCE_TORSO_HEAVY_GTM,
+				I::RESISTANCE_TORSO_HEAVY_GTM_1
 			);
 
 			walk_with_flip(

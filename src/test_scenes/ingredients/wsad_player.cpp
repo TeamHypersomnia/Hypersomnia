@@ -250,8 +250,14 @@ namespace test_flavours {
 					pistol_like.grip_to_mag = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_PISTOL_GTM);
 				}
 
-				torso_def.stances[item_holding_stance::HEAVY_LIKE].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_HEAVY_WALK);
-				torso_def.stances[item_holding_stance::HEAVY_LIKE].shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_HEAVY_SHOT);
+				{
+					auto& heavy_like = torso_def.stances[item_holding_stance::HEAVY_LIKE];
+
+					heavy_like.carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_HEAVY_WALK);
+					heavy_like.shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_HEAVY_SHOT);
+					heavy_like.pocket_to_mag = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_HEAVY_GTM);
+					heavy_like.grip_to_mag = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_HEAVY_GTM);
+				}
 
 				torso_def.stances[item_holding_stance::AKIMBO].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_AKIMBO_WALK);
 				torso_def.stances[item_holding_stance::AKIMBO].shoot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_AKIMBO_SHOT);
