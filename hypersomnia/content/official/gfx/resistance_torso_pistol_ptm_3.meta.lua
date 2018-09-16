@@ -81,10 +81,10 @@ return {
     torso = {
       back = {
         pos = {
-          x = -2,
-          y = 16
+          x = -3,
+          y = 14
         },
-        rotation = -88.66778564453125
+        rotation = -86.087783813476562
       },
       head = {
         pos = {
