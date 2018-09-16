@@ -147,7 +147,11 @@ auto calc_stance_usage(
 
 			if (const auto anim_ptr = logicals.find(anim)) {
 				if (const auto found_frame = ::calc_current_frame(*anim_ptr, rld->progress_ms)) {
-					return (gtm ? result_t::grip_to_mag : result_t::pocket_to_mag)(*found_frame);
+					if (gtm) {
+						return result_t::grip_to_mag(*found_frame);
+					}
+
+					return result_t::pocket_to_mag(*found_frame);
 				}
 			}
 		}

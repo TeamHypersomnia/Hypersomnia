@@ -42,12 +42,14 @@ std::optional<reloading_movement> calc_reloading_movement(
 			const auto& ctx = transfers->current_reloading_context;
 
 			if (const auto w0 = cosm[ctx.concerned_slot]) {
-				const auto source = cosm[n == 1 ? ctx.old_ammo_source : ctx.new_ammo_source];
-
 				real32 progress_ms = 0.f;
 
-				if (const auto progress = source.find_mounting_progress()) {
-					progress_ms = progress->progress_ms;
+				const auto source = cosm[n == 1 ? ctx.old_ammo_source : ctx.new_ammo_source];
+
+				if (source) {
+					if (const auto progress = source.find_mounting_progress()) {
+						progress_ms = progress->progress_ms;
+					}
 				}
 
 				return reloading_movement {
