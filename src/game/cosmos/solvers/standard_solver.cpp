@@ -86,8 +86,8 @@ void standard_solve(const logic_step step) {
 	force_joint_system().apply_forces_towards_target_entities(step);
 	item_system().handle_throw_item_intents(step);
 	item_system().handle_reload_intents(step);
-	global.solve_item_mounting(step);
 	item_system().advance_reloading_contexts(step);
+	global.solve_item_mounting(step);
 	demolitions_system().detonate_fuses(step);
 	demolitions_system().advance_cascade_explosions(step);
 

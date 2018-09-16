@@ -31,6 +31,35 @@ std::optional<reloading_movement> calc_reloading_movement(
 ) {
 	const auto n = wielded_items.size();
 
+	if (n == 0) {
+		return std::nullopt;
+	}
+
+	{
+		const auto capability = cosm[wielded_items[0]].get_current_slot().get_container();
+
+		if (const auto transfers = capability.template find<components::item_slot_transfers>()) {
+			const auto& ctx = transfers->current_reloading_context;
+
+			if (const auto w0 = cosm[ctx.concerned_slot]) {
+				const auto source = cosm[n == 1 ? ctx.old_ammo_source : ctx.new_ammo_source];
+
+				real32 progress_ms = 0.f;
+
+				if (const auto progress = source.find_mounting_progress()) {
+					progress_ms = progress->progress_ms;
+				}
+
+				return reloading_movement {
+					w0.get_container(),
+					source,
+					n == 1 ? reloading_movement_type::GRIP_TO_MAG : reloading_movement_type::POCKET_TO_MAG,
+					progress_ms
+				};
+			}
+		}
+	}
+
 	if (n == 1) {
 		const auto w0 = cosm[wielded_items[0]];
 		if (const auto mag_slot = w0[slot_function::GUN_DETACHABLE_MAGAZINE]) {
@@ -68,4 +97,19 @@ auto calc_reloading_movement(
 	const E& typed_handle
 ) {
 	return calc_reloading_movement(typed_handle.get_cosmos(), typed_handle.get_wielded_items());
+}
+
+template <class C, class W>
+bool is_currently_reloading(
+	const C& cosm,
+	const W& wielded_items
+) {
+	return ::calc_reloading_movement(cosm, wielded_items) != std::nullopt;
+}
+
+template <class E>
+bool is_currently_reloading(
+	const E& typed_handle
+) {
+	return is_currently_reloading(typed_handle.get_cosmos(), typed_handle.get_wielded_items());
 }

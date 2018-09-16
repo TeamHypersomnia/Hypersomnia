@@ -309,7 +309,10 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 					if (old_mag_slot.is_hand_slot()) {
 						RLD_LOG("Old mag unmounted.");
 
-						return try_hide_other_item();
+						if (try_hide_other_item()) {
+							RLD_LOG("Old mag hidden.");
+							return true;
+						}
 					}
 				}
 
@@ -362,10 +365,12 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 			return false;
 		};
 
-		const bool context_advanced_successfully = advance_context();
+		for (int c = 0; c < 2; ++c) {
+			const bool context_advanced_successfully = advance_context();
 
-		if (!context_advanced_successfully) {
-			ctx = {};
+			if (!context_advanced_successfully) {
+				ctx = {};
+			}
 		}
 	});
 }

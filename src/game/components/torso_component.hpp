@@ -36,16 +36,8 @@ auto calc_stance_id(
 			return item_holding_stance::BARE_LIKE;
 		}
 
-		const auto is_reloading = [&]() {
-			if (const auto transfers = typed_entity.template find<components::item_slot_transfers>()) {
-				if (cosm[transfers->current_reloading_context.concerned_slot]) {
-					return true;
-				}
-			}
-
-			return ::calc_reloading_movement(cosm, wielded_items) != std::nullopt;
-		}();
-
+		const auto is_reloading = ::is_currently_reloading(typed_entity.get_cosmos(), wielded_items);
+		
 		if (is_reloading) {
 			if (const auto s0 = stance_of(0); s0 != item_holding_stance::BARE_LIKE) {
 				return s0;

@@ -39,7 +39,8 @@ FORCE_INLINE void detail_specific_entity_drawer(
 	const cref_typed_entity_handle<E> typed_handle,
 	const specific_draw_input& in,
 	T render_visitor,
-	const transformr viewing_transform
+	const transformr viewing_transform,
+	const bool flip_vertically = false
 ) {
 	/* Might or might not be used depending on if constexpr flow */
 	(void)render_visitor;
@@ -70,6 +71,10 @@ FORCE_INLINE void detail_specific_entity_drawer(
 
 			result.renderable_transform = viewing_transform;
 			result.global_time_seconds = in.global_time_seconds;
+
+			if (flip_vertically) {
+				result.flip.vertically = !result.flip.vertically;
+			}
 
 			{
 				const auto& v = sprite.neon_intensity_vibration;
@@ -310,7 +315,7 @@ FORCE_INLINE void specific_entity_drawer(
 
 				/* Draw items under the sentience first. */
 
-				const bool currently_reloading = ::calc_reloading_movement(typed_handle) != std::nullopt;
+				const bool currently_reloading = ::is_currently_reloading(typed_handle.get_cosmos(), wielded_items);
 
 				auto should_draw_under_torso = [&](const auto attachment_entity) {
 					const auto current_slot = attachment_entity.get_current_slot();
@@ -351,11 +356,42 @@ FORCE_INLINE void specific_entity_drawer(
 							if (under_torso == should_draw_under_torso(attachment_entity)) {
 								attachment_entity.template dispatch_on_having_all<invariants::item>(
 									[&](const auto typed_attachment_handle) {
+										const bool additional_flip = [&]() {
+											if (!currently_reloading) {
+												return false;
+											}
+
+											auto has_flip_when_reloading = [&](const auto& reloading_container) {
+												if (const auto* const item = reloading_container.template find<invariants::item>()) {
+													if (item->flip_when_reloading) {
+														return true;
+													}
+												}
+
+												return false;
+											};
+
+											const auto attachment_slot = typed_attachment_handle.get_current_slot();
+											const auto type = attachment_slot.get_type();
+
+											if (type == slot_function::PRIMARY_HAND || type == slot_function::SECONDARY_HAND) {
+												return has_flip_when_reloading(typed_attachment_handle);
+											}
+											else if (type == slot_function::GUN_DETACHABLE_MAGAZINE || type == slot_function::GUN_MUZZLE) {
+												if (const auto slot = attachment_slot.get_container().get_current_slot()) {
+													return has_flip_when_reloading(slot.get_container());
+												}
+											}
+
+											return false;
+										}();
+
 										detail_specific_entity_drawer(
 											typed_attachment_handle,
 											in,
 											render_visitor,
-											viewing_transform * attachment_offset
+											viewing_transform * attachment_offset,
+											additional_flip
 										);
 									}
 								);

@@ -21,6 +21,7 @@ inline transformr get_anchored_offset(
 
 struct attachment_offset_settings {
 	bool consider_mag_rotations = false;
+	bool consider_mag_reloads = false;
 
 	static auto for_logic() {
 		return attachment_offset_settings();
@@ -29,6 +30,7 @@ struct attachment_offset_settings {
 	static auto for_rendering() {
 		attachment_offset_settings output;
 		output.consider_mag_rotations = true;
+		output.consider_mag_reloads = true;
 		return output;
 	}
 };
@@ -122,6 +124,34 @@ transformr direct_attachment_offset(
 
 	if (shall_flip) {
 		anchor.flip_vertically();
+	}
+
+	if (settings.consider_mag_reloads) {
+		auto is_reloading_and_should_flip = [&](const auto& reloading_container) {
+			if (::is_currently_reloading(reloading_container)) {
+				if (const auto* const item = attachment.template find<invariants::item>()) {
+					if (item->flip_when_reloading) {
+						return true;
+					}
+				}
+			}
+
+			return false;
+		};
+
+		if (type == slot_function::PRIMARY_HAND || type == slot_function::SECONDARY_HAND) {
+			if (is_reloading_and_should_flip(container)) {
+				anchor.flip_vertically();
+			}
+		}
+		else if (type == slot_function::GUN_DETACHABLE_MAGAZINE || type == slot_function::GUN_MUZZLE) {
+			if (const auto slot = container.get_current_slot()) {
+				if (is_reloading_and_should_flip(slot.get_container())) {
+					anchor.flip_vertically();
+					attachment_offset.flip_vertically();
+				}
+			}
+		}
 	}
 
 	return get_anchored_offset(attachment_offset, anchor);
