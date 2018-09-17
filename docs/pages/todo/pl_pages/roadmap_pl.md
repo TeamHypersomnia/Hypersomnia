@@ -11,17 +11,9 @@ summary: Drobny scratchpad planów
 W kolejności:
 
 - Bomb mode
-	- Podział na połowy
-		- Limit rund
-		- Strzałka z napisem "Winner!" na koniec
 	- GUI: Buy menu
-	- GUI: Wybór drużyny
-- Poprawki do gameplayu
-	- Jakakolwiek forma przeładowywania broni
-	- Automatyczne załadowywanie pocisku do komory gdy jedna ręka trzyma niezaładowaną broń a druga jest pusta
 - Edytor
     - Wskrzeszenie odtwarzania rozgrywki do testów determinizmu (będzie konieczne do networkingu)
-	- Specyfikowanie offsetów wypadania łusek per-obrazek
 - Dekoracje
     - Statyczne dymki na scenie, np. z wiatraków
 - Port powrotny na Windowsa
@@ -56,6 +48,16 @@ W kolejności:
 
 ## Roadmap (odfajkowane)
 
+- Edytor
+	- Specyfikowanie offsetów wypadania łusek per-obrazek
+- Poprawki do gameplayu
+	- Jakakolwiek forma przeładowywania broni
+	- Automatyczne załadowywanie pocisku do komory gdy jedna ręka trzyma niezaładowaną broń a druga jest pusta
+- Bomb mode
+	- Podział na połowy
+		- Limit rund
+		- Strzałka z napisem "Winner!" na koniec
+	- GUI: Wybór drużyny
 - Ikonki obok nicka w scoreboardzie (def, paka, dead)
 - Defuser kit
 - Fix: Transfer przypisanych itemów do GUI w hotbarze, przy starcie nowej rundy

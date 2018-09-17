@@ -1475,3 +1475,38 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- Stencil buffer
 	- We can even write a fov shader that makes a circle
 
+
+- Reloading animation sequence
+	- Logical order
+		- Start unmounting mag
+		- After delay: 3 transfers at the same time
+			- Hide old
+			- Pull out new
+			- Start mounting new
+		- Problem: The mag, once unmounted, gets hidden instantaneously
+			- On the other hand, it would be nice to synchronize the end of unmounting with audio feedback for successul removal of the magazine
+	- Effect order:
+		- Start unmounting mag. Initiate unload animation.
+		- Until mag successfully unmounted, play last two animation frames (done on the animation level).
+		- Initiate load animation
+
+
+- GUI required by modes
+	- Arena GUI
+		- Used by bomb modes, TDM modes etc.
+			- May use some if constexprs internally
+		- It's not synchronized, nor is it performance critical...
+			- ...so let's screw that strong typing and have just one arena_gui type
+		- Elements
+			- Round time
+				- Read only
+			- Recent kills
+				- Read only
+			- TAB menu
+				- State: bool show
+				- Interactive
+			- Team selection
+				- State: bool show
+				- Interactive
+			- General
+				- Read-onlies are drawn with our own GUI, from within draw_custom_gui of each setup concerned

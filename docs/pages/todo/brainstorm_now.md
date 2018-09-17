@@ -6,19 +6,20 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Reloading animation sequence
-	- Logical order
-		- Start unmounting mag
-		- After delay: 3 transfers at the same time
-			- Hide old
-			- Pull out new
-			- Start mounting new
-		- Problem: The mag, once unmounted, gets hidden instantaneously
-			- On the other hand, it would be nice to synchronize the end of unmounting with audio feedback for successul removal of the magazine
-	- Effect order:
-		- Start unmounting mag. Initiate unload animation.
-		- Until mag successfully unmounted, play last two animation frames (done on the animation level).
-		- Initiate load animation
+- Fix collision sounds
+	- Allow up to n collision sounds in a quick succession, for a pair of entities
+		- Parameter: n
+		- Parameter: cooldown interval
+			- Somewhere around 100ms
+		- Always reset the cooldown timer if another one happens
+		- Do we need to track transforms for this?
+			- Possibly not, because e.g. a shell might enter a pathological cycle and spawn loads of sounds
+			- Also entities are assumed to be convex
+	- Set or map?
+		- unordered set
+	- Kept where?
+		- In the sound system
+		- The sound start should contain information about if it was from a collision
 
 - Drop items from hotbar on pressing RPM
 
@@ -78,26 +79,6 @@ summary: That which we are brainstorming at the moment.
 	- The more the speed during dash, the stronger the dash
 
 - add a match-global rng seed offset to mode state
-
-- GUI required by modes
-	- Arena GUI
-		- Used by bomb modes, TDM modes etc.
-			- May use some if constexprs internally
-		- It's not synchronized, nor is it performance critical...
-			- ...so let's screw that strong typing and have just one arena_gui type
-		- Elements
-			- Round time
-				- Read only
-			- Recent kills
-				- Read only
-			- TAB menu
-				- State: bool show
-				- Interactive
-			- Team selection
-				- State: bool show
-				- Interactive
-			- General
-				- Read-onlies are drawn with our own GUI, from within draw_custom_gui of each setup concerned
 
 - Delta controls for property editor
 	- Will be useful for offsets
