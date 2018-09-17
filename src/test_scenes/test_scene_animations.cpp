@@ -277,6 +277,29 @@ void load_test_scene_animations(
 			make_shoot_durations(anim.frames);
 		};
 
+		auto pistol_shot = [&](const T test_id, const I first_frame_id) {
+			auto& anim = make_torso(test_id, first_frame_id, 20.0f);
+			auto& f = anim.frames;
+			ping_pong_range(f);
+
+			std::vector<float> d = {
+				10.f,
+				15.f,
+				15.f,
+				20.f,
+				20.f,
+				10.f,
+				30.f,
+				35.f,
+				35.f,
+				40.f
+			};
+
+			for (std::size_t i = 0; i < d.size(); ++i) {
+				f[i].duration_milliseconds = d[i];
+			}
+		};
+
 		auto bare_or_akimbo_shoot = [&](const T test_id, const I first_frame_id) {
 			auto& anim = make_torso(test_id, first_frame_id, 20.0f);
 
@@ -359,7 +382,7 @@ void load_test_scene_animations(
 				I::RESISTANCE_TORSO_PISTOL_WALK_1
 			);
 
-			standard_shoot(
+			pistol_shot(
 				T::RESISTANCE_TORSO_PISTOL_SHOT,
 				I::RESISTANCE_TORSO_PISTOL_SHOT_1
 			);

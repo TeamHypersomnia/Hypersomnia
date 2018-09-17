@@ -102,12 +102,19 @@ return {
       },
       primary_hand = {
         pos = {
-          x = 57,
+          x = 56,
           y = 6
         },
         rotation = 0
       },
       secondary_hand = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      shoulder = {
         pos = {
           x = 0,
           y = 0

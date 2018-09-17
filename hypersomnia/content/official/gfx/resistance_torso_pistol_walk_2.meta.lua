@@ -114,6 +114,13 @@ return {
         },
         rotation = 0
       },
+      shoulder = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
       strafe_facing_offset = -90
     }
   },
