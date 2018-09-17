@@ -114,7 +114,11 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 
 	if (t == circular_bar_type::SMALL) {
 		const auto& watched_character = cosm[in.viewed_character_id];
-		const auto watched_character_faction = watched_character.get_official_faction();
+		const auto watched_character_faction = watched_character ? watched_character.get_official_faction() : faction_type::SPECTATOR;
+
+		auto is_authorized_faction = [&](const auto f) {
+			return watched_character_faction != faction_type::SPECTATOR && f != watched_character_faction;
+		};
 
 		const bool enemy_hud = in.settings.draw_enemy_hud;
 
@@ -129,7 +133,7 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 						if (progress > 0.f) {
 							if (!enemy_hud) { 
 								if (const auto c = it.get_owning_transfer_capability()) {
-									if (c.get_official_faction() != watched_character_faction) {
+									if (is_authorized_faction(c.get_official_faction())) {
 										return;
 									}
 								}
@@ -165,7 +169,7 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 
 				if (!enemy_hud) { 
 					if (const auto c = item.get_owning_transfer_capability()) {
-						if (c.get_official_faction() != watched_character_faction) {
+						if (is_authorized_faction(c.get_official_faction())) {
 							return;
 						}
 					}

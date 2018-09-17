@@ -28,13 +28,17 @@ augs::vertex_triangle_buffer draw_sentiences_hud(const draw_sentiences_hud_input
 	auto& specials = in.specials;
 
 	const auto& watched_character = cosmos[in.viewed_character_id];
-	const auto watched_character_faction = watched_character.get_official_faction();
+	const auto watched_character_faction = watched_character ? watched_character.get_official_faction() : faction_type::SPECTATOR;
+
+	auto is_authorized_faction = [&](const auto f) {
+		return watched_character_faction != faction_type::SPECTATOR && f != watched_character_faction;
+	};
 
 	const auto timestamp_ms = static_cast<unsigned>(in.global_time_seconds * 1000);
 	augs::vertex_triangle_buffer circular_bars_information;
 
 	visible_entities.for_each<render_layer::SENTIENCES>(cosmos, [&](const auto v) {
-		if (!in.settings.draw_enemy_hud && v.get_official_faction() != watched_character_faction) {
+		if (!in.settings.draw_enemy_hud && is_authorized_faction(v.get_official_faction())) {
 			return;
 		}
 
