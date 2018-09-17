@@ -71,9 +71,11 @@ enum class circular_bar_type {
 struct draw_hud_for_explosives_input {
 	const augs::drawer output;
 	augs::special_buffer& specials;
+	const game_drawing_settings& settings;
 
 	const interpolation_system& interpolation;
 	const cosmos& cosm;
+	const entity_id viewed_character_id;
 	const double global_time_seconds;
 
 	const augs::atlas_entry circular_bar_tex;

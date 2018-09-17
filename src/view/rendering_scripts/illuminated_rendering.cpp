@@ -632,8 +632,10 @@ void illuminated_rendering(
 			draw_hud_for_explosives({
 				output,
 				renderer.get_special_buffer(),
+				settings,
 				interp,
 				cosm,
+				viewed_character,
 				global_time_seconds,
 				tex,
 				type

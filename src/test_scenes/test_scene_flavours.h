@@ -89,7 +89,7 @@ enum class test_plain_sprited_bodys {
 
 enum class test_shootable_weapons {
 	// GEN INTROSPECTOR enum class test_shootable_weapons
-	SAMPLE_RIFLE,
+	BILMER2000,
 	VINDICATOR,
 	LEWSII,
 	KEK9,

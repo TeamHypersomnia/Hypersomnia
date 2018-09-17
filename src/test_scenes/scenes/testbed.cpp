@@ -82,7 +82,7 @@ namespace test_scenes {
 
 		auto& metropolis = vars.factions[faction_type::METROPOLIS];
 
-		metropolis.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SAMPLE_RIFLE);
+		metropolis.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BILMER2000);
 		metropolis.initial_eq.weapon_ammo = bilmer_mag;
 		metropolis.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 		metropolis.initial_eq.belt_wearable = to_entity_flavour_id(test_tool_items::DEFUSE_KIT);

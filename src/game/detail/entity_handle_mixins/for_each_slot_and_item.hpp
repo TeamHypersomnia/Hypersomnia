@@ -134,7 +134,6 @@ void inventory_mixin<E>::for_each_attachment_recursive(
 								auto insert_where = container_stack.end();
 
 								if (flip_hands_order && type == slot_function::SECONDARY_HAND && container_stack.back().parent.type == slot_function::PRIMARY_HAND) {
-									LOG_NVPS("flipping");
 									insert_where--;
 								}
 

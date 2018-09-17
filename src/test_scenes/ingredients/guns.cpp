@@ -875,7 +875,7 @@ namespace test_flavours {
 
 
 		{
-			auto& meta = get_test_flavour(flavours, test_shootable_weapons::SAMPLE_RIFLE);
+			auto& meta = get_test_flavour(flavours, test_shootable_weapons::BILMER2000);
 
 			{
 				invariants::render render_def;
@@ -922,6 +922,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().standard_price = 3100;
 			set_chambering_duration_ms(meta, 400.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
+			only_allow_mag(meta, test_container_items::STANDARD_MAGAZINE);
 		}
 
 		{
@@ -1029,6 +1030,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().standard_price = 2900;
 			set_chambering_duration_ms(meta, 500.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
+			only_allow_mag(meta, test_container_items::STANDARD_MAGAZINE);
 		}
 
 		{
@@ -1341,7 +1343,7 @@ namespace prefabs {
 	}
 
 	entity_handle create_sample_rifle(const logic_step step, vec2 pos, entity_id load_mag_id) {
-		return create_gun(step, pos, test_shootable_weapons::SAMPLE_RIFLE, load_mag_id);
+		return create_gun(step, pos, test_shootable_weapons::BILMER2000, load_mag_id);
 	}
 
 	entity_handle create_gun(const logic_step step, vec2 pos, const test_shootable_weapons flavour, entity_id load_mag_id) {

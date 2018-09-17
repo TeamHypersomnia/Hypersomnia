@@ -11,6 +11,7 @@
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "game/detail/hand_fuse_math.h"
 #include "game/detail/bombsite_in_range.h"
+#include "view/game_drawing_settings.h"
 #include "game/detail/gun/shell_offset.h"
 
 void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
@@ -112,6 +113,11 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 	);
 
 	if (t == circular_bar_type::SMALL) {
+		const auto& watched_character = cosm[in.viewed_character_id];
+		const auto watched_character_faction = watched_character.get_official_faction();
+
+		const bool enemy_hud = in.settings.draw_enemy_hud;
+
 		cosm.for_each_having<components::gun>(
 			[&](const auto it) {
 				if (const auto tr = it.find_viewing_transform(in.interpolation)) {
@@ -121,6 +127,14 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 						const auto& progress = gun.chambering_progress_ms;
 
 						if (progress > 0.f) {
+							if (!enemy_hud) { 
+								if (const auto c = it.get_owning_transfer_capability()) {
+									if (c.get_official_faction() != watched_character_faction) {
+										return;
+									}
+								}
+							}
+
 							const auto highlight_amount = progress / chamber_slot->mounting_duration_ms;
 
 							auto shell_spawn_offset = ::calc_shell_offset(it);
@@ -137,12 +151,25 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 
 		for (const auto& m : global.pending_item_mounts) {
 			const auto& item = cosm[m.first];
+
+			if (item.dead()) {
+				continue;
+			}
+
 			const auto& request = m.second;
 
 			const auto& progress = request.progress_ms;
 
 			if (progress > 0.f) {
 				const auto highlight_amount = 1.f - (progress / request.get_mounting_duration_ms(item));
+
+				if (!enemy_hud) { 
+					if (const auto c = item.get_owning_transfer_capability()) {
+						if (c.get_official_faction() != watched_character_faction) {
+							return;
+						}
+					}
+				}
 
 				if (!request.is_unmounting(item)) {
 					if (const auto slot = cosm[request.target]) {
