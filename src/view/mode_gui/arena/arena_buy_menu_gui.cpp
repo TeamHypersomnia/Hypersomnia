@@ -206,9 +206,17 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 	if (in.is_in_buy_zone) {
 		if (owned_weapons.size() > 0) {
+			std::unordered_set<entity_flavour_id> displayed_replenishables;
+
 			centered_text("REPLENISH AMMUNITION");
 
 			for (const auto& f : owned_weapons) {
+				if (found_in(displayed_replenishables, f.mag)) {
+					continue;
+				}
+
+				emplace_element(displayed_replenishables, f.mag);
+
 				const auto index = typesafe_sprintf("S+%x", 1 + index_in(owned_weapons, f));
 				const bool choice_was_made = flavour_button(f.mag, index);
 
@@ -222,32 +230,33 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			}
 		}
 
-		if (current_menu == buy_menu_type::MAIN) {
-			centered_text("CHOOSE CATEGORY");
+		ImGui::BeginChild("Child1", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.3f, 0));
 
-			augs::for_each_enum_except_bounds([&](const buy_menu_type e) {
-				if (e == buy_menu_type::MAIN) {
-					return;
-				}
+		centered_text("BUY WEAPONS");
 
-				const auto index = typesafe_sprintf("(%x)", static_cast<int>(e));
-
-				text_disabled(index);
-				ImGui::SameLine();
-
-				const auto label = format_enum(e);
-
-				if (ImGui::Button(label.c_str())) {
-					current_menu = e;
-				}
-			});
-		}
-		else {
-			centered_text(to_uppercase(format_enum(current_menu)));
-
-			if (ImGui::Button("Back")) {
-				current_menu = buy_menu_type::MAIN;
+		augs::for_each_enum_except_bounds([&](const buy_menu_type e) {
+			if (e == buy_menu_type::MAIN) {
+				return;
 			}
+
+			const auto index = typesafe_sprintf("(%x)", static_cast<int>(e));
+
+			text_disabled(index);
+			ImGui::SameLine();
+
+			const auto label = format_enum(e);
+
+			if (ImGui::Selectable(label.c_str(), e == current_menu)) {
+				current_menu = e;
+			}
+		});
+
+		ImGui::EndChild();
+
+		if (current_menu != buy_menu_type::MAIN) {
+			ImGui::SameLine();
+			ImGui::BeginChild("Child2", ImVec2(0, 0), false);
+			centered_text(to_uppercase(format_enum(current_menu)));
 
 			auto do_item_menu = [&](
 				const std::optional<item_holding_stance> considered_stance,
@@ -361,6 +370,8 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 				default: break;
 			}
+
+			ImGui::EndChild();
 		}
 	}
 	else {
