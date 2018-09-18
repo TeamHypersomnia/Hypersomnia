@@ -79,6 +79,7 @@ void arena_gui_state::perform_imgui(
 						mode_input.vars.view.money_icon,
 						p->stats.money,
 						mode_in.images_in_atlas,
+						mode_in.config.arena_mode_gui.money_indicator_color,
 						true
 					});
 

@@ -12,6 +12,7 @@ enum class buy_menu_type {
 	// GEN INTROSPECTOR enum class buy_menu_type
 	MAIN,
 
+	MELEE_WEAPONS,
 	PISTOLS,
 	SUBMACHINE_GUNS,
 	RIFLES,
@@ -29,6 +30,7 @@ struct arena_buy_menu_gui {
 		assets::image_id money_icon;
 		money_type available_money;
 		const images_in_atlas_map& images_in_atlas;
+		const rgba money_indicator_color;
 		const bool is_in_buy_zone;
 	};
 

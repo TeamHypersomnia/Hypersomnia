@@ -69,8 +69,6 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 	text(typesafe_sprintf("%x$"), in.available_money);
 
-	std::vector<entity_id> owned_items;
-
 	auto image_of = [&](const auto& of) {
 		if constexpr(std::is_same_v<decltype(of), const entity_flavour_id&>) {
 			return cosm.on_flavour(of, [&](const auto& typed_flavour) {
@@ -115,7 +113,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ImGui::GetTextLineHeight());
 					ImGui::SetCursorPosX(x);
 
-					text("%x$", price_of(f_id));
+					text_color(typesafe_sprintf("%x$", price_of(f_id)), in.money_indicator_color);
 				});
 			}
 
@@ -136,41 +134,69 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		return pa > pb;
 	};
 
+	auto owned_comparator = [&](const auto& a, const auto& b) {
+		return price_comparator(a.mag, b.mag);
+	};
+
+	struct owned_entry {
+		entity_flavour_id weapon;
+		entity_flavour_id mag;
+		int num = 1;
+
+		owned_entry() = default;
+		owned_entry(const entity_flavour_id& weapon, const entity_flavour_id& mag) : weapon(weapon), mag(mag) {};
+
+		bool operator==(const owned_entry& b) const {
+			return std::tie(weapon, mag) == std::tie(b.weapon, b.mag);
+		}
+	};
+
+	std::vector<owned_entry> owned_weapons;
+
 	if (subject.alive()) {
+		money_type equipment_value = 0;
+
 		subject.for_each_contained_item_recursive([&](const auto& typed_item) {
-			/* Skip bombs, personal deposits and zero-price items which are considered non-buyable */
-
-			if (typed_item.get_current_slot().get_type() == slot_function::PERSONAL_DEPOSIT) {
-				return;
-			}
-
-			if (const auto price = typed_item.find_price(); price == std::nullopt || *price == 0) {
-				return;
-			}
-
-			if (const auto fuse = typed_item.template find<invariants::hand_fuse>()) {
-				if (fuse->is_like_plantable_bomb()) {
+			if (const auto price = typed_item.find_price(); price != std::nullopt && *price != 0) {
+				/* Skip bombs, personal deposits and zero-price items which are considered non-buyable */
+				if (typed_item.get_current_slot().get_type() == slot_function::PERSONAL_DEPOSIT) {
 					return;
 				}
-			}
 
-			owned_items.push_back(typed_item);
+				if (const auto fuse = typed_item.template find<invariants::hand_fuse>()) {
+					if (fuse->is_like_plantable_bomb()) {
+						return;
+					}
+				}
+
+				equipment_value += *price;
+
+				if (const auto mag = typed_item[slot_function::GUN_DETACHABLE_MAGAZINE]) {
+					const auto new_entry = owned_entry(typed_item.get_flavour_id(), mag->only_allow_flavour);
+
+					if (const auto it = find_in(owned_weapons, new_entry); it != owned_weapons.end()) {
+						++it->num;
+					}
+					else {
+						owned_weapons.push_back(new_entry);
+					}
+				}
+			}
 		});
 
-		sort_range(owned_items, price_comparator);
+		sort_range(owned_weapons, owned_comparator);
+		text(typesafe_sprintf("Equipment value: %x$", equipment_value));
 
-		money_type total = 0;
+		text("Owned weapons:");
 
-		for (const auto& o_id : owned_items) {
-			total += price_of(o_id);
-		}
-
-		text(typesafe_sprintf("Equipment value: %x$", total));
-		text("Owned items:");
-
-		for (const auto o_id : owned_items) {
+		for (const auto& o : owned_weapons) {
 			ImGui::SameLine();
-			flavour_button(cosm[o_id].get_flavour_id());
+			flavour_button(o.weapon);
+
+			if (o.num > 1) {
+				ImGui::SameLine();
+				text_disabled(typesafe_sprintf("(%xx)", o.num));
+			}
 		}
 
 		ImGui::Separator();
@@ -179,38 +205,22 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 	result_type result;
 
 	if (in.is_in_buy_zone) {
-		centered_text("REPLENISH AMMUNITION");
+		if (owned_weapons.size() > 0) {
+			centered_text("REPLENISH AMMUNITION");
 
-		std::unordered_set<entity_flavour_id> processed_flavours;
+			for (const auto& f : owned_weapons) {
+				const auto index = typesafe_sprintf("S+%x", 1 + index_in(owned_weapons, f));
+				const bool choice_was_made = flavour_button(f.mag, index);
 
-		for (const auto& o_id : owned_items) {
-			if (const auto o = cosm[o_id]) {
-				{
-					const auto flavour =  o.get_flavour_id();
+				ImGui::Separator();
 
-					if (found_in(processed_flavours, flavour)) {
-						continue;
-					}
-
-					emplace_element(processed_flavours, flavour);
-				}
-
-				if (const auto mag_slot = o[slot_function::GUN_DETACHABLE_MAGAZINE]) {
-					if (const auto& f = mag_slot->only_allow_flavour; f.is_set()) {
-						const auto index = typesafe_sprintf("%x", 1 + index_in(owned_items, o_id));
-						const bool choice_was_made = flavour_button(f, index);
-
-						if (choice_was_made) {
-							mode_commands::item_purchase msg;
-							msg.flavour_id = f;
-							result = msg;
-						}
-					}
+				if (choice_was_made) {
+					mode_commands::item_purchase msg;
+					msg.flavour_id = f.mag;
+					result = msg;
 				}
 			}
 		}
-
-		ImGui::Separator();
 
 		if (current_menu == buy_menu_type::MAIN) {
 			centered_text("CHOOSE CATEGORY");
@@ -263,11 +273,17 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				for (const auto& b : buyable_items) {
 					const auto index = typesafe_sprintf("%x", 1 + index_in(buyable_items, b));
 
+					ImGui::Separator();
+
 					if (flavour_button(b, index)) {
 						mode_commands::item_purchase msg;
 						msg.flavour_id = b;
 						result = msg;
 					}
+				}
+
+				if (!buyable_items.empty()) {
+					ImGui::Separator();
 				}
 			};
 
