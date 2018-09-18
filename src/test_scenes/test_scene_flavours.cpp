@@ -250,6 +250,22 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_box_markers::RESISTANCE_BUY_AREA);
+			invariants::box_marker marker;
+			marker.type = area_marker_type::BUY_AREA;
+			marker.meta.associated_faction = faction_type::RESISTANCE;
+			meta.set(marker);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_box_markers::METROPOLIS_BUY_AREA);
+			invariants::box_marker marker;
+			marker.type = area_marker_type::BUY_AREA;
+			marker.meta.associated_faction = faction_type::METROPOLIS;
+			meta.set(marker);
+		}
+
+		{
 			auto& meta = flavour_with_sprite(
 				test_tool_items::DEFUSE_KIT,
 				test_scene_image_id::DEFUSE_KIT,

@@ -22,6 +22,9 @@ void draw_marker_borders(
 				if (::is_bombsite(t)) {
 					return red;
 				}
+				else if (t == area_marker_type::BUY_AREA) {
+					return rgba(200, 200, 0, 255);
+				}
 
 				return white;
 			}();

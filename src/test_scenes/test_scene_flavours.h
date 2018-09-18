@@ -244,6 +244,8 @@ enum class test_box_markers {
 	// GEN INTROSPECTOR enum class test_box_markers
 	BOMBSITE_A,
 	BOMBSITE_B,
+	RESISTANCE_BUY_AREA,
+	METROPOLIS_BUY_AREA,
 	COUNT
 	// END GEN INTROSPECTOR
 };

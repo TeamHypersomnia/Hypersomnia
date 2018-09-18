@@ -62,31 +62,36 @@ namespace test_scenes {
 
 	void testbed::setup(bomb_mode_vars& vars) {
 		vars.name = "Testbed bomb vars";
+		vars.economy.initial_money = 1000;
 
-		auto& resistance = vars.factions[faction_type::RESISTANCE];
+#if GIVE_AMMO
+		{
+			const auto pro90_mag = requested_ammo { 
+				to_entity_flavour_id(test_container_items::PRO90_MAGAZINE), 
+				to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE)
+			};
 
-		const auto pro90_mag = requested_ammo { 
-			to_entity_flavour_id(test_container_items::PRO90_MAGAZINE), 
-			to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE)
-		};
+			const auto bilmer_mag = requested_ammo { 
+				to_entity_flavour_id(test_container_items::STANDARD_MAGAZINE), 
+				to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE)
+			};
 
-		const auto bilmer_mag = requested_ammo { 
-			to_entity_flavour_id(test_container_items::STANDARD_MAGAZINE), 
-			to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE)
-		};
+			auto& resistance = vars.factions[faction_type::RESISTANCE];
 
-		resistance.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::PRO90);
-		resistance.initial_eq.weapon_ammo = pro90_mag;
-		resistance.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
-		resistance.initial_eq.spare_mags.emplace_back(3, pro90_mag);
+			resistance.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::PRO90);
+			resistance.initial_eq.weapon_ammo = pro90_mag;
+			resistance.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+			resistance.initial_eq.spare_mags.emplace_back(3, pro90_mag);
 
-		auto& metropolis = vars.factions[faction_type::METROPOLIS];
+			auto& metropolis = vars.factions[faction_type::METROPOLIS];
 
-		metropolis.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BILMER2000);
-		metropolis.initial_eq.weapon_ammo = bilmer_mag;
-		metropolis.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
-		metropolis.initial_eq.belt_wearable = to_entity_flavour_id(test_tool_items::DEFUSE_KIT);
-		metropolis.initial_eq.spare_mags.emplace_back(3, bilmer_mag);
+			metropolis.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BILMER2000);
+			metropolis.initial_eq.weapon_ammo = bilmer_mag;
+			metropolis.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+			metropolis.initial_eq.belt_wearable = to_entity_flavour_id(test_tool_items::DEFUSE_KIT);
+			metropolis.initial_eq.spare_mags.emplace_back(3, bilmer_mag);
+		}
+#endif
 
 		{
 			auto& mt = vars.view.event_sounds[faction_type::METROPOLIS];
@@ -744,8 +749,10 @@ namespace test_scenes {
 		const auto orig1 = vec2(380, -1524);
 		create_aquarium(orig1);
 
-		create(test_box_markers::BOMBSITE_A, vec2(580, -800)).set_logical_size(vec2(600, 200));
-		create(test_box_markers::BOMBSITE_B, vec2(480, 200)).set_logical_size(vec2(600, 200));
+		create(test_box_markers::METROPOLIS_BUY_AREA, vec2(580, -800)).set_logical_size(vec2(600, 200));
+		create(test_box_markers::RESISTANCE_BUY_AREA, vec2(480, 200)).set_logical_size(vec2(600, 200));
+
+		create(test_box_markers::BOMBSITE_A, vec2(580, -400)).set_logical_size(vec2(600, 200));
 
 		//create(test_hand_explosives::BOMB, vec2(280, 200));
 

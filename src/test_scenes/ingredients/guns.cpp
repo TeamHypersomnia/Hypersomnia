@@ -772,6 +772,7 @@ namespace test_flavours {
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
 				item.space_occupied_per_charge = to_space_units("0.5");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
+				item.standard_price = 70;
 				meta.set(item);
 			}
 		}

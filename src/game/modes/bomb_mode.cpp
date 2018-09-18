@@ -1479,7 +1479,7 @@ void bomb_mode::clear_players_round_state(const input_type in) {
 void bomb_mode::set_players_money_to_initial(const input_type in) {
 	for (auto& it : players) {
 		auto& p = it.second;
-		p.stats.money = in.vars.initial_money;
+		p.stats.money = in.vars.economy.initial_money;
 	}
 }
 
@@ -1496,7 +1496,7 @@ void bomb_mode::reset_players_stats(const input_type in) {
 void bomb_mode::post_award(const input_type in, const mode_player_id id, money_type amount) {
 	auto& stats = players[id].stats;
 	auto& current_money = stats.money;
-	amount = std::clamp(amount, -current_money, in.vars.maximum_money - current_money);
+	amount = std::clamp(amount, -current_money, in.vars.economy.maximum_money - current_money);
 
 	if (amount != 0) {
 		current_money += amount;

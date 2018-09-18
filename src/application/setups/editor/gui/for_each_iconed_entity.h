@@ -24,6 +24,10 @@ struct marker_icon {
 			id = I::EDITOR_ICON_BOMBSITE_C;
 			col = get_faction_color(meta.associated_faction);
 		}
+		else if (type == area_marker_type::BUY_AREA) {
+			id = I::EDITOR_ICON_BUY_AREA;
+			col = get_faction_color(meta.associated_faction);
+		}
 	}
 
 	template <class F>

@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Buy menu
+
 - Alt + G throws secondary item
 
 - Alt + R only unloads the magazine

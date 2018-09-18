@@ -208,6 +208,8 @@ enum class test_scene_image_id {
 
 	STANDARD_PERSONAL_DEPOSIT,
 
+	MONEY_ICON,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

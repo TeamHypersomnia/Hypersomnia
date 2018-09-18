@@ -29,6 +29,9 @@ struct bomb_mode_faction_vars {
 
 struct bomb_mode_economy_vars {
 	// GEN INTROSPECTOR struct bomb_mode_economy_vars
+	money_type initial_money = 1000;
+	money_type maximum_money = 16000;
+
 	money_type losing_faction_award = 1500;
 	money_type winning_faction_award = 3250;
 	money_type consecutive_loss_bonus = 500;
@@ -48,9 +51,6 @@ struct bomb_mode_economy_vars {
 struct bomb_mode_vars {
 	// GEN INTROSPECTOR struct bomb_mode_vars
 	std::string name;
-	money_type initial_money = 800;
-	money_type maximum_money = 16000;
-
 	unsigned allow_spawn_after_secs_after_starting = 10;
 	unsigned max_players = 10;
 	unsigned round_secs = 120;

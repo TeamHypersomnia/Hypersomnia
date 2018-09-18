@@ -11,7 +11,8 @@ enum class area_marker_type {
 	// GEN INTROSPECTOR enum class area_marker_type
 	BOMBSITE_A,
 	BOMBSITE_B,
-	BOMBSITE_C
+	BOMBSITE_C,
+	BUY_AREA
 	// END GEN INTROSPECTOR
 };
 
