@@ -61,8 +61,8 @@ return {
       },
       hand_anchor = {
         pos = {
-          x = -15,
-          y = 3
+          x = -16,
+          y = 4
         },
         rotation = 0
       },
@@ -115,7 +115,15 @@ return {
           y = 0
         },
         rotation = 0
-      }
+      },
+      shoulder = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      strafe_facing_offset = 0
     }
   },
   usage_as_button = {

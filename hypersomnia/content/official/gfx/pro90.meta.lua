@@ -59,8 +59,8 @@ return {
       },
       hand_anchor = {
         pos = {
-          x = 5,
-          y = 4
+          x = -1,
+          y = 6
         },
         rotation = 0
       },
@@ -108,6 +108,13 @@ return {
         rotation = 0
       },
       secondary_hand = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      shoulder = {
         pos = {
           x = 0,
           y = 0
