@@ -1510,3 +1510,19 @@ i			- if the newly calculated target is different than last_reload_target, reset
 				- Interactive
 			- General
 				- Read-onlies are drawn with our own GUI, from within draw_custom_gui of each setup concerned
+
+- Fix collision sounds
+	- Allow up to n collision sounds in a quick succession, for a pair of entities
+		- Parameter: n
+		- Parameter: cooldown interval
+			- Somewhere around 100ms
+		- Always reset the cooldown timer if another one happens
+		- Do we need to track transforms for this?
+			- Possibly not, because e.g. a shell might enter a pathological cycle and spawn loads of sounds
+			- Also entities are assumed to be convex
+	- Set or map?
+		- unordered set
+	- Kept where?
+		- In the sound system
+		- The sound start should contain information about if it was from a collision
+

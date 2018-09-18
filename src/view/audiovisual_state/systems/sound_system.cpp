@@ -281,6 +281,9 @@ bool sound_system::generic_sound_cache::still_playing() const {
 	return source.is_playing() || followup_inputs.size() > 0;
 }
 
+static const auto collision_sound_cooldown_duration = 250.f;
+static const auto collision_sound_occurences_before_cooldown = 4;
+
 void sound_system::update_effects_from_messages(const const_logic_step step, const update_properties_input in) {
 	{
 		const auto& events = step.get_queue<messages::stop_sound_effect>();
@@ -314,6 +317,26 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 		const auto& events = step.get_queue<M>();
 
 		for (auto& e : events) {
+			{
+				const auto& s = e.payload.start.source_collision;
+
+				if (!(s == collision_sound_source())) {
+					const auto it = collision_sound_cooldowns.try_emplace(s);
+
+					auto& cooldown = (*it.first).second;
+
+					++cooldown.consecutive_occurences;
+					++cooldown.remaining_ms = collision_sound_cooldown_duration;
+
+					// LOG_NVPS(cooldown.consecutive_occurences);
+
+					if (cooldown.consecutive_occurences > collision_sound_occurences_before_cooldown) {
+						// LOG("Skipping");
+						continue;
+					}
+				}
+			}
+
 			try {
 				short_sounds.emplace_back(e.payload, in);
 			}
@@ -448,6 +471,18 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 }
 
 void sound_system::fade_sources(const augs::delta dt) {
+	erase_if (collision_sound_cooldowns, [&](auto& it) {
+		auto& c = it.second;
+
+		c.remaining_ms -= dt.in_milliseconds();
+
+		if (c.remaining_ms <= 0.f) {
+			return true;
+		}
+
+		return false;
+	});
+
 	erase_if(fading_sources, [dt](fading_source& f) {
 		auto& source = f.source;
 

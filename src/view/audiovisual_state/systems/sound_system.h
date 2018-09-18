@@ -80,11 +80,17 @@ class sound_system {
 		float fade_per_sec = 3.f;
 	};
 
+	struct collision_sound_cooldown {
+		float remaining_ms = 0.f;
+		int consecutive_occurences = 0;
+	};
+
 	std::vector<generic_sound_cache> short_sounds;
 	audiovisual_cache_map<generic_sound_cache> firearm_engine_caches;
 	audiovisual_cache_map<generic_sound_cache> continuous_sound_caches;
 
 	std::vector<fading_source> fading_sources;
+	std::unordered_map<collision_sound_source, collision_sound_cooldown> collision_sound_cooldowns;
 
 	template <class T>
 	void fade_and_erase(T& caches, const unversioned_entity_id id, const float fade_per_sec = 3.f) {

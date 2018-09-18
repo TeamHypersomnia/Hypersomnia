@@ -61,7 +61,7 @@ void play_collision_sound(
 
 					effect.start(
 						step, 
-						sound_effect_start_input::fire_and_forget(location)
+						sound_effect_start_input::fire_and_forget(location).mark_source_collision(sub, col)
 					);
 				}
 			}

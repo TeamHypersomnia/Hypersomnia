@@ -25,12 +25,34 @@ struct sound_effect_modifier {
 	// END GEN INTROSPECTOR
 };
 
+struct collision_sound_source {
+	entity_id subject;
+	entity_id collider;
+
+	bool operator==(const collision_sound_source& b) const {
+		return 
+			(subject == b.subject && collider == b.collider)
+			|| (subject == b.collider && collider == b.subject)
+		;
+	}
+};
+
+namespace std {
+	template <>
+	struct hash<collision_sound_source> {
+		std::size_t operator()(const collision_sound_source& v) const {
+			return std::hash<entity_id>()(v.subject) + std::hash<entity_id>()(v.collider);
+		}
+	};
+}
+
 struct sound_effect_start_input {
 	absolute_or_local positioning;
 	entity_id direct_listener;
 	bool always_direct_listener = false;
 	faction_type listener_faction = faction_type::SPECTATOR;
 	std::size_t variation_number = static_cast<std::size_t>(-1);
+	collision_sound_source source_collision;
 
 	static sound_effect_start_input fire_and_forget(const transformr where) {
 		sound_effect_start_input in;
@@ -57,6 +79,13 @@ struct sound_effect_start_input {
 
 	static sound_effect_start_input at_listener(const entity_id id) {
 		return at_entity(id).set_listener(id);
+	}
+
+	auto& mark_source_collision(const entity_id sub, const entity_id col) {
+		source_collision.subject = sub;
+		source_collision.collider = col;
+
+		return *this;
 	}
 };
 
