@@ -7,7 +7,8 @@ return {
     F = "SWITCH_WEAPON_LASER",
     MouseButton4 = "SWITCH_GAME_GUI_MODE",
 	Tab = "OPEN_SCOREBOARD",
-	F2 = "CHOOSE_TEAM"
+	F2 = "OPEN_BUY_MENU",
+	F3 = "CHOOSE_TEAM"
   },
   audio = {
     enable_hrtf = false,

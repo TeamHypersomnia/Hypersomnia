@@ -63,6 +63,7 @@ struct arena_mode_view_vars {
 	bool show_info_icons_of_opponents = false;
 
 	augs::enum_array<assets::image_id, scoreboard_icon_type> icons;
+	assets::image_id money_icon;
 	// END GEN INTROSPECTOR
 };
 

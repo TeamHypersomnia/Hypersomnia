@@ -21,6 +21,10 @@ bool arena_gui_state::control(
 		return true;
 	}
 
+	if (buy_menu.control(in)) {
+		return true;
+	}
+
 	if (choose_team.control(in)) {
 		return true;
 	}
@@ -51,14 +55,36 @@ void arena_gui_state::perform_imgui(
 		add(p.defusing);
 		add(p.bombing);
 
-		const auto choice = choose_team.perform_imgui({
-			mode_input.vars.view.square_logos,
-			factions,
-			mode_in.images_in_atlas
-		});
+		{
+			const auto choice = choose_team.perform_imgui({
+				mode_input.vars.view.square_logos,
+				factions,
+				mode_in.images_in_atlas
+			});
 
-		if (choice != std::nullopt) {
-			mode_in.entropy.players[mode_in.local_player].team_choice = *choice;
+			if (choice != std::nullopt) {
+				mode_in.entropy.players[mode_in.local_player].team_choice = *choice;
+			}
+		}
+
+		{
+			const auto& cosm = mode_input.cosm;
+
+			if (const auto p = typed_mode.find(mode_in.local_player)) {
+				const auto guid = p->guid;
+
+				if (const auto this_player_handle = cosm[guid]) {
+					const auto choice = buy_menu.perform_imgui({
+						this_player_handle,
+						mode_input.vars.view.money_icon,
+						p->stats.money
+					});
+
+					if (choice != std::nullopt) {
+						mode_in.entropy.players[mode_in.local_player].queues.post(*choice);
+					}
+				}
+			}
 		}
 	}
 }

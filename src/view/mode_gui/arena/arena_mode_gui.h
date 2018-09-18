@@ -7,10 +7,12 @@
 
 #include "view/mode_gui/arena/arena_scoreboard_gui.h"
 #include "view/mode_gui/arena/arena_choose_team_gui.h"
+#include "view/mode_gui/arena/arena_buy_menu_gui.h"
 
 struct arena_gui_state {
 	arena_scoreboard_gui scoreboard;
 	arena_choose_team_gui choose_team;
+	arena_buy_menu_gui buy_menu;
 
 	mutable augs::sound_source tick_sound;
 	mutable std::optional<float> last_seconds_value;
