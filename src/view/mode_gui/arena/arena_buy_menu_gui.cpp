@@ -60,12 +60,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 	const auto window_name = "Buy menu";
 	auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar);
 
-	{
-		const auto s = ImGui::CalcTextSize(window_name, nullptr, true);
-		const auto w = ImGui::GetWindowWidth();
-		ImGui::SetCursorPosX(w / 2 - s.x / 2);
-		text(window_name);
-	}
+	centered_text(window_name);
 
 	if (const auto& entry = in.images_in_atlas.at(in.money_icon).diffuse; entry.exists()) {
 		game_image_button("#moneyicon", entry);
@@ -79,18 +74,18 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 	auto image_of = [&](const auto& of) {
 		if constexpr(std::is_same_v<decltype(of), const entity_flavour_id&>) {
 			return cosm.on_flavour(of, [&](const auto& typed_flavour) {
-				return typed_flavour.template find<invariants::sprite>()->image_id;
+				return typed_flavour.get_image_id();
 			});
 		}
 		else {
-			return cosm[of].template find<invariants::sprite>()->image_id;
+			return cosm[of].get_image_id();
 		}
 	};
 
 	auto price_of = [&](const auto& of) {
 		if constexpr(std::is_same_v<decltype(of), const entity_flavour_id&>) {
 			return cosm.on_flavour(of, [&](const auto& typed_flavour) {
-				return typed_flavour.template find<invariants::item>()->standard_price;
+				return typed_flavour.find_price();
 			});
 		}
 		else {
@@ -98,9 +93,33 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		}
 	};
 
-	auto entity_button = [&](const auto& o, const std::string& label = "#ownedimage") {
-		if (const auto& entry = in.images_in_atlas.at(image_of(o)).diffuse; entry.exists()) {
-			return game_image_button(label, entry);
+	auto flavour_button = [&](const entity_flavour_id& f_id, const std::string& label = "") {
+		if (const auto& entry = in.images_in_atlas.at(image_of(f_id)).diffuse; entry.exists()) {
+			const bool show_description = !label.empty();
+
+			if (show_description) {
+				text_disabled(typesafe_sprintf("(%x)", label));
+				ImGui::SameLine();
+			}
+
+			const auto result = game_image_button(label, entry);
+
+			if (show_description) {
+				ImGui::SameLine();
+
+				cosm.on_flavour(f_id, [&](const auto& typed_flavour) {
+					const auto x = ImGui::GetCursorPosX();
+					text(typed_flavour.get_name());
+					ImGui::SameLine();
+
+					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ImGui::GetTextLineHeight());
+					ImGui::SetCursorPosX(x);
+
+					text("%x$", price_of(f_id));
+				});
+			}
+
+			return result;
 		}
 
 		return false;
@@ -151,7 +170,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 		for (const auto o_id : owned_items) {
 			ImGui::SameLine();
-			entity_button(o_id);
+			flavour_button(cosm[o_id].get_flavour_id());
 		}
 
 		ImGui::Separator();
@@ -160,43 +179,51 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 	result_type result;
 
 	if (in.is_in_buy_zone) {
-		if (current_menu == buy_menu_type::MAIN) {
-			text("Buy ammo:");
+		centered_text("REPLENISH AMMUNITION");
 
-			std::unordered_set<entity_flavour_id> processed_flavours;
+		std::unordered_set<entity_flavour_id> processed_flavours;
 
-			for (const auto o_id : owned_items) {
-				if (const auto o = cosm[o_id]) {
-					{
-						const auto flavour =  o.get_flavour_id();
+		for (const auto& o_id : owned_items) {
+			if (const auto o = cosm[o_id]) {
+				{
+					const auto flavour =  o.get_flavour_id();
 
-						if (found_in(processed_flavours, flavour)) {
-							continue;
-						}
-
-						emplace_element(processed_flavours, flavour);
+					if (found_in(processed_flavours, flavour)) {
+						continue;
 					}
 
-					if (const auto mag_slot = o[slot_function::GUN_DETACHABLE_MAGAZINE]) {
-						if (const auto& f = mag_slot->only_allow_flavour; f.is_set()) {
-							const bool choice_was_made = entity_button(entity_flavour_id(f));
+					emplace_element(processed_flavours, flavour);
+				}
 
-							if (choice_was_made) {
-								mode_commands::item_purchase msg;
-								msg.flavour_id = f;
-								result = msg;
-							}
+				if (const auto mag_slot = o[slot_function::GUN_DETACHABLE_MAGAZINE]) {
+					if (const auto& f = mag_slot->only_allow_flavour; f.is_set()) {
+						const auto index = typesafe_sprintf("%x", 1 + index_in(owned_items, o_id));
+						const bool choice_was_made = flavour_button(f, index);
+
+						if (choice_was_made) {
+							mode_commands::item_purchase msg;
+							msg.flavour_id = f;
+							result = msg;
 						}
 					}
 				}
 			}
+		}
 
-			ImGui::Separator();
+		ImGui::Separator();
+
+		if (current_menu == buy_menu_type::MAIN) {
+			centered_text("CHOOSE CATEGORY");
 
 			augs::for_each_enum_except_bounds([&](const buy_menu_type e) {
 				if (e == buy_menu_type::MAIN) {
 					return;
 				}
+
+				const auto index = typesafe_sprintf("(%x)", static_cast<int>(e));
+
+				text_disabled(index);
+				ImGui::SameLine();
 
 				const auto label = format_enum(e);
 
@@ -206,19 +233,21 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			});
 		}
 		else {
+			centered_text(to_uppercase(format_enum(current_menu)));
+
 			if (ImGui::Button("Back")) {
 				current_menu = buy_menu_type::MAIN;
 			}
 
 			auto do_item_menu = [&](
 				const std::optional<item_holding_stance> considered_stance,
-				auto&& foreach
+				auto&& for_each_potential_item
 			) {
 				std::vector<entity_flavour_id> buyable_items;
 
-				foreach([&](const auto& id, const auto& flavour) {
+				for_each_potential_item([&](const auto& id, const auto& flavour) {
 					if (considered_stance != std::nullopt) {
-						auto item = flavour.template find<invariants::item>();
+						const auto item = flavour.template find<invariants::item>();
 
 						if (item->holding_stance != *considered_stance) {
 							return;
@@ -229,9 +258,12 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				});
 
 				sort_range(buyable_items, price_comparator);
+				reverse_range(buyable_items);
 
-				for (const auto& b : reverse(buyable_items)) {
-					if (entity_button(b)) {
+				for (const auto& b : buyable_items) {
+					const auto index = typesafe_sprintf("%x", 1 + index_in(buyable_items, b));
+
+					if (flavour_button(b, index)) {
 						mode_commands::item_purchase msg;
 						msg.flavour_id = b;
 						result = msg;

@@ -286,4 +286,14 @@ public:
 
 		return std::nullopt;
 	}
+
+	assets::image_id get_image_id() const {
+		const auto self = *static_cast<const E*>(this);
+
+		if (const auto sprite = self.template find<invariants::sprite>()) {
+			return sprite->image_id;
+		}
+
+		return {};
+	}
 };

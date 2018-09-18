@@ -44,13 +44,7 @@ std::optional<mode_commands::team_choice> arena_choose_team_gui::perform_imgui(c
 
 	const auto window_name = "Choose your faction";
 	auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar);
-
-	{
-		const auto s = ImGui::CalcTextSize(window_name, nullptr, true);
-		const auto w = ImGui::GetWindowWidth();
-		ImGui::SetCursorPosX(w / 2 - s.x / 2);
-		text(window_name);
-	}
+	centered_text(window_name);
 
 	const auto n = in.available_factions.size();
 

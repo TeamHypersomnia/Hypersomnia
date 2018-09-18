@@ -300,12 +300,8 @@ void arena_gui_state::draw_mode_gui(
 						return tool.appearance.icon;
 					}
 					else {
-						if (const auto sprite = tool.template find<invariants::sprite>()) {
-							return sprite->image_id;
-						}
+						return tool.get_image_id();
 					}
-
-					return {};
 				});
 
 				const auto death_fallback_icon = in.images_in_atlas.at(mode_input.vars.view.icons[scoreboard_icon_type::DEATH_ICON]);

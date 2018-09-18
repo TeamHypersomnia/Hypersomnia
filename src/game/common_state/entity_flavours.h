@@ -64,6 +64,22 @@ public:
 		return get<invariants::text_details>().description;
 	}
 
+	assets::image_id get_image_id() const {
+		if (const auto sprite = find<invariants::sprite>()) {
+			return sprite->image_id;
+		}
+
+		return {};
+	}
+
+	std::optional<money_type> find_price() const {
+		if (const auto item = find<invariants::item>()) {
+			return item->standard_price;
+		}
+
+		return std::nullopt;
+	}
+
 	template <class D>
 	D* find() {
 		return find_impl<D>(*this);

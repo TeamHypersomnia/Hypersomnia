@@ -1042,6 +1042,8 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::LEWSII);
 
+			meta.get<invariants::text_details>().name = "Lews II";
+
 			{
 				invariants::render render_def;
 				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;

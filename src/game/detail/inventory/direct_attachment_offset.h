@@ -47,16 +47,16 @@ transformr direct_attachment_offset(
 	const auto& logicals = cosm.get_logical_assets();
 
 	const auto anchors = [&]() {
-		if (const auto* const sprite = attachment.template find<invariants::sprite>()) {
-			return logicals.get_offsets(sprite->image_id).item;
+		if (const auto image_id = attachment.get_image_id(); image_id.is_set()) {
+			return logicals.get_offsets(image_id).item;
 		}
 
 		return item_offsets();
 	}();
 
 	auto get_offsets_by_gun = [&]() {
-		if (const auto* const sprite = container.template find<invariants::sprite>()) {
-			auto offsets = logicals.get_offsets(sprite->image_id).gun;
+		if (const auto image_id = container.get_image_id(); image_id.is_set()) {
+			auto offsets = logicals.get_offsets(image_id).gun;
 
 			if (settings.consider_mag_rotations) {
 				if (const auto* const gun = container.template find<components::gun>()) {

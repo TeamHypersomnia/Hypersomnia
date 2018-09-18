@@ -303,6 +303,13 @@ namespace augs {
 			}
 		}
 
+		inline void centered_text(const std::string& str) {
+			const auto s = ImGui::CalcTextSize(str.c_str(), nullptr, true);
+			const auto w = ImGui::GetWindowWidth();
+			ImGui::SetCursorPosX(w / 2 - s.x / 2);
+			text(str);
+		}
+
 		inline void text(const char* const t) {
 			ImGui::TextUnformatted(t);
 		}
