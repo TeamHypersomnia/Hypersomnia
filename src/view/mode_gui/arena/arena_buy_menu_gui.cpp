@@ -93,6 +93,9 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 	auto flavour_button = [&](const entity_flavour_id& f_id, const std::string& label = "") {
 		if (const auto& entry = in.images_in_atlas.at(image_of(f_id)).diffuse; entry.exists()) {
+			const auto size = entry.get_original_size();
+
+			const auto line_h = ImGui::GetTextLineHeight();
 			const bool show_description = !label.empty();
 
 			if (show_description) {
@@ -100,7 +103,9 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				ImGui::SameLine();
 			}
 
-			const auto result = game_image_button(label, entry);
+			const auto image_padding = vec2(0, 4);
+			game_image(entry, size, white, image_padding);
+			invisible_button(label, size + image_padding);
 
 			if (show_description) {
 				ImGui::SameLine();
@@ -110,14 +115,14 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					text(typed_flavour.get_name());
 					ImGui::SameLine();
 
-					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + ImGui::GetTextLineHeight());
+					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + line_h);
 					ImGui::SetCursorPosX(x);
 
 					text_color(typesafe_sprintf("%x$", price_of(f_id)), in.money_indicator_color);
 				});
 			}
 
-			return result;
+			return false;
 		}
 
 		return false;

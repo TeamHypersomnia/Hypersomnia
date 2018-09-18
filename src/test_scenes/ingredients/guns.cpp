@@ -813,6 +813,8 @@ namespace test_flavours {
 				item.standard_price = 150;
 				meta.set(item);
 			}
+
+			meta.get<invariants::text_details>().name = "Lews II magazine";
 		}
 
 		{
@@ -1042,8 +1044,6 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::LEWSII);
 
-			meta.get<invariants::text_details>().name = "Lews II";
-
 			{
 				invariants::render render_def;
 				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
@@ -1101,6 +1101,7 @@ namespace test_flavours {
 			set_chambering_duration_ms(meta, 700.f);
 
 			only_allow_mag(meta, test_container_items::LEWSII_MAGAZINE);
+			meta.get<invariants::text_details>().name = "Lews II";
 		}
 
 		{
