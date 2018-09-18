@@ -393,6 +393,11 @@ void hotbar_button::respond_to_events(
 			this_id->elapsed_hover_time_ms = 0.f;
 		}
 
+		if (info == gui_event::lstarteddrag) {
+			const auto assigned_entity = this_id->get_assigned_entity(context.get_subject_entity());
+			gui.dragged_charges = assigned_entity.get<components::item>().get_charges();
+		}
+
 		if (info.msg == gui_event::lfinisheddrag) {
 			drag_and_drop_callback(context, prepare_drag_and_drop_result(context, this_id, rect_world.rect_hovered), info.total_dragged_amount);
 		}

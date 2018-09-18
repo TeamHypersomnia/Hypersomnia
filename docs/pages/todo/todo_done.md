@@ -1526,3 +1526,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- In the sound system
 		- The sound start should contain information about if it was from a collision
 
+- Drop items from hotbar on pressing RPM
+

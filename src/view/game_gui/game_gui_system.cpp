@@ -142,8 +142,7 @@ bool game_gui_system::control_gui_world(
 	auto& element = context.get_character_gui();
 
 	if (root_entity.has<components::item_slot_transfers>()) {
-		if (const auto held_rect = context.get_if<item_button_in_item>(world.rect_held_by_lmb)) {
-			const auto& item_entity = cosm[held_rect.get_location().item_id];
+		auto handle_drag_of = [&](const auto& item_entity) {
 			auto& dragged_charges = element.dragged_charges;
 
 			if (change.was_pressed(augs::event::keys::key::RMOUSE)) {
@@ -154,7 +153,7 @@ bool game_gui_system::control_gui_world(
 			}
 
 			if (change.msg == augs::event::message::wheel) {
-				const auto item = item_entity.get<components::item>();
+				const auto item = item_entity.template get<components::item>();
 
 				const auto delta = change.data.scroll.amount;
 
@@ -166,6 +165,24 @@ bool game_gui_system::control_gui_world(
 				if (dragged_charges > item.get_charges()) {
 					dragged_charges = dragged_charges - item.get_charges();
 				}
+
+				return true;
+			}
+
+			return false;
+		};
+
+		if (const auto held_rect = context.get_if<item_button_in_item>(world.rect_held_by_lmb)) {
+			const auto& item_entity = cosm[held_rect.get_location().item_id];
+
+			if (handle_drag_of(item_entity)) {
+				return true;
+			}
+		}
+
+		if (const auto held_rect = context.get_if<hotbar_button_in_character_gui>(world.rect_held_by_lmb)) {
+			if (handle_drag_of(held_rect->get_assigned_entity(root_entity))) {
+				return true;
 			}
 		}
 	}

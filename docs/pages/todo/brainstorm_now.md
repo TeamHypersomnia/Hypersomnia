@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Drop items from hotbar on pressing RPM
-
 - Alt + G throws secondary item
 
 - Alt + R only unloads the magazine
