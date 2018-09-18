@@ -144,6 +144,9 @@ public:
 	template <class... MustHaveComponents, class F>
 	void for_each_having(F&& callback) const;
 
+	template <class... MustHaveInvariants, class F>
+	void for_each_flavour_having(F&& callback) const;
+
 	template <class F>
 	void for_each_in(const processing_subjects f, F&& callback) {
 		for_each_in_impl(*this, f, std::forward<F>(callback));

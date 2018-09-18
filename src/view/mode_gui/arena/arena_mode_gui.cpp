@@ -77,7 +77,9 @@ void arena_gui_state::perform_imgui(
 					const auto choice = buy_menu.perform_imgui({
 						this_player_handle,
 						mode_input.vars.view.money_icon,
-						p->stats.money
+						p->stats.money,
+						mode_in.images_in_atlas,
+						true
 					});
 
 					if (choice != std::nullopt) {

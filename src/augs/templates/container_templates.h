@@ -80,9 +80,24 @@ void erase_from_to(
 	v.erase(v.begin() + from, v.begin() + to);
 }
 
+template <class Container>
+decltype(auto) unique_range(Container& v) {
+	return std::unique(v.begin(), v.end());
+}
+
+template <class Container, class F>
+decltype(auto) unique_range(Container& v, F&& f) {
+	return std::unique(v.begin(), v.end(), std::forward<F>(f));
+}
+
 template<class Container>
 void remove_duplicates_from_sorted(Container& v, std::enable_if_t<can_access_data_v<Container>>* = nullptr) {
-	v.erase(std::unique(v.begin(), v.end()), v.end());
+	v.erase(unique_range(v), v.end());
+}
+
+template<class Container, class F>
+void remove_duplicates_from_sorted(Container& v, F&& f, std::enable_if_t<can_access_data_v<Container>>* = nullptr) {
+	v.erase(unique_range(v, std::forward<F>(f)), v.end());
 }
 
 template<class A, class B>

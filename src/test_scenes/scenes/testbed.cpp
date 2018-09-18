@@ -139,6 +139,8 @@ namespace test_scenes {
 			vars.view.icons[scoreboard_icon_type::BOMB_ICON] = to_image_id(test_scene_image_id::BOMB_ICON);
 			vars.view.icons[scoreboard_icon_type::DEFUSE_KIT_ICON] = to_image_id(test_scene_image_id::DEFUSE_KIT_ICON);
 		}
+
+		vars.view.money_icon = to_image_id(test_scene_image_id::MONEY_ICON);
 	}
 
 	void testbed::populate(const loaded_image_caches_map& caches, const logic_step step) const {

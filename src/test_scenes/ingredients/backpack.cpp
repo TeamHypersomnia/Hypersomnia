@@ -39,6 +39,7 @@ namespace test_flavours {
 			item.space_occupied_per_charge = to_space_units("1");
 			item.categories_for_slot_compatibility.set(item_category::BACK_WEARABLE);
 
+			item.standard_price = 300;
 			item.wear_sound.id = to_sound_id(test_scene_sound_id::BACKPACK_WEAR);
 
 			meta.set(item);
@@ -73,6 +74,7 @@ namespace test_flavours {
 
 			item.space_occupied_per_charge = to_space_units("1");
 			item.categories_for_slot_compatibility.set(item_category::PERSONAL_DEPOSIT_WEARABLE);
+			item.standard_price = 300;
 
 			item.wear_sound.id = to_sound_id(test_scene_sound_id::BACKPACK_WEAR);
 

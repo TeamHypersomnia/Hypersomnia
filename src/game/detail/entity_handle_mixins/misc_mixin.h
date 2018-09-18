@@ -13,6 +13,7 @@
 #include "game/cosmos/specific_entity_handle_declaration.h"
 #include "game/detail/sentience_shake.h"
 #include "augs/math/physics_structs.h"
+#include "game/detail/economy/money_type.h"
 
 void unset_input_flags_of_orphaned_entity(const entity_handle);
 
@@ -274,5 +275,15 @@ public:
 				unset_input_flags_of_orphaned_entity(self);
 			}
 		}
+	}
+
+	std::optional<money_type> find_price() const {
+		const auto self = *static_cast<const E*>(this);
+
+		if (const auto item = self.template find<invariants::item>()) {
+			return item->standard_price;
+		}
+
+		return std::nullopt;
 	}
 };

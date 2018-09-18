@@ -46,7 +46,7 @@ std::ostream& write_nvps(
 	const char* const label, 
 	H1&& value
 ) {
-	return out << label << "=" << std::forward<H1>(value);
+	return pretty_print(out << label << "=", value);
 }
 
 template<typename H1, typename... T> 
@@ -57,8 +57,9 @@ std::ostream& write_nvps(
 	T&&... rest
 ) {
 	const char* const pcomma = strchr(label, ',');
+
 	return write_nvps(
-		out.write(label, pcomma - label) << "=" << std::forward<H1>(value) << ',',
+		pretty_print(out.write(label, pcomma - label) << "=", std::forward<H1>(value)) << ',',
 		pcomma + 1,
 		std::forward<T>(rest)...
 	);

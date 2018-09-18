@@ -32,7 +32,7 @@ namespace invariants {
 		sound_effect_input wield_sound;
 		sound_effect_input wear_sound;
 
-		money_type standard_price = 1000;
+		money_type standard_price = 0;
 
 		bool flip_when_reloading = true;
 		bool draw_mag_over_when_reloading = true;

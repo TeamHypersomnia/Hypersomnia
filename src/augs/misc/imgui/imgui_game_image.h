@@ -53,6 +53,10 @@ namespace augs {
 			);
 		}
 
+		inline void game_image(const augs::atlas_entry& entry, const rgba col = white, const vec2 offset = vec2::zero) {
+			game_image(entry, entry.get_original_size(), col, offset);
+		}
+
 		struct colors_nha {
 			rgba normal = white;
 			rgba hovered = white;
@@ -68,7 +72,7 @@ namespace augs {
 		};
 
 		template <class T>
-		inline bool game_image_button(const std::string& id, const augs::atlas_entry& entry, const T& size, const colors_nha cols = colors_nha{}) {
+		bool game_image_button(const std::string& id, const augs::atlas_entry& entry, const T& size, const colors_nha cols = colors_nha{}) {
 			const auto local_pos = ImGui::GetCursorPos();
 			const auto result = invisible_button(id, size);
 			const auto after_pos = ImGui::GetCursorPos();
