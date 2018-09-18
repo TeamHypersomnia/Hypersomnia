@@ -394,8 +394,11 @@ void hotbar_button::respond_to_events(
 		}
 
 		if (info == gui_event::lstarteddrag) {
-			const auto assigned_entity = this_id->get_assigned_entity(context.get_subject_entity());
-			gui.dragged_charges = assigned_entity.get<components::item>().get_charges();
+			if (const auto assigned_entity = this_id->get_assigned_entity(context.get_subject_entity())) {
+				if (const auto item = assigned_entity.find<components::item>()) {
+					gui.dragged_charges = item->get_charges();
+				}
+			}
 		}
 
 		if (info.msg == gui_event::lfinisheddrag) {

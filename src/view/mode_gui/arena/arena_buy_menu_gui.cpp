@@ -93,12 +93,27 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 	auto flavour_button = [&](const entity_flavour_id& f_id, const std::string& label = "") {
 		if (const auto& entry = in.images_in_atlas.at(image_of(f_id)).diffuse; entry.exists()) {
-			const auto size = entry.get_original_size();
+			const auto local_pos = ImGui::GetCursorPos();
+
+			const auto& item_spacing = ImGui::GetStyle().ItemSpacing;
+			//auto scp3 = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(3, 10));
+
+			const auto size = vec2(entry.get_original_size());
 
 			const auto line_h = ImGui::GetTextLineHeight();
 			const bool show_description = !label.empty();
 
 			if (show_description) {
+				const auto hover_col = rgba(ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
+				const auto active_col = rgba(ImGui::GetStyle().Colors[ImGuiCol_HeaderActive]);
+
+				auto scp = scoped_style_color(ImGuiCol_HeaderHovered, rgba(hover_col).multiply_rgb(1 / 2.1f));
+				auto scp2 = scoped_style_color(ImGuiCol_HeaderActive, rgba(active_col).multiply_rgb(1 / 1.8f));
+
+				const auto label_id = typesafe_sprintf("##%xlabel");
+				ImGui::Selectable(label_id.c_str(), false, ImGuiSelectableFlags_None, ImVec2(0, item_spacing.y - 1 + std::max(size.y, line_h * 2)));
+				ImGui::SetCursorPos(local_pos);
+
 				text_disabled(typesafe_sprintf("(%x)", label));
 				ImGui::SameLine();
 			}
@@ -115,10 +130,13 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					text(typed_flavour.get_name());
 					ImGui::SameLine();
 
-					ImGui::SetCursorPosY(ImGui::GetCursorPosY() + line_h);
+					const auto prev_y = ImGui::GetCursorPosY() + line_h;
+					ImGui::SetCursorPosY(prev_y);
 					ImGui::SetCursorPosX(x);
 
 					text_color(typesafe_sprintf("%x$", price_of(f_id)), in.money_indicator_color);
+
+					ImGui::SetCursorPosY(prev_y + line_h + item_spacing.y);
 				});
 			}
 
@@ -214,6 +232,10 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			std::unordered_set<entity_flavour_id> displayed_replenishables;
 
 			centered_text("REPLENISH AMMUNITION");
+
+			if (owned_weapons.size() > 0) {
+				ImGui::Separator();
+			}
 
 			for (const auto& f : owned_weapons) {
 				if (found_in(displayed_replenishables, f.mag)) {
