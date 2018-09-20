@@ -118,6 +118,7 @@ namespace test_flavours {
 			item.space_occupied_per_charge = to_space_units(typesafe_sprintf("%x", real32(meta.template get<invariants::sprite>().size.area()) / 200));
 			item.holding_stance = stance;
 			item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
+			item.gratis_ammo_pieces_with_first = 3;
 
 			default_gun_props(meta);
 
@@ -139,6 +140,7 @@ namespace test_flavours {
 				mag.finish_unmounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_FINISH_UNLOAD);
 
 				item.flip_when_reloading = false;
+				item.gratis_ammo_pieces_with_first = 1;
 			}
 			else if (stance == item_holding_stance::PISTOL_LIKE) {
 				mag.start_mounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_START_LOAD);
@@ -1013,6 +1015,7 @@ namespace test_flavours {
 			set_chambering_duration_ms(meta, 400.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			only_allow_mag(meta, test_container_items::BILMER2000_MAGAZINE);
+			meta.get<invariants::item>().specific_to = faction_type::METROPOLIS;
 		}
 
 		{
@@ -1121,6 +1124,7 @@ namespace test_flavours {
 			set_chambering_duration_ms(meta, 500.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			only_allow_mag(meta, test_container_items::VINDICATOR_MAGAZINE);
+			meta.get<invariants::item>().specific_to = faction_type::RESISTANCE;
 		}
 
 		{
@@ -1287,6 +1291,7 @@ namespace test_flavours {
 			set_density_mult(meta, 0.8f);
 			only_allow_mag(meta, test_container_items::KEK9_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
+			meta.get<invariants::item>().specific_to = faction_type::RESISTANCE;
 		}
 
 		{
@@ -1335,6 +1340,7 @@ namespace test_flavours {
 			set_density_mult(meta, 0.7f);
 			only_allow_mag(meta, test_container_items::SN69_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
+			meta.get<invariants::item>().specific_to = faction_type::METROPOLIS;
 		}
 
 		{
@@ -1422,6 +1428,7 @@ namespace test_flavours {
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("3.0");
 			item.holding_stance = item_holding_stance::RIFLE_LIKE;
+			item.gratis_ammo_pieces_with_first = 0;
 			meta.set(item);
 			meta.get<invariants::item>().standard_price = 2500;
 			set_density_mult(meta, 0.8f);

@@ -40,7 +40,7 @@ namespace invariants {
 		pad_bytes<2> pad2;
 
 		faction_type specific_to = faction_type::SPECTATOR;
-		unsigned gratis_mags_with_first = 2;
+		unsigned gratis_ammo_pieces_with_first = 0;
 		// END GEN INTROSPECTOR
 	};
 }

@@ -144,7 +144,6 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 				const auto label_id = typesafe_sprintf("##%xlabel");
 
-
 				if (is_disabled) {
 					const auto selectable_size = ImVec2(ImGui::GetContentRegionAvailWidth(), 2 * item_spacing.y - 1 + std::max(size.y, line_h * 2));
 					rect_filled(selectable_size, in.settings.disabled_bg, vec2(0, -item_spacing.y + 2));
@@ -172,12 +171,27 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					text(typed_flavour.get_name());
 					ImGui::SameLine();
 
+					if (in.give_extra_mags_on_first_purchase && b == button_type::BUYABLE_WEAPON) {
+						const auto& item_def = typed_flavour.template get<invariants::item>();
+						const auto& g = item_def.gratis_ammo_pieces_with_first;
+
+						if (g > 0) {
+							if (!found_in(in.done_purchases, f_id)) {
+								text_disabled("(+");
+								ImGui::SameLine();
+								text("%x", g);
+								ImGui::SameLine();
+								text_disabled("mags)");
+								ImGui::SameLine();
+							}
+						}
+					}
+
 					const auto prev_y = ImGui::GetCursorPosY() + line_h;
 					ImGui::SetCursorPosY(prev_y);
 					ImGui::SetCursorPosX(x);
 
 					text_color(typesafe_sprintf("%x$", price_of(f_id)), money_color);
-
 
 					ImGui::SameLine();
 
@@ -363,10 +377,15 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				std::vector<item_flavour_id> buyable_items;
 
 				for_each_potential_item([&](const auto& id, const auto& flavour) {
-					if (considered_stance != std::nullopt) {
-						const auto item = flavour.template find<invariants::item>();
+					const auto item = flavour.template get<invariants::item>();
+					const auto& s = item.specific_to;
 
-						if (item->holding_stance != *considered_stance) {
+					if (s != faction_type::SPECTATOR && s != subject.get_official_faction()) {
+						return;
+					}
+
+					if (considered_stance != std::nullopt) {
+						if (item.holding_stance != *considered_stance) {
 							return;
 						}
 					}
