@@ -296,6 +296,11 @@ return {
 		y = 20 + 16 * 8
 	},
 
+	buy_menu_settings = {
+		disabled_bg = "75 0 0 180",
+		disabled_active_bg = "90 0 0 220"
+	},
+
     scoreboard_settings = {
 	  dark_color_overlay_under_score = true,
       background_color = "15 15 15 200",

@@ -1,5 +1,12 @@
 #pragma once
 
+struct buy_menu_gui_settings {
+	// GEN INTROSPECTOR struct buy_menu_gui_settings
+	rgba disabled_bg = rgba(170, 0, 0, 90);
+	rgba disabled_active_bg = rgba(180, 0, 0, 150);
+	// END GEN INTROSPECTOR
+};
+
 struct scoreboard_gui_settings {
 	// GEN INTROSPECTOR struct scoreboard_gui_settings
 	vec2i player_row_inner_padding = vec2i(2, 4);
@@ -38,6 +45,7 @@ struct arena_mode_gui_settings {
 	unsigned max_weapon_icon_height = 0;
 
 	scoreboard_gui_settings scoreboard_settings;
+	buy_menu_gui_settings buy_menu_settings;
 	rgba money_indicator_color = rgba(249, 133, 255, 255);
 	rgba award_indicator_color = yellow;
 	vec2i money_indicator_pos = vec2i(-40, 20 + 16 * 4);

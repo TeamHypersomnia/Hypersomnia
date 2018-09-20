@@ -18,6 +18,7 @@
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 #include "game/organization/special_flavour_id_types.h"
 #include "game/modes/detail/item_purchase_logic.hpp"
+#include "view/mode_gui/arena/arena_mode_gui_settings.h"
 
 bool arena_buy_menu_gui::control(app_ingame_intent_input in) {
 	using namespace augs::event;
@@ -114,6 +115,26 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			const auto line_h = ImGui::GetTextLineHeight();
 			const bool show_description = b != button_type::OWNED_WEAPON;
 
+			const auto num_owned = subject.count_contained(f_id);
+
+			const auto slot_opts = slot_finding_opts {
+				slot_finding_opt::CHECK_WEARABLES,
+				slot_finding_opt::CHECK_HANDS,
+				slot_finding_opt::CHECK_CONTAINERS
+			};
+
+			const auto num_carryable = num_carryable_pieces(
+				subject,
+				slot_opts, 
+				f_id
+			);
+
+			const auto price = price_of(f_id);
+
+			const auto num_affordable = in.available_money / price;
+
+			const bool is_disabled = num_affordable == 0 || num_carryable == 0;
+
 			if (show_description) {
 				const auto hover_col = rgba(ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
 				const auto active_col = rgba(ImGui::GetStyle().Colors[ImGuiCol_HeaderActive]);
@@ -122,7 +143,17 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				auto scp2 = scoped_style_color(ImGuiCol_HeaderActive, rgba(active_col).multiply_rgb(1 / 1.8f));
 
 				const auto label_id = typesafe_sprintf("##%xlabel");
-				ImGui::Selectable(label_id.c_str(), false, ImGuiSelectableFlags_None, ImVec2(0, item_spacing.y - 1 + std::max(size.y, line_h * 2)));
+
+
+				if (is_disabled) {
+					const auto selectable_size = ImVec2(ImGui::GetContentRegionAvailWidth(), 2 * item_spacing.y - 1 + std::max(size.y, line_h * 2));
+					rect_filled(selectable_size, in.settings.disabled_bg, vec2(0, -item_spacing.y + 2));
+				}
+				else {
+					const auto selectable_size = ImVec2(0, item_spacing.y - 1 + std::max(size.y, line_h * 2));
+					ImGui::Selectable(label_id.c_str(), false, ImGuiSelectableFlags_None, selectable_size);
+				}
+
 				ImGui::SetCursorPos(local_pos);
 
 				text_disabled(typesafe_sprintf("(%x)", label));
@@ -148,32 +179,31 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					text_color(typesafe_sprintf("%x$", price_of(f_id)), money_color);
 
 
-					const auto slot_opts = slot_finding_opts {
-						slot_finding_opt::CHECK_WEARABLES,
-						slot_finding_opt::CHECK_HANDS,
-						slot_finding_opt::CHECK_CONTAINERS
-					};
-
-					const auto num_carryable = num_carryable_pieces(
-						subject,
-						slot_opts, 
-						f_id
-					);
-
-					const auto num_owned = subject.count_contained(f_id);
-					const auto price = price_of(f_id);
-
-					const auto num_affordable = in.available_money / price;
-
-					ImGui::SameLine();
-					text("Can afford");
-					ImGui::SameLine();
-					text_color(typesafe_sprintf("%x", num_affordable), money_color);
-					ImGui::SameLine();
-					text("more");
 					ImGui::SameLine();
 
-					text("Space: %x/%x", num_owned, num_carryable);
+					//if (num_affordable > 0) {
+						text_disabled("(Can buy");
+						ImGui::SameLine();
+						text_color(typesafe_sprintf("%x", num_affordable), num_affordable == 0 ? red : money_color);
+						ImGui::SameLine();
+						text_disabled("more)");
+						ImGui::SameLine();
+						//}
+					//else {
+						//text_color("Insufficient funds", red);
+						//ImGui::SameLine();
+						//}
+
+					const auto space_rhs = num_owned + num_carryable;
+
+					text_disabled("Space:");
+					ImGui::SameLine();
+					if (num_carryable == 0) {
+						text_color(typesafe_sprintf("%x/%x", num_owned, space_rhs), red);
+					}
+					else {
+						text_disabled(typesafe_sprintf("%x/%x", num_owned, space_rhs));
+					}
 
 					ImGui::SetCursorPosY(prev_y + line_h + item_spacing.y);
 				});

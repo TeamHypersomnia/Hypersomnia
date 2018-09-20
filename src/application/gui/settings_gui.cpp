@@ -207,6 +207,14 @@ void settings_gui_state::perform(
 						revertable_checkbox(SCOPE_CFG_NVP(dark_color_overlay_under_score));
 					}
 
+					if (auto node = scoped_tree_node("Buy menu")) {
+						auto scope = scoped_indent();
+						auto& scope_cfg = config.arena_mode_gui.buy_menu_settings;
+
+						revertable_color_edit(SCOPE_CFG_NVP(disabled_bg));
+						revertable_color_edit(SCOPE_CFG_NVP(disabled_active_bg));
+					}
+
 					auto& scope_cfg = config.arena_mode_gui;
 
 					if (auto node = scoped_tree_node("Knockouts indicators")) {

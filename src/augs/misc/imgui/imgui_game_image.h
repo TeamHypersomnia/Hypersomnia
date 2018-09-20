@@ -22,6 +22,22 @@ namespace augs {
 		}
 
 		template <class T>
+		void rect_filled(const T& size, const rgba col = white, const vec2 offset = vec2::zero) {
+			const auto imsize = static_cast<ImVec2>(size);
+
+			const auto cpos = vec2(ImGui::GetCursorScreenPos()) + offset;
+
+			ImGui::GetWindowDrawList()->AddQuadFilled(
+				static_cast<ImVec2>(cpos),
+				{ cpos.x + imsize.x, cpos.y },
+				{ cpos.x + imsize.x, cpos.y + imsize.y },
+				{ cpos.x, cpos.y + imsize.y },
+
+				ImGui::ColorConvertFloat4ToU32(col.operator ImVec4())
+			);
+		}
+
+		template <class T>
 		void game_image(const augs::atlas_entry& entry, const T& size, const rgba col = white, const vec2 offset = vec2::zero) {
 			const auto imsize = static_cast<ImVec2>(size);
 

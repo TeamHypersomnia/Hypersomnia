@@ -9,6 +9,7 @@
 
 class images_in_atlas_map;
 struct app_ingame_intent_input;
+struct buy_menu_gui_settings;
 
 enum class buy_menu_type {
 	// GEN INTROSPECTOR enum class buy_menu_type
@@ -36,6 +37,7 @@ struct arena_buy_menu_gui {
 		const bool is_in_buy_zone;
 		const item_purchases_vector& done_purchases;
 		const bool give_extra_mags_on_first_purchase;
+		const buy_menu_gui_settings& settings;
 	};
 
 	// GEN INTROSPECTOR struct arena_buy_menu_gui
