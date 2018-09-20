@@ -4,6 +4,8 @@
 #include "game/assets/ids/asset_ids.h"
 #include "game/cosmos/entity_handle_declaration.h"
 #include "game/detail/economy/money_type.h"
+#include "game/modes/detail/item_purchase_structs.h"
+#include "augs/graphics/rgba.h"
 
 class images_in_atlas_map;
 struct app_ingame_intent_input;
@@ -32,6 +34,8 @@ struct arena_buy_menu_gui {
 		const images_in_atlas_map& images_in_atlas;
 		const rgba money_indicator_color;
 		const bool is_in_buy_zone;
+		const item_purchases_vector& done_purchases;
+		const bool give_extra_mags_on_first_purchase;
 	};
 
 	// GEN INTROSPECTOR struct arena_buy_menu_gui

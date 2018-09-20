@@ -160,7 +160,23 @@ struct typed_entity_id {
 	bool operator!=(const typed_entity_id<E> b) const {
 		return !operator==(b);
 	}
+
+	bool is_set() const {
+		return raw.is_set();
+	}
 }; 
+
+template <class T>
+const std::string& get_type_name();
+
+template <class E>
+std::ostream& operator<<(std::ostream& out, const typed_entity_id<E>& x) {
+	if (!x.is_set()) {
+		return out << "(unset)";
+	}
+
+	return out << get_type_name<E>() << "-" << x.raw;
+}
 
 struct child_entity_id : entity_id {
 	using base = entity_id;

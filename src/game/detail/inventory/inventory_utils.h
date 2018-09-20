@@ -5,19 +5,19 @@
 #include "game/detail/inventory/item_slot_transfer_request.h"
 #include "game/detail/inventory/item_transfer_result.h"
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
+#include "game/detail/inventory/inventory_space_type.h"
 
 augs::constant_size_vector<item_slot_transfer_request, 4> swap_slots_for_items(
 	const const_entity_handle first, 
 	const const_entity_handle second 
 );
 
-unsigned calc_space_occupied_with_children(const_entity_handle item);
+inventory_space_type calc_space_occupied_with_children(const_entity_handle item);
 
 containment_result query_containment_result(
 	const const_entity_handle item, 
 	const const_inventory_slot_handle target_slot, 
-	int specified_quantity = -1,
-	bool allow_replacement = true
+	int specified_quantity = -1
 );
 
 struct capability_comparison {
@@ -39,8 +39,8 @@ slot_function get_slot_with_compatible_category(const_entity_handle item, const_
 
 bool can_stack_entities(const_entity_handle, const_entity_handle);
 
-unsigned to_space_units(const std::string& s);
-std::string format_space_units(unsigned);
+inventory_space_type to_space_units(const std::string& s);
+std::string format_space_units(inventory_space_type);
 
 int count_charges_in_deposit(const_entity_handle item);
 int count_charges_inside(const_inventory_slot_handle);

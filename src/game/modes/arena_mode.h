@@ -7,6 +7,7 @@
 #include "game/modes/mode_player_id.h"
 #include "game/detail/damage_origin.h"
 #include "game/detail/economy/money_type.h"
+#include "game/modes/detail/item_purchase_structs.h"
 
 struct arena_mode_win {
 	// GEN INTROSPECTOR struct arena_mode_win

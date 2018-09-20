@@ -11,6 +11,9 @@
 #include "game/enums/slot_physical_behaviour.h"
 #include "game/cosmos/entity_flavour_id.h"
 #include "game/detail/view_input/sound_effect_input.h"
+#include "game/detail/inventory/inventory_space_type.h"
+
+#include "game/organization/special_flavour_id_types.h"
 
 class cosmos;
 
@@ -21,15 +24,16 @@ namespace augs {
 struct inventory_slot {
 	// GEN INTROSPECTOR struct inventory_slot
 	item_category category_allowed = item_category::GENERAL;
-	entity_flavour_id only_allow_flavour;
+	item_flavour_id only_allow_flavour;
 
 	real32 mounting_duration_ms = -1.f;
 	slot_physical_behaviour physical_behaviour = slot_physical_behaviour::DEACTIVATE_BODIES;
 	bool only_last_inserted_is_movable = false;
 	bool always_allow_exactly_one_item = false;
-	pad_bytes<2> pad;
+	bool contributes_to_space_occupied = true;
+	pad_bytes<1> pad;
 
-	unsigned space_available = 0;
+	inventory_space_type space_available = 0;
 
 	float attachment_density_multiplier = 1.f;
 
@@ -44,6 +48,11 @@ struct inventory_slot {
 
 	bool has_unlimited_space() const;
 	bool makes_physical_connection() const;
+
+	bool is_category_compatible_with(
+		const entity_flavour_id&,
+		const item_category_flagset&
+	) const;
 
 	bool is_category_compatible_with(const_entity_handle item) const;
 	bool is_mounted_slot() const;

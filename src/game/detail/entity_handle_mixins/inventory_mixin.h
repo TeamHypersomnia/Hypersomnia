@@ -10,6 +10,8 @@
 #include "augs/build_settings/platform_defines.h"
 #include "game/detail/inventory/wielding_result.h"
 #include "augs/enums/callback_result.h"
+#include "game/detail/inventory/inventory_space_type.h"
+#include "game/organization/special_flavour_id_types.h"
 
 struct attachment_offset_settings;
 struct colliders_connection;
@@ -77,8 +79,9 @@ public:
 		infer_item_colliders_recursive();
 	}
 
-	std::optional<unsigned> find_space_occupied() const;	
+	std::optional<inventory_space_type> find_space_occupied() const;	
 	int num_charges_fitting_in(const inventory_slot_handle_type&) const;
+	int count_contained(const item_flavour_id&) const;
 	void set_charges(int) const;
 
 	generic_handle_type get_owning_transfer_capability() const;
@@ -88,6 +91,12 @@ public:
 
 	std::optional<colliders_connection> calc_connection_to_topmost_container() const;
 	std::optional<colliders_connection> calc_connection_until_container(const entity_id until) const;
+
+	template <class F>
+	void for_each_candidate_slot(
+		const slot_finding_opts&,
+		F&& callback
+	) const;
 
 	template <class handle_type>
 	inventory_slot_handle_type find_slot_for(

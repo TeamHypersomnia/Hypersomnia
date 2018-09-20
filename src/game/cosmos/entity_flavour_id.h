@@ -120,16 +120,16 @@ std::ostream& operator<<(std::ostream& out, const typed_entity_flavour_id<T> x) 
 }
 
 namespace std {
-	template <>
-	struct hash<entity_flavour_id> {
-		std::size_t operator()(const entity_flavour_id v) const {
+	template <class... C>
+	struct hash<constrained_entity_flavour_id<C...>> {
+		std::size_t operator()(const constrained_entity_flavour_id<C...>& v) const {
 			return augs::simple_two_hash(v.raw, v.type_id);
 		}
 	};
 
 	template <class T>
 	struct hash<typed_entity_flavour_id<T>> {
-		std::size_t operator()(const typed_entity_flavour_id<T> v) const {
+		std::size_t operator()(const typed_entity_flavour_id<T>& v) const {
 			return augs::simple_two_hash(typeid(T).hash_code(), v.raw);
 		}
 	};

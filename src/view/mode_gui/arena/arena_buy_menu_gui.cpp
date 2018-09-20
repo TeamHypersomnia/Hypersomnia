@@ -14,6 +14,10 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"
 #include "application/app_intent_type.h"
+#include "game/detail/flavour_scripts.h"
+#include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
+#include "game/organization/special_flavour_id_types.h"
+#include "game/modes/detail/item_purchase_logic.hpp"
 
 bool arena_buy_menu_gui::control(app_ingame_intent_input in) {
 	using namespace augs::event;
@@ -44,6 +48,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 	const auto& subject = in.subject;
 	const auto& cosm = subject.get_cosmos();
+	const auto money_color = in.money_indicator_color;
 
 	if (subject.dead()) {
 		return std::nullopt;
@@ -67,10 +72,10 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		ImGui::SameLine();
 	}
 
-	text(typesafe_sprintf("%x$"), in.available_money);
+	text_color(typesafe_sprintf("%x$", in.available_money), money_color);
 
 	auto image_of = [&](const auto& of) {
-		if constexpr(std::is_same_v<decltype(of), const entity_flavour_id&>) {
+		if constexpr(std::is_same_v<decltype(of), const item_flavour_id&>) {
 			return cosm.on_flavour(of, [&](const auto& typed_flavour) {
 				return typed_flavour.get_image_id();
 			});
@@ -81,9 +86,9 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 	};
 
 	auto price_of = [&](const auto& of) {
-		if constexpr(std::is_same_v<decltype(of), const entity_flavour_id&>) {
+		if constexpr(std::is_same_v<decltype(of), const item_flavour_id&>) {
 			return cosm.on_flavour(of, [&](const auto& typed_flavour) {
-				return typed_flavour.find_price();
+				return *typed_flavour.find_price();
 			});
 		}
 		else {
@@ -91,7 +96,13 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		}
 	};
 
-	auto flavour_button = [&](const entity_flavour_id& f_id, const std::string& label = "") {
+	enum class button_type {
+		REPLENISHABLE,
+		OWNED_WEAPON,
+		BUYABLE_WEAPON
+	};
+
+	auto flavour_button = [&](const item_flavour_id& f_id, const button_type b, const std::string& label = "") {
 		if (const auto& entry = in.images_in_atlas.at(image_of(f_id)).diffuse; entry.exists()) {
 			const auto local_pos = ImGui::GetCursorPos();
 
@@ -101,7 +112,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			const auto size = vec2(entry.get_original_size());
 
 			const auto line_h = ImGui::GetTextLineHeight();
-			const bool show_description = !label.empty();
+			const bool show_description = b != button_type::OWNED_WEAPON;
 
 			if (show_description) {
 				const auto hover_col = rgba(ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
@@ -134,7 +145,35 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					ImGui::SetCursorPosY(prev_y);
 					ImGui::SetCursorPosX(x);
 
-					text_color(typesafe_sprintf("%x$", price_of(f_id)), in.money_indicator_color);
+					text_color(typesafe_sprintf("%x$", price_of(f_id)), money_color);
+
+
+					const auto slot_opts = slot_finding_opts {
+						slot_finding_opt::CHECK_WEARABLES,
+						slot_finding_opt::CHECK_HANDS,
+						slot_finding_opt::CHECK_CONTAINERS
+					};
+
+					const auto num_carryable = num_carryable_pieces(
+						subject,
+						slot_opts, 
+						f_id
+					);
+
+					const auto num_owned = subject.count_contained(f_id);
+					const auto price = price_of(f_id);
+
+					const auto num_affordable = in.available_money / price;
+
+					ImGui::SameLine();
+					text("Can afford");
+					ImGui::SameLine();
+					text_color(typesafe_sprintf("%x", num_affordable), money_color);
+					ImGui::SameLine();
+					text("more");
+					ImGui::SameLine();
+
+					text("Space: %x/%x", num_owned, num_carryable);
 
 					ImGui::SetCursorPosY(prev_y + line_h + item_spacing.y);
 				});
@@ -162,12 +201,12 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 	};
 
 	struct owned_entry {
-		entity_flavour_id weapon;
-		entity_flavour_id mag;
+		item_flavour_id weapon;
+		item_flavour_id mag;
 		int num = 1;
 
 		owned_entry() = default;
-		owned_entry(const entity_flavour_id& weapon, const entity_flavour_id& mag) : weapon(weapon), mag(mag) {};
+		owned_entry(const item_flavour_id& weapon, const item_flavour_id& mag) : weapon(weapon), mag(mag) {};
 
 		bool operator==(const owned_entry& b) const {
 			return std::tie(weapon, mag) == std::tie(b.weapon, b.mag);
@@ -208,13 +247,15 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		});
 
 		sort_range(owned_weapons, owned_comparator);
-		text(typesafe_sprintf("Equipment value: %x$", equipment_value));
+		text("Equipment value:");
+		ImGui::SameLine();
+		text_color(typesafe_sprintf("%x$", equipment_value), money_color);
 
 		text("Owned weapons:");
 
 		for (const auto& o : owned_weapons) {
 			ImGui::SameLine();
-			flavour_button(o.weapon);
+			flavour_button(o.weapon, button_type::OWNED_WEAPON, "");
 
 			if (o.num > 1) {
 				ImGui::SameLine();
@@ -229,7 +270,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 	if (in.is_in_buy_zone) {
 		if (owned_weapons.size() > 0) {
-			std::unordered_set<entity_flavour_id> displayed_replenishables;
+			std::unordered_set<item_flavour_id> displayed_replenishables;
 
 			centered_text("REPLENISH AMMUNITION");
 
@@ -245,7 +286,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				emplace_element(displayed_replenishables, f.mag);
 
 				const auto index = typesafe_sprintf("S+%x", 1 + index_in(owned_weapons, f));
-				const bool choice_was_made = flavour_button(f.mag, index);
+				const bool choice_was_made = flavour_button(f.mag, button_type::REPLENISHABLE, index);
 
 				ImGui::Separator();
 
@@ -289,7 +330,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				const std::optional<item_holding_stance> considered_stance,
 				auto&& for_each_potential_item
 			) {
-				std::vector<entity_flavour_id> buyable_items;
+				std::vector<item_flavour_id> buyable_items;
 
 				for_each_potential_item([&](const auto& id, const auto& flavour) {
 					if (considered_stance != std::nullopt) {
@@ -311,7 +352,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 					ImGui::Separator();
 
-					if (flavour_button(b, index)) {
+					if (flavour_button(b, button_type::BUYABLE_WEAPON, index)) {
 						mode_commands::item_purchase msg;
 						msg.flavour_id = b;
 						result = msg;
@@ -329,7 +370,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 			auto for_each_pistol = [&](auto&& callback) {
 				cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
-					if (price_of(entity_flavour_id(id)) <= 1000) {
+					if (price_of(item_flavour_id(id)) <= 1000) {
 						callback(id, flavour);
 					}
 				});
@@ -337,7 +378,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 			auto for_each_smg = [&](auto&& callback) {
 				cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
-					if (price_of(entity_flavour_id(id)) > 1000) {
+					if (price_of(item_flavour_id(id)) > 1000) {
 						callback(id, flavour);
 					}
 				});

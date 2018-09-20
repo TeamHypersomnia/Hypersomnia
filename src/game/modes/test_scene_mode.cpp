@@ -31,7 +31,7 @@ void test_scene_mode::init_spawned(const input in, const entity_id id, const log
 	const auto handle = in.cosm[id];
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
-		::generate_equipment(in.vars.initial_eq, typed_handle, step);
+		in.vars.initial_eq.generate_for(typed_handle, step);
 
 		auto& sentience = typed_handle.template get<components::sentience>();
 

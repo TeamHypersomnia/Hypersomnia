@@ -1,5 +1,6 @@
 #pragma once
 #include "game/detail/inventory/inventory_slot_id.h"
+#include "game/detail/inventory/inventory_space_type.h"
 
 #include "game/enums/item_category.h"
 #include "game/enums/item_holding_stance.h"
@@ -22,7 +23,7 @@ namespace invariants {
 	struct item {
 		static constexpr bool reinfer_when_tweaking = true;
 		// GEN INTROSPECTOR struct invariants::item
-		unsigned space_occupied_per_charge = 1;
+		inventory_space_type space_occupied_per_charge = 1;
 		item_category_flagset categories_for_slot_compatibility = { item_category::GENERAL };
 		item_holding_stance holding_stance = item_holding_stance::BARE_LIKE;
 

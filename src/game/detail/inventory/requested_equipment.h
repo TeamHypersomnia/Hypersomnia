@@ -1,27 +1,28 @@
 #pragma once
-#include "game/cosmos/entity_flavour_id.h"
+#include "game/organization/special_flavour_id_types.h"
 #include "augs/misc/simple_pair.h"
+#include "game/cosmos/step_declaration.h"
 
-struct requested_ammo {
-	// GEN INTROSPECTOR struct requested_ammo
-	entity_flavour_id magazine;
-	entity_flavour_id charge;
-	// END GEN INTROSPECTOR
-};
-
-using other_equipment_vector = std::vector<augs::simple_pair<int, entity_flavour_id>>;
-using spare_ammo_vector = std::vector<augs::simple_pair<int, requested_ammo>>;
+using other_equipment_vector = std::vector<augs::simple_pair<int, item_flavour_id>>;
 
 struct requested_equipment {
 	// GEN INTROSPECTOR struct requested_equipment
-	entity_flavour_id weapon;
-	requested_ammo weapon_ammo;
-	entity_flavour_id backpack;
-	entity_flavour_id belt_wearable;
-	entity_flavour_id personal_deposit_wearable;
-	entity_flavour_id shoulder_wearable;
+	item_flavour_id weapon;
+	item_flavour_id non_standard_mag;
+	item_flavour_id non_standard_charge;
+	int num_spare_ammo_pieces = 0;
+
+	item_flavour_id back_wearable;
+	item_flavour_id belt_wearable;
+	item_flavour_id personal_deposit_wearable;
+	item_flavour_id shoulder_wearable;
 
 	other_equipment_vector other_equipment;
-	spare_ammo_vector spare_mags;
 	// END GEN INTROSPECTOR
+
+	template <class E>
+	void generate_for(
+		const E& character, 
+		const logic_step step
+	) const;
 };

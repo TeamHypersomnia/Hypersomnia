@@ -12,10 +12,11 @@
 #include "game/detail/physics/colliders_connection.h"
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/detail/inventory/inventory_slot_id.h"
-
+#include "game/detail/inventory/inventory_space_type.h"
 #include "game/components/transform_component.h"
 
 struct inventory_slot;
+inventory_space_type calc_space_occupied_with_children(const_entity_handle item);
 
 class cosmos;
 
@@ -68,8 +69,8 @@ public:
 
 	float calc_density_multiplier_due_to_being_attached() const;
 
-	unsigned calc_local_space_available() const;
-	unsigned calc_real_space_available() const;
+	inventory_space_type calc_local_space_available() const;
+	inventory_space_type calc_real_space_available() const;
 
 	bool is_physically_connected_until(
 		const entity_id until_parent,
@@ -312,7 +313,7 @@ slot_function basic_inventory_slot_handle<E>::get_type() const {
 }
 
 template <class E>
-unsigned basic_inventory_slot_handle<E>::calc_real_space_available() const {
+inventory_space_type basic_inventory_slot_handle<E>::calc_real_space_available() const {
 	const auto lsa = calc_local_space_available();
 
 	const auto maybe_item = get_container().template find<components::item>();
@@ -334,12 +335,12 @@ bool basic_inventory_slot_handle<E>::can_contain(const entity_id id) const {
 }
 
 template <class E>
-unsigned basic_inventory_slot_handle<E>::calc_local_space_available() const {
+inventory_space_type basic_inventory_slot_handle<E>::calc_local_space_available() const {
 	if (get().has_unlimited_space()) {
 		return 1000000 * SPACE_ATOMS_PER_UNIT;
 	}
 
-	unsigned lsa = get().space_available;
+	auto lsa = get().space_available;
 
 	for (const auto e : get_items_inside()) {
 		const auto occupied = calc_space_occupied_with_children(get_cosmos()[e]);
@@ -357,4 +358,13 @@ unsigned basic_inventory_slot_handle<E>::calc_local_space_available() const {
 template <class E>
 const std::vector<entity_id>& basic_inventory_slot_handle<E>::get_items_inside() const {
 	return get_cosmos().get_solvable_inferred().relational.get_items_of_slots().get_children_of(get_id());
+}
+
+template <class E>
+std::ostream& operator<<(std::ostream& out, const basic_inventory_slot_handle<E> &x) {
+	if (x.dead()) {
+		return out << "(dead slot handle)";
+	}
+
+	return out << typesafe_sprintf("%x (%x)", x.get_type(), x.get_container());
 }

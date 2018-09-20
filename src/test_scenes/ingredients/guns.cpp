@@ -612,7 +612,7 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_container_items::STANDARD_MAGAZINE);
+			auto& meta = get_test_flavour(flavours, test_container_items::BILMER2000_MAGAZINE);
 
 			{
 				invariants::render render_def;
@@ -621,7 +621,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::STANDARD_MAGAZINE, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::BILMER2000_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::container container; 
@@ -630,6 +630,80 @@ namespace test_flavours {
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
 			charge_deposit_def.space_available = to_space_units("0.3");
 			charge_deposit_def.mounting_duration_ms = 500.f;
+			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE);
+			charge_deposit_def.contributes_to_space_occupied = false;
+
+			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
+			meta.set(container);
+
+			{
+				invariants::item item;
+
+				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				item.space_occupied_per_charge = to_space_units("0.5");
+				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
+				item.standard_price = 70;
+				meta.set(item);
+			}
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_container_items::DATUM_GUN_MAGAZINE);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::DATUM_GUN_MAGAZINE, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+
+			invariants::container container; 
+
+			inventory_slot charge_deposit_def;
+			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
+			charge_deposit_def.space_available = to_space_units("0.25");
+			charge_deposit_def.mounting_duration_ms = 700.f;
+			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE);
+			charge_deposit_def.contributes_to_space_occupied = false;
+
+			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
+			meta.set(container);
+
+			{
+				invariants::item item;
+
+				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				item.space_occupied_per_charge = to_space_units("0.5");
+				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
+				item.standard_price = 100;
+				meta.set(item);
+			}
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_container_items::VINDICATOR_MAGAZINE);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::VINDICATOR_MAGAZINE, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+
+			invariants::container container; 
+
+			inventory_slot charge_deposit_def;
+			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
+			charge_deposit_def.space_available = to_space_units("0.3");
+			charge_deposit_def.mounting_duration_ms = 500.f;
+			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE);
+			charge_deposit_def.contributes_to_space_occupied = false;
 
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
 			meta.set(container);
@@ -664,6 +738,8 @@ namespace test_flavours {
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
 			charge_deposit_def.space_available = to_space_units("0.25");
 			charge_deposit_def.mounting_duration_ms = 500.f;
+			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE);
+			charge_deposit_def.contributes_to_space_occupied = false;
 
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
 			meta.set(container);
@@ -698,6 +774,8 @@ namespace test_flavours {
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
 			charge_deposit_def.space_available = to_space_units("0.25");
 			charge_deposit_def.mounting_duration_ms = 500.f;
+			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE);
+			charge_deposit_def.contributes_to_space_occupied = false;
 
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
 			meta.set(container);
@@ -732,6 +810,8 @@ namespace test_flavours {
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
 			charge_deposit_def.space_available = to_space_units("0.5");
 			charge_deposit_def.mounting_duration_ms = 300.f;
+			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE);
+			charge_deposit_def.contributes_to_space_occupied = false;
 
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
 			meta.set(container);
@@ -766,6 +846,8 @@ namespace test_flavours {
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
 			charge_deposit_def.space_available = to_space_units("0.8");
 			charge_deposit_def.mounting_duration_ms = 500.f;
+			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::AO44_CHARGE);
+			charge_deposit_def.contributes_to_space_occupied = false;
 
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
 			meta.set(container);
@@ -930,7 +1012,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().standard_price = 3100;
 			set_chambering_duration_ms(meta, 400.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
-			only_allow_mag(meta, test_container_items::STANDARD_MAGAZINE);
+			only_allow_mag(meta, test_container_items::BILMER2000_MAGAZINE);
 		}
 
 		{
@@ -1038,7 +1120,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().standard_price = 2900;
 			set_chambering_duration_ms(meta, 500.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
-			only_allow_mag(meta, test_container_items::STANDARD_MAGAZINE);
+			only_allow_mag(meta, test_container_items::VINDICATOR_MAGAZINE);
 		}
 
 		{
@@ -1157,6 +1239,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().standard_price = 4000;
 			set_chambering_duration_ms(meta, 900.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
+			only_allow_mag(meta, test_container_items::DATUM_GUN_MAGAZINE);
 		}
 
 		{
@@ -1343,155 +1426,5 @@ namespace test_flavours {
 			meta.get<invariants::item>().standard_price = 2500;
 			set_density_mult(meta, 0.8f);
 		}
-	}
-}
-
-namespace prefabs {
-	entity_handle create_vindicator(const logic_step step, vec2 pos, entity_id load_mag_id) {
-		return create_gun(step, pos, test_shootable_weapons::VINDICATOR, load_mag_id);
-	}
-
-	entity_handle create_sample_rifle(const logic_step step, vec2 pos, entity_id load_mag_id) {
-		return create_gun(step, pos, test_shootable_weapons::BILMER2000, load_mag_id);
-	}
-
-	entity_handle create_gun(const logic_step step, vec2 pos, const test_shootable_weapons flavour, entity_id load_mag_id) {
-		auto& cosmos = step.get_cosmos();
-		auto load_mag = cosmos[load_mag_id];
-
-		auto weapon = create_test_scene_entity(cosmos, flavour, pos);
-
-		if (load_mag.alive()) {
-			auto request = item_slot_transfer_request::standard(load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE]);
-			request.params.bypass_mounting_requirements = true;
-
-			perform_transfer(request, step);
-
-#if LOAD_TO_CHAMBER
-			if (load_mag[slot_function::ITEM_DEPOSIT].has_items()) {
-				auto request = item_slot_transfer_request::standard(
-					load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], 
-					weapon[slot_function::GUN_CHAMBER], 
-					1
-				);
-
-				request.params.bypass_mounting_requirements = true;
-
-				perform_transfer(request, step);
-			}
-#endif
-		}
-
-		return weapon;
-	}
-
-	entity_handle create_weapon(const logic_step step, test_shootable_weapons flav, vec2 pos, entity_id load_mag_id) {
-		auto& cosmos = step.get_cosmos();
-		auto load_mag = cosmos[load_mag_id];
-
-		auto weapon = create_test_scene_entity(cosmos, flav, pos);
-
-		if (load_mag.alive()) {
-			auto request = item_slot_transfer_request::standard(load_mag, weapon[slot_function::GUN_DETACHABLE_MAGAZINE]);
-			request.params.bypass_mounting_requirements = true;
-
-			perform_transfer(request, step);
-
-#if LOAD_TO_CHAMBER
-			if (load_mag[slot_function::ITEM_DEPOSIT].has_items()) {
-				auto request = item_slot_transfer_request::standard(load_mag[slot_function::ITEM_DEPOSIT].get_items_inside()[0], weapon[slot_function::GUN_CHAMBER], 1);
-				request.params.bypass_mounting_requirements = true;
-				perform_transfer(request, step);
-			}
-#endif
-		}
-
-		return weapon;
-	}
-
-	entity_handle create_ao44(const logic_step step, vec2 pos, entity_id load_mag_id) {
-		return create_weapon(step, test_shootable_weapons::AO44, pos, load_mag_id);
-	}
-
-	entity_handle create_kek9(const logic_step step, vec2 pos, entity_id load_mag_id) {
-		return create_weapon(step, test_shootable_weapons::KEK9, pos, load_mag_id);
-	}
-
-	entity_handle create_sn69(const logic_step step, vec2 pos, entity_id load_mag_id) {
-		return create_weapon(step, test_shootable_weapons::SN69, pos, load_mag_id);
-	}
-
-	entity_handle create_amplifier_arm(
-		const logic_step step,
-		vec2 pos
-	) {
-		auto& cosmos = step.get_cosmos();
-		auto weapon = create_test_scene_entity(cosmos, test_shootable_weapons::AMPLIFIER_ARM, pos);
-
-		return weapon;
-	}
-}
-
-namespace prefabs {
-	entity_handle create_magazine(const logic_step step, const transformr pos, const test_container_items flav, const entity_id charge_inside_id, const int force_num_charges) {
-		auto& cosmos = step.get_cosmos();
-		auto charge_inside = cosmos[charge_inside_id];
-
-		auto sample_magazine = create_test_scene_entity(cosmos, flav, pos);
-
-		if (charge_inside.alive()) {
-			const auto num_fitting_in = charge_inside.num_charges_fitting_in(sample_magazine[slot_function::ITEM_DEPOSIT]);
-
-			int ch = 0;
-
-			if (force_num_charges != -1) {
-				ch = force_num_charges;
-			}
-			else {
-				ch = num_fitting_in;
-			}
-
-			if (ch) {
-				charge_inside.get<components::item>().set_charges(ch);
-			}
-
-			auto load_charge = item_slot_transfer_request::standard(charge_inside, sample_magazine[slot_function::ITEM_DEPOSIT]);
-			load_charge.params.bypass_mounting_requirements = true;
-
-			perform_transfer(load_charge, step);
-		}
-
-		return sample_magazine;
-	}
-
-
-	entity_handle create_sample_magazine(const logic_step step, const transformr pos, const entity_id charge_inside_id, const int force_num_charges) {
-		return create_magazine(step, pos, test_container_items::STANDARD_MAGAZINE, charge_inside_id, force_num_charges);
-	}
-
-	entity_handle create_pro90_magazine(const logic_step step, const transformr pos, const entity_id charge_inside_id, const int force_num_charges) {
-		return create_magazine(step, pos, test_container_items::PRO90_MAGAZINE, charge_inside_id, force_num_charges);
-	}
-
-	entity_handle create_ao44_magazine(const logic_step step, const transformr pos, const entity_id charge_inside_id, const int force_num_charges) {
-		return create_magazine(step, pos, test_container_items::AO44_MAGAZINE, charge_inside_id, force_num_charges);
-	}
-
-	entity_handle create_cyan_charge(const logic_step step, const vec2 pos) {
-		auto& cosmos = step.get_cosmos();
-		const auto charge = create_test_scene_entity(cosmos, test_shootable_charges::CYAN_CHARGE, pos);
-		return charge;
-	}
-
-	entity_handle create_ao44_charge(const logic_step step, const vec2 pos) {
-		auto& cosmos = step.get_cosmos();
-		const auto charge = create_test_scene_entity(cosmos, test_shootable_charges::AO44_CHARGE, pos);
-		return charge;
-	}
-
-	entity_handle create_steel_charge(const logic_step step, const vec2 pos) {
-		auto& cosmos = step.get_cosmos();
-		const auto charge = create_test_scene_entity(cosmos, test_shootable_charges::STEEL_CHARGE, pos);
-		return charge;
 	}
 }

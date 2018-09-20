@@ -179,8 +179,7 @@ slot_function get_slot_with_compatible_category(const const_entity_handle item, 
 containment_result query_containment_result(
 	const const_entity_handle item_entity,
 	const const_inventory_slot_handle target_slot,
-	const int specified_quantity,
-	const bool /* allow_replacement */
+	const int specified_quantity
 ) {
 	const auto& cosmos = item_entity.get_cosmos();
 	const auto item = item_entity.get<components::item>();
@@ -300,7 +299,7 @@ int count_charges_inside(const const_inventory_slot_handle id) {
 	return charges;
 }
 
-std::string format_space_units(const unsigned u) {
+std::string format_space_units(const inventory_space_type u) {
 	if (!u) {
 		return "0";
 	}
@@ -308,15 +307,17 @@ std::string format_space_units(const unsigned u) {
 	return to_string_ex(u / double(SPACE_ATOMS_PER_UNIT), 2);
 }
 
-unsigned calc_space_occupied_with_children(const const_entity_handle item_entity) {
+inventory_space_type calc_space_occupied_with_children(const const_entity_handle item_entity) {
 	auto space_occupied = *item_entity.find_space_occupied();
 
 	if (auto* const container = item_entity.find<invariants::container>()) {
 		ensure_eq(item_entity.get<components::item>().get_charges(), 1);
 
 		for (const auto& slot : container->slots) {
-			for (const auto entity_in_slot : get_items_inside(item_entity, slot.first)) {
-				space_occupied += calc_space_occupied_with_children(item_entity.get_cosmos()[entity_in_slot]);
+			if (slot.second.contributes_to_space_occupied) {
+				for (const auto entity_in_slot : get_items_inside(item_entity, slot.first)) {
+					space_occupied += calc_space_occupied_with_children(item_entity.get_cosmos()[entity_in_slot]);
+				}
 			}
 		}
 	}

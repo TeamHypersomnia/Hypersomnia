@@ -80,7 +80,9 @@ void arena_gui_state::perform_imgui(
 						p->stats.money,
 						mode_in.images_in_atlas,
 						mode_in.config.arena_mode_gui.money_indicator_color,
-						true
+						true,
+						p->stats.round_state.done_purchases,
+						mode_input.vars.economy.give_extra_mags_on_first_purchase
 					});
 
 					if (choice != std::nullopt) {

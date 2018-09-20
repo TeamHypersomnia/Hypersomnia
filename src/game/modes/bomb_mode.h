@@ -45,6 +45,8 @@ struct bomb_mode_economy_vars {
 	money_type bomb_plant_award = 250;
 	money_type bomb_explosion_award = 350;
 	money_type bomb_defuse_award = 500;
+
+	bool give_extra_mags_on_first_purchase = true;
 	// END GEN INTROSPECTOR
 };
 
@@ -93,6 +95,7 @@ struct bomb_mode_faction_state {
 
 struct arena_mode_player_round_state {
 	// GEN INTROSPECTOR struct arena_mode_player_round_state
+	item_purchases_vector done_purchases;
 	arena_mode_awards_vector awards;
 	// END GEN INTROSPECTOR
 };

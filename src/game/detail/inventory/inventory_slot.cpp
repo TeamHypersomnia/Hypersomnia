@@ -21,12 +21,26 @@ bool inventory_slot::has_unlimited_space() const {
 	return physical_behaviour != slot_physical_behaviour::DEACTIVATE_BODIES;
 }
 
-bool inventory_slot::is_category_compatible_with(const const_entity_handle id) const {
-	if (only_allow_flavour.type_id.is_set()) {
-		return id.get_flavour_id() == only_allow_flavour;
+bool inventory_slot::is_category_compatible_with(
+	const const_entity_handle handle
+) const {
+	if (const auto item = handle.find<invariants::item>()) {
+		return is_category_compatible_with(
+			handle.get_flavour_id(), 
+			item->categories_for_slot_compatibility
+		);
 	}
 
-	auto& item_def = id.get<invariants::item>();
-	
-	return item_def.categories_for_slot_compatibility.test(category_allowed);
+	return false;
+}
+
+bool inventory_slot::is_category_compatible_with(
+	const entity_flavour_id& item_flavour_id,
+	const item_category_flagset& categories
+) const {
+	if (only_allow_flavour.is_set()) {
+		return item_flavour_id == only_allow_flavour;
+	}
+
+	return categories.test(category_allowed);
 }

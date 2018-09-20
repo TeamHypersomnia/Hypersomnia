@@ -37,27 +37,16 @@
 #include "test_scenes/scenes/test_scene_node.h"
 #include "game/modes/test_scene_mode.h"
 #include "game/modes/bomb_mode.h"
+#include "game/detail/inventory/generate_equipment.h"
 
 namespace test_scenes {
 	void testbed::setup(test_scene_mode_vars& vars) {
 		vars.name = "Testbed vars";
 		vars.spawned_faction = faction_type::RESISTANCE;
 
-		/* const auto pro90_mag = requested_ammo { */ 
-		/* 	to_entity_flavour_id(test_container_items::PRO90_MAGAZINE), */ 
-		/* 	to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE) */
-		/* }; */
-
-		const auto vindicator_mag = requested_ammo { 
-			to_entity_flavour_id(test_container_items::STANDARD_MAGAZINE), 
-			to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE)
-		};
-
 		vars.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::VINDICATOR);
-		vars.initial_eq.weapon_ammo = vindicator_mag;
 		vars.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
-
-		vars.initial_eq.spare_mags.emplace_back(3, vindicator_mag);
+		vars.initial_eq.num_spare_ammo_pieces = 3;
 	}
 
 	void testbed::setup(bomb_mode_vars& vars) {
@@ -71,25 +60,15 @@ namespace test_scenes {
 			resistance.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 			metropolis.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 
+#define GIVE_AMMO 1
+
 #if GIVE_AMMO
-			const auto pro90_mag = requested_ammo { 
-				to_entity_flavour_id(test_container_items::PRO90_MAGAZINE), 
-				to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE)
-			};
-
-			const auto bilmer_mag = requested_ammo { 
-				to_entity_flavour_id(test_container_items::STANDARD_MAGAZINE), 
-				to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE)
-			};
-
-			resistance.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::PRO90);
-			resistance.initial_eq.weapon_ammo = pro90_mag;
-			resistance.initial_eq.spare_mags.emplace_back(3, pro90_mag);
+			resistance.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::AO44);
+			resistance.initial_eq.num_spare_ammo_pieces = 3;
 
 			metropolis.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BILMER2000);
-			metropolis.initial_eq.weapon_ammo = bilmer_mag;
+			metropolis.initial_eq.num_spare_ammo_pieces = 3;
 			metropolis.initial_eq.belt_wearable = to_entity_flavour_id(test_tool_items::DEFUSE_KIT);
-			metropolis.initial_eq.spare_mags.emplace_back(3, bilmer_mag);
 #endif
 		}
 
@@ -222,6 +201,25 @@ namespace test_scenes {
 			return i < new_characters.size() ? world[new_characters.at(i)] : world[entity_id()];
 		};
 
+		auto give_weapon = [&](const auto& character, const test_shootable_weapons w) {
+			requested_equipment r;
+			r.weapon = to_entity_flavour_id(w);
+
+			if constexpr(!std::is_same_v<const transformr&, decltype(character)>) {
+				r.num_spare_ammo_pieces = 2;
+				r.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+			}
+
+			r.generate_for(character, step);
+		};
+
+		auto give_backpack = [&](const auto& character, const test_container_items c) {
+			requested_equipment r;
+			r.back_wearable = to_entity_flavour_id(c);
+
+			r.generate_for(character, step);
+		};
+
 		const auto metropolis_type = test_controlled_characters::METROPOLIS_SOLDIER;
 		const auto resistance_type = test_controlled_characters::RESISTANCE_SOLDIER;
 
@@ -251,36 +249,17 @@ namespace test_scenes {
 				sentience.get<personal_electricity_meter_instance>().set_value(10000);
 				sentience.get<personal_electricity_meter_instance>().set_maximum_value(10000);
 
-				const auto rifle = (is_metropolis ? prefabs::create_sample_rifle : prefabs::create_vindicator)(
-					step, vec2(100, -500), prefabs::create_sample_magazine(step, vec2(100, -650), prefabs::create_steel_charge(step, vec2(0, 0)), 30)
-				);
-
 				if (i == 1) {
 					new_character.get<components::crosshair>().base_offset.x = -500;
 				}
 
-				perform_transfer(item_slot_transfer_request::standard(rifle, new_character.get_primary_hand()), step);
+				give_weapon(new_character, is_metropolis ? test_shootable_weapons::BILMER2000 : test_shootable_weapons::VINDICATOR);
 			}
 
 			if (i == 7 || i == 8 || i == 9) {
 				/* Give some stuff to three test characters */
-				if (i == 9) {
-					const auto rifle = prefabs::create_sample_rifle(step, vec2(100, -500),
-						prefabs::create_sample_magazine(step, vec2(100, -650),
-							prefabs::create_cyan_charge(step, vec2(0, 0))));
-
-					perform_transfer(item_slot_transfer_request::standard(rifle, new_character.get_primary_hand()), step);
-				}
-				else {
-					const auto rifle = (i == 7 ? prefabs::create_sample_rifle : prefabs::create_sample_rifle)(step, vec2(100, -500),
-						prefabs::create_sample_magazine(step, vec2(100, -650),
-							prefabs::create_cyan_charge(step, vec2(0, 0))));
-
-					perform_transfer(item_slot_transfer_request::standard(rifle, new_character.get_primary_hand()), step);
-				}
-
-				auto backpack = create(is_metropolis ? sample_backpack : brown_backpack, vec2(200, -650));
-				perform_transfer(item_slot_transfer_request::standard(backpack, new_character[slot_function::BACK]), step);
+				give_weapon(new_character, test_shootable_weapons::BILMER2000);
+				give_backpack(new_character, is_metropolis ? sample_backpack : brown_backpack);
 			}
 
 			fill_range(sentience.learned_spells, true);
@@ -409,24 +388,21 @@ namespace test_scenes {
 		}
 
 		for (int k = 0; k < 2; ++k) {
-			prefabs::create_kek9(step, vec2(-800 - k * 150, -200),
-				prefabs::create_magazine(step, vec2(100, -650), test_container_items::KEK9_MAGAZINE,
-					prefabs::create_cyan_charge(step, vec2(0, 0))));
-
-			prefabs::create_sn69(step, vec2(-800 - k * 150, 0),
-				prefabs::create_magazine(step, vec2(100, -650), test_container_items::SN69_MAGAZINE,
-					prefabs::create_cyan_charge(step, vec2(0, 0))));
-
-			prefabs::create_ao44(step, vec2(-800 - k * 150, 200),
-				prefabs::create_magazine(step, vec2(100, -650), test_container_items::AO44_MAGAZINE,
-					prefabs::create_ao44_charge(step, vec2(0, 0))));
-
-			prefabs::create_gun(step, vec2(-800 - k * 150, 400), 
-			test_shootable_weapons::PRO90, prefabs::create_pro90_magazine(step, vec2(100, -650), prefabs::create_steel_charge(step, vec2(0, 0)), 50));
+			give_weapon(transformr(vec2(-800 - k * 150, -200)), test_shootable_weapons::KEK9);
+			give_weapon(transformr(vec2(-800 - k * 150, 0)), test_shootable_weapons::SN69);
+			give_weapon(transformr(vec2(-800 - k * 150, 200)), test_shootable_weapons::AO44);
+			give_weapon(transformr(vec2(-800 - k * 150, 400)), test_shootable_weapons::PRO90);
 		}
 
-		prefabs::create_amplifier_arm(step, vec2(-300, -500 + 50));
-		
+		give_weapon(transformr(vec2(-300, -500 + 50)), test_shootable_weapons::AMPLIFIER_ARM);
+		give_weapon(transformr(vec2(280, -750)), test_shootable_weapons::DATUM_GUN);
+
+		give_weapon(transformr(vec2(280, -150)), test_shootable_weapons::VINDICATOR);
+		give_weapon(transformr(vec2(280, -250)), test_shootable_weapons::BILMER2000);
+
+		give_weapon(transformr(vec2(300, -100)), test_shootable_weapons::LEWSII);
+		give_weapon(transformr(vec2(400, -100)), test_shootable_weapons::LEWSII);
+
 		/* TODO: Spawn a machete actually */
 		const auto machete_type = force_type;
 
@@ -435,19 +411,6 @@ namespace test_scenes {
 		create(sample_backpack, vec2(200, -750));
 		create(brown_backpack, vec2(280, -750));
 		create(test_complex_decorations::ROTATING_FAN, vec2(380, -750));
-
-		prefabs::create_gun(step, vec2(280, -750), test_shootable_weapons::DATUM_GUN, prefabs::create_sample_magazine(step, vec2(100, -650), prefabs::create_cyan_charge(step, vec2(0, 0)), 25));
-
-		prefabs::create_vindicator(
-			step, vec2(280, -150), prefabs::create_sample_magazine(step, vec2(100, -650), prefabs::create_steel_charge(step, vec2(0, 0)), 30)
-		);
-
-		prefabs::create_sample_rifle(
-			step, vec2(280, -250), prefabs::create_sample_magazine(step, vec2(100, -650), prefabs::create_cyan_charge(step, vec2(0, 0)), 30)
-		);
-
-		prefabs::create_gun(step, vec2(300, -100), test_shootable_weapons::LEWSII, prefabs::create_magazine(step, vec2(100, -650), test_container_items::LEWSII_MAGAZINE, prefabs::create_steel_charge(step, vec2(0, 0)), 100));
-		prefabs::create_gun(step, vec2(400, -100), test_shootable_weapons::LEWSII, prefabs::create_magazine(step, vec2(100, -650), test_container_items::LEWSII_MAGAZINE, prefabs::create_steel_charge(step, vec2(0, 0)), 100));
 
 		const auto aquarium_size = get_size_of(test_scene_image_id::AQUARIUM_SAND_1);
 		const auto whole_aquarium_size = aquarium_size * 2;

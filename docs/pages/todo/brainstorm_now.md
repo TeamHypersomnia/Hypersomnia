@@ -7,6 +7,16 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - Buy menu
+	- Layout considerations
+		- How to show how many left can be bought?
+		- In case of a mag, simple enough.
+			- Look for hands + containers
+		- In case of a weapon
+			- Look for hands + containers
+		- What if (+3 mags)
+			- Count just the weapon
+			- But we can't predict the result with 3 additional mags
+		- Basically always the same slot opts
 
 - Alt + G throws secondary item
 

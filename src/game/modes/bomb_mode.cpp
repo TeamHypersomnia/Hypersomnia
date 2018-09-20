@@ -198,7 +198,7 @@ void bomb_mode::init_spawned(
 			}
 		}
 		else {
-			::generate_equipment(faction_vars.initial_eq, typed_handle, step);
+			faction_vars.initial_eq.generate_for(typed_handle, step);
 		}
 
 		auto& sentience = typed_handle.template get<components::sentience>();

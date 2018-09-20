@@ -78,25 +78,6 @@ namespace test_scenes {
 			fill_range(sentience.learned_spells, true);
 		}
 
-#if 0
-		prefabs::create_sample_rifle(step, vec2(100, -500 + 50),
-		prefabs::create_sample_magazine(step, vec2(100, -650),
-		prefabs::create_cyan_charge(step, vec2(0, 0))));
-
-
-		const auto force_type = test_hand_explosives::FORCE_GRENADE;
-		const auto ped_type = test_hand_explosives::PED_GRENADE;
-		const auto interference_type = test_hand_explosives::INTERFERENCE_GRENADE;
-
-		create(force_type, { 100, 100 });
-		create(force_type, { 200, 100 });
-		create(force_type, { 300, 100});
-
-		/* Test: create cyan charges first, only then magazine, and reinfer. */
-		const auto charge = prefabs::create_cyan_charge(step, vec2(0, 0));
-		prefabs::create_sample_magazine(step, vec2(100, -650), charge);
-#endif
-
 		{
 			const vec2 floor_size = get_size_of(test_scene_image_id::FLOOR);
 			const auto total_floor_size = floor_size * 10;

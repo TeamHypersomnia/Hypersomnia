@@ -3,6 +3,59 @@
 #include "game/detail/inventory/item_mounting.hpp"
 
 template <class E>
+int inventory_mixin<E>::count_contained(const item_flavour_id& id) const {
+	int n = 0;
+
+	for_each_contained_item_recursive(
+		[&](const auto& typed_item) {
+			if (item_flavour_id(typed_item.get_flavour_id()) == id) {
+				++n;
+			}
+		},
+		std::nullopt
+	);
+
+	return n;
+}
+
+template <class E>
+template <class F>
+void inventory_mixin<E>::for_each_candidate_slot(
+	const slot_finding_opts& opts,
+	F&& callback
+) const {
+	const auto& searched_root_container = *static_cast<const E*>(this);
+
+	for (const auto& o : opts) {
+		if (o == slot_finding_opt::CHECK_WEARABLES) {
+			callback(searched_root_container[slot_function::BELT]);
+			callback(searched_root_container[slot_function::BACK]);
+			callback(searched_root_container[slot_function::SHOULDER]);
+			callback(searched_root_container[slot_function::TORSO_ARMOR]);
+			callback(searched_root_container[slot_function::HAT]);
+			callback(searched_root_container[slot_function::PERSONAL_DEPOSIT]);
+		}
+		else if (o == slot_finding_opt::CHECK_HANDS) {
+			callback(searched_root_container[slot_function::PRIMARY_HAND]);
+			callback(searched_root_container[slot_function::SECONDARY_HAND]);
+		}
+		else if (o == slot_finding_opt::CHECK_CONTAINERS) {
+			if (const auto personal_slot = searched_root_container[slot_function::PERSONAL_DEPOSIT]) {
+				if (const auto personal_wearable = personal_slot.get_item_if_any()) {
+					callback(personal_wearable[slot_function::ITEM_DEPOSIT]);
+				}
+			}
+
+			if (const auto back_slot = searched_root_container[slot_function::BACK]) {
+				if (const auto back_wearable = back_slot.get_item_if_any()) {
+					callback(back_wearable[slot_function::ITEM_DEPOSIT]);
+				}
+			}
+		}
+	}
+}
+
+template <class E>
 template <class handle_type>
 typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find_slot_for(
 	const handle_type item,
@@ -27,37 +80,10 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find
 		}
 	};
 
-	for (const auto& o : opts) {
-		if (o == slot_finding_opt::CHECK_WEARABLES) {
-			check_slot(searched_root_container[slot_function::BELT]);
-			check_slot(searched_root_container[slot_function::BACK]);
-			check_slot(searched_root_container[slot_function::SHOULDER]);
-			check_slot(searched_root_container[slot_function::TORSO_ARMOR]);
-			check_slot(searched_root_container[slot_function::HAT]);
-			check_slot(searched_root_container[slot_function::PERSONAL_DEPOSIT]);
-		}
-		else if (o == slot_finding_opt::CHECK_HANDS) {
-			check_slot(searched_root_container[slot_function::PRIMARY_HAND]);
-			check_slot(searched_root_container[slot_function::SECONDARY_HAND]);
-		}
-		else if (o == slot_finding_opt::CHECK_CONTAINERS) {
-			if (const auto personal_slot = searched_root_container[slot_function::PERSONAL_DEPOSIT]) {
-				if (const auto personal_wearable = personal_slot.get_item_if_any()) {
-					check_slot(personal_wearable[slot_function::ITEM_DEPOSIT]);
-				}
-			}
-
-			if (const auto back_slot = searched_root_container[slot_function::BACK]) {
-				if (const auto back_wearable = back_slot.get_item_if_any()) {
-					check_slot(back_wearable[slot_function::ITEM_DEPOSIT]);
-				}
-			}
-		}
-
-		if (target_slot.is_set()) {
-			break;
-		}
-	}
+	for_each_candidate_slot(
+		opts,
+		check_slot
+	);
 
 	return cosmos[target_slot];
 }
