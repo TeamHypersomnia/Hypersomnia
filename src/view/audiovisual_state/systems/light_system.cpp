@@ -97,6 +97,8 @@ void light_system::render_all_lights(const light_system_input in) const {
 	const auto global_time_seconds = drawing_in.global_time_seconds;
 	const auto output = augs::drawer{ renderer.get_triangle_buffer() };
 	const auto& light_shader = in.light_shader;
+	const auto& wall_light_shader = light_shader;
+
 	const auto& standard_shader = in.standard_shader;
 
 	const auto& cosm = in.cosm;
@@ -113,10 +115,23 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	light_shader.set_as_current();
 
-	const auto light_pos_uniform = light_shader.get_uniform_location("light_pos");
-	const auto light_distance_mult_uniform = light_shader.get_uniform_location("distance_mult");
-	const auto light_attenuation_uniform = light_shader.get_uniform_location("light_attenuation");
-	const auto light_multiply_color_uniform = light_shader.get_uniform_location("multiply_color");
+	struct light_uniforms {
+		GLint pos;
+		GLint distance_mult;
+		GLint attenuation;
+		GLint multiply_color;
+
+		light_uniforms(const augs::graphics::shader_program& s) {
+			pos = s.get_uniform_location("light_pos");
+			distance_mult = s.get_uniform_location("distance_mult");
+			attenuation = s.get_uniform_location("light_attenuation");
+			multiply_color = s.get_uniform_location("multiply_color");
+		}
+	};
+
+	const auto light_uniform = light_uniforms(light_shader);
+	const auto& wall_light_uniform = light_uniform;
+
 	const auto& interp = drawing_in.interp;
 	const auto& particles = in.particles;
 	
@@ -134,7 +149,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	const auto eye = cone.eye;
 
 	light_shader.set_projection(in.cone.get_projection_matrix());
-	light_shader.set_uniform(light_distance_mult_uniform, 1.f / eye.zoom);
+	light_shader.set_uniform(light_uniform.distance_mult, 1.f / eye.zoom);
 
 	const auto queried_camera_aabb = [&]() {
 		auto c = cone;
@@ -204,7 +219,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 				return screen_space;
 			}();
 
-			light_shader.set_uniform(light_pos_uniform, light_frag_pos);
+			light_shader.set_uniform(light_uniform.pos, light_frag_pos);
 		}
 
 		const bool was_visibility_calculated = !r.empty();
@@ -243,11 +258,11 @@ void light_system::render_all_lights(const light_system_input in) const {
 					(variation_vals[2] + a.quadratic) / QUADRATIC_MULT
 				};
 
-				light_shader.set_uniform(light_attenuation_uniform, attenuations);
+				light_shader.set_uniform(light_uniform.attenuation, attenuations);
 			}
 
 			light_shader.set_uniform(
-				light_multiply_color_uniform,
+				light_uniform.multiply_color,
 				white.rgb()
 			);
 
@@ -255,12 +270,37 @@ void light_system::render_all_lights(const light_system_input in) const {
 			renderer.clear_triangles();
 		}
 
+	}
+
+	if (std::addressof(wall_light_shader) != std::addressof(light_shader)) {
+		wall_light_shader.set_as_current();
+		wall_light_shader.set_projection(in.cone.get_projection_matrix());
+		wall_light_shader.set_uniform(wall_light_uniform.distance_mult, 1.f / eye.zoom);
+	}
+
+	for (size_t i = 0; i < responses.size(); ++i) {
+		const auto& light_entity = cosm[requests[i].subject];
+		const auto& light = light_entity.get<components::light>();
+		const auto& light_def = light_entity.get<invariants::light>();
+		const auto world_light_pos = requests[i].eye_transform.pos;
+
+		const auto& cache = per_entity_cache.at(light_entity);
+		const auto& variation_vals = cache.all_variation_values;
+
 		const auto wall_light_aabb = [&]() {
 			const auto wall_reach = light_def.calc_wall_reach_trimmed();
 			return xywh::center_and_size(world_light_pos, vec2::square(wall_reach * 2));
 		}();
 
 		if (queried_camera_aabb.hover(wall_light_aabb)) {
+			const auto light_frag_pos = [&]() {
+				auto screen_space = cone.to_screen_space(world_light_pos);	
+				screen_space.y = cone.screen_size.y - screen_space.y;
+				return screen_space;
+			}();
+
+			wall_light_shader.set_uniform(wall_light_uniform.pos, light_frag_pos);
+
 			++num_wall_lights;
 
 			{
@@ -272,11 +312,11 @@ void light_system::render_all_lights(const light_system_input in) const {
 					(variation_vals[5] + a.quadratic) / QUADRATIC_MULT
 				};
 
-				light_shader.set_uniform(light_attenuation_uniform, attenuations);
+				wall_light_shader.set_uniform(wall_light_uniform.attenuation, attenuations);
 			}
 
-			light_shader.set_uniform(
-				light_multiply_color_uniform,
+			wall_light_shader.set_uniform(
+				wall_light_uniform.multiply_color,
 				light.color.rgb()
 			);
 
@@ -288,8 +328,8 @@ void light_system::render_all_lights(const light_system_input in) const {
 			renderer.call_triangles();
 			renderer.clear_triangles();
 
-			light_shader.set_uniform(
-				light_multiply_color_uniform,
+			wall_light_shader.set_uniform(
+				wall_light_uniform.multiply_color,
 				white.rgb()
 			);
 		}
