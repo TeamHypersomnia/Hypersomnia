@@ -26,7 +26,7 @@ namespace filters {
 	b2Filter line_of_sight_query() {
 		b2Filter out;
 		out.categoryBits = make_flags(C::QUERY);
-		out.maskBits = make_flags(C::WALL, C::GLASS_OBSTACLE);
+		out.maskBits = make_flags(C::WALL);
 		return out;
 	}
 

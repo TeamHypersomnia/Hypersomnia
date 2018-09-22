@@ -192,6 +192,7 @@ namespace augs {
 
 			bool is_mouse_key(const key);
 			bool is_numpad_key(const key);
+			std::optional<int> get_number(const key);
 
 			std::string key_to_string(const key);
 			key string_to_key(const std::string&);

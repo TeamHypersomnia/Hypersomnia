@@ -20,6 +20,23 @@
 #include "game/modes/detail/item_purchase_logic.hpp"
 #include "view/mode_gui/arena/arena_mode_gui_settings.h"
 
+static auto make_hotkey_map() {
+	using namespace augs::event::keys;
+
+	arena_buy_menu_hotkey_map m;
+	m[key::M] = buy_menu_type::MELEE;
+	m[key::P] = buy_menu_type::PISTOLS;
+	m[key::S] = buy_menu_type::SUBMACHINE_GUNS;
+	m[key::R] = buy_menu_type::RIFLES;
+	m[key::O] = buy_menu_type::SHOTGUNS;
+	m[key::H] = buy_menu_type::HEAVY_GUNS;
+	m[key::G] = buy_menu_type::GRENADES;
+	m[key::L] = buy_menu_type::SPELLS;
+	m[key::T] = buy_menu_type::TOOLS;
+
+	return m;
+}
+
 bool arena_buy_menu_gui::control(app_ingame_intent_input in) {
 	using namespace augs::event;
 	using namespace augs::event::keys;
@@ -34,6 +51,46 @@ bool arena_buy_menu_gui::control(app_ingame_intent_input in) {
 				show = !show;
 				return true;
 			}
+		}
+	}
+
+	if (!show) {
+		return false;
+	}
+	
+	static const auto m = make_hotkey_map();
+
+	const auto& c = in.common_input_state;
+
+	if (ch == key_change::PRESSED) {
+		const auto key = in.e.get_key();
+
+		if (const auto it = mapped_or_nullptr(m, key)) {
+			current_menu = *it;
+			return true;
+		}
+
+		if (const auto n = get_number(key)) {
+			if (c.keys[key::LSHIFT]) {
+				requested_replenishables.push_back(*n);
+				selected_replenishables.emplace(*n);
+			}
+			else {
+				requested_weapons.push_back(*n);
+				selected_weapons.emplace(*n);
+			}
+
+			return true;
+		}
+	}
+
+	if (ch == key_change::RELEASED) {
+		const auto key = in.e.get_key();
+
+		if (const auto n = get_number(key)) {
+			selected_weapons.erase(*n);
+			selected_replenishables.erase(*n);
+			return true;
 		}
 	}
 
@@ -55,9 +112,9 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		return std::nullopt;
 	}
 
-	/* if (!show) { */
-	/* 	return std::nullopt; */
-	/* } */
+	if (!show) {
+		return std::nullopt;
+	}
 
 	ImGui::SetNextWindowPosCenter();
 
@@ -99,11 +156,41 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 	enum class button_type {
 		REPLENISHABLE,
-		OWNED_WEAPON,
 		BUYABLE_WEAPON
 	};
 
-	auto flavour_button = [&](const item_flavour_id& f_id, const button_type b, const std::string& label = "") {
+	auto draw_owned_weapon = [&](const item_flavour_id& f_id) {
+		if (const auto& entry = in.images_in_atlas.at(image_of(f_id)).diffuse; entry.exists()) {
+			const auto image_padding = vec2(0, 4);
+			const auto size = vec2(entry.get_original_size());
+			game_image(entry, size, white, image_padding);
+			invisible_button("", size + image_padding);
+		}
+	};
+
+	result_type result;
+
+	auto set_result = [&](const auto& r) {
+		mode_commands::item_purchase msg;
+		msg.flavour_id = r;
+		result = msg;
+	};
+
+	auto flavour_button = [&](
+		const item_flavour_id& f_id, 
+		const button_type b, 
+		const int index
+	) {
+		auto& requested = b == button_type::REPLENISHABLE ? requested_replenishables : requested_weapons;
+		const auto& selected = b == button_type::REPLENISHABLE ? selected_replenishables : selected_weapons;
+
+		if (requested.size() > 0) {
+			if (requested.front() == index) {
+				requested.erase(requested.begin());
+				set_result(f_id);
+			}
+		}
+
 		if (const auto& entry = in.images_in_atlas.at(image_of(f_id)).diffuse; entry.exists()) {
 			const auto local_pos = ImGui::GetCursorPos();
 
@@ -113,9 +200,8 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			const auto size = vec2(entry.get_original_size());
 
 			const auto line_h = ImGui::GetTextLineHeight();
-			const bool show_description = b != button_type::OWNED_WEAPON;
-
 			const auto num_owned = subject.count_contained(f_id);
+			const bool is_replenishable = b == button_type::REPLENISHABLE;
 
 			const auto slot_opts = slot_finding_opts {
 				slot_finding_opt::CHECK_WEARABLES,
@@ -135,35 +221,39 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 			const bool is_disabled = num_affordable == 0 || num_carryable == 0;
 
-			if (show_description) {
+			{
 				const auto hover_col = rgba(ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
 				const auto active_col = rgba(ImGui::GetStyle().Colors[ImGuiCol_HeaderActive]);
 
 				auto scp = scoped_style_color(ImGuiCol_HeaderHovered, rgba(hover_col).multiply_rgb(1 / 2.1f));
 				auto scp2 = scoped_style_color(ImGuiCol_HeaderActive, rgba(active_col).multiply_rgb(1 / 1.8f));
 
-				const auto label_id = typesafe_sprintf("##%xlabel");
+				const auto label_id = typesafe_sprintf("##%xr%x", index, int(b));
+
+				const bool active = found_in(selected, index);
 
 				if (is_disabled) {
+					const auto col = active ? in.settings.disabled_active_bg : in.settings.disabled_bg;
 					const auto selectable_size = ImVec2(ImGui::GetContentRegionAvailWidth(), 2 * item_spacing.y - 1 + std::max(size.y, line_h * 2));
-					rect_filled(selectable_size, in.settings.disabled_bg, vec2(0, -item_spacing.y + 2));
+					rect_filled(selectable_size, col, vec2(0, -item_spacing.y + 2));
 				}
 				else {
 					const auto selectable_size = ImVec2(0, item_spacing.y - 1 + std::max(size.y, line_h * 2));
-					ImGui::Selectable(label_id.c_str(), false, ImGuiSelectableFlags_None, selectable_size);
+					ImGui::Selectable(label_id.c_str(), active, ImGuiSelectableFlags_None, selectable_size);
 				}
 
 				ImGui::SetCursorPos(local_pos);
 
-				text_disabled(typesafe_sprintf("(%x)", label));
+				const auto hotkey_text = typesafe_sprintf(is_replenishable ? "(S+%x)" : "(%x)", index);
+				text_disabled(hotkey_text);
 				ImGui::SameLine();
 			}
 
 			const auto image_padding = vec2(0, 4);
 			game_image(entry, size, white, image_padding);
-			invisible_button(label, size + image_padding);
+			invisible_button("", size + image_padding);
 
-			if (show_description) {
+			{
 				ImGui::SameLine();
 
 				cosm.on_flavour(f_id, [&](const auto& typed_flavour) {
@@ -299,7 +389,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 		for (const auto& o : owned_weapons) {
 			ImGui::SameLine();
-			flavour_button(o.weapon, button_type::OWNED_WEAPON, "");
+			draw_owned_weapon(o.weapon); 
 
 			if (o.num > 1) {
 				ImGui::SameLine();
@@ -309,8 +399,6 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 		ImGui::Separator();
 	}
-
-	result_type result;
 
 	if (in.is_in_buy_zone) {
 		if (owned_weapons.size() > 0) {
@@ -329,15 +417,13 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 				emplace_element(displayed_replenishables, f.mag);
 
-				const auto index = typesafe_sprintf("S+%x", 1 + index_in(owned_weapons, f));
+				const auto index = 1 + index_in(owned_weapons, f);
 				const bool choice_was_made = flavour_button(f.mag, button_type::REPLENISHABLE, index);
 
 				ImGui::Separator();
 
 				if (choice_was_made) {
-					mode_commands::item_purchase msg;
-					msg.flavour_id = f.mag;
-					result = msg;
+					set_result(f.mag);
 				}
 			}
 		}
@@ -351,9 +437,15 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				return;
 			}
 
-			const auto index = typesafe_sprintf("(%x)", static_cast<int>(e));
+			static const auto m = make_hotkey_map();
 
-			text_disabled(index);
+			const auto bound_key = key_or_default(m, e);
+
+			ensure(bound_key != augs::event::keys::key::INVALID);
+
+			const auto hotkey_text = typesafe_sprintf("(%x)", key_to_string(bound_key));
+
+			text_disabled(hotkey_text);
 			ImGui::SameLine();
 
 			const auto label = format_enum(e);
@@ -397,14 +489,12 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				reverse_range(buyable_items);
 
 				for (const auto& b : buyable_items) {
-					const auto index = typesafe_sprintf("%x", 1 + index_in(buyable_items, b));
+					const auto index = 1 + index_in(buyable_items, b);
 
 					ImGui::Separator();
 
 					if (flavour_button(b, button_type::BUYABLE_WEAPON, index)) {
-						mode_commands::item_purchase msg;
-						msg.flavour_id = b;
-						result = msg;
+						set_result(b);
 					}
 				}
 

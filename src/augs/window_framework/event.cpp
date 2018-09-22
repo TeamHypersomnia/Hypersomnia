@@ -219,6 +219,18 @@ namespace augs {
 				return false;
 			}
 
+			std::optional<int> get_number(const key k) {
+				const auto left = int(key::_0);
+				const auto right = int(key::_9);
+				const auto v = int(k);
+
+				if (v >= left && v <= right) {
+					return v - left;
+				}
+
+				return std::nullopt;
+			}
+
 			bool is_mouse_key(const key k) {
 				switch(k) {
 					case key::LMOUSE: return true;
@@ -320,7 +332,7 @@ namespace augs {
 				case key::I: return "I"; break;
 				case key::J: return "J"; break;
 				case key::K: return "K"; break;
-				case key::L: return ""; break;
+				case key::L: return "L"; break;
 				case key::M: return "M"; break;
 				case key::N: return "N"; break;
 				case key::O: return "O"; break;
