@@ -583,10 +583,6 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			ImGui::BeginChild("Child2", ImVec2(0, 0), false);
 			centered_text(to_uppercase(format_enum(current_menu)));
 
-			auto is_compatible_faction = [&](const auto& f) {
-				return f == faction_type::SPECTATOR || f == subject.get_official_faction();
-			};
-
 			auto do_item_menu = [&](
 				const std::optional<item_holding_stance> considered_stance,
 				auto&& for_each_purchasable
@@ -596,7 +592,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				for_each_purchasable([&](const auto& id, const auto& flavour) {
 					const auto item = flavour.template get<invariants::item>();
 
-					if (!is_compatible_faction(item.specific_to)) {
+					if (!factions_compatible(subject, id)) {
 						return;
 					}
 
@@ -635,7 +631,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					[&](const auto& typed_spell) {
 						using S = remove_cref<decltype(typed_spell)>;
 
-						if (!is_compatible_faction(typed_spell.common.specific_to)) {
+						if (!factions_compatible(subject, spell_id::of<S>())) {
 							return;
 						}
 

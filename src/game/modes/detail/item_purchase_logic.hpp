@@ -105,6 +105,30 @@ inline bool is_magazine_like(const cosmos& cosm, const item_flavour_id& id) {
 	});
 }
 
+template <class E, class T>
+bool factions_compatible(
+	const E& subject, 
+	const T& object
+) {
+	const auto& cosm = subject.get_cosmos();
+
+	auto compatible = [&](const auto& f) {
+		const auto subject_faction = subject.get_official_faction();
+		return f == faction_type::SPECTATOR || subject_faction == f;
+	};
+
+	if constexpr(std::is_same_v<T, spell_id>) {
+		return on_spell(cosm, object, [&](const auto& spell) {
+			return compatible(spell.common.specific_to);
+		});
+	}
+	else {
+		return cosm.on_flavour(object, [&](const auto& typed_flavour) {
+			return compatible(typed_flavour.template get<invariants::item>().specific_to);
+		});
+	}
+}
+
 template <class T>
 bool is_backpack_like(const T& handle) {
 	if (const auto item = handle.template find<invariants::item>()) {

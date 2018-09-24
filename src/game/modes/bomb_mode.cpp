@@ -1019,6 +1019,10 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 
 						for (const auto& p : purchases) {
 							if (const auto f_id = p.item; ::is_alive(cosm, f_id)) {
+								if (!factions_compatible(player_handle, f_id)) {
+									continue;
+								}
+
 								const auto price = ::get_price_of(cosm, f_id);
 
 								if (money >= price) {
@@ -1052,6 +1056,10 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 							}
 
 							if (const auto s_id = p.spell; ::is_alive(cosm, s_id)) {
+								if (!factions_compatible(player_handle, s_id)) {
+									continue;
+								}
+
 								const auto price = ::get_price_of(cosm, s_id);
 
 								const auto& sentience = player_handle.template get<components::sentience>();
