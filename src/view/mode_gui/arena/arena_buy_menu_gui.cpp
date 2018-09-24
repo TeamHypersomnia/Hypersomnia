@@ -14,7 +14,6 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"
 #include "application/app_intent_type.h"
-#include "game/detail/flavour_scripts.h"
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 #include "game/organization/special_flavour_id_types.h"
 #include "game/modes/detail/item_purchase_logic.hpp"

@@ -21,6 +21,10 @@ void requested_equipment::generate_for(
 			return;
 		}
 
+		if (from.dead()) {
+			return;
+		}
+
 		if (const auto tr = to.get_container().find_logic_transform()) {
 			from.set_logic_transform(*tr);
 		}
@@ -63,6 +67,10 @@ void requested_equipment::generate_for(
 		}
 	};
 
+	auto pickup = [&](const auto& what) {
+		transfer(what, get_pickup_slot_for(what));
+	};
+
 	const auto character_transform = [&]() {
 		if constexpr (to_the_ground) {
 			return character;
@@ -102,10 +110,7 @@ void requested_equipment::generate_for(
 
 	auto generate_spares = [&](const item_flavour_id& f) {
 		while (n-- > 0) {
-			const auto spare_mag = make_mag(f);
-			const auto target_slot = get_pickup_slot_for(spare_mag);
-
-			transfer(spare_mag, target_slot);
+			pickup(make_mag(f));
 		}
 	};
 
@@ -116,7 +121,7 @@ void requested_equipment::generate_for(
 		weapon.set_logic_transform(character_transform);
 
 		if constexpr (!to_the_ground) {
-			transfer(weapon, character.get_primary_hand());
+			pickup(weapon);
 		}
 
 		auto load_charge_to_chamber = [&](const auto& charge_flavour) {
@@ -170,9 +175,7 @@ void requested_equipment::generate_for(
 		const auto& f = it.second;
 
 		while (n--) {
-			if (const auto new_item = just_create_entity(cosm, f)) {
-				transfer(new_item, get_pickup_slot_for(new_item));
-			}
+			pickup(just_create_entity(cosm, f));
 		}
 	}
 

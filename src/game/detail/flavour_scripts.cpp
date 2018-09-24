@@ -3,7 +3,7 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"
 
-inventory_space_type calc_space_occupied_of_brand_new(
+inventory_space_type calc_space_occupied_of_purchased(
 	const cosmos& cosm, 
 	const entity_flavour_id& id
 ) {
@@ -11,16 +11,13 @@ inventory_space_type calc_space_occupied_of_brand_new(
 		id,
 		[&](const auto& typed_flavour) {
 			if (const auto item = typed_flavour.template find<invariants::item>()) {
-#if 0
 				if (const auto container = typed_flavour.template find<invariants::container>()) {
-					if (const auto depo = mapped_or_nullptr(container->slots, slot_function::ITEM_DEPOSIT)) {
-						if (depo->only_allow_flavour.is_set()) {
-							/* It is a special item deposit which will be filled with something in particular */
-							return depo->space_available + item->space_occupied_per_charge;
+					if (const auto mag = mapped_or_nullptr(container->slots, slot_function::GUN_DETACHABLE_MAGAZINE)) {
+						if (const auto& f = mag->only_allow_flavour; f.is_set()) {
+							return item->space_occupied_per_charge + calc_space_occupied_of_purchased(cosm, f);
 						}
 					}
 				}
-#endif
 
 				return item->space_occupied_per_charge;
 			}

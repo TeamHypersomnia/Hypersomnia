@@ -17,7 +17,7 @@ int num_carryable_pieces(
 		[&](const auto& typed_flavour) {
 			const auto& item_def = typed_flavour.template get<invariants::item>();
 
-			const auto piece_occupied_space = item_def.space_occupied_per_charge;
+			const auto piece_occupied_space = calc_space_occupied_of_purchased(cosm, item);
 
 			auto check_slot = [&](const auto& slot) {
 				if (slot.dead()) {
