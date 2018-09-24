@@ -241,6 +241,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		const auto size = vec2(entry.get_original_size());
 
 		const auto line_h = ImGui::GetTextLineHeight();
+		const auto button_h = std::max(size.y, line_h * 2) + item_spacing.y;
 
 		const auto num_affordable = [&]() {
 			const auto price = price_of(object);
@@ -263,11 +264,11 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 		if (is_disabled) {
 			const auto col = active ? in.settings.disabled_active_bg : in.settings.disabled_bg;
-			const auto selectable_size = ImVec2(ImGui::GetContentRegionAvailWidth(), 2 * item_spacing.y - 1 + std::max(size.y, line_h * 2));
-			rect_filled(selectable_size, col, vec2(0, -item_spacing.y + 2));
+			const auto selectable_size = ImVec2(ImGui::GetContentRegionAvailWidth(), 2 * item_spacing.y + button_h);
+			rect_filled(selectable_size, col, vec2(0, -item_spacing.y + 1));
 		}
 		else {
-			const auto selectable_size = ImVec2(0, item_spacing.y - 1 + std::max(size.y, line_h * 2));
+			const auto selectable_size = ImVec2(0, 1 + button_h);
 			result = ImGui::Selectable(label_id.c_str(), active, ImGuiSelectableFlags_None, selectable_size);
 		}
 
@@ -294,7 +295,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 		price_callback(num_affordable);
 
-		ImGui::SetCursorPosY(prev_y + line_h + item_spacing.y);
+		ImGui::SetCursorPosY(local_pos.y + button_h + item_spacing.y);
 
 		return result;
 	};
