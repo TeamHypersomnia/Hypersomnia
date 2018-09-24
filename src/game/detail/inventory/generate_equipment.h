@@ -62,7 +62,7 @@ void requested_equipment::generate_for(
 		}
 		else {
 			const auto slot = character.find_pickup_target_slot_for(new_item);
-			LOG_NVPS(new_item, slot);
+			// LOG_NVPS(new_item, slot);
 			return slot;
 		}
 	};

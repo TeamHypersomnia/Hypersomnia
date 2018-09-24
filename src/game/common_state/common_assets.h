@@ -25,5 +25,8 @@ struct common_assets {
 
 	footstep_effect_input standard_footstep;
 	particle_effect_input haste_footstep_particles;
+
+	sound_effect_input standard_learnt_spell_sound;
+	particle_effect_input standard_learnt_spell_particles;
 	// END GEN INTROSPECTOR
 };

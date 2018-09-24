@@ -1054,11 +1054,15 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 							if (const auto s_id = p.spell; ::is_alive(cosm, s_id)) {
 								const auto price = ::get_price_of(cosm, s_id);
 
-								if (money >= price) {
+								const auto& sentience = player_handle.template get<components::sentience>();
+
+								if (money >= price && !sentience.is_learnt(s_id)) {
 									requested_equipment eq;
 
 									eq.spells_to_give[s_id.get_index()] = true;
 									eq.generate_for(player_handle, step);
+
+									::play_learnt_spell_effect(player_handle, s_id, step);
 
 									money -= price;
 								}

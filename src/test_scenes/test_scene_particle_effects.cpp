@@ -2036,4 +2036,125 @@ void load_test_scene_particle_effects(
 
 		effect.emissions.push_back(em);
 	}
+
+	{
+		auto& effect = acquire_effect(test_scene_particle_effect_id::STANDARD_LEARNT_SPELL);
+
+		{
+			particles_emission em;
+			default_bounds(em);
+
+			em.swing_spread.set(0, 0);
+			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
+			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
+
+			em.spread_degrees = float_range(360, 360);
+			em.num_of_particles_to_spawn_initially.set(100, 100);
+			em.particles_per_sec = float_range(250, 250);
+			em.stream_lifetime_ms = float_range(1000, 1000);
+
+			em.base_speed = float_range(20, 300);
+			em.base_speed_variation = float_range(0.f, 0.f);
+
+			em.rotation_speed = float_range(0, 0);
+			em.particle_lifetime_ms = float_range(1000, 1000);
+
+			em.randomize_spawn_point_within_circle_of_inner_radius = float_range(200.f, 200.f);
+			em.randomize_spawn_point_within_circle_of_outer_radius = float_range(250.f, 250.f);
+
+			em.starting_spawn_circle_size_multiplier = float_range(1.f, 1.f);
+			em.ending_spawn_circle_size_multiplier = float_range(0.35f, 0.35f);
+
+			em.starting_homing_force = float_range(100.f, 100.f);
+			em.ending_homing_force = float_range(10000.f, 10000.f);
+
+			for (size_t i = 0; i < anim.frames.size() - 1; ++i)
+			{
+				homing_animated_particle particle_definition;
+
+				particle_definition.linear_damping = 0;
+				particle_definition.animation.state.frame_num = i;
+				particle_definition.animation.id = cast_blink_id;
+				particle_definition.animation.speed_factor = 4.f;
+				particle_definition.color = white;
+
+				em.add_particle_definition(particle_definition);
+			}
+
+			for (int i = 0; i < 7 - 1; ++i)
+			{
+				homing_animated_particle particle_definition;
+
+				particle_definition.linear_damping = 0;
+				particle_definition.animation.state.frame_num = i;
+				particle_definition.animation.speed_factor = 4.f;
+				particle_definition.animation.id = cast_blink_id;
+				particle_definition.color = white;
+
+				em.add_particle_definition(particle_definition);
+			}
+
+			{
+
+				homing_animated_particle particle_definition;
+
+				particle_definition.linear_damping = 0;
+				particle_definition.animation.state.frame_num = 2;
+				particle_definition.animation.speed_factor = 4.f;
+				particle_definition.animation.id = cast_blink_id;
+				particle_definition.color = white;
+
+				em.add_particle_definition(particle_definition);
+			}
+
+			em.size_multiplier = float_range(1, 1);
+			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
+			em.initial_rotation_variation = 0;
+			em.should_particles_look_towards_velocity = false;
+			em.randomize_acceleration = true;
+
+			effect.emissions.push_back(em);
+		}
+
+		{
+			particles_emission em;
+			default_bounds(em);
+
+			em.swing_spread.set(0, 0);
+			em.swings_per_sec.set(0.3 / 2, 0.5 / 2);
+			em.swing_spread_change_rate.set(0.3 / 2, 0.5 / 2);
+
+			em.spread_degrees = float_range(360, 360);
+			em.base_speed = float_range(200, 250);
+			em.base_speed_variation = float_range(20.f, 40.f);
+
+			em.num_of_particles_to_spawn_initially.set(180, 200);
+
+			em.rotation_speed = float_range(2.5f*RAD_TO_DEG<float>, 2.8f*RAD_TO_DEG<float>);
+			em.particle_lifetime_ms = float_range(900, 900);
+
+			em.randomize_spawn_point_within_circle_of_inner_radius = float_range(50.f, 50.f);
+			em.randomize_spawn_point_within_circle_of_outer_radius = float_range(100.f, 100.f);
+
+			for (int i = 0; i < 3; ++i) {
+				general_particle particle_definition;
+
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 0;
+				set(particle_definition, to_image_id(test_scene_image_id(int(test_scene_image_id::SMOKE_1) + i)), rgba(255, 255, 255, 15));
+				particle_definition.unshrinking_time_ms = 50.f;
+				particle_definition.shrink_when_ms_remaining = 50.f;
+				particle_definition.acc.set(0, 0);
+
+				em.add_particle_definition(particle_definition);
+			}
+
+			em.size_multiplier = float_range(0.35, 0.35);
+			em.target_layer = particle_layer::ILLUMINATING_SMOKES;
+			em.initial_rotation_variation = 180;
+			em.randomize_acceleration = false;
+
+			effect.emissions.push_back(em);
+		}
+	}
 }

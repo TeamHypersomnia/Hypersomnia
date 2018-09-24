@@ -105,3 +105,27 @@ inline bool is_magazine_like(const cosmos& cosm, const item_flavour_id& id) {
 	});
 }
 
+template <class E>
+void play_learnt_spell_effect(
+	const E& subject,
+	const spell_id& id,
+	const logic_step step
+) {
+	const auto& cosm = step.get_cosmos();
+	const auto& assets = cosm.get_common_assets();
+
+	{
+		const auto& effect = assets.standard_learnt_spell_sound;
+		effect.start(step, sound_effect_start_input::at_entity(subject));
+	}
+
+	{
+		const auto col = on_spell(cosm, id, [&](const auto& spell) {
+			return spell.common.associated_color;
+		});
+
+		auto effect = assets.standard_learnt_spell_particles;
+		effect.modifier.colorize = col;
+		effect.start(step, particle_effect_start_input::orbit_local(subject, {}).set_homing(subject));
+	}
+}
