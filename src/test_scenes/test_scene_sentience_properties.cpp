@@ -16,7 +16,7 @@ void load_test_scene_sentience_properties(
 	auto& spells = state.spells;
 	auto& meters = state.meters;
 
-	const rgba turqoise_spell_color = { 0, 225, 255, 255 };
+	const rgba turqoise_spell_color = turquoise;
 	const rgba blue_spell_border = cyan; //{ 0, 128, 209, 255 };
 	const rgba green_spell_color = { 0, 255, 0, 255 };
 

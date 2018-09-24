@@ -1,5 +1,3 @@
-#include "formatted_string.h"
-
 #include <algorithm>
 #include <cstring>
 #include <vector>
@@ -14,6 +12,7 @@
 #include "augs/string/string_templates.h"
 #include "augs/misc/scope_guard.h"
 #include "augs/ensure.h"
+#include "augs/gui/formatted_string.h"
 
 namespace augs {
 	namespace gui {
