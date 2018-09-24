@@ -298,7 +298,9 @@ return {
 
 	buy_menu_settings = {
 		disabled_bg = "75 0 0 180",
-		disabled_active_bg = "90 0 0 220"
+		disabled_active_bg = "90 0 0 220",
+		already_owns_active_bg = "0 130 0 150",
+		already_owns_bg = "0 76 0 91"
 	},
 
     scoreboard_settings = {

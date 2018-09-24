@@ -75,7 +75,7 @@ namespace test_scenes {
 			auto& sentience = new_character.get<components::sentience>();
 
 
-			fill_range(sentience.learned_spells, true);
+			fill_range(sentience.learnt_spells, true);
 		}
 
 		{

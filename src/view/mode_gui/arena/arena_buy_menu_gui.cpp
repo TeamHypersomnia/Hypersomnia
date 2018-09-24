@@ -222,6 +222,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 	auto general_purchase_button = [&](
 		const auto& object, 
 		const auto& selected,
+		const bool is_owned,
 		const std::optional<int> num_carryable,
 		const int index,
 		const std::string& additional_id,
@@ -262,7 +263,12 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 		const bool active = found_in(selected, index);
 
-		if (is_disabled) {
+		if (is_owned) {
+			const auto col = active ? in.settings.already_owns_active_bg : in.settings.already_owns_bg;
+			const auto selectable_size = ImVec2(ImGui::GetContentRegionAvailWidth(), 2 * item_spacing.y + button_h);
+			rect_filled(selectable_size, col, vec2(0, -item_spacing.y + 1));
+		}
+		else if (is_disabled) {
 			const auto col = active ? in.settings.disabled_active_bg : in.settings.disabled_bg;
 			const auto selectable_size = ImVec2(ImGui::GetContentRegionAvailWidth(), 2 * item_spacing.y + button_h);
 			rect_filled(selectable_size, col, vec2(0, -item_spacing.y + 1));
@@ -290,10 +296,15 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		ImGui::SetCursorPosY(prev_y);
 		ImGui::SetCursorPosX(x);
 
-		text_color(typesafe_sprintf("%x$", price_of(object)), money_color);
-		ImGui::SameLine();
+		if (is_owned) {
+			text("Owned already");
+		}
+		else {
+			text_color(typesafe_sprintf("%x$", price_of(object)), money_color);
+			ImGui::SameLine();
 
-		price_callback(num_affordable);
+			price_callback(num_affordable);
+		}
 
 		ImGui::SetCursorPosY(local_pos.y + button_h + item_spacing.y);
 
@@ -321,9 +332,12 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		/* In case we make the font statically allocated one day */
 		static_assert(sizeof(dummy) < 1000);
 
+		const bool learnt = subject.template get<components::sentience>().is_learnt(s_id);
+
 		return general_purchase_button(
 			s_id,
 			selected,
+			learnt,
 			1,
 			index,
 			additional_id,
@@ -399,6 +413,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		return general_purchase_button(
 			f_id,
 			selected,
+			false,
 			num_carryable,
 			index,
 			additional_id,

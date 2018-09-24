@@ -262,7 +262,7 @@ namespace test_scenes {
 				give_backpack(new_character, is_metropolis ? sample_backpack : brown_backpack);
 			}
 
-			fill_range(sentience.learned_spells, true);
+			fill_range(sentience.learnt_spells, true);
 		}
 
 		{

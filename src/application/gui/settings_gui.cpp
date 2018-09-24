@@ -213,6 +213,9 @@ void settings_gui_state::perform(
 
 						revertable_color_edit(SCOPE_CFG_NVP(disabled_bg));
 						revertable_color_edit(SCOPE_CFG_NVP(disabled_active_bg));
+
+						revertable_color_edit(SCOPE_CFG_NVP(already_owns_bg));
+						revertable_color_edit(SCOPE_CFG_NVP(already_owns_active_bg));
 					}
 
 					auto& scope_cfg = config.arena_mode_gui;

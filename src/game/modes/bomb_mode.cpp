@@ -204,7 +204,7 @@ void bomb_mode::init_spawned(
 
 		for_each_through_std_get(sentience.meters, [](auto& m) { m.make_full(); });
 
-		fill_range(sentience.learned_spells, true);
+		fill_range(sentience.learnt_spells, true);
 
 		if (transferred != std::nullopt) {
 			typed_handle.template get<components::movement>().flags = transferred->player.movement;

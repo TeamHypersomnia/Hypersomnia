@@ -209,7 +209,7 @@ spell_id action_button::get_bound_spell(
 	const auto bound_spell = this_id->bound_spell;
 	const auto& sentience = context.get_subject_entity().get<components::sentience>();
 
-	if (bound_spell.is_set() && sentience.is_learned(bound_spell)) {
+	if (bound_spell.is_set() && sentience.is_learnt(bound_spell)) {
 		return bound_spell;
 	}
 

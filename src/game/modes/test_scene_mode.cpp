@@ -37,7 +37,7 @@ void test_scene_mode::init_spawned(const input in, const entity_id id, const log
 
 		for_each_through_std_get(sentience.meters, [](auto& m) { m.make_full(); });
 
-		fill_range(sentience.learned_spells, true);
+		fill_range(sentience.learnt_spells, true);
 	});
 }
 

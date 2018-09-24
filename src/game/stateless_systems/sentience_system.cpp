@@ -73,7 +73,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 
 		spell.dispatch(
 			[&](auto s) {
-				if (sentience.learned_spells[spell.get_index()]) {
+				if (sentience.learnt_spells[spell.get_index()]) {
 					using S = decltype(s);
 					auto& spell_instance_data = std::get<instance_of<S>>(sentience.spells);
 

@@ -32,7 +32,7 @@
 
 #include "game/enums/use_button_query_result.h"
 
-using learned_spells_array_type = std::array<
+using learnt_spells_array_type = std::array<
 	bool,
 	aligned_num_of_bytes_v<num_types_in_list_v<spell_instance_tuple>, 4>
 >;
@@ -61,7 +61,7 @@ namespace components {
 
 		meter_instance_tuple meters;
 
-		learned_spells_array_type learned_spells = {};
+		learnt_spells_array_type learnt_spells = {};
 
 		spell_instance_tuple spells;
 		perk_instance_tuple perks;
@@ -83,9 +83,9 @@ namespace components {
 		damage_origin knockout_origin;
 		// END GEN INTROSPECTOR
 
-		bool is_learned(const spell_id id) const {
+		bool is_learnt(const spell_id id) const {
 			ensure(id.is_set());
-			return learned_spells[id.get_index()] == true;
+			return learnt_spells[id.get_index()] == true;
 		}
 
 		bool is_spell_being_cast() const {

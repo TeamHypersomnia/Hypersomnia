@@ -323,7 +323,7 @@ void game_gui_system::control_hotbar_and_action_button(
 			if (i.was_pressed()) {
 				const auto bound_spell = action_b.bound_spell;
 
-				if (bound_spell.is_set() && gui_entity.get<components::sentience>().is_learned(bound_spell)) {
+				if (bound_spell.is_set() && gui_entity.get<components::sentience>().is_learnt(bound_spell)) {
 					spell_requests[gui_entity] = bound_spell;
 				}
 			}
