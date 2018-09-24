@@ -205,6 +205,12 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			return false;
 		}
 
+		const auto price = price_of(object);
+
+		if (price == 0) {
+			return false;
+		}
+
 		const auto local_pos = ImGui::GetCursorPos();
 
 		const auto& item_spacing = ImGui::GetStyle().ItemSpacing;
@@ -213,10 +219,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		const auto line_h = ImGui::GetTextLineHeight();
 		const auto button_h = std::max(size.y, line_h * 2) + item_spacing.y;
 
-		const auto num_affordable = [&]() {
-			const auto price = price_of(object);
-			return in.available_money / price;			
-		}();
+		const auto num_affordable = in.available_money / price;
 
 		const bool is_disabled = num_affordable == 0 || (num_carryable && *num_carryable == 0);
 
@@ -371,10 +374,20 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		const bool is_replenishable = b == button_type::REPLENISHABLE;
 		const auto hotkey_text = typesafe_sprintf(is_replenishable ? "(S+%x)" : "(%x)", index);
 
+		const auto num_owned = subject.count_contained(f_id);
+
+		const bool owned_status = [&]() {
+			if (::makes_sense_to_only_own_one(cosm, f_id)) {
+				return num_owned >= 1;
+			}
+
+			return false;
+		}();
+
 		return general_purchase_button(
 			f_id,
 			selected,
-			false,
+			owned_status,
 			num_carryable,
 			index,
 			additional_id,
@@ -411,7 +424,6 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					text_disabled("more)");
 					ImGui::SameLine();
 
-					const auto num_owned = subject.count_contained(f_id);
 					const auto space_rhs = num_owned + num_carryable;
 
 					text_disabled("Space:");
@@ -682,6 +694,18 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				});
 			};
 
+			auto for_each_tool = [&](auto&& callback) {
+				cosm.for_each_flavour_having<invariants::tool>(callback);
+
+				cosm.for_each_flavour_having<invariants::container, invariants::item>(
+					[&](const auto& id, const auto& flavour) {
+						if (::is_backpack_like(flavour)) {
+							callback(id, flavour);
+						}
+					}
+				);
+			};
+
 			switch (current_menu) {
 				case buy_menu_type::PISTOLS: {
 					do_item_menu(
@@ -725,6 +749,15 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 				case buy_menu_type::SPELLS: {
 					do_spells_menu();
+					break;
+				}
+
+				case buy_menu_type::TOOLS: {
+					do_item_menu(
+						std::nullopt,
+						for_each_tool
+					);
+
 					break;
 				}
 

@@ -41,6 +41,7 @@ namespace test_flavours {
 
 			item.standard_price = 300;
 			item.wear_sound.id = to_sound_id(test_scene_sound_id::BACKPACK_WEAR);
+			item.specific_to = faction_type::METROPOLIS;
 
 			meta.set(item);
 
@@ -48,6 +49,7 @@ namespace test_flavours {
 				auto& brown = get_test_flavour(flavours, test_container_items::BROWN_BACKPACK);
 				brown = meta;
 				brown.get<invariants::text_details>().name = format_enum(test_container_items::BROWN_BACKPACK);
+				brown.get<invariants::item>().specific_to = faction_type::RESISTANCE;
 				test_flavours::add_sprite(brown, caches, test_scene_image_id::BROWN_BACKPACK, white);
 			}
 		}

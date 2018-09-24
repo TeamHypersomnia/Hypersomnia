@@ -105,6 +105,21 @@ inline bool is_magazine_like(const cosmos& cosm, const item_flavour_id& id) {
 	});
 }
 
+template <class T>
+bool is_backpack_like(const T& handle) {
+	if (const auto item = handle.template find<invariants::item>()) {
+		return item->categories_for_slot_compatibility.test(item_category::BACK_WEARABLE);
+	}
+
+	return false;
+}
+
+inline bool makes_sense_to_only_own_one(const cosmos& cosm, const item_flavour_id& id) {
+	return cosm.on_flavour(id, [&](const auto& typed_flavour) {
+		return typed_flavour.template has<invariants::tool>() || is_backpack_like(typed_flavour);
+	});
+}
+
 template <class E>
 void play_learnt_spell_effect(
 	const E& subject,
