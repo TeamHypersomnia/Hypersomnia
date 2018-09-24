@@ -343,7 +343,9 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					ImGui::SameLine();
 				});
 			},
-			[&](const auto num_affordable) {
+			[&](auto num_affordable) {
+				num_affordable = std::min(num_affordable, 1);
+
 				on_spell(s_id,  [&](const auto& spell_data) {
 					(void)spell_data;
 					text_disabled("(Can buy");
