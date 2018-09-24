@@ -18,14 +18,13 @@ void draw_cast_spells_highlights(const draw_cast_spells_highlights_input in) {
 			const auto casted_spell = sentience.currently_casted_spell;
 
 			if (casted_spell.is_set()) {
-				get_by_dynamic_id(
-					sentience.spells,
-					casted_spell,
-					[&](const auto& spell){
+				casted_spell.dispatch(
+					[&](auto s) {
 						const auto highlight_amount = 1.f - (in.global_time_seconds - sentience.time_of_last_spell_cast.in_seconds(dt)) / 0.4f;
 
 						if (highlight_amount > 0.f) {
-							const auto spell_data = get_meta_of(spell, cosmos.get_common_significant().spells);
+							using S = decltype(s);
+							const auto& spell_data = std::get<S>(cosmos.get_common_significant().spells);
 
 							auto highlight_col = spell_data.common.associated_color;
 							highlight_col.a = static_cast<rgba_channel>(255 * highlight_amount);

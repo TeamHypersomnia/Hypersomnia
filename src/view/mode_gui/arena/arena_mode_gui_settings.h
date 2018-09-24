@@ -4,6 +4,9 @@ struct buy_menu_gui_settings {
 	// GEN INTROSPECTOR struct buy_menu_gui_settings
 	rgba disabled_bg = rgba(170, 0, 0, 90);
 	rgba disabled_active_bg = rgba(180, 0, 0, 150);
+
+	rgba already_owns_bg = rgba(0, 170, 0, 90);
+	rgba already_owns_active_bg = rgba(0, 180, 0, 150);
 	// END GEN INTROSPECTOR
 };
 

@@ -9,7 +9,6 @@
 #include "game/detail/inventory/generate_equipment.h"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #include "game/messages/start_sound_effect.h"
-#include "game/detail/damage_origin.hpp"
 #include "game/detail/get_knockout_award.h"
 #include "game/detail/damage_origin.hpp"
 #include "game/messages/changed_identities_message.h"

@@ -45,11 +45,13 @@ void action_button::draw(
 
 		const auto absolute_rect = context.get_tree_entry(this_id).get_absolute_rect();
 		if (bound_spell.is_set()) {
-			get_by_dynamic_id(
-				sentience.spells,
-				bound_spell,
-				[&](const auto& spell){
-					const auto spell_data = get_meta_of(spell, cosmos.get_common_significant().spells);
+			bound_spell.dispatch(
+				[&](auto s){
+					using S = decltype(s);
+					using I = instance_of<S>;
+
+					const auto& spell = std::get<I>(sentience.spells);
+					const auto spell_data = std::get<S>(cosmos.get_common_significant().spells);
 
 					const auto& pe = sentience.get<personal_electricity_meter_instance>();
 					const bool has_enough_mana = pe.value >= spell_data.common.personal_electricity_required;

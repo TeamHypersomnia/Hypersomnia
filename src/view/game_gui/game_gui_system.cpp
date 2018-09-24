@@ -82,13 +82,13 @@ character_gui& game_gui_system::get_character_gui(const entity_id id) {
 	if (it == character_guis.end()) {
 		auto& new_gui = (*character_guis.try_emplace(id).first).second;
 		
-		new_gui.action_buttons[0].bound_spell.set<exaltation_instance>();
-		new_gui.action_buttons[1].bound_spell.set<fury_of_the_aeons_instance>();
-		new_gui.action_buttons[2].bound_spell.set<ultimate_wrath_of_the_aeons_instance>();
-		new_gui.action_buttons[3].bound_spell.set<haste_instance>();
-		new_gui.action_buttons[4].bound_spell.set<echoes_of_the_higher_realms_instance>();
-		new_gui.action_buttons[5].bound_spell.set<electric_triad_instance>();
-		new_gui.action_buttons[6].bound_spell.set<electric_shield_instance>();
+		new_gui.action_buttons[0].bound_spell.set<exaltation>();
+		new_gui.action_buttons[1].bound_spell.set<fury_of_the_aeons>();
+		new_gui.action_buttons[2].bound_spell.set<ultimate_wrath_of_the_aeons>();
+		new_gui.action_buttons[3].bound_spell.set<haste>();
+		new_gui.action_buttons[4].bound_spell.set<echoes_of_the_higher_realms>();
+		new_gui.action_buttons[5].bound_spell.set<electric_triad>();
+		new_gui.action_buttons[6].bound_spell.set<electric_shield>();
 		
 		return new_gui;
 	}

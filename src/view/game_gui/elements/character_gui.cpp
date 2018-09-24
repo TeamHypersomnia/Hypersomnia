@@ -549,13 +549,10 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 					const auto bound_spell = action_button::get_bound_spell(context, dereferenced);
 
 					if (bound_spell.is_set()) {
-						const auto& sentience = gui_entity.get<components::sentience>();
-
-						tooltip_text = get_by_dynamic_id(
-							sentience.spells,
-							bound_spell,
-							[&](const auto& spell) {
-								const auto& spell_data = get_meta_of(spell, cosmos.get_common_significant().spells);
+						tooltip_text = bound_spell.dispatch(
+							[&](auto s) {
+								using S = decltype(s);
+								const auto& spell_data = std::get<S>(cosmos.get_common_significant().spells);
 
 								return text::from_bbcode(
 									get_bbcoded_spell_description(

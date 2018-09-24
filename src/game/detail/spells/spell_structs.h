@@ -12,6 +12,8 @@
 #include "game/common_state/entity_name_str.h"
 #include "game/detail/adversarial_meta.h"
 
+#include "game/detail/economy/money_type.h"
+
 struct spell_common_data {
 	// GEN INTROSPECTOR struct spell_common_data
 	particle_effect_input cast_sparkles;
@@ -21,6 +23,9 @@ struct spell_common_data {
 	unsigned personal_electricity_required = 40u;
 	unsigned cooldown_ms = 5000u;
 	rgba associated_color = white;
+
+	money_type standard_price = 1000;
+	faction_type specific_to = faction_type::SPECTATOR;
 	// END GEN INTROSPECTOR
 };
 

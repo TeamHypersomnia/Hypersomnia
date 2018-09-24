@@ -132,25 +132,39 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 	text_color(typesafe_sprintf("%x$", in.available_money), money_color);
 
+	auto is_alive = [&](const item_flavour_id& t) {
+		if (!t.is_set()) {
+			return false;
+		}
+
+		return t.dispatch(
+			[&](const auto& typed_id) {
+				return nullptr != cosm.find_flavour(typed_id);
+			}
+		);
+	};
+
 	auto image_of = [&](const auto& of) {
 		if constexpr(std::is_same_v<decltype(of), const item_flavour_id&>) {
+			if (!is_alive(of)) {
+				return assets::image_id();
+			}
+
 			return cosm.on_flavour(of, [&](const auto& typed_flavour) {
 				return typed_flavour.get_image_id();
 			});
-		}
-		else {
-			return cosm[of].get_image_id();
 		}
 	};
 
 	auto price_of = [&](const auto& of) {
 		if constexpr(std::is_same_v<decltype(of), const item_flavour_id&>) {
+			if (!is_alive(of)) {
+				return static_cast<money_type>(0);
+			}
+
 			return cosm.on_flavour(of, [&](const auto& typed_flavour) {
 				return *typed_flavour.find_price();
 			});
-		}
-		else {
-			return *cosm[of].find_price();
 		}
 	};
 
@@ -172,15 +186,102 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 	auto set_result = [&](const auto& r) {
 		mode_commands::item_purchase msg;
-		msg.flavour_id = r;
+
+		if constexpr(std::is_same_v<decltype(r), const item_flavour_id&>) {
+			msg.item = r;
+		}
+		else {
+			msg.spell = r;
+		}
+
 		result = msg;
 	};
 
-	auto flavour_button = [&](
-		const item_flavour_id& f_id, 
+	auto general_purchase_button = [&](
+		const auto& object, 
+		const auto& entry, 
+		const auto& selected,
+		const std::optional<int> num_carryable,
+		const int index,
+		const std::string& additional_id,
+		const auto& hotkey_text,
+		auto&& name_callback,
+		auto&& price_callback
+	) {
+		const auto local_pos = ImGui::GetCursorPos();
+
+		const auto& item_spacing = ImGui::GetStyle().ItemSpacing;
+		const auto size = vec2(entry.get_original_size());
+
+		const auto line_h = ImGui::GetTextLineHeight();
+
+		const auto num_affordable = [&]() {
+			const auto price = price_of(object);
+			return in.available_money / price;			
+		}();
+
+		const bool is_disabled = num_affordable == 0 || (num_carryable && *num_carryable == 0);
+
+		{
+			const auto hover_col = rgba(ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
+			const auto active_col = rgba(ImGui::GetStyle().Colors[ImGuiCol_HeaderActive]);
+
+			auto scp = scoped_style_color(ImGuiCol_HeaderHovered, rgba(hover_col).multiply_rgb(1 / 2.1f));
+			auto scp2 = scoped_style_color(ImGuiCol_HeaderActive, rgba(active_col).multiply_rgb(1 / 1.8f));
+
+			const auto label_id = typesafe_sprintf("##%xr%x", index, additional_id);
+
+			const bool active = found_in(selected, index);
+
+			if (is_disabled) {
+				const auto col = active ? in.settings.disabled_active_bg : in.settings.disabled_bg;
+				const auto selectable_size = ImVec2(ImGui::GetContentRegionAvailWidth(), 2 * item_spacing.y - 1 + std::max(size.y, line_h * 2));
+				rect_filled(selectable_size, col, vec2(0, -item_spacing.y + 2));
+			}
+			else {
+				const auto selectable_size = ImVec2(0, item_spacing.y - 1 + std::max(size.y, line_h * 2));
+				ImGui::Selectable(label_id.c_str(), active, ImGuiSelectableFlags_None, selectable_size);
+			}
+
+			ImGui::SetCursorPos(local_pos);
+
+			text_disabled(hotkey_text);
+			ImGui::SameLine();
+
+			const auto image_padding = vec2(0, 4);
+			game_image(entry, size, white, image_padding);
+			invisible_button("", size + image_padding);
+
+			ImGui::SameLine();
+
+			const auto x = ImGui::GetCursorPosX();
+			name_callback();
+
+			const auto prev_y = ImGui::GetCursorPosY() + line_h;
+			ImGui::SetCursorPosY(prev_y);
+			ImGui::SetCursorPosX(x);
+
+			text_color(typesafe_sprintf("%x$", price_of(object)), money_color);
+			ImGui::SameLine();
+
+			price_callback(num_affordable);
+
+			ImGui::SetCursorPosY(prev_y + line_h + item_spacing.y);
+		}
+	};
+
+	const auto& spells = cosm.get_common_significant().spells;
+	(void)spells;
+
+	auto purchase_item_button = [&](
+		const auto& f_id, 
 		const button_type b, 
 		const int index
 	) {
+		if (!is_alive(f_id)) {
+			return false;
+		}
+
 		auto& requested = b == button_type::REPLENISHABLE ? requested_replenishables : requested_weapons;
 		const auto& selected = b == button_type::REPLENISHABLE ? selected_replenishables : selected_weapons;
 
@@ -192,126 +293,80 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		}
 
 		if (const auto& entry = in.images_in_atlas.at(image_of(f_id)).diffuse; entry.exists()) {
-			const auto local_pos = ImGui::GetCursorPos();
+			const auto num_carryable = [&]() -> int {
+				const auto slot_opts = slot_finding_opts {
+					slot_finding_opt::CHECK_WEARABLES,
+					slot_finding_opt::CHECK_HANDS,
+					slot_finding_opt::CHECK_CONTAINERS
+				};
 
-			const auto& item_spacing = ImGui::GetStyle().ItemSpacing;
-			//auto scp3 = scoped_style_var(ImGuiStyleVar_ItemSpacing, ImVec2(3, 10));
+				return num_carryable_pieces(
+					subject,
+					slot_opts, 
+					f_id
+				);
+			}();
 
-			const auto size = vec2(entry.get_original_size());
+			const auto additional_id = std::to_string(int(b));
 
-			const auto line_h = ImGui::GetTextLineHeight();
-			const auto num_owned = subject.count_contained(f_id);
 			const bool is_replenishable = b == button_type::REPLENISHABLE;
+			const auto hotkey_text = typesafe_sprintf(is_replenishable ? "(S+%x)" : "(%x)", index);
 
-			const auto slot_opts = slot_finding_opts {
-				slot_finding_opt::CHECK_WEARABLES,
-				slot_finding_opt::CHECK_HANDS,
-				slot_finding_opt::CHECK_CONTAINERS
-			};
+			general_purchase_button(
+				f_id,
+				entry,
+				selected,
+				num_carryable,
+				index,
+				additional_id,
+				hotkey_text,
+				[&]() {
+					cosm.on_flavour(f_id, [&](const auto& typed_flavour) {
+						text(typed_flavour.get_name());
+						ImGui::SameLine();
 
-			const auto num_carryable = num_carryable_pieces(
-				subject,
-				slot_opts, 
-				f_id
-			);
+						if (in.give_extra_mags_on_first_purchase && b == button_type::BUYABLE_WEAPON) {
+							const auto& item_def = typed_flavour.template get<invariants::item>();
+							const auto& g = item_def.gratis_ammo_pieces_with_first;
 
-			const auto price = price_of(f_id);
-
-			const auto num_affordable = in.available_money / price;
-
-			const bool is_disabled = num_affordable == 0 || num_carryable == 0;
-
-			{
-				const auto hover_col = rgba(ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
-				const auto active_col = rgba(ImGui::GetStyle().Colors[ImGuiCol_HeaderActive]);
-
-				auto scp = scoped_style_color(ImGuiCol_HeaderHovered, rgba(hover_col).multiply_rgb(1 / 2.1f));
-				auto scp2 = scoped_style_color(ImGuiCol_HeaderActive, rgba(active_col).multiply_rgb(1 / 1.8f));
-
-				const auto label_id = typesafe_sprintf("##%xr%x", index, int(b));
-
-				const bool active = found_in(selected, index);
-
-				if (is_disabled) {
-					const auto col = active ? in.settings.disabled_active_bg : in.settings.disabled_bg;
-					const auto selectable_size = ImVec2(ImGui::GetContentRegionAvailWidth(), 2 * item_spacing.y - 1 + std::max(size.y, line_h * 2));
-					rect_filled(selectable_size, col, vec2(0, -item_spacing.y + 2));
-				}
-				else {
-					const auto selectable_size = ImVec2(0, item_spacing.y - 1 + std::max(size.y, line_h * 2));
-					ImGui::Selectable(label_id.c_str(), active, ImGuiSelectableFlags_None, selectable_size);
-				}
-
-				ImGui::SetCursorPos(local_pos);
-
-				const auto hotkey_text = typesafe_sprintf(is_replenishable ? "(S+%x)" : "(%x)", index);
-				text_disabled(hotkey_text);
-				ImGui::SameLine();
-			}
-
-			const auto image_padding = vec2(0, 4);
-			game_image(entry, size, white, image_padding);
-			invisible_button("", size + image_padding);
-
-			{
-				ImGui::SameLine();
-
-				cosm.on_flavour(f_id, [&](const auto& typed_flavour) {
-					const auto x = ImGui::GetCursorPosX();
-					text(typed_flavour.get_name());
-					ImGui::SameLine();
-
-					if (in.give_extra_mags_on_first_purchase && b == button_type::BUYABLE_WEAPON) {
-						const auto& item_def = typed_flavour.template get<invariants::item>();
-						const auto& g = item_def.gratis_ammo_pieces_with_first;
-
-						if (g > 0) {
-							if (!found_in(in.done_purchases, f_id)) {
-								text_disabled("(+");
-								ImGui::SameLine();
-								text("%x", g);
-								ImGui::SameLine();
-								text_disabled("mags)");
-								ImGui::SameLine();
+							if (g > 0) {
+								if (!found_in(in.done_purchases, f_id)) {
+									text_disabled("(+");
+									ImGui::SameLine();
+									text("%x", g);
+									ImGui::SameLine();
+									text_disabled("mags)");
+									ImGui::SameLine();
+								}
 							}
 						}
-					}
-
-					const auto prev_y = ImGui::GetCursorPosY() + line_h;
-					ImGui::SetCursorPosY(prev_y);
-					ImGui::SetCursorPosX(x);
-
-					text_color(typesafe_sprintf("%x$", price_of(f_id)), money_color);
-
-					ImGui::SameLine();
-
-					//if (num_affordable > 0) {
+					});
+				},
+				[&](const auto num_affordable) {
+					cosm.on_flavour(f_id, [&](const auto& typed_flavour) {
+						(void)typed_flavour;
 						text_disabled("(Can buy");
 						ImGui::SameLine();
 						text_color(typesafe_sprintf("%x", num_affordable), num_affordable == 0 ? red : money_color);
 						ImGui::SameLine();
 						text_disabled("more)");
 						ImGui::SameLine();
-						//}
-					//else {
-						//text_color("Insufficient funds", red);
-						//ImGui::SameLine();
-						//}
 
-					const auto space_rhs = num_owned + num_carryable;
+						const auto num_owned = subject.count_contained(f_id);
+						const auto space_rhs = num_owned + num_carryable;
 
-					text_disabled("Space:");
-					ImGui::SameLine();
-					if (num_carryable == 0) {
-						text_color(typesafe_sprintf("%x/%x", num_owned, space_rhs), red);
-					}
-					else {
-						text_disabled(typesafe_sprintf("%x/%x", num_owned, space_rhs));
-					}
+						text_disabled("Space:");
+						ImGui::SameLine();
 
-					ImGui::SetCursorPosY(prev_y + line_h + item_spacing.y);
-				});
-			}
+						if (num_carryable == 0) {
+							text_color(typesafe_sprintf("%x/%x", num_owned, space_rhs), red);
+						}
+						else {
+							text_disabled(typesafe_sprintf("%x/%x", num_owned, space_rhs));
+						}
+					});
+				}
+			);
 
 			return false;
 		}
@@ -418,7 +473,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				emplace_element(displayed_replenishables, f.mag);
 
 				const auto index = 1 + index_in(owned_weapons, f);
-				const bool choice_was_made = flavour_button(f.mag, button_type::REPLENISHABLE, index);
+				const bool choice_was_made = purchase_item_button(f.mag, button_type::REPLENISHABLE, index);
 
 				ImGui::Separator();
 
@@ -493,7 +548,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 					ImGui::Separator();
 
-					if (flavour_button(b, button_type::BUYABLE_WEAPON, index)) {
+					if (purchase_item_button(b, button_type::BUYABLE_WEAPON, index)) {
 						set_result(b);
 					}
 				}
@@ -572,6 +627,11 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 						item_holding_stance::HEAVY_LIKE,
 						for_each_shotgun
 					);
+					break;
+				}
+
+				case buy_menu_type::SPELLS: {
+
 					break;
 				}
 

@@ -31,7 +31,7 @@ using spell_instance_list_t = transform_types_in_list_t<
 >;
 
 using spell_instance_tuple = spell_instance_list_t<augs::trivially_copyable_tuple>;
-using spell_id = type_in_list_id<spell_instance_tuple>;
+using spell_id = type_in_list_id<spell_list_t<type_list>>;
 
 template <class T>
 constexpr bool is_spell_v = is_one_of_list_v<remove_cref<T>, spell_list_t<type_list>>;

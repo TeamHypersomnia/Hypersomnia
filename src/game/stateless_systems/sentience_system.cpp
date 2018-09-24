@@ -63,7 +63,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 		}
 
 		if (subject.is_frozen()) {
-			if (!spell.is<haste_instance>()) {
+			if (!spell.is<haste>()) {
 				/* Make exception for a haste spell. */
 				continue;
 			}
@@ -71,14 +71,15 @@ void sentience_system::cast_spells(const logic_step step) const {
 
 		ensure(spell.is_set());
 
-		get_by_dynamic_id(
-			sentience.spells,
-			spell,
-			[&](auto& spell_instance_data){
+		spell.dispatch(
+			[&](auto s) {
 				if (sentience.learned_spells[spell.get_index()]) {
+					using S = decltype(s);
+					auto& spell_instance_data = std::get<instance_of<S>>(sentience.spells);
+
 					auto& personal_electricity = sentience.get<personal_electricity_meter_instance>();
 
-					const auto meta = get_meta_of(spell_instance_data, spell_metas);
+					const auto& meta = std::get<S>(spell_metas);
 					const auto common = meta.common;
 
 					const bool can_cast_already =
@@ -183,11 +184,14 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 			}
 
 			if (sentience.is_spell_being_cast()) {
-				get_by_dynamic_id(
-					sentience.spells, 
-					sentience.currently_casted_spell,
-					[&](auto& spell){
-						const auto spell_meta = get_meta_of(spell, cosm.get_common_significant().spells);
+				sentience.currently_casted_spell.dispatch(
+					[&](auto s) {
+						using S = decltype(s);
+						using I = instance_of<S>;
+
+						auto& spell = std::get<I>(sentience.spells);
+
+						const auto& spell_meta = std::get<S>(cosm.get_common_significant().spells);
 						const auto spell_logic_duration_ms = spell_meta.get_spell_logic_duration_ms();
 						
 						const auto when_casted = sentience.time_of_last_spell_cast;

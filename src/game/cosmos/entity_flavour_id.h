@@ -26,7 +26,7 @@ struct constrained_entity_flavour_id {
 	// END GEN INTROSPECTOR
 
 	bool is_set() const {
-		return raw.is_set();
+		return raw.is_set() && type_id.is_set();
 	}
 
 	bool operator==(const constrained_entity_flavour_id<C...> b) const {

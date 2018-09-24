@@ -62,8 +62,9 @@ auto damage_origin::on_tool_used(C& cosm, F callback) const {
 	using opt_R = std::optional<R>;
 
 	if (cause.spell.is_set()) {
-		return cause.spell.dispatch([&](auto dummy) -> opt_R {
-			return callback(get_meta_of(dummy, cosm.get_common_significant().spells));
+		return cause.spell.dispatch([&](auto s) -> opt_R {
+			using S = decltype(s);
+			return callback(std::get<S>(cosm.get_common_significant().spells));
 		});
 	}
 
