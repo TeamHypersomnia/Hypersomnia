@@ -31,7 +31,7 @@ static auto make_hotkey_map() {
 	m[key::R] = buy_menu_type::RIFLES;
 	m[key::O] = buy_menu_type::SHOTGUNS;
 	m[key::H] = buy_menu_type::HEAVY_GUNS;
-	m[key::G] = buy_menu_type::GRENADES;
+	m[key::N] = buy_menu_type::GRENADES;
 	m[key::L] = buy_menu_type::SPELLS;
 	m[key::T] = buy_menu_type::TOOLS;
 
@@ -135,30 +135,13 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 	const auto& spells = cosm.get_common_significant().spells;
 
-	auto on_spell = [&](const spell_id& id, auto&& callback) -> decltype(auto) {
-		return id.dispatch(
-			[&](auto s) -> decltype(auto) {
-				using S = decltype(s);
-				return callback(std::get<S>(spells));
-			}
-		);
-	};
-
-	auto is_alive = [&](const item_flavour_id& t) {
-		if (!t.is_set()) {
-			return false;
-		}
-
-		return t.dispatch(
-			[&](const auto& typed_id) {
-				return nullptr != cosm.find_flavour(typed_id);
-			}
-		);
+	auto _on_spell = [&](const spell_id& id, auto&& f) -> decltype(auto) {
+		return ::on_spell(cosm, id, std::forward<decltype(f)>(f));
 	};
 
 	auto image_of = [&](const auto& of) {
 		if constexpr(std::is_same_v<decltype(of), const item_flavour_id&>) {
-			if (!is_alive(of)) {
+			if (!is_alive(cosm, of)) {
 				return assets::image_id();
 			}
 
@@ -167,27 +150,14 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			});
 		}
 		else {
-			return on_spell(of, [&](const auto& spell_data) {
+			return _on_spell(of, [&](const auto& spell_data) {
 				return spell_data.appearance.icon;
 			});
 		}
 	};
 
 	auto price_of = [&](const auto& of) {
-		if constexpr(std::is_same_v<decltype(of), const item_flavour_id&>) {
-			if (!is_alive(of)) {
-				return static_cast<money_type>(0);
-			}
-
-			return cosm.on_flavour(of, [&](const auto& typed_flavour) {
-				return *typed_flavour.find_price();
-			});
-		}
-		else {
-			return on_spell(of, [&](const auto& spell_data) {
-				return spell_data.common.standard_price;
-			});
-		}
+		return ::get_price_of(cosm, of);
 	};
 
 	enum class button_type {
@@ -343,7 +313,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			additional_id,
 			hotkey_text,
 			[&]() {
-				on_spell(s_id, [&](const auto& spell_data) {
+				_on_spell(s_id, [&](const auto& spell_data) {
 					const auto f = augs::gui::text::from_bbcode(spell_data.appearance.name, { dummy, white });
 
 					if (f.empty()) {
@@ -360,7 +330,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			[&](auto num_affordable) {
 				num_affordable = std::min(num_affordable, 1);
 
-				on_spell(s_id,  [&](const auto& spell_data) {
+				_on_spell(s_id,  [&](const auto& spell_data) {
 					(void)spell_data;
 					text_disabled("(Can buy");
 					ImGui::SameLine();
@@ -377,7 +347,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		const button_type b, 
 		const int index
 	) {
-		if (!is_alive(f_id)) {
+		if (!is_alive(cosm, f_id)) {
 			return false;
 		}
 
@@ -391,19 +361,11 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			}
 		}
 
-		const auto num_carryable = [&]() -> int {
-			const auto slot_opts = slot_finding_opts {
-				slot_finding_opt::CHECK_WEARABLES,
-				slot_finding_opt::CHECK_HANDS,
-				slot_finding_opt::CHECK_CONTAINERS
-			};
-
-			return num_carryable_pieces(
-				subject,
-				slot_opts, 
-				f_id
-			);
-		}();
+		const auto num_carryable = num_carryable_pieces(
+			subject,
+			::get_buy_slot_opts(), 
+			f_id
+		);
 
 		const auto additional_id = std::to_string(int(b));
 
@@ -771,6 +733,9 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			}
 
 			ImGui::EndChild();
+		}
+		else {
+			requested_weapons.clear();
 		}
 	}
 	else {

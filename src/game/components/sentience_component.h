@@ -32,11 +32,6 @@
 
 #include "game/enums/use_button_query_result.h"
 
-using learnt_spells_array_type = std::array<
-	bool,
-	aligned_num_of_bytes_v<num_types_in_list_v<spell_instance_tuple>, 4>
->;
-
 struct damage_owner {
 	// GEN INTROSPECTOR struct damage_owner
 	signi_entity_id who;

@@ -46,7 +46,8 @@ namespace test_scenes {
 
 		vars.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::VINDICATOR);
 		vars.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
-		vars.initial_eq.num_spare_ammo_pieces = 3;
+
+		fill_range(vars.initial_eq.spells_to_give, true);
 	}
 
 	void testbed::setup(bomb_mode_vars& vars) {
@@ -64,10 +65,7 @@ namespace test_scenes {
 
 #if GIVE_AMMO
 			resistance.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::AO44);
-			resistance.initial_eq.num_spare_ammo_pieces = 3;
-
 			metropolis.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BILMER2000);
-			metropolis.initial_eq.num_spare_ammo_pieces = 3;
 			metropolis.initial_eq.belt_wearable = to_entity_flavour_id(test_tool_items::DEFUSE_KIT);
 #endif
 		}
@@ -205,8 +203,10 @@ namespace test_scenes {
 			requested_equipment r;
 			r.weapon = to_entity_flavour_id(w);
 
-			if constexpr(!std::is_same_v<const transformr&, decltype(character)>) {
-				r.num_spare_ammo_pieces = 2;
+			if constexpr(std::is_same_v<const transformr&, decltype(character)>) {
+				r.num_given_ammo_pieces = 1;
+			}
+			else {
 				r.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 			}
 
@@ -261,8 +261,6 @@ namespace test_scenes {
 				give_weapon(new_character, test_shootable_weapons::BILMER2000);
 				give_backpack(new_character, is_metropolis ? sample_backpack : brown_backpack);
 			}
-
-			fill_range(sentience.learnt_spells, true);
 		}
 
 		{

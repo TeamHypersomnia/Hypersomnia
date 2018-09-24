@@ -36,3 +36,7 @@ using spell_id = type_in_list_id<spell_list_t<type_list>>;
 template <class T>
 constexpr bool is_spell_v = is_one_of_list_v<remove_cref<T>, spell_list_t<type_list>>;
 	
+using learnt_spells_array_type = std::array<
+	bool,
+	aligned_num_of_bytes_v<num_types_in_list_v<spell_instance_tuple>, 4>
+>;

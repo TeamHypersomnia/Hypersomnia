@@ -239,6 +239,7 @@ private:
 		movement_flags movement;
 		bool survived = false;
 		transferred_inventory saved_eq;
+		learnt_spells_array_type saved_spells;
 	};
 
 	struct transfer_meta {

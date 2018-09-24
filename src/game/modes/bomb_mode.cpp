@@ -15,6 +15,7 @@
 #include "game/messages/health_event.h"
 #include "augs/string/format_enum.h"
 #include "game/messages/battle_event_message.h"
+#include "game/modes/detail/item_purchase_logic.hpp"
 
 using input_type = bomb_mode::input;
 
@@ -159,6 +160,10 @@ void bomb_mode::init_spawned(
 		if (transferred != std::nullopt && transferred->player.survived) {
 			const auto& eq = transferred->player.saved_eq;
 
+			if (const auto sentience = typed_handle.template find<components::sentience>()) {
+				sentience->learnt_spells = transferred->player.saved_spells;
+			}
+
 			std::vector<entity_id> created_items;
 
 			for (const auto& i : eq.items) {
@@ -200,11 +205,10 @@ void bomb_mode::init_spawned(
 			faction_vars.initial_eq.generate_for(typed_handle, step);
 		}
 
-		auto& sentience = typed_handle.template get<components::sentience>();
-
-		for_each_through_std_get(sentience.meters, [](auto& m) { m.make_full(); });
-
-		fill_range(sentience.learnt_spells, true);
+		{
+			auto& sentience = typed_handle.template get<components::sentience>();
+			for_each_through_std_get(sentience.meters, [](auto& m) { m.make_full(); });
+		}
 
 		if (transferred != std::nullopt) {
 			typed_handle.template get<components::movement>().flags = transferred->player.movement;
@@ -635,6 +639,10 @@ bomb_mode::round_transferred_players bomb_mode::make_transferred_players(const i
 				continue;
 			}
 
+			if (const auto sentience = handle.find<components::sentience>()) {
+				pm.saved_spells = sentience->learnt_spells;
+			}
+
 			auto& eq = pm.saved_eq;
 			auto& items = eq.items;
 			pm.survived = true;
@@ -994,15 +1002,80 @@ void bomb_mode::process_win_conditions(const input_type in, const logic_step ste
 
 void bomb_mode::execute_player_commands(const input_type in, const mode_entropy& entropy, const logic_step step) {
 	const auto current_round = get_round_num();
+	auto& cosm = in.cosm;
 
 	for (const auto& p : entropy.players) {
 		const auto& commands = p.second;
 		const auto id = p.first;
 
 		if (const auto player_data = find(id)) {
-			const auto previous_faction = player_data->faction;
+			{
+				on_player_handle(cosm, id, [&](const auto& player_handle) {
+					if constexpr(!is_nullopt_v<decltype(player_handle)>) {
+						const auto& purchases = commands.queues.get_queue<mode_commands::item_purchase>();
+						auto& stats = player_data->stats;
+						auto& money = stats.money;
+						auto& done_purchases = stats.round_state.done_purchases;
+
+						for (const auto& p : purchases) {
+							if (const auto f_id = p.item; ::is_alive(cosm, f_id)) {
+								const auto price = ::get_price_of(cosm, f_id);
+
+								if (money >= price) {
+									if (::num_carryable_pieces(player_handle, ::get_buy_slot_opts(), f_id) == 0) {
+										continue;
+									}
+
+									requested_equipment eq;
+
+									if (::is_magazine_like(cosm, f_id)) {
+										eq.non_standard_mag = f_id;
+										eq.num_given_ammo_pieces = 1;
+									}
+									else {
+										if (found_in(done_purchases, f_id)) {
+											eq.num_given_ammo_pieces = 1;
+										}
+										else {
+											done_purchases.push_back(f_id);
+										}
+
+										eq.weapon = f_id;
+									}
+
+									eq.generate_for(player_handle, step);
+
+									money -= price;
+								}
+
+								continue;
+							}
+
+							if (const auto s_id = p.spell; ::is_alive(cosm, s_id)) {
+								const auto price = ::get_price_of(cosm, s_id);
+
+								if (money >= price) {
+									requested_equipment eq;
+
+									eq.spells_to_give[s_id.get_index()] = true;
+									eq.generate_for(player_handle, step);
+
+									money -= price;
+								}
+
+								continue;
+							}
+						}
+					}
+					else {
+						(void)player_handle;
+					}
+				});
+			}
 
 			if (const auto& new_choice = commands.team_choice; new_choice != std::nullopt) {
+				const auto previous_faction = player_data->faction;
+
 				const auto f = new_choice->target_team;
 
 				// TODO: Notify GUI about the result.
@@ -1028,8 +1101,6 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 				LOG(format_enum(result));
 
 				if (result == faction_choice_result::CHANGED) {
-					auto& cosm = in.cosm;
-
 					LOG("Changed from %x to %x", format_enum(previous_faction), format_enum(f));
 
 					on_player_handle(cosm, id, [&](const auto& player_handle) {
