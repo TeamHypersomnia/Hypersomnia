@@ -18,6 +18,7 @@
 
 #include <Box2D/Collision/Shapes/b2PolygonShape.h>
 #include <new>
+#include <optional>
 
 b2Shape* b2PolygonShape::Clone(b2BlockAllocator* allocator) const
 {
@@ -71,7 +72,7 @@ int32 b2PolygonShape::GetChildCount() const
 	return 1;
 }
 
-static b2Vec2 ComputeCentroid(const b2Vec2* vs, int32 count)
+static std::optional<b2Vec2> ComputeCentroid(const b2Vec2* vs, int32 count)
 {
 	b2Assert(count >= 3);
 
@@ -112,14 +113,17 @@ static b2Vec2 ComputeCentroid(const b2Vec2* vs, int32 count)
 	}
 
 	// Centroid
-	b2Assert(area > b2_epsilon);
-	c *= 1.0f / area;
-	return c;
+	if (area > b2_epsilon) {
+		c *= 1.0f / area;
+		return c;
+	}
+
+	return std::nullopt;
 }
 
 #include "augs/math/vec2.h"
 
-void b2PolygonShape::Set(const vec2* vertices, const int32 n)
+bool b2PolygonShape::Set(const vec2* vertices, const int32 n)
 {
 	b2Assert(3 <= n && n <= b2_maxPolygonVertices);
 	m_count = n;
@@ -134,16 +138,28 @@ void b2PolygonShape::Set(const vec2* vertices, const int32 n)
 		int32 i1 = i;
 		int32 i2 = i + 1 < n ? i + 1 : 0;
 		b2Vec2 edge = m_vertices[i2] - m_vertices[i1];
-		b2Assert(edge.LengthSquared() > b2_epsilon * b2_epsilon);
+		const auto valid = edge.LengthSquared() > b2_epsilon * b2_epsilon;
+
+		if (!valid) {
+			SetAsBox(0.01f, 0.01f);
+			return false;
+		}
+
 		m_normals[i] = b2Cross(edge, 1.0f);
 		m_normals[i].Normalize();
 	}
 
 	// Compute the polygon centroid.
-	m_centroid = ComputeCentroid(m_vertices, n);
+	if (const auto c = ComputeCentroid(m_vertices, n)) {
+		m_centroid = *c;
+		return true;
+	}
+
+	SetAsBox(0.01f, 0.01f);
+	return false;
 }
 
-void b2PolygonShape::Set(const b2Vec2* vertices, const int32 n)
+bool b2PolygonShape::Set(const b2Vec2* vertices, const int32 n)
 {
 	b2Assert(3 <= n && n <= b2_maxPolygonVertices);
 	m_count = n;
@@ -158,13 +174,25 @@ void b2PolygonShape::Set(const b2Vec2* vertices, const int32 n)
 		int32 i1 = i;
 		int32 i2 = i + 1 < n ? i + 1 : 0;
 		b2Vec2 edge = m_vertices[i2] - m_vertices[i1];
-		b2Assert(edge.LengthSquared() > b2_epsilon * b2_epsilon);
+
+		const auto valid = edge.LengthSquared() > b2_epsilon * b2_epsilon;
+
+		if (!valid) {
+			SetAsBox(0.01f, 0.01f);
+			return false;
+		}
+
 		m_normals[i] = b2Cross(edge, 1.0f);
 		m_normals[i].Normalize();
 	}
 
-	// Compute the polygon centroid.
-	m_centroid = ComputeCentroid(m_vertices, n);
+	if (const auto c = ComputeCentroid(m_vertices, n)) {
+		m_centroid = *c;
+		return true;
+	}
+
+	SetAsBox(0.01f, 0.01f);
+	return false;
 }
 
 bool b2PolygonShape::TestPoint(const b2Transform& xf, const b2Vec2& p) const

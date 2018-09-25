@@ -19,7 +19,12 @@ constexpr bool has_string_v = has_string<T>::value;
 template <class S, class T>
 S& pretty_print(S& os, const T& val) {
 	if constexpr(can_stream_left_v<S, T> && !has_string_v<T>) {
-		os << val;
+		if constexpr(std::is_same_v<T, unsigned char>) {
+			os << static_cast<int>(val);
+		}
+		else {
+			os << val;
+		}
 	}
 	else if constexpr(is_optional_v<T>) {
 		if (val != std::nullopt) {

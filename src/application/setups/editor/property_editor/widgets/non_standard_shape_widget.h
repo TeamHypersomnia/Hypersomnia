@@ -4,6 +4,7 @@
 
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_drawers.h"
+#include "augs/misc/from_concave_polygon.h"
 #include "augs/templates/wrap_templates.h"
 
 struct non_standard_shape_widget {
@@ -111,60 +112,78 @@ struct non_standard_shape_widget {
 			const bool is_adding_mode = n < considered_poly.max_size() && io.KeyShift;
 			const bool is_removing_mode = n > 3 && io.KeyAlt;
 			const bool is_normal_mode = !is_removing_mode && !is_removing_mode;
+			const bool is_show_partition_mode = is_normal_mode && io.KeyCtrl;
 
-			for (std::size_t i = 0; i < considered_poly.size(); ++i) {
-				auto a = considered_poly[i];
-				auto b = wrap_next(considered_poly, i);
+			if (is_show_partition_mode) {
 
-				if (hovered) {
-					if (is_normal_mode) {
-						if (i == closest_prev) {
-							segment(a, mpos, green);
-						}
-						else if (i == closest_i) {
-							segment(mpos, b, green);
-						}
+			}
+			else {
+				for (std::size_t i = 0; i < considered_poly.size(); ++i) {
+					auto a = considered_poly[i];
+					auto b = wrap_next(considered_poly, i);
 
-						segment(a, b, white);
-					}
-					else if (is_adding_mode) {
+					if (hovered) {
+						if (is_normal_mode) {
+							if (i == closest_prev) {
+								segment(a, mpos, green);
+							}
+							else if (i == closest_i) {
+								segment(mpos, b, green);
+							}
 
-					}
-					else if (is_removing_mode) {
-						if (i == closest_prev) {
-							segment(a, considered_poly[closest_next], white);
-							segment(a, b, red);
-						}
-						else if (i == closest_i) {
-							segment(a, b, red);
-						}
-						else {
 							segment(a, b, white);
 						}
+						else if (is_adding_mode) {
+
+						}
+						else if (is_removing_mode) {
+							if (i == closest_prev) {
+								segment(a, considered_poly[closest_next], white);
+								segment(a, b, red);
+							}
+							else if (i == closest_i) {
+								segment(a, b, red);
+							}
+							else {
+								segment(a, b, white);
+							}
+						}
+					}
+					else {
+						segment(a, b, white);
 					}
 				}
-				else {
-					segment(a, b, white);
+
+				if (ImGui::IsItemClicked()) {
+					result = tweaker_type::DISCRETE;
+
+					if (is_normal_mode) {
+						considered_poly[closest_i] = mpos;
+					}
+					else if (is_adding_mode) {
+						considered_poly.insert(considered_poly.begin() + closest_next, mpos);
+					}
+					else if (is_removing_mode) {
+						considered_poly.erase(considered_poly.begin() + closest_i);
+					}
+
+					object = considered;
 				}
 			}
-
-			if (ImGui::IsItemClicked()) {
-				result = tweaker_type::DISCRETE;
-
-				if (is_normal_mode) {
-					considered_poly[closest_i] = mpos;
-				}
-				else if (is_adding_mode) {
-					considered_poly.insert(considered_poly.begin() + closest_next, mpos);
-				}
-				else if (is_removing_mode) {
-					considered_poly.erase(considered_poly.begin() + closest_i);
-				}
-
-				object = considered;
-			}
-
 			invisible_button("###VertexSelectorAfter", viewing_size);
+		};
+
+		auto perform_standard_widget = [&]() {
+			/* Perform the standard widget for manual tweaking */
+			auto iw = scoped_item_width(-1);
+
+			for (auto& v : object.original_poly) {
+				auto id = scoped_id(index_in(object.original_poly, v));
+
+				if (drag_vec2(identity_label, v)) {
+					result = tweaker_type::CONTINUOUS;
+				}
+			}
 		};
 
 		if (nodeize) {
@@ -174,12 +193,18 @@ struct non_standard_shape_widget {
 
 			if (node) {
 				perform_widget();
+				perform_standard_widget();
 			}
 		}
 		else {
 			if (auto combo = scoped_combo((identity_label + "Picker").c_str(), "Pick...", ImGuiComboFlags_HeightLargest)) {
 				perform_widget();
+				perform_standard_widget();
 			}
+		}
+
+		if (result.has_value()) {
+			augs::refresh_convex_partitioning(object);
 		}
 
 		return result;

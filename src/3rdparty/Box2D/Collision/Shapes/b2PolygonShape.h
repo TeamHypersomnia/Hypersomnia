@@ -42,8 +42,8 @@ public:
 	/// @warning the points may be re-ordered, even if they form a convex polygon
 	/// @warning collinear points are handled but not removed. Collinear points
 	/// may lead to poor stacking behavior.
-	void Set(const b2Vec2* points, int32 count);
-	void Set(const vec2* points, int32 count);
+	bool Set(const b2Vec2* points, int32 count);
+	bool Set(const vec2* points, int32 count);
 
 	/// Build vertices to represent an axis-aligned box centered on the local origin.
 	/// @param hx the half-width.

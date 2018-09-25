@@ -8,13 +8,13 @@ namespace augs {
 	template <
 		class T, 
 		std::size_t vertex_count, 
-		std::size_t index_count,
-		class C
+		std::size_t index_count
 	>
-	void from_concave_polygon(
-		basic_convex_partitioned_shape<T, vertex_count, index_count>& poly,
-		const C& verts
+	void refresh_convex_partitioning(
+		basic_convex_partitioned_shape<T, vertex_count, index_count>& poly
 	) {
+		const auto& verts = poly.original_poly;
+
 		const auto partition_result = [&]() {
 			std::list<TPPLPoly> output;
 			std::list<TPPLPoly> input;
@@ -41,8 +41,6 @@ namespace augs {
 		auto& pc = poly.convex_partition;
 		pc.clear();
 
-		poly.original_poly = verts;
-
 		if (partition_result.size() == 1) {
 			return;
 		}
@@ -56,15 +54,15 @@ namespace augs {
 				}
 			}
 
-			for (const auto& out_vertex : out_poly) {
-				using I = typename decltype(poly)::index_type;
+			using I = typename remove_cref<decltype(pc)>::value_type;
+
+			for (long i = 0; i < out_poly.GetNumPoints(); ++i) {
+				const auto& out_vertex = out_poly.GetPoint(i);
 				pc.push_back(static_cast<I>(out_vertex.id));
 			}
 
-			pc.push_back(pc.out_poly.GetPoint(0));
+			pc.push_back(static_cast<I>(out_poly.GetPoint(0).id));
 		}
-
-		reverse_range(poly.convex_partition);
 	}
 
 	template <std::size_t vertex_count, std::size_t index_count>

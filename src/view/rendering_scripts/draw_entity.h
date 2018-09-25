@@ -65,7 +65,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 		auto input = [&]() {
 			auto result = in.make_input_for<invariants::sprite>();
 
-			if (const auto flips = typed_handle.calculate_flip_flags()) { 
+			if (const auto flips = typed_handle.calc_flip_flags()) { 
 				result.flip = *flips;
 			}
 

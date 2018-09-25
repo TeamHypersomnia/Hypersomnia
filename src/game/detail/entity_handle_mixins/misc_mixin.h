@@ -21,7 +21,7 @@ template <class E>
 class misc_mixin {
 public:
 
-	std::optional<flip_flags> calculate_flip_flags() const {
+	std::optional<flip_flags> calc_flip_flags() const {
 		const auto self = *static_cast<const E*>(this);
 
 		if (const auto sprite = self.template find<components::sprite>()) {

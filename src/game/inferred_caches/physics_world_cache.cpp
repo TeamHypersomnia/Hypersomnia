@@ -391,8 +391,29 @@ void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle
 		auto& constructed_fixtures = cache.constructed_fixtures;
 		ensure(constructed_fixtures.empty());
 
+		const auto flips = handle.calc_flip_flags();
+		const bool flip_order = flips && flips->vertically != flips->horizontally;
+
 		auto from_convex_partition = [&](auto shape) {
 			shape.offset_vertices(connection.shape_offset);
+
+			if (flips) {
+				if (flips->horizontally) {
+					for (auto& v : shape.original_poly) {
+						v.neg_x();
+					}
+				}
+
+				if (flips->vertically) {
+					for (auto& v : shape.original_poly) {
+						v.neg_y();
+					}
+				}
+
+				if (flip_order) {
+					reverse_range(shape.convex_partition);
+				}
+			}
 
 			using C = logic_convex_poly;
 
@@ -439,7 +460,7 @@ void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle
 						continue;
 					}
 
-					convex.push_back(poly[i]);
+					convex.push_back(poly[partition[i]]);
 				}
 			}
 		};
