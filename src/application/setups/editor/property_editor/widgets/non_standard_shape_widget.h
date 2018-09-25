@@ -90,7 +90,7 @@ struct non_standard_shape_widget {
 			const auto mpos = [&]() {
 				const auto pos = ImGui::GetCursorScreenPos();
 				const auto image_space_new = vec2i(vec2(io.MousePos.x - pos.x, io.MousePos.y - pos.y) / zoom);
-				return image_space_new - reference_point;
+				return vec2(image_space_new - reference_point);
 			}();
 
 			const auto closest_i = [&]() {
@@ -109,15 +109,13 @@ struct non_standard_shape_widget {
 
 			const auto closest_edge_a = [&]() {
 				std::size_t ci = 0;
-				float dist = -1;
+				float dist = -1.f;
 
 				for (std::size_t i = 0; i < considered_poly.size(); ++i) {
-					const auto new_dist = mpos.distance_from_segment_sq(considered_poly[i], wrap_next(considered_poly, i));
+					const auto seg = vec2::segment_type{ considered_poly[i], wrap_next(considered_poly, i) };
+					const auto new_dist = mpos.distance_from_segment_sq(seg);
 
-					if (dist == -1) {
-						dist = new_dist;
-					}
-					else if (new_dist < dist) {
+					if (dist == -1.f || new_dist < dist) {
 						dist = new_dist;
 						ci = i;
 					}

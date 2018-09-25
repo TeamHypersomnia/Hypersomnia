@@ -82,6 +82,27 @@ return {
         y = 0
       }
     },
+    non_standard_shape = {
+      convex_partition = {},
+      original_poly = {
+        {
+          x = -20,
+          y = -4
+        },
+        {
+          x = 20,
+          y = -20
+        },
+        {
+          x = 20,
+          y = 20
+        },
+        {
+          x = -20,
+          y = 4
+        }
+      }
+    },
     torso = {
       back = {
         pos = {
@@ -117,7 +138,15 @@ return {
           y = 0
         },
         rotation = 0
-      }
+      },
+      shoulder = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      strafe_facing_offset = 0
     }
   },
   usage_as_button = {

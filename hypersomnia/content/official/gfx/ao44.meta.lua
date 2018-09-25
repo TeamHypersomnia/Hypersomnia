@@ -80,6 +80,35 @@ return {
         y = 0
       }
     },
+    non_standard_shape = {
+      convex_partition = {},
+      original_poly = {
+        {
+          x = -24,
+          y = 7
+        },
+        {
+          x = -13,
+          y = -10
+        },
+        {
+          x = 24,
+          y = -11
+        },
+        {
+          x = 24,
+          y = -5
+        },
+        {
+          x = 0,
+          y = -4
+        },
+        {
+          x = -25,
+          y = 14
+        }
+      }
+    },
     torso = {
       back = {
         pos = {
