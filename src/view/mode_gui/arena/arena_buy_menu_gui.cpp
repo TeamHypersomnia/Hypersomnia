@@ -19,6 +19,7 @@
 #include "game/modes/detail/item_purchase_logic.hpp"
 #include "augs/gui/formatted_string.h"
 #include "view/mode_gui/arena/arena_mode_gui_settings.h"
+#include "game/detail/buy_area_in_range.h"
 
 static auto make_hotkey_map() {
 	using namespace augs::event::keys;
@@ -109,6 +110,11 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 	const auto money_color = in.money_indicator_color;
 
 	if (subject.dead()) {
+		return std::nullopt;
+	}
+
+	if (!buy_area_in_range(subject)) {
+		show = false;
 		return std::nullopt;
 	}
 

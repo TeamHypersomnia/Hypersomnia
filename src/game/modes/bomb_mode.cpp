@@ -16,6 +16,7 @@
 #include "augs/string/format_enum.h"
 #include "game/messages/battle_event_message.h"
 #include "game/modes/detail/item_purchase_logic.hpp"
+#include "game/detail/buy_area_in_range.h"
 
 using input_type = bomb_mode::input;
 
@@ -1012,6 +1013,10 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 			{
 				on_player_handle(cosm, id, [&](const auto& player_handle) {
 					if constexpr(!is_nullopt_v<decltype(player_handle)>) {
+						if (!buy_area_in_range(player_handle)) {
+							return;
+						}
+
 						const auto& purchases = commands.queues.get_queue<mode_commands::item_purchase>();
 						auto& stats = player_data->stats;
 						auto& money = stats.money;
