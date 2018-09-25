@@ -39,6 +39,23 @@
 #include "game/detail/physics/missile_surface_info.h"
 #include "game/detail/explosive/detonate.h"
 
+#define LOG_RICOCHETS 0
+
+template <class... Args>
+void RIC_LOG(Args&&... args) {
+#if LOG_RICOCHETS
+	LOG(std::forward<Args>(args)...);
+#else
+	((void)args, ...);
+#endif
+}
+
+#if LOG_RICOCHETS
+#define RIC_LOG_NVPS LOG_NVPS
+#else
+#define RIC_LOG_NVPS RIC_LOG
+#endif
+
 using namespace augs;
 
 void play_collision_sound(
@@ -60,18 +77,22 @@ void missile_system::ricochet_missiles(const logic_step step) {
 	(void)now;
 
 	for (const auto& it : events) {
-		if (it.type != messages::collision_message::event_type::BEGIN_CONTACT || it.one_is_sensor) {
-			continue;
+		{
+			const bool interested = it.type != messages::collision_message::event_type::BEGIN_CONTACT;
+
+			if (!interested || it.one_is_sensor) {
+				continue;
+			}
 		}
 
-		const auto subject_handle = cosm[it.subject];
+		const auto surface_handle = cosm[it.subject];
 		const auto missile_handle = cosm[it.collider];
 
 		missile_handle.dispatch_on_having_all<invariants::missile>([&](const auto typed_missile) {
 			const auto& missile_def = typed_missile.template get<invariants::missile>();
 			auto& missile = typed_missile.template get<components::missile>();
 
-			const auto info = missile_surface_info(typed_missile, subject_handle);
+			const auto info = missile_surface_info(typed_missile, surface_handle);
 
 			if (!info.is_ricochetable()) {
 				return;
@@ -95,11 +116,21 @@ void missile_system::ricochet_missiles(const logic_step step) {
 
 			const auto hit_facing = impact_dir.degrees_between(collision_normal);
 
-			const auto& collider_fixtures = subject_handle.get<invariants::fixtures>();
-			const auto max_ricochet_angle = collider_fixtures.max_ricochet_angle;
+			const auto& surface_fixtures = surface_handle.get<invariants::fixtures>();
+			const auto max_ricochet_angle = surface_fixtures.max_ricochet_angle;
 
 			const auto left_b = 90 - max_ricochet_angle;
 			const auto right_b = 90 + max_ricochet_angle;
+
+			if (DEBUG_DRAWING.draw_forces) {
+				DEBUG_PERSISTENT_LINES.emplace_back(
+					yellow,
+					vec2(it.point),
+					vec2(it.point) + collision_normal * 150
+				);
+			}
+
+			RIC_LOG_NVPS(left_b, hit_facing, right_b);
 
 			if (hit_facing > left_b && hit_facing < right_b) {
 				{
@@ -132,7 +163,7 @@ void missile_system::ricochet_missiles(const logic_step step) {
 				rigid_body.set_velocity(reflected_dir * impact_speed);
 				rigid_body.set_transform(new_transform);
 
-				::play_collision_sound(angle_mult * 150.f, it.point, typed_missile, subject_handle, step);
+				::play_collision_sound(angle_mult * 150.f, it.point, typed_missile, surface_handle, step);
 
 				const auto effect_transform = transformr(it.point, reflected_dir.degrees());
 
@@ -173,11 +204,15 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 		const bool contact_start = it.type == messages::collision_message::event_type::BEGIN_CONTACT;
 		const bool pre_solve = it.type == messages::collision_message::event_type::PRE_SOLVE;
 
-		if ((!contact_start && !pre_solve) || it.one_is_sensor) {
-			continue;
+		{
+			const bool interested = contact_start || pre_solve;
+
+			if (!interested || it.one_is_sensor) {
+				continue;
+			}
 		}
 
-		const auto subject_handle = cosm[it.subject];
+		const auto surface_handle = cosm[it.subject];
 		const auto missile_handle = cosm[it.collider];
 
 		missile_handle.dispatch_on_having_all<invariants::missile>([&](const auto typed_missile) {
@@ -185,7 +220,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			auto& missile = typed_missile.template get<components::missile>();
 
 			const auto collision_normal = vec2(it.normal).normalize();
-			const auto info = missile_surface_info(typed_missile, subject_handle);
+			const auto info = missile_surface_info(typed_missile, surface_handle);
 
 			if (info.should_ignore_altogether()) {
 				return;
@@ -203,7 +238,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			if (pre_solve) {
 				/* 
 					With a PreSolve must have happened a PostSolve. 
-					Correct velocity direction. 
+					Correct velocity to point in the direction of the body rotation.
 				*/
 				const auto body = typed_missile.template get<components::rigid_body>();
 				const auto current_vel = body.get_velocity();
@@ -214,6 +249,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 				//const auto new_tr = transformr(tr.pos, current_vel.degrees());
 				const auto new_vel = current_dir * current_vel.length();
 
+				RIC_LOG_NVPS(new_vel);
 				body.set_velocity(new_vel);
 			}
 
@@ -223,8 +259,14 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 					missile.when_last_ricocheted
 				);
 
+				RIC_LOG_NVPS(missile_def.ricochet_cooldown_ms, missile.when_last_ricocheted.step);
+
 				if (ricochet_cooldown) {
+					RIC_LOG("Det: rico cooldown");
 					return;
+				}
+				else {
+					RIC_LOG("Det: NO COOLDOWN");
 				}
 			}
 
@@ -234,7 +276,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			if (missile_def.impulse_upon_hit > 0.f && contact_start) {
 				auto considered_impulse = missile_def.impulse_upon_hit * missile.power_multiplier_of_sender;
 
-				if (const auto sentience = subject_handle.find<components::sentience>()) {
+				if (const auto sentience = surface_handle.find<components::sentience>()) {
 					const auto& shield_of_victim = sentience->get<electric_shield_perk_instance>();
 
 					if (!shield_of_victim.timing.is_enabled(clk)) {
@@ -242,7 +284,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 					}
 				}
 
-				const auto subject_of_impact = subject_handle.get_owner_of_colliders().get<components::rigid_body>();
+				const auto subject_of_impact = surface_handle.get_owner_of_colliders().get<components::rigid_body>();
 				const auto subject_of_impact_mass_pos = subject_of_impact.get_mass_position(); 
 
 				const auto impact = vec2(impact_velocity).set_length(considered_impulse);
@@ -252,7 +294,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 			missile.saved_point_of_impact_before_death = { it.point, impact_dir.degrees() };
 
-			const auto owning_capability = subject_handle.get_owning_transfer_capability();
+			const auto owning_capability = surface_handle.get_owning_transfer_capability();
 			const bool is_victim_a_held_item = info.surface_is_item && owning_capability.alive() && owning_capability != it.subject;
 
 			messages::damage_message damage_msg;

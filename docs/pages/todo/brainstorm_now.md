@@ -6,9 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Specifying physical shapes per-image
-	- std::vector<vec2i> in the image
-
 - Alt + G throws secondary item
 
 - Alt + R only unloads the magazine

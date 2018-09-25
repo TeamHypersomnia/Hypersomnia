@@ -355,12 +355,14 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 
 				const auto& ignored = collider_special_physics.during_cooldown_ignore_collision_with;
 
-				if (ignored == subject_owner_body) {
-					return true;
-				}
+				if (ignored.is_set()) {
+					if (ignored == subject_owner_body) {
+						return true;
+					}
 
-				if (ignored == subject_capability) {
-					return true;
+					if (ignored == subject_capability) {
+						return true;
+					}
 				}
 			}
 

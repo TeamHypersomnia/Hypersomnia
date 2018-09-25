@@ -1540,3 +1540,6 @@ i			- if the newly calculated target is different than last_reload_target, reset
 			- But we can't predict the result with 3 additional mags
 		- Basically always the same slot opts
 
+- Specifying physical shapes per-image
+	- std::vector<vec2i> in the image
+

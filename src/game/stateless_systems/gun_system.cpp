@@ -476,9 +476,9 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			auto& heat = gun.current_heat;
 
 			if (total_recoil != 0.f) {
+#if ENABLE_RECOIL
 				auto total_kickback = total_recoil;
 
-#if ENABLE_RECOIL
 				if (sentience && sentience->use_button == use_button_state::DEFUSING) {
 					total_recoil *= 1.5f;
 					total_kickback *= 1.5f;
