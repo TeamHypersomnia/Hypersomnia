@@ -65,6 +65,7 @@ struct all_necessary_shaders {
 	optional_shader illuminating_smoke;
 	optional_shader exploding_rings;
 	optional_shader light;
+	optional_shader textured_light;
 	// END GEN INTROSPECTOR
 
 	all_necessary_shaders(

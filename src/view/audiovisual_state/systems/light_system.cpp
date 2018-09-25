@@ -97,7 +97,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	const auto global_time_seconds = drawing_in.global_time_seconds;
 	const auto output = augs::drawer{ renderer.get_triangle_buffer() };
 	const auto& light_shader = in.light_shader;
-	const auto& wall_light_shader = light_shader;
+	const auto& wall_light_shader = in.textured_light_shader;
 
 	const auto& standard_shader = in.standard_shader;
 
@@ -130,7 +130,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	};
 
 	const auto light_uniform = light_uniforms(light_shader);
-	const auto& wall_light_uniform = light_uniform;
+	const auto& wall_light_uniform = light_uniforms(wall_light_shader);
 
 	const auto& interp = drawing_in.interp;
 	const auto& particles = in.particles;

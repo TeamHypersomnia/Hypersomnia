@@ -36,6 +36,7 @@ struct light_system_input {
 	std::array<float, 16> projection_matrix;
 	const augs::graphics::fbo& light_fbo;
 	const augs::graphics::shader_program& light_shader;
+	const augs::graphics::shader_program& textured_light_shader;
 	const augs::graphics::shader_program& standard_shader;
 	std::function<void()> neon_callback;
 	std::function<void()> fill_stencil;

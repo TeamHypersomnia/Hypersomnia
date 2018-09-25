@@ -113,6 +113,11 @@ all_necessary_shaders::all_necessary_shaders(
 		specular_highlights->set_uniform("basic_texture", 0);
 		specular_highlights->set_uniform("light_texture", 2);
 	}
+
+	if (textured_light) {
+		textured_light->set_as_current();
+		textured_light->set_uniform("basic_texture", 0);
+	}
 }
 
 all_necessary_sounds::all_necessary_sounds(

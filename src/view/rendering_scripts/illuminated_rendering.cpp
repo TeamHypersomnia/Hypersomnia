@@ -267,6 +267,7 @@ void illuminated_rendering(
 		matrix,
 		fbos.light.value(),
 		*shaders.light, 
+		*shaders.textured_light, 
 		*shaders.standard, 
 		[&]() {
 			if (viewed_character) {
