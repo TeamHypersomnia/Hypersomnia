@@ -67,12 +67,9 @@ enum class test_controlled_characters {
 	// END GEN INTROSPECTOR
 };
 
-enum class test_plain_sprited_bodys {
-	// GEN INTROSPECTOR enum class test_plain_sprited_bodys
+enum class test_plain_sprited_bodies {
+	// GEN INTROSPECTOR enum class test_plain_sprited_bodies
 	CRATE,
-	CYAN_SHELL,
-	STEEL_SHELL,
-	AO44_SHELL,
 	BRICK_WALL,
 	AQUARIUM_GLASS,
 
@@ -209,6 +206,10 @@ enum class test_remnant_bodies {
 	STEEL_ROUND_REMNANT_2,
 	STEEL_ROUND_REMNANT_3,
 
+	CYAN_SHELL,
+	STEEL_SHELL,
+	AO44_SHELL,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };
@@ -270,7 +271,7 @@ enum class test_tool_items {
 
 using test_flavours_map = type_map<
 	type_pair<test_controlled_characters, controlled_character>,
-	type_pair<test_plain_sprited_bodys, plain_sprited_body>,
+	type_pair<test_plain_sprited_bodies, plain_sprited_body>,
 	type_pair<test_shootable_weapons, shootable_weapon>,
 	type_pair<test_shootable_charges, shootable_charge>,
 	type_pair<test_sprite_decorations, sprite_decoration>,

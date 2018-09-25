@@ -12,7 +12,7 @@ class test_scene_node {
 	cosmos* cosm;
 
 	std::variant<
-		test_plain_sprited_bodys,
+		test_plain_sprited_bodies,
 		test_complex_decorations,
 		test_sprite_decorations,
 		test_sound_decorations,

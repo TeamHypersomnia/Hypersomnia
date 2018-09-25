@@ -461,7 +461,7 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_plain_sprited_bodys::CYAN_SHELL);
+			auto& meta = get_test_flavour(flavours, test_remnant_bodies::CYAN_SHELL);
 
 			{
 				invariants::render render_def;
@@ -472,10 +472,15 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::CYAN_SHELL, white);
 			test_flavours::add_shell_dynamic_body(meta);
+
+			invariants::remnant remnant;
+			remnant.lifetime_secs = 20.f;
+			remnant.start_shrinking_when_remaining_ms = 7000.f;
+			meta.set(remnant);
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_plain_sprited_bodys::STEEL_SHELL);
+			auto& meta = get_test_flavour(flavours, test_remnant_bodies::STEEL_SHELL);
 
 			{
 				invariants::render render_def;
@@ -486,10 +491,15 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_SHELL, white);
 			test_flavours::add_shell_dynamic_body(meta);
+
+			invariants::remnant remnant;
+			remnant.lifetime_secs = 20.f;
+			remnant.start_shrinking_when_remaining_ms = 7000.f;
+			meta.set(remnant);
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_plain_sprited_bodys::AO44_SHELL);
+			auto& meta = get_test_flavour(flavours, test_remnant_bodies::AO44_SHELL);
 
 			{
 				invariants::render render_def;
@@ -500,6 +510,11 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_SHELL, white);
 			test_flavours::add_shell_dynamic_body(meta);
+
+			invariants::remnant remnant;
+			remnant.lifetime_secs = 20.f;
+			remnant.start_shrinking_when_remaining_ms = 7000.f;
+			meta.set(remnant);
 		}
 
 		{
@@ -532,7 +547,7 @@ namespace test_flavours {
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
 				cartridge.shell_trace_particles.modifier.colorize = cyan;
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_plain_sprited_bodys::CYAN_SHELL);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::CYAN_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::CYAN_ROUND);
 
 				meta.set(cartridge);
@@ -569,7 +584,7 @@ namespace test_flavours {
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
 				cartridge.shell_trace_particles.modifier.colorize = rgba(202, 186, 89, 255);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_plain_sprited_bodys::STEEL_SHELL);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::STEEL_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::STEEL_ROUND);
 
 				meta.set(cartridge);
@@ -606,7 +621,7 @@ namespace test_flavours {
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
 				cartridge.shell_trace_particles.modifier.colorize = rgba(202, 186, 89, 255);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_plain_sprited_bodys::AO44_SHELL);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::AO44_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::AO44_ROUND);
 
 				meta.set(cartridge);

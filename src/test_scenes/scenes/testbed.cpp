@@ -127,7 +127,7 @@ namespace test_scenes {
 			return create_test_scene_entity(world, std::forward<decltype(args)>(args)...);
 		};
 
-		const auto crate_type = test_plain_sprited_bodys::CRATE;
+		const auto crate_type = test_plain_sprited_bodies::CRATE;
 		const auto force_type = test_hand_explosives::FORCE_GRENADE;
 		const auto ped_type = test_hand_explosives::PED_GRENADE;
 		const auto interference_type = test_hand_explosives::INTERFERENCE_GRENADE;
@@ -367,7 +367,7 @@ namespace test_scenes {
 				};
 
 				floor_align(test_sprite_decorations::WATER_ROOM_FLOOR).set_size(total_floor_size);
-				floor_align(test_plain_sprited_bodys::BRICK_WALL)
+				floor_align(test_plain_sprited_bodies::BRICK_WALL)
 					.ro().ti().stretch_b().again()
 					.ro().bo().extend_l(2).extend_b(1).again()
 					.lo().ti().stretch_b().again()
@@ -457,19 +457,19 @@ namespace test_scenes {
 
 				aquarium_align(test_particles_decorations::AQUARIUM_BUBBLES).ti().rot_90().mv(0, 15);
 
-				aquarium_align(test_plain_sprited_bodys::AQUARIUM_GLASS)
+				aquarium_align(test_plain_sprited_bodies::AQUARIUM_GLASS)
 					.li().bo().nr()
-					.next(test_plain_sprited_bodys::AQUARIUM_GLASS_START).lo().create_pop()
+					.next(test_plain_sprited_bodies::AQUARIUM_GLASS_START).lo().create_pop()
 					.stretch_r(-1)
-					.next(test_plain_sprited_bodys::AQUARIUM_GLASS_START).ro().flip_h()
+					.next(test_plain_sprited_bodies::AQUARIUM_GLASS_START).ro().flip_h()
 				;
 
-				aquarium_align(test_plain_sprited_bodys::LAB_WALL_SMOOTH_END)
+				aquarium_align(test_plain_sprited_bodies::LAB_WALL_SMOOTH_END)
 					.li().bo().again()
 					.ri().bo().flip_h()
 				;
 
-				aquarium_align(test_plain_sprited_bodys::LAB_WALL_CORNER_SQUARE)
+				aquarium_align(test_plain_sprited_bodies::LAB_WALL_CORNER_SQUARE)
 					.lo().bo().again()
 					.ro().bo().flip_h().again()
 
@@ -477,7 +477,7 @@ namespace test_scenes {
 					.to().ro().flip_v().flip_h()
 				;
 
-				aquarium_align(test_plain_sprited_bodys::LAB_WALL)
+				aquarium_align(test_plain_sprited_bodies::LAB_WALL)
 					.rot_90().lo().bi().stretch_t().again()
 					.flip_v().rot_90().ro().bi().stretch_t().again()
 					.flip_v().to().li().stretch_r()

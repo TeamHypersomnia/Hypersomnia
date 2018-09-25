@@ -63,7 +63,7 @@ namespace test_flavours {
 
 		dynamic_obstacle(
 			flavour_with_sprite(
-				test_plain_sprited_bodys::CRATE,
+				test_plain_sprited_bodies::CRATE,
 				test_scene_image_id::CRATE,
 				render_layer::DYNAMIC_BODY
 			),
@@ -72,7 +72,7 @@ namespace test_flavours {
 
 		static_obstacle(
 			flavour_with_sprite(
-				test_plain_sprited_bodys::BRICK_WALL,
+				test_plain_sprited_bodies::BRICK_WALL,
 				test_scene_image_id::BRICK_WALL,
 				render_layer::DYNAMIC_BODY
 			),
@@ -82,7 +82,7 @@ namespace test_flavours {
 
 		static_obstacle(
 			flavour_with_sprite(
-				test_plain_sprited_bodys::LAB_WALL_SMOOTH_END,
+				test_plain_sprited_bodies::LAB_WALL_SMOOTH_END,
 				test_scene_image_id::LAB_WALL_SMOOTH_END,
 				render_layer::DYNAMIC_BODY
 			),
@@ -93,7 +93,7 @@ namespace test_flavours {
 
 		static_obstacle(
 			flavour_with_sprite(
-				test_plain_sprited_bodys::LAB_WALL_CORNER_CUT,
+				test_plain_sprited_bodies::LAB_WALL_CORNER_CUT,
 				test_scene_image_id::LAB_WALL_CORNER_CUT,
 				render_layer::DYNAMIC_BODY
 			),
@@ -104,7 +104,7 @@ namespace test_flavours {
 
 		static_obstacle(
 			flavour_with_sprite(
-				test_plain_sprited_bodys::LAB_WALL_CORNER_SQUARE,
+				test_plain_sprited_bodies::LAB_WALL_CORNER_SQUARE,
 				test_scene_image_id::LAB_WALL_CORNER_SQUARE,
 				render_layer::DYNAMIC_BODY
 			),
@@ -115,7 +115,7 @@ namespace test_flavours {
 
 		static_obstacle(
 			flavour_with_sprite(
-				test_plain_sprited_bodys::LAB_WALL,
+				test_plain_sprited_bodies::LAB_WALL,
 				test_scene_image_id::LAB_WALL,
 				render_layer::DYNAMIC_BODY
 			),
@@ -126,7 +126,7 @@ namespace test_flavours {
 
 		static_glass_obstacle(
 			flavour_with_sprite(
-				test_plain_sprited_bodys::AQUARIUM_GLASS,
+				test_plain_sprited_bodies::AQUARIUM_GLASS,
 				test_scene_image_id::AQUARIUM_GLASS,
 				render_layer::GLASS_BODY
 			)
@@ -134,7 +134,7 @@ namespace test_flavours {
 
 		static_glass_obstacle(
 			flavour_with_sprite(
-				test_plain_sprited_bodys::AQUARIUM_GLASS_START,
+				test_plain_sprited_bodies::AQUARIUM_GLASS_START,
 				test_scene_image_id::AQUARIUM_GLASS_START,
 				render_layer::GLASS_BODY
 			)
