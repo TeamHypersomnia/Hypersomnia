@@ -7,8 +7,9 @@ constexpr std::size_t SPECIFIC_HOSTILE_ENTITIES_COUNT = 5;
 constexpr std::size_t CONCURRENT_TREES_COUNT = 5;
 
 constexpr std::size_t DESTRUCTION_SCARS_COUNT = 6;
-constexpr std::size_t CONVEX_POLYS_COUNT = 10;
-constexpr std::size_t CONVEX_POLY_VERTEX_COUNT = 8;
+
+constexpr std::size_t POLY_VERTEX_COUNT = 12;
+constexpr std::size_t POLY_PARTITION_INDEX_COUNT = POLY_VERTEX_COUNT * 4;
 
 constexpr std::size_t RENDERING_POLYGON_VERTEX_COUNT = 20;
 constexpr std::size_t RENDERING_POLYGON_INDEX_COUNT = 20;

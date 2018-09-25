@@ -45,27 +45,6 @@ void update_size_for_new_image(
 		post_editor_command(cmd_in, std::move(cmd));
 	}
 
-	if (const auto shape_invariant_id = in.shape_polygon_invariant_id) {
-		auto cmd = in.command;
-
-		{
-			const auto addr = MACRO_MAKE_FLAVOUR_FIELD_ADDRESS(invariants::shape_polygon, shape);
-			cmd.property_id = flavour_property_id { *shape_invariant_id, addr };
-		}
-
-		{
-			using T = decltype(invariants::shape_polygon::shape);
-
-			const auto original_shape = T(cache.make_box());
-			cmd.value_after_change = augs::to_bytes(original_shape);
-		}
-
-		cmd.built_description = "Update physics shape to match sprite size";
-		cmd.common.has_parent = true;
-
-		post_editor_command(cmd_in, std::move(cmd));
-	}
-
 	const auto& cosm = cmd_in.get_cosmos();
 
 	const auto& name_from_image = ::get_displayed_name(image_defs[new_id]);

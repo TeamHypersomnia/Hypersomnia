@@ -217,8 +217,6 @@ struct tests_of_traits {
 	static_assert(!augs::has_byte_readwrite_overloads_v<augs::memory_stream, value_meter>);
 	static_assert(augs::has_lua_readwrite_overloads_v<augs::pool<int, of_size<300>::make_constant_vector, unsigned>>);
 
-	static_assert(b2_maxPolygonVertices == CONVEX_POLY_VERTEX_COUNT);
-
 	static_assert(
 		sizeof(entity_id) >= sizeof(entity_guid),
 		"With given memory layouts, entity_id<->entity_guid substitution will not be possible in delta encoding"

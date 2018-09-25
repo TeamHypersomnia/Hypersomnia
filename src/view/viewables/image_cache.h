@@ -16,10 +16,6 @@ struct image_cache {
 
 	vec2u original_image_size;
 
-	auto make_box() const {
-		return convex_partitioned_shape::from_box(original_image_size);
-	}
-
 	vec2u get_original_size() const {
 		return original_image_size;
 	}

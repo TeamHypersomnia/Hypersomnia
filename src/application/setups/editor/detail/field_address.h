@@ -17,6 +17,7 @@
 #include "view/maybe_official_path_declaration.h"
 #include "game/detail/inventory/requested_equipment.h"
 #include "game/modes/detail/item_purchase_structs.h"
+#include "game/assets/image_offsets.h"
 
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 
@@ -43,8 +44,6 @@ using flavour_field_type_id = type_in_list_id<
 	type_list<
 		augs::trivial_type_marker,
 		std::string,
-		convex_partitioned_shape::poly_vector_type,
-		convex_partitioned_shape::convex_poly,
 		wandering_pixels_frames,
 		remnant_flavour_vector
 	>
@@ -61,11 +60,11 @@ using asset_field_type_id = type_in_list_id<
 	type_list<
 		augs::trivial_type_marker,
 		std::string,
-		convex_partitioned_shape::poly_vector_type,
-		convex_partitioned_shape::convex_poly,
 		maybe_official_sound_path,
 		maybe_official_image_path,
 		std::vector<rgba>,
+		image_shape_type::original_poly_type,
+		image_shape_type::convex_partition_type,
 		plain_animation_frames_type,
 
 		std::vector<particles_emission>,

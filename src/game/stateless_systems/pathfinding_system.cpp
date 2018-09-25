@@ -19,6 +19,7 @@
 #include "game/debug_drawing_settings.h"
 
 void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
+#if TODO_PATHFINDING
 	auto& cosmos = step.get_cosmos();
 	const auto si = cosmos.get_si();
 	const auto& settings = cosmos.get_common_significant().pathfinding;
@@ -559,4 +560,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 			}
 		}
 	);
+#else
+	(void)step;
+#endif
 }

@@ -342,14 +342,14 @@ void physics_world_cache::infer_colliders(const const_entity_handle h) {
 
 void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle h, const colliders_connection& connection) {
 	h.dispatch_on_having_all<invariants::fixtures>([this, connection](const auto handle) {
-		const auto& cosmos = handle.get_cosmos();
+		const auto& cosm = handle.get_cosmos();
 	
 		const auto it = colliders_caches.try_emplace(handle.get_id().to_unversioned());
 
 		auto& cache = (*it.first).second;
 		cache.clear(*this);
 
-		const auto new_owner = cosmos[connection.owner];
+		const auto new_owner = cosm[connection.owner];
 
 		if (new_owner.dead()) {
 			colliders_caches.erase(it.first);
@@ -391,27 +391,56 @@ void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle
 		auto& constructed_fixtures = cache.constructed_fixtures;
 		ensure(constructed_fixtures.empty());
 
-		auto from_polygon_shape = [&](auto shape) {
+		auto from_convex_partition = [&](auto shape) {
 			shape.offset_vertices(connection.shape_offset);
 
-			for (std::size_t ci = 0; ci < shape.convex_polys.size(); ++ci) {
-				const auto& convex = shape.convex_polys[ci];
-				std::vector<b2Vec2> b2verts(convex.begin(), convex.end());
+			using C = logic_convex_poly;
+
+			unsigned ci = 0;
+
+			auto add_convex = [&](const auto& convex) {
+				augs::constant_size_vector<b2Vec2, decltype(logic_convex_poly::original_poly)::max_size()> b2verts(
+					convex.begin(), 
+					convex.end()
+				);
 
 				for (auto& v : b2verts) {
 					v = si.get_meters(v);
 				}
 
-				b2PolygonShape shape;
-				shape.Set(b2verts.data(), static_cast<int32>(b2verts.size()));
+				b2PolygonShape ps;
+				ps.Set(b2verts.data(), static_cast<int32>(b2verts.size()));
 
-				fixdef.shape = &shape;
+				fixdef.shape = &ps;
 				b2Fixture* const new_fix = owner_b2Body.CreateFixture(&fixdef);
 
 				ensure(static_cast<short>(ci) < std::numeric_limits<short>::max());
-				new_fix->index_in_component = static_cast<short>(ci);
+				new_fix->index_in_component = static_cast<short>(ci++);
 
 				constructed_fixtures.emplace_back(new_fix);
+			};
+
+			const auto& poly = shape.original_poly;
+
+			if (shape.take_vertices_one_after_another()) {
+				add_convex(poly);
+			}
+			else {
+				const auto& partition = shape.convex_partition;
+
+				C::original_poly_type convex;
+
+				std::size_t last_i = 0;
+
+				for (std::size_t i = 0; i < partition.size(); ++i) {
+					if ((i - last_i) > 0 && partition[i] == partition[last_i]) {
+						add_convex(convex);
+						last_i = i + 1;
+						continue;
+					}
+
+					convex.push_back(poly[i]);
+				}
 			}
 		};
 
@@ -427,7 +456,7 @@ void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle
 		};
 
 		if (const auto* const shape_polygon = handle.template find<invariants::shape_polygon>()) {
-			from_polygon_shape(shape_polygon->shape);
+			from_convex_partition(shape_polygon->shape);
 			return;
 		}
 
@@ -450,12 +479,29 @@ void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle
 		}
 
 		if (const auto* const sprite = handle.template find<invariants::sprite>()) {
-			auto size = handle.get_logical_size();
+			const auto& offsets = cosm.get_logical_assets().get_offsets(sprite->image_id);
 
-			size.x = std::max(1.f, size.x);
-			size.y = std::max(1.f, size.y);
+			if (const auto& shape = offsets.non_standard_shape; !shape.empty()) {
+				from_convex_partition(shape);
+			}
+			else {
+				auto size = handle.get_logical_size();
 
-			from_polygon_shape(convex_partitioned_shape::from_box(size));
+				size.x = std::max(1.f, size.x);
+				size.y = std::max(1.f, size.y);
+
+				size = si.get_meters(size);
+
+				b2PolygonShape ps;
+				ps.SetAsBox(size.x * 0.5f, size.y * 0.5f);
+
+				fixdef.shape = &ps;
+				b2Fixture* const new_fix = owner_b2Body.CreateFixture(&fixdef);
+
+				new_fix->index_in_component = 0;
+
+				constructed_fixtures.emplace_back(new_fix);
+			}
 
 			return;
 		}
@@ -475,13 +521,13 @@ void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle
 
 void physics_world_cache::infer_joint(const const_entity_handle /* handle */) {
 #if TODO
-	const auto& cosmos = handle.get_cosmos();
+	const auto& cosm = handle.get_cosmos();
 
 	if (const auto motor_joint = handle.find<components::motor_joint>();
 
 		motor_joint != nullptr
-		&& rigid_body_cache_exists_for(cosmos[motor_joint.get_target_bodies()[0]])
-		&& rigid_body_cache_exists_for(cosmos[motor_joint.get_target_bodies()[1]])
+		&& rigid_body_cache_exists_for(cosm[motor_joint.get_target_bodies()[0]])
+		&& rigid_body_cache_exists_for(cosm[motor_joint.get_target_bodies()[1]])
 	) {
 		const components::motor_joint joint_data = motor_joint.get_raw_component();
 
@@ -492,8 +538,8 @@ void physics_world_cache::infer_joint(const const_entity_handle /* handle */) {
 
 		b2MotorJointDef def;
 		def.userData = handle.get_id();
-		def.bodyA = find_rigid_body_cache(cosmos[joint_data.target_bodies[0]]).body;
-		def.bodyB = find_rigid_body_cache(cosmos[joint_data.target_bodies[1]]).body;
+		def.bodyA = find_rigid_body_cache(cosm[joint_data.target_bodies[0]]).body;
+		def.bodyB = find_rigid_body_cache(cosm[joint_data.target_bodies[1]]).body;
 		def.collideConnected = joint_data.collide_connected;
 		def.linearOffset = b2Vec2(si.get_meters(joint_data.linear_offset));
 		def.angularOffset = DEG_TO_RAD<float> * joint_data.angular_offset;

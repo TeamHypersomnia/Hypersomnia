@@ -6,109 +6,41 @@
 
 template <
 	class T,
-	std::size_t convex_polys_count,
-	std::size_t convex_poly_vertex_count
+	std::size_t vertex_count,
+	std::size_t partition_index_count
 >
 struct basic_convex_partitioned_shape {
-	using this_type = basic_convex_partitioned_shape<T, convex_polys_count, convex_poly_vertex_count>;
+	using this_type = basic_convex_partitioned_shape<T, vertex_count, partition_index_count>;
 	using vec2 = basic_vec2<T>;
 	using transform = basic_transform<T>;
+	using index_type = unsigned char;
 
-	using convex_poly = augs::constant_size_vector<vec2, convex_poly_vertex_count>;
-	using poly_vector_type = augs::constant_size_vector<convex_poly, convex_polys_count>;
+	using original_poly_type = augs::constant_size_vector<vec2, vertex_count>;
+	using convex_partition_type = augs::constant_size_vector<unsigned char, partition_index_count>;
 
-	// GEN INTROSPECTOR struct basic_convex_partitioned_shape class T std::size_t convex_polys_count std::size_t convex_poly_vertex_count
-	poly_vector_type convex_polys = {};
+	// GEN INTROSPECTOR struct basic_convex_partitioned_shape class T std::size_t vertex_count std::size_t partition_index_count
+	original_poly_type original_poly = {};
+	convex_partition_type convex_partition = {};
 	// END GEN INTROSPECTOR
 
-	static auto from_box(const vec2 size) {
-		const auto hx = size.x / 2;
-		const auto hy = size.y / 2;
-
-		this_type result;
-		result.convex_polys.emplace_back();
-
-		auto& new_poly = result.convex_polys.back();
-		new_poly.resize(4);
-
-		new_poly[0] = { -hx, -hy };
-		new_poly[1] = {  hx, -hy };
-		new_poly[2] = {  hx,  hy };
-		new_poly[3] = { -hx,  hy };
-
-		return result;
-	}
-
 	void offset_vertices(const transformr transform) {
-		for (auto& c : convex_polys) {
-			for (auto& v : c) {
-				v.rotate(transform.rotation);
-				v += transform.pos;
-			}
+		for (auto& v : original_poly) {
+			v.rotate(transform.rotation);
+			v += transform.pos;
 		}
 	}
 
 	void scale(const vec2 mult) {
-		for (auto& c : convex_polys) {
-			for (auto& v : c) {
-				v *= mult;
-			}
+		for (auto& v : original_poly) {
+			v *= mult;
 		}
 	}
 
-	template <class C>
-	void add_convex_polygon(const C& new_convex, const unsigned from) {
-		const unsigned max_vertices = convex_poly_vertex_count;
-
-		const auto remaining = new_convex.size() - from;
-
-		if (remaining + 1 > max_vertices) {
-			convex_poly new_poly;
-
-			new_poly.push_back(new_convex[0]);
-
-			new_poly.insert(
-				new_poly.end(),
-				new_convex.begin() + from, 
-				new_convex.begin() + from + max_vertices
-			);
-
-			convex_polys.push_back(new_poly);
-
-			const auto next_starting = from + max_vertices - 2;
-			add_convex_polygon(new_convex, next_starting);
-		}
-		else {
-			convex_poly new_poly;
-
-			new_poly.push_back(new_convex[0]);
-
-			new_poly.insert(
-				new_poly.end(),
-				new_convex.begin() + from, 
-				new_convex.end()
-			);
-
-			convex_polys.push_back(new_poly);
-		}
+	bool empty() const {
+		return original_poly.empty();
 	}
 
-	template <class C>
-	void add_convex_polygon(const C& new_convex) {
-		const unsigned max_vertices = convex_poly_vertex_count;
-
-		if (new_convex.size() > max_vertices) {
-			convex_poly new_poly;
-			new_poly.assign(new_convex.begin(), new_convex.begin() + max_vertices);
-			convex_polys.push_back(new_poly);
-
-			const auto next_starting = max_vertices - 1;
-			add_convex_polygon(new_convex, next_starting);
-		}
-		else {
-			convex_poly new_poly;
-			new_poly.assign(new_convex.begin(), new_convex.end());
-			convex_polys.push_back(new_poly);
-		}
+	bool take_vertices_one_after_another() const {
+		return convex_partition.empty();
 	}
 };

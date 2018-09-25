@@ -84,7 +84,7 @@ void emit_warnings(const handle_type h) {
 	}
 
 	if (const auto polygon = h.template find<invariants::shape_polygon>()) {
-		if (polygon->shape.convex_polys.empty()) {
+		if (polygon->shape.empty()) {
 			warning_unset_field(h, "invariants::shape_polygon::shape.convex_polys");
 		}
 	}

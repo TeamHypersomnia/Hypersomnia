@@ -5,10 +5,10 @@
 #include "augs/misc/convex_partitioned_shape.h"
 #include "game/container_sizes.h"
 
-using convex_partitioned_shape = basic_convex_partitioned_shape<
+using logic_convex_poly = basic_convex_partitioned_shape<
 	real32,
-	CONVEX_POLYS_COUNT,
-	CONVEX_POLY_VERTEX_COUNT
+	POLY_VERTEX_COUNT,
+	POLY_PARTITION_INDEX_COUNT
 >;
 
 struct b2Fixture_index_in_component;
@@ -31,7 +31,7 @@ namespace invariants {
 		static constexpr bool reinfer_when_tweaking = true;
 
 		// GEN INTROSPECTOR struct invariants::shape_polygon
-		convex_partitioned_shape shape;
+		logic_convex_poly shape;
 		// END GEN INTROSPECTOR
 	};
 }

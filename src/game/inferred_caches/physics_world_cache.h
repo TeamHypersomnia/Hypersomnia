@@ -29,7 +29,7 @@ struct rigid_body_cache {
 struct colliders_cache {
 	augs::constant_size_vector<
 		augs::propagate_const<b2Fixture*>, 
-		CONVEX_POLYS_COUNT
+		POLY_VERTEX_COUNT
 	> constructed_fixtures;
 
 	colliders_connection connection;

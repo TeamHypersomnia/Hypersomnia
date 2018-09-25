@@ -1,6 +1,9 @@
 #pragma once
 #include "augs/math/vec2.h"
 #include "augs/math/transform.h"
+#include "augs/misc/convex_partitioned_shape.h"
+
+using image_shape_type = basic_convex_partitioned_shape<real32, 12, 12 * 4>;
 
 struct torso_offsets {
 	// GEN INTROSPECTOR struct torso_offsets
@@ -54,6 +57,8 @@ struct all_image_offsets {
 	legs_offsets legs;
 	gun_offsets gun;
 	item_offsets item;
+
+	image_shape_type non_standard_shape;
 	// END GEN INTROSPECTOR
 };
 

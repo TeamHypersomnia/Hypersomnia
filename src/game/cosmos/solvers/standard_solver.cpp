@@ -142,8 +142,10 @@ void standard_solve(const logic_step step) {
 	{
 		auto pathfinding_raycasts_scope = cosm.measure_raycasts(performance.pathfinding_raycasts);
 
+#if TODO_PATHFINDING
 		auto scope = measure_scope(performance.pathfinding);
 		pathfinding_system().advance_pathfinding_sessions(step);
+#endif
 	}
 
 	{
