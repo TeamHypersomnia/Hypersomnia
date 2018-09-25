@@ -1010,7 +1010,7 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 		const auto id = p.first;
 
 		if (const auto player_data = find(id)) {
-			{
+			if (get_buy_seconds_left(in) > 0.f) {
 				on_player_handle(cosm, id, [&](const auto& player_handle) {
 					if constexpr(!is_nullopt_v<decltype(player_handle)>) {
 						if (!buy_area_in_range(player_handle)) {
@@ -1379,6 +1379,10 @@ float bomb_mode::get_round_seconds_passed(const input_type in) const {
 
 float bomb_mode::get_freeze_seconds_left(const input_type in) const {
 	return static_cast<float>(in.vars.freeze_secs) - get_total_seconds(in);
+}
+
+float bomb_mode::get_buy_seconds_left(const input_type in) const {
+	return static_cast<float>(in.vars.freeze_secs + in.vars.buy_secs_after_freeze) - get_total_seconds(in);
 }
 
 float bomb_mode::get_round_seconds_left(const input_type in) const {

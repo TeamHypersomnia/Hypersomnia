@@ -70,6 +70,10 @@ void arena_gui_state::perform_imgui(
 		{
 			const auto& cosm = mode_input.cosm;
 
+			if (typed_mode.get_buy_seconds_left(mode_input) <= 0.f) {
+				buy_menu.show = false;
+			}
+
 			if (const auto p = typed_mode.find(mode_in.local_player)) {
 				const auto guid = p->guid;
 

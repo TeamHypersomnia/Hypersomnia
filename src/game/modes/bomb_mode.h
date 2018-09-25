@@ -58,6 +58,7 @@ struct bomb_mode_vars {
 	unsigned round_secs = 120;
 	unsigned round_end_secs = 5;
 	unsigned freeze_secs = 5;
+	unsigned buy_secs_after_freeze = 10;
 	unsigned warmup_secs = 45;
 	unsigned warmup_respawn_after_ms = 2000;
 	unsigned max_rounds = 5;
@@ -345,6 +346,7 @@ public:
 	float get_seconds_since_win(input) const;
 	float get_match_summary_seconds_left(input) const;
 	float get_round_end_seconds_left(input) const;
+	float get_buy_seconds_left(input) const;
 
 	float get_critical_seconds_left(input) const;
 	float get_seconds_since_planting(input) const;
