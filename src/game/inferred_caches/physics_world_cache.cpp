@@ -409,10 +409,6 @@ void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle
 						v.neg_y();
 					}
 				}
-
-				if (flip_order) {
-					reverse_range(shape.convex_partition);
-				}
 			}
 
 			using C = logic_convex_poly;
@@ -424,6 +420,10 @@ void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle
 					convex.begin(), 
 					convex.end()
 				);
+
+				if (flip_order) {
+					reverse_range(b2verts);
+				}
 
 				for (auto& v : b2verts) {
 					v = si.get_meters(v);

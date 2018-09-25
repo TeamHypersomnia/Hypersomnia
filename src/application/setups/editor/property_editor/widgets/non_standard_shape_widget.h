@@ -107,11 +107,32 @@ struct non_standard_shape_widget {
 			const auto closest_prev = wrap_prev(n, closest_i);
 			const auto closest_next = wrap_next(n, closest_i);
 
+			const auto closest_edge_a = [&]() {
+				std::size_t ci = 0;
+				float dist = -1;
+
+				for (std::size_t i = 0; i < considered_poly.size(); ++i) {
+					const auto new_dist = mpos.distance_from_segment_sq(considered_poly[i], wrap_next(considered_poly, i));
+
+					if (dist == -1) {
+						dist = new_dist;
+					}
+					else if (new_dist < dist) {
+						dist = new_dist;
+						ci = i;
+					}
+				}
+
+				return ci;
+			}();
+
+			const auto closest_edge_b = wrap_next(n, closest_edge_a);
+
 			const bool hovered = ImGui::IsItemHovered();
 
 			const bool is_adding_mode = n < considered_poly.max_size() && io.KeyShift;
 			const bool is_removing_mode = n > 3 && io.KeyAlt;
-			const bool is_normal_mode = !is_removing_mode && !is_removing_mode;
+			const bool is_normal_mode = !is_removing_mode && !is_adding_mode;
 			const bool is_show_partition_mode = is_normal_mode && io.KeyCtrl;
 
 			if (is_show_partition_mode) {
@@ -134,7 +155,14 @@ struct non_standard_shape_widget {
 							segment(a, b, white);
 						}
 						else if (is_adding_mode) {
+							if (i == closest_edge_a) {
+								segment(a, mpos, yellow);
+							}
+							else if (i == closest_edge_b) {
+								segment(mpos, a, yellow);
+							}
 
+							segment(a, b, white);
 						}
 						else if (is_removing_mode) {
 							if (i == closest_prev) {
@@ -161,7 +189,7 @@ struct non_standard_shape_widget {
 						considered_poly[closest_i] = mpos;
 					}
 					else if (is_adding_mode) {
-						considered_poly.insert(considered_poly.begin() + closest_next, mpos);
+						considered_poly.insert(considered_poly.begin() + closest_edge_b, mpos);
 					}
 					else if (is_removing_mode) {
 						considered_poly.erase(considered_poly.begin() + closest_i);
