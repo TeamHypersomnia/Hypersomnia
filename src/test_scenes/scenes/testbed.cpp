@@ -469,7 +469,7 @@ namespace test_scenes {
 					.ri().bo().flip_h()
 				;
 
-				aquarium_align(test_plain_sprited_bodies::LAB_WALL_CORNER_SQUARE)
+				aquarium_align(test_plain_sprited_bodies::LAB_WALL_CORNER_CUT)
 					.lo().bo().again()
 					.ro().bo().flip_h().again()
 
