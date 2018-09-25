@@ -468,6 +468,7 @@ void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle
 		auto from_circle_shape = [&](const real32 radius) {
 			b2CircleShape shape;
 			shape.m_radius = si.get_meters(radius);
+			shape.m_p += b2Vec2(connection.shape_offset.pos);
 
 			fixdef.shape = &shape;
 			b2Fixture* const new_fix = owner_b2Body.CreateFixture(&fixdef);
@@ -515,6 +516,17 @@ void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle
 
 				b2PolygonShape ps;
 				ps.SetAsBox(size.x * 0.5f, size.y * 0.5f);
+
+				const auto off_meters = si.get_meters(connection.shape_offset.pos);
+
+				for (int i = 0; i < 4; ++i) {
+					vec2 out = ps.m_vertices[i];
+
+					out.rotate(connection.shape_offset.rotation);
+					out += off_meters;
+
+					ps.m_vertices[i] = b2Vec2(out);
+				}
 
 				fixdef.shape = &ps;
 				b2Fixture* const new_fix = owner_b2Body.CreateFixture(&fixdef);
