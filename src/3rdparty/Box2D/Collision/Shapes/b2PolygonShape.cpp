@@ -19,6 +19,7 @@
 #include <Box2D/Collision/Shapes/b2PolygonShape.h>
 #include <new>
 #include <optional>
+#include "augs/ensure.h"
 
 b2Shape* b2PolygonShape::Clone(b2BlockAllocator* allocator) const
 {
@@ -125,7 +126,12 @@ static std::optional<b2Vec2> ComputeCentroid(const b2Vec2* vs, int32 count)
 
 bool b2PolygonShape::Set(const vec2* vertices, const int32 n)
 {
+#if 0
+	ensure_geq(n, 3);
+	ensure_leq(n, b2_maxPolygonVertices);
+#else
 	b2Assert(3 <= n && n <= b2_maxPolygonVertices);
+#endif
 	m_count = n;
 
 	for (int32 i = 0; i < n; ++i) {
@@ -161,7 +167,12 @@ bool b2PolygonShape::Set(const vec2* vertices, const int32 n)
 
 bool b2PolygonShape::Set(const b2Vec2* vertices, const int32 n)
 {
+#if 0
+	ensure_geq(n, 3);
+	ensure_leq(n, b2_maxPolygonVertices);
+#else
 	b2Assert(3 <= n && n <= b2_maxPolygonVertices);
+#endif
 	m_count = n;
 
 	for (int32 i = 0; i < n; ++i) {

@@ -457,6 +457,7 @@ void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle
 					if ((i - last_i) > 0 && partition[i] == partition[last_i]) {
 						add_convex(convex);
 						last_i = i + 1;
+						convex.clear();
 						continue;
 					}
 

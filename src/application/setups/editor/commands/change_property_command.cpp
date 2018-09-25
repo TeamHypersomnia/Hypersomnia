@@ -14,6 +14,7 @@
 #include "application/setups/editor/commands/asset_commands.h"
 
 #include "application/setups/editor/commands/detail/editor_property_accessors.h"
+#include "augs/misc/from_concave_polygon.h"
 
 #include "augs/readwrite/byte_readwrite.h"
 
@@ -33,9 +34,29 @@ void change_property_command<D>::refresh_other_state(const editor_command_input 
 			in.folder.work->update_offsets_of(i, changer_callback_result::DONT_REFRESH);
 		}
 
+		if (self.property_id.field.type_id.template is<image_shape_type>()) {
+			auto& cosm = in.folder.work->world;
+
+			cosm.change_common_significant(
+				[&](cosmos_common_significant& common) {
+					for (const auto& i : self.affected_assets) {
+						auto& sh = common.logical_assets.get_offsets(i).non_standard_shape;
+						augs::refresh_convex_partitioning(sh);
+
+						in.folder.work->viewables.image_definitions[i].meta.offsets.non_standard_shape.convex_partition = sh.convex_partition;
+					};
+
+					return changer_callback_result::DONT_REFRESH;
+				}
+			);
+		}
+
 		if (!self.affected_assets.empty()) {
-			/* Only for refreshing */
-			in.folder.work->update_offsets_of(self.affected_assets.front());
+			auto reinfer = [&]() {
+				in.folder.work->update_offsets_of(self.affected_assets.front());
+			};
+
+			reinfer();
 		}	
 	}
 }
@@ -108,16 +129,7 @@ void change_property_command<D>::redo(const editor_command_input in) {
 		}	
 	);
 
-	if constexpr(std::is_same_v<D, change_asset_property_command<assets::image_id>>) {
-		for (const auto& i : self.affected_assets) {
-			in.folder.work->update_offsets_of(i, changer_callback_result::DONT_REFRESH);
-		}
-
-		if (!self.affected_assets.empty()) {
-			/* Only for refreshing */
-			in.folder.work->update_offsets_of(self.affected_assets.front());
-		}	
-	}
+	refresh_other_state(in);
 }
 
 template <class D>

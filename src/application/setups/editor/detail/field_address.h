@@ -63,8 +63,7 @@ using asset_field_type_id = type_in_list_id<
 		maybe_official_sound_path,
 		maybe_official_image_path,
 		std::vector<rgba>,
-		image_shape_type::original_poly_type,
-		image_shape_type::convex_partition_type,
+		image_shape_type,
 		plain_animation_frames_type,
 
 		std::vector<particles_emission>,

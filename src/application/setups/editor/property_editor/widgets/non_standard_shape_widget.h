@@ -134,7 +134,24 @@ struct non_standard_shape_widget {
 			const bool is_show_partition_mode = is_normal_mode && io.KeyCtrl;
 
 			if (is_show_partition_mode) {
+				if (considered.take_vertices_one_after_another()) {
+					for (std::size_t i = 0; i < considered_poly.size(); ++i) {
+						const auto& a = considered_poly[i];
+						const auto& b = wrap_next(considered_poly, i);
 
+						segment(a, b, green);
+					}
+				}
+				else {
+					const auto& cp = considered.convex_partition;
+
+					for (std::size_t i = 0; i < cp.size(); ++i) {
+						const auto& a = considered_poly[cp[i]];
+						const auto& b = considered_poly[wrap_next(cp, i)];
+
+						segment(a, b, orange);
+					}
+				}
 			}
 			else {
 				for (std::size_t i = 0; i < considered_poly.size(); ++i) {
@@ -230,7 +247,6 @@ struct non_standard_shape_widget {
 		}
 
 		if (result.has_value()) {
-			augs::refresh_convex_partitioning(object);
 		}
 
 		return result;

@@ -3,6 +3,7 @@
 #include "augs/graphics/vertex.h"
 #include "augs/drawing/polygon.h"
 #include "augs/misc/convex_partitioned_shape.h"
+#include "3rdparty/Box2D/Common/b2Settings.h"
 
 namespace augs {
 	template <
@@ -15,6 +16,13 @@ namespace augs {
 	) {
 		const auto& verts = poly.original_poly;
 
+		auto& pc = poly.convex_partition;
+		pc.clear();
+
+		if (verts.empty()) {
+			return;
+		}
+
 		const auto partition_result = [&]() {
 			std::list<TPPLPoly> output;
 			std::list<TPPLPoly> input;
@@ -24,10 +32,13 @@ namespace augs {
 			subject_poly.SetHole(false);
 
 			for (std::size_t i = 0; i < verts.size(); ++i) {
-				vec2 p(verts[i]);
-				subject_poly[static_cast<int>(i)].x = p.x;
-				subject_poly[static_cast<int>(i)].y = -p.y;
-				subject_poly[static_cast<int>(i)].id = static_cast<int>(i);
+				const auto ii = static_cast<int>(i);
+
+				auto& in_v = subject_poly[ii];
+
+				in_v.x = verts[i].x;
+				in_v.y = verts[i].y;
+				in_v.id = ii;
 			}
 
 			input.push_back(subject_poly);
@@ -38,18 +49,22 @@ namespace augs {
 			return output;
 		}();
 
-		auto& pc = poly.convex_partition;
-		pc.clear();
-
 		if (partition_result.size() == 1) {
 			return;
 		}
 
 		for (const auto& out_poly : partition_result) {
+			const auto n = out_poly.GetNumPoints();
+			
+			if (n > b2_maxPolygonVertices) {
+				/* TODO: Ressurrect the code that did those 8-polygon partitions out of convexes */
+				continue;
+			}
+
 			{
 				const auto how_many_more_can_fit = static_cast<int>(pc.max_size() - pc.size());
 
-				if (how_many_more_can_fit < out_poly.GetNumPoints() + 1) {
+				if (how_many_more_can_fit < n + 1) {
 					break;
 				}
 			}
@@ -58,10 +73,12 @@ namespace augs {
 
 			for (long i = 0; i < out_poly.GetNumPoints(); ++i) {
 				const auto& out_vertex = out_poly.GetPoint(i);
-				pc.push_back(static_cast<I>(out_vertex.id));
+				const auto new_id = static_cast<I>(out_vertex.id);
+				pc.push_back(new_id);
 			}
 
-			pc.push_back(static_cast<I>(out_poly.GetPoint(0).id));
+			const auto last_id = static_cast<I>(out_poly.GetPoint(0).id);
+			pc.push_back(last_id);
 		}
 	}
 

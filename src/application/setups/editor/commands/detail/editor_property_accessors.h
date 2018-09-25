@@ -20,7 +20,7 @@ struct editor_property_accessors {
 		const Container& flavour_ids,
 		F callback
 	) {
-		bool result = false;
+		bool reinfer = false;
 
 		get_by_dynamic_id(
 			all_entity_types(),
@@ -50,14 +50,14 @@ struct editor_property_accessors {
 						}
 
 						if (should_reinfer_after_change(i)) {
-							result = true;
+							reinfer = true;
 						}
 					}
 				);
 			}
 		);
 
-		return result;
+		return reinfer;
 	}
 
 	template <class C, class Container, class F>
