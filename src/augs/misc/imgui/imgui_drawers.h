@@ -68,5 +68,16 @@ namespace augs {
 
 			draw_quad_local(points, col);
 		};
+
+		inline void draw_segment(const vec2i a, const vec2i b, const rgba col, const float thickness) {
+			const auto cpos = vec2(ImGui::GetCursorScreenPos());
+
+			ImGui::GetWindowDrawList()->AddLine(
+				static_cast<ImVec2>(cpos + a), 
+				static_cast<ImVec2>(cpos + b), 
+				ImGui::GetColorU32(col),
+				thickness
+			);
+		};
 	}
 }

@@ -31,6 +31,7 @@
 #include "application/setups/editor/property_editor/widgets/image_color_picker_widget.h"
 #include "application/setups/editor/property_editor/widgets/image_offset_widget.h"
 #include "application/setups/editor/property_editor/widgets/source_path_widget.h"
+#include "application/setups/editor/property_editor/widgets/non_standard_shape_widget.h"
 
 #include "application/setups/editor/detail/do_pathed_asset_properties.h"
 #include "application/setups/editor/detail/do_forget_button.h"

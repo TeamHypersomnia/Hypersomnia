@@ -4,6 +4,11 @@
 #include "application/setups/editor/property_editor/special_widgets.h"
 #include "application/setups/editor/detail/pathed_asset_entry.h"
 
+struct pathed_asset_properties_behaviour {
+	template <class T>
+	static constexpr bool should_skip = std::is_same_v<T, image_shape_type::convex_partition_type>;
+};
+
 template <class asset_id_type, class A, class B, class C>
 void do_pathed_asset_properties(
 	const path_tree_settings& tree_settings,
@@ -116,9 +121,17 @@ void do_pathed_asset_properties(
 		>
 	;
 
+	using shape_widget =
+		std::conditional_t<
+			is_image_type,
+			non_standard_shape_widget,
+			default_widget_provider
+		>
+	;
+
 	const auto& project_path = cmd_in.folder.current_path;
 
-	general_edit_properties<field_type_id>(
+	general_edit_properties<field_type_id, pathed_asset_properties_behaviour>(
 		prop_in,
 		definitions[id],
 		post_new_change,
@@ -138,6 +151,7 @@ void do_pathed_asset_properties(
 		special_widgets(
 			source_path_widget { viewables, project_path, prop_in.settings, disable_path_chooser },
 			offset_widget { id, game_atlas, nodeize_image_widgets },
+			shape_widget { id, game_atlas, nodeize_image_widgets },
 			color_widget { id, game_atlas, viewables.image_definitions, preview, project_path, nodeize_image_widgets }
 		),
 		default_sane_default_provider(),

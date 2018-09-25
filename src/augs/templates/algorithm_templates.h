@@ -5,6 +5,16 @@
 #include "augs/templates/reversion_wrapper.h"
 
 template <class Container, class T>
+decltype(auto) minimum_i(const Container& v, T&& pred) {
+	return std::min_element(v.begin(), v.end(), std::forward<T>(pred)) - v.begin();
+}
+
+template <class Container, class T>
+decltype(auto) maximum_i(const Container& v, T&& pred) {
+	return std::max_element(v.begin(), v.end(), std::forward<T>(pred)) - v.begin();
+}
+
+template <class Container, class T>
 decltype(auto) minimum_of(const Container& v, T&& pred) {
 	return *std::min_element(v.begin(), v.end(), std::forward<T>(pred));
 }

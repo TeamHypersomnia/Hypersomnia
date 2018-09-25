@@ -36,6 +36,11 @@ struct basic_convex_partitioned_shape {
 		}
 	}
 
+	void clear() {
+		original_poly.clear();
+		convex_partition.clear();
+	}
+
 	bool empty() const {
 		return original_poly.empty();
 	}
