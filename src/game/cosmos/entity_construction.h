@@ -16,7 +16,7 @@ void construct_pre_inference(const handle_type h) {
 		rigid_body.get_special().dropped_or_created_cooldown.set(200, cosmos.get_timestamp());
 	}
 
-	if (const auto overridden = h.template find<components::overridden_size>()) {
+	if (const auto overridden = h.template find<components::overridden_geo>()) {
 		auto& s = overridden.get_raw_component({}).size;
 
 		if (!s.is_enabled) {

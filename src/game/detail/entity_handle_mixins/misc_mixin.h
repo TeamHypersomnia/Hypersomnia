@@ -24,39 +24,26 @@ public:
 	std::optional<flip_flags> calc_flip_flags() const {
 		const auto self = *static_cast<const E*>(this);
 
-		if (const auto sprite = self.template find<components::sprite>()) {
-			return sprite->flip;	
+		if (const auto overridden = self.template find<components::overridden_geo>()) {
+			return overridden.get_raw_component().flip;	
 		}
 
 		return std::nullopt;
 	}
 
 	void flip_horizontally() const {
-		const auto self = *static_cast<const E*>(this);
-
-		if (const auto sprite = self.template find<components::sprite>()) {
-			auto& f = sprite->flip.horizontally;
-			f = !f;
-		}
+		do_flip(flip_flags { true, false });
 	}
 
 	void flip_vertically() const {
-		const auto self = *static_cast<const E*>(this);
-
-		if (const auto sprite = self.template find<components::sprite>()) {
-			auto& f = sprite->flip.vertically;
-			f = !f;
-		}
+		do_flip(flip_flags { false, true });
 	}
 
 	void do_flip(const flip_flags f) const {
 		const auto self = *static_cast<const E*>(this);
 
-		if (f.horizontally) {
-			self.flip_horizontally();
-		}
-		if (f.vertically) {
-			self.flip_vertically();
+		if (const auto overridden = self.template find<components::overridden_geo>()) {
+			overridden.do_flip(f);
 		}
 	}
 

@@ -2,9 +2,9 @@
 #include "game/cosmos/component_synchronizer.h"
 
 template <class E>
-class component_synchronizer<E, components::overridden_size> : public synchronizer_base<E, components::overridden_size> {
+class component_synchronizer<E, components::overridden_geo> : public synchronizer_base<E, components::overridden_geo> {
 protected:
-	using base = synchronizer_base<E, components::overridden_size>;
+	using base = synchronizer_base<E, components::overridden_geo>;
 	using base::operator->;
 	using base::handle;
 
@@ -28,5 +28,25 @@ public:
 	void reset() const {
 		this->component->size.is_enabled = false;
 		infer_caches();
+	}
+
+	void do_flip(const flip_flags f) const {
+		bool reinfer = false;
+
+		if (f.horizontally) {
+			auto& f = this->component->flip.horizontally;
+			f = !f;
+			reinfer = true;
+		}
+
+		if (f.vertically) {
+			auto& f = this->component->flip.vertically;
+			f = !f;
+			reinfer = true;
+		}
+
+		if (reinfer) {
+			infer_caches();
+		}
 	}
 };

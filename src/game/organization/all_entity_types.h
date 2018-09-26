@@ -62,7 +62,7 @@ struct plain_sprited_body {
 
 	using components = type_list<
 		components::sprite,
-		components::overridden_size,
+		components::overridden_geo,
 		components::rigid_body,
 		components::interpolation
 	>;
@@ -139,7 +139,7 @@ struct sprite_decoration {
 
 	using components = type_list<
 		components::sprite,
-		components::overridden_size,
+		components::overridden_geo,
 		components::transform
 	>;
 };
@@ -155,7 +155,7 @@ struct wandering_pixels_decoration {
 
 	using components = type_list<
 		components::position,
-		components::overridden_size,
+		components::overridden_geo,
 		components::wandering_pixels
 	>;
 };
@@ -405,7 +405,7 @@ struct box_marker {
 
 	using components = type_list<
 		components::transform,
-		components::overridden_size
+		components::overridden_geo
 	>;
 };
 

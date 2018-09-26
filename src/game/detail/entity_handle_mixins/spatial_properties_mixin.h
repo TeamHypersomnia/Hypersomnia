@@ -104,8 +104,8 @@ public:
 	std::optional<ltrb> find_aabb(const transformr transform) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 
-		if (const auto overridden_size = handle.template find<components::overridden_size>()) {
-			const auto& s = overridden_size.get();
+		if (const auto overridden_geo = handle.template find<components::overridden_geo>()) {
+			const auto& s = overridden_geo.get();
 
 			if (s.is_enabled) {
 				return augs::sprite_aabb(transform, s.value);
@@ -173,8 +173,8 @@ public:
 	auto& set_logical_size(const vec2 new_size) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 
-		if (const auto overridden_size = handle.template find<components::overridden_size>()) {
-			overridden_size.set(new_size);
+		if (const auto overridden_geo = handle.template find<components::overridden_geo>()) {
+			overridden_geo.set(new_size);
 			return *this;
 		}
 

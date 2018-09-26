@@ -88,7 +88,7 @@ namespace test_flavours {
 				wandering.particles_count = 15;
 				meta.set(wandering);
 
-				components::overridden_size s;
+				components::overridden_geo s;
 				s.size.emplace(vec2(750, 750));
 				meta.set(s);
 			}
@@ -120,7 +120,7 @@ namespace test_flavours {
 				wandering.particles_count = 500;
 				meta.set(wandering);
 
-				components::overridden_size s;
+				components::overridden_geo s;
 				s.size.emplace(vec2(750, 750));
 				meta.set(s);
 			}

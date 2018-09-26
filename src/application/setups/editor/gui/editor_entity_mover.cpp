@@ -63,7 +63,7 @@ void editor_entity_mover::start_resizing_selection(
 		auto command = s.make_command_from_selections<resize_entities_command>(
 			"",
 			[](const auto typed_handle) {
-				return typed_handle.template has<components::overridden_size>() && typed_handle.has_independent_transform();
+				return typed_handle.template has<components::overridden_geo>() && typed_handle.has_independent_transform();
 			}	
 		);
 

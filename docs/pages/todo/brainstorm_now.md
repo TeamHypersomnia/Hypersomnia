@@ -6,12 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Game events log and chat
-	- In the same window
-	- ImGui or own GUI?
-		- We actually have some textbox code we can introduce later for chatting
-			- Better control over such an important feature
-
 - Transform design
 	- It is the case that many entities might share identical origin, in which case it would be unwieldy to update origins for all entities to a new one.
 		- E.g. fish in aquarium.
@@ -23,6 +17,12 @@ summary: That which we are brainstorming at the moment.
 	- for editor, the origin could just also be accessed as an independent transform
 		- so access_independent_transform -> access_independent_transforms
 		- con: more memory wasted? who gives a heck, though...
+
+- Game events log and chat
+	- In the same window
+	- ImGui or own GUI?
+		- We actually have some textbox code we can introduce later for chatting
+			- Better control over such an important feature
 
 - Windows back-port
 	- use non-multisampling fb configs on Windows

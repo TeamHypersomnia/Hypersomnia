@@ -56,10 +56,10 @@ static void save_sizes(
 		[&](const auto& i) {
 			const auto typed_handle = cosm[i];
 
-			if constexpr(typed_handle.template has<components::overridden_size>()) {
-				const auto& overridden_size = typed_handle.get().template get<components::overridden_size>();
+			if constexpr(typed_handle.template has<components::overridden_geo>()) {
+				const auto& overridden_geo = typed_handle.get().template get<components::overridden_geo>();
 
-				augs::write_bytes(into, overridden_size.size);
+				augs::write_bytes(into, overridden_geo.size);
 			}
 		}
 	);
@@ -75,10 +75,10 @@ static void unresize_entities(
 		[&](const auto& i) {
 			const auto typed_handle = cosm[i];
 
-			if constexpr(typed_handle.template has<components::overridden_size>()) {
-				auto& overridden_size = typed_handle.get(key).template get<components::overridden_size>();
+			if constexpr(typed_handle.template has<components::overridden_geo>()) {
+				auto& overridden_geo = typed_handle.get(key).template get<components::overridden_geo>();
 
-				augs::read_bytes(from, overridden_size.size);
+				augs::read_bytes(from, overridden_geo.size);
 			}
 		}
 	);
@@ -175,7 +175,7 @@ static void resize_entities(
 				}
 			}
 
-			if constexpr(typed_handle.template has<components::overridden_size>()) {
+			if constexpr(typed_handle.template has<components::overridden_geo>()) {
 				typed_handle.access_independent_transform(
 					[&](auto& transform) {
 						using T = remove_cref<decltype(transform)>;
@@ -206,16 +206,16 @@ static void resize_entities(
 						const auto rect = ltrb::center_and_size(pos, current_size);
 
 						auto set_size = [&](const vec2 new_size) {
-							auto& overridden_size = typed_handle.get(key).template get<components::overridden_size>();
+							auto& overridden_geo = typed_handle.get(key).template get<components::overridden_geo>();
 
 							if (size_unit.has_value()) {
 								vec2i s = new_size;
 								s /= size_unit.value();
 								s *= size_unit.value();
-								overridden_size.size.emplace(s);
+								overridden_geo.size.emplace(s);
 							}
 							else {
-								overridden_size.size.emplace(new_size);
+								overridden_geo.size.emplace(new_size);
 							}
 						};
 

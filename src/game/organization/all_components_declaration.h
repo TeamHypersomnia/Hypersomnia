@@ -79,7 +79,7 @@ namespace components {
 	struct animation;
 	struct remnant;
 	struct continuous_particles;
-	struct overridden_size;
+	struct overridden_geo;
 	struct cascade_explosion;
 }
 
@@ -154,7 +154,7 @@ using component_list_t = List<
 	components::animation,
 	components::remnant,
 	components::continuous_particles,
-	components::overridden_size,
+	components::overridden_geo,
 	components::cascade_explosion
 >;
 

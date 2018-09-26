@@ -395,7 +395,7 @@ public:
 					});
 
 					if (mover.is_active()) {
-						handle.dispatch_on_having_all<components::overridden_size>([&](const auto typed_handle) {
+						handle.dispatch_on_having_all<components::overridden_geo>([&](const auto typed_handle) {
 							const auto s = typed_handle.get_logical_size();
 							const auto tr = typed_handle.get_logic_transform();
 
