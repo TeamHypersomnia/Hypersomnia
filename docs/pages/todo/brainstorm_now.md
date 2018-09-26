@@ -6,6 +6,21 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Arbitrary pasting of entities
+	- Vastly useful for importing stuff from testbed maps into existing ones
+		- Let alone between community maps
+	- This is pretty complex.
+		- If we allow pasting across workspaces, we might even have to copy actual asset files.
+	- Won't matter until after deathmatch stage
+		- Surely?
+	- The editor will have to construct the command tree, like
+		- paste_flavours + paste_entities, if no requisite flavours are found inside the project at the time of pasting
+			- the clipboard will have both the entity and flavour
+		- the editor's clipboard can actually become...
+			- paste entity flavour + paste entity command, stored, waiting to be executed!
+				- the move itself won't need to be stored
+	- Cut is just copy + delete
+
 - Marker entity: movement path origin
 
 - Transform design

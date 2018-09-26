@@ -92,6 +92,7 @@ enum class test_shootable_weapons {
 	KEK9,
 	SN69,
 	AO44,
+	CALICO,
 	PRO90,
 	AMPLIFIER_ARM,
 	DATUM_GUN,
@@ -104,7 +105,7 @@ enum class test_shootable_charges {
 	// GEN INTROSPECTOR enum class test_shootable_charges
 	CYAN_CHARGE,
 	STEEL_CHARGE,
-	AO44_CHARGE,
+	ORANGE_CHARGE,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -137,7 +138,7 @@ enum class test_plain_missiles {
 	// GEN INTROSPECTOR enum class test_plain_missiles
 	CYAN_ROUND,
 	STEEL_ROUND,
-	AO44_ROUND,
+	ORANGE_ROUND,
 	ELECTRIC_MISSILE,
 
 	COUNT
@@ -167,6 +168,7 @@ enum class test_container_items {
 	KEK9_MAGAZINE,
 	SN69_MAGAZINE,
 	AO44_MAGAZINE,
+	CALICO_MAGAZINE,
 	PRO90_MAGAZINE,
 	LEWSII_MAGAZINE,
 
@@ -208,7 +210,7 @@ enum class test_remnant_bodies {
 
 	CYAN_SHELL,
 	STEEL_SHELL,
-	AO44_SHELL,
+	ORANGE_SHELL,
 
 	COUNT
 	// END GEN INTROSPECTOR

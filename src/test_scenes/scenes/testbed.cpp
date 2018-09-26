@@ -64,7 +64,7 @@ namespace test_scenes {
 #define GIVE_AMMO 1
 
 #if GIVE_AMMO
-			resistance.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::AO44);
+			resistance.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::CALICO);
 			metropolis.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BILMER2000);
 			metropolis.initial_eq.belt_wearable = to_entity_flavour_id(test_tool_items::DEFUSE_KIT);
 #endif
@@ -390,6 +390,7 @@ namespace test_scenes {
 			give_weapon(transformr(vec2(-800 - k * 150, 0)), test_shootable_weapons::SN69);
 			give_weapon(transformr(vec2(-800 - k * 150, 200)), test_shootable_weapons::AO44);
 			give_weapon(transformr(vec2(-800 - k * 150, 400)), test_shootable_weapons::PRO90);
+			give_weapon(transformr(vec2(-800 - k * 150, 600)), test_shootable_weapons::CALICO);
 		}
 
 		give_weapon(transformr(vec2(-300, -500 + 50)), test_shootable_weapons::AMPLIFIER_ARM);

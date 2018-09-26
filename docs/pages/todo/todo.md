@@ -68,16 +68,6 @@ summary: Just a hidden scratchpad.
 	- Won't matter until after deathmatch stage
 	- will it be useful?
 
-- Arbitrary pasting of entities
-	- Won't matter until after deathmatch stage
-	- The editor will have to construct the command tree, like
-		- paste_flavours + paste_entities, if no requisite flavours are found inside the project at the time of pasting
-			- the clipboard will have both the entity and flavour
-		- the editor's clipboard can actually become...
-			- paste entity flavour + paste entity command, stored, waiting to be executed!
-				- the move itself won't need to be stored
-	- Cut is just copy + delete
-
 - Editor status bar
 	- Won't matter until after deathmatch stage
 	- Check how it works in vim

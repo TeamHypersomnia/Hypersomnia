@@ -269,7 +269,7 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_plain_missiles::AO44_ROUND);
+			auto& meta = get_test_flavour(flavours, test_plain_missiles::ORANGE_ROUND);
 
 			{
 				invariants::render render_def;
@@ -285,7 +285,7 @@ namespace test_flavours {
 				meta.set(flags_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_ROUND, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ORANGE_ROUND, white);
 
 			{
 				{
@@ -499,7 +499,7 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_remnant_bodies::AO44_SHELL);
+			auto& meta = get_test_flavour(flavours, test_remnant_bodies::ORANGE_SHELL);
 
 			{
 				invariants::render render_def;
@@ -508,7 +508,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_SHELL, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ORANGE_SHELL, white);
 			test_flavours::add_shell_dynamic_body(meta);
 
 			invariants::remnant remnant;
@@ -592,7 +592,7 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_shootable_charges::AO44_CHARGE);
+			auto& meta = get_test_flavour(flavours, test_shootable_charges::ORANGE_CHARGE);
 
 			{
 				invariants::render render_def;
@@ -601,7 +601,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_CHARGE, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ORANGE_CHARGE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::item item;
@@ -621,8 +621,8 @@ namespace test_flavours {
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
 				cartridge.shell_trace_particles.modifier.colorize = rgba(202, 186, 89, 255);
 
-				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::AO44_SHELL);
-				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::AO44_ROUND);
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::ORANGE_SHELL);
+				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::ORANGE_ROUND);
 
 				meta.set(cartridge);
 			}
@@ -863,7 +863,7 @@ namespace test_flavours {
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
 			charge_deposit_def.space_available = to_space_units("0.8");
 			charge_deposit_def.mounting_duration_ms = 500.f;
-			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::AO44_CHARGE);
+			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::ORANGE_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
 
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
@@ -874,6 +874,42 @@ namespace test_flavours {
 
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
 				item.space_occupied_per_charge = to_space_units("0.5");
+				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
+				item.standard_price = 60;
+				meta.set(item);
+			}
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_container_items::CALICO_MAGAZINE);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::CALICO_MAGAZINE, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+
+			invariants::container container; 
+
+			inventory_slot charge_deposit_def;
+			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
+			charge_deposit_def.space_available = to_space_units("1.5");
+			charge_deposit_def.mounting_duration_ms = 500.f;
+			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::ORANGE_CHARGE);
+			charge_deposit_def.contributes_to_space_occupied = false;
+
+			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
+			meta.set(container);
+
+			{
+				invariants::item item;
+
+				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				item.space_occupied_per_charge = to_space_units("1.0");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 60;
 				meta.set(item);
@@ -957,11 +993,11 @@ namespace test_flavours {
 				render_def.layer = render_layer::FLYING_BULLETS;
 
 				meta.set(render_def);
-				test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44_ROUND, white);
+				test_flavours::add_sprite(meta, caches, test_scene_image_id::ORANGE_ROUND, white);
 			}
 
 			{
-				meta.set(get_test_flavour(flavours, test_plain_missiles::AO44_ROUND).get<invariants::trace>());
+				meta.set(get_test_flavour(flavours, test_plain_missiles::ORANGE_ROUND).get<invariants::trace>());
 			}
 		}
 
@@ -1410,6 +1446,56 @@ namespace test_flavours {
 			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
 		}
 
+		{
+			auto& meta = get_test_flavour(flavours, test_shootable_weapons::CALICO);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			invariants::gun gun_def;
+
+			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::CALICO_MUZZLE);
+
+			gun_def.action_mode = gun_action_type::AUTOMATIC;
+			gun_def.muzzle_velocity = {4100.f, 4100.f};
+			gun_def.shot_cooldown_ms = 110.f;
+
+			gun_def.shell_angular_velocity = {2.f, 10.f};
+			gun_def.shell_spread_degrees = 12.f;
+			gun_def.shell_velocity = {300.f, 1900.f};
+			gun_def.damage_multiplier = 0.64f;
+			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
+			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
+			gun_def.recoil_multiplier = 1.35f;
+			gun_def.kickback_towards_wielder = 20.f;
+			gun_def.adversarial.knockout_award = static_cast<money_type>(550);
+
+			gun_def.maximum_heat = 2.f;
+			gun_def.gunshot_adds_heat = 0.072f;
+			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
+			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
+			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::CALICO_SHOT);
+
+			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::LIGHT_PISTOL_CHAMBERING);
+
+			meta.set(gun_def);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::CALICO, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1500.f, 0.f, false, "0.1");
+			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
+			meta.get<invariants::item>().standard_price = 650;
+			set_chambering_duration_ms(meta, 250.f);
+			set_density_mult(meta, 0.7f);
+			only_allow_mag(meta, test_container_items::CALICO_MAGAZINE);
+			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
+			meta.get<invariants::item>().specific_to = faction_type::SPECTATOR;
+		}
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::AMPLIFIER_ARM);
 

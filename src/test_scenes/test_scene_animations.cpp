@@ -76,6 +76,36 @@ void load_test_scene_animations(
 		return alloc(animation_id, anim);
 	};
 
+	auto make_shoot_durations = [](auto& f, const float m = 1.f) {
+		if (f.size() == 3) {
+			ping_pong_range(f);
+
+			f[2].duration_milliseconds = m * 10;
+			f[3].duration_milliseconds = m * 10;
+			f[4].duration_milliseconds = m * 30;
+			f[5].duration_milliseconds = m * 35;
+		}
+		else if (f.size() == 4) {
+			ping_pong_range(f);
+
+			f[3].duration_milliseconds = m * 10;
+			f[4].duration_milliseconds = m * 10;
+			f[5].duration_milliseconds = m * 30;
+			f[6].duration_milliseconds = m * 35;
+			f[7].duration_milliseconds = m * 35;
+		}
+		else if (f.size() == 5) {
+			ping_pong_range(f);
+
+			f[4].duration_milliseconds = m * 10;
+			f[5].duration_milliseconds = m * 10;
+			f[6].duration_milliseconds = m * 30;
+			f[7].duration_milliseconds = m * 35;
+			f[8].duration_milliseconds = m * 35;
+			f[9].duration_milliseconds = m * 40;
+		}
+	};
+
 	{
 		auto& cast_blink = make_plain(
 			test_id_type::CAST_BLINK,
@@ -129,39 +159,19 @@ void load_test_scene_animations(
 
 			anim.frames.insert(anim.frames.begin(), { to_image_id(test_scene_image_id::DATUM_GUN), 20.f });
 		} 
+
+		{
+			auto& anim = make_plain(
+				test_id_type::CALICO_SHOT,
+				test_scene_image_id::CALICO_SHOT_1,
+				20.0f
+			);
+
+			make_shoot_durations(anim.frames, 1.f);
+		} 
 	}
 
 	{
-		auto make_shoot_durations = [](auto& f, const float m = 1.f) {
-			if (f.size() == 3) {
-				ping_pong_range(f);
-
-				f[2].duration_milliseconds = m * 10;
-				f[3].duration_milliseconds = m * 10;
-				f[4].duration_milliseconds = m * 30;
-				f[5].duration_milliseconds = m * 35;
-			}
-			else if (f.size() == 4) {
-				ping_pong_range(f);
-
-				f[3].duration_milliseconds = m * 10;
-				f[4].duration_milliseconds = m * 10;
-				f[5].duration_milliseconds = m * 30;
-				f[6].duration_milliseconds = m * 35;
-				f[7].duration_milliseconds = m * 35;
-			}
-			else if (f.size() == 5) {
-				ping_pong_range(f);
-
-				f[4].duration_milliseconds = m * 10;
-				f[5].duration_milliseconds = m * 10;
-				f[6].duration_milliseconds = m * 30;
-				f[7].duration_milliseconds = m * 35;
-				f[8].duration_milliseconds = m * 35;
-				f[9].duration_milliseconds = m * 40;
-			}
-		};
-
 		auto make_torso = make_plain;
 
 		auto standard_walk = [&](const T test_id, const I first_frame_id) {
