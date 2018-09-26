@@ -114,7 +114,7 @@ void for_each_iconed_entity(
 	visible.for_each<render_layer::CONTINUOUS_PARTICLES>(cosm, [&](const auto handle) {
 		callback(
 			handle,
-			assets::necessary_image_id::EDITOR_ICON_WANDERING_PIXELS, 
+			assets::necessary_image_id::EDITOR_ICON_PARTICLE_SOURCE, 
 			handle.get_logic_transform(),
 			handle.template get<invariants::continuous_particles>().effect.modifier.colorize
 		);
