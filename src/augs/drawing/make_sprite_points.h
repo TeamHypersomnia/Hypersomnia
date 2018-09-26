@@ -14,7 +14,7 @@ namespace augs {
 	) {
 		sprite_points v;
 
-		v[0] = v[1] = v[2] = v[3] = pos - size / 2;
+		v[0] = v[1] = v[2] = v[3] = -size / 2;
 
 		// v[0];
 		v[1].x += size.x;
@@ -24,10 +24,20 @@ namespace augs {
 
 		v[3].y += size.y;
 
-		v[0].rotate(degrees, pos);
-		v[1].rotate(degrees, pos);
-		v[2].rotate(degrees, pos);
-		v[3].rotate(degrees, pos);
+		const auto radians = DEG_TO_RAD<float> * degrees;
+
+		const auto s = static_cast<float>(sin(radians));
+		const auto c = static_cast<float>(cos(radians));
+
+		for (auto& vv : v) {
+			const auto new_x = vv.x * c - vv.y * s;
+			const auto new_y = vv.x * s + vv.y * c;
+
+			vv.x = new_x;
+			vv.y = new_y;
+
+			vv += pos;
+		}
 
 		return v;
 	}

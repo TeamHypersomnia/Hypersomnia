@@ -231,8 +231,9 @@ auto first_free_key(const Container& in, T candidate = static_cast<T>(0)) {
 	}
 }
 
-template <class T, class C>
-std::size_t index_in(C& container, T& object) {
+template <class C, class T>
+std::size_t index_in(C&& container, T&& object) {
+	static_assert(can_access_data_v<remove_cref<C>> && std::is_same_v<remove_cref<T>, typename remove_cref<C>::value_type>);
 	return std::addressof(object) - std::addressof(container[0]);
 }
 

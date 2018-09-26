@@ -28,6 +28,10 @@ struct marker_icon {
 			id = I::EDITOR_ICON_BUY_AREA;
 			col = get_faction_color(meta.associated_faction);
 		}
+		else if (type == area_marker_type::ORGANISM_AREA) {
+			id = I::EDITOR_ICON_ORGANISM_AREA;
+			col = white;
+		}
 	}
 
 	template <class F>

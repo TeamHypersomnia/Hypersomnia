@@ -27,7 +27,7 @@ public:
 		using E = entity_handle_type;
 
 		if constexpr(E::is_specific) {
-			const auto handle = *static_cast<const entity_handle_type*>(this);
+			const auto& handle = *static_cast<const entity_handle_type*>(this);
 			auto& components = handle.get(keys...).components;
 
 			if constexpr(E::template has<components::rigid_body>()) {
@@ -171,18 +171,18 @@ public:
 	}
 
 	auto& set_logical_size(const vec2 new_size) const {
-		const auto handle = *static_cast<const entity_handle_type*>(this);
+		const auto& handle = *static_cast<const entity_handle_type*>(this);
 
 		if (const auto overridden_geo = handle.template find<components::overridden_geo>()) {
 			overridden_geo.set(new_size);
-			return *this;
+			return handle;
 		}
 
-		return *this;
+		return handle;
 	}
 
 	std::optional<vec2> find_logical_tip() const {
-		const auto handle = *static_cast<const entity_handle_type*>(this);
+		const auto& handle = *static_cast<const entity_handle_type*>(this);
 
 		const auto w = handle.get_logical_size().x;
 
@@ -215,7 +215,7 @@ transformr spatial_properties_mixin<E>::get_logic_transform() const {
 
 template <class E>
 std::optional<transformr> spatial_properties_mixin<E>::find_logic_transform() const {
-	const auto handle = *static_cast<const E*>(this);
+	const auto& handle = *static_cast<const E*>(this);
 
 #if MORE_LOGS
 	LOG("Finding transform for %x.", handle);
@@ -307,7 +307,7 @@ std::optional<transformr> spatial_properties_mixin<E>::find_logic_transform() co
 
 template <class E>
 vec2 spatial_properties_mixin<E>::get_effective_velocity() const {
-	const auto handle = *static_cast<const E*>(this);
+	const auto& handle = *static_cast<const E*>(this);
 
 	if (const auto owner = handle.get_owner_of_colliders()) {
 		return owner.template get<components::rigid_body>().get_velocity();
@@ -318,7 +318,7 @@ vec2 spatial_properties_mixin<E>::get_effective_velocity() const {
 
 template <class E>
 bool spatial_properties_mixin<E>::has_independent_transform() const {
-	const auto handle = *static_cast<const E*>(this);
+	const auto& handle = *static_cast<const E*>(this);
 	const auto owner_body = handle.get_owner_of_colliders();
 
 	if (owner_body.alive() && owner_body != handle) {
@@ -334,7 +334,7 @@ bool spatial_properties_mixin<E>::has_independent_transform() const {
 
 template <class E>
 void spatial_properties_mixin<E>::set_logic_transform(const transformr t) const {
-	const auto handle = *static_cast<const E*>(this);
+	const auto& handle = *static_cast<const E*>(this);
 
 	if (!has_independent_transform()) {
 		return;

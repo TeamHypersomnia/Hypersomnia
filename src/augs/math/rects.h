@@ -384,6 +384,17 @@ struct basic_ltrb {
 
 		return result;
 	}
+
+	auto make_vertices() const {
+		std::array<vec2_type, 4> result;
+
+		result[0] = vec2_type(l, t);
+		result[1] = vec2_type(r, t);
+		result[2] = vec2_type(r, b);
+		result[3] = vec2_type(l, b);
+
+		return result;
+	}
 };
 
 template <class T>
@@ -573,6 +584,17 @@ struct basic_xywh {
 
 		result[3][0] = vec2_type(x, y + h);
 		result[3][1] = vec2_type(x, y);
+
+		return result;
+	}
+
+	auto make_vertices() const {
+		std::array<vec2_type, 4> result;
+
+		result[0] = vec2_type(x, y);
+		result[1] = vec2_type(x + w, y);
+		result[2] = vec2_type(x + w, y + h);
+		result[3] = vec2_type(x, y + h);
 
 		return result;
 	}

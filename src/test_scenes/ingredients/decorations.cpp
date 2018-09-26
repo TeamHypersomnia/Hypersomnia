@@ -104,7 +104,6 @@ namespace test_flavours {
 				auto& fish = movement_path_def.fish_movement;
 				auto& def = fish.value;
 				fish.is_enabled = true;
-				def.rect_size = aquarium_size * 2;
 				def.base_speed = base_speed;
 				def.sine_speed_boost = sine_speed_boost;
 				def.bubble_effect.id = to_particle_effect_id(test_scene_particle_effect_id::FISH_BUBBLE);
@@ -113,6 +112,18 @@ namespace test_flavours {
 				meta.set(movement_path_def);
 			}
 		};
+
+		{
+			auto& meta = get_test_flavour(in.flavours, test_box_markers::ORGANISM_AREA);
+			invariants::box_marker marker;
+			marker.type = area_marker_type::ORGANISM_AREA;
+			marker.meta.associated_faction = faction_type::SPECTATOR;
+			meta.set(marker);
+
+			components::overridden_geo geo;
+			geo.size.emplace(aquarium_size * 2);
+			meta.set(geo);
+		}
 
 		flavour_with_animation(
 			test_complex_decorations::FLOWER_PINK,

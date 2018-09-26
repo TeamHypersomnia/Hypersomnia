@@ -1,6 +1,7 @@
 #include "augs/misc/randomization.h"
 #include "augs/drawing/make_sprite_points.h"
 #include "augs/math/steering.h"
+#include "augs/math/make_rect_points.h"
 
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
@@ -41,10 +42,12 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				const auto tip_pos = *subject.find_logical_tip();
 
 				const auto& def = movement_path_def.fish_movement.value;
-				const auto size = def.rect_size;
 
-				const auto origin = movement_path.origin;
-				const auto bound = xywh::center_and_size(origin.pos, size);
+				const auto origin = cosm[movement_path.origin];
+
+				if (origin.dead()) {
+					return;
+				}
 
 				const auto global_time = cosm.get_total_seconds_passed() + real32(subject.get_guid());
 				const auto global_time_sine = std::sin(global_time * 2);
@@ -196,13 +199,24 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 				const auto total_speed = velocity.length();
 
-				const auto bound_avoidance = augs::steer_to_avoid_bounds(
-					velocity,
-					tip_pos,
-					bound,
-					40.f,
-					0.2f
-				);
+				const auto bound_avoidance = origin.dispatch([&](const auto& typed_origin) {
+					if (const auto tr = typed_origin.find_logic_transform()) {
+						if (const auto size = typed_origin.get_logical_size(); size.area() > 0) {
+							if (const auto area = typed_origin.template find<invariants::box_marker>()) {
+								return augs::steer_to_avoid_edges(
+									velocity,
+									tip_pos,
+									augs::make_rect_points<vec2>(size, tr->rotation, tr->pos),
+									tr->pos,
+									40.f,
+									0.2f
+								);
+							}
+						}
+					}
+
+					return vec2::zero;
+				});
 
 				velocity += bound_avoidance;
 

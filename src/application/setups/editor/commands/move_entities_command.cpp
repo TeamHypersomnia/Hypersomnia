@@ -441,8 +441,8 @@ active_edges::active_edges(const transformr tr, const vec2 rect_size, vec2 refer
 
 	auto segment_closer = [&reference_point](const auto& a, const auto& b) {
 		return 
-			reference_point.distance_from_segment_sq(a)
-		   	< reference_point.distance_from_segment_sq(b)
+			reference_point.sq_distance_from(a)
+		   	< reference_point.sq_distance_from(b)
 		;
 	};
 

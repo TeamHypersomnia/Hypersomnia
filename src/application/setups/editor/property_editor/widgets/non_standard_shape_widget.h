@@ -113,7 +113,7 @@ struct non_standard_shape_widget {
 
 				for (std::size_t i = 0; i < considered_poly.size(); ++i) {
 					const auto seg = vec2::segment_type{ considered_poly[i], wrap_next(considered_poly, i) };
-					const auto new_dist = mpos.distance_from_segment_sq(seg);
+					const auto new_dist = mpos.sq_distance_from(seg);
 
 					if (dist == -1.f || new_dist < dist) {
 						dist = new_dist;

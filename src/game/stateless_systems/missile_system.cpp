@@ -40,7 +40,7 @@
 #include "game/detail/explosive/detonate.h"
 
 #define USER_RICOCHET_COOLDOWNS 0
-#define LOG_RICOCHETS 1
+#define LOG_RICOCHETS 0
 
 template <class... Args>
 void RIC_LOG(Args&&... args) {

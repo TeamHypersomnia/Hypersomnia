@@ -57,22 +57,6 @@ struct basic_vec2 {
 		return res;
 	}
 
-	static bool segment_in_segment(
-		const basic_vec2 smaller_p1, 
-		const basic_vec2 smaller_p2, 
-		const basic_vec2 bigger_p1, 
-		const basic_vec2 bigger_p2,
-		const real maximum_offset
-	) {
-		return
-			((bigger_p2 - bigger_p1).length_sq() >= (smaller_p2 - smaller_p1).length_sq())
-			&&
-			smaller_p1.distance_from_segment_sq(bigger_p1, bigger_p2) < maximum_offset*maximum_offset
-			&&
-			smaller_p2.distance_from_segment_sq(bigger_p1, bigger_p2) < maximum_offset*maximum_offset
-		;
-	}
-
 	template <class V>
 	basic_vec2(const V& v, std::enable_if_t<has_x_and_y_v<V>>* = nullptr) : 
 		x(static_cast<type>(v.x)), 
@@ -114,8 +98,8 @@ struct basic_vec2 {
 		return basic_vec2<type>(static_cast<type>(cos(radians)), static_cast<type>(sin(radians)));
 	}
 
-	real distance_from_segment(const basic_vec2 start, const basic_vec2 end) const {
-		return std::sqrt(distance_from_segment_sq(start, end));
+	real distance_from(const segment_type s) const {
+		return std::sqrt(sq_distance_from(s));
 	}
 
 	real get_projection_multiplier(const basic_vec2 start, const basic_vec2 end) const {
@@ -158,7 +142,7 @@ struct basic_vec2 {
 		return start + proj_mult * segment;
 	}
 
-	real distance_from_segment_sq(const basic_vec2 start, const basic_vec2 end) const {
+	real sq_distance_from_segment(const basic_vec2 start, const basic_vec2 end) const {
 		const auto& p = *this;
 
 		if (start.compare(end)) {
@@ -168,8 +152,8 @@ struct basic_vec2 {
 		return (p - closest_point_on_segment(start, end)).length_sq();
 	}
 
-	auto distance_from_segment_sq(const segment_type segment) const {
-		return distance_from_segment_sq(segment[0], segment[1]);
+	auto sq_distance_from(const segment_type segment) const {
+		return sq_distance_from_segment(segment[0], segment[1]);
 	}
 
 	type dot(const basic_vec2 v) const {
@@ -594,16 +578,16 @@ struct basic_vec2 {
 		return length_sq() < b.length_sq();
 	}
 
-	bool to_left_of(const basic_vec2& a, const basic_vec2& b) const {
-		return (*this - a).cross(b - a) > 0.f;
-	}
-
-	bool to_right_of(const basic_vec2& a, const basic_vec2& b) const {
-		return (*this - a).cross(b - a) < 0.f;
-	}
-
 	bool operator>(const basic_vec2& b) const {
 		return length_sq() > b.length_sq();
+	}
+
+	bool to_left_of(const segment_type& s) const {
+		return (*this - s[0]).cross(s[1] - s[0]) > 0.f;
+	}
+
+	bool to_right_of(const segment_type& s) const {
+		return (*this - s[0]).cross(s[1] - s[0]) < 0.f;
 	}
 
 	template <class v> bool operator==(const v& p) const { return x == p.x && y == p.y; }

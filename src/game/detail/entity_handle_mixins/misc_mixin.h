@@ -152,7 +152,7 @@ public:
 		}
 		else {
 			static_assert(always_false_v<E>, "You can't get a flavour out of a non-specific handle.");
-			return *this;
+			return 0;
 		}
 	}
 

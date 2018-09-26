@@ -8,7 +8,6 @@
 
 struct fish_movement_def {
 	// GEN INTROSPECTOR struct fish_movement_def
-	vec2 rect_size;
 	real32 sine_speed_boost = 100.f;
 	real32 base_speed = 80.f;
 	real32 base_bubble_interval_ms = 1000.f;
@@ -29,7 +28,7 @@ namespace invariants {
 namespace components {
 	struct movement_path {
 		// GEN INTROSPECTOR struct components::movement_path
-		transformr origin;
+		signi_entity_id origin;
 		real32 path_time = 0.f;
 		real32 last_speed = 0.f;
 		augs::enum_array<vec2, startle_type> startle;

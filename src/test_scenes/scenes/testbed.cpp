@@ -652,61 +652,63 @@ namespace test_scenes {
 			const auto dragon_fish = test_complex_decorations::DRAGON_FISH;
 			const auto rainbow_dragon_fish = test_complex_decorations::RAINBOW_DRAGON_FISH;
 
-			auto create_fish = [&](auto t, auto where, auto origin) {
+			const auto origin_entity = create(test_box_markers::ORGANISM_AREA, aquarium_origin).set_logical_size(aquarium_size * 2);
+
+			auto create_fish = [&](auto t, auto where) {
 				const auto decor = create(t, where);
-				decor.template get<components::movement_path>().origin = origin;
+				decor.template get<components::movement_path>().origin = origin_entity.get_id();
 				const auto secs = real32(decor.template get<components::animation>().state.frame_num) * 12.23f;
 				decor.template get<components::sprite>().effect_offset_secs = secs;
 				return decor;
 			};
 
-			create_fish(yellowfish, aquarium_tr - vec2(80, 10), aquarium_origin);
-			create_fish(yellowfish, aquarium_tr + transformr(vec2(80, 10), -180), aquarium_origin);
-			create_fish(yellowfish, aquarium_tr - vec2(80, 30), aquarium_origin);
-			create_fish(yellowfish, aquarium_tr + transformr(vec2(80, 50), -180), aquarium_origin);
-			create_fish(yellowfish, aquarium_tr - vec2(120, 30), aquarium_origin);
-			create_fish(yellowfish, aquarium_tr + transformr(vec2(90, 40), -180), aquarium_origin);
+			create_fish(yellowfish, aquarium_tr - vec2(80, 10));
+			create_fish(yellowfish, aquarium_tr + transformr(vec2(80, 10), -180));
+			create_fish(yellowfish, aquarium_tr - vec2(80, 30));
+			create_fish(yellowfish, aquarium_tr + transformr(vec2(80, 50), -180));
+			create_fish(yellowfish, aquarium_tr - vec2(120, 30));
+			create_fish(yellowfish, aquarium_tr + transformr(vec2(90, 40), -180));
 
-			create_fish(cyanvioletfish, aquarium_tr - vec2(40, 10), aquarium_origin);
-			create_fish(cyanvioletfish, aquarium_tr + transformr(vec2(40, 10), -180), aquarium_origin);
-			create_fish(cyanvioletfish, aquarium_tr - vec2(40, 30), aquarium_origin);
-			create_fish(cyanvioletfish, aquarium_tr + transformr(vec2(40, 50), -180), aquarium_origin);
-			create_fish(cyanvioletfish, aquarium_tr - vec2(70, 30), aquarium_origin);
-			create_fish(cyanvioletfish, aquarium_tr + transformr(vec2(40, 40), -180), aquarium_origin);
+			create_fish(cyanvioletfish, aquarium_tr - vec2(40, 10));
+			create_fish(cyanvioletfish, aquarium_tr + transformr(vec2(40, 10), -180));
+			create_fish(cyanvioletfish, aquarium_tr - vec2(40, 30));
+			create_fish(cyanvioletfish, aquarium_tr + transformr(vec2(40, 50), -180));
+			create_fish(cyanvioletfish, aquarium_tr - vec2(70, 30));
+			create_fish(cyanvioletfish, aquarium_tr + transformr(vec2(40, 40), -180));
 
-			create_fish(yellowfish, aquarium_tr + vec2(20, 20) - vec2(80, 10), aquarium_origin);
-			create_fish(yellowfish, aquarium_tr + vec2(20, 20) + transformr(vec2(80, 10), -180), aquarium_origin);
-			create_fish(yellowfish, aquarium_tr + vec2(20, 20) - vec2(80, 30), aquarium_origin);
-			create_fish(yellowfish, aquarium_tr + vec2(20, 20) + transformr(vec2(80, 50), -180), aquarium_origin);
-			create_fish(yellowfish, aquarium_tr + vec2(20, 20) - vec2(120, 30), aquarium_origin);
-			create_fish(yellowfish, aquarium_tr + vec2(20, 20) + transformr(vec2(90, 40), -180), aquarium_origin);
+			create_fish(yellowfish, aquarium_tr + vec2(20, 20) - vec2(80, 10));
+			create_fish(yellowfish, aquarium_tr + vec2(20, 20) + transformr(vec2(80, 10), -180));
+			create_fish(yellowfish, aquarium_tr + vec2(20, 20) - vec2(80, 30));
+			create_fish(yellowfish, aquarium_tr + vec2(20, 20) + transformr(vec2(80, 50), -180));
+			create_fish(yellowfish, aquarium_tr + vec2(20, 20) - vec2(120, 30));
+			create_fish(yellowfish, aquarium_tr + vec2(20, 20) + transformr(vec2(90, 40), -180));
 
 			const auto jellyfishtr = aquarium_tr + transformr(vec2(100, 100), -45);
-			create_fish(darkbluefish, jellyfishtr - vec2(80, 10), aquarium_origin);
-			create_fish(darkbluefish, jellyfishtr + transformr(vec2(80, 10), -180), aquarium_origin);
+			create_fish(darkbluefish, jellyfishtr - vec2(80, 10));
+			create_fish(darkbluefish, jellyfishtr + transformr(vec2(80, 10), -180));
 
-			create_fish(darkbluefish, jellyfishtr - vec2(80, 30), aquarium_origin);
-			create_fish(darkbluefish, jellyfishtr + transformr(vec2(80, 50), -180), aquarium_origin);
+			create_fish(darkbluefish, jellyfishtr - vec2(80, 30));
+			create_fish(darkbluefish, jellyfishtr + transformr(vec2(80, 50), -180));
 
-			create_fish(darkbluefish, jellyfishtr - vec2(120, 30), aquarium_origin);
-			create_fish(darkbluefish, jellyfishtr + transformr(vec2(90, 40), -180), aquarium_origin);
+			create_fish(darkbluefish, jellyfishtr - vec2(120, 30));
+			create_fish(darkbluefish, jellyfishtr + transformr(vec2(90, 40), -180));
 
-			create_fish(jellyfish, aquarium_tr - vec2(180, 30), aquarium_origin);
-			create_fish(jellyfish, aquarium_tr + transformr(vec2(190, 40), -180), aquarium_origin);
-			create_fish(jellyfish, aquarium_tr - vec2(180, 50), aquarium_origin);
-			create_fish(jellyfish, aquarium_tr + transformr(vec2(190, 60), -180), aquarium_origin);
-			create_fish(jellyfish, aquarium_tr - vec2(180, 70), aquarium_origin);
-			create_fish(jellyfish, aquarium_tr + transformr(vec2(190, 80), -180), aquarium_origin);
+			create_fish(jellyfish, aquarium_tr - vec2(180, 30));
+			create_fish(jellyfish, aquarium_tr + transformr(vec2(190, 40), -180));
+			create_fish(jellyfish, aquarium_tr - vec2(180, 50));
+			create_fish(jellyfish, aquarium_tr + transformr(vec2(190, 60), -180));
+			create_fish(jellyfish, aquarium_tr - vec2(180, 70));
+			create_fish(jellyfish, aquarium_tr + transformr(vec2(190, 80), -180));
 
-			create_fish(dragon_fish, aquarium_tr - vec2(280, 130), aquarium_origin);
-			create_fish(dragon_fish, aquarium_tr + transformr(vec2(290, 40), -180), aquarium_origin);
-			create_fish(dragon_fish, aquarium_tr - vec2(280, 150), aquarium_origin);
-			create_fish(dragon_fish, aquarium_tr + transformr(vec2(290, 60), -180), aquarium_origin);
+			create_fish(dragon_fish, aquarium_tr - vec2(280, 130));
+			create_fish(dragon_fish, aquarium_tr + transformr(vec2(290, 40), -180));
+			create_fish(dragon_fish, aquarium_tr - vec2(280, 150));
+			create_fish(dragon_fish, aquarium_tr + transformr(vec2(290, 60), -180));
 
-			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos - vec2(280, 130), aquarium_origin);
-			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos + vec2(290, 40), aquarium_origin);
-			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos - vec2(280, 150), aquarium_origin);
-			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos + vec2(290, 60), aquarium_origin);
+			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos - vec2(280, 130));
+			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos + vec2(290, 40));
+			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos - vec2(280, 150));
+			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos + vec2(290, 60));
 		};
 
 		const auto orig1 = vec2(380, -1524);

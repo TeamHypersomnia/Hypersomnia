@@ -70,10 +70,13 @@ struct camera_cone {
 	ltrb get_visible_world_rect_aabb() const {
 		const auto visible_world_area = get_visible_world_area();
 
-		const auto rotated_rect_verts = augs::make_rect_points<vec2>(visible_world_area, eye.transform.rotation);
-		const auto rotated_rect_aabb = augs::get_aabb(rotated_rect_verts);
+		const auto rotated_rect_verts = augs::make_rect_points<vec2>(
+			visible_world_area, 
+			eye.transform.rotation, 
+			eye.transform.pos
+		);
 
-		return rotated_rect_aabb + eye.transform.pos;
+		return augs::get_aabb(rotated_rect_verts);
 	}
 	
 	auto get_projection_matrix() const {

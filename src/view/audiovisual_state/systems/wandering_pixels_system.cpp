@@ -180,10 +180,11 @@ void wandering_pixels_system::advance_for(
 			if (wandering.keep_particles_within_bounds) {
 				const auto velocity = p.pos - prev_pos;
 
-				p.pos += augs::steer_to_avoid_bounds(
+				p.pos += augs::steer_to_avoid_edges(
 					velocity,
 					p.pos,
-					current_reach,
+					current_reach.make_vertices(),
+					current_reach.get_center(),
 					30.f,
 					1.f
 				);

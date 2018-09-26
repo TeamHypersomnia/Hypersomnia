@@ -3,6 +3,7 @@
 #include "augs/math/vec2.h"
 #include "augs/math/arithmetical.h"
 #include "augs/log.h"
+#include "augs/templates/wrap_templates.h"
 
 namespace augs {
 	inline bool isLeft(const vec2 a, const vec2 b, const vec2 c) {
@@ -117,18 +118,28 @@ namespace augs {
 		return vec2(avoidance).set_length(avoidance_force * std::max(0.f, 1.f - (danger_dist / comfort_zone)));
 	}
 
-	inline auto steer_to_avoid_bounds(
+	template <class V, class C>
+	inline auto steer_to_avoid_edges(
 		const vec2 velocity,
 		const vec2 position,
-		const xywh& bound,
+		const V& vertices,
+		const C& center,
 		const real32 max_dist_to_avoid,
 		const real32 force_multiplier
 	) {
-		const auto edges = bound.make_edges();
 		auto dist_to_closest = std::numeric_limits<real32>::max();
 
-		for (const auto& e : edges) {
-			const auto dist = position.distance_from_segment_sq(e[0], e[1]);
+		bool pos_outside = false;
+
+		for (const auto& v : vertices) {
+			const auto& next_vert = wrap_next(vertices, index_in(vertices, v));
+			const auto seg = vec2::segment_type { v, next_vert };
+
+			if (position.to_left_of(seg)) {
+				pos_outside = true;
+			}
+
+			const auto dist = position.sq_distance_from(seg);
 
 			if (dist < dist_to_closest) {
 				dist_to_closest = dist;
@@ -141,7 +152,7 @@ namespace augs {
 
 		auto dir_mult = std::max(0.f, 1.f - dist_to_closest / max_dist_to_avoid) * force_multiplier;
 
-		if (!bound.hover(position)) {
+		if (pos_outside) {
 			/* Protect from going outside */
 			dir_mult = 1.f;
 		}
@@ -149,7 +160,7 @@ namespace augs {
 		return augs::seek(
 			velocity,
 			position,
-			bound.get_center(),
+			center,
 			velocity.length()
 		) * dir_mult;
 	}
