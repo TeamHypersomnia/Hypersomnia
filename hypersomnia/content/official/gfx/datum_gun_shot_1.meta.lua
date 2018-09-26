@@ -53,7 +53,7 @@ return {
       },
       hand_anchor = {
         pos = {
-          x = -17,
+          x = -19,
           y = 0
         },
         rotation = 0

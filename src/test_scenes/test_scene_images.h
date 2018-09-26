@@ -42,6 +42,8 @@ enum class test_scene_image_id {
 	FLOWER_CYAN_1,
 	CONSOLE_LIGHT_1,
 	VINDICATOR_SHOT_1,
+
+	DATUM_GUN,
 	DATUM_GUN_SHOT_1,
 
 	SOIL,

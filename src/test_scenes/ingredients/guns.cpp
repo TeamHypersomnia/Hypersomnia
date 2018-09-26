@@ -1249,7 +1249,7 @@ namespace test_flavours {
 
 			meta.set(gun_def);
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::DATUM_GUN_SHOT_1, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::DATUM_GUN, white);
 
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 1.45f);

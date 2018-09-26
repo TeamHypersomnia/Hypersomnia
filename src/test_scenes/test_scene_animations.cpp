@@ -122,11 +122,12 @@ void load_test_scene_animations(
 			anim.frames[0].duration_milliseconds = 10.f;
 			anim.frames[1].duration_milliseconds = 10.f;
 			anim.frames[2].duration_milliseconds = 10.f;
-			anim.frames[3].duration_milliseconds = 10.f;
-			anim.frames[4].duration_milliseconds = 20.f;
+			anim.frames[3].duration_milliseconds = 20.f;
+			anim.frames[4].duration_milliseconds = 25.f;
 			anim.frames[5].duration_milliseconds = 25.f;
-			anim.frames[6].duration_milliseconds = 25.f;
-			anim.frames[7].duration_milliseconds = 30.f;
+			anim.frames[6].duration_milliseconds = 30.f;
+
+			anim.frames.insert(anim.frames.begin(), { to_image_id(test_scene_image_id::DATUM_GUN), 20.f });
 		} 
 	}
 
