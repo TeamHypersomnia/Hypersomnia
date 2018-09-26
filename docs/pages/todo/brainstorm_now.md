@@ -6,10 +6,27 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Alt + G throws secondary item
+- Game events log and chat
+	- In the same window
+	- ImGui or own GUI?
+		- We actually have some textbox code we can introduce later for chatting
+			- Better control over such an important feature
 
-- Alt + R only unloads the magazine
-	- Could also be used for scavenging
+- Transform design
+	- It is the case that many entities might share identical origin, in which case it would be unwieldy to update origins for all entities to a new one.
+		- E.g. fish in aquarium.
+	- It is also the case that the origins might be tied to decorational entities.
+		- E.g. aquarium sand.
+	- movement path component will have an origin transform which will automatically be moved by the editor
+		- the transform component will be kept up to date and it will be the logical transform
+		- the rendering code will also only touch this logical transform
+	- for editor, the origin could just also be accessed as an independent transform
+		- so access_independent_transform -> access_independent_transforms
+		- con: more memory wasted? who gives a heck, though...
+
+- Windows back-port
+	- use non-multisampling fb configs on Windows
+		- proven to improve performance twofold, on linux
 
 - Melee combat
 	- Primary and secondary attacks for knives
@@ -19,13 +36,11 @@ summary: That which we are brainstorming at the moment.
 	- Attack collisions
 		- When hurt triggers of two or more players touch, they are pushed away opposite to their facing
 		
-- Ensure that a single capability only ever mounts a single item at a time?
+- Let us comfortably drop the item in secondary hand
+	- Alt+G?
+	- The most recent?
 
-- Game events log and chat
-	- In the same window
-	- ImGui or own GUI?
-		- We actually have some textbox code we can introduce later for chatting
-			- Better control over such an important feature
+- Ensure that a single capability only ever mounts a single item at a time?
 
 - Remove the notion of container_with_small_size
 	- Interesting concept but we'll just handle it during actual serialization stage
@@ -103,9 +118,6 @@ summary: That which we are brainstorming at the moment.
 			- Simply add_player({ ... }, nickname) on connection.
 				- This first makes them a spectator.
 
-- Mode vars gui
-	- Can set the current one, resetting the cosmos
-
 - Storage of pre-defined mode informations inside a map
 	- ``.modes`` file
 		- A map is still functional without modes and modes can always be later specified, so a separate file is justified
@@ -154,23 +166,6 @@ summary: That which we are brainstorming at the moment.
 
 - FFA game mode
 	- Win condition: None, there is only time limit.
-- Duel game mode
-	- Win condition: same as TDM, just will be less players
-	- Just different kinds of spawns
-	- **Actually, we won't create special purpose logic for duels.**
-		- There will just be specific maps for playing TDM as duel.
-- Team deathmatch game mode
-	- Win condition: Consciousness status of any entity of CT side
-- Bomb defuse game mode
-	- Win condition: Existence of any entity of C4 flavour
-		- A bomb can only stop existing due to being detonated
-	- Win condition: Consciousness status of any entity of CT side
-
-- Game modes shall be separated into immutable & instance
-	- The instance will probably have a mutable copy of the immutable, anyway, for admin tweaks
-
-- Map won't define that "a weapon can't be bought here".
-	- It will only provide a list of ready-to-be-used profiles where this could be specified.
 
 - To avoid transmitting some server-decided seed for the beginning of each round (e.g. to position players around)...
 	- ...we can just derive a hash of all inputs from the previous round, or just hash entire cosmos state
@@ -201,27 +196,6 @@ summary: That which we are brainstorming at the moment.
 	- things like round time, c4 time, they can be specified completely regardless of the intercosm contents.
 		- thus they should be textual configs, for which we can nevertheless provide some GUIs.
 
-- Each game mode definition file will be named after its stem, and the extension will determine its type
-	- **(Implemented first)** struct team_deathmatch
-		- (Implemented first) player flavour id
-		- (Implemented first) vector of spawn transforms
-		- std optional with preferred duel transforms
-	- struct free_for_all
-		- player flavour id
-		- vector of spawn transforms
-	- struct bomb_defuse
-		- player flavour id
-		- c4 flavour id
-		- vector of spawn transforms
-		- vector of xywh rects signifying bombsites
-	- struct capture_the_flag
-		- player flavour id
-		- vector of spawn transforms
-		- flag flavour id
-		- flag base flavour id
-		- flag positions
-	- struct mmo_server
-		- start player flavour 
 - server will accept an ``std::variant<free_for_all, bomb_defuse...>``
 	- each will perform its own logic
 
@@ -260,17 +234,6 @@ summary: That which we are brainstorming at the moment.
 		- Will be named like ``ProjectName.compat.lua``
 			- Contains the intercosm and rulesets, all important things.
 
-- Transform design
-	- It is the case that many entities might share identical origin, in which case it would be unwieldy to update origins for all entities to a new one.
-		- E.g. fish in aquarium.
-	- It is also the case that the origins might be tied to decorational entities.
-		- E.g. aquarium sand.
-	- movement path component will have an origin transform which will automatically be moved by the editor
-		- the transform component will be kept up to date and it will be the logical transform
-		- the rendering code will also only touch this logical transform
-	- for editor, the origin could just also be accessed as an independent transform
-		- so access_independent_transform -> access_independent_transforms
-		- con: more memory wasted? who gives a heck, though...
 
 - Sound should be loaded from the smallest to the biggest
 	- So that effects are loaded first

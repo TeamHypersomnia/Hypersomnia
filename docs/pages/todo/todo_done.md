@@ -1543,3 +1543,31 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - Specifying physical shapes per-image
 	- std::vector<vec2i> in the image
 
+- Each game mode definition file will be named after its stem, and the extension will determine its type
+	- **(Implemented first)** struct team_deathmatch
+		- (Implemented first) player flavour id
+		- (Implemented first) vector of spawn transforms
+		- std optional with preferred duel transforms
+	- struct free_for_all
+		- player flavour id
+		- vector of spawn transforms
+	- struct bomb_defuse
+		- player flavour id
+		- c4 flavour id
+		- vector of spawn transforms
+		- vector of xywh rects signifying bombsites
+	- struct capture_the_flag
+		- player flavour id
+		- vector of spawn transforms
+		- flag flavour id
+		- flag base flavour id
+		- flag positions
+	- struct mmo_server
+		- start player flavour 
+
+- Image preview in Images GUI
+	- Store the image and texture inside editor structure so that it may be properly cleaned up
+	- Then send just image id to the imgui renderering routine
+
+- add this maybe? https://github.com/jpakkane/naturalsort
+

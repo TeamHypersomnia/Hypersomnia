@@ -6,6 +6,24 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- consider having entity guids in components instead of entity ids for simplicity of network transfers
+	- question is, won't we anyway be sending the whole pool state?
+		- it's just several bytes overhead per entity
+	- there ain't really that many and it will be greatly useful
+
+- Ctrl+I shall open a quick go to gui that will instantiate a chosen flavour
+
+- Fill new workspace with test scene essentials
+	- This would prevent image ids in common state from being invalid
+		- Probably less checks to make, in GUI as well
+	- Can make those the first in test scene image enums so that we can stop importing images after some point
+
+- finish work with atlas and sound regeneration
+	- regenerate only seen assets
+	- always load diffuse map with the corresponding neon map to avoid unilluminated objects near the camera...
+		- ...even though many diffuse maps nearby have been loaded
+		- perhaps we won't really need the separation between diffuse and neon, because maximum atlases will be huge anyway
+
 - Optionally, make the bomb non-pickupable by other factions
 	- For now just set infinite space occupied and don't iterate recursively to check if the item is forbidden
 
@@ -66,10 +84,6 @@ summary: Just a hidden scratchpad.
 		- Changing a mode to normal clears the last message
 	- Will be useful for the author to know what is going on
 
-- Image preview in Images GUI
-	- Store the image and texture inside editor structure so that it may be properly cleaned up
-	- Then send just image id to the imgui renderering routine
-
 - Property editor: make container elements tickable and modifiable in bulk
 
 - Editing vertices in editor
@@ -77,22 +91,6 @@ summary: Just a hidden scratchpad.
 		- Will be important later, once we want some crazy irregular maps.
 		- e.g. setting reach for wandering pixels
 		- if fixture, change shape
-
-- Fill new workspace with test scene essentials
-	- This would prevent image ids in common state from being invalid
-		- Probably less checks to make, in GUI as well
-	- Can make those the first in test scene image enums so that we can stop importing images after some point
-
-- Ctrl+I shall open a quick go to gui that will instantiate a chosen flavour
-
-- finish work with atlas and sound regeneration
-	- regenerate only seen assets
-	- always load diffuse map with the corresponding neon map to avoid unilluminated objects near the camera...
-		- ...even though many diffuse maps nearby have been loaded
-		- perhaps we won't really need the separation between diffuse and neon, because maximum atlases will be huge anyway
-
-- use non-multisampling fb configs on Windows
-	- proven to improve performance twofold, on linux
 
 - settable_as_mixin should have push_bind and pop_bind?
 
@@ -102,20 +100,14 @@ summary: Just a hidden scratchpad.
 - copy gfx and sfx folders on save as...
 	- For now on re-opening the newly saved project these resources will be missing
 
-- add this maybe? https://github.com/jpakkane/naturalsort
-
 - research building with clang on windows?
 
 - let particle definitions be split into the invariant and variant parts, like components
 	- pro: better cache coherency
 
 - templatize some dangling memory stream arguments
-- add unique sprite decoration type
 
 - normalize the names of getters in xywh/ltrb
-
-- consider having entity guids in components instead of entity ids for simplicity of network transfers
-	- there ain't really that many and it will be greatly useful
 
 - in go to dialog, make selection groups appear as the first
 	- later we might just make a variant of several types instead of entity_guid in match vector
@@ -151,12 +143,6 @@ summary: Just a hidden scratchpad.
 	- we could either set an "is_modified" flag or track it in history
 		- not much modification points for selections, so quite viable
 
-- Entity groups will be useful later, not until we make a simple deathmatch where we can include some simple weapon/car creation logic etc
-	- Really?
-	- What about weapon spawns
-		- scene could have predefined weapon entity flavours
-		- same for each of initial magazines
-
 - pass display size and implement augs::get_display
 
 - editor should print "types of selected entities" and their common properties, identically as with entities/components
@@ -167,15 +153,14 @@ summary: Just a hidden scratchpad.
 		- would just create particle effect inputs and pass them to the simulation
 	- same with sound system
 
-- In production build, let the ensure throw an ensure_exception. 
-	- Then, in the editor, when the game is still unstable, we will catch an error during whenever we step the cosmos or change some sensitive valuesa,
-	- then upon catching, we will save the last known correct version to hdd.
-
 - Local setup should record session live
 	- This is really important in the face of bugs.
 	- Or just get rid of test scene setup for now and let it by default launch a scene in editor that records inputs
 
 - ensure should throw so that the editor destructor can perform autosave
+	- actually, if some modification caused crash, it would be better if the author can try to edit without it
+	- Then, in the editor, when the game is still unstable, we will catch an error during whenever we step the cosmos or change some sensitive valuesa,
+	- then upon catching, we will save the last known correct version to hdd.
 	- for cores, just emit them programatically on unix
 	- and on windows it makes little sense to abort there, just debugbreak and throw.
 

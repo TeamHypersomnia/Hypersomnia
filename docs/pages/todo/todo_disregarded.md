@@ -269,6 +269,15 @@ summary: Just a hidden scratchpad.
 	- if constexpr has round time
 	- main would also have to know the arguments like initial cosmos
 		- so perhaps it would be better for a setup to interact with main, not the mode itself
+
+- Entity groups will be useful later, not until we make a simple deathmatch where we can include some simple weapon/car creation logic etc
+	- Really?
+	- What about weapon spawns
+		- scene could have predefined weapon entity flavours
+		- same for each of initial magazines
+
+- add unique sprite decoration type
+
 - Marker entities
 	- Special-purpose components:
 		- shape_aabb
@@ -277,4 +286,8 @@ summary: Just a hidden scratchpad.
 		- shape_polygon can be used both for marking and for physical bodies
 	- separation between visible shapes and physical shapes is described elsewhere
 		- but the same logic would be used nevertheless
+
+- Alt + R only unloads the magazine
+	- We can quickly hide the weapon to interrupt reloading
+	- Could also be used for scavenging
 
