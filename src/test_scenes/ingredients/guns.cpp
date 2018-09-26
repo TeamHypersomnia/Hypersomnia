@@ -237,7 +237,7 @@ namespace test_flavours {
 
 			invariants::missile missile;
 
-			missile.ricochet_cooldown_ms = 17.f;
+			missile.ricochet_born_cooldown_ms = 17.f;
 			missile.destruction_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
 			missile.spawn_exploding_ring = false;
 			missile.destruction_particles.modifier.colorize = white;
@@ -309,7 +309,7 @@ namespace test_flavours {
 
 			invariants::missile missile;
 
-			missile.ricochet_cooldown_ms = 17.f;
+			missile.ricochet_born_cooldown_ms = 17.f;
 			missile.destruction_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
 			missile.spawn_exploding_ring = false;
 			missile.destruction_particles.modifier.colorize = white;
@@ -390,7 +390,7 @@ namespace test_flavours {
 			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_RICOCHET);
 			missile.ricochet_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_RICOCHET);
 			missile.ricochet_particles.modifier.colorize = cyan;
-			missile.ricochet_cooldown_ms = 17.f;
+			missile.ricochet_born_cooldown_ms = 17.f;
 
 			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
 			missile.destruction_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
@@ -448,7 +448,7 @@ namespace test_flavours {
 
 			missile.homing_towards_hostile_strength = 1.0f;
 			missile.damage_amount = 42;
-			missile.ricochet_cooldown_ms = 17.f;
+			missile.ricochet_born_cooldown_ms = 17.f;
 
 			auto& trace_modifier = missile.trace_sound.modifier;
 

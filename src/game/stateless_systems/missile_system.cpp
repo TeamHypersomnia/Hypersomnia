@@ -39,7 +39,8 @@
 #include "game/detail/physics/missile_surface_info.h"
 #include "game/detail/explosive/detonate.h"
 
-#define LOG_RICOCHETS 0
+#define USER_RICOCHET_COOLDOWNS 0
+#define LOG_RICOCHETS 1
 
 template <class... Args>
 void RIC_LOG(Args&&... args) {
@@ -78,7 +79,7 @@ void missile_system::ricochet_missiles(const logic_step step) {
 
 	for (const auto& it : events) {
 		{
-			const bool interested = it.type != messages::collision_message::event_type::BEGIN_CONTACT;
+			const bool interested = it.type == messages::collision_message::event_type::BEGIN_CONTACT;
 
 			if (!interested || it.one_is_sensor) {
 				continue;
@@ -89,12 +90,19 @@ void missile_system::ricochet_missiles(const logic_step step) {
 		const auto missile_handle = cosm[it.collider];
 
 		missile_handle.dispatch_on_having_all<invariants::missile>([&](const auto typed_missile) {
+			RIC_LOG("(RIC)(%x) MISSILE %x WITH: %x", now.step, "CONTACT START", surface_handle);
+
 			const auto& missile_def = typed_missile.template get<invariants::missile>();
+			const auto ricochet_cooldown_ms = missile_def.ricochet_cooldown_ms;
+			(void)missile_def;
+			(void)ricochet_cooldown_ms;
+
 			auto& missile = typed_missile.template get<components::missile>();
 
 			const auto info = missile_surface_info(typed_missile, surface_handle);
 
 			if (!info.is_ricochetable()) {
+				RIC_LOG("non-ricochetable surface, IGNORED");
 				return;
 			}
 
@@ -106,6 +114,7 @@ void missile_system::ricochet_missiles(const logic_step step) {
 			const auto impact_dot_normal = impact_dir.dot(collision_normal);
 
 			if (impact_dot_normal >= 0.f) {
+				RIC_LOG("dot normal is %x, IGNORED", impact_dot_normal);
 				return;
 			}
 
@@ -128,25 +137,42 @@ void missile_system::ricochet_missiles(const logic_step step) {
 					vec2(it.point),
 					vec2(it.point) + collision_normal * 150
 				);
+
+				DEBUG_PERSISTENT_LINES.emplace_back(
+					green,
+					vec2(it.point),
+					vec2(it.point) - impact_dir * 150
+				);
 			}
 
 			RIC_LOG_NVPS(left_b, hit_facing, right_b);
 
 			if (hit_facing > left_b && hit_facing < right_b) {
 				{
-					const bool ricochet_cooldown = clk.lasts(
-						missile_def.ricochet_cooldown_ms,
-						missile.when_last_ricocheted
-					);
-
 					const bool born_cooldown = clk.lasts(
-						missile_def.ricochet_cooldown_ms,
+						missile_def.ricochet_born_cooldown_ms,
 						missile_handle.when_born()
 					);
 
-					if (ricochet_cooldown || born_cooldown) {
+					if (born_cooldown) {
+						RIC_LOG("Rico: born cooldown");
 						return;
 					}
+
+#if USER_RICOCHET_COOLDOWNS
+					const bool ricochet_cooldown = clk.lasts(
+						ricochet_cooldown_ms,
+						missile.when_last_ricocheted
+					);
+#else
+					const bool ricochet_cooldown = now.step <= missile.when_last_ricocheted.step + 1;
+#endif
+					if (ricochet_cooldown) {
+						RIC_LOG("Rico: rico cooldown");
+						return;
+					}
+
+					RIC_LOG("NO COOLDOWN, performing RICOCHET with %x, NOW: %x, impact dir: %x, coll normal: %x", surface_handle, now.step, impact_dir, collision_normal);
 				}
 
 				const auto angle = std::min(hit_facing - left_b, right_b - hit_facing);
@@ -160,7 +186,11 @@ void missile_system::ricochet_missiles(const logic_step step) {
 				const auto target_position = rigid_body.get_transform().pos;
 				const auto new_transform = transformr(target_position, reflected_dir.degrees());
 
-				rigid_body.set_velocity(reflected_dir * impact_speed);
+				const auto new_velocity = reflected_dir * impact_speed;
+
+				RIC_LOG_NVPS(new_velocity);
+
+				rigid_body.set_velocity(new_velocity);
 				rigid_body.set_transform(new_transform);
 
 				::play_collision_sound(angle_mult * 150.f, it.point, typed_missile, surface_handle, step);
@@ -188,6 +218,9 @@ void missile_system::ricochet_missiles(const logic_step step) {
 					);
 				}
 			}
+			else {
+				RIC_LOG("Not enough facing. IGNORED.");
+			}
 		});
 	}
 }
@@ -195,6 +228,7 @@ void missile_system::ricochet_missiles(const logic_step step) {
 void missile_system::detonate_colliding_missiles(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	const auto& clk = cosm.get_clock();
+	const auto& now = clk.now;
 	const auto& events = step.get_queue<messages::collision_message>();
 
 	const auto steps = cosm.get_total_steps_passed();
@@ -216,13 +250,20 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 		const auto missile_handle = cosm[it.collider];
 
 		missile_handle.dispatch_on_having_all<invariants::missile>([&](const auto typed_missile) {
+			RIC_LOG("(DET) MISSILE %x WITH: %x", pre_solve ? "PRE SOLVE" : "CONTACT START", surface_handle);
+
 			const auto& missile_def = typed_missile.template get<invariants::missile>();
+			const auto ricochet_cooldown_ms = missile_def.ricochet_cooldown_ms;
+			(void)missile_def;
+			(void)ricochet_cooldown_ms;
+
 			auto& missile = typed_missile.template get<components::missile>();
 
 			const auto collision_normal = vec2(it.normal).normalize();
 			const auto info = missile_surface_info(typed_missile, surface_handle);
 
 			if (info.should_ignore_altogether()) {
+				RIC_LOG("IGNORED");
 				return;
 			}
 
@@ -254,20 +295,21 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			}
 
 			{
+
+#if USER_RICOCHET_COOLDOWNS
 				const bool ricochet_cooldown = clk.lasts(
-					missile_def.ricochet_cooldown_ms,
+					ricochet_cooldown_ms,
 					missile.when_last_ricocheted
 				);
-
-				RIC_LOG_NVPS(missile_def.ricochet_cooldown_ms, missile.when_last_ricocheted.step);
-
+#else
+				const bool ricochet_cooldown = now.step <= missile.when_last_ricocheted.step + 1;
+#endif
 				if (ricochet_cooldown) {
-					RIC_LOG("Det: rico cooldown");
+					RIC_LOG("DET: rico cooldown, no impact");
 					return;
 				}
-				else {
-					RIC_LOG("Det: NO COOLDOWN");
-				}
+
+				RIC_LOG("DET: NO COOLDOWN, IMPACTING");
 			}
 
 			const auto impact_velocity = it.collider_impact_velocity;

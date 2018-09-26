@@ -385,6 +385,9 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							while (charges--) {
 								if (const auto round_flavour = single_bullet_or_pellet_stack.get<invariants::cartridge>().round_flavour; round_flavour.is_set()) {
 									cosmic::create_entity(cosmos, round_flavour, [&](const auto round_entity, auto&&...){
+#if !ENABLE_RECOIL
+										LOG("ROUND CREATED");
+#endif
 										auto& sender = round_entity.template get<components::sender>();
 										sender.set(gun_entity);
 

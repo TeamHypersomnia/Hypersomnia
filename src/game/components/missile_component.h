@@ -79,6 +79,7 @@ namespace invariants {
 
 		remnant_flavour_vector remnant_flavours;
 		real32 ricochet_cooldown_ms = 24.f;
+		real32 ricochet_born_cooldown_ms = 24.f;
 		// END GEN INTROSPECTOR
 	};
 }
