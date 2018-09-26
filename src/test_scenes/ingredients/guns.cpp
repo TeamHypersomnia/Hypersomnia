@@ -1481,7 +1481,7 @@ namespace test_flavours {
 			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::CALICO_SHOT);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
-			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::LIGHT_PISTOL_CHAMBERING);
+			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::HEAVY_PISTOL_CHAMBERING);
 
 			meta.set(gun_def);
 
