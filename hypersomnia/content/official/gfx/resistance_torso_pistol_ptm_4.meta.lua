@@ -78,6 +78,10 @@ return {
         y = 0
       }
     },
+    non_standard_shape = {
+      convex_partition = {},
+      original_poly = {}
+    },
     torso = {
       back = {
         pos = {
@@ -102,8 +106,8 @@ return {
       },
       primary_hand = {
         pos = {
-          x = 20,
-          y = -34
+          x = 17,
+          y = -36
         },
         rotation = -135
       },
