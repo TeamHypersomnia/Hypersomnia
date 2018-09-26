@@ -6,7 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Add grenades to the buy menu
 - Fix convex partitioning bug
+- Fix triangle bug in visibility system
 
 - Arbitrary pasting of entities
 	- Vastly useful for importing stuff from testbed maps into existing ones

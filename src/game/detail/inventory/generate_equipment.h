@@ -5,6 +5,7 @@
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
+#include "game/modes/detail/item_purchase_logic.hpp"
 
 template <class E>
 void requested_equipment::generate_for(
@@ -81,7 +82,7 @@ void requested_equipment::generate_for(
 	}();
 
 	auto make_mag = [&](const auto& mag_flavour) {
-		if (mag_flavour.is_set()) {
+		if (mag_flavour.is_set() && is_magazine_like(cosm, mag_flavour)) {
 			const auto magazine = just_create_entity(cosm, mag_flavour);
 			const auto mag_deposit = magazine[slot_function::ITEM_DEPOSIT];
 
