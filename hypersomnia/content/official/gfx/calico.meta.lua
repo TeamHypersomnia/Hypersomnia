@@ -30,10 +30,10 @@ return {
       },
       shell_spawn = {
         pos = {
-          x = -7,
+          x = -23,
           y = -7
         },
-        rotation = 0
+        rotation = -90
       }
     },
     item = {

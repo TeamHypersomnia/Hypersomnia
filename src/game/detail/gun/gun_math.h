@@ -19,12 +19,19 @@ vec2i get_bullet_spawn_offset(const T& gun_handle) {
 template <class T>
 transformr calc_muzzle_transform(
 	const T& gun_handle,
-	const transformr& gun_transform
+	const transformr& gun_transform,
+	const vec2i bullet_spawn_offset
 ) {
-	const auto bullet_spawn_offset = get_bullet_spawn_offset(gun_handle);
-
 	const auto w = gun_handle.get_logical_size().x;
 	return gun_transform * transformr(bullet_spawn_offset + vec2(w / 2, 0));
+}
+
+template <class T>
+transformr calc_muzzle_transform(
+	const T& gun_handle,
+	const transformr& gun_transform
+) {
+	return calc_muzzle_transform(gun_handle, gun_transform, get_bullet_spawn_offset(gun_handle));
 }
 
 template <class T>

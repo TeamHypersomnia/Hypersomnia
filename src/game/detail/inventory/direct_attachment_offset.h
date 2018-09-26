@@ -6,6 +6,7 @@
 #include "game/detail/gun/gun_math.h"
 #include "game/assets/image_offsets.h"
 #include "game/components/torso_component.hpp"
+#include "game/detail/frame_calculation.h"
 
 inline transformr get_anchored_offset(
 	const transformi attachment_offset,
@@ -22,6 +23,7 @@ inline transformr get_anchored_offset(
 struct attachment_offset_settings {
 	bool consider_mag_rotations = false;
 	bool consider_mag_reloads = false;
+	bool consider_weapon_shooting = false;
 
 	static auto for_logic() {
 		return attachment_offset_settings();
@@ -31,6 +33,7 @@ struct attachment_offset_settings {
 		attachment_offset_settings output;
 		output.consider_mag_rotations = true;
 		output.consider_mag_reloads = true;
+		output.consider_weapon_shooting = true;
 		return output;
 	}
 };
@@ -55,7 +58,23 @@ transformr direct_attachment_offset(
 	}();
 
 	auto get_offsets_by_gun = [&]() {
-		if (const auto image_id = container.get_image_id(); image_id.is_set()) {
+		const auto image_id = [&]() {
+			if (settings.consider_weapon_shooting) {
+				if (const auto gun = container.template find<components::gun>()) {
+					const auto& gun_def = container.template get<invariants::gun>();
+
+					if (const auto shoot_animation = logicals.find(gun_def.shoot_animation)) {
+						if (const auto* const frame = ::find_shoot_frame(*gun, *shoot_animation, cosm)) {
+							return frame->image_id;
+						}
+					}
+				}
+			}
+
+			return container.get_image_id();
+		}();
+
+		if (image_id.is_set()) {
 			auto offsets = logicals.get_offsets(image_id).gun;
 
 			if (settings.consider_mag_rotations) {
@@ -112,7 +131,7 @@ transformr direct_attachment_offset(
 		break;
 
 		case slot_function::GUN_MUZZLE: 
-		attachment_offset = ::calc_muzzle_transform(attachment, {}).get_integerized();
+		attachment_offset = ::calc_muzzle_transform(attachment, {}, get_offsets_by_gun().bullet_spawn).get_integerized();
 		anchor = anchors.attachment_anchor;
 		break;
 

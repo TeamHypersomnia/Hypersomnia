@@ -23,17 +23,17 @@ return {
       },
       detachable_magazine = {
         pos = {
-          x = -6,
+          x = -12,
           y = -8
         },
         rotation = 0
       },
       shell_spawn = {
         pos = {
-          x = -7,
+          x = -23,
           y = -7
         },
-        rotation = 0
+        rotation = -90
       }
     },
     item = {

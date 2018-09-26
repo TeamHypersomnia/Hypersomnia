@@ -3,6 +3,10 @@
 #include "game/components/movement_component.h"
 #include "game/assets/animation_math.h"
 #include "game/detail/inventory/weapon_reloading.hpp"
+#include "game/assets/animation.h"
+#include "game/components/animation_component.h"
+
+using cosmos_clock = augs::stepped_clock;
 
 template <class L>
 const plain_animation_frame* find_frame(
