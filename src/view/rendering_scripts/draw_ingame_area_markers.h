@@ -4,7 +4,7 @@
 #include "game/components/marker_component.h"
 
 template <class E>
-void draw_marker_borders(
+void draw_ingame_area_markers(
 	const E& typed_handle, 
 	const augs::line_drawer_with_default& drawer,
 	const transformr where,
@@ -13,6 +13,10 @@ void draw_marker_borders(
 	std::optional<rgba> color = std::nullopt
 ) {
 	if (const auto marker = typed_handle.template find<invariants::box_marker>()) {
+		if (marker->type == area_marker_type::ORGANISM_AREA) {
+			return;
+		}
+
 		const auto size = typed_handle.get_logical_size();
 
 		if (color == std::nullopt) {

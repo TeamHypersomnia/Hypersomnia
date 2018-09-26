@@ -21,7 +21,7 @@
 
 #include "application/setups/editor/gui/editor_tab_gui.h"
 #include "application/setups/draw_setup_gui_input.h"
-#include "view/rendering_scripts/draw_marker_borders.h"
+#include "view/rendering_scripts/draw_ingame_area_markers.h"
 
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/lua_file.h"
@@ -1325,7 +1325,7 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 				border_input { 1, 2 }
 			);
 
-			::draw_marker_borders(typed_handle, lines, screen_space, in.cone.eye.zoom, 1.f, color);
+			::draw_ingame_area_markers(typed_handle, lines, screen_space, in.cone.eye.zoom, 1.f, color);
 		}	
 	);
 
