@@ -27,7 +27,7 @@
 #include "view/rendering_scripts/illuminated_rendering.h"
 #include "view/rendering_scripts/draw_wandering_pixels_as_sprites.h"
 #include "view/rendering_scripts/helper_drawer.h"
-#include "view/rendering_scripts/draw_ingame_area_markers.h"
+#include "view/rendering_scripts/draw_area_indicator.h"
 
 #include "view/viewables/all_viewables_declaration.h"
 #include "view/viewables/image_in_atlas.h"
@@ -441,9 +441,10 @@ void illuminated_rendering(
 
 		if (markers.is_enabled) {
 			visible.for_each<render_layer::AREA_MARKERS>(cosm, [&](const auto e) {
-				e.template dispatch_on_having_all<invariants::box_marker>([&](const auto typed_handle){ 
+				e.template dispatch_on_having_all<invariants::box_marker>([&](const auto typed_handle) { 
 					const auto where = typed_handle.get_logic_transform();
-					::draw_ingame_area_markers(typed_handle, line_output, where, cone.eye.zoom, markers.value);
+					const auto& marker_alpha = markers.value;
+					::draw_area_indicator(typed_handle, line_output, where, cone.eye.zoom, marker_alpha, drawn_indicator_type::INGAME);
 				});
 			});
 		}

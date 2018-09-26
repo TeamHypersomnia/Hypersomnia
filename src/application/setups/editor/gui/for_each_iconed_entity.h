@@ -30,7 +30,7 @@ struct marker_icon {
 		}
 		else if (type == area_marker_type::ORGANISM_AREA) {
 			id = I::EDITOR_ICON_ORGANISM_AREA;
-			col = white;
+			col = green;
 		}
 	}
 

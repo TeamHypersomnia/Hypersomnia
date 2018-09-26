@@ -3,18 +3,26 @@
 #include "augs/drawing/drawing.h"
 #include "game/components/marker_component.h"
 
+enum class drawn_indicator_type {
+	EDITOR,
+	INGAME
+};
+
 template <class E>
-void draw_ingame_area_markers(
+void draw_area_indicator(
 	const E& typed_handle, 
 	const augs::line_drawer_with_default& drawer,
 	const transformr where,
 	const float zoom,
 	const float alpha,
+	const drawn_indicator_type type,
 	std::optional<rgba> color = std::nullopt
 ) {
 	if (const auto marker = typed_handle.template find<invariants::box_marker>()) {
-		if (marker->type == area_marker_type::ORGANISM_AREA) {
-			return;
+		if (type == drawn_indicator_type::INGAME) {
+			if (marker->type == area_marker_type::ORGANISM_AREA) {
+				return;
+			}
 		}
 
 		const auto size = typed_handle.get_logical_size();
