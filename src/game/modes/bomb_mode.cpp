@@ -1028,9 +1028,14 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 									continue;
 								}
 
-								const auto price = ::get_price_of(cosm, f_id);
+								const auto price = ::find_price_of(cosm, f_id);
+								const bool price_correct = price && *price != 0;
 
-								if (money >= price) {
+								if (!price_correct) {
+									continue;
+								}
+
+								if (money >= *price) {
 									if (::num_carryable_pieces(player_handle, ::get_buy_slot_opts(), f_id) == 0) {
 										continue;
 									}
@@ -1054,7 +1059,7 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 
 									eq.generate_for(player_handle, step);
 
-									money -= price;
+									money -= *price;
 								}
 
 								continue;
@@ -1065,11 +1070,16 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 									continue;
 								}
 
-								const auto price = ::get_price_of(cosm, s_id);
+								const auto price = ::find_price_of(cosm, s_id);
+								const bool price_correct = price && *price != 0;
+
+								if (!price_correct) {
+									continue;
+								}
 
 								const auto& sentience = player_handle.template get<components::sentience>();
 
-								if (money >= price && !sentience.is_learnt(s_id)) {
+								if (money >= *price && !sentience.is_learnt(s_id)) {
 									requested_equipment eq;
 
 									eq.spells_to_give[s_id.get_index()] = true;
@@ -1077,7 +1087,7 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 
 									::play_learnt_spell_effect(player_handle, s_id, step);
 
-									money -= price;
+									money -= *price;
 								}
 
 								continue;

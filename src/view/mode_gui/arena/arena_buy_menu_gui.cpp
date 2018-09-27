@@ -162,7 +162,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 	};
 
 	auto price_of = [&](const auto& of) {
-		return ::get_price_of(cosm, of);
+		return *::find_price_of(cosm, of);
 	};
 
 	enum class button_type {
@@ -617,10 +617,12 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				for (const auto& b : buyable_items) {
 					const auto index = 1 + index_in(buyable_items, b);
 
-					ImGui::Separator();
+					if (price_of(b) > 0) {
+						ImGui::Separator();
 
-					if (purchase_item_button(b, button_type::BUYABLE_WEAPON, index)) {
-						set_result(b);
+						if (purchase_item_button(b, button_type::BUYABLE_WEAPON, index)) {
+							set_result(b);
+						}
 					}
 				}
 
@@ -653,10 +655,12 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				for (const auto& b : buyable_spells) {
 					const auto index = 1 + index_in(buyable_spells, b);
 
-					ImGui::Separator();
+					if (price_of(b) > 0) {
+						ImGui::Separator();
 
-					if (purchase_spell_button(b, index)) {
-						set_result(b);
+						if (purchase_spell_button(b, index)) {
+							set_result(b);
+						}
 					}
 				}
 
@@ -705,6 +709,10 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				);
 			};
 
+			auto for_each_grenade = [&](auto&& callback) {
+				cosm.for_each_flavour_having<invariants::hand_fuse>(callback);
+			};
+
 			switch (current_menu) {
 				case buy_menu_type::PISTOLS: {
 					do_item_menu(
@@ -748,6 +756,15 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 				case buy_menu_type::SPELLS: {
 					do_spells_menu();
+					break;
+				}
+
+				case buy_menu_type::GRENADES: {
+					do_item_menu(
+						std::nullopt,
+						for_each_grenade
+					);
+
 					break;
 				}
 

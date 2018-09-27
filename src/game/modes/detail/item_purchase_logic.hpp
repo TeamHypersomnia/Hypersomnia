@@ -74,14 +74,14 @@ inline bool is_alive(const cosmos& cosm, const spell_id& t) {
 }
 
 template <class E>
-auto get_price_of(const cosmos& cosm, const E& object) {
+std::optional<money_type> find_price_of(const cosmos& cosm, const E& object) {
 	if constexpr(std::is_same_v<E, item_flavour_id>) {
 		if (!is_alive(cosm, object)) {
 			return static_cast<money_type>(0);
 		}
 
 		return cosm.on_flavour(object, [&](const auto& typed_flavour) {
-			return *typed_flavour.find_price();
+			return typed_flavour.find_price();
 		});
 	}
 	else {
