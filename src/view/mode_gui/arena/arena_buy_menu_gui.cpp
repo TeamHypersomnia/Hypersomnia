@@ -687,10 +687,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 			auto for_each_shotgun = [&](auto&& callback) {
 				cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
-					const auto& gun_def = flavour.template get<invariants::gun>();
-
-					if (gun_def.shot_cooldown_ms > 150) {
-						/* A heavy gun with such a slow firerate must be a shotgun */
+					if (is_shotgun_like(cosm, id)) {
 						callback(id, flavour);
 					}
 				});
@@ -743,7 +740,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 				case buy_menu_type::SHOTGUNS: {
 					do_item_menu(
-						item_holding_stance::HEAVY_LIKE,
+						item_holding_stance::RIFLE_LIKE,
 						for_each_shotgun
 					);
 					break;

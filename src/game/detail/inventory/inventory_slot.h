@@ -31,7 +31,7 @@ struct inventory_slot {
 	bool only_last_inserted_is_movable = false;
 	bool always_allow_exactly_one_item = false;
 	bool contributes_to_space_occupied = true;
-	pad_bytes<1> pad;
+	bool draw_under_container = false;
 
 	inventory_space_type space_available = 0;
 

@@ -105,6 +105,18 @@ inline bool is_magazine_like(const cosmos& cosm, const item_flavour_id& id) {
 	});
 }
 
+inline bool is_shotgun_like(const cosmos& cosm, const item_flavour_id& id) {
+	return cosm.on_flavour(id, [&](const auto& typed_flavour) {
+		if (const auto gun = typed_flavour.template find<invariants::gun>()) {
+			return gun->shot_cooldown_ms >= 200.f && std::fabs(gun->muzzle_velocity.first - gun->muzzle_velocity.second) >= 1000.f;
+		}
+
+		return false;
+	});
+
+	return false;
+}
+
 template <class E, class T>
 bool factions_compatible(
 	const E& subject, 

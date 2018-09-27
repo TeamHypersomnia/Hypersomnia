@@ -382,41 +382,69 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 							int charges = { single_bullet_or_pellet_stack.get<components::item>().get_charges() };
 
+							auto rng = cosmos.get_rng_for(single_bullet_or_pellet_stack);
+
 							while (charges--) {
-								if (const auto round_flavour = single_bullet_or_pellet_stack.get<invariants::cartridge>().round_flavour; round_flavour.is_set()) {
-									cosmic::create_entity(cosmos, round_flavour, [&](const auto round_entity, auto&&...){
+								const auto& cartridge_def = single_bullet_or_pellet_stack.get<invariants::cartridge>();
+
+								if (const auto round_flavour = cartridge_def.round_flavour; round_flavour.is_set()) {
+									const auto& num_rounds = cartridge_def.num_rounds_spawned;
+
+									auto create_round = [&](const std::optional<real32> rotational_offset) {
+										cosmic::create_entity(cosmos, round_flavour, [&](const auto round_entity, auto&&...) {
 #if !ENABLE_RECOIL
-										LOG("ROUND CREATED");
+											LOG("ROUND CREATED");
 #endif
-										auto& sender = round_entity.template get<components::sender>();
-										sender.set(gun_entity);
+											auto& sender = round_entity.template get<components::sender>();
+											sender.set(gun_entity);
 
-										{
-											auto& missile = round_entity.template get<components::missile>();
-											missile.power_multiplier_of_sender = gun_def.damage_multiplier;
+											{
+												auto& missile = round_entity.template get<components::missile>();
+												missile.power_multiplier_of_sender = gun_def.damage_multiplier;
+											}
+
+											const auto& missile_def = round_entity.template get<invariants::missile>();
+											total_recoil += missile_def.recoil_multiplier * gun_def.recoil_multiplier / num_rounds;
+
+											const auto considered_muzzle_transform = [&]() {
+												if (rotational_offset.has_value()) {
+													auto o = muzzle_transform;
+													o.rotation += *rotational_offset;
+													return o;
+												}
+
+												return muzzle_transform;
+											}();
+
+											round_entity.set_logic_transform(considered_muzzle_transform);
+
+											response.spawned_rounds.push_back(round_entity);
+
+											{
+												const auto missile_velocity = 
+													vec2::from_degrees(considered_muzzle_transform.rotation)
+													* missile_def.muzzle_velocity_mult
+													* rng.randval(gun_def.muzzle_velocity)
+												;
+
+												round_entity.template get<components::rigid_body>().set_velocity(missile_velocity);
+											}
+
+											correct_interpolation_for(round_entity);
+										}, [&](const auto) {});
+									};
+
+									if (num_rounds == 1) {
+										create_round(std::nullopt);
+									}
+									else {
+										const auto hv = rng.randval_h(cartridge_def.rounds_spread_degrees_variation / 2);
+										const auto h = (cartridge_def.rounds_spread_degrees + hv) / 2;
+
+										for (int r = 0; r < num_rounds; ++r) {
+											create_round(rng.randval_h(h));
 										}
-
-										const auto& missile_def = round_entity.template get<invariants::missile>();
-										total_recoil += missile_def.recoil_multiplier * gun_def.recoil_multiplier;
-
-										round_entity.set_logic_transform(muzzle_transform);
-
-										response.spawned_rounds.push_back(round_entity);
-
-										{
-											auto rng = cosmos.get_rng_for(round_entity);
-
-											const auto missile_velocity = 
-												vec2::from_degrees(muzzle_transform.rotation)
-												* missile_def.muzzle_velocity_mult
-												* rng.randval(gun_def.muzzle_velocity)
-											;
-
-											round_entity.template get<components::rigid_body>().set_velocity(missile_velocity);
-										}
-
-										correct_interpolation_for(round_entity);
-									}, [&](const auto) {});
+									}
 								}
 							}
 

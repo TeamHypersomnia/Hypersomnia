@@ -6,6 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Fix rendering order of dropped gun attachments
+	- Also make it possible to always render them under?
+
+- Enlarge sentiences boxes?
+	- Or add to requests when a held entity requested to draw?
+	- Would be hard since it w
+
 - Add grenades to the buy menu
 - Fix convex partitioning bug
 - Fix triangle bug in visibility system

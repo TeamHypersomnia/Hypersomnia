@@ -23,6 +23,7 @@ namespace invariants {
 
 		int num_rounds_spawned = 1;
 		real32 rounds_spread_degrees = 0.f;
+		real32 rounds_spread_degrees_variation = 0.f;
 		// END GEN INTROSPECTOR
 	};
 }
