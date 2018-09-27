@@ -21,6 +21,7 @@
 #include "view/game_gui/elements/slot_button.h"
 #include "view/game_gui/elements/item_button.h"
 #include "game/messages/changed_identities_message.h"
+#include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #include "game/detail/entity_handle_mixins/make_wielding_transfers.hpp"
@@ -500,6 +501,7 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 		const bool interested =
 			target_slot.alive()
 			&& transferred_item.alive()
+			&& is_weapon_like(transferred_item)
 			&& target_slot.get_type() != slot_function::PERSONAL_DEPOSIT
 			&& (transfer.result.is_pickup() || (same_capability && !target_slot->is_mounted_slot()))
 		;

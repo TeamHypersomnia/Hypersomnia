@@ -64,7 +64,7 @@ namespace test_scenes {
 #define GIVE_AMMO 1
 
 #if GIVE_AMMO
-			resistance.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::WARX_FQ12);
+			resistance.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::CALICO);
 			metropolis.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::WARX_FQ12);
 			metropolis.initial_eq.belt_wearable = to_entity_flavour_id(test_tool_items::DEFUSE_KIT);
 #endif

@@ -754,7 +754,7 @@ namespace test_flavours {
 
 				cartridge.num_rounds_spawned = 10;
 				cartridge.rounds_spread_degrees = 20.f;
-				cartridge.rounds_spread_degrees_variation = 5.f;
+				cartridge.rounds_spread_degrees_variation = 7.f;
 
 				meta.set(cartridge);
 			}
@@ -1663,7 +1663,7 @@ namespace test_flavours {
 			gun_def.gunshot_adds_heat = 0.242f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
-			gun_def.adversarial.knockout_award = static_cast<money_type>(700);
+			gun_def.adversarial.knockout_award = static_cast<money_type>(150);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 
