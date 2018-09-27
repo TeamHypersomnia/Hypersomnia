@@ -272,8 +272,6 @@ unsigned to_space_units(const std::string& s) {
 	}
 
 	for (auto& c : s) {
-		ensure(mult > 0);
-		
 		if (c == '.') {
 			continue;
 		}

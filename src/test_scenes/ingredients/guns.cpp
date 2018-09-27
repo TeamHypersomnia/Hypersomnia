@@ -115,7 +115,7 @@ namespace test_flavours {
 			meta.set(container);
 
 			invariants::item item;
-			item.space_occupied_per_charge = to_space_units(typesafe_sprintf("%x", real32(meta.template get<invariants::sprite>().size.area()) / 200));
+			item.space_occupied_per_charge = to_space_units(typesafe_sprintf("%x", real32(meta.template get<invariants::sprite>().size.area()) / 450));
 			item.holding_stance = stance;
 			item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
 			item.gratis_ammo_pieces_with_first = 3;
@@ -397,7 +397,7 @@ namespace test_flavours {
 			missile.ricochet_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_RICOCHET);
 
 			missile.destruction_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
-			missile.damage_amount = 7;
+			missile.damage_amount = 6;
 			missile.max_lifetime_ms = 350.f;
 
 			auto& trace_modifier = missile.trace_sound.modifier;
