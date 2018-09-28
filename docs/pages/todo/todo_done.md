@@ -1571,3 +1571,18 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - add this maybe? https://github.com/jpakkane/naturalsort
 
+- Add grenades to the buy menu
+- Marker entity: movement path origin
+
+- Transform design
+	- It is the case that many entities might share identical origin, in which case it would be unwieldy to update origins for all entities to a new one.
+		- E.g. fish in aquarium.
+	- It is also the case that the origins might be tied to decorational entities.
+		- E.g. aquarium sand.
+	- movement path component will have an origin transform which will automatically be moved by the editor
+		- the transform component will be kept up to date and it will be the logical transform
+		- the rendering code will also only touch this logical transform
+	- for editor, the origin could just also be accessed as an independent transform
+		- so access_independent_transform -> access_independent_transforms
+		- con: more memory wasted? who gives a heck, though...
+

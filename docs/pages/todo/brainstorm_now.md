@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Somehow communicate the number of magazines available and their fillings
+- Maybe just automatically arrange the items in inventory gui and keep containers open by default?
+
 - Fix rendering order of dropped gun attachments
 	- Also make it possible to always render them under?
 
@@ -13,7 +16,6 @@ summary: That which we are brainstorming at the moment.
 	- Or add to requests when a held entity requested to draw?
 	- Would be hard since it w
 
-- Add grenades to the buy menu
 - Fix convex partitioning bug
 - Fix triangle bug in visibility system
 
@@ -31,20 +33,6 @@ summary: That which we are brainstorming at the moment.
 			- paste entity flavour + paste entity command, stored, waiting to be executed!
 				- the move itself won't need to be stored
 	- Cut is just copy + delete
-
-- Marker entity: movement path origin
-
-- Transform design
-	- It is the case that many entities might share identical origin, in which case it would be unwieldy to update origins for all entities to a new one.
-		- E.g. fish in aquarium.
-	- It is also the case that the origins might be tied to decorational entities.
-		- E.g. aquarium sand.
-	- movement path component will have an origin transform which will automatically be moved by the editor
-		- the transform component will be kept up to date and it will be the logical transform
-		- the rendering code will also only touch this logical transform
-	- for editor, the origin could just also be accessed as an independent transform
-		- so access_independent_transform -> access_independent_transforms
-		- con: more memory wasted? who gives a heck, though...
 
 - Game events log and chat
 	- In the same window
@@ -243,9 +231,9 @@ summary: That which we are brainstorming at the moment.
 		- writes all visible project files: intercosm and all rulesets visible to the editor. Purges autosave once done.
 		- if saving for the first time to a directory, editor may ask
 			- Are you sure you want to overwrite 3 file(s)
-				/home/pbc/x.int
-				/home/pbc/x.hyproj
-				/home/pbc/autosave/x.int
+				x/x.int
+				x/x.hyproj
+				x/autosave/x.int
 			?	
 			- (non-existent files and files with 0 size will be excluded)
 			- a different popup design will be in order

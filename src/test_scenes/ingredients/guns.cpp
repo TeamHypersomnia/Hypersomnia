@@ -1342,7 +1342,7 @@ namespace test_flavours {
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.062f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
-			gun_def.recoil_multiplier = 1.3f;
+			gun_def.recoil_multiplier = 1.15f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(400);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);

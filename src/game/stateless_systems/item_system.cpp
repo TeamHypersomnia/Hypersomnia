@@ -72,6 +72,7 @@ auto calc_reloading_context(const E& capability) {
 			entity_id current_mag_id;
 
 			int best_num_charges = -1;
+			int current_num_charges = -1;
 
 			auto is_better = [&](const auto& charges, const auto& candidate) {
 				if (charges == best_num_charges) {
@@ -100,6 +101,7 @@ auto calc_reloading_context(const E& capability) {
 			if (const auto current_mag = mag_slot.get_item_if_any()) {
 				current_mag_id = current_mag.get_id();
 				try_mag(current_mag);
+				current_num_charges = best_num_charges;
 			}
 
 			const auto traversed_slots = slot_flags {
@@ -122,7 +124,7 @@ auto calc_reloading_context(const E& capability) {
 				traversed_slots
 			);
 
-			if (best_num_charges > 0 && best_mag != current_mag_id) {
+			if (best_num_charges > current_num_charges && best_mag != current_mag_id) {
 				RLD_LOG("Found best: has %x charges.", best_num_charges);
 				ctx.concerned_slot = mag_slot;
 				ctx.new_ammo_source = best_mag;
