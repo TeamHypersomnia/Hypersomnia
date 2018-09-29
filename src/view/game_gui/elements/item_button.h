@@ -56,8 +56,8 @@ struct item_button : game_gui_rect_node {
 
 	template <class C, class gui_element_id, class L>
 	static void for_each_child(const C context, const gui_element_id this_id, L generic_call) {
-		const auto& cosmos = context.get_cosmos();
-		const auto container_entity = cosmos[this_id.get_location().item_id];
+		const auto& cosm = context.get_cosmos();
+		const auto container_entity = cosm[this_id.get_location().item_id];
 
 		if (const auto container = container_entity.template find<invariants::container>()) {
 			for (const auto& s : container->slots) {

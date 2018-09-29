@@ -158,10 +158,10 @@ entity_id get_closest_hostile(
 	const float radius,
 	const b2Filter filter
 ) {
-	const auto& cosmos = subject.get_cosmos();
-	const auto si = cosmos.get_si();
+	const auto& cosm = subject.get_cosmos();
+	const auto si = cosm.get_si();
 
-	const auto& physics = cosmos.get_solvable_inferred().physics;
+	const auto& physics = cosm.get_solvable_inferred().physics;
 	const auto transform = subject.get_logic_transform();
 
 	entity_id closest_hostile;
@@ -177,7 +177,7 @@ entity_id get_closest_hostile(
 			transform.pos + vec2(radius, radius),
 			filter,
 			[&](const b2Fixture* const fix) {
-				const const_entity_handle s = cosmos[get_body_entity_that_owns(fix)];
+				const const_entity_handle s = cosm[get_body_entity_that_owns(fix)];
 
 				if (s != subject && s.has<components::attitude>() && !s.sentient_and_unconscious()) {
 					const auto calculated_attitude = calc_attitude(s, subject_attitude);
@@ -206,10 +206,10 @@ std::vector<entity_id> get_closest_hostiles(
 	const float radius,
 	const b2Filter filter
 ) {
-	const auto& cosmos = subject.get_cosmos();
-	const auto si = cosmos.get_si();
+	const auto& cosm = subject.get_cosmos();
+	const auto si = cosm.get_si();
 
-	const auto& physics = cosmos.get_solvable_inferred().physics;
+	const auto& physics = cosm.get_solvable_inferred().physics;
 	const auto transform = subject.get_logic_transform();
 
 	struct hostile_entry {
@@ -240,7 +240,7 @@ std::vector<entity_id> get_closest_hostiles(
 			transform.pos + vec2(radius, radius),
 			filter,
 			[&](const b2Fixture* const fix) {
-				const const_entity_handle s = cosmos[get_body_entity_that_owns(fix)];
+				const const_entity_handle s = cosm[get_body_entity_that_owns(fix)];
 
 				if (s != subject && s.has<components::attitude>()) {
 					const auto calculated_attitude = calc_attitude(s, subject_attitude);

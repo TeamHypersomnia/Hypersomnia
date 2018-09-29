@@ -4,11 +4,11 @@
 
 template <class T>
 vec2i get_bullet_spawn_offset(const T& gun_handle) {
-	const auto& cosmos = gun_handle.get_cosmos();
+	const auto& cosm = gun_handle.get_cosmos();
 
 	if (const auto* const sprite = gun_handle.template find<invariants::sprite>()) {
 		const auto reference_id = sprite->image_id;
-		const auto& offsets = cosmos.get_logical_assets().get_offsets(reference_id);
+		const auto& offsets = cosm.get_logical_assets().get_offsets(reference_id);
 
 		return offsets.gun.bullet_spawn;
 	}

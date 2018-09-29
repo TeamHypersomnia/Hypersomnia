@@ -17,11 +17,11 @@
 #include "game/stateless_systems/car_system.h"
 
 void car_system::set_steering_flags_from_intents(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 	const auto& intents = step.get_queue<messages::intent_message>();
 
 	for (auto& it : intents) {
-		auto* const maybe_car = cosmos[it.subject].find<components::car>();
+		auto* const maybe_car = cosm[it.subject].find<components::car>();
 		
 		if (maybe_car == nullptr) {
 			continue;
@@ -51,10 +51,10 @@ void car_system::set_steering_flags_from_intents(const logic_step step) {
 }
 
 void car_system::apply_movement_forces(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 	const auto delta = step.get_delta();
 
-	cosmos.for_each_having<components::car>( 
+	cosm.for_each_having<components::car>( 
 		[&](const auto it) {
 			auto& car = it.template get<components::car>();
 			const auto rigid_body = it.template get<components::rigid_body>();
@@ -168,17 +168,17 @@ void car_system::apply_movement_forces(const logic_step step) {
 				}
 			};
 
-			engine_handler(cosmos[car.deceleration_engine[0].particles], car.decelerating && !car.accelerating);
-			engine_handler(cosmos[car.deceleration_engine[1].particles], car.decelerating && !car.accelerating);
+			engine_handler(cosm[car.deceleration_engine[0].particles], car.decelerating && !car.accelerating);
+			engine_handler(cosm[car.deceleration_engine[1].particles], car.decelerating && !car.accelerating);
 
-			engine_handler(cosmos[car.acceleration_engine[0].particles], car.accelerating && !car.decelerating);
-			engine_handler(cosmos[car.acceleration_engine[1].particles], car.accelerating && !car.decelerating);
+			engine_handler(cosm[car.acceleration_engine[0].particles], car.accelerating && !car.decelerating);
+			engine_handler(cosm[car.acceleration_engine[1].particles], car.accelerating && !car.decelerating);
 
-			engine_handler(cosmos[car.right_engine.particles], car.turning_left && !car.turning_right);
-			engine_handler(cosmos[car.left_engine.particles], car.turning_right && !car.turning_left);
+			engine_handler(cosm[car.right_engine.particles], car.turning_left && !car.turning_right);
+			engine_handler(cosm[car.left_engine.particles], car.turning_right && !car.turning_left);
 
-			const bool sound_enabled = cosmos[car.current_driver].alive();
-			const auto sound_entity = cosmos[car.engine_sound];
+			const bool sound_enabled = cosm[car.current_driver].alive();
+			const auto sound_entity = cosm[car.engine_sound];
 			const float pitch = 0.3f 
 				+ speed 
 					* 1.2f / car.speed_for_pitch_unit
@@ -189,8 +189,8 @@ void car_system::apply_movement_forces(const logic_step step) {
 			if (sound_entity.alive() && sound_entity.has<components::sound_existence>()) {
 				auto& existence = sound_entity.template get<components::sound_existence>();
 
-				if (cosmos[car.current_driver].alive()) {
-					const auto since_last_turn_on = (cosmos.get_timestamp() - car.last_turned_on).in_seconds(cosmos.get_fixed_delta());
+				if (cosm[car.current_driver].alive()) {
+					const auto since_last_turn_on = (cosm.get_timestamp() - car.last_turned_on).in_seconds(cosm.get_fixed_delta());
 
 					existence.input.direct_listener = car.current_driver;
 					existence.input.effect.modifier.pitch = std::min(since_last_turn_on / 1.5f, pitch);
@@ -199,7 +199,7 @@ void car_system::apply_movement_forces(const logic_step step) {
 					components::sound_existence::activate(sound_entity);
 				}
 				else {
-					const auto since_last_turn_off = (cosmos.get_timestamp() - car.last_turned_off).in_seconds(cosmos.get_fixed_delta());
+					const auto since_last_turn_off = (cosm.get_timestamp() - car.last_turned_off).in_seconds(cosm.get_fixed_delta());
 
 					existence.input.direct_listener.unset();
 					existence.input.effect.modifier.gain = std::max(0.f, 1.f - since_last_turn_off / 1.5f);

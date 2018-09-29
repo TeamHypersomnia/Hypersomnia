@@ -14,7 +14,7 @@ namespace components {
 	}
 
 	void sender::set(const const_entity_handle new_direct_sender) {
-		const auto& cosmos = new_direct_sender.get_cosmos();
+		const auto& cosm = new_direct_sender.get_cosmos();
 
 		set_direct(new_direct_sender);
 
@@ -23,7 +23,7 @@ namespace components {
 			faction_of_sender = capability.get_official_faction();
 
 			if (const auto maybe_driver = capability.find<components::driver>()) {
-				if (cosmos[maybe_driver->owned_vehicle]) {
+				if (cosm[maybe_driver->owned_vehicle]) {
 					vehicle_driven_by_capability = maybe_driver->owned_vehicle;
 				}
 			}

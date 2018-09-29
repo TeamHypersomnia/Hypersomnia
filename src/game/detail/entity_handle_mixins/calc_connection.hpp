@@ -38,14 +38,14 @@ std::optional<colliders_connection> inventory_mixin<E>::calc_connection_to_topmo
 	const auto& self = *static_cast<const E*>(this);
 	ensure(self);
 
-	const auto& cosmos = self.get_cosmos();
+	const auto& cosm = self.get_cosmos();
 
 	colliders_connection result;
 
 	auto it = self.get_current_slot().get_id();
 	entity_id current_attachment = self.get_id();
 
-	while (const auto slot = cosmos[it]) {
+	while (const auto slot = cosm[it]) {
 		if (slot->physical_behaviour == slot_physical_behaviour::DEACTIVATE_BODIES) {
 			/* 
 				Failed: "until" not found before meeting an item deposit.
@@ -61,7 +61,7 @@ std::optional<colliders_connection> inventory_mixin<E>::calc_connection_to_topmo
 			behaviour must be slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY.
 		*/
 
-		detail_save_and_forward(result, slot, cosmos, current_attachment, offsets, it);
+		detail_save_and_forward(result, slot, cosm, current_attachment, offsets, it);
 	}
 
 	for (const auto& o : reverse(offsets)) {
@@ -81,7 +81,7 @@ std::optional<colliders_connection> inventory_mixin<E>::calc_connection_until_co
 	ensure(self);
 	ensure(until.is_set());
 
-	const auto& cosmos = self.get_cosmos();
+	const auto& cosm = self.get_cosmos();
 
 	if (until == self) {
 		return colliders_connection { self, {} };
@@ -93,7 +93,7 @@ std::optional<colliders_connection> inventory_mixin<E>::calc_connection_until_co
 	entity_id current_attachment = self.get_id();
 
 	do {
-		const auto slot = cosmos[it];
+		const auto slot = cosm[it];
 
 		if (slot.dead()) {
 			/* Failed: found a dead slot before could reach "until" */
@@ -110,7 +110,7 @@ std::optional<colliders_connection> inventory_mixin<E>::calc_connection_until_co
 			behaviour must be slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY.
 		*/
 
-		detail_save_and_forward(result, slot, cosmos, current_attachment, offsets, it);
+		detail_save_and_forward(result, slot, cosm, current_attachment, offsets, it);
 	} while(it.container_entity != until);
 
 	for (const auto& o : reverse(offsets)) {

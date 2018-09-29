@@ -127,13 +127,13 @@ std::vector<misprediction_candidate_entry> simulation_receiver::acquire_potentia
 ) const {
 	std::vector<misprediction_candidate_entry> potential_mispredictions;
 	
-	const auto& cosmos = predicted_cosmos_before_reconciliation;
+	const auto& cosm = predicted_cosmos_before_reconciliation;
 	
 	potential_mispredictions.reserve(
-		cosmos.get_solvable().get_count_of(processing_subjects::WITH_ENABLED_PAST_CONTAGIOUS) + unpredictables_infected.size()
+		cosm.get_solvable().get_count_of(processing_subjects::WITH_ENABLED_PAST_CONTAGIOUS) + unpredictables_infected.size()
 	);
 
-	cosmos.for_each_in(
+	cosm.for_each_in(
 		processing_subjects::WITH_ENABLED_PAST_CONTAGIOUS,
 		[&](const const_entity_handle e) {
 			potential_mispredictions.push_back(acquire_potential_misprediction(e));
@@ -141,8 +141,8 @@ std::vector<misprediction_candidate_entry> simulation_receiver::acquire_potentia
 	);
 
 	for (const auto& e : unpredictables_infected) {
-		if (cosmos[e].alive()) {
-			potential_mispredictions.push_back(acquire_potential_misprediction(cosmos[e]));
+		if (cosm[e].alive()) {
+			potential_mispredictions.push_back(acquire_potential_misprediction(cosm[e]));
 		}
 	}
 

@@ -9,10 +9,10 @@
 #include "view/audiovisual_state/systems/interpolation_system.h"
 
 void draw_cast_spells_highlights(const draw_cast_spells_highlights_input in) {
-	const auto& cosmos = in.cosm;
-	const auto dt = cosmos.get_fixed_delta();
+	const auto& cosm = in.cosm;
+	const auto dt = cosm.get_fixed_delta();
 
-	cosmos.for_each_having<components::sentience>(
+	cosm.for_each_having<components::sentience>(
 		[&](const auto it) {
 			const auto& sentience = it.template get<components::sentience>();
 			const auto casted_spell = sentience.currently_casted_spell;
@@ -24,7 +24,7 @@ void draw_cast_spells_highlights(const draw_cast_spells_highlights_input in) {
 
 						if (highlight_amount > 0.f) {
 							using S = decltype(s);
-							const auto& spell_data = std::get<S>(cosmos.get_common_significant().spells);
+							const auto& spell_data = std::get<S>(cosm.get_common_significant().spells);
 
 							auto highlight_col = spell_data.common.associated_color;
 							highlight_col.a = static_cast<rgba_channel>(255 * highlight_amount);
@@ -45,9 +45,9 @@ void draw_cast_spells_highlights(const draw_cast_spells_highlights_input in) {
 }
 
 void draw_explosion_body_highlights(const draw_explosion_body_highlights_input in) {
-	const auto& cosmos = in.cosm;
+	const auto& cosm = in.cosm;
 
-	cosmos.for_each_having<invariants::cascade_explosion>(
+	cosm.for_each_having<invariants::cascade_explosion>(
 		[&](const auto it) {
 			if (const auto tr = it.find_viewing_transform(in.interpolation)) {
 				const auto& cascade_def = it.template get<invariants::cascade_explosion>();

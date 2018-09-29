@@ -45,14 +45,14 @@ public:
 	template <class F>
 	void for_each_child_entity_recursive(F&& callback) const {
 		const auto self = *static_cast<const entity_handle_type*>(this);
-		auto& cosmos = self.get_cosmos();
+		auto& cosm = self.get_cosmos();
 
 		self.for_each_component(
-			[&cosmos, &callback](const auto& subject_component) {
+			[&cosm, &callback](const auto& subject_component) {
 				augs::introspect(
 					[&](auto, const auto& member) {
 						if constexpr(std::is_same_v<remove_cref<decltype(member)>, child_entity_id>) {
-							const auto child_handle = cosmos[member];
+							const auto child_handle = cosm[member];
 
 							if (child_handle.alive() && callback(child_handle) == callback_result::CONTINUE) {
 								child_handle.for_each_child_entity_recursive(std::forward<F>(callback));

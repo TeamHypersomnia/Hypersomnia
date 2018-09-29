@@ -505,7 +505,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 	const vec2i tooltip_pos
 ) const {
 	const auto& rect_world = context.get_rect_world();
-	const auto& cosmos = context.get_cosmos();
+	const auto& cosm = context.get_cosmos();
 	const auto gui_entity = context.get_subject_entity();
 	const auto output = context.get_output();
 	const auto screen_size = context.screen_size;
@@ -524,10 +524,10 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 				using T = std::remove_const_t<decltype(location)>;
 
 				if constexpr(std::is_same_v<T, item_button_in_item>) {
-					tooltip_text = text::from_bbcode(get_bbcoded_entity_details(cosmos[location.item_id]), description_style);
+					tooltip_text = text::from_bbcode(get_bbcoded_entity_details(cosm[location.item_id]), description_style);
 				}
 				else if constexpr(std::is_same_v<T, slot_button_in_container>) {
-					tooltip_text = text::from_bbcode(get_bbcoded_slot_details(cosmos[location.slot_id]), context.get_gui_font());
+					tooltip_text = text::from_bbcode(get_bbcoded_slot_details(cosm[location.slot_id]), context.get_gui_font());
 				}
 				else if constexpr(std::is_same_v<T, hotbar_button_in_character_gui>) {
 					const auto assigned_entity = dereferenced->get_assigned_entity(gui_entity);
@@ -552,7 +552,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 						tooltip_text = bound_spell.dispatch(
 							[&](auto s) {
 								using S = decltype(s);
-								const auto& spell_data = std::get<S>(cosmos.get_common_significant().spells);
+								const auto& spell_data = std::get<S>(cosm.get_common_significant().spells);
 
 								return text::from_bbcode(
 									get_bbcoded_spell_description(
@@ -583,7 +583,7 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 
 		const auto world_cursor_pos = cone.to_world_space(context.get_input_state().mouse.pos);
 
-		const auto hovered = cosmos[get_hovered_world_entity(cosmos, world_cursor_pos)];
+		const auto hovered = cosm[get_hovered_world_entity(cosm, world_cursor_pos)];
 
 		if (hovered.alive()) {
 			if (context.dependencies.settings.draw_aabb_highlighter) {

@@ -79,12 +79,12 @@ std::string value_bar::get_description_for_hover(
 	const const_game_gui_context context,
 	const const_this_pointer self
 ) {
-	const auto& cosmos = context.get_cosmos();
+	const auto& cosm = context.get_cosmos();
 	const auto& sentience = context.get_subject_entity().get<components::sentience>();
 
 	return visit_by_vertical_index(
 		sentience,
-		cosmos,
+		cosm,
 		self.get_location().vertical_index,
 		
 		[&](const auto& meter, const auto& meta){
@@ -106,8 +106,8 @@ void value_bar::draw(
 	const viewing_game_gui_context context, 
 	const const_this_pointer this_id
 ) {
-	const auto& cosmos = context.get_cosmos();
-	const auto& clk = cosmos.get_clock();
+	const auto& cosm = context.get_cosmos();
+	const auto& clk = cosm.get_clock();
 	const auto& game_images = context.get_game_images();
 
 	if (!this_id->get_flag(augs::gui::flag::ENABLE_DRAWING)) {
@@ -147,7 +147,7 @@ void value_bar::draw(
 		
 		const auto current_value_ratio = visit_by_vertical_index(
 			sentience,
-			cosmos,
+			cosm,
 			vertical_index,
 
 			[](const auto& meter, auto){
@@ -168,7 +168,7 @@ void value_bar::draw(
 
 		/* Draw the value label if it is a meter, draw nothing if perk */
 
-		visit_by_vertical_index(sentience, cosmos, vertical_index,
+		visit_by_vertical_index(sentience, cosm, vertical_index,
 			[&](const auto& meter, auto) {
 				const auto value = meter.get_value();
 
@@ -291,12 +291,12 @@ assets::image_id value_bar::get_bar_icon(
 	const const_game_gui_context context, 
 	const const_this_pointer this_id
 ) {
-	const auto& cosmos = context.get_cosmos();
+	const auto& cosm = context.get_cosmos();
 	const auto& sentience = context.get_subject_entity().get<components::sentience>();
 
 	return visit_by_vertical_index(
 		sentience,
-		cosmos,
+		cosm,
 		this_id.get_location().vertical_index,
 		[](const auto& /* perk_or_meter */, const auto& meta){
 			return meta.appearance.get_icon();
@@ -311,12 +311,12 @@ rgba value_bar::get_bar_col(
 	rgba result;
 
 	if (const auto sentience = context.get_subject_entity().find<components::sentience>()) {
-		const auto& cosmos = context.get_cosmos();
+		const auto& cosm = context.get_cosmos();
 
 		result = 
 			visit_by_vertical_index(
 				*sentience,
-				cosmos,
+				cosm,
 				this_id.get_location().vertical_index,
 				[](auto, const auto& meta){
 					return meta.appearance.get_bar_color();

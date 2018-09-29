@@ -55,12 +55,12 @@ public:
 	template <class interpolation_system_type>
 	std::optional<transformr> find_viewing_transform(const interpolation_system_type& sys) const {
 		const auto handle = *static_cast<const entity_handle_type*>(this);
-		const auto& cosmos = handle.get_cosmos();
+		const auto& cosm = handle.get_cosmos();
 
 		if (const auto connection = handle.find_colliders_connection();
 			connection && connection->owner != handle.get_id()
 		) {
-			if (auto body_transform = sys.find_interpolated(cosmos[connection->owner])) {
+			if (auto body_transform = sys.find_interpolated(cosm[connection->owner])) {
 				auto bt = *body_transform;
 
 				auto displacement = connection->shape_offset;
@@ -235,8 +235,8 @@ std::optional<transformr> spatial_properties_mixin<E>::find_logic_transform() co
 	*/
 
 	if (const auto connection = handle.find_colliders_connection()) {
-		const auto& cosmos = handle.get_cosmos();
-		const auto owner = cosmos[connection->owner];
+		const auto& cosm = handle.get_cosmos();
+		const auto owner = cosm[connection->owner];
 
 		auto calc_transform = [&](const auto& body) {
 			const auto body_transform = body.get_transform();
@@ -290,8 +290,8 @@ std::optional<transformr> spatial_properties_mixin<E>::find_logic_transform() co
 
 	/* The owner might have been dead due to the item being in a backpack, for example */
 	if (const auto item = handle.template find<components::item>()) {
-		const auto& cosmos = handle.get_cosmos();
-		return cosmos[item->get_current_slot()].get_container().find_logic_transform();
+		const auto& cosm = handle.get_cosmos();
+		return cosm[item->get_current_slot()].get_container().find_logic_transform();
 	}
 
 	if (const auto transform = handle.template find<components::transform>()) {

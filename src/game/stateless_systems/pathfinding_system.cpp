@@ -20,9 +20,9 @@
 
 void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 #if TODO_PATHFINDING
-	auto& cosmos = step.get_cosmos();
-	const auto si = cosmos.get_si();
-	const auto& settings = cosmos.get_common_significant().pathfinding;
+	auto& cosm = step.get_cosmos();
+	const auto si = cosm.get_si();
+	const auto& settings = cosm.get_common_significant().pathfinding;
 
 	const auto get_world_vertices = [&](
 		const const_entity_handle subject, 
@@ -58,11 +58,11 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 	const float epsilon_distance_visible_point_sq = settings.epsilon_distance_visible_point * settings.epsilon_distance_visible_point;
 	
 	/* we'll need a reference to physics system for raycasting */
-	const physics_world_cache& physics = cosmos.get_solvable_inferred().physics;
+	const physics_world_cache& physics = cosm.get_solvable_inferred().physics;
 
 	auto& lines = DEBUG_LOGIC_STEP_LINES;
 
-	cosmos.for_each_having<components::pathfinding>(
+	cosm.for_each_having<components::pathfinding>(
 		[&](const auto it) {
 		/* get necessary components */
 			auto& pathfinding = it.template get<components::pathfinding>();
@@ -201,11 +201,11 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 								bool was_hit = false;
 
 								physics.for_each_intersection_with_polygon(
-									cosmos.get_si(),
+									cosm.get_si(),
 									sensor_polygon, 
 									pathfinding.filter, 
 									([&](const auto fix, auto, auto) {
-										if (cosmos[get_body_entity_that_owns(fix)] != it) {
+										if (cosm[get_body_entity_that_owns(fix)] != it) {
 											was_hit = true;
 											return callback_result::ABORT;
 										}
@@ -293,7 +293,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 
 					if (visibility_condition_fulfilled) {
 						const auto line_of_sight = physics.ray_cast_px(
-							cosmos.get_si(), 
+							cosm.get_si(), 
 							from, 
 							point, 
 							filter

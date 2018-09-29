@@ -162,7 +162,7 @@ void physics_world_cache::infer_rigid_body(const const_entity_handle h) {
 			if (only_update_properties) {
 				/* 
 					Invariant/component guaranteed to exist because it must have once been created from an existing def,
-					and changing type content implies reinference of the entire cosmos.
+					and changing type content implies reinference of the entire cosm.
 				*/
 		
 				const auto& def = handle.template get<invariants::rigid_body>();

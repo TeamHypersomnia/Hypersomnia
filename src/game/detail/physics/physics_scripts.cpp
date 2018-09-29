@@ -13,7 +13,7 @@ bool are_connected_by_friction(
 	const const_entity_handle child, 
 	const const_entity_handle parent
 ) {
-	const auto& cosmos = child.get_cosmos();
+	const auto& cosm = child.get_cosmos();
 
 	bool matched_ancestor = false;
 
@@ -23,13 +23,13 @@ bool are_connected_by_friction(
 	if(owner_body_of_child.alive()) {
 		entity_id childs_ancestor_entity = owner_body_of_child.get_owner_friction_ground();
 
-		while (cosmos[childs_ancestor_entity].alive()) {
+		while (cosm[childs_ancestor_entity].alive()) {
 			if (childs_ancestor_entity == owner_body_of_parent) {
 				matched_ancestor = true;
 				break;
 			}
 
-			childs_ancestor_entity = cosmos[childs_ancestor_entity].get_owner_friction_ground();
+			childs_ancestor_entity = cosm[childs_ancestor_entity].get_owner_friction_ground();
 		}
 	}
 

@@ -6,6 +6,10 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Local setup should record session live
+	- This is really important in the face of bugs.
+	- Or just get rid of test scene setup for now and let it by default launch a scene in editor that records inputs
+
 - Fix rendering order of dropped gun attachments
 	- Also make it possible to always render them under?
 
@@ -14,32 +18,12 @@ summary: Just a hidden scratchpad.
 		- it's just several bytes overhead per entity
 	- there ain't really that many and it will be greatly useful
 
-- Ctrl+I shall open a quick go to gui that will instantiate a chosen flavour
-
 - Fill new workspace with test scene essentials
 	- This would prevent image ids in common state from being invalid
 		- Probably less checks to make, in GUI as well
 	- Can make those the first in test scene image enums so that we can stop importing images after some point
 
-- finish work with atlas and sound regeneration
-	- regenerate only seen assets
-	- always load diffuse map with the corresponding neon map to avoid unilluminated objects near the camera...
-		- ...even though many diffuse maps nearby have been loaded
-		- perhaps we won't really need the separation between diffuse and neon, because maximum atlases will be huge anyway
-
-- Optionally, make the bomb non-pickupable by other factions
-	- For now just set infinite space occupied and don't iterate recursively to check if the item is forbidden
-
-- refactor: stepped_clock
-	- has delta + now
-	- passed everywhere where now and dt are required
-	- cosmos::get_clock() instead of timestamp & fixed delta
-	- this prepares us for a possibility that the delta might change and we'll need some history of delta changes
-
 - alt+scroll could disable/enable layers starting from the topmost one
-
-- Possibly use b2TestOverlap for checking against the camera selection?
-- Make a tree out of time measurement profiler calls and get summary just from "fps" or "whole regeneration"
 
 - Fix this: due to a filter, the node disappears during renaming
 	- just when constructing a filter, save a name with which it was remembered in cached fae selections
@@ -48,13 +32,6 @@ summary: Just a hidden scratchpad.
 	- Just rebuild a cache each time a filter is modified?
 		- Not responsive if for example history is moved around, so no.
 
-- Possibly abort the for_each_flavour loop altogether after deleting a flavour?
-	- Will only be problematic if the ids will be rewritten in place, which won't even be the case with sparse pools, not even with pointer ids
-	- Only problematic with direct index-based ids
-
-- Improve wielding transfers calculation so that less transfers are made
-	- Transfer effects will be fixed automagically then
-
 - Selection tabs
 	- Generalize editor_tab_gui to be also able to handle the selection tabs window
 	- Enter on selection opens relevant selection group in tabs
@@ -62,20 +39,6 @@ summary: Just a hidden scratchpad.
 		- Low priority
 
 - Ctrl+Home should center on the whole scene
-
-- Parties and hostile parties are currently integers; use bitsets properly
-	- Won't matter until after we have AI
-	- although, handle slot categories properly as well
-
-- Perhaps something to let us select and manipulate entities in gameplay mode?
-	- Won't matter until after deathmatch stage
-	- will it be useful?
-
-- Editor status bar
-	- Won't matter until after deathmatch stage
-	- Check how it works in vim
-		- Changing a mode to normal clears the last message
-	- Will be useful for the author to know what is going on
 
 - Property editor: make container elements tickable and modifiable in bulk
 
@@ -146,15 +109,10 @@ summary: Just a hidden scratchpad.
 		- would just create particle effect inputs and pass them to the simulation
 	- same with sound system
 
-- Local setup should record session live
-	- This is really important in the face of bugs.
-	- Or just get rid of test scene setup for now and let it by default launch a scene in editor that records inputs
-
-- ensure should throw so that the editor destructor can perform autosave
-	- actually, if some modification caused crash, it would be better if the author can try to edit without it
-	- Then, in the editor, when the game is still unstable, we will catch an error during whenever we step the cosmos or change some sensitive valuesa,
-	- then upon catching, we will save the last known correct version to hdd.
-	- for cores, just emit them programatically on unix
-	- and on windows it makes little sense to abort there, just debugbreak and throw.
-
 - some hint for windows unicode in imgui: https://github.com/ocornut/imgui/issues/1060
+
+- finish work with atlas and sound regeneration
+	- regenerate only seen assets
+	- always load diffuse map with the corresponding neon map to avoid unilluminated objects near the camera...
+		- ...even though many diffuse maps nearby have been loaded
+		- perhaps we won't really need the separation between diffuse and neon, because maximum atlases will be huge anyway

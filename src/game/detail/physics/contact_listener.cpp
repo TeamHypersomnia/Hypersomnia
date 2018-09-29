@@ -36,9 +36,8 @@ contact_listener::~contact_listener() {
 
 void contact_listener::BeginContact(b2Contact* contact) {
 	auto& sys = get_sys();
-	auto& cosmos = cosm;
 
-	const auto si = cosmos.get_si();
+	const auto si = cosm.get_si();
 	const auto clk = cosm.get_clock();	
 	
 	std::array<messages::collision_message, 2> msgs;
@@ -72,8 +71,8 @@ void contact_listener::BeginContact(b2Contact* contact) {
 		msg.one_is_sensor = fix_a->IsSensor() || fix_b->IsSensor();
 		msg.type = messages::collision_message::event_type::BEGIN_CONTACT;
 
-		const auto subject = cosmos[fix_a->GetUserData()];
-		const auto collider = cosmos[fix_b->GetUserData()];
+		const auto subject = cosm[fix_a->GetUserData()];
+		const auto collider = cosm[fix_b->GetUserData()];
 
 		msg.subject = subject;
 		msg.collider = collider;
@@ -196,8 +195,7 @@ void contact_listener::BeginContact(b2Contact* contact) {
 
 void contact_listener::EndContact(b2Contact* contact) {
 	auto& sys = get_sys();
-	auto& cosmos = cosm;
-	const auto si = cosmos.get_si();
+	const auto si = cosm.get_si();
 
 	for (int i = 0; i < 2; ++i) {
 		auto fix_a = contact->GetFixtureA();
@@ -213,8 +211,8 @@ void contact_listener::EndContact(b2Contact* contact) {
 		messages::collision_message msg;
 		msg.type = messages::collision_message::event_type::END_CONTACT;
 
-		const auto subject = cosmos[fix_a->GetUserData()];
-		const auto collider = cosmos[fix_b->GetUserData()];
+		const auto subject = cosm[fix_a->GetUserData()];
+		const auto collider = cosm[fix_b->GetUserData()];
 
 		ensure(subject.alive());
 		ensure(collider.alive());
@@ -264,9 +262,8 @@ void contact_listener::EndContact(b2Contact* contact) {
 
 void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldManifold */) {
 	auto& sys = get_sys();
-	auto& cosmos = cosm;
 
-	const auto si = cosmos.get_si();
+	const auto si = cosm.get_si();
 	const auto clk = cosm.get_clock();
 
 	std::array<messages::collision_message, 2> msgs;
@@ -291,8 +288,8 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 
 		msg.type = messages::collision_message::event_type::PRE_SOLVE;
 
-		const auto subject = cosmos[fix_a->GetUserData()];
-		const auto collider = cosmos[fix_b->GetUserData()];
+		const auto subject = cosm[fix_a->GetUserData()];
+		const auto collider = cosm[fix_b->GetUserData()];
 
 		msg.subject = subject;
 		msg.collider = collider;
@@ -424,8 +421,7 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 
 void contact_listener::PostSolve(b2Contact* contact, const b2ContactImpulse* impulse) {
 	auto& sys = get_sys();
-	auto& cosmos = cosm;
-	const auto si = cosmos.get_si();
+	const auto si = cosm.get_si();
 
 	messages::collision_message msgs[2];
 
@@ -447,8 +443,8 @@ void contact_listener::PostSolve(b2Contact* contact, const b2ContactImpulse* imp
 
 		msg.type = messages::collision_message::event_type::POST_SOLVE;
 
-		const auto subject = cosmos[fix_a->GetUserData()];
-		const auto collider = cosmos[fix_b->GetUserData()];
+		const auto subject = cosm[fix_a->GetUserData()];
+		const auto collider = cosm[fix_b->GetUserData()];
 
 		msg.subject = subject;
 		msg.collider = collider;

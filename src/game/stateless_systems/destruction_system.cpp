@@ -12,7 +12,7 @@
 #include "game/components/shape_circle_component.h"
 
 void destruction_system::generate_damages_from_forceful_collisions(const logic_step step) const {
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 	const auto& events = step.get_queue<messages::collision_message>();
 
 	for (const auto& it : events) {
@@ -20,7 +20,7 @@ void destruction_system::generate_damages_from_forceful_collisions(const logic_s
 			continue;
 		}
 		
-		const auto subject = cosmos[it.subject];
+		const auto subject = cosm[it.subject];
 		const auto& fixtures = subject.get<invariants::fixtures>();
 
 		const auto& data_indices = it.subject_b2Fixture_index;
@@ -32,7 +32,7 @@ void destruction_system::generate_damages_from_forceful_collisions(const logic_s
 			damage_msg.subject_b2Fixture_index = it.subject_b2Fixture_index;
 			damage_msg.collider_b2Fixture_index = it.collider_b2Fixture_index;
 
-			damage_msg.origin = damage_origin(cosmos[it.collider]);
+			damage_msg.origin = damage_origin(cosm[it.collider]);
 			damage_msg.subject = it.subject;
 			damage_msg.amount = 0.f;
 			damage_msg.impact_velocity = it.collider_impact_velocity;

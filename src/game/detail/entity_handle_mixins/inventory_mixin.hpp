@@ -37,10 +37,10 @@ void inventory_mixin<E>::set_charges(const int n) const {
 template <class E>
 typename inventory_mixin<E>::generic_handle_type inventory_mixin<E>::get_topmost_container() const {
 	const auto& self = *static_cast<const E*>(this);
-	auto& cosmos = self.get_cosmos();
+	auto& cosm = self.get_cosmos();
 
 	if (self.dead()) {
-		return cosmos[entity_id()];
+		return cosm[entity_id()];
 	}
 
 	if (self.template has<components::item_slot_transfers>()) {
@@ -48,7 +48,7 @@ typename inventory_mixin<E>::generic_handle_type inventory_mixin<E>::get_topmost
 	}
 
 	if (const auto item = self.template find<components::item>()) {
-		if (const auto slot = cosmos[item->get_current_slot()]) {
+		if (const auto slot = cosm[item->get_current_slot()]) {
 			return slot.get_container().get_topmost_container();
 		}
 	}
@@ -57,15 +57,15 @@ typename inventory_mixin<E>::generic_handle_type inventory_mixin<E>::get_topmost
 		return self;
 	}
 
-	return cosmos[entity_id()];
+	return cosm[entity_id()];
 }
 
 template <class E>
 bool inventory_mixin<E>::owning_transfer_capability_alive_and_same_as_of(const entity_id b) const {
 	const auto& self = *static_cast<const E*>(this);
-	auto& cosmos = self.get_cosmos();
+	auto& cosm = self.get_cosmos();
 	const auto this_capability = get_owning_transfer_capability();
-	const auto b_capability = cosmos[b].get_owning_transfer_capability();
+	const auto b_capability = cosm[b].get_owning_transfer_capability();
 
 	return this_capability.alive() && b_capability.alive() && this_capability == b_capability;
 }
@@ -153,7 +153,7 @@ bool inventory_mixin<E>::only_secondary_holds_item() const {
 template <class E>
 typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::get_first_free_hand() const {
 	const auto& self = *static_cast<const E*>(this);
-	auto& cosmos = self.get_cosmos();
+	auto& cosm = self.get_cosmos();
 
 	inventory_slot_id target_slot;
 
@@ -169,18 +169,18 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::get_
 		}
 	);
 
-	return cosmos[target_slot];
+	return cosm[target_slot];
 }
 
 template <class E>
 inventory_item_address inventory_mixin<E>::get_address_from_root(const entity_id until) const {
 	const auto& self = *static_cast<const E*>(this);
-	auto& cosmos = self.get_cosmos();
+	auto& cosm = self.get_cosmos();
 
 	inventory_item_address output;
 	inventory_slot_id current_slot = get_current_slot();
 
-	while (cosmos[current_slot].alive()) {
+	while (cosm[current_slot].alive()) {
 		output.root_container = current_slot.container_entity;
 		output.directions.push_back(current_slot.type);
 
@@ -188,7 +188,7 @@ inventory_item_address inventory_mixin<E>::get_address_from_root(const entity_id
 			break;
 		}
 
-		current_slot = cosmos[current_slot.container_entity].get_current_slot();
+		current_slot = cosm[current_slot.container_entity].get_current_slot();
 	}
 
 	std::reverse(output.directions.begin(), output.directions.end());

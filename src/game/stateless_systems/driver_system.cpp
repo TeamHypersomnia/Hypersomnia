@@ -25,7 +25,7 @@
 void driver_system::assign_drivers_who_touch_wheels(const logic_step step) {
 	(void)step;
 #if TODO_CARS
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 	const auto& contacts = step.get_queue<messages::collision_message>();
 
 	for (const auto& e : contacts) {
@@ -33,7 +33,7 @@ void driver_system::assign_drivers_who_touch_wheels(const logic_step step) {
 			continue;
 		}
 
-		const auto driver = cosmos[e.subject];
+		const auto driver = cosm[e.subject];
 
 		if (const auto maybe_driver = driver.find<components::driver>();
 			maybe_driver != nullptr && maybe_driver->take_hold_of_wheel_when_touched
@@ -42,7 +42,7 @@ void driver_system::assign_drivers_who_touch_wheels(const logic_step step) {
 				continue;
 			}
 
-			const auto car = cosmos[e.collider].get_owner_of_colliders();
+			const auto car = cosm[e.collider].get_owner_of_colliders();
 			const auto maybe_car = car.find<components::car>();
 
 			if(maybe_car != nullptr) {
@@ -56,13 +56,13 @@ void driver_system::assign_drivers_who_touch_wheels(const logic_step step) {
 }
 
 void driver_system::release_drivers_due_to_ending_contact_with_wheel(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 	const auto& contacts = step.get_queue<messages::collision_message>();
 
 	for (const auto& c : contacts) {
 		if (c.type == messages::collision_message::event_type::END_CONTACT) {
-			const auto& driver_entity = cosmos[c.subject];
-			const auto car_entity = cosmos[c.collider].get_owner_of_colliders();
+			const auto& driver_entity = cosm[c.subject];
+			const auto car_entity = cosm[c.collider].get_owner_of_colliders();
 
 			if (car_entity.alive()) {
 				if (const auto* const driver = driver_entity.find<components::driver>()) {
@@ -78,15 +78,15 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel(const logic
 
 void driver_system::release_drivers_due_to_requests(const logic_step step) {
 #if TODO_CARS
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 	const auto& intents = step.get_queue<messages::intent_message>();
 
 	for (const auto& e : intents) {
 		if (e.intent == game_intent_type::RELEASE_CAR && e.was_pressed()) {
-			release_car_ownership(cosmos[e.subject]);
+			release_car_ownership(cosm[e.subject]);
 		}
 		else if (e.intent == game_intent_type::TAKE_HOLD_OF_WHEEL) {
-			const auto subject = cosmos[e.subject];
+			const auto subject = cosm[e.subject];
 
 			if (subject.sentient_and_unconscious()) {
 				continue;
@@ -116,7 +116,7 @@ bool driver_system::change_car_ownership(
 	const entity_handle car_entity
 ) {
 	auto& driver = driver_entity.get<components::driver>();
-	auto& cosmos = driver_entity.get_cosmos();
+	auto& cosm = driver_entity.get_cosmos();
 
 	const auto maybe_rigid_body = driver_entity.find<components::rigid_body>();
 	const bool has_physics = maybe_rigid_body != nullptr;
@@ -125,7 +125,7 @@ bool driver_system::change_car_ownership(
 	if (/* new_ownership */ car_entity.alive()) {
 		auto& car = car_entity.get<components::car>();
 
-		if (cosmos[car.current_driver].alive()) {
+		if (cosm[car.current_driver].alive()) {
 			return false;
 		}
 
@@ -137,7 +137,7 @@ bool driver_system::change_car_ownership(
 		driver.owned_vehicle = car_entity;
 		car.current_driver = driver_entity;
 
-		car.last_turned_on = cosmos.get_timestamp();
+		car.last_turned_on = cosm.get_timestamp();
 
 #if TODO
 		force_joint.target_bodies[0] = driver_entity;
@@ -161,12 +161,12 @@ bool driver_system::change_car_ownership(
 		}
 	}
 	else if (
-		const auto owned_vehicle = cosmos[driver.owned_vehicle];
+		const auto owned_vehicle = cosm[driver.owned_vehicle];
 		owned_vehicle.alive()
 	) {
 		auto& car = owned_vehicle.get<components::car>();
 
-		car.last_turned_off = cosmos.get_timestamp();
+		car.last_turned_off = cosm.get_timestamp();
 
 		driver.owned_vehicle.unset();
 		car.current_driver.unset();

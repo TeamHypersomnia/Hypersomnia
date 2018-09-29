@@ -20,7 +20,7 @@ void drag_and_drop_callback(
 	const std::optional<drag_and_drop_result>& drag_result,
 	const vec2i total_dragged_amount
 ) {
-	auto& cosmos = context.get_cosmos();
+	auto& cosm = context.get_cosmos();
 	auto& gui = context.get_character_gui();
 
 	if (!drag_result.has_value()) {
@@ -45,12 +45,12 @@ void drag_and_drop_callback(
 				);
 			}
 			else {
-				const auto& item = cosmos[transfer_data.item_id];
+				const auto& item = cosm[transfer_data.item_id];
 
 				const vec2i griddified = griddify(total_dragged_amount);
 
 				const auto this_button = context.dereference_location(item_button_in_item{ transfer_data.item_id });
-				const auto parent_slot = cosmos[item.template get<components::item>().get_current_slot()];
+				const auto parent_slot = cosm[item.template get<components::item>().get_current_slot()];
 				const auto parent_button = context.dereference_location(slot_button_in_container{ parent_slot.get_id() });
 
 				if (parent_slot->always_allow_exactly_one_item) {
@@ -64,7 +64,7 @@ void drag_and_drop_callback(
 		}
 		else if constexpr (std::is_same_v<T, drop_for_hotbar_assignment>) {
 			const auto dereferenced_button = context.dereference_location(transfer_data.assign_to);
-			const auto new_assigned_item = cosmos[transfer_data.item_id];
+			const auto new_assigned_item = cosm[transfer_data.item_id];
 			const auto owner_transfer_capability = context.get_subject_entity();
 
 			ensure(dereferenced_button != nullptr);
@@ -96,7 +96,7 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 	const game_gui_element_location held_rect_id, 
 	const game_gui_element_location drop_target_rect_id
 ) {
-	const auto& cosmos = context.get_cosmos();
+	const auto& cosm = context.get_cosmos();
 	const auto& element = context.get_character_gui();
 	const auto owning_transfer_capability = context.get_subject_entity();
 
@@ -126,7 +126,7 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 		if (context.alive(drop_target_rect_id)) {
 			possible_target_hovered = true;
 
-			const auto dragged_item_handle = cosmos[dragged_item.get_location().item_id];
+			const auto dragged_item_handle = cosm[dragged_item.get_location().item_id];
 
 			const auto target_slot = context.template get_if<slot_button_in_container>(drop_target_rect_id);
 			const auto target_drop_item = context.template get_if<drag_and_drop_target_drop_item_in_character_gui>(drop_target_rect_id);
@@ -173,7 +173,7 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 				simulated_transfer.target_slot = target_slot.get_location().slot_id;
 			}
 			else if (target_item != nullptr && target_item != dragged_item) {
-				const auto target_item_handle = cosmos[target_item.get_location().item_id];
+				const auto target_item_handle = cosm[target_item.get_location().item_id];
 
 				if (target_item_handle.template find<invariants::container>()) {
 					const auto compatible_slot = get_slot_with_compatible_category(dragged_item_handle, target_item_handle);
@@ -195,12 +195,12 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 			}
 
 			if (possible_target_hovered) {
-				if (target_item != nullptr && cosmos[simulated_transfer.target_slot].dead()) {
+				if (target_item != nullptr && cosm[simulated_transfer.target_slot].dead()) {
 					drop.hint_text = "No compatible slot available";
 					drop.result.transferred_charges = 0;
 				}
 				else {
-					drop.result = query_transfer_result(cosmos, simulated_transfer);
+					drop.result = query_transfer_result(cosm, simulated_transfer);
 				}
 
 				const auto predicted_result = drop.result;

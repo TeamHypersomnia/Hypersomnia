@@ -34,10 +34,10 @@ void action_button::draw(
 		const auto& sentience = context.get_subject_entity().get<components::sentience>();
 		const auto bound_spell = get_bound_spell(context, this_id);
 
-		const auto& cosmos = context.get_cosmos();
+		const auto& cosm = context.get_cosmos();
 
 		const auto output = context.get_output();
-		const auto clk = cosmos.get_clock();
+		const auto clk = cosm.get_clock();
 
 		const auto& necessarys = context.get_necessary_images();
 		const auto& game_images = context.get_game_images();
@@ -51,7 +51,7 @@ void action_button::draw(
 					using I = instance_of<S>;
 
 					const auto& spell = std::get<I>(sentience.spells);
-					const auto spell_data = std::get<S>(cosmos.get_common_significant().spells);
+					const auto spell_data = std::get<S>(cosm.get_common_significant().spells);
 
 					const auto& pe = sentience.get<personal_electricity_meter_instance>();
 					const bool has_enough_mana = pe.value >= spell_data.common.personal_electricity_required;

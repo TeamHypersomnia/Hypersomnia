@@ -24,11 +24,11 @@
 using namespace augs;
 
 void movement_system::set_movement_flags_from_input(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 	const auto& events = step.get_queue<messages::intent_message>();
 
 	for (const auto& it : events) {
-		cosmos(
+		cosm(
 			it.subject,
 			[&](const auto subject) {
 				if (auto* const movement = subject.template find<components::movement>()) {
@@ -64,13 +64,13 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 }
 
 void movement_system::apply_movement_forces(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 
-	const auto& clk = cosmos.get_clock();
+	const auto& clk = cosm.get_clock();
 	const auto delta = clk.dt;
 	const auto delta_ms = delta.in_milliseconds();
 
-	cosmos.for_each_having<components::movement>(
+	cosm.for_each_having<components::movement>(
 		[&](const auto it) {
 			auto& movement = it.template get<components::movement>();
 			auto& movement_def = it.template get<invariants::movement>();
@@ -191,7 +191,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				}
 
 				if (is_sentient) {
-					sentience->time_of_last_exertion = cosmos.get_timestamp();
+					sentience->time_of_last_exertion = cosm.get_timestamp();
 				}
 
 				auto applied_force = requested_by_input;
@@ -229,7 +229,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 				const auto anim_id = leg_anim.id;
 
-				const auto& logicals = cosmos.get_logical_assets();
+				const auto& logicals = cosm.get_logical_assets();
 
 				if (const auto anim = logicals.find(anim_id)) {
 					/* Offset the effect transform by leg offset, if the animation exists */
@@ -249,17 +249,17 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					effect_transform *= transformr(offset);
 				}
 
-				const auto& common_assets = cosmos.get_common_assets();
+				const auto& common_assets = cosm.get_common_assets();
 				auto chosen_effect = common_assets.standard_footstep;
 				
 				{
 					/* Choose effect based on where the foot has landed */
 
 					const auto ground_id = get_hovered_world_entity(
-						cosmos,
+						cosm,
 						effect_transform.pos,
-						[&cosmos](const auto id) {
-							return cosmos[id].template has<invariants::ground>();
+						[&cosm](const auto id) {
+							return cosm[id].template has<invariants::ground>();
 						},
 						render_layer_filter::whitelist(
 							render_layer::CAR_INTERIOR,
@@ -271,7 +271,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 						)
 					);
 
-					if (const auto ground_entity = cosmos[ground_id]) {
+					if (const auto ground_entity = cosm[ground_id]) {
 						const auto& ground = ground_entity.template get<invariants::ground>();
 
 						if (ground.footstep_effect.is_enabled) {

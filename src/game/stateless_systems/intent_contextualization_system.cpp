@@ -26,11 +26,11 @@
 using namespace augs;
 
 void intent_contextualization_system::handle_use_button_presses(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 	auto& intents = step.get_queue<messages::intent_message>();
 	
 	for (auto& e : intents) {
-		const auto subject = cosmos[e.subject];
+		const auto subject = cosm[e.subject];
 
 		if (e.intent == game_intent_type::USE_BUTTON) {
 			if (const auto sentience = subject.find<components::sentience>()) {
@@ -77,7 +77,7 @@ void intent_contextualization_system::advance_use_button(const logic_step step) 
 
 				if (maybe_driver) {
 					const auto car_id = maybe_driver->owned_vehicle;
-					const auto car = cosmos[car_id];
+					const auto car = cosm[car_id];
 
 					const bool is_now_driving = 
 						car.alive() 
@@ -98,14 +98,14 @@ void intent_contextualization_system::advance_use_button(const logic_step step) 
 }
 
 void intent_contextualization_system::contextualize_crosshair_action_intents(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 
 	{
 #if UNUSED
 		auto& events = step.get_queue<messages::motion_message>();
 		
 		for (auto& it : events) {
-			const auto subject = cosmos[it.subject];
+			const auto subject = cosm[it.subject];
 		}
 #endif
 	}
@@ -115,7 +115,7 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 	for (auto& it : events) {
 		entity_id callee;
 
-		const auto subject = cosmos[it.subject];
+		const auto subject = cosm[it.subject];
 
 		if (subject.is_frozen()) {
 			continue;
@@ -140,7 +140,7 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 			}
 		}
 
-		const auto callee_handle = cosmos[callee];
+		const auto callee_handle = cosm[callee];
 
 		if (callee_handle.alive()) {
 			if (callee_handle.has<components::gun>()) {
@@ -184,19 +184,19 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 }
 
 void intent_contextualization_system::contextualize_movement_intents(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 	auto& intents = step.get_queue<messages::intent_message>();
 
 	for (auto& e : intents) {
 		entity_id callee;
 		bool callee_resolved = false;
 
-		const auto subject = cosmos[e.subject];
+		const auto subject = cosm[e.subject];
 
 		const auto* const maybe_driver = subject.find<components::driver>();
 		const auto* const maybe_container = subject.find<invariants::container>();
 
-		if (maybe_driver && cosmos[maybe_driver->owned_vehicle].alive()) {
+		if (maybe_driver && cosm[maybe_driver->owned_vehicle].alive()) {
 			if (e.intent == game_intent_type::MOVE_FORWARD
 				|| e.intent == game_intent_type::MOVE_BACKWARD
 				|| e.intent == game_intent_type::MOVE_LEFT

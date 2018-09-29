@@ -53,25 +53,25 @@ typename physics_mixin<E>::generic_handle_type physics_mixin<E>::get_owner_frict
 template <class E>
 std::optional<colliders_connection> physics_mixin<E>::calc_colliders_connection() const {
 	const auto self = *static_cast<const E*>(this);
-	const auto& cosmos = self.get_cosmos();
+	const auto& cosm = self.get_cosmos();
 	
 	std::optional<colliders_connection> result;
 
-	self.template dispatch_on_having_all<invariants::fixtures>([&cosmos, &result](const auto typed_self) {
+	self.template dispatch_on_having_all<invariants::fixtures>([&cosm, &result](const auto typed_self) {
 		if (const auto overridden = typed_self.template find<components::specific_colliders_connection>()) {
 			result = overridden->connection;
 			return;
 		}
 
 		if (const auto item = typed_self.template find<components::item>()) {
-			if (const auto slot = cosmos[item->get_current_slot()]) {
+			if (const auto slot = cosm[item->get_current_slot()]) {
 				if (const auto topmost_container = typed_self.calc_connection_to_topmost_container()) {
 					if (auto topmost_container_connection = 
-						cosmos[topmost_container->owner].calc_colliders_connection()
+						cosm[topmost_container->owner].calc_colliders_connection()
 					) {
 						const auto owner = topmost_container_connection->owner;
 	#if MORE_LOGS
-						LOG("%x (item) owned by %x", typed_self, cosmos[owner]);
+						LOG("%x (item) owned by %x", typed_self, cosm[owner]);
 	#endif
 						result = colliders_connection {
 							owner,
@@ -104,20 +104,20 @@ real32 physics_mixin<E>::calc_density(
 	const invariants::fixtures& def	
 ) const {
 	const auto self = *static_cast<const E*>(this);
-	const auto& cosmos = self.get_cosmos();
+	const auto& cosm = self.get_cosmos();
 
 	real32 density = def.density;
 
 	if (const auto item = self.template find<components::item>()) {
-		if (const auto slot = cosmos[item->get_current_slot()]) {
-			density *= cosmos[item->get_current_slot()].calc_density_multiplier_due_to_being_attached();
+		if (const auto slot = cosm[item->get_current_slot()]) {
+			density *= cosm[item->get_current_slot()].calc_density_multiplier_due_to_being_attached();
 		}
 	}
 
-	const auto owner_body = cosmos[calculated_connection.owner];
+	const auto owner_body = cosm[calculated_connection.owner];
 
 	if (const auto* const driver = owner_body.template find<components::driver>()) {
-		if (cosmos[driver->owned_vehicle].alive()) {
+		if (cosm[driver->owned_vehicle].alive()) {
 			density *= driver->density_multiplier_while_driving;
 		}
 	}
@@ -128,9 +128,9 @@ real32 physics_mixin<E>::calc_density(
 template <class E>
 std::optional<colliders_connection> physics_mixin<E>::find_colliders_connection() const {
 	const auto self = *static_cast<const E*>(this);
-	auto& cosmos = self.get_cosmos();
+	auto& cosm = self.get_cosmos();
 
-	if (const auto cache = cosmos.get_solvable_inferred().physics.find_colliders_cache(self)) {
+	if (const auto cache = cosm.get_solvable_inferred().physics.find_colliders_cache(self)) {
 		return cache->connection;
 	}
 
@@ -140,46 +140,46 @@ std::optional<colliders_connection> physics_mixin<E>::find_colliders_connection(
 template <class E>
 typename physics_mixin<E>::generic_handle_type physics_mixin<E>::get_owner_of_colliders() const {
 	const auto self = *static_cast<const E*>(this);
-	auto& cosmos = self.get_cosmos();
+	auto& cosm = self.get_cosmos();
 
 	if (const auto connection = find_colliders_connection()) {
-		return cosmos[connection->owner];
+		return cosm[connection->owner];
 	}
 
-	return cosmos[entity_id()];
+	return cosm[entity_id()];
 }
 
 template <class E>
 void physics_mixin<E>::infer_colliders() const {
 	const auto self = *static_cast<const E*>(this);
-	auto& cosmos = self.get_cosmos();
+	auto& cosm = self.get_cosmos();
 
-	cosmos.get_solvable_inferred({}).physics.infer_colliders(self);
+	cosm.get_solvable_inferred({}).physics.infer_colliders(self);
 }
 
 template <class E>
 void physics_mixin<E>::infer_rigid_body() const {
 	const auto self = *static_cast<const E*>(this);
-	auto& cosmos = self.get_cosmos();
+	auto& cosm = self.get_cosmos();
 
-	cosmos.get_solvable_inferred({}).physics.infer_rigid_body(self);
+	cosm.get_solvable_inferred({}).physics.infer_rigid_body(self);
 }
 
 template <class E>
 void physics_mixin<E>::infer_colliders_from_scratch() const {
 	const auto self = *static_cast<const E*>(this);
-	auto& cosmos = self.get_cosmos();
+	auto& cosm = self.get_cosmos();
 
-	cosmos.get_solvable_inferred({}).physics.infer_colliders_from_scratch(self);
+	cosm.get_solvable_inferred({}).physics.infer_colliders_from_scratch(self);
 }
 
 template <class E>
 void physics_mixin<E>::infer_transform() const {
 	const auto self = *static_cast<const E*>(this);
-	auto& cosmos = self.get_cosmos();
+	auto& cosm = self.get_cosmos();
 
-	cosmos.get_solvable_inferred({}).physics.infer_rigid_body(self);
-	cosmos.get_solvable_inferred({}).tree_of_npo.infer_cache_for(self);
+	cosm.get_solvable_inferred({}).physics.infer_rigid_body(self);
+	cosm.get_solvable_inferred({}).tree_of_npo.infer_cache_for(self);
 }
 
 template <class E>

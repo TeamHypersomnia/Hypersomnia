@@ -27,7 +27,7 @@ void exploding_ring_system::acquire_new_rings(const std::vector<exploding_ring_i
 
 void exploding_ring_system::advance(
 	randomization& rng,
-	const cosmos& cosmos,
+	const cosmos& cosm,
 	const particle_effects_map& manager,
 	const augs::delta dt,
 	particles_simulation_system& particles_output_for_effects
@@ -51,7 +51,7 @@ void exploding_ring_system::advance(
 				const auto spawn_radius_width = (maximum_spawn_radius - minimum_spawn_radius) / 2.4f;
 
 				const auto max_particles_to_spawn = static_cast<unsigned>(160.f * maximum_spawn_radius / 400.f);
-				const auto& common_assets = cosmos.get_common_assets();
+				const auto& common_assets = cosm.get_common_assets();
 
 				const auto* const ring_smoke = mapped_or_nullptr(manager, common_assets.exploding_ring_smoke);
 				const auto* const ring_sparkles = mapped_or_nullptr(manager, common_assets.exploding_ring_sparkles);

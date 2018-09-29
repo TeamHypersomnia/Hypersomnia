@@ -62,7 +62,7 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find
    	const slot_finding_opts& opts
 ) const {
 	const auto& searched_root_container = *static_cast<const E*>(this);
-	auto& cosmos = item.get_cosmos();
+	auto& cosm = item.get_cosmos();
 
 	ensure(item.alive()) 
 	ensure(searched_root_container.alive());
@@ -85,7 +85,7 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find
 		check_slot
 	);
 
-	return cosmos[target_slot];
+	return cosm[target_slot];
 }
 
 template <class E>

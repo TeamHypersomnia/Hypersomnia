@@ -116,10 +116,10 @@ void cosmic::reinfer_solvable(cosmos& cosm) {
 }
 
 entity_handle just_clone_entity(const entity_handle source_entity) {
-	auto& cosmos = source_entity.get_cosmos();
+	auto& cosm = source_entity.get_cosmos();
 
 	if (source_entity.dead()) {
-		return entity_handle::dead_handle(cosmos);
+		return entity_handle::dead_handle(cosm);
 	}
 
 	return source_entity.dispatch([](const auto typed_handle){
@@ -142,7 +142,7 @@ void entity_deleter(
 	const entity_handle handle,
 	F entity_deallocator
 ) {
-	auto& cosmos = handle.get_cosmos();
+	auto& cosm = handle.get_cosmos();
 
 	if (handle.dead()) {
 		return;
@@ -176,7 +176,7 @@ void entity_deleter(
 
 	for (const auto& d : dependent_items) {
 		/* The items that were once assigned to the deleted entity now have no owner */
-		cosmos[d].infer_change_of_current_slot();
+		cosm[d].infer_change_of_current_slot();
 	}
 }
 
@@ -225,10 +225,10 @@ void make_deletion_queue(
 void make_deletion_queue(
 	const destruction_queue& queued, 
 	deletion_queue& deletions, 
-	const cosmos& cosmos
+	const cosmos& cosm
 ) {
 	for (const auto& it : queued) {
-		make_deletion_queue(cosmos[it.subject], deletions);
+		make_deletion_queue(cosm[it.subject], deletions);
 	}
 }
 
@@ -248,22 +248,22 @@ deletion_queue make_deletion_queue(const const_entity_handle h) {
 
 deletion_queue make_deletion_queue(
 	const destruction_queue& queued, 
-	const cosmos& cosmos
+	const cosmos& cosm
 ) {
 	thread_local deletion_queue q;
 	q.clear();
-	make_deletion_queue(queued, q, cosmos);
+	make_deletion_queue(queued, q, cosm);
 	return q;
 }
 
-void reverse_perform_deletions(const deletion_queue& deletions, cosmos& cosmos) {
+void reverse_perform_deletions(const deletion_queue& deletions, cosmos& cosm) {
 	/* 
 		The queue is usually populated with entities and their children.
 		It makes sense to delete children first, so we iterate it backwards.
 	*/
 
 	for (auto it = deletions.rbegin(); it != deletions.rend(); ++it) {
-		const auto subject = cosmos[(*it).subject];
+		const auto subject = cosm[(*it).subject];
 
 		if (subject.dead()) {
 			continue;

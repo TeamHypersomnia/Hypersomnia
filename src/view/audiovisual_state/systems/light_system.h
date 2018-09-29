@@ -62,7 +62,7 @@ struct light_system {
 
 	void advance_attenuation_variations(
 		randomization& rng,
-		const cosmos& cosmos,
+		const cosmos& cosm,
 		const augs::delta
 	);
 

@@ -181,7 +181,7 @@ containment_result query_containment_result(
 	const const_inventory_slot_handle target_slot,
 	const int specified_quantity
 ) {
-	const auto& cosmos = item_entity.get_cosmos();
+	const auto& cosm = item_entity.get_cosmos();
 	const auto item = item_entity.get<components::item>();
 	const auto& item_def = item_entity.get<invariants::item>();
 	const auto& slot = *target_slot;
@@ -203,7 +203,7 @@ containment_result query_containment_result(
 		const bool slot_would_have_too_many_items =
 			slot.always_allow_exactly_one_item
 			&& items.size() == 1
-			&& !can_stack_entities(cosmos[target_slot.get_items_inside().at(0)], item_entity)
+			&& !can_stack_entities(cosm[target_slot.get_items_inside().at(0)], item_entity)
 		;
 
 		if (slot_would_have_too_many_items) {

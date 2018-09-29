@@ -49,11 +49,11 @@ void pure_color_highlight_system::advance(const augs::delta dt) {
 }
 
 void pure_color_highlight_system::draw_highlights(
-	const cosmos& cosmos,
+	const cosmos& cosm,
 	const draw_renderable_input& in
 ) const {
 	for (const auto& r : highlights) {
-		const auto subject = cosmos[r.in.target];
+		const auto subject = cosm[r.in.target];
 
 		if (subject.dead()) {
 			continue;

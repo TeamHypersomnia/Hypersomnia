@@ -15,17 +15,17 @@
 namespace behaviours {
 	tree::goal_availability immediate_evasion::goal_resolution(tree::state_of_traversal& t) const {
 		//const auto& los = t.step.transient.calculated_line_of_sight.at(subject);
-		const auto& cosmos = t.step.get_cosmos();
-		const auto subject = cosmos[t.subject];
+		const auto& cosm = t.step.get_cosmos();
+		const auto subject = cosm[t.subject];
 
 		immediate_evasion_goal goal;
 
 		float total_danger = 0.f;
 
-		(void)cosmos;
+		(void)cosm;
 
 		/* for (auto s : los.visible_dangers) { */
-		/* 	const auto danger = assess_danger(subject, cosmos[s]); */
+		/* 	const auto danger = assess_danger(subject, cosm[s]); */
 		/* 	ensure(danger.amount > 0); */
 
 		/* 	total_danger += danger.amount; */
@@ -42,8 +42,8 @@ namespace behaviours {
 	}
 
 	void immediate_evasion::execute_leaf_goal_callback(const tree::execution_occurence o, tree::state_of_traversal& t) const {
-		auto& cosmos = t.step.get_cosmos();
-		const auto subject = cosmos[t.subject];
+		auto& cosm = t.step.get_cosmos();
+		const auto subject = cosm[t.subject];
 
 		auto& movement = subject.get<components::movement>();
 

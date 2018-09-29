@@ -13,10 +13,10 @@
 #include "game/cosmos/for_each_entity.h"
 
 void force_joint_system::apply_forces_towards_target_entities(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 	const auto delta = step.get_delta();
 
-	cosmos.for_each_having<components::force_joint>(
+	cosm.for_each_having<components::force_joint>(
 		[&](const auto it) {
 			if (!it.template has<components::rigid_body>()) {
 				return;
@@ -31,7 +31,7 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 			const auto& force_joint = it.template get<components::force_joint>();
 
 #if TODO
-			const auto chased_transform = ::find_transform(force_joint.chasing, cosmos);
+			const auto chased_transform = ::find_transform(force_joint.chasing, cosm);
 #endif
 			transformr chased_transform;
 
@@ -82,7 +82,7 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 
 				if (force_for_chased.length() > 5) {
 #if TODO
-					if (const auto chased_entity = cosmos[::get_chased(force_joint.chasing)]) {
+					if (const auto chased_entity = cosm[::get_chased(force_joint.chasing)]) {
 						const auto& chased_physics = chased_entity.template get<components::rigid_body>();
 						chased_physics.apply_force(force_for_chaser * chased_physics.get_mass());
 					}

@@ -4,7 +4,14 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
-- rename world, cosmos to cosm everywhere
+- Optionally, make the bomb non-pickupable by other factions
+	- For now just set infinite space occupied and don't iterate recursively to check if the item is forbidden
+
+- refactor: stepped_clock
+	- has delta + now
+	- passed everywhere where now and dt are required
+	- cosmos::get_clock() instead of timestamp & fixed delta
+	- this prepares us for a possibility that the delta might change and we'll need some history of delta changes
 
 - thoughts about groups, templatized components, guids and network transfers 
 	- **we will anyway templatize the components by the type of ids they store to have groups for example**
@@ -55,7 +62,6 @@ permalink: todo_low
 	- at this point it is only a performance improvement
 	- or perhaps several compilation error checks?
 
-
 - fix errors at unit tests when not statically allocating 
 - Groups can be defined separately from flavours, e.g. many groups can share the same flavours.
 	- if we want to have a group wherein a weapon is spawned with a magazine, we can simply set the inventory slot ids beforehand.
@@ -72,6 +78,17 @@ permalink: todo_low
 
 - implement instances of cooldowns for casts statelessly when there is such a need
 
-- Describe two kinds of state: constant-divergent and exponentially-divergent
-	- tree of NPO, sprites, polygons, renders: constant divergence - they do not propagate further
-	- sentience, fixtures, rigid body: exponential divergence
+- Ctrl+I shall open a quick go to gui that will instantiate a chosen flavour
+
+- Improve wielding transfers calculation so that less transfers are made
+	- Transfer effects will be fixed automagically then
+
+- Editor status bar
+	- Won't matter until after deathmatch stage
+	- Check how it works in vim
+		- Changing a mode to normal clears the last message
+	- Will be useful for the author to know what is going on
+
+- Possibly use b2TestOverlap for checking against the camera selection?
+- Make a tree out of time measurement profiler calls and get summary just from "fps" or "whole regeneration"
+

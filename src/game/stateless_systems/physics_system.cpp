@@ -11,18 +11,18 @@
 #define OVER_BODIES 0
 
 void physics_system::post_and_clear_accumulated_collision_messages(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
-	auto& physics = cosmos.get_solvable_inferred({}).physics;
+	auto& cosm = step.get_cosmos();
+	auto& physics = cosm.get_solvable_inferred({}).physics;
 	
 	step.post_message(physics.accumulated_messages);
 	physics.accumulated_messages.clear();
 }
 
 void physics_system::step_and_set_new_transforms(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
-	auto& physics = cosmos.get_solvable_inferred({}).physics;
+	auto& cosm = step.get_cosmos();
+	auto& physics = cosm.get_solvable_inferred({}).physics;
 
-	auto& performance = cosmos.profiler;
+	auto& performance = cosm.profiler;
 
 	{
 		auto scope = measure_scope(performance.physics_step);
@@ -46,13 +46,13 @@ void physics_system::step_and_set_new_transforms(const logic_step step) {
 #if OVER_BODIES
 	for (b2Body* b = physics.b2world->GetBodyList(); b != nullptr; b = b->GetNext()) {
 		if (b->GetType() == b2_staticBody) continue;
-		entity_handle entity = cosmos[b->GetUserData()];
+		entity_handle entity = cosm[b->GetUserData()];
 
 		physics.recurential_friction_handler(step, b, b->m_ownerFrictionGround);
 		entity.get<components::rigid_body>().update_after_step(*b);	
 	}
 #else
-	cosmos.for_each_having<components::rigid_body>(
+	cosm.for_each_having<components::rigid_body>(
 		[&](const auto handle){
 			const auto rigid_body = handle.template get<components::rigid_body>();
 

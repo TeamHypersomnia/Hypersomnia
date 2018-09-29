@@ -28,13 +28,13 @@ vec2 components::crosshair::get_bounds_in_this_look() const {
 }
 
 void crosshair_system::generate_crosshair_intents(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 
 	{
 		const auto& events = step.get_queue<messages::motion_message>();
 		
 		for (const auto& it : events) {
-			const auto subject = cosmos[it.subject];
+			const auto subject = cosm[it.subject];
 
 			if (const auto crosshair = subject.find_crosshair()) {
 				const vec2 delta = vec2(vec2(it.offset) * crosshair->sensitivity).rotate(crosshair->rotation_offset);
@@ -59,7 +59,7 @@ void crosshair_system::generate_crosshair_intents(const logic_step step) {
 	const auto& events = step.get_queue<messages::intent_message>();
 
 	for (const auto& it : events) {
-		const auto subject = cosmos[it.subject];
+		const auto subject = cosm[it.subject];
 		
 		if (const auto crosshair = subject.find_crosshair()) {
 			if (it.intent == game_intent_type::SWITCH_LOOK && it.was_pressed()) {
@@ -77,20 +77,20 @@ void crosshair_system::generate_crosshair_intents(const logic_step step) {
 }
 
 void crosshair_system::apply_crosshair_intents_to_base_offsets(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 	const auto& events = step.get_queue<messages::crosshair_motion_message>();
 
 	for (const auto& it : events) {
-		cosmos[it.subject].find_crosshair()->base_offset = it.crosshair_base_offset;
+		cosm[it.subject].find_crosshair()->base_offset = it.crosshair_base_offset;
 	}
 }
 
 void crosshair_system::integrate_crosshair_recoils(const logic_step step) {
 	const auto delta = step.get_delta();
 	const auto secs = delta.in_seconds();
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 
-	cosmos.for_each_having<components::crosshair>(
+	cosm.for_each_having<components::crosshair>(
 		[&](const auto subject) {
 			auto& crosshair = subject.template get<components::crosshair>();
 			auto& crosshair_def = subject.template get<invariants::crosshair>();

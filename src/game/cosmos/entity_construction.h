@@ -10,10 +10,10 @@
 
 template <class handle_type>
 void construct_pre_inference(const handle_type h) {
-	auto& cosmos = h.get_cosmos();
+	auto& cosm = h.get_cosmos();
 
 	if (const auto rigid_body = h.template find<components::rigid_body>()) {
-		rigid_body.get_special().dropped_or_created_cooldown.set(200, cosmos.get_timestamp());
+		rigid_body.get_special().dropped_or_created_cooldown.set(200, cosm.get_timestamp());
 	}
 
 	if (const auto overridden = h.template find<components::overridden_geo>()) {
@@ -35,7 +35,7 @@ void construct_pre_inference(const handle_type h) {
 
 template <class handle_type>
 void construct_post_inference(const handle_type h) {
-	auto& cosmos = h.get_cosmos();
+	auto& cosm = h.get_cosmos();
 
 	if (const auto interpolation = h.template find<components::interpolation>()) {
 		if (const auto t = h.find_logic_transform()) {
@@ -51,7 +51,7 @@ void construct_post_inference(const handle_type h) {
 	}
 
 	if (const auto trace = h.template find<components::trace>()) {
-		auto rng = cosmos.get_rng_for(h.get_id());
+		auto rng = cosm.get_rng_for(h.get_id());
 		trace->reset(*h.template find<invariants::trace>(), rng);
 	}
 
@@ -59,7 +59,7 @@ void construct_post_inference(const handle_type h) {
 		const auto def = h.template find<invariants::animation>();
 
 		if (def && def->loops_infinitely()) {
-			auto rng = cosmos.get_rng_for(h.get_id());
+			auto rng = cosm.get_rng_for(h.get_id());
 			animation->state.frame_num = rng.randval(0u, 100u);
 		}
 	}

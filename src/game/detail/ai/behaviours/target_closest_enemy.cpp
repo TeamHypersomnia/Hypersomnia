@@ -24,8 +24,8 @@ namespace behaviours {
 		if (occ == tree::execution_occurence::LAST)
 			return;
 
-		auto& cosmos = t.step.get_cosmos();
-		auto subject = cosmos[t.subject];
+		auto& cosm = t.step.get_cosmos();
+		auto subject = cosm[t.subject];
 		const auto subject_transform = subject.get_logic_transform();
 		const auto pos = subject_transform.pos;
 		/* auto& los = t.step.transient.calculated_line_of_sight.at(subject); */
@@ -37,7 +37,7 @@ namespace behaviours {
 
 		(void)min_distance;
 		/* for (auto s_raw : los.visible_sentiences) { */
-		/* 	auto s = cosmos[s_raw]; */
+		/* 	auto s = cosm[s_raw]; */
 		/* 	const auto calculated_attitude = calc_attitude(s, subject); */
 
 		/* 	if (is_hostile(calculated_attitude)) { */
@@ -50,7 +50,7 @@ namespace behaviours {
 		/* 	} */
 		/* } */
 
-		auto closest_hostile = cosmos[closest_hostile_raw];
+		auto closest_hostile = cosm[closest_hostile_raw];
 
 		attitude.currently_attacked_visible_entity = closest_hostile;
 

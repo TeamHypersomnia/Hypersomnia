@@ -11,10 +11,10 @@
 
 namespace behaviours {
 	tree::goal_availability navigate_to_last_seen_position_of_target::goal_resolution(tree::state_of_traversal& t) const {
-		auto& cosmos = t.step.get_cosmos();
-		auto subject = cosmos[t.subject];
+		auto& cosm = t.step.get_cosmos();
+		auto subject = cosm[t.subject];
 		auto& attitude = subject.get<components::attitude>();
-		auto currently_attacked_visible_entity = cosmos[attitude.currently_attacked_visible_entity];
+		auto currently_attacked_visible_entity = cosm[attitude.currently_attacked_visible_entity];
 
 		if (currently_attacked_visible_entity.dead() && attitude.is_alert && !attitude.last_seen_target_position_inspected) {
 			return tree::goal_availability::SHOULD_EXECUTE;
@@ -24,8 +24,8 @@ namespace behaviours {
 	}
 
 	void navigate_to_last_seen_position_of_target::execute_leaf_goal_callback(tree::execution_occurence o, tree::state_of_traversal& t) const {
-		auto& cosmos = t.step.get_cosmos();
-		auto subject = cosmos[t.subject];
+		auto& cosm = t.step.get_cosmos();
+		auto subject = cosm[t.subject];
 		auto& attitude = subject.get<components::attitude>();
 		auto& movement = subject.get<components::movement>();
 		auto& pathfinding = subject.get<components::pathfinding>();

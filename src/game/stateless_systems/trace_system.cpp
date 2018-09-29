@@ -22,10 +22,10 @@
 #include "game/stateless_systems/trace_system.h"
 
 void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 	const auto delta = step.get_delta();
 
-	cosmos.for_each_having<components::trace>(
+	cosm.for_each_having<components::trace>(
 		[&](const auto t) {
 			auto& trace = t.template get<components::trace>();
 			const auto& trace_def = t.template get<invariants::trace>();
@@ -50,9 +50,9 @@ void trace_system::lengthen_sprites_of_traces(const logic_step step) const {
 }
 
 void trace_system::destroy_outdated_traces(const logic_step step) const {
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 
-	cosmos.for_each_having<components::trace>(
+	cosm.for_each_having<components::trace>(
 		[&](const auto t) {
 			auto& trace = t.template get<components::trace>();
 
@@ -68,11 +68,11 @@ void trace_system::destroy_outdated_traces(const logic_step step) const {
 }
 
 void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step step) const {
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 	const auto& events = step.get_queue<messages::will_soon_be_deleted>();
 
 	for (const auto& it : events) {
-		const auto deleted_entity = cosmos[it.subject];
+		const auto deleted_entity = cosm[it.subject];
 
 		if (const auto* const trace = deleted_entity.find<components::trace>();
 	   		trace && !trace->is_it_a_finishing_trace
@@ -100,7 +100,7 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 			}
 
 			if (const auto finishing_trace = cosmic::create_entity(
-				cosmos, 
+				cosm, 
 				trace_def.finishing_trace_flavour,
 				[&](const auto typed_handle, auto&&...) {
 					typed_handle.set_logic_transform(transform_of_finishing);

@@ -143,13 +143,13 @@ void visibility_system::calc_visibility(const logic_step step) const {
 }
 
 visibility_responses visibility_system::calc_visibility(
-	const cosmos& cosmos,
+	const cosmos& cosm,
 	const visibility_requests& vis_requests
 ) const {
 	visibility_responses output;
 
 	calc_visibility(
-		cosmos,
+		cosm,
 		vis_requests,
 		output
 	);
@@ -173,11 +173,11 @@ struct target_vertex {
 };
 
 void visibility_system::calc_visibility(
-	const cosmos& cosmos,
+	const cosmos& cosm,
 	const visibility_requests& vis_requests,
 	visibility_responses& vis_responses
 ) const {
-	const auto si = cosmos.get_si();
+	const auto si = cosm.get_si();
 
 	static const auto vtx_hit_col = yellow;
 	static const auto ray_obstructed_col = red;
@@ -188,12 +188,12 @@ void visibility_system::calc_visibility(
 	static const auto triangle_edge_col = violet;
 	static const auto unreachable_area_col = white;
 
-	const auto settings = [&cosmos](){ 
+	const auto settings = [&cosm](){ 
 		auto absolutize = [](float& f) {
 			f = std::fabs(f);
 		};
 
-		auto s = cosmos.get_common_significant().visibility;
+		auto s = cosm.get_common_significant().visibility;
 
 		absolutize(s.epsilon_distance_vertex_hit);
 		absolutize(s.epsilon_ray_distance_variation);
@@ -214,7 +214,7 @@ void visibility_system::calc_visibility(
 	const auto epsilon_threshold_obstacle_hit_meters = si.get_meters(settings.epsilon_threshold_obstacle_hit);
 
 	/* we'll need a reference to physics system for raycasting */
-	const auto& physics = cosmos.get_solvable_inferred().physics;
+	const auto& physics = cosm.get_solvable_inferred().physics;
 
 	struct ray_input {
 		vec2 destination;

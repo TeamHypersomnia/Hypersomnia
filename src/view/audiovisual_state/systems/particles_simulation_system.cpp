@@ -225,7 +225,7 @@ void particles_simulation_system::update_effects_from_messages(
 }
 
 void particles_simulation_system::integrate_all_particles(
-	const cosmos& cosmos,
+	const cosmos& cosm,
 	const augs::delta delta,
 	const plain_animations_pool& anims,
 	const interpolation_system& interp
@@ -252,12 +252,12 @@ void particles_simulation_system::integrate_all_particles(
 
 	for (auto& particle_layer : homing_animated_particles) {
 		erase_if(particle_layer, [&](auto& cluster) {
-			const auto homing_target = cosmos[cluster.first];
+			const auto homing_target = cosm[cluster.first];
 
 			if (homing_target.alive()) {
 				dead_particles_remover(cluster.second);
 
-				const auto homing_transform = cosmos[cluster.first].get_viewing_transform(interp);
+				const auto homing_transform = cosm[cluster.first].get_viewing_transform(interp);
 
 				for (auto& p : cluster.second) {
 					p.integrate(delta.in_seconds(), homing_transform.pos, anims);

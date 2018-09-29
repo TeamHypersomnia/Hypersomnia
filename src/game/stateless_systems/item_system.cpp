@@ -378,8 +378,8 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 }
 
 void item_system::pick_up_touching_items(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
-	const auto& clk = cosmos.get_clock();
+	auto& cosm = step.get_cosmos();
+	const auto& clk = cosm.get_clock();
 	const auto& collisions = step.get_queue<messages::collision_message>();
 
 	for (const auto& c : collisions) {
@@ -389,8 +389,8 @@ void item_system::pick_up_touching_items(const logic_step step) {
 
 		entity_id picker_id = c.subject;
 
-		const auto picker = cosmos[picker_id];
-		const auto item_entity = cosmos[c.collider];
+		const auto picker = cosm[picker_id];
+		const auto item_entity = cosm[c.collider];
 
 		if (const auto item = item_entity.find<components::item>();
 			item && item_entity.get_owning_transfer_capability().dead()
@@ -420,7 +420,7 @@ void item_system::pick_up_touching_items(const logic_step step) {
 					(pick_list.empty() && transfers.pick_all_touched_items_if_list_to_pick_empty)
 					|| found_on_subscription_list
 				) {
-					const auto pickup_slot = typed_picker.find_pickup_target_slot_for(cosmos[item_to_pick]);
+					const auto pickup_slot = typed_picker.find_pickup_target_slot_for(cosm[item_to_pick]);
 
 					if (pickup_slot.alive()) {
 						const bool can_pick_already = transfers.pickup_timeout.try_to_fire_and_reset(clk);
@@ -436,7 +436,7 @@ void item_system::pick_up_touching_items(const logic_step step) {
 }
 
 void item_system::handle_throw_item_intents(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 	const auto& requests = step.get_queue<messages::intent_message>();
 
 	for (auto r : requests) {
@@ -451,7 +451,7 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 			}
 
 			if (requested_index != static_cast<std::size_t>(-1)) {
-				const auto subject = cosmos[r.subject];
+				const auto subject = cosm[r.subject];
 
 				if (subject.has<components::item_slot_transfers>()) {
 					if (const auto item_inside = subject.calc_hand_action(requested_index).held_item; item_inside.is_set()) {

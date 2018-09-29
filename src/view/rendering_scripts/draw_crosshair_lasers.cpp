@@ -27,8 +27,8 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 	if (in.character.alive()) {
 		const auto subject_with_crosshair = in.character; 
 
-		const auto& cosmos = in.character.get_cosmos();
-		const auto& physics = cosmos.get_solvable_inferred().physics;
+		const auto& cosm = in.character.get_cosmos();
+		const auto& physics = cosm.get_solvable_inferred().physics;
 
 		const vec2 crosshair_pos = subject_with_crosshair.get_world_crosshair_transform(in.interpolation).pos;
 
@@ -52,7 +52,7 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 			const vec2 line_to
 		) {
 			const auto raycast = physics.ray_cast_px(
-				cosmos.get_si(),
+				cosm.get_si(),
 				line_from,
 				line_to,
 				filters::flying_item(),
@@ -65,7 +65,7 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 				in.callback(
 					line_from, 
 					raycast.intersection, 
-					calc_color(cosmos[raycast.what_entity])
+					calc_color(cosm[raycast.what_entity])
 				);
 			}
 			else {
@@ -78,7 +78,7 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 		};
 
 		for (const auto subject_item_id : in.character.get_wielded_items()) {
-			const auto subject_item = cosmos[subject_item_id];
+			const auto subject_item = cosm[subject_item_id];
 
 			if (subject_item.has<components::gun>()) {
 				const auto rifle_transform = subject_item.get_viewing_transform(in.interpolation);

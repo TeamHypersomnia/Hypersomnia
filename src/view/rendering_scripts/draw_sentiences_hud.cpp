@@ -22,12 +22,12 @@ using namespace augs::gui::text;
 
 augs::vertex_triangle_buffer draw_sentiences_hud(const draw_sentiences_hud_input in) {
 	const auto& visible_entities = in.all;
-	const auto& cosmos = in.cosm;
+	const auto& cosm = in.cosm;
 	const auto& interp = in.interpolation;
 	const auto output = in.output;
 	auto& specials = in.specials;
 
-	const auto& watched_character = cosmos[in.viewed_character_id];
+	const auto& watched_character = cosm[in.viewed_character_id];
 	const auto watched_character_faction = watched_character ? watched_character.get_official_faction() : faction_type::SPECTATOR;
 
 	auto is_authorized_faction = [&](const auto f) {
@@ -37,7 +37,7 @@ augs::vertex_triangle_buffer draw_sentiences_hud(const draw_sentiences_hud_input
 	const auto timestamp_ms = static_cast<unsigned>(in.global_time_seconds * 1000);
 	augs::vertex_triangle_buffer circular_bars_information;
 
-	visible_entities.for_each<render_layer::SENTIENCES>(cosmos, [&](const auto v) {
+	visible_entities.for_each<render_layer::SENTIENCES>(cosm, [&](const auto v) {
 		if (!in.settings.draw_enemy_hud && is_authorized_faction(v.get_official_faction())) {
 			return;
 		}
@@ -108,7 +108,7 @@ augs::vertex_triangle_buffer draw_sentiences_hud(const draw_sentiences_hud_input
 					const bool ccw
 				) {
 					if (id.alive() && id.has_items()) {
-						const auto item = cosmos[id.get_items_inside()[0]];
+						const auto item = cosm[id.get_items_inside()[0]];
 
 						const auto ammo_info = calc_ammo_info(item);
 

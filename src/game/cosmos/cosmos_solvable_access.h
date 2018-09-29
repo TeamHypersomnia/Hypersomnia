@@ -15,7 +15,7 @@ struct stored_id_provider;
 
 class cosmos_solvable_access {
 	/*
-		The following domains are free to arbitrarily change the solvable inside cosmos,
+		The following domains are free to arbitrarily change the solvable inside cosm,
 		as they take proper precautions to keep state consistent or otherwise refresh it.
 	*/
 	friend cosmic_delta;

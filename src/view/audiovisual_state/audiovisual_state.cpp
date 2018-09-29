@@ -146,8 +146,8 @@ void audiovisual_state::spread_past_infection(const const_logic_step step) {
 void audiovisual_state::standard_post_solve(const const_logic_step step, const audiovisual_post_solve_input input) {
 	auto scope = measure_scope(performance.post_solve);
 
-	const auto& cosmos = step.get_cosmos();
-	//reserve_caches_for_entities(cosmos.get_solvable().get_entity_pool().capacity());
+	const auto& cosm = step.get_cosmos();
+	//reserve_caches_for_entities(cosm.get_solvable().get_entity_pool().capacity());
 
 	const auto& healths = step.get_queue<messages::health_event>();
 	const auto& new_thunders = step.get_queue<thunder_input>();
@@ -157,13 +157,13 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 	auto& interp = get<interpolation_system>();
 
 	for (const auto& c : new_interpolation_corrections) {
-		const auto from = cosmos[c.set_previous_transform_from];
+		const auto from = cosm[c.set_previous_transform_from];
 
 		if (from.alive()) {
 			//LOG_NVPS(interp.get_cache_of(c.subject).interpolated_transform.pos, interp.get_cache_of(from).interpolated_transform.pos);
 
 			interp.set_updated_interpolated_transform(
-				cosmos[c.subject],
+				cosm[c.subject],
 				interp.get_cache_of(from).interpolated_transform
 			);
 
@@ -173,7 +173,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 		}
 		else {
 			interp.set_updated_interpolated_transform(
-				cosmos[c.subject],
+				cosm[c.subject],
 				c.set_previous_transform_value
 			);
 
@@ -236,7 +236,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 					vn.text = "Death";
 					vn.color = number_col;
 
-					if (const auto transform = cosmos[h.subject].find_logic_transform()) {
+					if (const auto transform = cosm[h.subject].find_logic_transform()) {
 						vn.pos = transform->pos;
 						flying_numbers.add(vn);
 					}
@@ -368,7 +368,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 					vn.text = "Unconscious";
 					vn.color = number_col;
 
-					if (const auto transform = cosmos[h.subject].find_logic_transform()) {
+					if (const auto transform = cosm[h.subject].find_logic_transform()) {
 						vn.pos = transform->pos;
 						flying_numbers.add(vn);
 					}
@@ -460,8 +460,8 @@ void audiovisual_state::standard_post_cleanup(const const_logic_step step) {
 	}
 }
 
-void audiovisual_state::clear_dead_entities(const cosmos& cosmos) {
-	get<sound_system>().clear_dead_entities(cosmos);
-	get<particles_simulation_system>().clear_dead_entities(cosmos);
-	get<wandering_pixels_system>().clear_dead_entities(cosmos);
+void audiovisual_state::clear_dead_entities(const cosmos& cosm) {
+	get<sound_system>().clear_dead_entities(cosm);
+	get<particles_simulation_system>().clear_dead_entities(cosm);
+	get<wandering_pixels_system>().clear_dead_entities(cosm);
 }

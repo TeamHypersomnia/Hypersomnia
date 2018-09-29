@@ -5,10 +5,10 @@
 template <class E>
 typename inventory_mixin<E>::generic_handle_type inventory_mixin<E>::get_owning_transfer_capability() const {
 	const auto& self = *static_cast<const E*>(this);
-	auto& cosmos = self.get_cosmos();
+	auto& cosm = self.get_cosmos();
 
 	if (self.dead()) {
-		return cosmos[entity_id()];
+		return cosm[entity_id()];
 	}
 
 	if (self.template has<components::item_slot_transfers>()) {
@@ -16,11 +16,11 @@ typename inventory_mixin<E>::generic_handle_type inventory_mixin<E>::get_owning_
 	}
 
 	if (const auto item = self.template find<components::item>()) {
-		if (const auto slot = cosmos[item->get_current_slot()]) {
+		if (const auto slot = cosm[item->get_current_slot()]) {
 			return slot.get_container().get_owning_transfer_capability();
 		}
 	}
 
-	return cosmos[entity_id()];
+	return cosm[entity_id()];
 }
 

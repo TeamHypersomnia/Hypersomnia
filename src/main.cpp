@@ -579,7 +579,7 @@ int work(const int argc, const char* const * const argv) try {
 	) {
 		const auto screen_size = window.get_screen_size();
 		const auto viewed_character = get_viewed_character();
-		const auto& cosmos = viewed_character.get_cosmos();
+		const auto& cosm = viewed_character.get_cosmos();
 		
 		//audiovisuals.reserve_caches_for_entities(viewed_character.get_cosmos().get_solvable().get_entity_pool().capacity());
 		
@@ -590,9 +590,9 @@ int work(const int argc, const char* const * const argv) try {
 
 			interp.integrate_interpolated_transforms(
 				viewing_config.interpolation, 
-				cosmos, 
+				cosm, 
 				augs::delta(frame_delta) *= speed_multiplier, 
-				cosmos.get_fixed_delta()
+				cosm.get_fixed_delta()
 			);
 		}
 
@@ -631,7 +631,7 @@ int work(const int argc, const char* const * const argv) try {
 			all_visible,
 
 			get_viewable_defs().particle_effects,
-			cosmos.get_logical_assets().plain_animations,
+			cosm.get_logical_assets().plain_animations,
 
 			streaming.loaded_sounds,
 

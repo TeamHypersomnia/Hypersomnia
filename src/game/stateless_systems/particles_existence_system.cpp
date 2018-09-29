@@ -26,18 +26,18 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 	const auto& healths = step.get_queue<messages::health_event>();
 	const auto& exhausted_casts = step.get_queue<messages::exhausted_cast>();
 	const auto& logicals = step.get_logical_assets();
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 
 	for (const auto& g : gunshots) {
 		for (auto& r : g.spawned_rounds) {
-			const auto spawned_round = cosmos[r];
+			const auto spawned_round = cosm[r];
 
 			{
 				const auto& effect = spawned_round.get<invariants::missile>().muzzle_leave_particles;
 
 				effect.start(
 					step,
-					particle_effect_start_input::orbit_absolute(cosmos[g.subject], g.muzzle_transform)
+					particle_effect_start_input::orbit_absolute(cosm[g.subject], g.muzzle_transform)
 				);
 			}
 
@@ -49,13 +49,13 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 					effect.start(
 						step,
-						particle_effect_start_input::orbit_local(cosmos[r], { vec2::zero, rotation } )
+						particle_effect_start_input::orbit_local(cosm[r], { vec2::zero, rotation } )
 					);
 				}
 			}
 		}
 
-		const auto shell = cosmos[g.spawned_shell];
+		const auto shell = cosm[g.spawned_shell];
 
 		if (shell.alive()) {
 			const auto& effect = g.cartridge_definition.shell_trace_particles;
@@ -82,7 +82,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 		}();
 
 		if (d.inflictor_destructed) {
-			const auto inflictor = cosmos[d.origin.cause.entity];
+			const auto inflictor = cosm[d.origin.cause.entity];
 
 			if (const auto missile = inflictor.find<invariants::missile>()) {
 				const auto& effect = missile->destruction_particles;
@@ -90,7 +90,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 				{
 					effect.start(
 						step,
-						particle_effect_start_input::orbit_absolute(cosmos[d.subject], impact_transform) 
+						particle_effect_start_input::orbit_absolute(cosm[d.subject], impact_transform) 
 					);
 				}
 
@@ -118,7 +118,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 		}
 
 		if (d.type == adverse_element_type::FORCE && d.amount > 0) {
-			if (const auto subject = cosmos[d.subject]; subject.alive()) {
+			if (const auto subject = cosm[d.subject]; subject.alive()) {
 				const auto& fixtures = subject.get<invariants::fixtures>();
 
 				if (const auto* const mat = logicals.find(fixtures.material)) {
@@ -132,7 +132,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 					effect.start(
 						step,
-						particle_effect_start_input::orbit_absolute(cosmos[d.subject], impact_transform)
+						particle_effect_start_input::orbit_absolute(cosm[d.subject], impact_transform)
 					);
 				}
 			}
@@ -140,7 +140,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 	}
 
 	for (const auto& h : healths) {
-		const auto subject = cosmos[h.subject];
+		const auto subject = cosm[h.subject];
 
 		if (h.target == messages::health_event::target_type::HEALTH) {
 			const auto& sentience = subject.get<invariants::sentience>();
@@ -179,7 +179,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 	}
 
 	for (const auto& e : exhausted_casts) {
-		const auto& effect = cosmos.get_common_assets().exhausted_smoke_particles;
+		const auto& effect = cosm.get_common_assets().exhausted_smoke_particles;
 
 		effect.start(
 			step,

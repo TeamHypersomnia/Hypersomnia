@@ -297,3 +297,22 @@ summary: Just a hidden scratchpad.
 	- let pathfinding be a circumstantial component?
 	- we don't care much about that AI alters some state because virtually only ai will use that pathfinding
 	
+- ensure should throw so that the editor destructor can perform autosave
+	- actually, if some modification caused crash, it would be better if the author can try to edit without it
+	- Then, in the editor, when the game is still unstable, we will catch an error during whenever we step the cosmos or change some sensitive valuesa,
+	- then upon catching, we will save the last known correct version to hdd.
+	- for cores, just emit them programatically on unix
+	- and on windows it makes little sense to abort there, just debugbreak and throw.
+
+- Possibly abort the for_each_flavour loop altogether after deleting a flavour?
+	- Will only be problematic if the ids will be rewritten in place, which won't even be the case with sparse pools, not even with pointer ids
+	- Only problematic with direct index-based ids
+
+- Describe two kinds of state: constant-divergent and exponentially-divergent
+	- tree of NPO, sprites, polygons, renders: constant divergence - they do not propagate further
+	- sentience, fixtures, rigid body: exponential divergence
+
+- Perhaps something to let us select and manipulate entities in gameplay mode?
+	- Won't matter until after deathmatch stage
+	- will it be useful?
+

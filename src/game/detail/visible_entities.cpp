@@ -40,10 +40,10 @@ visible_entities& visible_entities::reacquire_all_and_sort(const visible_entitie
 }
 
 void visible_entities::acquire_physical(const visible_entities_query input) {
-	const auto& cosmos = input.cosm;
+	const auto& cosm = input.cosm;
 	const auto camera = input.cone;
 
-	const auto& physics = cosmos.get_solvable_inferred().physics;
+	const auto& physics = cosm.get_solvable_inferred().physics;
 
 	thread_local std::unordered_set<entity_id> unique_from_physics;
 	unique_from_physics.clear();
@@ -52,13 +52,13 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 		const auto camera_aabb = camera.get_visible_world_rect_aabb();
 		
 		physics.for_each_intersection_with_polygon(
-			cosmos.get_si(),
+			cosm.get_si(),
 			camera_aabb.get_vertices<real32>(),
 			filters::renderable_query(),
 			[&](const b2Fixture* const fix, auto, auto) {
-				const auto owning_entity_id = cosmos.to_versioned(get_entity_that_owns(fix));
+				const auto owning_entity_id = cosm.to_versioned(get_entity_that_owns(fix));
 
-				if (::passes_filter(input.filter, cosmos, owning_entity_id)) {
+				if (::passes_filter(input.filter, cosm, owning_entity_id)) {
 					unique_from_physics.insert(owning_entity_id);
 				}
 
@@ -68,12 +68,12 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 	}
 	else {
 		physics.for_each_in_camera(
-			cosmos.get_si(),
+			cosm.get_si(),
 			camera,
 			[&](const b2Fixture* const fix) {
-				const auto owning_entity_id = cosmos.to_versioned(get_entity_that_owns(fix));
+				const auto owning_entity_id = cosm.to_versioned(get_entity_that_owns(fix));
 
-				if (::passes_filter(input.filter, cosmos, owning_entity_id)) {
+				if (::passes_filter(input.filter, cosm, owning_entity_id)) {
 					unique_from_physics.insert(owning_entity_id);
 				}
 
@@ -83,28 +83,28 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 	}
 
 	for (const auto& a : unique_from_physics) {
-		register_visible(cosmos, a);
+		register_visible(cosm, a);
 	}
 }
 
 void visible_entities::acquire_non_physical(const visible_entities_query input) {
-	const auto& cosmos = input.cosm;
+	const auto& cosm = input.cosm;
 	const auto camera = input.cone;
 	const auto camera_aabb = camera.get_visible_world_rect_aabb();
 
-	const auto& tree_of_npo = cosmos.get_solvable_inferred().tree_of_npo;
+	const auto& tree_of_npo = cosm.get_solvable_inferred().tree_of_npo;
 	
 	auto acquire_from = [&](const tree_of_npo_type type) {
 		tree_of_npo.for_each_in_camera(
 			[&](const unversioned_entity_id unversioned_id) {
-				const auto id = cosmos.to_versioned(unversioned_id);
+				const auto id = cosm.to_versioned(unversioned_id);
 				
-				if (!::passes_filter(input.filter, cosmos, id)) {
+				if (!::passes_filter(input.filter, cosm, id)) {
 					return;
 				}
 
 				if (input.accuracy == EXACT) {
-					const bool visible = cosmos[id].dispatch([&](const auto typed_handle) {
+					const bool visible = cosm[id].dispatch([&](const auto typed_handle) {
 						const auto aabb = typed_handle.find_aabb();
 
 						if (aabb == std::nullopt) {
@@ -138,11 +138,11 @@ void visible_entities::acquire_non_physical(const visible_entities_query input) 
 					});
 
 					if (visible) {
-						register_visible(cosmos, id);
+						register_visible(cosm, id);
 					}
 				}
 				else {
-					register_visible(cosmos, id);
+					register_visible(cosm, id);
 				}
 			},
 			camera,

@@ -34,7 +34,7 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 
 	constexpr float standard_triad_radius = 800.f;
 	const auto caster = subject;
-	auto& cosmos = caster.get_cosmos();
+	auto& cosm = caster.get_cosmos();
 
 	if (!spell_data.missile_flavour.is_set()) {
 		return;
@@ -48,13 +48,13 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 	);
 
 	for (unsigned i = 0; i < 3 && i < static_cast<unsigned>(hostiles.size()); ++i) {
-		const auto next_hostile = cosmos[hostiles[i]];
+		const auto next_hostile = cosm[hostiles[i]];
 #if MORE_LOGS
 		LOG_NVPS(next_hostile.get_id());
 #endif
 
 		cosmic::create_entity(
-			cosmos, 
+			cosm, 
 			spell_data.missile_flavour,
 			[&](const auto new_energy_ball, auto&&...) {
 				auto new_energy_ball_transform = caster_transform;

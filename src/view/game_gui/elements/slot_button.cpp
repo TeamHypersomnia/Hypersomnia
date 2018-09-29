@@ -30,9 +30,9 @@ void slot_button::draw(
 		return;
 	}
 
-	const auto& cosmos = context.get_cosmos();
+	const auto& cosm = context.get_cosmos();
 
-	const auto slot_handle = cosmos[this_id.get_location().slot_id];
+	const auto slot_handle = cosm[this_id.get_location().slot_id];
 	const auto hand_index = slot_handle.get_hand_index();
 	const auto& detector = this_id->detector;
 	const auto output = context.get_output();
@@ -145,9 +145,9 @@ void slot_button::rebuild_layouts(const game_gui_context context, const this_in_
 }
 
 void slot_button::update_rc(const game_gui_context context, const this_in_container this_id) {
-	const auto& cosmos = context.get_cosmos();
+	const auto& cosm = context.get_cosmos();
 
-	const auto slot_handle = cosmos[this_id.get_location().slot_id];
+	const auto slot_handle = cosm[this_id.get_location().slot_id];
 
 	bool should_draw = false;
 

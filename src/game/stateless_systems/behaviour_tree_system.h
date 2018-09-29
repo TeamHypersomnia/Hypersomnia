@@ -6,5 +6,5 @@ class cosmos;
 
 class behaviour_tree_system {
 public:
-	void evaluate_trees(const logic_step cosmos);
+	void evaluate_trees(const logic_step cosm);
 };

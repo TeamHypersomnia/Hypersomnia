@@ -51,7 +51,7 @@ void thunder_system::add(
 
 void thunder_system::advance(
 	randomization& rng,
-	const cosmos& cosmos,
+	const cosmos& cosm,
 	const particle_effects_map& manager,
 	const augs::delta dt,
 	particles_simulation_system& particles_output_for_effects
@@ -90,8 +90,8 @@ void thunder_system::advance(
 
 						child.max_lifetime_ms = rng.randval(t.in.max_branch_lifetime_ms);
 
-						const auto raycast = cosmos.get_solvable_inferred().physics.ray_cast_px(
-							cosmos.get_si(),
+						const auto raycast = cosm.get_solvable_inferred().physics.ray_cast_px(
+							cosm.get_si(),
 							child.from,
 							child.to,
 							filters::flying_item()
@@ -124,7 +124,7 @@ void thunder_system::advance(
 				const bool is_leaf = b.children.empty();
 
 				if (is_leaf) {
-					const auto* const remnants = mapped_or_nullptr(manager, cosmos.get_common_assets().thunder_remnants);
+					const auto* const remnants = mapped_or_nullptr(manager, cosm.get_common_assets().thunder_remnants);
 
 					if (remnants != nullptr) {
 						const auto& remnants_emission = remnants->emissions.at(0);

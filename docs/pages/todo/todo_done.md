@@ -1609,3 +1609,9 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - Add a flag to build editor or not
 	- Because it builds really long
 
+- rename world, cosmos to cosm everywhere
+
+- Parties and hostile parties are currently integers; use bitsets properly
+	- Won't matter until after we have AI
+	- although, handle slot categories properly as well
+

@@ -11,11 +11,11 @@
 #include "game/detail/inventory/perform_transfer.h"
 
 void destroy_system::mark_queued_entities_and_their_children_for_deletion(const logic_step step) {
-	auto& cosmos = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 	const auto& queued = step.get_queue<messages::queue_deletion>();
 	auto& deletions = step.get_queue<messages::will_soon_be_deleted>();
 
-	make_deletion_queue(queued, deletions, cosmos);
+	make_deletion_queue(queued, deletions, cosm);
 }
 
 void destroy_system::reverse_perform_deletions(const logic_step step) {

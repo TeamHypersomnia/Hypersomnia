@@ -10,7 +10,7 @@ perform_transfer_result perform_transfer_impl(
 	write_synchronized_component_access,
 	cosmos_solvable_inferred_access,
 	const item_slot_transfer_request r, 
-	cosmos& cosmos
+	cosmos& cosm
 ); 
 
 template <class E>
@@ -32,8 +32,8 @@ public:
 	};
 
 	auto get_current_slot() const {
-		const auto& cosmos = this->get_handle().get_cosmos();
-		return cosmos.get_solvable().deguidize(get_raw_component().current_slot);
+		const auto& cosm = this->get_handle().get_cosmos();
+		return cosm.get_solvable().deguidize(get_raw_component().current_slot);
 	}
 
 	auto get_charges() const {

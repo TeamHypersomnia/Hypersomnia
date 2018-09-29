@@ -44,10 +44,10 @@ bool item_button::is_being_wholely_dragged_or_pending_finish(
 ) {
 	const auto& rect_world = context.get_rect_world();
 	const auto& element = context.get_character_gui();
-	const auto& cosmos = context.get_cosmos();
+	const auto& cosm = context.get_cosmos();
 
 	if (rect_world.is_currently_dragging(this_id)) {
-		const bool is_drag_partial = element.dragged_charges < cosmos[this_id.get_location().item_id].get<components::item>().get_charges();
+		const bool is_drag_partial = element.dragged_charges < cosm[this_id.get_location().item_id].get<components::item>().get_charges();
 		return !is_drag_partial;
 	}
 	else {
@@ -168,8 +168,8 @@ void item_button::draw_proc(
 		return;
 	}
 
-	const auto& cosmos = context.get_cosmos();
-	const auto& item = cosmos[this_id.get_location().item_id];
+	const auto& cosm = context.get_cosmos();
+	const auto& item = cosm[this_id.get_location().item_id];
 	const auto& detector = this_id->detector;
 	const auto& rect_world = context.get_rect_world();
 	const auto& element = context.get_character_gui();
@@ -186,7 +186,7 @@ void item_button::draw_proc(
 	
 	const auto this_absolute_rect = this_tree_entry.get_absolute_rect();
 
-	auto parent_slot = cosmos[item.get<components::item>().get_current_slot()];
+	auto parent_slot = cosm[item.get<components::item>().get_current_slot()];
 
 	rgba inside_col = cyan;
 	rgba border_col = cyan;
@@ -427,8 +427,8 @@ bool item_button::is_inventory_root(const const_game_gui_context context, const 
 void item_button::rebuild_layouts(const game_gui_context context, const this_in_item this_id) {
 	base::rebuild_layouts(context, this_id);
 
-	const auto& cosmos = context.get_cosmos();
-	const auto item = cosmos[this_id.get_location().item_id];
+	const auto& cosm = context.get_cosmos();
+	const auto item = cosm[this_id.get_location().item_id];
 
 	if (is_inventory_root(context, this_id)) {
 		this_id->set_flag(augs::gui::flag::ENABLE_DRAWING_OF_CHILDREN);
@@ -492,8 +492,8 @@ void item_button::rebuild_layouts(const game_gui_context context, const this_in_
 void item_button::respond_to_events(const game_gui_context context, const this_in_item this_id, const gui_entropy& entropies) {
 	base::respond_to_events(context, this_id, entropies);
 
-	const auto& cosmos = context.get_cosmos();
-	const auto& item = cosmos[this_id.get_location().item_id];
+	const auto& cosm = context.get_cosmos();
+	const auto& item = cosm[this_id.get_location().item_id];
 	const auto& rect_world = context.get_rect_world();
 	auto& element = context.get_character_gui();
 

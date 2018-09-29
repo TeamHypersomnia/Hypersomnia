@@ -41,7 +41,7 @@ public:
 	void advance(const augs::delta dt);
 	
 	void draw_highlights(
-		const cosmos& cosmos,
+		const cosmos& cosm,
 		const draw_renderable_input&
 	) const;
 

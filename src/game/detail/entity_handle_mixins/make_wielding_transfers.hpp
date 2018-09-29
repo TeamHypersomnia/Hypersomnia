@@ -41,10 +41,10 @@ wielding_result inventory_mixin<E>::swap_wielded_items() const {
 template <class E>
 wielding_result inventory_mixin<E>::make_wielding_transfers_for(hand_selections_array selections) const {
 	const auto& self = *static_cast<const E*>(this);
-	auto& cosmos = self.get_cosmos();
+	auto& cosm = self.get_cosmos();
 
 	for (entity_id& ss : selections) {
-		if (!cosmos[ss]) {
+		if (!cosm[ss]) {
 			ss = {};
 		}
 	}
@@ -61,7 +61,7 @@ wielding_result inventory_mixin<E>::make_wielding_transfers_for(hand_selections_
 	result.result = wielding_result::type::THE_SAME_SETUP;
 
 	if (auto move_to_secondary_and_draw = 
-		is_akimbo(cosmos, selections)
+		is_akimbo(cosm, selections)
 		&& first_held == selections[1]
 		&& second_held == entity_id()
 	) {
@@ -87,7 +87,7 @@ wielding_result inventory_mixin<E>::make_wielding_transfers_for(hand_selections_
 	for (std::size_t i = 0; i < selections.size(); ++i) {
 		const auto hand = self.get_hand_no(i);
 
-		const auto item_for_hand = cosmos[selections[si]];
+		const auto item_for_hand = cosm[selections[si]];
 		const auto item_in_hand = hand.get_item_if_any();
 
 		const bool identical_outcome =

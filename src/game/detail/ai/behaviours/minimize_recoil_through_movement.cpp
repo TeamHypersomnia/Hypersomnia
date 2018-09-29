@@ -12,10 +12,10 @@
 
 namespace behaviours {
 	tree::goal_availability minimize_recoil_through_movement::goal_resolution(tree::state_of_traversal& t) const {
-		const auto& cosmos = t.step.get_cosmos();
-		const auto subject = cosmos[t.subject];
+		const auto& cosm = t.step.get_cosmos();
+		const auto subject = cosm[t.subject];
 		const auto& attitude = subject.get<components::attitude>();
-		const auto currently_attacked_visible_entity = cosmos[attitude.currently_attacked_visible_entity];
+		const auto currently_attacked_visible_entity = cosm[attitude.currently_attacked_visible_entity];
 
 		if (const auto c = subject.find_crosshair()) {
 			if (currently_attacked_visible_entity.alive()) {
@@ -34,8 +34,8 @@ namespace behaviours {
 	}
 
 	void minimize_recoil_through_movement::execute_leaf_goal_callback(tree::execution_occurence o, tree::state_of_traversal& t) const {
-		auto& cosmos = t.step.get_cosmos();
-		const auto subject = cosmos[t.subject];
+		auto& cosm = t.step.get_cosmos();
+		const auto subject = cosm[t.subject];
 		auto& movement = subject.get<components::movement>();
 
 		if (o == tree::execution_occurence::LAST) {

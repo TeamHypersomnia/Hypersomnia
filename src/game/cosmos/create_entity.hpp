@@ -122,9 +122,9 @@ auto cosmic::specific_clone_entity(
 	const handle_type source_entity,
 	P&& pre_construction
 ) {
-	auto& cosmos = source_entity.get_cosmos();
+	auto& cosm = source_entity.get_cosmos();
 
-	return cosmic::specific_create_entity(cosmos, source_entity.get_flavour_id(), [&](const auto new_entity, auto&&...) {
+	return cosmic::specific_create_entity(cosm, source_entity.get_flavour_id(), [&](const auto new_entity, auto&&...) {
 		const auto& source_components = source_entity.get({}).components;
 		auto& new_solvable = new_entity.get({});
 		auto& new_components = new_solvable.components;
