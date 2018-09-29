@@ -380,7 +380,7 @@ void hotbar_button::respond_to_events(
 			const auto assigned_entity = this_id->get_assigned_entity(context.get_subject_entity());
 
 			if (assigned_entity.alive()) {
-				character_gui::hotbar_selection_setup setup;
+				wielding_setup setup;
 				setup.hand_selections[0] = assigned_entity;
 
 				const auto next_wielding = gui.make_and_push_hotbar_selection_setup(setup, context.get_subject_entity());

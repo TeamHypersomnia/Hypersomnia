@@ -16,32 +16,19 @@
 #include "view/game_gui/elements/hotbar_button.h"
 #include "view/game_gui/elements/action_button.h"
 #include "view/game_gui/elements/value_bar.h"
+#include "game/detail/inventory/wielding_setup.h"
 
 struct wielding_result;
 
 struct character_gui {
-	struct hotbar_selection_setup {
-		entity_handle::hand_selections_array hand_selections;
-
-		bool operator==(const hotbar_selection_setup b) const {
-			return hand_selections == b.hand_selections;  
-		}
-
-		hotbar_selection_setup get_available_entities(const const_entity_handle h) const;
-
-		friend std::ostream& operator<<(std::ostream& o, const hotbar_selection_setup& s) {
-			return pretty_print(o, s.hand_selections);
-		}
-	};
-	
 	std::array<hotbar_button, 10> hotbar_buttons;
 	std::array<action_button, 10> action_buttons;
 	std::array<value_bar, value_bar_count> value_bars;
 
-	hotbar_selection_setup last_setups[2];
+	wielding_setup last_setups[2];
 	int currently_held_hotbar_button_index = -1;
 	int push_new_setup_when_index_released = -1;
-	hotbar_selection_setup push_new_setup;
+	wielding_setup push_new_setup;
 
 	unsigned current_hotbar_selection_setup_index = 0;
 	bool is_gui_look_enabled = false;
@@ -59,17 +46,17 @@ struct character_gui {
 		const drag_and_drop_target_drop_item&
 	) const;
 
-	void save_setup(const hotbar_selection_setup);
-	void push_setup(const hotbar_selection_setup);
+	void save_setup(const wielding_setup);
+	void push_setup(const wielding_setup);
 
-	const hotbar_selection_setup& get_current_hotbar_selection_setup() const;
+	const wielding_setup& get_current_hotbar_selection_setup() const;
 
-	static entity_id get_hotbar_assigned_entity_if_available(
+	static entity_id get_wieldable_if_available(
 		const const_entity_handle gui_entity,
 		const const_entity_handle assigned_entity
 	);
 
-	hotbar_selection_setup get_setup_from_button_indices(
+	wielding_setup get_setup_from_button_indices(
 		const const_entity_handle gui_entity,
 		const int hotbar_button_index_for_primary_selection,
 		const int hotbar_button_index_for_secondary_selection = -1
@@ -100,12 +87,12 @@ struct character_gui {
 	);
 
 	wielding_result make_and_push_hotbar_selection_setup(
-		const hotbar_selection_setup new_setup,
+		const wielding_setup new_setup,
 		const const_entity_handle gui_entity
 	);
 
 	wielding_result make_wielding_transfers_for(
-		const hotbar_selection_setup new_setup,
+		const wielding_setup new_setup,
 		const const_entity_handle gui_entity
 	);
 
@@ -113,7 +100,7 @@ struct character_gui {
 		const const_entity_handle gui_entity
 	);
 
-	hotbar_selection_setup get_actual_selection_setup(
+	wielding_setup get_actual_selection_setup(
 		const const_entity_handle gui_entity
 	) const;
 

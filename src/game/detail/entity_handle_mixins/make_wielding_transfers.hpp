@@ -80,8 +80,9 @@ wielding_result inventory_mixin<E>::make_wielding_transfers_for(hand_selections_
 		return result;
 	}
 
-	augs::constant_size_vector<item_slot_transfer_request, hand_count> holsters;
-	augs::constant_size_vector<item_slot_transfer_request, hand_count> draws;
+	entity_id try_to_holster_after_draw;
+	augs::constant_size_vector<item_slot_transfer_request, hand_count_v> holsters;
+	augs::constant_size_vector<item_slot_transfer_request, hand_count_v> draws;
 
 	std::size_t si = 0;
 	for (std::size_t i = 0; i < selections.size(); ++i) {
@@ -115,6 +116,9 @@ wielding_result inventory_mixin<E>::make_wielding_transfers_for(hand_selections_
 				holsters.push_back(item_slot_transfer_request::standard(item_in_hand, holstering_slot));
 				insert_for_hand();
 			}
+			else {
+				try_to_holster_after_draw = item_in_hand;
+			}
 		}
 		else {
 			insert_for_hand();
@@ -127,6 +131,22 @@ wielding_result inventory_mixin<E>::make_wielding_transfers_for(hand_selections_
 	concatenate(result.transfers, draws);
 
 	result.play_effects_only_in_last();
+
+	if (try_to_holster_after_draw.is_set()) {
+		if (draws.size() == 1) {
+			const auto slot_drawn_from = cosm[draws[0].item].get_current_slot();
+
+			result.transfers.push_back(item_slot_transfer_request::standard(
+				try_to_holster_after_draw, 
+				slot_drawn_from
+			));
+			
+			auto& r = result.transfers.back();
+
+			r.params.play_transfer_sounds = false;
+			r.params.play_transfer_particles = false;
+		}
+	}
 
 	return result;
 }

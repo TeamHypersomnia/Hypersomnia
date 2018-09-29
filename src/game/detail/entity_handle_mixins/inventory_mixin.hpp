@@ -248,7 +248,7 @@ augs::constant_size_vector<entity_id, 2> inventory_mixin<E>::get_wielded_items()
 template <class E>
 template <class F>
 void inventory_mixin<E>::for_each_hand(F callback) const {
-	for (std::size_t i = 0; i < hand_count; ++i) {
+	for (std::size_t i = 0; i < hand_count_v; ++i) {
 		const auto hand = get_hand_no(i);
 
 		if (hand.alive()) {

@@ -39,6 +39,7 @@
 #include "game/detail/inventory/wielding_result.h"
 #include "game/detail/spells/spell_structs.h"
 #include "game/detail/entity_handle_mixins/make_wielding_transfers.hpp"
+#include "game/detail/inventory/wielding_setup.hpp"
 
 using namespace augs;
 using namespace augs::gui;
@@ -74,35 +75,16 @@ vec2i character_gui::get_initial_position_for(const vec2i screen_size, const dra
 	return vec2i(screen_size.x - 150, 30);
 }
 
-const character_gui::hotbar_selection_setup& character_gui::get_current_hotbar_selection_setup() const {
+const wielding_setup& character_gui::get_current_hotbar_selection_setup() const {
 	return last_setups[current_hotbar_selection_setup_index];
 }
 
-entity_id character_gui::get_hotbar_assigned_entity_if_available(
-	const const_entity_handle gui_entity,
-	const const_entity_handle assigned_entity
-) {
-	const auto character_capability = gui_entity.get_owning_transfer_capability();
-
-	if (character_capability.dead()) {
-		return {};
-	}
-
-	if (character_capability == assigned_entity.get_owning_transfer_capability()) {
-		if (!assigned_entity.get_current_slot()->is_mounted_slot()) {
-			return assigned_entity.get_id();
-		}
-	}
-
-	return {};
-}
-
-character_gui::hotbar_selection_setup character_gui::get_setup_from_button_indices(
+wielding_setup character_gui::get_setup_from_button_indices(
 	const const_entity_handle gui_entity,
 	const int hotbar_button_index_for_primary_selection,
 	const int hotbar_button_index_for_secondary_selection
 ) const {
-	hotbar_selection_setup output;
+	wielding_setup output;
 
 	const auto primary = hotbar_button_index_for_primary_selection;
 	const auto secondary = hotbar_button_index_for_secondary_selection;
@@ -199,24 +181,11 @@ void character_gui::assign_item_to_first_free_hotbar_button(
 	}
 }
 
-character_gui::hotbar_selection_setup character_gui::hotbar_selection_setup::get_available_entities(const const_entity_handle h) const {
-	hotbar_selection_setup output;
-
-	for (size_t i = 0; i < hand_selections.size(); ++i) {
-		output.hand_selections[i] = get_hotbar_assigned_entity_if_available(
-			h, 
-			h.get_cosmos()[hand_selections[i]]
-		); 
-	}
-
-	return output;
-}
-
 wielding_result character_gui::make_wielding_transfers_for(
-	const hotbar_selection_setup new_setup,
+	const wielding_setup new_setup,
 	const const_entity_handle gui_entity
 ) {
-	const auto actually_available_setup = new_setup.get_available_entities(gui_entity);
+	const auto actually_available_setup = new_setup.make_viable_setup(gui_entity);
 	ensure_eq(new_setup, actually_available_setup);
 
 	const auto result = gui_entity.make_wielding_transfers_for(new_setup.hand_selections);
@@ -229,7 +198,7 @@ wielding_result character_gui::make_wielding_transfers_for_previous_hotbar_selec
 	auto& current_setup_index = current_hotbar_selection_setup_index;
 	const auto& cosm = gui_entity.get_cosmos();
 
-	const auto previous_setup = last_setups[1 - current_setup_index].get_available_entities(gui_entity);
+	const auto previous_setup = last_setups[1 - current_setup_index].make_viable_setup(gui_entity);
 
 	const bool previous_is_identical_so_wield_first_item_from_hotbar
 		= previous_setup == get_actual_selection_setup(gui_entity)
@@ -280,11 +249,11 @@ wielding_result character_gui::make_wielding_transfers_for_previous_hotbar_selec
 	}
 }
 
-void character_gui::save_setup(const hotbar_selection_setup now_actual_setup) {
+void character_gui::save_setup(const wielding_setup now_actual_setup) {
 	last_setups[current_hotbar_selection_setup_index] = now_actual_setup;
 }
 
-void character_gui::push_setup(const hotbar_selection_setup new_setup) {
+void character_gui::push_setup(const wielding_setup new_setup) {
 	auto& current = current_hotbar_selection_setup_index;
 	current = 1 - current;
 
@@ -292,7 +261,7 @@ void character_gui::push_setup(const hotbar_selection_setup new_setup) {
 }
 
 wielding_result character_gui::make_and_push_hotbar_selection_setup(
-	const hotbar_selection_setup new_setup,
+	const wielding_setup new_setup,
 	const const_entity_handle gui_entity
 ) {
 	wielding_result out;
@@ -312,10 +281,10 @@ wielding_result character_gui::make_and_push_hotbar_selection_setup(
 	return out;
 }
 
-character_gui::hotbar_selection_setup character_gui::get_actual_selection_setup(
+wielding_setup character_gui::get_actual_selection_setup(
 	const const_entity_handle gui_entity
 ) const {
-	hotbar_selection_setup output;
+	wielding_setup output;
 
 	for (size_t i = 0; i < output.hand_selections.size(); ++i) {
 		output.hand_selections[i] = gui_entity.get_if_any_item_in_hand_no(i);

@@ -12,6 +12,7 @@
 #include "augs/enums/callback_result.h"
 #include "game/detail/inventory/inventory_space_type.h"
 #include "game/organization/special_flavour_id_types.h"
+#include "game/detail/inventory/wielding_setup.h"
 
 struct attachment_offset_settings;
 struct colliders_connection;
@@ -49,9 +50,6 @@ public:
 
 	using generic_handle_type = basic_entity_handle<is_const>;
 	using inventory_slot_handle_type = basic_inventory_slot_handle<generic_handle_type>;
-
-	static constexpr size_t hand_count = 2;
-	using hand_selections_array = std::array<entity_id, hand_count>;
 
 	template <class C>
 	static bool is_akimbo(const C& cosm, const hand_selections_array& sels) {

@@ -509,7 +509,7 @@ void item_button::respond_to_events(const game_gui_context context, const this_i
 				if (item.alive()) {
 					if (const auto slot = item.get_current_slot()) {
 						if (slot.get_type() != slot_function::PERSONAL_DEPOSIT) {
-							character_gui::hotbar_selection_setup setup;
+							wielding_setup setup;
 							setup.hand_selections[0] = item;
 
 							const auto next_wielding = element.make_and_push_hotbar_selection_setup(setup, context.get_subject_entity());
