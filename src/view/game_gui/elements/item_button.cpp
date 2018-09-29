@@ -425,8 +425,6 @@ bool item_button::is_inventory_root(const const_game_gui_context context, const 
 }
 
 void item_button::rebuild_layouts(const game_gui_context context, const this_in_item this_id) {
-	this_id->last_child_y_offset = 50;
-
 	base::rebuild_layouts(context, this_id);
 
 	const auto& cosmos = context.get_cosmos();
@@ -450,7 +448,21 @@ void item_button::rebuild_layouts(const game_gui_context context, const this_in_
 		this_id->rc.set_size(rounded_size);
 	}
 
-	const auto parent_slot = cosmos[item.get<components::item>().get_current_slot()];
+	const auto parent_slot = item.get_current_slot();
+
+	{
+		auto& initialized = this_id->initialized;
+
+		if (!initialized) {
+			const auto t = parent_slot.get_type();
+
+			if (t == slot_function::BACK || t == slot_function::PERSONAL_DEPOSIT) {
+				this_id->is_container_open = true;
+			}
+
+			initialized = true;
+		}
+	}
 
 	if (parent_slot) {
 		if (parent_slot->always_allow_exactly_one_item) {
