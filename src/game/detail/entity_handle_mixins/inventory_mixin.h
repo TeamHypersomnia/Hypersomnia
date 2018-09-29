@@ -51,16 +51,6 @@ public:
 	using generic_handle_type = basic_entity_handle<is_const>;
 	using inventory_slot_handle_type = basic_inventory_slot_handle<generic_handle_type>;
 
-	template <class C>
-	static bool is_akimbo(const C& cosm, const hand_selections_array& sels) {
-		for (const auto& s : sels) {
-			if (cosm[s].dead()) {
-				return false;
-			}
-		}
-
-		return true;
-	}
 
 	void infer_item_colliders_recursive() const {
 		const auto& self = *static_cast<const derived_handle_type*>(this);
@@ -131,9 +121,6 @@ public:
 	generic_handle_type get_wielded_other_than(entity_id) const;
 
 	inventory_item_address get_address_from_root(const entity_id until = entity_id()) const;
-
-	wielding_result make_wielding_transfers_for(hand_selections_array) const;
-	wielding_result swap_wielded_items() const;
 
 	template <class S, class I>
 	callback_result for_each_contained_slot_and_item_recursive(

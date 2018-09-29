@@ -1,23 +1,40 @@
 #pragma once
 #include <array>
 #include "augs/string/pretty_print.h"
+#include "game/cosmos/entity_id.h"
 
 static constexpr std::size_t hand_count_v = 2;
-using hand_selections_array = std::array<entity_id, hand_count_v>;
 
-struct wielding_setup {
-	// GEN INTROSPECTOR struct wielding_setup
+template <class id_type>
+struct basic_wielding_setup  {
+	using this_type = basic_wielding_setup<id_type>;
+	using hand_selections_array = std::array<id_type, hand_count_v>;
+
+	// GEN INTROSPECTOR struct basic_wielding_setup class id_type
 	hand_selections_array hand_selections;
 	// END GEN INTROSPECTOR
 
-	bool operator==(const wielding_setup b) const {
+	template <class E>
+	static this_type from_current(const E& character_entity);
+
+	bool operator==(const this_type& b) const {
 		return hand_selections == b.hand_selections;  
 	}
 
 	template <class E>
 	auto make_viable_setup(const E& character_entity) const;
 
-	friend std::ostream& operator<<(std::ostream& o, const wielding_setup& s) {
+	template <class C>
+	bool is_akimbo(const C& cosm) const;
+
+	template <class E>
+	bool same_as_in(const E& character_entity) const {
+		return *this == from_current(character_entity);
+	}
+
+	friend std::ostream& operator<<(std::ostream& o, const this_type& s) {
 		return pretty_print(o, s.hand_selections);
 	}
 };
+
+using wielding_setup = basic_wielding_setup<entity_id>;

@@ -24,7 +24,6 @@
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
-#include "game/detail/entity_handle_mixins/make_wielding_transfers.hpp"
 
 static int to_hotbar_index(const game_gui_intent_type type) {
 	switch (type) {
@@ -65,6 +64,7 @@ cosmic_entropy game_gui_system::get_and_clear_pending_events() {
 
 	out.transfer_requests = pending_transfers;
 	out.cast_spells_per_entity = spell_requests;
+	out.wields_per_entity = wield_requests;
 
 	pending_transfers.clear();
 	spell_requests.clear();
@@ -75,6 +75,7 @@ cosmic_entropy game_gui_system::get_and_clear_pending_events() {
 void game_gui_system::clear_all_pending_events() {
 	pending_transfers.clear();
 	spell_requests.clear();
+	wield_requests.clear();
 }
 
 character_gui& game_gui_system::get_character_gui(const entity_id id) {
@@ -121,12 +122,8 @@ void game_gui_system::queue_transfer(const item_slot_transfer_request req) {
 	pending_transfers.push_back(req);
 }
 
-void game_gui_system::queue_transfers(const wielding_result res) {
-	// ensure(res.successful());
-
-	if (res.successful()) {
-		concatenate(pending_transfers, res.transfers);
-	}
+void game_gui_system::queue_wielding(const entity_id& subject, const wielding_setup& wielding) {
+	wield_requests[subject] = wielding;
 }
 	
 bool game_gui_system::control_gui_world(
@@ -239,9 +236,10 @@ void game_gui_system::control_hotbar_and_action_button(
 				const auto resolved_index = gui_entity.calc_hand_action(requested_index).hand_index;
 
 				if (resolved_index != static_cast<std::size_t>(-1)) {
-					auto new_setup = gui.get_actual_selection_setup(gui_entity);
+					auto new_setup = wielding_setup::from_current(gui_entity);
 					new_setup.hand_selections[resolved_index].unset();
-					queue_transfers(gui.make_and_push_hotbar_selection_setup(new_setup, gui_entity));
+
+					queue_wielding(gui_entity, new_setup);
 				}
 			}
 		}
@@ -275,7 +273,7 @@ void game_gui_system::control_hotbar_and_action_button(
 							hotbar_button_index
 						);
 
-						queue_transfers(gui.make_and_push_hotbar_selection_setup(setup, gui_entity));
+						queue_wielding(gui_entity, setup);
 						gui.push_new_setup_when_index_released = -1;
 					}
 					else {
@@ -284,16 +282,16 @@ void game_gui_system::control_hotbar_and_action_button(
 							hotbar_button_index
 						);
 
-						const auto actual_setup = gui.get_actual_selection_setup(gui_entity);
+						const auto current_setup = wielding_setup::from_current(gui_entity);
 
-						gui.save_setup(actual_setup);
+						gui.save_setup(current_setup);
 
-						if (new_setup == actual_setup) {
+						if (new_setup == current_setup) {
 							auto& ar = new_setup.hand_selections;
 							std::swap(ar[0], ar[1]);
 						}
 
-						queue_transfers(gui.make_wielding_transfers_for(new_setup, gui_entity));
+						queue_wielding(gui_entity, new_setup);
 
 						gui.push_new_setup = new_setup;
 						gui.push_new_setup_when_index_released = hotbar_button_index;
@@ -330,11 +328,11 @@ void game_gui_system::control_hotbar_and_action_button(
 			}
 		}
 		else if (i.intent == game_gui_intent_type::PREVIOUS_HOTBAR_SELECTION_SETUP && i.was_pressed()) {
-			const auto wielding = gui.make_wielding_transfers_for_previous_hotbar_selection_setup(gui_entity);
+			const auto wielding = gui.make_wielding_setup_for_previous_hotbar_selection_setup(gui_entity);
 
-			if (wielding.successful()) {
-				queue_transfers(wielding);
-			}
+			//if (!wielding.same_as_in(gui_entity)) {
+				queue_wielding(gui_entity, wielding);
+				//}
 		}
 	}
 }

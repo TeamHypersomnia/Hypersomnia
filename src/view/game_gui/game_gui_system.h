@@ -16,6 +16,7 @@
 #include "view/game_gui/elements/character_gui.h"
 #include "view/game_gui/elements/slot_button.h"
 #include "view/game_gui/elements/item_button.h"
+#include "game/detail/inventory/wielding_setup.h"
 
 class game_gui_system {
 public:
@@ -25,6 +26,7 @@ public:
 	std::unordered_map<entity_id, character_gui> character_guis;
 
 	augs::container_with_small_size<std::vector<item_slot_transfer_request>, unsigned short> pending_transfers;
+	augs::container_with_small_size<std::unordered_map<entity_id, wielding_setup>, unsigned char> wield_requests;
 	augs::container_with_small_size<std::unordered_map<entity_id, spell_id>, unsigned char> spell_requests;
 	
 	game_gui_rect_world world;
@@ -65,7 +67,7 @@ public:
 	void clear_all_pending_events();
 
 	void queue_transfer(const item_slot_transfer_request);
-	void queue_transfers(const wielding_result);
+	void queue_wielding(const entity_id&, const wielding_setup&);
 
 	character_gui& get_character_gui(const entity_id);
 	const character_gui& get_character_gui(const entity_id) const;

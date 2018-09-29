@@ -512,9 +512,11 @@ void item_button::respond_to_events(const game_gui_context context, const this_i
 							wielding_setup setup;
 							setup.hand_selections[0] = item;
 
-							const auto next_wielding = element.make_and_push_hotbar_selection_setup(setup, context.get_subject_entity());
+							const auto subject = context.get_subject_entity();
 
-							context.get_game_gui_system().queue_transfers(next_wielding);
+							//if (!setup.same_as_in(subject)) {
+								context.get_game_gui_system().queue_wielding(subject, setup);
+								//}
 						}
 					}
 				}

@@ -23,6 +23,11 @@ void detail_rewriter(
 	else if constexpr(std::is_assignable_v<To&, const From&>) {
 		rewritten_to = rewritten_from;
 	}
+	else if constexpr(is_std_array_v<From>) {
+		for (std::size_t i = 0; i < rewritten_from.size(); ++i) {
+			detail_rewriter<destination_type, source_type>(rewritten_to[i], rewritten_from[i], std::forward<T>(transformator));
+		}
+	}
 	else {
 		augs::introspect(
 			[&](auto, auto& to, const auto& from) {

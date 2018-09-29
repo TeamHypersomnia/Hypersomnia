@@ -181,18 +181,7 @@ void character_gui::assign_item_to_first_free_hotbar_button(
 	}
 }
 
-wielding_result character_gui::make_wielding_transfers_for(
-	const wielding_setup new_setup,
-	const const_entity_handle gui_entity
-) {
-	const auto actually_available_setup = new_setup.make_viable_setup(gui_entity);
-	ensure_eq(new_setup, actually_available_setup);
-
-	const auto result = gui_entity.make_wielding_transfers_for(new_setup.hand_selections);
-	return result;
-}
-
-wielding_result character_gui::make_wielding_transfers_for_previous_hotbar_selection_setup(
+wielding_setup character_gui::make_wielding_setup_for_previous_hotbar_selection_setup(
 	const const_entity_handle gui_entity
 ) {
 	auto& current_setup_index = current_hotbar_selection_setup_index;
@@ -200,13 +189,11 @@ wielding_result character_gui::make_wielding_transfers_for_previous_hotbar_selec
 
 	const auto previous_setup = last_setups[1 - current_setup_index].make_viable_setup(gui_entity);
 
-	const bool previous_is_identical_so_wield_first_item_from_hotbar
-		= previous_setup == get_actual_selection_setup(gui_entity)
-	;
+	if (previous_setup == wielding_setup::from_current(gui_entity)) {
+		/* Previous is identical so wield first item from hotbar */
 
-	if (previous_is_identical_so_wield_first_item_from_hotbar) {
 		const auto try_wielding_item_from_hotbar_button_no = [&](const std::size_t hotbar_button_index) {
-			wielding_result output;
+			std::optional<wielding_setup> output;
 
 			const auto tried_setup = get_setup_from_button_indices(gui_entity, static_cast<int>(hotbar_button_index), -1);
 			const auto candidate_entity = cosm[tried_setup.hand_selections[0]];
@@ -216,7 +203,7 @@ wielding_result character_gui::make_wielding_transfers_for_previous_hotbar_selec
 					const bool finally_found_differing_setup = !(tried_setup == previous_setup);
 
 					if (finally_found_differing_setup) {
-						output = make_and_push_hotbar_selection_setup(tried_setup, gui_entity);
+						output = tried_setup;
 					}
 				}
 			}
@@ -224,29 +211,17 @@ wielding_result character_gui::make_wielding_transfers_for_previous_hotbar_selec
 			return output;
 		};
 
-		wielding_result output_transfers;
-
 		for (std::size_t i = 0; i < hotbar_buttons.size(); ++i) {
-			output_transfers = try_wielding_item_from_hotbar_button_no(i);
-
-			if (output_transfers.successful()) {
-				break;
+			if (const auto wielding = try_wielding_item_from_hotbar_button_no(i)) {
+				return *wielding;
 			}
 		}
 
-		return output_transfers;
+		return {};
 	}
-	else {
-		const auto previous_setup_that_is_different = make_wielding_transfers_for(previous_setup, gui_entity);
 
-		if (previous_setup_that_is_different.transfers.size() > 0) {
-			current_setup_index = 1 - current_setup_index;
-			return previous_setup_that_is_different;
-		}
-		else {
-			return gui_entity.swap_wielded_items();
-		}
-	}
+	current_setup_index = 1 - current_setup_index;
+	return previous_setup;
 }
 
 void character_gui::save_setup(const wielding_setup now_actual_setup) {
@@ -258,39 +233,6 @@ void character_gui::push_setup(const wielding_setup new_setup) {
 	current = 1 - current;
 
 	last_setups[current] = new_setup;
-}
-
-wielding_result character_gui::make_and_push_hotbar_selection_setup(
-	const wielding_setup new_setup,
-	const const_entity_handle gui_entity
-) {
-	wielding_result out;
-
-	if (new_setup == get_actual_selection_setup(gui_entity)) {
-		out.result = wielding_result::type::THE_SAME_SETUP;
-	}
-	else {
-		out = make_wielding_transfers_for(new_setup, gui_entity);
-
-		if (out.successful()) {
-			//save_setup(get_actual_selection_setup(gui_entity));
-			push_setup(new_setup);
-		}
-	}
-
-	return out;
-}
-
-wielding_setup character_gui::get_actual_selection_setup(
-	const const_entity_handle gui_entity
-) const {
-	wielding_setup output;
-
-	for (size_t i = 0; i < output.hand_selections.size(); ++i) {
-		output.hand_selections[i] = gui_entity.get_if_any_item_in_hand_no(i);
-	}
-
-	return output;
 }
 
 void character_gui::draw_cursor_with_tooltip(

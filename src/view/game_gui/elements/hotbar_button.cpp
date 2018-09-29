@@ -377,15 +377,16 @@ void hotbar_button::respond_to_events(
 		this_id->detector.update_appearance(info);
 
 		if (info.msg == gui_event::lclick) {
-			const auto assigned_entity = this_id->get_assigned_entity(context.get_subject_entity());
+			const auto subject = context.get_subject_entity();
+			const auto assigned_entity = this_id->get_assigned_entity(subject);
 
 			if (assigned_entity.alive()) {
 				wielding_setup setup;
 				setup.hand_selections[0] = assigned_entity;
 
-				const auto next_wielding = gui.make_and_push_hotbar_selection_setup(setup, context.get_subject_entity());
-
-				context.get_game_gui_system().queue_transfers(next_wielding);
+				//if (!setup.same_as_in(subject)) {
+					context.get_game_gui_system().queue_wielding(subject, setup);
+					//}
 			}
 		}
 

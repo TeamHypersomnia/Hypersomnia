@@ -13,6 +13,7 @@
 #include "game/messages/intent_message.h"
 #include "game/detail/inventory/item_slot_transfer_request.h"
 #include "game/detail/spells/all_spells.h"
+#include "game/detail/inventory/wielding_setup.h"
 
 class cosmos;
 
@@ -20,6 +21,8 @@ template <class key>
 struct basic_cosmic_entropy {
 	// GEN INTROSPECTOR struct basic_cosmic_entropy class key
 	augs::container_with_small_size<std::unordered_map<key, spell_id>, unsigned char> cast_spells_per_entity;
+	augs::container_with_small_size<std::unordered_map<key, basic_wielding_setup<key>>, unsigned char> wields_per_entity;
+
 	augs::container_with_small_size<std::unordered_map<key, game_intents>, unsigned char> intents_per_entity;
 	augs::container_with_small_size<std::unordered_map<key, game_motions>, unsigned char> motions_per_entity;
 	augs::container_with_small_size<std::vector<basic_item_slot_transfer_request<key>>, unsigned short> transfer_requests;

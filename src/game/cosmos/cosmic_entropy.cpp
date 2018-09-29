@@ -51,6 +51,7 @@ size_t basic_cosmic_entropy<key>::length() const {
 
 	total += transfer_requests.size();
 	total += cast_spells_per_entity.size();
+	total += wields_per_entity.size();
 
 	return total;
 }
@@ -70,6 +71,12 @@ basic_cosmic_entropy<key>& basic_cosmic_entropy<key>::operator+=(const basic_cos
 	for (const auto& spell : b.cast_spells_per_entity) {
 		if (cast_spells_per_entity.find(spell.first) == cast_spells_per_entity.end()) {
 			cast_spells_per_entity[spell.first] = spell.second;
+		}
+	}
+
+	for (const auto& wield : b.wields_per_entity) {
+		if (wields_per_entity.find(wield.first) == wields_per_entity.end()) {
+			wields_per_entity[wield.first] = wield.second;
 		}
 	}
 
@@ -112,6 +119,7 @@ bool guid_mapped_entropy::operator!=(const guid_mapped_entropy& b) const {
 	return !(
 		intents_per_entity == b.intents_per_entity
 		&& motions_per_entity == b.motions_per_entity
+		&& wields_per_entity == b.wields_per_entity
 		&& cast_spells_per_entity == b.cast_spells_per_entity
 		&& transfer_requests == b.transfer_requests
 	);
@@ -129,12 +137,18 @@ guid_mapped_entropy::guid_mapped_entropy(
 		motions_per_entity[mapper[entry.first].get_guid()] = entry.second;
 	}
 
+	const auto& solvable = mapper.get_solvable();
+
 	for (const auto& entry : b.cast_spells_per_entity) {
 		cast_spells_per_entity[mapper[entry.first].get_guid()] = entry.second;
 	}
 
+	for (const auto& entry : b.wields_per_entity) {
+		wields_per_entity[mapper[entry.first].get_guid()] = solvable.guidize(entry.second);
+	}
+
 	for (const auto& entry : b.transfer_requests) {
-		transfer_requests.push_back(mapper.get_solvable().guidize(entry));
+		transfer_requests.push_back(solvable.guidize(entry));
 	}
 }
 
@@ -150,12 +164,18 @@ cosmic_entropy::cosmic_entropy(
 		motions_per_entity[mapper[entry.first].get_id()] = entry.second;
 	}
 
+	const auto& solvable = mapper.get_solvable();
+
 	for (const auto& entry : b.cast_spells_per_entity) {
 		cast_spells_per_entity[mapper[entry.first].get_id()] = entry.second;
 	}
 
+	for (const auto& entry : b.wields_per_entity) {
+		wields_per_entity[mapper[entry.first].get_id()] = solvable.deguidize(entry.second);
+	}
+
 	for (const auto& entry : b.transfer_requests) {
-		transfer_requests.push_back(mapper.get_solvable().deguidize(entry));
+		transfer_requests.push_back(solvable.deguidize(entry));
 	}
 }
 
