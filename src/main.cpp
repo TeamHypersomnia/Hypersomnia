@@ -371,13 +371,14 @@ int work(const int argc, const char* const * const argv) try {
 		});
 	};
 
-	static auto create_game_gui_deps = []() {
+	static auto create_game_gui_deps = [](const auto& viewing_config) {
 		return game_gui_context_dependencies {
 			get_viewable_defs().image_definitions,
 			streaming.images_in_atlas,
 			streaming.necessary_images_in_atlas,
 			streaming.get_loaded_gui_fonts().gui,
-			audiovisuals.randomizing
+			audiovisuals.randomizing,
+			viewing_config.game_gui
 		};
 	};
 
@@ -744,13 +745,13 @@ int work(const int argc, const char* const * const argv) try {
 	/* MSVC ICE workaround */
 	auto& _common_input_state = common_input_state;
 
-	static auto make_create_game_gui_context = [&](const config_lua_table&) {
+	static auto make_create_game_gui_context = [&](const config_lua_table& viewing_config) {
 		return [&]() {
 			return game_gui.create_context(
 				window.get_screen_size(),
 				_common_input_state,
 				get_viewed_character(),
-				create_game_gui_deps()
+				create_game_gui_deps(viewing_config)
 			);
 		};
 	};

@@ -334,6 +334,9 @@ return {
     primary_selected_color = "0 255 255 255",
     secondary_selected_color = "86 156 214 255"
   },
+  game_gui = {
+
+  },
   interpolation = {
     enabled = true,
     speed = 1000

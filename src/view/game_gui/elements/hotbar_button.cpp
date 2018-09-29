@@ -71,7 +71,7 @@ vec2i hotbar_button::get_bbox(
 	const auto ent = get_assigned_entity(owner_transfer_capability);
 
 	if (ent.dead()) {
-		return { 55, 55 };
+		return { 45, 55 };
 	}
 
 	return get_button_corners_info().internal_size_to_cornered_size(

@@ -381,11 +381,16 @@ void game_gui_system::rebuild_layouts(
 			int current_x = screen_size.x / 2 - total_width / 2 - left_rc_spacing;
 
 			const auto set_rc = [&](auto& hb) {
-				const auto bbox = hb.get_bbox(necessarys, image_defs, root_entity);
+				//if (const auto ent = hb.get_assigned_entity(root_entity); ent.alive()) {
+					const auto bbox = hb.get_bbox(necessarys, image_defs, root_entity);
 
-				hb.rc = xywh(xywhi(current_x, screen_size.y - max_hotbar_height - 50, bbox.x + left_rc_spacing + right_rc_spacing, max_hotbar_height));
+					hb.rc = xywh(xywhi(current_x, screen_size.y - max_hotbar_height - 50, bbox.x + left_rc_spacing + right_rc_spacing, max_hotbar_height));
 
-				current_x += bbox.x + left_rc_spacing + right_rc_spacing;
+					current_x += bbox.x + left_rc_spacing + right_rc_spacing;
+					//}
+					//else {
+						//hb.rc = {};
+						//}
 			};
 
 			for (size_t i = 0; i < element.hotbar_buttons.size(); ++i) {

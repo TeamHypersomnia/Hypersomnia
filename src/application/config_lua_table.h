@@ -25,6 +25,7 @@
 #include "view/mode_gui/arena/arena_mode_gui_settings.h"
 #include "view/faction_view_settings.h"
 #include "view/gui_fonts.h"
+#include "view/game_gui/elements/game_gui_settings.h"
 
 #include "test_scenes/test_scene_settings.h"
 
@@ -83,6 +84,8 @@ struct config_lua_table {
 	augs::audio_volume_settings audio_volume;
 	debug_drawing_settings debug_drawing;
 	hotbar_settings hotbar;
+	game_gui_settings game_gui;
+
 	world_camera_settings camera;
 	game_drawing_settings drawing;
 	interpolation_settings interpolation;

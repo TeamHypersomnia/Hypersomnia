@@ -6,6 +6,7 @@ namespace augs {
 	struct baked_font;
 }
 
+struct game_gui_settings;
 struct randomizing_system;
 
 struct game_gui_context_dependencies {
@@ -14,4 +15,5 @@ struct game_gui_context_dependencies {
 	const necessary_images_in_atlas_map& necessary_images;
 	const augs::baked_font& gui_font;
 	randomizing_system& randomizing;
+	const game_gui_settings& game_gui;
 };

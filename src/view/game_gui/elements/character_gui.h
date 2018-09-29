@@ -59,8 +59,6 @@ struct character_gui {
 		const drag_and_drop_target_drop_item&
 	) const;
 
-	vec2 initial_inventory_root_position(const vec2i screen_size) const;
-
 	void save_setup(const hotbar_selection_setup);
 	void push_setup(const hotbar_selection_setup);
 
