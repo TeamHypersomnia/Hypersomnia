@@ -291,3 +291,9 @@ summary: Just a hidden scratchpad.
 	- We can quickly hide the weapon to interrupt reloading
 	- Could also be used for scavenging
 
+- team & ffa matches should get different logic altogether
+
+- what about AI?
+	- let pathfinding be a circumstantial component?
+	- we don't care much about that AI alters some state because virtually only ai will use that pathfinding
+	

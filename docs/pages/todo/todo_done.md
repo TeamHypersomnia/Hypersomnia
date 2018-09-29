@@ -1586,3 +1586,26 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- so access_independent_transform -> access_independent_transforms
 		- con: more memory wasted? who gives a heck, though...
 
+- Somehow communicate the number of magazines available and their fillings
+- Maybe just automatically arrange the items in inventory gui and keep containers open by default?
+
+- Grenades shall change shape to circle so that throws can be precise
+	- Let hand fuse invariant have an optional radius for the thrown grenade
+		- should we reinfer when tweaking?
+	- the physics world cache will simply take into consideration if the hand fuse was released, when calculating shape
+		- so hand fuse component might want to become a synchronizable
+
+- traces
+	- maybe traces should be audiovisual?
+	- fix the feel of traces (maybe shrink them only horizontally?)
+		- **only do this after we have editor**, obviously
+	- should be fast enough
+	- otherwise make it a super quick cache?
+	- chosen_lengthening_duration_ms should be randomized statelessly with help of guid
+	- store just stepped timestamp of when the trace was fired instead of incrementing the passed time 
+
+- Halftime and round limit
+
+- Add a flag to build editor or not
+	- Because it builds really long
+

@@ -6,6 +6,9 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Fix rendering order of dropped gun attachments
+	- Also make it possible to always render them under?
+
 - consider having entity guids in components instead of entity ids for simplicity of network transfers
 	- question is, won't we anyway be sending the whole pool state?
 		- it's just several bytes overhead per entity

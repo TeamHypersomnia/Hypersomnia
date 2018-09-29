@@ -6,12 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Somehow communicate the number of magazines available and their fillings
-- Maybe just automatically arrange the items in inventory gui and keep containers open by default?
-
-- Fix rendering order of dropped gun attachments
-	- Also make it possible to always render them under?
-
 - Enlarge sentiences boxes?
 	- Or add to requests when a held entity requested to draw?
 	- Would be hard since it w
@@ -94,13 +88,7 @@ summary: That which we are brainstorming at the moment.
 	- Gradually increase walking force over time
 	- The more the speed during dash, the stronger the dash
 
-- add a match-global rng seed offset to mode state
-
-- Delta controls for property editor
-	- Will be useful for offsets
-	- New tweaker_type?
-		- Based on this, set is_delta boolean in change_property_command
-		- can_accumulate_v trait
+- Add a match-global rng seed offset to mode state
 
 - Player & modes
 	- A mode shall operate without crash on virtually any cosmos
@@ -179,8 +167,6 @@ summary: That which we are brainstorming at the moment.
 
 - "I" in editor invokes initialization routine of the chosen game mode
 	- Just starts advancing it from the beginning.
-
-- team & ffa matches should get different logic altogether
 
 - FFA game mode
 	- Win condition: None, there is only time limit.
@@ -275,9 +261,6 @@ summary: That which we are brainstorming at the moment.
 		- stored in common assets
 	- now sensible filters values will be provided by the testbed
 
-- Shuffled animations
-	- Inside randomizing system?
-
 - Particles and flavours
 	- std::unordered_map<particle_flavour_id, vector of particles>
 		- We will always simulate all particles that we have in memory.
@@ -319,12 +302,7 @@ summary: That which we are brainstorming at the moment.
 		- corner case: delete while move?
 		- should work anyway and yeah, deactivate it then
 
-- Grenades shall change shape to circle so that throws can be precise
-	- Let hand fuse invariant have an optional radius for the thrown grenade
-		- should we reinfer when tweaking?
-	- the physics world cache will simply take into consideration if the hand fuse was released, when calculating shape
-		- so hand fuse component might want to become a synchronizable
-
 - check in editor if the saving/opening path is a valid folder?
+
 - make reveal in explorer work for both files and folders
 	- cause it also works for dirs
