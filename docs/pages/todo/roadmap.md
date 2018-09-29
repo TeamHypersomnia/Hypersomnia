@@ -7,14 +7,8 @@ summary: Current plans.
 ---
 
 - Editor
-	- Productivity improvements
-		- Renaming flavours automatically
-		- Final touches to property editor
 	- Decorations
-		- Static and moving animations
-		- Movement paths for decorations
 		- Wandering smokes
-		- Sounds glued to entities, e.g. computers
 	- Proper recording & replaying functionality
 		- Necessary for determinism tests
 - Networking

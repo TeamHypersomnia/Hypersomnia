@@ -28,8 +28,6 @@ summary: That which we are brainstorming at the moment.
 				- the move itself won't need to be stored
 	- Cut is just copy + delete
 
-- Shake on shooting with a sniper rifle
-
 - Game events log and chat
 	- In the same window
 	- ImGui or own GUI?
@@ -51,11 +49,6 @@ summary: That which we are brainstorming at the moment.
 - Let us comfortably drop the item in secondary hand
 	- Alt+G?
 	- The most recent?
-
-- Ensure that a single capability only ever mounts a single item at a time?
-
-- Remove the notion of container_with_small_size
-	- Interesting concept but we'll just handle it during actual serialization stage
 
 - Structuring entropy
 	- What a client sends to the server?
@@ -80,16 +73,6 @@ summary: That which we are brainstorming at the moment.
 			- But we don't have to differentiate for now
 		- Zero-commands will be signified by a zero bit
 
-- Revival and undoing the knockouts
-
-- Dashing
-	- Assigned to space, since we don't have jumping anyway
-	- pure color highlight system could be used to add highlight the dashing entity
-	- Gradually increase walking force over time
-	- The more the speed during dash, the stronger the dash
-
-- Add a match-global rng seed offset to mode state
-
 - Player & modes
 	- A mode shall operate without crash on virtually any cosmos
 		- Should catch up with changes
@@ -110,19 +93,6 @@ summary: That which we are brainstorming at the moment.
 					- instance name
 					- actually a map would be better as it will be a frequent use case and we shouldn't add this to all entities
 					- clients will simply query the map to find the viewing character
-
-- Mode round ecology
-	- Example procedure:
-		- Server starts with no players, the mode gets initialized and just advances.
-			- Special win condition logic for when there are no players.
-		- Somebody connects mid-round.
-			- They have to choose a faction, if so the server allows.
-				- Should this also be mode logic?
-				- We might later introduce auto-balance, in which case it might be good for it to stay deterministic.
-			- Changing of faction shall be part of mode entropy.
-			- Mode could keep track of names to be spawned.
-			- Simply add_player({ ... }, nickname) on connection.
-				- This first makes them a spectator.
 
 - Storage of pre-defined mode informations inside a map
 	- ``.modes`` file
@@ -266,10 +236,6 @@ summary: That which we are brainstorming at the moment.
 		- We will always simulate all particles that we have in memory.
 		- This will add a nice speedup, and also we will easily invalidate particles when particle flavour changes or is deleted.
 		- Particle types will also be pooled and will be a separate viewable.
-
-- Fix what happens when too many entities are created
-	- **Let the game work when a new entity cannot be created.**
-		- Just return a dead handle.
 
 - Probably somehow disallow arbitrary inferring of relational cache?
 	- There was some unresolved crash problem with this.

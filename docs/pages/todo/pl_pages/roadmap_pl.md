@@ -10,8 +10,6 @@ summary: Drobny scratchpad planów
 
 W kolejności:
 
-- Bomb mode
-	- GUI: Buy menu
 - Edytor
     - Wskrzeszenie odtwarzania rozgrywki do testów determinizmu (będzie konieczne do networkingu)
 - Dekoracje
@@ -27,7 +25,8 @@ W kolejności:
 	- Fixy do determinizmu w Box2D
 - Dalsze poprawki do gameplayu
 	- (Low prio) Dashing
-	- (Low prio) Nawalanie gołymi rękoma? Co jak zabraknie nam ammo i many? Całkiem możliwe, bo postacie mogą być bardzo żywotne
+	- (Low prio) Melee combat nożem
+		- A jak ktoś wyrzuci nóż to RIP
 - Ogarnięcie od strony społecznościowej
     - Nagra się porządne podsumowanie z moim komentarzem głosowym, tak jak pierwsze dwa.
     - Wtedy gra będzie już poniekąd grywalna więc trzeba będzie:
@@ -48,6 +47,8 @@ W kolejności:
 
 ## Roadmap (odfajkowane)
 
+- Bomb mode
+	- GUI: Buy menu
 - Edytor
 	- Specyfikowanie offsetów wypadania łusek per-obrazek
 - Poprawki do gameplayu

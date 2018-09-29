@@ -316,3 +316,13 @@ summary: Just a hidden scratchpad.
 	- Won't matter until after deathmatch stage
 	- will it be useful?
 
+- visible_entities should be templated by all_type
+	- could be instantiated
+	- is it necessary though?
+- normalize the names of getters in xywh/ltrb
+
+- editor should print "types of selected entities" and their common properties, identically as with entities/components
+
+
+- Ensure that a single capability only ever mounts a single item at a time?
+	- An extreme corner case

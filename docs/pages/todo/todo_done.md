@@ -1615,3 +1615,25 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- Won't matter until after we have AI
 	- although, handle slot categories properly as well
 
+- Editing vertices in editor
+	- A generic "unmap_entity_vertices" and "map_entity_vertices" that depend on the context
+		- Will be important later, once we want some crazy irregular maps.
+		- e.g. setting reach for wandering pixels
+		- if fixture, change shape
+
+- handle mouse glitches when letting go of moved entities or duplicated ones
+	- reset some drag/press state etc.
+
+
+- Mode round ecology
+	- Example procedure:
+		- Server starts with no players, the mode gets initialized and just advances.
+			- Special win condition logic for when there are no players.
+		- Somebody connects mid-round.
+			- They have to choose a faction, if so the server allows.
+				- Should this also be mode logic?
+				- We might later introduce auto-balance, in which case it might be good for it to stay deterministic.
+			- Changing of faction shall be part of mode entropy.
+			- Mode could keep track of names to be spawned.
+			- Simply add_player({ ... }, nickname) on connection.
+				- This first makes them a spectator.

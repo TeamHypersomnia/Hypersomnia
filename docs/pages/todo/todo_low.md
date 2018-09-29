@@ -92,3 +92,41 @@ permalink: todo_low
 - Possibly use b2TestOverlap for checking against the camera selection?
 - Make a tree out of time measurement profiler calls and get summary just from "fps" or "whole regeneration"
 
+- Property editor: make container elements tickable and modifiable in bulk
+
+- Fix this: due to a filter, the node disappears during renaming
+	- just when constructing a filter, save a name with which it was remembered in cached fae selections
+		- i guess we will still be able to do for eaches and all flav id getters even with changed state structure
+	- also when it is duplicated
+	- Just rebuild a cache each time a filter is modified?
+		- Not responsive if for example history is moved around, so no.
+
+- fix concatenation of shakes
+	- shake for ms
+	- shake mult
+	- impact velocity mult
+
+- Ctrl+Home should center on the whole scene
+
+- settable_as_mixin should have push_bind and pop_bind?
+
+
+- Selection tabs
+	- Generalize editor_tab_gui to be also able to handle the selection tabs window
+	- Enter on selection opens relevant selection group in tabs
+	- Switching tabs with entities should always refocus on the same kind of property
+		- Low priority
+- fix characters getting typed when alt+something combos are pressed
+	- once we have combo maps, there will be a separate function to determine whether the input is to be fetched
+		- it will also return true on "character" input
+	- a separate function will actually respond to combos
+- later print shortcuts in the menus for the windows
+	- e.g. History Alt+H
+
+- Remove the notion of container_with_small_size
+	- Interesting concept but we'll just handle it during actual serialization stage
+
+- Revival and undoing the knockouts
+
+- Add a match-global rng seed offset to mode state
+
