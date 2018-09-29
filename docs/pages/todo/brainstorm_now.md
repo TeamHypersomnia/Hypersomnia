@@ -34,6 +34,8 @@ summary: That which we are brainstorming at the moment.
 				- the move itself won't need to be stored
 	- Cut is just copy + delete
 
+- Shake on shooting with a sniper rifle
+
 - Game events log and chat
 	- In the same window
 	- ImGui or own GUI?

@@ -20,6 +20,7 @@
 #include "game/detail/adversarial_meta.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
+#include "game/detail/sentience_shake.h"
 
 namespace augs {
 	struct introspection_access;
@@ -97,6 +98,9 @@ namespace invariants {
 
 		real32 kickback_towards_wielder = 0.f;
 		real32 recoil_multiplier = 1.f;
+
+		sentience_shake shot_shake;
+		real32 shot_shake_radius = 0.f;
 
 		bool allow_chambering_with_akimbo = false;
 		pad_bytes<3> pad;

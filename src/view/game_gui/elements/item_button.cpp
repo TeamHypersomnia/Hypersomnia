@@ -383,10 +383,18 @@ void item_button::draw_proc(
 
 	if (f.draw_connector) {
 		if (!is_parent_capable || parent_slot.get_type() == slot_function::ITEM_DEPOSIT) {
+			const auto source_rect = [&]() {
+				if (const auto prev_rect = context.get_tree_entry(this_id->previous_item).get_absolute_rect(); prev_rect.good()) {
+					return prev_rect;
+				}
+
+				return context.get_tree_entry(item_button_in_item{ parent_slot.get_container() }).get_absolute_rect();
+			}();
+
 			draw_pixel_line_connector(
 				output, 
 				this_absolute_rect, 
-				context.get_tree_entry(item_button_in_item{ parent_slot.get_container() }).get_absolute_rect(),
+				source_rect,
 				border_col
 			);
 		}
@@ -417,6 +425,8 @@ bool item_button::is_inventory_root(const const_game_gui_context context, const 
 }
 
 void item_button::rebuild_layouts(const game_gui_context context, const this_in_item this_id) {
+	this_id->last_child_y_offset = 50;
+
 	base::rebuild_layouts(context, this_id);
 
 	const auto& cosmos = context.get_cosmos();
@@ -440,15 +450,30 @@ void item_button::rebuild_layouts(const game_gui_context context, const this_in_
 		this_id->rc.set_size(rounded_size);
 	}
 
-	auto parent_slot = cosmos[item.get<components::item>().get_current_slot()];
+	const auto parent_slot = cosmos[item.get<components::item>().get_current_slot()];
 
-	const auto parent_button = context.const_dereference_location(slot_button_in_container{ parent_slot.get_id() });
+	if (parent_slot) {
+		if (parent_slot->always_allow_exactly_one_item) {
+			if (const auto parent_button = context.const_dereference_location(slot_button_in_container{ parent_slot.get_id() })) {
+				this_id->rc.set_position(parent_button->rc.get_position());
+			}
+		}
+		else {
+			const auto parent_rect = context.get_tree_entry(item_button_in_item{ parent_slot.get_container() }).get_absolute_rect();
 
-	if (parent_slot->always_allow_exactly_one_item) {
-		this_id->rc.set_position(parent_button->rc.get_position());
-	}
-	else {
-		this_id->rc.set_position(this_id->drag_offset_in_item_deposit);
+			const auto source_rect = [&]() {
+				if (const auto prev_rect = context.get_tree_entry(this_id->previous_item).get_absolute_rect(); prev_rect.good()) {
+					return prev_rect;
+				}
+
+				return parent_rect;
+			}();
+
+			const auto this_size = this_id->rc.get_size();
+			const auto padding = 5;
+
+			this_id->rc.set_position(-vec2i(0, parent_rect.t - source_rect.t + this_size.y + padding) + this_id->drag_offset_in_item_deposit);
+		}
 	}
 }
 
@@ -466,6 +491,21 @@ void item_button::respond_to_events(const game_gui_context context, const this_i
 
 			if (info == gui_event::lstarteddrag) {
 				element.dragged_charges = item.get<components::item>().get_charges();
+			}
+
+			if (info == gui_event::lclick) {
+				if (item.alive()) {
+					if (const auto slot = item.get_current_slot()) {
+						if (slot.get_type() != slot_function::PERSONAL_DEPOSIT) {
+							character_gui::hotbar_selection_setup setup;
+							setup.hand_selections[0] = item;
+
+							const auto next_wielding = element.make_and_push_hotbar_selection_setup(setup, context.get_subject_entity());
+
+							context.get_game_gui_system().queue_transfers(next_wielding);
+						}
+					}
+				}
 			}
 
 			if (info == gui_event::rclick) {

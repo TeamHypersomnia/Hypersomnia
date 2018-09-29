@@ -45,20 +45,23 @@ using namespace augs::gui;
 using namespace augs::gui::text;
 
 xywh character_gui::get_rectangle_for_slot_function(const slot_function f) {
+	const auto unit = 70;
+
 	switch (f) {
-	case slot_function::PRIMARY_HAND: return xywh(100, 0, 33, 33);
-	case slot_function::SECONDARY_HAND: return xywh(-100, 0, 33, 33);
-	case slot_function::BACK: return xywh(100, -100, 33, 33);
-	case slot_function::BELT: return xywh(150, -100, 33, 33);
-	case slot_function::TORSO_ARMOR: return xywh(0, 0, 33, 33);
+	case slot_function::SECONDARY_HAND: return xywh(-unit*3, -unit, 33, 33);
 
-	case slot_function::ITEM_DEPOSIT: return xywh(0, -100, 33, 33);
-	case slot_function::SHOULDER: return xywh(0, -150, 33, 33);
-	case slot_function::PERSONAL_DEPOSIT: return xywh(0, -100, 33, 33);
+	case slot_function::PRIMARY_HAND: return xywh(-unit*3, 0, 33, 33);
+	case slot_function::PERSONAL_DEPOSIT: return xywh(-unit * 1, 0, 33, 33);
+	case slot_function::SHOULDER: return xywh(0, 0, 33, 33);
+	case slot_function::BELT: return xywh(unit, 0, 33, 33);
+	case slot_function::BACK: return xywh(unit * 2, 0, 33, 33);
+	case slot_function::TORSO_ARMOR: return xywh(unit * 3, 0, 33, 33);
 
-	case slot_function::GUN_DETACHABLE_MAGAZINE: return xywh(0, 50, 33, 33);
-	case slot_function::GUN_CHAMBER: return xywh(0, -50, 33, 33);
-	case slot_function::GUN_MUZZLE: return xywh(-50, 0, 33, 33);
+	case slot_function::ITEM_DEPOSIT: return xywh(0, 0, 33, 33);
+
+	case slot_function::GUN_DETACHABLE_MAGAZINE: return xywh(0, unit, 33, 33);
+	case slot_function::GUN_CHAMBER: return xywh(0, -unit, 33, 33);
+	case slot_function::GUN_MUZZLE: return xywh(-unit, 0, 33, 33);
 	default: ensure(false);
 	}
 	ensure(false);
@@ -71,7 +74,7 @@ vec2i character_gui::get_initial_position_for(const vec2i screen_size, const dra
 }
 
 vec2 character_gui::initial_inventory_root_position(const vec2i screen_size) const {
-	return vec2(screen_size.x - 250.f, screen_size.y - 200.f);
+	return vec2(screen_size.x - 250.f, screen_size.y + 100.f);
 }
 
 const character_gui::hotbar_selection_setup& character_gui::get_current_hotbar_selection_setup() const {

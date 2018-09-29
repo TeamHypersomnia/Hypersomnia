@@ -25,6 +25,9 @@ struct item_button : game_gui_rect_node {
 
 	vec2i drag_offset_in_item_deposit;
 
+	int last_child_y_offset = 0;
+	mutable item_button_in_item previous_item;
+
 	static ltrb calc_button_layout(
 		const const_entity_handle component_owner,
 		const image_definitions_map&,
@@ -65,10 +68,17 @@ struct item_button : game_gui_rect_node {
 					generic_call(context.dereference_location(child_slot_location));
 				}
 
-				for (const auto in : ::get_items_inside(container_entity, s.first)) {
+				const auto items_inside = ::get_items_inside(container_entity, s.first);
+
+				for (std::size_t i = 0; i < items_inside.size(); ++i) {
+					const auto& in = items_inside[i];
+
 					item_button_in_item child_item_location;
 					child_item_location.item_id = in;
-					generic_call(context.dereference_location(child_item_location));
+
+					const auto dereferenced = context.dereference_location(child_item_location);
+					dereferenced->previous_item.item_id = i > 0 ? items_inside[i - 1] : entity_id();
+					generic_call(dereferenced);
 				}
 			}
 		}

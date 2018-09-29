@@ -179,8 +179,8 @@ void slot_button::update_rc(const game_gui_context context, const this_in_contai
 
 	if (is_capable) {
 		inventory_root_offset = context.get_screen_size();
-		inventory_root_offset.x -= 250;
-		inventory_root_offset.y -= 200;
+		inventory_root_offset.x -= 300;
+		inventory_root_offset.y -= 100;
 	}
 
 	const auto standard_relative_pos = ltrb(character_gui::get_rectangle_for_slot_function(this_id.get_location().slot_id.type));
