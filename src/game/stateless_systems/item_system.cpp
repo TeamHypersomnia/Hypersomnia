@@ -524,7 +524,7 @@ void item_system::handle_wielding_requests(const logic_step step) {
 		const auto& self = cosm[wield.first];
 		const auto& request = wield.second;
 		const auto& selections = request.hand_selections;
-		const auto current_selection = wielding_setup::from_current(self);
+		//const auto current_selection = wielding_setup::from_current(self);
 
 		const auto first_held = cosm[selections[0]];
 		const auto second_held = cosm[selections[1]];
@@ -540,11 +540,11 @@ void item_system::handle_wielding_requests(const logic_step step) {
 			continue;
 		}
 
-		if (current_selection == request) {
-			WLD_LOG("Same setup. Swap.");
-			swap_wielded(self);
-			continue;
-		}
+		/* if (current_selection == request) { */
+		/* 	WLD_LOG("Same setup. Swap."); */
+		/* 	swap_wielded(self); */
+		/* 	continue; */
+		/* } */
 
 #if 1
 		if (request.is_akimbo(cosm)

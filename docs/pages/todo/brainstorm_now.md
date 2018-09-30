@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- fix wielding sounds
+	- keep vector of perform transfer results with marks whether they should happen
+	- always notify logic, only finally notify audiovisuals
+
 - Enlarge sentiences boxes?
 	- Or add to requests when a held entity requested to draw?
 	- Would be hard since it w

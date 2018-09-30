@@ -41,7 +41,7 @@
 #include "game/detail/entity_handle_mixins/make_wielding_transfers.hpp"
 #include "game/detail/inventory/wielding_setup.hpp"
 
-#define LOG_HOTBAR 1
+#define LOG_HOTBAR 0
 
 template <class... Args>
 void HOT_LOG(Args&&... args) {
@@ -204,13 +204,19 @@ wielding_setup character_gui::make_wielding_setup_for_previous_hotbar_selection_
 	auto& current_setup_index = current_hotbar_selection_setup_index;
 	const auto& cosm = gui_entity.get_cosmos();
 
-	const auto previous_setup = last_setups[1 - current_setup_index].make_viable_setup(gui_entity);
+	const auto prev_idx = 1 - current_setup_index;
+
+	HOT_LOG("Q. Current: %x Prev: %x", current_setup_index, prev_idx);
+
+	const auto previous_setup = last_setups[prev_idx].make_viable_setup(gui_entity);
 
 	if (previous_setup == wielding_setup::from_current(gui_entity)) {
 		/* Previous is identical so wield first item from hotbar */
 
-		HOT_LOG_NVPS(previous_setup.hand_selections[0], previous_setup.hand_selections[1]);
-		HOT_LOG("Same setup");
+		HOT_LOG("Same setup:");
+
+		HOT_LOG_NVPS(cosm[previous_setup.hand_selections[0]]);
+		HOT_LOG_NVPS(cosm[previous_setup.hand_selections[1]]);
 
 		const auto try_wielding_item_from_hotbar_button_no = [&](const std::size_t hotbar_button_index) {
 			std::optional<wielding_setup> output;
@@ -240,22 +246,22 @@ wielding_setup character_gui::make_wielding_setup_for_previous_hotbar_selection_
 		return {};
 	}
 
-	HOT_LOG_NVPS(current_setup_index);
+	HOT_LOG("Different setups, standard request.");
 
-	current_setup_index = 1 - current_setup_index;
+	current_setup_index = prev_idx;
 	return previous_setup;
 }
 
 void character_gui::save_setup(const wielding_setup now_actual_setup) {
-	HOT_LOG("Saving setup");
+	HOT_LOG("Saving setup to %x", current_hotbar_selection_setup_index);
 	last_setups[current_hotbar_selection_setup_index] = now_actual_setup;
 }
 
 void character_gui::push_setup(const wielding_setup new_setup) {
-	HOT_LOG("Pushing setup");
 	auto& current = current_hotbar_selection_setup_index;
 	current = 1 - current;
 
+	HOT_LOG("Pushing setup to %x", current);
 	last_setups[current] = new_setup;
 }
 

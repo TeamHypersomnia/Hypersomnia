@@ -239,6 +239,7 @@ void game_gui_system::control_hotbar_and_action_button(
 					new_setup.hand_selections[resolved_index].unset();
 
 					queue_wielding(gui_entity, new_setup);
+					gui.push_setup(new_setup);
 				}
 			}
 		}
@@ -266,16 +267,20 @@ void game_gui_system::control_hotbar_and_action_button(
 					const bool should_dual_wield = currently_held_index > -1;
 
 					if (should_dual_wield) {
-						const auto setup = gui.get_setup_from_button_indices(
+						const auto akimbo_setup = gui.get_setup_from_button_indices(
 							gui_entity, 
 							currently_held_index, 
 							hotbar_button_index
 						);
 
-						queue_wielding(gui_entity, setup);
-						gui.push_new_setup_when_index_released = -1;
+						queue_wielding(gui_entity, akimbo_setup);
+						gui.save_setup(akimbo_setup);
+
+						currently_held_index = -1;
 					}
 					else {
+						currently_held_index = hotbar_button_index;
+
 						auto new_setup = gui.get_setup_from_button_indices(
 							gui_entity, 
 							hotbar_button_index
@@ -283,30 +288,17 @@ void game_gui_system::control_hotbar_and_action_button(
 
 						const auto current_setup = wielding_setup::from_current(gui_entity);
 
-						gui.save_setup(current_setup);
-
 						if (new_setup == current_setup) {
 							auto& ar = new_setup.hand_selections;
 							std::swap(ar[0], ar[1]);
 						}
 
 						queue_wielding(gui_entity, new_setup);
-
-						gui.push_new_setup = new_setup;
-						gui.push_new_setup_when_index_released = hotbar_button_index;
+						gui.push_setup(new_setup);
 					}
-
-					currently_held_index = hotbar_button_index;
 				}
 				else {
-					if (hotbar_button_index == currently_held_index) {
-						currently_held_index = -1;
-					}
-				
-					if (hotbar_button_index == gui.push_new_setup_when_index_released) {
-						gui.push_setup(gui.push_new_setup);
-						gui.push_new_setup_when_index_released = -1;
-					}
+					currently_held_index = -1;
 				}
 			}
 		}
@@ -486,10 +478,6 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 				for (auto& s : l.hand_selections) {
 					migrate_id(s);
 				}
-			}
-
-			for (auto& s : ch.push_new_setup.hand_selections) {
-				migrate_id(s);
 			}
 		}
 	}
