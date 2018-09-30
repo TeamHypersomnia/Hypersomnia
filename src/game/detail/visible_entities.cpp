@@ -72,10 +72,27 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 			camera,
 			[&](const b2Fixture* const fix) {
 				const auto owning_entity_id = cosm.to_versioned(get_entity_that_owns(fix));
+				const auto handle = cosm[owning_entity_id];
 
-				if (::passes_filter(input.filter, cosm, owning_entity_id)) {
-					unique_from_physics.insert(owning_entity_id);
-				}
+				handle.dispatch(
+					[&](const auto& typed_handle) {
+						using T = remove_cref<decltype(typed_handle)>;
+
+						auto add_if_passes = [&](const auto& what) {
+							if (::passes_filter(input.filter, what)) {
+								unique_from_physics.insert(what.get_id());
+							}
+						};
+
+						if constexpr(T::template has<components::item>()) {
+							if (const auto owning_capability = typed_handle.get_owning_transfer_capability()) {
+								add_if_passes(owning_capability);
+							}
+						}
+
+						add_if_passes(typed_handle);
+					}
+				);
 
 				return callback_result::CONTINUE;
 			}

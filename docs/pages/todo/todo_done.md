@@ -1645,3 +1645,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - Fix convex partitioning bug
 - Fix triangle bug in visibility system
 
+- When a held entity is visible, add its capability to the visible entities so it is also drawn
+
