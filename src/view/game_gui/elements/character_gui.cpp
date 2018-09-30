@@ -209,8 +209,9 @@ wielding_setup character_gui::make_wielding_setup_for_previous_hotbar_selection_
 	HOT_LOG("Q. Current: %x Prev: %x", current_setup_index, prev_idx);
 
 	const auto previous_setup = last_setups[prev_idx].make_viable_setup(gui_entity);
+	const auto current_setup = wielding_setup::from_current(gui_entity);
 
-	if (previous_setup == wielding_setup::from_current(gui_entity)) {
+	if (previous_setup == current_setup) {
 		/* Previous is identical so wield first item from hotbar */
 
 		HOT_LOG("Same setup:");
@@ -248,6 +249,7 @@ wielding_setup character_gui::make_wielding_setup_for_previous_hotbar_selection_
 
 	HOT_LOG("Different setups, standard request.");
 
+	last_setups[current_setup_index] = current_setup;
 	current_setup_index = prev_idx;
 	return previous_setup;
 }
