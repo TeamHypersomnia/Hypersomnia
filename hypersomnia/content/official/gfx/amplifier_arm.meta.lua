@@ -31,6 +31,13 @@ return {
           y = 0
         },
         rotation = 0
+      },
+      shell_spawn = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       }
     },
     item = {
@@ -76,6 +83,69 @@ return {
         y = 0
       }
     },
+    non_standard_shape = {
+      convex_partition = {
+        3,
+        4,
+        5,
+        8,
+        3,
+        5,
+        6,
+        7,
+        8,
+        5,
+        1,
+        2,
+        3,
+        8,
+        9,
+        0,
+        1
+      },
+      original_poly = {
+        {
+          x = -30,
+          y = 2
+        },
+        {
+          x = -24,
+          y = -6
+        },
+        {
+          x = -16,
+          y = -6
+        },
+        {
+          x = 6,
+          y = -1
+        },
+        {
+          x = 19,
+          y = -9
+        },
+        {
+          x = 18,
+          y = -4
+        },
+        {
+          x = 30,
+          y = -4
+        },
+        {
+          x = 29,
+          y = 8
+        },
+        {
+          x = 3,
+          y = 5
+        },
+        {
+          x = -29,
+          y = 7
+        }
+      }
+    },
     torso = {
       back = {
         pos = {
@@ -111,7 +181,15 @@ return {
           y = 0
         },
         rotation = 0
-      }
+      },
+      shoulder = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      strafe_facing_offset = 0
     }
   },
   usage_as_button = {

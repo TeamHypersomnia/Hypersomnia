@@ -1642,3 +1642,4 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- keep vector of perform transfer results with marks whether they should happen
 	- always notify logic, only finally notify audiovisuals
 
+- Fix convex partitioning bug
