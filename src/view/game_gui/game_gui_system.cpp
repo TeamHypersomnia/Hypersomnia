@@ -223,6 +223,46 @@ void game_gui_system::control_hotbar_and_action_button(
 		auto r = intent;
 
 		if (r.was_pressed()) {
+			auto request_setup = [&](const auto& new_setup, const auto& current_setup) {
+				queue_wielding(gui_entity, new_setup);
+				gui.overwrite_current_setup(current_setup);
+				gui.push_setup(new_setup);
+			};
+
+			if (r.intent == game_gui_intent_type::HOLSTER) {
+				const auto& cosm = gui_entity.get_cosmos();
+
+				const auto current_setup = wielding_setup::from_current(gui_entity);
+
+				const auto first = cosm[current_setup.hand_selections[0]];
+				const auto second = cosm[current_setup.hand_selections[1]];
+
+				if (first && second) {
+					const auto& item_0 = first.template get<components::item>();
+					const auto& item_1 = second.template get<components::item>();
+
+					auto when = [&](const auto& it) {
+						return it.get_raw_component().when_last_transferred.step;
+					};
+
+					auto hide_nth = [&](const auto n) {
+						auto new_setup = current_setup;
+						new_setup.hand_selections[n].unset();
+						request_setup(new_setup, current_setup);
+					};
+
+					if (when(item_0) < when(item_1)) {
+						hide_nth(1);
+						return;
+					}
+
+					if (when(item_1) < when(item_0)) {
+						hide_nth(0);
+						return;
+					}
+				}
+			}
+
 			auto requested_index = static_cast<std::size_t>(-1);
 
 			if (r.intent == game_gui_intent_type::HOLSTER) {
@@ -236,11 +276,13 @@ void game_gui_system::control_hotbar_and_action_button(
 				const auto resolved_index = gui_entity.calc_hand_action(requested_index).hand_index;
 
 				if (resolved_index != static_cast<std::size_t>(-1)) {
-					auto new_setup = wielding_setup::from_current(gui_entity);
+					const auto current_setup = wielding_setup::from_current(gui_entity);
+
+					auto new_setup = current_setup;
 					new_setup.hand_selections[resolved_index].unset();
 
-					queue_wielding(gui_entity, new_setup);
-					gui.push_setup(new_setup);
+					request_setup(new_setup, current_setup);
+					return;
 				}
 			}
 		}
@@ -275,7 +317,13 @@ void game_gui_system::control_hotbar_and_action_button(
 						);
 
 						queue_wielding(gui_entity, akimbo_setup);
-						gui.save_setup(akimbo_setup);
+
+						/* 
+							Saving into the current setup now 
+							overwrites the setup that was pushed when only the first item was requested.
+						*/
+
+						gui.overwrite_current_setup(akimbo_setup);
 
 						currently_held_index = -1;
 					}

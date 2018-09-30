@@ -464,7 +464,7 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 	}
 }
 
-#define LOG_WIELDING 1
+#define LOG_WIELDING 0
 
 template <class... Args>
 void WLD_LOG(Args&&... args) {

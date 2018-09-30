@@ -25,7 +25,9 @@ namespace test_flavours {
 			meta.set(render_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BACKPACK, white);
-			test_flavours::add_lying_item_dynamic_body(meta);
+
+			auto& fixtures = test_flavours::add_lying_item_dynamic_body(meta);
+			fixtures.density *= 0.3f;
 
 			invariants::container container; 
 			inventory_slot slot_def;

@@ -2,6 +2,7 @@
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/inventory/inventory_space_type.h"
 
+#include "augs/misc/timing/stepped_timing.h"
 #include "game/enums/item_category.h"
 #include "game/enums/item_holding_stance.h"
 
@@ -15,6 +16,7 @@ namespace components {
 		// GEN INTROSPECTOR struct components::item
 		int charges = 1;
 		signi_inventory_slot_id current_slot;
+		augs::stepped_timestamp when_last_transferred;
 		// END GEN INTROSPECTOR
 	};
 }

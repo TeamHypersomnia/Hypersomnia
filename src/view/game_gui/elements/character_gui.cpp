@@ -41,7 +41,7 @@
 #include "game/detail/entity_handle_mixins/make_wielding_transfers.hpp"
 #include "game/detail/inventory/wielding_setup.hpp"
 
-#define LOG_HOTBAR 0
+#define LOG_HOTBAR 1
 
 template <class... Args>
 void HOT_LOG(Args&&... args) {
@@ -254,7 +254,7 @@ wielding_setup character_gui::make_wielding_setup_for_previous_hotbar_selection_
 	return previous_setup;
 }
 
-void character_gui::save_setup(const wielding_setup now_actual_setup) {
+void character_gui::overwrite_current_setup(const wielding_setup now_actual_setup) {
 	HOT_LOG("Saving setup to %x", current_hotbar_selection_setup_index);
 	last_setups[current_hotbar_selection_setup_index] = now_actual_setup;
 }

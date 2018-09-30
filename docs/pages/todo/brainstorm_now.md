@@ -201,7 +201,6 @@ summary: That which we are brainstorming at the moment.
 		- Will be named like ``ProjectName.compat.lua``
 			- Contains the intercosm and rulesets, all important things.
 
-
 - Sound should be loaded from the smallest to the biggest
 	- So that effects are loaded first
 	- New synchronization

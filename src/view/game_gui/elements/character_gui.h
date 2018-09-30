@@ -42,7 +42,7 @@ struct character_gui {
 		const drag_and_drop_target_drop_item&
 	) const;
 
-	void save_setup(const wielding_setup);
+	void overwrite_current_setup(const wielding_setup);
 	void push_setup(const wielding_setup);
 
 	const wielding_setup& get_current_hotbar_selection_setup() const;

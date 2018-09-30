@@ -365,5 +365,7 @@ perform_transfer_result perform_transfer_impl(
 		}
 	}
 
+	const auto now = cosm.get_timestamp();
+	item.when_last_transferred = now;
 	return output;
 }
