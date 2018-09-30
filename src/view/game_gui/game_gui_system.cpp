@@ -66,8 +66,7 @@ cosmic_entropy game_gui_system::get_and_clear_pending_events() {
 	out.cast_spells_per_entity = spell_requests;
 	out.wields_per_entity = wield_requests;
 
-	pending_transfers.clear();
-	spell_requests.clear();
+	clear_all_pending_events();
 
 	return out;
 }

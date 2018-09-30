@@ -95,15 +95,15 @@ void basic_cosmic_entropy<key>::clear() {
 
 template <class key>
 void basic_cosmic_entropy<key>::clear_dead_entities(const cosmos& cosm) {
-	auto eraser = [&cosm](const auto& it) {
-		return cosm[it.first].dead();
-	};
-
 	augs::introspect(
 		[&](auto, auto& member_container) {
 			using T = remove_cref<decltype(member_container)>;
 			
 			if constexpr(!std::is_same_v<decltype(transfer_requests), T>) {
+				auto eraser = [&cosm](const auto& it) {
+					return cosm[it.first].dead();
+				};
+
 				erase_if(member_container, eraser);
 			}
 		},
