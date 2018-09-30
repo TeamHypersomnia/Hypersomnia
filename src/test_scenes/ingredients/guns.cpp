@@ -217,12 +217,6 @@ namespace test_flavours {
 
 			{
 				{
-					components::trace trace_def;
-					trace_def.enabled = true;
-					meta.set(trace_def);
-				}
-
-				{
 					invariants::trace trace_def;
 					trace_def.max_multiplier_x = {0.370f, 1.0f};
 					trace_def.max_multiplier_y = {0.f, 0.09f};
@@ -289,12 +283,6 @@ namespace test_flavours {
 
 			{
 				{
-					components::trace trace_def;
-					trace_def.enabled = true;
-					meta.set(trace_def);
-				}
-
-				{
 					invariants::trace trace_def;
 					trace_def.max_multiplier_x = {0.370f, 1.0f};
 					trace_def.max_multiplier_y = {0.f, 0.09f};
@@ -359,12 +347,6 @@ namespace test_flavours {
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, white);
 
 			{
-				{
-					components::trace trace_def;
-					trace_def.enabled = true;
-					meta.set(trace_def);
-				}
-
 				{
 					invariants::trace trace_def;
 					trace_def.max_multiplier_x = {0.370f, 1.0f};
@@ -664,10 +646,6 @@ namespace test_flavours {
 
 			meta.set(item);
 
-			components::item item_inst;
-			item_inst.charges = 30;
-			meta.set(item_inst);
-
 			{
 				invariants::cartridge cartridge; 
 
@@ -701,10 +679,6 @@ namespace test_flavours {
 
 			meta.set(item);
 
-			components::item item_inst;
-			item_inst.charges = 8;
-			meta.set(item_inst);
-
 			{
 				invariants::cartridge cartridge; 
 
@@ -737,10 +711,6 @@ namespace test_flavours {
 			item.stackable = true;
 
 			meta.set(item);
-
-			components::item item_inst;
-			item_inst.charges = 8;
-			meta.set(item_inst);
 
 			{
 				invariants::cartridge cartridge; 
