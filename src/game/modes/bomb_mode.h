@@ -189,8 +189,8 @@ public:
 	};
 
 	struct participating_factions {
-		faction_type bombing;
-		faction_type defusing;
+		faction_type bombing = faction_type::SPECTATOR;
+		faction_type defusing = faction_type::SPECTATOR;
 
 		template <class F>
 		void for_each(F callback) const {

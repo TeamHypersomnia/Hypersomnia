@@ -1643,3 +1643,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- always notify logic, only finally notify audiovisuals
 
 - Fix convex partitioning bug
+- Fix triangle bug in visibility system
+

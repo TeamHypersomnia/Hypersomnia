@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Fix triangle bug in visibility system
-
 - Enlarge sentiences boxes?
 	- Or add to requests when a held entity requested to draw?
 	- Would be hard since it w
