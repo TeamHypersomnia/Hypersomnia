@@ -2,12 +2,9 @@ return {
   extra_loadables = {
     enabled_generate_neon_map = {
       alpha_multiplier = 1,
-      amplification = 80,
+      amplification = 130,
       light_colors = {
-        "0 202 188 255",
-        "12 170 159 255",
-        "18 72 119 255",
-        "24 60 91 255"
+        "0 255 255 255"
       },
       radius = {
         x = 80,
@@ -24,6 +21,13 @@ return {
         y = 0
       },
       detachable_magazine = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      shell_spawn = {
         pos = {
           x = 0,
           y = 0
@@ -74,6 +78,10 @@ return {
         y = 0
       }
     },
+    non_standard_shape = {
+      convex_partition = {},
+      original_poly = {}
+    },
     torso = {
       back = {
         pos = {
@@ -109,7 +117,15 @@ return {
           y = 0
         },
         rotation = 0
-      }
+      },
+      shoulder = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      strafe_facing_offset = 0
     }
   },
   usage_as_button = {

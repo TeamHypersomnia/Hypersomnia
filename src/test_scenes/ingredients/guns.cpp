@@ -1355,7 +1355,7 @@ namespace test_flavours {
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::VINDICATOR_SHOT_1, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 1.15f);
-			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1200.f);
+			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1200.f, 0.f);
 			meta.get<invariants::item>().standard_price = 2900;
 			set_chambering_duration_ms(meta, 500.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;

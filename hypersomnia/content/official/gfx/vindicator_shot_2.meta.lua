@@ -25,10 +25,17 @@ return {
       },
       detachable_magazine = {
         pos = {
-          x = -8,
-          y = 9
+          x = -19,
+          y = 8
         },
-        rotation = 90
+        rotation = 0
+      },
+      shell_spawn = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       }
     },
     item = {
@@ -74,6 +81,10 @@ return {
         y = 0
       }
     },
+    non_standard_shape = {
+      convex_partition = {},
+      original_poly = {}
+    },
     torso = {
       back = {
         pos = {
@@ -109,7 +120,15 @@ return {
           y = 0
         },
         rotation = 0
-      }
+      },
+      shoulder = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      strafe_facing_offset = 0
     }
   },
   usage_as_button = {
