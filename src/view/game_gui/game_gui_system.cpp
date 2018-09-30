@@ -23,6 +23,7 @@
 #include "game/messages/changed_identities_message.h"
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 
+#include "game/detail/inventory/wielding_setup.hpp"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 
 static int to_hotbar_index(const game_gui_intent_type type) {
