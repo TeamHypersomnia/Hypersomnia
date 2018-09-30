@@ -351,8 +351,14 @@ namespace test_scenes {
 
 			{
 				create(test_sprite_decorations::HAVE_A_PLEASANT, transformr(vec2(-42, -32)));
+
+				create(test_plain_sprited_bodies::SNACKBAR, transformr(vec2(1504, -96)));
+				create(test_sprite_decorations::SNACKBAR_CAPTION, transformr(vec2(1504, -86)));
+				create(test_sound_decorations::HUMMING_DISABLED, transformr(vec2(1504, -86)));
+
 				create(test_sprite_decorations::AWAKENING, transformr(vec2(-42, 8)));
 				create(test_sprite_decorations::METROPOLIS, transformr(vec2(1106, 3)));
+
 
 				//const vec2 floor_size = get_size_of(test_scene_image_id::FLOOR);
 				const auto total_floor_size = vec2i(1280, 1280);
@@ -369,6 +375,7 @@ namespace test_scenes {
 				floor_align(test_sprite_decorations::WATER_ROOM_FLOOR).set_size(total_floor_size);
 				floor_align(test_plain_sprited_bodies::BRICK_WALL)
 					.ro().ti().stretch_b().again()
+					.ro().bi().nr().extend_r(2).again()
 					.ro().bo().extend_l(2).extend_b(1).again()
 					.lo().ti().stretch_b().again()
 					.lo().bo().extend_r(2).extend_b(1).next(test_sprite_decorations::ROAD_DIRT)

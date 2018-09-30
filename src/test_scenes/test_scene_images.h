@@ -225,6 +225,9 @@ enum class test_scene_image_id {
 
 	MONEY_ICON,
 
+	SNACKBAR,
+	SNACKBAR_CAPTION,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

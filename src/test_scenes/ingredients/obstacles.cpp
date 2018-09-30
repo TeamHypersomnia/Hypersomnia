@@ -79,6 +79,17 @@ namespace test_flavours {
 			test_scene_physical_material_id::WOOD
 		);
 
+		static_obstacle(
+			flavour_with_sprite(
+				test_plain_sprited_bodies::SNACKBAR,
+				test_scene_image_id::SNACKBAR,
+				render_layer::DYNAMIC_BODY
+			),
+
+			test_scene_physical_material_id::METAL,
+			0.2f,
+			20.f
+		);
 
 		static_obstacle(
 			flavour_with_sprite(

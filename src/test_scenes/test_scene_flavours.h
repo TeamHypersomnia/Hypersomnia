@@ -36,6 +36,8 @@ enum class test_sprite_decorations {
 	AWAKENING,
 	METROPOLIS,
 
+	SNACKBAR_CAPTION,
+
 	AQUARIUM_BOTTOM_LAMP_LIGHT,
 	AQUARIUM_BOTTOM_LAMP_BODY,
 
@@ -79,6 +81,8 @@ enum class test_plain_sprited_bodies {
 	LAB_WALL_SMOOTH_END,
 	LAB_WALL_CORNER_CUT,
 	LAB_WALL_CORNER_SQUARE,
+
+	SNACKBAR,
 
 	COUNT
 	// END GEN INTROSPECTOR

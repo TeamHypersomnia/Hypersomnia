@@ -210,6 +210,14 @@ namespace test_flavours {
 			render_layer::NEON_CAPTIONS
 		);
 
+		flavour_with_sprite(
+			test_sprite_decorations::SNACKBAR_CAPTION,
+			test_scene_image_id::SNACKBAR_CAPTION,
+			render_layer::NEON_CAPTIONS,
+			white,
+			augs::sprite_special_effect::COLOR_WAVE
+		);
+
 		{
 			auto& meta = get_test_flavour(flavours, test_point_markers::FFA_SPAWN);
 			invariants::point_marker marker;
