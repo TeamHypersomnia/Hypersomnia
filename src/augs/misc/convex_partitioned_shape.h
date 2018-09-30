@@ -48,4 +48,7 @@ struct basic_convex_partitioned_shape {
 	bool take_vertices_one_after_another() const {
 		return convex_partition.empty();
 	}
+
+	template <class F>
+	void for_each_convex(F&& callback) const;
 };

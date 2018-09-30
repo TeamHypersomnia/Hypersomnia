@@ -27,6 +27,7 @@
 #include "augs/build_settings/setting_debug_physics_world_cache_copy.h"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 #include "game/enums/filters.h"
+#include "augs/misc/convex_partitioned_shape.hpp"
 
 template <class E>
 auto calc_filters(const E& handle) {
@@ -411,8 +412,6 @@ void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle
 				}
 			}
 
-			using C = logic_convex_poly;
-
 			unsigned ci = 0;
 
 			auto add_convex = [&](const auto& convex) {
@@ -441,29 +440,7 @@ void physics_world_cache::infer_colliders_from_scratch(const const_entity_handle
 				constructed_fixtures.emplace_back(new_fix);
 			};
 
-			const auto& poly = shape.original_poly;
-
-			if (shape.take_vertices_one_after_another()) {
-				add_convex(poly);
-			}
-			else {
-				const auto& partition = shape.convex_partition;
-
-				C::original_poly_type convex;
-
-				std::size_t last_i = 0;
-
-				for (std::size_t i = 0; i < partition.size(); ++i) {
-					if ((i - last_i) > 0 && partition[i] == partition[last_i]) {
-						add_convex(convex);
-						last_i = i + 1;
-						convex.clear();
-						continue;
-					}
-
-					convex.push_back(poly[partition[i]]);
-				}
-			}
+			shape.for_each_convex(add_convex);
 		};
 
 		auto from_circle_shape = [&](const real32 radius) {

@@ -6,6 +6,7 @@
 #include "augs/misc/imgui/imgui_drawers.h"
 #include "augs/misc/from_concave_polygon.h"
 #include "augs/templates/wrap_templates.h"
+#include "augs/misc/convex_partitioned_shape.hpp"
 
 struct non_standard_shape_widget {
 	const assets::image_id id;
@@ -134,24 +135,16 @@ struct non_standard_shape_widget {
 			const bool is_show_partition_mode = is_normal_mode && io.KeyCtrl;
 
 			if (is_show_partition_mode) {
-				if (considered.take_vertices_one_after_another()) {
-					for (std::size_t i = 0; i < considered_poly.size(); ++i) {
-						const auto& a = considered_poly[i];
-						const auto& b = wrap_next(considered_poly, i);
+				considered.for_each_convex([&](const auto& convex) {
+					const auto col = considered.take_vertices_one_after_another() ? green : orange;
 
-						segment(a, b, green);
+					for (std::size_t i = 0; i < convex.size(); ++i) {
+						const auto& va = convex[i];
+						const auto& vb = wrap_next(convex, i);
+
+						segment(va, vb, col);
 					}
-				}
-				else {
-					const auto& cp = considered.convex_partition;
-
-					for (std::size_t i = 0; i < cp.size(); ++i) {
-						const auto& a = considered_poly[cp[i]];
-						const auto& b = considered_poly[wrap_next(cp, i)];
-
-						segment(a, b, orange);
-					}
-				}
+				});
 			}
 			else {
 				for (std::size_t i = 0; i < considered_poly.size(); ++i) {
