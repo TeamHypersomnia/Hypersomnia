@@ -1637,3 +1637,8 @@ i			- if the newly calculated target is different than last_reload_target, reset
 			- Mode could keep track of names to be spawned.
 			- Simply add_player({ ... }, nickname) on connection.
 				- This first makes them a spectator.
+
+- fix wielding sounds
+	- keep vector of perform transfer results with marks whether they should happen
+	- always notify logic, only finally notify audiovisuals
+

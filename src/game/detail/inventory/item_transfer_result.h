@@ -11,6 +11,8 @@ struct item_transfer_result {
 	capability_relation relation;
 	unsigned transferred_charges = 0;
 	bool only_initiated_mounting = false;
+	bool holster = false;
+	bool wield = false;
 
 	bool is_successful() const {
 		return result == item_transfer_result_type::SUCCESSFUL_TRANSFER;
@@ -18,5 +20,13 @@ struct item_transfer_result {
 
 	bool is_pickup() const {
 		return is_successful() && relation == capability_relation::PICKUP;
+	}
+
+	bool is_holster() const {
+		return holster;
+	}
+
+	bool is_wield() const {
+		return wield;
 	}
 };

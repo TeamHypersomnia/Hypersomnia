@@ -161,7 +161,7 @@ perform_transfer_result perform_transfer_impl(
 		}
 	}
 
-	const bool is_pickup = result.relation == capability_relation::PICKUP;
+	const bool is_pickup = result.is_pickup();
 
 	auto play_pickup_or_holster_effect = [&]() {
 		if (target_slot_exists && target_slot.get_id().type == slot_function::ITEM_DEPOSIT) {
@@ -170,7 +170,7 @@ perform_transfer_result perform_transfer_impl(
 			if (is_pickup) {
 				sound.input = common_assets.item_pickup_to_deposit_sound;
 			}
-			else {
+			else if (result.is_holster()) {
 				sound.input = common_assets.item_holster_sound;
 			}
 
@@ -320,7 +320,7 @@ perform_transfer_result perform_transfer_impl(
 			output.transfer_sound.emplace(std::move(dropped));
 		}
 		else if (target_slot) {
-			if (target_slot.is_hand_slot()) {
+			if (result.is_wield()) {
 				packaged_sound_effect wielded;
 
 				const auto& item_def = transferred_item.get<invariants::item>();
@@ -334,14 +334,14 @@ perform_transfer_result perform_transfer_impl(
 
 			}
 			else {
-				packaged_sound_effect wielded;
+				packaged_sound_effect worn;
 
 				const auto& item_def = transferred_item.get<invariants::item>();
 
-				wielded.input = item_def.wear_sound;
-				wielded.start = sound_effect_start_input::at_entity(target_root);
+				worn.input = item_def.wear_sound;
+				worn.start = sound_effect_start_input::at_entity(target_root);
 
-				output.transfer_sound.emplace(std::move(wielded));
+				output.transfer_sound.emplace(std::move(worn));
 			}
 		}
 

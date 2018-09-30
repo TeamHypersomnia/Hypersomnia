@@ -464,7 +464,7 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 	}
 }
 
-#define LOG_WIELDING 0
+#define LOG_WIELDING 1
 
 template <class... Args>
 void WLD_LOG(Args&&... args) {
@@ -487,7 +487,7 @@ void item_system::handle_wielding_requests(const logic_step step) {
 	const auto& entropy = step.get_entropy();
 	const auto& wields = entropy.wields_per_entity;
 
-	auto swap_wielded = [&](const auto& self) {
+	auto swap_wielded = [&](const auto& self, const bool play_effects_at_all = true) {
 		wielding_result result;
 
 		const bool both_hands_available = self.get_hand_no(0).alive() && self.get_hand_no(1).alive();
@@ -511,7 +511,14 @@ void item_system::handle_wielding_requests(const logic_step step) {
 			result.result = wielding_result::type::SUCCESSFUL;
 		}
 
-		result.play_effects_only_in_first();
+		if (play_effects_at_all) {
+			result.play_effects_only_in_first();
+		}
+		else {
+			for (auto& r : result.transfers) {
+				r.params.play_transfer_sounds = false;
+			}
+		}
 
 		for (auto& r : result.transfers) {
 			r.params.play_transfer_particles = false;
@@ -524,10 +531,10 @@ void item_system::handle_wielding_requests(const logic_step step) {
 		const auto& self = cosm[wield.first];
 		const auto& request = wield.second;
 		const auto& selections = request.hand_selections;
-		//const auto current_selection = wielding_setup::from_current(self);
+		const auto current_selection = wielding_setup::from_current(self);
 
-		const auto first_held = cosm[selections[0]];
-		const auto second_held = cosm[selections[1]];
+		const auto first_held = cosm[current_selection.hand_selections[0]];
+		const auto second_held = cosm[current_selection.hand_selections[1]];
 
 		const bool total_holster = first_held.dead() && second_held.dead();
 
@@ -573,8 +580,15 @@ void item_system::handle_wielding_requests(const logic_step step) {
 
 		if (first_held == selections[1] || second_held == selections[0]) {
 			/* Swap now if we have to. */
-			swap_wielded(self);
+			swap_wielded(self, false);
 		}
+
+		struct transfer_record {
+
+		};
+
+		thread_local std::vector<perform_transfer_result> results;
+		results.clear();
 
 		/* Now we can consider each hand separately. */
 		auto transfer = [&](const auto& from, const auto& to) {
@@ -582,7 +596,12 @@ void item_system::handle_wielding_requests(const logic_step step) {
 				return;
 			}
 
-			perform_transfer(item_slot_transfer_request::standard(from, to), step);
+			auto request = item_slot_transfer_request::standard(from, to);
+			request.params.play_transfer_particles = false;
+			const auto result = perform_transfer_no_step(request, cosm);
+
+			result.notify(step);
+			results.push_back(result);
 		};
 
 		//augs::constant_size_vector<std::size_t, hand_count_v> failed_hands;
@@ -661,6 +680,24 @@ void item_system::handle_wielding_requests(const logic_step step) {
 		for (std::size_t i = 0; i < hand_count_v; ++i) {
 			/* Finally, try to holster whatever can be holstered now. */
 			try_hand(i);
+		}
+
+		bool wield_played = false;
+
+		for (const auto& r : reverse(results)) {
+			if (r.result.result.is_wield()) {
+				r.play_effects(step);
+				wield_played = true;
+				break;
+			}
+		}
+
+		if (!wield_played) {
+			for (const auto& r : reverse(results)) {
+				if (r.result.result.is_holster()) {
+					r.play_effects(step);
+				}
+			}
 		}
 
 #else

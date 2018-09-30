@@ -155,6 +155,18 @@ item_transfer_result query_transfer_result(
 		}
 	}
 
+	if (output.is_successful() ) {
+		const auto t = target_slot.get_type();
+
+		if (t == slot_function::ITEM_DEPOSIT) {
+			output.holster = true;
+		}
+
+		if (target_slot.is_hand_slot()) {
+			output.wield = true;
+		}
+	}
+
 	return output;
 }
 
