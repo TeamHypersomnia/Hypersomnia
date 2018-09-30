@@ -234,32 +234,22 @@ void game_gui_system::control_hotbar_and_action_button(
 
 				const auto current_setup = wielding_setup::from_current(gui_entity);
 
-				const auto first = cosm[current_setup.hand_selections[0]];
-				const auto second = cosm[current_setup.hand_selections[1]];
+				auto hide = [&](const auto& item, const auto n) {
+					(void)item;
 
-				if (first && second) {
-					const auto& item_0 = first.template get<components::item>();
-					const auto& item_1 = second.template get<components::item>();
-
-					auto when = [&](const auto& it) {
-						return it.get_raw_component().when_last_transferred.step;
-					};
-
-					auto hide_nth = [&](const auto n) {
+					if constexpr(is_nullopt_v<decltype(item)>) {
+						return false;
+					}
+					else {
 						auto new_setup = current_setup;
 						new_setup.hand_selections[n].unset();
 						request_setup(new_setup, current_setup);
-					};
-
-					if (when(item_0) < when(item_1)) {
-						hide_nth(1);
-						return;
+						return true;
 					}
+				};
 
-					if (when(item_1) < when(item_0)) {
-						hide_nth(0);
-						return;
-					}
+				if (current_setup.on_more_recent_item(cosm, hide)) {
+					return;
 				}
 			}
 

@@ -39,10 +39,6 @@ summary: That which we are brainstorming at the moment.
 	- Attack collisions
 		- When hurt triggers of two or more players touch, they are pushed away opposite to their facing
 		
-- Let us comfortably drop the item in secondary hand
-	- Alt+G?
-	- The most recent?
-
 - Structuring entropy
 	- What a client sends to the server?
 		- Necessarily, the contents of mode_player_entropy

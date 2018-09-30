@@ -121,7 +121,7 @@ return {
     A = "MOVE_LEFT",
     D = "MOVE_RIGHT",
     E = "USE_BUTTON",
-    G = "THROW",
+    G = "DROP",
     LeftControl = "START_PICKING_UP_ITEMS",
     LeftMouseButton = "CROSSHAIR_PRIMARY_ACTION",
     LeftShift = "SPRINT",

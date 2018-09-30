@@ -1647,3 +1647,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - When a held entity is visible, add its capability to the visible entities so it is also drawn
 
+- Let us comfortably drop the item in secondary hand
+	- Alt+G?
+	- The most recent?
+

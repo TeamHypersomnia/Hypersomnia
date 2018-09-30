@@ -442,24 +442,47 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 
 	for (auto r : requests) {
 		if (r.was_pressed()) {
-			auto requested_index = static_cast<std::size_t>(-1);
+			cosm[r.subject].dispatch_on_having_all<components::item_slot_transfers>([&](const auto& typed_subject) {
+				auto do_drop = [&](const auto& item_inside) {
+					if (item_inside.dead()) {
+						return;
+					}
 
-			if (r.intent == game_intent_type::THROW) {
-				requested_index = 0;
-			}
-			else if (r.intent == game_intent_type::THROW_SECONDARY) {
-				requested_index = 1;
-			}
+					perform_transfer(item_slot_transfer_request::drop(item_inside), step);
+				};
 
-			if (requested_index != static_cast<std::size_t>(-1)) {
-				const auto subject = cosm[r.subject];
+				if (r.intent == game_intent_type::DROP) {
+					const auto current_setup = wielding_setup::from_current(typed_subject);
 
-				if (subject.has<components::item_slot_transfers>()) {
-					if (const auto item_inside = subject.calc_hand_action(requested_index).held_item; item_inside.is_set()) {
-						perform_transfer(item_slot_transfer_request::drop(item_inside), step);
+					auto drop = [&](const auto& item, const auto) {
+						if constexpr(is_nullopt_v<decltype(item)>) {
+							return false;
+						}
+						else {
+							do_drop(item);
+							return true;
+						}
+					};
+
+					if (current_setup.on_more_recent_item(cosm, drop)) {
+						return;
 					}
 				}
-			}
+
+				auto requested_index = static_cast<std::size_t>(-1);
+
+				if (r.intent == game_intent_type::DROP) {
+					requested_index = 0;
+				}
+				else if (r.intent == game_intent_type::DROP_SECONDARY) {
+					requested_index = 1;
+				}
+
+				if (requested_index != static_cast<std::size_t>(-1)) {
+					const auto& item_inside = typed_subject.calc_hand_action(requested_index).held_item;
+					do_drop(cosm[item_inside]);
+				}
+			});
 		}
 	}
 }

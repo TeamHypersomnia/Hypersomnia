@@ -21,8 +21,8 @@ enum class game_intent_type {
 	// GEN INTROSPECTOR enum class game_intent_type
 	INVALID,
 
-	THROW,
-	THROW_SECONDARY,
+	DROP,
+	DROP_SECONDARY,
 
 	START_PICKING_UP_ITEMS,
 

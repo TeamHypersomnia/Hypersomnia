@@ -35,6 +35,9 @@ struct basic_wielding_setup  {
 	friend std::ostream& operator<<(std::ostream& o, const this_type& s) {
 		return pretty_print(o, s.hand_selections);
 	}
+
+	template <class C, class F>
+	decltype(auto) on_more_recent_item(C& cosm, F&& callback) const;
 };
 
 using wielding_setup = basic_wielding_setup<entity_id>;

@@ -307,6 +307,10 @@ void editor_entity_selector::do_mousemotion(
 
 		if (ids.size() > 0) {
 			hovered = ids[0];
+			LOG_NVPS(ids.size(), hovered);
+		}
+		else {
+			LOG("EMPTY IDS");
 		}
 	}
 }

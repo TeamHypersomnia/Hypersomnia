@@ -58,3 +58,29 @@ basic_wielding_setup<I> basic_wielding_setup<I>::from_current(const E& character
 
 	return output;
 }
+
+template <class I>
+template <class C, class F>
+decltype(auto) basic_wielding_setup<I>::on_more_recent_item(C& cosm, F&& callback) const {
+	const auto entity_0 = cosm[hand_selections[0]];
+	const auto entity_1 = cosm[hand_selections[1]];
+
+	if (entity_0 && entity_1) {
+		const auto& item_0 = entity_0.template get<components::item>();
+		const auto& item_1 = entity_1.template get<components::item>();
+
+		auto when = [&](const auto& it) {
+			return it.get_raw_component().when_last_transferred.step;
+		};
+
+		if (when(item_0) > when(item_1)) {
+			return callback(entity_0, 0);
+		}
+
+		if (when(item_1) > when(item_0)) {
+			return callback(entity_1, 1);
+		}
+	}
+
+	return callback(std::nullopt, std::nullopt);
+}
