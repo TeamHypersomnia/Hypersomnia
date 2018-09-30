@@ -315,7 +315,7 @@ void visibility_system::calc_visibility(
 				if (shape.GetType() == b2Shape::e_polygon) {
 					const auto& poly = static_cast<const b2PolygonShape&>(shape);
 
-					std::array<int, b2_maxPolygonVertices> connected_visible_edges = {};
+					std::array<bool, b2_maxPolygonVertices> invisible_edges = {};
 
 					const auto vn = poly.GetVertexCount();
 
@@ -333,58 +333,59 @@ void visibility_system::calc_visibility(
 
 							if (eye_local - vec2(vert) < eye_local - vec2(next_vert)) {
 								VIS_LOG("Collinear and visible:");
-								++connected_visible_edges[this_idx];
+								invisible_edges[next_idx] = true;
 							}
 							else {
 								VIS_LOG("Collinear and invisible:");
-								++connected_visible_edges[next_idx];
+								invisible_edges[this_idx] = true;
 							}
 						}
 						else {
 							if (side > 0.f) {
-								++connected_visible_edges[this_idx];
-								++connected_visible_edges[next_idx];
+								VIS_LOG("Visible (%x):", side);
+							}
+							else {
+								VIS_LOG("Invisible (%x):", side);
+								invisible_edges[this_idx] = true;
 							}
 						}
 
-						VIS_LOG_NVPS(vec2(vert), vp, connected_visible_edges[vp]);
+						VIS_LOG_NVPS(vec2(vert), vp, invisible_edges[vp]);
 					}
 
 					auto idx = [vn](int i) {
 						return i < 0 ? vn + i : i % vn;
 					};
 
+					VIS_LOG("Setting visions");
+
 					for (int vp = 0; vp < vn; ++vp) {
 						const auto vert = poly.GetVertex(vp);
 						const auto vv = static_cast<vec2>(b2Mul(xf, vert));
 
-						const bool this_vis = connected_visible_edges[vp];
+						const bool this_vis = !invisible_edges[vp];
+						const bool prev_vis = !invisible_edges[idx(vp - 1)];
 
-						if (!this_vis) {
+						VIS_LOG_NVPS(prev_vis, this_vis);
+
+						if (!this_vis && !prev_vis) {
+							VIS_LOG("Surely invisible");
 							add_surely_invisible(vv);
 							continue;
 						}
 
-						const bool prev_vis = connected_visible_edges[idx(vp - 1)];
-						const bool next_vis = connected_visible_edges[idx(vp + 1)];
-
-						if (!prev_vis && !next_vis) {
-							VIS_LOG("WARNING! A problem occured in visibility calculation.");
-						}
-
 						if (const auto entry = push_vertex_if_within_range(vv)) {
-							if (prev_vis && next_vis) {
+							if (prev_vis && this_vis) {
 								entry->vision_extends = 0;
 							}
-							else if (prev_vis && !next_vis) {
+							else if (prev_vis && !this_vis) {
 								entry->vision_extends = -1;
 							}
-							else if (!prev_vis && next_vis) {
+							else if (!prev_vis && this_vis) {
 								entry->vision_extends = 1;
 							}
 
 							VIS_LOG("Pushed %x", vp);
-							VIS_LOG_NVPS(prev_vis, this_vis, next_vis);
 							VIS_LOG_NVPS(si.get_pixels(vv), entry->vision_extends);
 						}
 					}
@@ -582,15 +583,21 @@ void visibility_system::calc_visibility(
 
 				if (edge_ray_output.hit) {
 					/* Clamp the ray against the visibility square */
-					destination = edge_ray_output.intersection + direction * si.get_meters(1.f);
+					destination = edge_ray_output.intersection + direction * si.get_meters(3.f);
 					break;
 				}
 			}
 
-			/* cast both rays starting from the player position and ending in targets[x].target,
-			ignoring subject entity ("it") completely, save results in ray_callbacks[2] */
 			ray_input new_ray_input;
 			new_ray_input.destination = vertex.is_on_a_bound ? vertex.pos : destination;
+
+#if LOG_VISIBILITY
+			{
+				const auto i = index_in(all_vertices_transformed, vertex);
+				VIS_LOG_NVPS(i, si.get_pixels(new_ray_input.destination), vertex.is_on_a_bound);
+			}
+#endif
+
 			all_ray_inputs.push_back(new_ray_input);
 		}
 
@@ -603,6 +610,12 @@ void visibility_system::calc_visibility(
 		for (std::size_t j = 0; j < all_ray_inputs.size(); ++j) {
 			auto result = physics.ray_cast(eye_meters, all_ray_inputs[j].destination, request.filter, ignored_entity);
 			all_ray_outputs.emplace_back(std::move(result));
+
+#if LOG_VISIBILITY
+			if (DEBUG_DRAWING.draw_cast_rays) {
+				draw_line(all_ray_inputs[j].destination, pink);
+			}
+#endif
 		}
 
 		for (std::size_t i = 0; i < all_ray_outputs.size(); ++i) {
@@ -764,7 +777,7 @@ void visibility_system::calc_visibility(
 								}
 
 								/* save new double ray */
-								VIS_LOG("no hit: disc");
+								VIS_LOG("boundary hit: discontinuity");
 								if (push_double_ray(new_double_ray)) {
 									response.discontinuities.push_back(new_discontinuity);
 
@@ -774,7 +787,7 @@ void visibility_system::calc_visibility(
 								}
 							}
 							else {
-								VIS_LOG("no hit: vtx hit");
+								VIS_LOG("boundary hit: vtx hit");
 								if (push_double_ray(boundary_intersection)) {
 									response.vertex_hits.emplace_back(
 										static_cast<int>(double_rays.size()) - 1, 
