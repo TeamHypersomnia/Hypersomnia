@@ -4,8 +4,8 @@
 #include "augs/templates/folded_finders.h"
 #include "augs/string/string_templates_declaration.h"
 #include "augs/drawing/flip.h"
+#include "game/enums/filters.h"
 
-#include "application/setups/editor/editor_settings.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 #include "application/setups/editor/property_editor/property_editor_settings.h"
 #include "application/setups/editor/property_editor/default_widget_provider.h"
@@ -33,7 +33,7 @@ static constexpr bool inline_with_members_v =
 
 template <class T>
 static constexpr bool has_direct_widget_v = 
-	is_one_of_v<T, std::string, bool, vec2, vec2i, rgba>
+	is_one_of_v<T, std::string, bool, vec2, vec2i, rgba, b2Filter>
 	|| is_arithmetic_minmax_v<T>
 	|| std::is_arithmetic_v<T>
 	|| std::is_enum_v<T>
@@ -43,8 +43,6 @@ template <class T>
 static constexpr bool always_skip_in_properties =
 	is_padding_field_v<T>
 	// Yet unsupported:
-
-	|| std::is_same_v<T, b2Filter>
 ;
 
 template <class M>
@@ -72,6 +70,28 @@ std::optional<tweaker_type> detail_direct_edit(
 	}
 	else if constexpr(std::is_same_v<M, bool>) {
 		if (checkbox(identity_label, altered)) {
+			return tweaker_type::DISCRETE;
+		}
+	}
+	else if constexpr(std::is_same_v<M, b2Filter>) {
+		using P = predefined_filter_type;
+
+		P found_predefined = P::COUNT;
+
+		augs::for_each_enum_except_bounds(
+			[&](const P p) {
+				if (filters[p] == altered) {
+					found_predefined = p;
+				}
+			}
+		);
+
+		if (enum_combo(
+			identity_label, 
+			found_predefined, 
+			found_predefined == P::COUNT ? "(Custom)" : ""
+		)) {
+			altered = filters[found_predefined];
 			return tweaker_type::DISCRETE;
 		}
 	}

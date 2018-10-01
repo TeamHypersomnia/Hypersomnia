@@ -23,6 +23,7 @@
 #include "application/setups/editor/property_editor/widgets/unpathed_asset_widget.h"
 #include "application/setups/editor/property_editor/special_widgets.h"
 #include "application/setups/editor/property_editor/commanding_property_editor_input.h"
+#include "application/setups/editor/editor_settings.h"
 
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
