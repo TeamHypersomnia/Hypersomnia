@@ -504,4 +504,7 @@ public:
 	augs::maybe<render_layer_filter> get_render_layer_filter() const;
 
 	void draw_custom_gui(const draw_setup_gui_input&);
+
+	void draw_status_bar(const draw_setup_gui_input&);
+	void draw_recent_message(const draw_setup_gui_input&);
 };

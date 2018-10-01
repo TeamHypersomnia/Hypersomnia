@@ -285,12 +285,24 @@ namespace augs {
 
 				draft.cached_str = coloured_str;
 
-				if (c.test(center::X)) {
+				if (c.test(ralign::CX)) {
 					pos.x -= draft.get_bbox().x / 2;
 				}
 
-				if (c.test(center::Y)) {
+				if (c.test(ralign::CY)) {
 					pos.y -= draft.get_bbox().y / 2;
+				}
+
+				if (c.test(ralign::RB)) {
+					pos -= draft.get_bbox();
+				}
+
+				if (c.test(ralign::LB)) {
+					pos.y -= draft.get_bbox().y;
+				}
+
+				if (c.test(ralign::RT)) {
+					pos.x -= draft.get_bbox().x;
 				}
 
 				print.draw_text(out, pos + vec2i(-1, 0), draft, clipper);

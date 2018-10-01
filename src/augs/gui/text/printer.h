@@ -7,11 +7,11 @@
 #include "augs/misc/enum/enum_boolset.h"
 
 namespace augs {
-	enum class center {
-		X, Y, COUNT
+	enum class ralign {
+		CX, CY, RT, RB, LB, COUNT
 	};
 
-	using center_flags = augs::enum_boolset<center>;
+	using center_flags = augs::enum_boolset<ralign>;
 
 	namespace gui {
 		namespace text {

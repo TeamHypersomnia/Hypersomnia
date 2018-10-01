@@ -293,7 +293,7 @@ void arena_scoreboard_gui::draw_gui(
 				}
 
 				auto do_draw = [&]() {
-					text_stroked(label, yellow, text_pos, { augs::center::X, augs::center::Y });
+					text_stroked(label, yellow, text_pos, { augs::ralign::CX, augs::ralign::CY });
 				};
 
 				if (tied) {
@@ -356,7 +356,7 @@ void arena_scoreboard_gui::draw_gui(
 			pen.x += score_text_max_w + cell_pad.x * 4;
 			//head_orig.r + cell_pad.x * 2
 
-			text_stroked(std::string("for ") + format_enum(faction), colors.standard, vec2i { 0, faction_bg_orig.get_center().y } , { augs::center::Y });
+			text_stroked(std::string("for ") + format_enum(faction), colors.standard, vec2i { 0, faction_bg_orig.get_center().y } , { augs::ralign::CY });
 
 			pen.y += bg_height;
 			pen.x = prev_pen_x;

@@ -83,12 +83,6 @@ permalink: todo_low
 - Improve wielding transfers calculation so that less transfers are made
 	- Transfer effects will be fixed automagically then
 
-- Editor status bar
-	- Won't matter until after deathmatch stage
-	- Check how it works in vim
-		- Changing a mode to normal clears the last message
-	- Will be useful for the author to know what is going on
-
 - Possibly use b2TestOverlap for checking against the camera selection?
 - Make a tree out of time measurement profiler calls and get summary just from "fps" or "whole regeneration"
 

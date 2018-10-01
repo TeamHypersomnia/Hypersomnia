@@ -22,6 +22,7 @@
 #include "application/setups/editor/gui/editor_tab_gui.h"
 #include "application/setups/draw_setup_gui_input.h"
 #include "view/rendering_scripts/draw_area_indicator.h"
+#include "augs/gui/text/printer.h"
 
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/lua_file.h"
@@ -1419,6 +1420,98 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 	}
 
 	draw_mode_gui(in);
+	draw_status_bar(in);
+	draw_recent_message(in);
+}
+
+void editor_setup::draw_status_bar(const draw_setup_gui_input& in) {
+	using namespace augs::gui::text;
+
+	const auto ss = in.screen_size;
+	const auto padding = vec2i(2, 2);
+
+	if (const auto current_eye = find_current_camera_eye()) {
+		const auto st = style(in.gui_fonts.gui);
+
+		{
+			const auto zoom = current_eye->zoom * 100.f;
+			const auto zoom_text = typesafe_sprintf("%x%", zoom);
+
+			print_stroked(
+				in.drawer,
+				ss - padding,
+				formatted_string(zoom_text, st),
+				augs::ralign::RB
+			);
+		}
+
+#if 0
+		if (const auto wp = find_world_cursor_pos()) {
+			const auto world_cursor_pos_text = typesafe_sprintf("X: %x Y: %x", wp->x, wp->y);
+
+			print_stroked(
+				in.drawer,
+				vec2i(padding.x, ss.y - padding.y),
+				formatted_string(world_cursor_pos_text, st),
+				augs::ralign::LB
+			);
+		}
+#endif
+
+		{
+			std::string total_text;
+			std::string separator = "  ";
+
+			total_text += "Snap: ";
+
+			const auto& v = view();
+
+			if (v.snapping_enabled) {
+				total_text += "Yes";
+			}
+			else {
+				total_text += "No ";
+			}
+
+			total_text += separator;
+			total_text += "Grid: ";
+
+			{
+				const auto& g = v.grid;
+				total_text += typesafe_sprintf("%x/%x", g.unit_pixels, settings.grid.render.get_maximum_unit());
+			}
+
+			total_text += separator;
+			total_text += "RSM: ";
+
+			{
+				switch (v.rect_select_mode) {
+					case editor_rect_select_type::EVERYTHING: total_text += "E"; break;
+					case editor_rect_select_type::SAME_LAYER: total_text += "L"; break;
+					case editor_rect_select_type::SAME_FLAVOUR: total_text += "F"; break;
+					default: break;
+				}
+			}
+
+			if (const auto viewed = get_viewed_character()) {
+				total_text += separator;
+				total_text += "Controlling: ";
+				total_text += viewed.get_name();
+			}
+
+			print_stroked(
+				in.drawer,
+				vec2i(padding.x, ss.y - padding.y),
+				formatted_string(total_text, st),
+				augs::ralign::LB
+			);
+		}
+	}
+
+}
+
+void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
+	(void)in;
 }
 
 template <class F>

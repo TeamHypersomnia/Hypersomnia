@@ -369,7 +369,7 @@ void arena_gui_state::draw_mode_gui(
 					in.drawer,
 					pen,
 					lhs_text,
-					{ augs::center::Y }
+					{ augs::ralign::CY }
 				);
 
 				pen.x += lhs_bbox.x;
@@ -390,7 +390,7 @@ void arena_gui_state::draw_mode_gui(
 					in.drawer,
 					pen,
 					rhs_text,
-					{ augs::center::Y }
+					{ augs::ralign::CY }
 				);
 
 				pen.y = total_bbox.b();
@@ -404,7 +404,7 @@ void arena_gui_state::draw_mode_gui(
 				in.drawer,
 				{ s.x / 2, static_cast<int>(t) },
 				val,
-				{ augs::center::X }
+				{ augs::ralign::CX }
 			);
 		};
 
