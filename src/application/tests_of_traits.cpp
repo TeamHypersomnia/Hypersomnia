@@ -519,11 +519,6 @@ struct game_state_checks {
 	}
 
 	template <class T>
-	struct is_flavour_id {
-		static constexpr bool value = is_constrained_flavour_id_v<T> || is_typed_flavour_id_v<T>;
-	};
-	
-	template <class T>
 	struct is_asset_id {
 		static constexpr bool value = is_pathed_asset<T> || is_unpathed_asset<T>;
 	};

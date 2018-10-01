@@ -115,6 +115,14 @@ template <class T>
 constexpr bool is_constrained_flavour_id_v = is_constrained_flavour_id<T>::value;
 
 template <class T>
+struct is_flavour_id {
+	static constexpr bool value = is_constrained_flavour_id_v<T> || is_typed_flavour_id_v<T>;
+};
+	
+template <class T>
+constexpr bool is_flavour_id_v = is_flavour_id<T>::value;
+
+template <class T>
 std::ostream& operator<<(std::ostream& out, const typed_entity_flavour_id<T> x) {
 	return out << "(" << get_type_name<T>() << ": " << x.raw << ")";
 }

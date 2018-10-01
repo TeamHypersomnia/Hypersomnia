@@ -1655,3 +1655,10 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- might choose a name, just like enums
 	- stored in common assets
 
+- Initial components
+	- Let's ditch templatization for now
+	- Entity ids in components
+		- Will always be unset on creation
+		- We'll just ignore them in editor
+	- Useful for some wandering pixels flavours
+

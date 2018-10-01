@@ -292,93 +292,102 @@ void detail_general_edit_properties(
 				constexpr bool has_size_limit = has_constexpr_max_size_v<T>;
 
 				if constexpr(can_access_data_v<T>) {
-					auto displayed_container_label = formatted_label;
+					using V = typename T::value_type;
 
-					if constexpr(expandable && has_size_limit) {
-						displayed_container_label = typesafe_sprintf(
-							"%x (%x/%x)###%x", 
-							formatted_label, 
-							altered.size(), 
-							altered.capacity(), 
-							formatted_label
-						);
-					}
+					constexpr bool should_skip_whole_container = 
+						always_skip_in_properties<V> 
+						|| Behaviour::template should_skip<V>
+					;
 
-					if (auto node = node_and_columns(displayed_container_label, input.extra_columns)) {
-						if constexpr(S::template handles_prologue<T>) {
-							ImGui::NextColumn();
+					if constexpr(!should_skip_whole_container) {
+						auto displayed_container_label = formatted_label;
 
-							if (input.special_widget_provider.handle_prologue(displayed_container_label, altered)) {
-								notify_change_of(formatted_label, tweaker_type::DISCRETE, altered, std::nullopt);
-							}
-
-							augs::imgui::next_columns(input.extra_columns + 1);
+						if constexpr(expandable && has_size_limit) {
+							displayed_container_label = typesafe_sprintf(
+								"%x (%x/%x)###%x", 
+								formatted_label, 
+								altered.size(), 
+								altered.capacity(), 
+								formatted_label
+							);
 						}
 
-						for (unsigned i = 0; i < static_cast<unsigned>(altered.size()); ++i) {
-							auto i_id = augs::imgui::scoped_id(i);
+						if (auto node = node_and_columns(displayed_container_label, input.extra_columns)) {
+							if constexpr(S::template handles_prologue<T>) {
+								ImGui::NextColumn();
 
-							if constexpr(expandable) {
-								{
-									auto colors = maybe_disabled_cols(input.settings, altered.size() >= altered.max_size());
-
-									if (ImGui::Button("D")) {
-										auto duplicated = altered[i];
-										altered.insert(altered.begin() + i + 1, std::move(duplicated));
-										notify_change_of(formatted_label, tweaker_type::DISCRETE, altered, std::nullopt);
-										break;
-									}
-
-									ImGui::SameLine();
-
-								}
-
-								{
-									auto colors = maybe_disabled_cols(
-										input.settings, 
-										altered.size() == 1 && forbid_zero_elements_v<T>
-									);
-
-									if (ImGui::Button("-")) {
-										altered.erase(altered.begin() + i);
-										notify_change_of(formatted_label, tweaker_type::DISCRETE, altered, std::nullopt);
-										break;
-									}
-								}
-							}
-
-							ImGui::SameLine();
-
-							const auto element_label = std::to_string(i);
-
-							if constexpr(pass_notifier_through) {
-								detail_general_edit_properties<Behaviour, true, inline_properties>(
-									input, 
-									equality_predicate,
-									notify_change_of,
-									element_label,
-									altered[i]
-								);
-							}
-							else {
-								detail_general_edit_properties<Behaviour, true, inline_properties>(
-									input, 
-									[&equality_predicate, i, &altered] (auto&&...) { return equality_predicate(altered, i); },
-									[&notify_change_of, i, &altered] (const auto& l, const tweaker_type t, auto&&...) { notify_change_of(l, t, altered, i); },
-									element_label,
-									altered[i]
-								);
-							}
-						}
-
-						if constexpr (expandable) {
-							if (altered.size() < altered.max_size()) {
-								if (ImGui::Button("+")) {
-									altered.emplace_back(input.sane_defaults.template construct<typename T::value_type>());
+								if (input.special_widget_provider.handle_prologue(displayed_container_label, altered)) {
 									notify_change_of(formatted_label, tweaker_type::DISCRETE, altered, std::nullopt);
 								}
 
-								augs::imgui::next_columns(input.extra_columns + 2);
+								augs::imgui::next_columns(input.extra_columns + 1);
+							}
+
+							for (unsigned i = 0; i < static_cast<unsigned>(altered.size()); ++i) {
+								auto i_id = augs::imgui::scoped_id(i);
+
+								if constexpr(expandable) {
+									{
+										auto colors = maybe_disabled_cols(input.settings, altered.size() >= altered.max_size());
+
+										if (ImGui::Button("D")) {
+											auto duplicated = altered[i];
+											altered.insert(altered.begin() + i + 1, std::move(duplicated));
+											notify_change_of(formatted_label, tweaker_type::DISCRETE, altered, std::nullopt);
+											break;
+										}
+
+										ImGui::SameLine();
+
+									}
+
+									{
+										auto colors = maybe_disabled_cols(
+											input.settings, 
+											altered.size() == 1 && forbid_zero_elements_v<T>
+										);
+
+										if (ImGui::Button("-")) {
+											altered.erase(altered.begin() + i);
+											notify_change_of(formatted_label, tweaker_type::DISCRETE, altered, std::nullopt);
+											break;
+										}
+									}
+								}
+
+								ImGui::SameLine();
+
+								const auto element_label = std::to_string(i);
+
+								if constexpr(pass_notifier_through) {
+									detail_general_edit_properties<Behaviour, true, inline_properties>(
+										input, 
+										equality_predicate,
+										notify_change_of,
+										element_label,
+										altered[i]
+									);
+								}
+								else {
+									detail_general_edit_properties<Behaviour, true, inline_properties>(
+										input, 
+										[&equality_predicate, i, &altered] (auto&&...) { return equality_predicate(altered, i); },
+										[&notify_change_of, i, &altered] (const auto& l, const tweaker_type t, auto&&...) { notify_change_of(l, t, altered, i); },
+										element_label,
+										altered[i]
+									);
+								}
+							}
+
+							if constexpr (expandable) {
+								if (altered.size() < altered.max_size()) {
+									if (ImGui::Button("+")) {
+										altered.emplace_back(input.sane_defaults.template construct<typename T::value_type>());
+										notify_change_of(formatted_label, tweaker_type::DISCRETE, altered, std::nullopt);
+									}
+
+									augs::imgui::next_columns(input.extra_columns + 2);
+								}
 							}
 						}
 					}

@@ -205,6 +205,14 @@ void edit_flavour(
    	);
 }
 
+struct initial_component_editor_behaviour {
+	template <class T>
+	static constexpr bool should_skip = 
+		std::is_same_v<T, signi_entity_id>
+		|| is_flavour_id_v<T>
+	;
+};
+
 template <class T>
 void edit_initial_component(
 	const fae_property_editor_input in,
@@ -260,7 +268,7 @@ void edit_initial_component(
 
 	const auto& cosm = cmd_in.get_cosmos();
 
-	general_edit_properties<field_type_id>(
+	general_edit_properties<field_type_id, initial_component_editor_behaviour>(
 		cpe_in.prop_in, 
 		component,
 		post_new_change,
@@ -277,28 +285,30 @@ void edit_initial_component(
 	);
 }
 template <class E>
-void edit_initial_component_properties(
+void edit_initial_components_properties(
 	const fae_property_editor_input in,
 	const entity_flavour<E>& flavour,
 	const change_initial_component_property_command& command
 ) {
 	using namespace augs::imgui;
 
-	auto get_index = [](const auto& comp) {
-		return index_in_list_v<remove_cref<decltype(comp)>, components_of<E>>;
-	};
+	if (const auto node = scoped_tree_node_ex("Initial components")) {
+		auto get_index = [](const auto& comp) {
+			return index_in_list_v<remove_cref<decltype(comp)>, components_of<E>>;
+		};
 
-	for_each_through_std_get(
-		flavour.initial_components,
-		[&](const auto& component) {
-			const auto component_label = format_struct_name(component) + " component";
-			const auto node = scoped_tree_node_ex(component_label);
+		for_each_through_std_get(
+			flavour.initial_components,
+			[&](const auto& component) {
+				const auto component_label = format_struct_name(component) + " component";
+				const auto node = scoped_tree_node_ex(component_label);
 
-			next_column_text();
+				next_column_text();
 
-			if (node) {
-				edit_initial_component(in, component, get_index(component), flavour.get_name(), command);
+				if (node) {
+					edit_initial_component(in, component, get_index(component), flavour.get_name(), command);
+				}
 			}
-		}
-   	);
+		);
+	}
 }

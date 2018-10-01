@@ -6,13 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Initial components
-	- Let's ditch templatization for now
-	- Entity ids in components
-		- Will always be unset on creation
-		- We'll just ignore them in editor
-	- Useful for some wandering pixels flavours
-
 - Arbitrary pasting of entities
 	- Vastly useful for importing stuff from testbed maps into existing ones
 		- Let alone between community maps
