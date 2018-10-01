@@ -11,9 +11,6 @@
 
 namespace ingredients {
 	void add_standard_pathfinding_capability(entity_handle) {
-		//auto& pathfinding = e += components::pathfinding();
-		//auto& visibility = e += components::visibility();
-		//
 		//pathfinding.mark_touched_as_discovered = true;
 		//pathfinding.force_persistent_navpoints = true;
 		//pathfinding.enable_backtracking = false;
@@ -23,14 +20,14 @@ namespace ingredients {
 		//pathfinding.favor_velocity_parallellness = true;
 		//pathfinding.filter = predefined_queries::pathfinding();
 		//
-		//auto& layer = visibility.full_visibility_layers[components::visibility::DYNAMIC_PATHFINDING];
+		//auto& layer = visibility.full_visibility_layers[invariants::visibility::DYNAMIC_PATHFINDING];
 		//layer.square_side = 1000;
 		//layer.color.set(0, 255, 255, 120);
 		//layer.filter = predefined_queries::pathfinding();
 	}
 
 	void add_soldier_intelligence(entity_handle) {
-		// auto& los = e.get<components::visibility>().line_of_sight_layers[components::visibility::LINE_OF_SIGHT];
+		// auto& los = e.get<invariants::visibility>().line_of_sight_layers[invariants::visibility::LINE_OF_SIGHT];
 		// los.test_sentiences = true;
 		// los.test_attitudes = true;
 		// los.test_items = true;
@@ -39,7 +36,7 @@ namespace ingredients {
 		// los.obstruction_filter = predefined_queries::line_of_sight();
 		// los.candidate_filter = filters[predefined_filter_type::LINE_OF_SIGHT_CANDIDATES];
 		// 
-		// auto& behaviour_tree = e += components::behaviour_tree();
+		// auto& behaviour_tree = e += invariants::behaviour_tree();
 		// auto& trees = behaviour_tree.concurrent_trees;
 		// 
 		// trees.resize(3);

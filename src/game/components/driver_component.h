@@ -5,7 +5,7 @@
 namespace components {
 	struct driver {
 		// GEN INTROSPECTOR struct components::driver
-		entity_id owned_vehicle;
+		signi_entity_id owned_vehicle;
 		float density_multiplier_while_driving = 0.02f;
 		// END GEN INTROSPECTOR
 	};

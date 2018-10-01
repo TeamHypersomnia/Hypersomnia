@@ -6,6 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Initial components
+	- Let's ditch templatization for now
+	- Entity ids in components
+		- Will always be unset on creation
+		- We'll just ignore them in editor
+	- Useful for some wandering pixels flavours
+
 - Arbitrary pasting of entities
 	- Vastly useful for importing stuff from testbed maps into existing ones
 		- Let alone between community maps
@@ -20,6 +27,9 @@ summary: That which we are brainstorming at the moment.
 			- paste entity flavour + paste entity command, stored, waiting to be executed!
 				- the move itself won't need to be stored
 	- Cut is just copy + delete
+
+- Simplify workflow for creating new weapons?
+	- E.g. remove the need to specify finishing traces
 
 - Game events log and chat
 	- In the same window
@@ -208,19 +218,6 @@ summary: That which we are brainstorming at the moment.
 - Note: drone sound (sentience sounds overall) will be calculated exactly as the firing engine sound
 	- Sentience humming caches
 	- These don't need their playing pos synchronized
-
-- Property editor: Checkbox matrix for b2Filter
-	- might be useful once we come to glass walls 
-	- a list of predefined filters
-		- might choose a name, just like enums
-		- stored in common assets
-	- now sensible filters values will be provided by the testbed
-
-- Particles and flavours
-	- std::unordered_map<particle_flavour_id, vector of particles>
-		- We will always simulate all particles that we have in memory.
-		- This will add a nice speedup, and also we will easily invalidate particles when particle flavour changes or is deleted.
-		- Particle types will also be pooled and will be a separate viewable.
 
 - Probably somehow disallow arbitrary inferring of relational cache?
 	- There was some unresolved crash problem with this.

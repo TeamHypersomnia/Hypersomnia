@@ -17,7 +17,7 @@ namespace components {
 		static constexpr bool is_synchronized = true;
 
 		// GEN INTROSPECTOR struct components::motor_joint
-		std::array<entity_id, 2> target_bodies;
+		std::array<signi_entity_id, 2> target_bodies;
 
 		bool activated = true;
 		bool collide_connected = false;

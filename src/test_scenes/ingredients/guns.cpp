@@ -609,10 +609,6 @@ namespace test_flavours {
 
 			meta.set(item);
 
-			components::item item_inst;
-			item_inst.charges = 30;
-			meta.set(item_inst);
-
 			{
 				invariants::cartridge cartridge; 
 

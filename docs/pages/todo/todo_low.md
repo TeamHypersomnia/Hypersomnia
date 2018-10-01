@@ -130,3 +130,11 @@ permalink: todo_low
 
 - Add a match-global rng seed offset to mode state
 
+- Property editor: Checkbox matrix for b2Filter
+
+- Particles and flavours
+	- std::unordered_map<particle_flavour_id, vector of particles>
+		- We will always simulate all particles that we have in memory.
+		- This will add a nice speedup, and also we will easily invalidate particles when particle flavour changes or is deleted.
+		- Particle types will also be pooled and will be a separate viewable.
+

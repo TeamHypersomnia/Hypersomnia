@@ -14,7 +14,7 @@ struct car_engine_entities {
 namespace components {
 	struct car {
 		// GEN INTROSPECTOR struct components::car
-		entity_id current_driver;
+		signi_entity_id current_driver;
 
 		child_entity_id interior;
 

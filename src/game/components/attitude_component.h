@@ -10,7 +10,7 @@
 #include "augs/pad_bytes.h"
 
 using specific_hostile_entities_vector = 
-	augs::constant_size_vector<entity_id, SPECIFIC_HOSTILE_ENTITIES_COUNT>
+	augs::constant_size_vector<signi_entity_id, SPECIFIC_HOSTILE_ENTITIES_COUNT>
 ;
 
 namespace components {
@@ -22,7 +22,7 @@ namespace components {
 
 		specific_hostile_entities_vector specific_hostile_entities = {};
 		
-		entity_id currently_attacked_visible_entity;
+		signi_entity_id currently_attacked_visible_entity;
 		attitude_type target_attitude = attitude_type::NEUTRAL;
 
 		bool is_alert = false;

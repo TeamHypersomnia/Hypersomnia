@@ -1651,3 +1651,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- Alt+G?
 	- The most recent?
 
+- a list of predefined filters
+	- might choose a name, just like enums
+	- stored in common assets
+
