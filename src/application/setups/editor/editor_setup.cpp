@@ -1527,6 +1527,20 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 		auto get_description = [&](const auto& from_command) -> decltype(auto) {
 			return std::visit(
 				[&](const auto& typed_command) -> decltype(auto) {
+					{
+						using T = remove_cref<decltype(typed_command)>;
+
+						static constexpr bool show_only_if_undid_or_redid = 
+							is_one_of_v<T, resize_entities_command, move_entities_command>
+						;
+
+						if constexpr(show_only_if_undid_or_redid) {
+							if (op.type == O::EXECUTE_NEW) {
+								return colored("");
+							}
+						}
+					}
+
 					auto dest = typed_command.describe();
 
 					formatted_string result;
@@ -1596,7 +1610,7 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 			if (op.stamp.seconds_ago() <= cfg.show_for_ms / 1000) {
 				/* TODO: (LOW) Improve granularity to milliseconds */
 
-				const auto rev_number = colored(typesafe_sprintf("#%x: ", h.get_current_revision()));
+				const auto rev_number = colored(typesafe_sprintf("#%x: ", 1 + h.get_current_revision()));
 				const auto result_text = rev_number + message_text;
 
 				const auto ss = in.screen_size;
