@@ -83,25 +83,27 @@ void requested_equipment::generate_for(
 
 	auto make_mag = [&](const auto& mag_flavour) {
 		if (mag_flavour.is_set() && is_magazine_like(cosm, mag_flavour)) {
-			const auto magazine = just_create_entity(cosm, mag_flavour);
-			const auto mag_deposit = magazine[slot_function::ITEM_DEPOSIT];
+			if (const auto magazine = just_create_entity(cosm, mag_flavour)) {
+				const auto mag_deposit = magazine[slot_function::ITEM_DEPOSIT];
 
-			const auto final_charge_flavour = [&]() {
-				if (eq.non_standard_charge.is_set()) {
-					return eq.non_standard_charge;
+				const auto final_charge_flavour = [&]() {
+					if (eq.non_standard_charge.is_set()) {
+						return eq.non_standard_charge;
+					}
+
+					return mag_deposit->only_allow_flavour;
+				}();
+
+				if (final_charge_flavour.is_set()) {
+					if (const auto c = just_create_entity(cosm, final_charge_flavour)) {
+						c.set_charges(c.num_charges_fitting_in(mag_deposit));
+
+						transfer(c, mag_deposit);
+					}
 				}
 
-				return mag_deposit->only_allow_flavour;
-			}();
-
-			if (final_charge_flavour.is_set()) {
-				const auto c = just_create_entity(cosm, final_charge_flavour);
-				c.set_charges(c.num_charges_fitting_in(mag_deposit));
-
-				transfer(c, mag_deposit);
+				return magazine;
 			}
-
-			return magazine;
 		}
 
 		return cosm[entity_id()];
@@ -116,51 +118,52 @@ void requested_equipment::generate_for(
 	};
 
 	if (eq.weapon.is_set()) {
-		const auto weapon = just_create_entity(cosm, eq.weapon);
+		if (const auto weapon = just_create_entity(cosm, eq.weapon)) {
+			/* So that the effect transform is valid */
+			weapon.set_logic_transform(character_transform);
 
-		/* So that the effect transform is valid */
-		weapon.set_logic_transform(character_transform);
-
-		if constexpr (!to_the_ground) {
-			pickup(weapon);
-		}
-
-		auto load_charge_to_chamber = [&](const auto& charge_flavour) {
-			if (charge_flavour.is_set()) {
-				const auto c = just_create_entity(cosm, charge_flavour);
-				c.set_charges(1);
-
-				if (const auto chamber = weapon[slot_function::GUN_CHAMBER]) {
-					transfer(c, chamber);
-				}
-			}
-		};
-
-		const auto magazine_slot = weapon[slot_function::GUN_DETACHABLE_MAGAZINE];
-
-		if (magazine_slot) {
-			const auto final_mag_flavour = [&]() {
-				if (eq.non_standard_mag.is_set()) {
-					return eq.non_standard_mag;
-				}
-
-				return magazine_slot->only_allow_flavour;
-			}();
-
-			if (n < 0) {
-				n = weapon.template get<invariants::item>().gratis_ammo_pieces_with_first;
+			if constexpr (!to_the_ground) {
+				pickup(weapon);
 			}
 
-			if (n > 0) {
-				if (const auto new_mag = make_mag(final_mag_flavour)) {
-					transfer(new_mag, magazine_slot);
-					--n;
+			auto load_charge_to_chamber = [&](const auto& charge_flavour) {
+				if (charge_flavour.is_set()) {
+					if (const auto c = just_create_entity(cosm, charge_flavour)) {
+						c.set_charges(1);
 
-					if (const auto loaded_charge = new_mag[slot_function::ITEM_DEPOSIT].get_item_if_any()) {
-						load_charge_to_chamber(loaded_charge.get_flavour_id());
+						if (const auto chamber = weapon[slot_function::GUN_CHAMBER]) {
+							transfer(c, chamber);
+						}
+					}
+				}
+			};
+
+			const auto magazine_slot = weapon[slot_function::GUN_DETACHABLE_MAGAZINE];
+
+			if (magazine_slot) {
+				const auto final_mag_flavour = [&]() {
+					if (eq.non_standard_mag.is_set()) {
+						return eq.non_standard_mag;
 					}
 
-					generate_spares(final_mag_flavour);
+					return magazine_slot->only_allow_flavour;
+				}();
+
+				if (n < 0) {
+					n = weapon.template get<invariants::item>().gratis_ammo_pieces_with_first;
+				}
+
+				if (n > 0) {
+					if (const auto new_mag = make_mag(final_mag_flavour)) {
+						transfer(new_mag, magazine_slot);
+						--n;
+
+						if (const auto loaded_charge = new_mag[slot_function::ITEM_DEPOSIT].get_item_if_any()) {
+							load_charge_to_chamber(loaded_charge.get_flavour_id());
+						}
+
+						generate_spares(final_mag_flavour);
+					}
 				}
 			}
 		}

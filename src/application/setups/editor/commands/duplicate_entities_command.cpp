@@ -62,37 +62,42 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 
 	auto duplicate = [&](auto&& new_transform_setter) {
 		duplicated_entities.for_each([&](auto& e) {
-			const auto duplicated = cosmic::specific_clone_entity(cosm[e.source_id]);
+			try {
+				const auto duplicated = cosmic::specific_clone_entity(cosm[e.source_id]);
 
-			const bool group_found = groups.on_group_entry_of(e.source_id, [&](auto, const auto& group, auto) {
-				/* 
-					If the source entity was in a group,
-				   	move the duplicated one to a corresponding group for duplicates.
-				*/
+				const bool group_found = groups.on_group_entry_of(e.source_id, [&](auto, const auto& group, auto) {
+					/* 
+						If the source entity was in a group,
+						move the duplicated one to a corresponding group for duplicates.
+					*/
 
-				const auto new_group_name = group.name + new_group_suffix;
-				const auto new_idx = groups.get_group_by(new_group_name);
+					const auto new_group_name = group.name + new_group_suffix;
+					const auto new_idx = groups.get_group_by(new_group_name);
 
-				created_grouping.push_entry(duplicated);
-				created_grouping.group_indices_after.push_back(new_idx);
-			});
+					created_grouping.push_entry(duplicated);
+					created_grouping.group_indices_after.push_back(new_idx);
+				});
 
-			if (!group_found) {
-				created_grouping.push_entry(duplicated);
+				if (!group_found) {
+					created_grouping.push_entry(duplicated);
 
-				const auto new_idx = groups.get_group_by(free_untitled_group);
-				created_grouping.group_indices_after.push_back(new_idx);
-			}
-
-			new_transform_setter(duplicated);
-			e.duplicated_id = duplicated.get_id();
-
-			selections.emplace(e.duplicated_id);
-
-			if (in.settings.keep_source_entities_selected_on_mirroring) {
-				if (does_mirroring) {
-					selections.emplace(e.source_id);
+					const auto new_idx = groups.get_group_by(free_untitled_group);
+					created_grouping.group_indices_after.push_back(new_idx);
 				}
+
+				new_transform_setter(duplicated);
+				e.duplicated_id = duplicated.get_id();
+
+				selections.emplace(e.duplicated_id);
+
+				if (in.settings.keep_source_entities_selected_on_mirroring) {
+					if (does_mirroring) {
+						selections.emplace(e.source_id);
+					}
+				}
+			}
+			catch (const entity_creation_error&) {
+
 			}
 		});
 

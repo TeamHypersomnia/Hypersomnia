@@ -111,6 +111,11 @@ public:
 		return significant.template get_pool<E>().size();
 	}
 	
+	template <class E>
+	auto get_max_count_of() const {
+		return significant.template get_pool<E>().max_size();
+	}
+
 	auto get_count_of(const processing_subjects list_type) const {
 		return inferred.processing.get(list_type).size();
 	}

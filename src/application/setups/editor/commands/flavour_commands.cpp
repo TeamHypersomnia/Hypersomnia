@@ -146,16 +146,22 @@ void instantiate_flavour_command::redo(const editor_command_input in) {
 
 			built_description = typesafe_sprintf("Instantiated flavour: %x", flavour.get_name());
 
-			created_id = cosmic::specific_create_entity(
-				cosm,
-			   	flavour_id,
-			   	[this](const auto typed_handle, auto&&...) {
-					typed_handle.set_logic_transform(transformr(where));
-				}
-			).get_id();
-
 			auto& selections = in.folder.view.selected_entities;
-			selections = { created_id };
+
+			try {
+				const auto created_entity = cosmic::specific_create_entity(
+					cosm,
+					flavour_id,
+					[this](const auto typed_handle, auto&&...) {
+						typed_handle.set_logic_transform(transformr(where));
+					}
+				); 
+
+				selections = { created_entity.get_id() };
+			}
+			catch (const entity_creation_error&) {
+				selections = {};
+			}
 		}
 	);
 }

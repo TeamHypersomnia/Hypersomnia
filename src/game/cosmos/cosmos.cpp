@@ -177,24 +177,24 @@ namespace augs {
 			sol::table maybe_next_entity = entities_table[entity_table_counter];
 
 			if (maybe_next_entity.valid()) {
-				const auto new_entity = cosmic::create_entity(cosm);
+				if (const auto new_entity = cosmic::create_entity(cosm)) {
+					for (auto key_value_pair : maybe_next_entity) {
+						const auto component_name = key_value_pair.first.as<std::string>();
 
-				for (auto key_value_pair : maybe_next_entity) {
-					const auto component_name = key_value_pair.first.as<std::string>();
+						for_each_component_type(
+							[&](auto c) {
+								using component_type = decltype(c);
 
-					for_each_component_type(
-						[&](auto c) {
-							using component_type = decltype(c);
+								const auto this_component_name = get_type_name_strip_namespace<component_type>();
 
-							const auto this_component_name = get_type_name_strip_namespace<component_type>();
-
-							if (this_component_name == component_name) {
-								component_type c;
-								read_lua(key_value_pair.second, c);
-								new_entity.get({}).add<component_type>(c, cosm.get_solvable());
+								if (this_component_name == component_name) {
+									component_type c;
+									read_lua(key_value_pair.second, c);
+									new_entity.get({}).add<component_type>(c, cosm.get_solvable());
+								}
 							}
-						}
-					);
+						);
+					}
 				}
 			}
 			else {

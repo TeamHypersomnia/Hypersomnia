@@ -64,108 +64,137 @@ item_transfer_result query_transfer_result(
 	const item_slot_transfer_request r	
 ) {
 	item_transfer_result output;
-	const auto transferred_item = cosm[r.item];
+	output.result = item_transfer_result_type::INVALID_PARAMETERS;
+
+	const auto item_handle = cosm[r.item];
 	const auto target_slot = cosm[r.target_slot];
-	const auto item = transferred_item.get<components::item>();
 
-	ensure(r.params.specified_quantity != 0);
-
-	const auto capabilities_compared = match_transfer_capabilities(transferred_item.get_cosmos(), r);
-	const auto relation = capabilities_compared.relation_type;
-
-	output.relation = relation;
-
-	if (relation == capability_relation::UNMATCHING) {
-		if (r.params.bypass_unmatching_capabilities) {
-
-		}
-		else {
-			output.result = item_transfer_result_type::INVALID_CAPABILITIES;
-			return output;
-		}
+	if (item_handle.dead()) {
+		return output;
 	}
 
-	if (relation == capability_relation::DROP || relation == capability_relation::ANONYMOUS_DROP) {
-		output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER;
+	item_handle.dispatch_on_having_all<components::item>(
+		[&](const auto& transferred_item) {
+			{
+				const auto& slv = cosm.get_solvable();
 
-		if (r.params.specified_quantity == -1) {
-			output.transferred_charges = item.get_charges();
-		}
-		else {
-			output.transferred_charges = std::min(r.params.specified_quantity, item.get_charges());
-		}
-	}
-	else {
-		if (target_slot.is_child_of(transferred_item)) {
-			/* Trying to insert inside the transferred item. */
-			output.result = item_transfer_result_type::THE_SAME_SLOT; 
-		}
-		else {
-			const auto containment_result = query_containment_result(
-				transferred_item, 
-				target_slot,
-				r.params.specified_quantity
-			);
+				using E = entity_type_of<decltype(transferred_item)>;
 
-			output.transferred_charges = containment_result.transferred_charges;
+				const auto cnt = slv.get_count_of<E>();
+				const auto max_cnt = slv.get_max_count_of<E>();
 
-			switch (containment_result.result) {
-				case containment_result_type::INCOMPATIBLE_CATEGORIES: 
-					output.result = item_transfer_result_type::INCOMPATIBLE_CATEGORIES; 
-					break;
+				if (cnt + 1 >= max_cnt) {
+					/* 
+						Pathological case - we're running out of entity space. 
+						We might need to create an entity to clone a stack.
+					*/
+					output.result = item_transfer_result_type::ENTITY_POOL_IS_FULL;
+					return;
+				}
+			}
 
-				case containment_result_type::INSUFFICIENT_SPACE: 
-					output.result = item_transfer_result_type::INSUFFICIENT_SPACE; 
-					break;
+			const auto item = transferred_item.template get<components::item>();
 
-				case containment_result_type::THE_SAME_SLOT: 
+			ensure(r.params.specified_quantity != 0);
+
+			const auto capabilities_compared = match_transfer_capabilities(transferred_item.get_cosmos(), r);
+			const auto relation = capabilities_compared.relation_type;
+
+			output.relation = relation;
+
+			if (relation == capability_relation::UNMATCHING) {
+				if (r.params.bypass_unmatching_capabilities) {
+
+				}
+				else {
+					output.result = item_transfer_result_type::INVALID_CAPABILITIES;
+					return;
+				}
+			}
+
+			if (relation == capability_relation::DROP || relation == capability_relation::ANONYMOUS_DROP) {
+				output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER;
+
+				if (r.params.specified_quantity == -1) {
+					output.transferred_charges = item.get_charges();
+				}
+				else {
+					output.transferred_charges = std::min(r.params.specified_quantity, item.get_charges());
+				}
+			}
+			else {
+				if (target_slot.is_child_of(transferred_item)) {
+					/* Trying to insert inside the transferred item. */
 					output.result = item_transfer_result_type::THE_SAME_SLOT; 
-					break;
+				}
+				else {
+					const auto containment_result = query_containment_result(
+						transferred_item, 
+						target_slot,
+						r.params.specified_quantity
+					);
 
-				case containment_result_type::SUCCESSFUL_CONTAINMENT:
-					output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER; 
-					break;
+					output.transferred_charges = containment_result.transferred_charges;
 
-				case containment_result_type::TOO_MANY_ITEMS:
-					output.result = item_transfer_result_type::TOO_MANY_ITEMS;
-					break;
+					switch (containment_result.result) {
+						case containment_result_type::INCOMPATIBLE_CATEGORIES: 
+							output.result = item_transfer_result_type::INCOMPATIBLE_CATEGORIES; 
+							break;
 
-				default: 
-					output.result = item_transfer_result_type::INVALID_RESULT; 
-					break;
+						case containment_result_type::INSUFFICIENT_SPACE: 
+							output.result = item_transfer_result_type::INSUFFICIENT_SPACE; 
+							break;
+
+						case containment_result_type::THE_SAME_SLOT: 
+							output.result = item_transfer_result_type::THE_SAME_SLOT; 
+							break;
+
+						case containment_result_type::SUCCESSFUL_CONTAINMENT:
+							output.result = item_transfer_result_type::SUCCESSFUL_TRANSFER; 
+							break;
+
+						case containment_result_type::TOO_MANY_ITEMS:
+							output.result = item_transfer_result_type::TOO_MANY_ITEMS;
+							break;
+
+						default: 
+							output.result = item_transfer_result_type::INVALID_RESULT; 
+							break;
+					}
+				}
+			}
+
+			if (output.is_successful() && !r.params.bypass_mounting_requirements) {
+				/* Not so fast. Let's see if we can properly mount here. */
+				const auto mounting_result = calc_mounting_conditions(transferred_item, target_slot);
+
+				switch (mounting_result) {
+					case mounting_conditions_type::PROGRESS:
+						output.only_initiated_mounting = true;
+						break;
+
+					case mounting_conditions_type::ABORT:
+						output.result = item_transfer_result_type::MOUNTING_CONDITIONS_NOT_MET;
+						break;
+
+					case mounting_conditions_type::NO_MOUNTING_REQUIRED:
+						break;
+				}
+			}
+
+			if (output.is_successful() ) {
+				const auto t = target_slot.get_type();
+
+				if (t == slot_function::ITEM_DEPOSIT) {
+					output.holster = true;
+				}
+
+				if (target_slot.is_hand_slot()) {
+					output.wield = true;
+				}
 			}
 		}
-	}
-
-	if (output.is_successful() && !r.params.bypass_mounting_requirements) {
-		/* Not so fast. Let's see if we can properly mount here. */
-		const auto mounting_result = calc_mounting_conditions(transferred_item, target_slot);
-
-		switch (mounting_result) {
-			case mounting_conditions_type::PROGRESS:
-				output.only_initiated_mounting = true;
-				break;
-
-			case mounting_conditions_type::ABORT:
-				output.result = item_transfer_result_type::MOUNTING_CONDITIONS_NOT_MET;
-				break;
-
-			case mounting_conditions_type::NO_MOUNTING_REQUIRED:
-				break;
-		}
-	}
-
-	if (output.is_successful() ) {
-		const auto t = target_slot.get_type();
-
-		if (t == slot_function::ITEM_DEPOSIT) {
-			output.holster = true;
-		}
-
-		if (target_slot.is_hand_slot()) {
-			output.wield = true;
-		}
-	}
+	);
 
 	return output;
 }

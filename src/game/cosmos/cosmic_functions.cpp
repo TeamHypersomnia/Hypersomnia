@@ -122,9 +122,14 @@ entity_handle just_clone_entity(const entity_handle source_entity) {
 		return entity_handle::dead_handle(cosm);
 	}
 
-	return source_entity.dispatch([](const auto typed_handle){
-		return entity_handle(cosmic::specific_clone_entity(typed_handle));
-	});
+	try {
+		return source_entity.dispatch([](const auto typed_handle){
+			return entity_handle(cosmic::specific_clone_entity(typed_handle));
+		});
+	}
+	catch (const entity_creation_error&) {
+		return entity_handle::dead_handle(cosm);
+	}
 }
 
 template <class F>

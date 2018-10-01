@@ -75,34 +75,35 @@ perform_transfer_result perform_transfer_impl(
 		return handle.template get<components::item>().get_raw_component(access); 
 	};
 
-	const auto transferred_item = cosm[r.item];
-	const auto transferred_item_guid = transferred_item.get_guid();
-
-	auto& item = get_item_of(transferred_item);
-
-	const auto source_slot = cosm[deguidize(item.current_slot)];
-	const auto target_slot = cosm[r.target_slot];
-
-	const auto source_slot_container = source_slot.get_container();
-	const auto target_slot_container = target_slot.get_container();
-
-	const auto source_root = source_slot_container.get_topmost_container();
-	const auto target_root = target_slot_container.get_topmost_container();
+	perform_transfer_result output;
 
 	const auto result = query_transfer_result(cosm, r);
 
-	perform_transfer_result output;
+	const auto target_slot = cosm[r.target_slot];
+	const auto target_slot_container = target_slot.get_container();
+	const auto target_root = target_slot_container.get_topmost_container();
 
 	output.result.result = result;
 	output.result.item = r.item;
 	output.result.target_slot = target_slot;
-	output.result.source_root = target_root;
 	output.result.target_root = target_root;
 
 	if (!result.is_successful()) {
 		LOG("perform_transfer failed: %x", format_enum(result.result));
 		return output;
 	}
+
+	const auto transferred_item = cosm[r.item];
+
+	auto& item = get_item_of(transferred_item);
+
+	const auto source_slot = cosm[deguidize(item.current_slot)];
+	const auto source_slot_container = source_slot.get_container();
+	const auto source_root = source_slot_container.get_topmost_container();
+
+	output.result.source_root = target_root;
+
+	const auto transferred_item_guid = transferred_item.get_guid();
 
 	if (!r.params.bypass_mounting_requirements) {
 		const bool source_mounted = source_slot.alive() ? source_slot->is_mounted_slot() : false;

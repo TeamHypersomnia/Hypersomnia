@@ -194,16 +194,21 @@ void bomb_mode::init_spawned(
 					}
 				);
 
-				auto request = item_slot_transfer_request::standard(new_item.get_id(), target_slot);
-				request.params.bypass_mounting_requirements = true;
-				
-				const auto result = perform_transfer_no_step(request, cosm);
-				result.notify_logical(step);
+				if (new_item) {
+					auto request = item_slot_transfer_request::standard(new_item.get_id(), target_slot);
+					request.params.bypass_mounting_requirements = true;
 
-				const auto new_id = new_item.get_id();
-				transferred->msg.changes[i.source_entity_id] = new_id;
+					const auto result = perform_transfer_no_step(request, cosm);
+					result.notify_logical(step);
 
-				created_items.push_back(new_id);
+					const auto new_id = new_item.get_id();
+					transferred->msg.changes[i.source_entity_id] = new_id;
+
+					created_items.push_back(new_id);
+				}
+				else {
+					transferred->msg.changes[i.source_entity_id] = entity_id();
+				}
 			}
 		}
 		else {

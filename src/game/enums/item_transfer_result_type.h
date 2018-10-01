@@ -25,6 +25,9 @@ enum class item_transfer_result_type {
 	// GEN INTROSPECTOR enum class item_transfer_result_type
 	INVALID_RESULT,
 
+	INVALID_PARAMETERS,
+	ENTITY_POOL_IS_FULL,
+
 	INVALID_CAPABILITIES,
 
 	TOO_MANY_ITEMS,
