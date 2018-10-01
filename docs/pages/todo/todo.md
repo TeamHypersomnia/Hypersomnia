@@ -6,6 +6,9 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Balance colliding bullets so that damage to be dealt is subtracted from the stronger bullet
+	- Possibly reduce trace size then
+
 - research building with clang on windows?
 
 - Local setup should record session live

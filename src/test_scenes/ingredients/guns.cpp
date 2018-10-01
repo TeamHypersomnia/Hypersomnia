@@ -316,6 +316,7 @@ namespace test_flavours {
 
 			missile.remnant_flavours.emplace_back(to_entity_flavour_id(test_remnant_bodies::STEEL_ROUND_REMNANT_2));
 			missile.damage_amount = 47;
+			missile.victim_shake *= 2.f;
 
 			auto& trace_modifier = missile.trace_sound.modifier;
 
@@ -380,6 +381,7 @@ namespace test_flavours {
 
 			missile.destruction_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
 			missile.damage_amount = 6;
+			missile.victim_shake *= 0.25f;
 			missile.max_lifetime_ms = 350.f;
 
 			auto& trace_modifier = missile.trace_sound.modifier;
@@ -501,6 +503,7 @@ namespace test_flavours {
 
 			missile.homing_towards_hostile_strength = 1.0f;
 			missile.damage_amount = 42;
+			missile.victim_shake *= 2.f;
 			missile.ricochet_born_cooldown_ms = 17.f;
 
 			auto& trace_modifier = missile.trace_sound.modifier;

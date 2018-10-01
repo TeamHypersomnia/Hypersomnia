@@ -478,13 +478,24 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 				}
 			}
 
+			auto apply_shake = [&](const auto& to_whom) {
+				to_whom.template dispatch_on_having_all<invariants::sentience>([&](const auto& typed_victim) {
+					const auto& sentience_def = typed_victim.template get<invariants::sentience>();
+					auto& sentience = typed_victim.template get<components::sentience>();
+
+					const auto mult = sentience_def.aimpunch_mult;
+
+					auto considered_shake = d.victim_shake;
+					considered_shake *= mult;
+					considered_shake.apply(now, sentience);
+				});
+			};
+
 			if (sentience) {
-				d.victim_shake.apply(now, *sentience);
+				apply_shake(subject);
 			}
 			else if (const auto owning_capability = subject.get_owning_transfer_capability()) {
-				if (const auto s = owning_capability.find<components::sentience>()) {
-					d.victim_shake.apply(now, *s);
-				}
+				apply_shake(owning_capability);
 			}
 		}
 	}

@@ -435,6 +435,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 				damage_msg.subject = it.subject;
 				damage_msg.amount = total_damage_amount;
 				damage_msg.victim_shake = missile_def.victim_shake;
+				damage_msg.victim_shake *= missile.power_multiplier_of_sender;
 				damage_msg.impact_velocity = impact_velocity;
 				damage_msg.point_of_impact = it.point;
 				step.post_message(damage_msg);
