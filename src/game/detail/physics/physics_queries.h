@@ -152,7 +152,7 @@ void for_each_in_camera(
 		si,
 		visible_aabb.left_top(),
 		visible_aabb.right_bottom(),
-		filters::renderable_query(),
+		predefined_queries::renderable(),
 		callback
 	);
 }

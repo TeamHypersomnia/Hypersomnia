@@ -811,3 +811,6 @@ fixtures can form scene graph as they have relative transforms.
 
 - use per_entity_type_container widely
 
+- FFA game mode
+	- Win condition: None, there is only time limit.
+

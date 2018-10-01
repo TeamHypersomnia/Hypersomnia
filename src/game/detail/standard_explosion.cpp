@@ -101,7 +101,7 @@ void standard_explosion_input::instantiate(
 
 	messages::visibility_information_request request;
 	request.eye_transform = explosion_location;
-	request.filter = filters::pathfinding_query();
+	request.filter = predefined_queries::pathfinding();
 	request.square_side = effective_radius * 2;
 	request.subject = subject_if_any;
 
@@ -132,7 +132,7 @@ void standard_explosion_input::instantiate(
 		physics.for_each_intersection_with_triangle(
 			cosm.get_si(),
 			damaging_triangle,
-			filters::wall(),
+			filters[predefined_filter_type::WALL],
 			[&](
 				const b2Fixture* const fix,
 				const vec2 point_a,
@@ -228,7 +228,7 @@ void standard_explosion_input::instantiate(
 			si,
 			si.get_meters(effective_radius) * 2,
 			explosion_location.to<b2Transform>(si),
-			filters::character(),
+			filters[predefined_filter_type::CHARACTER],
 			[&](
 				const b2Fixture* const fix,
 				const vec2,

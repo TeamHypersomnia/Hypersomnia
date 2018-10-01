@@ -21,12 +21,12 @@ namespace ingredients {
 		//pathfinding.rotate_navpoints = 10;
 		//pathfinding.distance_navpoint_hit = 2;
 		//pathfinding.favor_velocity_parallellness = true;
-		//pathfinding.filter = filters::pathfinding_query();
+		//pathfinding.filter = predefined_queries::pathfinding();
 		//
 		//auto& layer = visibility.full_visibility_layers[components::visibility::DYNAMIC_PATHFINDING];
 		//layer.square_side = 1000;
 		//layer.color.set(0, 255, 255, 120);
-		//layer.filter = filters::pathfinding_query();
+		//layer.filter = predefined_queries::pathfinding();
 	}
 
 	void add_soldier_intelligence(entity_handle) {
@@ -36,8 +36,8 @@ namespace ingredients {
 		// los.test_items = true;
 		// los.test_dangers = true;
 		// los.maximum_distance = 1000.0;
-		// los.obstruction_filter = filters::line_of_sight_query();
-		// los.candidate_filter = filters::line_of_sight_candidates();
+		// los.obstruction_filter = predefined_queries::line_of_sight();
+		// los.candidate_filter = filters[predefined_filter_type::LINE_OF_SIGHT_CANDIDATES];
 		// 
 		// auto& behaviour_tree = e += components::behaviour_tree();
 		// auto& trees = behaviour_tree.concurrent_trees;

@@ -94,7 +94,7 @@ void thunder_system::advance(
 							cosm.get_si(),
 							child.from,
 							child.to,
-							filters::flying_item()
+							filters[predefined_filter_type::FLYING_ITEM]
 						);
 
 						if (raycast.hit) {

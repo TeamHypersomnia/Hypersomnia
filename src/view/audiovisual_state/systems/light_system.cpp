@@ -178,7 +178,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 					request.eye_transform.pos += light_displacement;
 
 					if (queried_camera_aabb.hover(light_aabb)) {
-						request.filter = filters::line_of_sight_query();
+						request.filter = predefined_queries::line_of_sight();
 						request.square_side = reach * 2;
 					}
 					else {

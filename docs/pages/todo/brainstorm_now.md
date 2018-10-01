@@ -127,9 +127,6 @@ summary: That which we are brainstorming at the moment.
 - "I" in editor invokes initialization routine of the chosen game mode
 	- Just starts advancing it from the beginning.
 
-- FFA game mode
-	- Win condition: None, there is only time limit.
-
 - To avoid transmitting some server-decided seed for the beginning of each round (e.g. to position players around)...
 	- ...we can just derive a hash of all inputs from the previous round, or just hash entire cosmos state
 	- this way we are unpredictable about it but still deterministic

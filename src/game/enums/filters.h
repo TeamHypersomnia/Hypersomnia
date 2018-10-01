@@ -1,36 +1,58 @@
 #pragma once
 #include <Box2D/Dynamics/b2Fixture.h>
+#include "augs/misc/enum/enum_array.h"
 
-namespace filters {
-	enum class categories {
-		// GEN INTROSPECTOR enum class filters::categories
+using filter_type = b2Filter;
 
-		QUERY,
-		BULLET,
-		WALL,
-		CHARACTER,
-		LYING_ITEM,
-		GROUND,
-		FLYING,
-		TRIGGER,
-		SHELL,
-		GLASS_OBSTACLE,
+enum class filter_category {
+	// GEN INTROSPECTOR enum class filter_category
 
-		COUNT
-		// END GEN INTROSPECTOR
-	};
+	QUERY,
+	BULLET,
+	WALL,
+	CHARACTER,
+	LYING_ITEM,
+	GROUND,
+	FLYING,
+	TRIGGER,
+	SHELL,
+	GLASS_OBSTACLE,
 
-	b2Filter line_of_sight_query();
-	b2Filter pathfinding_query();
-	b2Filter renderable_query();
+	COUNT
+	// END GEN INTROSPECTOR
+};
 
-	b2Filter wall();
-	b2Filter character();
-	b2Filter ground();
-	b2Filter lying_item();
-	b2Filter flying_bullet();
-	b2Filter flying_item();
-	b2Filter shell();
-	b2Filter planted_explosive();
-	b2Filter glass_obstacle();
-}
+namespace predefined_queries {
+	filter_type line_of_sight();
+	filter_type pathfinding();
+	filter_type renderable();
+};
+
+enum class predefined_filter_type {
+	// GEN INTROSPECTOR enum class predefined_filter_type
+	WALL,
+	CHARACTER,
+	GROUND,
+	LYING_ITEM,
+	FLYING_BULLET,
+	FLYING_ITEM,
+	SHELL,
+	PLANTED_EXPLOSIVE,
+	GLASS_OBSTACLE,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
+struct predefined_filters {
+	augs::enum_array<filter_type, predefined_filter_type> filters;
+
+	predefined_filters();
+
+	template <class T>
+	decltype(auto) operator[](const T& t) const {
+		return filters[t];
+	}
+};
+
+extern const predefined_filters filters;

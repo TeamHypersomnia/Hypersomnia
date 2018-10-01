@@ -55,7 +55,7 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 				cosm.get_si(),
 				line_from,
 				line_to,
-				filters::flying_item(),
+				filters[predefined_filter_type::FLYING_ITEM],
 				subject
 			);
 

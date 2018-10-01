@@ -34,11 +34,11 @@ auto calc_filters(const E& handle) {
 	const auto& colliders_data = handle.template get<invariants::fixtures>();
 
 	if (handle.is_like_planted_bomb()) {
-		return filters::planted_explosive();
+		return filters[predefined_filter_type::PLANTED_EXPLOSIVE];
 	}
 
 	if (handle.is_like_thrown_explosive()) {
-		return filters::flying_item();
+		return filters[predefined_filter_type::FLYING_ITEM];
 	}
 
 	return colliders_data.filter;

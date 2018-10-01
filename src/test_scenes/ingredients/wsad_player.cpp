@@ -97,7 +97,7 @@ namespace test_flavours {
 			body.damping.linear = 6.5f;
 			body.damping.angular = 6.5f;
 
-			fixtures_invariant.filter = filters::character();
+			fixtures_invariant.filter = filters[predefined_filter_type::CHARACTER];
 			fixtures_invariant.density = 1.0;
 
 			meta.set(body);

@@ -1,7 +1,9 @@
 #include "game/enums/filters.h"
 #include "augs/misc/enum/enum_bitset.h"
 
-using C = filters::categories;
+using C = filter_category;
+
+const predefined_filters filters;
 
 template <class... Args>
 static auto make_flags(Args... enums) {
@@ -22,89 +24,82 @@ static auto standard_participation_except(C c) {
 	return static_cast<uint16>(r.to_ulong());
 }
 
-namespace filters {
-	b2Filter line_of_sight_query() {
+namespace predefined_queries {
+	b2Filter line_of_sight() {
 		b2Filter out;
 		out.categoryBits = make_flags(C::QUERY);
 		out.maskBits = make_flags(C::WALL);
 		return out;
 	}
 
-	b2Filter pathfinding_query() {
+	b2Filter pathfinding() {
 		b2Filter out;
 		out.categoryBits = make_flags(C::QUERY);
 		out.maskBits = make_flags(C::WALL, C::GLASS_OBSTACLE);
 		return out;
 	}
 	
-	b2Filter renderable_query() {
+	b2Filter renderable() {
 		b2Filter out;
 		out.categoryBits = make_flags(C::QUERY);
 		out.maskBits = make_flags(C::BULLET, C::CHARACTER, C::LYING_ITEM, C::WALL, C::GROUND, C::SHELL, C::GLASS_OBSTACLE, C::FLYING);
 		return out;
 	}
+}
 
-	b2Filter wall() {
-		b2Filter out;
+predefined_filters::predefined_filters() {
+	{
+		auto& out = filters[predefined_filter_type::WALL];
 		out.categoryBits = make_flags(C::WALL);
 		out.maskBits = standard_participation();
-		return out;
 	}
+	{
 
-	b2Filter character() {
-		b2Filter out;
+		auto& out = filters[predefined_filter_type::CHARACTER];
 		out.categoryBits = make_flags(C::CHARACTER);
 		out.maskBits = standard_participation();
-		return out;
 	}
-	
-	b2Filter ground() {
-		b2Filter out;
+	{
+
+		auto& out = filters[predefined_filter_type::GROUND];
 		out.categoryBits = make_flags(C::GROUND);
 		out.maskBits = standard_participation_except(C::FLYING);
-		return out;
 	}
+	{
 
-	b2Filter lying_item() {
-		b2Filter out;
+		auto& out = filters[predefined_filter_type::LYING_ITEM];
 		out.categoryBits = make_flags(C::LYING_ITEM);
 		out.maskBits = standard_participation();
-		return out;
 	}
+	{
 
-	b2Filter flying_item() {
-		b2Filter out;
+		auto& out = filters[predefined_filter_type::FLYING_ITEM];
 		out.categoryBits = make_flags(C::FLYING);
 		out.maskBits = standard_participation_except(C::LYING_ITEM);
-		return out;
 	}
+	{
 
-	b2Filter flying_bullet() {
-		b2Filter out;
+		auto& out = filters[predefined_filter_type::FLYING_BULLET];
 		out.categoryBits = make_flags(C::FLYING);
 		out.maskBits = standard_participation();
-		return out;
 	}
+	{
 
-	b2Filter shell() {
-		b2Filter out;
+		auto& out = filters[predefined_filter_type::SHELL];
 		out.categoryBits = make_flags(C::SHELL);
 		out.maskBits = standard_participation_except(C::FLYING);
-		return out;
 	}
+	{
 
-	b2Filter planted_explosive() {
-		b2Filter out;
+		auto& out = filters[predefined_filter_type::PLANTED_EXPLOSIVE];
 		out.categoryBits = make_flags(C::LYING_ITEM);
 		out.maskBits = make_flags(C::QUERY, C::SHELL);
-		return out;
 	}
+	{
 
-	b2Filter glass_obstacle() {
-		b2Filter out;
+		auto& out = filters[predefined_filter_type::GLASS_OBSTACLE];
 		out.categoryBits = make_flags(C::GLASS_OBSTACLE);
 		out.maskBits = standard_participation();
-		return out;
 	}
-
 }
+

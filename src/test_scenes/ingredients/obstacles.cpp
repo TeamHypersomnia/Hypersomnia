@@ -41,7 +41,7 @@ namespace test_flavours {
 			);
 
 			auto& fixtures_def = meta.template get<invariants::fixtures>();
-			fixtures_def.filter = filters::glass_obstacle();
+			fixtures_def.filter = filters[predefined_filter_type::GLASS_OBSTACLE];
 
 			meta.template get<invariants::sprite>().color.a = glass_alpha;
 			meta.template get<invariants::sprite>().neon_color.a = glass_neon_alpha;

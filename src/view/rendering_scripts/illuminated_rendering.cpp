@@ -170,7 +170,7 @@ void illuminated_rendering(
 
 			messages::visibility_information_request request;
 			request.eye_transform = *viewed_character_transform;
-			request.filter = filters::pathfinding_query();
+			request.filter = predefined_queries::pathfinding();
 			request.square_side = std::max(screen_size.x, screen_size.y) * 2;
 			request.subject = viewed_character;
 
