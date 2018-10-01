@@ -7,7 +7,6 @@ summary: Just a hidden scratchpad.
 ---
 
 - research building with clang on windows?
-- alt+scroll could disable/enable layers starting from the topmost one
 
 - Local setup should record session live
 	- This is really important in the face of bugs.

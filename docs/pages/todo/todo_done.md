@@ -1662,3 +1662,4 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- We'll just ignore them in editor
 	- Useful for some wandering pixels flavours
 
+- ctrl+scroll could disable/enable layers starting from the topmost one

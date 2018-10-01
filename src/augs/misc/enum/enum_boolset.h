@@ -129,6 +129,22 @@ namespace augs {
 		auto end() const {
 			return flags.end();
 		}
+
+		auto rbegin() {
+			return flags.rbegin();
+		}
+
+		auto rend() {
+			return flags.rend();
+		}
+
+		auto rbegin() const {
+			return flags.rbegin();
+		}
+
+		auto rend() const {
+			return flags.rend();
+		}
 	};
 }
 
