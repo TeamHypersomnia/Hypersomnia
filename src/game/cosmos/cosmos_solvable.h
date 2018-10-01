@@ -12,6 +12,11 @@
 #include "game/cosmos/cosmos_solvable_inferred.h"
 #include "game/cosmos/cosmos_solvable_significant.h"
 #include "game/cosmos/entity_id.h"
+#include "game/cosmos/entity_creation_error.h"
+
+struct entity_creation_input {
+	raw_entity_flavour_id flavour_id;
+};
 
 class cosmos_solvable {
 	using guid_cache = std::map<entity_guid, entity_id>;
@@ -24,8 +29,8 @@ class cosmos_solvable {
 		B& object;
 	};
 
-	template <class E, class... Args>
-	auto allocate_new_entity(const entity_guid new_guid, Args&&... args);
+	template <class E>
+	auto allocate_new_entity(const entity_guid new_guid, entity_creation_input);
 
 	template <class E, class... Args>
 	auto detail_undo_free_entity(Args&&... args);
@@ -55,14 +60,14 @@ public:
 
 	void reserve_storage_for_entities(const cosmic_pool_size_type);
 
-	template <class E, class... Args>
-	auto allocate_next_entity(Args&&... args);
+	template <class E>
+	auto allocate_next_entity(entity_creation_input);
 
 	template <class E, class... Args>
 	auto undo_free_entity(Args&&... undo_free_args);
 
-	template <class E, class... Args>
-	auto allocate_entity_with_specific_guid(const entity_guid specific_guid, Args&&... args);
+	template <class E>
+	auto allocate_entity_with_specific_guid(const entity_guid specific_guid, entity_creation_input);
 
 	std::optional<cosmic_pool_undo_free_input> free_entity(entity_id);
 	void undo_last_allocate_entity(entity_id);

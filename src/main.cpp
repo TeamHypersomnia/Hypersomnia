@@ -1654,6 +1654,11 @@ catch (const augs::filesystem_error& err) {
 
 	return EXIT_FAILURE;
 }
+catch (const entity_creation_error& err) {
+	LOG("Unhandled entity creation error: %x", format_enum(err.type));
+
+	return EXIT_FAILURE;
+}
 /* We want the debugger to break if it is not in production */
 #if IS_PRODUCTION_BUILD
 catch (const std::runtime_error& err) {

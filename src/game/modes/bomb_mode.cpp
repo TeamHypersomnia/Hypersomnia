@@ -79,6 +79,10 @@ decltype(auto) bomb_mode::on_bomb_entity(const input_type in, F callback) const 
 	const auto bomb_flavour = vars.bomb_flavour;
 	const auto& flavours = cosm.get_solvable_inferred().name;
 
+	if (!bomb_flavour.is_set()) {
+		return callback(std::nullopt);
+	}
+
 	return bomb_flavour.dispatch([&](const auto& typed_bomb_flavour_id) {
 		const auto& bombs = flavours.get_entities_by_flavour_id(typed_bomb_flavour_id);
 
@@ -443,8 +447,10 @@ void bomb_mode::spawn_bomb_near_players(const input_type in) {
 
 	const auto new_bomb_entity = spawn_bomb(in);
 
-	new_bomb_entity.set_logic_transform(transformr(avg_pos));
-	new_bomb_entity.get<components::rigid_body>().apply_impulse(avg_dir * 100);
+	if (new_bomb_entity) {
+		new_bomb_entity.set_logic_transform(transformr(avg_pos));
+		new_bomb_entity.get<components::rigid_body>().apply_impulse(avg_dir * 100);
+	}
 }
 
 

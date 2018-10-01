@@ -3,6 +3,7 @@
 #include "augs/misc/pool/pool_allocate.h"
 #include "game/cosmos/cosmic_functions.h"
 #include "game/detail/entity_handle_mixins/get_current_slot.hpp"
+#include "game/cosmos/entity_creation_error.h"
 
 template <class E, class C, class I, class P>
 ref_typed_entity_handle<E> cosmic::specific_create_entity_detail(
@@ -12,7 +13,12 @@ ref_typed_entity_handle<E> cosmic::specific_create_entity_detail(
 	P pre_construction
 ) {
 	static_assert(!std::is_const_v<C>, "Can't create entity in a const cosmos.");
-	const auto new_allocation = cosm.get_solvable({}).template allocate_next_entity<E>(flavour_id.raw);
+
+	if (nullptr == cosm.find_flavour(flavour_id)) {
+		throw entity_creation_error { entity_creation_error_type::DEAD_FLAVOUR };
+	}
+
+	const auto new_allocation = cosm.get_solvable({}).template allocate_next_entity<E>({ flavour_id.raw });
 	const auto handle = ref_typed_entity_handle<E> { cosm, { new_allocation.object, new_allocation.key } };
 
 	{
@@ -66,20 +72,29 @@ entity_handle cosmic::create_entity(
 ) {
 	using candidate_types = typename decltype(flavour_id)::matching_types; 
 
+	if (!flavour_id.is_set()) {
+		return cosm[entity_id()];
+	}
+
 	return conditional_get_by_dynamic_id<candidate_types>(
 		all_entity_types(),
 		flavour_id.type_id,
 		[&](auto e) {
 			using E = decltype(e);
 
-			const auto typed_handle = specific_create_entity(
-				cosm, 
-				typed_entity_flavour_id<E>(flavour_id.raw), 
-				std::forward<Pre>(pre_construction)
-			);
+			try {
+				const auto typed_handle = specific_create_entity(
+					cosm, 
+					typed_entity_flavour_id<E>(flavour_id.raw), 
+					std::forward<Pre>(pre_construction)
+				);
 
-			post_construction(typed_handle);
-			return entity_handle(typed_handle);
+				post_construction(typed_handle);
+				return entity_handle(typed_handle);
+			}
+			catch (const entity_creation_error& err) {
+				return cosm[entity_id()];
+			}
 		}
 	);
 }
@@ -151,15 +166,15 @@ auto cosmic::specific_clone_entity(const handle_type source_entity) {
 	return specific_clone_entity(source_entity, [](auto&&...) {});
 }
 
-template <class E, class... Args>
-auto cosmos_solvable::allocate_new_entity(const entity_guid new_guid, Args&&... args) {
+template <class E>
+auto cosmos_solvable::allocate_new_entity(const entity_guid new_guid, const entity_creation_input in) {
 	auto& pool = significant.get_pool<E>();
 
 	if (pool.full_capacity()) {
-		throw std::runtime_error("Entities should be controllably reserved to avoid invalidation of entity_handles.");
+		throw entity_creation_error { entity_creation_error_type::POOL_FULL };
 	}
 
-	const auto result = pool.allocate(new_guid, std::forward<Args>(args)..., get_timestamp());
+	const auto result = pool.allocate(new_guid, in.flavour_id, get_timestamp());
 
 	allocation_result<typed_entity_id<E>, decltype(result.object)> output {
 		typed_entity_id<E>(result.key), result.object
@@ -180,10 +195,15 @@ auto cosmos_solvable::detail_undo_free_entity(Args&&... args) {
 	return output;
 }
 
-template <class E, class... Args>
-auto cosmos_solvable::allocate_next_entity(Args&&... args) {
-	const auto next_guid = significant.next_entity_guid.value++;
-	return allocate_entity_with_specific_guid<E>(next_guid, std::forward<Args>(args)...);
+template <class E>
+auto cosmos_solvable::allocate_next_entity(const entity_creation_input in) {
+	auto& guid_value = significant.next_entity_guid.value;
+
+	const auto next_guid = guid_value;
+	const auto result = allocate_entity_with_specific_guid<E>(next_guid, in);
+
+	++guid_value;
+	return result;
 }
 
 template <class E, class... Args>
@@ -194,9 +214,9 @@ auto cosmos_solvable::undo_free_entity(Args&&... undo_free_args) {
 	return result;
 }
 
-template <class E, class... Args>
-auto cosmos_solvable::allocate_entity_with_specific_guid(const entity_guid specific_guid, Args&&... args) {
-	const auto result = allocate_new_entity<E>(specific_guid, std::forward<Args>(args)...);
+template <class E>
+auto cosmos_solvable::allocate_entity_with_specific_guid(const entity_guid specific_guid, const entity_creation_input in) {
+	const auto result = allocate_new_entity<E>(specific_guid, in);
 	guid_to_id[specific_guid] = result.key;
 	return result;
 }
