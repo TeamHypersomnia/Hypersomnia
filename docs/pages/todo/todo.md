@@ -59,10 +59,6 @@ summary: Just a hidden scratchpad.
 		- ...even though many diffuse maps nearby have been loaded
 		- perhaps we won't really need the separation between diffuse and neon, because maximum atlases will be huge anyway
 
-- Fix what happens when too many entities are created
-	- **Let the game work when a new entity cannot be created.**
-		- Just return a dead handle.
-
 - Shake on shooting with a sniper rifle
 
 - Dashing

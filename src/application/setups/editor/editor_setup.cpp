@@ -1370,7 +1370,7 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 		eye->transform.pos.discard_fract();
 
 		if (const auto view = find_view()) {
-			if (view->show_grid) {
+			if (view->show_grid && is_editing_mode()) {
 				triangles.grid(
 					screen_size,
 					view->grid.unit_pixels,

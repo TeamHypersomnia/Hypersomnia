@@ -6,16 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Editor status bar
-	- Won't matter until after deathmatch stage
-	- But will vastly improve experience
-	- Downmost left for status
-	- Downmost right for zoom
-	- Messages in right down corner
-	- Check how it works in vim
-		- Changing a mode to normal clears the last message
-	- Will be useful for the author to know what is going on
-
 - Player & modes
 	- A mode shall operate without crash on virtually any cosmos
 		- Should catch up with changes

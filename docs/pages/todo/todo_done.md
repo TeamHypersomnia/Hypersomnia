@@ -1663,3 +1663,18 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- Useful for some wandering pixels flavours
 
 - ctrl+scroll could disable/enable layers starting from the topmost one
+
+- Fix what happens when too many entities are created
+	- **Let the game work when a new entity cannot be created.**
+		- Just return a dead handle.
+
+- Editor status bar
+	- Won't matter until after deathmatch stage
+	- But will vastly improve experience
+	- Downmost left for status
+	- Downmost right for zoom
+	- Messages in right down corner
+	- Check how it works in vim
+		- Changing a mode to normal clears the last message
+	- Will be useful for the author to know what is going on
+
