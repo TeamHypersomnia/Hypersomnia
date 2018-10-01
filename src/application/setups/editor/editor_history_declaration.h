@@ -19,6 +19,7 @@ struct create_flavour_command;
 struct duplicate_flavour_command;
 struct delete_flavour_command;
 struct change_flavour_property_command;
+struct change_initial_component_property_command;
 struct instantiate_flavour_command;
 
 struct change_entity_property_command;
@@ -59,6 +60,7 @@ using editor_history_base = augs::history_with_marks<
 	duplicate_flavour_command,
 	delete_flavour_command,
 	change_flavour_property_command,
+	change_initial_component_property_command,
 	instantiate_flavour_command,
 
 	change_entity_property_command,

@@ -4,12 +4,7 @@
 #include "application/setups/editor/commands/editor_command_structs.h"
 #include "application/setups/editor/commands/change_property_command.h"
 
-#include "application/setups/editor/detail/field_address.h"
-
-struct entity_property_id {
-	unsigned component_id = static_cast<unsigned>(-1);
-	entity_field_address field;
-};
+#include "application/setups/editor/commands/detail/entity_property_id.h"
 
 using affected_entities_type = std::vector<entity_id_base>;
 

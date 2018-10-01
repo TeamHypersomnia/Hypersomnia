@@ -12,12 +12,12 @@ static constexpr bool should_reinfer_after_change(const T&) {
 }
 
 struct editor_property_accessors {
-	template <class C, class Container, class F>
+	template <class C, class F>
 	static bool access(
 		const flavour_property_id& self,
 		C& cosm,
 		const entity_type_id type_id,
-		const Container& flavour_ids,
+		const std::vector<raw_entity_flavour_id>& flavour_ids,
 		F callback
 	) {
 		bool reinfer = false;
@@ -60,12 +60,54 @@ struct editor_property_accessors {
 		return reinfer;
 	}
 
-	template <class C, class Container, class F>
+	template <class C, class F>
 	static bool access(
 		const entity_property_id& self,
 		C& cosm,
 		const entity_type_id type_id,
-		const Container& entity_ids,
+		const std::vector<raw_entity_flavour_id>& flavour_ids,
+		F callback
+	) {
+		get_by_dynamic_id(
+			all_entity_types(),
+			type_id,
+			[&](auto e) {
+				using E = decltype(e);
+
+				get_by_dynamic_index(
+					components_of<E> {},
+					self.component_id,
+					[&](const auto& c) {
+						using Component = remove_cref<decltype(c)>;
+
+						for (const auto& f : flavour_ids) {
+							const auto result = on_field_address(
+								std::get<Component>(cosm.get_flavour({}, typed_entity_flavour_id<E>(f)).initial_components),
+								self.field,
+
+								[&](auto& resolved_field) -> callback_result {
+									return callback(resolved_field);
+								}
+							);
+
+							if (callback_result::ABORT == result) {
+								break;
+							}
+						}
+					}
+				);
+			}
+		);
+
+		return false;
+	}
+
+	template <class C, class F>
+	static bool access(
+		const entity_property_id& self,
+		C& cosm,
+		const entity_type_id type_id,
+		const std::vector<entity_id_base>& entity_ids,
 		F callback
 	) {
 		bool reinfer = false;
@@ -144,6 +186,17 @@ struct editor_property_accessors {
 		if (access(self.property_id, cosm, self.type_id, self.affected_flavours, continue_if_nullopt(std::forward<F>(callback)))) {
 			cosm.change_common_significant([&](auto&) { return changer_callback_result::REFRESH; });
 		}
+	}
+
+	template <class T, class F>
+	static void access_each_property(
+		const change_initial_component_property_command& self,
+		T in,
+		F&& callback
+	) {
+		auto& cosm = in.get_cosmos();
+
+		access(self.property_id, cosm, self.type_id, self.affected_flavours, continue_if_nullopt(std::forward<F>(callback)));
 	}
 
 	template <class T, class F>

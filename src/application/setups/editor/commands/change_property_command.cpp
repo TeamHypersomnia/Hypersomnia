@@ -155,7 +155,9 @@ void change_property_command<D>::undo(const editor_command_input in) {
 }
 
 template class change_property_command<change_flavour_property_command>;
+template class change_property_command<change_initial_component_property_command>;
 template class change_property_command<change_entity_property_command>;
+
 template class change_property_command<change_common_state_command>;
 template class change_property_command<change_group_property_command>;
 template class change_property_command<change_current_mode_property_command>;

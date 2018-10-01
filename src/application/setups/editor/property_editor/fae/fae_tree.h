@@ -65,6 +65,11 @@ void do_edit_flavours_gui(
 	cmd.type_id.set<E>();
 	obtain_raw_id_vector(cmd.affected_flavours, ids);
 	edit_flavour(in, flavour, cmd);
+
+	change_initial_component_property_command ini_cmd;
+	ini_cmd.affected_flavours = std::move(cmd.affected_flavours);
+	ini_cmd.type_id.set<E>();
+	edit_initial_component_properties(in, flavour, ini_cmd);
 }
 
 template <class F>
