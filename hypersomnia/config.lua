@@ -105,13 +105,25 @@ return {
     entity_selector = {
       hovered_color = "255 255 255 20",
       selected_color = "65 131 196 80",
-      held_color = "65 131 196 120"
+      held_color = "65 131 196 120",
+	  hovered_color = "255 255 255 80",
+	  hovered_dashed_line_color = "255 255 255 140"
     },
     controlled_entity_color = "255 255 0 120",
     matched_entity_color = "0 255 0 80",
 
     rectangular_selection_color = "65 131 196 60",
     rectangular_selection_border_color = "65 131 196 120",
+
+	action_indicator = {
+		bg_color = "0 0 0 180",
+		bg_border_color = "255 255 255 15",
+
+		max_width = 300,
+		show_for_ms = 3000,
+		text_padding = { x = 10, y = 10 },
+		offset = { x = 80, y = 80 },
+	},
 
     different_values_frame_bg = "115 73 0 255",
     different_values_frame_hovered_bg = "158 122 0 255",

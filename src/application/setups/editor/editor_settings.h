@@ -53,6 +53,18 @@ struct editor_test_scene_settings {
 	// END GEN INTROSPECTOR
 };
 
+struct editor_action_indicator_settings {
+	// GEN INTROSPECTOR struct editor_action_indicator_settings
+	rgba bg_color = { 0, 0, 0, 180 };
+	rgba bg_border_color = { 255, 255, 255, 15 };
+
+	unsigned max_width = 300;
+	unsigned show_for_ms = 3000;
+	vec2i text_padding = vec2i(5, 5);
+	vec2i offset = vec2i(80, 80);
+	// END GEN INTROSPECTOR
+};
+
 struct editor_settings {
 	// GEN INTROSPECTOR struct editor_settings
 	editor_autosave_settings autosave;
@@ -74,5 +86,7 @@ struct editor_settings {
 
 	rgba rectangular_selection_color = { 65, 131, 196, 60 };
 	rgba rectangular_selection_border_color = { 65, 131, 196, 120 };
+
+	editor_action_indicator_settings action_indicator;
 	// END GEN INTROSPECTOR
 };

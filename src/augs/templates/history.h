@@ -2,9 +2,26 @@
 #include <vector>
 #include <variant>
 #include <optional>
+#include "augs/misc/time_utils.h"
 
 namespace augs {
 	struct introspection_access;
+
+	enum class history_op_type {
+		NONE,
+
+		UNDO,
+		REDO,
+		EXECUTE_NEW,
+		SEEK
+	};
+
+	struct last_history_op {
+		// GEN INTROSPECTOR struct last_history_op
+		history_op_type type = history_op_type::NONE;
+		date_time stamp;
+		// END GEN INTROSPECTOR
+	};
 
 	template <class Derived, class... CommandTypes>
 	class history {
@@ -18,7 +35,12 @@ namespace augs {
 		// GEN INTROSPECTOR class augs::history class Derived class... CommandTypes 
 		index_type current_revision = static_cast<index_type>(-1);
 		std::vector<command_type> commands; 
+		last_history_op last_op;
 		// END GEN INTROSPECTOR
+
+		void set_last_op(const history_op_type type) {
+			last_op = { type, date_time() };
+		}
 
 		void derived_set_modified_flags() {
 			auto& self = *static_cast<Derived*>(this);
@@ -26,6 +48,10 @@ namespace augs {
 		}
 
 	public:
+		const auto& get_last_op() const {
+			return last_op;
+		}
+
 		template <class T, class... RedoArgs>
 		const T& execute_new(T&& command, RedoArgs&&... redo_args);
 

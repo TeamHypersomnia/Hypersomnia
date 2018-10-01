@@ -20,6 +20,7 @@ namespace augs {
 		std::string get_stamp() const;
 		std::string get_readable() const;
 
+		unsigned long long seconds_ago() const;
 		std::string how_long_ago() const;
 		std::string how_long_ago_tell_seconds() const;
 

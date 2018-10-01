@@ -27,6 +27,8 @@ namespace augs {
 
 		redo(std::forward<RedoArgs>(redo_args)...);
 
+		set_last_op(history_op_type::EXECUTE_NEW);
+
 		return std::get<remove_cref<T>>(last_command());
 	}
 
@@ -47,6 +49,8 @@ namespace augs {
 		);
 
 		++current_revision;
+		set_last_op(history_op_type::REDO);
+
 		return true;
 	}
 
@@ -67,12 +71,18 @@ namespace augs {
 		);
 
 		--current_revision;
+		set_last_op(history_op_type::UNDO);
+
 		return true;
 	}
 
 	template <class D, class... C>
 	template <class... Args>
 	void history<D, C...>::seek_to_revision(const index_type n, Args&&... args) {
+		if (n != current_revision) {
+			set_last_op(history_op_type::SEEK);
+		}
+
 		while (current_revision < n) {
 			redo(std::forward<Args>(args)...);
 		}

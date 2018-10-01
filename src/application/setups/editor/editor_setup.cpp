@@ -1511,7 +1511,123 @@ void editor_setup::draw_status_bar(const draw_setup_gui_input& in) {
 }
 
 void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
-	(void)in;
+	if (anything_opened() && is_editing_mode()) {
+		const auto& h = folder().history;
+		const auto op = h.get_last_op();
+
+		using namespace augs::gui::text;
+		using O = augs::history_op_type;
+
+		const auto& fnt = in.gui_fonts.gui;
+		auto colored = [&](const auto& s, const rgba col = white) {
+			const auto st = style(fnt, col);
+			return formatted_string(s, st);
+		};
+
+		auto get_description = [&](const auto& from_command) -> decltype(auto) {
+			return std::visit(
+				[&](const auto& typed_command) -> decltype(auto) {
+					auto dest = typed_command.describe();
+
+					formatted_string result;
+
+					auto try_preffix = [&](const auto& preffix, const auto col) {
+						if (begins_with(dest, preffix)) {
+							cut_preffix(dest, preffix);
+							result = colored(preffix, col) + colored(dest);
+							return true;
+						}
+
+						return false;
+					};
+
+					if (try_preffix("Deleted", red)
+						|| try_preffix("Filled", green)
+						|| try_preffix("Altered", orange)
+						|| try_preffix("Renamed", orange)
+						|| try_preffix("Changed", orange)
+						|| try_preffix("Created", green)
+						|| try_preffix("Started", green)				
+						|| try_preffix("Started tracking", green)				
+						|| try_preffix("Duplicated", cyan)
+						|| try_preffix("Mirrored", cyan)
+					) {
+						return result;
+					}
+
+					return colored(dest);
+				},
+				from_command
+			);
+		};
+
+		const auto message_text = [&]() {
+			if (op.type == O::UNDO) {
+				if (h.has_next_command()) {
+					const auto preffix = colored("Undid ", orange);
+					const auto& cmd = h.next_command();
+
+					return preffix + get_description(cmd);
+				}
+			}
+			else if (op.type == O::REDO) {
+				if (h.has_last_command()) {
+					const auto preffix = colored("Redid ", pink);
+					const auto& cmd = h.last_command();
+
+					return preffix + get_description(cmd);
+				}
+			}
+			else if (op.type == O::EXECUTE_NEW) {
+				if (h.has_last_command()) {
+					const auto& cmd = h.last_command();
+
+					return get_description(cmd);
+				}
+
+			}
+
+			return colored("");
+		}();
+
+		if (message_text.size() > 0) {
+			const auto& cfg = settings.action_indicator;
+
+			if (op.stamp.seconds_ago() <= cfg.show_for_ms / 1000) {
+				/* TODO: (LOW) Improve granularity to milliseconds */
+
+				const auto rev_number = colored(typesafe_sprintf("#%x: ", h.get_current_revision()));
+				const auto result_text = rev_number + message_text;
+
+				const auto ss = in.screen_size;
+				const auto rb_space = cfg.offset;
+				const auto text_padding = cfg.text_padding;
+				const auto wrapping = cfg.max_width;
+
+				const auto bbox = get_text_bbox(result_text, wrapping, false);
+				//const auto line_h = static_cast<int>(fnt.metrics.get_height());
+				//bbox.y = std::max(bbox.y, line_h * 2);
+
+				const auto& out = in.drawer;
+
+				const auto rect_pos = ss - rb_space - bbox - text_padding * 2;
+				const auto text_pos = rect_pos + text_padding;
+				const auto rect_size = bbox + text_padding * 2;
+				const auto rect = xywh(rect_pos, rect_size);
+
+				out.aabb_with_border(rect, cfg.bg_color, cfg.bg_border_color);
+
+				print_stroked(
+					out,
+					text_pos,
+					result_text,
+					{},
+					black,
+					wrapping
+				);
+			}
+		}
+	}
 }
 
 template <class F>

@@ -55,9 +55,12 @@ std::string augs::date_time::how_long_ago_tell_seconds() const {
 	return how_long_ago(true);
 }
 
-std::string augs::date_time::how_long_ago(const bool tell_seconds) const {
-	const auto secs = static_cast<unsigned long long>(std::difftime(std::time(nullptr), t));
+unsigned long long augs::date_time::seconds_ago() const {
+	return static_cast<unsigned long long>(std::difftime(std::time(nullptr), t));
+}
 
+std::string augs::date_time::how_long_ago(const bool tell_seconds) const {
+	const auto secs = seconds_ago();
 	const auto mins = secs / 60;
 	const auto hrs = mins / 60;
 	const auto days = hrs / 24;

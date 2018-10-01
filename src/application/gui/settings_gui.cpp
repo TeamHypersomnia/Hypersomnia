@@ -398,6 +398,8 @@ void settings_gui_state::perform(
 							auto& scope_cfg = config.editor.entity_selector;
 
 							revertable_color_edit(SCOPE_CFG_NVP(hovered_color));
+							revertable_color_edit(SCOPE_CFG_NVP(hovered_dashed_line_color));
+
 							revertable_color_edit(SCOPE_CFG_NVP(selected_color));
 							revertable_color_edit(SCOPE_CFG_NVP(held_color));
 						}
@@ -408,6 +410,21 @@ void settings_gui_state::perform(
 							revertable_color_edit(SCOPE_CFG_NVP(controlled_entity_color));
 							revertable_color_edit(SCOPE_CFG_NVP(matched_entity_color));
 						}
+					}
+
+					if (auto node = scoped_tree_node("Action indicator")) {
+						auto& scope_cfg = config.editor.action_indicator;
+
+						revertable_color_edit(SCOPE_CFG_NVP(bg_color));
+						revertable_color_edit(SCOPE_CFG_NVP(bg_border_color));
+
+						revertable_slider(SCOPE_CFG_NVP(max_width), 10u, 1000u);
+						revertable_slider(SCOPE_CFG_NVP(show_for_ms), 0u, 20000u);
+
+						revertable_slider(SCOPE_CFG_NVP(show_for_ms), 0u, 20000u);
+
+						revertable_drag_vec2(SCOPE_CFG_NVP(text_padding));
+						revertable_drag_vec2(SCOPE_CFG_NVP(offset));
 					}
 
 					auto& scope_cfg = config.editor;
