@@ -3,6 +3,7 @@
 #include <map>
 
 #include "augs/drawing/general_border.h"
+#include "augs/templates/wrap_templates.h"
 
 #include "game/assets/all_logical_assets.h"
 
@@ -363,6 +364,20 @@ public:
 		if (is_editing_mode()) {
 			const auto& world = work().world;
 
+			if (const auto handle = world[selector.get_hovered()]) {
+				if (const auto tr = handle.find_logic_transform()) {
+					/* Draw dashed lines around the selected entity */
+					const auto ps = augs::make_rect_points<vec2>(handle.get_logical_size(), tr->pos, tr->rotation);
+
+					for (std::size_t i = 0; i < ps.size(); ++i) {
+						const auto& v = ps[i];
+						const auto& nv = wrap_next(ps, i);
+
+						callback(v, nv, settings.entity_selector.hovered_dashed_line_color, 0);
+					}
+				}
+			}
+
 			for_each_selected_entity(
 				[&](const entity_id id) {
 					const auto handle = world[id];
@@ -473,13 +488,6 @@ public:
 				make_grouped_selector_op_input()
 			);
 
-			if (const auto match = get_matching_go_to_entity()) {
-				auto color = green;
-				color.a += static_cast<rgba_channel>(augs::zigzag(global_time_seconds, 1.0 / 2) * 25);
-				
-				callback(match.get_id(), settings.matched_entity_color);
-			}
-
 			if (const auto hovered_guid = fae_gui.get_hovered_guid()) {
 				if (const auto hovered = world[hovered_guid]) {
 					/* Hovering from GUI, so choose the stronger, held color for it */
@@ -492,6 +500,13 @@ public:
 					/* Hovering from GUI, so choose the stronger, held color for it */
 					callback(hovered.get_id(), settings.entity_selector.held_color);
 				}
+			}
+
+			if (const auto match = get_matching_go_to_entity()) {
+				auto color = green;
+				color.a += static_cast<rgba_channel>(augs::zigzag(global_time_seconds, 1.0 / 2) * 25);
+				
+				callback(match.get_id(), settings.matched_entity_color);
 			}
 		}
 	}

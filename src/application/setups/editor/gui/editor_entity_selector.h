@@ -55,6 +55,10 @@ public:
 		return held;
 	}
 
+	auto get_hovered() const {
+		return hovered;
+	}
+
 	std::optional<ltrb> find_screen_space_rect_selection(
 		const camera_cone&,
 		vec2i mouse_pos

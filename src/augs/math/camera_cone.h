@@ -72,8 +72,8 @@ struct camera_cone {
 
 		const auto rotated_rect_verts = augs::make_rect_points<vec2>(
 			visible_world_area, 
-			eye.transform.rotation, 
-			eye.transform.pos
+			eye.transform.pos, 
+			eye.transform.rotation
 		);
 
 		return augs::get_aabb(rotated_rect_verts);

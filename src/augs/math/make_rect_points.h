@@ -2,8 +2,8 @@
 #include "augs/math/vec2.h"
 
 namespace augs {
-	template <class T, class S, class D, class P>
-	auto make_rect_points(const basic_vec2<S> size, const D degrees, const P& pos) {
+	template <class T, class S, class P, class D>
+	auto make_rect_points(const basic_vec2<S> size, const P& pos, const D degrees) {
 		std::array<T, 4> v;
 
 		v[0] = v[1] = v[2] = v[3] = -size / 2;

@@ -30,6 +30,7 @@ struct editor_entity_selector_settings {
 	rgba held_color = { 65, 131, 196, 160 };
 	rgba selected_color = { 65, 131, 196, 120 };
 	rgba hovered_color = { 255, 255, 255, 80 };
+	rgba hovered_dashed_line_color = { 255, 255, 255, 140 };
 	// END GEN INTROSPECTOR
 };
 
