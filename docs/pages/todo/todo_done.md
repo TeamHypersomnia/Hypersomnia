@@ -1678,3 +1678,23 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- Changing a mode to normal clears the last message
 	- Will be useful for the author to know what is going on
 
+
+	- For resetting a round, the modes will need to have an initial comos solvable
+		- For round-less modes, e.g. test scene mode, we can simply pass the same cosmos
+			- Actually just have a constexpr bool for each
+		- To re-create characters, we'll need to keep track of all of them
+			- Better than to transfer from the existing cosmos as it will make it deterministic
+			- Plus we'll be able to delete dead player entities if for some reason we need it
+
+	- Keeping track of character-client relation after round is reset?
+		- Solution: mode_player_id
+		- Server keeps client-entity_guid pairs?
+			- How do we make that entity_guid invariant?
+			- Perhaps we should choose a unique in-game name for each and use it as an id?
+				- components::text_details
+					- instance name
+					- actually a map would be better as it will be a frequent use case and we shouldn't add this to all entities
+					- clients will simply query the map to find the viewing character
+
+	- A mode shall operate without crash on virtually any cosmos
+		- Should catch up with changes

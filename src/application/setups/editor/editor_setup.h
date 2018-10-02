@@ -522,4 +522,7 @@ public:
 
 	void draw_status_bar(const draw_setup_gui_input&);
 	void draw_recent_message(const draw_setup_gui_input&);
+
+	void hide_layers_of_selected_entities();
+	void unhide_all_layers();
 };

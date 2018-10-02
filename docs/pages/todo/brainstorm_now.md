@@ -6,26 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Player & modes
-	- A mode shall operate without crash on virtually any cosmos
-		- Should catch up with changes
-	- A player stores initial signi. It updates it every time:
-		- A scene is filled.
-		- A special button is pressed.
-	- For resetting a round, the modes will need to have an initial comos solvable
-		- For round-less modes, e.g. test scene mode, we can simply pass the same cosmos
-			- Actually just have a constexpr bool for each
-		- To re-create characters, we'll need to keep track of all of them
-			- Better than to transfer from the existing cosmos as it will make it deterministic
-			- Plus we'll be able to delete dead player entities if for some reason we need it
-	- Keeping track of character-client relation after round is reset?
-		- Server keeps client-entity_guid pairs?
-			- How do we make that entity_guid invariant?
-			- Perhaps we should choose a unique in-game name for each and use it as an id?
-				- components::text_details
-					- instance name
-					- actually a map would be better as it will be a frequent use case and we shouldn't add this to all entities
-					- clients will simply query the map to find the viewing character
+- Editor player, modes and their replays
+	- An editor player stores initial signi. It updates it every time:
+		- ~~A scene is filled.~~
+		- Always when the mode is started for playtesting.
 
 - Persistence of entity ids in editor and clearing them
 	- Cases of storage:

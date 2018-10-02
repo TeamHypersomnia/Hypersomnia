@@ -1032,6 +1032,35 @@ bool editor_setup::handle_input_before_imgui(
 	return false;
 }
 
+void editor_setup::hide_layers_of_selected_entities() {
+	if (anything_opened()) {
+		auto& vf = view().viewing_filter;
+
+		if (vf.is_enabled) {
+			auto& cosm = work().world;
+
+			for_each_selected_entity(
+				[&](const auto e) {
+					const auto l = calc_render_layer(cosm[e]);
+					vf.value.layers[l] = false;
+				}
+			);
+		}
+	}
+}
+
+void editor_setup::unhide_all_layers() {
+	if (anything_opened()) {
+		auto& vf = view().viewing_filter;
+
+		if (vf.is_enabled) {
+			for (auto& f : vf.value.layers) {
+				f = true;
+			}
+		}
+	}
+}
+
 bool editor_setup::handle_input_before_game(
 	const app_ingame_intent_map& app_controls,
 	const necessary_images_in_atlas_map& sizes_for_icons,
@@ -1208,6 +1237,7 @@ bool editor_setup::handle_input_before_game(
 					case key::O: override_viewed_entity({}); view().reset_panning(); return true;
 					case key::R: mover.rotate_selection_once_by(make_mover_input(), 90); return true;
 					case key::E: mover.start_resizing_selection(make_mover_input(), true); return true;
+					case key::H: unhide_all_layers(); return true;
 
 					case key::_1: view().rect_select_mode = editor_rect_select_type::EVERYTHING; return true;
 					case key::_2: view().rect_select_mode = editor_rect_select_type::SAME_LAYER; return true;
@@ -1238,6 +1268,7 @@ bool editor_setup::handle_input_before_game(
 				case key::T: mover.start_moving_selection(make_mover_input()); return true;
 				case key::R: mover.start_rotating_selection(make_mover_input()); return true;
 				case key::ADD: player().request_step(); return true;
+				case key::H: hide_layers_of_selected_entities(); return true;
 				default: break;
 			}
 		}
