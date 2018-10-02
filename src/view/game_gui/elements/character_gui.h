@@ -24,9 +24,9 @@ struct character_gui {
 	std::array<value_bar, value_bar_count> value_bars;
 
 	wielding_setup last_setup;
+	bool was_last_setup_set = false;
 	int currently_held_hotbar_button_index = -1;
 
-	unsigned current_hotbar_selection_setup_index = 0;
 	bool is_gui_look_enabled = false;
 	bool preview_due_to_item_picking_request = false;
 	bool draw_space_available_inside_container_icons = true;

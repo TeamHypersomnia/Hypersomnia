@@ -197,56 +197,62 @@ void character_gui::assign_item_to_first_free_hotbar_button(
 wielding_setup character_gui::make_wielding_setup_for_previous_hotbar_selection_setup(
 	const const_entity_handle gui_entity
 ) {
-	auto& current_setup_index = current_hotbar_selection_setup_index;
 	const auto& cosm = gui_entity.get_cosmos();
-
-	const auto prev_idx = 1 - current_setup_index;
-
-	HOT_LOG("Q. Current: %x Prev: %x", current_setup_index, prev_idx);
 
 	const auto previous_setup = last_setup.make_viable_setup(gui_entity);
 	const auto current_setup = wielding_setup::from_current(gui_entity);
 
-	if (previous_setup == current_setup) {
-		/* Previous is identical so wield first item from hotbar */
+	const auto& current_hands = current_setup.hand_selections;
+	const auto& previous_hands = previous_setup.hand_selections;
 
-		HOT_LOG("Same setup:");
+	HOT_LOG_NVPS(cosm[current_hands[0]]);
+	HOT_LOG_NVPS(cosm[current_hands[1]]);
 
-		HOT_LOG_NVPS(cosm[previous_setup.hand_selections[0]]);
-		HOT_LOG_NVPS(cosm[previous_setup.hand_selections[1]]);
+	auto chosen_new_setup = [&]() {
+		if (!was_last_setup_set || previous_setup == current_setup) {
+			was_last_setup_set = true;
+			/* Previous is identical so wield first item from hotbar */
 
-		const auto try_wielding_item_from_hotbar_button_no = [&](const std::size_t hotbar_button_index) {
-			std::optional<wielding_setup> output;
+			HOT_LOG("Same as previous setup.");
 
-			const auto tried_setup = get_setup_from_button_indices(gui_entity, static_cast<int>(hotbar_button_index), -1);
-			const auto candidate_entity = cosm[tried_setup.hand_selections[0]];
+			const auto try_wielding_item_from_hotbar_button_no = [&](const std::size_t hotbar_button_index) -> std::optional<wielding_setup> {
+				const auto tried_setup = get_setup_from_button_indices(gui_entity, static_cast<int>(hotbar_button_index), -1);
+				const auto candidate_entity = cosm[tried_setup.hand_selections[0]];
 
-			if (candidate_entity.alive()) {
-				if (!is_clothing(candidate_entity.get<invariants::item>().categories_for_slot_compatibility)) {
-					const bool finally_found_differing_setup = !(tried_setup == previous_setup);
+				if (candidate_entity.alive()) {
+					if (!is_clothing(candidate_entity.get<invariants::item>().categories_for_slot_compatibility)) {
+						const bool finally_found_differing_setup = !(tried_setup == previous_setup);
 
-					if (finally_found_differing_setup) {
-						output = tried_setup;
+						if (finally_found_differing_setup) {
+							HOT_LOG("Found hotbar candidate: %x", candidate_entity);
+							return tried_setup;
+						}
 					}
+				}
+
+				return std::nullopt;
+			};
+
+			for (std::size_t i = 0; i < hotbar_buttons.size(); ++i) {
+				if (const auto wielding = try_wielding_item_from_hotbar_button_no(i)) {
+					return *wielding;
 				}
 			}
 
-			return output;
-		};
-
-		for (std::size_t i = 0; i < hotbar_buttons.size(); ++i) {
-			if (const auto wielding = try_wielding_item_from_hotbar_button_no(i)) {
-				return *wielding;
-			}
+			HOT_LOG("No hotbar candidate.");
+			return wielding_setup();
 		}
+		else {
+			HOT_LOG_NVPS(cosm[previous_hands[0]]);
+			HOT_LOG_NVPS(cosm[previous_hands[1]]);
 
-		return {};
-	}
-
-	HOT_LOG("Different setups, standard request.");
+			HOT_LOG("Different setups, standard request.");
+			return previous_setup;
+		}
+	}();
 
 	last_setup = current_setup;
-	return previous_setup;
+	return chosen_new_setup;
 }
 
 void character_gui::save_as_last_setup(const wielding_setup now_actual_setup) {
