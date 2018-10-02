@@ -673,6 +673,14 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				cosm.for_each_flavour_having<invariants::gun>(callback);
 			};
 
+			auto for_each_rifle = [&](auto&& callback) {
+				cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
+					if (!is_shotgun_like(cosm, id)) {
+						callback(id, flavour);
+					}
+				});
+			};
+
 			auto for_each_pistol = [&](auto&& callback) {
 				cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
 					if (price_of(item_flavour_id(id)) <= 1000) {
@@ -733,7 +741,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				case buy_menu_type::RIFLES: {
 					do_item_menu(
 						item_holding_stance::RIFLE_LIKE,
-						for_each_gun
+						for_each_rifle
 					);
 					break;
 				}
