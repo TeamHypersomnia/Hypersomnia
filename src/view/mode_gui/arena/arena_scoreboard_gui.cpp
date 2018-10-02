@@ -120,7 +120,7 @@ void arena_scoreboard_gui::draw_gui(
 	};
 	(void)text;
 
-	auto text_stroked = [&](const auto& ss, const rgba col, vec2i where, augs::center_flags flags = {}) {
+	auto text_stroked = [&](const auto& ss, const rgba col, vec2i where, augs::ralign_flags flags = {}) {
 		where += pen;
 
 		auto stroke_col = black;
@@ -135,7 +135,7 @@ void arena_scoreboard_gui::draw_gui(
 		);
 	};
 
-	auto text_stroked_large = [&](const auto& ss, const rgba col, vec2i where, augs::center_flags flags = {}) {
+	auto text_stroked_large = [&](const auto& ss, const rgba col, vec2i where, augs::ralign_flags flags = {}) {
 		where += pen;
 
 		auto stroke_col = black;

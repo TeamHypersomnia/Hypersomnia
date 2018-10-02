@@ -1,6 +1,7 @@
 #define INCLUDE_TYPES_IN 1
 #include "augs/filesystem/path.h"
 #include "augs/templates/type_templates.h"
+#include "augs/templates/maybe.h"
 
 #include "augs/templates/traits/is_comparable.h"
 #include "augs/templates/type_map.h"
@@ -566,4 +567,6 @@ struct game_state_checks {
 
 	static_assert(is_unique_ptr_v<std::unique_ptr<int>>);
 	static_assert(!is_unique_ptr_v<std::optional<int>>);
+	static_assert(is_comparable_v<augs::maybe<float>, augs::maybe<float>>);
+	static_assert(is_comparable_v<const augs::maybe<float>&, const augs::maybe<float>&>);
 };

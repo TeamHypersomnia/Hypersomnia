@@ -124,8 +124,8 @@ public:
 
 	template <class S, class I>
 	callback_result for_each_contained_slot_and_item_recursive(
-		S slot_callback, 
-		I item_callback,
+		S&& slot_callback, 
+		I&& item_callback,
 		const optional_slot_flags& filter
 	) const;
 

@@ -81,6 +81,12 @@ predefined_filters::predefined_filters() {
 
 		auto& out = filters[predefined_filter_type::FLYING_BULLET];
 		out.categoryBits = make_flags(C::FLYING);
+		out.maskBits = standard_participation_except(C::FLYING);
+	}
+	{
+
+		auto& out = filters[predefined_filter_type::FLYING_COLLIDING_BULLET];
+		out.categoryBits = make_flags(C::FLYING);
 		out.maskBits = standard_participation();
 	}
 	{

@@ -25,7 +25,7 @@ namespace augs {
 				const drawer_with_default out,
 				const vec2i pos,
 				const drafter& d,
-				const caret_info caret,
+				const caret_info& caret,
 				const ltrbi clipper
 			) const {
 				const auto& colors = d.cached_str;
@@ -260,7 +260,7 @@ namespace augs {
 				const drawer out,
 				vec2i pos,
 				const formatted_string& str,
-				const center_flags c,
+				const ralign_flags c,
 				const rgba stroke_color,
 				const unsigned wrapping_width,
 				const ltrbi clipper,
@@ -321,7 +321,7 @@ namespace augs {
 				const drawer_with_default out,
 				const vec2i pos,
 				const formatted_string& str,
-				const caret_info caret,
+				const caret_info& caret,
 				const unsigned wrapping_width,
 				const ltrbi clipper,
 				const bool use_kerning
@@ -342,7 +342,7 @@ namespace augs {
 				const drawer_with_default out,
 				const vec2i pos,
 				const formatted_string& str,
-				const caret_info caret,
+				const caret_info& caret,
 				const rgba stroke_color,
 				const unsigned wrapping_width,
 				const ltrbi clipper,

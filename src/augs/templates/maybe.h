@@ -28,14 +28,15 @@ namespace augs {
 			return is_enabled;
 		}
 	};
+
+	template <class T, class = std::enable_if_t<is_comparable_v<T, T>>>
+	bool operator==(const maybe<T>& a, const maybe<T>& b) {
+		return a.value == b.value && a.is_enabled == b.is_enabled;
+	}
+
+	template <class T, class = std::enable_if_t<is_comparable_v<T, T>>>
+	bool operator!=(const maybe<T>& a, const maybe<T>& b) {
+		return !(a == b);
+	}
 }
 
-template <class T, class = std::enable_if_t<is_comparable_v<T, T>>>
-bool operator==(const augs::maybe<T>& op, const augs::maybe<T>& b) {
-	return op.value() == b.value() && op.has_value() == b.has_value();
-}
-
-template <class T, class = std::enable_if_t<is_neq_comparable_v<T, T>>>
-bool operator!=(const augs::maybe<T>& op, const augs::maybe<T>& b) {
-	return !(op == b);
-}

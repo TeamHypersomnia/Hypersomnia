@@ -1635,7 +1635,7 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 					out,
 					text_pos,
 					result_text,
-					{},
+					augs::ralign_flags {},
 					black,
 					wrapping
 				);

@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include <sstream>
+#include <algorithm>
 #include "augs/build_settings/platform_defines.h"
 
 struct ImVec4;

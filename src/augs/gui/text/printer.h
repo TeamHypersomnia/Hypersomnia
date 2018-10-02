@@ -11,7 +11,7 @@ namespace augs {
 		CX, CY, RT, RB, LB, COUNT
 	};
 
-	using center_flags = augs::enum_boolset<ralign>;
+	using ralign_flags = augs::enum_boolset<ralign>;
 
 	namespace gui {
 		namespace text {
@@ -56,7 +56,7 @@ namespace augs {
 					const drawer_with_default out,
 					const vec2i pos,
 					const drafter&,
-					const caret_info caret,
+					const caret_info& caret,
 					const ltrbi clipper = ltrbi()
 				) const;
 			};
@@ -80,7 +80,7 @@ namespace augs {
 				const drawer out,
 				const vec2i pos,
 				const formatted_string& str,
-				const center_flags = {},
+				const ralign_flags = {},
 				const rgba stroke_color = black,
 				const unsigned wrapping_width = 0,
 				const ltrbi clipper = ltrbi(),
@@ -91,7 +91,7 @@ namespace augs {
 				const drawer_with_default out,
 				const vec2i pos,
 				const formatted_string& str,
-				const caret_info caret,
+				const caret_info& caret,
 				const unsigned wrapping_width = 0,
 				const ltrbi clipper = ltrbi(),
 				const bool use_kerning = false
@@ -101,7 +101,7 @@ namespace augs {
 				const drawer_with_default out,
 				const vec2i pos,
 				const formatted_string& str,
-				const caret_info caret,
+				const caret_info& caret,
 				const rgba stroke_color = black,
 				const unsigned wrapping_width = 0,
 				const ltrbi clipper = ltrbi(),

@@ -132,17 +132,17 @@ namespace augs {
 	) {
 		write_container_bytes(ar, *storage, size_type());
 	}
-}
 
-template <
-	class A, 
-	class B, 
-	class size_type_A, 
-	class size_type_B
->
-bool operator==(
-	const augs::container_with_small_size<A, size_type_A>& a,
-	const augs::container_with_small_size<B, size_type_B>& b
-) {
-	return *a == *b;
+	template <
+		class A, 
+		class B, 
+		class size_type_A, 
+		class size_type_B
+	>
+	bool operator==(
+		const container_with_small_size<A, size_type_A>& a,
+		const container_with_small_size<B, size_type_B>& b
+	) {
+		return *a == *b;
+	}
 }

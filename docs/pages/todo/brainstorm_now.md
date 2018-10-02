@@ -27,6 +27,34 @@ summary: That which we are brainstorming at the moment.
 					- actually a map would be better as it will be a frequent use case and we shouldn't add this to all entities
 					- clients will simply query the map to find the viewing character
 
+- Persistence of entity ids in editor and clearing them
+	- Cases of storage:
+		- Selection
+			- Rectangular
+			- Significant
+		- Groups
+	- Cases of invalidation:
+		- **Undoing a command that introduces new entities**
+			- E.g. one that creates an entity from nothing
+			- Look for both undo_last_create and "delete_entity"
+		- Commands whose undoing or redoing should automatically select affected entities
+			- Purge is justified in this case
+			- shouldn't this be pretty much all commands that affect entity existence?
+				- No. Redoing delete has no reason to purge selections of some other entities.
+					- Clear individually, also for the groups.
+			- problem: if, on delete, we remove an entity from the group it belongs to, the undoing of delete doesn't know what to do
+				- grouping will be tracked by history
+				- thus let the delete command just store its own "ungroup entities" command and invoke it beforehand on all entries
+		- Delete command
+		- Gameplay mode
+			- For now we won't support editor operations inside gameplay mode?
+				- Should be easy enough though, we can always just read the deletion commands
+			- To ensure space efficiency even with static allocations, we'll just serialize the cosmos to bytes instead of making a full clone
+				- Should even be faster considering that recreating some associative containers' structure might be already costly
+	- mover should be deactivated when?
+		- corner case: delete while move?
+		- should work anyway and yeah, deactivate it then
+
 - Arbitrary pasting of entities
 	- Vastly useful for importing stuff from testbed maps into existing ones
 		- Let alone between community maps
@@ -215,34 +243,6 @@ summary: That which we are brainstorming at the moment.
 
 - Probably somehow disallow arbitrary inferring of relational cache?
 	- There was some unresolved crash problem with this.
-
-- Persistence of entity ids in editor and clearing them
-	- Cases of storage:
-		- Selection
-			- Rectangular
-			- Significant
-		- Groups
-	- Cases of invalidation:
-		- **Undoing a command that introduces new entities**
-			- E.g. one that creates an entity from nothing
-			- Look for both undo_last_create and "delete_entity"
-		- Commands whose undoing or redoing should automatically select affected entities
-			- Purge is justified in this case
-			- shouldn't this be pretty much all commands that affect entity existence?
-				- No. Redoing delete has no reason to purge selections of some other entities.
-					- Clear individually, also for the groups.
-			- problem: if, on delete, we remove an entity from the group it belongs to, the undoing of delete doesn't know what to do
-				- grouping will be tracked by history
-				- thus let the delete command just store its own "ungroup entities" command and invoke it beforehand on all entries
-		- Delete command
-		- Gameplay mode
-			- For now we won't support editor operations inside gameplay mode?
-				- Should be easy enough though, we can always just read the deletion commands
-			- To ensure space efficiency even with static allocations, we'll just serialize the cosmos to bytes instead of making a full clone
-				- Should even be faster considering that recreating some associative containers' structure might be already costly
-	- mover should be deactivated when?
-		- corner case: delete while move?
-		- should work anyway and yeah, deactivate it then
 
 - check in editor if the saving/opening path is a valid folder?
 
