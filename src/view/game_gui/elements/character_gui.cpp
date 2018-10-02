@@ -92,10 +92,6 @@ vec2i character_gui::get_initial_position_for(const vec2i screen_size, const dra
 	return vec2i(screen_size.x - 150, 30);
 }
 
-const wielding_setup& character_gui::get_current_hotbar_selection_setup() const {
-	return last_setups[current_hotbar_selection_setup_index];
-}
-
 wielding_setup character_gui::get_setup_from_button_indices(
 	const const_entity_handle gui_entity,
 	const int hotbar_button_index_for_primary_selection,
@@ -208,7 +204,7 @@ wielding_setup character_gui::make_wielding_setup_for_previous_hotbar_selection_
 
 	HOT_LOG("Q. Current: %x Prev: %x", current_setup_index, prev_idx);
 
-	const auto previous_setup = last_setups[prev_idx].make_viable_setup(gui_entity);
+	const auto previous_setup = last_setup.make_viable_setup(gui_entity);
 	const auto current_setup = wielding_setup::from_current(gui_entity);
 
 	if (previous_setup == current_setup) {
@@ -249,22 +245,13 @@ wielding_setup character_gui::make_wielding_setup_for_previous_hotbar_selection_
 
 	HOT_LOG("Different setups, standard request.");
 
-	last_setups[current_setup_index] = current_setup;
-	current_setup_index = prev_idx;
+	last_setup = current_setup;
 	return previous_setup;
 }
 
-void character_gui::overwrite_current_setup(const wielding_setup now_actual_setup) {
-	HOT_LOG("Saving setup to %x", current_hotbar_selection_setup_index);
-	last_setups[current_hotbar_selection_setup_index] = now_actual_setup;
-}
-
-void character_gui::push_setup(const wielding_setup new_setup) {
-	auto& current = current_hotbar_selection_setup_index;
-	current = 1 - current;
-
-	HOT_LOG("Pushing setup to %x", current);
-	last_setups[current] = new_setup;
+void character_gui::save_as_last_setup(const wielding_setup now_actual_setup) {
+	HOT_LOG("Saving setup");
+	last_setup = now_actual_setup;
 }
 
 void character_gui::draw_cursor_with_tooltip(

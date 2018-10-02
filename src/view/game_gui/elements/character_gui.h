@@ -23,7 +23,7 @@ struct character_gui {
 	std::array<action_button, 10> action_buttons;
 	std::array<value_bar, value_bar_count> value_bars;
 
-	wielding_setup last_setups[2];
+	wielding_setup last_setup;
 	int currently_held_hotbar_button_index = -1;
 
 	unsigned current_hotbar_selection_setup_index = 0;
@@ -42,10 +42,7 @@ struct character_gui {
 		const drag_and_drop_target_drop_item&
 	) const;
 
-	void overwrite_current_setup(const wielding_setup);
-	void push_setup(const wielding_setup);
-
-	const wielding_setup& get_current_hotbar_selection_setup() const;
+	void save_as_last_setup(const wielding_setup);
 
 	static entity_id get_wieldable_if_available(
 		const const_entity_handle gui_entity,

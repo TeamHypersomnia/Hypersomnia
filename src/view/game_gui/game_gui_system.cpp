@@ -225,8 +225,7 @@ void game_gui_system::control_hotbar_and_action_button(
 		if (r.was_pressed()) {
 			auto request_setup = [&](const auto& new_setup, const auto& current_setup) {
 				queue_wielding(gui_entity, new_setup);
-				gui.overwrite_current_setup(current_setup);
-				gui.push_setup(new_setup);
+				gui.save_as_last_setup(current_setup);
 			};
 
 			if (r.intent == game_gui_intent_type::HOLSTER) {
@@ -308,13 +307,6 @@ void game_gui_system::control_hotbar_and_action_button(
 
 						queue_wielding(gui_entity, akimbo_setup);
 
-						/* 
-							Saving into the current setup now 
-							overwrites the setup that was pushed when only the first item was requested.
-						*/
-
-						gui.overwrite_current_setup(akimbo_setup);
-
 						currently_held_index = -1;
 					}
 					else {
@@ -332,8 +324,8 @@ void game_gui_system::control_hotbar_and_action_button(
 							std::swap(ar[0], ar[1]);
 						}
 
+						gui.save_as_last_setup(current_setup);
 						queue_wielding(gui_entity, new_setup);
-						gui.push_setup(new_setup);
 					}
 				}
 				else {
@@ -513,10 +505,8 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 				migrate_id(h.last_assigned_entity);
 			}
 
-			for (auto& l : ch.last_setups) {
-				for (auto& s : l.hand_selections) {
-					migrate_id(s);
-				}
+			for (auto& s : ch.last_setup.hand_selections) {
+				migrate_id(s);
 			}
 		}
 	}
