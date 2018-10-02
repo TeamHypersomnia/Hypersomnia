@@ -79,11 +79,6 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 		) {
 			const auto& trace_def = deleted_entity.get<invariants::trace>();
 
-			// TODO: Rely on create entity returning dead handle
-			if (!trace_def.finishing_trace_flavour.is_set()) {
-				continue;
-			}
-		
 			auto transform_of_finishing = deleted_entity.get_logic_transform();
 
 			if (const auto missile = deleted_entity.find<components::missile>()) {

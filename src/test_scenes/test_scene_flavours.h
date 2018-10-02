@@ -307,7 +307,7 @@ using test_flavours_map = type_map<
 	type_pair<test_tool_items, tool_item>
 >;
 
-#if TODO
+#if TODO_CARS
 TRUCK_FRONT,
 TRUCK_INTERIOR,
 TRUCK_LEFT_WHEEL,

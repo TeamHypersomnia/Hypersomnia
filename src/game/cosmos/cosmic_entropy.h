@@ -28,13 +28,6 @@ struct basic_cosmic_entropy {
 	augs::container_with_small_size<std::vector<basic_item_slot_transfer_request<key>>, unsigned short> transfer_requests;
 	// END GEN INTROSPECTOR
 
-#if TODO
-	void override_transfers_leaving_other_entities(
-		const cosmos&,
-		std::vector<basic_item_slot_transfer_request<key>> new_transfers
-	);
-#endif
-
 	size_t length() const;
 
 	basic_cosmic_entropy& operator+=(const basic_cosmic_entropy& b);

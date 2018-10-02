@@ -380,7 +380,6 @@ void character_gui::draw_cursor_with_tooltip(
 						dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, drawn_pos);
 					}
 					else {
-						/* TODO: Why was it left here? const auto drawn_pos = drag_amount; */
 						dragged_item_button->draw_complete_dragged_ghost(context, dragged_item_button, drag_amount);
 					}
 

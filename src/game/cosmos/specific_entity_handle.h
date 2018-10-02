@@ -16,9 +16,6 @@
 template <class E>
 struct entity_solvable;
 
-template <class E>
-struct empty_id_provider {};
-
 template <class derived_handle_type>
 struct iterated_id_provider {
 private:

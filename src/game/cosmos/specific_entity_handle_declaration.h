@@ -1,9 +1,6 @@
 #pragma once
 #include "augs/templates/remove_cref.h"
 
-template <class>
-struct empty_id_provider;
-
 template <class derived_handle_type>
 struct iterated_id_provider;
 
@@ -46,17 +43,6 @@ using ref_typed_entity_handle = basic_ref_typed_entity_handle<false, entity_type
 
 template <class entity_type>
 using cref_typed_entity_handle = basic_ref_typed_entity_handle<true, entity_type>;
-
-#if TODO
-template <bool C, class E>
-using basic_noid_entity_handle = specific_entity_handle<C, E, empty_id_provider>;
-
-template <class entity_type>
-using noid_entity_handle = basic_noid_entity_handle<false, entity_type>;
-
-template <class entity_type>
-using const_noid_entity_handle = basic_noid_entity_handle<true, entity_type>;
-#endif
 
 /* Shortcut */
 

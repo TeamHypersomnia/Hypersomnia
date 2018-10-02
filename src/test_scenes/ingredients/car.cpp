@@ -24,7 +24,7 @@
 namespace test_flavours {
 	void populate_car_flavours(const populate_flavours_input in) {
 		(void)in;
-#if TODO
+#if TODO_CARS
 		{
 			auto& meta = get_test_flavour(flavours, test_scene_flavour::TRUCK_FRONT);
 			
@@ -79,7 +79,7 @@ namespace test_flavours {
 	}
 }
 
-#if TODO
+#if TODO_CARS
 namespace prefabs {
 	entity_handle create_car(const logic_step step, const transformr& spawn_transform) {
 		auto& world = step.get_cosmos();

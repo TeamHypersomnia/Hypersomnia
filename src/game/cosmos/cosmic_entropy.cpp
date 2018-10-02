@@ -9,34 +9,6 @@
 
 #include "game/detail/inventory/perform_transfer.h"
 
-#if TODO
-template <class key>
-void basic_cosmic_entropy<key>::override_transfers_leaving_other_entities(
-	const cosmos& cosm,
-	std::vector<basic_item_slot_transfer_request<key>> new_transfers
-) {
-	erase_if(transfer_requests, [&](const basic_item_slot_transfer_request<key> o) {
-		const auto overridden_transfer = match_transfer_capabilities(cosm, cosm.get_solvable().deguidize(o));
-		
-		ensure(overridden_transfer.is_legal());
-
-		for (const auto n : new_transfers) {
-			const auto new_transfer = cosm.get_solvable().deguidize(n);
-			
-			if (match_transfer_capabilities(cosm, new_transfer).authorized_capability
-				== overridden_transfer.authorized_capability
-			) {
-				return true;
-			}
-		}
-
-		return false;
-	});
-
-	concatenate(transfer_requests, new_transfers);
-}
-#endif
-
 template <class key>
 size_t basic_cosmic_entropy<key>::length() const {
 	size_t total = 0;

@@ -135,7 +135,7 @@ namespace test_scenes {
 		const auto sample_backpack = test_container_items::SAMPLE_BACKPACK;
 		const auto brown_backpack = test_container_items::BROWN_BACKPACK;
 
-#if TODO
+#if TODO_CARS
 		const auto car = prefabs::create_car(step, transformr( { 1490, 340 }, -180));
 		const auto car2 = prefabs::create_car(step, transformr({ 1490, 340 + 400 }, -180));
 		const auto car3 = prefabs::create_car(step, transformr({ 1490, 340 + 800 }, -180));
@@ -194,10 +194,6 @@ namespace test_scenes {
 
 		std::vector<entity_id> new_characters;
 		new_characters.resize(num_characters);
-
-		auto character = [&](const size_t i) {
-			return i < new_characters.size() ? world[new_characters.at(i)] : world[entity_id()];
-		};
 
 		auto give_weapon = [&](const auto& character, const test_shootable_weapons w) {
 			requested_equipment r;
@@ -409,11 +405,6 @@ namespace test_scenes {
 
 		give_weapon(transformr(vec2(300, -100)), test_shootable_weapons::LEWSII);
 		give_weapon(transformr(vec2(400, -100)), test_shootable_weapons::LEWSII);
-
-		/* TODO: Spawn a machete actually */
-		const auto machete_type = force_type;
-
-		create(machete_type, vec2(100, 100));
 
 		create(sample_backpack, vec2(200, -750));
 		create(brown_backpack, vec2(280, -750));
@@ -738,10 +729,5 @@ namespace test_scenes {
 			test_scene_node { world, test_complex_decorations::CONSOLE_LIGHT }
 		).ro()
 		.next(test_sound_decorations::HUMMING_DISABLED);
-
-		if (character(2).alive()) {
-			const auto second_machete = create(machete_type, vec2(0, 300));
-			perform_transfer(item_slot_transfer_request::standard(second_machete, character(2).get_primary_hand()), step);
-		}
 	}
 }

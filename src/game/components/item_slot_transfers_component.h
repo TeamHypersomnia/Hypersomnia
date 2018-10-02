@@ -19,7 +19,7 @@ struct item_slot_mounting_operation {
 };
 
 using only_pick_these_items_vector = 
-	augs::constant_size_vector<entity_id, ONLY_PICK_THESE_ITEMS_COUNT>
+	augs::constant_size_vector<signi_entity_id, ONLY_PICK_THESE_ITEMS_COUNT>
 ;
 
 namespace components {

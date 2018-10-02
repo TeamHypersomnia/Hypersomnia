@@ -451,8 +451,6 @@ void settings_gui_state::perform(
 				);
 				
 				ImGui::Separator();
-
-				// TODO: debug behaviour of this
 				ImGui::ShowStyleEditor(&config.gui_style);
 
 				break;

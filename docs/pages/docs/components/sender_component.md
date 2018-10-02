@@ -27,5 +27,3 @@ point to the character who has thrown it.
 In case of explosion bodies generated from a bomb, they all get their sender components copied from the bomb.  
 
 An explosion, on detonation, sends damage messages.  
-TODO:  
-The damage messages should also convey the information about the sender, so that we know who's killed who and with what.

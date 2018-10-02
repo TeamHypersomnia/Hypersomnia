@@ -136,9 +136,6 @@ namespace std {
 		size_t operator()(const augs::font_loading_input& in) const {
 			return augs::hash_multiple(
 				in.source_font_path.string(), 
-#if TODO
-				in.unicode_ranges.string(), 
-#endif
 				in.size_in_pixels
 			);
 		}
