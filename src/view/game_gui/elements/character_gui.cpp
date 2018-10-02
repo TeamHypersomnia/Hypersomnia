@@ -41,7 +41,7 @@
 #include "game/detail/entity_handle_mixins/make_wielding_transfers.hpp"
 #include "game/detail/inventory/wielding_setup.hpp"
 
-#define LOG_HOTBAR 1
+#define LOG_HOTBAR 0
 
 template <class... Args>
 void HOT_LOG(Args&&... args) {
@@ -215,19 +215,34 @@ wielding_setup character_gui::make_wielding_setup_for_previous_hotbar_selection_
 
 			HOT_LOG("Same as previous setup.");
 
-			const auto try_wielding_item_from_hotbar_button_no = [&](const std::size_t hotbar_button_index) -> std::optional<wielding_setup> {
+			auto make_setup_with = [&](const auto& candidate_entity) {
+				wielding_setup setup;
+				setup.hand_selections[0] = candidate_entity;
+				return setup;
+			};
+
+			auto should_wield_entity = [&](const auto& candidate_entity) {
+				if (candidate_entity.alive()) {
+					if (!is_clothing(candidate_entity.template get<invariants::item>().categories_for_slot_compatibility)) {
+						const bool finally_found_differing_setup = !(make_setup_with(candidate_entity) == current_setup);
+
+						if (finally_found_differing_setup) {
+							HOT_LOG("Found candidate: %x", candidate_entity);
+							return true;
+						}
+					}
+				}
+
+				return false;
+			};
+
+			auto try_wielding_item_from_hotbar_button_no = [&](const std::size_t hotbar_button_index) -> std::optional<wielding_setup> {
 				const auto tried_setup = get_setup_from_button_indices(gui_entity, static_cast<int>(hotbar_button_index), -1);
 				const auto candidate_entity = cosm[tried_setup.hand_selections[0]];
 
-				if (candidate_entity.alive()) {
-					if (!is_clothing(candidate_entity.get<invariants::item>().categories_for_slot_compatibility)) {
-						const bool finally_found_differing_setup = !(tried_setup == previous_setup);
-
-						if (finally_found_differing_setup) {
-							HOT_LOG("Found hotbar candidate: %x", candidate_entity);
-							return tried_setup;
-						}
-					}
+				if (const auto setup = should_wield_entity(candidate_entity)) {
+					HOT_LOG("Found hotbar candidate: %x", candidate_entity);
+					return make_setup_with(candidate_entity);
 				}
 
 				return std::nullopt;
@@ -240,6 +255,28 @@ wielding_setup character_gui::make_wielding_setup_for_previous_hotbar_selection_
 			}
 
 			HOT_LOG("No hotbar candidate.");
+
+			std::optional<wielding_setup> result;
+
+			gui_entity.for_each_contained_item_recursive(
+				[&](const auto& typed_item) {
+					if (::is_weapon_like(typed_item)) {
+						if (should_wield_entity(typed_item)) {
+							result = make_setup_with(typed_item);
+							HOT_LOG("Found owned item candidate: %x", typed_item);
+							return recursive_callback_result::ABORT;
+						}
+					}
+
+					return recursive_callback_result::CONTINUE_AND_RECURSE;
+				}
+			);
+
+			if (result) {
+				return *result;
+			}
+
+			HOT_LOG("No owned item candidate.");
 			return wielding_setup();
 		}
 		else {
@@ -250,6 +287,11 @@ wielding_setup character_gui::make_wielding_setup_for_previous_hotbar_selection_
 			return previous_setup;
 		}
 	}();
+
+	const auto& new_hands = chosen_new_setup.hand_selections;
+
+	HOT_LOG_NVPS(cosm[new_hands[0]]);
+	HOT_LOG_NVPS(cosm[new_hands[1]]);
 
 	last_setup = current_setup;
 	return chosen_new_setup;

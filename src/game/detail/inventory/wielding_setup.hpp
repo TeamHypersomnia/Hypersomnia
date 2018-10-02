@@ -26,10 +26,12 @@ auto basic_wielding_setup<I>::make_viable_setup(const E& h) const {
 	basic_wielding_setup<I> output;
 
 	for (std::size_t i = 0; i < hand_selections.size(); ++i) {
-		output.hand_selections[i] = get_wieldable_if_available(
-			h, 
-			h.get_cosmos()[hand_selections[i]]
-		); 
+		if (const auto candidate_wieldable = h.get_cosmos()[hand_selections[i]]) {
+			if (::is_weapon_like(candidate_wieldable)) {
+				output.hand_selections[i] = get_wieldable_if_available(h, candidate_wieldable);
+			}
+		}
+
 	}
 
 	return output;
