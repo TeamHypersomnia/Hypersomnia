@@ -129,6 +129,7 @@ void contact_listener::BeginContact(b2Contact* contact) {
 					}
 				}
 
+#if TODO_CARS
 				if (found_suitable) {
 					auto new_owner = subject.get_owner_of_colliders();
 					auto& grounds = collider_physics.owner_friction_grounds;
@@ -158,6 +159,7 @@ void contact_listener::BeginContact(b2Contact* contact) {
 
 					sys.rechoose_owner_friction_body(collider.get_owner_of_colliders());
 				}
+#endif
 			}
 		}
 
@@ -232,6 +234,7 @@ void contact_listener::EndContact(b2Contact* contact) {
 			if (!collider_fixtures.is_friction_ground)
 #endif
 			{
+#if TODO_CARS
 				for (auto it = collider_physics.owner_friction_grounds.begin(); it != collider_physics.owner_friction_grounds.end(); ++it) {
 					if ((*it).target == subject.get_owner_of_colliders()) {
 						auto& fixtures_connected = (*it).fixtures_connected;
@@ -251,6 +254,9 @@ void contact_listener::EndContact(b2Contact* contact) {
 						break;
 					}
 				}
+#else
+				(void)collider_physics;
+#endif
 			}
 		}
 
@@ -304,6 +310,7 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 		const const_entity_handle subject_capability = subject.get_owning_transfer_capability();
 		const const_entity_handle collider_owner_body = collider.get_owner_of_colliders();
 
+#if TODO_CARS
 		if (subject_fixtures.is_friction_ground()) {
 			// friction fields do not collide with their children
 			if (are_connected_by_friction(collider, subject)) {
@@ -322,6 +329,7 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 				}
 			}
 		}
+#endif
 
 		if (subject_capability.alive()) {
 			const auto* const driver = subject_capability.find<components::driver>();

@@ -7,6 +7,7 @@
 #include "physics_scripts.h"
 
 void physics_world_cache::rechoose_owner_friction_body(const entity_handle entity) {
+#if TODO_CARS
 	if (const auto cache = find_rigid_body_cache(entity)) {
 		auto& special_physics = entity.get_special_physics();
 		auto& cosm = entity.get_cosmos();
@@ -58,6 +59,9 @@ void physics_world_cache::rechoose_owner_friction_body(const entity_handle entit
 			body->m_ownerFrictionGround = nullptr;
 		}
 	}
+#else
+	(void)entity;
+#endif
 }
 
 void physics_world_cache::recurential_friction_handler(const logic_step step, b2Body* const body, b2Body* const friction_entity) {

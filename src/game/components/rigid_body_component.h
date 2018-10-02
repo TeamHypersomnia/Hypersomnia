@@ -33,10 +33,11 @@ struct special_physics {
 	// GEN INTROSPECTOR struct special_physics
 	augs::stepped_cooldown dropped_or_created_cooldown;
 	signi_entity_id during_cooldown_ignore_collision_with;
+#if TODO_CARS
 	signi_entity_id owner_friction_ground;
 	friction_connection_vector owner_friction_grounds = {};
+#endif
 	// END GEN INTROSPECTOR
-
 	//float measured_carried_mass = 0.f;
 };
 

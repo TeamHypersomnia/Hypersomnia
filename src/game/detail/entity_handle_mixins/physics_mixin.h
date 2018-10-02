@@ -47,7 +47,11 @@ public:
 template <class E>
 typename physics_mixin<E>::generic_handle_type physics_mixin<E>::get_owner_friction_ground() const {
 	const auto self = *static_cast<const E*>(this);
+#if TODO_CARS
 	return self.get_cosmos()[self.get_owner_of_colliders().get_special_physics().owner_friction_ground];
+#else
+	return self.get_cosmos()[entity_id()];
+#endif
 }
 
 template <class E>
