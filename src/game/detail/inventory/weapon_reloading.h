@@ -1,10 +1,11 @@
 #pragma once
 #include <array>
 #include "game/cosmos/entity_id.h"
+#include "game/detail/inventory/wielding_setup.h"
 
 struct reloading_context {
 	// GEN INTROSPECTOR struct reloading_context
-	std::array<signi_entity_id, 2> initial_setup;
+	signi_wielding_setup initial_setup;
 	signi_inventory_slot_id concerned_slot;
 	signi_entity_id new_ammo_source;
 	signi_entity_id old_ammo_source;

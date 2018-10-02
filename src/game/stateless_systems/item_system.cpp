@@ -58,6 +58,8 @@ template <class E>
 auto calc_reloading_context(const E& capability) {
 	reloading_context ctx;
 
+	ctx.initial_setup = signi_wielding_setup::from_current(capability);
+
 	const auto& cosm = capability.get_cosmos();
 	const auto items = capability.get_wielded_items();
 

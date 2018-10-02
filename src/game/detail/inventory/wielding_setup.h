@@ -27,6 +27,11 @@ struct basic_wielding_setup  {
 	template <class C>
 	bool is_akimbo(const C& cosm) const;
 
+	auto& flip() {
+		std::swap(hand_selections[0], hand_selections[1]);
+		return *this;
+	}
+
 	template <class E>
 	bool same_as_in(const E& character_entity) const {
 		return *this == from_current(character_entity);
@@ -41,3 +46,4 @@ struct basic_wielding_setup  {
 };
 
 using wielding_setup = basic_wielding_setup<entity_id>;
+using signi_wielding_setup = basic_wielding_setup<signi_entity_id>;

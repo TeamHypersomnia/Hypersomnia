@@ -1698,3 +1698,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 	- A mode shall operate without crash on virtually any cosmos
 		- Should catch up with changes
+
+			- problem: if, on delete, we remove an entity from the group it belongs to, the undoing of delete doesn't know what to do
+				- grouping will be tracked by history
+				- thus let the delete command just store its own "ungroup entities" command and invoke it beforehand on all entries

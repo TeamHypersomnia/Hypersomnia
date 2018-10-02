@@ -2,8 +2,14 @@
 #include "game/detail/inventory/weapon_reloading.h"
 
 inline bool reloading_context::significantly_different_from(const reloading_context& b) const {
+	auto swapped_setup = initial_setup;
+	swapped_setup.flip();
+
+	const bool setups_same = initial_setup == b.initial_setup || swapped_setup == b.initial_setup;
+
 	return 
-		concerned_slot != b.concerned_slot 
+		!setups_same
+		|| concerned_slot != b.concerned_slot 
 		|| new_ammo_source != b.new_ammo_source 
 	;
 }
