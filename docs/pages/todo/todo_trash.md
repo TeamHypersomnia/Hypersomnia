@@ -814,3 +814,5 @@ fixtures can form scene graph as they have relative transforms.
 - FFA game mode
 	- Win condition: None, there is only time limit.
 
+- To ensure space efficiency even with static allocations, we'll just serialize the cosmos to bytes instead of making a full clone
+	- Should even be faster considering that recreating some associative containers' structure might be already costly

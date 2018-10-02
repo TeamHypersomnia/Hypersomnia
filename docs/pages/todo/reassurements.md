@@ -5,6 +5,11 @@ permalink: reassurements
 summary: We don't need to do this yet, because...
 ---
 
+- It makes little sense to enable editor GUI inside gameplay mode.
+	- We'll just make it possible to interact with imgui controls in-game.
+	- We don't have some fancy replay-preview stuff like in that other game we saw somewhere...
+	- and anyway it's better to move some important objects while paused, while we can snap to grid, etc.
+
 - For now, don't make commands for creating/deleting/duplicating mode vars
 	- Just in testbed populate all types with one vars instance
 

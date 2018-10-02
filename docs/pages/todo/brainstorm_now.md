@@ -23,21 +23,22 @@ summary: That which we are brainstorming at the moment.
 		- overridden_viewed_id
 		- Some commands
 		- ticked entities in fae gui
+	- What about selection groups when something is removed?
+		- For playtesting, we should probably store the entire view state along with the intercosm.
+			- Actually, store only the entity ids as they are subject to alteration during subsequent stepping.
+			- Btw grouping is command-deterministic
 	- The only thing we need to do to prevent crash is to always check if the entity is alive
-		- Or just after each step, clear_dead_entities remove?
+		- A cleaner approach is to implement clear_dead_entities to be called after each step
+		- This is because there is more cases of usage than there are cases of state
 	- Cases of invalidation:
-		- Gameplay mode
-			- For now we won't support editor operations inside gameplay mode?
-				- Should be easy enough though, we can always just read the deletion commands
-			- To ensure space efficiency even with static allocations, we'll just serialize the cosmos to bytes instead of making a full clone
-				- Should even be faster considering that recreating some associative containers' structure might be already costly
 		- **Undoing a command that introduces new entities**
 			- E.g. one that creates an entity from nothing
 			- Look for both undo_last_create and "delete_entity"
-		- Commands whose undoing or redoing should automatically select affected entities
-			- Purge is justified in this case
-			- shouldn't this be pretty much all commands that affect entity existence?
-				- No. Redoing delete has no reason to purge selections of some other entities.
+		- We sometimes completely purge, but it's only for:
+			- Fills;
+			- Commands whose undoing or redoing should automatically select affected entities.
+				- Instantiation, duplication etc.
+				- Delete has no reason to purge selections of some other entities.
 		- Delete command
 	- mover should be deactivated when?
 		- corner case: delete while move?

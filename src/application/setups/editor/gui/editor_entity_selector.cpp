@@ -19,6 +19,15 @@ void editor_entity_selector::reset_held_params() {
 
 void editor_entity_selector::clear_selection_of(const entity_id id) {
 	erase_element(in_rectangular_selection, id);
+
+	if (hovered == id) {
+		hovered.unset();
+	}
+
+	if (held == id) {
+		rectangular_drag_origin = std::nullopt;
+		held.unset();
+	}
 }
 
 void editor_entity_selector::clear() {
