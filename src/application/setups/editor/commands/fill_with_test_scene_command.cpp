@@ -45,6 +45,7 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 	bomb_vars.freeze_secs = 0;
 	bomb_vars.round_end_secs = 3;
 	bomb_vars.max_rounds = 30;
+	bomb_vars.buy_secs_after_freeze = 60;
 #endif
 
 	const auto& settings = in.settings.test_scene;

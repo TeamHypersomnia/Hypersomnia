@@ -1041,7 +1041,7 @@ int work(const int argc, const char* const * const argv) try {
 				since we have more than just one.
 			*/
 
-			if (game_gui.world.wants_to_capture_mouse(create_game_gui_context())) {
+			if (game_gui_mode && should_draw_game_gui() && game_gui.world.wants_to_capture_mouse(create_game_gui_context())) {
 				if (current_setup) {
 					if (auto* editor = std::get_if<editor_setup>(&*current_setup)) {
 						editor->unhover();
