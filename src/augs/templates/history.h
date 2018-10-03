@@ -13,7 +13,8 @@ namespace augs {
 		UNDO,
 		REDO,
 		EXECUTE_NEW,
-		SEEK
+		SEEK,
+		FORCE_SET_REVISION
 	};
 
 	struct last_history_op {
@@ -70,6 +71,11 @@ namespace augs {
 
 		auto get_current_revision() const {
 			return current_revision;
+		}
+
+		void force_set_current_revision(const index_type& new_revision) {
+			current_revision = new_revision;
+			set_last_op(history_op_type::FORCE_SET_REVISION);
 		}
 
 		bool is_revision_newest() const {

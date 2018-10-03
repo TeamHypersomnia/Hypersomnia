@@ -326,3 +326,14 @@ summary: Just a hidden scratchpad.
 
 - Ensure that a single capability only ever mounts a single item at a time?
 	- An extreme corner case
+
+	- Store entire folder?
+		- it's not that clean, we wouldn't want to restore the path
+		- Worst space complexity
+
+			- The layout of values for move command might be different if some entity ids change
+				- actually probably not since the types are going to be the same
+				- still, if we read some values for one entity and not for others, we have chaos
+				- actually this doesnt concern us because we are redoing, not undoing
+					- so we only need be concerned about input values for redo
+			- leading to chaos?

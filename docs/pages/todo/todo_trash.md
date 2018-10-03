@@ -816,3 +816,51 @@ fixtures can form scene graph as they have relative transforms.
 
 - To ensure space efficiency even with static allocations, we'll just serialize the cosmos to bytes instead of making a full clone
 	- Should even be faster considering that recreating some associative containers' structure might be already costly
+		- ~~A scene is filled.~~
+			- Actually, no, because it doesn't change 
+
+	- An editor player stores initial signi. It updates it:
+		- **Always when the mode is started for playtesting.**
+			- Then it is copied from the work.
+
+
+- After exiting testing mode
+	- Restore what could possibly be changed by the gameplay actions
+		- The cosmos: obviously, altered
+			- Restore it from the initial signi
+		- The rest of the intercosm cannot change by mere gameplay actions
+		- And if it changes, it is due to the commands that can be undone
+			- Undoing of entity alterations might fail
+	- Re-applying changes
+
+			- Solved on its own if we have a clean history initialized
+
+	- ~~Change entity ids to guids in components~~
+		- Actually guids won't help much here
+
+- Okay this can be done later:
+
+	- We could fall-back to using entity guids in commands
+		- Should be drop-in replaceable, handle is convertible to guid and we will also use the subscript op
+		- Suppose that a solvable step created two entities and then duplicated an initially existing wall
+			- source guid to be written is that of the initially existing wall
+			- many walls duplicated?	
+				- same guids as well
+			- now without stepping, duplicate those duplicates
+				- how do you really know how much to subtract?
+					- we would need to know which step was the entity created at, which is... dirty
+		- next several solvable steps created 4 entities and then duplicated the duplicates
+	- We then need to communicate creation of entities
+		- Do we have step everywhere we need to create entity in solvable?
+	- We don't need to communicate deletions
+		- Actually we do for determinism of allocations
+		- Under the assumption that the chance of the same id coming up is astronomically low
+	- Since we don't need deletions, why not just compare the guid counter before and after the step?
+	- we can detect that the solvable creates entities and thus simulate creation of these entities on re-application
+		- and later delete them
+	- Sanitization is still necessary because a command-less delete of an initially existing entity might have happened during test play
+		- Which is really the only case where something can go haywire now
+	- Q1: Is it at all important?
+	- Q2: Can it be done later on?
+		- I guess! We have to implement restoration of old solvable first anyway.
+

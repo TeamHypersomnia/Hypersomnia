@@ -5,6 +5,8 @@
 #include "augs/misc/timing/fixed_delta_timer.h"
 #include "view/mode_gui/arena/arena_mode_gui.h"
 
+#include "application/setups/editor/player/editor_player_step_type.h"
+
 struct cosmos_solvable_significant;
 
 struct editor_player {
@@ -12,6 +14,7 @@ struct editor_player {
 	double speed = 1.0;
 	int additional_steps = 0;
 	bool paused = true;
+	editor_player_step_type current_step = 0;
 
 	all_modes_variant current_mode;
 	mode_vars_id current_mode_vars_id = mode_vars_id();

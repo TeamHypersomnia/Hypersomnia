@@ -6,10 +6,87 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Implementation order
+
+- Problem: The results of re-applied commands might turn out completely off if...
+	- ...some entities were created in-game before e.g. duplicating some entities and later moving them
+		- this is because the generated ids won't correspond
+	- **CHOSEN SOLUTION:** Allow all commands on the test workspace, but...
+		- ...simply sanitize the re-applied commands to only affect **initially existing entities**
+		- E.g. duplicating or mirroring once will work just once
+		- If we need it in the future we can add some remapping later
+		- Just warn about this in GUI somehow
+		- Also remove commands for whom affected entities are none in this model
+
+- Re-applying process
+	- **CHOSEN SOLUTION**: make commands redoable arbitrary number of times, then force-set revision and re-do
+		- most to code, probably cleanest architecturally
+			- not that much to code
+		- best performance and least ways it could go wrong, perhaps
+	- keep a copy of an un-executed command in a separate history
+		- worse space complexity, not much to code, not much clean architecturally
+	- undo everything and then re-do when the folder has been restored
+		- least to code, worst performance
+
+- Manipulating the folder in place during playtest vs keeping another instance and redirecting
+	- **CHOSEN SOLUTION**: We should just std::move around on start and finish.
+		- Entry points for the folder might be quite many so that's hard to predict
+		- Anyway everything in the folder, incl. history, should be quickly std::movable
+			- folder has only 1000 bytes
+
+- Constraints in the playtest mode
+	- History will be the same one
+		- Though we can always make it different inside GUI
+	- we'll need to forbid undoing past the revision when we've started the playtest
+		- Or just interrupt on undo?
+	- we'll need to forbid filing with new scenes?
+		- The only things untouched by the fill are history and current_path
+		- Shouldn't matter really
+	- Some notification might be useful
+
+- Player start
+	- **CHOSEN SOLUTION**: Store only the essentials
+		- Don't share a struct for this, just store them in a new struct explicitly one by one
+			- That struct will be what should go into unique ptr
+			- Contents:
+				- Copy of the intercosm
+					- From which we will also be acquiring the initial signi for advancing the mode
+				- View elements:
+					- Group selection state
+					- Selection state
+				- mode_vars
+				- ~~From the player:~~
+					- initial mode_state
+						- actually, no, because we should always reset it to initial values
+				- history?
+					- NO! History will be the same, later we will only force-set revision
+
+- Existential commands vs those that depend on them
+	- Both need be sanitized anyway
+
+- Editor step
+	- A number of times that the editor player has advanced, not a cosmos in particular
+	- Because a logical step of the cosmos might be reset on every mode round
+
+- Commands could store the editor step when they were executed...
+	- ...so that upon undoing, the editor falls back to the correct solvable state
+
 - Editor player, modes and their replays
-	- An editor player stores initial signi. It updates it every time:
-		- ~~A scene is filled.~~
-		- Always when the mode is started for playtesting.
+	- When the player is started:
+		- Store 
+		- Alternatively, when the player is restored, rewind
+			- ...but this is wacky
+	- When the re-applying is requested
+		- Restore cosmos
+		- Restore vars
+		- Restore view elements
+		- Force set revision in history without making any changes
+		- Sanitize all commands one by one as they are being re-applied
+	- Existence of initial signi denotes whether the player is playing
+		- Actually, we should keep more than a session there, e.g. the saved selection groups?
+	- Store optional of state to be restored
+
+- Determinism: Change unordered containers to ordered ones in the mode state
 
 - Persistence of entity ids in editor and clearing them
 	- Where entity ids are in the editor state:
