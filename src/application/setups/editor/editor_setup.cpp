@@ -1037,6 +1037,8 @@ void editor_setup::hide_layers_of_selected_entities() {
 		auto& vf = view().viewing_filter;
 
 		if (vf.is_enabled) {
+			selector.clear();
+
 			auto& cosm = work().world;
 
 			for_each_selected_entity(
@@ -1054,6 +1056,8 @@ void editor_setup::unhide_all_layers() {
 		auto& vf = view().viewing_filter;
 
 		if (vf.is_enabled) {
+			selector.clear();
+
 			for (auto& f : vf.value.layers) {
 				f = true;
 			}
@@ -1095,6 +1099,8 @@ bool editor_setup::handle_input_before_game(
 	}
 
 	if (is_editing_mode()) {
+		auto& cosm = work().world;
+
 		if (e.was_any_key_pressed()) {
 			const auto k = e.data.key.key;
 
@@ -1149,7 +1155,6 @@ bool editor_setup::handle_input_before_game(
 			const auto current_eye = *maybe_eye;
 			const auto world_cursor_pos = get_world_cursor_pos(current_eye);
 
-			auto& cosm = work().world;
 			const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
 			const auto current_cone = camera_cone(current_eye, screen_size);
 
@@ -1232,12 +1237,29 @@ bool editor_setup::handle_input_before_game(
 				}
 			}
 
+			auto reperform_selector = [&]() {
+				if (const auto maybe_eye = find_current_camera_eye()) {
+					const auto current_eye = *maybe_eye;
+					const auto world_cursor_pos = get_world_cursor_pos(current_eye);
+
+					selector.do_mousemotion(
+						sizes_for_icons,
+						cosm,
+						view().rect_select_mode,
+						world_cursor_pos,
+						current_eye,
+						false,
+						view().get_effective_selecting_filter()
+					);
+				}
+			};
+
 			if (has_shift) {
 				switch (k) {
 					case key::O: override_viewed_entity({}); view().reset_panning(); return true;
 					case key::R: mover.rotate_selection_once_by(make_mover_input(), 90); return true;
 					case key::E: mover.start_resizing_selection(make_mover_input(), true); return true;
-					case key::H: unhide_all_layers(); return true;
+					case key::H: unhide_all_layers(); reperform_selector(); return true;
 
 					case key::_1: view().rect_select_mode = editor_rect_select_type::EVERYTHING; return true;
 					case key::_2: view().rect_select_mode = editor_rect_select_type::SAME_LAYER; return true;
@@ -1268,7 +1290,7 @@ bool editor_setup::handle_input_before_game(
 				case key::T: mover.start_moving_selection(make_mover_input()); return true;
 				case key::R: mover.start_rotating_selection(make_mover_input()); return true;
 				case key::ADD: player().request_step(); return true;
-				case key::H: hide_layers_of_selected_entities(); return true;
+				case key::H: hide_layers_of_selected_entities(); reperform_selector(); return true;
 				default: break;
 			}
 		}

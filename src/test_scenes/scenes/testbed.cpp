@@ -693,21 +693,21 @@ namespace test_scenes {
 			create_fish(darkbluefish, jellyfishtr - vec2(120, 30));
 			create_fish(darkbluefish, jellyfishtr + transformr(vec2(90, 40), -180));
 
-			create_fish(jellyfish, aquarium_tr - vec2(180, 30));
+			create_fish(jellyfish, aquarium_tr - vec2(80, 30));
 			create_fish(jellyfish, aquarium_tr + transformr(vec2(190, 40), -180));
-			create_fish(jellyfish, aquarium_tr - vec2(180, 50));
+			create_fish(jellyfish, aquarium_tr - vec2(80, 50));
 			create_fish(jellyfish, aquarium_tr + transformr(vec2(190, 60), -180));
-			create_fish(jellyfish, aquarium_tr - vec2(180, 70));
+			create_fish(jellyfish, aquarium_tr - vec2(80, 70));
 			create_fish(jellyfish, aquarium_tr + transformr(vec2(190, 80), -180));
 
-			create_fish(dragon_fish, aquarium_tr - vec2(280, 130));
+			create_fish(dragon_fish, aquarium_tr - vec2(100, 30));
 			create_fish(dragon_fish, aquarium_tr + transformr(vec2(290, 40), -180));
-			create_fish(dragon_fish, aquarium_tr - vec2(280, 150));
+			create_fish(dragon_fish, aquarium_tr - vec2(100, 50));
 			create_fish(dragon_fish, aquarium_tr + transformr(vec2(290, 60), -180));
 
-			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos - vec2(280, 130));
+			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos - vec2(100, 30));
 			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos + vec2(290, 40));
-			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos - vec2(280, 150));
+			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos - vec2(100, 50));
 			create_fish(rainbow_dragon_fish, vec2(40, 40) + aquarium_tr.pos + vec2(290, 60));
 		};
 
