@@ -26,16 +26,8 @@ struct mode_entropy {
 	std::map<mode_player_id, mode_player_entropy> players;
 	// END GEN INTROSPECTOR
 
-	void clear_dead_entities(const cosmos& cosm) {
-		cosmic.clear_dead_entities(cosm);
-	}
-
-	void clear() {
-		cosmic.clear();
-		players.clear();
-	}
-
-	bool empty() const {
-		return players.empty() && cosmic.empty();
-	}
+	void clear_dead_entities(const cosmos& cosm);
+	void clear();
+	bool empty() const;
+	mode_entropy& operator+=(const mode_entropy& b);
 };

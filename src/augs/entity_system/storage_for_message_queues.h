@@ -2,16 +2,20 @@
 #include <tuple>
 #include <vector>
 
-#include "augs/templates/for_each_std_get.h"
+#include "augs/templates/unfold.h"
 #include "augs/templates/folded_finders.h"
 #include "augs/templates/container_templates.h"
 
 namespace augs {
 	struct introspection_access;
 
-	template<class... Queues>
+	template <class... Queues>
 	class storage_for_message_queues {
-		using tuple_type = std::tuple<std::vector<Queues>...>;
+		template <class Q>
+		using make_vector = std::vector<Q>;
+
+		using tuple_type = std::tuple<make_vector<Queues>...>;
+
 		friend introspection_access;
 
 		// GEN INTROSPECTOR class augs::storage_for_message_queues class... Queues
@@ -55,7 +59,19 @@ namespace augs {
 		}
 
 		void flush_queues() {
-			for_each_through_std_get(queues, [](auto& q) { q.clear(); });
+			::unfold<make_vector, Queues...>(queues, [&](auto& q) {
+				q.clear();
+			});
+		}
+
+		auto& operator+=(const storage_for_message_queues& b) {
+			auto c = [&](auto& q) {
+				concatenate(q, std::get<remove_cref<decltype(q)>>(b.queues));
+			};
+
+			::unfold<make_vector, Queues...>(queues, c);
+
+			return *this;
 		}
 	};
 }

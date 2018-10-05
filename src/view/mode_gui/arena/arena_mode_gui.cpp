@@ -33,11 +33,13 @@ bool arena_gui_state::control(
 }
 
 template <class M>
-void arena_gui_state::perform_imgui(
+mode_entropy arena_gui_state::perform_imgui(
 	draw_mode_gui_input mode_in, 
 	const M& typed_mode, 
 	const typename M::input& mode_input
 ) {
+	mode_entropy result_entropy;
+
 	if constexpr(M::round_based) {
 		const auto p = typed_mode.calc_participating_factions(mode_input);
 
@@ -63,7 +65,7 @@ void arena_gui_state::perform_imgui(
 			});
 
 			if (choice != std::nullopt) {
-				mode_in.entropy.players[mode_in.local_player].team_choice = *choice;
+				result_entropy.players[mode_in.local_player].team_choice = *choice;
 			}
 		}
 
@@ -91,12 +93,14 @@ void arena_gui_state::perform_imgui(
 					});
 
 					if (choice != std::nullopt) {
-						mode_in.entropy.players[mode_in.local_player].queues.post(*choice);
+						result_entropy.players[mode_in.local_player].queues.post(*choice);
 					}
 				}
 			}
 		}
 	}
+
+	return result_entropy;
 }
 
 template <class M>
@@ -547,13 +551,13 @@ template void arena_gui_state::draw_mode_gui(
 	const bomb_mode::input&
 ) const;
 
-template void arena_gui_state::perform_imgui(
+template mode_entropy arena_gui_state::perform_imgui(
 	draw_mode_gui_input, 
 	const bomb_mode&, 
 	const typename bomb_mode::input&
 );
 
-template void arena_gui_state::perform_imgui(
+template mode_entropy arena_gui_state::perform_imgui(
 	draw_mode_gui_input, 
 	const test_scene_mode&, 
 	const typename test_scene_mode::input&

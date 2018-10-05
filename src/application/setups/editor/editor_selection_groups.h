@@ -72,7 +72,7 @@ public:
 		);
 	}
 
-	void set_group(selection_group_unit, unsigned);
+	void set_group(selection_group_unit, unsigned group_id);
 	editor_selection_group& new_group();
 
 	std::string get_free_group_name(const std::string& pattern) const;

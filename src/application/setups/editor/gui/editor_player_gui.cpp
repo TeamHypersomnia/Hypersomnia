@@ -16,18 +16,18 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 	acquire_keyboard_once();
 
 	if (ImGui::Button("Play")) {
-		player.paused = false;
+		player.start_pause_resume(cmd_in.folder);
 	}
 
 	ImGui::SameLine();
 	
 	if (ImGui::Button("Pause")) {
-		player.paused = true;
+		player.pause();
 	}
 
 	ImGui::SameLine();
 	
 	if (ImGui::Button("Stop")) {
-		player.paused = true;
+		player.pause();
 	}
 }

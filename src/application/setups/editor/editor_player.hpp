@@ -17,14 +17,9 @@ decltype(auto) editor_player::on_mode_with_input_impl(
 			
 			if (const auto vars = mapped_or_nullptr(all_vars.template get_for<V>(), self.current_mode_vars_id)) {
 				if constexpr(M::needs_initial_signi) {
-					const auto& initial = self.mode_initial_signi;
-					const auto& chosen_initial = 
-						initial != nullptr ? 
-						*initial :
-						cosm.get_solvable().significant
-					;
+					const auto& initial = self.before_start.value().work->world.get_solvable().significant;
 
-					callback(typed_mode, I{ *vars, chosen_initial, cosm });
+					callback(typed_mode, I{ *vars, initial, cosm });
 				}
 				else {
 					callback(typed_mode, I{ *vars, cosm });

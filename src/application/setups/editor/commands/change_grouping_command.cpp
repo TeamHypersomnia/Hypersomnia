@@ -1,6 +1,9 @@
 #include "application/setups/editor/commands/change_grouping_command.h"
 #include "application/setups/editor/editor_folder.h"
 
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
+
 std::size_t change_grouping_command::size() const {
 	return affected_entities.size();
 }
@@ -25,7 +28,7 @@ void change_grouping_command::sanitize(editor_command_input in) {
 		}
 	}
 
-	auto cleaner = [&](const auto& where) {
+	auto cleaner = [&](auto& where) {
 		erase_if(where, [&](const auto& what) {
 			return to_erase[index_in(where, what)];
 		});

@@ -52,7 +52,7 @@ const cosmos& editor_setup::get_viewed_cosmos() const {
 }
 
 real32 editor_setup::get_interpolation_ratio() const {
-	return anything_opened() ? player().timer.fraction_of_step_until_next_step(get_viewed_cosmos().get_fixed_delta()) : 1.0;
+	return anything_opened() ? player().get_timer().fraction_of_step_until_next_step(get_viewed_cosmos().get_fixed_delta()) : 1.0;
 }
 
 entity_id editor_setup::get_viewed_character_id() const {
@@ -63,14 +63,8 @@ entity_id editor_setup::get_viewed_character_id() const {
 			return overridden;
 		}
 
-		auto& cosm = work().world;
+		return work().world[player().lookup_character(view().ids.local_player)].get_id();
 
-		return std::visit(
-			[&](const auto& typed_mode) -> entity_id { 
-				return cosm[typed_mode.lookup(view().ids.local_player)].get_id();
-			},
-			player().current_mode
-		);
 	}
 
 	return {};
@@ -110,7 +104,7 @@ const_entity_handle editor_setup::get_matching_go_to_entity() const {
 
 void editor_setup::on_folder_changed() {
 	if (anything_opened()) {
-		player().paused = true;
+		player().pause();
 	}
 
 	selector.clear();
@@ -483,7 +477,7 @@ void editor_setup::perform_custom_imgui(
 			if (const auto id = output.instantiate_id) {
 				if (is_gameplay_on()) {
 					/* Go back to editing */
-					player().paused = true;
+					player().pause();
 				}
 
 				instantiate_flavour_command cmd;
@@ -561,18 +555,19 @@ void editor_setup::perform_custom_imgui(
 		on_mode_with_input(
 			[&](const auto& typed_mode, const auto& mode_input) {
 				const auto draw_mode_in = draw_mode_gui_input { 
-					player().total_collected_entropy,
 					get_game_screen_top(), 
 					view().ids.local_player, 
 					game_atlas,
 					config
 				};
 
-				arena_gui.perform_imgui(
+				const auto new_entropy = arena_gui.perform_imgui(
 					draw_mode_in, 
 					typed_mode, 
 					mode_input
 				);
+
+				player().control(new_entropy);
 			}
 		);
 	}
@@ -1084,10 +1079,10 @@ bool editor_setup::handle_input_before_game(
 
 	if (e.was_any_key_pressed()) {
 		switch (e.data.key.key) {
-			case key::NUMPAD0: player().speed = 1.0; return true;
-			case key::NUMPAD1: player().speed = 0.01; return true;
-			case key::NUMPAD2: player().speed = 0.05; return true;
-			case key::NUMPAD3: player().speed = 0.1; return true;
+			case key::NUMPAD0: player().set_speed(1.0); return true;
+			case key::NUMPAD1: player().set_speed(0.01); return true;
+			case key::NUMPAD2: player().set_speed(0.05); return true;
+			case key::NUMPAD3: player().set_speed(0.1); return true;
 			default: break;
 		}
 	}
@@ -1713,7 +1708,6 @@ void editor_setup::draw_mode_gui(const draw_setup_gui_input& in) {
 		on_mode_with_input(
 			[&](const auto& typed_mode, const auto& mode_input) {
 				const auto draw_mode_in = draw_mode_gui_input { 
-					player().total_collected_entropy,
 					get_game_screen_top(), 
 					view().ids.local_player, 
 					in.images_in_atlas,

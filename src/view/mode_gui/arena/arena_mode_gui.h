@@ -20,7 +20,7 @@ struct arena_gui_state {
 	bool control(app_ingame_intent_input);
 
 	template <class M>
-	void perform_imgui(
+	mode_entropy perform_imgui(
 		draw_mode_gui_input, 
 		const M& mode, 
 		const typename M::input&

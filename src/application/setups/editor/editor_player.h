@@ -57,6 +57,7 @@ class editor_player {
 	// END GEN INTROSPECTOR
 
 	friend augs::introspection_access;
+	friend struct editor_property_accessors;
 
 	template <class E, class A, class C, class F>
 	static decltype(auto) on_mode_with_input_impl(
@@ -72,9 +73,14 @@ class editor_player {
 public:
 
 	double get_speed() const;
+	void set_speed(double);
+
 	bool is_editing_mode() const;
 	bool has_testing_started() const;
+
 	void control(const cosmic_entropy& entropy);
+	void control(const mode_entropy& entropy);
+
 	void request_additional_step();
 
 	void begin_replaying();
@@ -82,6 +88,8 @@ public:
 
 	void pause();
 	void quit_testing_and_reapply(editor_command_input);
+
+	void start_resume(editor_folder&);
 	void start_pause_resume(editor_folder&);
 
 	template <class M>
@@ -106,4 +114,10 @@ public:
 	decltype(auto) on_mode_with_input(Args&&... args) const {
 		return on_mode_with_input_impl(*this, std::forward<Args>(args)...);
 	}
+
+	const auto& get_timer() const {
+		return timer;
+	}
+
+	entity_guid lookup_character(mode_player_id) const;
 };

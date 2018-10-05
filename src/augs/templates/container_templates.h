@@ -178,10 +178,10 @@ auto mapped_or_nullptr(
 	}
 }
 
-template <class value_type>
+template <class value_type, class Key>
 auto mapped_or_nullptr(
 	std::vector<value_type>& container,
-	const std::size_t& i
+	const Key& i
 ) -> value_type* {
 	if (i < container.size()) {
 		return container.data() + i;
@@ -190,10 +190,10 @@ auto mapped_or_nullptr(
 	return nullptr;
 }
 
-template <class value_type>
+template <class value_type, class Key>
 auto mapped_or_nullptr(
 	const std::vector<value_type>& container,
-	const std::size_t& i
+	const Key& i
 ) -> const value_type* {
 	if (i < container.size()) {
 		return container.data() + i;

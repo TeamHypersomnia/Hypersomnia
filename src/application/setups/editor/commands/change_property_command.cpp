@@ -150,12 +150,12 @@ void change_property_command<D>::undo(const editor_command_input in) {
 		}	
 	);
 
-	self.clear_undo_state();
 	refresh_other_state(in);
+	self.clear_undo_state();
 }
 
 template <class D>
-void change_property_command::clear_undo_state() {
+void change_property_command<D>::clear_undo_state() {
 	values_before_change.clear();
 }
 
@@ -175,5 +175,12 @@ template class change_property_command<change_asset_property_command<assets::pla
 template class change_property_command<change_asset_property_command<assets::particle_effect_id>>;
 
 void change_entity_property_command::sanitize(const editor_command_input in) {
-	sanitize_affected_entities(in, affected_entities);
+	sanitize_affected_entities(in, affected_entities, [this](const auto& entry) {
+		entity_id target;
+		target.type_id = type_id;
+		target.raw = entry;
+		return target;
+	});
 }
+
+static_assert(has_member_sanitize_v<change_entity_property_command, editor_command_input>);

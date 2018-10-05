@@ -2,7 +2,8 @@
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/editor_player.hpp"
 #include "application/intercosm.h"
-#include "application/setups/editor/commands/editor_command_sanitizer.h"
+#include "application/setups/editor/commands/editor_command_traits.h"
+#include "application/setups/editor/editor_history.hpp"
 
 template <class C>
 void make_redoable_for_different_solvable(
@@ -12,7 +13,7 @@ void make_redoable_for_different_solvable(
 	auto sanitize = [&](auto& typed_command) {
 		using T = remove_cref<decltype(typed_command)>;
 
-		if constexpr(has_member_sanitize_v<T>) {
+		if constexpr(has_member_sanitize_v<T, editor_command_input>) {
 			typed_command.sanitize(in);
 		}
 		else {
@@ -53,6 +54,10 @@ double editor_player::get_speed() const {
 	return paused ? 0.0 : speed;
 }
 
+void editor_player::set_speed(const double new_speed) {
+	speed = new_speed;
+}
+
 bool editor_player::is_editing_mode() const {
 	return paused;
 }
@@ -63,6 +68,10 @@ bool editor_player::has_testing_started() const {
 
 void editor_player::control(const cosmic_entropy& entropy) {
 	total_collected_entropy.cosmic += entropy;
+}
+
+void editor_player::control(const mode_entropy& entropy) {
+	total_collected_entropy += entropy;
 }
 
 void editor_player::request_additional_step() {
@@ -83,10 +92,9 @@ void editor_player::quit_testing_and_reapply(const editor_command_input in) {
 	current_step = 0;
 
 	h.force_set_current_revision(start_revision);
-	auto& cosm = in.get_cosmos();
 
 	while (h.has_next_command()) {
-		::make_redoable_for_different_solvable(cosm, h.next_command());
+		::make_redoable_for_different_solvable(in, h.next_command());
 		h.redo(in);
 	}
 }
@@ -96,17 +104,19 @@ void editor_player::start_resume(editor_folder& f) {
 		save_state_before_start(f);
 	}
 
-	if (paused) {
-		paused = false;
-	}
+	paused = false;
+}
+
+void editor_player::pause() {
+	paused = true;
 }
 
 void editor_player::start_pause_resume(editor_folder& f) {
-	if (!has_testing_started()) {
+	if (paused) {
 		start_resume(f);
 	}
 	else {
-		paused = !paused;
+		paused = true;
 	}
 }
 
@@ -129,4 +139,13 @@ void editor_player::ensure_handler() {
 
 		Therefore, we can leave it at that.
 	*/
+}
+
+entity_guid editor_player::lookup_character(const mode_player_id id) const {
+	return std::visit(
+		[&](const auto& typed_mode) { 
+			return typed_mode.lookup(id);
+		},
+		current_mode
+	);
 }

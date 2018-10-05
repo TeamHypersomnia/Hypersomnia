@@ -29,7 +29,7 @@ struct editor_view_ids {
 	editor_selection_groups selection_groups;
 	current_selections_type selected_entities;
 
-	mode_player_id local_player_id;
+	mode_player_id local_player;
 	entity_id overridden_viewed;
 	// END GEN INTROSPECTOR
 

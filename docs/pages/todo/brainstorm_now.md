@@ -6,10 +6,17 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- GUI for the player
+	- Some timeline would be good
+		- Marks for when any input is applied
+			- Shown with regards to currently controlled entity
+
 - Implementation order
 	- Default chosen mode
 	- Initially there should be none
 	- Honestly why not choose it at fill stage?
+		- No problem just altering the mode before start...
+			- Just as we could do it in the first step
 
 - Re-applying process
 	- **CHOSEN SOLUTION:** make commands redoable arbitrary number of times, then force-set revision and re-do
