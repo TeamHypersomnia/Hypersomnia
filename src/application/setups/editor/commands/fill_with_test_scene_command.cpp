@@ -59,19 +59,19 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 #endif
 	view = {};
 
-	auto& cosm = work->world;
-
 	mode_vars.clear();
+
+	auto& player_id = view.ids.local_player;
 
 	{
 		const auto test_vars_id = mode_vars_id(0);
 		mode_vars.get_for<test_scene_mode_vars>().try_emplace(test_vars_id, std::move(test_vars));
 
 		if (!settings.start_bomb_mode) {
-			test_scene_mode mode;
-			view.ids.local_player = mode.add_player({ test_vars, cosm }, faction_type::RESISTANCE);
+			const auto arbitrary_player_id = static_cast<mode_player_id>(0);
+			player_id = arbitrary_player_id;
 
-			player.init_mode(std::move(mode), test_vars_id);
+			player.choose_mode<test_scene_mode>(test_vars_id);
 		}
 	}
 
@@ -80,32 +80,10 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 		mode_vars.get_for<bomb_mode_vars>().try_emplace(bomb_vars_id, std::move(bomb_vars));
 
 		if (settings.start_bomb_mode) {
-			bomb_mode mode;
+			const auto arbitrary_player_id = static_cast<mode_player_id>(3);
+			player_id = arbitrary_player_id;
 
-			auto& player_id = view.ids.local_player;
-
-			{
-				const auto in = bomb_mode::input { bomb_vars, cosm.get_solvable().significant, cosm };
-
-				{
-					mode.auto_assign_faction(in, mode.add_player(in, "kryS."));
-					mode.auto_assign_faction(in, mode.add_player(in, "pepsik"));
-
-					const auto id = mode.add_player(in, "sbk1337");
-					mode.auto_assign_faction(in, id);
-					player_id = id;
-
-					mode.auto_assign_faction(in, mode.add_player(in, "FortesQ"));
-				}
-
-				{
-					const auto id = mode.add_player(in, "Pythagoras");
-					mode.auto_assign_faction(in, id);
-					mode.auto_assign_faction(in, mode.add_player(in, "Billan"));
-				}
-			}
-
-			player.init_mode(std::move(mode), bomb_vars_id);
+			player.choose_mode<bomb_mode>(bomb_vars_id);
 		}
 	}
 }

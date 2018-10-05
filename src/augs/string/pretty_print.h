@@ -75,6 +75,9 @@ S& pretty_print(S& os, const T& val) {
 		write_underlying();
 #endif
 	}
+	else if constexpr(std::is_pointer_v<T>) {
+		os << get_type_name<T>() << "*: " << static_cast<intptr_t>(val);
+	}
 	else {
 		static_assert(always_false_v<T>, "No suitable operator<< found.");
 	}

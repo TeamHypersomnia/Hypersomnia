@@ -51,14 +51,16 @@ class editor_player {
 	bool paused = true;
 	advance_type advance_mode = advance_type::RECORDING;
 
+	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
+
 	editor_player_step_type current_step = 0;
 	std::map<editor_player_step_type, entropy_type> step_to_entropy;
 	mode_entropy total_collected_entropy;
 
 	all_modes_variant current_mode;
 	mode_vars_id current_mode_vars_id = mode_vars_id();
+
 	std::optional<player_before_start_state> before_start;
-	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 	// END GEN INTROSPECTOR
 
 	friend augs::introspection_access;
@@ -74,6 +76,8 @@ class editor_player {
 
 	void save_state_before_start(editor_folder&);
 	void restore_saved_state(editor_folder&);
+
+	void initialize_testing(editor_folder&);
 
 public:
 
@@ -98,7 +102,7 @@ public:
 	void start_pause_resume(editor_folder&);
 
 	template <class M>
-	void init_mode(M&& mode, const mode_vars_id& vars_id);
+	void choose_mode(const mode_vars_id& vars_id);
 
 	void ensure_handler();
 

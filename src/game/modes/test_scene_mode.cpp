@@ -108,6 +108,14 @@ void test_scene_mode::mode_pre_solve(input_type in, const mode_entropy& entropy,
 	(void)entropy;
 	auto& cosm = in.cosm;
 
+	if (players.empty()) {
+		auto n = in.vars.spawned_chars;
+
+		while (n--) {
+			add_player(in, in.vars.spawned_faction);
+		}
+	}
+
 	const auto& clk = cosm.get_clock();
 
 	for (const auto& p : pending_inits) {

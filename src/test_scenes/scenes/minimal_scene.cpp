@@ -28,6 +28,7 @@ namespace test_scenes {
 	}
 
 	void minimal_scene::setup(bomb_mode_vars& vars) {
+		vars.bots = { "First", "Second", "Third", "Fourth", "Fifth", "Sixth" };
 		vars.name = "Minimal scene bomb vars";
 	}
 

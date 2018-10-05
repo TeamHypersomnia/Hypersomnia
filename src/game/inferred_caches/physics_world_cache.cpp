@@ -29,6 +29,8 @@
 #include "game/enums/filters.h"
 #include "augs/misc/convex_partitioned_shape.hpp"
 
+#define DEBUG_PHYSICS_SYSTEM_COPY 1
+
 template <class E>
 auto calc_filters(const E& handle) {
 	const auto& colliders_data = handle.template get<invariants::fixtures>();
@@ -642,7 +644,7 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 		const unsigned count = 1
 	) {
 #if DEBUG_PHYSICS_SYSTEM_COPY
-		ensure_eq(already_migrated_pointers.find(reinterpret_cast<void**>(&pointer_to_be_migrated)), already_migrated_pointers.end());
+		ensure(already_migrated_pointers.find(reinterpret_cast<void**>(&pointer_to_be_migrated)) == already_migrated_pointers.end());
 		already_migrated_pointers.insert(reinterpret_cast<void**>(&pointer_to_be_migrated));
 #endif
 
@@ -690,7 +692,7 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 		contact_edge_b_offset
 	](b2ContactEdge*& edge_ptr) {
 #if DEBUG_PHYSICS_SYSTEM_COPY
-		ensure_eq(already_migrated_pointers.find((void**)&edge_ptr), already_migrated_pointers.end());
+		ensure(already_migrated_pointers.find((void**)&edge_ptr) == already_migrated_pointers.end());
 		already_migrated_pointers.insert((void**)&edge_ptr);
 #endif
 		if (edge_ptr == nullptr) {
@@ -755,7 +757,7 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 		joint_edge_b_offset
 	](b2JointEdge*& edge_ptr) {
 #if DEBUG_PHYSICS_SYSTEM_COPY
-		ensure_eq(already_migrated_pointers.find((void**)&edge_ptr), already_migrated_pointers.end());
+		ensure(already_migrated_pointers.find((void**)&edge_ptr) == already_migrated_pointers.end());
 		already_migrated_pointers.insert((void**)&edge_ptr);
 #endif
 		if (edge_ptr == nullptr) {
@@ -866,8 +868,11 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 				*/
 
 				ensure(pointer_migrations.find(f->m_proxies[i].fixture) != pointer_migrations.end())
-				const auto ff = pointer_migrations[f->m_proxies[i].fixture];
-				ensure_eq(reinterpret_cast<void*>(f), ff);
+
+				{
+					const auto ff = pointer_migrations[f->m_proxies[i].fixture];
+					ensure_eq(reinterpret_cast<void*>(f), ff);
+				}
 #endif
 				f->m_proxies[i].fixture = f;
 				
@@ -885,28 +890,41 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 
 	colliders_caches.clear();
 	rigid_body_caches.clear();
-	joint_caches.clear();
-#if TODO
 
 	colliders_caches.reserve(b.colliders_caches.size());
 	rigid_body_caches.reserve(b.rigid_body_caches.size());
-	joint_caches.reserve(b.joint_caches.size());
 
-	for (auto& it : colliders_caches) {
-		for (auto& f : b.colliders_caches[it.first].constructed_fixtures) {
-			colliders_caches[i].constructed_fixtures.emplace_back(
+	for (const auto& it : b.colliders_caches) {
+		auto& migrated_cache = colliders_caches[it.first];
+
+		migrated_cache = it.second;
+		migrated_cache.constructed_fixtures.clear();
+
+		for (const auto& f : it.second.constructed_fixtures) {
+			migrated_cache.constructed_fixtures.emplace_back(
 				reinterpret_cast<b2Fixture*>(pointer_migrations.at(reinterpret_cast<const void*>(f.get())))
 			);
 		}
 	}
 	
-	for (auto& it : b.rigid_body_caches) {
-		const auto b_body = b.rigid_body_caches[it.first].body.get();
+	for (const auto& it : b.rigid_body_caches) {
+		const auto b_body = it.second.body.get();
+
+		auto& migrated_cache = rigid_body_caches[it.first];
+		static_assert(sizeof(migrated_cache) == sizeof(augs::propagate_const<b2Body*>));
+
+#if WHEN_MORE_FIELDS_ADDED
+		migrated_cache = it.second;
+#endif
 
 		if (b_body) {
-			rigid_body_caches[i].body = reinterpret_cast<b2Body*>(pointer_migrations.at(reinterpret_cast<const void*>(b_body)));
+			migrated_cache.body = reinterpret_cast<b2Body*>(pointer_migrations.at(reinterpret_cast<const void*>(b_body)));
 		}
 	}
+
+#if TODO
+	joint_caches.clear();
+	joint_caches.reserve(b.joint_caches.size());
 
 	for (auto& it : joint_caches) {
 		const auto b_joint = b.joint_caches[it.first].joint.get();

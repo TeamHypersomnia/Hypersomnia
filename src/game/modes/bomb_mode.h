@@ -52,7 +52,9 @@ struct bomb_mode_economy_vars {
 
 struct bomb_mode_vars {
 	// GEN INTROSPECTOR struct bomb_mode_vars
-	std::string name;
+	std::string name = "Unnamed bomb mode vars";
+	std::vector<entity_name_str> bots;
+
 	unsigned allow_spawn_after_secs_after_starting = 10;
 	unsigned max_players = 10;
 	unsigned round_secs = 120;

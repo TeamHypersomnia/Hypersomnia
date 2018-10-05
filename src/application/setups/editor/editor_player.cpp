@@ -82,6 +82,10 @@ void editor_player::request_additional_step() {
 }
 
 void editor_player::finish_testing(const editor_command_input in, const finish_testing_type mode) {
+	if (!has_testing_started()) {
+		return;
+	}
+
 	const auto start_revision = before_start->revision;
 
 	auto& f = in.folder;
@@ -108,9 +112,25 @@ void editor_player::finish_testing(const editor_command_input in, const finish_t
 	}
 }
 
+void editor_player::initialize_testing(editor_folder& f) {
+	begin_recording();
+	save_state_before_start(f);
+
+	current_step = 0;
+	step_to_entropy.clear();
+	total_collected_entropy.clear();
+
+	std::visit(
+		[&](auto& typed_mode) {
+			typed_mode = {};
+		},
+		current_mode
+	);
+}
+
 void editor_player::start_resume(editor_folder& f) {
 	if (!has_testing_started()) {
-		save_state_before_start(f);
+		initialize_testing(f);
 	}
 
 	paused = false;

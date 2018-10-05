@@ -1566,6 +1566,11 @@ void bomb_mode::restart(const input_type in, const logic_step step) {
 		state = arena_mode_state::LIVE;
 	}
 
+	for (const auto& new_name : in.vars.bots) {
+		const auto new_bot = add_player(in, new_name);
+		auto_assign_faction(in, new_bot);
+	}
+
 	setup_round(in, step);
 }
 

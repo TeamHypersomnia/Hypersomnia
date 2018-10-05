@@ -19,11 +19,13 @@ decltype(auto) editor_player::on_mode_with_input_impl(
 				if (const auto vars = mapped_or_nullptr(all_vars.template get_for<V>(), self.current_mode_vars_id)) {
 					if constexpr(M::needs_initial_signi) {
 						const auto& initial = self.before_start.value().work->world.get_solvable().significant;
+						const auto in = I { *vars, initial, cosm };
 
-						callback(typed_mode, I{ *vars, initial, cosm });
+						callback(typed_mode, in);
 					}
 					else {
-						callback(typed_mode, I{ *vars, cosm });
+						const auto in = I { *vars, cosm };
+						callback(typed_mode, in);
 					}
 				}
 			},
@@ -87,9 +89,9 @@ void editor_player::advance_player(
 }
 
 template <class M>
-void editor_player::init_mode(M&& mode, const mode_vars_id& vars_id) {
+void editor_player::choose_mode(const mode_vars_id& vars_id) {
 	ensure(!has_testing_started());
 
 	current_mode_vars_id = vars_id;
-	current_mode.emplace<remove_cref<M>>(std::move(mode));
+	current_mode.emplace<M>();
 }

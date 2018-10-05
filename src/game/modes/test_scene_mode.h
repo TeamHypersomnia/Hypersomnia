@@ -13,11 +13,12 @@ class cosmos;
 
 struct test_scene_mode_vars {
 	// GEN INTROSPECTOR struct test_scene_mode_vars
-	std::string name;
+	std::string name = "Unnamed test scene mode vars";
 
 	real32 respawn_after_ms = 3000;
 	requested_equipment initial_eq;
 	faction_type spawned_faction = faction_type::RESISTANCE;
+	int spawned_chars = 1;
 	// END GEN INTROSPECTOR
 };
 
@@ -59,7 +60,7 @@ public:
 	entity_guid lookup(const mode_player_id&) const;
 	mode_player_id lookup(const entity_guid&) const;
 
-	void request_restart() {}
+	void request_restart() { players.clear(); }
 
 	template <class PreSolve, class... Callbacks>
 	void advance(
