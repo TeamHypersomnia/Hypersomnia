@@ -20,4 +20,6 @@ struct change_entity_property_command : change_property_command<change_entity_pr
 	auto count_affected() const {
 		return affected_entities.size();
 	}
+
+	void sanitize(editor_command_input);
 };

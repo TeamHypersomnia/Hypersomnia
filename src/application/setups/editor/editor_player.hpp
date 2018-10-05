@@ -2,12 +2,12 @@
 #include "application/setups/editor/editor_player.h"
 #include "game/cosmos/cosmos.h"
 
-template <class E, class A, class F>
+template <class E, class A, class C, class F>
 decltype(auto) editor_player::on_mode_with_input_impl(
 	E& self,
-	const all_mode_vars_maps& all_vars,
-	cosmos& cosm,
-	F callback
+	const A& all_vars,
+	C& cosm,
+	F&& callback
 ) {
 	return std::visit(
 		[&](auto& typed_mode) {
@@ -15,7 +15,7 @@ decltype(auto) editor_player::on_mode_with_input_impl(
 			using V = typename M::vars_type;
 			using I = typename M::input;
 			
-			if (const auto vars = mapped_or_nullptr(all_vars.get_for<V>(), self.current_mode_vars_id)) {
+			if (const auto vars = mapped_or_nullptr(all_vars.template get_for<V>(), self.current_mode_vars_id)) {
 				if constexpr(M::needs_initial_signi) {
 					const auto& initial = self.mode_initial_signi;
 					const auto& chosen_initial = 

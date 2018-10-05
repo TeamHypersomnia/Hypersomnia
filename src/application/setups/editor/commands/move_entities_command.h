@@ -65,6 +65,8 @@ public:
 
 	void redo(const editor_command_input in);
 	void undo(const editor_command_input in);
+
+	void sanitize(editor_command_input);
 };
 
 struct active_edges {
@@ -140,4 +142,6 @@ public:
 	auto get_active_edges() const {
 		return edges;
 	}
+
+	void sanitize(editor_command_input);
 };

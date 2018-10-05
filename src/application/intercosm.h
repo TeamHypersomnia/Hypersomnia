@@ -33,14 +33,6 @@ struct intercosm {
 	all_viewables_defs viewables;
 	// END GEN INTROSPECTOR
 
-	intercosm() = default;
-
-	intercosm(intercosm&&) = delete;
-	intercosm& operator=(intercosm&&) = delete;
-
-	intercosm(const intercosm&) = delete;
-	intercosm& operator=(const intercosm&) = delete;
-
 #if BUILD_TEST_SCENES
 	void make_test_scene(
 		sol::state&, 

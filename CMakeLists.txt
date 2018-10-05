@@ -631,6 +631,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/enum/enum_map.cpp"
 	"src/view/mode_gui/arena/arena_buy_menu_gui.cpp"
 	"src/game/detail/flavour_scripts.cpp"
+	"src/application/setups/editor/editor_player.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

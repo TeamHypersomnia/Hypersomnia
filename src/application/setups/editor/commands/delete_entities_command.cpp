@@ -6,6 +6,7 @@
 #include "game/cosmos/create_entity.hpp"
 
 #include "application/setups/editor/commands/delete_entities_command.h"
+#include "application/setups/editor/commands/editor_command_sanitizer.h"
 
 std::string delete_entities_command::describe() const {
 	return built_description;
@@ -61,4 +62,12 @@ void delete_entities_command::undo(const editor_command_input in) {
 	}
 
 	cosmic::reinfer_all_entities(cosm);
+}
+
+void delete_entities_command::sanitize(const editor_command_input in) {
+	deleted_grouping.sanitize(in);
+
+	sanitize_affected_entities(in, deleted_entities, [](const auto& entry) {
+		return entry.content.guid;
+	});
 }

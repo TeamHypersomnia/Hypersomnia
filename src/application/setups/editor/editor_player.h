@@ -1,25 +1,29 @@
 #pragma once
 #include <memory>
 #include <map>
-#include "application/setups/editor/editor_history.h"
+#include "augs/misc/timing/fixed_delta_timer.h"
+
 #include "game/modes/all_mode_includes.h"
 #include "game/modes/mode_entropy.h"
-#include "augs/misc/timing/fixed_delta_timer.h"
-#include "view/mode_gui/arena/arena_mode_gui.h"
 
 #include "application/setups/editor/player/editor_player_step_type.h"
+#include "application/setups/editor/editor_history.h"
+#include "application/setups/editor/editor_view.h"
 
 struct cosmos_solvable_significant;
 
 struct editor_folder;
-
-class cosmos;
+struct editor_command_input;
 
 namespace augs {
 	struct introspection_access;
 }
 
+struct intercosm;
+
 struct player_before_start_state {
+	using revision_type = editor_history::index_type;
+
 	// GEN INTROSPECTOR struct player_before_start_state
 	std::unique_ptr<intercosm> work;
 	editor_view_ids view_ids;
@@ -29,7 +33,6 @@ struct player_before_start_state {
 };
 
 class editor_player {
-	using revision_type = editor_history::index_type;
 	using entropy_type = mode_entropy;
 
 	enum class advance_type {
@@ -55,15 +58,15 @@ class editor_player {
 
 	friend augs::introspection_access;
 
-	template <class E, class A, class F>
+	template <class E, class A, class C, class F>
 	static decltype(auto) on_mode_with_input_impl(
 		E& self,
-		const all_mode_vars_maps& all_vars,
-		cosmos& cosm,
+		const A& all_vars,
+		C& cosm,
 		F&& callback
 	);
 
-	void save_state_before_start(const editor_folder&);
+	void save_state_before_start(editor_folder&);
 	void restore_saved_state(editor_folder&);
 
 public:
@@ -78,7 +81,7 @@ public:
 	void begin_recording();
 
 	void pause();
-	void quit_testing_and_reapply(editor_folder&);
+	void quit_testing_and_reapply(editor_command_input);
 	void start_pause_resume(editor_folder&);
 
 	template <class M>
@@ -95,12 +98,12 @@ public:
 	);
 
 	template <class... Args>
-	decltype(auto) on_mode_with_input(Args&& args...) {
+	decltype(auto) on_mode_with_input(Args&&... args) {
 		return on_mode_with_input_impl(*this, std::forward<Args>(args)...);
 	}
 
 	template <class... Args>
-	decltype(auto) on_mode_with_input(Args&& args...) const {
+	decltype(auto) on_mode_with_input(Args&&... args) const {
 		return on_mode_with_input_impl(*this, std::forward<Args>(args)...);
 	}
 };

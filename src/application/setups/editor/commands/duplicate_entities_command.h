@@ -48,4 +48,6 @@ public:
 
 	bool empty() const;
 	std::string describe() const;
+
+	void sanitize(editor_command_input);
 };

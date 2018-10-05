@@ -257,3 +257,9 @@ void duplicate_entities_command::undo(const editor_command_input in) {
 		but the same problem will nevertheless persist in networked environments.
 	*/
 }
+
+void duplicate_entities_command::sanitize(const editor_command_input in) {
+	sanitize_affected_entities(in, duplicated_entities, [](const auto& entry) {
+		return entry.source_id;
+	});
+}

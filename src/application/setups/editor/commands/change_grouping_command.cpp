@@ -13,8 +13,34 @@ void change_grouping_command::push_entry(const entity_id id) {
 	affected_entities.push_back(id);
 }
 
+void change_grouping_command::sanitize(editor_command_input in) {
+	std::vector<bool> to_erase;
+	to_erase.resize(affected_entities.size());
+
+	const auto& cosm = in.get_cosmos();
+
+	for (std::size_t i = 0; i < affected_entities.size(); ++i) {
+		if (cosm[affected_entities[i]].dead()) {
+			to_erase[i] = true;
+		}
+	}
+
+	auto cleaner = [&](const auto& where) {
+		erase_if(where, [&](const auto& what) {
+			return to_erase[index_in(where, what)];
+		});
+	};
+
+	cleaner(affected_entities);
+	cleaner(group_indices_after);
+}
+
 void change_grouping_command::redo(const editor_command_input in) {
+#if DEBUG_COMMANDS
 	ensure(group_indices_before.empty());
+#else
+	group_indices_before.clear();
+#endif
 
 	/* First, ungroup the affected entities */
 	auto& groups = in.folder.view.ids.selection_groups;

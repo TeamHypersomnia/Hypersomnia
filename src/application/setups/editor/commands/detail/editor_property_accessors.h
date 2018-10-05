@@ -262,7 +262,7 @@ struct editor_property_accessors {
 		in.folder.mode_vars.visit(
 			self.vars_type_id,
 			[&](auto& typed_mode_vars) {
-				if (auto* const found_mode_vars = mapped_or_nullptr(typed_mode_vars.at(self.vars_id)) {
+				if (auto* const found_mode_vars = mapped_or_nullptr(typed_mode_vars, self.vars_id)) {
 					on_field_address(
 						*found_mode_vars,
 						self.field,
@@ -297,6 +297,8 @@ struct editor_property_accessors {
 	) {
 		auto& groups = in.folder.view.ids.selection_groups.groups;
 
-		callback(groups[self.group_index].name);
+		if (auto mapped_group = mapped_or_nullptr(groups, self.group_index)) {
+			callback(mapped_group->name);
+		}
 	}
 };

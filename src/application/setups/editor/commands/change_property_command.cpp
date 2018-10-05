@@ -17,6 +17,7 @@
 #include "augs/misc/from_concave_polygon.h"
 
 #include "augs/readwrite/byte_readwrite.h"
+#include "application/setups/editor/commands/editor_command_sanitizer.h"
 
 template <class D>
 std::string change_property_command<D>::describe() const {
@@ -168,3 +169,7 @@ template class change_property_command<change_asset_property_command<assets::sou
 
 template class change_property_command<change_asset_property_command<assets::plain_animation_id>>;
 template class change_property_command<change_asset_property_command<assets::particle_effect_id>>;
+
+void change_entity_property_command::sanitize(const editor_command_input in) {
+	sanitize_affected_entities(in, affected_entities);
+}

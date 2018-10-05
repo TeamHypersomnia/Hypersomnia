@@ -1,15 +1,18 @@
 #include "application/setups/editor/editor_player.h"
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/editor_player.hpp"
+#include "application/intercosm.h"
+#include "application/setups/editor/commands/editor_command_sanitizer.h"
 
-void editor_player::save_state_before_start(const editor_folder& folder) {
+void editor_player::save_state_before_start(editor_folder& folder) {
 	ensure(!before_start.has_value());
 	before_start.emplace();
 
 	auto& backup = *before_start;
 
 	backup.work = std::move(folder.work);
-	folder.work = std::make_unique<intercosm>(*backup.work);
+	folder.work = std::make_unique<intercosm>();
+	*folder.work = *backup.work;
 
 	backup.view_ids = folder.view.ids;
 	backup.mode_vars = folder.mode_vars;
@@ -21,7 +24,7 @@ void editor_player::restore_saved_state(editor_folder& folder) {
 	auto& backup = *before_start;
 
 	folder.work = std::move(backup.work);
-	folder.view_ids = std::move(backup.view.ids);
+	folder.view.ids = std::move(backup.view_ids);
 	folder.mode_vars = std::move(backup.mode_vars);
 
 	before_start.reset();
@@ -36,7 +39,7 @@ bool editor_player::is_editing_mode() const {
 }
 
 bool editor_player::has_testing_started() const {
-	return before_start != nullptr;
+	return before_start != std::nullopt;
 }
 
 void editor_player::control(const cosmic_entropy& entropy) {
@@ -49,12 +52,24 @@ void editor_player::request_additional_step() {
 	}
 }
 
-void editor_player::quit_testing_and_reapply(editor_folder& f) {
+void editor_player::quit_testing_and_reapply(const editor_command_input in) {
 	const auto start_revision = before_start->revision;
+
+	auto& f = in.folder;
+	auto& h = f.history;
+
 	restore_saved_state(f);
 
 	paused = true;
 	current_step = 0;
+
+	h.force_set_current_revision(start_revision);
+	auto& cosm = in.get_cosmos();
+
+	while (h.has_next_command()) {
+		::sanitize_command(cosm, h.next_command());
+		h.redo(in);
+	}
 }
 
 void editor_player::start_resume(editor_folder& f) {

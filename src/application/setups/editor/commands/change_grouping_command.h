@@ -25,6 +25,8 @@ struct change_grouping_command {
 
 	std::size_t size() const;
 	bool empty() const;
+
+	void sanitize(editor_command_input);
 };
 
 struct change_group_property_command : change_property_command<change_group_property_command> {

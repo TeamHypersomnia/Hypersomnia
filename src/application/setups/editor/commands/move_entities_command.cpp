@@ -8,6 +8,7 @@
 #include "application/setups/editor/gui/editor_entity_selector.h"
 #include "application/setups/editor/gui/find_aabb_of.h"
 #include "application/setups/editor/detail/editor_transform_utils.h"
+#include "application/setups/editor/commands/editor_command_sanitizer.h"
 
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
@@ -433,6 +434,9 @@ void move_entities_command::undo(const editor_command_input in) {
 	in.folder.view.ids.select(moved_entities);
 }
 
+void move_entities_command::sanitize(const editor_command_input in) {
+	sanitize_affected_entities(in, moved_entities);
+}
 
 active_edges::active_edges(const transformr tr, const vec2 rect_size, vec2 reference_point, const bool both_axes) {
 	reference_point.rotate(-tr.rotation, tr.pos);
@@ -558,4 +562,8 @@ void resize_entities_command::undo(const editor_command_input in) {
 	cosmic::reinfer_all_entities(cosm);
 
 	in.folder.view.ids.select(resized_entities);
+}
+
+void resize_entities_command::sanitize(const editor_command_input in) {
+	sanitize_affected_entities(in, resized_entities);
 }

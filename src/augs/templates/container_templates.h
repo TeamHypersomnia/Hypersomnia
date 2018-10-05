@@ -178,6 +178,30 @@ auto mapped_or_nullptr(
 	}
 }
 
+template <class value_type>
+auto mapped_or_nullptr(
+	std::vector<value_type>& container,
+	const std::size_t& i
+) -> value_type* {
+	if (i < container.size()) {
+		return container.data() + i;
+	}
+
+	return nullptr;
+}
+
+template <class value_type>
+auto mapped_or_nullptr(
+	const std::vector<value_type>& container,
+	const std::size_t& i
+) -> const value_type* {
+	if (i < container.size()) {
+		return container.data() + i;
+	}
+
+	return nullptr;
+}
+
 template <class C, class K, class T>
 T mapped_or_default(
 	C&& container,

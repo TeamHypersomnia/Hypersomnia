@@ -317,7 +317,7 @@ public:
 	cosmos_clock clock_before_setup;
 	arena_mode_state state = arena_mode_state::INIT;
 	per_faction_t<bomb_mode_faction_state> factions;
-	std::unordered_map<mode_player_id, bomb_mode_player> players;
+	std::map<mode_player_id, bomb_mode_player> players;
 	bomb_mode_round_state current_round;
 
 	std::vector<mode_player_id> recently_added_players;
