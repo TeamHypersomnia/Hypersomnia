@@ -9,25 +9,27 @@ decltype(auto) editor_player::on_mode_with_input_impl(
 	C& cosm,
 	F&& callback
 ) {
-	return std::visit(
-		[&](auto& typed_mode) {
-			using M = remove_cref<decltype(typed_mode)>;
-			using V = typename M::vars_type;
-			using I = typename M::input;
-			
-			if (const auto vars = mapped_or_nullptr(all_vars.template get_for<V>(), self.current_mode_vars_id)) {
-				if constexpr(M::needs_initial_signi) {
-					const auto& initial = self.before_start.value().work->world.get_solvable().significant;
+	if (self.has_testing_started()) {
+		std::visit(
+			[&](auto& typed_mode) {
+				using M = remove_cref<decltype(typed_mode)>;
+				using V = typename M::vars_type;
+				using I = typename M::input;
+				
+				if (const auto vars = mapped_or_nullptr(all_vars.template get_for<V>(), self.current_mode_vars_id)) {
+					if constexpr(M::needs_initial_signi) {
+						const auto& initial = self.before_start.value().work->world.get_solvable().significant;
 
-					callback(typed_mode, I{ *vars, initial, cosm });
+						callback(typed_mode, I{ *vars, initial, cosm });
+					}
+					else {
+						callback(typed_mode, I{ *vars, cosm });
+					}
 				}
-				else {
-					callback(typed_mode, I{ *vars, cosm });
-				}
-			}
-		},
-		self.current_mode
-	);
+			},
+			self.current_mode
+		);
+	}
 }
 
 template <class A, class... Callbacks>
@@ -45,43 +47,41 @@ void editor_player::advance_player(
 
 	auto steps = self.additional_steps + self.timer.extract_num_of_logic_steps(cosm.get_fixed_delta());
 
-	if (self.has_testing_started()) {
-		on_mode_with_input(
-			all_vars,
-			cosm,
-			[&](auto& typed_mode, const auto& in) {
-				while (steps--) {
-					auto& applied_entropy = self.total_collected_entropy;
-					auto& step_i = self.current_step;
+	on_mode_with_input(
+		all_vars,
+		cosm,
+		[&](auto& typed_mode, const auto& in) {
+			while (steps--) {
+				auto& applied_entropy = self.total_collected_entropy;
+				auto& step_i = self.current_step;
 
-					applied_entropy.clear_dead_entities(cosm);
+				applied_entropy.clear_dead_entities(cosm);
 
-					switch (self.advance_mode) {
-						case advance_type::REPLAYING:
-							if (const auto found_entropy = mapped_or_nullptr(step_to_entropy, step_i)) {
-								applied_entropy = *found_entropy;
-							}
-							
-						case advance_type::RECORDING:
-							if (!applied_entropy.empty()) {
-								step_to_entropy[step_i] = applied_entropy;
-							}
+				switch (self.advance_mode) {
+					case advance_type::REPLAYING:
+						if (const auto found_entropy = mapped_or_nullptr(step_to_entropy, step_i)) {
+							applied_entropy = *found_entropy;
+						}
+						
+					case advance_type::RECORDING:
+						if (!applied_entropy.empty()) {
+							step_to_entropy[step_i] = applied_entropy;
+						}
 
-						default: break;
-					}
-
-					typed_mode.advance(
-						in,
-						applied_entropy,
-						std::forward<Callbacks>(callbacks)...
-					);
-
-					applied_entropy.clear();
-					++step_i;
+					default: break;
 				}
+
+				typed_mode.advance(
+					in,
+					applied_entropy,
+					std::forward<Callbacks>(callbacks)...
+				);
+
+				applied_entropy.clear();
+				++step_i;
 			}
-		);
-	}
+		}
+	);
 
 	self.additional_steps = 0;
 }

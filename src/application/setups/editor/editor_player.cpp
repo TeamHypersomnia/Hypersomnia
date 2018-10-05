@@ -31,8 +31,7 @@ void editor_player::save_state_before_start(editor_folder& folder) {
 	auto& backup = *before_start;
 
 	backup.work = std::move(folder.work);
-	folder.work = std::make_unique<intercosm>();
-	*folder.work = *backup.work;
+	folder.work = std::make_unique<intercosm>(*backup.work);
 
 	backup.view_ids = folder.view.ids;
 	backup.mode_vars = folder.mode_vars;
@@ -63,7 +62,7 @@ bool editor_player::is_editing_mode() const {
 }
 
 bool editor_player::has_testing_started() const {
-	return before_start != std::nullopt;
+	return before_start.has_value();
 }
 
 void editor_player::control(const cosmic_entropy& entropy) {

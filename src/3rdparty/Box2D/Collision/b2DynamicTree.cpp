@@ -820,3 +820,8 @@ b2DynamicTree& b2DynamicTree::operator=(const b2DynamicTree& b)
 
 	return *this;
 }
+
+b2DynamicTree::b2DynamicTree(const b2DynamicTree& b) {
+	m_nodes = nullptr;
+	*this = b;
+}

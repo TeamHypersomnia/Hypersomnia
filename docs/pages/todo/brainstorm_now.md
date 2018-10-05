@@ -6,10 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Implement view early to know what's going on
+
 - GUI for the player
 	- Some timeline would be good
 		- Marks for when any input is applied
 			- Shown with regards to currently controlled entity
+	- Should be able to zoom out
 
 - Implementation order
 	- Default chosen mode

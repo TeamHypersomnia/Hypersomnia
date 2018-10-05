@@ -590,7 +590,7 @@ physics_world_cache::physics_world_cache() :
 	b2world->SetAutoClearForces(false);
 }
 
-physics_world_cache::physics_world_cache(const physics_world_cache& b) {
+physics_world_cache::physics_world_cache(const physics_world_cache& b) : physics_world_cache() {
 	*this = b;
 }
 
@@ -882,8 +882,6 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 		as for every existing b2FixtureProxy we have manually migrated the correspondent userdata
 		inside the loop that migrated all bodies and fixtures.
 	*/
-
-	ensure(false);
 
 	colliders_caches.clear();
 	rigid_body_caches.clear();
