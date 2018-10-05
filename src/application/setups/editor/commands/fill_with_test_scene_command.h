@@ -31,6 +31,8 @@ public:
 
 	void redo(editor_command_input);
 	void undo(editor_command_input);
+
+	void clear_undo_state();
 };
 
 

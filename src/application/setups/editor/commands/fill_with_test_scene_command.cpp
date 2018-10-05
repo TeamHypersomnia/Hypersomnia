@@ -17,6 +17,7 @@ std::string fill_with_test_scene_command::describe() const {
 }
 
 void fill_with_test_scene_command::redo(const editor_command_input in) {
+	clear_undo_state();
 	in.purge_selections();
 
 	auto& work = in.folder.work;
@@ -115,6 +116,12 @@ void fill_with_test_scene_command::undo(const editor_command_input in) {
 	augs::from_bytes(modes_before_fill, in.folder.mode_vars);
 	augs::from_bytes(player_before_fill, in.folder.player);
 
+	clear_undo_state();
+}
+
+void fill_with_test_scene_command::clear_undo_state() {
 	intercosm_before_fill.clear();
 	view_before_fill.clear();
+	modes_before_fill.clear();
+	player_before_fill.clear();
 }

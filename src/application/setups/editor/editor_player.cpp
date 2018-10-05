@@ -4,6 +4,25 @@
 #include "application/intercosm.h"
 #include "application/setups/editor/commands/editor_command_sanitizer.h"
 
+template <class C>
+void make_redoable_for_different_solvable(
+	const editor_command_input& in,
+	C& command
+) {
+	auto sanitize = [&](auto& typed_command) {
+		using T = remove_cref<decltype(typed_command)>;
+
+		if constexpr(has_member_sanitize_v<T>) {
+			typed_command.sanitize(in);
+		}
+		else {
+			static_assert(!has_affected_entities_v<T>);
+		}
+	};
+
+	std::visit(sanitize, command);
+}
+
 void editor_player::save_state_before_start(editor_folder& folder) {
 	ensure(!before_start.has_value());
 	before_start.emplace();
@@ -67,7 +86,7 @@ void editor_player::quit_testing_and_reapply(const editor_command_input in) {
 	auto& cosm = in.get_cosmos();
 
 	while (h.has_next_command()) {
-		::sanitize_command(cosm, h.next_command());
+		::make_redoable_for_different_solvable(cosm, h.next_command());
 		h.redo(in);
 	}
 }

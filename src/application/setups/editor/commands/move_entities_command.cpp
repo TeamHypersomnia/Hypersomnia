@@ -405,10 +405,10 @@ void move_entities_command::rewrite_change(
 }
 
 void move_entities_command::redo(const editor_command_input in) {
-	auto& cosm = in.get_cosmos();
+	clear_undo_state();
 
+	auto& cosm = in.get_cosmos();
 	auto before_change_data = augs::ref_memory_stream(values_before_change);
-	ensure(values_before_change.empty());
 
 	save_transforms(cosm, moved_entities, before_change_data);
 	move_entities(cosm);
@@ -427,7 +427,7 @@ void move_entities_command::undo(const editor_command_input in) {
 	auto& cosm = in.get_cosmos();
 
 	unmove_entities(cosm);
-	values_before_change.clear();
+	clear_undo_state();
 
 	cosmic::reinfer_all_entities(cosm);
 
@@ -436,6 +436,10 @@ void move_entities_command::undo(const editor_command_input in) {
 
 void move_entities_command::sanitize(const editor_command_input in) {
 	sanitize_affected_entities(in, moved_entities);
+}
+
+void move_entities_command::clear_undo_state() {
+	values_before_change.clear();
 }
 
 active_edges::active_edges(const transformr tr, const vec2 rect_size, vec2 reference_point, const bool both_axes) {
@@ -536,10 +540,10 @@ void resize_entities_command::rewrite_change(
 }
 
 void resize_entities_command::redo(const editor_command_input in) {
-	auto& cosm = in.get_cosmos();
+	clear_undo_state();
 
+	auto& cosm = in.get_cosmos();
 	auto before_change_data = augs::ref_memory_stream(values_before_change);
-	ensure(values_before_change.empty());
 
 	::save_sizes(cosm, resized_entities, before_change_data);
 	::save_transforms(cosm, resized_entities, before_change_data);
@@ -557,7 +561,7 @@ void resize_entities_command::undo(const editor_command_input in) {
 	auto before_change_data = augs::cref_memory_stream(values_before_change);
 
 	unresize_entities(cosm);
-	values_before_change.clear();
+	clear_undo_state();
 
 	cosmic::reinfer_all_entities(cosm);
 
@@ -566,4 +570,8 @@ void resize_entities_command::undo(const editor_command_input in) {
 
 void resize_entities_command::sanitize(const editor_command_input in) {
 	sanitize_affected_entities(in, resized_entities);
+}
+
+void resize_entities_command::clear_undo_state() {
+	values_before_change.clear();
 }

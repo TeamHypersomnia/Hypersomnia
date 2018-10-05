@@ -35,12 +35,12 @@ void change_grouping_command::sanitize(editor_command_input in) {
 	cleaner(group_indices_after);
 }
 
-void change_grouping_command::redo(const editor_command_input in) {
-#if DEBUG_COMMANDS
-	ensure(group_indices_before.empty());
-#else
+void change_grouping_command::clear_undo_state() {
 	group_indices_before.clear();
-#endif
+}
+
+void change_grouping_command::redo(const editor_command_input in) {
+	clear_undo_state();
 
 	/* First, ungroup the affected entities */
 	auto& groups = in.folder.view.ids.selection_groups;
@@ -83,7 +83,6 @@ void change_grouping_command::undo(const editor_command_input in) {
 	for (const auto& e : affected_entities) {
 		const auto found_group = groups.on_group_entry_of(e, eraser);
 
-#if DEBUG_COMMANDS
 		if (all_to_new_group || group_indices_after.size() > 0) {
 			/* 
 				We're undoing creation of new group or assigning to some, 
@@ -100,9 +99,6 @@ void change_grouping_command::undo(const editor_command_input in) {
 
 			ensure(!found_group);
 		}
-#else
-		(void)found_group;
-#endif
 	}
 
 	for (std::size_t i = 0; i < affected_entities.size(); ++i) {
@@ -114,7 +110,7 @@ void change_grouping_command::undo(const editor_command_input in) {
 		}
 	}
 
-	group_indices_before.clear();
+	clear_undo_state();
 }
 
 std::string change_grouping_command::describe() const {

@@ -74,7 +74,7 @@ public:
 
 	template <class P>
 	void redo(P& pool) {
-		ensure(forgotten_content.empty());
+		clear_undo_state();
 
 		auto s = augs::ref_memory_stream(forgotten_content);
 		augs::write_bytes(s, pool.get(freed_id));
@@ -89,6 +89,10 @@ public:
 		augs::read_bytes(s, def);
 		pool.undo_free(undo_free_input, std::move(def));
 
+		clear_undo_state();
+	}
+
+	void clear_undo_state() {
 		forgotten_content.clear();
 	}
 };

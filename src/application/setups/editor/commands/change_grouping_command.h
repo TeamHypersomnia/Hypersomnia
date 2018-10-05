@@ -27,6 +27,7 @@ struct change_grouping_command {
 	bool empty() const;
 
 	void sanitize(editor_command_input);
+	void clear_undo_state();
 };
 
 struct change_group_property_command : change_property_command<change_group_property_command> {

@@ -23,31 +23,3 @@ void sanitize_affected_entities(
 	erase_if(affected_entities, dead_eraser);
 }
 
-template <class C>
-void sanitize_command(
-	const editor_command_input& in,
-	C& command
-) {
-	/* auto& cosm = in.get_cosmos(); */
-
-	auto sanitize = [&](auto& typed_command) {
-		using T = remove_cref<decltype(typed_command)>;
-
-		/* auto dead_eraser = [&](const auto& id) { */
-		/* 	return cosm[id].dead(); */
-		/* }; */
-
-		if constexpr(has_member_sanitize_v<T>) {
-			typed_command.sanitize(in);
-		}
-		else {
-			static_assert(!has_affected_entities_v<T>);
-		}
-
-/* 		if constexpr(has_affected_entities_v<T>) { */
-/* 			erase_if(typed_command.affected_entities, dead_eraser); */
-/* 		} */
-	};
-
-	std::visit(sanitize, command);
-}

@@ -67,6 +67,7 @@ public:
 	void undo(const editor_command_input in);
 
 	void sanitize(editor_command_input);
+	void clear_undo_state();
 };
 
 struct active_edges {
@@ -144,4 +145,5 @@ public:
 	}
 
 	void sanitize(editor_command_input);
+	void clear_undo_state();
 };

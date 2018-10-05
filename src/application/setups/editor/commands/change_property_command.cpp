@@ -111,7 +111,7 @@ template <class D>
 void change_property_command<D>::redo(const editor_command_input in) {
 	auto& self = *static_cast<D*>(this);
 
-	ensure(values_before_change.empty());
+	self.clear_undo_state();
 
 	const auto trivial_element_size = value_after_change.size();
 
@@ -150,9 +150,13 @@ void change_property_command<D>::undo(const editor_command_input in) {
 		}	
 	);
 
-	values_before_change.clear();
-
+	self.clear_undo_state();
 	refresh_other_state(in);
+}
+
+template <class D>
+void change_property_command::clear_undo_state() {
+	values_before_change.clear();
 }
 
 template class change_property_command<change_flavour_property_command>;

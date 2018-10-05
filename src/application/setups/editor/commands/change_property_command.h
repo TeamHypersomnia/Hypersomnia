@@ -28,4 +28,6 @@ public:
 
 	void redo(const editor_command_input in);
 	void undo(const editor_command_input in);
+
+	void clear_undo_state();
 };

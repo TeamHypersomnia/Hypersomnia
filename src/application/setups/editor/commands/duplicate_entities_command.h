@@ -50,4 +50,5 @@ public:
 	std::string describe() const;
 
 	void sanitize(editor_command_input);
+	void clear_undo_state();
 };
