@@ -4,6 +4,16 @@
 
 namespace augs {
 	template <class D, class... C>
+	void history<D, C...>::discard_later_revisions() {
+		erase_from_to(commands, current_revision + 1);
+
+		derived_set_modified_flags();
+
+		auto& self = *static_cast<D*>(this);
+		self.invalidate_revisions_from(current_revision + 1);
+	}
+
+	template <class D, class... C>
 	template <class T, class... RedoArgs>
 	const T& history<D, C...>::execute_new(T&& command, RedoArgs&&... redo_args) {
 		/* 
@@ -11,14 +21,7 @@ namespace augs {
 			Later we might support branches. 
 		*/
 
-		erase_from_to(commands, current_revision + 1);
-
-		derived_set_modified_flags();
-
-		{
-			auto& self = *static_cast<D*>(this);
-			self.invalidate_revisions_from(current_revision + 1);
-		}
+		discard_later_revisions();
 
 		commands.emplace_back(
 			std::in_place_type_t<remove_cref<T>>(),

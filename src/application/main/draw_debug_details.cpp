@@ -54,6 +54,10 @@ void draw_debug_details(
 	};
 #endif
 
+	const auto& cosm = viewed_character.get_cosmos();
+
+	total_details += { typesafe_sprintf("Entities: %x\n", cosm.get_entities_count()), text_style };
+
 	if (viewed_character.alive()) {
 		if (const auto transform = viewed_character.find_logic_transform()) {
 			const auto coords = transform->pos;
@@ -61,8 +65,7 @@ void draw_debug_details(
 
 			total_details += {
 				typesafe_sprintf(
-					"Entities: %x\nX: %f2\nY: %f2\nRot: %f2\n",
-					viewed_character.get_cosmos().get_entities_count(),
+					"X: %f2\nY: %f2\nRot: %f2\n",
 					coords.x,
 					coords.y,
 					rot

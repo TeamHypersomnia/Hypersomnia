@@ -40,7 +40,6 @@ std::optional<ltrb> editor_setup::find_screen_space_rect_selection(
 
 void editor_setup::open_last_folders(sol::state& lua) {
 	catch_popup([&]() { ::open_last_folders(lua, signi); });
-	base::refresh();
 }
 
 double editor_setup::get_audiovisual_speed() const {
@@ -882,8 +881,6 @@ void editor_setup::close_folder(const folder_index i) {
 	else {
 		signi.current_index = std::min(signi.current_index, static_cast<folder_index>(signi.folders.size() - 1));
 	}
-
-	base::refresh();
 }
 
 void editor_setup::close_folder() {
@@ -984,6 +981,7 @@ bool editor_setup::handle_input_before_imgui(
 				case key::N: new_tab(); return true;
 				case key::O: open(window); return true;
 				case key::ENTER: return confirm_modal_popup();
+				case key::BACKSPACE: if (anything_opened()) { player().finish_testing(make_command_input(), finish_testing_type::DISCARD_CHANGES); }
 				default: break;
 			}
 		}
@@ -1725,4 +1723,52 @@ void editor_setup::ensure_handler() {
 		player().ensure_handler(); 
 		force_autosave_now();
 	}
+}
+
+void editor_setup::set_current(const folder_index i) {
+	if (signi.current_index != i) {
+		on_folder_changed();
+	}
+
+	signi.current_index = i;
+}
+
+bool editor_setup::anything_opened() const {
+	return 
+		signi.folders.size() > 0 
+		&& signi.current_index != static_cast<folder_index>(-1) 
+		&& signi.current_index < signi.folders.size()
+	;
+}
+
+editor_folder& editor_setup::folder() {
+	return signi.folders[signi.current_index];
+}
+
+const editor_folder& editor_setup::folder() const {
+	return signi.folders[signi.current_index];
+}
+
+intercosm& editor_setup::work() {
+	return *folder().work;
+}
+
+const intercosm& editor_setup::work() const {
+	return *folder().work;
+}
+
+editor_player& editor_setup::player() {
+	return folder().player;
+}
+
+const editor_player& editor_setup::player() const {
+	return folder().player;
+}
+
+editor_view& editor_setup::view() {
+	return folder().view;
+}
+
+const editor_view& editor_setup::view() const {
+	return folder().view;
 }

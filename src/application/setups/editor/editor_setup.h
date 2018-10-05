@@ -53,7 +53,6 @@
 
 #include "application/setups/editor/gui/for_each_iconed_entity.h"
 
-#include "application/setups/editor/detail/current_access_cache.h"
 #include "application/setups/editor/detail/make_command_from_selections.h"
 #include "application/app_intent_type.h"
 
@@ -76,9 +75,9 @@ struct editor_destructor_input {
 
 class images_in_atlas_map;
 
-class editor_setup : private current_access_cache<editor_setup> {
-	using base = current_access_cache<editor_setup>;
-	friend base;
+struct intercosm;
+
+class editor_setup {
 	friend augs::introspection_access;
 
 	/* These two friends for handy printing of internal state */
@@ -147,8 +146,6 @@ class editor_setup : private current_access_cache<editor_setup> {
 
 		auto& new_folder = signi.folders[new_index];
 
-		base::refresh();
-
 		try {
 			new_folder_provider(new_folder);
 			set_current(new_index);
@@ -157,8 +154,6 @@ class editor_setup : private current_access_cache<editor_setup> {
 			signi.folders.erase(signi.folders.begin() + new_index);
 			set_popup(p);
 		}
-
-		base::refresh();
 	}
 
 	void enter_testing_mode();
@@ -213,12 +208,9 @@ class editor_setup : private current_access_cache<editor_setup> {
 	float get_menu_bar_height() const;
 	float get_game_screen_top() const;
 
-public:
-	using base::anything_opened;
-	using base::folder;
-	using base::view;
-	using base::work;
+	void set_current(const folder_index i);
 
+public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
 	static constexpr bool has_additional_highlights = true;
@@ -526,4 +518,18 @@ public:
 	void unhide_all_layers();
 
 	void ensure_handler();
+
+	bool anything_opened() const;
+
+	editor_folder& folder();
+	const editor_folder& folder() const;
+
+	intercosm& work();
+	const intercosm& work() const;
+
+	editor_player& player();
+	const editor_player& player() const;
+
+	editor_view& view();
+	const editor_view& view() const;
 };

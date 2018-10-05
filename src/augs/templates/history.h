@@ -78,6 +78,8 @@ namespace augs {
 			set_last_op(history_op_type::FORCE_SET_REVISION);
 		}
 
+		void discard_later_revisions();
+
 		bool is_revision_newest() const {
 			return current_revision == static_cast<index_type>(commands.size()) - 1;
 		}

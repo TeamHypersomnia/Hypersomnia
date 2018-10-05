@@ -25,6 +25,7 @@ void make_redoable_for_different_solvable(
 }
 
 void editor_player::save_state_before_start(editor_folder& folder) {
+	LOG("Save state");
 	ensure(!before_start.has_value());
 	before_start.emplace();
 
@@ -39,6 +40,7 @@ void editor_player::save_state_before_start(editor_folder& folder) {
 }
 
 void editor_player::restore_saved_state(editor_folder& folder) {
+	LOG("Restore state");
 	ensure(before_start.has_value());
 	auto& backup = *before_start;
 
@@ -79,7 +81,7 @@ void editor_player::request_additional_step() {
 	}
 }
 
-void editor_player::quit_testing_and_reapply(const editor_command_input in) {
+void editor_player::finish_testing(const editor_command_input in, const finish_testing_type mode) {
 	const auto start_revision = before_start->revision;
 
 	auto& f = in.folder;
@@ -92,9 +94,17 @@ void editor_player::quit_testing_and_reapply(const editor_command_input in) {
 
 	h.force_set_current_revision(start_revision);
 
-	while (h.has_next_command()) {
-		::make_redoable_for_different_solvable(in, h.next_command());
-		h.redo(in);
+	if (mode == finish_testing_type::DISCARD_CHANGES) {
+		h.discard_later_revisions();
+	}
+	else if (mode == finish_testing_type::REAPPLY_CHANGES) {
+		while (h.has_next_command()) {
+			::make_redoable_for_different_solvable(in, h.next_command());
+			h.redo(in);
+		}
+	}
+	else {
+		ensure(false);
 	}
 }
 

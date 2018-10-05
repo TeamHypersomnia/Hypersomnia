@@ -32,6 +32,8 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 	modes_before_fill = augs::to_bytes(mode_vars);
 	player_before_fill = augs::to_bytes(player);
 
+	player = {};
+
 	test_scene_mode_vars test_vars;
 	bomb_mode_vars bomb_vars;
 

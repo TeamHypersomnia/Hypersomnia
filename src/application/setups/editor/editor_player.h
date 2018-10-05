@@ -32,6 +32,11 @@ struct player_before_start_state {
 	// END GEN INTROSPECTOR
 };
 
+enum class finish_testing_type {
+	REAPPLY_CHANGES,
+	DISCARD_CHANGES
+};
+
 class editor_player {
 	using entropy_type = mode_entropy;
 
@@ -87,7 +92,7 @@ public:
 	void begin_recording();
 
 	void pause();
-	void quit_testing_and_reapply(editor_command_input);
+	void finish_testing(editor_command_input, finish_testing_type);
 
 	void start_resume(editor_folder&);
 	void start_pause_resume(editor_folder&);
