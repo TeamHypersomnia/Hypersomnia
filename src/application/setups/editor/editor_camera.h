@@ -6,7 +6,7 @@
 
 struct intercosm;
 struct editor_view;
-struct editor_player;
+class editor_player;
 struct editor_camera_settings;
 
 namespace editor_detail {

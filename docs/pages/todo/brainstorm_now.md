@@ -7,42 +7,27 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - Implementation order
-
-- Problem: The results of re-applied commands might turn out completely off if...
-	- ...some entities were created in-game before e.g. duplicating some entities and later moving them
-		- this is because the generated ids won't correspond
-	- **CHOSEN SOLUTION:** Allow all commands on the test workspace, but...
-		- ...simply sanitize the re-applied commands to only affect **initially existing entities**
-		- E.g. duplicating or mirroring once will work just once
-		- If we need it in the future we can add some remapping later
-		- Just warn about this in GUI somehow
-		- Also remove commands for whom affected entities are none in this model
+	- Default chosen mode
+	- Initially there should be none
+	- Honestly why not choose it at fill stage?
 
 - Re-applying process
-	- **CHOSEN SOLUTION**: make commands redoable arbitrary number of times, then force-set revision and re-do
+	- **CHOSEN SOLUTION:** make commands redoable arbitrary number of times, then force-set revision and re-do
 		- most to code, probably cleanest architecturally
 			- not that much to code
-		- best performance and least ways it could go wrong, perhaps
-	- keep a copy of an un-executed command in a separate history
-		- worse space complexity, not much to code, not much clean architecturally
-	- undo everything and then re-do when the folder has been restored
+		- best processing performance and least ways it could go wrong, perhaps
+	- **RECONSIDER:** undo everything and then re-do when the folder has been restored
 		- least to code, worst performance
-
-- Manipulating the folder in place during playtest vs keeping another instance and redirecting
-	- **CHOSEN SOLUTION**: We should just std::move around on start and finish.
-		- Entry points for the folder might be quite many so that's hard to predict
-		- Anyway everything in the folder, incl. history, should be quickly std::movable
-			- folder has only 1000 bytes
-
-- Constraints in the playtest mode
-	- History will be the same one
-		- Though we can always make it different inside GUI
-	- we'll need to forbid undoing past the revision when we've started the playtest
-		- Or just interrupt on undo?
-	- we'll need to forbid filing with new scenes?
-		- The only things untouched by the fill are history and current_path
-		- Shouldn't matter really
-	- Some notification might be useful
+			- Will it be that bad?
+			- Playtests won't be that long anyway
+		- although... we'll need to skip some commands while undoing
+			- which is sorta dirty
+		- least to store as well
+		- actually this will save a lot on space
+		- and no need to force set revisions
+	- always keep a copy of an un-executed command in a separate history
+		- this only avoids the need to force-set revision and code re-redoability which isn't all that important
+		- worse space complexity, not much to code, not much clean architecturally
 
 - Player start
 	- **CHOSEN SOLUTION**: Store only the essentials
@@ -60,6 +45,37 @@ summary: That which we are brainstorming at the moment.
 						- actually, no, because we should always reset it to initial values
 				- history?
 					- NO! History will be the same, later we will only force-set revision
+
+- Constraints in the playtest mode
+	- we'll need to forbid undoing past the revision when we've started the playtest
+		- Or just interrupt on undo?
+		- Or just create a started playtest command?
+			- That's BS becasue it won't exist after re-application
+	- History will be left untouched?
+		- Though we can always make it different inside GUI
+	- we'll need to forbid filling with new scenes?
+		- The only things untouched by the fill are history and current_path
+		- Shouldn't matter really
+	- Some notification might be useful
+
+- Problem: The results of re-applied commands might turn out completely off if...
+	- ...some entities were created in-game before e.g. duplicating some entities and later moving them
+		- this is because the generated ids won't correspond
+	- **CHOSEN SOLUTION:** Allow all commands on the test workspace, but...
+		- ...simply sanitize the re-applied commands to only affect **initially existing entities**
+		- E.g. duplicating or mirroring once will work just once
+		- If we need it in the future we can add some remapping later
+		- Just warn about this in GUI somehow
+		- Also remove commands for whom affected entities are none in this model
+
+
+- Manipulating the folder in place during playtest vs keeping another instance and redirecting
+	- **CHOSEN SOLUTION**: We should just std::move around on start and finish.
+		- Entry points for the folder might be quite many so that's hard to predict
+		- Anyway everything in the folder, incl. history, should be quickly std::movable
+			- folder has only 1000 bytes
+
+- test the ensure handler
 
 - Existential commands vs those that depend on them
 	- Both need be sanitized anyway
@@ -87,6 +103,7 @@ summary: That which we are brainstorming at the moment.
 	- Store optional of state to be restored
 
 - Determinism: Change unordered containers to ordered ones in the mode state
+- Determinism: Change unordered containers to ordered ones in the entropy
 
 - Persistence of entity ids in editor and clearing them
 	- Where entity ids are in the editor state:
@@ -97,7 +114,7 @@ summary: That which we are brainstorming at the moment.
 		- Entity selector
 			- hovered
 			- held
-		- overridden_viewed_id
+		- ids.overridden_viewed
 		- Some commands
 		- ticked entities in fae gui
 	- What about selection groups when something is removed?

@@ -10,8 +10,8 @@
 #include "game/detail/inventory/perform_transfer.h"
 
 template <class key>
-size_t basic_cosmic_entropy<key>::length() const {
-	size_t total = 0;
+std::size_t basic_cosmic_entropy<key>::length() const {
+	std::size_t total = 0;
 
 	for (const auto& ent : intents_per_entity) {
 		total += ent.second.size();
@@ -26,6 +26,11 @@ size_t basic_cosmic_entropy<key>::length() const {
 	total += wields_per_entity.size();
 
 	return total;
+}
+
+template <class key>
+bool basic_cosmic_entropy<key>::empty() const {
+	return length() == 0;
 }
 
 template <class key>

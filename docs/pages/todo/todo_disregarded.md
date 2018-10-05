@@ -298,6 +298,7 @@ summary: Just a hidden scratchpad.
 	- we don't care much about that AI alters some state because virtually only ai will use that pathfinding
 	
 - ensure should throw so that the editor destructor can perform autosave
+	- then we won't be able to use std::abort...
 	- actually, if some modification caused crash, it would be better if the author can try to edit without it
 	- Then, in the editor, when the game is still unstable, we will catch an error during whenever we step the cosmos or change some sensitive valuesa,
 	- then upon catching, we will save the last known correct version to hdd.

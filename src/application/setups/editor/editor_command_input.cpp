@@ -33,13 +33,13 @@ void editor_command_input::interrupt_tweakers() const {
 }
 
 void editor_command_input::purge_selections() const {
-	folder.view.selected_entities.clear();
+	folder.view.ids.selected_entities.clear();
 	selector.clear();
 	mover.escape();
 }
 
 void editor_command_input::clear_selection_of(const entity_id id) const {
-	erase_element(folder.view.selected_entities, id);
+	erase_element(folder.view.ids.selected_entities, id);
 
 	selector.clear_selection_of(id);
 }

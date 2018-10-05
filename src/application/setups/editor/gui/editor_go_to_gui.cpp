@@ -39,10 +39,10 @@ void standard_confirm_go_to(const const_entity_handle match, const bool has_ctrl
 
 	if (match) {
 		if (has_ctrl) {
-			view.selected_entities.emplace(match);
+			view.ids.selected_entities.emplace(match);
 		}
 		else {
-			view.selected_entities = { match };
+			view.ids.selected_entities = { match };
 		}
 
 		if (!view.panned_camera.has_value()) {

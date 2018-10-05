@@ -57,7 +57,7 @@ real32 editor_setup::get_interpolation_ratio() const {
 
 entity_id editor_setup::get_viewed_character_id() const {
 	if (anything_opened()) {
-		const auto& overridden = view().overridden_viewed_id;
+		const auto& overridden = view().ids.overridden_viewed;
 
 		if (overridden.is_set()) {
 			return overridden;
@@ -67,7 +67,7 @@ entity_id editor_setup::get_viewed_character_id() const {
 
 		return std::visit(
 			[&](const auto& typed_mode) -> entity_id { 
-				return cosm[typed_mode.lookup(view().local_player_id)].get_id();
+				return cosm[typed_mode.lookup(view().ids.local_player)].get_id();
 			},
 			player().current_mode
 		);
@@ -92,7 +92,7 @@ bool editor_setup::is_editing_mode() const {
 	return anything_opened() ? player().is_editing_mode() : false;
 }
 
-bool editor_setup::is_gameplay_mode() const {
+bool editor_setup::is_gameplay_on() const {
 	return anything_opened() && !is_editing_mode();
 }
 
@@ -134,12 +134,12 @@ void editor_setup::override_viewed_entity(const entity_id overridden_id) {
 		on_mode_with_input(
 			[&](const auto& typed_mode, const auto&) {
 				if (const auto id = typed_mode.lookup(work().world[overridden_id].get_guid()); id.is_set()) {
-					view().local_player_id = id;
-					view().overridden_viewed_id = {};
+					view().ids.local_player = id;
+					view().ids.overridden_viewed = {};
 				}
 				else {
-					view().local_player_id = {};
-					view().overridden_viewed_id = overridden_id;
+					view().ids.local_player = {};
+					view().ids.overridden_viewed = overridden_id;
 				}
 			}
 		);
@@ -321,7 +321,7 @@ void editor_setup::perform_custom_imgui(
 
 	const bool has_ctrl = ImGui::GetIO().KeyCtrl;
 
-	if (!is_gameplay_mode()) {
+	if (!is_gameplay_on()) {
 		{
 			/* We don't want ugly borders in our menu bar */
 			auto window_border_size = scoped_style_var(ImGuiStyleVar_WindowBorderSize, 0.0f);
@@ -478,10 +478,10 @@ void editor_setup::perform_custom_imgui(
 		common_state_gui.perform(settings, make_command_input());
 
 		{
-			const auto output = fae_gui.perform(make_fae_gui_input(), view().selected_entities);
+			const auto output = fae_gui.perform(make_fae_gui_input(), view().ids.selected_entities);
 
 			if (const auto id = output.instantiate_id) {
-				if (is_gameplay_mode()) {
+				if (is_gameplay_on()) {
 					/* Go back to editing */
 					player().paused = true;
 				}
@@ -491,7 +491,7 @@ void editor_setup::perform_custom_imgui(
 				cmd.where.pos = *find_world_cursor_pos();
 				const auto& executed = post_editor_command(make_command_input(), std::move(cmd));
 				const auto created_id = executed.get_created_id();
-				view().selected_entities = { created_id };
+				view().ids.selected_entities = { created_id };
 				mover.start_moving_selection(make_mover_input());
 				make_last_command_a_child();
 			}
@@ -520,7 +520,7 @@ void editor_setup::perform_custom_imgui(
 				selections.emplace(held);
 
 				if (!view().ignore_groups) {
-					view().selection_groups.for_each_sibling(held, [&](const auto id){ selections.emplace(id); });
+					view().ids.selection_groups.for_each_sibling(held, [&](const auto id){ selections.emplace(id); });
 				}
 			}
 
@@ -536,7 +536,7 @@ void editor_setup::perform_custom_imgui(
 			const auto output = selected_fae_gui.perform(in, all_selected);
 
 			const auto& cosm = work().world;
-			output.filter.perform(cosm, view().selected_entities);
+			output.filter.perform(cosm, view().ids.selected_entities);
 		}
 
 		coordinates_gui.perform(*this, screen_size, mouse_pos, all_selected);
@@ -563,7 +563,7 @@ void editor_setup::perform_custom_imgui(
 				const auto draw_mode_in = draw_mode_gui_input { 
 					player().total_collected_entropy,
 					get_game_screen_top(), 
-					view().local_player_id, 
+					view().ids.local_player, 
 					game_atlas,
 					config
 				};
@@ -612,13 +612,13 @@ void editor_setup::clear_id_caches() {
 	selector.clear();
 
 	if (anything_opened()) {
-		view().selected_entities.clear();
+		view().ids.selected_entities.clear();
 	}
 }
 
 void editor_setup::finish_rectangular_selection() {
 	if (anything_opened()) {
-		selector.finish_rectangular(view().selected_entities);
+		selector.finish_rectangular(view().ids.selected_entities);
 	}
 }
 
@@ -627,8 +627,8 @@ setup_escape_result editor_setup::escape() {
 		ok_only_popup = std::nullopt;
 		return setup_escape_result::JUST_FETCH;
 	}
-	else if (anything_opened() && !player().paused) {
-		player().paused = true;
+	else if (anything_opened() && is_gameplay_on()) {
+		player().pause();
 		return setup_escape_result::SWITCH_TO_GAME_GUI;
 	}
 	else if (mover.escape()) {
@@ -812,40 +812,39 @@ void editor_setup::reveal_in_explorer(const augs::window& owner) {
 	owner.reveal_in_explorer(folder().get_paths().int_file);
 }
 
-void editor_setup::play() {
+void editor_setup::enter_testing_mode() {
 	if (anything_opened()) {
-		player().paused = false;
+		player().start_resume(folder());
 	}
 }
 
-void editor_setup::pause() {
+void editor_setup::quit_testing_mode() {
 	if (anything_opened()) {
-		player().paused = true;
+
 	}
 }
 
 void editor_setup::play_pause() {
 	if (anything_opened()) {
-		bool& f = player().paused;
-		f = !f;
+		player().start_pause_resume(folder());
 	}
 }
 
 void editor_setup::stop() {
 	if (anything_opened()) {
-		player().paused = true;
+		player().pause();
 	}
 }
 
 void editor_setup::prev() {
 	if (anything_opened()) {
-		player().paused = true;
+
 	}
 }
 
 void editor_setup::next() {
 	if (anything_opened()) {
-		player().paused = true;
+
 	}
 }
 
@@ -884,7 +883,6 @@ void editor_setup::close_folder(const folder_index i) {
 
 	if (signi.folders.empty()) {
 		signi.current_index = -1;
-		pause();
 	}
 	else {
 		signi.current_index = std::min(signi.current_index, static_cast<folder_index>(signi.folders.size() - 1));
@@ -905,7 +903,7 @@ editor_command_input editor_setup::make_command_input() {
 }
 
 grouped_selector_op_input editor_setup::make_grouped_selector_op_input() const {
-	return { view().selected_entities, view().selection_groups, view().ignore_groups };
+	return { view().ids.selected_entities, view().ids.selection_groups, view().ignore_groups };
 }
 
 editor_fae_gui_input editor_setup::make_fae_gui_input() {
@@ -922,7 +920,7 @@ void editor_setup::select_all_entities(const bool has_ctrl) {
 			work().world,
 			view().rect_select_mode,
 		   	has_ctrl,
-			view().selected_entities,
+			view().ids.selected_entities,
 			view().get_effective_selecting_filter()
 		);
 	}
@@ -1194,7 +1192,7 @@ bool editor_setup::handle_input_before_game(
 			}
 
 			{
-				auto& selections = view().selected_entities;
+				auto& selections = view().ids.selected_entities;
 
 				if (e.was_pressed(key::LMOUSE)) {
 					selector.do_left_press(cosm, has_ctrl, world_cursor_pos, selections);
@@ -1272,13 +1270,13 @@ bool editor_setup::handle_input_before_game(
 
 			switch (k) {
 				case key::O: 
-					if (view().selected_entities.size() == 1) { 
-						override_viewed_entity(*view().selected_entities.begin()); 
+					if (view().ids.selected_entities.size() == 1) { 
+						override_viewed_entity(*view().ids.selected_entities.begin()); 
 					}
 					return true;
 				case key::A: view().toggle_ignore_groups(); return true;
 				case key::Z: center_view_at_selection(); if (has_shift) { view().reset_zoom(); } return true;
-				case key::I: play(); return true;
+				case key::I: enter_testing_mode(); return true;
 				case key::E: mover.start_resizing_selection(make_mover_input(), false); return true;
 				case key::G: view().toggle_grid(); return true;
 				case key::S: view().toggle_snapping(); return true;
@@ -1289,7 +1287,7 @@ bool editor_setup::handle_input_before_game(
 				case key::DEL: delete_selection(); return true;
 				case key::T: mover.start_moving_selection(make_mover_input()); return true;
 				case key::R: mover.start_rotating_selection(make_mover_input()); return true;
-				case key::ADD: player().request_step(); return true;
+				case key::ADD: player().request_additional_step(); return true;
 				case key::H: hide_layers_of_selected_entities(); reperform_selector(); return true;
 				default: break;
 			}
@@ -1702,8 +1700,7 @@ void editor_setup::on_mode_with_input(F&& callback) const {
 	if (anything_opened()) {
 		auto& f = folder();
 
-		::on_mode_with_input(
-			player(),
+		player().on_mode_with_input(
 			f.mode_vars,
 			f.work->world,
 			std::forward<F>(callback)
@@ -1718,7 +1715,7 @@ void editor_setup::draw_mode_gui(const draw_setup_gui_input& in) {
 				const auto draw_mode_in = draw_mode_gui_input { 
 					player().total_collected_entropy,
 					get_game_screen_top(), 
-					view().local_player_id, 
+					view().ids.local_player, 
 					in.images_in_atlas,
 					in.config
 				};
@@ -1726,5 +1723,12 @@ void editor_setup::draw_mode_gui(const draw_setup_gui_input& in) {
 				arena_gui.draw_mode_gui(in, draw_mode_in, typed_mode, mode_input);
 			}
 		);
+	}
+}
+
+void editor_setup::ensure_handler() {
+	if (anything_opened()) {
+		player().ensure_handler(); 
+		force_autosave_now();
 	}
 }

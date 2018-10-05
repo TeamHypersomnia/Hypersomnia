@@ -161,8 +161,8 @@ class editor_setup : private current_access_cache<editor_setup> {
 		base::refresh();
 	}
 
-	void play();
-	void pause();
+	void enter_testing_mode();
+	void quit_testing_mode();
 
 	std::future<std::optional<std::string>> open_folder_dialog;
 	std::future<std::optional<std::string>> save_project_dialog;
@@ -254,8 +254,7 @@ public:
 		global_time_seconds += frame_delta.in_seconds();
 
 		if (anything_opened()) {
-			::advance_player(
-				player(),
+			player().advance_player(
 				frame_delta,
 				folder().mode_vars,
 				work().world,
@@ -317,7 +316,7 @@ public:
 	void finish_rectangular_selection();
 	void unhover();
 	bool is_editing_mode() const;
-	bool is_gameplay_mode() const;
+	bool is_gameplay_on() const;
 
 	bool is_mover_active() const {
 		return mover.is_active();
@@ -332,7 +331,7 @@ public:
 	template <class F>
 	void for_each_selected_entity(F&& callback) const {
 		if (anything_opened()) {
-			selector.for_each_selected_entity(std::forward<F>(callback), view().selected_entities);
+			selector.for_each_selected_entity(std::forward<F>(callback), view().ids.selected_entities);
 		}
 	}
 
@@ -525,4 +524,6 @@ public:
 
 	void hide_layers_of_selected_entities();
 	void unhide_all_layers();
+
+	void ensure_handler();
 };

@@ -5,6 +5,9 @@ permalink: reassurements
 summary: We don't need to do this yet, because...
 ---
 
+- Force autosaving for when setting a value in editor causes a crash?
+	- Actually this is pretty interactive so the cause will be readily known; not necessary
+
 - It makes little sense to enable editor GUI inside gameplay mode.
 	- We'll just make it possible to interact with imgui controls in-game.
 	- We don't have some fancy replay-preview stuff like in that other game we saw somewhere...

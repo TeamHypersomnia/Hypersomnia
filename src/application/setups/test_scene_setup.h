@@ -120,4 +120,6 @@ public:
 	}
 
 	void draw_custom_gui(const draw_setup_gui_input&) {}
+
+	void ensure_handler() {}
 };

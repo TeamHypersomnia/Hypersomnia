@@ -17,7 +17,7 @@ void change_grouping_command::redo(const editor_command_input in) {
 	ensure(group_indices_before.empty());
 
 	/* First, ungroup the affected entities */
-	auto& groups = in.folder.view.selection_groups;
+	auto& groups = in.folder.view.ids.selection_groups;
 
 	const auto pusher = [this](const auto index, auto& group, const auto it) {
 		group_indices_before.push_back(static_cast<unsigned>(index));
@@ -40,7 +40,7 @@ void change_grouping_command::redo(const editor_command_input in) {
 
 		for (std::size_t i = 0; i < num_indices; ++i) {
 			const auto idx = group_indices_after[i];
-			groups.set_group(idx, affected_entities[i]); 
+			groups.set_group(affected_entities[i], idx); 
 		}
 	}
 }
@@ -48,7 +48,7 @@ void change_grouping_command::redo(const editor_command_input in) {
 void change_grouping_command::undo(const editor_command_input in) {
 	ensure_eq(group_indices_before.size(), affected_entities.size());
 
-	auto& groups = in.folder.view.selection_groups;
+	auto& groups = in.folder.view.ids.selection_groups;
 
 	const auto eraser = [&](const auto, auto& group, const auto it) {
 		group.entries.erase(it);
@@ -57,6 +57,7 @@ void change_grouping_command::undo(const editor_command_input in) {
 	for (const auto& e : affected_entities) {
 		const auto found_group = groups.on_group_entry_of(e, eraser);
 
+#if DEBUG_COMMANDS
 		if (all_to_new_group || group_indices_after.size() > 0) {
 			/* 
 				We're undoing creation of new group or assigning to some, 
@@ -73,6 +74,9 @@ void change_grouping_command::undo(const editor_command_input in) {
 
 			ensure(!found_group);
 		}
+#else
+		(void)found_group;
+#endif
 	}
 
 	for (std::size_t i = 0; i < affected_entities.size(); ++i) {
@@ -80,7 +84,7 @@ void change_grouping_command::undo(const editor_command_input in) {
 			previous_group_index != static_cast<unsigned>(-1)
 		) {
 			const auto id = affected_entities[i];
-			groups.set_group(previous_group_index, id); 
+			groups.set_group(id, previous_group_index); 
 		}
 	}
 

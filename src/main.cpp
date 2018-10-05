@@ -500,6 +500,16 @@ int work(const int argc, const char* const * const argv) try {
 	std::signal(SIGSTOP, signal_handler);
 #endif
  
+	static auto main_ensure_handler = []() {
+		visit_current_setup(
+			[&](auto& setup) {
+				setup.ensure_handler();
+			}
+		);
+	};
+
+	::ensure_handler = main_ensure_handler;
+
 	static bool should_quit = false;
 
 	static auto do_main_menu_option = [](const main_menu_button_type t) {

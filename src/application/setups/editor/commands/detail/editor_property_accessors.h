@@ -262,13 +262,15 @@ struct editor_property_accessors {
 		in.folder.mode_vars.visit(
 			self.vars_type_id,
 			[&](auto& typed_mode_vars) {
-				on_field_address(
-					typed_mode_vars.at(self.vars_id),
-					self.field,
-					continue_if_nullopt([&](auto& resolved_field) {
-						return callback(resolved_field);
-					})
-				);
+				if (auto* const found_mode_vars = mapped_or_nullptr(typed_mode_vars.at(self.vars_id)) {
+					on_field_address(
+						*found_mode_vars,
+						self.field,
+						continue_if_nullopt([&](auto& resolved_field) {
+							return callback(resolved_field);
+						})
+					);
+				}
 			}
 		);
 	}
@@ -293,7 +295,7 @@ struct editor_property_accessors {
 		T in,
 		F callback
 	) {
-		auto& groups = in.folder.view.selection_groups.groups;
+		auto& groups = in.folder.view.ids.selection_groups.groups;
 
 		callback(groups[self.group_index].name);
 	}

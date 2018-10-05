@@ -1,4 +1,6 @@
 #pragma once
+#include <map>
+
 #include "game/cosmos/cosmic_entropy.h"
 #include "game/modes/mode_commands/team_choice.h"
 #include "game/modes/mode_commands/item_purchase.h"
@@ -21,7 +23,7 @@ struct mode_player_entropy {
 struct mode_entropy {
 	// GEN INTROSPECTOR struct mode_entropy
 	cosmic_entropy cosmic;
-	std::unordered_map<mode_player_id, mode_player_entropy> players;
+	std::map<mode_player_id, mode_player_entropy> players;
 	// END GEN INTROSPECTOR
 
 	void clear_dead_entities(const cosmos& cosm) {
@@ -31,5 +33,9 @@ struct mode_entropy {
 	void clear() {
 		cosmic.clear();
 		players.clear();
+	}
+
+	bool empty() const {
+		return players.empty() && cosmic.empty();
 	}
 };

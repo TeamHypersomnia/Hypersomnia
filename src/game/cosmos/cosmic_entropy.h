@@ -34,6 +34,8 @@ struct basic_cosmic_entropy {
 
 	void clear_dead_entities(const cosmos&);
 	void clear();
+
+	bool empty() const;
 };
 
 struct cosmic_entropy;

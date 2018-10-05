@@ -49,8 +49,7 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 			auto& folder = cmd_in.folder;
 			auto& player = cmd_in.get_player();
 
-			::on_mode_with_input(
-				player,
+			player.on_mode_with_input(
 				folder.mode_vars,
 				folder.work->world,
 				[&](auto& typed_mode, const auto& mode_input) {

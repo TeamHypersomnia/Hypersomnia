@@ -31,8 +31,8 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 	in.interrupt_tweakers();
 
 	auto& f = in.folder;
-	auto& selections = f.view.selected_entities;
-	auto& groups = f.view.selection_groups;
+	auto& selections = f.view.ids.selected_entities;
+	auto& groups = f.view.ids.selection_groups;
 
 	auto& cosm = in.get_cosmos();
 
@@ -238,7 +238,7 @@ void duplicate_entities_command::undo(const editor_command_input in) {
 	auto& cosm = in.get_cosmos();
 
 	auto& f = in.folder;
-	auto& selections = f.view.selected_entities;
+	auto& selections = f.view.ids.selected_entities;
 
 	duplicated_entities.for_each_reverse([&](const auto& e) {
 		cosmic::undo_last_create_entity(cosm[e.duplicated_id]);

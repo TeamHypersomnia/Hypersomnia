@@ -132,3 +132,12 @@ permalink: todo_low
 		- This will add a nice speedup, and also we will easily invalidate particles when particle flavour changes or is deleted.
 		- Particle types will also be pooled and will be a separate viewable.
 
+- Validity of files when we delete them arbitrarily from map files
+	- Don't worry about that now, they should anyway more or less work
+	- Intercosm alone is always good
+	- Deleted mode vars can invalidate ids
+	- so always check if id exists before determining a mode
+		- Indeed, we do this
+	- We probably shouldn't make these considerations and only ever expose .int and .modes? 
+	- view can be removed at will though it might break history
+

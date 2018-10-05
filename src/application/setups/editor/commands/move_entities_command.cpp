@@ -414,7 +414,7 @@ void move_entities_command::redo(const editor_command_input in) {
 
 	cosmic::reinfer_all_entities(cosm);
 
-	auto& selections = in.folder.view.selected_entities;
+	auto& selections = in.folder.view.ids.selected_entities;
 	selections.clear();
 
 	moved_entities.for_each([&](const auto id) {
@@ -430,7 +430,7 @@ void move_entities_command::undo(const editor_command_input in) {
 
 	cosmic::reinfer_all_entities(cosm);
 
-	in.folder.view.select_ids(moved_entities);
+	in.folder.view.ids.select(moved_entities);
 }
 
 
@@ -544,7 +544,7 @@ void resize_entities_command::redo(const editor_command_input in) {
 
 	cosmic::reinfer_all_entities(cosm);
 
-	in.folder.view.select_ids(resized_entities);
+	in.folder.view.ids.select(resized_entities);
 }
 
 void resize_entities_command::undo(const editor_command_input in) {
@@ -557,5 +557,5 @@ void resize_entities_command::undo(const editor_command_input in) {
 
 	cosmic::reinfer_all_entities(cosm);
 
-	in.folder.view.select_ids(resized_entities);
+	in.folder.view.ids.select(resized_entities);
 }

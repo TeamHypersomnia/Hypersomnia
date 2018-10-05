@@ -2,6 +2,8 @@
 #include "augs/log.h"
 #include "augs/build_settings/setting_enable_ensure.h"
 
+extern void (*ensure_handler)();
+
 void save_log_and_terminate();
 
 #if ENABLE_ENSURE && !FORCE_DISABLE_ENSURE

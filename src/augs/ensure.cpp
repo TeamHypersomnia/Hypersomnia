@@ -5,7 +5,13 @@
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/shell.h"
 
+void (*ensure_handler)() = nullptr;
+
 void save_log_and_terminate() {
+	if (ensure_handler != nullptr) {
+		ensure_handler();
+	}
+
 	if (augs::window::current_exists()) {
 		augs::window::get_current().disable_cursor_clipping();
 	}

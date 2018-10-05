@@ -65,10 +65,9 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 
 		if (!settings.start_bomb_mode) {
 			test_scene_mode mode;
-			view.local_player_id = mode.add_player({ test_vars, cosm }, faction_type::RESISTANCE);
+			view.ids.local_player = mode.add_player({ test_vars, cosm }, faction_type::RESISTANCE);
 
-			player.current_mode_vars_id = test_vars_id;
-			player.current_mode.emplace<test_scene_mode>(std::move(mode));
+			player.init_mode(std::move(mode), test_vars_id);
 		}
 	}
 
@@ -79,7 +78,7 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 		if (settings.start_bomb_mode) {
 			bomb_mode mode;
 
-			auto& player_id = view.local_player_id;
+			auto& player_id = view.ids.local_player;
 
 			{
 				const auto in = bomb_mode::input { bomb_vars, cosm.get_solvable().significant, cosm };
@@ -102,12 +101,9 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 				}
 			}
 
-			player.current_mode_vars_id = bomb_vars_id;
-			player.current_mode.emplace<bomb_mode>(std::move(mode));
+			player.init_mode(std::move(mode), bomb_vars_id);
 		}
 	}
-
-	player.mode_initial_signi = std::make_unique<cosmos_solvable_significant>(work->world.get_solvable().significant);
 }
 
 void fill_with_test_scene_command::undo(const editor_command_input in) {

@@ -1702,3 +1702,15 @@ i			- if the newly calculated target is different than last_reload_target, reset
 			- problem: if, on delete, we remove an entity from the group it belongs to, the undoing of delete doesn't know what to do
 				- grouping will be tracked by history
 				- thus let the delete command just store its own "ungroup entities" command and invoke it beforehand on all entries
+
+- Always perform autosave when starting the playtest?
+	- Okay, why not just force autosave when the ensure fails instead of always doing it?
+		- Automagically handles the write of last step
+		- Just let the player know if it happens during step so that it...
+		- okay, do we save the step to the map before or after it is performed?
+		- save before, but increment the counter *after* it is done
+		- in this way we'll have the player just shifted back always one step before the crash
+	- Then also equip the player with ability to always write the steps to file
+		- In this way when we have a crash, we can always repro easily
+	- A failed ensure should write-out the step buffer so we don't have to write every time
+		- We'll test this with some simulated crash later on

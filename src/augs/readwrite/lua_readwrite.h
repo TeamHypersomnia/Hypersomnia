@@ -234,9 +234,11 @@ namespace augs {
 							sol::object maybe_field = input_table[label];
 							
 							if (maybe_field.valid()) {
-								typename T::value_type value;
-								read_lua(maybe_field, value);
-								field.emplace(std::move(value));
+								if (field == std::nullopt) {
+									field.emplace();
+								}
+
+								read_lua(maybe_field, *field);
 							}
 						}
 						else if constexpr(is_maybe_v<T>) {

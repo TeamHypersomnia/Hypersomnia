@@ -146,7 +146,7 @@ void instantiate_flavour_command::redo(const editor_command_input in) {
 
 			built_description = typesafe_sprintf("Instantiated flavour: %x", flavour.get_name());
 
-			auto& selections = in.folder.view.selected_entities;
+			auto& selections = in.folder.view.ids.selected_entities;
 
 			try {
 				const auto created_entity = cosmic::specific_create_entity(
