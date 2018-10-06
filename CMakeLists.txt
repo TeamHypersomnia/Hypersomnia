@@ -1300,7 +1300,7 @@ if(MSVC)
 endif()
 
 if(CLANG)
-	list(APPEND HYPERSOMNIA_LIBS c++experimental dl Xi)
+	list(APPEND HYPERSOMNIA_LIBS c++fs c++experimental dl Xi)
 elseif(GCC)
 	list(APPEND HYPERSOMNIA_LIBS stdc++fs dl Xi)
 endif()

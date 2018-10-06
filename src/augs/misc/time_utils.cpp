@@ -27,6 +27,13 @@ augs::date_time::date_time(
 {
 }
 
+augs::date_time::date_time(
+	const augs::file_time_type& tp
+) : 
+	date_time(augs::file_time_type::clock::to_time_t(tp)) 
+{
+}
+
 std::string augs::date_time::get_stamp() const {
     std::tm local_time = *std::localtime(&t);
 

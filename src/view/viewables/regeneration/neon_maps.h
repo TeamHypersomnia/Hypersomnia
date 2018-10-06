@@ -4,6 +4,7 @@
 
 #include "augs/graphics/rgba.h"
 #include "augs/filesystem/path.h"
+#include "augs/filesystem/file_time_type.h"
 
 struct neon_map_input {
 	// GEN INTROSPECTOR struct neon_map_input
@@ -23,7 +24,7 @@ struct neon_map_input {
 struct neon_map_stamp {
 	// GEN INTROSPECTOR struct neon_map_stamp
 	neon_map_input input;
-	std::chrono::system_clock::time_point last_write_time_of_source;
+	augs::file_time_type last_write_time_of_source;
 	// END GEN INTROSPECTOR
 };
 

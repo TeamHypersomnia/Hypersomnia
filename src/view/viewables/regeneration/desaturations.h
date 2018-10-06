@@ -4,10 +4,11 @@
 
 #include "augs/graphics/rgba.h"
 #include "augs/filesystem/path.h"
+#include "augs/filesystem/file_time_type.h"
 
 struct desaturation_stamp {
 	// GEN INTROSPECTOR struct desaturation_stamp
-	std::chrono::system_clock::time_point last_write_time_of_source;
+	augs::file_time_type last_write_time_of_source;
 	// END GEN INTROSPECTOR
 };
 

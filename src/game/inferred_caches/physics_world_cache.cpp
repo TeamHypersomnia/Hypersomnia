@@ -29,8 +29,6 @@
 #include "game/enums/filters.h"
 #include "augs/misc/convex_partitioned_shape.hpp"
 
-#define DEBUG_PHYSICS_SYSTEM_COPY 1
-
 template <class E>
 auto calc_filters(const E& handle) {
 	const auto& colliders_data = handle.template get<invariants::fixtures>();

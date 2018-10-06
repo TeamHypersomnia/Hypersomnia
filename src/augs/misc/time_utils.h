@@ -2,6 +2,7 @@
 #include <ctime>
 #include <string>
 #include <chrono>
+#include "augs/filesystem/file_time_type.h"
 
 namespace augs {
 	struct date_time {
@@ -12,6 +13,7 @@ namespace augs {
 		date_time();
 		date_time(const std::time_t& t) : t(t) {}
 		date_time(const std::chrono::system_clock::time_point&);
+		date_time(const file_time_type&);
 
 		operator std::time_t() const {
 			return t;

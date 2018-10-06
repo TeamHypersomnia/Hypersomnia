@@ -9,10 +9,14 @@ summary: That which we are brainstorming at the moment.
 - Implement view early to know what's going on
 
 - GUI for the player
-	- Some timeline would be good
-		- Marks for when any input is applied
+	- Timeline
+		- Yellow marks at positions when when any input is applied
 			- Shown with regards to currently controlled entity
-	- Should be able to zoom out
+		- If recording, show the position marker in orange
+		- If replaying, in green
+		- Show world time and total editor time
+	- Should be able to zoom out?
+	- Moving around like in audacity
 
 - Implementation order
 	- Default chosen mode

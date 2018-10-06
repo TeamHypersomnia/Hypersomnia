@@ -35,7 +35,7 @@ namespace augs {
 	using file_open_error = std::ifstream::failure;
 	using filesystem_error = std::experimental::filesystem::filesystem_error;
 	
-	inline std::chrono::system_clock::time_point last_write_time(const path_type& path) {
+	inline auto last_write_time(const path_type& path) {
 		return std::experimental::filesystem::last_write_time(path);
 	}
 

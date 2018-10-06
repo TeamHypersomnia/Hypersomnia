@@ -44,7 +44,7 @@ add_executable(version_file_generator
 )
 
 if (CLANG)
-	target_link_libraries(version_file_generator c++experimental)
+	target_link_libraries(version_file_generator c++fs c++experimental)
 elseif(GCC)
 	target_link_libraries(version_file_generator stdc++fs)
 endif()
