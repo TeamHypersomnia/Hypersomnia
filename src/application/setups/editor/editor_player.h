@@ -129,4 +129,8 @@ public:
 	}
 
 	entity_guid lookup_character(mode_player_id) const;
+
+	using revision_type = editor_history::index_type;
+
+	revision_type get_revision_when_started_testing() const;
 };

@@ -178,3 +178,9 @@ entity_guid editor_player::lookup_character(const mode_player_id id) const {
 		current_mode
 	);
 }
+
+editor_player::revision_type editor_player::get_revision_when_started_testing() const {
+	ensure(has_testing_started());
+
+	return before_start.value().revision;
+}

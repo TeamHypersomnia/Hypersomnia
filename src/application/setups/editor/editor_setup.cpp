@@ -956,6 +956,12 @@ bool editor_setup::handle_input_before_imgui(
 		const bool has_ctrl{ common_input_state[key::LCTRL] };
 		const bool has_shift{ common_input_state[key::LSHIFT] };
 
+		if (!has_ctrl && k == key::ENTER) {
+			if (confirm_modal_popup()) {
+				return true;
+			}
+		}	
+
 		if (has_alt) {
 			switch (k) {
 				case key::A: fae_gui.open(); return true;
@@ -980,8 +986,8 @@ bool editor_setup::handle_input_before_imgui(
 			switch (k) {
 				case key::N: new_tab(); return true;
 				case key::O: open(window); return true;
-				case key::ENTER: return confirm_modal_popup();
 				case key::BACKSPACE: if (anything_opened()) { player().finish_testing(make_command_input(), finish_testing_type::DISCARD_CHANGES); }
+				case key::ENTER: if (anything_opened()) { player().finish_testing(make_command_input(), finish_testing_type::REAPPLY_CHANGES); }
 				default: break;
 			}
 		}
