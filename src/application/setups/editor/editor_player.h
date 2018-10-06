@@ -10,6 +10,8 @@
 #include "application/setups/editor/editor_history.h"
 #include "application/setups/editor/editor_view.h"
 
+#include "augs/templates/snapshotted_player.h"
+
 struct cosmos_solvable_significant;
 
 struct editor_folder;
@@ -37,25 +39,40 @@ enum class finish_testing_type {
 	DISCARD_CHANGES
 };
 
-class editor_player {
-	using entropy_type = mode_entropy;
+using editor_solvable_snapshot = std::vector<std::byte>;
+using editor_player_entropy_type = mode_entropy;
+using editor_player_base = augs::snapshotted_player<
+	editor_player_entropy_type,
+	editor_solvable_snapshot
+>;
 
-	enum class advance_type {
-		RECORDING,
-		REPLAYING
+template <class A, class C>
+struct player_advance_input_t {
+	const A& all_vars;
+	cosmos& cosm;
+	const C& callbacks;
+};
+
+template <class A, class C>
+auto player_advance_input(
+	const A& all_vars,
+	cosmos& cosm,
+	const C& callbacks
+) {
+	return player_advance_input_t<A, C> {
+		all_vars,
+		cosm,
+		callbacks
 	};
+}
+
+class editor_player : public editor_player_base {
+	using base = editor_player_base;
+	using introspect_base = base;
+	using step_type = base::step_type;
 
 	// GEN INTROSPECTOR class editor_player
-	double speed = 1.0;
-	int additional_steps = 0;
-	bool paused = true;
-	advance_type advance_mode = advance_type::RECORDING;
-
-	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
-
-	editor_player_step_type current_step = 0;
-	std::map<editor_player_step_type, entropy_type> step_to_entropy;
-	mode_entropy total_collected_entropy;
+	editor_player_entropy_type total_collected_entropy;
 
 	all_modes_variant current_mode;
 	mode_vars_id current_mode_vars_id = mode_vars_id();
@@ -79,10 +96,16 @@ class editor_player {
 
 	void initialize_testing(editor_folder&);
 
-public:
+	template <class I>
+	void advance_single_step(const I& input);
 
-	double get_speed() const;
-	void set_speed(double);
+	template <class I>
+	auto make_snapshotted_advance_input(const I& input);
+
+	template <class I>
+	auto make_set_snapshot(const I& input);
+
+public:
 
 	bool is_editing_mode() const;
 	bool has_testing_started() const;
@@ -90,12 +113,6 @@ public:
 	void control(const cosmic_entropy& entropy);
 	void control(const mode_entropy& entropy);
 
-	void request_additional_step();
-
-	void begin_replaying();
-	void begin_recording();
-
-	void pause();
 	void finish_testing(editor_command_input, finish_testing_type);
 
 	void start_resume(editor_folder&);
@@ -106,12 +123,10 @@ public:
 
 	void ensure_handler();
 
-	template <class A, class... Callbacks>
+	template <class I>
 	void advance_player(
 		augs::delta frame_delta,
-		const A& all_vars,
-		cosmos& cosm,
-		Callbacks&&... callbacks
+		const I& input
 	);
 
 	template <class... Args>
@@ -124,13 +139,18 @@ public:
 		return on_mode_with_input_impl(*this, std::forward<Args>(args)...);
 	}
 
-	const auto& get_timer() const {
-		return timer;
-	}
-
 	entity_guid lookup_character(mode_player_id) const;
 
 	using revision_type = editor_history::index_type;
 
 	revision_type get_revision_when_started_testing() const;
+
+	double get_current_secs() const;
+	double get_total_secs() const;
+
+	template <class I>
+	void seek_to(
+		step_type, 
+		const I& input
+	) const;
 };

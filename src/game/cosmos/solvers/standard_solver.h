@@ -4,15 +4,15 @@
 #include "game/cosmos/data_living_one_step.h"
 #include "game/cosmos/cosmic_functions.h"
 
+#include "game/cosmos/solvers/solver_callbacks.h"
+
 void standard_solve(const logic_step step);
 
 struct standard_solver {
-	template <class Pre, class Post, class PostCleanup>
+	template <class C>
 	void operator()(
 		logic_step_input input,
-		Pre pre_solve,
-		Post post_solve,
-		PostCleanup post_cleanup
+		C&& callbacks
 	) {
 		thread_local data_living_one_step queues;
 		const auto step = logic_step(input, queues);
@@ -22,11 +22,11 @@ struct standard_solver {
 		});
 
 		cosmic::increment_step(input.cosm);
-		pre_solve(step);
+		callbacks.pre_solve(step);
 		standard_solve(step);
-		post_solve(const_logic_step(step));
+		callbacks.post_solve(const_logic_step(step));
 		step.perform_deletions();
-		post_cleanup(const_logic_step(step));
+		callbacks.post_cleanup(const_logic_step(step));
 	}
 };
 

@@ -19,13 +19,14 @@ void make_redoable_for_different_solvable(
 		else {
 			static_assert(!has_affected_entities_v<T>);
 		}
+
+		typed_command.common.when_happened = 0;
 	};
 
 	std::visit(sanitize, command);
 }
 
 void editor_player::save_state_before_start(editor_folder& folder) {
-	LOG("Save state");
 	ensure(!before_start.has_value());
 	before_start.emplace();
 
@@ -40,7 +41,6 @@ void editor_player::save_state_before_start(editor_folder& folder) {
 }
 
 void editor_player::restore_saved_state(editor_folder& folder) {
-	LOG("Restore state");
 	ensure(before_start.has_value());
 	auto& backup = *before_start;
 
@@ -51,16 +51,8 @@ void editor_player::restore_saved_state(editor_folder& folder) {
 	before_start.reset();
 }
 
-double editor_player::get_speed() const {
-	return paused ? 0.0 : speed;
-}
-
-void editor_player::set_speed(const double new_speed) {
-	speed = new_speed;
-}
-
 bool editor_player::is_editing_mode() const {
-	return paused;
+	return is_paused();
 }
 
 bool editor_player::has_testing_started() const {
@@ -75,12 +67,6 @@ void editor_player::control(const mode_entropy& entropy) {
 	total_collected_entropy += entropy;
 }
 
-void editor_player::request_additional_step() {
-	if (has_testing_started()) {
-		++additional_steps;
-	}
-}
-
 void editor_player::finish_testing(const editor_command_input in, const finish_testing_type mode) {
 	if (!has_testing_started()) {
 		return;
@@ -93,8 +79,7 @@ void editor_player::finish_testing(const editor_command_input in, const finish_t
 
 	restore_saved_state(f);
 
-	paused = true;
-	current_step = 0;
+	base::finish();
 
 	h.force_set_current_revision(start_revision);
 
@@ -113,12 +98,9 @@ void editor_player::finish_testing(const editor_command_input in, const finish_t
 }
 
 void editor_player::initialize_testing(editor_folder& f) {
-	begin_recording();
 	save_state_before_start(f);
 
-	current_step = 0;
-	step_to_entropy.clear();
-	total_collected_entropy.clear();
+	base::start();
 
 	std::visit(
 		[&](auto& typed_mode) {
@@ -133,34 +115,22 @@ void editor_player::start_resume(editor_folder& f) {
 		initialize_testing(f);
 	}
 
-	paused = false;
-}
-
-void editor_player::pause() {
-	paused = true;
+	base::resume();
 }
 
 void editor_player::start_pause_resume(editor_folder& f) {
-	if (paused) {
+	if (is_paused()) {
 		start_resume(f);
 	}
 	else {
-		paused = true;
+		pause();
 	}
-}
-
-void editor_player::begin_replaying() {
-	advance_mode = advance_type::REPLAYING;
-}
-
-void editor_player::begin_recording() {
-	advance_mode = advance_type::RECORDING;
 }
 
 void editor_player::ensure_handler() {
 	/* So that we don't accidentally overwrite the repro: */
-	begin_replaying();
-	pause();
+	base::begin_replaying();
+	base::pause();
 
 	/* 
 		The editor step is not yet incremented,

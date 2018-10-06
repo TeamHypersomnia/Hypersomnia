@@ -19,6 +19,7 @@
 #include "application/setups/editor/commands/flavour_commands.h"
 
 #include "application/setups/editor/editor_history_declaration.h"
+#include "application/setups/editor/editor_command_input.h"
 
 struct editor_history : public editor_history_base {
 	using introspect_base = editor_history_base;
@@ -27,12 +28,9 @@ struct editor_history : public editor_history_base {
 
 	inline bool next_command_has_parent() const;
 
-	template <class T, class... RedoArgs>
-	const T& execute_new(T&& command, RedoArgs&&... redo_args);
+	template <class T>
+	const T& execute_new(T&& command, editor_command_input);
 
-	template <class... Args>
-	void redo(Args&&... args);
-
-	template <class... Args>
-	void undo(Args&&... args);
+	void redo(editor_command_input);
+	void undo(editor_command_input);
 };

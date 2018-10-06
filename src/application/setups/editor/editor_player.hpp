@@ -1,6 +1,6 @@
 #pragma once
 #include "application/setups/editor/editor_player.h"
-#include "game/cosmos/cosmos.h"
+#include "application/intercosm.h"
 
 template <class E, class A, class C, class F>
 decltype(auto) editor_player::on_mode_with_input_impl(
@@ -34,58 +34,91 @@ decltype(auto) editor_player::on_mode_with_input_impl(
 	}
 }
 
-template <class A, class... Callbacks>
-void editor_player::advance_player(
-	augs::delta frame_delta,
-	const A& all_vars,
-	cosmos& cosm,
-	Callbacks&&... callbacks
-) {
-	auto& self = *this;
-
-	if (!self.paused) {
-		self.timer.advance(frame_delta *= self.speed);
-	}
-
-	auto steps = self.additional_steps + self.timer.extract_num_of_logic_steps(cosm.get_fixed_delta());
-
-	on_mode_with_input(
-		all_vars,
-		cosm,
-		[&](auto& typed_mode, const auto& in) {
-			while (steps--) {
-				auto& applied_entropy = self.total_collected_entropy;
-				auto& step_i = self.current_step;
-
-				applied_entropy.clear_dead_entities(cosm);
-
-				switch (self.advance_mode) {
-					case advance_type::REPLAYING:
-						if (const auto found_entropy = mapped_or_nullptr(step_to_entropy, step_i)) {
-							applied_entropy = *found_entropy;
-						}
-						
-					case advance_type::RECORDING:
-						if (!applied_entropy.empty()) {
-							step_to_entropy[step_i] = applied_entropy;
-						}
-
-					default: break;
-				}
-
+template <class I>
+auto editor_player::make_snapshotted_advance_input(const I& in) {
+	auto step_callback = [&](const auto& applied_entropy) {
+		on_mode_with_input(
+			in.all_vars,
+			in.cosm,
+			[&](auto& typed_mode, const auto& in) {
 				typed_mode.advance(
 					in,
 					applied_entropy,
-					std::forward<Callbacks>(callbacks)...
+					in.callbacks
 				);
-
-				applied_entropy.clear();
-				++step_i;
 			}
-		}
-	);
+		);
+	};
 
-	self.additional_steps = 0;
+	auto make_snapshot = [&](const auto n) -> editor_solvable_snapshot {
+		if (n == 0) {
+			return {};
+		}
+		
+		augs::memory_stream ms;
+
+		augs::write_bytes(ms, current_mode);
+		augs::write_bytes(ms, in.cosm.get_solvable().significant);
+
+		return std::move(ms);//ms.operator std::vector<std::byte>&&();
+	};
+
+	return augs::snapshotted_advance_input(
+		total_collected_entropy,
+		step_callback,
+		make_snapshot
+	);
+}
+
+template <class I>
+auto editor_player::make_set_snapshot(const I& in) {
+	return [&](const auto n, const auto& snapshot) {
+		if (n == 0) {
+			in.cosm = before_start.value().work->world;
+		}
+
+		auto ss = augs::cref_memory_stream(snapshot);
+
+		augs::read_bytes(ss, current_mode);
+		in.cosm.read_solvable_from(n, ss);
+	};
+}
+
+template <class I>
+void editor_player::seek_to(
+	const editor_player::step_type step, 
+	const I& in
+) const {
+	if constexpr(std::is_same_v<I, editor_folder>) {
+		auto& all_vars = in.
+
+		seek_to(
+			step,
+			player_advance_input(
+				all_vars,
+				in.work->world,
+				solver_callbacks()
+			)
+		);
+	}
+
+	base::seek_to(
+		step,
+		make_snapshotted_advance_input(in),
+		make_set_snapshot(in)
+	);
+}
+
+template <class I>
+void editor_player::advance_player(
+	augs::delta frame_delta,
+	const I& in
+) {
+	base::advance(
+		make_snapshotted_advance_input(in),
+		frame_delta,
+		in.cosm.get_fixed_delta()
+	);
 }
 
 template <class M>

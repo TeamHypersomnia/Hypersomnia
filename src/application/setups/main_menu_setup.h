@@ -114,10 +114,10 @@ public:
 	void customize_for_viewing(config_lua_table& config) const;
 	void apply(const config_lua_table& config);
 
-	template <class... Callbacks>
+	template <class C>
 	void advance(
 		const augs::delta frame_delta,
-		Callbacks&&... callbacks
+		const C& callbacks
 	) {
 		latest_news_pos.x += frame_delta.per_second(50.f);
 
@@ -131,7 +131,7 @@ public:
 			mode.advance(
 				{ mode_vars, intro.world },
 				{ total_collected_entropy, {} },
-				std::forward<Callbacks>(callbacks)...
+				callbacks
 			);
 
 			total_collected_entropy.clear();

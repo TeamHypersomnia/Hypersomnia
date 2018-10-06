@@ -4,6 +4,7 @@
 
 #include "application/setups/editor/editor_command_input.h"
 #include "application/setups/editor/editor_folder.h"
+#include "application/setups/editor/editor_player.h"
 #include "application/setups/editor/gui/editor_history_gui.h"
 
 void editor_history_gui::perform(const editor_command_input in) {
@@ -36,6 +37,16 @@ void editor_history_gui::perform(const editor_command_input in) {
 	text_disabled("When");
 	ImGui::NextColumn();
 	ImGui::Separator();
+
+	const auto playtest_start_revision = [&]() -> std::optional<index_type> {
+		const auto& p = in.folder.player;
+
+		if (p.has_testing_started()) {
+			return p.get_revision_when_started_testing();
+		}
+
+		return std::nullopt;
+	}();
 
 	auto do_history_node = [&](
 		const index_type command_index,
@@ -83,6 +94,13 @@ void editor_history_gui::perform(const editor_command_input in) {
 
 		if (ImGui::IsItemClicked()) {
 			history.seek_to_revision(command_index, in);
+		}
+
+		if (playtest_start_revision == command_index) {
+			//ImGui::PushStyleColor(ImGuiCol_HeaderHovered, red);
+			//ImGui::Selectable("(Playtesting started)", false);
+			//ImGui::PopStyleColor();
+			text_disabled("(Playtesting started)");
 		}
 
 		ImGui::NextColumn();

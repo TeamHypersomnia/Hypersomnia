@@ -6,15 +6,44 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Since sending of entropy will be highly optimized for space, it makes no sense to have augs::container_with_small_size
+
+- Implement tree node for the children of commands in history gui
+
+- Replaying and commands
+	- Problems include:
+		- Should we automatically set to replaing on ctrl+z or leave it at recording and always delete later entries?
+			- automatically pause on ctrl+z?
+		- rewrite_change during playtest
+			- We can just spam with commands
+	- Should they be undone/redone according to the timeline?
+	- We will have to redo commands as the player advances
+		- Makes sense, will let us compare some changes in a consistent fashion
+
+- Later if we want to concatenate recorded entropies, we may just hold a step_to_entropy per each concerned player and accumulate them before step
+
 - Implement view early to know what's going on
+
+- Snapshots during recording
+	- To have total determinism, just always reinfer at snapshot times, even when recording
+		- This way we don't have to store inferred state in snapshots
+		- This will also be a good way to test stability of the simulation under a spontaneous need to reinfer
+			- e.g. on a new connection
+	- and serialize the solvable to save on space storage
+		- it will also probably be faster to serialize to bytes than to recreate entire containers with some complex maps, should there be any
+			- e.g. in pending mounts
+		- deserialization will be slower but it won't be used as often
 
 - GUI for the player
 	- Timeline
+		- IMGUI is the way to go, really
+			- Builtin horizontal scrollbar, tooltip, child windows, selection control, etc
 		- Yellow marks at positions when when any input is applied
 			- Shown with regards to currently controlled entity
 		- If recording, show the position marker in orange
 		- If replaying, in green
 		- Show world time and total editor time
+		- If a command was pasted, the marker should be cyan
 	- Should be able to zoom out?
 	- Moving around like in audacity
 

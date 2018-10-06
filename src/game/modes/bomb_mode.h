@@ -383,29 +383,28 @@ public:
 	template <class C, class F>
 	void for_each_player_handle_in(C&, faction_type, F&& callback) const;
 
-	template <class PreSolve, class PostSolve, class... Callbacks>
+	template <class C>
+	auto combine_callbacks(const C& callbacks) {
+		return callbacks.combine(
+			[&](auto pre_solve, const logic_step step) {
+				pre_solve(step);
+				mode_pre_solve(in, entropy, step);
+			},
+			[&](auto post_solve, const const_logic_step step) {
+				mode_post_solve(in, entropy, step);
+				post_solve(step);
+			}
+		);
+	}
+
+	template <class C>
 	void advance(
 		const input in, 
 		const mode_entropy& entropy, 
-		PreSolve&& pre_solve,
-		PostSolve&& post_solve,
-		Callbacks&&... callbacks
+		const C& callbacks
 	) {
-		{
-			const auto input = logic_step_input { in.cosm, entropy.cosmic };
+		const auto input = logic_step_input { in.cosm, entropy.cosmic };
 
-			standard_solver()(
-				input,
-				[&](const logic_step step) {
-					pre_solve(step);
-					mode_pre_solve(in, entropy, step);
-				},
-				[&](const const_logic_step step) {
-					mode_post_solve(in, entropy, step);
-					post_solve(step);
-				},
-				std::forward<Callbacks>(callbacks)...
-			);
-		}
+		standard_solver()(input, combine_callbacks(callbacks));
 	}
 };

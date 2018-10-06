@@ -5,6 +5,9 @@ permalink: reassurements
 summary: We don't need to do this yet, because...
 ---
 
+- Ensure that the main's presolve doesn't change the solvable
+	- Indeed it is only about debug lines
+
 - Force autosaving for when setting a value in editor causes a crash?
 	- Actually this is pretty interactive so the cause will be readily known; not necessary
 

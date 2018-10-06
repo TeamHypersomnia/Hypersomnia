@@ -712,12 +712,14 @@ int work(const int argc, const char* const * const argv) try {
 
 		setup.advance(
 			frame_delta,
-			setup_pre_solve,
-			[&](const const_logic_step step) {
-				_setup_post_solve(step, viewing_config);
-				_audiovisual_step(augs::delta::zero, setup.get_audiovisual_speed(), viewing_config);
-			},
-			setup_post_cleanup
+			solver_callbacks(
+				setup_pre_solve,
+				[&](const const_logic_step step) {
+					_setup_post_solve(step, viewing_config);
+					_audiovisual_step(augs::delta::zero, setup.get_audiovisual_speed(), viewing_config);
+				},
+				setup_post_cleanup
+			)
 		);
 
 		audiovisuals.randomizing.last_frame_delta = frame_delta;

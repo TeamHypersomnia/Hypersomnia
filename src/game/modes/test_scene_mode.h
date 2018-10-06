@@ -62,24 +62,24 @@ public:
 
 	void request_restart() { players.clear(); }
 
-	template <class PreSolve, class... Callbacks>
+	template <class C>
+	auto combine_callbacks(const C& callbacks) {
+		return callbacks.combine(
+			[&](auto pre_solve, const logic_step step) {
+				pre_solve(step);
+				mode_pre_solve(in, entropy, step);
+			}
+		);
+	}
+
+	template <class C>
 	void advance(
 		const input in, 
 		const mode_entropy& entropy, 
-		PreSolve&& pre_solve,
-		Callbacks&&... callbacks
+		const C& callbacks
 	) {
-		{
-			const auto input = logic_step_input { in.cosm, entropy.cosmic };
+		const auto input = logic_step_input { in.cosm, entropy.cosmic };
 
-			standard_solver()(
-				input,
-				[&](const logic_step step) {
-					pre_solve(step);
-					mode_pre_solve(in, entropy, step);
-				},
-				std::forward<Callbacks>(callbacks)...
-			);
-		}
+		standard_solver()(input, combine_callbacks(callbacks));
 	}
 };

@@ -11,8 +11,8 @@ inline bool editor_history::next_command_has_parent() const {
 	);
 }
 
-template <class T, class... RedoArgs>
-const T& editor_history::execute_new(T&& command, RedoArgs&&... redo_args) {
+template <class T>
+const T& editor_history::execute_new(T&& command, const editor_command_input in) {
 	command.common.reset_timestamp();
 
 	if (has_last_command()) {
@@ -28,15 +28,37 @@ const T& editor_history::execute_new(T&& command, RedoArgs&&... redo_args) {
 		}
 	}
 
+	command.common.when_happened = in.folder.player.get_current_step();
+
 	return editor_history_base::execute_new(
 		std::forward<T>(command),
-		std::forward<RedoArgs>(redo_args)...
+		in
 	);
 }
 
-template <class... Args>
-void editor_history::redo(Args&&... args) {
-	while (editor_history_base::redo(std::forward<Args>(args)...)) {
+inline void editor_history::redo(const editor_command_input in) {
+	auto do_redo = [&]() {
+		auto& p = in.get_player();
+
+		if (p.has_testing_started() && has_next_command()) {
+			std::visit(
+				[&](const auto& cmd) {
+					using T = remove_cref<decltype(cmd)>;
+
+					if constexpr(needs_valid_solvable_v<T>) {
+						const auto& target_step = cmd.common.when_happened;
+
+						p.seek_to(target_step, in.folder);
+					}
+				},
+				next_command()
+			);
+		}
+
+		return editor_history_base::redo(in);
+	};
+
+	while (do_redo()) {
 		if (has_next_command() && next_command_has_parent()) {
 			continue;
 		}
@@ -45,9 +67,29 @@ void editor_history::redo(Args&&... args) {
 	}
 }
 
-template <class... Args>
-void editor_history::undo(Args&&... args) {
-	while (editor_history_base::undo(std::forward<Args>(args)...)) {
+inline void editor_history::undo(const editor_command_input in) {
+	auto do_undo = [&]() {
+		auto& p = in.get_player();
+
+		if (p.has_testing_started() && has_last_command()) {
+			std::visit(
+				[&](const auto& cmd) {
+					using T = remove_cref<decltype(cmd)>;
+
+					if constexpr(needs_valid_solvable_v<T>) {
+						const auto& target_step = cmd.common.when_happened;
+
+						p.seek_to(target_step);
+					}
+				},
+				last_command()
+			);
+		}
+
+		return editor_history_base::undo(in);
+	};
+
+	while (do_undo()) {
 		if (has_next_command() && next_command_has_parent()) {
 			continue;
 		}

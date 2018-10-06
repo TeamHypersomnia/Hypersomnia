@@ -45,13 +45,20 @@ bool cosmos::empty() const {
 	return get_solvable().empty();
 }
 
-void cosmos::set(const cosmos_solvable_significant& signi) {
-	cosmic::change_solvable_significant(*this, [&](cosmos_solvable_significant& s){ 
+void cosmos::set(const cosmos_solvable_significant& new_signi) {
+	cosmic::change_solvable_significant(*this, [&](cosmos_solvable_significant& current_signi){ 
 		{
 			auto scope = measure_scope(profiler.duplication);
-			s = signi; 
+			current_signi = new_signi; 
 		}
 
+		return changer_callback_result::REFRESH; 
+	});
+}
+
+void cosmos::read_solvable_from(const augs::cref_memory_stream& ss) {
+	cosmic::change_solvable_significant(*this, [&](cosmos_solvable_significant& current_signi) { 
+		augs::read_bytes(ss, current_signi);
 		return changer_callback_result::REFRESH; 
 	});
 }

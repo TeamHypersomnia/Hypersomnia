@@ -238,19 +238,21 @@ public:
 	void customize_for_viewing(config_lua_table& cfg) const;
 	void apply(const config_lua_table& cfg);
 
-	template <class... Callbacks>
+	template <class C>
 	void advance(
 		augs::delta frame_delta,
-		Callbacks&&... callbacks
+		const C& callbacks
 	) {
 		global_time_seconds += frame_delta.in_seconds();
 
 		if (anything_opened()) {
 			player().advance_player(
 				frame_delta,
-				folder().mode_vars,
-				work().world,
-				std::forward<Callbacks>(callbacks)...
+				player_advance_input(
+					folder().mode_vars,
+					work().world,
+					callbacks
+				)
 			);
 		}
 	}

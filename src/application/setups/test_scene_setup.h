@@ -81,10 +81,10 @@ public:
 		return setup_escape_result::IGNORE;
 	}
 
-	template <class... Callbacks>
+	template <class C>
 	void advance(
 		const augs::delta frame_delta,
-		Callbacks&&... callbacks
+		const C& callbacks
 	) {
 		timer.advance(frame_delta);
 		auto steps = timer.extract_num_of_logic_steps(get_viewed_cosmos().get_fixed_delta());
@@ -97,7 +97,7 @@ public:
 			mode.advance(
 				{ mode_vars, scene.world },
 				{ total_collected_entropy, {} },
-				std::forward<Callbacks>(callbacks)...
+				callbacks
 			);
 
 			total_collected_entropy.clear();
