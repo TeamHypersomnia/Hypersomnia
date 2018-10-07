@@ -36,6 +36,8 @@ namespace augs {
 
 	protected:
 		enum class advance_type {
+			PAUSED,
+
 			RECORDING,
 			REPLAYING
 		};
@@ -44,7 +46,7 @@ namespace augs {
 
 		// GEN INTROSPECTOR class snapshotted_player class A class B
 		std::map<step_type, entropy_type> step_to_entropy;
-		advance_type advance_mode = advance_type::RECORDING;
+		advance_type advance_mode = advance_type::PAUSED;
 		step_type current_step = 0;
 
 		unsigned snapshot_frequency_in_steps = 3000;
@@ -54,10 +56,10 @@ namespace augs {
 
 		double speed = 1.0;
 		int additional_steps = 0;
-		bool paused = true;
 		// END GEN INTROSPECTOR
 
-		void push_snapshot_if_needed();
+		template <class MakeSnapshot>
+		void push_snapshot_if_needed(MakeSnapshot&&);
 
 		template <class I>
 		void advance_single_step(const I& input);
@@ -66,7 +68,7 @@ namespace augs {
 		template <class I>
 		void advance(
 			const I& input,
-			const delta& frame_delta, 
+			delta frame_delta, 
 			const delta& fixed_delta
 		);
 
@@ -83,11 +85,9 @@ namespace augs {
 			step_type, 
 			const I& input,
 			SetSnapshot&& set_snapshot
-		) const;
+		);
 
-		void seek_to(editor_player_step_type) const;
-
-		void first_start();
+		void seek_to(editor_player_step_type);
 
 		const fixed_delta_timer& get_timer() const;
 
@@ -98,7 +98,7 @@ namespace augs {
 
 		bool is_paused() const;
 
-		void request_additional_step();
+		void request_steps(int amount);
 
 		void begin_replaying();
 		void begin_recording();

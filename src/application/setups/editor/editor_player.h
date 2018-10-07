@@ -105,8 +105,9 @@ class editor_player : public editor_player_base {
 	template <class I>
 	auto make_set_snapshot(const I& input);
 
-public:
+	augs::delta get_chosen_delta() const;
 
+public:
 	bool is_editing_mode() const;
 	bool has_testing_started() const;
 
@@ -115,8 +116,8 @@ public:
 
 	void finish_testing(editor_command_input, finish_testing_type);
 
-	void start_resume(editor_folder&);
-	void start_pause_resume(editor_folder&);
+	void begin_recording(editor_folder&);
+	void begin_replaying(editor_folder&);
 
 	template <class M>
 	void choose_mode(const mode_vars_id& vars_id);
@@ -151,6 +152,6 @@ public:
 	template <class I>
 	void seek_to(
 		step_type, 
-		const I& input
-	) const;
+		I&& input
+	);
 };

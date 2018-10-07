@@ -1,6 +1,8 @@
 #pragma once
 #include "application/setups/editor/editor_player.h"
 #include "application/intercosm.h"
+#include "augs/templates/snapshotted_player.hpp"
+#include "application/setups/editor/editor_folder.hpp"
 
 template <class E, class A, class C, class F>
 decltype(auto) editor_player::on_mode_with_input_impl(
@@ -36,37 +38,37 @@ decltype(auto) editor_player::on_mode_with_input_impl(
 
 template <class I>
 auto editor_player::make_snapshotted_advance_input(const I& in) {
-	auto step_callback = [&](const auto& applied_entropy) {
-		on_mode_with_input(
-			in.all_vars,
-			in.cosm,
-			[&](auto& typed_mode, const auto& in) {
-				typed_mode.advance(
-					in,
-					applied_entropy,
-					in.callbacks
-				);
-			}
-		);
-	};
-
-	auto make_snapshot = [&](const auto n) -> editor_solvable_snapshot {
-		if (n == 0) {
-			return {};
-		}
-		
-		augs::memory_stream ms;
-
-		augs::write_bytes(ms, current_mode);
-		augs::write_bytes(ms, in.cosm.get_solvable().significant);
-
-		return std::move(ms);//ms.operator std::vector<std::byte>&&();
-	};
-
 	return augs::snapshotted_advance_input(
 		total_collected_entropy,
-		step_callback,
-		make_snapshot
+
+		[&](const auto& applied_entropy) {
+			/* step */
+			on_mode_with_input(
+				in.all_vars,
+				in.cosm,
+				[&](auto& typed_mode, const auto& mode_in) {
+					typed_mode.advance(
+						mode_in,
+						applied_entropy,
+						in.callbacks
+					);
+				}
+			);
+		},
+
+		[&](const auto n) -> editor_solvable_snapshot {
+			/* make_snapshot */
+			if (n == 0) {
+				return {};
+			}
+			
+			augs::memory_stream ms;
+
+			augs::write_bytes(ms, current_mode);
+			augs::write_bytes(ms, in.cosm.get_solvable().significant);
+
+			return std::move(ms);//ms.operator std::vector<std::byte>&&();
+		}
 	);
 }
 
@@ -75,38 +77,33 @@ auto editor_player::make_set_snapshot(const I& in) {
 	return [&](const auto n, const auto& snapshot) {
 		if (n == 0) {
 			in.cosm = before_start.value().work->world;
+			return;
 		}
 
 		auto ss = augs::cref_memory_stream(snapshot);
 
 		augs::read_bytes(ss, current_mode);
-		in.cosm.read_solvable_from(n, ss);
+		in.cosm.read_solvable_from(ss);
 	};
 }
 
 template <class I>
 void editor_player::seek_to(
 	const editor_player::step_type step, 
-	const I& in
-) const {
-	if constexpr(std::is_same_v<I, editor_folder>) {
-		auto& all_vars = in.
+	I&& in
+) {
+	if constexpr(std::is_same_v<remove_cref<I>, editor_folder>) {
+		auto& folder = in;
 
-		seek_to(
+		this->seek_to(step, folder.make_player_advance_input(solver_callbacks()));
+	}
+	else {
+		base::seek_to(
 			step,
-			player_advance_input(
-				all_vars,
-				in.work->world,
-				solver_callbacks()
-			)
+			make_snapshotted_advance_input(std::forward<I>(in)),
+			make_set_snapshot(std::forward<I>(in))
 		);
 	}
-
-	base::seek_to(
-		step,
-		make_snapshotted_advance_input(in),
-		make_set_snapshot(in)
-	);
 }
 
 template <class I>

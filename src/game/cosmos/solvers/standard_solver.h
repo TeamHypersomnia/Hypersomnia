@@ -5,6 +5,7 @@
 #include "game/cosmos/cosmic_functions.h"
 
 #include "game/cosmos/solvers/solver_callbacks.h"
+#include "game/organization/all_messages_includes.h"
 
 void standard_solve(const logic_step step);
 

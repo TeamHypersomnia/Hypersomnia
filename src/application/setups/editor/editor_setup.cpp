@@ -806,42 +806,6 @@ void editor_setup::reveal_in_explorer(const augs::window& owner) {
 	owner.reveal_in_explorer(folder().get_paths().int_file);
 }
 
-void editor_setup::enter_testing_mode() {
-	if (anything_opened()) {
-		player().start_resume(folder());
-	}
-}
-
-void editor_setup::quit_testing_mode() {
-	if (anything_opened()) {
-
-	}
-}
-
-void editor_setup::play_pause() {
-	if (anything_opened()) {
-		player().start_pause_resume(folder());
-	}
-}
-
-void editor_setup::stop() {
-	if (anything_opened()) {
-		player().pause();
-	}
-}
-
-void editor_setup::prev() {
-	if (anything_opened()) {
-
-	}
-}
-
-void editor_setup::next() {
-	if (anything_opened()) {
-
-	}
-}
-
 void editor_setup::new_tab() {
 	try_to_open_new_folder([&](editor_folder& t) {
 		t.current_path = get_first_free_untitled_path("Project%x");
@@ -942,12 +906,6 @@ bool editor_setup::handle_input_before_imgui(
 		switch (k) {
 			case key::PAGEUP: move_currently_viewed(-1); return true;
 			case key::PAGEDOWN: move_currently_viewed(1); return true;
-
-			/* Media buttons work regardless of pause */
-			case key::PLAY_PAUSE_TRACK: play_pause(); return true;
-			case key::PREV_TRACK: prev(); return true;
-			case key::NEXT_TRACK: next(); return true;
-			case key::STOP_TRACK: stop(); return true;
 
 			default: break;
 		}
@@ -1275,7 +1233,8 @@ bool editor_setup::handle_input_before_game(
 					return true;
 				case key::A: view().toggle_ignore_groups(); return true;
 				case key::Z: center_view_at_selection(); if (has_shift) { view().reset_zoom(); } return true;
-				case key::I: enter_testing_mode(); return true;
+				case key::I: player().begin_recording(folder()); return true;
+				case key::L: player().begin_replaying(folder()); return true;
 				case key::E: mover.start_resizing_selection(make_mover_input(), false); return true;
 				case key::G: view().toggle_grid(); return true;
 				case key::S: view().toggle_snapping(); return true;
@@ -1286,7 +1245,8 @@ bool editor_setup::handle_input_before_game(
 				case key::DEL: delete_selection(); return true;
 				case key::T: mover.start_moving_selection(make_mover_input()); return true;
 				case key::R: mover.start_rotating_selection(make_mover_input()); return true;
-				case key::ADD: player().request_additional_step(); return true;
+				case key::ADD: player().request_steps(1); return true;
+				case key::SUBTRACT: player().request_steps(-1); return true;
 				case key::H: hide_layers_of_selected_entities(); reperform_selector(); return true;
 				default: break;
 			}

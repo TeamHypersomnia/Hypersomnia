@@ -63,23 +63,23 @@ public:
 	void request_restart() { players.clear(); }
 
 	template <class C>
-	auto combine_callbacks(const C& callbacks) {
-		return callbacks.combine(
-			[&](auto pre_solve, const logic_step step) {
-				pre_solve(step);
-				mode_pre_solve(in, entropy, step);
-			}
-		);
-	}
-
-	template <class C>
 	void advance(
 		const input in, 
 		const mode_entropy& entropy, 
-		const C& callbacks
+		C callbacks
 	) {
 		const auto input = logic_step_input { in.cosm, entropy.cosmic };
 
-		standard_solver()(input, combine_callbacks(callbacks));
+		standard_solver()(
+			input, 
+			solver_callbacks(
+				[&](const logic_step step) {
+					callbacks.pre_solve(step);
+					mode_pre_solve(in, entropy, step);
+				},
+				callbacks.post_solve,
+				callbacks.post_cleanup
+			)
+		);
 	}
 };

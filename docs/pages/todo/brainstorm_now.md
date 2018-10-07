@@ -6,14 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Since sending of entropy will be highly optimized for space, it makes no sense to have augs::container_with_small_size
-
 - Implement tree node for the children of commands in history gui
 
 - Replaying and commands
 	- Problems include:
 		- Should we automatically set to replaing on ctrl+z or leave it at recording and always delete later entries?
 			- automatically pause on ctrl+z?
+				- This should be done for an even better feedback
+			- when paused, "i" always enters recording mode, "l" always enters replaying mode
 		- rewrite_change during playtest
 			- We can just spam with commands
 	- Should they be undone/redone according to the timeline?
@@ -21,18 +21,11 @@ summary: That which we are brainstorming at the moment.
 		- Makes sense, will let us compare some changes in a consistent fashion
 
 - Later if we want to concatenate recorded entropies, we may just hold a step_to_entropy per each concerned player and accumulate them before step
+	- No need for some wanky overrides
 
 - Implement view early to know what's going on
 
-- Snapshots during recording
-	- To have total determinism, just always reinfer at snapshot times, even when recording
-		- This way we don't have to store inferred state in snapshots
-		- This will also be a good way to test stability of the simulation under a spontaneous need to reinfer
-			- e.g. on a new connection
-	- and serialize the solvable to save on space storage
-		- it will also probably be faster to serialize to bytes than to recreate entire containers with some complex maps, should there be any
-			- e.g. in pending mounts
-		- deserialization will be slower but it won't be used as often
+- Since sending of entropy will be highly optimized for space, it makes no sense to have augs::container_with_small_size
 
 - GUI for the player
 	- Timeline

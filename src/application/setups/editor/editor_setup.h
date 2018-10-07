@@ -56,6 +56,8 @@
 #include "application/setups/editor/detail/make_command_from_selections.h"
 #include "application/app_intent_type.h"
 
+#include "application/setups/editor/editor_folder.hpp"
+
 struct config_lua_table;
 struct draw_setup_gui_input;
 
@@ -156,9 +158,6 @@ class editor_setup {
 		}
 	}
 
-	void enter_testing_mode();
-	void quit_testing_mode();
-
 	std::future<std::optional<std::string>> open_folder_dialog;
 	std::future<std::optional<std::string>> save_project_dialog;
 
@@ -248,11 +247,7 @@ public:
 		if (anything_opened()) {
 			player().advance_player(
 				frame_delta,
-				player_advance_input(
-					folder().mode_vars,
-					work().world,
-					callbacks
-				)
+				folder().make_player_advance_input(callbacks)
 			);
 		}
 	}
@@ -289,11 +284,6 @@ public:
 	void copy();
 	void cut();
 	void paste();
-
-	void play_pause();
-	void stop();
-	void prev();
-	void next();
 
 	void new_tab();
 	void next_tab();

@@ -2,7 +2,7 @@
 
 struct default_solver_callback {
 	template <class... Args>
-	void operator()(Args&&...) {}
+	void operator()(Args&&...) const {}
 };
 
 template <
@@ -16,13 +16,13 @@ struct solver_callbacks_t {
 	PostCleanup post_cleanup;
 	
 	solver_callbacks_t(
-		PreSolve&& pre_solve,
-		PostSolve&& post_solve,
-		PostCleanup&& post_cleanup
+		PreSolve pre_solve,
+		PostSolve post_solve,
+		PostCleanup post_cleanup
 	) :
-		pre_solve(std::move(pre_solve)),
-		post_solve(std::move(post_solve)),
-		post_cleanup(std::move(post_cleanup))
+		pre_solve(pre_solve),
+		post_solve(post_solve),
+		post_cleanup(post_cleanup)
 	{}
 
 	template <
@@ -60,13 +60,13 @@ template <
 	class PostCleanup = default_solver_callback
 >
 auto solver_callbacks(
-	PreSolve&& pre_solve = default_solver_callback(),
-	PostSolve&& post_solve = default_solver_callback(),
-	PostCleanup&& post_cleanup = default_solver_callback()
+	PreSolve pre_solve = default_solver_callback(),
+	PostSolve post_solve = default_solver_callback(),
+	PostCleanup post_cleanup = default_solver_callback()
 ) {
 	return solver_callbacks_t(
-		std::forward<PreSolve>(pre_solve),
-		std::forward<PostSolve>(post_solve),
-		std::forward<PostCleanup>(post_cleanup)
+		pre_solve,
+		post_solve,
+		post_cleanup
 	);
 }

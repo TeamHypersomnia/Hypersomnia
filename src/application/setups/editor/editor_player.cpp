@@ -80,6 +80,7 @@ void editor_player::finish_testing(const editor_command_input in, const finish_t
 	restore_saved_state(f);
 
 	base::finish();
+	total_collected_entropy.clear();
 
 	h.force_set_current_revision(start_revision);
 
@@ -97,10 +98,22 @@ void editor_player::finish_testing(const editor_command_input in, const finish_t
 	}
 }
 
+#if !TODO_DELTA
+augs::delta editor_player::get_chosen_delta() const {
+	return before_start.value().work->world.get_fixed_delta();
+}
+#endif
+
+double editor_player::get_current_secs() const {
+	return base::get_current_step() * get_chosen_delta().in_seconds();
+}
+
+double editor_player::get_total_secs() const {
+	return base::get_total_steps() * get_chosen_delta().in_seconds();
+}
+
 void editor_player::initialize_testing(editor_folder& f) {
 	save_state_before_start(f);
-
-	base::start();
 
 	std::visit(
 		[&](auto& typed_mode) {
@@ -110,26 +123,23 @@ void editor_player::initialize_testing(editor_folder& f) {
 	);
 }
 
-void editor_player::start_resume(editor_folder& f) {
+void editor_player::begin_recording(editor_folder& f) {
 	if (!has_testing_started()) {
 		initialize_testing(f);
 	}
 
-	base::resume();
+	base::begin_recording();
 }
 
-void editor_player::start_pause_resume(editor_folder& f) {
-	if (is_paused()) {
-		start_resume(f);
+void editor_player::begin_replaying(editor_folder& f) {
+	if (!has_testing_started()) {
+		initialize_testing(f);
 	}
-	else {
-		pause();
-	}
+
+	base::begin_replaying();
 }
 
 void editor_player::ensure_handler() {
-	/* So that we don't accidentally overwrite the repro: */
-	base::begin_replaying();
 	base::pause();
 
 	/* 

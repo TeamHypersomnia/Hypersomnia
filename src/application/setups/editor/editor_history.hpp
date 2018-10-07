@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/templates/history.hpp"
 #include "application/setups/editor/editor_history.h"
+#include "application/setups/editor/editor_folder.h"
 
 inline bool editor_history::next_command_has_parent() const {
 	return std::visit(
@@ -79,7 +80,7 @@ inline void editor_history::undo(const editor_command_input in) {
 					if constexpr(needs_valid_solvable_v<T>) {
 						const auto& target_step = cmd.common.when_happened;
 
-						p.seek_to(target_step);
+						p.seek_to(target_step, in.folder);
 					}
 				},
 				last_command()

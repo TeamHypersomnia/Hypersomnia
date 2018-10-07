@@ -1714,3 +1714,15 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- In this way when we have a crash, we can always repro easily
 	- A failed ensure should write-out the step buffer so we don't have to write every time
 		- We'll test this with some simulated crash later on
+
+	- To have total determinism, just always reinfer at snapshot times, even when recording
+		- This way we don't have to store inferred state in snapshots
+		- This will also be a good way to test stability of the simulation under a spontaneous need to reinfer
+			- e.g. on a new connection
+
+
+- Snapshots during recording
+	- and serialize the solvable to save on space storage
+		- it will also probably be faster to serialize to bytes than to recreate entire containers with some complex maps, should there be any
+			- e.g. in pending mounts
+		- deserialization will be slower but it won't be used as often

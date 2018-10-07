@@ -56,6 +56,9 @@ struct editor_folder {
 	void load_folder(const augs::path_type& from, const augs::path_type& name);
 
 	editor_paths get_paths() const;
+
+	template <class C>
+	auto make_player_advance_input(const C& with_callbacks);
 };
 
 struct editor_last_folders {
