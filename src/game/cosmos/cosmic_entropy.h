@@ -28,7 +28,7 @@ struct basic_cosmic_entropy {
 	augs::container_with_small_size<std::vector<basic_item_slot_transfer_request<key>>, unsigned short> transfer_requests;
 	// END GEN INTROSPECTOR
 
-	size_t length() const;
+	std::size_t length() const;
 
 	basic_cosmic_entropy& operator+=(const basic_cosmic_entropy& b);
 

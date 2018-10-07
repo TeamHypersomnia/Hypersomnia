@@ -36,8 +36,9 @@ decltype(auto) editor_player::on_mode_with_input_impl(
 }
 
 template <class C>
-auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<C>& input) {
-	auto& folder = cmd_in.folder;
+auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<C> in) {
+	auto& folder = in.cmd_in.folder;
+	auto& history = folder.history;
 	auto& cosm = folder.commanded.work->world;
 
 	return augs::snapshotted_advance_input(
@@ -49,10 +50,26 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 				folder.commanded.mode_vars,
 				cosm,
 				[&](auto& typed_mode, const auto& mode_in) {
-					/* 
-						There are two moments that we could correctly redo a command that has happened at step N.
+					while (history.has_next_command()) {
+						const auto when_happened = std::visit(
+							[&](const auto& typed_command) {
+								return typed_command.common.when_happened;
+							},
+							history.next_command()
+						);
+
+						const auto current_step = get_current_step();
+
+						ensure_leq(current_step, when_happened);
+
+						if (current_step == when_happened) {
+							history.redo(in.cmd_in);
+							continue;
+						}
 						
-					*/
+						break;
+					}
+
 					typed_mode.advance(
 						mode_in,
 						applied_entropy,
@@ -71,9 +88,7 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 			augs::memory_stream ms;
 
 			augs::write_bytes(ms, current_mode);
-			augs::write_bytes(ms, folder.commanded.work->world);
-			augs::write_bytes(ms, folder.commanded.view_ids);
-			augs::write_bytes(ms, folder.commanded.mode_vars);
+			augs::write_bytes(ms, folder.commanded);
 
 			return std::move(ms);//ms.operator std::vector<std::byte>&&();
 		}
@@ -81,26 +96,27 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 }
 
 template <class C>
-auto editor_player::make_set_snapshot(const player_advance_input_t<C>& in) {
-	auto& cosm = in.cmd_in.get_cosmos();
+auto editor_player::make_set_snapshot(const player_advance_input_t<C> in) {
+	auto& folder = in.cmd_in.folder;
 
 	return [&](const auto n, const auto& snapshot) {
 		if (n == 0) {
-			cosm = before_start.value().commanded.work->world;
+			current_mode = {};
+			folder.commanded = before_start.value().commanded;
 			return;
 		}
 
 		auto ss = augs::cref_memory_stream(snapshot);
 
 		augs::read_bytes(ss, current_mode);
-		cosm.read_solvable_from(ss);
+		augs::read_bytes(ss, folder.commanded);
 	};
 }
 
 template <class C>
 void editor_player::seek_to(
 	const editor_player::step_type step, 
-	const player_advance_input_t<C>& in
+	const player_advance_input_t<C> in
 ) {
 	base::seek_to(
 		step,

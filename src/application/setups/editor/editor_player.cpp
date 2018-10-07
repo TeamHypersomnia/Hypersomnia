@@ -38,7 +38,7 @@ void editor_player::save_state_before_start(editor_folder& folder) {
 
 	backup.view_ids = currnt.view_ids;
 	backup.mode_vars = currnt.mode_vars;
-	backup.revision = currnt.history.get_current_revision();
+	before_start->revision = folder.history.get_current_revision();
 }
 
 void editor_player::restore_saved_state(editor_folder& folder) {
@@ -172,5 +172,5 @@ void editor_player::seek_to(
 	const step_type step, 
 	const editor_command_input in
 ) {
-	seek_to(step, player_advance_input(in, solver_callbacks());
+	seek_to(step, player_advance_input(in, solver_callbacks()));
 }

@@ -41,19 +41,33 @@ inline void editor_history::redo(const editor_command_input cmd_in) {
 	auto do_redo = [&]() {
 		auto& p = cmd_in.get_player();
 
+		/* TODO: find the target revision by querying for parents first. */
+		const auto target_revision = get_current_revision() + 1;
+		(void)target_revision;
+
 		if (p.has_testing_started() && has_next_command()) {
 			std::visit(
 				[&](const auto& cmd) {
 					using T = remove_cref<decltype(cmd)>;
 
-					if constexpr(needs_valid_solvable_v<T>) {
-						const auto& target_step = cmd.common.when_happened;
+					const auto& target_step = cmd.common.when_happened;
+					const auto current_step = p.get_current_step();
+					ensure_leq(current_step, target_step);
 
-						p.seek_to(target_step, cmd_in);
-					}
+					/* 
+						if there are no commands mid-way, seek_to with a later step will only adjust the solvable. 
+						seek_to will call redo only after leaving the step at which the command was done.
+						It will never invoke the commands of the target step.
+
+						if current step is equal to target step, seek to will return right away.
+					*/
+
+					p.seek_to(target_step, cmd_in);
 				},
 				next_command()
 			);
+
+			/* So now we'll have to redo once again */
 		}
 
 		return editor_history_base::redo(cmd_in);
@@ -71,20 +85,50 @@ inline void editor_history::redo(const editor_command_input cmd_in) {
 inline void editor_history::undo(const editor_command_input cmd_in) {
 	auto do_undo = [&]() {
 		auto& p = cmd_in.get_player();
+		/* TODO: find the target revision by querying for parents first. */
+		/* TODO: once target revision found, clamp it against get_revision_when_started_testing? Actually, just stop looking for parents when it's found... */
+		const auto target_revision = get_current_revision() - 1;
 
-		if (p.has_testing_started() && has_last_command()) {
-			std::visit(
-				[&](const auto& cmd) {
-					using T = remove_cref<decltype(cmd)>;
+		if (p.has_testing_started()) {
+			if (get_current_revision() == p.get_revision_when_started_testing()) {
+				return false;
+			}
 
-					if constexpr(needs_valid_solvable_v<T>) {
+			if (has_last_command()) {
+				std::visit(
+					[&](const auto& cmd) {
+						using T = remove_cref<decltype(cmd)>;
+
 						const auto& target_step = cmd.common.when_happened;
+						const auto current_step = p.get_current_step();
+
+						ensure_leq(target_step, current_step);
+
+						if (target_step == cmd.common.when_happened) {
+							/* Solvable is compatible. Perform plain undo. */
+							editor_history_base::undo(cmd_in);
+							return;
+						}
 
 						p.seek_to(target_step, cmd_in);
-					}
-				},
-				last_command()
-			);
+
+						/* After the workspace is adjusted to target step, we still have to redo until we meet the target revision. */
+
+						ensure_leq(get_current_revision(), target_revision);
+
+						while (get_current_revision() < target_revision) {
+							/* Perform plain redo. */
+							editor_history_base::redo(cmd_in);
+						}
+					},
+					last_command()
+				);
+
+				/* seek_to will get there be redoing, so no more undoing necesary */
+				return true;
+			}
+
+			return false;
 		}
 
 		return editor_history_base::undo(cmd_in);

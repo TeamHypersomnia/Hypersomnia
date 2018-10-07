@@ -6,11 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Commands refactor: separation of undo and redo state
-	- redoer and undoer objects
-		- each has only the required information
-		- redoer returns an undoer
-		- redo state is always the same
+- Disable history gui seeking to revisions past the start
 
 - Implement tree node for the children of commands in history gui
 
@@ -30,6 +26,7 @@ summary: That which we are brainstorming at the moment.
 
 - Later if we want to concatenate recorded entropies, we may just hold a step_to_entropy per each concerned player and accumulate them before step
 	- No need for some wanky overrides
+	- though these overrides should be easy enough, we can even determine the authorized capability for transfers
 
 - Implement view early to know what's going on
 

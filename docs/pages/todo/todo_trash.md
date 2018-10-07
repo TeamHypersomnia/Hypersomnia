@@ -885,3 +885,6 @@ fixtures can form scene graph as they have relative transforms.
 	- Should they be undone/redone according to the timeline?
 	- We will have to redo commands as the player advances
 		- Makes sense, will let us compare some changes in a consistent fashion
+
+						/* Here seek should always redo all commands done on the target step, because the target command will be the last one if the target step is lesser.
+				   			if we undo once again during a step where there was more commands, we'll just do a plain undo without seeking, until we have a smaller target step again.	*/

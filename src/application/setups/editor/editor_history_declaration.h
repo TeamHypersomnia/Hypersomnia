@@ -48,22 +48,6 @@ struct change_asset_property_command;
 template <class>
 struct duplicate_asset_command;
 
-template <class T>
-constexpr bool needs_valid_solvable_v = is_one_of_v<T,
-	move_entities_command,
-	resize_entities_command,
-
-	paste_entities_command,
-	delete_entities_command,
-	duplicate_entities_command,
-
-	instantiate_flavour_command,
-	change_entity_property_command,
-
-	change_grouping_command,
-	change_current_mode_property_command
->;
-
 using editor_history_base = augs::history_with_marks<
 	fill_with_test_scene_command,
 

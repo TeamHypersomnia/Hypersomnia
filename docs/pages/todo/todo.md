@@ -6,6 +6,12 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Commands refactor: separation of undo and redo state
+	- redoer and undoer objects
+		- each has only the required information
+		- redoer returns an undoer
+		- redo state is always the same
+
 - Balance colliding bullets so that damage to be dealt is subtracted from the stronger bullet
 	- Possibly reduce trace size then
 

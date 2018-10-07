@@ -47,8 +47,8 @@ using editor_player_base = augs::snapshotted_player<
 
 template <class C>
 struct player_advance_input_t {
-	const editor_command_input in;
-	const C& callbacks;
+	editor_command_input in;
+	C callbacks;
 };
 
 template <class C>
@@ -90,10 +90,10 @@ class editor_player : public editor_player_base {
 	void initialize_testing(editor_folder&);
 
 	template <class C>
-	auto make_snapshotted_advance_input(const player_advance_input_t<C>& input);
+	auto make_snapshotted_advance_input(player_advance_input_t<C> input);
 
 	template <class C>
-	auto make_set_snapshot(const player_advance_input_t<C>& input);
+	auto make_set_snapshot(player_advance_input_t<C> input);
 
 	augs::delta get_chosen_delta() const;
 
@@ -147,6 +147,6 @@ public:
 
 	void seek_to(
 		step_type, 
-		const editor_command_input input
+		editor_command_input input
 	);
 };
