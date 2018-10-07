@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/templates/history.hpp"
 #include "application/setups/editor/editor_history.h"
-#include "application/setups/editor/editor_folder.h"
+#include "application/setups/editor/editor_player.h"
 
 inline bool editor_history::next_command_has_parent() const {
 	return std::visit(
@@ -29,7 +29,7 @@ const T& editor_history::execute_new(T&& command, const editor_command_input in)
 		}
 	}
 
-	command.common.when_happened = in.folder.player.get_current_step();
+	command.common.when_happened = in.get_player().get_current_step();
 
 	return editor_history_base::execute_new(
 		std::forward<T>(command),
@@ -37,9 +37,9 @@ const T& editor_history::execute_new(T&& command, const editor_command_input in)
 	);
 }
 
-inline void editor_history::redo(const editor_command_input in) {
+inline void editor_history::redo(const editor_command_input cmd_in) {
 	auto do_redo = [&]() {
-		auto& p = in.get_player();
+		auto& p = cmd_in.get_player();
 
 		if (p.has_testing_started() && has_next_command()) {
 			std::visit(
@@ -49,14 +49,14 @@ inline void editor_history::redo(const editor_command_input in) {
 					if constexpr(needs_valid_solvable_v<T>) {
 						const auto& target_step = cmd.common.when_happened;
 
-						p.seek_to(target_step, in.folder);
+						p.seek_to(target_step, cmd_in);
 					}
 				},
 				next_command()
 			);
 		}
 
-		return editor_history_base::redo(in);
+		return editor_history_base::redo(cmd_in);
 	};
 
 	while (do_redo()) {
@@ -68,9 +68,9 @@ inline void editor_history::redo(const editor_command_input in) {
 	}
 }
 
-inline void editor_history::undo(const editor_command_input in) {
+inline void editor_history::undo(const editor_command_input cmd_in) {
 	auto do_undo = [&]() {
-		auto& p = in.get_player();
+		auto& p = cmd_in.get_player();
 
 		if (p.has_testing_started() && has_last_command()) {
 			std::visit(
@@ -80,14 +80,14 @@ inline void editor_history::undo(const editor_command_input in) {
 					if constexpr(needs_valid_solvable_v<T>) {
 						const auto& target_step = cmd.common.when_happened;
 
-						p.seek_to(target_step, in.folder);
+						p.seek_to(target_step, cmd_in);
 					}
 				},
 				last_command()
 			);
 		}
 
-		return editor_history_base::undo(in);
+		return editor_history_base::undo(cmd_in);
 	};
 
 	while (do_undo()) {

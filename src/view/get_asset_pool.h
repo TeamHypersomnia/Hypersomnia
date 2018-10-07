@@ -37,12 +37,12 @@ auto& get_asset_pool(V&& viewables, L&& logicals) {
 
 template <class T, class E>
 auto& get_asset_pool(E&& cmd_in) {
-	return get_asset_pool<T>(cmd_in.folder.work->viewables, cmd_in.folder.work->world.get_logical_assets());
+	return get_asset_pool<T>(cmd_in.folder.commanded.commanded.work->viewables, cmd_in.folder.commanded.commanded.work->world.get_logical_assets());
 }
 
 template <class T, class E>
 auto& access_asset_pool(E&& cmd_in, cosmos_common_significant_access access) {
-	return get_asset_pool<T>(cmd_in.folder.work->viewables, cmd_in.folder.work->world.get_logical_assets(access));
+	return get_asset_pool<T>(cmd_in.folder.commanded.commanded.work->viewables, cmd_in.folder.commanded.commanded.work->world.get_logical_assets(access));
 }
 
 template <class T>

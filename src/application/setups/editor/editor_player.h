@@ -9,6 +9,7 @@
 #include "application/setups/editor/player/editor_player_step_type.h"
 #include "application/setups/editor/editor_history.h"
 #include "application/setups/editor/editor_view.h"
+#include "application/setups/editor/editor_commanded_state.h"
 
 #include "augs/templates/snapshotted_player.h"
 
@@ -27,9 +28,7 @@ struct player_before_start_state {
 	using revision_type = editor_history::index_type;
 
 	// GEN INTROSPECTOR struct player_before_start_state
-	std::unique_ptr<intercosm> work;
-	editor_view_ids view_ids;
-	all_mode_vars_maps mode_vars;
+	editor_commanded_state commanded;
 	revision_type revision = -1;
 	// END GEN INTROSPECTOR
 };
@@ -46,24 +45,18 @@ using editor_player_base = augs::snapshotted_player<
 	editor_solvable_snapshot
 >;
 
-template <class A, class C>
+template <class C>
 struct player_advance_input_t {
-	const A& all_vars;
-	cosmos& cosm;
+	const editor_command_input in;
 	const C& callbacks;
 };
 
-template <class A, class C>
+template <class C>
 auto player_advance_input(
-	const A& all_vars,
-	cosmos& cosm,
+	const editor_command_input& in,
 	const C& callbacks
 ) {
-	return player_advance_input_t<A, C> {
-		all_vars,
-		cosm,
-		callbacks
-	};
+	return player_advance_input_t<C> { in, callbacks };
 }
 
 class editor_player : public editor_player_base {
@@ -96,14 +89,11 @@ class editor_player : public editor_player_base {
 
 	void initialize_testing(editor_folder&);
 
-	template <class I>
-	void advance_single_step(const I& input);
+	template <class C>
+	auto make_snapshotted_advance_input(const player_advance_input_t<C>& input);
 
-	template <class I>
-	auto make_snapshotted_advance_input(const I& input);
-
-	template <class I>
-	auto make_set_snapshot(const I& input);
+	template <class C>
+	auto make_set_snapshot(const player_advance_input_t<C>& input);
 
 	augs::delta get_chosen_delta() const;
 
@@ -149,9 +139,14 @@ public:
 	double get_current_secs() const;
 	double get_total_secs() const;
 
-	template <class I>
+	template <class C>
 	void seek_to(
 		step_type, 
-		I&& input
+		player_advance_input_t<C> input
+	);
+
+	void seek_to(
+		step_type, 
+		const editor_command_input input
 	);
 };

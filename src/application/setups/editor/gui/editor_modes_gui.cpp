@@ -50,12 +50,12 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 			auto& player = cmd_in.get_player();
 
 			player.on_mode_with_input(
-				folder.mode_vars,
-				folder.work->world,
+				folder.commanded.mode_vars,
+				folder.commanded.work->world,
 				[&](auto& typed_mode, const auto& mode_input) {
 					using M = remove_cref<decltype(typed_mode)>;
 
-					auto& work = *cmd_in.folder.work;
+					auto& work = *cmd_in.folder.commanded.work;
 					auto& cosm = work.world;
 
 					const auto in = commanding_property_editor_input {
@@ -123,7 +123,7 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 
 	ImGui::Separator();
 
-	auto& all_vars = cmd_in.folder.mode_vars;
+	auto& all_vars = cmd_in.folder.commanded.mode_vars;
 
 	all_vars.for_each_container(
 		[&](const auto& modes) {
@@ -145,7 +145,7 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 					next_columns(2);
 
 					if (node) {
-						auto& work = *cmd_in.folder.work;
+						auto& work = *cmd_in.folder.commanded.work;
 						auto& cosm = work.world;
 
 						auto in = commanding_property_editor_input {

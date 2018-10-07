@@ -6,19 +6,27 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Commands refactor: separation of undo and redo state
+	- redoer and undoer objects
+		- each has only the required information
+		- redoer returns an undoer
+		- redo state is always the same
+
 - Implement tree node for the children of commands in history gui
 
 - Replaying and commands
-	- Problems include:
-		- Should we automatically set to replaing on ctrl+z or leave it at recording and always delete later entries?
-			- automatically pause on ctrl+z?
-				- This should be done for an even better feedback
-			- when paused, "i" always enters recording mode, "l" always enters replaying mode
-		- rewrite_change during playtest
-			- We can just spam with commands
-	- Should they be undone/redone according to the timeline?
-	- We will have to redo commands as the player advances
-		- Makes sense, will let us compare some changes in a consistent fashion
+	- Replay commands along the solvable's progress as they were applied.
+		- pro: don't have to sanitize undos, they are always applied for the solvables upon which the command was originally executed
+		- pro: repros replayable even with commands involved
+		- pro: can do funny directing stuff
+		- con: much space wasted but who cares
+	- Implementation details
+		- editor history
+			- redo shall only move the solvable forward first if there is such a need;
+			- only then apply command once
+			- undo 
+				- if solvable step at which it was applied matches, simply undo once
+				- shall only use the seek_to if the solvable step mismatches
 
 - Later if we want to concatenate recorded entropies, we may just hold a step_to_entropy per each concerned player and accumulate them before step
 	- No need for some wanky overrides

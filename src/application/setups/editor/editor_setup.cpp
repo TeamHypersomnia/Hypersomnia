@@ -1660,8 +1660,8 @@ void editor_setup::on_mode_with_input(F&& callback) const {
 		auto& f = folder();
 
 		player().on_mode_with_input(
-			f.mode_vars,
-			f.work->world,
+			f.commanded.mode_vars,
+			f.commanded.work->world,
 			std::forward<F>(callback)
 		);
 	}
@@ -1716,11 +1716,11 @@ const editor_folder& editor_setup::folder() const {
 }
 
 intercosm& editor_setup::work() {
-	return *folder().work;
+	return *folder().commanded.work;
 }
 
 const intercosm& editor_setup::work() const {
-	return *folder().work;
+	return *folder().commanded.work;
 }
 
 editor_player& editor_setup::player() {

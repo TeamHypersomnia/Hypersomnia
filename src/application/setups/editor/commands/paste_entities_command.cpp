@@ -37,7 +37,7 @@ void paste_entities_command::redo(const editor_command_input in) {
 	{
 		auto& f = in.folder;
 
-		auto& selections = f.view.ids.selected_entities;
+		auto& selections = f.commanded.view_ids.selected_entities;
 		selections.clear();
 
 		pasted_entities.for_each([&](auto& e) {

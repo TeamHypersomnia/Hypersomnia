@@ -48,7 +48,7 @@ void delete_entities_command::undo(const editor_command_input in) {
 	in.purge_selections();
 
 	{
-		auto& selections = f.view.ids.selected_entities;
+		auto& selections = f.commanded.view_ids.selected_entities;
 
 		/* 
 			NOTE: Pools should be independent, but to be theoretically pure,

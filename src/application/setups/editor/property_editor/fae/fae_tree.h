@@ -178,7 +178,7 @@ auto tree_of_flavours(
 							thread_local std::vector<std::string> locations;
 							locations.clear();
 
-							auto& work = *cpe_in.command_in.folder.work;
+							auto& work = *cpe_in.command_in.folder.commanded.work;
 
 							find_locations_that_use_flavour(
 								flavour_id,

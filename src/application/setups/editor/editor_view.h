@@ -56,7 +56,6 @@ struct editor_view {
 	maybe_layer_filter viewing_filter = maybe_layer_filter(render_layer_filter::all(), true);
 
 	std::optional<camera_eye> panned_camera;
-	editor_view_ids ids;
 	// END GEN INTROSPECTOR
 
 	void reset_zoom();

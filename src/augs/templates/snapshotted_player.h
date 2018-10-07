@@ -73,7 +73,6 @@ namespace augs {
 		);
 
 	public:
-
 		editor_player_step_type get_current_step() const;
 		editor_player_step_type get_total_steps() const;
 

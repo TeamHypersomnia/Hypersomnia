@@ -864,3 +864,24 @@ fixtures can form scene graph as they have relative transforms.
 	- Q2: Can it be done later on?
 		- I guess! We have to implement restoration of old solvable first anyway.
 
+
+	- This proves very complex after all.
+		- really hard when commands need to be replayed.
+			- E.g. we would need to also serialize the entire work state with each snapshot
+			- actually shouldn't be much compared to the cosmos contents
+			- this stuff can be compressed later on to really minimal amounts
+				- tar.gz yields very short (de)compression times
+			- pro: don't have to sanitize undos
+			- pro: repros replayable even with commands involved
+		- or we can sanitize undos
+			- cosmos solvables are just as big, though...
+	- Problems include:
+		- Should we automatically set to replaing on ctrl+z or leave it at recording and always delete later entries?
+			- automatically pause on ctrl+z?
+				- This should be done for an even better feedback
+			- when paused, "i" always enters recording mode, "l" always enters replaying mode
+		- rewrite_change during playtest
+			- We can just spam with commands
+	- Should they be undone/redone according to the timeline?
+	- We will have to redo commands as the player advances
+		- Makes sense, will let us compare some changes in a consistent fashion

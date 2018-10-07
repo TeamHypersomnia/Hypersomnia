@@ -6,10 +6,8 @@
 #include "augs/graphics/vertex.h"
 
 #include "application/setups/editor/editor_history.h"
-#include "application/setups/editor/editor_view.h"
 #include "application/setups/editor/editor_player.h"
-
-#include "game/modes/all_mode_includes.h"
+#include "application/setups/editor/editor_commanded_state.h"
 
 using folder_index = unsigned;
 
@@ -20,7 +18,6 @@ namespace sol {
 	class state;
 }
 
-struct intercosm;
 struct editor_recent_paths;
 struct editor_paths;
 
@@ -29,11 +26,11 @@ struct editor_folder {
 
 	augs::path_type current_path;
 
+	editor_commanded_state commanded;
+
 	editor_view view;
-	std::unique_ptr<intercosm> work;
-	editor_history history;
 	editor_player player;
-	all_mode_vars_maps mode_vars;
+	editor_history history;
 
 	/* Opened game mode definitions go here */
 

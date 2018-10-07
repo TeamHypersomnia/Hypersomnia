@@ -28,7 +28,7 @@ void create_flavour_command::redo_and_copy(const editor_command_input in, const 
 
 			static const auto entity_type_label = str_ops(format_field_name(get_type_name<E>())).replace_all(" ", "").subject;
 
-			auto& work = *in.folder.work;
+			auto& work = *in.folder.commanded.work;
 			auto& cosm = work.world;
 			auto& defs = work.viewables;
 
@@ -74,7 +74,7 @@ void create_flavour_command::undo(const editor_command_input in) {
 		[&](auto e) {
 			using E = decltype(e);
 
-			auto& work = *in.folder.work;
+			auto& work = *in.folder.commanded.work;
 			auto& cosm = work.world;
 			auto& flavours = cosm.get_flavours<E>({});
 
@@ -92,7 +92,7 @@ void delete_flavour_command::redo(const editor_command_input in) {
 		[&](auto e) {
 			using E = decltype(e);
 
-			auto& work = *in.folder.work;
+			auto& work = *in.folder.commanded.work;
 			auto& cosm = work.world;
 
 			auto& flavours = cosm.get_flavours<E>({});
@@ -109,7 +109,7 @@ void delete_flavour_command::undo(const editor_command_input in) {
 		[&](auto e) {
 			using E = decltype(e);
 
-			auto& work = *in.folder.work;
+			auto& work = *in.folder.commanded.work;
 			auto& cosm = work.world;
 
 			auto& flavours = cosm.get_flavours<E>({});
@@ -139,14 +139,14 @@ void instantiate_flavour_command::redo(const editor_command_input in) {
 
 			const auto flavour_id = typed_entity_flavour_id<E>(instantiated_id.raw);
 
-			auto& work = *in.folder.work;
+			auto& work = *in.folder.commanded.work;
 			auto& cosm = work.world;
 
 			const auto& flavour = cosm.get_flavour(flavour_id);
 
 			built_description = typesafe_sprintf("Instantiated flavour: %x", flavour.get_name());
 
-			auto& selections = in.folder.view.ids.selected_entities;
+			auto& selections = in.folder.commanded.view_ids.selected_entities;
 
 			try {
 				const auto created_entity = cosmic::specific_create_entity(
@@ -167,7 +167,7 @@ void instantiate_flavour_command::redo(const editor_command_input in) {
 }
 
 void instantiate_flavour_command::undo(const editor_command_input in) {
-	auto& work = *in.folder.work;
+	auto& work = *in.folder.commanded.work;
 	auto& cosm = work.world;
 
 	in.clear_selection_of(created_id);

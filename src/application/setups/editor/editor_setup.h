@@ -56,8 +56,6 @@
 #include "application/setups/editor/detail/make_command_from_selections.h"
 #include "application/app_intent_type.h"
 
-#include "application/setups/editor/editor_folder.hpp"
-
 struct config_lua_table;
 struct draw_setup_gui_input;
 
@@ -247,7 +245,7 @@ public:
 		if (anything_opened()) {
 			player().advance_player(
 				frame_delta,
-				folder().make_player_advance_input(callbacks)
+				make_player_input(callbacks)
 			);
 		}
 	}
@@ -325,6 +323,9 @@ public:
 	editor_fae_gui_input make_fae_gui_input();
 
 	entity_mover_input make_mover_input();
+
+	template <class C>
+	auto make_player_input(const C& callbacks);
 
 	template <class T, class... Args>
 	auto make_command_from_selections(Args&&... args) const {

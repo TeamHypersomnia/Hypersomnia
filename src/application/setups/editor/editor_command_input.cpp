@@ -17,7 +17,7 @@ editor_player& editor_command_input::get_player() const {
 }
 
 all_viewables_defs& editor_command_input::get_viewable_defs() const {
-	return folder.work->viewables;
+	return folder.commanded.work->viewables;
 }
 
 const all_logical_assets& editor_command_input::get_logical_assets() const {
@@ -25,7 +25,7 @@ const all_logical_assets& editor_command_input::get_logical_assets() const {
 }
 
 cosmos& editor_command_input::get_cosmos() const {
-	return folder.work->world;
+	return folder.commanded.work->world;
 }
 
 void editor_command_input::interrupt_tweakers() const {
@@ -33,13 +33,13 @@ void editor_command_input::interrupt_tweakers() const {
 }
 
 void editor_command_input::purge_selections() const {
-	folder.view.ids.selected_entities.clear();
+	folder.commanded.view_ids.selected_entities.clear();
 	selector.clear();
 	mover.escape();
 }
 
 void editor_command_input::clear_selection_of(const entity_id id) const {
-	erase_element(folder.view.ids.selected_entities, id);
+	erase_element(folder.commanded.view_ids.selected_entities, id);
 
 	selector.clear_selection_of(id);
 }

@@ -41,9 +41,9 @@ void editor_selection_groups_gui::perform(const bool has_ctrl, editor_command_in
 	ImGui::NextColumn();
 	ImGui::Separator();
 
-	const auto& groups = in.folder.view.ids.selection_groups.get_groups();
+	const auto& groups = in.folder.commanded.view_ids.selection_groups.get_groups();
 
-	auto& selected = in.folder.view.ids.selected_entities;
+	auto& selected = in.folder.commanded.view_ids.selected_entities;
 	auto& history = in.get_history();
 
 	for (std::size_t i = 0; i < groups.size(); ++i) {

@@ -21,18 +21,21 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 	clear_undo_state();
 	in.purge_selections();
 
-	auto& work = in.folder.work;
+	auto& work = in.folder.commanded.work;
 	auto& view = in.folder.view;
-
-	auto& mode_vars = in.folder.mode_vars;
+	auto& view_ids = in.folder.commanded.view_ids;
 	auto& player = in.folder.player;
+	auto& mode_vars = in.folder.commanded.mode_vars;
 
-	work->to_bytes(intercosm_before_fill);
-	view_before_fill = augs::to_bytes(view);
-	modes_before_fill = augs::to_bytes(mode_vars);
-	player_before_fill = augs::to_bytes(player);
+	auto ms = augs::ref_memory_stream(before_fill);
+
+	augs::write_bytes(ms, in.folder.commanded);
+	augs::write_bytes(ms, view);
+	augs::write_bytes(ms, player);
 
 	player = {};
+	view = {};
+	view_ids = {};
 
 	test_scene_mode_vars test_vars;
 	bomb_mode_vars bomb_vars;
@@ -57,11 +60,10 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 #if BUILD_TEST_SCENES
 	work->make_test_scene(in.lua, { minimal, settings.scene_tickrate }, test_vars, std::addressof(bomb_vars));
 #endif
-	view = {};
 
 	mode_vars.clear();
 
-	auto& player_id = view.ids.local_player;
+	auto& player_id = view_ids.local_player;
 
 	{
 		const auto test_vars_id = mode_vars_id(0);
@@ -91,18 +93,15 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 void fill_with_test_scene_command::undo(const editor_command_input in) {
 	in.purge_selections();
 
-	auto& work = in.folder.work;
-	work->from_bytes(intercosm_before_fill);
-	augs::from_bytes(view_before_fill, in.folder.view);
-	augs::from_bytes(modes_before_fill, in.folder.mode_vars);
-	augs::from_bytes(player_before_fill, in.folder.player);
+	auto ms = augs::cref_memory_stream(before_fill);
+
+	augs::read_bytes(ms, in.folder.commanded);
+	augs::read_bytes(ms, in.folder.view);
+	augs::read_bytes(ms, in.folder.player);
 
 	clear_undo_state();
 }
 
 void fill_with_test_scene_command::clear_undo_state() {
-	intercosm_before_fill.clear();
-	view_before_fill.clear();
-	modes_before_fill.clear();
-	player_before_fill.clear();
+	before_fill.clear();
 }

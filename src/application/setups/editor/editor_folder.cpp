@@ -58,10 +58,12 @@ void editor_folder::save_folder(const augs::path_type& to, const augs::path_type
 	augs::create_directory(to / maybe_official_path<assets::image_id>::get_content_suffix());
 	augs::create_directory(to / maybe_official_path<assets::sound_id>::get_content_suffix());
 
-	work->save_as_int(paths.int_file);
+	commanded.work->save_as_int(paths.int_file);
+	augs::save_as_bytes(commanded.view_ids, paths.view_ids_file);
+	augs::save_as_bytes(commanded.mode_vars, paths.modes_file);
+
 	augs::save_as_bytes(view, paths.view_file);
 	augs::save_as_bytes(history, paths.hist_file);
-	augs::save_as_bytes(mode_vars, paths.modes_file);
 	augs::save_as_bytes(player, paths.player_file);
 
 	const auto old_autosave_path = paths.autosave_path;
@@ -111,7 +113,7 @@ void editor_folder::load_folder(const augs::path_type& from, const augs::path_ty
 	const auto paths = editor_paths(from, name);
 
 	try {
-		work->load_from_int(paths.int_file);
+		commanded.work->load_from_int(paths.int_file);
 	}
 	catch (const intercosm_loading_error& err) {
 		editor_popup p;
@@ -124,9 +126,11 @@ void editor_folder::load_folder(const augs::path_type& from, const augs::path_ty
 	}
 
 	try {
+		augs::load_from_bytes(commanded.view_ids, paths.view_ids_file);
+		augs::load_from_bytes(commanded.mode_vars, paths.modes_file);
+
 		augs::load_from_bytes(view, paths.view_file);
 		augs::load_from_bytes(history, paths.hist_file);
-		augs::load_from_bytes(mode_vars, paths.modes_file);
 		augs::load_from_bytes(player, paths.player_file);
 	}
 	catch (const augs::file_open_error&) {

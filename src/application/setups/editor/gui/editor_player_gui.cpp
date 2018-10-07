@@ -56,7 +56,7 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 
 			if (slider("Player position", mult, 0.f, 1.f)) {
 				const auto target_step = player.get_total_steps() * mult;
-				player.seek_to(target_step, folder);
+				player.seek_to(target_step, cmd_in);
 			}
 
 			ImGui::ProgressBar(mult);

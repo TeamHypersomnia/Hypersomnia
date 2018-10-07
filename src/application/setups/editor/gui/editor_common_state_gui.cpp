@@ -38,10 +38,10 @@ static void edit_common(
 	const cosmos_common_significant& signi
 ) {
 	auto& cmd_in = in.command_in;
-	auto& defs = cmd_in.folder.work->viewables;
+	auto& defs = cmd_in.folder.commanded.work->viewables;
 	const auto project_path = cmd_in.folder.current_path;
 
-	auto& work = *cmd_in.folder.work;
+	auto& work = *cmd_in.folder.commanded.work;
 	auto& cosm = work.world;
 
 	singular_edit_properties<common_state_editor_behaviour>(
@@ -66,7 +66,7 @@ void editor_common_state_gui::perform(const editor_settings& settings, const edi
 		return;
 	}
 
-	auto& work = *in.folder.work;
+	auto& work = *in.folder.commanded.work;
 	auto& cosm = work.world;
 
 	ImGui::Columns(2); // 4-ways, with border

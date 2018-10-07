@@ -50,6 +50,7 @@ inline auto get_unsaved_path(augs::path_type path) {
 struct editor_paths {
 	augs::path_type int_file;
 	augs::path_type view_file;
+	augs::path_type view_ids_file;
 	augs::path_type hist_file;
 	augs::path_type modes_file;
 	augs::path_type player_file;

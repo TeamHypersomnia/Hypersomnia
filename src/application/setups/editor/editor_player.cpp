@@ -30,23 +30,26 @@ void editor_player::save_state_before_start(editor_folder& folder) {
 	ensure(!before_start.has_value());
 	before_start.emplace();
 
-	auto& backup = *before_start;
+	auto& currnt = folder.commanded;
+	auto& backup = before_start->commanded;
 
-	backup.work = std::move(folder.work);
-	folder.work = std::make_unique<intercosm>(*backup.work);
+	backup.work = std::move(currnt.work);
+	currnt.work = std::make_unique<intercosm>(*backup.work);
 
-	backup.view_ids = folder.view.ids;
-	backup.mode_vars = folder.mode_vars;
-	backup.revision = folder.history.get_current_revision();
+	backup.view_ids = currnt.view_ids;
+	backup.mode_vars = currnt.mode_vars;
+	backup.revision = currnt.history.get_current_revision();
 }
 
 void editor_player::restore_saved_state(editor_folder& folder) {
 	ensure(before_start.has_value());
-	auto& backup = *before_start;
 
-	folder.work = std::move(backup.work);
-	folder.view.ids = std::move(backup.view_ids);
-	folder.mode_vars = std::move(backup.mode_vars);
+	auto& backup = before_start->commanded;
+	auto& currnt = folder.commanded;
+
+	currnt.work = std::move(backup.work);
+	currnt.view_ids = std::move(backup.view_ids);
+	currnt.mode_vars = std::move(backup.mode_vars);
 
 	before_start.reset();
 }
@@ -100,7 +103,7 @@ void editor_player::finish_testing(const editor_command_input in, const finish_t
 
 #if !TODO_DELTA
 augs::delta editor_player::get_chosen_delta() const {
-	return before_start.value().work->world.get_fixed_delta();
+	return before_start.value().commanded.work->world.get_fixed_delta();
 }
 #endif
 
@@ -163,4 +166,11 @@ editor_player::revision_type editor_player::get_revision_when_started_testing() 
 	ensure(has_testing_started());
 
 	return before_start.value().revision;
+}
+
+void editor_player::seek_to(
+	const step_type step, 
+	const editor_command_input in
+) {
+	seek_to(step, player_advance_input(in, solver_callbacks());
 }
