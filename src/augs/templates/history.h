@@ -80,8 +80,16 @@ namespace augs {
 
 		void discard_later_revisions();
 
+		static auto get_first_revision() {
+			return static_cast<index_type>(-1);
+		}
+
+		auto get_last_revision() const {
+			return static_cast<index_type>(commands.size()) - 1;
+		}
+
 		bool is_revision_newest() const {
-			return current_revision == static_cast<index_type>(commands.size()) - 1;
+			return current_revision == get_last_revision();
 		}
 
 		bool is_revision_oldest() const {

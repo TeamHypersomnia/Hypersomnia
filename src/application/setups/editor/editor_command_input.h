@@ -1,5 +1,6 @@
 #pragma once
 #include <utility>
+#include "augs/templates/snapshotted_player_step_type.h"
 
 struct editor_folder;
 class editor_entity_selector;
@@ -35,6 +36,8 @@ struct editor_command_input {
 	editor_player& get_player() const;
 	all_viewables_defs& get_viewable_defs() const;
 	const all_logical_assets& get_logical_assets() const;
+
+	augs::snapshotted_player_step_type get_current_step() const;
 
 	void purge_selections() const;
 	void interrupt_tweakers() const;

@@ -6,7 +6,6 @@
 #include "game/modes/all_mode_includes.h"
 #include "game/modes/mode_entropy.h"
 
-#include "application/setups/editor/player/editor_player_step_type.h"
 #include "application/setups/editor/editor_history.h"
 #include "application/setups/editor/editor_view.h"
 #include "application/setups/editor/editor_commanded_state.h"
@@ -47,7 +46,7 @@ using editor_player_base = augs::snapshotted_player<
 
 template <class C>
 struct player_advance_input_t {
-	editor_command_input in;
+	editor_command_input cmd_in;
 	C callbacks;
 };
 

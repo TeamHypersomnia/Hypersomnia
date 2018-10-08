@@ -26,11 +26,11 @@ struct editor_history : public editor_history_base {
 
 	using editor_history_base::editor_history_base;
 
-	inline bool next_command_has_parent() const;
-
 	template <class T>
 	const T& execute_new(T&& command, editor_command_input);
 
 	void redo(editor_command_input);
 	void undo(editor_command_input);
+
+	void seek_to_revision(index_type n, editor_command_input);
 };

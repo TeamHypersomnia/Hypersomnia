@@ -3,12 +3,12 @@
 
 namespace augs {
 	template <class A, class B>
-	editor_player_step_type snapshotted_player<A, B>::get_current_step() const {
+	auto snapshotted_player<A, B>::get_current_step() const {
 		return current_step;
 	}
 
 	template <class A, class B>
-	editor_player_step_type snapshotted_player<A, B>::get_total_steps() const {
+	auto snapshotted_player<A, B>::get_total_steps() const {
 		if (step_to_entropy.size() > 0) {
 			return std::max(current_step, (*step_to_entropy.rbegin()).first);
 		}

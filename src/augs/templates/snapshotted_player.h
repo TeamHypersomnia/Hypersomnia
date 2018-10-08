@@ -3,10 +3,9 @@
 #include "augs/misc/timing/stepped_timing.h"
 #include "augs/misc/timing/fixed_delta_timer.h"
 #include "augs/misc/timing/delta.h"
+#include "augs/templates/snapshotted_player_step_type.h"
 
 namespace augs {
-	using snapshotted_player_step_type = decltype(augs::stepped_timestamp::step);
-
 	struct introspection_access;
 
 	template <class entropy_type, class Step, class MakeSnapshot>
@@ -73,8 +72,8 @@ namespace augs {
 		);
 
 	public:
-		editor_player_step_type get_current_step() const;
-		editor_player_step_type get_total_steps() const;
+		auto get_current_step() const;
+		auto get_total_steps() const;
 
 		template <
 			class I,
@@ -86,7 +85,7 @@ namespace augs {
 			SetSnapshot&& set_snapshot
 		);
 
-		void seek_to(editor_player_step_type);
+		void seek_to(step_type);
 
 		const fixed_delta_timer& get_timer() const;
 

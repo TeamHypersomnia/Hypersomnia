@@ -7,6 +7,7 @@
 #include "application/setups/editor/gui/editor_entity_mover.h"
 
 #include "application/setups/editor/gui/editor_fae_gui.h"
+#include "application/setups/editor/editor_player.h"
 
 editor_history& editor_command_input::get_history() const {
 	return folder.history;
@@ -14,6 +15,10 @@ editor_history& editor_command_input::get_history() const {
 
 editor_player& editor_command_input::get_player() const {
 	return folder.player;
+}
+
+augs::snapshotted_player_step_type editor_command_input::get_current_step() const {
+	return get_player().get_current_step();
 }
 
 all_viewables_defs& editor_command_input::get_viewable_defs() const {
