@@ -226,4 +226,12 @@ namespace augs {
 		return performed_steps;
 	}
 
+	template <class A, class B>
+	void snapshotted_player<A, B>::clear_later_entropies() {
+		auto& ste = step_to_entropy;
+
+		if (const auto it = ste.lower_bound(get_current_step()); it != ste.end()) {
+			ste.erase(it, ste.end());
+		}
+	}
 }

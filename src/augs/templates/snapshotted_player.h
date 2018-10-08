@@ -45,6 +45,8 @@ namespace augs {
 
 		// GEN INTROSPECTOR class snapshotted_player class A class B
 		std::map<step_type, entropy_type> step_to_entropy;
+
+	private:
 		advance_type advance_mode = advance_type::PAUSED;
 		step_type current_step = 0;
 
@@ -72,6 +74,11 @@ namespace augs {
 			delta frame_delta, 
 			const delta& fixed_delta
 		);
+
+		void clear_later_entropies();
+
+		template <class F>
+		void for_each_later_entropy(F&&);
 
 	public:
 		auto get_current_step() const;

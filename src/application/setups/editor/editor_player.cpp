@@ -131,6 +131,7 @@ void editor_player::begin_recording(editor_folder& f) {
 		initialize_testing(f);
 	}
 
+	base::clear_later_entropies();
 	base::begin_recording();
 }
 
