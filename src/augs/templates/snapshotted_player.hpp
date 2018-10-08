@@ -1,6 +1,23 @@
 #pragma once
 #include "augs/templates/snapshotted_player.h"
 
+#define LOG_PLAYER 1
+
+template <class... Args>
+void PLR_LOG(Args&&... args) {
+#if LOG_PLAYER
+	LOG(std::forward<Args>(args)...);
+#else
+	((void)args, ...);
+#endif
+}
+
+#if LOG_PLAYER
+#define PLR_LOG_NVPS LOG_NVPS
+#else
+#define PLR_LOG_NVPS PLR_LOG
+#endif
+
 namespace augs {
 	template <class A, class B>
 	auto snapshotted_player<A, B>::get_current_step() const {
@@ -72,8 +89,12 @@ namespace augs {
 		SetSnapshot&& set_snapshot
 	) {
 		auto set = [&](const auto i) {
+			PLR_LOG("Set snapshot num %x (size: %x)", i, snapshots.size());
+
 			set_snapshot(i, snapshots.at(i));
 			current_step = i * snapshot_frequency_in_steps;
+
+			PLR_LOG("New current step: %x", current_step);
 		};
 
 		const auto seeked_adj_snapshot = std::min(
@@ -81,7 +102,11 @@ namespace augs {
 			seeked_step / snapshot_frequency_in_steps
 		);
 
+		PLR_LOG("Seeking from %x to %x", current_step, seeked_step);
+		PLR_LOG("Adjacent snapshot: #%x", seeked_adj_snapshot);
+
 		if (seeked_step < current_step) {
+			PLR_LOG("Seek backwards");
 			set(seeked_adj_snapshot);
 		}
 
@@ -95,12 +120,22 @@ namespace augs {
 			const auto distance_from_adj_snapshot = seeked_step - step_of_adj_snapshot;
 			const auto distance_from_seeked_step = seeked_step - current_step;
 
+			PLR_LOG_NVPS(
+				step_of_adj_snapshot,
+				distance_from_adj_snapshot,
+				distance_from_seeked_step
+			);
+
 			if (distance_from_adj_snapshot < distance_from_seeked_step) {
+				PLR_LOG("Speedup the forward seek");
+
 				set(seeked_adj_snapshot);
 			}
 		}
 
 		/* Advance how much is needed from the time of the set snapshot. */
+
+		PLR_LOG("Advancing the rest from %x to %x.", current_step, seeked_step);
 
 		while (current_step < seeked_step) {
 			advance_single_step(input);
@@ -116,7 +151,13 @@ namespace augs {
 			const bool valid_snapshot_exists = snapshot_index < snapshots.size();
 
 			if (!valid_snapshot_exists) {
+				ensure_eq(snapshot_index, snapshots.size());
+
+				PLR_LOG("Snapshot step: %x. Snapshot #%x pushed.", current_step, snapshot_index);
 				snapshots.emplace_back(make_snapshot(snapshot_index));
+			}
+			else {
+				PLR_LOG("Snapshot step: %x. Snapshot #%x exists.", current_step, snapshot_index);
 			}
 		}
 	}
