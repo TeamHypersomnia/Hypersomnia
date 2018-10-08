@@ -37,8 +37,8 @@ void editor_history::redo(const editor_command_input cmd_in) {
 }
 
 void editor_history::undo(const editor_command_input cmd_in) {
-	const auto last_revision = get_last_revision();
 	const auto& commands = get_commands();
+	const auto start_revision = get_current_revision();
 
 	auto& p = cmd_in.get_player();
 	auto target_revision = get_current_revision();
@@ -50,7 +50,7 @@ void editor_history::undo(const editor_command_input cmd_in) {
 			}
 		}
 
-		if (i == last_revision) {
+		if (i == start_revision) {
 			continue;
 		}
 

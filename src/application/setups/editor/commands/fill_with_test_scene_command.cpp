@@ -29,7 +29,7 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 
 	auto ms = augs::ref_memory_stream(before_fill);
 
-	augs::write_bytes(ms, in.folder.commanded);
+	augs::write_bytes(ms, *in.folder.commanded);
 	augs::write_bytes(ms, view);
 	augs::write_bytes(ms, player);
 
@@ -95,7 +95,9 @@ void fill_with_test_scene_command::undo(const editor_command_input in) {
 
 	auto ms = augs::cref_memory_stream(before_fill);
 
-	augs::read_bytes(ms, in.folder.commanded);
+	in.folder.commanded->work.clear();
+
+	augs::read_bytes(ms, *in.folder.commanded);
 	augs::read_bytes(ms, in.folder.view);
 	augs::read_bytes(ms, in.folder.player);
 
