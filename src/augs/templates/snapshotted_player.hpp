@@ -36,11 +36,13 @@ namespace augs {
 	template <class A, class B>
 	void snapshotted_player<A, B>::begin_replaying() {
 		advance_mode = advance_type::REPLAYING;
+		PLR_LOG("begin_replaying");
 	}
 
 	template <class A, class B>
 	void snapshotted_player<A, B>::begin_recording() {
 		advance_mode = advance_type::RECORDING;
+		PLR_LOG("begin_recording");
 	}
 
 	template <class A, class B>
@@ -64,6 +66,7 @@ namespace augs {
 	template <class A, class B>
    	void snapshotted_player<A, B>::pause() {
 		advance_mode = advance_type::PAUSED;
+		PLR_LOG("pause");
 	}
 
 	template <class A, class B>
@@ -187,14 +190,23 @@ namespace augs {
 			}
 		}
 		
-		switch (advance_mode) {
+		auto considered_mode = advance_mode;
+
+		if (considered_mode == advance_type::PAUSED) {
+			/* If we're paused, treat is as replaying since we're probably seeking without applying any new inputs */
+			considered_mode = advance_type::REPLAYING;
+		}
+
+		switch (considered_mode) {
 			case advance_type::REPLAYING:
 				applied_entropy = mapped_or_default(step_to_entropy, step_i);
+				break;
 				
 			case advance_type::RECORDING:
 				if (!applied_entropy.empty()) {
 					step_to_entropy[step_i] = applied_entropy;
 				}
+				break;
 
 			default: break;
 		}
@@ -212,6 +224,10 @@ namespace augs {
 		const delta& fixed_delta
 	) {
 		auto steps = additional_steps;
+
+		if (additional_steps) {
+			PLR_LOG_NVPS(additional_steps);
+		}
 
 		if (!is_paused()) {
 			timer.advance(frame_delta *= speed);

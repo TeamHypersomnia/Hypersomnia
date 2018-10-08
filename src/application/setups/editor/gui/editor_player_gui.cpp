@@ -4,6 +4,7 @@
 #include "application/setups/editor/editor_player.hpp"
 #include "application/setups/editor/editor_folder.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
+#include "augs/templates/chrono_templates.h"
 
 #include "application/setups/editor/detail/maybe_different_colors.h"
 
@@ -62,6 +63,10 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 			ImGui::ProgressBar(mult);
 		}
 
+		text("Current time: %x", format_mins_secs_ms(current));
+		text("Recording length: %x", format_mins_secs_ms(total));
+
 		text("Snapshots: %x", player.get_snapshots().size());
+		text("Revision when started: %x", player.get_revision_when_started_testing());
 	}
 }

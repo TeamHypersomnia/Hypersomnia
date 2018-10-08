@@ -6,7 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Disable history gui seeking to revisions past the start
+- Make snapshot frequency configurable
 
 - Implement tree node for the children of commands in history gui
 
@@ -145,30 +145,6 @@ summary: That which we are brainstorming at the moment.
 
 - Determinism: Change unordered containers to ordered ones in the mode state
 - Determinism: Change unordered containers to ordered ones in the entropy
-
-- Persistence of entity ids in editor and clearing them
-	- Where entity ids are in the editor state:
-		- Selection
-			- Rectangular
-			- Significant
-		- Selection Groups
-		- Entity selector
-			- hovered
-			- held
-		- ids.overridden_viewed
-		- Some commands?
-			- Well it doesn't matter because we restore correct solvable always
-		- ticked entities in fae gui
-	- What about selection groups when something is removed?
-		- For playtesting, we should probably store the entire view state along with the intercosm.
-			- Actually, store only the entity ids as they are subject to alteration during subsequent stepping.
-			- Btw grouping is command-deterministic
-	- The only thing we need to do to prevent crash is to always check if the entity is alive
-		- A cleaner approach is to implement clear_dead_entities to be called after each step
-		- This is because there is more cases of usage than there are cases of state
-	- mover should be deactivated when?
-		- corner case: delete while move?
-		- should work anyway and yeah, deactivate it then
 
 - Arbitrary pasting of entities
 	- Vastly useful for importing stuff from testbed maps into existing ones

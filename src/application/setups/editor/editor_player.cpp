@@ -184,3 +184,6 @@ void editor_player::reset_mode() {
 		current_mode
 	);
 }
+
+static_assert(has_introspect_base_v<editor_player>);
+static_assert(has_introspect_v<editor_player_base>);

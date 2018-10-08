@@ -44,7 +44,7 @@ namespace augs {
 		friend introspection_access;
 		using snapshots_type = std::vector<snapshot_type>;
 
-		// GEN INTROSPECTOR class snapshotted_player class A class B
+		// GEN INTROSPECTOR class augs::snapshotted_player class A class B
 		std::map<step_type, entropy_type> step_to_entropy;
 
 	private:

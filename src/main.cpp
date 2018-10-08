@@ -59,6 +59,8 @@
 #include "cmd_line_params.h"
 #include "build_info.h"
 
+#include "augs/readwrite/byte_readwrite.h"
+
 int work(const int argc, const char* const * const argv);
 
 #if PLATFORM_WINDOWS

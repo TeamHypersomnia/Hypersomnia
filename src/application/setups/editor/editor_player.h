@@ -60,7 +60,11 @@ auto player_advance_input(
 
 class editor_player : public editor_player_base {
 	using base = editor_player_base;
+
+public:
 	using introspect_base = base;
+
+private:
 	using step_type = base::step_type;
 
 	// GEN INTROSPECTOR class editor_player
