@@ -32,11 +32,11 @@ void change_property_command<D>::refresh_other_state(const editor_command_input 
 		auto& self = *static_cast<D*>(this);
 
 		for (const auto& i : self.affected_assets) {
-			in.folder.commanded.work->update_offsets_of(i, changer_callback_result::DONT_REFRESH);
+			in.folder.commanded.work.update_offsets_of(i, changer_callback_result::DONT_REFRESH);
 		}
 
 		if (self.property_id.field.type_id.template is<image_shape_type>()) {
-			auto& cosm = in.folder.commanded.work->world;
+			auto& cosm = in.folder.commanded.work.world;
 
 			cosm.change_common_significant(
 				[&](cosmos_common_significant& common) {
@@ -44,7 +44,7 @@ void change_property_command<D>::refresh_other_state(const editor_command_input 
 						auto& sh = common.logical_assets.get_offsets(i).non_standard_shape;
 						augs::refresh_convex_partitioning(sh);
 
-						in.folder.commanded.work->viewables.image_definitions[i].meta.offsets.non_standard_shape.convex_partition = sh.convex_partition;
+						in.folder.commanded.work.viewables.image_definitions[i].meta.offsets.non_standard_shape.convex_partition = sh.convex_partition;
 					};
 
 					return changer_callback_result::DONT_REFRESH;
@@ -54,7 +54,7 @@ void change_property_command<D>::refresh_other_state(const editor_command_input 
 
 		if (!self.affected_assets.empty()) {
 			auto reinfer = [&]() {
-				in.folder.commanded.work->update_offsets_of(self.affected_assets.front());
+				in.folder.commanded.work.update_offsets_of(self.affected_assets.front());
 			};
 
 			reinfer();

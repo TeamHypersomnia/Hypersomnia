@@ -51,7 +51,7 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 
 			player.on_mode_with_input(
 				folder.commanded.mode_vars,
-				folder.commanded.work->world,
+				folder.commanded.work.world,
 				[&](auto& typed_mode, const auto& mode_input) {
 					using M = remove_cref<decltype(typed_mode)>;
 

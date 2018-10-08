@@ -38,7 +38,7 @@ static void edit_common(
 	const cosmos_common_significant& signi
 ) {
 	auto& cmd_in = in.command_in;
-	auto& defs = cmd_in.folder.commanded.work->viewables;
+	auto& defs = cmd_in.folder.commanded.work.viewables;
 	const auto project_path = cmd_in.folder.current_path;
 
 	auto& work = *cmd_in.folder.commanded.work;

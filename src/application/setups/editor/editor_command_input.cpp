@@ -22,7 +22,7 @@ augs::snapshotted_player_step_type editor_command_input::get_current_step() cons
 }
 
 all_viewables_defs& editor_command_input::get_viewable_defs() const {
-	return folder.commanded.work->viewables;
+	return folder.commanded.work.viewables;
 }
 
 const all_logical_assets& editor_command_input::get_logical_assets() const {
@@ -30,7 +30,7 @@ const all_logical_assets& editor_command_input::get_logical_assets() const {
 }
 
 cosmos& editor_command_input::get_cosmos() const {
-	return folder.commanded.work->world;
+	return folder.commanded.work.world;
 }
 
 void editor_command_input::interrupt_tweakers() const {

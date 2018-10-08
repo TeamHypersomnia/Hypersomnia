@@ -58,7 +58,7 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 	const auto& settings = in.settings.test_scene;
 
 #if BUILD_TEST_SCENES
-	work->make_test_scene(in.lua, { minimal, settings.scene_tickrate }, test_vars, std::addressof(bomb_vars));
+	work.make_test_scene(in.lua, { minimal, settings.scene_tickrate }, test_vars, std::addressof(bomb_vars));
 #endif
 
 	mode_vars.clear();

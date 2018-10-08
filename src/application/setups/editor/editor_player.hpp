@@ -19,7 +19,7 @@ decltype(auto) editor_player::on_mode_with_input_impl(
 				
 				if (const auto vars = mapped_or_nullptr(all_vars.template get_for<V>(), self.current_mode_vars_id)) {
 					if constexpr(M::needs_initial_signi) {
-						const auto& initial = self.before_start.value().commanded.work->world.get_solvable().significant;
+						const auto& initial = self.before_start.value().commanded.work.world.get_solvable().significant;
 						const auto in = I { *vars, initial, cosm };
 
 						callback(typed_mode, in);
@@ -39,7 +39,7 @@ template <class C>
 auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<C> in) {
 	auto& folder = in.cmd_in.folder;
 	auto& history = folder.history;
-	auto& cosm = folder.commanded.work->world;
+	auto& cosm = folder.commanded.work.world;
 
 	return augs::snapshotted_advance_input(
 		total_collected_entropy,
@@ -88,7 +88,7 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 			augs::memory_stream ms;
 
 			augs::write_bytes(ms, current_mode);
-			augs::write_bytes(ms, folder.commanded);
+			augs::write_bytes(ms, *folder.commanded);
 
 			return std::move(ms);//ms.operator std::vector<std::byte>&&();
 		}
@@ -102,14 +102,14 @@ auto editor_player::make_set_snapshot(const player_advance_input_t<C> in) {
 	return [&](const auto n, const auto& snapshot) {
 		if (n == 0) {
 			current_mode = {};
-			folder.commanded = before_start.value().commanded;
+			*folder.commanded = *before_start.commanded;
 			return;
 		}
 
 		auto ss = augs::cref_memory_stream(snapshot);
 
 		augs::read_bytes(ss, current_mode);
-		augs::read_bytes(ss, folder.commanded);
+		augs::read_bytes(ss, *folder.commanded);
 	};
 }
 

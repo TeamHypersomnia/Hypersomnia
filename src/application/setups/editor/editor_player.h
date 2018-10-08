@@ -27,7 +27,7 @@ struct player_before_start_state {
 	using revision_type = editor_history::index_type;
 
 	// GEN INTROSPECTOR struct player_before_start_state
-	editor_commanded_state commanded;
+	std::unique_ptr<editor_commanded_state> commanded;
 	revision_type revision = -1;
 	// END GEN INTROSPECTOR
 };
@@ -69,7 +69,7 @@ class editor_player : public editor_player_base {
 	all_modes_variant current_mode;
 	mode_vars_id current_mode_vars_id = mode_vars_id();
 
-	std::optional<player_before_start_state> before_start;
+	player_before_start_state before_start;
 	// END GEN INTROSPECTOR
 
 	friend augs::introspection_access;

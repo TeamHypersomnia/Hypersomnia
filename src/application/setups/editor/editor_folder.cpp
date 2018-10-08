@@ -13,7 +13,10 @@ std::string editor_folder::get_display_path() const {
 	return ::get_project_name(current_path);
 }
 
-editor_folder::editor_folder(const augs::path_type& p) : current_path(p), work(std::make_unique<intercosm>()) {}
+editor_folder::editor_folder(const augs::path_type& p) : 
+	current_path(p), 
+	work(std::make_unique<intercosm>()) 
+{}
 
 editor_paths editor_folder::get_paths() const {
 	return { current_path, ::get_project_name(current_path) };
@@ -58,7 +61,7 @@ void editor_folder::save_folder(const augs::path_type& to, const augs::path_type
 	augs::create_directory(to / maybe_official_path<assets::image_id>::get_content_suffix());
 	augs::create_directory(to / maybe_official_path<assets::sound_id>::get_content_suffix());
 
-	commanded.work->save_as_int(paths.int_file);
+	commanded.work.save_as_int(paths.int_file);
 	augs::save_as_bytes(commanded.view_ids, paths.view_ids_file);
 	augs::save_as_bytes(commanded.mode_vars, paths.modes_file);
 
@@ -113,7 +116,7 @@ void editor_folder::load_folder(const augs::path_type& from, const augs::path_ty
 	const auto paths = editor_paths(from, name);
 
 	try {
-		commanded.work->load_from_int(paths.int_file);
+		commanded.work.load_from_int(paths.int_file);
 	}
 	catch (const intercosm_loading_error& err) {
 		editor_popup p;

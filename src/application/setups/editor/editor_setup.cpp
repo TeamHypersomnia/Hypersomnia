@@ -1661,7 +1661,7 @@ void editor_setup::on_mode_with_input(F&& callback) const {
 
 		player().on_mode_with_input(
 			f.commanded.mode_vars,
-			f.commanded.work->world,
+			f.commanded.work.world,
 			std::forward<F>(callback)
 		);
 	}

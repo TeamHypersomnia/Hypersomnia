@@ -27,31 +27,33 @@ void make_redoable_for_different_solvable(
 }
 
 void editor_player::save_state_before_start(editor_folder& folder) {
-	ensure(!before_start.has_value());
-	before_start.emplace();
+	ensure(!has_testing_started());
 
-	auto& currnt = folder.commanded;
-	auto& backup = before_start->commanded;
+	ensure(backup == nullptr);
 
-	backup.work = std::move(currnt.work);
-	currnt.work = std::make_unique<intercosm>(*backup.work);
+	auto& current = folder.commanded;
+	auto& backup = before_start.commanded;
 
-	backup.view_ids = currnt.view_ids;
-	backup.mode_vars = currnt.mode_vars;
-	before_start->revision = folder.history.get_current_revision();
+	/* Move current to backup so it is left untouched */
+	backup = std::move(current);
+
+	/* Generate a clone for the current state */
+	current = std::make_unique<intercosm>(*backup);
+
+	before_start.revision = folder.history.get_current_revision();
 }
 
 void editor_player::restore_saved_state(editor_folder& folder) {
-	ensure(before_start.has_value());
+	ensure(has_testing_started());
+	ensure(backup != nullptr);
 
-	auto& backup = before_start->commanded;
-	auto& currnt = folder.commanded;
+	auto& backup = before_start.commanded;
+	auto& current = folder.commanded;
 
-	currnt.work = std::move(backup.work);
-	currnt.view_ids = std::move(backup.view_ids);
-	currnt.mode_vars = std::move(backup.mode_vars);
+	current = std::move(backup);
+	ensure(backup == nullptr);
 
-	before_start.reset();
+	before_start.revision = -1;
 }
 
 bool editor_player::is_editing_mode() const {
@@ -59,7 +61,7 @@ bool editor_player::is_editing_mode() const {
 }
 
 bool editor_player::has_testing_started() const {
-	return before_start.has_value();
+	return before_start.commanded != nullptr;
 }
 
 void editor_player::control(const cosmic_entropy& entropy) {
@@ -75,7 +77,7 @@ void editor_player::finish_testing(const editor_command_input in, const finish_t
 		return;
 	}
 
-	const auto start_revision = before_start->revision;
+	const auto start_revision = before_start.revision;
 
 	auto& f = in.folder;
 	auto& h = f.history;
@@ -103,7 +105,7 @@ void editor_player::finish_testing(const editor_command_input in, const finish_t
 
 #if !TODO_DELTA
 augs::delta editor_player::get_chosen_delta() const {
-	return before_start.value().commanded.work->world.get_fixed_delta();
+	return before_start.commanded.work.world.get_fixed_delta();
 }
 #endif
 
@@ -165,7 +167,7 @@ entity_guid editor_player::lookup_character(const mode_player_id id) const {
 editor_player::revision_type editor_player::get_revision_when_started_testing() const {
 	ensure(has_testing_started());
 
-	return before_start.value().revision;
+	return before_start.revision;
 }
 
 void editor_player::seek_to(
