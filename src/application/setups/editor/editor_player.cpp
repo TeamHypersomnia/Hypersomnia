@@ -123,13 +123,7 @@ double editor_player::get_total_secs() const {
 
 void editor_player::initialize_testing(editor_folder& f) {
 	save_state_before_start(f);
-
-	std::visit(
-		[&](auto& typed_mode) {
-			typed_mode = {};
-		},
-		current_mode
-	);
+	reset_mode();
 }
 
 void editor_player::begin_recording(editor_folder& f) {
@@ -179,4 +173,13 @@ void editor_player::seek_to(
 	const editor_command_input in
 ) {
 	seek_to(step, player_advance_input(in, solver_callbacks()));
+}
+
+void editor_player::reset_mode() {
+	std::visit(
+		[&](auto& typed_mode) {
+			typed_mode = {};
+		},
+		current_mode
+	);
 }

@@ -101,7 +101,7 @@ auto editor_player::make_set_snapshot(const player_advance_input_t<C> in) {
 
 	return [&](const auto n, const auto& snapshot) {
 		if (n == 0) {
-			current_mode = {};
+			reset_mode();
 			*folder.commanded = *before_start.commanded;
 			return;
 		}

@@ -96,6 +96,8 @@ class editor_player : public editor_player_base {
 
 	augs::delta get_chosen_delta() const;
 
+	void reset_mode();
+
 public:
 	bool is_editing_mode() const;
 	bool has_testing_started() const;
