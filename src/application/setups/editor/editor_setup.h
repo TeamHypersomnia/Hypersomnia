@@ -27,7 +27,7 @@
 #include "application/setups/editor/editor_folder.h"
 #include "application/setups/editor/editor_recent_paths.h"
 
-#include "application/setups/editor/gui/editor_entity_selector.inl"
+#include "application/setups/editor/gui/editor_entity_selector.hpp"
 #include "application/setups/editor/gui/editor_entity_mover.h"
 
 #include "application/setups/editor/editor_command_input.h"

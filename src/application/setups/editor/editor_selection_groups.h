@@ -29,19 +29,7 @@ class editor_selection_groups {
 	friend editor_property_accessors;
 
 	template <class C, class F>
-	static bool on_group_entry_of_impl(C& self, const selection_group_unit id, F callback) {
-		for (std::size_t i = 0; i < self.groups.size(); ++i) {
-			auto& g = self.groups[i];
-			auto& entries = g.entries;
-
-			if (auto it = entries.find(id); it != entries.end()) {
-				callback(i, g, it);
-				return true;
-			}
-		}
-
-		return false;
-	}
+	static bool on_group_entry_of_impl(C& self, selection_group_unit id, F&& callback);
 
 	// GEN INTROSPECTOR class editor_selection_groups
 	selection_groups_type groups;
@@ -53,24 +41,13 @@ public:
 	}
 
 	template <class... Args>
-	decltype(auto) on_group_entry_of(Args&&... args) {
-		return on_group_entry_of_impl(*this, std::forward<Args>(args)...);
-	}
+	decltype(auto) on_group_entry_of(Args&&... args);
 
 	template <class... Args>
-	decltype(auto) on_group_entry_of(Args&&... args) const {
-		return on_group_entry_of_impl(*this, std::forward<Args>(args)...);
-	}
+	decltype(auto) on_group_entry_of(Args&&... args) const;
 
 	template <class F>
-	bool for_each_sibling(const selection_group_unit id, F callback) const {
-		return on_group_entry_of(
-			id, 
-			[&callback](auto, const auto& group, auto) {
-				for_each_in(group.entries, callback);
-			}
-		);
-	}
+	bool for_each_sibling(const selection_group_unit id, F callback) const;
 
 	void set_group(selection_group_unit, unsigned group_id);
 	editor_selection_group& new_group();

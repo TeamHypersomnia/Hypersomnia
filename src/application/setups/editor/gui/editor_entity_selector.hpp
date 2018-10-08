@@ -1,5 +1,6 @@
 #pragma once
 #include "application/setups/editor/gui/editor_entity_selector.h"
+#include "application/setups/editor/editor_selection_groups.hpp"
 
 template <class F>
 void editor_entity_selector::for_each_highlight(

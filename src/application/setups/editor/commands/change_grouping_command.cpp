@@ -1,5 +1,6 @@
 #include "application/setups/editor/commands/change_grouping_command.h"
 #include "application/setups/editor/editor_folder.h"
+#include "application/setups/editor/editor_selection_groups.hpp"
 
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"

@@ -23,6 +23,7 @@
 #include "application/setups/draw_setup_gui_input.h"
 #include "view/rendering_scripts/draw_area_indicator.h"
 #include "augs/gui/text/printer.h"
+#include "application/setups/editor/editor_selection_groups.hpp"
 
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/lua_file.h"

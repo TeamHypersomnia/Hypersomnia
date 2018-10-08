@@ -9,7 +9,7 @@
 #include "augs/math/math.h"
 
 #include "game/cosmos/entity_handle.h"
-#include "application/setups/editor/gui/editor_entity_selector.inl"
+#include "application/setups/editor/gui/editor_entity_selector.hpp"
 #include "game/cosmos/for_each_entity.h"
 
 void editor_entity_selector::reset_held_params() {
