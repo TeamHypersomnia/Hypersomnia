@@ -170,7 +170,7 @@ void instantiate_flavour_command::undo(const editor_command_input in) {
 	auto& work = in.folder.commanded->work;
 	auto& cosm = work.world;
 
-	in.clear_selection_of(created_id);
+	in.clear_dead_entity(created_id);
 	cosmic::undo_last_create_entity(cosm[created_id]);
 	created_id = {};
 }

@@ -380,3 +380,17 @@ fae_tree_output editor_fae_gui::perform(
 	return {};
 #endif
 }
+
+void editor_fae_gui_base::clear_dead_entities(const cosmos& cosm) {
+	cosm.clear_dead(entities_tree_data.hovered_guid);
+}
+
+void editor_fae_gui::clear_dead_entities(const cosmos& cosm) {
+	editor_fae_gui_base::clear_dead_entities(cosm);
+	cosm.erase_dead(cached_ticked_entities);
+}
+
+void editor_selected_fae_gui::clear_dead_entities(const cosmos& cosm) {
+	editor_fae_gui_base::clear_dead_entities(cosm);
+	cosm.erase_dead(ticked_entities);
+}

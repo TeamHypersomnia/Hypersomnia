@@ -264,6 +264,20 @@ public:
 			measurement.measure(surplus);
 		});
 	}
+
+	template <class C>
+	void erase_dead(C& container) const {
+		erase_if(container, [&](const auto& entry) {
+			return operator[](entry).dead();
+		});
+	}
+
+	template <class C>
+	void clear_dead(C& entry) const {
+		if (operator[](entry).dead()) {
+			entry = {};
+		}
+	}
 };
 
 inline si_scaling cosmos::get_si() const {

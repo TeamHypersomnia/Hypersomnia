@@ -162,7 +162,7 @@ namespace augs {
 
 	template <class entropy_type, class B>
 	template <class I>
-	void snapshotted_player<entropy_type, B>::advance(
+	int snapshotted_player<entropy_type, B>::advance(
 		const I& in,
 		delta frame_delta, 
 		const delta& fixed_delta
@@ -174,11 +174,15 @@ namespace augs {
 			steps += timer.extract_num_of_logic_steps(fixed_delta);
 		}
 
+		const auto performed_steps = steps;
+
 		while (steps--) {
 			advance_single_step(in);
 		}
 
 		additional_steps = 0;
+
+		return performed_steps;
 	}
 
 }

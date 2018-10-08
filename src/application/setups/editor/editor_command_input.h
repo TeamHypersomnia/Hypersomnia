@@ -11,6 +11,7 @@ namespace sol {
 
 class editor_entity_mover;
 struct editor_fae_gui;
+struct editor_selected_fae_gui;
 
 class cosmos;
 
@@ -28,6 +29,7 @@ struct editor_command_input {
 	editor_entity_selector& selector;
 
 	editor_fae_gui& fae_gui;
+	editor_selected_fae_gui& selected_fae_gui;
 	editor_entity_mover& mover;
 
 	cosmos& get_cosmos() const; 
@@ -41,7 +43,8 @@ struct editor_command_input {
 
 	void purge_selections() const;
 	void interrupt_tweakers() const;
-	void clear_selection_of(entity_id) const;
+	void clear_dead_entity(entity_id) const;
+	void clear_dead_entities() const;
 };
 
 template <class E, class T>

@@ -37,7 +37,8 @@ public:
 	void unhover();
 	void finish_rectangular(current_selections_type& into);
 
-	void clear_selection_of(entity_id);
+	void clear_dead_entity(entity_id);
+	void clear_dead_entities(const cosmos& cosm);
 
 	void do_left_press(
 		const cosmos& cosm,

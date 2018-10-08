@@ -17,7 +17,17 @@ void editor_entity_selector::reset_held_params() {
 	layer_of_held = render_layer::INVALID;
 }
 
-void editor_entity_selector::clear_selection_of(const entity_id id) {
+void editor_entity_selector::clear_dead_entities(const cosmos& cosm) {
+	cosm.erase_dead(in_rectangular_selection);
+	cosm.clear_dead(hovered);
+
+	if (cosm[held].dead()) {
+		rectangular_drag_origin = std::nullopt;
+		held.unset();
+	}
+}
+
+void editor_entity_selector::clear_dead_entity(const entity_id id) {
 	erase_element(in_rectangular_selection, id);
 
 	if (hovered == id) {

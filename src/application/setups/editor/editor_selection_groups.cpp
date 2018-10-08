@@ -1,5 +1,7 @@
 #include "augs/string/typesafe_sprintf.h"
 #include "application/setups/editor/editor_selection_groups.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
 
 void editor_selection_groups::set_group(const selection_group_unit id, const unsigned index) {
 	groups[index].entries.emplace(id);
@@ -62,4 +64,10 @@ std::size_t editor_selection_groups::get_group_by(const std::string& name) {
 	auto& g = groups.back();
 	g.name = name;
 	return groups.size() - 1;
+}
+
+void editor_selection_groups::clear_dead_entities(const cosmos& cosm) {
+	for (auto& g : groups) {
+		cosm.erase_dead(g.entries);
+	}
 }

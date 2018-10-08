@@ -156,7 +156,8 @@ summary: That which we are brainstorming at the moment.
 			- hovered
 			- held
 		- ids.overridden_viewed
-		- Some commands
+		- Some commands?
+			- Well it doesn't matter because we restore correct solvable always
 		- ticked entities in fae gui
 	- What about selection groups when something is removed?
 		- For playtesting, we should probably store the entire view state along with the intercosm.
@@ -165,16 +166,6 @@ summary: That which we are brainstorming at the moment.
 	- The only thing we need to do to prevent crash is to always check if the entity is alive
 		- A cleaner approach is to implement clear_dead_entities to be called after each step
 		- This is because there is more cases of usage than there are cases of state
-	- Cases of invalidation:
-		- **Undoing a command that introduces new entities**
-			- E.g. one that creates an entity from nothing
-			- Look for both undo_last_create and "delete_entity"
-		- We sometimes completely purge, but it's only for:
-			- Fills;
-			- Commands whose undoing or redoing should automatically select affected entities.
-				- Instantiation, duplication etc.
-				- Delete has no reason to purge selections of some other entities.
-		- Delete command
 	- mover should be deactivated when?
 		- corner case: delete while move?
 		- should work anyway and yeah, deactivate it then

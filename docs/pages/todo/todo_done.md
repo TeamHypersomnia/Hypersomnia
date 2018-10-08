@@ -1726,3 +1726,15 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- it will also probably be faster to serialize to bytes than to recreate entire containers with some complex maps, should there be any
 			- e.g. in pending mounts
 		- deserialization will be slower but it won't be used as often
+
+	- Cases of invalidation:
+		- **Undoing a command that introduces new entities**
+			- E.g. one that creates an entity from nothing
+			- Look for both undo_last_create and "delete_entity"
+		- We sometimes completely purge, but it's only for:
+			- Fills;
+			- Commands whose undoing or redoing should automatically select affected entities.
+				- Instantiation, duplication etc.
+				- Delete has no reason to purge selections of some other entities.
+		- Redoing a delete command
+		- Advancing the cosmos solvable

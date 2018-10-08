@@ -34,7 +34,7 @@ void delete_entities_command::redo(const editor_command_input in) {
 
 	deleted_entities.for_each([&](auto& e) {
 		const auto handle = cosm[e.content.guid];
-		in.clear_selection_of(handle.get_id());
+		in.clear_dead_entity(handle.get_id());
 		e.undo_delete_input = *cosmic::delete_entity(handle);
 	});
 }

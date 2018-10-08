@@ -7,6 +7,7 @@
 #include "application/setups/editor/gui/editor_entity_mover.h"
 
 #include "application/setups/editor/gui/editor_fae_gui.h"
+#include "game/cosmos/entity_handle.h"
 #include "application/setups/editor/editor_player.h"
 #include "augs/templates/snapshotted_player.hpp"
 
@@ -36,6 +37,7 @@ cosmos& editor_command_input::get_cosmos() const {
 
 void editor_command_input::interrupt_tweakers() const {
 	fae_gui.interrupt_tweakers();
+	selected_fae_gui.interrupt_tweakers();
 }
 
 void editor_command_input::purge_selections() const {
@@ -44,8 +46,23 @@ void editor_command_input::purge_selections() const {
 	mover.escape();
 }
 
-void editor_command_input::clear_selection_of(const entity_id id) const {
+void editor_command_input::clear_dead_entity(const entity_id id) const {
 	erase_element(folder.commanded->view_ids.selected_entities, id);
 
-	selector.clear_selection_of(id);
+	selector.clear_dead_entity(id);
+}
+
+void editor_command_input::clear_dead_entities() const {
+	const auto& cosm = get_cosmos();
+	selector.clear_dead_entities(cosm);
+
+	auto& view_ids = folder.commanded->view_ids;
+	
+	cosm.erase_dead(view_ids.selected_entities);
+	cosm.clear_dead(view_ids.overridden_viewed);
+
+	view_ids.selection_groups.clear_dead_entities(cosm);
+
+	fae_gui.clear_dead_entities(cosm);
+	selected_fae_gui.clear_dead_entities(cosm);
 }

@@ -123,6 +123,8 @@ void editor_player::seek_to(
 		make_snapshotted_advance_input(in),
 		make_set_snapshot(in)
 	);
+
+	in.cmd_in.clear_dead_entities();
 }
 
 template <class C>
@@ -130,11 +132,15 @@ void editor_player::advance_player(
 	augs::delta frame_delta,
 	const player_advance_input_t<C>& in
 ) {
-	base::advance(
+	const auto performed_steps = base::advance(
 		make_snapshotted_advance_input(in),
 		frame_delta,
 		in.cmd_in.get_cosmos().get_fixed_delta()
 	);
+
+	if (performed_steps) {
+		in.cmd_in.clear_dead_entities();
+	}
 }
 
 template <class M>

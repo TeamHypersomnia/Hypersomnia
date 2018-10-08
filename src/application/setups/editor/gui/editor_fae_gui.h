@@ -52,6 +52,8 @@ struct editor_fae_gui_base : standard_window_mixin<editor_fae_gui_base> {
 
 	void do_view_mode_switch();
 
+	void clear_dead_entities(const cosmos&);
+
 protected:
 	friend augs::introspection_access;
 	entities_tree_state entities_tree_data;
@@ -80,6 +82,8 @@ struct editor_fae_gui : editor_fae_gui_base {
 		fae_selections_type& all_selections
 	);
 
+	void clear_dead_entities(const cosmos&);
+
 private:
 	ticked_flavours_type ticked_flavours;
 	ticked_entities_type cached_ticked_entities;
@@ -94,6 +98,8 @@ struct editor_selected_fae_gui : editor_fae_gui_base {
 		editor_fae_gui_input,
 		const fae_selections_type& only_match_entities
 	);
+
+	void clear_dead_entities(const cosmos&);
 
 private:
 	ticked_flavours_type ticked_flavours;

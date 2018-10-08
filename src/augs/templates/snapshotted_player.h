@@ -64,8 +64,10 @@ namespace augs {
 		void advance_single_step(const I& input);
 
 	protected:
+		/* Returns the number of steps performed */
+
 		template <class I>
-		void advance(
+		int advance(
 			const I& input,
 			delta frame_delta, 
 			const delta& fixed_delta

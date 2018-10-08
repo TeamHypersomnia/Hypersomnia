@@ -79,4 +79,6 @@ public:
 
 	std::size_t find_group_by(const std::string& name) const;
 	std::size_t get_group_by(const std::string& name);
+
+	void clear_dead_entities(const cosmos&);
 };
