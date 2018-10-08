@@ -61,5 +61,7 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 
 			ImGui::ProgressBar(mult);
 		}
+
+		text("Snapshots: %x", player.get_snapshots().size());
 	}
 }

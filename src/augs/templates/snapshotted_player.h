@@ -42,6 +42,7 @@ namespace augs {
 		};
 
 		friend introspection_access;
+		using snapshots_type = std::vector<snapshot_type>;
 
 		// GEN INTROSPECTOR class snapshotted_player class A class B
 		std::map<step_type, entropy_type> step_to_entropy;
@@ -51,7 +52,7 @@ namespace augs {
 		step_type current_step = 0;
 
 		unsigned snapshot_frequency_in_steps = 3000;
-		std::vector<snapshot_type> snapshots;
+		snapshots_type snapshots;
 
 		fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 
@@ -97,6 +98,7 @@ namespace augs {
 		void seek_to(step_type);
 
 		const fixed_delta_timer& get_timer() const;
+		const snapshots_type& get_snapshots() const;
 
 		void pause();
 		void resume();

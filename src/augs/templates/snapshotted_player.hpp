@@ -49,6 +49,11 @@ namespace augs {
 	}
 
 	template <class A, class B>
+	const typename snapshotted_player<A, B>::snapshots_type& snapshotted_player<A, B>::get_snapshots() const { 
+		return snapshots;
+	}
+
+	template <class A, class B>
    	void snapshotted_player<A, B>::finish() {
 		step_to_entropy.clear();
 		current_step = 0;
@@ -184,9 +189,7 @@ namespace augs {
 		
 		switch (advance_mode) {
 			case advance_type::REPLAYING:
-				if (const auto found_entropy = mapped_or_nullptr(step_to_entropy, step_i)) {
-					applied_entropy = *found_entropy;
-				}
+				applied_entropy = mapped_or_default(step_to_entropy, step_i);
 				
 			case advance_type::RECORDING:
 				if (!applied_entropy.empty()) {

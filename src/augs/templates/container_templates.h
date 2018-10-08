@@ -215,6 +215,22 @@ T mapped_or_default(
 	return def;
 }
 
+template <class C, class K>
+auto mapped_or_default(
+	C&& container,
+	K&& key
+) {
+	auto* const ptr = mapped_or_nullptr(std::forward<C>(container), std::forward<K>(key));
+
+	using R = remove_cref<decltype(*ptr)>;
+
+	if (ptr) {
+		return *ptr;
+	}
+
+	return R();
+}
+
 template <class Container>
 auto accumulate_mapped_values(Container& container) {
 	using M = typename remove_cref<Container>::mapped_type;
