@@ -26,7 +26,7 @@ struct editor_folder {
 
 	augs::path_type current_path;
 
-	editor_commanded_state commanded;
+	std::unique_ptr<editor_commanded_state> commanded;
 
 	editor_view view;
 	editor_player player;

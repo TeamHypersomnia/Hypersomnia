@@ -313,7 +313,7 @@ public:
 	template <class F>
 	void for_each_selected_entity(F&& callback) const {
 		if (anything_opened()) {
-			selector.for_each_selected_entity(std::forward<F>(callback), view().ids.selected_entities);
+			selector.for_each_selected_entity(std::forward<F>(callback), view_ids().selected_entities);
 		}
 	}
 
@@ -325,7 +325,9 @@ public:
 	entity_mover_input make_mover_input();
 
 	template <class C>
-	auto make_player_input(const C& callbacks);
+	auto make_player_input(const C& callbacks) {
+		return player_advance_input(make_command_input(), callbacks);
+	}
 
 	template <class T, class... Args>
 	auto make_command_from_selections(Args&&... args) const {
@@ -525,4 +527,7 @@ public:
 
 	editor_view& view();
 	const editor_view& view() const;
+
+	editor_view_ids& view_ids();
+	const editor_view_ids& view_ids() const;
 };

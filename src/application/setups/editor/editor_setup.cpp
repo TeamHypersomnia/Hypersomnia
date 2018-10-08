@@ -56,13 +56,13 @@ real32 editor_setup::get_interpolation_ratio() const {
 
 entity_id editor_setup::get_viewed_character_id() const {
 	if (anything_opened()) {
-		const auto& overridden = view().ids.overridden_viewed;
+		const auto& overridden = view_ids().overridden_viewed;
 
 		if (overridden.is_set()) {
 			return overridden;
 		}
 
-		return work().world[player().lookup_character(view().ids.local_player)].get_id();
+		return work().world[player().lookup_character(view_ids().local_player)].get_id();
 
 	}
 
@@ -127,12 +127,12 @@ void editor_setup::override_viewed_entity(const entity_id overridden_id) {
 		on_mode_with_input(
 			[&](const auto& typed_mode, const auto&) {
 				if (const auto id = typed_mode.lookup(work().world[overridden_id].get_guid()); id.is_set()) {
-					view().ids.local_player = id;
-					view().ids.overridden_viewed = {};
+					view_ids().local_player = id;
+					view_ids().overridden_viewed = {};
 				}
 				else {
-					view().ids.local_player = {};
-					view().ids.overridden_viewed = overridden_id;
+					view_ids().local_player = {};
+					view_ids().overridden_viewed = overridden_id;
 				}
 			}
 		);
@@ -471,7 +471,7 @@ void editor_setup::perform_custom_imgui(
 		common_state_gui.perform(settings, make_command_input());
 
 		{
-			const auto output = fae_gui.perform(make_fae_gui_input(), view().ids.selected_entities);
+			const auto output = fae_gui.perform(make_fae_gui_input(), view_ids().selected_entities);
 
 			if (const auto id = output.instantiate_id) {
 				if (is_gameplay_on()) {
@@ -484,7 +484,7 @@ void editor_setup::perform_custom_imgui(
 				cmd.where.pos = *find_world_cursor_pos();
 				const auto& executed = post_editor_command(make_command_input(), std::move(cmd));
 				const auto created_id = executed.get_created_id();
-				view().ids.selected_entities = { created_id };
+				view_ids().selected_entities = { created_id };
 				mover.start_moving_selection(make_mover_input());
 				make_last_command_a_child();
 			}
@@ -513,7 +513,7 @@ void editor_setup::perform_custom_imgui(
 				selections.emplace(held);
 
 				if (!view().ignore_groups) {
-					view().ids.selection_groups.for_each_sibling(held, [&](const auto id){ selections.emplace(id); });
+					view_ids().selection_groups.for_each_sibling(held, [&](const auto id){ selections.emplace(id); });
 				}
 			}
 
@@ -529,7 +529,7 @@ void editor_setup::perform_custom_imgui(
 			const auto output = selected_fae_gui.perform(in, all_selected);
 
 			const auto& cosm = work().world;
-			output.filter.perform(cosm, view().ids.selected_entities);
+			output.filter.perform(cosm, view_ids().selected_entities);
 		}
 
 		coordinates_gui.perform(*this, screen_size, mouse_pos, all_selected);
@@ -541,7 +541,7 @@ void editor_setup::perform_custom_imgui(
 		if (const auto confirmation = 
 			go_to_entity_gui.perform(settings.go_to, work().world, go_to_dialog_pos)
 		) {
-			::standard_confirm_go_to(*confirmation, has_ctrl, view());
+			::standard_confirm_go_to(*confirmation, has_ctrl, view(), view_ids());
 		}
 
 		if (const auto rot = mover.current_mover_rot_delta(make_mover_input())) {
@@ -555,7 +555,7 @@ void editor_setup::perform_custom_imgui(
 			[&](const auto& typed_mode, const auto& mode_input) {
 				const auto draw_mode_in = draw_mode_gui_input { 
 					get_game_screen_top(), 
-					view().ids.local_player, 
+					view_ids().local_player, 
 					game_atlas,
 					config
 				};
@@ -606,13 +606,13 @@ void editor_setup::clear_id_caches() {
 	selector.clear();
 
 	if (anything_opened()) {
-		view().ids.selected_entities.clear();
+		view_ids().selected_entities.clear();
 	}
 }
 
 void editor_setup::finish_rectangular_selection() {
 	if (anything_opened()) {
-		selector.finish_rectangular(view().ids.selected_entities);
+		selector.finish_rectangular(view_ids().selected_entities);
 	}
 }
 
@@ -859,7 +859,7 @@ editor_command_input editor_setup::make_command_input() {
 }
 
 grouped_selector_op_input editor_setup::make_grouped_selector_op_input() const {
-	return { view().ids.selected_entities, view().ids.selection_groups, view().ignore_groups };
+	return { view_ids().selected_entities, view_ids().selection_groups, view().ignore_groups };
 }
 
 editor_fae_gui_input editor_setup::make_fae_gui_input() {
@@ -876,7 +876,7 @@ void editor_setup::select_all_entities(const bool has_ctrl) {
 			work().world,
 			view().rect_select_mode,
 		   	has_ctrl,
-			view().ids.selected_entities,
+			view_ids().selected_entities,
 			view().get_effective_selecting_filter()
 		);
 	}
@@ -1149,7 +1149,7 @@ bool editor_setup::handle_input_before_game(
 			}
 
 			{
-				auto& selections = view().ids.selected_entities;
+				auto& selections = view_ids().selected_entities;
 
 				if (e.was_pressed(key::LMOUSE)) {
 					selector.do_left_press(cosm, has_ctrl, world_cursor_pos, selections);
@@ -1227,8 +1227,8 @@ bool editor_setup::handle_input_before_game(
 
 			switch (k) {
 				case key::O: 
-					if (view().ids.selected_entities.size() == 1) { 
-						override_viewed_entity(*view().ids.selected_entities.begin()); 
+					if (view_ids().selected_entities.size() == 1) { 
+						override_viewed_entity(*view_ids().selected_entities.begin()); 
 					}
 					return true;
 				case key::A: view().toggle_ignore_groups(); return true;
@@ -1660,8 +1660,8 @@ void editor_setup::on_mode_with_input(F&& callback) const {
 		auto& f = folder();
 
 		player().on_mode_with_input(
-			f.commanded.mode_vars,
-			f.commanded.work.world,
+			f.commanded->mode_vars,
+			f.commanded->work.world,
 			std::forward<F>(callback)
 		);
 	}
@@ -1673,7 +1673,7 @@ void editor_setup::draw_mode_gui(const draw_setup_gui_input& in) {
 			[&](const auto& typed_mode, const auto& mode_input) {
 				const auto draw_mode_in = draw_mode_gui_input { 
 					get_game_screen_top(), 
-					view().ids.local_player, 
+					view_ids().local_player, 
 					in.images_in_atlas,
 					in.config
 				};
@@ -1716,11 +1716,11 @@ const editor_folder& editor_setup::folder() const {
 }
 
 intercosm& editor_setup::work() {
-	return *folder().commanded.work;
+	return folder().commanded->work;
 }
 
 const intercosm& editor_setup::work() const {
-	return *folder().commanded.work;
+	return folder().commanded->work;
 }
 
 editor_player& editor_setup::player() {
@@ -1737,4 +1737,12 @@ editor_view& editor_setup::view() {
 
 const editor_view& editor_setup::view() const {
 	return folder().view;
+}
+
+editor_view_ids& editor_setup::view_ids() {
+	return folder().commanded->view_ids;
+}
+
+const editor_view_ids& editor_setup::view_ids() const {
+	return folder().commanded->view_ids;
 }

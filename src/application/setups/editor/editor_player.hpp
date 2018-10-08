@@ -19,7 +19,7 @@ decltype(auto) editor_player::on_mode_with_input_impl(
 				
 				if (const auto vars = mapped_or_nullptr(all_vars.template get_for<V>(), self.current_mode_vars_id)) {
 					if constexpr(M::needs_initial_signi) {
-						const auto& initial = self.before_start.value().commanded.work.world.get_solvable().significant;
+						const auto& initial = self.before_start.commanded->work.world.get_solvable().significant;
 						const auto in = I { *vars, initial, cosm };
 
 						callback(typed_mode, in);
@@ -39,7 +39,7 @@ template <class C>
 auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<C> in) {
 	auto& folder = in.cmd_in.folder;
 	auto& history = folder.history;
-	auto& cosm = folder.commanded.work.world;
+	auto& cosm = folder.commanded->work.world;
 
 	return augs::snapshotted_advance_input(
 		total_collected_entropy,
@@ -47,7 +47,7 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 		[&](const auto& applied_entropy) {
 			/* step */
 			on_mode_with_input(
-				folder.commanded.mode_vars,
+				folder.commanded->mode_vars,
 				cosm,
 				[&](auto& typed_mode, const auto& mode_in) {
 					while (history.has_next_command()) {
@@ -125,15 +125,15 @@ void editor_player::seek_to(
 	);
 }
 
-template <class I>
+template <class C>
 void editor_player::advance_player(
 	augs::delta frame_delta,
-	const I& in
+	const player_advance_input_t<C>& in
 ) {
 	base::advance(
 		make_snapshotted_advance_input(in),
 		frame_delta,
-		in.cosm.get_fixed_delta()
+		in.cmd_in.get_cosmos().get_fixed_delta()
 	);
 }
 

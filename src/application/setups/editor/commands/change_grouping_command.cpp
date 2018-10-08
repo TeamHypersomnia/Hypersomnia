@@ -46,7 +46,7 @@ void change_grouping_command::redo(const editor_command_input in) {
 	clear_undo_state();
 
 	/* First, ungroup the affected entities */
-	auto& groups = in.folder.commanded.view_ids.selection_groups;
+	auto& groups = in.folder.commanded->view_ids.selection_groups;
 
 	const auto pusher = [this](const auto index, auto& group, const auto it) {
 		group_indices_before.push_back(static_cast<unsigned>(index));
@@ -77,7 +77,7 @@ void change_grouping_command::redo(const editor_command_input in) {
 void change_grouping_command::undo(const editor_command_input in) {
 	ensure_eq(group_indices_before.size(), affected_entities.size());
 
-	auto& groups = in.folder.commanded.view_ids.selection_groups;
+	auto& groups = in.folder.commanded->view_ids.selection_groups;
 
 	const auto eraser = [&](const auto, auto& group, const auto it) {
 		group.entries.erase(it);

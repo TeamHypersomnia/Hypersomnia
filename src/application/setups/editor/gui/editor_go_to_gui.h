@@ -11,6 +11,7 @@
 class cosmos;
 struct editor_go_to_settings;
 struct editor_view;
+struct editor_view_ids;
 
 class editor_go_to_entity_gui {
 	bool show = false;
@@ -33,4 +34,9 @@ public:
 	const_entity_handle get_matching_go_to_entity(const cosmos&) const;
 };
 
-void standard_confirm_go_to(const_entity_handle, bool has_ctrl, editor_view&);
+void standard_confirm_go_to(
+	const_entity_handle, 
+	bool has_ctrl, 
+	editor_view&,
+	editor_view_ids&
+);

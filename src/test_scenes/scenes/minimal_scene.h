@@ -16,9 +16,9 @@ namespace test_scenes {
 		void populate_with_entities(const loaded_image_caches_map& caches, const logic_step_input input) {
 			standard_solver()(
 				input,
-				[&](const logic_step step) { populate(caches, step); }, 
-				[](auto) {},
-				[](auto) {}
+				solver_callbacks(
+					[&](const logic_step step) { populate(caches, step); }
+				)
 			);
 		}
 

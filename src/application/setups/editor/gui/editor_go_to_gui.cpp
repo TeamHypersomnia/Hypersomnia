@@ -34,7 +34,7 @@ void editor_go_to_entity_gui::open() {
 	ImGui::SetWindowFocus("Go to entity");
 }
 
-void standard_confirm_go_to(const const_entity_handle match, const bool has_ctrl, editor_view& view) {
+void standard_confirm_go_to(const const_entity_handle match, const bool has_ctrl, editor_view& view, editor_view_ids& view_ids) {
 	/* Confirm selection with quick search */
 
 	if (match) {

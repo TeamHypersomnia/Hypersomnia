@@ -56,7 +56,7 @@ void cosmos::set(const cosmos_solvable_significant& new_signi) {
 	});
 }
 
-void cosmos::read_solvable_from(const augs::cref_memory_stream& ss) {
+void cosmos::read_solvable_from(augs::cref_memory_stream& ss) {
 	cosmic::change_solvable_significant(*this, [&](cosmos_solvable_significant& current_signi) { 
 		augs::read_bytes(ss, current_signi);
 		return changer_callback_result::REFRESH; 

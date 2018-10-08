@@ -174,9 +174,7 @@ main_menu_setup::main_menu_setup(
 			mode.advance(
 				{ mode_vars, cosm },
 				{ entropy, {} },
-				[](auto&&...) {},
-				[](auto&&...) {},
-				[](auto&&...) {}
+				solver_callbacks()
 			);
 		}
 	}

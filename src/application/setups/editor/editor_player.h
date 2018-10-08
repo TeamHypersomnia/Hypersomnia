@@ -113,10 +113,10 @@ public:
 
 	void ensure_handler();
 
-	template <class I>
+	template <class C>
 	void advance_player(
 		augs::delta frame_delta,
-		const I& input
+		const player_advance_input_t<C>& input
 	);
 
 	template <class... Args>

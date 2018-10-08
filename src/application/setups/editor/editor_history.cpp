@@ -1,5 +1,7 @@
 #include "application/setups/editor/editor_history.h"
+#include "augs/templates/history.hpp"
 #include "application/setups/editor/editor_player.h"
+#include "augs/templates/snapshotted_player.hpp"
 
 template <class T>
 bool command_has_parent(const T& cmd) {

@@ -1,8 +1,7 @@
 #pragma once
 #include "application/setups/editor/editor_view.h"
 #include "game/modes/all_mode_includes.h"
-
-struct intercosm;
+#include "application/intercosm.h"
 
 struct editor_commanded_state {
 	// GEN INTROSPECTOR struct editor_commanded_state

@@ -45,7 +45,7 @@ public:
 	template <class F>
 	void change_common_significant(F&& callback);
 
-	void read_solvable_from(const augs::cref_memory_stream& ss); 
+	void read_solvable_from(augs::cref_memory_stream& ss); 
 	void set(const cosmos_solvable_significant& signi); 
 	si_scaling get_si() const;
 

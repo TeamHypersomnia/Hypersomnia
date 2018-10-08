@@ -132,7 +132,7 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 			new_entry.id = id;
 			new_entry.name = get_displayed_name(object, get_asset_pool<assets::image_id>(cmd_in));
 
-			find_locations_that_use(id, folder.commanded.commanded.work.world, folder.commanded.commanded.work.viewables, [&](const auto& location) {
+			find_locations_that_use(id, folder.commanded->work.world, folder.commanded->work.viewables, [&](const auto& location) {
 				new_entry.using_locations.push_back(location);
 			});
 
@@ -271,7 +271,7 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 
 			auto prop_in = property_editor_input { settings, property_editor_data };
 			const auto& project_path = cmd_in.folder.current_path;
-			auto& viewables = folder.commanded.work.viewables;
+			auto& viewables = folder.commanded->work.viewables;
 
 			using frames_widget_type = 
 				std::conditional_t<

@@ -80,7 +80,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 	}
 
 	auto& folder = cmd_in.folder;
-	auto& work = *folder.commanded.work;
+	auto& work = folder.commanded->work;
 
 	auto& viewables = work.viewables;
 	auto& definitions = get_viewable_pool<asset_id_type>(viewables);

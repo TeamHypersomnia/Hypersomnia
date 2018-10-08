@@ -21,11 +21,11 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 	clear_undo_state();
 	in.purge_selections();
 
-	auto& work = in.folder.commanded.work;
+	auto& work = in.folder.commanded->work;
 	auto& view = in.folder.view;
-	auto& view_ids = in.folder.commanded.view_ids;
+	auto& view_ids = in.folder.commanded->view_ids;
 	auto& player = in.folder.player;
-	auto& mode_vars = in.folder.commanded.mode_vars;
+	auto& mode_vars = in.folder.commanded->mode_vars;
 
 	auto ms = augs::ref_memory_stream(before_fill);
 
