@@ -103,7 +103,7 @@ public:
 
 	template <class F>
 	void for_each_highlight(
-		F callback,
+		F&& callback,
 		const editor_entity_selector_settings& settings,
 		const cosmos& cosm,
 		const grouped_selector_op_input in

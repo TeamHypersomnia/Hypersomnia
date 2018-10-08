@@ -1,4 +1,4 @@
-#include "application/setups/editor/editor_setup.h"
+#include "application/setups/editor/editor_setup.hpp"
 #include "application/setups/editor/editor_history.hpp"
 #include "game/cosmos/cosmic_functions.h"
 #include "game/detail/inventory/inventory_slot_handle.h"

@@ -13,7 +13,7 @@
 #include "view/viewables/images_in_atlas_map.h"
 
 #include "application/config_lua_table.h"
-#include "application/setups/editor/editor_setup.h"
+#include "application/setups/editor/editor_setup.hpp"
 #include "application/setups/editor/editor_player.hpp"
 #include "application/setups/editor/editor_paths.h"
 #include "application/setups/editor/editor_camera.h"

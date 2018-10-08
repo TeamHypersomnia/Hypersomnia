@@ -1,15 +1,9 @@
 #pragma once
 #include <future>
-#include <map>
 
-#include "augs/drawing/general_border.h"
 #include "augs/templates/wrap_templates.h"
 
 #include "game/assets/all_logical_assets.h"
-
-#include "game/organization/all_component_includes.h"
-#include "game/cosmos/cosmos.h"
-#include "game/cosmos/entity_handle.h"
 #include "game/detail/visible_entities.h"
 
 #include "view/necessary_image_id.h"
@@ -20,7 +14,7 @@
 #include "view/mode_gui/arena/arena_mode_gui.h"
 
 #include "application/intercosm.h"
-
+#include "game/cosmos/entity_handle.h"
 #include "application/debug_settings.h"
 
 #include "application/setups/setup_common.h"
@@ -51,9 +45,6 @@
 #include "application/setups/editor/gui/editor_pathed_asset_gui.h"
 #include "application/setups/editor/gui/editor_unpathed_asset_gui.h"
 
-#include "application/setups/editor/gui/for_each_iconed_entity.h"
-
-#include "application/setups/editor/detail/make_command_from_selections.h"
 #include "application/app_intent_type.h"
 
 struct config_lua_table;
@@ -138,23 +129,7 @@ class editor_setup {
 	}
 
 	template <class F>
-	void try_to_open_new_folder(F&& new_folder_provider) {
-		const auto new_index = signi.current_index + 1;
-
-		signi.folders.reserve(signi.folders.size() + 1);
-		signi.folders.emplace(signi.folders.begin() + new_index);
-
-		auto& new_folder = signi.folders[new_index];
-
-		try {
-			new_folder_provider(new_folder);
-			set_current(new_index);
-		}
-		catch (const editor_popup& p) {
-			signi.folders.erase(signi.folders.begin() + new_index);
-			set_popup(p);
-		}
-	}
+	void try_to_open_new_folder(F&& new_folder_provider);
 
 	std::future<std::optional<std::string>> open_folder_dialog;
 	std::future<std::optional<std::string>> save_project_dialog;
@@ -330,133 +305,28 @@ public:
 	}
 
 	template <class T, class... Args>
-	auto make_command_from_selections(Args&&... args) const {
-		return ::make_command_from_selections<T>(
-			make_for_each_selected_entity(),
-			work().world,
-			std::forward<Args>(args)...
-		);
-	}
+	auto make_command_from_selections(Args&&...) const;
 
 	std::unordered_set<entity_id> get_all_selected_entities() const;
 
 	template <class F>
-	void for_each_line(F) const {
-
-	}
+	void for_each_line(F) const {}
 
 	template <class F>
-	void for_each_dashed_line(F callback) const {
-		if (is_editing_mode()) {
-			const auto& world = work().world;
-
-			if (const auto handle = world[selector.get_hovered()]) {
-				if (const auto tr = handle.find_logic_transform()) {
-					/* Draw dashed lines around the selected entity */
-					const auto ps = augs::make_rect_points<vec2>(handle.get_logical_size(), tr->pos, tr->rotation);
-
-					for (std::size_t i = 0; i < ps.size(); ++i) {
-						const auto& v = ps[i];
-						const auto& nv = wrap_next(ps, i);
-
-						callback(v, nv, settings.entity_selector.hovered_dashed_line_color, 0);
-					}
-				}
-			}
-
-			for_each_selected_entity(
-				[&](const entity_id id) {
-					const auto handle = world[id];
-
-					handle.dispatch_on_having_all<invariants::light>([&](const auto typed_handle) {
-						const auto center = typed_handle.get_logic_transform().pos;
-
-						const auto& light_def = typed_handle.template get<invariants::light>();
-						const auto& light = typed_handle.template get<components::light>();
-
-						const auto light_color = light.color;
-
-						auto draw_reach_indicator = [&](const auto reach, const auto col) {
-							const auto h_size = vec2::square(reach);
-							const auto size = vec2::square(reach * 2);
-
-							callback(center, center + h_size, col);
-
-							augs::general_border_from_to(
-								ltrb(xywh::center_and_size(center, size)),
-								0,
-								[&](const vec2 from, const vec2 to) {
-									callback(from, to, col);
-								}
-							);
-						};
-
-						draw_reach_indicator(light_def.calc_reach_trimmed(), light_color);
-						draw_reach_indicator(light_def.calc_wall_reach_trimmed(), rgba(light_color).mult_alpha(0.7f));
-					});
-
-					if (mover.is_active()) {
-						handle.dispatch_on_having_all<components::overridden_geo>([&](const auto typed_handle) {
-							const auto s = typed_handle.get_logical_size();
-							const auto tr = typed_handle.get_logic_transform();
-
-							const auto& history = folder().history;
-							const auto& last = history.last_command();
-
-							if (const auto* const cmd = std::get_if<resize_entities_command>(std::addressof(last))) {
-								const auto active = cmd->get_active_edges();
-								const auto edges = ltrb::center_and_size(tr.pos, s).make_edges();
-
-								auto draw_edge = [&](auto e) {
-									callback(e[0].mult(tr), e[1].mult(tr), red, global_time_seconds * 8, true);
-								};
-
-								if (active.top) {
-									draw_edge(edges[0]);
-								}
-								if (active.right) {
-									draw_edge(edges[1]);
-								}
-								if (active.bottom) {
-									draw_edge(edges[2]);
-								}
-								if (active.left) {
-									draw_edge(edges[3]);
-								}
-							}
-						});
-					}
-				}
-			);
-		}
-	}
+	void for_each_dashed_line(F&&) const;
 
 	template <class F>
 	void for_each_icon(
 		const visible_entities& entities, 
 		const faction_view_settings& settings,
-		F callback
-	) const {
-		if (is_editing_mode()) {
-			const auto& world = work().world;
-
-			::for_each_iconed_entity(
-				world, 
-				entities,
-				settings,
-
-				[&](auto&&... args) {
-					callback(std::forward<decltype(args)>(args)...);
-				}
-			);
-		}
-	}
+		F&& callback
+	) const;
 
 	std::optional<rgba> find_highlight_color_of(const entity_id id) const;
 	std::optional<ltrb> find_selection_aabb() const;
 
 	template <class F>
-	void for_each_highlight(F callback) const {
+	void for_each_highlight(F&& callback) const {
 		if (is_editing_mode()) {
 			const auto& world = work().world;
 
@@ -468,7 +338,7 @@ public:
 			}
 
 			selector.for_each_highlight(
-				callback,
+				std::forward<F>(callback),
 				settings.entity_selector,
 				world,
 				make_grouped_selector_op_input()
