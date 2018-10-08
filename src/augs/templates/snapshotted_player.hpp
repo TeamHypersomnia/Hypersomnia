@@ -71,28 +71,36 @@ namespace augs {
 		const I& input,
 		SetSnapshot&& set_snapshot
 	) {
-		const auto previous_snapshot_index = std::min(
-			static_cast<unsigned>(snapshots.size() - 1),
-			seeked_step / snapshot_frequency_in_steps
-		);
-
-		auto set_ith = [&](const auto i) {
+		auto set = [&](const auto i) {
 			set_snapshot(i, snapshots.at(i));
 			current_step = i * snapshot_frequency_in_steps;
 		};
 
+		const auto seeked_adj_snapshot = std::min(
+			static_cast<unsigned>(snapshots.size() - 1),
+			seeked_step / snapshot_frequency_in_steps
+		);
+
 		if (seeked_step < current_step) {
-			set_ith(previous_snapshot_index);
+			set(seeked_adj_snapshot);
 		}
 
-		/* at this point the seeked_step is either equal or greater than the current */
+		/* At this point the current step is <= than the target step. */
 
-		const auto distance_from_previous_snapshot = seeked_step - previous_snapshot_index * snapshot_frequency_in_steps;
-		const auto distance_from_current = seeked_step - current_step;
+		{
+			/* Maybe we can speed up the forward seek by setting some future snapshot. */
 
-		if (distance_from_previous_snapshot < distance_from_current) {
-			set_ith(previous_snapshot_index);
+			const auto step_of_adj_snapshot = seeked_adj_snapshot * snapshot_frequency_in_steps;
+
+			const auto distance_from_adj_snapshot = seeked_step - step_of_adj_snapshot;
+			const auto distance_from_seeked_step = seeked_step - current_step;
+
+			if (distance_from_adj_snapshot < distance_from_seeked_step) {
+				set(seeked_adj_snapshot);
+			}
 		}
+
+		/* Advance how much is needed from the time of the set snapshot. */
 
 		while (current_step < seeked_step) {
 			advance_single_step(input);
@@ -102,7 +110,7 @@ namespace augs {
 	template <class A, class B>
 	template <class MakeSnapshot>
 	void snapshotted_player<A, B>::push_snapshot_if_needed(MakeSnapshot&& make_snapshot) {
-		if (current_step != 0 && current_step % snapshot_frequency_in_steps == 0) {
+		if (current_step % snapshot_frequency_in_steps == 0) {
 			const auto snapshot_index = current_step / snapshot_frequency_in_steps;
 
 			const bool valid_snapshot_exists = snapshot_index < snapshots.size();
