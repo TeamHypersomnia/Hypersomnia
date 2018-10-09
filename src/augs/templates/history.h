@@ -69,6 +69,10 @@ namespace augs {
 			return commands;
 		}
 
+		auto& get_commands() {
+			return commands;
+		}
+
 		auto get_current_revision() const {
 			return current_revision;
 		}

@@ -28,7 +28,7 @@ struct player_before_start_state {
 
 	// GEN INTROSPECTOR struct player_before_start_state
 	std::unique_ptr<editor_commanded_state> commanded;
-	revision_type revision = -1;
+	editor_history history;
 	// END GEN INTROSPECTOR
 };
 
@@ -138,8 +138,6 @@ public:
 	entity_guid lookup_character(mode_player_id) const;
 
 	using revision_type = editor_history::index_type;
-
-	revision_type get_revision_when_started_testing() const;
 
 	double get_current_secs() const;
 	double get_total_secs() const;

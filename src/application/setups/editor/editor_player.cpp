@@ -43,7 +43,8 @@ void editor_player::save_state_before_start(editor_folder& folder) {
 	/* Generate a clone for the current state */
 	current = std::make_unique<editor_commanded_state>(*backup);
 
-	before_start.revision = folder.history.get_current_revision();
+	before_start.history = std::move(folder.history);
+	folder.history = {};
 }
 
 void editor_player::restore_saved_state(editor_folder& folder) {
@@ -57,7 +58,8 @@ void editor_player::restore_saved_state(editor_folder& folder) {
 	current = std::move(backup);
 	ensure(backup == nullptr);
 
-	before_start.revision = -1;
+	folder.history = std::move(before_start.history);
+	before_start.history = {};
 }
 
 bool editor_player::is_editing_mode() const {
@@ -81,25 +83,37 @@ void editor_player::finish_testing(const editor_command_input in, const finish_t
 		return;
 	}
 
-	const auto start_revision = before_start.revision;
-
 	auto& f = in.folder;
-	auto& h = f.history;
+
+	auto& current_history = f.history;
+	auto playtested_history = editor_history(std::move(f.history));
 
 	restore_saved_state(f);
 
 	base::finish();
 	total_collected_entropy.clear();
 
-	h.force_set_current_revision(start_revision);
-
 	if (mode == finish_testing_type::DISCARD_CHANGES) {
-		h.discard_later_revisions();
+
 	}
 	else if (mode == finish_testing_type::REAPPLY_CHANGES) {
-		while (h.has_next_command()) {
-			::make_redoable_for_different_solvable(in, h.next_command());
-			h.redo(in);
+		current_history.discard_later_revisions();
+
+		using R = editor_history::index_type;
+
+		auto& commands = playtested_history.get_commands();
+
+		for (R i = 0; i < playtested_history.get_current_revision(); ++i) {
+			auto& cmd = commands[i];
+
+			::make_redoable_for_different_solvable(in, cmd);
+
+			std::visit(
+				[&](auto& typed_cmd) {
+					current_history.execute_new(std::move(typed_cmd), in);
+				},
+				cmd
+			);
 		}
 	}
 	else {
@@ -161,12 +175,6 @@ entity_guid editor_player::lookup_character(const mode_player_id id) const {
 		},
 		current_mode
 	);
-}
-
-editor_player::revision_type editor_player::get_revision_when_started_testing() const {
-	ensure(has_testing_started());
-
-	return before_start.revision;
 }
 
 void editor_player::seek_to(

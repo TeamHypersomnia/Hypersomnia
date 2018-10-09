@@ -115,7 +115,7 @@ auto editor_player::make_set_snapshot(const player_advance_input_t<C> in) {
 		if (n == 0) {
 			reset_mode();
 			*folder.commanded = *before_start.commanded;
-			history.force_set_current_revision(before_start.revision);
+			history.force_set_current_revision(history.get_first_revision());
 			return;
 		}
 

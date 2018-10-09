@@ -38,16 +38,6 @@ void editor_history_gui::perform(const editor_command_input in) {
 	ImGui::NextColumn();
 	ImGui::Separator();
 
-	const auto playtest_start_revision = [&]() -> std::optional<index_type> {
-		const auto& p = in.folder.player;
-
-		if (p.has_testing_started()) {
-			return p.get_revision_when_started_testing();
-		}
-
-		return std::nullopt;
-	}();
-
 	auto do_history_node = [&](
 		const index_type command_index,
 		const std::string& description,
@@ -88,24 +78,12 @@ void editor_history_gui::perform(const editor_command_input in) {
 
 		auto indent = cond_scoped_indent(has_parent);
 
-		if (playtest_start_revision && command_index < *playtest_start_revision) {
-			text_disabled(description);
-		}
-		else {
-			ImGui::Selectable(description.c_str(), is_selected);
-		}
+		ImGui::Selectable(description.c_str(), is_selected);
 
 		ImGui::PopStyleColor(colors);
 
 		if (ImGui::IsItemClicked()) {
 			history.seek_to_revision(command_index, in);
-		}
-
-		if (playtest_start_revision == command_index) {
-			//ImGui::PushStyleColor(ImGuiCol_HeaderHovered, red);
-			//ImGui::Selectable("(Playtesting started)", false);
-			//ImGui::PopStyleColor();
-			text_disabled("(Playtesting started)");
 		}
 
 		ImGui::NextColumn();
@@ -119,7 +97,10 @@ void editor_history_gui::perform(const editor_command_input in) {
 		ImGui::NextColumn();
 	};
 
-	do_history_node(-1, "Created project files", in.folder.view.meta.timestamp, false);
+	{
+		const auto first_label = in.get_player().has_testing_started() ? "Started playtesting" : "Created project files";
+		do_history_node(-1, first_label, in.folder.view.meta.timestamp, false);
+	}
 
 	const auto& commands = history.get_commands();
 

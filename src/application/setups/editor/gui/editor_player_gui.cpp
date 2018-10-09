@@ -68,6 +68,5 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 		text("Recording length: %x", format_mins_secs_ms(total));
 
 		text("Snapshots: %x", player.get_snapshots().size());
-		text("Revision when started: %x", player.get_revision_when_started_testing());
 	}
 }
