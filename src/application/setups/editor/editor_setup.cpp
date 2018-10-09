@@ -1521,10 +1521,18 @@ void editor_setup::draw_status_bar(const draw_setup_gui_input& in) {
 				total_text += viewed.get_name();
 			}
 
+			auto formatted_status_bar_text = formatted_string(total_text, st);
+
+			if (player().has_testing_started() && is_editing_mode()) {
+				const auto st = style(in.gui_fonts.gui, yellow);
+
+				formatted_status_bar_text = formatted_string("Paused the playtesting\n", st) + formatted_status_bar_text;
+			}
+
 			print_stroked(
 				in.drawer,
 				vec2i(padding.x, ss.y - padding.y),
-				formatted_string(total_text, st),
+				formatted_status_bar_text,
 				augs::ralign::LB
 			);
 		}

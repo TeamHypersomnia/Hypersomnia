@@ -6,11 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- What do we do if we start recording mid-way?
+- What do we do if we start recording when some commands can still be redone?
 	- Well we could simply move the current history to backup for free...
 		- ...instantiate new history without having to clone anything at all...
 		- and we dont even have to use force sets now
-		- plus we have a clean view in the history gui
+		- plus we have a clean view in the history gui without further ado
+		- what about the first revision?
 	- Do we save entire history?
 		- that might be really some pain
 
