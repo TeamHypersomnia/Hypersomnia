@@ -1787,3 +1787,21 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Implement tree node for the children of commands in history gui
 
+
+- Check for crashes when we have some audiovisuals but we suddenly switch to an empty workspace
+
+
+- Replaying and commands
+	- Replay commands along the solvable's progress as they were applied.
+		- pro: don't have to sanitize undos, they are always applied for the solvables upon which the command was originally executed
+		- pro: repros replayable even with commands involved
+		- pro: can do funny directing stuff
+		- con: much space wasted but who cares
+	- Implementation details
+		- editor history
+			- redo shall only move the solvable forward first if there is such a need;
+			- only then apply command once
+			- undo 
+				- if solvable step at which it was applied matches, simply undo once
+				- shall only use the seek_to if the solvable step mismatches
+

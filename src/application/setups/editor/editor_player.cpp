@@ -197,3 +197,10 @@ editor_player::step_type editor_player::get_current_step() const {
 	return base::get_current_step();
 }
 
+
+void editor_player::request_steps(const int amount) {
+	if (has_testing_started()) {
+		base::request_steps(amount);
+	}
+}
+

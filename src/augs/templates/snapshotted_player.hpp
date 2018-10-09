@@ -59,6 +59,8 @@ namespace augs {
    	void snapshotted_player<A, B>::finish() {
 		step_to_entropy.clear();
 		current_step = 0;
+		additional_steps = 0;
+		snapshots.clear();
 
 		pause();
 	}
@@ -72,6 +74,11 @@ namespace augs {
 	template <class A, class B>
    	bool snapshotted_player<A, B>::is_paused() const {
 		return advance_mode == advance_type::PAUSED;
+	}
+
+	template <class A, class B>
+	bool snapshotted_player<A, B>::is_recording() const {
+		return advance_mode == advance_type::RECORDING;
 	}
 
 	template <class A, class B>

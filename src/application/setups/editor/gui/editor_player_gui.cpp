@@ -59,7 +59,9 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 				const auto target_step = player.get_total_steps() * mult;
 				player.seek_to(target_step, cmd_in);
 
-				player.begin_replaying(folder);
+				if (player.is_recording()) {
+					player.begin_replaying(folder);
+				}
 			}
 
 			ImGui::ProgressBar(mult);

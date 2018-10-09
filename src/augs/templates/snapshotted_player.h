@@ -106,6 +106,7 @@ namespace augs {
 		void finish();
 
 		bool is_paused() const;
+		bool is_recording() const;
 
 		void request_steps(int amount);
 

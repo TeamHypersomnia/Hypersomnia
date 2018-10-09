@@ -102,6 +102,8 @@ private:
 
 	void reset_mode();
 
+	using base::request_steps;
+
 public:
 	bool is_editing_mode() const;
 	bool has_testing_started() const;
@@ -153,4 +155,6 @@ public:
 		step_type, 
 		editor_command_input input
 	);
+
+	void request_steps(int amount);
 };

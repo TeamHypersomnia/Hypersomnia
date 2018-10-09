@@ -7,8 +7,7 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - Fix autosaving when playtesting
-
-- Check for crashes when we have some audiovisuals but we suddenly switch to an empty workspace
+	- Revision number might coincide
 
 - Make snapshot frequency configurable
 	- Actually let's just quickly implement map there
@@ -20,23 +19,13 @@ summary: That which we are brainstorming at the moment.
 		- Actually, just provide sort inside layers for domains that require ordering
 			- e.g. get first bomb
 
-- Replaying and commands
-	- Replay commands along the solvable's progress as they were applied.
-		- pro: don't have to sanitize undos, they are always applied for the solvables upon which the command was originally executed
-		- pro: repros replayable even with commands involved
-		- pro: can do funny directing stuff
-		- con: much space wasted but who cares
-	- Implementation details
-		- editor history
-			- redo shall only move the solvable forward first if there is such a need;
-			- only then apply command once
-			- undo 
-				- if solvable step at which it was applied matches, simply undo once
-				- shall only use the seek_to if the solvable step mismatches
-
-- Later if we want to concatenate recorded entropies, we may just hold a step_to_entropy per each concerned player and accumulate them before step
-	- No need for some wanky overrides
-	- though these overrides should be easy enough, we can even determine the authorized capability for transfers
+- Restructure entropy
+	- Let entropy be just a map of players into a struct of respective inputs
+		- don't hold multiple maps
+		- we'll write manual entropy serialization code anyway
+	- Fixes: Later if we want to concatenate recorded entropies, we may just hold a step_to_entropy per each concerned player and accumulate them before step
+		- No need for some wanky overrides
+		- though these overrides should be easy enough, we can even determine the authorized capability for transfers
 
 - Implement view early to know what's going on
 

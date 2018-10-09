@@ -67,7 +67,9 @@ void editor_history::seek_to_revision(
 		return;
 	}
 
-	p.begin_replaying(cmd_in.folder);
+	if (p.has_testing_started() && p.is_recording()) {
+		p.begin_replaying(cmd_in.folder);
+	}
 
 	auto do_redo = [&]() {
 		editor_history_base::redo(cmd_in);
