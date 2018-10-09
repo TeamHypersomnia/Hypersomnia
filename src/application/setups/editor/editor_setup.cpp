@@ -956,8 +956,8 @@ bool editor_setup::handle_input_before_imgui(
 			switch (k) {
 				case key::N: new_tab(); return true;
 				case key::O: open(window); return true;
-				case key::BACKSPACE: if (anything_opened()) { player().finish_testing(make_command_input(), finish_testing_type::DISCARD_CHANGES); }
-				case key::ENTER: if (anything_opened()) { player().finish_testing(make_command_input(), finish_testing_type::REAPPLY_CHANGES); }
+				case key::BACKSPACE: finish_and_discard(); return true; 
+				case key::ENTER: finish_and_reapply(); return true;
 				default: break;
 			}
 		}
@@ -1569,11 +1569,13 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 
 			if (try_preffix("Deleted", red)
 				|| try_preffix("Cannot", red)
+				|| try_preffix("Discarded", orange)
+				|| try_preffix("Reapplied", pink)
 				|| try_preffix("Successfully", green)
 				|| try_preffix("Filled", green)
-				|| try_preffix("Altered", orange)
-				|| try_preffix("Renamed", orange)
-				|| try_preffix("Changed", orange)
+				|| try_preffix("Altered", yellow)
+				|| try_preffix("Renamed", yellow)
+				|| try_preffix("Changed", yellow)
 				|| try_preffix("Created", green)
 				|| try_preffix("Started", green)				
 				|| try_preffix("Started tracking", green)				
@@ -1739,6 +1741,30 @@ bool editor_setup::anything_opened() const {
 		&& signi.current_index != static_cast<folder_index>(-1) 
 		&& signi.current_index < signi.folders.size()
 	;
+}
+
+void editor_setup::finish_and_discard() {
+	if (anything_opened()) { 
+		auto& p = player();
+
+		if (p.has_testing_started()) {
+			player().finish_testing(make_command_input(), finish_testing_type::DISCARD_CHANGES);
+
+			recent_message.set("Discarded the playtesting session");
+		}
+	}
+}
+
+void editor_setup::finish_and_reapply() {
+	if (anything_opened()) { 
+		auto& p = player();
+
+		if (p.has_testing_started()) {
+			player().finish_testing(make_command_input(), finish_testing_type::REAPPLY_CHANGES);
+
+			recent_message.set("Reapplied changes done during the playtesting session");
+		}
+	}
 }
 
 editor_folder& editor_setup::folder() {
