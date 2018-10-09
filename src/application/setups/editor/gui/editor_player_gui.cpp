@@ -63,6 +63,7 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 			ImGui::ProgressBar(mult);
 		}
 
+		text("Current step: %x/%x", player.get_current_step(), player.get_total_steps());
 		text("Current time: %x", format_mins_secs_ms(current));
 		text("Recording length: %x", format_mins_secs_ms(total));
 

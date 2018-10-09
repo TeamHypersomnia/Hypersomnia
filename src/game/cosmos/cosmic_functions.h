@@ -26,7 +26,6 @@ struct entity_solvable;
 class cosmic {
 	static void destroy_caches_of(const entity_handle h);
 	static void infer_all_entities(cosmos& cosm);
-	static void reinfer_solvable(cosmos&);
 
 	template <class F>
 	friend void entity_deleter(const entity_handle, F);
@@ -102,6 +101,7 @@ public:
 	static void reserve_storage_for_entities(cosmos&, const cosmic_pool_size_type s);
 	static void increment_step(cosmos&);
 
+	static void reinfer_solvable(cosmos&);
 	static void reinfer_all_entities(cosmos&);
 	static void infer_caches_for(const entity_handle h);
 

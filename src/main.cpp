@@ -726,18 +726,16 @@ int work(const int argc, const char* const * const argv) try {
 		
 		audiovisual_step(frame_delta, setup.get_audiovisual_speed(), viewing_config);
 
-		/* MSVC ICE workaround */
-		auto& _audiovisual_step = audiovisual_step;
-		auto& _setup_post_solve = setup_post_solve;
+		auto setup_audiovisual_post_solve = [&viewing_config, &setup](const const_logic_step step) {
+			setup_post_solve(step, viewing_config);
+			audiovisual_step(augs::delta::zero, setup.get_audiovisual_speed(), viewing_config);
+		};
 
 		setup.advance(
 			frame_delta,
 			solver_callbacks(
 				setup_pre_solve,
-				[&](const const_logic_step step) {
-					_setup_post_solve(step, viewing_config);
-					_audiovisual_step(augs::delta::zero, setup.get_audiovisual_speed(), viewing_config);
-				},
+				setup_audiovisual_post_solve,
 				setup_post_cleanup
 			)
 		);

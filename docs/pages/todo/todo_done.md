@@ -1769,3 +1769,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - Somehow clear dead entities after each seek in main
 	- Communicate it somehow?
 
+- Crash when manually advancing but not when seeking
+	- Only in release...
+	- also check if the plain advance remembers to set the commands properly
+

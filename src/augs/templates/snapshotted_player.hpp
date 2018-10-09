@@ -36,13 +36,13 @@ namespace augs {
 	template <class A, class B>
 	void snapshotted_player<A, B>::begin_replaying() {
 		advance_mode = advance_type::REPLAYING;
-		PLR_LOG("begin_replaying");
+		PLR_LOG("begin_replaying at step: %x", current_step);
 	}
 
 	template <class A, class B>
 	void snapshotted_player<A, B>::begin_recording() {
 		advance_mode = advance_type::RECORDING;
-		PLR_LOG("begin_recording");
+		PLR_LOG("begin_recording at step: %x", current_step);
 	}
 
 	template <class A, class B>
@@ -166,6 +166,7 @@ namespace augs {
 			}
 			else {
 				PLR_LOG("Snapshot step: %x. Snapshot #%x exists.", current_step, snapshot_index);
+				make_snapshot(std::nullopt);
 			}
 		}
 	}
@@ -178,18 +179,6 @@ namespace augs {
 
 		push_snapshot_if_needed(in.make_snapshot);
 
-		{
-			const auto next_snapshot_index = 1 + step_i / snapshot_frequency_in_steps;
-			const bool outdated_snapshots_to_delete_exist = next_snapshot_index < snapshots.size();
-
-			if (outdated_snapshots_to_delete_exist) {
-				snapshots.erase(
-					snapshots.begin() + next_snapshot_index,
-					snapshots.end()
-				);
-			}
-		}
-		
 		auto considered_mode = advance_mode;
 
 		if (considered_mode == advance_type::PAUSED) {
@@ -206,6 +195,19 @@ namespace augs {
 				if (!applied_entropy.empty()) {
 					step_to_entropy[step_i] = applied_entropy;
 				}
+
+				{
+					const auto next_snapshot_index = 1 + step_i / snapshot_frequency_in_steps;
+					const bool outdated_snapshots_to_delete_exist = next_snapshot_index < snapshots.size();
+
+					if (outdated_snapshots_to_delete_exist) {
+						snapshots.erase(
+							snapshots.begin() + next_snapshot_index,
+							snapshots.end()
+						);
+					}
+				}
+		
 				break;
 
 			default: break;

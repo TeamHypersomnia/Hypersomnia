@@ -91,7 +91,7 @@ namespace augs {
 
 	template <class Archive>
 	void read_object_bytes(Archive& from, cosmos& cosm) {
-		ensure(cosm.empty());
+		cosmic::clear(cosm);
 
 		auto& profiler = cosm.profiler;
 
@@ -156,9 +156,9 @@ namespace augs {
 
 	template <class Archive>
 	void read_object_lua(Archive /* ar */, cosmos& /* cosm */) {
-		ensure(false);
+		//cosmic::clear(cosm);
+
 #if TODO
-		ensure(cosm.empty());
 
 		/* TODO: Fix it to use tuples of initial values when creating entities */
 		/* TODO: Fix it to read guids properly instead of entity ids */

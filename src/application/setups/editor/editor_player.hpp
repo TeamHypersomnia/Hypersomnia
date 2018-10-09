@@ -44,7 +44,7 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 	return augs::snapshotted_advance_input(
 		total_collected_entropy,
 
-		[&](const auto& applied_entropy) {
+		[this, &folder, &history, &cosm, in](const auto& applied_entropy) {
 			/* step */
 			on_mode_with_input(
 				folder.commanded->mode_vars,
@@ -79,18 +79,27 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 			);
 		},
 
-		[&](const auto n) -> editor_solvable_snapshot {
+		[this, &folder](const auto n) -> editor_solvable_snapshot {
 			/* make_snapshot */
-			if (n == 0) {
+			
+			cosmic::reinfer_solvable(folder.commanded->work.world);
+
+			if constexpr(is_nullopt_v<decltype(n)>) {
 				return {};
 			}
-			
-			augs::memory_stream ms;
+			else {
+				/* make_snapshot */
+				if (n == 0) {
+					return {};
+				}
+				
+				augs::memory_stream ms;
 
-			augs::write_bytes(ms, current_mode);
-			augs::write_bytes(ms, *folder.commanded);
+				augs::write_bytes(ms, current_mode);
+				augs::write_bytes(ms, *folder.commanded);
 
-			return std::move(ms);//ms.operator std::vector<std::byte>&&();
+				return std::move(ms);//ms.operator std::vector<std::byte>&&();
+			}
 		}
 	);
 }
