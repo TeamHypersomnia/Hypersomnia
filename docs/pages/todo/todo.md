@@ -6,6 +6,10 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- conditional log macro
+
+- Always initialize the hotbar with some values if it is not yet initialized
+
 - Commands refactor: separation of undo and redo state
 	- redoer and undoer objects
 		- each has only the required information

@@ -12,6 +12,8 @@
 #include "game/cosmos/entity_id.h"
 #include "game/cosmos/cosmos_global_solvable.h"
 
+#include "augs/misc/assignment_detector.h"
+
 using cosmos_clock = augs::stepped_clock;
 
 struct cosmos_solvable_significant {
@@ -23,6 +25,8 @@ struct cosmos_solvable_significant {
 	std::unordered_map<entity_id, entity_name_str> specific_names;
 	cosmos_global_solvable global;
 	// END GEN INTROSPECTOR
+
+	mutable augs::assignment_detector assignment_detector;
 
 	template <class E>
 	auto& get_pool() {

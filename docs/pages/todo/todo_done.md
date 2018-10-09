@@ -1766,3 +1766,6 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- corner case: delete while move?
 		- should work anyway and yeah, deactivate it then
 
+- Somehow clear dead entities after each seek in main
+	- Communicate it somehow?
+

@@ -687,17 +687,35 @@ int work(const int argc, const char* const * const argv) try {
 		const cosmic_entropy& new_game_entropy,
 		const config_lua_table& viewing_config
 	) {
-		if (const auto now_sampled = get_sampled_cosmos(setup);
-			now_sampled != last_sampled_cosmos
-		) {
-#if 0
-			audiovisuals.clear_dead_entities(*now_sampled);
-#endif
-			audiovisuals.clear();
-			all_visible.clear_dead_entities(*now_sampled);
+		const auto now_sampled = get_sampled_cosmos(setup);
 
-			/* TODO: We need to have one game gui per cosmos. */
-			game_gui = {};//clear_dead_entities(*now_sampled);
+		const bool has_cosmos_changed = [&]() {
+			if (now_sampled != last_sampled_cosmos) {
+				return true;
+			}
+
+			auto& assignments = now_sampled->get_solvable().significant.assignment_detector.count;
+
+			if (assignments > 0) {
+				assignments = 0;
+				return true;
+			}
+
+			return false;
+		}();
+
+		if (has_cosmos_changed) {
+			LOG("Sanitizing cosmos-related audiovisuals due to possible change");
+
+#if 1
+			game_gui.clear_dead_entities(*now_sampled);
+			audiovisuals.clear_dead_entities(*now_sampled);
+#else
+			audiovisuals.clear();
+			game_gui = {};
+#endif
+
+			all_visible.clear_dead_entities(*now_sampled);
 
 			last_sampled_cosmos = now_sampled;
 			audiovisual_step(augs::delta::zero, setup.get_audiovisual_speed(), viewing_config);

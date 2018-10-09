@@ -18,6 +18,23 @@
 #include "game/modes/detail/item_purchase_logic.hpp"
 #include "game/detail/buy_area_in_range.h"
 
+#define LOG_BOMB_MODE !IS_PRODUCTION_BUILD
+
+template <class... Args>
+void BMB_LOG(Args&&... args) {
+#if LOG_BOMB_MODE
+	LOG(std::forward<Args>(args)...);
+#else
+	((void)args, ...);
+#endif
+}
+
+#if LOG_BOMB_MODE
+#define BMB_LOG_NVPS LOG_NVPS
+#else
+#define BMB_LOG_NVPS BMB_LOG
+#endif
+
 using input_type = bomb_mode::input;
 
 bomb_mode_player* bomb_mode::find(const mode_player_id& id) {
@@ -1136,10 +1153,10 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 					return choose_faction(id, f);
 				}();
 
-				LOG(format_enum(result));
+				BMB_LOG(format_enum(result));
 
 				if (result == faction_choice_result::CHANGED) {
-					LOG("Changed from %x to %x", format_enum(previous_faction), format_enum(f));
+					BMB_LOG("Changed from %x to %x", format_enum(previous_faction), format_enum(f));
 
 					on_player_handle(cosm, id, [&](const auto& player_handle) {
 						if constexpr(!is_nullopt_v<decltype(player_handle)>) {
@@ -1205,7 +1222,6 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 	spawn_recently_added_players(in, step);
 
 	if (state == arena_mode_state::INIT) {
-		LOG("RESTART!!!");
 		restart(in, step);
 	}
 	else if (state == arena_mode_state::WARMUP) {
@@ -1286,7 +1302,6 @@ void bomb_mode::mode_post_solve(const input_type in, const mode_entropy& entropy
 				const auto faction = subject.get_official_faction();
 
 				if (event == battle_event::INTERRUPTED_DEFUSING) {
-					LOG("IOnter");
 					if (const auto sound_id = in.vars.view.event_sounds[faction][battle_event::IM_DEFUSING_THE_BOMB]; sound_id.is_set()) {
 						messages::stop_sound_effect stop;
 						stop.match_effect_id = sound_id;
@@ -1612,7 +1627,6 @@ void bomb_mode::set_players_money_to_initial(const input_type in) {
 	for (auto& it : players) {
 		auto& p = it.second;
 		p.stats.money = in.vars.economy.initial_money;
-		LOG_NVPS(in.vars.economy.initial_money);
 	}
 }
 

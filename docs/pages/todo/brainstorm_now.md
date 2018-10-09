@@ -6,9 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Somehow clear dead entities after each seek in main
-
 - Crash when manually advancing but not when seeking
+	- Only in release...
 	- also check if the plain advance remembers to set the commands properly
 
 - Make snapshot frequency configurable
