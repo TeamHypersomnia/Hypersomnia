@@ -79,7 +79,7 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 			);
 		},
 
-		[this, &folder](const auto n) -> editor_solvable_snapshot {
+		[this, &folder, &history](const auto n) -> editor_solvable_snapshot {
 			/* make_snapshot */
 			
 			cosmic::reinfer_solvable(folder.commanded->work.world);
@@ -95,6 +95,8 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 				
 				augs::memory_stream ms;
 
+				augs::write_bytes(ms, history.get_current_revision());
+
 				augs::write_bytes(ms, current_mode);
 				augs::write_bytes(ms, *folder.commanded);
 
@@ -107,15 +109,24 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 template <class C>
 auto editor_player::make_set_snapshot(const player_advance_input_t<C> in) {
 	auto& folder = in.cmd_in.folder;
+	auto& history = folder.history;
 
 	return [&](const auto n, const auto& snapshot) {
 		if (n == 0) {
 			reset_mode();
 			*folder.commanded = *before_start.commanded;
+			history.force_set_current_revision(before_start.revision);
 			return;
 		}
 
 		auto ss = augs::cref_memory_stream(snapshot);
+
+		{
+			decltype(history.get_current_revision()) revision;
+			augs::read_bytes(ss, revision);
+
+			history.force_set_current_revision(revision);
+		}
 
 		augs::read_bytes(ss, current_mode);
 		augs::read_bytes(ss, *folder.commanded);
