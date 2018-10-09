@@ -1805,3 +1805,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 				- if solvable step at which it was applied matches, simply undo once
 				- shall only use the seek_to if the solvable step mismatches
 
+
+- Some strange bug when seeking while recording

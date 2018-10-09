@@ -26,11 +26,22 @@ namespace augs {
 
 	template <class A, class B>
 	auto snapshotted_player<A, B>::get_total_steps() const {
-		if (step_to_entropy.size() > 0) {
-			return std::max(current_step, (*step_to_entropy.rbegin()).first);
-		}
+		using step_type = typename snapshotted_player<A, B>::step_type;
 
-		return current_step;
+		if (is_recording()) { 
+			if (step_to_entropy.size() > 0) {
+				return std::max(current_step, (*step_to_entropy.rbegin()).first);
+			}
+
+			return current_step;
+		}
+		else {
+			if (step_to_entropy.size() > 0) {
+				return (*step_to_entropy.rbegin()).first;
+			}
+
+			return static_cast<step_type>(0);
+		}
 	}
 
 	template <class A, class B>

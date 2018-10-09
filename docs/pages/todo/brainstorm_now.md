@@ -8,6 +8,8 @@ summary: That which we are brainstorming at the moment.
 
 - Fix autosaving when playtesting
 	- Revision number might coincide
+		- will it though?
+	- no autosave happens when revision is -1
 
 - Make snapshot frequency configurable
 	- Actually let's just quickly implement map there

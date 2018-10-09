@@ -1,4 +1,4 @@
 #pragma once
 #include <string>
 
-std::string readable_bytesize(unsigned bytes);
+std::string readable_bytesize(std::size_t bytes);

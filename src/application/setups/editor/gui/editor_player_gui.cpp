@@ -5,6 +5,7 @@
 #include "application/setups/editor/editor_folder.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/templates/chrono_templates.h"
+#include "augs/misc/readable_bytesize.h"
 
 #include "application/setups/editor/detail/maybe_different_colors.h"
 
@@ -47,21 +48,26 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 	}
 
 	if (player.has_testing_started()) {
-		const auto current = player.get_current_secs();
 		const auto total = player.get_total_secs();
+		const auto current = player.get_current_secs();
 
 		if (total > 0.0) {
 			//text("Player position:");
 
 			auto mult = static_cast<float>(current / total);
+			mult = std::clamp(mult, 0.f, 1.f);
 
 			if (slider("Player position", mult, 0.f, 1.f)) {
+				mult = std::clamp(mult, 0.f, 1.f);
+
 				const auto target_step = player.get_total_steps() * mult;
-				player.seek_to(target_step, cmd_in);
+				PLR_LOG_NVPS(mult, player.get_current_step(), player.get_total_steps(), target_step);
 
 				if (player.is_recording()) {
 					player.begin_replaying(folder);
 				}
+
+				player.seek_to(target_step, cmd_in);
 			}
 
 			ImGui::ProgressBar(mult);
@@ -71,6 +77,14 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 		text("Current time: %x", format_mins_secs_ms(current));
 		text("Recording length: %x", format_mins_secs_ms(total));
 
-		text("Snapshots: %x", player.get_snapshots().size());
+		const auto& snapshots = player.get_snapshots();
+
+		std::size_t total_snapshot_bytes = 0;
+
+		for (const auto& s : snapshots) {
+			total_snapshot_bytes += s.size();
+		}
+
+		text("Snapshots: %x (%x)", snapshots.size() - 1, readable_bytesize(total_snapshot_bytes));
 	}
 }

@@ -1,7 +1,7 @@
 #include "readable_bytesize.h"
 #include "augs/string/typesafe_sprintf.h"
 
-std::string readable_bytesize(unsigned _size) {
+std::string readable_bytesize(const std::size_t _size) {
 	double size = static_cast<double>(_size);
 
 	int i = 0;
