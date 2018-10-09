@@ -46,6 +46,7 @@
 #include "application/setups/editor/gui/editor_unpathed_asset_gui.h"
 
 #include "application/app_intent_type.h"
+#include "application/setups/editor/editor_recent_message.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -85,6 +86,7 @@ class editor_setup {
 	editor_entity_mover mover;
 
 	editor_go_to_entity_gui go_to_entity_gui;
+	editor_recent_message recent_message;
 
 	// GEN INTROSPECTOR class editor_setup
 	editor_player_gui player_gui = std::string("Player");

@@ -262,14 +262,25 @@ void editor_setup::save_current_folder_to(const path_operation op) {
 void editor_setup::fill_with_minimal_scene() {
 	if (anything_opened()) {
 		clear_id_caches();
-		folder().history.execute_new(fill_with_test_scene_command(true), make_command_input());
+
+		if (!player().has_testing_started()) {
+			folder().history.execute_new(fill_with_test_scene_command(true), make_command_input());
+		}
+		else {
+			recent_message.set("Cannot fill with a test scene when a playtesting session is in progress.");
+		}
 	}
 }
 
 void editor_setup::fill_with_test_scene() {
 	if (anything_opened()) {
 		clear_id_caches();
-		folder().history.execute_new(fill_with_test_scene_command(false), make_command_input());
+		if (!player().has_testing_started()) {
+			folder().history.execute_new(fill_with_test_scene_command(false), make_command_input());
+		}
+		else {
+			recent_message.set("Cannot fill with a minimal scene when a playtesting session is in progress.");
+		}
 	}
 }
 
@@ -1524,101 +1535,115 @@ void editor_setup::draw_status_bar(const draw_setup_gui_input& in) {
 void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 	if (anything_opened() && is_editing_mode()) {
 		const auto& h = folder().history;
-		const auto op = h.get_last_op();
 
 		using namespace augs::gui::text;
 		using O = augs::history_op_type;
 
 		const auto& fnt = in.gui_fonts.gui;
+
 		auto colored = [&](const auto& s, const rgba col = white) {
 			const auto st = style(fnt, col);
 			return formatted_string(s, st);
 		};
 
-		auto get_description = [&](const auto& from_command) -> decltype(auto) {
-			return std::visit(
-				[&](const auto& typed_command) -> decltype(auto) {
-					{
-						using T = remove_cref<decltype(typed_command)>;
+		auto make_colorized = [&](auto dest) {
+			formatted_string result;
 
-						static constexpr bool show_only_if_undid_or_redid = 
-							is_one_of_v<T, resize_entities_command, move_entities_command>
-						;
+			auto try_preffix = [&](const auto& preffix, const auto col) {
+				if (begins_with(dest, preffix)) {
+					cut_preffix(dest, preffix);
+					result = colored(preffix, col) + colored(dest);
+					return true;
+				}
 
-						if constexpr(show_only_if_undid_or_redid) {
-							if (op.type == O::EXECUTE_NEW) {
-								return colored("");
-							}
-						}
-					}
+				return false;
+			};
 
-					auto dest = typed_command.describe();
+			if (try_preffix("Deleted", red)
+				|| try_preffix("Cannot", red)
+				|| try_preffix("Successfully", green)
+				|| try_preffix("Filled", green)
+				|| try_preffix("Altered", orange)
+				|| try_preffix("Renamed", orange)
+				|| try_preffix("Changed", orange)
+				|| try_preffix("Created", green)
+				|| try_preffix("Started", green)				
+				|| try_preffix("Started tracking", green)				
+				|| try_preffix("Duplicated", cyan)
+				|| try_preffix("Mirrored", cyan)
+			) {
+				return result;
+			}
 
-					formatted_string result;
-
-					auto try_preffix = [&](const auto& preffix, const auto col) {
-						if (begins_with(dest, preffix)) {
-							cut_preffix(dest, preffix);
-							result = colored(preffix, col) + colored(dest);
-							return true;
-						}
-
-						return false;
-					};
-
-					if (try_preffix("Deleted", red)
-						|| try_preffix("Filled", green)
-						|| try_preffix("Altered", orange)
-						|| try_preffix("Renamed", orange)
-						|| try_preffix("Changed", orange)
-						|| try_preffix("Created", green)
-						|| try_preffix("Started", green)				
-						|| try_preffix("Started tracking", green)				
-						|| try_preffix("Duplicated", cyan)
-						|| try_preffix("Mirrored", cyan)
-					) {
-						return result;
-					}
-
-					return colored(dest);
-				},
-				from_command
-			);
+			return colored(dest);
 		};
 
-		const auto message_text = [&]() {
-			if (op.type == O::UNDO) {
-				if (h.has_next_command()) {
-					const auto preffix = colored("Undid ", orange);
-					const auto& cmd = h.next_command();
+		augs::date_time considered_stamp;
+		formatted_string message_text;
 
-					return preffix + get_description(cmd);
+		if (const auto op = h.get_last_op(); op.stamp > recent_message.stamp) {
+			auto get_description = [&](const auto& from_command) -> decltype(auto) {
+				return std::visit(
+					[&](const auto& typed_command) -> decltype(auto) {
+						{
+							using T = remove_cref<decltype(typed_command)>;
+
+							static constexpr bool show_only_if_undid_or_redid = 
+								is_one_of_v<T, resize_entities_command, move_entities_command>
+							;
+
+							if constexpr(show_only_if_undid_or_redid) {
+								if (op.type == O::EXECUTE_NEW) {
+									return colored("");
+								}
+							}
+						}
+
+						return make_colorized(typed_command.describe());
+
+					},
+					from_command
+				);
+			};
+
+			message_text = [&]() {
+				if (op.type == O::UNDO) {
+					if (h.has_next_command()) {
+						const auto preffix = colored("Undid ", orange);
+						const auto& cmd = h.next_command();
+
+						return preffix + get_description(cmd);
+					}
 				}
-			}
-			else if (op.type == O::REDO) {
-				if (h.has_last_command()) {
-					const auto preffix = colored("Redid ", pink);
-					const auto& cmd = h.last_command();
+				else if (op.type == O::REDO) {
+					if (h.has_last_command()) {
+						const auto preffix = colored("Redid ", pink);
+						const auto& cmd = h.last_command();
 
-					return preffix + get_description(cmd);
+						return preffix + get_description(cmd);
+					}
 				}
-			}
-			else if (op.type == O::EXECUTE_NEW) {
-				if (h.has_last_command()) {
-					const auto& cmd = h.last_command();
+				else if (op.type == O::EXECUTE_NEW) {
+					if (h.has_last_command()) {
+						const auto& cmd = h.last_command();
 
-					return get_description(cmd);
+						return get_description(cmd);
+					}
+
 				}
 
-			}
-
-			return colored("");
-		}();
+				return colored("");
+			}();
+		}
+		else {
+			message_text = make_colorized(recent_message.content);
+			considered_stamp = recent_message.stamp;
+		}
 
 		if (message_text.size() > 0) {
 			const auto& cfg = settings.action_indicator;
 
-			if (op.stamp.seconds_ago() <= cfg.show_for_ms / 1000) {
+			if (considered_stamp.seconds_ago() <= cfg.show_for_ms / 1000) {
 				/* TODO: (LOW) Improve granularity to milliseconds */
 
 				const auto rev_number = colored(typesafe_sprintf("#%x: ", 1 + h.get_current_revision()));
