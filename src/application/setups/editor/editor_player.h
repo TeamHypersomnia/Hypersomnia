@@ -143,6 +143,7 @@ public:
 
 	double get_current_secs() const;
 	double get_total_secs() const;
+	step_type get_current_step() const;
 
 	template <class C>
 	void seek_to(

@@ -185,5 +185,7 @@ void editor_player::reset_mode() {
 	);
 }
 
-static_assert(has_introspect_base_v<editor_player>);
-static_assert(has_introspect_v<editor_player_base>);
+editor_player::step_type editor_player::get_current_step() const {
+	return base::get_current_step();
+}
+

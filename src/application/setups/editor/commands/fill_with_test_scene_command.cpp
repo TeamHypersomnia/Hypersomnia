@@ -18,6 +18,9 @@ std::string fill_with_test_scene_command::describe() const {
 }
 
 void fill_with_test_scene_command::redo(const editor_command_input in) {
+	/* Reset to zero if it happened while playtesting */
+	common.when_happened = 0;
+
 	clear_undo_state();
 	in.purge_selections();
 
