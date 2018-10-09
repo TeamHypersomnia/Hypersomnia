@@ -58,7 +58,7 @@ void editor_history::undo(const editor_command_input cmd_in) {
 }
 
 void editor_history::seek_to_revision(
-	const index_type target_revision , 
+	const index_type target_revision, 
 	const editor_command_input cmd_in
 ) {
 	auto& p = cmd_in.get_player();
@@ -66,6 +66,8 @@ void editor_history::seek_to_revision(
 	if (target_revision == get_current_revision()) {
 		return;
 	}
+
+	p.begin_replaying(cmd_in.folder);
 
 	auto do_redo = [&]() {
 		editor_history_base::redo(cmd_in);

@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/templates/identity_templates.h"
+#include "application/setups/editor/commands/editor_command_traits.h"
 
 template <class cmd_type, class P, class E, class F = empty_callback>
 auto make_rewrite_last_change(
@@ -14,9 +15,29 @@ auto make_rewrite_last_change(
 		auto& last = cmd_in.get_history().last_command();
 
 		if (auto* const cmd = std::get_if<cmd_type>(std::addressof(last))) {
-			cmd->built_description = description + property_location;
-			before_rewrite(*cmd, new_content);
-			cmd->rewrite_change(augs::to_bytes(new_content), cmd_in);
+			const auto current_step = cmd_in.get_current_step();
+
+			if (current_step == cmd->common.when_happened) {
+				cmd->built_description = description + property_location;
+				before_rewrite(*cmd, new_content);
+				cmd->rewrite_change(augs::to_bytes(new_content), cmd_in);
+			}
+			else {
+				/* Spawn new command for another step */
+				auto cloned_cmd = *cmd;
+				cloned_cmd.built_description = description + property_location;
+
+				if constexpr(has_member_sanitize_v<cmd_type, editor_command_input>) {
+					cloned_cmd.sanitize(cmd_in);
+				}
+
+				before_rewrite(cloned_cmd, new_content);
+
+				cloned_cmd.value_after_change = augs::to_bytes(new_content);
+				cloned_cmd.common.has_parent = true;
+
+				::post_editor_command(cmd_in, cloned_cmd);
+			}
 		}
 		else {
 			LOG("WARNING! There was some problem with tracking activity of editor controls.");

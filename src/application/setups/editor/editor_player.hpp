@@ -63,10 +63,13 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 						ensure_leq(current_step, when_happened);
 
 						if (current_step == when_happened) {
-							history.redo(in.cmd_in);
+							PLR_LOG("Plain redo of a command at %x", current_step);
+							history.editor_history_base::redo(in.cmd_in);
 							continue;
 						}
 						
+						PLR_LOG("Next happens at %x, now at %x, so breaking", when_happened, current_step);
+
 						break;
 					}
 
