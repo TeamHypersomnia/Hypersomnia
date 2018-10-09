@@ -1205,6 +1205,7 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 	spawn_recently_added_players(in, step);
 
 	if (state == arena_mode_state::INIT) {
+		LOG("RESTART!!!");
 		restart(in, step);
 	}
 	else if (state == arena_mode_state::WARMUP) {
@@ -1555,7 +1556,26 @@ void bomb_mode::request_restart() {
 	state = arena_mode_state::INIT;
 }
 
+bomb_mode_player* bomb_mode::find_player_by(const entity_name_str& chosen_name) {
+	for (auto& it : players) {
+		auto& player_data = it.second;
+
+		if (player_data.chosen_name == chosen_name) {
+			return std::addressof(player_data);
+		}
+	}
+
+	return nullptr;
+}
+
 void bomb_mode::restart(const input_type in, const logic_step step) {
+	for (const auto& new_name : in.vars.bots) {
+		if (nullptr == find_player_by(new_name)) {
+			const auto new_bot = add_player(in, new_name);
+			auto_assign_faction(in, new_bot);
+		}
+	}
+
 	reset_players_stats(in);
 	factions = {};
 
@@ -1564,11 +1584,6 @@ void bomb_mode::restart(const input_type in, const logic_step step) {
 	}
 	else {
 		state = arena_mode_state::LIVE;
-	}
-
-	for (const auto& new_name : in.vars.bots) {
-		const auto new_bot = add_player(in, new_name);
-		auto_assign_faction(in, new_bot);
 	}
 
 	setup_round(in, step);
@@ -1597,6 +1612,7 @@ void bomb_mode::set_players_money_to_initial(const input_type in) {
 	for (auto& it : players) {
 		auto& p = it.second;
 		p.stats.money = in.vars.economy.initial_money;
+		LOG_NVPS(in.vars.economy.initial_money);
 	}
 }
 
@@ -1606,8 +1622,8 @@ void bomb_mode::reset_players_stats(const input_type in) {
 		p.stats = {};
 	}
 
-	set_players_money_to_initial(in);
 	clear_players_round_state(in);
+	set_players_money_to_initial(in);
 }
 
 void bomb_mode::post_award(const input_type in, const mode_player_id id, money_type amount) {

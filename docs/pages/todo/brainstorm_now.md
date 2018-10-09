@@ -6,7 +6,20 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Somehow clear dead entities after each seek in main
+
+- Crash when manually advancing but not when seeking
+	- also check if the plain advance remembers to set the commands properly
+
 - Make snapshot frequency configurable
+	- Actually let's just quickly implement map there
+
+- Determinism fixes
+	- Change unordered containers to ordered ones in the mode state
+	- Change unordered containers to ordered ones in the entropy
+	- Change unordered containers to ordered ones in the visible entities
+		- Actually, just provide sort inside layers for domains that require ordering
+			- e.g. get first bomb
 
 - Implement tree node for the children of commands in history gui
 
@@ -142,9 +155,6 @@ summary: That which we are brainstorming at the moment.
 	- Existence of initial signi denotes whether the player is playing
 		- Actually, we should keep more than a session there, e.g. the saved selection groups?
 	- Store optional of state to be restored
-
-- Determinism: Change unordered containers to ordered ones in the mode state
-- Determinism: Change unordered containers to ordered ones in the entropy
 
 - Arbitrary pasting of entities
 	- Vastly useful for importing stuff from testbed maps into existing ones

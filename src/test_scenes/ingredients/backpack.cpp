@@ -31,7 +31,7 @@ namespace test_flavours {
 
 			invariants::container container; 
 			inventory_slot slot_def;
-			slot_def.space_available = to_space_units("30");
+			slot_def.space_available = to_space_units("15");
 
 			container.slots[slot_function::ITEM_DEPOSIT] = slot_def;
 			meta.set(container);
