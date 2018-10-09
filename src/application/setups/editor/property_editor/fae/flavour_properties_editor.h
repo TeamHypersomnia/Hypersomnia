@@ -15,6 +15,7 @@
 
 #include "application/setups/editor/property_editor/special_widgets.h"
 #include "application/setups/editor/detail/format_struct_name.h"
+#include "application/setups/editor/detail/rewrite_last_change.h"
 
 template <class T>
 decltype(auto) get_name_of(const entity_flavour<T>& flavour) {
@@ -86,22 +87,16 @@ void edit_invariant(
 		update_size_if_tex_changed(in, field_id, invariant);
 	};
 
-	auto rewrite_last_change = [&](
-		const auto& description,
-		const auto& new_content
-	) {
-		auto& last = history.last_command();
-
-		if (auto* const cmd = std::get_if<cmd_type>(std::addressof(last))) {
-			cmd->built_description = description + property_location;
-			describe_if_renamed_flavour(*cmd, old_description, cmd->property_id.field, invariant, new_content);
-			cmd->rewrite_change(augs::to_bytes(new_content), cmd_in);
-		}
-		else {
-			LOG("WARNING! There was some problem with tracking activity of editor controls.");
-		}
+	auto before_rewrite = [&](auto& cmd, const auto& new_content) {
+		describe_if_renamed_flavour(cmd, old_description, cmd.property_id.field, invariant, new_content);
 	};
 
+	auto rewrite_last_change = make_rewrite_last_change<cmd_type>(
+		property_location,
+		cmd_in,
+		before_rewrite
+	);
+		
 	const auto& cosm = cmd_in.get_cosmos();
 	
 	const auto project_path = cmd_in.folder.current_path;
@@ -251,20 +246,10 @@ void edit_initial_component(
 		history.execute_new(cmd, cmd_in);
 	};
 
-	auto rewrite_last_change = [&](
-		const auto& description,
-		const auto& new_content
-	) {
-		auto& last = history.last_command();
-
-		if (auto* const cmd = std::get_if<cmd_type>(std::addressof(last))) {
-			cmd->built_description = description + property_location;
-			cmd->rewrite_change(augs::to_bytes(new_content), cmd_in);
-		}
-		else {
-			LOG("WARNING! There was some problem with tracking activity of editor controls.");
-		}
-	};
+	auto rewrite_last_change = make_rewrite_last_change<cmd_type>(
+		property_location,
+		cmd_in
+	);
 
 	const auto& cosm = cmd_in.get_cosmos();
 

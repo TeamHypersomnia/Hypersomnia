@@ -4,6 +4,7 @@
 #include "application/setups/editor/detail/field_address.h"
 #include "application/setups/editor/property_editor/general_edit_properties.h"
 #include "application/setups/editor/detail/format_struct_name.h"
+#include "application/setups/editor/detail/rewrite_last_change.h"
 
 template <class T>
 void edit_component(
@@ -43,20 +44,10 @@ void edit_component(
 		history.execute_new(cmd, cmd_in);
 	};
 
-	auto rewrite_last_change = [&](
-		const auto& description,
-		const auto& new_content
-	) {
-		auto& last = history.last_command();
-
-		if (auto* const cmd = std::get_if<cmd_type>(std::addressof(last))) {
-			cmd->built_description = description + property_location;
-			cmd->rewrite_change(augs::to_bytes(new_content), cmd_in);
-		}
-		else {
-			LOG("WARNING! There was some problem with tracking activity of editor controls.");
-		}
-	};
+	auto rewrite_last_change = make_rewrite_last_change<cmd_type>(
+		property_location,
+		cmd_in
+	);
 
 	const auto& cosm = cmd_in.get_cosmos();
 

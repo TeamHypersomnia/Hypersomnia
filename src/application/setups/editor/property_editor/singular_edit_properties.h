@@ -1,6 +1,7 @@
 #pragma once
 #include "application/setups/editor/property_editor/general_edit_properties.h"
 #include "application/setups/editor/property_editor/commanding_property_editor_input.h"
+#include "application/setups/editor/detail/rewrite_last_change.h"
 
 template <
 	class Behaviour = default_edit_properties_behaviour,
@@ -39,20 +40,10 @@ void singular_edit_properties(
 		history.execute_new(cmd, cmd_in);
 	};
 
-	auto rewrite_last_change = [&](
-		const auto& description,
-		const auto& new_content
-	) {
-		auto& last = history.last_command();
-
-		if (auto* const cmd = std::get_if<cmd_type>(std::addressof(last))) {
-			cmd->built_description = description + property_location;
-			cmd->rewrite_change(augs::to_bytes(new_content), cmd_in);
-		}
-		else {
-			LOG("WARNING! There was some problem with tracking activity of editor controls.");
-		}
-	};
+	auto rewrite_last_change = make_rewrite_last_change<cmd_type>(
+		property_location,
+		cmd_in
+	);
 
 	general_edit_properties<field_type_id, Behaviour>(
 		in.prop_in, 

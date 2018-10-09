@@ -1,9 +1,7 @@
 #pragma once
+#include "augs/templates/identity_templates.h"
 
-struct default_solver_callback {
-	template <class... Args>
-	void operator()(Args&&...) const {}
-};
+using default_solver_callback = empty_callback;
 
 template <
 	class PreSolve,

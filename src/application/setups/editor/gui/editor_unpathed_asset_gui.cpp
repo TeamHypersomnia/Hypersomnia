@@ -35,6 +35,7 @@
 #include "augs/readwrite/byte_readwrite.h"
 
 #include "augs/templates/list_utils.h"
+#include "application/setups/editor/detail/rewrite_last_change.h"
 
 template <class id_type>
 struct unpathed_asset_entry {
@@ -254,20 +255,10 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 				post_editor_command(cmd_in, std::move(cmd));
 			};
 
-			auto rewrite_last_change = [&](
-				const auto& description,
-				const auto& new_content
-			) {
-				auto& last = cmd_in.get_history().last_command();
-
-				if (auto* const cmd = std::get_if<cmd_type>(std::addressof(last))) {
-					cmd->built_description = description + property_location;
-					cmd->rewrite_change(augs::to_bytes(new_content), cmd_in);
-				}
-				else {
-					LOG("WARNING! There was some problem with tracking activity of editor controls.");
-				}
-			};
+			auto rewrite_last_change = make_rewrite_last_change<cmd_type>(
+				property_location,
+				cmd_in
+			);
 
 			auto prop_in = property_editor_input { settings, property_editor_data };
 			const auto& project_path = cmd_in.folder.current_path;

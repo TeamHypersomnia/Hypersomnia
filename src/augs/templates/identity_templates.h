@@ -1,8 +1,13 @@
 #pragma once
 
+struct empty_callback {
+	template <class... Types>
+	void operator()(Types&&...) const {}
+};
+
 struct true_returner {
 	template <class... Types>
-	bool operator()(Types...) const {
+	bool operator()(Types&&...) const {
 		return true;
 	}
 };

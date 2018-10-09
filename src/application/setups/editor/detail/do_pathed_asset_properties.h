@@ -3,6 +3,7 @@
 #include "application/setups/editor/detail/read_write_defaults_buttons.h"
 #include "application/setups/editor/property_editor/special_widgets.h"
 #include "application/setups/editor/detail/pathed_asset_entry.h"
+#include "application/setups/editor/detail/rewrite_last_change.h"
 
 struct pathed_asset_properties_behaviour {
 	template <class T>
@@ -83,20 +84,10 @@ void do_pathed_asset_properties(
 		post_editor_command(cmd_in, std::move(cmd));
 	};
 
-	auto rewrite_last_change = [&](
-		const auto& description,
-		const auto& new_content
-	) {
-		auto& last = cmd_in.get_history().last_command();
-
-		if (auto* const cmd = std::get_if<cmd_type>(std::addressof(last))) {
-			cmd->built_description = description + property_location;
-			cmd->rewrite_change(augs::to_bytes(new_content), cmd_in);
-		}
-		else {
-			LOG("WARNING! There was some problem with tracking activity of editor controls.");
-		}
-	};
+	auto rewrite_last_change = make_rewrite_last_change<cmd_type>(
+		property_location,
+		cmd_in
+	);
 
 	const bool disable_path_chooser = is_current_ticked && ticked_ids.size() > 1;
 
