@@ -56,7 +56,7 @@ void editor_selection_groups_gui::perform(const bool has_ctrl, editor_command_in
 
 			auto name = g.name;
 
-			auto flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick;
+			auto flags = static_cast<int>(ImGuiTreeNodeFlags_OpenOnArrow);
 
 			const bool whole_group_selected = all_found(g.entries, selected);
 

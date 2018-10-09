@@ -4,7 +4,7 @@
 #include "augs/templates/snapshotted_player.hpp"
 
 template <class T>
-bool command_has_parent(const T& cmd) {
+static bool has_parent(const T& cmd) {
 	return std::visit(
 		[](const auto& typed_command) {
 			return typed_command.common.has_parent;
@@ -26,7 +26,7 @@ void editor_history::redo(const editor_command_input cmd_in) {
 			continue;
 		}
 
-		if (command_has_parent(commands[i])) {
+		if (::has_parent(commands[i])) {
 			continue;
 		}
 
@@ -47,7 +47,7 @@ void editor_history::undo(const editor_command_input cmd_in) {
 			continue;
 		}
 
-		if (command_has_parent(commands[i])) {
+		if (::has_parent(commands[i])) {
 			continue;
 		}
 

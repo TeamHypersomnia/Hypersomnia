@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Fix autosaving when playtesting
+
 - Check for crashes when we have some audiovisuals but we suddenly switch to an empty workspace
 
 - Make snapshot frequency configurable
@@ -17,8 +19,6 @@ summary: That which we are brainstorming at the moment.
 	- Change unordered containers to ordered ones in the visible entities
 		- Actually, just provide sort inside layers for domains that require ordering
 			- e.g. get first bomb
-
-- Implement tree node for the children of commands in history gui
 
 - Replaying and commands
 	- Replay commands along the solvable's progress as they were applied.

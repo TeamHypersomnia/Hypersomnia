@@ -7,6 +7,16 @@
 #include "application/setups/editor/editor_player.h"
 #include "application/setups/editor/gui/editor_history_gui.h"
 
+template <class T>
+static bool has_parent(const T& cmd) {
+	return std::visit(
+		[](const auto& typed_command) {
+			return typed_command.common.has_parent;
+		},
+		cmd
+	);
+}
+
 void editor_history_gui::perform(const editor_command_input in) {
 	using namespace augs::imgui;
 	using index_type = editor_history::index_type;
@@ -42,13 +52,14 @@ void editor_history_gui::perform(const editor_command_input in) {
 		const index_type command_index,
 		const std::string& description,
 		const augs::date_time& when,
-		const bool has_parent
+		const bool has_parent,
+		const bool is_parent
 	){
 		const auto how_long_ago = when.how_long_ago();
 		const bool passes_filter = filter.PassFilter(description.c_str()) || filter.PassFilter(how_long_ago.c_str());
 
 		if (!passes_filter) {
-			return;
+			return false;
 		}
 
 		const auto current_revision = history.get_current_revision();
@@ -76,14 +87,32 @@ void editor_history_gui::perform(const editor_command_input in) {
 			ImGui::PushStyleColor(ImGuiCol_Text, disabled_color.operator ImVec4());
 		}
 
-		auto indent = cond_scoped_indent(has_parent);
+		//auto indent = cond_scoped_indent(has_parent);
+		(void)has_parent;
 
-		ImGui::Selectable(description.c_str(), is_selected);
+		bool result = false;
+
+		if (is_parent) {
+			auto flags = static_cast<int>(ImGuiTreeNodeFlags_OpenOnArrow);
+
+			if (is_selected) {
+				flags = flags | ImGuiTreeNodeFlags_Selected;
+			}
+
+			result = ImGui::TreeNodeEx(description.c_str(), flags);
+		}
+		else {
+			ImGui::Selectable(description.c_str(), is_selected);
+		}
 
 		ImGui::PopStyleColor(colors);
 
 		if (ImGui::IsItemClicked()) {
-			history.seek_to_revision(command_index, in);
+			ImGuiContext& g = *ImGui::GetCurrentContext();
+
+			if (!is_parent || g.ActiveIdClickOffset.x > g.FontSize + ImGui::GetStyle().FramePadding.x * 2) {
+				history.seek_to_revision(command_index, in);
+			}
 		}
 
 		ImGui::NextColumn();
@@ -95,24 +124,61 @@ void editor_history_gui::perform(const editor_command_input in) {
 		}
 
 		ImGui::NextColumn();
+
+		return result;
 	};
 
 	{
 		const auto first_label = in.get_player().has_testing_started() ? "Started playtesting" : "Created project files";
-		do_history_node(-1, first_label, in.folder.view.meta.timestamp, false);
+		do_history_node(-1, first_label, in.folder.view.meta.timestamp, false, false);
 	}
 
 	const auto& commands = history.get_commands();
 
-	for (std::size_t i = 0; i < commands.size(); ++i) {
-		const auto& c = commands[i];
-
+	auto do_normal_command = [&](const std::size_t i) {
 		std::visit(
 			[&](const auto& command) {
-				do_history_node(i, command.describe(), command.common.timestamp, command.common.has_parent);
+				do_history_node(i, command.describe(), command.common.timestamp, command.common.has_parent, false);
 			},
-			c
+			commands[i]
 		);
+	};
+
+	auto do_parent_command = [&](const std::size_t i) {
+		return std::visit(
+			[&](const auto& command) {
+				return do_history_node(i, command.describe(), command.common.timestamp, command.common.has_parent, true);
+			},
+			commands[i]
+		);
+	};
+
+	for (std::size_t i = 0; i < commands.size(); ++i) {
+		if (i < commands.size() - 1) {
+			if (::has_parent(commands[i + 1])) {
+				const bool do_children = do_parent_command(i);
+
+				auto j = i + 1;
+
+				while (j < commands.size() && has_parent(commands[j])) {
+					if (do_children) { 
+						do_normal_command(j); 
+					}
+
+					++j;
+				}
+
+				i = j - 1;
+
+				if (do_children) {
+					ImGui::TreePop();
+				}
+
+				continue;
+			}
+		}
+
+		do_normal_command(i);
 	}
 }
 

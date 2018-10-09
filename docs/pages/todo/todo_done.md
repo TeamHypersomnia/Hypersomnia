@@ -1784,3 +1784,6 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- Do we save entire history?
 		- that might be really some pain
 
+
+- Implement tree node for the children of commands in history gui
+
