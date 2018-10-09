@@ -118,13 +118,23 @@ struct animation_in_particle {
 	// END GEN INTROSPECTOR
 
 	void advance(const real32 dt, const plain_animations_pool& anims) {
-		if (state.advance(dt * speed_factor, anims[id].frames)) {
-			speed_factor = -1.f;
+		if (const auto found_animation = mapped_or_nullptr(anims, id)) {
+			if (state.advance(dt * speed_factor, found_animation->frames)) {
+				speed_factor = -1.f;
+			}
+
+			return;
 		}
+
+		speed_factor = -1.f;
 	}
 
 	auto get_image_id(const plain_animations_pool& anims) const {
-		return anims[id].get_image_id(state);
+		if (const auto found_animation = mapped_or_nullptr(anims, id)) {
+			return found_animation->get_image_id(state);
+		}
+
+		return assets::image_id();
 	}
 
 	bool is_dead() const {
@@ -132,15 +142,19 @@ struct animation_in_particle {
 	}
 
 	bool should_integrate(const plain_animations_pool& anims) const {
-		const auto& stop = anims[id].meta.stop_movement_at_frame;
+		if (const auto found_animation = mapped_or_nullptr(anims, id)) {
+			const auto& stop = found_animation->meta.stop_movement_at_frame;
 
-		if (stop.is_enabled) {
-			if (state.frame_num >= stop.value) {
-				return false;
+			if (stop.is_enabled) {
+				if (state.frame_num >= stop.value) {
+					return false;
+				}
 			}
+
+			return true;
 		}
 
-		return true;
+		return false;
 	}
 };
 
