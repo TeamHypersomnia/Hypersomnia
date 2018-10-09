@@ -65,9 +65,19 @@ void editor_history::undo(const editor_command_input cmd_in) {
 }
 
 void editor_history::seek_to_revision(
-	const index_type target_revision, 
+	const index_type input_revision, 
 	const editor_command_input cmd_in
 ) {
+	auto& p = cmd_in.get_player();
+
+	const auto target_revision = [&]() {
+		if (p.has_testing_started()) {
+			return std::max(input_revision, p.get_revision_when_started_testing());
+		}
+
+		return input_revision;
+	}();
+
 	if (target_revision == get_current_revision()) {
 		return;
 	}
@@ -94,8 +104,6 @@ void editor_history::seek_to_revision(
 			commands[target_revision]
 		);
 	};
-
-	auto& p = cmd_in.get_player();
 
 	auto undo_until_target = [&]() {
 		ensure_less(target_revision, get_current_revision());

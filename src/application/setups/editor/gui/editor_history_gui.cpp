@@ -88,7 +88,12 @@ void editor_history_gui::perform(const editor_command_input in) {
 
 		auto indent = cond_scoped_indent(has_parent);
 
-		ImGui::Selectable(description.c_str(), is_selected);
+		if (playtest_start_revision && command_index < *playtest_start_revision) {
+			text_disabled(description);
+		}
+		else {
+			ImGui::Selectable(description.c_str(), is_selected);
+		}
 
 		ImGui::PopStyleColor(colors);
 
