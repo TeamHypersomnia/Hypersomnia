@@ -485,7 +485,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/inferred_caches/tree_of_npo_cache.cpp"
 	"src/game/other_unit_tests.cpp"
 	"src/game/cosmos/cosmic_entropy.cpp"
-	"src/game/cosmos/cosmic_movie_director.cpp"
 	"src/game/cosmos/data_living_one_step.cpp"
 	"src/augs/filesystem/directory.cpp"
 	"src/augs/gui/appearance_detector.cpp"

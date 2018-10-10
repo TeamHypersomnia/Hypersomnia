@@ -18,7 +18,6 @@
 #include "view/network/step_packaged_for_network.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/logic_step.h"
-#include "game/cosmos/cosmic_movie_director.h"
 #include "game/organization/all_messages_includes.h"
 #include "game/cosmos/data_living_one_step.h"
 
@@ -147,9 +146,7 @@ main_menu_setup::main_menu_setup(
 #endif
 	}
 
-	// director.load_recording_from_file(settings.menu_intro_scene_entropy_path);
-
-	const bool is_recording_available = is_intro_scene_available && director.is_recording_available();
+	const bool is_recording_available = is_intro_scene_available && false;
 	initial_step_number = cosm.get_total_steps_passed();
 
 	for (auto& m : gui.root.buttons) {
@@ -169,7 +166,8 @@ main_menu_setup::main_menu_setup(
 
 	if (is_recording_available) {
 		while (cosm.get_total_seconds_passed() < settings.rewind_intro_scene_by_secs) {
-			const auto entropy = cosmic_entropy(director.get_entropy_for_step(cosm.get_total_steps_passed() - initial_step_number), cosm);
+			//const auto entropy = cosmic_entropy(director.get_entropy_for_step(cosm.get_total_steps_passed() - initial_step_number), cosm);
+			const auto entropy = cosmic_entropy();
 
 			mode.advance(
 				{ mode_vars, cosm },

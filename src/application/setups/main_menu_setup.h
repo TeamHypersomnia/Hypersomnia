@@ -17,7 +17,6 @@
 
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
-#include "game/cosmos/cosmic_movie_director.h"
 #include "game/organization/all_component_includes.h"
 #include "game/detail/render_layer_filter.h"
 
@@ -64,7 +63,6 @@ class main_menu_setup : public default_setup_settings {
 	creators_screen creators;
 #endif
 
-	cosmic_movie_director director;
 	unsigned initial_step_number = 0xdeadbeef;
 
 	augs::action_list intro_actions;
