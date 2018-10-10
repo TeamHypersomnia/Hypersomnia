@@ -259,7 +259,7 @@ struct editor_property_accessors {
 		T in,
 		F callback
 	) {
-		in.folder.commanded->mode_vars.visit(
+		in.folder.commanded->mode_vars.vars.visit(
 			self.vars_type_id,
 			[&](auto& typed_mode_vars) {
 				if (auto* const found_mode_vars = mapped_or_nullptr(typed_mode_vars, self.vars_id)) {

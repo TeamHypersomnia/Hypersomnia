@@ -71,7 +71,7 @@ private:
 	editor_player_entropy_type total_collected_entropy;
 
 	all_modes_variant current_mode;
-	mode_vars_id current_mode_vars_id = mode_vars_id();
+	raw_mode_vars_id current_mode_vars_id = raw_mode_vars_id();
 
 	player_before_start_state before_start;
 public:
@@ -119,9 +119,6 @@ public:
 	void begin_recording(editor_folder&);
 	void begin_replaying(editor_folder&);
 
-	template <class M>
-	void choose_mode(const mode_vars_id& vars_id);
-
 	void ensure_handler();
 
 	template <class C>
@@ -166,4 +163,6 @@ public:
 	}
 
 	void set_dirty();
+
+	void choose_mode(const mode_vars_id& vars_id);
 };

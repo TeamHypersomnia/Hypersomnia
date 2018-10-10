@@ -14,10 +14,9 @@ decltype(auto) editor_player::on_mode_with_input_impl(
 		std::visit(
 			[&](auto& typed_mode) {
 				using M = remove_cref<decltype(typed_mode)>;
-				using V = typename M::vars_type;
 				using I = typename M::input;
 				
-				if (const auto vars = mapped_or_nullptr(all_vars.template get_for<V>(), self.current_mode_vars_id)) {
+				if (const auto vars = mapped_or_nullptr(all_vars.template get_for<M>(), self.current_mode_vars_id)) {
 					if constexpr(M::needs_initial_signi) {
 						const auto& initial = self.before_start.commanded->work.world.get_solvable().significant;
 						const auto in = I { *vars, initial, cosm };
@@ -47,7 +46,7 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 		[this, &folder, &history, &cosm, in](const auto& applied_entropy) {
 			/* step */
 			on_mode_with_input(
-				folder.commanded->mode_vars,
+				folder.commanded->mode_vars.vars,
 				cosm,
 				[&](auto& typed_mode, const auto& mode_in) {
 					while (history.has_next_command()) {
@@ -171,13 +170,4 @@ void editor_player::advance_player(
 		set_dirty();
 		in.cmd_in.clear_dead_entities();
 	}
-}
-
-template <class M>
-void editor_player::choose_mode(const mode_vars_id& vars_id) {
-	ensure(!has_testing_started());
-
-	set_dirty();
-	current_mode_vars_id = vars_id;
-	current_mode.emplace<M>();
 }

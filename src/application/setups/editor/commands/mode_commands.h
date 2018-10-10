@@ -14,8 +14,8 @@ struct change_mode_vars_property_command : change_property_command<change_mode_v
 
 	// GEN INTROSPECTOR struct change_mode_vars_property_command
 	mode_field_address field;
-	mode_vars_id vars_id;
-	mode_vars_type_id vars_type_id;
+	raw_mode_vars_id vars_id;
+	mode_type_id vars_type_id;
 	// END GEN INTROSPECTOR
 
 	auto count_affected() const {

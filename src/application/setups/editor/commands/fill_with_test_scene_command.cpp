@@ -65,31 +65,36 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 	work.make_test_scene(in.lua, { minimal, settings.scene_tickrate }, test_vars, std::addressof(bomb_vars));
 #endif
 
-	mode_vars.clear();
+	auto& vars = mode_vars.vars;
+	vars.clear();
 
 	auto& player_id = view_ids.local_player;
 
 	{
-		const auto test_vars_id = mode_vars_id(0);
-		mode_vars.get_for<test_scene_mode_vars>().try_emplace(test_vars_id, std::move(test_vars));
+		const auto test_vars_id = raw_mode_vars_id(0);
+		vars.get_for<test_scene_mode>().try_emplace(test_vars_id, std::move(test_vars));
 
 		if (!settings.start_bomb_mode) {
 			const auto arbitrary_player_id = static_cast<mode_player_id>(0);
 			player_id = arbitrary_player_id;
 
-			player.choose_mode<test_scene_mode>(test_vars_id);
+			auto& def = mode_vars.default_mode;
+			def.type_id.set<test_scene_mode>();
+			def.raw = test_vars_id;
 		}
 	}
 
 	{
-		const auto bomb_vars_id = mode_vars_id(0);
-		mode_vars.get_for<bomb_mode_vars>().try_emplace(bomb_vars_id, std::move(bomb_vars));
+		const auto bomb_vars_id = raw_mode_vars_id(0);
+		vars.get_for<bomb_mode>().try_emplace(bomb_vars_id, std::move(bomb_vars));
 
 		if (settings.start_bomb_mode) {
 			const auto arbitrary_player_id = static_cast<mode_player_id>(3);
 			player_id = arbitrary_player_id;
 
-			player.choose_mode<bomb_mode>(bomb_vars_id);
+			auto& def = mode_vars.default_mode;
+			def.type_id.set<bomb_mode>();
+			def.raw = bomb_vars_id;
 		}
 	}
 }

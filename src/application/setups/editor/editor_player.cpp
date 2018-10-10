@@ -137,6 +137,8 @@ double editor_player::get_total_secs() const {
 }
 
 void editor_player::initialize_testing(editor_folder& f) {
+	choose_mode(f.commanded->mode_vars.default_mode);
+
 	save_state_before_start(f);
 	reset_mode();
 }
@@ -214,4 +216,20 @@ void editor_player::request_steps(const int amount) {
 
 void editor_player::set_dirty() {
 	dirty = true;
+}
+
+void editor_player::choose_mode(const mode_vars_id& vars_id) {
+	ensure(!has_testing_started());
+
+	set_dirty();
+
+	current_mode_vars_id = vars_id.raw;
+
+	vars_id.type_id.dispatch(
+		[&](auto m) {
+			using M = decltype(m);
+
+			current_mode.emplace<M>();
+		}
+	);
 }

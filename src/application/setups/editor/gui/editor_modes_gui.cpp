@@ -40,98 +40,99 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 
 	thread_local std::string nickname = "Test-player";
 
-	{
-		auto node = scoped_tree_node("Current mode");
+	/* TODO: commandize it properly? */
 
-		next_columns(2);
+	auto& player = cmd_in.get_player();
+	auto& folder = cmd_in.folder;
 
-		if (node) {
-			auto& folder = cmd_in.folder;
-			auto& player = cmd_in.get_player();
+	player.on_mode_with_input(
+		folder.commanded->mode_vars.vars,
+		folder.commanded->work.world,
+		[&](auto& typed_mode, const auto& mode_input) {
+			auto node = scoped_tree_node("Current mode");
 
-			/* TODO: commandize it properly? */
-			player.on_mode_with_input(
-				folder.commanded->mode_vars,
-				folder.commanded->work.world,
-				[&](auto& typed_mode, const auto& mode_input) {
-					using M = remove_cref<decltype(typed_mode)>;
+			next_columns(2);
 
-					auto& work = cmd_in.folder.commanded->work;
-					auto& cosm = work.world;
+			if (node) {
+				using M = remove_cref<decltype(typed_mode)>;
 
-					const auto in = commanding_property_editor_input {
-						{ settings.property_editor, property_editor_data }, { cmd_in }
-					};
+				auto& work = cmd_in.folder.commanded->work;
+				auto& cosm = work.world;
 
-					if constexpr(std::is_same_v<M, test_scene_mode>) {
-						(void)mode_input;
+				const auto in = commanding_property_editor_input {
+					{ settings.property_editor, property_editor_data }, { cmd_in }
+				};
+
+				if constexpr(std::is_same_v<M, test_scene_mode>) {
+					(void)mode_input;
+				}
+				else {
+					if (ImGui::Button("Add player")) {
+						typed_mode.auto_assign_faction(mode_input, typed_mode.add_player(mode_input, nickname));
 					}
-					else {
-						if (ImGui::Button("Add player")) {
-							typed_mode.auto_assign_faction(mode_input, typed_mode.add_player(mode_input, nickname));
-						}
 
-						ImGui::SameLine();
+					ImGui::SameLine();
 
-						if (ImGui::Button("Add spectator")) {
-							typed_mode.add_player(mode_input, nickname);
-						}
+					if (ImGui::Button("Add spectator")) {
+						typed_mode.add_player(mode_input, nickname);
+					}
 
-						ImGui::SameLine();
+					ImGui::SameLine();
 
-						input_text<256>("Nickname", nickname);
+					input_text<256>("Nickname", nickname);
 
-						if (ImGui::Button("Restart")) {
-							typed_mode.request_restart();
-						}
+					if (ImGui::Button("Restart")) {
+						typed_mode.request_restart();
+					}
 
-						const auto players_node_label = "Players";
-						auto players_node = scoped_tree_node(players_node_label);
+					const auto players_node_label = "Players";
+					auto players_node = scoped_tree_node(players_node_label);
 
-						if (players_node) {
-							for (const auto& p : typed_mode.players) {
-								const auto this_player_label = typesafe_sprintf("%x (id: %x)", p.second.chosen_name, p.first.value);
+					if (players_node) {
+						for (const auto& p : typed_mode.players) {
+							const auto this_player_label = typesafe_sprintf("%x (id: %x)", p.second.chosen_name, p.first.value);
 
-								if (const auto this_player_node = scoped_tree_node(this_player_label.c_str())) {
-									const auto player_handle = cosm[p.second.guid];
-									const auto character_name = player_handle.alive() ? player_handle.get_name() : "dead";
-									text(typesafe_sprintf("Corresponding character name: %x", character_name));
+							if (const auto this_player_node = scoped_tree_node(this_player_label.c_str())) {
+								const auto player_handle = cosm[p.second.guid];
+								const auto character_name = player_handle.alive() ? player_handle.get_name() : "dead";
+								text(typesafe_sprintf("Corresponding character name: %x", character_name));
 
-									singular_edit_properties(
-										in,
-										p.second,
-										this_player_label,
-										change_current_mode_property_command()
-									);
-								}
+								singular_edit_properties(
+									in,
+									p.second,
+									this_player_label,
+									change_current_mode_property_command()
+								);
 							}
 						}
 					}
-
-					singular_edit_properties(
-						in,
-						typed_mode,
-						" (Current mode)",
-						change_current_mode_property_command(),
-						special_widgets(
-							flavour_widget { cosm }
-						)
-					);
 				}
-			);
+
+				singular_edit_properties(
+					in,
+					typed_mode,
+					" (Current mode)",
+					change_current_mode_property_command(),
+					special_widgets(
+						flavour_widget { cosm }
+					)
+				);
+			}
 		}
-	}
+	);
 
 	ImGui::Separator();
 
 	auto& all_vars = cmd_in.folder.commanded->mode_vars;
 
-	all_vars.for_each_container(
-		[&](const auto& modes) {
-			ImGui::Separator();
-			using vars_type = typename remove_cref<decltype(modes)>::mapped_type;
+	for_each_type_in_list<all_modes>(
+		[&](auto m) {
+			using M = decltype(m);
 
-			const auto type_node_label = format_field_name(get_type_name<vars_type>());
+			ImGui::Separator();
+			const auto& modes = all_vars.vars.get_for<M>();
+			const auto type_node_label = format_field_name(get_type_name<typename M::vars_type>());
+
 			auto type_node = scoped_tree_node(type_node_label.c_str());
 
 			next_columns(2);
@@ -154,7 +155,7 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 						};
 
 						change_mode_vars_property_command cmd;
-						cmd.vars_type_id.set<vars_type>();
+						cmd.vars_type_id.set<M>();
 						cmd.vars_id = vars_id;
 
 						singular_edit_properties(
