@@ -433,6 +433,12 @@ void settings_gui_state::perform(
 					revertable_color_edit(SCOPE_CFG_NVP(rectangular_selection_border_color));
 				}
 
+				if (auto node = scoped_tree_node("Player")) {
+					auto& scope_cfg = config.editor.player;
+
+					revertable_slider(SCOPE_CFG_NVP(snapshot_frequency_in_steps), 400u, 5000u);
+				}
+
 				break;
 			}
 			case settings_pane::GUI_STYLES: {

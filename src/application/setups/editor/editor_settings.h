@@ -5,6 +5,7 @@
 #include "augs/drawing/grid_render_settings.h"
 
 #include "application/setups/editor/property_editor/property_editor_settings.h"
+#include "augs/templates/snapshotted_player_settings.h"
 
 struct editor_autosave_settings {
 	// GEN INTROSPECTOR struct editor_autosave_settings
@@ -75,6 +76,7 @@ struct editor_settings {
 #endif
 
 	editor_grid_settings grid;
+	augs::snapshotted_player_settings player;
 	editor_camera_settings camera;
 	editor_go_to_settings go_to;
 	editor_entity_selector_settings entity_selector;

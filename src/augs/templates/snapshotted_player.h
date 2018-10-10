@@ -4,6 +4,7 @@
 #include "augs/misc/timing/fixed_delta_timer.h"
 #include "augs/misc/timing/delta.h"
 #include "augs/templates/snapshotted_player_step_type.h"
+#include "augs/templates/snapshotted_player_settings.h"
 
 namespace augs {
 	struct introspection_access;
@@ -13,15 +14,18 @@ namespace augs {
 		entropy_type& total_collected;
 		Step step;
 		MakeSnapshot make_snapshot;
+		const snapshotted_player_settings& settings;
 
 		snapshotted_advance_input(
 			entropy_type& total_collected,
 			Step&& step,
-			MakeSnapshot&& make_snapshot
+			MakeSnapshot&& make_snapshot,
+			const snapshotted_player_settings& settings
 		) :
 			total_collected(total_collected),
 			step(std::move(step)),
-			make_snapshot(std::move(make_snapshot))
+			make_snapshot(std::move(make_snapshot)),
+			settings(settings)
 		{}
 	};
 
@@ -42,7 +46,7 @@ namespace augs {
 		};
 
 		friend introspection_access;
-		using snapshots_type = std::vector<snapshot_type>;
+		using snapshots_type = std::map<step_type, snapshot_type>;
 
 		// GEN INTROSPECTOR class augs::snapshotted_player class A class B
 		std::map<step_type, entropy_type> step_to_entropy;
@@ -50,10 +54,7 @@ namespace augs {
 	private:
 		advance_type advance_mode = advance_type::PAUSED;
 		step_type current_step = 0;
-
-		unsigned snapshot_frequency_in_steps = 3000;
 		snapshots_type snapshots;
-
 		fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 
 		double speed = 1.0;
@@ -61,7 +62,7 @@ namespace augs {
 		// END GEN INTROSPECTOR
 
 		template <class MakeSnapshot>
-		void push_snapshot_if_needed(MakeSnapshot&&);
+		void push_snapshot_if_needed(MakeSnapshot&&, unsigned frequency_in_steps);
 
 		template <class I>
 		void advance_single_step(const I& input);

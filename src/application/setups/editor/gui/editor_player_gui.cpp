@@ -82,10 +82,18 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 		std::size_t total_snapshot_bytes = 0;
 
 		for (const auto& s : snapshots) {
-			total_snapshot_bytes += s.size();
+			total_snapshot_bytes += s.second.size();
 		}
 
-		text("Snapshots: %x (%x)", snapshots.size() - 1, readable_bytesize(total_snapshot_bytes));
+		text("Snapshots: %x (%x)", snapshots.size(), readable_bytesize(total_snapshot_bytes));
+
+		if (snapshots.size() > 0) {
+			auto it = snapshots.upper_bound(player.get_current_step());
+			--it;
+
+			const auto dist = std::distance(snapshots.begin(), it);
+			text("Current snapshot: %x (step: %x)", dist, (*it).first); 
+		}
 	}
 
 	text("(Debug) player dirty: %x", player.dirty);

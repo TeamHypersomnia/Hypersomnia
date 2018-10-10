@@ -110,44 +110,46 @@ namespace augs {
 	template <class A, class B>
 	template <class I, class SetSnapshot>
 	void snapshotted_player<A, B>::seek_to(
-		typename snapshotted_player<A, B>::step_type seeked_step,
+		typename snapshotted_player<A, B>::step_type requested_step,
 		const I& input,
 		SetSnapshot&& set_snapshot
 	) {
-		auto set = [&](const auto i) {
-			PLR_LOG("Set snapshot num %x (size: %x)", i, snapshots.size());
+		const auto seeked_step = std::min(requested_step, get_total_steps());
 
-			set_snapshot(i, snapshots.at(i));
-			current_step = i * snapshot_frequency_in_steps;
-
-			PLR_LOG("New current step: %x", current_step);
-		};
-
-		const auto seeked_adj_snapshot = std::min(
-			static_cast<unsigned>(snapshots.size() - 1),
-			seeked_step / snapshot_frequency_in_steps
-		);
+		if (seeked_step == current_step) {
+			return;
+		}
 
 		PLR_LOG("Seeking from %x to %x", current_step, seeked_step);
-		PLR_LOG("Adjacent snapshot: #%x", seeked_adj_snapshot);
+
+		const auto seeked_adj_snapshot = [&]() {
+			auto it = snapshots.upper_bound(seeked_step);
+			--it;
+			return *it;
+		}();
+
+		const auto step_of_adj_snapshot = seeked_adj_snapshot.first;
+	   
+		auto seek_to_snapshot = [&]() {
+			PLR_LOG("Set snapshot at step %x (size: %x)", current_step, snapshots.size());
+
+			set_snapshot(step_of_adj_snapshot, seeked_adj_snapshot.second);
+
+			current_step = step_of_adj_snapshot;
+		};
+
+		PLR_LOG("Adjacent snapshot step: #%x", step_of_adj_snapshot);
 
 		if (seeked_step < current_step) {
 			PLR_LOG("Seek backwards");
-			set(seeked_adj_snapshot);
+			seek_to_snapshot();
 		}
-
-		/* At this point the current step is <= than the target step. */
-
-		{
-			/* Maybe we can speed up the forward seek by setting some future snapshot. */
-
-			const auto step_of_adj_snapshot = seeked_adj_snapshot * snapshot_frequency_in_steps;
-
+		else {
+			/* We're seeking forward. Setting the snapshot here may speed up the seek. */
 			const auto distance_from_adj_snapshot = seeked_step - step_of_adj_snapshot;
 			const auto distance_from_seeked_step = seeked_step - current_step;
 
 			PLR_LOG_NVPS(
-				step_of_adj_snapshot,
 				distance_from_adj_snapshot,
 				distance_from_seeked_step
 			);
@@ -155,7 +157,7 @@ namespace augs {
 			if (distance_from_adj_snapshot < distance_from_seeked_step) {
 				PLR_LOG("Speedup the forward seek");
 
-				set(seeked_adj_snapshot);
+				seek_to_snapshot();
 			}
 		}
 
@@ -170,20 +172,32 @@ namespace augs {
 
 	template <class A, class B>
 	template <class MakeSnapshot>
-	void snapshotted_player<A, B>::push_snapshot_if_needed(MakeSnapshot&& make_snapshot) {
-		if (current_step % snapshot_frequency_in_steps == 0) {
-			const auto snapshot_index = current_step / snapshot_frequency_in_steps;
+	void snapshotted_player<A, B>::push_snapshot_if_needed(MakeSnapshot&& make_snapshot, const unsigned frequency_in_steps) {
+		if (is_recording()) {
+			const bool is_snapshot_time = [&]() {
+				if (snapshots.empty()) {
+					ensure_eq(0, current_step);
+					return true;
+				}
 
-			const bool valid_snapshot_exists = snapshot_index < snapshots.size();
+				auto it = snapshots.upper_bound(current_step);
+				--it;
 
-			if (!valid_snapshot_exists) {
-				ensure_eq(snapshot_index, snapshots.size());
+				const auto since_last = current_step - (*it).first;
+				return since_last >= frequency_in_steps;
+			}();
 
-				PLR_LOG("Snapshot step: %x. Snapshot #%x pushed.", current_step, snapshot_index);
-				snapshots.emplace_back(make_snapshot(snapshot_index));
+			if (is_snapshot_time) {
+				PLR_LOG("Snapshot step: %x. Pushed.", current_step);
+				snapshots[current_step] = make_snapshot(current_step);
 			}
-			else {
-				PLR_LOG("Snapshot step: %x. Snapshot #%x exists.", current_step, snapshot_index);
+		}
+		else {
+			const bool valid_snapshot_exists = found_in(snapshots, current_step);
+
+			if (valid_snapshot_exists) {
+				PLR_LOG("Snapshot step: %x. Exists.", current_step);
+
 				make_snapshot(std::nullopt);
 			}
 		}
@@ -195,7 +209,7 @@ namespace augs {
 		auto& step_i = current_step;
 		auto& applied_entropy = in.total_collected;
 
-		push_snapshot_if_needed(in.make_snapshot);
+		push_snapshot_if_needed(in.make_snapshot, in.settings.snapshot_frequency_in_steps);
 
 		auto considered_mode = advance_mode;
 
@@ -214,17 +228,10 @@ namespace augs {
 					step_to_entropy[step_i] = applied_entropy;
 				}
 
-				{
-					const auto next_snapshot_index = 1 + step_i / snapshot_frequency_in_steps;
-					const bool outdated_snapshots_to_delete_exist = next_snapshot_index < snapshots.size();
-
-					if (outdated_snapshots_to_delete_exist) {
-						snapshots.erase(
-							snapshots.begin() + next_snapshot_index,
-							snapshots.end()
-						);
-					}
-				}
+				snapshots.erase(
+					snapshots.upper_bound(current_step),
+					snapshots.end()
+				);
 		
 				break;
 

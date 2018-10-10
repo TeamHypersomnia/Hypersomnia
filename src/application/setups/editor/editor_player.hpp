@@ -2,6 +2,7 @@
 #include "application/setups/editor/editor_player.h"
 #include "application/intercosm.h"
 #include "augs/templates/snapshotted_player.hpp"
+#include "application/setups/editor/editor_settings.h"
 
 template <class E, class A, class C, class F>
 decltype(auto) editor_player::on_mode_with_input_impl(
@@ -104,7 +105,9 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 
 				return std::move(ms);//ms.operator std::vector<std::byte>&&();
 			}
-		}
+		},
+
+		in.cmd_in.settings.player
 	);
 }
 

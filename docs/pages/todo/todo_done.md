@@ -1807,3 +1807,147 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 
 - Some strange bug when seeking while recording
+
+- was_modified exists so that the history is saved when some new commands were added later on but we returned to the current revision
+	- we would always set modified flags during record or replay because the line gets really blurry here
+	- autosave when:
+		- playtesting & playtesting dirty flag set
+			- one cannot undirty it at al
+		- if not playtesting, the history wants to do so or dirty flag is set
+		- having gone back from playtesting to old history (which will yield that it is unset) by discarding
+			- as the cosmos is completely different
+	- disallow quit and show * when:
+		- playtesting & playtesting dirty flag set
+		- if not playtesting, at non-empty workspace and unsaved revision
+	- set dirty flag when:
+		- history's seek to revision requested
+		- any mutable editor player op
+
+- Fix autosaving when playtesting
+	- Revision number might coincide
+		- will it though?
+	- no autosave happens when revision is -1
+
+- Make snapshot frequency configurable
+	- Actually let's just quickly implement map there
+
+- Implement view early to know what's going on
+
+- Implementation order
+	- Default chosen mode
+	- Initially there should be none
+	- Honestly why not choose it at fill stage?
+		- No problem just altering the mode before start...
+			- Just as we could do it in the first step
+
+- Re-applying process
+	- **CHOSEN SOLUTION:** make commands redoable arbitrary number of times, then force-set revision and re-do
+		- most to code, probably cleanest architecturally
+			- not that much to code
+		- best processing performance and least ways it could go wrong, perhaps
+	- **RECONSIDER:** undo everything and then re-do when the folder has been restored
+		- least to code, worst performance
+			- Will it be that bad?
+			- Playtests won't be that long anyway
+		- although... we'll need to skip some commands while undoing
+			- which is sorta dirty
+		- least to store as well
+		- actually this will save a lot on space
+		- and no need to force set revisions
+	- always keep a copy of an un-executed command in a separate history
+		- this only avoids the need to force-set revision and code re-redoability which isn't all that important
+		- worse space complexity, not much to code, not much clean architecturally
+
+- Player start
+	- **CHOSEN SOLUTION**: Store only the essentials
+		- Don't share a struct for this, just store them in a new struct explicitly one by one
+			- That struct will be what should go into unique ptr
+			- Contents:
+				- Copy of the intercosm
+					- From which we will also be acquiring the initial signi for advancing the mode
+				- View elements:
+					- Group selection state
+					- Selection state
+				- mode_vars
+				- ~~From the player:~~
+					- initial mode_state
+						- actually, no, because we should always reset it to initial values
+				- history?
+					- NO! History will be the same, later we will only force-set revision
+
+- Constraints in the playtest mode
+	- we'll need to forbid undoing past the revision when we've started the playtest
+		- Or just interrupt on undo?
+		- Or just create a started playtest command?
+			- That's BS becasue it won't exist after re-application
+	- History will be left untouched?
+		- Though we can always make it different inside GUI
+	- we'll need to forbid filling with new scenes?
+		- The only things untouched by the fill are history and current_path
+		- Shouldn't matter really
+	- Some notification might be useful
+
+
+- Problem: The results of re-applied commands might turn out completely off if...
+	- ...some entities were created in-game before e.g. duplicating some entities and later moving them
+		- this is because the generated ids won't correspond
+	- **CHOSEN SOLUTION:** Allow all commands on the test workspace, but...
+		- ...simply sanitize the re-applied commands to only affect **initially existing entities**
+		- E.g. duplicating or mirroring once will work just once
+		- If we need it in the future we can add some remapping later
+		- Just warn about this in GUI somehow
+		- Also remove commands for whom affected entities are none in this model
+
+- Manipulating the folder in place during playtest vs keeping another instance and redirecting
+	- **CHOSEN SOLUTION**: We should just std::move around on start and finish.
+		- Entry points for the folder might be quite many so that's hard to predict
+		- Anyway everything in the folder, incl. history, should be quickly std::movable
+			- folder has only 1000 bytes
+
+- Existential commands vs those that depend on them
+	- Both need be sanitized anyway
+
+
+- Editor step
+	- A number of times that the editor player has advanced, not a cosmos in particular
+	- Because a logical step of the cosmos might be reset on every mode round
+
+- Commands could store the editor step when they were executed...
+	- ...so that upon undoing, the editor falls back to the correct solvable state
+
+
+
+- Editor player, modes and their replays
+	- When the player is started:
+		- Store 
+		- Alternatively, when the player is restored, rewind
+			- ...but this is wacky
+	- When the re-applying is requested
+		- Restore cosmos
+		- Restore vars
+		- Restore view elements
+		- Force set revision in history without making any changes
+		- Sanitize all commands one by one as they are being re-applied
+	- Existence of initial signi denotes whether the player is playing
+		- Actually, we should keep more than a session there, e.g. the saved selection groups?
+	- Store optional of state to be restored
+
+
+- Storage of pre-defined mode informations inside a map
+	- ``.modes`` file
+		- A map is still functional without modes and modes can always be later specified, so a separate file is justified
+		- As flavour ids aren't human readable, makes sense to use binary format for now
+	- Each should also have a name, e.g. "test scene", "bomb", "ffa", "tdm", "duel"
+		- For easy choosing from the admin console
+	- unordered map of ints for each defined profile
+		- player stores the current int and a variant of mode instances
+		- we std::visit by the mode instance on advancing and then acquire the vars by it
+	- Editor view shall keep track of current mode instance?
+		- We thought about the player, but we must serialize this per-opened folder.
+		- Editor view is suitable because:
+			- It is the part of the state that is specific to the editor session, but will never be used during gameplay.
+			- This actually implies that the **player should be found within the view**.
+			- No problem having player state per-view, just that we'll pause it whenever we switch a tab or quit the editor.
+		- What about history of changes made during the mode?
+		- Probably player as well.
+		- The work won't store any 

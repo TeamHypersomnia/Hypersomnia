@@ -4,6 +4,18 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- GUI for the player
+	- Timeline
+		- IMGUI is the way to go, really
+			- Builtin horizontal scrollbar, tooltip, child windows, selection control, etc
+		- Yellow marks at positions when when any input is applied
+			- Shown with regards to currently controlled entity
+		- If recording, show the position marker in orange
+		- If replaying, in green
+		- Show world time and total editor time
+		- If a command was pasted, the marker should be cyan
+	- Should be able to zoom out?
+	- Moving around like in audacity
 - Optionally, make the bomb non-pickupable by other factions
 	- For now just set infinite space occupied and don't iterate recursively to check if the item is forbidden
 
