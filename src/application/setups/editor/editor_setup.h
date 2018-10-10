@@ -184,6 +184,8 @@ class editor_setup {
 
 	void set_current(const folder_index i);
 
+	std::size_t find_folder_by_path(const augs::path_type& current_path) const;
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;

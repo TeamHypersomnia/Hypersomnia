@@ -147,6 +147,8 @@ void editor_player::begin_recording(editor_folder& f) {
 
 	base::clear_later_entropies();
 	base::begin_recording();
+
+	f.history.set_modified_flags();
 }
 
 void editor_player::begin_replaying(editor_folder& f) {

@@ -46,7 +46,7 @@ using history_type = augs::history_with_marks<A_command, B_command>;
 
 #define test_mark_as_current() \
 REQUIRE(hist.at_unsaved_revision()); \
-hist.mark_current_revision_as_saved(); \
+hist.mark_as_just_saved(); \
 REQUIRE(!hist.at_unsaved_revision());
 
 TEST_CASE("Templates History") {
@@ -86,7 +86,7 @@ TEST_CASE("Templates History") {
 		REQUIRE(context.a_value == 6);
 
 		hist.undo(context);
-		hist.mark_current_revision_as_saved();
+		hist.mark_as_just_saved();
 
 		REQUIRE(context.a_value == 0);
 

@@ -146,10 +146,6 @@ namespace augs {
 		bool modified_since_save = false;
 		// END GEN INTROSPECTOR
 
-		void set_modified_flags() {
-			modified_since_save = true;
-		}
-
 		void invalidate_revisions_from(const index_type index) {
 			if (saved_at_revision && saved_at_revision.value() >= index) {
 				/* The revision that is currently saved to disk has just been deleted */
@@ -161,25 +157,25 @@ namespace augs {
 		using base::get_current_revision;
 		using base::empty;
 
-		void mark_current_revision_as_saved() {
-			saved_at_revision = get_current_revision();
-		}
-
-		void mark_as_not_modified() {
-			modified_since_save = false;
+		void set_modified_flags() {
+			modified_since_save = true;
 		}
 
 		void mark_as_just_saved() {
-			mark_as_not_modified();
-			mark_current_revision_as_saved();
+			modified_since_save = false;
+			saved_at_revision = get_current_revision();
 		}
 
 		bool is_revision_saved(const index_type candidate) const {
 			return saved_at_revision == candidate;
 		}
 
+		bool at_saved_revision() const {
+			return empty() || is_revision_saved(get_current_revision());
+		}
+
 		bool at_unsaved_revision() const {
-			return !empty() && !is_revision_saved(get_current_revision());
+			return !at_saved_revision();
 		}
 
 		bool was_modified() const {

@@ -224,12 +224,19 @@ void editor_setup::apply(const config_lua_table& cfg) {
 	return;
 }
 
-void editor_setup::open_folder_in_new_tab(const path_operation op) {
+std::size_t editor_setup::find_folder_by_path(const augs::path_type& current_path) const {
 	for (std::size_t i = 0; i < signi.folders.size(); ++i) {
-		if (signi.folders[i].current_path == op.path) {
-			set_current(static_cast<folder_index>(i));
-			return;
+		if (signi.folders[i].current_path == current_path) {
+			return static_cast<folder_index>(i);
 		}
+	}
+
+	return dead_folder_v;
+}
+
+void editor_setup::open_folder_in_new_tab(const path_operation op) {
+	if (const auto existing = find_folder_by_path(op.path); existing != dead_folder_v) {
+		set_current(existing);
 	}
 
 	try_to_open_new_folder(
@@ -820,7 +827,12 @@ void editor_setup::reveal_in_explorer(const augs::window& owner) {
 
 void editor_setup::new_tab() {
 	try_to_open_new_folder([&](editor_folder& t) {
-		t.current_path = get_first_free_untitled_path("Project%x");
+		t.current_path = get_first_free_untitled_path(
+			"Project%x", 
+			[&](const auto& candidate) {
+				return find_folder_by_path(candidate) == dead_folder_v;
+			}
+		);
 		augs::create_directories(t.current_path);
 	});
 }

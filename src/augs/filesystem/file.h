@@ -11,6 +11,7 @@
 
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/filesystem/path.h"
+#include "augs/templates/identity_templates.h"
 
 namespace augs {
 	template <class T, class... Args>
@@ -43,6 +44,10 @@ namespace augs {
 		return std::experimental::filesystem::exists(path);
 	}
 
+	inline bool is_empty(const path_type& path) {
+		return std::experimental::filesystem::is_empty(path);
+	}
+
 	inline decltype(auto) remove_file(const path_type& path) {
 		std::error_code err;
 		return std::experimental::filesystem::remove(path, err);
@@ -53,17 +58,51 @@ namespace augs {
 		return std::experimental::filesystem::remove_all(path, err);
 	}
 
-	inline path_type first_free_path(const path_type path_template) {
+	enum class free_path_type {
+		NON_EXISTING,
+		EMPTY
+	};
+
+	template <class F = true_returner>
+	path_type find_first(const free_path_type type, const path_type& path_template, F&& allow_candidate = true_returner()) {
 		for (std::size_t candidate = 0;; ++candidate) {
 			const auto candidate_path = candidate ? 
 				typesafe_sprintf(path_template.string(), typesafe_sprintf("-%x", candidate))
 				: typesafe_sprintf(path_template.string(), "")
 			;
 
-			if (!augs::exists(candidate_path)) {
-				return candidate_path;
+			auto result = [&]() {
+				if (!augs::exists(candidate_path)) {
+					return candidate_path;
+				}
+
+				if (type == free_path_type::EMPTY) {
+					if (augs::is_empty(candidate_path)) {
+						return candidate_path;
+					}
+				}
+
+				return std::string();
+			}();
+
+			if (result.empty()) {
+				continue;
+			}
+
+			if (allow_candidate(result)) {
+				return result;
 			}
 		}
+	}
+
+	template <class... Args>
+	decltype(auto) first_empty_path(Args&&... args) {
+		return find_first(free_path_type::EMPTY, std::forward<Args>(args)...);
+	}
+
+	template <class... Args>
+	decltype(auto) first_free_path(Args&&... args) {
+		return find_first(free_path_type::NON_EXISTING, std::forward<Args>(args)...);
 	}
 
 	inline path_type switch_path(

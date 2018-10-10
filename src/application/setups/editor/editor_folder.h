@@ -10,6 +10,7 @@
 #include "application/setups/editor/editor_commanded_state.h"
 
 using folder_index = unsigned;
+constexpr unsigned dead_folder_v = static_cast<folder_index>(-1);
 
 struct editor_popup;
 using editor_warning = editor_popup;

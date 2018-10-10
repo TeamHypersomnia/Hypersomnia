@@ -315,7 +315,7 @@ namespace test_flavours {
 			missile.destruction_sound.id = to_sound_id(test_scene_sound_id::STEEL_PROJECTILE_DESTRUCTION);
 
 			missile.remnant_flavours.emplace_back(to_entity_flavour_id(test_remnant_bodies::STEEL_ROUND_REMNANT_2));
-			missile.damage_amount = 47;
+			missile.damage_amount = 49;
 			missile.victim_shake *= 2.f;
 
 			auto& trace_modifier = missile.trace_sound.modifier;
@@ -1672,7 +1672,7 @@ namespace test_flavours {
 			gun_def.shell_angular_velocity = {2.f, 10.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {300.f, 1900.f};
-			gun_def.damage_multiplier = 0.64f;
+			gun_def.damage_multiplier = 0.62f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.recoil_multiplier = 1.35f;
