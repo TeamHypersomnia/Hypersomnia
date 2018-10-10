@@ -84,8 +84,6 @@ void editor_player::finish_testing(const editor_command_input in, const finish_t
 	}
 
 	auto& f = in.folder;
-
-	auto& current_history = f.history;
 	auto playtested_history = editor_history(std::move(f.history));
 
 	restore_saved_state(f);
@@ -99,13 +97,14 @@ void editor_player::finish_testing(const editor_command_input in, const finish_t
 
 	}
 	else if (mode == finish_testing_type::REAPPLY_CHANGES) {
+		auto& current_history = f.history;
 		current_history.discard_later_revisions();
 
 		using R = editor_history::index_type;
 
 		auto& commands = playtested_history.get_commands();
 
-		for (R i = 0; i < playtested_history.get_current_revision(); ++i) {
+		for (R i = 0; i <= playtested_history.get_current_revision(); ++i) {
 			auto& cmd = commands[i];
 
 			::make_redoable_for_different_solvable(in, cmd);
