@@ -61,21 +61,9 @@ static int to_special_action_index(const game_gui_intent_type type) {
 }
 
 cosmic_entropy game_gui_system::get_and_clear_pending_events() {
-	cosmic_entropy out;
-
-	out.transfer_requests = pending_transfers;
-	out.cast_spells_per_entity = spell_requests;
-	out.wields_per_entity = wield_requests;
-
-	clear_all_pending_events();
-
+	auto out = pending;
+	pending.clear();
 	return out;
-}
-
-void game_gui_system::clear_all_pending_events() {
-	pending_transfers.clear();
-	spell_requests.clear();
-	wield_requests.clear();
 }
 
 character_gui& game_gui_system::get_character_gui(const entity_id id) {
@@ -118,12 +106,12 @@ const item_button& game_gui_system::get_item_button(const entity_id id) const {
 	return item_buttons.at(id);
 }
 
-void game_gui_system::queue_transfer(const item_slot_transfer_request req) {
-	pending_transfers.push_back(req);
+void game_gui_system::queue_transfer(const entity_id& subject, const item_slot_transfer_request req) {
+	pending[subject].transfers.push_back(req);
 }
 
 void game_gui_system::queue_wielding(const entity_id& subject, const wielding_setup& wielding) {
-	wield_requests[subject] = wielding;
+	pending[subject].wield = wielding;
 }
 	
 bool game_gui_system::control_gui_world(
@@ -145,7 +133,7 @@ bool game_gui_system::control_gui_world(
 
 			if (change.was_pressed(augs::event::keys::key::RMOUSE)) {
 				if (world.held_rect_is_dragged) {
-					pending_transfers.push_back(item_slot_transfer_request::drop_some(item_entity, dragged_charges));
+					queue_transfer(root_entity, item_slot_transfer_request::drop_some(item_entity, dragged_charges));
 					return true;
 				}
 			}
@@ -345,7 +333,7 @@ void game_gui_system::control_hotbar_and_action_button(
 				const auto bound_spell = action_b.bound_spell;
 
 				if (bound_spell.is_set() && gui_entity.get<components::sentience>().is_learnt(bound_spell)) {
-					spell_requests[gui_entity] = bound_spell;
+					pending[gui_entity].cast_spell = bound_spell;
 				}
 			}
 		}

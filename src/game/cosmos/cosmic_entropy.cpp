@@ -13,47 +13,47 @@ template <class key>
 std::size_t basic_cosmic_entropy<key>::length() const {
 	std::size_t total = 0;
 
-	for (const auto& ent : intents_per_entity) {
-		total += ent.second.size();
-	}
+	for (const auto& p : players) {
+		const auto& e = p.second;
 
-	for (const auto& ent : motions_per_entity) {
-		total += ent.second.size();
-	}
+		total += e.motions.size();
+		total += e.intents.size();
+		total += e.transfers.size();
 
-	total += transfer_requests.size();
-	total += cast_spells_per_entity.size();
-	total += wields_per_entity.size();
+		if (e.cast_spell.is_set()) {
+			++total;
+		}
+
+		if (e.wield != std::nullopt) { 
+			++total;
+		}
+	}
 
 	return total;
 }
 
 template <class key>
 bool basic_cosmic_entropy<key>::empty() const {
-	return length() == 0;
+	return players.empty() || length() == 0;
 }
 
 template <class key>
 basic_cosmic_entropy<key>& basic_cosmic_entropy<key>::operator+=(const basic_cosmic_entropy& b) {
-	for (const auto& intents : b.intents_per_entity) {
-		concatenate(intents_per_entity[intents.first], intents.second);
-	}
+	for (const auto& p : b.players) {
+		const auto& r = p.second;
 
-	for (const auto& intents : b.motions_per_entity) {
-		concatenate(motions_per_entity[intents.first], intents.second);
-	}
+		auto& l = players[p.first];
 
-	concatenate(transfer_requests, b.transfer_requests);
+		concatenate(l.intents, r.intents);
+		concatenate(l.motions, r.motions);
+		concatenate(l.transfers, r.transfers);
 
-	for (const auto& spell : b.cast_spells_per_entity) {
-		if (cast_spells_per_entity.find(spell.first) == cast_spells_per_entity.end()) {
-			cast_spells_per_entity[spell.first] = spell.second;
+		if (r.wield != std::nullopt) {
+			l.wield = r.wield;
 		}
-	}
 
-	for (const auto& wield : b.wields_per_entity) {
-		if (wields_per_entity.find(wield.first) == wields_per_entity.end()) {
-			wields_per_entity[wield.first] = wield.second;
+		if (r.cast_spell.is_set()) {
+			l.cast_spell = r.cast_spell;
 		}
 	}
 
@@ -62,98 +62,50 @@ basic_cosmic_entropy<key>& basic_cosmic_entropy<key>::operator+=(const basic_cos
 
 template <class key>
 void basic_cosmic_entropy<key>::clear() {
-	augs::introspect(
-		[](auto, auto& member) {
-			member.clear();
-		},
-		*this
-	);
+	players.clear();
 }
 
 template <class key>
 void basic_cosmic_entropy<key>::clear_dead_entities(const cosmos& cosm) {
-	augs::introspect(
-		[&](auto, auto& member_container) {
-			using T = remove_cref<decltype(member_container)>;
-			
-			if constexpr(!std::is_same_v<decltype(transfer_requests), T>) {
-				auto eraser = [&cosm](const auto& it) {
-					return cosm[it.first].dead();
-				};
+	erase_if(players, [&](auto& p) {
+		if (cosm[p.first].dead()) {
+			return true;
+		}
 
-				erase_if(member_container, eraser);
-			}
-		},
-		*this
-	);
+		auto eraser = [&cosm](const auto& it) {
+			return cosm[it.item].dead();
+		};
 
-	erase_if(transfer_requests, [&](const auto& request) {
-		return cosm[request.item].dead();
+		erase_if(p.second.transfers, eraser);
+
+		return false;
 	});
 }
 
-bool guid_mapped_entropy::operator!=(const guid_mapped_entropy& b) const {
-	return !(
-		intents_per_entity == b.intents_per_entity
-		&& motions_per_entity == b.motions_per_entity
-		&& wields_per_entity == b.wields_per_entity
-		&& cast_spells_per_entity == b.cast_spells_per_entity
-		&& transfer_requests == b.transfer_requests
-	);
+template <class K>
+bool basic_player_entropy<K>::operator==(const basic_player_entropy<K>& b) const {
+	return
+		intents == b.intents
+		&& motions == b.motions
+		&& wield == b.wield
+		&& cast_spell == b.cast_spell
+		&& transfers == b.transfers
+	;
 }
 
-guid_mapped_entropy::guid_mapped_entropy(
-	const cosmic_entropy& b,
-	const cosmos& mapper
-) {
-	for (const auto& entry : b.intents_per_entity) {
-		intents_per_entity[mapper[entry.first].get_guid()] = entry.second;
-	}
-
-	for (const auto& entry : b.motions_per_entity) {
-		motions_per_entity[mapper[entry.first].get_guid()] = entry.second;
-	}
-
-	const auto& solvable = mapper.get_solvable();
-
-	for (const auto& entry : b.cast_spells_per_entity) {
-		cast_spells_per_entity[mapper[entry.first].get_guid()] = entry.second;
-	}
-
-	for (const auto& entry : b.wields_per_entity) {
-		wields_per_entity[mapper[entry.first].get_guid()] = solvable.guidize(entry.second);
-	}
-
-	for (const auto& entry : b.transfer_requests) {
-		transfer_requests.push_back(solvable.guidize(entry));
-	}
+template <class K>
+bool basic_player_entropy<K>::operator!=(const basic_player_entropy<K>& b) const {
+	return !operator==(b);
 }
 
-cosmic_entropy::cosmic_entropy(
-	const guid_mapped_entropy& b, 
-	const cosmos& mapper
-) {
-	for (const auto& entry : b.intents_per_entity) {
-		intents_per_entity[mapper[entry.first].get_id()] = entry.second;
-	}
+template <class K>
+bool basic_cosmic_entropy<K>::operator==(const basic_cosmic_entropy<K>& b) const {
+	return players == b.players;
+}
 
-	for (const auto& entry : b.motions_per_entity) {
-		motions_per_entity[mapper[entry.first].get_id()] = entry.second;
-	}
-
-	const auto& solvable = mapper.get_solvable();
-
-	for (const auto& entry : b.cast_spells_per_entity) {
-		cast_spells_per_entity[mapper[entry.first].get_id()] = entry.second;
-	}
-
-	for (const auto& entry : b.wields_per_entity) {
-		wields_per_entity[mapper[entry.first].get_id()] = solvable.deguidize(entry.second);
-	}
-
-	for (const auto& entry : b.transfer_requests) {
-		transfer_requests.push_back(solvable.deguidize(entry));
-	}
+template <class K>
+bool basic_cosmic_entropy<K>::operator!=(const basic_cosmic_entropy<K>& b) const {
+	return !operator==(b);
 }
 
 cosmic_entropy::cosmic_entropy(
@@ -161,9 +113,10 @@ cosmic_entropy::cosmic_entropy(
 	const game_intents& intents,
 	const game_motions& motions
 ) {
-	intents_per_entity[controlled_entity] = intents;
-	motions_per_entity[controlled_entity] = motions;
+	auto& p = players[controlled_entity];
+	p.intents = intents;
+	p.motions = motions;
 }
 
 template struct basic_cosmic_entropy<entity_id>;
-template struct basic_cosmic_entropy<entity_guid>;
+template struct basic_player_entropy<entity_id>;

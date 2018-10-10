@@ -1951,3 +1951,6 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- What about history of changes made during the mode?
 		- Probably player as well.
 		- The work won't store any 
+
+- test the ensure handler
+

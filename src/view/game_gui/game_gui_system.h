@@ -25,9 +25,7 @@ public:
 
 	std::unordered_map<entity_id, character_gui> character_guis;
 
-	augs::container_with_small_size<std::vector<item_slot_transfer_request>, unsigned short> pending_transfers;
-	augs::container_with_small_size<std::unordered_map<entity_id, wielding_setup>, unsigned char> wield_requests;
-	augs::container_with_small_size<std::unordered_map<entity_id, spell_id>, unsigned char> spell_requests;
+	cosmic_entropy pending;
 	
 	game_gui_rect_world world;
 	game_gui_rect_tree tree;
@@ -64,9 +62,8 @@ public:
 	}
 
 	cosmic_entropy get_and_clear_pending_events();
-	void clear_all_pending_events();
 
-	void queue_transfer(const item_slot_transfer_request);
+	void queue_transfer(const entity_id&, const item_slot_transfer_request);
 	void queue_wielding(const entity_id&, const wielding_setup&);
 
 	character_gui& get_character_gui(const entity_id);

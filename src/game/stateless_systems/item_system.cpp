@@ -510,7 +510,6 @@ void item_system::handle_wielding_requests(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 
 	const auto& entropy = step.get_entropy();
-	const auto& wields = entropy.wields_per_entity;
 
 	auto swap_wielded = [&](const auto& self, const bool play_effects_at_all = true) {
 		wielding_result result;
@@ -552,9 +551,13 @@ void item_system::handle_wielding_requests(const logic_step step) {
 		result.apply(step);
 	};
 
-	for (const auto& wield : wields) {
-		const auto& self = cosm[wield.first];
-		const auto& request = wield.second;
+	for (const auto& p : entropy.players) {
+		if (p.second.wield == std::nullopt) {
+			continue;
+		}
+
+		const auto& self = cosm[p.first];
+		const auto& request = *p.second.wield;
 		const auto& selections = request.hand_selections;
 		const auto current_selection = wielding_setup::from_current(self);
 

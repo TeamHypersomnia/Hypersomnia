@@ -1,10 +1,9 @@
 #pragma once
 #include <vector>
-#include <unordered_map>
+#include <map>
 
 #include "augs/readwrite/memory_stream.h"
 #include "augs/misc/machine_entropy.h"
-#include "augs/misc/container_with_small_size.h"
 
 #include "augs/window_framework/event.h"
 
@@ -18,14 +17,24 @@
 class cosmos;
 
 template <class key>
-struct basic_cosmic_entropy {
-	// GEN INTROSPECTOR struct basic_cosmic_entropy class key
-	augs::container_with_small_size<std::unordered_map<key, spell_id>, unsigned char> cast_spells_per_entity;
-	augs::container_with_small_size<std::unordered_map<key, basic_wielding_setup<key>>, unsigned char> wields_per_entity;
+struct basic_player_entropy {
+	// GEN INTROSPECTOR struct basic_player_entropy class key
+	spell_id cast_spell;
+	std::optional<basic_wielding_setup<key>> wield;
+	game_intents intents;
+	game_motions motions;
+	std::vector<basic_item_slot_transfer_request<key>> transfers;
+	// END GEN INTROSPECTOR
 
-	augs::container_with_small_size<std::unordered_map<key, game_intents>, unsigned char> intents_per_entity;
-	augs::container_with_small_size<std::unordered_map<key, game_motions>, unsigned char> motions_per_entity;
-	augs::container_with_small_size<std::vector<basic_item_slot_transfer_request<key>>, unsigned short> transfer_requests;
+	bool operator==(const basic_player_entropy<key>& b) const;
+	bool operator!=(const basic_player_entropy<key>& b) const;
+};
+
+template <class key>
+struct basic_cosmic_entropy {
+	using player_entropy_type = basic_player_entropy<key>;
+	// GEN INTROSPECTOR struct basic_cosmic_entropy class key
+	std::map<key, player_entropy_type> players;
 	// END GEN INTROSPECTOR
 
 	std::size_t length() const;
@@ -36,35 +45,28 @@ struct basic_cosmic_entropy {
 	void clear();
 
 	bool empty() const;
-};
 
-struct cosmic_entropy;
-
-struct guid_mapped_entropy : basic_cosmic_entropy<entity_guid> {
-	using base = basic_cosmic_entropy<entity_guid>;
-	using introspect_base = base;
-	
-	guid_mapped_entropy() = default;
-	explicit guid_mapped_entropy(const cosmic_entropy&, const cosmos&);
-	
-	guid_mapped_entropy& operator+=(const guid_mapped_entropy& b) {
-		base::operator+=(b);
-		return *this;
+	player_entropy_type& operator[](const key& k) {
+		return players[k];
 	}
 
-	bool operator!=(const guid_mapped_entropy&) const;
+	const player_entropy_type& at(const key& k) const { 
+		return players.at(k);
+	}
+
+	bool operator==(const basic_cosmic_entropy<key>&) const;
+	bool operator!=(const basic_cosmic_entropy<key>&) const;
 };
+
+using player_entropy = basic_player_entropy<signi_entity_id>;
+
+struct cosmic_entropy;
 
 struct cosmic_entropy : basic_cosmic_entropy<entity_id> {
 	using base = basic_cosmic_entropy<entity_id>;
 	using introspect_base = base;
 
 	cosmic_entropy() = default;
-	
-	explicit cosmic_entropy(
-		const guid_mapped_entropy&, 
-		const cosmos&
-	);
 	
 	explicit cosmic_entropy(
 		const entity_id controlled_entity,

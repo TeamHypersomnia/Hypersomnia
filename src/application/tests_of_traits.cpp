@@ -138,10 +138,6 @@ struct tests_of_traits {
 	static_assert(!has_introspect_base_v<double>);
 	static_assert(!has_introspect_base_v<value_meter>);
 
-	static_assert(has_introspect_v<guid_mapped_entropy>);
-	static_assert(!has_introspect_body_v<guid_mapped_entropy>);
-	static_assert(has_introspect_base_v<guid_mapped_entropy>);
-
 	static_assert(has_introspect_v<derivedintrotest>, "Trait has failed");
 	static_assert(has_introspect_body_v<value_meter>, "Trait has failed");
 

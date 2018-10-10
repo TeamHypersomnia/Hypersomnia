@@ -131,6 +131,14 @@ struct entity_id {
 	}
 
 	friend std::ostream& operator<<(std::ostream& out, const entity_id x);
+
+	bool operator<(const entity_id& b) const {
+		if (type_id == b.type_id) {
+			return raw < b.raw;
+		}
+
+		return type_id < b.type_id;
+	}
 }; 
 
 template <class E>

@@ -23,8 +23,6 @@ summary: That which we are brainstorming at the moment.
 
 - Since sending of entropy will be highly optimized for space, it makes no sense to have augs::container_with_small_size
 
-- test the ensure handler
-
 - Arbitrary pasting of entities
 	- Vastly useful for importing stuff from testbed maps into existing ones
 		- Let alone between community maps

@@ -54,7 +54,7 @@ void simulation_receiver::predict_intents_of_remote_entities(
 						}
 
 						if (release_intent.is_set()) {
-							adjusted_entropy.intents_per_entity[e.get_guid()].push_back(release_intent);
+							adjusted_entropy[e.get_guid()].intents.push_back(release_intent);
 						}
 					}
 				}

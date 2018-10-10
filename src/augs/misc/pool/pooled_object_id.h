@@ -61,6 +61,14 @@ namespace augs {
 			un.indirection_index = indirection_index;
 			return un;
 		}
+
+		bool operator<(const pooled_object_id& b) const {
+			if (indirection_index == b.indirection_index) {
+				return version < b.version;
+			}
+
+			return indirection_index < b.indirection_index;
+		}
 	};
 }
 

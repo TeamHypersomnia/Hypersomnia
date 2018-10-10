@@ -88,12 +88,16 @@ public:
 		return index;
 	}
 
-	bool operator==(const type_in_list_id b) const{
+	bool operator==(const type_in_list_id b) const {
 		return index == b.index;
 	}
 
 	bool operator!=(const type_in_list_id b) const{
 		return !operator==(b);
+	}
+
+	bool operator<(const type_in_list_id b) const {
+		return index < b.index;
 	}
 
 	template <class F>

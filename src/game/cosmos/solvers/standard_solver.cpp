@@ -47,7 +47,9 @@ void standard_solve(const logic_step step) {
 
 	contact_listener listener(cosm);
 
-	perform_transfers(step.get_entropy().transfer_requests, step);
+	for (const auto& p : step.get_entropy().players) {
+		perform_transfers(p.second.transfers, step);
+	}
 
 	performance.entropy_length.measure(step.get_entropy().length());
 

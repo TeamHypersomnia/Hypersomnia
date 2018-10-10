@@ -32,7 +32,7 @@ void drag_and_drop_callback(
 
 		if constexpr (std::is_same_v<T, drop_for_item_slot_transfer>) {
 			if (transfer_data.result.is_successful()) {
-				context.get_game_gui_system().queue_transfer(transfer_data.simulated_transfer);
+				context.get_game_gui_system().queue_transfer(context.get_subject_entity(), transfer_data.simulated_transfer);
 			}
 		}
 		else if constexpr (std::is_same_v<T, unfinished_drag_of_item>) {

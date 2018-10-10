@@ -52,9 +52,13 @@ void sentience_system::cast_spells(const logic_step step) const {
 
 	constexpr float standard_cooldown_for_all_spells_ms = 2000.f;
 
-	for (const auto& cast : step.get_entropy().cast_spells_per_entity) {
-		const auto subject = cosm[cast.first];
-		const auto spell = cast.second;
+	for (const auto& players : step.get_entropy().players) {
+		const auto subject = cosm[players.first];
+		const auto spell = players.second.cast_spell;
+
+		if (!spell.is_set()) {
+			continue;
+		}
 
 		auto& sentience = subject.get<components::sentience>();
 
@@ -68,8 +72,6 @@ void sentience_system::cast_spells(const logic_step step) const {
 				continue;
 			}
 		}
-
-		ensure(spell.is_set());
 
 		spell.dispatch(
 			[&](auto s) {
