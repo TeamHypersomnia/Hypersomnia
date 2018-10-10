@@ -141,6 +141,12 @@ void editor_player::seek_to(
 	const editor_player::step_type step, 
 	const player_advance_input_t<C> in
 ) {
+	if (step == get_current_step()) {
+		return;
+	}
+
+	set_dirty();
+
 	base::seek_to(
 		step,
 		make_snapshotted_advance_input(in),
@@ -162,6 +168,7 @@ void editor_player::advance_player(
 	);
 
 	if (performed_steps) {
+		set_dirty();
 		in.cmd_in.clear_dead_entities();
 	}
 }
@@ -170,6 +177,7 @@ template <class M>
 void editor_player::choose_mode(const mode_vars_id& vars_id) {
 	ensure(!has_testing_started());
 
+	set_dirty();
 	current_mode_vars_id = vars_id;
 	current_mode.emplace<M>();
 }

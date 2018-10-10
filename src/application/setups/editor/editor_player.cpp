@@ -93,6 +93,8 @@ void editor_player::finish_testing(const editor_command_input in, const finish_t
 	base::finish();
 	total_collected_entropy.clear();
 
+	set_dirty();
+
 	if (mode == finish_testing_type::DISCARD_CHANGES) {
 
 	}
@@ -148,7 +150,7 @@ void editor_player::begin_recording(editor_folder& f) {
 	base::clear_later_entropies();
 	base::begin_recording();
 
-	f.history.set_modified_flags();
+	set_dirty();
 }
 
 void editor_player::begin_replaying(editor_folder& f) {
@@ -157,6 +159,8 @@ void editor_player::begin_replaying(editor_folder& f) {
 	}
 
 	base::begin_replaying();
+
+	set_dirty();
 }
 
 void editor_player::ensure_handler() {
@@ -187,6 +191,8 @@ void editor_player::seek_to(
 }
 
 void editor_player::reset_mode() {
+	set_dirty();
+
 	std::visit(
 		[&](auto& typed_mode) {
 			typed_mode = {};
@@ -202,7 +208,11 @@ editor_player::step_type editor_player::get_current_step() const {
 
 void editor_player::request_steps(const int amount) {
 	if (has_testing_started()) {
+		set_dirty();
 		base::request_steps(amount);
 	}
 }
 
+void editor_player::set_dirty() {
+	dirty = true;
+}

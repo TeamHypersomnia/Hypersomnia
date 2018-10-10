@@ -49,6 +49,7 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 			auto& folder = cmd_in.folder;
 			auto& player = cmd_in.get_player();
 
+			/* TODO: commandize it properly? */
 			player.on_mode_with_input(
 				folder.commanded->mode_vars,
 				folder.commanded->work.world,

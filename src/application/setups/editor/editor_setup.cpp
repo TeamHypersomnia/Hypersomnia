@@ -246,7 +246,7 @@ void editor_setup::open_folder_in_new_tab(const path_operation op) {
 			if (const auto warning = f.load_folder_maybe_autosave()) {
 				set_popup(*warning);
 			}
-			/* f.history.mark_as_just_saved(); */
+			/* f.mark_as_just_saved(); */
 		}
 	);
 }
@@ -254,7 +254,7 @@ void editor_setup::open_folder_in_new_tab(const path_operation op) {
 void editor_setup::save_current_folder() {
 	try {
 		folder().save_folder();
-		folder().history.mark_as_just_saved();
+		folder().mark_as_just_saved();
 	}
 	catch (const std::runtime_error& what) {
 		set_popup({ "Error", "Failed to save the project.\nSome serious problem has occured.", what.what() });
@@ -852,8 +852,8 @@ void editor_setup::prev_tab() {
 void editor_setup::close_folder(const folder_index i) {
    	auto& folder_to_close = signi.folders[i];
 
-	if (folder_to_close.at_unsaved_revision()) {
-		set_popup({ "Error", "Nie", "Nie" });
+	if (!folder_to_close.allow_close()) {
+		set_popup({ "Error", "Save your work before closing the tab.", "" });
 		return;
 	}
 		

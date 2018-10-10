@@ -18,8 +18,8 @@ static void save_last_folders(
 	last_folders.paths.reserve(signi.folders.size());
 
 	for (const auto& f : signi.folders) {
-		if (const auto& h = f.history; h.empty()) {
-			/* Drop empty projects without any changes */
+		if (f.empty()) {
+			/* Drop empty projects without any changes whatsoever */
 			continue;
 		}
 
@@ -36,9 +36,7 @@ void editor_autosave::save(
 	save_last_folders(lua, signi);
 
 	for (const auto& f : signi.folders) {
-		if (const auto& h = f.history;
-			h.at_unsaved_revision() || h.was_modified()
-		) {
+		if (f.should_autosave()) {
 			auto autosave_path = f.get_autosave_path();
 			augs::create_directories(autosave_path);
 

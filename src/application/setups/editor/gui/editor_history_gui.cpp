@@ -29,6 +29,8 @@ void editor_history_gui::perform(const editor_command_input in) {
 		return;
 	}
 
+	const bool playtesting = in.get_player().has_testing_started();
+
 	acquire_keyboard_once();
 
 	const auto& style = ImGui::GetStyle();
@@ -74,7 +76,7 @@ void editor_history_gui::perform(const editor_command_input in) {
 			ImGui::PushStyleColor(ImGuiCol_HeaderHovered, header_hover_color);
 		}
 
-		if (history.is_revision_saved(command_index)) {
+		if (!playtesting && history.is_revision_saved(command_index)) {
 			++colors;
 
 			auto saved_color = rgba(0, 200, 0, 255);
@@ -129,7 +131,7 @@ void editor_history_gui::perform(const editor_command_input in) {
 	};
 
 	{
-		const auto first_label = in.get_player().has_testing_started() ? "Started playtesting" : "Created project files";
+		const auto first_label = playtesting ? "Started playtesting" : "Created project files";
 		do_history_node(-1, first_label, in.folder.view.meta.timestamp, false, false);
 	}
 

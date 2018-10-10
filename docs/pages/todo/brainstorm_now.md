@@ -6,6 +6,21 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- was_modified exists so that the history is saved when some new commands were added later on but we returned to the current revision
+	- we would always set modified flags during record or replay because the line gets really blurry here
+	- autosave when:
+		- playtesting & playtesting dirty flag set
+			- one cannot undirty it at al
+		- if not playtesting, the history wants to do so or dirty flag is set
+		- having gone back from playtesting to old history (which will yield that it is unset) by discarding
+			- as the cosmos is completely different
+	- disallow quit and show * when:
+		- playtesting & playtesting dirty flag set
+		- if not playtesting, at non-empty workspace and unsaved revision
+	- set dirty flag when:
+		- history's seek to revision requested
+		- any mutable editor player op
+
 - Fix autosaving when playtesting
 	- Revision number might coincide
 		- will it though?

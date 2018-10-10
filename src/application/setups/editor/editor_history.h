@@ -23,7 +23,6 @@
 
 struct editor_history : public editor_history_base {
 	using introspect_base = editor_history_base;
-
 	using editor_history_base::editor_history_base;
 
 	template <class T>

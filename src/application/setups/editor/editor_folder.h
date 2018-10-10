@@ -41,8 +41,6 @@ struct editor_folder {
 
 	bool is_untitled() const;
 
-	bool at_unsaved_revision() const;
-
 	void save_folder() const;
 	void save_folder(const augs::path_type& to) const;
 	void save_folder(const augs::path_type& to, const augs::path_type name) const;
@@ -52,6 +50,12 @@ struct editor_folder {
 	void load_folder();
 	void load_folder(const augs::path_type& from);
 	void load_folder(const augs::path_type& from, const augs::path_type& name);
+
+	void mark_as_just_saved();
+	bool should_autosave() const;
+	bool empty() const;
+
+	bool allow_close() const;
 
 	editor_paths get_paths() const;
 

@@ -67,6 +67,8 @@ void editor_history::seek_to_revision(
 		return;
 	}
 
+	p.set_dirty();
+
 	if (p.has_testing_started() && p.is_recording()) {
 		p.begin_replaying(cmd_in.folder);
 	}

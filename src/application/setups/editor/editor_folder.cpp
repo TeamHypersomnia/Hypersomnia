@@ -35,10 +35,6 @@ void editor_folder::set_folder_path(
 	recent.add(lua, path);
 }
 
-bool editor_folder::at_unsaved_revision() const {
-	return history.at_unsaved_revision();
-}
-
 bool editor_folder::is_untitled() const {
 	return is_untitled_path(current_path);
 }
@@ -98,7 +94,7 @@ std::optional<editor_warning> editor_folder::load_folder_maybe_autosave() {
 		/* If no autosave folder was found, try the real path. */
 		*this = editor_folder(real_path);
 		load_folder();
-		history.mark_as_just_saved();
+		mark_as_just_saved();
 	}
 
 	return std::nullopt;
@@ -138,4 +134,37 @@ void editor_folder::load_folder(const augs::path_type& from, const augs::path_ty
 	catch (const augs::file_open_error&) {
 		/* We just let it happen. These files are not necessary. */
 	}
+}
+
+void editor_folder::mark_as_just_saved() {
+	history.mark_as_just_saved();
+	player.dirty = false;
+}
+
+bool editor_folder::should_autosave() const {
+	if (player.has_testing_started()) {
+		return player.dirty;
+	}
+
+	return player.dirty || history.at_unsaved_revision() || history.was_modified();
+}
+
+bool editor_folder::empty() const {
+	if (player.has_testing_started()) {
+		return false;
+	}
+
+	return history.empty();
+}
+
+bool editor_folder::allow_close() const {
+	if (player.dirty) {
+		return false;
+	}
+
+	if (player.has_testing_started()) {
+		return true;
+	}
+
+	return history.at_saved_revision();
 }

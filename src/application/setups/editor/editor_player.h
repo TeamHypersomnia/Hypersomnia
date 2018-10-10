@@ -74,6 +74,9 @@ private:
 	mode_vars_id current_mode_vars_id = mode_vars_id();
 
 	player_before_start_state before_start;
+public:
+	bool dirty = false;
+private:
 	// END GEN INTROSPECTOR
 
 	friend augs::introspection_access;
@@ -157,4 +160,10 @@ public:
 	);
 
 	void request_steps(int amount);
+
+	const auto& get_before_start() const {
+		return before_start;
+	}
+
+	void set_dirty();
 };

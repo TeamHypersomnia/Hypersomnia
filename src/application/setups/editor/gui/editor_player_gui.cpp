@@ -87,4 +87,6 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 
 		text("Snapshots: %x (%x)", snapshots.size() - 1, readable_bytesize(total_snapshot_bytes));
 	}
+
+	text("(Debug) player dirty: %x", player.dirty);
 }

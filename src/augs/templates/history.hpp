@@ -7,7 +7,7 @@ namespace augs {
 	void history<D, C...>::discard_later_revisions() {
 		erase_from_to(commands, current_revision + 1);
 
-		derived_set_modified_flags();
+		derived_set_modified_flag();
 
 		auto& self = *static_cast<D*>(this);
 		self.invalidate_revisions_from(current_revision + 1);
@@ -42,7 +42,7 @@ namespace augs {
 			return false;
 		}
 
-		derived_set_modified_flags();
+		derived_set_modified_flag();
 
 		std::visit(
 			[&](auto& command) {
@@ -64,7 +64,7 @@ namespace augs {
 			return false;
 		}
 
-		derived_set_modified_flags();
+		derived_set_modified_flag();
 
 		std::visit(
 			[&](auto& command) {

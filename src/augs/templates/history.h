@@ -43,9 +43,9 @@ namespace augs {
 			last_op = { type, date_time() };
 		}
 
-		void derived_set_modified_flags() {
+		void derived_set_modified_flag() {
 			auto& self = *static_cast<Derived*>(this);
-			self.set_modified_flags();
+			self.set_modified_flag();
 		}
 
 	public:
@@ -153,11 +153,12 @@ namespace augs {
 			}
 		}
 
-	public:
-		using base::get_current_revision;
 		using base::empty;
 
-		void set_modified_flags() {
+	public:
+		using base::get_current_revision;
+
+		void set_modified_flag() {
 			modified_since_save = true;
 		}
 
@@ -180,6 +181,10 @@ namespace augs {
 
 		bool was_modified() const {
 			return modified_since_save;
+		}
+
+		bool empty() const {
+			return base::empty() && !was_modified();
 		}
 	};
 }
