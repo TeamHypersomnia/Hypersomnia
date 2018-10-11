@@ -436,7 +436,7 @@ void settings_gui_state::perform(
 				if (auto node = scoped_tree_node("Player")) {
 					auto& scope_cfg = config.editor.player;
 
-					revertable_slider(SCOPE_CFG_NVP(snapshot_frequency_in_steps), 400u, 5000u);
+					revertable_slider(SCOPE_CFG_NVP(snapshot_interval_in_steps), 400u, 5000u);
 				}
 
 				break;

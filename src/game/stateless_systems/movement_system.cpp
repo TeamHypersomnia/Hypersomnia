@@ -94,7 +94,6 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			movement.was_sprint_effective = movement.flags.sprint;
 
 			value_meter::damage_result consciousness_damage_by_sprint;
-			float minimum_consciousness_to_sprint = 0.f;
 
 			enum class haste_type {
 				NONE,
@@ -120,17 +119,19 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			}();
 
 			if (is_sentient) {
+				const auto& def = it.template get<invariants::sentience>();
+
 				auto& consciousness = sentience->get<consciousness_meter_instance>();
 
-				minimum_consciousness_to_sprint = consciousness.get_maximum_value() / 10;
+				const auto minimum_cp_to_sprint = consciousness.get_maximum_value() * def.minimum_cp_to_sprint;
 
-				if (consciousness.value < minimum_consciousness_to_sprint - 0.1f) {
+				if (consciousness.value < minimum_cp_to_sprint - 0.1f) {
 					movement_force_mult /= 2;
 				}
 
 				consciousness_damage_by_sprint = consciousness.calc_damage_result(
-					2 * delta.in_seconds(),
-					minimum_consciousness_to_sprint
+					def.sprint_drains_cp_per_second * delta.in_seconds(),
+					minimum_cp_to_sprint
 				);
 
 				if (consciousness_damage_by_sprint.excessive > 0) {

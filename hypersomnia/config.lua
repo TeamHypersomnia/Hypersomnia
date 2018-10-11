@@ -68,6 +68,9 @@ return {
 	draw_enemy_hud = false
   },
   editor = {
+	player = {
+		snapshot_interval_in_steps = 800
+	},
     grid = {
       render = {
         alpha_multiplier = 0.5,

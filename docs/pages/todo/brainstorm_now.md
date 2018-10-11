@@ -13,13 +13,7 @@ summary: That which we are brainstorming at the moment.
 		- Actually, just provide sort inside layers for domains that require ordering
 			- e.g. get first bomb
 
-- Restructure entropy
-	- Let entropy be just a map of players into a struct of respective inputs
-		- don't hold multiple maps
-		- we'll write manual entropy serialization code anyway
-	- Fixes: Later if we want to concatenate recorded entropies, we may just hold a step_to_entropy per each concerned player and accumulate them before step
-		- No need for some wanky overrides
-		- though these overrides should be easy enough, we can even determine the authorized capability for transfers
+- Allow for recording of multiple entities
 
 - Since sending of entropy will be highly optimized for space, it makes no sense to have augs::container_with_small_size
 

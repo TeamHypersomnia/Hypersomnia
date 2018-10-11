@@ -1954,3 +1954,9 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - test the ensure handler
 
+
+- Restructure entropy
+	- Let entropy be just a map of players into a struct of respective inputs
+		- don't hold multiple maps
+		- we'll write manual entropy serialization code anyway
+

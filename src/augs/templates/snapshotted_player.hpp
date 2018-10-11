@@ -172,7 +172,7 @@ namespace augs {
 
 	template <class A, class B>
 	template <class MakeSnapshot>
-	void snapshotted_player<A, B>::push_snapshot_if_needed(MakeSnapshot&& make_snapshot, const unsigned frequency_in_steps) {
+	void snapshotted_player<A, B>::push_snapshot_if_needed(MakeSnapshot&& make_snapshot, const unsigned interval_in_steps) {
 		if (is_recording()) {
 			const bool is_snapshot_time = [&]() {
 				if (snapshots.empty()) {
@@ -184,7 +184,7 @@ namespace augs {
 				--it;
 
 				const auto since_last = current_step - (*it).first;
-				return since_last >= frequency_in_steps;
+				return since_last >= interval_in_steps;
 			}();
 
 			if (is_snapshot_time) {
@@ -209,7 +209,7 @@ namespace augs {
 		auto& step_i = current_step;
 		auto& applied_entropy = in.total_collected;
 
-		push_snapshot_if_needed(in.make_snapshot, in.settings.snapshot_frequency_in_steps);
+		push_snapshot_if_needed(in.make_snapshot, in.settings.snapshot_interval_in_steps);
 
 		auto considered_mode = advance_mode;
 

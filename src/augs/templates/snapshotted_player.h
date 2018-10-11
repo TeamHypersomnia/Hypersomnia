@@ -62,7 +62,7 @@ namespace augs {
 		// END GEN INTROSPECTOR
 
 		template <class MakeSnapshot>
-		void push_snapshot_if_needed(MakeSnapshot&&, unsigned frequency_in_steps);
+		void push_snapshot_if_needed(MakeSnapshot&&, unsigned interval_in_steps);
 
 		template <class I>
 		void advance_single_step(const I& input);

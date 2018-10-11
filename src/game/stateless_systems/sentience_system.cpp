@@ -130,9 +130,9 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 	auto& cosm = step.get_cosmos();
 	const auto delta = cosm.get_fixed_delta();
 
-	const auto regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 3);
-	const auto consciousness_regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 2);
-	const auto pe_regeneration_frequency_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 3);
+	const auto regeneration_interval_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 3);
+	const auto consciousness_regeneration_interval_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 2);
+	const auto pe_regeneration_interval_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 3);
 
 	cosm.for_each_having<components::sentience>(
 		[&](const auto subject) {
@@ -147,7 +147,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 				if (health.is_enabled()) {
 					const auto passed = (now.step - sentience.time_of_last_received_damage.step);
 
-					if (passed > 0 && passed % regeneration_frequency_in_steps == 0) {
+					if (passed > 0 && passed % regeneration_interval_in_steps == 0) {
 						health.value -= health.calc_damage_result(-2).effective;
 					}
 				}
@@ -155,7 +155,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 				if (consciousness.is_enabled()) {
 					const auto passed = (now.step - sentience.time_of_last_exertion.step);
 
-					if (passed > 0 && passed % consciousness_regeneration_frequency_in_steps == 0) {
+					if (passed > 0 && passed % consciousness_regeneration_interval_in_steps == 0) {
 						consciousness.value -= consciousness.calc_damage_result(-2).effective;
 					}
 				}
@@ -163,7 +163,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 				if (personal_electricity.is_enabled()) {
 					const auto passed = now.step;
 
-					if (passed > 0 && passed % pe_regeneration_frequency_in_steps == 0) {
+					if (passed > 0 && passed % pe_regeneration_interval_in_steps == 0) {
 						personal_electricity.value -= personal_electricity.calc_damage_result(-4).effective;
 					}
 				}

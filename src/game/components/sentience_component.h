@@ -147,6 +147,9 @@ namespace invariants {
 		impulse_mults drop_impulse_on_knockout = { 2000.0f, 1.5f };
 
 		particle_effect_input health_decrease_particles;
+
+		real32 minimum_cp_to_sprint = 0.1f;
+		real32 sprint_drains_cp_per_second = 4.f;
 		// END GEN INTROSPECTOR
 	};
 }
