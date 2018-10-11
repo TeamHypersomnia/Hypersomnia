@@ -9,6 +9,7 @@
 #include "application/setups/editor/editor_history.h"
 #include "application/setups/editor/editor_view.h"
 #include "application/setups/editor/editor_commanded_state.h"
+#include "game/cosmos/entropy_recording_options.h"
 
 #include "augs/templates/snapshotted_player.h"
 
@@ -74,7 +75,11 @@ private:
 	raw_mode_vars_id current_mode_vars_id = raw_mode_vars_id();
 
 	player_before_start_state before_start;
+
 public:
+	cosmic_entropy_recording_options cosmic_recording_options;
+	mode_entropy_recording_options mode_recording_options;
+
 	bool dirty = false;
 private:
 	// END GEN INTROSPECTOR
@@ -106,6 +111,8 @@ private:
 	void reset_mode();
 
 	using base::request_steps;
+
+	void adjust_entropy(const editor_folder&, editor_player_entropy_type&, bool neg) const;
 
 public:
 	bool is_editing_mode() const;

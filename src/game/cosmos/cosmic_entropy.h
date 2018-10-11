@@ -14,6 +14,7 @@
 #include "game/detail/spells/all_spells.h"
 #include "game/detail/inventory/wielding_setup.h"
 
+struct cosmic_entropy_recording_options;
 class cosmos;
 
 template <class key>
@@ -28,6 +29,8 @@ struct basic_player_entropy {
 
 	bool operator==(const basic_player_entropy<key>& b) const;
 	bool operator!=(const basic_player_entropy<key>& b) const;
+
+	void clear_relevant(cosmic_entropy_recording_options);
 };
 
 template <class key>

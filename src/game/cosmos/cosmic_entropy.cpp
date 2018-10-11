@@ -8,6 +8,7 @@
 #include "augs/templates/introspection_utils/rewrite_members.h"
 
 #include "game/detail/inventory/perform_transfer.h"
+#include "game/cosmos/entropy_recording_options.h"
 
 template <class key>
 std::size_t basic_cosmic_entropy<key>::length() const {
@@ -106,6 +107,23 @@ bool basic_cosmic_entropy<K>::operator==(const basic_cosmic_entropy<K>& b) const
 template <class K>
 bool basic_cosmic_entropy<K>::operator!=(const basic_cosmic_entropy<K>& b) const {
 	return !operator==(b);
+}
+
+template <class K>
+void basic_player_entropy<K>::clear_relevant(const cosmic_entropy_recording_options opts) {
+	if (opts.overwrite_intents) {
+		intents.clear();
+	}
+
+	if (opts.overwrite_motions) {
+		motions.clear();
+	}
+
+	if (opts.overwrite_rest) {
+		cast_spell.unset();
+		wield = std::nullopt;
+		transfers.clear();
+	}
 }
 
 cosmic_entropy::cosmic_entropy(

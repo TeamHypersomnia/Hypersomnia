@@ -61,6 +61,8 @@ struct editor_folder {
 
 	template <class C>
 	auto make_player_advance_input(const C& with_callbacks);
+
+	entity_id get_viewed_character_id() const;
 };
 
 struct editor_last_folders {

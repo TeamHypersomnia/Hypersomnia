@@ -57,14 +57,7 @@ real32 editor_setup::get_interpolation_ratio() const {
 
 entity_id editor_setup::get_viewed_character_id() const {
 	if (anything_opened()) {
-		const auto& overridden = view().overridden_viewed;
-
-		if (overridden.is_set()) {
-			return overridden;
-		}
-
-		return work().world[player().lookup_character(view().local_player)].get_id();
-
+		return folder().get_viewed_character_id();
 	}
 
 	return {};

@@ -148,7 +148,15 @@ void editor_player::begin_recording(editor_folder& f) {
 		initialize_testing(f);
 	}
 
-	base::clear_later_entropies();
+#if 0
+	base::for_each_later_entropy(
+		[&](auto& it) {
+			LOG_NVPS(it.first);
+			adjust_entropy(f, it.second, false);
+		}
+	);
+#endif
+
 	base::begin_recording();
 
 	set_dirty();
@@ -233,3 +241,32 @@ void editor_player::choose_mode(const mode_vars_id& vars_id) {
 		}
 	);
 }
+
+void editor_player::adjust_entropy(const editor_folder& folder, editor_player_entropy_type& entropy, const bool neg) const {
+	const auto local_player = folder.view.local_player;
+
+	if (auto p = mapped_or_nullptr(entropy.players, local_player)) {
+		auto f = mode_recording_options;
+
+		if (neg) {
+			f.neg();
+		}
+
+		if (f.overwrite) {
+			*p = {};
+		}
+	}
+
+	const auto currently_viewed = folder.get_viewed_character_id();
+
+	if (auto p = mapped_or_nullptr(entropy.cosmic.players, currently_viewed)) {
+		auto opts = cosmic_recording_options;
+
+		if (neg) {
+			opts.neg();
+		}
+
+		p->clear_relevant(opts);
+	}
+}
+

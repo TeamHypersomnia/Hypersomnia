@@ -8,6 +8,7 @@
 #include "augs/misc/maybe_official_path.h"
 
 #include "augs/readwrite/byte_file.h"
+#include "game/cosmos/entity_handle.h"
 
 std::string editor_folder::get_display_path() const {
 	return ::get_project_name(current_path);
@@ -167,4 +168,15 @@ bool editor_folder::allow_close() const {
 	}
 
 	return history.at_saved_revision();
+}
+
+
+entity_id editor_folder::get_viewed_character_id() const {
+	const auto& overridden = view.overridden_viewed;
+
+	if (overridden.is_set()) {
+		return overridden;
+	}
+
+	return commanded->work.world[player.lookup_character(view.local_player)].get_id();
 }

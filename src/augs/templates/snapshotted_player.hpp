@@ -207,7 +207,6 @@ namespace augs {
 	template <class I>
 	void snapshotted_player<entropy_type, B>::advance_single_step(const I& in) {
 		auto& step_i = current_step;
-		auto& applied_entropy = in.total_collected;
 
 		push_snapshot_if_needed(in.make_snapshot, in.settings.snapshot_interval_in_steps);
 
@@ -218,14 +217,22 @@ namespace augs {
 			considered_mode = advance_type::REPLAYING;
 		}
 
+		auto applied = entropy_type();
+
 		switch (considered_mode) {
 			case advance_type::REPLAYING:
-				applied_entropy = mapped_or_default(step_to_entropy, step_i);
+				applied = mapped_or_default(step_to_entropy, step_i);
 				break;
 				
 			case advance_type::RECORDING:
-				if (!applied_entropy.empty()) {
-					step_to_entropy[step_i] = applied_entropy;
+				{
+					auto& entry = step_to_entropy[step_i];
+					in.record_entropy(entry);
+					applied = entry;
+
+					if (entry.empty()) {
+						step_to_entropy.erase(step_i);
+					}
 				}
 
 				snapshots.erase(
@@ -238,8 +245,7 @@ namespace augs {
 			default: break;
 		}
 
-		in.step(applied_entropy);
-		applied_entropy.clear();
+		in.step(applied);
 		++step_i;
 	}
 
@@ -278,6 +284,19 @@ namespace augs {
 
 		if (const auto it = ste.lower_bound(get_current_step()); it != ste.end()) {
 			ste.erase(it, ste.end());
+		}
+	}
+
+	template <class A, class B>
+	template <class F>
+	void snapshotted_player<A, B>::for_each_later_entropy(F&& callback) {
+		auto& ste = step_to_entropy;
+		auto it = ste.lower_bound(get_current_step());
+
+		while (it != ste.end()) {
+			auto& entry = *it;
+			callback(entry);
+			++it;
 		}
 	}
 }

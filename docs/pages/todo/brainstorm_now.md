@@ -6,14 +6,22 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Allow for recording of multiple entities
+	- Procedure
+		- Given overwrite flags
+			- motions, intents 
+		- Given some existing stream of entropies for some player
+			- On begin recording in some middle
+				- Purge entropies in accordance with the flags
+				- In snapshotted player, accumulate
+				- Before passing total collected, always clean it on the editor_player side
+
 - Determinism fixes
 	- Change unordered containers to ordered ones in the mode state
 	- Change unordered containers to ordered ones in the entropy
 	- Change unordered containers to ordered ones in the visible entities
 		- Actually, just provide sort inside layers for domains that require ordering
 			- e.g. get first bomb
-
-- Allow for recording of multiple entities
 
 - Since sending of entropy will be highly optimized for space, it makes no sense to have augs::container_with_small_size
 

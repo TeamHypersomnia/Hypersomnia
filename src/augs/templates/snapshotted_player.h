@@ -9,21 +9,21 @@
 namespace augs {
 	struct introspection_access;
 
-	template <class entropy_type, class Step, class MakeSnapshot>
+	template <class Step, class RecordEntropy, class MakeSnapshot>
 	struct snapshotted_advance_input {
-		entropy_type& total_collected;
 		Step step;
+		RecordEntropy record_entropy;
 		MakeSnapshot make_snapshot;
 		const snapshotted_player_settings& settings;
 
 		snapshotted_advance_input(
-			entropy_type& total_collected,
 			Step&& step,
+			RecordEntropy&& record_entropy,
 			MakeSnapshot&& make_snapshot,
 			const snapshotted_player_settings& settings
 		) :
-			total_collected(total_collected),
 			step(std::move(step)),
+			record_entropy(std::move(record_entropy)),
 			make_snapshot(std::move(make_snapshot)),
 			settings(settings)
 		{}

@@ -42,8 +42,6 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 	auto& cosm = folder.commanded->work.world;
 
 	return augs::snapshotted_advance_input(
-		total_collected_entropy,
-
 		[this, &folder, &history, &cosm, in](const auto& applied_entropy) {
 			/* step */
 			on_mode_with_input(
@@ -80,6 +78,15 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 					);
 				}
 			);
+
+			total_collected_entropy.clear();
+		},
+
+		[&](auto& existing_entropy) {
+			adjust_entropy(folder, existing_entropy, false);
+			adjust_entropy(folder, total_collected_entropy, true);
+
+			existing_entropy += total_collected_entropy;
 		},
 
 		[this, &folder, &history](const auto n) -> editor_solvable_snapshot {
