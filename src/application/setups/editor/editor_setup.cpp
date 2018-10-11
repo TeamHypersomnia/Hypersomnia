@@ -57,13 +57,13 @@ real32 editor_setup::get_interpolation_ratio() const {
 
 entity_id editor_setup::get_viewed_character_id() const {
 	if (anything_opened()) {
-		const auto& overridden = view_ids().overridden_viewed;
+		const auto& overridden = view().overridden_viewed;
 
 		if (overridden.is_set()) {
 			return overridden;
 		}
 
-		return work().world[player().lookup_character(view_ids().local_player)].get_id();
+		return work().world[player().lookup_character(view().local_player)].get_id();
 
 	}
 
@@ -128,12 +128,12 @@ void editor_setup::override_viewed_entity(const entity_id overridden_id) {
 		on_mode_with_input(
 			[&](const auto& typed_mode, const auto&) {
 				if (const auto id = typed_mode.lookup(work().world[overridden_id].get_guid()); id.is_set()) {
-					view_ids().local_player = id;
-					view_ids().overridden_viewed = {};
+					view().local_player = id;
+					view().overridden_viewed = {};
 				}
 				else {
-					view_ids().local_player = {};
-					view_ids().overridden_viewed = overridden_id;
+					view().local_player = {};
+					view().overridden_viewed = overridden_id;
 				}
 			}
 		);
@@ -574,7 +574,7 @@ void editor_setup::perform_custom_imgui(
 			[&](const auto& typed_mode, const auto& mode_input) {
 				const auto draw_mode_in = draw_mode_gui_input { 
 					get_game_screen_top(), 
-					view_ids().local_player, 
+					view().local_player, 
 					game_atlas,
 					config
 				};
@@ -1721,7 +1721,7 @@ void editor_setup::draw_mode_gui(const draw_setup_gui_input& in) {
 			[&](const auto& typed_mode, const auto& mode_input) {
 				const auto draw_mode_in = draw_mode_gui_input { 
 					get_game_screen_top(), 
-					view_ids().local_player, 
+					view().local_player, 
 					in.images_in_atlas,
 					in.config
 				};

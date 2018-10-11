@@ -59,7 +59,6 @@ void editor_command_input::clear_dead_entities() const {
 	auto& view_ids = folder.commanded->view_ids;
 	
 	cosm.erase_dead(view_ids.selected_entities);
-	cosm.clear_dead(view_ids.overridden_viewed);
 
 	view_ids.selection_groups.clear_dead_entities(cosm);
 

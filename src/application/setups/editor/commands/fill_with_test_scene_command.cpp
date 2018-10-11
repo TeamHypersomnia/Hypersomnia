@@ -68,7 +68,7 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 	auto& vars = mode_vars.vars;
 	vars.clear();
 
-	auto& player_id = view_ids.local_player;
+	auto& player_id = view.local_player;
 
 	{
 		const auto test_vars_id = raw_mode_vars_id(0);

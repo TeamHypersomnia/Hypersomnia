@@ -28,9 +28,6 @@ struct editor_view_ids {
 	// GEN INTROSPECTOR struct editor_view_ids
 	editor_selection_groups selection_groups;
 	current_selections_type selected_entities;
-
-	mode_player_id local_player;
-	entity_id overridden_viewed;
 	// END GEN INTROSPECTOR
 
 	template <template <class> class Mod>
@@ -56,6 +53,9 @@ struct editor_view {
 	maybe_layer_filter viewing_filter = maybe_layer_filter(render_layer_filter::all(), true);
 
 	std::optional<camera_eye> panned_camera;
+
+	mode_player_id local_player;
+	entity_id overridden_viewed;
 	// END GEN INTROSPECTOR
 
 	void reset_zoom();
