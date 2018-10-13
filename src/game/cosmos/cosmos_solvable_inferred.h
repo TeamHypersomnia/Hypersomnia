@@ -23,7 +23,7 @@ constexpr bool can_reserve_caches_v = can_reserve_caches<T>::value;
 struct cosmos_solvable_inferred {
 	// GEN INTROSPECTOR struct cosmos_solvable_inferred
 	relational_cache relational;
-	flavour_id_cache name;
+	flavour_id_cache flavour_ids;
 	physics_world_cache physics;
 	processing_lists_cache processing;
 	tree_of_npo_cache tree_of_npo;

@@ -101,7 +101,7 @@ public:
 
 	template <class E>
 	const auto& get_entities_by_flavour_id(const typed_entity_flavour_id<E>& id) const {
-		return inferred.name.get_entities_by_flavour_id(id);
+		return inferred.flavour_ids.get_entities_by_flavour_id(id);
 	}
 	
 	std::size_t get_entities_count() const;

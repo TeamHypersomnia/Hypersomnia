@@ -136,7 +136,7 @@ void find_locations_that_use_flavour(
 	const all_viewables_defs& defs,
 	F&& location_callback
 ) {
-	const auto num_entities = cosm.get_solvable_inferred().name.get_entities_by_flavour_id(id).size();
+	const auto num_entities = cosm.get_solvable_inferred().flavour_ids.get_entities_by_flavour_id(id).size();
 
 	if (num_entities > 0) {
 		location_callback(typesafe_sprintf("%x Entities of this flavour", num_entities));

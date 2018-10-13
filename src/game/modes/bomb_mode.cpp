@@ -94,7 +94,7 @@ decltype(auto) bomb_mode::on_bomb_entity(const input_type in, F callback) const 
 	auto& cosm = in.cosm;
 
 	const auto bomb_flavour = vars.bomb_flavour;
-	const auto& flavours = cosm.get_solvable_inferred().name;
+	const auto& flavours = cosm.get_solvable_inferred().flavour_ids;
 
 	if (!bomb_flavour.is_set()) {
 		return callback(std::nullopt);
