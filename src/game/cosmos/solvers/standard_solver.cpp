@@ -76,6 +76,10 @@ void standard_solve(const logic_step step) {
 	movement_system().set_movement_flags_from_input(step);
 	movement_system().apply_movement_forces(step);
 
+	crosshair_system().handle_crosshair_intents(step);
+	crosshair_system().update_base_offsets(step);
+	sentience_system().rotate_towards_crosshairs_and_driven_vehicles(step);
+
 	gun_system().consume_gun_intents(step);
 	gun_system().launch_shots_due_to_pressed_triggers(step);
 
@@ -100,13 +104,9 @@ void standard_solve(const logic_step step) {
 		listener.during_step = false;
 	}
 
-	sentience_system().rotate_towards_crosshairs_and_driven_vehicles(step);
-
 	trace_system().lengthen_sprites_of_traces(step);
 
-	crosshair_system().generate_crosshair_intents(step);
 	crosshair_system().integrate_crosshair_recoils(step);
-	crosshair_system().apply_crosshair_intents_to_base_offsets(step);
 
 	item_system().pick_up_touching_items(step);
 
