@@ -164,6 +164,11 @@ namespace test_flavours {
 			sentience.detached_flavours.head = to_entity_flavour_id(test_plain_sprited_bodies::DETACHED_METROPOLIS_HEAD);
 			sentience.base_detached_head_speed = -4000.f;
 
+			sentience.detached_head_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
+			sentience.detached_head_particles.modifier.colorize = pink;
+			sentience.detached_head_particles.modifier.scale_lifetimes *= 1.5f;
+			sentience.detached_head_particles.modifier.scale_amounts *= 1.5f;
+
 			sentience.health_decrease_particles.id = to_particle_effect_id(test_scene_particle_effect_id::HEALTH_DAMAGE_SPARKLES);
 			sentience.health_decrease_particles.modifier.colorize = red;
 			sentience.health_decrease_particles.modifier.scale_lifetimes = 1.5f;
@@ -230,6 +235,7 @@ namespace test_flavours {
 			meta.get<invariants::sprite>().image_id = to_image_id(test_scene_image_id::RESISTANCE_TORSO_BARE_WALK_SHOT_1);
 
 			meta.get<invariants::sentience>().detached_flavours.head = to_entity_flavour_id(test_plain_sprited_bodies::DETACHED_RESISTANCE_HEAD);
+			meta.get<invariants::sentience>().detached_head_particles.modifier.colorize = red;
 
 			{
 				invariants::torso torso_def;

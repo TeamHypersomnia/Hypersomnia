@@ -155,6 +155,8 @@ namespace invariants {
 		real32 sprint_drains_cp_per_second = 4.f;
 		real32 base_detached_head_speed = 2000.f;
 
+		particle_effect_input detached_head_particles;
+
 		detached_body_parts_flavours detached_flavours;
 		// END GEN INTROSPECTOR
 	};

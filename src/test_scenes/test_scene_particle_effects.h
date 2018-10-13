@@ -35,6 +35,8 @@ enum class test_scene_particle_effect_id {
 	FISH_BUBBLE,
 	STANDARD_LEARNT_SPELL,
 
+	DETACHED_HEAD_FIRE,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

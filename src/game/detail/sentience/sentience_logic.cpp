@@ -53,6 +53,13 @@ void perform_knockout(
 						rigid_body.set_velocity(direction * sentience_def.base_detached_head_speed);
 						rigid_body.set_angular_velocity(7200.f);
 						rigid_body.get_special().during_cooldown_ignore_collision_with = typed_subject;
+
+						const auto& effect = sentience_def.detached_head_particles;
+
+						effect.start(
+							step,
+							particle_effect_start_input::orbit_local(typed_entity, { vec2::zero, 180 } )
+						);
 					},
 					[&](auto&&...) {}
 				);
