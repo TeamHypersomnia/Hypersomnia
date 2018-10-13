@@ -52,7 +52,7 @@ namespace augs {
 				}
 			}
 			else {
-				ensure(false && "Trying to unset a non-existing parent.")
+				ensure(false && "Trying to unset a non-existing parent.");
 			}
 		}
 

@@ -5,7 +5,6 @@
 
 template <class E>
 const adversarial_meta* find_adversarial_meta(const E& from) {
-	LOG(get_type_name<E>());
 	if constexpr(E::template has<invariants::gun>()) {
 		return std::addressof(from.template get<invariants::gun>().adversarial);
 	}

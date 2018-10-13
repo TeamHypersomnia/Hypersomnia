@@ -79,3 +79,7 @@ summary: Just a hidden scratchpad.
 	- pure color highlight system could be used to add highlight the dashing entity
 	- Gradually increase walking force over time
 	- The more the speed during dash, the stronger the dash
+
+- Note: drone sound (sentience sounds overall) will be calculated exactly as the firing engine sound
+	- Sentience humming caches
+	- These don't need their playing pos synchronized

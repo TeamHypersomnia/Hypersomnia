@@ -2011,3 +2011,23 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - Remove the notion of container_with_small_size
 	- Interesting concept but we'll just handle it during actual serialization stage
 
+- Determinism fixes
+	- Change unordered containers to ordered ones in the mode state
+	- Change unordered containers to ordered ones in the entropy
+
+
+
+- However it is to the discretion of a mode *how* the creation and removal of players happen...
+	- ...it is already outside of their scope *when* they happen.
+	- Therefore, each mode shall expose add_player and remove_player functions to be called by literally anybody, anytime.
+		- As for serialization, these will be some "choreographic events" inserted between steps, or in a case of a network session, "network event"
+	- Similarly, change_var shall not be something that the mode bothers with, especially that the calling logic would be pretty much duplicated.
+	- There will still be much use of the messages; e.g. mode_messages::game_completed to determine the result
+
+- Let bubbles simply be particle stream off-shots
+	- Might even better parametrize positioning
+	- We will still have fine control over the existence
+	- Less strain on the server
+
+- game mode property is a part of game mode definition
+- game mode definition = all game mode properties

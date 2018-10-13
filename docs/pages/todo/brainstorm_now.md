@@ -6,10 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Determinism fixes
-	- Change unordered containers to ordered ones in the mode state
-	- Change unordered containers to ordered ones in the entropy
-
 - Arbitrary pasting of entities
 	- Vastly useful for importing stuff from testbed maps into existing ones
 		- Let alone between community maps
@@ -46,22 +42,9 @@ summary: That which we are brainstorming at the moment.
 	- Attack collisions
 		- When hurt triggers of two or more players touch, they are pushed away opposite to their facing
 
-- However it is to the discretion of a mode *how* the creation and removal of players happen...
-	- ...it is already outside of their scope *when* they happen.
-	- Therefore, each mode shall expose add_player and remove_player functions to be called by literally anybody, anytime.
-		- As for serialization, these will be some "choreographic events" inserted between steps, or in a case of a network session, "network event"
-	- Similarly, change_var shall not be something that the mode bothers with, especially that the calling logic would be pretty much duplicated.
-	- There will still be much use of the messages; e.g. mode_messages::game_completed to determine the result
-
 - To avoid transmitting some server-decided seed for the beginning of each round (e.g. to position players around)...
 	- ...we can just derive a hash of all inputs from the previous round, or just hash entire cosmos state
 	- this way we are unpredictable about it but still deterministic
-
-- game mode property is a part of game mode definition
-- game mode definition = all game mode properties
-- a **game mode marker** is a game mode property of game mode definition that has a spatial representation
-	- and thus can be visualized in the world view
-	- e.g. C4 trigger or a spawn point
 
 - file operations:
 	- new project
@@ -102,14 +85,6 @@ summary: That which we are brainstorming at the moment.
 		- store std::atomic<bool> next to sound_buffer in loaded_sounds_map
 			- set it to false whenever definition changes or it is to be loaded
 			- check if future is implemented same way
-
-- find closest point pairs for fish?
-	- firstly determine if the setting of the new npo node isn't actually the bottleneck
-	- tho probably it's the false positives
-
-- Note: drone sound (sentience sounds overall) will be calculated exactly as the firing engine sound
-	- Sentience humming caches
-	- These don't need their playing pos synchronized
 
 - Probably somehow disallow arbitrary inferring of relational cache?
 	- There was some unresolved crash problem with this.

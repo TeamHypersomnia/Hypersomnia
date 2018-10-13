@@ -930,3 +930,12 @@ fixtures can form scene graph as they have relative transforms.
 
 - "I" in editor invokes initialization routine of the chosen game mode
 	- Just starts advancing it from the beginning.
+- arrange components in such an order that the fundamentals go first, and frequently used go next to each other
+	- so that component ids are cached more frequently
+
+- for better cache coherency, we might, inside systematic functions, iterate components and keep track in some cache to which entities they belong
+	- so that we always have a perfect coherency at least along a single component 
+
+- a **game mode marker** is a game mode property of game mode definition that has a spatial representation
+	- and thus can be visualized in the world view
+	- e.g. C4 trigger or a spawn point

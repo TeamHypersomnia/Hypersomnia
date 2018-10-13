@@ -5,10 +5,7 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
-- Let bubbles simply be particle stream off-shots
-	- Might even better parametrize positioning
-	- We will still have fine control over the existence
-	- Less strain on the server
+- Optimize fish neighborhood calculation
 
 - Let render layers be tied to native entity types so that we don't have to dispatch each time
 	- Actually all visible entities could just be array of vectors per native type
@@ -57,8 +54,6 @@ summary: Just a hidden scratchpad.
 
 - destroy_all_caches -> clear_all_caches and use clears
 
-- arrange components in such an order that the fundamentals go first, and frequently used go next to each other
-	- so that component ids are cached more frequently
 - separate rigid body and static rigid body
 	- so that the static rigid body does not store velocities and dampings needlessly
 	- and so that we only add interpolation component for dynamic rigid bodies
@@ -75,8 +70,7 @@ summary: Just a hidden scratchpad.
 			- then complete reinference
 		- destroy cache wants to update sweep transform and velocities for consistency 
 	- otherwise settransform and others will be called directly
-- for better cache coherency, we might, inside systematic functions, iterate components and keep track in some cache to which entities they belong
-	- so that we always have a perfect coherency at least along a single component 
+
 - describe concept: quick caches
 	- stored directly in the aggregate
 	- will be used to store copies of invariants for super quick access
