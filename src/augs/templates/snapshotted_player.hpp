@@ -93,6 +93,11 @@ namespace augs {
 	}
 
 	template <class A, class B>
+	bool snapshotted_player<A, B>::is_replaying() const {
+		return advance_mode == advance_type::REPLAYING;
+	}
+
+	template <class A, class B>
    	void snapshotted_player<A, B>::request_steps(const int amount) {
 		additional_steps += amount;
 	}

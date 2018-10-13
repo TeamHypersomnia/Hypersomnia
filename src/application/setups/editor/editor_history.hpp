@@ -4,6 +4,10 @@
 
 template <class T>
 const T& editor_history::execute_new(T&& command, const editor_command_input in) {
+	if (!in.allow_execution()) {
+		return command;
+	}
+
 	command.common.reset_timestamp();
 
 	if (has_last_command()) {

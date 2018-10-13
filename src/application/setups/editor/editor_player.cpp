@@ -159,6 +159,8 @@ void editor_player::begin_recording(editor_folder& f) {
 
 	base::begin_recording();
 
+	auto& h = f.history;
+	h.discard_later_revisions();
 	set_dirty();
 }
 

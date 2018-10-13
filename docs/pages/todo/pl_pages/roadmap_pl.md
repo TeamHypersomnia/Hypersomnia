@@ -10,8 +10,6 @@ summary: Drobny scratchpad planów
 
 W kolejności:
 
-- Edytor
-    - Wskrzeszenie odtwarzania rozgrywki do testów determinizmu (będzie konieczne do networkingu)
 - Dekoracje
     - Statyczne dymki na scenie, np. z wiatraków
 - Port powrotny na Windowsa
@@ -47,6 +45,8 @@ W kolejności:
 
 ## Roadmap (odfajkowane)
 
+- Edytor
+    - Wskrzeszenie odtwarzania rozgrywki do testów determinizmu (będzie konieczne do networkingu)
 - Bomb mode
 	- GUI: Buy menu
 - Edytor

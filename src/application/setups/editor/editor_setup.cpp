@@ -482,7 +482,7 @@ void editor_setup::perform_custom_imgui(
 
 		common_state_gui.perform(settings, make_command_input());
 
-		{
+		if (!player().is_recording()) {
 			const auto output = fae_gui.perform(make_fae_gui_input(), view_ids().selected_entities);
 
 			if (const auto id = output.instantiate_id) {

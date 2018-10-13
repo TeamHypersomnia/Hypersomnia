@@ -9,8 +9,6 @@ summary: Current plans.
 - Editor
 	- Decorations
 		- Wandering smokes
-	- Proper recording & replaying functionality
-		- Necessary for determinism tests
 - Networking
 	- In the meanwhile, @Spicmir will be mapping a laboratory
 	- In the meanwhile, lua import/export functionality might become necessary

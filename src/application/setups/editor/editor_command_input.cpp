@@ -65,3 +65,7 @@ void editor_command_input::clear_dead_entities() const {
 	fae_gui.clear_dead_entities(cosm);
 	selected_fae_gui.clear_dead_entities(cosm);
 }
+
+bool editor_command_input::allow_execution() const {
+	return !folder.player.is_replaying();
+}

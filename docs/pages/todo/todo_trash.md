@@ -912,3 +912,21 @@ fixtures can form scene graph as they have relative transforms.
 			- But we don't have to differentiate for now
 		- Zero-commands will be signified by a zero bit
 
+
+- Mode entropy 
+	- As it steps together with the cosmos, will necessarily contain cosmic entropy
+	- Mode messages:
+		- mode_messages::add_player	
+			- For FFA, we just ignore the associated faction
+		- mode_messages::remove_player	
+		- mode_messages::change_property
+			- e.g. for changing round times on the fly
+			- could be implemented similarly to editor properties
+				- especially since we'll create a property editor for the game mode properties
+		- mode_messages::create_entity
+			- For admin playing
+		- mode_messages::apply_impulse
+			- For admin playing
+
+- "I" in editor invokes initialization routine of the chosen game mode
+	- Just starts advancing it from the beginning.

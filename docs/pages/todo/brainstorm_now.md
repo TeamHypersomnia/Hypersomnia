@@ -6,15 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Allow for recording of multiple entities
-	- Procedure
-		- Given overwrite flags
-			- motions, intents 
-		- Given some existing stream of entropies for some player
-			- On begin recording in some middle
-				- Purge entropies in accordance with the flags
-				- In snapshotted player, accumulate
-				- Before passing total collected, always clean it on the editor_player side
+- Let heads drop off after death
+- Implement recording only of mouse, so differentiate intents
 
 - Determinism fixes
 	- Change unordered containers to ordered ones in the mode state
@@ -68,57 +61,15 @@ summary: That which we are brainstorming at the moment.
 	- Similarly, change_var shall not be something that the mode bothers with, especially that the calling logic would be pretty much duplicated.
 	- There will still be much use of the messages; e.g. mode_messages::game_completed to determine the result
 
-- Mode entropy 
-	- As it steps together with the cosmos, will necessarily contain cosmic entropy
-	- Mode messages:
-		- mode_messages::add_player	
-			- For FFA, we just ignore the associated faction
-		- mode_messages::remove_player	
-		- mode_messages::change_property
-			- e.g. for changing round times on the fly
-			- could be implemented similarly to editor properties
-				- especially since we'll create a property editor for the game mode properties
-		- mode_messages::create_entity
-			- For admin playing
-		- mode_messages::apply_impulse
-			- For admin playing
-
-- "I" in editor invokes initialization routine of the chosen game mode
-	- Just starts advancing it from the beginning.
-
 - To avoid transmitting some server-decided seed for the beginning of each round (e.g. to position players around)...
 	- ...we can just derive a hash of all inputs from the previous round, or just hash entire cosmos state
 	- this way we are unpredictable about it but still deterministic
 
-- Game-mode profiles
-	- Each map can specify a "profile" with sensible values for a deathmatch, tdm, etc.
-		- At the same time, it will be documenting the proper use of the map
-	- Will be useful for a built-in test scene
-			
 - game mode property is a part of game mode definition
 - game mode definition = all game mode properties
 - a **game mode marker** is a game mode property of game mode definition that has a spatial representation
 	- and thus can be visualized in the world view
 	- e.g. C4 trigger or a spawn point
-
-- It makes little sense for an intercosm to have a built-in collection of game mode definitions...
-	- ...at least on the grounds that there will be less files overall.
-	- because we will anyway have lots of stuff under gfx/ and sfx/
-	- and it introduces some stupid corner cases, right?
-- so, most of our headache comes from the fact that we have hard time drawing the fine line responsibilities of...
-	- ...what is necessary to define in the map itself, e.g. spawn points or flavours
-	- ...what should be configurable per every session of a game mode, e.g. roundtime.
-	- this dichotomy, once voiced, pretty much speaks for itself.
-	- basically, if some game mode properties need to be defined in relation to what is in the map, 
-		- then yes, have it in the definition file and configurable in the editor.
-		- still can be changed and customized, just saying we'll make UI for this in editor and save/load ops.
-	- things like round time, c4 time, they can be specified completely regardless of the intercosm contents.
-		- thus they should be textual configs, for which we can nevertheless provide some GUIs.
-
-- server will accept an ``std::variant<free_for_all, bomb_defuse...>``
-	- each will perform its own logic
-
-- Construction scripts are a different thing and we'll save scripting topics and their determinism for later
 
 - file operations:
 	- new project

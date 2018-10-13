@@ -1960,3 +1960,39 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- don't hold multiple maps
 		- we'll write manual entropy serialization code anyway
 
+
+- Allow for recording of multiple entities
+	- Procedure
+		- Given overwrite flags
+			- motions, intents 
+		- Given some existing stream of entropies for some player
+			- On begin recording in some middle
+				- Purge entropies in accordance with the flags
+				- In snapshotted player, accumulate
+				- Before passing total collected, always clean it on the editor_player side
+
+- Game-mode profiles
+	- Each map can specify a "profile" with sensible values for a deathmatch, tdm, etc.
+		- At the same time, it will be documenting the proper use of the map
+	- Will be useful for a built-in test scene
+			
+
+-w It makes little sense for an intercosm to have a built-in collection of game mode definitions...
+	- ...at least on the grounds that there will be less files overall.
+	- because we will anyway have lots of stuff under gfx/ and sfx/
+	- and it introduces some stupid corner cases, right?
+- so, most of our headache comes from the fact that we have hard time drawing the fine line responsibilities of...
+	- ...what is necessary to define in the map itself, e.g. spawn points or flavours
+	- ...what should be configurable per every session of a game mode, e.g. roundtime.
+	- this dichotomy, once voiced, pretty much speaks for itself.
+	- basically, if some game mode properties need to be defined in relation to what is in the map, 
+		- then yes, have it in the definition file and configurable in the editor.
+		- still can be changed and customized, just saying we'll make UI for this in editor and save/load ops.
+	- things like round time, c4 time, they can be specified completely regardless of the intercosm contents.
+		- thus they should be textual configs, for which we can nevertheless provide some GUIs.
+
+- server will accept an ``std::variant<free_for_all, bomb_defuse...>``
+	- each will perform its own logic
+
+- Construction scripts are a different thing and we'll save scripting topics and their determinism for later
+

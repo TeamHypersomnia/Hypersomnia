@@ -45,6 +45,8 @@ struct editor_command_input {
 	void interrupt_tweakers() const;
 	void clear_dead_entity(entity_id) const;
 	void clear_dead_entities() const;
+
+	bool allow_execution() const;
 };
 
 template <class E, class T>
