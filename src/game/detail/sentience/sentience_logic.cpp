@@ -60,6 +60,11 @@ void perform_knockout(
 							step,
 							particle_effect_start_input::orbit_local(typed_entity, { vec2::zero, 180 } )
 						);
+
+						effect.start(
+							step,
+							particle_effect_start_input::orbit_local(typed_subject, { vec2::zero, 180 } )
+						);
 					},
 					[&](auto&&...) {}
 				);

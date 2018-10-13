@@ -10,8 +10,6 @@ summary: That which we are brainstorming at the moment.
 	- Change unordered containers to ordered ones in the mode state
 	- Change unordered containers to ordered ones in the entropy
 
-- Since sending of entropy will be highly optimized for space, it makes no sense to have augs::container_with_small_size
-
 - Arbitrary pasting of entities
 	- Vastly useful for importing stuff from testbed maps into existing ones
 		- Let alone between community maps

@@ -2005,3 +2005,9 @@ i			- if the newly calculated target is different than last_reload_target, reset
 			- e.g. get first bomb
 		- sort_layer_wise
 			- by entity_id?
+
+- Since sending of entropy will be highly optimized for space, it makes no sense to have augs::container_with_small_size
+
+- Remove the notion of container_with_small_size
+	- Interesting concept but we'll just handle it during actual serialization stage
+

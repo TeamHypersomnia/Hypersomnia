@@ -131,9 +131,6 @@ permalink: todo_low
 - later print shortcuts in the menus for the windows
 	- e.g. History Alt+H
 
-- Remove the notion of container_with_small_size
-	- Interesting concept but we'll just handle it during actual serialization stage
-
 - Revival and undoing the knockouts
 
 - Add a match-global rng seed offset to mode state

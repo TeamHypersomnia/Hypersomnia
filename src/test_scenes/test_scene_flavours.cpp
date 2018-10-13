@@ -303,6 +303,7 @@ namespace test_flavours {
 
 			auto& f = test_flavours::add_lying_item_dynamic_body(meta);
 			f.density *= 2.5;
+			f.restitution *= 2.;
 		}
 
 		{
@@ -314,6 +315,7 @@ namespace test_flavours {
 
 			auto& f = test_flavours::add_lying_item_dynamic_body(meta);
 			f.density *= 2.5;
+			f.restitution *= 2.;
 		}
 	}
 }
