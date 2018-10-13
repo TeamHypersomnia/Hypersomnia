@@ -42,16 +42,18 @@ FORCE_INLINE void detail_specific_entity_drawer(
 	const transformr viewing_transform,
 	const bool flip_vertically = false
 ) {
+	using H = cref_typed_entity_handle<E>;
+
 	/* Might or might not be used depending on if constexpr flow */
 	(void)render_visitor;
 	(void)viewing_transform;
 	(void)in;
 
-	if constexpr(typed_handle.template has<invariants::sprite>()) {
+	if constexpr(H::template has<invariants::sprite>()) {
 		const auto sprite = [&typed_handle]() {
 			auto result = typed_handle.template get<invariants::sprite>();
 
-			if constexpr(typed_handle.template has<components::overridden_geo>()) {
+			if constexpr(H::template has<components::overridden_geo>()) {
 				const auto& s = typed_handle.template get<components::overridden_geo>().get();
 
 				if (s.is_enabled) {
@@ -87,7 +89,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 				}
 			}
 
-			if constexpr(typed_handle.template has<components::sprite>()) {
+			if constexpr(H::template has<components::sprite>()) {
 				const auto& sprite_comp = typed_handle.template get<components::sprite>();
 				result.global_time_seconds += sprite_comp.effect_offset_secs;
 
@@ -100,7 +102,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 		}();
 
 		if constexpr(!for_gui) {
-			if constexpr(typed_handle.template has<components::hand_fuse>()) {
+			if constexpr(H::template has<components::hand_fuse>()) {
 				const auto& fuse = typed_handle.template get<components::hand_fuse>();
 				const auto& fuse_def = typed_handle.template get<invariants::hand_fuse>();
 
@@ -133,7 +135,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 				}
 			}
 
-			if constexpr(typed_handle.template has<invariants::animation>()) {
+			if constexpr(H::template has<invariants::animation>()) {
 				const auto& animation_def = typed_handle.template get<invariants::animation>();
 				const auto& animation = typed_handle.template get<components::animation>();
 
@@ -151,7 +153,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 				}
 			}
 
-			if constexpr(typed_handle.template has<components::trace>()) {
+			if constexpr(H::template has<components::trace>()) {
 				const auto& trace = typed_handle.template get<components::trace>();
 
 				if (trace.enabled) {
@@ -172,7 +174,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 				}
 			}
 
-			if constexpr(typed_handle.template has<components::remnant>()) {
+			if constexpr(H::template has<components::remnant>()) {
 				const auto& remnant = typed_handle.template get<components::remnant>();
 
 				auto remnanted_sprite = sprite;
@@ -182,7 +184,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 				return;
 			}
 
-			if constexpr(typed_handle.template has<components::gun>()) {
+			if constexpr(H::template has<components::gun>()) {
 				const auto& gun = typed_handle.template get<components::gun>();
 				const auto& gun_def = typed_handle.template get<invariants::gun>();
 
@@ -206,7 +208,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 		return;
 	}
 
-	if constexpr(typed_handle.template has<invariants::polygon>()) {
+	if constexpr(H::template has<invariants::polygon>()) {
 		auto input = in.make_input_for<invariants::polygon>();
 
 		input.renderable_transform = viewing_transform;
@@ -224,21 +226,26 @@ FORCE_INLINE void specific_entity_drawer(
 	const draw_renderable_input& in,
 	T render_visitor
 ) {
+	using H = cref_typed_entity_handle<E>;
+
 	/* Might or might not be used depending on if constexpr flow */
 	(void)render_visitor;
 	(void)in;
 
 	const auto viewing_transform = typed_handle.get_viewing_transform(in.interp);
 
-	if (typed_handle.template has<invariants::item>()) {
+	if constexpr (H::template has<components::item>()) {
 		if (typed_handle.get_owning_transfer_capability().alive()) {
 			/* Will be drawn when the capability itself is drawn. */
 			return;
 		}
 	}
 
-	if (const auto maybe_torso = typed_handle.template find<invariants::torso>()) {
-		if (const auto movement = typed_handle.template find<components::movement>()) {
+	if constexpr (H::template has<invariants::torso>()) {
+		if constexpr (H::template has<components::movement>()) {
+			const auto& torso = typed_handle.template get<invariants::torso>();
+			const auto& movement = typed_handle.template get<components::movement>();
+
 			const auto& cosm = typed_handle.get_cosmos();
 			const auto& logicals = cosm.get_logical_assets();
 
@@ -264,11 +271,11 @@ FORCE_INLINE void specific_entity_drawer(
 
 			const auto wielded_items = typed_handle.get_wielded_items();
 			const auto stance_id = ::calc_stance_id(typed_handle, wielded_items);
-			const auto& stance = maybe_torso->stances[stance_id];
+			const auto& stance = torso.stances[stance_id];
 
-			auto four_ways = movement->four_ways_animation;
+			auto four_ways = movement.four_ways_animation;
 
-			if (movement->was_walk_effective) {
+			if (movement.was_walk_effective) {
 				four_ways.index = 0;
 			}
 
@@ -291,7 +298,7 @@ FORCE_INLINE void specific_entity_drawer(
 				}();
 
 				{
-					const auto leg_anim = maybe_torso->calc_leg_anim(velocity, face_degrees + stance_offsets.strafe_facing_offset);
+					const auto leg_anim = torso.calc_leg_anim(velocity, face_degrees + stance_offsets.strafe_facing_offset);
 
 					if (const auto animation = logicals.find(leg_anim.id);
 						animation != nullptr
@@ -427,33 +434,37 @@ FORCE_INLINE void specific_entity_drawer(
 
 				draw_items_recursively(false);
 
-				if constexpr(typed_handle.template has<components::head>()) {
-					const auto& head = typed_handle.template get<components::head>();
-					const auto& head_def = typed_handle.template get<invariants::head>();
+				const auto& sentience = typed_handle.template get<components::sentience>();
 
-					const auto target_image = stance_usage.is_shooting ? head_def.shooting_head_image : head_def.head_image;
+				if (!sentience.is_dead()) {
+					if constexpr(typed_handle.template has<components::head>()) {
+						const auto& head = typed_handle.template get<components::head>();
+						const auto& head_def = typed_handle.template get<invariants::head>();
 
-					const auto& head_offsets = logicals.get_offsets(target_image);
+						const auto target_image = stance_usage.is_shooting ? head_def.shooting_head_image : head_def.head_image;
 
-					auto stance_offsets_for_head = stance_offsets;
-					auto anchor_for_head = head_offsets.item.head_anchor;
+						const auto& head_offsets = logicals.get_offsets(target_image);
 
-					if (only_secondary) {
-						stance_offsets_for_head.flip_vertically();
-						anchor_for_head.flip_vertically();
+						auto stance_offsets_for_head = stance_offsets;
+						auto anchor_for_head = head_offsets.item.head_anchor;
+
+						if (only_secondary) {
+							stance_offsets_for_head.flip_vertically();
+							anchor_for_head.flip_vertically();
+						}
+
+						const auto target_offset = ::get_anchored_offset(stance_offsets_for_head.head, anchor_for_head);
+						const auto target_transform = viewing_transform * target_offset;
+
+						invariants::sprite sprite;
+						sprite.set(target_image, in.manager);
+
+						auto input = in.make_input_for<invariants::sprite>();
+						input.renderable_transform = target_transform;
+						input.renderable_transform.rotation += head.shake_rotation_amount;
+
+						render_visitor(sprite, in.manager, input);
 					}
-
-					const auto target_offset = ::get_anchored_offset(stance_offsets_for_head.head, anchor_for_head);
-					const auto target_transform = viewing_transform * target_offset;
-
-					invariants::sprite sprite;
-					sprite.set(target_image, in.manager);
-
-					auto input = in.make_input_for<invariants::sprite>();
-					input.renderable_transform = target_transform;
-					input.renderable_transform.rotation += head.shake_rotation_amount;
-
-					render_visitor(sprite, in.manager, input);
 				}
 			}
 		}
