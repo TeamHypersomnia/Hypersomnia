@@ -50,7 +50,7 @@ void perform_knockout(
 
 						const auto& rigid_body = typed_entity.template get<components::rigid_body>();
 
-						rigid_body.set_velocity(-direction * sentience_def.base_detached_head_speed);
+						rigid_body.set_velocity(direction * sentience_def.base_detached_head_speed);
 						rigid_body.set_angular_velocity(7200.f);
 						rigid_body.get_special().during_cooldown_ignore_collision_with = typed_subject;
 					},

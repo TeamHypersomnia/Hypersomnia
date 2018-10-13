@@ -1,4 +1,5 @@
 #include <limits>
+#include <unordered_set>
 
 #include <Box2D/Box2D.h>
 

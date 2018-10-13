@@ -39,14 +39,38 @@ visible_entities& visible_entities::reacquire_all_and_sort(const visible_entitie
 	return *this;
 }
 
+/* We're using our own flags instead of unordered_set implementation for it to be deterministic */
+
+template <class T>
+using make_flags = std::array<bool, T::statically_allocated_entities>;
+
+using all_flags = per_entity_type_container<make_flags>;
+
 void visible_entities::acquire_physical(const visible_entities_query input) {
 	const auto& cosm = input.cosm;
 	const auto camera = input.cone;
 
 	const auto& physics = cosm.get_solvable_inferred().physics;
 
-	thread_local std::unordered_set<entity_id> unique_from_physics;
+	thread_local auto unique_flags = all_flags();
+	thread_local auto unique_from_physics = std::vector<entity_id>();
+
 	unique_from_physics.clear();
+
+	auto get_flag_for = [&](const entity_id& e) -> bool& {
+		return unique_flags.visit(e.type_id, [&](auto& typed_flags) -> bool& {
+			return typed_flags[e.raw.indirection_index];
+		});
+	};
+
+	auto register_unique = [&](const entity_id& e) {
+		auto& f = get_flag_for(e);
+
+		if (!f) {
+			unique_from_physics.push_back(e);
+			f = true;
+		}
+	};
 
 	if (input.accuracy == EXACT) {
 		const auto camera_aabb = camera.get_visible_world_rect_aabb();
@@ -59,7 +83,7 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 				const auto owning_entity_id = cosm.to_versioned(get_entity_that_owns(fix));
 
 				if (::passes_filter(input.filter, cosm, owning_entity_id)) {
-					unique_from_physics.insert(owning_entity_id);
+					register_unique(owning_entity_id);
 				}
 
 				return callback_result::CONTINUE;
@@ -80,7 +104,7 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 
 						auto add_if_passes = [&](const auto& what) {
 							if (::passes_filter(input.filter, what)) {
-								unique_from_physics.insert(what.get_id());
+								register_unique(what.get_id());
 							}
 						};
 
@@ -101,6 +125,7 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 
 	for (const auto& a : unique_from_physics) {
 		register_visible(cosm, a);
+		get_flag_for(a) = false;
 	}
 }
 

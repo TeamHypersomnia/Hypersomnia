@@ -12,7 +12,7 @@ void startle_nearby_organisms(
 	const real32 startle_force,
 	const startle_type type
 ) {
-	thread_local visible_entities neighbors;
+	auto& neighbors = thread_local_visible_entities();
 
 	neighbors.clear();
 	neighbors.acquire_non_physical({

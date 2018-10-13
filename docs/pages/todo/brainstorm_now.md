@@ -6,18 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Let heads drop off after death
-	- Won't it be better to implement head in terms of a hat?
-		- Hat will be separate to a head so let's have it like a body.
-
-- Implement recording only of mouse, so differentiate intents
-
 - Determinism fixes
 	- Change unordered containers to ordered ones in the mode state
 	- Change unordered containers to ordered ones in the entropy
-	- Change unordered containers to ordered ones in the visible entities
-		- Actually, just provide sort inside layers for domains that require ordering
-			- e.g. get first bomb
 
 - Since sending of entropy will be highly optimized for space, it makes no sense to have augs::container_with_small_size
 

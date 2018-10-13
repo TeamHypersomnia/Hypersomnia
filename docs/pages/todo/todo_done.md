@@ -1996,3 +1996,12 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Construction scripts are a different thing and we'll save scripting topics and their determinism for later
 
+- Let heads drop off after death
+	- Won't it be better to implement head in terms of a hat?
+		- Hat will be separate to a head so let's have it like a body.
+
+	- Change unordered containers to ordered ones in the visible entities
+		- Actually, just provide sort inside layers for domains that require ordering
+			- e.g. get first bomb
+		- sort_layer_wise
+			- by entity_id?

@@ -4,6 +4,8 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Implement recording only of mouse, so differentiate intents
+
 - GUI for the player
 	- Timeline
 		- IMGUI is the way to go, really
