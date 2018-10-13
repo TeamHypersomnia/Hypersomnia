@@ -301,7 +301,8 @@ namespace test_flavours {
 				render_layer::SMALL_DYNAMIC_BODY
 			);
 
-			test_flavours::add_lying_item_dynamic_body(meta);
+			auto& f = test_flavours::add_lying_item_dynamic_body(meta);
+			f.density *= 2.5;
 		}
 
 		{
@@ -311,7 +312,8 @@ namespace test_flavours {
 				render_layer::SMALL_DYNAMIC_BODY
 			);
 
-			test_flavours::add_lying_item_dynamic_body(meta);
+			auto& f = test_flavours::add_lying_item_dynamic_body(meta);
+			f.density *= 2.5;
 		}
 	}
 }
