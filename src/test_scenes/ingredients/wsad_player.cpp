@@ -162,7 +162,7 @@ namespace test_flavours {
 			components::sentience sentience_inst;
 
 			sentience.detached_flavours.head = to_entity_flavour_id(test_plain_sprited_bodies::DETACHED_METROPOLIS_HEAD);
-			sentience.base_detached_head_speed = 3000.f;
+			sentience.base_detached_head_speed = 4000.f;
 
 			sentience.health_decrease_particles.id = to_particle_effect_id(test_scene_particle_effect_id::HEALTH_DAMAGE_SPARKLES);
 			sentience.health_decrease_particles.modifier.colorize = red;
