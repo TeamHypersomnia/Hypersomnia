@@ -84,6 +84,9 @@ enum class test_plain_sprited_bodies {
 
 	SNACKBAR,
 
+	DETACHED_METROPOLIS_HEAD,
+	DETACHED_RESISTANCE_HEAD,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

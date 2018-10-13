@@ -7,6 +7,9 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - Let heads drop off after death
+	- Won't it be better to implement head in terms of a hat?
+		- Hat will be separate to a head so let's have it like a body.
+
 - Implement recording only of mouse, so differentiate intents
 
 - Determinism fixes

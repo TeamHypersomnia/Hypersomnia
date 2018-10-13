@@ -34,8 +34,8 @@ namespace invariants {
 		bool destructible = false;
 
 		bool sensor = false;
+		bool bullets_fly_through = false;
 
-		pad_bytes<1> pad;
 		b2Filter filter;
 
 		assets::physical_material_id material;

@@ -161,6 +161,9 @@ namespace test_flavours {
 			invariants::sentience sentience; 
 			components::sentience sentience_inst;
 
+			sentience.detached_flavours.head = to_entity_flavour_id(test_plain_sprited_bodies::DETACHED_METROPOLIS_HEAD);
+			sentience.base_detached_head_speed = 3000.f;
+
 			sentience.health_decrease_particles.id = to_particle_effect_id(test_scene_particle_effect_id::HEALTH_DAMAGE_SPARKLES);
 			sentience.health_decrease_particles.modifier.colorize = red;
 			sentience.health_decrease_particles.modifier.scale_lifetimes = 1.5f;
@@ -225,6 +228,8 @@ namespace test_flavours {
 			meta = get_test_flavour(flavours, test_controlled_characters::METROPOLIS_SOLDIER);
 			meta.get<invariants::text_details>().name = format_enum(test_controlled_characters::RESISTANCE_SOLDIER);
 			meta.get<invariants::sprite>().image_id = to_image_id(test_scene_image_id::RESISTANCE_TORSO_BARE_WALK_SHOT_1);
+
+			meta.get<invariants::sentience>().detached_flavours.head = to_entity_flavour_id(test_plain_sprited_bodies::DETACHED_RESISTANCE_HEAD);
 
 			{
 				invariants::torso torso_def;

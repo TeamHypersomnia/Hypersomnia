@@ -133,6 +133,7 @@ TEST_CASE("StateTest2 PaddingTest") {
 			}
 
 			// test by delta
+
 			{
 				auto a = checked_type(args...);
 				auto b = checked_type(args...);

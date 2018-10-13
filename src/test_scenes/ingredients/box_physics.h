@@ -55,6 +55,7 @@ namespace test_flavours {
 		fixtures_def.density = .2f;
 		fixtures_def.restitution = .5f;
 		fixtures_def.material = to_physical_material_id(test_scene_physical_material_id::METAL);
+		fixtures_def.bullets_fly_through = true;
 
 		meta.set(fixtures_def);
 		meta.set(body_def);

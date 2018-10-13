@@ -51,7 +51,6 @@ namespace test_flavours {
 			auto& meta,
 			const auto material
 		) {
-
 			test_flavours::add_standard_dynamic_body(meta);
 
 			auto& fixtures_def = meta.template get<invariants::fixtures>();

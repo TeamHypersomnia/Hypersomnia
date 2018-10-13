@@ -9,14 +9,19 @@
 namespace augs {
 	template <class offset_type>
 	auto run_length_encoding(const std::vector<char>& bit_data) {
-		ensure(bit_data.size() < std::numeric_limits<offset_type>::max());
+		ensure_leq(bit_data.size(), std::numeric_limits<offset_type>::max() + 1);
 
 		std::vector<offset_type> output;
 
 		char previous_value = 0;
 		offset_type current_vec_pos = 0;
 
-		for (offset_type i = 0; i < bit_data.size(); ++i) {
+		offset_type i = static_cast<offset_type>(-1);
+		const auto last_index = static_cast<offset_type>(bit_data.size() - 1);
+
+		while (i != last_index) {
+			++i;
+
 			if (previous_value != bit_data[i]) {
 				if (bit_data[i] != 0) {
 					if (!output.size()) {
@@ -31,7 +36,7 @@ namespace augs {
 				else {
 					const offset_type next_offset = i - current_vec_pos;
 					
-					ensure(output.size() > 0);
+					ensure_greater(output.size(), 0);
 
 					output.push_back(next_offset);
 					current_vec_pos += next_offset;
@@ -41,7 +46,7 @@ namespace augs {
 		}
 
 		if (bit_data.back()) {
-			output.push_back(static_cast<offset_type>(bit_data.size()) - current_vec_pos);
+			output.push_back(static_cast<offset_type>(bit_data.size() - current_vec_pos));
 		}
 
 		return output;
@@ -155,7 +160,7 @@ namespace augs {
 				ptr += changed_offsets[i + 1];
 			}
 
-			ensure(ptr <= original_location + length);
+			ensure_leq(ptr, original_location + length);
 		}
 	};
 

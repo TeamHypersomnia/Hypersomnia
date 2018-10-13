@@ -30,6 +30,7 @@
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/detail/damage_origin.h"
 
+#include "game/detail/sentience/detached_body_parts.h"
 #include "game/enums/use_button_query_result.h"
 
 struct damage_owner {
@@ -76,6 +77,8 @@ namespace components {
 
 		damage_owners_vector damage_owners;
 		damage_origin knockout_origin;
+
+		detached_body_parts detached;
 		// END GEN INTROSPECTOR
 
 		bool is_learnt(const spell_id id) const {
@@ -150,6 +153,9 @@ namespace invariants {
 
 		real32 minimum_cp_to_sprint = 0.1f;
 		real32 sprint_drains_cp_per_second = 4.f;
+		real32 base_detached_head_speed = 2000.f;
+
+		detached_body_parts_flavours detached_flavours;
 		// END GEN INTROSPECTOR
 	};
 }

@@ -30,7 +30,7 @@ public:
 
 		surface_is_item = surface.template has<components::item>();
 		ignore_altogether = bullet_colliding_with_any_subject_of_sender;
-		is_fly_through = ignore_altogether || surface_is_item;
+		is_fly_through = ignore_altogether || surface_is_item || surface.template get<invariants::fixtures>().bullets_fly_through;
 	}
 
 	bool should_ignore_altogether() const {

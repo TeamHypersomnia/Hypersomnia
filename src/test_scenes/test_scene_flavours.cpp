@@ -293,5 +293,25 @@ namespace test_flavours {
 
 			meta.set(item);
 		}
+
+		{
+			auto& meta = flavour_with_sprite(
+				test_plain_sprited_bodies::DETACHED_RESISTANCE_HEAD,
+				test_scene_image_id::RESISTANCE_HEAD,
+				render_layer::SMALL_DYNAMIC_BODY
+			);
+
+			test_flavours::add_lying_item_dynamic_body(meta);
+		}
+
+		{
+			auto& meta = flavour_with_sprite(
+				test_plain_sprited_bodies::DETACHED_METROPOLIS_HEAD,
+				test_scene_image_id::METROPOLIS_HEAD,
+				render_layer::SMALL_DYNAMIC_BODY
+			);
+
+			test_flavours::add_lying_item_dynamic_body(meta);
+		}
 	}
 }
