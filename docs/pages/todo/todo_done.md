@@ -2041,3 +2041,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- Don't iterate by guids, just process all entities just like you would always process them
 		- this will allow us to hold an unordered map of guids
 
+- Container invariant in editor?
+

@@ -55,6 +55,8 @@ void editor_history_gui::perform(const editor_command_input in) {
 		const auto& command,
 		const bool is_parent
 	){
+		auto scope = scoped_id(command_index);
+
 		const auto& description = command.describe();
 		const augs::date_time& when = command.common.timestamp;
 		const bool has_parent = command.common.has_parent;

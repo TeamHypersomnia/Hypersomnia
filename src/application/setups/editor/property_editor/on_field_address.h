@@ -36,7 +36,7 @@ decltype(auto) on_field_address(
 				return callback(*field_location);
 			}
 			else if (index < field_location->size()) {
-				return callback(field_location->operator[](index));
+				return callback(field_location->at(index));
 			}
 			else {
 				return callback(std::nullopt);

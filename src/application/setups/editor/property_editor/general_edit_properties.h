@@ -19,6 +19,9 @@
 #include "application/setups/editor/detail/field_address.h"
 #include "augs/templates/introspection_utils/count_members.h"
 
+#include "augs/templates/traits/is_enum_map.h"
+#include "augs/misc/enum/enum_map.h"
+
 #define HIDE_DISABLED_MAYBES 1
 
 template <class T>
@@ -287,8 +290,42 @@ void detail_general_edit_properties(
 					further();
 				}
 			}
+			else if constexpr(is_enum_map_v<T>) {
+				if (auto node = node_and_columns(formatted_label, input.extra_columns)) {
+					using E = typename T::key_type;
+
+					augs::for_each_enum_except_bounds(
+						[&](const E i) {
+							if (const auto value = mapped_or_nullptr(altered, i)) {
+								auto i_id = augs::imgui::scoped_id(static_cast<int>(i));
+
+								const auto element_label = format_enum(i);
+
+								if constexpr(pass_notifier_through) {
+									detail_general_edit_properties<Behaviour, true, inline_properties>(
+										input, 
+										equality_predicate,
+										notify_change_of,
+										element_label,
+										*value
+									);
+								}
+								else {
+									detail_general_edit_properties<Behaviour, true, inline_properties>(
+										input, 
+										[&equality_predicate, i, &altered] (auto&&...) { return equality_predicate(altered, i); },
+										[&notify_change_of, i, &altered] (const auto& l, const tweaker_type t, auto&&...) { notify_change_of(l, t, altered, i); },
+										element_label,
+										*value
+									);
+								}
+							}
+						}
+					);
+				}
+			}
 			else if constexpr(is_container_v<T>) {
-				constexpr bool expandable = !has_constexpr_size_v<T>;
+				constexpr bool resizable = !has_constexpr_size_v<T>;
 				constexpr bool has_size_limit = has_constexpr_max_size_v<T>;
 
 				if constexpr(can_access_data_v<T>) {
@@ -302,7 +339,7 @@ void detail_general_edit_properties(
 					if constexpr(!should_skip_whole_container) {
 						auto displayed_container_label = formatted_label;
 
-						if constexpr(expandable && has_size_limit) {
+						if constexpr(resizable && has_size_limit) {
 							displayed_container_label = typesafe_sprintf(
 								"%x (%x/%x)###%x", 
 								formatted_label, 
@@ -326,12 +363,12 @@ void detail_general_edit_properties(
 							for (unsigned i = 0; i < static_cast<unsigned>(altered.size()); ++i) {
 								auto i_id = augs::imgui::scoped_id(i);
 
-								if constexpr(expandable) {
+								if constexpr(resizable) {
 									{
 										auto colors = maybe_disabled_cols(input.settings, altered.size() >= altered.max_size());
 
 										if (ImGui::Button("D")) {
-											auto duplicated = altered[i];
+											auto duplicated = altered.at(i);
 											altered.insert(altered.begin() + i + 1, std::move(duplicated));
 											notify_change_of(formatted_label, tweaker_type::DISCRETE, altered, std::nullopt);
 											break;
@@ -365,7 +402,7 @@ void detail_general_edit_properties(
 										equality_predicate,
 										notify_change_of,
 										element_label,
-										altered[i]
+										altered.at(i)
 									);
 								}
 								else {
@@ -374,12 +411,12 @@ void detail_general_edit_properties(
 										[&equality_predicate, i, &altered] (auto&&...) { return equality_predicate(altered, i); },
 										[&notify_change_of, i, &altered] (const auto& l, const tweaker_type t, auto&&...) { notify_change_of(l, t, altered, i); },
 										element_label,
-										altered[i]
+										altered.at(i)
 									);
 								}
 							}
 
-							if constexpr (expandable) {
+							if constexpr (resizable) {
 								if (altered.size() < altered.max_size()) {
 									if (ImGui::Button("+")) {
 										altered.emplace_back(input.sane_defaults.template construct<typename T::value_type>());
@@ -503,7 +540,7 @@ void general_edit_properties(
 
 				if constexpr(std::is_same_v<I, unsigned>) {
 					addr.element_index = index;
-					return field_equality_predicate(modified[index], addr);
+					return field_equality_predicate(modified.at(index), addr);
 				}
 				else {
 					return field_equality_predicate(modified, addr);
@@ -517,8 +554,8 @@ void general_edit_properties(
 				if constexpr(std::is_same_v<I, unsigned>) {
 					addr.element_index = index;
 
-					do_tweaker(tweaker_input<field_type_id, remove_cref<decltype(modified[index])>>{
-						t, formatted_label, addr, modified[index]
+					do_tweaker(tweaker_input<field_type_id, remove_cref<decltype(modified.at(index))>>{
+						t, formatted_label, addr, modified.at(index)
 					});
 				}
 				else {

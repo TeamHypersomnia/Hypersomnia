@@ -7,12 +7,14 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - Client-side adjustable crosshair sensitivity
+	- Note that we will anyway require SOME form of synchronization of client settings, like nickname
 	- **CHOSEN SOLUTION:** How about keeping floats in cosmic entropy?
-		- The writing and reading of the entropy for network comms will be contextual, anyway
+		- The writing and reading of the entropy for network comms will be **contextual**, anyway
 		- Notice that determinism won't be broken if we just change sensi during replay or recording, because the final value will always be held in entropy
-	- Anyways, we'll need some form of synchronization of client settings, like nickname
-	- probably it won't hurt to keep sensitivity inside the crosshair component
-		- because we have to share this information if we want to use shorts for communicating motion deltas
+	- Would it hurt to keep sensitivity inside the crosshair component
+		- Yes, because we'll need to synchronize not just network comms on changing a local setting, but even local plays
+			- which would otherwise not be necessary
+		- though we have to share this information if we want to use shorts for communicating motion deltas
 
 - Melee combat
 	- Primary and secondary attacks for knives
@@ -29,6 +31,9 @@ summary: That which we are brainstorming at the moment.
 - Since mouse motions will probably be the bottleneck of network communication, both coords will usually be able to be sent in one byte
 	- Range would be 0 - 16
 	- There would be a bit flag for when it exceeds the range
+		- Which will actually be often and then we might use two bytes
+			- mouse motion should never really exceed 255
+				- will also make it harder to use aimbots that instantaneously change mouse location
 
 - file operations:
 	- import intercosm (either lua or int)
