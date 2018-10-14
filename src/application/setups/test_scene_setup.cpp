@@ -32,10 +32,6 @@ void test_scene_setup::customize_for_viewing(config_lua_table& config) const {
 	return;
 }
 
-void test_scene_setup::control(const cosmic_entropy& events) {
-	total_collected_entropy += events;
-}
-
 void test_scene_setup::accept_game_gui_events(const cosmic_entropy& events) {
-	total_collected_entropy += events;
+	control(events);
 }

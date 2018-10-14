@@ -17,6 +17,9 @@ enum class game_motion_type {
 	// END GEN INTROSPECTOR
 };
 
+template <class T>
+using per_game_motion_t = augs::enum_map<game_motion_type, T>;
+
 enum class game_intent_type {
 	// GEN INTROSPECTOR enum class game_intent_type
 	INVALID,
@@ -61,7 +64,12 @@ using game_intent_map = augs::enum_map<
 >;
 
 using game_intent = basic_input_intent<game_intent_type>;
-using game_motion = basic_input_motion<game_motion_type>;
+
+using game_motion = basic_input_motion<game_motion_type, vec2>;
+using raw_game_motion = basic_input_motion<game_motion_type, basic_vec2<short>>;
 
 using game_intents = std::vector<game_intent>;
 using game_motions = std::vector<game_motion>;
+using raw_game_motions = std::vector<raw_game_motion>;
+
+using accumulated_motions = per_game_motion_t<raw_game_motion>;

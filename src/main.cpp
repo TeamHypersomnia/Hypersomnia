@@ -53,7 +53,8 @@
 #include "application/main/draw_debug_details.h"
 #include "application/main/draw_debug_lines.h"
 #include "application/main/release_flags.h"
-#include "application/main/adjust_game_motions.h"
+
+#include "application/input/input_pass_result.h"
 
 #include "application/setups/draw_setup_gui_input.h"
 
@@ -685,9 +686,10 @@ int work(const int argc, const char* const * const argv) try {
 	static auto advance_setup = [](
 		const augs::delta frame_delta,
 		auto& setup,
-		const cosmic_entropy& new_game_entropy,
-		const config_lua_table& viewing_config
+		const input_pass_result& result
 	) {
+		const auto& viewing_config = result.viewing_config;
+
 		const auto now_sampled = get_sampled_cosmos(setup);
 
 		const bool has_cosmos_changed = [&]() {
@@ -722,7 +724,9 @@ int work(const int argc, const char* const * const argv) try {
 			audiovisual_step(augs::delta::zero, setup.get_audiovisual_speed(), viewing_config);
 		}
 
-		setup.control(new_game_entropy);
+		setup.control(result.motions);
+		setup.control(result.intents);
+
 		setup.accept_game_gui_events(game_gui.get_and_clear_pending_events());
 		
 		audiovisual_step(frame_delta, setup.get_audiovisual_speed(), viewing_config);
@@ -733,7 +737,7 @@ int work(const int argc, const char* const * const argv) try {
 		};
 
 		setup.advance(
-			frame_delta,
+			{ frame_delta, window.get_screen_size(), viewing_config.input },
 			solver_callbacks(
 				setup_pre_solve,
 				setup_audiovisual_post_solve,
@@ -746,12 +750,11 @@ int work(const int argc, const char* const * const argv) try {
 
 	static auto advance_current_setup = [](
 		const augs::delta frame_delta,
-		const cosmic_entropy& new_game_entropy,
-		const config_lua_table& viewing_config
+		const input_pass_result& result
 	) { 
 		visit_current_setup(
 			[&](auto& setup) {
-				advance_setup(frame_delta, setup, new_game_entropy, viewing_config);
+				advance_setup(frame_delta, setup, result);
 			}
 		);
 	};
@@ -847,21 +850,10 @@ int work(const int argc, const char* const * const argv) try {
 			The result of the call, which is the collection of new game commands, will be passed further down the loop. 
 		*/
 
-		struct input_pass_result {
-			cosmic_entropy game_entropy;
-			config_lua_table viewing_config;
-		};
-		
 		const auto result = [frame_delta]() -> input_pass_result {
-			static game_intents game_intents;
-			static game_motions game_motions;
+			input_pass_result out;
 
-			game_intents.clear();
-			game_motions.clear();
-
-			static augs::local_entropy new_window_entropy;
-
-			new_window_entropy.clear();
+			augs::local_entropy new_window_entropy;
 
 			/* Generate release events if the previous frame so requested. */
 
@@ -1010,6 +1002,8 @@ int work(const int argc, const char* const * const argv) try {
 
 				return config_copy;
 			});
+
+			out.viewing_config = viewing_config;
 
 			configurables.apply(viewing_config);
 
@@ -1234,7 +1228,7 @@ int work(const int argc, const char* const * const argv) try {
 								/* Leave it for the game gui */
 							}
 							else {
-								game_intents.push_back({ *it, *key_change });
+								out.intents.push_back({ *it, *key_change });
 
 								if (was_pressed) {
 									continue;
@@ -1244,7 +1238,11 @@ int work(const int argc, const char* const * const argv) try {
 					}
 
 					if (direct_gameplay && e.msg == message::mousemotion) {
-						game_motions.push_back({ game_motion_type::MOVE_CROSSHAIR, e.data.mouse.rel });
+						raw_game_motion m;
+						m.motion = game_motion_type::MOVE_CROSSHAIR;
+						m.offset = e.data.mouse.rel;
+
+						out.motions.emplace_back(m);
 						continue;
 					}
 
@@ -1261,28 +1259,7 @@ int work(const int argc, const char* const * const argv) try {
 				beyond the closing of this scope.
 			*/
 
-			const auto result_entropy = [&]() {
-				if (const auto viewed = get_viewed_character()) {
-					if (const auto crosshair = viewed.find_crosshair()) {
-						adjust_game_motions(
-							crosshair->base_offset,
-							crosshair->sensitivity,
-							window.get_screen_size(),
-							game_motions
-						);
-					}
-
-					return cosmic_entropy(
-						viewed,
-						game_intents,
-						game_motions
-					);
-				}
-				
-				return cosmic_entropy();
-			}();
-
-			return { result_entropy, viewing_config };
+			return out;
 		}();
 
 		const auto& new_viewing_config = result.viewing_config;
@@ -1334,7 +1311,7 @@ int work(const int argc, const char* const * const argv) try {
 
 			This also advances the audiovisual state, based on the cosmos returned by the setup.
 		*/
-		advance_current_setup(frame_delta, result.game_entropy, new_viewing_config);
+		advance_current_setup(frame_delta, result);
 		
 		/*
 			Game GUI might have been altered by the step's post-solve,

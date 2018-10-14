@@ -44,13 +44,15 @@ void crosshair_system::update_base_offsets(const logic_step step) {
 	const auto& events = step.get_queue<messages::motion_message>();
 	
 	for (const auto& motion : events) {
-		const auto subject = cosm[motion.subject];
+		if (motion.motion == game_motion_type::MOVE_CROSSHAIR) {
+			const auto subject = cosm[motion.subject];
 
-		if (const auto crosshair = subject.find_crosshair()) {
-			const auto delta = vec2(motion.offset) * crosshair->sensitivity;
+			if (const auto crosshair = subject.find_crosshair()) {
+				auto& base_offset = crosshair->base_offset;
+				base_offset += motion.offset;
 
-			auto& base_offset = crosshair->base_offset;
-			base_offset += delta;
+				static_assert(std::is_same_v<remove_cref<decltype(base_offset)>, decltype(motion.offset)>);
+			}
 		}
 	}
 }

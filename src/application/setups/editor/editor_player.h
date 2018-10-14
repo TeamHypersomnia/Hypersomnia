@@ -69,8 +69,6 @@ private:
 	using step_type = base::step_type;
 
 	// GEN INTROSPECTOR class editor_player
-	editor_player_entropy_type total_collected_entropy;
-
 	all_modes_variant current_mode;
 	raw_mode_vars_id current_mode_vars_id = raw_mode_vars_id();
 
@@ -100,8 +98,8 @@ private:
 
 	void initialize_testing(editor_folder&);
 
-	template <class C>
-	auto make_snapshotted_advance_input(player_advance_input_t<C> input);
+	template <class C, class E>
+	auto make_snapshotted_advance_input(player_advance_input_t<C> input, E&& extract_collected_entropy);
 
 	template <class C>
 	auto make_set_snapshot(player_advance_input_t<C> input);
@@ -121,9 +119,6 @@ public:
 	bool is_editing_mode() const;
 	bool has_testing_started() const;
 
-	void control(const cosmic_entropy& entropy);
-	void control(const mode_entropy& entropy);
-
 	void finish_testing(editor_command_input, finish_testing_type);
 
 	void begin_recording(editor_folder&);
@@ -131,10 +126,11 @@ public:
 
 	void ensure_handler();
 
-	template <class C>
+	template <class C, class E>
 	void advance_player(
 		augs::delta frame_delta,
-		const player_advance_input_t<C>& input
+		const player_advance_input_t<C>& input,
+		E&& extract_collected_entropy
 	);
 
 	template <class... Args>

@@ -26,6 +26,7 @@
 #include "view/faction_view_settings.h"
 #include "view/gui_fonts.h"
 #include "view/game_gui/elements/game_gui_settings.h"
+#include "application/input/input_settings.h"
 
 #include "test_scenes/test_scene_settings.h"
 
@@ -104,6 +105,7 @@ struct config_lua_table {
 	test_scene_settings test_scene;
 	editor_settings editor;
 	all_gui_fonts_inputs gui_fonts;
+	input_settings input;
 
 	arena_mode_gui_settings arena_mode_gui;
 	faction_view_settings faction_view;

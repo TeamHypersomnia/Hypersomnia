@@ -18,6 +18,7 @@
 #include "application/setups/default_setup_settings.h"
 
 #include "application/debug_settings.h"
+#include "application/input/entropy_accumulator.h"
 #include "application/setups/setup_common.h"
 
 struct config_lua_table;
@@ -32,7 +33,7 @@ class test_scene_setup : public default_setup_settings {
 	test_scene_mode_vars mode_vars;
 
 	intercosm scene;
-	cosmic_entropy total_collected_entropy;
+	entropy_accumulator total_collected;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 	entity_id viewed_character_id;
 
@@ -83,28 +84,28 @@ public:
 
 	template <class C>
 	void advance(
-		const augs::delta frame_delta,
+		const setup_advance_input& in,
 		const C& callbacks
 	) {
-		timer.advance(frame_delta);
+		timer.advance(in.frame_delta);
 		auto steps = timer.extract_num_of_logic_steps(get_viewed_cosmos().get_fixed_delta());
 
 		while (steps--) {
-			total_collected_entropy.clear_dead_entities(scene.world);
-			
-			// player.advance_player_and_biserialize(total_collected_entropy);
+			const auto total = total_collected.extract(get_viewed_character(), in);
 
 			mode.advance(
 				{ mode_vars, scene.world },
-				{ total_collected_entropy, {} },
+				total,
 				callbacks
 			);
-
-			total_collected_entropy.clear();
 		}
 	}
 
-	void control(const cosmic_entropy&);
+	template <class T>
+	void control(const T& t) {
+		total_collected.control(t);
+	}
+
 	void accept_game_gui_events(const cosmic_entropy&);
 
 	std::optional<camera_eye> find_current_camera_eye() const {

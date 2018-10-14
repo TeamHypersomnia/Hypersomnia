@@ -181,17 +181,7 @@ void editor_setup::force_autosave_now() const {
 	autosave.save(destructor_input.lua, signi);
 }
 
-void editor_setup::control(
-	const cosmic_entropy& entropy
-) {
-	if (anything_opened()) {
-		player().control(entropy);
-	}
-}
-
-void editor_setup::accept_game_gui_events(
-	const cosmic_entropy& entropy
-) {
+void editor_setup::accept_game_gui_events(const cosmic_entropy& entropy) {
 	control(entropy);
 }
 
@@ -578,7 +568,7 @@ void editor_setup::perform_custom_imgui(
 					mode_input
 				);
 
-				player().control(new_entropy);
+				control(new_entropy);
 			}
 		);
 	}

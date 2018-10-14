@@ -48,6 +48,8 @@
 #include "application/app_intent_type.h"
 #include "application/setups/editor/editor_recent_message.h"
 
+#include "application/input/entropy_accumulator.h"
+
 struct config_lua_table;
 struct draw_setup_gui_input;
 
@@ -77,6 +79,8 @@ class editor_setup {
 	friend editor_coordinates_gui;
 
 	double global_time_seconds = 0.0;
+
+	entropy_accumulator total_collected;
 
 	editor_significant signi;
 	editor_autosave autosave;
@@ -216,20 +220,31 @@ public:
 
 	template <class C>
 	void advance(
-		augs::delta frame_delta,
+		const setup_advance_input in,
 		const C& callbacks
 	) {
-		global_time_seconds += frame_delta.in_seconds();
+		global_time_seconds += in.frame_delta.in_seconds();
 
 		if (anything_opened()) {
 			player().advance_player(
-				frame_delta,
-				make_player_input(callbacks)
+				in.frame_delta,
+				make_player_input(callbacks),
+				[&]() {
+					return total_collected.extract(get_viewed_character(), in);
+				}
 			);
 		}
 	}
 
-	void control(const cosmic_entropy&);
+	template <class T>
+	void control(const T& t) {
+		if (anything_opened()) {
+			if (player().is_recording()) {
+				total_collected.control(t);
+			}
+		}
+	}
+
 	void accept_game_gui_events(const cosmic_entropy&);
 
 	bool handle_input_before_imgui(

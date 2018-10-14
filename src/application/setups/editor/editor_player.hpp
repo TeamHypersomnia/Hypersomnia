@@ -35,8 +35,8 @@ decltype(auto) editor_player::on_mode_with_input_impl(
 	}
 }
 
-template <class C>
-auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<C> in) {
+template <class C, class E>
+auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<C> in, E&& extract_collected_entropy) {
 	auto& folder = in.cmd_in.folder;
 	auto& history = folder.history;
 	auto& cosm = folder.commanded->work.world;
@@ -78,15 +78,15 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 					);
 				}
 			);
-
-			total_collected_entropy.clear();
 		},
 
 		[&](auto& existing_entropy) {
 			adjust_entropy(folder, existing_entropy, false);
-			adjust_entropy(folder, total_collected_entropy, true);
 
-			existing_entropy += total_collected_entropy;
+			auto extracted = extract_collected_entropy();
+			adjust_entropy(folder, extracted, true);
+
+			existing_entropy += extracted;
 		},
 
 		[this, &folder, &history](const auto n) -> editor_solvable_snapshot {
@@ -160,20 +160,21 @@ void editor_player::seek_to(
 
 	base::seek_to(
 		seeked_step,
-		make_snapshotted_advance_input(in),
+		make_snapshotted_advance_input(in, []() { return editor_player_entropy_type(); }),
 		make_set_snapshot(in)
 	);
 
 	in.cmd_in.clear_dead_entities();
 }
 
-template <class C>
+template <class C, class E>
 void editor_player::advance_player(
 	augs::delta frame_delta,
-	const player_advance_input_t<C>& in
+	const player_advance_input_t<C>& in,
+	E&& extract_collected_entropy
 ) {
 	const auto performed_steps = base::advance(
-		make_snapshotted_advance_input(in),
+		make_snapshotted_advance_input(in, std::forward<E>(extract_collected_entropy)),
 		frame_delta,
 		in.cmd_in.get_cosmos().get_fixed_delta()
 	);

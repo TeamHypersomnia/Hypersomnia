@@ -286,6 +286,9 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::CONTROLS: {
+				auto& scope_cfg = config.input;
+
+				revertable_drag_vec2(SCOPE_CFG_NVP(mouse_sensitivity));
 
 				break;
 			}

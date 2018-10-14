@@ -19,11 +19,8 @@ namespace components {
 	struct crosshair {
 		// GEN INTROSPECTOR struct components::crosshair
 		crosshair_orbit_type orbit_mode = crosshair_orbit_type::LOOK;
-
 		simple_body recoil;
-
 		vec2 base_offset;
-		vec2 sensitivity = vec2(1.0f, 1.0f);
 		// END GEN INTROSPECTOR
 	};
 }

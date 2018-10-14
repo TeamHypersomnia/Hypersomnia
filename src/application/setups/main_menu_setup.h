@@ -114,12 +114,12 @@ public:
 
 	template <class C>
 	void advance(
-		const augs::delta frame_delta,
+		const setup_advance_input in,
 		const C& callbacks
 	) {
-		latest_news_pos.x += frame_delta.per_second(50.f);
+		latest_news_pos.x += in.frame_delta.per_second(50.f);
 
-		timer.advance(frame_delta);
+		timer.advance(in.frame_delta);
 
 		auto steps = timer.extract_num_of_logic_steps(get_viewed_cosmos().get_fixed_delta());
 
@@ -143,7 +143,8 @@ public:
 		const vec2i screen_size
 	) const;
 
-	void control(const cosmic_entropy&) {
+	template <class T>
+	void control(const T&) {
 		return;
 	}
 

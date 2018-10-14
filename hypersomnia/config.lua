@@ -132,6 +132,12 @@ return {
     different_values_frame_hovered_bg = "158 122 0 255",
     different_values_frame_active_bg = "168 158 0 255"
   },
+  input = {
+	mouse_sensitivity = {
+	  x = 3,
+	  y = 3
+	}
+  },
   game_controls = {
     A = "MOVE_LEFT",
     D = "MOVE_RIGHT",

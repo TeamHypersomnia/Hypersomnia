@@ -1,12 +1,10 @@
 #pragma once
 #include "augs/math/vec2.h"
 
-using controller_motion = basic_vec2<short>;
-
-template <class motion_type_enum>
+template <class motion_type_enum, class motion_offset>
 struct basic_input_motion {
 	motion_type_enum motion = motion_type_enum::INVALID;
-	controller_motion offset;
+	motion_offset offset;
 
 	void set_motion_type(const motion_type_enum t) {
 		motion = t;

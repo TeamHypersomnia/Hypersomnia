@@ -70,14 +70,6 @@ bool editor_player::has_testing_started() const {
 	return before_start.commanded != nullptr;
 }
 
-void editor_player::control(const cosmic_entropy& entropy) {
-	total_collected_entropy.cosmic += entropy;
-}
-
-void editor_player::control(const mode_entropy& entropy) {
-	total_collected_entropy += entropy;
-}
-
 void editor_player::finish_testing(const editor_command_input in, const finish_testing_type mode) {
 	if (!has_testing_started()) {
 		return;
@@ -89,7 +81,6 @@ void editor_player::finish_testing(const editor_command_input in, const finish_t
 	restore_saved_state(f);
 
 	base::finish();
-	total_collected_entropy.clear();
 
 	set_dirty();
 
