@@ -4,9 +4,18 @@
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 
-#include "game/inferred_caches/processing_lists_cache.h"
+#include "game/inferred_caches/processing_lists_cache.hpp"
+#include "game/cosmos/for_each_entity.h"
 
-void processing_lists_cache::destroy_cache_of(const const_entity_handle handle) {
+void processing_lists_cache::infer_all(const cosmos& cosm) {
+	cosm.for_each_entity(
+		[&](const auto& typed_handle) {
+			specific_infer_cache_for(typed_handle);
+		}
+	);
+}
+
+void processing_lists_cache::destroy_cache_of(const const_entity_handle& handle) {
 	const auto id = handle.get_id();
 
 	if (const auto cache = mapped_or_nullptr(per_entity_cache, id)) {
@@ -18,35 +27,12 @@ void processing_lists_cache::destroy_cache_of(const const_entity_handle handle) 
 	}
 }
 
-void processing_lists_cache::infer_cache_for(const const_entity_handle handle) {
-	const auto id = handle.get_id();
-
-	const auto it = per_entity_cache.try_emplace(id);
-	auto& cache = (*it.first).second;
-
-	all_processing_flags new_flags;
-
-	if (handle.get_flag(entity_flag::IS_PAST_CONTAGIOUS)) {
-		new_flags.set(processing_subjects::WITH_ENABLED_PAST_CONTAGIOUS);
-	}
-
-	if (/* cache_existed */ !it.second) {
-		if (cache.recorded_flags == new_flags) {
-			return;
+void processing_lists_cache::infer_cache_for(const const_entity_handle& handle) {
+	handle.dispatch(
+		[&](const auto& typed_handle) {
+			specific_infer_cache_for(typed_handle);
 		}
-	}
-
-	augs::for_each_enum_except_bounds([&](const processing_subjects key) {
-		auto& list = lists[key];
-
-		erase_element(list, id);
-
-		if (new_flags.test(key)) {
-			list.push_back(id);
-		}
-	});
-
-	cache.recorded_flags = new_flags;
+	);
 }
 
 void processing_lists_cache::reserve_caches_for_entities(size_t n) {

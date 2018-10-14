@@ -182,8 +182,10 @@ void physics_mixin<E>::infer_transform() const {
 	const auto self = *static_cast<const E*>(this);
 	auto& cosm = self.get_cosmos();
 
-	cosm.get_solvable_inferred({}).physics.infer_rigid_body(self);
-	cosm.get_solvable_inferred({}).tree_of_npo.infer_cache_for(self);
+	const auto h = self.to_const_generic();
+
+	cosm.get_solvable_inferred({}).physics.infer_rigid_body(h);
+	cosm.get_solvable_inferred({}).tree_of_npo.infer_cache_for(h);
 }
 
 template <class E>

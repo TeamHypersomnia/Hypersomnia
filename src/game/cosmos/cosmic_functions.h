@@ -24,7 +24,7 @@ template <class E>
 struct entity_solvable;
 
 class cosmic {
-	static void destroy_caches_of(const entity_handle h);
+	static void destroy_caches_of(const entity_handle& h);
 	static void infer_all_entities(cosmos& cosm);
 
 	template <class F>
@@ -103,11 +103,11 @@ public:
 
 	static void reinfer_solvable(cosmos&);
 	static void reinfer_all_entities(cosmos&);
-	static void infer_caches_for(const entity_handle h);
+	static void infer_caches_for(const entity_handle& h);
 
 	template <class C, class F>
 	static void change_solvable_significant(C& cosm, F&& callback);
 
-	template <class... MustHaveComponents, class C, class F>
+	template <template <class> class Predicate = always_true, class C, class F>
 	static void for_each_entity(C& self, F callback);
 };

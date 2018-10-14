@@ -14,6 +14,7 @@
 #include "game/detail/visible_entities.h"
 
 #include "game/stateless_systems/movement_path_system.h"
+#include "game/inferred_caches/tree_of_npo_cache.hpp"
 
 void movement_path_system::advance_paths(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
@@ -272,7 +273,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				anim_state.frame_elapsed_ms += elapsed_anim_ms;
 			}
 
-			npo.infer_cache_for(subject);
+			npo.specific_infer_cache_for(subject);
 		}
 	);
 }

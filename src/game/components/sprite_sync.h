@@ -9,7 +9,9 @@ protected:
 	using base::handle;
 
 	void infer_caches() const {
-		handle.get_cosmos().get_solvable_inferred({}).tree_of_npo.infer_cache_for(handle);
+		const auto h = handle.to_const_generic();
+
+		handle.get_cosmos().get_solvable_inferred({}).tree_of_npo.infer_cache_for(h);
 		handle.infer_colliders_from_scratch();
 	}
 

@@ -1,9 +1,8 @@
 #pragma once
 #include "game/cosmos/cosmos_solvable.h"
 #include "augs/enums/callback_result.h"
-#include "game/cosmos/entity_type_traits.h"
 
-template <class... MustHaveComponents, class S, class F>
+template <template <class> class Predicate, class S, class F>
 void cosmos_solvable::for_each_entity_impl(S& self, F callback) {
 	self.significant.for_each_entity_pool(
 		[&](auto& p) {
@@ -13,7 +12,7 @@ void cosmos_solvable::for_each_entity_impl(S& self, F callback) {
 			using Solvable = typename pool_type::mapped_type;
 			using E = entity_type_of<Solvable>;
 
-			if constexpr(has_all_of_v<E, MustHaveComponents...>) {
+			if constexpr(Predicate<E>::value) {
 				using index_type = typename pool_type::used_size_type;
 
 				for (index_type i = 0; i < p.size(); ++i) {
@@ -40,12 +39,12 @@ void cosmos_solvable::for_each_entity_impl(S& self, F callback) {
 	);
 }
 
-template <class... MustHaveComponents, class F>
+template <template <class> class Predicate, class F>
 void cosmos_solvable::for_each_entity(F&& callback) {
-	for_each_entity_impl<MustHaveComponents...>(*this, std::forward<F>(callback));
+	for_each_entity_impl<Predicate>(*this, std::forward<F>(callback));
 }
 
-template <class... MustHaveComponents, class F>
+template <template <class> class Predicate, class F>
 void cosmos_solvable::for_each_entity(F&& callback) const {
-	for_each_entity_impl<MustHaveComponents...>(*this, std::forward<F>(callback));
+	for_each_entity_impl<Predicate>(*this, std::forward<F>(callback));
 }

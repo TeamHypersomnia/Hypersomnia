@@ -9,6 +9,8 @@
 
 #include "game/cosmos/entity_flavour_id.h"
 
+class cosmos;
+
 class flavour_id_cache {
 	template <class T>
 	using make_flavour_map = std::unordered_map<
@@ -21,6 +23,11 @@ class flavour_id_cache {
 	caches_type caches;
 public:
 	template <class E>
+	struct concerned_with {
+		static constexpr bool value = true;
+	};
+
+	template <class E>
 	const auto& get_entities_by_flavour_id(const typed_entity_flavour_id<E> id) const {
 		thread_local const std::unordered_set<typed_entity_id<E>> detail_none;
 
@@ -31,6 +38,11 @@ public:
 		return detail_none;
 	}
 
-	void infer_cache_for(const const_entity_handle);
-	void destroy_cache_of(const const_entity_handle);
+	template <class E>
+	void specific_infer_cache_for(const E&);
+
+	void infer_all(const cosmos&);
+
+	void infer_cache_for(const const_entity_handle&);
+	void destroy_cache_of(const const_entity_handle&);
 };

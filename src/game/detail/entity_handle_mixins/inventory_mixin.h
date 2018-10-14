@@ -57,7 +57,7 @@ public:
 		ensure(self);
 
 		self.infer_colliders();
-		self.for_each_contained_item_recursive([](const auto h) {
+		self.for_each_contained_item_recursive([](const auto& h) {
 			h.infer_colliders();	
 		});
 	}

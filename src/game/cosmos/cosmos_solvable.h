@@ -1,5 +1,6 @@
 #pragma once
 #include <map>
+#include "augs/templates/identity_templates.h"
 
 #include "augs/misc/timing/delta.h"
 
@@ -19,7 +20,7 @@ struct entity_creation_input {
 };
 
 class cosmos_solvable {
-	using guid_cache = std::map<entity_guid, entity_id>;
+	using guid_cache = std::unordered_map<entity_guid, entity_id>;
 
 	static const cosmos_solvable zero;
 
@@ -44,7 +45,7 @@ class cosmos_solvable {
 		F callback	
 	);
 
-	template <class... MustHaveComponents, class S, class F>
+	template <template <class> class Predicate, class S, class F>
 	static void for_each_entity_impl(S& self, F callback);
 
 	entity_guid get_guid(const entity_id&) const;
@@ -135,10 +136,10 @@ public:
 	augs::delta get_fixed_delta() const;
 	unsigned get_steps_per_second() const;
 
-	template <class... MustHaveComponents, class F>
+	template <template <class> class Predicate = always_true, class F>
 	void for_each_entity(F&& callback);
 	
-	template <class... MustHaveComponents, class F>
+	template <template <class> class Predicate = always_true, class F>
 	void for_each_entity(F&& callback) const;
 
 	bool empty() const;

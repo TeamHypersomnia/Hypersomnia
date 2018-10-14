@@ -161,7 +161,7 @@ void editor_entity_selector::select_all(
 
 	current_selections.reserve(current_selections.size() + cosm.get_entities_count());
 
-	cosmic::for_each_entity(cosm, [&](const auto handle) {
+	cosm.for_each_entity([&](const auto& handle) {
 		if (!::passes_filter(filter, handle)) {
 			return;
 		}

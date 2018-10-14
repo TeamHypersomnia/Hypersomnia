@@ -7,6 +7,12 @@
 #include "game/cosmos/change_common_significant.hpp"
 #include "game/cosmos/delete_entity.h"
 
+#include "game/inferred_caches/tree_of_npo_cache.hpp"
+#include "game/inferred_caches/relational_cache.hpp"
+#include "game/inferred_caches/processing_lists_cache.hpp"
+#include "game/inferred_caches/flavour_id_cache.hpp"
+#include "game/inferred_caches/physics_world_cache.hpp"
+
 entity_handle just_create_entity(
 	cosmos& cosm,
 	const entity_flavour_id id
@@ -48,20 +54,26 @@ entity_handle cosmic::create_entity(
 	);
 }
 
-void cosmic::infer_caches_for(const entity_handle h) {
+void cosmic::infer_caches_for(const entity_handle& h) {
 	auto& cosm = h.get_cosmos();
 
-	auto constructor = [h](auto, auto& sys) {
-		sys.infer_cache_for(h);
-	};
+	h.dispatch([&](const auto& typed_handle) {
+		auto constructor = [&](auto, auto& sys) {
+			using S = remove_cref<decltype(sys)>;
 
-	augs::introspect(constructor, cosm.get_solvable_inferred({}));
+			if constexpr(S::template concerned_with<entity_type_of<decltype(typed_handle)>>::value) {
+				sys.specific_infer_cache_for(typed_handle);
+			}
+		};
+
+		augs::introspect(constructor, cosm.get_solvable_inferred({}));
+	});
 }
 
-void cosmic::destroy_caches_of(const entity_handle h) {
+void cosmic::destroy_caches_of(const entity_handle& h) {
 	auto& cosm = h.get_cosmos();
 
-	auto destructor = [h](auto, auto& sys) {
+	auto destructor = [&h](auto, auto& sys) {
 		sys.destroy_cache_of(h);
 	};
 
@@ -85,9 +97,7 @@ void cosmic::infer_all_entities(cosmos& cosm) {
 	*/
 
 	auto constructor = [&cosm](auto, auto& sys) {
-		for (const auto& ordered_pair : cosm.get_solvable().get_guid_to_id()) {
-			sys.infer_cache_for(cosm[ordered_pair.second]);
-		}
+		sys.infer_all(cosm);
 	};
 
 	augs::introspect(constructor, cosm.get_solvable_inferred({}));

@@ -133,6 +133,12 @@ public:
 		return nullptr;
 	}
 
+	template <template <class> class Predicate = always_true, class F>
+	void for_each_entity(F&& callback);
+
+	template <template <class> class Predicate = always_true, class F>
+	void for_each_entity(F&& callback) const;
+
 	template <class... MustHaveComponents, class F>
 	void for_each_having(F&& callback);
 

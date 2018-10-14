@@ -1,20 +1,26 @@
 #include "augs/templates/container_templates.h"
 #include "game/cosmos/entity_handle.h"
-#include "game/inferred_caches/flavour_id_cache.h"
+#include "game/inferred_caches/flavour_id_cache.hpp"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/for_each_entity.h"
 
-void flavour_id_cache::infer_cache_for(const const_entity_handle h) {
-	h.dispatch(
-		[&](const auto typed_handle) {
-			using E = entity_type_of<decltype(typed_handle)>;
-			const auto id = typed_handle.get_id();
-
-			auto& m = caches.get_for<E>();
-			m[typed_handle.get_flavour_id()].emplace(id);
+void flavour_id_cache::infer_all(const cosmos& cosm) {
+	cosm.for_each_entity(
+		[&](const auto& typed_handle) {
+			specific_infer_cache_for(typed_handle);
 		}
 	);
 }
 
-void flavour_id_cache::destroy_cache_of(const const_entity_handle h) {
+void flavour_id_cache::infer_cache_for(const const_entity_handle& h) {
+	h.dispatch(
+		[&](const auto typed_handle) {
+			specific_infer_cache_for(typed_handle);
+		}
+	);
+}
+
+void flavour_id_cache::destroy_cache_of(const const_entity_handle& h) {
 	h.dispatch(
 		[&](const auto typed_handle) {
 			using E = entity_type_of<decltype(typed_handle)>;

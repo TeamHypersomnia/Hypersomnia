@@ -67,12 +67,18 @@ class physics_world_cache {
 	inferred_cache_map<colliders_cache> colliders_caches;
 	inferred_cache_map<joint_cache> joint_caches;
 
-	void infer_colliders_from_scratch(
-		const const_entity_handle, 
+	template <class E>
+	void specific_infer_colliders_from_scratch(
+		const E&, 
 		const colliders_connection&
 	);
 
 public:
+	template <class E>
+	struct concerned_with {
+		static constexpr bool value = true;
+	};
+
 	// b2World on stack causes a stack overflow due to a large stack allocator, therefore it must be dynamically allocated
 	std::unique_ptr<b2World> b2world;
 
@@ -186,7 +192,7 @@ public:
 
 	b2Fixture_index_in_component get_index_in_component(
 		const b2Fixture* const f, 
-		const const_entity_handle
+		const const_entity_handle&
 	) const;
 
 	void rechoose_owner_friction_body(entity_handle);
@@ -194,24 +200,32 @@ public:
 
 	void reserve_caches_for_entities(const size_t n);
 
-	void infer_cache_for(const const_entity_handle);
-	void destroy_cache_of(const const_entity_handle);
+	void infer_all(const cosmos&);
 
 	template <class E>
-	void infer_rigid_body_existence(const E handle) {
-		if (const auto cache = find_rigid_body_cache(handle)) {
-			return;
-		}
+	void specific_infer_cache_for(const E&);
 
-		infer_rigid_body(handle);
-	}
+	template <class E>
+	void specific_infer_rigid_body(const E&);
 
-	void infer_colliders_from_scratch(const const_entity_handle);
-	void infer_colliders(const const_entity_handle);
-	void infer_rigid_body(const const_entity_handle);
-	void infer_joint(const const_entity_handle);
+	template <class E>
+	void specific_infer_colliders(const E&);
 
-	void destroy_colliders_cache(const const_entity_handle);
-	void destroy_rigid_body_cache(const const_entity_handle);
-	void destroy_joint_cache(const const_entity_handle);
+	template <class E>
+	void specific_infer_joint(const E&);
+
+	void infer_cache_for(const const_entity_handle&);
+	void destroy_cache_of(const const_entity_handle&);
+
+	template <class E>
+	void infer_rigid_body_existence(const E& handle);
+
+	void infer_colliders_from_scratch(const const_entity_handle&);
+	void infer_colliders(const const_entity_handle&);
+	void infer_rigid_body(const const_entity_handle&);
+	void infer_joint(const const_entity_handle&);
+
+	void destroy_colliders_cache(const const_entity_handle&);
+	void destroy_rigid_body_cache(const const_entity_handle&);
+	void destroy_joint_cache(const const_entity_handle&);
 };

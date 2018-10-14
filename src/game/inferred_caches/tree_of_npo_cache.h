@@ -10,11 +10,16 @@
 #include "game/cosmos/entity_handle_declaration.h"
 
 #include "augs/math/camera_cone.h"
+
+#include "game/detail/entities_with_render_layer.h"
+#include "game/cosmos/entity_type_traits.h"
 /* NPO stands for "non-physical objects" */
 
 namespace components {
 	struct tree_of_npo_node;
 };
+
+class cosmos;
 
 union tree_of_npo_node {
 	using payload_type = unversioned_entity_id;
@@ -56,6 +61,14 @@ class tree_of_npo_cache {
 	const cache* find_cache(const unversioned_entity_id) const;
 
 public:
+	template <class E>
+	struct concerned_with {
+		static constexpr bool value = 
+			is_one_of_list_v<E, entities_with_render_layer>
+			&& !has_any_of_v<E, invariants::fixtures, invariants::rigid_body>
+		;
+	};	
+
 	/* Used for example for debugging the created nodes */
 	template <class F>
 	void for_each_aabb(F callback) const {
@@ -97,6 +110,11 @@ public:
 
 	void reserve_caches_for_entities(const size_t n);
 
-	void infer_cache_for(const const_entity_handle);
-	void destroy_cache_of(const const_entity_handle);
+	void infer_all(const cosmos&);
+
+	template <class E>
+	void specific_infer_cache_for(const E&);
+
+	void infer_cache_for(const const_entity_handle&);
+	void destroy_cache_of(const const_entity_handle&);
 };

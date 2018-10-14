@@ -330,7 +330,7 @@ fae_tree_output editor_fae_gui::perform(
 		cached_flavour_to_entities,
 		filter,
 		[&cosm](auto&& callback) {
-			cosmic::for_each_entity(cosm, std::forward<decltype(callback)>(callback));
+			cosm.for_each_entity(std::forward<decltype(callback)>(callback));
 		}
 	);
 

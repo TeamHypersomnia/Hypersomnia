@@ -4,9 +4,9 @@
 #include "game/cosmos/cosmos_solvable.hpp"
 #include "game/organization/for_each_entity_type.h"
 
-template <class... MustHaveComponents, class C, class F>
+template <template <class> class Predicate, class C, class F>
 void cosmic::for_each_entity(C& self, F callback) {
-	self.get_solvable({}).template for_each_entity<MustHaveComponents...>(
+	self.get_solvable({}).template for_each_entity<Predicate>(
 		[&](auto& object, const auto iteration_index) -> decltype(auto) {
 			using O = decltype(object);
 			using E = entity_type_of<O>;
@@ -19,12 +19,22 @@ void cosmic::for_each_entity(C& self, F callback) {
 
 template <class... MustHaveComponents, class F>
 void cosmos::for_each_having(F&& callback) {
-	cosmic::for_each_entity<MustHaveComponents...>(*this, std::forward<F>(callback));
+	cosmic::for_each_entity<has_all_of<MustHaveComponents...>::template type>(*this, std::forward<F>(callback));
 }
 
 template <class... MustHaveComponents, class F>
 void cosmos::for_each_having(F&& callback) const {
-	cosmic::for_each_entity<MustHaveComponents...>(*this, std::forward<F>(callback));
+	cosmic::for_each_entity<has_all_of<MustHaveComponents...>::template type>(*this, std::forward<F>(callback));
+}
+
+template <template <class> class Predicate, class F>
+void cosmos::for_each_entity(F&& callback) {
+	cosmic::for_each_entity<Predicate>(*this, std::forward<F>(callback));
+}
+
+template <template <class> class Predicate, class F>
+void cosmos::for_each_entity(F&& callback) const {
+	cosmic::for_each_entity<Predicate>(*this, std::forward<F>(callback));
 }
 
 template <class... MustHaveInvariants, class F>

@@ -455,6 +455,14 @@ public:
 		using void_entity_ptr = maybe_const_ptr_t<is_const, void>;
 		return { static_cast<void_entity_ptr>(find_subject()), owner, this->get_id() };
 	}
+
+	auto to_generic() const {
+		return this->operator basic_entity_handle<is_const>();
+	}
+
+	auto to_const_generic() const {
+		return this->operator basic_entity_handle<true>();
+	}
 };
 
 template <bool is_const, class entity_type, template <class> class identifier_provider>

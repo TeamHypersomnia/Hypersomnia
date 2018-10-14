@@ -2036,3 +2036,8 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- Because that bound will be very tightly tied to the view state
 	- So maybe finish it like this
 
+
+- Optimize reinference
+	- Don't iterate by guids, just process all entities just like you would always process them
+		- this will allow us to hold an unordered map of guids
+
