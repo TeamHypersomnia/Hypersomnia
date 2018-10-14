@@ -147,17 +147,19 @@ auto editor_player::make_set_snapshot(const player_advance_input_t<C> in) {
 
 template <class C>
 void editor_player::seek_to(
-	const editor_player::step_type step, 
+	const editor_player::step_type requested_step, 
 	const player_advance_input_t<C> in
 ) {
-	if (step == get_current_step()) {
+	const auto seeked_step = std::min(requested_step, get_total_steps(in.cmd_in.folder));
+
+	if (seeked_step == get_current_step()) {
 		return;
 	}
 
 	set_dirty();
 
 	base::seek_to(
-		step,
+		seeked_step,
 		make_snapshotted_advance_input(in),
 		make_set_snapshot(in)
 	);

@@ -112,6 +112,8 @@ void editor_history::seek_to_revision(
 		}
 	};
 
+	PLR_LOG_NVPS(get_current_revision(), target_revision);
+
 	if (get_current_revision() < target_revision) {
 		/* Redoing. */
 
@@ -143,6 +145,7 @@ void editor_history::seek_to_revision(
 		if (p.has_testing_started()) {
 			const auto target_step = when_target_cmd_happened();
 			const auto current_step = p.get_current_step();
+			PLR_LOG_NVPS(target_step, current_step);
 
 			if (current_step == target_step) {
 				/* No step happened since the time of the targeted command. */

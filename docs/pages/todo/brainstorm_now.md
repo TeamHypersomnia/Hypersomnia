@@ -6,10 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Well why not simply set the screen sizes in game logic?
-	- Because that bound will be very tightly tied to the view state
-	- So maybe finish it like this
-
 - Melee combat
 	- Primary and secondary attacks for knives
 		- Akimbo is thus handicapped only to the primary

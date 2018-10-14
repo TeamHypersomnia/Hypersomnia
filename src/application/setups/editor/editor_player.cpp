@@ -132,8 +132,8 @@ double editor_player::get_current_secs() const {
 	return base::get_current_step() * get_chosen_delta().in_seconds();
 }
 
-double editor_player::get_total_secs() const {
-	return base::get_total_steps() * get_chosen_delta().in_seconds();
+double editor_player::get_total_secs(const editor_folder& folder) const {
+	return get_total_steps(folder) * get_chosen_delta().in_seconds();
 }
 
 void editor_player::initialize_testing(editor_folder& f) {
@@ -216,6 +216,29 @@ editor_player::step_type editor_player::get_current_step() const {
 	return base::get_current_step();
 }
 
+editor_player::step_type editor_player::get_total_steps(const editor_folder& f) const {
+	const auto of_last_command = [&]() -> editor_player::step_type {
+		const auto& h = f.history;
+		const auto& cmds = h.get_commands();
+
+		const auto rev = h.get_last_revision();
+
+		if (rev == h.get_first_revision()) {
+			return 0;
+		}
+
+		return std::visit(
+			[](const auto& typed_cmd) {
+				return typed_cmd.common.when_happened;
+			},
+			cmds[rev]
+		);
+	}();
+		
+	const auto of_entropies = base::get_current_step();
+
+	return std::max(of_last_command, of_entropies);
+}
 
 void editor_player::request_steps(const int amount) {
 	if (has_testing_started()) {

@@ -115,12 +115,10 @@ namespace augs {
 	template <class A, class B>
 	template <class I, class SetSnapshot>
 	void snapshotted_player<A, B>::seek_to(
-		typename snapshotted_player<A, B>::step_type requested_step,
+		typename snapshotted_player<A, B>::step_type seeked_step,
 		const I& input,
 		SetSnapshot&& set_snapshot
 	) {
-		const auto seeked_step = std::min(requested_step, get_total_steps());
-
 		if (seeked_step == current_step) {
 			return;
 		}

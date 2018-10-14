@@ -2031,3 +2031,8 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - game mode property is a part of game mode definition
 - game mode definition = all game mode properties
+
+- Well why not simply set the screen sizes in game logic?
+	- Because that bound will be very tightly tied to the view state
+	- So maybe finish it like this
+

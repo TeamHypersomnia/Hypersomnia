@@ -114,6 +114,9 @@ private:
 
 	void adjust_entropy(const editor_folder&, editor_player_entropy_type&, bool neg) const;
 
+	using base::get_current_step;
+	using base::get_total_steps;
+
 public:
 	bool is_editing_mode() const;
 	bool has_testing_started() const;
@@ -149,8 +152,10 @@ public:
 	using revision_type = editor_history::index_type;
 
 	double get_current_secs() const;
-	double get_total_secs() const;
+	double get_total_secs(const editor_folder&) const;
+
 	step_type get_current_step() const;
+	step_type get_total_steps(const editor_folder&) const;
 
 	template <class C>
 	void seek_to(

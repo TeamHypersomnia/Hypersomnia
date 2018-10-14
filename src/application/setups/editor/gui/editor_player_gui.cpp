@@ -48,7 +48,7 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 	}
 
 	if (player.has_testing_started()) {
-		const auto total = player.get_total_secs();
+		const auto total = player.get_total_secs(folder);
 		const auto current = player.get_current_secs();
 
 		if (total > 0.0) {
@@ -60,8 +60,8 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 			if (slider("Player position", mult, 0.f, 1.f)) {
 				mult = std::clamp(mult, 0.f, 1.f);
 
-				const auto target_step = player.get_total_steps() * mult;
-				PLR_LOG_NVPS(mult, player.get_current_step(), player.get_total_steps(), target_step);
+				const auto target_step = player.get_total_steps(folder) * mult;
+				PLR_LOG_NVPS(mult, player.get_current_step(), player.get_total_steps(folder), target_step);
 
 				if (player.is_recording()) {
 					player.begin_replaying(folder);
@@ -73,7 +73,7 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 			ImGui::ProgressBar(mult);
 		}
 
-		text("Current step: %x/%x", player.get_current_step(), player.get_total_steps());
+		text("Current step: %x/%x", player.get_current_step(), player.get_total_steps(folder));
 		text("Current time: %x", format_mins_secs_ms(current));
 		text("Recording length: %x", format_mins_secs_ms(total));
 
