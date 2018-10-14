@@ -210,7 +210,6 @@ namespace test_flavours {
 				components::crosshair crosshair;
 				crosshair.base_offset.set(-20, 0);
 				crosshair.sensitivity.set(3, 3);
-				crosshair.base_offset_bound.set(1920, 1080);
 				meta.set(crosshair);
 			}
 

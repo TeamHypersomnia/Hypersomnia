@@ -23,13 +23,8 @@ namespace components {
 		simple_body recoil;
 
 		vec2 base_offset;
-		vec2 base_offset_bound;
-
-		float rotation_offset = 0.f;
 		vec2 sensitivity = vec2(1.0f, 1.0f);
 		// END GEN INTROSPECTOR
-
-		vec2 get_bounds_in_this_look() const;
 	};
 }
 

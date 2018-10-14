@@ -15,17 +15,6 @@
 #include "game/cosmos/data_living_one_step.h"
 #include "game/cosmos/for_each_entity.h"
 
-vec2 components::crosshair::get_bounds_in_this_look() const {
-	if (orbit_mode == crosshair_orbit_type::ANGLED) {
-		return base_offset_bound / 2.f;
-	}
-	else if (orbit_mode == crosshair_orbit_type::LOOK) {
-		return base_offset_bound;
-	}
-
-	return {};
-}
-
 void crosshair_system::handle_crosshair_intents(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 
@@ -54,16 +43,14 @@ void crosshair_system::update_base_offsets(const logic_step step) {
 
 	const auto& events = step.get_queue<messages::motion_message>();
 	
-	for (const auto& it : events) {
-		const auto subject = cosm[it.subject];
+	for (const auto& motion : events) {
+		const auto subject = cosm[motion.subject];
 
 		if (const auto crosshair = subject.find_crosshair()) {
-			const auto delta = vec2(vec2(it.offset) * crosshair->sensitivity).rotate(crosshair->rotation_offset);
+			const auto delta = vec2(motion.offset) * crosshair->sensitivity;
 
 			auto& base_offset = crosshair->base_offset;
-
 			base_offset += delta;
-			base_offset.clamp_rotated(crosshair->get_bounds_in_this_look(), crosshair->rotation_offset);
 		}
 	}
 }

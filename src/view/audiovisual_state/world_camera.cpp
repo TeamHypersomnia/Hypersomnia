@@ -150,8 +150,12 @@ vec2 world_camera::get_camera_offset_due_to_character_crosshair(
 			}
 
 			if (crosshair->orbit_mode == crosshair_orbit_type::LOOK) {
-				/* simple proportion */
-				camera_crosshair_offset /= crosshair->base_offset_bound;
+				const auto bound = screen_size;
+
+				if (bound.neither_zero()) {
+					camera_crosshair_offset /= bound;
+				}
+
 				camera_crosshair_offset *= camera_cone(current_eye, screen_size).get_visible_world_area() * settings.look_bound_expand;
 			}
 		}

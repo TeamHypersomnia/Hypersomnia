@@ -53,6 +53,7 @@
 #include "application/main/draw_debug_details.h"
 #include "application/main/draw_debug_lines.h"
 #include "application/main/release_flags.h"
+#include "application/main/adjust_game_motions.h"
 
 #include "application/setups/draw_setup_gui_input.h"
 
@@ -1262,6 +1263,15 @@ int work(const int argc, const char* const * const argv) try {
 
 			const auto result_entropy = [&]() {
 				if (const auto viewed = get_viewed_character()) {
+					if (const auto crosshair = viewed.find_crosshair()) {
+						adjust_game_motions(
+							crosshair->base_offset,
+							crosshair->sensitivity,
+							window.get_screen_size(),
+							game_motions
+						);
+					}
+
 					return cosmic_entropy(
 						viewed,
 						game_intents,
