@@ -52,12 +52,15 @@ void editor_history_gui::perform(const editor_command_input in) {
 
 	auto do_history_node = [&](
 		const index_type command_index,
-		const std::string& description,
-		const augs::date_time& when,
-		const bool has_parent,
+		const auto& command,
 		const bool is_parent
 	){
+		const auto& description = command.describe();
+		const augs::date_time& when = command.common.timestamp;
+		const bool has_parent = command.common.has_parent;
+
 		const auto how_long_ago = when.how_long_ago();
+
 		const bool passes_filter = filter.PassFilter(description.c_str()) || filter.PassFilter(how_long_ago.c_str());
 
 		if (!passes_filter) {
@@ -122,7 +125,10 @@ void editor_history_gui::perform(const editor_command_input in) {
 		text_disabled(how_long_ago /* + " (?)" */);	
 
 		if (ImGui::IsItemHovered()) {
-			text_tooltip(when.get_readable());
+			auto cmd_tooltip = when.get_readable();
+			cmd_tooltip += typesafe_sprintf("\nEditor step: %x", command.common.when_happened);
+
+			text_tooltip(cmd_tooltip);
 		}
 
 		ImGui::NextColumn();
@@ -131,16 +137,34 @@ void editor_history_gui::perform(const editor_command_input in) {
 	};
 
 	{
-		const auto first_label = playtesting ? "Started playtesting" : "Created project files";
-		do_history_node(-1, first_label, in.folder.view.meta.timestamp, false, false);
+		struct first_command_dummy {
+			bool playtesting;
+
+			struct common_type {
+				bool has_parent = false;
+				augs::date_time timestamp;
+				decltype(editor_command_common::when_happened) when_happened = 0;
+			} common;
+
+			auto describe() const {
+				return std::string(playtesting ? "Started playtesting" : "Created project files");
+			}
+		};
+
+		const auto first_command = first_command_dummy {
+			playtesting,
+			{ false, in.folder.view.meta.timestamp, 0 }
+		};
+
+		do_history_node(-1, first_command, false);
 	}
 
 	const auto& commands = history.get_commands();
 
 	auto do_normal_command = [&](const std::size_t i) {
 		std::visit(
-			[&](const auto& command) {
-				do_history_node(i, command.describe(), command.common.timestamp, command.common.has_parent, false);
+			[&](const auto& typed_command) {
+				do_history_node(i, typed_command, false);
 			},
 			commands[i]
 		);
@@ -148,8 +172,8 @@ void editor_history_gui::perform(const editor_command_input in) {
 
 	auto do_parent_command = [&](const std::size_t i) {
 		return std::visit(
-			[&](const auto& command) {
-				return do_history_node(i, command.describe(), command.common.timestamp, command.common.has_parent, true);
+			[&](const auto& typed_command) {
+				return do_history_node(i, typed_command, true);
 			},
 			commands[i]
 		);
