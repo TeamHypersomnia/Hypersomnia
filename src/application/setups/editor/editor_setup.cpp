@@ -220,6 +220,7 @@ std::size_t editor_setup::find_folder_by_path(const augs::path_type& current_pat
 void editor_setup::open_folder_in_new_tab(const path_operation op) {
 	if (const auto existing = find_folder_by_path(op.path); existing != dead_folder_v) {
 		set_current(existing);
+		return;
 	}
 
 	try_to_open_new_folder(
@@ -344,6 +345,7 @@ void editor_setup::perform_custom_imgui(
 							const auto str = augs::filename_first(target_path);
 
 							if (ImGui::MenuItem(str.c_str())) {
+								LOG_NVPS(target_path);
 								open_folder_in_new_tab(path_op(target_path));
 							}
 						}

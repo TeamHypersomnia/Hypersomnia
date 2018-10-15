@@ -26,6 +26,7 @@ summary: That which we are brainstorming at the moment.
 
 - file operations:
 	- Import intercosm from lua
+		- Checks for lua files inside a directory and loads them all
 		- Implies starting a new project or clearing history, which will anyway imply an almost clear workspace.
 			- So always start new.
 	- Export project for compatibility
