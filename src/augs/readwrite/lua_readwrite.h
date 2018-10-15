@@ -34,7 +34,7 @@ namespace augs {
 
 	template <class... T>
 	inline const char* get_variant_content_label(T&&...) {
-		return "fields";
+		return "content";
 	}
 
 	template <class T>
@@ -78,13 +78,18 @@ namespace augs {
 	}
 
 	template <class Serialized>
-	void read_lua(sol::object input_object, Serialized& into) {
+	void verify_read_lua() {
 		static_assert(
 			!is_optional_v<Serialized> && !is_maybe_v<Serialized>,
 			"std::optional and maybe can only be serialized as a member object."
 		);
 
 		static_assert(!std::is_const_v<Serialized>, "Trying to read into a const object.");
+	}
+
+	template <class Archive, class Serialized>
+	void read_lua(Archive input_object, Serialized& into) {
+		verify_read_lua<Serialized>();
 
 		if constexpr(has_lua_read_overload_v<Serialized>) {
 			static_assert(has_lua_write_overload_v<Serialized>, "Has read_object_lua overload, but no write_object_lua overload.");
@@ -92,7 +97,16 @@ namespace augs {
 			sol::table input_table = input_object;
 			read_object_lua(input_table, into);
 		}
-		else if constexpr(is_variant_v<Serialized>) {
+		else {
+			read_lua_no_overload(input_object, into);
+		}
+	}
+
+	template <class Archive, class Serialized>
+	void read_lua_no_overload(Archive input_object, Serialized& into) {
+		verify_read_lua<Serialized>();
+
+		if constexpr(is_variant_v<Serialized>) {
 			sol::table input_table = input_object;
 			ensure(input_table.is<sol::table>());
 
@@ -251,7 +265,7 @@ namespace augs {
 			}
 			else {
 				introspect(
-					[input_table](const auto& label, auto& field) {
+					[&input_table](const auto& label, auto& field) {
 						using T = remove_cref<decltype(field)>;
 
 						if constexpr(is_optional_v<T>) {
@@ -296,22 +310,6 @@ namespace augs {
 		}
 	}
 
-	/*
-		For correct overload resolution.
-		This prevents the compiler from choosing the templated, byte-wise read
-		when the archive type is sol::table - obviously.
-	*/
-
-	template <class Table, class Serialized>
-	void read_lua_table(Table input_table, Serialized& into) {
-		read_lua(sol::object(input_table), into);
-	}
-
-	template <class A, class B, class Serialized>
-	void read_lua(sol::proxy<A, B> input_proxy, Serialized& into) {
-		read_lua(sol::object(input_proxy), into);
-	}
-
 	template <class T>
 	decltype(auto) general_to_lua_value(const T& field) {
 		if constexpr(std::is_pointer_v<T>) {
@@ -337,19 +335,19 @@ namespace augs {
 	}
 	
 	template <class T, class K>
-	void write_table_or_field(sol::table output_table, const T& from, K&& key) {
+	void write_table_or_field(sol::table& output_table, const T& from, K&& key) {
 		if constexpr(representable_as_lua_value_v<T>) {
 			output_table[std::forward<K>(key)] = general_to_lua_value(from);
 		}
 		else {
 			auto new_table = output_table.create();
+			write_lua(new_table, from);
 			output_table[std::forward<K>(key)] = new_table;
-			write_lua_table(new_table, from);
 		}
 	}
 
-	template <class Table, class Serialized>
-	void write_lua_table(Table output_table, const Serialized& from) {
+	template <class Archive, class Serialized>
+	void verify_write_lua() {
 		static_assert(
 			!representable_as_lua_value_v<Serialized>, 
 			"Directly representable, but no key (label) provided! Use write_representable_field to directly serialize this object."
@@ -359,15 +357,28 @@ namespace augs {
 			!is_optional_v<Serialized> && !is_maybe_v<Serialized>,
 			"std::optional can only be serialized as a member object."
 		);
+	}
+
+	template <class Archive, class Serialized>
+	void write_lua(Archive& output_table, const Serialized& from) {
+		verify_write_lua<Archive, Serialized>();
 
 		if constexpr(has_lua_write_overload_v<Serialized>) {
 			static_assert(has_lua_read_overload_v<Serialized>, "Has write_object_lua overload, but no read_object_lua overload.");
 
 			write_object_lua(output_table, from);
 		}
-		else if constexpr(is_variant_v<Serialized>) {
+		else {
+			write_lua_no_overload(output_table, from);
+		}
+	}
+	template <class Archive, class Serialized>
+	void write_lua_no_overload(Archive& output_table, const Serialized& from) {
+		verify_write_lua<Archive, Serialized>();
+
+		if constexpr(is_variant_v<Serialized>) {
 			std::visit(
-				[&output_table](const auto& resolved){
+				[&output_table](const auto& resolved) mutable {
 					const auto variant_type_label = get_variant_type_label();
 					const auto variant_content_label = get_variant_content_label();
 					const auto this_type_name = get_type_name_strip_namespace(resolved);
@@ -452,7 +463,7 @@ namespace augs {
 		}
 		else {
 			introspect(
-				[output_table](const auto& label, const auto& field) {
+				[&output_table](const auto& label, const auto& field) {
 					using T = remove_cref<decltype(field)>;
 
 					if constexpr(is_optional_v<T>) {

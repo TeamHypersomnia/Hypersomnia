@@ -1,5 +1,3 @@
-#include <sol2/sol.hpp>
-
 #include "augs/readwrite/memory_stream.h"
 
 #include "augs/misc/randomization.h"
@@ -56,110 +54,7 @@ void cosmos::set(const cosmos_solvable_significant& new_signi) {
 	});
 }
 
-void cosmos::read_solvable_from(augs::cref_memory_stream& ss) {
-	cosmic::change_solvable_significant(*this, [&](cosmos_solvable_significant& current_signi) { 
-		augs::read_bytes(ss, current_signi);
-		return changer_callback_result::REFRESH; 
-	});
+void cosmos::reinfer_everything() {
+	common.reinfer();
+	cosmic::reinfer_solvable(*this);
 }
-
-namespace augs {
-	template <class Archive>
-	void write_object_bytes(Archive& into, const cosmos& cosm) {
-		auto& profiler = cosm.profiler;
-
-		if constexpr(can_reserve_v<Archive>) {
-			augs::byte_counter_stream counter_stream;
-
-			{
-				auto scope = measure_scope(profiler.size_calculation_pass);
-				augs::write_bytes(counter_stream, cosm.get_common_significant());
-				augs::write_bytes(counter_stream, cosm.get_solvable().significant);
-			}
-
-			auto scope = measure_scope(profiler.memory_allocation_pass);
-			
-			into.reserve(into.get_write_pos() + counter_stream.size());
-		}
-
-		{
-			auto scope = measure_scope(profiler.serialization_pass);
-			augs::write_bytes(into, cosm.get_common_significant());
-			augs::write_bytes(into, cosm.get_solvable().significant);
-		}
-	}
-
-	template <class Archive>
-	void read_object_bytes(Archive& from, cosmos& cosm) {
-		cosmic::clear(cosm);
-
-		auto& profiler = cosm.profiler;
-
-		auto scope = measure_scope(profiler.deserialization_pass);
-
-		cosm.change_common_significant([&](cosmos_common_significant& common) {
-			augs::read_bytes(from, common);
-			return changer_callback_result::DONT_REFRESH;
-		});
-
-		cosmic::change_solvable_significant(cosm, [&](cosmos_solvable_significant& significant) {
-			augs::read_bytes(from, significant);
-			return changer_callback_result::REFRESH;
-		});
-	}
-
-	template <class Archive>
-	void write_object_lua(Archive into, const cosmos& cosm) {
-		{
-			auto common_table = into.create();
-			into["common"] = common_table;
-
-			write_lua_table(common_table, cosm.get_common_significant());
-		}
-		
-		{
-			auto solvable_table = into.create();
-			into["solvable"] = solvable_table;
-
-			write_lua_table(solvable_table, cosm.get_solvable().significant);
-		}
-	}
-
-	template <class Archive>
-	void read_object_lua(Archive from, cosmos& cosm) {
-		cosmic::clear(cosm);
-
-		cosm.change_common_significant([&](cosmos_common_significant& common) {
-			auto common_table = from["common"];
-
-			if (common_table.valid()) {
-				augs::read_lua_table(common_table, common);
-			}
-
-			return changer_callback_result::DONT_REFRESH;
-		});
-
-		cosmic::change_solvable_significant(cosm, [&](cosmos_solvable_significant& significant) {
-			auto solvable_table = from["common"];
-
-			if (solvable_table.valid()) {
-				augs::read_lua_table(solvable_table, significant);
-			}
-
-			return changer_callback_result::REFRESH;
-		});
-	}
-}
-
-template void augs::write_object_bytes(augs::memory_stream&, const cosmos&);
-template void augs::read_object_bytes(augs::memory_stream&, cosmos&);
-
-template void augs::write_object_bytes(augs::ref_memory_stream&, const cosmos&);
-template void augs::read_object_bytes(augs::cref_memory_stream&, cosmos&);
-
-template void augs::write_object_bytes(std::ofstream&, const cosmos&);
-template void augs::read_object_bytes(std::ifstream&, cosmos&);
-
-template void augs::write_object_lua(sol::table, const cosmos&);
-template void augs::read_object_lua(sol::table, cosmos&);
-

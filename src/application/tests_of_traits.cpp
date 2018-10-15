@@ -206,13 +206,11 @@ struct tests_of_traits {
 	static_assert(static_cast<int>(imguicol_helper::ImGuiCol_COUNT) == static_cast<int>(ImGuiCol_COUNT));
 
 	static_assert(augs::has_byte_readwrite_overloads_v<augs::memory_stream, augs::path_type>);
-	static_assert(augs::has_byte_readwrite_overloads_v<augs::memory_stream, cosmos>);
-	static_assert(augs::has_lua_readwrite_overloads_v<cosmos>);
+	static_assert(!augs::has_byte_readwrite_overloads_v<augs::memory_stream, cosmos>);
+	static_assert(!augs::has_lua_readwrite_overloads_v<cosmos>);
 	static_assert(!augs::has_lua_readwrite_overloads_v<value_meter>);
 
-	static_assert(augs::has_byte_readwrite_overloads_v<augs::memory_stream, augs::pool<int, make_vector, unsigned>>);
 	static_assert(!augs::has_byte_readwrite_overloads_v<augs::memory_stream, value_meter>);
-	static_assert(augs::has_lua_readwrite_overloads_v<augs::pool<int, of_size<300>::make_constant_vector, unsigned>>);
 
 	static_assert(
 		sizeof(entity_id) >= sizeof(entity_guid),

@@ -3,7 +3,7 @@ image_from_commands = {
 		commands = {
 			{
 				kind = "circle_midpoint",
-				fields = {
+				content = {
 					radius = 46,
 					border_width = 1,		
 					scale_alpha = false,
@@ -16,7 +16,7 @@ image_from_commands = {
 
 			{
 				kind = "circle_midpoint",
-				fields = {
+				content = {
 					radius = 44,
 					border_width = 6,		
 					scale_alpha = false,

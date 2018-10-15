@@ -13,10 +13,6 @@
 
 #include "game/enums/processing_subjects.h"
 
-struct cosmos_loading_error : error_with_typesafe_sprintf {
-	using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
-};
-
 class cosmos {
 	template <class C, class F>
 	static void for_each_in_impl(C& self, const processing_subjects f, F callback) {
@@ -45,7 +41,6 @@ public:
 	template <class F>
 	void change_common_significant(F&& callback);
 
-	void read_solvable_from(augs::cref_memory_stream& ss); 
 	void set(const cosmos_solvable_significant& signi); 
 	si_scaling get_si() const;
 
@@ -284,6 +279,8 @@ public:
 			entry = {};
 		}
 	}
+
+	void reinfer_everything();
 };
 
 inline si_scaling cosmos::get_si() const {
@@ -296,22 +293,4 @@ inline const cosmos_common_significant& cosmos::get_common_significant() const {
 
 inline const common_assets& cosmos::get_common_assets() const {
 	return get_common_significant().assets;
-}
-
-#if READWRITE_OVERLOAD_TRAITS_INCLUDED || LUA_READWRITE_OVERLOAD_TRAITS_INCLUDED
-#error "I/O traits were included BEFORE I/O overloads, which may cause them to be omitted under some compilers."
-#endif
-
-namespace augs {
-	template <class Archive>
-	void write_object_bytes(Archive& ar, const cosmos& cosm);
-	
-	template <class Archive>
-	void read_object_bytes(Archive& ar, cosmos& cosm);
-
-	template <class Archive>
-	void write_object_lua(Archive, const cosmos& cosm);
-
-	template <class Archive>
-	void read_object_lua(Archive, cosmos& cosm);
 }

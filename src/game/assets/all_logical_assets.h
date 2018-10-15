@@ -20,9 +20,9 @@ struct all_logical_assets {
 
 	recoil_players_pool recoils;
 	physical_materials_pool physical_materials;
+	// END GEN INTROSPECTOR
 
 	std::array<all_image_offsets, MAX_IMAGES_IN_INTERCOSM> image_offsets;
-	// END GEN INTROSPECTOR
 
 	auto& get_offsets(const assets::image_id id) {
 		return image_offsets.at(id.get_cache_index());

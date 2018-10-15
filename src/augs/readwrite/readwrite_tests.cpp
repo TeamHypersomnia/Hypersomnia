@@ -1,6 +1,8 @@
 #if BUILD_UNIT_TESTS
 #include <Catch/single_include/catch2/catch.hpp>
+#include "augs/misc/pool/pool_io.hpp"
 #include "augs/misc/pool/pool.h"
+#include "augs/misc/pool/pool_allocate.h"
 #include "augs/misc/constant_size_vector.h"
 #include "augs/misc/enum/enum_array.h"
 
@@ -234,6 +236,39 @@ TEST_CASE("Lua readwrite General") {
 
 		REQUIRE(try_to_reload_with_lua(lua, mm));
 		REQUIRE(try_to_reload_with_lua(lua, v));
+
+		using P = augs::pool<T, of_size<300>::make_constant_vector, unsigned short>;
+		P pp;
+		pp.reserve(300);
+
+		pp.allocate(T());
+		pp.allocate(T());
+		pp.allocate(v);
+		pp.free(pp.allocate(T()));
+
+		const auto before = pp;
+		REQUIRE(try_to_reload_with_lua(lua, pp));
+
+		auto make_pool_bytes = [&](const auto& from) {
+			std::vector<std::byte> b;
+			auto ss = augs::ref_memory_stream(b);
+
+			from.for_each_id_and_object(
+				[&](const auto& a, const auto& b){
+					augs::write_bytes(ss, a);
+					augs::write_bytes(ss, b);
+				}
+			);
+
+			return b;
+		};
+
+		{
+			const auto ba = make_pool_bytes(before);
+			const auto bb = make_pool_bytes(pp);
+
+			REQUIRE(ba == bb);
+		}
 	}
 }
 

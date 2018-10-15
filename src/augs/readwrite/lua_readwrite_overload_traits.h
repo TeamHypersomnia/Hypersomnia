@@ -31,7 +31,7 @@ namespace augs {
 		type_list<Args...>,
 		decltype(
 			write_object_lua(
-				std::declval<sol::table>(),
+				std::declval<sol::table&>(),
 				std::declval<Args&>()...
 			),
 			void()

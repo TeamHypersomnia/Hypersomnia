@@ -66,17 +66,17 @@ namespace augs {
 	}
 
 	template <class Archive, class Serialized>
-	void read_bytes(Archive& ar, Serialized& storage) {
+	void verify_read_bytes() {
 		static_assert(is_byte_stream_v<Archive>, "Trying to read from a non-byte stream.");
 		static_assert(!std::is_const_v<Serialized>, "Trying to read bytes to a const object.");
 		static_assert(!std::is_same_v<Serialized, std::nullptr_t> && !std::is_same_v<Serialized, std::nullopt_t> , "Trying to read bytes to a null object.");
+	}
 
-		if constexpr(has_byte_read_overload_v<Archive, Serialized>) {
-			static_assert(has_byte_write_overload_v<Archive, Serialized>, "Has read_object_bytes overload, but no write_object_bytes overload.");
+	template <class Archive, class Serialized>
+	void read_bytes_no_overload(Archive& ar, Serialized& storage) {
+		verify_read_bytes<Archive, Serialized>();
 
-			read_object_bytes(ar, storage);
-		}
-		else if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
+		if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
 			detail::read_raw_bytes(ar, &storage, 1);
 		}
 		else if constexpr(is_unique_ptr_v<Serialized>) {
@@ -152,6 +152,20 @@ namespace augs {
 		}
 	}
 
+	template <class Archive, class Serialized>
+	void read_bytes(Archive& ar, Serialized& storage) {
+		verify_read_bytes<Archive, Serialized>();
+
+		if constexpr(has_byte_read_overload_v<Archive, Serialized>) {
+			static_assert(has_byte_write_overload_v<Archive, Serialized>, "Has read_object_bytes overload, but no write_object_bytes overload.");
+
+			read_object_bytes(ar, storage);
+		}
+		else {
+			read_bytes_no_overload(ar, storage);
+		}
+	}
+
 	namespace detail {
 		template <class Archive, class Serialized>
 		void write_bytes_n(
@@ -170,17 +184,18 @@ namespace augs {
 		}
 	}
 
+	
 	template <class Archive, class Serialized>
-	void write_bytes(Archive& ar, const Serialized& storage) {
+	void verify_write_bytes() {
 		static_assert(is_byte_stream_v<Archive>, "Trying to write to a non-byte stream.");
 		static_assert(!std::is_same_v<Serialized, std::nullptr_t> && !std::is_same_v<Serialized, std::nullopt_t> , "Trying to write bytes from a null object.");
+	}
 
-		if constexpr(has_byte_write_overload_v<Archive, Serialized>) {
-			static_assert(has_byte_read_overload_v<Archive, remove_cref<Serialized>&>, "Has write_object_bytes overload, but no read_object_bytes overload.");
+	template <class Archive, class Serialized>
+	void write_bytes_no_overload(Archive& ar, const Serialized& storage) {
+		verify_write_bytes<Archive, Serialized>();
 
-			write_object_bytes(ar, storage);
-		}
-		else if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
+		if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
 			detail::write_raw_bytes(ar, &storage, 1);
 		}
 		else if constexpr(is_optional_v<Serialized>) {
@@ -233,6 +248,18 @@ namespace augs {
 				},
 				storage
 			);
+		}
+	}
+
+	template <class Archive, class Serialized>
+	void write_bytes(Archive& ar, const Serialized& storage) {
+		if constexpr(has_byte_write_overload_v<Archive, Serialized>) {
+			static_assert(has_byte_read_overload_v<Archive, remove_cref<Serialized>&>, "Has write_object_bytes overload, but no read_object_bytes overload.");
+
+			write_object_bytes(ar, storage);
+		}
+		else {
+			write_bytes_no_overload(ar, storage);
 		}
 	}
 

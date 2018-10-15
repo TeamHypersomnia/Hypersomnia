@@ -73,15 +73,17 @@ void editor_folder::load_folder(const augs::path_type& from) {
 void editor_folder::load_folder(const augs::path_type& from, const augs::path_type& name) {
 	const auto paths = editor_paths(from, name);
 
+	const auto& int_path = paths.int_file;
+
 	try {
-		commanded->work.load_from_int(paths.int_file);
+		commanded->work.load_from_int(int_path);
 	}
-	catch (const intercosm_loading_error& err) {
+	catch (const std::exception& err) {
 		editor_popup p;
 
-		p.title = err.title;
-		p.details = err.details;
-		p.message = err.message;
+		p.title = "Error";
+		p.message = typesafe_sprintf("A problem occured when trying to load %x.", augs::filename_first(int_path));
+		p.details = err.what();
 
 		throw p;
 	}
@@ -215,15 +217,17 @@ void editor_folder::import_folder(sol::state& lua, const augs::path_type& from) 
 	const auto name = ::get_project_name(from);
 	const auto paths = editor_paths(from, name);
 
+	const auto& int_lua_path = paths.int_lua_file;
+
 	try {
-		commanded->work.load_from_lua({ lua, paths.int_lua_file });
+		commanded->work.load_from_lua({ lua, int_lua_path });
 	}
-	catch (const intercosm_loading_error& err) {
+	catch (const std::exception& err) {
 		editor_popup p;
 
-		p.title = err.title;
-		p.details = err.details;
-		p.message = err.message;
+		p.title = "Error";
+		p.message = typesafe_sprintf("A problem occured when trying to import %x.", augs::filename_first(int_lua_path));
+		p.details = err.what();
 
 		throw p;
 	}

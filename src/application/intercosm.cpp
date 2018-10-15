@@ -1,4 +1,6 @@
 #include "application/intercosm.h"
+#include "game/cosmos/cosmic_functions.h"
+#include "application/intercosm_io.hpp"
 
 #include "augs/templates/introspection_utils/recursive_clear.h"
 
@@ -16,6 +18,9 @@
 
 #include "augs/readwrite/lua_file.h"
 #include "augs/readwrite/byte_file.h"
+
+static_assert(!augs::is_byte_readwrite_appropriate_v<std::ifstream, all_logical_assets>);
+static_assert(augs::is_byte_readwrite_appropriate_v<std::ifstream, augs::simple_pair<int, double>>);
 
 void intercosm::clear() {
 	cosmic::clear(world);
@@ -101,55 +106,18 @@ void intercosm::save_as_lua(const intercosm_path_op op) const {
 	augs::save_as_lua_table(op.lua, *this, op.path);
 }
 
+void intercosm::post_load_state_correction() {
+	world.change_common_significant([&](cosmos_common_significant& common) {
+		viewables.update_relevant(common.logical_assets);
+
+		return changer_callback_result::DONT_REFRESH;
+	});
+
+	world.reinfer_everything();
+}
+
 void intercosm::load_from_lua(const intercosm_path_op op) {
-	const auto display_path = augs::filename_first(op.path);
-
-	try {
-		clear();
-
-		augs::load_from_lua_table(op.lua, *this, op.path);
-
-		/* TODO: Check version integrity */
-
-		version = hypersomnia_version();
-	}
-	catch (const cosmos_loading_error& err) {
-		throw intercosm_loading_error {
-			"Error",
-			typesafe_sprintf("Failed to load %x.\nFile might be corrupt.", display_path),
-			err.what()
-		};
-	}
-	catch (const augs::stream_read_error& err) {
-		throw intercosm_loading_error{
-			"Error",
-			typesafe_sprintf("Failed to load %x.\nFile might be corrupt.", display_path),
-			err.what()
-		};
-	}
-	catch (const augs::lua_deserialization_error& err) {
-		throw intercosm_loading_error {
-			"Error",
-			typesafe_sprintf("Failed to load %x.\nNot a valid lua table.", display_path),
-			err.what()
-		};
-	}
-	catch (const augs::file_open_error& err) {
-		throw intercosm_loading_error {
-			"Error",
-			typesafe_sprintf("Failed to load %x.\nFile might be missing.", display_path),
-			err.what()
-		};
-	}
-}
-
-void intercosm::to_bytes(std::vector<std::byte>& to) const {
-	return augs::to_bytes(to, *this);
-}
-
-void intercosm::from_bytes(const std::vector<std::byte>& bytes) {
-	clear();
-	augs::from_bytes(bytes, *this);
+	augs::load_from_lua_table(op.lua, *this, op.path);
 }
 
 void intercosm::save_as_int(const augs::path_type& path) const {
@@ -157,38 +125,7 @@ void intercosm::save_as_int(const augs::path_type& path) const {
 }
 
 void intercosm::load_from_int(const augs::path_type& path) {
-	const auto display_path = augs::filename_first(path);
-
-	try {
-		clear();
-
-		augs::load_from_bytes(*this, path);
-
-		/* TODO: Check version integrity */
-
-		version = hypersomnia_version();
-	}
-	catch (const cosmos_loading_error& err) {
-		throw intercosm_loading_error {
-			"Error",
-			typesafe_sprintf("Failed to load %x.\nFile might be corrupt.", display_path),
-			err.what()
-		};
-	}
-	catch (const augs::stream_read_error& err) {
-		throw intercosm_loading_error{
-			"Error",
-			typesafe_sprintf("Failed to load %x.\nFile might be corrupt.", display_path),
-			err.what()
-		};
-	}
-	catch (const augs::file_open_error& err) {
-		throw intercosm_loading_error {
-			"Error",
-			typesafe_sprintf("Failed to load %x.\nFile might be missing.", display_path),
-			err.what()
-		};
-	}
+	augs::load_from_bytes(*this, path);
 }
 
 void intercosm::update_offsets_of(const assets::image_id& id, const changer_callback_result result) {
@@ -199,3 +136,6 @@ void intercosm::update_offsets_of(const assets::image_id& id, const changer_call
 		}
 	);
 }
+
+static_assert(augs::has_byte_readwrite_overloads_v<augs::memory_stream, augs::pool<int, make_vector, unsigned>>);
+static_assert(augs::has_lua_readwrite_overloads_v<augs::pool<int, of_size<300>::make_constant_vector, unsigned>>);

@@ -16,6 +16,12 @@ namespace augs {
 	template <class Archive, class Serialized>
 	void write_bytes(Archive&, const Serialized&);
 
+	template <class Archive, class Serialized>
+	void read_bytes_no_overload(Archive&, Serialized&);
+
+	template <class Archive, class Serialized>
+	void write_bytes_no_overload(Archive&, const Serialized&);
+
 	template <class Archive, class Container, class container_size_type = unsigned>
 	void read_container_bytes(
 		Archive& ar,

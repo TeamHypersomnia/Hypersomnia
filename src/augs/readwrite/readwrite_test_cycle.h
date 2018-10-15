@@ -7,6 +7,7 @@
 #include "augs/templates/can_stream.h"
 
 const auto test_file_path = GENERATED_FILES_DIR "/test_byte_readwrite.bin";
+const auto test_lua_file_path = GENERATED_FILES_DIR "/test_lua_readwrite.lua";
 
 namespace detail {
 	enum class dummy_enum {
@@ -116,7 +117,7 @@ bool try_to_reload_with_lua(sol::state& lua, T& v) {
 		}
 	}
 
-	const auto& path = test_file_path;
+	const auto& path = test_lua_file_path;
 
 	const auto tmp = ref_or_get(v);
 

@@ -446,7 +446,7 @@ void editor_setup::perform_custom_imgui(
 						save_as(owner);
 					}
 
-					if (item_if_tabs("Export for compatibility (lua)", "")) {
+					if (item_if_tabs("(Experimental) Export for compatibility (lua)", "")) {
 						export_for_compatibility(owner);
 					}
 
@@ -1831,8 +1831,8 @@ void editor_setup::draw_mode_gui(const draw_setup_gui_input& in) {
 
 void editor_setup::ensure_handler() {
 	if (anything_opened()) {
-		player().ensure_handler(); 
-		force_autosave_now();
+		//player().ensure_handler(); 
+		//force_autosave_now();
 	}
 }
 
