@@ -2064,3 +2064,10 @@ i			- if the newly calculated target is different than last_reload_target, reset
 			- which would otherwise not be necessary
 		- though we have to share this information if we want to use shorts for communicating motion deltas
 
+- Fixing crosshair to work with different screen sizes
+	- For now the bound is hardcoded
+	- Adjust it on each motion in main
+		- In the end, review all motions and accumulate them to a single message
+			- Later handles the problem of compression
+		- accumulation shall happen later 
+

@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Context help
+	- Enums corresponding to text files
+	- Problem: arbitrarily colorized text is not supported in imgui
+
 - Melee combat
 	- Primary and secondary attacks for knives
 		- Akimbo is thus handicapped only to the primary
@@ -17,6 +21,8 @@ summary: That which we are brainstorming at the moment.
 		- so that we don't have to hold this state per each melee weapon
 
 - Allow to change the tickrate in the non-playtesting mode?
+	- This will be a session setting, really
+	- We'll just restart on re-tick
 
 - file operations:
 	- Import intercosm from lua
@@ -50,13 +56,6 @@ summary: That which we are brainstorming at the moment.
 					- thus we constrain asynchronicity as much as possible and escape it as quickly as possible
 				- those that have only "okay" can stay as they are
 
-- Fixing crosshair to work with different screen sizes
-	- For now the bound is hardcoded
-	- Adjust it on each motion in main
-		- In the end, review all motions and accumulate them to a single message
-			- Later handles the problem of compression
-		- accumulation shall happen later 
-
 - Arbitrary pasting of entities
 	- Vastly useful for importing stuff from testbed maps into existing ones
 		- Let alone between community maps
@@ -88,7 +87,10 @@ summary: That which we are brainstorming at the moment.
 - To avoid transmitting some server-decided seed for the beginning of each round (e.g. to position players around)...
 	- ...we can just derive a hash of all inputs from the previous round, or just hash entire cosmos state
 	- this way we are unpredictable about it but still deterministic
-
+	- Seed will have to be sent in the beginning anyway, along with the state
+	- Some amount of initial information will need to be transmitted anyway
+		- Like current players?
+		- Isn't this all a matter of sending the bomb mode state?
 
 - Sound should be loaded from the smallest to the biggest
 	- So that effects are loaded first
