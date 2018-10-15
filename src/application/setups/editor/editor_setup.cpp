@@ -225,29 +225,108 @@ void editor_setup::open_folder_in_new_tab(const path_operation op) {
 
 	try_to_open_new_folder(
 		[this, op](editor_folder& f) {
-			f.set_folder_path(op.lua, op.path, recent);
+			f.set_folder_path(op.path);
 
-			if (const auto warning = f.load_folder_maybe_autosave()) {
+			if (const auto warning = f.open_most_relevant_content(op.lua)) {
 				set_popup(*warning);
 			}
+
+			recent.add(op.lua, f.current_path);
 			/* f.mark_as_just_saved(); */
 		}
 	);
 }
 
-void editor_setup::save_current_folder() {
+bool editor_setup::save_current_folder() {
+	if (!anything_opened()) {
+		return false;
+	}
+
+	auto& f = folder();
+	const auto& p = f.current_path;
+
+	auto make_error = [&](const auto& what) {
+		const auto content = typesafe_sprintf(
+			"Unknown problem occured when saving the project files to:\n%x.\nTry to save the files to a safe location immediately!",
+			p
+		);
+
+		set_popup({ "Error", content, what });
+	};
+
 	try {
-		folder().save_folder();
-		folder().mark_as_just_saved();
+		std::as_const(f).save_folder();
+		f.mark_as_just_saved();
+
+		recent_message.set("Written the current project files to %x", p);
+
+		return true;
 	}
-	catch (const std::runtime_error& what) {
-		set_popup({ "Error", "Failed to save the project.\nSome serious problem has occured.", what.what() });
+	catch (const std::exception& e) {
+		make_error(e.what());
 	}
+	catch (...) {
+		make_error("Unknown exception");
+	}
+
+	return false;
 }
 
-void editor_setup::save_current_folder_to(const path_operation op) {
-	folder().set_folder_path(op.lua, op.path, recent);
-	save_current_folder();
+bool editor_setup::save_current_folder_to(const path_operation op) {
+	if (!anything_opened()) {
+		return false;
+	}
+
+	auto& f = folder();
+
+	const auto previous_path = f.current_path;
+	const bool was_untitled = f.is_untitled();
+	const auto& target_path = op.path;
+
+	f.set_folder_path(target_path);
+
+	if (save_current_folder()) {
+		if (was_untitled) {
+			augs::remove_directory(previous_path);
+		}
+
+		recent.add(op.lua, target_path);
+		return true;
+	}
+	else {
+		f.set_folder_path(previous_path);
+	}
+
+	return false;
+}
+
+void editor_setup::export_current_folder_to(const path_operation op) {
+	if (!anything_opened()) {
+		return;
+	}
+
+	const auto& p = op.path;
+
+	auto make_error = [&](const auto& what) {
+		const auto content = typesafe_sprintf(
+			"Unknown problem occured when exporting the .int and .modes files to %x.",
+			p
+		);
+
+		set_popup({ "Error", content, what });
+	};
+
+	try {
+		const auto& f = folder();
+		f.export_folder(op.lua, p);
+		recent_message.set("Exported the .int and .modes files to %x.", p);
+	}
+	catch (const std::exception& e) {
+		make_error(e.what());
+	}
+	catch (...) {
+		make_error("Unknown exception");
+	}
 }
 
 void editor_setup::fill_with_minimal_scene() {
@@ -365,6 +444,10 @@ void editor_setup::perform_custom_imgui(
 
 					if (item_if_tabs("Save as", "F12")) {
 						save_as(owner);
+					}
+
+					if (item_if_tabs("Export for compatibility (lua)", "")) {
+						export_for_compatibility(owner);
 					}
 
 					ImGui::Separator();
@@ -585,19 +668,29 @@ void editor_setup::perform_custom_imgui(
 		}
 	}
 
-	if (save_project_dialog.valid() && is_ready(save_project_dialog)) {
-		if (const auto result_path = save_project_dialog.get()) {
-			if (::is_untitled_path(*result_path)) {
-				set_popup({"Error", "Can't save to a directory with untitled projects.", ""});
+	if (anything_opened()) {
+		if (save_folder_dialog.valid() && is_ready(save_folder_dialog)) {
+			if (const auto result_path = save_folder_dialog.get()) {
+				const auto& p = *result_path;
+
+				if (::is_untitled_path(p)) {
+					set_popup({"Error", "Can't save to a directory with untitled projects.", ""});
+				}
+				else {
+					save_current_folder_to(path_op(p));
+				}
 			}
-			else {
-				const auto previous_path = folder().current_path;
-				const bool was_untitled = folder().is_untitled();
+		}
 
-				save_current_folder_to(path_op(*result_path));
+		if (export_folder_dialog.valid() && is_ready(export_folder_dialog)) {
+			if (const auto result_path = export_folder_dialog.get()) {
+				const auto& p = *result_path;
 
-				if (was_untitled) {
-					augs::remove_directory(previous_path);
+				if (::is_untitled_path(p)) {
+					set_popup({"Error", "Can't export to a directory with untitled projects.", ""});
+				}
+				else {
+					export_current_folder_to(path_op(p));
 				}
 			}
 		}
@@ -673,12 +766,25 @@ void editor_setup::save(const augs::window& owner) {
 	}
 }
 
+void editor_setup::export_for_compatibility(const augs::window& owner) {
+	if (!anything_opened() || ok_only_popup) {
+		return;
+	}
+
+	export_folder_dialog = std::async(
+		std::launch::async,
+		[&](){
+			return owner.choose_directory_dialog("Choose folder for the exported project files");
+		}
+	);
+}
+
 void editor_setup::save_as(const augs::window& owner) {
 	if (!anything_opened() || ok_only_popup) {
 		return;
 	}
 
-	save_project_dialog = std::async(
+	save_folder_dialog = std::async(
 		std::launch::async,
 		[&](){
 			return owner.choose_directory_dialog("Choose folder for project files");
@@ -1576,6 +1682,9 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 				|| try_preffix("Reapplied", pink)
 				|| try_preffix("Successfully", green)
 				|| try_preffix("Filled", green)
+				|| try_preffix("Exported", green)
+				|| try_preffix("Written", green)
+				|| try_preffix("Saved", green)
 				|| try_preffix("Altered", yellow)
 				|| try_preffix("Renamed", yellow)
 				|| try_preffix("Changed", yellow)
@@ -1619,7 +1728,7 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 				);
 			};
 
-			message_text = [&]() {
+			message_text = colored(typesafe_sprintf("#%x: ", 1 + h.get_current_revision())) + [&]() {
 				if (op.type == O::UNDO) {
 					if (h.has_next_command()) {
 						const auto preffix = colored("Undid ", orange);
@@ -1659,15 +1768,12 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 			if (considered_stamp.seconds_ago() <= cfg.show_for_ms / 1000) {
 				/* TODO: (LOW) Improve granularity to milliseconds */
 
-				const auto rev_number = colored(typesafe_sprintf("#%x: ", 1 + h.get_current_revision()));
-				const auto result_text = rev_number + message_text;
-
 				const auto ss = in.screen_size;
 				const auto rb_space = cfg.offset;
 				const auto text_padding = cfg.text_padding;
 				const auto wrapping = cfg.max_width;
 
-				const auto bbox = get_text_bbox(result_text, wrapping, false);
+				const auto bbox = get_text_bbox(message_text, wrapping, false);
 				//const auto line_h = static_cast<int>(fnt.metrics.get_height());
 				//bbox.y = std::max(bbox.y, line_h * 2);
 
@@ -1683,7 +1789,7 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 				print_stroked(
 					out,
 					text_pos,
-					result_text,
+					message_text,
 					augs::ralign_flags {},
 					black,
 					wrapping

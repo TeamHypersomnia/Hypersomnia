@@ -15,6 +15,12 @@ editor_paths::editor_paths(
 	modes_file = in_folder(".modes");
 	player_file = in_folder(".player");
 
+	int_lua_file = in_folder("int.lua");
+	modes_lua_file = in_folder("modes.lua");
+
+	default_export_path = target_folder / (project_name + "-export");
+	imported_folder_path = target_folder / (project_name + "-imported");
+
 	autosave_path = target_folder / "autosave";
 }
 

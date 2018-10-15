@@ -35,7 +35,7 @@ struct editor_folder {
 
 	/* Opened game mode definitions go here */
 
-	void set_folder_path(sol::state&, const augs::path_type&, editor_recent_paths&);
+	void set_folder_path(const augs::path_type&);
 	std::string get_display_path() const;
 	augs::path_type get_autosave_path() const;
 
@@ -45,14 +45,16 @@ struct editor_folder {
 	void save_folder(const augs::path_type& to) const;
 	void save_folder(const augs::path_type& to, const augs::path_type name) const;
 
-	std::optional<editor_warning> load_folder_maybe_autosave();
+	void export_folder(sol::state& lua, const augs::path_type& to) const;
+	void import_folder(sol::state& lua, const augs::path_type& from);
+
+	std::optional<editor_warning> open_most_relevant_content(sol::state& lua);
 
 	void load_folder();
 	void load_folder(const augs::path_type& from);
 	void load_folder(const augs::path_type& from, const augs::path_type& name);
 
 	void mark_as_just_saved();
-	bool should_autosave() const;
 	bool empty() const;
 
 	bool allow_close() const;
@@ -63,6 +65,11 @@ struct editor_folder {
 	auto make_player_advance_input(const C& with_callbacks);
 
 	entity_id get_viewed_character_id() const;
+
+	void autosave_if_needed() const;
+
+private:
+	bool should_autosave() const;
 };
 
 struct editor_last_folders {

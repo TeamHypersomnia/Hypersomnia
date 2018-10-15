@@ -36,21 +36,7 @@ void editor_autosave::save(
 	save_last_folders(lua, signi);
 
 	for (const auto& f : signi.folders) {
-		if (f.should_autosave()) {
-			auto autosave_path = f.get_autosave_path();
-			augs::create_directories(autosave_path);
-
-			try {
-				f.save_folder(autosave_path, ::get_project_name(f.current_path));
-			}
-			catch (...) {
-				/* 
-					Uhh... that would suck, 
-					but at this point the user might be forcibly closing the app,
-					so there's no reason to try to communicate failure here.
-				*/
-			}
-		}
+		f.autosave_if_needed();
 	}
 }
 
@@ -69,7 +55,7 @@ void open_last_folders(
 			try {
 				auto new_folder = editor_folder(real_path);
 
-				if (const auto warning = new_folder.load_folder_maybe_autosave()) {
+				if (const auto warning = new_folder.open_most_relevant_content(lua)) {
 					failures.push_back(*warning);
 				}
 

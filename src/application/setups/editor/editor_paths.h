@@ -56,6 +56,12 @@ struct editor_paths {
 	augs::path_type player_file;
 	augs::path_type autosave_path;
 
+	augs::path_type int_lua_file;
+	augs::path_type modes_lua_file;
+
+	augs::path_type default_export_path;
+	augs::path_type imported_folder_path;
+
 	editor_paths(
 		const augs::path_type& target_folder,
 		const std::string& project_name

@@ -138,7 +138,9 @@ class editor_setup {
 	void try_to_open_new_folder(F&& new_folder_provider);
 
 	std::future<std::optional<std::string>> open_folder_dialog;
-	std::future<std::optional<std::string>> save_project_dialog;
+	std::future<std::optional<std::string>> save_folder_dialog;
+
+	std::future<std::optional<std::string>> export_folder_dialog;
 
 	void set_popup(const editor_popup);
 	
@@ -146,8 +148,9 @@ class editor_setup {
 
 	void open_folder_in_new_tab(path_operation);
 
-	void save_current_folder();
-	void save_current_folder_to(path_operation);
+	bool save_current_folder();
+	bool save_current_folder_to(path_operation);
+	void export_current_folder_to(path_operation);
 
 	void fill_with_minimal_scene();
 	void fill_with_test_scene();
@@ -270,6 +273,7 @@ public:
 	void open(const augs::window& owner);
 	void save(const augs::window& owner);
 	void save_as(const augs::window& owner);
+	void export_for_compatibility(const augs::window& owner);
 	void undo();
 	void redo();
 
