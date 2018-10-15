@@ -204,6 +204,39 @@ TEST_CASE("Byte readwrite Pointers") {
 	readwrite_test_cycle(abcde);
 }
 
+TEST_CASE("Lua readwrite General") {
+	auto lua = augs::create_lua_state();
+	
+	using E = detail::dummy_enum;
+	augs::enum_boolset<E> bb;
+	readwrite_test_cycle(bb);
+
+	bb[E::_3] = true;
+	bb[E::_4] = true;
+
+	augs::simple_pair<int, bool> dm = { 4325, true };
+	std::vector<int> abc = { 23, 4, 523 };
+
+	REQUIRE(try_to_reload_with_lua(lua, bb));
+	REQUIRE(try_to_reload_with_lua(lua, dm));
+	REQUIRE(try_to_reload_with_lua(lua, abc));
+	REQUIRE(try_to_reload_with_lua(lua, bb));
+
+	{
+		using map_type = std::unordered_map<int, std::string>;
+		using T = std::variant<int, std::string, map_type, std::pair<std::string, int>>;
+
+		map_type mm;
+		mm[4] = "2.0";
+		mm[4287] = "455.2";
+		mm[16445] = "4.0";
+		T v = mm;
+
+		REQUIRE(try_to_reload_with_lua(lua, mm));
+		REQUIRE(try_to_reload_with_lua(lua, v));
+	}
+}
+
 TEST_CASE("Byte readwrite Variants and optionals") {
 	const auto& path = test_file_path;
 

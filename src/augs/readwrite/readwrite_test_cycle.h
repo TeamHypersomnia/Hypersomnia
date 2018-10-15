@@ -3,13 +3,14 @@
 #include "augs/misc/pool/pool_declaration.h"
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_file.h"
+#include "augs/readwrite/lua_file.h"
 #include "augs/templates/can_stream.h"
 
 const auto test_file_path = GENERATED_FILES_DIR "/test_byte_readwrite.bin";
 
 namespace detail {
 	enum class dummy_enum {
-		// GEN INTROSPECTOR enum class dummy_enum
+		// GEN INTROSPECTOR enum class detail::dummy_enum
 		INVALID,
 		_1,
 		_2,
@@ -96,6 +97,31 @@ bool try_to_reload_with_bytes(T& v) {
 	}
 
 	augs::load_from_bytes(v, path);
+	augs::remove_file(path);
+
+	if constexpr(augs::is_pool_v<T>) {
+		(void)tmp;
+		return true;
+	}
+	else {
+		return report_compare(tmp, v);
+	}
+}
+
+template <class T>
+bool try_to_reload_with_lua(sol::state& lua, T& v) {
+	if constexpr(!augs::is_pool_v<T>) {
+		if (!(v == v)) {
+			return false;
+		}
+	}
+
+	const auto& path = test_file_path;
+
+	const auto tmp = ref_or_get(v);
+
+	augs::save_as_lua_table(lua, v, path);
+	augs::load_from_lua_table(lua, v, path);
 	augs::remove_file(path);
 
 	if constexpr(augs::is_pool_v<T>) {
