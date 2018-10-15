@@ -825,6 +825,7 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 
 	static std::optional<std::string> choose_path(const augs::path_type& script_path) {
 		if (!augs::exists(script_path)) {
+			LOG("WARNING! Could not find the script file: %x.", script_path);
 			return std::nullopt;
 		}
 
@@ -853,9 +854,10 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 	}
 
 	void window::reveal_in_explorer(const augs::path_type& p) const {
-		const auto script_path = "scripts/unix/select_file.local";
+		const auto script_path = "scripts/unix/reveal_file.local";
 
 		if (!augs::exists(script_path)) {
+			LOG("WARNING! Could not find the script file: %x.", script_path);
 			return;
 		}
 
