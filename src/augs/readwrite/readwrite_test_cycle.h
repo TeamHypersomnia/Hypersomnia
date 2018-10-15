@@ -7,6 +7,19 @@
 
 const auto test_file_path = GENERATED_FILES_DIR "/test_byte_readwrite.bin";
 
+namespace detail {
+	enum class dummy_enum {
+		// GEN INTROSPECTOR enum class dummy_enum
+		INVALID,
+		_1,
+		_2,
+		_3,
+		_4,
+		COUNT
+		// END GEN INTROSPECTOR
+	};
+}
+
 template <class T>
 void report(const T& v, const T& reloaded) {
 	if constexpr(!augs::is_pool_v<T>) {

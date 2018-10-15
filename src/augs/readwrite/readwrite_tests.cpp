@@ -10,6 +10,7 @@
 #include "augs/math/vec2.h"
 #include "augs/math/transform.h"
 #include "augs/math/camera_cone.h"
+#include "augs/misc/enum/enum_boolset.h"
 
 TEST_CASE("Filesystem test") {
 	const auto& path = test_file_path;
@@ -160,6 +161,15 @@ TEST_CASE("Byte readwrite FixedContainers") {
 	readwrite_test_cycle(cc);
 	cc[19] = 489;
 	readwrite_test_cycle(cc);
+
+	using E = detail::dummy_enum;
+	augs::enum_boolset<E> bb;
+	readwrite_test_cycle(bb);
+
+	bb[E::_3] = true;
+	bb[E::_4] = true;
+
+	readwrite_test_cycle(bb);
 }
 
 TEST_CASE("Byte readwrite Optionals") {

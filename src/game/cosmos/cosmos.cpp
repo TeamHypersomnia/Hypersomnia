@@ -109,108 +109,45 @@ namespace augs {
 	}
 
 	template <class Archive>
-	void write_object_lua(Archive /* ar */, const cosmos& /* cosm */) {
-#if TODO
+	void write_object_lua(Archive into, const cosmos& cosm) {
 		{
-			auto common_table = ar.create();
-			ar["common"] = common_table;
+			auto common_table = into.create();
+			into["common"] = common_table;
 
-			write_lua(common_table, cosm.get_common_significant());
+			write_lua_table(common_table, cosm.get_common_significant());
 		}
 		
-		ensure(false);
-		// TODO: write completely separate tables per each entity type?
-
 		{
-			auto pool_meta_table = ar.create();
-			ar["pool_meta"] = pool_meta_table;
-			pool_meta_table["reserved_entities_count"] = static_cast<unsigned>(cosm.get_solvable().get_maximum_entities());
+			auto solvable_table = into.create();
+			into["solvable"] = solvable_table;
+
+			write_lua_table(solvable_table, cosm.get_solvable().significant);
 		}
-
-		auto entities_table = ar.create();
-		ar["entities"] = entities_table;
-		
-		int entity_table_counter = 1;
-
-		for (const auto& ent : cosm.get_solvable().get_entity_pool()) {
-			auto this_entity_table = entities_table.create();
-	
-			ent.for_each_component(
-				[&](const auto& comp) {
-					using component_type = remove_cref<decltype(comp)>;
-
-					const auto this_component_name = get_type_name_strip_namespace<component_type>();
-
-					auto this_component_table = this_entity_table.create();
-					this_entity_table[this_component_name] = this_component_table;
-
-					write_lua(this_component_table, comp);
-				},
-				cosm.get_solvable()
-			);
-
-			entities_table[entity_table_counter++] = this_entity_table;
-		}
-#endif
 	}
 
 	template <class Archive>
-	void read_object_lua(Archive /* ar */, cosmos& /* cosm */) {
-		//cosmic::clear(cosm);
-
-#if TODO
-
-		/* TODO: Fix it to use tuples of initial values when creating entities */
-		/* TODO: Fix it to read guids properly instead of entity ids */
-		auto refresh_when_done = augs::scope_guard([&cosm]() {
-			cosm.reinfer_solvable();
-		});
-
-		{
-			sol::object reserved_count = ar["pool_meta"]["reserved_entities_count"];
-			cosm.reserve_storage_for_entities(reserved_count.as<unsigned>());
-		}
+	void read_object_lua(Archive from, cosmos& cosm) {
+		cosmic::clear(cosm);
 
 		cosm.change_common_significant([&](cosmos_common_significant& common) {
-			read_lua(ar["common"], common);
+			auto common_table = from["common"];
+
+			if (common_table.valid()) {
+				augs::read_lua_table(common_table, common);
+			}
 
 			return changer_callback_result::DONT_REFRESH;
 		});
 
-		int entity_table_counter = 1;
-		auto entities_table = ar["entities"];
+		cosmic::change_solvable_significant(cosm, [&](cosmos_solvable_significant& significant) {
+			auto solvable_table = from["common"];
 
-		while (true) {
-			sol::table maybe_next_entity = entities_table[entity_table_counter];
-
-			if (maybe_next_entity.valid()) {
-				if (const auto new_entity = cosmic::create_entity(cosm)) {
-					for (auto key_value_pair : maybe_next_entity) {
-						const auto component_name = key_value_pair.first.as<std::string>();
-
-						for_each_component_type(
-							[&](auto c) {
-								using component_type = decltype(c);
-
-								const auto this_component_name = get_type_name_strip_namespace<component_type>();
-
-								if (this_component_name == component_name) {
-									component_type c;
-									read_lua(key_value_pair.second, c);
-									new_entity.get({}).add<component_type>(c, cosm.get_solvable());
-								}
-							}
-						);
-					}
-				}
+			if (solvable_table.valid()) {
+				augs::read_lua_table(solvable_table, significant);
 			}
-			else {
-				break;
-			};
 
-			++entity_table_counter;
-		}
-#endif
+			return changer_callback_result::REFRESH;
+		});
 	}
 }
 

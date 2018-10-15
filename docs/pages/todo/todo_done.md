@@ -2043,3 +2043,24 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Container invariant in editor?
 
+- motion_accumulator
+	- setups acquire motions and intents
+	- they hold the accumulator that spits just a single motion when we are ready to step
+		- well... what if the sensitivity changes mid-step
+			- that is a massive corner case that isn't really worth considering
+			- the only problem is that the corrections for bounds might be off
+			- but otherwise it's not a problem even during tweaks really
+	- accumulate before applying adjustments, adjust once just the single motion
+
+- Client-side adjustable crosshair sensitivity
+	- Note that we will anyway require SOME form of synchronization of client settings, like nickname
+	- **CHOSEN SOLUTION:** How about keeping floats in cosmic entropy?
+		- The writing and reading of the entropy for network comms will be **contextual**, anyway
+		- Notice that determinism won't be broken if we just change sensi during replay or recording, because the final value will always be held in entropy
+		- for now we can just keep sending floats and we'll optimize later
+		- what do we do about adjusting?
+	- Would it hurt to keep sensitivity inside the crosshair component
+		- Yes, because we'll need to synchronize not just network comms on changing a local setting, but even local plays
+			- which would otherwise not be necessary
+		- though we have to share this information if we want to use shorts for communicating motion deltas
+

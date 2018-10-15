@@ -23,6 +23,8 @@
 #include "augs/readwrite/lua_readwrite_declaration.h"
 #include "augs/readwrite/lua_readwrite_overload_traits.h"
 #include "augs/readwrite/lua_traits.h"
+#include "augs/misc/enum/enum_boolset.h"
+#include "augs/misc/enum/is_enum_boolset.h"
 
 namespace augs {
 	template <class... T>
@@ -118,7 +120,7 @@ namespace augs {
 		}
 		else {
 			sol::table input_table = input_object;
-			ensure(input_table.is<sol::table>() && "A container must be read from a table, not a value.");
+			ensure(input_table.is<sol::table>() && "This must be read from a table, not a value.");
 			
 			if constexpr(is_container_v<Serialized>) {
 				using Container = Serialized;
@@ -166,6 +168,28 @@ namespace augs {
 							read_lua(maybe_entry, into[e]);
 						}
 					});
+				}
+				else if constexpr(is_enum_boolset_v<Container>) {
+					using E = typename Container::enum_type;
+
+					into.reset();
+
+					int counter = 1;
+
+					while (true) {
+						sol::object maybe_element = input_table[counter];
+
+						if (maybe_element.valid()) {
+							E e;
+							general_from_lua_value<E>(maybe_element, e);
+							into[e] = true;
+						}
+						else {
+							break;
+						}
+
+						++counter;
+					}
 				}
 				else if constexpr(is_std_array_v<Container>) {
 					for (std::size_t i = 0; i < into.size(); ++i) {
@@ -382,6 +406,19 @@ namespace augs {
 			else if constexpr(is_enum_array_v<Container>) {
 				augs::for_each_enum_except_bounds([&](typename Container::enum_type e) {
 					write_table_or_field(output_table, from[e], general_to_lua_value(e));
+				});
+			}
+			else if constexpr(is_enum_boolset_v<Container>) {
+				using E = typename Container::enum_type;
+
+				int counter = 1;
+
+				augs::for_each_enum_except_bounds([&](const E e) {
+					if (from[e]) {
+						const auto entry_name = augs::enum_to_string(e);
+						output_table[counter] = entry_name;
+						++counter;
+					}
 				});
 			}
 			else if constexpr(is_std_array_v<Container>) {

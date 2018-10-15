@@ -83,3 +83,11 @@ summary: Just a hidden scratchpad.
 - Note: drone sound (sentience sounds overall) will be calculated exactly as the firing engine sound
 	- Sentience humming caches
 	- These don't need their playing pos synchronized
+
+- Since mouse motions will probably be the bottleneck of network communication, both coords will usually be able to be sent in one byte
+	- Range would be 0 - 16
+	- There would be a bit flag for when it exceeds the range
+		- Which will actually be often and then we might use two bytes
+			- mouse motion should never really exceed 255
+				- will also make it harder to use aimbots that instantaneously change mouse location
+
