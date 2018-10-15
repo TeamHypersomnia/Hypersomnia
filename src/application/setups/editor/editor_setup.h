@@ -281,8 +281,8 @@ public:
 	void next_tab();
 	void prev_tab();
 
-	void close_folder();
-	void close_folder(const folder_index i);
+	bool close_folder();
+	bool close_folder(const folder_index i);
 
 	void go_to_all();
 	void go_to_entity();

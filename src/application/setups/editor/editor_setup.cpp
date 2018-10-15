@@ -381,7 +381,9 @@ void editor_setup::perform_custom_imgui(
 
 					if (item_if_tabs("Close all")) {
 						while (anything_opened()) {
-							close_folder();
+							if (!close_folder()) {
+								break;
+							}
 						}
 					}
 				}
@@ -832,12 +834,12 @@ void editor_setup::prev_tab() {
 	}
 }
 
-void editor_setup::close_folder(const folder_index i) {
+bool editor_setup::close_folder(const folder_index i) {
    	auto& folder_to_close = signi.folders[i];
 
 	if (!folder_to_close.allow_close()) {
 		set_popup({ "Error", "Save your work before closing the tab.", "" });
-		return;
+		return false;
 	}
 		
 	if (folder_to_close.is_untitled()) {
@@ -852,12 +854,16 @@ void editor_setup::close_folder(const folder_index i) {
 	else {
 		signi.current_index = std::min(signi.current_index, static_cast<folder_index>(signi.folders.size() - 1));
 	}
+
+	return true;
 }
 
-void editor_setup::close_folder() {
+bool editor_setup::close_folder() {
 	if (anything_opened()) {
-		close_folder(signi.current_index);
+		return close_folder(signi.current_index);
 	}
+
+	return false;
 }
 
 
