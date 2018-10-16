@@ -7,6 +7,8 @@
 #include "game/enums/particle_layer.h"
 #include "view/viewables/particle_types.h"
 
+#include "augs/templates/per_type.h"
+
 struct particle_effect_modifier;
 
 struct particles_emission {
@@ -14,16 +16,9 @@ struct particles_emission {
 	using random_bound = augs::random_bound<float>;
 
 	template <class T>
-	using particle_definitions_container = std::vector<T>;
+	using make_particle_vector = std::vector<T>;
 
-	using tuple_of_particle_definitions_vectors = 
-		transform_types_in_list_t<
-			list_of_particle_types_t<
-				std::tuple
-			>,
-			particle_definitions_container
-		>
-	;
+	using particle_definitions_vectors = per_type_container<list_of_particle_types_t<>, make_particle_vector>;
 
 	// GEN INTROSPECTOR struct particles_emission
 	minmax spread_degrees = minmax(0.f, 0.f);
@@ -60,18 +55,18 @@ struct particles_emission {
 	bool should_particles_look_towards_velocity = true;
 	pad_bytes<1> pad;
 
-	tuple_of_particle_definitions_vectors particle_definitions;
+	particle_definitions_vectors particle_definitions;
 	particle_layer target_layer = particle_layer::ILLUMINATING_PARTICLES;
 	// END GEN INTROSPECTOR
 
 	template <class T>
 	auto& get_definitions() {
-		return std::get<particle_definitions_container<T>>(particle_definitions);
+		return particle_definitions.get_for<T>();
 	}
 
 	template <class T>
 	const auto& get_definitions() const {
-		return std::get<particle_definitions_container<T>>(particle_definitions);
+		return particle_definitions.get_for<T>();
 	}
 
 	template <class T>

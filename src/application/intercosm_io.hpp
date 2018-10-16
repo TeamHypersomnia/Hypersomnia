@@ -139,14 +139,12 @@ namespace augs {
 				const auto label = get_type_name_strip_namespace<T>();
 
 				sol::object maybe_field = archive[label];
-				LOG_NVPS(label);
 
 				const bool field_specified = maybe_field.valid();
 
 				if (field_specified) {
 					auto& container = ptc.template get_for<T>();
 					read_lua(maybe_field, container);
-					LOG_NVPS(label, container.size());
 				}
 			}
 		);

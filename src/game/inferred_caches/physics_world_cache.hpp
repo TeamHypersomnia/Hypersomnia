@@ -314,7 +314,6 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 	}
 
 	if (const auto* const sprite = handle.template find<invariants::sprite>()) {
-		LOG_NVPS(handle, sprite->image_id);
 		const auto& offsets = cosm.get_logical_assets().get_offsets(sprite->image_id);
 
 		if (const auto& shape = offsets.non_standard_shape; !shape.empty()) {
