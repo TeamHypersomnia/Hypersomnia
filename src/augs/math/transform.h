@@ -7,10 +7,17 @@
 struct b2Transform;
 
 template <class T>
+const std::string& get_type_name();
+
+template <class T>
 struct basic_transform {
 	using transform = basic_transform<T>;
 	using vec2 = basic_vec2<T>;
 	using R = real32;
+
+	static std::string get_custom_type_name() {
+		return "transform_" + get_type_name<T>();
+	}
 
 	static constexpr bool reinfer_when_tweaking = true;
 

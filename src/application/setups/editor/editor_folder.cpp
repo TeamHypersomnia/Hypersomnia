@@ -140,12 +140,22 @@ std::optional<editor_warning> editor_folder::open_most_relevant_content(sol::sta
 	const auto& real_path = current_path;
 
 	try {
-		/* Try to import the lua files first. */
 		import_folder(lua, current_path);
+		return std::nullopt;
 	}
-	catch (...) {
-		/* We don't care if it fails, then just try to load the actual binaries. */
+	catch (const augs::file_open_error& err) {
+		/* The importable files don't exist. Proceed with loading the binary files. */
 	}
+	/* catch (const std::exception& err) { */
+	/* 	ensure(false); */
+	/* 	editor_popup p; */
+
+	/* 	p.title = "Error"; */
+	/* 	p.message = typesafe_sprintf("A problem occured when trying to import %x.", augs::filename_first(real_path)); */
+	/* 	p.details = err.what(); */
+
+	/* 	throw p; */
+	/* } */
 
 	try {
 		/* First try to load from the neighbouring autosave folder. */
@@ -219,18 +229,7 @@ void editor_folder::import_folder(sol::state& lua, const augs::path_type& from) 
 
 	const auto& int_lua_path = paths.int_lua_file;
 
-	try {
-		commanded->work.load_from_lua({ lua, int_lua_path });
-	}
-	catch (const std::exception& err) {
-		editor_popup p;
-
-		p.title = "Error";
-		p.message = typesafe_sprintf("A problem occured when trying to import %x.", augs::filename_first(int_lua_path));
-		p.details = err.what();
-
-		throw p;
-	}
+	commanded->work.load_from_lua({ lua, int_lua_path });
 
 	try {
 		augs::load_from_lua_table(lua, commanded->mode_vars, paths.modes_lua_file);

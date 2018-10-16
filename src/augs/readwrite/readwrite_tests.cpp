@@ -248,6 +248,8 @@ TEST_CASE("Lua readwrite General") {
 
 		const auto before = pp;
 		REQUIRE(try_to_reload_with_lua(lua, pp));
+		REQUIRE(try_to_reload_with_lua(lua, pp));
+		REQUIRE(try_to_reload_with_lua(lua, pp));
 
 		auto make_pool_bytes = [&](const auto& from) {
 			std::vector<std::byte> b;

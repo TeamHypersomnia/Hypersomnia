@@ -2071,3 +2071,35 @@ i			- if the newly calculated target is different than last_reload_target, reset
 			- Later handles the problem of compression
 		- accumulation shall happen later 
 
+- file operations:
+	- Import intercosm from lua
+		- Checks for lua files inside a directory and loads them all
+		- Implies starting a new project or clearing history, which will anyway imply an almost clear workspace.
+			- So always start new.
+	- Export project for compatibility
+		- ``ProjectName.int.lua``
+			- Contains the intercosm and rulesets, all important things.
+	- Export mode vars
+		- ``ProjectName.modes.lua``
+	- new project
+		- opens new tab and spawns a folder in untitleds directory
+	- open folder
+		- opens a folder, loads whatever there is
+	- save project as
+		- choose existing directory
+			- ranger can do that 
+	- save project
+		- if untitled, uses save as instead
+		- same as Ctrl+S.
+		- writes all visible project files: intercosm and all rulesets visible to the editor. Purges autosave once done.
+		- if saving for the first time to a directory, editor may ask
+			- Are you sure you want to overwrite 3 file(s)
+				x/x.int
+				x/x.hyproj
+				x/autosave/x.int
+			?	
+			- (non-existent files and files with 0 size will be excluded)
+			- a different popup design will be in order
+				- after receiveing dialog's future result, set an optional pending save object
+					- thus we constrain asynchronicity as much as possible and escape it as quickly as possible
+				- those that have only "okay" can stay as they are

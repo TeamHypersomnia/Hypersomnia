@@ -35,7 +35,7 @@ enum-introspector-body-format:
 		using T = std::conditional_t<sizeof...(A) == 0, decltype(e), int>;
 
 		switch(e) {
-%x		default: return "Invalid";
+%x		default: return "UnknownEnumValue";
 		}
 	}
 

@@ -159,11 +159,25 @@ namespace dummy_nmsp {
 	struct dummy {
 
 	};
+
+	template <class T>
+	struct dummy_a {
+
+	};
+
+	template <class T>
+	struct dummy_b {
+
+	};
 }
 
 TEST_CASE("Getting type's name") {
 	REQUIRE("dummy_nmsp::dummy" == get_type_name<dummy_nmsp::dummy>());
 	REQUIRE("dummy" == get_type_name_strip_namespace<dummy_nmsp::dummy>());
+	REQUIRE("std::string" == get_type_name<std::string>());
+	REQUIRE("string" == get_type_name_strip_namespace<std::string>());
+
+	//REQUIRE("dummy_a<dummy_nmsp::dummy_b<int> >" == get_type_name_strip_namespace<dummy_nmsp::dummy_a<dummy_nmsp::dummy_b<int>>>());
 }
 
 TEST_CASE("Templates StringTemplates") {

@@ -356,7 +356,7 @@ template <class C>
 auto subscript_handle_getter(C& cosm, const unversioned_entity_id id)
 	-> basic_entity_handle<std::is_const_v<C>>
 {
-	return subscript_handle_getter(cosm, cosm.to_versioned(id));
+	return subscript_handle_getter(cosm, cosm.find_versioned(id));
 }
 
 template <class C>

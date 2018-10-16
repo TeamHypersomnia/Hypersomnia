@@ -64,6 +64,8 @@ class per_type_container {
 	}
 
 public:
+	using list_type = List;
+
 	auto size() const {
 		std::size_t total = 0;
 

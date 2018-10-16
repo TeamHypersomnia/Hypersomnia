@@ -58,6 +58,10 @@ namespace augs {
 	struct polygon {
 		using drawing_input = polygon_drawing_input;
 
+		static std::string get_custom_type_name() {
+			return "polygon";
+		}
+
 		// The texture coordinates in vertices are in the local 0.0 - 1.0 space of the texture,
 		// and are remapped to global atlas coordinates per every draw,
 		// so there is no need to exclude them from the significant state.
@@ -110,6 +114,10 @@ namespace augs {
 	>
 	struct polygon_with_id : polygon<vertex_count, index_count> {
 		static constexpr bool reinfer_when_tweaking = true;
+
+		static std::string get_custom_type_name() {
+			return "polygon_with_id";
+		}
 
 		using introspect_base = polygon<vertex_count, index_count>;
 

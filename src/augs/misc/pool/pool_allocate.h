@@ -9,17 +9,17 @@ namespace augs {
 		class... Args
 	>
 	typename pool<T, M, size_type, K...>::allocation_result pool<T, M, size_type, K...>::allocate(Args&&... args) {
-		if (full_capacity()) {
-			if constexpr(constexpr_max_size) {
-				throw std::runtime_error("This static pool cannot be further expanded.");
+		if (size_at_capacity()) {
+			if (can_still_expand()) {
+				const auto old_size = size();
+				const auto new_size = static_cast<std::size_t>(old_size) * expansion_mult + expansion_add;
+				const auto trimmed_new_size = std::min(static_cast<std::size_t>(max_size()), new_size);
+
+				ensure_greater(trimmed_new_size, old_size);
+				reserve(static_cast<size_type>(new_size));
 			}
 			else {
-				const auto old_size = size();
-				const auto new_size = std::size_t(old_size) * expansion_mult + expansion_add;
-
-				ensure(new_size <= std::numeric_limits<size_type>::max());
-
-				reserve(static_cast<size_type>(new_size));
+				throw std::runtime_error("Pool is full and cannot be further expanded!");
 			}
 		}
 
@@ -130,7 +130,7 @@ namespace augs {
 
 	template <class T, template <class> class M, class size_type, class... K>
 	auto pool<T, M, size_type, K...>::free(const unversioned_id_type key) {
-		return free(to_versioned(key));
+		return free(get_versioned(key));
 	}
 
 	template <class T, template <class> class M, class size_type, class... K>

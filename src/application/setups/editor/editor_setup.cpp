@@ -1831,8 +1831,8 @@ void editor_setup::draw_mode_gui(const draw_setup_gui_input& in) {
 
 void editor_setup::ensure_handler() {
 	if (anything_opened()) {
-		//player().ensure_handler(); 
-		//force_autosave_now();
+		player().ensure_handler(); 
+		force_autosave_now();
 	}
 }
 

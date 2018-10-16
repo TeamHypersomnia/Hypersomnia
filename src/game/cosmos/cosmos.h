@@ -231,10 +231,14 @@ public:
 		return get_solvable().get_fixed_delta();
 	}
 
-	auto to_versioned(const unversioned_entity_id& id) const {
-		return get_solvable().to_versioned(id);
+	auto get_versioned(const unversioned_entity_id& id) const {
+		return get_solvable().get_versioned(id);
 	}
 	
+	auto find_versioned(const unversioned_entity_id& id) const {
+		return get_solvable().find_versioned(id);
+	}
+
 	auto& get_logical_assets(cosmos_common_significant_access k) {
 		return get_common_significant(k).logical_assets;
 	}

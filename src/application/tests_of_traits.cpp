@@ -113,6 +113,11 @@ struct tests_of_traits {
 			auto okay5 = conditional_find_by_dynamic_id<candidates>(t, type_in_list_id<all_entity_types>(), nopt_tester);
 			static_assert(same<double, decltype(okay5)>);
 		}
+
+		augs::pool<int, of_size<300>::make_constant_vector, unsigned short> ppp;
+
+		// ERROR: "The container can hold more elements than the pool can index with size_type!"
+		// augs::pool<int, of_size<300>::make_constant_vector, unsigned char> ppp2;
 	}
 
 	/* One-shot asserts. */

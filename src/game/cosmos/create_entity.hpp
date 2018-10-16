@@ -170,7 +170,7 @@ template <class E>
 auto cosmos_solvable::allocate_new_entity(const entity_guid new_guid, const entity_creation_input in) {
 	auto& pool = significant.get_pool<E>();
 
-	if (pool.full_capacity()) {
+	if (pool.full()) {
 		throw entity_creation_error { entity_creation_error_type::POOL_FULL };
 	}
 

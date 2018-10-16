@@ -5,9 +5,9 @@
 constexpr unsigned SPACE_ATOMS_PER_UNIT = 1000;
 
 enum class slot_function {
+	// GEN INTROSPECTOR enum class slot_function
 	INVALID,
 
-	// GEN INTROSPECTOR enum class slot_function
 	PERSONAL_DEPOSIT,
 	ITEM_DEPOSIT,
 
@@ -25,8 +25,9 @@ enum class slot_function {
 	TORSO_ARMOR,
 	SHOULDER,
 	HAT,
-	// END GEN INTROSPECTOR
+
 	COUNT
+	// END GEN INTROSPECTOR
 };
 
 inline bool is_torso_attachment(const slot_function f) {

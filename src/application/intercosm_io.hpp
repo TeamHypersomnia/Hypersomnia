@@ -1,6 +1,8 @@
 #pragma once
 #include <sol2/sol.hpp>
 #include "augs/misc/pool/pool_io.hpp"
+#include "game/cosmos/per_entity_type.h"
+#include "augs/templates/for_each_type.h"
 
 #if READWRITE_OVERLOAD_TRAITS_INCLUDED || LUA_READWRITE_OVERLOAD_TRAITS_INCLUDED
 #error "I/O traits were included BEFORE I/O overloads, which may cause them to be omitted under some compilers."
@@ -82,7 +84,7 @@ namespace augs {
 		});
 
 		cosmic::change_solvable_significant(cosm, [&](cosmos_solvable_significant& significant) {
-			auto solvable_table = from["common"];
+			auto solvable_table = from["solvable"];
 
 			if (solvable_table.valid()) {
 				augs::read_lua(solvable_table, significant);
@@ -114,6 +116,40 @@ namespace augs {
 		ic.clear();
 		augs::read_lua_no_overload(table, ic);
 		ic.post_load_state_correction();
+	}
+
+	template <class Archive, class List, template <class> class Mod>
+	void write_object_lua(Archive& archive, const per_type_container<List, Mod>& ptc) {
+		for_each_type_in_list<List>(
+			[&](auto t) {
+				using T = decltype(t);
+				const auto label = get_type_name_strip_namespace<T>();
+				const auto& container = ptc.template get_for<T>();
+
+				write_table_or_field(archive, container, label);
+			}
+		);
+	}
+
+	template <class Archive, class List, template <class> class Mod>
+	void read_object_lua(Archive archive, per_type_container<List, Mod>& ptc) {
+		for_each_type_in_list<List>(
+			[&](auto t) {
+				using T = decltype(t);
+				const auto label = get_type_name_strip_namespace<T>();
+
+				sol::object maybe_field = archive[label];
+				LOG_NVPS(label);
+
+				const bool field_specified = maybe_field.valid();
+
+				if (field_specified) {
+					auto& container = ptc.template get_for<T>();
+					read_lua(maybe_field, container);
+					LOG_NVPS(label, container.size());
+				}
+			}
+		);
 	}
 }
 

@@ -80,7 +80,8 @@ public:
 
 	void set_steps_per_second(const unsigned steps_per_second);
 
-	entity_id to_versioned(const unversioned_entity_id&) const;
+	entity_id get_versioned(const unversioned_entity_id&) const;
+	entity_id find_versioned(const unversioned_entity_id&) const;
 
 	entity_id get_entity_id_by(const entity_guid&) const;
 
@@ -181,11 +182,21 @@ inline entity_id cosmos_solvable::get_entity_id_by(const entity_guid& guid) cons
 	return {};
 }
 
-inline entity_id cosmos_solvable::to_versioned(const unversioned_entity_id& id) const {
+inline entity_id cosmos_solvable::get_versioned(const unversioned_entity_id& id) const {
 	return { 
 		significant.on_pool(
 			id.type_id, 
-			[id](const auto& p){ return p.to_versioned(id.raw); }
+			[id](const auto& p){ return p.get_versioned(id.raw); }
+		), 
+		id.type_id 
+	};
+}
+
+inline entity_id cosmos_solvable::find_versioned(const unversioned_entity_id& id) const {
+	return { 
+		significant.on_pool(
+			id.type_id, 
+			[id](const auto& p){ return p.find_versioned(id.raw); }
 		), 
 		id.type_id 
 	};

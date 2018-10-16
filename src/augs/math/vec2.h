@@ -21,10 +21,17 @@ struct has_x_and_y<T, decltype(std::declval<T&>().x, std::declval<T&>().y, void(
 template <class T>
 constexpr bool has_x_and_y_v = has_x_and_y<T>::value;
 
+template <class T>
+const std::string& get_type_name();
+
 template <class type>
 struct basic_vec2 {
 	using coordinate_type = type;
 	using segment_type = std::array<basic_vec2, 2>;
+
+	static std::string get_custom_type_name() {
+		return "vec2_" + get_type_name<type>();
+	}
 
 	// GEN INTROSPECTOR struct basic_vec2 class type
 	type x = static_cast<type>(0);

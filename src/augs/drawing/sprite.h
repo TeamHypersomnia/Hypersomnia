@@ -40,6 +40,10 @@ namespace augs {
 
 		using drawing_input = sprite_drawing_input;
 
+		static std::string get_custom_type_name() {
+			return "sprite";
+		}
+
 		sprite(
 			const id_type image_id = {},
 			const size_type size = size_type(),

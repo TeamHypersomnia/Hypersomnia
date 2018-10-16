@@ -24,8 +24,12 @@ const std::string& get_type_name() {
 		else if constexpr(is_enum_array_v<T>) {
 			return get_type_name<typename T::value_type>() + '[' + get_type_name<typename T::enum_type>() + "::COUNT (" + std::to_string(is_enum_array<T>::size) + ")]";
 		}
-
-		return demangle(typeid(T).name());
+		else if constexpr(std::is_same_v<T, std::string>) {
+			return "std::string";
+		}
+		else {
+			return demangle(typeid(T).name());
+		}
 	}();
 
 	return name;
@@ -40,9 +44,19 @@ const std::string& get_type_name_strip_namespace() {
 		else {
 			auto name = get_type_name<T>();
 
-			if (const auto it = name.rfind("::");
-				it != std::string::npos
-			) {
+			while (true) {
+				const auto it = name.find("::");
+
+				if (it == std::string::npos) {
+					break;
+				}
+
+				const auto itl = name.find("<");
+
+				if (itl != std::string::npos && itl < it) {
+					break;
+				}
+
 				name = name.substr(it + 2);
 			}
 

@@ -5,6 +5,13 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Sound should be loaded from the smallest to the biggest
+	- So that effects are loaded first
+	- New synchronization
+		- store std::atomic<bool> next to sound_buffer in loaded_sounds_map
+			- set it to false whenever definition changes or it is to be loaded
+			- check if future is implemented same way
+
 - Optimize fish neighborhood calculation
 
 - Let render layers be tied to native entity types so that we don't have to dispatch each time

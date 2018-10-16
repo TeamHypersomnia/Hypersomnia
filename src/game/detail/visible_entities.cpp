@@ -80,7 +80,7 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 			camera_aabb.get_vertices<real32>(),
 			predefined_queries::renderable(),
 			[&](const b2Fixture* const fix, auto, auto) {
-				const auto owning_entity_id = cosm.to_versioned(get_entity_that_owns(fix));
+				const auto owning_entity_id = cosm.get_versioned(get_entity_that_owns(fix));
 
 				if (::passes_filter(input.filter, cosm, owning_entity_id)) {
 					register_unique(owning_entity_id);
@@ -95,7 +95,7 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 			cosm.get_si(),
 			camera,
 			[&](const b2Fixture* const fix) {
-				const auto owning_entity_id = cosm.to_versioned(get_entity_that_owns(fix));
+				const auto owning_entity_id = cosm.get_versioned(get_entity_that_owns(fix));
 				const auto handle = cosm[owning_entity_id];
 
 				handle.dispatch(
@@ -139,7 +139,7 @@ void visible_entities::acquire_non_physical(const visible_entities_query input) 
 	auto acquire_from = [&](const tree_of_npo_type type) {
 		tree_of_npo.for_each_in_camera(
 			[&](const unversioned_entity_id unversioned_id) {
-				const auto id = cosm.to_versioned(unversioned_id);
+				const auto id = cosm.get_versioned(unversioned_id);
 				
 				if (!::passes_filter(input.filter, cosm, id)) {
 					return;

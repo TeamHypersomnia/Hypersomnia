@@ -55,6 +55,14 @@ namespace augs {
 			;
 		}
 
+		bool correct_range(const unversioned_id_type key) const {
+			return 
+				/* Quickly eliminate fresh ids without fetching indirectors.size() */
+				key.indirection_index != static_cast<size_type>(-1) 
+				&& key.indirection_index < indirectors.size()
+			;
+		}
+
 		static bool versions_match(const pool_indirector_type& indirector, const key_type key) {
 			return indirector.version == key.version && indirector.real_index != static_cast<size_type>(-1);
 		}
@@ -67,12 +75,14 @@ namespace augs {
 	public:
 		pool(const size_type slot_count = 0u) {
 			if constexpr(constexpr_max_size) {
-				(void)slot_count;
-				reserve(objects.max_size());
+				static_assert(
+					object_pool_type::max_size() <= 
+					std::numeric_limits<size_type>::max() - 1,
+					"The container can hold more elements than the pool can index with size_type!"
+				);
 			}
-			else {
-				reserve(slot_count);
-			}
+
+			reserve(slot_count);
 		}
 
 		void reserve(const size_type new_capacity) {
@@ -124,14 +134,25 @@ namespace augs {
 			Args&&... removed_content
 		);
 
-		key_type to_versioned(const unversioned_id_type key) const {
+		auto get_versioned(const unversioned_id_type key) const {
 			key_type ver;
 			ver.indirection_index = key.indirection_index;
 			ver.version = indirectors[key.indirection_index].version;
 			return ver;
 		}
 
-		key_type to_id(const size_type real_object_index) const {
+		auto find_versioned(const unversioned_id_type key) const {
+			key_type ver;
+
+			if (correct_range(key)) {
+				ver.indirection_index = key.indirection_index;
+				ver.version = indirectors[key.indirection_index].version;
+			}
+
+			return ver;
+		}
+
+		auto to_id(const size_type real_object_index) const {
 			const auto& s = slots[real_object_index];
 
 			key_type id;
@@ -236,7 +257,10 @@ namespace augs {
 		}
 
 		auto max_size() const {
-			return static_cast<size_type>(objects.max_size());
+			const auto size_type_limit = static_cast<size_type>(std::numeric_limits<size_type>::max() - 1);
+			const auto container_limit = static_cast<size_type>(objects.max_size());
+
+			return std::min(size_type_limit, container_limit);
 		}
 
 		auto capacity() const {
@@ -247,12 +271,16 @@ namespace augs {
 			return size() == 0;
 		}
 
-		bool full_capacity() const {
+		bool size_at_capacity() const {
 			return size() == capacity();
 		}
 
+		bool can_still_expand() const {
+			return size() < max_size();
+		}
+
 		bool full() const {
-			return size() == max_size();
+			return size_at_capacity() && !can_still_expand();
 		}
 
 		bool indirectors_equal(const pool& b) const {

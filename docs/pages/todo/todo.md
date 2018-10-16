@@ -6,6 +6,27 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Arbitrary pasting of entities
+	- Vastly useful for importing stuff from testbed maps into existing ones
+		- Let alone between community maps
+	- This is pretty complex.
+		- If we allow pasting across workspaces, we might even have to copy actual asset files.
+	- Won't matter until after deathmatch stage
+		- Surely?
+	- The editor will have to construct the command tree, like
+		- paste_flavours + paste_entities, if no requisite flavours are found inside the project at the time of pasting
+			- the clipboard will have both the entity and flavour
+		- the editor's clipboard can actually become...
+			- paste entity flavour + paste entity command, stored, waiting to be executed!
+				- the move itself won't need to be stored
+	- Cut is just copy + delete
+
+- Allow to change the tickrate in the non-playtesting mode?
+	- This will be a session setting, really
+	- We'll just restart on re-tick
+
+- Overwrite notice in editor
+
 - conditional log macro
 
 - Always initialize the hotbar with some values if it is not yet initialized

@@ -9,26 +9,6 @@
 #endif
 
 namespace augs {
-	template <class A, class M, template <class> class C, class S, class... K>
-	void read_object_bytes(A& ar, pool<M, C, S, K...>& storage) {
-		storage.read_object_bytes(ar);
-	}
-	
-	template <class A, class M, template <class> class C, class S, class... K>
-	void write_object_bytes(A& ar, const pool<M, C, S, K...>& storage) {
-		storage.write_object_bytes(ar);
-	}
-
-	template <class A, class M, template <class> class C, class S, class... K>
-	void read_object_lua(A ar, pool<M, C, S, K...>& storage) {
-		storage.read_object_lua(ar);
-	}
-
-	template <class A, class M, template <class> class C, class S, class... K>
-	void write_object_lua(A ar, const pool<M, C, S, K...>& storage) {
-		storage.write_object_lua(ar);
-	}
-
 	template <class A, template <class> class B, class C, class... D>
 	template <class Archive>
 	void pool<A, B, C, D...>::write_object_bytes(Archive& ar) const {
@@ -110,7 +90,7 @@ namespace augs {
 			if (object_entry.valid() && meta_entry.valid()) {
 				{
 					A object;
-					read_lua(objects_table[counter], object);
+					read_lua(object_entry, object);
 					objects.emplace_back(std::move(object));
 				}
 				
@@ -122,7 +102,7 @@ namespace augs {
 
 				indirectors.resize(std::max(indirectors.size(), static_cast<std::size_t>(pointing) + 1));
 
-				indirectors[pointing].real_index = static_cast<size_type>(counter);
+				indirectors[pointing].real_index = objects.size() - 1;
 				indirectors[pointing].version = version;
 
 				using slot_type = typename P::pool_slot_type;
@@ -143,5 +123,25 @@ namespace augs {
 				free_indirectors.push_back(static_cast<size_type>(i));
 			}
 		}
+	}
+
+	template <class A, class M, template <class> class C, class S, class... K>
+	void read_object_bytes(A& ar, pool<M, C, S, K...>& storage) {
+		storage.read_object_bytes(ar);
+	}
+	
+	template <class A, class M, template <class> class C, class S, class... K>
+	void write_object_bytes(A& ar, const pool<M, C, S, K...>& storage) {
+		storage.write_object_bytes(ar);
+	}
+
+	template <class A, class M, template <class> class C, class S, class... K>
+	void read_object_lua(A ar, pool<M, C, S, K...>& storage) {
+		storage.read_object_lua(ar);
+	}
+
+	template <class A, class M, template <class> class C, class S, class... K>
+	void write_object_lua(A& ar, const pool<M, C, S, K...>& storage) {
+		storage.write_object_lua(ar);
 	}
 }

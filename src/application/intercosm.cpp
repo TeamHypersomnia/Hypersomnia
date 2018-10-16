@@ -19,6 +19,7 @@
 #include "augs/readwrite/lua_file.h"
 #include "augs/readwrite/byte_file.h"
 
+static_assert(has_introspect_base_v<const entity_solvable<const controlled_character>>);
 static_assert(!augs::is_byte_readwrite_appropriate_v<std::ifstream, all_logical_assets>);
 static_assert(augs::is_byte_readwrite_appropriate_v<std::ifstream, augs::simple_pair<int, double>>);
 
@@ -139,3 +140,4 @@ void intercosm::update_offsets_of(const assets::image_id& id, const changer_call
 
 static_assert(augs::has_byte_readwrite_overloads_v<augs::memory_stream, augs::pool<int, make_vector, unsigned>>);
 static_assert(augs::has_lua_readwrite_overloads_v<augs::pool<int, of_size<300>::make_constant_vector, unsigned>>);
+static_assert(augs::has_lua_readwrite_overloads_v<make_entity_pool<controlled_character>>);
