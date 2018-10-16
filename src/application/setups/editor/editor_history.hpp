@@ -4,7 +4,7 @@
 
 template <class T>
 const T& editor_history::execute_new(T&& command, const editor_command_input in) {
-	if (!in.allow_execution()) {
+	if (!in.allow_new_commands()) {
 		return command;
 	}
 

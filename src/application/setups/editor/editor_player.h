@@ -121,6 +121,7 @@ public:
 
 	void finish_testing(editor_command_input, finish_testing_type);
 
+	void pause();
 	void begin_recording(editor_folder&);
 	void begin_replaying(editor_folder&);
 

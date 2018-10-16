@@ -46,7 +46,9 @@ struct editor_command_input {
 	void clear_dead_entity(entity_id) const;
 	void clear_dead_entities() const;
 
-	bool allow_execution() const;
+	bool allow_new_commands() const;
+
+	static editor_command_input make_dummy_for(sol::state&, editor_folder&);
 };
 
 template <class E, class T>

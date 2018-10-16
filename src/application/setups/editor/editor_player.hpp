@@ -66,7 +66,7 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 							continue;
 						}
 						
-						PLR_LOG("Next happens at %x, now at %x, so breaking", when_happened, current_step);
+						//	PLR_LOG("Next happens at %x, now at %x, so breaking", when_happened, current_step);
 
 						break;
 					}

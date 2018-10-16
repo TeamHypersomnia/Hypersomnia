@@ -37,22 +37,13 @@ struct editor_folder {
 
 	void set_folder_path(const augs::path_type&);
 	std::string get_display_path() const;
-	augs::path_type get_autosave_path() const;
 
 	bool is_untitled() const;
 
 	void save_folder() const;
-	void save_folder(const augs::path_type& to) const;
-	void save_folder(const augs::path_type& to, const augs::path_type name) const;
-
 	void export_folder(sol::state& lua, const augs::path_type& to) const;
-	void import_folder(sol::state& lua, const augs::path_type& from);
 
 	std::optional<editor_warning> open_most_relevant_content(sol::state& lua);
-
-	void load_folder();
-	void load_folder(const augs::path_type& from);
-	void load_folder(const augs::path_type& from, const augs::path_type& name);
 
 	void mark_as_just_saved();
 	bool empty() const;
@@ -61,15 +52,22 @@ struct editor_folder {
 
 	editor_paths get_paths() const;
 
-	template <class C>
-	auto make_player_advance_input(const C& with_callbacks);
-
 	entity_id get_viewed_character_id() const;
 
 	void autosave_if_needed() const;
 
 private:
+	void import_folder(sol::state& lua, const augs::path_type& from);
+
+	void load_folder();
+	void load_folder(const augs::path_type& from);
+	void load_folder(const augs::path_type& from, const augs::path_type& name);
+
+	void save_folder(const augs::path_type& to) const;
+	void save_folder(const augs::path_type& to, const augs::path_type name) const;
+
 	bool should_autosave() const;
+	augs::path_type get_autosave_path() const;
 };
 
 struct editor_last_folders {

@@ -2103,3 +2103,9 @@ i			- if the newly calculated target is different than last_reload_target, reset
 				- after receiveing dialog's future result, set an optional pending save object
 					- thus we constrain asynchronicity as much as possible and escape it as quickly as possible
 				- those that have only "okay" can stay as they are
+
+- Determinism problem: if we re-open a project, we necessarily get freshly-inferred state
+	- We can simply re-seek, but when?
+	- On all instances of load_folder?
+		- Just make dummies for command input
+			- Shouldn't hurt

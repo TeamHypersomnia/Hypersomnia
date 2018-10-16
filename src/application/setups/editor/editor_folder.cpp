@@ -146,21 +146,33 @@ std::optional<editor_warning> editor_folder::open_most_relevant_content(sol::sta
 	catch (const augs::file_open_error& err) {
 		/* The importable files don't exist. Proceed with loading the binary files. */
 	}
-	/* catch (const std::exception& err) { */
-	/* 	ensure(false); */
-	/* 	editor_popup p; */
+	catch (const std::exception& err) {
+		ensure(false);
+		editor_popup p;
 
-	/* 	p.title = "Error"; */
-	/* 	p.message = typesafe_sprintf("A problem occured when trying to import %x.", augs::filename_first(real_path)); */
-	/* 	p.details = err.what(); */
+		p.title = "Error";
+		p.message = typesafe_sprintf("A problem occured when trying to import %x.", augs::filename_first(real_path));
+		p.details = err.what();
 
-	/* 	throw p; */
-	/* } */
+		throw p;
+	}
+
+	auto reseek_player_to_stay_deterministic = [&]() {
+		if (player.get_current_step() > 0) {
+			const auto cmd_in = editor_command_input::make_dummy_for(lua, *this);
+			const auto target_step = player.get_current_step();
+
+			player.pause();
+			player.seek_to(target_step - 1, cmd_in);
+			player.seek_to(target_step, cmd_in);
+		}
+	};
 
 	try {
 		/* First try to load from the neighbouring autosave folder. */
 		const auto autosave_path = get_autosave_path();
 		load_folder(autosave_path, ::get_project_name(real_path));
+		reseek_player_to_stay_deterministic();
 
 		if (!augs::exists(real_path)) {
 			const auto display_autosave = augs::filename_first(autosave_path);
@@ -179,6 +191,7 @@ std::optional<editor_warning> editor_folder::open_most_relevant_content(sol::sta
 		/* If no autosave folder was found, try the real path. */
 		*this = editor_folder(real_path);
 		load_folder();
+		reseek_player_to_stay_deterministic();
 		mark_as_just_saved();
 	}
 

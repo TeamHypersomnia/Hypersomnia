@@ -286,3 +286,8 @@ void editor_player::adjust_entropy(const editor_folder& folder, editor_player_en
 	}
 }
 
+void editor_player::pause() {
+	base::pause();
+
+	set_dirty();
+}

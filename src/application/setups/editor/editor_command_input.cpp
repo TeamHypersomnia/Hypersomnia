@@ -10,6 +10,7 @@
 #include "game/cosmos/entity_handle.h"
 #include "application/setups/editor/editor_player.h"
 #include "augs/templates/snapshotted_player.hpp"
+#include "application/setups/editor/gui/editor_fae_gui.h"
 
 editor_history& editor_command_input::get_history() const {
 	return folder.history;
@@ -66,6 +67,34 @@ void editor_command_input::clear_dead_entities() const {
 	selected_fae_gui.clear_dead_entities(cosm);
 }
 
-bool editor_command_input::allow_execution() const {
+bool editor_command_input::allow_new_commands() const {
 	return !folder.player.is_replaying();
+}
+
+
+editor_command_input editor_command_input::make_dummy_for(sol::state& lua, editor_folder& folder) {
+	/* Create dummies */
+	struct dummies {
+		editor_entity_mover mover;
+		editor_entity_selector selector;
+		editor_settings settings;
+		editor_fae_gui fae_gui = std::string();
+		editor_selected_fae_gui selected_fae_gui = std::string();
+	};
+
+	thread_local dummies d;
+
+	LOG_NVPS(sizeof(dummies));
+
+	d.settings.player.snapshot_interval_in_steps = 0;
+
+	return editor_command_input {
+		lua,
+		d.settings,
+		folder,
+		d.selector,
+		d.fae_gui,
+		d.selected_fae_gui,
+		d.mover
+	};
 }
