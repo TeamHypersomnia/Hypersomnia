@@ -226,7 +226,7 @@ editor_player::step_type editor_player::get_total_steps(const editor_folder& f) 
 		);
 	}();
 		
-	const auto of_entropies = base::get_current_step();
+	const auto of_entropies = base::get_total_steps();
 
 	return std::max(of_last_command, of_entropies);
 }
