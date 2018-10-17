@@ -56,7 +56,8 @@ struct bomb_mode_vars {
 	std::vector<entity_name_str> bots;
 
 	unsigned allow_spawn_after_secs_after_starting = 10;
-	unsigned max_players = 10;
+	unsigned max_players_per_team = 5;
+	unsigned max_players_total = 10;
 	unsigned round_secs = 120;
 	unsigned round_end_secs = 5;
 	unsigned freeze_secs = 5;
@@ -65,6 +66,7 @@ struct bomb_mode_vars {
 	unsigned warmup_respawn_after_ms = 2000;
 	unsigned max_rounds = 5;
 	unsigned match_summary_seconds = 15;
+	unsigned game_commencing_seconds = 3;
 	meter_value_type minimal_damage_for_assist = 41;
 	per_faction_t<bomb_mode_faction_vars> factions;
 
@@ -169,6 +171,8 @@ enum class faction_choice_result {
 	THE_SAME,
 	CHOOSING_TOO_FAST,
 	BEST_BALANCE_ALREADY,
+	TEAM_IS_FULL,
+	GAME_IS_FULL,
 	CHANGED
 	// END GEN INTROSPECTOR
 };
@@ -311,6 +315,8 @@ private:
 	void execute_player_commands(input, const mode_entropy&, logic_step);
 	void spawn_recently_added_players(input, logic_step);
 
+	void handle_game_commencing(input, logic_step);
+
 public:
 
 	// GEN INTROSPECTOR class bomb_mode
@@ -323,6 +329,9 @@ public:
 	bomb_mode_round_state current_round;
 
 	std::vector<mode_player_id> recently_added_players;
+
+	bool should_commence_when_ready = false;
+	real32 commencing_timer_ms = -1.f;
 	// END GEN INTROSPECTOR
 
 	mode_player_id add_player(input, const entity_name_str& chosen_name);

@@ -21,6 +21,7 @@ struct arena_choose_team_gui {
 		const per_faction_t<assets::image_id>& button_logos;
 		const std::vector<faction_info>& available_factions;
 		const images_in_atlas_map& images_in_atlas;
+		const faction_type current_faction;
 	};
 
 	// GEN INTROSPECTOR struct arena_choose_team_gui

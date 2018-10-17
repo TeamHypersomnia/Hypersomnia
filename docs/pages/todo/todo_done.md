@@ -2112,3 +2112,11 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Add references to lua reads accordingly
 
+- Wandering smokes decoration would be cool
+	- We have the state ready: continuous_particles
+
+- Game commencing
+	- bool should_commence
+		- set when all players in the same faction
+	- real32 game commencing timer
+

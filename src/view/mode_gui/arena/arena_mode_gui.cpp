@@ -45,7 +45,7 @@ mode_entropy arena_gui_state::perform_imgui(
 
 		using I = arena_choose_team_gui::input::faction_info;
 
-		const auto max_players_in_each = mode_input.vars.max_players / p.size();
+		const auto max_players_in_each = mode_input.vars.max_players_per_team;
 
 		std::vector<I> factions;
 
@@ -58,14 +58,19 @@ mode_entropy arena_gui_state::perform_imgui(
 		add(p.bombing);
 
 		{
-			const auto choice = choose_team.perform_imgui({
-				mode_input.vars.view.square_logos,
-				factions,
-				mode_in.images_in_atlas
-			});
+			const auto player_id = mode_in.local_player;
 
-			if (choice != std::nullopt) {
-				result_entropy.players[mode_in.local_player].team_choice = *choice;
+			if (const auto p = typed_mode.find(player_id)) {
+				const auto choice = choose_team.perform_imgui({
+					mode_input.vars.view.square_logos,
+					factions,
+					mode_in.images_in_atlas,
+					p->faction
+				});
+
+				if (choice != std::nullopt) {
+					result_entropy.players[player_id].team_choice = *choice;
+				}
 			}
 		}
 
@@ -449,6 +454,13 @@ void arena_gui_state::draw_mode_gui(
 			const auto one_fourth_t = in.screen_size.y / 6;
 			draw_indicator_at(val, one_fourth_t);
 		};
+
+		if (auto& commencing_left = typed_mode.commencing_timer_ms; commencing_left != -1.f) {
+			// const auto c = std::ceil(commencing_left);
+
+			draw_info_indicator(colored("Game Commencing!", white));
+			return;
+		}
 
 		auto draw_warmup_indicator = draw_info_indicator;
 

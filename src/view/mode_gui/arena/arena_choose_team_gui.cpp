@@ -63,28 +63,59 @@ std::optional<mode_commands::team_choice> arena_choose_team_gui::perform_imgui(c
 		if (const auto& entry = in.images_in_atlas.at(in.button_logos[f]).diffuse; entry.exists()) {
 			const auto faction_label = format_enum(f);
 
-			const bool is_full = info.num_players == info.max_players;
+			const bool is_full = info.max_players && info.num_players == info.max_players;
+			const bool is_current = f == in.current_faction;
 
 			{
 				const auto label = faction_label + "##Button";
 
 				const auto disabled_col = rgba(220, 110, 110, 70);
 
-				if (game_image_button(label, entry, is_full ? augs::imgui::colors_nha { disabled_col, disabled_col, disabled_col } : augs::imgui::colors_nha::standard())) {
-					return make_choice(f);
+				const auto color_scheme = [&]() {
+					if (is_current) {
+						return augs::imgui::colors_nha { gray, gray, gray };
+					}
+
+					if (is_full) {
+						return augs::imgui::colors_nha { disabled_col, disabled_col, disabled_col };
+					}
+					
+					return augs::imgui::colors_nha::standard();
+				}();
+
+				if (game_image_button(label, entry, color_scheme)) {
+					if (!is_full) {
+						if (is_current) {
+
+						}
+						else {
+							return make_choice(f);
+						}
+					}
 				}
 			}
 
-			const auto numbers = typesafe_sprintf("(players: %x/%x)", info.num_players, info.max_players);
+			const auto numbers = 
+				info.max_players 
+				? typesafe_sprintf("(players: %x/%x)", info.num_players, info.max_players)
+				: typesafe_sprintf("(players: %x)", info.num_players)
+			;
 
 			text_color(faction_label, is_full ? rgba(255, 255, 255, 70) : info.color);
 			ImGui::SameLine();
 
 			if (is_full) {
-				text_color(numbers + " - full", red);
+				text_color(numbers, red);
 			}
 			else {
 				text_disabled(numbers);
+			}
+
+			if (is_current) {
+				text_color("Current faction", green);
+			}
+			else if (is_full) {
+				text_color("Faction full", red);
 			}
 		}
 

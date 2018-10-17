@@ -1108,39 +1108,6 @@ bool editor_setup::handle_input_before_imgui(
 	return false;
 }
 
-void editor_setup::hide_layers_of_selected_entities() {
-	if (anything_opened()) {
-		auto& vf = view().viewing_filter;
-
-		if (vf.is_enabled) {
-			selector.clear();
-
-			auto& cosm = work().world;
-
-			for_each_selected_entity(
-				[&](const auto e) {
-					const auto l = calc_render_layer(cosm[e]);
-					vf.value.layers[l] = false;
-				}
-			);
-		}
-	}
-}
-
-void editor_setup::unhide_all_layers() {
-	if (anything_opened()) {
-		auto& vf = view().viewing_filter;
-
-		if (vf.is_enabled) {
-			selector.clear();
-
-			for (auto& f : vf.value.layers) {
-				f = true;
-			}
-		}
-	}
-}
-
 bool editor_setup::handle_input_before_game(
 	const app_ingame_intent_map& app_controls,
 	const necessary_images_in_atlas_map& sizes_for_icons,
@@ -1375,6 +1342,39 @@ bool editor_setup::handle_input_before_game(
 	}
 
 	return false;
+}
+
+void editor_setup::hide_layers_of_selected_entities() {
+	if (anything_opened()) {
+		auto& vf = view().viewing_filter;
+
+		if (vf.is_enabled) {
+			selector.clear();
+
+			auto& cosm = work().world;
+
+			for_each_selected_entity(
+				[&](const auto e) {
+					const auto l = calc_render_layer(cosm[e]);
+					vf.value.layers[l] = false;
+				}
+			);
+		}
+	}
+}
+
+void editor_setup::unhide_all_layers() {
+	if (anything_opened()) {
+		auto& vf = view().viewing_filter;
+
+		if (vf.is_enabled) {
+			selector.clear();
+
+			for (auto& f : vf.value.layers) {
+				f = true;
+			}
+		}
+	}
 }
 
 std::optional<vec2> editor_setup::find_world_cursor_pos() const {

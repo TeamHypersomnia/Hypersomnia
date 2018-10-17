@@ -6,9 +6,6 @@ permalink: roadmap
 summary: Current plans.
 ---
 
-- Editor
-	- Decorations
-		- Wandering smokes
 - Networking
 	- In the meanwhile, @Spicmir will be mapping a laboratory
 	- In the meanwhile, lua import/export functionality might become necessary

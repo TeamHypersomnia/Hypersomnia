@@ -6,22 +6,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Wandering smokes decoration would be cool
-	- We have the state ready: continuous_particles
-
-- Context help
-	- Enums corresponding to text files
-	- Problem: arbitrarily colorized text is not supported in imgui
 
 - Melee combat
+	- melee_fighter component
+		- so that we don't have to hold this state per each melee weapon
 	- Primary and secondary attacks for knives
 		- Akimbo is thus handicapped only to the primary
 			- But really it makes little sense to carry two knives
 	- A melee attack cannot be interrupted, except when a collision of two attacks occurs
 	- Attack collisions
 		- When hurt triggers of two or more players touch, they are pushed away opposite to their facing
-	- melee_fighter component
-		- so that we don't have to hold this state per each melee weapon
 
 - Simplify workflow for creating new weapons?
 	- E.g. remove the need to specify finishing traces
@@ -51,3 +45,7 @@ summary: That which we are brainstorming at the moment.
 
 - make reveal in explorer work for both files and folders
 	- cause it also works for dirs
+
+- Context help
+	- Enums corresponding to text files
+	- Problem: arbitrarily colorized text is not supported in imgui

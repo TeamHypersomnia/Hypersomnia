@@ -1136,7 +1136,29 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 				// TODO: Notify GUI about the result.
 
 				const auto result = [&]() {
+					if (previous_faction == f) {
+						return faction_choice_result::THE_SAME;
+					}
+
+					if (previous_faction == faction_type::SPECTATOR) {
+						const auto& game_limit = in.vars.max_players_per_team;
+
+						const auto num_active_players = players.size() - num_players_in(faction_type::SPECTATOR);
+
+						if (game_limit && num_active_players >= game_limit) {
+							return faction_choice_result::TEAM_IS_FULL;
+						}
+					}
+
 					if (f != faction_type::SPECTATOR) {
+						{
+							const auto& team_limit = in.vars.max_players_per_team;
+
+							if (team_limit && num_players_in(f) >= team_limit) {
+								return faction_choice_result::TEAM_IS_FULL;
+							}
+						}
+
 						/* This is a serious choice */
 						if (player_data->round_when_chosen_faction == current_round) {
 							return faction_choice_result::CHOOSING_TOO_FAST;
@@ -1218,8 +1240,47 @@ void bomb_mode::spawn_recently_added_players(const input_type in, const logic_st
 	recently_added_players.clear();
 }
 
+void bomb_mode::handle_game_commencing(const input_type in, const logic_step step) {
+	if (commencing_timer_ms != -1.f) {
+		commencing_timer_ms -= step.get_delta().in_milliseconds();
+
+		if (commencing_timer_ms <= 0.f) {
+			commencing_timer_ms = -1.f;
+			restart(in, step);
+		}
+
+		return;
+	}
+
+	const bool are_factions_ready = [&]() {
+		const auto p = calc_participating_factions(in);
+
+		bool all_ready = true;
+
+		p.for_each([&](const faction_type f) {
+			if (num_players_in(f) == 0) {
+				all_ready = false;
+			}
+		});
+
+		return all_ready;
+	}();
+
+	if (!should_commence_when_ready && !are_factions_ready) {
+		should_commence_when_ready = true;
+		return;
+	}
+
+	if (should_commence_when_ready && are_factions_ready) {
+		commencing_timer_ms = static_cast<real32>(in.vars.game_commencing_seconds * 1000);
+		should_commence_when_ready = false;
+		return;
+	}
+}
+
 void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy, const logic_step step) {
 	spawn_recently_added_players(in, step);
+	handle_game_commencing(in, step);
 
 	if (state == arena_mode_state::INIT) {
 		restart(in, step);
@@ -1634,6 +1695,7 @@ void bomb_mode::reset_players_stats(const input_type in) {
 	for (auto& it : players) {
 		auto& p = it.second;
 		p.stats = {};
+		p.round_when_chosen_faction = static_cast<unsigned>(-1);
 	}
 
 	clear_players_round_state(in);

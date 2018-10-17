@@ -43,7 +43,6 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 	/* TODO: commandize it properly!!! */
 
 	auto& folder = cmd_in.folder;
-#if TODO
 	auto& player = folder.player;
 
 	player.on_mode_with_input(
@@ -121,7 +120,6 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 			}
 		}
 	);
-#endif
 
 	ImGui::Separator();
 

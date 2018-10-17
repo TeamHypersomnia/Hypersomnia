@@ -10,8 +10,8 @@ summary: Drobny scratchpad planów
 
 W kolejności:
 
-- Dekoracje
-    - Statyczne dymki na scenie, np. z wiatraków
+- Melee combat nożem
+	- A jak ktoś wyrzuci nóż to RIP
 - Port powrotny na Windowsa
     - Zainstaluję Windows 10 i na nim spróbuję zbudować.
     - Q&A
@@ -23,8 +23,6 @@ W kolejności:
 	- Fixy do determinizmu w Box2D
 - Dalsze poprawki do gameplayu
 	- (Low prio) Dashing
-	- (Low prio) Melee combat nożem
-		- A jak ktoś wyrzuci nóż to RIP
 - Ogarnięcie od strony społecznościowej
     - Nagra się porządne podsumowanie z moim komentarzem głosowym, tak jak pierwsze dwa.
     - Wtedy gra będzie już poniekąd grywalna więc trzeba będzie:
@@ -45,6 +43,8 @@ W kolejności:
 
 ## Roadmap (odfajkowane)
 
+- Dekoracje
+    - Statyczne dymki na scenie, np. z wiatraków
 - Edytor
     - Wskrzeszenie odtwarzania rozgrywki do testów determinizmu (będzie konieczne do networkingu)
 - Bomb mode
