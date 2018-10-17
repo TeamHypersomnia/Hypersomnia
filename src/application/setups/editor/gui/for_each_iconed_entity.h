@@ -88,7 +88,7 @@ void for_each_iconed_entity(
 		});
 	});
 
-	visible.for_each<render_layer::LIGHTS>(cosm, [&](const auto handle) {
+	visible.for_each<render_layer::LIGHTS>(cosm, [&](const auto& handle) {
 		callback(
 			handle,
 			assets::necessary_image_id::EDITOR_ICON_LIGHT, 
@@ -97,7 +97,7 @@ void for_each_iconed_entity(
 		);
 	});
 
-	visible.for_each<render_layer::ILLUMINATING_WANDERING_PIXELS, render_layer::DIM_WANDERING_PIXELS>(cosm, [&](const auto handle) {
+	visible.for_each<render_layer::ILLUMINATING_WANDERING_PIXELS, render_layer::DIM_WANDERING_PIXELS>(cosm, [&](const auto& handle) {
 		callback(
 			handle,
 			assets::necessary_image_id::EDITOR_ICON_WANDERING_PIXELS, 
@@ -106,7 +106,7 @@ void for_each_iconed_entity(
 		);
 	});
 
-	visible.for_each<render_layer::CONTINUOUS_SOUNDS>(cosm, [&](const auto handle) {
+	visible.for_each<render_layer::CONTINUOUS_SOUNDS>(cosm, [&](const auto&	handle) {
 		callback(
 			handle,
 			assets::necessary_image_id::EDITOR_ICON_SOUND, 
@@ -115,10 +115,17 @@ void for_each_iconed_entity(
 		);
 	});
 
-	visible.for_each<render_layer::CONTINUOUS_PARTICLES>(cosm, [&](const auto handle) {
+	visible.for_each<render_layer::CONTINUOUS_PARTICLES>(cosm, [&](const auto& handle) {
+		const bool has_displacement = handle.template get<invariants::continuous_particles>().displacement.is_enabled;
+		const auto chosen_icon = 
+			has_displacement
+			? assets::necessary_image_id::EDITOR_ICON_SMOKE_EFFECT 
+			: assets::necessary_image_id::EDITOR_ICON_PARTICLE_SOURCE
+		;
+
 		callback(
 			handle,
-			assets::necessary_image_id::EDITOR_ICON_PARTICLE_SOURCE, 
+			chosen_icon,
 			handle.get_logic_transform(),
 			handle.template get<invariants::continuous_particles>().effect.modifier.colorize
 		);

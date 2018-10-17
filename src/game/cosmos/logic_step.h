@@ -3,6 +3,7 @@
 #include "game/cosmos/cosmic_entropy.h"
 #include "game/messages/will_soon_be_deleted.h"
 #include "game/stateless_systems/destroy_system.h"
+#include "augs/misc/randomization_declaration.h"
 
 struct data_living_one_step;
 struct cosmos_common_significant;
@@ -27,13 +28,16 @@ class basic_logic_step {
 
 public:
 	data_living_one_step_ref transient;
+	randomization& step_rng;
 
 	basic_logic_step(
 		const basic_logic_step_input<is_const> input,
-		data_living_one_step_ref transient
+		data_living_one_step_ref transient,
+		randomization& step_rng
 	) :
 		input(input),
-		transient(transient)
+		transient(transient),
+		step_rng(step_rng)
 	{}
 
 	auto& get_cosmos() const {
@@ -53,7 +57,7 @@ public:
 	}
 
 	operator const_logic_step() const {
-		return { input, transient };
+		return { input, transient, step_rng };
 	}
 	
 	bool any_deletion_occured() const {

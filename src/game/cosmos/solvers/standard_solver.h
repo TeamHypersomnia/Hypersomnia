@@ -3,6 +3,8 @@
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/data_living_one_step.h"
 #include "game/cosmos/cosmic_functions.h"
+#include "augs/misc/randomization.h"
+#include "game/cosmos/cosmos.h"
 
 #include "game/cosmos/solvers/solver_callbacks.h"
 #include "game/organization/all_messages_includes.h"
@@ -16,7 +18,8 @@ struct standard_solver {
 		C&& callbacks
 	) {
 		thread_local data_living_one_step queues;
-		const auto step = logic_step(input, queues);
+		auto step_rng = randomization(input.cosm.get_total_steps_passed());
+		const auto step = logic_step(input, queues, step_rng);
 
 		auto scope = augs::scope_guard([](){
 			queues.clear();

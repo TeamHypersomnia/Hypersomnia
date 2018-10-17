@@ -184,6 +184,17 @@ namespace test_scenes {
 			}
 		}
 
+		{
+			std::vector<transformr> wandering_smokes_transforms = {
+				{ { 22, 450 }, 0 },
+				{ { 910, 500 }, 0 }
+			};
+
+			for (const auto& s : wandering_smokes_transforms) {
+				create(test_particles_decorations::WANDERING_SMOKE, s).set_logical_size(vec2(1000, 500));
+			}
+		}
+
 		std::vector<transformr> character_transforms = {
 			{ { 0, 300 }, 0 },
 			{ { -1540, 211 }, 68 },

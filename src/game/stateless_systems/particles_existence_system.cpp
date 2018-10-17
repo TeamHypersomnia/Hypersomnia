@@ -19,6 +19,57 @@
 #include "game/messages/exploding_ring_input.h"
 
 #include "game/stateless_systems/particles_existence_system.h"
+#include "game/cosmos/for_each_entity.h"
+
+void particles_existence_system::displace_streams(const logic_step step) const {
+	auto& cosm = step.get_cosmos();
+	const auto& clk = cosm.get_clock();
+
+	auto& step_rng = step.step_rng;
+
+	cosm.for_each_having<components::continuous_particles>(
+		[&](const auto& it) {
+			const auto& cp_def = it.template get<invariants::continuous_particles>();
+			const auto& disp = cp_def.displacement;
+
+			if (!disp.is_enabled) {
+				return;
+			}
+			
+			const auto& disp_def = disp.value;
+			auto& cp = it.template get<components::continuous_particles>();
+			auto& state = cp.displacement_state;
+
+			auto& chosen_duration = state.current_duration_ms;
+
+			if (clk.is_ready(chosen_duration, state.when_last)) {
+				chosen_duration = step_rng.randval(disp_def.duration_ms);
+				state.when_last = clk.now;
+
+				auto& offset = state.current;
+
+				auto h = it.get_logical_size() / 2;
+
+				if (h.x_non_zero()) {
+					offset.x = step_rng.randval_h(h.x);
+				}
+
+				if (h.y_non_zero()) {
+					offset.y = step_rng.randval_h(h.y);
+				}
+
+				offset += step_rng.random_point_in_unit_circle<real32>() * disp_def.additional_radius;
+
+				offset.rotate(it.get_logic_transform().rotation, vec2());
+			}
+
+			if (DEBUG_DRAWING.enabled) {
+				const auto tr = it.get_logic_transform();
+				DEBUG_LOGIC_STEP_LINES.emplace_back(white, tr.pos, tr.pos + state.current);
+			}
+		}
+	);
+}
 
 void particles_existence_system::play_particles_from_events(const logic_step step) const {
 	const auto& gunshots = step.get_queue<messages::gunshot_message>();

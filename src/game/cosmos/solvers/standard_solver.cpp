@@ -128,6 +128,7 @@ void standard_solve(const logic_step step) {
 	driver_system().release_drivers_due_to_ending_contact_with_wheel(step);
 
 	particles_existence_system().play_particles_from_events(step);
+	particles_existence_system().displace_streams(step);
 	sound_existence_system().play_sounds_from_events(step);
 
 	{

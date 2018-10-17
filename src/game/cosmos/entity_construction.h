@@ -25,9 +25,15 @@ void construct_pre_inference(const handle_type h) {
 			}
 
 			if (const auto marker = h.template find<invariants::box_marker>()) {
-				s.is_enabled = true;
 				/* Set a sensible value */
+				s.is_enabled = true;
 				s.value.set(128, 128);
+			}
+
+			if (const auto particles = h.template find<invariants::continuous_particles>()) {
+				/* Set a sensible value */
+				s.is_enabled = true;
+				s.value.set(64, 64);
 			}
 		}
 	}

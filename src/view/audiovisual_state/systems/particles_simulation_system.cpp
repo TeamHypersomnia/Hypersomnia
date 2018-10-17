@@ -19,6 +19,7 @@
 
 #include "view/audiovisual_state/systems/particles_simulation_system.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
+#include "augs/templates/traits/is_nullopt.h"
 #include "game/detail/gun/firearm_engine.h"
 
 using emi_inst = particles_simulation_system::emission_instance;
@@ -458,30 +459,51 @@ void particles_simulation_system::advance_visible_streams(
 
 		for (auto& c : orbital_emissions) { 
 			const auto chase = c.chasing;
-			const auto where = find_transform(chase, cosm, interp);
-			const bool visible_in_camera = where && cam_aabb.hover(where->pos);
 
-			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
+			if (const auto where = find_transform(chase, cosm, interp)) {
+				const bool visible_in_camera = cam_aabb.hover(where->pos);
+
+				advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
+			}
 		}
 
 		for (auto& it : firearm_engine_caches) { 
 			auto& c = it.second;
 
 			const auto chase = c.chasing;
-			const auto where = find_transform(chase, cosm, interp);
-			const bool visible_in_camera = where && cam_aabb.hover(where->pos);
 
-			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
+			if (const auto where = find_transform(chase, cosm, interp)) {
+				const bool visible_in_camera = cam_aabb.hover(where->pos);
+
+				advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
+			}
 		}
 		
 		for (auto& it : continuous_particles_caches) { 
 			auto& c = it.second;
-
 			const auto chase = c.chasing;
-			const auto where = find_transform(chase, cosm, interp);
-			const bool visible_in_camera = where && cam_aabb.hover(where->pos);
 
-			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
+			if (auto where = find_transform(chase, cosm, interp)) {
+				const auto displacement = [&]() {
+					if (const auto subject = cosm[it.first]) {
+						return subject.dispatch_on_having_all_ret<components::continuous_particles>([](const auto& typed_subject) {
+							if constexpr(is_nullopt_v<decltype(typed_subject)>) {
+								return transformr();
+							}
+							else {
+								return transformr(typed_subject.template get<components::continuous_particles>().displacement_state.current, 0);
+							}
+						});
+					}
+
+					return transformr();
+				}();
+
+				*where += displacement;
+				const bool visible_in_camera = cam_aabb.hover(where->pos);
+
+				advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
+			}
 		}
 	}
 

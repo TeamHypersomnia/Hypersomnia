@@ -139,8 +139,8 @@ struct sprite_decoration {
 
 	using components = type_list<
 		components::sprite,
-		components::overridden_geo,
-		components::transform
+		components::transform,
+		components::overridden_geo
 	>;
 };
 
@@ -378,7 +378,8 @@ struct particles_decoration {
 
 	using components = type_list<
 		components::continuous_particles,
-		components::transform
+		components::transform,
+		components::overridden_geo
 	>;
 };
 

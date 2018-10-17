@@ -6,8 +6,8 @@
 
 struct stream_displacement {
 	// GEN INTROSPECTOR struct stream_displacement
-	real32 radius = 100.f;
-	augs::minmax<real32> duration_ms;
+	real32 additional_radius = 10.f;
+	augs::minmax<real32> duration_ms = augs::minmax<real32>(200.f, 2000.f);
 	// END GEN INTROSPECTOR
 };
 

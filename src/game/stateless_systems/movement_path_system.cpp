@@ -20,7 +20,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
 	const auto delta = step.get_delta();
 
-	auto rng = randomization(cosm.get_total_steps_passed());
+	auto& step_rng = step.step_rng;
 
 	auto& npo = cosm.get_solvable_inferred({}).tree_of_npo;
 
@@ -247,11 +247,11 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 					auto& next_in_ms = movement_path.next_bubble_in_ms;
 					
-					auto choose_new_interval = [&rng, &next_in_ms, &def]() {
+					auto choose_new_interval = [&step_rng, &next_in_ms, &def]() {
 						const auto interval = def.base_bubble_interval_ms;
 						const auto h = interval / 1.5f;
 
-						next_in_ms = rng.randval(interval - h, interval + h);
+						next_in_ms = step_rng.randval(interval - h, interval + h);
 					};
 
 					if (next_in_ms < 0.f) {

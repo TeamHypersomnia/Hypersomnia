@@ -245,6 +245,8 @@ enum class test_particles_decorations {
 	// GEN INTROSPECTOR enum class test_particles_decorations
 	AQUARIUM_BUBBLES,
 	FLOWER_BUBBLES,
+
+	WANDERING_SMOKE,
 	COUNT
 	// END GEN INTROSPECTOR
 };

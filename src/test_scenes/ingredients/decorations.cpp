@@ -385,5 +385,20 @@ namespace test_flavours {
 			test_scene_particle_effect_id::FLOWER_BUBBLES,
 			rgba(bubble_neon.rgb(), 255)
 		);
+
+		{
+			auto& meta = flavour_with_particles(
+				test_particles_decorations::WANDERING_SMOKE,
+				test_scene_particle_effect_id::WANDERING_SMOKE,
+				white
+			);
+
+			invariants::continuous_particles& cp = meta.template get<invariants::continuous_particles>();
+			cp.displacement.is_enabled = true;
+			auto& disp = cp.displacement.value;
+
+			disp.additional_radius = 10.f;
+			disp.duration_ms = { 200.f, 2000.f };
+		}
 	}
 }
