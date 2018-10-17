@@ -112,12 +112,13 @@ int main(const int argc, const char* const * const argv) {
 }
 
 /*
-	static is used for variables because some are huge, especially setups.
-	On the other hand, to preserve the destruction in the order of definition,
-	we must make all variables static, otherwise the huge resources marked static
-	would get destructed last, possibly causing bugs.
+	static is used for variables because some take massive amounts of space
+	which would otherwise cause a stack overflow.
+	
+	To preserve the destruction in the order of definition,
+	we must also make all other variables static to avoid bugs.
 
-	this function will also be called only once.
+	This function will also be called only once.
 */
 
 int work(const int argc, const char* const * const argv) try {
@@ -1676,7 +1677,7 @@ catch (const entity_creation_error& err) {
 
 	return EXIT_FAILURE;
 }
-/* We want the debugger to break if it is not in production */
+/* We want to know the complete stack trace if we are not in production. */
 #if IS_PRODUCTION_BUILD
 catch (const std::runtime_error& err) {
 	LOG("std::runtime_error thrown: %x", err.what());

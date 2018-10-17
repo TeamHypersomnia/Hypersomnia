@@ -72,7 +72,7 @@ namespace augs {
 	}
 
 	template <class Archive>
-	void read_object_lua(Archive from, cosmos& cosm) {
+	void read_object_lua(const Archive& from, cosmos& cosm) {
 		cosm.change_common_significant([&](cosmos_common_significant& common) {
 			auto common_table = from["common"];
 
@@ -112,7 +112,7 @@ namespace augs {
 	}
 
 	template <class Archive>
-	void read_object_lua(Archive table, intercosm& ic) {
+	void read_object_lua(const Archive& table, intercosm& ic) {
 		ic.clear();
 		augs::read_lua_no_overload(table, ic);
 		ic.post_load_state_correction();
@@ -132,7 +132,7 @@ namespace augs {
 	}
 
 	template <class Archive, class List, template <class> class Mod>
-	void read_object_lua(Archive archive, per_type_container<List, Mod>& ptc) {
+	void read_object_lua(const Archive& archive, per_type_container<List, Mod>& ptc) {
 		for_each_type_in_list<List>(
 			[&](auto t) {
 				using T = decltype(t);
@@ -161,7 +161,7 @@ template void augs::write_object_bytes(std::ofstream&, const cosmos&);
 template void augs::read_object_bytes(std::ifstream&, cosmos&);
 
 template void augs::write_object_lua(sol::table&, const cosmos&);
-template void augs::read_object_lua(sol::table, cosmos&);
+template void augs::read_object_lua(const sol::table&, cosmos&);
 
 
 template void augs::write_object_bytes(augs::memory_stream&, const intercosm&);
@@ -174,4 +174,4 @@ template void augs::write_object_bytes(std::ofstream&, const intercosm&);
 template void augs::read_object_bytes(std::ifstream&, intercosm&);
 
 template void augs::write_object_lua(sol::table&, const intercosm&);
-template void augs::read_object_lua(sol::table, intercosm&);
+template void augs::read_object_lua(const sol::table&, intercosm&);

@@ -40,10 +40,11 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 
 	thread_local std::string nickname = "Test-player";
 
-	/* TODO: commandize it properly? */
+	/* TODO: commandize it properly!!! */
 
-	auto& player = cmd_in.get_player();
 	auto& folder = cmd_in.folder;
+#if TODO
+	auto& player = folder.player;
 
 	player.on_mode_with_input(
 		folder.commanded->mode_vars.vars,
@@ -120,10 +121,11 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 			}
 		}
 	);
+#endif
 
 	ImGui::Separator();
 
-	auto& all_vars = cmd_in.folder.commanded->mode_vars;
+	auto& all_vars = folder.commanded->mode_vars;
 
 	for_each_type_in_list<all_modes>(
 		[&](auto m) {
@@ -147,7 +149,7 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 					next_columns(2);
 
 					if (node) {
-						auto& work = cmd_in.folder.commanded->work;
+						auto& work = folder.commanded->work;
 						auto& cosm = work.world;
 
 						auto in = commanding_property_editor_input {

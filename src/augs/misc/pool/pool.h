@@ -369,7 +369,7 @@ namespace augs {
 		void write_object_lua(Archive& ar) const;
 
 		template <class Archive>
-		void read_object_lua(Archive& ar);
+		void read_object_lua(const Archive& ar);
 
 		/* Synonyms for compatibility with other containers */
 

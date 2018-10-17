@@ -9,8 +9,6 @@ summary: That which we are brainstorming at the moment.
 - Wandering smokes decoration would be cool
 	- We have the state ready: continuous_particles
 
-- Add references to lua reads accordingly
-
 - Context help
 	- Enums corresponding to text files
 	- Problem: arbitrarily colorized text is not supported in imgui

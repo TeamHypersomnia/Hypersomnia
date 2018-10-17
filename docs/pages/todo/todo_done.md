@@ -2109,3 +2109,6 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- On all instances of load_folder?
 		- Just make dummies for command input
 			- Shouldn't hurt
+
+- Add references to lua reads accordingly
+

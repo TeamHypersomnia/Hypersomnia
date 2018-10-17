@@ -66,5 +66,5 @@ namespace augs {
 	void write_object_lua(Archive&, const intercosm&);
 
 	template <class Archive>
-	void read_object_lua(Archive, intercosm&);
+	void read_object_lua(const Archive&, intercosm&);
 }

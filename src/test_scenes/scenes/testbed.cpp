@@ -55,6 +55,7 @@ namespace test_scenes {
 			"kryS.",
 			"pepsik",
 			"sbk1337",
+			"0RH-",
 			"FortesQ",
 			"Spicmir",
 			"Pythagoras",

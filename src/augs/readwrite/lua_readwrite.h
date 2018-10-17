@@ -38,7 +38,7 @@ namespace augs {
 	}
 
 	template <class T>
-	void general_from_lua_value(sol::object object, T& into) {
+	void general_from_lua_value(const sol::object& object, T& into) {
 		if constexpr(std::is_pointer_v<T>) {
 			into = nullptr;
 		}
@@ -88,7 +88,7 @@ namespace augs {
 	}
 
 	template <class Archive, class Serialized>
-	void read_lua(Archive input_object, Serialized& into) {
+	void read_lua(const Archive& input_object, Serialized& into) {
 		verify_read_lua<Serialized>();
 
 		if constexpr(has_lua_read_overload_v<Serialized>) {
@@ -103,7 +103,7 @@ namespace augs {
 	}
 
 	template <class Archive, class Serialized>
-	void read_lua_no_overload(Archive input_object, Serialized& into) {
+	void read_lua_no_overload(const Archive& input_object, Serialized& into) {
 		verify_read_lua<Serialized>();
 
 		if constexpr(is_variant_v<Serialized>) {

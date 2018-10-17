@@ -69,7 +69,7 @@ namespace augs {
 
 	template <class A, template <class> class B, class C, class... D>
 	template <class Archive>
-	void pool<A, B, C, D...>::read_object_lua(Archive& from) {
+	void pool<A, B, C, D...>::read_object_lua(const Archive& from) {
 		objects.clear();
 		slots.clear();
 		indirectors.clear();
@@ -136,7 +136,7 @@ namespace augs {
 	}
 
 	template <class A, class M, template <class> class C, class S, class... K>
-	void read_object_lua(A ar, pool<M, C, S, K...>& storage) {
+	void read_object_lua(const A& ar, pool<M, C, S, K...>& storage) {
 		storage.read_object_lua(ar);
 	}
 
