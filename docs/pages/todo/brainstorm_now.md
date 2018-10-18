@@ -6,7 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-
 - Melee combat
 	- melee_fighter component
 		- so that we don't have to hold this state per each melee weapon

@@ -24,6 +24,7 @@ struct cosmos_solvable_significant;
 struct bomb_mode_faction_vars {
 	// GEN INTROSPECTOR struct bomb_mode_faction_vars
 	requested_equipment initial_eq;
+	requested_equipment warmup_initial_eq;
 	// END GEN INTROSPECTOR
 };
 
@@ -31,6 +32,7 @@ struct bomb_mode_economy_vars {
 	// GEN INTROSPECTOR struct bomb_mode_economy_vars
 	money_type initial_money = 1000;
 	money_type maximum_money = 16000;
+	money_type warmup_initial_money = 16000;
 
 	money_type losing_faction_award = 1500;
 	money_type winning_faction_award = 3250;
@@ -72,6 +74,7 @@ struct bomb_mode_vars {
 
 	constrained_entity_flavour_id<invariants::explosive> bomb_flavour;
 	bool clear_dropped_items = false;
+	bool allow_game_commencing = false;
 
 	bomb_mode_economy_vars economy;
 	arena_mode_view_vars view;

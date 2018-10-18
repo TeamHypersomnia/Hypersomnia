@@ -229,7 +229,13 @@ void bomb_mode::init_spawned(
 			}
 		}
 		else {
-			faction_vars.initial_eq.generate_for(typed_handle, step);
+			const auto& eq = 
+				state == arena_mode_state::WARMUP
+				? faction_vars.warmup_initial_eq
+				: faction_vars.initial_eq
+			;
+
+			eq.generate_for(typed_handle, step);
 		}
 
 		{
@@ -1280,7 +1286,13 @@ void bomb_mode::handle_game_commencing(const input_type in, const logic_step ste
 
 void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy, const logic_step step) {
 	spawn_recently_added_players(in, step);
-	handle_game_commencing(in, step);
+
+	if (in.vars.allow_game_commencing) {
+		handle_game_commencing(in, step);
+	}
+	else {
+		commencing_timer_ms = -1;
+	}
 
 	if (state == arena_mode_state::INIT) {
 		restart(in, step);
@@ -1657,6 +1669,10 @@ void bomb_mode::restart(const input_type in, const logic_step step) {
 
 	if (in.vars.warmup_secs > 4) {
 		state = arena_mode_state::WARMUP;
+
+		for (auto& p : players) {
+			p.second.stats.money = in.vars.economy.warmup_initial_money;
+		}
 	}
 	else {
 		state = arena_mode_state::LIVE;
