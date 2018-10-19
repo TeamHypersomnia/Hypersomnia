@@ -7,7 +7,8 @@ namespace augs {
 		// GEN INTROSPECTOR enum class augs::marks_state
 		NONE,
 		JUMPING,
-		MARKING
+		MARKING,
+		REMOVING
 		// END GEN INTROSPECTOR
 	};
 
@@ -37,5 +38,7 @@ namespace augs {
 			const event::change&,
 			const T& current
 		);
+
+		void close();
 	};
 }

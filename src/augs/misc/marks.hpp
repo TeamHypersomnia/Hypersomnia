@@ -3,6 +3,12 @@
 
 namespace augs {
 	template <class T>
+	void marks<T>::close() {
+		state = augs::marks_state::NONE;
+		eat_keys = 0;
+	}
+
+	template <class T>
 	typename marks<T>::result marks<T>::control(
 		const event::change& ch,
 		const T& current
@@ -38,13 +44,48 @@ namespace augs {
 			}
 		}
 
+		if (state == marks_state::REMOVING) {
+			if (ch.was_pressed(key::BACKSPACE)) {
+				state = marks_state::MARKING;
+				return only_fetch;
+			}
+
+			if (ch.msg == message::character) {
+				const auto code_point = ch.data.character.code_point;
+
+				if (code_point != '\'') {
+					marks.erase(code_point);
+				}
+			}
+
+			if (ch.get_key_change() != key_change::NO_CHANGE) {
+				return only_fetch;
+			}
+		}
+
 		if (state == marks_state::MARKING) {
+			if (ch.was_pressed(key::DEL)) {
+				marks.clear();
+				return only_fetch;
+			}
+
+			if (ch.was_pressed(key::BACKSPACE)) {
+				state = marks_state::REMOVING;
+				return only_fetch;
+			}
+
 			if (ch.msg == message::character) {
 				state = marks_state::NONE;
 
 				const auto code_point = ch.data.character.code_point;
 
-				marks.try_emplace(code_point, current);
+				if (code_point == '\'') {
+					previous = current;
+				}
+				else {
+					marks[code_point] = current;
+				}
+
 				eat_keys = 1;
 
 				return only_fetch;

@@ -725,6 +725,10 @@ setup_escape_result editor_setup::escape() {
 		player().pause();
 		return setup_escape_result::SWITCH_TO_GAME_GUI;
 	}
+	else if (anything_opened() && view().marks.state != augs::marks_state::NONE) {
+		view().marks.close();
+		return setup_escape_result::JUST_FETCH;
+	}
 	else if (mover.escape()) {
 		return setup_escape_result::JUST_FETCH;
 	}
@@ -1678,7 +1682,14 @@ void editor_setup::draw_marks_gui(const draw_setup_gui_input& in) {
 				return formatted_string(s, st);
 			};
 
-			auto marks_text = colored("Marks\n\n");
+			auto marks_text = colored("Marks ");
+
+			if (marks.state == augs::marks_state::REMOVING) {
+				marks_text += colored("(Removing - Backspace to stop)\n\n", red);
+			}
+			else {
+				marks_text += colored("(Backspace to start removing, Del clears)\n\n");
+			}
 
 			auto add_mark = [&](const auto& char_text, const auto& value) {
 				marks_text += colored(char_text, yellow);

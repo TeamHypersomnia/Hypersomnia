@@ -2122,3 +2122,6 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - check in editor if the saving/opening path is a valid folder?
 	- We handle write errors now
+
+- Marks in editor
+

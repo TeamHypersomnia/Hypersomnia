@@ -429,7 +429,13 @@ namespace augs {
 					LOG("Output enum: %x", int(ch.data.key.key));
 				}
 
-				character_event_emitter(press);	
+				switch (ch.data.key.key) {
+					case key::ESC: break;
+					case key::DEL: break;
+					case key::BACKSPACE: break;
+					default: character_event_emitter(press); break;
+				}
+
 				return ch;
             }
             case XCB_KEY_RELEASE: {
@@ -563,7 +569,7 @@ namespace augs {
 			return xcb_key_symbols_get_keysym(syms, keycode, 0);
 		};
 
-		auto character_event_emitter = [&](const xcb_key_press_event_t* const press){
+		auto character_event_emitter = [&](const xcb_key_press_event_t* const press) {
 			using namespace event;
 			
 			change ch;

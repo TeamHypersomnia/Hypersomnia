@@ -80,6 +80,8 @@ void editor_player::finish_testing(const editor_command_input in, const finish_t
 
 	restore_saved_state(f);
 
+	f.view.overridden_viewed = {};
+
 	base::finish();
 
 	set_dirty();
