@@ -185,6 +185,28 @@ entity_guid editor_player::lookup_character(const mode_player_id id) const {
 	);
 }
 
+template <class C>
+void editor_player::seek_to(
+	const editor_player::step_type requested_step, 
+	const player_advance_input_t<C> in
+) {
+	const auto seeked_step = std::min(requested_step, get_total_steps(in.cmd_in.folder));
+
+	if (seeked_step == get_current_step()) {
+		return;
+	}
+
+	set_dirty();
+
+	base::seek_to(
+		seeked_step,
+		make_snapshotted_advance_input(in, []() { return editor_player_entropy_type(); }),
+		make_set_snapshot(in)
+	);
+
+	in.cmd_in.clear_dead_entities();
+}
+
 void editor_player::seek_to(
 	const step_type step, 
 	const editor_command_input in
@@ -291,3 +313,8 @@ void editor_player::pause() {
 
 	set_dirty();
 }
+
+template class augs::snapshotted_player<
+	editor_player_entropy_type,
+	editor_solvable_snapshot
+>;

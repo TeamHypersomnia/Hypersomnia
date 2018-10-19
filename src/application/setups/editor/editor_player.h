@@ -108,9 +108,15 @@ private:
 
 	void reset_mode();
 
-	using base::request_steps;
+	template <class C>
+	void seek_to(
+		step_type, 
+		player_advance_input_t<C> input
+	);
 
 	void adjust_entropy(const editor_folder&, editor_player_entropy_type&, bool neg) const;
+
+	using base::request_steps;
 
 	using base::get_current_step;
 	using base::get_total_steps;
@@ -153,12 +159,6 @@ public:
 
 	step_type get_current_step() const;
 	step_type get_total_steps(const editor_folder&) const;
-
-	template <class C>
-	void seek_to(
-		step_type, 
-		player_advance_input_t<C> input
-	);
 
 	void seek_to(
 		step_type, 

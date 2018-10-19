@@ -4,6 +4,10 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Probably somehow disallow arbitrary inferring of relational cache?
+	- AFAIK the only place where we arbitrarily infer the relational cache is for motor_joint which isn't used now anyway
+	- There was some unresolved crash problem with this.
+
 - Implement recording only of mouse, so differentiate intents
 
 - GUI for the player

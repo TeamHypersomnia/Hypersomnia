@@ -11,7 +11,6 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/memory_stream.h"
 #include "application/setups/editor/editor_settings.h"
-#include "application/setups/editor/editor_player.hpp"
 
 std::string fill_with_test_scene_command::describe() const {
 	return typesafe_sprintf("Filled with %x", minimal ? "minimal test scene" : "test scene");

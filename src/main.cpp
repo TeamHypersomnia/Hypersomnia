@@ -53,6 +53,7 @@
 #include "application/main/draw_debug_details.h"
 #include "application/main/draw_debug_lines.h"
 #include "application/main/release_flags.h"
+#include "application/setups/editor/editor_player.hpp"
 
 #include "application/input/input_pass_result.h"
 

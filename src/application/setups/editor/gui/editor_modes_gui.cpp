@@ -14,8 +14,8 @@
 
 #include "application/setups/editor/property_editor/special_widgets.h"
 #include "application/setups/editor/property_editor/widgets/flavour_widget.h"
+#include "application/setups/editor/detail/on_mode_with_input.hpp"
 
-#include "application/setups/editor/editor_player.hpp"
 #include "application/setups/editor/editor_settings.h"
 
 #include "augs/readwrite/byte_readwrite.h"

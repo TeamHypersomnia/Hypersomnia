@@ -4,7 +4,7 @@
 template <class E>
 void relational_cache::specific_infer_cache_for(const E& typed_handle) {
 	/*
-		WHEN ORDER OF ITEMS IN THE CONTAINER BECOMES RELEVANT,
+		WHEN ORDER OF ITEMS IN THE CONTAINER BECOMES IMPORTANT,
 		This procedure should be fixed or otherwise the reinference might break the order of items!
 	*/
 

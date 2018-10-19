@@ -15,6 +15,7 @@
 
 #include "application/setups/editor/editor_selection_groups.h"
 #include "application/setups/editor/gui/editor_rect_select_type.h"
+#include "application/setups/editor/editor_marks.h"
 
 struct editor_folder_meta {
 	// GEN INTROSPECTOR struct editor_folder_meta
@@ -53,6 +54,7 @@ struct editor_view {
 	maybe_layer_filter viewing_filter = maybe_layer_filter(render_layer_filter::all(), true);
 
 	std::optional<camera_eye> panned_camera;
+	editor_marks marks;
 
 	mode_player_id local_player;
 	entity_id overridden_viewed;

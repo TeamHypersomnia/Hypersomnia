@@ -5,6 +5,9 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- make reveal in explorer work for both files and folders
+	- cause it also works for dirs
+
 - Automatically reload only after shooting and when an unloaded gun is wielded while there is no other thing in hands
 	- For now, players won't really care about removing magazines by hand
 		- We disregard it since it would make automatic reloading a lot harder

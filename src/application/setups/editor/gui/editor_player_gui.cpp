@@ -1,7 +1,6 @@
 #include "application/setups/editor/gui/editor_player_gui.h"
 #include "application/setups/editor/editor_player.h"
 #include "application/setups/editor/editor_command_input.h"
-#include "application/setups/editor/editor_player.hpp"
 #include "application/setups/editor/editor_folder.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/templates/chrono_templates.h"
@@ -61,7 +60,6 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 				mult = std::clamp(mult, 0.f, 1.f);
 
 				const auto target_step = player.get_total_steps(folder) * mult;
-				PLR_LOG_NVPS(mult, player.get_current_step(), player.get_total_steps(folder), target_step);
 
 				if (player.is_recording()) {
 					player.begin_replaying(folder);

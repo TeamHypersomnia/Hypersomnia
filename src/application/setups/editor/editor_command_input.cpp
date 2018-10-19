@@ -9,7 +9,6 @@
 #include "application/setups/editor/gui/editor_fae_gui.h"
 #include "game/cosmos/entity_handle.h"
 #include "application/setups/editor/editor_player.h"
-#include "augs/templates/snapshotted_player.hpp"
 #include "application/setups/editor/gui/editor_fae_gui.h"
 
 editor_history& editor_command_input::get_history() const {

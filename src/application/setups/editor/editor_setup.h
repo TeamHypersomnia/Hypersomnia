@@ -19,7 +19,6 @@
 
 #include "application/setups/setup_common.h"
 
-#include "application/setups/editor/editor_player.hpp"
 #include "application/setups/editor/editor_popup.h"
 #include "application/setups/editor/editor_significant.h"
 #include "application/setups/editor/editor_autosave.h"
@@ -401,6 +400,7 @@ public:
 
 	void draw_status_bar(const draw_setup_gui_input&);
 	void draw_recent_message(const draw_setup_gui_input&);
+	void draw_marks_gui(const draw_setup_gui_input&);
 
 	void hide_layers_of_selected_entities();
 	void unhide_all_layers();

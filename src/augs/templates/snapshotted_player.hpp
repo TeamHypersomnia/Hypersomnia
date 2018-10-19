@@ -125,6 +125,12 @@ namespace augs {
 
 		PLR_LOG("Seeking from %x to %x", current_step, seeked_step);
 
+		LOG_NVPS(snapshots.size());
+
+		for (const auto& s : snapshots) {
+			LOG_NVPS(s.first);
+		}
+
 		const auto seeked_adj_snapshot = [&]() {
 			auto it = snapshots.upper_bound(seeked_step);
 			--it;
@@ -176,15 +182,15 @@ namespace augs {
 	template <class A, class B>
 	template <class MakeSnapshot>
 	void snapshotted_player<A, B>::push_snapshot_if_needed(MakeSnapshot&& make_snapshot, const unsigned interval_in_steps) {
-		if (interval_in_steps == 0) {
-			return;
-		}
-
 		if (is_recording()) {
 			const bool is_snapshot_time = [&]() {
 				if (snapshots.empty()) {
 					ensure_eq(0, current_step);
 					return true;
+				}
+
+				if (interval_in_steps == 0) {
+					return false;
 				}
 
 				auto it = snapshots.upper_bound(current_step);

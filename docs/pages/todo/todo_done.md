@@ -2120,3 +2120,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- set when all players in the same faction
 	- real32 game commencing timer
 
+- check in editor if the saving/opening path is a valid folder?
+	- We handle write errors now

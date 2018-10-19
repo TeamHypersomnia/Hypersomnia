@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Marks in editor
+
 - Melee combat
 	- melee_fighter component
 		- so that we don't have to hold this state per each melee weapon
@@ -36,14 +38,6 @@ summary: That which we are brainstorming at the moment.
 	- Some amount of initial information will need to be transmitted anyway
 		- Like current players?
 		- Isn't this all a matter of sending the bomb mode state?
-
-- Probably somehow disallow arbitrary inferring of relational cache?
-	- There was some unresolved crash problem with this.
-
-- check in editor if the saving/opening path is a valid folder?
-
-- make reveal in explorer work for both files and folders
-	- cause it also works for dirs
 
 - Context help
 	- Enums corresponding to text files

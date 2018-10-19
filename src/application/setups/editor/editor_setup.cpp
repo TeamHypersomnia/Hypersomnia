@@ -1,3 +1,4 @@
+#include "augs/misc/marks.hpp"
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "augs/string/string_templates.h"
 #include "augs/templates/algorithm_templates.h"
@@ -14,7 +15,7 @@
 
 #include "application/config_lua_table.h"
 #include "application/setups/editor/editor_setup.hpp"
-#include "application/setups/editor/editor_player.hpp"
+#include "application/setups/editor/detail/on_mode_with_input.hpp"
 #include "application/setups/editor/editor_paths.h"
 #include "application/setups/editor/editor_camera.h"
 #include "application/setups/editor/editor_history.hpp"
@@ -1196,6 +1197,17 @@ bool editor_setup::handle_input_before_game(
 
 		if (const auto maybe_eye = find_current_camera_eye()) {
 			const auto current_eye = *maybe_eye;
+
+			if (const auto result = view().marks.control(e, current_eye); 
+				result.result != augs::marks_result_type::NONE
+			) {
+				if (result.result == augs::marks_result_type::JUMPED) {
+					view().panned_camera = result.chosen_value;
+				}
+
+				return true;
+			}
+
 			const auto world_cursor_pos = get_world_cursor_pos(current_eye);
 
 			const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
@@ -1553,6 +1565,7 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 	draw_mode_gui(in);
 	draw_status_bar(in);
 	draw_recent_message(in);
+	draw_marks_gui(in);
 }
 
 void editor_setup::draw_status_bar(const draw_setup_gui_input& in) {
@@ -1647,6 +1660,69 @@ void editor_setup::draw_status_bar(const draw_setup_gui_input& in) {
 		}
 	}
 
+}
+
+#include "3rdparty/sol2/sol/unicode.hpp"
+
+void editor_setup::draw_marks_gui(const draw_setup_gui_input& in) {
+	if (anything_opened() && is_editing_mode()) {
+		const auto& marks = view().marks;
+
+		if (marks.state != augs::marks_state::NONE) {
+			using namespace augs::gui::text;
+
+			const auto& fnt = in.gui_fonts.gui;
+
+			auto colored = [&](const auto& s, const rgba col = white) {
+				const auto st = style(fnt, col);
+				return formatted_string(s, st);
+			};
+
+			auto marks_text = colored("Marks\n\n");
+
+			auto add_mark = [&](const auto& char_text, const auto& value) {
+				marks_text += colored(char_text, yellow);
+				marks_text += colored(typesafe_sprintf("     x: %x, y: %x, zoom: %x\n", value.transform.pos.x, value.transform.pos.y, value.zoom));
+			};
+
+			add_mark("'", marks.previous);
+
+			for (const auto& m : marks.marks) {
+				const auto& code_point = m.first;
+				const auto utf8 = sol::unicode::code_point_to_utf8(code_point);
+
+				auto char_text = std::string();
+
+				for (std::size_t i = 0; i < utf8.code_units_size; ++i) {
+					char_text += utf8.code_units[i];
+				}
+
+				add_mark(char_text, m.second);
+			}
+
+			const auto bbox = get_text_bbox(marks_text);
+
+			const auto ss = in.screen_size;
+			const auto& cfg = settings.action_indicator;
+
+			const auto text_padding = cfg.text_padding;
+
+			const auto& out = in.drawer;
+
+			const auto rect_pos = ss / 2 - bbox / 2 - text_padding * 2;
+			const auto text_pos = rect_pos + text_padding;
+			const auto rect_size = bbox + text_padding * 2;
+			const auto rect = xywh(rect_pos, rect_size);
+
+			out.aabb_with_border(rect, cfg.bg_color, cfg.bg_border_color);
+
+			print_stroked(
+				out,
+				text_pos,
+				marks_text
+			);
+		}
+	}
 }
 
 void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
@@ -1915,3 +1991,5 @@ editor_view_ids& editor_setup::view_ids() {
 const editor_view_ids& editor_setup::view_ids() const {
 	return folder().commanded->view_ids;
 }
+
+template struct augs::marks<camera_eye>;
