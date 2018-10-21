@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Stop the whoosh sound on obstacle hit
+- Apply shake and impact of the damage, always mult cooldown by two
+
 - Melee combat
 	- melee_fighter component
 		- so that we don't have to hold this state per each melee weapon

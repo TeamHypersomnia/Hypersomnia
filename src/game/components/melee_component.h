@@ -29,12 +29,6 @@ struct melee_clash_def {
 	// GEN INTROSPECTOR struct melee_clash_def
 	sound_effect_input sound;
 	particle_effect_input particles;
-
-	sentience_shake victim_shake = { 200.f, 1.f };
-	sentience_shake subject_shake = { 200.f, 1.f };
-
-	real32 subject_impulse = 100.f;
-	real32 victim_impulse = 100.f;
 	// END GEN INTROSPECTOR
 };
 

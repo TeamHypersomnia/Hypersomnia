@@ -56,9 +56,6 @@ namespace test_flavours {
 					{
 						auto& clash = a.clash;
 
-						clash.victim_shake *= 0.5f;
-						clash.subject_shake *= 0.5f;
-
 						clash.sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_CLASH);
 						clash.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_CLASH);
 					}
@@ -84,8 +81,6 @@ namespace test_flavours {
 
 					{
 						auto& clash = a.clash;
-
-						clash.subject_shake *= 2.0f;
 
 						clash.sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_CLASH);
 						clash.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_CLASH);

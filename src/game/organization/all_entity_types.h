@@ -123,7 +123,9 @@ struct melee_weapon {
 		components::melee,
 		components::item,
 		components::rigid_body,
-		components::interpolation
+		components::interpolation,
+
+		components::sender
 	>;
 };
 
