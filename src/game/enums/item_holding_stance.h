@@ -6,6 +6,8 @@ enum class item_holding_stance {
 	PISTOL_LIKE,
 	RIFLE_LIKE,
 	HEAVY_LIKE,
+	KNIFE_LIKE,
+	SWORD_LIKE,
 
 	AKIMBO,
 

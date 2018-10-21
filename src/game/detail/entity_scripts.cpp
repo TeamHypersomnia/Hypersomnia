@@ -27,12 +27,12 @@ void unset_input_flags_of_orphaned_entity(entity_handle e) {
 		movement->reset_movement_flags();
 	}
 
-	if (auto* const gun = e.find<components::gun>()) {
-		gun->is_trigger_pressed = false;
+	if (auto* const melee_fighter = e.find<components::melee_fighter>()) {
+		melee->reset_flags();
 	}
 
-	if (auto* const melee = e.find<components::melee>()) {
-		melee->reset_weapon(e);
+	if (auto* const gun = e.find<components::gun>()) {
+		gun->is_trigger_pressed = false;
 	}
 
 	if (auto* const hand_fuse = e.find<components::hand_fuse>()) {

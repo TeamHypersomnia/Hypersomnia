@@ -1,5 +1,5 @@
 #pragma once
-#include "game/enums/melee_state.h"
+#include "game/enums/melee_fighter_state.h"
 #include "game/cosmos/entity_handle_declaration.h"
 
 class cosmos;

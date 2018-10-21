@@ -148,15 +148,15 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 				it.subject = callee;
 				continue;
 			}
-			else if (callee_handle.has<components::melee>()) {
+			else if (callee_handle.has<invariants::melee>()) {
 				if (it.intent == game_intent_type::CROSSHAIR_PRIMARY_ACTION) {
 					it.intent = game_intent_type::MELEE_PRIMARY_MOVE;
 				}
+
 				else if (it.intent == game_intent_type::CROSSHAIR_SECONDARY_ACTION) {
 					it.intent = game_intent_type::MELEE_SECONDARY_MOVE;
 				}
 
-				it.subject = callee;
 				continue;
 			}
 			else {

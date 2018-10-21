@@ -84,38 +84,43 @@ frame_and_flip<T> get_frame_and_flip(
 	};
 }
 
+enum class stance_flag {
+	SHOOTING,
+	COUNT
+};
+
 template <class T>
 struct stance_frame_usage {
 	const frame_type_t<T>* const frame;
-	flip_flags flip;
-	const bool is_shooting;
+	flip_flags movement_flip;
+	const augs::enum_boolset<stance_flag> flags;
 
 	static auto none() {
-		return stance_frame_usage<T> { nullptr, flip_flags(), false };
+		return stance_frame_usage<T> { nullptr, flip_flags(), {} };
 	}
 
 	static auto carry(const frame_and_flip<T>& f) {
-		return stance_frame_usage<T> { std::addressof(f.frame), f.flip, false };
+		return stance_frame_usage<T> { std::addressof(f.frame), f.flip, {} };
 	}
 
 	static auto grip_to_mag(const frame_type_t<T>& f) {
-		return stance_frame_usage<T> { std::addressof(f), flip_flags(), false };
+		return stance_frame_usage<T> { std::addressof(f), flip_flags(), {} };
 	}
 
 	static auto pocket_to_mag(const frame_type_t<T>& f) {
-		return stance_frame_usage<T> { std::addressof(f), flip_flags(), false };
+		return stance_frame_usage<T> { std::addressof(f), flip_flags(), {} };
 	}
 
 	static auto shoot(const frame_type_t<T>& f) {
-		return stance_frame_usage<T> { std::addressof(f), flip_flags(), true };
+		return stance_frame_usage<T> { std::addressof(f), flip_flags(), { stance_flag::SHOOTING } };
 	}
 
 	static auto chambering(const frame_type_t<T>& f) {
-		return stance_frame_usage<T> { std::addressof(f), flip_flags(), true };
+		return stance_frame_usage<T> { std::addressof(f), flip_flags(), { stance_flag::SHOOTING } };
 	}
 
 	static auto shoot_flipped(const frame_type_t<T>& f) {
-		return stance_frame_usage<T> { std::addressof(f), flip_flags::make_vertically(), true };
+		return stance_frame_usage<T> { std::addressof(f), flip_flags::make_vertically(), { stance_flag::SHOOTING } };
 	}
 
 	explicit operator bool() const {
@@ -123,7 +128,7 @@ struct stance_frame_usage {
 	}
 
 	auto get_with_flip() const {
-		return frame_and_flip<T>{ *frame, flip };
+		return frame_and_flip<T>{ *frame, movement_flip };
 	}
 };
 
@@ -160,9 +165,8 @@ auto calc_stance_usage(
 			}
 		}
 
-		if (const auto shoot_animation = logicals.find(stance.shoot)) {
-			/* Determine whether we want a carrying or a shooting animation */
-			if (const auto gun = cosm[wielded_items[0]].template find<components::gun>()) {
+		if (const auto gun = cosm[wielded_items[0]].template find<components::gun>()) {
+			if (const auto shoot_animation = logicals.find(stance.actions[weapon_action_type::PRIMARY])) {
 				const auto frame = ::find_shoot_frame(*gun, *shoot_animation, cosm);
 				const auto second_frame = [n, &cosm, shoot_animation, &wielded_items]() -> decltype(frame) {
 					if (n == 2) {
@@ -189,6 +193,12 @@ auto calc_stance_usage(
 				if (second_frame) {
 					return result_t::shoot_flipped(*second_frame);
 				}
+			}
+		}
+
+		if (const auto melee = cosm[wielded_items[0]].template find<components::melee>()) {
+			if (const auto action_animation = logicals.find(stance.actions[melee->action])) {
+
 			}
 		}
 	}

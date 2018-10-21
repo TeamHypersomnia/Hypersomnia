@@ -45,10 +45,10 @@ namespace invariants {
 		// GEN INTROSPECTOR struct invariants::missile
 		meter_value_type damage_amount = 12;
 
-		float muzzle_velocity_mult = 1.f;
+		real32 muzzle_velocity_mult = 1.f;
 
-		float impulse_upon_hit = 10.f;
-		float impulse_multiplier_against_sentience = 10.f;
+		real32 impulse_upon_hit = 10.f;
+		real32 impulse_multiplier_against_sentience = 10.f;
 		sentience_shake victim_shake = { 400.f, 1.f };
 
 		bool damage_upon_collision = true;
@@ -56,13 +56,13 @@ namespace invariants {
 		bool constrain_lifetime = true;
 		bool damage_falloff = false;
 
-		float damage_falloff_starting_distance = 500.f;
-		float minimum_amount_after_falloff = 5.f;
+		real32 damage_falloff_starting_distance = 500.f;
+		real32 minimum_amount_after_falloff = 5.f;
 
-		float max_lifetime_ms = 2000.f;
-		float recoil_multiplier = 1.f;
+		real32 max_lifetime_ms = 2000.f;
+		real32 recoil_multiplier = 1.f;
 
-		float homing_towards_hostile_strength = 0.f;
+		real32 homing_towards_hostile_strength = 0.f;
 
 		sound_effect_input trace_sound;
 		sound_effect_input destruction_sound;

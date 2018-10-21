@@ -3,6 +3,7 @@
 #include "game/cosmos/entity_handle.h"
 
 #include "game/assets/ids/asset_ids.h"
+#include "test_scenes/test_scene_particle_effects.h"
 
 #include "game/components/sender_component.h"
 #include "game/components/missile_component.h"
@@ -13,31 +14,98 @@
 
 namespace test_flavours {
 	void populate_melee_flavours(const populate_flavours_input in) {
-		(void)in;
+		auto& flavours = in.flavours;
+		auto& caches = in.caches;
+
 		{
-#if TODO
-			auto& meta = get_test_flavour(flavours, test_scene_flavour::URBAN_CYAN_MACHETE);
+			auto& meta = get_test_flavour(flavours, test_melee_weapons::RESISTANCE_KNIFE);
 
-			invariants::render render_def;
-			render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
 
-			meta.set(render_def);
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::URBAN_CYAN_MACHETE, white);
+				meta.set(render_def);
+			}
 
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::RESISTANCE_KNIFE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
-			invariants::item item;
-			item.space_occupied_per_charge = to_space_units("2.5");
-			meta.set(item);
+			{
+				invariants::item item;
 
-			invariants::missile missile;
-			missile.destroy_upon_damage = false;
-			missile.damage_upon_collision = false;
-			missile.damage_amount = 50.f;
-			missile.impulse_upon_hit = 1000.f;
-			missile.constrain_lifetime = false;
-			meta.set(missile);
-#endif
+				item.space_occupied_per_charge = to_space_units("1.5");
+				item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
+
+				meta.set(item);
+			}
+
+			{
+				invariants::melee melee;
+
+				{
+					auto& a = melee.actions[weapon_action_type::PRIMARY];
+					a.init_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_PRIMARY);
+					a.wielder_impulse = 20.f;
+					a.cp_required = 5.f;
+
+					a.obstacle_hit_recoil = 40.f;
+					a.sentience_hit_recoil = 10.f;
+
+					a.reverse_animation_on_finish = false;
+
+					{
+						auto& clash = a.clash;
+
+						clash.victim_shake *= 0.5f;
+						clash.subject_shake *= 0.5f;
+
+						clash.sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_CLASH);
+						clash.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_CLASH);
+					}
+
+					a.damage.base = 27.f;
+					a.damage.shake *= 0.4f;
+					a.damage.impulse = 1000.f;
+					a.damage.impact_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SECONDARY);
+					a.damage.impact_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_IMPACT);
+					a.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+				}
+
+				{
+					auto& a = melee.actions[weapon_action_type::SECONDARY];
+					a.init_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SECONDARY);
+					a.wielder_impulse = 50.f;
+					a.cp_required = 12.f;
+
+					a.obstacle_hit_recoil = 80.f;
+					a.sentience_hit_recoil = 20.f;
+
+					a.reverse_animation_on_finish = true;
+
+					{
+						auto& clash = a.clash;
+
+						clash.subject_shake *= 2.0f;
+
+						clash.sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_CLASH);
+						clash.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_CLASH);
+					}
+
+					a.damage.base = 57.f;
+					a.damage.impulse = 2000.f;
+					a.damage.impact_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SECONDARY);
+					a.damage.impact_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_IMPACT);
+					a.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+				}
+
+				meta.set(melee);
+			}
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_melee_weapons::METROPOLIS_KNIFE);
+
+			meta = get_test_flavour(flavours, test_melee_weapons::RESISTANCE_KNIFE);
 		}
 	}
 }

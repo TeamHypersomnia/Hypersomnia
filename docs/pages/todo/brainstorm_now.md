@@ -1,4 +1,4 @@
----
+
 title: Brainstorm now
 tags: [planning]
 hide_sidebar: true
@@ -9,12 +9,23 @@ summary: That which we are brainstorming at the moment.
 - Melee combat
 	- melee_fighter component
 		- so that we don't have to hold this state per each melee weapon
-	- Primary and secondary attacks for knives
-		- Akimbo is thus handicapped only to the primary
-			- But really it makes little sense to carry two knives
+	- Returning animation
+		- Don't. Simply specify a target rotation to which the character is to be rotated
+			- We might even set a slower rotating speed for a while
+		- If we hit a solid obstacle, we always return with the animation reversed
+		- Do we want another animation for returning when the hit was complete?
+			- If we don't want it, we can always set the same animation
+	- communicating animation offsets
+		- We need information from the animation itself
+			- Actually we do hold animations in logical assets so we are all set
 	- A melee attack cannot be interrupted, except when a collision of two attacks occurs
 	- Attack collisions
 		- When hurt triggers of two or more players touch, they are pushed away opposite to their facing
+
+- Flipping of editor selection
+
+- Easily spawn loaded weapons or magazines
+	- For now, let instantation load them all by default
 
 - Simplify workflow for creating new weapons?
 	- E.g. remove the need to specify finishing traces

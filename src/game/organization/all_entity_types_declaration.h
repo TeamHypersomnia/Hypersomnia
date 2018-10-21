@@ -2,16 +2,17 @@
 #include "augs/templates/type_in_list_id.h"
 #include "augs/templates/folded_finders.h"
 
-struct controlled_character;
 struct plain_sprited_body;
+struct controlled_character;
+struct plain_missile;
 struct shootable_weapon;
 struct shootable_charge;
+struct melee_weapon;
 struct sprite_decoration;
 struct complex_decoration;
 struct wandering_pixels_decoration;
 struct static_light;
 struct hand_explosive;
-struct plain_missile;
 struct finishing_trace;
 struct container_item;
 struct explosive_missile;
@@ -24,16 +25,17 @@ struct explosion_body;
 struct tool_item;
 
 using all_entity_types = type_list<
-	controlled_character,
 	plain_sprited_body,
+	controlled_character,
+	plain_missile,
 	shootable_weapon,
 	shootable_charge,
+	melee_weapon,
 	sprite_decoration,
 	complex_decoration,
 	wandering_pixels_decoration,
 	static_light,
 	hand_explosive,
-	plain_missile,
 	finishing_trace,
 	container_item,
 	explosive_missile,

@@ -19,6 +19,7 @@ struct controlled_character {
 		invariants::sentience,
 		invariants::container,
 		invariants::item_slot_transfers,
+		invariants::melee_fighter,
 
 		invariants::sprite,
 		invariants::render,
@@ -33,6 +34,7 @@ struct controlled_character {
 		components::movement,
 
 		components::item_slot_transfers,
+		components::melee_fighter,
 		components::crosshair,
 		components::sentience,
 
@@ -95,6 +97,32 @@ struct shootable_weapon {
 
 		components::rigid_body,
 
+		components::interpolation
+	>;
+};
+
+/* E.g. a knife, a machete */
+
+struct melee_weapon {
+	static constexpr std::size_t statically_allocated_entities = 1500;
+	static constexpr std::size_t statically_allocated_flavours = 150;
+
+	using invariants = type_list<
+		invariants::melee,
+		invariants::item,
+
+		invariants::rigid_body,
+		invariants::fixtures,
+		invariants::sprite,
+		invariants::render,
+
+		invariants::interpolation
+	>;
+
+	using components = type_list<
+		components::melee,
+		components::item,
+		components::rigid_body,
 		components::interpolation
 	>;
 };

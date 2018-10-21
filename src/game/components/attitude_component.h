@@ -16,7 +16,7 @@ using specific_hostile_entities_vector =
 namespace components {
 	struct attitude {
 		// GEN INTROSPECTOR struct components::attitude
-		float maximum_divergence_angle_before_shooting = 10.0;
+		real32 maximum_divergence_angle_before_shooting = 10.0;
 
 		faction_type official_faction;
 

@@ -420,6 +420,8 @@ namespace test_scenes {
 			give_weapon(transformr(vec2(-800 - k * 150, 400)), test_shootable_weapons::PRO90);
 			give_weapon(transformr(vec2(-800 - k * 150, 600)), test_shootable_weapons::CALICO);
 			give_weapon(transformr(vec2(-800 - k * 150, 800)), test_shootable_weapons::WARX_FQ12);
+			give_weapon(transformr(vec2(-800 - k * 150, 1000)), test_shootable_weapons::RESISTANCE_KNIFE);
+			give_weapon(transformr(vec2(-800 - k * 150, 1200)), test_shootable_weapons::METROPOLIS_KNIFE);
 		}
 
 		give_weapon(transformr(vec2(-300, -500 + 50)), test_shootable_weapons::AMPLIFIER_ARM);

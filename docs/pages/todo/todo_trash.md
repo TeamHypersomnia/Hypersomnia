@@ -939,3 +939,7 @@ fixtures can form scene graph as they have relative transforms.
 - a **game mode marker** is a game mode property of game mode definition that has a spatial representation
 	- and thus can be visualized in the world view
 	- e.g. C4 trigger or a spawn point
+	- Primary and secondary attacks for knives
+		- Akimbo is thus handicapped only to the primary
+			- But really it makes little sense to carry two knives
+		- actually we'll disable attacks in akimbo

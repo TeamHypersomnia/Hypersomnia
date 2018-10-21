@@ -21,6 +21,7 @@
 #include "game/components/item_slot_transfers_component.h"
 #include "game/components/trace_component.h"
 #include "game/components/melee_component.h"
+#include "game/components/melee_fighter_component.h"
 #include "game/components/sentience_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/interpolation_component.h"

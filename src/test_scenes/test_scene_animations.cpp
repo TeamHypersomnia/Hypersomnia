@@ -400,6 +400,21 @@ void load_test_scene_animations(
 				I::RESISTANCE_TORSO_PISTOL_WALK_1
 			);
 
+			standard_walk(
+				T::RESISTANCE_TORSO_KNIFE_WALK,
+				I::RESISTANCE_TORSO_KNIFE_WALK_1
+			);
+
+			standard_shoot(
+				T::RESISTANCE_TORSO_KNIFE_PRIM,
+				I::RESISTANCE_TORSO_KNIFE_PRIM_1
+			);
+
+			standard_shoot(
+				T::RESISTANCE_TORSO_KNIFE_SECD,
+				I::RESISTANCE_TORSO_KNIFE_SECD_1
+			);
+
 			pistol_shot(
 				T::RESISTANCE_TORSO_PISTOL_SHOT,
 				I::RESISTANCE_TORSO_PISTOL_SHOT_1

@@ -47,6 +47,8 @@ namespace invariants {
 	struct box_marker;
 	struct cascade_explosion;
 	struct tool;
+	struct melee;
+	struct melee_fighter;
 }
 
 namespace components {
@@ -81,6 +83,7 @@ namespace components {
 	struct continuous_particles;
 	struct overridden_geo;
 	struct cascade_explosion;
+	struct melee_fighter;
 }
 
 using assert_always_together = type_list<
@@ -141,6 +144,7 @@ using component_list_t = List<
 	components::item_slot_transfers,
 	components::trace,
 	components::melee,
+	components::melee_fighter,
 	components::sentience,
 	components::attitude,
 	components::interpolation,
@@ -195,7 +199,9 @@ using invariant_list_t = List<
 	invariants::point_marker,
 	invariants::box_marker,
 	invariants::cascade_explosion,
-	invariants::tool
+	invariants::tool,
+	invariants::melee,
+	invariants::melee_fighter
 >;
 
 template <class... Types>

@@ -290,7 +290,7 @@ FORCE_INLINE void specific_entity_drawer(
 
 					auto result = logicals.get_offsets(stance_image_id).torso;
 
-					if (stance_usage.flip.vertically) {
+					if (stance_usage.movement_flip.vertically) {
 						result.flip_vertically();
 					}
 
@@ -425,7 +425,7 @@ FORCE_INLINE void specific_entity_drawer(
 					auto usage = stance_usage;
 
 					if (only_secondary) {
-						auto& f = usage.flip.vertically;
+						auto& f = usage.movement_flip.vertically;
 						f = !f;
 					}
 
@@ -441,7 +441,11 @@ FORCE_INLINE void specific_entity_drawer(
 						const auto& head = typed_handle.template get<components::head>();
 						const auto& head_def = typed_handle.template get<invariants::head>();
 
-						const auto target_image = stance_usage.is_shooting ? head_def.shooting_head_image : head_def.head_image;
+						const auto target_image = 
+							stance_usage.flags.test(stance_flag::SHOOTING)
+							? head_def.shooting_head_image 
+							: head_def.head_image
+						;
 
 						const auto& head_offsets = logicals.get_offsets(target_image);
 

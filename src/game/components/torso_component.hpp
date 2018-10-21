@@ -9,7 +9,7 @@ struct leg_animation_usage {
 };
 
 inline const assets::torso_animation_id& stance_animations::get_chambering() const {
-	return shoot;
+	return actions[weapon_action_type::PRIMARY];
 }
 
 template <class E>

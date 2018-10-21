@@ -6,6 +6,15 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- enum_boolset begin and end should probably return enums
+	- simpler lua i/o
+	- no need for for-eaches
+	- nice exercise for iterators
+
+- Allow choosing the flavour of the character
+	- Each might have completely different properties or animations
+	- Effectively implements a class
+
 - Arbitrary pasting of entities
 	- Vastly useful for importing stuff from testbed maps into existing ones
 		- Let alone between community maps
