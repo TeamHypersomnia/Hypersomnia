@@ -57,22 +57,22 @@ public:
 		const auto handle = *static_cast<const entity_handle_type*>(this);
 		const auto& cosm = handle.get_cosmos();
 
-		if (const auto connection = handle.find_colliders_connection();
-			connection && connection->owner != handle.get_id()
-		) {
-			if (auto body_transform = sys.find_interpolated(cosm[connection->owner])) {
-				auto bt = *body_transform;
+		if (const auto connection = handle.find_colliders_connection()) {
+			if (connection->owner != handle.get_id()) {
+				if (auto body_transform = sys.find_interpolated(cosm[connection->owner])) {
+					auto bt = *body_transform;
 
-				auto displacement = connection->shape_offset;
+					auto displacement = connection->shape_offset;
 
-				if (!displacement.pos.is_zero()) {
-					displacement.pos.rotate(bt.rotation, vec2(0, 0));
+					if (!displacement.pos.is_zero()) {
+						displacement.pos.rotate(bt.rotation, vec2(0, 0));
+					}
+
+					return bt + displacement;
 				}
 
-				return bt + displacement;
+				return std::nullopt;
 			}
-
-			return std::nullopt;
 		}
 		
 		return sys.find_interpolated(handle);

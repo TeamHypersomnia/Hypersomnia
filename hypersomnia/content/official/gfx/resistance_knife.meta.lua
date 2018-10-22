@@ -59,8 +59,8 @@ return {
       },
       hand_anchor = {
         pos = {
-          x = 0,
-          y = 0
+          x = -14,
+          y = 1
         },
         rotation = 0
       },
@@ -79,8 +79,54 @@ return {
       }
     },
     non_standard_shape = {
-      convex_partition = {},
-      original_poly = {}
+      convex_partition = {
+        2,
+        3,
+        4,
+        5,
+        6,
+        1,
+        2,
+        1,
+        6,
+        7,
+        0,
+        1
+      },
+      original_poly = {
+        {
+          x = -15,
+          y = -2
+        },
+        {
+          x = -6,
+          y = -1
+        },
+        {
+          x = -3,
+          y = -4
+        },
+        {
+          x = 5,
+          y = -4
+        },
+        {
+          x = 14,
+          y = -2
+        },
+        {
+          x = 17.5,
+          y = 4.5
+        },
+        {
+          x = 0,
+          y = 3
+        },
+        {
+          x = -16,
+          y = 3
+        }
+      }
     },
     torso = {
       back = {

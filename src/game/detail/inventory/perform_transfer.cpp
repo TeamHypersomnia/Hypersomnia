@@ -270,12 +270,16 @@ perform_transfer_result perform_transfer_impl(
 	if (is_drop_request) {
 		ensure(source_slot_container.alive());
 
-		grabbed_item_part_handle.infer_change_of_current_slot();
+		if (auto sender = grabbed_item_part_handle.find<components::sender>()) {
+			sender->set(source_root);
+		}
 
 		/* 
 			Since a dropped item does not belong to any capability tree now,
 			it must be inferred separately from the other two recursive calls.
 		*/
+
+		grabbed_item_part_handle.infer_change_of_current_slot();
 
 		const auto rigid_body = grabbed_item_part_handle.get<components::rigid_body>();
 

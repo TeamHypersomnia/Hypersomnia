@@ -67,8 +67,10 @@ void rigid_body_cache::clear(physics_world_cache& owner) {
 		owner.joint_caches.erase(j->joint->GetUserData());
 	}
 
-	// no need to manually destroy each fixture and joint of the body,
-	// Box2D will take care of that after just deleting the body.
+	/* 
+		There is no need to manually destroy each fixture and joint of the body,
+		Box2D will take care of that after just deleting the body.
+	*/
 
 	owner.b2world->DestroyBody(body);
 	body = nullptr;

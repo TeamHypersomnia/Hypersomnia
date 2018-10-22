@@ -97,21 +97,23 @@ struct fuse_logic_provider {
 			request.params.additional_drop_impulse = fuse_def.additional_release_impulse;
 		}
 
+		/* 
+			Note that the dropping transfer will effectively reinfer
+			the colliders and the rigid body of the explosive,
+			so no further refreshing is required.
+		*/
+
 		perform_transfer(request, step);
 
 		fuse_def.release_sound.start(
 			step,
 			sound_effect_start_input::fire_and_forget(fused_transform).set_listener(holder)
 		);
-
-		refresh_fused_body();
 	}
 
-	void refresh_fused_body() const {
-		if (fuse_def.is_like_plantable_bomb()) {
-			fused_entity.infer_rigid_body();
-			fused_entity.infer_colliders();
-		}
+	void refresh_fused_physics() const {
+		fused_entity.infer_rigid_body();
+		fused_entity.infer_colliders();
 	}
 
 	void defuse() const {
@@ -296,7 +298,7 @@ struct fuse_logic_provider {
 					if (defusing_delay_complete()) {
 						defuse();
 						play_defused_effects();
-						refresh_fused_body();
+						refresh_fused_physics();
 						return;
 					}
 

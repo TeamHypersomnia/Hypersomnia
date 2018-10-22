@@ -6,6 +6,20 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Make flying grenades bullet bodies so that we are accurate
+
+- Throwing the knives
+	- Let's make it first
+		- We'll have a nice entry point in the missile system
+	- When to unset the sender of a thrown item?
+		- When it first collides with something under velocity that is lower than the required bound for damage?
+			- For now it's not of much importance but yeah, it's a good candidate
+			- Kills can still be misattributed, e.g. by initiating an explosion
+		- We would effectively need to iterate all melee weapons to see if the velocity has cooled down already
+			- We could always make it a processing list in the future
+		- We might need this for other properties as well, e.g. for setting a filter from a flying item to a small dynamic body
+			- And for changing the bullet body type
+
 - Then the direct attachment offset must calculate the offsets, I guess.
 
 - Setting fixtures vs querying knife fixtures on each step

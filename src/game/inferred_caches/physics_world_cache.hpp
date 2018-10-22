@@ -300,7 +300,7 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		return;
 	}
 
-	if (handle.is_like_thrown_explosive()) {
+	if (!handle.is_like_planted_bomb() && handle.is_like_thrown_explosive()) {
 		if (const auto fuse = handle.template find<invariants::hand_fuse>()) {
 			from_circle_shape(fuse->circle_shape_radius_when_released);
 		}

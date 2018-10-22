@@ -359,11 +359,16 @@ FORCE_INLINE void specific_entity_drawer(
 						return true;
 					}
 
-					/* Draw pistols under hands in akimbo */
-					if (stance_id == item_holding_stance::AKIMBO 
-						&& attachment_entity.template get<invariants::item>().holding_stance == item_holding_stance::PISTOL_LIKE
-					) {
-						return true;
+					if (stance_id == item_holding_stance::AKIMBO) {
+						/* In akimbo, draw pistols and knives under hands */
+						const auto holding_stance = attachment_entity.template get<invariants::item>().holding_stance;
+
+						const bool pistol_or_knife = 
+							holding_stance == item_holding_stance::PISTOL_LIKE 
+							|| holding_stance == item_holding_stance::KNIFE_LIKE
+						;
+
+						return pistol_or_knife;
 					}
 
 					return false;
