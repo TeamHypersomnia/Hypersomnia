@@ -681,6 +681,12 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				});
 			};
 
+			auto for_each_melee = [&](auto&& callback) {
+				cosm.for_each_flavour_having<invariants::melee>([&](const auto& id, const auto& flavour) {
+					callback(id, flavour);
+				});
+			};
+
 			auto for_each_pistol = [&](auto&& callback) {
 				cosm.for_each_flavour_having<invariants::gun>([&](const auto& id, const auto& flavour) {
 					if (price_of(item_flavour_id(id)) <= 1000) {
@@ -722,6 +728,14 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			};
 
 			switch (current_menu) {
+				case buy_menu_type::MELEE: {
+					do_item_menu(
+						item_holding_stance::KNIFE_LIKE,
+						for_each_melee
+					);
+					break;
+				}
+
 				case buy_menu_type::PISTOLS: {
 					do_item_menu(
 						item_holding_stance::PISTOL_LIKE,

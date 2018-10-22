@@ -36,6 +36,8 @@ namespace test_flavours {
 				item.space_occupied_per_charge = to_space_units("1.5");
 				item.holding_stance = item_holding_stance::KNIFE_LIKE;
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_DRAW);
+				item.standard_price = static_cast<money_type>(250);
+				item.specific_to = faction_type::RESISTANCE;
 
 				meta.set(item);
 			}
@@ -113,6 +115,8 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_melee_weapons::METROPOLIS_KNIFE);
 
 			meta = get_test_flavour(flavours, test_melee_weapons::RESISTANCE_KNIFE);
+			meta.template get<invariants::text_details>().name = "Metropolis knife";
+			meta.template get<invariants::item>().specific_to = faction_type::METROPOLIS;
 		}
 	}
 }
