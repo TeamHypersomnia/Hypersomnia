@@ -67,6 +67,89 @@ void play_collision_sound(
 	const logic_step step
 );
 
+template <class R, class F>
+static void spawn_bullet_remnants(
+	const logic_step step,
+	R& rng,
+	F flavours,
+	const vec2& collision_normal,
+	const vec2& impact_dir,
+	const vec2& impact_point
+) {
+	auto& cosm = step.get_cosmos();
+
+	shuffle_range(flavours, rng.generator);
+
+	int total_spawned = std::min(static_cast<int>(flavours.size()), 2);
+
+	auto how_many_along_normal = rng.randval(total_spawned - 1, total_spawned);
+
+	for (int i = 0; i < total_spawned; ++i) {
+		const auto& r_id = flavours[i];
+		const auto speed = rng.randval(1000.f, 4800.f);
+
+		vec2 vel;
+
+		if (how_many_along_normal) {
+			const auto sgn = rng.randval(0, 1);
+
+			auto amount_rotated = rng.randval(70.f, 87.f);
+
+			if (sgn == 1) {
+				amount_rotated = -amount_rotated;
+			}
+
+			vel = vec2(collision_normal).rotate(amount_rotated) * speed;
+
+			--how_many_along_normal;
+		}
+		else {
+			vel = -1 * vec2(impact_dir).rotate(rng.randval(-40.f, 40.f)) * speed;
+		}
+
+		cosmic::create_entity(
+			cosm,
+			r_id,
+			[&](const auto typed_remnant, auto&&...) {
+				auto spawn_offset = vec2(vel).normalize() * rng.randval(55.f, 60.f);
+				const auto rot = rng.randval(0, 360);
+				
+				typed_remnant.set_logic_transform(transformr(impact_point + spawn_offset, rot));
+			},
+			[&](const auto typed_remnant) {
+
+				typed_remnant.template get<components::rigid_body>().set_velocity(vel);
+				typed_remnant.template get<components::rigid_body>().set_angular_velocity(rng.randval(1060.f, 4000.f));
+
+				const auto& effect = typed_remnant.template get<invariants::remnant>().trace_particles;
+
+				effect.start(
+					step,
+					particle_effect_start_input::orbit_local(typed_remnant, { vec2::zero, 180 } )
+				);
+			}
+		);
+	}
+}
+
+
+template <class T>
+static void make_velocity_face_body_orientation(
+	const T& typed_missile
+) {
+	const auto body = typed_missile.template get<components::rigid_body>();
+	const auto current_vel = body.get_velocity();
+	const auto tr = body.get_transform();
+
+	const auto current_dir = vec2::from_degrees(tr.rotation);
+
+	//const auto new_tr = transformr(tr.pos, current_vel.degrees());
+	const auto new_vel = current_dir * current_vel.length();
+
+	RIC_LOG_NVPS(new_vel);
+	body.set_velocity(new_vel);
+}
+
 void missile_system::ricochet_missiles(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	const auto clk = cosm.get_clock();
@@ -89,7 +172,7 @@ void missile_system::ricochet_missiles(const logic_step step) {
 		const auto surface_handle = cosm[it.subject];
 		const auto missile_handle = cosm[it.collider];
 
-		missile_handle.dispatch_on_having_all<invariants::missile>([&](const auto typed_missile) {
+		missile_handle.dispatch_on_having_all<invariants::missile>([&](const auto& typed_missile) {
 			RIC_LOG("(RIC)(%x) MISSILE %x WITH: %x", now.step, "CONTACT START", surface_handle);
 
 			const auto& missile_def = typed_missile.template get<invariants::missile>();
@@ -151,7 +234,7 @@ void missile_system::ricochet_missiles(const logic_step step) {
 				{
 					const bool born_cooldown = clk.lasts(
 						missile_def.ricochet_born_cooldown_ms,
-						missile_handle.when_born()
+						typed_missile.when_born()
 					);
 
 					if (born_cooldown) {
@@ -249,7 +332,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 		const auto surface_handle = cosm[it.subject];
 		const auto missile_handle = cosm[it.collider];
 
-		missile_handle.dispatch_on_having_all<invariants::missile>([&](const auto typed_missile) {
+		missile_handle.dispatch_on_having_all<invariants::missile>([&](const auto& typed_missile) {
 			RIC_LOG("(DET) MISSILE %x WITH: %x", pre_solve ? "PRE SOLVE" : "CONTACT START", surface_handle);
 
 			const auto& missile_def = typed_missile.template get<invariants::missile>();
@@ -277,22 +360,9 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			}
 
 			if (pre_solve) {
-				/* 
-					With a PreSolve must have happened a PostSolve. 
-					Correct the missile's velocity so that it points towards where the body itself is oriented.
-				*/
+				/* With a PreSolve must have happened a PostSolve that altered our initial velocity. */
 
-				const auto body = typed_missile.template get<components::rigid_body>();
-				const auto current_vel = body.get_velocity();
-				const auto tr = body.get_transform();
-
-				const auto current_dir = vec2::from_degrees(tr.rotation);
-
-				//const auto new_tr = transformr(tr.pos, current_vel.degrees());
-				const auto new_vel = current_dir * current_vel.length();
-
-				RIC_LOG_NVPS(new_vel);
-				body.set_velocity(new_vel);
+				make_velocity_face_body_orientation(typed_missile);
 			}
 
 			{
@@ -362,7 +432,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			if (info.should_detonate() && missile_def.destroy_upon_damage) {
 				--charges;
 				
-				detonate_if(missile_handle.get_id(), it.point, step);
+				detonate_if(typed_missile.get_id(), it.point, step);
 
 				if (augs::is_positive_epsilon(total_damage_amount)) {
 					startle_nearby_organisms(cosm, it.point, total_damage_amount * 12.f, 27.f, startle_type::LIGHTER);
@@ -370,69 +440,24 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 				// delete only once
 				if (charges == 0) {
-					step.post_message(messages::queue_deletion(missile_handle));
+					step.post_message(messages::queue_deletion(typed_missile));
 					damage_msg.inflictor_destructed = true;
 
 					auto rng = cosm.get_rng_for(typed_missile);
-					auto flavours = missile_def.remnant_flavours;
-					
-					shuffle_range(flavours, rng.generator);
 
-					int total_spawned = std::min(static_cast<int>(flavours.size()), 2);
-
-					auto how_many_along_normal = rng.randval(total_spawned - 1, total_spawned);
-
-					for (int i = 0; i < total_spawned; ++i) {
-						const auto& r_id = flavours[i];
-						const auto speed = rng.randval(1000.f, 4800.f);
-
-						vec2 vel;
-
-						if (how_many_along_normal) {
-							const auto sgn = rng.randval(0, 1);
-
-							auto amount_rotated = rng.randval(70.f, 87.f);
-
-							if (sgn == 1) {
-								amount_rotated = -amount_rotated;
-							}
-
-							vel = vec2(collision_normal).rotate(amount_rotated) * speed;
-
-							--how_many_along_normal;
-						}
-						else {
-							vel = -1 * vec2(impact_dir).rotate(rng.randval(-40.f, 40.f)) * speed;
-						}
-
-						cosmic::create_entity(
-							cosm,
-							r_id,
-							[&](const auto typed_remnant, auto&&...) {
-								auto spawn_offset = vec2(vel).normalize() * rng.randval(55.f, 60.f);
-								const auto rot = rng.randval(0, 360);
-								
-								typed_remnant.set_logic_transform(transformr(it.point + spawn_offset, rot));
-							},
-							[&](const auto typed_remnant) {
-
-								typed_remnant.template get<components::rigid_body>().set_velocity(vel);
-								typed_remnant.template get<components::rigid_body>().set_angular_velocity(rng.randval(1060.f, 4000.f));
-
-								const auto& effect = typed_remnant.template get<invariants::remnant>().trace_particles;
-
-								effect.start(
-									step,
-									particle_effect_start_input::orbit_local(typed_remnant, { vec2::zero, 180 } )
-								);
-							}
-						);
-					}
+					spawn_bullet_remnants(
+						step,
+						rng,
+						missile_def.remnant_flavours,
+						collision_normal,
+						impact_dir,
+						it.point
+					);
 				}
 			}
 
 			if (send_damage && contact_start) {
-				damage_msg.origin = damage_origin(missile_handle);
+				damage_msg.origin = damage_origin(typed_missile);
 				damage_msg.subject = it.subject;
 				damage_msg.amount = total_damage_amount;
 				damage_msg.victim_shake = missile_def.victim_shake;
