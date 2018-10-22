@@ -57,108 +57,15 @@ void RIC_LOG(Args&&... args) {
 #define RIC_LOG_NVPS RIC_LOG
 #endif
 
+#include "game/detail/missile/missile_utils.h"
+#include "game/detail/missile/missile_collision.h"
+#include "game/detail/missile/missile_ricochet.h"
+
 using namespace augs;
-
-void play_collision_sound(
-	const real32 strength,
-	const vec2 location,
-	const const_entity_handle sub,
-	const const_entity_handle col,
-	const logic_step step
-);
-
-template <class R, class F>
-static void spawn_bullet_remnants(
-	const logic_step step,
-	R& rng,
-	F flavours,
-	const vec2& collision_normal,
-	const vec2& impact_dir,
-	const vec2& impact_point
-) {
-	auto& cosm = step.get_cosmos();
-
-	shuffle_range(flavours, rng.generator);
-
-	int total_spawned = std::min(static_cast<int>(flavours.size()), 2);
-
-	auto how_many_along_normal = rng.randval(total_spawned - 1, total_spawned);
-
-	for (int i = 0; i < total_spawned; ++i) {
-		const auto& r_id = flavours[i];
-		const auto speed = rng.randval(1000.f, 4800.f);
-
-		vec2 vel;
-
-		if (how_many_along_normal) {
-			const auto sgn = rng.randval(0, 1);
-
-			auto amount_rotated = rng.randval(70.f, 87.f);
-
-			if (sgn == 1) {
-				amount_rotated = -amount_rotated;
-			}
-
-			vel = vec2(collision_normal).rotate(amount_rotated) * speed;
-
-			--how_many_along_normal;
-		}
-		else {
-			vel = -1 * vec2(impact_dir).rotate(rng.randval(-40.f, 40.f)) * speed;
-		}
-
-		cosmic::create_entity(
-			cosm,
-			r_id,
-			[&](const auto typed_remnant, auto&&...) {
-				auto spawn_offset = vec2(vel).normalize() * rng.randval(55.f, 60.f);
-				const auto rot = rng.randval(0, 360);
-				
-				typed_remnant.set_logic_transform(transformr(impact_point + spawn_offset, rot));
-			},
-			[&](const auto typed_remnant) {
-
-				typed_remnant.template get<components::rigid_body>().set_velocity(vel);
-				typed_remnant.template get<components::rigid_body>().set_angular_velocity(rng.randval(1060.f, 4000.f));
-
-				const auto& effect = typed_remnant.template get<invariants::remnant>().trace_particles;
-
-				effect.start(
-					step,
-					particle_effect_start_input::orbit_local(typed_remnant, { vec2::zero, 180 } )
-				);
-			}
-		);
-	}
-}
-
-
-template <class T>
-static void make_velocity_face_body_orientation(
-	const T& typed_missile
-) {
-	const auto body = typed_missile.template get<components::rigid_body>();
-	const auto current_vel = body.get_velocity();
-	const auto tr = body.get_transform();
-
-	const auto current_dir = vec2::from_degrees(tr.rotation);
-
-	//const auto new_tr = transformr(tr.pos, current_vel.degrees());
-	const auto new_vel = current_dir * current_vel.length();
-
-	RIC_LOG_NVPS(new_vel);
-	body.set_velocity(new_vel);
-}
 
 void missile_system::ricochet_missiles(const logic_step step) {
 	auto& cosm = step.get_cosmos();
-	const auto clk = cosm.get_clock();
-	const auto now = clk.now;
 	const auto& events = step.get_queue<messages::collision_message>();
-
-	const auto steps = cosm.get_total_steps_passed();
-	(void)steps;
-	(void)now;
 
 	for (const auto& it : events) {
 		{
@@ -173,137 +80,16 @@ void missile_system::ricochet_missiles(const logic_step step) {
 		const auto missile_handle = cosm[it.collider];
 
 		missile_handle.dispatch_on_having_all<invariants::missile>([&](const auto& typed_missile) {
-			RIC_LOG("(RIC)(%x) MISSILE %x WITH: %x", now.step, "CONTACT START", surface_handle);
+			::ricochet_missile_against_surface(
+				step,
 
-			const auto& missile_def = typed_missile.template get<invariants::missile>();
-			const auto ricochet_cooldown_ms = missile_def.ricochet_cooldown_ms;
-			(void)missile_def;
-			(void)ricochet_cooldown_ms;
+				typed_missile, 
+				surface_handle,
 
-			auto& missile = typed_missile.template get<components::missile>();
-
-			const auto info = missile_surface_info(typed_missile, surface_handle);
-
-			if (!info.is_ricochetable()) {
-				RIC_LOG("non-ricochetable surface, IGNORED");
-				return;
-			}
-
-			const auto collision_normal = vec2(it.normal).normalize();
-
-			const auto impact_velocity = it.collider_impact_velocity;
-			const auto impact_speed = impact_velocity.length();
-			const auto impact_dir = impact_velocity / impact_speed;
-			const auto impact_dot_normal = impact_dir.dot(collision_normal);
-
-			if (impact_dot_normal >= 0.f) {
-				RIC_LOG("dot normal is %x, IGNORED", impact_dot_normal);
-				return;
-			}
-
-			/* 
-				If the collision normal and velocity point in opposite directions,
-				check if ricochet happens.
-			*/
-
-			const auto hit_facing = impact_dir.degrees_between(collision_normal);
-
-			const auto& surface_fixtures = surface_handle.get<invariants::fixtures>();
-			const auto max_ricochet_angle = surface_fixtures.max_ricochet_angle;
-
-			const auto left_b = 90 - max_ricochet_angle;
-			const auto right_b = 90 + max_ricochet_angle;
-
-			if (DEBUG_DRAWING.draw_forces) {
-				DEBUG_PERSISTENT_LINES.emplace_back(
-					yellow,
-					vec2(it.point),
-					vec2(it.point) + collision_normal * 150
-				);
-
-				DEBUG_PERSISTENT_LINES.emplace_back(
-					green,
-					vec2(it.point),
-					vec2(it.point) - impact_dir * 150
-				);
-			}
-
-			RIC_LOG_NVPS(left_b, hit_facing, right_b);
-
-			if (hit_facing > left_b && hit_facing < right_b) {
-				{
-					const bool born_cooldown = clk.lasts(
-						missile_def.ricochet_born_cooldown_ms,
-						typed_missile.when_born()
-					);
-
-					if (born_cooldown) {
-						RIC_LOG("Rico: born cooldown");
-						return;
-					}
-
-#if USER_RICOCHET_COOLDOWNS
-					const bool ricochet_cooldown = clk.lasts(
-						ricochet_cooldown_ms,
-						missile.when_last_ricocheted
-					);
-#else
-					const bool ricochet_cooldown = now.step <= missile.when_last_ricocheted.step + 1;
-#endif
-					if (ricochet_cooldown) {
-						RIC_LOG("Rico: rico cooldown");
-						return;
-					}
-
-					RIC_LOG("NO COOLDOWN, performing RICOCHET with %x, NOW: %x, impact dir: %x, coll normal: %x", surface_handle, now.step, impact_dir, collision_normal);
-				}
-
-				const auto angle = std::min(hit_facing - left_b, right_b - hit_facing);
-				const auto angle_mult = angle / max_ricochet_angle;
-
-				missile.when_last_ricocheted = now;
-
-				const auto reflected_dir = vec2(impact_dir).reflect(collision_normal);
-				const auto& rigid_body = typed_missile.template get<components::rigid_body>();
-
-				const auto target_position = rigid_body.get_transform().pos;
-				const auto new_transform = transformr(target_position, reflected_dir.degrees());
-
-				const auto new_velocity = reflected_dir * impact_speed;
-
-				RIC_LOG_NVPS(new_velocity);
-
-				rigid_body.set_velocity(new_velocity);
-				rigid_body.set_transform(new_transform);
-
-				::play_collision_sound(angle_mult * 150.f, it.point, typed_missile, surface_handle, step);
-
-				const auto effect_transform = transformr(it.point, reflected_dir.degrees());
-
-				{
-					const auto& effect = missile_def.ricochet_particles;
-
-					effect.start(
-						step,
-						particle_effect_start_input::fire_and_forget(effect_transform)
-					);
-				}
-
-				{
-					const auto pitch = 0.7f + angle_mult / 1.5f;
-
-					auto effect = missile_def.ricochet_sound;
-					effect.modifier.pitch = pitch;
-
-					effect.start(
-						step,
-						sound_effect_start_input::fire_and_forget(effect_transform)
-					);
-				}
-			}
-			else {
-				RIC_LOG("Not enough facing. IGNORED.");
-			}
+				it.normal,
+				it.collider_impact_velocity,
+				it.point
+			);
 		});
 	}
 }
