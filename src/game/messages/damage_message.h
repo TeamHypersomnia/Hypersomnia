@@ -17,7 +17,6 @@ namespace messages {
 		vec2 point_of_impact;
 		adverse_element_type type = adverse_element_type::FORCE;
 
-		b2Fixture_index_in_component collider_b2Fixture_index;
-		b2Fixture_index_in_component subject_b2Fixture_index;
+		b2Fixture_indices indices;
 	};
 }

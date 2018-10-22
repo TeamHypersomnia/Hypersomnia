@@ -23,14 +23,13 @@ void destruction_system::generate_damages_from_forceful_collisions(const logic_s
 		const auto subject = cosm[it.subject];
 		const auto& fixtures = subject.get<invariants::fixtures>();
 
-		const auto& data_indices = it.subject_b2Fixture_index;
+		const auto& data_indices = it.indices.subject;
 
 		if (data_indices.is_set() && fixtures.is_destructible()) {
 			//LOG("Destructible fixture was hit.");
 
 			messages::damage_message damage_msg;
-			damage_msg.subject_b2Fixture_index = it.subject_b2Fixture_index;
-			damage_msg.collider_b2Fixture_index = it.collider_b2Fixture_index;
+			damage_msg.indices = it.indices;
 
 			damage_msg.origin = damage_origin(cosm[it.collider]);
 			damage_msg.subject = it.subject;

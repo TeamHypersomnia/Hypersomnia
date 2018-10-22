@@ -11,11 +11,10 @@ namespace messages {
 		vec2 point;
 		vec2 normal;
 
-		b2Fixture_index_in_component collider_b2Fixture_index;
-		b2Fixture_index_in_component subject_b2Fixture_index;
+		b2Fixture_indices indices;
 		
-		float normal_impulse = 0.f;
-		float tangent_impulse = 0.f;
+		real32 normal_impulse = 0.f;
+		real32 tangent_impulse = 0.f;
 
 		bool one_is_sensor = false;
 
