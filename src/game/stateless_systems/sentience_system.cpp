@@ -32,6 +32,7 @@
 #include "game/detail/gun/gun_math.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/detail/damage_origin.hpp"
+#include "game/detail/weapon_like.h"
 #include "game/detail/sentience/sentience_logic.h"
 
 damage_cause::damage_cause(const const_entity_handle& handle) {
@@ -581,7 +582,7 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 							requested_angle = colinearize_AB_with_C(mc, barrel_center, muzzle, target_transform.pos, debug_line_drawer);
 						}
 					}
-					else if (subject_item.template find<components::hand_fuse>()) {
+					else if (is_weapon_like(subject_item)) {
 						auto throwable_transform = subject_item.get_logic_transform();
 						auto throwable_target_vector = throwable_transform.pos + vec2::from_degrees(throwable_transform.rotation);
 

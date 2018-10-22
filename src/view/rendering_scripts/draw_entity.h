@@ -350,13 +350,16 @@ FORCE_INLINE void specific_entity_drawer(
 						}
 					}
 
-					const auto is_special_stance = 
-						stance_id == item_holding_stance::HEAVY_LIKE ||
-						stance_id == item_holding_stance::PISTOL_LIKE
-					;
+					{
+						const auto required_by_stance = 
+							stance_id == item_holding_stance::HEAVY_LIKE ||
+							stance_id == item_holding_stance::PISTOL_LIKE ||
+							stance_id == item_holding_stance::KNIFE_LIKE
+						;
 
-					if (is_special_stance && current_slot.is_hand_slot()) {
-						return true;
+						if (required_by_stance && current_slot.is_hand_slot()) {
+							return true;
+						}
 					}
 
 					if (stance_id == item_holding_stance::AKIMBO) {

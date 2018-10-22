@@ -14,6 +14,7 @@
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
+#include "game/detail/weapon_like.h"
 
 void line_output_wrapper::operator()(const vec2 from, const vec2 to, const rgba col) const {
 	output.line(line_tex, from, to, col);
@@ -98,7 +99,7 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 					);
 				}
 			}
-			else if (subject_item.has<invariants::explosive>() || subject_item.has<invariants::melee>()) {
+			else if (is_weapon_like(subject_item)) {
 				const auto explosive_transform = subject_item.get_viewing_transform(in.interpolation);
 				const auto explosive_target_vector = explosive_transform.pos + vec2::from_degrees(explosive_transform.rotation);
 

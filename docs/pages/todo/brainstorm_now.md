@@ -6,22 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- asset ids in bomb mode vars widget
+
 - Throwing the knives
-	- What to change in physics on throw
-		- Bullet: false->true
-		- Filter
-		- Body updated, colliders refiltered
-		- perform transfer should infer the body as well, but not from scratch
-	- Let's make it first
-		- We'll have a nice entry point in the missile system
-	- When to unset the sender of a thrown item?
-		- When it first collides with something under velocity that is lower than the required bound for damage?
-			- For now it's not of much importance but yeah, it's a good candidate
-			- Kills can still be misattributed, e.g. by initiating an explosion
-		- We would effectively need to iterate all melee weapons to see if the velocity has cooled down already
-			- We could always make it a processing list in the future
-		- We might need this for other properties as well, e.g. for setting a filter from a flying item to a small dynamic body
-			- And for changing the bullet body type
+	- pass through held item
 
 - Then the direct attachment offset must calculate the offsets, I guess.
 

@@ -46,6 +46,12 @@ namespace test_flavours {
 				{
 					auto& t = melee.throw_def;
 					t.min_speed_to_hurt = 500.f;
+
+					auto& d = t.damage;
+					d.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+					d.base = 88.f;
+					d.impact_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SECONDARY);
+					d.impact_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_IMPACT);
 				}
 
 				{
