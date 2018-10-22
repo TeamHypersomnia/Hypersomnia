@@ -51,9 +51,11 @@ void play_collision_sound(
 
 				if (gain_mult > 0.01f) {
 					// LOG("Cnorm/scgain/ccgain:\n%f4,%f4,%f4", strength, subject_coll.collision_sound_gain_mult, collider_coll.collision_sound_gain_mult);
+					LOG_NVPS(pitch_mult);
 
 					sound_effect_input effect;
-					effect.modifier.pitch = std::min(1.5f, 0.85f + pitch_mult);
+					//effect.modifier.pitch = std::min(1.5f, 0.85f + pitch_mult);
+					effect.modifier.pitch = std::max(0.9f, 1.5f - pitch_mult);
 					
 					effect.modifier.gain = gain_mult;
 					effect.id = *sound_id;

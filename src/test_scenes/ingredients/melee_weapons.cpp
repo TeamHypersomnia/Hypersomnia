@@ -28,7 +28,12 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::RESISTANCE_KNIFE, white);
-			test_flavours::add_lying_item_dynamic_body(meta);
+
+			{
+				auto& fixtures = test_flavours::add_lying_item_dynamic_body(meta);
+				fixtures.density *= 1.5f;
+				fixtures.material = to_physical_material_id(test_scene_physical_material_id::KNIFE);
+			}
 
 			{
 				invariants::item item;

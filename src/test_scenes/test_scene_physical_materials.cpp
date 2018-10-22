@@ -36,6 +36,11 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 		}
 	};
 
+	set_pair(test_scene_physical_material_id::KNIFE, test_scene_physical_material_id::METAL, test_scene_sound_id::COLLISION_KNIFE_METAL);
+	set_pair(test_scene_physical_material_id::KNIFE, test_scene_physical_material_id::WOOD, test_scene_sound_id::COLLISION_KNIFE_WOOD);
+	set_pair(test_scene_physical_material_id::KNIFE, test_scene_physical_material_id::GLASS, test_scene_sound_id::COLLISION_GLASS);
+	set_pair(test_scene_physical_material_id::KNIFE, test_scene_physical_material_id::GRENADE, test_scene_sound_id::COLLISION_GRENADE);
+
 	set_pair(test_scene_physical_material_id::METAL, test_scene_physical_material_id::METAL, test_scene_sound_id::COLLISION_METAL_METAL);
 	set_pair(test_scene_physical_material_id::METAL, test_scene_physical_material_id::WOOD, test_scene_sound_id::COLLISION_METAL_WOOD);
 	set_pair(test_scene_physical_material_id::WOOD, test_scene_physical_material_id::WOOD, test_scene_sound_id::COLLISION_METAL_WOOD);
