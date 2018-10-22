@@ -2151,3 +2151,6 @@ i			- if the newly calculated target is different than last_reload_target, reset
 			- We could always make it a processing list in the future
 		- We might need this for other properties as well, e.g. for setting a filter from a flying item to a small dynamic body
 			- And for changing the bullet body type
+
+- asset ids in bomb mode vars widget
+

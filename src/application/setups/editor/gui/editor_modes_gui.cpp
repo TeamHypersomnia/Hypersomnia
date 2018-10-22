@@ -21,6 +21,10 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/memory_stream.h"
 
+#include "application/setups/editor/property_editor/widgets/pathed_asset_widget.h"
+#include "application/setups/editor/property_editor/widgets/unpathed_asset_widget.h"
+#include "application/setups/editor/property_editor/widgets/asset_sane_default_provider.h"
+
 void editor_modes_gui::perform(const editor_settings& settings, editor_command_input cmd_in) {
 	using namespace augs::imgui;
 
@@ -158,14 +162,22 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 						cmd.vars_type_id.set<M>();
 						cmd.vars_id = vars_id;
 
+						auto& defs = cmd_in.folder.commanded->work.viewables;
+
+						const auto project_path = cmd_in.folder.current_path;
+
 						singular_edit_properties(
 							in,
 							typed_mode,
 							" (Current mode)",
 							cmd,
 							special_widgets(
+								pathed_asset_widget { defs, project_path, cmd_in },
+								unpathed_asset_widget { defs, cosm.get_logical_assets() },
 								flavour_widget { cosm }
-							)
+							),
+
+							asset_sane_default_provider { defs }
 						);
 					}
 				}
