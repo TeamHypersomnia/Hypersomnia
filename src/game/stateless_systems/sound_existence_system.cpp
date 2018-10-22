@@ -42,30 +42,27 @@ void play_collision_sound(
 	if (subject_coll_material != nullptr
 		&& collider_coll_material != nullptr
 	) {
-		auto play_sound = [&](const auto sound_id) {
-			if (sound_id) {
+		auto play_sound = [&](const auto* sound_def) {
+			if (sound_def) {
 				const auto impulse = strength * subject_coll.collision_sound_gain_mult * collider_coll.collision_sound_gain_mult;
 
-				const auto gain_mult = (impulse / 15.f) * (impulse / 15.f);
-				const auto pitch_mult = impulse / 185.f;
+				const auto gain_mult = impulse * impulse * sound_def->gain_mult;
+				const auto pitch_mult = impulse * sound_def->pitch_mult;
 
 				if (gain_mult > 0.01f) {
 					// LOG("Cnorm/scgain/ccgain:\n%f4,%f4,%f4", strength, subject_coll.collision_sound_gain_mult, collider_coll.collision_sound_gain_mult);
-					LOG_NVPS(pitch_mult);
 
-					sound_effect_input effect;
-					//effect.modifier.pitch = std::min(1.5f, 0.85f + pitch_mult);
-					effect.modifier.pitch = std::max(0.9f, 1.5f - pitch_mult);
-					
-					effect.modifier.gain = gain_mult;
-					effect.id = *sound_id;
+					auto effect = sound_def->effect;
 
-					// LOG("Coll. gain/pitch: %f3/%f3", in.effect.modifier.gain, in.effect.modifier.pitch);
+					const auto& pitch_bound = sound_def->pitch;
+					effect.modifier.pitch *= std::max(pitch_bound.first, pitch_bound.second - pitch_mult);
+					effect.modifier.gain *= gain_mult;
 
-					effect.start(
-						step, 
-						sound_effect_start_input::fire_and_forget(location).mark_source_collision(sub, col)
-					);
+					auto start = sound_effect_start_input::fire_and_forget(location).mark_source_collision(sub, col);
+					start.collision_sound_cooldown_duration = sound_def->cooldown_duration;
+					start.collision_sound_occurences_before_cooldown = sound_def->occurences_before_cooldown;
+
+					effect.start(step, start);
 				}
 			}
 		};

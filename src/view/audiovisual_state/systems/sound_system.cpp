@@ -281,9 +281,6 @@ bool sound_system::generic_sound_cache::still_playing() const {
 	return source.is_playing() || followup_inputs.size() > 0;
 }
 
-static const auto collision_sound_cooldown_duration = 250.f;
-static const auto collision_sound_occurences_before_cooldown = 4;
-
 void sound_system::update_effects_from_messages(const const_logic_step step, const update_properties_input in) {
 	{
 		const auto& events = step.get_queue<messages::stop_sound_effect>();
@@ -318,7 +315,8 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 
 		for (auto& e : events) {
 			{
-				const auto& s = e.payload.start.source_collision;
+				const auto& start = e.payload.start;
+				const auto& s = start.source_collision;
 
 				if (!(s == collision_sound_source())) {
 					const auto it = collision_sound_cooldowns.try_emplace(s);
@@ -326,11 +324,11 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 					auto& cooldown = (*it.first).second;
 
 					++cooldown.consecutive_occurences;
-					++cooldown.remaining_ms = collision_sound_cooldown_duration;
+					++cooldown.remaining_ms = start.collision_sound_cooldown_duration;
 
 					// LOG_NVPS(cooldown.consecutive_occurences);
 
-					if (cooldown.consecutive_occurences > collision_sound_occurences_before_cooldown) {
+					if (cooldown.consecutive_occurences > start.collision_sound_occurences_before_cooldown) {
 						// LOG("Skipping");
 						continue;
 					}

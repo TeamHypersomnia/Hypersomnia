@@ -19,26 +19,46 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 		all_definitions.allocate().object.name = format_enum(id);
 	});
 
+	using minmax = augs::minmax<real32>;
+
 	const auto set_pair = [&](
 		const test_scene_physical_material_id a,
 		const test_scene_physical_material_id b,
 		const test_scene_sound_id c,
-		const bool both_ways = true
+		const bool both_ways = true,
+		collision_sound_def def_template = {}
 	) {
 		const auto a_id = to_physical_material_id(a);
 		const auto b_id = to_physical_material_id(b);
 		const auto c_id = to_sound_id(c);
 
-		all_definitions[a_id].collision_sound_matrix[b_id] = c_id;
+		{
+			auto& entry = all_definitions[a_id].collision_sound_matrix[b_id];
+			def_template.effect.id = c_id;
+			entry = def_template;
+		}
 
 		if (both_ways) {
-			all_definitions[b_id].collision_sound_matrix[a_id] = c_id;
+			auto& entry = all_definitions[b_id].collision_sound_matrix[a_id];
+
+			def_template.effect.id = c_id;
+			entry = def_template;
 		}
 	};
 
-	set_pair(test_scene_physical_material_id::KNIFE, test_scene_physical_material_id::METAL, test_scene_sound_id::COLLISION_KNIFE_METAL);
-	set_pair(test_scene_physical_material_id::KNIFE, test_scene_physical_material_id::WOOD, test_scene_sound_id::COLLISION_KNIFE_WOOD);
-	set_pair(test_scene_physical_material_id::KNIFE, test_scene_physical_material_id::GLASS, test_scene_sound_id::COLLISION_GLASS);
+	{
+		collision_sound_def def;
+		def.pitch = minmax(0.9f, 1.25f);
+		def.gain_mult *= 5.0f;
+
+		def.occurences_before_cooldown = 1;
+
+		set_pair(test_scene_physical_material_id::KNIFE, test_scene_physical_material_id::METAL, test_scene_sound_id::COLLISION_KNIFE_METAL, true, def);
+		set_pair(test_scene_physical_material_id::KNIFE, test_scene_physical_material_id::WOOD, test_scene_sound_id::COLLISION_KNIFE_WOOD, true, def);
+		set_pair(test_scene_physical_material_id::KNIFE, test_scene_physical_material_id::GLASS, test_scene_sound_id::COLLISION_KNIFE_METAL, false, def);
+		set_pair(test_scene_physical_material_id::GLASS, test_scene_physical_material_id::KNIFE, test_scene_sound_id::COLLISION_GLASS, false);
+	}
+
 	set_pair(test_scene_physical_material_id::KNIFE, test_scene_physical_material_id::GRENADE, test_scene_sound_id::COLLISION_GRENADE);
 
 	set_pair(test_scene_physical_material_id::METAL, test_scene_physical_material_id::METAL, test_scene_sound_id::COLLISION_METAL_METAL);
