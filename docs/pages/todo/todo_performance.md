@@ -5,6 +5,9 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Destroy b2Bodies when they are not needed, e.g. they are in inventory
+	- Mandatory for MMO
+
 - Sound should be loaded from the smallest to the biggest
 	- So that effects are loaded first
 	- New synchronization

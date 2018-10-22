@@ -1,6 +1,7 @@
 #pragma once
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/detail/inventory/item_mounting.hpp"
+#include "game/detail/weapon_like.h"
 
 template <class E>
 int inventory_mixin<E>::count_contained(const item_flavour_id& id) const {
@@ -92,15 +93,6 @@ template <class E>
 template <class handle_type>
 typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find_holstering_slot_for(const handle_type holstered_item) const {
 	return find_slot_for(holstered_item, { slot_finding_opt::CHECK_WEARABLES, slot_finding_opt::CHECK_CONTAINERS });
-}
-
-template <class E>
-bool is_weapon_like(const E& typed_handle) {
-	return 
-		typed_handle.template has<components::gun>() 
-		|| typed_handle.template has<components::hand_fuse>()
-		|| typed_handle.template has<components::melee>()
-	;
 }
 
 template <class E>

@@ -17,6 +17,7 @@
 #include "game/cosmos/data_living_one_step.h"
 #include "game/cosmos/for_each_entity.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
+#include "game/detail/melee/like_melee.h"
 
 using namespace augs;
 
@@ -29,6 +30,22 @@ namespace components {
 		const bool allow_rotation = state == melee_fighter_state::READY || state == melee_fighter_state::COOLDOWN;
 		return !allow_rotation;
 	}
+}
+
+void melee_system::advance_thrown_melee_logic(const logic_step step) {
+	auto& cosm = step.get_cosmos();
+
+	cosm.for_each_having<components::melee>([&](const auto& it) {
+		auto& sender = it.template get<components::sender>();
+
+		if (sender.is_set()) {
+			if (!has_hurting_velocity(it)) {
+				sender.unset();
+				it.infer_rigid_body();
+				it.infer_colliders();
+			}
+		}
+	});
 }
 
 void melee_system::initiate_and_update_moves(const logic_step step) {

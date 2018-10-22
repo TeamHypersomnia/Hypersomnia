@@ -280,3 +280,23 @@ maybe_const_ptr_t<inventory_mixin<E>::is_const, pending_item_mount> inventory_mi
 
 	return mapped_or_nullptr(cosm.get_global_solvable().pending_item_mounts, self.get_guid());
 }
+
+template <class E>
+void inventory_mixin<E>::infer_item_physics_recursive() const {
+	const auto& self = *static_cast<const E*>(this);
+	ensure(self);
+
+	self.infer_colliders();
+	self.for_each_contained_item_recursive([](const auto& h) {
+		h.infer_colliders();	
+	});
+}
+
+template <class E>
+void inventory_mixin<E>::infer_change_of_current_slot() const {
+	/* Synonym */
+	infer_item_physics_recursive();
+
+	const auto& self = *static_cast<const E*>(this);
+	self.infer_rigid_body();
+}

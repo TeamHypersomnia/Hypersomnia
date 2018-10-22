@@ -23,6 +23,7 @@
 #include "game/messages/melee_swing_response.h"
 #include "game/messages/health_event.h"
 #include "game/messages/exhausted_cast_message.h"
+#include "game/detail/physics/calc_physical_material.hpp"
 
 void play_collision_sound(
 	const real32 strength,
@@ -35,8 +36,8 @@ void play_collision_sound(
 	const auto subject_coll = sub.get<invariants::fixtures>();
 	const auto collider_coll = col.get<invariants::fixtures>();
 
-	const auto* const subject_coll_material = logicals.find(sub.calc_physical_material());
-	const auto* const collider_coll_material = logicals.find(col.calc_physical_material());
+	const auto* const subject_coll_material = logicals.find(calc_physical_material(sub));
+	const auto* const collider_coll_material = logicals.find(calc_physical_material(col));
 
 	if (subject_coll_material != nullptr
 		&& collider_coll_material != nullptr

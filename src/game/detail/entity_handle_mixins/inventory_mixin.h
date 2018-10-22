@@ -52,21 +52,8 @@ public:
 	using generic_handle_type = basic_entity_handle<is_const>;
 	using inventory_slot_handle_type = basic_inventory_slot_handle<generic_handle_type>;
 
-
-	void infer_item_colliders_recursive() const {
-		const auto& self = *static_cast<const derived_handle_type*>(this);
-		ensure(self);
-
-		self.infer_colliders();
-		self.for_each_contained_item_recursive([](const auto& h) {
-			h.infer_colliders();	
-		});
-	}
-
-	void infer_change_of_current_slot() const {
-		/* Synonym */
-		infer_item_colliders_recursive();
-	}
+	void infer_item_physics_recursive() const;
+	void infer_change_of_current_slot() const;
 
 	std::optional<inventory_space_type> find_space_occupied() const;	
 	int num_charges_fitting_in(const inventory_slot_handle_type&) const;

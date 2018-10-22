@@ -258,11 +258,11 @@ perform_transfer_result perform_transfer_impl(
 	*/
 
 	if (source_root) {
-		source_root.infer_item_colliders_recursive();
+		source_root.infer_item_physics_recursive();
 	}
 
 	if (target_root) {
-		target_root.infer_item_colliders_recursive();
+		target_root.infer_item_physics_recursive();
 	}
 
 	const bool is_drop_request = result.relation == capability_relation::DROP;

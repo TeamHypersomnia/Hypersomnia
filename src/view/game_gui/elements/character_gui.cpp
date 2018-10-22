@@ -40,6 +40,7 @@
 #include "game/detail/spells/spell_structs.h"
 #include "game/detail/entity_handle_mixins/make_wielding_transfers.hpp"
 #include "game/detail/inventory/wielding_setup.hpp"
+#include "game/detail/weapon_like.h"
 
 #define LOG_HOTBAR 0
 

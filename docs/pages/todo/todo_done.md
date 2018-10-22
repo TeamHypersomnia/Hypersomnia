@@ -2134,3 +2134,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- This way we don't have to worry about resetting triggers ever
 	- We acquire sentience in the gun system anyway
 
+- Make flying grenades bullet bodies so that we are accurate
+

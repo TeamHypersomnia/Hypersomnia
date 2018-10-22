@@ -6,9 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Make flying grenades bullet bodies so that we are accurate
-
 - Throwing the knives
+	- What to change in physics on throw
+		- Bullet: false->true
+		- Filter
+		- Body updated, colliders refiltered
+		- perform transfer should infer the body as well, but not from scratch
 	- Let's make it first
 		- We'll have a nice entry point in the missile system
 	- When to unset the sender of a thrown item?

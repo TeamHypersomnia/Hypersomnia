@@ -8,6 +8,14 @@
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 
 namespace components {
+	bool sender::is_set() const {
+		return direct_sender.is_set();
+	}
+
+	void sender::unset() {
+		*this = {};
+	}
+
 	void sender::set_direct(const const_entity_handle new_direct_sender) {
 		direct_sender = new_direct_sender;
 		direct_sender_flavour = new_direct_sender.get_flavour_id();

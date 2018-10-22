@@ -125,12 +125,6 @@ namespace augs {
 
 		PLR_LOG("Seeking from %x to %x", current_step, seeked_step);
 
-		LOG_NVPS(snapshots.size());
-
-		for (const auto& s : snapshots) {
-			LOG_NVPS(s.first);
-		}
-
 		const auto seeked_adj_snapshot = [&]() {
 			auto it = snapshots.upper_bound(seeked_step);
 			--it;

@@ -40,8 +40,6 @@ public:
 	void infer_rigid_body() const;
 	void infer_colliders_from_scratch() const;
 	void infer_transform() const;
-
-	assets::physical_material_id calc_physical_material() const;
 };
 
 template <class E>
@@ -188,21 +186,3 @@ void physics_mixin<E>::infer_transform() const {
 	cosm.get_solvable_inferred({}).tree_of_npo.infer_cache_for(h);
 }
 
-template <class E>
-assets::physical_material_id physics_mixin<E>::calc_physical_material() const {
-	const auto self = *static_cast<const E*>(this);
-
-	if (const auto fuse = self.template find<invariants::hand_fuse>()) {
-		if (self.is_like_thrown_explosive()) {
-			if (fuse->released_physical_material.is_set()) {
-				return fuse->released_physical_material;
-			}
-		}
-	}
-
-	if (const auto fixtures = self.template find<invariants::fixtures>()) {
-		return fixtures->material;
-	}
-
-	return {};
-}

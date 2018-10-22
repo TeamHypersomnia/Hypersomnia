@@ -3,15 +3,62 @@
 #include "augs/misc/convex_partitioned_shape.hpp"
 #include "game/enums/filters.h"
 
+#include "game/detail/explosive/like_explosive.h"
+#include "game/detail/melee/like_melee.h"
+
+inline auto to_b2Body_type(const rigid_body_type t) {
+	switch (t) {
+		case rigid_body_type::STATIC: 
+			return b2BodyType::b2_staticBody;
+		case rigid_body_type::KINEMATIC: 
+			return b2BodyType::b2_kinematicBody;
+		case rigid_body_type::DYNAMIC: 
+			return b2BodyType::b2_dynamicBody;
+
+		default: 
+			return b2BodyType::b2_staticBody;
+	}
+};
+
+template <class E>
+auto calc_is_bullet(const E& handle) {
+	const auto& rigid_body = handle.template get<invariants::rigid_body>();
+
+	if (is_like_thrown_explosive(handle)) {
+		return true;
+	}
+
+	if (is_like_thrown_melee(handle)) {
+		return true;
+	}
+
+	return rigid_body.bullet;
+}
+
+template <class E>
+auto calc_body_type(const E& handle) {
+	const auto& physics_def = handle.template get<invariants::rigid_body>();
+
+	const auto type = 
+		is_like_planted_bomb(handle) 
+		? rigid_body_type::STATIC 
+		: physics_def.body_type
+	;
+
+	return to_b2Body_type(type);
+}
+
 template <class E>
 auto calc_filters(const E& handle) {
 	const auto& colliders_data = handle.template get<invariants::fixtures>();
 
-	if (handle.is_like_planted_bomb()) {
+	if (is_like_planted_bomb(handle)) {
 		return filters[predefined_filter_type::PLANTED_EXPLOSIVE];
 	}
 
-	if (handle.is_like_thrown_explosive()) {
+	if (is_like_thrown_explosive(handle)
+		|| is_like_thrown_melee(handle)
+	) {
 		return filters[predefined_filter_type::FLYING_ITEM];
 	}
 
@@ -19,12 +66,12 @@ auto calc_filters(const E& handle) {
 }
 
 template <class E>
-void physics_world_cache::infer_rigid_body_existence(const E& typed_handle) {
+void physics_world_cache::specific_infer_rigid_body_existence(const E& typed_handle) {
 	if (const auto cache = find_rigid_body_cache(typed_handle)) {
 		return;
 	}
 
-	infer_rigid_body(typed_handle);
+	specific_infer_rigid_body_from_scratch(typed_handle);
 }
 
 template <class E>
@@ -45,24 +92,63 @@ void physics_world_cache::specific_infer_cache_for(const E& typed_handle) {
 }
 
 template <class E>
-void physics_world_cache::specific_infer_rigid_body(const E& handle) {
+void physics_world_cache::specific_infer_rigid_body_from_scratch(const E& handle) {
 	const auto it = rigid_body_caches.try_emplace(unversioned_entity_id(handle));
 	auto& cache = (*it.first).second;
 
 	const auto& physics_def = handle.template get<invariants::rigid_body>();
 
-	auto to_b2Body_type = [](const rigid_body_type t) {
-		switch (t) {
-			case rigid_body_type::DYNAMIC: return b2BodyType::b2_dynamicBody;
-			case rigid_body_type::STATIC: return b2BodyType::b2_staticBody;
-			case rigid_body_type::KINEMATIC: return b2BodyType::b2_kinematicBody;
-			default: return b2BodyType::b2_staticBody;
-		}
-	};
+	cache.clear(*this);
 
-	const auto body_type = [&]() {
-		return handle.is_like_planted_bomb() ? rigid_body_type::STATIC : physics_def.body_type;
-	}();
+	const auto rigid_body = handle.template get<components::rigid_body>();
+	const auto& physics_data = rigid_body.get_raw_component();
+
+	b2BodyDef def;
+	def.type = calc_body_type(handle);
+
+	def.userData = unversioned_entity_id(handle);
+
+	def.bullet = calc_is_bullet(handle);
+	def.allowSleep = physics_def.allow_sleep;
+
+	const auto damping = rigid_body.calc_damping_mults(physics_def);
+
+	def.angularDamping = damping.angular;
+	def.linearDamping = damping.linear;
+
+	def.transform = physics_data.physics_transforms.m_xf;
+	def.sweep = physics_data.physics_transforms.m_sweep;
+
+	def.linearVelocity = b2Vec2(physics_data.velocity);
+	def.angularVelocity = physics_data.angular_velocity;
+
+	if (handle.template has<components::missile>()) {
+		def.fixedRotation = true;
+	}
+
+	def.active = true;
+
+	cache.body = b2world->CreateBody(&def);
+
+	cache.body->SetAngledDampingEnabled(physics_def.angled_damping);
+	cache.body->SetLinearDampingVec(b2Vec2(damping.linear_axis_aligned));
+
+	/*
+		All colliders caches, before their own inference,
+		manually infer the existence of the rigid body,
+		and the b2Body cannot henceforth disappear from existence.
+			Note: if we know it is going to be rebuilt (e.g. due to a change from dynamic to static) 
+			we must manually call the fixtures updater.
+
+		Thus the rigid body, on its own inference, does not have to inform all fixtures
+		about that it has just come into existence.
+	*/
+}
+
+template <class E>
+void physics_world_cache::specific_infer_rigid_body(const E& handle) {
+	const auto it = rigid_body_caches.try_emplace(unversioned_entity_id(handle));
+	auto& cache = (*it.first).second;
 
 	if (!it.second) {
 		/* The cache already existed. */
@@ -70,7 +156,7 @@ void physics_world_cache::specific_infer_rigid_body(const E& handle) {
 
 		bool only_update_properties = true;
 
-		if (to_b2Body_type(body_type) != body.GetType()) {
+		if (calc_body_type(handle) != body.GetType()) {
 			only_update_properties = false;
 		}
 
@@ -95,6 +181,7 @@ void physics_world_cache::specific_infer_rigid_body(const E& handle) {
 			body.SetAngularDamping(damping.angular);
 			body.SetLinearDampingVec(b2Vec2(damping.linear_axis_aligned));
 			body.SetAngledDampingEnabled(def.angled_damping);
+			body.SetBullet(calc_is_bullet(handle));
 	
 			if (handle.template has<components::missile>()) {
 				body.SetFixedRotation(true);
@@ -129,51 +216,7 @@ void physics_world_cache::specific_infer_rigid_body(const E& handle) {
 		}
 	}
 
-	/*
-		Here the cache is not constructed so we rebuild from scratch.
-	*/
-	cache.clear(*this);
-
-	const auto rigid_body = handle.template get<components::rigid_body>();
-	const auto& physics_data = rigid_body.get_raw_component();
-
-	b2BodyDef def;
-	def.type = to_b2Body_type(body_type);
-
-	def.userData = unversioned_entity_id(handle);
-
-	def.bullet = physics_def.bullet;
-	def.allowSleep = physics_def.allow_sleep;
-
-	const auto damping = rigid_body.calc_damping_mults(physics_def);
-
-	def.angularDamping = damping.angular;
-	def.linearDamping = damping.linear;
-
-	def.transform = physics_data.physics_transforms.m_xf;
-	def.sweep = physics_data.physics_transforms.m_sweep;
-
-	def.linearVelocity = b2Vec2(physics_data.velocity);
-	def.angularVelocity = physics_data.angular_velocity;
-
-	if (handle.template has<components::missile>()) {
-		def.fixedRotation = true;
-	}
-
-	def.active = true;
-
-	cache.body = b2world->CreateBody(&def);
-
-	cache.body->SetAngledDampingEnabled(physics_def.angled_damping);
-	cache.body->SetLinearDampingVec(b2Vec2(damping.linear_axis_aligned));
-
-	/*
-		All colliders caches, before their own inference,
-		manually infer the existence of the rigid body.
-
-		Thus the rigid body, on its own inference, does not have to inform all fixtures
-		about that it has just come into existence.
-	*/
+	specific_infer_rigid_body_from_scratch(handle);
 }
 
 template <class E>
@@ -192,7 +235,7 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		return;
 	}
 
-	infer_rigid_body_existence(new_owner);
+	specific_infer_rigid_body_existence(new_owner);
 
 	const auto body_cache = find_rigid_body_cache(new_owner);
 
@@ -300,7 +343,7 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		return;
 	}
 
-	if (!handle.is_like_planted_bomb() && handle.is_like_thrown_explosive()) {
+	if (is_like_thrown_explosive(handle)) {
 		if (const auto fuse = handle.template find<invariants::hand_fuse>()) {
 			from_circle_shape(fuse->circle_shape_radius_when_released);
 		}

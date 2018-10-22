@@ -1,4 +1,5 @@
 #include "game/detail/inventory/wielding_setup.h"
+#include "game/detail/weapon_like.h"
 
 template <class A, class B>
 entity_id get_wieldable_if_available(

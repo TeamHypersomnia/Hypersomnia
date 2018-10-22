@@ -218,30 +218,6 @@ public:
 		return faction_type::SPECTATOR;
 	}
 
-	bool is_like_planted_bomb() const {
-		const auto self = *static_cast<const E*>(this);
-
-		if (const auto fuse = self.template find<components::hand_fuse>()) {
-			if (const auto fuse_def = self.template find<invariants::hand_fuse>()) {
-				return fuse->armed() && fuse_def->is_like_plantable_bomb();
-			}
-		}
-
-		return false;
-	}
-
-	bool is_like_thrown_explosive() const {
-		const auto self = *static_cast<const E*>(this);
-
-		if (const auto fuse = self.template find<components::hand_fuse>()) {
-			if (const auto fuse_def = self.template find<invariants::hand_fuse>()) {
-				return fuse->armed() && self.get_owning_transfer_capability().dead();
-			}
-		}
-
-		return false;
-	}
-
 	bool is_frozen() const {
 		const auto self = *static_cast<const E*>(this);
 

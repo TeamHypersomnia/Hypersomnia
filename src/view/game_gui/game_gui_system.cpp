@@ -21,7 +21,7 @@
 #include "view/game_gui/elements/slot_button.h"
 #include "view/game_gui/elements/item_button.h"
 #include "game/messages/changed_identities_message.h"
-#include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
+#include "game/detail/weapon_like.h"
 
 #include "game/detail/inventory/wielding_setup.hpp"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"

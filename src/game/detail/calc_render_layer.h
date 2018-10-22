@@ -6,17 +6,18 @@
 #include "game/cosmos/entity_type_traits.h"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 #include "game/detail/entities_with_render_layer.h"
+#include "game/detail/explosive/like_explosive.h"
 
 template <class H>
 FORCE_INLINE auto calc_render_layer(const H& handle) {
 	if constexpr(H::is_specific) {
 		if constexpr(H::template has<invariants::render>()) {
 			if constexpr(H::template has<invariants::hand_fuse>()) {
-				if (handle.is_like_planted_bomb()) {
+				if (is_like_planted_bomb(handle)) {
 					return render_layer::PLANTED_BOMBS;
 				} 
 
-				if (handle.is_like_thrown_explosive()) {
+				if (is_like_thrown_explosive(handle)) {
 					return render_layer::OVER_SMALL_DYNAMIC_BODY;
 				} 
 			}

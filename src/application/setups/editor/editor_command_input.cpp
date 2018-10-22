@@ -83,8 +83,6 @@ editor_command_input editor_command_input::make_dummy_for(sol::state& lua, edito
 
 	thread_local dummies d;
 
-	LOG_NVPS(sizeof(dummies));
-
 	d.settings.player.snapshot_interval_in_steps = 0;
 
 	return editor_command_input {

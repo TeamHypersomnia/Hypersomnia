@@ -44,6 +44,11 @@ namespace test_flavours {
 				invariants::melee melee;
 
 				{
+					auto& t = melee.throw_def;
+					t.min_velocity_to_hurt = 500.f;
+				}
+
+				{
 					auto& a = melee.actions[weapon_action_type::PRIMARY];
 					a.init_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_PRIMARY);
 					a.wielder_impulse = 20.f;

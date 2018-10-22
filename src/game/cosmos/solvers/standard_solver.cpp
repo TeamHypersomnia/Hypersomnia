@@ -86,6 +86,7 @@ void standard_solve(const logic_step step) {
 	car_system().apply_movement_forces(step);
 
 	melee_system().initiate_and_update_moves(step);
+	melee_system().advance_thrown_melee_logic(step);
 
 	force_joint_system().apply_forces_towards_target_entities(step);
 	item_system().handle_throw_item_intents(step);

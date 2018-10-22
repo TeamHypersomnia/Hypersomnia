@@ -19,5 +19,8 @@ namespace components {
 		void set_direct(const const_entity_handle direct_sender);
 
 		bool is_sender_subject(const const_entity_handle potential_sender) const;
+
+		bool is_set() const;
+		void unset();
 	};
 }

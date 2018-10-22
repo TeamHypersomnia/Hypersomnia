@@ -206,7 +206,13 @@ public:
 	void specific_infer_cache_for(const E&);
 
 	template <class E>
+	void specific_infer_rigid_body_existence(const E& handle);
+
+	template <class E>
 	void specific_infer_rigid_body(const E&);
+
+	template <class E>
+	void specific_infer_rigid_body_from_scratch(const E& handle);
 
 	template <class E>
 	void specific_infer_colliders(const E&);
@@ -216,9 +222,6 @@ public:
 
 	void infer_cache_for(const const_entity_handle&);
 	void destroy_cache_of(const const_entity_handle&);
-
-	template <class E>
-	void infer_rigid_body_existence(const E& handle);
 
 	void infer_colliders_from_scratch(const const_entity_handle&);
 	void infer_colliders(const const_entity_handle&);
