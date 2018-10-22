@@ -27,6 +27,9 @@ namespace behaviours {
 	}
 
 	void pull_trigger::execute_leaf_goal_callback(const tree::execution_occurence o, tree::state_of_traversal& t) const {
+		(void)o;
+		(void)t;
+#if TODO_AI
 		auto& cosm = t.step.get_cosmos();
 		const auto subject = cosm[t.subject];
 		const auto wielded = subject.get_wielded_guns();
@@ -41,5 +44,6 @@ namespace behaviours {
 				w.get<components::gun>().is_trigger_pressed = true;
 			}
 		}
+#endif
 	}
 }

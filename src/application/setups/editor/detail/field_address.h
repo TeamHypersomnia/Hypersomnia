@@ -13,6 +13,7 @@
 #include "game/components/movement_path_component.h"
 #include "game/components/missile_component.h"
 #include "game/components/attitude_component.h"
+#include "game/components/melee_fighter_component.h"
 #include "game/modes/arena_mode.h"
 #include "view/maybe_official_path_declaration.h"
 #include "game/detail/inventory/requested_equipment.h"
@@ -33,6 +34,7 @@ using property_field_type_id_t = field_type_id_t<decltype(cmd_type::property_id)
 using entity_field_type_id = type_in_list_id<
 	type_list<
 		augs::trivial_type_marker,
+		already_hit_entities,
 		only_pick_these_items_vector,
 		specific_hostile_entities_vector,
 		friction_connection_vector,

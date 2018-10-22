@@ -196,11 +196,11 @@ auto calc_stance_usage(
 			}
 		}
 
-		if (const auto melee = cosm[wielded_items[0]].template find<components::melee>()) {
-			if (const auto action_animation = logicals.find(stance.actions[melee->action])) {
+		/* if (const auto melee = cosm[wielded_items[0]].template find<components::melee>()) { */
+		/* 	if (const auto action_animation = logicals.find(stance.actions[melee->action])) { */
 
-			}
-		}
+		/* 	} */
+		/* } */
 	}
 
 	if (n == 1) {

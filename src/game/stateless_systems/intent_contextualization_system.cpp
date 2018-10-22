@@ -121,9 +121,9 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 			continue;
 		}
 
-		bool is_secondary = false;
+		auto action_type = weapon_action_type::COUNT;
 
-		if (subject.has<invariants::container>()) {
+		subject.dispatch_on_having_all<components::sentience>([&](const auto& typed_subject) {
 			auto requested_index = static_cast<std::size_t>(-1);
 
 			if (it.intent == game_intent_type::CROSSHAIR_PRIMARY_ACTION) {
@@ -136,49 +136,40 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 			if (requested_index != static_cast<std::size_t>(-1)) {
 				const auto action = subject.calc_hand_action(requested_index);
 				callee = action.held_item;
-				is_secondary = action.is_secondary;
+				action_type = action.type;
+
+				auto& sentience = typed_subject.template get<components::sentience>();
+				sentience.hand_flags[requested_index] = it.was_pressed();
 			}
-		}
+		});
 
 		const auto callee_handle = cosm[callee];
 
 		if (callee_handle.alive()) {
-			if (callee_handle.has<components::gun>()) {
-				it.intent = game_intent_type::PRESS_GUN_TRIGGER;
-				it.subject = callee;
-				continue;
-			}
-			else if (callee_handle.has<invariants::melee>()) {
-				if (it.intent == game_intent_type::CROSSHAIR_PRIMARY_ACTION) {
-					it.intent = game_intent_type::MELEE_PRIMARY_MOVE;
+			callee_handle.dispatch_on_having_all<components::gun>(
+				[&](const auto& typed_gun) {
+					typed_gun.template get<components::gun>().just_pressed[action_type] = true;
 				}
+			);
 
-				else if (it.intent == game_intent_type::CROSSHAIR_SECONDARY_ACTION) {
-					it.intent = game_intent_type::MELEE_SECONDARY_MOVE;
-				}
+			callee_handle.dispatch_on_having_all<components::hand_fuse>(
+				[&](const auto typed_fused) {
+					const auto fuse_logic = fuse_logic_provider(typed_fused, step);
 
-				continue;
-			}
-			else {
-				callee_handle.dispatch_on_having_all<components::hand_fuse>(
-					[&](const auto typed_fused) {
-						const auto fuse_logic = fuse_logic_provider(typed_fused, step);
-
-						if (fuse_logic.fuse_def.has_delayed_arming()) {
-							fuse_logic.fuse.arming_requested = it.was_pressed();
+					if (fuse_logic.fuse_def.has_delayed_arming()) {
+						fuse_logic.fuse.arming_requested = it.was_pressed();
+					}
+					else {
+						if (it.was_pressed()) {
+							fuse_logic.arm_explosive();
+							fuse_logic.fuse.armed_as_secondary_action = action_type == weapon_action_type::SECONDARY;
 						}
 						else {
-							if (it.was_pressed()) {
-								fuse_logic.arm_explosive();
-								fuse_logic.fuse.armed_as_secondary_action = is_secondary;
-							}
-							else {
-								fuse_logic.release_explosive_if_armed();
-							}
+							fuse_logic.release_explosive_if_armed();
 						}
 					}
-				);
-			}
+				}
+			);
 		}
 	}
 }
@@ -194,7 +185,6 @@ void intent_contextualization_system::contextualize_movement_intents(const logic
 		const auto subject = cosm[e.subject];
 
 		const auto* const maybe_driver = subject.find<components::driver>();
-		const auto* const maybe_container = subject.find<invariants::container>();
 
 		if (maybe_driver && cosm[maybe_driver->owned_vehicle].alive()) {
 			if (e.intent == game_intent_type::MOVE_FORWARD
@@ -214,19 +204,21 @@ void intent_contextualization_system::contextualize_movement_intents(const logic
 			}
 		}
 		
+#if LEGACY
+
 		if (!callee_resolved) {
-			if (maybe_container) {
+			if (const auto* const maybe_container = subject.find<invariants::container>();) {
 				if (e.intent == game_intent_type::SPACE_BUTTON) {
 					const auto hand = subject.get_primary_hand();
 
 					if (hand.alive() && hand.get_items_inside().size() > 0) {
-						e.intent = game_intent_type::MELEE_TERTIARY_MOVE;
 						callee = hand.get_items_inside()[0];
 						callee_resolved = true;
 					}
 				}
 			}
 		}
+#endif
 
 		if (callee_resolved) {
 			e.subject = callee;

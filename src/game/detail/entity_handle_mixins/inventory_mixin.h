@@ -13,6 +13,7 @@
 #include "game/detail/inventory/inventory_space_type.h"
 #include "game/organization/special_flavour_id_types.h"
 #include "game/detail/inventory/wielding_setup.h"
+#include "game/enums/weapon_action_type.h"
 
 struct attachment_offset_settings;
 struct colliders_connection;
@@ -20,7 +21,7 @@ struct colliders_connection;
 struct hand_action {
 	const std::size_t hand_index;
 	const entity_id held_item;
-	const bool is_secondary;
+	const weapon_action_type type;
 };
 
 enum class wielding_type {

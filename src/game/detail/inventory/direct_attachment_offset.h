@@ -106,39 +106,39 @@ transformr direct_attachment_offset(
 
 	switch (type) {
 		case slot_function::PRIMARY_HAND: 
-		attachment_offset = get_actual_offsets_by_torso().primary_hand;
-		anchor = anchors.hand_anchor;
-		break;
+			attachment_offset = get_actual_offsets_by_torso().primary_hand;
+			anchor = anchors.hand_anchor;
+			break;
 
 		case slot_function::SECONDARY_HAND: 
-		attachment_offset = get_actual_offsets_by_torso().secondary_hand;
-		anchor = anchors.hand_anchor;
-		break;
+			attachment_offset = get_actual_offsets_by_torso().secondary_hand;
+			anchor = anchors.hand_anchor;
+			break;
 
 		case slot_function::BACK: 
-		attachment_offset = get_actual_offsets_by_torso().back;
-		anchor = anchors.back_anchor;
-		break;
+			attachment_offset = get_actual_offsets_by_torso().back;
+			anchor = anchors.back_anchor;
+			break;
 
 		case slot_function::BELT: 
-		attachment_offset = get_actual_offsets_by_torso().back;
-		anchor = anchors.back_anchor;
-		break;
+			attachment_offset = get_actual_offsets_by_torso().back;
+			anchor = anchors.back_anchor;
+			break;
 
 		case slot_function::GUN_DETACHABLE_MAGAZINE: 
-		attachment_offset = get_offsets_by_gun().detachable_magazine;
-		anchor = anchors.attachment_anchor;
-		break;
+			attachment_offset = get_offsets_by_gun().detachable_magazine;
+			anchor = anchors.attachment_anchor;
+			break;
 
 		case slot_function::GUN_MUZZLE: 
-		attachment_offset = ::calc_muzzle_transform(attachment, {}, get_offsets_by_gun().bullet_spawn).get_integerized();
-		anchor = anchors.attachment_anchor;
-		break;
+			attachment_offset = ::calc_muzzle_transform(attachment, {}, get_offsets_by_gun().bullet_spawn).get_integerized();
+			anchor = anchors.attachment_anchor;
+			break;
 
 		default:
-		attachment_offset = {};
-		anchor = {};
-		break;
+			attachment_offset = {};
+			anchor = {};
+			break;
 	}
 
 	if (shall_flip) {

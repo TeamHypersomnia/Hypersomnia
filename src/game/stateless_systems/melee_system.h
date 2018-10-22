@@ -14,7 +14,5 @@ class melee_animation;
 
 class melee_system {
 public:
-
-	void consume_melee_intents(const logic_step step);
 	void initiate_and_update_moves(const logic_step step);
 };

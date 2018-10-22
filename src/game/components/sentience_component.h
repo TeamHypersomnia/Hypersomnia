@@ -32,6 +32,8 @@
 
 #include "game/detail/sentience/detached_body_parts.h"
 #include "game/enums/use_button_query_result.h"
+#include "game/enums/weapon_action_type.h"
+#include "game/detail/inventory/hand_count.h"
 
 struct damage_owner {
 	// GEN INTROSPECTOR struct damage_owner
@@ -79,6 +81,10 @@ namespace components {
 		damage_origin knockout_origin;
 
 		detached_body_parts detached;
+
+		std::array<bool, hand_count_v> hand_flags = {};
+		bool block_flag = false;
+		pad_bytes<1> pad;
 		// END GEN INTROSPECTOR
 
 		bool is_learnt(const spell_id id) const {

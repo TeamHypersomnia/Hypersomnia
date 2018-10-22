@@ -122,7 +122,7 @@ void requested_equipment::generate_for(
 			/* So that the effect transform is valid */
 			weapon.set_logic_transform(character_transform);
 
-			if constexpr (!to_the_ground) {
+			if constexpr(!to_the_ground) {
 				pickup(weapon);
 			}
 

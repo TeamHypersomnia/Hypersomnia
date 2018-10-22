@@ -98,7 +98,7 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 					);
 				}
 			}
-			else if (subject_item.find<invariants::explosive>()) {
+			else if (subject_item.has<invariants::explosive>() || subject_item.has<invariants::melee>()) {
 				const auto explosive_transform = subject_item.get_viewing_transform(in.interpolation);
 				const auto explosive_target_vector = explosive_transform.pos + vec2::from_degrees(explosive_transform.rotation);
 

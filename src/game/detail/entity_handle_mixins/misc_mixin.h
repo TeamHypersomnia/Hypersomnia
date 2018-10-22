@@ -15,7 +15,7 @@
 #include "augs/math/physics_structs.h"
 #include "game/detail/economy/money_type.h"
 
-void unset_input_flags_of_orphaned_entity(const entity_handle);
+void unset_input_flags_of_orphaned_entity(const entity_handle&);
 
 template <class E>
 class misc_mixin {

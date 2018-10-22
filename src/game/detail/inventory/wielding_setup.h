@@ -3,7 +3,7 @@
 #include "augs/string/pretty_print.h"
 #include "game/cosmos/entity_id.h"
 
-static constexpr std::size_t hand_count_v = 2;
+#include "game/detail/inventory/hand_count.h"
 
 template <class id_type>
 struct basic_wielding_setup  {

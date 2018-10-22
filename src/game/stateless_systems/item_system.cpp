@@ -456,7 +456,7 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 						return;
 					}
 
-					auto request = item_slot_transfer_request::drop(item_inside), step;
+					auto request = item_slot_transfer_request::drop(item_inside);
 
 					{
 						const bool apply_more_force = is_throw || r.intent == game_intent_type::THROW_SECONDARY;
@@ -469,7 +469,7 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 						}
 					}
 
-					perform_transfer(request);
+					perform_transfer(request, step);
 				};
 
 				if (is_drop_like) {

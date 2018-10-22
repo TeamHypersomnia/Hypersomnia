@@ -34,7 +34,8 @@ namespace test_flavours {
 				invariants::item item;
 
 				item.space_occupied_per_charge = to_space_units("1.5");
-				item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
+				item.holding_stance = item_holding_stance::KNIFE_LIKE;
+				item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_DRAW);
 
 				meta.set(item);
 			}
@@ -51,7 +52,7 @@ namespace test_flavours {
 					a.obstacle_hit_recoil = 40.f;
 					a.sentience_hit_recoil = 10.f;
 
-					a.reverse_animation_on_finish = false;
+					a.returning_animation_on_finish = false;
 
 					{
 						auto& clash = a.clash;
@@ -77,7 +78,7 @@ namespace test_flavours {
 					a.obstacle_hit_recoil = 80.f;
 					a.sentience_hit_recoil = 20.f;
 
-					a.reverse_animation_on_finish = true;
+					a.returning_animation_on_finish = true;
 
 					{
 						auto& clash = a.clash;

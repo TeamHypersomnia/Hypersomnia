@@ -2125,3 +2125,12 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Marks in editor
 
+- use trigger_just_pressed flag to handle automatic guns
+
+- fix intent contextualization is_secondary 
+
+- Let sentience hold input flags for actions, instead of a gun having a trigger
+	- Then only process guns that are held
+	- This way we don't have to worry about resetting triggers ever
+	- We acquire sentience in the gun system anyway
+

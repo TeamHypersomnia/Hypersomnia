@@ -5,6 +5,7 @@
 #include "augs/math/simple_physics.h"
 #include "augs/misc/timing/stepped_timing.h"
 #include "augs/misc/minmax.h"
+#include "augs/misc/enum/enum_boolset.h"
 
 #include "game/enums/gun_action_type.h"
 
@@ -21,6 +22,7 @@
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/detail/sentience_shake.h"
+#include "game/enums/weapon_action_type.h"
 
 namespace augs {
 	struct introspection_access;
@@ -29,18 +31,16 @@ namespace augs {
 namespace components {
 	struct gun {
 		// GEN INTROSPECTOR struct components::gun
-		augs::stepped_timestamp when_last_fired;
-		augs::stepped_timestamp when_last_played_trigger_effect;
+		real32 current_heat = 0.f;
+		real32 chambering_progress_ms = 0.f;
+		real32 max_heat_after_steam_schedule = 0.f;
 
-		bool is_trigger_pressed = false;
 		bool is_chambering_handle_being_pulled = false;
 		bool steam_burst_scheduled = false;
-		bool play_trigger_effect_once = false;
+		augs::enum_boolset<weapon_action_type, 2> just_pressed;
 
-		float current_heat = 0.f;
-		float max_heat_after_steam_schedule = 0.f;
-		float chambering_progress_ms = 0.f;
-
+		augs::stepped_timestamp when_last_fired;
+		augs::stepped_timestamp when_last_played_trigger_effect;
 		augs::stepped_timestamp when_began_pulling_chambering_handle;
 
 		recoil_player_instance recoil;
@@ -58,29 +58,29 @@ namespace components {
 namespace invariants {
 	struct gun {
 		// GEN INTROSPECTOR struct invariants::gun
-		float shot_cooldown_ms = 100.f;
+		real32 shot_cooldown_ms = 100.f;
 
 		gun_action_type action_mode = gun_action_type::INVALID;
 		unsigned num_last_bullets_to_trigger_low_ammo_cue = 0;
 
-		augs::minmax<float> muzzle_velocity = { 2000.f, 2000.f };
+		augs::minmax<real32> muzzle_velocity = { 2000.f, 2000.f };
 
-		float damage_multiplier = 1.f;
+		real32 damage_multiplier = 1.f;
 
-		augs::minmax<float> shell_velocity = { 300.f, 1700.f };
-		augs::minmax<float> shell_angular_velocity = { 2.f, 14.f };
+		augs::minmax<real32> shell_velocity = { 300.f, 1700.f };
+		augs::minmax<real32> shell_angular_velocity = { 2.f, 14.f };
 
-		float shell_spread_degrees = 20.f;
+		real32 shell_spread_degrees = 20.f;
 
 		transformr shell_spawn_offset;
 
-		float gunshot_adds_heat = 0.05f;
-		float heat_cooldown_speed_mult = 1.f;
-		float maximum_heat = 1.f;
-		float minimum_heat_to_shoot = 0.f;
+		real32 gunshot_adds_heat = 0.05f;
+		real32 heat_cooldown_speed_mult = 1.f;
+		real32 maximum_heat = 1.f;
+		real32 minimum_heat_to_shoot = 0.f;
 
-		float steam_burst_schedule_mult = 0.75f;
-		float steam_burst_perform_diff = 0.5f;
+		real32 steam_burst_schedule_mult = 0.75f;
+		real32 steam_burst_perform_diff = 0.5f;
 
 		sound_effect_input heavy_heat_start_sound;
 		sound_effect_input light_heat_start_sound;

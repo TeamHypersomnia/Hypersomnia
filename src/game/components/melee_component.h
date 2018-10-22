@@ -34,6 +34,8 @@ struct melee_clash_def {
 
 struct melee_attack_definition {
 	// GEN INTROSPECTOR struct melee_attack_definition
+	real32 cooldown_ms = 500.f;
+
 	damaging_object_info damage;
 
 	real32 obstacle_hit_recoil = 40.f;
@@ -47,7 +49,7 @@ struct melee_attack_definition {
 
 	melee_clash_def clash;
 
-	bool reverse_animation_on_finish = false;
+	bool returning_animation_on_finish = false;
 	pad_bytes<3> pad;
 	// END GEN INTROSPECTOR
 };

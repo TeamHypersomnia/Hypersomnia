@@ -18,7 +18,7 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"
 
-void unset_input_flags_of_orphaned_entity(entity_handle e) {
+void unset_input_flags_of_orphaned_entity(const entity_handle& e) {
 	if (auto* const car = e.find<components::car>()) {
 		car->reset_movement_flags();
 	}
@@ -27,27 +27,22 @@ void unset_input_flags_of_orphaned_entity(entity_handle e) {
 		movement->reset_movement_flags();
 	}
 
-	if (auto* const melee_fighter = e.find<components::melee_fighter>()) {
-		melee->reset_flags();
-	}
-
-	if (auto* const gun = e.find<components::gun>()) {
-		gun->is_trigger_pressed = false;
-	}
-
 	if (auto* const hand_fuse = e.find<components::hand_fuse>()) {
 		hand_fuse->arming_requested = false;
 	}
 }
 
 identified_danger assess_danger(
-	const const_entity_handle victim, 
-	const const_entity_handle danger
+	const const_entity_handle& victim, 
+	const const_entity_handle& danger
 ) {
 	identified_danger result;
 
 	const auto* const sentience = victim.find<components::sentience>();
-	if (!sentience) return result;
+
+	if (!sentience) {
+		return result;
+	}
 
 	result.danger = danger;
 
@@ -62,7 +57,7 @@ identified_danger assess_danger(
 	const auto danger_pos = danger.get_logic_transform().pos;
 	const auto danger_vel = danger.get_owner_of_colliders().get_effective_velocity();
 	const auto danger_dir = (danger_pos - victim_pos);
-	const float danger_distance = danger_dir.length();
+	const auto danger_distance = danger_dir.length();
 
 	result.recommended_evasion = augs::danger_avoidance(victim_pos, danger_pos, danger_vel);
 	result.recommended_evasion.normalize();
@@ -107,7 +102,7 @@ attitude_type calc_attitude(const const_entity_handle targeter, const const_enti
 }
 
 
-float assess_projectile_velocity_of_weapon(const const_entity_handle weapon) {
+real32 assess_projectile_velocity_of_weapon(const const_entity_handle& weapon) {
 	if (weapon.dead()) {
 		return 0.f;
 	}
@@ -155,7 +150,7 @@ ammunition_information calc_ammo_info(const const_entity_handle item) {
 entity_id get_closest_hostile(
 	const const_entity_handle subject,
 	const const_entity_handle subject_attitude,
-	const float radius,
+	const real32 radius,
 	const b2Filter filter
 ) {
 	const auto& cosm = subject.get_cosmos();
@@ -166,7 +161,7 @@ entity_id get_closest_hostile(
 
 	entity_id closest_hostile;
 
-	float min_distance = std::numeric_limits<float>::max();
+	auto min_distance = std::numeric_limits<real32>::max();
 
 	if (subject_attitude.alive()) {
 		const auto subject_attitude_transform = subject_attitude.get_logic_transform();
@@ -203,7 +198,7 @@ entity_id get_closest_hostile(
 std::vector<entity_id> get_closest_hostiles(
 	const const_entity_handle subject,
 	const const_entity_handle subject_attitude,
-	const float radius,
+	const real32 radius,
 	const b2Filter filter
 ) {
 	const auto& cosm = subject.get_cosmos();
@@ -214,7 +209,7 @@ std::vector<entity_id> get_closest_hostiles(
 
 	struct hostile_entry {
 		entity_id s;
-		float dist = 0.f;
+		real32 dist = 0.f;
 
 		bool operator<(const hostile_entry& b) const {
 			return dist < b.dist;

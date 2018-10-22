@@ -279,8 +279,9 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 			if (pre_solve) {
 				/* 
 					With a PreSolve must have happened a PostSolve. 
-					Correct velocity to point in the direction of the body rotation.
+					Correct the missile's velocity so that it points towards where the body itself is oriented.
 				*/
+
 				const auto body = typed_missile.template get<components::rigid_body>();
 				const auto current_vel = body.get_velocity();
 				const auto tr = body.get_transform();

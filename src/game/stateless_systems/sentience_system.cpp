@@ -530,11 +530,19 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 	auto& cosm = step.get_cosmos();
 
 	cosm.for_each_having<components::sentience>(
-		[&](const auto subject) {
-			components::sentience& sentience = subject.template get<components::sentience>();
+		[&](const auto& subject) {
+			auto& sentience = subject.template get<components::sentience>();
 
 			if (!sentience.is_conscious()) {
 				return;
+			}
+
+			{
+				const auto& melee_fighter = subject.template get<components::melee_fighter>();
+
+				if (melee_fighter.fighter_orientation_frozen()) {
+					return;
+				}
 			}
 
 			const auto subject_transform = subject.get_logic_transform();

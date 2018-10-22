@@ -123,25 +123,25 @@ hand_action inventory_mixin<E>::calc_hand_action(const std::size_t requested_ind
 		return {
 			requested_index,
 			(requested_index == 0 ? in_primary : in_secondary).get_id(),
-			false
+			weapon_action_type::PRIMARY
 		};
 	}
 	else if (in_primary.alive()) {
 		return {
 			0u,
 			in_primary.get_id(),
-			requested_index == 1
+			requested_index == 1 ? weapon_action_type::SECONDARY : weapon_action_type::PRIMARY
 		};
 	}
 	else if (in_secondary.alive()) {
 		return {
 			1u,
 			in_secondary.get_id(),
-			requested_index == 1
+			requested_index == 1 ? weapon_action_type::SECONDARY : weapon_action_type::PRIMARY
 		};
 	}
 
-	return { static_cast<std::size_t>(-1), entity_id(), false };
+	return { static_cast<std::size_t>(-1), entity_id(), weapon_action_type::COUNT };
 }
 
 template <class E>
