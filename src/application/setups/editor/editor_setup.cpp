@@ -200,6 +200,18 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 		config.drawing.draw_area_markers = {};
 	}
 
+	if (is_gameplay_on()) {
+		on_mode_with_input(
+			[&](const auto& typed_mode, const auto& mode_input) {
+				using T = remove_cref<decltype(typed_mode)>;
+
+				if constexpr(!std::is_same_v<T, test_scene_mode>) {
+					mode_input.vars.view.adjust(config.drawing);
+				}
+			}
+		);
+	}
+
 	return;
 }
 

@@ -53,6 +53,8 @@ enum class scoreboard_icon_type {
 	// END GEN INTROSPECTOR
 };
 
+struct game_drawing_settings;
+
 struct arena_mode_view_vars {
 	// GEN INTROSPECTOR struct arena_mode_view_vars
 	per_faction_t<per_faction_t<assets::sound_id>> win_sounds;
@@ -62,10 +64,15 @@ struct arena_mode_view_vars {
 	per_faction_t<assets::image_id> square_logos;
 	bool show_money_of_opponents = false;
 	bool show_info_icons_of_opponents = false;
+	bool show_enemy_hud = false;
 
 	augs::enum_array<assets::image_id, scoreboard_icon_type> icons;
 	assets::image_id money_icon;
+
+	real32 fog_of_war_angle = 150.f;
 	// END GEN INTROSPECTOR
+
+	void adjust(game_drawing_settings&) const;
 };
 
 struct arena_mode_match_result {

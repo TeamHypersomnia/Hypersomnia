@@ -633,6 +633,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/editor_player.cpp"
 	"src/game/modes/mode_entropy.cpp"
 	"src/application/input/adjust_game_motions.cpp"
+	"src/game/modes/arena_mode.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

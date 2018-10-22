@@ -9,6 +9,7 @@ summary: That which we are brainstorming at the moment.
 - asset ids in bomb mode vars widget
 
 - Throwing the knives
+	- missile system responsibility
 	- pass through held item
 
 - Then the direct attachment offset must calculate the offsets, I guess.
