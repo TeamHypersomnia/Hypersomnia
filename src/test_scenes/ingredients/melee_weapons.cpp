@@ -45,7 +45,7 @@ namespace test_flavours {
 
 				{
 					auto& t = melee.throw_def;
-					t.min_velocity_to_hurt = 500.f;
+					t.min_speed_to_hurt = 500.f;
 				}
 
 				{

@@ -7,10 +7,10 @@ bool has_hurting_velocity(const E& self) {
 			const auto& throw_def = melee_def->throw_def;
 
 			const auto vel = body.get_velocity();
-			const auto min_vel = throw_def.min_velocity_to_hurt;
-			const auto min_vel_sq = min_vel * min_vel;
+			const auto min_speed = throw_def.min_speed_to_hurt;
+			const auto min_speed_sq = min_speed * min_speed;
 
-			return vel.length_sq() >= min_vel_sq;
+			return vel.length_sq() >= min_speed_sq;
 		}
 	}
 

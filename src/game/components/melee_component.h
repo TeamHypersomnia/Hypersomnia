@@ -58,7 +58,7 @@ struct melee_throw_def {
 	// GEN INTROSPECTOR struct melee_throw_def
 	damaging_object_info damage;
 	real32 boomerang_impulse = 2000.f;
-	real32 min_velocity_to_hurt = 50.f;
+	real32 min_speed_to_hurt = 50.f;
 	// END GEN INTROSPECTOR
 };
 
