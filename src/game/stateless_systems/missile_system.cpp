@@ -38,6 +38,7 @@
 #include "game/detail/organisms/startle_nearbly_organisms.h"
 #include "game/detail/explosive/detonate.h"
 #include "game/detail/melee/like_melee.h"
+#include "game/messages/thunder_input.h"
 
 #define USER_RICOCHET_COOLDOWNS 0
 #define LOG_RICOCHETS 0
@@ -158,6 +159,57 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 		if (*type == missile_collision_type::CONTACT_START) {
 			missile_handle.dispatch_on_having_all<invariants::melee>([&](const auto& typed_melee) {
 				if (is_like_thrown_melee(typed_melee)) {
+					if (is_like_thrown_melee(surface_handle)) {
+						const auto& from = surface_handle;
+						const auto& what = typed_melee;
+
+						const auto& from_throw_def = from.template get<invariants::melee>().throw_def;
+						const auto& clash_def = from_throw_def.clash;
+
+						const auto clash_impulse = clash_def.impulse;
+
+						if (clash_impulse > 0.f) {
+							const auto clash_dir = -vec2(it.collider_impact_velocity).normalize();
+							const auto& rigid_body = what.template get<components::rigid_body>();
+
+							const auto total_vel = clash_dir * clash_impulse;
+							rigid_body.set_velocity(total_vel);
+
+							const auto eff_dir = vec2(clash_dir).perpendicular_cw();
+							const auto eff_transform = transformr(it.point, eff_dir.degrees());
+
+							clash_def.particles.start(
+								step,
+								particle_effect_start_input::fire_and_forget(eff_transform)
+							);
+
+							clash_def.sound.start(
+								step,
+								sound_effect_start_input::fire_and_forget(eff_transform)
+							);
+
+							{
+								thunder_input th;
+
+								th.delay_between_branches_ms = {10.f, 25.f};
+								th.max_branch_lifetime_ms = {40.f, 65.f};
+								th.branch_length = {10.f, 120.f};
+
+								th.max_all_spawned_branches = 40;
+								th.max_branch_children = 2;
+
+								th.first_branch_root = eff_transform;
+								th.branch_angle_spread = 40.f;
+
+								th.color = white;
+
+								step.post_message(th);
+							}
+						}
+
+						return;
+					}
+
 					const auto info = missile_surface_info(typed_melee, surface_handle);
 
 					const bool sentient = sentient_and_not_dead(surface_handle);

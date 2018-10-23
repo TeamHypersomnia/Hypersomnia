@@ -13,6 +13,8 @@
 
 struct melee_clash_def {
 	// GEN INTROSPECTOR struct melee_clash_def
+	real32 impulse = 2000.f;
+
 	sound_effect_input sound;
 	particle_effect_input particles;
 	// END GEN INTROSPECTOR
@@ -44,6 +46,7 @@ struct melee_throw_def {
 	// GEN INTROSPECTOR struct melee_throw_def
 	damage_definition damage;
 	real32 boomerang_impulse = 2000.f;
+	melee_clash_def clash;
 	real32 min_speed_to_hurt = 50.f;
 	// END GEN INTROSPECTOR
 };

@@ -354,7 +354,6 @@ perform_transfer_result perform_transfer_impl(
 
 				worn.input = item_def.wear_sound;
 				worn.start = sound_effect_start_input::at_entity(target_root);
-				LOG("WEARING!!");
 
 				output.transfer_sound.emplace(std::move(worn));
 			}
