@@ -62,6 +62,7 @@ namespace test_flavours {
 
 					eff.sentience_impact.sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SENTIENCE_IMPACT);
 					eff.sentience_impact.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_IMPACT);
+					t.boomerang_impulse = 4000.f;
 				}
 
 				{

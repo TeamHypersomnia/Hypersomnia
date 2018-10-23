@@ -24,6 +24,7 @@
 #include "game/messages/health_event.h"
 #include "game/messages/exhausted_cast_message.h"
 #include "game/detail/physics/calc_physical_material.hpp"
+#include "game/detail/sentience/sentience_getters.h"
 
 void play_collision_sound(
 	const real32 strength,
@@ -213,7 +214,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 				);
 			};
 
-			const bool sentient = subject.sentient_and_damageable();
+			const bool sentient = sentient_and_vulnerable(subject);
 			const auto& def = d.effects;
 
 			if (d.inflictor_destructed) {

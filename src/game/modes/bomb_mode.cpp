@@ -18,6 +18,8 @@
 #include "game/modes/detail/item_purchase_logic.hpp"
 #include "game/detail/buy_area_in_range.h"
 
+#include "game/detail/sentience/sentience_getters.h"
+
 #define LOG_BOMB_MODE !IS_PRODUCTION_BUILD
 
 template <class... Args>
@@ -670,7 +672,7 @@ bomb_mode::round_transferred_players bomb_mode::make_transferred_players(const i
 			auto& pm = result[id];
 			pm.movement = handle.get<components::movement>().flags;
 
-			if (handle.sentient_and_unconscious()) {
+			if (sentient_and_unconscious(handle)) {
 				continue;
 			}
 

@@ -22,6 +22,8 @@
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/data_living_one_step.h"
 
+#include "game/detail/sentience/sentience_getters.h"
+
 void driver_system::assign_drivers_who_touch_wheels(const logic_step step) {
 	(void)step;
 #if TODO_CARS
@@ -38,7 +40,7 @@ void driver_system::assign_drivers_who_touch_wheels(const logic_step step) {
 		if (const auto maybe_driver = driver.find<components::driver>();
 			maybe_driver != nullptr && maybe_driver->take_hold_of_wheel_when_touched
 		) {
-			if (driver.sentient_and_unconscious()) {
+			if (sentient_and_unconscious(driver)) {
 				continue;
 			}
 
@@ -88,7 +90,7 @@ void driver_system::release_drivers_due_to_requests(const logic_step step) {
 		else if (e.intent == game_intent_type::TAKE_HOLD_OF_WHEEL) {
 			const auto subject = cosm[e.subject];
 
-			if (subject.sentient_and_unconscious()) {
+			if (sentient_and_unconscious(subject)) {
 				continue;
 			}
 

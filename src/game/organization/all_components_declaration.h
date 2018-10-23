@@ -103,7 +103,8 @@ using assert_always_together = type_list<
 	type_pair<invariants::animation, components::animation>,
 	type_pair<invariants::remnant, components::remnant>,
 	type_pair<invariants::continuous_particles, components::continuous_particles>,
-	type_pair<invariants::cascade_explosion, components::cascade_explosion>
+	type_pair<invariants::cascade_explosion, components::cascade_explosion>,
+	type_pair<invariants::melee, components::melee>
 >;
 
 using assert_first_implies_second = type_list<
@@ -116,7 +117,8 @@ using assert_never_together = type_list<
 	type_pair<components::rigid_body, components::transform>,
 	type_pair<components::rigid_body, components::position>,
 	type_pair<components::position, components::transform>,
-	type_pair<components::rigid_body, components::wandering_pixels>
+	type_pair<components::rigid_body, components::wandering_pixels>,
+	type_pair<invariants::melee, invariants::missile>
 >;
 
 using always_present_invariants = type_list<

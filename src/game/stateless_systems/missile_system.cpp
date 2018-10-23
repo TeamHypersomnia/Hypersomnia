@@ -37,6 +37,7 @@
 #include "game/stateless_systems/sound_existence_system.h"
 #include "game/detail/organisms/startle_nearbly_organisms.h"
 #include "game/detail/explosive/detonate.h"
+#include "game/detail/melee/like_melee.h"
 
 #define USER_RICOCHET_COOLDOWNS 0
 #define LOG_RICOCHETS 0
@@ -145,10 +146,79 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 				it.collider_impact_velocity,
 				it.point
 			)) {
-				missile.saved_point_of_impact_before_death = result->saved_point_of_impact_before_death;
+				missile.saved_point_of_impact_before_death = result->transform_of_impact;
 				missile.damage_charges_before_destruction = result->new_charges_value;
 			}
 		});
+
+		/* 
+			Treat melee weapons as special kind of missiles.
+	   	*/
+
+		if (*type == missile_collision_type::CONTACT_START) {
+			missile_handle.dispatch_on_having_all<invariants::melee>([&](const auto& typed_melee) {
+				if (is_like_thrown_melee(typed_melee) && sentient_and_not_dead(surface_handle)) {
+					const auto info = missile_surface_info(typed_melee, surface_handle);
+
+					const auto& melee_def = typed_melee.template get<invariants::melee>();
+					const auto& throw_def = melee_def.throw_def;
+
+					auto simulated_missile_def = invariants::missile();
+					auto simulated_missile = components::missile();
+
+					{
+						auto& m = simulated_missile_def;
+
+						m.damage = throw_def.damage;
+						m.damage_upon_collision = true;
+						m.destroy_upon_damage = false;
+						m.constrain_lifetime = false;
+						m.damage_falloff = false;
+					}
+
+					{
+						auto& m = simulated_missile;
+						m.damage_charges_before_destruction = 1;
+						m.power_multiplier_of_sender = 1.f;
+					}
+
+					if (const auto result = collide_missile_against_surface(
+						step,
+
+						typed_melee, 
+						surface_handle,
+
+						simulated_missile_def,
+						simulated_missile,
+
+						*type,
+
+						info,
+
+						it.indices,
+
+						it.normal,
+						it.collider_impact_velocity,
+						it.point
+					)) {
+						{
+							auto& sender = typed_melee.template get<components::sender>();
+							sender.unset();
+						}
+
+						const auto boomerang_impulse = throw_def.boomerang_impulse;
+
+						if (boomerang_impulse > 0.f) {
+							const auto& rigid_body = typed_melee.template get<components::rigid_body>();
+							const auto boomerang_dir = -vec2::from_degrees(result->transform_of_impact.rotation);
+
+							const auto total_vel = boomerang_dir * boomerang_impulse;
+							rigid_body.set_velocity(total_vel);
+						}
+					}
+				}
+			});
+		}
 	}
 }
 

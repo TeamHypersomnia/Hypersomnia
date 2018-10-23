@@ -186,26 +186,6 @@ public:
 		}
 	}
 
-	bool sentient_and_unconscious() const {
-		const auto self = *static_cast<const E*>(this);
-
-		if (const auto sentience = self.template find<components::sentience>()) {
-			return !sentience->is_conscious();
-		}
-
-		return false;
-	}
-
-	bool sentient_and_damageable() const {
-		const auto self = *static_cast<const E*>(this);
-
-		if (const auto sentience = self.template find<components::sentience>()) {
-			return !sentience->is_dead();
-		}
-
-		return false;
-	}
-
 	faction_type get_official_faction() const {
 		const auto self = *static_cast<const E*>(this);
 

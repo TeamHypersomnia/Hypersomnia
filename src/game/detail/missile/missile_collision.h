@@ -1,8 +1,9 @@
 #pragma once
 #include "game/detail/physics/missile_surface_info.h"
+#include "game/detail/sentience/sentience_getters.h"
 
 struct missile_collision_result {
-	transformr saved_point_of_impact_before_death;
+	transformr transform_of_impact;
 	int new_charges_value = 0;
 };
 
@@ -92,12 +93,8 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 	if (impact_impulse > 0.f && contact_start) {
 		auto considered_impulse = impact_impulse * missile.power_multiplier_of_sender;
 
-		if (const auto sentience = surface_handle.template find<components::sentience>()) {
-			const auto& shield_of_victim = sentience->template get<electric_shield_perk_instance>();
-
-			if (!shield_of_victim.timing.is_enabled(clk)) {
-				considered_impulse *= missile_def.damage.impulse_multiplier_against_sentience;
-			}
+		if (sentient_and_vulnerable(surface_handle)) {
+			considered_impulse *= missile_def.damage.impulse_multiplier_against_sentience;
 		}
 
 		const auto subject_of_impact = surface_handle.get_owner_of_colliders().template get<components::rigid_body>();
@@ -107,8 +104,6 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 
 		subject_of_impact.apply_impulse(impact, point - subject_of_impact_mass_pos);
 	}
-
-	auto saved_point_of_impact_before_death = transformr { point, impact_dir.degrees() };
 
 	const auto owning_capability = surface_handle.get_owning_transfer_capability();
 
@@ -177,5 +172,5 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 		step.post_message(damage_msg);
 	}
 
-	return missile_collision_result { saved_point_of_impact_before_death, charges };
+	return missile_collision_result { transformr { point, impact_dir.degrees() }, charges };
 }

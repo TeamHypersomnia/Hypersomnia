@@ -17,6 +17,7 @@
 #include "game/detail/inventory/inventory_slot.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"
+#include "game/detail/sentience/sentience_getters.h"
 
 void unset_input_flags_of_orphaned_entity(const entity_handle& e) {
 	if (auto* const car = e.find<components::car>()) {
@@ -174,7 +175,7 @@ entity_id get_closest_hostile(
 			[&](const b2Fixture* const fix) {
 				const const_entity_handle s = cosm[get_body_entity_that_owns(fix)];
 
-				if (s != subject && s.has<components::attitude>() && !s.sentient_and_unconscious()) {
+				if (s != subject && s.has<components::attitude>() && !sentient_and_unconscious(s)) {
 					const auto calculated_attitude = calc_attitude(s, subject_attitude);
 
 					if (is_hostile(calculated_attitude)) {

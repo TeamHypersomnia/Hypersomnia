@@ -44,6 +44,8 @@
 #include "game/detail/inventory/wielding_setup.hpp"
 #include "game/detail/melee/like_melee.h"
 
+#include "game/detail/sentience/sentience_getters.h"
+
 #define LOG_RELOADING 0
 
 template <class... Args>
@@ -409,7 +411,7 @@ void item_system::pick_up_touching_items(const logic_step step) {
 							return;
 						}
 
-						if (typed_picker.sentient_and_unconscious()) {
+						if (sentient_and_unconscious(typed_picker)) {
 							return;
 						}
 

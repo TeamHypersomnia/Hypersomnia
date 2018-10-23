@@ -20,6 +20,7 @@
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/frame_calculation.h"
 #include "game/detail/visible_entities.h"
+#include "game/detail/sentience/sentience_getters.h"
 
 using namespace augs;
 
@@ -84,7 +85,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			components::sentience* const sentience = it.template find<components::sentience>();
 			const bool is_sentient = sentience != nullptr;
 
-			if (it.sentient_and_unconscious()) {
+			if (sentient_and_unconscious(it)) {
 				/* Behave as if all input was unset */
 				movement.reset_movement_flags();
 			}

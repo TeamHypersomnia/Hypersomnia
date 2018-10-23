@@ -20,6 +20,7 @@
 
 #include "game/stateless_systems/particles_existence_system.h"
 #include "game/cosmos/for_each_entity.h"
+#include "game/detail/sentience/sentience_getters.h"
 
 void particles_existence_system::displace_streams(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
@@ -173,7 +174,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 			const auto& def = d.effects;
 
-			const bool sentient = subject.sentient_and_damageable();
+			const bool sentient = sentient_and_vulnerable(subject);
 
 			if (d.inflictor_destructed) {
 				do_effect(def.destruction);
