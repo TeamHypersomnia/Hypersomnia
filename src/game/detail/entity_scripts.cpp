@@ -67,7 +67,7 @@ identified_danger assess_danger(
 	const auto comfort_zone_disturbance_ratio = augs::disturbance(danger_distance, comfort_zone);
 
 	if (missile) {
-		result.amount += comfort_zone_disturbance_ratio * missile->damage_amount*4;
+		result.amount += comfort_zone_disturbance_ratio * missile->damage.base*4;
 	}
 
 	if (attitude) {

@@ -199,33 +199,54 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 	}
 
 	for (const auto& d : damages) {
-		if (d.inflictor_destructed) {
-			const auto inflictor = cosm[d.origin.cause.entity];
-			
-			const auto& effect = inflictor.get<invariants::missile>().destruction_sound;
+		const auto subject = cosm[d.subject];
 
-			effect.start(
-				step,
-				sound_effect_start_input::orbit_absolute(cosm[d.subject], d.point_of_impact).set_listener(d.subject)
-			);
+		if (subject.dead()) {
+			continue;
+		}
+
+		{
+			auto do_effect = [&](const auto& effect_def) {
+				effect_def.sound.start(
+					step,
+					sound_effect_start_input::orbit_absolute(subject, d.point_of_impact).set_listener(subject)
+				);
+			};
+
+			const bool sentient = subject.sentient_and_damageable();
+			const auto& def = d.effects;
+
+			if (d.inflictor_destructed) {
+				do_effect(def.destruction);
+
+				if (sentient) {
+					do_effect(def.sentience_impact);
+				}
+			}
+			else {
+				if (sentient) {
+					do_effect(def.sentience_impact);
+				}
+				else {
+					do_effect(def.impact);
+				}
+			}
 		}
 
 		if (d.type == adverse_element_type::FORCE) {
-			if (const auto subject = cosm[d.subject]; subject.alive()) {
-				const auto& fixtures = subject.get<invariants::fixtures>();
+			const auto& fixtures = subject.get<invariants::fixtures>();
 
-				if (const auto* const mat = logicals.find(fixtures.material)) {
-					const auto unit = mat->unit_effect_damage;
-					const auto mult = d.amount / unit;
-					
-					auto effect = mat->standard_damage_sound;
-					effect.modifier.gain = std::min(1.f, mult);
+			if (const auto* const mat = logicals.find(fixtures.material)) {
+				const auto unit = mat->unit_effect_damage;
+				const auto mult = d.amount / unit;
+				
+				auto effect = mat->standard_damage_sound;
+				effect.modifier.gain = std::min(1.f, mult);
 
-					effect.start(
-						step,
-						sound_effect_start_input::orbit_absolute(cosm[d.subject], d.point_of_impact).set_listener(d.subject)
-					);
-				}
+				effect.start(
+					step,
+					sound_effect_start_input::orbit_absolute(subject, d.point_of_impact).set_listener(subject)
+				);
 			}
 		}
 	}

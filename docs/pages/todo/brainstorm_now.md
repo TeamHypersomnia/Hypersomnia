@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Special sentience material vs sentience impact sound specifier
+	- Makes little sense to make it a material because a collision might or might not signify damage
+
 - Throwing the knives
 	- missile system responsibility
 	- pass through held item

@@ -6,6 +6,7 @@
 #include "augs/templates/introspect.h"
 #include "game/cosmos/change_common_significant.hpp"
 #include "game/cosmos/delete_entity.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 
 #include "game/inferred_caches/tree_of_npo_cache.hpp"
 #include "game/inferred_caches/relational_cache.hpp"

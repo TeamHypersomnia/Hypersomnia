@@ -58,8 +58,10 @@ namespace test_flavours {
 					auto& d = t.damage;
 					d.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 					d.base = 88.f;
-					d.impact_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SECONDARY);
-					d.impact_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_IMPACT);
+					auto& eff = d.effects;
+
+					eff.sentience_impact.sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SENTIENCE_IMPACT);
+					eff.sentience_impact.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_IMPACT);
 				}
 
 				{
@@ -82,10 +84,15 @@ namespace test_flavours {
 
 					a.damage.base = 27.f;
 					a.damage.shake *= 0.4f;
-					a.damage.impulse = 1000.f;
-					a.damage.impact_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SECONDARY);
-					a.damage.impact_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_IMPACT);
+					a.damage.impact_impulse = 1000.f;
 					a.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+
+					auto& eff = a.damage.effects;
+
+					eff.impact.sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_PRIMARY_IMPACT);
+					eff.impact.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_IMPACT);
+
+					eff.sentience_impact.sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SENTIENCE_IMPACT);
 				}
 
 				{
@@ -107,10 +114,15 @@ namespace test_flavours {
 					}
 
 					a.damage.base = 57.f;
-					a.damage.impulse = 2000.f;
-					a.damage.impact_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SECONDARY);
-					a.damage.impact_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_IMPACT);
+					a.damage.impact_impulse = 2000.f;
 					a.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+
+					auto& eff = a.damage.effects;
+
+					eff.impact.sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SECONDARY_IMPACT);
+					eff.impact.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_IMPACT);
+
+					eff.sentience_impact.sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SENTIENCE_IMPACT);
 				}
 
 				meta.set(melee);

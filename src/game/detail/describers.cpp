@@ -107,11 +107,11 @@ entity_name_str get_bbcoded_entity_properties(const const_entity_handle id) {
 	}
 
 	if (missile) {
-		if (missile->damage_amount > 0) {
-			result << "Base missile: [color=vscyan]" << missile->damage_amount << "[/color]\n";
+		if (missile->damage.base > 0) {
+			result << "Base missile: [color=vscyan]" << missile->damage.base << "[/color]\n";
 		}
-		else if (missile->damage_amount < 0) {
-			result << "Restores health: [color=vscyan]" << -missile->damage_amount << "[/color]\n";
+		else if (missile->damage.base < 0) {
+			result << "Restores health: [color=vscyan]" << -missile->damage.base << "[/color]\n";
 		}
 
 		if (missile->constrain_lifetime) {

@@ -87,14 +87,16 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 	const auto impact_velocity = collider_impact_velocity;
 	const auto impact_dir = vec2(impact_velocity).normalize();
 
-	if (missile_def.impulse_upon_hit > 0.f && contact_start) {
-		auto considered_impulse = missile_def.impulse_upon_hit * missile.power_multiplier_of_sender;
+	const auto& impact_impulse = missile_def.damage.impact_impulse;
+
+	if (impact_impulse > 0.f && contact_start) {
+		auto considered_impulse = impact_impulse * missile.power_multiplier_of_sender;
 
 		if (const auto sentience = surface_handle.template find<components::sentience>()) {
 			const auto& shield_of_victim = sentience->template get<electric_shield_perk_instance>();
 
 			if (!shield_of_victim.timing.is_enabled(clk)) {
-				considered_impulse *= missile_def.impulse_multiplier_against_sentience;
+				considered_impulse *= missile_def.damage.impulse_multiplier_against_sentience;
 			}
 		}
 
@@ -118,7 +120,7 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 		;
 
 		if (is_victim_a_held_item && contact_start) {
-			missile_def.pass_through_held_item_sound.start(
+			missile_def.damage.pass_through_held_item_sound.start(
 				step,
 				sound_effect_start_input::fire_and_forget( { point, 0.f } ).set_listener(owning_capability)
 			);
@@ -126,7 +128,7 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 	}
 
 	const auto total_damage_amount = 
-		missile_def.damage_amount * 
+		missile_def.damage.base * 
 		missile.power_multiplier_of_sender
 	;
 
@@ -135,6 +137,7 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 
 	messages::damage_message damage_msg;
 	damage_msg.indices = indices;
+	damage_msg.effects = missile_def.damage.effects;
 
 	if (info.should_detonate() && missile_def.destroy_upon_damage) {
 		--charges;
@@ -167,7 +170,7 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 		damage_msg.origin = damage_origin(typed_missile);
 		damage_msg.subject = surface_handle;
 		damage_msg.amount = total_damage_amount;
-		damage_msg.victim_shake = missile_def.victim_shake;
+		damage_msg.victim_shake = missile_def.damage.shake;
 		damage_msg.victim_shake *= missile.power_multiplier_of_sender;
 		damage_msg.impact_velocity = impact_velocity;
 		damage_msg.point_of_impact = point;

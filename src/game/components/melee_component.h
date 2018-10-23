@@ -6,24 +6,10 @@
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/enums/weapon_action_type.h"
 #include "augs/misc/enum/enum_array.h"
+#include "game/detail/damage/damage_definition.h"
 
 #include "game/container_sizes.h"
 #include "augs/pad_bytes.h"
-
-struct damaging_object_info {
-	// GEN INTROSPECTOR struct damaging_object_info
-	real32 base = 23.f;
-	sentience_shake shake = { 400.f, 1.f };
-
-	real32 impulse = 1000.f;
-	real32 impulse_multiplier_against_sentience = 10.f;
-
-	sound_effect_input impact_sound;
-	particle_effect_input impact_particles;
-
-	sound_effect_input pass_through_held_item_sound;
-	// END GEN INTROSPECTOR
-};
 
 struct melee_clash_def {
 	// GEN INTROSPECTOR struct melee_clash_def
@@ -36,7 +22,7 @@ struct melee_attack_definition {
 	// GEN INTROSPECTOR struct melee_attack_definition
 	real32 cooldown_ms = 500.f;
 
-	damaging_object_info damage;
+	damage_definition damage;
 
 	real32 obstacle_hit_recoil = 40.f;
 	real32 sentience_hit_recoil = 10.f;
@@ -56,7 +42,7 @@ struct melee_attack_definition {
 
 struct melee_throw_def {
 	// GEN INTROSPECTOR struct melee_throw_def
-	damaging_object_info damage;
+	damage_definition damage;
 	real32 boomerang_impulse = 2000.f;
 	real32 min_speed_to_hurt = 50.f;
 	// END GEN INTROSPECTOR

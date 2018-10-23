@@ -6,6 +6,7 @@
 #include "game/enums/adverse_element_type.h"
 #include "augs/misc/value_meter.h"
 #include "game/detail/damage_origin.h"
+#include "game/detail/damage/damage_definition.h"
 
 namespace messages {
 	struct damage_message : public message {
@@ -16,6 +17,7 @@ namespace messages {
 		vec2 impact_velocity;
 		vec2 point_of_impact;
 		adverse_element_type type = adverse_element_type::FORCE;
+		damage_effects effects;
 
 		b2Fixture_indices indices;
 	};

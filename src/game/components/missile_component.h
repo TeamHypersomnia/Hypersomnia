@@ -20,6 +20,8 @@
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
 
+#include "game/detail/damage/damage_definition.h"
+
 using remnant_flavour_id = constrained_entity_flavour_id<invariants::remnant>;
 using remnant_flavour_vector = augs::constant_size_vector<remnant_flavour_id, 4>;
 
@@ -43,13 +45,9 @@ namespace components {
 namespace invariants {
 	struct missile {
 		// GEN INTROSPECTOR struct invariants::missile
-		meter_value_type damage_amount = 12;
+		damage_definition damage;
 
 		real32 muzzle_velocity_mult = 1.f;
-
-		real32 impulse_upon_hit = 10.f;
-		real32 impulse_multiplier_against_sentience = 10.f;
-		sentience_shake victim_shake = { 400.f, 1.f };
 
 		bool damage_upon_collision = true;
 		bool destroy_upon_damage = true;
@@ -65,17 +63,13 @@ namespace invariants {
 		real32 homing_towards_hostile_strength = 0.f;
 
 		sound_effect_input trace_sound;
-		sound_effect_input destruction_sound;
 		sound_effect_input ricochet_sound;
-		sound_effect_input pass_through_held_item_sound;
 
 		particle_effect_input ricochet_particles;
 		particle_effect_input muzzle_leave_particles;
 		bool trace_particles_fly_backwards = false;
-		bool spawn_exploding_ring = true;
-		pad_bytes<2> pad;
+		pad_bytes<3> pad;
 		particle_effect_input trace_particles;
-		particle_effect_input destruction_particles;
 
 		remnant_flavour_vector remnant_flavours;
 		real32 ricochet_cooldown_ms = 24.f;

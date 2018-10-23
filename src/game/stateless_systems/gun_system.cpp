@@ -279,7 +279,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						}
 					);
 
-					const auto mana_needed = missile.damage_amount / 4;
+					const auto mana_needed = missile.damage.base / 4;
 
 					auto& pe = sentience.get<personal_electricity_meter_instance>();
 

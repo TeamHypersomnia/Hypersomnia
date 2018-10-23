@@ -42,6 +42,7 @@
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 #include "game/detail/inventory/weapon_reloading.hpp"
 #include "game/detail/inventory/wielding_setup.hpp"
+#include "game/detail/melee/like_melee.h"
 
 #define LOG_RELOADING 0
 
@@ -390,51 +391,55 @@ void item_system::pick_up_touching_items(const logic_step step) {
 			continue;
 		}
 
-		entity_id picker_id = c.subject;
-
-		const auto picker = cosm[picker_id];
+		const auto picker = cosm[c.subject];
 		const auto item_entity = cosm[c.collider];
 
-		if (const auto item = item_entity.find<components::item>();
-			item && item_entity.get_owning_transfer_capability().dead()
-		) {
-			picker.dispatch_on_having_all<components::item_slot_transfers>([&](const auto& typed_picker) {
-				const auto& movement = typed_picker.template get<components::movement>();
-				auto& transfers = typed_picker.template get<components::item_slot_transfers>();
-
-				if (!movement.flags.picking) {
+		item_entity.dispatch_on_having_all<components::item>(
+			[&](const auto& typed_item) {
+				if (is_like_thrown_melee(typed_item)) {
 					return;
 				}
 
-				if (typed_picker.sentient_and_unconscious()) {
-					return;
-				}
+				if (typed_item.get_owning_transfer_capability().dead()) {
+					picker.dispatch_on_having_all<components::item_slot_transfers>([&](const auto& typed_picker) {
+						const auto& movement = typed_picker.template get<components::movement>();
+						auto& transfers = typed_picker.template get<components::item_slot_transfers>();
 
-				entity_id item_to_pick = item_entity;
-
-				if (item_entity.get_current_slot().alive()) {
-					item_to_pick = item_entity.get_current_slot().get_root_container();
-				}
-
-				const auto& pick_list = transfers.only_pick_these_items;
-				const bool found_on_subscription_list = found_in(pick_list, item_to_pick);
-
-				if (/* item_subscribed */
-					(pick_list.empty() && transfers.pick_all_touched_items_if_list_to_pick_empty)
-					|| found_on_subscription_list
-				) {
-					const auto pickup_slot = typed_picker.find_pickup_target_slot_for(cosm[item_to_pick]);
-
-					if (pickup_slot.alive()) {
-						const bool can_pick_already = transfers.pickup_timeout.try_to_fire_and_reset(clk);
-
-						if (can_pick_already) {
-							perform_transfer(item_slot_transfer_request::standard(item_to_pick, pickup_slot), step);
+						if (!movement.flags.picking) {
+							return;
 						}
-					}
+
+						if (typed_picker.sentient_and_unconscious()) {
+							return;
+						}
+
+						entity_id item_to_pick = typed_item;
+
+						if (typed_item.get_current_slot().alive()) {
+							item_to_pick = typed_item.get_current_slot().get_root_container();
+						}
+
+						const auto& pick_list = transfers.only_pick_these_items;
+						const bool found_on_subscription_list = found_in(pick_list, item_to_pick);
+
+						if (/* item_subscribed */
+							(pick_list.empty() && transfers.pick_all_touched_items_if_list_to_pick_empty)
+							|| found_on_subscription_list
+						) {
+							const auto pickup_slot = typed_picker.find_pickup_target_slot_for(cosm[item_to_pick]);
+
+							if (pickup_slot.alive()) {
+								const bool can_pick_already = transfers.pickup_timeout.try_to_fire_and_reset(clk);
+
+								if (can_pick_already) {
+									perform_transfer(item_slot_transfer_request::standard(item_to_pick, pickup_slot), step);
+								}
+							}
+						}
+					});
 				}
-			});
-		}
+			}
+		);
 	}
 }
 
