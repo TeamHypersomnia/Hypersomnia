@@ -188,9 +188,18 @@ item_transfer_result query_transfer_result(
 				if (t == slot_function::ITEM_DEPOSIT) {
 					output.holster = true;
 				}
-
-				if (target_slot.is_hand_slot()) {
+				else if (target_slot.is_hand_slot()) {
 					output.wield = true;
+				}
+				else if (
+					t == slot_function::PERSONAL_DEPOSIT
+					|| t == slot_function::BELT
+					|| t == slot_function::BACK
+					|| t == slot_function::TORSO_ARMOR
+					|| t == slot_function::SHOULDER
+					|| t == slot_function::HAT
+				) {
+					output.wear = true;
 				}
 			}
 		}

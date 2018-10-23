@@ -44,6 +44,8 @@ namespace test_flavours {
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_DRAW);
 				item.standard_price = static_cast<money_type>(250);
 				item.specific_to = faction_type::RESISTANCE;
+				item.categories_for_slot_compatibility.set(item_category::SHOULDER_WEARABLE);
+				item.wear_sound.id = to_sound_id(test_scene_sound_id::SHEATH_KNIFE);
 
 				meta.set(item);
 			}

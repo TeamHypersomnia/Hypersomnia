@@ -13,6 +13,7 @@ struct item_transfer_result {
 	bool only_initiated_mounting = false;
 	bool holster = false;
 	bool wield = false;
+	bool wear = false;
 
 	bool is_successful() const {
 		return result == item_transfer_result_type::SUCCESSFUL_TRANSFER;
@@ -24,6 +25,10 @@ struct item_transfer_result {
 
 	bool is_holster() const {
 		return holster;
+	}
+
+	bool is_wear() const {
+		return wear;
 	}
 
 	bool is_wield() const {

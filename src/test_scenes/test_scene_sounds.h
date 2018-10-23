@@ -154,6 +154,8 @@ enum class test_scene_sound_id {
 
 	STANDARD_KNIFE_SENTIENCE_IMPACT,
 
+	SHEATH_KNIFE,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

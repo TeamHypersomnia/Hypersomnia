@@ -632,8 +632,8 @@ void item_system::handle_wielding_requests(const logic_step step) {
 			continue;
 		}
 
+		/* Swap now if we have to. */
 		if (first_held == selections[1] || second_held == selections[0]) {
-			/* Swap now if we have to. */
 			swap_wielded(self, false);
 		}
 
@@ -658,7 +658,6 @@ void item_system::handle_wielding_requests(const logic_step step) {
 			results.push_back(result);
 		};
 
-		//augs::constant_size_vector<std::size_t, hand_count_v> failed_hands;
 		std::array<bool, hand_count_v> failed_hands = {};
 
 		auto try_hand = [&](const std::size_t i) {
@@ -734,6 +733,12 @@ void item_system::handle_wielding_requests(const logic_step step) {
 		for (std::size_t i = 0; i < hand_count_v; ++i) {
 			/* Finally, try to holster whatever can be holstered now. */
 			try_hand(i);
+		}
+
+		for (const auto& r : reverse(results)) {
+			if (r.result.result.is_wear()) {
+				r.play_effects(step);
+			}
 		}
 
 		bool wield_played = false;
