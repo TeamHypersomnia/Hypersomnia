@@ -364,7 +364,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				start_footstep_effect();
 			}
 
-			rigid_body.infer_caches();
+			rigid_body.infer_damping();
 		}
 	);
 }

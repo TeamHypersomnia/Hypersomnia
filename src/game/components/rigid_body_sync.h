@@ -47,11 +47,15 @@ class component_synchronizer<E, components::rigid_body>
 	using base = synchronizer_base<E, components::rigid_body>;
 	using base::handle;
 
+	template <class B>
+	void infer_damping(B& b) const;
+
 public:
 	using base::base;
 	using base::get_raw_component;
 
 	void infer_caches() const;
+	void infer_damping() const;
 
 	void set_velocity(const vec2) const;
 	void set_angular_velocity(const float) const;
@@ -376,4 +380,23 @@ std::optional<ltrb> component_synchronizer<E, components::rigid_body>::find_aabb
 	}
 
 	return std::nullopt;
+}
+
+template <class E>
+void component_synchronizer<E, components::rigid_body>::infer_damping() const {
+	if (const auto body = find_body()) {
+		infer_damping(*body);
+	}
+}
+
+template <class E>
+template <class B>
+void component_synchronizer<E, components::rigid_body>::infer_damping(B& b) const {
+	const auto& def = handle.template get<invariants::rigid_body>();
+	const auto damping = this->calc_damping_mults(def);
+
+	b.SetLinearDamping(damping.linear);
+	b.SetAngularDamping(damping.angular);
+	b.SetLinearDampingVec(b2Vec2(damping.linear_axis_aligned));
+	b.SetAngledDampingEnabled(def.angled_damping);
 }

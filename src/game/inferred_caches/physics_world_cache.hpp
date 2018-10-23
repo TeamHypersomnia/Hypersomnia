@@ -176,7 +176,6 @@ void physics_world_cache::specific_infer_rigid_body(const E& handle) {
 	
 			const auto& def = handle.template get<invariants::rigid_body>();
 			const auto rigid_body = handle.template get<components::rigid_body>();
-			const auto damping = rigid_body.calc_damping_mults(def);
 			const auto& data = rigid_body.get_raw_component();
 	
 			/* 
@@ -185,10 +184,7 @@ void physics_world_cache::specific_infer_rigid_body(const E& handle) {
 			*/
 	
 			/* These have no side-effects */
-			body.SetLinearDamping(damping.linear);
-			body.SetAngularDamping(damping.angular);
-			body.SetLinearDampingVec(b2Vec2(damping.linear_axis_aligned));
-			body.SetAngledDampingEnabled(def.angled_damping);
+			rigid_body.infer_damping(body);
 			body.SetBullet(calc_is_bullet(handle));
 	
 			if (handle.template has<components::missile>()) {
