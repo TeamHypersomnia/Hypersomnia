@@ -107,19 +107,11 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 
 	const auto owning_capability = surface_handle.get_owning_transfer_capability();
 
-	{
-		const bool is_victim_a_held_item = 
-			info.surface_is_item 
-			&& owning_capability.alive() 
-			&& owning_capability != surface_handle
-		;
-
-		if (is_victim_a_held_item && contact_start) {
-			missile_def.damage.pass_through_held_item_sound.start(
-				step,
-				sound_effect_start_input::fire_and_forget( { point, 0.f } ).set_listener(owning_capability)
-			);
-		}
+	if (info.surface_is_held_item && contact_start) {
+		missile_def.damage.pass_through_held_item_sound.start(
+			step,
+			sound_effect_start_input::fire_and_forget( { point, 0.f } ).set_listener(owning_capability)
+		);
 	}
 
 	const auto total_damage_amount = 

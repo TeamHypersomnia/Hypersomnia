@@ -13,7 +13,9 @@ void construct_pre_inference(const handle_type h) {
 	auto& cosm = h.get_cosmos();
 
 	if (const auto rigid_body = h.template find<components::rigid_body>()) {
-		rigid_body.get_special().dropped_or_created_cooldown.set(200, cosm.get_timestamp());
+		if (!h.template has<components::missile>()) {
+			rigid_body.get_special().dropped_or_created_cooldown.set(200, cosm.get_timestamp());
+		}
 	}
 
 	if (const auto overridden = h.template find<components::overridden_geo>()) {

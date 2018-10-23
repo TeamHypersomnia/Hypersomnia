@@ -20,6 +20,9 @@
 #include "game/detail/inventory/drop_from_all_slots.h"
 #include "augs/string/format_enum.h"
 
+#include "game/detail/melee/like_melee.h"
+#include "game/detail/explosive/like_explosive.h"
+
 void drop_from_all_slots(const invariants::container& container, const entity_handle handle, const impulse_mults impulse, const logic_step step) {
 	drop_from_all_slots(container, handle, impulse, [step](const auto& result) { result.notify(step); result.play_effects(step); });
 }
@@ -311,6 +314,12 @@ perform_transfer_result perform_transfer_impl(
 		);
 
 		special_physics.during_cooldown_ignore_collision_with = source_root;
+
+		if (is_like_thrown_melee(grabbed_item_part_handle)
+			|| is_like_thrown_explosive(grabbed_item_part_handle)
+		) {
+			special_physics.during_cooldown_ignore_other_cooled_down = false;
+		}
 	}
 
 	if (r.params.play_transfer_sounds) {

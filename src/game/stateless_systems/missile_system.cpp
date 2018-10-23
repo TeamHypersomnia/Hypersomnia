@@ -157,8 +157,15 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 		if (*type == missile_collision_type::CONTACT_START) {
 			missile_handle.dispatch_on_having_all<invariants::melee>([&](const auto& typed_melee) {
-				if (is_like_thrown_melee(typed_melee) && sentient_and_not_dead(surface_handle)) {
+				if (is_like_thrown_melee(typed_melee)) {
 					const auto info = missile_surface_info(typed_melee, surface_handle);
+
+					const bool sentient = sentient_and_not_dead(surface_handle);
+					const bool interested = sentient || info.surface_is_held_item;
+
+					if (!interested) {
+						return;
+					}
 
 					const auto& melee_def = typed_melee.template get<invariants::melee>();
 					const auto& throw_def = melee_def.throw_def;
@@ -201,19 +208,21 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 						it.collider_impact_velocity,
 						it.point
 					)) {
-						{
-							auto& sender = typed_melee.template get<components::sender>();
-							sender.unset();
-						}
+						if (sentient) {
+							{
+								auto& sender = typed_melee.template get<components::sender>();
+								sender.unset();
+							}
 
-						const auto boomerang_impulse = throw_def.boomerang_impulse;
+							const auto boomerang_impulse = throw_def.boomerang_impulse;
 
-						if (boomerang_impulse > 0.f) {
-							const auto& rigid_body = typed_melee.template get<components::rigid_body>();
-							const auto boomerang_dir = -vec2::from_degrees(result->transform_of_impact.rotation);
+							if (boomerang_impulse > 0.f) {
+								const auto& rigid_body = typed_melee.template get<components::rigid_body>();
+								const auto boomerang_dir = -vec2::from_degrees(result->transform_of_impact.rotation);
 
-							const auto total_vel = boomerang_dir * boomerang_impulse;
-							rigid_body.set_velocity(total_vel);
+								const auto total_vel = boomerang_dir * boomerang_impulse;
+								rigid_body.set_velocity(total_vel);
+							}
 						}
 					}
 				}

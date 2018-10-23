@@ -62,6 +62,14 @@ auto calc_filters(const E& handle) {
 		return filters[predefined_filter_type::FLYING_ITEM];
 	}
 
+	{
+		const auto capability = handle.get_owning_transfer_capability();
+
+		if (capability && capability != handle) {
+			return filters[predefined_filter_type::CHARACTER];
+		}
+	}
+
 	return colliders_data.filter;
 }
 

@@ -33,6 +33,8 @@ struct special_physics {
 	// GEN INTROSPECTOR struct special_physics
 	augs::stepped_cooldown dropped_or_created_cooldown;
 	signi_entity_id during_cooldown_ignore_collision_with;
+	bool during_cooldown_ignore_other_cooled_down = true;
+	pad_bytes<3> pad;
 #if TODO_CARS
 	signi_entity_id owner_friction_ground;
 	friction_connection_vector owner_friction_grounds = {};

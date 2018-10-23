@@ -19,6 +19,7 @@
 
 #include "game/detail/physics/missile_surface_info.h"
 #include "game/inferred_caches/physics_world_cache.h"
+#include "game/detail/melee/like_melee.h"
 
 #define FRICTION_FIELDS_COLLIDE 0
 
@@ -350,10 +351,12 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 
 		const bool dropped_item_colliding_with_container = [&]() {
 			if (collider_special_physics.dropped_or_created_cooldown.lasts(clk)) {
-				{
+				if (collider_special_physics.during_cooldown_ignore_other_cooled_down) {
 					const auto& subject_special_physics = subject_owner_body.get_special_physics();
 
-					if (subject_special_physics.dropped_or_created_cooldown.lasts(clk)) {
+					if (subject_special_physics.during_cooldown_ignore_other_cooled_down 
+						&& subject_special_physics.dropped_or_created_cooldown.lasts(clk)
+					) {
 						return true;
 					}
 				}
@@ -374,11 +377,11 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 			return false;
 		}();
 
-		// if (dropped_item_colliding_with_container) {
-		// 	LOG(
-		// 		"Ignoring collisiong between %x and %x", subject_owner_body, collider_owner_body
-		// 	);
-		// }
+		 /* if (dropped_item_colliding_with_container) { */
+		 /* 	LOG( */
+		 /* 		"Ignoring collisiong between %x and %x", subject_owner_body, collider_owner_body */
+		 /* 	); */
+		 /* } */
 
 		if (dropped_item_colliding_with_container) {
 			contact->SetEnabled(false);
@@ -402,7 +405,7 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 			contact->SetEnabled(false);
 		}
 
-		if (subject.has<components::missile>()) {
+		if (subject.has<components::missile>() || is_like_thrown_melee(subject)) {
 			const auto info = missile_surface_info(subject, collider);
 
 			if (info.ignore_standard_impulse()) {
