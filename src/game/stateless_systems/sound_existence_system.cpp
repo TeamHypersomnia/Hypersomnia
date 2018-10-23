@@ -214,7 +214,8 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 				);
 			};
 
-			const bool sentient = sentient_and_vulnerable(subject);
+			const bool sentient = subject.has<components::sentience>();
+
 			const auto& def = d.effects;
 
 			if (d.inflictor_destructed) {

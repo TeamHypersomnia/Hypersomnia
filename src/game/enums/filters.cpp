@@ -18,14 +18,22 @@ static auto standard_participation() {
 	return static_cast<uint16>(standard_participation_bitset().to_ulong());
 }
 
-static auto standard_participation_except(C c) {
+template <class... C>
+static auto standard_participation_except(C... c) {
 	auto r = standard_participation_bitset();
-	r.reset(c);
+	(r.reset(c), ...);
 	return static_cast<uint16>(r.to_ulong());
 }
 
 namespace predefined_queries {
 	b2Filter line_of_sight() {
+		b2Filter out;
+		out.categoryBits = make_flags(C::QUERY);
+		out.maskBits = make_flags(C::WALL);
+		return out;
+	}
+
+	b2Filter crosshair_laser() {
 		b2Filter out;
 		out.categoryBits = make_flags(C::QUERY);
 		out.maskBits = make_flags(C::WALL);
@@ -80,20 +88,20 @@ predefined_filters::predefined_filters() {
 	{
 
 		auto& out = filters[predefined_filter_type::FLYING_BULLET];
-		out.categoryBits = make_flags(C::FLYING);
-		out.maskBits = standard_participation_except(C::FLYING);
+		out.categoryBits = make_flags(C::BULLET);
+		out.maskBits = standard_participation_except(C::BULLET);
 	}
 	{
 
 		auto& out = filters[predefined_filter_type::FLYING_COLLIDING_BULLET];
-		out.categoryBits = make_flags(C::FLYING);
+		out.categoryBits = make_flags(C::BULLET);
 		out.maskBits = standard_participation();
 	}
 	{
 
 		auto& out = filters[predefined_filter_type::SHELL];
 		out.categoryBits = make_flags(C::SHELL);
-		out.maskBits = standard_participation_except(C::FLYING);
+		out.maskBits = standard_participation_except(C::BULLET, C::FLYING, C::TRIGGER);
 	}
 	{
 
