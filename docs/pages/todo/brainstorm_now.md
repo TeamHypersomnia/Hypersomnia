@@ -6,6 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Always throw the primary weapon (and highlight it) if holding melee weapons
+	- Throw both!
+
+- Fix throws so that they also register hit entities
+	- Just add a cooldown for hitting
+	- We may remove the oldest entries
+
 - Special sentience material vs sentience impact sound specifier
 	- Makes little sense to make it a material because a collision might or might not signify damage
 

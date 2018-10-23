@@ -21,6 +21,7 @@ struct torso_offsets {
 		secondary_hand.flip_vertically();
 		back.flip_vertically();
 		head.flip_vertically();
+		shoulder.flip_vertically();
 		strafe_facing_offset *= -1;
 
 		std::swap(primary_hand, secondary_hand);
@@ -45,6 +46,7 @@ struct item_offsets {
 	// GEN INTROSPECTOR struct item_offsets
 	transformi hand_anchor;
 	transformi back_anchor;
+	transformi shoulder_anchor;
 	transformi head_anchor;
 	transformi attachment_anchor;
 	transformi beep_offset;
