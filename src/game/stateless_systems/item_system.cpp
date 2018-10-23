@@ -455,9 +455,6 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 				const bool is_throw = r.intent == game_intent_type::THROW;
 				const bool is_drop = r.intent == game_intent_type::DROP;
 
-				const bool is_secondary_like = r.intent == game_intent_type::THROW_SECONDARY || r.intent == game_intent_type::DROP_SECONDARY;
-				const bool is_drop_like = is_throw || is_drop;
-
 				auto do_drop = [&](const auto& item_inside) {
 					if (item_inside.dead()) {
 						return;
@@ -479,6 +476,27 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					perform_transfer(request, step);
 				};
 
+				if (is_throw) {
+					bool anything_thrown = false;
+
+					const auto wielded_items = typed_subject.get_wielded_items();
+
+					for (const auto& w : wielded_items) {
+						const auto h = cosm[w];
+
+						if (h.template has<components::melee>()) {
+							do_drop(h);
+							anything_thrown = true;
+						}
+					}
+
+					if (anything_thrown) {
+						return;
+					}
+				}
+
+				const bool is_drop_like = is_throw || is_drop;
+
 				if (is_drop_like) {
 					const auto current_setup = wielding_setup::from_current(typed_subject);
 
@@ -498,6 +516,8 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 				}
 
 				auto requested_index = static_cast<std::size_t>(-1);
+
+				const bool is_secondary_like = r.intent == game_intent_type::DROP_SECONDARY;
 
 				if (is_drop_like) {
 					requested_index = 0;
