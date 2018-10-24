@@ -58,7 +58,7 @@ namespace augs {
 		fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 
 		double speed = 1.0;
-		int additional_steps = 0;
+		step_type additional_steps = 0;
 		// END GEN INTROSPECTOR
 
 		template <class MakeSnapshot>
@@ -110,7 +110,7 @@ namespace augs {
 		bool is_recording() const;
 		bool is_replaying() const;
 
-		void request_steps(int amount);
+		void request_steps(step_type amount);
 
 		void begin_replaying();
 		void begin_recording();

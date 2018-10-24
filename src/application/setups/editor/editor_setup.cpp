@@ -1363,7 +1363,7 @@ bool editor_setup::handle_input_before_game(
 				case key::T: mover.start_moving_selection(make_mover_input()); return true;
 				case key::R: mover.start_rotating_selection(make_mover_input()); return true;
 				case key::ADD: player().request_steps(1); return true;
-				case key::SUBTRACT: player().request_steps(-1); return true;
+				case key::SUBTRACT: player().seek_backward(1, make_command_input()); return true;
 				case key::H: hide_layers_of_selected_entities(); reperform_selector(); return true;
 				default: break;
 			}

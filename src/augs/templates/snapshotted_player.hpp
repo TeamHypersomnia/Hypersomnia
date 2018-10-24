@@ -98,7 +98,7 @@ namespace augs {
 	}
 
 	template <class A, class B>
-   	void snapshotted_player<A, B>::request_steps(const int amount) {
+	void snapshotted_player<A, B>::request_steps(typename snapshotted_player<A, B>::step_type amount) {
 		additional_steps += amount;
 	}
 

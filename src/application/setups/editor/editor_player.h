@@ -111,7 +111,8 @@ private:
 	template <class C>
 	void seek_to(
 		step_type, 
-		player_advance_input_t<C> input
+		player_advance_input_t<C> input,
+		bool trim_to_total_steps = true
 	);
 
 	void adjust_entropy(const editor_folder&, editor_player_entropy_type&, bool neg) const;
@@ -162,10 +163,16 @@ public:
 
 	void seek_to(
 		step_type, 
+		editor_command_input input,
+		bool trim_to_total_steps = true
+	);
+
+	void seek_backward(
+		step_type, 
 		editor_command_input input
 	);
 
-	void request_steps(int amount);
+	void request_steps(step_type amount);
 
 	const auto& get_before_start() const {
 		return before_start;

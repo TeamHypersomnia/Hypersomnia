@@ -190,9 +190,14 @@ entity_guid editor_player::lookup_character(const mode_player_id id) const {
 template <class C>
 void editor_player::seek_to(
 	const editor_player::step_type requested_step, 
-	const player_advance_input_t<C> in
+	const player_advance_input_t<C> in,
+	const bool trim_to_total_steps
 ) {
-	const auto seeked_step = std::min(requested_step, get_total_steps(in.cmd_in.folder));
+	const auto seeked_step = 
+		trim_to_total_steps 
+		? std::min(requested_step, get_total_steps(in.cmd_in.folder))
+		: requested_step
+	;
 
 	if (seeked_step == get_current_step()) {
 		return;
@@ -211,9 +216,20 @@ void editor_player::seek_to(
 
 void editor_player::seek_to(
 	const step_type step, 
-	const editor_command_input in
+	const editor_command_input cmd_in,
+	const bool trim_to_total_steps
 ) {
-	seek_to(step, player_advance_input(in, solver_callbacks()));
+	seek_to(step, player_advance_input(cmd_in, solver_callbacks()), trim_to_total_steps);
+}
+
+void editor_player::seek_backward(
+	const step_type offset, 
+	const editor_command_input cmd_in
+) {
+	const auto current = get_current_step();
+	const auto target = current >= offset ? current - offset : 0;
+
+	seek_to(target, cmd_in, false);
 }
 
 void editor_player::reset_mode() {
@@ -255,7 +271,7 @@ editor_player::step_type editor_player::get_total_steps(const editor_folder& f) 
 	return std::max(of_last_command, of_entropies);
 }
 
-void editor_player::request_steps(const int amount) {
+void editor_player::request_steps(const editor_player::step_type amount) {
 	if (has_testing_started()) {
 		set_dirty();
 		base::request_steps(amount);
