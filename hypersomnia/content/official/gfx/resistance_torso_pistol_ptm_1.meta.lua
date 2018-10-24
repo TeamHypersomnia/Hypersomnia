@@ -70,6 +70,13 @@ return {
           y = 0
         },
         rotation = 0
+      },
+      shoulder_anchor = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       }
     },
     legs = {
@@ -118,12 +125,19 @@ return {
         },
         rotation = -18.434947967529297
       },
-      shoulder = {
+      secondary_shoulder = {
         pos = {
           x = 0,
           y = 0
         },
         rotation = 0
+      },
+      shoulder = {
+        pos = {
+          x = -21,
+          y = -8
+        },
+        rotation = 87
       },
       strafe_facing_offset = -90
     }
