@@ -70,6 +70,13 @@ return {
           y = 0
         },
         rotation = 0
+      },
+      shoulder_anchor = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       }
     },
     legs = {
@@ -77,6 +84,10 @@ return {
         x = 0,
         y = 0
       }
+    },
+    non_standard_shape = {
+      convex_partition = {},
+      original_poly = {}
     },
     torso = {
       back = {
@@ -114,12 +125,19 @@ return {
         },
         rotation = 0
       },
-      shoulder = {
+      secondary_shoulder = {
         pos = {
           x = 0,
           y = 0
         },
         rotation = 0
+      },
+      shoulder = {
+        pos = {
+          x = 12,
+          y = -14
+        },
+        rotation = -139
       },
       strafe_facing_offset = 0
     }

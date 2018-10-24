@@ -256,7 +256,7 @@ bool basic_inventory_slot_handle<E>::is_physically_connected_until(
 
 template <class E>
 float basic_inventory_slot_handle<E>::calc_density_multiplier_due_to_being_attached() const {
-	const float density_multiplier = get().attachment_density_multiplier;
+	const auto density_multiplier = get().attachment_density_multiplier;
 
 	if (const auto maybe_item = get_container().template find<components::item>()) {
 		if (const auto slot = owner[maybe_item->get_current_slot()]) {

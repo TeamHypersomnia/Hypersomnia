@@ -350,28 +350,28 @@ FORCE_INLINE void specific_entity_drawer(
 						}
 					}
 
-					{
+					if (current_slot.is_hand_slot()) {
 						const auto required_by_stance = 
 							stance_id == item_holding_stance::HEAVY_LIKE ||
 							stance_id == item_holding_stance::PISTOL_LIKE ||
 							stance_id == item_holding_stance::KNIFE_LIKE
 						;
 
-						if (required_by_stance && current_slot.is_hand_slot()) {
+						if (required_by_stance) {
 							return true;
 						}
-					}
 
-					if (stance_id == item_holding_stance::AKIMBO) {
-						/* In akimbo, draw pistols and knives under hands */
-						const auto holding_stance = attachment_entity.template get<invariants::item>().holding_stance;
+						if (stance_id == item_holding_stance::AKIMBO) {
+							/* In akimbo, draw pistols and knives under hands */
+							const auto holding_stance = attachment_entity.template get<invariants::item>().holding_stance;
 
-						const bool pistol_or_knife = 
-							holding_stance == item_holding_stance::PISTOL_LIKE 
-							|| holding_stance == item_holding_stance::KNIFE_LIKE
-						;
+							const bool pistol_or_knife = 
+								holding_stance == item_holding_stance::PISTOL_LIKE 
+								|| holding_stance == item_holding_stance::KNIFE_LIKE
+							;
 
-						return pistol_or_knife;
+							return pistol_or_knife;
+						}
 					}
 
 					return false;

@@ -143,6 +143,7 @@ namespace test_flavours {
 					slot_def.category_allowed = item_category::SHOULDER_WEARABLE;
 					slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY;
 					slot_def.always_allow_exactly_one_item = true;
+					slot_def.attachment_density_multiplier = 0.2f;
 					container.slots[slot_function::SHOULDER] = slot_def;
 				}
 

@@ -13,6 +13,7 @@ struct torso_offsets {
 	transformi head;
 	transformi legs;
 	transformi shoulder;
+	transformi secondary_shoulder;
 	real32 strafe_facing_offset = 0.f;
 	// END GEN INTROSPECTOR
 
@@ -22,9 +23,11 @@ struct torso_offsets {
 		back.flip_vertically();
 		head.flip_vertically();
 		shoulder.flip_vertically();
+		secondary_shoulder.flip_vertically();
 		strafe_facing_offset *= -1;
 
 		std::swap(primary_hand, secondary_hand);
+		std::swap(shoulder, secondary_shoulder);
 	}
 };
 

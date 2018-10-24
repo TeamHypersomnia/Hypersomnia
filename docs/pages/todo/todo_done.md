@@ -2154,3 +2154,6 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - asset ids in bomb mode vars widget
 
+- Always throw the primary weapon (and highlight it) if holding melee weapons
+	- Throw both!
+

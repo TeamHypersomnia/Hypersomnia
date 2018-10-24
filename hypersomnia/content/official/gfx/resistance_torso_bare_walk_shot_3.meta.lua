@@ -26,6 +26,13 @@ return {
           y = 0
         },
         rotation = 0
+      },
+      shell_spawn = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       }
     },
     item = {
@@ -63,6 +70,13 @@ return {
           y = 0
         },
         rotation = 0
+      },
+      shoulder_anchor = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       }
     },
     legs = {
@@ -70,6 +84,10 @@ return {
         x = 0,
         y = 0
       }
+    },
+    non_standard_shape = {
+      convex_partition = {},
+      original_poly = {}
     },
     torso = {
       back = {
@@ -84,7 +102,7 @@ return {
           x = -2,
           y = 2
         },
-        rotation = -0
+        rotation = 0
       },
       legs = {
         pos = {
@@ -98,15 +116,30 @@ return {
           x = 13,
           y = 19
         },
-        rotation = -0
+        rotation = 0
       },
       secondary_hand = {
         pos = {
           x = 16,
           y = -20
         },
-        rotation = -0
-      }
+        rotation = 0
+      },
+      secondary_shoulder = {
+        pos = {
+          x = 7,
+          y = 20
+        },
+        rotation = 183
+      },
+      shoulder = {
+        pos = {
+          x = 10,
+          y = -19
+        },
+        rotation = 177
+      },
+      strafe_facing_offset = 0
     }
   },
   usage_as_button = {

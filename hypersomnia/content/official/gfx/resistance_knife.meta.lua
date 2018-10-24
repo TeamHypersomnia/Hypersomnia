@@ -70,6 +70,13 @@ return {
           y = 0
         },
         rotation = 0
+      },
+      shoulder_anchor = {
+        pos = {
+          x = -7,
+          y = 3
+        },
+        rotation = 4.9697408676147461
       }
     },
     legs = {
