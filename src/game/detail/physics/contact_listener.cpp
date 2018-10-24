@@ -20,6 +20,7 @@
 #include "game/detail/physics/missile_surface_info.h"
 #include "game/inferred_caches/physics_world_cache.h"
 #include "game/detail/melee/like_melee.h"
+#include "game/detail/sentience/sentience_getters.h"
 
 #define FRICTION_FIELDS_COLLIDE 0
 
@@ -406,10 +407,14 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 		}
 
 		if (subject.has<components::missile>() || is_like_thrown_melee(subject)) {
+			LOG_NVPS(subject, collider);
 			const auto info = missile_surface_info(subject, collider);
 
-			if (info.ignore_standard_impulse()) {
+			if (info.ignore_standard_impulse() || collider.has<components::sentience>()) {
+				LOG("Ignored");
 				contact->SetEnabled(false);
+				post_collision_messages = false;
+				break;
 			}
 		}
 

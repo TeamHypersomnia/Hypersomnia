@@ -2,6 +2,7 @@
 #include "augs/math/vec2.h" 
 #include "augs/pad_bytes.h"
 
+#include "augs/misc/timing/stepped_timing.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/enums/weapon_action_type.h"
@@ -10,6 +11,7 @@
 
 #include "game/container_sizes.h"
 #include "augs/pad_bytes.h"
+#include "augs/math/physics_structs.h"
 
 struct melee_clash_def {
 	// GEN INTROSPECTOR struct melee_clash_def
@@ -45,7 +47,7 @@ struct melee_attack_definition {
 struct melee_throw_def {
 	// GEN INTROSPECTOR struct melee_throw_def
 	damage_definition damage;
-	real32 boomerang_impulse = 2000.f;
+	impulse_mults boomerang_impulse = { 2000.f, 1.5f };
 	melee_clash_def clash;
 	real32 min_speed_to_hurt = 50.f;
 	// END GEN INTROSPECTOR
@@ -63,7 +65,9 @@ namespace invariants {
 namespace components {
 	struct melee {
 		// GEN INTROSPECTOR struct components::melee
-		real32 reserved = 0.f;
+		augs::stepped_timestamp when_passed_held_item;
+		augs::stepped_timestamp when_clashed;
+		augs::stepped_timestamp when_inflicted_damage;
 		// END GEN INTROSPECTOR
 	};
 }

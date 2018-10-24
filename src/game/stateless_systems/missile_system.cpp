@@ -158,8 +158,26 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 		if (*type == missile_collision_type::CONTACT_START) {
 			missile_handle.dispatch_on_having_all<invariants::melee>([&](const auto& typed_melee) {
+				const auto& clk = cosm.get_clock();
+				const auto& now = clk.now;
+
 				if (is_like_thrown_melee(typed_melee)) {
-					if (is_like_thrown_melee(surface_handle)) {
+					auto& melee = typed_melee.template get<components::melee>();
+
+					auto cooldown_passes = [&](augs::stepped_timestamp& stamp, const int cooldown = 2) {
+						return !(now.step <= stamp.step + cooldown);
+					};
+
+					auto try_pass_cooldown = [&](augs::stepped_timestamp& stamp, const int cooldown = 2) {
+						if (!cooldown_passes(stamp, cooldown)) {
+							return false;
+						}
+
+						stamp = now;
+						return true;
+					};
+
+					if (is_like_thrown_melee(surface_handle) && try_pass_cooldown(melee.when_clashed, 5)) {
 						const auto& from = surface_handle;
 						const auto& what = typed_melee;
 
@@ -183,10 +201,19 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 								particle_effect_start_input::fire_and_forget(eff_transform)
 							);
 
-							clash_def.sound.start(
-								step,
-								sound_effect_start_input::fire_and_forget(eff_transform)
-							);
+							{
+								const bool avoid_clashing_same_sound =
+									clash_def.sound.id == what.template get<invariants::melee>().throw_def.clash.sound.id
+									&& !cooldown_passes(from.template get<components::melee>().when_clashed)
+								;
+
+								if (!avoid_clashing_same_sound) {
+									clash_def.sound.start(
+										step,
+										sound_effect_start_input::fire_and_forget(eff_transform)
+									);
+								}
+							}
 
 							{
 								thunder_input th;
@@ -212,10 +239,18 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 					const auto info = missile_surface_info(typed_melee, surface_handle);
 
-					const bool sentient = sentient_and_not_dead(surface_handle);
+					const bool sentient = surface_handle.template has<components::sentience>();
 					const bool interested = sentient || info.surface_is_held_item;
 
 					if (!interested) {
+						return;
+					}
+
+					if (sentient && !try_pass_cooldown(melee.when_inflicted_damage)) {
+						return;
+					}
+
+					if (info.surface_is_held_item && !try_pass_cooldown(melee.when_passed_held_item)) {
 						return;
 					}
 
@@ -261,20 +296,22 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 						it.point
 					)) {
 						if (sentient) {
+#if UNSET_SENDER_AFTER_DEALING_DAMAGE
 							{
 								auto& sender = typed_melee.template get<components::sender>();
 								sender.unset();
 							}
+#endif
 
 							const auto boomerang_impulse = throw_def.boomerang_impulse;
 
-							if (boomerang_impulse > 0.f) {
-								const auto& rigid_body = typed_melee.template get<components::rigid_body>();
-								const auto boomerang_dir = -vec2::from_degrees(result->transform_of_impact.rotation);
+							const auto& rigid_body = typed_melee.template get<components::rigid_body>();
+							const auto boomerang_dir = -vec2::from_degrees(result->transform_of_impact.rotation);
 
-								const auto total_vel = boomerang_dir * boomerang_impulse;
-								rigid_body.set_velocity(total_vel);
-							}
+							const auto total_vel = boomerang_dir * boomerang_impulse.linear;
+							rigid_body.set_velocity(total_vel);
+
+							rigid_body.apply_angular_impulse(boomerang_impulse.angular * rigid_body.get_mass());
 						}
 					}
 				}
