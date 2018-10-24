@@ -1082,8 +1082,6 @@ bool editor_setup::handle_input_before_imgui(
 			switch (k) {
 				case key::N: new_tab(); return true;
 				case key::O: open(window); return true;
-				case key::BACKSPACE: finish_and_discard(); return true; 
-				case key::ENTER: finish_and_reapply(); return true;
 				default: break;
 			}
 		}
@@ -1166,6 +1164,9 @@ bool editor_setup::handle_input_before_game(
 
 			if (has_ctrl) {
 				switch(k) {
+					case key::BACKSPACE: finish_and_discard(); return true; 
+					case key::ENTER: finish_and_reapply(); return true;
+
 					case key::LEFT: mirror_selection(vec2i(-1, 0)); return true;
 					case key::RIGHT: mirror_selection(vec2i(1, 0)); return true;
 					case key::UP: mirror_selection(vec2i(0, -1)); return true;

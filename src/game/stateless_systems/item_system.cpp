@@ -477,20 +477,43 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 				};
 
 				if (is_throw) {
-					bool anything_thrown = false;
-
 					const auto wielded_items = typed_subject.get_wielded_items();
+
+					std::array<transformr, 2> positions;
+					int thrown_melees = 0;
 
 					for (const auto& w : wielded_items) {
 						const auto h = cosm[w];
 
 						if (h.template has<components::melee>()) {
-							do_drop(h);
-							anything_thrown = true;
+							positions[thrown_melees++] = h.get_logic_transform();
 						}
 					}
 
-					if (anything_thrown) {
+					if (thrown_melees > 0) {
+						for (const auto& w : wielded_items) {
+							const auto h = cosm[w];
+
+							if (h.template has<components::melee>()) {
+								do_drop(h);
+							}
+						}
+
+						if (thrown_melees == 2) {
+							/* 
+								If we want both knives thrown from the exact positions that they were held in 
+								during akimbo, we need to restore their positions before one of them was dropped.
+
+								That is because a drop will instantly switch to a one-handed stance 
+								which will significantly displace the other knife.
+							*/
+
+							for (const auto& w : wielded_items) {
+								const auto h = cosm[w];
+								h.set_logic_transform(positions[index_in(wielded_items, w)]);
+							}
+						}
+
 						return;
 					}
 				}
