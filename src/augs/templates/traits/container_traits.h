@@ -4,6 +4,7 @@
 #include <utility>
 
 #include "augs/templates/traits/has_begin_and_end.h"
+#include "augs/templates/traits/is_std_array.h"
 
 template <int t>
 struct constexpr_tester {};
@@ -17,9 +18,6 @@ struct has_constexpr_max_size<T, decltype(constexpr_tester<T::max_size()>(), voi
 template <class T>
 struct has_constexpr_max_size<T, decltype(constexpr_tester<T().max_size()>(), void())> : std::true_type {};
 
-template <class T>
-constexpr bool has_constexpr_max_size_v = has_constexpr_max_size<T>::value;
-
 
 template <class T, class = void>
 struct has_constexpr_size : std::false_type {};
@@ -30,9 +28,22 @@ struct has_constexpr_size<T, decltype(constexpr_tester<T::size()>(), void())> : 
 template <class T>
 struct has_constexpr_size<T, decltype(constexpr_tester<T().size()>(), void())> : std::true_type {};
 
-template <class T>
-constexpr bool has_constexpr_size_v = has_constexpr_size<T>::value;
+/*	
+	Unfortunately, there are problems detecting constexpr-ness in MSVC, 
+	so we need to make a special case for std::array. 
+*/
 
+template <class T>
+constexpr bool has_constexpr_max_size_v =
+	is_std_array_v<T> 
+	|| has_constexpr_max_size<T>::value
+;
+
+template <class T>
+constexpr bool has_constexpr_size_v =
+	is_std_array_v<T> 
+	|| has_constexpr_size<T>::value
+;
 
 template <class T, class = void>
 struct is_associative : std::false_type {};

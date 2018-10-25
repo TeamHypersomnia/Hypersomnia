@@ -122,6 +122,9 @@ struct tests_of_traits {
 
 	/* One-shot asserts. */
 
+	static_assert(!is_one_of_v<int, float, double>, "Trait has failed");
+	static_assert(is_one_of_v<unsigned, float, float, double, unsigned>, "Trait has failed");
+	static_assert(is_one_of_v<cosmos, int, cosmos_clock, cosmos>, "Trait has failed");
 	static_assert(same<test_type_map::at<int>, double>);
 	static_assert(same<test_type_map::at<double>, int>);
 	static_assert(same<test_type_map::at<float>, const char*>);
@@ -282,9 +285,6 @@ struct tests_of_traits {
 	static_assert(same<filter_types_in_list<std::is_integral, type_list<double, int, float>>::get_type<0>, int>, "Trait has failed");
 	
 	static_assert(is_one_of_list_v<unsigned, std::tuple<float, float, double, unsigned>>, "Trait has failed");
-	static_assert(!is_one_of_v<int, float, double>, "Trait has failed");
-	static_assert(is_one_of_v<unsigned, float, float, double, unsigned>, "Trait has failed");
-	static_assert(is_one_of_v<cosmos, int, cosmos_clock, cosmos>, "Trait has failed");
 
 	static_assert(index_in_list_v<unsigned, std::tuple<float, float, double, unsigned>> == 3, "Trait has failed");
 	static_assert(index_in_v<unsigned, float, float, double, unsigned> == 3, "Trait has failed");
@@ -451,7 +451,6 @@ struct game_state_checks {
 			all_entity_types(), 
 			[](auto e) {
 				using E = decltype(e);
-				using List = invariants_and_components_of<E>;
 
 				for_each_through_std_get(
 					assert_always_together(),
@@ -459,6 +458,7 @@ struct game_state_checks {
 						using C = decltype(constraint);
 						using F = typename C::First;
 						using S = typename C::Second;
+						using List = invariants_and_components_of<E>;
 
 						static_assert(
 							is_one_of_list_v<F, List> == is_one_of_list_v<S, List>,
@@ -473,6 +473,7 @@ struct game_state_checks {
 						using C = decltype(constraint);
 						using F = typename C::First;
 						using S = typename C::Second;
+						using List = invariants_and_components_of<E>;
 
 						if constexpr(is_one_of_list_v<F, List>) {
 							static_assert(
@@ -489,6 +490,7 @@ struct game_state_checks {
 						using C = decltype(constraint);
 						using F = typename C::First;
 						using S = typename C::Second;
+						using List = invariants_and_components_of<E>;
 
 						static_assert(
 							!is_one_of_list_v<F, List> || !is_one_of_list_v<S, List>,

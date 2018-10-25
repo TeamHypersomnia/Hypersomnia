@@ -3,6 +3,7 @@
 #include "generated/introspectors.h"
 #include "augs/templates/traits/introspection_traits.h"
 #include "augs/templates/list_utils.h"
+#include "augs/templates/folded_finders.h"
 
 namespace augs {
 	template <class T>
@@ -65,7 +66,7 @@ struct sum_matching_in;
 
 template <template <class> class C, class... Args>
 struct sum_matching_in<C, type_list<Args...>> {
-	static constexpr std::size_t value = (... + sum_matching_in<C, Args>::value);
+	static constexpr std::size_t value = (folded_sum_v<sum_matching_in<C, Args>::value...>);
 };
 
 template <template <class> class C, class... Args>

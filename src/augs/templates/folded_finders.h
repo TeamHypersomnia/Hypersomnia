@@ -59,3 +59,6 @@ constexpr std::size_t index_in_list_v = index_in_list<0, S, List>::value;
 template <class S, class... Types>
 constexpr std::size_t index_in_v = index_in_list_v<S, type_list<Types...>>;
 
+
+template <std::size_t... indices>
+constexpr std::size_t folded_sum_v = (... + indices);

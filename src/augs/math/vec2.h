@@ -419,8 +419,8 @@ struct basic_vec2 {
 		const auto new_x = x * c - y * s;
 		const auto new_y = x * s + y * c;
 
-		x = new_x;
-		y = new_y;
+		x = static_cast<type>(new_x);
+		y = static_cast<type>(new_y);
 
 		return *this;
 	}

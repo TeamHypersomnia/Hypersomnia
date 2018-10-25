@@ -207,7 +207,7 @@ namespace augs {
 
 		void resize_no_init(const std::size_t s) {
 			static_assert(is_trivially_copyable);
-			count = s;
+			count = static_cast<size_type>(s);
 		}
 
 		void resize(const std::size_t s) {
@@ -224,7 +224,7 @@ namespace augs {
 				}
 			}
 			else {
-				count = s;
+				count = static_cast<size_type>(s);
 			}
 		}
 

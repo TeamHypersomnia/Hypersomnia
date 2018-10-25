@@ -55,11 +55,11 @@ struct maybe_official_path {
 		return augs::get_prettified_filename(path);
 	}
 
-	static auto get_content_suffix() {
+	static std::string get_content_suffix() {
 		return ::get_content_suffix<T>();
 	}
 
-	static auto get_in_official() {
+	static augs::path_type get_in_official() {
 		return augs::path_type(OFFICIAL_CONTENT_DIR) / get_content_suffix();
 	}
 

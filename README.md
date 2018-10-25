@@ -69,6 +69,14 @@ Use your favorite shell to go into the newly created ```build/``` folder and run
 cmake ..
 ```
 
+Or if you are on a 64-bit system, run:
+
+```
+cmake -G "Visual Studio 15 2017 Win64" -DBUILD_IN_CONSOLE_MODE=1 ..
+```
+
+Note that the 64-bit version is more likely to be kept up to date.
+
 If you want to somehow customize your build, refer to the beginning of ```CMakeLists.txt``` to see which options you can pass to the ```cmake``` command.
 
 Resultant ```.sln``` and ```.vcxproj``` files should appear in the ```build/``` directory.

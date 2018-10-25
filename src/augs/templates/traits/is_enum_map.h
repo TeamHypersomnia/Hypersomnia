@@ -4,8 +4,8 @@
 template <class T>
 struct is_enum_map : std::false_type {};
 
-template <class T, class _enum>
-struct is_enum_map<augs::enum_map<T, _enum>> : std::true_type {
+template <class _enum, class T>
+struct is_enum_map<augs::enum_map<_enum, T>> : std::true_type {
 	static constexpr std::size_t size = static_cast<std::size_t>(_enum::COUNT);
 };
 

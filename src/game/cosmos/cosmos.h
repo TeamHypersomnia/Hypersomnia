@@ -41,8 +41,11 @@ public:
 	template <class F>
 	void change_common_significant(F&& callback);
 
-	void set(const cosmos_solvable_significant& signi); 
-	si_scaling get_si() const;
+	void set(const cosmos_solvable_significant& signi);
+
+	si_scaling get_si() const {
+		return get_common_significant().si;
+	}
 
 	randomization get_rng_for(const entity_id) const;
 	fast_randomization get_fast_rng_for(const entity_id) const;
@@ -50,17 +53,21 @@ public:
 	
 	std::string summary() const;
 
-	const cosmos_common_significant& get_common_significant() const;
-
-	auto& get_common_significant(cosmos_common_significant_access) {
+	const cosmos_common_significant& get_common_significant() const {
 		return common.significant;
 	}
 
-	const auto& get_common_significant(cosmos_common_significant_access) const {
+	cosmos_common_significant& get_common_significant(cosmos_common_significant_access) {
 		return common.significant;
 	}
 
-	const common_assets& get_common_assets() const;
+	const cosmos_common_significant& get_common_significant(cosmos_common_significant_access) const {
+		return common.significant;
+	}
+
+	const common_assets& get_common_assets() const {
+		return get_common_significant().assets;
+	}
 
 	/* Shortcuts */
 
@@ -191,15 +198,15 @@ public:
 		return solvable.get_solvable();
 	}
 
-	auto& get_solvable_inferred(cosmos_solvable_inferred_access k) {
+	cosmos_solvable_inferred& get_solvable_inferred(cosmos_solvable_inferred_access k) {
 		return solvable.get_solvable_inferred(k);
 	}
 
-	const auto& get_solvable_inferred(cosmos_solvable_inferred_access k) const {
+	const cosmos_solvable_inferred& get_solvable_inferred(cosmos_solvable_inferred_access k) const {
 		return solvable.get_solvable_inferred(k);
 	}
 
-	const auto& get_solvable_inferred() const {
+	const cosmos_solvable_inferred& get_solvable_inferred() const {
 		return solvable.get_solvable_inferred();
 	}
 
@@ -286,15 +293,3 @@ public:
 
 	void reinfer_everything();
 };
-
-inline si_scaling cosmos::get_si() const {
-	return get_common_significant().si;
-}
-
-inline const cosmos_common_significant& cosmos::get_common_significant() const {
-	return common.significant;
-}
-
-inline const common_assets& cosmos::get_common_assets() const {
-	return get_common_significant().assets;
-}
