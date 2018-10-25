@@ -93,6 +93,7 @@ entity_handle cosmic::create_entity(
 				return entity_handle(typed_handle);
 			}
 			catch (const entity_creation_error& err) {
+				(void)err;
 				return cosm[entity_id()];
 			}
 		}

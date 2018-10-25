@@ -55,7 +55,7 @@ private:
 		return conditional_get_by_dynamic_id<candidate_types>(
 			all_entity_types(),
 			flavour_id.type_id,
-			[&](auto t) -> decltype(auto) {
+			[&, flavour_id](auto t) -> decltype(auto) {
 				using E = decltype(t);
 				return callback(self.flavours.template get_for<E>().get(flavour_id.raw));
 			}

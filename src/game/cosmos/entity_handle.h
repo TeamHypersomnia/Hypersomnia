@@ -8,6 +8,7 @@
 #include "game/detail/inventory/inventory_slot_handle.h"
 #include "augs/templates/maybe_const.h"
 #include "augs/templates/traits/component_traits.h"
+#include "augs/templates/traits/is_nullopt.h"
 #include "augs/templates/folded_finders.h"
 
 #include "game/cosmos/entity_handle_declaration.h"
@@ -65,10 +66,8 @@ class basic_entity_handle :
 	template <class T>
 	auto* find_invariant_ptr() const {
 		return conditional_dispatch_ret<entity_types_having_all_of<T>>(
-			[&](auto t) -> const T* { 
-				using E = decltype(t);
-
-				if constexpr(std::is_same_v<E, std::nullopt_t>) {
+			[&](const auto& t) -> const T* { 
+				if constexpr(is_nullopt_v<decltype(t)>) {
 					return nullptr;
 				}
 				else {
@@ -77,19 +76,22 @@ class basic_entity_handle :
 			}
 		);
 	}
+	
+	template <class T, class H>
+	static auto* find_or_nullptr(const H& t) {
+		return t.template find_component_ptr<T>();
+	}
+
+	template <class T>
+	static std::nullptr_t find_or_nullptr(const std::nullopt_t& n) {
+		return nullptr;
+	}
 
 	template <class T>
 	auto* find_component_ptr() const {
 		return conditional_dispatch_ret<entity_types_having_all_of<T>>(
-			[&](auto t) -> maybe_const_ptr_t<is_const, T> { 
-				using E = decltype(t);
-
-				if constexpr(std::is_same_v<E, std::nullopt_t>) {
-					return nullptr;
-				}
-				else {
-					return t.template find_component_ptr<T>(); 
-				}
+			[&](const auto& t) -> maybe_const_ptr_t<is_const, T> {
+				return find_or_nullptr<T>(t);
 			}
 		);
 	}
@@ -210,9 +212,9 @@ public:
 			all_entity_types(), 
 			raw_id.type_id,
 			[&](auto t) -> decltype(auto) { 
-				using E = decltype(t);
+				using E = remove_cref<decltype(t)>;
 
-				if constexpr(std::is_same_v<E, std::nullopt_t>) {
+				if constexpr(is_nullopt_v<E>) {
 					return callback(std::nullopt);
 				}
 				else {
@@ -226,7 +228,7 @@ public:
 	FORCE_INLINE void conditional_dispatch(F&& callback) const {
 		this->conditional_dispatch_ret<List>(
 			[&](const auto& typed_handle) {
-				if constexpr(!std::is_same_v<const std::nullopt_t&, decltype(typed_handle)>) {
+				if constexpr(!is_nullopt_v<decltype(typed_handle)>) {
 					callback(typed_handle);
 				}
 			}
@@ -246,7 +248,7 @@ public:
 	void dispatch_on_having_all(F&& callback) const {
 		this->conditional_dispatch_ret<entity_types_having_all_of<List...>>(
 			[&](const auto& typed_handle) {
-				if constexpr(!std::is_same_v<const std::nullopt_t&, decltype(typed_handle)>) {
+				if constexpr(!is_nullopt_v<decltype(typed_handle)>) {
 					callback(typed_handle);
 				}
 			}
@@ -257,7 +259,7 @@ public:
 	void dispatch_on_having_any(F&& callback) const {
 		this->conditional_dispatch_ret<entity_types_having_any_of<List...>>(
 			[&](const auto& typed_handle) {
-				if constexpr(!std::is_same_v<const std::nullopt_t&, decltype(typed_handle)>) {
+				if constexpr(!is_nullopt_v<decltype(typed_handle)>) {
 					callback(typed_handle);
 				}
 			}
@@ -282,7 +284,7 @@ public:
 	bool has() const {
 		return this->conditional_dispatch_ret<entity_types_having_any_of<T>>(
 			[&](const auto& typed_handle) {
-				return !std::is_same_v<const std::nullopt_t&, decltype(typed_handle)>;
+				return !is_nullopt_v<decltype(typed_handle)>;
 			}
 		);
 	}

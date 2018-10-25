@@ -5,7 +5,7 @@
 template <std::size_t I>
 auto to_polygon_shape(const std::array<vec2, I>& arr) {
 	b2PolygonShape output;
-	output.Set(arr.data(), arr.size());
+	output.Set(arr.data(), static_cast<int32>(arr.size()));
 	return output;
 }
 

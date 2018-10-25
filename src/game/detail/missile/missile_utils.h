@@ -51,14 +51,13 @@ static void spawn_bullet_remnants(
 		cosmic::create_entity(
 			cosm,
 			r_id,
-			[&](const auto typed_remnant, auto&&...) {
+			[&, vel](const auto typed_remnant, auto&&...) {
 				auto spawn_offset = vec2(vel).normalize() * rng.randval(55.f, 60.f);
-				const auto rot = rng.randval(0, 360);
+				const auto rot = rng.randval(0.f, 360.f);
 				
 				typed_remnant.set_logic_transform(transformr(impact_point + spawn_offset, rot));
 			},
-			[&](const auto typed_remnant) {
-
+			[vel, &rng, &step](const auto typed_remnant) {
 				typed_remnant.template get<components::rigid_body>().set_velocity(vel);
 				typed_remnant.template get<components::rigid_body>().set_angular_velocity(rng.randval(1060.f, 4000.f));
 

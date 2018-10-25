@@ -39,7 +39,7 @@ vec2 calc_barrel_center(
 	const T& gun_handle,
 	const transformr& gun_transform
 ) {
-	const auto bullet_spawn_offset = get_bullet_spawn_offset(gun_handle);
+	const auto bullet_spawn_offset = static_cast<vec2>(get_bullet_spawn_offset(gun_handle));
 
 	return (gun_transform * transformr(vec2(0, bullet_spawn_offset.y))).pos;
 }

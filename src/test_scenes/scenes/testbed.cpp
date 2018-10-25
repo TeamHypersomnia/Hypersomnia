@@ -681,7 +681,7 @@ namespace test_scenes {
 
 			const auto origin_entity = create(test_box_markers::ORGANISM_AREA, aquarium_origin).set_logical_size(aquarium_size * 2);
 
-			auto create_fish = [&](auto t, auto where) {
+			auto create_fish = [&, origin_entity](auto t, auto where) {
 				const auto decor = create(t, where);
 				decor.template get<components::movement_path>().origin = origin_entity.get_id();
 				const auto secs = real32(decor.template get<components::animation>().state.frame_num) * 12.23f;

@@ -35,7 +35,7 @@ void requested_equipment::generate_for(
 		perform_transfer(request, step);
 	};
 
-	auto make_wearable = [&](const item_flavour_id& from, const slot_function slot) {
+	auto make_wearable = [&, character](const auto& from, const slot_function slot) {
 		if (!from.is_set()) {
 			return;
 		}
@@ -72,7 +72,7 @@ void requested_equipment::generate_for(
 		transfer(what, get_pickup_slot_for(what));
 	};
 
-	const auto character_transform = [&]() {
+	const auto character_transform = [&](auto&&...) {
 		if constexpr (to_the_ground) {
 			return character;
 		}
