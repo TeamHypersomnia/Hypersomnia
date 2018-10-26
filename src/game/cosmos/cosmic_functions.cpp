@@ -2,6 +2,7 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/create_entity.hpp"
+#include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 #include "game/detail/inventory/perform_transfer.h"
 #include "augs/templates/introspect.h"
 #include "game/cosmos/change_common_significant.hpp"
@@ -36,7 +37,36 @@ void cosmic::set_specific_name(const entity_handle& handle, const entity_name_st
 
 void cosmic::clear(cosmos& cosm) {
 	cosm.get_solvable({}).clear();
-	cosm.change_common_significant([](auto& c) { c = {}; return changer_callback_result::DONT_REFRESH; });
+	
+	cosm.change_common_significant([&](cosmos_common_significant& c) {
+		augs::introspect(
+			[&](auto, auto& field) {
+				using T = remove_cref<decltype(field)>;
+
+				if constexpr (std::is_same_v<T, all_logical_assets>) {
+					augs::introspect(
+						[&](auto, auto& sub_field) {
+							sub_field.clear();
+						},
+						field
+					);
+
+					for (auto& s : field.image_offsets) {
+						s = {};
+					}
+				}
+				else if constexpr (std::is_same_v<T, all_entity_flavours>) {
+					field.clear();
+				}
+				else {
+					field = {};
+				}
+			},
+			c
+		);
+
+		return changer_callback_result::DONT_REFRESH;
+	});
 }
 
 entity_handle cosmic::create_entity(

@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+
+- Usability fixes to editor 
+	- Disallow flavour instantation when there is no image specified
+	- Test gameplay when there is no flavour, basically when the workspace is empty
+
 - Fix throws so that they also register hit entities
 	- Just add a cooldown for hitting
 	- We may remove the oldest entries

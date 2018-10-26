@@ -14,6 +14,8 @@ using plain_animations_pool = make_asset_pool<plain_animation, assets::plain_ani
 using recoil_players_pool = make_asset_pool<recoil_player, assets::recoil_player_id_key>;
 using physical_materials_pool = make_asset_pool<physical_material, assets::physical_material_id_key>;
 
+using all_image_offsets_array_type = std::array<all_image_offsets, MAX_IMAGES_IN_INTERCOSM>;
+
 struct all_logical_assets {
 	// GEN INTROSPECTOR struct all_logical_assets
 	plain_animations_pool plain_animations;
@@ -22,7 +24,7 @@ struct all_logical_assets {
 	physical_materials_pool physical_materials;
 	// END GEN INTROSPECTOR
 
-	std::array<all_image_offsets, MAX_IMAGES_IN_INTERCOSM> image_offsets;
+	all_image_offsets_array_type image_offsets;
 
 	auto& get_offsets(const assets::image_id id) {
 		return image_offsets.at(id.get_cache_index());

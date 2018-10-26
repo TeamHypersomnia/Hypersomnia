@@ -345,7 +345,7 @@ void settings_gui_state::perform(
 					if (auto node = scoped_tree_node("Test scene generation")) {
 						auto& scope_cfg = config.editor.test_scene;
 						
-						revertable_slider(SCOPE_CFG_NVP(scene_tickrate), 10.f, 300.f);
+						revertable_slider(SCOPE_CFG_NVP(scene_tickrate), 10u, 300u);
 						revertable_checkbox(SCOPE_CFG_NVP(start_bomb_mode));
 					}
 				}	
@@ -496,7 +496,7 @@ void settings_gui_state::perform(
 					auto indent = scoped_indent();
 
 					revertable_checkbox("Create minimal", config.test_scene.create_minimal);
-					revertable_slider("Tickrate", config.test_scene.scene_tickrate, 10.f, 300.f);
+					revertable_slider("Tickrate", config.test_scene.scene_tickrate, 10u, 300u);
 				}
 
 				{

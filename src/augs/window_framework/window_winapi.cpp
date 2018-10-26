@@ -9,9 +9,27 @@
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/platform_utils.h"
 
+#include <Windows.h>
 #include "augs/window_framework/translate_winapi_enums.h"
 
 namespace augs {
+	struct window::platform_data {
+		HWND hwnd = nullptr;
+		HDC hdc = nullptr;
+		HGLRC hglrc = nullptr;
+
+		vec2i min_window_size;
+		vec2i max_window_size;
+
+		int style = 0xdeadbeef;
+		int exstyle = 0xdeadbeef;
+
+		bool double_click_occured = false;
+
+		timer triple_click_timer;
+		unsigned triple_click_delay = 0xdeadbeef;
+	};
+
 	std::wstring widen(const std::string& s) {
 		return std::wstring(s.begin(), s.end());
 	}
@@ -40,14 +58,15 @@ namespace augs {
 		return DefWindowProc(hwnd, umsg, wParam, lParam);
 	}
 
-	std::optional<event::change> window::handle_event(const UINT m, const WPARAM wParam, const LPARAM lParam) {
+	template <class U, class W, class L>
+	std::optional<event::change> window::handle_event(const U m, const W wParam, const L lParam) {
 		using namespace event::keys;
 
 		event::change change;
 		change.msg = translate_enum(m);
 
 		auto default_proc = [&]() {
-			DefWindowProc(hwnd, m, wParam, lParam);
+			DefWindowProc(platform->hwnd, m, wParam, lParam);
 		};
 
 		switch (m) {
@@ -101,10 +120,10 @@ namespace augs {
 		// Doubleclicks
 		
 		case WM_LBUTTONDBLCLK:
-			SetCapture(hwnd);
+			SetCapture(platform->hwnd);
 			
-			triple_click_timer.extract<std::chrono::microseconds>();
-			double_click_occured = true;
+			platform->triple_click_timer.extract<std::chrono::microseconds>();
+			platform->double_click_occured = true;
 
 			return change;
 
@@ -117,11 +136,11 @@ namespace augs {
 		case WM_LBUTTONDOWN:
 			change.data.key.key = key::LMOUSE;
 
-			SetCapture(hwnd);
+			SetCapture(platform->hwnd);
 
-			if (double_click_occured && triple_click_timer.extract<std::chrono::milliseconds>() < triple_click_delay) {
+			if (platform->double_click_occured && platform->triple_click_timer.extract<std::chrono::milliseconds>() < platform->triple_click_delay) {
 				change.msg = event::message::ltripleclick;
-				double_click_occured = false;
+				platform->double_click_occured = false;
 			}
 
 			return change;
@@ -171,7 +190,7 @@ namespace augs {
 			return change;
 		case WM_LBUTTONUP:
 			change.data.key.key = key::LMOUSE;
-			if (GetCapture() == hwnd) ReleaseCapture(); return change;
+			if (GetCapture() == platform->hwnd) ReleaseCapture(); return change;
 		case WM_RBUTTONUP:
 			change.data.key.key = key::RMOUSE;
 			return change;
@@ -183,7 +202,7 @@ namespace augs {
 				const auto p = MAKEPOINTS(lParam);
 				const auto new_pos = basic_vec2<short>{ p.x, p.y };
 
-				double_click_occured = false;
+				platform->double_click_occured = false;
 
 				return handle_mousemove(new_pos);
 			}
@@ -236,10 +255,10 @@ namespace augs {
 		case WM_GETMINMAXINFO:
 			{
 				auto* const mi = reinterpret_cast<MINMAXINFO*>(lParam);
-				mi->ptMinTrackSize.x = min_window_size.x;
-				mi->ptMinTrackSize.y = min_window_size.y;
-				mi->ptMaxTrackSize.x = max_window_size.x;
-				mi->ptMaxTrackSize.y = max_window_size.y;
+				mi->ptMinTrackSize.x = platform->min_window_size.x;
+				mi->ptMinTrackSize.y = platform->min_window_size.y;
+				mi->ptMaxTrackSize.x = platform->max_window_size.x;
+				mi->ptMaxTrackSize.y = platform->max_window_size.y;
 			}
 			return change;
 
@@ -253,12 +272,12 @@ namespace augs {
 	}
 
 	void window::set_window_name(const std::string& name) {
-		SetWindowText(hwnd, widen(name).c_str());
+		SetWindowText(platform->hwnd, widen(name).c_str());
 	}
 
 	window::window(
 		const window_settings& settings
-	) {
+	) : platform(std::make_unique<window::platform_data>()) {
 		// TODO: throw an exception instead of ensuring
 		static bool register_once = [](){
 			WNDCLASSEX wcl = { 0 };
@@ -285,10 +304,11 @@ namespace augs {
 			ensure(register_success && "class registering");
 			return register_success;
 		}();
+		(void)register_once;
 
-		triple_click_delay = GetDoubleClickTime();
-		hwnd = CreateWindowEx(0, L"augwin", L"invalid_name", 0, 0, 0, 0, 0, 0, 0, GetModuleHandle(NULL), this);
-		ensure(hwnd);
+		platform->triple_click_delay = GetDoubleClickTime();
+		platform->hwnd = CreateWindowEx(0, L"augwin", L"invalid_name", 0, 0, 0, 0, 0, 0, 0, GetModuleHandle(NULL), this);
+		ensure(platform->hwnd);
 
 		PIXELFORMATDESCRIPTOR p;
 		ZeroMemory(&p, sizeof(p));
@@ -299,23 +319,24 @@ namespace augs {
 		p.iPixelType = PFD_TYPE_RGBA;
 		p.cColorBits = settings.bpp;
 		p.cAlphaBits = 8;
+		p.cStencilBits = 8;
 		p.cDepthBits = 0;
 		p.iLayerType = PFD_MAIN_PLANE;
-		hdc = GetDC(hwnd);
-		ensure(hdc);
+		platform->hdc = GetDC(platform->hwnd);
+		ensure(platform->hdc);
 
-		const auto pf = ChoosePixelFormat(hdc, &p);
+		const auto pf = ChoosePixelFormat(platform->hdc, &p);
 		
 		ensure(pf);
 
 		{
-			const auto result = SetPixelFormat(hdc, pf, &p);
+			const auto result = SetPixelFormat(platform->hdc, pf, &p);
 			ensure(result);
 		}
 
 #if BUILD_OPENGL
-		hglrc = wglCreateContext(hdc);
-		ensure(hglrc);
+		platform->hglrc = wglCreateContext(platform->hdc);
+		ensure(platform->hglrc);
 #endif
 		const auto sc = set_as_current();
 		ensure(sc);
@@ -323,7 +344,7 @@ namespace augs {
 
 		SetLastError(0);
 		{
-			const auto result = !(SetWindowLongPtr(hwnd, GWLP_USERDATA, (LONG_PTR)this) == 0 && GetLastError() != 0);
+			const auto result = !(SetWindowLongPtr(platform->hwnd, GWLP_USERDATA, (LONG_PTR)this) == 0 && GetLastError() != 0);
 			ensure(result);
 		}
 
@@ -338,7 +359,7 @@ namespace augs {
 		Rid[0].usUsagePage = HID_USAGE_PAGE_GENERIC;
 		Rid[0].usUsage = HID_USAGE_GENERIC_MOUSE;
 		Rid[0].dwFlags = RIDEV_INPUTSINK;
-		Rid[0].hwndTarget = hwnd;
+		Rid[0].hwndTarget = platform->hwnd;
 		RegisterRawInputDevices(Rid, 1, sizeof(Rid[0]));
 
 		apply(settings, true);
@@ -357,54 +378,54 @@ namespace augs {
 				LR_SHARED         
 			);
 
-			SendMessage(hwnd, WM_SETICON, ICON_SMALL, (LPARAM)app_icon);
-			SendMessage(hwnd, WM_SETICON, ICON_BIG, (LPARAM)app_icon);
+			SendMessage(platform->hwnd, WM_SETICON, ICON_SMALL, (LPARAM)app_icon);
+			SendMessage(platform->hwnd, WM_SETICON, ICON_BIG, (LPARAM)app_icon);
 		}
 	}
 
 	void window::destroy() {
-		if (hwnd) {
+		if (platform->hwnd) {
 			unset_if_current();
 
 #if BUILD_OPENGL
-			wglDeleteContext(hglrc);
+			wglDeleteContext(platform->hglrc);
 #endif
-			ReleaseDC(hwnd, hdc);
-			DestroyWindow(hwnd);
+			ReleaseDC(platform->hwnd, platform->hdc);
+			DestroyWindow(platform->hwnd);
 
-			hwnd = nullptr;
+			platform->hwnd = nullptr;
 		}
 	}
 
 	void window::set_window_border_enabled(const bool enabled) {
 		if (enabled) {
-			style = WS_OVERLAPPEDWINDOW;
-			exstyle = WS_EX_WINDOWEDGE;
+			platform->style = WS_OVERLAPPEDWINDOW;
+			platform->exstyle = WS_EX_WINDOWEDGE;
 		}
 		else {
-			style = WS_POPUP;
-			exstyle = WS_EX_APPWINDOW;
+			platform->style = WS_POPUP;
+			platform->exstyle = WS_EX_APPWINDOW;
 		}
 
-		SetWindowLongPtr(hwnd, GWL_EXSTYLE, exstyle);
-		SetWindowLongPtr(hwnd, GWL_STYLE, style);
+		SetWindowLongPtr(platform->hwnd, GWL_EXSTYLE, platform->exstyle);
+		SetWindowLongPtr(platform->hwnd, GWL_STYLE, platform->style);
 
-		SetWindowPos(hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOZORDER | SWP_NOOWNERZORDER);
+		SetWindowPos(platform->hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOZORDER | SWP_NOOWNERZORDER);
 		set_window_rect(get_window_rect());
 		show();
 	}
 
 	bool window::swap_buffers() {
-		return SwapBuffers(hdc) != FALSE;
+		return SwapBuffers(platform->hdc) != FALSE;
 	}
 
 	void window::show() {
-		ShowWindow(hwnd, SW_SHOW);
+		ShowWindow(platform->hwnd, SW_SHOW);
 	}
 
 	bool window::set_as_current_impl() {
 #if BUILD_OPENGL
-		return wglMakeCurrent(hdc, hglrc);
+		return wglMakeCurrent(platform->hdc, platform->hglrc);
 #else
 		return true;
 #endif
@@ -422,7 +443,7 @@ namespace augs {
 		{
 			MSG wmsg;
 
-			while (PeekMessageW(&wmsg, hwnd, 0, 0, PM_REMOVE)) {
+			while (PeekMessageW(&wmsg, platform->hwnd, 0, 0, PM_REMOVE)) {
 				const auto new_change = handle_event(
 					wmsg.message, 
 					wmsg.wParam, 
@@ -443,8 +464,8 @@ namespace augs {
 		static RECT wr = { 0 };
 		const auto result = 
 			(SetRect(&wr, r.x, r.y, r.r(), r.b())) &&
-			(AdjustWindowRectEx(&wr, style, FALSE, exstyle)) &&
-			(MoveWindow(hwnd, wr.left, wr.top, wr.right - wr.left, wr.bottom - wr.top, TRUE))
+			(AdjustWindowRectEx(&wr, platform->style, FALSE, platform->exstyle)) &&
+			(MoveWindow(platform->hwnd, wr.left, wr.top, wr.right - wr.left, wr.bottom - wr.top, TRUE))
 		;
 
 		ensure(result);
@@ -452,9 +473,9 @@ namespace augs {
 
 	xywhi window::get_window_rect() const {
 		static RECT r;
-		GetClientRect(hwnd, &r);
-		ClientToScreen(hwnd, (POINT*)&r);
-		ClientToScreen(hwnd, (POINT*)&r + 1);
+		GetClientRect(platform->hwnd, &r);
+		ClientToScreen(platform->hwnd, (POINT*)&r);
+		ClientToScreen(platform->hwnd, (POINT*)&r + 1);
 		return ltrbi(r.left, r.top, r.right, r.bottom);
 	}
 
@@ -503,7 +524,7 @@ namespace augs {
 		ZeroMemory(&ofn, sizeof(ofn));
 		ofn.lStructSize = sizeof(ofn);
 		ofn.lpstrFile = szFile.data();
-		ofn.hwndOwner = hwnd;
+		ofn.hwndOwner = platform->hwnd;
 		ofn.lpstrFile[0] = '\0';
 		ofn.nMaxFile = static_cast<DWORD>(szFile.size());
 		ofn.lpstrFilter = filter.data();
@@ -546,7 +567,7 @@ namespace augs {
 		ZeroMemory(&ofn, sizeof(ofn));
 		ofn.lStructSize = sizeof(ofn);
 		ofn.lpstrFile = szFile.data();
-		ofn.hwndOwner = hwnd;
+		ofn.hwndOwner = platform->hwnd;
 		ofn.lpstrFile[0] = '\0';
 		ofn.nMaxFile = static_cast<DWORD>(szFile.size());
 		ofn.lpstrFilter = filter.data();
@@ -614,6 +635,10 @@ namespace augs {
 		else {
 			while (ShowCursor(TRUE) <= 0);
 		}
+	}
+
+	window::~window() {
+		destroy();
 	}
 }
 

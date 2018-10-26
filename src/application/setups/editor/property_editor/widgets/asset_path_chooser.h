@@ -40,7 +40,7 @@ public:
 
 				auto make_path_adder = [&](const bool official, const auto& root) {
 					return [official, this, &allow_path_predicate, &root](const auto& p) {
-						if (assets::is_supported_extension<I>(p.extension())) {
+						if (assets::is_supported_extension<I>(p.extension().string())) {
 							maybe_official_path<I> entry;
 
 							entry.path = cut_preffix(p.string(), root.string() + "/");

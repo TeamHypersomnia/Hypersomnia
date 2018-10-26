@@ -66,5 +66,10 @@ struct editor_paths {
 		const augs::path_type& target_folder,
 		const std::string& project_name
 	);
+
+	editor_paths(
+		const augs::path_type& target_folder,
+		const augs::path_type& project_name
+	);
 };
 

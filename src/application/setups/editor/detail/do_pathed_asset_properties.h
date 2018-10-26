@@ -32,7 +32,7 @@ void do_pathed_asset_properties(
 	auto& definitions = get_viewable_pool<asset_id_type>(viewables);
 
 	const auto id = path_entry.id;
-	const auto displayed_name = tree_settings.get_prettified(path_entry.get_filename());
+	const auto displayed_name = tree_settings.get_prettified(path_entry.get_filename().string());
 
 	{
 		::read_write_defaults_buttons(

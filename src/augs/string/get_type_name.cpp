@@ -1,14 +1,14 @@
 #include "augs/string/get_type_name.h"
 #include "augs/string/string_templates.h"
 
+static auto remove_preffix(std::string name) {
+	return str_ops(name).multi_replace_all({ "struct ", "class ", "enum " }, "").subject;
+}
+
 #if PLATFORM_UNIX
 #include <cstdlib>
 #include <memory>
 #include <cxxabi.h>
-
-static auto remove_preffix(std::string name) {
-	return str_ops(name).multi_replace_all({ "struct ", "class ", "enum " }, "").subject;
-}
 
 std::string demangle(const char* name) {
 	int status = -4; // some arbitrary value to eliminate the compiler warning

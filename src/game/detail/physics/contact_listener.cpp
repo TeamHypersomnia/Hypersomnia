@@ -407,11 +407,9 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 		}
 
 		if (subject.has<components::missile>() || is_like_thrown_melee(subject)) {
-			LOG_NVPS(subject, collider);
 			const auto info = missile_surface_info(subject, collider);
 
 			if (info.ignore_standard_impulse() || collider.has<components::sentience>()) {
-				LOG("Ignored");
 				contact->SetEnabled(false);
 				post_collision_messages = false;
 				break;

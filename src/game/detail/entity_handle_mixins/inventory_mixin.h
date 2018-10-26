@@ -134,5 +134,5 @@ public:
 	template <class G>
 	ltrb calc_attachments_aabb(G&& get_offsets_by_torso) const;
 
-	auto* find_mounting_progress() const;
+	auto find_mounting_progress() const;
 };

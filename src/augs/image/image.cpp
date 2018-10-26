@@ -15,8 +15,9 @@
 #include <arpa/inet.h>
 #else
 #include <winsock.h>
+#undef min
+#undef max
 #endif
-
 /* 
 	We write manual encoding/decoding wrappers to be able to pass our own rgba vectors,
 	instead of vectors of unsigned chars.

@@ -45,7 +45,7 @@ void simple_browse_path_tree(
 		bool official_separator = false;
 
 		for (const auto& l : all_paths) {
-			const auto prettified = settings.get_prettified(l.get_filename());
+			const auto prettified = settings.get_prettified(l.get_filename().string());
 			const auto displayed_dir = l.get_displayed_directory();
 
 			if (!filter.PassFilter(prettified.c_str()) && !filter.PassFilter(displayed_dir.c_str())) {
@@ -74,7 +74,7 @@ void simple_browse_path_tree(
 			ImGui::Separator();
 
 			for (const auto& l : disallowed_paths) {
-				const auto prettified = settings.get_prettified(l.get_filename());
+				const auto prettified = settings.get_prettified(l.get_filename().string());
 				const auto displayed_dir = l.get_displayed_directory();
 
 				if (!filter.PassFilter(prettified.c_str()) && !filter.PassFilter(displayed_dir.c_str())) {

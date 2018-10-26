@@ -1,6 +1,7 @@
 #pragma once
 #include <algorithm>
 #include <iterator>
+#include <vector>
 #include "augs/templates/traits/container_traits.h"
 #include "augs/templates/maybe_const.h"
 

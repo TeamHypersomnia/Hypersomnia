@@ -49,6 +49,7 @@ void requested_equipment::generate_for(
 		else {
 			just_create_entity(cosm, from);
 			(void)slot;
+			(void)character;
 		}
 	};
 

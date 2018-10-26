@@ -165,6 +165,14 @@ struct additive_time_scope {
 	double total = 0.0;
 	augs::time_measurements& into;
 
+	additive_time_scope(
+		const double total,
+		augs::time_measurements& into
+	) :
+		total(total),
+		into(into)
+	{}
+
 	additive_time_scope(additive_time_scope&&) = delete;
 	additive_time_scope(const additive_time_scope& b) = delete;
 

@@ -80,7 +80,10 @@ namespace augs {
 
 	public:
 		template <bool is_const, bool R>
-		class basic_iterator {
+		class basic_iterator : public std::iterator<
+			std::forward_iterator_tag,   // iterator_category
+			maybe_const_t<is_const, T>                      // value_type
+		> {
 			using owner_ptr_type = maybe_const_ptr_t<is_const, enum_map_base>;
 			using pair_type = simple_pair<const key_type, maybe_const_ref_t<is_const, mapped_type>>;
 			

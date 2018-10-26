@@ -2,6 +2,13 @@
 
 editor_paths::editor_paths(
 	const augs::path_type& target_folder,
+	const augs::path_type& project_name
+) : editor_paths(target_folder, project_name.string()) {
+
+}
+
+editor_paths::editor_paths(
+	const augs::path_type& target_folder,
 	const std::string& project_name
 ) {
 	auto in_folder = [&](const auto ext) {

@@ -274,7 +274,7 @@ wielding_type inventory_mixin<E>::get_wielding_of(const handle_type item) const 
 }
 
 template <class E>
-auto* inventory_mixin<E>::find_mounting_progress() const {
+auto inventory_mixin<E>::find_mounting_progress() const {
 	const auto& self = *static_cast<const E*>(this);
 	auto& cosm = self.get_cosmos();
 

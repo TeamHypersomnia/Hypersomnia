@@ -22,5 +22,5 @@ void path_tree_settings::do_name_location_columns() const {
 }
 
 std::string path_tree_settings::get_prettified(const std::string& filename) const {
-	return pretty_names ? format_field_name(augs::path_type(filename).stem()) : filename;
+	return pretty_names ? format_field_name(augs::path_type(filename).stem().string()) : filename;
 }

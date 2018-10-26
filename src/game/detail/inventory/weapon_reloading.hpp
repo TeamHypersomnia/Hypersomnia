@@ -1,5 +1,6 @@
 #pragma once
 #include "game/detail/inventory/weapon_reloading.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 
 inline bool reloading_context::significantly_different_from(const reloading_context& b) const {
 	auto swapped_setup = initial_setup;

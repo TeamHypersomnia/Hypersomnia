@@ -274,8 +274,8 @@ void game_gui_system::control_hotbar_and_action_button(
 		) {
 			auto& currently_held_index = gui.currently_held_hotbar_button_index;
 
-			if (gui.hotbar_buttons[currently_held_index].get_assigned_entity(gui_entity).dead()) {
-				if (currently_held_index > -1) {
+			if (currently_held_index > -1) {
+				if (gui.hotbar_buttons[currently_held_index].get_assigned_entity(gui_entity).dead()) {
 					/* Clear currently held index because nothing is assigned already */
 					currently_held_index = -1;
 				}

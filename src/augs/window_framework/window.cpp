@@ -172,8 +172,4 @@ namespace augs {
 	bool window::is_active() const {
 		return active;
 	}
-
-	window::~window() {
-		destroy();
-	}
 }

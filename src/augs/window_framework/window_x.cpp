@@ -871,4 +871,8 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 
 		std::thread([shell_command](){ augs::shell(shell_command); }).detach();
 	}
+
+	window::~window() {
+		destroy();
+	}
 }

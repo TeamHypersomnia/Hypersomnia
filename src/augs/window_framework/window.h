@@ -1,9 +1,6 @@
 #pragma once
-#if PLATFORM_WINDOWS
-#include <Windows.h>
-#undef min
-#undef max
-#elif PLATFORM_UNIX
+
+#if PLATFORM_UNIX
 /*
 	Hacky forward declarations to avoid the need for X includes.
 	There are errors anyway when the declarations are conflicting,
@@ -48,33 +45,18 @@ namespace augs {
 		using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
 	};
 
-	// extern LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
 	class window : public settable_as_current_mixin<window> {
 #if PLATFORM_WINDOWS
-		friend LRESULT CALLBACK wndproc(HWND, UINT, WPARAM, LPARAM);
-
-		HWND hwnd = nullptr;
-		HDC hdc = nullptr;
-		HGLRC hglrc = nullptr;
-
-		vec2i min_window_size;
-		vec2i max_window_size;
-
-		int style = 0xdeadbeef;
-		int exstyle = 0xdeadbeef;
-
-		bool double_click_occured = false;
-		bool clear_window_inputs_once = true;
-
-		timer triple_click_timer;
-		unsigned triple_click_delay = 0xdeadbeef; /* maximum delay time for the next click (after doubleclick) to be considered tripleclick (in milliseconds) */
+		struct platform_data;
+		std::unique_ptr<platform_data> platform;
 
 		void show();
 
+		template <class U, class W, class L>
 		std::optional<event::change> handle_event(
-			const UINT, 
-			const WPARAM, 
-			const LPARAM
+			const U, 
+			const W, 
+			const L
 		);
 
 #elif PLATFORM_UNIX
