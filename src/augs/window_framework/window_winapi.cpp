@@ -517,7 +517,8 @@ namespace augs {
 		// Display the Open dialog box. 
 
 		if (GetOpenFileName(&ofn) == TRUE) {
-			return str_ops(narrow(ofn.lpstrFile)).replace_all("\\", "/");
+			auto result = augs::path_type(ofn.lpstrFile);
+			return str_ops(result.string()).replace_all("\\", "/");
 		}
 		else {
 			return std::nullopt;
@@ -528,6 +529,7 @@ namespace augs {
 		const std::string& custom_title
 	) const {
 		ensure(false && "This is not yet implemented.");
+		return std::nullopt;
 	}
 
 	std::optional<std::string> window::save_file_dialog(
