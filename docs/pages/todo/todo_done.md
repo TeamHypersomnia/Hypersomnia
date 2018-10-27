@@ -2158,3 +2158,4 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- Throw both!
 
 - fix RMB
+- fix png reading

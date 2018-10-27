@@ -143,7 +143,8 @@ namespace augs {
 	vec2u image::get_size(const path_type& file_path) {
 		try {
 			const auto extension = file_path.extension();
-			auto in = with_exceptions<std::ifstream>(file_path);
+			auto in = with_exceptions<std::ifstream>();
+			in.open(file_path, std::ios::in | std::ios::binary);
 
 			if (extension == ".png") {
 				unsigned int width, height;
