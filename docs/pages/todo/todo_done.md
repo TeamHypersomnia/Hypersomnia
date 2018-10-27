@@ -2157,3 +2157,4 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - Always throw the primary weapon (and highlight it) if holding melee weapons
 	- Throw both!
 
+- fix RMB

@@ -29,8 +29,10 @@ message translate_enum(const UINT m) {
 	case WM_RBUTTONDBLCLK:				return message::rdoubleclick;
 	case WM_MBUTTONDBLCLK:				return message::mdoubleclick;
 
-	case WM_LBUTTONDOWN:				return message::keydown; 
-	case WM_LBUTTONUP:					return message::keyup; 
+	case WM_LBUTTONDOWN:				return message::keydown;
+	case WM_LBUTTONUP:					return message::keyup;
+	case WM_RBUTTONDOWN:				return message::keydown;
+	case WM_RBUTTONUP:					return message::keyup;
 	case WM_MBUTTONDOWN:				return message::keydown; 
 	case WM_MBUTTONUP:					return message::keyup; 
 	case WM_XBUTTONDOWN:				return message::keydown; 
