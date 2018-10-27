@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Windows fixes
+	- fix RMB
+	- fix freetype errors
 
 - Usability fixes to editor 
 	- Disallow flavour instantation when there is no image specified

@@ -321,15 +321,17 @@ namespace augs {
 		p.cAlphaBits = 8;
 		p.cStencilBits = 8;
 		p.cDepthBits = 0;
+		p.cAuxBuffers = 0;
+		p.cAccumBits = 0;
 		p.iLayerType = PFD_MAIN_PLANE;
+
 		platform->hdc = GetDC(platform->hwnd);
 		ensure(platform->hdc);
 
-		const auto pf = ChoosePixelFormat(platform->hdc, &p);
-		
-		ensure(pf);
-
 		{
+			const auto pf = ChoosePixelFormat(platform->hdc, &p);
+			ensure(pf);
+
 			const auto result = SetPixelFormat(platform->hdc, pf, &p);
 			ensure(result);
 		}

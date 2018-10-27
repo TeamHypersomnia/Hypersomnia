@@ -80,7 +80,7 @@ int main(const int argc, const char* const * const argv) {
 #else
 #error "Unsupported platform!"
 #endif
-	std::setlocale(LC_ALL, "");
+	std::setlocale(LC_NUMERIC, "C");
 
 	if (cmd_line_params(argc, argv).help_only) {
 		std::cout << get_help_section() << std::endl;

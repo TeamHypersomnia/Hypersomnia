@@ -29,7 +29,6 @@ test_scene_setup::test_scene_setup(
 
 void test_scene_setup::customize_for_viewing(config_lua_table& config) const {
 	config.window.name = "Hypersomnia test scene";
-	config.drawing.fog_of_war.enabled = false;
 	return;
 }
 
