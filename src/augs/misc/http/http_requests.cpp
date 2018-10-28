@@ -47,12 +47,9 @@ namespace augs {
 		SOCKET Socket;
 
 		SOCKADDR_IN SockAddr;
-		int lineCount = 0;
-		int rowCount = 0;
 		struct hostent *host;
 		locale local;
 		char buffer[10000];
-		int i = 0;
 		int nDataLength;
 		string website_HTML;
 		
@@ -115,12 +112,9 @@ namespace augs {
 
 		SOCKET Socket;
 		SOCKADDR_IN SockAddr;
-		int lineCount = 0;
-		int rowCount = 0;
 		struct hostent *host;
 		locale local;
 		char buffer[10000];
-		int i = 0;
 		int nDataLength;
 		string website_HTML;
 

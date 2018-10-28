@@ -29,6 +29,15 @@ elseif("${CMAKE_CXX_COMPILER_ID}" STREQUAL "GNU")
 	set(GCC ON)
 endif()
 
+if(MSVC)
+	if(CLANG)
+		message("Building with Clang on Windows.")
+	else()
+		set(MSVC_SPECIFIC ON)
+		message("Building with MSVC specifically.")
+	endif()
+endif()
+
 if(UNIX)
 	message("Building for UNIX systems.")
 
@@ -167,10 +176,10 @@ endif()
 
 set(BUILD_GLAD ${BUILD_OPENGL})
 
-if (MSVC OR CLANG) 
-	set(ADD_MCMODEL_LARGE_FLAG OFF CACHE STRING "Needed to suppress some crazy linker errors")
-elseif (GCC)
+if (GCC)
 	set(ADD_MCMODEL_LARGE_FLAG ON CACHE STRING "Needed to suppress some crazy linker errors")
+else()
+	set(ADD_MCMODEL_LARGE_FLAG OFF CACHE STRING "Needed to suppress some crazy linker errors")
 endif()
 
 if(NOT BUILD_WINDOW_FRAMEWORK)
@@ -333,6 +342,7 @@ set(HYPERSOMNIA_TEST_SCENES_CPPS
 set(HYPERSOMNIA_CPU_INTENSIVE_CPPS
 	# This should be the first one to build to catch errors early
 	"src/main.cpp"
+	"src/work.cpp"
 	"src/view/rendering_scripts/illuminated_rendering.cpp"
 	"src/application/tests_of_traits.cpp"
 
@@ -708,7 +718,7 @@ endif()
 
 # natvis files for easier debugging in Visual Studio.
 
-if(MSVC)
+if(MSVC_SPECIFIC)
 	set(HYPERSOMNIA_NATVIS_FILES
 		"src/game/cosmos/entity_handle.natvis"
 		"src/game/detail/inventory/inventory_slot_handle.natvis"
@@ -857,24 +867,35 @@ if(GCC OR CLANG)
 		set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -m64")
 	endif()
 
-	# Generate debug information (we don't care about C libraries at this point)
-	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -g")
-
 	message("-O0 will be specified for Debug build.")
-	set(HYPERSOMNIA_CXX_DEBUG_FLAGS "${HYPERSOMNIA_CXX_DEBUG_FLAGS} -O0")
-	set(HYPERSOMNIA_C_DEBUG_FLAGS "${HYPERSOMNIA_C_DEBUG_FLAGS} -O0")
+	set(HYPERSOMNIA_CXX_DEBUG_FLAGS "${HYPERSOMNIA_CXX_DEBUG_FLAGS} -Xclang -O0")
+	set(HYPERSOMNIA_C_DEBUG_FLAGS "${HYPERSOMNIA_C_DEBUG_FLAGS} -Xclang -O0")
+
+	if(NOT MSVC)
+		# Generate debug information (we don't care about C libraries at this point)
+		set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -g")
+	endif()
 endif()
 
 if(CLANG)
-	set(CHOSEN_WARNINGS "-Wall -Werror -Wextra")
-
+	if(NOT MSVC)
+		set(CHOSEN_WARNINGS "-Wall -Werror -Wextra")
+	endif()
+	
 	# -Wall and -Wextra cover everything already
 	set(WARNINGS_FOR_OUR_CODE_ONLY " ")
 
 	# Latest features of C++17 will be enabled.
-	# Looks like stdlib=libc++ is duplicated for the linker as well,
-	# so we only have to add it to CXX.
-	set(HYPERSOMNIA_CXX_FLAGS "${CHOSEN_WARNINGS} -ftemplate-backtrace-limit=0 -fcolor-diagnostics -std=gnu++1z -stdlib=libc++ -Wno-error=unused-command-line-argument -Wno-error=missing-braces")
+	set(HYPERSOMNIA_CXX_FLAGS 
+		"${HYPERSOMNIA_CXX_FLAGS} ${CHOSEN_WARNINGS} -fcolor-diagnostics -Wno-error=unused-command-line-argument -Wno-error=missing-braces"
+	)
+
+	if(NOT MSVC)
+		set(HYPERSOMNIA_CXX_FLAGS 
+			"${HYPERSOMNIA_CXX_FLAGS} -ftemplate-backtrace-limit=0"
+		)
+	endif()
+
 	set_source_files_properties(${HYPERSOMNIA_CODEBASE_CPPS} PROPERTIES COMPILE_FLAGS ${WARNINGS_FOR_OUR_CODE_ONLY})
 endif()
 
@@ -908,20 +929,36 @@ if(GCC)
 
 	set(WARNINGS_FOR_OUR_CODE_ONLY "-Wall -Wextra -Werror -Wno-unused-value")
 
-	set(HYPERSOMNIA_CXX_FLAGS "${CHOSEN_WARNINGS} -ftemplate-backtrace-limit=0 -fdiagnostics-color -std=gnu++1z")
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} ${CHOSEN_WARNINGS} -ftemplate-backtrace-limit=0 -fdiagnostics-color")
 	set_source_files_properties(${HYPERSOMNIA_CODEBASE_CPPS} PROPERTIES COMPILE_FLAGS ${WARNINGS_FOR_OUR_CODE_ONLY})
+endif()
+
+if(MSVC_SPECIFIC)
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} /MP /Gm- /GL")
 endif()
 
 if(MSVC)
 	# Latest features of C++17 will be enabled.
-	set(HYPERSOMNIA_CXX_FLAGS "/std:c++latest /MP /Gm- /fp:strict /bigobj /permissive-")
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} /std:c++latest /fp:strict /bigobj /permissive-")
 	set(HYPERSOMNIA_CXX_DEBUG_FLAGS " ")
-	set(HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS "/Ob2 /GL /Oi")
-	set(HYPERSOMNIA_CXX_RELEASE_FLAGS ${HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS})
+	set(HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS "/Ob2 /Oi")
+else()
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -std=gnu++1z")
+endif()
+
+if (CLANG AND NOT MSVC)
+	set(USE_LIBCXX ON)
+endif()
+
+if(USE_LIBCXX)
+	# Looks like stdlib=libc++ is duplicated for the linker as well,
+	# so we only have to add it to CXX.
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -stdlib=libc++")
 endif()
 
 if(CLANG)
 	set(HYPERSOMNIA_CXX_RELEASE_FLAGS "-flto -fwhole-program-vtables")
+	set(HYPERSOMNIA_LINKER_RELEASE_FLAGS "-flto -fwhole-program-vtables")
 endif()
 
 if(ADD_MCMODEL_LARGE_FLAG)
@@ -935,16 +972,14 @@ endif()
 
 # We configure additional flags for linker.
 
-if (CLANG)
+if (CLANG AND NOT MSVC)
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=lld")
 endif()
 
 set(CMAKE_SHARED_LIBRARY_LINK_C_FLAGS "")
 set(CMAKE_SHARED_LIBRARY_LINK_CXX_FLAGS "")
 
-if(CLANG)
-	set(HYPERSOMNIA_LINKER_RELEASE_FLAGS "-flto -fwhole-program-vtables")
-elseif(MSVC)
+if(MSVC_SPECIFIC)
 	set(HYPERSOMNIA_LINKER_RELEASE_FLAGS "/LTCG /INCREMENTAL:NO /OPT:REF")
 
 	# Incremental LTCG is enough for RelWithDebInfo.
@@ -973,9 +1008,7 @@ add_definitions(-D_SILENCE_CXX17_ITERATOR_BASE_CLASS_DEPRECATION_WARNING)
 
 add_definitions(-D_SILENCE_CXX17_UNCAUGHT_EXCEPTION_DEPRECATION_WARNING)
 
-if(UNIX)
-    add_definitions(-DPLATFORM_UNIX=1)
-elseif(MSVC)
+if(MSVC)
 	add_definitions(-DPLATFORM_WINDOWS=1)
 
 	add_definitions(
@@ -984,6 +1017,8 @@ elseif(MSVC)
 		-D_SCL_SECURE_NO_WARNINGS
 		-DUNICODE
 	  )
+elseif(UNIX)
+    add_definitions(-DPLATFORM_UNIX=1)
 endif()
 
 # Additionally, we mark Release as the production build.
@@ -1299,9 +1334,7 @@ if(MSVC)
 			"winmm.lib"  		# for ENet
 		)
 	endif()
-endif()
-
-if(CLANG)
+elseif(CLANG)
 	list(APPEND HYPERSOMNIA_LIBS c++fs c++experimental dl Xi)
 elseif(GCC)
 	list(APPEND HYPERSOMNIA_LIBS stdc++fs dl Xi)
@@ -1311,7 +1344,7 @@ target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
 
 set_target_properties(Hypersomnia PROPERTIES DEBUG_POSTFIX "")
 
-if(MSVC)
+if(MSVC_SPECIFIC)
 	set_target_properties(Hypersomnia PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${HYPERSOMNIA_EXE_RESOURCES_DIR}")
 	set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT Hypersomnia)
 endif()
