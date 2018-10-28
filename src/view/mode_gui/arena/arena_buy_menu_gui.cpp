@@ -25,15 +25,15 @@ static auto make_hotkey_map() {
 	using namespace augs::event::keys;
 
 	arena_buy_menu_hotkey_map m;
-	m[key::M] = buy_menu_type::MELEE;
-	m[key::P] = buy_menu_type::PISTOLS;
-	m[key::S] = buy_menu_type::SUBMACHINE_GUNS;
+	m[key::Q] = buy_menu_type::MELEE;
+	m[key::W] = buy_menu_type::PISTOLS;
+	m[key::E] = buy_menu_type::SUBMACHINE_GUNS;
 	m[key::R] = buy_menu_type::RIFLES;
-	m[key::O] = buy_menu_type::SHOTGUNS;
-	m[key::H] = buy_menu_type::HEAVY_GUNS;
-	m[key::N] = buy_menu_type::GRENADES;
-	m[key::L] = buy_menu_type::SPELLS;
-	m[key::T] = buy_menu_type::TOOLS;
+	m[key::T] = buy_menu_type::SHOTGUNS;
+	m[key::Y] = buy_menu_type::HEAVY_GUNS;
+	m[key::U] = buy_menu_type::GRENADES;
+	m[key::I] = buy_menu_type::SPELLS;
+	m[key::O] = buy_menu_type::TOOLS;
 
 	return m;
 }
@@ -378,7 +378,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		const auto additional_id = std::to_string(int(b));
 
 		const bool is_replenishable = b == button_type::REPLENISHABLE;
-		const auto hotkey_text = typesafe_sprintf(is_replenishable ? "(S+%x)" : "(%x)", index);
+		const auto hotkey_text = typesafe_sprintf(is_replenishable ? "(Shift+%x)" : "(%x)", index);
 
 		const auto num_owned = subject.count_contained(f_id);
 

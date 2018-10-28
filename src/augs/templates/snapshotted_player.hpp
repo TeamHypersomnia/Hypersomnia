@@ -125,12 +125,7 @@ namespace augs {
 
 		PLR_LOG("Seeking from %x to %x", current_step, seeked_step);
 
-		const auto seeked_adj_snapshot = [&]() {
-			auto it = snapshots.upper_bound(seeked_step);
-			--it;
-			return *it;
-		}();
-
+		const auto seeked_adj_snapshot = *std::prev(snapshots.upper_bound(seeked_step)); 
 		const auto step_of_adj_snapshot = seeked_adj_snapshot.first;
 	   
 		auto seek_to_snapshot = [&]() {
@@ -187,10 +182,9 @@ namespace augs {
 					return false;
 				}
 
-				auto it = snapshots.upper_bound(current_step);
-				--it;
+				const auto it = *std::prev(snapshots.upper_bound(current_step));
 
-				const auto since_last = current_step - (*it).first;
+				const auto since_last = current_step - it.first;
 				return since_last >= interval_in_steps;
 			}();
 
