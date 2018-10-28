@@ -881,7 +881,7 @@ if(CLANG)
 	if(NOT MSVC)
 		set(CHOSEN_WARNINGS "-Wall -Werror -Wextra")
 	endif()
-	
+
 	# -Wall and -Wextra cover everything already
 	set(WARNINGS_FOR_OUR_CODE_ONLY " ")
 
@@ -940,7 +940,6 @@ endif()
 if(MSVC)
 	# Latest features of C++17 will be enabled.
 	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} /std:c++latest /fp:strict /bigobj /permissive-")
-	set(HYPERSOMNIA_CXX_DEBUG_FLAGS " ")
 	set(HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS "/Ob2 /Oi")
 else()
 	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -std=gnu++1z")
@@ -1071,6 +1070,11 @@ else()
 
 	string(REPLACE "-g" "" CMAKE_CXX_FLAGS_DEBUG ${CMAKE_CXX_FLAGS_DEBUG})
 	string(REPLACE "-g" "" CMAKE_C_FLAGS_DEBUG ${CMAKE_C_FLAGS_DEBUG})
+
+	if(MSVC)
+		string(REPLACE "/debug" "" CMAKE_EXE_LINKER_FLAGS_DEBUG ${CMAKE_EXE_LINKER_FLAGS_DEBUG})
+		string(REPLACE "/debug" "" CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO ${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO})
+	endif()
 endif()
 
 message("All CXX flags: ${CMAKE_CXX_FLAGS}")
