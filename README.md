@@ -3,8 +3,8 @@
 [![Build Status](https://travis-ci.org/TeamHypersomnia/Hypersomnia.svg?branch=master)](https://travis-ci.org/TeamHypersomnia/Hypersomnia)
 [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/5aatwxv8hceaop56?svg=true)](https://ci.appveyor.com/project/geneotech/Hypersomnia)
 
-Latest Windows binaries: https://ci.appveyor.com/project/geneotech/hypersomnia/build/artifacts
-Latest Linux binaries: (in progress)
+Latest **Windows** binaries: https://ci.appveyor.com/project/geneotech/hypersomnia/build/artifacts  
+Latest **Linux** binaries: (in progress)
 
 - [Hypersomnia](#hypersomnia)
 - [Gallery](#gallery)
@@ -47,17 +47,19 @@ Watch gameplays on YouTube:
 
 # How to build
 
-Currently, Hypersomnia is only buildable using ``clang`` (7.0.0 or newer), both on Linux or Windows.
-Additionally, the system must be 64-bit.
-Formerly, the game was buildable under modern ``gcc`` versions, 
-and also using under ``MSVC`` (the Microsoft's compiler shipping with Visual Studio),
-but it quickly became too much of a hassle to support these compilers as we use **modern C++ constructs** throughout the entire codebase.
-``gcc``, for example, would sometimes simply crash on some really template-heavy code.
+Currently, Hypersomnia is only buildable using ``clang`` (7.0.0 or newer), both on Linux or Windows.  
+Additionally, the system must be 64-bit.  
+Formerly, the game was buildable under modern ``gcc`` versions,  
+and also using under ``MSVC`` (the Microsoft's compiler shipping with Visual Studio),  
+but it quickly became too much of a hassle to support these compilers as we use **modern C++ constructs** throughout the entire codebase.  
+``gcc``, for example, would sometimes simply crash on some really template-heavy code.  
 
-Relevant ``CMakeLists.txt`` files still contain respective clauses for both ``MSVC`` and ``gcc``, 
-so it might be possible to build the game in the future once these compilers catch up with ``clang``.
 
-Irrespectively of the OS, you will need some dependencies installed to build Hypersomnia:
+Relevant ``CMakeLists.txt`` files still contain respective clauses for both ``MSVC`` and ``gcc``,  
+so it might be possible to build the game in the future once these compilers catch up with ``clang``.  
+
+
+Irrespectively of the OS, you will need some dependencies installed to build Hypersomnia:  
  - The newest **CMake**.
  - **git** to clone the respository and later generate version information.
  - Optional: **Python 3.6** or newer for the script that prepares an archive with the executable.
@@ -74,13 +76,13 @@ git clone --depth 1 --recurse-submodules https://github.com/TeamHypersomnia/Hype
 The ``--depth 1`` parameters forces a shallow clone which will drastically reduce the download size.
 The ``--recurse-submodules`` is necessary to clone the submodules as well.
 
-Once complete repository finishes downloading, create a ```build/``` folder next to ```CMakeLists.txt``` file.  
+Once repository finishes downloading, create a ```build/``` folder next to ```CMakeLists.txt``` file.  
 Next steps depend on the platform you are on.
 
 ## Windows
 
 Prerequisites:
-- **Visual Studio 2017 Preview** or newer.
+- **Visual Studio 2017 Preview** (Community) or newer.
 - ``ninja`` installed somewhere in PATH.
 - [LLVM](http://releases.llvm.org/) 7 toolchain (or newer).
 
@@ -88,11 +90,16 @@ Use your favorite shell to go into the newly created ```build/``` folder and run
 
 ```
 call "C:\Program Files (x86)\Microsoft Visual Studio\Preview\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
-# If you intent to develop the game, it is best to use "Debug" configuration for the fastest builds.
 set CONFIGURATION=Release
 cmake -G Ninja -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DGENERATE_DEBUG_INFORMATION=0 ..
 ninja
 ```
+
+Note: the path to vcvarsall in the first line may differ if you're using a version of Visual Studio that is not **Visual Studio 2017 Preview Community**.
+
+Note: your computer **might start lagging heavily** for the duration of the build as ``ninja`` will use all available cores for compilation.
+
+If you intend to develop the game, it is best to use "Debug" configuration for the fastest builds.
 
 If you want to somehow customize your build, e.g. disable certain game features, refer to the beginning of ```CMakeLists.txt``` to see which options you can pass to the ```cmake``` command.
 
@@ -123,25 +130,28 @@ Current platforms are actively tested and supported:
 
 - ``git``
 - ``cmake``
-- ``ninja``
-- [LLVM](http://releases.llvm.org/) 7 toolchain (or newer).
 
-#### Distro-specific
+#### Additional, distro-specific
 
 Arch Linux:
 
+- LLVM:
+  - ``clang``
+  - ``libc++``
+  - ``lld``
 - ``pkg-config``
 - ``libx11``
 - ``libxcb``
 - ``xcb-util-keysyms``
+- ``ninja``
 
 Ubuntu:
 
-- ``clang-7``
-- ``lld-7``
-- ``libc++-7-dev``
-- ``libc++abi-7-dev``
-- ``cmake``
+- LLVM:
+  - ``clang-7``
+  - ``lld-7``
+  - ``libc++-7-dev``
+  - ``libc++abi-7-dev``
 - ``ninja-build``
 - ``libxcb-keysyms1``
 - ``libxcb-keysyms1-dev``
