@@ -40,9 +40,9 @@ before_build:
 build_script:
   - mkdir nin
   - cd nin
-  - mkdir $env:CONFIGURATION
-  - cd $env:CONFIGURATION
-  - cmake -G Ninja -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl.exe -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=$env:CONFIGURATION -DGENERATE_DEBUG_INFORMATION=0 ../..
+  - mkdir "$env:CONFIGURATION"
+  - cd "$env:CONFIGURATION"
+  - cmake -G Ninja -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl.exe -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE="$env:CONFIGURATION" -DGENERATE_DEBUG_INFORMATION=0 ../..
   - ninja
 
 test_script:
