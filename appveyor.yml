@@ -21,6 +21,9 @@ install:
   - set PATH=C:\projects\deps\ninja;%PATH%
   - ninja --version
 
+  - appveyor DownloadFile https://prereleases.llvm.org/win-snapshots/LLVM-8.0.0-r345380-win64.exe -FileName llvm-installer.exe
+  - START /WAIT llvm-installer.exe /S /D=C:\"Program Files\LLVM"
+
 notifications:
   - provider: Email
     to:
@@ -38,7 +41,6 @@ before_build:
   - cd C:\projects\hypersomnia
 
 build_script:
-  - ps: '& "C:/Program Files/LLVM/bin/clang-cl.exe" -v'
   - mkdir nin
   - cd nin
   - mkdir %CONFIGURATION%
