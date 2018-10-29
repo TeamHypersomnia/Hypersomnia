@@ -3,7 +3,9 @@
 [![Build Status](https://travis-ci.org/TeamHypersomnia/Hypersomnia.svg?branch=master)](https://travis-ci.org/TeamHypersomnia/Hypersomnia)
 [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/5aatwxv8hceaop56?svg=true)](https://ci.appveyor.com/project/geneotech/Hypersomnia)
 
-*([Our CI is due to be overhauled](https://github.com/TeamHypersomnia/Hypersomnia/issues/258). Currently, the game is only buildable under clang 6.0.0 and gcc 7.3.1; or newer ones.)*
+Latest Windows binaries: https://ci.appveyor.com/project/geneotech/hypersomnia/build/artifacts
+Latest Linux binaries: (in progress)
+
 - [Hypersomnia](#hypersomnia)
 - [Gallery](#gallery)
 - [How to build](#how-to-build)
@@ -44,80 +46,118 @@ Watch gameplays on YouTube:
   [4]: http://gifyu.com/images/30.smoke.png
 
 # How to build
-To build Hypersomnia, you will need some dependencies installed on your system:
+
+Currently, Hypersomnia is only buildable using ``clang`` (7.0.0 or newer), both on Linux or Windows.
+Additionally, the system must be 64-bit.
+Formerly, the game was buildable under modern ``gcc`` versions, 
+and also using under ``MSVC`` (the Microsoft's compiler shipping with Visual Studio),
+but it quickly became too much of a hassle to support these compilers as we use **modern C++ constructs** throughout the entire codebase.
+``gcc``, for example, would sometimes simply crash on some really template-heavy code.
+
+Relevant ``CMakeLists.txt`` files still contain respective clauses for both ``MSVC`` and ``gcc``, 
+so it might be possible to build the game in the future once these compilers catch up with ``clang``.
+
+Irrespectively of the OS, you will need some dependencies installed to build Hypersomnia:
  - The newest **CMake**.
  - **git** to clone the respository and later generate version information.
- - Optional: **7-Zip** so that the **Release** configuration can automatically create a compressed archive with the executable and game resources, ready to be sent to someone. 
  - Optional: **Python 3.6** or newer for the script that prepares an archive with the executable.
+ - Optional: **7-Zip** so that the **Release** configuration can automatically create a compressed archive with the executable and game resources, ready to be sent to someone. 
+   - Note that Continuous Integration systems always upload the build artifacts anyway.
 
-Once installed, go to the directory where you wish to have your Hypersomnia project downloaded,
+Once dependencies are installed, go to the directory where you wish to have your Hypersomnia project downloaded,
 open git bash and paste:
 
 ```
-git clone https://github.com/TeamHypersomnia/Hypersomnia.git --recursive
+git clone --depth 1 --recurse-submodules https://github.com/TeamHypersomnia/Hypersomnia
 ```
 
-The repository will start downloading. Once complete, create a ```build/``` folder next to ```CMakeLists.txt``` file.  
+The ``--depth 1`` parameters forces a shallow clone which will drastically reduce the download size.
+The ``--recurse-submodules`` is necessary to clone the submodules as well.
+
+Once complete repository finishes downloading, create a ```build/``` folder next to ```CMakeLists.txt``` file.  
 Next steps depend on the platform you are on.
 
 ## Windows
 
-You will need **Visual Studio 2017 Preview** or newer.
-Use your favorite shell to go into the newly created ```build/``` folder and run:
+Prerequisites:
+- **Visual Studio 2017 Preview** or newer.
+- ``ninja`` installed somewhere in PATH.
+- [LLVM](http://releases.llvm.org/) 7 toolchain (or newer).
+
+Use your favorite shell to go into the newly created ```build/``` folder and run these commands:
 
 ```
-cmake ..
+call "C:\Program Files (x86)\Microsoft Visual Studio\Preview\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+# If you intent to develop the game, it is best to use "Debug" configuration for the fastest builds.
+set CONFIGURATION=Release
+cmake -G Ninja -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DGENERATE_DEBUG_INFORMATION=0 ..
+ninja
 ```
 
-Or if you are on a 64-bit system, run:
+If you want to somehow customize your build, e.g. disable certain game features, refer to the beginning of ```CMakeLists.txt``` to see which options you can pass to the ```cmake``` command.
+
+If the game builds successfully, issue these commands to launch it:
 
 ```
-cmake -G "Visual Studio 15 2017 Win64" -DBUILD_IN_CONSOLE_MODE=1 ..
+cd ../hypersomnia
+../build/Hypersomnia.exe
 ```
 
-Note that the 64-bit version is more likely to be kept up to date.
+<!-- Note that the 64-bit version is more likely to be kept up to date. -->
 
-If you want to somehow customize your build, refer to the beginning of ```CMakeLists.txt``` to see which options you can pass to the ```cmake``` command.
-
+<!--
 Resultant ```.sln``` and ```.vcxproj``` files should appear in the ```build/``` directory.
 Open ```Hypersomnia.sln``` file, select **Release** configuration and hit **F7** to build the game.
 **F5** should launch it.
+-->
 
 If, for some reason, some step fails, refer to the latest working Appveyor build and the relevant ```appveyor.yml``` file.
 
 ## Linux
 
-Current platforms are actively supported:
+Current platforms are actively tested and supported:
 - Arch Linux with i3 window manager
-- Ubuntu 14.04 trusty, but it was only tested via Travis - the unit tests all pass.
+<!--- Ubuntu 14.04 trusty, but it was only tested via Travis - the unit tests all pass. -->
 
 ### Dependencies
-
-#### Tools
 
 - ``git``
 - ``cmake``
 - ``ninja``
+- [LLVM](http://releases.llvm.org/) 7 toolchain (or newer).
 
-#### Build dependencies
+#### Distro-specific
+
+Arch Linux:
 
 - ``pkg-config``
 - ``libx11``
 - ``libxcb``
 - ``xcb-util-keysyms``
 
-On Ubuntu:
+Ubuntu:
+
+- ``clang-7``
+- ``lld-7``
+- ``libc++-7-dev``
+- ``libc++abi-7-dev``
+- ``cmake``
+- ``ninja-build``
+- ``libxcb-keysyms1``
+- ``libxcb-keysyms1-dev``
+- ``libxi6``
+- ``libxi-dev``
 - ``alsa-oss``
 - ``osspd-alsa``
 - ``osspd``
 - ``libasound2``
 - ``libasound2-dev``
-- ``libxcb-keysyms1-dev``
-- ``libxi6``
-- ``libxi-dev``
 
+
+<!--
 #### Compiler toolchain
 
+You will need 
 You can go with:
 
 - ``gcc 7.3`` or newer, or...
@@ -143,17 +183,21 @@ make all -j8 -C build/current  781.58s user 33.29s system 696% cpu 1:57.04 total
 
 LLVM toolchain is expected to yield much faster build times, even on the order of minutes.  
 The generated binary is also more performant (e.g. a simple benchmark yielded ``700 FPS`` versus ``800 FPS`` on a default main menu scene)
+-->
 
 ### One-shot launch
 
+Once the dependencies are all set, this is the complete script for building and launching the game from scratch, with RelWithDebInfo configuration:
+
 ```
-git clone https://github.com/TeamHypersomnia/Hypersomnia --recursive
+git clone --depth 1 --recurse-submodules https://github.com/TeamHypersomnia/Hypersomnia
 cd Hypersomnia
+export CXX=clang++; export CC=clang;
 cmake/build.sh RelWithDebInfo x64
 ninja run -C build/current
 ```
 
-### Detailed instructions
+#### Details
  
 Use your favorite shell to enter the repository's directory.
 Then run:
@@ -178,6 +222,7 @@ After which, the resultant Makefile should appear in the build/Debug-x64-gcc dir
 
 #### Invoking ninja
 
+<!--
 If you are building with ``clang``, make sure to call these exports before invoking ``ninja``:
 
 ```
@@ -186,6 +231,7 @@ export CXX=clang++; export CC=clang;
 
 This is because some third-party libraries - freetype, for example - generate their Makefiles only after calling ``ninja`` on the Hypersomnia's ``build.ninja`` itself.
 (if GCC build fails for some reason, add respective exports as well.)
+-->
 
 There are several additional ninja targets defined:
 
