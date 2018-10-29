@@ -33,8 +33,8 @@ python:
 
 matrix:
   include:
-  - env: c_compiler=clang cxx_compiler=clang++ config=Debug other_cmake_flags=""
-    compiler: clang
+  - env: c_compiler=clang-7 cxx_compiler=clang++-7 config=Debug other_cmake_flags=""
+    compiler: clang-7
 #  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=Debug other_cmake_flags=""
 #    compiler: gcc
 #  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=RelWithDebInfo other_cmake_flags=""
