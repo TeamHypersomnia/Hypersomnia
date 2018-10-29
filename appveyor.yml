@@ -34,18 +34,21 @@ artifacts:
     name: Hypersomnia (64-bit)
 
 before_build:
-  - call "C:\Program Files (x86)\Microsoft Visual Studio\Preview\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
-  - cd C:\projects\hypersomnia
+  - |
+  call "C:\Program Files (x86)\Microsoft Visual Studio\Preview\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+  cd C:\projects\hypersomnia
 
 build_script:
-  - mkdir nin
-  - cd nin
-  - mkdir "$env:CONFIGURATION"
-  - cd "$env:CONFIGURATION"
-  - cmake -G Ninja -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl.exe -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE="$env:CONFIGURATION" -DGENERATE_DEBUG_INFORMATION=0 ../..
-  - ninja
+  - ps: |
+  mkdir nin
+  cd nin
+  mkdir $env:CONFIGURATION
+  cd $env:CONFIGURATION
+  cmake -G Ninja -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl.exe -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=$env:CONFIGURATION -DGENERATE_DEBUG_INFORMATION=0 ../..
+  ninja
 
 test_script:
-  - ps: 'cd ../../hypersomnia'
-  - ps: '../cmake/test_and_pack.ps -configuration $env:CONFIGURATION -console_mode 0'
+  - ps: |
+  cd ../../hypersomnia
+  & ../cmake/test_and_pack.ps -configuration $env:CONFIGURATION -console_mode 0
 

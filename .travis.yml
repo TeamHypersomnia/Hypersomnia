@@ -9,6 +9,10 @@ addons:
      - apport
      - gcc-7
      - g++-7
+     - clang-7
+     - lld-7
+     - libc++1-7
+     - libc++abi1-7
      - cmake
      - ninja-build
      - libxcb-keysyms1
@@ -22,6 +26,7 @@ addons:
      - libasound2-dev
     sources:
      - ubuntu-toolchain-r-test
+     - llvm-toolchain-trusty-7
 
 python:
   - "3.6"
@@ -30,10 +35,10 @@ matrix:
   include:
   - env: c_compiler=clang cxx_compiler=clang++ config=Debug other_cmake_flags=""
     compiler: clang
-  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=Debug other_cmake_flags=""
-    compiler: gcc
-  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=RelWithDebInfo other_cmake_flags=""
-    compiler: gcc
+#  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=Debug other_cmake_flags=""
+#    compiler: gcc
+#  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=RelWithDebInfo other_cmake_flags=""
+#    compiler: gcc
 
 before_install:
  - ulimit -c
@@ -45,37 +50,6 @@ before_install:
  - initctl list || true
 
 script:
-  - SAVED_PWD=$PWD
-  - |
-    if [[ "${c_compiler}" == "clang" ]]; then
-      DEPS_DIR="${TRAVIS_BUILD_DIR}/deps"
-      mkdir -p ${DEPS_DIR} && cd ${DEPS_DIR}
-
-      LLVM_VERSION="5.0.1"
-      LLVM_DIR=${DEPS_DIR}/llvm-${LLVM_VERSION}
-
-      LLVM_URL="http://llvm.org/releases/${LLVM_VERSION}/llvm-${LLVM_VERSION}.src.tar.xz"
-      LIBCXX_URL="http://llvm.org/releases/${LLVM_VERSION}/libcxx-${LLVM_VERSION}.src.tar.xz"
-      LIBCXXABI_URL="http://llvm.org/releases/${LLVM_VERSION}/libcxxabi-${LLVM_VERSION}.src.tar.xz"
-      CLANG_URL="http://llvm.org/releases/${LLVM_VERSION}/clang+llvm-${LLVM_VERSION}-x86_64-linux-gnu-ubuntu-14.04.tar.xz"
-
-      mkdir -p ${LLVM_DIR} ${LLVM_DIR}/build ${LLVM_DIR}/projects/libcxx ${LLVM_DIR}/projects/libcxxabi ${LLVM_DIR}/clang
-
-      travis_retry wget --quiet -O - ${LLVM_URL}      | tar --strip-components=1 -xJ -C ${LLVM_DIR}
-      travis_retry wget --quiet -O - ${LIBCXX_URL}    | tar --strip-components=1 -xJ -C ${LLVM_DIR}/projects/libcxx
-      travis_retry wget --quiet -O - ${LIBCXXABI_URL} | tar --strip-components=1 -xJ -C ${LLVM_DIR}/projects/libcxxabi
-      travis_retry wget --quiet -O - ${CLANG_URL}     | tar --strip-components=1 -xJ -C ${LLVM_DIR}/clang
-
-      (cd ${LLVM_DIR}/build && cmake .. -DCMAKE_INSTALL_PREFIX=${LLVM_DIR}/install -DCMAKE_CXX_COMPILER=clang++)
-      (cd ${LLVM_DIR}/build/projects/libcxx && make install -j2)
-      (cd ${LLVM_DIR}/build/projects/libcxxabi && make install -j2)
-
-      export CXXFLAGS="-nostdinc++ -isystem ${LLVM_DIR}/install/include/c++/v1"
-      export LDFLAGS="-L ${LLVM_DIR}/install/lib -l c++ -l c++abi"
-      export LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:${LLVM_DIR}/install/lib"
-      export PATH="${LLVM_DIR}/clang/bin:${PATH}"
-    fi
-  - cd $SAVED_PWD
   - ${c_compiler} -v && ${cxx_compiler} -v && cmake --version && make --version && python --version
   - export CC=${c_compiler}
   - export CXX=${cxx_compiler}
