@@ -6,11 +6,12 @@ branches:
 image: Visual Studio 2017 Preview
 configuration: Release
 build:
-  verbosity: minimal
+  verbosity: detailed
 
-shallow_clone: true
+clone_script:
+  - git clone --depth 1 --recurse-submodules https://github.com/%APPVEYOR_REPO_NAME%.git %APPVEYOR_BUILD_FOLDER%
+
 install:
-  - git submodule update --init --recursive
   - mkdir C:\projects\deps
   - cd C:\projects\deps
 
