@@ -1,8 +1,8 @@
 #!/usr/bin/env bash 
 CONFIGURATION=$1
 ARCHITECTURE=$2
-C_COMPILER=$3
-CXX_COMPILER=$4
+C_COMPILER=$CC
+CXX_COMPILER=$CXX
 
 if [[ ! -z "$3" ]] && [[ -z "$4" ]]
 then
@@ -18,6 +18,10 @@ if [[ -z "$C_COMPILER" ]]
 then
 	C_COMPILER="clang"
 	CXX_COMPILER="clang++"
+fi
+
+if [[ "$C_COMPILER" = "clang" ]]
+then
 	ADDITIONAL_FLAGS="-D_CMAKE_TOOLCHAIN_PREFIX=llvm-"
 fi
 

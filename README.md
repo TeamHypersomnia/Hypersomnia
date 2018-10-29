@@ -107,7 +107,7 @@ If the game builds successfully, issue these commands to launch it:
 
 ```
 cd ../hypersomnia
-../build/Hypersomnia.exe
+"../build/Hypersomnia.exe"
 ```
 
 <!-- Note that the 64-bit version is more likely to be kept up to date. -->
@@ -213,19 +213,21 @@ Use your favorite shell to enter the repository's directory.
 Then run:
 
 ```
-cmake/build.sh [Debug|Release|RelWithDebInfo|MinSizeRel] [x86|x64] [C_COMPILER CXX_COMPILER] ["ADDITIONAL CMAKE FLAGS"]
+cmake/build.sh [Debug|Release|RelWithDebInfo|MinSizeRel] [x86|x64] ["ADDITIONAL CMAKE FLAGS"]
 ```
 For example:
 
 ```
-cmake/build.sh Debug x64 clang clang++
+export CXX=clang++; export CC=clang;
+cmake/build.sh Debug x64
 ```
 After which, the resultant Makefile should appear in the build/Debug-x64-clang directory.
 
 Example for gcc:
 
 ```
-cmake/build.sh Debug x64 gcc g++
+export CXX=g++; export CC=gcc;
+cmake/build.sh Debug x64
 ```
 
 After which, the resultant Makefile should appear in the build/Debug-x64-gcc directory.
