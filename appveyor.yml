@@ -38,15 +38,15 @@ before_build:
   - cd C:\projects\hypersomnia
 
 build_script:
-  - "C:\Program Files\LLVM\bin\clang-cl.exe" -v
+  - ps: '& "C:/Program Files/LLVM/bin/clang-cl.exe" -v'
   - mkdir nin
   - cd nin
   - mkdir %CONFIGURATION%
   - cd %CONFIGURATION%
-  - cmake -G Ninja -DCMAKE_C_COMPILER="C:\Program Files\LLVM\bin\clang-cl.exe" -DCMAKE_CXX_COMPILER="C:\Program Files\LLVM\bin\clang-cl.exe" -DCMAKE_LINKER="C:\Program Files\LLVM\bin\lld-link.exe" -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DGENERATE_DEBUG_INFORMATION=0 ../..
+  - cmake -G Ninja -DCMAKE_C_COMPILER:PATH="C:\Program Files\LLVM\bin\clang-cl.exe" -DCMAKE_CXX_COMPILER:PATH="C:\Program Files\LLVM\bin\clang-cl.exe" -DCMAKE_LINKER:PATH="C:\Program Files\LLVM\bin\lld-link.exe" -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=%CONFIGURATION% -DGENERATE_DEBUG_INFORMATION=0 ../..
   - ninja
 
 test_script:
-  - cd ../../hypersomnia'
-  - ps: '& ../cmake/test_and_pack.ps -configuration $env:CONFIGURATION -console_mode 0'
+  - cd ../../hypersomnia
+  - ps: '& ../cmake/test_and_pack.ps1 -configuration $env:CONFIGURATION -console_mode 0'
 

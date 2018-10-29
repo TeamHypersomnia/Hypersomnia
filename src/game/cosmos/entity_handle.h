@@ -83,7 +83,7 @@ class basic_entity_handle :
 	}
 
 	template <class T>
-	static std::nullptr_t find_or_nullptr(const std::nullopt_t& n) {
+	static std::nullptr_t find_or_nullptr(const std::nullopt_t&) {
 		return nullptr;
 	}
 
