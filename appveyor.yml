@@ -6,33 +6,45 @@ branches:
 image: Visual Studio 2017 Preview
 configuration: Release
 build:
-  parallel: true                  # enable MSBuild parallel builds
-  project: dev/Hypersomnia.sln      # path to Visual Studio solution or project
   verbosity: minimal
+
+shallow_clone: true
 install:
   - git submodule update --init --recursive
+  - mkdir C:\projects\deps
+  - cd C:\projects\deps
 
-test:
-  assemblies:
-    only:
-      - '**\*.Hypersomnia.exe'
-      - '**\*.Hypersomnia-Debug.exe'
+  - set NINJA_URL="https://github.com/ninja-build/ninja/releases/download/v1.8.2/ninja-win.zip"
+  - appveyor DownloadFile %NINJA_URL% -FileName ninja.zip
+  - 7z x ninja.zip -oC:\projects\deps\ninja > nul
+  - set PATH=C:\projects\deps\ninja;%PATH%
+  - ninja --version
 
 notifications:
   - provider: Email
     to:
-      - some@email.com
+      - patryk.czachurski@gmail.com
     on_build_success: false
     on_build_failure: false
-    on_build_status_changed: false
+    on_build_status_changed: true
 
+artifacts:
+  - path: Hypersomnia-x64.zip
+    name: Hypersomnia (64-bit)
 
 before_build:
-  - mkdir dev
-  - cd dev
-  - cmake -G "Visual Studio 15 2017 Win64" -DBUILD_IN_CONSOLE_MODE=1 ..
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\Preview\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+  - cd C:\projects\hypersomnia
+
+build_script:
+  - mkdir nin
+  - cd nin
+  - mkdir $env:CONFIGURATION
+  - cd $env:CONFIGURATION
+  - cmake -G Ninja -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl.exe -DCMAKE_LINKER=lld-link -DARCHITECTURE="x64" -DCMAKE_BUILD_TYPE=$env:CONFIGURATION -DGENERATE_DEBUG_INFORMATION=0 ../..
+  - ninja
 
 test_script:
-  - ps: 'cd ../hypersomnia'
-  - ps: '& "../dev/$env:CONFIGURATION/Hypersomnia.exe" --unit-tests-only'
-  - ps: 'if($LastExitCode -ne 0) { $host.SetShouldExit($LastExitCode ) }'
+  - ps: 'cd ../../hypersomnia'
+  - ps: '../cmake/test_and_pack.ps -configuration $env:CONFIGURATION -console_mode 0'
+
