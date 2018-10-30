@@ -11,6 +11,11 @@
 
 #include <Windows.h>
 #include <shlobj.h>
+#include "augs/graphics/OpenGL_includes.h"
+
+#include "3rdparty/glad/glad_wgl.h"
+#include "3rdparty/glad/glad_wgl.c"
+
 #include "augs/window_framework/translate_winapi_enums.h"
 
 static std::string PickContainer(const std::wstring& custom_title) {
@@ -363,8 +368,25 @@ namespace augs {
 		(void)register_once;
 
 		platform->triple_click_delay = GetDoubleClickTime();
-		platform->hwnd = CreateWindowEx(0, L"augwin", L"invalid_name", 0, 0, 0, 0, 0, 0, 0, GetModuleHandle(NULL), this);
-		ensure(platform->hwnd);
+
+		auto make_window = [&]() {
+			platform->hwnd = CreateWindowEx(0, L"augwin", L"invalid_name", 0, 0, 0, 0, 0, 0, 0, GetModuleHandle(NULL), this);
+			ensure(platform->hwnd);
+
+			platform->hdc = GetDC(platform->hwnd);
+			ensure(platform->hdc);
+		};
+
+		auto make_context = [&]() {
+#if BUILD_OPENGL
+			platform->hglrc = wglCreateContext(platform->hdc);
+			ensure(platform->hglrc);
+#endif
+			const auto sc = set_as_current();
+			ensure(sc);
+		};
+
+		make_window();
 
 		PIXELFORMATDESCRIPTOR p;
 		ZeroMemory(&p, sizeof(p));
@@ -381,9 +403,6 @@ namespace augs {
 		p.cAccumBits = 0;
 		p.iLayerType = PFD_MAIN_PLANE;
 
-		platform->hdc = GetDC(platform->hwnd);
-		ensure(platform->hdc);
-
 		{
 			const auto pf = ChoosePixelFormat(platform->hdc, &p);
 			ensure(pf);
@@ -392,12 +411,55 @@ namespace augs {
 			ensure(result);
 		}
 
-#if BUILD_OPENGL
-		platform->hglrc = wglCreateContext(platform->hdc);
-		ensure(platform->hglrc);
-#endif
-		const auto sc = set_as_current();
-		ensure(sc);
+
+		{
+			LOG("Making dummy context");
+			make_context();
+
+			if (!gladLoadWGL(platform->hdc)) {
+				throw window_error("Failed to initialize GLAD WGL!"); 		
+			}
+
+			set_current_to_none();
+			destroy();
+		
+			make_window();
+
+			const int attribList[] = {
+    			WGL_DRAW_TO_WINDOW_ARB, GL_TRUE,
+    			WGL_SUPPORT_OPENGL_ARB, GL_TRUE,
+    			WGL_DOUBLE_BUFFER_ARB, GL_TRUE,
+    			WGL_PIXEL_TYPE_ARB, WGL_TYPE_RGBA_ARB,
+    			WGL_COLOR_BITS_ARB, static_cast<int>(settings.bpp),
+    			WGL_ALPHA_BITS_ARB, 8,
+    			WGL_DEPTH_BITS_ARB, 0,
+    			WGL_STENCIL_BITS_ARB, 8,
+    			WGL_SAMPLE_BUFFERS_ARB, 0,
+    			WGL_SAMPLES_ARB, 0,
+    			WGL_AUX_BUFFERS_ARB, 0,
+    			WGL_ACCUM_BITS_ARB, 0,
+    			WGL_ACCUM_RED_BITS_ARB, 0,
+    			WGL_ACCUM_GREEN_BITS_ARB, 0,
+    			WGL_ACCUM_BLUE_BITS_ARB, 0,
+    			WGL_ACCUM_ALPHA_BITS_ARB, 0,
+    			0,
+			};
+
+			int pixelFormat;
+			UINT numFormats;
+
+			ensure(wglChoosePixelFormatARB(platform->hdc, attribList, NULL, 1, &pixelFormat, &numFormats));
+			LOG_NVPS(pixelFormat, numFormats);
+			ensure_eq(1, numFormats);
+			
+			const auto result = SetPixelFormat(platform->hdc, pixelFormat, &p);
+			ensure(result);
+			
+			LOG("Making context proper");
+
+			make_context();
+		}
+
 		show();
 
 		SetLastError(0);
