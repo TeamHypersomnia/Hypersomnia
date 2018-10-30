@@ -10,7 +10,45 @@
 #include "augs/window_framework/platform_utils.h"
 
 #include <Windows.h>
+#include <shlobj.h>
 #include "augs/window_framework/translate_winapi_enums.h"
+
+static std::string PickContainer(const std::wstring& custom_title) {
+	std::string result;
+    IFileDialog *pfd;
+    
+    if (SUCCEEDED(CoCreateInstance(CLSID_FileOpenDialog, NULL, CLSCTX_INPROC_SERVER, IID_PPV_ARGS(&pfd))))
+    {
+        DWORD dwOptions;
+        if (SUCCEEDED(pfd->GetOptions(&dwOptions)))
+        {
+            pfd->SetOptions(dwOptions | FOS_PICKFOLDERS);
+        }
+        
+        pfd->SetTitle(custom_title.c_str());
+
+        if (SUCCEEDED(pfd->Show(NULL)))
+        {
+            IShellItem *psi;
+            if (SUCCEEDED(pfd->GetResult(&psi)))
+            {
+				LPWSTR g_path = nullptr;
+                if(!SUCCEEDED(psi->GetDisplayName(SIGDN_DESKTOPABSOLUTEPARSING, &g_path)))
+                {
+                    MessageBox(NULL, L"GetIDListName() failed", NULL, NULL);
+                }
+
+			result = augs::path_type(g_path).string();
+			str_ops(result).replace_all("\\", "/");
+
+                psi->Release();
+            }
+        }
+        pfd->Release();
+    }
+
+    return result;
+}
 
 namespace augs {
 	struct window::platform_data {
@@ -551,7 +589,13 @@ namespace augs {
 	std::optional<std::string> window::choose_directory_dialog(
 		const std::string& custom_title
 	) const {
-		ensure(false && "This is not yet implemented.");
+		const auto title = widen(custom_title);
+		const auto choice = ::PickContainer(title);
+
+		if (choice.size() > 0) {
+			return choice;
+		}
+
 		return std::nullopt;
 	}
 
