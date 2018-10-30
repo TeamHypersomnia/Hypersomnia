@@ -342,7 +342,7 @@ inventory_space_type basic_inventory_slot_handle<E>::calc_local_space_available(
 
 	auto lsa = get().space_available;
 
-	for (const auto e : get_items_inside()) {
+	for (const auto& e : get_items_inside()) {
 		const auto occupied = calc_space_occupied_with_children(get_cosmos()[e]);
 
 		if (occupied > lsa) {

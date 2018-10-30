@@ -2159,3 +2159,19 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - fix RMB
 - fix png reading
+
+
+- Windows fixes
+	- fix freetype errors
+
+- Fix throws so that they also register hit entities
+	- Just add a cooldown for hitting
+	- We may remove the oldest entries
+
+	
+- Special sentience material vs sentience impact sound specifier
+	- Makes little sense to make it a material because a collision might or might not signify damage
+
+- Throwing the knives
+	- missile system responsibility
+	- pass through held item

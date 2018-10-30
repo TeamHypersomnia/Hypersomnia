@@ -6,7 +6,9 @@ void drop_from_all_slots(const invariants::container& container, const E handle,
 	auto& cosm = handle.get_cosmos();
 
 	for (const auto& s : container.slots) {
-		for (const auto item : get_items_inside(handle, s.first)) {
+		const auto items = get_items_inside(handle, s.first);
+
+		for (const auto item : items) {
 			auto drop_item = [&](const auto& dropped_item) {
 				result_callback(perform_transfer_no_step(item_slot_transfer_request::drop(dropped_item, impulse), cosm));
 			};

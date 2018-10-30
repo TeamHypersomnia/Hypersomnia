@@ -36,7 +36,9 @@ callback_result inventory_mixin<E>::for_each_contained_slot_and_item_recursive(
 					continue;
 				}
 				else if (slot_callback_result == recursive_callback_result::CONTINUE_AND_RECURSE) {
-					for (const auto& id : get_items_inside(typed_container, s.first)) {
+					const auto items = get_items_inside(typed_container, s.first);
+					
+					for (const auto& id : items) {
 						const auto result = cosm[id].template dispatch_on_having_all_ret<components::item>(
 							[&](const auto& child_item_handle) {
 								if constexpr(!is_nullopt_v<decltype(child_item_handle)>) {
