@@ -129,6 +129,11 @@ namespace augs {
 
 		case WM_KEYUP:
 			change.data.key.key = translate_key_with_lparam(lParam, wParam);
+
+			if (current_settings.log_keystrokes) {
+				LOG("Keyup: %x", key_to_string(change.data.key.key));
+			}
+
 			return change;
 		case WM_KEYDOWN:
 			change.data.key.key = translate_key_with_lparam(lParam, wParam);
@@ -137,16 +142,29 @@ namespace augs {
 				return std::nullopt;
 			}
 
+			if (current_settings.log_keystrokes) {
+				LOG("Keydown: %x", key_to_string(change.data.key.key));
+			}
+
 			return change;
 
 		case WM_SYSKEYUP:
 			change.data.key.key = translate_key_with_lparam(lParam, wParam);
+
+			if (current_settings.log_keystrokes) {
+				LOG("Syskeyup: %x", key_to_string(change.data.key.key));
+			}
+
 			return change;
 		case WM_SYSKEYDOWN:
 			change.data.key.key = translate_key_with_lparam(lParam, wParam);
 
 			if (/* repeated */ ((lParam & (1 << 30)) != 0)) {
 				return std::nullopt;
+			}
+
+			if (current_settings.log_keystrokes) {
+				LOG("Syskeydown: %x", key_to_string(change.data.key.key));
 			}
 
 			return change;

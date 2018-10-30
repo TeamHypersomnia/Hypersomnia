@@ -47,6 +47,8 @@ namespace augs {
 			case message::ltripleclick: return key_change::PRESSED;
 			case message::keydown: return key_change::PRESSED;
 			case message::keyup:  return key_change::RELEASED;
+			case message::syskeydown: return key_change::PRESSED;
+			case message::syskeyup:  return key_change::RELEASED;
 			case message::ldoubleclick:  return key_change::PRESSED;
 			case message::mdoubleclick: return key_change::PRESSED;
 			case message::rdoubleclick: return key_change::PRESSED;
