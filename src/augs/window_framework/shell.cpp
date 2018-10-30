@@ -14,12 +14,8 @@ namespace augs {
 	int shell(const std::string& s) {
 		LOG("SHELL COMMAND: %x", s);
 
-#if TODO_STRINGS
 		const auto wide = widen(s);
 		return static_cast<int>(reinterpret_cast<INT_PTR>(ShellExecute(NULL, NULL, wide.c_str(), NULL, NULL, SW_SHOW)));
-#else
-		return 0;
-#endif
 	}
 }
 #elif PLATFORM_UNIX
@@ -46,7 +42,7 @@ namespace augs {
 #if PLATFORM_WINDOWS
 namespace augs {
 	void open_text_editor(const std::string& on_file) {
-		augs::shell(on_file);
+		augs::shell("\"" + augs::path_type(on_file).string() + "\"");
 	}
 }
 #elif PLATFORM_UNIX
