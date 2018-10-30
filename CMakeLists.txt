@@ -1387,7 +1387,7 @@ if(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE)
 endif()
 
 # Custom targets for Makefile
-if(UNIX)
+if(${CMAKE_GENERATOR} STREQUAL "Unix makefiles" OR ${CMAKE_GENERATOR} STREQUAL "Ninja")
 	set(HYPERSOMNIA_WORKING_DIR ${HYPERSOMNIA_EXE_RESOURCES_DIR})
 
 	add_custom_target(run
