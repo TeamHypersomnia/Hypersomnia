@@ -2175,3 +2175,8 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - Throwing the knives
 	- missile system responsibility
 	- pass through held item
+
+
+- Windows back-port
+	- use non-multisampling fb configs on Windows
+		- proven to improve performance twofold, on linux

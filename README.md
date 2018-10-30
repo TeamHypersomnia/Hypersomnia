@@ -11,6 +11,7 @@ Latest **Linux** binaries: (in progress)
 - [How to build](#how-to-build)
   - [Windows](#windows)
   - [Linux](#linux)
+    - [Dependencies](#dependencies)
     - [One-shot launch](#one-shot-launch)
     - [Detailed instructions](#detailed-instructions)
     - [Editor integration](#editor-integration)
@@ -47,16 +48,18 @@ Watch gameplays on YouTube:
 
 # How to build
 
-Currently, Hypersomnia is only buildable using ``clang`` (7.0.0 or newer), both on Linux or Windows.  
+Currently, Hypersomnia is only buildable using ``clang`` (7.0.0 or newer), both on Linux and Windows.  
 Additionally, the system must be 64-bit.  
+
+<!--
 Formerly, the game was buildable under modern ``gcc`` versions,  
-and also using under ``MSVC`` (the Microsoft's compiler shipping with Visual Studio),  
+and also using ``MSVC`` (the Microsoft's compiler shipping with Visual Studio),  
 but it quickly became too much of a hassle to support these compilers as we use **modern C++ constructs** throughout the entire codebase.  
 ``gcc``, for example, would sometimes simply crash on some really template-heavy code.  
+-->
 
-
-Relevant ``CMakeLists.txt`` files still contain respective clauses for both ``MSVC`` and ``gcc``,  
-so it might be possible to build the game in the future once these compilers catch up with ``clang``.  
+Relevant ``CMakeLists.txt`` files contain respective clauses for both ``MSVC`` and ``gcc``,  
+so in the future, it might be possible to build the game under these compilers if they catch up with ``clang``.  
 
 
 Irrespectively of the OS, you will need some dependencies installed to build Hypersomnia:  
@@ -85,6 +88,7 @@ Prerequisites:
 - **Visual Studio 2017 Preview** (Community) or newer.
 - ``ninja`` installed somewhere in PATH.
 - [LLVM](http://releases.llvm.org/) 7 toolchain (or newer).
+  - For example, use this installer: http://releases.llvm.org/7.0.0/LLVM-7.0.0-win64.exe
 
 Use your favorite shell to go into the newly created ```build/``` folder and run these commands:
 
@@ -221,7 +225,7 @@ For example:
 export CXX=clang++; export CC=clang;
 cmake/build.sh Debug x64
 ```
-After which, the resultant Makefile should appear in the build/Debug-x64-clang directory.
+After which, the resultant ``build.ninja`` should appear in the build/Debug-x64-clang directory.
 
 Example for gcc:
 
@@ -230,7 +234,7 @@ export CXX=g++; export CC=gcc;
 cmake/build.sh Debug x64
 ```
 
-After which, the resultant Makefile should appear in the build/Debug-x64-gcc directory.
+After which, the resultant ``build.ninja`` should appear in the build/Debug-x64-gcc directory.
 
 #### Invoking ninja
 
@@ -289,7 +293,7 @@ Currently, the following file managers are supported:
 
 The scripts use ``$TERMINAL`` variable for file managers that need a terminal to run on. Ensure your terminal supports ``-e`` flag that passes the commands to launch on startup. 
 
-If you want to implement your own script, the only thing it is required to do is creating a ``$PWD/cache/gen/last_file_path.txt`` file containg the path to the file to be opened or saved to by the editor.
+If you want to implement your own save or open file script, the only thing it must output is a ``$PWD/cache/gen/last_file_path.txt`` file containg the chosen path.
 
 # Contributing
 
