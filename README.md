@@ -124,7 +124,7 @@ If, for some reason, some step fails, refer to the latest working Appveyor build
 
 Current platforms are actively tested and supported:
 - Arch Linux with i3 window manager
-<!--- Ubuntu 14.04 trusty, but it was only tested via Travis - the unit tests all pass. -->
+- Ubuntu, but it is tested only through Travis builds.
 
 ### Dependencies
 

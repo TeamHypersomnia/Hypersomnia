@@ -33,7 +33,7 @@ python:
 
 matrix:
   include:
-  - env: c_compiler=clang-7 cxx_compiler=clang++-7 config=Debug other_cmake_flags=""
+  - env: c_compiler=clang-7 cxx_compiler=clang++-7 config=Release other_cmake_flags=""
     compiler: clang-7
 #  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=Debug other_cmake_flags=""
 #    compiler: gcc
@@ -53,7 +53,7 @@ script:
   - ${c_compiler} -v && ${cxx_compiler} -v && cmake --version && make --version && python --version
   - export CC=${c_compiler}
   - export CXX=${cxx_compiler}
-  - cmake/build.sh ${config} x64 ${c_compiler} ${cxx_compiler} "-DBUILD_IN_CONSOLE_MODE=1 ${other_cmake_flags}"
+  - cmake/build.sh ${config} x64 "${other_cmake_flags}"
   - ulimit -c unlimited -S
   - pushd build/current
   - ninja tests -k 0
