@@ -24,6 +24,10 @@ bool is_between(
     vec2 second, 
     vec2 candidate
 ) {
+	if (first == second) {
+		return true;
+	}
+
     bool boundary_winding_cw = crossproduct2d(first, second) > 0.f;
 
     if (boundary_winding_cw) {

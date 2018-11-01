@@ -32,7 +32,7 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 			const auto full_rot = 360;
 			const auto empty_angular_amount = full_rot * (1 - highlight_amount);
 
-			s.v1.set(-90, -90 + full_rot) /= 180;
+			s.v1.set(0.f, 0.f);
 			s.v2.set(-90 + empty_angular_amount, -90) /= 180;
 
 			in.specials.push_back(s);
