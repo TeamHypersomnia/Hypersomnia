@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- In game GUI, implement a flag to always choose a weapon on Q instead of holstering
+	- Only when there is no weapon allow holster, e.g. when this is the only weapon
+
 - Usability fixes to editor 
 	- Disallow flavour instantation when there is no image specified
 	- Test gameplay when there is no flavour, basically when the workspace is empty

@@ -17,8 +17,16 @@ namespace test_flavours {
 		auto& flavours = in.flavours;
 		auto& caches = in.caches;
 
-		{
-			auto& meta = get_test_flavour(flavours, test_melee_weapons::RESISTANCE_KNIFE);
+		auto make_knife = [&](
+			const auto f,
+			const auto i,
+			const auto price,
+			const auto specific_to,
+			const auto weight_ratio
+		) {
+			(void)weight_ratio;
+
+			auto& meta = get_test_flavour(flavours, f);
 
 			{
 				invariants::render render_def;
@@ -27,7 +35,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::RESISTANCE_KNIFE, white);
+			test_flavours::add_sprite(meta, caches, i, white);
 
 			{
 				auto& fixtures = test_flavours::add_lying_item_dynamic_body(meta);
@@ -42,8 +50,8 @@ namespace test_flavours {
 				item.space_occupied_per_charge = to_space_units("1.5");
 				item.holding_stance = item_holding_stance::KNIFE_LIKE;
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_DRAW);
-				item.standard_price = static_cast<money_type>(250);
-				item.specific_to = faction_type::RESISTANCE;
+				item.standard_price = static_cast<money_type>(price);
+				item.specific_to = specific_to;
 				item.categories_for_slot_compatibility.set(item_category::SHOULDER_WEARABLE);
 				item.wear_sound.id = to_sound_id(test_scene_sound_id::SHEATH_KNIFE);
 
@@ -137,14 +145,38 @@ namespace test_flavours {
 
 				meta.set(melee);
 			}
-		}
+		};
 
-		{
-			auto& meta = get_test_flavour(flavours, test_melee_weapons::METROPOLIS_KNIFE);
+		make_knife(
+			test_melee_weapons::FURY_THROWER,
+			test_scene_image_id::FURY_THROWER,
+			static_cast<money_type>(250),
+			faction_type::RESISTANCE,
+			1.1f
+		);
 
-			meta = get_test_flavour(flavours, test_melee_weapons::RESISTANCE_KNIFE);
-			meta.template get<invariants::text_details>().name = "Metropolis knife";
-			meta.template get<invariants::item>().specific_to = faction_type::METROPOLIS;
-		}
+		make_knife(
+			test_melee_weapons::ELECTRIC_RAPIER,
+			test_scene_image_id::ELECTRIC_RAPIER,
+			static_cast<money_type>(350),
+			faction_type::SPECTATOR,
+			1.2f
+		);
+
+		make_knife(
+			test_melee_weapons::CYAN_SCYTHE,
+			test_scene_image_id::CYAN_SCYTHE,
+			static_cast<money_type>(300),
+			faction_type::METROPOLIS,
+			1.f
+		);
+
+		make_knife(
+			test_melee_weapons::POSEIDON,
+			test_scene_image_id::POSEIDON,
+			static_cast<money_type>(350),
+			faction_type::SPECTATOR,
+			1.2f
+		);
 	}
 }

@@ -111,8 +111,10 @@ enum class test_shootable_weapons {
 
 enum class test_melee_weapons {
 	// GEN INTROSPECTOR enum class test_melee_weapons
-	METROPOLIS_KNIFE,
-	RESISTANCE_KNIFE,
+	FURY_THROWER,
+	ELECTRIC_RAPIER,
+	CYAN_SCYTHE,
+	POSEIDON,
 
 	COUNT
 	// END GEN INTROSPECTOR
