@@ -1,6 +1,18 @@
 #include "game/detail/inventory/wielding_setup.h"
 #include "game/detail/weapon_like.h"
 
+template <class I>
+template <class C>
+bool basic_wielding_setup<I>::is_bare_hands(const C& cosm) const {
+	for (std::size_t i = 0; i < hand_selections.size(); ++i) {
+		if (cosm[hand_selections[i]]) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
 template <class A, class B>
 entity_id get_wieldable_if_available(
 	const A& gui_entity,

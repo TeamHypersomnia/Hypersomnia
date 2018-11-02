@@ -210,9 +210,10 @@ wielding_setup character_gui::make_wielding_setup_for_previous_hotbar_selection_
 	HOT_LOG_NVPS(cosm[current_hands[1]]);
 
 	auto chosen_new_setup = [&]() {
-		if (!was_last_setup_set || previous_setup == current_setup) {
-			was_last_setup_set = true;
+		if (!was_last_setup_set || previous_setup == current_setup || previous_setup.is_bare_hands(cosm)) {
 			/* Previous is identical so wield first item from hotbar */
+
+			was_last_setup_set = true;
 
 			HOT_LOG("Same as previous setup.");
 

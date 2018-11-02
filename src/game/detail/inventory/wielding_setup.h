@@ -27,6 +27,9 @@ struct basic_wielding_setup  {
 	template <class C>
 	bool is_akimbo(const C& cosm) const;
 
+	template <class C>
+	bool is_bare_hands(const C& cosm) const;
+
 	auto& flip() {
 		std::swap(hand_selections[0], hand_selections[1]);
 		return *this;
