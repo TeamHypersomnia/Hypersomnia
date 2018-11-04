@@ -1287,11 +1287,6 @@ bool editor_setup::handle_input_before_game(
 			}
 		}
 
-		if (e.was_pressed(key::SLASH)) {
-			go_to_entity();
-			return true;
-		}
-
 		if (e.was_any_key_pressed()) {
 			const auto k = e.data.key.key;
 
@@ -1374,6 +1369,8 @@ bool editor_setup::handle_input_before_game(
 				case key::ADD: player().request_steps(1); return true;
 				case key::SUBTRACT: player().seek_backward(1, make_command_input()); return true;
 				case key::H: hide_layers_of_selected_entities(); reperform_selector(); return true;
+				case key::SLASH: e.was_pressed(key::SLASH); return true;
+				case key::PAUSE: make_command_input().purge_selections(); return true;
 				default: break;
 			}
 		}
