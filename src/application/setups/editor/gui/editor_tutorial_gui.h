@@ -1,4 +1,5 @@
 #pragma once
+#include <unordered_map>
 #include "application/setups/editor/gui/standard_window_mixin.h"
 #include "augs/misc/enum/enum_array.h"
 
@@ -26,7 +27,8 @@ struct editor_tutorial_gui : standard_window_mixin<editor_tutorial_gui> {
 	using base::base;
 	using introspect_base = base;
 
-	augs::enum_array<std::string, editor_tutorial_type> text_contents;
+	augs::enum_array<std::string, editor_tutorial_type> context_manuals;
+	std::unordered_map<std::string, std::string> dialog_manuals;
 
 	editor_tutorial_gui(const std::string&);
 

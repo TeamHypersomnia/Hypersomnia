@@ -35,10 +35,7 @@ void editor_filters_gui::perform(
 		return;
 	}
 
-	if (acquire_once) {
-		ImGui::SetKeyboardFocusHere();
-		acquire_once = false;
-	}
+	acquire_keyboard_once();
 
 	const auto max_text_w = [&]() {
 		float max_w = -1;

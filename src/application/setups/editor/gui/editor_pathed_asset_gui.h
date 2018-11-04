@@ -51,9 +51,14 @@ public:
 		editor_command_input
 	);
 
+	bool is_separate_properties_focused() const {
+		return base::show && separate_properties_focused;
+	}
+
 private:
 	std::unordered_set<asset_id_type> ticked_assets;
 	property_editor_state property_editor_data;
+	bool separate_properties_focused = false;
 
 	editor_image_preview preview;
 

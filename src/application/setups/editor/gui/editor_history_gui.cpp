@@ -35,11 +35,6 @@ void editor_history_gui::perform(const editor_command_input in) {
 
 	const auto& style = ImGui::GetStyle();
 
-	if (acquire_once) {
-		ImGui::SetKeyboardFocusHere();
-		acquire_once = false;
-	}
-
 	thread_local ImGuiTextFilter filter;
 	filter.Draw();
 

@@ -20,7 +20,13 @@ struct standard_window_mixin {
 			ImGui::SetNextWindowSize(ImVec2(350,560), ImGuiCond_FirstUseEver);
 		}
 
-		return augs::imgui::cond_scoped_window(show, title.c_str(), &show, std::forward<Args>(args)...);
+		auto result = augs::imgui::cond_scoped_window(show, title.c_str(), &show, std::forward<Args>(args)...);
+
+		if (result) {
+			was_focused = ImGui::IsWindowFocused() || ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows);
+		}
+
+		return std::move(result);
 	}
 
 	standard_window_mixin(const std::string& title) : title(title) {}
@@ -36,7 +42,16 @@ struct standard_window_mixin {
 		return title;
 	}
 
-protected:
+	bool is_focused() const {
+		return show && was_focused;
+	}
+	
+	bool will_acquire_keyboard_once() const {
+		return acquire_once;
+	}
+
+private:
 	std::string title;
 	bool acquire_once = false;
+	bool was_focused = false;
 };

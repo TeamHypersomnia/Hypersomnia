@@ -18,6 +18,10 @@ All open projects will be autosaved:
 To configure autosaving, press Esc, choose Settings and navigate to Editor tab. 
 Many other tweaks to editor's behaviour are available there.
 
+The autosave information is stored next inside your project directory, in a folder named ``autosave``.  
+This folder should replicate exactly the rest of the project's directory tree.  
+The autosave folder can always be safely deleted in order to return to the state at the last explicit save.
+
 ## Basic navigation
 
 You should be able to navigate through the world intuitively using your mouse:

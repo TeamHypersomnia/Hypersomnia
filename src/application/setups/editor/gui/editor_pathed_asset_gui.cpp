@@ -117,7 +117,7 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 		return in_range;
 	};
 
-	if (base::acquire_once) {
+	if (base::will_acquire_keyboard_once()) {
 		acquire_missing_paths = true;
 	}
 
@@ -284,11 +284,17 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 
 	const auto prop_in = property_editor_input { settings, property_editor_data };
 
+	separate_properties_focused = false;
+
 	if (separate_properties.show && currently_viewed_entry != nullptr) {
 		const auto& path_entry = *currently_viewed_entry;
 
 		ImGui::SetNextWindowSize(ImVec2(350,560), ImGuiCond_FirstUseEver);
-		auto scope = scoped_window("Current image", std::addressof(separate_properties.show));
+
+		const auto title = "Current " + label;
+		auto scope = scoped_window(title.c_str(), std::addressof(separate_properties.show));
+
+		separate_properties_focused = ImGui::IsWindowFocused() || ImGui::IsWindowFocused(ImGuiFocusedFlags_ChildWindows);
 
 		handle_moving_of_currently_viewed();
 
