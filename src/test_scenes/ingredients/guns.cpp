@@ -69,7 +69,8 @@ namespace test_flavours {
 			const float mounting_duration_ms = 500.f, 
 			const float /* mag_rotation */ = -90.f,
 		   	const bool magazine_hidden = false,
-		   	const std::string& chamber_space = "0.01"
+		   	const std::string& chamber_space = "0.01",
+			const bool mag_contributes_to_space = false
 		){
 			invariants::container container; 
 
@@ -89,6 +90,7 @@ namespace test_flavours {
 				slot_def.always_allow_exactly_one_item = true;
 				slot_def.category_allowed = item_category::MAGAZINE;
 				slot_def.mounting_duration_ms = mounting_duration_ms;
+				slot_def.contributes_to_space_occupied = mag_contributes_to_space;
 
 				container.slots[slot_function::GUN_DETACHABLE_MAGAZINE] = slot_def;
 			}
@@ -99,6 +101,7 @@ namespace test_flavours {
 				slot_def.always_allow_exactly_one_item = true;
 				slot_def.category_allowed = item_category::SHOT_CHARGE;
 				slot_def.space_available = to_space_units(chamber_space);
+				slot_def.contributes_to_space_occupied = false;
 
 				container.slots[slot_function::GUN_CHAMBER] = slot_def;
 			}
@@ -1400,7 +1403,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::LEWSII, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			make_default_gun_container(meta, item_holding_stance::HEAVY_LIKE, 2000.f);
+			make_default_gun_container(meta, item_holding_stance::HEAVY_LIKE, 2000.f, 0.f, false, "0.01", true);
 			set_density_mult(meta, 1.25);
 
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::LEWSII_DRAW);

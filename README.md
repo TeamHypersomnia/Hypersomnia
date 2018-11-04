@@ -58,7 +58,7 @@ but it quickly became too much of a hassle to support these compilers as we use 
 ``gcc``, for example, would sometimes simply crash on some really template-heavy code.  
 -->
 
-Relevant ``CMakeLists.txt`` files contain respective clauses for both ``MSVC`` and ``gcc``,  
+The project's ``CMakeLists.txt`` contains clauses for both ``MSVC`` and ``gcc``,  
 so in the future, it might be possible to build the game under these compilers if they catch up with ``clang``.  
 
 

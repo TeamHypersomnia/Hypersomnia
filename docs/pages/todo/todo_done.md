@@ -2180,3 +2180,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - Windows back-port
 	- use non-multisampling fb configs on Windows
 		- proven to improve performance twofold, on linux
+- In game GUI, implement a flag to always choose a weapon on Q instead of holstering
+
+	- Only when there is no weapon allow holster, e.g. when this is the only weapon
+

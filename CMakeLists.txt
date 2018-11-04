@@ -174,6 +174,12 @@ endif()
 # Here we automatically adjust some of the switches,
 # based on what was set by the user.
 
+if (UNIX)
+	# Honestly I don't know why we need that,
+	# there is some weird CMAKE_AR-NOTFOUND error without this line.
+	set(CMAKE_AR "ar")
+endif()
+
 set(BUILD_GLAD ${BUILD_OPENGL})
 
 if (GCC)

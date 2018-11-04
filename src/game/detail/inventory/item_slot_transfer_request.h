@@ -21,7 +21,9 @@ struct item_slot_transfer_request_params {
 	bool play_transfer_sounds = true;
 	bool play_transfer_particles = true;
 
-	pad_bytes<3> pad;
+	bool perform_recoils = true;
+
+	pad_bytes<2> pad;
 	// END GEN INTROSPECTOR
 };
 

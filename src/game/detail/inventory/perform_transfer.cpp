@@ -270,6 +270,8 @@ perform_transfer_result perform_transfer_impl(
 
 	const bool is_drop_request = result.relation == capability_relation::DROP;
 
+	const auto rigid_body = grabbed_item_part_handle.get<components::rigid_body>();
+
 	if (is_drop_request) {
 		ensure(source_slot_container.alive());
 
@@ -283,8 +285,6 @@ perform_transfer_result perform_transfer_impl(
 		*/
 
 		grabbed_item_part_handle.infer_change_of_current_slot();
-
-		const auto rigid_body = grabbed_item_part_handle.get<components::rigid_body>();
 
 		const auto capability_def = source_root.find<invariants::item_slot_transfers>();
 
@@ -303,8 +303,10 @@ perform_transfer_result perform_transfer_impl(
 			total_impulse.linear * vec2::from_degrees(initial_transform_of_transferred.rotation)
 		;
 
-		rigid_body.apply_impulse(impulse * rigid_body.get_mass());
-		rigid_body.apply_angular_impulse(total_impulse.angular * rigid_body.get_mass());
+		const auto mass = rigid_body.get_mass();
+
+		rigid_body.apply_impulse(impulse * mass);
+		rigid_body.apply_angular_impulse(total_impulse.angular * mass);
 
 		auto& special_physics = grabbed_item_part_handle.get_special_physics();
 
@@ -319,6 +321,30 @@ perform_transfer_result perform_transfer_impl(
 			|| is_like_thrown_explosive(grabbed_item_part_handle)
 		) {
 			special_physics.during_cooldown_ignore_other_cooled_down = false;
+		}
+	}
+
+	if (r.params.perform_recoils) {
+		if (target_slot) {
+			auto do_recoil = [&](const auto& mult) {
+				const auto conceptual_mass = std::sqrt(std::sqrt(static_cast<real32>(::calc_space_occupied_with_children(grabbed_item_part_handle)) / SPACE_ATOMS_PER_UNIT));
+				const auto capability_def = target_root.find<invariants::item_slot_transfers>();
+
+				if (capability_def) {
+					impulse_input in;
+					in.linear = mult * conceptual_mass * vec2::from_degrees(target_root.get_logic_transform().rotation);
+					in.angular = mult * conceptual_mass;
+					in = in * capability_def->transfer_recoil_mults;
+					target_root.apply_crosshair_recoil(in);
+				}
+			};
+
+			if (result.is_wield() || is_pickup) {
+				do_recoil(1.f);
+			}
+			else if (result.is_holster()) {
+				do_recoil(-0.5f);
+			}
 		}
 	}
 

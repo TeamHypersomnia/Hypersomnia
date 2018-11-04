@@ -42,7 +42,8 @@ namespace invariants {
 		// GEN INTROSPECTOR struct invariants::item_slot_transfers
 		impulse_mults standard_throw_impulse = { 7000.f, 0.f };
 		impulse_mults standard_drop_impulse = { 2000.f, 1.5f };
-		float disable_collision_on_drop_for_ms = 300.f;
+		impulse_mults transfer_recoil_mults = { 0.1f, 0.3f };
+		real32 disable_collision_on_drop_for_ms = 300.f;
 		// END GEN INTROSPECTOR
 	};
 }
