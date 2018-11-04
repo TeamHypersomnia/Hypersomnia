@@ -99,8 +99,10 @@ void editor_tutorial_gui::perform(const editor_setup& setup) {
 
 	const auto it = next_ht();
 
+	const auto col = setup.settings.tutorial_text_color;
+
 	if (it == std::string::npos) {
-		text(chosen_text);
+		text_color(chosen_text, col);
 	}
 	else {
 		text(chosen_text.substr(0, it));
@@ -126,7 +128,7 @@ void editor_tutorial_gui::perform(const editor_setup& setup) {
 					}
 				}
 
-				text(contents);
+				text_color(contents, col);
 			}
 			
 			prev_it = next_hashtag;

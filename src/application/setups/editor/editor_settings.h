@@ -83,6 +83,8 @@ struct editor_settings {
 	property_editor_settings property_editor;
 	editor_test_scene_settings test_scene;
 
+	rgba tutorial_text_color = { 210, 210, 210, 255 };
+
 	rgba controlled_entity_color = { 255, 255, 0, 120 };
 	rgba matched_entity_color = { 0, 255, 0, 80 };
 

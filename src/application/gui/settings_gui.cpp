@@ -432,6 +432,7 @@ void settings_gui_state::perform(
 
 					auto& scope_cfg = config.editor;
 
+					revertable_color_edit(SCOPE_CFG_NVP(tutorial_text_color));
 					revertable_color_edit(SCOPE_CFG_NVP(rectangular_selection_color));
 					revertable_color_edit(SCOPE_CFG_NVP(rectangular_selection_border_color));
 				}

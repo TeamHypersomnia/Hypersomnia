@@ -112,6 +112,7 @@ return {
 	  hovered_color = "255 255 255 80",
 	  hovered_dashed_line_color = "255 255 255 140"
     },
+	tutorial_text_color = "220 220 220 255",
     controlled_entity_color = "255 255 0 120",
     matched_entity_color = "0 255 0 80",
 

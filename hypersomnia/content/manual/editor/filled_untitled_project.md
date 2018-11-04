@@ -9,4 +9,3 @@ Create an empty folder and give it a name of your project.
 When you choose it, it will be populated with all the project files. 
 
 The editor is still highly experimental, so remember to save your work often!
-
