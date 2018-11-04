@@ -40,6 +40,7 @@
 #include "application/setups/editor/gui/editor_filters_gui.h"
 #include "application/setups/editor/gui/editor_player_gui.h"
 #include "application/setups/editor/gui/editor_modes_gui.h"
+#include "application/setups/editor/gui/editor_tutorial_gui.h"
 
 #include "application/setups/editor/gui/editor_pathed_asset_gui.h"
 #include "application/setups/editor/gui/editor_unpathed_asset_gui.h"
@@ -74,6 +75,7 @@ class editor_setup {
 	friend augs::introspection_access;
 
 	/* These two friends for handy printing of internal state */
+	friend editor_tutorial_gui;
 	friend editor_summary_gui;
 	friend editor_coordinates_gui;
 
@@ -102,6 +104,7 @@ class editor_setup {
 	editor_summary_gui summary_gui = std::string("Summary");
 	editor_coordinates_gui coordinates_gui = std::string("Coordinates");
 	editor_filters_gui filters_gui = std::string("Filters");
+	editor_tutorial_gui tutorial_gui = std::string("Editor tutorial");
 
 	editor_images_gui images_gui = std::string("Images");
 	editor_sounds_gui sounds_gui = std::string("Sounds");
@@ -298,7 +301,7 @@ public:
 	bool is_gameplay_on() const;
 
 	bool is_mover_active() const {
-		return mover.is_active();
+		return mover.is_active(folder().history);
 	}
 
 	std::optional<camera_eye> find_current_camera_eye() const; 

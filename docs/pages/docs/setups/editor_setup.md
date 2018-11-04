@@ -12,7 +12,7 @@ summary: |
 ## Project structure
 
 The editor considers a **folder to be a project**.  
-The project name is equivalent to the folder name.  
+The **project name** is equivalent to the **folder name**.  
 
 Among other meta file formats, the editor supports read and write operations on both ``.int`` and ``.lua`` [intercosm file formats](intercosm#file-formats).  
 The "File" menu button provides all supported operations, most with keyboard shortcuts.

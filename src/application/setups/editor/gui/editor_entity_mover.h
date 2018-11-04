@@ -11,6 +11,14 @@ struct entity_mover_input {
 	editor_setup& setup;
 };
 
+enum class mover_op_type {
+	NONE,
+
+	TRANSLATING,
+	ROTATING,
+	RESIZING
+};
+
 class editor_entity_mover {
 	bool active = false;
 	vec2 initial_world_cursor_pos;
@@ -28,9 +36,8 @@ class editor_entity_mover {
 
 public:
 	bool escape();
-	bool is_active() const {
-		return active;
-	}
+	bool is_active(const editor_history&) const;
+	mover_op_type get_current_op(const editor_history&) const;
 
 	void start_moving_selection(entity_mover_input in);
 	void start_rotating_selection(entity_mover_input in);

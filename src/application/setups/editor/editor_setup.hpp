@@ -82,7 +82,7 @@ void editor_setup::for_each_dashed_line(F&& callback) const {
 					draw_reach_indicator(light_def.calc_wall_reach_trimmed(), rgba(light_color).mult_alpha(0.7f));
 				});
 
-				if (mover.is_active()) {
+				if (is_mover_active()) {
 					handle.dispatch_on_having_all<components::overridden_geo>([&](const auto typed_handle) {
 						const auto s = typed_handle.get_logical_size();
 						const auto tr = typed_handle.get_logic_transform();

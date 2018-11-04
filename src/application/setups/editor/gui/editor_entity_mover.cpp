@@ -5,6 +5,37 @@
 
 using input_type = entity_mover_input;
 
+bool editor_entity_mover::is_active(const editor_history& h) const {
+	return get_current_op(h) != mover_op_type::NONE;
+}
+
+mover_op_type editor_entity_mover::get_current_op(const editor_history& h) const {
+	if (!active) {
+		return mover_op_type::NONE;
+	}
+
+	if (!h.has_last_command()) {
+		return mover_op_type::NONE;
+	}
+
+	const auto& last = h.last_command();
+
+	if (const auto* const cmd = std::get_if<resize_entities_command>(std::addressof(last))) {
+		(void)cmd;
+		return mover_op_type::RESIZING;
+	}
+	else if (const auto* const cmd = std::get_if<move_entities_command>(std::addressof(last))) {
+		if (cmd->rotation_center) {
+			return mover_op_type::ROTATING;
+		}
+		else {
+			return mover_op_type::TRANSLATING;
+		}
+	}
+
+	return mover_op_type::NONE;
+}
+
 bool editor_entity_mover::escape() {
 	if (active) {
 		active = false;
