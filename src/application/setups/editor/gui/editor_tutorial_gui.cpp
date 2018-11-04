@@ -149,6 +149,12 @@ void editor_tutorial_gui::perform(const editor_setup& setup) {
 					}
 				}
 				else {
+					if (setup.is_editing_mode()) {
+						return T::PLAYTESTING_EDITING;
+					}
+					else if (setup.is_gameplay_on()) {
+						return T::PLAYTESTING_INGAME;
+					}
 				}
 			}
 
@@ -175,7 +181,7 @@ void editor_tutorial_gui::perform(const editor_setup& setup) {
 		text_color(chosen_text, col);
 	}
 	else {
-		text(chosen_text.substr(0, it));
+		text_color(chosen_text.substr(0, it), col);
 		std::size_t prev_it = it;
 
 		while (prev_it != std::string::npos) {

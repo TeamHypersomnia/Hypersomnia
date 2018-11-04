@@ -1,5 +1,5 @@
 Perfect! Your work is all safe now.
-From here, there are many things that can be done. 
+There are many things that can be done, from here;
 Make sure to read carefully through all of these sections, exactly in the order they are presented.
 
 ## Autosaves
@@ -48,8 +48,6 @@ If you don't like it, you can tweak the colors in Editor settings (Esc->Settings
 To select the hovered entity, press LMB. 
 To select many entities, drag the mouse while holding LMB - a selection rectangle should appear.
 
-## Playtesting
-
 ## Marks
 
 You can also use Marks feature to remember some important locations of the map:
@@ -68,3 +66,14 @@ Thus, you can quickly jump between two chosen locations by double-tapping the ap
 This is very useful if you want to move several objects across two distant places - instead of making a lot of mouse movements to navigate between the two locations, 
 simply mark both locations once, jump to the first and later to the second location, 
 and then, simply double-tap the apostrophe to switch between them.
+
+## Modes
+
+Press Alt+D (View->Modes) for more information.
+
+## Playtesting
+
+You will certainly want to test how your map plays.
+To do so, simply press "i" to begin playing your world.
+
+The currently selected mode will start executing its logic on the map.
