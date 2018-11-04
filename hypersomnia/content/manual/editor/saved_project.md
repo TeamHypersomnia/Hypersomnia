@@ -14,9 +14,17 @@ Many other tweaks to editor's behaviour are available there.
 ## Basic navigation
 
 You should be able to navigate through the world intuitively using your mouse:
+
 - Drag the mouse while holding RMB to move around.
 - Use your mouse wheel to zoom in or out.
-- Whatever movement you make, holding Shift will make it faster, whereas holding left Alt will make it slower.
+
+You can use keyboard to do the same:
+
+- Press your arrow keys to move around.
+- Press - to zoom in and = to zoom out.
+
+Whatever movement you make, holding Shift will make it faster.
+Holding left Alt will make it slower.
 
 Remember that if you get lost exploring the map, simply press HOME to return to the origin of the map (x = 0, y = 0, zoom = 100%).
 

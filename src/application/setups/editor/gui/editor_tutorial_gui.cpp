@@ -93,5 +93,43 @@ void editor_tutorial_gui::perform(const editor_setup& setup) {
 
 	const auto& chosen_text = text_contents.at(chosen_tutorial);
 
-	text(chosen_text);
+	auto next_ht = [&](const std::size_t from = 0) {
+		return chosen_text.find("##", from);
+	};
+
+	const auto it = next_ht();
+
+	if (it == std::string::npos) {
+		text(chosen_text);
+	}
+	else {
+		text(chosen_text.substr(0, it));
+		std::size_t prev_it = it;
+
+		while (prev_it != std::string::npos) {
+			const auto begin_title_pos = prev_it + 3;
+			const auto newline_pos = chosen_text.find("\n", begin_title_pos);
+			const auto title = chosen_text.substr(begin_title_pos, newline_pos - begin_title_pos);
+			const auto next_hashtag = next_ht(newline_pos);
+
+			if (ImGui::CollapsingHeader(title.c_str())) {
+				auto contents = chosen_text.substr(newline_pos, next_hashtag - newline_pos);
+
+				if (contents.size() > 0) {
+					if (contents.size() > 1) {
+						if (contents[1] == '\n') {
+							contents.erase(contents.begin(), contents.begin() + 2);
+						}
+					}
+					else {
+						contents.erase(contents.begin());
+					}
+				}
+
+				text(contents);
+			}
+			
+			prev_it = next_hashtag;
+		}
+	}
 }
