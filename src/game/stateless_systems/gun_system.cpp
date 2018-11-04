@@ -597,6 +597,19 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						}
 					}
 
+					{
+						const auto& transfers = capability.template get<invariants::item_slot_transfers>();
+						const auto when_transferred = gun_entity.template get<components::item>().get_raw_component().when_last_transferred;
+						const auto r = clk.get_ratio_of_remaining_time(transfers.after_wield_recoil_ms, when_transferred);
+
+						const auto conceptual_mass = std::sqrt(static_cast<real32>(::calc_space_occupied_with_children(gun_entity)) / SPACE_ATOMS_PER_UNIT);
+
+						if (r > 0.f) {
+							const auto total_mult = r * conceptual_mass * transfers.after_wield_recoil_mults.angular;
+							total_recoil += total_mult;
+						}
+					}
+
 					if (const auto* const recoil_player = logicals.find(gun_def.recoil.id)) {
 						const auto recoil_value = gun.recoil.shoot_and_get_impulse(gun_def.recoil, *recoil_player);
 

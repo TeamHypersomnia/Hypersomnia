@@ -222,6 +222,8 @@ namespace test_flavours {
 			{
 				invariants::item_slot_transfers transfers; 
 				transfers.transfer_recoil_mults = { 0.2f, 0.4f };
+				transfers.after_wield_recoil_mults = { 0.4f, 1.1f };
+				transfers.after_wield_recoil_ms = 1000.f;
 				meta.set(transfers);
 			}
 		}

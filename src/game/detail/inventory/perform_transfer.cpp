@@ -343,7 +343,7 @@ perform_transfer_result perform_transfer_impl(
 				do_recoil(1.f);
 			}
 			else if (result.is_holster()) {
-				do_recoil(-0.5f);
+				do_recoil(-0.6f);
 			}
 		}
 	}
