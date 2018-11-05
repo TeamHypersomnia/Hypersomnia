@@ -496,10 +496,13 @@ void editor_setup::perform_custom_imgui(
 					}
 
 					ImGui::Separator();
+#if 0
 					if (item_if_tabs("Cut", "CTRL+X")) {}
 					if (item_if_tabs("Copy", "CTRL+C")) {}
 					if (item_if_tabs("Paste", "CTRL+V")) {}
 					ImGui::Separator();
+
+#endif
 
 #if BUILD_TEST_SCENES
 					if (item_if_tabs("Fill with test scene", "SHIFT+F5")) {

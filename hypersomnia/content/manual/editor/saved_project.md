@@ -1,6 +1,8 @@
 Perfect! Your work is all safe now.
-There are many things that can be done, from here;
-Make sure to read carefully through all of these sections, exactly in the order they are presented.
+There are many things that can be done from here.
+
+Make sure to read carefully through the following sections, 
+DON'T SKIP ANY, and read EXACTLY in the order they are presented!
 
 ## Autosaves
 
@@ -15,12 +17,64 @@ All open projects will be autosaved:
 	- ...unless it is due to a segmentation fault or some other catastrophic event.
 - Additionally, every single minute. 
 
-To configure autosaving, press Esc, choose Settings and navigate to Editor tab. 
-Many other tweaks to editor's behaviour are available there.
+If you wish to tweak autosaving behaviour:
+- press Escape button,
+- choose Settings,
+- navigate to Editor tab,
+- unfold the "General" section.
+You can find many, many other options there that can change how editor behaves.
 
-The autosave information is stored next inside your project directory, in a folder named ``autosave``.  
-This folder should replicate exactly the rest of the project's directory tree.  
-The autosave folder can always be safely deleted in order to return to the state at the last explicit save.
+The autosave state is stored inside your project directory, in a folder named ``autosave``.  
+This folder should exactly replicate the rest of the project's directory tree.  
+
+The autosave folder **will be deleted** every time you explicitly save the project (e.g. through Ctrl+S).
+You may also delete it manually at any time,
+in order to return to the moment where you last saved your work explicitly.
+
+## Project directory structure
+
+You will find a bunch of files and folders inside your newly saved project,
+the meaning of which is as follows:
+
+- Folder: ``autosave``. 
+	- You already know what it is for - if not, return to the "Autosaves" section.
+
+- Folders: ``gfx`` and ``sfx``.
+	- This is where you put your project-specific resources not found in the official collection (content/official).
+	  Though initially empty, they are created automatically for your convenience.
+
+	  You will NOT be able to import ANY images or sounds outside the project-specific ``gfx`` and ``sfx`` folders, 
+	  or the official counterparts (content/official/gfx, content/official/sfx).
+	  This is to ensure that your project folder has everything it needs to be opened on another machine.
+
+- File: ``Project.int``.
+	- A binary blob representing your game world. 
+	  ".int" refers to an "intercosm" (a short for an "Interactive cosmos") file format. 
+      It MUST exist at the time the editor opens a project folder.
+	  You should not delete or otherwise alter it.
+
+- File: ``Project.hist``.
+	- A binary blob representing the history of changes. 
+	- Can safely be deleted at any time if you don't want to track some old operations anymore and it gets too big.
+
+- File: ``Project.view``.
+	- A binary blob holding the camera state, grid settings, marks, filters etc (more on these later).
+	- Can safely be deleted at any time to reset those settings.
+
+- File: ``Project.view_ids``.
+	- A binary blob holding identificators of selected entities and selection groups (more on these later).
+	- Can safely be deleted at any time to reset those settings.
+
+- File: ``Project.modes``.
+	- A binary blob representing the predefined game mode configurations (more on these later).
+	- You should not delete or otherwise alter it.
+
+- File: ``Project.player``.
+	- A binary blob representing the player state (more on that later).
+	- You should not delete or otherwise alter it.
+
+To ensure that gameplay recordings are replayed deterministically,
+NONE of the above files should be deleted during a playtest (more on that later).
 
 ## Basic navigation
 
@@ -37,35 +91,41 @@ You can use keyboard to do the same:
 Whatever movement you make, holding Shift will make it faster.
 Holding left Alt will make it slower.
 
-Remember that if you get lost exploring the map, simply press HOME to return to the origin of the map (x = 0, y = 0, zoom = 100%).
-
-## Selecting entities
-
-Using the mouse cursor, you can select entities in the game world.
-The currently hovered entity will be highlighted with a bright color. 
-If you don't like it, you can tweak the colors in Editor settings (Esc->Settings->Editor).
-
-To select the hovered entity, press LMB. 
-To select many entities, drag the mouse while holding LMB - a selection rectangle should appear.
+Remember that if you get lost exploring the map,
+simply press HOME to return to the origin of the map (x = 0, y = 0, zoom = 100%).
 
 ## Marks
 
-You can also use Marks feature to remember some important locations of the map:
+You can also use Marks feature to remember some important locations in the map:
 Whenever you are looking at a location you want to remember:
 
 - Press M to open the Marks dialog in the marking mode.
 - Press another key under which you want to remember (mark) the location.
 
 You have successfully marked a location.
-Later, to return to that location, press ' (apostrophe) to open the Marks dialog again - this time, in the jumping mode:
+Later, to return to that location, press ' (apostrophe) to open the Marks dialog again - 
+this time, in the jumping mode:
 
 - Press the key under which the location was remembered.
 
+The camera should jump to the chosen location.
+
 The previously chosen location is at all times assigned to the apostrophe itself. 
 Thus, you can quickly jump between two chosen locations by double-tapping the apostrophe. 
-This is very useful if you want to move several objects across two distant places - instead of making a lot of mouse movements to navigate between the two locations, 
+This is very useful if you want to move several objects across two distant places - 
+instead of making a lot of mouse movements to navigate between the two locations, 
 simply mark both locations once, jump to the first and later to the second location, 
 and then, simply double-tap the apostrophe to switch between them.
+
+## Selecting entities
+
+Using the mouse cursor, you can select entities in the game world.
+The currently hovered entity will be highlighted with a bright color and outlined with a dashed line.
+
+Select the hovered entity by pressing the Left Mouse Button.
+The contents of this window will change when you do so - follow the instructions provided there. 
+
+## Go to entity
 
 ## Modes
 

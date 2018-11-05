@@ -54,7 +54,7 @@ void editor_summary_gui::perform(editor_setup& setup) {
 			using T = entity_type_of<typename remove_cref<decltype(p)>::mapped_type>;
 
 			const auto si = p.size();
-			const auto ca = p.capacity();
+			const auto ca = p.max_size();
 			const auto percent = static_cast<float>(si) / static_cast<float>(ca) * 100;
 
 			lines.push_back(
