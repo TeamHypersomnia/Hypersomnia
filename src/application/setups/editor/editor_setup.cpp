@@ -1068,6 +1068,10 @@ bool editor_setup::handle_input_before_imgui(
 			if (confirm_modal_popup()) {
 				return true;
 			}
+
+			if (mover.escape()) {
+				return true;
+			}
 		}	
 
 		if (has_alt) {
