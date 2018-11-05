@@ -753,6 +753,7 @@ setup_escape_result editor_setup::escape() {
 		return setup_escape_result::JUST_FETCH;
 	}
 	else if (mover.escape()) {
+		undo();
 		return setup_escape_result::JUST_FETCH;
 	}
 
