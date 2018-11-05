@@ -351,7 +351,7 @@ void settings_gui_state::perform(
 				}	
 				
 				if (auto node = scoped_tree_node("Interface")) {
-					if (auto node = scoped_tree_node("Grid rendering")) {
+					if (auto node = scoped_tree_node("Grid")) {
 						auto& scope_cfg = config.editor.grid.render;
 
 						if (auto lines = scoped_tree_node("Line colors")) {
@@ -360,7 +360,6 @@ void settings_gui_state::perform(
 							}
 						}
 
-						revertable_slider("Alpha", scope_cfg.alpha_multiplier, 0.f, 1.f);
 						{
 							auto& po2 = scope_cfg.maximum_power_of_two;
 
@@ -369,6 +368,7 @@ void settings_gui_state::perform(
 							text(typesafe_sprintf("(Max grid size: %x)", 1 << po2));
 						}
 
+						revertable_slider("Alpha", scope_cfg.alpha_multiplier, 0.f, 1.f);
 						revertable_slider(SCOPE_CFG_NVP(hide_grids_smaller_than), 0u, 128u);
 					}
 

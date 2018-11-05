@@ -101,7 +101,7 @@ You can also filter existing groups by using the text area at the top of the dia
 
 ## Operations: Transformations 
 
-- Press E to start resizing the selected entities along a single axis.
+- Press E to start resizing the selected entities along a single axis closest to the cursor.
 - Press Shift + E to start resizing the selected entities along two axes closest to the cursor.
 - Press T to start moving the selected entities with your mouse.
 - Press R to start rotating the selected entities.
