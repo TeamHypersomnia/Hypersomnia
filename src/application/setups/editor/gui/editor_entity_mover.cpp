@@ -150,6 +150,32 @@ void editor_entity_mover::start_rotating_selection(const input_type in) {
 	}
 }
 
+void editor_entity_mover::reset_rotation(const input_type in) {
+	auto& s = in.setup;
+
+	if (s.anything_opened()) {
+		s.finish_rectangular_selection();
+
+		auto command = s.make_command_from_selections<move_entities_command>(
+			"",
+			[](const auto typed_handle) {
+				return typed_handle.has_independent_transform();
+			}	
+		);
+
+		if (!command.empty()) {
+			command.special = special_move_operation::RESET_ROTATION;
+			s.folder().history.execute_new(std::move(command), s.make_command_input());
+		}
+	}
+}
+
+#if TODO
+void editor_entity_mover::align_individually(const input_type in) {
+
+}
+#endif
+
 void editor_entity_mover::rotate_selection_once_by(const input_type in, const int degrees) {
 	if (const auto aabb = in.setup.find_selection_aabb()) {
 		const bool reinvoke_positional_moving = current_mover_pos_delta(in) != nullptr;

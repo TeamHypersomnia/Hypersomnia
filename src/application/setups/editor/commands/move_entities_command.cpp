@@ -90,8 +90,34 @@ static void move_entities(
 	cosmos& cosm,
 	const moved_entities_type& subjects,
 	const delta_type& dt,
-	const std::optional<vec2> rotation_center
+	const std::optional<vec2> rotation_center,
+	const special_move_operation special
 ) {
+	if (special == special_move_operation::RESET_ROTATION) {
+		auto rotation_resetter = 
+			[&](auto& tr, auto&) {
+				using T = remove_cref<decltype(tr)>;
+
+				if constexpr(std::is_same_v<T, physics_engine_transforms>) {
+					auto new_transform = tr.get();
+					new_transform.rotation = 0;
+					tr.set(new_transform);
+				}
+				else if constexpr(std::is_same_v<T, transformr>) {
+					tr.rotation = 0;
+				}
+				else if constexpr(std::is_same_v<T, vec2>) {
+
+				}
+				else {
+					static_assert(always_false_v<T>, "Unknown transform type.");
+				}
+			}
+		;
+
+		on_each_independent_transform(cosm, subjects, rotation_resetter, key);
+	}
+
 	const auto si = cosm.get_si();
 	const auto dt_si = dt.to_si_space(si);
 
@@ -387,7 +413,7 @@ void move_entities_command::reinfer_moved(cosmos& cosm) {
 }
 
 void move_entities_command::move_entities(cosmos& cosm) {
-	::move_entities({}, cosm, moved_entities, move_by, rotation_center);
+	::move_entities({}, cosm, moved_entities, move_by, rotation_center, special);
 }
 
 void move_entities_command::rewrite_change(

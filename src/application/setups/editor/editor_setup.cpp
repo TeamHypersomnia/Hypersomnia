@@ -1330,7 +1330,6 @@ bool editor_setup::handle_input_before_game(
 					case key::Z: center_view_at_selection(); return true;
 					case key::I: player().begin_recording(folder()); return true;
 					case key::L: player().begin_replaying(folder()); return true;
-					case key::E: mover.start_resizing_selection(make_mover_input(), false); return true;
 					case key::G: view().toggle_grid(); return true;
 					case key::S: view().toggle_snapping(); return true;
 					case key::OPEN_SQUARE_BRACKET: view().grid.decrease_grid_size(); clamp_units(); return true;
@@ -1338,8 +1337,10 @@ bool editor_setup::handle_input_before_game(
 					case key::C: duplicate_selection(); return true;
 					case key::D: cut_selection(); return true;
 					case key::DEL: delete_selection(); return true;
-					case key::T: mover.start_moving_selection(make_mover_input()); return true;
+					case key::W: mover.reset_rotation(make_mover_input()); return true;
+					case key::E: mover.start_resizing_selection(make_mover_input(), false); return true;
 					case key::R: mover.start_rotating_selection(make_mover_input()); return true;
+					case key::T: mover.start_moving_selection(make_mover_input()); return true;
 					case key::ADD: player().request_steps(1); return true;
 					case key::SUBTRACT: player().seek_backward(1, make_command_input()); return true;
 					case key::H: hide_layers_of_selected_entities(); reperform_selector(); return true;

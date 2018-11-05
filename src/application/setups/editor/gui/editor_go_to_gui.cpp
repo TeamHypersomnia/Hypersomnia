@@ -106,9 +106,6 @@ std::optional<const_entity_handle> editor_go_to_entity_gui::perform(
 	);
 
 	static auto arrow_callback = [](ImGuiTextEditCallbackData* data) {
-		LOG_NVPS(data->EventFlag);
-		LOG_NVPS(data->Buf);			
-
 		auto& input = *reinterpret_cast<text_edit_callback_input*>(data->UserData);
 		auto& self = input.self;
 		auto& cosm = input.cosm;

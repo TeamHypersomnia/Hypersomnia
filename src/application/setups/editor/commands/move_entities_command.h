@@ -20,6 +20,12 @@ namespace augs {
 template <class T>
 using typed_entity_id_vector = std::vector<typed_entity_id<T>>;
 
+enum class special_move_operation {
+	NONE,
+	RESET_ROTATION,
+	SNAP_INDIVIDUALLY
+};
+
 class move_entities_command {
 	friend augs::introspection_access;
 
@@ -37,6 +43,7 @@ private:
 	std::vector<std::byte> values_before_change;
 public:
 
+	special_move_operation special = special_move_operation::NONE;
 	delta_type move_by;
 	std::optional<vec2> rotation_center;
 

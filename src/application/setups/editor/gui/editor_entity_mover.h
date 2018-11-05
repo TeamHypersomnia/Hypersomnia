@@ -43,6 +43,9 @@ public:
 	void start_rotating_selection(entity_mover_input in);
 	void rotate_selection_once_by(entity_mover_input in, int degrees);
 
+	void reset_rotation(entity_mover_input in);
+	void align_individually(entity_mover_input in);
+
 	void start_resizing_selection(entity_mover_input in, bool both_axes_simultaneously);
 
 	vec2* current_mover_pos_delta(entity_mover_input in) const;
