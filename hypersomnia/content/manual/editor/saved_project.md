@@ -137,6 +137,8 @@ The contents of this window will change when you do so - follow the instructions
 
 ## Go to entity
 
+Press Slash (/) to start quick search for an entity.
+
 ## Modes
 
 Press Alt+D (View->Modes) for more information.

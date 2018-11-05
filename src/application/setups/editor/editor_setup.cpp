@@ -1117,7 +1117,6 @@ bool editor_setup::handle_input_before_imgui(
 				switch (k) {
 					case key::S: save(window); return true;
 					case key::COMMA: go_to_all(); return true;
-					case key::W: close_folder(); return true;
 					case key::TAB: next_tab(); return true;
 					default: break;
 				}
@@ -1271,6 +1270,7 @@ bool editor_setup::handle_input_before_game(
 				}
 
 				switch (k) {
+					case key::W: close_folder(); return true;
 					case key::A: select_all_entities(has_ctrl); return true;
 					case key::_0: view().reset_zoom(); return true;
 					case key::Z: undo(); return true;
@@ -1304,6 +1304,7 @@ bool editor_setup::handle_input_before_game(
 
 			if (has_shift) {
 				switch (k) {
+					case key::Z: center_view_at_selection(); view().reset_zoom(); return true;
 					case key::O: override_viewed_entity({}); view().reset_panning(); return true;
 					case key::R: mover.rotate_selection_once_by(make_mover_input(), 90); return true;
 					case key::E: mover.start_resizing_selection(make_mover_input(), true); return true;
@@ -1318,32 +1319,34 @@ bool editor_setup::handle_input_before_game(
 
 			auto clamp_units = [&]() { view().grid.clamp_units(8, settings.grid.render.get_maximum_unit()); };
 
-			switch (k) {
-				case key::O: 
-					if (view_ids().selected_entities.size() == 1) { 
-						override_viewed_entity(*view_ids().selected_entities.begin()); 
-					}
-					return true;
-				case key::A: view().toggle_ignore_groups(); return true;
-				case key::Z: center_view_at_selection(); if (has_shift) { view().reset_zoom(); } return true;
-				case key::I: player().begin_recording(folder()); return true;
-				case key::L: player().begin_replaying(folder()); return true;
-				case key::E: mover.start_resizing_selection(make_mover_input(), false); return true;
-				case key::G: view().toggle_grid(); return true;
-				case key::S: view().toggle_snapping(); return true;
-				case key::OPEN_SQUARE_BRACKET: view().grid.decrease_grid_size(); clamp_units(); return true;
-				case key::CLOSE_SQUARE_BRACKET: view().grid.increase_grid_size(); clamp_units(); return true;
-				case key::C: duplicate_selection(); return true;
-				case key::D: cut_selection(); return true;
-				case key::DEL: delete_selection(); return true;
-				case key::T: mover.start_moving_selection(make_mover_input()); return true;
-				case key::R: mover.start_rotating_selection(make_mover_input()); return true;
-				case key::ADD: player().request_steps(1); return true;
-				case key::SUBTRACT: player().seek_backward(1, make_command_input()); return true;
-				case key::H: hide_layers_of_selected_entities(); reperform_selector(); return true;
-				case key::SLASH: e.was_pressed(key::SLASH); return true;
-				case key::PAUSE: make_command_input().purge_selections(); return true;
-				default: break;
+			if (!has_shift && !has_ctrl) {
+				switch (k) {
+					case key::O: 
+						if (view_ids().selected_entities.size() == 1) { 
+							override_viewed_entity(*view_ids().selected_entities.begin()); 
+						}
+						return true;
+					case key::A: view().toggle_ignore_groups(); return true;
+					case key::Z: center_view_at_selection(); return true;
+					case key::I: player().begin_recording(folder()); return true;
+					case key::L: player().begin_replaying(folder()); return true;
+					case key::E: mover.start_resizing_selection(make_mover_input(), false); return true;
+					case key::G: view().toggle_grid(); return true;
+					case key::S: view().toggle_snapping(); return true;
+					case key::OPEN_SQUARE_BRACKET: view().grid.decrease_grid_size(); clamp_units(); return true;
+					case key::CLOSE_SQUARE_BRACKET: view().grid.increase_grid_size(); clamp_units(); return true;
+					case key::C: duplicate_selection(); return true;
+					case key::D: cut_selection(); return true;
+					case key::DEL: delete_selection(); return true;
+					case key::T: mover.start_moving_selection(make_mover_input()); return true;
+					case key::R: mover.start_rotating_selection(make_mover_input()); return true;
+					case key::ADD: player().request_steps(1); return true;
+					case key::SUBTRACT: player().seek_backward(1, make_command_input()); return true;
+					case key::H: hide_layers_of_selected_entities(); reperform_selector(); return true;
+					case key::SLASH: go_to_entity(); return true;
+					case key::PAUSE: make_command_input().purge_selections(); return true;
+					default: break;
+				}
 			}
 		}
 	}
