@@ -1188,42 +1188,6 @@ bool editor_setup::handle_input_before_game(
 			}
 		}
 
-		if (has_ctrl && e.msg == message::wheel) {
-			auto a = e.data.scroll.amount;
-			auto& vf = view().viewing_filter;
-
-			if (vf.is_enabled) {
-				if (a > 0) {
-					for (auto& flag : reverse(vf.value.layers)) {
-						if (!flag) {
-							flag = true;
-
-							--a;
-
-							if (!a) {
-								break;
-							}
-						}
-					}
-				}
-				else if (a < 0) {
-					for (auto& flag : vf.value.layers) {
-						if (flag) {
-							flag = false;
-
-							++a;
-
-							if (!a) {
-								break;
-							}
-						}
-					}
-				}
-			}
-
-			return true;
-		}
-
 		if (const auto maybe_eye = find_current_camera_eye()) {
 			const auto current_eye = *maybe_eye;
 
