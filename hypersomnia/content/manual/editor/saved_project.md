@@ -25,11 +25,16 @@ If you wish to tweak autosaving behaviour:
 You can find many, many other options there that can change how editor behaves.
 
 The autosave state is stored inside your project directory, in a folder named ``autosave``.  
-This folder should exactly replicate the rest of the project's directory tree.  
+The folder exactly replicates the rest of the project's directory tree.  
 
-The autosave folder **will be deleted** every time you explicitly save the project (e.g. through Ctrl+S).
-You may also delete it manually at any time,
-in order to return to the moment where you last saved your work explicitly.
+- When trying to open a folder located at ``C:/Project``, the editor first checks if a folder named ``C:/Project/autosave`` exists.
+	- If it is found, the opened tab is populated only with the work from the ``C:/Project/autosave`` folder. 
+      The tab itself still carries the path of the original folder,
+	  so an explicit save (``Ctrl+S``) will properly update the real project folder.
+
+The autosave folder **will be deleted** every time you explicitly save the project.
+If you wish to revert the project to the state where you last saved your work explicitly.
+you may safely delete the ``autosave`` folder at any time.
 
 ## Project directory structure
 
@@ -40,11 +45,13 @@ the meaning of which is as follows:
 	- You already know what it is for - if not, return to the "Autosaves" section.
 
 - Folders: ``gfx`` and ``sfx``.
-	- This is where you put your project-specific resources not found in the official collection (content/official).
-	  Though initially empty, they are created automatically for your convenience.
+	- This is where you put your project-specific resources.
+	  Though initially empty, these two folders are created automatically for your convenience.
 
-	  You will NOT be able to import ANY images or sounds outside the project-specific ``gfx`` and ``sfx`` folders, 
-	  or the official counterparts (content/official/gfx, content/official/sfx).
+	  In your project, you will be able to import images and sounds ONLY from these locations:
+		- the project-specific ``gfx`` and ``sfx`` folders,
+		- the official collections (content/official/gfx, content/official/sfx).
+
 	  This is to ensure that your project folder has everything it needs to be opened on another machine.
 
 - File: ``Project.int``.
@@ -55,15 +62,15 @@ the meaning of which is as follows:
 
 - File: ``Project.hist``.
 	- A binary blob representing the history of changes. 
-	- Can safely be deleted at any time if you don't want to track some old operations anymore and it gets too big.
+	- Can be safely deleted at any time if you don't want to track some old operations anymore and it gets too big.
 
 - File: ``Project.view``.
 	- A binary blob holding the camera state, grid settings, marks, filters etc (more on these later).
-	- Can safely be deleted at any time to reset those settings.
+	- Can be safely deleted at any time to reset those settings.
 
 - File: ``Project.view_ids``.
 	- A binary blob holding identificators of selected entities and selection groups (more on these later).
-	- Can safely be deleted at any time to reset those settings.
+	- Can be safely deleted at any time to reset those settings.
 
 - File: ``Project.modes``.
 	- A binary blob representing the predefined game mode configurations (more on these later).
@@ -86,7 +93,7 @@ You should be able to navigate through the world intuitively using your mouse:
 You can use keyboard to do the same:
 
 - Press your arrow keys to move around.
-- Press - to zoom in and = to zoom out.
+- Press - to zoom out and = to zoom in.
 
 Whatever movement you make, holding Shift will make it faster.
 Holding left Alt will make it slower.
@@ -94,17 +101,20 @@ Holding left Alt will make it slower.
 Remember that if you get lost exploring the map,
 simply press HOME to return to the origin of the map (x = 0, y = 0, zoom = 100%).
 
+Press Ctrl+0 to only reset the zoom to 100%.
+
 ## Marks
 
-You can also use Marks feature to remember some important locations in the map:
+Marks let you remember some important locations in the map.
+These are inspired by Vim.
 Whenever you are looking at a location you want to remember:
 
 - Press M to open the Marks dialog in the marking mode.
 - Press another key under which you want to remember (mark) the location.
 
 You have successfully marked a location.
-Later, to return to that location, press ' (apostrophe) to open the Marks dialog again - 
-this time, in the jumping mode:
+Later, to return to that location, press ' (apostrophe) to open the Marks dialog again,
+but this time in the jumping mode:
 
 - Press the key under which the location was remembered.
 
@@ -134,6 +144,9 @@ Press Alt+D (View->Modes) for more information.
 ## Playtesting
 
 You will certainly want to test how your map plays.
-To do so, simply press "i" to begin playing your world.
-
+To do so, press HOME to return to the origin,
+and then press "i" to begin playing your world.
 The currently selected mode will start executing its logic on the map.
+
+If camera is not centered at origin by the time you start the playtest,
+it will not follow your character but stay in the same place instead.

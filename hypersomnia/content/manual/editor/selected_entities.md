@@ -1,7 +1,10 @@
 You have just selected some entities. 
-Press Pause Break to clear the selection and show general help for this view.
+When you are done reading this section,
+press Pause Break to clear the selection and show general help for this view.
 
 The selected entities are highlighted with a bright blue color.
+The editor always draws a white bounding bounding box of all selected entities.
+
 If you don't like the colors, you can tweak them in Editor settings (Esc->Settings->Editor->Appearance).
 
 ## Selection rectangle
@@ -9,8 +12,8 @@ If you don't like the colors, you can tweak them in Editor settings (Esc->Settin
 To select many entities, drag the mouse while holding LMB.
 A selection rectangle should appear. 
 
-By default, the only entities added to selection will be the ones
-on the same render layer as the first entity hit by the rectangle.
+By default, the rectangle will only select entities on the same render layer 
+as the first entity hit by the rectangle.
 
 You can change this behaviour on the fly. 
 In the order of the most general to the most specific:
@@ -34,13 +37,12 @@ You can press Ctrl+A to select all entities according to the current RSM.
 You can add entities to the current selection,
 just like you would files in a file explorer.
 Hold CTRL to add or remove entities from your selection.
-The editor always draws a white bounding bounding box of all selected entities.
 
 For example, to select all the Force and PED grenades (the red and the blue ones), do the following:
 
 - Press Shift + 3 to pick "Flavour" RSM.
 - Navigate with your mouse to the column of grenades laying on the street, just a little below the origin.
-- Select any of the red grenades (watch out, the contents of this window will change once you do this).
+- Select any of the red grenades.
 - Press Ctrl+A - the selection will now contain all entities having the same flavour as the last selected entity.
 - Start holding left CTRL.
 - Select any of the blue grenades.
@@ -50,18 +52,52 @@ Done!
 
 ## Selection groups
 
-For more information, see 
+Selection groups exist so that blobs of conceptually related entities 
+can always be automatically selected together.
 
-## Navigating camera to the selection
+Press Alt+G to open the selection groups dialog. 
+The dialog lists all existing selection groups.
+
+- To group currently selected entities, press Ctrl+G.
+	- A new group named Group-0 should appear in the dialog.
+- To remove currently selected entities from all groups, press Ctrl+U.
+	- If a group has no entities left, it will automatically be deleted.
+
+These invoke actual commands,
+so make sure to save your work after each grouping or ungrouping operation.
+
+In the "Selection groups" dialog, unfold the chosen group node by clicking exactly at the arrow icon.
+There, you can rename the group.
+
+To select all entities belonging to a particular group, click on its name.
+You can also filter existing groups by using the text area at the top of the dialog.
+
+## Operations: View
 
 - Press Z to place the camera exactly at the center of the selection's bounding box.
-- Press Shift+Z to additionally reset zoom.
+	- Press Shift+Z to do the same but to additionally reset zoom.
+- Press H to temporarily hide the layers of all selected entities.
+	- This is very useful if you want to select an entity that is below several other layers 
+	  of unrelated stuff. A good example is if you want to select a sand dune
+	  that is possibly below several fish, a water overlay entity, water caustics entities,
+	  and maybe under some flowers at that.
+- Press Shfit + H to unhide all layers.
 
 ## Operations: Existential
 
 - Press D or DEL to delete the selected entities.
-- Press C to duplicate the selected entities. You will be able to move them right away.
+- Press C to duplicate the selected entities.
+	- You will be able to move them right away.
 - Press Ctrl + Up/Down/Left/Right arrow to mirror the selection in the respective direction.
+	- "Mirroring" here means simply duplicating the selected entities 
+	  and flipping them along the axis specified by the chosen arrow button.
+	  This is greatly useful for creating symmetrical rooms.
+
+	  Note: while positions and rotations of all entities will be properly mirrored,
+	  not all entities will have their sprites flipped.
+	  While it may make sense to flip a sprite of a wall or a floor,
+	  it makes no sense to flip a laying item's sprite.
+	  There are also entities that have no sprites at all, like lights, area markers or wandering pixels.
 
 ## Operations: Transformations 
 

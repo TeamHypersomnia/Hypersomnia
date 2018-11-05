@@ -69,7 +69,7 @@ void editor_tutorial_gui::perform(const editor_setup& setup) {
 
 	augs::path_type chosen_tutorial_path; 
 	
-	const auto chosen_text = [&]() {
+	const auto& chosen_text = [&]() {
 		std::string focused_dialog;
 
 		augs::introspect(
@@ -96,8 +96,12 @@ void editor_tutorial_gui::perform(const editor_setup& setup) {
 		);
 
 		if (!focused_dialog.empty()) {
-			chosen_tutorial_path = make_dialog_manual_path(focused_dialog);
-			return dialog_manuals[focused_dialog];
+			const auto& text = dialog_manuals.at(focused_dialog);
+
+			if (!text.empty()) {
+				chosen_tutorial_path = make_dialog_manual_path(focused_dialog);
+				return text;
+			}
 		}
 
 		const auto chosen_tutorial_type = [&]() {

@@ -8,6 +8,7 @@ This means that you can test your changes very quickly
 The same rules apply when editing normally, with a few differences:
 
 - You can select the character you want to control by selecting it and pressing O.
+	- The currently controlled entity is always highlighted in bright yellow.
 - When you are done testing your changes
 To re-apply your changes, press Ctrl+Enter.
 
