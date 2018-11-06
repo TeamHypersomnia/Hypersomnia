@@ -33,8 +33,8 @@ protected:
 	static constexpr bool is_const = is_handle_const_v<entity_handle_type>;
 	using component_pointer = maybe_const_ptr_t<is_const, component_type>;
 
-	component_pointer component;
-	entity_handle_type handle;
+	const component_pointer component;
+	const entity_handle_type handle;
 
 public:
 	auto& get_raw_component(write_synchronized_component_access) const {
@@ -67,7 +67,7 @@ public:
 
 	synchronizer_base(
 		const component_pointer c, 
-		const entity_handle_type h
+		const entity_handle_type& h
 	) : 
 		component(c), 
 		handle(h)

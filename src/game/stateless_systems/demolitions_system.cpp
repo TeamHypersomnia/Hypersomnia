@@ -25,7 +25,7 @@ void demolitions_system::detonate_fuses(const logic_step step) {
 	const auto& clk = cosm.get_clock();
 
 	cosm.for_each_having<components::hand_fuse>(
-		[&](const auto it) {
+		[&](const auto& it) {
 			const auto fuse_logic = fuse_logic_provider(it, step);
 			fuse_logic.advance_arming_and_defusing();
 
@@ -63,7 +63,6 @@ void demolitions_system::detonate_fuses(const logic_step step) {
 			}
 		}
 	);
-
 }
 
 void demolitions_system::advance_cascade_explosions(const logic_step step) {

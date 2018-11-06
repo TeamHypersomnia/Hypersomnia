@@ -236,8 +236,7 @@ std::optional<transformr> spatial_properties_mixin<E>::find_logic_transform() co
 	*/
 
 	if (const auto connection = handle.find_colliders_connection()) {
-		const auto& cosm = handle.get_cosmos();
-		const auto owner = cosm[connection->owner];
+		const auto owner_id = connection->owner;
 
 		auto calc_transform = [&](const auto& body) {
 			const auto body_transform = body.get_transform();
@@ -255,7 +254,7 @@ std::optional<transformr> spatial_properties_mixin<E>::find_logic_transform() co
 
 		if constexpr(E::is_specific) {
 			if constexpr(E::template has<components::rigid_body>()) {
-				if (owner.get_id() == handle.get_id()) {
+				if (owner_id == handle.get_id()) {
 					if (const auto body = handle.template get<components::rigid_body>();
 						body.is_constructed()
 					) {
@@ -265,7 +264,9 @@ std::optional<transformr> spatial_properties_mixin<E>::find_logic_transform() co
 			}
 		}
 
-		if (const auto body = owner.template get<components::rigid_body>();
+		const auto& cosm = handle.get_cosmos();
+
+		if (const auto body = cosm[owner_id].template get<components::rigid_body>();
 			body.is_constructed()
 		) {
 			return calc_transform(body);

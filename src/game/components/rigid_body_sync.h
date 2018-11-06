@@ -18,7 +18,9 @@ class component_synchronizer<E, components::rigid_body>
 		return handle.get_cosmos().get_solvable_inferred({}).physics.find_rigid_body_cache(handle);
 	}
 
-	auto find_body() const {	
+	const decltype(std::declval<E&>().get_cosmos().get_solvable_inferred({}).physics.find_rigid_body_cache(std::declval<E&>())->body.get()) body_ptr;
+
+	auto find_body_impl() const {	
 		using T = decltype(find_cache()->body.get());
 
 		if (auto cache = find_cache()) {
@@ -26,6 +28,10 @@ class component_synchronizer<E, components::rigid_body>
 		}
 
 		return T(nullptr);
+	}
+
+	auto find_body() const {	
+		return body_ptr;
 	}
 
 	auto body() const {
@@ -53,6 +59,14 @@ class component_synchronizer<E, components::rigid_body>
 public:
 	using base::base;
 	using base::get_raw_component;
+
+	component_synchronizer(
+		const typename base::component_pointer c, 
+		const E& h
+	) : 
+		base(c, h),
+		body_ptr(find_body_impl())
+	{}
 
 	void infer_caches() const;
 	void infer_damping() const;
@@ -173,7 +187,7 @@ bool component_synchronizer<E, components::rigid_body>::test_point(const vec2 v)
 
 template <class E>
 bool component_synchronizer<E, components::rigid_body>::is_constructed() const {
-	return find_cache() != nullptr;
+	return find_body() != nullptr;
 }
 
 template <class E>
