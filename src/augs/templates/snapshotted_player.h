@@ -55,7 +55,7 @@ namespace augs {
 		advance_type advance_mode = advance_type::PAUSED;
 		step_type current_step = 0;
 		snapshots_type snapshots;
-		fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
+		fixed_delta_timer timer = { 30, augs::lag_spike_handling_type::CATCH_UP };
 
 		double speed = 1.0;
 		step_type additional_steps = 0;

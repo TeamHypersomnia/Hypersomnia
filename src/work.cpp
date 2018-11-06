@@ -1263,7 +1263,11 @@ int work(const int argc, const char* const * const argv) try {
 
 			This also advances the audiovisual state, based on the cosmos returned by the setup.
 		*/
-		advance_current_setup(frame_delta, result);
+
+		{
+			auto scope = measure_scope(frame_performance.advance_setup);
+			advance_current_setup(frame_delta, result);
+		}
 		
 		/*
 			Game GUI might have been altered by the step's post-solve,

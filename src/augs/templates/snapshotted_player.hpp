@@ -125,7 +125,7 @@ namespace augs {
 
 		PLR_LOG("Seeking from %x to %x", current_step, seeked_step);
 
-		const auto seeked_adj_snapshot = *std::prev(snapshots.upper_bound(seeked_step)); 
+		const auto& seeked_adj_snapshot = *std::prev(snapshots.upper_bound(seeked_step)); 
 		const auto step_of_adj_snapshot = seeked_adj_snapshot.first;
 	   
 		auto seek_to_snapshot = [&]() {
@@ -182,7 +182,7 @@ namespace augs {
 					return false;
 				}
 
-				const auto it = *std::prev(snapshots.upper_bound(current_step));
+				const auto& it = *std::prev(snapshots.upper_bound(current_step));
 
 				const auto since_last = current_step - it.first;
 				return since_last >= interval_in_steps;
@@ -265,6 +265,8 @@ namespace augs {
 
 		if (!is_paused()) {
 			timer.advance(frame_delta *= speed);
+			timer.max_steps_to_perform_at_once = 30;
+			timer.mode = lag_spike_handling_type::CATCH_UP;
 			steps += timer.extract_num_of_logic_steps(fixed_delta);
 		}
 

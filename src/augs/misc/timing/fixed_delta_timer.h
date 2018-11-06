@@ -10,10 +10,10 @@ namespace augs {
 	class fixed_delta_timer {
 		double accumulator_secs = 0.0;
 		
+	public:
 		unsigned max_steps_to_perform_at_once = 5;
 		lag_spike_handling_type mode = lag_spike_handling_type::DISCARD;
 
-	public:
 		fixed_delta_timer() = default;
 		 
 		fixed_delta_timer(

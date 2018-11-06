@@ -20,6 +20,7 @@ struct frame_profiler : public augs::profiler_mixin<frame_profiler> {
 	augs::time_measurements light_visibility;
 	augs::time_measurements light_rendering;
 	augs::time_measurements particles_rendering;
+	augs::time_measurements advance_setup;
 
 	augs::time_measurements camera_visibility_query;
 	augs::amount_measurements<std::size_t> num_drawn_lights = 1;
