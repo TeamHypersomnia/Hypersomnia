@@ -25,6 +25,10 @@ struct editor_history : public editor_history_base {
 	using introspect_base = editor_history_base;
 	using editor_history_base::editor_history_base;
 
+	// GEN INTROSPECTOR struct editor_history
+	augs::date_time when_created;
+	// END GEN INTROSPECTOR
+
 	template <class T>
 	const T& execute_new(T&& command, editor_command_input);
 

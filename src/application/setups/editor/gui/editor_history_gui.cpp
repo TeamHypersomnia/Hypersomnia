@@ -150,7 +150,7 @@ void editor_history_gui::perform(const editor_command_input in) {
 
 		const auto first_command = first_command_dummy {
 			playtesting,
-			{ false, in.folder.view.meta.timestamp, 0 }
+			{ false, history.when_created, 0 }
 		};
 
 		do_history_node(-1, first_command, false);

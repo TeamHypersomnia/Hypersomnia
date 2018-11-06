@@ -17,12 +17,6 @@
 #include "application/setups/editor/gui/editor_rect_select_type.h"
 #include "application/setups/editor/editor_marks.h"
 
-struct editor_folder_meta {
-	// GEN INTROSPECTOR struct editor_folder_meta
-	augs::date_time timestamp;
-	// END GEN INTROSPECTOR
-};
-
 using current_selections_type = std::unordered_set<entity_id>;
 
 struct editor_view_ids {
@@ -43,7 +37,6 @@ struct editor_view_ids {
 
 struct editor_view {
 	// GEN INTROSPECTOR struct editor_view
-	editor_folder_meta meta;
 	snapping_grid grid;
 	bool show_grid = true;
 	bool snapping_enabled = true;
