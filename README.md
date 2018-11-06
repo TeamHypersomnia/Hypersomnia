@@ -9,8 +9,8 @@ Latest **Linux** binaries: (in progress)
 - [Hypersomnia](#hypersomnia)
 - [Gallery](#gallery)
 - [How to build](#how-to-build)
-  - [Windows](#windows)
-  - [Linux](#linux)
+  - [Windows instructions](#windows-instructions)
+  - [Linux instructions](#linux-instructions)
     - [Dependencies](#dependencies)
     - [One-shot launch](#one-shot-launch)
     - [Detailed instructions](#detailed-instructions)
@@ -82,7 +82,16 @@ The ``--recurse-submodules`` is necessary to clone the submodules as well.
 Once repository finishes downloading, create a ```build/``` folder next to ```CMakeLists.txt``` file.  
 Next steps depend on the platform you are on.
 
-## Windows
+On all platforms, you can choose among three building configurations:
+
+- ``Debug`` - the fastest to build and provides debug information.   
+	Recommended for normal development.
+- ``Release`` - takes AWFULLY long to build because of link-time optimizations.  
+	No debug information. Use only for production builds. Specifies ``IS_PRODUCTION_BUILD=1`` C++ preprocessor define.
+- ``RelWithDebInfo`` - Same as ``Release`` but with debug info and without link-time optimizations.  
+	Preferred choice for quickly testing how the game's mechanics play at normal speed, and also for debugging performance problems.
+
+## Windows instructions
 
 Prerequisites:
 - **Visual Studio 2017 Preview** (Community) or newer.
@@ -99,7 +108,7 @@ cmake -G Ninja -DCMAKE_C_COMPILER=clang-cl -DCMAKE_CXX_COMPILER=clang-cl -DCMAKE
 ninja
 ```
 
-Note: the path to vcvarsall in the first line may differ if you're using a version of Visual Studio that is not **Visual Studio 2017 Preview Community**.
+Note: the path to ``vcvarsall.bat`` in the first line may differ if you're using a version of Visual Studio that is not **Visual Studio 2017 Preview Community**.
 
 Note: your computer **might start lagging heavily** for the duration of the build as ``ninja`` will use all available cores for compilation.
 
@@ -124,7 +133,7 @@ Open ```Hypersomnia.sln``` file, select **Release** configuration and hit **F7**
 
 If, for some reason, some step fails, refer to the latest working Appveyor build and the relevant ```appveyor.yml``` file.
 
-## Linux
+## Linux instructions
 
 Current platforms are actively tested and supported:
 - Arch Linux with i3 window manager
@@ -217,7 +226,7 @@ Use your favorite shell to enter the repository's directory.
 Then run:
 
 ```
-cmake/build.sh [Debug|Release|RelWithDebInfo|MinSizeRel] [x86|x64] ["ADDITIONAL CMAKE FLAGS"]
+cmake/build.sh [Debug|Release|RelWithDebInfo] [x86|x64] ["ADDITIONAL CMAKE FLAGS"]
 ```
 For example:
 
