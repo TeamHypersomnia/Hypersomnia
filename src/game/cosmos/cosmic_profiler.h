@@ -14,6 +14,7 @@ struct cosmic_profiler : public augs::profiler_mixin<cosmic_profiler> {
 	augs::amount_measurements<std::size_t> entropy_length = 1;
 
 	augs::time_measurements logic;
+	augs::time_measurements missiles;
 	augs::time_measurements rendering;
 	augs::time_measurements camera_query;
 	augs::time_measurements gui;
@@ -26,6 +27,7 @@ struct cosmic_profiler : public augs::profiler_mixin<cosmic_profiler> {
 	augs::time_measurements pathfinding;
 	augs::time_measurements movement_paths;
 	augs::time_measurements stateful_animations;
+	augs::time_measurements sentiences;
 
 	augs::time_measurements deserialization_pass = 1;
 

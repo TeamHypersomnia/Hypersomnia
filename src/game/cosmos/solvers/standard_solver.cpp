@@ -103,24 +103,33 @@ void standard_solve(const logic_step step) {
 		listener.during_step = false;
 	}
 
+	physics_system().post_and_clear_accumulated_collision_messages(step);
+
 	trace_system().lengthen_sprites_of_traces(step);
 
 	crosshair_system().integrate_crosshair_recoils(step);
 
 	item_system().pick_up_touching_items(step);
 
-	missile_system().ricochet_missiles(step);
-	missile_system().detonate_colliding_missiles(step);
-	missile_system().detonate_expired_missiles(step);
+	{
+		auto scope = measure_scope(performance.missiles);
+
+		missile_system().ricochet_missiles(step);
+		missile_system().detonate_colliding_missiles(step);
+		missile_system().detonate_expired_missiles(step);
+	}
 
 	destruction_system().generate_damages_from_forceful_collisions(step);
 	destruction_system().apply_damages_and_split_fixtures(step);
 
-	sentience_system().process_special_results_of_health_events(step);
-	sentience_system().regenerate_values_and_advance_spell_logic(step);
-	sentience_system().apply_damage_and_generate_health_events(step);
-	physics_system().post_and_clear_accumulated_collision_messages(step);
-	sentience_system().cooldown_aimpunches(step);
+	{
+		auto scope = measure_scope(performance.sentiences);
+
+		sentience_system().process_special_results_of_health_events(step);
+		sentience_system().regenerate_values_and_advance_spell_logic(step);
+		sentience_system().apply_damage_and_generate_health_events(step);
+		sentience_system().cooldown_aimpunches(step);
+	}
 
 	driver_system().release_drivers_due_to_requests(step);
 	driver_system().assign_drivers_who_touch_wheels(step);
