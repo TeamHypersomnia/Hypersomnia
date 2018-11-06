@@ -157,7 +157,9 @@ void instantiate_flavour_command::redo(const editor_command_input in) {
 					}
 				); 
 
-				selections = { created_entity.get_id() };
+				created_id = created_entity.get_id();
+
+				selections = { created_id };
 			}
 			catch (const entity_creation_error&) {
 				selections = {};
@@ -171,6 +173,10 @@ void instantiate_flavour_command::undo(const editor_command_input in) {
 	auto& cosm = work.world;
 
 	in.clear_dead_entity(created_id);
-	cosmic::undo_last_create_entity(cosm[created_id]);
+
+	if (const auto handle = cosm[created_id]) {
+		cosmic::undo_last_create_entity(cosm[created_id]);
+	}
+
 	created_id = {};
 }

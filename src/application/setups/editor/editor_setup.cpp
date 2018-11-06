@@ -26,6 +26,8 @@
 #include "augs/gui/text/printer.h"
 #include "application/setups/editor/editor_selection_groups.hpp"
 
+#include "game/detail/weapon_like.h"
+
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/lua_file.h"
 
@@ -603,11 +605,15 @@ void editor_setup::perform_custom_imgui(
 				instantiate_flavour_command cmd;
 				cmd.instantiated_id = *id;
 				cmd.where.pos = *find_world_cursor_pos();
-				const auto& executed = post_editor_command(make_command_input(), std::move(cmd));
-				const auto created_id = executed.get_created_id();
-				view_ids().selected_entities = { created_id };
-				mover.start_moving_selection(make_mover_input());
-				make_last_command_a_child();
+				const auto cmd_in = make_command_input();
+				const auto& executed = post_editor_command(cmd_in, std::move(cmd));
+
+				auto& cosm = work().world;
+
+				if (const auto created = cosm[executed.get_created_id()]) {
+					mover.start_moving_selection(make_mover_input());
+					make_last_command_a_child();
+				}
 			}
 		}
 
@@ -1316,7 +1322,6 @@ bool editor_setup::handle_input_before_game(
 					case key::O: override_viewed_entity({}); view().reset_panning(); return true;
 					case key::R: mover.rotate_selection_once_by(make_mover_input(), 90); return true;
 					case key::E: mover.start_resizing_selection(make_mover_input(), true); return true;
-					case key::H: unhide_all_layers(); reperform_selector(); return true;
 
 					case key::_1: view().rect_select_mode = editor_rect_select_type::EVERYTHING; return true;
 					case key::_2: view().rect_select_mode = editor_rect_select_type::SAME_LAYER; return true;
@@ -1352,6 +1357,7 @@ bool editor_setup::handle_input_before_game(
 					case key::ADD: player().request_steps(1); return true;
 					case key::SUBTRACT: player().seek_backward(1, make_command_input()); return true;
 					case key::H: hide_layers_of_selected_entities(); reperform_selector(); return true;
+					case key::U: unhide_all_layers(); reperform_selector(); return true;
 					case key::SLASH: go_to_entity(); return true;
 					case key::PAUSE: make_command_input().purge_selections(); return true;
 					default: break;

@@ -81,7 +81,7 @@ You can also filter existing groups by using the text area at the top of the dia
 	  of unrelated stuff. A good example is if you want to select a sand dune
 	  that is possibly below several fish, a water overlay entity, water caustics entities,
 	  and maybe under some flowers at that.
-- Press Shfit + H to unhide all layers.
+- Press U to unhide all layers.
 
 ## Operations: Existential
 
