@@ -15,6 +15,7 @@ struct cosmic_profiler : public augs::profiler_mixin<cosmic_profiler> {
 
 	augs::time_measurements logic;
 	augs::time_measurements missiles;
+	augs::time_measurements explosives;
 	augs::time_measurements rendering;
 	augs::time_measurements camera_query;
 	augs::time_measurements gui;

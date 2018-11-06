@@ -211,7 +211,7 @@ template <class E>
 transformr spatial_properties_mixin<E>::get_logic_transform() const {
 	const auto t = find_logic_transform();
 	ensure(t.has_value());
-	return *find_logic_transform();
+	return *t;
 }
 
 template <class E>

@@ -176,7 +176,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 			if (shake_amount > 0.f) {
 				const auto shake_mult = shake_amount * shake_amount * sentience.shake.mult;
 
-				auto rng = cosm.get_rng_for(subject);
+				auto& rng = step.step_rng;
 				impulse_input in;
 
 				in.linear = shake_mult * rng.template random_point_in_unit_circle<real32>();
