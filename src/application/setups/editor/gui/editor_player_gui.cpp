@@ -100,19 +100,19 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 		auto& opts = player.cosmic_recording_options;
 
 		if (checkbox("Overwrite intents", opts.overwrite_intents)) {
-			player.set_dirty();
+			//player.set_dirty();
 		}
 
 		if (checkbox("Overwrite motions", opts.overwrite_motions)) {
-			player.set_dirty();
+			//player.set_dirty();
 		}
 
 		if (checkbox("Overwrite mode commands", player.mode_recording_options.overwrite)) {
-			player.set_dirty();
+			//player.set_dirty();
 		}
 
 		if (checkbox("Overwrite rest", opts.overwrite_rest)) {
-			player.set_dirty();
+			//player.set_dirty();
 		}
 	}
 }

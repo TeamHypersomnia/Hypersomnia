@@ -31,18 +31,23 @@ bool editor_folder::is_untitled() const {
 	return is_untitled_path(current_path);
 }
 
-void editor_folder::save_folder() const {
-	save_folder(current_path);
+void editor_folder::save_folder(const editor_save_type mode) const {
+	save_folder(current_path, mode);
 }
 
-void editor_folder::save_folder(const augs::path_type& to) const {
-	save_folder(to, ::get_project_name(to));
+void editor_folder::save_folder(const augs::path_type& to, const editor_save_type mode) const {
+	save_folder(to, ::get_project_name(to), mode);
 }
 
-void editor_folder::save_folder(const augs::path_type& to, const augs::path_type name) const {
+void editor_folder::save_folder(const augs::path_type& to, const augs::path_type name, const editor_save_type mode) const {
 	const auto paths = editor_paths(to, name);
 
 	augs::create_directories_for(paths.int_file);
+
+	if (mode == editor_save_type::ONLY_VIEW) {
+		augs::save_as_bytes(view, paths.view_file);
+		return;
+	}
 
 	/* For convenience, create subdirectories for content */
 
@@ -163,8 +168,8 @@ std::optional<editor_warning> editor_folder::open_most_relevant_content(sol::sta
 			const auto target_step = player.get_current_step();
 
 			player.pause();
-			player.seek_to(target_step - 1, cmd_in);
-			player.seek_to(target_step, cmd_in);
+			player.seek_to(target_step - 1, cmd_in, false);
+			player.seek_to(target_step, cmd_in, false);
 		}
 	};
 
@@ -203,9 +208,11 @@ augs::path_type editor_folder::get_autosave_path() const {
 }
 
 bool editor_folder::should_autosave() const {
+#if 0
 	if (player.has_testing_started()) {
 		return player.dirty;
 	}
+#endif
 
 	return player.dirty || history.at_unsaved_revision() || history.was_modified();
 }
@@ -225,6 +232,10 @@ void editor_folder::autosave_if_needed() const {
 				so there's no reason to try to communicate failure here.
 			*/
 		}
+	}
+	else {
+		/* Always implicitly save at least the view information */
+		save_folder(editor_save_type::ONLY_VIEW);
 	}
 }
 

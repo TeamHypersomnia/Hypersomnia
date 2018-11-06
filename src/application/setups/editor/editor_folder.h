@@ -22,6 +22,11 @@ namespace sol {
 struct editor_recent_paths;
 struct editor_paths;
 
+enum class editor_save_type {
+	EVERYTHING,
+	ONLY_VIEW
+};
+
 struct editor_folder {
 	editor_folder(const augs::path_type& p = {});
 
@@ -40,7 +45,7 @@ struct editor_folder {
 
 	bool is_untitled() const;
 
-	void save_folder() const;
+	void save_folder(editor_save_type = editor_save_type::EVERYTHING) const;
 	void export_folder(sol::state& lua, const augs::path_type& to) const;
 
 	std::optional<editor_warning> open_most_relevant_content(sol::state& lua);
@@ -63,8 +68,8 @@ private:
 	void load_folder(const augs::path_type& from);
 	void load_folder(const augs::path_type& from, const augs::path_type& name);
 
-	void save_folder(const augs::path_type& to) const;
-	void save_folder(const augs::path_type& to, const augs::path_type name) const;
+	void save_folder(const augs::path_type& to, editor_save_type = editor_save_type::EVERYTHING) const;
+	void save_folder(const augs::path_type& to, const augs::path_type name, editor_save_type = editor_save_type::EVERYTHING) const;
 
 	bool should_autosave() const;
 	augs::path_type get_autosave_path() const;

@@ -84,7 +84,10 @@ void editor_player::finish_testing(const editor_command_input in, const finish_t
 
 	base::finish();
 
-	set_dirty();
+	dirty = false;
+
+	/* Forces autosave in the case that we returned to a saved revision */
+	f.history.set_modified_flag();
 
 	if (mode == finish_testing_type::DISCARD_CHANGES) {
 
