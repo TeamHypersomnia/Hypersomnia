@@ -49,83 +49,85 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 	auto& folder = cmd_in.folder;
 	auto& player = folder.player;
 
-	player.on_mode_with_input(
-		folder.commanded->mode_vars.vars,
-		folder.commanded->work.world,
-		[&](auto& typed_mode, const auto& mode_input) {
-			auto node = scoped_tree_node("Current mode");
+	if (player.has_testing_started()) {
+		player.on_mode_with_input(
+			folder.commanded->mode_vars.vars,
+			folder.commanded->work.world,
+			[&](auto& typed_mode, const auto& mode_input) {
+				auto node = scoped_tree_node("Current mode");
 
-			next_columns(2);
+				next_columns(2);
 
-			if (node) {
-				using M = remove_cref<decltype(typed_mode)>;
+				if (node) {
+					using M = remove_cref<decltype(typed_mode)>;
 
-				auto& work = cmd_in.folder.commanded->work;
-				auto& cosm = work.world;
+					auto& work = cmd_in.folder.commanded->work;
+					auto& cosm = work.world;
 
-				const auto in = commanding_property_editor_input {
-					{ settings.property_editor, property_editor_data }, { cmd_in }
-				};
+					const auto in = commanding_property_editor_input {
+						{ settings.property_editor, property_editor_data }, { cmd_in }
+					};
 
-				if constexpr(std::is_same_v<M, test_scene_mode>) {
-					(void)mode_input;
-				}
-				else {
-					if (ImGui::Button("Add player")) {
-						typed_mode.auto_assign_faction(mode_input, typed_mode.add_player(mode_input, nickname));
+					if constexpr(std::is_same_v<M, test_scene_mode>) {
+						(void)mode_input;
 					}
+					else {
+						if (ImGui::Button("Add player")) {
+							typed_mode.auto_assign_faction(mode_input, typed_mode.add_player(mode_input, nickname));
+						}
 
-					ImGui::SameLine();
+						ImGui::SameLine();
 
-					if (ImGui::Button("Add spectator")) {
-						typed_mode.add_player(mode_input, nickname);
-					}
+						if (ImGui::Button("Add spectator")) {
+							typed_mode.add_player(mode_input, nickname);
+						}
 
-					ImGui::SameLine();
+						ImGui::SameLine();
 
-					input_text<256>("Nickname", nickname);
+						input_text<256>("Nickname", nickname);
 
-					if (ImGui::Button("Restart")) {
-						typed_mode.request_restart();
-					}
+						if (ImGui::Button("Restart")) {
+							typed_mode.request_restart();
+						}
 
-					const auto players_node_label = "Players";
-					auto players_node = scoped_tree_node(players_node_label);
+						const auto players_node_label = "Players";
+						auto players_node = scoped_tree_node(players_node_label);
 
-					if (players_node) {
-						for (const auto& p : typed_mode.players) {
-							const auto this_player_label = typesafe_sprintf("%x (id: %x)", p.second.chosen_name, p.first.value);
+						if (players_node) {
+							for (const auto& p : typed_mode.players) {
+								const auto this_player_label = typesafe_sprintf("%x (id: %x)", p.second.chosen_name, p.first.value);
 
-							if (const auto this_player_node = scoped_tree_node(this_player_label.c_str())) {
-								const auto player_handle = cosm[p.second.guid];
-								const auto character_name = player_handle.alive() ? player_handle.get_name() : "dead";
-								text(typesafe_sprintf("Corresponding character name: %x", character_name));
+								if (const auto this_player_node = scoped_tree_node(this_player_label.c_str())) {
+									const auto player_handle = cosm[p.second.guid];
+									const auto character_name = player_handle.alive() ? player_handle.get_name() : "dead";
+									text(typesafe_sprintf("Corresponding character name: %x", character_name));
 
-								singular_edit_properties(
-									in,
-									p.second,
-									this_player_label,
-									change_current_mode_property_command()
-								);
+									singular_edit_properties(
+										in,
+										p.second,
+										this_player_label,
+										change_current_mode_property_command()
+									);
+								}
 							}
 						}
 					}
+
+					singular_edit_properties(
+						in,
+						typed_mode,
+						" (Current mode)",
+						change_current_mode_property_command(),
+						special_widgets(
+							flavour_widget { cosm }
+						)
+					);
 				}
-
-				singular_edit_properties(
-					in,
-					typed_mode,
-					" (Current mode)",
-					change_current_mode_property_command(),
-					special_widgets(
-						flavour_widget { cosm }
-					)
-				);
 			}
-		}
-	);
+		);
 
-	ImGui::Separator();
+		ImGui::Separator();
+	}
 
 	auto& all_vars = folder.commanded->mode_vars;
 

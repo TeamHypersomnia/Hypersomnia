@@ -11,15 +11,6 @@
 #include "augs/templates/introspect_declaration.h"
 
 namespace augs {
-	/*
-		Simple introspection with just one level of depth.
-		Will invoke a callback upon every top-level field of a struct,
-		and also on all fields of base classes specified with either of these two:
-
-			using introspect_base = ...;
-			using introspect_bases = type_list<...>;
-	*/
-
 	template <class F, class Instance, class... Instances>
 	void introspect_body(
 		F&& callback,
@@ -34,6 +25,15 @@ namespace augs {
 			std::forward<F>(callback), t, tn...
 		);
 	}
+
+	/*
+		Simple introspection with just one level of depth.
+		Will invoke a callback upon every top-level field of a struct,
+		and also on all fields of base classes specified with either of these two:
+
+		using introspect_base = ...;
+		using introspect_bases = type_list<...>;
+	*/
 
 	template <class F, class Instance, class... Instances>
 	void introspect(

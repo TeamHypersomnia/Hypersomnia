@@ -1768,6 +1768,10 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 				|| try_preffix("Written", green)
 				|| try_preffix("Saved", green)
 				|| try_preffix("Altered", yellow)
+				|| try_preffix("Set", yellow)
+				|| try_preffix("Moved", yellow)
+				|| try_preffix("Rotated", yellow)
+				|| try_preffix("Resized", yellow)
 				|| try_preffix("Renamed", yellow)
 				|| try_preffix("Changed", yellow)
 				|| try_preffix("Created", green)
@@ -1810,7 +1814,7 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 				);
 			};
 
-			message_text = colored(typesafe_sprintf("#%x: ", 1 + h.get_current_revision())) + [&]() {
+			const auto description = [&]() {
 				if (op.type == O::UNDO) {
 					if (h.has_next_command()) {
 						const auto preffix = colored("Undid ", orange);
@@ -1836,8 +1840,12 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 
 				}
 
-				return colored("");
+				return colored("Unknown op type");
 			}();
+
+			if (description.size() > 0) {
+				message_text = colored(typesafe_sprintf("#%x: ", 1 + h.get_current_revision())) + description;
+			}
 		}
 		else {
 			message_text = make_colorized(recent_message.content);

@@ -154,6 +154,9 @@ void editor_entity_mover::reset_rotation(const input_type in) {
 	auto& s = in.setup;
 
 	if (s.anything_opened()) {
+		const bool reinvoke_positional_moving = current_mover_pos_delta(in) != nullptr;
+		const bool reinvoke_rotational_moving = current_mover_rot_delta(in) != nullptr;
+
 		s.finish_rectangular_selection();
 
 		auto command = s.make_command_from_selections<move_entities_command>(
@@ -166,6 +169,14 @@ void editor_entity_mover::reset_rotation(const input_type in) {
 		if (!command.empty()) {
 			command.special = special_move_operation::RESET_ROTATION;
 			s.folder().history.execute_new(std::move(command), s.make_command_input());
+		}
+
+		if (reinvoke_positional_moving) {
+			start_moving_selection(in);
+		}
+
+		if (reinvoke_rotational_moving) {
+			start_rotating_selection(in);
 		}
 	}
 }

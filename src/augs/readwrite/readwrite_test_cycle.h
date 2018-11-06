@@ -10,6 +10,38 @@ const auto test_file_path = GENERATED_FILES_DIR "/test_byte_readwrite.bin";
 const auto test_lua_file_path = GENERATED_FILES_DIR "/test_lua_readwrite.lua";
 
 namespace detail {
+	struct dummy_A {
+		// GEN INTROSPECTOR struct detail::A
+		int a = 1;
+		// END GEN INTROSPECTOR
+
+		bool operator==(const dummy_A& r) const {
+			return a == r.a;
+		}
+	};
+
+	struct dummy_B : dummy_A {
+		using introspect_base = dummy_A;
+		// GEN INTROSPECTOR struct detail::B
+		std::optional<int> b;
+		// END GEN INTROSPECTOR
+
+		bool operator==(const dummy_B& r) const {
+			return b == r.b && dummy_A::operator==(r);
+		}
+	};
+
+	struct dummy_C : dummy_B {
+		using introspect_base = dummy_B;
+		// GEN INTROSPECTOR struct detail::C
+		int c = 3;
+		// END GEN INTROSPECTOR
+
+		bool operator==(const dummy_C& r) const {
+			return c == r.c && dummy_B::operator==(r);
+		}
+	};
+
 	enum class dummy_enum {
 		// GEN INTROSPECTOR enum class detail::dummy_enum
 		INVALID,
@@ -24,7 +56,7 @@ namespace detail {
 
 template <class T>
 void report(const T& v, const T& reloaded) {
-	if constexpr(!augs::is_pool_v<T>) {
+	if constexpr(!std::is_base_of_v<detail::dummy_A, T> && !augs::is_pool_v<T>) {
 		LOG("Original %x\nReloaded: %x", v, reloaded);
 	}
 }

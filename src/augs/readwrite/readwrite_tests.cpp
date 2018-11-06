@@ -33,6 +33,16 @@ TEST_CASE("Filesystem test") {
 TEST_CASE("Byte readwrite Sanity check") {
 	using T = std::variant<double, std::string, std::unordered_map<int, double>, std::optional<std::string>>;
 
+	{
+		detail::dummy_C a, b;
+		REQUIRE(a == b);
+		REQUIRE(detail::dummy_A() == detail::dummy_A());
+		REQUIRE(detail::dummy_C() == detail::dummy_C());
+
+		detail::dummy_B c, d;
+		REQUIRE(c == d);
+	}
+
 	T a, b;
 	REQUIRE(a == b);
 
@@ -66,6 +76,31 @@ TEST_CASE("Byte readwrite Sanity check") {
 	REQUIRE(arr() == arr());
 }
 
+TEST_CASE("Byte readwrite Custom structs") {
+	detail::dummy_A a;
+	detail::dummy_B b;
+	detail::dummy_C c;
+
+	readwrite_test_cycle(a);
+	readwrite_test_cycle(b);
+	readwrite_test_cycle(c);
+
+	a.a = 34;
+	b.a = 5890;
+	c.a = 543;
+
+	readwrite_test_cycle(a);
+	readwrite_test_cycle(b);
+	readwrite_test_cycle(c);
+
+	a.a = 324;
+	b.b = 590;
+	c.c = 548;
+
+	readwrite_test_cycle(a);
+	readwrite_test_cycle(b);
+	readwrite_test_cycle(c);
+}
 TEST_CASE("Byte readwrite Trivial types") {
 	int a = 2;
 	double b = 512.0;

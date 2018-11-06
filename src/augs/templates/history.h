@@ -141,7 +141,7 @@ namespace augs {
 	private:
 		friend augs::introspection_access;
 
-		// GEN INTROSPECTOR class history_with_marks class... CommandTypes
+		// GEN INTROSPECTOR class augs::history_with_marks class... CommandTypes
 		std::optional<index_type> saved_at_revision;
 		bool modified_since_save = false;
 		// END GEN INTROSPECTOR
@@ -165,6 +165,10 @@ namespace augs {
 		void mark_as_just_saved() {
 			modified_since_save = false;
 			saved_at_revision = get_current_revision();
+		}
+
+		auto find_revision_saved_at() const {
+			return saved_at_revision;
 		}
 
 		bool is_revision_saved(const index_type candidate) const {

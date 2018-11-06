@@ -5,6 +5,9 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- Watch out to always properly name the introspectors for types that specify introspect_base.
+	- Our history with marks would silently not get introspected because of such error.
+
 - Make field address has first checked if the type is trivally copyable.
 	- It resulted in containers being always passed, element_index having never been considered.
 

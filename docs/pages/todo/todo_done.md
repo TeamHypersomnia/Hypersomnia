@@ -2184,3 +2184,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 	- Only when there is no weapon allow holster, e.g. when this is the only weapon
 
+- research building with clang on windows?
+

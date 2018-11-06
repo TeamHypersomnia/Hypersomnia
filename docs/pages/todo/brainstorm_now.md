@@ -7,6 +7,9 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - Usability fixes to editor 
+	- Flipping of editor selection
+		- Shift+V, Shift+H
+	- Setting specific names to entities
 	- Disallow flavour instantation when there is no image specified
 	- Test gameplay when there is no flavour, basically when the workspace is empty
 
@@ -66,8 +69,6 @@ summary: That which we are brainstorming at the moment.
 	- A melee attack cannot be interrupted, except for solid obstacles and when a collision of two attacks occurs
 	- Attack collisions
 		- When hurt triggers of two or more players touch, they are pushed away opposite to their facing
-
-- Flipping of editor selection
 
 - Easily spawn loaded weapons or magazines
 	- For now, let instantation load them all by default

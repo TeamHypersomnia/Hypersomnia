@@ -11,7 +11,7 @@ summary: Just a hidden scratchpad.
 	- no need for for-eaches
 	- nice exercise for iterators
 
-- Allow choosing the flavour of the character
+- When joining a game, allow choosing the flavour of the character
 	- Each might have completely different properties or animations
 	- Effectively implements a class
 
@@ -36,7 +36,7 @@ summary: Just a hidden scratchpad.
 
 - Overwrite notice in editor
 
-- conditional log macro
+- Refactor: conditional log macro
 
 - Always initialize the hotbar with some values if it is not yet initialized
 
@@ -48,8 +48,6 @@ summary: Just a hidden scratchpad.
 
 - Balance colliding bullets so that damage to be dealt is subtracted from the stronger bullet
 	- Possibly reduce trace size then
-
-- research building with clang on windows?
 
 - Local setup should record session live
 	- This is really important in the face of bugs.

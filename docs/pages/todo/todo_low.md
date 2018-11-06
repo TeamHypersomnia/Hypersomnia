@@ -69,9 +69,6 @@ permalink: todo_low
 - Implement ctrl+tab for settings window
 	- shortcuts for first letter shall always focus relevant window
 
-- add dialog asking if we want to leave changes?
-	- for now we overwrite
-
 - Later, bullet trace sounds should be calculated statelessly
 
 - Resurrect the unit tests for padding that were deleted along with cosmic delta
@@ -121,7 +118,6 @@ permalink: todo_low
 - Ctrl+Home should center on the whole scene
 
 - settable_as_mixin should have push_bind and pop_bind?
-
 
 - Selection tabs
 	- Generalize editor_tab_gui to be also able to handle the selection tabs window
