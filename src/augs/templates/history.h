@@ -88,6 +88,10 @@ namespace augs {
 			return static_cast<index_type>(-1);
 		}
 
+		bool on_first_revision() const {
+			return get_current_revision() == get_first_revision();
+		}
+
 		auto get_last_revision() const {
 			return static_cast<index_type>(commands.size()) - 1;
 		}

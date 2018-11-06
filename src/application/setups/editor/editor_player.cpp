@@ -140,7 +140,13 @@ void editor_player::initialize_testing(editor_folder& f) {
 }
 
 void editor_player::begin_recording(editor_folder& f) {
+	auto& h = f.history;
+
 	if (!has_testing_started()) {
+		if (h.on_first_revision()) {
+			return;
+		}
+
 		initialize_testing(f);
 	}
 
@@ -155,13 +161,18 @@ void editor_player::begin_recording(editor_folder& f) {
 
 	base::begin_recording();
 
-	auto& h = f.history;
 	h.discard_later_revisions();
 	set_dirty();
 }
 
 void editor_player::begin_replaying(editor_folder& f) {
+	auto& h = f.history;
+
 	if (!has_testing_started()) {
+		if (h.on_first_revision()) {
+			return;
+		}
+
 		initialize_testing(f);
 	}
 

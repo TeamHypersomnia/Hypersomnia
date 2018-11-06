@@ -10,8 +10,6 @@ summary: That which we are brainstorming at the moment.
 	- Flipping of editor selection
 		- Shift+V, Shift+H
 	- Setting specific names to entities
-	- Disallow flavour instantation when there is no image specified
-	- Test gameplay when there is no flavour, basically when the workspace is empty
 
 - Then the direct attachment offset must calculate the offsets, I guess.
 

@@ -2186,3 +2186,4 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - research building with clang on windows?
 
+	- Disallow flavour instantation when there is no image specified

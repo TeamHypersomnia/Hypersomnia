@@ -341,3 +341,5 @@ summary: Just a hidden scratchpad.
 				- actually this doesnt concern us because we are redoing, not undoing
 					- so we only need be concerned about input values for redo
 			- leading to chaos?
+
+	- Test gameplay when there is no flavour, basically when the workspace is empty
