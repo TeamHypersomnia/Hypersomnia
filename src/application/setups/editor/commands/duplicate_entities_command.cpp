@@ -112,27 +112,25 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 	if (does_mirroring) {
 		auto duplicate_with_flip = [&](auto calc_mirror_offset, const bool hori, const bool vert) {
 			duplicate([&](const auto typed_handle) {
-				if (const auto source_transform = typed_handle.find_logic_transform()) {
-					if (typed_handle.has_independent_transform()) {
-						{
-							const auto source_transform = typed_handle.get_logic_transform();
-							const auto new_rotation = vec2::from_degrees(source_transform.rotation).neg_y().degrees();
+				if (const auto ir = typed_handle.find_independent_transform()) {
+					{
+						const auto source_transform = *ir;
+						const auto new_rotation = vec2::from_degrees(source_transform.rotation).neg_y().degrees();
 
-							const auto mirror_offset = calc_mirror_offset(
-								source_transform.pos, 
-								typed_handle.find_aabb()
-							);
+						const auto mirror_offset = calc_mirror_offset(
+							source_transform.pos, 
+							typed_handle.find_aabb()
+						);
 
-							auto mirrored_transform = transformr(mirror_offset + source_transform.pos, new_rotation);
-							fix_pixel_imperfections(mirrored_transform);
-							typed_handle.set_logic_transform(mirrored_transform);
-						}
-
-						flip_flags f;
-						f.horizontally = hori;
-						f.vertically = vert;
-						typed_handle.do_flip(f);
+						auto mirrored_transform = transformr(mirror_offset + source_transform.pos, new_rotation);
+						fix_pixel_imperfections(mirrored_transform);
+						typed_handle.set_logic_transform(mirrored_transform);
 					}
+
+					flip_flags f;
+					f.horizontally = hori;
+					f.vertically = vert;
+					typed_handle.do_flip(f);
 				}
 			});
 		};

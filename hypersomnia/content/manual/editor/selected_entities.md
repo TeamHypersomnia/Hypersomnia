@@ -101,12 +101,15 @@ You can also filter existing groups by using the text area at the top of the dia
 
 ## Operations: Transformations 
 
-- Press E to start resizing the selected entities along a single axis closest to the cursor.
-- Press Shift + E to start resizing the selected entities along two axes closest to the cursor.
 - Press T to start moving the selected entities with your mouse.
 - Press R to start rotating the selected entities.
   - You can also press Ctrl+R to rotate the selected entities by exactly -90 degrees.
   - You can also press Shift+R to rotate the selected entities by exactly 90 degrees. 
+- Press Shift+H to flip the selected entities horizontally.
+- Press Shift+V to flip the selected entities vertically.
+- Press E to start resizing the selected entities along a single axis closest to the cursor.
+- Press Shift + E to start resizing the selected entities along two axes closest to the cursor.
+
 
 Remember you can always undo the last performed operation simply by pressing Ctrl+Z.
 You can redo operations as well - by pressing Ctrl+Shift+Z.

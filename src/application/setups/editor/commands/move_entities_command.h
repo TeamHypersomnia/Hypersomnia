@@ -9,6 +9,7 @@
 #include "game/cosmos/per_entity_type.h"
 #include "game/cosmos/entity_handle_declaration.h"
 
+#include "augs/drawing/flip.h"
 #include "application/setups/editor/commands/editor_command_structs.h"
 
 struct editor_command_input;
@@ -69,6 +70,45 @@ public:
 	
 	void unmove_entities(cosmos& cosm);
 	void reinfer_moved(cosmos& cosm);
+
+	void redo(const editor_command_input in);
+	void undo(const editor_command_input in);
+
+	void sanitize(editor_command_input);
+	void clear_undo_state();
+};
+
+class flip_entities_command {
+	friend augs::introspection_access;
+
+	void flip_entities(cosmos& cosm);
+	void unmove_entities(cosmos& cosm);
+
+public:
+	using flipped_entities_type = per_entity_type_container<typed_entity_id_vector>;
+	using delta_type = transformr;
+
+	// GEN INTROSPECTOR class flip_entities_command
+	editor_command_common common;
+private:
+	flipped_entities_type flipped_entities;
+	std::vector<std::byte> values_before_change;
+public:
+	flip_flags flip;
+	std::string built_description;
+	// END GEN INTROSPECTOR
+
+	std::string describe() const;
+
+	void push_entry(const_entity_handle);
+
+	auto size() const {
+		return flipped_entities.size();
+	}
+
+	bool empty() const {
+		return size() == 0;
+	}
 
 	void redo(const editor_command_input in);
 	void undo(const editor_command_input in);

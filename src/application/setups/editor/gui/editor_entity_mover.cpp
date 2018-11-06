@@ -150,12 +150,50 @@ void editor_entity_mover::start_rotating_selection(const input_type in) {
 	}
 }
 
+static auto make_reinvoker(editor_entity_mover& m, const input_type in) {
+	const bool pos = m.current_mover_pos_delta(in) != nullptr;
+	const bool rot = m.current_mover_rot_delta(in) != nullptr;
+
+	return augs::scope_guard(
+		[pos, rot, in, &m]() {
+			if (pos) {
+				m.start_moving_selection(in);
+			}
+
+			if (rot) {
+				m.start_rotating_selection(in);
+			}
+		}
+	);
+}
+
+void editor_entity_mover::flip_selection(const input_type in, const flip_flags flip) {
+	auto& s = in.setup;
+
+	if (s.anything_opened()) {
+		auto reinvoker = make_reinvoker(*this, in);
+
+		s.finish_rectangular_selection();
+
+		auto command = s.make_command_from_selections<flip_entities_command>(
+			"",
+			[](const auto typed_handle) {
+				return typed_handle.has_independent_transform();
+			}	
+		);
+
+		if (!command.empty()) {
+			command.flip = flip;
+			s.folder().history.execute_new(std::move(command), s.make_command_input());
+		}
+	}
+}
+
 void editor_entity_mover::reset_rotation(const input_type in) {
 	auto& s = in.setup;
 
 	if (s.anything_opened()) {
-		const bool reinvoke_positional_moving = current_mover_pos_delta(in) != nullptr;
-		const bool reinvoke_rotational_moving = current_mover_rot_delta(in) != nullptr;
+		auto reinvoker = make_reinvoker(*this, in);
 
 		s.finish_rectangular_selection();
 
@@ -170,14 +208,6 @@ void editor_entity_mover::reset_rotation(const input_type in) {
 			command.special = special_move_operation::RESET_ROTATION;
 			s.folder().history.execute_new(std::move(command), s.make_command_input());
 		}
-
-		if (reinvoke_positional_moving) {
-			start_moving_selection(in);
-		}
-
-		if (reinvoke_rotational_moving) {
-			start_rotating_selection(in);
-		}
 	}
 }
 
@@ -189,18 +219,9 @@ void editor_entity_mover::align_individually(const input_type in) {
 
 void editor_entity_mover::rotate_selection_once_by(const input_type in, const int degrees) {
 	if (const auto aabb = in.setup.find_selection_aabb()) {
-		const bool reinvoke_positional_moving = current_mover_pos_delta(in) != nullptr;
-		const bool reinvoke_rotational_moving = current_mover_rot_delta(in) != nullptr;
+		auto reinvoker = make_reinvoker(*this, in);
 
 		transform_selection(in, aabb->get_center(), transformr(vec2::zero, degrees));
-
-		if (reinvoke_positional_moving) {
-			start_moving_selection(in);
-		}
-
-		if (reinvoke_rotational_moving) {
-			start_rotating_selection(in);
-		}
 	}
 }
 

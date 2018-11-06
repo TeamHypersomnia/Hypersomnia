@@ -1,6 +1,7 @@
 #pragma once
 #include <optional>
 
+#include "augs/drawing/flip.h"
 #include "augs/math/vec2.h"
 #include "augs/math/transform.h"
 
@@ -44,6 +45,7 @@ public:
 	void rotate_selection_once_by(entity_mover_input in, int degrees);
 
 	void reset_rotation(entity_mover_input in);
+	void flip_selection(entity_mover_input in, flip_flags flip);
 	void align_individually(entity_mover_input in);
 
 	void start_resizing_selection(entity_mover_input in, bool both_axes_simultaneously);

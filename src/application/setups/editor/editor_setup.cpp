@@ -1323,6 +1323,9 @@ bool editor_setup::handle_input_before_game(
 					case key::R: mover.rotate_selection_once_by(make_mover_input(), 90); return true;
 					case key::E: mover.start_resizing_selection(make_mover_input(), true); return true;
 
+					case key::H: mover.flip_selection(make_mover_input(), flip_flags::make_horizontally()); return true;
+					case key::V: mover.flip_selection(make_mover_input(), flip_flags::make_vertically()); return true;
+
 					case key::_1: view().rect_select_mode = editor_rect_select_type::EVERYTHING; return true;
 					case key::_2: view().rect_select_mode = editor_rect_select_type::SAME_LAYER; return true;
 					case key::_3: view().rect_select_mode = editor_rect_select_type::SAME_FLAVOUR; return true;

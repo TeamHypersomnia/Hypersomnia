@@ -51,6 +51,7 @@ public:
 
 	transformr get_logic_transform() const;
 	std::optional<transformr> find_logic_transform() const;
+	std::optional<transformr> find_independent_transform() const;
 
 	template <class interpolation_system_type>
 	std::optional<transformr> find_viewing_transform(const interpolation_system_type& sys) const {
@@ -314,6 +315,33 @@ vec2 spatial_properties_mixin<E>::get_effective_velocity() const {
 	}
 
 	return {};
+}
+
+template <class E>
+std::optional<transformr> spatial_properties_mixin<E>::find_independent_transform() const {
+	const auto& handle = *static_cast<const E*>(this);
+	std::optional<transformr> result;
+
+	access_independent_transform(
+		[&result, &handle](const auto& tr) {
+			using T = remove_cref<decltype(tr)>;
+
+			if constexpr(std::is_same_v<T, physics_engine_transforms>) {
+				result = tr.get(handle.get_cosmos().get_si());
+			}
+			else if constexpr(std::is_same_v<T, transformr>) {
+				result = tr;
+			}
+			else if constexpr(std::is_same_v<T, vec2>) {
+				result = transformr(tr, 0);
+			}
+			else {
+				static_assert(always_false_v<T>, "Unknown transform type.");
+			}
+		}
+	);
+
+	return result;
 }
 
 template <class E>

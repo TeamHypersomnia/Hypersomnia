@@ -6,6 +6,7 @@
 class cosmic_delta;
 class cosmic;
 class move_entities_command;
+class flip_entities_command;
 class resize_entities_command;
 
 struct editor_property_accessors;
@@ -23,6 +24,7 @@ class cosmos_solvable_access {
 
 	/* Some classes for editor must be privileged */
 	friend move_entities_command;
+	friend flip_entities_command;
 	friend resize_entities_command;
 
 	friend editor_property_accessors;

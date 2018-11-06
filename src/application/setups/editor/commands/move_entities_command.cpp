@@ -601,3 +601,139 @@ void resize_entities_command::sanitize(const editor_command_input in) {
 void resize_entities_command::clear_undo_state() {
 	values_before_change.clear();
 }
+
+
+std::string flip_entities_command::describe() const {
+	if (flip.horizontally) {
+		return "Flipped horizontally: " + built_description;
+	}
+
+	if (flip.vertically) {
+		return "Flipped vertically: " + built_description;
+	}
+
+	return "Unknown flip operation: " + built_description;
+}
+
+void flip_entities_command::push_entry(const const_entity_handle handle) {
+	handle.dispatch([&](const auto typed_handle) {
+		using E = entity_type_of<decltype(typed_handle)>;
+		using vector_type = typed_entity_id_vector<E>;
+
+		flipped_entities.get<vector_type>().push_back({ typed_handle.get_id() });
+	});
+}
+
+void flip_entities_command::sanitize(const editor_command_input in) {
+	sanitize_affected_entities(in, flipped_entities);
+}
+
+void flip_entities_command::clear_undo_state() {
+	values_before_change.clear();
+}
+
+void flip_entities_command::flip_entities(cosmos& cosm) {
+	auto for_each_subject = [this](auto callback){ 
+		flipped_entities.for_each([&](auto& e) {
+			callback(e);
+		});
+	};
+
+	if (const auto source_aabb = find_aabb_of(cosm, for_each_subject)) {
+		auto flip_with_mirror = [&](auto calc_mirror_offset) {
+			for_each_subject(
+				[&](const auto& id) {
+					const auto typed_handle = cosm[id];
+
+					if (const auto ir = typed_handle.find_independent_transform()) {
+						const auto source_transform = *ir;
+						const auto new_rotation = vec2::from_degrees(source_transform.rotation).neg_y().degrees();
+
+						const auto mirror_offset = calc_mirror_offset(
+							source_transform.pos, 
+							typed_handle.find_aabb()
+						);
+
+						auto mirrored_transform = transformr(mirror_offset + source_transform.pos, new_rotation);
+						fix_pixel_imperfections(mirrored_transform);
+						typed_handle.set_logic_transform(mirrored_transform);
+						typed_handle.do_flip(flip);
+					}
+				}
+			);
+		};
+
+		if (flip.horizontally) {
+			flip_with_mirror(
+				[source_aabb](const transformr& source, const std::optional<ltrb>& aabb) {
+					if (aabb) {
+						return vec2(source_aabb->l + source_aabb->r - aabb->l - aabb->r, 0.f);
+					}
+					else {
+						const auto dist_to_axis = source_aabb->r - source.pos.x;
+						return vec2(dist_to_axis * 2 - source_aabb->w(), 0.f);
+					}
+				}
+			);
+		}
+
+		if (flip.vertically) {
+			flip_with_mirror(
+				[source_aabb](const transformr& source, const std::optional<ltrb>& aabb) {
+					if (aabb) {
+						return vec2(0.f, source_aabb->t + source_aabb->b - aabb->t - aabb->b);
+					}
+					else {
+						const auto dist_to_axis = source_aabb->b - source.pos.y;
+						return vec2(0.f, dist_to_axis * 2);
+					}
+				}
+			);
+		}
+	}
+}
+
+void flip_entities_command::redo(const editor_command_input in) {
+	clear_undo_state();
+
+	auto& cosm = in.get_cosmos();
+	auto before_change_data = augs::ref_memory_stream(values_before_change);
+
+	save_transforms(cosm, flipped_entities, before_change_data);
+	flip_entities(cosm);
+
+	cosmic::reinfer_all_entities(cosm);
+
+	auto& selections = in.folder.commanded->view_ids.selected_entities;
+	selections.clear();
+
+	flipped_entities.for_each([&](const auto id) {
+		selections.emplace(id);
+	});
+}
+
+void flip_entities_command::unmove_entities(cosmos& cosm) {
+	auto before_change_data = augs::cref_memory_stream(values_before_change);
+
+	::unmove_entities({}, cosm, flipped_entities, before_change_data);
+}
+
+void flip_entities_command::undo(const editor_command_input in) {
+	auto& cosm = in.get_cosmos();
+
+	unmove_entities(cosm);
+
+	flipped_entities.for_each([&](auto& id) {
+		const auto typed_handle = cosm[id];
+
+		if (typed_handle.find_independent_transform()) {
+			typed_handle.do_flip(flip);
+		}
+	});
+
+	clear_undo_state();
+
+	cosmic::reinfer_all_entities(cosm);
+
+	in.folder.commanded->view_ids.select(flipped_entities);
+}

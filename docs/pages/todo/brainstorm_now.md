@@ -7,9 +7,15 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - Usability fixes to editor 
-	- Flipping of editor selection
-		- Shift+V, Shift+H
+	- Comfortable import, export and use of mode vars
+		- Server will probably be able to accept a lua script easily
+		- With an export, we may simply create a folder with a script file per each var
 	- Setting specific names to entities
+	- Complex instantiations
+		- I struggle to see any that are necessary before DM
+			- even manual transfers arent that necessary
+		- Guns with magazines already
+		- For now expose transfer GUI?
 
 - Then the direct attachment offset must calculate the offsets, I guess.
 
