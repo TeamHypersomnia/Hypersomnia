@@ -282,27 +282,36 @@ If you plan to use the Hypersomnia editor on Linux, you might want to follow som
 
 #### Opening and saving files
 
-The Hypersomnia editor can open files for editing and save them.  
-On Windows, this is accomplished through [GetOpenFileName](https://msdn.microsoft.com/en-us/library/windows/desktop/ms646927(v=vs.85).aspx).  
-Needless to say, such a thing does not exist on Linux.  
-Hypersomnia provides bash scripts for common file managers in ``hypersomnia/scripts/unix/managers``.  
-Choose one for opening and one for saving, then ``cd`` to ``hypersomnia/scripts/unix`` and, assuming you want to use ``ranger`` as your file manager, create symlinks as such: 
+The Hypersomnia editor can choose directories for opening projects and saving them.  
+On Windows, this is accomplished through an ``IFileDialog``.  
+Needless to say, such a class does not exist on Linux.  
+Hypersomnia provides shell scripts for common file managers in ``hypersomnia/scripts/unix/managers``.  
+You'll need one for choosing a directory and one for revealing files in explorer.  
+``cd`` to ``hypersomnia/scripts/unix`` and, assuming you want to use ``ranger`` as your file manager, create symlinks as such:  
 
 ```
-ln -s managers/save_file_ranger.zsh save_file.local
-ln -s managers/open_file_ranger.zsh open_file.local
 ln -s managers/choose_directory_ranger.zsh choose_directory.local
 ln -s managers/reveal_file_ranger.zsh reveal_file.local 
 ```
 
-The symlinks will not be tracked by git.  
+The framework also supports calling scripts for opening and saving files,  
+though the project does not use this functionality yet:
+
+```
+ln -s managers/save_file_ranger.zsh save_file.local
+ln -s managers/open_file_ranger.zsh open_file.local
+```
+
+None of the symlinks will be tracked by git.  
 
 Currently, the following file managers are supported:
-- [ranger](https://github.com/ranger/ranger) through ``--choosefile`` option
+- [ranger](https://github.com/ranger/ranger) through ``--choosedir``, ``--choosefile`` and ``--selectfile`` options
 
-The scripts use ``$TERMINAL`` variable for file managers that need a terminal to run on. Ensure your terminal supports ``-e`` flag that passes the commands to launch on startup. 
+To implement your own script for choosing a directory:
 
-If you want to implement your own save or open file script, the only thing it must output is a ``$PWD/cache/gen/last_file_path.txt`` file containg the chosen path.
+- Use a ``$TERMINAL`` variable for file managers that need a terminal to run on.  
+  Ensure your terminal supports ``-e`` flag that passes the commands to launch on startup. 
+- Output a ``$PWD/cache/gen/last_file_path.txt`` file containg the result - which is the chosen path, e.g. ``/home/pbc/projects/my_map``.
 
 # Contributing
 
