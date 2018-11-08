@@ -104,8 +104,12 @@ void editor_tutorial_gui::perform(const editor_setup& setup) {
 		if (!current_dialog.empty()) {
 			const auto& text = dialog_manuals.at(current_dialog);
 
+			static const std::string no_content = 
+				"No help was written for this dialog.\nThis means that its elements are self-explanatory."
+			;
+
 			chosen_tutorial_path = make_dialog_manual_path(current_dialog);
-			return text;
+			return text.empty() ? no_content : text;
 		}
 
 		const auto chosen_tutorial_type = [&]() {

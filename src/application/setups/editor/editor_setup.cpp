@@ -520,44 +520,45 @@ void editor_setup::perform_custom_imgui(
 #endif
 				}
 				if (auto menu = scoped_menu("View")) {
-					auto do_window_entry = [&](auto& win) {
-						if (item_if_tabs(win.get_title().c_str())) {
+					auto do_window_entry = [&](auto& win, const auto shortcut) {
+						const auto s = std::string("ALT+") + shortcut;
+						if (item_if_tabs(win.get_title().c_str(), s.c_str())) {
 							win.open();
 						}
 					};
 
 					ImGui::MenuItem("(Info)", NULL, false, false);
 
-					do_window_entry(summary_gui);
-					do_window_entry(coordinates_gui);
+					do_window_entry(summary_gui, "U");
+					do_window_entry(coordinates_gui, "O");
 
 					ImGui::Separator();
 					ImGui::MenuItem("(Editing)", NULL, false, false);
 
-					do_window_entry(layers_gui);
-					do_window_entry(history_gui);
+					do_window_entry(layers_gui, "L");
+					do_window_entry(history_gui, "H");
 
-					if (item_if_tabs("Player")) {
+					if (item_if_tabs("Player", "ALT+P")) {
 						player_gui.show = true;
 					}
 
-					do_window_entry(selection_groups_gui);
-					do_window_entry(modes_gui);
+					do_window_entry(selection_groups_gui, "G");
+					do_window_entry(modes_gui, "D");
 
 					ImGui::Separator();
 					ImGui::MenuItem("(State)", NULL, false, false);
 
-					do_window_entry(common_state_gui);
-					do_window_entry(fae_gui);
-					do_window_entry(selected_fae_gui);
+					do_window_entry(common_state_gui, "C");
+					do_window_entry(fae_gui, "A");
+					do_window_entry(selected_fae_gui, "S");
 
 					ImGui::Separator();
 					ImGui::MenuItem("(Assets)", NULL, false, false);
 
-					do_window_entry(images_gui);
-					do_window_entry(sounds_gui);
-					do_window_entry(particle_effects_gui);
-					do_window_entry(plain_animations_gui);
+					do_window_entry(images_gui, "I");
+					do_window_entry(sounds_gui, "S");
+					do_window_entry(particle_effects_gui, "R");
+					do_window_entry(plain_animations_gui, "M");
 
 					ImGui::Separator();
 
