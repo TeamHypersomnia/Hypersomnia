@@ -1,5 +1,5 @@
 The flavour and entity hierarchies let you tweak innumerable properties 
-of the objects residing within the game world.
+of the map's basic building blocks: the game objects.
 
 This dialog has the most potential for customization.
 Before we go any further, you have to gain a basic understanding 
@@ -125,3 +125,20 @@ Alternatively, if you wanted to select ALL entities EXCEPT all guns, you could p
 to remove only and exactly the "Shootable weapons" from the current selection.
 
 You can do the same with flavours, not just entity types.
+
+## Special widgets: asset identificators
+
+Some widgets require you to choose a path to a resource, for example Sprite invariant->Image id.
+A mini explorer will be spawned when you click on the combo box.
+
+Assets from ONLY these locations will be shown on the list:
+- the project-specific ``gfx`` and ``sfx`` folders,
+- the official collections (content/official/gfx, content/official/sfx).
+
+This is to ensure that your project folder has everything it needs to be opened on another machine.
+
+The chosen image will be automatically imported if it has not yet been.
+
+Additionally, if you alter Sprite invariant->Image id, the sprite's size will be updated to match the image size.
+The flavour's name will also be automatically updated (although as an undoable command!),
+since it is best to name flavours after the images they are associated with.
