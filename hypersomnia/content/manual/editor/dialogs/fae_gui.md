@@ -1,4 +1,4 @@
-The "Scene hierarchy" is very similar to "Selection hierarchy",
+The "Scene hierarchy" is very similar to "Selection hierarchy" (Alt+S),
 with a few differences:
 
 - It always lists ALL existing flavours and entities.

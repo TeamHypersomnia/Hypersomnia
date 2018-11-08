@@ -174,7 +174,7 @@ void editor_tutorial_gui::perform(const editor_setup& setup) {
 	}();
 
 	if (ImGui::Button("Open")) {
-		std::thread([chosen_tutorial_path](){ augs::open_text_editor(chosen_tutorial_path); }).detach();
+		std::thread([chosen_tutorial_path](){ augs::open_text_editor(chosen_tutorial_path.string()); }).detach();
 	}
 
 	ImGui::SameLine();
