@@ -4,6 +4,7 @@
 
 #include "game/cosmos/entity_id.h"
 #include "game/modes/all_mode_includes.h"
+#include "game/modes/mode_player_id.h"
 #include "application/setups/editor/commands/change_property_command.h"
 #include "application/setups/editor/commands/editor_command_structs.h"
 #include "application/setups/editor/editor_command_input.h"
@@ -28,6 +29,19 @@ struct change_current_mode_property_command : change_property_command<change_cur
 	using introspect_base = change_property_command<change_current_mode_property_command>;
 
 	// GEN INTROSPECTOR struct change_current_mode_property_command
+	mode_field_address field;
+	// END GEN INTROSPECTOR
+
+	auto count_affected() const {
+		return 1u;
+	}
+};
+
+struct change_mode_player_property_command : change_property_command<change_mode_player_property_command> {
+	using introspect_base = change_property_command<change_mode_player_property_command>;
+
+	// GEN INTROSPECTOR struct change_mode_player_property_command
+	mode_player_id player_id;
 	mode_field_address field;
 	// END GEN INTROSPECTOR
 

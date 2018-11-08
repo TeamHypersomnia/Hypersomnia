@@ -33,6 +33,7 @@ struct change_group_property_command;
 
 struct change_current_mode_property_command;
 struct change_mode_vars_property_command;
+struct change_mode_player_property_command;
 
 template <class>
 struct create_pathed_asset_id_command;
@@ -73,7 +74,6 @@ using editor_history_base = augs::history_with_marks<
 	change_grouping_command,
 	change_group_property_command,
 
-	change_current_mode_property_command,
 	change_mode_vars_property_command,
 
 	create_pathed_asset_id_command<assets::image_id>,
@@ -92,5 +92,16 @@ using editor_history_base = augs::history_with_marks<
 	create_unpathed_asset_id_command<assets::particle_effect_id>,
 	forget_asset_id_command<assets::particle_effect_id>,
 	duplicate_asset_command<assets::particle_effect_id>,
-	change_asset_property_command<assets::particle_effect_id>
+	change_asset_property_command<assets::particle_effect_id>,
+
+	/* Playtest-specific */
+
+	change_current_mode_property_command,
+	change_mode_player_property_command
+>;
+
+template <class T>
+constexpr bool is_playtest_specific_v = is_one_of_v<T,
+	change_current_mode_property_command,
+	change_mode_player_property_command
 >;

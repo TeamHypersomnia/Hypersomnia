@@ -107,7 +107,11 @@ void editor_player::finish_testing(const editor_command_input in, const finish_t
 
 			std::visit(
 				[&](auto& typed_cmd) {
-					current_history.execute_new(std::move(typed_cmd), in);
+					using T = remove_cref<decltype(typed_cmd)>;
+
+					if constexpr(!is_playtest_specific_v<T>) {
+						current_history.execute_new(std::move(typed_cmd), in);
+					}
 				},
 				cmd
 			);

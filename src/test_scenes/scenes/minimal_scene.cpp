@@ -28,8 +28,9 @@ namespace test_scenes {
 	}
 
 	void minimal_scene::setup(bomb_mode_vars& vars) {
-		vars.bots = { "First", "Second", "Third", "Fourth", "Fifth", "Sixth" };
+		vars.bot_names = { "First", "Second", "Third", "Fourth", "Fifth", "Sixth" };
 		vars.name = "Minimal scene bomb vars";
+		vars.bot_quota = vars.bot_names.size();
 	}
 
 	void minimal_scene::populate(const loaded_image_caches_map& caches, const logic_step step) const {

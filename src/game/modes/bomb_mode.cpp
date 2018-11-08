@@ -17,6 +17,7 @@
 #include "game/messages/battle_event_message.h"
 #include "game/modes/detail/item_purchase_logic.hpp"
 #include "game/detail/buy_area_in_range.h"
+#include "game/cosmos/delete_entity.h"
 
 #include "game/detail/sentience/sentience_getters.h"
 
@@ -314,7 +315,16 @@ void bomb_mode::remove_player(input_type in, const mode_player_id& id) {
 	const auto guid = lookup(id);
 
 	if (const auto handle = in.cosm[guid]) {
-		cosmic::delete_entity(handle);
+		deletion_queue q;
+		q.push_back(handle.get_id());
+
+		handle.for_each_contained_item_recursive(
+			[&](const auto& contained) {
+				q.push_back(entity_id(contained.get_id()));
+			}
+		);
+
+		reverse_perform_deletions(q, in.cosm);
 	}
 
 	erase_element(players, id);
@@ -1220,6 +1230,45 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 	}
 }
 
+void bomb_mode::spawn_and_kick_bots(const input_type in, const logic_step) {
+	const auto& names = in.vars.bot_names;
+	const auto requested_bots = std::min(
+		in.vars.bot_quota,
+		static_cast<unsigned>(names.size())
+	);
+
+	if (current_num_bots == requested_bots) {
+		return;
+	}
+
+	if (current_num_bots > requested_bots) {
+		std::vector<mode_player_id> to_erase;
+
+		for (const auto& p : reverse(players)) {
+			if (p.second.is_bot) {
+				to_erase.push_back(p.first);
+
+				if (to_erase.size() == current_num_bots - requested_bots) {
+					break;
+				}
+			}
+		}
+
+		for (const auto& t : to_erase) {
+			remove_player(in, t);
+		}
+
+		current_num_bots = requested_bots;
+	}
+
+	while (current_num_bots < requested_bots) {
+		const auto new_id = add_player(in, names[current_num_bots++]);
+		auto_assign_faction(in, new_id);
+		
+		players.at(new_id).is_bot = true;
+	}
+}
+
 void bomb_mode::spawn_recently_added_players(const input_type in, const logic_step step) {
 	for (const auto& id : recently_added_players) {
 		if (const auto player_data = find(id)) {
@@ -1287,6 +1336,7 @@ void bomb_mode::handle_game_commencing(const input_type in, const logic_step ste
 }
 
 void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy, const logic_step step) {
+	spawn_and_kick_bots(in, step);
 	spawn_recently_added_players(in, step);
 
 	if (in.vars.allow_game_commencing) {
@@ -1659,13 +1709,6 @@ bomb_mode_player* bomb_mode::find_player_by(const entity_name_str& chosen_name) 
 }
 
 void bomb_mode::restart(const input_type in, const logic_step step) {
-	for (const auto& new_name : in.vars.bots) {
-		if (nullptr == find_player_by(new_name)) {
-			const auto new_bot = add_player(in, new_name);
-			auto_assign_faction(in, new_bot);
-		}
-	}
-
 	reset_players_stats(in);
 	factions = {};
 

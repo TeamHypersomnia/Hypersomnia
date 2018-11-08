@@ -51,6 +51,7 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 		},
 
 		[&](auto& existing_entropy) {
+			/* record_entropy */
 			adjust_entropy(folder, existing_entropy, false);
 
 			auto extracted = extract_collected_entropy();

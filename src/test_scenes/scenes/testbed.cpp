@@ -51,16 +51,18 @@ namespace test_scenes {
 	}
 
 	void testbed::setup(bomb_mode_vars& vars) {
-		vars.bots = {
-			"kryS.",
-			"pepsik",
-			"sbk1337",
-			"0RH-",
-			"FortesQ",
+		vars.bot_names = {
+			"daedalus",
+			"icarus",
+			"geneotech",
+			"pbc",
+			"adam.jensen",
 			"Spicmir",
 			"Pythagoras",
 			"Billan"
 		};
+
+		vars.bot_quota = vars.bot_names.size();
 
 		vars.name = "Testbed bomb vars";
 		vars.economy.initial_money = 1000;

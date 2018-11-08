@@ -255,6 +255,28 @@ struct editor_property_accessors {
 
 	template <class T, class F>
 	static void access_each_property(
+		const change_mode_player_property_command& self,
+		T in,
+		F callback
+	) {
+		std::visit(
+			[&](auto& typed_mode) {
+				if (const auto player = mapped_or_nullptr(typed_mode.players, self.player_id)) {
+					on_field_address(
+						*player,
+						self.field,
+						continue_if_nullopt([&](auto& resolved_field) {
+							return callback(resolved_field);
+						})
+					);
+				}
+			},
+			in.folder.player.current_mode
+		);
+	}
+
+	template <class T, class F>
+	static void access_each_property(
 		const change_mode_vars_property_command& self,
 		T in,
 		F callback

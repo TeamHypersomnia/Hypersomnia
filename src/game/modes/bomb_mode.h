@@ -55,7 +55,9 @@ struct bomb_mode_economy_vars {
 struct bomb_mode_vars {
 	// GEN INTROSPECTOR struct bomb_mode_vars
 	std::string name = "Unnamed bomb mode vars";
-	std::vector<entity_name_str> bots;
+
+	std::vector<entity_name_str> bot_names;
+	unsigned bot_quota = 8;
 
 	unsigned allow_spawn_after_secs_after_starting = 10;
 	unsigned max_players_per_team = 5;
@@ -134,6 +136,7 @@ struct bomb_mode_player {
 	faction_type faction = faction_type::SPECTATOR;
 	bomb_mode_player_stats stats;
 	unsigned round_when_chosen_faction = static_cast<unsigned>(-1); 
+	bool is_bot = false;
 	// END GEN INTROSPECTOR
 
 	bomb_mode_player(const entity_name_str& chosen_name = {}) : 
@@ -317,6 +320,7 @@ private:
 
 	void execute_player_commands(input, const mode_entropy&, logic_step);
 	void spawn_recently_added_players(input, logic_step);
+	void spawn_and_kick_bots(input, logic_step);
 
 	void handle_game_commencing(input, logic_step);
 
@@ -335,6 +339,7 @@ public:
 
 	bool should_commence_when_ready = false;
 	real32 commencing_timer_ms = -1.f;
+	unsigned current_num_bots = 0;
 	// END GEN INTROSPECTOR
 
 	mode_player_id add_player(input, const entity_name_str& chosen_name);

@@ -54,7 +54,7 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 			folder.commanded->mode_vars.vars,
 			folder.commanded->work.world,
 			[&](auto& typed_mode, const auto& mode_input) {
-				auto node = scoped_tree_node("Current mode");
+				auto node = scoped_tree_node("Current mode state");
 
 				next_columns(2);
 
@@ -72,20 +72,6 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 						(void)mode_input;
 					}
 					else {
-						if (ImGui::Button("Add player")) {
-							typed_mode.auto_assign_faction(mode_input, typed_mode.add_player(mode_input, nickname));
-						}
-
-						ImGui::SameLine();
-
-						if (ImGui::Button("Add spectator")) {
-							typed_mode.add_player(mode_input, nickname);
-						}
-
-						ImGui::SameLine();
-
-						input_text<256>("Nickname", nickname);
-
 						if (ImGui::Button("Restart")) {
 							typed_mode.request_restart();
 						}
@@ -102,11 +88,14 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 									const auto character_name = player_handle.alive() ? player_handle.get_name() : "dead";
 									text(typesafe_sprintf("Corresponding character name: %x", character_name));
 
+									change_mode_player_property_command cmd;
+									cmd.player_id = p.first;
+
 									singular_edit_properties(
 										in,
 										p.second,
 										this_player_label,
-										change_current_mode_property_command()
+										cmd
 									);
 								}
 							}
@@ -116,7 +105,7 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 					singular_edit_properties(
 						in,
 						typed_mode,
-						" (Current mode)",
+						" (Current mode state)",
 						change_current_mode_property_command(),
 						special_widgets(
 							flavour_widget { cosm }
@@ -125,8 +114,6 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 				}
 			}
 		);
-
-		ImGui::Separator();
 	}
 
 	auto& all_vars = folder.commanded->mode_vars;
