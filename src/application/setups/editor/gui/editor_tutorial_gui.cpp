@@ -1,3 +1,4 @@
+#include <thread>
 #include "application/setups/editor/gui/editor_tutorial_gui.h"
 #include "augs/templates/enum_introspect.h"
 #include "application/setups/editor/editor_setup.h"
@@ -173,7 +174,7 @@ void editor_tutorial_gui::perform(const editor_setup& setup) {
 	}();
 
 	if (ImGui::Button("Open")) {
-		augs::open_text_editor(chosen_tutorial_path);
+		std::thread([chosen_tutorial_path](){ augs::open_text_editor(chosen_tutorial_path); }).detach();
 	}
 
 	ImGui::SameLine();
