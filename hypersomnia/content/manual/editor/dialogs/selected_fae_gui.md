@@ -85,8 +85,8 @@ and you'll be able to undo virtually any performed change.
 If you want to see the history of changes for a specific field,
 simply open up the History GUI (Alt+H) and write the property's name into the filter box.
 
-The documentation of the purpose and behaviour of all properties 
-will eventually be documented on wiki.hypersomnia.xyz.  
+The documentation of the purpose and behaviour of all invariants, components 
+and all of their properties will eventually be documented on wiki.hypersomnia.xyz.  
 The names should, however, be more or less self-explanatory.
 
 ## GUI: Multiple selections
@@ -107,6 +107,11 @@ a character does not have a fire rate.
 	      for example - one could perfectly set identical collider density to a character and a wall -
 	      it is still not possible to do due to implementation complexity. 
 	      Maybe in the future we'll implement that.
+
+If the value of a property is identical across the entire selection, 
+its widget will have a natural, blue color.
+If, on the other hand, it differs somewhere, e.g. 9 out of 10 selected guns have a fire interval of 100ms,
+but the tenth has 110ms, the value of this property will be highlighted in orange.
 
 ## GUI: Ex and On buttons
 

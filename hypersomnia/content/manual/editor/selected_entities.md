@@ -72,6 +72,11 @@ There, you can rename the group.
 To select all entities belonging to a particular group, click on its name.
 You can also filter existing groups by using the text area at the top of the dialog.
 
+## Editing properties
+
+To view the selected entities in a hierarchy and edit their properties,
+press Alt+S to open "Selection hierarchy" and follow further instructions.
+
 ## Operations: View
 
 - Press Z to place the camera exactly at the center of the selection's bounding box.
@@ -111,8 +116,3 @@ to see what else you can do with the selected entities.
 Remember you can always undo the last performed operation simply by pressing Ctrl+Z.
 You can redo operations as well - by pressing Ctrl+Shift+Z.
 To see the history of all changes and navigate freely through all revisions, press Alt+H (View->History).
-
-## Editing properties
-
-To view the selected entities in a hierarchy and edit their properties,
-press Alt+S to open "Selection hierarchy" and follow further instructions.
