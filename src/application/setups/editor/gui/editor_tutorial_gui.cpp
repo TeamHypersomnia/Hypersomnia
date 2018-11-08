@@ -2,6 +2,7 @@
 #include "augs/templates/enum_introspect.h"
 #include "application/setups/editor/editor_setup.h"
 #include "augs/filesystem/file.h"
+#include "augs/window_framework/shell.h"
 
 static auto make_dialog_manual_path(const std::string& stem) {
 	const auto manual_dir = augs::path_type("content/manual/editor/dialogs");
@@ -170,6 +171,12 @@ void editor_tutorial_gui::perform(const editor_setup& setup) {
 		chosen_tutorial_path = make_manual_path(chosen_tutorial_type);
 		return context_manuals.at(chosen_tutorial_type);
 	}();
+
+	if (ImGui::Button("Open")) {
+		augs::open_text_editor(chosen_tutorial_path);
+	}
+
+	ImGui::SameLine();
 
 	text_disabled(augs::filename_first(chosen_tutorial_path));
 

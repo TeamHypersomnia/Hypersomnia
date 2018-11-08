@@ -9,6 +9,10 @@ This will also delete all previously open untitled projects.
  
 The text you are reading is stored in files inside the content/manual/editor folder.
 The path to the currently read file is printed just above the text.
+There is also a button to open the file in a preferred markdown viewer 
+if you'd like the reading experience to be more comfortable.
+	- If you are on Windows, make sure that .md extension is associated with your editor of choice.
+	- You could for example use Remarkable on both Linux and Windows.
 
 ## Introduction
 
