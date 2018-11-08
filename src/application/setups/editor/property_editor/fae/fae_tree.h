@@ -389,7 +389,7 @@ auto tree_of_entities(
 								);
 							}();
 
-							{
+							if (fae_in.show_instantiation_button) {
 								const auto scoped_style = in_line_button_style();
 
 								{

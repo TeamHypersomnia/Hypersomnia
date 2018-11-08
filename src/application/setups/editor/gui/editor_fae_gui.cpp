@@ -152,7 +152,7 @@ fae_tree_input editor_fae_gui_base::make_fae_input(
 	};
 
 	return fae_tree_input { 
-		cpe_in, is_selection, !is_selection, !is_selection
+		cpe_in, is_selection, !is_selection, !is_selection, !is_selection
 	};
 }
 

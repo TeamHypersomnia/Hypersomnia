@@ -143,6 +143,10 @@ Press Slash (/) to start quick search for an entity.
 
 Visit these windows to get more information:
 
+## Scene hierarchy
+
+Press Alt+A (View->Scene hierarchy) for more information.
+
 ## Modes
 
 Press Alt+D (View->Modes) for more information.

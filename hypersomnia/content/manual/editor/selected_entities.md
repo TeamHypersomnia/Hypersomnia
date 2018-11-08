@@ -111,3 +111,8 @@ to see what else you can do with the selected entities.
 Remember you can always undo the last performed operation simply by pressing Ctrl+Z.
 You can redo operations as well - by pressing Ctrl+Shift+Z.
 To see the history of all changes and navigate freely through all revisions, press Alt+H (View->History).
+
+## Editing properties
+
+To view the selected entities in a hierarchy and edit their properties,
+press Alt+S to open "Selection hierarchy" and follow further instructions.

@@ -10,7 +10,7 @@
   disable_on_homepage: on
 - title: ECS
   name: ECS
-  description: Our flavour of Entity-component-system pattern.
+  description: Our kind of Entity-component-system pattern.
 - title: Components
   name: components
   description: All of them.

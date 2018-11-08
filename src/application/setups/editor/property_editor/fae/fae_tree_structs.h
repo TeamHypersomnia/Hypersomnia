@@ -27,6 +27,7 @@ struct fae_tree_input {
 	const bool show_filter_buttons = false;
 	const bool show_flavour_control_buttons = false;
 	const bool show_locations_using_flavour = false;
+	const bool show_instantiation_button = false;
 
 	operator fae_property_editor_input() const {
 		return { cpe_in };

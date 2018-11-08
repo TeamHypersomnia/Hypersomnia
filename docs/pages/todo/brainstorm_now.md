@@ -72,7 +72,7 @@ summary: That which we are brainstorming at the moment.
 		- When hurt triggers of two or more players touch, they are pushed away opposite to their facing
 
 - Easily spawn loaded weapons or magazines
-	- For now, let instantation load them all by default
+	- For now, let instantiation load them all by default
 
 - Simplify workflow for creating new weapons?
 	- E.g. remove the need to specify finishing traces
