@@ -44,14 +44,12 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 
 	thread_local std::string nickname = "Test-player";
 
-	/* TODO: commandize it properly!!! */
-
 	auto& folder = cmd_in.folder;
 	auto& player = folder.player;
 
 	if (player.has_testing_started()) {
 		player.on_mode_with_input(
-			folder.commanded->mode_vars.vars,
+			folder.commanded->mode_rules.vars,
 			folder.commanded->work.world,
 			[&](auto& typed_mode, const auto& mode_input) {
 				auto node = scoped_tree_node("Current mode state");
@@ -116,7 +114,7 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 		);
 	}
 
-	auto& all_vars = folder.commanded->mode_vars;
+	auto& all_vars = folder.commanded->mode_rules;
 
 	for_each_type_in_list<all_modes>(
 		[&](auto m) {
@@ -147,7 +145,7 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 							{ settings.property_editor, property_editor_data }, { cmd_in }
 						};
 
-						change_mode_vars_property_command cmd;
+						change_mode_rules_property_command cmd;
 						cmd.vars_type_id.set<M>();
 						cmd.vars_id = vars_id;
 

@@ -64,8 +64,6 @@ permalink: todo_low
 - Shuffled animations
 	- Inside randomizing system?
 
-- Commandize "Add player" and "Restart" in editor
-
 - Implement ctrl+tab for settings window
 	- shortcuts for first letter shall always focus relevant window
 

@@ -22,12 +22,12 @@
 #include "game/modes/test_scene_mode.h"
 
 namespace test_scenes {
-	void minimal_scene::setup(test_scene_mode_vars& vars) {
+	void minimal_scene::setup(test_scene_mode_rules& vars) {
 		vars.spawned_faction = faction_type::METROPOLIS;
 		vars.name = "Minimal scene vars";
 	}
 
-	void minimal_scene::setup(bomb_mode_vars& vars) {
+	void minimal_scene::setup(bomb_mode_rules& vars) {
 		vars.bot_names = { "First", "Second", "Third", "Fourth", "Fifth", "Sixth" };
 		vars.name = "Minimal scene bomb vars";
 		vars.bot_quota = vars.bot_names.size();

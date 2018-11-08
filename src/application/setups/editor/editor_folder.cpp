@@ -58,7 +58,7 @@ void editor_folder::save_folder(const augs::path_type& to, const augs::path_type
 	commanded->work.save_as_int(paths.int_file);
 
 	augs::save_as_bytes(commanded->view_ids, paths.view_ids_file);
-	augs::save_as_bytes(commanded->mode_vars, paths.modes_file);
+	augs::save_as_bytes(commanded->mode_rules, paths.modes_file);
 	augs::save_as_bytes(view, paths.view_file);
 	augs::save_as_bytes(history, paths.hist_file);
 	augs::save_as_bytes(player, paths.player_file);
@@ -95,7 +95,7 @@ void editor_folder::load_folder(const augs::path_type& from, const augs::path_ty
 
 	try {
 		augs::load_from_bytes(commanded->view_ids, paths.view_ids_file);
-		augs::load_from_bytes(commanded->mode_vars, paths.modes_file);
+		augs::load_from_bytes(commanded->mode_rules, paths.modes_file);
 		augs::load_from_bytes(view, paths.view_file);
 		augs::load_from_bytes(history, paths.hist_file);
 		augs::load_from_bytes(player, paths.player_file);
@@ -244,7 +244,7 @@ void editor_folder::export_folder(sol::state& lua, const augs::path_type& to) co
 	const auto paths = editor_paths(to, name);
 
 	commanded->work.save_as_lua({ lua, paths.int_lua_file });
-	augs::save_as_lua_table(lua, commanded->mode_vars, paths.modes_lua_file);
+	augs::save_as_lua_table(lua, commanded->mode_rules, paths.modes_lua_file);
 }
 
 void editor_folder::import_folder(sol::state& lua, const augs::path_type& from) {
@@ -256,7 +256,7 @@ void editor_folder::import_folder(sol::state& lua, const augs::path_type& from) 
 	commanded->work.load_from_lua({ lua, int_lua_path });
 
 	try {
-		augs::load_from_lua_table(lua, commanded->mode_vars, paths.modes_lua_file);
+		augs::load_from_lua_table(lua, commanded->mode_rules, paths.modes_lua_file);
 	}
 	catch (...) {
 		/* It's not necessary that we have the modes. */

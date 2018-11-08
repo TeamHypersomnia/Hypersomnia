@@ -1912,7 +1912,7 @@ void editor_setup::on_mode_with_input(F&& callback) const {
 		auto& f = folder();
 
 		player().on_mode_with_input(
-			f.commanded->mode_vars.vars,
+			f.commanded->mode_rules.vars,
 			f.commanded->work.world,
 			std::forward<F>(callback)
 		);

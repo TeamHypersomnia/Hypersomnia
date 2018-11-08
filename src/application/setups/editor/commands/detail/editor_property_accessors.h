@@ -277,16 +277,16 @@ struct editor_property_accessors {
 
 	template <class T, class F>
 	static void access_each_property(
-		const change_mode_vars_property_command& self,
+		const change_mode_rules_property_command& self,
 		T in,
 		F callback
 	) {
-		in.folder.commanded->mode_vars.vars.visit(
+		in.folder.commanded->mode_rules.vars.visit(
 			self.vars_type_id,
-			[&](auto& typed_mode_vars) {
-				if (auto* const found_mode_vars = mapped_or_nullptr(typed_mode_vars, self.vars_id)) {
+			[&](auto& typed_mode_rules) {
+				if (auto* const found_mode_rules = mapped_or_nullptr(typed_mode_rules, self.vars_id)) {
 					on_field_address(
-						*found_mode_vars,
+						*found_mode_rules,
 						self.field,
 						continue_if_nullopt([&](auto& resolved_field) {
 							return callback(resolved_field);

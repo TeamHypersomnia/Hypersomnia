@@ -40,7 +40,7 @@
 #include "game/detail/inventory/generate_equipment.h"
 
 namespace test_scenes {
-	void testbed::setup(test_scene_mode_vars& vars) {
+	void testbed::setup(test_scene_mode_rules& vars) {
 		vars.name = "Testbed vars";
 		vars.spawned_faction = faction_type::RESISTANCE;
 
@@ -50,7 +50,7 @@ namespace test_scenes {
 		fill_range(vars.initial_eq.spells_to_give, true);
 	}
 
-	void testbed::setup(bomb_mode_vars& vars) {
+	void testbed::setup(bomb_mode_rules& vars) {
 		vars.bot_names = {
 			"daedalus",
 			"icarus",

@@ -167,7 +167,7 @@ template class change_property_command<change_common_state_command>;
 template class change_property_command<change_group_property_command>;
 template class change_property_command<change_current_mode_property_command>;
 template class change_property_command<change_mode_player_property_command>;
-template class change_property_command<change_mode_vars_property_command>;
+template class change_property_command<change_mode_rules_property_command>;
 
 template class change_property_command<change_asset_property_command<assets::image_id>>;
 template class change_property_command<change_asset_property_command<assets::sound_id>>;

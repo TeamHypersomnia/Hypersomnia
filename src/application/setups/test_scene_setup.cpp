@@ -12,9 +12,9 @@ test_scene_setup::test_scene_setup(
 	const input_recording_type recording_type
 ) {
 #if BUILD_TEST_SCENES
-	scene.make_test_scene(lua, settings, mode_vars);
+	scene.make_test_scene(lua, settings, mode_rules);
 	auto& cosm = scene.world;
-	viewed_character_id = cosm[mode.lookup(mode.add_player({ mode_vars, cosm }, faction_type::RESISTANCE))].get_id();
+	viewed_character_id = cosm[mode.lookup(mode.add_player({ mode_rules, cosm }, faction_type::RESISTANCE))].get_id();
 #else
 	(void)lua;
 	(void)settings;

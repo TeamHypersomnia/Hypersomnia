@@ -16,8 +16,8 @@ struct intercosm_path_op {
 
 struct test_scene_settings;
 
-struct test_scene_mode_vars;
-struct bomb_mode_vars;
+struct test_scene_mode_rules;
+struct bomb_mode_rules;
 
 struct intercosm {
 	// GEN INTROSPECTOR struct intercosm
@@ -31,8 +31,8 @@ struct intercosm {
 	void make_test_scene(
 		sol::state&, 
 		test_scene_settings,
-		test_scene_mode_vars&,
-		bomb_mode_vars* = nullptr
+		test_scene_mode_rules&,
+		bomb_mode_rules* = nullptr
 	);
 #endif
 

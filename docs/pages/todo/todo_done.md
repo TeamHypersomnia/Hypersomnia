@@ -1868,7 +1868,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 				- View elements:
 					- Group selection state
 					- Selection state
-				- mode_vars
+				- mode_rules
 				- ~~From the player:~~
 					- initial mode_state
 						- actually, no, because we should always reset it to initial values
@@ -2190,3 +2190,6 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 	- Flipping of editor selection
 		- Shift+V, Shift+H
+
+- Commandize "Add player" and "Restart" in editor
+

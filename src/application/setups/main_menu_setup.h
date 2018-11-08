@@ -45,7 +45,7 @@ class main_menu_setup : public default_setup_settings {
 
 	intercosm intro;
 	test_scene_mode mode;
-	test_scene_mode_vars mode_vars;
+	test_scene_mode_rules mode_rules;
 	entity_id viewed_character_id;
 
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
@@ -127,7 +127,7 @@ public:
 			total_collected_entropy.clear_dead_entities(intro.world);
 
 			mode.advance(
-				{ mode_vars, intro.world },
+				{ mode_rules, intro.world },
 				{ total_collected_entropy, {} },
 				callbacks
 			);

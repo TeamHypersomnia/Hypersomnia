@@ -52,8 +52,8 @@ struct bomb_mode_economy_vars {
 	// END GEN INTROSPECTOR
 };
 
-struct bomb_mode_vars {
-	// GEN INTROSPECTOR struct bomb_mode_vars
+struct bomb_mode_rules {
+	// GEN INTROSPECTOR struct bomb_mode_rules
 	std::string name = "Unnamed bomb mode vars";
 
 	std::vector<entity_name_str> bot_names;
@@ -190,12 +190,12 @@ enum class round_start_type {
 
 class bomb_mode {
 public:
-	using vars_type = bomb_mode_vars;
+	using vars_type = bomb_mode_rules;
 	static constexpr bool needs_initial_signi = true;
 	static constexpr bool round_based = true;
 
 	struct input {
-		const bomb_mode_vars& vars;
+		const bomb_mode_rules& vars;
 		const cosmos_solvable_significant& initial_signi;
 		cosmos& cosm;
 	};

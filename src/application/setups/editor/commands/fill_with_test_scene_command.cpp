@@ -27,7 +27,7 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 	auto& view = in.folder.view;
 	auto& view_ids = in.folder.commanded->view_ids;
 	auto& player = in.folder.player;
-	auto& mode_vars = in.folder.commanded->mode_vars;
+	auto& mode_rules = in.folder.commanded->mode_rules;
 
 	auto ms = augs::ref_memory_stream(before_fill);
 
@@ -39,8 +39,8 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 	view = {};
 	view_ids = {};
 
-	test_scene_mode_vars test_vars;
-	bomb_mode_vars bomb_vars;
+	test_scene_mode_rules test_vars;
+	bomb_mode_rules bomb_vars;
 
 #if IS_PRODUCTION_BUILD
 	bomb_vars.warmup_secs = 45;
@@ -64,34 +64,34 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 	work.make_test_scene(in.lua, { minimal, settings.scene_tickrate }, test_vars, std::addressof(bomb_vars));
 #endif
 
-	auto& vars = mode_vars.vars;
+	auto& vars = mode_rules.vars;
 	vars.clear();
 
 	auto& player_id = view.local_player;
 
 	{
-		const auto test_vars_id = raw_mode_vars_id(0);
+		const auto test_vars_id = raw_mode_rules_id(0);
 		vars.get_for<test_scene_mode>().try_emplace(test_vars_id, std::move(test_vars));
 
 		if (!settings.start_bomb_mode) {
 			const auto arbitrary_player_id = mode_player_id::first();
 			player_id = arbitrary_player_id;
 
-			auto& def = mode_vars.default_mode;
+			auto& def = mode_rules.default_mode;
 			def.type_id.set<test_scene_mode>();
 			def.raw = test_vars_id;
 		}
 	}
 
 	{
-		const auto bomb_vars_id = raw_mode_vars_id(0);
+		const auto bomb_vars_id = raw_mode_rules_id(0);
 		vars.get_for<bomb_mode>().try_emplace(bomb_vars_id, std::move(bomb_vars));
 
 		if (settings.start_bomb_mode) {
 			const auto arbitrary_player_id = mode_player_id::first();
 			player_id = arbitrary_player_id;
 
-			auto& def = mode_vars.default_mode;
+			auto& def = mode_rules.default_mode;
 			def.type_id.set<bomb_mode>();
 			def.raw = bomb_vars_id;
 		}
