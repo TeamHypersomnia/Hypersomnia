@@ -621,6 +621,10 @@ void item_system::handle_wielding_requests(const logic_step step) {
 	};
 
 	for (const auto& p : entropy.players) {
+		if (cosm[p.first].dead()) {
+			continue;
+		}
+
 		if (p.second.wield == std::nullopt) {
 			continue;
 		}

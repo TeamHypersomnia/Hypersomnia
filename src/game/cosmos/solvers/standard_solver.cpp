@@ -48,6 +48,10 @@ void standard_solve(const logic_step step) {
 	contact_listener listener(cosm);
 
 	for (const auto& p : step.get_entropy().players) {
+		if (cosm[p.first].dead()) {
+			continue;
+		}
+
 		perform_transfers(p.second.transfers, step);
 	}
 

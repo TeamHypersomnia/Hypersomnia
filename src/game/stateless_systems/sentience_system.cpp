@@ -57,6 +57,10 @@ void sentience_system::cast_spells(const logic_step step) const {
 		const auto subject = cosm[players.first];
 		const auto spell = players.second.cast_spell;
 
+		if (subject.dead()) {
+			continue;
+		}
+
 		if (!spell.is_set()) {
 			continue;
 		}
