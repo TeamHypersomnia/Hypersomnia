@@ -3,7 +3,7 @@ When you are done reading this section,
 press Pause Break to clear the selection and show general help for this view.
 
 The selected entities are highlighted with a bright blue color.
-The editor always draws a white bounding bounding box of all selected entities.
+The editor always draws a white bounding bounding box around the selected entities.
 
 If you don't like the colors, you can tweak them in Editor settings (Esc->Settings->Editor->Appearance).
 
@@ -15,17 +15,17 @@ A selection rectangle should appear.
 By default, the rectangle will only select entities on the same render layer 
 as the first entity hit by the rectangle.
 
-You can change this behaviour on the fly. 
+You will change this behaviour on the fly. 
 In the order of the most general to the most specific:
 
 - Shift + 1 picks "Everything" mode.
 	- All entities touching the selection rectangle will be selected.
 - Shift + 2 picks "Layer" mode.
 	- After the first entity is selected, only entities having the same render layer will be added to selection.
-		- This way you can quickly select all walls under the rectangle, or for example all floors.
+		- This way you can quickly select all walls, or for example all floors.
 - Shift + 3 picks "Flavour" mode.
 	- After the first entity is selected, only entities having the same flavour will be added to selection.
-		- This way you can quickly select all Electric rapiers under the rectangle, or for example all BILMER2000 magazines.
+		- This way you can quickly select all Electric rapiers, or for example all BILMER2000 magazines.
 
 To see which Rectangle Selection Mode is currently chosen, 
 look at the bottom of the screen and find the "RSM: " indicator.
@@ -81,7 +81,10 @@ You can also filter existing groups by using the text area at the top of the dia
 	  of unrelated stuff. A good example is if you want to select a sand dune
 	  that is possibly below several fish, a water overlay entity, water caustics entities,
 	  and maybe under some flowers at that.
+	- It can also be used to temporarily hide floors or other big objects
+	  that highlight the whole screen due to constantly being hovered.
 - Press U to unhide all layers.
+	- You can manually hide and unhide layers from within the "Layers" window (Alt+L).
 
 ## Operations: Existential
 

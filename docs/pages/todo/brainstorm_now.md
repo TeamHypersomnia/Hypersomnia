@@ -7,17 +7,6 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - Usability fixes to editor 
-	- Comfortable import, export and use of mode vars
-		- Proposition: Just "modes" file
-			- Pro: less work to do now
-			- Pro: entire packages of modes in a single file
-				- can load them as well
-		- Proposition: Mode vars objects per file
-			- Pro: Possible organization in the filesystem
-			- Pro: Can easily add new modes without launching editor?
-			- Con: Format of the filename, have to forbid some characters
-		- Server will probably be able to accept a lua script easily
-		- With an export, we may simply create a folder with a script file per each var
 	- Setting specific names to entities
 	- Complex instantiations
 		- I struggle to see any that are necessary before DM

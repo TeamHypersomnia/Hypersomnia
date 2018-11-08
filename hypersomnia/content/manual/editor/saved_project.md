@@ -12,7 +12,7 @@ including things like the history of changes or the camera position.
 
 All open projects will be autosaved:
 - Every time you switch window focus.
-- Every time you exit the editor.
+- Every time you exit the editor gracefully.
 - Every time the game crashes...
 	- ...unless it is due to a segmentation fault or some other catastrophic event.
 - Additionally, every single minute. 
@@ -25,12 +25,13 @@ If you wish to tweak autosaving behaviour:
 You can find many, many other options there that can change how editor behaves.
 
 The autosave state is stored inside your project directory, in a folder named ``autosave``.  
-The folder exactly replicates the rest of the project's directory tree.  
+The folder exactly replicates the rest of the project's directory tree (more on that in the next section).  
 
-- When trying to open a folder located at ``C:/Project``, the editor first checks if a folder named ``C:/Project/autosave`` exists.
-	- If it is found, the opened tab is populated only with the work from the ``C:/Project/autosave`` folder. 
-      The tab itself still carries the path of the original folder,
-	  so an explicit save (``Ctrl+S``) will properly update the real project folder.
+- On launch, the editor automatically loads the autosaved state if it exists, instead of the files saved explicitly (``Ctrl+S``).
+	- When trying to open a folder located at ``C:/Project``, the editor first checks if a folder named ``C:/Project/autosave`` exists.
+		- If it is found, the opened tab is populated only with the work from the ``C:/Project/autosave`` folder. 
+      	The tab itself still carries the path of the original folder,
+	  	so an explicit save (``Ctrl+S``) will properly update the real project folder.
 
 The autosave folder **will be deleted** every time you explicitly save the project.
 If you wish to revert the project to the state where you last saved your work explicitly.
@@ -65,7 +66,7 @@ the meaning of which is as follows:
 	- Can be safely deleted at any time if you don't want to track some old operations anymore and it gets too big.
 
 - File: ``Project.view``.
-	- A binary blob holding the camera state, grid settings, marks, filters etc (more on these later).
+	- A binary blob holding the camera state, grid settings, marks, hidden layers and others (more on these later).
 	- Can be safely deleted at any time to reset those settings.
 
 - File: ``Project.view_ids``.
@@ -95,13 +96,12 @@ You can use keyboard to do the same:
 - Press your arrow keys to move around.
 - Press - to zoom out and = to zoom in.
 
-Whatever movement you make, holding Shift will make it faster.
-Holding left Alt will make it slower.
+Whatever movement you make, holding Shift will make it faster,
+whereas holding left Alt will make it slower.
 
 Remember that if you get lost exploring the map,
 simply press HOME to return to the origin of the map (x = 0, y = 0, zoom = 100%).
-
-Press Ctrl+0 to only reset the zoom to 100%.
+	Press Ctrl+0 to reset the zoom without resetting the camera position.
 
 ## Marks
 
@@ -138,6 +138,10 @@ The contents of this window will change when you do so - follow the instructions
 ## Go to entity
 
 Press Slash (/) to start quick search for an entity.
+
+## Assets
+
+Visit these windows to get more information:
 
 ## Modes
 

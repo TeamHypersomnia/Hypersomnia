@@ -1,7 +1,7 @@
 #include "augs/misc/enum/enum_boolset.h"
 #include "augs/string/string_templates.h"
 
-#include "application/setups/editor/gui/editor_filters_gui.h"
+#include "application/setups/editor/gui/editor_layers_gui.h"
 
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
@@ -12,7 +12,7 @@
 
 #include "augs/templates/enum_introspect.h"
 
-void editor_filters_gui::perform(
+void editor_layers_gui::perform(
 	const property_editor_settings& settings,
 	augs::maybe<render_layer_filter>& viewing,
 	augs::maybe<render_layer_filter>& selecting

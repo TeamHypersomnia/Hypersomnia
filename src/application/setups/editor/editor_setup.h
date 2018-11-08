@@ -37,7 +37,7 @@
 #include "application/setups/editor/gui/editor_common_state_gui.h"
 #include "application/setups/editor/gui/editor_selection_groups_gui.h"
 #include "application/setups/editor/gui/editor_summary_gui.h"
-#include "application/setups/editor/gui/editor_filters_gui.h"
+#include "application/setups/editor/gui/editor_layers_gui.h"
 #include "application/setups/editor/gui/editor_player_gui.h"
 #include "application/setups/editor/gui/editor_modes_gui.h"
 #include "application/setups/editor/gui/editor_tutorial_gui.h"
@@ -103,7 +103,7 @@ class editor_setup {
 	editor_selection_groups_gui selection_groups_gui = std::string("Selection groups");
 	editor_summary_gui summary_gui = std::string("Summary");
 	editor_coordinates_gui coordinates_gui = std::string("Coordinates");
-	editor_filters_gui filters_gui = std::string("Filters");
+	editor_layers_gui layers_gui = std::string("Layers");
 	editor_tutorial_gui tutorial_gui = std::string("Editor tutorial");
 
 	editor_images_gui images_gui = std::string("Images");

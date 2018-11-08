@@ -534,7 +534,7 @@ void editor_setup::perform_custom_imgui(
 					ImGui::Separator();
 					ImGui::MenuItem("(Editing)", NULL, false, false);
 
-					do_window_entry(filters_gui);
+					do_window_entry(layers_gui);
 					do_window_entry(history_gui);
 
 					if (item_if_tabs("Player")) {
@@ -621,7 +621,7 @@ void editor_setup::perform_custom_imgui(
 		modes_gui.perform(settings, make_command_input());
 
 		summary_gui.perform(*this);
-		filters_gui.perform(
+		layers_gui.perform(
 			settings.property_editor,
 			view().viewing_filter,
 			view().selecting_filter
@@ -1098,7 +1098,7 @@ bool editor_setup::handle_input_before_imgui(
 				case key::P: player_gui.show = true; return true;
 				case key::U: summary_gui.open(); return true;
 				case key::O: coordinates_gui.open(); return true;
-				case key::F: filters_gui.open(); return true;
+				case key::L: layers_gui.open(); return true;
 				case key::I: images_gui.open(); return true;
 				case key::N: sounds_gui.open(); return true;
 				case key::R: particle_effects_gui.open(); return true;
@@ -1785,6 +1785,8 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 				|| try_preffix("Written", green)
 				|| try_preffix("Saved", green)
 				|| try_preffix("Altered", yellow)
+				|| try_preffix("Grouped", yellow)
+				|| try_preffix("Ungrouped", orange)
 				|| try_preffix("Set", yellow)
 				|| try_preffix("Moved", yellow)
 				|| try_preffix("Rotated", yellow)
