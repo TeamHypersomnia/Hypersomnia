@@ -149,7 +149,7 @@ Press Alt+D (View->Modes) for more information.
 
 ## Playtesting
 
-You will certainly want to test how your map plays.
+Naturally, you will want to test how your map plays.
 To do so, press HOME to return to the origin,
 and then press "i" to begin playing your world.
 The currently selected mode will start executing its logic on the map.

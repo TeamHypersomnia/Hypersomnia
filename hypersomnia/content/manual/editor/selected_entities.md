@@ -76,15 +76,9 @@ You can also filter existing groups by using the text area at the top of the dia
 
 - Press Z to place the camera exactly at the center of the selection's bounding box.
 	- Press Shift+Z to do the same but to additionally reset zoom.
-- Press H to temporarily hide the layers of all selected entities.
-	- This is very useful if you want to select an entity that is below several other layers 
-	  of unrelated stuff. A good example is if you want to select a sand dune
-	  that is possibly below several fish, a water overlay entity, water caustics entities,
-	  and maybe under some flowers at that.
-	- It can also be used to temporarily hide floors or other big objects
-	  that highlight the whole screen due to constantly being hovered.
-- Press U to unhide all layers.
-	- You can manually hide and unhide layers from within the "Layers" window (Alt+L).
+
+Press Alt+L to open Layers window and navigate to "Keyboard bindings" section
+to see what else you can do with the selected entities.
 
 ## Operations: Existential
 

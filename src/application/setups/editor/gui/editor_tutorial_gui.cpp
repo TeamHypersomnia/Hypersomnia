@@ -96,12 +96,14 @@ void editor_tutorial_gui::perform(const editor_setup& setup) {
 		);
 
 		if (!focused_dialog.empty()) {
-			const auto& text = dialog_manuals.at(focused_dialog);
+			current_dialog = focused_dialog;
+		}
 
-			if (!text.empty()) {
-				chosen_tutorial_path = make_dialog_manual_path(focused_dialog);
-				return text;
-			}
+		if (!current_dialog.empty()) {
+			const auto& text = dialog_manuals.at(current_dialog);
+
+			chosen_tutorial_path = make_dialog_manual_path(current_dialog);
+			return text;
 		}
 
 		const auto chosen_tutorial_type = [&]() {
@@ -171,6 +173,14 @@ void editor_tutorial_gui::perform(const editor_setup& setup) {
 
 	text_disabled(augs::filename_first(chosen_tutorial_path));
 
+	if (!current_dialog.empty()) {
+		ImGui::SameLine();
+
+		if (ImGui::Button("Return")) {
+			current_dialog.clear();
+		}
+	}
+	
 	ImGui::Separator();
 
 	auto next_ht = [&](const std::size_t from = 0) {

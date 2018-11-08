@@ -30,6 +30,10 @@ struct editor_tutorial_gui : standard_window_mixin<editor_tutorial_gui> {
 	using base::base;
 	using introspect_base = base;
 
+	// GEN INTROSPECTOR struct editor_tutorial_gui
+	std::string current_dialog;
+	// END GEN INTROSPECTOR
+
 	augs::enum_array<std::string, editor_tutorial_type> context_manuals;
 	std::unordered_map<std::string, std::string> dialog_manuals;
 

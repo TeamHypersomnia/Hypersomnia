@@ -2,8 +2,7 @@ Welcome to the editor setup!
 This tutorial will teach you everything you need to become a proficient mapper.
 It will always show you only the information that is relevant to what you are currently doing.
 If you close this window, you can always re-open it by going to View->Tutorial, or simply by pressing Alt+X. 
-If another window is focused, this window will show details about the focused window.
-If this window is focused, the contextual help will be printed.
+Whenever you focus another window, specific help for that window will be shown here.
 
 To restart the tutorial, you may safely delete the cache/usr/editor folder.
 This will also delete all previously open untitled projects.
