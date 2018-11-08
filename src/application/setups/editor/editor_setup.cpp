@@ -1620,12 +1620,22 @@ void editor_setup::draw_status_bar(const draw_setup_gui_input& in) {
 #endif
 
 		{
+			const auto& v = view();
+
 			std::string total_text;
 			std::string separator = "  ";
 
-			total_text += "Snap: ";
+			total_text += "Groups: ";
 
-			const auto& v = view();
+			if (v.ignore_groups) {
+				total_text += "No ";
+			}
+			else {
+				total_text += "Yes";
+			}
+
+			total_text += separator;
+			total_text += "Snap: ";
 
 			if (v.snapping_enabled) {
 				total_text += "Yes";
