@@ -77,9 +77,11 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 			const auto arbitrary_player_id = mode_player_id::first();
 			player_id = arbitrary_player_id;
 
-			auto& def = rulesets.default_ruleset;
+			auto& def = rulesets.meta.playtest_default;
 			def.type_id.set<test_scene_mode>();
 			def.raw = test_ruleset_id;
+
+			rulesets.meta.server_default = def;
 		}
 	}
 
@@ -91,9 +93,11 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 			const auto arbitrary_player_id = mode_player_id::first();
 			player_id = arbitrary_player_id;
 
-			auto& def = rulesets.default_ruleset;
+			auto& def = rulesets.meta.playtest_default;
 			def.type_id.set<bomb_mode>();
 			def.raw = bomb_ruleset_id;
+
+			rulesets.meta.server_default = def;
 		}
 	}
 }

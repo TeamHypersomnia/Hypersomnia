@@ -41,7 +41,7 @@
 
 namespace test_scenes {
 	void testbed::setup(test_mode_ruleset& rs) {
-		rs.name = "Testbed ruleset";
+		rs.name = "Generated test ruleset";
 		rs.spawned_faction = faction_type::RESISTANCE;
 
 		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::VINDICATOR);
@@ -64,7 +64,7 @@ namespace test_scenes {
 
 		rs.bot_quota = rs.bot_names.size();
 
-		rs.name = "Testbed bomb ruleset";
+		rs.name = "Generated bomb ruleset";
 		rs.economy.initial_money = 1000;
 
 		{

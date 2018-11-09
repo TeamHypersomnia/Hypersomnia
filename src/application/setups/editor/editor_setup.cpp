@@ -1800,6 +1800,7 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 				|| try_preffix("Ungrouped", orange)
 				|| try_preffix("Set", yellow)
 				|| try_preffix("Unset", orange)
+				|| try_preffix("Selected", yellow)
 				|| try_preffix("Moved", yellow)
 				|| try_preffix("Rotated", yellow)
 				|| try_preffix("Resized", yellow)

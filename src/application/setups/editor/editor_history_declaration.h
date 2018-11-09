@@ -31,8 +31,9 @@ struct change_common_state_command;
 struct change_grouping_command;
 struct change_group_property_command;
 
-struct change_current_mode_property_command;
 struct change_ruleset_property_command;
+struct change_rulesets_meta_property;
+struct change_current_mode_property_command;
 struct change_mode_player_property_command;
 
 template <class>
@@ -75,6 +76,7 @@ using editor_history_base = augs::history_with_marks<
 	change_group_property_command,
 
 	change_ruleset_property_command,
+	change_rulesets_meta_property,
 
 	create_pathed_asset_id_command<assets::image_id>,
 	forget_asset_id_command<assets::image_id>,

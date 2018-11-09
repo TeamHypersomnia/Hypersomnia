@@ -25,6 +25,18 @@ struct change_ruleset_property_command : change_property_command<change_ruleset_
 	}
 };
 
+struct change_rulesets_meta_property : change_property_command<change_rulesets_meta_property> {
+	using introspect_base = change_property_command<change_rulesets_meta_property>;
+
+	// GEN INTROSPECTOR struct change_rulesets_meta_property
+	only_trivial_field_address field;
+	// END GEN INTROSPECTOR
+
+	auto count_affected() const {
+		return 1u;
+	}
+};
+
 struct change_current_mode_property_command : change_property_command<change_current_mode_property_command> {
 	using introspect_base = change_property_command<change_current_mode_property_command>;
 

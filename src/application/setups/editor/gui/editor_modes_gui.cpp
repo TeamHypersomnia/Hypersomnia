@@ -21,9 +21,13 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/memory_stream.h"
 
+#include "application/setups/editor/detail/maybe_different_colors.h"
+
 #include "application/setups/editor/property_editor/widgets/pathed_asset_widget.h"
 #include "application/setups/editor/property_editor/widgets/unpathed_asset_widget.h"
 #include "application/setups/editor/property_editor/widgets/asset_sane_default_provider.h"
+
+#define MACRO_MAKE_ONLY_TRIVIAL_FIELD_ADDRESS(a,b) make_field_address<only_trivial_field_type_id, decltype(a::b)>(augs_offsetof(a,b))
 
 void editor_modes_gui::perform(const editor_settings& settings, editor_command_input cmd_in) {
 	using namespace augs::imgui;
@@ -115,6 +119,7 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 	}
 
 	auto& rulesets = folder.commanded->rulesets.all;
+	const auto& meta = folder.commanded->rulesets.meta;
 
 	for_each_type_in_list<all_modes>(
 		[&](auto m) {
@@ -130,14 +135,71 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 
 			if (type_node) {
 				for (const auto& it : modes) {
-					const auto& typed_mode = it.second;
+					const auto& ruleset = it.second;
 					const auto id = it.first;
-					const auto node_label = typed_mode.name + "###" + std::to_string(id);
+
+					const auto typed_id = ruleset_id {
+						mode_type_id::of<M>(),
+						id
+					};
+
+					const bool is_server = meta.server_default == typed_id;
+					const bool is_playtest = meta.playtest_default == typed_id;
+
+					const auto node_label = ruleset.name + "###" + std::to_string(id);
 					auto node = scoped_tree_node(node_label.c_str());
+
+					if (is_server) {
+						ImGui::SameLine();
+						text_color("S", orange);
+					}
+
+					if (is_playtest) {
+						ImGui::SameLine();
+						text_color("P", yellow);
+					}
 
 					next_columns(2);
 
 					if (node) {
+						{
+							auto f = is_playtest;
+
+							auto scope = maybe_disabled_cols(settings.property_editor, is_playtest);
+
+							if (checkbox("Playtest default", f)) {
+								if (!is_playtest) {
+									change_rulesets_meta_property cmd;
+									cmd.field = MACRO_MAKE_ONLY_TRIVIAL_FIELD_ADDRESS(rulesets_meta, playtest_default);
+									cmd.value_after_change = augs::to_bytes(typed_id);
+									cmd.built_description = typesafe_sprintf("Selected \"%x\" as default for playtesting", ruleset.name);
+									post_editor_command(cmd_in, cmd);
+								}
+							}
+
+							ImGui::NextColumn();
+							ImGui::NextColumn();
+						}
+
+						{
+							auto f = is_server;
+
+							auto scope = maybe_disabled_cols(settings.property_editor, is_server);
+
+							if (checkbox("Server default", f)) {
+								if (!is_server) {
+									change_rulesets_meta_property cmd;
+									cmd.field = MACRO_MAKE_ONLY_TRIVIAL_FIELD_ADDRESS(rulesets_meta, server_default);
+									cmd.value_after_change = augs::to_bytes(typed_id);
+									cmd.built_description = typesafe_sprintf("Selected \"%x\" as default for servers", ruleset.name);
+									post_editor_command(cmd_in, cmd);
+								}
+							}
+
+							ImGui::NextColumn();
+							ImGui::NextColumn();
+						}
+
 						auto& work = folder.commanded->work;
 						auto& cosm = work.world;
 
@@ -153,10 +215,12 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 
 						const auto project_path = cmd_in.folder.current_path;
 
+						const auto location = typesafe_sprintf(" (%x)", ruleset.name);
+
 						singular_edit_properties(
 							in,
-							typed_mode,
-							" (Current mode)",
+							ruleset,
+							location.c_str(),
 							cmd,
 							special_widgets(
 								pathed_asset_widget { defs, project_path, cmd_in },

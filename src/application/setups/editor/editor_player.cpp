@@ -137,7 +137,7 @@ double editor_player::get_total_secs(const editor_folder& folder) const {
 }
 
 void editor_player::initialize_testing(editor_folder& f) {
-	choose_mode(f.commanded->rulesets.default_ruleset);
+	choose_mode(f.commanded->rulesets.meta.playtest_default);
 
 	save_state_before_start(f);
 	reset_mode();

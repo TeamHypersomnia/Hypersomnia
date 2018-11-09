@@ -255,6 +255,21 @@ struct editor_property_accessors {
 
 	template <class T, class F>
 	static void access_each_property(
+		const change_rulesets_meta_property& self,
+		T in,
+		F callback
+	) {
+		on_field_address(
+			in.folder.commanded->rulesets.meta,
+			self.field,
+			continue_if_nullopt([&](auto& resolved_field) {
+				return callback(resolved_field);
+			})
+		);
+	}
+
+	template <class T, class F>
+	static void access_each_property(
 		const change_mode_player_property_command& self,
 		T in,
 		F callback

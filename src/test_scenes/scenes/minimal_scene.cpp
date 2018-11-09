@@ -24,12 +24,12 @@
 namespace test_scenes {
 	void minimal_scene::setup(test_mode_ruleset& rs) {
 		rs.spawned_faction = faction_type::METROPOLIS;
-		rs.name = "Minimal scene ruleset";
+		rs.name = "Generated test ruleset";
 	}
 
 	void minimal_scene::setup(bomb_mode_ruleset& rs) {
 		rs.bot_names = { "First", "Second", "Third", "Fourth", "Fifth", "Sixth" };
-		rs.name = "Minimal scene bomb ruleset";
+		rs.name = "Generated bomb ruleset";
 		rs.bot_quota = rs.bot_names.size();
 	}
 

@@ -89,6 +89,12 @@ using mode_field_type_id  = type_in_list_id<
 	>
 >;
 
+using only_trivial_field_type_id = type_in_list_id<
+	type_list<
+		augs::trivial_type_marker
+	>
+>;
+
 template <class field_type_id>
 struct field_address {
 	// GEN INTROSPECTOR struct field_address class field_type_id
@@ -111,6 +117,7 @@ using flavour_field_address = field_address<flavour_field_type_id>;
 using entity_field_address = field_address<entity_field_type_id>;
 using asset_field_address = field_address<asset_field_type_id>;
 using mode_field_address = field_address<mode_field_type_id>;
+using only_trivial_field_address = field_address<only_trivial_field_type_id>;
 
 template <class I, class M>
 auto get_type_id_for_field() {
