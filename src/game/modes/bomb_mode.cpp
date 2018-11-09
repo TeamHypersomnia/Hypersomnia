@@ -619,7 +619,7 @@ void bomb_mode::setup_round(
 	cosm.set(in.initial_signi);
 	remove_test_characters(cosm);
 
-	if (in.rules.clear_dropped_items) {
+	if (in.rules.delete_lying_items_on_round_start) {
 		remove_test_dropped_items(cosm);
 	}
 

@@ -75,7 +75,7 @@ struct bomb_mode_ruleset {
 	per_faction_t<bomb_mode_faction_rules> factions;
 
 	constrained_entity_flavour_id<invariants::explosive> bomb_flavour;
-	bool clear_dropped_items = false;
+	bool delete_lying_items_on_round_start = false;
 	bool allow_game_commencing = false;
 
 	bomb_mode_economy_rules economy;

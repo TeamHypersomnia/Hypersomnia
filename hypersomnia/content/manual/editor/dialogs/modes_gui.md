@@ -8,22 +8,23 @@ For example, with a Team Deathmatch:
 
 - You might want to have a set of rules specific for serious 5v5 matches:
 	- long freeze times, longer round end delays, no weapons initially granted
-- and another set of rules for whenever you want to play a quick 1v1 duel:
+- You might also want to have an additional set of rules for occasions when you want to play a quick 1v1 duel:
 	- cap player number to 2, almost instant round restart, 
 	  minimal freeze time, maybe always give some basic equipment, and so on.
 
 The server's admin can then load a ruleset of his choice on the fly,
-as long as he has the ``.rulesets`` file.
+as long as they have the ``.rulesets`` file.
 
 During a playtest, a "Current mode state" node appears in the Modes dialog,
 which lets you peek into the state of the currently played mode,
 	- Although, that is useful only for debugging purposes.
 	- This state is held in the ``Project.player`` file.
 
-## Theory: A solver vs a mode
+## What exactly is a mode? A mode versus a solver.
+
 There are two principal objects responsible for the entire process of moving the game forward in time.
 
-- A solver. It constitutes the great majority of what happens during the game.
+- A solver. It constitutes the majority of what happens during the game.
   During a solve, these things take place, among many others:
 	- physics and collision handling,
 	- detonation of bombs and grenades,
@@ -35,9 +36,10 @@ There are two principal objects responsible for the entire process of moving the
   An example of a mode is a Team Deathmatch, a Bomb Mode, or a Free for All.
   A mode is responsible for:
 	- respawning dead sentient beings back to life when it is appropriate,
-	- introducing the concept of teams, 
-	- counting the rounds, money, and a whole lot of other statistics
+		- e.g. when a new round starts or right away during a warmup.
+	- introducing the concept of teams if so is appropriate, 
+	- keeping track of rounds, scores, money, and a whole lot of other statistics,
 	- checking win conditions.
 		- For example, if the bomb entity stops existing in Bomb Mode,
-		  the win goes to the bombing faction - and the defusing factions loses - 
+		  the win goes to the bombing faction - and the defusing faction loses - 
 		  since the only way that a bomb stops existing is due to it exploding.
