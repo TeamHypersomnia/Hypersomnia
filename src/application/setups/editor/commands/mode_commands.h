@@ -10,13 +10,13 @@
 #include "application/setups/editor/editor_command_input.h"
 #include "application/setups/editor/detail/field_address.h"
 
-struct change_mode_rules_property_command : change_property_command<change_mode_rules_property_command> {
-	using introspect_base = change_property_command<change_mode_rules_property_command>;
+struct change_ruleset_property_command : change_property_command<change_ruleset_property_command> {
+	using introspect_base = change_property_command<change_ruleset_property_command>;
 
-	// GEN INTROSPECTOR struct change_mode_rules_property_command
+	// GEN INTROSPECTOR struct change_ruleset_property_command
 	mode_field_address field;
-	raw_mode_rules_id vars_id;
-	mode_type_id vars_type_id;
+	raw_ruleset_id id;
+	mode_type_id type_id;
 	// END GEN INTROSPECTOR
 
 	auto count_affected() const {

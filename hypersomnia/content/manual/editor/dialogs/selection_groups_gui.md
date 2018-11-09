@@ -1,5 +1,7 @@
 Selection groups exist so that blobs of conceptually related entities 
 can always be automatically selected together.
+For example, it quickly become bothersome to select every single element of an aquarium 
+every time you want to move it around.
 
 The dialog lists all existing selection groups.
 
@@ -17,6 +19,8 @@ There, you can rename the group.
 To select all entities belonging to a particular group, click on its name.
 You can also filter existing groups by using the text area at the top of the dialog.
 
-To toggle ignoring of groups, press A.
+If you want to temporarily ignore groups, press A to toggle ignoring.
 	You can see if you are currently respecting the groups by looking at the indicator
 	at the bottom of the screen.
+
+The selection groups are always ignored during rectangle selection.

@@ -73,8 +73,8 @@ the meaning of which is as follows:
 	- A binary blob holding identificators of selected entities and selection groups (more on these later).
 	- Can be safely deleted at any time to reset those settings.
 
-- File: ``Project.modes``.
-	- A binary blob representing the predefined game mode configurations (more on these later).
+- File: ``Project.rulesets``.
+	- A binary blob representing the predefined rulesets of modes to be played on this map (more on these later).
 	- You should not delete or otherwise alter it.
 
 - File: ``Project.player``.

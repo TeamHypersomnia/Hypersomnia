@@ -52,12 +52,12 @@ struct editor_paths {
 	augs::path_type view_file;
 	augs::path_type view_ids_file;
 	augs::path_type hist_file;
-	augs::path_type modes_file;
+	augs::path_type rulesets_file;
 	augs::path_type player_file;
 	augs::path_type autosave_path;
 
 	augs::path_type int_lua_file;
-	augs::path_type modes_lua_file;
+	augs::path_type rulesets_lua_file;
 
 	augs::path_type default_export_path;
 	augs::path_type imported_folder_path;

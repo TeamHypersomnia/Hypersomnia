@@ -1868,14 +1868,14 @@ i			- if the newly calculated target is different than last_reload_target, reset
 				- View elements:
 					- Group selection state
 					- Selection state
-				- mode_rules
+				- rulesets
 				- ~~From the player:~~
 					- initial mode_state
 						- actually, no, because we should always reset it to initial values
 				- history?
 					- NO! History will be the same, later we will only force-set revision
 
-- Constraints in the playtest mode
+- Constraints in the playtest
 	- we'll need to forbid undoing past the revision when we've started the playtest
 		- Or just interrupt on undo?
 		- Or just create a started playtest command?
@@ -1934,7 +1934,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 
 - Storage of pre-defined mode informations inside a map
-	- ``.modes`` file
+	- ``.rulesets`` file
 		- A map is still functional without modes and modes can always be later specified, so a separate file is justified
 		- As flavour ids aren't human readable, makes sense to use binary format for now
 	- Each should also have a name, e.g. "test scene", "bomb", "ffa", "tdm", "duel"
@@ -2080,7 +2080,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- ``ProjectName.int.lua``
 			- Contains the intercosm and rulesets, all important things.
 	- Export mode vars
-		- ``ProjectName.modes.lua``
+		- ``ProjectName.rulesets.lua``
 	- new project
 		- opens new tab and spawns a folder in untitleds directory
 	- open folder

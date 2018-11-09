@@ -40,18 +40,18 @@
 #include "game/detail/inventory/generate_equipment.h"
 
 namespace test_scenes {
-	void testbed::setup(test_scene_mode_rules& vars) {
-		vars.name = "Testbed vars";
-		vars.spawned_faction = faction_type::RESISTANCE;
+	void testbed::setup(test_mode_ruleset& rs) {
+		rs.name = "Testbed ruleset";
+		rs.spawned_faction = faction_type::RESISTANCE;
 
-		vars.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::VINDICATOR);
-		vars.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::VINDICATOR);
+		rs.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 
-		fill_range(vars.initial_eq.spells_to_give, true);
+		fill_range(rs.initial_eq.spells_to_give, true);
 	}
 
-	void testbed::setup(bomb_mode_rules& vars) {
-		vars.bot_names = {
+	void testbed::setup(bomb_mode_ruleset& rs) {
+		rs.bot_names = {
 			"daedalus",
 			"icarus",
 			"geneotech",
@@ -62,14 +62,14 @@ namespace test_scenes {
 			"Billan"
 		};
 
-		vars.bot_quota = vars.bot_names.size();
+		rs.bot_quota = rs.bot_names.size();
 
-		vars.name = "Testbed bomb vars";
-		vars.economy.initial_money = 1000;
+		rs.name = "Testbed bomb ruleset";
+		rs.economy.initial_money = 1000;
 
 		{
-			auto& resistance = vars.factions[faction_type::RESISTANCE];
-			auto& metropolis = vars.factions[faction_type::METROPOLIS];
+			auto& resistance = rs.factions[faction_type::RESISTANCE];
+			auto& metropolis = rs.factions[faction_type::METROPOLIS];
 
 			resistance.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 			metropolis.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
@@ -87,7 +87,7 @@ namespace test_scenes {
 		}
 
 		{
-			auto& mt = vars.view.event_sounds[faction_type::METROPOLIS];
+			auto& mt = rs.view.event_sounds[faction_type::METROPOLIS];
 
 			mt[battle_event::START] = to_sound_id(test_scene_sound_id::MT_START);
 			mt[battle_event::BOMB_PLANTED] = to_sound_id(test_scene_sound_id::MT_BOMB_PLANTED);
@@ -97,43 +97,43 @@ namespace test_scenes {
 		}
 
 		{
-			auto& re = vars.view.event_sounds[faction_type::RESISTANCE];
-			re = vars.view.event_sounds[faction_type::METROPOLIS];
+			auto& re = rs.view.event_sounds[faction_type::RESISTANCE];
+			re = rs.view.event_sounds[faction_type::METROPOLIS];
 			re[battle_event::BOMB_PLANTED] = to_sound_id(test_scene_sound_id::RE_BOMB_PLANTED);
 		}
 
 		{
-			auto& mt = vars.view.win_sounds[faction_type::METROPOLIS];
+			auto& mt = rs.view.win_sounds[faction_type::METROPOLIS];
 
 			mt[faction_type::RESISTANCE] = to_sound_id(test_scene_sound_id::MT_RESISTANCE_WINS);
 			mt[faction_type::METROPOLIS] = to_sound_id(test_scene_sound_id::MT_METROPOLIS_WINS);
 		}
 
 		{
-			auto& re = vars.view.win_sounds[faction_type::RESISTANCE];
-			re = vars.view.win_sounds[faction_type::METROPOLIS];
+			auto& re = rs.view.win_sounds[faction_type::RESISTANCE];
+			re = rs.view.win_sounds[faction_type::METROPOLIS];
 		}
 
-		vars.bomb_flavour = to_entity_flavour_id(test_hand_explosives::BOMB);
+		rs.bomb_flavour = to_entity_flavour_id(test_hand_explosives::BOMB);
 
-		vars.view.logos[faction_type::METROPOLIS] = to_image_id(test_scene_image_id::METROPOLIS_LOGO);
-		vars.view.logos[faction_type::ATLANTIS] = to_image_id(test_scene_image_id::ATLANTIS_LOGO);
-		vars.view.logos[faction_type::RESISTANCE] = to_image_id(test_scene_image_id::RESISTANCE_LOGO);
+		rs.view.logos[faction_type::METROPOLIS] = to_image_id(test_scene_image_id::METROPOLIS_LOGO);
+		rs.view.logos[faction_type::ATLANTIS] = to_image_id(test_scene_image_id::ATLANTIS_LOGO);
+		rs.view.logos[faction_type::RESISTANCE] = to_image_id(test_scene_image_id::RESISTANCE_LOGO);
 
-		vars.view.square_logos[faction_type::METROPOLIS] = to_image_id(test_scene_image_id::METROPOLIS_SQUARE_LOGO);
+		rs.view.square_logos[faction_type::METROPOLIS] = to_image_id(test_scene_image_id::METROPOLIS_SQUARE_LOGO);
 		// TODO: add atlantis logo
-		vars.view.square_logos[faction_type::ATLANTIS] = to_image_id(test_scene_image_id::METROPOLIS_SQUARE_LOGO);
-		vars.view.square_logos[faction_type::RESISTANCE] = to_image_id(test_scene_image_id::RESISTANCE_SQUARE_LOGO);
+		rs.view.square_logos[faction_type::ATLANTIS] = to_image_id(test_scene_image_id::METROPOLIS_SQUARE_LOGO);
+		rs.view.square_logos[faction_type::RESISTANCE] = to_image_id(test_scene_image_id::RESISTANCE_SQUARE_LOGO);
 
 		{
-			vars.view.icons[scoreboard_icon_type::DEATH_ICON] = to_image_id(test_scene_image_id::DEATH_ICON);
-			vars.view.icons[scoreboard_icon_type::UNCONSCIOUS_ICON] = to_image_id(test_scene_image_id::UNCONSCIOUS_ICON);
-			vars.view.icons[scoreboard_icon_type::NO_AMMO_ICON] = to_image_id(test_scene_image_id::NO_AMMO_ICON);
-			vars.view.icons[scoreboard_icon_type::BOMB_ICON] = to_image_id(test_scene_image_id::BOMB_ICON);
-			vars.view.icons[scoreboard_icon_type::DEFUSE_KIT_ICON] = to_image_id(test_scene_image_id::DEFUSE_KIT_ICON);
+			rs.view.icons[scoreboard_icon_type::DEATH_ICON] = to_image_id(test_scene_image_id::DEATH_ICON);
+			rs.view.icons[scoreboard_icon_type::UNCONSCIOUS_ICON] = to_image_id(test_scene_image_id::UNCONSCIOUS_ICON);
+			rs.view.icons[scoreboard_icon_type::NO_AMMO_ICON] = to_image_id(test_scene_image_id::NO_AMMO_ICON);
+			rs.view.icons[scoreboard_icon_type::BOMB_ICON] = to_image_id(test_scene_image_id::BOMB_ICON);
+			rs.view.icons[scoreboard_icon_type::DEFUSE_KIT_ICON] = to_image_id(test_scene_image_id::DEFUSE_KIT_ICON);
 		}
 
-		vars.view.money_icon = to_image_id(test_scene_image_id::MONEY_ICON);
+		rs.view.money_icon = to_image_id(test_scene_image_id::MONEY_ICON);
 	}
 
 	void testbed::populate(const loaded_image_caches_map& caches, const logic_step step) const {

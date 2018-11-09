@@ -41,7 +41,7 @@ Hold CTRL to add or remove entities from your selection.
 For example, to select all the Force and PED grenades (the red and the blue ones), do the following:
 
 - Press Shift + 3 to pick "Flavour" RSM.
-- Navigate with your mouse to the column of grenades laying on the street, just a little below the origin.
+- Navigate with your mouse to the column of grenades lying on the street, just a little below the origin.
 - Select any of the red grenades.
 - Press Ctrl+A - the selection will now contain all entities having the same flavour as the last selected entity.
 - Start holding left CTRL.
@@ -80,7 +80,7 @@ to see what else you can do with the selected entities.
 	  Note: while positions and rotations of all entities will be properly mirrored,
 	  not all entities will have their sprites flipped.
 	  While it may make sense to flip a sprite of a wall or a floor,
-	  it makes no sense to flip a laying item's sprite.
+	  it makes no sense to flip a lying item's sprite.
 	  There are also entities that have no sprites at all, like lights, area markers or wandering pixels.
 
 ## Operations: Transformations 

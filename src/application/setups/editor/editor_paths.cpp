@@ -19,11 +19,11 @@ editor_paths::editor_paths(
 	view_file = in_folder(".view");
 	view_ids_file = in_folder(".view_ids");
 	hist_file = in_folder(".hist");
-	modes_file = in_folder(".modes");
+	rulesets_file = in_folder(".rulesets");
 	player_file = in_folder(".player");
 
 	int_lua_file = in_folder(".int.lua");
-	modes_lua_file = in_folder(".modes.lua");
+	rulesets_lua_file = in_folder(".rulesets.lua");
 
 	default_export_path = target_folder / (project_name + "-export");
 	imported_folder_path = target_folder / (project_name + "-imported");

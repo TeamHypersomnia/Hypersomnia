@@ -8,10 +8,10 @@
 #include "augs/templates/type_in_list_id.h"
 #include "augs/templates/transform_types.h"
 
-using raw_mode_rules_id = unsigned;
+using raw_ruleset_id = unsigned;
 
 template <class T>
-using make_vars_map = std::unordered_map<raw_mode_rules_id, typename T::vars_type>;
+using make_ruleset_map = std::unordered_map<raw_ruleset_id, typename T::ruleset_type>;
 
 using all_modes = type_list<
 	test_scene_mode,
@@ -20,5 +20,5 @@ using all_modes = type_list<
 
 using mode_type_id = type_in_list_id<all_modes>;
 
-using all_mode_rules_maps = per_type_container<all_modes, make_vars_map>;
+using all_rulesets_map = per_type_container<all_modes, make_ruleset_map>;
 using all_modes_variant = replace_list_type_t<all_modes, std::variant>;

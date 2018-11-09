@@ -208,7 +208,7 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 				using T = remove_cref<decltype(typed_mode)>;
 
 				if constexpr(!std::is_same_v<T, test_scene_mode>) {
-					mode_input.vars.view.adjust(config.drawing);
+					mode_input.rules.view.adjust(config.drawing);
 				}
 			}
 		);
@@ -324,7 +324,7 @@ void editor_setup::export_current_folder_to(const path_operation op) {
 
 	auto make_error = [&](const auto& what) {
 		const auto content = typesafe_sprintf(
-			"Unknown problem occured when exporting the .int and .modes files to %x.",
+			"Unknown problem occured when exporting the .int and .rulesets files to %x.",
 			p
 		);
 
@@ -334,7 +334,7 @@ void editor_setup::export_current_folder_to(const path_operation op) {
 	try {
 		const auto& f = folder();
 		f.export_folder(op.lua, p);
-		recent_message.set("Exported the .int and .modes files to %x.", p);
+		recent_message.set("Exported the .int and .rulesets files to %x.", p);
 	}
 	catch (const std::exception& e) {
 		make_error(e.what());
@@ -1925,7 +1925,7 @@ void editor_setup::on_mode_with_input(F&& callback) const {
 		auto& f = folder();
 
 		player().on_mode_with_input(
-			f.commanded->mode_rules.vars,
+			f.commanded->rulesets.all,
 			f.commanded->work.world,
 			std::forward<F>(callback)
 		);

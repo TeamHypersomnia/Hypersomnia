@@ -21,15 +21,15 @@ struct entity_id;
 class cosmos;
 struct cosmos_solvable_significant;
 
-struct bomb_mode_faction_vars {
-	// GEN INTROSPECTOR struct bomb_mode_faction_vars
+struct bomb_mode_faction_rules {
+	// GEN INTROSPECTOR struct bomb_mode_faction_rules
 	requested_equipment initial_eq;
 	requested_equipment warmup_initial_eq;
 	// END GEN INTROSPECTOR
 };
 
-struct bomb_mode_economy_vars {
-	// GEN INTROSPECTOR struct bomb_mode_economy_vars
+struct bomb_mode_economy_rules {
+	// GEN INTROSPECTOR struct bomb_mode_economy_rules
 	money_type initial_money = 1000;
 	money_type maximum_money = 16000;
 	money_type warmup_initial_money = 16000;
@@ -52,9 +52,9 @@ struct bomb_mode_economy_vars {
 	// END GEN INTROSPECTOR
 };
 
-struct bomb_mode_rules {
-	// GEN INTROSPECTOR struct bomb_mode_rules
-	std::string name = "Unnamed bomb mode vars";
+struct bomb_mode_ruleset {
+	// GEN INTROSPECTOR struct bomb_mode_ruleset
+	std::string name = "Unnamed bomb mode ruleset";
 
 	std::vector<entity_name_str> bot_names;
 	unsigned bot_quota = 8;
@@ -72,14 +72,14 @@ struct bomb_mode_rules {
 	unsigned match_summary_seconds = 15;
 	unsigned game_commencing_seconds = 3;
 	meter_value_type minimal_damage_for_assist = 41;
-	per_faction_t<bomb_mode_faction_vars> factions;
+	per_faction_t<bomb_mode_faction_rules> factions;
 
 	constrained_entity_flavour_id<invariants::explosive> bomb_flavour;
 	bool clear_dropped_items = false;
 	bool allow_game_commencing = false;
 
-	bomb_mode_economy_vars economy;
-	arena_mode_view_vars view;
+	bomb_mode_economy_rules economy;
+	arena_mode_view_rules view;
 	// END GEN INTROSPECTOR
 
 	auto get_num_rounds() const {
@@ -190,12 +190,12 @@ enum class round_start_type {
 
 class bomb_mode {
 public:
-	using vars_type = bomb_mode_rules;
+	using ruleset_type = bomb_mode_ruleset;
 	static constexpr bool needs_initial_signi = true;
 	static constexpr bool round_based = true;
 
 	struct input {
-		const bomb_mode_rules& vars;
+		const ruleset_type& rules;
 		const cosmos_solvable_significant& initial_signi;
 		cosmos& cosm;
 	};

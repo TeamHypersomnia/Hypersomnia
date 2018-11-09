@@ -15,7 +15,7 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 		[this, &folder, &history, &cosm, in](const auto& applied_entropy) {
 			/* step */
 			on_mode_with_input(
-				folder.commanded->mode_rules.vars,
+				folder.commanded->rulesets.all,
 				cosm,
 				[&](auto& typed_mode, const auto& mode_in) {
 					while (history.has_next_command()) {

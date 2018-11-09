@@ -313,7 +313,7 @@ void arena_scoreboard_gui::draw_gui(
 			pen.x += cell_pad.x * 2;
 
 			if (sorted_players.size() > 0) {
-				if (const auto& head_image = mode_input.vars.view.logos[faction]; head_image.is_set()) {
+				if (const auto& head_image = mode_input.rules.view.logos[faction]; head_image.is_set()) {
 					if (const auto& entry = draw_in.images_in_atlas.at(head_image).diffuse; entry.exists()) {
 						const auto size = entry.get_original_size();
 						auto head_orig = ltrbi(vec2i::zero, size).place_in_center_of(faction_bg_orig);
@@ -510,7 +510,7 @@ void arena_scoreboard_gui::draw_gui(
 
 				auto show_icon = [&]() {
 					if (icon != std::nullopt) {
-						const auto icon_image = mode_input.vars.view.icons.at(*icon);
+						const auto icon_image = mode_input.rules.view.icons.at(*icon);
 
 						if (const auto& entry = draw_in.images_in_atlas.at(icon_image).diffuse; entry.exists()) {
 							const auto size = entry.get_original_size();
@@ -536,7 +536,7 @@ void arena_scoreboard_gui::draw_gui(
 					}
 				};
 
-				if (mode_input.vars.view.show_info_icons_of_opponents) {
+				if (mode_input.rules.view.show_info_icons_of_opponents) {
 					show_icon();
 				}
 				else {
@@ -563,7 +563,7 @@ void arena_scoreboard_gui::draw_gui(
 					col_text(typesafe_sprintf("%x$", stats.money));
 				};
 
-				if (mode_input.vars.view.show_money_of_opponents) {
+				if (mode_input.rules.view.show_money_of_opponents) {
 					do_money();
 				}
 				else {

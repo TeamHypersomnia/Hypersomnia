@@ -49,7 +49,7 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 
 	if (player.has_testing_started()) {
 		player.on_mode_with_input(
-			folder.commanded->mode_rules.vars,
+			folder.commanded->rulesets.all,
 			folder.commanded->work.world,
 			[&](auto& typed_mode, const auto& mode_input) {
 				auto node = scoped_tree_node("Current mode state");
@@ -114,15 +114,15 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 		);
 	}
 
-	auto& all_vars = folder.commanded->mode_rules;
+	auto& rulesets = folder.commanded->rulesets.all;
 
 	for_each_type_in_list<all_modes>(
 		[&](auto m) {
 			using M = decltype(m);
 
 			ImGui::Separator();
-			const auto& modes = all_vars.vars.get_for<M>();
-			const auto type_node_label = format_field_name(get_type_name<typename M::vars_type>());
+			const auto& modes = rulesets.get_for<M>();
+			const auto type_node_label = format_field_name(get_type_name<typename M::ruleset_type>()) + "s";
 
 			auto type_node = scoped_tree_node(type_node_label.c_str());
 
@@ -131,8 +131,8 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 			if (type_node) {
 				for (const auto& it : modes) {
 					const auto& typed_mode = it.second;
-					const auto vars_id = it.first;
-					const auto node_label = typed_mode.name + "###" + std::to_string(vars_id);
+					const auto id = it.first;
+					const auto node_label = typed_mode.name + "###" + std::to_string(id);
 					auto node = scoped_tree_node(node_label.c_str());
 
 					next_columns(2);
@@ -145,9 +145,9 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 							{ settings.property_editor, property_editor_data }, { cmd_in }
 						};
 
-						change_mode_rules_property_command cmd;
-						cmd.vars_type_id.set<M>();
-						cmd.vars_id = vars_id;
+						change_ruleset_property_command cmd;
+						cmd.type_id.set<M>();
+						cmd.id = id;
 
 						auto& defs = cmd_in.folder.commanded->work.viewables;
 

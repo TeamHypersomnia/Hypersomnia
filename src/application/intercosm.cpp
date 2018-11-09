@@ -35,8 +35,8 @@ void intercosm::clear() {
 void intercosm::make_test_scene(
 	sol::state& lua, 
 	const test_scene_settings settings,
-	test_scene_mode_rules& test_mode,
-	bomb_mode_rules* const bomb_mode
+	test_mode_ruleset& test_mode,
+	bomb_mode_ruleset* const bomb_mode
 ) {
 	clear();
 

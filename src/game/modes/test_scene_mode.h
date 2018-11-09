@@ -11,8 +11,8 @@ struct entity_id;
 
 class cosmos;
 
-struct test_scene_mode_rules {
-	// GEN INTROSPECTOR struct test_scene_mode_rules
+struct test_mode_ruleset {
+	// GEN INTROSPECTOR struct test_mode_ruleset
 	std::string name = "Unnamed test scene mode vars";
 
 	real32 respawn_after_ms = 3000;
@@ -32,12 +32,12 @@ struct test_mode_player {
 
 class test_scene_mode {
 public:
-	using vars_type = test_scene_mode_rules;
+	using ruleset_type = test_mode_ruleset;
 	static constexpr bool needs_initial_signi = false;
 	static constexpr bool round_based = false;
 
 	struct input {
-		const test_scene_mode_rules& vars;
+		const ruleset_type& rules;
 		cosmos& cosm;
 	};
 

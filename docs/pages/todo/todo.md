@@ -30,7 +30,7 @@ summary: Just a hidden scratchpad.
 				- the move itself won't need to be stored
 	- Cut is just copy + delete
 
-- Allow to change the tickrate in the non-playtesting mode?
+- Allow to change the tickrate in the non-playtesting?
 	- This will be a session setting, really
 	- We'll just restart on re-tick
 

@@ -70,7 +70,7 @@ private:
 
 	// GEN INTROSPECTOR class editor_player
 	all_modes_variant current_mode;
-	raw_mode_rules_id current_mode_rules_id = raw_mode_rules_id();
+	raw_ruleset_id current_mode_rules_id = raw_ruleset_id();
 
 	player_before_start_state before_start;
 
@@ -180,5 +180,5 @@ public:
 
 	void set_dirty();
 
-	void choose_mode(const mode_rules_id& vars_id);
+	void choose_mode(const ruleset_id& id);
 };

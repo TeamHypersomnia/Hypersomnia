@@ -30,7 +30,7 @@ namespace sol {
 
 class test_scene_setup : public default_setup_settings {
 	test_scene_mode mode;
-	test_scene_mode_rules mode_rules;
+	test_mode_ruleset ruleset;
 
 	intercosm scene;
 	entropy_accumulator total_collected;
@@ -94,7 +94,7 @@ public:
 			const auto total = total_collected.extract(get_viewed_character(), in);
 
 			mode.advance(
-				{ mode_rules, scene.world },
+				{ ruleset, scene.world },
 				total,
 				callbacks
 			);

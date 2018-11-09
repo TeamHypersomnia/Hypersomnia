@@ -3,17 +3,17 @@
 #include "game/modes/all_mode_includes.h"
 #include "application/intercosm.h"
 
-struct mode_rules_id {
-	// GEN INTROSPECTOR struct mode_rules_id
+struct ruleset_id {
+	// GEN INTROSPECTOR struct ruleset_id
 	mode_type_id type_id;
-	raw_mode_rules_id raw;
+	raw_ruleset_id raw;
 	// END GEN INTROSPECTOR
 };
 
-struct predefined_mode_rules {
-	// GEN INTROSPECTOR struct predefined_mode_rules
-	all_mode_rules_maps vars;
-	mode_rules_id default_mode;
+struct predefined_rulesets {
+	// GEN INTROSPECTOR struct predefined_rulesets
+	all_rulesets_map all;
+	ruleset_id default_ruleset;
 	// END GEN INTROSPECTOR
 };
 
@@ -21,6 +21,6 @@ struct editor_commanded_state {
 	// GEN INTROSPECTOR struct editor_commanded_state
 	editor_view_ids view_ids;
 	intercosm work;
-	predefined_mode_rules mode_rules;
+	predefined_rulesets rulesets;
 	// END GEN INTROSPECTOR
 };

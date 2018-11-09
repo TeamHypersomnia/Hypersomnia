@@ -16,8 +16,8 @@ summary: We don't need to do this yet, because...
 	- We don't have some fancy replay-preview stuff like in that other game we saw somewhere...
 	- and anyway it's better to move some important objects while paused, while we can snap to grid, etc.
 
-- For now, don't make commands for creating/deleting/duplicating mode vars
-	- Just in testbed populate all types with one vars instance
+- For now, don't make commands for creating/deleting/duplicating mode rulesets
+	- Just in testbed populate all types with one ruleset instance
 
 - For now don't worry about maximum size, it's enough until DM
 	- In production, we will always reserve max used ever on startup

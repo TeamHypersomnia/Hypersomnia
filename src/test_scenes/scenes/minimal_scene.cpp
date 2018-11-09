@@ -22,15 +22,15 @@
 #include "game/modes/test_scene_mode.h"
 
 namespace test_scenes {
-	void minimal_scene::setup(test_scene_mode_rules& vars) {
-		vars.spawned_faction = faction_type::METROPOLIS;
-		vars.name = "Minimal scene vars";
+	void minimal_scene::setup(test_mode_ruleset& rs) {
+		rs.spawned_faction = faction_type::METROPOLIS;
+		rs.name = "Minimal scene ruleset";
 	}
 
-	void minimal_scene::setup(bomb_mode_rules& vars) {
-		vars.bot_names = { "First", "Second", "Third", "Fourth", "Fifth", "Sixth" };
-		vars.name = "Minimal scene bomb vars";
-		vars.bot_quota = vars.bot_names.size();
+	void minimal_scene::setup(bomb_mode_ruleset& rs) {
+		rs.bot_names = { "First", "Second", "Third", "Fourth", "Fifth", "Sixth" };
+		rs.name = "Minimal scene bomb ruleset";
+		rs.bot_quota = rs.bot_names.size();
 	}
 
 	void minimal_scene::populate(const loaded_image_caches_map& caches, const logic_step step) const {

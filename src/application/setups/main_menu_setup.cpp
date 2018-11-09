@@ -140,8 +140,8 @@ main_menu_setup::main_menu_setup(
 
 	if (is_intro_scene_available) {
 #if BUILD_TEST_SCENES
-		intro.make_test_scene(lua, { false, 60 }, mode_rules);
-		viewed_character_id = cosm[mode.lookup(mode.add_player({ mode_rules, cosm }, faction_type::RESISTANCE))].get_id();
+		intro.make_test_scene(lua, { false, 60 }, ruleset);
+		viewed_character_id = cosm[mode.lookup(mode.add_player({ ruleset, cosm }, faction_type::RESISTANCE))].get_id();
 #endif
 	}
 
@@ -169,7 +169,7 @@ main_menu_setup::main_menu_setup(
 			const auto entropy = cosmic_entropy();
 
 			mode.advance(
-				{ mode_rules, cosm },
+				{ ruleset, cosm },
 				{ entropy, {} },
 				solver_callbacks()
 			);

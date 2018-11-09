@@ -137,7 +137,7 @@ double editor_player::get_total_secs(const editor_folder& folder) const {
 }
 
 void editor_player::initialize_testing(editor_folder& f) {
-	choose_mode(f.commanded->mode_rules.default_mode);
+	choose_mode(f.commanded->rulesets.default_ruleset);
 
 	save_state_before_start(f);
 	reset_mode();
@@ -300,14 +300,14 @@ void editor_player::set_dirty() {
 	dirty = true;
 }
 
-void editor_player::choose_mode(const mode_rules_id& vars_id) {
+void editor_player::choose_mode(const ruleset_id& id) {
 	ensure(!has_testing_started());
 
 	set_dirty();
 
-	current_mode_rules_id = vars_id.raw;
+	current_mode_rules_id = id.raw;
 
-	vars_id.type_id.dispatch(
+	id.type_id.dispatch(
 		[&](auto m) {
 			using M = decltype(m);
 

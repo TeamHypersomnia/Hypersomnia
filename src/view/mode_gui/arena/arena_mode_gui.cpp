@@ -45,7 +45,7 @@ mode_entropy arena_gui_state::perform_imgui(
 
 		using I = arena_choose_team_gui::input::faction_info;
 
-		const auto max_players_in_each = mode_input.vars.max_players_per_team;
+		const auto max_players_in_each = mode_input.rules.max_players_per_team;
 
 		std::vector<I> factions;
 
@@ -62,7 +62,7 @@ mode_entropy arena_gui_state::perform_imgui(
 
 			if (const auto p = typed_mode.find(player_id)) {
 				const auto choice = choose_team.perform_imgui({
-					mode_input.vars.view.square_logos,
+					mode_input.rules.view.square_logos,
 					factions,
 					mode_in.images_in_atlas,
 					p->faction
@@ -87,13 +87,13 @@ mode_entropy arena_gui_state::perform_imgui(
 				if (const auto this_player_handle = cosm[guid]) {
 					const auto choice = buy_menu.perform_imgui({
 						this_player_handle,
-						mode_input.vars.view.money_icon,
+						mode_input.rules.view.money_icon,
 						p->stats.money,
 						mode_in.images_in_atlas,
 						mode_in.config.arena_mode_gui.money_indicator_color,
 						true,
 						p->stats.round_state.done_purchases,
-						mode_input.vars.economy.give_extra_mags_on_first_purchase,
+						mode_input.rules.economy.give_extra_mags_on_first_purchase,
 						mode_in.config.arena_mode_gui.buy_menu_settings
 					});
 
@@ -321,7 +321,7 @@ void arena_gui_state::draw_mode_gui(
 					}
 				});
 
-				const auto death_fallback_icon = in.images_in_atlas.at(mode_input.vars.view.icons[scoreboard_icon_type::DEATH_ICON]);
+				const auto death_fallback_icon = in.images_in_atlas.at(mode_input.rules.view.icons[scoreboard_icon_type::DEATH_ICON]);
 				const auto& entry = tool_image_id != std::nullopt ? in.images_in_atlas.at(*tool_image_id) : death_fallback_icon;
 
 				const auto tool_size = [&]() {

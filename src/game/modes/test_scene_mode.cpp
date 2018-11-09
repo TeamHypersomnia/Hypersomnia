@@ -31,7 +31,7 @@ void test_scene_mode::init_spawned(const input in, const entity_id id, const log
 	const auto handle = in.cosm[id];
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
-		in.vars.initial_eq.generate_for(typed_handle, step);
+		in.rules.initial_eq.generate_for(typed_handle, step);
 
 		auto& sentience = typed_handle.template get<components::sentience>();
 
@@ -109,10 +109,10 @@ void test_scene_mode::mode_pre_solve(input_type in, const mode_entropy& entropy,
 	auto& cosm = in.cosm;
 
 	if (players.empty()) {
-		auto n = in.vars.spawned_chars;
+		auto n = in.rules.spawned_chars;
 
 		while (n--) {
-			add_player(in, in.vars.spawned_faction);
+			add_player(in, in.rules.spawned_faction);
 		}
 	}
 
@@ -130,7 +130,7 @@ void test_scene_mode::mode_pre_solve(input_type in, const mode_entropy& entropy,
 		auto& sentience = typed_handle.template get<components::sentience>();
 
 		if (sentience.when_knocked_out.was_set() && clk.is_ready(
-			in.vars.respawn_after_ms,
+			in.rules.respawn_after_ms,
 			sentience.when_knocked_out
 		)) {
 			teleport_to_next_spawn(in, typed_handle);

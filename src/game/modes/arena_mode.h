@@ -55,8 +55,8 @@ enum class scoreboard_icon_type {
 
 struct game_drawing_settings;
 
-struct arena_mode_view_vars {
-	// GEN INTROSPECTOR struct arena_mode_view_vars
+struct arena_mode_view_rules {
+	// GEN INTROSPECTOR struct arena_mode_view_rules
 	per_faction_t<per_faction_t<assets::sound_id>> win_sounds;
 	per_faction_t<augs::enum_array<assets::sound_id, battle_event>> event_sounds;
 

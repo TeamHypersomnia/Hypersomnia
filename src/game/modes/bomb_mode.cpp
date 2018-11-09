@@ -93,10 +93,10 @@ faction_choice_result bomb_mode::choose_faction(const mode_player_id& id, const 
 
 template <class F>
 decltype(auto) bomb_mode::on_bomb_entity(const input_type in, F callback) const {
-	auto& vars = in.vars;
+	auto& rules = in.rules;
 	auto& cosm = in.cosm;
 
-	const auto bomb_flavour = vars.bomb_flavour;
+	const auto bomb_flavour = rules.bomb_flavour;
 	const auto& flavours = cosm.get_solvable_inferred().flavour_ids;
 
 	if (!bomb_flavour.is_set()) {
@@ -179,7 +179,7 @@ void bomb_mode::init_spawned(
 ) {
 	auto& cosm = in.cosm;
 	const auto handle = cosm[id];
-	const auto& faction_vars = in.vars.factions[handle.get_official_faction()];
+	const auto& faction_vars = in.rules.factions[handle.get_official_faction()];
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
 		if (transferred != std::nullopt && transferred->player.survived) {
@@ -495,7 +495,7 @@ void bomb_mode::spawn_bomb_near_players(const input_type in) {
 
 
 entity_handle bomb_mode::spawn_bomb(const input_type in) {
-	return cosmic::create_entity(in.cosm, in.vars.bomb_flavour);
+	return cosmic::create_entity(in.cosm, in.rules.bomb_flavour);
 }
 
 bool bomb_mode::give_bomb_to_random_player(const input_type in, const logic_step step) {
@@ -619,7 +619,7 @@ void bomb_mode::setup_round(
 	cosm.set(in.initial_signi);
 	remove_test_characters(cosm);
 
-	if (in.vars.clear_dropped_items) {
+	if (in.rules.clear_dropped_items) {
 		remove_test_dropped_items(cosm);
 	}
 
@@ -653,7 +653,7 @@ void bomb_mode::setup_round(
 		step.post_message(msg);
 	}
 
-	if (in.vars.freeze_secs > 0.f) {
+	if (in.rules.freeze_secs > 0.f) {
 		if (state != arena_mode_state::WARMUP) {
 			set_players_frozen(in, true);
 
@@ -698,7 +698,7 @@ bomb_mode::round_transferred_players bomb_mode::make_transferred_players(const i
 				[&](const auto typed_item) {
 					const auto flavour_id = typed_item.get_flavour_id();
 
-					if (entity_flavour_id(flavour_id) == entity_flavour_id(in.vars.bomb_flavour)) {
+					if (entity_flavour_id(flavour_id) == entity_flavour_id(in.rules.bomb_flavour)) {
 						return recursive_callback_result::CONTINUE_DONT_RECURSE;
 					}
 
@@ -769,7 +769,7 @@ void bomb_mode::count_knockout(const input_type in, const entity_guid victim, co
 	for (const auto& candidate : assists) {
 		if (const auto who = cosm[candidate.who]) {
 			if (who != knockouter) {
-				if (candidate.amount >= in.vars.minimal_damage_for_assist) {
+				if (candidate.amount >= in.rules.minimal_damage_for_assist) {
 					ko.assist = lookup(cosm[assists.front().who]);
 					break;
 				}
@@ -809,7 +809,7 @@ void bomb_mode::count_knockout(const input_type in, const arena_mode_knockout ko
 		}
 		else if (same_faction(ko.knockouter, ko.victim)) {
 			knockouts_dt = -1;
-			post_award(in, ko.knockouter, in.vars.economy.team_kill_penalty * -1);
+			post_award(in, ko.knockouter, in.rules.economy.team_kill_penalty * -1);
 		}
 
 		if (knockouts_dt > 0) {
@@ -855,14 +855,14 @@ void bomb_mode::count_knockouts_for_unconscious_players_in(const input_type in, 
 }
 
 bool bomb_mode::is_halfway_round(const input_type in) const {
-	const auto n = in.vars.get_num_rounds();
+	const auto n = in.rules.get_num_rounds();
 	const auto current_round = get_round_num();
 
 	return current_round == n / 2;
 }
 
 bool bomb_mode::is_final_round(const input_type in) const {
-	const auto n = in.vars.get_num_rounds();
+	const auto n = in.rules.get_num_rounds();
 	const auto current_round = get_round_num();
 
 	bool someone_has_over_half = false;
@@ -891,20 +891,20 @@ void bomb_mode::make_win(const input_type in, const faction_type winner) {
 	auto& consecutive_losses = factions[loser].consecutive_losses;
 	++consecutive_losses;
 
-	auto winner_award = in.vars.economy.winning_faction_award;
-	auto loser_award = in.vars.economy.losing_faction_award;
+	auto winner_award = in.rules.economy.winning_faction_award;
+	auto loser_award = in.rules.economy.losing_faction_award;
 
 	if (consecutive_losses > 1) {
 		loser_award += std::min(
 			consecutive_losses - 1, 
-			in.vars.economy.max_consecutive_loss_bonuses
-		) * in.vars.economy.consecutive_loss_bonus;
+			in.rules.economy.max_consecutive_loss_bonuses
+		) * in.rules.economy.consecutive_loss_bonus;
 	}
 
 	if (loser == p.bombing) {
 		if (current_round.bomb_planter.is_set()) {
-			loser_award += in.vars.economy.lost_but_bomb_planted_team_bonus;
-			winner_award += in.vars.economy.defused_team_bonus;
+			loser_award += in.rules.economy.lost_but_bomb_planted_team_bonus;
+			winner_award += in.rules.economy.defused_team_bonus;
 		}
 	}
 	
@@ -937,7 +937,7 @@ void bomb_mode::play_win_sound(const input_type in, const const_logic_step step,
 	const auto p = calc_participating_factions(in);
 
 	p.for_each([&](const faction_type t) {
-		if (const auto sound_id = in.vars.view.win_sounds[t][winner]; sound_id.is_set()) {
+		if (const auto sound_id = in.rules.view.win_sounds[t][winner]; sound_id.is_set()) {
 			play_faction_sound(step, t, sound_id);
 		}
 	});
@@ -952,7 +952,7 @@ void bomb_mode::play_sound_for(const input_type in, const const_logic_step step,
 }
 
 void bomb_mode::play_faction_sound_for(const input_type in, const const_logic_step step, const battle_event event, const faction_type t) const {
-	if (const auto sound_id = in.vars.view.event_sounds[t][event]; sound_id.is_set()) {
+	if (const auto sound_id = in.rules.view.event_sounds[t][event]; sound_id.is_set()) {
 		play_faction_sound(step, t, sound_id);
 	}
 }
@@ -973,14 +973,14 @@ void bomb_mode::play_bomb_defused_sound(const input_type in, const const_logic_s
 		auto& effects = msg.payload.inputs;
 		effects.reserve(2);
 
-		if (const auto defused_id = in.vars.view.event_sounds[t][battle_event::BOMB_DEFUSED]; defused_id.is_set()) {
+		if (const auto defused_id = in.rules.view.event_sounds[t][battle_event::BOMB_DEFUSED]; defused_id.is_set()) {
 			sound_effect_input effect;
 			effect.id = defused_id;
 
 			effects.emplace_back(std::move(effect));
 		}
 
-		if (const auto win_id = in.vars.view.win_sounds[t][winner]; win_id.is_set()) {
+		if (const auto win_id = in.rules.view.win_sounds[t][winner]; win_id.is_set()) {
 			sound_effect_input effect;
 			effect.id = win_id;
 
@@ -1006,7 +1006,7 @@ void bomb_mode::process_win_conditions(const input_type in, const logic_step ste
 	if (bomb_exploded(in)) {
 		const auto planting_player = current_round.bomb_planter;
 		++players[planting_player].stats.bomb_explosions;
-		post_award(in, planting_player, in.vars.economy.bomb_explosion_award);
+		post_award(in, planting_player, in.rules.economy.bomb_explosion_award);
 		standard_win(p.bombing);
 		return;
 	}
@@ -1015,7 +1015,7 @@ void bomb_mode::process_win_conditions(const input_type in, const logic_step ste
 		const auto winner = p.defusing;
 		const auto defusing_player = lookup(character_who_defused.get_guid());
 		++players[defusing_player].stats.bomb_defuses;
-		post_award(in, defusing_player, in.vars.economy.bomb_defuse_award);
+		post_award(in, defusing_player, in.rules.economy.bomb_defuse_award);
 		make_win(in, winner);
 
 		play_bomb_defused_sound(in, step, winner);
@@ -1159,7 +1159,7 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 					}
 
 					if (previous_faction == faction_type::SPECTATOR) {
-						const auto& game_limit = in.vars.max_players_per_team;
+						const auto& game_limit = in.rules.max_players_per_team;
 
 						const auto num_active_players = players.size() - num_players_in(faction_type::SPECTATOR);
 
@@ -1170,7 +1170,7 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 
 					if (f != faction_type::SPECTATOR) {
 						{
-							const auto& team_limit = in.vars.max_players_per_team;
+							const auto& team_limit = in.rules.max_players_per_team;
 
 							if (team_limit && num_players_in(f) >= team_limit) {
 								return faction_choice_result::TEAM_IS_FULL;
@@ -1231,9 +1231,9 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 }
 
 void bomb_mode::spawn_and_kick_bots(const input_type in, const logic_step) {
-	const auto& names = in.vars.bot_names;
+	const auto& names = in.rules.bot_names;
 	const auto requested_bots = std::min(
-		in.vars.bot_quota,
+		in.rules.bot_quota,
 		static_cast<unsigned>(names.size())
 	);
 
@@ -1287,7 +1287,7 @@ void bomb_mode::spawn_recently_added_players(const input_type in, const logic_st
 			else if (state == arena_mode_state::LIVE) {
 				const auto passed = get_round_seconds_passed(in);
 
-				if (passed <= in.vars.allow_spawn_after_secs_after_starting) {
+				if (passed <= in.rules.allow_spawn_after_secs_after_starting) {
 					do_spawn();
 				}
 			}
@@ -1329,7 +1329,7 @@ void bomb_mode::handle_game_commencing(const input_type in, const logic_step ste
 	}
 
 	if (should_commence_when_ready && are_factions_ready) {
-		commencing_timer_ms = static_cast<real32>(in.vars.game_commencing_seconds * 1000);
+		commencing_timer_ms = static_cast<real32>(in.rules.game_commencing_seconds * 1000);
 		should_commence_when_ready = false;
 		return;
 	}
@@ -1339,7 +1339,7 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 	spawn_and_kick_bots(in, step);
 	spawn_recently_added_players(in, step);
 
-	if (in.vars.allow_game_commencing) {
+	if (in.rules.allow_game_commencing) {
 		handle_game_commencing(in, step);
 	}
 	else {
@@ -1350,7 +1350,7 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 		restart(in, step);
 	}
 	else if (state == arena_mode_state::WARMUP) {
-		respawn_the_dead(in, step, in.vars.warmup_respawn_after_ms);
+		respawn_the_dead(in, step, in.rules.warmup_respawn_after_ms);
 
 		if (get_warmup_seconds_left(in) <= 0.f) {
 			if (!current_round.cache_players_frozen) {
@@ -1427,14 +1427,14 @@ void bomb_mode::mode_post_solve(const input_type in, const mode_entropy& entropy
 				const auto faction = subject.get_official_faction();
 
 				if (event == battle_event::INTERRUPTED_DEFUSING) {
-					if (const auto sound_id = in.vars.view.event_sounds[faction][battle_event::IM_DEFUSING_THE_BOMB]; sound_id.is_set()) {
+					if (const auto sound_id = in.rules.view.event_sounds[faction][battle_event::IM_DEFUSING_THE_BOMB]; sound_id.is_set()) {
 						messages::stop_sound_effect stop;
 						stop.match_effect_id = sound_id;
 						step.post_message(stop);
 					}
 				}
 				else {
-					if (const auto sound_id = in.vars.view.event_sounds[faction][event]; sound_id.is_set()) {
+					if (const auto sound_id = in.rules.view.event_sounds[faction][event]; sound_id.is_set()) {
 						play_faction_sound(step, faction, sound_id);
 					}
 				}
@@ -1477,7 +1477,7 @@ void bomb_mode::mode_post_solve(const input_type in, const mode_entropy& entropy
 						planter = lookup(cosm[typed_bomb.template get<components::sender>().capability_of_sender].get_guid());
 						++players[planter].stats.bomb_plants;
 
-						post_award(in, planter, in.vars.economy.bomb_plant_award);
+						post_award(in, planter, in.rules.economy.bomb_plant_award);
 					}
 				}
 			});
@@ -1508,7 +1508,7 @@ const float match_begins_in_secs = 4.f;
 
 float bomb_mode::get_warmup_seconds_left(const input_type in) const {
 	if (state == arena_mode_state::WARMUP) {
-		return static_cast<float>(in.vars.warmup_secs) - get_total_seconds(in);
+		return static_cast<float>(in.rules.warmup_secs) - get_total_seconds(in);
 	}
 
 	return -1.f;
@@ -1517,7 +1517,7 @@ float bomb_mode::get_warmup_seconds_left(const input_type in) const {
 float bomb_mode::get_match_begins_in_seconds(const input_type in) const {
 	if (state == arena_mode_state::WARMUP) {
 		const auto secs = get_total_seconds(in);
-		const auto warmup_secs = static_cast<float>(in.vars.warmup_secs);
+		const auto warmup_secs = static_cast<float>(in.rules.warmup_secs);
 
 		if (secs >= warmup_secs) {
 			/* It's after the warmup. */
@@ -1536,19 +1536,19 @@ float bomb_mode::get_total_seconds(const input_type in) const {
 }
 
 float bomb_mode::get_round_seconds_passed(const input_type in) const {
-	return get_total_seconds(in) - static_cast<float>(in.vars.freeze_secs);
+	return get_total_seconds(in) - static_cast<float>(in.rules.freeze_secs);
 }
 
 float bomb_mode::get_freeze_seconds_left(const input_type in) const {
-	return static_cast<float>(in.vars.freeze_secs) - get_total_seconds(in);
+	return static_cast<float>(in.rules.freeze_secs) - get_total_seconds(in);
 }
 
 float bomb_mode::get_buy_seconds_left(const input_type in) const {
-	return static_cast<float>(in.vars.freeze_secs + in.vars.buy_secs_after_freeze) - get_total_seconds(in);
+	return static_cast<float>(in.rules.freeze_secs + in.rules.buy_secs_after_freeze) - get_total_seconds(in);
 }
 
 float bomb_mode::get_round_seconds_left(const input_type in) const {
-	return static_cast<float>(in.vars.round_secs) + in.vars.freeze_secs - get_total_seconds(in);
+	return static_cast<float>(in.rules.round_secs) + in.rules.freeze_secs - get_total_seconds(in);
 }
 
 float bomb_mode::get_seconds_since_win(const input_type in) const {
@@ -1565,7 +1565,7 @@ float bomb_mode::get_seconds_since_win(const input_type in) const {
 
 float bomb_mode::get_match_summary_seconds_left(const input_type in) const {
 	if (const auto since_win = get_seconds_since_win(in); since_win != -1.f) {
-		return static_cast<float>(in.vars.match_summary_seconds) - since_win;
+		return static_cast<float>(in.rules.match_summary_seconds) - since_win;
 	}
 
 	return -1.f;
@@ -1576,7 +1576,7 @@ float bomb_mode::get_round_end_seconds_left(const input_type in) const {
 		return -1.f;
 	}
 
-	return static_cast<float>(in.vars.round_end_secs) - get_seconds_since_win(in);
+	return static_cast<float>(in.rules.round_end_secs) - get_seconds_since_win(in);
 }
 
 bool bomb_mode::bomb_exploded(const input_type in) const {
@@ -1712,11 +1712,11 @@ void bomb_mode::restart(const input_type in, const logic_step step) {
 	reset_players_stats(in);
 	factions = {};
 
-	if (in.vars.warmup_secs > 4) {
+	if (in.rules.warmup_secs > 4) {
 		state = arena_mode_state::WARMUP;
 
 		for (auto& p : players) {
-			p.second.stats.money = in.vars.economy.warmup_initial_money;
+			p.second.stats.money = in.rules.economy.warmup_initial_money;
 		}
 	}
 	else {
@@ -1748,7 +1748,7 @@ void bomb_mode::clear_players_round_state(const input_type in) {
 void bomb_mode::set_players_money_to_initial(const input_type in) {
 	for (auto& it : players) {
 		auto& p = it.second;
-		p.stats.money = in.vars.economy.initial_money;
+		p.stats.money = in.rules.economy.initial_money;
 	}
 }
 
@@ -1766,7 +1766,7 @@ void bomb_mode::reset_players_stats(const input_type in) {
 void bomb_mode::post_award(const input_type in, const mode_player_id id, money_type amount) {
 	auto& stats = players[id].stats;
 	auto& current_money = stats.money;
-	amount = std::clamp(amount, -current_money, in.vars.economy.maximum_money - current_money);
+	amount = std::clamp(amount, -current_money, in.rules.economy.maximum_money - current_money);
 
 	if (amount != 0) {
 		current_money += amount;
