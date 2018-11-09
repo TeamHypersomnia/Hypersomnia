@@ -601,11 +601,11 @@ namespace augs {
 
 	void window::set(const vsync_type mode) {
 		switch (mode) {
-			case vsync_type::OFF: wglSwapInterval(0); break;
-			case vsync_type::ON: wglSwapInterval(1); break;
-			case vsync_type::ADAPTIVE: wglSwapInterval(-1); break;
+			case vsync_type::OFF: wglSwapIntervalEXT(0); break;
+			case vsync_type::ON: wglSwapIntervalEXT(1); break;
+			case vsync_type::ADAPTIVE: wglSwapIntervalEXT(-1); break;
 
-			default: wglSwapInterval(0); break;
+			default: wglSwapIntervalEXT(0); break;
 		}
 	}
 
