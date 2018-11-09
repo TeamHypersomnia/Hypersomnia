@@ -1,8 +1,8 @@
 ---
-title: Art style guide (GFX)
-tags: [scratchpads_pl]
+title: Graphics creation guide (pl)
+tags: [gfx]
 hide_sidebar: true
-permalink: art_style_guide_gfx
+permalink: graphics_creation_guide_pl
 summary: Założenia dotyczące grafiki.
 ---
 

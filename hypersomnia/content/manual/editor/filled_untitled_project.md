@@ -1,4 +1,6 @@
 You have just filled the project with a test scene.
+The screen might remain blank for a moment while the game regenerates resources like neon maps.
+
 It is highly recommended that you now save this untitled project to a reasonable location.
 
 Prepare an empty folder somewhere on your disk,

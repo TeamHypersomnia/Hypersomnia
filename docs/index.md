@@ -9,6 +9,7 @@ permalink: index.html
 From here you can go to:
 - Encyclopaedia of the [Hypersomnia universe](universe).
 - Documentation of the [Hypersomnia source code](docs).
+- [Content creation guides](content_guides) for the [Hypersomnia editor](editor_setup).
 
 Whether a player or developer, you probably want to launch Hypersomnia first.  
 Unfortunately, no binaries are available yet.  

@@ -1,0 +1,10 @@
+# Note:
+# If you are using the createtag script, don't leave an blank line at the end of this file.
+# In other words, the last line must be the last tag in the allowed-tags list.
+- title: Editing
+  name: editing
+  description: General tips on how to efficiently use the Editor setup.
+- title: Graphics creation
+  name: gfx
+- title: Sound creation
+  name: sfx

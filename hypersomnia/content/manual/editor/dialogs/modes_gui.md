@@ -12,6 +12,8 @@ For example, with a Team Deathmatch:
 	- cap player number to 2, almost instant round restart, 
 	  minimal freeze time, maybe always give some basic equipment, and so on.
 
+TODO: Implement creating, removing and duplicating modes.
+
 The server admin can then load a ruleset of his choice on the fly,
 as long as they have the ``.rulesets`` file.
 

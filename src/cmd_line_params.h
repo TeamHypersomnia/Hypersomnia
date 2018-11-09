@@ -21,10 +21,7 @@ struct cmd_line_params {
 			else if (std::string(argv[1]) == "-h") {
 				help_only = true;
 			}
-			else if (augs::path_type(argv[1]).extension() == ".int") {
-				editor_target = argv[1];
-			}
-			else if (augs::path_type(argv[1]).extension() == ".lua") {
+			else {
 				editor_target = argv[1];
 			}
 		}

@@ -160,3 +160,7 @@ The currently selected mode will start executing its logic on the map.
 
 If camera is not centered at origin by the time you start the playtest,
 it will not follow your character but stay in the same place instead.
+
+## More information
+
+

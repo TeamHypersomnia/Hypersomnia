@@ -1187,6 +1187,18 @@ bool editor_setup::handle_input_before_game(
 		return true;
 	}
 
+	if (e.was_any_key_pressed()) {
+		const auto k = e.data.key.key;
+
+		if (has_ctrl) {
+			switch(k) {
+				case key::BACKSPACE: finish_and_discard(); return true; 
+				case key::ENTER: finish_and_reapply(); return true;
+				default: break;
+			}
+		}
+	}
+
 	if (is_editing_mode()) {
 		auto& cosm = work().world;
 
@@ -1195,9 +1207,6 @@ bool editor_setup::handle_input_before_game(
 
 			if (has_ctrl) {
 				switch(k) {
-					case key::BACKSPACE: finish_and_discard(); return true; 
-					case key::ENTER: finish_and_reapply(); return true;
-
 					case key::LEFT: mirror_selection(vec2i(-1, 0)); return true;
 					case key::RIGHT: mirror_selection(vec2i(1, 0)); return true;
 					case key::UP: mirror_selection(vec2i(0, -1)); return true;

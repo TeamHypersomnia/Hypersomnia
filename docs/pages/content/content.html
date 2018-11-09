@@ -1,0 +1,61 @@
+---
+title: Content creation guides for Hypersomnia worlds
+sidebar: universe_sidebar
+permalink: content_guides
+---
+<br/>
+Various topics on how to use the Editor setup to efficiently create Hypersomnia worlds.
+
+<br/>
+<br/>
+{% unless site.output == "pdf" %}
+<script src="js/jquery.shuffle.min.js"></script>
+<script src="js/jquery.ba-throttle-debounce.min.js"></script>
+{% endunless %}
+
+      <div class="filter-options">
+                {% for current_tag in site.data.content_tags %}
+				<button class="btn btn-primary" data-group="{{ current_tag.name }}">{{ current_tag.title }}</button>
+                {% endfor %} 
+    </div>      
+
+<div id="grid" class="row">
+
+                {% for current_tag in site.data.content_tags %}
+				<div class="col-xs-6 col-sm-4 col-md-4" data-groups='["{{ current_tag.name }}"]'>
+
+               <div class="panel panel-default">
+				   <div class="panel-heading">
+					   {% if current_tag.title_link %} 
+					   		<a href="{{ current_tag.title_link }}">{{ current_tag.title }}</a>
+				  		{% else %}
+							{{ current_tag.title }}
+						{% endif %}	
+				   </div>
+               <div class="panel-body">
+				   {{ current_tag.description }}
+
+                  <ul>
+                {% for page in site.pages %}
+                {% for tag in page.tags %}
+                {% if tag == current_tag.name %}
+                  <li><a href="{{page.url | remove: '/'}}">{{page.title}}</a></li>
+                {% endif %}
+                {% endfor %}
+                {% endfor %} 
+                  </ul>
+               </div>
+            </div>
+    
+    </div>
+                {% endfor %} 
+
+          <!-- sizer -->
+      <div class="col-xs-6 col-sm-4 col-md-1 shuffle_sizer"></div>          
+
+
+    </div><!-- /#grid -->
+
+{% unless site.output == "pdf" %}
+{% include initialize_shuffle.html %}
+{% endunless %}
