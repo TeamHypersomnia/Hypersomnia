@@ -145,6 +145,8 @@ namespace augs {
 
 		bool is_active() const;
 
+		void set(vsync_type);
+
 		struct file_dialog_filter {
 			std::string description;
 			std::string extension;

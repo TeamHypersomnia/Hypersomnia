@@ -13,8 +13,8 @@
 #include <xcb/xcb_keysyms.h>
 #include <xcb/xcbext.h>
 
-#include <GL/glx.h>
-#include <GL/gl.h>
+#include "3rdparty/glad/glad_glx.h"
+#include "3rdparty/glad/glad_glx.c"
 
 #include "augs/templates/container_templates.h"
 #include "augs/filesystem/file.h"
@@ -44,7 +44,11 @@ namespace augs {
 		display = XOpenDisplay(0);
 
 		if (display == nullptr) {
-			throw window_error("Could open X Display.");
+			throw window_error("Failed to open X Display.");
+		}
+
+		if (!gladLoadGLX(display, 0)) {
+			throw window_error("Failed to load GLX glad.");
 		}
 
 		/* XInput Extension available? */
@@ -740,6 +744,31 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 		);
 
 		return { geom->x, geom->y, geom->width, geom->height }; 
+	}
+
+	void window::set(const vsync_type mode) {
+		auto set_interval = [&](const int val) {
+			if (glXSwapIntervalMESA != nullptr) {
+				glXSwapIntervalMESA(val);
+			}
+			else if (glXSwapIntervalEXT != nullptr) {
+				glXSwapIntervalEXT(display, drawable, val);
+			}
+			else if (glXSwapIntervalSGI != nullptr) {
+				glXSwapIntervalSGI(val);
+			}
+			else {
+				LOG("Warning! VSync is not supported.");
+			}
+		};
+
+		switch (mode) {
+			case vsync_type::OFF: set_interval(0); break;
+			case vsync_type::ON: set_interval(1); break;
+			case vsync_type::ADAPTIVE: set_interval(-1); break;
+
+			default: set_interval(0); break;
+		}
 	}
 
 	bool window::set_as_current_impl() {

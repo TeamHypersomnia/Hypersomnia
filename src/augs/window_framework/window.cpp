@@ -112,6 +112,10 @@ namespace augs {
 			set_window_name(settings.name);
 		}
 
+		if (force || changed(settings.vsync_mode)) {
+			set(settings.vsync_mode);
+		}
+
 		if (force || changed(settings.border)) {
 			set_window_border_enabled(!settings.fullscreen && settings.border);
 		}

@@ -407,7 +407,8 @@ return {
     size = {
       x = 1200,
       y = 700
-    }
+    },
+	vsync_mode = OFF
   },
   faction_view = {
 	colors = {

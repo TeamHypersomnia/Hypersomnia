@@ -599,6 +599,16 @@ namespace augs {
 		return ltrbi(r.left, r.top, r.right, r.bottom);
 	}
 
+	void window::set(const vsync_type mode) {
+		switch (mode) {
+			case vsync_type::OFF: wglSwapInterval(0); break;
+			case vsync_type::ON: wglSwapInterval(1); break;
+			case vsync_type::ADAPTIVE: wglSwapInterval(-1); break;
+
+			default: wglSwapInterval(0); break;
+		}
+	}
+
 	void window::set_fullscreen_hint(const bool flag) {
 		
 	}
