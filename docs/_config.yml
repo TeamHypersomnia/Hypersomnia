@@ -16,6 +16,8 @@ organization_path: https://github.com/TeamHypersomnia
 
 repo_path: https://github.com/TeamHypersomnia/Hypersomnia
 
+official_content_path: https://raw.githubusercontent.com/TeamHypersomnia/Hypersomnia/master/hypersomnia/content/official
+
 github_editme_path: TeamHypersomnia/Hypersomnia/blob/master/docs/
 # if you're using Github, provide the basepath to the branch you've created for reviews, following the sample here. if not, leave this value blank.
 
