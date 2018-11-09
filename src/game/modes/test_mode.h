@@ -30,7 +30,7 @@ struct test_mode_player {
 	test_mode_player(const entity_guid guid = entity_guid()) : guid(guid) {}
 };
 
-class test_scene_mode {
+class test_mode {
 public:
 	using ruleset_type = test_mode_ruleset;
 	static constexpr bool needs_initial_signi = false;
@@ -48,7 +48,7 @@ private:
 	void mode_pre_solve(input, const mode_entropy&, logic_step);
 
 public:
-	// GEN INTROSPECTOR class test_scene_mode
+	// GEN INTROSPECTOR class test_mode
 	unsigned current_spawn_index = 0;
 	std::vector<entity_guid> pending_inits;
 	std::unordered_map<mode_player_id, test_mode_player> players;

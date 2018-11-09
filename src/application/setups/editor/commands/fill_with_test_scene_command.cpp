@@ -71,14 +71,14 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 
 	{
 		const auto test_ruleset_id = raw_ruleset_id(0);
-		all.get_for<test_scene_mode>().try_emplace(test_ruleset_id, std::move(test_ruleset));
+		all.get_for<test_mode>().try_emplace(test_ruleset_id, std::move(test_ruleset));
 
 		if (!settings.start_bomb_mode) {
 			const auto arbitrary_player_id = mode_player_id::first();
 			player_id = arbitrary_player_id;
 
 			auto& def = rulesets.meta.playtest_default;
-			def.type_id.set<test_scene_mode>();
+			def.type_id.set<test_mode>();
 			def.raw = test_ruleset_id;
 
 			rulesets.meta.server_default = def;

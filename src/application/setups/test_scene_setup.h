@@ -8,7 +8,7 @@
 #include "game/organization/all_component_includes.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
-#include "game/modes/test_scene_mode.h"
+#include "game/modes/test_mode.h"
 
 #include "view/viewables/all_viewables_defs.h"
 #include "test_scenes/test_scene_settings.h"
@@ -29,7 +29,7 @@ namespace sol {
 }
 
 class test_scene_setup : public default_setup_settings {
-	test_scene_mode mode;
+	test_mode mode;
 	test_mode_ruleset ruleset;
 
 	intercosm scene;

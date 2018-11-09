@@ -70,7 +70,7 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 						{ settings.property_editor, property_editor_data }, { cmd_in }
 					};
 
-					if constexpr(std::is_same_v<M, test_scene_mode>) {
+					if constexpr(std::is_same_v<M, test_mode>) {
 						(void)mode_input;
 					}
 					else {

@@ -630,7 +630,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/detail/organisms/startle_nearbly_organisms.cpp"
 	"src/game/stateless_systems/remnant_system.cpp"
 	"src/view/audiovisual_state/systems/randomizing_system.cpp"
-	"src/game/modes/test_scene_mode.cpp"
+	"src/game/modes/test_mode.cpp"
 	"src/application/setups/editor/gui/editor_player_gui.cpp"
 	"src/game/components/hand_fuse_component.cpp"
 	"src/game/debug_draw.cpp"

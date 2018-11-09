@@ -19,17 +19,17 @@
 #include "test_scenes/scenes/test_scene_node.h"
 #include "game/modes/bomb_mode.h"
 #include "augs/math/cascade_aligner.h"
-#include "game/modes/test_scene_mode.h"
+#include "game/modes/test_mode.h"
 
 namespace test_scenes {
 	void minimal_scene::setup(test_mode_ruleset& rs) {
 		rs.spawned_faction = faction_type::METROPOLIS;
-		rs.name = "Generated test ruleset";
+		rs.name = "Minimal test ruleset";
 	}
 
 	void minimal_scene::setup(bomb_mode_ruleset& rs) {
 		rs.bot_names = { "First", "Second", "Third", "Fourth", "Fifth", "Sixth" };
-		rs.name = "Generated bomb ruleset";
+		rs.name = "Minimal bomb ruleset";
 		rs.bot_quota = rs.bot_names.size();
 	}
 

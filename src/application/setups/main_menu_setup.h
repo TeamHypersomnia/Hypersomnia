@@ -29,7 +29,7 @@
 #include "application/gui/menu/creators_screen.h"
 #include "application/gui/main_menu_gui.h"
 #include "application/setups/main_menu_settings.h"
-#include "game/modes/test_scene_mode.h"
+#include "game/modes/test_mode.h"
 #include "application/setups/setup_common.h"
 
 struct config_lua_table;
@@ -44,7 +44,7 @@ class main_menu_setup : public default_setup_settings {
 	vec2 latest_news_pos = { 0.f, 0.f };
 
 	intercosm intro;
-	test_scene_mode mode;
+	test_mode mode;
 	test_mode_ruleset ruleset;
 	entity_id viewed_character_id;
 

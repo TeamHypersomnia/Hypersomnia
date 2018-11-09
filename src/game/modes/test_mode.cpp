@@ -1,5 +1,5 @@
 #include "game/cosmos/solvers/standard_solver.h"
-#include "game/modes/test_scene_mode.h"
+#include "game/modes/test_mode.h"
 #include "game/modes/mode_entropy.h"
 #include "game/modes/mode_helpers.h"
 #include "game/cosmos/cosmos.h"
@@ -7,9 +7,9 @@
 #include "game/cosmos/create_entity.hpp"
 #include "game/detail/inventory/generate_equipment.h"
 
-using input_type = test_scene_mode::input;
+using input_type = test_mode::input;
 
-entity_guid test_scene_mode::lookup(const mode_player_id& id) const {
+entity_guid test_mode::lookup(const mode_player_id& id) const {
 	if (const auto entry = mapped_or_nullptr(players, id)) {
 		return entry->guid;
 	}
@@ -17,7 +17,7 @@ entity_guid test_scene_mode::lookup(const mode_player_id& id) const {
 	return entity_guid::dead();
 }
 
-mode_player_id test_scene_mode::lookup(const entity_guid& guid) const {
+mode_player_id test_mode::lookup(const entity_guid& guid) const {
 	for (const auto& p : players) {
 		if (p.second.guid == guid) {
 			return p.first;
@@ -27,7 +27,7 @@ mode_player_id test_scene_mode::lookup(const entity_guid& guid) const {
 	return mode_player_id::dead();
 }
 
-void test_scene_mode::init_spawned(const input in, const entity_id id, const logic_step step) {
+void test_mode::init_spawned(const input in, const entity_id id, const logic_step step) {
 	const auto handle = in.cosm[id];
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
@@ -41,7 +41,7 @@ void test_scene_mode::init_spawned(const input in, const entity_id id, const log
 	});
 }
 
-void test_scene_mode::teleport_to_next_spawn(const input in, const entity_id id) {
+void test_mode::teleport_to_next_spawn(const input in, const entity_id id) {
 	const auto handle = in.cosm[id];
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
@@ -71,7 +71,7 @@ void test_scene_mode::teleport_to_next_spawn(const input in, const entity_id id)
 	});
 }
 
-mode_player_id test_scene_mode::add_player(input_type in, const faction_type faction) {
+mode_player_id test_mode::add_player(input_type in, const faction_type faction) {
 	auto& cosm = in.cosm;
 
 	if (const auto flavour = ::find_faction_character_flavour(cosm, faction); flavour.is_set()) {
@@ -97,14 +97,14 @@ mode_player_id test_scene_mode::add_player(input_type in, const faction_type fac
 	return mode_player_id::dead();
 }
 
-void test_scene_mode::remove_player(input_type in, const mode_player_id id) {
+void test_mode::remove_player(input_type in, const mode_player_id id) {
 	const auto guid = lookup(id);
 	cosmic::delete_entity(in.cosm[guid]);
 
 	erase_element(players, id);
 }
 
-void test_scene_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic_step step) {
+void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic_step step) {
 	(void)entropy;
 	auto& cosm = in.cosm;
 

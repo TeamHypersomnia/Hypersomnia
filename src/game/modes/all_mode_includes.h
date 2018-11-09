@@ -1,7 +1,7 @@
 #pragma once
 #include <variant>
 #include <unordered_map>
-#include "game/modes/test_scene_mode.h"
+#include "game/modes/test_mode.h"
 #include "game/modes/bomb_mode.h"
 
 #include "augs/templates/per_type.h"
@@ -14,7 +14,7 @@ template <class T>
 using make_ruleset_map = std::unordered_map<raw_ruleset_id, typename T::ruleset_type>;
 
 using all_modes = type_list<
-	test_scene_mode,
+	test_mode,
 	bomb_mode
 >;
 

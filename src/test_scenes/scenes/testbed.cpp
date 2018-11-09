@@ -35,13 +35,13 @@
 #include "game/cosmos/cosmic_delta.h"
 
 #include "test_scenes/scenes/test_scene_node.h"
-#include "game/modes/test_scene_mode.h"
+#include "game/modes/test_mode.h"
 #include "game/modes/bomb_mode.h"
 #include "game/detail/inventory/generate_equipment.h"
 
 namespace test_scenes {
 	void testbed::setup(test_mode_ruleset& rs) {
-		rs.name = "Generated test ruleset";
+		rs.name = "Standard test ruleset";
 		rs.spawned_faction = faction_type::RESISTANCE;
 
 		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::VINDICATOR);
@@ -64,7 +64,7 @@ namespace test_scenes {
 
 		rs.bot_quota = rs.bot_names.size();
 
-		rs.name = "Generated bomb ruleset";
+		rs.name = "Standard bomb ruleset";
 		rs.economy.initial_money = 1000;
 
 		{

@@ -9,7 +9,7 @@
 #include "game/cosmos/entity_handle.h"
 
 #include "game/cosmos/cosmos.h"
-#include "game/modes/test_scene_mode.h"
+#include "game/modes/test_mode.h"
 #include "game/modes/bomb_mode.h"
 #include "augs/string/format_enum.h"
 #include "game/detail/damage_origin.hpp"
@@ -552,8 +552,8 @@ void arena_gui_state::draw_mode_gui(
 template void arena_gui_state::draw_mode_gui(
 	const draw_setup_gui_input&,
 	const draw_mode_gui_input&,
-	const test_scene_mode&, 
-	const test_scene_mode::input&
+	const test_mode&, 
+	const test_mode::input&
 ) const;
 
 template void arena_gui_state::draw_mode_gui(
@@ -571,6 +571,6 @@ template mode_entropy arena_gui_state::perform_imgui(
 
 template mode_entropy arena_gui_state::perform_imgui(
 	draw_mode_gui_input, 
-	const test_scene_mode&, 
-	const typename test_scene_mode::input&
+	const test_mode&, 
+	const typename test_mode::input&
 );
