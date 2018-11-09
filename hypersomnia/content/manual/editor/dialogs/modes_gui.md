@@ -1,15 +1,24 @@
-The Modes gui lets you tweak the rules for any game mode that is meant to be played on this map.
-All rulesets are stored in a separate "Project.rulesets" file in your project directory.
-This lets you create your own rulesets any map without ever modifying the map file itself.
+The Modes dialog lets you tweak the rules for any game mode that is meant to be played on this map.
+All rulesets are stored together in a separate ``Project.rulesets`` file in your project directory.
+This lets you create your own rules for any existing map - without ever modifying the map file itself.
 
-You can create more than a single ruleset 
+You can create more than one ruleset for a given game mode.
 
-predefined sets of rules for modes that will be play
+For example, with a Team Deathmatch:
 
-During a playtest, it also lets you peek into the state of the currently played mode.
+- You might want to have a set of rules specific for serious 5v5 matches:
+	- long freeze times, longer round end delays, no weapons initially granted
+- and another set of rules for whenever you want to play a quick 1v1 duel:
+	- cap player number to 2, almost instant round restart, 
+	  minimal freeze time, maybe always give some basic equipment, and so on.
+
+The server's admin can then load a ruleset of his choice on the fly,
+as long as he has the ``.rulesets`` file.
+
+During a playtest, a "Current mode state" node appears in the Modes dialog,
+which lets you peek into the state of the currently played mode,
 	- Although, that is useful only for debugging purposes.
-	- This state is held in the 
-
+	- This state is held in the ``Project.player`` file.
 
 ## Theory: A solver vs a mode
 There are two principal objects responsible for the entire process of moving the game forward in time.

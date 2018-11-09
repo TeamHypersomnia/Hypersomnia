@@ -40,7 +40,7 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 	filter.Draw();
 
 	ImGui::Columns(2);
-	next_column_text_disabled("Details");
+	next_columns(2);
 
 	thread_local std::string nickname = "Test-player";
 
