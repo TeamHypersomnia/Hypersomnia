@@ -3,7 +3,7 @@
 # In other words, the last line must be the last tag in the allowed-tags list.
 - title: Editing
   name: editing
-  description: General tips on how to efficiently use the Editor setup.
+  description: General tips on how to create complete flavours for entities.
 - title: Graphics creation
   name: gfx
 - title: Sound creation
