@@ -20,6 +20,20 @@ which lets you peek into the state of the currently played mode,
 	- Although, that is useful only for debugging purposes.
 	- This state is held in the ``Project.player`` file.
 
+## Default rulesets
+
+If a ruleset is specified as a "Playtest default",
+it will be chosen for playtesting in editor whenever you press ``i`` 
+to enter gameplay for the first time.
+A yellow "P" will appear next to its name.
+Of course, there can only be a single Playtest default at a time.
+
+If a ruleset is specified as a "Server default",
+it will be loaded whenever this map is chosen for playing on any game server.
+	Of course, the server admin will later be able to choose among all modes available.
+An orange "S" will appear next to its name.
+Of course, there can only be a single Server default at a time.
+
 ## What exactly is a mode? A mode versus a solver.
 
 There are two principal objects responsible for the entire process of moving the game forward in time.

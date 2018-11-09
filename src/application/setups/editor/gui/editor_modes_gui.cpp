@@ -147,6 +147,11 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 					const bool is_playtest = meta.playtest_default == typed_id;
 
 					const auto node_label = ruleset.name + "###" + std::to_string(id);
+
+					if (!filter.PassFilter(node_label.c_str())) {
+						continue;
+					}
+
 					auto node = scoped_tree_node(node_label.c_str());
 
 					if (is_server) {
