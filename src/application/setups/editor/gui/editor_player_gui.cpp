@@ -39,6 +39,20 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 	}
 
 	{
+		auto scope = maybe_disabled_cols({}, player.get_current_step() == 0);
+
+		if (ImGui::Button("Rewind")) {
+			if (player.is_recording()) {
+				player.begin_replaying(folder);
+			}
+
+			player.seek_to(0, cmd_in);
+		}
+
+		ImGui::SameLine();
+	}
+
+	{
 		auto scope = maybe_disabled_cols({}, player.is_paused());
 
 		if (ImGui::Button("Pause")) {

@@ -48,6 +48,7 @@ possibly with some corpses and shells lying on the ground due to fired shots.
 	- The currently controlled entity is always highlighted in bright yellow.
 	- You can select any entity for controlling but only selecting the
 	  Controlled character type of entities will yield any meaningful result.
+- Press i to enter gameplay while controlling the selected character.
 
 ## Gameplay recording
 
