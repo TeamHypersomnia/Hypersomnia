@@ -18,16 +18,21 @@ if you'd like the reading experience to be more comfortable.
 
 Editor lets you create unique playable worlds for Hypersomnia.
 It is not meant to be a general-purpose, scriptable game creator like Unity or Unreal Engine,
-but rather a Hypersomnia-specific tool to create and test worlds.
+but rather a Hypersomnia-specific tool to create and test community worlds.
 In particular, you won't be able to write any scripts,
 or invent behaviour that the developers have never taken into account.
 
 That said, with enough effort, you could tweak mechanics to such an extent that they won't even resemble the original game.
+
+## ImGui end-user guide
+
+Hypersomnia uses ImGui framework for its GUI display.  
+Press Alt+V (View->ImGui tutorial) to view instructions on how to handle windows and various widgets.
 
 ## Let's begin
 
 It is HIGHLY RECOMMENDED that you use keyboard shortcuts wherever possible in order to increase your productivity.
 
 There are no open projects. 
-From here, press Ctrl+N to create an empty project,
+Press Ctrl+N to create an empty project,
 or press Ctrl+O to load a folder with existing project files.

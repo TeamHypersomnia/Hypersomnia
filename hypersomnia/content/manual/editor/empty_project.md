@@ -13,6 +13,6 @@ The two test scenes: testbed and minimal_scene are simple scenes generated purel
 Their code is maintained by developers so that any newly introduced game mechanic  
 can be quickly tested in a reasonably populated game world. 
 
-If these test scenes weren't added into the executable at the compilation stage,
-but stored in separate files instead, they would require porting to a newer version of the game, 
+If we didn't add these test scenes into the executable at the compilation stage,
+but instead stored them in separate files, they would require porting to a newer version of the game, 
 possibly with different data layouts, which would needlessly complicate development.

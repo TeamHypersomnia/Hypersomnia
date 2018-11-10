@@ -12,18 +12,15 @@ Summarizing from http://wiki.hypersomnia.xyz/entity_flavour
 So that working with content is easier, and so that less memory is wasted,  
 each game object is divided into two kinds of data:
 
-1. Flavour - state that should never change and is supposed to be shared between entities.
-   For example: the muzzle velocity and fire rate of a gun.
-2. Entity - state whose instance is needed by EACH and EVERY discernible object, since it is constantly in flux.
+1. Flavour - state that is defined only once and is later shared by one or more entities. The flavour's properties NEVER change during gameplay - except when the map designer tweaks values during a playtest - and can only ever be modified from within this editor.
+   For example: the muzzle velocity and the fire rate of a gun.
+2. Entity - state whose instance is needed by EACH and EVERY discernible object, since it constantly changes during gameplay.
    For example: the object's position or a flag signifying whether a gun's trigger is pressed, or the volume of its heat engine.
-
-In short, a flavour contains information that is stored ONCE and is later shared by one or more entities,
-whereas an entity is an instance of some flavour.
 
 A game "object" is an entity and its flavour seen as a whole.
 
-As a mapper, you will only be concerned with flavours 99% of the time.
-Viewing entity properties is mostly useful for in-game debugging.
+Except for entity positions, a map designer will only be concerned with flavour properties 99% of the time.
+Viewing entity properties is mostly useful for debugging in-game problems.
 
 ## Theory: Invariants vs Components
 

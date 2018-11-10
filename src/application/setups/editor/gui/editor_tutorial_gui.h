@@ -42,3 +42,11 @@ struct editor_tutorial_gui : standard_window_mixin<editor_tutorial_gui> {
 	void perform(const editor_setup&);
 };
 
+struct imgui_tutorial_gui : standard_window_mixin<imgui_tutorial_gui> {
+	using base = standard_window_mixin<imgui_tutorial_gui>;
+	using base::base;
+	using introspect_base = base;
+
+	void perform();
+};
+

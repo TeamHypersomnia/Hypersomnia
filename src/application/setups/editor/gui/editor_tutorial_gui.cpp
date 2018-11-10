@@ -47,7 +47,12 @@ void editor_tutorial_gui::perform(const editor_setup& setup) {
 
 				if constexpr(!std::is_same_v<T, editor_tutorial_gui>) {
 					const auto text_path = make_dialog_manual_path(label);
-					dialog_manuals[label] = augs::file_to_string(text_path);
+					try {
+						dialog_manuals[label] = augs::file_to_string(text_path);
+					}
+					catch (const augs::file_open_error& err) {
+						dialog_manuals[label] = "";
+					}
 				}
 			},
 			setup
@@ -236,4 +241,31 @@ void editor_tutorial_gui::perform(const editor_setup& setup) {
 			prev_it = next_hashtag;
 		}
 	}
+}
+
+void imgui_tutorial_gui::perform() {
+	auto tutorial = make_scoped_window(ImGuiWindowFlags_AlwaysAutoResize);
+
+	if (!tutorial) {
+		return;
+	}
+
+	ImGui::BulletText("Double-click on title bar to collapse window.");
+	ImGui::BulletText("If the window is resizable,\nclick and drag on lower right corner to resize window\n(double-click to auto fit window to its contents).");
+	ImGui::BulletText("Click and drag on any empty space to move window.");
+	ImGui::BulletText("TAB/SHIFT+TAB to cycle through keyboard editable fields.");
+	ImGui::BulletText("CTRL+Click on a slider or drag box to input value as text.");
+	if (ImGui::GetIO().FontAllowUserScaling)
+	ImGui::BulletText("CTRL+Mouse Wheel to zoom window contents.");
+	ImGui::BulletText("Mouse Wheel to scroll.");
+	ImGui::BulletText("While editing text:\n");
+	ImGui::Indent();
+	ImGui::BulletText("Hold SHIFT or use mouse to select text.");
+	ImGui::BulletText("CTRL+Left/Right to word jump.");
+	ImGui::BulletText("CTRL+A or double-click to select all.");
+	ImGui::BulletText("CTRL+X,CTRL+C,CTRL+V to use clipboard.");
+	ImGui::BulletText("CTRL+Z,CTRL+Y to undo/redo.");
+	ImGui::BulletText("ESCAPE to revert.");
+	ImGui::BulletText("You can apply arithmetic operators +,*,/ on numerical values.\nUse +- to subtract.");
+	ImGui::Unindent();
 }

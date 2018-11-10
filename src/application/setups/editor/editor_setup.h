@@ -105,6 +105,7 @@ class editor_setup {
 	editor_coordinates_gui coordinates_gui = std::string("Coordinates");
 	editor_layers_gui layers_gui = std::string("Layers");
 	editor_tutorial_gui tutorial_gui = std::string("Editor tutorial");
+	imgui_tutorial_gui imgui_tutorial = std::string("ImGui tutorial");
 
 	editor_images_gui images_gui = std::string("Images");
 	editor_sounds_gui sounds_gui = std::string("Sounds");

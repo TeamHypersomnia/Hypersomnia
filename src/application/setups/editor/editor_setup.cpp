@@ -565,6 +565,10 @@ void editor_setup::perform_custom_imgui(
 					if (ImGui::MenuItem("Tutorial", "ALT+X", nullptr, true)) {
 						tutorial_gui.show = true;
 					}
+
+					if (ImGui::MenuItem("ImGui Tutorial", "ALT+V", nullptr, true)) {
+						imgui_tutorial.show = true;
+					}
 				}
 			}
 		}
@@ -580,6 +584,7 @@ void editor_setup::perform_custom_imgui(
 	}
 
 	tutorial_gui.perform(*this);
+	imgui_tutorial.perform();
 
 	if (anything_opened()) {
 		history_gui.perform(make_command_input());
@@ -1106,6 +1111,7 @@ bool editor_setup::handle_input_before_imgui(
 				case key::M: plain_animations_gui.open(); return true;
 				case key::D: modes_gui.open(); return true;
 				case key::X: tutorial_gui.open(); return true;
+				case key::V: imgui_tutorial.open(); return true;
 				default: break;
 			}
 		}
