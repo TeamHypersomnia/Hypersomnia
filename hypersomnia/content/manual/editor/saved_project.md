@@ -141,7 +141,30 @@ Press Slash (/) to start quick search for an entity.
 
 ## Assets
 
-Visit these windows to get more information:
+The map designer will work with two kinds of assets:
+
+- Pathed assets. They are uniquely identified by the relative path to the referenced file.
+	- These are:
+		- Images (Alt+I).
+		- Sounds (Alt+N).
+	- Each of the official image and sound files have a set of properties associated with them.
+	  These properties, as well as relative paths to the files themselves, 
+	  are stored in the intercosm file along with the game world.
+
+	  Open up the relevant asset GUIs for further information.
+
+	  The pathed assets are always created implicitly without the designer's intervention.
+	  They are automatically imported whenever they are chosen for the first time for some property.
+
+- Unpathed assets. They have no corresponding path in the filesystem and are stored whole in the intercosm file.
+	- These are:
+		- Particle effects (Alt+R).
+		- Animations (Alt+M).
+		- Recoil patterns (GUI not implemented yet).
+		- Physical materials (GUI not implemented yet).
+			- They specify things like collision sounds or destruction effects.
+
+	  Open up the relevant asset GUIs for further information.
 
 ## Scene hierarchy
 

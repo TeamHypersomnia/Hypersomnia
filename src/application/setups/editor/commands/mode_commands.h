@@ -5,6 +5,7 @@
 #include "game/cosmos/entity_id.h"
 #include "game/modes/all_mode_includes.h"
 #include "game/modes/mode_player_id.h"
+#include "game/modes/ruleset_id.h"
 #include "application/setups/editor/commands/change_property_command.h"
 #include "application/setups/editor/commands/editor_command_structs.h"
 #include "application/setups/editor/editor_command_input.h"

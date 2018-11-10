@@ -133,7 +133,13 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			auto new_entry = asset_entry_type(path, id);
 
 #if BUILD_LOCATION_FINDERS
-			find_locations_that_use(id, work.world, viewables, [&](const std::string& location) {
+			const auto in_locations = candidate_id_locations {
+				work.world, 
+				work.viewables,
+				folder.commanded->rulesets
+			};
+
+			find_locations_that_use(id, in_locations, [&](const std::string& location) {
 				new_entry.using_locations.push_back(location);
 			});
 #else

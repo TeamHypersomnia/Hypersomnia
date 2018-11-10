@@ -133,7 +133,15 @@ void editor_unpathed_asset_gui<asset_id_type>::perform(
 			new_entry.id = id;
 			new_entry.name = get_displayed_name(object, get_asset_pool<assets::image_id>(cmd_in));
 
-			find_locations_that_use(id, folder.commanded->work.world, folder.commanded->work.viewables, [&](const auto& location) {
+			auto& commanded = *folder.commanded;
+
+			const auto in_locations = candidate_id_locations {
+				commanded.work.world, 
+				commanded.work.viewables,
+				commanded.rulesets
+			};
+
+			find_locations_that_use(id, in_locations, [&](const auto& location) {
 				new_entry.using_locations.push_back(location);
 			});
 

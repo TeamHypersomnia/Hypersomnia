@@ -17,7 +17,11 @@ ToDo: instead of creating detailed guide for this, we should simply introduce a 
 For your new gun, you should never reuse a magazine flavour that is named after a weapon with which it is compatible.  
 Thus, most of the time, you will create your own magazine flavour.
 
-For this, you will only need a magazine sprite.
+For this, you will only need an image for the magazine sprite.
+- To edit how the magazine fits into the gun, you should edit two image offsets:
+	- Firstly, the gun's ``detachable_magazine`` offset.
+	- Secondly, if you'll allow more than one magazine type for a gun (not recommended now), there is an ``attachment_offset`` in each item.
+		- Note that an item will only ever fit into a single type of attachment slot, so it makes sense to have such a generic name for this offset.
 
 Make sure to set a balanced price for the magazine within the [item invariant](item_component).
 
@@ -52,13 +56,18 @@ A gun will need:
 
 ### Graphics
 
-- The gun's sprite.
+- An image for the gun's Sprite invariant.
+	- Viewed:
+		- When the gun is idle,
+		- in the knockout indicators in the top left corner,
+		- and also in inventory GUI.
+	- You should edit the ``gun_offsets`` of the chosen gun image to set some important metrics for the gun.
+	  See Images GUI (Alt+I).
 - Optional: the gun's shooting animation.
 	- Can have any number of frames.
 - The gun's magazine sprite.
 
 ### Sounds
-
 
 ### Customization 
 

@@ -178,12 +178,18 @@ auto tree_of_flavours(
 							thread_local std::vector<std::string> locations;
 							locations.clear();
 
-							auto& work = cpe_in.command_in.folder.commanded->work;
+							auto& commanded = *cpe_in.command_in.folder.commanded;
+							auto& work = commanded.work;
+
+							const auto in_locations = candidate_id_locations {
+								work.world, 
+								work.viewables,
+								commanded.rulesets
+							};
 
 							find_locations_that_use_flavour(
 								flavour_id,
-								work.world,
-								work.viewables,
+								in_locations,
 								[](const std::string& location) {
 									locations.push_back(location);
 								}

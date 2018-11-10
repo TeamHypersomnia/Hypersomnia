@@ -3,6 +3,7 @@
 #include "augs/templates/introspection_utils/types_in.h"
 #include "game/cosmos/cosmos.h"
 #include "view/viewables/all_viewables_defs.h"
+#include "application/predefined_rulesets.h"
 
 template <class T>
 struct ignore_in_common : std::bool_constant<
@@ -68,15 +69,22 @@ void find_flavours_that_use(
 	});
 }
 
+struct candidate_id_locations {
+	const cosmos& cosm;
+	const all_viewables_defs& viewables;
+	const predefined_rulesets& rulesets;
+};
+
 template <class object_type, class F>
 void find_locations_that_use(
 	const object_type& id,
-	const cosmos& cosm,
-	const all_viewables_defs& viewables,
+	const candidate_id_locations l,
 	F location_callback
 ) {
 	/* For typed entity flavour ids, allow conversion to constrained entity ids. */
 	static constexpr bool allow_conversion = is_typed_flavour_id_v<object_type>;
+
+	auto& cosm = l.cosm;
 
 	using contains = detail_same_or_convertible<allow_conversion>;
 
@@ -107,12 +115,14 @@ void find_locations_that_use(
 		(void)preffix;
 		(void)p;
 
-		if constexpr(contains::template value<typename remove_cref<decltype(p)>::value_type, object_type>) {
+		using SearchedObject = typename remove_cref<decltype(p)>::value_type;
+
+		if constexpr(contains::template value<SearchedObject, object_type>) {
 			for_each_id_and_object(
 				p, 
 				[&](const auto&, const auto& asset) {
 					auto report_in_asset = [&](const std::string& location) {
-						const auto asset_name = get_displayed_name(asset, viewables.image_definitions);
+						const auto asset_name = get_displayed_name(asset, l.viewables.image_definitions);
 						const auto full_location = preffix + asset_name + " (" + location + ")";
 
 						location_callback(full_location);
@@ -124,24 +134,47 @@ void find_locations_that_use(
 		}
 	};
 
-	traverse_assets("Particle effect: ", viewables.particle_effects);
+	traverse_assets("Particle effect: ", l.viewables.particle_effects);
 	traverse_assets("Animation: ", logicals.plain_animations);
 	traverse_assets("Physical material: ", logicals.physical_materials);
+
+	{
+		const auto preffix = "Ruleset: ";
+
+		l.rulesets.all.for_each_container(
+			[&](const auto& rs_container) {
+				using SearchedObject = remove_cref<decltype(rs_container)>;
+
+				if constexpr(contains::template value<SearchedObject, object_type>) {
+					for (const auto& it : rs_container) {
+						const auto& ruleset = it.second;
+
+						auto report_in_ruleset = [&](const std::string& location) {
+							const auto full_location = preffix + ruleset.name + " (" + location + ")";
+
+							location_callback(full_location);
+						};
+
+						finder::find(id, ruleset, report_in_ruleset);
+					}
+				}
+			}
+		);
+	}
 }
 
 template <class E, class F>
 void find_locations_that_use_flavour(
 	const typed_entity_flavour_id<E> id,
-	const cosmos& cosm,
-	const all_viewables_defs& defs,
+	const candidate_id_locations l,
 	F&& location_callback
 ) {
-	const auto num_entities = cosm.get_solvable_inferred().flavour_ids.get_entities_by_flavour_id(id).size();
+	const auto num_entities = l.cosm.get_solvable_inferred().flavour_ids.get_entities_by_flavour_id(id).size();
 
 	if (num_entities > 0) {
 		location_callback(typesafe_sprintf("%x Entities of this flavour", num_entities));
 	}
 
-	find_locations_that_use(id, cosm, defs, std::forward<F>(location_callback));
+	find_locations_that_use(id, l, std::forward<F>(location_callback));
 }
 
