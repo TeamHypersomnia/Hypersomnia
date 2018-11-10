@@ -60,7 +60,7 @@ void editor_tutorial_gui::perform(const editor_setup& setup) {
 	}
 
 	static const std::vector<std::string> other_dialogs = {
-		"current_asset"
+		// "current_asset"
 	};
 
 	for (const auto& o : other_dialogs) {
@@ -86,7 +86,7 @@ void editor_tutorial_gui::perform(const editor_setup& setup) {
 				if (!std::is_same_v<T, editor_tutorial_gui>) {
 					if constexpr(is_one_of_v<T, editor_images_gui, editor_sounds_gui>) {
 						if (gui.is_separate_properties_focused()) {
-							focused_dialog = "current_asset";
+							focused_dialog = "";
 						}
 						else if (gui.is_focused()) {
 							focused_dialog = label;

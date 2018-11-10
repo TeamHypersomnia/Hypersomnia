@@ -237,6 +237,9 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 		}
 	};
 
+	look_for_current_in(missing_paths);
+	look_for_current_in(missing_orphaned_paths);
+
 	look_for_current_in(orphaned_paths);
 	look_for_current_in(used_paths);
 
@@ -344,13 +347,30 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 		text_disabled(typesafe_sprintf("%x", resolved_path.string()));
 
 		if constexpr(is_image_type) {
-			const auto& entry = game_atlas.at(currently_viewed_entry->id);
-			const auto is = vec2i(entry.get_original_size());
+			const auto& entry = game_atlas.at(currently_viewed_entry->id).diffuse;
 
-			text_disabled(typesafe_sprintf("%x x %x pixels", is.x, is.y));
+			const bool is_missing =
+				range_of_currently_viewed == std::addressof(missing_paths)
+				|| range_of_currently_viewed == std::addressof(missing_orphaned_paths)
+			;
 
-			game_image(entry.diffuse, is);
-			invisible_button("###imgpreview", is);
+			if (!is_missing) {
+				if (!entry.exists()) {
+					text_disabled("The preview is being loaded...");
+				}
+				else {
+					const auto is = vec2i(entry.get_original_size());
+
+					text_disabled(typesafe_sprintf("%x x %x pixels", is.x, is.y));
+
+					game_image(entry, is);
+					invisible_button("###imgpreview", is);
+				}
+			}
+			else {
+				text_color("File is missing! No preview available.", red);
+				text_color("\nPut a proper file into the original location,\nor point the editor to a new file path and click \"Re-check existence\".", orange);
+			}
 		}
 
 	}
@@ -412,22 +432,22 @@ void editor_pathed_asset_gui<asset_id_type>::perform(
 			}
 
 			if constexpr(is_image_type) {
-				if (ImGui::IsItemHovered()) {
-					const auto entry = game_atlas.at(id).diffuse;
+				const auto& entry = game_atlas.at(id).diffuse;
+
+				if (entry.exists()) {
+					if (ImGui::IsItemHovered()) {
+						if (entry.was_successfully_packed) {
+							auto tooltip = scoped_tooltip();
+							game_image_button("###TooltipPreview", entry);
+						}
+					}
 
 					if (entry.was_successfully_packed) {
-						auto tooltip = scoped_tooltip();
-						game_image_button("###TooltipPreview", entry);
+						ImGui::SameLine();
+						const auto size = entry.get_original_size();
+						const auto size_suffix = typesafe_sprintf("(%xx%x)", size.x, size.y);
+						text_disabled(size_suffix);
 					}
-				}
-
-				const auto& entry = game_atlas.at(id);
-
-				if (entry.diffuse.was_successfully_packed) {
-					ImGui::SameLine();
-					const auto size = entry.get_original_size();
-					const auto size_suffix = typesafe_sprintf("(%xx%x)", size.x, size.y);
-					text_disabled(size_suffix);
 				}
 			}
 
