@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Can't we really avoid the need for finishing traces?
+	- Well won't it later be very useful to define some explosion entities?
+	- There might even be more components like cascade explosion
+
 - Usability fixes to editor 
 	- Setting specific names to entities
 	- Complex instantiations

@@ -58,6 +58,7 @@ namespace invariants {
 		// GEN INTROSPECTOR struct invariants::melee
 		augs::enum_array<melee_attack_definition, weapon_action_type> actions;
 		melee_throw_def throw_def;
+		real32 movement_speed_bonus = 1.1f;
 		// END GEN INTROSPECTOR
 	};
 }

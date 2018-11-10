@@ -6,24 +6,36 @@ summary: |
 permalink: creating_guns
 ---
 
+{% include flavour_creation_tip.html %}
+
+ToDo: instead of creating detailed guide for this, we should simply introduce a creator window that only shows the most relevant fields for editing.
+
 ## Prerequisites
 
-### Preparing the ammunition
+### A magazine
 
-It is fine to reuse an existing cartridge flavour for your new gun.  
-For example, both BILMER2000 and Datum Gun shoot cyan charges for their cartridges,  
+For your new gun, you should never reuse a magazine flavour that is named after a weapon with which it is compatible.  
+Thus, most of the time, you will create your own magazine flavour.
+
+For this, you will only need a magazine sprite.
+
+Make sure to set a balanced price for the magazine within the [item invariant](item_component).
+
+#### Preparing the ammunition
+
+It is fine to reuse an existing cartridge flavour for your new magazine type.  
+For example, both BILMER2000 and Datum Gun use the Cyan charge flavour for their cartridges,  
 simply because they are aesthetically compatible.  
 
 If you wish to create a unique ammunition type for your weapon, follow the [gun charge creation guide](creating_charges).
 
-### A magazine
+#### Setting the compatible ammunition type
 
-You should never reuse a magazine flavour that is named after a weapon with which it is compatible.  
-Thus, most of the time, you will create your own magazine flavour.
+Navigate to the magazine's [container invariant](container_component), choose Item deposit,  
+and set ``only_allow_flavour`` to your cartridge flavour of choice.
 
-You will only need a magazine sprite.
-
-Make sure to set a balanced price for the magazine within the [item invariant](item_component).
+Tweak ``space_available`` to determine how many charges will fit inside.
+You can change the amount of space occupied
 
 ### A recoil pattern
 
@@ -46,6 +58,14 @@ A gun will need:
 - The gun's magazine sprite.
 
 ### Sounds
+
+
+### Customization 
+
+- Gun invariant
+	- ``adversarial.knockout_award`` - the amount of money that a player gets for killing with this weapon.
+	- ``magic_missile_flavour`` - If the gun is to be based on Personal Electricity rather than material ammunition, this is the flavour of the missile that will be spawned per each shot.
+		- If this flavour is set, the weapon will never use its chamber or magazine slots for gathering ammunition.
 
 ## Final touches
 

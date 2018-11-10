@@ -61,6 +61,7 @@ namespace invariants {
 		real32 recoil_multiplier = 1.f;
 
 		real32 homing_towards_hostile_strength = 0.f;
+		real32 pe_damage_ratio = 0.25f;
 
 		sound_effect_input trace_sound;
 		sound_effect_input ricochet_sound;

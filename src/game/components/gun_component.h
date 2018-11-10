@@ -72,8 +72,6 @@ namespace invariants {
 
 		real32 shell_spread_degrees = 20.f;
 
-		transformr shell_spawn_offset;
-
 		real32 gunshot_adds_heat = 0.05f;
 		real32 heat_cooldown_speed_mult = 1.f;
 		real32 maximum_heat = 1.f;
