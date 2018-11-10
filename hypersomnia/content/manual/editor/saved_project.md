@@ -177,7 +177,7 @@ Press Alt+D (View->Modes) for more information.
 ## Playtesting
 
 Naturally, you will want to test how your map plays.
-To do so, press HOME to return to the origin,
+To do so, press HOME to put camera at the origin,
 and then press "i" to begin playing your world.
 The currently selected mode will start executing its logic on the map.
 
@@ -186,4 +186,10 @@ it will not follow your character but stay in the same place instead.
 
 ## More information
 
+Congratulations!
 
+You should now be fluent in all editor features.  
+The learning doesn't end here, however.  
+
+Visit http://wiki.hypersomnia.xyz/content_guides 
+to read some very important guides on actually creating meaningful content. 
