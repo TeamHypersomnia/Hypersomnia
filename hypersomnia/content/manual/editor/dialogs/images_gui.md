@@ -11,6 +11,9 @@ In the Images GUI, you can:
 	  Naturally, they will be used whenever you fill your project with a test scene.
 - Manually import properties of images from a neighbouring ``.meta.lua`` file. 
 - Forget the orphaned images - those that are not used anywhere anymore.
+	- Simply press "F" next to the orphaned image name.
+		- Warning: this will cause the image properties to be deleted from the project.
+		  Only the ``.meta.lua`` file will, of course, survive.
 
 ## Renamed, moved or deleted images
 
@@ -29,8 +32,7 @@ The only consequence is that the game will have a glitch at places where the mis
 
 ## Using locations
 
-A neat feature of the editor is that you can easily view 
-where in the entire project is a particular asset used.
+A rather remarkable feature of the editor is the ability to view where in the entire project is a particular asset used.
 	If it is not used anywhere, it is called "orphaned" 
 	and can then be safely removed from the project.
 
@@ -40,7 +42,7 @@ A new column should appear with the locations printed.
 ## Current asset dialog
 
 Make sure the "Properties window" is checked and select any image on the list.
-A separate window for editing properties of the selected image should pop up.
+A separate window should pop up for editing its properties.
 
 Whenever the current asset dialog or the Images dialog is focused, you can:
 - Press Page down to move to the next image on the list.
@@ -59,10 +61,10 @@ several similar images in a quick succession.
 ## Extra loadables: Neon maps
 
 Neon maps enable the entities to emit their own light.
-The pixels of a specified set of colors is taken from the input image,
-blurred with a strong gaussian-like filter,
+First, the input image is searched for pixels of specified colors.
+They are then blurred with a strong gaussian-like filter,
 and later used in light calculations.
-	To specify which colors are taken as input, open Light colors node.
+	To specify which colors are to be considered, open Light colors node.
 
 You have to experiment with other parameters for the algorithm to truly understand their effect.
 
@@ -100,10 +102,8 @@ The controls are as follows:
 
 ## Offsets
 
-Some images require some important metrics.
+Some of the images used for flavours require important metrics.
 
 For example, we can generate a neon map for each image,  
 or specify its shape in detail when it is going to be used as a physical shape,
 or specify some attachment positions if it'll going to be a container like a torso or a gun.
-
-If you create an image and want to always load some sensible properties 

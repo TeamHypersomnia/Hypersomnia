@@ -4,7 +4,7 @@
 [![Appveyor Build Status](https://ci.appveyor.com/api/projects/status/5aatwxv8hceaop56?svg=true)](https://ci.appveyor.com/project/geneotech/Hypersomnia)
 
 Latest **Windows** binaries: https://ci.appveyor.com/project/geneotech/hypersomnia/build/artifacts  
-Latest **Linux** binaries: (in progress)
+The latest **Linux** binary has to [be built manually](#linux-instructions).
 
 - [Hypersomnia](#hypersomnia)
 - [Gallery](#gallery)
@@ -136,7 +136,7 @@ If, for some reason, some step fails, refer to the latest working Appveyor build
 ## Linux instructions
 
 Current platforms are actively tested and supported:
-- Arch Linux with i3 window manager
+- Arch Linux with i3 window manager.
 - Ubuntu, but it is tested only through Travis builds.
 
 ### Dependencies
