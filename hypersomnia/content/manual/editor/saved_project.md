@@ -3,6 +3,7 @@ There are many things that can be done from here.
 
 Make sure to read carefully through the following sections, 
 DON'T SKIP ANY, and read EXACTLY in the order they are presented!
+There is no TL;DR version.
 
 ## Autosaves
 
@@ -80,6 +81,10 @@ the meaning of which is as follows:
 - File: ``Project.player``.
 	- A binary blob representing the player state (more on that later).
 	- You should not delete or otherwise alter it.
+
+- Folder: ``Project-export``. 
+	- An empty folder created for your convenience when you decide to export the project to portable lua files.
+	  This way you won't have to create this folder yourself and a nice convention on locating the exports is established.
 
 To ensure that gameplay recordings are replayed deterministically,
 NONE of the above files should be deleted during a playtest (more on that later).

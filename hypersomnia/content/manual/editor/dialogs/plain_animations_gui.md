@@ -3,7 +3,7 @@ It can be explicitly created or duplicated.
 
 ## Creating a new animation
 
-When you create an animation by pressing "Create" button, 
+When you duplicate or create an animation by pressing "Create" button, 
 it starts as being Orphaned, since it is not yet used anywhere.
 
 By default, a Blank image will be used for the first frame.

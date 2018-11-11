@@ -76,7 +76,11 @@ void editor_tutorial_gui::perform(const editor_setup& setup) {
 
 	augs::path_type chosen_tutorial_path; 
 	
-	const auto& chosen_text = [&]() {
+	static const std::string no_content = 
+		"No help was written for this dialog.\nThis means that its elements are self-explanatory."
+	;
+
+	const auto& chosen_text = [&]() -> const auto& {
 		std::string focused_dialog;
 
 		augs::introspect(
@@ -109,12 +113,13 @@ void editor_tutorial_gui::perform(const editor_setup& setup) {
 		if (!current_dialog.empty()) {
 			const auto& text = dialog_manuals.at(current_dialog);
 
-			static const std::string no_content = 
-				"No help was written for this dialog.\nThis means that its elements are self-explanatory."
-			;
-
 			chosen_tutorial_path = make_dialog_manual_path(current_dialog);
-			return text.empty() ? no_content : text;
+
+			if (text.empty()) {
+				return no_content;
+			}
+
+			return text;
 		}
 
 		const auto chosen_tutorial_type = [&]() {
@@ -182,11 +187,13 @@ void editor_tutorial_gui::perform(const editor_setup& setup) {
 		return context_manuals.at(chosen_tutorial_type);
 	}();
 
-	if (ImGui::Button("Open")) {
-		std::thread([chosen_tutorial_path](){ augs::open_text_editor(chosen_tutorial_path.string()); }).detach();
-	}
+	if (std::addressof(chosen_text) != std::addressof(no_content)) {
+		if (ImGui::Button("Open")) {
+			std::thread([chosen_tutorial_path](){ augs::open_text_editor(chosen_tutorial_path.string()); }).detach();
+		}
 
-	ImGui::SameLine();
+		ImGui::SameLine();
+	}
 
 	text_disabled(augs::filename_first(chosen_tutorial_path));
 
