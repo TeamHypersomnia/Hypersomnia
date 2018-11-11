@@ -12,14 +12,16 @@ Summarizing from http://wiki.hypersomnia.xyz/entity_flavour
 So that working with content is easier, and so that less memory is wasted,  
 each game object is divided into two kinds of data:
 
-1. Flavour - state that is defined only once and is later shared by one or more entities. The flavour's properties NEVER change during gameplay - except when the map designer tweaks values during a playtest - and can only ever be modified from within this editor.
-   For example: the muzzle velocity and the fire rate of a gun.
-2. Entity - state whose instance is needed by EACH and EVERY discernible object, since it constantly changes during gameplay.
-   For example: the object's position or a flag signifying whether a gun's trigger is pressed, or the volume of its heat engine.
+- Flavour - state that is defined only once and is later shared by one or more entities. 
+  The flavour's properties NEVER change during gameplay - except when the map designer tweaks values during a playtest - 
+  and can only ever be modified from within this editor.
+	For example: the muzzle velocity and the fire rate of a gun.
+- Entity - state whose instance is needed by EACH and EVERY discernible object, since it constantly changes during gameplay.
+	For example: the object's position or a flag signifying whether a gun's trigger is pressed, or the volume of its heat engine.
 
 A game "object" is an entity and its flavour seen as a whole.
 
-Except for entity positions, a map designer will only be concerned with flavour properties 99% of the time.
+Except for entity positions, a map designer will be concerned with flavour properties 99% of the time.
 Viewing entity properties is mostly useful for debugging in-game problems.
 
 ## Theory: Invariants vs Components
@@ -32,9 +34,11 @@ e.g. a sentience component will always be present alongside a sentience invarian
 
 ## Theory: Entity type
 
-The memory layout of all entities and flavours is hardcoded, and thus, immutable.  
+There is a significant difference between this editor and general game creators like Unity.
+
+Here, the memory layout of all entities and flavours is hardcoded, and thus, immutable.  
 It means that there are only several possible combinations of invariants and components,
-and you can't manually add, remove or disable components/invariants at will.  
+and you cannot manually add, remove or disable components/invariants at will.  
 
 This is for several reasons:
 - Performance. These assumptions let us employ some massive hacks to improve cache coherency,
@@ -45,7 +49,7 @@ This is for several reasons:
   or make it otherwise unplayable.
   
   We don't see much benefit in letting mappers create "camera objects that shoot bullets",
-  or "spawn point markers that can also explode", because we're more pragmatic than idealistic.
+  or "spawnpoint markers that can also explode", because we're more pragmatic than idealistic.
 
   That doesn't mean that you can't introduce another type like this, as a C++ developer!
 - It was way, way simpler and faster to code.
@@ -53,7 +57,7 @@ This is for several reasons:
 An entity type is, for example, a "Controlled character".
 It is used to create playable characters. 
 It will have components like a sentience, a rigid body, a fixture (which is another name for a "collider") 
-and a crosshair.
+and a crosshair, among many others.
 
 Some kind of a wall, on the other hand, will have a "Plain sprited body" type.
 It will have a rigid body and a collider, but no crosshair or sentience.
@@ -69,22 +73,23 @@ If you select more than one entity, the GUI presents you with a hierarchy
 of all currently selected entities and their respective flavours, along with some widgets, like:
 
 - A filter for quickly finding a desired flavour, or an entity of desired flavour.
-- Whether you want to view flavour or entity properties at the moment.
+- At the bottom, whether you want to view flavour or entity properties at the moment.
 - Nodes for (un)folding flavours or entities of a particular type.
 
 A flavour can have a name and a description.  
 These appear in the game world whenever an entity is hovered with the mouse cursor.  
 
-You can unfold invariant and component nodes to edit them accordingly.
+Simply unfold invariant and component nodes to edit them accordingly.
 Whenever you tweak a property, a command will be spawned, 
 and you'll be able to undo virtually any performed change.
 
 If you want to see the history of changes for a specific field,
 simply open up the History GUI (Alt+H) and write the property's name into the filter box.
 
-The documentation of the purpose and behaviour of all invariants, components 
-and all of their properties will eventually be documented on wiki.hypersomnia.xyz.  
-The names should, however, be more or less self-explanatory.
+The documentation of the purpose and behaviour of all properties of invariants and components 
+will eventually be documented on wiki.hypersomnia.xyz.  
+The names should, however, be more or less self-explanatory,
+and you will probably learn most of this by way of experimentation.
 
 ## GUI: Multiple selections
 

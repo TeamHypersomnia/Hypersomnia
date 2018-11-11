@@ -16,7 +16,7 @@ so make sure to save your work after each grouping or ungrouping operation.
 In the "Selection groups" dialog, unfold the chosen group node by clicking exactly at the arrow icon.
 There, you can rename the group.
 
-To select all entities belonging to a particular group, click on its name.
+To select all entities belonging to a particular group, simply click on its name.
 You can also filter existing groups by using the text area at the top of the dialog.
 
 If you want to temporarily ignore groups, press A to toggle ignoring.

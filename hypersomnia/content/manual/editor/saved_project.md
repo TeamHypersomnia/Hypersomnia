@@ -82,12 +82,13 @@ the meaning of which is as follows:
 	- A binary blob representing the player state (more on that later).
 	- You should not delete or otherwise alter it.
 
+To ensure that gameplay recordings are replayed deterministically,
+NONE of the above should be deleted during a playtest (more on that later).
+
 - Folder: ``Project-export``. 
 	- An empty folder created for your convenience when you decide to export the project to portable lua files.
-	  This way you won't have to create this folder yourself and a nice convention on locating the exports is established.
-
-To ensure that gameplay recordings are replayed deterministically,
-NONE of the above files should be deleted during a playtest (more on that later).
+	  This way, you won't have to create this folder yourself and a nice convention on locating the exports is established.
+	- Can be safely deleted at any time.
 
 ## Basic navigation
 
@@ -158,10 +159,11 @@ The map designer will work with two kinds of assets:
 
 	  Open up the relevant asset GUIs for further information.
 
-	  The pathed assets are always created implicitly without the designer's intervention.
-	  They are automatically imported whenever they are chosen for the first time for some property.
+	  The pathed assets are imported implicitly,
+	  whenever they are chosen for the first time for some property.
+	  Therefore, the designer never explicitly creates or duplicates them.
 
-- Unpathed assets. They have no corresponding path in the filesystem and are stored whole in the intercosm file.
+- Unpathed assets. They have no corresponding path in the filesystem and are entirely stored in the intercosm file.
 	- These are:
 		- Particle effects (Alt+R).
 		- Animations (Alt+M).
