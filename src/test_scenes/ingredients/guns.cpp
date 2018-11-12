@@ -1330,7 +1330,7 @@ namespace test_flavours {
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.062f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
-			gun_def.recoil_multiplier = 1.15f;
+			gun_def.recoil_multiplier = 1.05f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(400);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
@@ -1485,7 +1485,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::KEK9_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
-			gun_def.muzzle_velocity = {3500.f, 3500.f};
+			gun_def.muzzle_velocity = {3600.f, 3600.f};
 			gun_def.shot_cooldown_ms = 100.f;
 
 			gun_def.shell_angular_velocity = {2.f, 14.f};
@@ -1534,7 +1534,7 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
 			gun_def.muzzle_velocity = {3500.f, 3500.f};
-			gun_def.shot_cooldown_ms = 100.f;
+			gun_def.shot_cooldown_ms = 90.f;
 
 			gun_def.shell_angular_velocity = {2.f, 10.f};
 			gun_def.shell_spread_degrees = 12.f;

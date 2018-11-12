@@ -300,7 +300,7 @@ perform_transfer_result perform_transfer_impl(
 
 		const auto total_impulse = r.params.additional_drop_impulse + standard_drop_impulse;
 		const auto impulse = 
-			total_impulse.linear * vec2::from_degrees(initial_transform_of_transferred.rotation)
+			total_impulse.linear * initial_transform_of_transferred.get_direction()
 		;
 
 		const auto mass = rigid_body.get_mass();
@@ -332,7 +332,7 @@ perform_transfer_result perform_transfer_impl(
 
 				if (capability_def) {
 					impulse_input in;
-					in.linear = mult * conceptual_mass * vec2::from_degrees(target_root.get_logic_transform().rotation);
+					in.linear = mult * conceptual_mass * target_root.get_logic_transform().get_direction();
 					in.angular = mult * conceptual_mass;
 					in = in * capability_def->transfer_recoil_mults;
 					target_root.apply_crosshair_recoil(in);

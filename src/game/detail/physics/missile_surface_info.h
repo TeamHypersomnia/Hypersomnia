@@ -20,8 +20,11 @@ public:
 	) {
 		const auto& missile_sender = missile.template get<components::sender>();
 
-		if (missile.template has<components::missile>() 
-			&& surface.template has<components::missile>()
+		if ((missile.template has<components::missile>() 
+			&& surface.template has<components::missile>())
+			||
+			(missile.template has<components::melee>() 
+			&& surface.template has<components::melee>())
 		) {
 			/* Prevent bullets coming from the same weapon or character from colliding with each other */
 

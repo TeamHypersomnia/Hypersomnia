@@ -588,7 +588,7 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 					}
 					else if (is_weapon_like(subject_item)) {
 						auto throwable_transform = subject_item.get_logic_transform();
-						auto throwable_target_vector = throwable_transform.pos + vec2::from_degrees(throwable_transform.rotation);
+						auto throwable_target_vector = throwable_transform.pos + throwable_transform.get_direction();
 
 						const auto mc = subject_transform.pos;
 

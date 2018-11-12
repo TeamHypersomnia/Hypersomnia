@@ -81,7 +81,7 @@ static void make_velocity_face_body_orientation(
 	const auto current_vel = body.get_velocity();
 	const auto tr = body.get_transform();
 
-	const auto current_dir = vec2::from_degrees(tr.rotation);
+	const auto current_dir = tr.get_direction();
 
 	//const auto new_tr = transformr(tr.pos, current_vel.degrees());
 	const auto new_vel = current_dir * current_vel.length();

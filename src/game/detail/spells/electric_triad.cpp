@@ -68,7 +68,7 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 				new_energy_ball.template get<components::sender>().set(caster);
 				new_energy_ball.template get<components::missile>().particular_homing_target = next_hostile;
 
-				const auto energy_ball_velocity = vec2::from_degrees(new_energy_ball_transform.rotation) * 2000;
+				const auto energy_ball_velocity = new_energy_ball_transform.get_direction() * 2000;
 				new_energy_ball.template get<components::rigid_body>().set_velocity(energy_ball_velocity);
 			},
 			[&](const auto) {}

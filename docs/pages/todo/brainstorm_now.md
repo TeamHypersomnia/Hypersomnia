@@ -6,22 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Can't we really avoid the need for finishing traces?
-	- Well won't it later be very useful to define some explosion entities?
-	- There might even be more components like cascade explosion
-
-- Usability fixes to editor 
-	- Setting specific names to entities
-	- Complex instantiations
-		- I struggle to see any that are necessary before DM
-			- even manual transfers arent that necessary
-		- Guns with magazines already
-		- For now expose transfer GUI?
-
-- Then the direct attachment offset must calculate the offsets, I guess.
+- Chosen solution: let direct attachment offset calculate the knife position so that the entity is always positioned where it is seen.
+	- Additionally, manually query once every time the animation frame changes.
+		- The change in animation frame will properly be detected by the melee system.
 
 - Setting fixtures vs querying knife fixtures on each step
 	- entity-based approach to positioning
+		- Then the direct attachment offset must calculate the offsets, I guess.
+		- Problem: The hit trigger won't exactly correspond to the knife's shape as we will take convex hulls
 		- pro: we can still base hits on a significant constant size vector
 		- pro: don't have to fool around with triggers, just accept begin contact events
 		- con: there might be some physics glitches since engine will try to push away the collider from the knife fixture

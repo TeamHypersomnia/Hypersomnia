@@ -177,6 +177,12 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 						return true;
 					};
 
+					const auto info = missile_surface_info(typed_melee, surface_handle);
+
+					if (info.should_ignore_altogether()) {
+						return;
+					}
+
 					if (is_like_thrown_melee(surface_handle) && try_pass_cooldown(melee.when_clashed, 5)) {
 						const auto& from = surface_handle;
 						const auto& what = typed_melee;
@@ -236,8 +242,6 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 						return;
 					}
-
-					const auto info = missile_surface_info(typed_melee, surface_handle);
 
 					const bool sentient = surface_handle.template has<components::sentience>();
 					const bool interested = sentient || info.surface_is_held_item;
@@ -306,7 +310,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 							const auto boomerang_impulse = throw_def.boomerang_impulse;
 
 							const auto& rigid_body = typed_melee.template get<components::rigid_body>();
-							const auto boomerang_dir = -vec2::from_degrees(result->transform_of_impact.rotation);
+							const auto boomerang_dir = result->transform_of_impact.get_direction() * -1;
 
 							const auto total_vel = boomerang_dir * boomerang_impulse.linear;
 							rigid_body.set_velocity(total_vel);

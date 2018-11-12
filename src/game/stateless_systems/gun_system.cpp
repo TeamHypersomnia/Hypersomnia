@@ -301,7 +301,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 										auto rng = cosm.get_rng_for(round_entity);
 
 										const auto missile_velocity = 
-											vec2::from_degrees(muzzle_transform.rotation)
+											muzzle_transform.get_direction()
 											* missile.muzzle_velocity_mult
 											* rng.randval(gun_def.muzzle_velocity)
 										;
@@ -495,7 +495,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 												{
 													const auto missile_velocity = 
-														vec2::from_degrees(considered_muzzle_transform.rotation)
+														considered_muzzle_transform.get_direction()
 														* missile_def.muzzle_velocity_mult
 														* rng.randval(gun_def.muzzle_velocity)
 													;
@@ -623,7 +623,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					total_kickback *= gun_def.kickback_towards_wielder;
 
 					body.apply_impulse(
-						total_kickback * vec2::from_degrees(gun_transform.rotation) * -1
+						total_kickback * gun_transform.get_direction() * -1
 					);
 
 					heat = std::min(gun_def.maximum_heat, heat + gun_def.gunshot_adds_heat);

@@ -70,7 +70,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				const auto min_speed = base_speed + speed_boost;
 				const auto max_speed = base_speed + max_speed_boost;
 
-				const auto current_dir = vec2::from_degrees(transform.rotation);
+				const auto current_dir = transform.get_direction();
 
 				const float comfort_zone_radius = 50.f;
 				const float cohesion_zone_radius = 60.f;
@@ -149,7 +149,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 						if (neighbor_path_def.fish_movement.is_enabled) {
 							const auto neighbor_transform = typed_neighbor.get_logic_transform();
-							const auto neighbor_vel = vec2::from_degrees(neighbor_transform.rotation) * neighbor_path.last_speed;
+							const auto neighbor_vel = neighbor_transform.get_direction() * neighbor_path.last_speed;
 							const auto neighbor_tip = *typed_neighbor.find_logical_tip();
 
 							const auto avoidance = augs::immediate_avoidance(
@@ -165,7 +165,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 							if (typed_neighbor.get_flavour_id() == subject.get_flavour_id()) {
 								average_pos += neighbor_transform.pos;
-								average_vel += vec2::from_degrees(neighbor_transform.rotation) * neighbor_path.last_speed;
+								average_vel += neighbor_transform.get_direction() * neighbor_path.last_speed;
 								++counted_neighbors;
 							}
 						}

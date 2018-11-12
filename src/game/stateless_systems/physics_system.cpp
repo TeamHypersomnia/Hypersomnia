@@ -53,7 +53,7 @@ void physics_system::step_and_set_new_transforms(const logic_step step) {
 	}
 #else
 	cosm.for_each_having<components::rigid_body>(
-		[&](const auto handle){
+		[&](const auto& handle){
 			const auto rigid_body = handle.template get<components::rigid_body>();
 
 			auto& body = *rigid_body.find_cache()->body.get();

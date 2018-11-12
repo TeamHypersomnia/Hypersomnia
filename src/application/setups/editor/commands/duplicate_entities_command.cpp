@@ -115,7 +115,7 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 				if (const auto ir = typed_handle.find_independent_transform()) {
 					{
 						const auto source_transform = *ir;
-						const auto new_rotation = vec2::from_degrees(source_transform.rotation).neg_y().degrees();
+						const auto new_rotation = source_transform.get_direction().neg_y().degrees();
 
 						const auto mirror_offset = calc_mirror_offset(
 							source_transform.pos, 

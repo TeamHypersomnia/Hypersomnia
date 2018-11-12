@@ -5,6 +5,9 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Idea: to improve physics readback performance,
+  we could somehow only update non-sleeping bodies, whilst acquiring this information directly from box2d?
+
 - Destroy b2Bodies when they are not needed, e.g. they are in inventory
 	- Mandatory for MMO
 

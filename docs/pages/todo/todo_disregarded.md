@@ -5,6 +5,12 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- Can't we really avoid the need for finishing traces?
+	- An alternative would be to hold the trace in the missile and reinfer without the body when the missile impacts,
+	  and prolong its life for a moment
+	- Well won't it later be very useful to define some explosion entities?
+	- There might even be more components like cascade explosion
+
 - make reveal in explorer work for both files and folders
 	- cause it also works for dirs
 

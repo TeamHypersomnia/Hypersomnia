@@ -510,7 +510,13 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 
 							for (const auto& w : wielded_items) {
 								const auto h = cosm[w];
-								h.set_logic_transform(positions[index_in(wielded_items, w)]);
+								const auto corrected_transform = positions[index_in(wielded_items, w)];
+								h.set_logic_transform(corrected_transform);
+
+								const auto body = h.template get<components::rigid_body>();
+								auto vel = body.get_velocity();
+								const auto l = vel.length();
+								body.set_velocity(corrected_transform.get_direction() * l);
 							}
 						}
 

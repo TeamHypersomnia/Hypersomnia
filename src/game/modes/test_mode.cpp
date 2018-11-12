@@ -63,7 +63,7 @@ void test_mode::teleport_to_next_spawn(const input in, const entity_id id) {
 			typed_handle.set_logic_transform(spawn_transform);
 
 			if (const auto crosshair = typed_handle.find_crosshair()) {
-				crosshair->base_offset = vec2::from_degrees(spawn_transform.rotation) * 200;
+				crosshair->base_offset = spawn_transform.get_direction() * 200;
 			}
 
 			normalize_spawn_index();

@@ -6,6 +6,14 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Usability fixes to editor 
+	- Setting specific names to entities
+	- Complex instantiations
+		- I struggle to see any that are necessary before DM
+			- even manual transfers arent that necessary
+		- Guns with magazines already
+		- For now expose transfer GUI?
+
 - enum_boolset begin and end should probably return enums
 	- simpler lua i/o
 	- no need for for-eaches

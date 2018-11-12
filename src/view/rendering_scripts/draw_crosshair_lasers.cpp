@@ -101,7 +101,7 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 			}
 			else if (is_weapon_like(subject_item)) {
 				const auto explosive_transform = subject_item.get_viewing_transform(in.interpolation);
-				const auto explosive_target_vector = explosive_transform.pos + vec2::from_degrees(explosive_transform.rotation);
+				const auto explosive_target_vector = explosive_transform.pos + explosive_transform.get_direction();
 
 				const auto proj = crosshair_pos.get_projection_multiplier(
 					explosive_transform.pos,

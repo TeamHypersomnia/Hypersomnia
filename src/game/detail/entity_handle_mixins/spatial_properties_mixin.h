@@ -188,7 +188,7 @@ public:
 		const auto w = handle.get_logical_size().x;
 
 		if (const auto t = handle.find_logic_transform()) {
-			return t->pos + vec2::from_degrees(t->rotation) * (w / 2);
+			return t->pos + t->get_direction() * (w / 2);
 		}
 
 		return std::nullopt;
