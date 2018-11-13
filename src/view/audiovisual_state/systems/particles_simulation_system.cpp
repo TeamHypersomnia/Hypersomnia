@@ -281,10 +281,17 @@ void update_component_related_cache(
 	EffectProvider effect_provider
 ) {
 	cosm.for_each_having<Component>(
-		[&](const auto gun_entity) {
-			const auto id = gun_entity.get_id().to_unversioned();
+		[&](const auto& typed_handle) {
+			const auto id = typed_handle.get_id().to_unversioned();
 
-			if (const auto particles = effect_provider(gun_entity)) {
+			if (const auto item = typed_handle.template find<components::item>()) {
+				if (typed_handle.find_colliders_connection() == std::nullopt) {
+					caches.erase(id);
+					return;
+				}
+			}
+
+			if (const auto particles = effect_provider(typed_handle)) {
 				if (auto* const existing = mapped_or_nullptr(caches, id)) {
 					existing->original = *particles;
 				}

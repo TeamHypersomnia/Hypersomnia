@@ -102,7 +102,6 @@ using assert_always_together = type_list<
 	type_pair<invariants::movement_path, components::movement_path>,
 	type_pair<invariants::animation, components::animation>,
 	type_pair<invariants::remnant, components::remnant>,
-	type_pair<invariants::continuous_particles, components::continuous_particles>,
 	type_pair<invariants::cascade_explosion, components::cascade_explosion>,
 	type_pair<invariants::melee, components::melee>
 >;
@@ -110,6 +109,7 @@ using assert_always_together = type_list<
 using assert_first_implies_second = type_list<
 	type_pair<invariants::item, invariants::sprite>,
 	type_pair<invariants::wandering_pixels, components::position>,
+	type_pair<components::continuous_particles, invariants::continuous_particles>,
 	type_pair<invariants::light, components::transform>
 >;
 

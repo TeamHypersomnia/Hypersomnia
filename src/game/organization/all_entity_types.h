@@ -116,10 +116,12 @@ struct melee_weapon {
 		invariants::sprite,
 		invariants::render,
 
-		invariants::interpolation
+		invariants::interpolation,
+		invariants::continuous_particles
 	>;
 
 	using components = type_list<
+		components::continuous_particles,
 		components::melee,
 		components::item,
 		components::rigid_body,

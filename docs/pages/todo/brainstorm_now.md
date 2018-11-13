@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Add inertia for the target rotation when we hit an obstacle
+	- Copy the lerp code from interpolation as it was mostly correct
+
 - Checks for animation bounds in melee system
 
 - Chosen solution: let direct attachment offset calculate the knife position so that the entity is always positioned where it is seen.

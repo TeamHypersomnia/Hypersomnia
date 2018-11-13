@@ -22,8 +22,9 @@ namespace test_flavours {
 			const auto i,
 			const auto price,
 			const auto specific_to,
-			const auto weight_ratio
-		) {
+			const auto weight_ratio,
+			const auto color
+		) -> auto& {
 			(void)weight_ratio;
 
 			auto& meta = get_test_flavour(flavours, f);
@@ -85,6 +86,8 @@ namespace test_flavours {
 				{
 					auto& a = melee.actions[weapon_action_type::PRIMARY];
 					a.init_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_PRIMARY);
+					a.init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_ATTACK);
+					a.init_particles.modifier.colorize = color;
 					a.wielder_impulse = 1000.f;
 					a.wielder_inert_for_ms = 350.f;
 					a.cp_required = 5.f;
@@ -117,6 +120,8 @@ namespace test_flavours {
 				{
 					auto& a = melee.actions[weapon_action_type::SECONDARY];
 					a.init_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SECONDARY);
+					a.init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_ATTACK);
+					a.init_particles.modifier.colorize = color;
 					a.wielder_impulse = 950.f;
 					a.wielder_inert_for_ms = 500.f;
 					a.cp_required = 12.f;
@@ -147,22 +152,37 @@ namespace test_flavours {
 
 				meta.set(melee);
 			}
+
+			return meta;
 		};
 
-		make_knife(
-			test_melee_weapons::FURY_THROWER,
-			test_scene_image_id::FURY_THROWER,
-			static_cast<money_type>(250),
-			faction_type::RESISTANCE,
-			1.1f
-		);
+		{
+			auto& meta = make_knife(
+				test_melee_weapons::FURY_THROWER,
+				test_scene_image_id::FURY_THROWER,
+				static_cast<money_type>(250),
+				faction_type::RESISTANCE,
+				1.1f,
+				white
+			);
+
+			invariants::continuous_particles particles_def;
+			particles_def.effect.id = to_particle_effect_id(test_scene_particle_effect_id::FURY_THROWER_TRACE);
+			particles_def.effect.modifier.colorize = orange;
+			meta.set(particles_def);
+
+			for (auto& a : meta.get<invariants::melee>().actions) {
+				a.init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FURY_THROWER_ATTACK);
+			}
+		}
 
 		make_knife(
 			test_melee_weapons::ELECTRIC_RAPIER,
 			test_scene_image_id::ELECTRIC_RAPIER,
 			static_cast<money_type>(350),
 			faction_type::SPECTATOR,
-			1.2f
+			1.2f,
+			cyan
 		);
 
 		make_knife(
@@ -170,7 +190,8 @@ namespace test_flavours {
 			test_scene_image_id::CYAN_SCYTHE,
 			static_cast<money_type>(300),
 			faction_type::METROPOLIS,
-			1.f
+			1.f,
+			cyan
 		);
 
 		make_knife(
@@ -178,7 +199,8 @@ namespace test_flavours {
 			test_scene_image_id::POSEIDON,
 			static_cast<money_type>(350),
 			faction_type::SPECTATOR,
-			1.2f
+			1.2f,
+			cyan
 		);
 	}
 }
