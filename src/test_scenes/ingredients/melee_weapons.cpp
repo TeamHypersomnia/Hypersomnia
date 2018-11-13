@@ -182,7 +182,7 @@ namespace test_flavours {
 			static_cast<money_type>(350),
 			faction_type::SPECTATOR,
 			1.2f,
-			cyan
+			white
 		);
 
 		make_knife(
@@ -200,7 +200,7 @@ namespace test_flavours {
 			static_cast<money_type>(350),
 			faction_type::SPECTATOR,
 			1.2f,
-			cyan
+			rgba(0, 200, 255, 255)
 		);
 	}
 }

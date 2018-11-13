@@ -494,8 +494,17 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 						for (const auto& w : wielded_items) {
 							const auto h = cosm[w];
 
-							if (h.template has<components::melee>()) {
+							if (const auto melee_def = h.template find<invariants::melee>()) {
 								do_drop(h);
+
+								{
+									const auto& effect = melee_def->actions.at(weapon_action_type::PRIMARY).init_particles;
+
+									effect.start(
+										step,
+										particle_effect_start_input::at_entity(h)
+									);
+								}
 							}
 						}
 
