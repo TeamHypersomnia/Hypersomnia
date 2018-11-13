@@ -85,6 +85,8 @@ namespace components {
 		std::array<bool, hand_count_v> hand_flags = {};
 		bool block_flag = false;
 		pad_bytes<1> pad;
+
+		real32 rotation_inertia_ms = 0.1f;
 		// END GEN INTROSPECTOR
 
 		bool is_learnt(const spell_id id) const {
@@ -167,6 +169,7 @@ namespace invariants {
 		particle_effect_input detached_head_particles;
 
 		detached_body_parts_flavours detached_flavours;
+		real32 max_inertia_when_rotation_possible = 500.f;
 		// END GEN INTROSPECTOR
 	};
 }

@@ -34,6 +34,7 @@
 #include "game/detail/damage_origin.hpp"
 #include "game/detail/weapon_like.h"
 #include "game/detail/sentience/sentience_logic.h"
+#include "game/detail/crosshair_math.hpp"
 
 damage_cause::damage_cause(const const_entity_handle& handle) {
 	entity = handle;
@@ -544,10 +545,11 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 				return;
 			}
 
-			{
-				const auto& melee_fighter = subject.template get<components::melee_fighter>();
+			const auto& fighter = subject.template get<components::melee_fighter>();
+			const auto melee_state = fighter.state;
 
-				if (melee_fighter.fighter_orientation_frozen()) {
+			if (melee_state == melee_fighter_state::IN_ACTION) {
+				if (fighter.action == weapon_action_type::PRIMARY) {
 					return;
 				}
 			}
@@ -559,7 +561,23 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 			if (const auto crosshair = subject.find_crosshair()) {
 				const auto items = subject.get_wielded_items();
 
+				auto& base_offset = crosshair->base_offset;
+				const auto prev_base_offset = base_offset;
+
+				const bool override_base_offset = 
+					melee_state == melee_fighter_state::IN_ACTION
+					&& fighter.action == weapon_action_type::SECONDARY
+				;
+
+				if (override_base_offset) {
+					base_offset = fighter.overridden_crosshair_base_offset;
+				}
+
 				const auto target_transform = subject.get_world_crosshair_transform();
+
+				if (override_base_offset) {
+					base_offset = prev_base_offset;
+				}
 
 				{
 					const auto diff = target_transform.pos - subject_transform.pos;

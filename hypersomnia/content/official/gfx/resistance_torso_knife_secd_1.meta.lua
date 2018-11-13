@@ -92,8 +92,8 @@ return {
     torso = {
       back = {
         pos = {
-          x = -12,
-          y = -4
+          x = -11,
+          y = -3
         },
         rotation = 29.744880676269531
       },
@@ -134,10 +134,10 @@ return {
       },
       shoulder = {
         pos = {
-          x = -9,
-          y = 21
+          x = 17,
+          y = -5
         },
-        rotation = -143.13009643554688
+        rotation = -149.53445434570312
       },
       strafe_facing_offset = 0
     }

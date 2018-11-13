@@ -18,6 +18,9 @@
 void unset_input_flags_of_orphaned_entity(const entity_handle&);
 
 template <class E>
+vec2 calc_crosshair_displacement(const E& self);
+
+template <class E>
 class misc_mixin {
 public:
 
@@ -67,28 +70,6 @@ public:
 		}
 	}
 
-	auto calc_crosshair_displacement(
-		const bool snap_epsilon_base_offset = false
-	) const {
-		const auto self = *static_cast<const E*>(this);
-
-		if (const auto crosshair = self.find_crosshair()) {
-			auto considered_base_offset = crosshair->base_offset;
-			const auto& recoil = crosshair->recoil;
-
-			if (snap_epsilon_base_offset && considered_base_offset.is_epsilon(4)) {
-				considered_base_offset.set(4, 0);
-			}
-
-			considered_base_offset += recoil.position;
-			considered_base_offset.rotate(recoil.rotation);
-
-			return considered_base_offset;
-		}
-
-		return vec2(0, 0);
-	}
-
 	void apply_shake(const sentience_shake shake) const {
 		const auto self = *static_cast<const E*>(this);
 
@@ -100,12 +81,12 @@ public:
 	template <class I>
 	auto get_world_crosshair_transform(I& interp) const {
 		const auto self = *static_cast<const E*>(this);
-		return self.get_viewing_transform(interp) + self.calc_crosshair_displacement();
+		return self.get_viewing_transform(interp) + ::calc_crosshair_displacement(self);
 	};
 
 	auto get_world_crosshair_transform() const {
 		const auto self = *static_cast<const E*>(this);
-		return self.get_logic_transform() + self.calc_crosshair_displacement();
+		return self.get_logic_transform() + ::calc_crosshair_displacement(self);
 	};
 
 	bool get_flag(const entity_flag f) const {

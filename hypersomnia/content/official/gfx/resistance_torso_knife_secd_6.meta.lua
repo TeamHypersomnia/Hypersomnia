@@ -134,10 +134,10 @@ return {
       },
       shoulder = {
         pos = {
-          x = -8,
-          y = -12
+          x = -7,
+          y = -14
         },
-        rotation = 132.70938110351562
+        rotation = 128.65980529785156
       },
       strafe_facing_offset = 0
     }

@@ -7,6 +7,7 @@
 #include "game/components/interpolation_component.h"
 #include "game/components/fixtures_component.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
+#include "game/detail/crosshair_math.hpp"
 
 void world_camera::tick(
 	const vec2i screen_size,
@@ -143,7 +144,7 @@ vec2 world_camera::get_camera_offset_due_to_character_crosshair(
 
 	if (const auto crosshair = entity_to_chase.find_crosshair()) {
 		if (crosshair->orbit_mode != crosshair_orbit_type::NONE) {
-			camera_crosshair_offset = entity_to_chase.calc_crosshair_displacement();
+			camera_crosshair_offset = calc_crosshair_displacement(entity_to_chase);
 
 			if (crosshair->orbit_mode == crosshair_orbit_type::ANGLED) {
 				camera_crosshair_offset.set_length(settings.angled_look_length);

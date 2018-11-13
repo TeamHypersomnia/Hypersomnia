@@ -70,6 +70,13 @@ return {
           y = 0
         },
         rotation = 0
+      },
+      shoulder_anchor = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       }
     },
     legs = {
@@ -85,15 +92,15 @@ return {
     torso = {
       back = {
         pos = {
-          x = 0,
-          y = 0
+          x = -14,
+          y = -4
         },
-        rotation = 0
+        rotation = 26.565052032470703
       },
       head = {
         pos = {
-          x = 0,
-          y = 0
+          x = -2,
+          y = 1
         },
         rotation = 0
       },
@@ -106,10 +113,10 @@ return {
       },
       primary_hand = {
         pos = {
-          x = 0,
-          y = 0
+          x = 28,
+          y = 35
         },
-        rotation = 0
+        rotation = -25
       },
       secondary_hand = {
         pos = {
@@ -118,12 +125,19 @@ return {
         },
         rotation = 0
       },
-      shoulder = {
+      secondary_shoulder = {
         pos = {
           x = 0,
           y = 0
         },
         rotation = 0
+      },
+      shoulder = {
+        pos = {
+          x = 15,
+          y = -12
+        },
+        rotation = -141.34019470214844
       },
       strafe_facing_offset = 0
     }

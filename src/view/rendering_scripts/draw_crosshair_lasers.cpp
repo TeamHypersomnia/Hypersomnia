@@ -15,6 +15,7 @@
 #include "game/components/fixtures_component.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "game/detail/weapon_like.h"
+#include "game/detail/crosshair_math.hpp"
 
 void line_output_wrapper::operator()(const vec2 from, const vec2 to, const rgba col) const {
 	output.line(line_tex, from, to, col);

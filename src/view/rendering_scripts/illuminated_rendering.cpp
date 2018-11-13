@@ -39,6 +39,7 @@
 #include "view/viewables/atlas_distributions.h"
 
 #include "view/rendering_scripts/illuminated_rendering.h"
+#include "game/detail/crosshair_math.hpp"
 
 void illuminated_rendering(
 	const illuminated_rendering_input in,
@@ -223,7 +224,7 @@ void illuminated_rendering(
 			else {
 				set_shader_with_matrix(shaders.fog_of_war);
 
-				auto dir = viewed_character.calc_crosshair_displacement();
+				auto dir = calc_crosshair_displacement(viewed_character);
 
 				if (dir.is_zero()) {
 					dir.set(1, 0);

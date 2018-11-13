@@ -257,32 +257,39 @@ namespace test_flavours {
 
 				torso_def.stances[item_holding_stance::BARE_LIKE].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_BARE_WALK);
 				act(item_holding_stance::BARE_LIKE, weapon_action_type::PRIMARY, test_scene_torso_animation_id::RESISTANCE_TORSO_BARE_SHOT);
+				torso_def.stances[item_holding_stance::BARE_LIKE].chambering = torso_def.stances[item_holding_stance::BARE_LIKE].actions[weapon_action_type::PRIMARY].perform;
 
 				{
 					auto& rifle_like = torso_def.stances[item_holding_stance::RIFLE_LIKE];
 
 					rifle_like.carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_RIFLE_WALK);
-					rifle_like.actions[weapon_action_type::PRIMARY].perform = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_RIFLE_SHOT);
+					auto& shot = rifle_like.actions[weapon_action_type::PRIMARY].perform;
+					shot = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_RIFLE_SHOT);
 					rifle_like.pocket_to_mag = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_RIFLE_PTM);
 					rifle_like.grip_to_mag = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_RIFLE_GTM);
+					rifle_like.chambering = shot;
 				}
 
 				{
 					auto& pistol_like = torso_def.stances[item_holding_stance::PISTOL_LIKE];
 
 					pistol_like.carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_PISTOL_WALK);
+					auto& shot = pistol_like.actions[weapon_action_type::PRIMARY].perform;
 					pistol_like.actions[weapon_action_type::PRIMARY].perform = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_PISTOL_SHOT);
 					pistol_like.pocket_to_mag = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_PISTOL_PTM);
 					pistol_like.grip_to_mag = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_PISTOL_GTM);
+					pistol_like.chambering = shot;
 				}
 
 				{
 					auto& heavy_like = torso_def.stances[item_holding_stance::HEAVY_LIKE];
 
 					heavy_like.carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_HEAVY_WALK);
+					auto& shot = heavy_like.actions[weapon_action_type::PRIMARY].perform;
 					heavy_like.actions[weapon_action_type::PRIMARY].perform = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_HEAVY_SHOT);
 					heavy_like.pocket_to_mag = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_HEAVY_GTM);
 					heavy_like.grip_to_mag = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_HEAVY_GTM);
+					heavy_like.chambering = shot;
 				}
 
 				{
@@ -297,6 +304,7 @@ namespace test_flavours {
 
 				torso_def.stances[item_holding_stance::AKIMBO].carry = to_animation_id(test_scene_torso_animation_id::RESISTANCE_TORSO_AKIMBO_WALK);
 				act(item_holding_stance::AKIMBO, weapon_action_type::PRIMARY, test_scene_torso_animation_id::RESISTANCE_TORSO_AKIMBO_SHOT);
+				torso_def.stances[item_holding_stance::AKIMBO].chambering = torso_def.stances[item_holding_stance::AKIMBO].actions[weapon_action_type::PRIMARY].perform;
 
 				meta.set(torso_def);
 			}

@@ -95,7 +95,7 @@ return {
           x = -10,
           y = -3
         },
-        rotation = 24.443954467773438
+        rotation = 16.990823745727539
       },
       head = {
         pos = {
@@ -134,10 +134,10 @@ return {
       },
       shoulder = {
         pos = {
-          x = 14,
-          y = -16
+          x = 15,
+          y = -15
         },
-        rotation = 180
+        rotation = -176.72950744628906
       },
       strafe_facing_offset = 0
     }

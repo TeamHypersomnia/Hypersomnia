@@ -25,6 +25,8 @@ namespace components {
 		weapon_action_type action = weapon_action_type::COUNT;
 		simple_animation_state anim_state;
 		already_hit_entities already_hit;
+
+		vec2 overridden_crosshair_base_offset;
 		// END GEN INTROSPECTOR
 
 		bool now_returning() const;

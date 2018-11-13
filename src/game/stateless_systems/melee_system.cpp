@@ -123,11 +123,9 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 					const auto& body = it.template get<components::rigid_body>();
 					const auto vel_dir = vec2(body.get_velocity()).normalize();
 
-					//auto tr = body.get_transform();
-					/* tr.rotation += 20.f; */
-					/* body.set_transform(tr); */
-
 					if (const auto crosshair = it.find_crosshair()) {
+						fighter.overridden_crosshair_base_offset = crosshair->base_offset;
+
 						const auto cross_dir = vec2(crosshair->base_offset).normalize();
 
 						const auto impulse_mult = (vel_dir.dot(cross_dir) + 1) / 2;
@@ -159,8 +157,6 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 						auto& movement = it.template get<components::movement>();
 						movement.linear_inertia_ms += current_attack_def.wielder_inert_for_ms;
-
-						//crosshair->base_offset.rotate(20.f);
 
 						{
 							const auto min_effect = 0.88f;

@@ -92,8 +92,8 @@ return {
     torso = {
       back = {
         pos = {
-          x = -10,
-          y = -13
+          x = -9,
+          y = -12
         },
         rotation = 61.699245452880859
       },
@@ -135,7 +135,7 @@ return {
       shoulder = {
         pos = {
           x = 17,
-          y = -5
+          y = -4
         },
         rotation = -120
       },
