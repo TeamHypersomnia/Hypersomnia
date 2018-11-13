@@ -88,8 +88,10 @@ namespace test_flavours {
 					a.init_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_PRIMARY);
 					a.init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_ATTACK);
 					a.init_particles.modifier.colorize = color;
+					a.wielder_init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_PRIMARY_SMOKE);
 					a.wielder_impulse = 1000.f;
 					a.wielder_inert_for_ms = 350.f;
+					a.cooldown_ms = 250.f;
 					a.cp_required = 5.f;
 
 					a.obstacle_hit_recoil = 40.f;
@@ -122,6 +124,7 @@ namespace test_flavours {
 					a.init_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SECONDARY);
 					a.init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_ATTACK);
 					a.init_particles.modifier.colorize = color;
+					a.wielder_init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_SECONDARY_SMOKE);
 					a.wielder_impulse = 950.f;
 					a.wielder_inert_for_ms = 500.f;
 					a.cp_required = 12.f;

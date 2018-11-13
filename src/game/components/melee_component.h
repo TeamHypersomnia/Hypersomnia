@@ -37,6 +37,7 @@ struct melee_attack_definition {
 
 	sound_effect_input init_sound;
 	particle_effect_input init_particles;
+	particle_effect_input wielder_init_particles;
 
 	melee_clash_def clash;
 

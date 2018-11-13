@@ -132,6 +132,25 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 						const auto impulse_mult = (vel_dir.dot(cross_dir) + 1) / 2;
 
+						{
+							const auto& movement_def  = it.template get<invariants::movement>();
+							const auto conceptual_max_speed = std::max(1.f, movement_def.max_speed_for_animation);
+							const auto current_velocity = body.get_velocity();
+							const auto current_speed = current_velocity.length();
+
+							const auto speed_mult = current_speed / conceptual_max_speed;
+							const auto total_mult = std::min(impulse_mult, speed_mult);
+
+							auto effect = current_attack_def.wielder_init_particles;
+							effect.modifier.scale_amounts = total_mult;
+							effect.modifier.scale_lifetimes = total_mult;
+
+							effect.start(
+								step,
+								particle_effect_start_input::at_entity(it)
+							);
+						}
+
 						body.apply_impulse(impulse_mult * cross_dir * body.get_mass() * current_attack_def.wielder_impulse);
 
 						auto& movement = it.template get<components::movement>();
