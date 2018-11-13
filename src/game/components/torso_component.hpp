@@ -8,10 +8,6 @@ struct leg_animation_usage {
 	float rotation = 0.f;
 };
 
-inline const assets::torso_animation_id& stance_animations::get_chambering() const {
-	return actions[weapon_action_type::PRIMARY];
-}
-
 template <class E>
 auto calc_stance_id(
 	const E& typed_entity,

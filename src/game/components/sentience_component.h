@@ -142,6 +142,9 @@ namespace invariants {
 		real32 use_button_angle = 90.f;
 
 		real32 aimpunch_mult = 1.f;
+		real32 const_inertia_damage_ratio = 2.f;
+		real32 linear_inertia_damage_ratio = 1.f;
+
 		impulse_mults knockout_impulse = { 1000.f, 80.f };
 
 		sound_effect_input health_decrease_sound;

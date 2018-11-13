@@ -71,7 +71,7 @@ void driver_system::release_drivers_due_to_ending_contact_with_wheel(const logic
 					if (const auto* const driver = driver_entity.find<components::driver>()) {
 						if (driver->owned_vehicle == car_entity) {
 							release_car_ownership(driver_entity);
-							driver_entity.get<components::movement>().make_inert_for_ms = 500.f;
+							driver_entity.get<components::movement>().const_inertia_ms = 500.f;
 						}
 					}
 				}

@@ -22,6 +22,8 @@
 #include "game/detail/visible_entities.h"
 #include "game/detail/sentience/sentience_getters.h"
 
+#include "game/detail/physics/infer_damping.hpp"
+
 using namespace augs;
 
 void movement_system::set_movement_flags_from_input(const logic_step step) {
@@ -147,10 +149,16 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				}
 			}
 
-			const bool is_inert = movement.make_inert_for_ms > 0.f;
+			const bool constant_inertia = movement.const_inertia_ms > 0.f;
 
-			if (is_inert) {
-				movement.make_inert_for_ms -= static_cast<float>(delta_ms);
+			if (constant_inertia) {
+				movement.const_inertia_ms -= static_cast<float>(delta_ms);
+			}
+
+			const bool linear_inertia = movement.linear_inertia_ms > 0.f;
+
+			if (linear_inertia) {
+				movement.linear_inertia_ms -= static_cast<float>(delta_ms);
 			}
 
 			const auto num_frames = movement_def.animation_frame_num;
@@ -188,8 +196,14 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					}
 				}
 
-				if (is_inert) {
-					movement_force_mult /= 10.f;
+				if (constant_inertia) {
+					movement_force_mult *= movement_def.const_inertia_mult;
+				}
+
+				if (linear_inertia) {
+					const auto m = movement_def.max_linear_inertia_when_movement_possible;
+					const auto inertia_mult = std::clamp(1.f - movement.linear_inertia_ms / m, 0.f, 1.f);
+					movement_force_mult *= inertia_mult;
 				}
 
 				if (is_sentient) {
@@ -323,7 +337,13 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				}
 			};
 
-			const auto animation_dt = delta_ms * speed_mult;
+			const bool legs_frozen =
+				movement.const_inertia_ms
+				+ movement.linear_inertia_ms
+				> movement_def.freeze_legs_when_inertia_exceeds
+			;
+
+			const auto animation_dt = legs_frozen ? 0.f : delta_ms * speed_mult;
 
 			auto& backward = movement.four_ways_animation.backward;
 			auto& amount = movement.animation_amount;

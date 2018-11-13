@@ -5,6 +5,7 @@
 
 #include "game/detail/explosive/like_explosive.h"
 #include "game/detail/melee/like_melee.h"
+#include "game/detail/physics/infer_damping.hpp"
 
 inline auto to_b2Body_type(const rigid_body_type t) {
 	switch (t) {
@@ -119,7 +120,7 @@ void physics_world_cache::specific_infer_rigid_body_from_scratch(const E& handle
 	def.bullet = calc_is_bullet(handle);
 	def.allowSleep = physics_def.allow_sleep;
 
-	const auto damping = rigid_body.calc_damping_mults(physics_def);
+	const auto damping = ::calc_damping_mults(handle, physics_def);
 
 	def.angularDamping = damping.angular;
 	def.linearDamping = damping.linear;
@@ -184,7 +185,7 @@ void physics_world_cache::specific_infer_rigid_body(const E& handle) {
 			*/
 	
 			/* These have no side-effects */
-			rigid_body.infer_damping(body);
+			::infer_damping(handle, body);
 			body.SetBullet(calc_is_bullet(handle));
 	
 			if (handle.template has<components::missile>()) {

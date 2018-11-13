@@ -32,6 +32,7 @@ struct melee_attack_definition {
 	real32 sentience_hit_recoil = 10.f;
 
 	real32 wielder_impulse = 20.f;
+	real32 wielder_inert_for_ms = 250.f;
 	real32 cp_required = 5.f;
 
 	sound_effect_input init_sound;

@@ -6,9 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Checks for animation bounds in melee system
+
 - Chosen solution: let direct attachment offset calculate the knife position so that the entity is always positioned where it is seen.
 	- Additionally, manually query once every time the animation frame changes.
 		- The change in animation frame will properly be detected by the melee system.
+
+- Use gift wrapping algorithm for calculating colliders
+	- we can quickly implement this on our own
 
 - Setting fixtures vs querying knife fixtures on each step
 	- entity-based approach to positioning

@@ -18,6 +18,7 @@
 #include "game/cosmos/for_each_entity.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/detail/melee/like_melee.h"
+#include "game/assets/animation_math.h"
 
 using namespace augs;
 
@@ -48,94 +49,187 @@ void melee_system::advance_thrown_melee_logic(const logic_step step) {
 	});
 }
 
+const auto reset_cooldown_v = real32(-1.f);
+
 void melee_system::initiate_and_update_moves(const logic_step step) {
 	auto& cosm = step.get_cosmos();
-	//const auto anims = cosm.get_logical_assets().plain_animations;
+	const auto& dt = step.get_delta();
+	const auto anims = cosm.get_logical_assets().plain_animations;
 
 	cosm.for_each_having<components::melee_fighter>([&](const auto& it) {
-		//const auto& fighter_def = it.template get<invariants::melee_fighter>();
-		//const auto& torso = it.template get<invariants::torso>();
+		const auto& fighter_def = it.template get<invariants::melee_fighter>();
 		const auto& sentience = it.template get<components::sentience>();
+
+		auto& fighter = it.template get<components::melee_fighter>();
+
+		auto& state = fighter.state;
+		auto& anim_state = fighter.anim_state;
+		auto& elapsed_ms = anim_state.frame_elapsed_ms;
+
+		auto reset_fighter = [&]() {
+			/* Avoid cheating by quick weapon switches */
+			state = melee_fighter_state::COOLDOWN;
+
+			auto& cooldown_ms = elapsed_ms;
+			cooldown_ms = reset_cooldown_v;
+		};
+
 		const auto wielded_items = it.get_wielded_items();
-		//const auto stance = torso.calc_stance(it, it.get_wielded_items());
 
-		//auto& fighter = it.template get<components::melee_fighter>();
+		if (wielded_items.size() != 1) {
+			reset_fighter();
+			return;
+		}
 
-		entity_id target_weapon;
+		const auto target_weapon = cosm[wielded_items[0]];
+
+		if (!target_weapon.template has<components::melee>()) {
+			reset_fighter();
+			return;
+		}
+
+		const auto& torso = it.template get<invariants::torso>();
+		const auto& stance = torso.calc_stance(it, wielded_items);
 
 		const auto chosen_action = [&]() {
-			if (wielded_items.size() != 1) {
-				/* Disallow any initiation if we're not wielding one and only one melee weapon */
-				return weapon_action_type::COUNT;
-			}
-
-			/* 
-				We may have both mouse buttons at the same time, 
-				but we must prioritize either button. 
-
-				Always choose primary over the secondary.
-			*/
-
 			for (std::size_t i = 0; i < hand_count_v; ++i) {
 				const auto& hand_flag = sentience.hand_flags[i];
 
 				if (hand_flag) {
 					const auto action = it.calc_hand_action(i);
-
-					if (cosm[action.held_item].template has<components::melee>()) {
-						target_weapon = action.held_item;
-						return action.type;
-					}
+					return action.type;
 				}
 			}
 
 			return weapon_action_type::COUNT;
 		}();
-		(void)chosen_action;
 
-#if 0
-		if (chosen_action != weapon_action_type::COUNT) {
-			cosm[target_weapon].dispatch_on_having<components::melee>(
-				[&](const auto& typed_weapon) {
+		const auto dt_ms = dt.in_milliseconds();
+
+		target_weapon.template dispatch_on_having_all<components::melee>(
+			[&](const auto& typed_weapon) {
+				const auto& melee_def = typed_weapon.template get<invariants::melee>();
+
+				if (state == melee_fighter_state::READY) {
+					if (chosen_action == weapon_action_type::COUNT) {
+						return;
+					}
+
+					state = melee_fighter_state::IN_ACTION;
+					fighter.action = chosen_action;
+
+					const auto& current_attack_def = melee_def.actions.at(chosen_action);
+
+					const auto& body = it.template get<components::rigid_body>();
+					const auto vel_dir = vec2(body.get_velocity()).normalize();
+
+					//auto tr = body.get_transform();
+					/* tr.rotation += 20.f; */
+					/* body.set_transform(tr); */
+
+					if (const auto crosshair = it.find_crosshair()) {
+						const auto cross_dir = vec2(crosshair->base_offset).normalize();
+
+						const auto impulse_mult = (vel_dir.dot(cross_dir) + 1) / 2;
+
+						body.apply_impulse(impulse_mult * cross_dir * body.get_mass() * current_attack_def.wielder_impulse);
+
+						auto& movement = it.template get<components::movement>();
+						movement.linear_inertia_ms += current_attack_def.wielder_inert_for_ms;
+
+						//crosshair->base_offset.rotate(20.f);
+					}
 
 				}
-			);
-		}
 
-		const auto stance_id = ::calc_stance_id(it, wielded_items);
+				if (state == melee_fighter_state::COOLDOWN) {
+					auto& cooldown_left_ms = elapsed_ms;
 
-		if (fighter.state == melee_fighter_state::READY) {
-			auto try_init_action = [&](const auto& type) {
-				auto& input_flags = fighter.input_flags;
+					if (cooldown_left_ms == reset_cooldown_v) {
+						for (const auto& a : melee_def.actions) {
+							if (cooldown_left_ms < a.cooldown_ms) {
+								cooldown_left_ms = a.cooldown_ms;
+							}
+						}
 
-				if (fighter.input_flags[type]) {
-					fighter.state = melee_fighter_state.IN_ACTION;
-					fighter.action = type;
-					return true;
+						return;
+					}
+
+					const auto speed_mult = fighter_def.cooldown_speed_mult;
+
+					cooldown_left_ms -= dt_ms * speed_mult;
+
+					if (cooldown_left_ms <= 0.f) {
+						state = melee_fighter_state::READY;
+						cooldown_left_ms = 0.f;
+					}
+
+					return;
 				}
 
-				return false;
-			};
+				const auto prev_index = anim_state.frame_num;
 
-			if (!try_init_action(weapon_action_type::PRIMARY)) {
-				try_init_action(weapon_action_type::SECONDARY);
+				auto infer_if_different_frames = [&]() {
+					const auto next_index = anim_state.frame_num;
+
+					if (next_index != prev_index) {
+						typed_weapon.infer_colliders_from_scratch();
+
+						return true;
+					}
+
+					return false;
+				};
+
+				const auto& action = fighter.action;
+				const auto& stance_anims = stance.actions[action];
+
+				if (state == melee_fighter_state::IN_ACTION) {
+					if (const auto* const current_anim = mapped_or_nullptr(anims, stance_anims.perform)) {
+						const auto& f = current_anim->frames;
+
+						if (!anim_state.advance(dt_ms, f)) {
+							/* Animation is in progress. */
+							infer_if_different_frames();
+						}
+						else {
+							/* The animation has finished. */
+							state = melee_fighter_state::RETURNING;
+							anim_state.frame_num = 0;
+						}
+					}
+
+					return;
+				}
+
+				if (fighter.now_returning()) {
+					if (const auto* const current_anim = mapped_or_nullptr(anims, stance_anims.returner)) {
+						const auto& f = current_anim->frames;
+
+						if (!anim_state.advance(dt_ms, f)) {
+							/* Animation is in progress. */
+							infer_if_different_frames();
+						}
+						else {
+							/* The animation has finished. */
+							state = melee_fighter_state::COOLDOWN;
+							anim_state.frame_num = 0;
+
+							const auto total_ms = ::calc_total_duration(f);
+
+							const auto& current_attack_def = melee_def.actions.at(action);
+
+							auto& cooldown_left_ms = elapsed_ms;
+							cooldown_left_ms = std::max(0.f, current_attack_def.cooldown_ms - total_ms);
+
+							typed_weapon.infer_colliders_from_scratch();
+						}
+					}
+
+					return;
+				}
+
 			}
-
-			return;
-		}
-
-		if (fighter.state == melee_fighter_state::IN_ACTION) {
-			const auto info = ::calc_stance_usage(
-				cosm,
-				torso.stances[stance_id],
-				{},
-				wielded_items
-			);
-		}
-
-		if (fighter.state == melee_fighter_state::COOLDOWN) {
-
-		}
-#endif
+		);
 	});
 }

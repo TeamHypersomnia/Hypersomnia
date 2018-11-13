@@ -7,6 +7,9 @@
 class physics_world_cache;
 class physics_system;
 
+template <class E, class B>
+void infer_damping(const E& handle, B& b);
+
 template <class E>
 class component_synchronizer<E, components::rigid_body> 
 	: public synchronizer_base<E, components::rigid_body> 
@@ -53,9 +56,6 @@ class component_synchronizer<E, components::rigid_body>
 	using base = synchronizer_base<E, components::rigid_body>;
 	using base::handle;
 
-	template <class B>
-	void infer_damping(B& b) const;
-
 public:
 	using base::base;
 	using base::get_raw_component;
@@ -69,7 +69,12 @@ public:
 	{}
 
 	void infer_caches() const;
-	void infer_damping() const;
+
+	void infer_damping() const {
+		if (const auto body = find_body()) {
+			::infer_damping(handle, *body);
+		}
+	}
 
 	void set_velocity(const vec2) const;
 	void set_angular_velocity(const float) const;
@@ -106,8 +111,6 @@ public:
 	auto& get_special() const {
 		return get_raw_component({}).special;
 	}
-
-	damping_mults calc_damping_mults(const invariants::rigid_body&) const;
 
 	vec2 get_velocity() const;
 	float get_mass() const;
@@ -188,47 +191,6 @@ bool component_synchronizer<E, components::rigid_body>::test_point(const vec2 v)
 template <class E>
 bool component_synchronizer<E, components::rigid_body>::is_constructed() const {
 	return find_body() != nullptr;
-}
-
-template <class E>
-damping_mults component_synchronizer<E, components::rigid_body>::calc_damping_mults(const invariants::rigid_body& def) const {
-	damping_mults damping = def.damping;
-
-	handle.template dispatch_on_having_all<components::movement>([&damping](const auto typed_handle) {
-		const auto& movement = typed_handle.template get<components::movement>();
-		const auto& movement_def = typed_handle.template get<invariants::movement>();
-
-		const bool is_inert = movement.make_inert_for_ms > 0.f;
-
-		if (is_inert) {
-			damping.linear = 2;
-		}
-		else {
-			damping.linear = movement_def.standard_linear_damping;
-		}
-
-		const auto requested_by_input = movement.get_force_requested_by_input(movement_def.input_acceleration_axes);
-
-		if (requested_by_input.non_zero()) {
-			if (movement.was_sprint_effective) {
-				if (!is_inert) {
-					damping.linear /= 4;
-				}
-			}
-		}
-
-		const bool make_inert = movement.make_inert_for_ms > 0.f;
-
-		/* the player feels less like a physical projectile if we brake per-axis */
-		if (!make_inert) {
-			damping.linear_axis_aligned += vec2(
-				requested_by_input.x_non_zero() ? 0.f : movement_def.braking_damping,
-				requested_by_input.y_non_zero() ? 0.f : movement_def.braking_damping
-			);
-		}
-	});
-
-	return damping.sanitize();
 }
 
 template <class E>
@@ -394,23 +356,4 @@ std::optional<ltrb> component_synchronizer<E, components::rigid_body>::find_aabb
 	}
 
 	return std::nullopt;
-}
-
-template <class E>
-void component_synchronizer<E, components::rigid_body>::infer_damping() const {
-	if (const auto body = find_body()) {
-		infer_damping(*body);
-	}
-}
-
-template <class E>
-template <class B>
-void component_synchronizer<E, components::rigid_body>::infer_damping(B& b) const {
-	const auto& def = handle.template get<invariants::rigid_body>();
-	const auto damping = this->calc_damping_mults(def);
-
-	b.SetLinearDamping(damping.linear);
-	b.SetAngularDamping(damping.angular);
-	b.SetLinearDampingVec(b2Vec2(damping.linear_axis_aligned));
-	b.SetAngledDampingEnabled(def.angled_damping);
 }

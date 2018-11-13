@@ -5,17 +5,23 @@
 #include "augs/misc/enum/enum_array.h"
 #include "game/enums/weapon_action_type.h"
 
+struct stance_action {
+	// GEN INTROSPECTOR struct stance_action
+	assets::torso_animation_id perform;
+	assets::torso_animation_id returner;
+	// END GEN INTROSPECTOR
+};
+
 struct stance_animations {
 	// GEN INTROSPECTOR struct stance_animations
 	assets::torso_animation_id carry;
 
-	augs::enum_array<assets::torso_animation_id, weapon_action_type> actions;
+	augs::enum_array<stance_action, weapon_action_type> actions;
 
+	assets::torso_animation_id chambering;
 	assets::torso_animation_id grip_to_mag;
 	assets::torso_animation_id pocket_to_mag;
 	// END GEN INTROSPECTORS
-
-	const assets::torso_animation_id& get_chambering() const;
 };
 
 namespace invariants {
@@ -29,7 +35,7 @@ namespace invariants {
 		unsigned min_strafe_facing = 50;
 		unsigned max_strafe_facing = 130;
 
-		float strafe_face_interp_mult = 0.f;
+		real32 strafe_face_interp_mult = 0.f;
 		// END GEN INTROSPECTOR
 
 		auto calc_leg_anim(

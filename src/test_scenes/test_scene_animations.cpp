@@ -290,9 +290,10 @@ void load_test_scene_animations(
 			return anim;
 		};
 
-		auto standard_shoot = [&](const T test_id, const I first_frame_id) {
+		auto standard_shoot = [&](const T test_id, const I first_frame_id) -> auto& {
 			auto& anim = make_torso(test_id, first_frame_id, 20.0f);
 			make_shoot_durations(anim.frames);
+			return anim;
 		};
 
 		auto pistol_shot = [&](const T test_id, const I first_frame_id) {
@@ -414,6 +415,24 @@ void load_test_scene_animations(
 				T::RESISTANCE_TORSO_KNIFE_SECD,
 				I::RESISTANCE_TORSO_KNIFE_SECD_1
 			);
+
+			{
+				auto& anim = standard_shoot(
+					T::RESISTANCE_TORSO_KNIFE_PRIM_RETURN,
+					I::RESISTANCE_TORSO_KNIFE_PRIM_1
+				);
+
+				reverse_range(anim.frames);
+			}
+
+			{
+				auto& anim = standard_shoot(
+					T::RESISTANCE_TORSO_KNIFE_SECD_RETURN,
+					I::RESISTANCE_TORSO_KNIFE_SECD_1
+				);
+
+				reverse_range(anim.frames);
+			}
 
 			pistol_shot(
 				T::RESISTANCE_TORSO_PISTOL_SHOT,

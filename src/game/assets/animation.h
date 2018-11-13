@@ -42,6 +42,28 @@ struct simple_animation_state {
 	}
 
 	template <class F, class C>
+	void go_back(
+		const real32 delta_ms,
+		F nth_frame_duration_ms,
+		C exit_frame_callback
+	) {
+		frame_elapsed_ms -= delta_ms;
+
+		while (frame_num != static_cast<unsigned>(-1)) {
+			const auto current_frame_duration = nth_frame_duration_ms(frame_num);
+
+			if (frame_elapsed_ms < 0) {
+				frame_elapsed_ms += current_frame_duration;
+				exit_frame_callback(frame_num);
+				--frame_num;
+			}
+			else {
+				break;
+			}
+		}
+	}
+
+	template <class F, class C>
 	void advance_looped(
 		const simple_animation_advance in,
 		F nth_frame_duration_ms,
@@ -71,6 +93,18 @@ struct simple_animation_state {
 		F&& nth_frame_duration_ms
 	) {
 		advance(in, std::forward<F>(nth_frame_duration_ms), [](auto){});
+	}
+
+	template <class T>
+	bool go_back(
+		const real32 dt,
+		const T& source_frames
+	) {
+		go_back(dt, [&](const auto i) { 
+			return source_frames[i].duration_milliseconds; 
+		}, [](auto){});
+
+		return frame_num == static_cast<unsigned>(-1);
 	}
 
 	template <class T>

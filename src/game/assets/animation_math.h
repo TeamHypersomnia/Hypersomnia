@@ -17,9 +17,7 @@ auto get_max_frame_size(const T& frames, const M& manager) {
 }
 
 template <class T>
-auto get_total_duration(
-	const T& frames
-) {
+auto calc_total_duration(const T& frames) {
 	real32 result = 0.f;
 
 	for (const auto& f : frames) {
@@ -71,7 +69,7 @@ frame_type_t<T>& calc_current_frame_looped(
 	const real32 total_time_ms
 ) {
 	const auto& frames = animation.frames;
-	const auto idx = calc_current_frame_index<0>(frames, std::fmod(total_time_ms, ::get_total_duration(frames)));
+	const auto idx = calc_current_frame_index<0>(frames, std::fmod(total_time_ms, ::calc_total_duration(frames)));
 
 	return frames[idx];
 }

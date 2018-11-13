@@ -280,7 +280,7 @@ FORCE_INLINE void specific_entity_drawer(
 			}
 
 			if (const auto stance_usage = calc_stance_usage(
-				cosm,
+				typed_handle,
 				stance, 
 				four_ways,
 				wielded_items
@@ -377,6 +377,10 @@ FORCE_INLINE void specific_entity_drawer(
 					return false;
 				};
 
+				auto get_offsets_by_torso = [stance_offsets]() {
+					return stance_offsets;
+				};
+
 				auto draw_items_recursively = [&](const bool under_torso = true) {
 					typed_handle.for_each_attachment_recursive(
 						[&](
@@ -416,9 +420,7 @@ FORCE_INLINE void specific_entity_drawer(
 								);
 							}
 						},
-						[stance_offsets]() {
-							return stance_offsets;
-						},
+						get_offsets_by_torso,
 						attachment_offset_settings::for_rendering(),
 						!draw_mag_over
 					);

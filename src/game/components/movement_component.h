@@ -82,8 +82,10 @@ namespace components {
 		bool was_walk_effective = false;
 		pad_bytes<2> pad;
 
-		float make_inert_for_ms = 0.f;
-		float animation_amount = 0.f;
+		real32 const_inertia_ms = 0.f;
+		real32 linear_inertia_ms = 0.f;
+
+		real32 animation_amount = 0.f;
 
 		movement_animation_state four_ways_animation;
 		// END GEN INTROSPECTOR
@@ -103,12 +105,17 @@ namespace invariants {
 		vec2 applied_force_offset;
 		vec2 input_acceleration_axes;
 
-		float acceleration_length = -1.f;
-		float standard_linear_damping = 0.f;
-		float non_braking_damping = 0.f;
-		float braking_damping = 0.f;
+		real32 acceleration_length = -1.f;
+		real32 standard_linear_damping = 0.f;
+		real32 non_braking_damping = 0.f;
+		real32 braking_damping = 0.f;
 
-		float max_speed_for_animation = 700.f;
+		real32 max_linear_inertia_when_movement_possible = 150.f;
+		real32 const_inertia_mult = 0.1f;
+
+		real32 freeze_legs_when_inertia_exceeds = 50.f;
+
+		real32 max_speed_for_animation = 700.f;
 		unsigned animation_frame_ms = 30;
 		unsigned animation_frame_num = 5;
 		// END GEN INTROSPECTOR

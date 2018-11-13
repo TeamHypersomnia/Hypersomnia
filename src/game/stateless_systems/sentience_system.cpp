@@ -273,6 +273,7 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 	auto& cosm = step.get_cosmos();
 	const auto subject = cosm[h.subject];
 	auto& sentience = subject.get<components::sentience>();
+	const auto& sentience_def = subject.get<invariants::sentience>();
 	auto& health = sentience.get<health_meter_instance>();
 	auto& consciousness = sentience.get<consciousness_meter_instance>();
 	auto& personal_electricity = sentience.get<personal_electricity_meter_instance>();
@@ -320,7 +321,8 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 			sentience.time_of_last_received_damage = cosm.get_timestamp();
 
 			auto& movement = subject.get<components::movement>();
-			movement.make_inert_for_ms += h.effective_amount*2;
+			movement.const_inertia_ms += h.effective_amount * sentience_def.const_inertia_damage_ratio;
+			//movement.linear_inertia_ms += h.effective_amount * sentience_def.linear_inertia_damage_ratio;
 
 			const auto consciousness_ratio = consciousness.get_ratio();
 			const auto health_ratio = health.get_ratio();

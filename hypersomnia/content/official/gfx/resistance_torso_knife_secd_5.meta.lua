@@ -70,6 +70,13 @@ return {
           y = 0
         },
         rotation = 0
+      },
+      shoulder_anchor = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       }
     },
     legs = {
@@ -106,12 +113,19 @@ return {
       },
       primary_hand = {
         pos = {
+          x = 54,
+          y = -11
+        },
+        rotation = -50.527542114257812
+      },
+      secondary_hand = {
+        pos = {
           x = 0,
           y = 0
         },
         rotation = 0
       },
-      secondary_hand = {
+      secondary_shoulder = {
         pos = {
           x = 0,
           y = 0

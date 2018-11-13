@@ -1,12 +1,44 @@
 #pragma once
 #include "game/components/gun_component.h"
 #include "game/components/movement_component.h"
+#include "game/components/melee_fighter_component.h"
 #include "game/assets/animation_math.h"
 #include "game/detail/inventory/weapon_reloading.hpp"
 #include "game/assets/animation.h"
 #include "game/components/animation_component.h"
 
 using cosmos_clock = augs::stepped_clock;
+
+template <class L>
+const plain_animation_frame* find_action_frame(
+	const stance_animations& stance,
+	const components::melee_fighter& fighter,
+	const L& logicals
+) {
+	const auto s = fighter.state;
+
+	const auto chosen_anim = [&]() {
+		if (s == melee_fighter_state::IN_ACTION) {
+			return stance.actions[fighter.action].perform;
+		}
+
+		if (fighter.now_returning()) {
+			return stance.actions[fighter.action].returner;
+		}
+
+		return assets::plain_animation_id();
+	}();
+
+	if (const auto action_animation = logicals.find(chosen_anim)) {
+		const auto& f = action_animation->frames;
+		const auto n = static_cast<unsigned>(f.size());
+		const auto i = std::min(n - 1, fighter.anim_state.frame_num);
+
+		return f.data() + i;
+	}
+
+	return nullptr;
+}
 
 template <class L>
 const plain_animation_frame* find_frame(
@@ -132,15 +164,16 @@ struct stance_frame_usage {
 	}
 };
 
-template <class C, class T>
+template <class E, class T>
 auto calc_stance_usage(
-	const C& cosm,
+	const E& typed_handle,
 	const stance_animations& stance,
 	const movement_animation_state& anim_state, 
 	const T& wielded_items
 ) {
 	using result_t = stance_frame_usage<const torso_animation>;
 
+	const auto& cosm = typed_handle.get_cosmos();
 	const auto& logicals = cosm.get_logical_assets();
 
 	const auto n = wielded_items.size();
@@ -166,7 +199,7 @@ auto calc_stance_usage(
 		}
 
 		if (const auto gun = cosm[wielded_items[0]].template find<components::gun>()) {
-			if (const auto shoot_animation = logicals.find(stance.actions[weapon_action_type::PRIMARY])) {
+			if (const auto shoot_animation = logicals.find(stance.actions[weapon_action_type::PRIMARY].perform)) {
 				const auto frame = ::find_shoot_frame(*gun, *shoot_animation, cosm);
 				const auto second_frame = [n, &cosm, shoot_animation, &wielded_items]() -> decltype(frame) {
 					if (n == 2) {
@@ -196,15 +229,15 @@ auto calc_stance_usage(
 			}
 		}
 
-		/* if (const auto melee = cosm[wielded_items[0]].template find<components::melee>()) { */
-		/* 	if (const auto action_animation = logicals.find(stance.actions[melee->action])) { */
-
-		/* 	} */
-		/* } */
+		if (const auto fighter = typed_handle.template find<components::melee_fighter>()) {
+			if (const auto frame = find_action_frame(stance, *fighter, logicals)) {
+				return result_t::shoot(*frame);
+			}
+		}
 	}
 
 	if (n == 1) {
-		if (const auto chambering_animation = logicals.find(stance.get_chambering())) {
+		if (const auto chambering_animation = logicals.find(stance.chambering)) {
 			if (const auto gun = cosm[wielded_items[0]].template find<components::gun>()) {
 				const auto frame = ::find_chambering_frame(*gun, *chambering_animation);
 

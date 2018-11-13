@@ -72,7 +72,7 @@ void wandering_pixels_system::advance_for(
 			return;
 		}
 
-		const auto total_animation_duration = ::get_total_duration(anim->frames);
+		const auto total_animation_duration = ::calc_total_duration(anim->frames);
 
 		if (cache.recorded_particle_count != wandering.particles_count) {
 			cache.particles.resize(wandering.particles_count);

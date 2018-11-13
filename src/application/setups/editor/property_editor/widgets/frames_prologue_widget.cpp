@@ -28,7 +28,7 @@ bool frames_prologue_widget::handle_prologue(const std::string&, plain_animation
 		thread_local augs::timer anim_timer;
 
 		const auto& anim = *logicals.find(id);
-		const auto total_duration = static_cast<double>(::get_total_duration(anim.frames));
+		const auto total_duration = static_cast<double>(::calc_total_duration(anim.frames));
 		const auto total_time = anim_timer.get<std::chrono::milliseconds>();
 		const auto considered_time = std::fmod(total_time, total_duration);
 		const auto current_frame = ::calc_current_frame(anim, considered_time);
