@@ -116,7 +116,7 @@ return {
           x = -1,
           y = 34
         },
-        rotation = -24.443954467773438
+        rotation = -25.346176147460938
       },
       secondary_hand = {
         pos = {
@@ -127,10 +127,10 @@ return {
       },
       secondary_shoulder = {
         pos = {
-          x = 0,
-          y = 0
+          x = -17,
+          y = 14
         },
-        rotation = 0
+        rotation = -113.19859313964844
       },
       shoulder = {
         pos = {
