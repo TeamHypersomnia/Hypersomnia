@@ -132,14 +132,18 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 						const auto impulse_mult = (vel_dir.dot(cross_dir) + 1) / 2;
 
-						{
-							const auto& movement_def  = it.template get<invariants::movement>();
-							const auto conceptual_max_speed = std::max(1.f, movement_def.max_speed_for_animation);
-							const auto current_velocity = body.get_velocity();
-							const auto current_speed = current_velocity.length();
+						const auto& movement_def  = it.template get<invariants::movement>();
+						const auto conceptual_max_speed = std::max(1.f, movement_def.max_speed_for_animation);
+						const auto current_velocity = body.get_velocity();
+						const auto current_speed = current_velocity.length();
 
-							const auto speed_mult = current_speed / conceptual_max_speed;
-							const auto total_mult = std::min(impulse_mult, speed_mult);
+						const auto speed_mult = current_speed / conceptual_max_speed;
+
+						{
+							const auto min_effect = chosen_action == weapon_action_type::PRIMARY ? 0.8f : 0.f;
+							const auto max_effect = chosen_action == weapon_action_type::PRIMARY ? 1.3f : 1.1f;
+
+							const auto total_mult = std::min(max_effect, std::max(min_effect, speed_mult * impulse_mult));
 
 							auto effect = current_attack_def.wielder_init_particles;
 							effect.modifier.scale_amounts = total_mult;
@@ -159,7 +163,13 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 						//crosshair->base_offset.rotate(20.f);
 
 						{
-							const auto& effect = current_attack_def.init_sound;
+							const auto min_effect = 0.88f;
+							const auto max_effect = 1.f;
+
+							const auto total_mult = std::min(max_effect, std::max(min_effect, speed_mult * impulse_mult));
+
+							auto effect = current_attack_def.init_sound;
+							effect.modifier.pitch = total_mult;
 
 							effect.start(
 								step,
