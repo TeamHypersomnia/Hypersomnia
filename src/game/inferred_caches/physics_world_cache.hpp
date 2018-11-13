@@ -6,6 +6,7 @@
 #include "game/detail/explosive/like_explosive.h"
 #include "game/detail/melee/like_melee.h"
 #include "game/detail/physics/infer_damping.hpp"
+#include "game/detail/entity_handle_mixins/calc_connection.hpp"
 
 inline auto to_b2Body_type(const rigid_body_type t) {
 	switch (t) {

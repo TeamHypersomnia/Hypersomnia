@@ -6,7 +6,6 @@
 #include "game/organization/all_components_declaration.h"
 #include "game/detail/physics/colliders_connection.h"
 #include "game/detail/entity_handle_mixins/get_current_slot.hpp"
-#include "game/detail/entity_handle_mixins/calc_connection.hpp"
 #include "game/components/fixtures_component.h"
 #include "game/components/rigid_body_sync.h"
 
@@ -53,54 +52,6 @@ typename physics_mixin<E>::generic_handle_type physics_mixin<E>::get_owner_frict
 }
 
 template <class E>
-std::optional<colliders_connection> physics_mixin<E>::calc_colliders_connection() const {
-	const auto self = *static_cast<const E*>(this);
-	const auto& cosm = self.get_cosmos();
-	
-	std::optional<colliders_connection> result;
-
-	self.template dispatch_on_having_all<invariants::fixtures>([&cosm, &result](const auto typed_self) {
-		if (const auto overridden = typed_self.template find<components::specific_colliders_connection>()) {
-			result = overridden->connection;
-			return;
-		}
-
-		if (const auto item = typed_self.template find<components::item>()) {
-			if (const auto slot = cosm[item->get_current_slot()]) {
-				if (const auto topmost_container = typed_self.calc_connection_to_topmost_container()) {
-					if (auto topmost_container_connection = 
-						cosm[topmost_container->owner].calc_colliders_connection()
-					) {
-						const auto owner = topmost_container_connection->owner;
-	#if MORE_LOGS
-						LOG("%x (item) owned by %x", typed_self, cosm[owner]);
-	#endif
-						result = colliders_connection {
-							owner,
-							topmost_container->shape_offset * topmost_container_connection->shape_offset
-						};
-
-						return;
-					}
-				}
-
-				return;
-			}
-		}
-
-		if (typed_self.template find<components::rigid_body>()) {
-	#if MORE_LOGS
-			LOG("%x (body) owned by itself", typed_self);
-	#endif
-			result = colliders_connection { typed_self, {} };
-			return;
-		}
-	});
-
-	return result;
-}
-
-template <class E>
 real32 physics_mixin<E>::calc_density(
 	const colliders_connection calculated_connection,
 	const invariants::fixtures& def	
@@ -136,7 +87,7 @@ std::optional<colliders_connection> physics_mixin<E>::find_colliders_connection(
 		return cache->connection;
 	}
 
-	return calc_colliders_connection();
+	return std::nullopt;
 }
 
 template <class E>

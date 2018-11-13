@@ -138,6 +138,24 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 						movement.linear_inertia_ms += current_attack_def.wielder_inert_for_ms;
 
 						//crosshair->base_offset.rotate(20.f);
+
+						{
+							const auto& effect = current_attack_def.init_sound;
+
+							effect.start(
+								step,
+								sound_effect_start_input::at_entity(typed_weapon).set_listener(it)
+							);
+						}
+
+						{
+							const auto& effect = current_attack_def.init_particles;
+
+							effect.start(
+								step,
+								particle_effect_start_input::at_entity(typed_weapon)
+							);
+						}
 					}
 
 				}
