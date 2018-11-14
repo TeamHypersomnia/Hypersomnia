@@ -21,6 +21,7 @@ editor_paths::editor_paths(
 	hist_file = in_folder(".hist");
 	rulesets_file = in_folder(".rulesets");
 	player_file = in_folder(".player");
+	entropies_live_file = in_folder(".live");
 
 	int_lua_file = in_folder(".int.lua");
 	rulesets_lua_file = in_folder(".rulesets.lua");

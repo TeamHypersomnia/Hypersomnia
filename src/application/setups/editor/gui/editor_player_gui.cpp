@@ -5,6 +5,8 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/templates/chrono_templates.h"
 #include "augs/misc/readable_bytesize.h"
+#include "application/setups/editor/editor_settings.h"
+#include "application/setups/editor/editor_paths.h"
 
 #include "application/setups/editor/detail/maybe_different_colors.h"
 
@@ -127,6 +129,36 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 
 		if (checkbox("Overwrite rest", opts.overwrite_rest)) {
 			//player.set_dirty();
+		}
+	}
+
+	{
+		if (cmd_in.settings.save_entropies_to_live_file) {
+			const auto paths = cmd_in.folder.get_paths();
+			const auto live_file_path = paths.entropies_live_file;
+
+			if (augs::exists(live_file_path)) {
+				text_color("(Debug) entropies.live file exists.", green);
+
+				if (ImGui::Button("Read & replay")) {
+					if (player.has_testing_started()) {
+						player.finish_testing(cmd_in, finish_testing_type::DISCARD_CHANGES);
+					}
+
+					if (!player.has_testing_started()) {
+						player.begin_replaying(folder);
+					}
+
+					player.read_live_entropies(live_file_path);
+				}
+
+				if (ImGui::Button("Delete")) {
+					augs::remove_file(live_file_path);
+				}
+			}
+		}
+		else {
+			text_disabled("Writing entropies to a live file is disabled.");
 		}
 	}
 }

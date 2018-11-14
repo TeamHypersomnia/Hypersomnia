@@ -46,10 +46,8 @@ namespace augs {
 		out.write(reinterpret_cast<const byte_type_for_t<decltype(out)>*>(bytes.data()), bytes.size());
 	}
 
-	template <class ContainerType>
-	void read_map_until_eof(const path_type& path, ContainerType& into) {
-		auto source = open_binary_input_stream(path);
-
+	template <class S, class ContainerType>
+	void read_map_until_eof(S& source, ContainerType& into) {
 		while (source.peek() != EOF) {
 			typename ContainerType::key_type key;
 			typename ContainerType::mapped_type value;
@@ -59,5 +57,12 @@ namespace augs {
 
 			into.emplace(std::move(key), std::move(value));
 		}
+	}
+
+	template <class ContainerType>
+	void read_map_until_eof(const path_type& path, ContainerType& into) {
+		auto source = open_binary_input_stream(path);
+
+		read_map_until_eof(source, into);
 	}
 }

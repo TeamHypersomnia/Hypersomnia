@@ -181,4 +181,5 @@ public:
 	void set_dirty();
 
 	void choose_mode(const ruleset_id& id);
+	void read_live_entropies(const augs::path_type& from);
 };

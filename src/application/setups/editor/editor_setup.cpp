@@ -219,6 +219,11 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 
 void editor_setup::apply(const config_lua_table& cfg) {
 	settings = cfg.editor;
+
+	if (cfg.editor.save_entropies_to_live_file) {
+		settings.player.snapshot_interval_in_steps = 0;
+	}
+
 	return;
 }
 

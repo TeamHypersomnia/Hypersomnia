@@ -117,6 +117,9 @@ namespace augs {
 
 		double get_speed() const;
 		void set_speed(double);
+
+		template <class S>
+		void read_live_entropies(S& from);
 	};
 }
 

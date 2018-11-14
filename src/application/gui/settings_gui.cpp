@@ -445,6 +445,12 @@ void settings_gui_state::perform(
 					revertable_slider(SCOPE_CFG_NVP(snapshot_interval_in_steps), 400u, 5000u);
 				}
 
+				if (auto node = scoped_tree_node("Debug")) {
+					auto& scope_cfg = config.editor;
+
+					revertable_checkbox(SCOPE_CFG_NVP(save_entropies_to_live_file));
+				}
+
 				break;
 			}
 			case settings_pane::GUI_STYLES: {

@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/templates/snapshotted_player.h"
+#include "augs/readwrite/byte_file.h"
 
 #define LOG_PLAYER 1
 
@@ -19,6 +20,12 @@ void PLR_LOG(Args&&... args) {
 #endif
 
 namespace augs {
+	template <class A, class B>
+	template <class S>
+	void snapshotted_player<A, B>::read_live_entropies(S& from) {
+		read_map_until_eof(from, step_to_entropy);
+	}
+
 	template <class A, class B>
 	auto snapshotted_player<A, B>::get_current_step() const {
 		return current_step;
@@ -207,8 +214,6 @@ namespace augs {
 	template <class entropy_type, class B>
 	template <class I>
 	void snapshotted_player<entropy_type, B>::advance_single_step(const I& in) {
-		auto& step_i = current_step;
-
 		push_snapshot_if_needed(in.make_snapshot, in.settings.snapshot_interval_in_steps);
 
 		auto considered_mode = advance_mode;
@@ -222,17 +227,17 @@ namespace augs {
 
 		switch (considered_mode) {
 			case advance_type::REPLAYING:
-				applied = mapped_or_default(step_to_entropy, step_i);
+				applied = mapped_or_default(step_to_entropy, current_step);
 				break;
 				
 			case advance_type::RECORDING:
 				{
-					auto& entry = step_to_entropy[step_i];
+					auto& entry = step_to_entropy[current_step];
 					in.record_entropy(entry);
 					applied = entry;
 
 					if (entry.empty()) {
-						step_to_entropy.erase(step_i);
+						step_to_entropy.erase(current_step);
 					}
 				}
 
@@ -247,7 +252,7 @@ namespace augs {
 		}
 
 		in.step(applied);
-		++step_i;
+		++current_step;
 	}
 
 	template <class entropy_type, class B>

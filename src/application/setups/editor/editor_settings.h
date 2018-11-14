@@ -77,6 +77,8 @@ struct editor_settings {
 
 	editor_grid_settings grid;
 	augs::snapshotted_player_settings player;
+	bool save_entropies_to_live_file = false;
+
 	editor_camera_settings camera;
 	editor_go_to_settings go_to;
 	editor_entity_selector_settings entity_selector;

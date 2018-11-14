@@ -352,6 +352,10 @@ void editor_player::pause() {
 	base::pause();
 }
 
+void editor_player::read_live_entropies(const augs::path_type& from) {
+	base::read_live_entropies(from);
+}
+
 template class augs::snapshotted_player<
 	editor_player_entropy_type,
 	editor_solvable_snapshot

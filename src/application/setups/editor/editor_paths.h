@@ -55,6 +55,7 @@ struct editor_paths {
 	augs::path_type rulesets_file;
 	augs::path_type player_file;
 	augs::path_type autosave_path;
+	augs::path_type entropies_live_file;
 
 	augs::path_type int_lua_file;
 	augs::path_type rulesets_lua_file;

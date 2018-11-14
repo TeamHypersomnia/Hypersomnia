@@ -4,12 +4,14 @@
 #include "augs/templates/snapshotted_player.hpp"
 #include "application/setups/editor/detail/on_mode_with_input.hpp"
 #include "application/setups/editor/editor_settings.h"
+#include "application/setups/editor/editor_paths.h"
 
 template <class C, class E>
 auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<C> in, E&& extract_collected_entropy) {
 	auto& folder = in.cmd_in.folder;
 	auto& history = folder.history;
 	auto& cosm = folder.commanded->work.world;
+	auto& settings = in.cmd_in.settings;
 
 	return augs::snapshotted_advance_input(
 		[this, &folder, &history, &cosm, in](const auto& applied_entropy) {
@@ -58,6 +60,18 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 			adjust_entropy(folder, extracted, true);
 
 			existing_entropy += extracted;
+
+			if (settings.save_entropies_to_live_file) {
+				const auto current_step = get_current_step();
+				const auto paths = folder.get_paths();
+				const auto live_file_path = paths.entropies_live_file;
+
+				auto s = augs::with_exceptions<std::ofstream>();
+				s.open(live_file_path, std::ios::out | std::ios::binary | std::ios::app);
+
+				augs::write_bytes(s, current_step);
+				augs::write_bytes(s, existing_entropy);
+			}
 		},
 
 		[this, &folder, &history](const auto n) -> editor_solvable_snapshot {
