@@ -82,6 +82,7 @@ void standard_solve(const logic_step step) {
 
 	crosshair_system().handle_crosshair_intents(step);
 	crosshair_system().update_base_offsets(step);
+	melee_system().initiate_and_update_moves(step);
 	sentience_system().rotate_towards_crosshairs_and_driven_vehicles(step);
 
 	gun_system().launch_shots_due_to_pressed_triggers(step);
@@ -89,7 +90,6 @@ void standard_solve(const logic_step step) {
 	car_system().set_steering_flags_from_intents(step);
 	car_system().apply_movement_forces(step);
 
-	melee_system().initiate_and_update_moves(step);
 	melee_system().advance_thrown_melee_logic(step);
 
 	force_joint_system().apply_forces_towards_target_entities(step);

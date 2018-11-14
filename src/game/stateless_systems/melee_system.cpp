@@ -19,6 +19,7 @@
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/detail/melee/like_melee.h"
 #include "game/assets/animation_math.h"
+#include "game/detail/inventory/perform_transfer.h"
 
 using namespace augs;
 
@@ -262,10 +263,19 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 							const auto& current_attack_def = melee_def.actions.at(action);
 
+							if (action == weapon_action_type::PRIMARY) {
+								const auto new_hand = it.get_first_free_hand();
+								auto request = item_slot_transfer_request::standard(typed_weapon, new_hand);
+								request.params.perform_recoils = false;
+
+								perform_transfer_no_step(request, cosm);
+							}
+							else {
+								typed_weapon.infer_colliders_from_scratch();
+							}
+
 							auto& cooldown_left_ms = elapsed_ms;
 							cooldown_left_ms = std::max(0.f, current_attack_def.cooldown_ms - total_ms);
-
-							typed_weapon.infer_colliders_from_scratch();
 						}
 					}
 

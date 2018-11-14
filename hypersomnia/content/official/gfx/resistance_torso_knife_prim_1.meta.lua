@@ -127,10 +127,10 @@ return {
       },
       secondary_shoulder = {
         pos = {
-          x = 0,
-          y = 0
+          x = 1,
+          y = 22
         },
-        rotation = 0
+        rotation = -172.87498474121094
       },
       shoulder = {
         pos = {

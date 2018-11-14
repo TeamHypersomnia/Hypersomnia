@@ -417,12 +417,16 @@ void load_test_scene_animations(
 			);
 
 			{
-				auto& anim = standard_shoot(
+				auto& anim = make_torso(
 					T::RESISTANCE_TORSO_KNIFE_PRIM_RETURN,
-					I::RESISTANCE_TORSO_KNIFE_PRIM_1
+					I::RESISTANCE_TORSO_KNIFE_PRIM_RETURN_1,
+					20.f
 				);
 
-				reverse_range(anim.frames);
+				anim.frames[1].duration_milliseconds = 30.f;
+				anim.frames[2].duration_milliseconds = 40.f;
+
+				(void)anim;
 			}
 
 			{
