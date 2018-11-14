@@ -24,7 +24,11 @@ public:
 
 	std::vector<ring> rings;
 
-	void acquire_new_rings(const std::vector<exploding_ring_input>& rings);
+	template <class C>
+	void acquire_new_rings(const C& rings);
+	
+	template <class I>
+	void acquire_new_ring(I&&);
 
 	void advance(
 		randomization& rng,

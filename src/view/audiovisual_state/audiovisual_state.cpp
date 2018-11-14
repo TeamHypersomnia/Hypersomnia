@@ -13,6 +13,7 @@
 #include "game/messages/interpolation_correction_request.h"
 
 #include "view/audiovisual_state/audiovisual_state.h"
+#include "view/audiovisual_state/systems/exploding_ring_system.hpp"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 
 #include "view/character_camera.h"
@@ -151,8 +152,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 
 	const auto& healths = step.get_queue<messages::health_event>();
 	const auto& new_thunders = step.get_queue<thunder_input>();
-	auto new_rings = step.get_queue<exploding_ring_input>();
-
+	
 	const auto& new_interpolation_corrections = step.get_queue<messages::interpolation_correction_request>();
 	auto& interp = get<interpolation_system>();
 
@@ -259,7 +259,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 					ring.color = red;
 					ring.center = h.point_of_impact;
 
-					new_rings.push_back(ring);
+					exploding_rings.acquire_new_ring(std::move(ring));
 				}
 
 				{
@@ -277,8 +277,8 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 
 					ring.color = red;
 					ring.center = h.point_of_impact;
-
-					new_rings.push_back(ring);
+					
+					exploding_rings.acquire_new_ring(std::move(ring));
 				}
 
 				{
@@ -330,7 +330,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 					ring.color = cyan;
 					ring.center = h.point_of_impact;
 
-					new_rings.push_back(ring);
+					exploding_rings.acquire_new_ring(std::move(ring));
 				}
 
 				{
@@ -349,7 +349,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 					ring.color = turquoise;
 					ring.center = h.point_of_impact;
 
-					new_rings.push_back(ring);
+					exploding_rings.acquire_new_ring(std::move(ring));
 				}
 			}
 			else {
@@ -391,7 +391,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 					ring.color = yellow;
 					ring.center = h.point_of_impact;
 
-					new_rings.push_back(ring);
+					exploding_rings.acquire_new_ring(std::move(ring));
 				}
 
 				{
@@ -410,7 +410,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 					ring.color = orange;
 					ring.center = h.point_of_impact;
 
-					new_rings.push_back(ring);
+					exploding_rings.acquire_new_ring(std::move(ring));
 				}
 			}
 			else {
@@ -447,9 +447,8 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 	for (const auto& t : new_thunders) {
 		thunders.add(rng, t);
 	}
-
-	exploding_rings.acquire_new_rings(new_rings);
-
+	
+	exploding_rings.acquire_new_rings(step.get_queue<exploding_ring_input>());
 }
 
 void audiovisual_state::standard_post_cleanup(const const_logic_step step) {

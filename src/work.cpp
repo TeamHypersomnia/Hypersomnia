@@ -1632,15 +1632,3 @@ catch (const entity_creation_error& err) {
 
 	return EXIT_FAILURE;
 }
-/* We want to know the complete stack trace if we are not in production. */
-#if IS_PRODUCTION_BUILD
-catch (const std::runtime_error& err) {
-	LOG("std::runtime_error thrown: %x", err.what());
-
-	return EXIT_FAILURE;
-}
-catch (...) {
-	LOG("Unknown exception.");
-	return EXIT_FAILURE;
-}
-#endif

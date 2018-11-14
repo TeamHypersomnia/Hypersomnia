@@ -14,17 +14,6 @@ void exploding_ring_system::clear() {
 	rings.clear();
 }
 
-void exploding_ring_system::acquire_new_rings(const std::vector<exploding_ring_input>& new_rings) {
-	rings.reserve(rings.size() + new_rings.size());
-
-	for (const auto& r : new_rings) {
-		ring n;
-		n.in = r;
-		n.time_of_occurence_seconds = global_time_seconds;
-		rings.push_back(n);
-	}
-}
-
 void exploding_ring_system::advance(
 	randomization& rng,
 	const cosmos& cosm,
