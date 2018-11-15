@@ -144,6 +144,11 @@ void physics_world_cache::specific_infer_rigid_body_from_scratch(const E& handle
 	cache.body->SetLinearDampingVec(b2Vec2(damping.linear_axis_aligned));
 
 	/*
+		Warning: given a working setup of collider and rigid body caches,
+		if rigid body now needs completely reinferring, the collider caches will be destroyed.
+		Rigid body should never be re-inferred ON ITS OWN when there is possibility 
+		that it will need to be rebuilt from scratch. 
+
 		All colliders caches, before their own inference,
 		manually infer the existence of the rigid body,
 		and the b2Body cannot henceforth disappear from existence.

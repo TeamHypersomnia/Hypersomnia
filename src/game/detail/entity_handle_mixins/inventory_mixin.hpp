@@ -287,6 +287,7 @@ void inventory_mixin<E>::infer_item_physics_recursive() const {
 	ensure(self);
 
 	self.infer_colliders();
+
 	self.for_each_contained_item_recursive([](const auto& h) {
 		h.infer_colliders();	
 	});
@@ -294,9 +295,8 @@ void inventory_mixin<E>::infer_item_physics_recursive() const {
 
 template <class E>
 void inventory_mixin<E>::infer_change_of_current_slot() const {
-	/* Synonym */
-	infer_item_physics_recursive();
-
 	const auto& self = *static_cast<const E*>(this);
 	self.infer_rigid_body();
+
+	infer_item_physics_recursive();
 }

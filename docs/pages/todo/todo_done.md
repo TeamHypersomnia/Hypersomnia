@@ -2195,3 +2195,9 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Crash on opening the editor due to snapshots being empty again... when trying to re-step for determinism
 
+- Planting the bomb crashes due to:
+	- accessing transform when there is no collider
+	- because of cache being destroyed when rigid body is inferred after colliders
+	- so either we fix the order of inferences or always infer colliders in the rigid body inferrer 
+		- prefer this until there is another problem, for an easy fix
+

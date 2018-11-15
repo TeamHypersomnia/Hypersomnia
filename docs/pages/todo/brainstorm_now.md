@@ -6,11 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Planting the bomb crashes due to:
-	- accessing transform when there is no collider
-	- because of cache being destroyed when rigid body is inferred after colliders
-	- so either we fix the order of inferences or always infer colliders in the rigid body inferrer 
-
 - Add inertia for the target rotation when we hit an obstacle
 	- Copy the lerp code from interpolation as it was mostly correct
 
