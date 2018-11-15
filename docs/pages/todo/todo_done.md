@@ -2201,3 +2201,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- so either we fix the order of inferences or always infer colliders in the rigid body inferrer 
 		- prefer this until there is another problem, for an easy fix
 
+- Add bubbles for poseidon
+

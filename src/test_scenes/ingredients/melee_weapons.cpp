@@ -197,13 +197,24 @@ namespace test_flavours {
 			cyan
 		);
 
-		make_knife(
-			test_melee_weapons::POSEIDON,
-			test_scene_image_id::POSEIDON,
-			static_cast<money_type>(350),
-			faction_type::SPECTATOR,
-			1.2f,
-			rgba(0, 200, 255, 255)
-		);
+		{
+			auto& meta = make_knife(
+				test_melee_weapons::POSEIDON,
+				test_scene_image_id::POSEIDON,
+				static_cast<money_type>(350),
+				faction_type::SPECTATOR,
+				1.2f,
+				white
+			);
+			
+			invariants::continuous_particles particles_def;
+			particles_def.effect.id = to_particle_effect_id(test_scene_particle_effect_id::POSEIDON_THROWER_TRACE);
+			particles_def.effect.modifier.colorize = rgba(0, 200, 255, 255);
+			meta.set(particles_def);
+
+			for (auto& a : meta.get<invariants::melee>().actions) {
+				a.init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::POSEIDON_THROWER_ATTACK);
+			}
+		}
 	}
 }
