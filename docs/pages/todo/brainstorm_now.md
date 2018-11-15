@@ -11,8 +11,6 @@ summary: That which we are brainstorming at the moment.
 	- because of cache being destroyed when rigid body is inferred after colliders
 	- so either we fix the order of inferences or always infer colliders in the rigid body inferrer 
 
-- Crash on opening the editor due to snapshots being empty again... when trying to re-step for determinism
-
 - Add inertia for the target rotation when we hit an obstacle
 	- Copy the lerp code from interpolation as it was mostly correct
 

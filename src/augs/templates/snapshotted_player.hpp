@@ -178,7 +178,7 @@ namespace augs {
 	template <class A, class B>
 	template <class MakeSnapshot>
 	void snapshotted_player<A, B>::push_snapshot_if_needed(MakeSnapshot&& make_snapshot, const unsigned interval_in_steps) {
-		if (is_recording()) {
+		if (is_recording() || (is_replaying() && get_current_step() == 0)) {
 			const bool is_snapshot_time = [&]() {
 				if (snapshots.empty()) {
 					ensure_eq(0, current_step);

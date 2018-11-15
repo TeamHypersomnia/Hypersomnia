@@ -2193,3 +2193,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Commandize "Add player" and "Restart" in editor
 
+- Crash on opening the editor due to snapshots being empty again... when trying to re-step for determinism
+
