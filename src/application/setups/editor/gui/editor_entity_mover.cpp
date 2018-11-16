@@ -65,7 +65,7 @@ void editor_entity_mover::start_transforming_selection(
 			active = true;
 
 			command.rotation_center = rotation_center;
-			s.folder().history.execute_new(std::move(command), s.make_command_input());
+			post_editor_command(s.make_command_input(), std::move(command));
 
 			initial_world_cursor_pos = s.find_world_cursor_pos().value().discard_fract();
 		}
@@ -108,7 +108,7 @@ void editor_entity_mover::start_resizing_selection(
 			command.reference_point = rr;
 			command.both_axes_simultaneously = both_axes_simultaneously;
 
-			s.folder().history.execute_new(std::move(command), s.make_command_input());
+			post_editor_command(s.make_command_input(), std::move(command));
 		}
 	}
 }
@@ -134,7 +134,7 @@ void editor_entity_mover::transform_selection(
 			command.rotation_center = rotation_center;
 			command.move_by = *one_shot_delta;
 
-			s.folder().history.execute_new(std::move(command), s.make_command_input());
+			post_editor_command(s.make_command_input(), std::move(command));
 		}
 	}
 }
@@ -184,7 +184,8 @@ void editor_entity_mover::flip_selection(const input_type in, const flip_flags f
 
 		if (!command.empty()) {
 			command.flip = flip;
-			s.folder().history.execute_new(std::move(command), s.make_command_input());
+
+			post_editor_command(s.make_command_input(), std::move(command));
 		}
 	}
 }
@@ -206,7 +207,7 @@ void editor_entity_mover::reset_rotation(const input_type in) {
 
 		if (!command.empty()) {
 			command.special = special_move_operation::RESET_ROTATION;
-			s.folder().history.execute_new(std::move(command), s.make_command_input());
+			post_editor_command(s.make_command_input(), std::move(command));
 		}
 	}
 }

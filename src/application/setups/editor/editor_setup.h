@@ -428,6 +428,9 @@ public:
 	editor_view_ids& view_ids();
 	const editor_view_ids& view_ids() const;
 
+	void begin_recording();
+	void begin_replaying();
+
 	void finish_and_discard();
 	void finish_and_reapply();
 };

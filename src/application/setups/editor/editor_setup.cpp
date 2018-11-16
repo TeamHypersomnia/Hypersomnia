@@ -891,7 +891,7 @@ void editor_setup::delete_selection() {
 		auto command = make_command_from_selections<delete_entities_command>("Deleted ");
 
 		if (!command.empty()) {
-			folder().history.execute_new(std::move(command), make_command_input());
+			post_editor_command(make_command_input(), std::move(command));
 			clear_id_caches();
 		}
 	}
@@ -907,12 +907,12 @@ void editor_setup::mirror_selection(const vec2i direction) {
 
 		if (!command.empty()) {
 			command.mirror_direction = direction;
-			folder().history.execute_new(std::move(command), make_command_input());
-		}
+			post_editor_command(make_command_input(), std::move(command));
 
-		if (only_duplicating) {
-			mover.start_moving_selection(make_mover_input());
-			make_last_command_a_child();
+			if (only_duplicating) {
+				mover.start_moving_selection(make_mover_input());
+				make_last_command_a_child();
+			}
 		}
 	}
 }
@@ -927,7 +927,7 @@ void editor_setup::group_selection() {
 
 		if (!command.empty()) {
 			command.all_to_new_group = true;
-			folder().history.execute_new(std::move(command), make_command_input());
+			post_editor_command(make_command_input(), std::move(command));
 		}
 	}
 }
@@ -937,7 +937,7 @@ void editor_setup::ungroup_selection() {
 		auto command = make_command_from_selections<change_grouping_command>("Ungrouped ");
 
 		if (!command.empty()) {
-			folder().history.execute_new(std::move(command), make_command_input());
+			post_editor_command(make_command_input(), std::move(command));
 		}
 	}
 }
@@ -1365,8 +1365,8 @@ bool editor_setup::handle_input_before_game(
 						return true;
 					case key::A: view().toggle_ignore_groups(); return true;
 					case key::Z: center_view_at_selection(); return true;
-					case key::I: player().begin_recording(folder()); return true;
-					case key::L: player().begin_replaying(folder()); return true;
+					case key::I: begin_recording(); return true;
+					case key::L: begin_replaying(); return true;
 					case key::G: view().toggle_grid(); return true;
 					case key::S: view().toggle_snapping(); return true;
 					case key::OPEN_SQUARE_BRACKET: view().grid.decrease_grid_size(); clamp_units(); return true;
@@ -2056,6 +2056,16 @@ editor_view_ids& editor_setup::view_ids() {
 
 const editor_view_ids& editor_setup::view_ids() const {
 	return folder().commanded->view_ids;
+}
+
+void editor_setup::begin_recording() {
+	mover.escape();
+	player().begin_recording(folder());
+}
+
+void editor_setup::begin_replaying() {
+	mover.escape();
+	player().begin_replaying(folder());
 }
 
 template struct augs::marks<camera_eye>;
