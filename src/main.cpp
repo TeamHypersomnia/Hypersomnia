@@ -46,16 +46,17 @@ int main(const int argc, const char* const * const argv) {
 			case EXIT_SUCCESS: 
 				augs::save_as_text(LOG_FILES_DIR "/exit_success_debug_log.txt", logs); 
 				break;
-			case EXIT_FAILURE: 
-				{
-					const auto failure_log_path = augs::path_type(LOG_FILES_DIR "/exit_failure_debug_log.txt");
-					augs::save_as_text(failure_log_path, logs);
-					
-					augs::open_text_editor(failure_log_path.string());
-				}
+			case EXIT_FAILURE: {
+				const auto failure_log_path = augs::path_type(LOG_FILES_DIR "/exit_failure_debug_log.txt");
+				augs::save_as_text(failure_log_path, logs);
+				
+				augs::open_text_editor(failure_log_path.string());
 
 				break;
-			default: break;
+			}
+
+			default: 
+				break;
 		}
 	}
 

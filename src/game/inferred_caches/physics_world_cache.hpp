@@ -323,7 +323,7 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 			fixdef.shape = &ps;
 			b2Fixture* const new_fix = owner_b2Body.CreateFixture(&fixdef);
 
-			ensure(static_cast<short>(ci) < std::numeric_limits<short>::max());
+			ensure_less(static_cast<short>(ci), std::numeric_limits<short>::max());
 			new_fix->index_in_component = static_cast<short>(ci++);
 
 			constructed_fixtures.emplace_back(new_fix);
@@ -367,8 +367,8 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		return;
 	}
 
-	if (const auto* const sprite = handle.template find<invariants::sprite>()) {
-		const auto& offsets = cosm.get_logical_assets().get_offsets(sprite->image_id);
+	if (const auto image_id = handle.get_image_id(); image_id.is_set()) {
+		const auto& offsets = cosm.get_logical_assets().get_offsets(image_id);
 
 		if (const auto& shape = offsets.non_standard_shape; !shape.empty()) {
 			from_convex_partition(shape);
@@ -406,7 +406,7 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		return;
 	}
 
-	ensure(false && "fixtures requested with no shape attached!");
+	ensure(false && "Fixtures requested with no shape defined! Maybe the entity has no image specified?");
 }
 
 

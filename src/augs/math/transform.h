@@ -259,3 +259,9 @@ namespace std {
 		}
 	};
 }
+
+template <class type>
+template <class T>
+basic_vec2<type>& basic_vec2<type>::rotate(const basic_transform<T>& t) {
+	return rotate(t.rotation, t.pos);
+}

@@ -83,7 +83,7 @@ void editor_setup::for_each_dashed_line(F&& callback) const {
 				});
 
 				if (is_mover_active()) {
-					handle.dispatch_on_having_all<components::overridden_geo>([&](const auto typed_handle) {
+					handle.dispatch_on_having_all<components::overridden_geo>([&](const auto& typed_handle) {
 						const auto s = typed_handle.get_logical_size();
 						const auto tr = typed_handle.get_logic_transform();
 
@@ -95,7 +95,7 @@ void editor_setup::for_each_dashed_line(F&& callback) const {
 							const auto edges = ltrb::center_and_size(tr.pos, s).make_edges();
 
 							auto draw_edge = [&](auto e) {
-								callback(e[0].mult(tr), e[1].mult(tr), red, global_time_seconds * 8, true);
+								callback(e[0].rotate(tr), e[1].rotate(tr), red, global_time_seconds * 8, true);
 							};
 
 							if (active.top) {

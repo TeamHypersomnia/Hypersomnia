@@ -25,6 +25,9 @@ template <class T>
 const std::string& get_type_name();
 
 template <class type>
+struct basic_transform;
+
+template <class type>
 struct basic_vec2 {
 	using coordinate_type = type;
 	using segment_type = std::array<basic_vec2, 2>;
@@ -511,9 +514,7 @@ struct basic_vec2 {
 	}
 
 	template <class T>
-	auto& mult(const T& transform) {
-		return rotate(transform.rotation, transform.pos);
-	}
+	basic_vec2<type>& rotate(const basic_transform<T>&); 
 
 	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
 	bool x_non_zero(const real eps = AUGS_EPSILON<real>) const {
