@@ -54,4 +54,8 @@ public:
 		const const_entity_handle subject,
 		const transformr updated_value
 	);
+
+	bool is_enabled() const {
+		return enabled;
+	}
 };

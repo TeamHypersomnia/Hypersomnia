@@ -134,7 +134,7 @@ void standard_explosion_input::instantiate(
 			damaging_triangle,
 			filters[predefined_filter_type::WALL],
 			[&](
-				const b2Fixture* const fix,
+				const b2Fixture& fix,
 				const vec2 point_a,
 				const vec2 point_b
 			) {
@@ -165,7 +165,7 @@ void standard_explosion_input::instantiate(
 					b2CircleShape shape;
 					shape.m_radius = si.get_meters(effective_radius);
 
-					if (const auto result = shape_overlaps_fixture(&shape, si, explosion_pos, *fix)) {
+					if (const auto result = shape_overlaps_fixture(&shape, si, explosion_pos, fix)) {
 						return true;
 					}
 
@@ -230,7 +230,7 @@ void standard_explosion_input::instantiate(
 			explosion_location.to<b2Transform>(si),
 			filters[predefined_filter_type::CHARACTER],
 			[&](
-				const b2Fixture* const fix,
+				const b2Fixture& fix,
 				const vec2,
 				const vec2
 			) {

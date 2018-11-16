@@ -304,13 +304,13 @@ void visibility_system::calc_visibility(
 		physics.for_each_in_aabb_meters(
 			aabb, 
 			request.filter,
-			[&](const b2Fixture* const f) {
+			[&](const b2Fixture& f) {
 				if (get_body_entity_that_owns(f) == Userdata(ignored_entity)) {
 					return callback_result::CONTINUE;
 				}
 
-				const auto& shape = *f->m_shape;
-				const auto xf = f->GetBody()->GetTransform();
+				const auto& shape = *f.m_shape;
+				const auto xf = f.GetBody()->GetTransform();
 				const auto eye_local = vec2(b2MulT(xf.q, eye_meters.operator b2Vec2() - xf.p));
 
 				if (shape.GetType() == b2Shape::e_polygon) {

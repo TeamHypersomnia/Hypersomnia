@@ -45,5 +45,8 @@ namespace augs {
 		enum_bitset(Args... setters) : base() {
 			[](auto...) {}(set(std::forward<Args>(setters))...);
 		}
+
+		explicit enum_bitset(const unsigned long l) : base(l) {}
+		explicit enum_bitset(const unsigned long long l) : base(l) {}
 	};
 }

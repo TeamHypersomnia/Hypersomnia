@@ -211,11 +211,25 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 	}
 
 	if (previous_transform && !is_direct_listener) {
-		const auto displacement = current_transform - *previous_transform;
+		const bool interp_enabled = in.interp.is_enabled();
+
+		const auto effective_velocity = [&]() {
+			const auto displacement = current_transform.pos - previous_transform->pos;
+
+			if (interp_enabled) {
+				return displacement * in.dt.in_steps_per_second();
+			}
+
+			return displacement * cosm.get_fixed_delta().in_steps_per_second();
+		}();
+
 		previous_transform = current_transform;
 
-		const auto effective_velocity = displacement.pos * in.dt.in_seconds();
-		source.set_velocity(si, effective_velocity);
+		if (interp_enabled || when_set_velocity != cosm.get_timestamp()) {
+			source.set_velocity(si, effective_velocity);
+		}
+
+		when_set_velocity = cosm.get_timestamp();
 	}
 
 	const auto& input = original.input;

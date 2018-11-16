@@ -317,7 +317,7 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 			contribute_to_damage(amount);
 			health.value -= amount;
 
-			ensure(health.value >= 0);
+			ensure_geq(health.value, 0);
 
 			sentience.time_of_last_received_damage = cosm.get_timestamp();
 

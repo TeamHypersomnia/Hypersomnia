@@ -24,6 +24,7 @@ enum class filter_category {
 
 namespace predefined_queries {
 	filter_type line_of_sight();
+	filter_type melee_query();
 	filter_type crosshair_laser();
 	filter_type pathfinding();
 	filter_type renderable();

@@ -38,7 +38,7 @@ void for_each_in_aabb_meters(
 
 		bool ReportFixture(b2Fixture* fixture) override {
 			if (b2ContactFilter::ShouldCollide(&filter, &fixture->GetFilterData())) {
-				return call(fixture) == callback_result::CONTINUE;
+				return call(*fixture) == callback_result::CONTINUE;
 			}
 
 			return true;
@@ -73,17 +73,17 @@ void for_each_intersection_with_shape_meters(
 		b2world,
 		shape_aabb,
 		filter,
-		[&](const b2Fixture* const fixture) -> callback_result {
+		[&](const b2Fixture& fixture) -> callback_result {
 			constexpr auto index_a = 0;
 			constexpr auto index_b = 0;
 
 			const auto result = b2TestOverlapInfo(
 				&shape,
 				index_a,
-				fixture->GetShape(),
+				fixture.GetShape(),
 				index_b,
 				queried_shape_transform,
-				fixture->GetBody()->GetTransform()
+				fixture.GetBody()->GetTransform()
 			);
 
 			if (result.overlap) {
@@ -225,10 +225,10 @@ void for_each_intersection_with_polygon(
 	);
 }
 
-inline auto get_body_entity_that_owns(const b2Fixture* const f) {
-	return f->GetBody()->GetUserData();
+inline auto get_body_entity_that_owns(const b2Fixture& f) {
+	return f.GetBody()->GetUserData();
 }
 
-inline auto get_entity_that_owns(const b2Fixture* const f) {
-	return f->GetUserData();
+inline auto get_entity_that_owns(const b2Fixture& f) {
+	return f.GetUserData();
 }

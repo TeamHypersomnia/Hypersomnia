@@ -20,6 +20,11 @@
 #include "game/detail/melee/like_melee.h"
 #include "game/assets/animation_math.h"
 #include "game/detail/inventory/perform_transfer.h"
+#include "augs/math/convex_hull.h"
+#include "game/enums/filters.h"
+#include "game/detail/physics/physics_queries.h"
+#include "augs/misc/enum/enum_bitset.h"
+#include "game/messages/damage_message.h"
 
 using namespace augs;
 
@@ -56,6 +61,10 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	const auto& dt = step.get_delta();
 	const auto anims = cosm.get_logical_assets().plain_animations;
+
+	std::vector<vec2> total_verts;
+	const auto si = cosm.get_si();
+	const auto& physics = cosm.get_solvable_inferred().physics;
 
 	cosm.for_each_having<components::melee_fighter>([&](const auto& it) {
 		const auto& fighter_def = it.template get<invariants::melee_fighter>();
@@ -118,6 +127,8 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 					state = melee_fighter_state::IN_ACTION;
 					fighter.action = chosen_action;
+					fighter.hit_obstacles.clear();
+					fighter.hit_others.clear();
 
 					const auto& current_attack_def = melee_def.actions.at(chosen_action);
 
@@ -213,11 +224,131 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 				const auto prev_index = anim_state.frame_num;
 
+				auto detect_damage = [&](
+					const transformr& from,
+					const transformr& to
+				) {
+					const auto impact_velocity = (to.pos - from.pos) * dt.in_steps_per_second();
+
+					const auto image_id = typed_weapon.get_image_id();
+					const auto& offsets = cosm.get_logical_assets().get_offsets(image_id);
+
+					if (const auto& shape = offsets.non_standard_shape; !shape.empty()) {
+						total_verts.clear();
+
+						for (auto h : shape.original_poly) {
+							h.mult(from);
+							total_verts.emplace_back(h);
+						}
+
+						for (auto h : shape.original_poly) {
+							h.mult(to);
+							total_verts.emplace_back(h);
+						}
+
+						const auto subject_id = entity_id(it.get_id());
+
+						auto detect_on = [&](const auto& convex) {
+							const auto shape = to_polygon_shape(convex, si);
+							const auto filter = predefined_queries::melee_query();
+
+							auto handle_intersection = [&](
+								const b2Fixture& fix,
+								const vec2 point_a,
+								const vec2 point_b
+							) {
+								(void)point_a;
+								const auto& point_of_impact = point_b;
+
+								const auto body_entity = cosm[get_body_entity_that_owns(fix)];
+								const auto body_entity_id = body_entity.get_id();
+
+								const bool is_self = 
+									body_entity_id == subject_id
+									|| body_entity.get_owning_transfer_capability() == subject_id
+								;
+
+								if (is_self) {
+									return callback_result::CONTINUE;
+								}
+
+								const auto hit_filter = fix.GetFilterData();
+								const auto bs = augs::enum_bitset<filter_category>(static_cast<unsigned long>(hit_filter.categoryBits));
+
+								const bool is_solid_obstacle = 
+									bs.test(filter_category::WALL)
+									|| bs.test(filter_category::GLASS_OBSTACLE)
+								;
+
+								const bool is_sentient = body_entity.template has<components::sentience>();
+
+								auto& already_hit = [&]() -> auto& {
+									if (is_sentient || is_solid_obstacle) {
+										return fighter.hit_obstacles;
+									}
+
+									return fighter.hit_others;
+								}();
+
+								if (already_hit.size() < already_hit.max_size()) {
+									const bool is_yet_unaffected = !found_in(already_hit, body_entity_id);
+
+									if (is_yet_unaffected) {
+										already_hit.emplace_back(body_entity_id);
+
+										messages::damage_message damage_msg;
+
+										damage_msg.type = adverse_element_type::FORCE;
+										damage_msg.origin = damage_origin(typed_weapon);
+										damage_msg.subject = body_entity;
+										damage_msg.impact_velocity = impact_velocity;
+										damage_msg.point_of_impact = point_of_impact;
+
+										step.post_message(damage_msg);
+									}
+								}
+
+								return callback_result::CONTINUE;
+							};
+
+							physics.for_each_intersection_with_polygon(
+								si,
+								convex,
+								filter,
+								handle_intersection
+							);
+						};
+
+						const auto max_v = b2_maxPolygonVertices;
+						auto hull = augs::convex_hull(total_verts);
+
+						/* Double-duty */
+						auto& acceptable = total_verts;
+						acceptable.clear();
+
+						while (hull.size() > max_v) {
+							acceptable.assign(hull.begin(), hull.begin() + max_v);
+							hull.erase(hull.begin() + 1, hull.begin() + max_v - 1);
+
+							detect_on(acceptable);
+						}
+
+						detect_on(hull);
+					}
+					else {
+						ensure(false && "A knife is required to have a non-standard shape defined.");
+					}
+				};
+
 				auto infer_if_different_frames = [&]() {
 					const auto next_index = anim_state.frame_num;
 
 					if (next_index != prev_index) {
+						const auto damage_from = typed_weapon.get_logic_transform();
 						typed_weapon.infer_colliders_from_scratch();
+						const auto damage_to = typed_weapon.get_logic_transform();
+
+						detect_damage(damage_from, damage_to);
 
 						return true;
 					}

@@ -176,15 +176,15 @@ void physics_world_cache::reserve_caches_for_entities(const size_t n) {
 }
 
 b2Fixture_index_in_component physics_world_cache::get_index_in_component(
-	const b2Fixture* const f, 
+	const b2Fixture& f, 
 	const const_entity_handle& handle
 ) const {
-	ensure(f->index_in_component != -1);
+	ensure(f.index_in_component != -1);
 
 	b2Fixture_index_in_component result;
-	result.convex_shape_index = static_cast<std::size_t>(f->index_in_component);
+	result.convex_shape_index = static_cast<std::size_t>(f.index_in_component);
 
-	ensure_eq(f, find_colliders_cache(handle.get_id())->constructed_fixtures[result.convex_shape_index].get());
+	ensure_eq(std::addressof(f), find_colliders_cache(handle.get_id())->constructed_fixtures[result.convex_shape_index].get());
 
 	return result;
 }

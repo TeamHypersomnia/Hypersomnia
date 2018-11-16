@@ -79,7 +79,7 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 			cosm.get_si(),
 			camera_aabb.get_vertices<real32>(),
 			predefined_queries::renderable(),
-			[&](const b2Fixture* const fix, auto, auto) {
+			[&](const b2Fixture& fix, auto, auto) {
 				const auto owning_entity_id = cosm.get_versioned(get_entity_that_owns(fix));
 
 				if (::passes_filter(input.filter, cosm, owning_entity_id)) {
@@ -94,7 +94,7 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 		physics.for_each_in_camera(
 			cosm.get_si(),
 			camera,
-			[&](const b2Fixture* const fix) {
+			[&](const b2Fixture& fix) {
 				const auto owning_entity_id = cosm.get_versioned(get_entity_that_owns(fix));
 				const auto handle = cosm[owning_entity_id];
 

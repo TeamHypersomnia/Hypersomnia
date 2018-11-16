@@ -100,6 +100,10 @@ struct basic_transform {
 		return pos == b.pos && rotation == b.rotation;
 	}
 
+	bool operator!=(const transform& b) const {
+		return !operator==(b);
+	}
+
 	auto interp(
 		const transform next,
 		const R alpha

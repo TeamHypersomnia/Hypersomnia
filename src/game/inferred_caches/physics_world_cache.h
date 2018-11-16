@@ -191,7 +191,7 @@ public:
 	}
 
 	b2Fixture_index_in_component get_index_in_component(
-		const b2Fixture* const f, 
+		const b2Fixture& f, 
 		const const_entity_handle&
 	) const;
 

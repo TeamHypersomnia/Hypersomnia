@@ -416,8 +416,8 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 			}
 		}
 
-		msg.indices.subject = sys.get_index_in_component(fix_a, subject);
-		msg.indices.collider = sys.get_index_in_component(fix_b, collider);
+		msg.indices.subject = sys.get_index_in_component(*fix_a, subject);
+		msg.indices.collider = sys.get_index_in_component(*fix_b, collider);
 
 		msg.normal = si.get_pixels(manifold.normal);
 		msg.point = manifold.points[0];
@@ -466,8 +466,8 @@ void contact_listener::PostSolve(b2Contact* contact, const b2ContactImpulse* imp
 		ensure(subject.alive());
 		ensure(collider.alive());
 
-		msg.indices.subject = sys.get_index_in_component(fix_a, subject);
-		msg.indices.collider = sys.get_index_in_component(fix_b, collider);
+		msg.indices.subject = sys.get_index_in_component(*fix_a, subject);
+		msg.indices.collider = sys.get_index_in_component(*fix_b, collider);
 
 		msg.point = manifold.points[0];
 		msg.point = si.get_pixels(msg.point);

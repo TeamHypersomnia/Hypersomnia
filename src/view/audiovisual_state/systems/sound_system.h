@@ -14,6 +14,7 @@
 
 #include "view/audiovisual_state/systems/audiovisual_cache_common.h"
 #include "view/viewables/all_viewables_declaration.h"
+#include "augs/misc/timing/stepped_timing.h"
 
 struct character_camera;
 class interpolation_system;
@@ -45,6 +46,7 @@ class sound_system {
 
 		/* For calculating sound's velocity */
 		std::optional<transformr> previous_transform;
+		augs::stepped_timestamp when_set_velocity;
 
 		std::vector<sound_effect_input> followup_inputs;
 

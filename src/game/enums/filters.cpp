@@ -36,7 +36,14 @@ namespace predefined_queries {
 	b2Filter crosshair_laser() {
 		b2Filter out;
 		out.categoryBits = make_flags(C::QUERY);
-		out.maskBits = make_flags(C::WALL);
+		out.maskBits = make_flags(C::WALL, C::GLASS_OBSTACLE, C::CHARACTER);
+		return out;
+	}
+
+	b2Filter melee_query() {
+		b2Filter out;
+		out.categoryBits = make_flags(C::QUERY);
+		out.maskBits = make_flags(C::WALL, C::GLASS_OBSTACLE, C::CHARACTER, C::LYING_ITEM);
 		return out;
 	}
 

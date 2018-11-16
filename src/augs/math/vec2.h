@@ -516,6 +516,15 @@ struct basic_vec2 {
 	template <class T>
 	basic_vec2<type>& rotate(const basic_transform<T>&); 
 
+	template <class T>
+	basic_vec2<type>& mult(const T& t) {
+		rotate(t.rotation);
+
+		x += t.pos.x;
+		y += t.pos.y;
+		return *this;
+	}
+
 	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
 	bool x_non_zero(const real eps = AUGS_EPSILON<real>) const {
 		return std::abs(x) > eps;
