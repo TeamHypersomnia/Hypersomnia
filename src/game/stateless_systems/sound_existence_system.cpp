@@ -121,6 +121,21 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			);
 		}
 
+		for (auto& r : g.spawned_rounds) {
+			const auto spawned_round = cosm[r];
+
+			{
+				if (const auto missile = spawned_round.find<invariants::missile>()) {
+					const auto& effect = missile->trace_sound;
+
+					auto start = sound_effect_start_input::at_entity(cosm[r]);
+					start.clear_when_target_dead = true;
+
+					effect.start(step, start);
+				}
+			}
+		}
+
 		{
 
 			const auto cued_count = gun_def.num_last_bullets_to_trigger_low_ammo_cue;
