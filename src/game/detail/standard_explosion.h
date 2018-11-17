@@ -10,16 +10,16 @@
 #include "game/cosmos/entity_id_declaration.h"
 #include "game/enums/adverse_element_type.h"
 #include "game/detail/sentience_shake.h"
+#include "game/detail/damage/damage_definition.h"
 
 struct damage_cause;
 
 struct standard_explosion_input {
 	// GEN INTROSPECTOR struct standard_explosion_input
-	float effective_radius = 250.f;
-	meter_value_type damage = 88;
-	float impact_impulse = 150.f;
+	real32 effective_radius = 250.f;
 
-	sentience_shake victim_shake;
+	damage_definition damage;
+
 	sentience_shake subject_shake;
 
 	rgba inner_ring_color = cyan;
@@ -33,11 +33,8 @@ struct standard_explosion_input {
 	// END GEN INTROSPECTOR
 
 	auto& operator*=(const real32 scalar) {
-		effective_radius *= scalar;
 		damage *= scalar;
-		impact_impulse *= scalar;
-
-		victim_shake *= scalar;
+		effective_radius *= scalar;
 		subject_shake *= scalar;
 		return *this;
 	}

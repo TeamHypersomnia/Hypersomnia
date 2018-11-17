@@ -221,6 +221,17 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			continue;
 		}
 
+		if (subject.has<components::item>()) {
+			if (const auto capability = subject.get_owning_transfer_capability()) {
+				d.damage.pass_through_held_item_sound.start(
+					step,
+					sound_effect_start_input::fire_and_forget( { d.point_of_impact, 0.f } ).set_listener(capability)
+				);
+
+				return;
+			}
+		}
+
 		{
 			auto do_effect = [&](const auto& effect_def) {
 				effect_def.sound.start(
@@ -231,21 +242,21 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 
 			const bool sentient = subject.has<components::sentience>();
 
-			const auto& def = d.effects;
+			const auto& e = d.damage.effects;
 
 			if (d.inflictor_destructed) {
-				do_effect(def.destruction);
+				do_effect(e.destruction);
 
 				if (sentient) {
-					do_effect(def.sentience_impact);
+					do_effect(e.sentience_impact);
 				}
 			}
 			else {
 				if (sentient) {
-					do_effect(def.sentience_impact);
+					do_effect(e.sentience_impact);
 				}
 				else {
-					do_effect(def.impact);
+					do_effect(e.impact);
 				}
 			}
 		}
@@ -255,7 +266,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 
 			if (const auto* const mat = logicals.find(fixtures.material)) {
 				const auto unit = mat->unit_effect_damage;
-				const auto mult = d.amount / unit;
+				const auto mult = d.damage.base / unit;
 				
 				auto effect = mat->standard_damage_sound;
 				effect.modifier.gain = std::min(1.f, mult);

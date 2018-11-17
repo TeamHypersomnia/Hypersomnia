@@ -1,4 +1,6 @@
 #pragma once
+#include "game/detail/view_input/sound_effect_input.h"
+#include "game/detail/view_input/particle_effect_input.h"
 
 struct impact_effect_def {
 	// GEN INTROSPECTOR struct impact_effect_def
@@ -29,5 +31,13 @@ struct damage_definition {
 
 	sound_effect_input pass_through_held_item_sound;
 	// END GEN INTROSPECTOR
+
+	template <class T>
+	auto& operator*=(const T& scalar) {
+		base *= scalar;
+		shake *= scalar;
+		impact_impulse *= scalar;
+		return *this;
+	}
 };
 

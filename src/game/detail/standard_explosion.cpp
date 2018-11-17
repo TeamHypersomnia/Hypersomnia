@@ -140,14 +140,14 @@ void standard_explosion_input::instantiate(
 			) {
 				(void)point_a;
 
-				const auto body_entity_id = get_body_entity_that_owns(fix);
-				const auto body_entity = cosm[body_entity_id];
+				const auto victim_id = get_entity_that_owns(fix);
+				const auto victim = cosm[victim_id];
 
 				const bool is_self = 
 					subject_alive
 					&& (
-						body_entity_id == FixtureUserdata(subject.get_id())
-						|| body_entity.get_owning_transfer_capability() == subject.get_id()
+						victim_id == FixtureUserdata(subject.get_id())
+						|| victim.get_owning_transfer_capability() == subject.get_id()
 					)
 				;
 
@@ -155,7 +155,7 @@ void standard_explosion_input::instantiate(
 					return callback_result::CONTINUE;
 				}
 
-				const bool is_explosion_body = body_entity.has<components::cascade_explosion>();
+				const bool is_explosion_body = victim.has<components::cascade_explosion>();
 
 				if (is_explosion_body) {
 					return callback_result::CONTINUE;
@@ -175,43 +175,23 @@ void standard_explosion_input::instantiate(
 				const bool should_be_affected = in_range;
 
 				if (should_be_affected) {
-					const auto it = affected_entities_of_bodies.insert(body_entity_id);
+					const auto it = affected_entities_of_bodies.insert(victim_id);
 					const bool is_yet_unaffected = it.second;
 
 					if (is_yet_unaffected) {
-						const auto& affected_physics = body_entity.get<components::rigid_body>();
-						const auto affected_physics_mass_pos = affected_physics.get_mass_position();
-
-						const auto center_offset = (point_b - affected_physics_mass_pos) * 0.8f;
-
 						messages::damage_message damage_msg;
 						damage_msg.type = this->type;
 						damage_msg.origin.cause = cause;
 						damage_msg.origin.copy_sender_from(subject);
-						damage_msg.subject = body_entity;
-						damage_msg.amount = damage;
+						damage_msg.subject = victim;
+						damage_msg.damage = damage;
 						damage_msg.impact_velocity = (point_b - explosion_pos).normalize();
 						damage_msg.point_of_impact = point_b;
-						damage_msg.victim_shake = victim_shake;
 
 						if (type == adverse_element_type::INTERFERENCE) {
 							// TODO: move this calculation after refactoring sentience system to not use messages?
-							damage_msg.amount += damage_msg.amount * body_entity.get_effective_velocity().length() / 400.f;
-						}
-
-						if (!augs::is_epsilon(impact_impulse)) {
-							const auto impulse = damage_msg.impact_velocity * impact_impulse;
-							damage_msg.impact_velocity = impulse;
-
-							affected_physics.apply_impulse(impulse, center_offset);
-
-							if (DEBUG_DRAWING.draw_explosion_forces) {
-								DEBUG_PERSISTENT_LINES.emplace_back(
-									cyan,
-									affected_physics_mass_pos + center_offset,
-									affected_physics_mass_pos + center_offset + impulse
-								);
-							}
+							auto& amount = damage_msg.damage.base;
+							amount *= 1 + victim.get_effective_velocity().length() / 400.f;
 						}
 
 						step.post_message(damage_msg);
@@ -234,15 +214,15 @@ void standard_explosion_input::instantiate(
 				const vec2,
 				const vec2
 			) {
-				const auto body_entity_id = get_body_entity_that_owns(fix);
-				const auto it = affected_entities_of_bodies.insert(body_entity_id);
+				const auto victim_id = get_body_entity_that_owns(fix);
+				const auto it = affected_entities_of_bodies.insert(victim_id);
 				const bool is_yet_unaffected = it.second;
 
 				if (is_yet_unaffected) {
-					const auto body_entity = cosm[body_entity_id];
+					const auto victim = cosm[victim_id];
 
-					if (const auto sentience = body_entity.find<components::sentience>()) {
-						auto lesser_shake = victim_shake;
+					if (const auto sentience = victim.find<components::sentience>()) {
+						auto lesser_shake = damage.shake;
 						lesser_shake *= 0.4f;
 						lesser_shake.apply(now, *sentience);
 					}

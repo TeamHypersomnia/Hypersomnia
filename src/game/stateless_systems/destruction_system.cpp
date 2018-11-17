@@ -33,7 +33,6 @@ void destruction_system::generate_damages_from_forceful_collisions(const logic_s
 
 			damage_msg.origin = damage_origin(cosm[it.collider]);
 			damage_msg.subject = it.subject;
-			damage_msg.amount = 0.f;
 			damage_msg.impact_velocity = it.collider_impact_velocity;
 			damage_msg.point_of_impact = it.point;
 

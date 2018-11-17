@@ -35,6 +35,7 @@
 #include "game/detail/weapon_like.h"
 #include "game/detail/sentience/sentience_logic.h"
 #include "game/detail/crosshair_math.hpp"
+#include "game/detail/sentience/sentience_getters.h"
 
 damage_cause::damage_cause(const const_entity_handle& handle) {
 	entity = handle;
@@ -380,6 +381,26 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 
 	for (const auto& d : damages) {
 		const auto subject = cosm[d.subject];
+		const auto& def = d.damage;
+		const auto& amount = def.base;
+
+		{
+			auto considered_impulse = def.impact_impulse;
+
+			if (considered_impulse > 0.f) {
+				if (sentient_and_vulnerable(subject)) {
+					considered_impulse *= def.impulse_multiplier_against_sentience;
+				}
+
+				const auto subject_of_impact = subject.get_owner_of_colliders().template get<components::rigid_body>();
+				const auto subject_of_impact_mass_pos = subject_of_impact.get_mass_position(); 
+
+				const auto impact = vec2(d.impact_velocity).set_length(considered_impulse);
+
+				LOG_NVPS(impact, d.point_of_impact - subject_of_impact_mass_pos);
+				subject_of_impact.apply_impulse(impact, d.point_of_impact - subject_of_impact_mass_pos);
+			}
+		}
 
 		auto* const sentience = subject.find<components::sentience>();
 
@@ -423,10 +444,10 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 			if (d.type == adverse_element_type::FORCE && health.is_enabled()) {
 				auto event = event_template;
 
-				auto after_shield_damage = d.amount;
+				auto after_shield_damage = amount;
 
 				if (is_shield_enabled) {
-					after_shield_damage = apply_ped(d.amount).excessive;
+					after_shield_damage = apply_ped(amount).excessive;
 				}
 
 				if (after_shield_damage > 0) {
@@ -445,11 +466,11 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 			else if (d.type == adverse_element_type::INTERFERENCE && consciousness.is_enabled()) {
 				auto event = event_template;
 
-				auto after_shield_damage = d.amount;
+				auto after_shield_damage = amount;
 
 				if (is_shield_enabled) {
 					constexpr meter_value_type absorption_by_shield_mult = 2;
-					after_shield_damage = absorption_by_shield_mult * apply_ped(d.amount / absorption_by_shield_mult).excessive;
+					after_shield_damage = absorption_by_shield_mult * apply_ped(amount / absorption_by_shield_mult).excessive;
 				}
 
 				if (after_shield_damage > 0) {
@@ -467,15 +488,15 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 
 			else if (d.type == adverse_element_type::PED && personal_electricity.is_enabled()) {
 				if (is_shield_enabled) {
-					apply_ped(static_cast<meter_value_type>(d.amount * 2.5));
+					apply_ped(static_cast<meter_value_type>(amount * 2.5));
 				}
 				else {
-					apply_ped(d.amount);
+					apply_ped(amount);
 				}
 			}
 		}
 
-		if (d.victim_shake.any()) {
+		if (d.damage.shake.any()) {
 			if (auto* const head = subject.find<components::head>()) {
 				if (const auto* const crosshair = subject.find_crosshair()) {
 					const auto recoil_amount = crosshair->recoil.rotation;
@@ -495,7 +516,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 
 					const auto mult = sentience_def.aimpunch_mult;
 
-					auto considered_shake = d.victim_shake;
+					auto considered_shake = d.damage.shake;
 					considered_shake *= mult;
 					considered_shake.apply(now, sentience);
 				});

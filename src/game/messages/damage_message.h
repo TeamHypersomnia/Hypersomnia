@@ -11,13 +11,11 @@
 namespace messages {
 	struct damage_message : public message {
 		bool inflictor_destructed = false;
-		meter_value_type amount = 0;
-		sentience_shake victim_shake;
+		damage_definition damage;
 		damage_origin origin;
 		vec2 impact_velocity;
 		vec2 point_of_impact;
 		adverse_element_type type = adverse_element_type::FORCE;
-		damage_effects effects;
 
 		b2Fixture_indices indices;
 	};

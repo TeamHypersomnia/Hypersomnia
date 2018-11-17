@@ -64,17 +64,21 @@ namespace test_flavours {
 			invariants::explosive explosive; 
 
 			auto& in = explosive.explosion;
+			auto& dmg = in.damage;
+
 			in.type = adverse_element_type::FORCE;
-			in.damage = 88.f;
+			dmg.base = 88.f;
 			in.inner_ring_color = red;
 			in.outer_ring_color = orange;
 			in.effective_radius = 300.f;
-			in.impact_impulse = 550.f;
+			dmg.impact_impulse = 550.f;
+			dmg.impulse_multiplier_against_sentience = 1.f;
 			in.sound_gain = 1.8f;
 			in.sound_effect = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
 
-			in.victim_shake.duration_ms = 500.f;
-			in.victim_shake.mult = 1.2f;
+			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+			dmg.shake.duration_ms = 500.f;
+			dmg.shake.mult = 1.2f;
 
 			meta.set(explosive);
 		}
@@ -113,18 +117,21 @@ namespace test_flavours {
 			invariants::explosive explosive; 
 
 			auto& in = explosive.explosion;
+			auto& dmg = in.damage;
 
-			in.damage = 100.f;
+			dmg.base = 100.f;
 			in.inner_ring_color = yellow;
 			in.outer_ring_color = orange;
 			in.effective_radius = 450.f;
-			in.impact_impulse = 2.f;
+			dmg.impact_impulse = 2.f;
+			dmg.impulse_multiplier_against_sentience = 1.f;
 			in.sound_gain = 2.2f;
 			in.sound_effect = to_sound_id(test_scene_sound_id::INTERFERENCE_EXPLOSION);
 			in.type = adverse_element_type::INTERFERENCE;
 
-			in.victim_shake.duration_ms = 800.f;
-			in.victim_shake.mult = 1.5f;
+			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+			dmg.shake.duration_ms = 800.f;
+			dmg.shake.mult = 1.5f;
 
 			meta.set(explosive);
 		}
@@ -165,35 +172,42 @@ namespace test_flavours {
 			invariants::explosive explosive; 
 
 			auto& in = explosive.explosion;
-			in.damage = 88.f;
+			auto& dmg = in.damage;
+
+			dmg.base = 88.f;
 			in.inner_ring_color = cyan;
 			in.outer_ring_color = turquoise;
 			in.effective_radius = 350.f;
-			in.impact_impulse = 2.f;
+			dmg.impact_impulse = 2.f;
+			dmg.impulse_multiplier_against_sentience = 1.f;
 			in.sound_gain = 2.2f;
 			in.sound_effect = to_sound_id(test_scene_sound_id::PED_EXPLOSION);
 			in.type = adverse_element_type::PED;
 			in.create_thunders_effect = true;
 
-			in.victim_shake = { 0.f, 0.f };
+			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+			dmg.shake = { 0.f, 0.f };
 
 			meta.set(explosive);
 		}
 
 		const auto bomb_explosion = []() {
 			standard_explosion_input in;
+			auto& dmg = in.damage;
 
 			in.type = adverse_element_type::FORCE;
-			in.damage = 348.f;
+			dmg.base = 348.f;
 			in.inner_ring_color = cyan;
 			in.outer_ring_color = white;
 			in.effective_radius = 500.f;
-			in.impact_impulse = 950.f;
+			dmg.impact_impulse = 950.f;
+			dmg.impulse_multiplier_against_sentience = 1.f;
 			in.sound_gain = 2.f;
 			in.sound_effect = to_sound_id(test_scene_sound_id::BOMB_EXPLOSION);
 
-			in.victim_shake.duration_ms = 700.f;
-			in.victim_shake.mult = 1.4f;
+			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+			dmg.shake.duration_ms = 700.f;
+			dmg.shake.mult = 1.4f;
 
 			return in;
 		}();

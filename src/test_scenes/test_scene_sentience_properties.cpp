@@ -115,8 +115,9 @@ void load_test_scene_sentience_properties(
 			auto& in = d.explosion;
 
 			in.effective_radius = 250.f;
-			in.damage = 88.f;
-			in.impact_impulse = 150.f;
+			in.damage.base = 88.f;
+			in.damage.impact_impulse = 150.f;
+			in.damage.impulse_multiplier_against_sentience = 1.f;
 			in.inner_ring_color = cyan;
 			in.outer_ring_color = white;
 			in.sound_effect = to_sound_id(test_scene_sound_id::EXPLOSION);
@@ -125,7 +126,7 @@ void load_test_scene_sentience_properties(
 
 			in.subject_shake.duration_ms = 600.f;
 			in.subject_shake.mult = 1.f;
-			in.victim_shake = in.subject_shake;
+			in.damage.shake = in.subject_shake;
 		}
 	}
 
@@ -176,46 +177,47 @@ void load_test_scene_sentience_properties(
 
 		{
 			standard_explosion_input in;
-			in.damage = 88.f;
+			in.damage.base = 88.f;
+			in.damage.impulse_multiplier_against_sentience = 1.f;
 			in.inner_ring_color = cyan;
 			in.outer_ring_color = white;
 			in.type = adverse_element_type::FORCE;
 
 			{
 				in.effective_radius = 200.f;
-				in.impact_impulse = 150.f;
+				in.damage.impact_impulse = 150.f;
 				in.sound_gain = 1.2f;
 				in.sound_effect = to_sound_id(test_scene_sound_id::EXPLOSION);
 
 				in.subject_shake.duration_ms = 400.f;
 				in.subject_shake.mult = 1.f;
-				in.victim_shake = in.subject_shake;
+				in.damage.shake = in.subject_shake;
 
 				d.explosions[0] = in;
 			}
 			
 			{
 				in.effective_radius = 400.f;
-				in.impact_impulse = 200.f;
+				in.damage.impact_impulse = 200.f;
 				in.sound_gain = 1.0f;
 				in.sound_effect = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
 
 				in.subject_shake.duration_ms = 500.f;
 				in.subject_shake.mult = 1.46f;
-				in.victim_shake = in.subject_shake;
+				in.damage.shake = in.subject_shake;
 
 				d.explosions[1] = in;
 			}
 			
 			{
 				in.effective_radius = 600.f;
-				in.impact_impulse = 250.f;
+				in.damage.impact_impulse = 250.f;
 				in.sound_gain = 1.2f;
 				in.sound_effect = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
 
 				in.subject_shake.duration_ms = 730.f;
 				in.subject_shake.mult = 2.f;
-				in.victim_shake = in.subject_shake;
+				in.damage.shake = in.subject_shake;
 
 				d.explosions[2] = in;
 			}

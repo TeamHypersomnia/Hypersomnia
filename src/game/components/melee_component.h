@@ -34,6 +34,7 @@ struct melee_attack_definition {
 	real32 wielder_impulse = 20.f;
 	real32 wielder_inert_for_ms = 250.f;
 	real32 cp_required = 5.f;
+	real32 bonus_damage_speed_ratio = 0.35f;
 
 	sound_effect_input init_sound;
 	particle_effect_input init_particles;

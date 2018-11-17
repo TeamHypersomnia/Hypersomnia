@@ -129,7 +129,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 		const auto impact_transform = [&]() {
 			auto result = transformr(d.point_of_impact);			
 
-			if (d.amount > 0) {
+			if (d.damage.base > 0) {
 				result.rotation = (-d.impact_velocity).degrees();
 			}
 			else {
@@ -151,7 +151,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 				}
 
 				if (effect_def.spawn_exploding_ring) {
-					const auto max_radius = d.amount * 1.5f;
+					const auto max_radius = d.damage.base * 1.5f;
 
 					exploding_ring_input ring;
 
@@ -172,33 +172,33 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 				}
 			};
 
-			const auto& def = d.effects;
+			const auto& e = d.damage.effects;
 
 			const bool sentient = sentient_and_vulnerable(subject);
 
 			if (d.inflictor_destructed) {
-				do_effect(def.destruction);
+				do_effect(e.destruction);
 
 				if (sentient) {
-					do_effect(def.sentience_impact);
+					do_effect(e.sentience_impact);
 				}
 			}
 			else {
 				if (sentient) {
-					do_effect(def.sentience_impact);
+					do_effect(e.sentience_impact);
 				}
 				else {
-					do_effect(def.impact);
+					do_effect(e.impact);
 				}
 			}
 		}
 
-		if (d.type == adverse_element_type::FORCE && d.amount > 0) {
+		if (d.type == adverse_element_type::FORCE && d.damage.base > 0) {
 			const auto& fixtures = subject.get<invariants::fixtures>();
 
 			if (const auto* const mat = logicals.find(fixtures.material)) {
 				const auto unit = mat->unit_effect_damage;
-				const auto mult = d.amount / unit;
+				const auto mult = d.damage.base / unit;
 
 				auto effect = mat->standard_damage_particles;
 

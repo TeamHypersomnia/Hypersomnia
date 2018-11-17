@@ -260,12 +260,12 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 								(void)point_a;
 								const auto& point_of_impact = point_b;
 
-								const auto body_entity = cosm[get_body_entity_that_owns(fix)];
-								const auto body_entity_id = body_entity.get_id();
+								const auto victim = cosm[get_entity_that_owns(fix)];
+								const auto victim_id = victim.get_id();
 
 								const bool is_self = 
-									body_entity_id == subject_id
-									|| body_entity.get_owning_transfer_capability() == subject_id
+									victim_id == subject_id
+									|| victim.get_owning_transfer_capability() == subject_id
 								;
 
 								if (is_self) {
@@ -280,7 +280,7 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 									|| bs.test(filter_category::GLASS_OBSTACLE)
 								;
 
-								const bool is_sentient = body_entity.template has<components::sentience>();
+								const bool is_sentient = victim.template has<components::sentience>();
 
 								auto& already_hit = [&]() -> auto& {
 									if (is_sentient || is_solid_obstacle) {
@@ -291,23 +291,27 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 								}();
 
 								if (already_hit.size() < already_hit.max_size()) {
-									const bool is_yet_unaffected = !found_in(already_hit, body_entity_id);
+									const bool is_yet_unaffected = !found_in(already_hit, victim_id);
 
 									if (is_yet_unaffected) {
-										already_hit.emplace_back(body_entity_id);
+										already_hit.emplace_back(victim_id);
 
 										const auto& current_attack_def = melee_def.actions.at(fighter.action);
+
 										const auto& def = current_attack_def.damage;
 
 										messages::damage_message damage_msg;
 
-										damage_msg.amount = def.base;
-										damage_msg.victim_shake = def.shake;
-										damage_msg.effects = def.effects;
-										 
+										const auto speed = it.get_effective_velocity().length();
+										const auto bonus_mult = speed * current_attack_def.bonus_damage_speed_ratio;
+										const auto mult = 1.f + bonus_mult;
+
+										damage_msg.damage = def;
+										damage_msg.damage *= mult;
+
 										damage_msg.type = adverse_element_type::FORCE;
 										damage_msg.origin = damage_origin(typed_weapon);
-										damage_msg.subject = body_entity;
+										damage_msg.subject = victim;
 										damage_msg.impact_velocity = impact_velocity;
 										damage_msg.point_of_impact = point_of_impact;
 

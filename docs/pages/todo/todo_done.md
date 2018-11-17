@@ -2203,3 +2203,4 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Add bubbles for poseidon
 
+- Refactor: use damage_definition for damage messages so we don't have to rewrite
