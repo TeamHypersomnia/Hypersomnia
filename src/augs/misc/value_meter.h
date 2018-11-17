@@ -1,6 +1,7 @@
 #pragma once
+#include "augs/math/declare_math.h"
 
-using meter_value_type = float;
+using meter_value_type = real32;
 
 struct value_meter {
 	struct damage_result {
@@ -12,6 +13,8 @@ struct value_meter {
 	// GEN INTROSPECTOR struct value_meter
 	meter_value_type value = 100;
 	meter_value_type maximum = 100;
+	real32 regeneration_unit = 2;
+	real32 regeneration_interval_secs = 3;
 	// END GEN INTROSPECTOR
 
 	damage_result calc_damage_result(

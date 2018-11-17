@@ -137,13 +137,14 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 	auto& cosm = step.get_cosmos();
 	const auto delta = cosm.get_fixed_delta();
 
-	const auto regeneration_interval_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 3);
-	const auto consciousness_regeneration_interval_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 2);
-	const auto pe_regeneration_interval_in_steps = static_cast<unsigned>(1 / delta.in_seconds() * 3);
+	auto make_interval_in_steps = [delta](const auto& m) {
+		return static_cast<unsigned>(1 / delta.in_seconds() * m.regeneration_interval_secs);
+	};
 
 	cosm.for_each_having<components::sentience>(
 		[&](const auto subject) {
 			components::sentience& sentience = subject.template get<components::sentience>();
+
 			auto& health = sentience.get<health_meter_instance>();
 			auto& consciousness = sentience.get<consciousness_meter_instance>();
 			auto& personal_electricity = sentience.get<personal_electricity_meter_instance>();
@@ -154,24 +155,24 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 				if (health.is_enabled()) {
 					const auto passed = (now.step - sentience.time_of_last_received_damage.step);
 
-					if (passed > 0 && passed % regeneration_interval_in_steps == 0) {
-						health.value -= health.calc_damage_result(-2).effective;
+					if (passed > 0 && passed % make_interval_in_steps(health) == 0) {
+						health.value -= health.calc_damage_result(-health.regeneration_unit).effective;
 					}
 				}
 
 				if (consciousness.is_enabled()) {
 					const auto passed = (now.step - sentience.time_of_last_exertion.step);
 
-					if (passed > 0 && passed % consciousness_regeneration_interval_in_steps == 0) {
-						consciousness.value -= consciousness.calc_damage_result(-2).effective;
+					if (passed > 0 && passed % make_interval_in_steps(consciousness) == 0) {
+						consciousness.value -= consciousness.calc_damage_result(-consciousness.regeneration_unit).effective;
 					}
 				}
 
 				if (personal_electricity.is_enabled()) {
 					const auto passed = now.step;
 
-					if (passed > 0 && passed % pe_regeneration_interval_in_steps == 0) {
-						personal_electricity.value -= personal_electricity.calc_damage_result(-4).effective;
+					if (passed > 0 && passed % make_interval_in_steps(personal_electricity) == 0) {
+						personal_electricity.value -= personal_electricity.calc_damage_result(-personal_electricity.regeneration_unit).effective;
 					}
 				}
 			}

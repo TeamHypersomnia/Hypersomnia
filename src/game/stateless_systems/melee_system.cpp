@@ -141,6 +141,7 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 							return;
 						}
 
+						sentience.time_of_last_exertion = cosm.get_timestamp();
 						consciousness.value -= consciousness_damage_by_attack.effective;
 					}
 
