@@ -29,10 +29,14 @@ struct melee_attack_definition {
 	damage_definition damage;
 
 	real32 obstacle_hit_recoil = 40.f;
+	real32 obstacle_hit_kickback_impulse = 80.f;
 	real32 sentience_hit_recoil = 10.f;
 
 	real32 wielder_impulse = 20.f;
 	real32 wielder_inert_for_ms = 250.f;
+	real32 obstacle_hit_rotation_inertia_ms = 350.f;
+	real32 obstacle_hit_recoil_mult = 1.2f;
+	real32 obstacle_hit_linear_inertia_ms = 250.f;
 	real32 cp_required = 5.f;
 	real32 bonus_damage_speed_ratio = 0.35f;
 

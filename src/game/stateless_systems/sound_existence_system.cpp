@@ -236,7 +236,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			auto do_effect = [&](const auto& effect_def) {
 				effect_def.sound.start(
 					step,
-					sound_effect_start_input::orbit_absolute(subject, d.point_of_impact).set_listener(subject)
+					sound_effect_start_input::fire_and_forget(d.point_of_impact).set_listener(subject)
 				);
 			};
 
@@ -273,7 +273,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 
 				effect.start(
 					step,
-					sound_effect_start_input::orbit_absolute(subject, d.point_of_impact).set_listener(subject)
+					sound_effect_start_input::fire_and_forget(d.point_of_impact).set_listener(subject)
 				);
 			}
 		}

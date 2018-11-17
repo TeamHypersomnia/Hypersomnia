@@ -58,8 +58,8 @@ void crosshair_system::update_base_offsets(const logic_step step) {
 }
 
 void crosshair_system::integrate_crosshair_recoils(const logic_step step) {
-	const auto delta = step.get_delta();
-	const auto secs = delta.in_seconds();
+	const auto dt = step.get_delta();
+	const auto secs = dt.in_seconds();
 	auto& cosm = step.get_cosmos();
 
 	cosm.for_each_having<components::crosshair>(
@@ -71,8 +71,27 @@ void crosshair_system::integrate_crosshair_recoils(const logic_step step) {
 			recoil.integrate(secs);
 			recoil.damp(secs, crosshair_def.recoil_damping);
 
+			const auto inertia_mult = [&]() {
+				const auto& sentience_def = subject.template get<invariants::sentience>();
+				auto& sentience = subject.template get<components::sentience>();
+
+				auto& inertia = sentience.rotation_inertia_ms;
+
+				if (augs::is_positive_epsilon(inertia)) {
+					inertia -= dt.in_milliseconds();
+					inertia = std::max(inertia, 0.f);
+
+					const auto max_intertia = sentience_def.max_inertia_when_rotation_possible;
+					const auto inertia_mult = std::max(0.f, 1.f - inertia / max_intertia);
+
+					return inertia_mult;
+				}
+
+				return 1.f;
+			}();
+
 			recoil.position.damp(secs, vec2::square(60.f));
-			recoil.rotation = augs::damp(recoil.rotation, secs, 60.f);
+			recoil.rotation = augs::damp(recoil.rotation, secs, 60.f * inertia_mult);
 		}
 	);
 }

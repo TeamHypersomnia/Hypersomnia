@@ -89,8 +89,12 @@ namespace test_flavours {
 					a.init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_ATTACK);
 					a.init_particles.modifier.colorize = color;
 					a.wielder_init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_PRIMARY_SMOKE);
+					a.obstacle_hit_rotation_inertia_ms = 1400.f;
+					a.obstacle_hit_recoil_mult = 1.1f;
+					a.obstacle_hit_kickback_impulse = 2500.f;
+					a.obstacle_hit_linear_inertia_ms = 140.f;
 					a.wielder_impulse = 1000.f;
-					a.wielder_inert_for_ms = 350.f;
+					a.wielder_inert_for_ms = 200.f;
 					a.cooldown_ms = 250.f;
 					a.cp_required = 5.f;
 
@@ -110,7 +114,7 @@ namespace test_flavours {
 					a.damage.shake *= 0.4f;
 					a.damage.impact_impulse = 20.f;
 					a.damage.impulse_multiplier_against_sentience = 10.f;
-					a.bonus_damage_speed_ratio = 1.f / 2000.f;
+					a.bonus_damage_speed_ratio = 1.f / 1700.f;
 					a.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
 					auto& eff = a.damage.effects;
@@ -128,9 +132,12 @@ namespace test_flavours {
 					a.init_particles.modifier.colorize = color;
 					a.wielder_init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_SECONDARY_SMOKE);
 					a.wielder_impulse = 950.f;
-					a.wielder_inert_for_ms = 500.f;
+					a.wielder_inert_for_ms = 300.f;
+					a.obstacle_hit_linear_inertia_ms = 100.f;
 					a.cp_required = 12.f;
 
+					a.obstacle_hit_kickback_impulse = 3600.f;
+					a.obstacle_hit_rotation_inertia_ms = 1000.f;
 					a.obstacle_hit_recoil = 80.f;
 					a.sentience_hit_recoil = 20.f;
 
@@ -146,7 +153,7 @@ namespace test_flavours {
 					a.damage.base = 57.f;
 					a.damage.impact_impulse = 40.f;
 					a.damage.impulse_multiplier_against_sentience = 10.f;
-					a.bonus_damage_speed_ratio = 1.f / 2000.f;
+					a.bonus_damage_speed_ratio = 1.f / 1700.f;
 					a.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
 					auto& eff = a.damage.effects;

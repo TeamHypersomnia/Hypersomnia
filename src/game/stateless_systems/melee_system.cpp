@@ -68,7 +68,7 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 	cosm.for_each_having<components::melee_fighter>([&](const auto& it) {
 		const auto& fighter_def = it.template get<invariants::melee_fighter>();
-		const auto& sentience = it.template get<components::sentience>();
+		auto& sentience = it.template get<components::sentience>();
 
 		auto& fighter = it.template get<components::melee_fighter>();
 
@@ -300,8 +300,74 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 										already_hit.emplace_back(victim_id);
 
 										const auto& current_attack_def = melee_def.actions.at(fighter.action);
-
 										const auto& def = current_attack_def.damage;
+
+										if (is_solid_obstacle && already_hit.size() == 1) {
+											{
+												auto& current = sentience.rotation_inertia_ms;
+												const auto& bonus = current_attack_def.obstacle_hit_rotation_inertia_ms;
+
+												current = std::max(current, bonus);
+											}
+
+											if (const auto crosshair = it.find_crosshair()) {
+												const auto& kickback = current_attack_def.obstacle_hit_kickback_impulse;
+												const auto& body = it.template get<components::rigid_body>();
+
+												const auto point_dir = (from.pos - point_of_impact).normalize();
+
+												const auto ray_a = from.pos;
+												const auto ray_b = point_of_impact - point_dir * 50;
+
+												const auto ray = physics.ray_cast_px(
+													cosm.get_si(),
+													ray_a,
+													ray_b,
+													predefined_queries::melee_solid_obstacle_query(),
+													typed_weapon
+												);
+
+												if (ray.hit) {
+													const auto& n = ray.normal;
+
+													if (DEBUG_DRAWING.draw_melee_info) {
+														DEBUG_PERSISTENT_LINES.emplace_back(
+															cyan,
+															ray_a,
+															ray_b
+														);
+
+														DEBUG_PERSISTENT_LINES.emplace_back(
+															yellow,
+															ray.intersection,
+															ray.intersection + n * 100
+														);
+													}
+
+													{
+														const auto inter_dir = (ray_a - ray.intersection).normalize();
+
+														impulse_input in;
+														in.angular = n.cross(inter_dir) * current_attack_def.obstacle_hit_recoil_mult;
+														it.apply_crosshair_recoil(in);
+
+														const auto parallel_mult = n.dot(inter_dir);
+														const auto considered_mult = std::max(parallel_mult - 0.4f, 0.f);
+														const auto total_impulse_mult = considered_mult * kickback * body.get_mass() / 3;
+														const auto total_impulse = total_impulse_mult * n;
+
+														const auto vel = body.get_velocity();
+														const auto target_vel = vec2(vel).reflect(n);
+														body.set_velocity(target_vel);
+
+														body.apply_impulse(total_impulse);
+													}
+												}
+											}
+
+											auto& movement = it.template get<components::movement>();
+											movement.linear_inertia_ms += current_attack_def.obstacle_hit_linear_inertia_ms;
+										}
 
 										messages::damage_message damage_msg;
 

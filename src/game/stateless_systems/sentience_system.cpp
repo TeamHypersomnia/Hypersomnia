@@ -397,7 +397,6 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 
 				const auto impact = vec2(d.impact_velocity).set_length(considered_impulse);
 
-				LOG_NVPS(impact, d.point_of_impact - subject_of_impact_mass_pos);
 				subject_of_impact.apply_impulse(impact, d.point_of_impact - subject_of_impact_mass_pos);
 			}
 		};

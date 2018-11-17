@@ -47,6 +47,13 @@ namespace predefined_queries {
 		return out;
 	}
 
+	b2Filter melee_solid_obstacle_query() {
+		b2Filter out;
+		out.categoryBits = make_flags(C::QUERY);
+		out.maskBits = make_flags(C::WALL, C::GLASS_OBSTACLE);
+		return out;
+	}
+
 	b2Filter pathfinding() {
 		b2Filter out;
 		out.categoryBits = make_flags(C::QUERY);
