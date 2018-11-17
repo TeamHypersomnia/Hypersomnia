@@ -299,7 +299,13 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 								if (already_hit.size() < already_hit.max_size()) {
 									const bool is_yet_unaffected = !found_in(already_hit, victim_id);
 
-									if (is_yet_unaffected) {
+									const auto& body = it.template get<components::rigid_body>();
+
+									if (is_solid_obstacle && already_hit.size() > 0 && victim_id == already_hit[0]) {
+										body.apply_impulse(fighter.first_separating_impulse);
+										fighter.first_separating_impulse = {};
+									}
+									else if (is_yet_unaffected) {
 										already_hit.emplace_back(victim_id);
 
 										const auto& current_attack_def = melee_def.actions.at(fighter.action);
@@ -315,7 +321,6 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 											if (const auto crosshair = it.find_crosshair()) {
 												const auto& kickback = current_attack_def.obstacle_hit_kickback_impulse;
-												const auto& body = it.template get<components::rigid_body>();
 
 												const auto point_dir = (from.pos - point_of_impact).normalize();
 
@@ -361,9 +366,12 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 														const auto vel = body.get_velocity();
 														const auto target_vel = vec2(vel).reflect(n);
-														body.set_velocity(target_vel);
+
+														const auto velocity_conservation = 0.6f;
+														body.set_velocity(target_vel * velocity_conservation);
 
 														body.apply_impulse(total_impulse);
+														fighter.first_separating_impulse = total_impulse;
 													}
 												}
 											}

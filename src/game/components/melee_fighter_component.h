@@ -27,6 +27,7 @@ namespace components {
 		already_hit_entities hit_obstacles;
 		already_hit_entities hit_others;
 		transformr previous_frame_transform;
+		vec2 first_separating_impulse;
 		vec2 overridden_crosshair_base_offset;
 		// END GEN INTROSPECTOR
 
