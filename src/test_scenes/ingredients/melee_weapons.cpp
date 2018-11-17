@@ -108,7 +108,7 @@ namespace test_flavours {
 
 					a.damage.base = 27.f;
 					a.damage.shake *= 0.4f;
-					a.damage.impact_impulse = 10.f;
+					a.damage.impact_impulse = 20.f;
 					a.damage.impulse_multiplier_against_sentience = 10.f;
 					a.bonus_damage_speed_ratio = 1.f / 2000.f;
 					a.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
@@ -144,7 +144,7 @@ namespace test_flavours {
 					}
 
 					a.damage.base = 57.f;
-					a.damage.impact_impulse = 20.f;
+					a.damage.impact_impulse = 40.f;
 					a.damage.impulse_multiplier_against_sentience = 10.f;
 					a.bonus_damage_speed_ratio = 1.f / 2000.f;
 					a.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);

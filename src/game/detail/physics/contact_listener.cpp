@@ -406,7 +406,7 @@ void contact_listener::PreSolve(b2Contact* contact, const b2Manifold* /* oldMani
 			contact->SetEnabled(false);
 		}
 
-		if (subject.has<components::missile>() || is_like_thrown_melee(subject)) {
+		if (subject.has<components::missile>() || is_like_thrown_melee(subject) || is_like_melee_in_action(subject)) {
 			const auto info = missile_surface_info(subject, collider);
 
 			if (info.ignore_standard_impulse() || collider.has<components::sentience>()) {

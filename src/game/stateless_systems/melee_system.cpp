@@ -228,6 +228,10 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 					const transformr& from,
 					const transformr& to
 				) {
+					if (fighter.now_returning()) {
+						return;
+					}
+
 					const auto impact_velocity = (to.pos - from.pos) * dt.in_steps_per_second();
 
 					const auto image_id = typed_weapon.get_image_id();
@@ -254,10 +258,9 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 							auto handle_intersection = [&](
 								const b2Fixture& fix,
-								const vec2 point_a,
+								const vec2,
 								const vec2 point_b
 							) {
-								(void)point_a;
 								const auto& point_of_impact = point_b;
 
 								const auto victim = cosm[get_entity_that_owns(fix)];

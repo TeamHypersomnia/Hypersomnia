@@ -60,6 +60,7 @@ auto calc_filters(const E& handle) {
 
 	if (is_like_thrown_explosive(handle)
 		|| is_like_thrown_melee(handle)
+		|| is_like_melee_in_action(handle)
 	) {
 		return filters[predefined_filter_type::FLYING_ITEM];
 	}

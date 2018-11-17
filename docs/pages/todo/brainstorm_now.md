@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- adjust doppler factors of bullet trace sounds
+
 - Add inertia for the target rotation when we hit an obstacle
 	- Copy the lerp code from interpolation as it was mostly correct
 
