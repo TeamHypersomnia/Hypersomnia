@@ -214,7 +214,7 @@ void standard_explosion_input::instantiate(
 				const vec2,
 				const vec2
 			) {
-				const auto victim_id = get_body_entity_that_owns(fix);
+				const auto victim_id = get_entity_that_owns(fix);
 				const auto it = affected_entities_of_bodies.insert(victim_id);
 				const bool is_yet_unaffected = it.second;
 

@@ -384,7 +384,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 		const auto& def = d.damage;
 		const auto& amount = def.base;
 
-		{
+		auto apply_impact_impulse = [&]() {
 			auto considered_impulse = def.impact_impulse;
 
 			if (considered_impulse > 0.f) {
@@ -400,7 +400,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 				LOG_NVPS(impact, d.point_of_impact - subject_of_impact_mass_pos);
 				subject_of_impact.apply_impulse(impact, d.point_of_impact - subject_of_impact_mass_pos);
 			}
-		}
+		};
 
 		auto* const sentience = subject.find<components::sentience>();
 
@@ -496,6 +496,8 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 			}
 		}
 
+		const auto owning_capability = subject.get_owning_transfer_capability();
+
 		if (d.damage.shake.any()) {
 			if (auto* const head = subject.find<components::head>()) {
 				if (const auto* const crosshair = subject.find_crosshair()) {
@@ -525,9 +527,15 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 			if (sentience) {
 				apply_shake(subject);
 			}
-			else if (const auto owning_capability = subject.get_owning_transfer_capability()) {
+			else if (owning_capability) {
 				apply_shake(owning_capability);
 			}
+		}
+
+		const bool held_item = sentience == nullptr && owning_capability;
+
+		if (!held_item) {
+			apply_impact_impulse();
 		}
 	}
 }
