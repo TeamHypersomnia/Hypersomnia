@@ -26,6 +26,7 @@ namespace components {
 		simple_animation_state anim_state;
 		already_hit_entities hit_obstacles;
 		already_hit_entities hit_others;
+		transformr previous_frame_transform;
 		vec2 overridden_crosshair_base_offset;
 		// END GEN INTROSPECTOR
 

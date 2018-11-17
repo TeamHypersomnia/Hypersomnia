@@ -89,7 +89,7 @@ namespace test_flavours {
 					a.init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_ATTACK);
 					a.init_particles.modifier.colorize = color;
 					a.wielder_init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_PRIMARY_SMOKE);
-					a.obstacle_hit_rotation_inertia_ms = 1400.f;
+					a.obstacle_hit_rotation_inertia_ms = 1000.f;
 					a.obstacle_hit_recoil_mult = 1.1f;
 					a.obstacle_hit_kickback_impulse = 2500.f;
 					a.obstacle_hit_linear_inertia_ms = 140.f;

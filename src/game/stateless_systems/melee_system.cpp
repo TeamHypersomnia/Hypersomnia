@@ -129,6 +129,9 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 					fighter.action = chosen_action;
 					fighter.hit_obstacles.clear();
 					fighter.hit_others.clear();
+					fighter.previous_frame_transform = typed_weapon.get_logic_transform();
+
+					typed_weapon.infer_colliders_from_scratch();
 
 					const auto& current_attack_def = melee_def.actions.at(chosen_action);
 
@@ -424,9 +427,10 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 					const auto next_index = anim_state.frame_num;
 
 					if (next_index != prev_index) {
-						const auto damage_from = typed_weapon.get_logic_transform();
+						const auto damage_from = fighter.previous_frame_transform;
 						typed_weapon.infer_colliders_from_scratch();
 						const auto damage_to = typed_weapon.get_logic_transform();
+						fighter.previous_frame_transform = damage_to;
 
 						detect_damage(damage_from, damage_to);
 
