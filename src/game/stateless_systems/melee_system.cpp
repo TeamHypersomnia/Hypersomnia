@@ -296,8 +296,15 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 									if (is_yet_unaffected) {
 										already_hit.emplace_back(body_entity_id);
 
+										const auto& current_attack_def = melee_def.actions.at(fighter.action);
+										const auto& def = current_attack_def.damage;
+
 										messages::damage_message damage_msg;
 
+										damage_msg.amount = def.base;
+										damage_msg.victim_shake = def.shake;
+										damage_msg.effects = def.effects;
+										 
 										damage_msg.type = adverse_element_type::FORCE;
 										damage_msg.origin = damage_origin(typed_weapon);
 										damage_msg.subject = body_entity;

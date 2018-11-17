@@ -4,7 +4,12 @@
 template <class E>
 void damage_origin::copy_sender_from(const E& causing_handle) {
 	if (const auto s = causing_handle.template find<components::sender>()) {
-		sender = *s;
+		if (s->is_set()) {
+			sender = *s;
+		}
+		else {
+			sender.set(causing_handle);
+		}
 	}
 	else {
 		sender.set(causing_handle);

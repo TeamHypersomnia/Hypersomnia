@@ -37,6 +37,19 @@ void perform_knockout(
 		const auto knocked_out_body = typed_subject.template get<components::rigid_body>();
 		knocked_out_body.apply(knockout_impulse * sentience_def.knockout_impulse);
 
+		{
+			auto& special_physics = typed_subject.get_special_physics();
+
+			const auto disable_collision_for_ms = 300;
+
+			special_physics.dropped_or_created_cooldown.set(
+				disable_collision_for_ms,
+				cosm.get_timestamp()
+			);
+
+			special_physics.during_cooldown_ignore_collision_with = origin.sender.capability_of_sender;
+		}
+
 		sentience.when_knocked_out = cosm.get_timestamp();
 		sentience.knockout_origin = origin;
 
