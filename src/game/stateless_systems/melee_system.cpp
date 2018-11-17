@@ -68,6 +68,7 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 	cosm.for_each_having<components::melee_fighter>([&](const auto& it) {
 		const auto& fighter_def = it.template get<invariants::melee_fighter>();
+		const auto& sentience_def = it.template get<invariants::sentience>();
 		auto& sentience = it.template get<components::sentience>();
 
 		auto& fighter = it.template get<components::melee_fighter>();
@@ -125,6 +126,24 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 						return;
 					}
 
+					const auto& current_attack_def = melee_def.actions.at(chosen_action);
+
+					if (augs::is_positive_epsilon(current_attack_def.cp_required)) {
+						auto& consciousness = sentience.template get<consciousness_meter_instance>();
+						const auto minimum_cp_to_attack = consciousness.get_maximum_value() * sentience_def.minimum_cp_to_sprint;
+
+						const auto consciousness_damage_by_attack = consciousness.calc_damage_result(
+							current_attack_def.cp_required,
+							minimum_cp_to_attack
+						);
+
+						if (consciousness_damage_by_attack.excessive > 0) {
+							return;
+						}
+
+						consciousness.value -= consciousness_damage_by_attack.effective;
+					}
+
 					state = melee_fighter_state::IN_ACTION;
 					fighter.action = chosen_action;
 					fighter.hit_obstacles.clear();
@@ -132,8 +151,6 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 					fighter.previous_frame_transform = typed_weapon.get_logic_transform();
 
 					typed_weapon.infer_colliders_from_scratch();
-
-					const auto& current_attack_def = melee_def.actions.at(chosen_action);
 
 					const auto& body = it.template get<components::rigid_body>();
 					const auto vel_dir = vec2(body.get_velocity()).normalize();

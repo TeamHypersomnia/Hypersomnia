@@ -128,7 +128,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 				const auto minimum_cp_to_sprint = consciousness.get_maximum_value() * def.minimum_cp_to_sprint;
 
-				if (consciousness.value < minimum_cp_to_sprint - 0.1f) {
+				if (consciousness.value < minimum_cp_to_sprint - AUGS_EPSILON<real32>) {
 					movement_force_mult /= 2;
 				}
 
