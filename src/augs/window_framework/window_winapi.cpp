@@ -450,7 +450,6 @@ namespace augs {
 
 			ensure(wglChoosePixelFormatARB(platform->hdc, attribList, NULL, 1, &pixelFormat, &numFormats));
 			LOG_NVPS(pixelFormat, numFormats);
-			ensure_eq(1, numFormats);
 			
 			const auto result = SetPixelFormat(platform->hdc, pixelFormat, &p);
 			ensure(result);
