@@ -16,6 +16,7 @@
 struct melee_clash_def {
 	// GEN INTROSPECTOR struct melee_clash_def
 	real32 impulse = 2000.f;
+	real32 victim_inert_for_ms = 250.f;
 
 	sound_effect_input sound;
 	particle_effect_input particles;

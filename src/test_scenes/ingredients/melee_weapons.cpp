@@ -108,10 +108,12 @@ namespace test_flavours {
 
 						clash.sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_CLASH);
 						clash.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_CLASH);
+						clash.victim_inert_for_ms = 500.f;
+						clash.impulse = 450.f;
 					}
 
 					a.damage.base = 27.f;
-					a.damage.shake *= 0.4f;
+					a.damage.shake.mult *= 0.9f;
 					a.damage.impact_impulse = 20.f;
 					a.damage.impulse_multiplier_against_sentience = 10.f;
 					a.bonus_damage_speed_ratio = 1.f / 1700.f;
@@ -130,6 +132,7 @@ namespace test_flavours {
 					a.init_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SECONDARY);
 					a.init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_ATTACK);
 					a.init_particles.modifier.colorize = color;
+					a.damage.shake.mult *= 1.15f;
 					a.wielder_init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_SECONDARY_SMOKE);
 					a.wielder_impulse = 950.f;
 					a.wielder_inert_for_ms = 300.f;
@@ -148,6 +151,8 @@ namespace test_flavours {
 
 						clash.sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_CLASH);
 						clash.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_CLASH);
+						clash.victim_inert_for_ms = 850.f;
+						clash.impulse = 750.f;
 					}
 
 					a.damage.base = 57.f;

@@ -25,6 +25,7 @@
 #include "game/detail/physics/physics_queries.h"
 #include "augs/misc/enum/enum_bitset.h"
 #include "game/messages/damage_message.h"
+#include "game/messages/thunder_input.h"
 
 using namespace augs;
 
@@ -120,6 +121,7 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 		target_weapon.template dispatch_on_having_all<components::melee>(
 			[&](const auto& typed_weapon) {
 				const auto& melee_def = typed_weapon.template get<invariants::melee>();
+				auto& melee = typed_weapon.template get<components::melee>();
 
 				if (state == melee_fighter_state::READY) {
 					if (chosen_action == weapon_action_type::COUNT) {
@@ -398,22 +400,124 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 											movement.linear_inertia_ms += current_attack_def.obstacle_hit_linear_inertia_ms;
 										}
 
-										messages::damage_message damage_msg;
+										bool clash_applied = false;
 
-										const auto speed = it.get_effective_velocity().length();
-										const auto bonus_mult = speed * current_attack_def.bonus_damage_speed_ratio;
-										const auto mult = 1.f + bonus_mult;
+										{
+											const auto now = cosm.get_timestamp();
 
-										damage_msg.damage = def;
-										damage_msg.damage *= mult;
+											auto cooldown_passes = [&](augs::stepped_timestamp& stamp, const int cooldown = 2) {
+												return !(now.step <= stamp.step + cooldown);
+											};
 
-										damage_msg.type = adverse_element_type::FORCE;
-										damage_msg.origin = damage_origin(typed_weapon);
-										damage_msg.subject = victim;
-										damage_msg.impact_velocity = impact_velocity;
-										damage_msg.point_of_impact = point_of_impact;
+											auto try_pass_cooldown = [&](augs::stepped_timestamp& stamp, const int cooldown = 2) {
+												if (!cooldown_passes(stamp, cooldown)) {
+													return false;
+												}
 
-										step.post_message(damage_msg);
+												stamp = now;
+												return true;
+											};
+
+											if (is_like_melee_in_action(victim) && try_pass_cooldown(melee.when_clashed, 5)) {
+												clash_applied = true;
+
+												const auto victim_owner = victim.get_owning_transfer_capability();
+												const auto victim_owner_pos = victim_owner.get_logic_transform().pos;
+												const auto subject_owner_pos = it.get_logic_transform().pos;
+												const auto impact_dir = (victim_owner_pos - subject_owner_pos).normalize();
+
+												const auto& v_melee_def = victim.template get<invariants::melee>();
+												auto& v_melee = victim.template get<components::melee>();
+												const auto& v_fighter = victim_owner.template get<components::melee_fighter>();
+
+												v_melee.when_clashed = now;
+
+												const auto& clash_def = current_attack_def.clash;
+												const auto& v_attack = v_melee_def.actions[v_fighter.action];
+												const auto& v_clash_def = v_attack.clash;
+
+												{
+													auto play_clash = [&](const auto& def) {
+														def.sound.start(
+															step,
+															sound_effect_start_input::fire_and_forget(point_of_impact)
+														);
+													};
+
+													play_clash(clash_def);
+
+													if (clash_def.sound.id != v_clash_def.sound.id) {
+														play_clash(v_clash_def);
+													}
+												}
+
+												{
+													const auto subject_impact = -v_clash_def.impulse * impact_dir;
+													const auto victim_impact = clash_def.impulse * impact_dir;
+
+													body.apply_impulse(subject_impact);
+													victim.template get<components::rigid_body>().apply_impulse(victim_impact);
+												}
+
+												{
+													auto subject_shake = v_attack.damage.shake;
+													auto victim_shake = current_attack_def.damage.shake;
+
+													subject_shake *= 2;
+													victim_shake *= 2;
+
+													victim_shake.apply(now, victim_owner.template get<components::sentience>());
+													subject_shake.apply(now, it.template get<components::sentience>());
+												}
+
+												{
+													const auto subject_inertia = v_clash_def.victim_inert_for_ms;
+													const auto victim_inertia = clash_def.victim_inert_for_ms;
+													
+													it.template get<components::movement>().linear_inertia_ms += subject_inertia;
+													victim_owner.template get<components::movement>().linear_inertia_ms += victim_inertia;
+												}
+
+												{
+													thunder_input th;
+
+													th.delay_between_branches_ms = {10.f, 35.f};
+													th.max_branch_lifetime_ms = {60.f, 85.f};
+													th.branch_length = {30.f, 150.f};
+
+													th.max_all_spawned_branches = 80;
+													th.max_branch_children = 2;
+
+													th.branch_angle_spread = 40.f;
+													th.color = white;
+
+													th.first_branch_root = transformr(point_of_impact, impact_dir.perpendicular_cw().degrees());
+													step.post_message(th);
+
+													th.first_branch_root = transformr(point_of_impact, impact_dir.perpendicular_ccw().degrees());
+													step.post_message(th);
+												}
+											}
+										}
+
+										if (!clash_applied) {
+											messages::damage_message damage_msg;
+
+											const auto speed = it.get_effective_velocity().length();
+											const auto bonus_mult = speed * current_attack_def.bonus_damage_speed_ratio;
+											const auto mult = 1.f + bonus_mult;
+
+											damage_msg.damage = def;
+											damage_msg.damage *= mult;
+
+											damage_msg.type = adverse_element_type::FORCE;
+											damage_msg.origin = damage_origin(typed_weapon);
+											damage_msg.subject = victim;
+											damage_msg.impact_velocity = impact_velocity;
+											damage_msg.point_of_impact = point_of_impact;
+
+											step.post_message(damage_msg);
+										}
 									}
 								}
 
