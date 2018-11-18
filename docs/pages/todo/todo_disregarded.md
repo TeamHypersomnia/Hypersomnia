@@ -5,6 +5,8 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- Stop the whoosh sound on obstacle hit
+
 - Can't we really avoid the need for finishing traces?
 	- An alternative would be to hold the trace in the missile and reinfer without the body when the missile impacts,
 	  and prolong its life for a moment

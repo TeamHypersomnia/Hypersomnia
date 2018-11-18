@@ -199,6 +199,13 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 							const auto total_vel = clash_dir * clash_impulse;
 							rigid_body.set_velocity(total_vel);
 
+							{
+								const auto vel_degrees = total_vel.degrees();
+								const auto s = augs::sgn(vel_degrees);
+
+								rigid_body.set_angular_velocity(s * 360.f * 15);
+							}
+
 							const auto eff_dir = vec2(clash_dir).perpendicular_cw();
 							const auto eff_transform = transformr(it.point, eff_dir.degrees());
 
