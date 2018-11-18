@@ -1167,8 +1167,16 @@ if(BUILD_OPENAL)
 	set(ALSOFT_UTILS FALSE CACHE BOOL "Build and install utility programs" FORCE)
 	set(ALSOFT_EXAMPLES FALSE CACHE BOOL "Build and install example programs" FORCE)
 	set(ALSOFT_TESTS FALSE CACHE BOOL "Build and install test programs" FORCE)
-	
+
+	if(CLANG AND NOT MSVC)
+		string(REPLACE " -Werror" "" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+	endif()
+
 	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/openal-soft")
+
+	if(CLANG AND NOT MSVC)
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror")
+	endif()
 
 	if(ADD_MCMODEL_LARGE_FLAG)
 		target_compile_options(OpenAL PUBLIC -mcmodel=large -no-pie)
