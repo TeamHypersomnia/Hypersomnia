@@ -136,6 +136,7 @@ namespace components {
 namespace invariants {
 	struct sentience {
 		// GEN INTROSPECTOR struct invariants::sentience
+		real32 shake_mult = 0.5f;
 		real32 comfort_zone = 500.f;
 		real32 minimum_danger_amount_to_evade = 20.f;
 		real32 danger_amount_from_hostile_attitude = 100.f;
