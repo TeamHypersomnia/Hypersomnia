@@ -22,8 +22,9 @@ The editor, on the next startup, or after pressing "Re-check existence",
 should detect that some images are missing from their original locations on the disk.
 Worry not, no information is lost when this happens. 
 A list with all missing images should appear above all other image entries.
-You can simply restore the file to its original location and press "Re-check existence" again 
-to let the editor notice that the file is already there.
+
+On your filesystem, restore the file to its original location.
+Then, in the editor, press "Re-check existence" to let the editor notice that the file is already there.
 Alternatively, simply point the editor to a new path and you'll be good to go.
 The properties will be left untouched.
 
@@ -75,6 +76,20 @@ whenever the players has not enough Personal Electricity to cast the spell.
 
 Should be off otherwise.
 
+## Offsets
+
+Some of the images used for flavours require important metrics.
+Examples:
+- a torso image might need to have its primary and secondary hand positions specified.
+- a gun image might need to have its magazine position specified.
+
+Go to Meta->Offsets of an open image.
+Unfold a group of offsets depending on the type of the image.
+
+The controls for choosing an offset are as follows:
+- LPM changes the offset position.
+- Holding Shift and clicking LPM changes the offset rotation.
+
 ## Physical shapes
 
 By default, whenever an entity is created in the physical world,
@@ -99,11 +114,3 @@ The controls are as follows:
 		  so this is how you verify it.
 			- for example, shapes of the bullets (but not those of whole cartridges) should remain convex.
 	- Otherwise, all edges will be highlighted in orange.
-
-## Offsets
-
-Some of the images used for flavours require important metrics.
-
-For example, we can generate a neon map for each image,  
-or specify its shape in detail when it is going to be used as a physical shape,
-or specify some attachment positions if it'll going to be a container like a torso or a gun.

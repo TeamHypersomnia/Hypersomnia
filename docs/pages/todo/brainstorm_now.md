@@ -6,6 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Letting servers adjust the speed of the game
+	- ticks are independent from the timing scales
+	- audiovisual state can accept speed mult separately I guess?
+		- which could be also changed when a proper tick is check
+
+- document the offset picker
+
 - adjust doppler factors of bullet trace sounds
 
 - Remember to reset input flags of the character itself on performing transfer

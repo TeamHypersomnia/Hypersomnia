@@ -14,11 +14,13 @@ or you want to record a scene for the main menu.
 	- As the game advances, this (obviously) overwrites any game inputs made on the controlled entity.
 - Press l to start replaying the in **read-only mode**, thus making no changes at all.
 	- The property tweaks (of flavours, entities, rulesets etc.) will also be disabled whenever you replay.
-- Press numbers on your numpad: 0, 1, 2, 3 to control the game's speed.
+- Press numbers on your numpad: 0, 1, 2, 3, 4, 5 to control the game's speed.
 	- 0 resets speed back to 1x.
 	- 1 sets speed to 0.01x.
 	- 2 sets speed to 0.05x.
 	- 3 sets speed to 0.1x.
+	- 4 sets speed to 0.5x.
+	- 5 sets speed to 2.0x.
 
 Whenever recording or replaying,  
 the camera will follow the character only if it is fixed on the player position by pressing HOME. 
