@@ -176,9 +176,12 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 			const auto capability = gun_entity.get_owning_transfer_capability();
 
+			auto& gun = gun_entity.template get<components::gun>();
+
 			if (capability.dead()) {
 				/* Only process autonomous gun logic */
 				cooldown_gun_heat(step, muzzle_transform, gun_entity);
+				gun.chambering_progress_ms = 0.f;
 				return;
 			}
 
@@ -203,7 +206,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					return out;
 				}();
 
-				auto& gun = gun_entity.template get<components::gun>();
 				const auto& gun_def = gun_entity.template get<invariants::gun>();
 
 				//const bool has_secondary_function = false;
