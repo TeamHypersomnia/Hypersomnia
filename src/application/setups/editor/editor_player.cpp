@@ -356,6 +356,23 @@ void editor_player::read_live_entropies(const augs::path_type& from) {
 	base::read_live_entropies(from);
 }
 
+double editor_player::get_audiovisual_speed(const editor_folder& f) const {
+	if (has_testing_started()) {
+		return on_mode_with_input(
+			f.commanded->rulesets.all,
+			f.commanded->work.world,
+			[&](const auto& m, const auto& in) {
+				const auto current_logic_speed = m.round_speeds.logic_speed_mult;
+				const auto chosen_audiovisual_speed = in.rules.view.audiovisual_speed;
+
+				return get_speed() * std::max(current_logic_speed, chosen_audiovisual_speed);
+			}
+		);
+	}
+
+	return 0.0;
+}
+
 template class augs::snapshotted_player<
 	editor_player_entropy_type,
 	editor_solvable_snapshot

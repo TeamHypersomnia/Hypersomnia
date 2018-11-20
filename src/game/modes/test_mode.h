@@ -12,6 +12,12 @@ struct entity_id;
 
 class cosmos;
 
+struct test_mode_view_rules {
+	// GEN INTROSPECTOR struct test_mode_view_rules
+	double audiovisual_speed = 1.0;
+	// END GEN INTROSPECTOR
+};
+
 struct test_mode_ruleset {
 	// GEN INTROSPECTOR struct test_mode_ruleset
 	std::string name = "Unnamed test scene mode vars";
@@ -21,6 +27,7 @@ struct test_mode_ruleset {
 	faction_type spawned_faction = faction_type::RESISTANCE;
 	int spawned_chars = 1;
 	augs::speed_vars speeds;
+	test_mode_view_rules view;
 	// END GEN INTROSPECTOR
 };
 

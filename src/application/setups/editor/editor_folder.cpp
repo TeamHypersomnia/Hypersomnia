@@ -280,3 +280,7 @@ double editor_folder::get_inv_tickrate() const {
 
 	return 1 / 128.0;
 }
+
+double editor_folder::get_audiovisual_speed() const {
+	return player.get_audiovisual_speed(*this);
+}

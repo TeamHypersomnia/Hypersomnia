@@ -62,6 +62,7 @@ struct editor_folder {
 	void autosave_if_needed() const;
 
 	double get_inv_tickrate() const;
+	double get_audiovisual_speed() const;
 
 private:
 	void import_folder(sol::state& lua, const augs::path_type& from);

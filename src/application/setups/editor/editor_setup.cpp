@@ -47,7 +47,11 @@ void editor_setup::open_last_folders(sol::state& lua) {
 }
 
 double editor_setup::get_audiovisual_speed() const {
-	return anything_opened() ? player().get_speed() : 1.0;
+	if (anything_opened()) {
+		return folder().get_audiovisual_speed();
+	}
+
+	return 0.0;
 }
 
 const cosmos& editor_setup::get_viewed_cosmos() const {
@@ -689,24 +693,26 @@ void editor_setup::perform_custom_imgui(
 			text_tooltip("x: %x\ny: %x", pos->x, pos->y);
 		}
 
-		on_mode_with_input(
-			[&](const auto& typed_mode, const auto& mode_input) {
-				const auto draw_mode_in = draw_mode_gui_input { 
-					get_game_screen_top(), 
-					view().local_player, 
-					game_atlas,
-					config
-				};
+		if (player().has_testing_started()) {
+			on_mode_with_input(
+				[&](const auto& typed_mode, const auto& mode_input) {
+					const auto draw_mode_in = draw_mode_gui_input { 
+						get_game_screen_top(), 
+						view().local_player, 
+						game_atlas,
+						config
+					};
 
-				const auto new_entropy = arena_gui.perform_imgui(
-					draw_mode_in, 
-					typed_mode, 
-					mode_input
-				);
+					const auto new_entropy = arena_gui.perform_imgui(
+						draw_mode_in, 
+						typed_mode, 
+						mode_input
+					);
 
-				control(new_entropy);
-			}
-		);
+					control(new_entropy);
+				}
+			);
+		}
 	}
 
 	if (open_folder_dialog.valid() && is_ready(open_folder_dialog)) {
@@ -1957,7 +1963,7 @@ void editor_setup::on_mode_with_input(F&& callback) const {
 }
 
 void editor_setup::draw_mode_gui(const draw_setup_gui_input& in) {
-	if (anything_opened()) {
+	if (anything_opened() && player().has_testing_started()) {
 		on_mode_with_input(
 			[&](const auto& typed_mode, const auto& mode_input) {
 				const auto draw_mode_in = draw_mode_gui_input { 

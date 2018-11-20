@@ -186,4 +186,6 @@ public:
 
 	void choose_mode(const ruleset_id& id);
 	void read_live_entropies(const augs::path_type& from);
+
+	double get_audiovisual_speed(const editor_folder&) const;
 };

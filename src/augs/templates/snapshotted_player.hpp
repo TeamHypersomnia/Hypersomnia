@@ -115,6 +115,11 @@ namespace augs {
 	}
 
 	template <class A, class B>
+	double snapshotted_player<A, B>::get_requested_speed() const {
+		return speed;
+	}
+
+	template <class A, class B>
    	void snapshotted_player<A, B>::set_speed(const double new_speed) {
 		speed = new_speed;
 	}

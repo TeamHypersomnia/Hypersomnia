@@ -116,6 +116,8 @@ namespace augs {
 		void begin_recording();
 
 		double get_speed() const;
+		double get_requested_speed() const;
+
 		void set_speed(double);
 
 		template <class S>
