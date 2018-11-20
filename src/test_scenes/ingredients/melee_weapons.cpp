@@ -65,7 +65,8 @@ namespace test_flavours {
 				{
 					auto& t = melee.throw_def;
 					t.min_speed_to_hurt = 500.f;
-					t.throw_angular_speed = 360.f * 10.f;
+					// t.throw_angular_speed = 360.f * 10.f;
+					t.throw_angular_speed = 0.f;
 
 					auto& d = t.damage;
 					d.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);

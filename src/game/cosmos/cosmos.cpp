@@ -58,3 +58,11 @@ void cosmos::reinfer_everything() {
 	common.reinfer();
 	cosmic::reinfer_solvable(*this);
 }
+
+void cosmos::set_fixed_delta(const augs::delta& dt) {
+	cosmic::change_solvable_significant(*this, [&](cosmos_solvable_significant& current_signi){ 
+		ensure_eq(0, current_signi.clk.now.step);
+		current_signi.clk.dt = dt;
+		return changer_callback_result::DONT_REFRESH; 
+	});
+}

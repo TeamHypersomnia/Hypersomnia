@@ -20,11 +20,11 @@ namespace augs {
 		return !operator==(b);
 	}
 
-	float stepped_timestamp::in_seconds(const delta delta) const {
+	real32 stepped_timestamp::in_seconds(const delta delta) const {
 		return step * delta.in_seconds();
 	}
 
-	float stepped_timestamp::in_milliseconds(const delta delta) const {
+	real32 stepped_timestamp::in_milliseconds(const delta delta) const {
 		return step * delta.in_milliseconds();
 	}
 	
@@ -33,14 +33,14 @@ namespace augs {
 	}
 
 	stepped_cooldown::stepped_cooldown(
-		const float cooldown_duration_ms
+		const real32 cooldown_duration_ms
 	) : 
 		cooldown_duration_ms(cooldown_duration_ms) 
 	{
 	}
 
 	void stepped_cooldown::set(
-		const float ms, 
+		const real32 ms, 
 		const stepped_timestamp now
 	) {
 		cooldown_duration_ms = ms;
@@ -65,13 +65,13 @@ namespace augs {
 		return clk.is_ready(cooldown_duration_ms, when_last_fired);
 	}
 
-	float stepped_cooldown::get_remaining_ms(
+	real32 stepped_cooldown::get_remaining_ms(
 		const stepped_clock& clk
 	) const {
 		return clk.get_remaining_ms(cooldown_duration_ms, when_last_fired);
 	}
 
-	float stepped_cooldown::get_ratio_of_remaining_time(
+	real32 stepped_cooldown::get_ratio_of_remaining_time(
 		const stepped_clock& clk
 	) const {
 		return clk.get_ratio_of_remaining_time(cooldown_duration_ms, when_last_fired);

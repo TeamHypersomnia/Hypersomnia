@@ -172,7 +172,7 @@ faction_type bomb_mode::get_player_faction(const mode_player_id& id) const {
 }
 
 void bomb_mode::init_spawned(
-	const input in, 
+	const input_type in, 
 	const entity_id id, 
 	const logic_step step,
 	const std::optional<transfer_meta> transferred

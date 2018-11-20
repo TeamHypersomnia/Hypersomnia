@@ -27,7 +27,7 @@ mode_player_id test_mode::lookup(const entity_guid& guid) const {
 	return mode_player_id::dead();
 }
 
-void test_mode::init_spawned(const input in, const entity_id id, const logic_step step) {
+void test_mode::init_spawned(const input_type in, const entity_id id, const logic_step step) {
 	const auto handle = in.cosm[id];
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
@@ -41,7 +41,7 @@ void test_mode::init_spawned(const input in, const entity_id id, const logic_ste
 	});
 }
 
-void test_mode::teleport_to_next_spawn(const input in, const entity_id id) {
+void test_mode::teleport_to_next_spawn(const input_type in, const entity_id id) {
 	const auto handle = in.cosm[id];
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {

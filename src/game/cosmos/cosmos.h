@@ -292,4 +292,6 @@ public:
 	}
 
 	void reinfer_everything();
+
+	void set_fixed_delta(const augs::delta& dt);
 };

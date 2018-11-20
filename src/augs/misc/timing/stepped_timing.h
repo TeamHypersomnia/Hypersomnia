@@ -15,19 +15,19 @@ namespace augs {
 		bool operator==(const stepped_timestamp) const;
 		bool operator!=(const stepped_timestamp) const;
 
-		float in_seconds(const delta) const;
-		float in_milliseconds(const delta) const;
+		real32 in_seconds(const delta) const;
+		real32 in_milliseconds(const delta) const;
 
 		bool was_set() const;
 	};
 
 	struct stepped_clock {
 		// GEN INTROSPECTOR struct augs::stepped_clock
-		stepped_timestamp now;
+		stepped_timestamp now = { static_cast<unsigned>(0) };
 		delta dt = delta::steps_per_second(60);
 		// END GEN INTROSPECTOR
 
-		float diff_seconds(const stepped_clock& lesser) const {
+		auto diff_seconds(const stepped_clock& lesser) const {
 			/* TODO: Account for different deltas when they can change. */
 			return (now - lesser.now).in_seconds(dt);
 		}
@@ -101,14 +101,14 @@ namespace augs {
 	struct stepped_cooldown {
 		// GEN INTROSPECTOR struct augs::stepped_cooldown
 		stepped_timestamp when_last_fired;
-		float cooldown_duration_ms = 1000.f;
+		real32 cooldown_duration_ms = 1000.f;
 		// END GEN INTROSPECTOR
 
-		stepped_cooldown(const float cooldown_duration_ms = 1000.f);
-		void set(const float cooldown_duration_ms, const stepped_timestamp now);
+		stepped_cooldown(const real32 cooldown_duration_ms = 1000.f);
+		void set(const real32 cooldown_duration_ms, const stepped_timestamp now);
 		
-		float get_remaining_ms(const stepped_clock&) const;
-		float get_ratio_of_remaining_time(const stepped_clock&) const;
+		real32 get_remaining_ms(const stepped_clock&) const;
+		real32 get_ratio_of_remaining_time(const stepped_clock&) const;
 
 		bool lasts(const stepped_clock&) const;
 		bool is_ready(const stepped_clock&) const;

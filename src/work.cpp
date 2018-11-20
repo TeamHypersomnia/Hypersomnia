@@ -589,7 +589,7 @@ int work(const int argc, const char* const * const argv) try {
 			frame_performance.num_visible_entities.measure(all_visible.count_all());
 		}
 
-		audiovisuals.advance({
+		audiovisuals.advance(audiovisual_advance_input {
 			frame_delta,
 			speed_multiplier,
 

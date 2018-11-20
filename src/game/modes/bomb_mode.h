@@ -408,10 +408,10 @@ public:
 		const mode_entropy& entropy, 
 		C callbacks
 	) {
-		const auto input = logic_step_input { in.cosm, entropy.cosmic };
+		const auto step_input = logic_step_input { in.cosm, entropy.cosmic };
 
 		standard_solver()(
-			input, 
+			step_input, 
 			solver_callbacks(
 				[&](const logic_step step) {
 					callbacks.pre_solve(step);

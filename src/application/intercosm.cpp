@@ -58,12 +58,17 @@ void intercosm::make_test_scene(
 			return changer_callback_result::DONT_REFRESH;
 		});
 
-		cosmic::change_solvable_significant(world, [settings](auto& s){
-			s.clk.dt = augs::delta::steps_per_second(settings.scene_tickrate); 
-			return changer_callback_result::REFRESH;
-		});
+		world.set_fixed_delta(augs::delta::steps_per_second(settings.scene_tickrate));
+		cosmic::reinfer_solvable(world);
 
 		populator.populate_with_entities(caches, { world, {} });
+
+		cosmic::change_solvable_significant(world, [](auto& s){
+			/* Populating with test scene will advance it so revert the step number back to 0 */
+			s.clk.now.step = 0;
+			return changer_callback_result::DONT_REFRESH;
+		});
+
 		populator.setup(test_mode);
 
 		if (bomb_mode != nullptr) {
