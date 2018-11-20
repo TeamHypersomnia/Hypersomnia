@@ -139,7 +139,7 @@ void editor_player::advance_player(
 	const auto performed_steps = base::advance(
 		make_snapshotted_advance_input(in, std::forward<E>(extract_collected_entropy)),
 		frame_delta,
-		in.cmd_in.get_cosmos().get_fixed_delta()
+		in.cmd_in.folder.get_inv_tickrate()
 	);
 
 	if (performed_steps) {

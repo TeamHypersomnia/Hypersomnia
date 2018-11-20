@@ -14,6 +14,7 @@
 #include "game/enums/battle_event.h"
 #include "augs/misc/enum/enum_array.h"
 #include "augs/misc/timing/stepped_timing.h"
+#include "augs/misc/timing/speed_vars.h"
 
 struct entity_guid;
 struct entity_id;
@@ -80,6 +81,8 @@ struct bomb_mode_ruleset {
 
 	bomb_mode_economy_rules economy;
 	arena_mode_view_rules view;
+
+	augs::speed_vars speeds;
 	// END GEN INTROSPECTOR
 
 	auto get_num_rounds() const {
@@ -340,6 +343,7 @@ public:
 	bool should_commence_when_ready = false;
 	real32 commencing_timer_ms = -1.f;
 	unsigned current_num_bots = 0;
+	augs::speed_vars round_speeds;
 	// END GEN INTROSPECTOR
 
 	mode_player_id add_player(input, const entity_name_str& chosen_name);

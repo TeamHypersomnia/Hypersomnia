@@ -1,7 +1,12 @@
 #include <cstring>
 
+#define BUILD_IMAGE 1
+
+#if BUILD_IMAGE
 #define LODEPNG_NO_COMPILE_ALLOCATORS
 #include "3rdparty/lodepng/lodepng.h"
+#endif
+
 #include "augs/ensure.h"
 
 #include "augs/image/image.h"
@@ -18,6 +23,8 @@
 #undef min
 #undef max
 #endif
+
+#if BUILD_IMAGE
 /* 
 	We write manual encoding/decoding wrappers to be able to pass our own rgba vectors,
 	instead of vectors of unsigned chars.
@@ -82,6 +89,8 @@ unsigned encode_rgba(std::vector<std::byte>& out, const std::vector<rgba>& in_v,
   return error;
 }
 
+#endif
+
 template<class C>
 static void Line(
 	int x1, 
@@ -141,6 +150,7 @@ namespace augs {
 	}
 
 	vec2u image::get_size(const path_type& file_path) {
+#if BUILD_IMAGE
 		try {
 			const auto extension = file_path.extension();
 			auto in = with_exceptions<std::ifstream>();
@@ -175,6 +185,9 @@ namespace augs {
 		catch (const std::exception& err) {
 			throw image_loading_error("Failed to read size of %x:\n%x", file_path, err.what());
 		}
+#else
+		return vec2u::zero;
+#endif
 	}
 
 	image::image(const vec2u new_size) {

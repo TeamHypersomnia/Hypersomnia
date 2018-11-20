@@ -178,6 +178,10 @@ public:
 		return before_start;
 	}
 
+	const auto& get_current_mode() const {
+		return current_mode;
+	}
+
 	void set_dirty();
 
 	void choose_mode(const ruleset_id& id);

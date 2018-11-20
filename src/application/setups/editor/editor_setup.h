@@ -208,7 +208,7 @@ public:
 
 	double get_audiovisual_speed() const;
 	const cosmos& get_viewed_cosmos() const;
-	real32 get_interpolation_ratio() const;
+	double get_interpolation_ratio() const;
 	entity_id get_viewed_character_id() const;
 	const_entity_handle get_viewed_character() const;
 	const all_viewables_defs& get_viewable_defs() const;

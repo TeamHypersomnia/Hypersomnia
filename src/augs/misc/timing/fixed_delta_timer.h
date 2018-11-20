@@ -23,7 +23,7 @@ namespace augs {
 
 		void advance(const delta frame_delta);
 
-		unsigned extract_num_of_logic_steps(const delta fixed_delta);
-		real32 fraction_of_step_until_next_step(const delta fixed_delta) const;
+		unsigned extract_num_of_logic_steps(const double inv_tickrate);
+		double fraction_of_step_until_next_step(const double inv_tickrate) const;
 	};
 }

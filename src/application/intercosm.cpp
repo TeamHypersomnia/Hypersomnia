@@ -19,6 +19,9 @@
 #include "augs/readwrite/lua_file.h"
 #include "augs/readwrite/byte_file.h"
 
+#include "game/modes/bomb_mode.h"
+#include "game/modes/test_mode.h"
+
 static_assert(has_introspect_base_v<const entity_solvable<const controlled_character>>);
 static_assert(!augs::is_byte_readwrite_appropriate_v<std::ifstream, all_logical_assets>);
 static_assert(augs::is_byte_readwrite_appropriate_v<std::ifstream, augs::simple_pair<int, double>>);
@@ -55,11 +58,14 @@ void intercosm::make_test_scene(
 			viewables.update_relevant(logicals);
 			::populate_test_scene_common(caches, common);
 
-			return changer_callback_result::DONT_REFRESH;
+			return changer_callback_result::REFRESH;
 		});
 
-		world.set_fixed_delta(augs::delta::steps_per_second(settings.scene_tickrate));
-		cosmic::reinfer_solvable(world);
+		if (bomb_mode) {
+			bomb_mode->speeds.tickrate = settings.scene_tickrate;
+		}
+
+		test_mode.speeds.tickrate = settings.scene_tickrate;
 
 		populator.populate_with_entities(caches, { world, {} });
 

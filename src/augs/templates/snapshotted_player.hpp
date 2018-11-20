@@ -260,7 +260,7 @@ namespace augs {
 	int snapshotted_player<entropy_type, B>::advance(
 		const I& in,
 		delta frame_delta, 
-		const delta& fixed_delta
+		const double inv_tickrate
 	) {
 		auto steps = additional_steps;
 
@@ -272,7 +272,7 @@ namespace augs {
 			timer.advance(frame_delta *= speed);
 			timer.max_steps_to_perform_at_once = 30;
 			timer.mode = lag_spike_handling_type::CATCH_UP;
-			steps += timer.extract_num_of_logic_steps(fixed_delta);
+			steps += timer.extract_num_of_logic_steps(inv_tickrate);
 		}
 
 		const auto performed_steps = steps;

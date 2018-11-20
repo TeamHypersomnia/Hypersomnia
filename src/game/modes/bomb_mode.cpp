@@ -179,7 +179,7 @@ void bomb_mode::init_spawned(
 ) {
 	auto& cosm = in.cosm;
 	const auto handle = cosm[id];
-	const auto& faction_vars = in.rules.factions[handle.get_official_faction()];
+	const auto& faction_rules = in.rules.factions[handle.get_official_faction()];
 
 	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
 		if (transferred != std::nullopt && transferred->player.survived) {
@@ -234,8 +234,8 @@ void bomb_mode::init_spawned(
 		else {
 			const auto& eq = 
 				state == arena_mode_state::WARMUP
-				? faction_vars.warmup_initial_eq
-				: faction_vars.initial_eq
+				? faction_rules.warmup_initial_eq
+				: faction_rules.initial_eq
 			;
 
 			eq.generate_for(typed_handle, step);
@@ -616,7 +616,11 @@ void bomb_mode::setup_round(
 		return result;
 	}();
 
+	round_speeds = in.rules.speeds;
+
 	cosm.set(in.initial_signi);
+	cosm.set_fixed_delta(round_speeds.calc_fixed_delta());
+
 	remove_test_characters(cosm);
 
 	if (in.rules.delete_lying_items_on_round_start) {
@@ -628,7 +632,6 @@ void bomb_mode::setup_round(
 	for_each_faction([&](const auto faction) {
 		reshuffle_spawns(cosm, faction);
 	});
-
 
 	messages::changed_identities_message msg;
 
@@ -648,6 +651,9 @@ void bomb_mode::setup_round(
 			msg.changes.try_emplace(*former_id, new_id);
 		}
 	}
+
+	spawn_and_kick_bots(in, step);
+	spawn_recently_added_players(in, step);
 
 	if (msg.changes.size() > 0) {
 		step.post_message(msg);
@@ -1336,6 +1342,10 @@ void bomb_mode::handle_game_commencing(const input_type in, const logic_step ste
 }
 
 void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy, const logic_step step) {
+	if (state == arena_mode_state::INIT) {
+		restart(in, step);
+	}
+
 	spawn_and_kick_bots(in, step);
 	spawn_recently_added_players(in, step);
 
@@ -1346,10 +1356,7 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 		commencing_timer_ms = -1;
 	}
 
-	if (state == arena_mode_state::INIT) {
-		restart(in, step);
-	}
-	else if (state == arena_mode_state::WARMUP) {
+	if (state == arena_mode_state::WARMUP) {
 		respawn_the_dead(in, step, in.rules.warmup_respawn_after_ms);
 
 		if (get_warmup_seconds_left(in) <= 0.f) {
@@ -1529,10 +1536,7 @@ float bomb_mode::get_match_begins_in_seconds(const input_type in) const {
 }
 
 float bomb_mode::get_total_seconds(const input_type in) const {
-	const auto& start_clk = in.initial_signi.clk;
-	const auto& clk = in.cosm.get_clock();
-
-	return clk.diff_seconds(start_clk);
+	return in.cosm.get_clock().now.in_seconds(round_speeds.calc_ticking_delta());
 }
 
 float bomb_mode::get_round_seconds_passed(const input_type in) const {
@@ -1558,8 +1562,8 @@ float bomb_mode::get_seconds_since_win(const input_type in) const {
 		return -1.f;
 	}
 
-	const auto& clk = in.cosm.get_clock();
-
+	auto clk = in.cosm.get_clock();
+	clk.dt = round_speeds.calc_ticking_delta();
 	return clk.diff_seconds(last_win.when);
 }
 

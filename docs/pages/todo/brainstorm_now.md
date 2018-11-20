@@ -6,16 +6,50 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- we can make the server always have the built-in functionality to play locally with a character
-	- for barebones server, we can simply compile out the window, opengl and openal, even lodepng, leaving us with no-ops at all
-		- server won't rely on image/sound information anyway, this will be the task of the mapper to once create a proper map
-	- we can simply set a flag for whether we want audiovisual processing
-	- menu guis won't be processed anyway
+- there is no problem with changing the amount of steps we re-simulate once tickrate is suddenly changed
+	- we simply always take the tickrate from the referential player
 
-- plan for full server replays
+- arena_server_setup
+- arena_client_setup
+
+- concept: server session
+	- mode-agnostic sever vars
+		- arena_server_vars
+			- perhaps they should not AT ALL influence the deterministic state itself
+				- problematically, logic_speed_mult does influence this state by influencing the requested delta
+				- so does the tickrate though
+					- although that should only generate entropy
+			- max players? 
+			- okay why not simply have both the tickrate and the audio speed in arena mode ruleset?
+				- simplest solution, not pure semantically but still architecturally somewhat
+				- we'll still have *some* server vars
+			- basically they should only change how entropy-generating code behaves and the timing code
+			- timing info
+				- tickrate
+				- snap audio speed to simulation speed
+		- these actually can be called vars, why not
 	- server step != mode step?
 		- server step tied to tickrate?
 			- the cosmos and the mode anyway don't know about the rates, just of a delta to advance
+	- server step will also be passed to the packed
+		- only ever zeroed-out on hard server resets OR when there are zero players?
+		- server step does not have to correlate to the cosmos step at all
+			- in fact they will most of the time be different due to rounds being reset
+			- so it's fine to always zero-out the server sequence when there are no players
+	- we can make the server always have the built-in functionality to play locally with a character
+		- for local plays, it won't be much of an overhead
+			- it doesn't even have to be used for pure local setups
+			- can be used for the editor playtesting to have full test experience?
+				- actually even then it's not required
+		- menu guis won't be processed anyway
+		- for now we don't need a barebones server
+			- we'll test it when the time comes
+			- for barebones server, we can simply compile out the window, opengl and openal, even lodepng, leaving us with no-ops at all
+				- server won't rely on image/sound information anyway, this will be the task of the mapper to once create a proper map
+				- we can also simply set a flag for whether we want audiovisual processing
+				- also completely compile out the vws 
+
+- plan for full server replays
 	- it's just about saving the entropies
 	- server shall be frozen and never advance when there are no players
 	- keeping timing information in arena server vars
@@ -24,9 +58,6 @@ summary: That which we are brainstorming at the moment.
 		- since it will also store player information
 	- server entropy serializer
 
-- mode-agnostic sever vars
-	- arena_server_vars
-	- these actually can be called vars, why not
 
 - Letting servers adjust the speed of the game
 	- bomb mode doesn't do timing, it just advances whenever asked, but it has to effecctively use the delta information
@@ -44,11 +75,10 @@ summary: That which we are brainstorming at the moment.
 	- audiovisual state can accept speed mult separately
 		- which could be also changed when a proper tick is check
 
-- document the offset picker
-
 - adjust doppler factors of bullet trace sounds
 
 - Remember to reset input flags of the character itself on performing transfer
+	- why? it's good to keep shooting once you change
 
 - Easily spawn loaded weapons or magazines
 	- For now, let instantiation load them all by default

@@ -84,7 +84,7 @@ public:
 	}
 
 	auto get_interpolation_ratio() const {
-		return timer.fraction_of_step_until_next_step(get_viewed_cosmos().get_fixed_delta());
+		return timer.fraction_of_step_until_next_step(get_viewed_cosmos().get_fixed_delta().in_seconds<double>());
 	}
 
 	auto get_viewed_character_id() const {
@@ -121,7 +121,8 @@ public:
 
 		timer.advance(in.frame_delta);
 
-		auto steps = timer.extract_num_of_logic_steps(get_viewed_cosmos().get_fixed_delta());
+		const auto inv_tickrate = get_viewed_cosmos().get_fixed_delta().in_seconds<real64>();
+		auto steps = timer.extract_num_of_logic_steps(inv_tickrate);
 
 		while (steps--) {
 			total_collected_entropy.clear_dead_entities(intro.world);

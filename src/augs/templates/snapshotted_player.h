@@ -74,7 +74,7 @@ namespace augs {
 		int advance(
 			const I& input,
 			delta frame_delta, 
-			const delta& fixed_delta
+			const double inv_tickrate
 		);
 
 		void clear_later_entropies();

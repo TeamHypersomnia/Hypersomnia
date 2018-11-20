@@ -7,24 +7,21 @@
 namespace augs {
 	struct introspection_access;
 
-	// TODO: usage of time should be uniform, 
-	// should only store precomputed float/double counterparts,
-	// without milliseconds
-
 	class delta {
 		friend struct introspection_access;
 		friend class timer;
 		using default_t = real32;
+		using double_type = real64;
 
 		// GEN INTROSPECTOR class augs::delta
-		double secs = 0.0;
-		double ms = 0.0;
+		double_type secs = 0.0;
+		double_type ms = 0.0;
 
 		default_t secsf = 0.f;
 		default_t msf = 0.f;
 		// END GEN INTROSPECTOR
 		
-		explicit delta(const double secs) :
+		explicit delta(const double_type secs) :
 			secs(secs),
 			ms(secs * 1000),
 			secsf(static_cast<default_t>(secs)),
@@ -38,6 +35,10 @@ namespace augs {
 			return delta{ steps ? 1.0 / steps : 0.0 };
 		}
 
+		static delta from_milliseconds(const double_type ms) {
+			return delta{ ms / 1000 };
+		}
+
 		bool operator==(const delta& b) const {
 			return secs == b.secs;
 		}
@@ -47,7 +48,7 @@ namespace augs {
 			if constexpr(std::is_same_v<T, default_t>) {
 				return { secsf };
 			}
-			else if constexpr(std::is_same_v<T, double>) {
+			else if constexpr(std::is_same_v<T, double_type>) {
 				return { secs };
 			}
 			else {
@@ -60,7 +61,7 @@ namespace augs {
 			if constexpr(std::is_same_v<T, default_t>) {
 				return { msf };
 			}
-			else if constexpr(std::is_same_v<T, double>) {
+			else if constexpr(std::is_same_v<T, double_type>) {
 				return { ms };
 			}
 			else {

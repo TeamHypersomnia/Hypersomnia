@@ -4,6 +4,12 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Proposition: instead of "logic speed mult" have a set of predictable parameters for the simulation?
+	- like, gun intervals speed mult
+	- like, physics speed mult
+	- so don't store it next to tickrate
+	- we could avoid influencing time-related domains
+
 - Arbitrarily colorized text in context help
 
 - Probably somehow disallow arbitrary inferring of relational cache?

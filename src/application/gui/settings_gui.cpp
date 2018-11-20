@@ -534,7 +534,6 @@ void settings_gui_state::perform(
 					revertable_slider(SCOPE_CFG_NVP(neon_regeneration_threads), 0u, t_max);
 				}
 
-
 				break;
 			}
 			default: {

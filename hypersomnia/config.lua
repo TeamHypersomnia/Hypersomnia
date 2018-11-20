@@ -99,7 +99,7 @@ return {
       num_lines = 15,
     },
     test_scene = {
-      scene_tickrate = 128,
+      scene_tickrate = 60,
       start_bomb_mode = true
     },
     camera = {
@@ -381,7 +381,7 @@ return {
   },
   test_scene = {
     create_minimal_test_scene = false,
-    scene_tickrate = 128
+    scene_tickrate = 60
   },
   simulation_receiver = {
     misprediction_smoothing_multiplier = 1.2000000476837158

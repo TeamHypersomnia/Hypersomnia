@@ -267,3 +267,16 @@ void editor_folder::import_folder(sol::state& lua, const augs::path_type& from) 
 	augs::create_directory(new_path);
 	set_folder_path(new_path);
 }
+
+double editor_folder::get_inv_tickrate() const {
+	if (player.has_testing_started()) {
+		return std::visit(
+			[&](const auto& typed_mode) {
+				return typed_mode.round_speeds.calc_inv_tickrate();
+			},
+			player.get_current_mode()
+		);
+	}
+
+	return 1 / 128.0;
+}

@@ -2270,3 +2270,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Context help
 	- Enums corresponding to text files
+- document the offset picker
+

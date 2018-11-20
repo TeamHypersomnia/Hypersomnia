@@ -5,6 +5,7 @@
 #include "game/cosmos/solvers/standard_solver.h"
 #include "game/modes/mode_entropy.h"
 #include "game/modes/mode_player_id.h"
+#include "augs/misc/timing/speed_vars.h"
 
 struct entity_guid;
 struct entity_id;
@@ -19,6 +20,7 @@ struct test_mode_ruleset {
 	requested_equipment initial_eq;
 	faction_type spawned_faction = faction_type::RESISTANCE;
 	int spawned_chars = 1;
+	augs::speed_vars speeds;
 	// END GEN INTROSPECTOR
 };
 
@@ -52,6 +54,7 @@ public:
 	unsigned current_spawn_index = 0;
 	std::vector<entity_guid> pending_inits;
 	std::unordered_map<mode_player_id, test_mode_player> players;
+	augs::speed_vars round_speeds;
 	// END GEN INTROSPECTOR
 
 	mode_player_id add_player(input, const faction_type);

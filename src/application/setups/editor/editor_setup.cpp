@@ -54,8 +54,8 @@ const cosmos& editor_setup::get_viewed_cosmos() const {
 	return anything_opened() ? work().world : cosmos::zero; 
 }
 
-real32 editor_setup::get_interpolation_ratio() const {
-	return anything_opened() ? player().get_timer().fraction_of_step_until_next_step(get_viewed_cosmos().get_fixed_delta()) : 1.0;
+double editor_setup::get_interpolation_ratio() const {
+	return anything_opened() ? player().get_timer().fraction_of_step_until_next_step(folder().get_inv_tickrate()) : 1.0;
 }
 
 entity_id editor_setup::get_viewed_character_id() const {
