@@ -58,6 +58,9 @@ struct melee_throw_def {
 	impulse_mults boomerang_impulse = { 2000.f, 1.5f };
 	melee_clash_def clash;
 	real32 min_speed_to_hurt = 50.f;
+
+	real32 throw_angular_speed = 0.f;
+	real32 clash_angular_speed = 360 * 20.f;
 	// END GEN INTROSPECTOR
 };
 

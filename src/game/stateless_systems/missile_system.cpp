@@ -187,10 +187,11 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 						const auto& from = surface_handle;
 						const auto& what = typed_melee;
 
+						const auto& throw_def = typed_melee.template get<invariants::melee>().throw_def;
 						const auto& from_throw_def = from.template get<invariants::melee>().throw_def;
-						const auto& clash_def = from_throw_def.clash;
+						const auto& other_clash = from_throw_def.clash;
 
-						const auto clash_impulse = clash_def.impulse;
+						const auto clash_impulse = other_clash.impulse;
 
 						if (clash_impulse > 0.f) {
 							const auto clash_dir = -vec2(it.collider_impact_velocity).normalize();
@@ -203,25 +204,25 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 								const auto vel_degrees = total_vel.degrees();
 								const auto s = augs::sgn(vel_degrees);
 
-								rigid_body.set_angular_velocity(s * 360.f * 15);
+								rigid_body.set_angular_velocity(s * throw_def.clash_angular_speed);
 							}
 
 							const auto eff_dir = vec2(clash_dir).perpendicular_cw();
 							const auto eff_transform = transformr(it.point, eff_dir.degrees());
 
-							clash_def.particles.start(
+							other_clash.particles.start(
 								step,
 								particle_effect_start_input::fire_and_forget(eff_transform)
 							);
 
 							{
 								const bool avoid_clashing_same_sound =
-									clash_def.sound.id == what.template get<invariants::melee>().throw_def.clash.sound.id
+									other_clash.sound.id == throw_def.clash.sound.id
 									&& !cooldown_passes(from.template get<components::melee>().when_clashed)
 								;
 
 								if (!avoid_clashing_same_sound) {
-									clash_def.sound.start(
+									other_clash.sound.start(
 										step,
 										sound_effect_start_input::fire_and_forget(eff_transform)
 									);

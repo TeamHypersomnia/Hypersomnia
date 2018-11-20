@@ -495,6 +495,12 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 							const auto h = cosm[w];
 
 							if (const auto melee_def = h.template find<invariants::melee>()) {
+								int mult = 1;
+
+								if (h.get_current_slot().get_type() == slot_function::SECONDARY_HAND) {
+									mult = -1;
+								}
+
 								do_drop(h);
 
 								{
@@ -505,6 +511,10 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 										particle_effect_start_input::at_entity(h)
 									);
 								}
+
+								const auto body = h.template get<components::rigid_body>();
+
+								body.set_angular_velocity(mult * melee_def->throw_def.throw_angular_speed);
 							}
 						}
 
