@@ -28,6 +28,7 @@
 #include "application/setups/editor/property_editor/widgets/asset_sane_default_provider.h"
 
 #define MACRO_MAKE_ONLY_TRIVIAL_FIELD_ADDRESS(a,b) make_field_address<only_trivial_field_type_id, decltype(a::b)>(augs_offsetof(a,b))
+#define MACRO_MAKE_MODE_FIELD_ADDRESS(a,b) make_field_address<mode_field_type_id, decltype(a::b)>(augs_offsetof(a,b))
 
 void editor_modes_gui::perform(const editor_settings& settings, editor_command_input cmd_in) {
 	using namespace augs::imgui;
@@ -75,7 +76,11 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 					}
 					else {
 						if (ImGui::Button("Restart")) {
-							typed_mode.request_restart();
+							change_current_mode_property_command cmd;
+							cmd.field = MACRO_MAKE_MODE_FIELD_ADDRESS(M, state);
+							cmd.value_after_change = augs::to_bytes(arena_mode_state::INIT);
+							cmd.built_description = typesafe_sprintf("Restarted the mode with ruleset: ", mode_input.rules.name);
+							post_editor_command(cmd_in, cmd);
 						}
 
 						const auto players_node_label = "Players";
