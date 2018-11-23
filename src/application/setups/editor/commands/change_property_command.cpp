@@ -64,7 +64,7 @@ void change_property_command<D>::refresh_other_state(const editor_command_input 
 
 template <class D>
 void change_property_command<D>::rewrite_change(
-	const std::vector<std::byte>& new_value,
+	std::vector<std::byte>&& new_value,
 	const editor_command_input in
 ) {
 	auto& self = *static_cast<D*>(this);
@@ -79,6 +79,8 @@ void change_property_command<D>::rewrite_change(
 			return callback_result::CONTINUE;
 		}
 	);
+
+	value_after_change = std::move(new_value);
 
 	refresh_other_state(in);
 }
