@@ -21,6 +21,10 @@ return {
     music = 1,
     sound_effects = 1
   },
+  sound = {
+	sync_sounds_longer_than_secs = 5,
+	max_divergence_before_sync_secs = 1
+  },
   camera = {
     additional_position_smoothing = {
       average_factor = 0.5,
@@ -99,7 +103,7 @@ return {
       num_lines = 15,
     },
     test_scene = {
-      scene_tickrate = 60,
+      scene_tickrate = 128,
       start_bomb_mode = true
     },
     camera = {
@@ -381,7 +385,7 @@ return {
   },
   test_scene = {
     create_minimal_test_scene = false,
-    scene_tickrate = 60
+    scene_tickrate = 128
   },
   simulation_receiver = {
     misprediction_smoothing_multiplier = 1.2000000476837158

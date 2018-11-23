@@ -75,7 +75,6 @@ int basic_randomization<T>::randval_v(
 	return randval(base_value - variation, base_value + variation);
 }
 
-#include "augs/log.h"
 template <class T>
 float basic_randomization<T>::randval_vm(
 	float base_value, 
@@ -93,7 +92,7 @@ int basic_randomization<T>::randval_h(const int h) {
 
 template <class T>
 std::vector<float> basic_randomization<T>::make_random_intervals(
-	const size_t n, 
+	const std::size_t n, 
 	const float maximum
 ) {
 	std::vector<float> result;
@@ -110,7 +109,7 @@ std::vector<float> basic_randomization<T>::make_random_intervals(
 
 template <class T>
 std::vector<float> basic_randomization<T>::make_random_intervals(
-	const size_t n, 
+	const std::size_t n, 
 	const float maximum, 
 	const float variation_multiplier
 ) {

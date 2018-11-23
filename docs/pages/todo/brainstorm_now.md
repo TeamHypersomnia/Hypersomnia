@@ -6,8 +6,62 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- there is no problem with changing the amount of steps we re-simulate once tickrate is suddenly changed
-	- we simply always take the tickrate from the referential player
+- what to send on client connection?
+	- if we want to replay either from session beginning or mid-way, inputs can become quite large
+	- cosmos solvable won't be that big
+	- we also have to send rulesets if we'll allow commands on them
+
+- it might be a good idea to split intercosm into many files?
+	- in case of compatibility breaks we could only tinker with a single file
+	- git has less to do as well
+
+- check how openal behaves on windows when abruptly stopping sounds
+
+- maps as git repositories
+	- how do we facilitate modifications on existing maps so that they don't have to be re-downloaded?
+	- we'd have to add remotes and assign branches to them
+
+- roundsounds and warmup themes
+	- we could introduce a separate file for ruleset viewables
+		- simply in mode GUI, use a flag for the unpathed/pathed asset widget that determines which viewables to write to
+		- alternatively, since viewables are never too big, simply always have viewables separate from the intercosm
+			- good for skinning the intercosm without ever having to modify it
+	- it would be nice if the sound system could synchronize music against the current arena state
+		- though just warmup. no need to synchronize roundsounds which are short by nature
+			- specifying the warmup theme sound
+				- chosen solution: flavour
+					- best performance
+					- low flexibility
+						- customization without altering the intercosm would involve changing the viewable definition
+						- might be necessary to introduce another warmup sound decoration entity flavour
+					- lowest coding complexity
+					- also lowest design/explaining complexity, not just coding
+						- we might be dead before the need for a more complex solution arises
+					- a bool for whether the music position should be synced?
+						- or a float with seconds tolerance
+							- although that would preferably be the client space setting
+				- sound effect input, spawn entity with unique sound
+					- 'might' incur performance problems?
+					- best flexibility
+					- moderate coding complexity
+					- still two solutions: 
+						- a new entity type for unique sound, or
+							- even worse compilation times...
+						- add a component unique_sound_effect to the existing type
+							- memory overhead
+				- sound effect input, sound system infers information from the mode
+					- best flexibility
+					- best performance
+					- worst coding complexity - greatest coupling
+		- instead of having to create entities? what if we make that functionality cosmos-specific?
+		- there could be a music entity that plays globally
+		- it would also be nice to have themes in rulesets?
+			- well we anyway have viewables definitions in the intercosm so...
+			- in practice every alteration in roundsounds will require a different map 
+				- and later a rebase, wtf
+				- rebases won't be possible with binary files
+
+- always calculate the tickrate from the referential player in case the tickrate suddenly changes
 
 - arena_server_setup
 - arena_client_setup

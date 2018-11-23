@@ -3,6 +3,8 @@
 
 enum class test_scene_sound_id {
 	// GEN INTROSPECTOR enum class test_scene_sound_id
+	BLANK,
+
 	BILMER2000_MUZZLE,
 	PRO90_MUZZLE,
 	ASSAULT_RIFLE_MUZZLE,

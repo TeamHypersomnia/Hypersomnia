@@ -359,6 +359,26 @@ namespace test_flavours {
 			500.f
 		);
 
+		{
+			auto& meta = get_test_flavour(flavours, test_sound_decorations::GENERIC_WARMUP_THEME);
+
+			invariants::continuous_sound sound_def;
+			sound_def.effect.id = to_sound_id(test_scene_sound_id::BLANK);
+			sound_def.effect.modifier.always_direct_listener = true;
+
+			meta.set(sound_def);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_sound_decorations::GENERIC_BOMB_SOON_EXPLODES_THEME);
+
+			invariants::continuous_sound sound_def;
+			sound_def.effect.id = to_sound_id(test_scene_sound_id::BLANK);
+			sound_def.effect.modifier.always_direct_listener = true;
+
+			meta.set(sound_def);
+		}
+
 		auto flavour_with_particles = [&](
 			const auto flavour_id,
 			const auto particles_id,

@@ -207,6 +207,7 @@ public:
 	~editor_setup();
 
 	double get_audiovisual_speed() const;
+	double get_inv_tickrate() const;
 	const cosmos& get_viewed_cosmos() const;
 	double get_interpolation_ratio() const;
 	entity_id get_viewed_character_id() const;

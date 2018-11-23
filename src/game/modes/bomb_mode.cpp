@@ -675,6 +675,21 @@ void bomb_mode::setup_round(
 			spawn_bomb_near_players(in);
 		}
 	}
+
+	if (state == arena_mode_state::WARMUP) {
+		const auto theme = in.rules.view.warmup_theme;
+
+		cosmic::create_entity(
+			cosm, 
+			theme,
+			[&](const auto&, auto&) {
+
+			},
+			[&](auto&) {
+
+			}
+		);
+	}
 }
 
 bomb_mode::round_transferred_players bomb_mode::make_transferred_players(const input_type in) const {
@@ -939,6 +954,19 @@ void bomb_mode::play_faction_sound(const const_logic_step step, const faction_ty
 	effect.start(step, input);
 }
 
+void bomb_mode::play_win_theme(const input_type in, const const_logic_step step, const faction_type winner) const {
+	if (const auto sound_id = in.rules.view.win_themes[winner]; sound_id.is_set()) {
+		sound_effect_input effect;
+		effect.id = sound_id;
+		effect.modifier.always_direct_listener = true;
+
+		sound_effect_start_input input;
+		input.variation_number = get_step_rng_seed(step.get_cosmos());
+
+		effect.start(step, input);
+	}
+}
+
 void bomb_mode::play_win_sound(const input_type in, const const_logic_step step, const faction_type winner) const {
 	const auto p = calc_participating_factions(in);
 
@@ -1004,12 +1032,21 @@ void bomb_mode::process_win_conditions(const input_type in, const logic_step ste
 
 	auto standard_win = [&](const auto winner) {
 		make_win(in, winner);
+		play_win_theme(in, step, winner);
 		play_win_sound(in, step, winner);
 	};
 
 	/* Bomb-based win-conditions */
 
+	auto stop_bomb_detonation_theme = [&]() {
+		if (bomb_detonation_theme.is_set()) {
+			step.post_message(messages::queue_deletion(bomb_detonation_theme));
+			bomb_detonation_theme.unset();
+		}
+	};
+
 	if (bomb_exploded(in)) {
+		stop_bomb_detonation_theme();
 		const auto planting_player = current_round.bomb_planter;
 		++players[planting_player].stats.bomb_explosions;
 		post_award(in, planting_player, in.rules.economy.bomb_explosion_award);
@@ -1018,6 +1055,7 @@ void bomb_mode::process_win_conditions(const input_type in, const logic_step ste
 	}
 
 	if (const auto character_who_defused = cosm[get_character_who_defused_bomb(in)]) {
+		stop_bomb_detonation_theme();
 		const auto winner = p.defusing;
 		const auto defusing_player = lookup(character_who_defused.get_guid());
 		++players[defusing_player].stats.bomb_defuses;
@@ -1488,6 +1526,23 @@ void bomb_mode::mode_post_solve(const input_type in, const mode_entropy& entropy
 					}
 				}
 			});
+
+			if (get_critical_seconds_left(in) <= in.rules.view.secs_until_detonation_to_start_theme) {
+				if (!bomb_detonation_theme.is_set()) {
+					const auto theme = in.rules.view.bomb_soon_explodes_theme;
+
+					bomb_detonation_theme = cosmic::create_entity(
+						cosm, 
+						theme,
+						[&](const auto&, auto&) {
+
+						},
+						[&](auto&) {
+
+						}
+					);
+				}
+			}
 		}
 	}
 }
@@ -1586,7 +1641,7 @@ float bomb_mode::get_round_end_seconds_left(const input_type in) const {
 bool bomb_mode::bomb_exploded(const input_type in) const {
 	return on_bomb_entity(in, [&](const auto& t) {
 		/* 
-			The bomb could only have stopped existing through one way: 
+			The bomb could have stopped existing through only one way: 
 			it has exploded.
 		*/
 
@@ -1622,7 +1677,7 @@ bool bomb_mode::bomb_planted(const input_type in) const {
 	});
 }
 
-float bomb_mode::get_critical_seconds_left(const input_type in) const {
+real32 bomb_mode::get_critical_seconds_left(const input_type in) const {
 	if (!bomb_planted(in)) {
 		return -1.f;
 	}

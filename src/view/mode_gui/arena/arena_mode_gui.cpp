@@ -13,6 +13,12 @@
 #include "game/modes/bomb_mode.h"
 #include "augs/string/format_enum.h"
 #include "game/detail/damage_origin.hpp"
+#include "augs/misc/action_list/standard_actions.h"
+
+const auto default_popul = augs::populate_with_delays_impl(
+	100.f,
+	0.65f
+);
 
 bool arena_gui_state::control(
 	const app_ingame_intent_input in
@@ -220,6 +226,10 @@ void arena_gui_state::draw_mode_gui(
 					money_indicator_pos - vec2i(money_text_w, 0),
 					colored(money_text, cfg.money_indicator_color)
 				);
+			}
+			else {
+				warmup.requested.clear();
+				warmup.current.clear();
 			}
 		}
 
@@ -469,8 +479,74 @@ void arena_gui_state::draw_mode_gui(
 
 			play_tick_if_soon(c, 5.f, true);
 			draw_warmup_indicator(colored("WARMUP\n" + format_mins_secs(c), white));
+
+			const auto& original_welcome = mode_input.rules.view.warmup_welcome_message;
+
+			if (!original_welcome.empty()) {
+				auto& last = warmup.last_seconds_value;
+
+				thread_local auto populator = default_popul;
+
+				if (!last || warmup_left > *last || warmup.requested.empty()) {
+					last = std::nullopt;
+
+					warmup.requested = augs::gui::text::from_bbcode(original_welcome, style(in.gui_fonts.gui, white));
+					warmup.current.clear();
+
+					populator = default_popul;
+					populator.on_enter(warmup.requested);
+				}
+
+				const auto dt_secs = last.has_value() ? *last - warmup_left : 0.f;
+				const auto dt_ms = dt_secs * 1000.f;
+				const auto dt = augs::delta::from_milliseconds(dt_ms);
+
+				{
+					populator.on_update(warmup.current, warmup.requested, dt);
+
+					const auto one_fourth_t = in.screen_size.y / 6;
+					const auto t = one_fourth_t + line_height * 3;
+					const auto s = in.screen_size;
+					const auto target_pos = vec2i { s.x / 2, static_cast<int>(t) };
+
+					auto target = warmup.current;
+
+					auto alpha_mult = 1.f;
+
+					if (!populator.is_complete()) {
+						target += colored("|", white);
+					}
+					else if (warmup.completed_at_secs > 0.f) {
+						const auto fade_delay = 5.f;
+						const auto diff = warmup.completed_at_secs - warmup_left;
+
+						if (diff > fade_delay) {
+							const auto fade_duration = 5.f;
+							const auto mult = 1.f - std::min(1.f, (diff - fade_delay) / fade_duration);
+							alpha_mult = mult;
+							target.mult_alpha(mult);
+						}
+					}
+					else {
+						warmup.completed_at_secs = warmup_left;
+					}
+
+					print_stroked(
+						in.drawer,
+						target_pos,
+						target,
+						{ augs::ralign::CX },
+						rgba(black).mult_alpha(alpha_mult)
+					);
+				}
+
+				last = warmup_left;
+			}
 			return;
 		}
+
+		warmup.requested.clear();
+		warmup.current.clear();
 
 		{
 			if (const auto secs = typed_mode.get_seconds_since_planting(mode_input); secs >= 0.f && secs <= 3.f) {

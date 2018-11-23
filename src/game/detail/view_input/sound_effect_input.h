@@ -18,9 +18,10 @@ struct sound_effect_modifier {
 	real32 reference_distance = 0.f;
 	real32 rolloff_factor = 1.f;
 	real32 doppler_factor = 1.f;
-	short repetitions = 1;
+	char repetitions = 1;
 	bool fade_on_exit = true;
 	bool sync_against_born_time = false;
+	bool always_direct_listener = false;
 	augs::distance_model distance_model = augs::distance_model::LINEAR_DISTANCE_CLAMPED;
 	// END GEN INTROSPECTOR
 };
@@ -49,7 +50,6 @@ namespace std {
 struct sound_effect_start_input {
 	absolute_or_local positioning;
 	entity_id direct_listener;
-	bool always_direct_listener = false;
 	bool clear_when_target_dead = false;
 	faction_type listener_faction = faction_type::SPECTATOR;
 	std::size_t variation_number = static_cast<std::size_t>(-1);

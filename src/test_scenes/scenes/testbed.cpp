@@ -102,6 +102,10 @@ namespace test_scenes {
 			re[battle_event::BOMB_PLANTED] = to_sound_id(test_scene_sound_id::RE_BOMB_PLANTED);
 		}
 
+		for (auto& t : rs.view.win_themes) {
+			t = to_sound_id(test_scene_sound_id::BLANK);
+		}
+
 		{
 			auto& mt = rs.view.win_sounds[faction_type::METROPOLIS];
 
@@ -115,6 +119,9 @@ namespace test_scenes {
 		}
 
 		rs.bomb_flavour = to_entity_flavour_id(test_hand_explosives::BOMB);
+		rs.view.warmup_theme = to_entity_flavour_id(test_sound_decorations::GENERIC_WARMUP_THEME);
+		rs.view.bomb_soon_explodes_theme = to_entity_flavour_id(test_sound_decorations::GENERIC_BOMB_SOON_EXPLODES_THEME);
+		rs.view.secs_until_detonation_to_start_theme = 11;
 
 		rs.view.logos[faction_type::METROPOLIS] = to_image_id(test_scene_image_id::METROPOLIS_LOGO);
 		rs.view.logos[faction_type::ATLANTIS] = to_image_id(test_scene_image_id::ATLANTIS_LOGO);

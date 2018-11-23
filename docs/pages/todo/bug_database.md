@@ -5,6 +5,9 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- why logic speed mult enters 0?
+	- rewrite change didn't save the new value to values_after_change
+
 - Watch out to always properly name the introspectors for types that specify introspect_base.
 	- Our history with marks would silently not get introspected because of such error.
 

@@ -31,12 +31,14 @@ struct audiovisual_post_solve_input {
 	const particle_effects_map& particle_effects;
 	const loaded_sounds_map& sounds;
 	const augs::audio_volume_settings audio_volume;
+	const sound_system_settings& sound_settings;
 	const character_camera& camera;
 };
 
 struct audiovisual_advance_input {
 	const augs::delta frame_delta;
 	const double speed_multiplier;
+	const double inv_tickrate;
 
 	const character_camera& camera;
 
@@ -45,7 +47,8 @@ struct audiovisual_advance_input {
 	const plain_animations_pool& plain_animations;
 
 	const loaded_sounds_map& sounds;
-	const augs::audio_volume_settings audio_volume;
+	const augs::audio_volume_settings& audio_volume;
+	const sound_system_settings& sound_settings;
 };
 
 struct audiovisual_state {

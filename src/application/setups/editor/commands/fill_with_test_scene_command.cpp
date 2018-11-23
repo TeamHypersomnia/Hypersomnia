@@ -49,7 +49,7 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 	bomb_ruleset.round_end_secs = 5;
 	bomb_ruleset.max_rounds = 30;
 #else
-	bomb_ruleset.warmup_secs = 3000;
+	bomb_ruleset.warmup_secs = 0;
 	bomb_ruleset.round_secs = 200;
 	bomb_ruleset.freeze_secs = 0;
 	bomb_ruleset.round_end_secs = 3;

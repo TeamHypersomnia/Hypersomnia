@@ -9,6 +9,16 @@
 #include "view/mode_gui/arena/arena_choose_team_gui.h"
 #include "view/mode_gui/arena/arena_buy_menu_gui.h"
 
+#include "augs/gui/formatted_string.h"
+#include "augs/misc/randomization.h"
+
+struct warmup_welcome_cache {
+	augs::gui::text::formatted_string current;
+	augs::gui::text::formatted_string requested;
+	std::optional<float> last_seconds_value;
+	float completed_at_secs = -1.f;
+};
+
 struct arena_gui_state {
 	arena_scoreboard_gui scoreboard;
 	arena_choose_team_gui choose_team;
@@ -16,6 +26,7 @@ struct arena_gui_state {
 
 	mutable augs::sound_source tick_sound;
 	mutable std::optional<float> last_seconds_value;
+	mutable warmup_welcome_cache warmup;
 
 	bool control(app_ingame_intent_input);
 

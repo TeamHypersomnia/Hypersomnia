@@ -362,10 +362,17 @@ double editor_player::get_audiovisual_speed(const editor_folder& f) const {
 			f.commanded->rulesets.all,
 			f.commanded->work.world,
 			[&](const auto& m, const auto& in) {
-				const auto current_logic_speed = m.round_speeds.logic_speed_mult;
-				const auto chosen_audiovisual_speed = in.rules.view.audiovisual_speed;
+				using M = remove_cref<decltype(m)>;
 
-				return get_speed() * std::max(current_logic_speed, chosen_audiovisual_speed);
+				if constexpr(std::is_same_v<test_mode, M>) {
+					return get_speed();
+				}
+				else {
+					const auto current_logic_speed = m.round_speeds.logic_speed_mult;
+					const auto chosen_audiovisual_speed = in.rules.view.audiovisual_speed;
+
+					return get_speed() * std::max(current_logic_speed, chosen_audiovisual_speed);
+				}
 			}
 		);
 	}

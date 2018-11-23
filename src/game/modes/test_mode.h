@@ -26,7 +26,6 @@ struct test_mode_ruleset {
 	requested_equipment initial_eq;
 	faction_type spawned_faction = faction_type::RESISTANCE;
 	int spawned_chars = 1;
-	augs::speed_vars speeds;
 	test_mode_view_rules view;
 	// END GEN INTROSPECTOR
 };
@@ -61,7 +60,6 @@ public:
 	unsigned current_spawn_index = 0;
 	std::vector<entity_guid> pending_inits;
 	std::unordered_map<mode_player_id, test_mode_player> players;
-	augs::speed_vars round_speeds;
 	// END GEN INTROSPECTOR
 
 	mode_player_id add_player(input, const faction_type);

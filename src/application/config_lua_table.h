@@ -21,6 +21,7 @@
 #include "view/game_gui/elements/hotbar_settings.h"
 #include "view/viewables/regeneration/content_regeneration_settings.h"
 #include "view/audiovisual_state/systems/interpolation_settings.h"
+#include "view/audiovisual_state/systems/sound_system_settings.h"
 #include "view/network/simulation_receiver_settings.h"
 #include "view/mode_gui/arena/arena_mode_gui_settings.h"
 #include "view/faction_view_settings.h"
@@ -90,6 +91,7 @@ struct config_lua_table {
 	world_camera_settings camera;
 	game_drawing_settings drawing;
 	interpolation_settings interpolation;
+	sound_system_settings sound;
 	simulation_receiver_settings simulation_receiver;
 	content_regeneration_settings content_regeneration;
 	main_menu_settings main_menu;

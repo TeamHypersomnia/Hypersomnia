@@ -82,6 +82,10 @@ public:
 		return setup_escape_result::IGNORE;
 	}
 
+	auto get_inv_tickrate() const {
+		return get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
+	}
+
 	template <class C>
 	void advance(
 		const setup_advance_input& in,
@@ -89,8 +93,7 @@ public:
 	) {
 		timer.advance(in.frame_delta);
 
-		const auto inv_tickrate = get_viewed_cosmos().get_fixed_delta().in_seconds<real64>();
-		auto steps = timer.extract_num_of_logic_steps(inv_tickrate);
+		auto steps = timer.extract_num_of_logic_steps(get_inv_tickrate());
 
 		while (steps--) {
 			const auto total = total_collected.extract(get_viewed_character(), in);

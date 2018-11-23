@@ -155,6 +155,8 @@ namespace augs {
 							{"vsdarkgray", vsdarkgray},
 							{"vslightgray", vslightgray},
 							{"violet", violet},
+							{"pink", pink},
+							{"ltblue", ltblue},
 							{"turquoise", turquoise},
 						};
 

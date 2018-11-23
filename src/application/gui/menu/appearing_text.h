@@ -49,11 +49,11 @@ struct appearing_text {
 		push(act(new augs::set_value_action<std::string>(text, std::string())));
 		push(act(new augs::set_value_action<bool>(caret_active, true)));
 
-		push(act(new augs::populate_with_delays<std::string>(text, target_text[0], population_interval * target_text[0].length(), population_variation, rng++)));
+		push(act(new augs::populate_with_delays<std::string>(text, target_text[0], population_interval, population_variation, rng++)));
 
 		if (target_text[1].size() > 0) {
 			push(act(new augs::delay_action(1000.f)));
-			push(act(new augs::populate_with_delays<std::string>(text, target_text[1], population_interval * target_text[1].length(), population_variation, rng++)));
+			push(act(new augs::populate_with_delays<std::string>(text, target_text[1], population_interval, population_variation, rng++)));
 		}
 
 		push(act(new augs::delay_action(1000.f)));

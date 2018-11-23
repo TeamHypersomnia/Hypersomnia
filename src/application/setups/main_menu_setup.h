@@ -112,6 +112,10 @@ public:
 	void customize_for_viewing(config_lua_table& config) const;
 	void apply(const config_lua_table& config);
 
+	auto get_inv_tickrate() const {
+		return get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
+	}
+
 	template <class C>
 	void advance(
 		const setup_advance_input in,
@@ -121,8 +125,7 @@ public:
 
 		timer.advance(in.frame_delta);
 
-		const auto inv_tickrate = get_viewed_cosmos().get_fixed_delta().in_seconds<real64>();
-		auto steps = timer.extract_num_of_logic_steps(inv_tickrate);
+		auto steps = timer.extract_num_of_logic_steps(get_inv_tickrate());
 
 		while (steps--) {
 			total_collected_entropy.clear_dead_entities(intro.world);

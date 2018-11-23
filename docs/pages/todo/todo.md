@@ -6,6 +6,10 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- So that we can change tickrate dynamically, timing logic can, instead of steps, simply hold the floating point (double) values of the seconds passed
+	- alternatively hold unsigned long longs?
+	- also store last_fixed_delta for easy cosmos::get_fixed_delta access
+
 - Usability fixes to editor 
 	- Setting specific names to entities
 	- Complex instantiations

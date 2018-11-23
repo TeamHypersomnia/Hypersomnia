@@ -108,10 +108,6 @@ void test_mode::mode_pre_solve(input_type in, const mode_entropy& entropy, logic
 	(void)entropy;
 	auto& cosm = in.cosm;
 
-	if (cosm.get_clock().now.step == 0) {
-		round_speeds = in.rules.speeds;
-	}
-
 	if (players.empty()) {
 		auto n = in.rules.spawned_chars;
 

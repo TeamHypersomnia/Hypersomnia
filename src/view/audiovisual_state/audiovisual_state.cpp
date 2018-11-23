@@ -115,11 +115,13 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		sounds.update_sound_properties(
 			{
 				input.audio_volume,
+				input.sound_settings,
 				input.sounds,
 				interp,
 				ear,
 				dt,
-				input.speed_multiplier
+				input.speed_multiplier,
+				input.inv_tickrate
 			}
 		);
 	}
@@ -207,11 +209,13 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 			step, 
 			{
 				input.audio_volume,
+				input.sound_settings,
 				input.sounds, 
 				interp, 
 				ear,
 				augs::delta::zero,
-				1.0
+				1.0,
+				0.0
 			}
 		);
 	}

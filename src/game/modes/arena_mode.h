@@ -56,7 +56,18 @@ enum class scoreboard_icon_type {
 struct game_drawing_settings;
 
 struct arena_mode_view_rules {
+	using theme_flavour_type = constrained_entity_flavour_id<
+		invariants::continuous_sound
+	>;
+
 	// GEN INTROSPECTOR struct arena_mode_view_rules
+	std::string warmup_welcome_message = "Warm up your wrists!";
+	std::string start_message = "Play fair and have fun!";
+
+	theme_flavour_type warmup_theme;
+
+	per_faction_t<assets::sound_id> win_themes;
+
 	per_faction_t<per_faction_t<assets::sound_id>> win_sounds;
 	per_faction_t<augs::enum_array<assets::sound_id, battle_event>> event_sounds;
 

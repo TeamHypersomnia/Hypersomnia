@@ -46,6 +46,14 @@ void editor_setup::open_last_folders(sol::state& lua) {
 	catch_popup([&]() { ::open_last_folders(lua, signi); });
 }
 
+double editor_setup::get_inv_tickrate() const {
+	if (anything_opened()) {
+		return folder().get_inv_tickrate();
+	}
+
+	return 0.0;
+}
+
 double editor_setup::get_audiovisual_speed() const {
 	if (anything_opened()) {
 		return folder().get_audiovisual_speed();
@@ -1198,6 +1206,8 @@ bool editor_setup::handle_input_before_game(
 			case key::NUMPAD3: player().set_speed(0.1); return true;
 			case key::NUMPAD4: player().set_speed(0.5); return true;
 			case key::NUMPAD5: player().set_speed(2.0); return true;
+			case key::NUMPAD6: player().set_speed(4.0); return true;
+			case key::NUMPAD7: player().set_speed(10.0); return true;
 			default: break;
 		}
 	}

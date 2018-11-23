@@ -53,6 +53,17 @@ struct bomb_mode_economy_rules {
 	// END GEN INTROSPECTOR
 };
 
+struct bomb_mode_view_rules : arena_mode_view_rules {
+	using base = arena_mode_view_rules;
+	using introspect_base = base;
+	using theme_flavour_type = base::theme_flavour_type;
+
+	// GEN INTROSPECTOR struct bomb_mode_view_rules
+	theme_flavour_type bomb_soon_explodes_theme;
+	unsigned secs_until_detonation_to_start_theme = 10;
+	// END GEN INTROSPECTOR
+};
+
 struct bomb_mode_ruleset {
 	// GEN INTROSPECTOR struct bomb_mode_ruleset
 	std::string name = "Unnamed bomb mode ruleset";
@@ -80,7 +91,7 @@ struct bomb_mode_ruleset {
 	bool allow_game_commencing = false;
 
 	bomb_mode_economy_rules economy;
-	arena_mode_view_rules view;
+	bomb_mode_view_rules view;
 
 	augs::speed_vars speeds;
 	// END GEN INTROSPECTOR
@@ -304,6 +315,7 @@ private:
 
 	void play_sound_for(input, const_logic_step, battle_event) const;
 	void play_win_sound(input, const_logic_step, faction_type) const;
+	void play_win_theme(input, const_logic_step, faction_type) const;
 
 	void play_bomb_defused_sound(input, const_logic_step, faction_type) const;
 
@@ -344,6 +356,7 @@ public:
 	real32 commencing_timer_ms = -1.f;
 	unsigned current_num_bots = 0;
 	augs::speed_vars round_speeds;
+	entity_id bomb_detonation_theme;
 	// END GEN INTROSPECTOR
 
 	mode_player_id add_player(input, const entity_name_str& chosen_name);
@@ -371,7 +384,7 @@ public:
 	float get_round_end_seconds_left(input) const;
 	float get_buy_seconds_left(input) const;
 
-	float get_critical_seconds_left(input) const;
+	real32 get_critical_seconds_left(input) const;
 	float get_seconds_since_planting(input) const;
 
 	unsigned calc_max_faction_score() const;

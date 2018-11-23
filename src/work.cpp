@@ -589,9 +589,14 @@ int work(const int argc, const char* const * const argv) try {
 			frame_performance.num_visible_entities.measure(all_visible.count_all());
 		}
 
+		const auto inv_tickrate = visit_current_setup([](const auto& setup) {
+			return setup.get_inv_tickrate();
+		});
+
 		audiovisuals.advance(audiovisual_advance_input {
 			frame_delta,
 			speed_multiplier,
+			inv_tickrate,
 
 			get_character_camera(),
 			all_visible,
@@ -601,7 +606,8 @@ int work(const int argc, const char* const * const argv) try {
 
 			streaming.loaded_sounds,
 
-			viewing_config.audio_volume
+			viewing_config.audio_volume,
+			viewing_config.sound
 		});
 	};
 
@@ -613,6 +619,7 @@ int work(const int argc, const char* const * const argv) try {
 				defs.particle_effects, 
 				streaming.loaded_sounds,
 				viewing_config.audio_volume,
+				viewing_config.sound,
 				get_character_camera()
 			});
 		}

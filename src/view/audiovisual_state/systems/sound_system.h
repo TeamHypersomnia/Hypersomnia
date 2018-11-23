@@ -16,6 +16,8 @@
 #include "view/viewables/all_viewables_declaration.h"
 #include "augs/misc/timing/stepped_timing.h"
 
+#include "view/audiovisual_state/systems/sound_system_settings.h"
+
 struct character_camera;
 class interpolation_system;
 class cosmos;
@@ -26,12 +28,14 @@ namespace augs {
 
 class sound_system {
 	struct update_properties_input {
-		const augs::audio_volume_settings& settings;
+		const augs::audio_volume_settings& volume;
+		const sound_system_settings& settings;
 		const loaded_sounds_map& manager;
 		const interpolation_system& interp;
 		const character_camera& ear;
 		const augs::delta dt;
 		const double speed_multiplier;
+		const double inv_tickrate;
 
 		const_entity_handle get_listener() const;
 		std::optional<transformr> find_transform(const absolute_or_local&) const;

@@ -63,6 +63,9 @@ std::optional<tweaker_type> detail_direct_edit(
 			else if (identity_label == "##name") {
 				return input_text<256>(identity_label, altered);
 			}
+			else if (identity_label.find("message") != std::string::npos) {
+				return input_multiline_text<2048>(identity_label, altered, 6);
+			}
 
 			return input_text<256>(identity_label, altered);
 		}();

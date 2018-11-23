@@ -40,6 +40,7 @@ void standard_solve(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	auto& performance = cosm.profiler;
 	auto& global = cosm.get_global_solvable();
+	ensure_greater(step.get_delta().in_seconds(), 0.f);
 
 	auto logic_scope = measure_scope(performance.logic);
 

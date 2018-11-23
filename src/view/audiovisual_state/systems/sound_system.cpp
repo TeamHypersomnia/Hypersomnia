@@ -184,7 +184,7 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 	const auto target_faction = original.start.listener_faction;
 
 	const bool is_direct_listener = 
-		original.start.always_direct_listener 
+		original.input.modifier.always_direct_listener 
 		|| listening_character == original.start.direct_listener
 		|| (target_faction != faction_type::SPECTATOR && faction == target_faction)
 	;
@@ -240,7 +240,7 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 	}
 
 	source.set_pitch(m.pitch * in.speed_multiplier);
-	source.set_gain(g_mult * m.gain * in.settings.sound_effects);
+	source.set_gain(g_mult * m.gain * in.volume.sound_effects);
 	source.set_max_distance(si, std::max(0.f, m.max_distance));
 	source.set_reference_distance(si, std::max(0.f, m.reference_distance));
 	source.set_looping(m.repetitions == -1);
@@ -450,6 +450,49 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		return false;
 	};
 
+	auto reseek = [&](const auto& subject, const auto& cache) {
+		const auto& source = cache.source;
+		const auto& m = cache.original.input.modifier;
+
+		if (const auto buf = source.get_bound_buffer()) {
+			const auto secs = buf->get_length_in_seconds();
+
+			if (secs > in.settings.sync_sounds_longer_than_secs) {
+				const auto when_born = subject.when_born().step;
+				const auto now_step = subject.get_cosmos().get_timestamp().step;
+
+				if (now_step < when_born) {
+					return;
+				}
+
+				const auto total_lived_secs = (now_step - when_born) * in.inv_tickrate * in.speed_multiplier;
+				const auto total_lived_cycles = total_lived_secs / secs;
+
+				const auto expected_secs = [&]() {
+					if (m.repetitions == -1) {
+						return std::fmod(total_lived_secs, secs);
+					}
+
+					if (total_lived_cycles + 1 >= m.repetitions) {
+						return std::min(total_lived_secs, secs);
+					}
+
+					return std::fmod(total_lived_secs, secs);
+				}();
+
+				const auto max_divergence = in.settings.max_divergence_before_sync_secs;
+				const auto actual_secs = source.get_time_in_seconds();
+
+				//LOG_NVPS(subject, expected_secs, actual_secs);
+
+				if (std::abs(expected_secs - actual_secs) > max_divergence) {
+					LOG("Reseek");
+					source.seek_to(expected_secs);
+				}
+			}
+		}
+	};
+
 	erase_if(continuous_sound_caches, [&](auto& it) {
 		auto& cache = it.second;
 
@@ -460,7 +503,13 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 			return true;
 		}
 
-		return update_facade(cache);
+		const auto result = update_facade(cache);
+
+		if (!result) {
+			reseek(cosm[it.first], cache);
+		}
+
+		return result;
 	});
 
 	erase_if(short_sounds, [&](generic_sound_cache& cache) {

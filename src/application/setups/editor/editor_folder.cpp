@@ -272,7 +272,14 @@ double editor_folder::get_inv_tickrate() const {
 	if (player.has_testing_started()) {
 		return std::visit(
 			[&](const auto& typed_mode) {
-				return typed_mode.round_speeds.calc_inv_tickrate();
+				using M = remove_cref<decltype(typed_mode)>;
+
+				if constexpr(std::is_same_v<test_mode, M>) {
+					return commanded->work.world.get_fixed_delta().in_seconds<double>();
+				}
+				else {
+					return typed_mode.round_speeds.calc_inv_tickrate();
+				}
 			},
 			player.get_current_mode()
 		);
