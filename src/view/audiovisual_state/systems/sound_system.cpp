@@ -239,8 +239,20 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 		}
 	}
 
+	const auto chosen_mult = [&]() {
+		if (original.input.modifier.always_direct_listener) {
+			if (const auto buf = source.get_bound_buffer()) {
+				if (buf->get_length_in_seconds() > in.settings.treat_as_music_sounds_longer_than_secs) {
+					return in.volume.music;
+				}
+			}
+		}
+
+		return in.volume.sound_effects;
+	}();
+
 	source.set_pitch(m.pitch * in.speed_multiplier);
-	source.set_gain(g_mult * m.gain * in.volume.sound_effects);
+	source.set_gain(g_mult * m.gain * chosen_mult);
 	source.set_max_distance(si, std::max(0.f, m.max_distance));
 	source.set_reference_distance(si, std::max(0.f, m.reference_distance));
 	source.set_looping(m.repetitions == -1);
@@ -486,7 +498,6 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 				//LOG_NVPS(subject, expected_secs, actual_secs);
 
 				if (std::abs(expected_secs - actual_secs) > max_divergence) {
-					LOG("Reseek");
 					source.seek_to(expected_secs);
 				}
 			}

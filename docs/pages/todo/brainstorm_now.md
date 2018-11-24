@@ -6,10 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- send knives flying the other way when dropped due to a knockout
-
-- define music as always longer than x and always hearable
-
 - what to send on client connection?
 	- if we want to replay either from session beginning or mid-way, inputs can become quite large
 	- cosmos solvable won't be that big

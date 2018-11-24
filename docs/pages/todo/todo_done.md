@@ -2281,3 +2281,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- always allow only on is_ready
 		- and process cooldowns if only one hand has melee and other has not?
 
+- send knives flying the other way when dropped due to a knockout
+
+- define music as always longer than x and always hearable
+
