@@ -14,6 +14,7 @@ namespace invariants {
 		real32 cooldown_speed_mult = 1.f;
 		real32 base_fist_damage = 23.f;
 		real32 damage_mult = 1.f;
+		real32 throw_cooldown_ms = 500.f;
 		// END GEN INTROSPECTOR
 	};
 }
@@ -29,6 +30,7 @@ namespace components {
 		transformr previous_frame_transform;
 		vec2 first_separating_impulse;
 		vec2 overridden_crosshair_base_offset;
+		real32 throw_cooldown_ms = -1.f;
 		// END GEN INTROSPECTOR
 
 		bool now_returning() const;

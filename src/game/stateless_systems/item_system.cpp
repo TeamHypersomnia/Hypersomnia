@@ -473,6 +473,8 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 						}
 					}
 
+					request.params.set_source_root_as_sender = is_throw;
+
 					perform_transfer(request, step);
 				};
 
@@ -491,52 +493,66 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					}
 
 					if (thrown_melees > 0) {
-						for (const auto& w : wielded_items) {
-							const auto h = cosm[w];
+						auto& fighter = typed_subject.template get<components::melee_fighter>();
+						const auto& fighter_def = typed_subject.template get<invariants::melee_fighter>();
+						
+						const bool suitable_state = 
+							fighter.state == melee_fighter_state::READY
+							|| fighter.state == melee_fighter_state::COOLDOWN
+						;
 
-							if (const auto melee_def = h.template find<invariants::melee>()) {
-								int mult = 1;
+						const bool cooldown_persists = fighter.throw_cooldown_ms > 0.f || !suitable_state;
 
-								if (h.get_current_slot().get_type() == slot_function::SECONDARY_HAND) {
-									mult = -1;
-								}
-
-								do_drop(h);
-
-								{
-									const auto& effect = melee_def->actions.at(weapon_action_type::PRIMARY).init_particles;
-
-									effect.start(
-										step,
-										particle_effect_start_input::at_entity(h)
-									);
-								}
-
-								const auto body = h.template get<components::rigid_body>();
-
-								body.set_angular_velocity(mult * melee_def->throw_def.throw_angular_speed);
-							}
-						}
-
-						if (thrown_melees == 2) {
-							/* 
-								If we want both knives thrown from the exact positions that they were held in 
-								during akimbo, we need to restore their positions before one of them was dropped.
-
-								That is because a drop will instantly switch to a one-handed stance 
-								which will significantly displace the other knife.
-							*/
-
+						if (!cooldown_persists) {
 							for (const auto& w : wielded_items) {
 								const auto h = cosm[w];
-								const auto corrected_transform = positions[index_in(wielded_items, w)];
-								h.set_logic_transform(corrected_transform);
 
-								const auto body = h.template get<components::rigid_body>();
-								auto vel = body.get_velocity();
-								const auto l = vel.length();
-								body.set_velocity(corrected_transform.get_direction() * l);
+								if (const auto melee_def = h.template find<invariants::melee>()) {
+									int mult = 1;
+
+									if (h.get_current_slot().get_type() == slot_function::SECONDARY_HAND) {
+										mult = -1;
+									}
+
+									do_drop(h);
+
+									{
+										const auto& effect = melee_def->actions.at(weapon_action_type::PRIMARY).init_particles;
+
+										effect.start(
+											step,
+											particle_effect_start_input::at_entity(h)
+										);
+									}
+
+									const auto body = h.template get<components::rigid_body>();
+
+									body.set_angular_velocity(mult * melee_def->throw_def.throw_angular_speed);
+								}
 							}
+
+							if (thrown_melees == 2) {
+								/* 
+									If we want both knives thrown from the exact positions that they were held in 
+									during akimbo, we need to restore their positions before one of them was dropped.
+
+									That is because a drop will instantly switch to a one-handed stance 
+									which will significantly displace the other knife.
+								*/
+
+								for (const auto& w : wielded_items) {
+									const auto h = cosm[w];
+									const auto corrected_transform = positions[index_in(wielded_items, w)];
+									h.set_logic_transform(corrected_transform);
+
+									const auto body = h.template get<components::rigid_body>();
+									auto vel = body.get_velocity();
+									const auto l = vel.length();
+									body.set_velocity(corrected_transform.get_direction() * l);
+								}
+							}
+
+							fighter.throw_cooldown_ms = fighter_def.throw_cooldown_ms;
 						}
 
 						return;

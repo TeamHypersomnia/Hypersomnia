@@ -2272,3 +2272,12 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- Enums corresponding to text files
 - document the offset picker
 
+- disallow throw during a melee move
+	- because someone could write a script that always initiates a throw whenever a hit occurs
+	- handle drop in the same way
+	- actually allow only if it is in ready state
+	- simply wait for cooldown?
+		- though it is always reset on changing conditions
+	- always allow only on is_ready
+		- and process cooldowns if only one hand has melee and other has not?
+

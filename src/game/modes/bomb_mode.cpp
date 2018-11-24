@@ -1061,6 +1061,7 @@ void bomb_mode::process_win_conditions(const input_type in, const logic_step ste
 		++players[defusing_player].stats.bomb_defuses;
 		post_award(in, defusing_player, in.rules.economy.bomb_defuse_award);
 		make_win(in, winner);
+		play_win_theme(in, step, winner);
 
 		play_bomb_defused_sound(in, step, winner);
 		return;

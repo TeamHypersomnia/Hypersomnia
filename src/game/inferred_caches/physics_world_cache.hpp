@@ -42,7 +42,7 @@ auto calc_body_type(const E& handle) {
 	const auto& physics_def = handle.template get<invariants::rigid_body>();
 
 	const auto type = 
-		is_like_planted_bomb(handle) 
+		is_like_planted_or_defused_bomb(handle) 
 		? rigid_body_type::STATIC 
 		: physics_def.body_type
 	;
@@ -54,7 +54,7 @@ template <class E>
 auto calc_filters(const E& handle) {
 	const auto& colliders_data = handle.template get<invariants::fixtures>();
 
-	if (is_like_planted_bomb(handle)) {
+	if (is_like_planted_or_defused_bomb(handle)) {
 		return filters[predefined_filter_type::PLANTED_EXPLOSIVE];
 	}
 

@@ -86,9 +86,9 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 				}
 			}
 
-			if (const auto when_armed = fuse.when_armed; when_armed.was_set()) {
+			if (fuse.armed()) {
 				const auto highlight_amount = static_cast<float>(1 - (
-					(in.global_time_seconds - when_armed.in_seconds(dt))
+					(in.global_time_seconds - fuse.when_armed.in_seconds(dt))
 					/ (fuse_def.fuse_delay_ms / 1000.f) 
 				));
 
@@ -98,15 +98,15 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 				else if (t == circular_bar_type::SMALL && !fuse_def.has_delayed_arming()) {
 					do_draw_circle(highlight_amount, white, red_violet);
 				}
-			}
 
-			if (t == circular_bar_type::OVER_MEDIUM && fuse_def.defusing_enabled()) {
-				if (const auto amount_defused = fuse.amount_defused; amount_defused >= 0.f) {
-					const auto highlight_amount = static_cast<float>(
-						amount_defused / fuse_def.defusing_duration_ms
-					);
+				if (t == circular_bar_type::OVER_MEDIUM && fuse_def.defusing_enabled()) {
+					if (const auto amount_defused = fuse.amount_defused; amount_defused >= 0.f) {
+						const auto highlight_amount = static_cast<float>(
+							amount_defused / fuse_def.defusing_duration_ms
+						);
 
-					do_draw_circle(highlight_amount, white, red_violet);
+						do_draw_circle(highlight_amount, white, red_violet);
+					}
 				}
 			}
 		}

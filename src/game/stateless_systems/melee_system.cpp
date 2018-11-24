@@ -74,6 +74,8 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 		auto& fighter = it.template get<components::melee_fighter>();
 
+		fighter.throw_cooldown_ms = std::max(-1.f, fighter.throw_cooldown_ms - dt.in_milliseconds());
+
 		auto& state = fighter.state;
 		auto& anim_state = fighter.anim_state;
 		auto& elapsed_ms = anim_state.frame_elapsed_ms;
@@ -621,6 +623,8 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 							auto& cooldown_left_ms = elapsed_ms;
 							cooldown_left_ms = std::max(0.f, current_attack_def.cooldown_ms - total_ms);
+
+							fighter.throw_cooldown_ms = std::max(fighter.throw_cooldown_ms, cooldown_left_ms);
 						}
 					}
 

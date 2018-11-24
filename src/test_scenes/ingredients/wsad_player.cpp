@@ -43,6 +43,13 @@ namespace test_flavours {
 			}
 
 			{
+				invariants::melee_fighter melee_fighter;
+				melee_fighter.throw_cooldown_ms = 300.f;
+
+				meta.set(melee_fighter);
+			}
+
+			{
 				invariants::torso torso_def;
 
 				torso_def.forward_legs = to_animation_id(test_scene_legs_animation_id::SILVER_TROUSERS);

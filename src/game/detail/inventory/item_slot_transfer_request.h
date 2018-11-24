@@ -22,8 +22,9 @@ struct item_slot_transfer_request_params {
 	bool play_transfer_particles = true;
 
 	bool perform_recoils = true;
+	bool set_source_root_as_sender = false;
 
-	pad_bytes<2> pad;
+	pad_bytes<1> pad;
 	// END GEN INTROSPECTOR
 };
 

@@ -275,8 +275,10 @@ perform_transfer_result perform_transfer_impl(
 	if (is_drop_request) {
 		ensure(source_slot_container.alive());
 
-		if (auto sender = grabbed_item_part_handle.find<components::sender>()) {
-			sender->set(source_root);
+		if (r.params.set_source_root_as_sender) {
+			if (auto sender = grabbed_item_part_handle.find<components::sender>()) {
+				sender->set(source_root);
+			}
 		}
 
 		/* 
