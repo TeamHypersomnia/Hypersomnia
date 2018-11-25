@@ -2285,3 +2285,45 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - define music as always longer than x and always hearable
 
+- roundsounds and warmup themes
+	- we could introduce a separate file for ruleset viewables
+		- simply in mode GUI, use a flag for the unpathed/pathed asset widget that determines which viewables to write to
+		- alternatively, since viewables are never too big, simply always have viewables separate from the intercosm
+			- good for skinning the intercosm without ever having to modify it
+	- it would be nice if the sound system could synchronize music against the current arena state
+		- though just warmup. no need to synchronize roundsounds which are short by nature
+			- specifying the warmup theme sound
+				- chosen solution: flavour
+					- best performance
+					- low flexibility
+						- customization without altering the intercosm would involve changing the viewable definition
+						- might be necessary to introduce another warmup sound decoration entity flavour
+					- lowest coding complexity
+					- also lowest design/explaining complexity, not just coding
+						- we might be dead before the need for a more complex solution arises
+					- a bool for whether the music position should be synced?
+						- or a float with seconds tolerance
+							- although that would preferably be the client space setting
+				- sound effect input, spawn entity with unique sound
+					- 'might' incur performance problems?
+					- best flexibility
+					- moderate coding complexity
+					- still two solutions: 
+						- a new entity type for unique sound, or
+							- even worse compilation times...
+						- add a component unique_sound_effect to the existing type
+							- memory overhead
+				- sound effect input, sound system infers information from the mode
+					- best flexibility
+					- best performance
+					- worst coding complexity - greatest coupling
+		- instead of having to create entities? what if we make that functionality cosmos-specific?
+		- there could be a music entity that plays globally
+		- it would also be nice to have themes in rulesets?
+			- well we anyway have viewables definitions in the intercosm so...
+			- in practice every alteration in roundsounds will require a different map 
+				- and later a rebase, wtf
+				- rebases won't be possible with binary files
+
+- adjust doppler factors of bullet trace sounds
+

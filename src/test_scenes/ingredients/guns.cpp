@@ -259,10 +259,14 @@ namespace test_flavours {
 			missile.remnant_flavours.emplace_back(to_entity_flavour_id(test_remnant_bodies::STEEL_ROUND_REMNANT_2));
 			missile.remnant_flavours.emplace_back(to_entity_flavour_id(test_remnant_bodies::STEEL_ROUND_REMNANT_3));
 
+			missile.trace_sound.id = to_sound_id(test_scene_sound_id::STEEL_PROJECTILE_FLIGHT);
+
 			auto& trace_modifier = missile.trace_sound.modifier;
 
-			trace_modifier.max_distance = 1020.f;
-			trace_modifier.reference_distance = 100.f;
+			trace_modifier.doppler_factor = 1.f;
+			trace_modifier.max_distance = 700.f;
+			trace_modifier.reference_distance = 50.f;
+			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
 			trace_modifier.gain = 1.3f;
 			trace_modifier.fade_on_exit = false;
 
@@ -328,10 +332,14 @@ namespace test_flavours {
 			missile.remnant_flavours.emplace_back(to_entity_flavour_id(test_remnant_bodies::STEEL_ROUND_REMNANT_2));
 			missile.damage.base = 49;
 
+			missile.trace_sound.id = to_sound_id(test_scene_sound_id::STEEL_PROJECTILE_FLIGHT);
+
 			auto& trace_modifier = missile.trace_sound.modifier;
 
-			trace_modifier.max_distance = 1020.f;
-			trace_modifier.reference_distance = 100.f;
+			trace_modifier.doppler_factor = 1.f;
+			trace_modifier.max_distance = 700.f;
+			trace_modifier.reference_distance = 50.f;
+			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
 			trace_modifier.gain = 1.3f;
 			trace_modifier.fade_on_exit = false;
 
@@ -398,10 +406,14 @@ namespace test_flavours {
 			missile.damage.shake *= 0.25f;
 			missile.max_lifetime_ms = 350.f;
 
+			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
+
 			auto& trace_modifier = missile.trace_sound.modifier;
 
+			trace_modifier.doppler_factor = 0.6f;
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
+			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
 			trace_modifier.gain = 1.3f;
 			trace_modifier.fade_on_exit = false;
 
@@ -469,8 +481,10 @@ namespace test_flavours {
 
 			auto& trace_modifier = missile.trace_sound.modifier;
 
+			trace_modifier.doppler_factor = 0.6f;
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
+			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
 			trace_modifier.gain = 1.3f;
 			trace_modifier.fade_on_exit = false;
 
@@ -527,8 +541,10 @@ namespace test_flavours {
 
 			auto& trace_modifier = missile.trace_sound.modifier;
 
+			trace_modifier.doppler_factor = 0.6f;
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
+			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
 			trace_modifier.gain = 1.3f;
 			trace_modifier.fade_on_exit = false;
 

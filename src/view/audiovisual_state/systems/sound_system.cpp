@@ -210,12 +210,27 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 		source.set_air_absorption_factor(absorption);
 	}
 
-	if (previous_transform && !is_direct_listener) {
-		const auto displacement = current_transform - *previous_transform;
+	if (previous_transform && !is_direct_listener && !(in.dt == augs::delta::zero)) {
+		const bool interp_enabled = in.interp.is_enabled();
+		const auto frame_dt_in_steps = in.dt.in_steps_per_second();
+
+		const auto effective_velocity = [&]() {
+			const auto displacement = current_transform.pos - previous_transform->pos;
+
+			if (interp_enabled) {
+				return displacement * frame_dt_in_steps;
+			}
+
+			return displacement * cosm.get_fixed_delta().in_steps_per_second();
+		}();
+
 		previous_transform = current_transform;
 
-		const auto effective_velocity = displacement.pos * in.dt.in_steps_per_second();
-		source.set_velocity(si, effective_velocity);
+		if (interp_enabled || when_set_velocity != cosm.get_timestamp()) {
+			source.set_velocity(si, effective_velocity);
+		}
+
+		when_set_velocity = cosm.get_timestamp();
 	}
 
 	const auto& input = original.input;

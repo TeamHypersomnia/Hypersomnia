@@ -142,7 +142,7 @@ namespace augs {
 
 	void sound_source::set_doppler_factor(const float factor) const {
 		(void)factor;
-		AL_CHECK(alSourcef(id, AL_DOPPLER_FACTOR, factor));
+		AL_CHECK(alSourcef(id, AL_DOPPLER_FACTOR, std::clamp(factor, 0.f, 1.f)));
 	}
 
 	void sound_source::set_spatialize(const bool f) const {
