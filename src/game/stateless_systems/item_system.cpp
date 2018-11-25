@@ -455,6 +455,10 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 				const bool is_throw = r.intent == game_intent_type::THROW;
 				const bool is_drop = r.intent == game_intent_type::DROP;
 
+				if (is_throw && typed_subject.is_frozen()) {
+					return;
+				}
+
 				auto do_drop = [&](const auto& item_inside) {
 					if (item_inside.dead()) {
 						return;
