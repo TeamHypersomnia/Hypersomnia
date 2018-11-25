@@ -7,7 +7,17 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - what to send on client connection?
+	- Note that WE WILL need SOME kind of reliable udp transport even for dumb chat messages
+		- we'll use reliable.io or a hand-written slice/chunk proto
+		- and like hell we are not going to retransmit them redundantly brute forcibly
+	- for the initial cosmos solvable state, we can send a delta against the initial cosm and the current cosm
+		- though entities for shells might get quite large
+		- a character is almost 1k...
+		- perhaps it will be best to send all inputs after all
 	- if we want to replay either from session beginning or mid-way, inputs can become quite large
+		- Though, we could use the exact same protocol
+			- simply post all inputs for the client
+		- and we could replay in parallel
 	- cosmos solvable won't be that big
 	- we also have to send rulesets if we'll allow commands on them
 

@@ -26,25 +26,25 @@ Set in a hypothetical afterlife reality, it shall provide joy through altruistic
 Declare allegiance to one of the three factions whose apple of discord is a disparity between prevailing notions of moral excellence.
 **Metropolis. Atlantis. Resistance.**
 
-See the game's [wiki](http://wiki.hypersomnia.xyz) to get familiar with the universe.  
-To understand the repository's folder structure, make sure to read the [documentation](http://wiki.hypersomnia.xyz/docs).
+See the game's [wiki](https://wiki.hypersomnia.xyz) to get familiar with the universe.  
+To understand the repository's folder structure, make sure to read the [documentation](https://wiki.hypersomnia.xyz/docs).
 
 ## Gallery
 
 Watch gameplays on YouTube:
 
-[![IMAGE ALT TEXT](http://img.youtube.com/vi/0vlUOO5l0jw/0.jpg)](http://www.youtube.com/watch?v=0vlUOO5l0jw "Video Title")
-[![IMAGE ALT TEXT](http://img.youtube.com/vi/mxvuWvD53tY/0.jpg)](http://www.youtube.com/watch?v=mxvuWvD53tY "Video Title")
-[![IMAGE ALT TEXT](http://img.youtube.com/vi/f0cHnds9UuU/0.jpg)](http://www.youtube.com/watch?v=f0cHnds9UuU "Video Title")
-[![IMAGE ALT TEXT](http://img.youtube.com/vi/XsSKj6hJH0w/0.jpg)](http://www.youtube.com/watch?v=XsSKj6hJH0w "Video Title")
+[![IMAGE ALT TEXT](https://img.youtube.com/vi/0vlUOO5l0jw/0.jpg)](https://www.youtube.com/watch?v=0vlUOO5l0jw "Video Title")
+[![IMAGE ALT TEXT](https://img.youtube.com/vi/mxvuWvD53tY/0.jpg)](https://www.youtube.com/watch?v=mxvuWvD53tY "Video Title")
+[![IMAGE ALT TEXT](https://img.youtube.com/vi/f0cHnds9UuU/0.jpg)](https://www.youtube.com/watch?v=f0cHnds9UuU "Video Title")
+[![IMAGE ALT TEXT](https://img.youtube.com/vi/XsSKj6hJH0w/0.jpg)](https://www.youtube.com/watch?v=XsSKj6hJH0w "Video Title")
 
 ![enter image description here][8]
 ![enter image description here][3]
 ![enter image description here][4]
 
   [8]: https://gifyu.com/images/16.main_menu_reup.png
-  [3]: http://gifyu.com/images/23.light.png
-  [4]: http://gifyu.com/images/30.smoke.png
+  [3]: https://gifyu.com/images/23.light.png
+  [4]: https://gifyu.com/images/30.smoke.png
 
 # How to build
 
@@ -96,8 +96,8 @@ On all platforms, you can choose among three building configurations:
 Prerequisites:
 - **Visual Studio 2017 Preview** (Community) or newer.
 - ``ninja`` installed somewhere in PATH.
-- [LLVM](http://releases.llvm.org/) 7 toolchain (or newer).
-  - For example, use this installer: http://releases.llvm.org/7.0.0/LLVM-7.0.0-win64.exe
+- [LLVM](https://releases.llvm.org/) 7 toolchain (or newer).
+  - For example, use this installer: https://releases.llvm.org/7.0.0/LLVM-7.0.0-win64.exe
 
 Use your favorite shell to go into the newly created ```build/``` folder and run these commands:
 
@@ -184,7 +184,7 @@ You will need
 You can go with:
 
 - ``gcc 7.3`` or newer, or...
-- ...[``llvm``](http://llvm.org/) toolchain. Required components:
+- ...[``llvm``](https://llvm.org/) toolchain. Required components:
 	- ``clang 6.0.1`` or newer
 	- ``libc++``
 	- ``libc++abi``
@@ -319,7 +319,7 @@ Pull requests are welcomed, should they even be typo fixes, missing const guaran
 If you however plan to add a completely new feature, create a relevant [issue](https://github.com/TeamHypersomnia/Hypersomnia/issues) so that everybody knows about it,
 because the project is continuously in a very, very active development and may undergo a revolution when it is the least expected.
 
-For documentation, please make sure to read the [wiki](http://wiki.hypersomnia.xyz) to learn about the game and the source code.
+For documentation, please make sure to read the [wiki](https://wiki.hypersomnia.xyz) to learn about the game and the source code.
 
 You will be added to [TeamHypersomnia](https://github.com/TeamHypersomnia) organization once at least one of your pull requests is accepted.
 

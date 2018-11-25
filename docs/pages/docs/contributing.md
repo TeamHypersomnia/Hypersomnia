@@ -27,7 +27,7 @@ These have been established too long ago, when the project wasn't thought of qui
     Worry not though, if you mess up with either, we will know thanks to AppVeyor and TravisCI integration.
 
 - Prefer initialization with ``auto`` or ``const auto``.
-    - Except if you need [default initialization](http://en.cppreference.com/w/cpp/language/default_initialization) or non-movable types as move elision does not yet fully work in MSVC.
+    - Except if you need [default initialization](https://en.cppreference.com/w/cpp/language/default_initialization) or non-movable types as move elision does not yet fully work in MSVC.
 
 - Put ```const``` wherever possible even at the cost of readability. 
     - In particular, ```const``` every possible function argument.
@@ -96,4 +96,4 @@ It is however entirely possible that such a need arises. In this case:
 
 Additionally, all modifications to the code not original to the Hypersomnia repository (whether a new one or already added) shall stay in accordance with their respective conventions.
 
-If you paste snippets from sites like [stackoverflow.com](http://stackoverflow.com), make sure to attribute them by adding a commented link above the code.
+If you paste snippets from sites like [stackoverflow.com](https://stackoverflow.com), make sure to attribute them by adding a commented link above the code.

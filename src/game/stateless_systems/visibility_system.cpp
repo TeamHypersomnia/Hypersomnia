@@ -52,7 +52,7 @@ void VIS_LOG(Args&&... args) {
 
 /*
 	Thanks to:
-	http://stackoverflow.com/questions/16542042/fastest-way-to-sort-vectors-by-angle-without-actually-computing-that-angle
+	https://stackoverflow.com/questions/16542042/fastest-way-to-sort-vectors-by-angle-without-actually-computing-that-angle
 */
 
 FORCE_INLINE auto comparable_angle(const vec2 diff) {

@@ -66,7 +66,7 @@ Wtedy mamy dwie różniące się dane.
 
 - Wrzucamy nowego entita o typie "wielokątne ciało" które ma teksturę ściany nieregularnej jaskinii, 256x256.
 	- Chcemy zrobić coś takiego:
-		- {% include image.html file="http://3.bp.blogspot.com/_LCX1wUXnhKo/TVLjzmrUlzI/AAAAAAAAA0c/5mlguVmeJIA/s1600/ctf_scourge2_mid.png" %}
+		- {% include image.html file="https://3.bp.blogspot.com/_LCX1wUXnhKo/TVLjzmrUlzI/AAAAAAAAA0c/5mlguVmeJIA/s1600/ctf_scourge2_mid.png" %}
 - Zaczynamy od prostokąta o rozmiarze źródłowego obrazka.
 - Wciskamy ``v`` i modyfikujemy wierzchołki tego wielokąta - tworzymy jaskinię.
 	- Z każdym poruszeniem, dodaniem, usunięciem wierzchołka, ciało fizyczne aktualizuje się aby się pokrywało 1:1 z wielokątem który będzie renderowany.
