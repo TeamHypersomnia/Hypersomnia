@@ -73,8 +73,10 @@
 */
 
 int work(const int argc, const char* const * const argv) try {
+	augs::timer until_first_swap;
+	bool until_first_swap_measured = false;
+
 	static session_profiler performance;
-	performance.until_first_swap.start();
 
 	LOG("Started at %x", augs::date_time().get_readable());
 	LOG("Working directory: %x", augs::get_current_working_directory());
@@ -125,7 +127,9 @@ int work(const int argc, const char* const * const argv) try {
 		}
 	}
 
+	augs::timer global_libraries_timer;
 	static const augs::global_libraries libraries;
+	LOG("Initializing global libraries took: %x ms", global_libraries_timer.template extract<std::chrono::milliseconds>());
 	
 	static augs::audio_context audio(config.audio);
 	augs::log_all_audio_devices(LOG_FILES_DIR "/audio_devices.txt");
@@ -1577,8 +1581,9 @@ int work(const int argc, const char* const * const argv) try {
 		frame_performance.num_triangles.measure(renderer.num_total_triangles_drawn);
 		renderer.num_total_triangles_drawn = 0u;
 
-		if (!performance.until_first_swap.was_measured()) {
-			performance.until_first_swap.stop();
+		if (!until_first_swap_measured) {
+			LOG("Time until first swap: %x ms", until_first_swap.extract<std::chrono::milliseconds>());
+			until_first_swap_measured = true;
 		}
 
 		{

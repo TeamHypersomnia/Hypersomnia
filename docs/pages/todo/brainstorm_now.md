@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- focus on creating a minimal api class for which we will be able to plug anything
+- we'll remove enet shortly
+
+- spectators
+	- preferably only in the client setup
+
 - what to send on client connection?
 	- Note that WE WILL need SOME kind of reliable udp transport even for dumb chat messages
 		- we'll use reliable.io or a hand-written slice/chunk proto

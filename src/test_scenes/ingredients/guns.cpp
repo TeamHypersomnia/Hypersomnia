@@ -817,7 +817,7 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("0.25");
+			charge_deposit_def.space_available = to_space_units("0.40");
 			charge_deposit_def.mounting_duration_ms = 700.f;
 			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
@@ -925,7 +925,7 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("0.32");
+			charge_deposit_def.space_available = to_space_units("0.37");
 			charge_deposit_def.mounting_duration_ms = 500.f;
 			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
@@ -1033,7 +1033,7 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("0.8");
+			charge_deposit_def.space_available = to_space_units("1.0");
 			charge_deposit_def.mounting_duration_ms = 500.f;
 			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::ORANGE_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
@@ -1226,19 +1226,20 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4500.f, 4500.f};
-			gun_def.shot_cooldown_ms = 92.f;
+			gun_def.shot_cooldown_ms = 84.f;
 
 			gun_def.shell_angular_velocity = {2.f, 14.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
-			gun_def.damage_multiplier = 2.2f;
+			gun_def.damage_multiplier = 2.5f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
-			gun_def.kickback_towards_wielder = 40.f;
+			gun_def.kickback_towards_wielder = 25.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(250);
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.052f;
+			gun_def.recoil_multiplier = 0.92f;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
@@ -1288,7 +1289,7 @@ namespace test_flavours {
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = 40.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(500);
-			gun_def.recoil_multiplier = 1.2f;
+			gun_def.recoil_multiplier = 1.1f;
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.052f;
@@ -1338,7 +1339,7 @@ namespace test_flavours {
 			gun_def.shell_angular_velocity = {2.f, 14.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
-			gun_def.damage_multiplier = 2.5f;
+			gun_def.damage_multiplier = 2.5f * 1.2f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = 70.f;
