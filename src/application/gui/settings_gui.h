@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/filesystem/path.h"
+#include "augs/misc/imgui/standard_window_mixin.h"
 
 struct config_lua_table;
 
@@ -19,12 +20,13 @@ enum class settings_pane {
 	// END GEN INTROSPECTOR
 };
 
-class settings_gui_state {
+class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	settings_pane active_pane = settings_pane::WINDOW;
 
 public:
-	bool show = false;
-	
+	using base = standard_window_mixin<settings_gui_state>;
+	using base::base;
+
 	void perform(
 		sol::state& lua,
 		const augs::path_type& path_for_saving,

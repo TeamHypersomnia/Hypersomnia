@@ -1,5 +1,5 @@
 #pragma once
-#include "application/setups/editor/gui/standard_window_mixin.h"
+#include "augs/misc/imgui/standard_window_mixin.h"
 
 struct editor_command_input;
 

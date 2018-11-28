@@ -43,6 +43,8 @@
 #include "application/config_lua_table.h"
 
 #include "application/gui/settings_gui.h"
+#include "application/gui/start_client_gui.h"
+#include "application/gui/start_server_gui.h"
 #include "application/gui/ingame_menu_gui.h"
 
 #include "application/setups/all_setups.h"
@@ -179,7 +181,10 @@ int work(const int argc, const char* const * const argv) try {
 	static std::optional<main_menu_setup> main_menu;
 	static std::optional<setup_variant> current_setup;
 
-	static settings_gui_state settings_gui;
+	static settings_gui_state settings_gui = std::string("Settings");
+	static start_client_gui_state start_client_gui = std::string("Connect to server");
+	static start_server_gui_state start_server_gui = std::string("Host a server");
+
 	static ingame_menu_gui ingame_menu;
 
 	/*
@@ -496,6 +501,14 @@ int work(const int argc, const char* const * const argv) try {
 		using T = decltype(t);
 
 		switch (t) {
+			case T::CONNECT_TO_UNIVERSE:
+				start_client_gui.open();
+				break;
+				
+			case T::HOST_UNIVERSE:
+				start_server_gui.open();
+				break;
+
 			case T::LOCAL_UNIVERSE:
 				launch_setup(launch_type::TEST_SCENE);
 				break;
@@ -505,8 +518,7 @@ int work(const int argc, const char* const * const argv) try {
 				break;
 
 			case T::SETTINGS:
-				settings_gui.show = true;
-				ImGui::SetWindowFocus("Settings");
+				settings_gui.open();
 				break;
 
 			case T::CREATORS:
@@ -534,8 +546,7 @@ int work(const int argc, const char* const * const argv) try {
 				break;
 
 			case T::SETTINGS:
-				settings_gui.show = true;
-				ImGui::SetWindowFocus("Settings");
+				settings_gui.open();
 				break;
 
 			case T::QUIT:
@@ -956,6 +967,28 @@ int work(const int argc, const char* const * const argv) try {
 				settings_gui,
 				lua,
 				[&]() {
+					if (!current_setup.has_value()) {
+						if (start_client_gui.perform(config.default_client_start)) {
+							change_with_save(
+								[](auto& cfg) {
+									cfg.default_client_start = config.default_client_start;
+								}
+							);
+
+							launch_setup(launch_type::CLIENT);
+						}
+
+						if (start_server_gui.perform(config.default_server_start)) {
+							change_with_save(
+								[](auto& cfg) {
+									cfg.default_server_start = config.default_server_start;
+								}
+							);
+
+							launch_setup(launch_type::SERVER);
+						}
+					}
+
 					/*
 						The editor setup might want to use IMGUI to create views of entities or resources,
 						thus we ask the current setup for its custom IMGUI logic.

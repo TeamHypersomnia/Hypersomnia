@@ -6,7 +6,7 @@
 #include "application/setups/editor/commands/editor_command_structs.h"
 #include "application/setups/editor/property_editor/fae/fae_tree_structs.h"
 
-#include "application/setups/editor/gui/standard_window_mixin.h"
+#include "augs/misc/imgui/standard_window_mixin.h"
 
 namespace augs {
 	struct introspection_access;

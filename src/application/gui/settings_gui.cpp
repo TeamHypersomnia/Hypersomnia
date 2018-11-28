@@ -43,16 +43,16 @@ void settings_gui_state::perform(
 	config_lua_table& last_saved_config,
 	vec2i screen_size
 ) {
-	if (!show) {
-		return;
-	}
-	
 	using namespace augs::imgui;
 
-	center_next_window();
-
-	auto settings = scoped_window("Settings", &show);
+	centered_size_mult = 0.6f;
 	
+	auto settings = make_scoped_window();
+
+	if (!settings) {
+		return;
+	}
+
 	{
 		auto child = scoped_child("settings view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
 		auto width = scoped_item_width(ImGui::GetWindowWidth() * 0.35f);

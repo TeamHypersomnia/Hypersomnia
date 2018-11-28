@@ -1,7 +1,7 @@
 #pragma once
 #include "game/detail/render_layer_filter.h"
 
-#include "application/setups/editor/gui/standard_window_mixin.h"
+#include "augs/misc/imgui/standard_window_mixin.h"
 #include "application/setups/editor/property_editor/property_editor_settings.h"
 
 struct editor_layers_gui : standard_window_mixin<editor_layers_gui> {

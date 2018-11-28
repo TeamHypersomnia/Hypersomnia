@@ -6,7 +6,7 @@
 #include "application/setups/editor/detail/editor_image_preview.h"
 
 #include "application/setups/editor/editor_command_input.h"
-#include "application/setups/editor/gui/standard_window_mixin.h"
+#include "augs/misc/imgui/standard_window_mixin.h"
 #include "application/setups/editor/gui/asset_path_browser_settings.h"
 #include "application/setups/editor/property_editor/property_editor_structs.h"
 

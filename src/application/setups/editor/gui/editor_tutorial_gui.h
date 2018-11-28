@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_map>
-#include "application/setups/editor/gui/standard_window_mixin.h"
+#include "augs/misc/imgui/standard_window_mixin.h"
 #include "augs/misc/enum/enum_array.h"
 
 enum class editor_tutorial_type {

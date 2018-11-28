@@ -1,6 +1,13 @@
 #pragma once
 #include "3rdparty/imgui/imgui.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
+#include "augs/misc/imgui/imgui_utils.h"
+
+namespace augs {
+	namespace imgui {
+		void center_next_window(float size_multiplier, ImGuiCond);
+	}
+}
 
 template <class derived>
 struct standard_window_mixin {
@@ -17,7 +24,12 @@ struct standard_window_mixin {
 	template <class... Args>
 	auto make_scoped_window(Args&&... args) {
 		if (show) {
-			ImGui::SetNextWindowSize(ImVec2(350,560), ImGuiCond_FirstUseEver);
+			if (centered_size_mult != std::nullopt) {
+				augs::imgui::center_next_window(*centered_size_mult);
+			}
+			else {
+				ImGui::SetNextWindowSize(ImVec2(350,560), ImGuiCond_FirstUseEver);
+			}
 		}
 
 		auto result = augs::imgui::cond_scoped_window(show, title.c_str(), &show, std::forward<Args>(args)...);
@@ -49,6 +61,9 @@ struct standard_window_mixin {
 	bool will_acquire_keyboard_once() const {
 		return acquire_once;
 	}
+
+protected:
+	std::optional<float> centered_size_mult;
 
 private:
 	std::string title;

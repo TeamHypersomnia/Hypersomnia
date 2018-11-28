@@ -1,4 +1,5 @@
 #pragma once
+#include <string>
 
 struct client_start_input {
 	// GEN INTROSPECTOR struct client_start_input

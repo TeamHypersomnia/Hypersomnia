@@ -1,6 +1,6 @@
 #pragma once
 #include <unordered_set>
-#include "application/setups/editor/gui/standard_window_mixin.h"
+#include "augs/misc/imgui/standard_window_mixin.h"
 
 struct entity_id;
 class editor_setup;

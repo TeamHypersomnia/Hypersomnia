@@ -574,6 +574,8 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/imgui/imgui_utils.cpp"
 	"src/augs/misc/imgui/imgui_control_wrappers.cpp"
 	"src/application/gui/settings_gui.cpp"
+	"src/application/gui/start_client_gui.cpp"
+	"src/application/gui/start_server_gui.cpp"
 	"src/game/assets/recoil_player.cpp"
 	"src/augs/gui/bbcode.cpp"
 	"src/augs/unit_tests.cpp"
