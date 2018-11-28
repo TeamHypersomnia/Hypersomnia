@@ -29,7 +29,6 @@ test_scene_setup::test_scene_setup(
 
 void test_scene_setup::customize_for_viewing(config_lua_table& config) const {
 	config.window.name = "Hypersomnia test scene";
-	return;
 }
 
 void test_scene_setup::accept_game_gui_events(const cosmic_entropy& events) {

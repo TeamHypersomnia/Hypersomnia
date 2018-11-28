@@ -303,6 +303,26 @@ int work(const int argc, const char* const * const argv) try {
 
 				break;
 
+			case launch_type::CLIENT:
+				setup_launcher([]() {
+					current_setup.emplace(std::in_place_type_t<client_setup>(),
+						lua,
+						config.default_client_start
+					);
+				});
+
+				break;
+
+			case launch_type::SERVER:
+				setup_launcher([]() {
+					current_setup.emplace(std::in_place_type_t<server_setup>(),
+						lua,
+						config.default_server_start
+					);
+				});
+
+				break;
+
 			case launch_type::EDITOR:
 				launch_editor(lua);
 
@@ -724,6 +744,22 @@ int work(const int argc, const char* const * const argv) try {
 
 	if (!params.editor_target.empty()) {
 		launch_editor(lua, params.editor_target);
+	}
+	else if (params.start_server) {
+		launch_setup(launch_type::SERVER);
+	}
+	else if (params.should_connect) {
+		{
+			const auto& target = params.connect_to_address;
+
+			if (!target.empty()) {
+				change_with_save([](config_lua_table& cfg) {
+					cfg.default_client_start.ip_port = params.connect_to_address;
+				});
+			}
+		}
+
+		launch_setup(launch_type::CLIENT);
 	}
 	else {
 		launch_setup(config.get_launch_mode());

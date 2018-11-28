@@ -432,5 +432,18 @@ return {
 		  background_dark = "47 10 0 255"
 	  }
 	}
+  },
+  default_server_start = {
+	enabled_ipv4 = "127.0.0.1",
+	enabled_ipv6 = "::1",
+	port = 8412
+  },
+  default_server_vars = {
+	current_arena = "test",
+	max_connections = 64
+  },
+  default_client_start = {
+	ip_port = "127.0.0.1:8142",
+	nickname = "Player"
   }
 }

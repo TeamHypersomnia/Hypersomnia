@@ -69,14 +69,17 @@ inline auto get_help_section() {
 return
 	std::string("Hypersomnia\nA community-centered shooter released as free software.\n") 
 	+ R"(
-usage: Hypersomnia [flag|file_path]
+usage: Hypersomnia [options|editor_file_path]
 
-Flags:
-    -h, --help                  Show this help and quit
-    --unit-tests-only           Perform unit tests only and quit
+Options:
+    -h, --help                  Show this help and quit.
+    --unit-tests-only           Perform unit tests only and quit.
+	--connect [ip:port]         Connect to an arena server in accordance with default_client_start inside the config file.
+								The ip:port argument is optional - if specified, it will override the ip_port field from the config file.
+	--start-server				Host an arena server in accordance with default_server_start inside the config file.
 
-If file_path is supplied and its extension is either lua or wp,
-the file will be automatically opened in the editor.
+If editor_file_path is supplied and it is a directory,
+the game will automatically launch the editor to try and open a project inside it. 
 
 )"
 + complete_build_info()

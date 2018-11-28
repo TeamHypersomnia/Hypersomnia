@@ -324,6 +324,20 @@ void settings_gui_state::perform(
 				// revertable_checkbox("Draw gameplay GUI", config.drawing.draw_character_gui); revert(config.drawing.draw_character_gui);
 				break;
 			}
+			case settings_pane::NETWORK: {
+				if (auto node = scoped_tree_node("Client settings")) {
+
+				}
+
+				if (auto node = scoped_tree_node("Default server start")) {
+					/* TODO */
+
+				}
+
+				if (auto node = scoped_tree_node("Default server vars")) {
+
+				}
+			}
 			case settings_pane::EDITOR: {
 				if (auto node = scoped_tree_node("General")) {
 					revertable_checkbox("Enable autosave", config.editor.autosave.enabled);

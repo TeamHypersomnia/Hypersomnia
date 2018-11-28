@@ -6,6 +6,34 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Host/connect window
+	- non-commanding window with property widgets and a start button
+		- since these settings will be critical, we'll hand-write the controls
+	- always save to config local lua on connect/host press
+
+- Don't use settings_gui.cpp for client/server defaults: simply edit these in connect/host dialogs and save on confirmation
+
+- Editor-like server vars tweaker accessible by pressing ESC server-side
+	- will have to be commandized properly, just like editor setup's
+
+- Game events log and chat
+	- Positioning based on input box window
+		- Under the input box window, we can have tabs changeable by ctrl+tab and ctrl+shift+tab
+	- Don't show input box window when chat is not active
+	- Scroll can be added later
+		- If we ever have scrollbar, change range, not coords.
+	- Always show n recent commands. 
+
+- we could begin by writing a simple chat server in order to test connections at all
+	- we could revive our textbox because it was battle tested
+		- actually, let's take imgui since we'll have tabs, collapsing etc for free
+		- note we don't need selection of text, we'll just log entire chat history the simplicity if someone wants to copy
+		- coloring could work by parsing actual content, instead of strangely structurizing commands
+			- e.g. nicknames would always be colorized depending on the faction
+		- wrapping will introduce a problem I guess but only the starting content will be colorized
+			- yeah only the preffix will ever have colors
+		- always wrap when inactive, but when active we can just as well wrap
+
 - focus on creating a minimal api class for which we will be able to plug anything
 - we'll remove enet shortly
 
@@ -39,12 +67,12 @@ summary: That which we are brainstorming at the moment.
 
 - always calculate the tickrate from the referential player in case the tickrate suddenly changes
 
-- arena_server_setup
-- arena_client_setup
+- server_setup
+- client_setup
 
 - concept: server session
 	- mode-agnostic sever vars
-		- arena_server_vars
+		- server_vars
 			- perhaps they should not AT ALL influence the deterministic state itself
 				- problematically, logic_speed_mult does influence this state by influencing the requested delta
 				- so does the tickrate though
@@ -114,11 +142,6 @@ summary: That which we are brainstorming at the moment.
 - Simplify workflow for creating new weapons?
 	- E.g. remove the need to specify finishing traces
 
-- Game events log and chat
-	- In the same window
-	- ImGui or own GUI?
-		- We actually have some textbox code we can introduce later for chatting
-			- Better control over such an important feature
 			
 - To avoid transmitting some server-decided seed for the beginning of each round (e.g. to position players around)...
 	- ...we can just derive a hash of all inputs from the previous round, or just hash entire cosmos state
@@ -127,3 +150,6 @@ summary: That which we are brainstorming at the moment.
 	- Some amount of initial information will need to be transmitted anyway
 		- Like current players?
 		- Isn't this all a matter of sending the bomb mode state?
+
+- matchmaking
+	- stats persistence

@@ -35,6 +35,9 @@
 #include "application/session_settings.h"
 #include "application/setups/main_menu_settings.h"
 #include "application/setups/editor/editor_settings.h"
+#include "application/setups/server/server_start_input.h"
+#include "application/setups/server/server_vars.h"
+#include "application/setups/client/client_start_input.h"
 #include "application/app_intent_type.h"
 
 enum class launch_type {
@@ -48,8 +51,8 @@ enum class launch_type {
 
 	DIRECTOR,
 
-	ONLY_CLIENT,
-	ONLY_SERVER,
+	CLIENT,
+	SERVER,
 
 	CLIENT_AND_SERVER,
 	TWO_CLIENTS_AND_SERVER,
@@ -111,6 +114,11 @@ struct config_lua_table {
 
 	arena_mode_gui_settings arena_mode_gui;
 	faction_view_settings faction_view;
+
+	server_start_input default_server_start;
+	server_vars default_server_vars;
+
+	client_start_input default_client_start;
 
 #if TODO
 	std::string connect_address;

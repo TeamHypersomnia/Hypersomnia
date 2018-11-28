@@ -1,42 +1,35 @@
 #pragma once
-#include <optional>
 #include "augs/misc/timing/fixed_delta_timer.h"
 #include "augs/math/camera_cone.h"
-
 #include "game/detail/render_layer_filter.h"
-#include "game/cosmos/entity_handle.h"
-#include "game/modes/test_mode.h"
-
-#include "test_scenes/test_scene_settings.h"
-
+#include "application/setups/client/client_start_input.h"
 #include "application/intercosm.h"
-#include "application/setups/default_setup_settings.h"
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
 
-#include "application/debug_settings.h"
+#include "application/setups/default_setup_settings.h"
 #include "application/input/entropy_accumulator.h"
+
 #include "application/setups/setup_common.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
 
-namespace sol {
-	class state;
-}
-
-class test_scene_setup : public default_setup_settings {
-	test_mode mode;
-	test_mode_ruleset ruleset;
-
+class client_setup : public default_setup_settings {
 	intercosm scene;
 	entropy_accumulator total_collected;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
+
 	entity_id viewed_character_id;
 
 public:
-	test_scene_setup(
+	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
+	static constexpr bool handles_window_input = false;
+	static constexpr bool has_additional_highlights = false;
+
+	client_setup(
 		sol::state& lua,
-		const test_scene_settings,
-		const input_recording_type recording_type
+		const client_start_input&
 	);
 
 	auto get_audiovisual_speed() const {
@@ -92,12 +85,8 @@ public:
 
 		while (steps--) {
 			const auto total = total_collected.extract(get_viewed_character(), in);
-
-			mode.advance(
-				{ ruleset, scene.world },
-				total,
-				callbacks
-			);
+			(void)total;
+			(void)callbacks;
 		}
 	}
 

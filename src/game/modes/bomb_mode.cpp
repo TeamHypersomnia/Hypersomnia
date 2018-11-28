@@ -308,6 +308,13 @@ mode_player_id bomb_mode::add_player(input_type in, const entity_name_str& chose
 	players.try_emplace(new_id, chosen_name);
 	recently_added_players.push_back(new_id);
 
+	if (state == arena_mode_state::WARMUP) {
+		players[new_id].stats.money = in.rules.economy.warmup_initial_money;
+	}
+	else {
+		players[new_id].stats.money = in.rules.economy.initial_money;
+	}
+
 	return new_id;
 }
 

@@ -10,6 +10,7 @@ enum class settings_pane {
 	AUDIO,
 	CONTROLS,
 	GAMEPLAY,
+	NETWORK,
 	EDITOR,
 	GUI_STYLES,
 	ADVANCED,

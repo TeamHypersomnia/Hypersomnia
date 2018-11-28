@@ -2327,3 +2327,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - adjust doppler factors of bullet trace sounds
 
+- giving money to connected players?
+	- always give initial money
+	- someone disconnects during warmup - his problem
+

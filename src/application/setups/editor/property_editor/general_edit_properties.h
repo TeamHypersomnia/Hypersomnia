@@ -206,6 +206,7 @@ void detail_general_edit_properties(
 	T& altered,
 	const bool nodify_introspected = true
 ) {
+	/* Suppress warnings */
 	(void)input; (void)equality_predicate; (void)notify_change_of; (void)label; (void)altered; (void)nodify_introspected;
 
 	static constexpr bool should_skip = 
@@ -529,6 +530,40 @@ void general_edit_properties(
 	};
 
 	auto traverse = [&](const auto& member_label, auto& member) {
+		auto equality_predicate = [&parent_altered, &field_equality_predicate](const auto& modified, const auto index) {
+			using I = std::remove_const_t<decltype(index)>;
+
+			auto addr = ::make_field_address<field_type_id>(parent_altered, modified);
+
+			if constexpr(std::is_same_v<I, unsigned>) {
+				addr.element_index = index;
+				return field_equality_predicate(modified.at(index), addr);
+			}
+			else {
+				return field_equality_predicate(modified, addr);
+			}
+		};
+
+		auto notify_change_of = [&parent_altered, &do_tweaker](const std::string& formatted_label, const tweaker_type t, const auto& modified, const auto index) {
+			/* notify_change_of */
+			using I = std::remove_const_t<decltype(index)>;
+
+			auto addr = ::make_field_address<field_type_id>(parent_altered, modified);
+
+			if constexpr(std::is_same_v<I, unsigned>) {
+				addr.element_index = index;
+
+				do_tweaker(tweaker_input<field_type_id, remove_cref<decltype(modified.at(index))>>{
+					t, formatted_label, addr, modified.at(index)
+				});
+			}
+			else {
+				do_tweaker(tweaker_input<field_type_id, remove_cref<decltype(modified)>>{
+					t, formatted_label, addr, modified
+				});
+			}
+		};
+
 		detail_general_edit_properties<Behaviour, false, false>(
 			detail_edit_properties_input<S, D> { 
 				special_widget_provider,
@@ -536,37 +571,8 @@ void general_edit_properties(
 				prop_in.settings,
 				extra_columns
 			},
-			[&parent_altered, &field_equality_predicate](const auto& modified, const auto index) {
-				using I = std::remove_const_t<decltype(index)>;
-
-				auto addr = ::make_field_address<field_type_id>(parent_altered, modified);
-
-				if constexpr(std::is_same_v<I, unsigned>) {
-					addr.element_index = index;
-					return field_equality_predicate(modified.at(index), addr);
-				}
-				else {
-					return field_equality_predicate(modified, addr);
-				}
-			},
-			[&parent_altered, &do_tweaker](const std::string& formatted_label, const tweaker_type t, const auto& modified, const auto index) {
-				using I = std::remove_const_t<decltype(index)>;
-
-				auto addr = ::make_field_address<field_type_id>(parent_altered, modified);
-
-				if constexpr(std::is_same_v<I, unsigned>) {
-					addr.element_index = index;
-
-					do_tweaker(tweaker_input<field_type_id, remove_cref<decltype(modified.at(index))>>{
-						t, formatted_label, addr, modified.at(index)
-					});
-				}
-				else {
-					do_tweaker(tweaker_input<field_type_id, remove_cref<decltype(modified)>>{
-						t, formatted_label, addr, modified
-					});
-				}
-			},
+			equality_predicate,
+			notify_change_of,
 			member_label,
 			member
 		);

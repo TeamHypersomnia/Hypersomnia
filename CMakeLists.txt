@@ -355,6 +355,8 @@ set(HYPERSOMNIA_CPU_INTENSIVE_CPPS
 
 	"src/application/setups/editor/gui/editor_fae_gui.cpp"
 	"src/application/setups/editor/editor_setup.cpp"
+	"src/application/setups/server/server_setup.cpp"
+	"src/application/setups/client/client_setup.cpp"
 	"src/application/setups/editor/gui/editor_common_state_gui.cpp"
 	"src/application/setups/editor/commands/change_property_command.cpp"
 )

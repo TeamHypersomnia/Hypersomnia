@@ -14,6 +14,14 @@ namespace augs {
 		pad_bytes<3> pad;
 		// END GEN INTROSPECTOR
 
+		static auto enabled(const T& value) {
+			return maybe(value, true);
+		}
+
+		static auto disabled(const T& value) {
+			return maybe(value, false);
+		}
+
 		maybe() = default;
 		maybe(const T& value) : value(value), is_enabled(true) {}
 		maybe(const T& value, const bool is_enabled) : value(value), is_enabled(is_enabled) {}
