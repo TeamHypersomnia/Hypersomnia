@@ -116,7 +116,7 @@ void for_each_iconed_entity(
 	});
 
 	visible.for_each<render_layer::CONTINUOUS_PARTICLES>(cosm, [&](const auto& handle) {
-		const bool has_displacement = handle.template get<invariants::continuous_particles>().displacement.is_enabled;
+		const bool has_displacement = handle.template get<invariants::continuous_particles>().wandering.is_enabled;
 		const auto chosen_icon = 
 			has_displacement
 			? assets::necessary_image_id::EDITOR_ICON_SMOKE_EFFECT 

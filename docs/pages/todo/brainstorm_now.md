@@ -6,13 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Host/connect window
-	- non-commanding window with property widgets and a start button
-		- since these settings will be critical, we'll hand-write the controls
-	- always save to config local lua on connect/host press
-
-- Don't use settings_gui.cpp for client/server defaults: simply edit these in connect/host dialogs and save on confirmation
-
 - Editor-like server vars tweaker accessible by pressing ESC server-side
 	- will have to be commandized properly, just like editor setup's
 

@@ -2331,3 +2331,9 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- always give initial money
 	- someone disconnects during warmup - his problem
 
+- Host/connect window
+	- non-commanding window with property widgets and a start button
+		- since these settings will be critical, we'll hand-write the controls
+	- always save to config local lua on connect/host press
+
+- Don't use settings_gui.cpp for client/server defaults: simply edit these in connect/host dialogs and save on confirmation

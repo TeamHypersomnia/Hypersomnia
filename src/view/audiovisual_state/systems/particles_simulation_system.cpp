@@ -498,7 +498,7 @@ void particles_simulation_system::advance_visible_streams(
 								return transformr();
 							}
 							else {
-								return transformr(typed_subject.template get<components::continuous_particles>().displacement_state.current, 0);
+								return transformr(typed_subject.template get<components::continuous_particles>().wandering_state.current, 0);
 							}
 						});
 					}

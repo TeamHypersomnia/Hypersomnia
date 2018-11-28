@@ -414,8 +414,8 @@ namespace test_flavours {
 			);
 
 			invariants::continuous_particles& cp = meta.template get<invariants::continuous_particles>();
-			cp.displacement.is_enabled = true;
-			auto& disp = cp.displacement.value;
+			cp.wandering.is_enabled = true;
+			auto& disp = cp.wandering.value;
 
 			disp.additional_radius = 10.f;
 			disp.duration_ms = { 200.f, 2000.f };

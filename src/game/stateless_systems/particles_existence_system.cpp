@@ -31,7 +31,7 @@ void particles_existence_system::displace_streams(const logic_step step) const {
 	cosm.for_each_having<components::continuous_particles>(
 		[&](const auto& it) {
 			const auto& cp_def = it.template get<invariants::continuous_particles>();
-			const auto& disp = cp_def.displacement;
+			const auto& disp = cp_def.wandering;
 
 			if (!disp.is_enabled) {
 				return;
@@ -39,7 +39,7 @@ void particles_existence_system::displace_streams(const logic_step step) const {
 			
 			const auto& disp_def = disp.value;
 			auto& cp = it.template get<components::continuous_particles>();
-			auto& state = cp.displacement_state;
+			auto& state = cp.wandering_state;
 
 			auto& chosen_duration = state.current_duration_ms;
 
