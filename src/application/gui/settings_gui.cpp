@@ -165,7 +165,7 @@ void settings_gui_state::perform(
 					config.window.raw_mouse_input = e != 0;
 				}
 
-				input_text<100>(CONFIG_NVP(window.name)); revert(config.window.name);
+				input_text<100>(CONFIG_NVP(window.name), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.window.name);
 				revertable_checkbox("Automatically hide settings in-game", config.session.automatically_hide_settings_ingame);
 
 				enum_combo("Vsync mode", config.window.vsync_mode);

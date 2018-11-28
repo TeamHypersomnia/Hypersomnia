@@ -43,9 +43,9 @@ struct standard_window_mixin {
 
 	standard_window_mixin(const std::string& title) : title(title) {}
 
-	void acquire_keyboard_once() {
+	void acquire_keyboard_once(int offset = 0) {
 		if (show && acquire_once) {
-			ImGui::SetKeyboardFocusHere();
+			ImGui::SetKeyboardFocusHere(offset);
 			acquire_once = false;
 		}
 	};
