@@ -171,6 +171,11 @@ namespace augs {
 
 		basic_memory_stream() = default;
 
+		B&& extract() && {
+			resize_no_init(buffer, get_write_pos());
+			return std::move(buffer);
+		}
+
 		operator B&&() && {
 			resize_no_init(buffer, get_write_pos());
 			return std::move(buffer);

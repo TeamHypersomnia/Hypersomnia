@@ -2,19 +2,11 @@
 #include "augs/misc/measurements.h"
 
 #include "augs/network/network_types.h"
-#include "augs/network/enet_raii.h"
 #include "augs/network/reliable_channel.h"
-
-struct _ENetPeer;
-typedef struct _ENetPeer ENetPeer;
 
 namespace augs {
 	namespace network {
 		class client {
-			endpoint_address address;
-			ENetHost_raii host;
-			ENetPeer* peer = nullptr;
-
 			reliable_channel redundancy;
 
 			augs::amount_measurements<std::size_t> sent_size = 1;
@@ -23,16 +15,25 @@ namespace augs {
 		public:
 			std::vector<message> collect_entropy();
 
-			bool connect(std::string host, unsigned short port, unsigned timeout_ms);
+			bool connect(
+				const std::string& address, 
+				unsigned timeout_ms
+			);
 
 			bool post_redundant(const packet& payload);
 			bool send_pending_redundant();
 
 			bool send_reliable(const packet& payload);
-			bool has_timed_out(const float sequence_interval_ms, const float ms) const;
+
+			bool has_timed_out(
+				const float sequence_interval_ms, 
+				const float ms
+			) const;
 
 			void disconnect();
 			void forceful_disconnect();
+
+			bool is_connected() const;
 
 			unsigned total_bytes_sent() const;
 			unsigned total_bytes_received() const;

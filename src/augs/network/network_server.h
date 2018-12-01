@@ -1,32 +1,19 @@
 #pragma once
 #include <unordered_map>
-#include "network_types.h"
-#include "enet_raii.h"
-#include "reliable_channel.h"
 
-struct _ENetPeer;
-typedef struct _ENetPeer ENetPeer;
+#include "augs/templates/maybe.h"
+
+#include "augs/network/network_types.h"
+#include "augs/network/reliable_channel.h"
+#include "augs/network/server_listen_input.h"
 
 namespace augs {
 	namespace network {
 		class server {
 			endpoint_address address;
-			ENetHost_raii host;
 
 			struct peer {
-				ENetPeer* ptr;
 				reliable_channel redundancy;
-
-				peer() : ptr(nullptr) {}
-				peer(ENetPeer * const ptr ) : ptr(ptr) {}
-
-				operator ENetPeer*() {
-					return ptr;
-				}
-
-				operator ENetPeer*() const {
-					return ptr;
-				}
 			};
 
 			std::unordered_map<endpoint_address, peer> peer_map;
@@ -35,11 +22,11 @@ namespace augs {
 
 			std::vector<message> collect_entropy();
 
-			bool listen(unsigned short port, unsigned max_connections);
+			bool listen(const server_listen_input&);
 
 			// void enable_lag(float loss, unsigned short latency, unsigned short jitter);
 			
-			bool post_redundant(const packet&, const endpoint_address& target);
+			bool post_redundant(packet&&, const endpoint_address& target);
 			
 			bool send_pending_redundant();
 

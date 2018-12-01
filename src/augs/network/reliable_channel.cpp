@@ -26,12 +26,23 @@ namespace augs {
 			}
 		}
 
-		bool reliable_sender::post_message(memory_stream& output) {
+		bool reliable_sender::post_message(const std::vector<std::byte>& payload) {
 			if (last_message - first_message >= std::numeric_limits<unsigned short>::max()) {
 				return false;
 			}
 
-			reliable_buf.push_back(output);
+			reliable_buf.emplace_back(payload);
+			++last_message;
+
+			return true;
+		}
+
+		bool reliable_sender::post_message(std::vector<std::byte>&& payload) {
+			if (last_message - first_message >= std::numeric_limits<unsigned short>::max()) {
+				return false;
+			}
+
+			reliable_buf.emplace_back(std::move(payload));
 			++last_message;
 
 			return true;
@@ -43,7 +54,8 @@ namespace augs {
 
 			for (auto& msg : reliable_buf) {
 				//reliable_bs.name_property("reliable message");
-				reliable_bs.write(msg);
+				//augs::cref_memory_stream ss(msg);
+				reliable_bs.write(msg.data(), msg.size());
 			}
 
 			if (reliable_bs.size() > 0) {
@@ -235,6 +247,10 @@ TEST_CASE("NetChannel SequenceArithmetic") {
 	REQUIRE(!sequence_more_recent(us(65534), us(2)));
 }
 
+static void post_from_stream(reliable_sender& sender, augs::memory_stream ss) {
+	sender.post_message(std::move(ss).extract());
+}
+
 TEST_CASE("NetChannel SingleTransmissionDeleteAllPending") {
 	reliable_sender sender;
 	reliable_receiver receiver;
@@ -248,10 +264,10 @@ TEST_CASE("NetChannel SingleTransmissionDeleteAllPending") {
 	}
 
 	/* post four messages */
-	sender.post_message(msg[0]);
-	sender.post_message(msg[1]);
-	sender.post_message(msg[2]);
-	sender.post_message(msg[3]);
+	post_from_stream(sender, msg[0]);
+	post_from_stream(sender, msg[1]);
+	post_from_stream(sender, msg[2]);
+	post_from_stream(sender, msg[3]);
 
 	augs::memory_stream sender_bs;
 	augs::memory_stream receiver_bs;
@@ -264,7 +280,7 @@ TEST_CASE("NetChannel SingleTransmissionDeleteAllPending") {
 
 	sender.read_ack(receiver_bs);
 
-	sender.post_message(msg[4]);
+	post_from_stream(sender, msg[4]);
 
 	REQUIRE(1 == sender.reliable_buf.size());
 	REQUIRE(1 == sender.sequence);
@@ -288,21 +304,21 @@ TEST_CASE("NetChannel PastAcknowledgementDeletesSeveralPending") {
 	augs::memory_stream receiver_packet;
 
 	/* post four messages */
-	sender.post_message(msg[0]);
-	sender.post_message(msg[1]);
-	sender.post_message(msg[2]);
-	sender.post_message(msg[3]);
+	post_from_stream(sender, msg[0]);
+	post_from_stream(sender, msg[1]);
+	post_from_stream(sender, msg[2]);
+	post_from_stream(sender, msg[3]);
 
 	sender.write_data(sender_packets[0]);
 
-	sender.post_message(msg[4]);
-	sender.post_message(msg[5]);
+	post_from_stream(sender, msg[4]);
+	post_from_stream(sender, msg[5]);
 
 	sender.write_data(sender_packets[1]);
 
-	sender.post_message(msg[6]);
-	sender.post_message(msg[7]);
-	sender.post_message(msg[8]);
+	post_from_stream(sender, msg[6]);
+	post_from_stream(sender, msg[7]);
+	post_from_stream(sender, msg[8]);
 
 	sender.write_data(sender_packets[2]);
 
@@ -334,16 +350,16 @@ TEST_CASE("NetChannel FlagForDeletionAndAck") {
 	augs::memory_stream receiver_packet;
 
 	/* post four messages */
-	sender.post_message(msg[0]);
-	sender.post_message(msg[1]);
-	sender.post_message(msg[2]);
-	sender.post_message(msg[3]);
+	post_from_stream(sender, msg[0]);
+	post_from_stream(sender, msg[1]);
+	post_from_stream(sender, msg[2]);
+	post_from_stream(sender, msg[3]);
 
 	sender.write_data(sender_packets[0]);
 
-	sender.post_message(msg[4]);
-	sender.post_message(msg[5]);
-	sender.post_message(msg[6]);
+	post_from_stream(sender, msg[4]);
+	post_from_stream(sender, msg[5]);
+	post_from_stream(sender, msg[6]);
 
 	sender.write_data(sender_packets[1]);
 	
@@ -353,8 +369,8 @@ TEST_CASE("NetChannel FlagForDeletionAndAck") {
 	//sender.reliable_buf[5].flag_for_deletion = true;
 	//sender.reliable_buf[6].flag_for_deletion = true;
 
-	sender.post_message(msg[7]);
-	sender.post_message(msg[8]);
+	post_from_stream(sender, msg[7]);
+	post_from_stream(sender, msg[8]);
 
 	sender.write_data(sender_packets[2]);
 	sender.write_data(sender_packets[3]);
@@ -411,16 +427,16 @@ TEST_CASE("NetChannel SequenceNumberOverflowMultipleTries") {
 		augs::memory_stream receiver_packet;
 
 		/* post four messages */
-		sender.post_message(msg[0]);
-		sender.post_message(msg[1]);
-		sender.post_message(msg[2]);
-		sender.post_message(msg[3]);
+		post_from_stream(sender, msg[0]);
+		post_from_stream(sender, msg[1]);
+		post_from_stream(sender, msg[2]);
+		post_from_stream(sender, msg[3]);
 
 		sender.write_data(sender_packets[0]);
 
-		sender.post_message(msg[4]);
-		sender.post_message(msg[5]);
-		sender.post_message(msg[6]);
+		post_from_stream(sender, msg[4]);
+		post_from_stream(sender, msg[5]);
+		post_from_stream(sender, msg[6]);
 
 		sender.write_data(sender_packets[1]);
 
@@ -430,8 +446,8 @@ TEST_CASE("NetChannel SequenceNumberOverflowMultipleTries") {
 		//sender.reliable_buf[5].flag_for_deletion = true;
 		//sender.reliable_buf[6].flag_for_deletion = true;
 
-		sender.post_message(msg[7]);
-		sender.post_message(msg[8]);
+		post_from_stream(sender, msg[7]);
+		post_from_stream(sender, msg[8]);
 
 		sender.write_data(sender_packets[2]);
 		sender.write_data(sender_packets[3]);
@@ -492,16 +508,16 @@ TEST_CASE("NetChannel OutOfDatePackets") {
 		augs::memory_stream receiver_packet;
 
 		/* post four messages */
-		sender.post_message(msg[0]);
-		sender.post_message(msg[1]);
-		sender.post_message(msg[2]);
-		sender.post_message(msg[3]);
+		post_from_stream(sender, msg[0]);
+		post_from_stream(sender, msg[1]);
+		post_from_stream(sender, msg[2]);
+		post_from_stream(sender, msg[3]);
 
 		sender.write_data(sender_packets[0]);
 
-		sender.post_message(msg[4]);
-		sender.post_message(msg[5]);
-		sender.post_message(msg[6]);
+		post_from_stream(sender, msg[4]);
+		post_from_stream(sender, msg[5]);
+		post_from_stream(sender, msg[6]);
 
 		sender.write_data(sender_packets[1]);
 
@@ -511,8 +527,8 @@ TEST_CASE("NetChannel OutOfDatePackets") {
 		//sender.reliable_buf[5].flag_for_deletion = true;
 		//sender.reliable_buf[6].flag_for_deletion = true;
 
-		sender.post_message(msg[7]);
-		sender.post_message(msg[8]);
+		post_from_stream(sender, msg[7]);
+		post_from_stream(sender, msg[8]);
 
 		sender.write_data(sender_packets[2]);
 		sender.write_data(sender_packets[3]);

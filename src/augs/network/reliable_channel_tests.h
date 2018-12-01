@@ -10,10 +10,10 @@ TEST_CASE("NetChannelWrapper SingleTransmissionDeleteAllPending") {
 	}
 
 	/* post four messages */
-	a.sender.post_message(msg[0]);
-	a.sender.post_message(msg[1]);
-	a.sender.post_message(msg[2]);
-	a.sender.post_message(msg[3]);
+	post_from_stream(a.sender, msg[0]);
+	post_from_stream(a.sender, msg[1]);
+	post_from_stream(a.sender, msg[2]);
+	post_from_stream(a.sender, msg[3]);
 
 	augs::memory_stream sender_bs;
 	augs::memory_stream receiver_bs;
@@ -30,7 +30,7 @@ TEST_CASE("NetChannelWrapper SingleTransmissionDeleteAllPending") {
 
 	a.handle_incoming_packet(receiver_bs);
 
-	a.sender.post_message(msg[4]);
+	post_from_stream(a.sender, msg[4]);
 
 	REQUIRE(1 == a.sender.reliable_buf.size());
 	REQUIRE(1 == a.sender.sequence);
@@ -54,21 +54,21 @@ TEST_CASE("NetChannelWrapper PastAcknowledgementDeletesSeveralPending") {
 	augs::memory_stream receiver_packet;
 
 	/* post four messages */
-	a.sender.post_message(msg[0]);
-	a.sender.post_message(msg[1]);
-	a.sender.post_message(msg[2]);
-	a.sender.post_message(msg[3]);
+	post_from_stream(a.sender, msg[0]);
+	post_from_stream(a.sender, msg[1]);
+	post_from_stream(a.sender, msg[2]);
+	post_from_stream(a.sender, msg[3]);
 
 	a.build_next_packet(sender_packets[0]);
 
-	a.sender.post_message(msg[4]);
-	a.sender.post_message(msg[5]);
+	post_from_stream(a.sender, msg[4]);
+	post_from_stream(a.sender, msg[5]);
 
 	a.build_next_packet(sender_packets[1]);
 
-	a.sender.post_message(msg[6]);
-	a.sender.post_message(msg[7]);
-	a.sender.post_message(msg[8]);
+	post_from_stream(a.sender, msg[6]);
+	post_from_stream(a.sender, msg[7]);
+	post_from_stream(a.sender, msg[8]);
 
 	a.build_next_packet(sender_packets[2]);
 
@@ -99,16 +99,16 @@ TEST_CASE("NetChannelWrapper FlagForDeletionAndAck") {
 	augs::memory_stream receiver_packet;
 
 	/* post four messages */
-	a.sender.post_message(msg[0]);
-	a.sender.post_message(msg[1]);
-	a.sender.post_message(msg[2]);
-	a.sender.post_message(msg[3]);
+	post_from_stream(a.sender, msg[0]);
+	post_from_stream(a.sender, msg[1]);
+	post_from_stream(a.sender, msg[2]);
+	post_from_stream(a.sender, msg[3]);
 
 	a.build_next_packet(sender_packets[0]);
 
-	a.sender.post_message(msg[4]);
-	a.sender.post_message(msg[5]);
-	a.sender.post_message(msg[6]);
+	post_from_stream(a.sender, msg[4]);
+	post_from_stream(a.sender, msg[5]);
+	post_from_stream(a.sender, msg[6]);
 
 	a.build_next_packet(sender_packets[1]);
 
@@ -118,8 +118,8 @@ TEST_CASE("NetChannelWrapper FlagForDeletionAndAck") {
 	//a.sender.reliable_buf[5].flag_for_deletion = true;
 	//a.sender.reliable_buf[6].flag_for_deletion = true;
 
-	a.sender.post_message(msg[7]);
-	a.sender.post_message(msg[8]);
+	post_from_stream(a.sender, msg[7]);
+	post_from_stream(a.sender, msg[8]);
 
 	a.build_next_packet(sender_packets[2]);
 	a.build_next_packet(sender_packets[3]);

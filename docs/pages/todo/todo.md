@@ -6,6 +6,9 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- ImGui popup for progress on loading atlases
+	- the imgui atlas itself will load quickly enough
+
 - So that we can change tickrate dynamically, timing logic can, instead of steps, simply hold the floating point (double) values of the seconds passed
 	- alternatively hold unsigned long longs?
 	- also store last_fixed_delta for easy cosmos::get_fixed_delta access

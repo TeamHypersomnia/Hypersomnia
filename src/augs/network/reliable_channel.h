@@ -12,7 +12,7 @@
 namespace augs {
 	namespace network {
 		struct reliable_sender {
-			std::vector<memory_stream> reliable_buf;
+			std::vector<std::vector<std::byte>> reliable_buf;
 
 			std::map<unsigned, unsigned> sequence_to_reliable_range;
 
@@ -22,7 +22,9 @@ namespace augs {
 			unsigned first_message = 0u;
 			unsigned last_message = 0u;
 
-			bool post_message(memory_stream&);
+			bool post_message(std::vector<std::byte>&&);
+			bool post_message(const std::vector<std::byte>&);
+
 			void write_data(memory_stream& output);
 			bool read_ack(memory_stream& input);
 		};

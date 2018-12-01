@@ -1,7 +1,5 @@
-#if BUILD_ENET
-#include <enet/enet.h>
-#undef min
-#undef max
+#if BUILD_NETWORKING
+
 #endif
 
 #include "network_server.h"
@@ -9,29 +7,19 @@
 
 namespace augs {
 	namespace network {
-		bool server::listen(const unsigned short port, const unsigned max_connections) {
-#if BUILD_ENET
-			ENetAddress addr;
-
-			addr.host = ENET_HOST_ANY;
-			addr.port = port;
-
-			return host.init(&addr /* the address to bind the server host to */,
-				max_connections      /* allow up to 32 clients and/or outgoing connections */,
-				2      /* allow up to 2 channels to be used, 0 and 1 */,
-				0      /* assume any amount of incoming bandwidth */,
-				0);
+		bool server::listen(const server_listen_input& in) {
+#if BUILD_NETWORKING
+			(void)in;
+			return false;
 #else
-			(void)port;
-			(void)max_connections;
-			LOG("Warning! ENet wasn't built.");
+			(void)in;
+			LOG("Warning! Networking backend was not built.");
 			return false;
 #endif
 		}
 
-		bool server::post_redundant(const packet& payload, const endpoint_address& target) {
-			packet stream = payload;
-			return peer_map.at(target).redundancy.sender.post_message(stream);
+		bool server::post_redundant(packet&& payload, const endpoint_address& target) {
+			return peer_map.at(target).redundancy.sender.post_message(std::move(payload));
 		}
 
 		bool server::has_endpoint(const endpoint_address& target) const {
@@ -43,30 +31,25 @@ namespace augs {
 		}
 
 		bool server::send_pending_redundant() {
-#if BUILD_ENET
+#if BUILD_NETWORKING
 			bool result = true;
 
 			for (auto& e : peer_map) {
 				augs::memory_stream payload;
 				
 				e.second.redundancy.build_next_packet(payload);
-
-				ENetPacket * const packet = enet_packet_create(payload.data(), payload.size(), ENET_PACKET_FLAG_UNSEQUENCED);
-				result = result && !enet_peer_send(e.second, 0, packet);
-				enet_host_flush(host.get());
 			}
+
 			return result;
 #endif
 			return false;
 		}
 
 		bool server::send_reliable(const packet& payload, const endpoint_address& target) {
-#if BUILD_ENET
-			ENetPacket * const packet = enet_packet_create(payload.data(), payload.size(), ENET_PACKET_FLAG_RELIABLE);
-			auto result = !enet_peer_send(peer_map.at(target), 1, packet);
-			enet_host_flush(host.get());
-
-			return result;
+#if BUILD_NETWORKING
+			(void)payload;
+			(void)target;
+			return false;
 #else
 			(void)payload;
 			(void)target;
@@ -75,16 +58,16 @@ namespace augs {
 		}
 
 		void server::disconnect(const endpoint_address& target) {
-#if BUILD_ENET
-			enet_peer_disconnect(peer_map.at(target), 0);
+#if BUILD_NETWORKING
+			(void)target;
 #else
 			(void)target;
 #endif
 		}
 
 		void server::forceful_disconnect(const endpoint_address& target) {
-#if BUILD_ENET
-			enet_peer_reset(peer_map.at(target));
+#if BUILD_NETWORKING
+			(void)target;
 #else
 			(void)target;
 #endif
@@ -94,57 +77,7 @@ namespace augs {
 		std::vector<message> server::collect_entropy() {
 			std::vector<message> total;
 
-#if BUILD_ENET
-			if (host.get() == nullptr)
-				return total;
-
-			ENetEvent event;
-
-			while (enet_host_service(host.get(), &event, 0) > 0) {
-				message new_event;
-				bool add_event = true;
-
-				switch (event.type) {
-				case ENET_EVENT_TYPE_CONNECT:
-					new_event.message_type = message::type::CONNECT;
-					new_event.address = event.peer->address;
-					LOG("SPort: %x", event.peer->address.port);
-					peer_map[new_event.address] = event.peer;
-
-					break;
-				case ENET_EVENT_TYPE_RECEIVE:
-					new_event.payload.reserve(event.packet->dataLength);
-					new_event.payload.write(reinterpret_cast<const std::byte*>(event.packet->data), event.packet->dataLength);
-					new_event.message_type = message::type::RECEIVE;
-					new_event.address = event.peer->address;
-
-					if (event.channelID == 0) {
-						auto result = peer_map.at(new_event.address).redundancy.handle_incoming_packet(new_event.payload);
-
-						if (result.result_type == result.NOTHING_RECEIVED) {
-							add_event = false;
-						}
-						else {
-							new_event.messages_to_skip = result.messages_to_skip;
-						}
-					}
-						
-					enet_packet_destroy(event.packet);
-
-					break;
-
-				case ENET_EVENT_TYPE_DISCONNECT:
-					new_event.message_type = message::type::DISCONNECT;
-					new_event.address = event.peer->address;
-
-					forceful_disconnect(new_event.address);
-					break;
-					default: break;
-				}
-				
-				if(add_event)
-					total.emplace_back(new_event);
-			}
+#if BUILD_NETWORKING
 #endif
 			return total;
 		}

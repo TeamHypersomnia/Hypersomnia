@@ -115,7 +115,7 @@ set(HYPERSOMNIA_LOCAL_FILES_DIR "cache/usr")
 
 option(BUILD_OPENAL "Build OpenAL Soft." ${DEFAULT_OPT})
 option(BUILD_OPENGL "Build OpenGL-related code." ${DEFAULT_OPT})
-option(BUILD_ENET "Build ENet networking library." ${DEFAULT_OPT})
+option(BUILD_NETWORKING "Build the networking backend." ${DEFAULT_OPT})
 option(BUILD_FREETYPE "Build FreeType library responsible for loading fonts." ${DEFAULT_OPT})
 option(BUILD_WINDOW_FRAMEWORK "Build code specific to a given platfom, e.g. window management done by WinAPI." ${DEFAULT_OPT})
 option(BUILD_HTTP_REQUESTS "Build simple http requests, e.g. for latest news bar in the main menu." ${DEFAULT_OPT})
@@ -475,7 +475,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/network/network_client.cpp"
 	"src/augs/network/network_types.cpp"
 	"src/augs/network/network_server.cpp"
-	"src/augs/network/enet_raii.cpp"
 	"src/augs/network/reliable_channel.cpp"
 	"src/augs/texture_atlas/bake_fresh_atlas.cpp"
 	"src/game/assets/animation.cpp"
@@ -1191,14 +1190,14 @@ endif()
 
 # We build the remaining libraries.
 
-if(BUILD_ENET)
-	add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/enet")
+if(BUILD_NETWORKING)
+	# add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/enet")
 
-	if(ADD_MCMODEL_LARGE_FLAG)
-		target_compile_options(enet PUBLIC -mcmodel=large -no-pie)
-	endif()
+	#if(ADD_MCMODEL_LARGE_FLAG)
+	#target_compile_options(enet PUBLIC -mcmodel=large -no-pie)
+	#endif()
 	
-	add_include_dirs_of("enet")
+	#add_include_dirs_of("enet")
 endif()
 
 if(BUILD_FREETYPE)
@@ -1237,8 +1236,8 @@ if(BUILD_SOUND_FORMAT_DECODERS)
 	add_definitions(-DBUILD_SOUND_FORMAT_DECODERS=1)
 endif()
 
-if(BUILD_ENET) 
-	add_definitions(-DBUILD_ENET=1)
+if(BUILD_NETWORKING) 
+	add_definitions(-DBUILD_NETWORKING=1)
 endif()
 
 if(BUILD_FREETYPE) 
@@ -1355,8 +1354,8 @@ if(BUILD_OPENAL)
 	list(APPEND HYPERSOMNIA_LIBS OpenAL)
 endif()
 
-if(BUILD_ENET)
-	list(APPEND HYPERSOMNIA_LIBS enet)
+if(BUILD_NETWORKING)
+
 endif()
 
 if(BUILD_FREETYPE)
@@ -1368,12 +1367,12 @@ if(BUILD_SOUND_FORMAT_DECODERS)
 endif()
 
 if(MSVC)
-	if(BUILD_ENET OR BUILD_HTTP_REQUESTS)
+	if(BUILD_NETWORKING OR BUILD_HTTP_REQUESTS)
 		message("Appending winsock libraries")
 
 		list(APPEND HYPERSOMNIA_LIBS
-			"Ws2_32.lib" 		# for ENet
-			"winmm.lib"  		# for ENet
+			"Ws2_32.lib"
+			"winmm.lib"
 		)
 	endif()
 elseif(CLANG)

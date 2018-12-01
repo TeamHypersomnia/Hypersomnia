@@ -1,6 +1,7 @@
 #include <signal.h>
-#if BUILD_ENET
-#include <enet/enet.h>
+
+#if BUILD_NETWORKING
+
 #endif
 
 #if BUILD_FREETYPE
@@ -34,11 +35,11 @@ namespace augs {
 #endif
 		}
 		
-		if(to_initialize.test(library::ENET)) {
-#if BUILD_ENET
-			const auto success = enet_initialize() == 0;
-			ensure(success && "Failed to initialize enet");
-			initialized.set(library::ENET);
+		if(to_initialize.test(library::NETWORKING)) {
+#if BUILD_NETWORKING
+			const auto success = true;
+			ensure(success && "Failed to initialize networking");
+			initialized.set(library::NETWORKING);
 #endif
 		}
 	}
@@ -53,11 +54,11 @@ namespace augs {
 #endif
 		}
 
-		if(to_deinitialize.test(library::ENET)) {
-#if BUILD_ENET
-			ensure(initialized.test(library::ENET));
-			enet_deinitialize();
-			initialized.set(library::ENET, false);
+		if(to_deinitialize.test(library::NETWORKING)) {
+#if BUILD_NETWORKING
+			ensure(initialized.test(library::NETWORKING));
+			// false
+			initialized.set(library::NETWORKING, false);
 #endif
 		}
 	}

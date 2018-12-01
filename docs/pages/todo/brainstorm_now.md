@@ -6,6 +6,31 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- We need to decide on the server software.
+	- focus on creating a minimal api class 
+		- whatever we plug there, whether dedicated serv instance or player hosted,
+			- we'll just pull our own message format from there
+			- We can as well add NAT punchthrough later
+				- Games like soldat don't even have it
+				- we'll read the guide on raknet even if we're not going to use it as it is comprehensive
+	- what we need from the network
+		- for early beta and later,
+			- reliable delivery for initial stuff + chat
+			- redundant delivery for inputs
+				- we have to revive the reliable channel
+			- perhaps compression?
+		- for later stages,
+			- masterserver + nat
+		- for dedicated servers,
+			- secure connections
+	- we'll remove enet shortly
+	- netcode.io + reliable.io
+		- pro: we'll learn more along the way and have more control over packets
+	- libyojimbo
+		- pro: will probably work right away
+		- it's actually for dedicated servers, not player hosted servers
+
+
 - Editor-like server vars tweaker accessible by pressing ESC server-side
 	- will have to be commandized properly, just like editor setup's
 
@@ -27,8 +52,6 @@ summary: That which we are brainstorming at the moment.
 			- yeah only the preffix will ever have colors
 		- always wrap when inactive, but when active we can just as well wrap
 
-- focus on creating a minimal api class for which we will be able to plug anything
-- we'll remove enet shortly
 
 - spectators
 	- preferably only in the client setup

@@ -11,7 +11,7 @@ namespace augs {
 	struct global_libraries {
 		enum class library {
 			FREETYPE,
-			ENET,
+			NETWORKING,
 
 			COUNT
 		};
@@ -23,7 +23,7 @@ namespace augs {
 		static std::unique_ptr<FT_Library> freetype_library;
 #endif
 
-		global_libraries(const library_flagset = { library::FREETYPE, library::ENET });
+		global_libraries(const library_flagset = { library::FREETYPE, library::NETWORKING });
 		
 		global_libraries(const global_libraries&) = delete;
 		global_libraries& operator=(const global_libraries&) = delete;
@@ -33,7 +33,7 @@ namespace augs {
 		
 		~global_libraries();
 
-		void init		(const library_flagset = { library::FREETYPE, library::ENET });
-		void deinit		(const library_flagset = { library::FREETYPE, library::ENET });
+		void init		(const library_flagset = { library::FREETYPE, library::NETWORKING });
+		void deinit		(const library_flagset = { library::FREETYPE, library::NETWORKING });
 	};
 };

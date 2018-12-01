@@ -10,9 +10,6 @@
 [submodule "3rdparty/rectpack2D"]
 	path = src/3rdparty/rectpack2D
 	url = https://github.com/TeamHypersomnia/rectpack2D.git
-[submodule "3rdparty/enet"]
-	path = src/3rdparty/enet
-	url = https://github.com/lsalzman/enet.git
 [submodule "3rdparty/openal-soft"]
 	path = src/3rdparty/openal-soft
 	url = https://github.com/kcat/openal-soft.git
