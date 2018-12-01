@@ -430,8 +430,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/audiovisual_state/systems/exploding_ring_system.cpp"
 	"src/view/game_gui/game_gui_system.cpp"
 	"src/view/audiovisual_state/systems/light_system.cpp"
-	"src/view/network/simulation_broadcast.cpp"
-	# "src/view/network/simulation_receiver.cpp"
 	"src/view/rendering_scripts/draw_sentiences_hud.cpp"
 	"src/view/rendering_scripts/draw_cast_spells_highlights.cpp"
 	"src/view/rendering_scripts/draw_crosshair_lasers.cpp"
