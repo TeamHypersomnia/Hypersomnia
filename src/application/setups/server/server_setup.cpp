@@ -14,7 +14,8 @@ server_setup::server_setup(
 	sol::state& lua,
 	const server_start_input& in
 ) : 
-	server(std::make_unique<server_adapter>(in)) 
+	server(std::make_unique<server_adapter>(in)),
+	server_time(yojimbo_time())
 {
 	(void)lua;
 }

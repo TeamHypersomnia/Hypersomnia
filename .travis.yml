@@ -50,6 +50,8 @@ before_install:
  - initctl list || true
 
 install:
+  - ls /usr/local/lib | grep sodium
+  - ls /usr/local/lib | grep mbedtls
   - wget https://github.com/premake/premake-core/releases/download/v5.0.0-alpha13/premake-5.0.0-alpha13-linux.tar.gz -O /tmp/premake5.tar.gz
   - tar -zxvf /tmp/premake5.tar.gz
   - wget https://github.com/jedisct1/libsodium/releases/download/1.0.16/libsodium-1.0.16.tar.gz -O /tmp/libsodium.tar.gz
@@ -70,6 +72,8 @@ install:
   - make
   - sudo make install
   - popd
+  - ls /usr/local/lib | grep sodium
+  - ls /usr/local/lib | grep mbedtls
   - sudo sh -c 'echo "/usr/local/lib" > /etc/ld.so.conf.d/somemorelibs.conf'
   - sudo ldconfig
 
@@ -77,6 +81,11 @@ script:
   - ${c_compiler} -v && ${cxx_compiler} -v && cmake --version && make --version && python --version
   - export CC=${c_compiler}
   - export CXX=${cxx_compiler}
+  - echo $LDFLAGS
+  - export LDFLAGS="${LDFLAGS} -L /usr/local/lib"
+  - echo $LDFLAGS
+  - ls /usr/local/lib | grep sodium
+  - ls /usr/local/lib | grep mbedtls
   - cmake/build.sh ${config} x64 "${other_cmake_flags}"
   - ulimit -c unlimited -S
   - pushd build/current

@@ -44,7 +44,7 @@ bool start_server_gui_state::perform(
 		}
 
 		slider("Max incoming connections", into.max_connections, 1, 64);
-		text_disabled("Tip: the number of incoming connections does not include the player at the server machine.\nIf you want to play a 1v1 with someone and not allow anyone else to join or watch, you want to set this value to 1.\n");
+		text_disabled("Tip: this number does not include the player at the server machine.\nIf you want to play a 1v1 with someone and not allow anyone else to join or watch,\nyou want to set this value to 1.\n\n");
 
 		text_disabled("Tip: you can tweak many other settings when the server is up and running.\nYou can edit the defaults inside the cache/usr/config.local.lua file,\nin the default_server_vars section.");
 	}
