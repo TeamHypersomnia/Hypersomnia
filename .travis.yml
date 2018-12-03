@@ -70,7 +70,7 @@ install:
   - make
   - sudo make install
   - popd
-  - sudo echo "/usr/local/lib" >> /etc/ld.so.conf
+  - sudo sh -c 'echo "/usr/local/lib" > /etc/ld.so.conf.d/somemorelibs.conf'
   - sudo ldconfig
 
 script:
