@@ -50,7 +50,6 @@ before_install:
  - initctl list || true
 
 install:
-  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
   - pushd /usr/local/lib
   - ls
   - popd
@@ -75,18 +74,14 @@ install:
   - pushd /usr/local/lib
   - ls
   - popd
-  - sudo sh -c 'echo "/usr/local/lib" > /etc/ld.so.conf.d/somemorelibs.conf'
+  - cat /etc/ld.so.conf
   - sudo ldconfig
 
 script:
   - ${c_compiler} -v && ${cxx_compiler} -v && cmake --version && make --version && python --version
   - export CC=${c_compiler}
   - export CXX=${cxx_compiler}
-  - echo $LDFLAGS
   - export LDFLAGS="${LDFLAGS} -L /usr/local/lib"
-  - echo $LDFLAGS
-  - ls /usr/local/lib | grep sodium
-  - ls /usr/local/lib | grep mbedtls
   - cmake/build.sh ${config} x64 "${other_cmake_flags}"
   - ulimit -c unlimited -S
   - pushd build/current
