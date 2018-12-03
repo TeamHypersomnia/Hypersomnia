@@ -246,7 +246,7 @@ void action_button::respond_to_events(
 			const auto bound_spell = get_bound_spell(context, this_id);
 			
 			if (bound_spell.is_set()) {
-				context.get_game_gui_system().pending[context.get_subject_entity()].cast_spell = bound_spell;
+				context.get_game_gui_system().pending.cast_spell = bound_spell;
 			}
 		}
 

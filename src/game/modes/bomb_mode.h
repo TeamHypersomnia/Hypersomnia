@@ -72,8 +72,7 @@ struct bomb_mode_ruleset {
 	unsigned bot_quota = 8;
 
 	unsigned allow_spawn_after_secs_after_starting = 10;
-	unsigned max_players_per_team = 5;
-	unsigned max_players_total = 10;
+	unsigned max_players_per_team = 32;
 	unsigned round_secs = 120;
 	unsigned round_end_secs = 5;
 	unsigned freeze_secs = 5;
@@ -158,6 +157,8 @@ struct bomb_mode_player {
 	{}
 
 	bool operator<(const bomb_mode_player& b) const;
+
+	bool is_set() const;
 };
 
 enum class arena_mode_state {
@@ -360,6 +361,10 @@ public:
 	// END GEN INTROSPECTOR
 
 	mode_player_id add_player(input, const entity_name_str& chosen_name);
+
+	/* A server might provide its own integer-based identifiers */
+	bool add_player_custom_id(const mode_player_id&, input, const entity_name_str& chosen_name);
+
 	void remove_player(input, const mode_player_id&);
 
 	faction_choice_result auto_assign_faction(input, const mode_player_id&);

@@ -14,7 +14,9 @@ test_scene_setup::test_scene_setup(
 #if BUILD_TEST_SCENES
 	scene.make_test_scene(lua, settings, ruleset);
 	auto& cosm = scene.world;
-	viewed_character_id = cosm[mode.lookup(mode.add_player({ ruleset, cosm }, faction_type::RESISTANCE))].get_id();
+
+	local_player_id = mode.add_player({ ruleset, cosm }, faction_type::RESISTANCE);
+	viewed_character_id = cosm[mode.lookup(local_player_id)].get_id();
 #else
 	(void)lua;
 	(void)settings;
@@ -31,6 +33,6 @@ void test_scene_setup::customize_for_viewing(config_lua_table& config) const {
 	config.window.name = "Hypersomnia test scene";
 }
 
-void test_scene_setup::accept_game_gui_events(const cosmic_entropy& events) {
+void test_scene_setup::accept_game_gui_events(const game_gui_entropy_type& events) {
 	control(events);
 }

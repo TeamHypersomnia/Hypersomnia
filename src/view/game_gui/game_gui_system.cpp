@@ -60,7 +60,7 @@ static int to_special_action_index(const game_gui_intent_type type) {
 	}
 }
 
-cosmic_entropy game_gui_system::get_and_clear_pending_events() {
+game_gui_system::pending_entropy_type game_gui_system::get_and_clear_pending_events() {
 	auto out = pending;
 	pending.clear();
 	return out;
@@ -107,11 +107,13 @@ const item_button& game_gui_system::get_item_button(const entity_id id) const {
 }
 
 void game_gui_system::queue_transfer(const entity_id& subject, const item_slot_transfer_request req) {
-	pending[subject].transfers.push_back(req);
+	(void)subject;
+	pending.transfers.push_back(req);
 }
 
 void game_gui_system::queue_wielding(const entity_id& subject, const wielding_setup& wielding) {
-	pending[subject].wield = wielding;
+	(void)subject;
+	pending.wield = wielding;
 }
 	
 bool game_gui_system::control_gui_world(
@@ -333,7 +335,7 @@ void game_gui_system::control_hotbar_and_action_button(
 				const auto bound_spell = action_b.bound_spell;
 
 				if (bound_spell.is_set() && gui_entity.get<components::sentience>().is_learnt(bound_spell)) {
-					pending[gui_entity].cast_spell = bound_spell;
+					pending.cast_spell = bound_spell;
 				}
 			}
 		}

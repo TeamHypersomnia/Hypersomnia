@@ -13,6 +13,6 @@ void client_setup::customize_for_viewing(config_lua_table& config) const {
 	config.window.name = "Arena client";
 }
 
-void client_setup::accept_game_gui_events(const cosmic_entropy& events) {
+void client_setup::accept_game_gui_events(const game_gui_entropy_type& events) {
 	control(events);
 }

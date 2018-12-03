@@ -41,21 +41,7 @@ bool basic_cosmic_entropy<key>::empty() const {
 template <class key>
 basic_cosmic_entropy<key>& basic_cosmic_entropy<key>::operator+=(const basic_cosmic_entropy& b) {
 	for (const auto& p : b.players) {
-		const auto& r = p.second;
-
-		auto& l = players[p.first];
-
-		concatenate(l.intents, r.intents);
-		concatenate(l.motions, r.motions);
-		concatenate(l.transfers, r.transfers);
-
-		if (r.wield != std::nullopt) {
-			l.wield = r.wield;
-		}
-
-		if (r.cast_spell.is_set()) {
-			l.cast_spell = r.cast_spell;
-		}
+		players[p.first] += p.second;
 	}
 
 	return *this;
@@ -84,6 +70,23 @@ void basic_cosmic_entropy<key>::clear_dead_entities(const cosmos& cosm) {
 }
 
 template <class K>
+basic_player_entropy<K>& basic_player_entropy<K>::operator+=(const basic_player_entropy<K>& r) {
+	concatenate(intents, r.intents);
+	concatenate(motions, r.motions);
+	concatenate(transfers, r.transfers);
+
+	if (r.wield != std::nullopt) {
+		wield = r.wield;
+	}
+
+	if (r.cast_spell.is_set()) {
+		cast_spell = r.cast_spell;
+	}
+
+	return *this;
+}
+
+template <class K>
 bool basic_player_entropy<K>::operator==(const basic_player_entropy<K>& b) const {
 	return
 		intents == b.intents
@@ -107,6 +110,11 @@ bool basic_cosmic_entropy<K>::operator==(const basic_cosmic_entropy<K>& b) const
 template <class K>
 bool basic_cosmic_entropy<K>::operator!=(const basic_cosmic_entropy<K>& b) const {
 	return !operator==(b);
+}
+
+template <class K>
+void basic_player_entropy<K>::clear() {
+	clear_relevant({});
 }
 
 template <class K>

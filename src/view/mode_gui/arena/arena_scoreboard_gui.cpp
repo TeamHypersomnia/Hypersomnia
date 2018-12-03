@@ -381,7 +381,7 @@ void arena_scoreboard_gui::draw_gui(
 			const auto is_conscious = player_handle.alive() && player_handle.template get<components::sentience>().is_conscious();
 
 			const auto local_player_faction = [&]() {
-				if (const auto p = typed_mode.find(draw_in.local_player)) {
+				if (const auto p = typed_mode.find(draw_in.local_player_id)) {
 					return p->faction;
 				}
 
@@ -394,7 +394,7 @@ void arena_scoreboard_gui::draw_gui(
 				auto total_lumi = cfg.bg_lumi_mult;
 				auto total_alpha = 1.f;
 
-				const bool is_local = player_id == draw_in.local_player;
+				const bool is_local = player_id == draw_in.local_player_id;
 
 				if (is_local) {
 					col.mult_luminance(cfg.current_player_bg_lumi_mult);
@@ -426,7 +426,7 @@ void arena_scoreboard_gui::draw_gui(
 				auto total_lumi = cfg.text_lumi_mult;
 				auto total_alpha = 1.f;
 
-				if (player_id == draw_in.local_player) {
+				if (player_id == draw_in.local_player_id) {
 					//return white;
 					total_lumi *= cfg.current_player_text_lumi_mult;
 				}

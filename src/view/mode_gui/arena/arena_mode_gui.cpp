@@ -39,12 +39,12 @@ bool arena_gui_state::control(
 }
 
 template <class M>
-mode_entropy arena_gui_state::perform_imgui(
+mode_player_entropy arena_gui_state::perform_imgui(
 	draw_mode_gui_input mode_in, 
 	const M& typed_mode, 
 	const typename M::input& mode_input
 ) {
-	mode_entropy result_entropy;
+	mode_player_entropy result_entropy;
 
 	if constexpr(M::round_based) {
 		const auto p = typed_mode.calc_participating_factions(mode_input);
@@ -64,7 +64,7 @@ mode_entropy arena_gui_state::perform_imgui(
 		add(p.bombing);
 
 		{
-			const auto player_id = mode_in.local_player;
+			const auto player_id = mode_in.local_player_id;
 
 			if (const auto p = typed_mode.find(player_id)) {
 				const auto choice = choose_team.perform_imgui({
@@ -75,7 +75,7 @@ mode_entropy arena_gui_state::perform_imgui(
 				});
 
 				if (choice != std::nullopt) {
-					result_entropy.players[player_id].team_choice = *choice;
+					result_entropy.team_choice = *choice;
 				}
 			}
 		}
@@ -87,7 +87,7 @@ mode_entropy arena_gui_state::perform_imgui(
 				buy_menu.show = false;
 			}
 
-			if (const auto p = typed_mode.find(mode_in.local_player)) {
+			if (const auto p = typed_mode.find(mode_in.local_player_id)) {
 				const auto guid = p->guid;
 
 				if (const auto this_player_handle = cosm[guid]) {
@@ -104,7 +104,7 @@ mode_entropy arena_gui_state::perform_imgui(
 					});
 
 					if (choice != std::nullopt) {
-						result_entropy.players[mode_in.local_player].queues.post(*choice);
+						result_entropy.item_purchase = *choice;
 					}
 				}
 			}
@@ -130,7 +130,7 @@ void arena_gui_state::draw_mode_gui(
 
 		using namespace augs::gui::text;
 
-		const auto local_player = mode_in.local_player;
+		const auto local_player_id = mode_in.local_player_id;
 		auto game_screen_top = mode_in.game_screen_top;
 
 		game_screen_top += 2;
@@ -151,7 +151,7 @@ void arena_gui_state::draw_mode_gui(
 		{
 			// TODO: fix this for varying icon sizes
 
-			if (const auto p = typed_mode.find(local_player)) {
+			if (const auto p = typed_mode.find(local_player_id)) {
 				const auto& stats = p->stats;
 
 				auto drawn_current_money = stats.money;
@@ -308,11 +308,11 @@ void arena_gui_state::draw_mode_gui(
 					rgba background;
 					rgba border;
 				} cols = [&]() -> colors {
-					if (local_player == ko.victim) {
+					if (local_player_id == ko.victim) {
 						return { rgba(150, 0, 0, 170), rgba(0, 0, 0, 0) };
 					}
 
-					if (local_player == ko.knockouter || local_player == ko.assist) {
+					if (local_player_id == ko.knockouter || local_player_id == ko.assist) {
 						return { black, rgba(180, 0, 0, 255) };
 					}
 					
@@ -639,13 +639,13 @@ template void arena_gui_state::draw_mode_gui(
 	const bomb_mode::input&
 ) const;
 
-template mode_entropy arena_gui_state::perform_imgui(
+template mode_player_entropy arena_gui_state::perform_imgui(
 	draw_mode_gui_input, 
 	const bomb_mode&, 
 	const typename bomb_mode::input&
 );
 
-template mode_entropy arena_gui_state::perform_imgui(
+template mode_player_entropy arena_gui_state::perform_imgui(
 	draw_mode_gui_input, 
 	const test_mode&, 
 	const typename test_mode::input&

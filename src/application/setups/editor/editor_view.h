@@ -49,7 +49,7 @@ struct editor_view {
 	std::optional<camera_eye> panned_camera;
 	editor_marks marks;
 
-	mode_player_id local_player;
+	mode_player_id local_player_id;
 	entity_id overridden_viewed;
 	// END GEN INTROSPECTOR
 

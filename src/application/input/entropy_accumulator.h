@@ -5,22 +5,30 @@
 #include "application/input/adjust_game_motions.h"
 
 struct entropy_accumulator {
-	mode_entropy entropy;
+	mode_player_entropy mode;
+	cosmic_player_entropy cosmic;
 
 	accumulated_motions motions;
 	game_intents intents;
 
 	template <class E, class I>
-	auto extract(
+	auto assemble(
 		const E& handle,
+		const mode_player_id& m_id,
 		const I& in
-	) {
-		entropy.clear_dead_entities(handle.get_cosmos());
+	) const {
+		mode_entropy out;
 
-		auto out = entropy;
+		if (m_id.is_set() && mode.is_set()) {
+			out.players[m_id] = mode;
+
+			/* Disallow controlling mode & cosmic at the same time for bandwidth optimization. */
+			return out;
+		}
 
 		if (handle) {
-			auto& player = out.cosmic[handle.get_id()];
+			const auto player_id = handle.get_id();
+			auto& player = out.cosmic[player_id];
 
 			if (const auto crosshair_motion = mapped_or_nullptr(motions, game_motion_type::MOVE_CROSSHAIR)) {
 				if (const auto crosshair = handle.find_crosshair()) {
@@ -30,15 +38,30 @@ struct entropy_accumulator {
 			}
 
 			concatenate(player.intents, intents);
+
+			player += cosmic;
 		}
 
-		clear();
+		out.clear_dead_entities(handle.get_cosmos());
 
 		return out;
 	}
 
+	template <class E, class I>
+	auto extract(
+		const E& handle,
+		const mode_player_id& m_id,
+		const I& in
+	) {
+		auto out = assemble(handle, m_id, in);
+		clear();
+		return out;
+	}
+
 	void clear() {
-		entropy.clear();
+		mode.clear();
+		cosmic.clear();
+
 		motions.clear();
 		intents.clear();
 	}
@@ -57,11 +80,14 @@ struct entropy_accumulator {
 		else if constexpr(std::is_same_v<T, game_intents>) {
 			concatenate(intents, n);
 		}
-		else if constexpr(std::is_same_v<T, cosmic_entropy>) {
-			entropy.cosmic += n;
+		else if constexpr(std::is_same_v<T, cosmic_player_entropy>) {
+			cosmic += n;
+		}
+		else if constexpr(std::is_same_v<T, mode_player_entropy>) {
+			mode += n;
 		}
 		else {
-			entropy += n;
+			static_assert(always_false_v<T>, "Uncontrollable type.");
 		}
 	}
 };

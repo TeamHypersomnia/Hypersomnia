@@ -12,6 +12,8 @@
 #include "augs/gui/formatted_string.h"
 #include "augs/misc/randomization.h"
 
+struct mode_player_entropy;
+
 struct warmup_welcome_cache {
 	augs::gui::text::formatted_string current;
 	augs::gui::text::formatted_string requested;
@@ -31,7 +33,7 @@ struct arena_gui_state {
 	bool control(app_ingame_intent_input);
 
 	template <class M>
-	mode_entropy perform_imgui(
+	mode_player_entropy perform_imgui(
 		draw_mode_gui_input, 
 		const M& mode, 
 		const typename M::input&

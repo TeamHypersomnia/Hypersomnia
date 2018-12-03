@@ -2,9 +2,6 @@
 #include <vector>
 #include <map>
 
-#include "augs/readwrite/memory_stream.h"
-#include "augs/misc/machine_entropy.h"
-
 #include "augs/window_framework/event.h"
 
 #include "game/cosmos/entity_id.h"
@@ -29,8 +26,10 @@ struct basic_player_entropy {
 
 	bool operator==(const basic_player_entropy<key>& b) const;
 	bool operator!=(const basic_player_entropy<key>& b) const;
+	basic_player_entropy& operator+=(const basic_player_entropy& b);
 
 	void clear_relevant(cosmic_entropy_recording_options);
+	void clear();
 };
 
 template <class key>
@@ -61,7 +60,8 @@ struct basic_cosmic_entropy {
 	bool operator!=(const basic_cosmic_entropy<key>&) const;
 };
 
-using player_entropy = basic_player_entropy<signi_entity_id>;
+using cosmic_player_entropy = basic_player_entropy<signi_entity_id>;
+using game_gui_entropy_type = cosmic_player_entropy;
 
 struct cosmic_entropy;
 

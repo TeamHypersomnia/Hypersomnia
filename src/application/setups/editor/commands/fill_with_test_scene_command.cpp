@@ -67,7 +67,7 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 	auto& all = rulesets.all;
 	all.clear();
 
-	auto& player_id = view.local_player;
+	auto& player_id = view.local_player_id;
 
 	{
 		const auto test_ruleset_id = raw_ruleset_id(0);

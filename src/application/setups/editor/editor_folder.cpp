@@ -138,7 +138,7 @@ entity_id editor_folder::get_viewed_character_id() const {
 		return overridden;
 	}
 
-	return commanded->work.world[player.lookup_character(view.local_player)].get_id();
+	return commanded->work.world[player.lookup_character(view.local_player_id)].get_id();
 }
 
 std::optional<editor_warning> editor_folder::open_most_relevant_content(sol::state& lua) {

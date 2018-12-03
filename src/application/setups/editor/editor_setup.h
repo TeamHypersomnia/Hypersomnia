@@ -237,7 +237,7 @@ public:
 				in.frame_delta,
 				make_player_input(callbacks),
 				[&]() {
-					return total_collected.extract(get_viewed_character(), in);
+					return total_collected.extract(get_viewed_character(), view().local_player_id, in);
 				}
 			);
 		}
@@ -252,7 +252,7 @@ public:
 		}
 	}
 
-	void accept_game_gui_events(const cosmic_entropy&);
+	void accept_game_gui_events(const game_gui_entropy_type&);
 
 	bool handle_input_before_imgui(
 		const augs::event::state& common_input_state,

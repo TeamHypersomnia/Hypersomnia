@@ -2337,3 +2337,4 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- always save to config local lua on connect/host press
 
 - Don't use settings_gui.cpp for client/server defaults: simply edit these in connect/host dialogs and save on confirmation
+- replace queues with a single optional for item purchase, let us not allow more than a single purchase per step

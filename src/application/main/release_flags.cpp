@@ -1,4 +1,5 @@
 #include "3rdparty/imgui/imgui.h"
+#include "augs/log.h"
 
 #include "augs/templates/container_templates.h"
 #include "application/main/release_flags.h"

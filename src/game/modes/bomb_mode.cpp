@@ -299,23 +299,43 @@ void bomb_mode::teleport_to_next_spawn(const input in, const entity_id id) {
 	});
 }
 
-mode_player_id bomb_mode::add_player(input_type in, const entity_name_str& chosen_name) {
+bool bomb_mode::add_player_custom_id(const mode_player_id& new_id, const input_type in, const entity_name_str& chosen_name) {
 	auto& cosm = in.cosm;
 	(void)cosm;
 
-	const auto new_id = first_free_key(players, mode_player_id::first());
+	auto& new_player = (*players.try_emplace(new_id).first).second;
 
-	players.try_emplace(new_id, chosen_name);
+	if (new_player.is_set()) {
+		return false;
+	}
+
+	new_player.chosen_name = chosen_name;
+
 	recently_added_players.push_back(new_id);
 
 	if (state == arena_mode_state::WARMUP) {
-		players[new_id].stats.money = in.rules.economy.warmup_initial_money;
+		new_player.stats.money = in.rules.economy.warmup_initial_money;
 	}
 	else {
-		players[new_id].stats.money = in.rules.economy.initial_money;
+		new_player.stats.money = in.rules.economy.initial_money;
 	}
 
-	return new_id;
+	return true;
+}
+
+mode_player_id bomb_mode::add_player(const input_type in, const entity_name_str& chosen_name) {
+	const auto new_id = first_free_key(players, mode_player_id::first());
+
+	if (new_id.is_set()) {
+		ensure(add_player_custom_id(new_id, in, chosen_name));
+		return new_id;
+	}
+
+	return {};
+}
+
+bool bomb_mode_player::is_set() const {
+	return !chosen_name.empty();
 }
 
 void bomb_mode::remove_player(input_type in, const mode_player_id& id) {
@@ -1108,87 +1128,85 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 		const auto id = p.first;
 
 		if (const auto player_data = find(id)) {
-			if (get_buy_seconds_left(in) > 0.f) {
+			const auto& maybe_purchase = commands.item_purchase;
+
+			if (maybe_purchase && get_buy_seconds_left(in) > 0.f) {
 				on_player_handle(cosm, id, [&](const auto& player_handle) {
 					if constexpr(!is_nullopt_v<decltype(player_handle)>) {
 						if (!buy_area_in_range(player_handle)) {
 							return;
 						}
 
-						const auto& purchases = commands.queues.get_queue<mode_commands::item_purchase>();
+						const auto& p = *maybe_purchase;
 						auto& stats = player_data->stats;
 						auto& money = stats.money;
 						auto& done_purchases = stats.round_state.done_purchases;
 
-						for (const auto& p : purchases) {
-							if (const auto f_id = p.item; ::is_alive(cosm, f_id)) {
-								if (!factions_compatible(player_handle, f_id)) {
-									continue;
+						if (const auto f_id = p.item; ::is_alive(cosm, f_id)) {
+							if (!factions_compatible(player_handle, f_id)) {
+								return;
+							}
+
+							const auto price = ::find_price_of(cosm, f_id);
+							const bool price_correct = price && *price != 0;
+
+							if (!price_correct) {
+								return;
+							}
+
+							if (money >= *price) {
+								if (::num_carryable_pieces(player_handle, ::get_buy_slot_opts(), f_id) == 0) {
+									return;
 								}
 
-								const auto price = ::find_price_of(cosm, f_id);
-								const bool price_correct = price && *price != 0;
+								requested_equipment eq;
 
-								if (!price_correct) {
-									continue;
+								if (::is_magazine_like(cosm, f_id)) {
+									eq.non_standard_mag = f_id;
+									eq.num_given_ammo_pieces = 1;
 								}
-
-								if (money >= *price) {
-									if (::num_carryable_pieces(player_handle, ::get_buy_slot_opts(), f_id) == 0) {
-										continue;
-									}
-
-									requested_equipment eq;
-
-									if (::is_magazine_like(cosm, f_id)) {
-										eq.non_standard_mag = f_id;
+								else {
+									if (found_in(done_purchases, f_id)) {
 										eq.num_given_ammo_pieces = 1;
 									}
 									else {
-										if (found_in(done_purchases, f_id)) {
-											eq.num_given_ammo_pieces = 1;
-										}
-										else {
-											done_purchases.push_back(f_id);
-										}
-
-										eq.weapon = f_id;
+										done_purchases.push_back(f_id);
 									}
 
-									eq.generate_for(player_handle, step);
-
-									money -= *price;
+									eq.weapon = f_id;
 								}
 
-								continue;
+								eq.generate_for(player_handle, step);
+
+								money -= *price;
 							}
 
-							if (const auto s_id = p.spell; ::is_alive(cosm, s_id)) {
-								if (!factions_compatible(player_handle, s_id)) {
-									continue;
-								}
+							return;
+						}
 
-								const auto price = ::find_price_of(cosm, s_id);
-								const bool price_correct = price && *price != 0;
+						if (const auto s_id = p.spell; ::is_alive(cosm, s_id)) {
+							if (!factions_compatible(player_handle, s_id)) {
+								return;
+							}
 
-								if (!price_correct) {
-									continue;
-								}
+							const auto price = ::find_price_of(cosm, s_id);
+							const bool price_correct = price && *price != 0;
 
-								const auto& sentience = player_handle.template get<components::sentience>();
+							if (!price_correct) {
+								return;
+							}
 
-								if (money >= *price && !sentience.is_learnt(s_id)) {
-									requested_equipment eq;
+							const auto& sentience = player_handle.template get<components::sentience>();
 
-									eq.spells_to_give[s_id.get_index()] = true;
-									eq.generate_for(player_handle, step);
+							if (money >= *price && !sentience.is_learnt(s_id)) {
+								requested_equipment eq;
 
-									::play_learnt_spell_effect(player_handle, s_id, step);
+								eq.spells_to_give[s_id.get_index()] = true;
+								eq.generate_for(player_handle, step);
 
-									money -= *price;
-								}
+								::play_learnt_spell_effect(player_handle, s_id, step);
 
-								continue;
+								money -= *price;
 							}
 						}
 					}

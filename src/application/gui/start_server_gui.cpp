@@ -34,6 +34,7 @@ bool start_server_gui_state::perform(
 		// auto& scope_cfg = into;
 
 		input_text<100>("Address (leave empty to find automatically)", into.ip);
+		text_disabled("Tip: the address can be either IPv4 or IPv6.\nFor example, you can put the IPv6 loopback address, which is \"::1\".");
 
 		{
 			auto chosen_port = static_cast<int>(into.port);
@@ -42,10 +43,10 @@ bool start_server_gui_state::perform(
 			into.port = static_cast<unsigned short>(std::clamp(chosen_port, 1024, 65535));
 		}
 
-		slider("Max connections", into.max_connections, 2, 64);
+		slider("Max incoming connections", into.max_connections, 1, 64);
+		text_disabled("Tip: the number of incoming connections does not include the player at the server machine.\nIf you want to play a 1v1 with someone and not allow anyone else to join or watch, you want to set this value to 1.\n");
 
 		text_disabled("Tip: you can tweak many other settings when the server is up and running.\nYou can edit the defaults inside the cache/usr/config.local.lua file,\nin the default_server_vars section.");
-		text_disabled("Tip: the address can be either IPv4 or IPv6.\nFor example, you can put the IPv6 loopback address, which is \"::1\".");
 	}
 
 	{

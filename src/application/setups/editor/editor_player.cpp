@@ -317,9 +317,9 @@ void editor_player::choose_mode(const ruleset_id& id) {
 }
 
 void editor_player::adjust_entropy(const editor_folder& folder, editor_player_entropy_type& entropy, const bool neg) const {
-	const auto local_player = folder.view.local_player;
+	const auto local_player_id = folder.view.local_player_id;
 
-	if (auto p = mapped_or_nullptr(entropy.players, local_player)) {
+	if (auto p = mapped_or_nullptr(entropy.players, local_player_id)) {
 		auto f = mode_recording_options;
 
 		if (neg) {

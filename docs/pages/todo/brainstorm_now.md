@@ -6,6 +6,61 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- To improve server-side playing performance, we could let a server-side player
+	- Otherwise we'd need 3 apps to test the server with two players
+
+- The built-in player of the server
+	- Always has mode id 0?
+		- The rest is mapped with offset of 1?
+		- Or simply it has -1
+			- mode would always allocate maxmodeplayers + 1
+
+- Server holds intercosm or cosmos?
+	- We might want to sync changed flavour state if we ever allow property changes during play
+
+- Preffix the single client entropy with a byte.
+	- The first bit signifies whether it is cosmic or mode
+		- we will only allow one type per step to increase number of message types possible within remaining 7 bits
+	- Remaining 7 bits will signify whether there's data for:
+		- cast spell
+		- wielding
+		- intents
+		- mouse
+		- etc.
+		- for mode: item purchase, team selection etc.
+
+- server entropy
+	- chosen solution: a client should have no notion of other clients.
+		- Therefore, add/remove player should be handled by MODE ENTROPY.
+		- Mode entropy is anyways serialized to all players.
+		- for now it's not critical that we serialize server messages, and their handling will anyway be centralized so we can introduce it later
+			- therefore for now just handle everything inside the run function with callbacks
+	- Surely: client connected, client disconnected, variant of messages
+	- maybe not for the sake of replaying, but for the sake of syncing non-step-entropy information to the clients?
+		- like connections/disconnections
+		- though a part of it might be private to the server?
+			- not really, I guess authentication would be transparent to the setup and handled by web backends and netcode io
+	- could it be made to be processed by clients as well?
+		- since the server also needs a way to communicate to others that a client has just connected
+	- replicated_state
+		- current cosmos
+		- current mode variant
+		- server rules
+	- network_game_interop
+		- an intermediate object that deterministically plays the effects of network entropy upon a mode
+		- advance
+		- responsible for adding/removing players to/from the modes
+			- perhaps application of other messages
+		- after server constructs the total server_entropy, with total inputs of players... 
+			- now the problem is that the input calculation is transparent for replays
+				- though it is a trivial thing
+
+decides which ones to send to the clients so that they don't 
+
+- perhaps we should implement remote entropy and just return it from the adapter, instead of acquiring templates
+	- because we'd anyway like to log the entropies
+	- unless we log entropies at the packet level
+
 - network_adapters
 	- has usings for server/client types
 	- global functions to abstract functionality?

@@ -3,6 +3,7 @@
 #include "augs/misc/pool/pool_io.hpp"
 #include "game/cosmos/per_entity_type.h"
 #include "augs/templates/for_each_type.h"
+#include "augs/readwrite/memory_stream.h"
 
 #if READWRITE_OVERLOAD_TRAITS_INCLUDED || LUA_READWRITE_OVERLOAD_TRAITS_INCLUDED
 #error "I/O traits were included BEFORE I/O overloads, which may cause them to be omitted under some compilers."

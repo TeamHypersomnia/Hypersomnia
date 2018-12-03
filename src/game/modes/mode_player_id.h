@@ -1,5 +1,7 @@
 #pragma once
 
+constexpr std::size_t max_mode_players_v = 64;
+
 struct mode_player_id {
 	using id_value_type = unsigned;
 	// GEN INTROSPECTOR struct mode_player_id
@@ -12,6 +14,10 @@ struct mode_player_id {
 
 	static auto first() {
 		return mode_player_id(1);
+	}
+
+	static auto machine_admin() {
+		return mode_player_id(static_cast<id_value_type>(max_mode_players_v));
 	}
 
 	mode_player_id() = default;

@@ -152,7 +152,7 @@ public:
 		return;
 	}
 
-	void accept_game_gui_events(const cosmic_entropy&) {
+	void accept_game_gui_events(const game_gui_entropy_type&) {
 		return;
 	}
 

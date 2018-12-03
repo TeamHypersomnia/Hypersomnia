@@ -136,11 +136,11 @@ void editor_setup::override_viewed_entity(const entity_id overridden_id) {
 		on_mode_with_input(
 			[&](const auto& typed_mode, const auto&) {
 				if (const auto id = typed_mode.lookup(work().world[overridden_id].get_guid()); id.is_set()) {
-					view().local_player = id;
+					view().local_player_id = id;
 					view().overridden_viewed = {};
 				}
 				else {
-					view().local_player = {};
+					view().local_player_id = {};
 					view().overridden_viewed = overridden_id;
 				}
 			}
@@ -196,7 +196,7 @@ void editor_setup::force_autosave_now() const {
 	autosave.save(destructor_input.lua, signi);
 }
 
-void editor_setup::accept_game_gui_events(const cosmic_entropy& entropy) {
+void editor_setup::accept_game_gui_events(const game_gui_entropy_type& entropy) {
 	control(entropy);
 }
 
@@ -706,7 +706,7 @@ void editor_setup::perform_custom_imgui(
 				[&](const auto& typed_mode, const auto& mode_input) {
 					const auto draw_mode_in = draw_mode_gui_input { 
 						get_game_screen_top(), 
-						view().local_player, 
+						view().local_player_id, 
 						game_atlas,
 						config
 					};
@@ -1978,7 +1978,7 @@ void editor_setup::draw_mode_gui(const draw_setup_gui_input& in) {
 			[&](const auto& typed_mode, const auto& mode_input) {
 				const auto draw_mode_in = draw_mode_gui_input { 
 					get_game_screen_top(), 
-					view().local_player, 
+					view().local_player_id, 
 					in.images_in_atlas,
 					in.config
 				};

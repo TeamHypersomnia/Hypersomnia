@@ -22,7 +22,6 @@
 #include "view/viewables/regeneration/content_regeneration_settings.h"
 #include "view/audiovisual_state/systems/interpolation_settings.h"
 #include "view/audiovisual_state/systems/sound_system_settings.h"
-#include "view/network/simulation_receiver_settings.h"
 #include "view/mode_gui/arena/arena_mode_gui_settings.h"
 #include "view/faction_view_settings.h"
 #include "view/gui_fonts.h"
@@ -39,6 +38,7 @@
 #include "application/setups/server/server_vars.h"
 #include "application/setups/client/client_start_input.h"
 #include "application/app_intent_type.h"
+#include "application/network/simulation_receiver_settings.h"
 
 enum class launch_type {
 	// GEN INTROSPECTOR enum class launch_type

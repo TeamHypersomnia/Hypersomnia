@@ -470,10 +470,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/misc/time_utils.cpp"
 	"src/augs/string/typesafe_sprintf.cpp"
 	"src/augs/string/typesafe_sscanf.cpp"
-	"src/augs/network/network_client.cpp"
 	"src/augs/network/network_types.cpp"
-	"src/augs/network/network_server.cpp"
-	"src/augs/network/reliable_channel.cpp"
 	"src/augs/texture_atlas/bake_fresh_atlas.cpp"
 	"src/game/assets/animation.cpp"
 	"src/game/assets/behaviour_tree.cpp"
@@ -653,6 +650,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/input/adjust_game_motions.cpp"
 	"src/game/modes/arena_mode.cpp"
 	"src/application/setups/editor/gui/editor_tutorial_gui.cpp"
+	"src/application/network/network_adapters.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

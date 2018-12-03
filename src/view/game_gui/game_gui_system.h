@@ -25,7 +25,9 @@ public:
 
 	std::unordered_map<entity_id, character_gui> character_guis;
 
-	cosmic_entropy pending;
+	using pending_entropy_type = cosmic_player_entropy;
+
+	pending_entropy_type pending;
 	
 	game_gui_rect_world world;
 	game_gui_rect_tree tree;
@@ -61,7 +63,7 @@ public:
 		};
 	}
 
-	cosmic_entropy get_and_clear_pending_events();
+	pending_entropy_type get_and_clear_pending_events();
 
 	void queue_transfer(const entity_id&, const item_slot_transfer_request);
 	void queue_wielding(const entity_id&, const wielding_setup&);

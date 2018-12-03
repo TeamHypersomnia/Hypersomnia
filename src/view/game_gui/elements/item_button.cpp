@@ -51,11 +51,9 @@ bool item_button::is_being_wholely_dragged_or_pending_finish(
 		return !is_drag_partial;
 	}
 	else {
-		for (const auto& p : context.get_game_gui_system().pending.players) {
-			for (const auto& r : p.second.transfers) {
-				if (r.item == this_id.get_location().item_id) {
-					return true;
-				}
+		for (const auto& r : context.get_game_gui_system().pending.transfers) {
+			if (r.item == this_id.get_location().item_id) {
+				return true;
 			}
 		}
 	}

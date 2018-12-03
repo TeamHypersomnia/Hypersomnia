@@ -31,6 +31,7 @@ class test_scene_setup : public default_setup_settings {
 	entropy_accumulator total_collected;
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
 	entity_id viewed_character_id;
+	mode_player_id local_player_id;
 
 public:
 	test_scene_setup(
@@ -91,7 +92,11 @@ public:
 		auto steps = timer.extract_num_of_logic_steps(get_inv_tickrate());
 
 		while (steps--) {
-			const auto total = total_collected.extract(get_viewed_character(), in);
+			const auto total = total_collected.extract(
+				get_viewed_character(), 
+				local_player_id, 
+				in
+			);
 
 			mode.advance(
 				{ ruleset, scene.world },
@@ -106,7 +111,7 @@ public:
 		total_collected.control(t);
 	}
 
-	void accept_game_gui_events(const cosmic_entropy&);
+	void accept_game_gui_events(const game_gui_entropy_type&);
 
 	std::optional<camera_eye> find_current_camera_eye() const {
 		return std::nullopt;

@@ -5,7 +5,6 @@
 #include "game/cosmos/solvers/standard_solver.h"
 #include "game/modes/mode_entropy.h"
 #include "game/modes/mode_player_id.h"
-#include "augs/misc/timing/speed_vars.h"
 
 struct entity_guid;
 struct entity_id;
