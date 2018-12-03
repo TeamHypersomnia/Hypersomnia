@@ -6,6 +6,91 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- network_adapters
+	- has usings for server/client types
+	- global functions to abstract functionality?
+		- actually just use a class wrapper and a getter for the specific object so that we know where we're getting specific
+
+- Sending large step infos through yojimbo?
+	- we probably want to handle it after DM milestone
+	- Don't rely on fragmentation
+
+- Let's just create a proof of concept using yojimbo, don't focus on creating a minimal augs interface
+	- When it works, we'll gradually abstract it away and see if it still works
+
+- Will yojimbo handle 128hz?
+
+- if we don't send any message at all for when a step has no entropy,
+	- we CANNOT possibly advance the referential cosmos in time
+		- which might become problematic once we have to simulate it forward several seconds
+	- so we should always send at least empty step message
+
+- what if reliable messages in yojimbo are actually redundancy?
+	- They are if we configure them like so.
+
+- improvements to redundancy
+	- message-wise fragmentation
+		- we might need some more effective way to deal with this
+			- Solution 1
+				- if there are 5 steps to sent, but 2 steps already fill the whole packet,
+				- and the other 3 can be packed into the next,
+				- simply withhold posting the 3 remaining messages until the other 2 are delivered
+				- in this case we might need to increase the rate of sends and send them even before the next tick
+			- Solution 2
+				- simply always send all messages redundantly but split into several packets
+				- client, apart from sending the most recent sequence number before which everything was received,
+					- also sends acks redundantly for all packets received out of order
+						- clears them once the most recent sequence number implies receiving of these out of order packets as well
+				- con: we would probably want to prioritize the 
+
+		- we have a map of sequence to reliable range
+		- later entries may arrive before earlier ones
+		- we keep a vector of pending entries and only  
+	- Unlikely, but a single step information might not fit into a packet
+		- e.g. if 300 players move their mouse at once
+		- in this VERY unlikely case we might just randomly drop some entropies to not overload the server?
+			- simply drop entropies of players who've sent the most commands
+				- so if someone coordinates a DoS of this sort, they will remain motionless
+				- if someone is innocent but their entropy is dropped, it might happen that:
+					- their player moves despite having their buttons pressed
+					- their mouse position is completely different than expected
+				- in this case, the client should try to repost the entropies that were cut
+
+- large block sending augs api
+	- asynchronous: deliver_large_data
+	- large_data_delivered() const
+	- always one large data is sent at a time
+	
+- solution: netcode.io + sending large blocks code from the example,
+	- or we'll take some code from yojimbo that sends blocks
+
+- against yojimbo?
+	- the message ecosystem that does not play well with our code
+	- other deps that we don't need atm
+
+- any cons for using netcode io?
+	- perhaps bandwidth overhead for encryption, but should be negliglible?
+	- might be a hassle to setup this in cmake but should be doable
+
+- problem: reliable.io has no concept of messages, we will have to learn how it is used in yojimbo or just somehow figure it out
+	- does reliable.io even do what we think it's doing? e.g. sending large blocks of data. This is the only thing we need it for.
+		- actually, yojimbo can do it
+
+- our bidirectional flow of inputs will be based on redundancy, 
+	and we'll also need some fragmentation logic
+
+- design augs api so that either netcode or yojimbo can be used underneath
+
+- PIMPL anywhere?
+	- actually netcode.io headers are pretty damn light
+
+- Besides encryption (which we can add later), what do we want from netcode.io?
+	- connection management against trivial ddos attacks, I guess
+
+- For now let's go with winsock + reliable.io to send large blocks
+	- We'll learn from netcode and maybe use some functions
+	- API will never need to change when we add security.
+
 - We need to decide on the server software.
 	- focus on creating a minimal api class 
 		- whatever we plug there, whether dedicated serv instance or player hosted,

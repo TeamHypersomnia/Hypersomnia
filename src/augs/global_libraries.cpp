@@ -1,7 +1,7 @@
 #include <signal.h>
 
 #if BUILD_NETWORKING
-
+#include "augs/network/network_types.h"
 #endif
 
 #if BUILD_FREETYPE
@@ -37,7 +37,7 @@ namespace augs {
 		
 		if(to_initialize.test(library::NETWORKING)) {
 #if BUILD_NETWORKING
-			const auto success = true;
+			const auto success = network::init();
 			ensure(success && "Failed to initialize networking");
 			initialized.set(library::NETWORKING);
 #endif
@@ -57,7 +57,7 @@ namespace augs {
 		if(to_deinitialize.test(library::NETWORKING)) {
 #if BUILD_NETWORKING
 			ensure(initialized.test(library::NETWORKING));
-			// false
+			ensure(network::deinit());
 			initialized.set(library::NETWORKING, false);
 #endif
 		}

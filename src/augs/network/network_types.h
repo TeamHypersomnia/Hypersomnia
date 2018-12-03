@@ -41,6 +41,9 @@ namespace augs {
 
 	namespace network {
 		using message = network_message;
+
+		bool init();
+		bool deinit();
 	}
 }
 

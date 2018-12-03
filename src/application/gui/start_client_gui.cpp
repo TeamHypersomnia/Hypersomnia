@@ -33,7 +33,7 @@ bool start_client_gui_state::perform(
 		// auto& scope_cfg = into;
 
 		base::acquire_keyboard_once();
-		input_text<100>("Address (ip4:port or [ip6]:port)", into.ip_port);
+		input_text<100>("Address (ipv4:port or [ipv6]:port)", into.ip_port);
 		input_text<32>("Chosen nickname (3-32 characters)", into.nickname);
 	}
 

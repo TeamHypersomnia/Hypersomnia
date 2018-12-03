@@ -33,6 +33,8 @@ bool start_server_gui_state::perform(
 
 		// auto& scope_cfg = into;
 
+		input_text<100>("Address (leave empty to find automatically)", into.ip);
+
 		{
 			auto chosen_port = static_cast<int>(into.port);
 
@@ -40,23 +42,10 @@ bool start_server_gui_state::perform(
 			into.port = static_cast<unsigned short>(std::clamp(chosen_port, 1024, 65535));
 		}
 
-		checkbox("IPv4", into.ipv4.is_enabled);
-
-		{
-			auto ind = scoped_indent();
-			auto maybe_disabled = maybe_disabled_cols({}, !into.ipv4.is_enabled);
-			input_text<100>("Address (leave empty to find automatically)##4", into.ipv4.value);
-		}
-
-		checkbox("IPv6", into.ipv6.is_enabled);
-
-		{
-			auto ind = scoped_indent();
-			auto maybe_disabled = maybe_disabled_cols({}, !into.ipv6.is_enabled);
-			input_text<100>("Address (leave empty to find automatically)##6", into.ipv6.value);
-		}
+		slider("Max connections", into.max_connections, 2, 64);
 
 		text_disabled("Tip: you can tweak many other settings when the server is up and running.\nYou can edit the defaults inside the cache/usr/config.local.lua file,\nin the default_server_vars section.");
+		text_disabled("Tip: the address can be either IPv4 or IPv6.\nFor example, you can put the IPv6 loopback address, which is \"::1\".");
 	}
 
 	{
@@ -65,8 +54,6 @@ bool start_server_gui_state::perform(
 		ImGui::Separator();
 
 		{
-			auto maybe_disabled = maybe_disabled_cols({}, !into.ipv6.is_enabled && !into.ipv4.is_enabled);
-
 			if (ImGui::Button("Launch!")) {
 				result = true;
 				//show = false;

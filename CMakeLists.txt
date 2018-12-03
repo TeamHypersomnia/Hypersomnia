@@ -741,6 +741,20 @@ if(BUILD_GLAD)
 	)
 endif()
 
+if(BUILD_NETWORKING)
+	list(APPEND HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
+		"src/3rdparty/yojimbo/yojimbo.cpp"
+		"src/3rdparty/yojimbo/tlsf/tlsf.c"
+		"src/3rdparty/yojimbo/netcode.io/netcode.c"
+		"src/3rdparty/yojimbo/reliable.io/reliable.c"
+	)
+
+	# "src/3rdparty/yojimbo/tlsf/tlsf.h"
+	# "src/3rdparty/yojimbo/yojimbo.h"
+	# "src/3rdparty/yojimbo/netcode.io/netcode.h"
+	# "src/3rdparty/yojimbo/reliable.io/reliable.h" 
+endif()
+
 # Project resource files, e.g. an icon.
 
 if(ADD_APPLICATION_ICON)
@@ -865,7 +879,17 @@ set(HYPERSOMNIA_INCLUDE_DIRS
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/lua"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/sol2"
 	"${PROJECT_SOURCE_DIR}/src/3rdparty/imgui"
+	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/reliable.io"
+	"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/netcode.io"
 )
+
+if (MSVC)
+	list(APPEND HYPERSOMNIA_INCLUDE_DIRS
+		"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/windows"
+	)
+
+	link_directories("${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/windows")
+endif()
 
 # We configure additional flags for the compiler.
 
@@ -1377,6 +1401,10 @@ elseif(CLANG)
 	list(APPEND HYPERSOMNIA_LIBS c++fs c++experimental dl Xi)
 elseif(GCC)
 	list(APPEND HYPERSOMNIA_LIBS stdc++fs dl Xi)
+endif()
+
+if (BUILD_NETWORKING)
+	list(APPEND HYPERSOMNIA_LIBS sodium mbedtls mbedx509 mbedcrypto)
 endif()
 
 target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
