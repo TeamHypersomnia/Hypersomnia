@@ -50,10 +50,10 @@ before_install:
  - initctl list || true
 
 install:
-  - ls /usr/local/lib | grep sodium
-  - ls /usr/local/lib | grep mbedtls
-  - wget https://github.com/premake/premake-core/releases/download/v5.0.0-alpha13/premake-5.0.0-alpha13-linux.tar.gz -O /tmp/premake5.tar.gz
-  - tar -zxvf /tmp/premake5.tar.gz
+  - export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+  - pushd /usr/local/lib
+  - ls
+  - popd
   - wget https://github.com/jedisct1/libsodium/releases/download/1.0.16/libsodium-1.0.16.tar.gz -O /tmp/libsodium.tar.gz
   - pushd .
   - cd /tmp
@@ -72,8 +72,9 @@ install:
   - make
   - sudo make install
   - popd
-  - ls /usr/local/lib | grep sodium
-  - ls /usr/local/lib | grep mbedtls
+  - pushd /usr/local/lib
+  - ls
+  - popd
   - sudo sh -c 'echo "/usr/local/lib" > /etc/ld.so.conf.d/somemorelibs.conf'
   - sudo ldconfig
 
