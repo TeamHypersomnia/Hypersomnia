@@ -24,6 +24,8 @@ addons:
      - osspd
      - libasound2
      - libasound2-dev
+     - libmbedtls-dev
+     - libsodium-dev
     sources:
      - ubuntu-toolchain-r-test
      - llvm-toolchain-trusty-7
