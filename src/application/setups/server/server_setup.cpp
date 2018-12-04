@@ -76,6 +76,13 @@ void server_setup::choose_arena(const std::string& name) {
 			scene,
 			rulesets
 		);
+
+		if (vars.override_default_ruleset.empty()) {
+			current_mode.choose(rulesets.meta.server_default);
+		}
+		else {
+			ensure(false && "Not implemented!");
+		}
 	}
 
 	vars.current_arena = name;
@@ -187,6 +194,6 @@ double server_setup::get_inv_tickrate() const {
 				return 1 / 60.0;
 			}
 		},
-		current_mode
+		current_mode.state
 	);
 }

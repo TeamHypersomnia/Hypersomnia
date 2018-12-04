@@ -249,7 +249,7 @@ struct editor_property_accessors {
 					})
 				);
 			},
-			in.folder.player.current_mode
+			in.folder.player.current_mode.state
 		);
 	}
 
@@ -286,7 +286,7 @@ struct editor_property_accessors {
 					);
 				}
 			},
-			in.folder.player.current_mode
+			in.folder.player.current_mode.state
 		);
 	}
 

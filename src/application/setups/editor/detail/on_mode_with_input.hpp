@@ -15,7 +15,7 @@ decltype(auto) editor_player::on_mode_with_input_impl(
 			using M = remove_cref<decltype(typed_mode)>;
 			using I = typename M::input;
 			
-			const auto vars = mapped_or_nullptr(all_vars.template get_for<M>(), self.current_mode_rules_id);
+			const auto vars = mapped_or_nullptr(all_vars.template get_for<M>(), self.current_mode.rules_id);
 			ensure(vars != nullptr);
 
 			if constexpr(M::needs_initial_signi) {
@@ -29,7 +29,7 @@ decltype(auto) editor_player::on_mode_with_input_impl(
 				return callback(typed_mode, in);
 			}
 		},
-		self.current_mode
+		self.current_mode.state
 	);
 }
 

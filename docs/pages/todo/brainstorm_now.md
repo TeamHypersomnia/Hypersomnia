@@ -6,6 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- commandize add_player and remove_player
+	- problem: we might be unable to deterministically predict the outcome
+		- what? actually, add player command will always succeed as long as there is space, which we can easily predict
+		- we won't predict auto-assignments but that's not really important
+		- also if we need predictability, wwe can do these once per step
+	- remember that we need to re-add players every time that a mode type is changed
+
 - Chat-level logs
 	- server_setup has to expose events somehow
 	- can send them really as chat messages to all the clients

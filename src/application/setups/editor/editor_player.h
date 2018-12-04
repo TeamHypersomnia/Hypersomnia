@@ -11,6 +11,7 @@
 #include "application/setups/editor/editor_commanded_state.h"
 #include "game/cosmos/entropy_recording_options.h"
 
+#include "application/arena/mode_and_rules.h"
 #include "augs/templates/snapshotted_player.h"
 
 struct cosmos_solvable_significant;
@@ -69,9 +70,7 @@ private:
 	using step_type = base::step_type;
 
 	// GEN INTROSPECTOR class editor_player
-	all_modes_variant current_mode;
-	raw_ruleset_id current_mode_rules_id = raw_ruleset_id();
-
+	mode_and_rules current_mode;
 	player_before_start_state before_start;
 
 public:
@@ -179,7 +178,7 @@ public:
 	}
 
 	const auto& get_current_mode() const {
-		return current_mode;
+		return current_mode.state;
 	}
 
 	void set_dirty();

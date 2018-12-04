@@ -8,6 +8,18 @@
 
 #include "augs/readwrite/byte_readwrite.h"
 
+void mode_and_rules::choose(const ruleset_id& id) {
+	rules_id = id.raw;
+
+	id.type_id.dispatch(
+		[&](auto m) {
+			using M = decltype(m);
+
+			state.emplace<M>();
+		}
+	);
+}
+
 template <class C>
 void make_redoable_for_different_solvable(
 	const editor_command_input& in,
@@ -201,7 +213,7 @@ entity_guid editor_player::lookup_character(const mode_player_id id) const {
 		[&](const auto& typed_mode) { 
 			return typed_mode.lookup(id);
 		},
-		current_mode
+		current_mode.state
 	);
 }
 
@@ -257,7 +269,7 @@ void editor_player::reset_mode() {
 		[&](auto& typed_mode) {
 			typed_mode = {};
 		},
-		current_mode
+		current_mode.state
 	);
 }
 
@@ -304,16 +316,7 @@ void editor_player::choose_mode(const ruleset_id& id) {
 	ensure(!has_testing_started());
 
 	set_dirty();
-
-	current_mode_rules_id = id.raw;
-
-	id.type_id.dispatch(
-		[&](auto m) {
-			using M = decltype(m);
-
-			current_mode.emplace<M>();
-		}
-	);
+	current_mode.choose(id);
 }
 
 void editor_player::adjust_entropy(const editor_folder& folder, editor_player_entropy_type& entropy, const bool neg) const {

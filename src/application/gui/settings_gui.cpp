@@ -324,19 +324,13 @@ void settings_gui_state::perform(
 				// revertable_checkbox("Draw gameplay GUI", config.drawing.draw_character_gui); revert(config.drawing.draw_character_gui);
 				break;
 			}
-			case settings_pane::NETWORK: {
-				if (auto node = scoped_tree_node("Client settings")) {
+			case settings_pane::SERVER: {
+				auto& scope_cfg = config.server;
 
-				}
+				revertable_slider(SCOPE_CFG_NVP(kick_if_inactive_for_secs), 0u, 300u);
+				revertable_slider(SCOPE_CFG_NVP(time_limit_to_enter_game_since_connection), 0u, 300u);
 
-				if (auto node = scoped_tree_node("Default server start")) {
-					/* TODO */
-
-				}
-
-				if (auto node = scoped_tree_node("Default server vars")) {
-
-				}
+				input_text<100>(SCOPE_CFG_NVP(override_default_ruleset)); revert(scope_cfg.override_default_ruleset);
 			}
 			case settings_pane::EDITOR: {
 				if (auto node = scoped_tree_node("General")) {
