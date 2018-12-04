@@ -74,7 +74,6 @@ install:
   - pushd /usr/local/lib
   - ls
   - popd
-  - cat /etc/ld.so.conf
   - sudo ldconfig
 
 script:

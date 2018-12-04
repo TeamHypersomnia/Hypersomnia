@@ -3,8 +3,8 @@
 #include "application/setups/server/server_start_input.h"
 #include "augs/misc/timing/timer.h"
 #include "game/modes/mode_entropy.h"
-
-using client_id_type = int;
+#include "augs/network/network_types.h"
+#include "augs/enums/callback_result.h"
 
 enum class GameMessageType {
 	INITIAL_SOLVABLE,
@@ -12,6 +12,16 @@ enum class GameMessageType {
 	CLIENT_ENTROPY,
 
 	COUNT
+};
+
+enum class connection_event_type {
+	CONNECTED,
+	DISCONNECTED
+};
+
+struct connection_event {
+	client_id_type subject_id = -1;
+	connection_event_type type = connection_event_type::CONNECTED;
 };
 
 namespace net_messages {
@@ -37,6 +47,16 @@ namespace net_messages {
 		}
 
 		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
+	};
+
+	struct client_welcome : public yojimbo::Message {
+		std::string chosen_nickname;
+
+		template <typename Stream>
+		bool Serialize(Stream& stream) {
+			(void)stream;
+			return true;
+		}
 	};
 
 	struct client_entropy : public yojimbo::Message {
@@ -94,29 +114,33 @@ class server_adapter {
 	GameAdapter adapter;
 	yojimbo::Server server;
 
+	std::vector<connection_event> pending_events;
+
 	friend GameAdapter;
 
 	void client_connected(const client_id_type id);
 	void client_disconnected(const client_id_type id);
 
 	template <class F>
-	void process_message(client_id_type id, yojimbo::Message&, F&& message_callback);
+	void process_connections_disconnections(F&& message_callback);
+
+	template <class F>
+	callback_result process_message(client_id_type id, yojimbo::Message&, F&& message_callback);
 
 public:
 	server_adapter(const server_start_input&);
 
 	template <class F>
 	void advance(
-		const double server_time, 
+		const net_time_t server_time, 
 		F&& message_callback
 	);
 
 	bool is_running() const;
 
-	void disconnect_client(const client_id_type id);
-	void deal_with_malicious_client(const client_id_type id);
+	bool is_client_connected(const client_id_type id) const;
 
-	std::string describe_client(const client_id_type id) const;
+	void disconnect_client(const client_id_type id);
 
 	auto& get_specific() {
 		return server;

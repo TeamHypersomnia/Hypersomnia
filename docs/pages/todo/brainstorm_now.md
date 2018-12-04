@@ -6,17 +6,32 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- To improve server-side playing performance, we could let a server-side player
-	- Otherwise we'd need 3 apps to test the server with two players
+- watch out for pending_events invalidation if we manually (dis)connect on message callback
+	- shouldn't happen though because the loop itself only calls callback for (dis)connections
+
+- Chat-level logs
+	- server_setup has to expose events somehow
+	- can send them really as chat messages to all the clients
+		- we also need to redirect it to the server player
+
+- Client FSM
+	- PENDING_WELCOME 
+	- RECEIVING_INITIAL_STATE
+		- after receiving initial state, we might want to send inputs that happened as a block as well
+	- IN_GAME
+	- Last time of valid activity
+		- Kick if AFK
+		- AFK timer can already be a server setting
+
+- Let someone on spectator when they are connected even if they're downloading initial solvable
+	- Though before they git clone the repos
+		- Not before we set up the masterserver.
+			- That is because clients will know about the map to be downloaded only through the masterserver that will expose the details of all of its servers.
 
 - The built-in player of the server
-	- Always has mode id 0?
-		- The rest is mapped with offset of 1?
-		- Or simply it has -1
-			- mode would always allocate maxmodeplayers + 1
-
-- Server holds intercosm or cosmos?
-	- We might want to sync changed flavour state if we ever allow property changes during play
+	- Always at id -1
+		- mode always allocates maxmodeplayers + 1 in its array
+	- The server setup will thus hold entire intercosm
 
 - Preffix the single client entropy with a byte.
 	- The first bit signifies whether it is cosmic or mode

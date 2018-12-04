@@ -6,6 +6,9 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- enum-less variants of enum_boolset and enum_map
+	- useful for quick mapping users in an array
+
 - ImGui popup for progress on loading atlases
 	- the imgui atlas itself will load quickly enough
 

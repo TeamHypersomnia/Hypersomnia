@@ -4,6 +4,7 @@
 struct server_vars {
 	// GEN INTROSPECTOR struct server_vars
 	std::string current_arena = "test";
-	unsigned max_connections = 64;
+	unsigned kick_if_inactive_for_secs = 60;
+	unsigned time_limit_to_enter_game_since_connection = 10;
 	// END GEN INTROSPECTOR
 };

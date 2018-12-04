@@ -1,6 +1,7 @@
 #pragma once
+#include "augs/network/network_types.h"
 
-constexpr std::size_t max_mode_players_v = 64;
+constexpr std::size_t max_mode_players_v = max_incoming_connections_v + 1;
 
 struct mode_player_id {
 	using id_value_type = unsigned;

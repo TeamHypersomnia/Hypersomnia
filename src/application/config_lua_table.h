@@ -116,7 +116,7 @@ struct config_lua_table {
 	faction_view_settings faction_view;
 
 	server_start_input default_server_start;
-	server_vars default_server_vars;
+	server_vars server;
 
 	client_start_input default_client_start;
 

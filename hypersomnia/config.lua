@@ -433,14 +433,16 @@ return {
 	  }
 	}
   },
-  default_server_vars = {
+  server = {
 	current_arena = "test",
-	max_connections = 64
+	kick_if_inactive_for_secs = 60,
+	time_limit_to_enter_game_since_connection = 10
   },
+
   default_server_start = {
-	enabled_ipv4 = "127.0.0.1",
-	enabled_ipv6 = "::1",
-	port = 8412
+	ip = "127.0.0.1",
+	port = 8412,
+	max_connections = 64
   },
   default_client_start = {
 	ip_port = "127.0.0.1:8142",

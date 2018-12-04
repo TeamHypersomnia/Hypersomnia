@@ -1,13 +1,14 @@
 #include "application/network/network_adapters.h"
+#include "augs/network/network_types.h"
+
+static_assert(max_incoming_connections_v == yojimbo::MaxClients);
 
 void server_adapter::client_connected(const client_id_type id) {
-	/* TODO: research the order */
-	(void)id;
+	pending_events.push_back({ id, connection_event_type::CONNECTED });
 }
 
 void server_adapter::client_disconnected(const client_id_type id) {
-	/* TODO: research the order */
-	(void)id;
+	pending_events.push_back({ id, connection_event_type::DISCONNECTED });
 }
 
 void GameAdapter::OnServerClientConnected(const client_id_type clientIndex) {
@@ -29,6 +30,10 @@ GameConnectionConfig::GameConnectionConfig() {
 
 bool server_adapter::is_running() const {
 	return server.IsRunning();
+}
+
+bool server_adapter::is_client_connected(const client_id_type id) const {
+	return server.IsClientConnected(id);
 }
 
 server_adapter::server_adapter(const server_start_input& in) :
@@ -56,21 +61,8 @@ server_adapter::server_adapter(const server_start_input& in) :
 	LOG("Server address is %x", buffer);
 }
 
-std::string server_adapter::describe_client(const client_id_type id) const {
-	return typesafe_sprintf(
-		"Id: %x\nNickname: %x",
-		id,
-		"not implemented"
-	);
-}
-
 void server_adapter::disconnect_client(const client_id_type id) {
 	server.DisconnectClient(id);
 }
 
-void server_adapter::deal_with_malicious_client(const client_id_type id) {
-	LOG("Malicious client detected. Details:\n%x");
-
-	disconnect_client(id);
-}
 

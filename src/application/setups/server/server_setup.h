@@ -15,8 +15,16 @@
 #include "game/modes/mode_entropy.h"
 #include "game/modes/ruleset_id.h"
 
+#include "augs/network/network_types.h"
+#include "application/setups/server/server_vars.h"
+#include "application/setups/server/server_client_state.h"
+
 struct config_lua_table;
 struct draw_setup_gui_input;
+
+namespace net_messages {
+	struct client_welcome;
+}
 
 class server_adapter;
 
@@ -29,9 +37,11 @@ class server_setup : public default_setup_settings {
 	entity_id viewed_character_id;
 
 	augs::propagate_const<std::unique_ptr<server_adapter>> server;
+	std::array<server_client_state, max_incoming_connections_v> clients;
 
-	static double get_current_time();
-	double server_time = 0.0;
+	static net_time_t get_current_time();
+	net_time_t server_time = 0.0;
+	server_vars vars;
 
 	template <class E, class A, class C, class F>
 	static decltype(auto) on_mode_with_input_impl(
@@ -86,10 +96,15 @@ public:
 	}
 
 	void customize_for_viewing(config_lua_table&) const;
+	void apply(const config_lua_table&);
 
-	void apply(const config_lua_table&) {
-		return;
-	}
+	void choose_arena(const std::string& name);
+
+	bool add_to_arena(const client_id_type&, const net_messages::client_welcome&);
+	void remove_from_arena(const client_id_type&);
+
+	std::string describe_client(const client_id_type id) const;
+	void deal_with_malicious_client(const client_id_type id);
 
 	auto escape() {
 		return setup_escape_result::IGNORE;
