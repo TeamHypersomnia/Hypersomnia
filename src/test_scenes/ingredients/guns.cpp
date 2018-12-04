@@ -243,8 +243,10 @@ namespace test_flavours {
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
 			}
 
-			//missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::MISSILE_SMOKE_TRAIL);
-			//missile.trace_particles.modifier.colorize = rgba(202, 185, 89, 255);
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FURY_THROWER_TRACE);
+			missile.trace_particles.modifier.colorize = rgba(202, 185, 89, 255);
+			missile.trace_particles.modifier.scale_amounts = 3.f;
+			missile.trace_particles.modifier.scale_lifetimes = 0.3f;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION);
 			missile.muzzle_leave_particles.modifier.colorize = white;//{ 255, 218, 5, 255 };
@@ -317,8 +319,10 @@ namespace test_flavours {
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
 			}
 
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
-			missile.trace_particles.modifier.colorize = rgba(255, 50, 0, 255);
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FURY_THROWER_ATTACK);
+			missile.trace_particles.modifier.colorize = rgba(255, 100, 0, 255);
+			missile.trace_particles.modifier.scale_amounts = 1.1f;
+			missile.trace_particles.modifier.scale_lifetimes = 0.8f;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION);
 			missile.muzzle_leave_particles.modifier.colorize = white;//{ 255, 218, 5, 255 };
@@ -1607,11 +1611,11 @@ namespace test_flavours {
 			gun_def.shell_angular_velocity = {2.f, 10.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {500.f, 2500.f};
-			gun_def.damage_multiplier = 1.f;
+			gun_def.damage_multiplier = 1.2f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 2;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.recoil_multiplier = 2.f;
-			gun_def.kickback_towards_wielder = 40.f;
+			gun_def.kickback_towards_wielder = 70.f;
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.202f;
@@ -1708,11 +1712,11 @@ namespace test_flavours {
 			gun_def.shell_angular_velocity = {2.f, 10.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {300.f, 1900.f};
-			gun_def.damage_multiplier = 0.62f;
+			gun_def.damage_multiplier = 0.82f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
-			gun_def.recoil_multiplier = 1.35f;
-			gun_def.kickback_towards_wielder = 20.f;
+			gun_def.recoil_multiplier = 1.25f;
+			gun_def.kickback_towards_wielder = 30.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(550);
 
 			gun_def.maximum_heat = 2.f;

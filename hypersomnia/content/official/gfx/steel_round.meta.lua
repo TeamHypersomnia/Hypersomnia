@@ -2,7 +2,7 @@ return {
   extra_loadables = {
     enabled_generate_neon_map = {
       alpha_multiplier = 1,
-      amplification = 150,
+      amplification = 350,
       light_colors = {
         "255 255 255 255",
         "167 167 167 255",
@@ -14,7 +14,7 @@ return {
         x = 100,
         y = 100
       },
-      standard_deviation = 6
+      standard_deviation = 5
     },
     generate_desaturation = false
   },
@@ -69,6 +69,13 @@ return {
         rotation = 0
       },
       head_anchor = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      shoulder_anchor = {
         pos = {
           x = 0,
           y = 0
@@ -137,6 +144,13 @@ return {
         rotation = 0
       },
       secondary_hand = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      secondary_shoulder = {
         pos = {
           x = 0,
           y = 0

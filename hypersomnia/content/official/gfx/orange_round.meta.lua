@@ -4,14 +4,13 @@ return {
       alpha_multiplier = 1,
       amplification = 500,
       light_colors = {
-        "255 0 21 255",
-        "238 195 154 255"
+        "255 218 5 255"
       },
       radius = {
-        x = 80,
-        y = 80
+        x = 200,
+        y = 200
       },
-      standard_deviation = 6
+      standard_deviation = 5
     },
     generate_desaturation = false
   },
@@ -66,6 +65,13 @@ return {
         rotation = 0
       },
       head_anchor = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      shoulder_anchor = {
         pos = {
           x = 0,
           y = 0
@@ -126,6 +132,13 @@ return {
         rotation = 0
       },
       secondary_hand = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      secondary_shoulder = {
         pos = {
           x = 0,
           y = 0
