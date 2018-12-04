@@ -2338,3 +2338,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Don't use settings_gui.cpp for client/server defaults: simply edit these in connect/host dialogs and save on confirmation
 - replace queues with a single optional for item purchase, let us not allow more than a single purchase per step
+
+- watch out for pending_events invalidation if we manually (dis)connect on message callback
+	- shouldn't happen though because the loop itself only calls callback for (dis)connections
+

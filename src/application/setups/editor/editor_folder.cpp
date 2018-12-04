@@ -10,6 +10,28 @@
 #include "augs/readwrite/lua_file.h"
 #include "game/cosmos/entity_handle.h"
 
+#include "application/arena/arena_utils.h"
+
+/* 
+	This unusual choice of definition location is due to server needing to call this function,
+	but byte serialization function names clashing with Yojimbo's.
+*/
+
+void load_arena_from(
+	const arena_paths& paths,
+	intercosm& scene,
+	predefined_rulesets& rulesets
+) {
+	scene.load_from_int(paths.int_file);
+
+	try {
+		augs::load_from_bytes(rulesets, paths.rulesets_file);
+	}
+	catch (const augs::file_open_error&) {
+		/* Just let it happen */
+	}
+}
+
 std::string editor_folder::get_display_path() const {
 	return ::get_project_name(current_path);
 }
@@ -42,7 +64,7 @@ void editor_folder::save_folder(const augs::path_type& to, const editor_save_typ
 void editor_folder::save_folder(const augs::path_type& to, const augs::path_type name, const editor_save_type mode) const {
 	const auto paths = editor_paths(to, name);
 
-	augs::create_directories_for(paths.int_file);
+	augs::create_directories_for(paths.arena.int_file);
 
 	if (mode == editor_save_type::ONLY_VIEW) {
 		augs::save_as_bytes(view, paths.view_file);
@@ -55,10 +77,10 @@ void editor_folder::save_folder(const augs::path_type& to, const augs::path_type
 	augs::create_directory(to / maybe_official_path<assets::sound_id>::get_content_suffix());
 	augs::create_directory(paths.default_export_path);
 
-	commanded->work.save_as_int(paths.int_file);
+	commanded->work.save_as_int(paths.arena.int_file);
 
 	augs::save_as_bytes(commanded->view_ids, paths.view_ids_file);
-	augs::save_as_bytes(commanded->rulesets, paths.rulesets_file);
+	augs::save_as_bytes(commanded->rulesets, paths.arena.rulesets_file);
 	augs::save_as_bytes(view, paths.view_file);
 	augs::save_as_bytes(history, paths.hist_file);
 	augs::save_as_bytes(player, paths.player_file);
@@ -78,10 +100,14 @@ void editor_folder::load_folder(const augs::path_type& from) {
 void editor_folder::load_folder(const augs::path_type& from, const augs::path_type& name) {
 	const auto paths = editor_paths(from, name);
 
-	const auto& int_path = paths.int_file;
+	const auto& int_path = paths.arena.int_file;
 
 	try {
-		commanded->work.load_from_int(int_path);
+		load_arena_from(
+			paths.arena,
+			commanded->work,
+			commanded->rulesets
+		);
 	}
 	catch (const std::exception& err) {
 		editor_popup p;
@@ -95,7 +121,6 @@ void editor_folder::load_folder(const augs::path_type& from, const augs::path_ty
 
 	try {
 		augs::load_from_bytes(commanded->view_ids, paths.view_ids_file);
-		augs::load_from_bytes(commanded->rulesets, paths.rulesets_file);
 		augs::load_from_bytes(view, paths.view_file);
 		augs::load_from_bytes(history, paths.hist_file);
 		augs::load_from_bytes(player, paths.player_file);

@@ -651,6 +651,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/modes/arena_mode.cpp"
 	"src/application/setups/editor/gui/editor_tutorial_gui.cpp"
 	"src/application/network/network_adapters.cpp"
+	"src/application/arena/arena_paths.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

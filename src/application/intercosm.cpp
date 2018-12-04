@@ -30,8 +30,10 @@ void intercosm::clear() {
 	cosmic::clear(world);
 	viewables.clear();
 
+#if 0
 	augs::recursive_clear(version);
 	version.commit_number = 0;
+#endif
 }
 
 #if BUILD_TEST_SCENES

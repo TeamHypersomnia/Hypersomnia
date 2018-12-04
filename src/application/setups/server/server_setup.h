@@ -18,6 +18,7 @@
 #include "augs/network/network_types.h"
 #include "application/setups/server/server_vars.h"
 #include "application/setups/server/server_client_state.h"
+#include "application/predefined_rulesets.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -30,6 +31,8 @@ class server_adapter;
 
 class server_setup : public default_setup_settings {
 	intercosm scene;
+	predefined_rulesets rulesets;
+
 	all_modes_variant current_mode;
 	raw_ruleset_id current_mode_rules_id = raw_ruleset_id();
 

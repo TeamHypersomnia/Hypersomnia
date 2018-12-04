@@ -1043,6 +1043,67 @@ void load_test_scene_particle_effects(
 
 			effect.emissions.push_back(em);
 		}
+
+		{
+			particles_emission em;
+			em.rotation_speed = float_range(0, 0);
+			em.particle_lifetime_ms = float_range(70, 200);
+			em.num_of_particles_to_spawn_initially.set(70, 86);
+			em.base_speed = float_range(20, 1857);
+			em.spread_degrees = float_range(43, 95);
+			em.angular_offset = float_range(0, 60);
+			em.randomize_spawn_point_within_circle_of_inner_radius = float_range(2.f, 5.f);
+			em.randomize_spawn_point_within_circle_of_outer_radius = float_range(7.f, 10.f);
+
+			{
+				general_particle particle_definition;
+
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 5873;
+				particle_definition.acc = { 40, -40 };
+				
+				set_with_size(particle_definition,
+					to_image_id(test_scene_image_id::BLANK), 
+					vec2i(4, 1),
+					rgba(202, 185, 89, 255)
+				);
+
+				particle_definition.alpha_levels = 1;
+
+				//particle_definition.unshrinking_time_ms = 50.f;
+				particle_definition.shrink_when_ms_remaining = 160.f;
+
+				em.add_particle_definition(particle_definition);
+			}
+
+			{
+				general_particle particle_definition;
+
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 6873;
+				particle_definition.acc = { 40, -40 };
+				
+				set_with_size(particle_definition,
+					to_image_id(test_scene_image_id::BLANK), 
+					vec2i(7, 2),
+					rgba(202, 185, 89, 255)
+				);
+
+				//particle_definition.unshrinking_time_ms = 50.f;
+				particle_definition.shrink_when_ms_remaining = 160.f;
+
+				particle_definition.alpha_levels = 1;
+
+				em.add_particle_definition(particle_definition);
+			}
+
+			em.scale_damping_to_velocity = true;
+			em.size_multiplier = float_range(2.2, 3.2);
+			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
+			em.initial_rotation_variation = 20;
+
+			effect.emissions.push_back(em);
+		}
 	}
 
 	{

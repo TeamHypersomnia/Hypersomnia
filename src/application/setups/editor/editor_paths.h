@@ -1,8 +1,9 @@
 #pragma once
-
 #include "augs/filesystem/path.h"
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
+
+#include "application/arena/arena_paths.h"
 
 #define EDITOR_DIR LOCAL_FILES_DIR "/editor"
 
@@ -48,11 +49,11 @@ inline auto get_unsaved_path(augs::path_type path) {
 }
 
 struct editor_paths {
-	augs::path_type int_file;
+	arena_paths arena;
+
 	augs::path_type view_file;
 	augs::path_type view_ids_file;
 	augs::path_type hist_file;
-	augs::path_type rulesets_file;
 	augs::path_type player_file;
 	augs::path_type autosave_path;
 	augs::path_type entropies_live_file;

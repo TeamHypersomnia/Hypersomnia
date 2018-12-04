@@ -1,7 +1,11 @@
 #include "application/setups/server/server_setup.h"
 #include "application/config_lua_table.h"
+#include "application/arena/arena_utils.h"
 
 #include "application/network/network_adapters.hpp"
+
+#include "augs/filesystem/file.h"
+#include "application/arena/arena_paths.h"
 
 /* To avoid incomplete type error */
 server_setup::~server_setup() = default;
@@ -43,14 +47,36 @@ void server_setup::apply(const config_lua_table& cfg) {
 	const auto& new_vars = cfg.server;
 
 	if (vars.current_arena != new_vars.current_arena) {
-		choose_arena(new_vars.current_arena);
+		try {
+			choose_arena(new_vars.current_arena);
+		}
+		catch (const augs::file_open_error& err) {
+			/* 
+				TODO!!! 
+				In case of loading errors, we should update the config to the previously working map (or empty string). 
+				We should also remove this line: "vars = cfg.server;" since it will update the arena name despite not having it loaded.
+			*/
+
+			/* This should never really happen as we'll always check before allowing admin to set a map name. */
+			LOG("Arena named %x was not found on the server!");
+		}
 	}
 
 	vars = cfg.server;
 }
 
 void server_setup::choose_arena(const std::string& name) {
-	// TODO: Load the arena
+	if (name.empty())  {
+		scene.clear();
+		rulesets = {};
+	}
+	else {
+		load_arena_from(
+			arena_paths(name),
+			scene,
+			rulesets
+		);
+	}
 
 	vars.current_arena = name;
 }

@@ -392,6 +392,7 @@ namespace test_flavours {
 				auto& dest_eff = missile.damage.effects.destruction;
 				dest_eff.spawn_exploding_ring = false;
 				dest_eff.particles.modifier.colorize = red;
+				dest_eff.particles.modifier.scale_amounts = 0.2f;
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
 			}
 
@@ -1243,7 +1244,7 @@ namespace test_flavours {
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.052f;
-			gun_def.recoil_multiplier = 0.92f;
+			gun_def.recoil_multiplier = 0.86f;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);

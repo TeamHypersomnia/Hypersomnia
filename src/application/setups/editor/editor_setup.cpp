@@ -983,7 +983,7 @@ void editor_setup::go_to_entity() {
 }
 
 void editor_setup::reveal_in_explorer(const augs::window& owner) {
-	owner.reveal_in_explorer(folder().get_paths().int_file);
+	owner.reveal_in_explorer(folder().get_paths().arena.int_file);
 }
 
 void editor_setup::new_tab() {

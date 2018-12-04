@@ -10,16 +10,14 @@ editor_paths::editor_paths(
 editor_paths::editor_paths(
 	const augs::path_type& target_folder,
 	const std::string& project_name
-) {
+) : arena(target_folder, project_name) {
 	auto in_folder = [&](const auto ext) {
 		return target_folder / (project_name + ext);
 	};
 
-	int_file = in_folder(".int");
 	view_file = in_folder(".view");
 	view_ids_file = in_folder(".view_ids");
 	hist_file = in_folder(".hist");
-	rulesets_file = in_folder(".rulesets");
 	player_file = in_folder(".player");
 	entropies_live_file = in_folder(".live");
 

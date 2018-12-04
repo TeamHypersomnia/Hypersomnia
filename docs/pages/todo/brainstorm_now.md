@@ -6,9 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- watch out for pending_events invalidation if we manually (dis)connect on message callback
-	- shouldn't happen though because the loop itself only calls callback for (dis)connections
-
 - Chat-level logs
 	- server_setup has to expose events somehow
 	- can send them really as chat messages to all the clients
