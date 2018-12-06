@@ -84,7 +84,7 @@ callback_result server_adapter::process_message(const client_id_type& client_id,
 template <class T>
 void server_adapter::send_message(const client_id_type& client_id, const game_channel_type& channel_id, T&& message_setter) {
 	using message_type = remove_cref<argument_t<remove_cref<T>, 0>>;
-	const auto idx = net_messages::id_t::of<message_type>().get_index();
+	const auto idx = net_messages::id_t::of<message_type*>().get_index();
 
 	const auto idx_int = static_cast<int>(idx);
 	const auto channel_id_int = static_cast<channel_id_type>(channel_id);

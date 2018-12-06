@@ -40,6 +40,10 @@ bool server_adapter::can_send_message(const client_id_type& id, const game_chann
 	return server.CanSendMessage(id, static_cast<channel_id_type>(channel));
 }
 
+bool server_adapter::has_messages_to_send(const client_id_type& id, const game_channel_type& channel) const {
+	return server.HasMessagesToSend(id, static_cast<channel_id_type>(channel));
+}
+
 server_adapter::server_adapter(const server_start_input& in) :
 	adapter(this),
 	server(

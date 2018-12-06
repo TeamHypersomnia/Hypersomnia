@@ -163,6 +163,12 @@ void server_setup::advance_internal(const setup_advance_input& in) {
 						return stop_processing_this_client();
 					}
 
+					auto message_provider = [&](net_messages::initial_steps& msg) {
+						(void)msg;
+					};
+
+					server->send_message(id, game_channel_type::SOLVABLE_STREAM, message_provider);
+
 					c.state = S::RECEIVING_INITIAL_STATE;
 				}
 			}

@@ -8,6 +8,7 @@ struct server_client_state {
 
 		PENDING_WELCOME,
 		RECEIVING_INITIAL_STATE,
+		RECEIVING_INITIAL_STATE_CORRECTION,
 		IN_GAME
 	};
 
