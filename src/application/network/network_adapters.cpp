@@ -25,15 +25,19 @@ void GameAdapter::OnServerClientDisconnected(const client_id_type clientIndex) {
 
 GameConnectionConfig::GameConnectionConfig() {
 	numChannels = 1;
-	channel[static_cast<int>(GameChannel::SOLVABLE_STREAM)].type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
+	channel[static_cast<int>(game_channel_type::SOLVABLE_STREAM)].type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
 }
 
 bool server_adapter::is_running() const {
 	return server.IsRunning();
 }
 
-bool server_adapter::is_client_connected(const client_id_type id) const {
+bool server_adapter::is_client_connected(const client_id_type& id) const {
 	return server.IsClientConnected(id);
+}
+
+bool server_adapter::can_send_message(const client_id_type& id, const game_channel_type& channel) const {
+	return server.CanSendMessage(id, static_cast<channel_id_type>(channel));
 }
 
 server_adapter::server_adapter(const server_start_input& in) :
@@ -61,7 +65,7 @@ server_adapter::server_adapter(const server_start_input& in) :
 	LOG("Server address is %x", buffer);
 }
 
-void server_adapter::disconnect_client(const client_id_type id) {
+void server_adapter::disconnect_client(const client_id_type& id) {
 	server.DisconnectClient(id);
 }
 

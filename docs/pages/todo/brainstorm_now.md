@@ -6,6 +6,43 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- custom factory in separate file to not mess up formatting
+	- simply cast int to type index in type_in_list_id
+	- type_list with all message types
+	- then dispatch
+	- then we dont need the enums whatsoever and write a simple wrapper in net adapter for creating messages passing the type once
+
+- Properly send initial state on connection
+	- Serialize right away and hold std::vector<std::byte> in the message structure
+		- In particular, dont create deep clones of the solvable or entropies 
+		- That's because serialization will be a lot faster than deep clones
+		- And we anyway have to serialize this so that's one step less
+	- For now, let's only send inputs per step instead of solvable
+		- This way we always quickly connect on the beginning of the round which is most frequently the case
+		- if you connect late that's your problem, but anyways it should happen rather quickly
+		- we can later implement dynamic choice of the way we transmit the initial state
+			- solvable's can be trivially estimated
+			- and we can keep track of the number of sent entropies this round, as we go
+			- this way we can compare which is more space efficient
+	- research the completion checking of messages in yojimbo
+		- we can use HasMessagesToSend
+			- actually not really because its hidden behind a private interface...
+		- Use the reference count, simply AcquireMessage on being posted
+			- this is even more flexible since it works even if we post more messages after this one
+		- perhaps by message id or a changed field value inside the message object?
+	- actually why do we need completion? can't we begin to queue up the inputs?
+		- we want to generate another solvable message right away or pack all inputs that happened tightly
+
+
+- General client processing loop
+	- Always check and add a mode player if the client is not yet in-game
+		- Handles restarts automatically
+	- if we do it per step, there will be a delay for the state to catch up, but:
+		- State is simpler
+		- We don't have to worry about malicious sizes
+		- We don't have to worry about message being too large due to all these nicknames
+		- Con: we might waste more bits/bytes overall but that's amortized over time
+
 - commandize add_player and remove_player
 	- problem: we might be unable to deterministically predict the outcome
 		- what? actually, add player command will always succeed as long as there is space, which we can easily predict

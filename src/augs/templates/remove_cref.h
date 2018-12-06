@@ -8,3 +8,6 @@
 
 template <class T>
 using remove_cref = std::remove_const_t<std::remove_reference_t<T>>;
+
+template <class T>
+using remove_cptr = std::remove_const_t<std::remove_pointer_t<T>>;

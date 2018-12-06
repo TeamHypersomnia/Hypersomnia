@@ -59,6 +59,7 @@ void server_setup::apply(const config_lua_table& cfg) {
 
 			/* This should never really happen as we'll always check before allowing admin to set a map name. */
 			LOG("Arena named %x was not found on the server!");
+			ensure(false);
 		}
 	}
 
@@ -92,12 +93,12 @@ void server_setup::accept_game_gui_events(const game_gui_entropy_type&) {
 
 }
 
-template <class M>
-constexpr bool is_server_specific_v = is_one_of_v<
-	M,
-	net_messages::initial_solvable,
-	net_messages::step_entropy
->;
+bool server_setup::add_to_arena(const client_id_type& client_id, const net_messages::client_welcome& msg) {
+	(void)client_id;
+	(void)msg;
+
+	return true;
+}
 
 void server_setup::advance_internal(const setup_advance_input& in) {
 	(void)in;
@@ -150,14 +151,15 @@ void server_setup::advance_internal(const setup_advance_input& in) {
 
 			namespace N = net_messages;
 
-			if constexpr(is_server_specific_v<M>) {
+			if constexpr(!M::client_to_server) {
+				static_assert(M::server_to_client);
 				/* What are you trying to pull off? */
 				deal_with_malicious_client(id);
 				return stop_processing_this_client();
 			}
 			else if constexpr (std::is_same_v<M, N::client_welcome>) {
 				if (c.state == S::PENDING_WELCOME) {
-					if (!add_to_arena(message)) {
+					if (!add_to_arena(id, message)) {
 						return stop_processing_this_client();
 					}
 

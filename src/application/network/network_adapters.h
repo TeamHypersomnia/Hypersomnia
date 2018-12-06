@@ -5,14 +5,7 @@
 #include "game/modes/mode_entropy.h"
 #include "augs/network/network_types.h"
 #include "augs/enums/callback_result.h"
-
-enum class GameMessageType {
-	INITIAL_SOLVABLE,
-	STEP_ENTROPY,
-	CLIENT_ENTROPY,
-
-	COUNT
-};
+#include "augs/ensure.h"
 
 enum class connection_event_type {
 	CONNECTED,
@@ -26,6 +19,39 @@ struct connection_event {
 
 namespace net_messages {
 	struct initial_solvable : public yojimbo::BlockMessage {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = false;
+
+		std::vector<std::byte> bytes;
+
+		template <typename Stream>
+		bool Serialize(Stream& stream) {
+			(void)stream;
+			return true;
+		}
+
+		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
+	};
+
+	struct initial_steps : public yojimbo::BlockMessage {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = false;
+
+		std::vector<std::byte> bytes;
+
+		template <typename Stream>
+		bool Serialize(Stream& stream) {
+			(void)stream;
+			return true;
+		}
+		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
+
+	};
+
+	struct initial_steps_correction : public yojimbo::BlockMessage {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = false;
+
 		std::vector<std::byte> bytes;
 
 		template <typename Stream>
@@ -38,6 +64,9 @@ namespace net_messages {
 	};
 
 	struct step_entropy : public yojimbo::Message {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = false;
+
 		mode_entropy entropy;
 
 		template <typename Stream>
@@ -50,6 +79,9 @@ namespace net_messages {
 	};
 
 	struct client_welcome : public yojimbo::Message {
+		static constexpr bool server_to_client = false;
+		static constexpr bool client_to_server = true;
+
 		std::string chosen_nickname;
 
 		template <typename Stream>
@@ -57,9 +89,14 @@ namespace net_messages {
 			(void)stream;
 			return true;
 		}
+
+		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
 	};
 
 	struct client_entropy : public yojimbo::Message {
+		static constexpr bool server_to_client = false;
+		static constexpr bool client_to_server = true;
+
 		total_mode_player_entropy entropy;
 
 		template <typename Stream>
@@ -70,9 +107,20 @@ namespace net_messages {
 
 		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
 	};
+
+	using all_t = type_list<
+		initial_solvable*,
+		initial_steps*,
+		initial_steps_correction*,
+		step_entropy*,
+		client_welcome*,
+		client_entropy*
+	>;
+	
+	using id_t = type_in_list_id<all_t>;
 }
 
-enum class GameChannel {
+enum class game_channel_type {
 	SOLVABLE_STREAM,
 	COMMUNICATIONS,
 
@@ -85,12 +133,7 @@ struct GameConnectionConfig : yojimbo::ClientServerConfig {
 
 class server_adapter;
 
-// the message factory
-YOJIMBO_MESSAGE_FACTORY_START(GameMessageFactory, (int)GameMessageType::COUNT);
-YOJIMBO_DECLARE_MESSAGE_TYPE((int)GameMessageType::INITIAL_SOLVABLE, net_messages::initial_solvable);
-YOJIMBO_DECLARE_MESSAGE_TYPE((int)GameMessageType::STEP_ENTROPY, net_messages::step_entropy);
-YOJIMBO_DECLARE_MESSAGE_TYPE((int)GameMessageType::CLIENT_ENTROPY, net_messages::client_entropy);
-YOJIMBO_MESSAGE_FACTORY_FINISH();
+#include "application/network/custom_yojimbo_factory.h"
 
 class GameAdapter : public yojimbo::Adapter {
 public:
@@ -101,8 +144,8 @@ public:
         return YOJIMBO_NEW(allocator, GameMessageFactory, allocator);
     }
 
-	void OnServerClientConnected(const client_id_type clientIndex) override;
-	void OnServerClientDisconnected(const client_id_type clientIndex) override;
+	void OnServerClientConnected(client_id_type clientIndex) override;
+	void OnServerClientDisconnected(client_id_type clientIndex) override;
    
 private:
     server_adapter* m_server;
@@ -118,14 +161,14 @@ class server_adapter {
 
 	friend GameAdapter;
 
-	void client_connected(const client_id_type id);
-	void client_disconnected(const client_id_type id);
+	void client_connected(client_id_type id);
+	void client_disconnected(client_id_type id);
 
 	template <class F>
 	void process_connections_disconnections(F&& message_callback);
 
 	template <class F>
-	callback_result process_message(client_id_type id, yojimbo::Message&, F&& message_callback);
+	callback_result process_message(const client_id_type& id, yojimbo::Message&, F&& message_callback);
 
 public:
 	server_adapter(const server_start_input&);
@@ -137,10 +180,14 @@ public:
 	);
 
 	bool is_running() const;
+	bool can_send_message(const client_id_type&, const game_channel_type&) const;
 
-	bool is_client_connected(const client_id_type id) const;
+	template <class T>
+	void send_message(const client_id_type& client_id, const game_channel_type& channel_id, T&& message_setter);
 
-	void disconnect_client(const client_id_type id);
+	bool is_client_connected(const client_id_type& id) const;
+
+	void disconnect_client(const client_id_type& id);
 
 	auto& get_specific() {
 		return server;

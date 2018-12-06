@@ -1,6 +1,7 @@
 #pragma once
 #include "application/network/network_adapters.h"
 #include "augs/enums/callback_result.h"
+#include "augs/templates/traits/function_traits.h"
 
 template <class F>
 void server_adapter::process_connections_disconnections(F&& message_callback) {
@@ -56,19 +57,41 @@ void server_adapter::advance(const double server_time, F&& message_callback) {
 }
 
 template <class F>
-callback_result server_adapter::process_message(const client_id_type id, yojimbo::Message& m, F&& message_callback) {
+callback_result server_adapter::process_message(const client_id_type& client_id, yojimbo::Message& m, F&& message_callback) {
 	using namespace net_messages;
 
-    switch (m.GetType()) {
-    case (int)GameMessageType::INITIAL_SOLVABLE:
-		return message_callback(id, (initial_solvable&)m);
-	case (int)GameMessageType::STEP_ENTROPY:
-		return message_callback(id, (step_entropy&)m);
+	const auto type = m.GetType();
 
-	case (int)GameMessageType::CLIENT_ENTROPY:
-		return message_callback(id, (client_entropy&)m);
+	using I = net_messages::id_t;
+	using Idx = I::index_type;
 
-    default:
+	if (static_cast<Idx>(type) >= I::max_index_v) {
 		return callback_result::ABORT;
-    }
+	}
+
+	I id;
+	id.set_index(static_cast<Idx>(type));
+
+	return id.dispatch(
+		[&](auto* e) -> callback_result {
+			using E = remove_cptr<decltype(e)>;
+
+			return message_callback(client_id, (E&)m);
+		}
+	);
+}
+
+template <class T>
+void server_adapter::send_message(const client_id_type& client_id, const game_channel_type& channel_id, T&& message_setter) {
+	using message_type = remove_cref<argument_t<remove_cref<T>, 0>>;
+	const auto idx = net_messages::id_t::of<message_type>().get_index();
+
+	const auto idx_int = static_cast<int>(idx);
+	const auto channel_id_int = static_cast<channel_id_type>(channel_id);
+
+	if (const auto new_message = (message_type*)server.CreateMessage(client_id, idx_int)) {
+		auto& m = *new_message;
+		message_setter(m);
+		server.SendMessage(client_id, channel_id_int, std::addressof(m));
+	}
 }

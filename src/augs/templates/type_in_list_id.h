@@ -5,6 +5,7 @@
 #include "augs/templates/transform_types.h"
 #include "augs/templates/hash_fwd.h"
 #include "augs/templates/remove_cref.h"
+#include "augs/ensure.h"
 
 namespace augs {
 	struct introspection_access;
@@ -31,9 +32,9 @@ template <class List>
 class type_in_list_id {
 public:
 	using list_type = replace_list_type_t<List, type_list>;
+	using index_type = unsigned;
 private:
 
-	using index_type = unsigned;
 	friend augs::introspection_access;
 	static constexpr unsigned dead_value = static_cast<unsigned>(-1);
 	// GEN INTROSPECTOR class type_in_list_id class L
@@ -45,6 +46,8 @@ private:
 		static_assert(is_one_of_list_v<T, list_type>, "The type list does not contain the specified type!");
 	}
 public:
+
+	static constexpr unsigned max_index_v = num_types_in_list_v<list_type>;
 
 	template <class T>
 	static auto get_index_of() {
@@ -60,7 +63,7 @@ public:
 	}
 
 	bool is_set() const {
-		return index < num_types_in_list_v<list_type>;
+		return index < max_index_v;
 	}
 
 	void unset() {
