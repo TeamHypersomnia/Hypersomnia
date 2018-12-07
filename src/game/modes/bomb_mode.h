@@ -340,6 +340,9 @@ private:
 
 	void handle_game_commencing(input, logic_step);
 
+	template <class S>
+	static auto find_player_by_impl(S& self, const entity_name_str& chosen_name);
+
 public:
 
 	// GEN INTROSPECTOR class bomb_mode
@@ -413,6 +416,7 @@ public:
 	void post_award(input, mode_player_id, money_type amount);
 
 	bomb_mode_player* find_player_by(const entity_name_str& chosen_name);
+	const bomb_mode_player* find_player_by(const entity_name_str& chosen_name) const;
 
 	bomb_mode_player* find(const mode_player_id&);
 	const bomb_mode_player* find(const mode_player_id&) const;

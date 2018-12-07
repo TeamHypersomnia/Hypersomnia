@@ -2,6 +2,8 @@
 #include "application/setups/server/server_vars.h"
 #include "augs/network/network_types.h"
 
+#include "application/network/requested_client_settings.h"
+
 struct server_client_state {
 	enum class type {
 		INVALID,
@@ -14,6 +16,7 @@ struct server_client_state {
 
 	type state = type::INVALID;
 	net_time_t last_valid_activity_time = -1.0;
+	requested_client_settings settings;
 
 	server_client_state() = default;
 

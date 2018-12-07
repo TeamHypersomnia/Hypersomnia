@@ -1830,8 +1830,11 @@ void bomb_mode::request_restart() {
 	state = arena_mode_state::INIT;
 }
 
-bomb_mode_player* bomb_mode::find_player_by(const entity_name_str& chosen_name) {
-	for (auto& it : players) {
+template <class S>
+auto bomb_mode::find_player_by_impl(S& self, const entity_name_str& chosen_name) {
+	using R = maybe_const_ptr_t<std::is_const_v<S>, bomb_mode_player>;
+
+	for (auto& it : self.players) {
 		auto& player_data = it.second;
 
 		if (player_data.chosen_name == chosen_name) {
@@ -1839,7 +1842,15 @@ bomb_mode_player* bomb_mode::find_player_by(const entity_name_str& chosen_name) 
 		}
 	}
 
-	return nullptr;
+	return R(nullptr);
+}
+
+bomb_mode_player* bomb_mode::find_player_by(const entity_name_str& chosen_name) {
+	return find_player_by_impl(*this, chosen_name);
+}
+
+const bomb_mode_player* bomb_mode::find_player_by(const entity_name_str& chosen_name) const {
+	return find_player_by_impl(*this, chosen_name);
 }
 
 void bomb_mode::restart(const input_type in, const logic_step step) {

@@ -10,6 +10,13 @@
 /* To avoid incomplete type error */
 server_setup::~server_setup() = default;
 
+mode_player_id server_setup::to_mode_player_id(const client_id_type& id) {
+	mode_player_id out;
+	out.value = static_cast<mode_player_id::id_value_type>(id);
+
+	return out;
+}
+
 void server_setup::deal_with_malicious_client(const client_id_type id) {
 	LOG("Malicious client detected. Details:\n%x", describe_client(id));
 }
@@ -93,17 +100,92 @@ void server_setup::accept_game_gui_events(const game_gui_entropy_type&) {
 
 }
 
-bool server_setup::add_to_arena(const client_id_type& client_id, const net_messages::client_welcome& msg) {
-	(void)client_id;
-	(void)msg;
-
+bool server_setup::add_to_arena(add_to_arena_input) {
 	return true;
 }
 
-void server_setup::advance_internal(const setup_advance_input& in) {
+void server_setup::disconnect_and_unset(const client_id_type& id) {
+	server->disconnect_client(id);
+	clients[id].unset();
+}
+
+void server_setup::advance_clients_state(const setup_advance_input& in) {
 	(void)in;
 
-	auto do_disconnect_client = [&](const client_id_type& id) {
+	/* Do it only once per tick */
+	bool added_someone_already = false;
+	bool removed_someone_already = false;
+
+	for (auto& c : clients) {
+		if (!c.is_set()) {
+			continue;
+		}
+
+		const auto client_id = static_cast<client_id_type>(index_in(clients, c));
+
+		auto add_client_if_not_yet_in_mode = [&]() {
+			const auto mode_id = to_mode_player_id(client_id);
+
+			auto final_nickname = on_mode(
+				[&](const auto& typed_mode) -> std::string {
+					if (nullptr == typed_mode.find(mode_id)) {
+						auto nickname = std::string(c.settings.chosen_nickname);
+
+						while (typed_mode.find_player_by(nickname)) {
+							nickname += std::to_string(client_id);
+						}
+
+						return nickname;
+					}
+
+					return "";
+				}
+			);
+
+			if (final_nickname.size() > 0) {
+				mode_entropy_general cmd;
+
+				cmd.added_player = add_player_input {
+					mode_id,
+					std::move(final_nickname),
+					faction_type::SPECTATOR
+				};
+
+				total_collected.control(cmd);
+				added_someone_already = true;
+			}
+		};
+
+		auto kick_if_afk = [&](){
+			const auto mode_id = to_mode_player_id(client_id);
+
+			if (c.should_kick_due_to_inactivity(vars, server_time)) {
+				disconnect_and_unset(client_id);
+
+				mode_entropy_general cmd;
+				cmd.removed_player = mode_id;
+
+				total_collected.control(cmd);
+				removed_someone_already = true;
+			}
+		};
+
+		if (!added_someone_already) {
+			if (c.state != server_client_state::type::PENDING_WELCOME) {
+				add_client_if_not_yet_in_mode();
+			}
+		}
+
+		if (!removed_someone_already) {
+			kick_if_afk();
+		}
+	}
+}
+
+void server_setup::handle_client_messages(const setup_advance_input& in) {
+	(void)in;
+
+	auto unset_client = [&](const client_id_type& id) {
 		if (auto& c = clients[id]; c.is_set()) {
 			/* 
 				A client might have disconnected during message processing. 
@@ -127,8 +209,8 @@ void server_setup::advance_internal(const setup_advance_input& in) {
 		using M = remove_cref<decltype(message)>;
 
 		auto stop_processing_this_client = [&]() {
-			do_disconnect_client(id);
-			return callback_result::ABORT;
+			unset_client(id);
+			return message_handler_result::ABORT_AND_DISCONNECT;
 		};
 
 		if constexpr(std::is_same_v<M, connection_event_type>) {
@@ -140,7 +222,7 @@ void server_setup::advance_internal(const setup_advance_input& in) {
 				LOG("Client connected. Details:\n%x", describe_client(id));
 			}
 			else {
-				do_disconnect_client(id);
+				unset_client(id);
 			}
 		}
 		else {
@@ -159,10 +241,7 @@ void server_setup::advance_internal(const setup_advance_input& in) {
 			}
 			else if constexpr (std::is_same_v<M, N::client_welcome>) {
 				if (c.state == S::PENDING_WELCOME) {
-					if (!add_to_arena(id, message)) {
-						return stop_processing_this_client();
-					}
-
+					// TODO: check if this is handled when we connect with < 3 characters as nickname
 					auto message_provider = [&](net_messages::initial_steps& msg) {
 						(void)msg;
 					};
@@ -171,37 +250,41 @@ void server_setup::advance_internal(const setup_advance_input& in) {
 
 					c.state = S::RECEIVING_INITIAL_STATE;
 				}
+
+				/* A client might re-state its requested settings */
+
+				c.settings = static_cast<const requested_client_settings&>(message);
+				c.last_valid_activity_time = server_time;
 			}
 			else if constexpr (std::is_same_v<M, N::client_entropy>) {
 				if (c.state != S::IN_GAME) {
-					// TODO: ensure that receiving initial state has ended
 					return stop_processing_this_client();
 				}
+
+				c.last_valid_activity_time = server_time;
 			}
 			else {
 				static_assert(always_false_v<M>, "Unhandled message type.");
 			}
 		}
 
-		return callback_result::CONTINUE;
+		return message_handler_result::CONTINUE;
 	};
 
 	server->advance(server_time, message_callback);
 }
 
-double server_setup::get_inv_tickrate() const {
-	return std::visit(
-		[&](const auto& typed_mode) {
-			using M = remove_cref<decltype(typed_mode)>;
+void server_setup::advance_internal(const setup_advance_input& in) {
+	(void)in;
 
-			if constexpr(supports_mode_v<M>) {
-				return typed_mode.round_speeds.calc_inv_tickrate();
-			}
-			else {
-				ensure(false && "Unsupported mode on the server!");
-				return 1 / 60.0;
-			}
-		},
-		current_mode.state
+	handle_client_messages(in);
+	advance_clients_state(in);
+}
+
+double server_setup::get_inv_tickrate() const {
+	return on_mode(
+		[&](const auto& typed_mode) {
+			return typed_mode.round_speeds.calc_inv_tickrate();
+		}
 	);
 }

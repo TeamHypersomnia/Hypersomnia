@@ -28,13 +28,18 @@ namespace net_messages {
 	struct client_welcome;
 }
 
+struct add_to_arena_input {
+	client_id_type client_id;
+	entity_name_str nickname;
+};
+
 class server_adapter;
 
 class server_setup : public default_setup_settings {
 	intercosm scene;
 	predefined_rulesets rulesets;
 
-	mode_and_rules current_mode;
+	server_mode_and_rules current_mode;
 
 	entropy_accumulator total_collected;
 	entity_id viewed_character_id;
@@ -46,12 +51,22 @@ class server_setup : public default_setup_settings {
 	net_time_t server_time = 0.0;
 	server_vars vars;
 
-	template <class E, class A, class C, class F>
+	template <class S, class F>
 	static decltype(auto) on_mode_with_input_impl(
-		E& self,
-		const A& all_vars,
-		C& cosm,
+		S& self,
 		F&& callback
+	);
+
+	void advance_internal(
+		const setup_advance_input& in
+	);
+
+	void handle_client_messages(
+		const setup_advance_input& in
+	);
+
+	void advance_clients_state(
+		const setup_advance_input& in
 	);
 
 public:
@@ -59,15 +74,14 @@ public:
 	static constexpr bool handles_window_input = false;
 	static constexpr bool has_additional_highlights = false;
 
-	template <class M>
-	static constexpr bool supports_mode_v = !std::is_same_v<M, test_mode>;
-
 	server_setup(
 		sol::state& lua,
 		const server_start_input&
 	);
 
 	~server_setup();
+
+	static mode_player_id to_mode_player_id(const client_id_type&);
 
 	auto get_audiovisual_speed() const {
 		return 1.0;
@@ -103,7 +117,7 @@ public:
 
 	void choose_arena(const std::string& name);
 
-	bool add_to_arena(const client_id_type&, const net_messages::client_welcome&);
+	bool add_to_arena(add_to_arena_input);
 	void remove_from_arena(const client_id_type&);
 
 	std::string describe_client(const client_id_type id) const;
@@ -114,10 +128,6 @@ public:
 	}
 
 	double get_inv_tickrate() const;
-
-	void advance_internal(
-		const setup_advance_input& in
-	);
 
 	template <class C>
 	void advance(
@@ -169,4 +179,26 @@ public:
 	void draw_custom_gui(const draw_setup_gui_input&) {}
 
 	void ensure_handler() {}
+
+	template <class... Args>
+	decltype(auto) on_mode_with_input(Args&&... args) {
+		return on_mode_with_input_impl(*this, std::forward<Args>(args)...);
+	}
+
+	template <class... Args>
+	decltype(auto) on_mode_with_input(Args&&... args) const {
+		return on_mode_with_input_impl(*this, std::forward<Args>(args)...);
+	}
+
+	template <class F>
+	decltype(auto) on_mode(F&& f) {
+		return std::visit(std::forward<F>(f), current_mode.state);
+	}
+
+	template <class F>
+	decltype(auto) on_mode(F&& f) const {
+		return std::visit(std::forward<F>(f), current_mode.state);
+	}
+
+	void disconnect_and_unset(const client_id_type&);
 };

@@ -2351,3 +2351,10 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- then dispatch
 	- then we dont need the enums whatsoever and write a simple wrapper in net adapter for creating messages passing the type once
 
+- dont use guids in the bomb mode, its pointless
+	- entity guids are pointless overall for now
+
+- put defs for net serialization in hpp, not much to be gained really from a separate cpp file, and we'll have simplicity
+
+- Pre-serialized messages
+

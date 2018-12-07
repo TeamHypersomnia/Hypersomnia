@@ -8,7 +8,7 @@ void server_adapter::process_connections_disconnections(F&& message_callback) {
 	for (const auto& p : pending_events) {
 		const auto result = message_callback(p.subject_id, p.type);
 
-		ensure(result == callback_result::CONTINUE);
+		ensure(result == message_handler_result::CONTINUE);
 		(void)result;
 	}
 
@@ -41,7 +41,7 @@ void server_adapter::advance(const double server_time, F&& message_callback) {
 					const auto result = process_message(i, *message, std::forward<F>(message_callback));
                     server.ReleaseMessage(i, message);
 
-					if (result == callback_result::ABORT) {
+					if (result == message_handler_result::ABORT_AND_DISCONNECT) {
 						j = connection_config.numChannels;
 						server.DisconnectClient(i);
 						break;
@@ -57,7 +57,7 @@ void server_adapter::advance(const double server_time, F&& message_callback) {
 }
 
 template <class F>
-callback_result server_adapter::process_message(const client_id_type& client_id, yojimbo::Message& m, F&& message_callback) {
+message_handler_result server_adapter::process_message(const client_id_type& client_id, yojimbo::Message& m, F&& message_callback) {
 	using namespace net_messages;
 
 	const auto type = m.GetType();
@@ -66,14 +66,14 @@ callback_result server_adapter::process_message(const client_id_type& client_id,
 	using Idx = I::index_type;
 
 	if (static_cast<Idx>(type) >= I::max_index_v) {
-		return callback_result::ABORT;
+		return message_handler_result::ABORT_AND_DISCONNECT;
 	}
 
 	I id;
 	id.set_index(static_cast<Idx>(type));
 
 	return id.dispatch(
-		[&](auto* e) -> callback_result {
+		[&](auto* e) -> message_handler_result {
 			using E = remove_cptr<decltype(e)>;
 
 			return message_callback(client_id, (E&)m);

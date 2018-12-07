@@ -8,18 +8,6 @@
 
 #include "augs/readwrite/byte_readwrite.h"
 
-void mode_and_rules::choose(const ruleset_id& id) {
-	rules_id = id.raw;
-
-	id.type_id.dispatch(
-		[&](auto m) {
-			using M = decltype(m);
-
-			state.emplace<M>();
-		}
-	);
-}
-
 template <class C>
 void make_redoable_for_different_solvable(
 	const editor_command_input& in,

@@ -6,18 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- dont use guids in the bomb mode, its pointless
-	- entity guids are pointless overall for now
-
-- put defs for net serialization in hpp, not much to be gained really from a separate cpp file, and we'll have simplicity
-
 - Notice that serialization of mode entropy will be a lot more complicated on the server
 	- So, we will have completely separate funcs for read and write
 	- We might later write player entropies from the one that posts the most messages
 		- we will check the bounds for the message anyways and drop later entropies for now
 	- E.g. we will calculate client ids by looking for them in the modes
-
-- Pre-serialized messages
 
 - Properly send initial state on connection
 	- Serialize right away and hold std::vector<std::byte> in the message structure

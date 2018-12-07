@@ -1,11 +1,27 @@
 #pragma once
 #include "game/modes/all_mode_includes.h"
+#include "augs/templates/folded_finders.h"
 
-struct mode_and_rules {
-	// GEN INTROSPECTOR struct mode_and_rules
-	all_modes_variant state = bomb_mode();
+template <class VariantType>
+struct basic_mode_and_rules {
+	// GEN INTROSPECTOR struct basic_mode_and_rules class VariantType
+	VariantType state = bomb_mode();
 	raw_ruleset_id rules_id = raw_ruleset_id();
 	// END GEN INTROSPECTOR
 
-	void choose(const ruleset_id&);
+	void choose(const ruleset_id& id) {
+		id.type_id.dispatch(
+			[&](auto typed_default_mode) {
+				using M = decltype(typed_default_mode);
+
+				if constexpr(is_one_of_list_v<M, VariantType>) {
+					state.template emplace<M>(std::move(typed_default_mode));
+					rules_id = id.raw;
+				}
+			}
+		);
+	}
 };
+
+using mode_and_rules = basic_mode_and_rules<all_modes_variant>;
+using server_mode_and_rules = basic_mode_and_rules<all_server_modes_variant>;

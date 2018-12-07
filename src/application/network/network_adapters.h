@@ -7,6 +7,8 @@
 #include "augs/enums/callback_result.h"
 #include "augs/ensure.h"
 
+#include "application/network/requested_client_settings.h"
+
 constexpr std::size_t chosen_packet_size_v = 1024;
 
 constexpr std::size_t total_header_bytes_v = 
@@ -19,6 +21,11 @@ constexpr std::size_t total_header_bytes_v =
 constexpr std::size_t max_message_size_v = ((chosen_packet_size_v - total_header_bytes_v) / 4) * 4;
 
 #include "application/network/network_serialization.h"
+
+enum class message_handler_result {
+	ABORT_AND_DISCONNECT,
+	CONTINUE
+};
 
 enum class connection_event_type {
 	CONNECTED,
@@ -82,12 +89,9 @@ namespace net_messages {
 		static constexpr bool client_to_server = true;
 	};
 
-	struct client_welcome : public yojimbo::Message {
+	struct client_welcome : public yojimbo::Message, public requested_client_settings {
 		static constexpr bool server_to_client = false;
 		static constexpr bool client_to_server = true;
-
-		static constexpr std::size_t buf_len = max_nickname_length_v + 1;
-		char chosen_nickname[buf_len];
 
 		template <typename Stream>
 		bool Serialize(Stream& stream) {
@@ -161,7 +165,7 @@ class server_adapter {
 	void process_connections_disconnections(F&& message_callback);
 
 	template <class F>
-	callback_result process_message(const client_id_type& id, yojimbo::Message&, F&& message_callback);
+	message_handler_result process_message(const client_id_type& id, yojimbo::Message&, F&& message_callback);
 
 public:
 	server_adapter(const server_start_input&);
