@@ -1119,6 +1119,27 @@ void bomb_mode::process_win_conditions(const input_type in, const logic_step ste
 	}
 }
 
+void bomb_mode::handle_special_commands(const input_type in, const mode_entropy& entropy, const logic_step step) {
+	const auto& g = entropy.general;
+
+	std::visit(
+		[&](const auto& cmd) {
+			using C = remove_cref<decltype(cmd)>;
+
+			if constexpr(std::is_same_v<C, std::monostate>) {
+
+			}
+			else if constexpr(std::is_same_v<C, mode_restart_command>) {
+				restart(in, step);
+			}
+			else {
+				static_assert(always_false_v<C>, "Unhandled command type!");
+			}
+		},
+		g.special_command
+	);
+}
+
 void bomb_mode::add_or_remove_players(const input_type in, const mode_entropy& entropy, const logic_step step) {
 	(void)step;
 
@@ -1438,6 +1459,7 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 
 	spawn_and_kick_bots(in, step);
 	add_or_remove_players(in, entropy, step);
+	handle_special_commands(in, entropy, step);
 	spawn_recently_added_players(in, step);
 
 	if (in.rules.allow_game_commencing) {

@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- general mode command list
+	- don't make a namespace for them
+	
+	
 - custom factory in separate file to not mess up formatting
 	- simply cast int to type index in type_in_list_id
 	- type_list with all message types

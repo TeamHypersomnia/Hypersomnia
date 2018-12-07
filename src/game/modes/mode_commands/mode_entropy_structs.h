@@ -9,3 +9,14 @@ struct add_player_input {
 	faction_type faction = faction_type::SPECTATOR;
 	// END GEN INTROSPECTOR
 };
+
+struct mode_restart_command {
+	// GEN INTROSPECTOR struct mode_restart_command
+	pad_bytes<1> pad;
+	// END GEN INTROSPECTOR
+};
+
+using all_general_mode_commands_variant = std::variant<
+	std::monostate,
+	mode_restart_command
+>;	

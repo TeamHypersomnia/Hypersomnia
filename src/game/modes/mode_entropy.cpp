@@ -1,3 +1,4 @@
+#include "augs/templates/traits/variant_traits.h"
 #include "game/modes/mode_entropy.h"
 
 void mode_entropy::accumulate(
@@ -51,10 +52,15 @@ void mode_entropy::clear() {
 void mode_entropy_general::clear() {
 	added_player.reset();
 	removed_player.reset();
+	special_command = std::monostate();
 }
 
 bool mode_entropy_general::empty() const {
-	return added_player == std::nullopt && removed_player == std::nullopt;
+	return 
+		added_player == std::nullopt 
+		&& removed_player == std::nullopt 
+		&& holds_monostate(special_command)
+	;
 }
 
 bool mode_entropy::empty() const {
@@ -86,6 +92,10 @@ mode_entropy_general& mode_entropy_general::operator+=(const mode_entropy_genera
 
 	override_if(added_player, b.added_player);
 	override_if(removed_player, b.removed_player);
+
+	if (!holds_monostate(b.special_command)) {
+		special_command = b.special_command;
+	}
 
 	return *this;
 }

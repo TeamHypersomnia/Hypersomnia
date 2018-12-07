@@ -39,6 +39,7 @@ struct mode_entropy_general {
 	// GEN INTROSPECTOR struct mode_entropy_general
 	std::optional<add_player_input> added_player;
 	std::optional<mode_player_id> removed_player;
+	all_general_mode_commands_variant special_command;
 	// END GEN INTROSPECTOR
 
 	mode_entropy_general& operator+=(const mode_entropy_general& b);

@@ -337,6 +337,7 @@ private:
 
 	void execute_player_commands(input, const mode_entropy&, logic_step);
 	void add_or_remove_players(input, const mode_entropy&, logic_step);
+	void handle_special_commands(input, const mode_entropy&, logic_step);
 	void spawn_recently_added_players(input, logic_step);
 	void spawn_and_kick_bots(input, logic_step);
 
