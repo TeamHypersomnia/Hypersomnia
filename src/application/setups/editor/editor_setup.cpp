@@ -135,7 +135,7 @@ void editor_setup::override_viewed_entity(const entity_id overridden_id) {
 	if (anything_opened()) {
 		on_mode_with_input(
 			[&](const auto& typed_mode, const auto&) {
-				if (const auto id = typed_mode.lookup(work().world[overridden_id].get_guid()); id.is_set()) {
+				if (const auto id = typed_mode.lookup(work().world[overridden_id]); id.is_set()) {
 					view().local_player_id = id;
 					view().overridden_viewed = {};
 				}

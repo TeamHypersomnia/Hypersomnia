@@ -88,9 +88,7 @@ mode_player_entropy arena_gui_state::perform_imgui(
 			}
 
 			if (const auto p = typed_mode.find(mode_in.local_player_id)) {
-				const auto guid = p->guid;
-
-				if (const auto this_player_handle = cosm[guid]) {
+				if (const auto this_player_handle = cosm[p->controlled_character_id]) {
 					const auto choice = buy_menu.perform_imgui({
 						this_player_handle,
 						mode_input.rules.view.money_icon,
@@ -263,9 +261,7 @@ void arena_gui_state::draw_mode_gui(
 
 				auto get_col = [&](const mode_player_id id) {
 					if (const auto p = typed_mode.find(id)) {
-						const auto guid = p->guid;
-
-						if (const auto this_player_handle = cosm[guid]) {
+						if (const auto this_player_handle = cosm[p->controlled_character_id]) {
 							return in.config.faction_view.colors[this_player_handle.get_official_faction()].standard;
 						}
 					}

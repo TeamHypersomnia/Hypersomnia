@@ -150,7 +150,7 @@ public:
 		return on_mode_with_input_impl(*this, std::forward<Args>(args)...);
 	}
 
-	entity_guid lookup_character(mode_player_id) const;
+	mode_entity_id lookup_character(mode_player_id) const;
 
 	using revision_type = editor_history::index_type;
 

@@ -9,6 +9,8 @@
 #include "game/detail/economy/money_type.h"
 #include "game/modes/detail/item_purchase_structs.h"
 
+using mode_entity_id = entity_id;
+
 struct arena_mode_win {
 	// GEN INTROSPECTOR struct arena_mode_win
 	augs::stepped_clock when;

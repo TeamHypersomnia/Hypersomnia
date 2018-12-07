@@ -104,7 +104,7 @@ mode_entropy_general editor_modes_gui::perform(const editor_settings& settings, 
 								const auto this_player_label = typesafe_sprintf("%x (id: %x)", p.second.chosen_name, p.first.value);
 
 								if (const auto this_player_node = scoped_tree_node(this_player_label.c_str())) {
-									const auto player_handle = cosm[p.second.guid];
+									const auto player_handle = cosm[p.second.controlled_character_id];
 									const auto character_name = player_handle.alive() ? player_handle.get_name() : "dead";
 									text(typesafe_sprintf("Corresponding character name: %x", character_name));
 

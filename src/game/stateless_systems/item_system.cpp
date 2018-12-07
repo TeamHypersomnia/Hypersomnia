@@ -83,7 +83,7 @@ auto calc_reloading_context(const E& capability) {
 			auto is_better = [&](const auto& charges, const auto& candidate) {
 				if (charges == best_num_charges) {
 					/* Break ties with creation time */
-					return candidate.when_born().step < cosm[best_mag].when_born().step;
+					return candidate.get_id().raw.indirection_index < best_mag.raw.indirection_index;
 				}
 
 				return charges > best_num_charges;

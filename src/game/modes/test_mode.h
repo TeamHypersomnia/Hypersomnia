@@ -6,6 +6,8 @@
 #include "game/modes/mode_entropy.h"
 #include "game/modes/mode_player_id.h"
 
+using mode_entity_id = entity_id;
+
 struct entity_guid;
 struct entity_id;
 
@@ -31,10 +33,10 @@ struct test_mode_ruleset {
 
 struct test_mode_player {
 	// GEN INTROSPECTOR struct test_mode_player
-	entity_guid guid;
+	mode_entity_id controlled_character_id;
 	// END GEN INTROSPECTOR
 
-	test_mode_player(const entity_guid guid = entity_guid()) : guid(guid) {}
+	test_mode_player(const mode_entity_id controlled_character_id = mode_entity_id()) : controlled_character_id(controlled_character_id) {}
 };
 
 class test_mode {
@@ -57,15 +59,15 @@ private:
 public:
 	// GEN INTROSPECTOR class test_mode
 	unsigned current_spawn_index = 0;
-	std::vector<entity_guid> pending_inits;
+	std::vector<mode_entity_id> pending_inits;
 	std::unordered_map<mode_player_id, test_mode_player> players;
 	// END GEN INTROSPECTOR
 
 	mode_player_id add_player(input, const faction_type);
 	void remove_player(input, mode_player_id);
 
-	entity_guid lookup(const mode_player_id&) const;
-	mode_player_id lookup(const entity_guid&) const;
+	mode_entity_id lookup(const mode_player_id&) const;
+	mode_player_id lookup(const mode_entity_id&) const;
 
 	void request_restart() { players.clear(); }
 

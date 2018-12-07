@@ -50,7 +50,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 					return;
 				}
 
-				const auto global_time = cosm.get_total_seconds_passed() + real32(subject.get_guid());
+				const auto global_time = cosm.get_total_seconds_passed() + real32(subject.get_id().raw.indirection_index);
 				const auto global_time_sine = std::sin(global_time * 2);
 
 				const auto max_speed_boost = def.sine_speed_boost;

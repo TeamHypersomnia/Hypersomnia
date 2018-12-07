@@ -79,7 +79,7 @@ using mode_field_type_id  = type_in_list_id<
 	type_list<
 		augs::trivial_type_marker,
 		std::string,
-		std::vector<entity_guid>,
+		std::vector<mode_entity_id>,
 		std::vector<entity_name_str>,
 		arena_mode_knockouts_vector,
 		arena_mode_awards_vector,

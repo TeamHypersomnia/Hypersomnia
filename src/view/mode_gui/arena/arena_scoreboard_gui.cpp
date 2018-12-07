@@ -377,7 +377,7 @@ void arena_scoreboard_gui::draw_gui(
 			const auto& player_id = p.second;
 			const auto& player_data = p.first;
 
-			const auto player_handle = cosm[player_data.guid];
+			const auto player_handle = cosm[player_data.controlled_character_id];
 			const auto is_conscious = player_handle.alive() && player_handle.template get<components::sentience>().is_conscious();
 
 			const auto local_player_faction = [&]() {

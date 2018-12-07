@@ -9,17 +9,17 @@
 
 using input_type = test_mode::input;
 
-entity_guid test_mode::lookup(const mode_player_id& id) const {
+mode_entity_id test_mode::lookup(const mode_player_id& id) const {
 	if (const auto entry = mapped_or_nullptr(players, id)) {
-		return entry->guid;
+		return entry->controlled_character_id;
 	}
 
-	return entity_guid::dead();
+	return mode_entity_id::dead();
 }
 
-mode_player_id test_mode::lookup(const entity_guid& guid) const {
+mode_player_id test_mode::lookup(const entity_id& controlled_character_id) const {
 	for (const auto& p : players) {
-		if (p.second.guid == guid) {
+		if (p.second.controlled_character_id == controlled_character_id) {
 			return p.first;
 		}
 	}
@@ -82,11 +82,11 @@ mode_player_id test_mode::add_player(input_type in, const faction_type faction) 
 			entity_flavour_id(flavour), 
 			[&](const auto new_character, auto&&...) {
 				teleport_to_next_spawn(in, new_character);
-				pending_inits.push_back(new_character.get_guid());
+				pending_inits.push_back(new_character);
 
 				cosmic::set_specific_name(new_character, "Player");
 
-				players.try_emplace(new_id, new_character.get_guid());
+				players.try_emplace(new_id, new_character);
 			},
 			[](auto&&...) {}
 		)) {
@@ -98,8 +98,8 @@ mode_player_id test_mode::add_player(input_type in, const faction_type faction) 
 }
 
 void test_mode::remove_player(input_type in, const mode_player_id id) {
-	const auto guid = lookup(id);
-	cosmic::delete_entity(in.cosm[guid]);
+	const auto controlled_character_id = lookup(id);
+	cosmic::delete_entity(in.cosm[controlled_character_id]);
 
 	erase_element(players, id);
 }

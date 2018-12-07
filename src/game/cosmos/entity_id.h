@@ -106,6 +106,10 @@ struct entity_id {
 		const child_entity_id& id
 	);
 
+	static auto dead() {
+		return entity_id();
+	}
+
 	bool operator==(const entity_id b) const {
 		return type_id == b.type_id && raw == b.raw;
 	}

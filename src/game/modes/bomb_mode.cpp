@@ -339,9 +339,9 @@ bool bomb_mode_player::is_set() const {
 }
 
 void bomb_mode::remove_player(input_type in, const mode_player_id& id) {
-	const auto guid = lookup(id);
+	const auto controlled_character_id = lookup(id);
 
-	if (const auto handle = in.cosm[guid]) {
+	if (const auto handle = in.cosm[controlled_character_id]) {
 		deletion_queue q;
 		q.push_back(handle.get_id());
 
@@ -357,12 +357,12 @@ void bomb_mode::remove_player(input_type in, const mode_player_id& id) {
 	erase_element(players, id);
 }
 
-entity_guid bomb_mode::lookup(const mode_player_id& id) const {
+mode_entity_id bomb_mode::lookup(const mode_player_id& id) const {
 	if (const auto entry = find(id)) {
-		return entry->guid;
+		return entry->controlled_character_id;
 	}
 
-	return entity_guid::dead();
+	return mode_entity_id::dead();
 }
 
 void bomb_mode::reshuffle_spawns(const cosmos& cosm, const faction_type faction) {
@@ -371,12 +371,12 @@ void bomb_mode::reshuffle_spawns(const cosmos& cosm, const faction_type faction)
 	auto& faction_state = factions[faction];
 
 	auto& spawns = faction_state.shuffled_spawns;
-	const auto last_spawn = spawns.empty() ? entity_guid() : spawns.back();
+	const auto last_spawn = spawns.empty() ? mode_entity_id::dead() : spawns.back();
 
 	spawns.clear();
 
 	auto adder = [&](const auto typed_spawn) {
-		spawns.push_back(typed_spawn.get_guid());
+		spawns.push_back(typed_spawn);
 	};
 
 	for_each_faction_spawn(cosm, faction, adder);
@@ -395,7 +395,7 @@ void bomb_mode::reshuffle_spawns(const cosmos& cosm, const faction_type faction)
 template <class C, class F>
 void bomb_mode::for_each_player_handle_in(C& cosm, const faction_type faction, F&& callback) const {
 	for_each_player_in(faction, [&](const auto&, const auto& data) {
-		if (const auto handle = cosm[data.guid]) {
+		if (const auto handle = cosm[data.controlled_character_id]) {
 			return handle.template dispatch_on_having_all_ret<components::sentience>([&](const auto& typed_player) {
 				if constexpr(is_nullopt_v<decltype(typed_player)>) {
 					return callback_result::CONTINUE;
@@ -413,7 +413,7 @@ void bomb_mode::for_each_player_handle_in(C& cosm, const faction_type faction, F
 template <class C, class F>
 decltype(auto) bomb_mode::on_player_handle(C& cosm, const mode_player_id& id, F&& callback) const {
 	if (const auto player_data = find(id)) {
-		if (const auto handle = cosm[player_data->guid]) {
+		if (const auto handle = cosm[player_data->controlled_character_id]) {
 			return callback(handle);
 		}
 	}
@@ -471,7 +471,7 @@ void bomb_mode::set_players_frozen(const input_type in, const bool flag) {
 	for (auto& it : players) {
 		auto& player_data = it.second;
 
-		if (const auto handle = in.cosm[player_data.guid]) {
+		if (const auto handle = in.cosm[player_data.controlled_character_id]) {
 			handle.set_frozen(flag);
 		}
 	}
@@ -481,7 +481,7 @@ void bomb_mode::release_triggers_of_weapons_of_players(const input_type in) {
 	for (auto& it : players) {
 		auto& player_data = it.second;
 
-		if (const auto handle = in.cosm[player_data.guid]) {
+		if (const auto handle = in.cosm[player_data.controlled_character_id]) {
 			handle.for_each_contained_item_recursive(
 				[&](const auto contained_item) {
 					unset_input_flags_of_orphaned_entity(contained_item);
@@ -608,15 +608,15 @@ entity_id bomb_mode::create_character_for_player(
 
 		if (handle.alive()) {
 			cosmic::set_specific_name(handle, p.chosen_name);
-			p.guid = handle.get_guid();
-			return handle.get_id();
+			p.controlled_character_id = handle;
+			return p.controlled_character_id;
 		}
 		else {
-			p.guid = {};
+			p.controlled_character_id.unset();
 		}
 	}
 	
-	return {};
+	return entity_id::dead();
 }
 
 void bomb_mode::setup_round(
@@ -633,7 +633,7 @@ void bomb_mode::setup_round(
 		std::unordered_map<mode_player_id, entity_id> result;
 
 		for (const auto& p : players) {
-			const auto new_id = cosm[p.second.guid].get_id();
+			const auto new_id = cosm[p.second.controlled_character_id].get_id();
 
 			if (new_id.is_set()) {
 				result.try_emplace(p.first, new_id);
@@ -726,7 +726,7 @@ bomb_mode::round_transferred_players bomb_mode::make_transferred_players(const i
 		const auto id = it.first;
 		auto& player_data = it.second;
 
-		if (const auto handle = in.cosm[player_data.guid]) {
+		if (const auto handle = in.cosm[player_data.controlled_character_id]) {
 			auto& pm = result[id];
 			pm.movement = handle.get<components::movement>().flags;
 
@@ -792,9 +792,9 @@ void bomb_mode::start_next_round(const input_type in, const logic_step step, con
 	}
 }
 
-mode_player_id bomb_mode::lookup(const entity_guid& guid) const {
+mode_player_id bomb_mode::lookup(const entity_id& controlled_character_id) const {
 	for (const auto& p : players) {
-		if (p.second.guid == guid) {
+		if (p.second.controlled_character_id == controlled_character_id) {
 			return p.first;
 		}
 	}
@@ -802,7 +802,7 @@ mode_player_id bomb_mode::lookup(const entity_guid& guid) const {
 	return mode_player_id::dead();
 }
 
-void bomb_mode::count_knockout(const input_type in, const entity_guid victim, const components::sentience& sentience) {
+void bomb_mode::count_knockout(const input_type in, const entity_id victim, const components::sentience& sentience) {
 	const auto& cosm = in.cosm;
 	const auto& clk = cosm.get_clock();
 	const auto& origin = sentience.knockout_origin;
@@ -1084,7 +1084,7 @@ void bomb_mode::process_win_conditions(const input_type in, const logic_step ste
 	if (const auto character_who_defused = cosm[get_character_who_defused_bomb(in)]) {
 		stop_bomb_detonation_theme();
 		const auto winner = p.defusing;
-		const auto defusing_player = lookup(character_who_defused.get_guid());
+		const auto defusing_player = lookup(character_who_defused);
 		++players[defusing_player].stats.bomb_defuses;
 		post_award(in, defusing_player, in.rules.economy.bomb_defuse_award);
 		make_win(in, winner);
@@ -1389,7 +1389,7 @@ void bomb_mode::spawn_and_kick_bots(const input_type in, const logic_step) {
 void bomb_mode::spawn_recently_added_players(const input_type in, const logic_step step) {
 	for (const auto& id : recently_added_players) {
 		if (const auto player_data = find(id)) {
-			if (player_data->guid.is_set()) {
+			if (player_data->controlled_character_id.is_set()) {
 				continue;
 			}
 
@@ -1594,7 +1594,7 @@ void bomb_mode::mode_post_solve(const input_type in, const mode_entropy& entropy
 						play_sound_for(in, step, battle_event::BOMB_PLANTED);
 
 						auto& planter = current_round.bomb_planter;
-						planter = lookup(cosm[typed_bomb.template get<components::sender>().capability_of_sender].get_guid());
+						planter = lookup(cosm[typed_bomb.template get<components::sender>().capability_of_sender]);
 						++players[planter].stats.bomb_plants;
 
 						post_award(in, planter, in.rules.economy.bomb_plant_award);

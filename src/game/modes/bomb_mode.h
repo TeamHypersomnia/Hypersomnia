@@ -17,9 +17,6 @@
 #include "augs/misc/timing/speed_vars.h"
 #include "game/modes/mode_commands/mode_entropy_structs.h"
 
-struct entity_guid;
-struct entity_id;
-
 class cosmos;
 struct cosmos_solvable_significant;
 
@@ -107,7 +104,7 @@ struct bomb_mode_faction_state {
 	unsigned current_spawn_index = 0;
 	unsigned score = 0;
 	unsigned consecutive_losses = 0;
-	std::vector<entity_guid> shuffled_spawns;
+	std::vector<mode_entity_id> shuffled_spawns;
 	// END GEN INTROSPECTOR
 
 	void clear_for_next_half() {
@@ -145,7 +142,7 @@ struct bomb_mode_player_stats {
 
 struct bomb_mode_player {
 	// GEN INTROSPECTOR struct bomb_mode_player
-	entity_guid guid;
+	entity_id controlled_character_id;
 	entity_name_str chosen_name;
 	faction_type faction = faction_type::SPECTATOR;
 	bomb_mode_player_stats stats;
@@ -328,7 +325,7 @@ private:
 
 	void count_knockouts_for_unconscious_players_in(input, faction_type);
 
-	void count_knockout(input, entity_guid victim, const components::sentience&);
+	void count_knockout(input, entity_id victim, const components::sentience&);
 	void count_knockout(input, arena_mode_knockout);
 
 	entity_handle spawn_bomb(input);
@@ -374,8 +371,8 @@ public:
 	faction_choice_result choose_faction(const mode_player_id&, const faction_type faction);
 	faction_type get_player_faction(const mode_player_id&) const;
 
-	entity_guid lookup(const mode_player_id&) const;
-	mode_player_id lookup(const entity_guid&) const;
+	mode_entity_id lookup(const mode_player_id&) const;
+	mode_player_id lookup(const mode_entity_id&) const;
 
 	unsigned get_round_num() const;
 

@@ -208,7 +208,7 @@ void editor_player::ensure_handler() {
 	*/
 }
 
-entity_guid editor_player::lookup_character(const mode_player_id id) const {
+mode_entity_id editor_player::lookup_character(const mode_player_id id) const {
 	return std::visit(
 		[&](const auto& typed_mode) { 
 			return typed_mode.lookup(id);
