@@ -6,6 +6,7 @@
 #include "game/modes/mode_commands/item_purchase.h"
 #include "augs/entity_system/storage_for_message_queues.h"
 #include "game/modes/mode_player_id.h"
+#include "game/modes/mode_commands/mode_entropy_structs.h"
 
 #if MODE_ENTROPY_HAS_QUEUES
 using mode_player_commands = augs::storage_for_message_queues<
@@ -34,10 +35,23 @@ struct total_mode_player_entropy {
 	// END GEN INTROSPECTOR
 };
 
+struct mode_entropy_general {
+	// GEN INTROSPECTOR struct mode_entropy_general
+	std::optional<add_player_input> added_player;
+	std::optional<mode_player_id> removed_player;
+	// END GEN INTROSPECTOR
+
+	mode_entropy_general& operator+=(const mode_entropy_general& b);
+
+	void clear();
+	bool empty() const;
+};
+
 struct mode_entropy {
 	// GEN INTROSPECTOR struct mode_entropy
 	cosmic_entropy cosmic;
 	std::map<mode_player_id, mode_player_entropy> players;
+	mode_entropy_general general;
 	// END GEN INTROSPECTOR
 
 	void clear_dead_entities(const cosmos& cosm);

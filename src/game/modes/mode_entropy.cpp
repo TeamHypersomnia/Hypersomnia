@@ -45,10 +45,20 @@ void mode_entropy::clear_dead_entities(const cosmos& cosm) {
 void mode_entropy::clear() {
 	cosmic.clear();
 	players.clear();
+	general.clear();
+}
+
+void mode_entropy_general::clear() {
+	added_player.reset();
+	removed_player.reset();
+}
+
+bool mode_entropy_general::empty() const {
+	return added_player == std::nullopt && removed_player == std::nullopt;
 }
 
 bool mode_entropy::empty() const {
-	return players.empty() && cosmic.empty();
+	return players.empty() && cosmic.empty() && general.empty();
 }
 
 mode_player_entropy& mode_player_entropy::operator+=(const mode_player_entropy& b) {
@@ -67,12 +77,27 @@ mode_player_entropy& mode_player_entropy::operator+=(const mode_player_entropy& 
 	return *this;
 }
 
+mode_entropy_general& mode_entropy_general::operator+=(const mode_entropy_general& b) {
+	auto override_if = [&](auto& a, const auto& b) {
+		if (b != std::nullopt) {
+			a = b;
+		}
+	};
+
+	override_if(added_player, b.added_player);
+	override_if(removed_player, b.removed_player);
+
+	return *this;
+}
+
 mode_entropy& mode_entropy::operator+=(const mode_entropy& b) {
 	cosmic += b.cosmic;
 
 	for (const auto& p : b.players) {
 		players[p.first] += p.second;
 	}
+
+	general += b.general;
 
 	return *this;
 }

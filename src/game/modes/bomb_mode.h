@@ -15,6 +15,7 @@
 #include "augs/misc/enum/enum_array.h"
 #include "augs/misc/timing/stepped_timing.h"
 #include "augs/misc/timing/speed_vars.h"
+#include "game/modes/mode_commands/mode_entropy_structs.h"
 
 struct entity_guid;
 struct entity_id;
@@ -335,6 +336,7 @@ private:
 	void spawn_bomb_near_players(input);
 
 	void execute_player_commands(input, const mode_entropy&, logic_step);
+	void add_or_remove_players(input, const mode_entropy&, logic_step);
 	void spawn_recently_added_players(input, logic_step);
 	void spawn_and_kick_bots(input, logic_step);
 
@@ -363,7 +365,7 @@ public:
 	mode_player_id add_player(input, const entity_name_str& chosen_name);
 
 	/* A server might provide its own integer-based identifiers */
-	bool add_player_custom_id(const mode_player_id&, input, const entity_name_str& chosen_name);
+	bool add_player_custom(input, const add_player_input&);
 
 	void remove_player(input, const mode_player_id&);
 
@@ -396,6 +398,8 @@ public:
 
 	std::size_t num_conscious_players_in(const cosmos&, faction_type) const;
 	std::size_t num_players_in(faction_type) const;
+
+	mode_player_id find_first_free_player() const;
 
 	std::optional<arena_mode_match_result> calc_match_result(input) const;
 

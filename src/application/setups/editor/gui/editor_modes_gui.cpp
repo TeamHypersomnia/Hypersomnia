@@ -30,14 +30,16 @@
 #define MACRO_MAKE_ONLY_TRIVIAL_FIELD_ADDRESS(a,b) make_field_address<only_trivial_field_type_id, decltype(a::b)>(augs_offsetof(a,b))
 #define MACRO_MAKE_MODE_FIELD_ADDRESS(a,b) make_field_address<mode_field_type_id, decltype(a::b)>(augs_offsetof(a,b))
 
-void editor_modes_gui::perform(const editor_settings& settings, editor_command_input cmd_in) {
+mode_entropy_general editor_modes_gui::perform(const editor_settings& settings, editor_command_input cmd_in) {
 	using namespace augs::imgui;
 
 	auto window = make_scoped_window();
 
 	if (!window) {
-		return;
+		return {};
 	}
+
+	mode_entropy_general output;
 
 	acquire_keyboard_once();
 
@@ -81,6 +83,19 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 							cmd.value_after_change = augs::to_bytes(arena_mode_state::INIT);
 							cmd.built_description = typesafe_sprintf("Restarted the mode with ruleset: ", mode_input.rules.name);
 							post_editor_command(cmd_in, cmd);
+						}
+
+						if (ImGui::Button("Add player")) {
+							if (const auto new_id = typed_mode.find_first_free_player(); new_id.is_set()) {
+								const auto new_name = typesafe_sprintf("Player%x", new_id.value);
+
+								mode_entropy_general cmd;
+								cmd.added_player = add_player_input {
+									new_id, new_name, faction_type::COUNT
+								};
+
+								output += cmd;
+							}
 						}
 
 						const auto players_node_label = "Players";
@@ -245,4 +260,6 @@ void editor_modes_gui::perform(const editor_settings& settings, editor_command_i
 			}
 		}
 	);
+
+	return output;
 }

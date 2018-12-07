@@ -8,6 +8,8 @@ struct entropy_accumulator {
 	mode_player_entropy mode;
 	cosmic_player_entropy cosmic;
 
+	mode_entropy_general mode_general;
+
 	accumulated_motions motions;
 	game_intents intents;
 
@@ -18,6 +20,7 @@ struct entropy_accumulator {
 		const I& in
 	) const {
 		mode_entropy out;
+		out.general = mode_general;
 
 		if (m_id.is_set() && mode.is_set()) {
 			out.players[m_id] = mode;
@@ -64,6 +67,8 @@ struct entropy_accumulator {
 
 		motions.clear();
 		intents.clear();
+
+		mode_general.clear();
 	}
 
 	template <class T>
@@ -85,6 +90,9 @@ struct entropy_accumulator {
 		}
 		else if constexpr(std::is_same_v<T, mode_player_entropy>) {
 			mode += n;
+		}
+		else if constexpr(std::is_same_v<T, mode_entropy_general>) {
+			mode_general += n;
 		}
 		else {
 			static_assert(always_false_v<T>, "Uncontrollable type.");

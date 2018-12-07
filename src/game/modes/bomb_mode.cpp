@@ -299,9 +299,11 @@ void bomb_mode::teleport_to_next_spawn(const input in, const entity_id id) {
 	});
 }
 
-bool bomb_mode::add_player_custom_id(const mode_player_id& new_id, const input_type in, const entity_name_str& chosen_name) {
+bool bomb_mode::add_player_custom(const input_type in, const add_player_input& add_in) {
 	auto& cosm = in.cosm;
 	(void)cosm;
+
+	const auto& new_id = add_in.id;
 
 	auto& new_player = (*players.try_emplace(new_id).first).second;
 
@@ -309,7 +311,7 @@ bool bomb_mode::add_player_custom_id(const mode_player_id& new_id, const input_t
 		return false;
 	}
 
-	new_player.chosen_name = chosen_name;
+	new_player.chosen_name = add_in.name;
 
 	recently_added_players.push_back(new_id);
 
@@ -324,10 +326,8 @@ bool bomb_mode::add_player_custom_id(const mode_player_id& new_id, const input_t
 }
 
 mode_player_id bomb_mode::add_player(const input_type in, const entity_name_str& chosen_name) {
-	const auto new_id = first_free_key(players, mode_player_id::first());
-
-	if (new_id.is_set()) {
-		ensure(add_player_custom_id(new_id, in, chosen_name));
+	if (const auto new_id = find_first_free_player(); new_id.is_set()) {
+		ensure(add_player_custom(in, { new_id, chosen_name }));
 		return new_id;
 	}
 
@@ -1119,6 +1119,32 @@ void bomb_mode::process_win_conditions(const input_type in, const logic_step ste
 	}
 }
 
+void bomb_mode::add_or_remove_players(const input_type in, const mode_entropy& entropy, const logic_step step) {
+	(void)step;
+
+	const auto& g = entropy.general;
+
+	if (g.added_player != std::nullopt) {
+		const auto& a = *g.added_player;
+		add_player_custom(in, a);
+
+		if (a.faction == faction_type::COUNT) {
+			auto_assign_faction(in, a.id);
+		}
+		else {
+			choose_faction(a.id, a.faction);
+		}
+	}
+
+	if (g.removed_player != std::nullopt) {
+		remove_player(in, *g.removed_player);
+	}
+}
+
+mode_player_id bomb_mode::find_first_free_player() const {
+	return first_free_key(players, mode_player_id::first());
+}
+
 void bomb_mode::execute_player_commands(const input_type in, const mode_entropy& entropy, const logic_step step) {
 	const auto current_round = get_round_num();
 	auto& cosm = in.cosm;
@@ -1411,6 +1437,7 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 	}
 
 	spawn_and_kick_bots(in, step);
+	add_or_remove_players(in, entropy, step);
 	spawn_recently_added_players(in, step);
 
 	if (in.rules.allow_game_commencing) {

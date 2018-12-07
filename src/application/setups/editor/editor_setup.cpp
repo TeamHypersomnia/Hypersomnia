@@ -641,7 +641,7 @@ void editor_setup::perform_custom_imgui(
 		}
 
 		selection_groups_gui.perform(has_ctrl, make_command_input());
-		modes_gui.perform(settings, make_command_input());
+		control(modes_gui.perform(settings, make_command_input()));
 
 		summary_gui.perform(*this);
 		layers_gui.perform(

@@ -130,9 +130,12 @@ public:
 		while (steps--) {
 			total_collected_entropy.clear_dead_entities(intro.world);
 
+			mode_entropy entropy;
+			entropy.cosmic = total_collected_entropy;
+
 			mode.advance(
 				{ ruleset, intro.world },
-				{ total_collected_entropy, {} },
+				entropy,
 				callbacks
 			);
 
