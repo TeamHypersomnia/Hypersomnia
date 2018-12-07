@@ -87,4 +87,6 @@ void server_adapter::disconnect_client(const client_id_type& id) {
 	server.DisconnectClient(id);
 }
 
-
+void server_adapter::send_packets() {
+	server.SendPackets();
+}

@@ -272,6 +272,17 @@ void server_setup::handle_client_messages(const setup_advance_input& in) {
 	};
 
 	server->advance(server_time, message_callback);
+
+	{
+		auto& ticks_remaining = ticks_until_sending_packets;
+
+		if (ticks_remaining == 0) {
+			server->send_packets();
+
+			ticks_remaining = vars.send_updates_once_every_tick;
+			--ticks_remaining;
+		}
+	}
 }
 
 void server_setup::advance_internal(const setup_advance_input& in) {

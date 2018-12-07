@@ -46,6 +46,7 @@ class server_setup : public default_setup_settings {
 
 	augs::propagate_const<std::unique_ptr<server_adapter>> server;
 	std::array<server_client_state, max_incoming_connections_v> clients;
+	unsigned ticks_until_sending_packets = 0;
 
 	static net_time_t get_current_time();
 	net_time_t server_time = 0.0;

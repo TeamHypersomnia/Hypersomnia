@@ -176,6 +176,8 @@ public:
 		F&& message_callback
 	);
 
+	void send_packets();
+
 	bool is_running() const;
 	bool can_send_message(const client_id_type&, const game_channel_type&) const;
 	bool has_messages_to_send(const client_id_type&, const game_channel_type&) const;

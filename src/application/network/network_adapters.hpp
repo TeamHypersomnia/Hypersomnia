@@ -52,8 +52,6 @@ void server_adapter::advance(const double server_time, F&& message_callback) {
             }
         }
     }
-
-    server.SendPackets();
 }
 
 template <class F>

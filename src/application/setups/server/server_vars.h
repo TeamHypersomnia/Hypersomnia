@@ -8,5 +8,7 @@ struct server_vars {
 
 	unsigned kick_if_inactive_for_secs = 60;
 	unsigned time_limit_to_enter_game_since_connection = 10;
+
+	unsigned send_updates_once_every_tick = 1;
 	// END GEN INTROSPECTOR
 };
