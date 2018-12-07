@@ -2342,3 +2342,12 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - watch out for pending_events invalidation if we manually (dis)connect on message callback
 	- shouldn't happen though because the loop itself only calls callback for (dis)connections
 
+- general mode command list
+	- don't make a namespace for them
+	
+- custom factory in separate file to not mess up formatting
+	- simply cast int to type index in type_in_list_id
+	- type_list with all message types
+	- then dispatch
+	- then we dont need the enums whatsoever and write a simple wrapper in net adapter for creating messages passing the type once
+

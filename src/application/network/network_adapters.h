@@ -7,6 +7,19 @@
 #include "augs/enums/callback_result.h"
 #include "augs/ensure.h"
 
+constexpr std::size_t chosen_packet_size_v = 1024;
+
+constexpr std::size_t total_header_bytes_v = 
+	yojimbo::ConservativeMessageHeaderBits
+	+ yojimbo::ConservativePacketHeaderBits 
+	+ yojimbo::ConservativeMessageHeaderBits 
+;
+
+/* Make the max message size conservative enough so that a single message does not cause packets to split. */
+constexpr std::size_t max_message_size_v = ((chosen_packet_size_v - total_header_bytes_v) / 4) * 4;
+
+#include "application/network/network_serialization.h"
+
 enum class connection_event_type {
 	CONNECTED,
 	DISCONNECTED
@@ -17,91 +30,68 @@ struct connection_event {
 	connection_event_type type = connection_event_type::CONNECTED;
 };
 
+#define NULL_SERIALIZER() \
+	template <typename Stream> \
+	bool Serialize(Stream& stream) { \
+		(void)stream; \
+		return true; \
+	}
+
+struct preserialized_message : public yojimbo::Message {
+	message_bytes_type bytes;
+
+	template <typename Stream>
+	bool Serialize(Stream& stream) {
+        int length = 0;
+
+        if ( Stream::IsWriting ) {
+			length = (int) bytes.size();
+        }
+
+        serialize_int( stream, length, 0, max_message_size_v );
+		serialize_bytes( stream, (uint8_t*)bytes.data(), length );
+
+		return true;
+	}
+
+	YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
+};
+
+struct only_block_message : public yojimbo::BlockMessage {
+	/* The client will never send blocks */
+
+	static constexpr bool server_to_client = true;
+	static constexpr bool client_to_server = false;
+
+	NULL_SERIALIZER();
+	YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
+};
+
 namespace net_messages {
-	struct initial_solvable : public yojimbo::BlockMessage {
+	struct initial_solvable : only_block_message {};
+	struct initial_steps : only_block_message {};
+	struct initial_steps_correction : only_block_message {};
+
+	struct step_entropy : preserialized_message {
 		static constexpr bool server_to_client = true;
 		static constexpr bool client_to_server = false;
-
-		std::vector<std::byte> bytes;
-
-		template <typename Stream>
-		bool Serialize(Stream& stream) {
-			(void)stream;
-			return true;
-		}
-
-		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
 	};
 
-	struct initial_steps : public yojimbo::BlockMessage {
-		static constexpr bool server_to_client = true;
-		static constexpr bool client_to_server = false;
-
-		std::vector<std::byte> bytes;
-
-		template <typename Stream>
-		bool Serialize(Stream& stream) {
-			(void)stream;
-			return true;
-		}
-		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
-
-	};
-
-	struct initial_steps_correction : public yojimbo::BlockMessage {
-		static constexpr bool server_to_client = true;
-		static constexpr bool client_to_server = false;
-
-		std::vector<std::byte> bytes;
-
-		template <typename Stream>
-		bool Serialize(Stream& stream) {
-			(void)stream;
-			return true;
-		}
-
-		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
-	};
-
-	struct step_entropy : public yojimbo::Message {
-		static constexpr bool server_to_client = true;
-		static constexpr bool client_to_server = false;
-
-		mode_entropy entropy;
-
-		template <typename Stream>
-		bool Serialize(Stream& stream) {
-			(void)stream;
-			return true;
-		}
-
-		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
+	struct client_entropy : preserialized_message {
+		static constexpr bool server_to_client = false;
+		static constexpr bool client_to_server = true;
 	};
 
 	struct client_welcome : public yojimbo::Message {
 		static constexpr bool server_to_client = false;
 		static constexpr bool client_to_server = true;
 
-		std::string chosen_nickname;
+		static constexpr std::size_t buf_len = max_nickname_length_v + 1;
+		char chosen_nickname[buf_len];
 
 		template <typename Stream>
 		bool Serialize(Stream& stream) {
-			(void)stream;
-			return true;
-		}
-
-		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
-	};
-
-	struct client_entropy : public yojimbo::Message {
-		static constexpr bool server_to_client = false;
-		static constexpr bool client_to_server = true;
-
-		total_mode_player_entropy entropy;
-
-		template <typename Stream>
-		bool Serialize(Stream& stream) {
-			(void)stream;
+			serialize_string(stream, chosen_nickname, buf_len);
 			return true;
 		}
 
@@ -129,6 +119,9 @@ enum class game_channel_type {
 
 struct GameConnectionConfig : yojimbo::ClientServerConfig {
 	GameConnectionConfig();
+	GameConnectionConfig(const server_start_input&);
+
+	void set_max_packet_size(unsigned);
 };
 
 class server_adapter;

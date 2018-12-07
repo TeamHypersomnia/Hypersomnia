@@ -82,8 +82,8 @@ auto calc_reloading_context(const E& capability) {
 
 			auto is_better = [&](const auto& charges, const auto& candidate) {
 				if (charges == best_num_charges) {
-					/* Break ties with guid */
-					return candidate.get_guid() < cosm[best_mag].get_guid();
+					/* Break ties with creation time */
+					return candidate.when_born().step < cosm[best_mag].when_born().step;
 				}
 
 				return charges > best_num_charges;

@@ -3,6 +3,9 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_utils.h"
 
+#include "augs/network/network_types.h"
+#include "application/setups/editor/detail/maybe_different_colors.h"
+
 #define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
 
 bool start_client_gui_state::perform(
@@ -34,7 +37,7 @@ bool start_client_gui_state::perform(
 
 		base::acquire_keyboard_once();
 		input_text<100>("Address (ipv4:port or [ipv6]:port)", into.ip_port);
-		input_text<32>("Chosen nickname (3-32 characters)", into.nickname);
+		input_text<max_nickname_length_v>("Chosen nickname (3-30 characters)", into.nickname);
 	}
 
 	{
@@ -42,9 +45,16 @@ bool start_client_gui_state::perform(
 
 		ImGui::Separator();
 
-		if (ImGui::Button("Connect!")) {
-			result = true;
-			//show = false;
+		const auto len = into.nickname.length();
+		const auto clamped_len = std::clamp(len, min_nickname_length_v, max_nickname_length_v);
+
+		{
+			auto scope = maybe_disabled_cols({}, len != clamped_len);
+
+			if (ImGui::Button("Connect!")) {
+				result = true;
+				//show = false;
+			}
 		}
 
 		ImGui::SameLine();

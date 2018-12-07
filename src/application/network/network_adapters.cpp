@@ -26,6 +26,19 @@ void GameAdapter::OnServerClientDisconnected(const client_id_type clientIndex) {
 GameConnectionConfig::GameConnectionConfig() {
 	numChannels = 1;
 	channel[static_cast<int>(game_channel_type::SOLVABLE_STREAM)].type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
+	set_max_packet_size(2 * 1024);
+}
+
+void GameConnectionConfig::set_max_packet_size(const unsigned s) {
+	maxPacketSize = s;
+    maxPacketFragments = (int) ceil( maxPacketSize / packetFragmentSize );
+}
+
+GameConnectionConfig::GameConnectionConfig(const server_start_input& in) : GameConnectionConfig() {
+	(void)in;
+#if 0
+	set_max_packet_size(in.max_packet_size);
+#endif
 }
 
 bool server_adapter::is_running() const {
@@ -45,6 +58,7 @@ bool server_adapter::has_messages_to_send(const client_id_type& id, const game_c
 }
 
 server_adapter::server_adapter(const server_start_input& in) :
+	connection_config(in),
 	adapter(this),
 	server(
 		yojimbo::GetDefaultAllocator(), 
