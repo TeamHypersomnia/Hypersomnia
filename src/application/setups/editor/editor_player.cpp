@@ -226,7 +226,7 @@ void editor_player::seek_to(
 	base::seek_to(
 		seeked_step,
 		make_snapshotted_advance_input(in, []() { return editor_player_entropy_type(); }),
-		make_set_snapshot(in)
+		make_load_snapshot(in)
 	);
 
 	in.cmd_in.clear_dead_entities();

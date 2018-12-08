@@ -13,98 +13,96 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 	auto& cosm = folder.commanded->work.world;
 	auto& settings = in.cmd_in.settings;
 
-	return augs::snapshotted_advance_input(
-		[this, &folder, &history, &cosm, in](const auto& applied_entropy) {
-			/* step */
-			on_mode_with_input(
-				folder.commanded->rulesets.all,
-				cosm,
-				[&](auto& typed_mode, const auto& mode_in) {
-					while (history.has_next_command()) {
-						const auto when_happened = std::visit(
-							[&](const auto& typed_command) {
-								return typed_command.common.when_happened;
-							},
-							history.next_command()
-						);
-
-						const auto current_step = get_current_step();
-
-						ensure_leq(current_step, when_happened);
-
-						if (current_step == when_happened) {
-							PLR_LOG("Plain redo of a command at %x", current_step);
-							history.editor_history_base::redo(in.cmd_in);
-							continue;
-						}
-						
-						//	PLR_LOG("Next happens at %x, now at %x, so breaking", when_happened, current_step);
-
-						break;
-					}
-
-					typed_mode.advance(
-						mode_in,
-						applied_entropy,
-						in.callbacks
+	auto step = [this, &folder, &history, &cosm, in](const auto& applied_entropy) {
+		on_mode_with_input(
+			folder.commanded->rulesets.all,
+			cosm,
+			[&](auto& typed_mode, const auto& mode_in) {
+				while (history.has_next_command()) {
+					const auto when_happened = std::visit(
+						[&](const auto& typed_command) {
+							return typed_command.common.when_happened;
+						},
+						history.next_command()
 					);
+
+					const auto current_step = get_current_step();
+
+					ensure_leq(current_step, when_happened);
+
+					if (current_step == when_happened) {
+						PLR_LOG("Plain redo of a command at %x", current_step);
+						history.editor_history_base::redo(in.cmd_in);
+						continue;
+					}
+					
+					//	PLR_LOG("Next happens at %x, now at %x, so breaking", when_happened, current_step);
+
+					break;
 				}
-			);
-		},
 
-		[&](auto& existing_entropy) {
-			/* record_entropy */
-			adjust_entropy(folder, existing_entropy, false);
-
-			auto extracted = extract_collected_entropy();
-			adjust_entropy(folder, extracted, true);
-
-			existing_entropy += extracted;
-
-			if (settings.save_entropies_to_live_file) {
-				const auto current_step = get_current_step();
-				const auto paths = folder.get_paths();
-				const auto live_file_path = paths.entropies_live_file;
-
-				auto s = augs::with_exceptions<std::ofstream>();
-				s.open(live_file_path, std::ios::out | std::ios::binary | std::ios::app);
-
-				augs::write_bytes(s, current_step);
-				augs::write_bytes(s, existing_entropy);
+				typed_mode.advance(
+					mode_in,
+					applied_entropy,
+					in.callbacks
+				);
 			}
-		},
+		);
+	};
 
-		[this, &folder, &history](const auto n) -> editor_solvable_snapshot {
-			/* make_snapshot */
-			
-			cosmic::reinfer_solvable(folder.commanded->work.world);
+	auto record_entropy = [&](auto& existing_entropy) {
+		adjust_entropy(folder, existing_entropy, false);
 
-			if constexpr(is_nullopt_v<decltype(n)>) {
+		auto extracted = extract_collected_entropy();
+		adjust_entropy(folder, extracted, true);
+
+		existing_entropy += extracted;
+
+		if (settings.save_entropies_to_live_file) {
+			const auto current_step = get_current_step();
+			const auto paths = folder.get_paths();
+			const auto live_file_path = paths.entropies_live_file;
+
+			auto s = augs::with_exceptions<std::ofstream>();
+			s.open(live_file_path, std::ios::out | std::ios::binary | std::ios::app);
+
+			augs::write_bytes(s, current_step);
+			augs::write_bytes(s, existing_entropy);
+		}
+	};
+
+	auto generate_snapshot = [this, &folder, &history](const auto n) -> editor_solvable_snapshot {
+		cosmic::reinfer_solvable(folder.commanded->work.world);
+
+		if constexpr(is_nullopt_v<decltype(n)>) {
+			return {};
+		}
+		else {
+			if (n == 0) {
 				return {};
 			}
-			else {
-				/* make_snapshot */
-				if (n == 0) {
-					return {};
-				}
-				
-				augs::memory_stream ms;
+			
+			augs::memory_stream ms;
 
-				augs::write_bytes(ms, history.get_current_revision());
+			augs::write_bytes(ms, history.get_current_revision());
 
-				augs::write_bytes(ms, current_mode.state);
-				augs::write_bytes(ms, *folder.commanded);
+			augs::write_bytes(ms, current_mode.state);
+			augs::write_bytes(ms, *folder.commanded);
 
-				return std::move(ms);//ms.operator std::vector<std::byte>&&();
-			}
-		},
+			return std::move(ms);//ms.operator std::vector<std::byte>&&();
+		}
+	};
 
+	return augs::snapshotted_advance_input(
+		std::move(step),
+		std::move(record_entropy),
+		std::move(generate_snapshot),
 		in.cmd_in.settings.player
 	);
 }
 
 template <class C>
-auto editor_player::make_set_snapshot(const player_advance_input_t<C> in) {
+auto editor_player::make_load_snapshot(const player_advance_input_t<C> in) {
 	auto& folder = in.cmd_in.folder;
 	auto& history = folder.history;
 

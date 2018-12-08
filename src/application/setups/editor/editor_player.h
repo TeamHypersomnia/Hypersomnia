@@ -101,7 +101,7 @@ private:
 	auto make_snapshotted_advance_input(player_advance_input_t<C> input, E&& extract_collected_entropy);
 
 	template <class C>
-	auto make_set_snapshot(player_advance_input_t<C> input);
+	auto make_load_snapshot(player_advance_input_t<C> input);
 
 	augs::delta get_chosen_delta() const;
 

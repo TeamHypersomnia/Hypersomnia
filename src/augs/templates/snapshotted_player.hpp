@@ -125,11 +125,11 @@ namespace augs {
 	}
 
 	template <class A, class B>
-	template <class I, class SetSnapshot>
+	template <class I, class LoadSnapshot>
 	void snapshotted_player<A, B>::seek_to(
 		typename snapshotted_player<A, B>::step_type seeked_step,
 		const I& input,
-		SetSnapshot&& set_snapshot
+		LoadSnapshot&& load_snapshot
 	) {
 		if (seeked_step == current_step) {
 			return;
@@ -143,7 +143,7 @@ namespace augs {
 		auto seek_to_snapshot = [&]() {
 			PLR_LOG("Set snapshot at step %x (size: %x)", current_step, snapshots.size());
 
-			set_snapshot(step_of_adj_snapshot, seeked_adj_snapshot.second);
+			load_snapshot(step_of_adj_snapshot, seeked_adj_snapshot.second);
 
 			current_step = step_of_adj_snapshot;
 		};
@@ -181,8 +181,8 @@ namespace augs {
 	}
 
 	template <class A, class B>
-	template <class MakeSnapshot>
-	void snapshotted_player<A, B>::push_snapshot_if_needed(MakeSnapshot&& make_snapshot, const unsigned interval_in_steps) {
+	template <class GenerateSnapshot>
+	void snapshotted_player<A, B>::push_snapshot_if_needed(GenerateSnapshot&& generate_snapshot, const unsigned interval_in_steps) {
 		if (is_recording() || (is_replaying() && get_current_step() == 0)) {
 			const bool is_snapshot_time = [&]() {
 				if (snapshots.empty()) {
@@ -202,7 +202,7 @@ namespace augs {
 
 			if (is_snapshot_time) {
 				PLR_LOG("Snapshot step: %x. Pushed.", current_step);
-				snapshots[current_step] = make_snapshot(current_step);
+				snapshots[current_step] = generate_snapshot(current_step);
 			}
 		}
 		else {
@@ -211,7 +211,7 @@ namespace augs {
 			if (valid_snapshot_exists) {
 				PLR_LOG("Snapshot step: %x. Exists.", current_step);
 
-				make_snapshot(std::nullopt);
+				generate_snapshot(std::nullopt);
 			}
 		}
 	}
@@ -219,7 +219,7 @@ namespace augs {
 	template <class entropy_type, class B>
 	template <class I>
 	void snapshotted_player<entropy_type, B>::advance_single_step(const I& in) {
-		push_snapshot_if_needed(in.make_snapshot, in.settings.snapshot_interval_in_steps);
+		push_snapshot_if_needed(in.generate_snapshot, in.settings.snapshot_interval_in_steps);
 
 		auto considered_mode = advance_mode;
 

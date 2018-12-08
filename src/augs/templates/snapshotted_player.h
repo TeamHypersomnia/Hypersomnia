@@ -9,22 +9,22 @@
 namespace augs {
 	struct introspection_access;
 
-	template <class Step, class RecordEntropy, class MakeSnapshot>
+	template <class Step, class RecordEntropy, class GenerateSnapshot>
 	struct snapshotted_advance_input {
 		Step step;
 		RecordEntropy record_entropy;
-		MakeSnapshot make_snapshot;
+		GenerateSnapshot generate_snapshot;
 		const snapshotted_player_settings& settings;
 
 		snapshotted_advance_input(
 			Step&& step,
 			RecordEntropy&& record_entropy,
-			MakeSnapshot&& make_snapshot,
+			GenerateSnapshot&& generate_snapshot,
 			const snapshotted_player_settings& settings
 		) :
 			step(std::move(step)),
 			record_entropy(std::move(record_entropy)),
-			make_snapshot(std::move(make_snapshot)),
+			generate_snapshot(std::move(generate_snapshot)),
 			settings(settings)
 		{}
 	};
@@ -62,8 +62,8 @@ namespace augs {
 		step_type additional_steps = 0;
 		// END GEN INTROSPECTOR
 
-		template <class MakeSnapshot>
-		void push_snapshot_if_needed(MakeSnapshot&&, unsigned interval_in_steps);
+		template <class GenerateSnapshot>
+		void push_snapshot_if_needed(GenerateSnapshot&&, unsigned interval_in_steps);
 
 		template <class I>
 		void advance_single_step(const I& input);
@@ -89,12 +89,12 @@ namespace augs {
 
 		template <
 			class I,
-			class SetSnapshot
+			class LoadSnapshot
 		>
 		void seek_to(
 			step_type, 
 			const I& input,
-			SetSnapshot&& set_snapshot
+			LoadSnapshot&& load_snapshot
 		);
 
 		void seek_to(step_type);
