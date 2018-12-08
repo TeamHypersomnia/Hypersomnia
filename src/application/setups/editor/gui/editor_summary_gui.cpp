@@ -10,6 +10,10 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/readable_bytesize.h"
 
+#include "augs/readwrite/memory_stream.h"
+#include "augs/readwrite/byte_readwrite.h"
+#include "3rdparty/lz4/lz4.c"
+
 void editor_summary_gui::perform(editor_setup& setup) {
 	using namespace augs::imgui;
 
@@ -32,9 +36,35 @@ void editor_summary_gui::perform(editor_setup& setup) {
 	if (auto total = scoped_tree_node(total_text.c_str())) {
 		{
 			augs::byte_counter_stream counter_stream;
-			augs::write_bytes(counter_stream, cosm.get_solvable().significant);
+
+			const auto& solvable = cosm.get_solvable().significant;
+
+			augs::write_bytes(counter_stream, solvable);
 
 			text("Solvable size: %x", readable_bytesize(counter_stream.size()));
+
+			if (auto scope = scoped_tree_node("Test compression")) {
+				augs::timer t;
+
+				thread_local augs::memory_stream s;
+				thread_local std::vector<std::byte> compressed_buf;
+
+				augs::write_bytes(s, solvable);
+				text("Raw write time: %x ms", t.template get<std::chrono::milliseconds>());
+
+				t.reset();
+
+				const auto bound = LZ4_compressBound(s.size());
+				compressed_buf.resize(bound);
+
+				const auto sz = LZ4_compress_default((const char*)s.data(), (char*)compressed_buf.data(), s.size(), compressed_buf.size());
+
+				text("Compression time: %x ms", t.template get<std::chrono::milliseconds>());
+				text("Compressed size: %x", readable_bytesize(sz));
+
+				compressed_buf.clear();
+				s.set_write_pos(0);
+			}
 		}
 
 		text("Usage of maximum pool space: ");
