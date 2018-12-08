@@ -1,4 +1,5 @@
 #include "augs/string/string_templates.h"
+#include "augs/misc/compress.h"
 
 #include "application/setups/editor/editor_setup.h"
 #include "application/setups/editor/gui/editor_summary_gui.h"
@@ -13,8 +14,6 @@
 #include "augs/misc/pool/pool_io.hpp"
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
-
-#include "3rdparty/lz4/lz4.c"
 
 void editor_summary_gui::perform(editor_setup& setup) {
 	using namespace augs::imgui;
@@ -48,24 +47,30 @@ void editor_summary_gui::perform(editor_setup& setup) {
 			if (auto scope = scoped_tree_node("Test compression")) {
 				augs::timer t;
 
-				thread_local augs::memory_stream s;
+				thread_local std::vector<std::byte> input_buf;
 				thread_local std::vector<std::byte> compressed_buf;
+				thread_local auto compressor_state = augs::make_compressor_state();
 
-				augs::write_bytes(s, solvable);
+				input_buf.clear();
+
+				{
+					auto s = augs::ref_memory_stream(input_buf);
+					augs::write_bytes(s, solvable);
+				}
 				text("Raw write time: %x ms", t.template get<std::chrono::milliseconds>());
 
 				t.reset();
 
-				const auto bound = LZ4_compressBound(s.size());
-				compressed_buf.resize(bound);
-
-				const auto sz = LZ4_compress_default((const char*)s.data(), (char*)compressed_buf.data(), s.size(), compressed_buf.size());
+				augs::compress(compressor_state, input_buf, compressed_buf);
 
 				text("Compression time: %x ms", t.template get<std::chrono::milliseconds>());
-				text("Compressed size: %x", readable_bytesize(sz));
+				text("Compressed size: %x", readable_bytesize(compressed_buf.size()));
 
-				compressed_buf.clear();
-				s.set_write_pos(0);
+				t.reset();
+
+				augs::decompress(compressed_buf, input_buf);
+
+				text("Decompression time: %x ms", t.template get<std::chrono::milliseconds>());
 			}
 		}
 
