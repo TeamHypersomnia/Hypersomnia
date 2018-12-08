@@ -10,8 +10,10 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/readable_bytesize.h"
 
+#include "augs/misc/pool/pool_io.hpp"
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
+
 #include "3rdparty/lz4/lz4.c"
 
 void editor_summary_gui::perform(editor_setup& setup) {

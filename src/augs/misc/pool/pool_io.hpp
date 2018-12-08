@@ -124,24 +124,4 @@ namespace augs {
 			}
 		}
 	}
-
-	template <class A, class M, template <class> class C, class S, class... K>
-	void read_object_bytes(A& ar, pool<M, C, S, K...>& storage) {
-		storage.read_object_bytes(ar);
-	}
-	
-	template <class A, class M, template <class> class C, class S, class... K>
-	void write_object_bytes(A& ar, const pool<M, C, S, K...>& storage) {
-		storage.write_object_bytes(ar);
-	}
-
-	template <class A, class M, template <class> class C, class S, class... K>
-	void read_object_lua(const A& ar, pool<M, C, S, K...>& storage) {
-		storage.read_object_lua(ar);
-	}
-
-	template <class A, class M, template <class> class C, class S, class... K>
-	void write_object_lua(A& ar, const pool<M, C, S, K...>& storage) {
-		storage.write_object_lua(ar);
-	}
 }
