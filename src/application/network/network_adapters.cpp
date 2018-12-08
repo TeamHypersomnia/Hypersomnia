@@ -1,5 +1,6 @@
 #include "application/network/network_adapters.h"
 #include "augs/network/network_types.h"
+#include "hypersomnia_version.h"
 
 static_assert(max_incoming_connections_v == yojimbo::MaxClients);
 
@@ -30,6 +31,8 @@ GameConnectionConfig::GameConnectionConfig() {
 }
 
 void GameConnectionConfig::set_max_packet_size(const unsigned s) {
+	protocolId = hypersomnia_version().commit_number;
+
 	maxPacketSize = s;
     maxPacketFragments = (int) ceil( maxPacketSize / packetFragmentSize );
 }

@@ -2,7 +2,7 @@
 #include <vector>
 
 namespace augs {
-	std::vector<std::byte> make_compressor_state();
+	std::vector<std::byte> make_compression_state();
 
 	std::vector<std::byte> compress(
 		std::vector<std::byte>& state,

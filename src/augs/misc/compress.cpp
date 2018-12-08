@@ -2,7 +2,7 @@
 #include "3rdparty/lz4/lz4.c"
 
 namespace augs {
-	std::vector<std::byte> make_compressor_state() {
+	std::vector<std::byte> make_compression_state() {
 		std::vector<std::byte> out;
 		out.resize(LZ4_sizeofState());
 		return out;
@@ -91,7 +91,7 @@ TEST_CASE("Ca CompressionDecompression") {
 			reinterpret_cast<const std::byte*>(blahblah.data() + blahblah.size())
 		);
 
-		auto state = augs::make_compressor_state();
+		auto state = augs::make_compression_state();
 		const auto compressed = augs::compress(state, bb);
 
 		REQUIRE(compressed != bb);

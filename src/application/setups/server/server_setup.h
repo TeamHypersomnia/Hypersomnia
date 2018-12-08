@@ -20,6 +20,7 @@
 #include "application/setups/server/server_client_state.h"
 #include "application/predefined_rulesets.h"
 #include "application/arena/mode_and_rules.h"
+#include "augs/readwrite/memory_stream_declaration.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -36,10 +37,18 @@ struct add_to_arena_input {
 class server_adapter;
 
 class server_setup : public default_setup_settings {
+	/* This is loaded from the arena folder */
 	intercosm scene;
 	predefined_rulesets rulesets;
 
-	server_mode_and_rules current_mode;
+	/* Other replicated state */
+	online_mode_and_rules current_mode;
+	server_vars vars;
+
+	/* The rest is server-specific */
+	std::vector<std::byte> serialization_buffer;
+	std::vector<std::byte> compressed_buffer;
+	std::vector<std::byte> compression_state;
 
 	entropy_accumulator total_collected;
 	entity_id viewed_character_id;
@@ -47,10 +56,13 @@ class server_setup : public default_setup_settings {
 	augs::propagate_const<std::unique_ptr<server_adapter>> server;
 	std::array<server_client_state, max_incoming_connections_v> clients;
 	unsigned ticks_until_sending_packets = 0;
+	net_time_t server_time = 0.0;
+
+	/* No server state follows later in code. */
+
+	augs::ref_memory_stream make_serialization_stream();
 
 	static net_time_t get_current_time();
-	net_time_t server_time = 0.0;
-	server_vars vars;
 
 	template <class S, class F>
 	static decltype(auto) on_mode_with_input_impl(

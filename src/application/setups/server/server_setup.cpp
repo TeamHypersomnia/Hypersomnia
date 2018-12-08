@@ -1,3 +1,5 @@
+#include "augs/misc/compress.h"
+
 #include "application/setups/server/server_setup.h"
 #include "application/config_lua_table.h"
 #include "application/arena/arena_utils.h"
@@ -6,6 +8,15 @@
 
 #include "augs/filesystem/file.h"
 #include "application/arena/arena_paths.h"
+
+#include "augs/misc/pool/pool_io.hpp"
+#include "augs/readwrite/byte_readwrite.h"
+#include "augs/readwrite/memory_stream.h"
+
+augs::ref_memory_stream server_setup::make_serialization_stream() {
+	serialization_buffer.clear();
+	return augs::ref_memory_stream(serialization_buffer);
+}
 
 /* To avoid incomplete type error */
 server_setup::~server_setup() = default;
@@ -37,6 +48,7 @@ server_setup::server_setup(
 	sol::state& lua,
 	const server_start_input& in
 ) : 
+	compression_state(augs::make_compression_state()),
 	server(std::make_unique<server_adapter>(in)),
 	server_time(yojimbo_time())
 {
@@ -261,8 +273,35 @@ void server_setup::handle_client_messages(const setup_advance_input& in) {
 			else if constexpr (std::is_same_v<M, N::client_welcome>) {
 				if (c.state == S::PENDING_WELCOME) {
 					// TODO: check if this is handled when we connect with < 3 characters as nickname
-					auto message_provider = [&](net_messages::initial_steps& msg) {
-						(void)msg;
+					auto message_provider = [&](net_messages::initial_solvable& msg) {
+						auto for_each_initial_state = [&](auto callback) {
+							callback(vars);
+							callback(current_mode);
+							callback(scene.world.get_solvable().significant);
+						};
+
+						auto write_all_to = [&](auto& s) {
+							for_each_initial_state([&s](const auto& data) {
+								augs::write_bytes(s, data);
+							});
+						};
+
+						{
+							augs::byte_counter_stream s;
+							write_all_to(s);
+							serialization_buffer.reserve(s.size());
+						}
+
+						auto s = make_serialization_stream();
+						write_all_to(s);
+
+						augs::compress(compression_state, serialization_buffer, compressed_buffer);
+
+						const auto result_size = compressed_buffer.size();
+						const auto memory = server->get_specific().AllocateBlock(id, result_size);
+
+						std::memcpy(memory, compressed_buffer.data(), result_size);
+						server->get_specific().AttachBlockToMessage(id, std::addressof(msg), memory, result_size);
 					};
 
 					server->send_message(id, game_channel_type::SOLVABLE_STREAM, message_provider);

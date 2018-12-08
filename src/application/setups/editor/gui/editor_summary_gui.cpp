@@ -49,7 +49,7 @@ void editor_summary_gui::perform(editor_setup& setup) {
 
 				thread_local std::vector<std::byte> input_buf;
 				thread_local std::vector<std::byte> compressed_buf;
-				thread_local auto compressor_state = augs::make_compressor_state();
+				thread_local auto compression_state = augs::make_compression_state();
 
 				input_buf.clear();
 
@@ -61,7 +61,7 @@ void editor_summary_gui::perform(editor_setup& setup) {
 
 				t.reset();
 
-				augs::compress(compressor_state, input_buf, compressed_buf);
+				augs::compress(compression_state, input_buf, compressed_buf);
 
 				text("Compression time: %x ms", t.template get<std::chrono::milliseconds>());
 				text("Compressed size: %x", readable_bytesize(compressed_buf.size()));

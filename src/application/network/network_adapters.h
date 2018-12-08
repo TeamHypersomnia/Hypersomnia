@@ -1,5 +1,8 @@
 #pragma once
 #include "3rdparty/yojimbo/yojimbo.h"
+#undef write_bytes
+#undef read_bytes
+
 #include "application/setups/server/server_start_input.h"
 #include "augs/misc/timing/timer.h"
 #include "game/modes/mode_entropy.h"
@@ -76,7 +79,6 @@ struct only_block_message : public yojimbo::BlockMessage {
 
 namespace net_messages {
 	struct initial_solvable : only_block_message {};
-	struct initial_steps : only_block_message {};
 	struct initial_steps_correction : only_block_message {};
 
 	struct step_entropy : preserialized_message {
@@ -104,7 +106,6 @@ namespace net_messages {
 
 	using all_t = type_list<
 		initial_solvable*,
-		initial_steps*,
 		initial_steps_correction*,
 		step_entropy*,
 		client_welcome*,
