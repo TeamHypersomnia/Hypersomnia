@@ -406,7 +406,6 @@ public:
 
 	unsigned get_score(faction_type) const;
 
-	void request_restart();
 	void restart(input, logic_step);
 
 	void reset_players_stats(input);

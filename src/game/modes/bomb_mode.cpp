@@ -1826,10 +1826,6 @@ std::optional<arena_mode_match_result> bomb_mode::calc_match_result(const input_
 	return result;
 }
 
-void bomb_mode::request_restart() {
-	state = arena_mode_state::INIT;
-}
-
 template <class S>
 auto bomb_mode::find_player_by_impl(S& self, const entity_name_str& chosen_name) {
 	using R = maybe_const_ptr_t<std::is_const_v<S>, bomb_mode_player>;

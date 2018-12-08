@@ -9,6 +9,7 @@
 #include "application/setups/editor/editor_paths.h"
 
 #include "application/setups/editor/detail/maybe_different_colors.h"
+#include "augs/misc/readable_bytesize.h"
 
 void editor_player_gui::perform(const editor_command_input cmd_in) {
 	using namespace augs::imgui;
@@ -90,6 +91,7 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 		text("Current step: %x/%x", player.get_current_step(), player.get_total_steps(folder));
 		text("Current time: %x", format_mins_secs_ms(current));
 		text("Recording length: %x", format_mins_secs_ms(total));
+		text("Step to entropy size: %x", readable_bytesize(player.estimate_step_to_entropy_size()));
 
 		const auto& snapshots = player.get_snapshots();
 

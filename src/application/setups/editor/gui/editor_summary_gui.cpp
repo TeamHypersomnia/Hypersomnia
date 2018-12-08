@@ -8,6 +8,7 @@
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
+#include "augs/misc/readable_bytesize.h"
 
 void editor_summary_gui::perform(editor_setup& setup) {
 	using namespace augs::imgui;
@@ -18,9 +19,9 @@ void editor_summary_gui::perform(editor_setup& setup) {
 		return;
 	}
 
-	auto& v = setup.view();
-	auto& f = setup.folder();
-	auto& cosm = setup.work().world;
+	const auto& v = setup.view();
+	const auto& f = setup.folder();
+	const auto& cosm = setup.work().world;
 
 	text(typesafe_sprintf("Folder path: %x", f.current_path));
 
@@ -29,6 +30,13 @@ void editor_summary_gui::perform(editor_setup& setup) {
 	;
 
 	if (auto total = scoped_tree_node(total_text.c_str())) {
+		{
+			augs::byte_counter_stream counter_stream;
+			augs::write_bytes(counter_stream, cosm.get_solvable().significant);
+
+			text("Solvable size: %x", readable_bytesize(counter_stream.size()));
+		}
+
 		text("Usage of maximum pool space: ");
 
 		std::vector<std::string> lines;

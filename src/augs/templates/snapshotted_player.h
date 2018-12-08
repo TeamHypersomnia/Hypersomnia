@@ -36,6 +36,7 @@ namespace augs {
 	class snapshotted_player {
 	public: 
 		using step_type = snapshotted_player_step_type;
+		using step_to_entropy_type = std::map<step_type, entropy_type>;
 
 	protected:
 		enum class advance_type {
@@ -49,7 +50,7 @@ namespace augs {
 		using snapshots_type = std::map<step_type, snapshot_type>;
 
 		// GEN INTROSPECTOR class augs::snapshotted_player class A class B
-		std::map<step_type, entropy_type> step_to_entropy;
+		step_to_entropy_type step_to_entropy;
 
 	private:
 		advance_type advance_mode = advance_type::PAUSED;

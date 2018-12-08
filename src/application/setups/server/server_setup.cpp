@@ -179,6 +179,25 @@ void server_setup::advance_clients_state(const setup_advance_input& in) {
 		if (!removed_someone_already) {
 			kick_if_afk();
 		}
+
+		using S = server_client_state::type;
+
+		if (c.state == S::RECEIVING_INITIAL_STATE) {
+			if (!server->has_messages_to_send(client_id, game_channel_type::SOLVABLE_STREAM)) {
+				auto message_provider = [&](net_messages::initial_steps_correction& msg) {
+					(void)msg;
+				};
+
+				server->send_message(client_id, game_channel_type::SOLVABLE_STREAM, message_provider);
+
+				c.state = S::RECEIVING_INITIAL_STATE_CORRECTION;
+			}
+		}
+		else if (c.state == S::RECEIVING_INITIAL_STATE_CORRECTION) {
+			if (!server->has_messages_to_send(client_id, game_channel_type::SOLVABLE_STREAM)) {
+				c.state = S::IN_GAME;
+			}
+		}
 	}
 }
 

@@ -187,4 +187,7 @@ public:
 	void read_live_entropies(const augs::path_type& from);
 
 	double get_audiovisual_speed(const editor_folder&) const;
+
+	std::size_t estimate_step_to_entropy_size() const;
+	const step_to_entropy_type& get_step_to_entropy() const;
 };

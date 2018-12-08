@@ -6,6 +6,21 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- It might be hard to properly send the initial mode state while avoiding desync
+	- sending solvable on init is also scalable for longer matches
+	- Rounds might be restarted arbitrarily due to pre-solve logic
+		- e.g. game commencing
+	- and when that happens the cosmos solvable is already altered
+
+- Optimize for bandwidth later. 
+	- For proof of concept, it will be enough to brute-force-write the inputs with our own serializers.
+
+- Connection helper interface?
+	- so that we have same interface for client and server and dont repeat ourselves
+	- we don't have much of these public funcs, though
+	- and it would probably complicate matters needlessly
+		- even pro yojimbo doesnt to that
+
 - Notice that serialization of mode entropy will be a lot more complicated on the server
 	- So, we will have completely separate funcs for read and write
 	- We might later write player entropies from the one that posts the most messages

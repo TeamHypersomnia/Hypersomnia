@@ -347,6 +347,17 @@ void editor_player::read_live_entropies(const augs::path_type& from) {
 	base::read_live_entropies(from);
 }
 
+std::size_t editor_player::estimate_step_to_entropy_size() const {
+	augs::byte_counter_stream counter_stream;
+	augs::write_bytes(counter_stream, step_to_entropy);
+
+	return counter_stream.size();
+}
+
+const editor_player::step_to_entropy_type& editor_player::get_step_to_entropy() const {
+	return step_to_entropy;
+}
+
 double editor_player::get_audiovisual_speed(const editor_folder& f) const {
 	if (has_testing_started()) {
 		return on_mode_with_input(

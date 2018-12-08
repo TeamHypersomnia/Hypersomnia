@@ -69,8 +69,6 @@ public:
 	mode_entity_id lookup(const mode_player_id&) const;
 	mode_player_id lookup(const mode_entity_id&) const;
 
-	void request_restart() { players.clear(); }
-
 	template <class C>
 	void advance(
 		const input in, 
