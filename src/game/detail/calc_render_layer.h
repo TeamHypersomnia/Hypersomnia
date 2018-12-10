@@ -1,7 +1,7 @@
 #pragma once
 #include "game/components/render_component.h"
 #include "augs/templates/traits/is_nullopt.h"
-#include "augs/build_settings/platform_defines.h"
+#include "augs/build_settings/compiler_defines.h"
 #include "game/organization/all_component_includes.h"
 #include "game/cosmos/entity_type_traits.h"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"

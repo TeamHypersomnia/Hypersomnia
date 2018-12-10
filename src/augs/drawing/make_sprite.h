@@ -3,7 +3,7 @@
 #include "augs/math/vec2.h"
 #include "augs/graphics/vertex.h"
 #include "augs/graphics/rgba.h"
-#include "augs/build_settings/platform_defines.h"
+#include "augs/build_settings/compiler_defines.h"
 
 #include "augs/texture_atlas/atlas_entry.h"
 #include "augs/drawing/flip.h"

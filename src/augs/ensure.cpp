@@ -1,14 +1,17 @@
 #include <csignal>
+#include <functional>
 
 #include "augs/ensure.h"
 #include "augs/filesystem/file.h"
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/shell.h"
+#include "augs/build_settings/compiler_defines.h"
 
-void (*ensure_handler)() = nullptr;
+extern std::function<void()> ensure_handler;
+//void (*ensure_handler)() = nullptr;
 
-void save_log_and_terminate() {
-	if (ensure_handler != nullptr) {
+FORCE_NOINLINE void save_log_and_terminate() {
+	if (ensure_handler) {
 		ensure_handler();
 	}
 

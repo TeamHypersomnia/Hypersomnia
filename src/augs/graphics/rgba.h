@@ -2,7 +2,7 @@
 #include <array>
 #include <sstream>
 #include <algorithm>
-#include "augs/build_settings/platform_defines.h"
+#include "augs/build_settings/compiler_defines.h"
 
 struct ImVec4;
 struct hsv;

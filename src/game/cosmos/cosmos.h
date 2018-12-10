@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/build_settings/platform_defines.h"
+#include "augs/build_settings/compiler_defines.h"
 #include "augs/misc/randomization_declaration.h"
 
 #include "game/organization/all_entity_types_declaration.h"

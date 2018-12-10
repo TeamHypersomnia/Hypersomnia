@@ -1,7 +1,7 @@
 #pragma once
 #include <optional>
 #include "augs/drawing/make_sprite_points.h"
-#include "augs/build_settings/platform_defines.h"
+#include "augs/build_settings/compiler_defines.h"
 
 #include "game/cosmos/entity_handle_declaration.h"
 #include "game/detail/entity_handle_mixins/get_current_slot.hpp"

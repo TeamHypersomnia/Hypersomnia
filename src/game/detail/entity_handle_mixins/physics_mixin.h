@@ -2,7 +2,7 @@
 #include <optional>
 #include "augs/math/vec2.h"
 #include "augs/templates/maybe_const.h"
-#include "augs/build_settings/platform_defines.h"
+#include "augs/build_settings/compiler_defines.h"
 #include "game/organization/all_components_declaration.h"
 #include "game/detail/physics/colliders_connection.h"
 #include "game/detail/entity_handle_mixins/get_current_slot.hpp"

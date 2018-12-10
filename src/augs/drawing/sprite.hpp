@@ -4,7 +4,7 @@
 #include "augs/drawing/drawing_input_base.h"
 #include "augs/drawing/make_sprite.h"
 #include "augs/texture_atlas/atlas_entry.h"
-#include "augs/build_settings/platform_defines.h"
+#include "augs/build_settings/compiler_defines.h"
 #include "augs/drawing/sprite.h"
 #include "augs/math/grid_math.h"
 

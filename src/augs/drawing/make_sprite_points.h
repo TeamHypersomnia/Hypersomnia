@@ -1,7 +1,7 @@
 #pragma once
 #include <array>
 #include "augs/math/vec2.h"
-#include "augs/build_settings/platform_defines.h"
+#include "augs/build_settings/compiler_defines.h"
 #include "augs/math/transform.h"
 
 namespace augs {

@@ -7,7 +7,7 @@
 #include "game/cosmos/entity_handle_declaration.h"
 #include "game/cosmos/step_declaration.h"
 #include "game/cosmos/entity_id.h"
-#include "augs/build_settings/platform_defines.h"
+#include "augs/build_settings/compiler_defines.h"
 #include "game/detail/inventory/wielding_result.h"
 #include "augs/enums/callback_result.h"
 #include "game/detail/inventory/inventory_space_type.h"

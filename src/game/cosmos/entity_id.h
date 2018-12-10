@@ -1,7 +1,7 @@
 #pragma once
 #include <type_traits>
 #include "augs/misc/pool/pooled_object_id.h"
-#include "augs/build_settings/platform_defines.h"
+#include "augs/build_settings/compiler_defines.h"
 
 #include "game/cosmos/entity_id_declaration.h"
 

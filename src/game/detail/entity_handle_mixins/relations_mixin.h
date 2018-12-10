@@ -2,7 +2,7 @@
 #include <vector>
 
 #include "augs/enums/callback_result.h"
-#include "augs/build_settings/platform_defines.h"
+#include "augs/build_settings/compiler_defines.h"
 
 #include "augs/templates/introspect_declaration.h"
 #include "augs/templates/maybe_const.h"

@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/math/vec2.h"
 #include "augs/math/rects.h"
-#include "augs/build_settings/platform_defines.h"
+#include "augs/build_settings/compiler_defines.h"
 
 namespace augs {
 	FORCE_INLINE ltrbi visible_grid_cells_detail(
