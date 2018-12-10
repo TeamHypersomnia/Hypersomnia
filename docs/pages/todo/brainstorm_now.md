@@ -6,11 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Try to fix mysterious crash on Windows by replacing std::vector with constant_size_vector wherever possible
-	- It appears that it still happens on audiovisual post solve
-		- when maybe a ring or a thunder is added?
-		- these can easily be const-vectorized
-			- have some separate view_container_sizes.h
+- step entropy should also include the index of client input accepted
 
 - It would be nice if the server_setup could only accept ready structs and was not concerned with messages being preserialized, 
 	and serialization in general

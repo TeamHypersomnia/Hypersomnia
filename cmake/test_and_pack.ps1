@@ -33,13 +33,13 @@ else {
 
 	Write-Host "Good log:" -ForegroundColor green
 	cat $good_log
+}
 
-	if ($configuration -eq "Release") {
-		Write-Host "Archiving the binary." -ForegroundColor yellow
-		
-		cp $target_exe Hypersomnia.exe
-		rm -r cache
-		cd ../
-		7z a Hypersomnia-x64.zip hypersomnia
-	}
+if ($configuration -eq "Release") {
+	Write-Host "Archiving the binary." -ForegroundColor yellow
+	
+	cp $target_exe Hypersomnia.exe
+	rm -r cache
+	cd ../
+	7z a Hypersomnia-x64.zip hypersomnia
 }

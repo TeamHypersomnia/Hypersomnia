@@ -69,16 +69,27 @@
 
 std::function<void()> ensure_handler;
 
+/*
+	static is used for all variables because some take massive amounts of space.
+	They would normally cause a stack overflow.
+	For example, Windows provides us with mere 1MB of stack space by default.
+	
+	To preserve the destruction in the order of definition,
+	we must also make all other variables static to avoid bugs.
+
+	This function will, anyway, only be called once during the lifetime of the program.
+*/
+
 int work(const int argc, const char* const * const argv) try {
-	augs::timer until_first_swap;
+	static augs::timer until_first_swap;
 	bool until_first_swap_measured = false;
 
-	session_profiler performance;
+	static session_profiler performance;
 
 	LOG("Started at %x", augs::date_time().get_readable());
 	LOG("Working directory: %x", augs::get_current_working_directory());
 
-	const auto params = cmd_line_params(argc, argv);
+	static const auto params = cmd_line_params(argc, argv);
 
 	augs::create_directories(LOG_FILES_DIR);
 	augs::create_directories(GENERATED_FILES_DIR);
@@ -86,12 +97,12 @@ int work(const int argc, const char* const * const argv) try {
 
 	dump_detailed_sizeof_information(LOG_FILES_DIR "/detailed_sizeofs.txt");
 
-	const auto canon_config_path = augs::path_type("config.lua");
-	const auto local_config_path = augs::path_type(LOCAL_FILES_DIR "/config.local.lua");
+	static const auto canon_config_path = augs::path_type("config.lua");
+	static const auto local_config_path = augs::path_type(LOCAL_FILES_DIR "/config.local.lua");
 
-	auto lua = augs::create_lua_state();
+	static auto lua = augs::create_lua_state();
 
-	config_lua_table config { 
+	static config_lua_table config { 
 		lua, 
 		augs::switch_path(
 			canon_config_path,
@@ -105,9 +116,9 @@ int work(const int argc, const char* const * const argv) try {
 		config.gui_style
 	);
 
-	auto last_saved_config = config;
+	static auto last_saved_config = config;
 
-	auto change_with_save = [&](auto setter) {
+	static auto change_with_save = [&](auto setter) {
 		setter(config);
 		setter(last_saved_config);
 
@@ -124,49 +135,49 @@ int work(const int argc, const char* const * const argv) try {
 		}
 	}
 
-	augs::timer global_libraries_timer;
-	const augs::global_libraries libraries;
+	static augs::timer global_libraries_timer;
+	static const augs::global_libraries libraries;
 	LOG("Initializing global libraries took: %x ms", global_libraries_timer.template extract<std::chrono::milliseconds>());
 	
-	augs::audio_context audio(config.audio);
+	static augs::audio_context audio(config.audio);
 	augs::log_all_audio_devices(LOG_FILES_DIR "/audio_devices.txt");
 
-	augs::window window(config.window);
+	static augs::window window(config.window);
 
-	augs::renderer renderer;
+	static augs::renderer renderer;
 	LOG_NVPS(renderer.get_max_texture_size());
 
-	all_necessary_fbos necessary_fbos(
+	static all_necessary_fbos necessary_fbos(
 		window.get_screen_size(),
 		config.drawing
 	);
 
-	all_necessary_shaders necessary_shaders(
+	static all_necessary_shaders necessary_shaders(
 		"content/necessary/shaders",
 		"content/necessary/shaders",
 		config.drawing
 	);
 
-	all_necessary_sounds necessary_sounds(
+	static all_necessary_sounds necessary_sounds(
 		"content/necessary/sfx"
 	);
 
-	const necessary_image_definitions_map necessary_image_definitions(
+	static const necessary_image_definitions_map necessary_image_definitions(
 		lua,
 		"content/necessary/gfx",
 		config.content_regeneration.regenerate_every_time
 	);
 	
-	const auto imgui_atlas = augs::imgui::create_atlas(config.gui_fonts.gui);
+	static const auto imgui_atlas = augs::imgui::create_atlas(config.gui_fonts.gui);
 
-	const auto configurables = configuration_subscribers {
+	static const auto configurables = configuration_subscribers {
 		window,
 		necessary_fbos,
 		audio
 	};
 
-	atlas_profiler atlas_performance;
-	frame_profiler frame_performance;
+	static atlas_profiler atlas_performance;
+	static frame_profiler frame_performance;
 
 	/* 
 		unique_ptr is used to avoid stack overflow.
@@ -175,48 +186,43 @@ int work(const int argc, const char* const * const argv) try {
 		therefore it resides in a separate unique_ptr.
 	*/
 
-	std::unique_ptr<main_menu_setup> main_menu;
-	std::unique_ptr<setup_variant> current_setup;
+	static std::optional<main_menu_setup> main_menu;
+	static std::optional<setup_variant> current_setup;
 
-	auto has_current_setup = [&]() {
-		return main_menu == nullptr && current_setup != nullptr;
+	static auto has_current_setup = []() {
+		return main_menu == std::nullopt && current_setup != std::nullopt;
 	};
 
-	auto has_main_menu = [&main_menu]() {
-		return main_menu != nullptr;
+	static auto has_main_menu = []() {
+		return main_menu != std::nullopt;
 	};
 
-	auto emplace_current_setup = [&p = current_setup] (auto tag, auto&&... args) {
-		using P = remove_cref<decltype(p)>;
-		using E = typename P::element_type;
+	static auto emplace_current_setup = [&p = current_setup] (auto tag, auto&&... args) {
+		using Tag = decltype(tag);
+		using T = type_of_in_place_type_t<Tag>; 
 
-		if (p == nullptr) {
-			p = std::make_unique<E>(
+		if (p == std::nullopt) {
+			p.emplace(
 				tag,
 				std::forward<decltype(args)>(args)...
 			);
 		}
 		else {
-			using Tag = decltype(tag);
-			using T = type_of_in_place_type_t<Tag>; 
-
-			p->emplace<T>(std::forward<decltype(args)>(args)...);
+			p.value().emplace<T>(std::forward<decltype(args)>(args)...);
 		}
 	};
 
-	auto emplace_main_menu = [&p = main_menu] (auto&&... args) {
-		if (p == nullptr) {
-			p = std::make_unique<main_menu_setup>(
-				std::forward<decltype(args)>(args)...
-			);
+	static auto emplace_main_menu = [&p = main_menu] (auto&&... args) {
+		if (p == std::nullopt) {
+			p.emplace(std::forward<decltype(args)>(args)...);
 		}
 	};
 
-	settings_gui_state settings_gui = std::string("Settings");
-	start_client_gui_state start_client_gui = std::string("Connect to server");
-	start_server_gui_state start_server_gui = std::string("Host a server");
+	static settings_gui_state settings_gui = std::string("Settings");
+	static start_client_gui_state start_client_gui = std::string("Connect to server");
+	static start_server_gui_state start_server_gui = std::string("Host a server");
 
-	ingame_menu_gui ingame_menu;
+	static ingame_menu_gui ingame_menu;
 
 	/*
 		Runtime representations of viewables,
@@ -225,19 +231,24 @@ int work(const int argc, const char* const * const argv) try {
 		loaded just once or if they are for example continuously streamed.
 	*/
 
-	viewables_streaming streaming(renderer);
-	auto streaming_finalize = augs::scope_guard([&]() {
+	static viewables_streaming streaming(renderer);
+	static auto streaming_finalize = augs::scope_guard([&]() {
 		streaming.finalize_pending_tasks();
 	});
 
-	world_camera gameplay_camera;
-	auto audiovisuals = std::make_unique<audiovisual_state>();
+	static world_camera gameplay_camera;
+	static audiovisual_state audiovisuals;
+	
+	static auto get_audiovisuals = []() -> audiovisual_state& {
+		return audiovisuals;
+	};
+
 
 	/*
 		The lambdas that aid to make the main loop code more concise.
 	*/	
 
-	auto visit_current_setup = [&](auto callback) -> decltype(auto) {
+	static auto visit_current_setup = [&](auto callback) -> decltype(auto) {
 		if (has_current_setup()) {
 			return std::visit(
 				[&](auto& setup) -> decltype(auto) {
@@ -251,7 +262,7 @@ int work(const int argc, const char* const * const argv) try {
 		}
 	};
 
-	auto on_specific_setup = [&](auto callback) -> decltype(auto) {
+	static auto on_specific_setup = [&](auto callback) -> decltype(auto) {
 		using T = remove_cref<argument_t<decltype(callback), 0>>;
 
 		if constexpr(std::is_same_v<T, main_menu_setup>) {
@@ -268,19 +279,19 @@ int work(const int argc, const char* const * const argv) try {
 		}
 	};
 
-	auto get_unofficial_content_dir = [&]() {
+	static auto get_unofficial_content_dir = [&]() {
 		return visit_current_setup([](const auto& s) { return s.get_unofficial_content_dir(); });
 	};
 
-	auto get_render_layer_filter = [&]() {
+	static auto get_render_layer_filter = [&]() {
 		return visit_current_setup([](const auto& s) { return s.get_render_layer_filter(); });
 	};
 
 	/* TODO: We need to have one game gui per cosmos. */
-	game_gui_system game_gui;
-	bool game_gui_mode = false;
+	static game_gui_system game_gui;
+	static bool game_gui_mode = false;
 
-	auto load_all = [&](const all_viewables_defs& new_defs) {
+	static auto load_all = [&](const all_viewables_defs& new_defs) {
 		streaming.load_all({
 			new_defs,
 			necessary_image_definitions,
@@ -292,27 +303,24 @@ int work(const int argc, const char* const * const argv) try {
 		});
 	};
 
-	auto setup_launcher = [&](auto&& setup_init_callback) {
-		audiovisuals->get<sound_system>().clear();
+	static auto setup_launcher = [&](auto&& setup_init_callback) {
+		get_audiovisuals().get<sound_system>().clear();
 
-		main_menu.release();
+		main_menu.reset();
 		ingame_menu.show = false;
 
 		setup_init_callback();
 		
-		/* MSVC ICE workaround */
-		auto& _load_all = load_all;
-
 		visit_current_setup([&](const auto& setup) {
 			using T = remove_cref<decltype(setup)>;
 			
 			if constexpr(T::loading_strategy == viewables_loading_type::LOAD_ALL_ONLY_ONCE) {
-				_load_all(setup.get_viewable_defs());
+				load_all(setup.get_viewable_defs());
 			}
 		});
 	};
 
-	auto launch_editor = [&](auto&&... args) {
+	static auto launch_editor = [&](auto&&... args) {
 		setup_launcher([&]() {
 			emplace_current_setup(std::in_place_type_t<editor_setup>(),
 				std::forward<decltype(args)>(args)...
@@ -322,7 +330,7 @@ int work(const int argc, const char* const * const argv) try {
 		});
 	};
 
-	auto launch_setup = [&](const launch_type mode) {
+	static auto launch_setup = [&](const launch_type mode) {
 		LOG("Launched mode: %x", augs::enum_to_string(mode));
 		
 		change_with_save([mode](config_lua_table& cfg) {
@@ -381,24 +389,24 @@ int work(const int argc, const char* const * const argv) try {
 		}
 	};
 
-	auto get_viewable_defs = [&]() -> const all_viewables_defs& {
+	static auto get_viewable_defs = [&]() -> const all_viewables_defs& {
 		return visit_current_setup([](auto& setup) -> const all_viewables_defs& {
 			return setup.get_viewable_defs();
 		});
 	};
 
-	auto create_game_gui_deps = [&](const auto& viewing_config) {
+	static auto create_game_gui_deps = [&](const auto& viewing_config) {
 		return game_gui_context_dependencies {
 			get_viewable_defs().image_definitions,
 			streaming.images_in_atlas,
 			streaming.necessary_images_in_atlas,
 			streaming.get_loaded_gui_fonts().gui,
-			audiovisuals->randomizing,
+			get_audiovisuals().randomizing,
 			viewing_config.game_gui
 		};
 	};
 
-	auto create_menu_context_deps = [&](const auto& viewing_config) {
+	static auto create_menu_context_deps = [&](const auto& viewing_config) {
 		return menu_context_dependencies{
 			streaming.necessary_images_in_atlas,
 			streaming.get_loaded_gui_fonts().gui,
@@ -407,7 +415,7 @@ int work(const int argc, const char* const * const argv) try {
 		};
 	};
 
-	auto get_viewed_character = [&]() -> const_entity_handle {
+	static auto get_viewed_character = [&]() -> const_entity_handle {
 		const auto& viewed_cosmos = visit_current_setup([](auto& setup) -> const cosmos& {
 			return setup.get_viewed_cosmos();
 		});
@@ -419,7 +427,7 @@ int work(const int argc, const char* const * const argv) try {
 		return viewed_cosmos[viewed_character_id];
 	};
 		
-	auto should_draw_game_gui = [&]() {
+	static auto should_draw_game_gui = [&]() {
 		{
 			bool should = true;
 
@@ -451,7 +459,7 @@ int work(const int argc, const char* const * const argv) try {
 		return true;
 	};
 
-	auto get_camera_eye = [&]() {		
+	static auto get_camera_eye = [&]() {		
 		if(const auto custom = visit_current_setup(
 			[](const auto& setup) { 
 				return setup.find_current_camera_eye(); 
@@ -463,7 +471,7 @@ int work(const int argc, const char* const * const argv) try {
 		return gameplay_camera.get_current_eye();
 	};
 
-	auto handle_app_intent = [&](const app_intent_type intent) {
+	static auto handle_app_intent = [&](const app_intent_type intent) {
 		using T = decltype(intent);
 
 		switch (intent) {
@@ -480,7 +488,7 @@ int work(const int argc, const char* const * const argv) try {
 		}
 	};
 	
-	auto handle_app_ingame_intent = [&](const app_ingame_intent_type intent) {
+	static auto handle_app_ingame_intent = [&](const app_ingame_intent_type intent) {
 		using T = decltype(intent);
 
 		switch (intent) {
@@ -507,7 +515,7 @@ int work(const int argc, const char* const * const argv) try {
 #if PLATFORM_UNIX	
 	static volatile std::sig_atomic_t signal_status = 0;
  
-	auto signal_handler = [](const int signal_type) {
+	static auto signal_handler = [](const int signal_type) {
    		signal_status = signal_type;
 	};
 
@@ -516,7 +524,7 @@ int work(const int argc, const char* const * const argv) try {
 	std::signal(SIGSTOP, signal_handler);
 #endif
  
-	auto main_ensure_handler = [&]() {
+	static auto main_ensure_handler = []() {
 		visit_current_setup(
 			[&](auto& setup) {
 				setup.ensure_handler();
@@ -526,9 +534,9 @@ int work(const int argc, const char* const * const argv) try {
 
 	::ensure_handler = main_ensure_handler;
 
-	bool should_quit = false;
+	static bool should_quit = false;
 
-	auto do_main_menu_option = [&](const main_menu_button_type t) {
+	static auto do_main_menu_option = [&](const main_menu_button_type t) {
 		using T = decltype(t);
 
 		switch (t) {
@@ -564,7 +572,7 @@ int work(const int argc, const char* const * const argv) try {
 		}
 	};
 
-	auto do_ingame_menu_option = [&](const ingame_menu_button_type t) {
+	static auto do_ingame_menu_option = [&](const ingame_menu_button_type t) {
 		using T = decltype(t);
 
 		switch (t) {
@@ -588,7 +596,7 @@ int work(const int argc, const char* const * const argv) try {
 		}
 	};
 
-	auto setup_pre_solve = [&](auto...) {
+	static auto setup_pre_solve = [&](auto...) {
 		renderer.save_debug_logic_step_lines_for_interpolation(DEBUG_LOGIC_STEP_LINES);
 		DEBUG_LOGIC_STEP_LINES.clear();
 	};
@@ -598,13 +606,13 @@ int work(const int argc, const char* const * const argv) try {
 		are separated only because MSVC outputs ICEs if they become nested.
 	*/
 
-	visible_entities all_visible;
+	static visible_entities all_visible;
 
-	auto get_character_camera = [&]() -> character_camera {
+	static auto get_character_camera = [&]() -> character_camera {
 		return { get_viewed_character(), { get_camera_eye(), window.get_screen_size() } };
 	};
 
-	auto audiovisual_step = [&](
+	static auto audiovisual_step = [&](
 		const augs::delta frame_delta,
 		const double speed_multiplier,
 		const config_lua_table& viewing_config
@@ -613,12 +621,12 @@ int work(const int argc, const char* const * const argv) try {
 		const auto viewed_character = get_viewed_character();
 		const auto& cosm = viewed_character.get_cosmos();
 		
-		//audiovisuals->reserve_caches_for_entities(viewed_character.get_cosmos().get_solvable().get_entity_pool().capacity());
+		//get_audiovisuals().reserve_caches_for_entities(viewed_character.get_cosmos().get_solvable().get_entity_pool().capacity());
 		
-		auto& interp = audiovisuals->get<interpolation_system>();
+		auto& interp = get_audiovisuals().get<interpolation_system>();
 
 		{
-			auto scope = measure_scope(audiovisuals->performance.interpolation);
+			auto scope = measure_scope(get_audiovisuals().performance.interpolation);
 
 			interp.integrate_interpolated_transforms(
 				viewing_config.interpolation, 
@@ -659,7 +667,7 @@ int work(const int argc, const char* const * const argv) try {
 			return setup.get_inv_tickrate();
 		});
 
-		audiovisuals->advance(audiovisual_advance_input {
+		get_audiovisuals().advance(audiovisual_advance_input {
 			frame_delta,
 			speed_multiplier,
 			inv_tickrate,
@@ -677,11 +685,11 @@ int work(const int argc, const char* const * const argv) try {
 		});
 	};
 
-	auto setup_post_solve = [&](const const_logic_step step, const config_lua_table& viewing_config) {
+	static auto setup_post_solve = [&](const const_logic_step step, const config_lua_table& viewing_config) {
 		{
 			const auto& defs = get_viewable_defs();
 
-			audiovisuals->standard_post_solve(step, { 
+			get_audiovisuals().standard_post_solve(step, { 
 				defs.particle_effects, 
 				streaming.loaded_sounds,
 				viewing_config.audio_volume,
@@ -693,8 +701,8 @@ int work(const int argc, const char* const * const argv) try {
 		game_gui.standard_post_solve(step);
 	};
 
-	auto setup_post_cleanup = [&](const const_logic_step step) {
-		audiovisuals->standard_post_cleanup(step);
+	static auto setup_post_cleanup = [&](const const_logic_step step) {
+		get_audiovisuals().standard_post_cleanup(step);
 		game_gui.standard_post_cleanup(step);
 		
 		if (step.any_deletion_occured()) {
@@ -702,13 +710,13 @@ int work(const int argc, const char* const * const argv) try {
 		}
 	};
 
-	auto get_sampled_cosmos = [](auto& setup) {
+	static auto get_sampled_cosmos = [](auto& setup) {
 		return std::addressof(setup.get_viewed_cosmos());
 	};
 
-	const cosmos* last_sampled_cosmos = nullptr;
+	static const cosmos* last_sampled_cosmos = nullptr;
 
-	auto advance_setup = [&](
+	static auto advance_setup = [&](
 		const augs::delta frame_delta,
 		auto& setup,
 		const input_pass_result& result
@@ -737,9 +745,9 @@ int work(const int argc, const char* const * const argv) try {
 
 #if 1
 			game_gui.clear_dead_entities(*now_sampled);
-			audiovisuals->clear_dead_entities(*now_sampled);
+			get_audiovisuals().clear_dead_entities(*now_sampled);
 #else
-			audiovisuals->clear();
+			get_audiovisuals().clear();
 			game_gui = {};
 #endif
 
@@ -756,7 +764,7 @@ int work(const int argc, const char* const * const argv) try {
 		
 		audiovisual_step(frame_delta, setup.get_audiovisual_speed(), viewing_config);
 
-		auto setup_audiovisual_post_solve = [&viewing_config, &setup, &setup_post_solve, &audiovisual_step](const const_logic_step step) {
+		auto setup_audiovisual_post_solve = [&](const const_logic_step step) {
 			setup_post_solve(step, viewing_config);
 			audiovisual_step(augs::delta::zero, setup.get_audiovisual_speed(), viewing_config);
 		};
@@ -770,10 +778,10 @@ int work(const int argc, const char* const * const argv) try {
 			)
 		);
 
-		audiovisuals->randomizing.last_frame_delta = frame_delta;
+		get_audiovisuals().randomizing.last_frame_delta = frame_delta;
 	};
 
-	auto advance_current_setup = [&](
+	static auto advance_current_setup = [&](
 		const augs::delta frame_delta,
 		const input_pass_result& result
 	) { 
@@ -811,34 +819,28 @@ int work(const int argc, const char* const * const argv) try {
 		The main loop variables.
 	*/
 
-	augs::timer frame_timer;
+	static augs::timer frame_timer;
 	
-	augs::event::state common_input_state;
+	static augs::event::state common_input_state;
 
-	release_flags releases;
+	static release_flags releases;
 
-	/* MSVC ICE workaround */
-	auto& _common_input_state = common_input_state;
-
-	auto make_create_game_gui_context = [&](const config_lua_table& viewing_config) {
+	static auto make_create_game_gui_context = [&](const config_lua_table& viewing_config) {
 		return [&]() {
 			return game_gui.create_context(
 				window.get_screen_size(),
-				_common_input_state,
+				common_input_state,
 				get_viewed_character(),
 				create_game_gui_deps(viewing_config)
 			);
 		};
 	};
 
-	/* MSVC ICE workaround */
-	auto& _window = window;
-
-	auto make_create_menu_context = [&](const config_lua_table& cfg) {
+	static auto make_create_menu_context = [&](const config_lua_table& cfg) {
 		return [&](auto& gui) {
 			return gui.create_context(
-				_window.get_screen_size(),
-				_common_input_state,
+				window.get_screen_size(),
+				common_input_state,
 				create_menu_context_deps(cfg)
 			);
 		};
@@ -945,10 +947,6 @@ int work(const int argc, const char* const * const argv) try {
 					}
 
 					if (!ingame_menu.show) {
-						/* MSVC ICE workaround */
-						auto& _simulated_state = simulated_input_state;
-						auto& _window = window;
-
 						if (visit_current_setup([&](auto& setup) {
 							using T = remove_cref<decltype(setup)>;
 
@@ -959,7 +957,7 @@ int work(const int argc, const char* const * const argv) try {
 								*/
 
 								return setup.handle_input_before_imgui(
-									_simulated_state, e, _window
+									simulated_input_state, e, window
 								);
 							}
 
@@ -1025,17 +1023,13 @@ int work(const int argc, const char* const * const argv) try {
 						thus we ask the current setup for its custom IMGUI logic.
 					*/
 
-					/* MSVC ICE workaround */
-					auto& _lua = lua;
-					auto& _window = window;
-					
 					visit_current_setup([&](auto& setup) {
 						using T = remove_cref<decltype(setup)>;
 
 						if constexpr(std::is_same_v<T, editor_setup>) {
 							/* Editor needs more goods */
 							setup.perform_custom_imgui(
-								_lua, _window, streaming.images_in_atlas, config
+								lua, window, streaming.images_in_atlas, config
 							);
 						}
 						else {
@@ -1233,10 +1227,6 @@ int work(const int argc, const char* const * const argv) try {
 				}
 
 				{
-					/* MSVC ICE workaround */
-					auto& _common_input_state = common_input_state;
-					auto& _window = window;
-
 					if (visit_current_setup([&](auto& setup) {
 						using T = remove_cref<decltype(setup)>;
 
@@ -1247,7 +1237,7 @@ int work(const int argc, const char* const * const argv) try {
 								const auto& app_ingame_controls = viewing_config.app_ingame_controls;
 
 								return setup.handle_input_before_game(
-									app_ingame_controls, streaming.necessary_images_in_atlas, _common_input_state, e, _window
+									app_ingame_controls, streaming.necessary_images_in_atlas, common_input_state, e, window
 								);
 							}
 						}
@@ -1331,9 +1321,6 @@ int work(const int argc, const char* const * const argv) try {
 			Viewables reloading pass.
 		*/
 
-		/* MSVC ICE workaround */
-		auto& _load_all = load_all;
-
 		visit_current_setup(
 			[&](const auto& setup) {
 				using T = remove_cref<decltype(setup)>;
@@ -1342,7 +1329,7 @@ int work(const int argc, const char* const * const argv) try {
 				constexpr auto s = T::loading_strategy;
 
 				if constexpr(s == S::LOAD_ALL) {
-					_load_all(setup.get_viewable_defs());
+					load_all(setup.get_viewable_defs());
 				}
 				else if constexpr(s == S::LOAD_ONLY_NEAR_CAMERA) {
 					static_assert(always_false_v<T>, "Unimplemented");
@@ -1359,7 +1346,7 @@ int work(const int argc, const char* const * const argv) try {
 		streaming.finalize_load({
 			new_viewing_config.debug.measure_atlas_uploading,
 			renderer,
-			audiovisuals->get<sound_system>()
+			get_audiovisuals().get<sound_system>()
 		});
 
 		const auto screen_size = window.get_screen_size();
@@ -1430,8 +1417,8 @@ int work(const int argc, const char* const * const argv) try {
 			create_game_gui_context(),
 
 			{
-				audiovisuals->get<interpolation_system>(),
-				audiovisuals->world_hover_highlighter,
+				get_audiovisuals().get<interpolation_system>(),
+				get_audiovisuals().world_hover_highlighter,
 				new_viewing_config.hotbar,
 				new_viewing_config.drawing,
 				new_viewing_config.game_gui_controls,
@@ -1503,7 +1490,7 @@ int work(const int argc, const char* const * const argv) try {
 					{
 						{ viewed_character, cone },
 						new_viewing_config.session.camera_query_aabb_mult,
-						*audiovisuals,
+						get_audiovisuals(),
 						new_viewing_config.drawing,
 						streaming.necessary_images_in_atlas,
 						streaming.get_loaded_gui_fonts().gui,
@@ -1672,7 +1659,7 @@ int work(const int argc, const char* const * const argv) try {
 				streaming.performance,
 				streaming.general_atlas_performance,
 				performance,
-				audiovisuals->performance
+				get_audiovisuals().performance
 			);
 		}
 

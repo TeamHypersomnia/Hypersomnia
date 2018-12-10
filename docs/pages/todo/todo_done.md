@@ -2405,3 +2405,9 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- Not before we set up the masterserver.
 			- That is because clients will know about the map to be downloaded only through the masterserver that will expose the details of all of its servers.
 
+- Try to fix mysterious crash on Windows by replacing std::vector with constant_size_vector wherever possible
+	- It appears that it still happens on audiovisual post solve
+		- when maybe a ring or a thunder is added?
+		- these can easily be const-vectorized
+			- have some separate view_container_sizes.h
+
