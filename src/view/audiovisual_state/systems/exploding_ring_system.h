@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/misc/minmax.h"
 #include "augs/misc/timing/delta.h"
+#include "augs/misc/constant_size_vector.h"
 #include "augs/math/camera_cone.h"
 
 #include "augs/drawing/sprite.h"
@@ -8,6 +9,8 @@
 
 #include "game/messages/exploding_ring_input.h"
 #include "game/components/transform_component.h"
+
+#include "view/view_container_sizes.h"
 
 class cosmos;
 class particles_simulation_system;
@@ -22,7 +25,7 @@ public:
 
 	double global_time_seconds = 0.0;
 
-	std::vector<ring> rings;
+	augs::constant_size_vector<ring, MAX_EXPLODING_RINGS> rings;
 
 	template <class C>
 	void acquire_new_rings(const C& rings);

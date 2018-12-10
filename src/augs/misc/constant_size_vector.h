@@ -97,9 +97,10 @@ namespace augs {
 		}
 
 		template <class... Args>
-		void emplace_back(Args&&... args) {
+		value_type& emplace_back(Args&&... args) {
 			ensure_less(count, capacity());
-			construct_at(count++, std::forward<Args>(args)...);
+			construct_at(count, std::forward<Args>(args)...);
+			return nth(count++);
 		}
 
 		value_type& operator[](const std::size_t i) {

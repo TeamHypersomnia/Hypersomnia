@@ -11,6 +11,10 @@ void flying_number_indicator_system::clear() {
 }
 
 void flying_number_indicator_system::add(const number::input new_in) {
+	if (container_full(numbers)) {
+		return;
+	}
+
 	number new_number;
 	new_number.in = new_in;
 	new_number.time_of_occurence_seconds = global_time_seconds;

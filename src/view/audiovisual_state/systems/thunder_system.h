@@ -7,6 +7,8 @@
 #include "game/components/transform_component.h"
 #include "view/viewables/all_viewables_declaration.h"
 
+#include "view/view_container_sizes.h"
+
 class particles_simulation_system;
 class cosmos;
 
@@ -20,7 +22,14 @@ class thunder_system {
 public:
 	struct thunder {
 		struct branch {
-			std::vector<int> children;
+			using child_index_type = unsigned char;
+			static_assert(std::numeric_limits<child_index_type>::max() >= MAX_THUNDER_BRANCH_CHILDREN);
+
+			augs::constant_size_vector<
+				child_index_type, 
+				MAX_THUNDER_BRANCH_CHILDREN
+			> children;
+
 			bool activated = true;
 			bool can_have_children = true;
 
@@ -36,12 +45,12 @@ public:
 		float until_next_branching_ms = 0.f;
 		unsigned num_active_branches = 0u;
 
-		std::vector<branch> branches;
+		augs::constant_size_vector<branch, MAX_THUNDER_BRANCHES> branches;
 
 		void create_root_branch(randomization&);
 	};
 
-	std::vector<thunder> thunders;
+	augs::constant_size_vector<thunder, MAX_THUNDERS> thunders;
 
 	void add(randomization&, const thunder_input);
 

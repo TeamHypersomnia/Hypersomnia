@@ -16,7 +16,7 @@ namespace augs {
 				const auto trimmed_new_size = std::min(static_cast<std::size_t>(max_size()), new_size);
 
 				ensure_greater(trimmed_new_size, old_size);
-				reserve(static_cast<size_type>(new_size));
+				reserve(static_cast<size_type>(trimmed_new_size));
 			}
 			else {
 				throw std::runtime_error("Pool is full and cannot be further expanded!");

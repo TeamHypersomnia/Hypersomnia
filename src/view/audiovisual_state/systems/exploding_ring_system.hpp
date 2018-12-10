@@ -3,11 +3,12 @@
 
 template <class C>
 void exploding_ring_system::acquire_new_rings(const C& new_rings) {
-	auto i = rings.size();
-	rings.resize(rings.size() + new_rings.size());
-
 	for (const auto& r : new_rings) {
-		auto& n = rings[i++];
+		if (container_full(rings)) {
+			break;
+		}
+
+		auto& n = rings.emplace_back();
 		n.in = r;
 		n.time_of_occurence_seconds = global_time_seconds;
 	}
@@ -15,9 +16,11 @@ void exploding_ring_system::acquire_new_rings(const C& new_rings) {
 
 template <class I>
 void exploding_ring_system::acquire_new_ring(I&& in) {
-	rings.emplace_back();
-	
-	auto& n = rings.back();
+	if (container_full(rings)) {
+		return;
+	}
+
+	auto& n = rings.emplace_back();
 	n.in = std::forward<I>(in);
 	n.time_of_occurence_seconds = global_time_seconds;
 }

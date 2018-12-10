@@ -7,6 +7,10 @@
 #include "augs/graphics/rgba.h"
 #include "augs/math/camera_cone.h"
 
+#include "view/view_container_sizes.h"
+#include "augs/misc/constant_size_vector.h"
+#include "augs/misc/constant_size_string.h"
+
 namespace augs {
 	struct baked_font;
 	struct drawer;
@@ -16,7 +20,7 @@ class flying_number_indicator_system {
 public:
 	struct number {
 		struct input {
-			std::string text;
+			augs::constant_size_string<MAX_FLYING_NUMBER_CHARACTERS> text;
 			rgba color;
 			
 			float maximum_duration_seconds = 0.f;
@@ -31,9 +35,11 @@ public:
 		mutable std::optional<vec2> first_camera_space_pos;
 	};
 
+private:
 	double global_time_seconds = 0.0;
 
-	std::vector<number> numbers;
+	augs::constant_size_vector<number, MAX_FLYING_NUMBER_INDICATORS> numbers;
+public:
 
 	void reserve_caches_for_entities(const size_t) const {}
 	void clear();

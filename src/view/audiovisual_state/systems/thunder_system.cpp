@@ -20,6 +20,10 @@ void thunder_system::clear() {
 }
 
 void thunder_system::thunder::create_root_branch(randomization& rng) {
+	if (container_full(branches)) {
+		return;
+	}
+
 	thunder::branch b;
 	b.current_lifetime_ms = 0.f;
 
@@ -41,6 +45,10 @@ void thunder_system::add(
 	const thunder_input in
 ) {
 	ensure(in.max_all_spawned_branches > 0);
+
+	if (container_full(thunders)) {
+		return;
+	}
 
 	thunder new_thunder;
 	new_thunder.in = in;
@@ -76,6 +84,10 @@ void thunder_system::advance(
 
 					for (auto ch = 0u; ch < num_children; ++ch) {
 						auto& b = t.branches[i];
+
+						if (container_full(b.children) || container_full(t.branches)) {
+							break;
+						}
 
 						thunder::branch child;
 						child.activated = true;
