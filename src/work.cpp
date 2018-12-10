@@ -231,7 +231,7 @@ int work(const int argc, const char* const * const argv) try {
 	});
 
 	world_camera gameplay_camera;
-	audiovisual_state audiovisuals;
+	auto audiovisuals = std::make_unique<audiovisual_state>();
 
 	/*
 		The lambdas that aid to make the main loop code more concise.
@@ -293,7 +293,7 @@ int work(const int argc, const char* const * const argv) try {
 	};
 
 	auto setup_launcher = [&](auto&& setup_init_callback) {
-		audiovisuals.get<sound_system>().clear();
+		audiovisuals->get<sound_system>().clear();
 
 		main_menu.release();
 		ingame_menu.show = false;
@@ -393,7 +393,7 @@ int work(const int argc, const char* const * const argv) try {
 			streaming.images_in_atlas,
 			streaming.necessary_images_in_atlas,
 			streaming.get_loaded_gui_fonts().gui,
-			audiovisuals.randomizing,
+			audiovisuals->randomizing,
 			viewing_config.game_gui
 		};
 	};
@@ -613,12 +613,12 @@ int work(const int argc, const char* const * const argv) try {
 		const auto viewed_character = get_viewed_character();
 		const auto& cosm = viewed_character.get_cosmos();
 		
-		//audiovisuals.reserve_caches_for_entities(viewed_character.get_cosmos().get_solvable().get_entity_pool().capacity());
+		//audiovisuals->reserve_caches_for_entities(viewed_character.get_cosmos().get_solvable().get_entity_pool().capacity());
 		
-		auto& interp = audiovisuals.get<interpolation_system>();
+		auto& interp = audiovisuals->get<interpolation_system>();
 
 		{
-			auto scope = measure_scope(audiovisuals.performance.interpolation);
+			auto scope = measure_scope(audiovisuals->performance.interpolation);
 
 			interp.integrate_interpolated_transforms(
 				viewing_config.interpolation, 
@@ -659,7 +659,7 @@ int work(const int argc, const char* const * const argv) try {
 			return setup.get_inv_tickrate();
 		});
 
-		audiovisuals.advance(audiovisual_advance_input {
+		audiovisuals->advance(audiovisual_advance_input {
 			frame_delta,
 			speed_multiplier,
 			inv_tickrate,
@@ -681,7 +681,7 @@ int work(const int argc, const char* const * const argv) try {
 		{
 			const auto& defs = get_viewable_defs();
 
-			audiovisuals.standard_post_solve(step, { 
+			audiovisuals->standard_post_solve(step, { 
 				defs.particle_effects, 
 				streaming.loaded_sounds,
 				viewing_config.audio_volume,
@@ -694,7 +694,7 @@ int work(const int argc, const char* const * const argv) try {
 	};
 
 	auto setup_post_cleanup = [&](const const_logic_step step) {
-		audiovisuals.standard_post_cleanup(step);
+		audiovisuals->standard_post_cleanup(step);
 		game_gui.standard_post_cleanup(step);
 		
 		if (step.any_deletion_occured()) {
@@ -737,9 +737,9 @@ int work(const int argc, const char* const * const argv) try {
 
 #if 1
 			game_gui.clear_dead_entities(*now_sampled);
-			audiovisuals.clear_dead_entities(*now_sampled);
+			audiovisuals->clear_dead_entities(*now_sampled);
 #else
-			audiovisuals.clear();
+			audiovisuals->clear();
 			game_gui = {};
 #endif
 
@@ -770,7 +770,7 @@ int work(const int argc, const char* const * const argv) try {
 			)
 		);
 
-		audiovisuals.randomizing.last_frame_delta = frame_delta;
+		audiovisuals->randomizing.last_frame_delta = frame_delta;
 	};
 
 	auto advance_current_setup = [&](
@@ -1359,7 +1359,7 @@ int work(const int argc, const char* const * const argv) try {
 		streaming.finalize_load({
 			new_viewing_config.debug.measure_atlas_uploading,
 			renderer,
-			audiovisuals.get<sound_system>()
+			audiovisuals->get<sound_system>()
 		});
 
 		const auto screen_size = window.get_screen_size();
@@ -1430,8 +1430,8 @@ int work(const int argc, const char* const * const argv) try {
 			create_game_gui_context(),
 
 			{
-				audiovisuals.get<interpolation_system>(),
-				audiovisuals.world_hover_highlighter,
+				audiovisuals->get<interpolation_system>(),
+				audiovisuals->world_hover_highlighter,
 				new_viewing_config.hotbar,
 				new_viewing_config.drawing,
 				new_viewing_config.game_gui_controls,
@@ -1503,7 +1503,7 @@ int work(const int argc, const char* const * const argv) try {
 					{
 						{ viewed_character, cone },
 						new_viewing_config.session.camera_query_aabb_mult,
-						audiovisuals,
+						*audiovisuals,
 						new_viewing_config.drawing,
 						streaming.necessary_images_in_atlas,
 						streaming.get_loaded_gui_fonts().gui,
@@ -1672,7 +1672,7 @@ int work(const int argc, const char* const * const argv) try {
 				streaming.performance,
 				streaming.general_atlas_performance,
 				performance,
-				audiovisuals.performance
+				audiovisuals->performance
 			);
 		}
 

@@ -4,6 +4,7 @@
 
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/build_settings/setting_enable_debug_log.h"
+#include "augs/build_settings/compiler_defines.h"
 
 struct log_entry {
 	std::string text;
@@ -30,7 +31,7 @@ public:
 void write_log_entry(const std::string& f);
 
 template <class... A>
-void LOG(const std::string& f, A&&... a) {
+FORCE_NOINLINE void LOG(const std::string& f, A&&... a) {
 	write_log_entry(typesafe_sprintf(f, std::forward<A>(a)...));
 }
 
