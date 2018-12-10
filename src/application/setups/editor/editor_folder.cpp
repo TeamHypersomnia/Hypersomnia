@@ -148,10 +148,6 @@ bool editor_folder::allow_close() const {
 		return false;
 	}
 
-	if (player.has_testing_started()) {
-		return true;
-	}
-
 	return history.at_saved_revision();
 }
 
@@ -192,9 +188,13 @@ std::optional<editor_warning> editor_folder::open_most_relevant_content(sol::sta
 			const auto cmd_in = editor_command_input::make_dummy_for(lua, *this);
 			const auto target_step = player.get_current_step();
 
+			const auto pre_seek_revision = history.get_current_revision();
+
 			player.pause();
 			player.seek_to(target_step - 1, cmd_in, false);
 			player.seek_to(target_step, cmd_in, false);
+
+			history.seek_to_revision(pre_seek_revision, cmd_in);
 		}
 	};
 
