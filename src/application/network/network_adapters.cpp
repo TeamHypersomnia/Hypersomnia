@@ -1,16 +1,11 @@
 #include "application/network/network_adapters.h"
 #include "augs/network/network_types.h"
+#include "augs/readwrite/memory_stream.h"
 #include "hypersomnia_version.h"
 
+#include "application/network/net_message_serialization.h"
+
 static_assert(max_incoming_connections_v == yojimbo::MaxClients);
-
-void server_adapter::client_connected(const client_id_type id) {
-	pending_events.push_back({ id, connection_event_type::CONNECTED });
-}
-
-void server_adapter::client_disconnected(const client_id_type id) {
-	pending_events.push_back({ id, connection_event_type::DISCONNECTED });
-}
 
 void GameAdapter::OnServerClientConnected(const client_id_type clientIndex) {
 	if (m_server != nullptr) {
@@ -24,20 +19,34 @@ void GameAdapter::OnServerClientDisconnected(const client_id_type clientIndex) {
 	}
 }
 
-GameConnectionConfig::GameConnectionConfig() {
+void server_adapter::client_connected(const client_id_type id) {
+	pending_events.push_back({ id, true });
+}
+
+void server_adapter::client_disconnected(const client_id_type id) {
+	pending_events.push_back({ id, false });
+}
+
+game_connection_config::game_connection_config() {
 	numChannels = 1;
-	channel[static_cast<int>(game_channel_type::SOLVABLE_STREAM)].type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
+
+	auto& solvable_stream = channel[static_cast<int>(game_channel_type::SOLVABLE_STREAM)];
+	solvable_stream.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
+	solvable_stream.maxBlockSize = 1024 * 1024 * 2;
+
+	serverPerClientMemory += 1024 * 1024 * 2;
+
 	set_max_packet_size(2 * 1024);
 }
 
-void GameConnectionConfig::set_max_packet_size(const unsigned s) {
+void game_connection_config::set_max_packet_size(const unsigned s) {
 	protocolId = hypersomnia_version().commit_number;
 
 	maxPacketSize = s;
     maxPacketFragments = (int) ceil( maxPacketSize / packetFragmentSize );
 }
 
-GameConnectionConfig::GameConnectionConfig(const server_start_input& in) : GameConnectionConfig() {
+game_connection_config::game_connection_config(const server_start_input& in) : game_connection_config() {
 	(void)in;
 #if 0
 	set_max_packet_size(in.max_packet_size);
@@ -87,9 +96,10 @@ server_adapter::server_adapter(const server_start_input& in) :
 }
 
 void server_adapter::disconnect_client(const client_id_type& id) {
-	server.DisconnectClient(id);
+	(void)id;
+	//server.DisconnectClient(id);
 }
 
 void server_adapter::send_packets() {
-	server.SendPackets();
+	//server.SendPackets();
 }

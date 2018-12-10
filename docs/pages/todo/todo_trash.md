@@ -943,3 +943,54 @@ fixtures can form scene graph as they have relative transforms.
 		- Akimbo is thus handicapped only to the primary
 			- But really it makes little sense to carry two knives
 		- actually we'll disable attacks in akimbo
+
+- what to send on client connection?
+	- Note that WE WILL need SOME kind of reliable udp transport even for dumb chat messages
+		- we'll use reliable.io or a hand-written slice/chunk proto
+		- and like hell we are not going to retransmit them redundantly brute forcibly
+	- for the initial cosmos solvable state, we can send a delta against the initial cosm and the current cosm
+		- though entities for shells might get quite large
+		- a character is almost 1k...
+		- perhaps it will be best to send all inputs after all
+	- if we want to replay either from session beginning or mid-way, inputs can become quite large
+		- Though, we could use the exact same protocol
+			- simply post all inputs for the client
+		- and we could replay in parallel
+	- cosmos solvable won't be that big
+	- we also have to send rulesets if we'll allow commands on them
+
+- it might be a good idea to split intercosm into many files?
+	- in case of compatibility breaks we could only tinker with a single file
+	- git has less to do as well
+
+
+- PIMPL anywhere?
+	- actually netcode.io headers are pretty damn light
+
+- server entropy
+	- chosen solution: a client should have no notion of other clients.
+		- actually it will be useful to specify sensitivity and encode further movements against these
+		- Therefore, add/remove player should be handled by MODE ENTROPY.
+		- Mode entropy is anyways serialized to all players.
+		- for now it's not critical that we serialize server messages, and their handling will anyway be centralized so we can introduce it later
+			- therefore for now just handle everything inside the run function with callbacks
+	- Surely: client connected, client disconnected, variant of messages
+	- maybe not for the sake of replaying, but for the sake of syncing non-step-entropy information to the clients?
+		- like connections/disconnections
+		- though a part of it might be private to the server?
+			- not really, I guess authentication would be transparent to the setup and handled by web backends and netcode io
+	- could it be made to be processed by clients as well?
+		- since the server also needs a way to communicate to others that a client has just connected
+	- replicated_state
+		- current cosmos
+		- current mode variant
+		- server rules
+	- network_game_interop
+		- an intermediate object that deterministically plays the effects of network entropy upon a mode
+		- advance
+		- responsible for adding/removing players to/from the modes
+			- perhaps application of other messages
+		- after server constructs the total server_entropy, with total inputs of players... 
+			- now the problem is that the input calculation is transparent for replays
+				- though it is a trivial thing
+

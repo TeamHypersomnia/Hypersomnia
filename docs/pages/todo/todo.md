@@ -6,6 +6,11 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- large block sending augs api
+	- asynchronous: deliver_large_data
+	- large_data_delivered() const
+	- always one large data is sent at a time
+
 - enum-less variants of enum_boolset and enum_map
 	- useful for quick mapping users in an array
 

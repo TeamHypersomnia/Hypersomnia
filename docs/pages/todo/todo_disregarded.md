@@ -363,3 +363,59 @@ summary: Just a hidden scratchpad.
 			- Con: Format of the filename, have to forbid some characters
 		- Server will probably be able to accept a lua script easily
 		- With an export, we may simply create a folder with a script file per each var
+
+	- For now, let's only send inputs per step instead of solvable
+		- This way we always quickly connect on the beginning of the round which is most frequently the case
+		- if you connect late that's your problem, but anyways it should happen rather quickly
+		- we can later implement dynamic choice of the way we transmit the initial state
+			- solvable's can be trivially estimated
+			- and we can keep track of the number of sent entropies this round, as we go
+			- this way we can compare which is more space efficient
+	- actually why do we need completion? can't we begin to queue up the inputs?
+		- we want to generate another solvable message right away or pack all inputs that happened tightly
+
+- For now let's go with winsock + reliable.io to send large blocks
+	- We'll learn from netcode and maybe use some functions
+	- API will never need to change when we add security.
+
+- solution: netcode.io + sending large blocks code from the example,
+	- or we'll take some code from yojimbo that sends blocks
+
+	
+- against yojimbo?
+	- the message ecosystem that does not play well with our code
+	- other deps that we don't need atm
+- design augs api so that either netcode or yojimbo can be used underneath
+
+- improvements to redundancy
+	- message-wise fragmentation
+		- we might need some more effective way to deal with this
+			- Solution 1
+				- if there are 5 steps to sent, but 2 steps already fill the whole packet,
+				- and the other 3 can be packed into the next,
+				- simply withhold posting the 3 remaining messages until the other 2 are delivered
+				- in this case we might need to increase the rate of sends and send them even before the next tick
+			- Solution 2
+				- simply always send all messages redundantly but split into several packets
+				- client, apart from sending the most recent sequence number before which everything was received,
+					- also sends acks redundantly for all packets received out of order
+						- clears them once the most recent sequence number implies receiving of these out of order packets as well
+				- con: we would probably want to prioritize the 
+
+		- we have a map of sequence to reliable range
+		- later entries may arrive before earlier ones
+		- we keep a vector of pending entries and only  
+	- Unlikely, but a single step information might not fit into a packet
+		- e.g. if 300 players move their mouse at once
+		- in this VERY unlikely case we might just randomly drop some entropies to not overload the server?
+			- simply drop entropies of players who've sent the most commands
+				- so if someone coordinates a DoS of this sort, they will remain motionless
+				- if someone is innocent but their entropy is dropped, it might happen that:
+					- their player moves despite having their buttons pressed
+					- their mouse position is completely different than expected
+				- in this case, the client should try to repost the entropies that were cut
+
+
+- perhaps we should implement remote entropy and just return it from the adapter, instead of acquiring templates
+	- because we'd anyway like to log the entropies
+	- unless we log entropies at the packet level

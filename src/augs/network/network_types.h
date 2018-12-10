@@ -15,3 +15,8 @@ namespace augs {
 		bool deinit();
 	}
 }
+
+enum class message_handler_result {
+	ABORT_AND_DISCONNECT,
+	CONTINUE
+};

@@ -9,14 +9,12 @@
 #include "augs/filesystem/file.h"
 #include "application/arena/arena_paths.h"
 
+#include "application/network/net_message_translation.h"
+#include "application/network/net_message_serialization.h"
+
 #include "augs/misc/pool/pool_io.hpp"
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/memory_stream.h"
-
-augs::ref_memory_stream server_setup::make_serialization_stream() {
-	serialization_buffer.clear();
-	return augs::ref_memory_stream(serialization_buffer);
-}
 
 /* To avoid incomplete type error */
 server_setup::~server_setup() = default;
@@ -28,7 +26,7 @@ mode_player_id server_setup::to_mode_player_id(const client_id_type& id) {
 	return out;
 }
 
-void server_setup::deal_with_malicious_client(const client_id_type id) {
+void server_setup::log_malicious_client(const client_id_type id) {
 	LOG("Malicious client detected. Details:\n%x", describe_client(id));
 }
 
@@ -48,7 +46,6 @@ server_setup::server_setup(
 	sol::state& lua,
 	const server_start_input& in
 ) : 
-	compression_state(augs::make_compression_state()),
 	server(std::make_unique<server_adapter>(in)),
 	server_time(yojimbo_time())
 {
@@ -116,9 +113,20 @@ bool server_setup::add_to_arena(add_to_arena_input) {
 	return true;
 }
 
+void server_setup::init_client(const client_id_type& id) {
+	clients[id] = server_client_state(server_time);
+
+	LOG("Client connected. Details:\n%x", describe_client(id));
+}
+
+void server_setup::unset_client(const client_id_type& id) {
+	LOG("Client disconnected. Details:\n%x", describe_client(id));
+	clients[id].unset();
+}
+
 void server_setup::disconnect_and_unset(const client_id_type& id) {
 	server->disconnect_client(id);
-	clients[id].unset();
+	unset_client(id);
 }
 
 void server_setup::advance_clients_state(const setup_advance_input& in) {
@@ -196,6 +204,7 @@ void server_setup::advance_clients_state(const setup_advance_input& in) {
 
 		if (c.state == S::RECEIVING_INITIAL_STATE) {
 			if (!server->has_messages_to_send(client_id, game_channel_type::SOLVABLE_STREAM)) {
+#if 0
 				auto message_provider = [&](net_messages::initial_steps_correction& msg) {
 					(void)msg;
 				};
@@ -203,133 +212,96 @@ void server_setup::advance_clients_state(const setup_advance_input& in) {
 				server->send_message(client_id, game_channel_type::SOLVABLE_STREAM, message_provider);
 
 				c.state = S::RECEIVING_INITIAL_STATE_CORRECTION;
+#else
+				// TODO: Actually send the correction
+				c.set_in_game(server_time);
+#endif
 			}
 		}
 		else if (c.state == S::RECEIVING_INITIAL_STATE_CORRECTION) {
 			if (!server->has_messages_to_send(client_id, game_channel_type::SOLVABLE_STREAM)) {
-				c.state = S::IN_GAME;
+				c.set_in_game(server_time);
 			}
 		}
 	}
 }
 
+template <class T>
+constexpr bool payload_easily_movable_v = true;
+
+template <class T, class F>
+message_handler_result server_setup::handle_client_message(
+	const client_id_type& client_id, 
+	F&& read_payload
+) {
+	constexpr auto abort_v = message_handler_result::ABORT_AND_DISCONNECT;
+	constexpr bool is_easy_v = payload_easily_movable_v<T>;
+
+	std::conditional_t<is_easy_v, T, std::monostate> payload;
+
+	if constexpr(is_easy_v) {
+		if (!read_payload(payload)) {
+			return abort_v;
+		}
+	}
+
+	using S = server_client_state::type;
+	namespace N = net_messages;
+
+	auto& c = clients[client_id];
+	ensure(c.is_set());
+
+	if constexpr (std::is_same_v<T, requested_client_settings>) {
+		/* 
+			A client might re-state its requested settings
+			even outside of the PENDING_WELCOME state
+		*/
+
+		c.settings = std::move(payload);
+
+		if (c.state == S::PENDING_WELCOME) {
+			server->send_payload(
+				client_id, 
+				game_channel_type::SOLVABLE_STREAM, 
+
+				buffers,
+
+				initial_arena_state_payload<true> {
+					scene.world.get_solvable().significant,
+					current_mode,
+					vars
+				}
+			);
+
+			c.state = S::RECEIVING_INITIAL_STATE;
+		}
+	}
+	else if constexpr (std::is_same_v<T, total_mode_player_entropy>) {
+		if (c.state != S::IN_GAME) {
+			/* 
+				The client shall not send commands until it receives the first step entropy,
+				at which point being IN_GAME is guaranteed.
+
+				Actually, wouldn't the ack for the last fragment come along the first client commands?
+			*/
+
+			return abort_v;
+		}
+	}
+	else {
+		static_assert(always_false_v<T>, "Unhandled payload type.");
+	}
+
+	c.last_valid_activity_time = server_time;
+	return message_handler_result::CONTINUE;
+}
+
 void server_setup::handle_client_messages(const setup_advance_input& in) {
 	(void)in;
 
-	auto unset_client = [&](const client_id_type& id) {
-		if (auto& c = clients[id]; c.is_set()) {
-			/* 
-				A client might have disconnected during message processing. 
-				The disconnection is handled right away so that the client array NEVER EVER 
-				holds lingering state for already disconnected clients.
+	server->advance(server_time, *this);
 
-				However, a disconnection event was still posted to pending events, due to calling disconnect_client.
-
-				We don't want to process the disconnection twice so we must first check if the client was already set.
-			*/
-
-			LOG("Client disconnected. Details:\n%x", describe_client(id));
-			c.unset();
-		}
-	};
-
-	auto message_callback = [&](
-		const client_id_type id, 
-		const auto& message
-	) {
-		using M = remove_cref<decltype(message)>;
-
-		auto stop_processing_this_client = [&]() {
-			unset_client(id);
-			return message_handler_result::ABORT_AND_DISCONNECT;
-		};
-
-		if constexpr(std::is_same_v<M, connection_event_type>) {
-			const auto type = message;
-
-			if (type == connection_event_type::CONNECTED) {
-				clients[id] = server_client_state(server_time);
-
-				LOG("Client connected. Details:\n%x", describe_client(id));
-			}
-			else {
-				unset_client(id);
-			}
-		}
-		else {
-			ensure(server->is_client_connected(id));
-
-			auto& c = clients[id];
-			using S = server_client_state::type;
-
-			namespace N = net_messages;
-
-			if constexpr(!M::client_to_server) {
-				static_assert(M::server_to_client);
-				/* What are you trying to pull off? */
-				deal_with_malicious_client(id);
-				return stop_processing_this_client();
-			}
-			else if constexpr (std::is_same_v<M, N::client_welcome>) {
-				if (c.state == S::PENDING_WELCOME) {
-					// TODO: check if this is handled when we connect with < 3 characters as nickname
-					auto message_provider = [&](net_messages::initial_solvable& msg) {
-						auto for_each_initial_state = [&](auto callback) {
-							callback(vars);
-							callback(current_mode);
-							callback(scene.world.get_solvable().significant);
-						};
-
-						auto write_all_to = [&](auto& s) {
-							for_each_initial_state([&s](const auto& data) {
-								augs::write_bytes(s, data);
-							});
-						};
-
-						{
-							augs::byte_counter_stream s;
-							write_all_to(s);
-							serialization_buffer.reserve(s.size());
-						}
-
-						auto s = make_serialization_stream();
-						write_all_to(s);
-
-						augs::compress(compression_state, serialization_buffer, compressed_buffer);
-
-						const auto result_size = compressed_buffer.size();
-						const auto memory = server->get_specific().AllocateBlock(id, result_size);
-
-						std::memcpy(memory, compressed_buffer.data(), result_size);
-						server->get_specific().AttachBlockToMessage(id, std::addressof(msg), memory, result_size);
-					};
-
-					server->send_message(id, game_channel_type::SOLVABLE_STREAM, message_provider);
-
-					c.state = S::RECEIVING_INITIAL_STATE;
-				}
-
-				/* A client might re-state its requested settings */
-
-				c.settings = static_cast<const requested_client_settings&>(message);
-				c.last_valid_activity_time = server_time;
-			}
-			else if constexpr (std::is_same_v<M, N::client_entropy>) {
-				if (c.state != S::IN_GAME) {
-					return stop_processing_this_client();
-				}
-
-				c.last_valid_activity_time = server_time;
-			}
-			else {
-				static_assert(always_false_v<M>, "Unhandled message type.");
-			}
-		}
-
-		return message_handler_result::CONTINUE;
-	};
-
-	server->advance(server_time, message_callback);
+	++current_step;
 
 	{
 		auto& ticks_remaining = ticks_until_sending_packets;

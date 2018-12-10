@@ -21,6 +21,7 @@
 #include "application/predefined_rulesets.h"
 #include "application/arena/mode_and_rules.h"
 #include "augs/readwrite/memory_stream_declaration.h"
+#include "augs/misc/serialization_buffers.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -36,6 +37,8 @@ struct add_to_arena_input {
 
 class server_adapter;
 
+using server_step_type = unsigned;
+
 class server_setup : public default_setup_settings {
 	/* This is loaded from the arena folder */
 	intercosm scene;
@@ -46,9 +49,9 @@ class server_setup : public default_setup_settings {
 	server_vars vars;
 
 	/* The rest is server-specific */
-	std::vector<std::byte> serialization_buffer;
-	std::vector<std::byte> compressed_buffer;
-	std::vector<std::byte> compression_state;
+	server_step_type current_step = 0;
+
+	augs::serialization_buffers buffers;
 
 	entropy_accumulator total_collected;
 	entity_id viewed_character_id;
@@ -81,6 +84,17 @@ class server_setup : public default_setup_settings {
 	void advance_clients_state(
 		const setup_advance_input& in
 	);
+
+	friend server_adapter;
+
+	template <class T, class F>
+	message_handler_result handle_client_message(
+		const client_id_type&, 
+		F&& read_payload
+	);
+
+	void init_client(const client_id_type&);
+	void unset_client(const client_id_type&);
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -134,7 +148,7 @@ public:
 	void remove_from_arena(const client_id_type&);
 
 	std::string describe_client(const client_id_type id) const;
-	void deal_with_malicious_client(const client_id_type id);
+	void log_malicious_client(const client_id_type id);
 
 	auto escape() {
 		return setup_escape_result::IGNORE;

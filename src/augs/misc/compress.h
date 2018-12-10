@@ -21,6 +21,12 @@ namespace augs {
 	);
 
 	void decompress(
+		const std::byte* input,
+		std::size_t byte_count,
+		std::vector<std::byte>& output
+	);
+
+	void decompress(
 		const std::vector<std::byte>& input,
 		std::vector<std::byte>& output
 	);

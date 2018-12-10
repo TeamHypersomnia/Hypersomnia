@@ -1,0 +1,104 @@
+#pragma once
+#include "augs/misc/constant_size_vector.h"
+#include "game/modes/mode_entropy.h"
+#include "augs/misc/serialization_buffers.h"
+
+using total_client_entropy = total_mode_player_entropy;
+
+constexpr std::size_t chosen_packet_size_v = 1024;
+
+constexpr std::size_t total_header_bytes_v = 
+	yojimbo::ConservativeMessageHeaderBits
+	+ yojimbo::ConservativePacketHeaderBits 
+	+ yojimbo::ConservativeMessageHeaderBits 
+;
+
+/* 
+	Make the max message size conservative enough 
+	so that a single message does never cause a packet to split. 
+*/
+
+constexpr std::size_t max_message_size_v = ((chosen_packet_size_v - total_header_bytes_v) / 4) * 4;
+
+using message_bytes_type = augs::constant_size_vector<std::byte, max_message_size_v>;
+
+struct preserialized_message : public yojimbo::Message {
+	message_bytes_type bytes;
+
+	template <typename Stream>
+	bool Serialize(Stream& stream);
+
+	YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
+};
+
+struct only_block_message : public yojimbo::BlockMessage {
+	/* The client will never send blocks */
+
+	static constexpr bool server_to_client = true;
+	static constexpr bool client_to_server = false;
+
+	template <typename Stream>
+	bool Serialize(Stream& stream) {
+		(void)stream;
+		return true;
+	}
+
+	YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
+};
+
+template <bool C>
+struct initial_arena_state_payload;
+
+namespace net_messages {
+	struct initial_arena_state : only_block_message {
+		bool to_payload(
+			augs::serialization_buffers&,
+			initial_arena_state_payload<false>
+		);
+
+		const std::vector<std::byte>* from_payload(
+			augs::serialization_buffers&,
+			initial_arena_state_payload<true>
+		);
+	};
+
+	//struct initial_steps_correction : only_block_message {};
+
+	struct step_entropy : preserialized_message {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = false;
+	};
+
+	struct client_entropy : preserialized_message {
+		static constexpr bool server_to_client = false;
+		static constexpr bool client_to_server = true;
+
+		bool from_payload(total_client_entropy&&);
+		bool to_payload(total_client_entropy&);
+	};
+
+	struct client_welcome : public yojimbo::Message {
+		static constexpr bool server_to_client = false;
+		static constexpr bool client_to_server = true;
+
+		requested_client_settings payload;
+
+		template <typename Stream>
+		bool Serialize(Stream& stream);
+
+		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
+
+		bool from_payload(requested_client_settings&&);
+		bool to_payload(requested_client_settings&);
+	};
+
+	using all_t = type_list<
+		initial_arena_state*,
+		//initial_steps_correction*,
+		step_entropy*,
+		client_welcome*,
+		client_entropy*
+	>;
+	
+	using id_t = type_in_list_id<all_t>;
+}

@@ -2358,3 +2358,50 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Pre-serialized messages
 
+	- research the completion checking of messages in yojimbo
+		- we can use HasMessagesToSend
+			- actually not really because its hidden behind a private interface...
+		- Use the reference count, simply AcquireMessage on being posted
+			- this is even more flexible since it works even if we post more messages after this one
+		- perhaps by message id or a changed field value inside the message object?
+
+- commandize add_player and remove_player
+	- problem: we might be unable to deterministically predict the outcome
+		- what? actually, add player command will always succeed as long as there is space, which we can easily predict
+		- we won't predict auto-assignments but that's not really important
+		- also if we need predictability, wwe can do these once per step
+	- remember that we need to re-add players every time that a mode type is changed
+
+- We need to decide on the server software.
+	- focus on creating a minimal api class 
+		- whatever we plug there, whether dedicated serv instance or player hosted,
+			- we'll just pull our own message format from there
+			- We can as well add NAT punchthrough later
+				- Games like soldat don't even have it
+				- we'll read the guide on raknet even if we're not going to use it as it is comprehensive
+	- what we need from the network
+		- for early beta and later,
+			- reliable delivery for initial stuff + chat
+			- redundant delivery for inputs
+				- we have to revive the reliable channel
+			- perhaps compression?
+		- for later stages,
+			- masterserver + nat
+		- for dedicated servers,
+			- secure connections
+	- we'll remove enet shortly
+	- netcode.io + reliable.io
+		- pro: we'll learn more along the way and have more control over packets
+	- libyojimbo
+		- pro: will probably work right away
+		- it's actually for dedicated servers, not player hosted servers
+- network_adapters
+	- has usings for server/client types
+	- global functions to abstract functionality?
+		- actually just use a class wrapper and a getter for the specific object so that we know where we're getting specific
+
+- Let someone on spectator when they are connected even if they're downloading initial solvable
+	- Though before they git clone the repos
+		- Not before we set up the masterserver.
+			- That is because clients will know about the map to be downloaded only through the masterserver that will expose the details of all of its servers.
+

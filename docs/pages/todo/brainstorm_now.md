@@ -6,6 +6,63 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Try to fix mysterious crash on Windows by replacing std::vector with constant_size_vector wherever possible
+	- It appears that it still happens on audiovisual post solve
+		- when maybe a ring or a thunder is added?
+		- these can easily be const-vectorized
+			- have some separate view_container_sizes.h
+
+- It would be nice if the server_setup could only accept ready structs and was not concerned with messages being preserialized, 
+	and serialization in general
+	- similarly as it receives "connection event" message
+	- let each message declare using payload_type
+	- for reading, the payload type would be created on the stack in the adapter, and then constructed by serializators from a separate header
+		- server would receive a ready reference to a struct
+	- it would be best if the server_setup controlled whether the payload type is to be on the stack or if it's ready somewhere else
+		- read_into
+		- instead of a lambda, have a template function handle_message which accepts a payload type as its argument
+			- then pass *this to the server advance
+			- the callback also accepts a callback for reading into so we control if the payload type enters stack or somewhere else
+				- if we decided that the yojimbo messages should hold the payload directly, the server adapter can call std::move in its lambda passed to the message callback
+		- what about structs that its not comfortable to mash into a single struct but still need to be read?
+			- e.g. initial solvable has multiple big objects in a single message
+				- mode solvable
+				- cosm solvable
+				- server vars
+			- do we send them separately?
+				- feels clean but possibly lost opportunity for compression
+					- although these things won't compress much better in conjunction
+				- we also get more latency due to separation of blocks
+			- read_payload accepts several arguments for specific types, we pass the message type as the type
+				- Indeed, it is us who decide whether to pass more arguments
+				- we can add a type list as a payload type
+				- this kind of thing will happen on the client though
+
+- Preserialized messages vs keeping structs in these messages
+	- Preserialized
+		- Pro: Ad-hoc serialization at the site of posting so less risk of inconsistency
+			- This is a big deal because MANY desync issues might be circumvented
+			- example problem: 
+				- a step information is posted for a client.
+				- we want to compress it by giving client ids instead of entity ids to associate each set of inputs with a client.
+				- however, we can't predict when will the message finally serialize
+		- Con: Increased bandwidth
+			- though just 2 bytes
+				- Actually, this is insignificant, because:
+					- the bandwidth bottlenek will be the server's upload
+					- and in the worst case it won't even amount to a single player continuously moving his mouse
+					- and compare this to the header sizes
+		- Pro: Faster estimation
+		- Pro: Easier interaction with the server as we don't have to cast the void* pointer
+			- Should be negliglible?
+		- Note that changing the way we write the messages won't really be that much since we will anyway read somehow from these bytes
+	- Keeping the struct
+		- Has to actually hold the data structure, e.g. a map
+		- has to operate on a dirty context pointer instead of our own serialization routine
+			- e.g. when the message ultimately serializes for sending the client ids on the server might be different than what will happen at the client
+
+- Whether to keep worst-case storage in the preserialized messages or not is another problem
+
 - It might be hard to properly send the initial mode state while avoiding desync
 	- sending solvable on init is also scalable for longer matches
 	- Rounds might be restarted arbitrarily due to pre-solve logic
@@ -32,21 +89,8 @@ summary: That which we are brainstorming at the moment.
 		- In particular, dont create deep clones of the solvable or entropies 
 		- That's because serialization will be a lot faster than deep clones
 		- And we anyway have to serialize this so that's one step less
-	- For now, let's only send inputs per step instead of solvable
-		- This way we always quickly connect on the beginning of the round which is most frequently the case
-		- if you connect late that's your problem, but anyways it should happen rather quickly
-		- we can later implement dynamic choice of the way we transmit the initial state
-			- solvable's can be trivially estimated
-			- and we can keep track of the number of sent entropies this round, as we go
-			- this way we can compare which is more space efficient
-	- research the completion checking of messages in yojimbo
-		- we can use HasMessagesToSend
-			- actually not really because its hidden behind a private interface...
-		- Use the reference count, simply AcquireMessage on being posted
-			- this is even more flexible since it works even if we post more messages after this one
-		- perhaps by message id or a changed field value inside the message object?
-	- actually why do we need completion? can't we begin to queue up the inputs?
-		- we want to generate another solvable message right away or pack all inputs that happened tightly
+
+- Implement steps correction sending 
 
 - General client processing loop
 	- Always check and add a mode player if the client is not yet in-game
@@ -56,13 +100,6 @@ summary: That which we are brainstorming at the moment.
 		- We don't have to worry about malicious sizes
 		- We don't have to worry about message being too large due to all these nicknames
 		- Con: we might waste more bits/bytes overall but that's amortized over time
-
-- commandize add_player and remove_player
-	- problem: we might be unable to deterministically predict the outcome
-		- what? actually, add player command will always succeed as long as there is space, which we can easily predict
-		- we won't predict auto-assignments but that's not really important
-		- also if we need predictability, wwe can do these once per step
-	- remember that we need to re-add players every time that a mode type is changed
 
 - Chat-level logs
 	- server_setup has to expose events somehow
@@ -77,11 +114,6 @@ summary: That which we are brainstorming at the moment.
 	- Last time of valid activity
 		- Kick if AFK
 		- AFK timer can already be a server setting
-
-- Let someone on spectator when they are connected even if they're downloading initial solvable
-	- Though before they git clone the repos
-		- Not before we set up the masterserver.
-			- That is because clients will know about the map to be downloaded only through the masterserver that will expose the details of all of its servers.
 
 - The built-in player of the server
 	- Always at id -1
@@ -99,42 +131,7 @@ summary: That which we are brainstorming at the moment.
 		- etc.
 		- for mode: item purchase, team selection etc.
 
-- server entropy
-	- chosen solution: a client should have no notion of other clients.
-		- Therefore, add/remove player should be handled by MODE ENTROPY.
-		- Mode entropy is anyways serialized to all players.
-		- for now it's not critical that we serialize server messages, and their handling will anyway be centralized so we can introduce it later
-			- therefore for now just handle everything inside the run function with callbacks
-	- Surely: client connected, client disconnected, variant of messages
-	- maybe not for the sake of replaying, but for the sake of syncing non-step-entropy information to the clients?
-		- like connections/disconnections
-		- though a part of it might be private to the server?
-			- not really, I guess authentication would be transparent to the setup and handled by web backends and netcode io
-	- could it be made to be processed by clients as well?
-		- since the server also needs a way to communicate to others that a client has just connected
-	- replicated_state
-		- current cosmos
-		- current mode variant
-		- server rules
-	- network_game_interop
-		- an intermediate object that deterministically plays the effects of network entropy upon a mode
-		- advance
-		- responsible for adding/removing players to/from the modes
-			- perhaps application of other messages
-		- after server constructs the total server_entropy, with total inputs of players... 
-			- now the problem is that the input calculation is transparent for replays
-				- though it is a trivial thing
-
-decides which ones to send to the clients so that they don't 
-
-- perhaps we should implement remote entropy and just return it from the adapter, instead of acquiring templates
-	- because we'd anyway like to log the entropies
-	- unless we log entropies at the packet level
-
-- network_adapters
-	- has usings for server/client types
-	- global functions to abstract functionality?
-		- actually just use a class wrapper and a getter for the specific object so that we know where we're getting specific
+- Properly sync client's changes to nickname, sensitivity or others.
 
 - Sending large step infos through yojimbo?
 	- we probably want to handle it after DM milestone
@@ -144,102 +141,12 @@ decides which ones to send to the clients so that they don't
 	- When it works, we'll gradually abstract it away and see if it still works
 
 - Will yojimbo handle 128hz?
+	- We can send packets once every second tick, so at 64hz
 
 - if we don't send any message at all for when a step has no entropy,
 	- we CANNOT possibly advance the referential cosmos in time
 		- which might become problematic once we have to simulate it forward several seconds
 	- so we should always send at least empty step message
-
-- what if reliable messages in yojimbo are actually redundancy?
-	- They are if we configure them like so.
-
-- improvements to redundancy
-	- message-wise fragmentation
-		- we might need some more effective way to deal with this
-			- Solution 1
-				- if there are 5 steps to sent, but 2 steps already fill the whole packet,
-				- and the other 3 can be packed into the next,
-				- simply withhold posting the 3 remaining messages until the other 2 are delivered
-				- in this case we might need to increase the rate of sends and send them even before the next tick
-			- Solution 2
-				- simply always send all messages redundantly but split into several packets
-				- client, apart from sending the most recent sequence number before which everything was received,
-					- also sends acks redundantly for all packets received out of order
-						- clears them once the most recent sequence number implies receiving of these out of order packets as well
-				- con: we would probably want to prioritize the 
-
-		- we have a map of sequence to reliable range
-		- later entries may arrive before earlier ones
-		- we keep a vector of pending entries and only  
-	- Unlikely, but a single step information might not fit into a packet
-		- e.g. if 300 players move their mouse at once
-		- in this VERY unlikely case we might just randomly drop some entropies to not overload the server?
-			- simply drop entropies of players who've sent the most commands
-				- so if someone coordinates a DoS of this sort, they will remain motionless
-				- if someone is innocent but their entropy is dropped, it might happen that:
-					- their player moves despite having their buttons pressed
-					- their mouse position is completely different than expected
-				- in this case, the client should try to repost the entropies that were cut
-
-- large block sending augs api
-	- asynchronous: deliver_large_data
-	- large_data_delivered() const
-	- always one large data is sent at a time
-	
-- solution: netcode.io + sending large blocks code from the example,
-	- or we'll take some code from yojimbo that sends blocks
-
-- against yojimbo?
-	- the message ecosystem that does not play well with our code
-	- other deps that we don't need atm
-
-- any cons for using netcode io?
-	- perhaps bandwidth overhead for encryption, but should be negliglible?
-	- might be a hassle to setup this in cmake but should be doable
-
-- problem: reliable.io has no concept of messages, we will have to learn how it is used in yojimbo or just somehow figure it out
-	- does reliable.io even do what we think it's doing? e.g. sending large blocks of data. This is the only thing we need it for.
-		- actually, yojimbo can do it
-
-- our bidirectional flow of inputs will be based on redundancy, 
-	and we'll also need some fragmentation logic
-
-- design augs api so that either netcode or yojimbo can be used underneath
-
-- PIMPL anywhere?
-	- actually netcode.io headers are pretty damn light
-
-- Besides encryption (which we can add later), what do we want from netcode.io?
-	- connection management against trivial ddos attacks, I guess
-
-- For now let's go with winsock + reliable.io to send large blocks
-	- We'll learn from netcode and maybe use some functions
-	- API will never need to change when we add security.
-
-- We need to decide on the server software.
-	- focus on creating a minimal api class 
-		- whatever we plug there, whether dedicated serv instance or player hosted,
-			- we'll just pull our own message format from there
-			- We can as well add NAT punchthrough later
-				- Games like soldat don't even have it
-				- we'll read the guide on raknet even if we're not going to use it as it is comprehensive
-	- what we need from the network
-		- for early beta and later,
-			- reliable delivery for initial stuff + chat
-			- redundant delivery for inputs
-				- we have to revive the reliable channel
-			- perhaps compression?
-		- for later stages,
-			- masterserver + nat
-		- for dedicated servers,
-			- secure connections
-	- we'll remove enet shortly
-	- netcode.io + reliable.io
-		- pro: we'll learn more along the way and have more control over packets
-	- libyojimbo
-		- pro: will probably work right away
-		- it's actually for dedicated servers, not player hosted servers
-
 
 - Editor-like server vars tweaker accessible by pressing ESC server-side
 	- will have to be commandized properly, just like editor setup's
@@ -262,30 +169,12 @@ decides which ones to send to the clients so that they don't
 			- yeah only the preffix will ever have colors
 		- always wrap when inactive, but when active we can just as well wrap
 
-
 - spectators
 	- preferably only in the client setup
 
-- what to send on client connection?
-	- Note that WE WILL need SOME kind of reliable udp transport even for dumb chat messages
-		- we'll use reliable.io or a hand-written slice/chunk proto
-		- and like hell we are not going to retransmit them redundantly brute forcibly
-	- for the initial cosmos solvable state, we can send a delta against the initial cosm and the current cosm
-		- though entities for shells might get quite large
-		- a character is almost 1k...
-		- perhaps it will be best to send all inputs after all
-	- if we want to replay either from session beginning or mid-way, inputs can become quite large
-		- Though, we could use the exact same protocol
-			- simply post all inputs for the client
-		- and we could replay in parallel
-	- cosmos solvable won't be that big
-	- we also have to send rulesets if we'll allow commands on them
+- Delta compress the solvable to send against the initial solvable
 
-- it might be a good idea to split intercosm into many files?
-	- in case of compatibility breaks we could only tinker with a single file
-	- git has less to do as well
-
-- check how openal behaves on windows when abruptly stopping sounds
+- check how openal behaves on Windows when abruptly stopping sounds
 
 - maps as git repositories
 	- how do we facilitate modifications on existing maps so that they don't have to be re-downloaded?
@@ -368,7 +257,6 @@ decides which ones to send to the clients so that they don't
 - Simplify workflow for creating new weapons?
 	- E.g. remove the need to specify finishing traces
 
-			
 - To avoid transmitting some server-decided seed for the beginning of each round (e.g. to position players around)...
 	- ...we can just derive a hash of all inputs from the previous round, or just hash entire cosmos state
 	- this way we are unpredictable about it but still deterministic

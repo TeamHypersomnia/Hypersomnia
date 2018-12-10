@@ -63,6 +63,13 @@ using test_type_map = type_map<
 	type_pair<const int, std::string>
 >;
 
+void ftrait_test(int, double, char);
+
+struct ftrait {
+	void test(int, double, char);
+	void ctest(int, double, char) const;
+};
+
 /* A shortcut which will be heavily used from now on */
 
 template <class A, class B>
@@ -122,6 +129,16 @@ struct tests_of_traits {
 
 	/* One-shot asserts. */
 
+	static_assert(same<int, argument_t<decltype(&ftrait::test), 0>>);
+	static_assert(same<int, argument_t<decltype(&ftrait::ctest), 0>>);
+
+	static_assert(same<double, argument_t<decltype(ftrait_test), 1>>);
+	static_assert(same<char, argument_t<decltype(ftrait_test), 2>>);
+	static_assert(same<char, last_argument_t<decltype(ftrait_test)>>);
+
+	static_assert(same<char, last_argument_t<decltype(&ftrait::test)>>);
+	static_assert(same<char, last_argument_t<decltype(&ftrait::ctest)>>);
+
 	static_assert(!is_one_of_v<int, float, double>, "Trait has failed");
 	static_assert(is_one_of_v<unsigned, float, float, double, unsigned>, "Trait has failed");
 	static_assert(is_one_of_v<cosmos, int, cosmos_clock, cosmos>, "Trait has failed");
@@ -132,13 +149,13 @@ struct tests_of_traits {
 
 	static_assert(augs::constant_size_vector_base<int, 20>::capacity(), "Trait has failed");
 
-	static_assert(augs::is_byte_stream_v<std::ifstream>);
-	static_assert(augs::is_byte_stream_v<std::ofstream>);
 	static_assert(augs::is_byte_stream_v<augs::memory_stream>);
 	static_assert(augs::is_byte_stream_v<augs::cref_memory_stream>);
 	static_assert(augs::is_byte_stream_v<derivedstreamtest>);
-
 	static_assert(!augs::is_byte_stream_v<derivedintrotest>);
+
+	static_assert(augs::is_byte_stream_v<std::ifstream>);
+	static_assert(augs::is_byte_stream_v<std::ofstream>);
 
 	static_assert(has_introspect_base_v<child_entity_id>);
 
