@@ -52,7 +52,7 @@ class sound_system {
 		std::optional<transformr> previous_transform;
 		augs::stepped_timestamp when_set_velocity;
 
-		std::vector<sound_effect_input> followup_inputs;
+		sound_effect_input_vector followup_inputs;
 
 		generic_sound_cache() = default;
 
@@ -91,11 +91,11 @@ class sound_system {
 		int consecutive_occurences = 0;
 	};
 
-	std::vector<generic_sound_cache> short_sounds;
+	augs::constant_size_vector<generic_sound_cache, MAX_SHORT_SOUNDS> short_sounds;
 	audiovisual_cache_map<generic_sound_cache> firearm_engine_caches;
 	audiovisual_cache_map<generic_sound_cache> continuous_sound_caches;
 
-	std::vector<fading_source> fading_sources;
+	augs::constant_size_vector<fading_source, MAX_FADING_SOURCES> fading_sources;
 	std::unordered_map<collision_sound_source, collision_sound_cooldown> collision_sound_cooldowns;
 
 	template <class T>

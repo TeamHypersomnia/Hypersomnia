@@ -7,6 +7,7 @@
 #include "view/viewables/all_viewables_declaration.h"
 #include "game/cosmos/entity_id.h"
 #include "game/components/transform_component.h"
+#include "view/view_container_sizes.h"
 
 class cosmos;
 class interpolation_system;
@@ -33,9 +34,11 @@ public:
 		double time_of_occurence_seconds = 0.0;
 	};
 
-	double global_time_seconds = 0.0;
 
-	std::vector<highlight> highlights;
+private:
+	double global_time_seconds = 0.0;
+	augs::constant_size_vector<highlight, MAX_PURE_COLOR_HIGHLIGHTS> highlights;
+public:
 	
 	void add(highlight::input);
 	void advance(const augs::delta dt);

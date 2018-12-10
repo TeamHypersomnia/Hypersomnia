@@ -27,6 +27,8 @@ struct draw_particles_input {
 };
 
 struct general_particle {
+	static constexpr std::size_t statically_allocate = 5000;
+
 	// GEN INTROSPECTOR struct general_particle
 	vec2 pos;
 	vec2 vel;
@@ -159,6 +161,8 @@ struct animation_in_particle {
 };
 
 struct animated_particle {
+	static constexpr std::size_t statically_allocate = 5000;
+
 	// GEN INTROSPECTOR struct animated_particle
 	vec2 pos;
 	vec2 vel;
@@ -202,6 +206,8 @@ struct animated_particle {
 };
 
 struct homing_animated_particle {
+	static constexpr std::size_t statically_allocate = 5000;
+
 	// GEN INTROSPECTOR struct homing_animated_particle
 	vec2 pos;
 	vec2 vel;

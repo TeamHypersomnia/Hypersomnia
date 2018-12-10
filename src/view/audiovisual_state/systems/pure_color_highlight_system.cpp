@@ -20,6 +20,10 @@ void pure_color_highlight_system::clear() {
 }
 
 void pure_color_highlight_system::add(const highlight::input new_in) {
+	if (container_full(highlights)) {
+		return;
+	}
+
 	bool found = false;
 
 	highlight new_highlight;

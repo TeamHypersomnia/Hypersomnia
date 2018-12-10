@@ -1,5 +1,7 @@
 #pragma once
 #include "augs/audio/distance_model.h"
+#include "augs/misc/constant_size_vector.h"
+#include "view/view_container_sizes.h"
 #include "augs/pad_bytes.h"
 #include "game/assets/ids/asset_ids.h"
 #include "augs/templates/hash_templates.h"
@@ -112,8 +114,10 @@ struct packaged_sound_effect {
 	void post(const_logic_step step) const;
 };
 
+using sound_effect_input_vector = augs::constant_size_vector<sound_effect_input, MAX_FOLLOWUP_SOUND_INPUTS>;
+
 struct packaged_multi_sound_effect {
-	std::vector<sound_effect_input> inputs;
+	sound_effect_input_vector inputs;
 	sound_effect_start_input start;
 
 	void post(const_logic_step step) const;

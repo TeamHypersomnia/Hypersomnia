@@ -74,9 +74,9 @@ public:
 		);
 	};
 
-	using emission_instances = std::vector<emission_instance>;
+	using emission_instances_type = augs::constant_size_vector<emission_instance, MAX_PARTICLE_EMISSIONS>;
 
-	static bool are_over(const emission_instances& instances) {
+	static bool are_over(const emission_instances_type& instances) {
 		for (const auto& instance : instances) {
 			if (!instance.is_over()) {
 				return false;
@@ -89,7 +89,7 @@ public:
 	struct effect_not_found {};
 
 	struct basic_cache {
-		std::vector<emission_instance> emission_instances;
+		emission_instances_type emission_instances;
 		packaged_particle_effect original;
 
 		basic_cache() = default;
@@ -133,14 +133,19 @@ public:
 		{}
 	};
 
+	template <class T>
+	using make_particle_vector = augs::constant_size_vector<T, T::statically_allocate>;
+
 	/* Particle vectors */
-	per_particle_layer_t<std::vector<general_particle>> general_particles;
-	per_particle_layer_t<std::vector<animated_particle>> animated_particles;
+	per_particle_layer_t<make_particle_vector<general_particle>> general_particles;
+	per_particle_layer_t<make_particle_vector<animated_particle>> animated_particles;
+
+	/* Here we must have a vector as we would be forced to allocate memory every time we begin an emission */
 	per_particle_layer_t<std::unordered_map<entity_id, std::vector<homing_animated_particle>>> homing_animated_particles;
 
 	/* Current streams vectors */
-	std::vector<orbital_cache> orbital_emissions;
-	std::vector<faf_cache> fire_and_forget_emissions;
+	augs::constant_size_vector<orbital_cache, MAX_ORBITAL_EMISSIONS> orbital_emissions;
+	augs::constant_size_vector<faf_cache, MAX_FIRE_AND_FORGET_EMISSIONS> fire_and_forget_emissions;
 
 	audiovisual_cache_map<orbital_cache> firearm_engine_caches;
 	audiovisual_cache_map<orbital_cache> continuous_particles_caches;

@@ -68,7 +68,7 @@ using asset_field_type_id = type_in_list_id<
 		image_shape_type,
 		plain_animation_frames_type,
 
-		std::vector<particles_emission>,
+		emission_vector,
 
 		sound_meta,
 		image_meta

@@ -96,6 +96,11 @@ namespace augs {
 			construct_at(count++, obj);
 		}
 
+		void push_back(value_type&& obj) {
+			ensure_less(count, capacity());
+			construct_at(count++, std::move(obj));
+		}
+
 		template <class... Args>
 		value_type& emplace_back(Args&&... args) {
 			ensure_less(count, capacity());

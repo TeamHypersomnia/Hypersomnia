@@ -107,6 +107,10 @@ particles_simulation_system::basic_cache::basic_cache(
 		emission_instances.reserve(source_effect->emissions.size());
 
 		for (auto emission : source_effect->emissions) {
+			if (container_full(emission_instances)) {
+				break;
+			}
+
 			emission_instances.emplace_back(emission, rng);
 		}
 	}
@@ -149,11 +153,23 @@ void particles_simulation_system::clear_dead_entities(const cosmos& new_cosmos) 
 }
 
 void particles_simulation_system::add_particle(const particle_layer l, const general_particle& p) {
-	general_particles[l].push_back(p);
+	auto& v = general_particles[l];
+
+	if (container_full(v)) {
+		return;
+	}
+
+	v.push_back(p);
 }
 
 void particles_simulation_system::add_particle(const particle_layer l, const animated_particle& p) {
-	animated_particles[l].push_back(p);
+	auto& v = animated_particles[l];
+
+	if (container_full(v)) {
+		return;
+	}
+
+	v.push_back(p);
 }
 
 void particles_simulation_system::add_particle(const particle_layer l, const entity_id id, const homing_animated_particle& p) {
@@ -201,22 +217,26 @@ void particles_simulation_system::update_effects_from_messages(
 
 		try {
 			if (!start.positioning.target.is_set()) {
-				fire_and_forget_emissions.emplace_back(
-					start.positioning.offset,
+				if (!container_full(fire_and_forget_emissions)) {
+					fire_and_forget_emissions.emplace_back(
+						start.positioning.offset,
 
-					e.payload,
-					manager,
-					rng
-				);
+						e.payload,
+						manager,
+						rng
+					);
+				}
 			}
 			else {
-				orbital_emissions.emplace_back(
-					start.positioning,
+				if (!container_full(orbital_emissions)) {
+					orbital_emissions.emplace_back(
+						start.positioning,
 
-					e.payload,
-					manager,
-					rng
-				);
+						e.payload,
+						manager,
+						rng
+					);
+				}
 			}
 		}
 		catch (const effect_not_found&) {
@@ -325,7 +345,7 @@ void particles_simulation_system::advance_visible_streams(
 	const interpolation_system& interp
 ) {
 	auto advance_emissions = [&](
-		emission_instances& instances, 
+		emission_instances_type& instances, 
 		const transformr current_transform,
 		const bool visible_in_camera,
 		const packaged_particle_effect& effect

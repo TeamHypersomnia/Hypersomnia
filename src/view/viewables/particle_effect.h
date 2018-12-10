@@ -3,6 +3,8 @@
 #include "augs/templates/type_mod_templates.h"
 #include "augs/templates/transform_types.h"
 
+#include "augs/misc/constant_size_vector.h"
+
 #include "augs/misc/minmax.h"
 #include "game/enums/particle_layer.h"
 #include "view/viewables/particle_types.h"
@@ -80,9 +82,11 @@ struct particles_emission {
 	}
 };
 
+using emission_vector = augs::constant_size_vector<particles_emission, MAX_PARTICLE_EMISSIONS>;
+
 struct particle_effect {
 	// GEN INTROSPECTOR struct particle_effect
-	std::vector<particles_emission> emissions;
+	emission_vector emissions;
 	std::string name;
 	// END GEN INTROSPECTOR
 

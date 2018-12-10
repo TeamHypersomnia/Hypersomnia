@@ -37,6 +37,10 @@ void sound_system::clear() {
 }
 
 void sound_system::start_fading(generic_sound_cache& cache, const float fade_per_sec) {
+	if (container_full(fading_sources)) {
+		return;
+	}
+
 	auto& source = cache.source;
 
 	if (source.is_playing()) {
@@ -363,7 +367,9 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 			}
 
 			try {
-				short_sounds.emplace_back(e.payload, in);
+				if (!container_full(short_sounds)) {
+					short_sounds.emplace_back(e.payload, in);
+				}
 			}
 			catch (const effect_not_found&) {
 
