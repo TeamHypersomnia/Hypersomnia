@@ -766,7 +766,6 @@ int work(const int argc, const char* const * const argv) try {
 
 		auto setup_audiovisual_post_solve = [&](const const_logic_step step) {
 			setup_post_solve(step, viewing_config);
-			audiovisual_step(augs::delta::zero, setup.get_audiovisual_speed(), viewing_config);
 		};
 
 		setup.advance(

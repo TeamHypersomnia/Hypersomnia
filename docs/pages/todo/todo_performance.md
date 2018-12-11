@@ -5,6 +5,13 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Looks like the operator== for viewables paths in load_all shows up in profiler as well.
+	- It would be good if the setup simply set "dirty" flag on all viewables that need reloading, 
+	  instead of dummily checking each time if the input has changed.
+		- this is even more flexible.
+	- The sounds could be incrementally loaded/unloaded based on paths
+	- But images anyway have to be atlased
+
 - Idea: to improve physics readback performance,
   we could somehow only update non-sleeping bodies, whilst acquiring this information directly from box2d?
 

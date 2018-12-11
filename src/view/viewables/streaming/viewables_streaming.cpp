@@ -49,6 +49,8 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 		auto& new_defs = new_all_defs.image_definitions;
 
 		{
+			auto scope = measure_scope(performance.detecting_changed_viewables);
+
 			{
 				/* Check for unloaded and changed resources */
 				for_each_id_and_object(now_defs, [&](const auto key, const auto& old_def) {
