@@ -10,12 +10,6 @@ summary: That which we are brainstorming at the moment.
 	- Whether to process deaths, e.g. to never predict them on the client
 	- Whether to post audiovisual messages, always false for the server
 
-- Performance problem on Windows...
-	- Rendering script takes too much time, it randomly takes long
-		- allocations? but where are we allocating during render?
-		- dashed lines?
-			- plausible since each single segment invokes a make_sprite_triangles so possibly sines and cosines
-
 - Client-side
 	- When initial state is received, wait for the first entropy
 	- When it arrives, simply begin queuing inputs localy

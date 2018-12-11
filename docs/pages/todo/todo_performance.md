@@ -5,6 +5,12 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Performance problems on Windows...
+	- Rendering script takes too much time, it randomly takes long
+		- allocations? but where are we allocating during render?
+		- dashed lines?
+			- plausible since each single segment invokes a make_sprite_triangles so possibly sines and cosines
+
 - Looks like the operator== for viewables paths in load_all shows up in profiler as well.
 	- It would be good if the setup simply set "dirty" flag on all viewables that need reloading, 
 	  instead of dummily checking each time if the input has changed.

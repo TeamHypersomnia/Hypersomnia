@@ -383,6 +383,7 @@ namespace augs {
 			ensure(platform->hglrc);
 #endif
 			const auto sc = set_as_current();
+			(void)sc;
 			ensure(sc);
 		};
 
@@ -405,9 +406,11 @@ namespace augs {
 
 		{
 			const auto pf = ChoosePixelFormat(platform->hdc, &p);
+			(void)pf;
 			ensure(pf);
 
 			const auto result = SetPixelFormat(platform->hdc, pf, &p);
+			(void)result;
 			ensure(result);
 		}
 
@@ -448,14 +451,19 @@ namespace augs {
 			int pixelFormat;
 			UINT numFormats;
 
-			const auto result = wglChoosePixelFormatARB(platform->hdc, attribList, NULL, 1, &pixelFormat, &numFormats);
-			(void)result;
-			ensure(result);
+			{
+				const auto result = wglChoosePixelFormatARB(platform->hdc, attribList, NULL, 1, &pixelFormat, &numFormats);
+				(void)result;
+				ensure(result);
+			}
 
 			LOG_NVPS(pixelFormat, numFormats);
 			
-			const auto result = SetPixelFormat(platform->hdc, pixelFormat, &p);
-			ensure(result);
+			{
+				const auto result = SetPixelFormat(platform->hdc, pixelFormat, &p);
+				(void)result;
+				ensure(result);
+			}
 			
 			LOG("Making context proper");
 
@@ -467,6 +475,7 @@ namespace augs {
 		SetLastError(0);
 		{
 			const auto result = !(SetWindowLongPtr(platform->hwnd, GWLP_USERDATA, (LONG_PTR)this) == 0 && GetLastError() != 0);
+			(void)result;
 			ensure(result);
 		}
 
@@ -590,6 +599,7 @@ namespace augs {
 			(MoveWindow(platform->hwnd, wr.left, wr.top, wr.right - wr.left, wr.bottom - wr.top, TRUE))
 		;
 
+		(void)result;
 		ensure(result);
 	}
 
