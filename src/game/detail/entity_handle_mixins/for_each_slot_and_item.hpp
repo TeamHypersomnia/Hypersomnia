@@ -14,8 +14,8 @@ callback_result inventory_mixin<E>::for_each_contained_slot_and_item_recursive(
 	const auto this_container = *static_cast<const E*>(this);
 	auto& cosm = this_container.get_cosmos();
 
-	return this_container.template dispatch_on_having_all_ret<invariants::container>([&](const auto typed_container) {
-		if constexpr(std::is_same_v<const std::nullopt_t, decltype(typed_container)>) {
+	return this_container.template dispatch_on_having_all_ret<invariants::container>([&](const auto& typed_container) {
+		if constexpr(is_nullopt_v<decltype(typed_container)>) {
 			return callback_result::CONTINUE;
 		}
 		else {

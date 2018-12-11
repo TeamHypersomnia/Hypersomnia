@@ -165,33 +165,22 @@ void illuminated_rendering(
 	;
 
 #if BUILD_STENCIL_BUFFER
-	const auto viewed_visibility = [&]() {
-		if (fog_of_war_effective) {
-			auto fow_raycasts_scope = cosm.measure_raycasts(profiler.fog_of_war_raycasts);
+	if (fog_of_war_effective) {
+		auto fow_raycasts_scope = cosm.measure_raycasts(profiler.fog_of_war_raycasts);
 
-			messages::visibility_information_request request;
-			request.eye_transform = *viewed_character_transform;
-			request.filter = predefined_queries::pathfinding();
-			request.square_side = static_cast<float>(std::max(screen_size.x, screen_size.y) * 2);
-			request.subject = viewed_character;
+		messages::visibility_information_request request;
+		request.eye_transform = *viewed_character_transform;
+		request.filter = predefined_queries::pathfinding();
+		request.square_side = static_cast<float>(std::max(screen_size.x, screen_size.y) * 2);
+		request.subject = viewed_character;
 
-			auto responses = visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(
-				cosm,
-				{ request }
-			);
-
-			const bool was_visibility_calculated = responses.size() == 1 && !responses.back().empty();
-
-			if (was_visibility_calculated) {
-				return responses;
-			}
-		}
-
-		return visibility_responses();
-	}();
+		visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(cosm, request);
+	}
 
 	auto fill_stencil = [&]() {
-		if (viewed_visibility.size() > 0) {
+		auto& viewed_visibility = thread_local_visibility_responses();
+
+		if (viewed_visibility.size() > 0 && !viewed_visibility[0].empty()) {
 			renderer.enable_stencil();
 
 			renderer.start_writing_stencil();
@@ -199,7 +188,7 @@ void illuminated_rendering(
 			renderer.clear_stencil();
 
 			const auto eye_pos = viewed_character_transform->pos;
-			const auto& r = viewed_visibility.back();
+			const auto& r = viewed_visibility[0];
 
 			for (std::size_t t = 0; t < r.get_num_triangles(); ++t) {
 				const auto world_light_tri = r.get_world_triangle(t, eye_pos);

@@ -2411,3 +2411,26 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- these can easily be const-vectorized
 			- have some separate view_container_sizes.h
 
+- Preserialized messages vs keeping structs in these messages
+	- Preserialized
+		- Pro: Ad-hoc serialization at the site of posting so less risk of inconsistency
+			- This is a big deal because MANY desync issues might be circumvented
+			- example problem: 
+				- a step information is posted for a client.
+				- we want to compress it by giving client ids instead of entity ids to associate each set of inputs with a client.
+				- however, we can't predict when will the message finally serialize
+		- Con: Increased bandwidth
+			- though just 2 bytes
+				- Actually, this is insignificant, because:
+					- the bandwidth bottlenek will be the server's upload
+					- and in the worst case it won't even amount to a single player continuously moving his mouse
+					- and compare this to the header sizes
+		- Pro: Faster estimation
+		- Pro: Easier interaction with the server as we don't have to cast the void* pointer
+			- Should be negliglible?
+		- Note that changing the way we write the messages won't really be that much since we will anyway read somehow from these bytes
+	- Keeping the struct
+		- Has to actually hold the data structure, e.g. a map
+		- has to operate on a dirty context pointer instead of our own serialization routine
+			- e.g. when the message ultimately serializes for sending the client ids on the server might be different than what will happen at the client
+

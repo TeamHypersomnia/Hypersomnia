@@ -69,6 +69,14 @@ size_t visibility_information_response::get_num_triangles() const {
 	return edges.size();
 }
 
+void visibility_information_response::clear() {
+	source_square_side = 0.f;
+	edges.clear();
+	vertex_hits.clear();
+	discontinuities.clear();
+	marked_holes.clear();
+}
+
 discontinuity* visibility_information_response::get_discontinuity_for_edge(const size_t n) {
 	for (auto& disc : discontinuities) {
 		if (disc.edge_index == static_cast<int>(n)) {
@@ -131,6 +139,7 @@ std::vector<vec2> visibility_information_response::get_world_polygon(
 }
 
 void visibility_system::calc_visibility(const logic_step step) const {
+#if TODO_PERFORMANCE
 	const auto& vis_requests = step.get_queue<messages::visibility_information_request>();
 
 	const auto vis_responses = calc_visibility(
@@ -141,21 +150,21 @@ void visibility_system::calc_visibility(const logic_step step) const {
 	for (size_t i = 0; i < vis_requests.size(); ++i) {
 		step.transient.calculated_visibility[vis_requests[i].subject] = vis_responses[i];
 	}
+#endif
+	(void)step;
 }
 
-visibility_responses visibility_system::calc_visibility(
+messages::visibility_information_response& visibility_system::calc_visibility(
 	const cosmos& cosm,
-	const visibility_requests& vis_requests
+	const messages::visibility_information_request& request
 ) const {
-	visibility_responses output;
+	auto& req = thread_local_visibility_requests();
+	auto& res = thread_local_visibility_responses();
 
-	calc_visibility(
-		cosm,
-		vis_requests,
-		output
-	);
-	
-	return output;
+	req.emplace_back(request);
+
+	calc_visibility(cosm, req, res);
+	return res[0];
 }
 
 struct target_vertex {
@@ -178,6 +187,10 @@ void visibility_system::calc_visibility(
 	const visibility_requests& vis_requests,
 	visibility_responses& vis_responses
 ) const {
+	if (vis_responses.size() < vis_requests.size()) {
+		vis_responses.resize(vis_requests.size());
+	}
+
 	const auto si = cosm.get_si();
 
 	static const auto vtx_hit_col = yellow;
@@ -226,12 +239,14 @@ void visibility_system::calc_visibility(
 	for (const auto& request : vis_requests) {
 		const auto ignored_entity = request.subject;
 		const auto transform = request.eye_transform;
-		visibility_information_response response;
+		const auto request_index = index_in(vis_requests, request);
+
+		auto& response = vis_responses[request_index];
+		response.clear();
 
 		response.source_square_side = request.square_side;
 
 		if (request.square_side < 1.f) {
-			vis_responses.emplace_back();
 			continue;
 		}
 
@@ -847,7 +862,7 @@ void visibility_system::calc_visibility(
 			auto discs_copy = response.discontinuities;
 
 			/* container for edges denoting unreachable areas */
-			std::vector<edge> marked_holes;
+			auto& marked_holes = response.marked_holes;
 
 			/* for every discontinuity, remove if there exists any edge that is too close to the discontinuity's vertex */
 			discs_copy.erase(std::remove_if(discs_copy.begin(), discs_copy.end(),
@@ -897,7 +912,7 @@ void visibility_system::calc_visibility(
 					});
 
 					/* denote the unreachable area by saving an edge from the closest point to the discontinuity */
-					marked_holes.push_back(edge(closest_point, d.points.first));
+					marked_holes.emplace_back(edge(closest_point, d.points.first));
 
 					if (DEBUG_DRAWING.draw_discontinuities) {
 						lines.emplace_back(unreachable_area_col, closest_point, d.points.first);
@@ -942,10 +957,8 @@ void visibility_system::calc_visibility(
 				}), discs_copy.end());
 			}
 
-			/* save all marked holes for pathfinding for example */
-			response.marked_holes = marked_holes;
 			/* save cleaned copy in actual discontinuities */
-			response.discontinuities = discs_copy;
+			response.discontinuities = std::move(discs_copy);
 		}
 
 		if (DEBUG_DRAWING.draw_discontinuities) {
@@ -953,8 +966,6 @@ void visibility_system::calc_visibility(
 				lines.emplace_back(disc.points.first, disc.points.second, discontinuity_col);
 			}
 		}
-
-		vis_responses.push_back(response);
 
 		if (DEBUG_DRAWING.draw_triangle_edges) {
 			for (const auto& r : vis_responses) {
@@ -974,6 +985,4 @@ void visibility_system::calc_visibility(
 			}
 		}
 	}
-
-	ensure_eq(vis_requests.size(), vis_responses.size());
 }

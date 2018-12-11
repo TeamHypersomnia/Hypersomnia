@@ -105,16 +105,11 @@ void standard_explosion_input::instantiate(
 	request.square_side = effective_radius * 2;
 	request.subject = subject_if_any;
 
-	const auto responses = visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(
-		cosm,
-		{ request }
-	);
+	auto& response = visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(cosm, request);
 
-	if (responses.empty()) {
+	if (response.empty()) {
 		return;
 	}
-
-	const auto& response = responses[0];
 
 	const auto& physics = cosm.get_solvable_inferred().physics;
 
@@ -232,6 +227,8 @@ void standard_explosion_input::instantiate(
 			}
 		);
 	}
+
+	// TODO_PERFORMANCE: This code is unnecessary for the server
 
 	{
 		exploding_ring_input ring;

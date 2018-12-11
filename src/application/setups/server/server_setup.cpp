@@ -301,8 +301,6 @@ void server_setup::handle_client_messages(const setup_advance_input& in) {
 
 	server->advance(server_time, *this);
 
-	++current_step;
-
 	{
 		auto& ticks_remaining = ticks_until_sending_packets;
 

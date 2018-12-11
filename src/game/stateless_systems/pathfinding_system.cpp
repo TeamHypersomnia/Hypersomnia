@@ -65,6 +65,11 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 	cosm.for_each_having<components::pathfinding>(
 		[&](const auto it) {
 		/* get necessary components */
+			static_assert(
+				always_false_v<decltype(it)>, 
+				"Not implemented. Look for TODO_PERFORMANCE in visibility system and overall improve the algorithm for determining visibility. Preferably, use one with a better complexity."
+			);
+
 			auto& pathfinding = it.template get<components::pathfinding>();
 			const auto& transform = it.get_logic_transform() + pathfinding.eye_offset;
 			const auto body = it.template get<components::rigid_body>();

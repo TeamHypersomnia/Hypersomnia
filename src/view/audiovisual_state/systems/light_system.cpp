@@ -142,8 +142,8 @@ void light_system::render_all_lights(const light_system_input in) const {
 		in.total_layer_scope
 	};
 
-	visibility_requests requests;
-	visibility_responses responses;
+	auto& requests = thread_local_visibility_requests();
+	auto& responses = thread_local_visibility_responses();
 
 	const auto cone = in.cone;
 	const auto eye = cone.eye;
@@ -202,7 +202,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	std::size_t num_lights = 0;
 	std::size_t num_wall_lights = 0;
 
-	for (size_t i = 0; i < responses.size(); ++i) {
+	for (size_t i = 0; i < requests.size(); ++i) {
 		const auto& r = responses[i];
 		const auto& light_entity = cosm[requests[i].subject];
 		const auto& light = light_entity.get<components::light>();
@@ -278,7 +278,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 		wall_light_shader.set_uniform(wall_light_uniform.distance_mult, 1.f / eye.zoom);
 	}
 
-	for (size_t i = 0; i < responses.size(); ++i) {
+	for (size_t i = 0; i < requests.size(); ++i) {
 		const auto& light_entity = cosm[requests[i].subject];
 		const auto& light = light_entity.get<components::light>();
 		const auto& light_def = light_entity.get<invariants::light>();

@@ -49,7 +49,7 @@ class server_setup : public default_setup_settings {
 	server_vars vars;
 
 	/* The rest is server-specific */
-	server_step_type current_step = 0;
+	server_step_type current_simulation_step = 0;
 
 	augs::serialization_buffers buffers;
 
@@ -166,6 +166,8 @@ public:
 
 		while (server_time <= current_time) {
 			advance_internal(in);
+
+			++current_simulation_step;
 
 			{
 				/* Process the built-in server player */

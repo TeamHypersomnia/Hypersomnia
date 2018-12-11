@@ -65,6 +65,12 @@ namespace messages {
 		/* segments that denote narrow areas */
 		std::vector<edge> marked_holes;
 
+		void clear();
+
+		bool empty() const {
+			return edges.empty() && vertex_hits.empty() && discontinuities.empty() && marked_holes.empty();
+		}
+
 		discontinuity* get_discontinuity_for_edge(const size_t edge_num);
 		discontinuity* get_discontinuity(const size_t disc_num);
 		const discontinuity* get_discontinuity_for_edge(const size_t edge_num) const;
@@ -75,10 +81,6 @@ namespace messages {
 		}
 
 		size_t get_num_triangles() const;
-
-		bool empty() const {
-			return edges.empty() && vertex_hits.empty() && discontinuities.empty() && marked_holes.empty();
-		}
 
 		triangle get_world_triangle(const size_t index, const vec2 origin) const;
 		std::vector<vec2> get_world_polygon(const float distance_epsilon, const vec2 expand_origin, const float expand_mult) const;

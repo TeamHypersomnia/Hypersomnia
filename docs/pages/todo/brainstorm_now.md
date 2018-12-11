@@ -6,7 +6,40 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- step entropy should also include the index of client input accepted
+- Step configuration for the cosmos
+	- Whether to process deaths, e.g. to never predict them on the client
+	- Whether to post audiovisual messages, always false for the server
+
+- Performance problem on Windows...
+	- Rendering script takes too much time, it randomly takes long
+		- allocations? but where are we allocating during render?
+		- dashed lines?
+			- plausible since each single segment invokes a make_sprite_triangles so possibly sines and cosines
+
+- Client-side
+	- When initial state is received, wait for the first entropy
+	- When it arrives, simply begin queuing inputs localy
+	- The server only sends a "client input accepted" byte in response
+		- when this happens, peel off the oldest input from out queue
+	- always re-simulate all inputs in the queue
+		- we don't have to calc some difference, this will happen naturally
+	- how does this approach scale when the effective latency suddenly decreases?
+		- so a server suddenly gets a burst of packets from the client
+			- if we unpack them evenly into steps, we don't decrease the effective latency
+		- since some steps were missed, now we have to squash inputs
+			- server sends a number of how many inputs were squashed?
+		- don't worry, by definition squashing will only occur in high-jitter environments
+			- squashed entropies should still preserve important behaviour
+			- e.g. you won't be left with a gun that shoots even though you've released the button already
+			- magnitude of movements might be malformed so we'll have a hitch, though nicely interpolated
+	- how does this approach scale when the effective latency suddenly increases?
+		- client just doesn't peel off inputs for a while from its queue
+	- to avoid squashing as much as possible we can have a server-side jitter buffer for clients
+		- though I remember we didn't have some good experience with it
+	- if the client input was not accepted, still peel off the back queue!
+		- simply treat it as a misprediction!
+		- well, this sucks, because we can possibly miss some important inputs like a button press
+		- suddenly our player stops moving!
 
 - It would be nice if the server_setup could only accept ready structs and was not concerned with messages being preserialized, 
 	and serialization in general
@@ -34,30 +67,8 @@ summary: That which we are brainstorming at the moment.
 				- we can add a type list as a payload type
 				- this kind of thing will happen on the client though
 
-- Preserialized messages vs keeping structs in these messages
-	- Preserialized
-		- Pro: Ad-hoc serialization at the site of posting so less risk of inconsistency
-			- This is a big deal because MANY desync issues might be circumvented
-			- example problem: 
-				- a step information is posted for a client.
-				- we want to compress it by giving client ids instead of entity ids to associate each set of inputs with a client.
-				- however, we can't predict when will the message finally serialize
-		- Con: Increased bandwidth
-			- though just 2 bytes
-				- Actually, this is insignificant, because:
-					- the bandwidth bottlenek will be the server's upload
-					- and in the worst case it won't even amount to a single player continuously moving his mouse
-					- and compare this to the header sizes
-		- Pro: Faster estimation
-		- Pro: Easier interaction with the server as we don't have to cast the void* pointer
-			- Should be negliglible?
-		- Note that changing the way we write the messages won't really be that much since we will anyway read somehow from these bytes
-	- Keeping the struct
-		- Has to actually hold the data structure, e.g. a map
-		- has to operate on a dirty context pointer instead of our own serialization routine
-			- e.g. when the message ultimately serializes for sending the client ids on the server might be different than what will happen at the client
-
 - Whether to keep worst-case storage in the preserialized messages or not is another problem
+	- I guess tlsf will be efficient here
 
 - It might be hard to properly send the initial mode state while avoiding desync
 	- sending solvable on init is also scalable for longer matches
