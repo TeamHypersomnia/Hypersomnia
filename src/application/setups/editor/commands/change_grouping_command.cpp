@@ -86,6 +86,7 @@ void change_grouping_command::undo(const editor_command_input in) {
 
 	for (const auto& e : affected_entities) {
 		const auto found_group = groups.on_group_entry_of(e, eraser);
+		(void)found_group;
 
 		if (all_to_new_group || group_indices_after.size() > 0) {
 			/* 

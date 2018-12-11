@@ -30,6 +30,8 @@ namespace augs {
 		}
 
 		const bool bad_format = true;
+		(void)bad_format;
+
 		ensure(!bad_format);
 		return AL_FORMAT_MONO8;
 #else

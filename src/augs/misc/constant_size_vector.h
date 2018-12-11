@@ -291,6 +291,7 @@ namespace augs {
 		}
 
 		void reserve(const std::size_t s) {
+			(void)s;
 			ensure_leq(s, max_size());
 			// no-op
 		}

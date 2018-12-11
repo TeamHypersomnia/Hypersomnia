@@ -57,6 +57,8 @@ void load_test_scene_sounds(sound_definitions_map& all_definitions) {
 
 		if (!definition.get_source_path().path.empty()) {
 			const auto new_allocation = all_definitions.allocate(std::move(definition));
+			(void)new_allocation;
+			(void)id;
 			ensure_eq(new_allocation.key, id);
 		}
 		else {

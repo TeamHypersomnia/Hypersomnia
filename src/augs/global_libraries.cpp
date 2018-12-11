@@ -30,6 +30,7 @@ namespace augs {
 		if(to_initialize.test(library::FREETYPE)) {
 #if BUILD_FREETYPE
 			const auto success = !FT_Init_FreeType(freetype_library.get()) && "freetype initialization";
+			(void)success;
 			ensure(success);
 			initialized.set(library::FREETYPE);
 #endif
@@ -38,6 +39,7 @@ namespace augs {
 		if(to_initialize.test(library::NETWORKING)) {
 #if BUILD_NETWORKING
 			const auto success = network::init();
+			(void)success;
 			ensure(success && "Failed to initialize networking");
 			initialized.set(library::NETWORKING);
 #endif
@@ -48,6 +50,7 @@ namespace augs {
 		if(to_deinitialize.test(library::FREETYPE)) {
 #if BUILD_FREETYPE
 			const auto success = !FT_Done_FreeType(*freetype_library.get()) && "freetype deinitialization";
+			(void)success;
 			ensure(initialized.test(library::FREETYPE));
 			ensure(success);
 			initialized.set(library::FREETYPE, false);

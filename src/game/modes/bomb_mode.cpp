@@ -327,7 +327,9 @@ bool bomb_mode::add_player_custom(const input_type in, const add_player_input& a
 
 mode_player_id bomb_mode::add_player(const input_type in, const entity_name_str& chosen_name) {
 	if (const auto new_id = find_first_free_player(); new_id.is_set()) {
-		ensure(add_player_custom(in, { new_id, chosen_name }));
+		const auto result = add_player_custom(in, { new_id, chosen_name });
+		(void)result;
+		ensure(result);
 		return new_id;
 	}
 

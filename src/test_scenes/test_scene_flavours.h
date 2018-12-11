@@ -365,6 +365,8 @@ auto& get_test_flavour(all_entity_flavours& flavours, const T enum_id) {
 
 		augs::for_each_enum_except_bounds([&into](const T t) {
 			const auto new_allocation = into.allocate();
+			(void)t;
+			(void)new_allocation;
 			ensure_eq(to_raw_flavour_id(t), new_allocation.key);
 		});
 	}

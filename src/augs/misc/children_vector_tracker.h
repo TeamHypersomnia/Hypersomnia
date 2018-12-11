@@ -42,6 +42,8 @@ namespace augs {
 				auto& tracked_children = parent_cache->tracked_children;
 
 				const auto previous_size = tracked_children.size();
+				(void)previous_size;
+
 				erase_element(tracked_children, child_id);
 
 				/* Ensure that erasure happened */

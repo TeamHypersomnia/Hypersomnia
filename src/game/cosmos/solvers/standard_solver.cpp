@@ -179,6 +179,7 @@ void standard_solve(const logic_step step) {
 	remnant_system().shrink_and_destroy_remnants(step);
 
 	const auto queued_before_marking_num = step.get_queue<messages::queue_deletion>().size();
+	(void)queued_before_marking_num;
 
 	destroy_system().mark_queued_entities_and_their_children_for_deletion(step);
 
@@ -187,6 +188,7 @@ void standard_solve(const logic_step step) {
 	listener.~contact_listener();
 
 	const auto queued_at_end_num = step.get_queue<messages::queue_deletion>().size();
+	(void)queued_at_end_num;
 
 	ensure_eq(queued_at_end_num, queued_before_marking_num);
 }

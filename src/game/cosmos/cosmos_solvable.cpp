@@ -117,6 +117,7 @@ std::optional<cosmic_pool_undo_free_input> cosmos_solvable::free_entity(const en
 
 void cosmos_solvable::undo_last_allocate_entity(const entity_id id) {
 	const auto erased_guid = clear_guid(id);
+	(void)erased_guid;
 
 	auto& next_entity_guid = significant.next_entity_guid.value;
 	--next_entity_guid;
@@ -129,6 +130,7 @@ void cosmos_solvable::undo_last_allocate_entity(const entity_id id) {
 entity_guid cosmos_solvable::clear_guid(const entity_id cleared) {
 	const auto guid = get_guid(cleared);
 	const auto erased_num = guid_to_id.erase(guid);
+	(void)erased_num;
 
 	ensure_eq(erased_num, 1);
 	return guid;

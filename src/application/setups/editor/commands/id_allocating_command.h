@@ -27,6 +27,7 @@ public:
 
 		auto validate = [previous_id](const auto new_id) {
 			if (previous_id.is_set()) {
+				(void)new_id;
 				ensure_eq(new_id, previous_id);
 			}
 		};

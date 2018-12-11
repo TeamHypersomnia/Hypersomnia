@@ -211,6 +211,7 @@ template <class E, class... Args>
 auto cosmos_solvable::undo_free_entity(Args&&... undo_free_args) {
 	const auto result = detail_undo_free_entity<E>(std::forward<Args>(undo_free_args)...);
 	const auto it = guid_to_id.emplace(result.object.guid, result.key);
+	(void)it;
 	ensure(it.second);
 	return result;
 }

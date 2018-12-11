@@ -115,6 +115,7 @@ void editor_history::seek_to_revision(
 		if (p.has_testing_started()) {
 			const auto target_step = when_target_cmd_happened();
 			const auto current_step = p.get_current_step();
+			(void)current_step;
 			ensure_leq(current_step, target_step);
 
 			/* 

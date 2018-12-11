@@ -77,6 +77,7 @@ void bake_fresh_atlas(
 
 			{
 				const bool is_font_unique = it.second;
+				(void)is_font_unique;
 				ensure(is_font_unique);
 			}
 

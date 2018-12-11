@@ -38,6 +38,9 @@ void load_test_scene_recoil_players(recoil_players_pool& all_definitions) {
 		const auto id = to_recoil_id(test_id);
 		const auto new_allocation = all_definitions.allocate(std::move(recoil));
 
+		(void)id;
+		(void)new_allocation;
+
 		ensure_eq(new_allocation.key, id);
 	}
 }

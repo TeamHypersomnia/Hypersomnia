@@ -63,6 +63,8 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find
    	const slot_finding_opts& opts
 ) const {
 	const auto& searched_root_container = *static_cast<const E*>(this);
+	(void)searched_root_container;
+
 	auto& cosm = item.get_cosmos();
 
 	ensure(item.alive()) 

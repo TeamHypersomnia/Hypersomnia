@@ -179,6 +179,7 @@ b2Fixture_index_in_component physics_world_cache::get_index_in_component(
 	const b2Fixture& f, 
 	const const_entity_handle& handle
 ) const {
+	(void)handle;
 	ensure(f.index_in_component != -1);
 
 	b2Fixture_index_in_component result;

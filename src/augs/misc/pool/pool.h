@@ -63,11 +63,13 @@ namespace augs {
 			;
 		}
 
-		static bool versions_match(const pool_indirector_type& indirector, const key_type key) {
+		static bool versions_match(const pool_indirector_type& indirector, const key_type& key) {
 			return indirector.version == key.version && indirector.real_index != static_cast<size_type>(-1);
 		}
 
-		static auto ensure_versions_match(const pool_indirector_type& indirector, const key_type key) {
+		static auto ensure_versions_match(const pool_indirector_type& indirector, const key_type& key) {
+			(void)indirector;
+			(void)key;
 			ensure_eq(indirector.version, key.version);
 			ensure(indirector.real_index != static_cast<size_type>(-1));
 		}

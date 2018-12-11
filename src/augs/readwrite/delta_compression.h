@@ -161,6 +161,8 @@ namespace augs {
 			}
 
 			ensure_leq(ptr, original_location + length);
+			(void)length;
+			(void)original_location;
 		}
 	};
 

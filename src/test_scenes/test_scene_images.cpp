@@ -62,6 +62,9 @@ void load_test_scene_images(
 
 		try {
 			const auto new_allocation = register_image(stem);
+			(void)new_allocation;
+			(void)id;
+
 			ensure_eq(id, new_allocation.key);
 		}
 		catch (const test_image_does_not_exist&) {

@@ -47,6 +47,10 @@ void save_log_and_terminate();
 #else
 #define ensure(x)
 #define ensure_eq(x, y)
+#define ensure_less(x, y)
+#define ensure_leq(x, y)
+#define ensure_greater(x, y)
+#define ensure_geq(x, y)
 #define should(x)
 #define should_eq(x, y)
 #endif

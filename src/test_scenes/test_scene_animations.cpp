@@ -29,6 +29,8 @@ void load_test_scene_animations(
 	augs::for_each_enum_except_bounds([&](const test_id_type test_id) {
 		const auto id = to_animation_id(test_id);
 		const auto new_allocation = defs.allocate();
+		(void)new_allocation;
+		(void)id;
 
 		ensure_eq(new_allocation.key, id);
 	});
