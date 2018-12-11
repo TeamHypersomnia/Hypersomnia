@@ -60,7 +60,9 @@ namespace augs {
 		if(to_deinitialize.test(library::NETWORKING)) {
 #if BUILD_NETWORKING
 			ensure(initialized.test(library::NETWORKING));
-			ensure(network::deinit());
+			const auto result = network::deinit();
+			(void)result;
+			ensure(result);
 			initialized.set(library::NETWORKING, false);
 #endif
 		}

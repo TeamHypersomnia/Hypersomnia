@@ -448,7 +448,10 @@ namespace augs {
 			int pixelFormat;
 			UINT numFormats;
 
-			ensure(wglChoosePixelFormatARB(platform->hdc, attribList, NULL, 1, &pixelFormat, &numFormats));
+			const auto result = wglChoosePixelFormatARB(platform->hdc, attribList, NULL, 1, &pixelFormat, &numFormats);
+			(void)result;
+			ensure(result);
+
 			LOG_NVPS(pixelFormat, numFormats);
 			
 			const auto result = SetPixelFormat(platform->hdc, pixelFormat, &p);
