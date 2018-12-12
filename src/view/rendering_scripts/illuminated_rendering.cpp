@@ -165,6 +165,13 @@ void illuminated_rendering(
 	;
 
 #if BUILD_STENCIL_BUFFER
+	/* 
+		We need a separate TLS because the one returned by thread_local_visibility_responses
+		would get overwritten by light calculations before the call to fill_stencil.
+	*/
+
+	thread_local visibility_responses viewed_visibility;
+
 	if (fog_of_war_effective) {
 		auto fow_raycasts_scope = cosm.measure_raycasts(profiler.fog_of_war_raycasts);
 
@@ -174,12 +181,14 @@ void illuminated_rendering(
 		request.square_side = static_cast<float>(std::max(screen_size.x, screen_size.y) * 2);
 		request.subject = viewed_character;
 
-		visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(cosm, request);
+		auto& requests = thread_local_visibility_requests();
+		requests.clear();
+		requests.push_back(request);
+
+		visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(cosm, requests, viewed_visibility);
 	}
 
 	auto fill_stencil = [&]() {
-		auto& viewed_visibility = thread_local_visibility_responses();
-
 		if (viewed_visibility.size() > 0 && !viewed_visibility[0].empty()) {
 			renderer.enable_stencil();
 
