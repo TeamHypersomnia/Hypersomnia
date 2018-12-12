@@ -612,6 +612,29 @@ int work(const int argc, const char* const * const argv) try {
 		return { get_viewed_character(), { get_camera_eye(), window.get_screen_size() } };
 	};
 
+	static auto reacquire_visible_entities = [](
+		const vec2i& screen_size,
+		const const_entity_handle& viewed_character,
+		const config_lua_table& viewing_config
+	) {
+		auto scope = measure_scope(frame_performance.camera_visibility_query);
+
+		auto queried_eye = get_camera_eye();
+		queried_eye.zoom /= viewing_config.session.camera_query_aabb_mult;
+
+		const auto queried_cone = camera_cone(queried_eye, screen_size);
+
+		all_visible.reacquire_all_and_sort({ 
+			viewed_character.get_cosmos(), 
+			queried_cone, 
+			visible_entities_query::accuracy_type::PROXIMATE,
+			get_render_layer_filter(),
+			tree_of_npo_filter::all()
+		});
+
+		frame_performance.num_visible_entities.measure(all_visible.count_all());
+	};
+
 	static auto audiovisual_step = [&](
 		const augs::delta frame_delta,
 		const double speed_multiplier,
@@ -644,24 +667,7 @@ int work(const int argc, const char* const * const argv) try {
 			viewed_character
 		);
 
-		{
-			auto scope = measure_scope(frame_performance.camera_visibility_query);
-
-			auto queried_eye = get_camera_eye();
-			queried_eye.zoom /= viewing_config.session.camera_query_aabb_mult;
-
-			const auto queried_cone = camera_cone(queried_eye, screen_size);
-
-			all_visible.reacquire_all_and_sort({ 
-				viewed_character.get_cosmos(), 
-				queried_cone, 
-				visible_entities_query::accuracy_type::PROXIMATE,
-				get_render_layer_filter(),
-				tree_of_npo_filter::all()
-			});
-
-			frame_performance.num_visible_entities.measure(all_visible.count_all());
-		}
+		reacquire_visible_entities(screen_size, viewed_character, viewing_config);
 
 		const auto inv_tickrate = visit_current_setup([](const auto& setup) {
 			return setup.get_inv_tickrate();
@@ -762,8 +768,6 @@ int work(const int argc, const char* const * const argv) try {
 
 		setup.accept_game_gui_events(game_gui.get_and_clear_pending_events());
 		
-		audiovisual_step(frame_delta, setup.get_audiovisual_speed(), viewing_config);
-
 		auto setup_audiovisual_post_solve = [&](const const_logic_step step) {
 			setup_post_solve(step, viewing_config);
 		};
@@ -778,6 +782,7 @@ int work(const int argc, const char* const * const argv) try {
 		);
 
 		get_audiovisuals().randomizing.last_frame_delta = frame_delta;
+		audiovisual_step(frame_delta, setup.get_audiovisual_speed(), viewing_config);
 	};
 
 	static auto advance_current_setup = [&](
