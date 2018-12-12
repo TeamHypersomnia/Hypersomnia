@@ -34,6 +34,7 @@
 #include "game/messages/start_sound_effect.h"
 #include "game/stateless_systems/gun_system.h"
 #include "game/inferred_caches/physics_world_cache.h"
+#include "game/detail/sentience/sentience_getters.h"
 
 using namespace augs;
 
@@ -192,9 +193,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					augs::enum_boolset<weapon_action_type> out;
 
 					for (std::size_t i = 0; i < hand_count_v; ++i) {
-						const auto& hand_flag = sentience.hand_flags[i];
-
-						if (hand_flag) {
+						if (::get_hand_flag(owning_capability, i)) {
 							const auto action = owning_capability.calc_hand_action(i);
 
 							if (action.held_item == gun_entity) {

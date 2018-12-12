@@ -36,3 +36,17 @@ bool sentient_and_not_dead(const E& self) {
 
 	return false;
 }
+
+template <class E>
+bool get_hand_flag(const E& self, const std::size_t index) {
+	if (const auto sentience = self.template find<components::sentience>()) {
+		const auto& now = self.get_cosmos().get_timestamp();
+
+		return 
+			sentience->hand_flags[index] 
+			|| sentience->when_hand_pressed[index] == now
+		;
+	}
+
+	return false;
+}

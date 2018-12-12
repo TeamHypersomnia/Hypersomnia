@@ -86,6 +86,8 @@ namespace components {
 		bool block_flag = false;
 		pad_bytes<1> pad;
 
+		std::array<augs::stepped_timestamp, hand_count_v> when_hand_pressed = {};
+
 		real32 rotation_inertia_ms = 0.1f;
 		// END GEN INTROSPECTOR
 

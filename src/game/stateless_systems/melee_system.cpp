@@ -26,6 +26,7 @@
 #include "augs/misc/enum/enum_bitset.h"
 #include "game/messages/damage_message.h"
 #include "game/messages/thunder_input.h"
+#include "game/detail/sentience/sentience_getters.h"
 
 using namespace augs;
 
@@ -107,9 +108,7 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 		const auto chosen_action = [&]() {
 			for (std::size_t i = 0; i < hand_count_v; ++i) {
-				const auto& hand_flag = sentience.hand_flags[i];
-
-				if (hand_flag) {
+				if (::get_hand_flag(it, i)) {
 					const auto action = it.calc_hand_action(i);
 					return action.type;
 				}

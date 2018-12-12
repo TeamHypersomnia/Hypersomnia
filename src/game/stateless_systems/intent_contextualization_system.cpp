@@ -134,12 +134,18 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 			}
 
 			if (requested_index != static_cast<std::size_t>(-1)) {
-				const auto action = subject.calc_hand_action(requested_index);
+				const auto& idx = requested_index;
+
+				const auto action = subject.calc_hand_action(idx);
 				callee = action.held_item;
 				action_type = action.type;
 
 				auto& sentience = typed_subject.template get<components::sentience>();
-				sentience.hand_flags[requested_index] = it.was_pressed();
+				sentience.hand_flags[idx] = it.was_pressed();
+
+				if (it.was_pressed()) {
+					sentience.when_hand_pressed[idx] = cosm.get_timestamp();
+				}
 			}
 		});
 
