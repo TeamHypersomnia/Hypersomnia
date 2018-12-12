@@ -9,7 +9,8 @@
 #define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
 
 bool start_client_gui_state::perform(
-	client_start_input& into
+	client_start_input& into_start,
+	client_vars& into_vars
 ) {
 	if (!show) {
 		return false;
@@ -36,8 +37,8 @@ bool start_client_gui_state::perform(
 		// auto& scope_cfg = into;
 
 		base::acquire_keyboard_once();
-		input_text<100>("Address (ipv4:port or [ipv6]:port)", into.ip_port);
-		input_text<max_nickname_length_v>("Chosen nickname (3-30 characters)", into.nickname);
+		input_text<100>("Address (ipv4:port or [ipv6]:port)", into_start.ip_port);
+		input_text<max_nickname_length_v>("Chosen nickname (3-30 characters)", into_vars.nickname);
 	}
 
 	{
@@ -45,7 +46,7 @@ bool start_client_gui_state::perform(
 
 		ImGui::Separator();
 
-		const auto len = into.nickname.length();
+		const auto len = into_vars.nickname.length();
 		const auto clamped_len = std::clamp(len, min_nickname_length_v, max_nickname_length_v);
 
 		{

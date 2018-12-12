@@ -35,6 +35,8 @@ struct total_mode_player_entropy {
 	// END GEN INTROSPECTOR
 };
 
+using total_client_entropy = total_mode_player_entropy;
+
 struct mode_entropy_general {
 	// GEN INTROSPECTOR struct mode_entropy_general
 	std::optional<add_player_input> added_player;

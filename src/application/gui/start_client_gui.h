@@ -1,5 +1,6 @@
 #pragma once
 #include "application/setups/client/client_start_input.h"
+#include "application/setups/client/client_vars.h"
 #include "augs/math/vec2.h"
 #include "augs/misc/imgui/standard_window_mixin.h"
 
@@ -9,6 +10,7 @@ public:
 	using base::base;
 
 	bool perform(
-		client_start_input& into
+		client_start_input&,
+		client_vars& 
 	);
 };

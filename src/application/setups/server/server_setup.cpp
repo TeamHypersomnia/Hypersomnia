@@ -114,7 +114,7 @@ bool server_setup::add_to_arena(add_to_arena_input) {
 }
 
 void server_setup::init_client(const client_id_type& id) {
-	clients[id] = server_client_state(server_time);
+	clients[id].init(server_time);
 
 	LOG("Client connected. Details:\n%x", describe_client(id));
 }

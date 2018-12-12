@@ -6,9 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Step configuration for the cosmos
-	- Whether to process deaths, e.g. to never predict them on the client
-	- Whether to post audiovisual messages, always false for the server
+- Server: accepting inputs
+	- I guess a simpler jitter buffer implementation could be in order
+		- e.g. just keep a vector and a maximum of steps to squash at once?
+	- jitter protects from latency increase, squashing from decrease
 
 - Client-side
 	- When initial state is received, wait for the first entropy
@@ -34,6 +35,10 @@ summary: That which we are brainstorming at the moment.
 		- simply treat it as a misprediction!
 		- well, this sucks, because we can possibly miss some important inputs like a button press
 		- suddenly our player stops moving!
+
+- Step configuration for the cosmos
+	- Whether to process deaths, e.g. to never predict them on the client
+	- Whether to post audiovisual messages, always false for the server
 
 - It would be nice if the server_setup could only accept ready structs and was not concerned with messages being preserialized, 
 	and serialization in general

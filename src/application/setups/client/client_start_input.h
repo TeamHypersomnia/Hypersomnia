@@ -3,7 +3,7 @@
 
 struct client_start_input {
 	// GEN INTROSPECTOR struct client_start_input
-	std::string ip_port = "127.0.0.1:8142";
-	std::string nickname = "Player";
+	std::string ip_port = "127.0.0.1:8412";
 	// END GEN INTROSPECTOR
 };
+

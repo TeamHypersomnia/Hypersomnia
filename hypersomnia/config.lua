@@ -433,19 +433,25 @@ return {
 	  }
 	}
   },
-  server = {
-	current_arena = "test",
-	kick_if_inactive_for_secs = 60,
-	time_limit_to_enter_game_since_connection = 10
-  },
 
   default_server_start = {
 	ip = "127.0.0.1",
 	port = 8412,
 	max_connections = 64
   },
+
+  server = {
+	current_arena = "test",
+	kick_if_inactive_for_secs = 60,
+	time_limit_to_enter_game_since_connection = 10
+  },
+
   default_client_start = {
-	ip_port = "127.0.0.1:8142",
-	nickname = "Player"
+	ip_port = "127.0.0.1:8412",
+  },
+
+  client = {
+	nickname = "Player",
+	requested_jitter_buffer_ms = 33
   }
 }

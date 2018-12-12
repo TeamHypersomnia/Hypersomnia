@@ -3,8 +3,6 @@
 #include "game/modes/mode_entropy.h"
 #include "augs/misc/serialization_buffers.h"
 
-using total_client_entropy = total_mode_player_entropy;
-
 constexpr std::size_t chosen_packet_size_v = 1024;
 
 constexpr std::size_t total_header_bytes_v = 

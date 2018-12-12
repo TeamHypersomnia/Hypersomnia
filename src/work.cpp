@@ -1001,7 +1001,7 @@ int work(const int argc, const char* const * const argv) try {
 				lua,
 				[&]() {
 					if (!has_current_setup()) {
-						if (start_client_gui.perform(config.default_client_start)) {
+						if (start_client_gui.perform(config.default_client_start, config.client)) {
 							change_with_save(
 								[&](auto& cfg) {
 									cfg.default_client_start = config.default_client_start;

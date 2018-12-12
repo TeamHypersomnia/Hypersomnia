@@ -37,6 +37,7 @@
 #include "application/setups/server/server_start_input.h"
 #include "application/setups/server/server_vars.h"
 #include "application/setups/client/client_start_input.h"
+#include "application/setups/client/client_vars.h"
 #include "application/app_intent_type.h"
 #include "application/network/simulation_receiver_settings.h"
 
@@ -119,6 +120,7 @@ struct config_lua_table {
 	server_vars server;
 
 	client_start_input default_client_start;
+	client_vars client;
 
 #if TODO
 	std::string connect_address;
