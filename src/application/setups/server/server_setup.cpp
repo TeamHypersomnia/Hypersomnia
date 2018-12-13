@@ -40,6 +40,20 @@ mode_player_id server_setup::get_admin_player_id() const {
 	return mode_player_id::machine_admin();
 }
 
+std::optional<camera_eye> server_setup::find_current_camera_eye() const {
+	return get_arena_handle().on_mode(
+		[&](const auto& typed_mode) -> std::optional<camera_eye> {
+			if (const auto player = typed_mode.find(get_admin_player_id())) {
+				if (player->faction == faction_type::SPECTATOR) {
+					return camera_eye();
+				}
+			}
+
+			return std::nullopt;
+		}
+	);
+}
+
 void server_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
 	auto& g = admin_client_gui;
 

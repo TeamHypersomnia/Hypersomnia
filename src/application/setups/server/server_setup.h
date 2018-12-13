@@ -214,9 +214,7 @@ public:
 
 	void accept_game_gui_events(const game_gui_entropy_type&);
 
-	std::optional<camera_eye> find_current_camera_eye() const {
-		return std::nullopt;
-	}
+	std::optional<camera_eye> find_current_camera_eye() const;
 
 	augs::path_type get_unofficial_content_dir() const {
 		return {};
