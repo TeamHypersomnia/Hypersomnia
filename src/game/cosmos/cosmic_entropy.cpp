@@ -85,7 +85,16 @@ void basic_cosmic_entropy<key>::clear_dead_entities(const cosmos& cosm) {
 template <class K>
 basic_player_entropy<K>& basic_player_entropy<K>::operator+=(const basic_player_entropy<K>& r) {
 	concatenate(intents, r.intents);
-	concatenate(motions, r.motions);
+	
+	for (const auto& it : r.motions) {
+		if (auto m = mapped_or_nullptr(motions, it.first)) {
+			*m += it.second;
+		}
+		else {
+			motions.emplace(it.first, it.second);
+		}
+	}
+
 	concatenate(transfers, r.transfers);
 
 	if (r.wield != std::nullopt) {

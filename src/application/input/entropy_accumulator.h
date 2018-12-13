@@ -42,7 +42,8 @@ struct entropy_accumulator {
 			if (const auto crosshair_motion = mapped_or_nullptr(motions, game_motion_type::MOVE_CROSSHAIR)) {
 				if (const auto crosshair = handle.find_crosshair()) {
 					const auto motion = to_game_motion(*crosshair_motion, crosshair->base_offset, in.settings.mouse_sensitivity, in.screen_size);
-					player.motions.push_back(motion);
+
+					player.motions[motion.motion] = motion.offset;
 				}
 			}
 

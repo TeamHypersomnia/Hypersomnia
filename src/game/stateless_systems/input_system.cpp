@@ -26,7 +26,11 @@ void input_system::make_input_messages(const logic_step step) {
 
 		for (const auto& motion : p.second.motions) {
 			auto msg = messages::motion_message();
-			msg.game_motion::operator=(motion);
+
+			const auto type = motion.first;
+
+			msg.motion = type;
+			msg.offset = motion.second;
 			msg.subject = p.first;
 			step.post_message(msg);
 		}
