@@ -36,6 +36,10 @@ server_setup::server_setup(
 	apply(initial_vars, force);
 }
 
+void server_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
+	(void)in;
+}
+
 mode_player_id server_setup::to_mode_player_id(const client_id_type& id) {
 	mode_player_id out;
 	out.value = static_cast<mode_player_id::id_value_type>(id);
@@ -57,10 +61,6 @@ entity_id server_setup::get_viewed_character_id() const {
 			return typed_mode.lookup(mode_player_id::machine_admin());
 		}
 	);
-}
-
-void server_setup::perform_custom_imgui() {
-
 }
 
 void server_setup::log_malicious_client(const client_id_type id) {

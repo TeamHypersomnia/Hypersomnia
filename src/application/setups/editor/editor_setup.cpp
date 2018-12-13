@@ -398,13 +398,11 @@ float editor_setup::get_game_screen_top() const {
 	return 0.f;
 }
 
-void editor_setup::perform_custom_imgui(
-	sol::state& lua,
-	augs::window& owner,
-	const images_in_atlas_map& game_atlas,
-	const config_lua_table& config
-) {
+void editor_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
 	using namespace augs::imgui;
+
+	auto& lua = in.lua;
+	auto& window = in.window;
 
 	autosave.advance(lua, signi, settings.autosave);
 
@@ -440,7 +438,7 @@ void editor_setup::perform_custom_imgui(
 					}
 
 					if (ImGui::MenuItem("Open", "CTRL+O")) {
-						open(owner);
+						open(window);
 					}
 
 					if (auto menu = scoped_menu("Recent projects", !recent.empty())) {
@@ -455,7 +453,6 @@ void editor_setup::perform_custom_imgui(
 							const auto str = augs::filename_first(target_path);
 
 							if (ImGui::MenuItem(str.c_str())) {
-								LOG_NVPS(target_path);
 								open_folder_in_new_tab(path_op(target_path));
 							}
 						}
@@ -470,15 +467,15 @@ void editor_setup::perform_custom_imgui(
 					ImGui::Separator();
 
 					if (item_if_tabs("Save", "CTRL+S")) {
-						save(owner);
+						save(window);
 					}
 
 					if (item_if_tabs("Save as", "F12")) {
-						save_as(owner);
+						save_as(window);
 					}
 
 					if (item_if_tabs("(Experimental) Export for compatibility (lua)", "")) {
-						export_for_compatibility(owner);
+						export_for_compatibility(window);
 					}
 
 					ImGui::Separator();
@@ -649,11 +646,11 @@ void editor_setup::perform_custom_imgui(
 			view().selecting_filter
 		);
 
-		images_gui.perform(owner, settings.property_editor, game_atlas, make_command_input());
-		sounds_gui.perform(owner, settings.property_editor, game_atlas, make_command_input());
+		images_gui.perform(window, settings.property_editor, in.game_atlas, make_command_input());
+		sounds_gui.perform(window, settings.property_editor, in.game_atlas, make_command_input());
 
-		particle_effects_gui.perform(settings.property_editor, game_atlas, make_command_input());
-		plain_animations_gui.perform(settings.property_editor, game_atlas, make_command_input());
+		particle_effects_gui.perform(settings.property_editor, in.game_atlas, make_command_input());
+		plain_animations_gui.perform(settings.property_editor, in.game_atlas, make_command_input());
 
 		const auto all_selected = [&]() -> decltype(get_all_selected_entities()) {
 			auto selections = get_all_selected_entities();
@@ -674,8 +671,8 @@ void editor_setup::perform_custom_imgui(
 		}();
 
 		{
-			const auto in = make_fae_gui_input();
-			const auto output = selected_fae_gui.perform(in, all_selected);
+			const auto fae_in = make_fae_gui_input();
+			const auto output = selected_fae_gui.perform(fae_in, all_selected);
 
 			const auto& cosm = work().world;
 			output.filter.perform(cosm, view_ids().selected_entities);
@@ -705,8 +702,8 @@ void editor_setup::perform_custom_imgui(
 				const auto draw_mode_in = draw_mode_gui_input { 
 					get_game_screen_top(), 
 					view().local_player_id, 
-					game_atlas,
-					config
+					in.game_atlas,
+					in.config
 				};
 
 				const auto new_entropy = arena_gui.perform_imgui(
@@ -805,7 +802,7 @@ bool editor_setup::confirm_modal_popup() {
 	return false;
 }
 
-void editor_setup::open(const augs::window& owner) {
+void editor_setup::open(const augs::window& window) {
 	if (ok_only_popup) {
 		return;
 	}
@@ -813,25 +810,25 @@ void editor_setup::open(const augs::window& owner) {
 	open_folder_dialog = std::async(
 		std::launch::async,
 		[&](){
-			return owner.choose_directory_dialog("Open folder with project files");
+			return window.choose_directory_dialog("Open folder with project files");
 		}
 	);
 }
 
-void editor_setup::save(const augs::window& owner) {
+void editor_setup::save(const augs::window& window) {
 	if (!anything_opened()) {
 		return;
 	}
 
 	if (folder().is_untitled()) {
-		save_as(owner);
+		save_as(window);
 	}
 	else {
 		save_current_folder();
 	}
 }
 
-void editor_setup::export_for_compatibility(const augs::window& owner) {
+void editor_setup::export_for_compatibility(const augs::window& window) {
 	if (!anything_opened() || ok_only_popup) {
 		return;
 	}
@@ -839,12 +836,12 @@ void editor_setup::export_for_compatibility(const augs::window& owner) {
 	export_folder_dialog = std::async(
 		std::launch::async,
 		[&](){
-			return owner.choose_directory_dialog("Choose folder for the exported project files");
+			return window.choose_directory_dialog("Choose folder for the exported project files");
 		}
 	);
 }
 
-void editor_setup::save_as(const augs::window& owner) {
+void editor_setup::save_as(const augs::window& window) {
 	if (!anything_opened() || ok_only_popup) {
 		return;
 	}
@@ -852,7 +849,7 @@ void editor_setup::save_as(const augs::window& owner) {
 	save_folder_dialog = std::async(
 		std::launch::async,
 		[&](){
-			return owner.choose_directory_dialog("Choose folder for project files");
+			return window.choose_directory_dialog("Choose folder for project files");
 		}
 	);
 }
@@ -979,8 +976,8 @@ void editor_setup::go_to_entity() {
 	go_to_entity_gui.open();
 }
 
-void editor_setup::reveal_in_explorer(const augs::window& owner) {
-	owner.reveal_in_explorer(folder().get_paths().arena.int_file);
+void editor_setup::reveal_in_explorer(const augs::window& window) {
+	window.reveal_in_explorer(folder().get_paths().arena.int_file);
 }
 
 void editor_setup::new_tab() {

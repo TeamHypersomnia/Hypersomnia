@@ -1030,21 +1030,15 @@ int work(const int argc, const char* const * const argv) try {
 
 					/*
 						The editor setup might want to use IMGUI to create views of entities or resources,
-						thus we ask the current setup for its custom IMGUI logic.
+						thus we ask the current setup for its custom ImGui logic.
+
+						Similarly, client and server setups might want to perform ImGui for things like team selection.
 					*/
 
 					visit_current_setup([&](auto& setup) {
-						using T = remove_cref<decltype(setup)>;
-
-						if constexpr(std::is_same_v<T, editor_setup>) {
-							/* Editor needs more goods */
-							setup.perform_custom_imgui(
-								lua, window, streaming.images_in_atlas, config
-							);
-						}
-						else {
-							setup.perform_custom_imgui();
-						}
+						setup.perform_custom_imgui({ 
+							lua, window, streaming.images_in_atlas, config 
+						});
 					});
 				},
 

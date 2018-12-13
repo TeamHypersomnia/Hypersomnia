@@ -14,3 +14,20 @@ struct setup_advance_input {
 	const vec2i& screen_size;
 	const input_settings& settings;
 };
+
+namespace augs {
+	class window;
+}
+
+namespace sol {
+	class state;
+}
+
+struct config_lua_table;
+
+struct perform_custom_imgui_input {
+	sol::state& lua;
+	augs::window& window;
+	const images_in_atlas_map& game_atlas;
+	const config_lua_table& config;
+};

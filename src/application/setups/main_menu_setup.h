@@ -97,7 +97,7 @@ public:
 		return intro.viewables;
 	}
 
-	void perform_custom_imgui() {
+	void perform_custom_imgui(perform_custom_imgui_input) {
 		return;
 	}
 

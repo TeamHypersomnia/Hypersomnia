@@ -57,9 +57,7 @@ public:
 		return scene.viewables;
 	}
 
-	void perform_custom_imgui() {
-		return;
-	}
+	void perform_custom_imgui(perform_custom_imgui_input);
 
 	void customize_for_viewing(config_lua_table&) const;
 

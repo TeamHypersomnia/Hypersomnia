@@ -26,6 +26,8 @@
 #include "application/network/server_step_entropy.h"
 #include "application/arena/arena_handle.h"
 
+#include "application/setups/client/client_gui.h"
+
 struct config_lua_table;
 struct draw_setup_gui_input;
 
@@ -71,6 +73,7 @@ class server_setup : public default_setup_settings {
 	unsigned ticks_until_sending_packets = 0;
 	net_time_t server_time = 0.0;
 
+	client_gui_state admin_client_gui;
 	/* No server state follows later in code. */
 
 	augs::ref_memory_stream make_serialization_stream();
@@ -144,7 +147,7 @@ public:
 		return scene.viewables;
 	}
 
-	void perform_custom_imgui();
+	void perform_custom_imgui(perform_custom_imgui_input);
 
 	void customize_for_viewing(config_lua_table&) const;
 
