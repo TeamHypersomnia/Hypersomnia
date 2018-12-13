@@ -19,7 +19,9 @@
 #include "application/arena/arena_handle.h"
 
 /* To avoid incomplete type error */
-server_setup::~server_setup() = default;
+server_setup::~server_setup() {
+	server->get_specific().Stop();
+}
 
 server_setup::server_setup(
 	sol::state& lua,
@@ -109,7 +111,10 @@ void server_setup::apply(const config_lua_table& cfg) {
 
 void server_setup::choose_arena(const std::string& name) {
 	if (name.empty()) {
-		get_arena_handle().make_default(lua);
+		get_arena_handle().make_default(
+			lua, 
+			initial_signi
+		);
 	}
 	else {
 		get_arena_handle().load_from(

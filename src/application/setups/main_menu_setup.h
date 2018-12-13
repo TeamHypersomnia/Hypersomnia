@@ -87,9 +87,7 @@ public:
 		return timer.fraction_of_step_until_next_step(get_viewed_cosmos().get_fixed_delta().in_seconds<double>());
 	}
 
-	auto get_viewed_character_id() const {
-		return viewed_character_id;
-	}
+	entity_id get_viewed_character_id() const;
 
 	auto get_viewed_character() const {
 		return get_viewed_cosmos()[get_viewed_character_id()];

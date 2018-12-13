@@ -33,10 +33,13 @@
 
 #include "augs/readwrite/lua_readwrite.h"
 
-
 using namespace augs::event::keys;
 using namespace augs::gui::text;
 using namespace augs::gui;
+
+entity_id main_menu_setup::get_viewed_character_id() const {
+	return viewed_character_id;
+}
 
 void main_menu_setup::customize_for_viewing(config_lua_table& config) const {
 	const auto previous_sfx_volume = config.audio_volume.sound_effects;

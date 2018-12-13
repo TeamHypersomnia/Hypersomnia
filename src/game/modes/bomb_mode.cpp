@@ -1150,7 +1150,8 @@ void bomb_mode::add_or_remove_players(const input_type in, const mode_entropy& e
 
 	if (g.added_player != std::nullopt) {
 		const auto& a = *g.added_player;
-		add_player_custom(in, a);
+		const auto result = add_player_custom(in, a);
+		(void)result;
 
 		if (a.faction == faction_type::COUNT) {
 			auto_assign_faction(in, a.id);

@@ -125,7 +125,10 @@ public:
 	}
 
 	template <class S>
-	void make_default(S& lua) const {
+	void make_default(
+		S& lua,
+		cosmos_solvable_significant& target_initial_signi
+	) const {
 		scene.clear();
 
 		rulesets = {};
@@ -143,6 +146,9 @@ public:
 			);
 		}
 
+		bomb_ruleset.bot_quota = 0;
+		bomb_ruleset.bot_names.clear();
+
 		const auto bomb_ruleset_id = raw_ruleset_id(0);
 		rulesets.all.template get_for<bomb_mode>().try_emplace(bomb_ruleset_id, std::move(bomb_ruleset));
 
@@ -155,5 +161,7 @@ public:
 
 		rulesets.meta.server_default = id;
 		rulesets.meta.playtest_default = id;
+
+		target_initial_signi = scene.world.get_solvable().significant;
 	}
 };
