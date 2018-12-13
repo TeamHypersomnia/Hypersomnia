@@ -129,6 +129,15 @@ void arena_gui_state::draw_mode_gui(
 		using namespace augs::gui::text;
 
 		const auto local_player_id = mode_in.local_player_id;
+
+		const auto local_player_faction = [&]() -> std::optional<faction_type> {
+			if (const auto p = typed_mode.find(local_player_id)) {
+				return p->faction;
+			}
+
+			return std::nullopt;
+		}();
+
 		auto game_screen_top = mode_in.game_screen_top;
 
 		game_screen_top += 2;
@@ -477,8 +486,9 @@ void arena_gui_state::draw_mode_gui(
 			draw_warmup_indicator(colored("WARMUP\n" + format_mins_secs(c), white));
 
 			const auto& original_welcome = mode_input.rules.view.warmup_welcome_message;
+			const bool non_spectator = local_player_faction && *local_player_faction != faction_type::SPECTATOR;
 
-			if (!original_welcome.empty()) {
+			if (non_spectator && !original_welcome.empty()) {
 				auto& last = warmup.last_seconds_value;
 
 				thread_local auto populator = default_popul;
