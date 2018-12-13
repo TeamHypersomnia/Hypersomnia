@@ -537,6 +537,8 @@ int work(const int argc, const char* const * const argv) try {
 
 	static bool should_quit = false;
 
+	static augs::event::state common_input_state;
+
 	static auto do_main_menu_option = [&](const main_menu_button_type t) {
 		using T = decltype(t);
 
@@ -546,6 +548,11 @@ int work(const int argc, const char* const * const argv) try {
 				break;
 				
 			case T::HOST_UNIVERSE:
+				if (common_input_state[augs::event::keys::key::LSHIFT]) {
+					launch_setup(launch_type::SERVER);
+					break;
+				}
+
 				start_server_gui.open();
 				break;
 
@@ -826,8 +833,6 @@ int work(const int argc, const char* const * const argv) try {
 
 	static augs::timer frame_timer;
 	
-	static augs::event::state common_input_state;
-
 	static release_flags releases;
 
 	static auto make_create_game_gui_context = [&](const config_lua_table& viewing_config) {
