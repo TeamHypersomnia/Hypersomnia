@@ -36,9 +36,34 @@ server_setup::server_setup(
 	apply(initial_vars, force);
 }
 
+mode_player_id server_setup::get_admin_player_id() const {
+	return mode_player_id::machine_admin();
+}
+
 void server_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
-	//admin_client_gui.
-	(void)in;
+	auto& g = admin_client_gui;
+
+
+	const auto game_screen_top = 0.f;
+
+	const auto draw_mode_in = draw_mode_gui_input { 
+		game_screen_top, 
+		get_admin_player_id(), 
+		in.game_atlas,
+		in.config
+	};
+
+	get_arena_handle().on_mode_with_input(
+		[&](const auto& typed_mode, const auto& mode_input) {
+			const auto new_entropy = g.arena_gui.perform_imgui(
+				draw_mode_in, 
+				typed_mode, 
+				mode_input
+			);
+
+			control(new_entropy);
+		}
+	);
 }
 
 bool server_setup::handle_input_before_imgui(
@@ -52,9 +77,32 @@ bool server_setup::handle_input_before_imgui(
 bool server_setup::handle_input_before_game(
 	const handle_input_before_game_input in
 ) {
-	(void)in;
+	auto& g = admin_client_gui;
+
+	if (g.arena_gui.control({ in.app_controls, in.common_input_state, in.e })) { 
+		return true;
+	}
 
 	return false;
+}
+
+void server_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
+	const auto& g = admin_client_gui;
+
+	const auto game_screen_top = 0.f;
+
+	const auto draw_mode_in = draw_mode_gui_input { 
+		game_screen_top,
+		get_admin_player_id(), 
+		in.images_in_atlas,
+		in.config
+	};
+
+	get_arena_handle().on_mode_with_input(
+		[&](const auto& typed_mode, const auto& mode_input) {
+			g.arena_gui.draw_mode_gui(in, draw_mode_in, typed_mode, mode_input);
+		}
+	);
 }
 
 mode_player_id server_setup::to_mode_player_id(const client_id_type& id) {
@@ -75,7 +123,7 @@ server_arena_handle<true> server_setup::get_arena_handle() const {
 entity_id server_setup::get_viewed_character_id() const {
 	return get_arena_handle().on_mode(
 		[&](const auto& typed_mode) {
-			return typed_mode.lookup(mode_player_id::machine_admin());
+			return typed_mode.lookup(get_admin_player_id());
 		}
 	);
 }
@@ -150,12 +198,10 @@ void server_setup::choose_arena(const std::string& name) {
 	vars.current_arena = name;
 
 	{
-		const auto admin_id = mode_player_id::machine_admin();
-
 		mode_entropy_general cmd;
 
 		cmd.added_player = add_player_input {
-			admin_id,
+			get_admin_player_id(),
 			vars.admin_nickname,
 			faction_type::SPECTATOR
 		};

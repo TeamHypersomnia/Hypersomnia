@@ -184,7 +184,7 @@ class editor_setup {
 		};
 	}
 
-	void draw_mode_gui(const draw_setup_gui_input&);
+	void draw_mode_gui(const draw_setup_gui_input&) const;
 
 	template <class F>
 	void on_mode_with_input(F&& callback) const;

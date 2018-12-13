@@ -84,6 +84,7 @@ struct arena_mode_view_rules {
 
 	real32 fog_of_war_angle = 150.f;
 	double audiovisual_speed = 1.0;
+	uint32_t keep_camera_at_dead_body_for_secs = 3;
 	// END GEN INTROSPECTOR
 
 	void adjust(game_drawing_settings&) const;

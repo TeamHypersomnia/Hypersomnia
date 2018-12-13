@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Clear cosmic entropy when the player is not conscious
+	- So that others are not allowed to waste bandwidth when they are dead
+
 - Notes on assymetric latency
 	- Effectively, the client always shows AHEAD the server time by 
 	- Therefore it is the client->server latency that is the most important

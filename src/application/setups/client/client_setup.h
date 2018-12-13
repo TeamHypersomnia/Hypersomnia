@@ -113,7 +113,7 @@ public:
 		return render_layer_filter::disabled();
 	}
 
-	void draw_custom_gui(const draw_setup_gui_input&) {}
+	void draw_custom_gui(const draw_setup_gui_input&);
 
 	void ensure_handler() {}
 };

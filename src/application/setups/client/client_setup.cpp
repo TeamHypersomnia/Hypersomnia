@@ -20,3 +20,9 @@ void client_setup::accept_game_gui_events(const game_gui_entropy_type& events) {
 void client_setup::perform_custom_imgui(perform_custom_imgui_input) {
 
 }
+
+void client_setup::draw_custom_gui(const draw_setup_gui_input& in) {
+	(void)in;
+
+}
+

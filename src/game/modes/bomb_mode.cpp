@@ -59,6 +59,22 @@ int bomb_mode_player_stats::calc_score() const {
 	;
 }
 
+template <class H>
+static void delete_with_held_items(const H handle) {
+	if (handle) {
+		deletion_queue q;
+		q.push_back(handle.get_id());
+
+		handle.for_each_contained_item_recursive(
+			[&](const auto& contained) {
+				q.push_back(entity_id(contained.get_id()));
+			}
+		);
+
+		reverse_perform_deletions(q, handle.get_cosmos());
+	}
+}
+
 bool bomb_mode_player::operator<(const bomb_mode_player& b) const {
 	const auto as = stats.calc_score();
 	const auto bs = b.stats.calc_score();
@@ -314,8 +330,6 @@ bool bomb_mode::add_player_custom(const input_type in, const add_player_input& a
 
 	new_player.chosen_name = add_in.name;
 
-	recently_added_players.push_back(new_id);
-
 	if (state == arena_mode_state::WARMUP) {
 		new_player.stats.money = in.rules.economy.warmup_initial_money;
 	}
@@ -344,18 +358,7 @@ bool bomb_mode_player::is_set() const {
 void bomb_mode::remove_player(input_type in, const mode_player_id& id) {
 	const auto controlled_character_id = lookup(id);
 
-	if (const auto handle = in.cosm[controlled_character_id]) {
-		deletion_queue q;
-		q.push_back(handle.get_id());
-
-		handle.for_each_contained_item_recursive(
-			[&](const auto& contained) {
-				q.push_back(entity_id(contained.get_id()));
-			}
-		);
-
-		reverse_perform_deletions(q, in.cosm);
-	}
+	delete_with_held_items(in.cosm[controlled_character_id]);
 
 	erase_element(players, id);
 }
@@ -683,7 +686,7 @@ void bomb_mode::setup_round(
 	}
 
 	spawn_and_kick_bots(in, step);
-	spawn_recently_added_players(in, step);
+	spawn_characters_for_recently_assigned(in, step);
 
 	if (msg.changes.size() > 0) {
 		step.post_message(msg);
@@ -1274,6 +1277,33 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 
 				// TODO: Notify GUI about the result.
 
+				using R = messages::health_event;
+
+				const auto death_request = on_player_handle(cosm, id, [&](const auto& player_handle) -> std::optional<R> {
+					if constexpr(!is_nullopt_v<decltype(player_handle)>) {
+						if (const auto tr = player_handle.find_logic_transform()) {
+							if (const auto sentience = player_handle.template find<components::sentience>()) {
+								if (!sentience->is_dead()) {
+									damage_origin origin;
+									origin.cause.flavour = player_handle.get_flavour_id();
+									origin.cause.entity = player_handle.get_id();
+									origin.sender.set(player_handle);
+
+									return R::request_death(
+										player_handle.get_id(),
+										tr->get_direction(),
+										tr->pos,
+										origin
+									);
+								}
+							}
+						}
+					}
+
+					(void)player_handle;
+					return std::nullopt;
+				});
+
 				const auto result = [&]() {
 					if (previous_faction == f) {
 						return faction_choice_result::THE_SAME;
@@ -1290,6 +1320,8 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 					}
 
 					if (f != faction_type::SPECTATOR) {
+						/* This is a serious choice */
+
 						{
 							const auto& team_limit = in.rules.max_players_per_team;
 
@@ -1298,9 +1330,12 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 							}
 						}
 
-						/* This is a serious choice */
-						if (player_data->round_when_chosen_faction == current_round) {
-							return faction_choice_result::CHOOSING_TOO_FAST;
+						if (death_request == std::nullopt) {
+							/* If we are already dead, don't allow to re-choose twice during the same round. */
+
+							if (player_data->round_when_chosen_faction == current_round) {
+								return faction_choice_result::CHOOSING_TOO_FAST;
+							}
 						}
 
 						player_data->round_when_chosen_faction = current_round;
@@ -1319,32 +1354,9 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 				if (result == faction_choice_result::CHANGED) {
 					BMB_LOG("Changed from %x to %x", format_enum(previous_faction), format_enum(f));
 
-					on_player_handle(cosm, id, [&](const auto& player_handle) {
-						if constexpr(!is_nullopt_v<decltype(player_handle)>) {
-							if (const auto tr = player_handle.find_logic_transform()) {
-								if (const auto sentience = player_handle.template find<components::sentience>()) {
-									if (!sentience->is_dead()) {
-										damage_origin origin;
-										origin.cause.flavour = player_handle.get_flavour_id();
-										origin.cause.entity = player_handle.get_id();
-										origin.sender.set(player_handle);
-
-										const auto death_request = messages::health_event::request_death(
-											player_handle.get_id(),
-											tr->get_direction(),
-											tr->pos,
-											origin
-										);
-
-										step.post_message(death_request);
-									}
-								}
-							}
-						}
-						else {
-							(void)player_handle;
-						}
-					});
+					if (death_request != std::nullopt) {
+						step.post_message(*death_request);
+					}
 				}
 			}
 		}
@@ -1390,32 +1402,31 @@ void bomb_mode::spawn_and_kick_bots(const input_type in, const logic_step) {
 	}
 }
 
-void bomb_mode::spawn_recently_added_players(const input_type in, const logic_step step) {
-	for (const auto& id : recently_added_players) {
-		if (const auto player_data = find(id)) {
-			if (player_data->controlled_character_id.is_set()) {
-				continue;
-			}
+void bomb_mode::spawn_characters_for_recently_assigned(const input_type in, const logic_step step) {
+	for (const auto& it : players) {
+		const auto& player_data = it.second;
+		const auto id = it.first;
 
-			auto do_spawn = [&]() {
-				create_character_for_player(in, step, id);
-			};
+		if (player_data.controlled_character_id.is_set()) {
+			continue;
+		}
 
-			if (state == arena_mode_state::WARMUP) {
-				/* Always spawn in warmup */
+		auto do_spawn = [&]() {
+			create_character_for_player(in, step, id);
+		};
+
+		if (state == arena_mode_state::WARMUP) {
+			/* Always spawn in warmup */
+			do_spawn();
+		}
+		else if (state == arena_mode_state::LIVE) {
+			const auto passed = get_round_seconds_passed(in);
+
+			if (players.size() == 1 || passed <= in.rules.allow_spawn_for_secs_after_starting) {
 				do_spawn();
-			}
-			else if (state == arena_mode_state::LIVE) {
-				const auto passed = get_round_seconds_passed(in);
-
-				if (passed <= in.rules.allow_spawn_after_secs_after_starting) {
-					do_spawn();
-				}
 			}
 		}
 	}
-
-	recently_added_players.clear();
 }
 
 void bomb_mode::handle_game_commencing(const input_type in, const logic_step step) {
@@ -1464,7 +1475,7 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 	spawn_and_kick_bots(in, step);
 	add_or_remove_players(in, entropy, step);
 	handle_special_commands(in, entropy, step);
-	spawn_recently_added_players(in, step);
+	spawn_characters_for_recently_assigned(in, step);
 
 	if (in.rules.allow_game_commencing) {
 		handle_game_commencing(in, step);
@@ -1630,19 +1641,26 @@ void bomb_mode::respawn_the_dead(const input_type in, const logic_step step, con
 	auto& cosm = in.cosm;
 	const auto& clk = cosm.get_clock();
 
-	cosm.for_each_having<components::sentience>([&](const auto typed_handle) {
-		auto& sentience = typed_handle.template get<components::sentience>();
+	for (auto& it : players) {
+		auto& player_data = it.second;
+		const auto id = it.first;
 
-		if (sentience.when_knocked_out.was_set() && clk.is_ready(
-			after_ms,
-			sentience.when_knocked_out
-		)) {
-			teleport_to_next_spawn(in, typed_handle);
-			init_spawned(in, typed_handle, step, std::nullopt);
+		on_player_handle(cosm, id, [&](const auto& player_handle) {
+			if constexpr(!is_nullopt_v<decltype(player_handle)>) {
+				auto& sentience = player_handle.template get<components::sentience>();
 
-			sentience.when_knocked_out = {};
-		}
-	});
+				if (sentience.when_knocked_out.was_set() && clk.is_ready(
+					after_ms,
+					sentience.when_knocked_out
+				)) {
+					delete_with_held_items(player_handle);
+					player_data.controlled_character_id.unset();
+
+					create_character_for_player(in, step, id, std::nullopt);
+				}
+			}
+		});
+	}
 }
 
 const float match_begins_in_secs = 4.f;
@@ -1901,7 +1919,7 @@ void bomb_mode::reset_players_stats(const input_type in) {
 	for (auto& it : players) {
 		auto& p = it.second;
 		p.stats = {};
-		p.round_when_chosen_faction = static_cast<unsigned>(-1);
+		p.round_when_chosen_faction = static_cast<uint32_t>(-1);
 	}
 
 	clear_players_round_state(in);

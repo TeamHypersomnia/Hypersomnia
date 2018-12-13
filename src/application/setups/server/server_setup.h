@@ -111,6 +111,8 @@ class server_setup : public default_setup_settings {
 	void init_client(const client_id_type&);
 	void unset_client(const client_id_type&);
 
+	mode_player_id get_admin_player_id() const;
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
@@ -185,7 +187,7 @@ public:
 			{
 				const auto admin_entropy = local_collected.extract(
 					get_viewed_character(), 
-					mode_player_id::machine_admin(),
+					get_admin_player_id(),
 					{ in.settings, in.screen_size }
 				);
 
@@ -224,7 +226,7 @@ public:
 		return render_layer_filter::disabled();
 	}
 
-	void draw_custom_gui(const draw_setup_gui_input&) {}
+	void draw_custom_gui(const draw_setup_gui_input&) const;
 
 	void ensure_handler() {}
 

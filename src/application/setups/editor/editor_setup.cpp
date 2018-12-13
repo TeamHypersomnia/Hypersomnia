@@ -697,15 +697,15 @@ void editor_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
 			text_tooltip("x: %x\ny: %x", pos->x, pos->y);
 		}
 
+		const auto draw_mode_in = draw_mode_gui_input { 
+			get_game_screen_top(), 
+			view().local_player_id, 
+			in.game_atlas,
+			in.config
+		};
+
 		on_mode_with_input(
 			[&](const auto& typed_mode, const auto& mode_input) {
-				const auto draw_mode_in = draw_mode_gui_input { 
-					get_game_screen_top(), 
-					view().local_player_id, 
-					in.game_atlas,
-					in.config
-				};
-
 				const auto new_entropy = arena_gui.perform_imgui(
 					draw_mode_in, 
 					typed_mode, 
@@ -1957,16 +1957,16 @@ void editor_setup::on_mode_with_input(F&& callback) const {
 	}
 }
 
-void editor_setup::draw_mode_gui(const draw_setup_gui_input& in) {
+void editor_setup::draw_mode_gui(const draw_setup_gui_input& in) const {
+	const auto draw_mode_in = draw_mode_gui_input { 
+		get_game_screen_top(), 
+		view().local_player_id, 
+		in.images_in_atlas,
+		in.config
+	};
+
 	on_mode_with_input(
 		[&](const auto& typed_mode, const auto& mode_input) {
-			const auto draw_mode_in = draw_mode_gui_input { 
-				get_game_screen_top(), 
-				view().local_player_id, 
-				in.images_in_atlas,
-				in.config
-			};
-
 			arena_gui.draw_mode_gui(in, draw_mode_in, typed_mode, mode_input);
 		}
 	);

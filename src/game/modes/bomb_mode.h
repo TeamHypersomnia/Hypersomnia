@@ -69,7 +69,7 @@ struct bomb_mode_ruleset {
 	std::vector<entity_name_str> bot_names;
 	unsigned bot_quota = 8;
 
-	unsigned allow_spawn_after_secs_after_starting = 10;
+	unsigned allow_spawn_for_secs_after_starting = 10;
 	unsigned max_players_per_team = 32;
 	unsigned round_secs = 120;
 	unsigned round_end_secs = 5;
@@ -146,7 +146,7 @@ struct bomb_mode_player {
 	entity_name_str chosen_name;
 	faction_type faction = faction_type::SPECTATOR;
 	bomb_mode_player_stats stats;
-	unsigned round_when_chosen_faction = static_cast<unsigned>(-1); 
+	uint32_t round_when_chosen_faction = static_cast<uint32_t>(-1); 
 	bool is_bot = false;
 	// END GEN INTROSPECTOR
 
@@ -344,7 +344,7 @@ private:
 	void execute_player_commands(input, const mode_entropy&, logic_step);
 	void add_or_remove_players(input, const mode_entropy&, logic_step);
 	void handle_special_commands(input, const mode_entropy&, logic_step);
-	void spawn_recently_added_players(input, logic_step);
+	void spawn_characters_for_recently_assigned(input, logic_step);
 	void spawn_and_kick_bots(input, logic_step);
 
 	void handle_game_commencing(input, logic_step);
@@ -362,8 +362,6 @@ public:
 	per_faction_t<bomb_mode_faction_state> factions;
 	std::map<mode_player_id, bomb_mode_player> players;
 	bomb_mode_round_state current_round;
-
-	std::vector<mode_player_id> recently_added_players;
 
 	bool should_commence_when_ready = false;
 	real32 commencing_timer_ms = -1.f;
