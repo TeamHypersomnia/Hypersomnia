@@ -58,7 +58,7 @@ void server_adapter::advance(const double server_time, H&& handler) {
 }
 
 template <class T>
-using payload_of_t = last_argument_t<decltype(&T::to_payload)>;
+using payload_of_t = last_argument_t<decltype(&T::read_payload)>;
 
 template <class H>
 message_handler_result server_adapter::process_message(const client_id_type& client_id, yojimbo::Message& m, H&& handler) {
@@ -90,7 +90,7 @@ message_handler_result server_adapter::process_message(const client_id_type& cli
 				auto read_payload_into = [&m](auto&&... args) {
 					auto& typed_msg = (net_message_type&)m;
 
-					return typed_msg.to_payload(
+					return typed_msg.read_payload(
 						std::forward<decltype(args)>(args)...
 					);
 				};
@@ -115,16 +115,16 @@ namespace detail {
 	template <class... Args>
 	struct strap_can_create {
 		template <class M, class = void>
-		struct from_payload : std::false_type {};
+		struct write_payload : std::false_type {};
 
 		template <class M>
-		struct from_payload<
+		struct write_payload<
 			M, 
-			decltype(std::declval<M&>().from_payload(std::declval<Args>()...), void())
+			decltype(std::declval<M&>().write_payload(std::declval<Args>()...), void())
 		> : std::true_type {};
 
 		template <class M>
-		struct can_create : from_payload<std::remove_pointer_t<M>> {};
+		struct can_create : write_payload<std::remove_pointer_t<M>> {};
 	};
 }
 
@@ -144,7 +144,7 @@ bool server_adapter::send_payload(
 	if (const auto new_message = create_message<net_message_type>(client_id)) {
 		auto& m = *new_message;
 
-		const auto translation_result = m.from_payload(
+		const auto translation_result = m.write_payload(
 			std::forward<Args>(args)...
 		);
 

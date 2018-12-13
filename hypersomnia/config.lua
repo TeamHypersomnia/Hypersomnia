@@ -452,6 +452,11 @@ return {
 
   client = {
 	nickname = "Player",
-	requested_jitter_buffer_ms = 33
+	net = {
+	  jitter = {
+	  	buffer_ms = 33,
+		merge_commands_when_above_ms = 50
+	  }
+	}
   }
 }

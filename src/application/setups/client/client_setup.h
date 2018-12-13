@@ -85,7 +85,12 @@ public:
 		auto steps = timer.extract_num_of_logic_steps(get_inv_tickrate());
 
 		while (steps--) {
-			const auto total = total_collected.extract(get_viewed_character(), local_player_id, in);
+			const auto total = total_collected.extract(
+				get_viewed_character(), 
+				local_player_id, 
+				{ in.settings, in.screen_size }
+			);
+
 			(void)total;
 			(void)callbacks;
 		}

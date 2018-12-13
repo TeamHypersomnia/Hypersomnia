@@ -30,6 +30,9 @@ struct basic_player_entropy {
 
 	void clear_relevant(cosmic_entropy_recording_options);
 	void clear();
+
+	std::size_t length() const;
+	bool empty() const;
 };
 
 template <class key>

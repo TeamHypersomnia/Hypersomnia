@@ -35,21 +35,32 @@ bool unsafe_write_message(
 }
 
 namespace net_messages {
-	bool client_welcome::to_payload(
+	bool server_step_entropy::read_payload(server_step_entropy_for_client& output) {
+		// TODO SECURITY: don't blindly trust the server!!!
+		// TODO BANDWIDTH: optimize entropy i/o
+
+		return unsafe_read_message(*this, output);
+	}
+
+	bool server_step_entropy::write_payload(const server_step_entropy_for_client& input) {
+		return unsafe_write_message(*this, input);
+	}
+
+	bool client_welcome::read_payload(
 		decltype(client_welcome::payload)& output
 	) {
 		output = std::move(payload);
 		return true;
 	}
 
-	bool client_welcome::from_payload(
+	bool client_welcome::write_payload(
 		decltype(client_welcome::payload)&& input
 	) {
 		payload = std::move(input);
 		return true;
 	}
 
-	bool client_entropy::to_payload(
+	bool client_entropy::read_payload(
 		total_client_entropy& output
 	) {
 		// TODO SECURITY: don't blindly trust the client!!!
@@ -58,13 +69,13 @@ namespace net_messages {
 		return unsafe_read_message(*this, output);
 	}
 
-	bool client_entropy::from_payload(
+	bool client_entropy::write_payload(
 		total_client_entropy&& input
 	) {
 		return unsafe_write_message(*this, input);
 	}
 
-	bool initial_arena_state::to_payload(
+	bool initial_arena_state::read_payload(
 		augs::serialization_buffers& buffers,
 		const initial_arena_state_payload<false> in
 	) {
@@ -102,7 +113,7 @@ namespace net_messages {
 		return true;
 	}
 
-	const std::vector<std::byte>* initial_arena_state::from_payload(
+	const std::vector<std::byte>* initial_arena_state::write_payload(
 		augs::serialization_buffers& buffers,
 		const initial_arena_state_payload<true> in
 	) {

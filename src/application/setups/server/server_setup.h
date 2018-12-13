@@ -23,6 +23,9 @@
 #include "augs/readwrite/memory_stream_declaration.h"
 #include "augs/misc/serialization_buffers.h"
 
+#include "application/network/server_step_entropy.h"
+#include "game/modes/on_mode_with_input.hpp"
+
 struct config_lua_table;
 struct draw_setup_gui_input;
 
@@ -42,6 +45,8 @@ using server_step_type = unsigned;
 class server_setup : public default_setup_settings {
 	/* This is loaded from the arena folder */
 	intercosm scene;
+	cosmos_solvable_significant initial_signi;
+
 	predefined_rulesets rulesets;
 
 	/* Other replicated state */
@@ -53,7 +58,9 @@ class server_setup : public default_setup_settings {
 
 	augs::serialization_buffers buffers;
 
-	entropy_accumulator total_collected;
+	entropy_accumulator local_collected;
+	server_step_entropy step_collected;
+
 	entity_id viewed_character_id;
 
 	augs::propagate_const<std::unique_ptr<server_adapter>> server;
@@ -71,18 +78,26 @@ class server_setup : public default_setup_settings {
 	static decltype(auto) on_mode_with_input_impl(
 		S& self,
 		F&& callback
-	);
+	) {
+		return general_on_mode_with_input(
+			self.current_mode.state,
+			self.rulesets.all,
+			self.current_mode.rules_id,
+			std::as_const(self.initial_signi),
+			self.scene.world,
+			std::forward<F>(callback)
+		);
+	}
 
-	void advance_internal(
-		const setup_advance_input& in
-	);
+	void advance_internal();
+	void handle_client_messages();
+	void advance_clients_state();
+	void send_server_step_entropies();
+	void send_packets_if_its_time();
 
-	void handle_client_messages(
-		const setup_advance_input& in
-	);
-
-	void advance_clients_state(
-		const setup_advance_input& in
+	void accept_entropy_of_client(
+		const mode_player_id,
+		const total_client_entropy&
 	);
 
 	friend server_adapter;
@@ -144,9 +159,6 @@ public:
 
 	void choose_arena(const std::string& name);
 
-	bool add_to_arena(add_to_arena_input);
-	void remove_from_arena(const client_id_type&);
-
 	std::string describe_client(const client_id_type id) const;
 	void log_malicious_client(const client_id_type id);
 
@@ -165,30 +177,37 @@ public:
 		const auto dt = get_inv_tickrate();
 
 		while (server_time <= current_time) {
-			advance_internal(in);
-
-			++current_simulation_step;
-
+			/* Extract entropy from the built-in server player */
 			{
-				/* Process the built-in server player */
-				const auto total = total_collected.extract(
+				const auto admin_entropy = local_collected.extract(
 					get_viewed_character(), 
 					mode_player_id::machine_admin(),
-					in
+					{ in.settings, in.screen_size }
 				);
 
-				(void)total;
+				step_collected += admin_entropy;
 			}
 
+			handle_client_messages();
+			advance_clients_state();
+			send_server_step_entropies();
+			send_packets_if_its_time();
+
+			on_mode_with_input(
+				[&](auto& typed_mode, const auto& in) {
+					typed_mode.advance(in, step_collected, callbacks);
+				}
+			);
+
+			step_collected.clear();
+			++current_simulation_step;
 			server_time += dt;
 		}
-
-		(void)callbacks;
 	}
 
 	template <class T>
 	void control(const T& t) {
-		total_collected.control(t);
+		local_collected.control(t);
 	}
 
 	void accept_game_gui_events(const game_gui_entropy_type&);

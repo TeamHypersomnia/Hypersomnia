@@ -1,5 +1,6 @@
 #pragma once
 #include "application/setups/server/server_vars.h"
+#include "augs/network/jitter_buffer.h"
 #include "augs/network/network_types.h"
 #include "game/modes/mode_entropy.h"
 
@@ -21,7 +22,8 @@ struct server_client_state {
 	net_time_t last_valid_activity_time = -1.0;
 	requested_client_settings settings;
 
-	client_pending_entropies entropies;
+	client_pending_entropies pending_entropies;
+	uint8_t num_entropies_accepted = 0;
 
 	server_client_state() = default;
 
@@ -52,11 +54,12 @@ struct server_client_state {
 		state = type::PENDING_WELCOME;
 		last_valid_activity_time = server_time;
 		settings = {};
-		entropies.clear();
+		pending_entropies.clear();
+		num_entropies_accepted = 0;
 	}
 
 	void unset() {
 		state = type::INVALID;
-		entropies.clear();
+		pending_entropies.clear();
 	}
 };

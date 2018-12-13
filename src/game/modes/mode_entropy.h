@@ -23,7 +23,7 @@ struct mode_player_entropy {
 	// END GEN INTROSPECTOR
 
 	void clear();
-	bool is_set() const;
+	bool empty() const;
 
 	mode_player_entropy& operator+=(const mode_player_entropy&);
 };
@@ -33,6 +33,9 @@ struct total_mode_player_entropy {
 	mode_player_entropy mode;
 	cosmic_player_entropy cosmic;
 	// END GEN INTROSPECTOR
+
+	total_mode_player_entropy& operator+=(const total_mode_player_entropy& b);
+	bool empty() const;
 };
 
 using total_client_entropy = total_mode_player_entropy;

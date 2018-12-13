@@ -30,7 +30,7 @@ void server_adapter::client_disconnected(const client_id_type id) {
 game_connection_config::game_connection_config() {
 	numChannels = 1;
 
-	auto& solvable_stream = channel[static_cast<int>(game_channel_type::SOLVABLE_STREAM)];
+	auto& solvable_stream = channel[static_cast<int>(game_channel_type::SOLVABLE_AND_STEPS)];
 	solvable_stream.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
 	solvable_stream.maxBlockSize = 1024 * 1024 * 2;
 

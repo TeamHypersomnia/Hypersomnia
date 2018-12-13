@@ -1,13 +1,28 @@
 #include "augs/templates/traits/variant_traits.h"
 #include "game/modes/mode_entropy.h"
 
+bool total_mode_player_entropy::empty() const {
+	return mode.empty() && cosmic.empty();
+}
+
+total_mode_player_entropy& total_mode_player_entropy::operator+=(const total_mode_player_entropy& b) {
+	mode += b.mode;
+	cosmic += b.cosmic;
+	return *this;
+}
+
 void mode_entropy::accumulate(
 	const mode_player_id m_id,
 	const entity_id id,
 	const total_mode_player_entropy& in
 ) {
-	cosmic[id] += in.cosmic;
-	players[m_id] += in.mode;
+	if (id.is_set()) {
+		cosmic[id] += in.cosmic;
+	}
+
+	if (m_id.is_set()) {
+		players[m_id] += in.mode;
+	}
 }
 
 total_mode_player_entropy mode_entropy::get_for(
@@ -32,10 +47,10 @@ void mode_player_entropy::clear() {
 	*this = {};
 }
 
-bool mode_player_entropy::is_set() const {
+bool mode_player_entropy::empty() const {
 	return 
-		team_choice != std::nullopt
-		|| item_purchase != std::nullopt
+		team_choice == std::nullopt
+		&& item_purchase == std::nullopt
 	;
 }
 

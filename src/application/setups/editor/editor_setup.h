@@ -237,7 +237,11 @@ public:
 				in.frame_delta,
 				make_player_input(callbacks),
 				[&]() {
-					return total_collected.extract(get_viewed_character(), view().local_player_id, in);
+					return total_collected.extract(
+						get_viewed_character(), 
+						view().local_player_id, 
+						{ in.settings, in.screen_size }
+					);
 				}
 			);
 		}

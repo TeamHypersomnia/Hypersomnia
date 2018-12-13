@@ -16,7 +16,7 @@
 #include "application/network/custom_yojimbo_factory.h"
 
 enum class game_channel_type {
-	SOLVABLE_STREAM,
+	SOLVABLE_AND_STEPS,
 	COMMUNICATIONS,
 
 	COUNT

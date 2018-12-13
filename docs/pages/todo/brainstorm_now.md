@@ -6,6 +6,26 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Notes on assymetric latency
+	- Effectively, the client always shows AHEAD the server time by 
+	- Therefore it is the client->server latency that is the most important
+		- We should ALWAYS resend the earliest messages since traffic on this side will NOT be the bottleneck
+		- so set the delay to 0 on client-side config
+
+- Chosen solution for jitter buffer
+	- Handling latency increase and thus, unaccepted client commands 
+		- Client adjusts naturally, the same way as in the beginning of the play where latency is assumed to be 0
+	- Handling latency decrease and thus, packet bursts
+		- Two strategies
+			- One, squash on the server 
+				- Pro: simpler, so we'll for now go with this strat
+				- Pro: gets the client fastest on track
+				- Con: slight jerks when this happens
+				- Was the same not mentioned with snapping of the ticks?
+			- Second, slow down tickrate on the client and thus the rate with which the commands are generated
+				- Pro: no jerks when this happens
+				- Con: takes more to get the client faster on track
+
 - Server: accepting inputs
 	- I guess a simpler jitter buffer implementation could be in order
 		- e.g. just keep a vector and a maximum of steps to squash at once?

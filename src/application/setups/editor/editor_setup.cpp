@@ -15,7 +15,7 @@
 
 #include "application/config_lua_table.h"
 #include "application/setups/editor/editor_setup.hpp"
-#include "application/setups/editor/detail/on_mode_with_input.hpp"
+#include "application/setups/editor/detail/editor_on_mode_with_input.hpp"
 #include "application/setups/editor/editor_paths.h"
 #include "application/setups/editor/editor_camera.h"
 #include "application/setups/editor/editor_history.hpp"

@@ -34,6 +34,12 @@ namespace augs {
 		template <class Iter>
 		void acquire_new_commands(Iter first, Iter last) {
 			buffer.insert(buffer.end(), first, last);
+
+			if (initial_filling) {
+				if (buffer.size() >= lower_limit) {
+					initial_filling = false;
+				}
+			}
 		}
 
 		std::vector<command> unpack_commands_once() {
@@ -49,19 +55,21 @@ namespace augs {
 
 				const bool unpacked_successfully = next_commands.size() > 0;
 
-				if (unpacked_successfully)
+				if (unpacked_successfully) {
 					steps_extrapolated = 0;
-				else
+				}
+				else {
 					++steps_extrapolated;
+				}
 			}
 
 			return next_commands;
 		}
 
-		bool unpack_new_command(command& next_command) {
+		bool unpack_next_command(command& next_command) {
 			if (!initial_filling) {
 				if (buffer.size() > 0) {
-					next_command = buffer.front();
+					next_command = std::move(buffer.front());
 					buffer.erase(buffer.begin());
 
 					return true;

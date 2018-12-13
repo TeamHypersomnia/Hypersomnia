@@ -22,6 +22,9 @@ namespace net_messages {
 		serialize_float(stream, payload.public_settings.mouse_sensitivity.x);
 		serialize_float(stream, payload.public_settings.mouse_sensitivity.y);
 
+		serialize_uint32(stream, payload.net.jitter.buffer_ms);
+		serialize_uint32(stream, payload.net.jitter.merge_commands_when_above_ms);
+
 		return true;
 	}
 }

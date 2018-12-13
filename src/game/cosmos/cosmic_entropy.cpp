@@ -10,24 +10,37 @@
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/cosmos/entropy_recording_options.h"
 
+
+template <class K>
+std::size_t basic_player_entropy<K>::length() const {
+	std::size_t total = 0;
+
+	total += motions.size();
+	total += intents.size();
+	total += transfers.size();
+
+	if (cast_spell.is_set()) {
+		++total;
+	}
+
+	if (wield != std::nullopt) { 
+		++total;
+	}
+
+	return total;
+}
+
+template <class K>
+bool basic_player_entropy<K>::empty() const {
+	return length() == 0;
+}
+
 template <class key>
 std::size_t basic_cosmic_entropy<key>::length() const {
 	std::size_t total = 0;
 
 	for (const auto& p : players) {
-		const auto& e = p.second;
-
-		total += e.motions.size();
-		total += e.intents.size();
-		total += e.transfers.size();
-
-		if (e.cast_spell.is_set()) {
-			++total;
-		}
-
-		if (e.wield != std::nullopt) { 
-			++total;
-		}
+		total += p.second.length();
 	}
 
 	return total;

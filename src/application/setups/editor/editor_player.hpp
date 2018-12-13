@@ -2,7 +2,7 @@
 #include "application/setups/editor/editor_player.h"
 #include "application/intercosm.h"
 #include "augs/templates/snapshotted_player.hpp"
-#include "application/setups/editor/detail/on_mode_with_input.hpp"
+#include "application/setups/editor/detail/editor_on_mode_with_input.hpp"
 #include "application/setups/editor/editor_settings.h"
 #include "application/setups/editor/editor_paths.h"
 

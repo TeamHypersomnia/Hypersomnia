@@ -100,6 +100,8 @@ void server_setup::choose_arena(const std::string& name) {
 		else {
 			ensure(false && "Not implemented!");
 		}
+
+		initial_signi = scene.world.get_solvable().significant;
 	}
 
 	vars.current_arena = name;
@@ -107,10 +109,6 @@ void server_setup::choose_arena(const std::string& name) {
 
 void server_setup::accept_game_gui_events(const game_gui_entropy_type&) {
 
-}
-
-bool server_setup::add_to_arena(add_to_arena_input) {
-	return true;
 }
 
 void server_setup::init_client(const client_id_type& id) {
@@ -129,23 +127,102 @@ void server_setup::disconnect_and_unset(const client_id_type& id) {
 	unset_client(id);
 }
 
-void server_setup::advance_clients_state(const setup_advance_input& in) {
-	(void)in;
+void server_setup::accept_entropy_of_client(
+	const mode_player_id mode_id,
+	const total_client_entropy& entropy
+) {
+	if (!entropy.empty()) {
+		const auto client_entity_id = on_mode(
+			[&](const auto& typed_mode) {
+				if (const auto p = typed_mode.find(mode_id)) {
+					return p->controlled_character_id;
+				}
 
+				return entity_id::dead();
+			}
+		);
+
+		/* 
+			TODO SECURITY: validate the entropies for unauthorized item transfers! 
+			Remember, though, that the client could have mistakenly thought that they are alive.
+			Therefore we should not assume they are malicious and kick them, but just ignore the invalid commands.
+		*/
+
+		step_collected.accumulate(
+			mode_id,
+			client_entity_id,
+			entropy
+		);
+	}
+}
+
+void server_setup::advance_clients_state() {
 	/* Do it only once per tick */
 	bool added_someone_already = false;
 	bool removed_someone_already = false;
 
+	const auto inv_simulation_delta_ms = 1.0 / (get_inv_tickrate() * 1000.0);
+
+	auto in_steps = [inv_simulation_delta_ms](const auto ms) {
+		return ms * inv_simulation_delta_ms;
+	};
+
+	step_collected.clear();
+
+	constexpr auto max_pending_commands_for_client_v = static_cast<uint8_t>(255);
+
 	for (auto& c : clients) {
+		using S = server_client_state::type;
+
 		if (!c.is_set()) {
 			continue;
 		}
 
 		const auto client_id = static_cast<client_id_type>(index_in(clients, c));
+		const auto mode_id = to_mode_player_id(client_id);
+
+		if (c.pending_entropies.size() > max_pending_commands_for_client_v) {
+			disconnect_and_unset(client_id);
+			continue;
+		}
+
+		auto contribute_to_step_entropy = [&]() {
+			if (c.state == S::IN_GAME) {
+#if 0
+				c.pending_entropies.set_lower_limit(
+					c.settings.net.requested_jitter_buffer_ms * inv_simulation_delta_ms;
+				);
+#endif
+
+				const auto jitter_vars = c.settings.net.jitter;
+				const auto jitter_squash_steps = in_steps(jitter_vars.merge_commands_when_above_ms);
+
+				auto& inputs = c.pending_entropies;
+
+				const auto num_pending = inputs.size();
+				const bool should_squash = num_pending >= jitter_squash_steps;
+
+				total_client_entropy entropy;
+
+				c.num_entropies_accepted = [&]() {
+					if (should_squash) {
+						for (const auto& e : inputs) {
+							entropy += e;
+						}
+
+						inputs.clear();
+
+						return static_cast<uint8_t>(num_pending);
+					}
+
+					return static_cast<uint8_t>(1);
+				}();
+
+				accept_entropy_of_client(mode_id, entropy);
+			}
+		};
 
 		auto add_client_if_not_yet_in_mode = [&]() {
-			const auto mode_id = to_mode_player_id(client_id);
-
 			auto final_nickname = on_mode(
 				[&](const auto& typed_mode) -> std::string {
 					if (nullptr == typed_mode.find(mode_id)) {
@@ -171,7 +248,7 @@ void server_setup::advance_clients_state(const setup_advance_input& in) {
 					faction_type::SPECTATOR
 				};
 
-				total_collected.control(cmd);
+				local_collected.control(cmd);
 				added_someone_already = true;
 			}
 		};
@@ -185,7 +262,7 @@ void server_setup::advance_clients_state(const setup_advance_input& in) {
 				mode_entropy_general cmd;
 				cmd.removed_player = mode_id;
 
-				total_collected.control(cmd);
+				local_collected.control(cmd);
 				removed_someone_already = true;
 			}
 		};
@@ -200,16 +277,14 @@ void server_setup::advance_clients_state(const setup_advance_input& in) {
 			kick_if_afk();
 		}
 
-		using S = server_client_state::type;
-
 		if (c.state == S::RECEIVING_INITIAL_STATE) {
-			if (!server->has_messages_to_send(client_id, game_channel_type::SOLVABLE_STREAM)) {
+			if (!server->has_messages_to_send(client_id, game_channel_type::SOLVABLE_AND_STEPS)) {
 #if 0
 				auto message_provider = [&](net_messages::initial_steps_correction& msg) {
 					(void)msg;
 				};
 
-				server->send_message(client_id, game_channel_type::SOLVABLE_STREAM, message_provider);
+				server->send_message(client_id, game_channel_type::SOLVABLE_AND_STEPS, message_provider);
 
 				c.state = S::RECEIVING_INITIAL_STATE_CORRECTION;
 #else
@@ -219,10 +294,12 @@ void server_setup::advance_clients_state(const setup_advance_input& in) {
 			}
 		}
 		else if (c.state == S::RECEIVING_INITIAL_STATE_CORRECTION) {
-			if (!server->has_messages_to_send(client_id, game_channel_type::SOLVABLE_STREAM)) {
+			if (!server->has_messages_to_send(client_id, game_channel_type::SOLVABLE_AND_STEPS)) {
 				c.set_in_game(server_time);
 			}
 		}
+
+		contribute_to_step_entropy();
 	}
 }
 
@@ -262,7 +339,7 @@ message_handler_result server_setup::handle_client_message(
 		if (c.state == S::PENDING_WELCOME) {
 			server->send_payload(
 				client_id, 
-				game_channel_type::SOLVABLE_STREAM, 
+				game_channel_type::SOLVABLE_AND_STEPS, 
 
 				buffers,
 
@@ -287,6 +364,8 @@ message_handler_result server_setup::handle_client_message(
 
 			return abort_v;
 		}
+
+		c.pending_entropies.emplace_back(std::move(payload));
 	}
 	else {
 		static_assert(always_false_v<T>, "Unhandled payload type.");
@@ -296,28 +375,44 @@ message_handler_result server_setup::handle_client_message(
 	return message_handler_result::CONTINUE;
 }
 
-void server_setup::handle_client_messages(const setup_advance_input& in) {
-	(void)in;
+void server_setup::handle_client_messages() {
+	auto& message_handler = *this;
+	server->advance(server_time, message_handler);
+}
 
-	server->advance(server_time, *this);
-
-	{
-		auto& ticks_remaining = ticks_until_sending_packets;
-
-		if (ticks_remaining == 0) {
-			server->send_packets();
-
-			ticks_remaining = vars.send_updates_once_every_tick;
-			--ticks_remaining;
+void server_setup::send_server_step_entropies() {
+	for (auto& c : clients) {
+		if (!c.is_set()) {
+			continue;
 		}
+
+		const auto client_id = static_cast<client_id_type>(index_in(clients, c));
+		// const auto mode_id = to_mode_player_id(client_id);
+
+		server_step_entropy_for_client for_client;
+		for_client.num_entropies_accepted = c.num_entropies_accepted;
+
+		server->send_payload(
+			client_id, 
+			game_channel_type::SOLVABLE_AND_STEPS,
+
+			for_client
+		);
 	}
 }
 
-void server_setup::advance_internal(const setup_advance_input& in) {
-	(void)in;
+void server_setup::send_packets_if_its_time() {
+	auto& ticks_remaining = ticks_until_sending_packets;
 
-	handle_client_messages(in);
-	advance_clients_state(in);
+	if (ticks_remaining == 0) {
+		server->send_packets();
+
+		ticks_remaining = vars.send_updates_once_every_tick;
+		--ticks_remaining;
+	}
+}
+
+void server_setup::advance_internal() {
 }
 
 double server_setup::get_inv_tickrate() const {

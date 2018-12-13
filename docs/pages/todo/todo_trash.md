@@ -994,3 +994,63 @@ fixtures can form scene graph as they have relative transforms.
 			- now the problem is that the input calculation is transparent for replays
 				- though it is a trivial thing
 
+- Jitter buffer
+	- Implement jitter buffer later when we can actually setup a net play and measure results
+	- Parameters: lower bound & upper bound for squashing
+	- Initial state: empty
+		- Eat inputs and dont unpack them until it hits lower bound
+		- when lower bound is met, proceed to Ready state
+	- State: ready 
+		- always unpack at least one command until there is space
+		- if there is more than upper bound, squash
+	- Do we ever have to force-refill after the initial filling?
+	- What if there is sudden spike in loss?
+		- The jitter buffer can run completely out of commands.
+	- What if there is a sudden improvement in latency?
+		- We will be frequently squashing as we will be oscillating around the upper bound
+	- What if we send more frequently than the tickrate?
+		- even under no loss, clocks might be not in sync
+	- What if we somehow make running empty of commands simply a misprediction?
+		- E.g. instead of overwriting the step on the client, simply insert an empty entropy before one that was due to be accepted and re-simulate with all
+		- This way we won't lose some important inputs, just stretch their duration
+		- Isn't this anyway what we implicitly did in the previous version?
+			- Notice that we simply don't peel off the oldest command if next_client_commands_accepted is false
+			- Note that implicitly we also reinfer ONLY if the mismatch was important, e.g. it was not place of what would be an empty entropy from us anyway 
+		- If it matches even though it was not accepted at the time, should we not peel off as well?
+		- we still somehow have to squash server-side
+		- if there are too many commands, couldn't be somehow adjust the send rate on the client?
+	- The server can tell the client how many contiguous commands it has for it up-front
+		- If there are many, and thus we know that the latency has decreased,
+			- we can slow down the client simulation a little
+				- and thus the rate at which we generate new commands
+				- until the commands pass through the lower bound
+			- and then return to normal rate
+			- the settings for these could be entirely client-side
+				- slow_down_above_ms
+				- stop_slowing_down_below_ms
+				- speed_up_when_ms_lost
+	- If the commands don't get accepted we "naturally" increase the rate of generation because we still send the oldest unaccepted command awaiting for its acceptance
+		- So the client will properly compensate for a sudden spike in latency
+			- Exactly the same way as it does in the very beginning of the session!
+				- We simply assume there is 0 latency at the init
+		- It's just that we don't have a mechanism for sudden improvement of conditions
+			- Which can be solved simply by slowing down the rate
+				- in particular, we don't need speeding up
+		- This also handles a single spike pretty well.
+			- When we spike in loss on either side or on both, no commands get accepted for a while.	
+				- So no commands get peeled off the queue of the client.
+				- So we predict further and further into the future.
+			- Then a lot of entropies get delivered at once due to redundant compensation.
+				- Then the client gets to know that the server has many messages up-front to be accepted.
+				- So we slow down a little to let the server accept those messages.
+					- Though does it not seriously impair us when we need to make sudden manuevers in a dynamic situation?
+					- Indeed, simply squashing the commands and mispredicting a little would get us quicker back on track
+					- Perhaps we can implement this slowing down later and for now simply squash the commands above threshold, on the server
+						- e.g. we could always squash unto half the bound so we don't oscillate near the edge later
+						- or squash everything and let the client naturally re-calibrate
+						- we could implement all techniques and let the client choose the preferred way, there's no problem with that
+						- one could even combine both techniques
+						- Either way, I think we never withhold commands on the server. We always apply at least a single one.
+							- Since the client will adjust itself for losses.
+				
+

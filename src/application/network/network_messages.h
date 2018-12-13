@@ -2,6 +2,7 @@
 #include "augs/misc/constant_size_vector.h"
 #include "game/modes/mode_entropy.h"
 #include "augs/misc/serialization_buffers.h"
+#include "application/network/server_step_entropy.h"
 
 constexpr std::size_t chosen_packet_size_v = 1024;
 
@@ -49,12 +50,12 @@ struct initial_arena_state_payload;
 
 namespace net_messages {
 	struct initial_arena_state : only_block_message {
-		bool to_payload(
+		bool read_payload(
 			augs::serialization_buffers&,
 			initial_arena_state_payload<false>
 		);
 
-		const std::vector<std::byte>* from_payload(
+		const std::vector<std::byte>* write_payload(
 			augs::serialization_buffers&,
 			initial_arena_state_payload<true>
 		);
@@ -62,17 +63,20 @@ namespace net_messages {
 
 	//struct initial_steps_correction : only_block_message {};
 
-	struct step_entropy : preserialized_message {
+	struct server_step_entropy : preserialized_message {
 		static constexpr bool server_to_client = true;
 		static constexpr bool client_to_server = false;
+
+		bool write_payload(const server_step_entropy_for_client&);
+		bool read_payload(server_step_entropy_for_client&);
 	};
 
 	struct client_entropy : preserialized_message {
 		static constexpr bool server_to_client = false;
 		static constexpr bool client_to_server = true;
 
-		bool from_payload(total_client_entropy&&);
-		bool to_payload(total_client_entropy&);
+		bool write_payload(total_client_entropy&&);
+		bool read_payload(total_client_entropy&);
 	};
 
 	struct client_welcome : public yojimbo::Message {
@@ -86,14 +90,14 @@ namespace net_messages {
 
 		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
 
-		bool from_payload(requested_client_settings&&);
-		bool to_payload(requested_client_settings&);
+		bool write_payload(requested_client_settings&&);
+		bool read_payload(requested_client_settings&);
 	};
 
 	using all_t = type_list<
 		initial_arena_state*,
 		//initial_steps_correction*,
-		step_entropy*,
+		server_step_entropy*,
 		client_welcome*,
 		client_entropy*
 	>;

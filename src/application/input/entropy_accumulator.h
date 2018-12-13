@@ -2,9 +2,15 @@
 #include "game/enums/game_intent_type.h"
 #include "game/modes/mode_entropy.h"
 
+#include "application/input/input_settings.h"
 #include "application/input/adjust_game_motions.h"
 
 struct entropy_accumulator {
+	struct input {
+		const input_settings& settings;
+		const vec2i screen_size;
+	};
+
 	mode_player_entropy mode;
 	cosmic_player_entropy cosmic;
 
@@ -13,16 +19,16 @@ struct entropy_accumulator {
 	accumulated_motions motions;
 	game_intents intents;
 
-	template <class E, class I>
+	template <class E>
 	auto assemble(
 		const E& handle,
 		const mode_player_id& m_id,
-		const I& in
+		const input in
 	) const {
 		mode_entropy out;
 		out.general = mode_general;
 
-		if (m_id.is_set() && mode.is_set()) {
+		if (m_id.is_set() && !mode.empty()) {
 			out.players[m_id] = mode;
 
 			/* Disallow controlling mode & cosmic at the same time for bandwidth optimization. */
@@ -50,11 +56,11 @@ struct entropy_accumulator {
 		return out;
 	}
 
-	template <class E, class I>
+	template <class E>
 	auto extract(
 		const E& handle,
 		const mode_player_id& m_id,
-		const I& in
+		const input in
 	) {
 		auto out = assemble(handle, m_id, in);
 		clear();
