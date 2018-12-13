@@ -3,6 +3,11 @@
 #include "application/predefined_rulesets.h"
 #include "application/arena/mode_and_rules.h"
 
+#include "application/arena/arena_utils.h"
+#include "test_scenes/test_scene_settings.h"
+
+struct arena_paths;
+
 template <bool C, class ModeAndRulesType>
 class basic_arena_handle {
 	template <class E, class F>
@@ -61,18 +66,8 @@ public:
 	const cosmos_solvable_significant& initial_signi;
 
 	template <class... Args>
-	decltype(auto) on_mode_with_input(Args&&... args) {
-		return this->on_mode_with_input_impl(*this, std::forward<Args>(args)...);
-	}
-
-	template <class... Args>
 	decltype(auto) on_mode_with_input(Args&&... args) const {
 		return this->on_mode_with_input_impl(*this, std::forward<Args>(args)...);
-	}
-
-	template <class... Args>
-	decltype(auto) on_mode_with_rules(Args&&... args) {
-		return this->on_mode_with_rules_impl(*this, std::forward<Args>(args)...);
 	}
 
 	template <class... Args>
@@ -112,13 +107,53 @@ public:
 	}
 
 	template <class F>
-	decltype(auto) on_mode(F&& f) {
-		return std::visit(std::forward<F>(f), current_mode.state);
-	}
-
-	template <class F>
 	decltype(auto) on_mode(F&& f) const {
 		return std::visit(std::forward<F>(f), current_mode.state);
 	}
 
+	void load_from(
+		const arena_paths& paths,
+		cosmos_solvable_significant& target_initial_signi
+	) const {
+		load_arena_from(
+			paths,
+			scene,
+			rulesets
+		);
+
+		target_initial_signi = scene.world.get_solvable().significant;
+	}
+
+	template <class S>
+	void make_default(S& lua) const {
+		scene.clear();
+
+		rulesets = {};
+
+		bomb_mode_ruleset bomb_ruleset;
+
+		{
+			test_mode_ruleset dummy;
+
+			scene.make_test_scene(
+				lua,
+				{},
+				dummy,
+				std::addressof(bomb_ruleset)
+			);
+		}
+
+		const auto bomb_ruleset_id = raw_ruleset_id(0);
+		rulesets.all.template get_for<bomb_mode>().try_emplace(bomb_ruleset_id, std::move(bomb_ruleset));
+
+		current_mode.rules_id = bomb_ruleset_id;
+		current_mode.state = bomb_mode();
+
+		ruleset_id id;
+		id.raw = bomb_ruleset_id;
+		id.type_id.set<bomb_mode>();
+
+		rulesets.meta.server_default = id;
+		rulesets.meta.playtest_default = id;
+	}
 };

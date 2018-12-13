@@ -109,28 +109,20 @@ void server_setup::apply(const config_lua_table& cfg) {
 
 void server_setup::choose_arena(const std::string& name) {
 	if (name.empty()) {
-		make_test_online_arena(
-			lua,
-			scene,
-			current_mode,
-			rulesets
-		);
+		get_arena_handle().make_default(lua);
 	}
 	else {
-		load_arena_from(
+		get_arena_handle().load_from(
 			arena_paths(name),
-			scene,
-			rulesets
+			initial_signi
 		);
+	}
 
-		if (vars.override_default_ruleset.empty()) {
-			current_mode.choose(rulesets.meta.server_default);
-		}
-		else {
-			ensure(false && "Not implemented!");
-		}
-
-		initial_signi = scene.world.get_solvable().significant;
+	if (vars.override_default_ruleset.empty()) {
+		current_mode.choose(rulesets.meta.server_default);
+	}
+	else {
+		ensure(false && "Not implemented!");
 	}
 
 	vars.current_arena = name;

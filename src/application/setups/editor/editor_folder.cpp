@@ -11,42 +11,11 @@
 #include "game/cosmos/entity_handle.h"
 
 #include "application/arena/arena_utils.h"
-#include "test_scenes/test_scene_settings.h"
 
 /* 
 	This unusual choice of definition location is due to server needing to call this function,
 	but byte serialization function names clashing with Yojimbo's.
 */
-
-void make_test_online_arena(
-	sol::state& lua,
-	intercosm& scene,
-	online_mode_and_rules& mode_and_rules,
-	predefined_rulesets& rulesets
-) {
-	scene.clear();
-
-	rulesets = {};
-
-	bomb_mode_ruleset bomb_ruleset;
-
-	{
-		test_mode_ruleset dummy;
-
-		scene.make_test_scene(
-			lua,
-			{},
-			dummy,
-			std::addressof(bomb_ruleset)
-		);
-	}
-
-	const auto bomb_ruleset_id = raw_ruleset_id(0);
-	rulesets.all.get_for<bomb_mode>().try_emplace(bomb_ruleset_id, std::move(bomb_ruleset));
-
-	mode_and_rules.rules_id = bomb_ruleset_id;
-	mode_and_rules.state = bomb_mode();
-}
 
 void load_arena_from(
 	const arena_paths& paths,
