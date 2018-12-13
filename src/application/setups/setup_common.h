@@ -1,6 +1,8 @@
 #pragma once
 #include "augs/misc/timing/delta.h"
+#include "view/necessary_resources.h"
 #include "application/input/input_settings.h"
+#include "application/app_intent_type.h"
 
 enum class setup_escape_result {
 	IGNORE,
@@ -30,4 +32,21 @@ struct perform_custom_imgui_input {
 	augs::window& window;
 	const images_in_atlas_map& game_atlas;
 	const config_lua_table& config;
+};
+
+struct handle_input_before_imgui_input {
+	const augs::event::state& common_input_state;
+	const augs::event::change e;
+
+	augs::window& window;
+};
+
+struct handle_input_before_game_input {
+	const app_ingame_intent_map& app_controls;
+	const necessary_images_in_atlas_map& sizes_for_icons;
+
+	const augs::event::state& common_input_state;
+	const augs::event::change e;
+
+	augs::window& window;
 };

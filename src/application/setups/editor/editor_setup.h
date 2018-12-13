@@ -253,20 +253,11 @@ public:
 	void accept_game_gui_events(const game_gui_entropy_type&);
 
 	bool handle_input_before_imgui(
-		const augs::event::state& common_input_state,
-		const augs::event::change change,
-
-		augs::window& window
+		handle_input_before_imgui_input
 	);
 
 	bool handle_input_before_game(
-		const app_ingame_intent_map& app_controls,
-		const necessary_images_in_atlas_map& sizes_for_icons,
-
-		const augs::event::state& common_input_state,
-		const augs::event::change change,
-
-		augs::window& window
+		handle_input_before_game_input
 	);
 
 	setup_escape_result escape();

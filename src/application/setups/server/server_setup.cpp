@@ -37,7 +37,24 @@ server_setup::server_setup(
 }
 
 void server_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
+	//admin_client_gui.
 	(void)in;
+}
+
+bool server_setup::handle_input_before_imgui(
+	const handle_input_before_imgui_input in
+) {
+	(void)in;
+
+	return false;
+}
+
+bool server_setup::handle_input_before_game(
+	const handle_input_before_game_input in
+) {
+	(void)in;
+
+	return false;
 }
 
 mode_player_id server_setup::to_mode_player_id(const client_id_type& id) {

@@ -113,7 +113,7 @@ class server_setup : public default_setup_settings {
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
-	static constexpr bool handles_window_input = false;
+	static constexpr bool handles_window_input = true;
 	static constexpr bool has_additional_highlights = false;
 
 	server_setup(
@@ -232,4 +232,12 @@ public:
 	server_arena_handle<true> get_arena_handle() const;
 
 	void disconnect_and_unset(const client_id_type&);
+
+	bool handle_input_before_imgui(
+		handle_input_before_imgui_input
+	);
+
+	bool handle_input_before_game(
+		handle_input_before_game_input
+	);
 };

@@ -1066,20 +1066,20 @@ void editor_setup::select_all_entities(const bool has_ctrl) {
 }
 
 bool editor_setup::handle_input_before_imgui(
-	const augs::event::state& common_input_state,
-	const augs::event::change e,
-
-	augs::window& window
+	const handle_input_before_imgui_input in
 ) {
+	const auto& state = in.common_input_state;
+	auto& window = in.window;
+
 	using namespace augs::event;
 	using namespace keys;
 
-	if (settings.autosave.on_lost_focus && e.msg == message::deactivate) {
+	if (settings.autosave.on_lost_focus && in.e.msg == message::deactivate) {
 		force_autosave_now();
 	}
 
-	if (e.was_any_key_pressed()) {
-		const auto k = e.data.key.key;
+	if (in.e.was_any_key_pressed()) {
+		const auto k = in.e.data.key.key;
 		
 		auto move_currently_viewed = [&](const int n) {
 			images_gui.move_currently_viewed_by += n;
@@ -1093,9 +1093,9 @@ bool editor_setup::handle_input_before_imgui(
 			default: break;
 		}
 
-		const bool has_alt{ common_input_state[key::LALT] };
-		const bool has_ctrl{ common_input_state[key::LCTRL] };
-		const bool has_shift{ common_input_state[key::LSHIFT] };
+		const bool has_alt{ state[key::LALT] };
+		const bool has_ctrl{ state[key::LCTRL] };
+		const bool has_shift{ state[key::LSHIFT] };
 
 		if (!has_ctrl && k == key::ENTER) {
 			if (confirm_modal_popup()) {
@@ -1174,14 +1174,11 @@ bool editor_setup::handle_input_before_imgui(
 }
 
 bool editor_setup::handle_input_before_game(
-	const app_ingame_intent_map& app_controls,
-	const necessary_images_in_atlas_map& sizes_for_icons,
-
-	const augs::event::state& common_input_state,
-	const augs::event::change e,
-
-	augs::window&
+	const handle_input_before_game_input in
 ) {
+	const auto& state = in.common_input_state;
+	const auto& e = in.e;
+
 	using namespace augs::event;
 	using namespace augs::event::keys;
 
@@ -1189,8 +1186,8 @@ bool editor_setup::handle_input_before_game(
 		return false;
 	}
 
-	const bool has_ctrl{ common_input_state[key::LCTRL] };
-	const bool has_shift{ common_input_state[key::LSHIFT] };
+	const bool has_ctrl{ state[key::LCTRL] };
+	const bool has_shift{ state[key::LSHIFT] };
 
 	if (e.was_any_key_pressed()) {
 		switch (e.data.key.key) {
@@ -1206,7 +1203,7 @@ bool editor_setup::handle_input_before_game(
 		}
 	}
 
-	if (arena_gui.control({ app_controls, common_input_state, e })) { 
+	if (arena_gui.control({ in.app_controls, state, e })) { 
 		return true;
 	}
 
@@ -1260,7 +1257,7 @@ bool editor_setup::handle_input_before_game(
 			if (editor_detail::handle_camera_input(
 				settings.camera,
 				current_cone,
-				common_input_state,
+				state,
 				e,
 				world_cursor_pos,
 				view().panned_camera
@@ -1274,12 +1271,12 @@ bool editor_setup::handle_input_before_game(
 				}
 
 				selector.do_mousemotion(
-					sizes_for_icons,
+					in.sizes_for_icons,
 					cosm,
 					view().rect_select_mode,
 					world_cursor_pos,
 					current_eye,
-					common_input_state[key::LMOUSE],
+					state[key::LMOUSE],
 					view().get_effective_selecting_filter()
 				);
 
@@ -1338,7 +1335,7 @@ bool editor_setup::handle_input_before_game(
 					const auto world_cursor_pos = get_world_cursor_pos(current_eye);
 
 					selector.do_mousemotion(
-						sizes_for_icons,
+						in.sizes_for_icons,
 						cosm,
 						view().rect_select_mode,
 						world_cursor_pos,

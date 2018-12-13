@@ -966,9 +966,9 @@ int work(const int argc, const char* const * const argv) try {
 									if for example IMGUI wants to capture keyboard input.	
 								*/
 
-								return setup.handle_input_before_imgui(
+								return setup.handle_input_before_imgui({
 									simulated_input_state, e, window
-								);
+								});
 							}
 
 							return false;
@@ -1240,9 +1240,9 @@ int work(const int argc, const char* const * const argv) try {
 
 								const auto& app_ingame_controls = viewing_config.app_ingame_controls;
 
-								return setup.handle_input_before_game(
+								return setup.handle_input_before_game({
 									app_ingame_controls, streaming.necessary_images_in_atlas, common_input_state, e, window
-								);
+								});
 							}
 						}
 
