@@ -42,13 +42,7 @@ void fill_with_test_scene_command::redo(const editor_command_input in) {
 	test_mode_ruleset test_ruleset;
 	bomb_mode_ruleset bomb_ruleset;
 
-#if IS_PRODUCTION_BUILD
-	bomb_ruleset.warmup_secs = 45;
-	bomb_ruleset.round_secs = 120;
-	bomb_ruleset.freeze_secs = 15;
-	bomb_ruleset.round_end_secs = 5;
-	bomb_ruleset.max_rounds = 30;
-#else
+#if !IS_PRODUCTION_BUILD
 	bomb_ruleset.warmup_secs = 0;
 	bomb_ruleset.round_secs = 200;
 	bomb_ruleset.freeze_secs = 0;

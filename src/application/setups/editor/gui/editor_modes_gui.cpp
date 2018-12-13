@@ -14,7 +14,7 @@
 
 #include "application/setups/editor/property_editor/special_widgets.h"
 #include "application/setups/editor/property_editor/widgets/flavour_widget.h"
-#include "application/setups/editor/detail/editor_on_mode_with_input.hpp"
+#include "application/arena/arena_handle.h"
 
 #include "application/setups/editor/editor_settings.h"
 
@@ -54,10 +54,8 @@ mode_entropy_general editor_modes_gui::perform(const editor_settings& settings, 
 	auto& player = folder.player;
 
 	if (player.has_testing_started()) {
-		player.on_mode_with_input(
-			folder.commanded->rulesets.all,
-			folder.commanded->work.world,
-			[&](auto& typed_mode, const auto& mode_input) {
+		player.get_arena_handle(folder).on_mode(
+			[&](auto& typed_mode) {
 				auto node = scoped_tree_node("Current mode state");
 
 				next_columns(2);
@@ -73,7 +71,7 @@ mode_entropy_general editor_modes_gui::perform(const editor_settings& settings, 
 					};
 
 					if constexpr(std::is_same_v<M, test_mode>) {
-						(void)mode_input;
+						(void)typed_mode;
 					}
 					else {
 						if (ImGui::Button("Restart")) {

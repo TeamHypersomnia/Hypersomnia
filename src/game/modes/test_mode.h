@@ -45,10 +45,19 @@ public:
 	static constexpr bool needs_initial_signi = false;
 	static constexpr bool round_based = false;
 
-	struct input {
+	template <bool C>
+	struct basic_input {
 		const ruleset_type& rules;
-		cosmos& cosm;
+		maybe_const_ref_t<C, cosmos> cosm;
+
+		template <bool is_const = C, class = std::enable_if_t<!is_const>>
+		operator basic_input<!is_const>() const {
+			return { rules, cosm };
+		}
 	};
+
+	using input = basic_input<false>;
+	using const_input = basic_input<true>;
 
 private:
 	void teleport_to_next_spawn(input, entity_id character);

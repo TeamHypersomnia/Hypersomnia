@@ -73,11 +73,11 @@ struct bomb_mode_ruleset {
 	unsigned max_players_per_team = 32;
 	unsigned round_secs = 120;
 	unsigned round_end_secs = 5;
-	unsigned freeze_secs = 5;
+	unsigned freeze_secs = 15;
 	unsigned buy_secs_after_freeze = 10;
 	unsigned warmup_secs = 45;
 	unsigned warmup_respawn_after_ms = 2000;
-	unsigned max_rounds = 5;
+	unsigned max_rounds = 30;
 	unsigned match_summary_seconds = 15;
 	unsigned game_commencing_seconds = 3;
 	meter_value_type minimal_damage_for_assist = 41;
@@ -207,11 +207,20 @@ public:
 	static constexpr bool needs_initial_signi = true;
 	static constexpr bool round_based = true;
 
-	struct input {
+	template <bool C>
+	struct basic_input {
 		const ruleset_type& rules;
 		const cosmos_solvable_significant& initial_signi;
-		cosmos& cosm;
+		maybe_const_ref_t<C, cosmos> cosm;
+
+		template <bool is_const = C, class = std::enable_if_t<!is_const>>
+		operator basic_input<!is_const>() const {
+			return { rules, initial_signi, cosm };
+		}
 	};
+
+	using input = basic_input<false>;
+	using const_input = basic_input<true>;
 
 	struct participating_factions {
 		faction_type bombing = faction_type::SPECTATOR;
@@ -240,11 +249,11 @@ public:
 		}
 	};
 
-	participating_factions calc_participating_factions(input) const;
-	faction_type calc_weakest_faction(input) const;
+	participating_factions calc_participating_factions(const_input) const;
+	faction_type calc_weakest_faction(const_input) const;
 
-	bool is_halfway_round(input) const;
-	bool is_final_round(input) const;
+	bool is_halfway_round(const_input) const;
+	bool is_final_round(const_input) const;
 
 private:
 	struct transferred_inventory {
@@ -303,11 +312,11 @@ private:
 	void respawn_the_dead(input, logic_step, unsigned after_ms);
 
 	template <class F>
-	decltype(auto) on_bomb_entity(input, F) const;
+	decltype(auto) on_bomb_entity(const_input, F) const;
 
-	bool bomb_exploded(input) const;
-	entity_id get_character_who_defused_bomb(input) const;
-	bool bomb_planted(input) const;
+	bool bomb_exploded(const const_input) const;
+	entity_id get_character_who_defused_bomb(const_input) const;
+	bool bomb_planted(const_input) const;
 
 	void play_faction_sound(const_logic_step, faction_type, assets::sound_id) const;
 	void play_faction_sound_for(input, const_logic_step, battle_event, faction_type) const;
@@ -379,21 +388,21 @@ public:
 
 	unsigned get_round_num() const;
 
-	float get_total_seconds(input) const;
+	float get_total_seconds(const_input) const;
 
-	float get_warmup_seconds_left(input) const;
-	float get_match_begins_in_seconds(input) const;
+	float get_warmup_seconds_left(const_input) const;
+	float get_match_begins_in_seconds(const_input) const;
 
-	float get_freeze_seconds_left(input) const;
-	float get_round_seconds_passed(input) const;
-	float get_round_seconds_left(input) const;
-	float get_seconds_since_win(input) const;
-	float get_match_summary_seconds_left(input) const;
-	float get_round_end_seconds_left(input) const;
-	float get_buy_seconds_left(input) const;
+	float get_freeze_seconds_left(const_input) const;
+	float get_round_seconds_passed(const_input) const;
+	float get_round_seconds_left(const_input) const;
+	float get_seconds_since_win(const_input) const;
+	float get_match_summary_seconds_left(const_input) const;
+	float get_round_end_seconds_left(const_input) const;
+	float get_buy_seconds_left(const_input) const;
 
-	real32 get_critical_seconds_left(input) const;
-	float get_seconds_since_planting(input) const;
+	real32 get_critical_seconds_left(const_input) const;
+	float get_seconds_since_planting(const_input) const;
 
 	unsigned calc_max_faction_score() const;
 
@@ -402,7 +411,7 @@ public:
 
 	mode_player_id find_first_free_player() const;
 
-	std::optional<arena_mode_match_result> calc_match_result(input) const;
+	std::optional<arena_mode_match_result> calc_match_result(const_input) const;
 
 	unsigned get_score(faction_type) const;
 

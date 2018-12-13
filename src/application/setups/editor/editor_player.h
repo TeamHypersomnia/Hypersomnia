@@ -60,6 +60,12 @@ auto player_advance_input(
 	return player_advance_input_t<C> { in, callbacks };
 }
 
+template <bool C, class ModeVariantType>
+class basic_arena_handle;
+
+template <bool C>
+using editor_arena_handle = basic_arena_handle<C, mode_and_rules>;
+
 class editor_player : public editor_player_base {
 	using base = editor_player_base;
 
@@ -84,13 +90,15 @@ private:
 	friend augs::introspection_access;
 	friend struct editor_property_accessors;
 
-	template <class E, class A, class C, class F>
-	static decltype(auto) on_mode_with_input_impl(
-		E& self,
-		const A& all_vars,
-		C& cosm,
-		F&& callback
-	);
+	template <class H, class S, class E>
+	static decltype(auto) get_arena_handle_impl(S& self, E& folder) {
+		return H {
+			self.current_mode,
+			folder.commanded->work,
+			folder.commanded->rulesets,
+			self.before_start.commanded->work.world.get_solvable().significant
+		};
+	}
 
 	void save_state_before_start(editor_folder&);
 	void restore_saved_state(editor_folder&);
@@ -140,16 +148,6 @@ public:
 		E&& extract_collected_entropy
 	);
 
-	template <class... Args>
-	decltype(auto) on_mode_with_input(Args&&... args) {
-		return on_mode_with_input_impl(*this, std::forward<Args>(args)...);
-	}
-
-	template <class... Args>
-	decltype(auto) on_mode_with_input(Args&&... args) const {
-		return on_mode_with_input_impl(*this, std::forward<Args>(args)...);
-	}
-
 	mode_entity_id lookup_character(mode_player_id) const;
 
 	using revision_type = editor_history::index_type;
@@ -190,4 +188,7 @@ public:
 
 	std::size_t estimate_step_to_entropy_size() const;
 	const step_to_entropy_type& get_step_to_entropy() const;
+
+	editor_arena_handle<false> get_arena_handle(editor_folder&);
+	editor_arena_handle<true> get_arena_handle(const editor_folder&) const;
 };

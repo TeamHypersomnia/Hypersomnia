@@ -24,7 +24,7 @@
 #include "augs/misc/serialization_buffers.h"
 
 #include "application/network/server_step_entropy.h"
-#include "game/modes/on_mode_with_input.hpp"
+#include "application/arena/arena_handle.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -40,7 +40,10 @@ struct add_to_arena_input {
 
 class server_adapter;
 
-using server_step_type = unsigned;
+using server_step_type = uint32_t;
+
+template <bool C>
+using server_arena_handle = basic_arena_handle<C, online_mode_and_rules>;
 
 class server_setup : public default_setup_settings {
 	/* This is loaded from the arena folder */
@@ -54,14 +57,14 @@ class server_setup : public default_setup_settings {
 	server_vars vars;
 
 	/* The rest is server-specific */
+	sol::state& lua;
+
 	server_step_type current_simulation_step = 0;
 
 	augs::serialization_buffers buffers;
 
 	entropy_accumulator local_collected;
 	server_step_entropy step_collected;
-
-	entity_id viewed_character_id;
 
 	augs::propagate_const<std::unique_ptr<server_adapter>> server;
 	std::array<server_client_state, max_incoming_connections_v> clients;
@@ -74,22 +77,16 @@ class server_setup : public default_setup_settings {
 
 	static net_time_t get_current_time();
 
-	template <class S, class F>
-	static decltype(auto) on_mode_with_input_impl(
-		S& self,
-		F&& callback
-	) {
-		return general_on_mode_with_input(
-			self.current_mode.state,
-			self.rulesets.all,
-			self.current_mode.rules_id,
-			std::as_const(self.initial_signi),
-			self.scene.world,
-			std::forward<F>(callback)
-		);
+	template <class H, class S>
+	static decltype(auto) get_arena_handle_impl(S& self) {
+		return H {
+			self.current_mode,
+			self.scene,
+			self.rulesets,
+			self.initial_signi
+		};
 	}
 
-	void advance_internal();
 	void handle_client_messages();
 	void advance_clients_state();
 	void send_server_step_entropies();
@@ -118,16 +115,15 @@ public:
 
 	server_setup(
 		sol::state& lua,
-		const server_start_input&
+		const server_start_input&,
+		const server_vars& 
 	);
 
 	~server_setup();
 
 	static mode_player_id to_mode_player_id(const client_id_type&);
 
-	auto get_audiovisual_speed() const {
-		return 1.0;
-	}
+	double get_audiovisual_speed() const;
 
 	const auto& get_viewed_cosmos() const {
 		return scene.world;
@@ -138,9 +134,7 @@ public:
 		return (get_current_time() - server_time) / dt;
 	}
 
-	auto get_viewed_character_id() const {
-		return viewed_character_id;
-	}
+	entity_id get_viewed_character_id() const;
 
 	auto get_viewed_character() const {
 		return get_viewed_cosmos()[get_viewed_character_id()];
@@ -150,12 +144,12 @@ public:
 		return scene.viewables;
 	}
 
-	void perform_custom_imgui() {
-		return;
-	}
+	void perform_custom_imgui();
 
 	void customize_for_viewing(config_lua_table&) const;
+
 	void apply(const config_lua_table&);
+	void apply(const server_vars&, bool force);
 
 	void choose_arena(const std::string& name);
 
@@ -177,6 +171,13 @@ public:
 		const auto dt = get_inv_tickrate();
 
 		while (server_time <= current_time) {
+			step_collected.clear();
+
+			handle_client_messages();
+			advance_clients_state();
+			send_server_step_entropies();
+			send_packets_if_its_time();
+
 			/* Extract entropy from the built-in server player */
 			{
 				const auto admin_entropy = local_collected.extract(
@@ -188,20 +189,16 @@ public:
 				step_collected += admin_entropy;
 			}
 
-			handle_client_messages();
-			advance_clients_state();
-			send_server_step_entropies();
-			send_packets_if_its_time();
-
-			on_mode_with_input(
+			get_arena_handle().on_mode_with_input(
 				[&](auto& typed_mode, const auto& in) {
 					typed_mode.advance(in, step_collected, callbacks);
 				}
 			);
 
-			step_collected.clear();
 			++current_simulation_step;
 			server_time += dt;
+
+			step_collected.clear();
 		}
 	}
 
@@ -228,25 +225,8 @@ public:
 
 	void ensure_handler() {}
 
-	template <class... Args>
-	decltype(auto) on_mode_with_input(Args&&... args) {
-		return on_mode_with_input_impl(*this, std::forward<Args>(args)...);
-	}
-
-	template <class... Args>
-	decltype(auto) on_mode_with_input(Args&&... args) const {
-		return on_mode_with_input_impl(*this, std::forward<Args>(args)...);
-	}
-
-	template <class F>
-	decltype(auto) on_mode(F&& f) {
-		return std::visit(std::forward<F>(f), current_mode.state);
-	}
-
-	template <class F>
-	decltype(auto) on_mode(F&& f) const {
-		return std::visit(std::forward<F>(f), current_mode.state);
-	}
+	server_arena_handle<false> get_arena_handle();
+	server_arena_handle<true> get_arena_handle() const;
 
 	void disconnect_and_unset(const client_id_type&);
 };

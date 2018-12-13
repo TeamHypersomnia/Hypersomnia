@@ -441,7 +441,8 @@ return {
   },
 
   server = {
-	current_arena = "test",
+	current_arena = "",
+	admin_nickname = "GameMaster",
 	kick_if_inactive_for_secs = 60,
 	time_limit_to_enter_game_since_connection = 10
   },

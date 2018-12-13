@@ -36,7 +36,7 @@ void arena_scoreboard_gui::draw_gui(
 	const draw_mode_gui_input& draw_in,
 
 	const M& typed_mode, 
-	const typename M::input& mode_input
+	const typename M::const_input& mode_input
 ) const {
 	using namespace augs::gui::text;
 
@@ -635,5 +635,5 @@ template void arena_scoreboard_gui::draw_gui(
 	const draw_mode_gui_input&, 
 
 	const bomb_mode& mode, 
-	const typename bomb_mode::input&
+	const typename bomb_mode::const_input&
 ) const;

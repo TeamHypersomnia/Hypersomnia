@@ -361,7 +361,8 @@ int work(const int argc, const char* const * const argv) try {
 				setup_launcher([&]() {
 					emplace_current_setup(std::in_place_type_t<server_setup>(),
 						lua,
-						config.default_server_start
+						config.default_server_start,
+						config.server
 					);
 				});
 

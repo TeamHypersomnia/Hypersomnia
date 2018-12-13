@@ -36,7 +36,7 @@ struct arena_gui_state {
 	mode_player_entropy perform_imgui(
 		draw_mode_gui_input, 
 		const M& mode, 
-		const typename M::input&
+		const typename M::const_input&
 	);
 
 	template <class M>
@@ -45,6 +45,6 @@ struct arena_gui_state {
 		const draw_mode_gui_input&,
 
 		const M& mode, 
-		const typename M::input&
+		const typename M::const_input&
 	) const;
 };

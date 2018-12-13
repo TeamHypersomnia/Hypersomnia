@@ -18,6 +18,6 @@ struct arena_scoreboard_gui {
 		const draw_mode_gui_input&,
 
 		const M& mode, 
-		const typename M::input&
+		const typename M::const_input&
 	) const;
 };

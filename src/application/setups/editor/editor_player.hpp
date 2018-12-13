@@ -2,21 +2,19 @@
 #include "application/setups/editor/editor_player.h"
 #include "application/intercosm.h"
 #include "augs/templates/snapshotted_player.hpp"
-#include "application/setups/editor/detail/editor_on_mode_with_input.hpp"
 #include "application/setups/editor/editor_settings.h"
 #include "application/setups/editor/editor_paths.h"
+
+#include "application/arena/arena_handle.h"
 
 template <class C, class E>
 auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<C> in, E&& extract_collected_entropy) {
 	auto& folder = in.cmd_in.folder;
 	auto& history = folder.history;
-	auto& cosm = folder.commanded->work.world;
 	auto& settings = in.cmd_in.settings;
 
-	auto step = [this, &folder, &history, &cosm, in](const auto& applied_entropy) {
-		on_mode_with_input(
-			folder.commanded->rulesets.all,
-			cosm,
+	auto step = [this, &folder, &history, in](const auto& applied_entropy) {
+		get_arena_handle(folder).on_mode_with_input(
 			[&](auto& typed_mode, const auto& mode_in) {
 				while (history.has_next_command()) {
 					const auto when_happened = std::visit(

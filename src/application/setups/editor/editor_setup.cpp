@@ -15,10 +15,11 @@
 
 #include "application/config_lua_table.h"
 #include "application/setups/editor/editor_setup.hpp"
-#include "application/setups/editor/detail/editor_on_mode_with_input.hpp"
 #include "application/setups/editor/editor_paths.h"
 #include "application/setups/editor/editor_camera.h"
 #include "application/setups/editor/editor_history.hpp"
+
+#include "application/arena/arena_handle.h"
 
 #include "application/setups/editor/gui/editor_tab_gui.h"
 #include "application/setups/draw_setup_gui_input.h"
@@ -132,20 +133,18 @@ void editor_setup::set_popup(const editor_popup p) {
 }
 
 void editor_setup::override_viewed_entity(const entity_id overridden_id) {
-	if (anything_opened()) {
-		on_mode_with_input(
-			[&](const auto& typed_mode, const auto&) {
-				if (const auto id = typed_mode.lookup(work().world[overridden_id]); id.is_set()) {
-					view().local_player_id = id;
-					view().overridden_viewed = {};
-				}
-				else {
-					view().local_player_id = {};
-					view().overridden_viewed = overridden_id;
-				}
+	player().get_arena_handle(folder()).on_mode(
+		[&](const auto& typed_mode) {
+			if (const auto id = typed_mode.lookup(work().world[overridden_id]); id.is_set()) {
+				view().local_player_id = id;
+				view().overridden_viewed = {};
 			}
-		);
-	}
+			else {
+				view().local_player_id = {};
+				view().overridden_viewed = overridden_id;
+			}
+		}
+	);
 }
 
 editor_setup::editor_setup(
@@ -215,12 +214,12 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 	}
 
 	if (is_gameplay_on()) {
-		on_mode_with_input(
-			[&](const auto& typed_mode, const auto& mode_input) {
+		player().get_arena_handle(folder()).on_mode_with_rules(
+			[&](const auto& typed_mode, const auto& rules) {
 				using T = remove_cref<decltype(typed_mode)>;
 
 				if constexpr(!std::is_same_v<T, test_mode>) {
-					mode_input.rules.view.adjust(config.drawing);
+					rules.view.adjust(config.drawing);
 				}
 			}
 		);
@@ -701,26 +700,24 @@ void editor_setup::perform_custom_imgui(
 			text_tooltip("x: %x\ny: %x", pos->x, pos->y);
 		}
 
-		if (player().has_testing_started()) {
-			on_mode_with_input(
-				[&](const auto& typed_mode, const auto& mode_input) {
-					const auto draw_mode_in = draw_mode_gui_input { 
-						get_game_screen_top(), 
-						view().local_player_id, 
-						game_atlas,
-						config
-					};
+		on_mode_with_input(
+			[&](const auto& typed_mode, const auto& mode_input) {
+				const auto draw_mode_in = draw_mode_gui_input { 
+					get_game_screen_top(), 
+					view().local_player_id, 
+					game_atlas,
+					config
+				};
 
-					const auto new_entropy = arena_gui.perform_imgui(
-						draw_mode_in, 
-						typed_mode, 
-						mode_input
-					);
+				const auto new_entropy = arena_gui.perform_imgui(
+					draw_mode_in, 
+					typed_mode, 
+					mode_input
+				);
 
-					control(new_entropy);
-				}
-			);
-		}
+				control(new_entropy);
+			}
+		);
 	}
 
 	if (open_folder_dialog.valid() && is_ready(open_folder_dialog)) {
@@ -1961,32 +1958,24 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 
 template <class F>
 void editor_setup::on_mode_with_input(F&& callback) const {
-	if (anything_opened()) {
-		auto& f = folder();
-
-		player().on_mode_with_input(
-			f.commanded->rulesets.all,
-			f.commanded->work.world,
-			std::forward<F>(callback)
-		);
+	if (anything_opened() && player().has_testing_started()) {
+		player().get_arena_handle(folder()).on_mode_with_input(std::forward<F>(callback));
 	}
 }
 
 void editor_setup::draw_mode_gui(const draw_setup_gui_input& in) {
-	if (anything_opened() && player().has_testing_started()) {
-		on_mode_with_input(
-			[&](const auto& typed_mode, const auto& mode_input) {
-				const auto draw_mode_in = draw_mode_gui_input { 
-					get_game_screen_top(), 
-					view().local_player_id, 
-					in.images_in_atlas,
-					in.config
-				};
+	on_mode_with_input(
+		[&](const auto& typed_mode, const auto& mode_input) {
+			const auto draw_mode_in = draw_mode_gui_input { 
+				get_game_screen_top(), 
+				view().local_player_id, 
+				in.images_in_atlas,
+				in.config
+			};
 
-				arena_gui.draw_mode_gui(in, draw_mode_in, typed_mode, mode_input);
-			}
-		);
-	}
+			arena_gui.draw_mode_gui(in, draw_mode_in, typed_mode, mode_input);
+		}
+	);
 }
 
 void editor_setup::ensure_handler() {

@@ -42,7 +42,7 @@ template <class M>
 mode_player_entropy arena_gui_state::perform_imgui(
 	draw_mode_gui_input mode_in, 
 	const M& typed_mode, 
-	const typename M::input& mode_input
+	const typename M::const_input& mode_input
 ) {
 	mode_player_entropy result_entropy;
 
@@ -118,7 +118,7 @@ void arena_gui_state::draw_mode_gui(
 	const draw_mode_gui_input& mode_in,
 
 	const M& typed_mode, 
-	const typename M::input& mode_input
+	const typename M::const_input& mode_input
 ) const {
 	const auto& cfg = in.config.arena_mode_gui;
 	const auto line_height = in.gui_fonts.gui.metrics.get_height();
@@ -625,24 +625,24 @@ template void arena_gui_state::draw_mode_gui(
 	const draw_setup_gui_input&,
 	const draw_mode_gui_input&,
 	const test_mode&, 
-	const test_mode::input&
+	const test_mode::const_input&
 ) const;
 
 template void arena_gui_state::draw_mode_gui(
 	const draw_setup_gui_input&,
 	const draw_mode_gui_input&,
 	const bomb_mode&, 
-	const bomb_mode::input&
+	const bomb_mode::const_input&
 ) const;
 
 template mode_player_entropy arena_gui_state::perform_imgui(
 	draw_mode_gui_input, 
 	const bomb_mode&, 
-	const typename bomb_mode::input&
+	const typename bomb_mode::const_input&
 );
 
 template mode_player_entropy arena_gui_state::perform_imgui(
 	draw_mode_gui_input, 
 	const test_mode&, 
-	const typename test_mode::input&
+	const typename test_mode::const_input&
 );

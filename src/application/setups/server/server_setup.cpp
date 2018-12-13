@@ -16,14 +16,49 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/memory_stream.h"
 
+#include "application/arena/arena_handle.h"
+
 /* To avoid incomplete type error */
 server_setup::~server_setup() = default;
+
+server_setup::server_setup(
+	sol::state& lua,
+	const server_start_input& in,
+	const server_vars& initial_vars
+) : 
+	lua(lua),
+	server(std::make_unique<server_adapter>(in)),
+	server_time(yojimbo_time())
+{
+	const bool force = true;
+	apply(initial_vars, force);
+}
 
 mode_player_id server_setup::to_mode_player_id(const client_id_type& id) {
 	mode_player_id out;
 	out.value = static_cast<mode_player_id::id_value_type>(id);
 
 	return out;
+}
+
+server_arena_handle<false> server_setup::get_arena_handle() {
+	return get_arena_handle_impl<server_arena_handle<false>>(*this);
+}
+
+server_arena_handle<true> server_setup::get_arena_handle() const {
+	return get_arena_handle_impl<server_arena_handle<true>>(*this);
+}
+
+entity_id server_setup::get_viewed_character_id() const {
+	return get_arena_handle().on_mode(
+		[&](const auto& typed_mode) {
+			return typed_mode.lookup(mode_player_id::machine_admin());
+		}
+	);
+}
+
+void server_setup::perform_custom_imgui() {
+
 }
 
 void server_setup::log_malicious_client(const client_id_type id) {
@@ -42,27 +77,12 @@ net_time_t server_setup::get_current_time() {
 	return yojimbo_time();
 }
 
-server_setup::server_setup(
-	sol::state& lua,
-	const server_start_input& in
-) : 
-	server(std::make_unique<server_adapter>(in)),
-	server_time(yojimbo_time())
-{
-	(void)lua;
-
-	/* Force the loading of a new arena the next time server vars are applied. */
-	vars.current_arena.clear();
-}
-
 void server_setup::customize_for_viewing(config_lua_table& config) const {
 	config.window.name = "Arena server";
 }
 
-void server_setup::apply(const config_lua_table& cfg) {
-	const auto& new_vars = cfg.server;
-
-	if (vars.current_arena != new_vars.current_arena) {
+void server_setup::apply(const server_vars& new_vars, const bool force) {
+	if (force || vars.current_arena != new_vars.current_arena) {
 		try {
 			choose_arena(new_vars.current_arena);
 		}
@@ -79,13 +99,22 @@ void server_setup::apply(const config_lua_table& cfg) {
 		}
 	}
 
-	vars = cfg.server;
+	vars = new_vars;
+}
+
+void server_setup::apply(const config_lua_table& cfg) {
+	const bool force = false;
+	apply(cfg.server, force);
 }
 
 void server_setup::choose_arena(const std::string& name) {
-	if (name.empty())  {
-		scene.clear();
-		rulesets = {};
+	if (name.empty()) {
+		make_test_online_arena(
+			lua,
+			scene,
+			current_mode,
+			rulesets
+		);
 	}
 	else {
 		load_arena_from(
@@ -105,10 +134,25 @@ void server_setup::choose_arena(const std::string& name) {
 	}
 
 	vars.current_arena = name;
+
+	{
+		const auto admin_id = mode_player_id::machine_admin();
+
+		mode_entropy_general cmd;
+
+		cmd.added_player = add_player_input {
+			admin_id,
+			vars.admin_nickname,
+			faction_type::SPECTATOR
+		};
+
+		local_collected.clear();
+		local_collected.control(cmd);
+	}
 }
 
-void server_setup::accept_game_gui_events(const game_gui_entropy_type&) {
-
+void server_setup::accept_game_gui_events(const game_gui_entropy_type& events) {
+	control(events);
 }
 
 void server_setup::init_client(const client_id_type& id) {
@@ -132,7 +176,7 @@ void server_setup::accept_entropy_of_client(
 	const total_client_entropy& entropy
 ) {
 	if (!entropy.empty()) {
-		const auto client_entity_id = on_mode(
+		const auto client_entity_id = get_arena_handle().on_mode(
 			[&](const auto& typed_mode) {
 				if (const auto p = typed_mode.find(mode_id)) {
 					return p->controlled_character_id;
@@ -166,8 +210,6 @@ void server_setup::advance_clients_state() {
 	auto in_steps = [inv_simulation_delta_ms](const auto ms) {
 		return ms * inv_simulation_delta_ms;
 	};
-
-	step_collected.clear();
 
 	constexpr auto max_pending_commands_for_client_v = static_cast<uint8_t>(255);
 
@@ -223,7 +265,7 @@ void server_setup::advance_clients_state() {
 		};
 
 		auto add_client_if_not_yet_in_mode = [&]() {
-			auto final_nickname = on_mode(
+			auto final_nickname = get_arena_handle().on_mode(
 				[&](const auto& typed_mode) -> std::string {
 					if (nullptr == typed_mode.find(mode_id)) {
 						auto nickname = std::string(c.settings.chosen_nickname);
@@ -412,13 +454,10 @@ void server_setup::send_packets_if_its_time() {
 	}
 }
 
-void server_setup::advance_internal() {
+double server_setup::get_inv_tickrate() const {
+	return get_arena_handle().get_inv_tickrate();
 }
 
-double server_setup::get_inv_tickrate() const {
-	return on_mode(
-		[&](const auto& typed_mode) {
-			return typed_mode.round_speeds.calc_inv_tickrate();
-		}
-	);
+double server_setup::get_audiovisual_speed() const {
+	return get_arena_handle().get_audiovisual_speed();
 }

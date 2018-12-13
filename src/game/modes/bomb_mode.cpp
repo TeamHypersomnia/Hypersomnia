@@ -39,6 +39,7 @@ void BMB_LOG(Args&&... args) {
 #endif
 
 using input_type = bomb_mode::input;
+using const_input_type = bomb_mode::const_input;
 
 bomb_mode_player* bomb_mode::find(const mode_player_id& id) {
 	return mapped_or_nullptr(players, id);
@@ -92,7 +93,7 @@ faction_choice_result bomb_mode::choose_faction(const mode_player_id& id, const 
 }
 
 template <class F>
-decltype(auto) bomb_mode::on_bomb_entity(const input_type in, F callback) const {
+decltype(auto) bomb_mode::on_bomb_entity(const const_input_type in, F callback) const {
 	auto& rules = in.rules;
 	auto& cosm = in.cosm;
 
@@ -115,7 +116,7 @@ decltype(auto) bomb_mode::on_bomb_entity(const input_type in, F callback) const 
 	});
 }
 
-bomb_mode::participating_factions bomb_mode::calc_participating_factions(const input_type in) const {
+bomb_mode::participating_factions bomb_mode::calc_participating_factions(const const_input_type in) const {
 	const auto& cosm = in.cosm;
 	const auto spawnable = calc_spawnable_factions(cosm);
 
@@ -141,7 +142,7 @@ bomb_mode::participating_factions bomb_mode::calc_participating_factions(const i
 	return output;
 }
 
-faction_type bomb_mode::calc_weakest_faction(const input_type in) const {
+faction_type bomb_mode::calc_weakest_faction(const const_input_type in) const {
 	const auto participating = calc_participating_factions(in);
 
 	struct {
@@ -904,14 +905,14 @@ void bomb_mode::count_knockouts_for_unconscious_players_in(const input_type in, 
 	});
 }
 
-bool bomb_mode::is_halfway_round(const input_type in) const {
+bool bomb_mode::is_halfway_round(const const_input_type in) const {
 	const auto n = in.rules.get_num_rounds();
 	const auto current_round = get_round_num();
 
 	return current_round == n / 2;
 }
 
-bool bomb_mode::is_final_round(const input_type in) const {
+bool bomb_mode::is_final_round(const const_input_type in) const {
 	const auto n = in.rules.get_num_rounds();
 	const auto current_round = get_round_num();
 
@@ -1645,7 +1646,7 @@ void bomb_mode::respawn_the_dead(const input_type in, const logic_step step, con
 
 const float match_begins_in_secs = 4.f;
 
-float bomb_mode::get_warmup_seconds_left(const input_type in) const {
+float bomb_mode::get_warmup_seconds_left(const const_input_type in) const {
 	if (state == arena_mode_state::WARMUP) {
 		return static_cast<float>(in.rules.warmup_secs) - get_total_seconds(in);
 	}
@@ -1653,7 +1654,7 @@ float bomb_mode::get_warmup_seconds_left(const input_type in) const {
 	return -1.f;
 }
 
-float bomb_mode::get_match_begins_in_seconds(const input_type in) const {
+float bomb_mode::get_match_begins_in_seconds(const const_input_type in) const {
 	if (state == arena_mode_state::WARMUP) {
 		const auto secs = get_total_seconds(in);
 		const auto warmup_secs = static_cast<float>(in.rules.warmup_secs);
@@ -1667,27 +1668,27 @@ float bomb_mode::get_match_begins_in_seconds(const input_type in) const {
 	return -1.f;
 }
 
-float bomb_mode::get_total_seconds(const input_type in) const {
+float bomb_mode::get_total_seconds(const const_input_type in) const {
 	return in.cosm.get_clock().now.in_seconds(round_speeds.calc_ticking_delta());
 }
 
-float bomb_mode::get_round_seconds_passed(const input_type in) const {
+float bomb_mode::get_round_seconds_passed(const const_input_type in) const {
 	return get_total_seconds(in) - static_cast<float>(in.rules.freeze_secs);
 }
 
-float bomb_mode::get_freeze_seconds_left(const input_type in) const {
+float bomb_mode::get_freeze_seconds_left(const const_input_type in) const {
 	return static_cast<float>(in.rules.freeze_secs) - get_total_seconds(in);
 }
 
-float bomb_mode::get_buy_seconds_left(const input_type in) const {
+float bomb_mode::get_buy_seconds_left(const const_input_type in) const {
 	return static_cast<float>(in.rules.freeze_secs + in.rules.buy_secs_after_freeze) - get_total_seconds(in);
 }
 
-float bomb_mode::get_round_seconds_left(const input_type in) const {
+float bomb_mode::get_round_seconds_left(const const_input_type in) const {
 	return static_cast<float>(in.rules.round_secs) + in.rules.freeze_secs - get_total_seconds(in);
 }
 
-float bomb_mode::get_seconds_since_win(const input_type in) const {
+float bomb_mode::get_seconds_since_win(const const_input_type in) const {
 	const auto& last_win = current_round.last_win;
 
 	if (!last_win.was_set()) {
@@ -1699,7 +1700,7 @@ float bomb_mode::get_seconds_since_win(const input_type in) const {
 	return clk.diff_seconds(last_win.when);
 }
 
-float bomb_mode::get_match_summary_seconds_left(const input_type in) const {
+float bomb_mode::get_match_summary_seconds_left(const const_input_type in) const {
 	if (const auto since_win = get_seconds_since_win(in); since_win != -1.f) {
 		return static_cast<float>(in.rules.match_summary_seconds) - since_win;
 	}
@@ -1707,7 +1708,7 @@ float bomb_mode::get_match_summary_seconds_left(const input_type in) const {
 	return -1.f;
 }
 
-float bomb_mode::get_round_end_seconds_left(const input_type in) const {
+float bomb_mode::get_round_end_seconds_left(const const_input_type in) const {
 	if (!current_round.last_win.was_set()) {
 		return -1.f;
 	}
@@ -1715,7 +1716,7 @@ float bomb_mode::get_round_end_seconds_left(const input_type in) const {
 	return static_cast<float>(in.rules.round_end_secs) - get_seconds_since_win(in);
 }
 
-bool bomb_mode::bomb_exploded(const input_type in) const {
+bool bomb_mode::bomb_exploded(const const_input_type in) const {
 	return on_bomb_entity(in, [&](const auto& t) {
 		/* 
 			The bomb could have stopped existing through only one way: 
@@ -1726,7 +1727,7 @@ bool bomb_mode::bomb_exploded(const input_type in) const {
 	});
 }
 
-entity_id bomb_mode::get_character_who_defused_bomb(const input_type in) const {
+entity_id bomb_mode::get_character_who_defused_bomb(const const_input_type in) const {
 	return on_bomb_entity(in, [&](const auto& typed_bomb) {
 		if constexpr(is_nullopt_v<decltype(typed_bomb)>) {
 			return entity_id();
@@ -1743,7 +1744,7 @@ entity_id bomb_mode::get_character_who_defused_bomb(const input_type in) const {
 	});
 }
 
-bool bomb_mode::bomb_planted(const input_type in) const {
+bool bomb_mode::bomb_planted(const const_input_type in) const {
 	return on_bomb_entity(in, [&](const auto& typed_bomb) {
 		if constexpr(is_nullopt_v<decltype(typed_bomb)>) {
 			return false;
@@ -1754,7 +1755,7 @@ bool bomb_mode::bomb_planted(const input_type in) const {
 	});
 }
 
-real32 bomb_mode::get_critical_seconds_left(const input_type in) const {
+real32 bomb_mode::get_critical_seconds_left(const const_input_type in) const {
 	if (!bomb_planted(in)) {
 		return -1.f;
 	}
@@ -1777,7 +1778,7 @@ real32 bomb_mode::get_critical_seconds_left(const input_type in) const {
 	});
 }
 
-float bomb_mode::get_seconds_since_planting(const input_type in) const {
+float bomb_mode::get_seconds_since_planting(const const_input_type in) const {
 	if (!bomb_planted(in)) {
 		return -1.f;
 	}
@@ -1812,7 +1813,7 @@ unsigned bomb_mode::get_score(const faction_type f) const {
 	return factions[f].score;
 }
 
-std::optional<arena_mode_match_result> bomb_mode::calc_match_result(const input_type in) const {
+std::optional<arena_mode_match_result> bomb_mode::calc_match_result(const const_input_type in) const {
 	if (state != arena_mode_state::MATCH_SUMMARY) {
 		return std::nullopt;
 	}

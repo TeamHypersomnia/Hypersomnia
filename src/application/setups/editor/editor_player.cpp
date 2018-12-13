@@ -360,26 +360,18 @@ const editor_player::step_to_entropy_type& editor_player::get_step_to_entropy() 
 
 double editor_player::get_audiovisual_speed(const editor_folder& f) const {
 	if (has_testing_started()) {
-		return on_mode_with_input(
-			f.commanded->rulesets.all,
-			f.commanded->work.world,
-			[&](const auto& m, const auto& in) {
-				using M = remove_cref<decltype(m)>;
-
-				if constexpr(std::is_same_v<test_mode, M>) {
-					return get_speed();
-				}
-				else {
-					const auto current_logic_speed = m.round_speeds.logic_speed_mult;
-					const auto chosen_audiovisual_speed = in.rules.view.audiovisual_speed;
-
-					return get_speed() * std::max(current_logic_speed, chosen_audiovisual_speed);
-				}
-			}
-		);
+		return get_speed() * get_arena_handle(f).get_audiovisual_speed();
 	}
 
 	return 0.0;
+}
+
+editor_arena_handle<false> editor_player::get_arena_handle(editor_folder& folder) {
+	return get_arena_handle_impl<editor_arena_handle<false>>(*this, folder);
+}
+
+editor_arena_handle<true> editor_player::get_arena_handle(const editor_folder& folder) const {
+	return get_arena_handle_impl<editor_arena_handle<true>>(*this, folder);
 }
 
 template class augs::snapshotted_player<
