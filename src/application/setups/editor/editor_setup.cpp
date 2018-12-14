@@ -157,6 +157,8 @@ editor_setup::editor_setup(
 
 	open_last_folders(lua);
 	load_gui_state();
+
+	arena_gui.choose_team.show = false;
 }
 
 editor_setup::editor_setup(
@@ -171,6 +173,8 @@ editor_setup::editor_setup(
 	open_last_folders(lua);
 	open_folder_in_new_tab({ lua, intercosm_path });
 	load_gui_state();
+
+	arena_gui.choose_team.show = false;
 }
 
 void editor_setup::load_gui_state() {

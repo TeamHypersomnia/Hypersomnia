@@ -28,8 +28,8 @@ namespace augs {
 		using undo_free_type = pool_undo_free_input<size_type, keys...>;
 
 		// GEN INTROSPECTOR struct augs::pooled_object_id class size_type class... keys
-		size_type version = 0;
 		size_type indirection_index = static_cast<size_type>(-1);
+		size_type version = 0;
 		// END GEN INTROSPECTOR
 
 		friend std::ostream& operator<<(std::ostream& out, const pooled_object_id x) {
@@ -45,7 +45,7 @@ namespace augs {
 		}
 
 		bool operator==(const pooled_object_id& b) const {
-			return version == b.version && indirection_index == b.indirection_index;
+			return indirection_index == b.indirection_index && version == b.version;
 		}
 
 		bool operator!=(const pooled_object_id& b) const {

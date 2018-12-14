@@ -1,5 +1,4 @@
 #pragma once
-#include "application/setups/server/server_start_input.h"
 #include "augs/math/camera_cone.h"
 #include "game/detail/render_layer_filter.h"
 #include "application/setups/server/server_start_input.h"
@@ -24,9 +23,8 @@
 #include "augs/misc/serialization_buffers.h"
 
 #include "application/network/server_step_entropy.h"
-#include "application/arena/arena_handle.h"
-
-#include "application/setups/client/client_gui.h"
+#include "view/mode_gui/arena/arena_gui_mixin.h"
+#include "application/network/network_common.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -42,12 +40,10 @@ struct add_to_arena_input {
 
 class server_adapter;
 
-using server_step_type = uint32_t;
-
-template <bool C>
-using server_arena_handle = basic_arena_handle<C, online_mode_and_rules>;
-
-class server_setup : public default_setup_settings {
+class server_setup : 
+	public default_setup_settings,
+	public arena_gui_mixin<server_setup> /* For the admin player */
+{
 	/* This is loaded from the arena folder */
 	intercosm scene;
 	cosmos_solvable_significant initial_signi;
@@ -73,7 +69,6 @@ class server_setup : public default_setup_settings {
 	unsigned ticks_until_sending_packets = 0;
 	net_time_t server_time = 0.0;
 
-	client_gui_state admin_client_gui;
 	/* No server state follows later in code. */
 
 	augs::ref_memory_stream make_serialization_stream();
@@ -128,8 +123,6 @@ public:
 
 	static mode_player_id to_mode_player_id(const client_id_type&);
 
-	double get_audiovisual_speed() const;
-
 	const auto& get_viewed_cosmos() const {
 		return scene.world;
 	}
@@ -149,8 +142,6 @@ public:
 		return scene.viewables;
 	}
 
-	void perform_custom_imgui(perform_custom_imgui_input);
-
 	void customize_for_viewing(config_lua_table&) const;
 
 	void apply(const config_lua_table&);
@@ -161,10 +152,7 @@ public:
 	std::string describe_client(const client_id_type id) const;
 	void log_malicious_client(const client_id_type id);
 
-	auto escape() {
-		return setup_escape_result::IGNORE;
-	}
-
+	double get_audiovisual_speed() const;
 	double get_inv_tickrate() const;
 
 	template <class C>
@@ -214,8 +202,6 @@ public:
 
 	void accept_game_gui_events(const game_gui_entropy_type&);
 
-	std::optional<camera_eye> find_current_camera_eye() const;
-
 	augs::path_type get_unofficial_content_dir() const {
 		return {};
 	}
@@ -224,20 +210,14 @@ public:
 		return render_layer_filter::disabled();
 	}
 
-	void draw_custom_gui(const draw_setup_gui_input&) const;
-
 	void ensure_handler() {}
 
-	server_arena_handle<false> get_arena_handle();
-	server_arena_handle<true> get_arena_handle() const;
+	online_arena_handle<false> get_arena_handle();
+	online_arena_handle<true> get_arena_handle() const;
 
 	void disconnect_and_unset(const client_id_type&);
 
-	bool handle_input_before_imgui(
-		handle_input_before_imgui_input
-	);
-
-	bool handle_input_before_game(
-		handle_input_before_game_input
-	);
+	mode_player_id get_local_player_id() const {
+		return get_admin_player_id();
+	}
 };

@@ -4,7 +4,7 @@
 #include "application/config_lua_table.h"
 #include "application/arena/arena_utils.h"
 
-#include "application/network/network_adapters.hpp"
+#include "application/network/server_adapter.hpp"
 
 #include "augs/filesystem/file.h"
 #include "application/arena/arena_paths.h"
@@ -40,85 +40,6 @@ mode_player_id server_setup::get_admin_player_id() const {
 	return mode_player_id::machine_admin();
 }
 
-std::optional<camera_eye> server_setup::find_current_camera_eye() const {
-	return get_arena_handle().on_mode(
-		[&](const auto& typed_mode) -> std::optional<camera_eye> {
-			if (const auto player = typed_mode.find(get_admin_player_id())) {
-				if (player->faction == faction_type::SPECTATOR) {
-					return camera_eye();
-				}
-			}
-
-			return std::nullopt;
-		}
-	);
-}
-
-void server_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
-	auto& g = admin_client_gui;
-
-
-	const auto game_screen_top = 0.f;
-
-	const auto draw_mode_in = draw_mode_gui_input { 
-		game_screen_top, 
-		get_admin_player_id(), 
-		in.game_atlas,
-		in.config
-	};
-
-	get_arena_handle().on_mode_with_input(
-		[&](const auto& typed_mode, const auto& mode_input) {
-			const auto new_entropy = g.arena_gui.perform_imgui(
-				draw_mode_in, 
-				typed_mode, 
-				mode_input
-			);
-
-			control(new_entropy);
-		}
-	);
-}
-
-bool server_setup::handle_input_before_imgui(
-	const handle_input_before_imgui_input in
-) {
-	(void)in;
-
-	return false;
-}
-
-bool server_setup::handle_input_before_game(
-	const handle_input_before_game_input in
-) {
-	auto& g = admin_client_gui;
-
-	if (g.arena_gui.control({ in.app_controls, in.common_input_state, in.e })) { 
-		return true;
-	}
-
-	return false;
-}
-
-void server_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
-	const auto& g = admin_client_gui;
-
-	const auto game_screen_top = 0.f;
-
-	const auto draw_mode_in = draw_mode_gui_input { 
-		game_screen_top,
-		get_admin_player_id(), 
-		in.images_in_atlas,
-		in.config
-	};
-
-	get_arena_handle().on_mode_with_input(
-		[&](const auto& typed_mode, const auto& mode_input) {
-			g.arena_gui.draw_mode_gui(in, draw_mode_in, typed_mode, mode_input);
-		}
-	);
-}
-
 mode_player_id server_setup::to_mode_player_id(const client_id_type& id) {
 	mode_player_id out;
 	out.value = static_cast<mode_player_id::id_value_type>(id);
@@ -126,12 +47,12 @@ mode_player_id server_setup::to_mode_player_id(const client_id_type& id) {
 	return out;
 }
 
-server_arena_handle<false> server_setup::get_arena_handle() {
-	return get_arena_handle_impl<server_arena_handle<false>>(*this);
+online_arena_handle<false> server_setup::get_arena_handle() {
+	return get_arena_handle_impl<online_arena_handle<false>>(*this);
 }
 
-server_arena_handle<true> server_setup::get_arena_handle() const {
-	return get_arena_handle_impl<server_arena_handle<true>>(*this);
+online_arena_handle<true> server_setup::get_arena_handle() const {
+	return get_arena_handle_impl<online_arena_handle<true>>(*this);
 }
 
 entity_id server_setup::get_viewed_character_id() const {
@@ -394,13 +315,13 @@ void server_setup::advance_clients_state() {
 		}
 
 		if (c.state == S::RECEIVING_INITIAL_STATE) {
-			if (!server->has_messages_to_send(client_id, game_channel_type::SOLVABLE_AND_STEPS)) {
+			if (!server->has_messages_to_send(client_id, game_channel_type::SERVER_SOLVABLE_AND_STEPS)) {
 #if 0
 				auto message_provider = [&](net_messages::initial_steps_correction& msg) {
 					(void)msg;
 				};
 
-				server->send_message(client_id, game_channel_type::SOLVABLE_AND_STEPS, message_provider);
+				server->send_message(client_id, game_channel_type::SERVER_SOLVABLE_AND_STEPS, message_provider);
 
 				c.state = S::RECEIVING_INITIAL_STATE_CORRECTION;
 #else
@@ -410,7 +331,7 @@ void server_setup::advance_clients_state() {
 			}
 		}
 		else if (c.state == S::RECEIVING_INITIAL_STATE_CORRECTION) {
-			if (!server->has_messages_to_send(client_id, game_channel_type::SOLVABLE_AND_STEPS)) {
+			if (!server->has_messages_to_send(client_id, game_channel_type::SERVER_SOLVABLE_AND_STEPS)) {
 				c.set_in_game(server_time);
 			}
 		}
@@ -453,16 +374,19 @@ message_handler_result server_setup::handle_client_message(
 		c.settings = std::move(payload);
 
 		if (c.state == S::PENDING_WELCOME) {
+			const auto sent_client_id = static_cast<uint32_t>(client_id);
+
 			server->send_payload(
 				client_id, 
-				game_channel_type::SOLVABLE_AND_STEPS, 
+				game_channel_type::SERVER_SOLVABLE_AND_STEPS, 
 
 				buffers,
 
 				initial_arena_state_payload<true> {
 					scene.world.get_solvable().significant,
 					current_mode,
-					vars
+					vars,
+					sent_client_id
 				}
 			);
 
@@ -510,7 +434,7 @@ void server_setup::send_server_step_entropies() {
 
 		server->send_payload(
 			client_id, 
-			game_channel_type::SOLVABLE_AND_STEPS,
+			game_channel_type::SERVER_SOLVABLE_AND_STEPS,
 
 			for_client
 		);

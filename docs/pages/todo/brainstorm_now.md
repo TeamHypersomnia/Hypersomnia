@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- ESC for closing buy menu and team selection
+
+- Instead of adding a flag to reinfer, 
+  can't client simply reinfer any time that a player is added to the mode?
+  E.g. always after the step
+
 - Clear cosmic entropy when the player is not conscious
 	- So that others are not allowed to waste bandwidth when they are dead
 

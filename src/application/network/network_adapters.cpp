@@ -1,4 +1,6 @@
-#include "application/network/network_adapters.h"
+#include "application/network/server_adapter.h"
+#include "application/network/client_adapter.h"
+
 #include "augs/network/network_types.h"
 #include "augs/readwrite/memory_stream.h"
 #include "hypersomnia_version.h"
@@ -28,11 +30,25 @@ void server_adapter::client_disconnected(const client_id_type id) {
 }
 
 game_connection_config::game_connection_config() {
-	numChannels = 1;
+	numChannels = 3;
 
-	auto& solvable_stream = channel[static_cast<int>(game_channel_type::SOLVABLE_AND_STEPS)];
-	solvable_stream.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
-	solvable_stream.maxBlockSize = 1024 * 1024 * 2;
+	{
+		auto& solvable_stream = channel[static_cast<int>(game_channel_type::SERVER_SOLVABLE_AND_STEPS)];
+		solvable_stream.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
+		solvable_stream.maxBlockSize = 1024 * 1024 * 2;
+	}
+
+	{
+		auto& client_entropies = channel[static_cast<int>(game_channel_type::CLIENT_ENTROPIES)];
+		client_entropies.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
+		/* these are like, super critical. */
+		client_entropies.messageResendTime = 0.f;
+	}
+
+	{
+		auto& communications = channel[static_cast<int>(game_channel_type::COMMUNICATIONS)];
+		communications.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
+	}
 
 	serverPerClientMemory += 1024 * 1024 * 2;
 
@@ -78,7 +94,7 @@ server_adapter::server_adapter(const server_start_input& in) :
 		yojimbo::Address(in.ip.c_str(), in.port), 
 		connection_config, 
 		adapter, 
-		0.0
+		yojimbo_time()
 	)
 {
     server.Start(in.max_connections);
@@ -102,4 +118,18 @@ void server_adapter::disconnect_client(const client_id_type& id) {
 
 void server_adapter::send_packets() {
 	//server.SendPackets();
+}
+
+client_adapter::client_adapter(const client_start_input& in) :
+	connection_config(),
+	adapter(nullptr),
+	client(
+		yojimbo::GetDefaultAllocator(), 
+		yojimbo::Address(in.ip_port.c_str()), 
+		connection_config, 
+		adapter, 
+		yojimbo_time()
+	)
+{
+
 }

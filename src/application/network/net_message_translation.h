@@ -7,6 +7,7 @@ struct initial_arena_state_payload {
 	maybe_const_ref_t<C, cosmos_solvable_significant> signi;
 	maybe_const_ref_t<C, online_mode_and_rules> mode;
 	maybe_const_ref_t<C, server_vars> vars;
+	maybe_const_ref_t<C, uint32_t> client_id;
 };
 
 using ref_net_stream = augs::basic_ref_memory_stream<message_bytes_type>;
@@ -109,6 +110,7 @@ namespace net_messages {
 		augs::read_bytes(s, in.signi);
 		augs::read_bytes(s, in.mode);
 		augs::read_bytes(s, in.vars);
+		augs::read_bytes(s, in.client_id);
 
 		return true;
 	}
@@ -121,6 +123,7 @@ namespace net_messages {
 			augs::write_bytes(s, in.signi);
 			augs::write_bytes(s, in.mode);
 			augs::write_bytes(s, in.vars);
+			augs::write_bytes(s, in.client_id);
 		};
 
 		{

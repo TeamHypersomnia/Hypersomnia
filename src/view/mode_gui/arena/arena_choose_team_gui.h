@@ -25,7 +25,7 @@ struct arena_choose_team_gui {
 	};
 
 	// GEN INTROSPECTOR struct arena_choose_team_gui
-	bool show = false;
+	bool show = true;
 	// END GEN INTROSPECTOR
 
 	/* Always initialize as hidden */
