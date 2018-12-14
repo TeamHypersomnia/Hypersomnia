@@ -774,7 +774,11 @@ setup_escape_result editor_setup::escape() {
 		ok_only_popup = std::nullopt;
 		return setup_escape_result::JUST_FETCH;
 	}
-	else if (anything_opened() && is_gameplay_on()) {
+	else if (is_gameplay_on()) {
+		if (arena_gui.escape()) {
+			return setup_escape_result::JUST_FETCH;
+		}
+
 		player().pause();
 		return setup_escape_result::SWITCH_TO_GAME_GUI;
 	}

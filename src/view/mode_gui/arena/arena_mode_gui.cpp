@@ -38,6 +38,20 @@ bool arena_gui_state::control(
 	return false;
 }
 
+bool arena_gui_state::escape() {
+	if (choose_team.show) {
+		choose_team.show = false;
+		return true;
+	}
+
+	if (buy_menu.show) {
+		buy_menu.show = false;
+		return true;
+	}
+
+	return false;
+}
+
 template <class M>
 mode_player_entropy arena_gui_state::perform_imgui(
 	draw_mode_gui_input mode_in, 

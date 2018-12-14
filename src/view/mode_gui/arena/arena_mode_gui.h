@@ -33,6 +33,7 @@ struct arena_gui_state {
 	mutable warmup_welcome_cache warmup;
 
 	bool control(app_ingame_intent_input);
+	bool escape();
 
 	template <class M>
 	mode_player_entropy perform_imgui(

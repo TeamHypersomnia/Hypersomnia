@@ -21,8 +21,9 @@ std::optional<camera_eye> arena_gui_mixin<D>::find_current_camera_eye() const {
 
 template <class D>
 setup_escape_result arena_gui_mixin<D>::escape() {
-	const auto& self = static_cast<const D&>(*this);
-	(void)self;
+	if (arena_gui.escape()) {
+		return setup_escape_result::JUST_FETCH;
+	}
 
 	return setup_escape_result::IGNORE;
 }
