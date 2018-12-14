@@ -49,6 +49,7 @@
 #include "application/setups/editor/editor_recent_message.h"
 
 #include "application/input/entropy_accumulator.h"
+#include "view/mode_gui/arena/arena_gui_mixin.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -71,7 +72,10 @@ class images_in_atlas_map;
 
 struct intercosm;
 
-class editor_setup {
+class editor_setup : public arena_gui_mixin<editor_setup> {
+	using arena_base = arena_gui_mixin<editor_setup>;
+	friend arena_base;
+
 	friend augs::introspection_access;
 
 	/* These two friends for handy printing of internal state */
@@ -113,8 +117,6 @@ class editor_setup {
 	editor_plain_animations_gui plain_animations_gui = std::string("Animations");
 	editor_particle_effects_gui particle_effects_gui = std::string("Particle effects");
 	// END GEN INTROSPECTOR
-
-	arena_gui_state arena_gui;
 
 	std::optional<editor_popup> ok_only_popup;
 
@@ -195,6 +197,8 @@ class editor_setup {
 	void set_current(const folder_index i);
 
 	std::size_t find_folder_by_path(const augs::path_type& current_path) const;
+
+	mode_player_id get_local_player_id() const;
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -423,4 +427,7 @@ public:
 
 	void finish_and_discard();
 	void finish_and_reapply();
+
+	editor_arena_handle<false> get_arena_handle();
+	editor_arena_handle<true> get_arena_handle() const;
 };

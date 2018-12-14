@@ -132,6 +132,14 @@ void editor_setup::set_popup(const editor_popup p) {
 	augs::save_as_text(LOG_FILES_DIR "/last_editor_message.txt", augs::date_time().get_readable() + '\n' + logged);
 }
 
+mode_player_id editor_setup::get_local_player_id() const {
+	if (is_gameplay_on()) {
+		return view().local_player_id;
+	}
+
+	return mode_player_id::dead();
+}
+
 void editor_setup::override_viewed_entity(const entity_id overridden_id) {
 	player().get_arena_handle(folder()).on_mode(
 		[&](const auto& typed_mode) {
@@ -701,24 +709,9 @@ void editor_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
 			text_tooltip("x: %x\ny: %x", pos->x, pos->y);
 		}
 
-		const auto draw_mode_in = draw_mode_gui_input { 
-			get_game_screen_top(), 
-			view().local_player_id, 
-			in.game_atlas,
-			in.config
-		};
-
-		on_mode_with_input(
-			[&](const auto& typed_mode, const auto& mode_input) {
-				const auto new_entropy = arena_gui.perform_imgui(
-					draw_mode_in, 
-					typed_mode, 
-					mode_input
-				);
-
-				control(new_entropy);
-			}
-		);
+		if (is_gameplay_on()) {
+			arena_base::perform_custom_imgui(in);
+		}
 	}
 
 	if (open_folder_dialog.valid() && is_ready(open_folder_dialog)) {
@@ -1207,8 +1200,10 @@ bool editor_setup::handle_input_before_game(
 		}
 	}
 
-	if (arena_gui.control({ in.app_controls, state, e })) { 
-		return true;
+	if (is_gameplay_on()) {
+		if (arena_base::handle_input_before_game(in)) {
+			return true;
+		}
 	}
 
 	if (e.was_any_key_pressed()) {
@@ -1962,18 +1957,9 @@ void editor_setup::on_mode_with_input(F&& callback) const {
 }
 
 void editor_setup::draw_mode_gui(const draw_setup_gui_input& in) const {
-	const auto draw_mode_in = draw_mode_gui_input { 
-		get_game_screen_top(), 
-		view().local_player_id, 
-		in.images_in_atlas,
-		in.config
-	};
-
-	on_mode_with_input(
-		[&](const auto& typed_mode, const auto& mode_input) {
-			arena_gui.draw_mode_gui(in, draw_mode_in, typed_mode, mode_input);
-		}
-	);
+	if (is_gameplay_on()) {
+		arena_base::draw_custom_gui(in);
+	}
 }
 
 void editor_setup::ensure_handler() {
@@ -2071,6 +2057,14 @@ void editor_setup::begin_recording() {
 void editor_setup::begin_replaying() {
 	mover.escape();
 	player().begin_replaying(folder());
+}
+
+editor_arena_handle<false> editor_setup::get_arena_handle() {
+	return player().get_arena_handle(folder());
+}
+
+editor_arena_handle<true> editor_setup::get_arena_handle() const {
+	return player().get_arena_handle(folder());
 }
 
 template struct augs::marks<camera_eye>;
