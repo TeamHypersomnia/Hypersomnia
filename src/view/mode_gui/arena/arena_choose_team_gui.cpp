@@ -24,6 +24,34 @@ bool arena_choose_team_gui::control(app_ingame_intent_input in) {
 				return true;
 			}
 		}
+
+		if (show) {
+			using namespace augs::event;
+
+			auto make_choice = [&](const faction_type f) {
+				key_requested_choice = f;
+			};
+
+			if (key == keys::key::A) {
+				make_choice(faction_type::COUNT);
+				return true;
+			}
+
+			if (key == keys::key::S) {
+				make_choice(faction_type::SPECTATOR);
+				return true;
+			}
+
+			if (key == keys::key::M) {
+				make_choice(faction_type::METROPOLIS);
+				return true;
+			}
+
+			if (key == keys::key::R) {
+				make_choice(faction_type::RESISTANCE);
+				return true;
+			}
+		}
 	}
 
 	return false;
@@ -33,6 +61,10 @@ using input_type = arena_choose_team_gui::input;
 
 std::optional<mode_commands::team_choice> arena_choose_team_gui::perform_imgui(const input_type in) {
 	using namespace augs::imgui;
+
+	auto unset_key_choice = augs::scope_guard([this]() {
+		key_requested_choice = std::nullopt;
+	});
 
 	if (!show) {
 		return std::nullopt;
@@ -83,12 +115,18 @@ std::optional<mode_commands::team_choice> arena_choose_team_gui::perform_imgui(c
 					return augs::imgui::colors_nha::standard();
 				}();
 
-				if (game_image_button(label, entry, color_scheme)) {
-					if (!is_full) {
-						if (is_current) {
+				const bool button_confirmed = game_image_button(label, entry, color_scheme);
 
+				if (!is_full) {
+					if (is_current) {
+
+					}
+					else {
+						if (key_requested_choice != std::nullopt) {
+							return make_choice(*key_requested_choice);
 						}
-						else {
+
+						if (button_confirmed) {
 							return make_choice(f);
 						}
 					}

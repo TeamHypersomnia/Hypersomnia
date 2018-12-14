@@ -28,6 +28,8 @@ struct arena_choose_team_gui {
 	bool show = true;
 	// END GEN INTROSPECTOR
 
+	std::optional<faction_type> key_requested_choice;
+
 	/* Always initialize as hidden */
 
 	bool control(app_ingame_intent_input);

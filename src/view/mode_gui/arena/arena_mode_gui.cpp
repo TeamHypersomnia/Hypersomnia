@@ -46,6 +46,10 @@ mode_player_entropy arena_gui_state::perform_imgui(
 ) {
 	mode_player_entropy result_entropy;
 
+	if (buy_menu.show && choose_team.show) {
+		buy_menu.show = false;
+	}
+
 	if constexpr(M::round_based) {
 		const auto p = typed_mode.calc_participating_factions(mode_input);
 
