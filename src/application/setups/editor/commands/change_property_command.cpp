@@ -54,7 +54,7 @@ void change_property_command<D>::refresh_other_state(const editor_command_input 
 
 		if (!self.affected_assets.empty()) {
 			auto reinfer = [&]() {
-				in.folder.commanded->work.update_offsets_of(self.affected_assets.front());
+				in.folder.commanded->work.update_offsets_of(self.affected_assets.front(), changer_callback_result::REFRESH);
 			};
 
 			reinfer();

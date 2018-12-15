@@ -6,9 +6,29 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- cosmos_and_viewables
+- can't we hold 
+	all_image_offsets_array_type
+  in viewables and always refer to offsets from there?
+  it could be passed to the logic step as a reference.
+  we anyway use viewables to populate the logical assets even on the server.
+  
+  - pro/con:
+	- Pro: less memory wasted
+	- Pro: more architecturally pure, probably less to worry during i/o
+	- Pro: don't have to perform cosmos i/o in the context of an intercosm
+	- Con: pain in the ass in passing the ref to it everywhere
+	- Con: possible fetch incurred for reading the array's address
+		- But are image offsets used in performance-critical domains?
+			- Probably not
+		- And we anyways have to fetch cosmos address even when we read from the cosmos
+		- The only downside is that we probably have one more variable to cache but that would be a problem only in critical domains
+
+- intercosm should become a handle of a cosmos + viewables 
+	- it should not force storage of these together.
+
 - yojimbo_assert( length < buffer_size - 1 );
-	- is it not a bug?
-		- Use byte serialization anyway to avoid the call to strlen
+	- reoprt a bug?
 
 - Detect when the initial state is being sent to optionally display progress
 	- Possibly by returning some info from ReceiveBlockData struct

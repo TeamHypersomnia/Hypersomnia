@@ -120,6 +120,15 @@ void intercosm::save_as_lua(const intercosm_path_op op) const {
 
 void intercosm::post_load_state_correction() {
 	world.change_common_significant([&](cosmos_common_significant& common) {
+		(void)common;
+
+		/*
+			The field:
+				all_image_offsets_array_type image_offsets;
+
+			Resides outside of the logical assets' introspection so that it is never written to hdd.
+		*/
+
 		viewables.update_relevant(common.logical_assets);
 
 		return changer_callback_result::DONT_REFRESH;

@@ -12,11 +12,6 @@
 
 #include "application/arena/arena_utils.h"
 
-/* 
-	This unusual choice of definition location is due to server needing to call this function,
-	but byte serialization function names clashing with Yojimbo's.
-*/
-
 void load_arena_from(
 	const arena_paths& paths,
 	intercosm& scene,

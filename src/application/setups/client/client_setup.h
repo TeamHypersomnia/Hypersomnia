@@ -30,6 +30,11 @@ struct config_lua_table;
 
 class client_adapter;
 
+enum class client_arena_type {
+	PREDICTED,
+	REFERENTIAL
+};
+
 class client_setup : 
 	public default_setup_settings,
 	public arena_gui_mixin<client_setup>
@@ -49,6 +54,9 @@ class client_setup :
 	server_vars sv_vars;
 
 	mode_player_id client_player_id;
+
+	cosmos referential_cosmos;
+	online_mode_and_rules referential_mode;
 
 	/* The rest is client-specific */
 	sol::state& lua;
@@ -72,13 +80,25 @@ class client_setup :
 	static net_time_t get_current_time();
 
 	template <class H, class S>
-	static decltype(auto) get_arena_handle_impl(S& self) {
-		return H {
-			self.current_mode,
-			self.scene,
-			self.rulesets,
-			self.initial_signi
-		};
+	static decltype(auto) get_arena_handle_impl(S& self, const client_arena_type t) {
+		if (t == client_arena_type::PREDICTED) {
+			return H {
+				self.current_mode,
+				self.scene,
+				self.rulesets,
+				self.initial_signi
+			};
+		}
+		else {
+			ensure_eq(t, client_arena_type::REFERENTIAL);
+
+			return H {
+				self.referential_mode,
+				self.scene,
+				self.rulesets,
+				self.initial_signi
+			};
+		}
 	}
 
 	void handle_server_messages();
@@ -182,8 +202,8 @@ public:
 		return client_player_id;
 	}
 
-	online_arena_handle<false> get_arena_handle();
-	online_arena_handle<true> get_arena_handle() const;
+	online_arena_handle<false> get_arena_handle(client_arena_type = client_arena_type::PREDICTED);
+	online_arena_handle<true> get_arena_handle(client_arena_type = client_arena_type::PREDICTED) const;
 
 	void log_malicious_server();
 };

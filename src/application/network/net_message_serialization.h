@@ -17,8 +17,23 @@ bool preserialized_message::Serialize(Stream& stream) {
 namespace net_messages {
 	template <typename Stream>
 	bool client_welcome::Serialize(Stream& stream) {
-		// TODO PERFORMANCE: properly serialize this using bytes serializator
-		serialize_string(stream, payload.chosen_nickname.data(), requested_client_settings::buf_len);
+		{
+			constexpr auto buffer_size = requested_client_settings::buf_len;
+			const auto s = payload.chosen_nickname.data();
+
+			int length = 0;
+			if ( Stream::IsWriting )
+			{
+				length = payload.chosen_nickname.size();
+			}
+
+			serialize_int( stream, length, 0, buffer_size - 1 );
+			serialize_bytes( stream, (uint8_t*)s, length );
+
+			if ( Stream::IsReading ) {
+				s[length] = '\0';
+			}
+		}
 
 		serialize_float(stream, payload.public_settings.mouse_sensitivity.x);
 		serialize_float(stream, payload.public_settings.mouse_sensitivity.y);

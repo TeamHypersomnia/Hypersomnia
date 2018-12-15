@@ -55,12 +55,12 @@ void client_setup::accept_game_gui_events(const game_gui_entropy_type& events) {
 	control(events);
 }
 
-online_arena_handle<false> client_setup::get_arena_handle() {
-	return get_arena_handle_impl<online_arena_handle<false>>(*this);
+online_arena_handle<false> client_setup::get_arena_handle(const client_arena_type t) {
+	return get_arena_handle_impl<online_arena_handle<false>>(*this, t);
 }
 
-online_arena_handle<true> client_setup::get_arena_handle() const {
-	return get_arena_handle_impl<online_arena_handle<true>>(*this);
+online_arena_handle<true> client_setup::get_arena_handle(const client_arena_type t) const {
+	return get_arena_handle_impl<online_arena_handle<true>>(*this, t);
 }
 
 double client_setup::get_inv_tickrate() const {
@@ -157,7 +157,8 @@ void client_setup::handle_server_messages() {
 
 void client_setup::send_client_commands() {
 	if (client->is_connected()) {
-		const bool init_send = state == client_state_type::INVALID;
+		using C = client_state_type;
+		const bool init_send = state == C::INVALID;
 
 		if (resend_requested_settings || init_send) {
 			client->send_payload(
@@ -168,6 +169,10 @@ void client_setup::send_client_commands() {
 			if (init_send) {
 				state = client_state_type::PENDING_WELCOME;
 			}
+		}
+
+		if (state == C::IN_GAME) {
+
 		}
 	}
 }
