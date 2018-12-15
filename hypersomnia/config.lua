@@ -457,7 +457,8 @@ return {
 	  jitter = {
 	  	buffer_ms = 33,
 		merge_commands_when_above_ms = 50
-	  }
+	  },
+	  server_timeout_secs = 3
 	}
   }
 }

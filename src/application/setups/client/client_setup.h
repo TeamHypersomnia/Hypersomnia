@@ -23,6 +23,8 @@
 #include "augs/misc/serialization_buffers.h"
 
 #include "view/mode_gui/arena/arena_gui_mixin.h"
+#include "application/network/client_state_type.h"
+#include "application/network/requested_client_settings.h"
 
 struct config_lua_table;
 
@@ -32,6 +34,10 @@ class client_setup :
 	public default_setup_settings,
 	public arena_gui_mixin<client_setup>
 {
+	using arena_base = arena_gui_mixin<client_setup>;
+	friend arena_base;
+	friend client_adapter;
+
 	/* This is loaded from the arena folder */
 	intercosm scene;
 	cosmos_solvable_significant initial_signi;
@@ -45,10 +51,21 @@ class client_setup :
 	mode_player_id client_player_id;
 
 	/* The rest is client-specific */
+	sol::state& lua;
+
+	client_start_input last_start;
+	client_state_type state = client_state_type::INVALID;
+
+	client_vars vars;
+	requested_client_settings requested_settings;
+	bool resend_requested_settings = false;
+
 	entropy_accumulator total_collected;
+	augs::serialization_buffers buffers;
 
 	augs::propagate_const<std::unique_ptr<client_adapter>> client;
 	net_time_t client_time = 0.0;
+	net_time_t when_initiated_connection = 0.0;
 
 	/* No client state follows later in code. */
 
@@ -64,6 +81,15 @@ class client_setup :
 		};
 	}
 
+	void handle_server_messages();
+	void send_client_commands();
+	void send_packets_if_its_time();
+
+	template <class T, class F>
+	message_handler_result handle_server_message(
+		F&& read_payload
+	);
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
@@ -75,6 +101,8 @@ public:
 	);
 
 	~client_setup();
+
+	void init_connection(const client_start_input&);
 
 	const auto& get_viewed_cosmos() const {
 		return scene.world;
@@ -95,11 +123,11 @@ public:
 		return scene.viewables;
 	}
 
+	void perform_custom_imgui(perform_custom_imgui_input);
+
 	void customize_for_viewing(config_lua_table&) const;
 
-	void apply(const config_lua_table&) {
-		return;
-	}
+	void apply(const config_lua_table&);
 
 	double get_audiovisual_speed() const;
 	double get_inv_tickrate() const;
@@ -119,6 +147,10 @@ public:
 				{ in.settings, in.screen_size }
 			);
 			
+			handle_server_messages();
+			send_client_commands();
+			send_packets_if_its_time();
+
 			get_arena_handle().on_mode_with_input(
 				[&](auto& typed_mode, const auto& in) {
 					typed_mode.advance(in, total, callbacks);
@@ -152,4 +184,6 @@ public:
 
 	online_arena_handle<false> get_arena_handle();
 	online_arena_handle<true> get_arena_handle() const;
+
+	void log_malicious_server();
 };

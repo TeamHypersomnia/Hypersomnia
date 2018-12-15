@@ -38,6 +38,7 @@ public:
 	);
 
 	void send_packets();
+	void stop();
 
 	bool is_running() const;
 	bool can_send_message(const client_id_type&, const game_channel_type&) const;

@@ -5,18 +5,12 @@
 #include "game/modes/mode_entropy.h"
 
 #include "application/network/requested_client_settings.h"
+#include "application/network/client_state_type.h"
 
 using client_pending_entropies = std::vector<total_client_entropy>;
 
 struct server_client_state {
-	enum class type {
-		INVALID,
-
-		PENDING_WELCOME,
-		RECEIVING_INITIAL_STATE,
-		RECEIVING_INITIAL_STATE_CORRECTION,
-		IN_GAME
-	};
+	using type = client_state_type;
 
 	type state = type::INVALID;
 	net_time_t last_valid_activity_time = -1.0;

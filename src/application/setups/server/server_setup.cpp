@@ -17,10 +17,11 @@
 #include "augs/readwrite/memory_stream.h"
 
 #include "application/arena/arena_handle.h"
+#include "application/arena/choose_arena.h"
 
 /* To avoid incomplete type error */
 server_setup::~server_setup() {
-	server->get_specific().Stop();
+	server->stop();
 }
 
 server_setup::server_setup(
@@ -110,25 +111,12 @@ void server_setup::apply(const config_lua_table& cfg) {
 }
 
 void server_setup::choose_arena(const std::string& name) {
-	if (name.empty()) {
-		get_arena_handle().make_default(
-			lua, 
-			initial_signi
-		);
-	}
-	else {
-		get_arena_handle().load_from(
-			arena_paths(name),
-			initial_signi
-		);
-	}
-
-	if (vars.override_default_ruleset.empty()) {
-		current_mode.choose(rulesets.meta.server_default);
-	}
-	else {
-		ensure(false && "Not implemented!");
-	}
+	::choose_arena(
+		lua,
+		get_arena_handle(),
+		vars,
+		initial_signi
+	);
 
 	vars.current_arena = name;
 
@@ -209,7 +197,7 @@ void server_setup::advance_clients_state() {
 	constexpr auto max_pending_commands_for_client_v = static_cast<uint8_t>(255);
 
 	for (auto& c : clients) {
-		using S = server_client_state::type;
+		using S = client_state_type;
 
 		if (!c.is_set()) {
 			continue;
@@ -305,7 +293,7 @@ void server_setup::advance_clients_state() {
 		};
 
 		if (!added_someone_already) {
-			if (c.state != server_client_state::type::PENDING_WELCOME) {
+			if (c.state != client_state_type::PENDING_WELCOME) {
 				add_client_if_not_yet_in_mode();
 			}
 		}
@@ -359,7 +347,7 @@ message_handler_result server_setup::handle_client_message(
 		}
 	}
 
-	using S = server_client_state::type;
+	using S = client_state_type;
 	namespace N = net_messages;
 
 	auto& c = clients[client_id];
@@ -380,12 +368,18 @@ message_handler_result server_setup::handle_client_message(
 				client_id, 
 				game_channel_type::SERVER_SOLVABLE_AND_STEPS, 
 
+				vars
+			);
+
+			server->send_payload(
+				client_id, 
+				game_channel_type::SERVER_SOLVABLE_AND_STEPS, 
+
 				buffers,
 
 				initial_arena_state_payload<true> {
 					scene.world.get_solvable().significant,
 					current_mode,
-					vars,
 					sent_client_id
 				}
 			);

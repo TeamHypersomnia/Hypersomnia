@@ -6,6 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- yojimbo_assert( length < buffer_size - 1 );
+	- is it not a bug?
+		- Use byte serialization anyway to avoid the call to strlen
+
+- Detect when the initial state is being sent to optionally display progress
+	- Possibly by returning some info from ReceiveBlockData struct
+
 - ESC for closing buy menu and team selection
 
 - Instead of adding a flag to reinfer, 

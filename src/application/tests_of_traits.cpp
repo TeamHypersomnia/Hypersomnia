@@ -36,6 +36,7 @@
 
 #include "3rdparty/imgui/imgui.h"
 
+#include "augs/misc/constant_size_string.h"
 /* Define several other traits which will validate properties of some other types. */
 
 namespace templates_detail {
@@ -588,4 +589,6 @@ struct game_state_checks {
 	static_assert(!is_unique_ptr_v<std::optional<int>>);
 	static_assert(is_comparable_v<augs::maybe<float>, augs::maybe<float>>);
 	static_assert(is_comparable_v<const augs::maybe<float>&, const augs::maybe<float>&>);
+
+	static_assert(is_container_v<augs::constant_size_string<20>>);
 };

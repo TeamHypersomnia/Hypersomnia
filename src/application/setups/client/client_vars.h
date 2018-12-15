@@ -18,5 +18,6 @@ struct client_vars {
 	// GEN INTROSPECTOR struct client_vars
 	std::string nickname = "Player";
 	client_net_vars net;
+	uint32_t server_timeout_secs = 3;
 	// END GEN INTROSPECTOR
 };

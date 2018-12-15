@@ -13,6 +13,7 @@
 #include "augs/math/transform.h"
 #include "augs/math/camera_cone.h"
 #include "augs/misc/enum/enum_boolset.h"
+#include "augs/misc/constant_size_string.h"
 
 TEST_CASE("Filesystem test") {
 	const auto& path = test_file_path;
@@ -185,7 +186,19 @@ TEST_CASE("Byte readwrite Containers") {
 }
 
 TEST_CASE("Byte readwrite FixedContainers") {
+	{
+		augs::constant_size_string<5> abab = "hja";
+		REQUIRE(std::string(abab) == "hja");
+		readwrite_test_cycle(abab);
+		REQUIRE(std::string(abab) == "hja");
+
+		abab = "ohyeah";
+		REQUIRE(std::string(abab) == "ohye");
+		readwrite_test_cycle(abab);
+	}
+
 	augs::constant_size_vector<int, 20> cc;
+
 	cc.resize(8);
 	readwrite_test_cycle(cc);
 	cc[0] = 483297;

@@ -1,0 +1,11 @@
+#pragma once
+
+enum class client_state_type {
+	INVALID,
+
+	PENDING_WELCOME,
+	RECEIVING_INITIAL_STATE,
+	RECEIVING_INITIAL_STATE_CORRECTION,
+	IN_GAME
+};
+

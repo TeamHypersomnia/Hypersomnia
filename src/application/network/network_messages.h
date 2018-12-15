@@ -21,6 +21,8 @@ constexpr std::size_t max_message_size_v = ((chosen_packet_size_v - total_header
 
 using message_bytes_type = augs::constant_size_vector<std::byte, max_message_size_v>;
 
+struct server_vars;
+
 struct preserialized_message : public yojimbo::Message {
 	message_bytes_type bytes;
 
@@ -63,6 +65,14 @@ namespace net_messages {
 
 	//struct initial_steps_correction : only_block_message {};
 
+	struct new_server_vars : preserialized_message {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = false;
+
+		bool write_payload(const server_vars&);
+		bool read_payload(server_vars&);
+	};
+
 	struct server_step_entropy : preserialized_message {
 		static constexpr bool server_to_client = true;
 		static constexpr bool client_to_server = false;
@@ -90,13 +100,14 @@ namespace net_messages {
 
 		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
 
-		bool write_payload(requested_client_settings&&);
+		bool write_payload(const requested_client_settings&);
 		bool read_payload(requested_client_settings&);
 	};
 
 	using all_t = type_list<
 		initial_arena_state*,
 		//initial_steps_correction*,
+		new_server_vars*,
 		server_step_entropy*,
 		client_welcome*,
 		client_entropy*

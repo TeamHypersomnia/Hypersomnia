@@ -21,6 +21,10 @@ void GameAdapter::OnServerClientDisconnected(const client_id_type clientIndex) {
 	}
 }
 
+void server_adapter::stop() {
+	server.Stop();
+}
+
 void server_adapter::client_connected(const client_id_type id) {
 	pending_events.push_back({ id, true });
 }
@@ -39,7 +43,7 @@ game_connection_config::game_connection_config() {
 	}
 
 	{
-		auto& client_entropies = channel[static_cast<int>(game_channel_type::CLIENT_ENTROPIES)];
+		auto& client_entropies = channel[static_cast<int>(game_channel_type::CLIENT_COMMANDS)];
 		client_entropies.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
 		/* these are like, super critical. */
 		client_entropies.messageResendTime = 0.f;
@@ -112,24 +116,66 @@ server_adapter::server_adapter(const server_start_input& in) :
 }
 
 void server_adapter::disconnect_client(const client_id_type& id) {
-	(void)id;
-	//server.DisconnectClient(id);
+	server.DisconnectClient(id);
 }
 
 void server_adapter::send_packets() {
-	//server.SendPackets();
+	server.SendPackets();
 }
 
-client_adapter::client_adapter(const client_start_input& in) :
+client_adapter::client_adapter() :
 	connection_config(),
 	adapter(nullptr),
 	client(
 		yojimbo::GetDefaultAllocator(), 
-		yojimbo::Address(in.ip_port.c_str()), 
+		yojimbo::Address("0.0.0.0"), 
 		connection_config, 
 		adapter, 
 		yojimbo_time()
 	)
-{
+{}
 
+void client_adapter::connect(const client_start_input& in) {
+	uint64_t clientId;
+	yojimbo::random_bytes((uint8_t*)&clientId, 8);
+
+	client.InsecureConnect(
+		privateKey.data(), 
+		clientId,
+		yojimbo::Address(in.ip_port.c_str())
+	);
 }
+
+void client_adapter::disconnect() {
+	client.Disconnect();
+}
+
+void client_adapter::send_packets() {
+	client.SendPackets();
+}
+
+bool client_adapter::can_send_message(const game_channel_type& channel) const {
+	return client.CanSendMessage(static_cast<channel_id_type>(channel));
+}
+
+bool client_adapter::has_messages_to_send(const game_channel_type& channel) const {
+	return client.HasMessagesToSend(static_cast<channel_id_type>(channel));
+}
+
+bool client_adapter::is_connected() const {
+	return client.IsConnected();
+}
+
+bool client_adapter::is_connecting() const {
+	return client.IsConnecting();
+}
+
+bool client_adapter::is_disconnected() const {
+	return client.IsDisconnected();
+}
+
+bool client_adapter::has_connection_failed() const {
+	return client.ConnectionFailed();
+}
+
+

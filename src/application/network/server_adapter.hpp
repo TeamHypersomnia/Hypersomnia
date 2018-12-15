@@ -17,12 +17,11 @@ void server_adapter::process_connections_disconnections(H&& handler) {
 }
 
 template <class H>
-void server_adapter::advance(const double server_time, H&& handler) {
+void server_adapter::advance(const net_time_t server_time, H&& handler) {
     if (!server.IsRunning()) {
         return;
     }
 
-    // update server and process messages
     server.AdvanceTime(server_time);
     server.ReceivePackets();
 
@@ -43,7 +42,7 @@ void server_adapter::advance(const double server_time, H&& handler) {
 
 					if (result == message_handler_result::ABORT_AND_DISCONNECT) {
 						j = connection_config.numChannels;
-						server.DisconnectClient(i);
+						disconnect_client(i);
 						handler.unset_client(i);
 						break;
 					}

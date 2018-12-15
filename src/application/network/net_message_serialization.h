@@ -17,7 +17,8 @@ bool preserialized_message::Serialize(Stream& stream) {
 namespace net_messages {
 	template <typename Stream>
 	bool client_welcome::Serialize(Stream& stream) {
-		serialize_string(stream, payload.chosen_nickname, requested_client_settings::buf_len);
+		// TODO PERFORMANCE: properly serialize this using bytes serializator
+		serialize_string(stream, payload.chosen_nickname.data(), requested_client_settings::buf_len);
 
 		serialize_float(stream, payload.public_settings.mouse_sensitivity.x);
 		serialize_float(stream, payload.public_settings.mouse_sensitivity.y);

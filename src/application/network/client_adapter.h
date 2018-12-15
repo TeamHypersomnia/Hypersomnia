@@ -13,10 +13,11 @@ class client_adapter {
 	message_handler_result process_message(yojimbo::Message&, H&& handler);
 
 	template <class T>
-	auto create_message(const client_id_type&);
+	auto create_message();
 
 public:
-	client_adapter(const client_start_input&);
+	client_adapter();
+	void connect(const client_start_input&);
 
 	template <class H>
 	void advance(
@@ -26,20 +27,21 @@ public:
 
 	void send_packets();
 
-	bool is_running() const;
-	bool can_send_message(const client_id_type&, const game_channel_type&) const;
-	bool has_messages_to_send(const client_id_type&, const game_channel_type&) const;
+	bool can_send_message(const game_channel_type&) const;
+	bool has_messages_to_send(const game_channel_type&) const;
 
 	template <class... Args>
 	bool send_payload(
-		const client_id_type& client_id, 
 		const game_channel_type& channel_id, 
 		Args&&... args
 	);
 
-	bool is_client_connected(const client_id_type& id) const;
+	bool is_disconnected() const;
+	bool is_connected() const;
+	bool is_connecting() const;
+	bool has_connection_failed() const;
 
-	void disconnect_client(const client_id_type& id);
+	void disconnect();
 
 	auto& get_specific() {
 		return client;
