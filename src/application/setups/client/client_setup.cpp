@@ -95,18 +95,26 @@ message_handler_result client_setup::handle_server_message(
 	}
 
 	if constexpr (std::is_same_v<T, server_vars>) {
-		sv_vars = payload;
+		const bool are_initial_vars = state == client_state_type::PENDING_WELCOME;
+		const auto& new_vars = payload;
 
-		::choose_arena(
-			lua,
-			get_arena_handle(),
-			sv_vars,
-			initial_signi
-		);
-
-		if (state == client_state_type::PENDING_WELCOME) {
+		if (are_initial_vars) {
 			state = client_state_type::RECEIVING_INITIAL_STATE;
 		}
+
+		if (are_initial_vars || sv_vars.current_arena != new_vars.current_arena) {
+			::choose_arena(
+				lua,
+				get_arena_handle(client_arena_type::REFERENTIAL),
+				new_vars,
+				initial_signi
+			);
+
+			/* Prepare the predicted cosmos. */
+			predicted_cosmos = scene.world;
+		}
+
+		sv_vars = new_vars;
 	}
 	else if constexpr (std::is_same_v<T, initial_payload>) {
 		if (state != client_state_type::RECEIVING_INITIAL_STATE) {

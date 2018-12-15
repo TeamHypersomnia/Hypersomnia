@@ -20,8 +20,6 @@ class basic_arena_handle {
 				using M = remove_cref<decltype(typed_mode)>;
 				using I = typename M::template basic_input<C>;
 				
-				auto& cosm = self.scene.world;
-
 				const auto vars = mapped_or_nullptr(
 					self.rulesets.all.template get_for<M>(), 
 					self.current_mode.rules_id
@@ -30,12 +28,12 @@ class basic_arena_handle {
 				ensure(vars != nullptr);
 
 				if constexpr(M::needs_initial_signi) {
-					const auto in = I { *vars, self.initial_signi, cosm };
+					const auto in = I { *vars, self.initial_signi, self.advanced_cosm };
 
 					return callback(typed_mode, in);
 				}
 				else {
-					const auto in = I { *vars, cosm };
+					const auto in = I { *vars, self.advanced_cosm };
 					return callback(typed_mode, in);
 				}
 			}
@@ -62,6 +60,7 @@ class basic_arena_handle {
 public:
 	maybe_const_ref_t<C, ModeAndRulesType> current_mode;
 	maybe_const_ref_t<C, intercosm> scene;
+	maybe_const_ref_t<C, cosmos> advanced_cosm;
 	maybe_const_ref_t<C, predefined_rulesets> rulesets;
 	const cosmos_solvable_significant& initial_signi;
 
@@ -81,7 +80,7 @@ public:
 				using M = remove_cref<decltype(typed_mode)>;
 
 				if constexpr(std::is_same_v<test_mode, M>) {
-					return scene.world.get_fixed_delta().template in_seconds<double>();
+					return advanced_cosm.get_fixed_delta().template in_seconds<double>();
 				}
 				else {
 					return typed_mode.round_speeds.calc_inv_tickrate();
@@ -121,7 +120,7 @@ public:
 			rulesets
 		);
 
-		target_initial_signi = scene.world.get_solvable().significant;
+		target_initial_signi = advanced_cosm.get_solvable().significant;
 	}
 
 	template <class S>
@@ -162,6 +161,18 @@ public:
 		rulesets.meta.server_default = id;
 		rulesets.meta.playtest_default = id;
 
-		target_initial_signi = scene.world.get_solvable().significant;
+		target_initial_signi = advanced_cosm.get_solvable().significant;
+	}
+
+	template <class Entropy, class Callbacks>
+	void advance(
+		const Entropy& entropy,
+		const Callbacks& callbacks
+	) const {
+		on_mode_with_input(
+			[&](auto& typed_mode, const auto& in) {
+				typed_mode.advance(in, entropy, callbacks);
+			}
+		);
 	}
 };

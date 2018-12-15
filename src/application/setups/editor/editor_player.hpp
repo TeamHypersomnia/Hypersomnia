@@ -14,38 +14,30 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 	auto& settings = in.cmd_in.settings;
 
 	auto step = [this, &folder, &history, in](const auto& applied_entropy) {
-		get_arena_handle(folder).on_mode_with_input(
-			[&](auto& typed_mode, const auto& mode_in) {
-				while (history.has_next_command()) {
-					const auto when_happened = std::visit(
-						[&](const auto& typed_command) {
-							return typed_command.common.when_happened;
-						},
-						history.next_command()
-					);
+		while (history.has_next_command()) {
+			const auto when_happened = std::visit(
+				[&](const auto& typed_command) {
+					return typed_command.common.when_happened;
+				},
+				history.next_command()
+			);
 
-					const auto current_step = get_current_step();
+			const auto current_step = get_current_step();
 
-					ensure_leq(current_step, when_happened);
+			ensure_leq(current_step, when_happened);
 
-					if (current_step == when_happened) {
-						PLR_LOG("Plain redo of a command at %x", current_step);
-						history.editor_history_base::redo(in.cmd_in);
-						continue;
-					}
-					
-					//	PLR_LOG("Next happens at %x, now at %x, so breaking", when_happened, current_step);
-
-					break;
-				}
-
-				typed_mode.advance(
-					mode_in,
-					applied_entropy,
-					in.callbacks
-				);
+			if (current_step == when_happened) {
+				PLR_LOG("Plain redo of a command at %x", current_step);
+				history.editor_history_base::redo(in.cmd_in);
+				continue;
 			}
-		);
+			
+			//	PLR_LOG("Next happens at %x, now at %x, so breaking", when_happened, current_step);
+
+			break;
+		}
+
+		get_arena_handle(folder).advance(applied_entropy, in.callbacks);
 	};
 
 	auto record_entropy = [&](auto& existing_entropy) {

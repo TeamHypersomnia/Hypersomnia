@@ -55,8 +55,8 @@ class client_setup :
 
 	mode_player_id client_player_id;
 
-	cosmos referential_cosmos;
-	online_mode_and_rules referential_mode;
+	cosmos predicted_cosmos;
+	online_mode_and_rules predicted_mode;
 
 	/* The rest is client-specific */
 	sol::state& lua;
@@ -83,8 +83,9 @@ class client_setup :
 	static decltype(auto) get_arena_handle_impl(S& self, const client_arena_type t) {
 		if (t == client_arena_type::PREDICTED) {
 			return H {
-				self.current_mode,
+				self.predicted_mode,
 				self.scene,
+				self.predicted_cosmos,
 				self.rulesets,
 				self.initial_signi
 			};
@@ -93,8 +94,9 @@ class client_setup :
 			ensure_eq(t, client_arena_type::REFERENTIAL);
 
 			return H {
-				self.referential_mode,
+				self.current_mode,
 				self.scene,
+				self.scene.world,
 				self.rulesets,
 				self.initial_signi
 			};
@@ -171,11 +173,7 @@ public:
 			send_client_commands();
 			send_packets_if_its_time();
 
-			get_arena_handle().on_mode_with_input(
-				[&](auto& typed_mode, const auto& in) {
-					typed_mode.advance(in, total, callbacks);
-				}
-			);
+			get_arena_handle().advance(total, callbacks);
 
 			client_time += dt;
 		}

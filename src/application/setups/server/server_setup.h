@@ -80,6 +80,7 @@ class server_setup :
 		return H {
 			self.current_mode,
 			self.scene,
+			self.scene.world,
 			self.rulesets,
 			self.initial_signi
 		};
@@ -182,11 +183,7 @@ public:
 				step_collected += admin_entropy;
 			}
 
-			get_arena_handle().on_mode_with_input(
-				[&](auto& typed_mode, const auto& in) {
-					typed_mode.advance(in, step_collected, callbacks);
-				}
-			);
+			get_arena_handle().advance(step_collected, callbacks);
 
 			++current_simulation_step;
 			server_time += dt;

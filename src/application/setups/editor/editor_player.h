@@ -95,6 +95,7 @@ private:
 		return H {
 			self.current_mode,
 			folder.commanded->work,
+			folder.commanded->work.world,
 			folder.commanded->rulesets,
 			self.before_start.commanded->work.world.get_solvable().significant
 		};
