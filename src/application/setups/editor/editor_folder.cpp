@@ -11,13 +11,14 @@
 #include "game/cosmos/entity_handle.h"
 
 #include "application/arena/arena_utils.h"
+#include "hypersomnia_version.h"
 
 void load_arena_from(
 	const arena_paths& paths,
 	intercosm& scene,
 	predefined_rulesets& rulesets
 ) {
-	scene.load_from_int(paths.int_file);
+	scene.load_from_bytes(paths.int_file);
 
 	try {
 		augs::load_from_bytes(rulesets, paths.rulesets_file);
@@ -72,13 +73,15 @@ void editor_folder::save_folder(const augs::path_type& to, const augs::path_type
 	augs::create_directory(to / maybe_official_path<assets::sound_id>::get_content_suffix());
 	augs::create_directory(paths.default_export_path);
 
-	commanded->work.save_as_int(paths.arena.int_file);
+	commanded->work.save_as_bytes(paths.arena.int_file);
 
 	augs::save_as_bytes(commanded->view_ids, paths.view_ids_file);
 	augs::save_as_bytes(commanded->rulesets, paths.arena.rulesets_file);
 	augs::save_as_bytes(view, paths.view_file);
 	augs::save_as_bytes(history, paths.hist_file);
 	augs::save_as_bytes(player, paths.player_file);
+
+	augs::save_as_text(hypersomnia_version().get_summary(), paths.version_info_file);
 
 	const auto old_autosave_path = paths.autosave_path;
 	augs::remove_directory(old_autosave_path);

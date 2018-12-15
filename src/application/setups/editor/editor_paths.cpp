@@ -27,6 +27,8 @@ editor_paths::editor_paths(
 	default_export_path = target_folder / (project_name + "-export");
 	imported_folder_path = target_folder / (project_name + "-imported");
 
+	version_info_file = in_folder(".version.txt");
+
 	autosave_path = target_folder / "autosave";
 }
 

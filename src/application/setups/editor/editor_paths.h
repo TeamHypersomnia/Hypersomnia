@@ -64,6 +64,8 @@ struct editor_paths {
 	augs::path_type default_export_path;
 	augs::path_type imported_folder_path;
 
+	augs::path_type version_info_file;
+
 	editor_paths(
 		const augs::path_type& target_folder,
 		const std::string& project_name

@@ -6,23 +6,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- cosmos_and_viewables
-- can't we hold 
-	all_image_offsets_array_type
-  in viewables and always refer to offsets from there?
-  it could be passed to the logic step as a reference.
-  we anyway use viewables to populate the logical assets even on the server.
-  
-  - pro/con:
-	- Pro: less memory wasted
-	- Pro: more architecturally pure, probably less to worry during i/o
-	- Pro: don't have to perform cosmos i/o in the context of an intercosm
-	- Con: pain in the ass in passing the ref to it everywhere
-	- Con: possible fetch incurred for reading the array's address
-		- But are image offsets used in performance-critical domains?
-			- Probably not
-		- And we anyways have to fetch cosmos address even when we read from the cosmos
-		- The only downside is that we probably have one more variable to cache but that would be a problem only in critical domains
+- How about we leave the intercosm alone and just provide several free-standing functions that will do the job?
+	- Simply alter the file loaders/savers
+
+- Write cosmos to two files: .comm and .solv
+	- read the .solv into initial solvable
+
+- So let's stick with the array in cosmos approach
+	- Let we have an interosm handle mixin
+	- and an intercosm class which is the simple storage case for the two
+	- Let there be a separation between solvable and common in any case
 
 - intercosm should become a handle of a cosmos + viewables 
 	- it should not force storage of these together.

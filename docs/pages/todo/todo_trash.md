@@ -1054,3 +1054,41 @@ fixtures can form scene graph as they have relative transforms.
 							- Since the client will adjust itself for losses.
 				
 
+
+- cosmos_and_viewables
+- can't we hold 
+	all_image_offsets_array_type
+  in viewables and always refer to offsets from there?
+  it could be passed to the logic step as a reference.
+  we anyway use viewables to populate the logical assets even on the server.
+  
+  - pro/con:
+	- Pro: less memory wasted
+	- Pro: more architecturally pure, probably less to worry during i/o
+	- Pro: don't have to perform cosmos i/o in the context of an intercosm
+	- Con: pain in the ass in passing the ref to it everywhere
+	- Con: possible fetch incurred for reading the array's address
+		- But are image offsets used in performance-critical domains?
+			- Probably not
+		- And we anyways have to fetch cosmos address even when we read from the cosmos
+		- The only downside is that we probably have one more variable to cache but that would be a problem only in critical domains
+	
+	- To be super pure, we might want to never have an array and just always read from the offsets in viewables.
+		- That only introduces a problem in that the cosmos (and the game logic overall) gets to know about things like source image paths.
+		- In the rendering domains, we can read from the viewables and not give it a second thought.
+		- For the cosmos, we can create a struct whose other fields are simply padded.
+			- And then reinterpret cast.
+			- Or just pass in some std function.
+			- You can pass a casted pool, though that's pretty dangerous. Not sure how much.
+	- Pass in a pointer & stride, and use a minimal reader
+		- Perhaps create a template for that
+		- We'll need an indirector pointer and the object pointer
+	- Array provides a lot faster access though, so we might want to make that trade-off
+		- Just not per-cosmos
+		- Let it live in the viewables
+	- Previously, we were romanticizing the cosmos as all that is required for deterministic advance
+		- That is no longer the case, for a while now
+		- That's because there are modes, even entropies, there will be settings for steps, etc etc
+		- So let's just define the cosmos as that which holds solvable + common together so that address for neither has to be fetched every time
+	- Problem: reinference will need this array
+	- even damn direct_attachment_offset...
