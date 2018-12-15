@@ -30,7 +30,7 @@ struct all_viewables_defs {
 	// END GEN INTROSPECTOR
 
 	void clear();
-	void update_relevant(all_logical_assets&);
+	void update_relevant(all_logical_assets&) const;
 };
 
 template <class I, class P>

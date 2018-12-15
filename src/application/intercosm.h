@@ -3,6 +3,7 @@
 #include "game/assets/all_logical_assets.h"
 #include "game/cosmos/cosmos.h"
 #include "view/viewables/all_viewables_defs.h"
+#include "application/arena/intercosm_paths.h"
 
 namespace sol {
 	class state;
@@ -17,6 +18,11 @@ struct test_scene_settings;
 
 struct test_mode_ruleset;
 struct bomb_mode_ruleset;
+
+void post_load_state_correction(
+	cosmos_common_significant&,
+	const all_viewables_defs&
+);
 
 struct intercosm {
 	// GEN INTROSPECTOR struct intercosm
@@ -33,11 +39,8 @@ struct intercosm {
 	);
 #endif
 
-	void load(const intercosm_path_op);
-	void save(const intercosm_path_op) const;
-
-	void load_from_bytes(const augs::path_type&);
-	void save_as_bytes(const augs::path_type&) const;
+	void load_from_bytes(const intercosm_paths&);
+	void save_as_bytes(const intercosm_paths&) const;
 
 	void load_from_lua(const intercosm_path_op);
 	void save_as_lua(const intercosm_path_op) const;

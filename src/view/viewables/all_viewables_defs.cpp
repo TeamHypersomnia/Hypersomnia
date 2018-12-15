@@ -33,7 +33,7 @@ std::optional<I> find_asset_id_by_path(
 }
 
 
-void all_viewables_defs::update_relevant(all_logical_assets& logicals) {
+void all_viewables_defs::update_relevant(all_logical_assets& logicals) const {
 	for_each_id_and_object(
 		image_definitions,
 		[&](const auto id, const auto& l) {

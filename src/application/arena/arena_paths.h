@@ -1,10 +1,11 @@
 #pragma once
 #include "augs/filesystem/path.h"
+#include "application/arena/intercosm_paths.h"
 
 #define ARENAS_DIR "arenas"
 
 struct arena_paths {
-	augs::path_type int_file;
+	intercosm_paths int_paths;
 	augs::path_type rulesets_file;
 
 	arena_paths(

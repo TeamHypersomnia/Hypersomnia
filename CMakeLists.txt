@@ -652,6 +652,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/gui/editor_tutorial_gui.cpp"
 	"src/application/network/network_adapters.cpp"
 	"src/application/arena/arena_paths.cpp"
+	"src/application/arena/intercosm_paths.cpp"
 	"src/augs/misc/compress.cpp"
 )
 

@@ -3,12 +3,11 @@
 arena_paths::arena_paths(
 	const augs::path_type& target_folder,
 	const std::string& arena_name
-) {
+) : int_paths(target_folder, arena_name) {
 	auto in_folder = [&](const auto ext) {
 		return target_folder / (arena_name + ext);
 	};
 
-	int_file = in_folder(".int");
 	rulesets_file = in_folder(".rulesets");
 }
 

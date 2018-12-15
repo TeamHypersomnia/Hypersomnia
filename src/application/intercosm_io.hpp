@@ -10,10 +10,6 @@
 #endif
 
 namespace augs {
-	/* 
-		The cosmos will only ever be read/written in the context of an intercosm. 
-	*/
-
 	template <class Archive>
 	void write_object_bytes(Archive& into, const cosmos& cosm) {
 		auto& profiler = cosm.profiler;
@@ -39,21 +35,35 @@ namespace augs {
 		}
 	}
 
+	/* 
+		The cosmos will only ever be read/written in the context of an intercosm. 
+		It will be refreshed (reinferred) by the i/o logic when it is the time.
+	*/
+
+	template <class Archive>
+	void read_signi_bytes(Archive& from, cosmos& cosm) {
+		cosmic::change_solvable_significant(cosm, [&](cosmos_solvable_significant& significant) {
+			augs::read_bytes(from, significant);
+			return changer_callback_result::DONT_REFRESH;
+		});
+	}
+
+	template <class Archive>
+	void read_common_bytes(Archive& from, cosmos& cosm) {
+		cosm.change_common_significant([&](cosmos_common_significant& common) {
+			augs::read_bytes(from, common);
+			return changer_callback_result::DONT_REFRESH;
+		});
+	}
+
 	template <class Archive>
 	void read_object_bytes(Archive& from, cosmos& cosm) {
 		auto& profiler = cosm.profiler;
 
 		auto scope = measure_scope(profiler.deserialization_pass);
 
-		cosm.change_common_significant([&](cosmos_common_significant& common) {
-			augs::read_bytes(from, common);
-			return changer_callback_result::DONT_REFRESH;
-		});
-
-		cosmic::change_solvable_significant(cosm, [&](cosmos_solvable_significant& significant) {
-			augs::read_bytes(from, significant);
-			return changer_callback_result::DONT_REFRESH;
-		});
+		read_common_bytes(from, cosm);
+		read_signi_bytes(from, cosm);
 	}
 
 	template <class Archive>

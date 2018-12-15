@@ -56,9 +56,28 @@ the meaning of which is as follows:
 
 	  This is to ensure that your project folder has everything it needs to be opened on another machine.
 
-- File: ``Project.int``.
-	- A binary blob representing your game world. 
-	  ".int" refers to an "intercosm" (a short for an "Interactive cosmos") file format. 
+- File: ``Project.solv``.
+	- A binary blob. ".solv" refers to an "solvable", which means that this state 
+	  is subject to "solving" as the gameplay goes forward in time.
+	  Here we keep object "instances" and their positions, sizes, rotations, 
+	  current velocities and so on.
+	  This stuff gets compressed and sent through the network each time a player joins the game.
+	  This is because the client has to know the initial state to be able to simulate the game forward.
+	  The client loads all other files locally, from its own pre-downloaded arena folder.
+      It MUST exist at the time the editor opens a project folder.
+	  You should not delete or otherwise alter it.
+
+- File: ``Project.comm``.
+	- A binary blob. ".comm" refers to "common", which means that this state 
+	  is shared by all entities from within the "Project.solv" file.
+	  Here we keep data like fire rate, muzzle velocity, what sounds to play
+	  on death, on shot, and overall things unalterable during proper gameplay.
+      It MUST exist at the time the editor opens a project folder.
+	  You should not delete or otherwise alter it.
+
+- File: ``Project.viewables``.
+	- A binary blob. Here we store all asset definitions, along with their paths.
+	  Other examples include image offsets, neon map parameters etc.
       It MUST exist at the time the editor opens a project folder.
 	  You should not delete or otherwise alter it.
 

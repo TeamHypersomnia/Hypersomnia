@@ -96,10 +96,15 @@ void intercosm::save_as_lua(const intercosm_path_op op) const {
 	augs::save_as_lua_table(op.lua, *this, op.path);
 }
 
+void post_load_state_correction(
+	cosmos_common_significant& common,
+	const all_viewables_defs& viewables
+) {
+	viewables.update_relevant(common.logical_assets);
+}
+
 void intercosm::post_load_state_correction() {
 	world.change_common_significant([&](cosmos_common_significant& common) {
-		(void)common;
-
 		/*
 			The field:
 				all_image_offsets_array_type image_offsets;
@@ -107,7 +112,7 @@ void intercosm::post_load_state_correction() {
 			Resides outside of the logical assets' introspection so that it is never written to hdd.
 		*/
 
-		viewables.update_relevant(common.logical_assets);
+		::post_load_state_correction(common, viewables);
 
 		return changer_callback_result::DONT_REFRESH;
 	});
@@ -119,12 +124,26 @@ void intercosm::load_from_lua(const intercosm_path_op op) {
 	augs::load_from_lua_table(op.lua, *this, op.path);
 }
 
-void intercosm::save_as_bytes(const augs::path_type& path) const {
-	augs::save_as_bytes(*this, path);
+void intercosm::save_as_bytes(const intercosm_paths& paths) const {
+	augs::save_as_bytes(viewables, paths.viewables_file);
+	augs::save_as_bytes(world.get_common_significant(), paths.comm_file);
+	augs::save_as_bytes(world.get_solvable().significant, paths.solv_file);
 }
 
-void intercosm::load_from_bytes(const augs::path_type& path) {
-	augs::load_from_bytes(*this, path);
+void intercosm::load_from_bytes(const intercosm_paths& paths) {
+	augs::load_from_bytes(viewables, paths.viewables_file);
+
+	world.change_common_significant([&](cosmos_common_significant& common) {
+		augs::load_from_bytes(common, paths.comm_file);
+		return changer_callback_result::DONT_REFRESH;
+	});
+
+	cosmic::change_solvable_significant(world, [&](cosmos_solvable_significant& significant) {
+		augs::load_from_bytes(significant, paths.solv_file);
+		return changer_callback_result::DONT_REFRESH;
+	});
+
+	post_load_state_correction();
 }
 
 void intercosm::update_offsets_of(const assets::image_id& id, const changer_callback_result result) {

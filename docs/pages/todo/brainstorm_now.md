@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- how about a brute-force set of loading functions and just 
+
 - How about we leave the intercosm alone and just provide several free-standing functions that will do the job?
 	- Simply alter the file loaders/savers
 

@@ -18,7 +18,7 @@ void load_arena_from(
 	intercosm& scene,
 	predefined_rulesets& rulesets
 ) {
-	scene.load_from_bytes(paths.int_file);
+	scene.load_from_bytes(paths.int_paths);
 
 	try {
 		augs::load_from_bytes(rulesets, paths.rulesets_file);
@@ -60,7 +60,7 @@ void editor_folder::save_folder(const augs::path_type& to, const editor_save_typ
 void editor_folder::save_folder(const augs::path_type& to, const augs::path_type name, const editor_save_type mode) const {
 	const auto paths = editor_paths(to, name);
 
-	augs::create_directories_for(paths.arena.int_file);
+	augs::create_directories_for(paths.version_info_file);
 
 	if (mode == editor_save_type::ONLY_VIEW) {
 		augs::save_as_bytes(view, paths.view_file);
@@ -73,7 +73,7 @@ void editor_folder::save_folder(const augs::path_type& to, const augs::path_type
 	augs::create_directory(to / maybe_official_path<assets::sound_id>::get_content_suffix());
 	augs::create_directory(paths.default_export_path);
 
-	commanded->work.save_as_bytes(paths.arena.int_file);
+	commanded->work.save_as_bytes(paths.arena.int_paths);
 
 	augs::save_as_bytes(commanded->view_ids, paths.view_ids_file);
 	augs::save_as_bytes(commanded->rulesets, paths.arena.rulesets_file);
@@ -81,7 +81,7 @@ void editor_folder::save_folder(const augs::path_type& to, const augs::path_type
 	augs::save_as_bytes(history, paths.hist_file);
 	augs::save_as_bytes(player, paths.player_file);
 
-	augs::save_as_text(hypersomnia_version().get_summary(), paths.version_info_file);
+	augs::save_as_text(paths.version_info_file, hypersomnia_version().get_summary());
 
 	const auto old_autosave_path = paths.autosave_path;
 	augs::remove_directory(old_autosave_path);
@@ -98,8 +98,6 @@ void editor_folder::load_folder(const augs::path_type& from) {
 void editor_folder::load_folder(const augs::path_type& from, const augs::path_type& name) {
 	const auto paths = editor_paths(from, name);
 
-	const auto& int_path = paths.arena.int_file;
-
 	try {
 		load_arena_from(
 			paths.arena,
@@ -111,7 +109,7 @@ void editor_folder::load_folder(const augs::path_type& from, const augs::path_ty
 		editor_popup p;
 
 		p.title = "Error";
-		p.message = typesafe_sprintf("A problem occured when trying to load %x.", augs::filename_first(int_path));
+		p.message = typesafe_sprintf("A problem occured when trying to load project folder \"%x\".", augs::filename_first(from));
 		p.details = err.what();
 
 		throw p;

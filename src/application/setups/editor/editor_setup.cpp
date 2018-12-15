@@ -978,7 +978,7 @@ void editor_setup::go_to_entity() {
 }
 
 void editor_setup::reveal_in_explorer(const augs::window& window) {
-	window.reveal_in_explorer(folder().get_paths().arena.int_file);
+	window.reveal_in_explorer(folder().get_paths().version_info_file);
 }
 
 void editor_setup::new_tab() {
