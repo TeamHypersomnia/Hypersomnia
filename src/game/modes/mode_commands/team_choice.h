@@ -6,5 +6,9 @@ namespace mode_commands {
 		// GEN INTROSPECTOR struct mode_commands::team_choice
 		faction_type target_team = faction_type::COUNT;
 		// END GEN INTROSPECTOR
+
+		bool operator==(const team_choice& b) const {
+			return target_team == b.target_team;
+		}
 	};
 }

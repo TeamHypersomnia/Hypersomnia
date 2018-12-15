@@ -32,7 +32,7 @@ void client_setup::init_connection(const client_start_input& in) {
 }
 
 client_setup::~client_setup() {
-	client->disconnect();
+	disconnect();
 }
 
 net_time_t client_setup::get_current_time() {
@@ -119,7 +119,7 @@ message_handler_result client_setup::handle_server_message(
 	else if constexpr (std::is_same_v<T, initial_payload>) {
 		if (state != client_state_type::RECEIVING_INITIAL_STATE) {
 			log_malicious_server();
-			client->disconnect();
+			disconnect();
 		}
 
 		uint32_t read_client_id;
@@ -163,24 +163,19 @@ void client_setup::handle_server_messages() {
 	client->advance(client_time, message_handler);
 }
 
-void client_setup::send_client_commands() {
-	if (client->is_connected()) {
-		using C = client_state_type;
-		const bool init_send = state == C::INVALID;
+void client_setup::send_pending_commands() {
+	using C = client_state_type;
 
-		if (resend_requested_settings || init_send) {
-			client->send_payload(
-				game_channel_type::CLIENT_COMMANDS,
-				std::as_const(requested_settings)
-			);
+	const bool init_send = state == C::INVALID;
 
-			if (init_send) {
-				state = client_state_type::PENDING_WELCOME;
-			}
-		}
+	if (resend_requested_settings || init_send) {
+		client->send_payload(
+			game_channel_type::CLIENT_COMMANDS,
+			std::as_const(requested_settings)
+		);
 
-		if (state == C::IN_GAME) {
-
+		if (init_send) {
+			state = client_state_type::PENDING_WELCOME;
 		}
 	}
 }
@@ -190,7 +185,9 @@ void client_setup::send_packets_if_its_time() {
 }
 
 void client_setup::log_malicious_server() {
-
+#if !IS_PRODUCTION_BUILD
+	ensure(false && "Server has sent some invalid data.");
+#endif
 }
 
 void client_setup::perform_custom_imgui(
@@ -247,4 +244,21 @@ void client_setup::apply(const config_lua_table& cfg) {
 	r.chosen_nickname = vars.nickname;
 	r.net = vars.net;
 	r.public_settings.mouse_sensitivity = cfg.input.mouse_sensitivity;
+}
+
+bool client_setup::is_connected() const {
+	return client->is_connected();
+}
+
+void client_setup::send_to_server(
+	const total_client_entropy& new_local_entropy
+) {
+	client->send_payload(
+		game_channel_type::CLIENT_COMMANDS,
+		new_local_entropy
+	);
+}
+
+void client_setup::disconnect() {
+	client->disconnect();
 }

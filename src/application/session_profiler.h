@@ -16,9 +16,8 @@ struct network_profiler : public augs::profiler_mixin<network_profiler> {
 	network_profiler();
 
 	// GEN INTROSPECTOR struct network_profiler
-	augs::time_measurements unpack_remote_steps;
-	augs::time_measurements sending_commands_and_predict;
-	augs::time_measurements sending_packets;
-	augs::time_measurements remote_entropy;
+	augs::time_measurements unpacking_remote_steps;
+	augs::time_measurements sending_messages;
+	augs::time_measurements receiving_messages;
 	// END GEN INTROSPECTOR
 };

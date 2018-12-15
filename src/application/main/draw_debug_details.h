@@ -7,6 +7,7 @@ struct cosmic_profiler;
 struct audiovisual_profiler;
 struct frame_profiler;
 struct atlas_profiler;
+struct network_profiler;
 
 namespace augs {
 	struct drawer;
@@ -19,6 +20,7 @@ void draw_debug_details(
 	const vec2i screen_size,
 	const const_entity_handle viewed_character,
 	const frame_profiler& frame_performance,
+	const network_profiler& network_performance,
 	const viewables_streaming_profiler& streaming_performance,
 	const atlas_profiler& general_atlas_performance,
 	const session_profiler& session_performance,

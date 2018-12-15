@@ -85,6 +85,7 @@ int work(const int argc, const char* const * const argv) try {
 	bool until_first_swap_measured = false;
 
 	static session_profiler performance;
+	static network_profiler network_performance;
 
 	LOG("Started at %x", augs::date_time().get_readable());
 	LOG("Working directory: %x", augs::get_current_working_directory());
@@ -780,14 +781,40 @@ int work(const int argc, const char* const * const argv) try {
 			setup_post_solve(step, viewing_config);
 		};
 
-		setup.advance(
-			{ frame_delta, window.get_screen_size(), viewing_config.input },
-			solver_callbacks(
-				setup_pre_solve,
-				setup_audiovisual_post_solve,
-				setup_post_cleanup
-			)
-		);
+		{
+			using S = remove_cref<decltype(setup)>;
+
+			if constexpr(std::is_same_v<S, client_setup>) {
+				/* The client needs more goodies */
+
+				setup.advance(
+					{ 
+						window.get_screen_size(), 
+						viewing_config.input, 
+						viewing_config.simulation_receiver, 
+						network_performance, 
+						get_audiovisuals().get<interpolation_system>(),
+						get_audiovisuals().get<past_infection_system>()
+					},
+					solver_callbacks(
+						setup_pre_solve,
+						setup_audiovisual_post_solve,
+						setup_post_cleanup
+					)
+				);
+			}
+			else {
+				setup.advance(
+					{ frame_delta, window.get_screen_size(), viewing_config.input },
+					solver_callbacks(
+						setup_pre_solve,
+						setup_audiovisual_post_solve,
+						setup_post_cleanup
+					)
+				);
+			}
+		}
+
 
 		get_audiovisuals().randomizing.last_frame_delta = frame_delta;
 		audiovisual_step(frame_delta, setup.get_audiovisual_speed(), viewing_config);
@@ -1660,6 +1687,7 @@ int work(const int argc, const char* const * const argv) try {
 				screen_size,
 				viewed_character,
 				frame_performance,
+				network_performance,
 				streaming.performance,
 				streaming.general_atlas_performance,
 				performance,

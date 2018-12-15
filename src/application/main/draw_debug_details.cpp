@@ -19,6 +19,7 @@ void draw_debug_details(
 	const vec2i screen_size,
 	const const_entity_handle viewed_character,
 	const frame_profiler& frame_performance,
+	const network_profiler& network_performance,
 	const viewables_streaming_profiler& streaming_performance,
 	const atlas_profiler& general_atlas_performance,
 	const session_profiler& session_performance,
@@ -95,6 +96,9 @@ void draw_debug_details(
 	total_details += { session_performance.summary(), text_style };
 	total_details += { "Frame\n", category_style };
 	total_details += { frame_performance.summary(), text_style };
+
+	total_details += { "Network\n", category_style };
+	total_details += { network_performance.summary(), text_style };
 
 	total_details += { "Cosmos\n", category_style };
 

@@ -58,6 +58,15 @@ struct entropy_accumulator {
 	}
 
 	template <class E>
+	auto assemble_for(
+		const E& handle,
+		const mode_player_id& m_id,
+		const input in
+	) const {
+		return assemble(handle, m_id, in).get_for(handle, m_id);
+	}
+
+	template <class E>
 	auto extract(
 		const E& handle,
 		const mode_player_id& m_id,

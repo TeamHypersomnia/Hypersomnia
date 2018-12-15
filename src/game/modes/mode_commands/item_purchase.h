@@ -9,5 +9,12 @@ namespace mode_commands {
 		item_flavour_id item;
 		spell_id spell;
 		// END GEN INTROSPECTOR
+
+		bool operator==(const item_purchase& b) const {
+			return 
+				item == b.item
+				&& spell == b.spell
+			;
+		}
 	};
 }

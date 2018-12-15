@@ -1092,3 +1092,83 @@ fixtures can form scene graph as they have relative transforms.
 		- So let's just define the cosmos as that which holds solvable + common together so that address for neither has to be fetched every time
 	- Problem: reinference will need this array
 	- even damn direct_attachment_offset...
+
+- We must reconciliate on when there is more than 1 command accepted,
+  even if the effectively applied entropies match,
+  because we must effectively move backward in time.
+- If there are no commands accepted, we must immediately nudge into the future
+  because if we reconcile later we will be suddenly shot off into the future with a lot of unconfirmed commands
+- when we reconcilliate due to < 1 or > 1 of commands accepted, 
+  we effectively need to nudge a little into the future or into the past.
+  It may so happen that the commands were the same either way.
+  We can possibly save on the amount of steps by checking if the predicted cosmos 
+- We must reconciliate on when there are no commands accepted, 
+  even if the effectively applied entropies match,
+  because 
+
+- Proposition:
+	- Total # of accepted determines how far ahead of the referential we need to be
+		- The less, the more into the future
+
+	- initially, current future offset is the # of entries in predicted entropies, as it determines how far we went with prediction
+	- if # of accepted equals # of incoming, there is no change in offset
+	- We can firstly sum all # accepted
+		- plus the incoming, determines how far ahead the  
+
+- All cases, assuming generally one server step arrives per sim step
+  "matches" = what was given to the referential matches to what was predicted
+	- 1 accepted and matches
+		- Peel off the front of predicted
+		- Leave predicted in-tact
+	- 1 accepted and mismatch (e.g. due to others)
+		- Peel off the front of predicted
+		- Re-predict
+	- 0 accepted and match
+		- Don't peel off the front
+		- Technically, same entropy was fed to the referential THIS ONCE
+			- But now we need to immediately move into the future a little
+			- so e.g. apply some non-zero entropies a little later than we predicted
+			- entropies of others are always zero during prediction
+			- it would only happen if the player was inactive for RTT, but if a vector of predicted entropies rotated by one would match like this:
+				ABCD
+				 ABCD (moved by one)
+				
+				ABCD
+				 ABC
+
+			  in that A = B, C = B, D = C
+			- then we would only need to re-simulate D on top of the predicted cosmos,
+			  instead of re-assigning the referential cosmos and re-simulate all pending entropies.
+
+			  This is only a performance optimization anyway.
+	- 0 accepted and mismatch
+		- Don't peel off the front
+		- Re-predict
+	- > 1 accepted and match
+		- ABCD
+          BCD
+		- Since we need to move into the past we need to re-predict all the more than when we need to go into the future.
+	- Once we need to re-predict, we don't even need to check against matches. It just doesn't matter.
+
+- Confusion might've come from the fact that we also used "Re-predict" or "reconcile" to also mean re-syncing of the timing,
+	- which re-assigning the referential cosmos and playing all predicted on top of it indeed does.
+
+
+## intercosm/viewables in cosmos
+
+- how about a brute-force set of loading functions and just 
+
+- How about we leave the intercosm alone and just provide several free-standing functions that will do the job?
+	- Simply alter the file loaders/savers
+
+- Write cosmos to two files: .comm and .solv
+	- read the .solv into initial solvable
+
+- So let's stick with the array in cosmos approach
+	- Let we have an interosm handle mixin
+	- and an intercosm class which is the simple storage case for the two
+	- Let there be a separation between solvable and common in any case
+
+- intercosm should become a handle of a cosmos + viewables 
+	- it should not force storage of these together.
+

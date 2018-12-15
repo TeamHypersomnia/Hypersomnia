@@ -66,6 +66,10 @@ entity_id server_setup::get_viewed_character_id() const {
 
 void server_setup::log_malicious_client(const client_id_type id) {
 	LOG("Malicious client detected. Details:\n%x", describe_client(id));
+
+#if !IS_PRODUCTION_BUILD
+	ensure(false && "Client has sent some invalid data.");
+#endif
 }
 
 std::string server_setup::describe_client(const client_id_type id) const {
@@ -414,7 +418,7 @@ void server_setup::handle_client_messages() {
 	server->advance(server_time, message_handler);
 }
 
-void server_setup::send_server_step_entropies() {
+void server_setup::send_server_step_entropies(const server_step_entropy& total) {
 	for (auto& c : clients) {
 		if (!c.is_set()) {
 			continue;
@@ -425,6 +429,7 @@ void server_setup::send_server_step_entropies() {
 
 		server_step_entropy_for_client for_client;
 		for_client.num_entropies_accepted = c.num_entropies_accepted;
+		for_client.total = total;
 
 		server->send_payload(
 			client_id, 

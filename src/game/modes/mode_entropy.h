@@ -26,6 +26,8 @@ struct mode_player_entropy {
 	bool empty() const;
 
 	mode_player_entropy& operator+=(const mode_player_entropy&);
+
+	bool operator==(const mode_player_entropy&) const;
 };
 
 struct total_mode_player_entropy {
@@ -51,6 +53,8 @@ struct mode_entropy_general {
 
 	void clear();
 	bool empty() const;
+
+	bool operator==(const mode_entropy_general&) const;
 };
 
 struct mode_entropy {
@@ -72,7 +76,9 @@ struct mode_entropy {
 	);
 
 	total_mode_player_entropy get_for(
-		mode_player_id,
-		entity_id
+		entity_id,
+		mode_player_id
 	) const;
+
+	bool operator==(const mode_entropy&) const;
 };

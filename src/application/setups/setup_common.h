@@ -17,6 +17,23 @@ struct setup_advance_input {
 	const input_settings& settings;
 };
 
+struct simulation_receiver_settings;
+class interpolation_system;
+class past_infection_system;
+struct network_profiler;
+
+struct client_advance_input {
+	const vec2i& screen_size;
+	const input_settings& settings;
+
+	const simulation_receiver_settings& simulation_receiver;
+
+	network_profiler& network_performance;
+
+	interpolation_system& interp;
+	past_infection_system& past_infection;
+};
+
 namespace augs {
 	class window;
 }

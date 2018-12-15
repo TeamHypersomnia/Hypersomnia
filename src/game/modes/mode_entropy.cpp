@@ -26,8 +26,8 @@ void mode_entropy::accumulate(
 }
 
 total_mode_player_entropy mode_entropy::get_for(
-	const mode_player_id m_id,
-	const entity_id id
+	const entity_id id,
+	const mode_player_id m_id
 ) const {
 	total_mode_player_entropy out;
 
@@ -125,4 +125,27 @@ mode_entropy& mode_entropy::operator+=(const mode_entropy& b) {
 	general += b.general;
 
 	return *this;
+}
+
+bool mode_entropy::operator==(const mode_entropy& b) const {
+	return 
+		general == b.general
+		&& players == b.players
+		&& cosmic == b.cosmic
+	;
+}
+
+bool mode_entropy_general::operator==(const mode_entropy_general& b) const {
+	return 
+		added_player == b.added_player
+		&& removed_player == b.removed_player
+		&& special_command == b.special_command
+	;
+}
+
+bool mode_player_entropy::operator==(const mode_player_entropy& b) const {
+	return 
+		team_choice == b.team_choice
+		&& item_purchase == b.item_purchase
+	;
 }

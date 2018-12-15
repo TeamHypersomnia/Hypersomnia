@@ -2434,3 +2434,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- has to operate on a dirty context pointer instead of our own serialization routine
 			- e.g. when the message ultimately serializes for sending the client ids on the server might be different than what will happen at the client
 
+- ESC for closing buy menu and team selection
+
+- Instead of adding a flag to reinfer, 
+  can't client simply reinfer any time that a player is added to the mode?

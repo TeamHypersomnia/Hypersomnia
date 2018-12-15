@@ -86,7 +86,7 @@ namespace net_messages {
 	}
 
 	inline bool client_entropy::write_payload(
-		total_client_entropy&& input
+		const total_client_entropy& input
 	) {
 		return unsafe_write_message(*this, input);
 	}

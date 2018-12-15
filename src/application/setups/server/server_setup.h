@@ -88,7 +88,7 @@ class server_setup :
 
 	void handle_client_messages();
 	void advance_clients_state();
-	void send_server_step_entropies();
+	void send_server_step_entropies(const server_step_entropy& total);
 	void send_packets_if_its_time();
 
 	void accept_entropy_of_client(
@@ -169,8 +169,6 @@ public:
 
 			handle_client_messages();
 			advance_clients_state();
-			send_server_step_entropies();
-			send_packets_if_its_time();
 
 			/* Extract entropy from the built-in server player */
 			{
@@ -182,6 +180,9 @@ public:
 
 				step_collected += admin_entropy;
 			}
+
+			send_server_step_entropies(step_collected);
+			send_packets_if_its_time();
 
 			get_arena_handle().advance(step_collected, callbacks);
 

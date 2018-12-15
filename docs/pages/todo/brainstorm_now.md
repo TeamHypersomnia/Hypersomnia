@@ -6,33 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- how about a brute-force set of loading functions and just 
-
-- How about we leave the intercosm alone and just provide several free-standing functions that will do the job?
-	- Simply alter the file loaders/savers
-
-- Write cosmos to two files: .comm and .solv
-	- read the .solv into initial solvable
-
-- So let's stick with the array in cosmos approach
-	- Let we have an interosm handle mixin
-	- and an intercosm class which is the simple storage case for the two
-	- Let there be a separation between solvable and common in any case
-
-- intercosm should become a handle of a cosmos + viewables 
-	- it should not force storage of these together.
+- dont use audiovisual callbacks for re-predicting
 
 - yojimbo_assert( length < buffer_size - 1 );
-	- reoprt a bug?
+	- report a bug?
 
 - Detect when the initial state is being sent to optionally display progress
 	- Possibly by returning some info from ReceiveBlockData struct
-
-- ESC for closing buy menu and team selection
-
-- Instead of adding a flag to reinfer, 
-  can't client simply reinfer any time that a player is added to the mode?
-  E.g. always after the step
 
 - Clear cosmic entropy when the player is not conscious
 	- So that others are not allowed to waste bandwidth when they are dead

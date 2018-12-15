@@ -85,7 +85,7 @@ namespace net_messages {
 		static constexpr bool server_to_client = false;
 		static constexpr bool client_to_server = true;
 
-		bool write_payload(total_client_entropy&&);
+		bool write_payload(const total_client_entropy&);
 		bool read_payload(total_client_entropy&);
 	};
 

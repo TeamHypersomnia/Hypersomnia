@@ -8,12 +8,24 @@ struct add_player_input {
 	entity_name_str name;
 	faction_type faction = faction_type::SPECTATOR;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const add_player_input& b) const {
+		return 
+			id == b.id
+			&& name == b.name
+			&& faction == b.faction
+		;
+	}
 };
 
 struct mode_restart_command {
 	// GEN INTROSPECTOR struct mode_restart_command
 	pad_bytes<1> pad;
 	// END GEN INTROSPECTOR
+
+	bool operator==(const mode_restart_command&) const {
+		return true;
+	}
 };
 
 using all_general_mode_commands_variant = std::variant<

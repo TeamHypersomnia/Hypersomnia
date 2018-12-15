@@ -64,6 +64,12 @@ public:
 	maybe_const_ref_t<C, predefined_rulesets> rulesets;
 	const cosmos_solvable_significant& initial_signi;
 
+	template <class T>
+	void assign_all_solvables(const T& from) const {
+		advanced_cosm = from.advanced_cosm;
+		current_mode = from.current_mode;
+	}
+
 	template <class... Args>
 	decltype(auto) on_mode_with_input(Args&&... args) const {
 		return this->on_mode_with_input_impl(*this, std::forward<Args>(args)...);
@@ -174,5 +180,9 @@ public:
 				typed_mode.advance(in, entropy, callbacks);
 			}
 		);
+	}
+
+	auto& get_cosmos() const {
+		return advanced_cosm;
 	}
 };

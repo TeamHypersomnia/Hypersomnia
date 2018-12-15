@@ -648,6 +648,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/setups/editor/editor_player.cpp"
 	"src/game/modes/mode_entropy.cpp"
 	"src/application/input/adjust_game_motions.cpp"
+	"src/application/network/simulation_receiver.cpp"
 	"src/game/modes/arena_mode.cpp"
 	"src/application/setups/editor/gui/editor_tutorial_gui.cpp"
 	"src/application/network/network_adapters.cpp"

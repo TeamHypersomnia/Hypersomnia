@@ -21,7 +21,7 @@ static void spawn_bullet_remnants(
 
 	shuffle_range(flavours, rng.generator);
 
-	int total_spawned = std::min(static_cast<int>(flavours.size()), 2);
+	auto total_spawned = std::min(static_cast<int>(flavours.size()), 1);
 
 	auto how_many_along_normal = rng.randval(total_spawned - 1, total_spawned);
 

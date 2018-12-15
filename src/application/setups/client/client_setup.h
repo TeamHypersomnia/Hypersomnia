@@ -26,6 +26,9 @@
 #include "application/network/client_state_type.h"
 #include "application/network/requested_client_settings.h"
 
+#include "application/network/simulation_receiver.h"
+#include "application/session_profiler.h"
+
 struct config_lua_table;
 
 class client_adapter;
@@ -60,6 +63,8 @@ class client_setup :
 
 	/* The rest is client-specific */
 	sol::state& lua;
+
+	simulation_receiver receiver;
 
 	client_start_input last_start;
 	client_state_type state = client_state_type::INVALID;
@@ -104,13 +109,15 @@ class client_setup :
 	}
 
 	void handle_server_messages();
-	void send_client_commands();
+	void send_pending_commands();
 	void send_packets_if_its_time();
 
 	template <class T, class F>
 	message_handler_result handle_server_message(
 		F&& read_payload
 	);
+
+	void send_to_server(const total_client_entropy&);
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -154,28 +161,95 @@ public:
 	double get_audiovisual_speed() const;
 	double get_inv_tickrate() const;
 
-	template <class C>
+	template <class Callbacks>
 	void advance(
-		const setup_advance_input& in,
-		const C& callbacks
+		const client_advance_input& in,
+		const Callbacks& callbacks
 	) {
+		using C = client_state_type;
+
+		auto& performance = in.network_performance;
+
 		const auto current_time = get_current_time();
 		const auto dt = get_inv_tickrate();
 
 		while (client_time <= current_time) {
-			const auto total = total_collected.extract(
+			const auto currently_controlled_character = get_viewed_character();
+
+			const auto new_local_entropy = total_collected.extract(
 				get_viewed_character(), 
 				get_local_player_id(), 
 				{ in.settings, in.screen_size }
 			);
-			
-			handle_server_messages();
-			send_client_commands();
-			send_packets_if_its_time();
 
-			get_arena_handle().advance(total, callbacks);
+			{
+				auto scope = measure_scope(performance.receiving_messages);
+				handle_server_messages();
+			}
+
+			const bool in_game = is_connected() && state == C::IN_GAME;
+
+			if (is_connected()) {
+				send_pending_commands();
+
+				if (in_game) {
+					const auto new_client_entropy = new_local_entropy.get_for(
+						get_viewed_character(), 
+						get_local_player_id()
+					);
+
+					send_to_server(new_client_entropy);
+
+					receiver.predicted_entropies.push_back(new_local_entropy);
+				}
+			}
+
+			{
+				auto scope = measure_scope(performance.sending_messages);
+				send_packets_if_its_time();
+			}
+
+			if (in_game) {
+				{
+					auto scope = measure_scope(performance.unpacking_remote_steps);
+
+					auto referential_arena = get_arena_handle(client_arena_type::REFERENTIAL);
+					auto predicted_arena = get_arena_handle(client_arena_type::PREDICTED);
+
+					auto advance_referential = [&](const auto& entropy) {
+						referential_arena.advance(entropy, solver_callbacks());
+					};
+
+					auto advance_predicted = [&](const auto& entropy) {
+						predicted_arena.advance(entropy, callbacks);
+					};
+
+					const auto result = receiver.unpack_deterministic_steps(
+						in.simulation_receiver,
+						in.interp,
+						in.past_infection,
+
+						currently_controlled_character,
+
+						referential_arena,
+						predicted_arena,
+
+						advance_referential,
+						advance_predicted
+					);
+
+					if (result.malicious_server) {
+						log_malicious_server();
+						disconnect();
+					}
+				}
+
+				get_arena_handle().advance(new_local_entropy, callbacks);
+			}
 
 			client_time += dt;
+
+			total_collected.clear();
 		}
 	}
 
@@ -204,4 +278,7 @@ public:
 	online_arena_handle<true> get_arena_handle(client_arena_type = client_arena_type::PREDICTED) const;
 
 	void log_malicious_server();
+
+	bool is_connected() const;
+	void disconnect();
 };
