@@ -114,7 +114,11 @@ message_handler_result client_setup::handle_server_message(
 		const auto& new_vars = payload;
 
 		if (are_initial_vars) {
+			LOG("Received initial vars from the server");
 			state = client_state_type::RECEIVING_INITIAL_STATE;
+		}
+		else {
+			LOG("Received corrected vars from the server");
 		}
 
 		if (are_initial_vars || sv_vars.current_arena != new_vars.current_arena) {
@@ -133,8 +137,9 @@ message_handler_result client_setup::handle_server_message(
 	}
 	else if constexpr (std::is_same_v<T, initial_payload>) {
 		if (state != client_state_type::RECEIVING_INITIAL_STATE) {
+			LOG("The server has sent initial state early (state: %x). Disconnecting.", state);
 			log_malicious_server();
-			disconnect();
+			return abort_v;
 		}
 
 		uint32_t read_client_id;
@@ -158,11 +163,22 @@ message_handler_result client_setup::handle_server_message(
 
 		client_player_id = static_cast<mode_player_id>(read_client_id);
 
+		LOG("Received initial state from the server");
+
 		state = client_state_type::IN_GAME;
 	}
 	else if constexpr (std::is_same_v<T, server_step_entropy_for_client>) {
-		const auto num_accepted = payload.num_entropies_accepted;
-		(void)num_accepted;
+		if (state != client_state_type::IN_GAME) {
+			LOG("The server has sent entropy too early (state: %x). Disconnecting.", state);
+
+			log_malicious_server();
+			return abort_v;
+		}
+
+		receiver.acquire_next_server_entropy(payload);
+
+		//LOG("Received %x th entropy from the server", receiver.incoming_entropies.size());
+		//LOG_NVPS(payload.num_entropies_accepted);
 	}
 	else {
 		static_assert(always_false_v<T>, "Unhandled payload type.");
@@ -190,7 +206,11 @@ void client_setup::send_pending_commands() {
 		);
 
 		if (init_send) {
+			LOG("Sent initial client configuration to the server.");
 			state = client_state_type::PENDING_WELCOME;
+		}
+		else {
+			LOG("Sent repeated client configuration to the server.");
 		}
 	}
 }
@@ -236,19 +256,31 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			}
 		}
 		else if (client->has_connection_failed()) {
-			text("Failed to establish connection with %x.", last_start.ip_port);
+			if (state == C::IN_GAME) {
+				text("You have been kicked from the server.");
 
-			text("\n");
-			ImGui::Separator();
+				text("\n");
+				ImGui::Separator();
 
-			if (ImGui::Button("Retry")) {
-				init_connection(last_start);
+				if (ImGui::Button("Go back")) {
+					return custom_imgui_result::GO_TO_MAIN_MENU;
+				}
 			}
+			else {
+				text("Failed to establish connection with %x.", last_start.ip_port);
 
-			ImGui::SameLine();
+				text("\n");
+				ImGui::Separator();
 
-			if (ImGui::Button("Go back")) {
-				return custom_imgui_result::GO_TO_MAIN_MENU;
+				if (ImGui::Button("Retry")) {
+					init_connection(last_start);
+				}
+
+				ImGui::SameLine();
+
+				if (ImGui::Button("Go back")) {
+					return custom_imgui_result::GO_TO_MAIN_MENU;
+				}
 			}
 		}
 		else if (client->is_disconnected()) {
@@ -305,6 +337,7 @@ bool client_setup::is_connected() const {
 void client_setup::send_to_server(
 	const total_client_entropy& new_local_entropy
 ) {
+	LOG("Sending commands to server");
 	client->send_payload(
 		game_channel_type::CLIENT_COMMANDS,
 		new_local_entropy

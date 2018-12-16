@@ -131,14 +131,21 @@ public:
 				}
 			}
 
+			incoming_entropies.clear();
+
 			const auto& total_accepted = p_i;
 
 			auto& p = predicted_entropies;
+
+			// LOG("TA: %x", total_accepted);
 
 			if (total_accepted <= p.size()) {
 				p.erase(p.begin(), p.begin() + total_accepted);
 			}
 			else {
+				LOG_NVPS(total_accepted, p.size());
+				LOG("Server is malicious!");
+
 				result.malicious_server = true;
 				return result;
 			}

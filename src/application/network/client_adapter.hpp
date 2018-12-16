@@ -25,7 +25,7 @@ void client_adapter::advance(const net_time_t client_time, H&& handler) {
 
 				if (result == message_handler_result::ABORT_AND_DISCONNECT) {
 					j = connection_config.numChannels;
-					disconnect();
+					handler.disconnect();
 					break;
 				}
 

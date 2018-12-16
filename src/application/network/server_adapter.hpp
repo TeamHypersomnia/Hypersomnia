@@ -42,8 +42,7 @@ void server_adapter::advance(const net_time_t server_time, H&& handler) {
 
 					if (result == message_handler_result::ABORT_AND_DISCONNECT) {
 						j = connection_config.numChannels;
-						disconnect_client(i);
-						handler.unset_client(i);
+						handler.disconnect_and_unset(i);
 						break;
 					}
 
@@ -64,6 +63,9 @@ message_handler_result server_adapter::process_message(const client_id_type& cli
 	using Idx = I::index_type;
 
 	if (static_cast<Idx>(type) >= I::max_index_v) {
+		LOG("Invalid message index: %x. Max: %x", type, I::max_index_v);
+
+		handler.log_malicious_client(client_id);
 		return message_handler_result::ABORT_AND_DISCONNECT;
 	}
 
@@ -77,6 +79,8 @@ message_handler_result server_adapter::process_message(const client_id_type& cli
 			constexpr bool forbidden_message_type = !net_message_type::client_to_server;
 
 			if constexpr(forbidden_message_type) {
+				LOG("Client has sent forbidden message type: %x", type);
+
 				handler.log_malicious_client(client_id);
 				return message_handler_result::ABORT_AND_DISCONNECT;
 			}

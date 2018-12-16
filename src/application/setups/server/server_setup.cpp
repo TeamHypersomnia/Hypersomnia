@@ -157,6 +157,7 @@ void server_setup::unset_client(const client_id_type& id) {
 }
 
 void server_setup::disconnect_and_unset(const client_id_type& id) {
+	ensure(false);
 	server->disconnect_client(id);
 	unset_client(id);
 }
@@ -203,35 +204,55 @@ void server_setup::advance_clients_state() {
 
 	constexpr auto max_pending_commands_for_client_v = static_cast<uint8_t>(255);
 
+	auto character_exists_for = [&](const mode_player_id mode_id) {
+		return get_arena_handle().on_mode(
+			[&](const auto& typed_mode) {
+				return typed_mode.find(mode_id);
+			}
+		);
+	};
+	
 	for (auto& c : clients) {
 		using S = client_state_type;
-
-		if (!c.is_set()) {
-			continue;
-		}
 
 		const auto client_id = static_cast<client_id_type>(index_in(clients, c));
 		const auto mode_id = to_mode_player_id(client_id);
 
+		auto remove_from_mode = [&]() {
+			mode_entropy_general cmd;
+			cmd.removed_player = mode_id;
+
+			local_collected.control(cmd);
+			removed_someone_already = true;
+		};
+
 		if (c.pending_entropies.size() > max_pending_commands_for_client_v) {
 			disconnect_and_unset(client_id);
+		}
+
+		if (!c.is_set()) {
+			if (!removed_someone_already) {
+				if (character_exists_for(mode_id)) {
+					remove_from_mode();
+				}
+			}
+
 			continue;
 		}
 
 		auto contribute_to_step_entropy = [&]() {
-			if (c.state == S::IN_GAME) {
 #if 0
-				c.pending_entropies.set_lower_limit(
-					c.settings.net.requested_jitter_buffer_ms * inv_simulation_delta_ms;
-				);
+			c.pending_entropies.set_lower_limit(
+				c.settings.net.requested_jitter_buffer_ms * inv_simulation_delta_ms;
+			);
 #endif
 
-				const auto jitter_vars = c.settings.net.jitter;
-				const auto jitter_squash_steps = in_steps(jitter_vars.merge_commands_when_above_ms);
+			const auto jitter_vars = c.settings.net.jitter;
+			const auto jitter_squash_steps = in_steps(jitter_vars.merge_commands_when_above_ms);
 
-				auto& inputs = c.pending_entropies;
+			auto& inputs = c.pending_entropies;
 
-				const auto num_pending = inputs.size();
+			if (const auto num_pending = inputs.size(); num_pending > 0) {
 				const bool should_squash = num_pending >= jitter_squash_steps;
 
 				total_client_entropy entropy;
@@ -247,6 +268,9 @@ void server_setup::advance_clients_state() {
 						return static_cast<uint8_t>(num_pending);
 					}
 
+					entropy = inputs[0];
+					inputs.erase(inputs.begin());
+
 					return static_cast<uint8_t>(1);
 				}();
 
@@ -254,7 +278,7 @@ void server_setup::advance_clients_state() {
 			}
 		};
 
-		auto add_client_if_not_yet_in_mode = [&]() {
+		auto add_client_to_mode = [&]() {
 			auto final_nickname = get_arena_handle().on_mode(
 				[&](const auto& typed_mode) -> std::string {
 					if (nullptr == typed_mode.find(mode_id)) {
@@ -271,104 +295,32 @@ void server_setup::advance_clients_state() {
 				}
 			);
 
-			if (final_nickname.size() > 0) {
-				mode_entropy_general cmd;
-
-				cmd.added_player = add_player_input {
-					mode_id,
-					std::move(final_nickname),
-					faction_type::SPECTATOR
-				};
-
-				local_collected.control(cmd);
-				added_someone_already = true;
+			if (final_nickname.empty()) {
+				return false;
 			}
+
+			mode_entropy_general cmd;
+
+			cmd.added_player = add_player_input {
+				mode_id,
+				std::move(final_nickname),
+				faction_type::SPECTATOR
+			};
+
+			local_collected.control(cmd);
+			added_someone_already = true;
+
+			return true;
 		};
 
 		auto kick_if_afk = [&](){
-			const auto mode_id = to_mode_player_id(client_id);
-
 			if (c.should_kick_due_to_inactivity(vars, server_time)) {
 				disconnect_and_unset(client_id);
-
-				mode_entropy_general cmd;
-				cmd.removed_player = mode_id;
-
-				local_collected.control(cmd);
-				removed_someone_already = true;
+				remove_from_mode();
 			}
 		};
 
-		if (!added_someone_already) {
-			if (c.state > client_state_type::PENDING_WELCOME) {
-				add_client_if_not_yet_in_mode();
-			}
-		}
-
-		if (!removed_someone_already) {
-			kick_if_afk();
-		}
-
-		if (c.state == S::RECEIVING_INITIAL_STATE) {
-			if (!server->has_messages_to_send(client_id, game_channel_type::SERVER_SOLVABLE_AND_STEPS)) {
-#if 0
-				auto message_provider = [&](net_messages::initial_steps_correction& msg) {
-					(void)msg;
-				};
-
-				server->send_message(client_id, game_channel_type::SERVER_SOLVABLE_AND_STEPS, message_provider);
-
-				c.state = S::RECEIVING_INITIAL_STATE_CORRECTION;
-#else
-				// TODO: Actually send the correction
-				c.set_in_game(server_time);
-#endif
-			}
-		}
-		else if (c.state == S::RECEIVING_INITIAL_STATE_CORRECTION) {
-			if (!server->has_messages_to_send(client_id, game_channel_type::SERVER_SOLVABLE_AND_STEPS)) {
-				c.set_in_game(server_time);
-			}
-		}
-
-		contribute_to_step_entropy();
-	}
-}
-
-template <class T>
-constexpr bool payload_easily_movable_v = true;
-
-template <class T, class F>
-message_handler_result server_setup::handle_client_message(
-	const client_id_type& client_id, 
-	F&& read_payload
-) {
-	constexpr auto abort_v = message_handler_result::ABORT_AND_DISCONNECT;
-	constexpr bool is_easy_v = payload_easily_movable_v<T>;
-
-	std::conditional_t<is_easy_v, T, std::monostate> payload;
-
-	if constexpr(is_easy_v) {
-		if (!read_payload(payload)) {
-			return abort_v;
-		}
-	}
-
-	using S = client_state_type;
-	namespace N = net_messages;
-
-	auto& c = clients[client_id];
-	ensure(c.is_set());
-
-	if constexpr (std::is_same_v<T, requested_client_settings>) {
-		/* 
-			A client might re-state its requested settings
-			even outside of the PENDING_WELCOME state
-		*/
-
-		c.settings = std::move(payload);
-
-		if (c.state == S::PENDING_WELCOME) {
+		auto send_state_for_the_first_time = [&]() {
 			const auto sent_client_id = static_cast<uint32_t>(client_id);
 
 			server->send_payload(
@@ -390,11 +342,87 @@ message_handler_result server_setup::handle_client_message(
 					sent_client_id
 				}
 			);
+		};
 
-			c.state = S::RECEIVING_INITIAL_STATE;
+		if (!added_someone_already) {
+			if (c.state > client_state_type::PENDING_WELCOME) {
+				if (!character_exists_for(mode_id)) {
+					if (add_client_to_mode()) {
+						if (c.state == S::WELCOME_ARRIVED) {
+							send_state_for_the_first_time();
+
+							c.state = S::RECEIVING_INITIAL_STATE;
+						}
+					}
+					else {
+						disconnect_and_unset(client_id);
+						continue;
+					}
+				}
+			}
+		}
+
+		if (!removed_someone_already) {
+			kick_if_afk();
+		}
+
+#if 0
+		else if (c.state == S::RECEIVING_INITIAL_STATE_CORRECTION) {
+			if (!server->has_messages_to_send(client_id, game_channel_type::SERVER_SOLVABLE_AND_STEPS)) {
+				c.set_in_game(server_time);
+			}
+
+		}
+#endif
+		if (c.state == S::IN_GAME) {
+			contribute_to_step_entropy();
+		}
+	}
+}
+
+template <class T>
+constexpr bool payload_easily_movable_v = true;
+
+template <class T, class F>
+message_handler_result server_setup::handle_client_message(
+	const client_id_type& client_id, 
+	F&& read_payload
+) {
+	constexpr auto abort_v = message_handler_result::ABORT_AND_DISCONNECT;
+	constexpr bool is_easy_v = payload_easily_movable_v<T>;
+
+	std::conditional_t<is_easy_v, T, std::monostate> payload;
+
+	if constexpr(is_easy_v) {
+		if (!read_payload(payload)) {
+			LOG("Failed to read payload from the client. Disconnecting.");
+			return abort_v;
+		}
+	}
+
+	using S = client_state_type;
+	namespace N = net_messages;
+
+	auto& c = clients[client_id];
+	ensure(c.is_set());
+
+	if constexpr (std::is_same_v<T, requested_client_settings>) {
+		/* 
+			A client might re-state its requested settings
+			even outside of the PENDING_WELCOME state
+		*/
+
+		c.settings = std::move(payload);
+
+		if (c.state == S::PENDING_WELCOME) {
+			c.state = S::WELCOME_ARRIVED;
 		}
 	}
 	else if constexpr (std::is_same_v<T, total_mode_player_entropy>) {
+		if (c.state == S::RECEIVING_INITIAL_STATE) {
+			c.set_in_game(server_time);
+		}
+
 		if (c.state != S::IN_GAME) {
 			/* 
 				The client shall not send commands until it receives the first step entropy,
@@ -403,10 +431,13 @@ message_handler_result server_setup::handle_client_message(
 				Actually, wouldn't the ack for the last fragment come along the first client commands?
 			*/
 
+			LOG("Client has sent its command too early (state: %x). Disconnecting.", c.state);
+
 			return abort_v;
 		}
 
 		c.pending_entropies.emplace_back(std::move(payload));
+		//LOG("Received %x th command from client. ", c.pending_entropies.size());
 	}
 	else {
 		static_assert(always_false_v<T>, "Unhandled payload type.");
@@ -427,12 +458,18 @@ void server_setup::send_server_step_entropies(const server_step_entropy& total) 
 			continue;
 		}
 
+		if (c.state < client_state_type::RECEIVING_INITIAL_STATE) {
+			continue;
+		}
+
 		const auto client_id = static_cast<client_id_type>(index_in(clients, c));
 		// const auto mode_id = to_mode_player_id(client_id);
 
 		server_step_entropy_for_client for_client;
 		for_client.num_entropies_accepted = c.num_entropies_accepted;
 		for_client.total = total;
+
+		c.num_entropies_accepted = 0;
 
 		server->send_payload(
 			client_id, 
