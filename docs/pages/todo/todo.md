@@ -6,6 +6,11 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Plan for rocket launchers
+
+- Properly implement bots
+	- Now they can break the client logic
+
 - large block sending augs api
 	- asynchronous: deliver_large_data
 	- large_data_delivered() const

@@ -6,8 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Properly implement bots
-	- Now they can break the client logic
+- Admin panel
 
 - yojimbo_assert( length < buffer_size - 1 );
 	- report a bug?

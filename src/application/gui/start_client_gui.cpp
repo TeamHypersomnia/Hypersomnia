@@ -39,6 +39,8 @@ bool start_client_gui_state::perform(
 		base::acquire_keyboard_once();
 		input_text<100>("Address (ipv4:port or [ipv6]:port)", into_start.ip_port);
 		input_text<max_nickname_length_v>("Chosen nickname (3-30 characters)", into_vars.nickname);
+
+		text_disabled("Tip: to quickly connect, you can press Shift+C here or in the main menu,\ninstead of clicking \"Connect!\" with your mouse.");
 	}
 
 	{

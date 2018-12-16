@@ -47,6 +47,8 @@ bool start_server_gui_state::perform(
 		text_disabled("Tip: this number does not include the player at the server machine.\nIf you want to play a 1v1 with someone and not allow anyone else to join or watch,\nyou want to set this value to 1.\n\n");
 
 		text_disabled("Tip: you can tweak many other settings when the server is up and running.\nYou can edit the defaults inside the cache/usr/config.local.lua file,\nin the server section.");
+
+		text_disabled("Tip: to quickly host a server, you can press Shift+H here or in the main menu,\ninstead of clicking \"Launch!\" with your mouse.");
 	}
 
 	{

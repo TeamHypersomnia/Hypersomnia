@@ -173,6 +173,7 @@ namespace test_flavours {
 			invariants::sentience sentience; 
 			components::sentience sentience_inst;
 
+			sentience.shield_damage_absorption_mult = 0.7f;
 			sentience.max_inertia_when_rotation_possible = 1000.f;
 			sentience.detached_flavours.head = to_entity_flavour_id(test_plain_sprited_bodies::DETACHED_METROPOLIS_HEAD);
 			sentience.base_detached_head_speed = -4000.f;

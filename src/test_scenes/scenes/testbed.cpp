@@ -81,7 +81,10 @@ namespace test_scenes {
 
 #if GIVE_AMMO
 			resistance.warmup_initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::CALICO);
-			metropolis.warmup_initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::WARX_FQ12);
+			metropolis.warmup_initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::CALICO);
+
+			metropolis.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SN69);
+			resistance.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::KEK9);
 #endif
 		}
 
