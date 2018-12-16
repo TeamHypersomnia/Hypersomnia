@@ -483,6 +483,12 @@ void server_setup::send_server_step_entropies(const server_step_entropy& total) 
 	}
 }
 
+void server_setup::reinfer_if_necessary_for(const server_step_entropy& entropy) {
+	if (entropy.general.added_player) {
+		cosmic::reinfer_solvable(get_arena_handle().get_cosmos());
+	}
+}
+
 void server_setup::send_packets_if_its_time() {
 	auto& ticks_remaining = ticks_until_sending_packets;
 

@@ -112,6 +112,8 @@ class server_setup :
 
 	mode_player_id get_admin_player_id() const;
 
+	void reinfer_if_necessary_for(const server_step_entropy& entropy);
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
@@ -186,6 +188,7 @@ public:
 			send_server_step_entropies(step_collected);
 			send_packets_if_its_time();
 
+			reinfer_if_necessary_for(step_collected);
 			get_arena_handle().advance(step_collected, callbacks);
 
 			++current_simulation_step;
