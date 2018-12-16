@@ -163,7 +163,8 @@ message_handler_result client_setup::handle_server_message(
 
 		client_player_id = static_cast<mode_player_id>(read_client_id);
 
-		LOG("Received initial state from the server");
+		LOG("Received initial state from the server.");
+		LOG("Received client id: %x", client_player_id);
 
 		state = client_state_type::IN_GAME;
 	}
@@ -284,7 +285,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			}
 		}
 		else if (client->is_disconnected()) {
-			text("Client has disconnected.");
+			text("Connection has ended.");
 
 			text("\n");
 			ImGui::Separator();
@@ -337,7 +338,6 @@ bool client_setup::is_connected() const {
 void client_setup::send_to_server(
 	const total_client_entropy& new_local_entropy
 ) {
-	LOG("Sending commands to server");
 	client->send_payload(
 		game_channel_type::CLIENT_COMMANDS,
 		new_local_entropy

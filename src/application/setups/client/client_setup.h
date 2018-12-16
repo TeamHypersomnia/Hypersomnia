@@ -247,7 +247,7 @@ public:
 				}
 
 				receiver.predicted_entropies.push_back(*new_local_entropy);
-				LOG("PE: %x", receiver.predicted_entropies.size());
+				//LOG("PE: %x", receiver.predicted_entropies.size());
 				get_arena_handle().advance(*new_local_entropy, callbacks);
 			}
 

@@ -189,6 +189,9 @@ void server_setup::accept_entropy_of_client(
 			entropy
 		);
 	}
+	else {
+
+	}
 }
 
 void server_setup::advance_clients_state() {
