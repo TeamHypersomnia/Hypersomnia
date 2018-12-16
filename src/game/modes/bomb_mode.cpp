@@ -840,6 +840,14 @@ void bomb_mode::count_knockout(const input_type in, const entity_id victim, cons
 	count_knockout(in, ko);
 }
 
+bomb_mode_player_stats* bomb_mode::stats_of(const mode_player_id& id) {
+	if (const auto p = find(id)) {
+		return std::addressof(p->stats);
+	}
+
+	return nullptr;
+}
+
 void bomb_mode::count_knockout(const input_type in, const arena_mode_knockout ko) {
 	current_round.knockouts.push_back(ko);
 
@@ -849,10 +857,6 @@ void bomb_mode::count_knockout(const input_type in, const arena_mode_knockout ko
 
 	auto same_faction = [&](const auto a, const auto b) {
 		return faction_of(a) == faction_of(b);
-	};
-
-	auto stats_of = [&](const auto& id) -> auto& {
-		return players[id].stats;
 	};
 
 	{
@@ -883,8 +887,13 @@ void bomb_mode::count_knockout(const input_type in, const arena_mode_knockout ko
 			}
 		}
 
-		stats_of(ko.knockouter).knockouts += knockouts_dt;
-		stats_of(ko.victim).deaths += 1;
+		if (const auto s = stats_of(ko.knockouter)) {
+			s->knockouts += knockouts_dt;
+		}
+
+		if (const auto s = stats_of(ko.victim)) {
+			s->deaths += 1;
+		}
 	}
 
 	if (ko.assist.is_set()) {
@@ -894,7 +903,9 @@ void bomb_mode::count_knockout(const input_type in, const arena_mode_knockout ko
 			assists_dt = -1;
 		}
 
-		stats_of(ko.assist).assists += assists_dt;
+		if (const auto s = stats_of(ko.assist)) {
+			s->deaths += assists_dt;
+		}
 	}
 }
 
@@ -1081,7 +1092,11 @@ void bomb_mode::process_win_conditions(const input_type in, const logic_step ste
 	if (bomb_exploded(in)) {
 		stop_bomb_detonation_theme();
 		const auto planting_player = current_round.bomb_planter;
-		++players[planting_player].stats.bomb_explosions;
+
+		if (const auto s = stats_of(planting_player)) {
+			s->bomb_explosions += 1;
+		}
+
 		post_award(in, planting_player, in.rules.economy.bomb_explosion_award);
 		standard_win(p.bombing);
 		return;
@@ -1091,7 +1106,11 @@ void bomb_mode::process_win_conditions(const input_type in, const logic_step ste
 		stop_bomb_detonation_theme();
 		const auto winner = p.defusing;
 		const auto defusing_player = lookup(character_who_defused);
-		++players[defusing_player].stats.bomb_defuses;
+
+		if (const auto s = stats_of(defusing_player)) {
+			s->bomb_defuses += 1;
+		}
+
 		post_award(in, defusing_player, in.rules.economy.bomb_defuse_award);
 		make_win(in, winner);
 		play_win_theme(in, step, winner);
@@ -1610,7 +1629,10 @@ void bomb_mode::mode_post_solve(const input_type in, const mode_entropy& entropy
 
 						auto& planter = current_round.bomb_planter;
 						planter = lookup(cosm[typed_bomb.template get<components::sender>().capability_of_sender]);
-						++players[planter].stats.bomb_plants;
+
+						if (const auto s = stats_of(planter)) {
+							s->bomb_plants += 1;
+						}
 
 						post_award(in, planter, in.rules.economy.bomb_plant_award);
 					}
@@ -1927,17 +1949,18 @@ void bomb_mode::reset_players_stats(const input_type in) {
 }
 
 void bomb_mode::post_award(const input_type in, const mode_player_id id, money_type amount) {
-	auto& stats = players[id].stats;
-	auto& current_money = stats.money;
-	amount = std::clamp(amount, -current_money, in.rules.economy.maximum_money - current_money);
+	if (const auto stats = stats_of(id)) {
+		auto& current_money = stats->money;
+		amount = std::clamp(amount, -current_money, in.rules.economy.maximum_money - current_money);
 
-	if (amount != 0) {
-		current_money += amount;
+		if (amount != 0) {
+			current_money += amount;
 
-		const auto award = arena_mode_award {
-			in.cosm.get_clock(), id, amount 
-		};
+			const auto award = arena_mode_award {
+				in.cosm.get_clock(), id, amount 
+			};
 
-		stats.round_state.awards.emplace_back(award);
+			stats->round_state.awards.emplace_back(award);
+		}
 	}
 }

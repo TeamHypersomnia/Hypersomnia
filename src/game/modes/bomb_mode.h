@@ -85,7 +85,7 @@ struct bomb_mode_ruleset {
 
 	constrained_entity_flavour_id<invariants::explosive> bomb_flavour;
 	bool delete_lying_items_on_round_start = false;
-	bool allow_game_commencing = false;
+	bool allow_game_commencing = true;
 
 	bomb_mode_economy_rules economy;
 	bomb_mode_view_rules view;
@@ -254,6 +254,8 @@ public:
 
 	bool is_halfway_round(const_input) const;
 	bool is_final_round(const_input) const;
+
+	bomb_mode_player_stats* stats_of(const mode_player_id&);
 
 private:
 	struct transferred_inventory {
