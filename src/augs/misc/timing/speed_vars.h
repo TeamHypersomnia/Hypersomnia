@@ -5,7 +5,7 @@
 namespace augs {
 	struct speed_vars {
 		// GEN INTROSPECTOR struct augs::speed_vars
-		unsigned tickrate = 128u;
+		unsigned tickrate = 60u;
 		real64 logic_speed_mult = 1.0; 
 		// END GEN INTROSPECTOR
 

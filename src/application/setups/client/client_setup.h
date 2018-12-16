@@ -171,7 +171,8 @@ public:
 		auto& performance = in.network_performance;
 
 		const auto current_time = get_current_time();
-		const auto dt = get_inv_tickrate();
+
+		static constexpr auto default_inv_tickrate = 1 / 60.0;
 
 		while (client_time <= current_time) {
 			const auto currently_controlled_character = get_viewed_character();
@@ -199,8 +200,6 @@ public:
 					);
 
 					send_to_server(new_client_entropy);
-
-					receiver.predicted_entropies.push_back(new_local_entropy);
 				}
 			}
 
@@ -220,8 +219,8 @@ public:
 						referential_arena.advance(entropy, solver_callbacks());
 					};
 
-					auto advance_predicted = [&](const auto& entropy) {
-						predicted_arena.advance(entropy, callbacks);
+					auto advance_repredicted = [&](const auto& entropy) {
+						predicted_arena.advance(entropy, solver_callbacks());
 					};
 
 					const auto result = receiver.unpack_deterministic_steps(
@@ -235,7 +234,7 @@ public:
 						predicted_arena,
 
 						advance_referential,
-						advance_predicted
+						advance_repredicted
 					);
 
 					if (result.malicious_server) {
@@ -244,10 +243,16 @@ public:
 					}
 				}
 
+				receiver.predicted_entropies.push_back(new_local_entropy);
 				get_arena_handle().advance(new_local_entropy, callbacks);
 			}
 
-			client_time += dt;
+			if (in_game) {
+				client_time += get_inv_tickrate();
+			}
+			else {
+				client_time += default_inv_tickrate;
+			}
 
 			total_collected.clear();
 		}

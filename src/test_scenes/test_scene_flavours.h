@@ -123,6 +123,7 @@ enum class test_melee_weapons {
 enum class test_shootable_charges {
 	// GEN INTROSPECTOR enum class test_shootable_charges
 	CYAN_CHARGE,
+	PISTOL_CYAN_CHARGE,
 	STEEL_CHARGE,
 	ORANGE_CHARGE,
 	SHOTGUN_RED_CHARGE,
@@ -157,6 +158,7 @@ enum class test_hand_explosives {
 enum class test_plain_missiles {
 	// GEN INTROSPECTOR enum class test_plain_missiles
 	CYAN_ROUND,
+	PISTOL_CYAN_ROUND,
 	STEEL_ROUND,
 	ORANGE_ROUND,
 	SHOTGUN_RED_ROUND,

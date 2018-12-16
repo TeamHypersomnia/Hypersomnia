@@ -2438,3 +2438,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Instead of adding a flag to reinfer, 
   can't client simply reinfer any time that a player is added to the mode?
+- dont use audiovisual callbacks for re-predicting
+

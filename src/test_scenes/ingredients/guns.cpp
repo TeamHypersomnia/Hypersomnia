@@ -351,6 +351,81 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_plain_missiles::PISTOL_CYAN_ROUND);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::FLYING_BULLETS;
+
+				meta.set(render_def);
+			}
+
+
+			{
+				invariants::flags flags_def;
+				flags_def.values.set(entity_flag::IS_IMMUNE_TO_PAST);
+				meta.set(flags_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::SHOTGUN_RED_ROUND, cyan);
+
+			{
+				{
+					invariants::trace trace_def;
+					trace_def.max_multiplier_x = {0.370f, 1.0f};
+					trace_def.max_multiplier_y = {0.f, 0.09f};
+					trace_def.lengthening_duration_ms = {36.f, 366.f};
+					trace_def.additional_multiplier = vec2(1.f, 1.f);
+					trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::CYAN_ROUND_FINISHING_TRACE);
+					meta.set(trace_def);
+				}
+			}
+
+			test_flavours::add_bullet_round_physics(meta);
+			meta.template get<invariants::rigid_body>().damping.linear = 3.5f;
+
+			invariants::missile missile;
+
+			missile.ricochet_born_cooldown_ms = 17.f;
+
+			{
+				auto& dest_eff = missile.damage.effects.destruction;
+				dest_eff.spawn_exploding_ring = false;
+				dest_eff.particles.modifier.colorize = cyan;
+				dest_eff.particles.modifier.scale_amounts = 0.2f;
+				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::PISTOL_PROJECTILE_DESTRUCTION);
+			}
+
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
+			missile.trace_particles.modifier.colorize = white;
+
+			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PISTOL_MUZZLE_LEAVE_EXPLOSION);
+			missile.muzzle_leave_particles.modifier.colorize = cyan;
+			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+
+			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_RICOCHET);
+			missile.ricochet_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_RICOCHET);
+
+			missile.damage.effects.destruction.sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
+			missile.damage.base = 12;
+			missile.damage.shake *= 0.85f;
+			missile.max_lifetime_ms = 450.f;
+
+			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
+
+			auto& trace_modifier = missile.trace_sound.modifier;
+
+			trace_modifier.doppler_factor = 0.6f;
+			trace_modifier.max_distance = 1020.f;
+			trace_modifier.reference_distance = 100.f;
+			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
+			trace_modifier.gain = 1.3f;
+			trace_modifier.fade_on_exit = false;
+
+			meta.set(missile);
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::SHOTGUN_RED_ROUND);
 
 			{
@@ -666,6 +741,39 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_shootable_charges::PISTOL_CYAN_CHARGE);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::CYAN_CHARGE, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+
+			invariants::item item;
+			item.space_occupied_per_charge = to_space_units("0.01");
+			item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
+			item.stackable = true;
+
+			meta.set(item);
+
+			{
+				invariants::cartridge cartridge; 
+
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
+				cartridge.shell_trace_particles.modifier.colorize = cyan;
+
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::CYAN_SHELL);
+				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::PISTOL_CYAN_ROUND);
+
+				meta.set(cartridge);
+			}
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::STEEL_CHARGE);
 
 			{
@@ -896,7 +1004,7 @@ namespace test_flavours {
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
 			charge_deposit_def.space_available = to_space_units("0.32");
 			charge_deposit_def.mounting_duration_ms = 500.f;
-			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE);
+			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::PISTOL_CYAN_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
 
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
@@ -932,7 +1040,7 @@ namespace test_flavours {
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
 			charge_deposit_def.space_available = to_space_units("0.37");
 			charge_deposit_def.mounting_duration_ms = 500.f;
-			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE);
+			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::PISTOL_CYAN_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
 
 			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
@@ -1258,7 +1366,7 @@ namespace test_flavours {
 			set_density_mult(meta, 0.75f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1000.f);
 			meta.get<invariants::item>().standard_price = 3100;
-			set_chambering_duration_ms(meta, 400.f);
+			set_chambering_duration_ms(meta, 450.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			only_allow_mag(meta, test_container_items::BILMER2000_MAGAZINE);
 			meta.get<invariants::item>().specific_to = faction_type::METROPOLIS;
@@ -1367,7 +1475,7 @@ namespace test_flavours {
 			set_density_mult(meta, 1.15f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1200.f, 0.f);
 			meta.get<invariants::item>().standard_price = 2900;
-			set_chambering_duration_ms(meta, 500.f);
+			set_chambering_duration_ms(meta, 550.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			only_allow_mag(meta, test_container_items::VINDICATOR_MAGAZINE);
 			meta.get<invariants::item>().specific_to = faction_type::RESISTANCE;
@@ -1507,7 +1615,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::KEK9_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
-			gun_def.muzzle_velocity = {3600.f, 3600.f};
+			gun_def.muzzle_velocity = {5000.f, 5000.f};
 			gun_def.shot_cooldown_ms = 100.f;
 
 			gun_def.shell_angular_velocity = {2.f, 14.f};
@@ -1518,7 +1626,7 @@ namespace test_flavours {
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 
 			gun_def.maximum_heat = 2.f;
-			gun_def.gunshot_adds_heat = 0.052f;
+			gun_def.gunshot_adds_heat = 0.042f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 
@@ -1533,7 +1641,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 500;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(350);
-			set_chambering_duration_ms(meta, 250.f);
+			set_chambering_duration_ms(meta, 390.f);
 			set_density_mult(meta, 0.8f);
 			only_allow_mag(meta, test_container_items::KEK9_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
@@ -1555,7 +1663,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::SN69_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
-			gun_def.muzzle_velocity = {3500.f, 3500.f};
+			gun_def.muzzle_velocity = {5000.f, 5000.f};
 			gun_def.shot_cooldown_ms = 90.f;
 
 			gun_def.shell_angular_velocity = {2.f, 10.f};
@@ -1568,7 +1676,7 @@ namespace test_flavours {
 			gun_def.adversarial.knockout_award = static_cast<money_type>(350);
 
 			gun_def.maximum_heat = 2.f;
-			gun_def.gunshot_adds_heat = 0.072f;
+			gun_def.gunshot_adds_heat = 0.040;
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 
@@ -1582,7 +1690,7 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1100.f, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 500;
-			set_chambering_duration_ms(meta, 250.f);
+			set_chambering_duration_ms(meta, 350.f);
 			set_density_mult(meta, 0.7f);
 			only_allow_mag(meta, test_container_items::SN69_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;

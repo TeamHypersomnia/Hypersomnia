@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- dont use audiovisual callbacks for re-predicting
-
 - yojimbo_assert( length < buffer_size - 1 );
 	- report a bug?
 

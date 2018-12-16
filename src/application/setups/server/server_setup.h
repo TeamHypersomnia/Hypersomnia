@@ -162,7 +162,6 @@ public:
 		const C& callbacks
 	) {
 		const auto current_time = get_current_time();
-		const auto dt = get_inv_tickrate();
 
 		while (server_time <= current_time) {
 			step_collected.clear();
@@ -187,7 +186,7 @@ public:
 			get_arena_handle().advance(step_collected, callbacks);
 
 			++current_simulation_step;
-			server_time += dt;
+			server_time += get_inv_tickrate();
 
 			step_collected.clear();
 		}
