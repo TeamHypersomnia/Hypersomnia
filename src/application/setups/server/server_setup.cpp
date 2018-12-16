@@ -1,3 +1,5 @@
+#include "augs/misc/imgui/imgui_scope_wrappers.h"
+#include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/compress.h"
 
 #include "application/setups/server/server_setup.h"
@@ -30,6 +32,7 @@ server_setup::server_setup(
 	const server_vars& initial_vars
 ) : 
 	lua(lua),
+	last_start(in),
 	server(std::make_unique<server_adapter>(in)),
 	server_time(yojimbo_time())
 {
@@ -457,4 +460,46 @@ double server_setup::get_inv_tickrate() const {
 
 double server_setup::get_audiovisual_speed() const {
 	return get_arena_handle().get_audiovisual_speed();
+}
+
+custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
+	if (!server->is_running()) {
+		using namespace augs::imgui;
+
+		ImGui::SetNextWindowPosCenter();
+
+		ImGui::SetNextWindowSize((vec2(ImGui::GetIO().DisplaySize) * 0.3f).operator ImVec2(), ImGuiCond_FirstUseEver);
+
+		const auto window_name = "Connection status";
+		auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
+
+		const auto addr = yojimbo::Address(last_start.ip.c_str(), last_start.port);
+
+		{
+			char buffer[256];
+			addr.ToString(buffer, sizeof(buffer));
+			text("Failed to host the server at address: %x", buffer);
+		}
+
+		text("\n");
+		ImGui::Separator();
+
+		if (ImGui::Button("Go back")) {
+			return custom_imgui_result::GO_TO_MAIN_MENU;
+		}
+	}
+
+	return arena_base::perform_custom_imgui(in);
+}
+
+setup_escape_result server_setup::escape() {
+	if (!is_gameplay_on()) {
+		return setup_escape_result::GO_TO_MAIN_MENU;
+	}
+
+	return setup_escape_result::IGNORE;
+}
+
+bool server_setup::is_gameplay_on() const {
+	return server->is_running();
 }

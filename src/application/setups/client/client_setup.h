@@ -121,8 +121,6 @@ class client_setup :
 
 	void send_to_server(const total_client_entropy&);
 
-	bool escape_to_main_menu_requested = false;
-
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;

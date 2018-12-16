@@ -217,11 +217,6 @@ custom_imgui_result client_setup::perform_custom_imgui(
 		arena_base::perform_custom_imgui(in);
 	}
 	else {
-		if (escape_to_main_menu_requested) {
-			escape_to_main_menu_requested = false;
-			return custom_imgui_result::GO_TO_MAIN_MENU;
-		}
-
 		ImGui::SetNextWindowPosCenter();
 
 		ImGui::SetNextWindowSize((vec2(ImGui::GetIO().DisplaySize) * 0.3f).operator ImVec2(), ImGuiCond_FirstUseEver);
@@ -326,9 +321,7 @@ bool client_setup::is_gameplay_on() const {
 
 setup_escape_result client_setup::escape() {
 	if (!is_gameplay_on()) {
-		escape_to_main_menu_requested = true;
-
-		return setup_escape_result::JUST_FETCH;
+		return setup_escape_result::GO_TO_MAIN_MENU;
 	}
 
 	return setup_escape_result::IGNORE;

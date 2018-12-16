@@ -44,6 +44,8 @@ class server_setup :
 	public default_setup_settings,
 	public arena_gui_mixin<server_setup> /* For the admin player */
 {
+	using arena_base = arena_gui_mixin<server_setup>;
+
 	/* This is loaded from the arena folder */
 	intercosm scene;
 	cosmos_solvable_significant initial_signi;
@@ -57,6 +59,7 @@ class server_setup :
 	/* The rest is server-specific */
 	sol::state& lua;
 
+	server_start_input last_start;
 	server_step_type current_simulation_step = 0;
 
 	augs::serialization_buffers buffers;
@@ -218,7 +221,8 @@ public:
 		return get_admin_player_id();
 	}
 
-	bool is_gameplay_on() const {
-		return true;
-	}
+	bool is_gameplay_on() const;
+
+	custom_imgui_result perform_custom_imgui(perform_custom_imgui_input);
+	setup_escape_result escape();
 };

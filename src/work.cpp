@@ -1197,6 +1197,7 @@ int work(const int argc, const char* const * const argv) try {
 								case setup_escape_result::LAUNCH_INGAME_MENU: ingame_menu.show = true; return true;
 								case setup_escape_result::SWITCH_TO_GAME_GUI: game_gui_mode = true; return true;
 								case setup_escape_result::JUST_FETCH: return true;
+								case setup_escape_result::GO_TO_MAIN_MENU: launch_setup(launch_type::MAIN_MENU); return true;
 								default: return false;
 							}
 						})) {

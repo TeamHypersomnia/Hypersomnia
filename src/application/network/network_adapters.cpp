@@ -105,10 +105,6 @@ server_adapter::server_adapter(const server_start_input& in) :
 
 	const auto addr = server.GetAddress();
 
-    if (!is_running()) {
-        throw std::runtime_error("Could not start server at port " + std::to_string(addr.GetPort()));
-    }
-
     char buffer[256];
     addr.ToString(buffer, sizeof(buffer));
 
