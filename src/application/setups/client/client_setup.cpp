@@ -26,12 +26,15 @@ client_setup::client_setup(
 }
 
 void client_setup::init_connection(const client_start_input& in) {
+	last_start = in;
+
 	state = client_state_type::INVALID;
 	client->connect(in);
 	when_initiated_connection = get_current_time();
 }
 
 client_setup::~client_setup() {
+	LOG("Client destr");
 	disconnect();
 }
 
@@ -40,6 +43,10 @@ net_time_t client_setup::get_current_time() {
 }
 
 entity_id client_setup::get_viewed_character_id() const {
+	if (!is_gameplay_on()) {
+		return entity_id::dead();
+	}
+
 	return get_arena_handle().on_mode(
 		[&](const auto& typed_mode) {
 			return typed_mode.lookup(get_local_player_id());
@@ -64,10 +71,18 @@ online_arena_handle<true> client_setup::get_arena_handle(const client_arena_type
 }
 
 double client_setup::get_inv_tickrate() const {
+	if (!is_gameplay_on()) {
+		return default_inv_tickrate;
+	}
+
 	return get_arena_handle().get_inv_tickrate();
 }
 
 double client_setup::get_audiovisual_speed() const {
+	if (!is_gameplay_on()) {
+		return 1.0;
+	}
+
 	return get_arena_handle().get_audiovisual_speed();
 }
 
@@ -190,33 +205,66 @@ void client_setup::log_malicious_server() {
 #endif
 }
 
-void client_setup::perform_custom_imgui(
+custom_imgui_result client_setup::perform_custom_imgui(
 	const perform_custom_imgui_input in
 ) {
 	using C = client_state_type;
 	using namespace augs::imgui;
 
-	const bool is_in_game = client->is_connected() && state == C::IN_GAME;
+	const bool is_gameplay_on = client->is_connected() && state == C::IN_GAME;
 
-	if (is_in_game) {
+	if (is_gameplay_on) {
 		arena_base::perform_custom_imgui(in);
 	}
 	else {
+		if (escape_to_main_menu_requested) {
+			escape_to_main_menu_requested = false;
+			return custom_imgui_result::GO_TO_MAIN_MENU;
+		}
+
 		ImGui::SetNextWindowPosCenter();
 
 		ImGui::SetNextWindowSize((vec2(ImGui::GetIO().DisplaySize) * 0.3f).operator ImVec2(), ImGuiCond_FirstUseEver);
 
 		const auto window_name = "Connection status";
-		auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar);
+		auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
 
 		if (client->is_connecting()) {
-			text("Connecting to %x\nTime: %3f seconds", last_start.ip_port, get_current_time() - when_initiated_connection);
-		}
-		else if (client->is_disconnected()) {
-			text("Client disconnected.");
+			text("Connecting to %x\nTime: %2f seconds", last_start.ip_port, get_current_time() - when_initiated_connection);
+
+			text("\n");
+			ImGui::Separator();
+
+			if (ImGui::Button("Abort")) {
+				disconnect();
+				return custom_imgui_result::GO_TO_MAIN_MENU;
+			}
 		}
 		else if (client->has_connection_failed()) {
-			text("The connection to %x has failed.", last_start.ip_port);
+			text("Failed to establish connection with %x.", last_start.ip_port);
+
+			text("\n");
+			ImGui::Separator();
+
+			if (ImGui::Button("Retry")) {
+				init_connection(last_start);
+			}
+
+			ImGui::SameLine();
+
+			if (ImGui::Button("Go back")) {
+				return custom_imgui_result::GO_TO_MAIN_MENU;
+			}
+		}
+		else if (client->is_disconnected()) {
+			text("Client has disconnected.");
+
+			text("\n");
+			ImGui::Separator();
+
+			if (ImGui::Button("Go back")) {
+				return custom_imgui_result::GO_TO_MAIN_MENU;
+			}
 		}
 		else if (client->is_connected()) {
 			text_color(typesafe_sprintf("Connected to %x.", last_start.ip_port), green);
@@ -233,8 +281,17 @@ void client_setup::perform_custom_imgui(
 			else {
 				text("Unknown error.");
 			}
+
+			text("\n");
+			ImGui::Separator();
+
+			if (ImGui::Button("Abort")) {
+				disconnect();
+			}
 		}
 	}
+
+	return custom_imgui_result::NONE;
 }
 
 void client_setup::apply(const config_lua_table& cfg) {
@@ -261,4 +318,18 @@ void client_setup::send_to_server(
 
 void client_setup::disconnect() {
 	client->disconnect();
+}
+
+bool client_setup::is_gameplay_on() const {
+	return is_connected() && state == client_state_type::IN_GAME;
+}
+
+setup_escape_result client_setup::escape() {
+	if (!is_gameplay_on()) {
+		escape_to_main_menu_requested = true;
+
+		return setup_escape_result::JUST_FETCH;
+	}
+
+	return setup_escape_result::IGNORE;
 }

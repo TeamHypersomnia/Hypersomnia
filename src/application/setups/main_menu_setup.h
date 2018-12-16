@@ -97,8 +97,8 @@ public:
 		return intro.viewables;
 	}
 
-	void perform_custom_imgui(perform_custom_imgui_input) {
-		return;
+	auto perform_custom_imgui(perform_custom_imgui_input) {
+		return custom_imgui_result::NONE;
 	}
 
 	auto escape() {

@@ -308,6 +308,7 @@ int work(const int argc, const char* const * const argv) try {
 		get_audiovisuals().get<sound_system>().clear();
 
 		main_menu.reset();
+		current_setup.reset();
 		ingame_menu.show = false;
 
 		setup_init_callback();
@@ -546,15 +547,20 @@ int work(const int argc, const char* const * const argv) try {
 		switch (t) {
 			case T::CONNECT_TO_UNIVERSE:
 				start_client_gui.open();
+
+				if (common_input_state[augs::event::keys::key::LSHIFT]) {
+					launch_setup(launch_type::CLIENT);
+				}
+
 				break;
 				
 			case T::HOST_UNIVERSE:
+				start_server_gui.open();
+
 				if (common_input_state[augs::event::keys::key::LSHIFT]) {
 					launch_setup(launch_type::SERVER);
-					break;
 				}
 
-				start_server_gui.open();
 				break;
 
 			case T::LOCAL_UNIVERSE:
@@ -1063,9 +1069,13 @@ int work(const int argc, const char* const * const argv) try {
 					*/
 
 					visit_current_setup([&](auto& setup) {
-						setup.perform_custom_imgui({ 
+						const auto result = setup.perform_custom_imgui({ 
 							lua, window, streaming.images_in_atlas, config 
 						});
+
+						if (result == custom_imgui_result::GO_TO_MAIN_MENU) {
+							launch_setup(launch_type::MAIN_MENU);
+						}
 					});
 				},
 

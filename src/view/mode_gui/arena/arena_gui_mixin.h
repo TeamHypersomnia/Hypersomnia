@@ -9,7 +9,7 @@ struct arena_gui_mixin {
 
 	setup_escape_result escape();
 
-	void perform_custom_imgui(perform_custom_imgui_input);
+	custom_imgui_result perform_custom_imgui(perform_custom_imgui_input);
 
 	bool handle_input_before_imgui(
 		handle_input_before_imgui_input

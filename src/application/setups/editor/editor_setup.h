@@ -218,7 +218,7 @@ public:
 	const_entity_handle get_viewed_character() const;
 	const all_viewables_defs& get_viewable_defs() const;
 
-	void perform_custom_imgui(perform_custom_imgui_input);
+	custom_imgui_result perform_custom_imgui(perform_custom_imgui_input);
 
 	void customize_for_viewing(config_lua_table& cfg) const;
 	void apply(const config_lua_table& cfg);

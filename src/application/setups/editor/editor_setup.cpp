@@ -410,7 +410,7 @@ float editor_setup::get_game_screen_top() const {
 	return 0.f;
 }
 
-void editor_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
+custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
 	using namespace augs::imgui;
 
 	auto& lua = in.lua;
@@ -753,6 +753,8 @@ void editor_setup::perform_custom_imgui(const perform_custom_imgui_input in) {
 	if (ok_only_popup && ok_only_popup->perform()) {
 		ok_only_popup = std::nullopt;
 	}
+
+	return custom_imgui_result::NONE;
 }
 
 void editor_setup::clear_id_caches() {

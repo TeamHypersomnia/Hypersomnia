@@ -6,6 +6,10 @@ template <class D>
 std::optional<camera_eye> arena_gui_mixin<D>::find_current_camera_eye() const {
 	const auto& self = static_cast<const D&>(*this);
 
+	if (!self.is_gameplay_on()) {
+		return camera_eye();
+	}
+
 	return self.get_arena_handle().on_mode(
 		[&](const auto& typed_mode) -> std::optional<camera_eye> {
 			if (const auto player = typed_mode.find(self.get_local_player_id())) {
@@ -21,6 +25,12 @@ std::optional<camera_eye> arena_gui_mixin<D>::find_current_camera_eye() const {
 
 template <class D>
 setup_escape_result arena_gui_mixin<D>::escape() {
+	auto& self = static_cast<D&>(*this);
+
+	if (!self.is_gameplay_on()) {
+		return setup_escape_result::IGNORE;
+	}
+
 	if (arena_gui.escape()) {
 		return setup_escape_result::JUST_FETCH;
 	}
@@ -29,10 +39,14 @@ setup_escape_result arena_gui_mixin<D>::escape() {
 }
 
 template <class D>
-void arena_gui_mixin<D>::perform_custom_imgui(
+custom_imgui_result arena_gui_mixin<D>::perform_custom_imgui(
 	const perform_custom_imgui_input in
 ) {
 	auto& self = static_cast<D&>(*this);
+
+	if (!self.is_gameplay_on()) {
+		return custom_imgui_result::NONE;
+	}
 
 	const auto game_screen_top = 0.f;
 
@@ -54,6 +68,8 @@ void arena_gui_mixin<D>::perform_custom_imgui(
 			self.control(new_entropy);
 		}
 	);
+
+	return custom_imgui_result::NONE;
 }
 
 template <class D>
@@ -61,8 +77,12 @@ bool arena_gui_mixin<D>::handle_input_before_imgui(
 	const handle_input_before_imgui_input in
 ) {
 	const auto& self = static_cast<const D&>(*this);
+
+	if (!self.is_gameplay_on()) {
+		return false;
+	}
+
 	(void)in;
-	(void)self;
 	return false;
 }
 
@@ -71,7 +91,10 @@ bool arena_gui_mixin<D>::handle_input_before_game(
 	const handle_input_before_game_input in
 ) {
 	const auto& self = static_cast<const D&>(*this);
-	(void)self;
+
+	if (!self.is_gameplay_on()) {
+		return false;
+	}
 
 	if (arena_gui.control({ in.app_controls, in.common_input_state, in.e })) { 
 		return true;
@@ -83,6 +106,11 @@ bool arena_gui_mixin<D>::handle_input_before_game(
 template <class D>
 void arena_gui_mixin<D>::draw_custom_gui(const draw_setup_gui_input& in) const {
 	const auto& self = static_cast<const D&>(*this);
+
+	if (!self.is_gameplay_on()) {
+		return;
+	}
+
 	const auto game_screen_top = 0.f;
 
 	const auto draw_mode_in = draw_mode_gui_input { 

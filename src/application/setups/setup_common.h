@@ -4,6 +4,11 @@
 #include "application/input/input_settings.h"
 #include "application/app_intent_type.h"
 
+enum class custom_imgui_result {
+	NONE,
+	GO_TO_MAIN_MENU
+};
+
 enum class setup_escape_result {
 	IGNORE,
 	LAUNCH_INGAME_MENU,

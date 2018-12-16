@@ -217,4 +217,8 @@ public:
 	mode_player_id get_local_player_id() const {
 		return get_admin_player_id();
 	}
+
+	bool is_gameplay_on() const {
+		return true;
+	}
 };

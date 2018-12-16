@@ -80,6 +80,8 @@ class client_setup :
 	net_time_t client_time = 0.0;
 	net_time_t when_initiated_connection = 0.0;
 
+	double default_inv_tickrate = 1 / 60.0;
+
 	/* No client state follows later in code. */
 
 	static net_time_t get_current_time();
@@ -119,6 +121,8 @@ class client_setup :
 
 	void send_to_server(const total_client_entropy&);
 
+	bool escape_to_main_menu_requested = false;
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
@@ -145,6 +149,7 @@ public:
 	entity_id get_viewed_character_id() const;
 
 	auto get_viewed_character() const {
+
 		return get_viewed_cosmos()[get_viewed_character_id()];
 	}
 
@@ -152,7 +157,7 @@ public:
 		return scene.viewables;
 	}
 
-	void perform_custom_imgui(perform_custom_imgui_input);
+	custom_imgui_result perform_custom_imgui(perform_custom_imgui_input);
 
 	void customize_for_viewing(config_lua_table&) const;
 
@@ -166,35 +171,35 @@ public:
 		const client_advance_input& in,
 		const Callbacks& callbacks
 	) {
-		using C = client_state_type;
-
 		auto& performance = in.network_performance;
 
 		const auto current_time = get_current_time();
 
-		static constexpr auto default_inv_tickrate = 1 / 60.0;
-
 		while (client_time <= current_time) {
-			const auto currently_controlled_character = get_viewed_character();
-
-			const auto new_local_entropy = total_collected.extract(
-				get_viewed_character(), 
-				get_local_player_id(), 
-				{ in.settings, in.screen_size }
-			);
-
 			{
 				auto scope = measure_scope(performance.receiving_messages);
 				handle_server_messages();
 			}
 
-			const bool in_game = is_connected() && state == C::IN_GAME;
+			const auto new_local_entropy = [&]() -> std::optional<mode_entropy> {
+				if (is_gameplay_on()) {
+					return total_collected.extract(
+						get_viewed_character(), 
+						get_local_player_id(), 
+						{ in.settings, in.screen_size }
+					);
+				}
+
+				return std::nullopt;
+			}();
+
+			const bool in_game = new_local_entropy != std::nullopt;
 
 			if (is_connected()) {
 				send_pending_commands();
 
 				if (in_game) {
-					const auto new_client_entropy = new_local_entropy.get_for(
+					const auto new_client_entropy = new_local_entropy->get_for(
 						get_viewed_character(), 
 						get_local_player_id()
 					);
@@ -228,7 +233,7 @@ public:
 						in.interp,
 						in.past_infection,
 
-						currently_controlled_character,
+						get_viewed_character(),
 
 						referential_arena,
 						predicted_arena,
@@ -243,8 +248,8 @@ public:
 					}
 				}
 
-				receiver.predicted_entropies.push_back(new_local_entropy);
-				get_arena_handle().advance(new_local_entropy, callbacks);
+				receiver.predicted_entropies.push_back(*new_local_entropy);
+				get_arena_handle().advance(*new_local_entropy, callbacks);
 			}
 
 			if (in_game) {
@@ -286,4 +291,7 @@ public:
 
 	bool is_connected() const;
 	void disconnect();
+
+	bool is_gameplay_on() const;
+	setup_escape_result escape();
 };
