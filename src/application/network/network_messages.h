@@ -4,6 +4,23 @@
 #include "augs/misc/serialization_buffers.h"
 #include "application/network/server_step_entropy.h"
 
+#define LOG_NET_SERIALIZATION !IS_PRODUCTION_BUILD
+
+template <class... Args>
+void NSR_LOG(Args&&... args) {
+#if LOG_NET_SERIALIZATION
+	LOG(std::forward<Args>(args)...);
+#else
+	((void)args, ...);
+#endif
+}
+
+#if LOG_NET_SERIALIZATION
+#define NSR_LOG_NVPS LOG_NVPS
+#else
+#define NSR_LOG_NVPS NSR_LOG
+#endif
+
 constexpr std::size_t chosen_packet_size_v = 1024;
 
 constexpr std::size_t total_header_bytes_v = 

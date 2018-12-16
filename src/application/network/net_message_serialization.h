@@ -9,6 +9,11 @@ bool preserialized_message::Serialize(Stream& stream) {
 	}
 
 	serialize_int( stream, length, 0, max_message_size_v );
+
+	if ( Stream::IsReading ) {
+		bytes.resize(length);
+	}
+
 	serialize_bytes( stream, (uint8_t*)bytes.data(), length );
 
 	return true;

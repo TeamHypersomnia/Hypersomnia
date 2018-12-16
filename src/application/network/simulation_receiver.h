@@ -129,14 +129,13 @@ public:
 
 					p_i += num_accepted;
 				}
-
 			}
 
 			const auto& total_accepted = p_i;
 
 			auto& p = predicted_entropies;
 
-			if (total_accepted < p.size()) {
+			if (total_accepted <= p.size()) {
 				p.erase(p.begin(), p.begin() + total_accepted);
 			}
 			else {

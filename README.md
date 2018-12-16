@@ -33,6 +33,7 @@ To understand the repository's folder structure, make sure to read the [document
 
 Watch gameplays on YouTube:
 
+[![IMAGE ALT TEXT](https://img.youtube.com/vi/d_G1mRqKlb0/0.jpg)](https://www.youtube.com/watch?v=d_G1mRqKlb0 "Video Title")
 [![IMAGE ALT TEXT](https://img.youtube.com/vi/0vlUOO5l0jw/0.jpg)](https://www.youtube.com/watch?v=0vlUOO5l0jw "Video Title")
 [![IMAGE ALT TEXT](https://img.youtube.com/vi/mxvuWvD53tY/0.jpg)](https://www.youtube.com/watch?v=mxvuWvD53tY "Video Title")
 [![IMAGE ALT TEXT](https://img.youtube.com/vi/f0cHnds9UuU/0.jpg)](https://www.youtube.com/watch?v=f0cHnds9UuU "Video Title")

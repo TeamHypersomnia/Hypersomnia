@@ -2,6 +2,7 @@
 #include "augs/readwrite/memory_stream.h"
 #include "augs/misc/serialization_buffers.h"
 #include "augs/misc/compress.h"
+#include "augs/misc/readable_bytesize.h"
 
 template <bool C>
 struct initial_arena_state_payload {
@@ -98,12 +99,18 @@ namespace net_messages {
 		const auto data = reinterpret_cast<const std::byte*>(GetBlockData());
 		const auto size = static_cast<std::size_t>(GetBlockSize());
 
+		NSR_LOG("RECEIVING INITIAL STATE");
+
+		NSR_LOG("Compressed stream size: %x", size);
+
 		if (size < sizeof(uint32_t)) {
 			return false;
 		}
 
 		const auto uncompressed_size = *reinterpret_cast<const uint32_t*>(data);
 	
+		NSR_LOG("Uncompressed size: %x", uncompressed_size);
+
 		/*
 			TODO: validate uncompressed_size with some predefined max solvable size.
 		*/
@@ -112,19 +119,29 @@ namespace net_messages {
 			return false;
 		}
 
-		buffers.serialization.resize(uncompressed_size);
+		auto& uncompressed_buf = buffers.serialization;
+		uncompressed_buf.resize(uncompressed_size);
 
 		augs::decompress(
 			data + sizeof(uint32_t),
 			size - sizeof(uint32_t),
-			buffers.serialization
+			uncompressed_buf
 		);
 
-		auto s = augs::cref_memory_stream(buffers.serialization);
+		if (uncompressed_buf.size() != uncompressed_size) {
+			NSR_LOG("Failed to decompress the buffer.");
+			return false;
+		}
+
+		NSR_LOG("Successfully uncompressed the buffer.");
+
+		auto s = augs::cref_memory_stream(uncompressed_buf);
 
 		augs::read_bytes(s, in.signi);
 		augs::read_bytes(s, in.mode);
 		augs::read_bytes(s, in.client_id);
+
+		NSR_LOG_NVPS(in.client_id);
 
 		return true;
 	}
@@ -139,21 +156,45 @@ namespace net_messages {
 			augs::write_bytes(s, in.client_id);
 		};
 
+		NSR_LOG("SENDING INITIAL STATE");
+
 		{
+			NSR_LOG("STAGE: ESTIMATION");
+
 			augs::byte_counter_stream s;
 			write_all_to(s);
-			buffers.serialization.reserve(s.size() + sizeof(uint32_t));
+			buffers.serialization.reserve(s.size());
+
+			NSR_LOG("Reserved size: %x", s.size());
+
+			{
+				auto s = buffers.make_serialization_stream();
+				write_all_to(s);
+			}
+
+			NSR_LOG("Result stream length: %x", buffers.serialization.size());
 		}
 
-		auto s = buffers.make_serialization_stream();
+		auto& c = buffers.compressed;
 
-		const auto real_size = static_cast<uint32_t>(buffers.serialization.size());
-		augs::write_bytes(s, real_size);
+		{
+			NSR_LOG("STAGE: COMPRESSION");
 
-		write_all_to(s);
+			c.clear();
 
-		augs::compress(buffers.compression_state, buffers.serialization, buffers.compressed);
+			{
+				auto s = augs::ref_memory_stream(c);
+				const auto uncompressed_size = static_cast<uint32_t>(buffers.serialization.size());
+				augs::write_bytes(s, uncompressed_size);
 
-		return std::addressof(buffers.compressed);
+				NSR_LOG("Uncompressed size: %x", uncompressed_size);
+			}
+
+			augs::compress(buffers.compression_state, buffers.serialization, c);
+
+			NSR_LOG("Compressed stream size: %x", c.size());
+		}
+
+		return std::addressof(c);
 	}
 }

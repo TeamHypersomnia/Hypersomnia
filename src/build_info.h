@@ -79,7 +79,7 @@ Options:
     --start-server              Host an arena server in accordance with default_server_start inside the config file.
 
 If editor_file_path is supplied and it is a directory,
-the game will automatically launch the editor to try and open a project inside it. 
+the game will automatically launch the editor to try and open the project inside it, if there is one. 
 
 )"
 + complete_build_info()

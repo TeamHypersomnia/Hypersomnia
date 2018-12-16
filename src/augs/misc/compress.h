@@ -17,7 +17,7 @@ namespace augs {
 
 	std::vector<std::byte> decompress(
 		const std::vector<std::byte>& input,
-		std::size_t original_size
+		std::size_t uncompressed_size
 	);
 
 	void decompress(

@@ -115,13 +115,15 @@ namespace augs {
 			return get_buffer().size();
 		}
 
-		void write(const std::byte* const data, const size_t bytes) {
-			if (write_pos + bytes > capacity()) {
-				reserve((write_pos + bytes) * 2);
+		void write(const std::byte* const data, const std::size_t bytes) {
+			const auto new_write_pos = write_pos + bytes;
+
+			if (new_write_pos > capacity()) {
+				reserve(new_write_pos * 2);
 			}
 
 			std::memcpy(get_buffer().data() + write_pos, data, bytes);
-			write_pos += bytes;
+			write_pos = new_write_pos;
 		}
 
 		void write(const memory_stream_mixin& s) {

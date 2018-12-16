@@ -300,7 +300,7 @@ void server_setup::advance_clients_state() {
 		};
 
 		if (!added_someone_already) {
-			if (c.state != client_state_type::PENDING_WELCOME) {
+			if (c.state > client_state_type::PENDING_WELCOME) {
 				add_client_if_not_yet_in_mode();
 			}
 		}

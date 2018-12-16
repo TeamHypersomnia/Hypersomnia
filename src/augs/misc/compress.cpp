@@ -1,5 +1,6 @@
 #include "augs/misc/compress.h"
 #include "3rdparty/lz4/lz4.c"
+#include "augs/log.h"
 
 namespace augs {
 	std::vector<std::byte> make_compression_state() {
@@ -23,26 +24,27 @@ namespace augs {
 		std::vector<std::byte>& output
 	) {
 		const auto size_bound = LZ4_compressBound(input.size());
-		output.resize(size_bound);
+		const auto prev_size = output.size();
+		output.resize(prev_size + size_bound);
 
-		const auto sz = LZ4_compress_fast_extState(
+		const auto bytes_written = LZ4_compress_fast_extState(
 			reinterpret_cast<void*>(state.data()), 
 			reinterpret_cast<const char*>(input.data()), 
-			reinterpret_cast<char*>(output.data()), 
+			reinterpret_cast<char*>(output.data() + prev_size), 
 			input.size(),
 			size_bound,
 			1
 		);
 
-		output.resize(sz);
+		output.resize(prev_size + bytes_written);
 	}
 
 	std::vector<std::byte> decompress(
 		const std::vector<std::byte>& input,
-		std::size_t original_size
+		const std::size_t uncompressed_size
 	) {
 		std::vector<std::byte> output;
-		output.resize(original_size);
+		output.resize(uncompressed_size);
 
 		decompress(input, output);
 		return output;
@@ -60,19 +62,22 @@ namespace augs {
 		const std::size_t byte_count,
 		std::vector<std::byte>& output
 	) {
-		const auto sz = LZ4_decompress_safe(
+		const auto uncompressed_size = output.size();
+
+		const auto bytes_read = LZ4_decompress_safe(
 			reinterpret_cast<const char*>(input), 
 			reinterpret_cast<char*>(output.data()), 
 			byte_count,
-			output.size()
+			uncompressed_size
 		);
 
-		if (sz < 0) {
+		if (bytes_read < 0) {
 			output.clear();
 			return;
 		}
 
-		if (output.size() != static_cast<std::size_t>(sz)) {
+		if (uncompressed_size != static_cast<std::size_t>(bytes_read)) {
+			LOG("Decompression failure. Read %x bytes, but expected %x.", bytes_read, uncompressed_size);
 			output.clear();
 		}
 	}
