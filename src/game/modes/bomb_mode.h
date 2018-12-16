@@ -377,7 +377,7 @@ public:
 	/* A server might provide its own integer-based identifiers */
 	bool add_player_custom(input, const add_player_input&);
 
-	void remove_player(input, const mode_player_id&);
+	void remove_player(input, logic_step, const mode_player_id&);
 
 	faction_choice_result auto_assign_faction(input, const mode_player_id&);
 	faction_choice_result choose_faction(const mode_player_id&, const faction_type faction);

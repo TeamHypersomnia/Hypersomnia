@@ -60,13 +60,29 @@ int bomb_mode_player_stats::calc_score() const {
 }
 
 template <class H>
-static void delete_with_held_items(const H handle) {
+static void delete_with_held_items(const input_type in, const logic_step step, const H handle) {
 	if (handle) {
 		deletion_queue q;
 		q.push_back(handle.get_id());
 
 		handle.for_each_contained_item_recursive(
 			[&](const auto& contained) {
+				const auto& b = in.rules.bomb_flavour;
+
+				if (b.is_set()) {
+					if (entity_flavour_id(b) == entity_flavour_id(contained.get_flavour_id())) {
+						/* Don't delete the bomb!!! Drop it instead. */
+
+						auto request = item_slot_transfer_request::drop(contained);
+						request.params.bypass_mounting_requirements = true;
+
+						const auto result = perform_transfer_no_step(request, step.get_cosmos());
+						result.notify_logical(step);
+
+						return;
+					}
+				}
+
 				q.push_back(entity_id(contained.get_id()));
 			}
 		);
@@ -355,10 +371,10 @@ bool bomb_mode_player::is_set() const {
 	return !chosen_name.empty();
 }
 
-void bomb_mode::remove_player(input_type in, const mode_player_id& id) {
+void bomb_mode::remove_player(input_type in, const logic_step step, const mode_player_id& id) {
 	const auto controlled_character_id = lookup(id);
 
-	delete_with_held_items(in.cosm[controlled_character_id]);
+	delete_with_held_items(in, step, in.cosm[controlled_character_id]);
 
 	erase_element(players, id);
 }
@@ -1184,7 +1200,7 @@ void bomb_mode::add_or_remove_players(const input_type in, const mode_entropy& e
 	}
 
 	if (g.removed_player != std::nullopt) {
-		remove_player(in, *g.removed_player);
+		remove_player(in, step, *g.removed_player);
 	}
 }
 
@@ -1382,7 +1398,7 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 	}
 }
 
-void bomb_mode::spawn_and_kick_bots(const input_type in, const logic_step) {
+void bomb_mode::spawn_and_kick_bots(const input_type in, const logic_step step) {
 	const auto& names = in.rules.bot_names;
 	const auto requested_bots = std::min(
 		in.rules.bot_quota,
@@ -1407,7 +1423,7 @@ void bomb_mode::spawn_and_kick_bots(const input_type in, const logic_step) {
 		}
 
 		for (const auto& t : to_erase) {
-			remove_player(in, t);
+			remove_player(in, step, t);
 		}
 
 		current_num_bots = requested_bots;
@@ -1675,7 +1691,7 @@ void bomb_mode::respawn_the_dead(const input_type in, const logic_step step, con
 					after_ms,
 					sentience.when_knocked_out
 				)) {
-					delete_with_held_items(player_handle);
+					delete_with_held_items(in, step, player_handle);
 					player_data.controlled_character_id.unset();
 
 					create_character_for_player(in, step, id, std::nullopt);

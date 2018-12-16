@@ -2440,3 +2440,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
   can't client simply reinfer any time that a player is added to the mode?
 - dont use audiovisual callbacks for re-predicting
 
+- properly remove player on disconect
+	- problem: we only have one disconnect event per step
+	- simply wait with adding the player until the concerned slot is free
+		- we anyway have a moment that there is no mode player id for an already existing client, e.g. before sending of initial state

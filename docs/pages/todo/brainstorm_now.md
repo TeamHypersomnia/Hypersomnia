@@ -8,11 +8,6 @@ summary: That which we are brainstorming at the moment.
 
 - Properly implement bots
 	- Now they can break the client logic
-	
-- properly remove player on disconect
-	- problem: we only have one disconnect event per step
-	- simply wait with adding the player until the concerned slot is free
-		- we anyway have a moment that there is no mode player id for an already existing client, e.g. before sending of initial state
 
 - yojimbo_assert( length < buffer_size - 1 );
 	- report a bug?

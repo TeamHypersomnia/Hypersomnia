@@ -82,7 +82,6 @@ namespace test_scenes {
 #if GIVE_AMMO
 			resistance.warmup_initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::CALICO);
 			metropolis.warmup_initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::WARX_FQ12);
-			metropolis.initial_eq.belt_wearable = to_entity_flavour_id(test_tool_items::DEFUSE_KIT);
 #endif
 		}
 
