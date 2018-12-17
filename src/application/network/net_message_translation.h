@@ -122,18 +122,21 @@ namespace net_messages {
 		auto& uncompressed_buf = buffers.serialization;
 		uncompressed_buf.resize(uncompressed_size);
 
-		augs::decompress(
-			data + sizeof(uint32_t),
-			size - sizeof(uint32_t),
-			uncompressed_buf
-		);
+		try {
+			augs::decompress(
+				data + sizeof(uint32_t),
+				size - sizeof(uint32_t),
+				uncompressed_buf
+			);
 
-		if (uncompressed_buf.size() != uncompressed_size) {
-			NSR_LOG("Failed to decompress the buffer.");
+			NSR_LOG("Successfully uncompressed the initial state.");
+		}
+		catch (const augs::decompression_error& err) {
+			LOG("Failed to decompress the initial state. Server might be malicious.");
+			LOG(err.what());
+
 			return false;
 		}
-
-		NSR_LOG("Successfully uncompressed the buffer.");
 
 		auto s = augs::cref_memory_stream(uncompressed_buf);
 

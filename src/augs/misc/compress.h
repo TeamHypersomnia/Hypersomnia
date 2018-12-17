@@ -1,7 +1,12 @@
 #pragma once
 #include <vector>
+#include "augs/templates/exception_templates.h"
 
 namespace augs {
+	struct decompression_error : error_with_typesafe_sprintf {
+		using error_with_typesafe_sprintf::error_with_typesafe_sprintf;
+	};
+
 	std::vector<std::byte> make_compression_state();
 
 	std::vector<std::byte> compress(

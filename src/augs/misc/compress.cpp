@@ -73,19 +73,18 @@ namespace augs {
 
 		if (bytes_read < 0) {
 			output.clear();
-			return;
+			throw decompression_error("Decompression failure. Failed to read any bytes.");
 		}
 
 		if (uncompressed_size != static_cast<std::size_t>(bytes_read)) {
-			LOG("Decompression failure. Read %x bytes, but expected %x.", bytes_read, uncompressed_size);
 			output.clear();
+			throw decompression_error("Decompression failure. Read %x bytes, but expected %x.", bytes_read, uncompressed_size);
 		}
 	}
 }
 
 #if BUILD_UNIT_TESTS
 #include <Catch/single_include/catch2/catch.hpp>
-#include "augs/log.h"
 
 TEST_CASE("Ca CompressionDecompression") {
 	const auto tests = {
@@ -119,15 +118,29 @@ TEST_CASE("Ca CompressionDecompression") {
 		}
 
 		{
-			const auto bad_decompressed = augs::decompress(augs::compress(state, input), input.size() + 1);
+			std::vector<std::byte> bad_decompressed;
+			bad_decompressed.resize(input.size() + 1);
 
-			REQUIRE(bad_decompressed.empty());
+			try {
+				augs::decompress(augs::compress(state, input), bad_decompressed);
+				REQUIRE(false);
+			}
+			catch(const augs::decompression_error&) { 
+				REQUIRE(bad_decompressed.empty());
+			}
 		}
 
 		if (blahblah.size() > 0) {
-			const auto bad_decompressed = augs::decompress(augs::compress(state, input), input.size() - 1);
+			std::vector<std::byte> bad_decompressed;
+			bad_decompressed.resize(input.size() - 1);
 
-			REQUIRE(bad_decompressed.empty());
+			try {
+				augs::decompress(augs::compress(state, input), bad_decompressed);
+				REQUIRE(false);
+			}
+			catch(const augs::decompression_error&) { 
+				REQUIRE(bad_decompressed.empty());
+			}
 		}
 	}
 }
