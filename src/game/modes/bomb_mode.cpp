@@ -583,7 +583,13 @@ bool bomb_mode::give_bomb_to_random_player(const input_type in, const logic_step
 
 	for (const auto& t : tried_slots) {
 		if (typed_player[t].is_empty_slot()) {
-			auto request = item_slot_transfer_request::standard(spawn_bomb(in).get_id(), typed_player[t].get_id());
+			const auto spawned_bomb = spawn_bomb(in);
+
+			if (spawned_bomb.dead()) {
+				return false;
+			}
+
+			auto request = item_slot_transfer_request::standard(spawned_bomb.get_id(), typed_player[t].get_id());
 			request.params.bypass_mounting_requirements = true;
 			perform_transfer(request, step);
 			break;
@@ -1774,6 +1780,10 @@ float bomb_mode::get_round_end_seconds_left(const const_input_type in) const {
 }
 
 bool bomb_mode::bomb_exploded(const const_input_type in) const {
+	if (!in.rules.bomb_flavour.is_set()) {
+		return false;
+	}
+
 	return on_bomb_entity(in, [&](const auto& t) {
 		/* 
 			The bomb could have stopped existing through only one way: 
