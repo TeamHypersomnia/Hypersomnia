@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Static linking
+
+- Leave a detailed net graph for later
+	- Just print some basic network usage
+
+- If we simply don't predict knockouts, we automatically don't predict the vulnerable win conditions in the mode
+	- Other win conditions are based on time so it won't be as bad
+
 - Admin panel
 
 - Detect when the initial state is being sent to optionally display progress

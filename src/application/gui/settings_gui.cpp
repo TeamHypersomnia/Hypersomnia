@@ -135,6 +135,8 @@ void settings_gui_state::perform(
 			}
 
 			text_disabled("The network simulation is always disabled in production builds.");
+#else
+			(void)sim;
 #endif
 		};
 

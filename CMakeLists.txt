@@ -129,6 +129,8 @@ option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ${DEFA
 option(BUILD_STENCIL_BUFFER "Build stencil buffer related code. Will be disabled in MMO setups, so everybody is equal in having wallhacks." ${DEFAULT_OPT})
 option(BUILD_PROPERTY_EDITOR "Build property editor code for the editor setup. Due to hardcore templates, this takes amazingly long time to build, so it makes sense to turn it off sometimes." ${DEFAULT_OPT})
 
+option(LINK_STATICALLY "Statically link all libraries." ${DEFAULT_OPT})
+
 set(BUILD_IN_CONSOLE_MODE OFF CACHE STRING "0")
 
 ## Build optimization switches.
@@ -865,6 +867,18 @@ else()
 	execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${HYPERSOMNIA_VERSION_FILE_INPUT_PATH} ${HYPERSOMNIA_VERSION_FILE_CPP})
 endif()
 
+if (LINK_STATICALLY AND UNIX)
+	message("Libraries will be linked statically.")
+
+	message("Default CMAKE_FIND_LIBRARY_SUFFIXES: ${CMAKE_FIND_LIBRARY_SUFFIXES}")
+
+	list( REMOVE_ITEM CMAKE_FIND_LIBRARY_SUFFIXES   ".a" )
+	list( INSERT      CMAKE_FIND_LIBRARY_SUFFIXES 0 ".a" )
+
+	message("CMAKE_FIND_LIBRARY_SUFFIXES after adjustment: ${CMAKE_FIND_LIBRARY_SUFFIXES}")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++")
+endif()
+
 
 # We add headers to aid IntelliSense.
 
@@ -902,6 +916,8 @@ if(GCC OR CLANG)
 		set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -m64")
 	endif()
 
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -fno-threadsafe-statics")
+
 	message("-O0 will be specified for Debug build.")
 	set(HYPERSOMNIA_CXX_DEBUG_FLAGS "${HYPERSOMNIA_CXX_DEBUG_FLAGS} -Xclang -O0")
 	set(HYPERSOMNIA_C_DEBUG_FLAGS "${HYPERSOMNIA_C_DEBUG_FLAGS} -Xclang -O0")
@@ -922,7 +938,7 @@ if(CLANG)
 
 	# Latest features of C++17 will be enabled.
 	set(HYPERSOMNIA_CXX_FLAGS 
-		"${HYPERSOMNIA_CXX_FLAGS} ${CHOSEN_WARNINGS} -fcolor-diagnostics -Wno-error=unused-command-line-argument -Wno-error=missing-braces"
+		"${HYPERSOMNIA_CXX_FLAGS} ${CHOSEN_WARNINGS}  -fcolor-diagnostics -Wno-error=unused-command-line-argument -Wno-error=missing-braces"
 	)
 
 	if(NOT MSVC)
@@ -1406,18 +1422,33 @@ if(MSVC)
 		)
 	endif()
 elseif(CLANG)
-	list(APPEND HYPERSOMNIA_LIBS c++fs c++experimental dl Xi)
+	find_library(CPP c++)
+	find_library(CPPFS c++fs)
+	find_library(CPPEXPERIMENTAL c++experimental)
+	find_library(CPPABI c++abi)
+
+	set(HYPERSOMNIA_LIBS ${CPP} ${CPPABI} ${CPPFS} ${CPPEXPERIMENTAL} ${HYPERSOMNIA_LIBS})
 elseif(GCC)
-	list(APPEND HYPERSOMNIA_LIBS stdc++fs dl Xi)
+	list(APPEND HYPERSOMNIA_LIBS stdc++fs)
+endif()
+
+if (UNIX)
+	list(APPEND HYPERSOMNIA_LIBS dl Xi)
 endif()
 
 if (BUILD_NETWORKING)
-	list(APPEND HYPERSOMNIA_LIBS sodium mbedtls mbedx509 mbedcrypto)
+	find_library(MBEDTLS mbedtls)
+	find_library(MBEDX509 mbedx509)
+	find_library(MBEDCRYPTO mbedcrypto)
+
+	list(APPEND HYPERSOMNIA_LIBS sodium ${MBEDTLS} ${MBEDX509} ${MBEDCRYPTO})
 endif()
 
-target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
-
 set_target_properties(Hypersomnia PROPERTIES DEBUG_POSTFIX "")
+
+message("All libs: ${HYPERSOMNIA_LIBS}")
+
+target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
 
 if(MSVC_SPECIFIC)
 	set_target_properties(Hypersomnia PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${HYPERSOMNIA_EXE_RESOURCES_DIR}")
