@@ -8,9 +8,6 @@ summary: That which we are brainstorming at the moment.
 
 - Admin panel
 
-- yojimbo_assert( length < buffer_size - 1 );
-	- report a bug?
-
 - Detect when the initial state is being sent to optionally display progress
 	- Possibly by returning some info from ReceiveBlockData struct
 

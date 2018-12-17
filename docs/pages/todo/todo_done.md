@@ -2444,3 +2444,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- problem: we only have one disconnect event per step
 	- simply wait with adding the player until the concerned slot is free
 		- we anyway have a moment that there is no mode player id for an already existing client, e.g. before sending of initial state
+
+- yojimbo_assert( length < buffer_size - 1 );
+	- report a bug?
+
