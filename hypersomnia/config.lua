@@ -481,8 +481,8 @@ return {
 	},
 
 	enabled_network_simulator = {
-      latency_ms = 50,
-      jitter_ms = 10,
+      latency_ms = 70,
+      jitter_ms = 15,
       loss_percent = 1,
 	  duplicates_percent = 1,
 	},

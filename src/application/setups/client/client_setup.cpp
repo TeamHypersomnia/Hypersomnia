@@ -48,7 +48,7 @@ entity_id client_setup::get_viewed_character_id() const {
 		return entity_id::dead();
 	}
 
-	return get_arena_handle().on_mode(
+	return get_arena_handle(client_arena_type::PREDICTED).on_mode(
 		[&](const auto& typed_mode) {
 			return typed_mode.lookup(get_local_player_id());
 		}
@@ -76,7 +76,7 @@ double client_setup::get_inv_tickrate() const {
 		return default_inv_tickrate;
 	}
 
-	return get_arena_handle().get_inv_tickrate();
+	return get_arena_handle(client_arena_type::PREDICTED).get_inv_tickrate();
 }
 
 double client_setup::get_audiovisual_speed() const {
@@ -84,7 +84,7 @@ double client_setup::get_audiovisual_speed() const {
 		return 1.0;
 	}
 
-	return get_arena_handle().get_audiovisual_speed();
+	return get_arena_handle(client_arena_type::PREDICTED).get_audiovisual_speed();
 }
 
 using initial_payload = initial_arena_state_payload<false>;
@@ -388,4 +388,8 @@ setup_escape_result client_setup::escape() {
 	}
 
 	return setup_escape_result::IGNORE;
+}
+
+const cosmos& client_setup::get_viewed_cosmos() const {
+	return get_arena_handle(client_arena_type::PREDICTED).get_cosmos();
 }

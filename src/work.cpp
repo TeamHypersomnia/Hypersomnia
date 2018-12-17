@@ -816,7 +816,16 @@ int work(const int argc, const char* const * const argv) try {
 		}();
 
 		if (has_cosmos_changed) {
-			LOG("Sanitizing cosmos-related audiovisuals due to possible change");
+			const bool is_client = 
+				current_setup != std::nullopt 
+				&& std::holds_alternative<client_setup>(*current_setup)
+			;
+
+			if (!is_client) {
+				/* Don't log this for the client as it will happen all the time due to prediction */
+
+				LOG("Sanitizing cosmos-related audiovisuals due to possible change");
+			}	
 
 #if 1
 			game_gui.clear_dead_entities(*now_sampled);

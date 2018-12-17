@@ -40,6 +40,7 @@ game_connection_config::game_connection_config() {
 		auto& solvable_stream = channel[static_cast<int>(game_channel_type::SERVER_SOLVABLE_AND_STEPS)];
 		solvable_stream.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
 		solvable_stream.maxBlockSize = 1024 * 1024 * 2;
+		solvable_stream.messageResendTime = 0.f;
 	}
 
 	{

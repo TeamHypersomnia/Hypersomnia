@@ -21,7 +21,7 @@
 
 #include "game/detail/sentience/sentience_getters.h"
 
-#define LOG_BOMB_MODE !IS_PRODUCTION_BUILD
+#define LOG_BOMB_MODE 0
 
 template <class... Args>
 void BMB_LOG(Args&&... args) {

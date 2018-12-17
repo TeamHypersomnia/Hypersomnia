@@ -137,9 +137,7 @@ public:
 
 	void init_connection(const client_start_input&);
 
-	const auto& get_viewed_cosmos() const {
-		return scene.world;
-	}
+	const cosmos& get_viewed_cosmos() const;
 
 	auto get_interpolation_ratio() const {
 		const auto dt = get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
@@ -149,7 +147,6 @@ public:
 	entity_id get_viewed_character_id() const;
 
 	auto get_viewed_character() const {
-
 		return get_viewed_cosmos()[get_viewed_character_id()];
 	}
 
@@ -267,7 +264,7 @@ public:
 				}
 
 				//LOG("PE: %x", receiver.predicted_entropies.size());
-				get_arena_handle().advance(*new_local_entropy, callbacks);
+				get_arena_handle(client_arena_type::PREDICTED).advance(*new_local_entropy, callbacks);
 			}
 
 			if (in_game) {
