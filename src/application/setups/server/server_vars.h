@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "augs/network/network_simulator_settings.h"
 
 struct server_vars {
 	// GEN INTROSPECTOR struct server_vars
@@ -12,5 +13,7 @@ struct server_vars {
 	unsigned time_limit_to_enter_game_since_connection = 10;
 
 	unsigned send_updates_once_every_tick = 1;
+
+	augs::maybe_network_simulator network_simulator;
 	// END GEN INTROSPECTOR
 };

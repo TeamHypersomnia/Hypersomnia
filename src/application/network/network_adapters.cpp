@@ -56,6 +56,12 @@ game_connection_config::game_connection_config() {
 
 	serverPerClientMemory += 1024 * 1024 * 2;
 
+#if IS_PRODUCTION_BUILD
+	networkSimulator = false;
+#else
+	networkSimulator = true;
+#endif
+
 	set_max_packet_size(2 * 1024);
 }
 
@@ -174,4 +180,28 @@ bool client_adapter::has_connection_failed() const {
 	return client.ConnectionFailed();
 }
 
+void client_adapter::set(augs::maybe_network_simulator s) {
+	if (!s.is_enabled) {
+		s = augs::network_simulator_settings::zero();
+	}
 
+	const auto& v = s.value;
+
+	client.SetLatency(v.latency_ms);
+	client.SetJitter(v.jitter_ms);
+	client.SetPacketLoss(v.loss_percent);
+	client.SetDuplicates(v.duplicates_percent);
+}
+
+void server_adapter::set(augs::maybe_network_simulator s) {
+	if (!s.is_enabled) {
+		s = augs::network_simulator_settings::zero();
+	}
+
+	const auto& v = s.value;
+
+	server.SetLatency(v.latency_ms);
+	server.SetJitter(v.jitter_ms);
+	server.SetPacketLoss(v.loss_percent);
+	server.SetDuplicates(v.duplicates_percent);
+}

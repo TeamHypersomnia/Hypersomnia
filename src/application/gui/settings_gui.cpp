@@ -120,6 +120,20 @@ void settings_gui_state::perform(
 			revert(f);
 		};
 
+		auto do_lag_simulator = [&](auto& sim) {
+			revertable_checkbox("Enable lag simulator", sim.is_enabled);
+
+			if (sim.is_enabled) {
+				auto& scope_cfg = sim.value;
+				auto indent = scoped_indent();
+
+				revertable_slider(SCOPE_CFG_NVP(latency_ms), 0.f, 200.f);
+				revertable_slider(SCOPE_CFG_NVP(jitter_ms), 0.f, 100.f);
+				revertable_slider(SCOPE_CFG_NVP(loss_percent), 0.f, 99.f);
+				revertable_slider(SCOPE_CFG_NVP(duplicates_percent), 0.f, 99.f);
+			}
+		};
+
 		switch (active_pane) {
 			case settings_pane::WINDOW: {
 				enum_combo("Launch on game's startup", config.launch_mode);
@@ -324,6 +338,10 @@ void settings_gui_state::perform(
 				// revertable_checkbox("Draw gameplay GUI", config.drawing.draw_character_gui); revert(config.drawing.draw_character_gui);
 				break;
 			}
+			case settings_pane::CLIENT: {
+				do_lag_simulator(config.client.network_simulator);
+				break;
+			}
 			case settings_pane::SERVER: {
 				auto& scope_cfg = config.server;
 
@@ -331,6 +349,10 @@ void settings_gui_state::perform(
 				revertable_slider(SCOPE_CFG_NVP(time_limit_to_enter_game_since_connection), 0u, 300u);
 
 				input_text<100>(SCOPE_CFG_NVP(override_default_ruleset)); revert(scope_cfg.override_default_ruleset);
+
+				do_lag_simulator(config.server.network_simulator);
+
+				break;
 			}
 			case settings_pane::EDITOR: {
 				if (auto node = scoped_tree_node("General")) {

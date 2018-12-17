@@ -113,6 +113,10 @@ void server_setup::apply(const server_vars& new_vars, const bool force) {
 		}
 	}
 
+	if (force || vars.network_simulator != new_vars.network_simulator) {
+		server->set(new_vars.network_simulator);
+	}
+
 	vars = new_vars;
 }
 

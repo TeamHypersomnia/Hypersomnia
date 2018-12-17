@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include "augs/network/network_simulator_settings.h"
 
 struct client_jitter_vars {
 	// GEN INTROSPECTOR struct client_jitter_vars
@@ -19,5 +20,7 @@ struct client_vars {
 	std::string nickname = "Player";
 	client_net_vars net;
 	uint32_t server_timeout_secs = 3;
+
+	augs::maybe_network_simulator network_simulator;
 	// END GEN INTROSPECTOR
 };

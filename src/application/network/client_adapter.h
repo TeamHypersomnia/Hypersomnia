@@ -1,5 +1,6 @@
 #pragma once
 #include "application/network/network_adapters.h"
+#include "augs/network/network_simulator_settings.h"
 
 class client_adapter {
 	std::array<uint8_t, yojimbo::KeyBytes> privateKey = {};
@@ -50,4 +51,6 @@ public:
 	const auto& get_specific() const {
 		return client;
 	}
+
+	void set(augs::maybe_network_simulator);
 };

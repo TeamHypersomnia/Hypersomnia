@@ -62,4 +62,6 @@ public:
 	const auto& get_specific() const {
 		return server;
 	}
+
+	void set(augs::maybe_network_simulator);
 };

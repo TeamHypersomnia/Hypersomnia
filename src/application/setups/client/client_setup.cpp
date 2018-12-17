@@ -328,6 +328,8 @@ void client_setup::apply(const config_lua_table& cfg) {
 	r.chosen_nickname = vars.nickname;
 	r.net = vars.net;
 	r.public_settings.mouse_sensitivity = cfg.input.mouse_sensitivity;
+
+	client->set(vars.network_simulator);
 }
 
 bool client_setup::is_connected() const {

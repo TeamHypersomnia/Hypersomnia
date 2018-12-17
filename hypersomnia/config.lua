@@ -442,9 +442,21 @@ return {
 
   server = {
 	current_arena = "",
+	override_default_ruleset = "",
+
 	admin_nickname = "GameMaster",
+
 	kick_if_inactive_for_secs = 60,
-	time_limit_to_enter_game_since_connection = 10
+	time_limit_to_enter_game_since_connection = 10,
+
+	send_updates_once_every_tick = 1,
+
+	enabled_network_simulator = {
+      latency_ms = 50,
+      jitter_ms = 10,
+      loss_percent = 1,
+	  duplicates_percent = 1,
+	}
   },
 
   dedicated_server = {
@@ -457,12 +469,20 @@ return {
 
   client = {
 	nickname = "Player",
+
 	net = {
 	  jitter = {
 	  	buffer_ms = 33,
 		merge_commands_when_above_ms = 50
 	  },
 	  server_timeout_secs = 3
+	},
+
+	enabled_network_simulator = {
+      latency_ms = 50,
+      jitter_ms = 10,
+      loss_percent = 1,
+	  duplicates_percent = 1,
 	}
   }
 }
