@@ -447,6 +447,10 @@ return {
 	time_limit_to_enter_game_since_connection = 10
   },
 
+  dedicated_server = {
+
+  },
+
   default_client_start = {
 	ip_port = "127.0.0.1:8412",
   },

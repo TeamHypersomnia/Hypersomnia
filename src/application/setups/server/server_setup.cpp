@@ -23,16 +23,20 @@
 
 /* To avoid incomplete type error */
 server_setup::~server_setup() {
-	server->stop();
+	if (server->is_running()) {
+		server->stop();
+	}
 }
 
 server_setup::server_setup(
 	sol::state& lua,
 	const server_start_input& in,
-	const server_vars& initial_vars
+	const server_vars& initial_vars,
+	const std::optional<augs::dedicated_server_input> dedicated
 ) : 
 	lua(lua),
 	last_start(in),
+	dedicated(dedicated),
 	server(std::make_unique<server_adapter>(in)),
 	server_time(yojimbo_time())
 {
@@ -127,7 +131,7 @@ void server_setup::choose_arena(const std::string& name) {
 
 	vars.current_arena = name;
 
-	{
+	if (should_have_admin_character()) {
 		mode_entropy_general cmd;
 
 		cmd.added_player = add_player_input {
@@ -547,5 +551,22 @@ setup_escape_result server_setup::escape() {
 }
 
 bool server_setup::is_gameplay_on() const {
+	return is_running();
+}
+
+bool server_setup::is_running() const {
 	return server->is_running();
+}
+
+bool server_setup::should_have_admin_character() const {
+	return dedicated == std::nullopt;
+}
+
+void server_setup::sleep_until_next_tick() {
+	return;
+	const auto sleep_dt = get_current_time() - server_time;
+
+	if (sleep_dt > 0.0) {
+		yojimbo_sleep(sleep_dt * 0.9);
+	}
 }

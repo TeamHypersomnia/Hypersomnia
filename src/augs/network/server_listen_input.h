@@ -10,4 +10,10 @@ namespace augs {
 		int max_connections = 64;
 		// END GEN INTROSPECTOR
 	};
+
+	struct dedicated_server_input {
+		// GEN INTROSPECTOR struct augs::dedicated_server_input
+		bool dummy = false;
+		// END GEN INTROSPECTOR
+	};
 }

@@ -28,7 +28,6 @@ struct arena_gui_state {
 	arena_buy_menu_gui buy_menu;
 	arena_spectator_gui spectator;
 
-	mutable augs::sound_source tick_sound;
 	mutable std::optional<float> last_seconds_value;
 	mutable warmup_welcome_cache warmup;
 

@@ -69,6 +69,6 @@ namespace augs {
 	}
 
 	global_libraries::~global_libraries() {
-		deinit();
+		deinit(initialized);
 	}
 };

@@ -33,7 +33,7 @@ namespace augs {
 		
 		~global_libraries();
 
-		void init		(const library_flagset = { library::FREETYPE, library::NETWORKING });
-		void deinit		(const library_flagset = { library::FREETYPE, library::NETWORKING });
+		void init		(library_flagset = { library::FREETYPE, library::NETWORKING });
+		void deinit		(library_flagset);
 	};
 };

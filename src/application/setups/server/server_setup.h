@@ -60,6 +60,8 @@ class server_setup :
 	sol::state& lua;
 
 	server_start_input last_start;
+	std::optional<augs::dedicated_server_input> dedicated;
+
 	server_step_type current_simulation_step = 0;
 
 	augs::serialization_buffers buffers;
@@ -122,7 +124,8 @@ public:
 	server_setup(
 		sol::state& lua,
 		const server_start_input&,
-		const server_vars& 
+		const server_vars&,
+		std::optional<augs::dedicated_server_input>
 	);
 
 	~server_setup();
@@ -163,7 +166,7 @@ public:
 
 	template <class C>
 	void advance(
-		const setup_advance_input& in,
+		const server_advance_input& in,
 		const C& callbacks
 	) {
 		const auto current_time = get_current_time();
@@ -174,8 +177,13 @@ public:
 			handle_client_messages();
 			advance_clients_state();
 
-			/* Extract entropy from the built-in server player */
 			{
+				/* 
+					Extract entropy from the built-in server player. 
+					If it is a dedicated server, this will only extract the general commands,
+					like player added or removed.
+				*/
+
 				const auto admin_entropy = local_collected.extract(
 					get_viewed_character(), 
 					get_admin_player_id(),
@@ -228,4 +236,9 @@ public:
 
 	custom_imgui_result perform_custom_imgui(perform_custom_imgui_input);
 	setup_escape_result escape();
+
+	bool is_running() const;
+	bool should_have_admin_character() const;
+
+	void sleep_until_next_tick();
 };

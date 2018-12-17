@@ -19,7 +19,7 @@ enum class setup_escape_result {
 
 struct setup_advance_input {
 	const augs::delta frame_delta;
-	const vec2i& screen_size;
+	const vec2i screen_size;
 	const input_settings& settings;
 };
 
@@ -27,6 +27,13 @@ struct simulation_receiver_settings;
 class interpolation_system;
 class past_infection_system;
 struct network_profiler;
+
+struct server_advance_input {
+	const vec2i screen_size;
+	const input_settings& settings;
+
+	network_profiler& network_performance;
+};
 
 struct client_advance_input {
 	const vec2i& screen_size;

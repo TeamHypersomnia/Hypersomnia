@@ -84,13 +84,23 @@ int work(const int argc, const char* const * const argv) try {
 	static augs::timer until_first_swap;
 	bool until_first_swap_measured = false;
 
+#if PLATFORM_UNIX	
+	static volatile std::sig_atomic_t signal_status = 0;
+ 
+	static auto signal_handler = [](const int signal_type) {
+   		signal_status = signal_type;
+	};
+
+	std::signal(SIGINT, signal_handler);
+	std::signal(SIGTERM, signal_handler);
+	std::signal(SIGSTOP, signal_handler);
+#endif
+
 	static session_profiler performance;
 	static network_profiler network_performance;
 
 	LOG("Started at %x", augs::date_time().get_readable());
 	LOG("Working directory: %x", augs::get_current_working_directory());
-
-	static const auto params = cmd_line_params(argc, argv);
 
 	augs::create_directories(LOG_FILES_DIR);
 	augs::create_directories(GENERATED_FILES_DIR);
@@ -126,6 +136,39 @@ int work(const int argc, const char* const * const argv) try {
 		last_saved_config.save(lua, local_config_path);
 	};
 
+	static const auto params = cmd_line_params(argc, argv);
+
+	static augs::timer global_libraries_timer;
+
+	static const auto libraries = 
+		params.start_dedicated_server 
+		? augs::global_libraries(augs::global_libraries::library::NETWORKING) 
+		: augs::global_libraries() 
+	;
+
+	LOG("Initializing global libraries took: %x ms", global_libraries_timer.template extract<std::chrono::milliseconds>());
+
+	static std::optional<setup_variant> current_setup;
+
+	static auto has_current_setup = []() {
+		return current_setup != std::nullopt;
+	};
+
+	static auto emplace_current_setup = [&p = current_setup] (auto tag, auto&&... args) {
+		using Tag = decltype(tag);
+		using T = type_of_in_place_type_t<Tag>; 
+
+		if (p == std::nullopt) {
+			p.emplace(
+				tag,
+				std::forward<decltype(args)>(args)...
+			);
+		}
+		else {
+			p.value().emplace<T>(std::forward<decltype(args)>(args)...);
+		}
+	};
+
 	if (config.unit_tests.run) {
 		augs::run_unit_tests(config.unit_tests);
 
@@ -136,10 +179,52 @@ int work(const int argc, const char* const * const argv) try {
 		}
 	}
 
-	static augs::timer global_libraries_timer;
-	static const augs::global_libraries libraries;
-	LOG("Initializing global libraries took: %x ms", global_libraries_timer.template extract<std::chrono::milliseconds>());
-	
+	if (params.start_dedicated_server) {
+		emplace_current_setup(
+			std::in_place_type_t<server_setup>(),
+			lua,
+			config.default_server_start,
+			config.server,
+			config.dedicated_server
+		);
+
+		auto& server = std::get<server_setup>(*current_setup);
+
+		while (server.is_running()) {
+			auto scope = measure_scope(performance.fps);
+
+#if PLATFORM_UNIX
+			if (signal_status != 0) {
+				const auto sig = signal_status;
+
+				LOG("%x received.", strsignal(sig));
+
+				if(
+					sig == SIGINT
+					|| sig == SIGSTOP
+					|| sig == SIGTERM
+				) {
+					LOG("Gracefully shutting down.");
+					break;
+				}
+			}
+#endif
+
+			server.advance(
+				{
+					vec2i(),
+					config.input,
+					network_performance
+				},
+				solver_callbacks()
+			);
+
+			server.sleep_until_next_tick();
+		}
+
+		return EXIT_SUCCESS;
+	}
+
 	static augs::audio_context audio(config.audio);
 	augs::log_all_audio_devices(LOG_FILES_DIR "/audio_devices.txt");
 
@@ -188,29 +273,9 @@ int work(const int argc, const char* const * const argv) try {
 	*/
 
 	static std::optional<main_menu_setup> main_menu;
-	static std::optional<setup_variant> current_setup;
-
-	static auto has_current_setup = []() {
-		return main_menu == std::nullopt && current_setup != std::nullopt;
-	};
 
 	static auto has_main_menu = []() {
 		return main_menu != std::nullopt;
-	};
-
-	static auto emplace_current_setup = [&p = current_setup] (auto tag, auto&&... args) {
-		using Tag = decltype(tag);
-		using T = type_of_in_place_type_t<Tag>; 
-
-		if (p == std::nullopt) {
-			p.emplace(
-				tag,
-				std::forward<decltype(args)>(args)...
-			);
-		}
-		else {
-			p.value().emplace<T>(std::forward<decltype(args)>(args)...);
-		}
 	};
 
 	static auto emplace_main_menu = [&p = main_menu] (auto&&... args) {
@@ -364,7 +429,8 @@ int work(const int argc, const char* const * const argv) try {
 					emplace_current_setup(std::in_place_type_t<server_setup>(),
 						lua,
 						config.default_server_start,
-						config.server
+						config.server,
+						std::nullopt
 					);
 				});
 
@@ -514,18 +580,6 @@ int work(const int argc, const char* const * const argv) try {
 			default: return false;
 		}
 	};
-
-#if PLATFORM_UNIX	
-	static volatile std::sig_atomic_t signal_status = 0;
- 
-	static auto signal_handler = [](const int signal_type) {
-   		signal_status = signal_type;
-	};
-
-	std::signal(SIGINT, signal_handler);
-	std::signal(SIGTERM, signal_handler);
-	std::signal(SIGSTOP, signal_handler);
-#endif
  
 	static auto main_ensure_handler = []() {
 		visit_current_setup(
@@ -790,6 +844,12 @@ int work(const int argc, const char* const * const argv) try {
 		{
 			using S = remove_cref<decltype(setup)>;
 
+			auto callbacks = solver_callbacks(
+				setup_pre_solve,
+				setup_audiovisual_post_solve,
+				setup_post_cleanup
+			);
+
 			if constexpr(std::is_same_v<S, client_setup>) {
 				/* The client needs more goodies */
 
@@ -802,21 +862,23 @@ int work(const int argc, const char* const * const argv) try {
 						get_audiovisuals().get<interpolation_system>(),
 						get_audiovisuals().get<past_infection_system>()
 					},
-					solver_callbacks(
-						setup_pre_solve,
-						setup_audiovisual_post_solve,
-						setup_post_cleanup
-					)
+					callbacks
+				);
+			}
+			else if constexpr(std::is_same_v<S, server_setup>) {
+				setup.advance(
+					{ 
+						window.get_screen_size(), 
+						viewing_config.input, 
+						network_performance
+					},
+					callbacks
 				);
 			}
 			else {
 				setup.advance(
 					{ frame_delta, window.get_screen_size(), viewing_config.input },
-					solver_callbacks(
-						setup_pre_solve,
-						setup_audiovisual_post_solve,
-						setup_post_cleanup
-					)
+					callbacks
 				);
 			}
 		}

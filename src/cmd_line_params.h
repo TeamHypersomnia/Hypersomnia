@@ -8,6 +8,7 @@ struct cmd_line_params {
 	bool unit_tests_only = false;
 	bool help_only = false;
 	bool start_server = false;
+	bool start_dedicated_server = false;
 	bool should_connect = false;
 	std::string connect_to_address;
 
@@ -23,8 +24,11 @@ struct cmd_line_params {
 			else if (a == "--help" || a == "-h") {
 				help_only = true;
 			}
-			else if (a == "--start-server") {
+			else if (a == "--server") {
 				start_server = true;
+			}
+			else if (a == "--dedicated-server") {
+				start_dedicated_server = true;
 			}
 			else if (a == "--connect") {
 				should_connect = true;

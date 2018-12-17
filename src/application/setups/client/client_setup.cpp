@@ -34,7 +34,6 @@ void client_setup::init_connection(const client_start_input& in) {
 }
 
 client_setup::~client_setup() {
-	LOG("Client destr");
 	disconnect();
 }
 
