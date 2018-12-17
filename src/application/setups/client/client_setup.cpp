@@ -31,6 +31,8 @@ void client_setup::init_connection(const client_start_input& in) {
 	state = client_state_type::INVALID;
 	client->connect(in);
 	when_initiated_connection = get_current_time();
+	receiver.clear();
+	last_disconnect_reason.clear();
 }
 
 client_setup::~client_setup() {
@@ -177,6 +179,19 @@ message_handler_result client_setup::handle_server_message(
 
 		receiver.acquire_next_server_entropy(payload);
 
+		const auto& max_commands = vars.max_buffered_server_commands;
+		const auto num_commands = receiver.incoming_entropies.size();
+
+		if (num_commands > max_commands) {
+			last_disconnect_reason = typesafe_sprintf(
+				"Number of buffered server commands (%x) exceeded max_buffered_server_commands (%x).", 
+				num_commands,
+				max_commands
+			);
+
+			return abort_v;
+		}
+
 		//LOG("Received %x th entropy from the server", receiver.incoming_entropies.size());
 		//LOG_NVPS(payload.num_entropies_accepted);
 	}
@@ -241,6 +256,14 @@ custom_imgui_result client_setup::perform_custom_imgui(
 
 		ImGui::SetNextWindowSize((vec2(ImGui::GetIO().DisplaySize) * 0.3f).operator ImVec2(), ImGuiCond_FirstUseEver);
 
+		auto print_reason_if_any = [&]() {
+			if (last_disconnect_reason.empty()) {
+				return;
+			}
+
+			text("Reason: \n%x", last_disconnect_reason);
+		};
+
 		const auto window_name = "Connection status";
 		auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
 
@@ -259,6 +282,8 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			if (state == C::IN_GAME) {
 				text("You have been kicked from the server.");
 
+				print_reason_if_any();
+
 				text("\n");
 				ImGui::Separator();
 
@@ -268,6 +293,8 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			}
 			else {
 				text("Failed to establish connection with %x.", last_start.ip_port);
+
+				print_reason_if_any();
 
 				text("\n");
 				ImGui::Separator();
@@ -285,6 +312,8 @@ custom_imgui_result client_setup::perform_custom_imgui(
 		}
 		else if (client->is_disconnected()) {
 			text("Connection has ended.");
+
+			print_reason_if_any();
 
 			text("\n");
 			ImGui::Separator();

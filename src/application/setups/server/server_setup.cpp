@@ -213,8 +213,6 @@ void server_setup::advance_clients_state() {
 		return ms * inv_simulation_delta_ms;
 	};
 
-	constexpr auto max_pending_commands_for_client_v = static_cast<uint8_t>(255);
-
 	auto character_exists_for = [&](const mode_player_id mode_id) {
 		return get_arena_handle().on_mode(
 			[&](const auto& typed_mode) {
@@ -237,8 +235,19 @@ void server_setup::advance_clients_state() {
 			removed_someone_already = true;
 		};
 
-		if (c.pending_entropies.size() > max_pending_commands_for_client_v) {
-			disconnect_and_unset(client_id);
+		{
+			const auto num_commands = c.pending_entropies.size();
+			const auto max_commands = vars.max_buffered_client_commands;
+
+			if (num_commands > max_commands) {
+				LOG(
+					"Disconnecting the client because the number of pending commands (%x) exceeds the maximum of %x.", 
+					num_commands,
+					max_commands
+				);
+
+				disconnect_and_unset(client_id);
+			}
 		}
 
 		if (!c.is_set()) {
@@ -270,13 +279,25 @@ void server_setup::advance_clients_state() {
 
 				c.num_entropies_accepted = [&]() {
 					if (should_squash) {
-						for (const auto& e : inputs) {
-							entropy += e;
+						const auto num_squashed = static_cast<uint8_t>(
+							std::min(
+								num_pending,
+								static_cast<std::size_t>(c.settings.net.jitter.max_commands_to_squash_at_once)
+							)
+						);
+
+						for (std::size_t i = 0; i < num_squashed; ++i) {
+							entropy += inputs[i];
 						}
 
-						inputs.clear();
+						if (num_squashed == num_pending) {
+							inputs.clear();
+						}
+						else {
+							inputs.erase(inputs.begin(), inputs.begin() + num_squashed);
+						}
 
-						return static_cast<uint8_t>(num_pending);
+						return static_cast<uint8_t>(num_squashed);
 					}
 
 					entropy = inputs[0];

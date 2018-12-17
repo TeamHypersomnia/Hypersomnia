@@ -456,7 +456,9 @@ return {
       jitter_ms = 10,
       loss_percent = 1,
 	  duplicates_percent = 1,
-	}
+	},
+
+	max_buffered_client_commands = 255
   },
 
   dedicated_server = {
@@ -473,9 +475,9 @@ return {
 	net = {
 	  jitter = {
 	  	buffer_ms = 33,
-		merge_commands_when_above_ms = 50
-	  },
-	  server_timeout_secs = 3
+		merge_commands_when_above_ms = 50,
+		max_commands_to_squash_at_once = 255
+	  }
 	},
 
 	enabled_network_simulator = {
@@ -483,6 +485,9 @@ return {
       jitter_ms = 10,
       loss_percent = 1,
 	  duplicates_percent = 1,
-	}
+	},
+
+	max_buffered_server_commands = 1000,
+	max_predicted_client_commands = 130
   }
 }

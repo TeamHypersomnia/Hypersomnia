@@ -64,6 +64,11 @@ public:
 	std::vector<received_entropy_type> incoming_entropies;
 	std::vector<simulated_entropy_type> predicted_entropies;
 
+	void clear() {
+		incoming_entropies.clear();
+		predicted_entropies.clear();
+	}
+
 	void acquire_next_server_entropy(const received_entropy_type& step) {
 		incoming_entropies.push_back(step);
 	}

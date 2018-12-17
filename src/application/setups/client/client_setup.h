@@ -82,6 +82,8 @@ class client_setup :
 
 	double default_inv_tickrate = 1 / 60.0;
 
+	std::string last_disconnect_reason;
+
 	/* No client state follows later in code. */
 
 	static net_time_t get_current_time();
@@ -246,7 +248,24 @@ public:
 					}
 				}
 
-				receiver.predicted_entropies.push_back(*new_local_entropy);
+				{
+					auto& p = receiver.predicted_entropies;
+
+					p.push_back(*new_local_entropy);
+
+					const auto& max_commands = vars.max_predicted_client_commands;
+
+					if (p.size() > max_commands) {
+						last_disconnect_reason = typesafe_sprintf(
+							"Number of predicted commands (%x) exceeded max_predicted_client_commands (%x).", 
+							p.size(),
+							max_commands
+						);
+
+						disconnect();
+					}
+				}
+
 				//LOG("PE: %x", receiver.predicted_entropies.size());
 				get_arena_handle().advance(*new_local_entropy, callbacks);
 			}

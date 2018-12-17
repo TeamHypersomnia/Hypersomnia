@@ -14,6 +14,8 @@ struct server_vars {
 
 	unsigned send_updates_once_every_tick = 1;
 
+	unsigned max_buffered_client_commands = 1000;
+
 	augs::maybe_network_simulator network_simulator;
 	// END GEN INTROSPECTOR
 };

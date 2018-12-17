@@ -45,6 +45,7 @@ namespace net_messages {
 
 		serialize_uint32(stream, payload.net.jitter.buffer_ms);
 		serialize_uint32(stream, payload.net.jitter.merge_commands_when_above_ms);
+		serialize_int(stream, payload.net.jitter.max_commands_to_squash_at_once, 0, 255);
 
 		return true;
 	}

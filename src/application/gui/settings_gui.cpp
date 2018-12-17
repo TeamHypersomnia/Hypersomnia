@@ -121,6 +121,7 @@ void settings_gui_state::perform(
 		};
 
 		auto do_lag_simulator = [&](auto& sim) {
+#if !IS_PRODUCTION_BUILD
 			revertable_checkbox("Enable lag simulator", sim.is_enabled);
 
 			if (sim.is_enabled) {
@@ -132,6 +133,9 @@ void settings_gui_state::perform(
 				revertable_slider(SCOPE_CFG_NVP(loss_percent), 0.f, 99.f);
 				revertable_slider(SCOPE_CFG_NVP(duplicates_percent), 0.f, 99.f);
 			}
+
+			text_disabled("The network simulation is always disabled in production builds.");
+#endif
 		};
 
 		switch (active_pane) {
@@ -339,7 +343,23 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::CLIENT: {
+				auto& scope_cfg = config.client;
+
+				if (auto node = scoped_tree_node("Requested network settings")) {
+					auto& scope_cfg = config.client.net.jitter;
+
+					if (auto node = scoped_tree_node("Jitter")) {
+						revertable_slider(SCOPE_CFG_NVP(buffer_ms), 0u, 200u);
+						revertable_slider(SCOPE_CFG_NVP(merge_commands_when_above_ms), 0u, 1000u);
+						revertable_slider(SCOPE_CFG_NVP(max_commands_to_squash_at_once), uint8_t(0), uint8_t(255));
+					}
+				}
+
+				revertable_slider(SCOPE_CFG_NVP(max_buffered_server_commands), 0u, 10000u);
+				revertable_slider(SCOPE_CFG_NVP(max_predicted_client_commands), 0u, 1000u);
+
 				do_lag_simulator(config.client.network_simulator);
+
 				break;
 			}
 			case settings_pane::SERVER: {
