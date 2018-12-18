@@ -129,7 +129,7 @@ option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ${DEFA
 option(BUILD_STENCIL_BUFFER "Build stencil buffer related code. Will be disabled in MMO setups, so everybody is equal in having wallhacks." ${DEFAULT_OPT})
 option(BUILD_PROPERTY_EDITOR "Build property editor code for the editor setup. Due to hardcore templates, this takes amazingly long time to build, so it makes sense to turn it off sometimes." ${DEFAULT_OPT})
 
-option(LINK_STATICALLY "Statically link all libraries." ${DEFAULT_OPT})
+option(LINK_STATICALLY "Statically link all libraries." OFF)
 
 set(BUILD_IN_CONSOLE_MODE OFF CACHE STRING "0")
 
@@ -903,8 +903,6 @@ if (MSVC)
 	list(APPEND HYPERSOMNIA_INCLUDE_DIRS
 		"${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/windows"
 	)
-
-	link_directories("${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/windows")
 endif()
 
 # We configure additional flags for the compiler.
@@ -1422,12 +1420,18 @@ if(MSVC)
 		)
 	endif()
 elseif(CLANG)
-	find_library(CPP c++)
-	find_library(CPPFS c++fs)
-	find_library(CPPEXPERIMENTAL c++experimental)
-	find_library(CPPABI c++abi)
+	if(USE_LIBCXX)
+		if(LINK_STATICALLY)
+			find_library(CPP c++)
+			find_library(CPPFS c++fs)
+			find_library(CPPEXPERIMENTAL c++experimental)
+			find_library(CPPABI c++abi)
 
-	set(HYPERSOMNIA_LIBS ${CPP} ${CPPABI} ${CPPFS} ${CPPEXPERIMENTAL} ${HYPERSOMNIA_LIBS})
+			set(HYPERSOMNIA_LIBS ${CPP} ${CPPABI} ${CPPFS} ${CPPEXPERIMENTAL} ${HYPERSOMNIA_LIBS})
+		else()
+			list(APPEND HYPERSOMNIA_LIBS c++fs c++experimental)
+		endif()
+	endif()
 elseif(GCC)
 	list(APPEND HYPERSOMNIA_LIBS stdc++fs)
 endif()
@@ -1437,11 +1441,18 @@ if (UNIX)
 endif()
 
 if (BUILD_NETWORKING)
-	find_library(MBEDTLS mbedtls)
-	find_library(MBEDX509 mbedx509)
-	find_library(MBEDCRYPTO mbedcrypto)
+	if (MSVC)
+		set(SODIUM_HINTS "${PROJECT_SOURCE_DIR}/src/3rdparty/yojimbo/windows")
+	else()
+		set(SODIUM_HINTS "")
+	endif()
 
-	list(APPEND HYPERSOMNIA_LIBS sodium ${MBEDTLS} ${MBEDX509} ${MBEDCRYPTO})
+	find_library(MBEDTLS NAMES mbedtls HINTS ${SODIUM_HINTS})
+	find_library(MBEDX509 NAMES mbedx509 HINTS ${SODIUM_HINTS})
+	find_library(MBEDCRYPTO NAMES mbedcrypto HINTS ${SODIUM_HINTS})
+	find_library(SODIUM NAMES sodium HINTS ${SODIUM_HINTS})
+
+	list(APPEND HYPERSOMNIA_LIBS ${SODIUM} ${MBEDTLS} ${MBEDX509} ${MBEDCRYPTO})
 endif()
 
 set_target_properties(Hypersomnia PROPERTIES DEBUG_POSTFIX "")
