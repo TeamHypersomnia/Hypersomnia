@@ -98,6 +98,8 @@ int work(const int argc, const char* const * const argv) try {
 
 	static session_profiler performance;
 	static network_profiler network_performance;
+	static network_info network_stats;
+	static server_network_info server_stats;
 
 	LOG("Started at %x", augs::date_time().get_readable());
 	LOG("Working directory: %x", augs::get_current_working_directory());
@@ -214,7 +216,8 @@ int work(const int argc, const char* const * const argv) try {
 				{
 					vec2i(),
 					config.input,
-					network_performance
+					network_performance,
+					server_stats
 				},
 				solver_callbacks()
 			);
@@ -371,6 +374,9 @@ int work(const int argc, const char* const * const argv) try {
 
 	static auto setup_launcher = [&](auto&& setup_init_callback) {
 		get_audiovisuals().get<sound_system>().clear();
+
+		network_stats = {};
+		server_stats = {};
 
 		main_menu.reset();
 		current_setup.reset();
@@ -867,7 +873,8 @@ int work(const int argc, const char* const * const argv) try {
 						window.get_screen_size(), 
 						viewing_config.input, 
 						viewing_config.simulation_receiver, 
-						network_performance, 
+						network_performance,
+						network_stats,
 						get_audiovisuals().get<interpolation_system>(),
 						get_audiovisuals().get<past_infection_system>()
 					},
@@ -879,7 +886,8 @@ int work(const int argc, const char* const * const argv) try {
 					{ 
 						window.get_screen_size(), 
 						viewing_config.input, 
-						network_performance
+						network_performance,
+						server_stats
 					},
 					callbacks
 				);
@@ -1770,6 +1778,8 @@ int work(const int argc, const char* const * const argv) try {
 				viewed_character,
 				frame_performance,
 				network_performance,
+				network_stats,
+				server_stats,
 				streaming.performance,
 				streaming.general_atlas_performance,
 				performance,

@@ -53,4 +53,5 @@ public:
 	}
 
 	void set(augs::maybe_network_simulator);
+	network_info get_network_info() const;
 };

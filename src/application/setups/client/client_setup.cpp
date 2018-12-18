@@ -393,3 +393,7 @@ setup_escape_result client_setup::escape() {
 const cosmos& client_setup::get_viewed_cosmos() const {
 	return get_arena_handle(client_arena_type::PREDICTED).get_cosmos();
 }
+
+void client_setup::update_stats(network_info& stats) const {
+	stats = client->get_network_info();
+}

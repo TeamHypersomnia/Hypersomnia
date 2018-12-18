@@ -206,3 +206,52 @@ void server_adapter::set(augs::maybe_network_simulator s) {
 	server.SetPacketLoss(v.loss_percent);
 	server.SetDuplicates(v.duplicates_percent);
 }
+
+static auto to_network_info(const yojimbo::NetworkInfo& n) {
+	network_info o;
+
+	o.rtt_ms = n.RTT;
+	o.loss_percent = n.packetLoss;
+	o.sent_kbps = n.sentBandwidth;
+	o.received_kbps = n.receivedBandwidth;
+	o.acked_kbps = n.ackedBandwidth;
+	o.packets_sent = n.numPacketsSent;
+	o.packets_received = n.numPacketsReceived;
+	o.packets_acked = n.numPacketsAcked;
+
+	return o;
+}
+
+network_info client_adapter::get_network_info() const {
+	yojimbo::NetworkInfo info;
+	client.GetNetworkInfo(info);
+	return to_network_info(info);
+}
+
+network_info server_adapter::get_network_info(const client_id_type id) const {
+	yojimbo::NetworkInfo info;
+	server.GetNetworkInfo(id, info);
+	return to_network_info(info);
+}
+
+server_network_info server_adapter::get_server_network_info() const {
+	server_network_info total;
+
+	if (!is_running()) {
+		return total;
+	}
+
+	for (client_id_type i = 0; i < static_cast<client_id_type>(max_incoming_connections_v); ++i) {
+		if (!is_client_connected(i)) {
+			continue;
+		}
+
+		yojimbo::NetworkInfo info;
+		server.GetNetworkInfo(i, info);
+
+		total.sent_kbps += info.sentBandwidth;
+		total.received_kbps += info.receivedBandwidth;
+	}
+
+	return total;
+}

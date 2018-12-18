@@ -8,6 +8,8 @@ struct audiovisual_profiler;
 struct frame_profiler;
 struct atlas_profiler;
 struct network_profiler;
+struct network_info;
+struct server_network_info;
 
 namespace augs {
 	struct drawer;
@@ -21,6 +23,8 @@ void draw_debug_details(
 	const const_entity_handle viewed_character,
 	const frame_profiler& frame_performance,
 	const network_profiler& network_performance,
+	const network_info& network_stats,
+	const server_network_info& server_stats,
 	const viewables_streaming_profiler& streaming_performance,
 	const atlas_profiler& general_atlas_performance,
 	const session_profiler& session_performance,

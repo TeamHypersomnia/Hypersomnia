@@ -274,6 +274,7 @@ public:
 				client_time += default_inv_tickrate;
 			}
 
+			update_stats(in.network_stats);
 			total_collected.clear();
 		}
 	}
@@ -309,4 +310,6 @@ public:
 
 	bool is_gameplay_on() const;
 	setup_escape_result escape();
+
+	void update_stats(network_info&) const;
 };

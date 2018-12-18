@@ -6,7 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Static linking
+- Create randomized players like in the good olden times
+	- to test the predicted experience
+	- we might look into legacy sources for guidance
+
+- Fix crash on kartezjan's komputer
 
 - Leave a detailed net graph for later
 	- Just print some basic network usage
@@ -15,9 +19,6 @@ summary: That which we are brainstorming at the moment.
 	- Other win conditions are based on time so it won't be as bad
 
 - Admin panel
-
-- Detect when the initial state is being sent to optionally display progress
-	- Possibly by returning some info from ReceiveBlockData struct
 
 - Clear cosmic entropy when the player is not conscious
 	- So that others are not allowed to waste bandwidth when they are dead
@@ -76,62 +77,6 @@ summary: That which we are brainstorming at the moment.
 	- Whether to process deaths, e.g. to never predict them on the client
 	- Whether to post audiovisual messages, always false for the server
 
-- It would be nice if the server_setup could only accept ready structs and was not concerned with messages being preserialized, 
-	and serialization in general
-	- similarly as it receives "connection event" message
-	- let each message declare using payload_type
-	- for reading, the payload type would be created on the stack in the adapter, and then constructed by serializators from a separate header
-		- server would receive a ready reference to a struct
-	- it would be best if the server_setup controlled whether the payload type is to be on the stack or if it's ready somewhere else
-		- read_into
-		- instead of a lambda, have a template function handle_message which accepts a payload type as its argument
-			- then pass *this to the server advance
-			- the callback also accepts a callback for reading into so we control if the payload type enters stack or somewhere else
-				- if we decided that the yojimbo messages should hold the payload directly, the server adapter can call std::move in its lambda passed to the message callback
-		- what about structs that its not comfortable to mash into a single struct but still need to be read?
-			- e.g. initial solvable has multiple big objects in a single message
-				- mode solvable
-				- cosm solvable
-				- server vars
-			- do we send them separately?
-				- feels clean but possibly lost opportunity for compression
-					- although these things won't compress much better in conjunction
-				- we also get more latency due to separation of blocks
-			- read_payload accepts several arguments for specific types, we pass the message type as the type
-				- Indeed, it is us who decide whether to pass more arguments
-				- we can add a type list as a payload type
-				- this kind of thing will happen on the client though
-
-- Whether to keep worst-case storage in the preserialized messages or not is another problem
-	- I guess tlsf will be efficient here
-
-- It might be hard to properly send the initial mode state while avoiding desync
-	- sending solvable on init is also scalable for longer matches
-	- Rounds might be restarted arbitrarily due to pre-solve logic
-		- e.g. game commencing
-	- and when that happens the cosmos solvable is already altered
-
-- Optimize for bandwidth later. 
-	- For proof of concept, it will be enough to brute-force-write the inputs with our own serializers.
-
-- Connection helper interface?
-	- so that we have same interface for client and server and dont repeat ourselves
-	- we don't have much of these public funcs, though
-	- and it would probably complicate matters needlessly
-		- even pro yojimbo doesnt to that
-
-- Notice that serialization of mode entropy will be a lot more complicated on the server
-	- So, we will have completely separate funcs for read and write
-	- We might later write player entropies from the one that posts the most messages
-		- we will check the bounds for the message anyways and drop later entropies for now
-	- E.g. we will calculate client ids by looking for them in the modes
-
-- Properly send initial state on connection
-	- Serialize right away and hold std::vector<std::byte> in the message structure
-		- In particular, dont create deep clones of the solvable or entropies 
-		- That's because serialization will be a lot faster than deep clones
-		- And we anyway have to serialize this so that's one step less
-
 - Implement steps correction sending 
 
 - General client processing loop
@@ -147,20 +92,6 @@ summary: That which we are brainstorming at the moment.
 	- server_setup has to expose events somehow
 	- can send them really as chat messages to all the clients
 		- we also need to redirect it to the server player
-
-- Client FSM
-	- PENDING_WELCOME 
-	- RECEIVING_INITIAL_STATE
-		- after receiving initial state, we might want to send inputs that happened as a block as well
-	- IN_GAME
-	- Last time of valid activity
-		- Kick if AFK
-		- AFK timer can already be a server setting
-
-- The built-in player of the server
-	- Always at id -1
-		- mode always allocates maxmodeplayers + 1 in its array
-	- The server setup will thus hold entire intercosm
 
 - Preffix the single client entropy with a byte.
 	- The first bit signifies whether it is cosmic or mode
@@ -179,16 +110,8 @@ summary: That which we are brainstorming at the moment.
 	- we probably want to handle it after DM milestone
 	- Don't rely on fragmentation
 
-- Let's just create a proof of concept using yojimbo, don't focus on creating a minimal augs interface
-	- When it works, we'll gradually abstract it away and see if it still works
-
 - Will yojimbo handle 128hz?
 	- We can send packets once every second tick, so at 64hz
-
-- if we don't send any message at all for when a step has no entropy,
-	- we CANNOT possibly advance the referential cosmos in time
-		- which might become problematic once we have to simulate it forward several seconds
-	- so we should always send at least empty step message
 
 - Editor-like server vars tweaker accessible by pressing ESC server-side
 	- will have to be commandized properly, just like editor setup's
@@ -227,43 +150,6 @@ summary: That which we are brainstorming at the moment.
 - server_setup
 - client_setup
 
-- concept: server session
-	- mode-agnostic sever vars
-		- server_vars
-			- perhaps they should not AT ALL influence the deterministic state itself
-				- problematically, logic_speed_mult does influence this state by influencing the requested delta
-				- so does the tickrate though
-					- although that should only generate entropy
-			- max players? 
-			- okay why not simply have both the tickrate and the audio speed in arena mode ruleset?
-				- simplest solution, not pure semantically but still architecturally somewhat
-				- we'll still have *some* server vars
-			- basically they should only change how entropy-generating code behaves and the timing code
-			- timing info
-				- tickrate
-				- snap audio speed to simulation speed
-		- these actually can be called vars, why not
-	- server step != mode step?
-		- server step tied to tickrate?
-			- the cosmos and the mode anyway don't know about the rates, just of a delta to advance
-	- server step will also be passed to the packed
-		- only ever zeroed-out on hard server resets OR when there are zero players?
-		- server step does not have to correlate to the cosmos step at all
-			- in fact they will most of the time be different due to rounds being reset
-			- so it's fine to always zero-out the server sequence when there are no players
-	- we can make the server always have the built-in functionality to play locally with a character
-		- for local plays, it won't be much of an overhead
-			- it doesn't even have to be used for pure local setups
-			- can be used for the editor playtesting to have full test experience?
-				- actually even then it's not required
-		- menu guis won't be processed anyway
-		- for now we don't need a barebones server
-			- we'll test it when the time comes
-			- for barebones server, we can simply compile out the window, opengl and openal, even lodepng, leaving us with no-ops at all
-				- server won't rely on image/sound information anyway, this will be the task of the mapper to once create a proper map
-				- we can also simply set a flag for whether we want audiovisual processing
-				- also completely compile out the vws 
-
 - plan for full server replays
 	- it's just about saving the entropies
 	- server shall be frozen and never advance when there are no players
@@ -273,10 +159,9 @@ summary: That which we are brainstorming at the moment.
 		- since it will also store player information
 	- server entropy serializer
 
-
 - Letting servers adjust the speed of the game
 	- bomb mode doesn't do timing, it just advances whenever asked, but it has to effecctively use the delta information
-		- which is obtained by lsm / tickrate
+		- which is obtained by ls / tickrate
 	- Remember to never let the incremented timers be treated as the system time
 		- Not so important for view of the arena modes as they are several mintues at most
 	- The tickrate and the logic speed multiplier (LSM) is transparent to the cosmos, it just gets a different delta

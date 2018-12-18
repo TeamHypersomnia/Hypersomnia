@@ -202,6 +202,7 @@ public:
 			++current_simulation_step;
 			server_time += get_inv_tickrate();
 
+			update_stats(in.server_stats);
 			step_collected.clear();
 		}
 	}
@@ -241,4 +242,6 @@ public:
 	bool should_have_admin_character() const;
 
 	void sleep_until_next_tick();
+
+	void update_stats(server_network_info&) const;
 };

@@ -595,3 +595,7 @@ void server_setup::sleep_until_next_tick() {
 		yojimbo_sleep(sleep_dt * 0.9);
 	}
 }
+
+void server_setup::update_stats(server_network_info& info) const {
+	info = server->get_server_network_info();
+}

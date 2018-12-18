@@ -27,12 +27,14 @@ struct simulation_receiver_settings;
 class interpolation_system;
 class past_infection_system;
 struct network_profiler;
+struct network_info;
 
 struct server_advance_input {
 	const vec2i screen_size;
 	const input_settings& settings;
 
 	network_profiler& network_performance;
+	server_network_info& server_stats;
 };
 
 struct client_advance_input {
@@ -42,6 +44,7 @@ struct client_advance_input {
 	const simulation_receiver_settings& simulation_receiver;
 
 	network_profiler& network_performance;
+	network_info& network_stats;
 
 	interpolation_system& interp;
 	past_infection_system& past_infection;
