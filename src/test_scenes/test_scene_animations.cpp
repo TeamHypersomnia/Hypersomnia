@@ -356,9 +356,84 @@ void load_test_scene_animations(
 				I::METROPOLIS_TORSO_RIFLE_WALK_1
 			);
 
+			standard_walk(
+				T::METROPOLIS_TORSO_PISTOL_WALK,
+				I::METROPOLIS_TORSO_PISTOL_WALK_1
+			);
+
+			standard_walk(
+				T::METROPOLIS_TORSO_KNIFE_WALK,
+				I::METROPOLIS_TORSO_KNIFE_WALK_1
+			);
+
+			standard_shoot(
+				T::METROPOLIS_TORSO_KNIFE_PRIM,
+				I::METROPOLIS_TORSO_KNIFE_PRIM_1
+			);
+
+			standard_shoot(
+				T::METROPOLIS_TORSO_KNIFE_SECD,
+				I::METROPOLIS_TORSO_KNIFE_SECD_1
+			);
+
+			{
+				auto& anim = make_torso(
+					T::METROPOLIS_TORSO_KNIFE_PRIM_RETURN,
+					I::METROPOLIS_TORSO_KNIFE_PRIM_RETURN_1,
+					20.f
+				);
+
+				anim.frames[1].duration_milliseconds = 30.f;
+				anim.frames[2].duration_milliseconds = 40.f;
+
+				(void)anim;
+			}
+
+			{
+				auto& anim = standard_shoot(
+					T::METROPOLIS_TORSO_KNIFE_SECD_RETURN,
+					I::METROPOLIS_TORSO_KNIFE_SECD_1
+				);
+
+				reverse_range(anim.frames);
+			}
+
+			pistol_shot(
+				T::METROPOLIS_TORSO_PISTOL_SHOT,
+				I::METROPOLIS_TORSO_PISTOL_SHOT_1
+			);
+
+			pistol_ptm(
+				T::METROPOLIS_TORSO_PISTOL_PTM,
+				I::METROPOLIS_TORSO_PISTOL_PTM_1,
+				50.f,
+				2,
+				2
+			);
+
+			pistol_gtm(
+				T::METROPOLIS_TORSO_PISTOL_GTM,
+				I::METROPOLIS_TORSO_PISTOL_PTM_1,
+				50.f
+			);
+
 			standard_shoot(
 				T::METROPOLIS_TORSO_RIFLE_SHOT,
 				I::METROPOLIS_TORSO_RIFLE_SHOT_1
+			);
+
+			rifle_ptm(
+				T::METROPOLIS_TORSO_RIFLE_PTM,
+				I::METROPOLIS_TORSO_RIFLE_PTM_1,
+				50.f,
+				2,
+				0
+			);
+
+			rifle_gtm(
+				T::METROPOLIS_TORSO_RIFLE_GTM,
+				I::METROPOLIS_TORSO_RIFLE_GTM_1,
+				50.f
 			);
 
 			standard_walk(
@@ -369,6 +444,13 @@ void load_test_scene_animations(
 			standard_shoot(
 				T::METROPOLIS_TORSO_HEAVY_SHOT,
 				I::METROPOLIS_TORSO_HEAVY_SHOT_1
+			);
+
+			standard_gtm(
+				T::METROPOLIS_TORSO_HEAVY_GTM,
+				I::METROPOLIS_TORSO_HEAVY_GTM_1,
+				50.f,
+				3
 			);
 
 			walk_with_flip(

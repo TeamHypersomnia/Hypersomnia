@@ -7,6 +7,7 @@ summary: Just a hidden scratchpad.
 ---
 
 - Plan for rocket launchers
+	- For the fire trace, we could take the fire muzzle shot particle effect, and repeat it with high frequency
 
 - Properly implement bots
 	- Now they can break the client logic

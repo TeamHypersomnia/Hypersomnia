@@ -1744,6 +1744,10 @@ float bomb_mode::get_freeze_seconds_left(const const_input_type in) const {
 }
 
 float bomb_mode::get_buy_seconds_left(const const_input_type in) const {
+	if (state == arena_mode_state::WARMUP) {
+		return get_warmup_seconds_left(in);
+	}
+
 	return static_cast<float>(in.rules.freeze_secs + in.rules.buy_secs_after_freeze) - get_total_seconds(in);
 }
 
