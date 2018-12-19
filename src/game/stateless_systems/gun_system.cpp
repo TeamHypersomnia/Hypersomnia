@@ -299,7 +299,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 									sender.set(gun_entity);
 
 									{
-										auto rng = cosm.get_rng_for(round_entity);
+										auto rng = cosm.get_nontemporal_rng_for(round_entity);
 
 										const auto missile_velocity = 
 											muzzle_transform.get_direction()
@@ -461,7 +461,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 								int charges = { single_bullet_or_pellet_stack.get<components::item>().get_charges() };
 
-								auto rng = cosm.get_rng_for(single_bullet_or_pellet_stack);
+								auto rng = cosm.get_nontemporal_rng_for(single_bullet_or_pellet_stack);
 
 								while (charges--) {
 									const auto& cartridge_def = single_bullet_or_pellet_stack.get<invariants::cartridge>();
@@ -529,7 +529,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 								if (const auto shell_flavour = single_bullet_or_pellet_stack.get<invariants::cartridge>().shell_flavour; shell_flavour.is_set()) {
 									cosmic::create_entity(cosm, shell_flavour, [&](const auto shell_entity, auto&&...){
-										auto rng = cosm.get_rng_for(shell_entity);
+										auto rng = cosm.get_nontemporal_rng_for(shell_entity);
 
 										const auto shell_spawn_offset = ::calc_shell_offset(gun_entity);
 										const auto spread_component = rng.randval_h(gun_def.shell_spread_degrees) + shell_spawn_offset.rotation;

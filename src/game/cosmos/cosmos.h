@@ -48,6 +48,7 @@ public:
 	}
 
 	randomization get_rng_for(const entity_id) const;
+	randomization get_nontemporal_rng_for(const entity_id) const;
 	fast_randomization get_fast_rng_for(const entity_id) const;
 	rng_seed_type get_rng_seed_for(const entity_id) const;
 	

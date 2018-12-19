@@ -40,7 +40,7 @@ void detonate(const detonate_input in) {
 
 	for (const auto& c_in : cascade_inputs) {
 		const auto n = c_in.num_spawned;
-		auto rng = cosm.get_rng_for(subject);
+		auto rng = cosm.get_nontemporal_rng_for(subject);
 
 		const auto angle_dt = c_in.spawn_spread / n;
 

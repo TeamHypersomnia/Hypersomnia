@@ -114,7 +114,7 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 			step.post_message(messages::queue_deletion(typed_missile));
 			damage_msg.inflictor_destructed = true;
 
-			auto rng = cosm.get_rng_for(typed_missile);
+			auto rng = cosm.get_nontemporal_rng_for(typed_missile);
 
 			spawn_bullet_remnants(
 				step,

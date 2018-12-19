@@ -25,7 +25,7 @@ rng_seed_type cosmos::get_rng_seed_for(const entity_id id) const {
 	const auto passed = get_total_steps_passed();
 
 	if (const auto handle = operator[](id)) {
-		return augs::simple_two_hash(handle.get_guid(), passed);
+		return augs::simple_two_hash(handle.get_id().raw.indirection_index, passed);
 	}
 
 	return std::hash<std::remove_const_t<decltype(passed)>>()(passed);
@@ -33,6 +33,25 @@ rng_seed_type cosmos::get_rng_seed_for(const entity_id id) const {
 
 randomization cosmos::get_rng_for(const entity_id id) const {
 	return{ get_rng_seed_for(id) };
+}
+
+randomization cosmos::get_nontemporal_rng_for(const entity_id id) const {
+	const auto handle = operator[](id);
+
+	auto h = augs::hash_multiple(
+		handle.get_id().raw.indirection_index, 
+		handle.get_id().type_id.get_index(), 
+		handle.when_born().step
+	);
+
+	if (const auto item = handle.find<components::item>()) {
+		const auto num_charges = item->get_charges();
+		if (num_charges != 1) {
+			augs::hash_combine(h, num_charges);
+		}
+	}
+
+	return h;
 }
 
 fast_randomization cosmos::get_fast_rng_for(const entity_id id) const {

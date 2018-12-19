@@ -77,7 +77,7 @@ void demolitions_system::advance_cascade_explosions(const logic_step step) {
 			auto& when_next = cascade.when_next_explosion;
 
 			if (clk.now >= when_next) {
-				auto rng = cosm.get_rng_for(it);
+				auto rng = cosm.get_nontemporal_rng_for(it);
 
 				{
 					const auto next_explosion_in_ms = rng.randval(cascade_def.explosion_interval_ms);
