@@ -194,6 +194,8 @@ public:
 				);
 
 				step_collected += { get_admin_player_id(), admin_entropy };
+				step_collected.general += local_collected.mode_general;
+				local_collected.clear();
 			}
 
 			send_server_step_entropies(step_collected);

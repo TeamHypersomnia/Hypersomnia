@@ -123,6 +123,8 @@ class client_setup :
 
 	void send_to_server(total_client_entropy&);
 
+	client_arena_type get_viewed_arena_type() const;
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
@@ -264,8 +266,12 @@ public:
 					}
 				}
 
+#if USE_CLIENT_PREDICTION
 				//LOG("PE: %x", receiver.predicted_entropies.size());
 				get_arena_handle(client_arena_type::PREDICTED).advance(*new_local_entropy, callbacks);
+#else
+				(void)callbacks;
+#endif
 			}
 
 			if (in_game) {
@@ -301,8 +307,8 @@ public:
 		return client_player_id;
 	}
 
-	online_arena_handle<false> get_arena_handle(client_arena_type = client_arena_type::PREDICTED);
-	online_arena_handle<true> get_arena_handle(client_arena_type = client_arena_type::PREDICTED) const;
+	online_arena_handle<false> get_arena_handle(std::optional<client_arena_type> = std::nullopt);
+	online_arena_handle<true> get_arena_handle(std::optional<client_arena_type> = std::nullopt) const;
 
 	void log_malicious_server();
 

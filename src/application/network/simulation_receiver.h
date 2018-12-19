@@ -11,6 +11,9 @@
 #include "application/network/server_step_entropy.h"
 #include "application/network/simulation_receiver_settings.h"
 
+/* Prediction is too costly in debug builds. */
+#define USE_CLIENT_PREDICTION NDEBUG
+
 struct misprediction_candidate_entry {
 	entity_id id;
 	components::transform transform;
@@ -173,6 +176,7 @@ public:
 			}
 		}
 
+#if USE_CLIENT_PREDICTION
 		if (repredict) {
 			auto& predicted_cosmos = predicted_arena.get_cosmos();
 
@@ -201,6 +205,14 @@ public:
 				potential_mispredictions
 			);
 		}
+#else
+		(void)settings;
+		(void)interp;
+		(void)past;
+		(void)predicted_arena;
+		(void)locally_controlled_entity;
+		(void)advance_predicted;
+#endif
 
 		return result;
 	}

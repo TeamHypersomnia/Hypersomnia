@@ -14,10 +14,10 @@ struct entropy_accumulator {
 	mode_player_entropy mode;
 	cosmic_player_entropy cosmic;
 
-	mode_entropy_general mode_general;
-
 	accumulated_motions motions;
 	game_intents intents;
+
+	mode_entropy_general mode_general;
 
 	template <class E>
 	auto assemble(

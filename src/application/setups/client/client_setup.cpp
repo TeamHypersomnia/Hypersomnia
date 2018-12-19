@@ -48,7 +48,7 @@ entity_id client_setup::get_viewed_character_id() const {
 		return entity_id::dead();
 	}
 
-	return get_arena_handle(client_arena_type::PREDICTED).on_mode(
+	return get_arena_handle().on_mode(
 		[&](const auto& typed_mode) {
 			return typed_mode.lookup(get_local_player_id());
 		}
@@ -63,12 +63,30 @@ void client_setup::accept_game_gui_events(const game_gui_entropy_type& events) {
 	control(events);
 }
 
-online_arena_handle<false> client_setup::get_arena_handle(const client_arena_type t) {
-	return get_arena_handle_impl<online_arena_handle<false>>(*this, t);
+client_arena_type client_setup::get_viewed_arena_type() const {
+#if USE_CLIENT_PREDICTION
+	return client_arena_type::PREDICTED;
+#else
+	return client_arena_type::REFERENTIAL;
+#endif
+
+	// TODO: For spectating the game, use the referential arena with jitter.
 }
 
-online_arena_handle<true> client_setup::get_arena_handle(const client_arena_type t) const {
-	return get_arena_handle_impl<online_arena_handle<true>>(*this, t);
+online_arena_handle<false> client_setup::get_arena_handle(std::optional<client_arena_type> c) {
+	if (c == std::nullopt) {
+		c = get_viewed_arena_type();
+	}
+
+	return get_arena_handle_impl<online_arena_handle<false>>(*this, *c);
+}
+
+online_arena_handle<true> client_setup::get_arena_handle(std::optional<client_arena_type> c) const {
+	if (c == std::nullopt) {
+		c = get_viewed_arena_type();
+	}
+
+	return get_arena_handle_impl<online_arena_handle<true>>(*this, *c);
 }
 
 double client_setup::get_inv_tickrate() const {
@@ -76,7 +94,7 @@ double client_setup::get_inv_tickrate() const {
 		return default_inv_tickrate;
 	}
 
-	return get_arena_handle(client_arena_type::PREDICTED).get_inv_tickrate();
+	return get_arena_handle().get_inv_tickrate();
 }
 
 double client_setup::get_audiovisual_speed() const {
@@ -84,7 +102,7 @@ double client_setup::get_audiovisual_speed() const {
 		return 1.0;
 	}
 
-	return get_arena_handle(client_arena_type::PREDICTED).get_audiovisual_speed();
+	return get_arena_handle().get_audiovisual_speed();
 }
 
 using initial_payload = initial_arena_state_payload<false>;
@@ -413,7 +431,7 @@ setup_escape_result client_setup::escape() {
 }
 
 const cosmos& client_setup::get_viewed_cosmos() const {
-	return get_arena_handle(client_arena_type::PREDICTED).get_cosmos();
+	return get_arena_handle(get_viewed_arena_type()).get_cosmos();
 }
 
 void client_setup::update_stats(network_info& stats) const {
