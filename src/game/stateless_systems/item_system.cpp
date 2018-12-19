@@ -779,6 +779,7 @@ void item_system::handle_wielding_requests(const logic_step step) {
 
 				if (holstering_slot.alive()) {
 					WLD_LOG("Holster found.");
+					WLD_LOG_NVPS(holstering_slot);
 					transfer(item_in_hand, holstering_slot);
 					transfer(item_for_hand, hand);
 				}

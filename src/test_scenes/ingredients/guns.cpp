@@ -63,10 +63,14 @@ namespace test_flavours {
 			meta.template get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].only_allow_flavour = ::to_entity_flavour_id(it);
 		};
 
+		auto only_allow_chamber_charge = [&](auto& meta, const test_shootable_charges it) {
+			meta.template get<invariants::container>().slots[slot_function::GUN_CHAMBER].only_allow_flavour = ::to_entity_flavour_id(it);
+		};
+
 		auto make_default_gun_container = [&default_gun_props](
 			auto& meta, 
 			const item_holding_stance stance, 
-			const float mounting_duration_ms = 500.f, 
+			const float mag_mounting_duration_ms = 500.f, 
 			const float /* mag_rotation */ = -90.f,
 		   	const bool magazine_hidden = false,
 		   	const std::string& chamber_space = "0.01",
@@ -89,7 +93,7 @@ namespace test_flavours {
 
 				slot_def.always_allow_exactly_one_item = true;
 				slot_def.category_allowed = item_category::MAGAZINE;
-				slot_def.mounting_duration_ms = mounting_duration_ms;
+				slot_def.mounting_duration_ms = mag_mounting_duration_ms;
 				slot_def.contributes_to_space_occupied = mag_contributes_to_space;
 
 				container.slots[slot_function::GUN_DETACHABLE_MAGAZINE] = slot_def;
@@ -200,6 +204,74 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_plain_missiles::SKULL_ROCKET_FLYING);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::FLYING_BULLETS;
+
+				meta.set(render_def);
+			}
+
+
+			{
+				invariants::flags flags_def;
+				flags_def.values.set(entity_flag::IS_IMMUNE_TO_PAST);
+				meta.set(flags_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::SKULL_ROCKET_FLYING, white);
+
+			{
+				{
+					components::trace trace_def;
+					trace_def.enabled = false;
+					meta.set(trace_def);
+				}
+			}
+
+
+			test_flavours::add_bullet_round_physics(meta);
+			meta.template get<invariants::rigid_body>().damping.linear = 2.f;
+
+			invariants::missile missile;
+
+			missile.ricochet_born_cooldown_ms = 17.f;
+
+			{
+				auto& dest_eff = missile.damage.effects.destruction;
+				dest_eff.spawn_exploding_ring = false;
+				dest_eff.particles.modifier.colorize = white;
+				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
+			}
+
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SKULL_ROCKET_TRACE);
+
+			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SKULL_ROCKET_MUZZLE_LEAVE_EXPLOSION);
+			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+
+			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::STEEL_RICOCHET);
+			missile.ricochet_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_RICOCHET);
+
+			missile.damage.effects.destruction.sound.id = to_sound_id(test_scene_sound_id::STEEL_PROJECTILE_DESTRUCTION);
+			missile.damage.base = 112.f;
+			missile.max_lifetime_ms = 1000.f;
+
+			missile.trace_sound.id = to_sound_id(test_scene_sound_id::STEEL_PROJECTILE_FLIGHT);
+
+			auto& trace_modifier = missile.trace_sound.modifier;
+
+			trace_modifier.doppler_factor = 1.f;
+			trace_modifier.max_distance = 700.f;
+			trace_modifier.reference_distance = 50.f;
+			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
+			trace_modifier.gain = 1.3f;
+			trace_modifier.fade_on_exit = false;
+
+			meta.set(missile);
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::STEEL_ROUND);
 
 			{
@@ -250,6 +322,7 @@ namespace test_flavours {
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION);
 			missile.muzzle_leave_particles.modifier.colorize = white;//{ 255, 218, 5, 255 };
+			missile.damage.base = 12;
 			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
 			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::STEEL_RICOCHET);
@@ -558,6 +631,7 @@ namespace test_flavours {
 
 			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
 			missile.damage.effects.destruction.sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
+			missile.damage.base = 12;
 
 			auto& trace_modifier = missile.trace_sound.modifier;
 
@@ -666,6 +740,25 @@ namespace test_flavours {
 			invariants::remnant remnant;
 			remnant.lifetime_secs = 20.f;
 			remnant.start_shrinking_when_remaining_ms = 7000.f;
+			meta.set(remnant);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_remnant_bodies::SKULL_ROCKET_SHELL);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::SKULL_ROCKET_SHELL, white);
+			test_flavours::add_shell_dynamic_body(meta);
+
+			invariants::remnant remnant;
+			remnant.lifetime_secs = 20.f;
+			remnant.start_shrinking_when_remaining_ms = 2000.f;
 			meta.set(remnant);
 		}
 
@@ -801,6 +894,39 @@ namespace test_flavours {
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::STEEL_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::STEEL_ROUND);
+
+				meta.set(cartridge);
+			}
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_shootable_charges::SKULL_ROCKET);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::SKULL_ROCKET, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+
+			invariants::item item;
+			item.space_occupied_per_charge = to_space_units("1.0");
+			item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
+			item.stackable = true;
+
+			meta.set(item);
+
+			{
+				invariants::cartridge cartridge; 
+
+				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
+				cartridge.shell_trace_particles.modifier.colorize = orange;
+
+				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::SKULL_ROCKET_SHELL);
+				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::SKULL_ROCKET_FLYING);
 
 				meta.set(cartridge);
 			}
@@ -1745,6 +1871,66 @@ namespace test_flavours {
 			set_density_mult(meta, 0.9f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("3.5");
 			only_allow_mag(meta, test_container_items::AO44_MAGAZINE);
+			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_shootable_weapons::ELON_HRL);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			invariants::gun gun_def;
+
+			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::AO44_MUZZLE);
+
+			gun_def.action_mode = gun_action_type::BOLT_ACTION;
+			gun_def.muzzle_velocity = {3800.f, 3800.f};
+			gun_def.shot_cooldown_ms = 0.f;
+			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::REVOLVER_CHAMBERING);
+			gun_def.allow_chambering_with_akimbo = false;
+
+			gun_def.shell_angular_velocity = {2.f, 10.f};
+			gun_def.shell_spread_degrees = 12.f;
+			gun_def.shell_velocity = {500.f, 2500.f};
+			gun_def.damage_multiplier = 1.f;
+			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 2;
+			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
+			gun_def.recoil_multiplier = 4.f;
+			gun_def.kickback_towards_wielder = 500.f;
+
+			gun_def.maximum_heat = 2.f;
+			gun_def.gunshot_adds_heat = 0.202f;
+			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
+			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
+			gun_def.adversarial.knockout_award = static_cast<money_type>(100);
+
+			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+
+			meta.set(gun_def);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ELON_HRL, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+			make_default_gun_container(meta, item_holding_stance::HEAVY_LIKE, 0.f, 0.f, false, "1.0");
+
+			auto& slots = meta.get<invariants::container>().slots;
+
+			slots[slot_function::GUN_CHAMBER].physical_behaviour = slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY;
+			slots.erase(slot_function::GUN_DETACHABLE_MAGAZINE);
+
+			set_chambering_duration_ms(meta, 1000.f);
+
+			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
+			meta.get<invariants::item>().standard_price = 4000;
+			set_density_mult(meta, 1.9f);
+			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("12.0");
+
+			only_allow_chamber_charge(meta, test_shootable_charges::SKULL_ROCKET);
+
 			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
 		}
 

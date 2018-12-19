@@ -16,9 +16,6 @@ summary: Just a hidden scratchpad.
 - Detect when the initial state is being sent to optionally display progress
 	- Possibly by returning some info from ReceiveBlockData struct
 
-- Plan for rocket launchers
-	- For the fire trace, we could take the fire muzzle shot particle effect, and repeat it with high frequency
-
 - Properly implement bots
 	- Now they can break the client logic
 

@@ -30,17 +30,24 @@ enum class wielding_type {
 	DUAL_WIELDED
 };
 
-enum class slot_finding_opt {
-	CHECK_WEARABLES,
-	CHECK_HANDS,
-	CHECK_CONTAINERS,
+enum class candidate_holster_type {
+	WEARABLES,
+	HANDS,
+	CONTAINERS,
 
 	COUNT
 };
 
+enum class slot_finding_opt {
+	ALL_CHARGES_MUST_FIT,
+	COUNT
+};
+
+using slot_finding_opts = augs::enum_boolset<slot_finding_opt>;
+
 struct pending_item_mount;
 
-using slot_finding_opts = augs::constant_size_vector<slot_finding_opt, 3>;
+using candidate_holster_types = augs::constant_size_vector<candidate_holster_type, 3>;
 
 template <class derived_handle_type>
 class inventory_mixin {
@@ -58,7 +65,9 @@ public:
 	std::optional<inventory_space_type> find_space_occupied() const;	
 	int num_charges_fitting_in(const inventory_slot_handle_type&) const;
 	int count_contained(const item_flavour_id&) const;
+
 	void set_charges(int) const;
+	int get_charges() const;
 
 	generic_handle_type get_owning_transfer_capability() const;
 	generic_handle_type get_topmost_container() const;
@@ -70,14 +79,15 @@ public:
 
 	template <class F>
 	void for_each_candidate_slot(
-		const slot_finding_opts&,
+		const candidate_holster_types&,
 		F&& callback
 	) const;
 
 	template <class handle_type>
 	inventory_slot_handle_type find_slot_for(
 		const handle_type picked_item,
-	   	const slot_finding_opts&
+	   	const candidate_holster_types&,
+		const slot_finding_opts& opts
 	) const;
 
 	template <class handle_type>

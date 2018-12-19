@@ -135,6 +135,11 @@ transformr direct_attachment_offset(
 			anchor = anchors.attachment_anchor;
 			break;
 
+		case slot_function::GUN_CHAMBER: 
+			attachment_offset = get_offsets_by_gun().chamber;
+			anchor = anchors.attachment_anchor;
+			break;
+
 		case slot_function::GUN_MUZZLE: 
 			attachment_offset = ::calc_muzzle_transform(attachment, {}, get_offsets_by_gun().bullet_spawn).get_integerized();
 			anchor = anchors.attachment_anchor;
@@ -168,7 +173,7 @@ transformr direct_attachment_offset(
 				anchor.flip_vertically();
 			}
 		}
-		else if (type == slot_function::GUN_DETACHABLE_MAGAZINE || type == slot_function::GUN_MUZZLE) {
+		else if (type == slot_function::GUN_DETACHABLE_MAGAZINE || type == slot_function::GUN_MUZZLE || type == slot_function::GUN_CHAMBER) {
 			if (const auto slot = container.get_current_slot()) {
 				if (is_reloading_and_should_flip(slot.get_container())) {
 					anchor.flip_vertically();

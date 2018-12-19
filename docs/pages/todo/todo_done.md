@@ -2565,3 +2565,30 @@ i			- if the newly calculated target is different than last_reload_target, reset
 				- server won't rely on image/sound information anyway, this will be the task of the mapper to once create a proper map
 				- we can also simply set a flag for whether we want audiovisual processing
 				- also completely compile out the vws 
+
+- Entropy optimization
+	- Chosen solution
+		- call translate_payload once on the server per step
+		- manually multicast this message to connected in-game clients
+		- it is identical for every client
+		- if the client's num accepted entropies != 1, send a separate message BEFORE sending the step
+			- in the best case it won't be sent at all so we might even save this byte
+		- the client holds std::optional<uint8_t> last_num_accepted;
+			- zeroes it out every time a step message arrives
+			- sets it every time a prestep_client_context arrives
+			
+	- It's best if the server preserializes the entropy instead of serializing it each time for every client
+	- Well we could send the same allocated step message to all the clients
+		- That will be the most performant and probably easiest
+		- "broadcast_payload"?
+			- so we'll use the same buffer for all clients
+			- we could always attach a lambda that determines whether this client needs it
+		- we will thus need to put commands_accepted in a separate message
+		- well what if we send num_entropies_accepted via unreliable channel? 
+			- e.g. you could send total messages accepted
+	- thus we need to send bytes as the payload
+
+
+- Leave a detailed net graph for later
+	- Just print some basic network usage
+

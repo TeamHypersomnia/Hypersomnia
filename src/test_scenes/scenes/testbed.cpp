@@ -44,7 +44,7 @@ namespace test_scenes {
 		rs.name = "Standard test ruleset";
 		rs.spawned_faction = faction_type::RESISTANCE;
 
-		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::VINDICATOR);
+		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::ELON_HRL);
 		rs.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 
 		fill_range(rs.initial_eq.spells_to_give, true);
@@ -245,6 +245,12 @@ namespace test_scenes {
 			r.generate_for(character, step);
 		};
 
+		auto give_charge = [&](const auto& where, const auto w, const int pieces) {
+			if (const auto new_ch = create(w, where)) {
+				new_ch.set_charges(pieces);
+			}
+		};
+
 		auto give_backpack = [&](const auto& character, const test_container_items c) {
 			requested_equipment r;
 			r.back_wearable = to_entity_flavour_id(c);
@@ -436,6 +442,9 @@ namespace test_scenes {
 			give_weapon(transformr(vec2(-800 - k * 150, 1200)), test_melee_weapons::CYAN_SCYTHE);
 			give_weapon(transformr(vec2(-800 - k * 150, 1400)), test_melee_weapons::ELECTRIC_RAPIER);
 			give_weapon(transformr(vec2(-800 - k * 150, 1600)), test_melee_weapons::POSEIDON);
+
+			give_weapon(transformr(vec2(-800 - k * 150, 1800)), test_shootable_weapons::ELON_HRL);
+			give_charge(transformr(vec2(-800 - k * 150, 2000)), test_shootable_charges::SKULL_ROCKET, 5);
 		}
 
 		give_weapon(transformr(vec2(-300, -500 + 50)), test_shootable_weapons::AMPLIFIER_ARM);

@@ -35,6 +35,13 @@ void inventory_mixin<E>::set_charges(const int n) const {
 }
 
 template <class E>
+int inventory_mixin<E>::get_charges() const {
+	const auto& self = *static_cast<const E*>(this);
+
+	return self.template get<components::item>().get_charges();
+}
+
+template <class E>
 typename inventory_mixin<E>::generic_handle_type inventory_mixin<E>::get_topmost_container() const {
 	const auto& self = *static_cast<const E*>(this);
 	auto& cosm = self.get_cosmos();

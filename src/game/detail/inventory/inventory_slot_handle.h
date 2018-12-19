@@ -48,6 +48,7 @@ public:
 	bool dead() const;
 
 	bool can_contain(const entity_id) const;
+	bool can_contain_whole(const entity_id) const;
 
 	entity_handle_type get_item_if_any() const;
 	entity_handle_type get_container() const;
@@ -332,6 +333,16 @@ bool basic_inventory_slot_handle<E>::can_contain(const entity_id id) const {
 	}
 
 	return query_containment_result(get_cosmos()[id], *this).transferred_charges > 0;
+}
+
+template <class E>
+bool basic_inventory_slot_handle<E>::can_contain_whole(const entity_id id) const {
+	if (dead()) {
+		return false;
+	}
+
+	const auto item_handle = get_cosmos()[id];
+	return static_cast<int>(query_containment_result(item_handle, *this).transferred_charges) == item_handle.get_charges();
 }
 
 template <class E>

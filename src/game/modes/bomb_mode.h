@@ -83,7 +83,7 @@ struct bomb_mode_ruleset {
 	meter_value_type minimal_damage_for_assist = 41;
 	per_faction_t<bomb_mode_faction_rules> factions;
 
-	constrained_entity_flavour_id<invariants::explosive> bomb_flavour;
+	constrained_entity_flavour_id<invariants::explosive, invariants::hand_fuse> bomb_flavour;
 	bool delete_lying_items_on_round_start = false;
 	bool allow_game_commencing = true;
 

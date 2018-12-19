@@ -23,6 +23,11 @@ auto vectorize_array(const std::array<T, I>& arr, F&& predicate) {
 
 void detonate(const detonate_input in) {
 	const auto& e = in.explosive;
+
+	if (!e.is_set()) {
+		return;
+	}
+
 	const auto& step = in.step;
 	auto& cosm = step.get_cosmos();
 

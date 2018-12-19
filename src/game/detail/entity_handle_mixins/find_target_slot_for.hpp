@@ -22,13 +22,13 @@ int inventory_mixin<E>::count_contained(const item_flavour_id& id) const {
 template <class E>
 template <class F>
 void inventory_mixin<E>::for_each_candidate_slot(
-	const slot_finding_opts& opts,
+	const candidate_holster_types& types,
 	F&& callback
 ) const {
 	const auto& searched_root_container = *static_cast<const E*>(this);
 
-	for (const auto& o : opts) {
-		if (o == slot_finding_opt::CHECK_WEARABLES) {
+	for (const auto& t : types) {
+		if (t == candidate_holster_type::WEARABLES) {
 			callback(searched_root_container[slot_function::BELT]);
 			callback(searched_root_container[slot_function::BACK]);
 			callback(searched_root_container[slot_function::SHOULDER]);
@@ -36,11 +36,11 @@ void inventory_mixin<E>::for_each_candidate_slot(
 			callback(searched_root_container[slot_function::HAT]);
 			callback(searched_root_container[slot_function::PERSONAL_DEPOSIT]);
 		}
-		else if (o == slot_finding_opt::CHECK_HANDS) {
+		else if (t == candidate_holster_type::HANDS) {
 			callback(searched_root_container[slot_function::PRIMARY_HAND]);
 			callback(searched_root_container[slot_function::SECONDARY_HAND]);
 		}
-		else if (o == slot_finding_opt::CHECK_CONTAINERS) {
+		else if (t == candidate_holster_type::CONTAINERS) {
 			if (const auto personal_slot = searched_root_container[slot_function::PERSONAL_DEPOSIT]) {
 				if (const auto personal_wearable = personal_slot.get_item_if_any()) {
 					callback(personal_wearable[slot_function::ITEM_DEPOSIT]);
@@ -60,7 +60,8 @@ template <class E>
 template <class handle_type>
 typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find_slot_for(
 	const handle_type item,
-   	const slot_finding_opts& opts
+   	const candidate_holster_types& types,
+	const slot_finding_opts& opts
 ) const {
 	const auto& searched_root_container = *static_cast<const E*>(this);
 	(void)searched_root_container;
@@ -78,13 +79,20 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find
 			return;
 		}
 
-		if (slot.can_contain(item)) {
-			target_slot = slot;
+		if (opts.test(slot_finding_opt::ALL_CHARGES_MUST_FIT)) {
+			if (slot.can_contain_whole(item)) {
+				target_slot = slot;
+			}
+		}
+		else {
+			if (slot.can_contain(item)) {
+				target_slot = slot;
+			}
 		}
 	};
 
 	for_each_candidate_slot(
-		opts,
+		types,
 		check_slot
 	);
 
@@ -94,16 +102,16 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find
 template <class E>
 template <class handle_type>
 typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find_holstering_slot_for(const handle_type holstered_item) const {
-	return find_slot_for(holstered_item, { slot_finding_opt::CHECK_WEARABLES, slot_finding_opt::CHECK_CONTAINERS });
+	return find_slot_for(holstered_item, { candidate_holster_type::WEARABLES, candidate_holster_type::CONTAINERS }, { slot_finding_opt::ALL_CHARGES_MUST_FIT } );
 }
 
 template <class E>
 template <class handle_type>
 typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find_pickup_target_slot_for(const handle_type picked_item) const {
-	auto finding_order = slot_finding_opts { 
-		slot_finding_opt::CHECK_WEARABLES, 
-		slot_finding_opt::CHECK_CONTAINERS, 
-		slot_finding_opt::CHECK_HANDS 
+	auto finding_order = candidate_holster_types { 
+		candidate_holster_type::WEARABLES, 
+		candidate_holster_type::CONTAINERS, 
+		candidate_holster_type::HANDS 
 	};
 
 	{
@@ -119,5 +127,5 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find
 		}
 	}
 
-	return find_slot_for(picked_item, finding_order);
+	return find_slot_for(picked_item, finding_order, slot_finding_opts());
 }

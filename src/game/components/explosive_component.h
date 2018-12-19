@@ -13,5 +13,9 @@ namespace invariants {
 		std::array<cascade_explosion_input, 3> cascade;
 		adversarial_meta adversarial = { static_cast<money_type>(700) };
 		// END GEN INTROSPECTOR
+
+		bool is_set() const {
+			return explosion.damage.is_set();
+		}
 	};
 }

@@ -5,7 +5,7 @@
 template <class E>
 int num_carryable_pieces(
 	const E& in_subject,
-	const slot_finding_opts& opts,
+	const candidate_holster_types& opts,
 	const item_flavour_id& item
 ) {
 	int total_fitting = 0;
@@ -92,10 +92,10 @@ std::optional<money_type> find_price_of(const cosmos& cosm, const E& object) {
 }
 
 inline auto get_buy_slot_opts() {
-	return slot_finding_opts {
-		slot_finding_opt::CHECK_WEARABLES,
-		slot_finding_opt::CHECK_HANDS,
-		slot_finding_opt::CHECK_CONTAINERS
+	return candidate_holster_types {
+		candidate_holster_type::WEARABLES,
+		candidate_holster_type::HANDS,
+		candidate_holster_type::CONTAINERS
 	};
 }
 

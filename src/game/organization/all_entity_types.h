@@ -249,7 +249,8 @@ struct plain_missile {
 
 		invariants::missile,
 
-		invariants::interpolation
+		invariants::interpolation,
+		invariants::explosive
 	>;
 
 	using components = type_list<

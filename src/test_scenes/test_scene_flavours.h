@@ -104,6 +104,7 @@ enum class test_shootable_weapons {
 	PRO90,
 	AMPLIFIER_ARM,
 	DATUM_GUN,
+	ELON_HRL,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -127,6 +128,7 @@ enum class test_shootable_charges {
 	STEEL_CHARGE,
 	ORANGE_CHARGE,
 	SHOTGUN_RED_CHARGE,
+	SKULL_ROCKET,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -163,6 +165,7 @@ enum class test_plain_missiles {
 	ORANGE_ROUND,
 	SHOTGUN_RED_ROUND,
 	ELECTRIC_MISSILE,
+	SKULL_ROCKET_FLYING,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -237,6 +240,7 @@ enum class test_remnant_bodies {
 	STEEL_SHELL,
 	ORANGE_SHELL,
 	SHOTGUN_RED_SHELL,
+	SKULL_ROCKET_SHELL,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -293,6 +297,9 @@ enum class test_explosion_bodies {
 	// GEN INTROSPECTOR enum class test_explosion_bodies
 	BOMB_CASCADE_EXPLOSION,
 	BOMB_CASCADE_EXPLOSION_SMALLER,
+
+	SKULL_ROCKET_CASCADE,
+	SKULL_ROCKET_CASCADE_SMALLER,
 	COUNT
 	// END GEN INTROSPECTOR
 };

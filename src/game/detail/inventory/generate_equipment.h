@@ -127,13 +127,15 @@ void requested_equipment::generate_for(
 				pickup(weapon);
 			}
 
+			const auto chamber_slot = weapon[slot_function::GUN_CHAMBER];
+
 			auto load_charge_to_chamber = [&](const auto& charge_flavour) {
 				if (charge_flavour.is_set()) {
 					if (const auto c = just_create_entity(cosm, charge_flavour)) {
 						c.set_charges(1);
 
-						if (const auto chamber = weapon[slot_function::GUN_CHAMBER]) {
-							transfer(c, chamber);
+						if (chamber_slot) {
+							transfer(c, chamber_slot);
 						}
 					}
 				}
@@ -166,6 +168,17 @@ void requested_equipment::generate_for(
 						generate_spares(final_mag_flavour);
 					}
 				}
+			}
+			else if (chamber_slot) {
+				const auto final_charge_flavour = [&]() {
+					if (eq.non_standard_mag.is_set()) {
+						return eq.non_standard_charge;
+					}
+
+					return chamber_slot->only_allow_flavour;
+				}();
+
+				load_charge_to_chamber(final_charge_flavour);
 			}
 		}
 	}

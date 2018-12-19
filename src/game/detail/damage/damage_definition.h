@@ -21,7 +21,7 @@ struct damage_effects {
 
 struct damage_definition {
 	// GEN INTROSPECTOR struct damage_definition
-	real32 base = 12.f;
+	real32 base = 0.f;
 	sentience_shake shake = { 400.f, 1.f };
 
 	real32 impact_impulse = 10.f;
@@ -38,6 +38,10 @@ struct damage_definition {
 		shake *= scalar;
 		impact_impulse *= scalar;
 		return *this;
+	}
+
+	bool is_set() const {
+		return base != 0.f;
 	}
 };
 

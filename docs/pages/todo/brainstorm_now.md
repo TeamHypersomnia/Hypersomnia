@@ -6,28 +6,25 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Entropy optimization
-	- Chosen solution
-		- call translate_payload once on the server per step
-		- manually multicast this message to connected in-game clients
-		- it is identical for every client
-		- if the client's num accepted entropies != 1, send a separate message BEFORE sending the step
-			- in the best case it won't be sent at all so we might even save this byte
-		- the client holds std::optional<uint8_t> last_num_accepted;
-			- zeroes it out every time a step message arrives
-			- sets it every time a prestep_client_context arrives
-			
-	- It's best if the server preserializes the entropy instead of serializing it each time for every client
-	- Well we could send the same allocated step message to all the clients
-		- That will be the most performant and probably easiest
-		- "broadcast_payload"?
-			- so we'll use the same buffer for all clients
-			- we could always attach a lambda that determines whether this client needs it
-		- we will thus need to put commands_accepted in a separate message
-		- well what if we send num_entropies_accepted via unreliable channel? 
-			- e.g. you could send total messages accepted
-	- thus we need to send bytes as the payload
+- Force proper drawing order of attachments as this really looks bad on the rocket launcher
+	- At least on guns?
 
+- If the charges don't all fit into inventory, allow to pick as many charges from the ground as possible
+	- Or do we force them to be picked by a free hand?
+		- Perhaps!
+
+- Allow to mount directly to chamber
+
+- rocket launchers
+	- For the fire trace, we could take the fire muzzle shot particle effect, and repeat it with high frequency
+	- Simply add explosive invariant to the plain missile?
+		- Do we have any use for the hand fuse there?
+			- nah, it's for beeping, arming and defusing
+		- will support cascade explosions out of the box
+	- add sounds later
+
+- The rocket item entity
+	- Should be a normal cartridge
 
 - Create randomized players like in the good olden times
 	- to test the predicted experience
@@ -36,16 +33,10 @@ summary: That which we are brainstorming at the moment.
 
 - Fix crash on kartezjan's komputer
 
-- Leave a detailed net graph for later
-	- Just print some basic network usage
-
 - If we simply don't predict knockouts, we automatically don't predict the vulnerable win conditions in the mode
 	- Other win conditions are based on time so it won't be as bad
 
 - Admin panel
-
-- Clear cosmic entropy when the player is not conscious
-	- So that others are not allowed to waste bandwidth when they are dead
 
 - Notes on assymetric latency
 	- Effectively, the client always shows AHEAD the server time by 

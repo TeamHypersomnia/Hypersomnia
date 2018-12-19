@@ -22,7 +22,6 @@ TEST_CASE("GetByDynamicId") {
 
 	auto tester = [](auto a) -> decltype(auto) {
 		using T = remove_cref<decltype(a)>;
-		static_assert( || same<T, explosive_missile>);
 
 		if constexpr(std::is_same_v<T, plain_missile>) {
 			return 4;
