@@ -22,6 +22,7 @@ struct misprediction_candidate_entry {
 struct steps_unpacking_result {
 	bool should_repredict = false;
 	bool malicious_server = false;
+	std::size_t total_accepted = static_cast<std::size_t>(-1);
 };
 
 class simulation_receiver {
@@ -119,7 +120,7 @@ public:
 		auto& repredict = result.should_repredict;
 
 		{
-			auto p_i = std::size_t(0);
+			auto p_i = static_cast<std::size_t>(0);
 
 			for (std::size_t i = 0; i < entropies.size(); ++i) {
 				/* If a new player was added, always reinfer. */
@@ -161,6 +162,7 @@ public:
 			entropies.clear();
 
 			const auto& total_accepted = p_i;
+			result.total_accepted = total_accepted;
 
 			auto& predicted = predicted_entropies;
 

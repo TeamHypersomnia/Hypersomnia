@@ -241,6 +241,8 @@ public:
 						advance_repredicted
 					);
 
+					performance.accepted_commands.measure(result.total_accepted);
+
 					if (result.malicious_server) {
 						LOG("There was a problem unpacking steps from the server. Disconnecting.");
 						log_malicious_server();
@@ -254,16 +256,19 @@ public:
 					p.push_back(*new_local_entropy);
 
 					const auto& max_commands = vars.max_predicted_client_commands;
+					const auto num_commands = p.size();
 
-					if (p.size() > max_commands) {
+					if (num_commands > max_commands) {
 						last_disconnect_reason = typesafe_sprintf(
 							"Number of predicted commands (%x) exceeded max_predicted_client_commands (%x).", 
-							p.size(),
+							num_commands,
 							max_commands
 						);
 
 						disconnect();
 					}
+
+					performance.predicted_steps.measure(num_commands);
 				}
 
 #if USE_CLIENT_PREDICTION
