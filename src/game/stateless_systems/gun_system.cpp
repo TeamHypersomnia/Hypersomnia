@@ -273,21 +273,21 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				bool decrease_heat_in_aftermath = true;
 
 				if (const auto magic_missile_flavour_id = gun_def.magic_missile_flavour; magic_missile_flavour_id.is_set()) {
-					const auto& missile = cosm.on_flavour(
+					const auto& missile_def = cosm.on_flavour(
 						magic_missile_flavour_id,
 						[](const auto& f) -> decltype(auto) {
 							return f.template get<invariants::missile>();
 						}
 					);
 
-					const auto mana_needed = missile.damage.base * missile.pe_damage_ratio;
+					const auto mana_needed = missile_def.damage.base * missile_def.pe_damage_ratio;
 
 					auto& pe = sentience.get<personal_electricity_meter_instance>();
 
 					if (pe.value >= mana_needed) {
 						if (try_to_fire_interval()) {
 							pe.value -= pe.calc_damage_result(mana_needed).effective;
-							total_recoil += missile.recoil_multiplier * gun_def.recoil_multiplier;
+							total_recoil += missile_def.recoil_multiplier * gun_def.recoil_multiplier;
 
 							cosmic::create_entity(
 								cosm, 
@@ -303,9 +303,14 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 										const auto missile_velocity = 
 											muzzle_transform.get_direction()
-											* missile.muzzle_velocity_mult
+											* missile_def.muzzle_velocity_mult
 											* rng.randval(gun_def.muzzle_velocity)
 										;
+
+										{
+											auto& missile = round_entity.template get<components::missile>();
+											missile.power_multiplier_of_sender = gun_def.damage_multiplier;
+										}
 
 										round_entity.template get<components::rigid_body>().set_velocity(missile_velocity);
 									}

@@ -616,7 +616,7 @@ namespace test_flavours {
 			missile.damage.effects.destruction.sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
 
 			missile.homing_towards_hostile_strength = 1.0f;
-			missile.damage.base = 42;
+			missile.damage.base = 64;
 			missile.ricochet_born_cooldown_ms = 17.f;
 
 			auto& trace_modifier = missile.trace_sound.modifier;
@@ -1868,7 +1868,7 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {2000.f, 2000.f};
 			gun_def.shot_cooldown_ms = 300.f;
 
-			gun_def.damage_multiplier = 1.f;
+			gun_def.damage_multiplier = 0.5f;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.magic_missile_flavour = to_entity_flavour_id(test_plain_missiles::ELECTRIC_MISSILE);

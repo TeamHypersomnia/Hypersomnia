@@ -140,12 +140,15 @@ public:
 
 		bomb_mode_ruleset bomb_ruleset;
 
+		test_scene_settings settings;
+		settings.scene_tickrate = 128;
+
 		{
 			test_mode_ruleset dummy;
 
 			scene.make_test_scene(
 				lua,
-				{},
+				settings,
 				dummy,
 				std::addressof(bomb_ruleset)
 			);
