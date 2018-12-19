@@ -69,11 +69,7 @@ void standard_explosion_input::instantiate(
 	}
 
 	{
-		sound_effect_input effect;
-		effect.id = sound_effect; 
-		effect.modifier.gain = sound_gain;
-
-		effect.start(
+		sound.start(
 			step,
 			sound_effect_start_input::fire_and_forget(explosion_location).set_listener(subject_if_any)
 		);

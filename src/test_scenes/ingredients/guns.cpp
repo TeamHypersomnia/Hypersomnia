@@ -263,7 +263,7 @@ namespace test_flavours {
 
 			trace_modifier.doppler_factor = 1.f;
 			trace_modifier.max_distance = 6000.f;
-			trace_modifier.reference_distance = 800.f;
+			trace_modifier.reference_distance = 1000.f;
 			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
 			trace_modifier.gain = 1.3f;
 			trace_modifier.fade_on_exit = false;

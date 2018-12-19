@@ -11,6 +11,7 @@
 #include "game/enums/adverse_element_type.h"
 #include "game/detail/sentience_shake.h"
 #include "game/detail/damage/damage_definition.h"
+#include "game/detail/view_input/sound_effect_input.h"
 
 struct damage_cause;
 
@@ -25,8 +26,7 @@ struct standard_explosion_input {
 	real32 wave_shake_radius_mult = 2.f;
 	rgba inner_ring_color = cyan;
 	rgba outer_ring_color = white;
-	assets::sound_id sound_effect;
-	real32 sound_gain = 1.f;
+	sound_effect_input sound;
 	real32 ring_duration_seconds = 0.20f;
 	adverse_element_type type = adverse_element_type::FORCE;
 	bool create_thunders_effect = false;

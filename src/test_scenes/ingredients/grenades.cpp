@@ -73,8 +73,8 @@ namespace test_flavours {
 			in.effective_radius = 300.f;
 			dmg.impact_impulse = 550.f;
 			dmg.impulse_multiplier_against_sentience = 1.f;
-			in.sound_gain = 1.8f;
-			in.sound_effect = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
+			in.sound.modifier.gain = 1.8f;
+			in.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
 
 			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 			dmg.shake.duration_ms = 500.f;
@@ -125,8 +125,8 @@ namespace test_flavours {
 			in.effective_radius = 450.f;
 			dmg.impact_impulse = 2.f;
 			dmg.impulse_multiplier_against_sentience = 1.f;
-			in.sound_gain = 2.2f;
-			in.sound_effect = to_sound_id(test_scene_sound_id::INTERFERENCE_EXPLOSION);
+			in.sound.modifier.gain = 2.2f;
+			in.sound.id = to_sound_id(test_scene_sound_id::INTERFERENCE_EXPLOSION);
 			in.type = adverse_element_type::INTERFERENCE;
 
 			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
@@ -180,8 +180,8 @@ namespace test_flavours {
 			in.effective_radius = 350.f;
 			dmg.impact_impulse = 2.f;
 			dmg.impulse_multiplier_against_sentience = 1.f;
-			in.sound_gain = 2.2f;
-			in.sound_effect = to_sound_id(test_scene_sound_id::PED_EXPLOSION);
+			in.sound.modifier.gain = 2.2f;
+			in.sound.id = to_sound_id(test_scene_sound_id::PED_EXPLOSION);
 			in.type = adverse_element_type::PED;
 			in.create_thunders_effect = true;
 
@@ -202,8 +202,8 @@ namespace test_flavours {
 			in.effective_radius = 500.f;
 			dmg.impact_impulse = 950.f;
 			dmg.impulse_multiplier_against_sentience = 1.f;
-			in.sound_gain = 2.f;
-			in.sound_effect = to_sound_id(test_scene_sound_id::BOMB_EXPLOSION);
+			in.sound.modifier.gain = 2.f;
+			in.sound.id = to_sound_id(test_scene_sound_id::BOMB_EXPLOSION);
 
 			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 			dmg.shake.duration_ms = 700.f;
@@ -214,7 +214,7 @@ namespace test_flavours {
 
 		auto bomb_cascade_explosion = bomb_explosion;
 		//bomb_cascade_explosion *= 0.7f;
-		bomb_cascade_explosion.sound_effect = to_sound_id(test_scene_sound_id::CASCADE_EXPLOSION);
+		bomb_cascade_explosion.sound.id = to_sound_id(test_scene_sound_id::CASCADE_EXPLOSION);
 		bomb_cascade_explosion.inner_ring_color = white;
 		bomb_cascade_explosion.outer_ring_color = cyan;
 		bomb_cascade_explosion.ring_duration_seconds = 0.3f;
@@ -233,8 +233,8 @@ namespace test_flavours {
 		{
 			auto e = bomb_explosion;
 			e *= 0.4f;
-			e.sound_gain = 1.f;
-			e.sound_effect = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
+			e.sound.modifier.gain = 1.f;
+			e.sound.id = to_sound_id(test_scene_sound_id::SKULL_ROCKET_DESTRUCTION);
 			e.inner_ring_color = yellow;
 			e.outer_ring_color = orange;
 			e.ring_duration_seconds = 0.3f;
@@ -254,8 +254,8 @@ namespace test_flavours {
 			auto e = bomb_explosion;
 			e *= 0.2f;
 			e.wave_shake_radius_mult = 6;
-			e.sound_gain = 1.f;
-			e.sound_effect = to_sound_id(test_scene_sound_id::EXPLOSION);
+			e.sound.modifier.gain = 1.f;
+			e.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
 			e.inner_ring_color = red;
 			e.outer_ring_color = orange;
 			e.ring_duration_seconds = 0.3f;
@@ -273,8 +273,8 @@ namespace test_flavours {
 		{
 			auto smaller_bomb_cascade_explosion = bomb_explosion;
 			smaller_bomb_cascade_explosion *= 0.07f;
-			smaller_bomb_cascade_explosion.sound_gain = 1.f;
-			smaller_bomb_cascade_explosion.sound_effect = to_sound_id(test_scene_sound_id::FIREWORK);
+			smaller_bomb_cascade_explosion.sound.modifier.gain = 1.f;
+			smaller_bomb_cascade_explosion.sound.id = to_sound_id(test_scene_sound_id::FIREWORK);
 			smaller_bomb_cascade_explosion.inner_ring_color = green;
 			smaller_bomb_cascade_explosion.outer_ring_color = dark_green;
 			smaller_bomb_cascade_explosion.ring_duration_seconds = 0.3f;
@@ -387,8 +387,12 @@ namespace test_flavours {
 				in.effective_radius = 400.f;
 				dmg.impact_impulse = 450.f;
 				dmg.impulse_multiplier_against_sentience = 1.f;
-				in.sound_gain = 2.f;
-				in.sound_effect = to_sound_id(test_scene_sound_id::PED_EXPLOSION);
+				in.sound.modifier.gain = 2.f;
+				in.sound.id = to_sound_id(test_scene_sound_id::SKULL_ROCKET_DESTRUCTION);
+				in.sound.modifier.max_distance = 8000.f;
+				in.sound.modifier.reference_distance = 1400.f;
+				in.sound.modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
+
 				in.create_thunders_effect = true;
 				in.wave_shake_radius_mult = 6;
 
