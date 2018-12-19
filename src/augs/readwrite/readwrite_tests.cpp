@@ -32,7 +32,7 @@ TEST_CASE("Filesystem test") {
 }
 
 TEST_CASE("Byte readwrite Sanity check") {
-	using T = std::variant<double, std::string, std::unordered_map<int, double>, std::optional<std::string>>;
+	using T = std::variant<std::monostate, double, std::string, std::unordered_map<int, double>, std::optional<std::string>>;
 
 	{
 		detail::dummy_C a, b;
@@ -274,7 +274,10 @@ TEST_CASE("Lua readwrite General") {
 
 	{
 		using map_type = std::unordered_map<int, std::string>;
-		using T = std::variant<int, std::string, map_type, std::pair<std::string, int>>;
+		using T = std::variant<std::monostate, int, std::string, map_type, std::pair<std::string, int>>;
+
+		T with_monostate;
+		REQUIRE(try_to_reload_with_lua(lua, with_monostate));
 
 		map_type mm;
 		mm[4] = "2.0";
@@ -326,12 +329,14 @@ TEST_CASE("Byte readwrite Variants and optionals") {
 	const auto& path = test_file_path;
 
 	using map_type = std::unordered_map<int, double>;
-	using T = std::variant<double, std::string, map_type, std::optional<std::string>>;
+	using T = std::variant<std::monostate, double, std::string, map_type, std::optional<std::string>>;
 
 	T v;
 
 	{
 		v = 2.0;
+		readwrite_test_cycle(v);
+		v = std::monostate();
 		readwrite_test_cycle(v);
 	}
 

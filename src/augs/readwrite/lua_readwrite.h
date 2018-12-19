@@ -6,6 +6,7 @@
 
 #include "augs/string/get_type_name.h"
 #include "augs/templates/traits/is_variant.h"
+#include "augs/templates/traits/is_monostate.h"
 #include "augs/templates/traits/is_optional.h"
 #include "augs/templates/traits/is_maybe.h"
 #include "augs/templates/traits/is_pair.h"
@@ -111,20 +112,26 @@ namespace augs {
 			ensure(input_table.is<sol::table>());
 
 			const auto variant_type_label = get_variant_type_label(into);
-			const auto variant_content_label = get_variant_content_label(into);
-
 			std::string variant_type = input_table[variant_type_label];
+
+			if (variant_type == "std_monostate") {
+				return;
+			}
+
+			const auto variant_content_label = get_variant_content_label(into);
 			sol::object variant_content = input_table[variant_content_label];
 
 			for_each_type_in_list<Serialized>(
-				[variant_content, variant_type, &into](const auto& specific_object){
-					const auto this_type_name = get_type_name_strip_namespace(specific_object);
+				[variant_content, variant_type, &into](const auto& resolved){
+					if constexpr(!is_monostate_v<decltype(resolved)>) {
+						const auto this_type_name = get_type_name_strip_namespace(resolved);
 
-					if (this_type_name == variant_type) {
-						using T = remove_cref<decltype(specific_object)>;
-						T object{};
-						read_lua(variant_content, object);
-						into.template emplace<T>(std::move(object));
+						if (this_type_name == variant_type) {
+							using T = remove_cref<decltype(resolved)>;
+							T object{};
+							read_lua(variant_content, object);
+							into.template emplace<T>(std::move(object));
+						}
 					}
 				}
 			);
@@ -377,14 +384,19 @@ namespace augs {
 		verify_write_lua<Archive, Serialized>();
 
 		if constexpr(is_variant_v<Serialized>) {
-			std::visit(
-				[&output_table](const auto& resolved) mutable {
-					const auto variant_type_label = get_variant_type_label();
-					const auto variant_content_label = get_variant_content_label();
-					const auto this_type_name = get_type_name_strip_namespace(resolved);
+			const auto variant_type_label = get_variant_type_label(from);
+			const auto variant_content_label = get_variant_content_label(from);
 
-					output_table[variant_type_label] = this_type_name;
-					write_table_or_field(output_table, resolved, variant_content_label);
+			std::visit(
+				[&](const auto& resolved) mutable {
+					if constexpr(is_monostate_v<decltype(resolved)>) {
+						output_table[variant_type_label] = "std_monostate";
+					}
+					else {
+						const auto this_type_name = get_type_name_strip_namespace(resolved);
+						output_table[variant_type_label] = this_type_name;
+						write_table_or_field(output_table, resolved, variant_content_label);
+					}
 				}, 
 				from
 			);

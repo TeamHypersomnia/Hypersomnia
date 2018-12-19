@@ -47,6 +47,9 @@ struct preserialized_message : public yojimbo::Message {
 	bool Serialize(Stream& stream);
 
 	YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
+
+	using yojimbo::Message::Acquire;
+	using yojimbo::Message::Release;
 };
 
 struct only_block_message : public yojimbo::BlockMessage {
@@ -62,6 +65,9 @@ struct only_block_message : public yojimbo::BlockMessage {
 	}
 
 	YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
+
+	using yojimbo::Message::Acquire;
+	using yojimbo::Message::Release;
 };
 
 template <bool C>

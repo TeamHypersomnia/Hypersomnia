@@ -8,13 +8,25 @@ struct prestep_client_context {
 };
 
 struct client_entropy_entry {
+	// GEN INTROSPECTOR struct client_entropy_entry
 	mode_player_id player_id;
 	total_mode_player_entropy total;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const client_entropy_entry& b) const {
+		return player_id == b.player_id && total == b.total;
+	}
 };
 
 struct networked_server_step_entropy {
+	// GEN INTROSPECTOR struct networked_server_step_entropy
 	std::vector<client_entropy_entry> players;
 	mode_entropy_general general;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const networked_server_step_entropy& b) const {
+		return players == b.players && general == b.general;
+	}
 
 	void operator+=(const client_entropy_entry& e) {
 		if (!e.player_id.is_set()) {

@@ -4,6 +4,7 @@
 #include "augs/templates/traits/is_optional.h"
 #include "augs/templates/traits/container_traits.h"
 #include "augs/templates/traits/is_variant.h"
+#include "augs/templates/traits/is_monostate.h"
 #include "augs/templates/traits/has_begin_and_end.h"
 #include "augs/templates/identity_templates.h"
 
@@ -77,6 +78,9 @@ S& pretty_print(S& os, const T& val) {
 	}
 	else if constexpr(std::is_pointer_v<T>) {
 		os << get_type_name<T>() << "*: " << static_cast<intptr_t>(val);
+	}
+	else if constexpr(is_monostate_v<T>) {
+		os << "std::monostate";
 	}
 	else {
 		static_assert(always_false_v<T>, "No suitable operator<< found.");

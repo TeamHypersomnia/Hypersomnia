@@ -595,3 +595,182 @@ server_step_entropy server_setup::unpack(const networked_server_step_entropy& n)
 		}
 	);
 }
+
+#include "augs/readwrite/to_bytes.h"
+
+#if BUILD_UNIT_TESTS
+#include <Catch/single_include/catch2/catch.hpp>
+#include "augs/misc/lua/lua_utils.h"
+#include <sol2/sol.hpp>
+#include "augs/readwrite/lua_file.h"
+
+TEST_CASE("NetSerialization EmptyEntropies") {
+	{
+		net_messages::server_step_entropy ss;
+		ss.Release();
+
+		{
+			REQUIRE(ss.bytes.size() == 0);
+
+			networked_server_step_entropy sent;
+			ss.write_payload(sent);
+
+			REQUIRE(ss.bytes.size() == 1);
+		}
+	}
+
+	{
+		net_messages::client_entropy ss;
+		ss.Release();
+
+		{
+			REQUIRE(ss.bytes.size() == 0);
+
+			total_client_entropy sent;
+			ss.write_payload(sent);
+
+			REQUIRE(ss.bytes.size() == 1);
+		}
+	}
+}
+
+TEST_CASE("NetSerialization ServerEntropy") {
+	net_messages::server_step_entropy ss;
+	ss.Release();
+	
+	networked_server_step_entropy sent;
+
+	const auto naive_bytes = [&]() {
+		total_mode_player_entropy t;
+		t.mode.team_choice = { { faction_type::METROPOLIS } };
+		t.mode.item_purchase.emplace();
+		t.mode.item_purchase->spell.set<fury_of_the_aeons>();
+
+		total_mode_player_entropy tt;
+		tt.cosmic.cast_spell.set<ultimate_wrath_of_the_aeons>();
+		tt.cosmic.motions[game_motion_type::MOVE_CROSSHAIR] = { 342, 432534 };
+		tt.cosmic.intents.push_back({ game_intent_type::USE_BUTTON, intent_change::PRESSED });
+		tt.cosmic.intents.push_back({ game_intent_type::MOVE_FORWARD, intent_change::RELEASED });
+
+		auto second = mode_player_id::first();
+		second.value++;
+
+		auto third = second;
+		third.value++;
+
+		sent.players.push_back({ mode_player_id::machine_admin(), t });
+		sent.players.push_back({ second, {} });
+		sent.players.push_back({ third, tt });
+		sent.players.push_back({ mode_player_id::first(), {} });
+
+		REQUIRE(ss.write_payload(sent));
+
+		return augs::to_bytes(sent);	
+	}();
+
+	networked_server_step_entropy received;
+	const auto naively_received = augs::from_bytes<networked_server_step_entropy>(naive_bytes);
+
+	REQUIRE(ss.read_payload(received));
+
+	if (!(received == sent) || !(received == naively_received)) {
+		auto lua = augs::create_lua_state();
+
+		augs::save_as_lua_table(lua, sent, "sent.lua");
+		augs::save_as_lua_table(lua, received, "received.lua");
+	}
+
+	REQUIRE(received == naively_received);
+	REQUIRE(received == sent);
+}
+
+TEST_CASE("NetSerialization ServerEntropySecond") {
+	net_messages::server_step_entropy ss;
+	ss.Release();
+
+	networked_server_step_entropy sent;
+
+	const auto naive_bytes = [&]() {
+		total_mode_player_entropy t;
+		t.mode.item_purchase.emplace();
+		t.mode.item_purchase->item.type_id.set<shootable_weapon>();
+		t.mode.item_purchase->item.raw.indirection_index = 11;
+		t.mode.item_purchase->item.raw.version = 11;
+
+		total_mode_player_entropy tt;
+		tt.cosmic.cast_spell.set<ultimate_wrath_of_the_aeons>();
+		tt.cosmic.motions[game_motion_type::MOVE_CROSSHAIR] = { 34, 111 };
+		tt.cosmic.intents.push_back({ game_intent_type::DROP, intent_change::RELEASED });
+		tt.cosmic.intents.push_back({ game_intent_type::DROP, intent_change::RELEASED });
+		tt.cosmic.intents.push_back({ game_intent_type::DROP, intent_change::RELEASED });
+
+		auto second = mode_player_id::first();
+		second.value++;
+
+		auto third = second;
+		third.value++;
+
+		sent.players.push_back({ mode_player_id::machine_admin(), {} });
+		sent.players.push_back({ second, tt });
+		sent.players.push_back({ mode_player_id::first(), tt });
+		sent.players.push_back({ third, {} });
+
+		REQUIRE(ss.write_payload(sent));
+
+		return augs::to_bytes(sent);	
+	}();
+
+	networked_server_step_entropy received;
+	const auto naively_received = augs::from_bytes<networked_server_step_entropy>(naive_bytes);
+
+	REQUIRE(ss.read_payload(received));
+
+	if (!(received == sent) || !(received == naively_received)) {
+		auto lua = augs::create_lua_state();
+
+		augs::save_as_lua_table(lua, sent, "sent.lua");
+		augs::save_as_lua_table(lua, received, "received.lua");
+	}
+
+	REQUIRE(received == naively_received);
+	REQUIRE(received == sent);
+}
+
+TEST_CASE("NetSerialization ClientEntropy") {
+	net_messages::client_entropy ss;
+	ss.Release();
+
+	total_client_entropy sent;
+
+	const auto naive_bytes = [&]() {
+		sent.mode.team_choice = { { faction_type::RESISTANCE } };
+		sent.mode.item_purchase.emplace();
+		sent.mode.item_purchase->spell.set<haste>();
+
+		sent.cosmic.cast_spell.set<ultimate_wrath_of_the_aeons>();
+		sent.cosmic.motions[game_motion_type::MOVE_CROSSHAIR] = { 342, 432534 };
+		sent.cosmic.intents.push_back({ game_intent_type::USE_BUTTON, intent_change::PRESSED });
+		sent.cosmic.intents.push_back({ game_intent_type::MOVE_FORWARD, intent_change::RELEASED });
+
+		ss.write_payload(sent);
+
+		return augs::to_bytes(sent);	
+	}();
+
+	total_client_entropy received;
+	const auto naively_received = augs::from_bytes<total_client_entropy>(naive_bytes);
+
+	REQUIRE(ss.read_payload(received));
+
+	if (!(received == sent) || !(received == naively_received)) {
+		auto lua = augs::create_lua_state();
+
+		augs::save_as_lua_table(lua, sent, "sent.lua");
+		augs::save_as_lua_table(lua, received, "received.lua");
+	}
+
+	REQUIRE(received == naively_received);
+	REQUIRE(received == sent);
+}
+
+#endif

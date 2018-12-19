@@ -143,3 +143,7 @@ bool mode_player_entropy::operator==(const mode_player_entropy& b) const {
 		&& item_purchase == b.item_purchase
 	;
 }
+
+bool total_mode_player_entropy::operator==(const total_mode_player_entropy& b) const {
+	return mode == b.mode && cosmic == b.cosmic;
+}

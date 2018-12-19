@@ -37,7 +37,7 @@ namespace augs {
 
 	struct trivial_type_marker {};
 
-	template <class B, class T>
+	template <class T, class B>
 	auto from_bytes(const B& bytes) {
 		static_assert(
 			!std::is_same_v<T, trivial_type_marker>,

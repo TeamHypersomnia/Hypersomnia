@@ -37,6 +37,7 @@ struct total_mode_player_entropy {
 	// END GEN INTROSPECTOR
 
 	total_mode_player_entropy& operator+=(const total_mode_player_entropy& b);
+	bool operator==(const total_mode_player_entropy&) const;
 	bool empty() const;
 };
 
