@@ -201,7 +201,7 @@ void standard_explosion_input::instantiate(
 	{
 		physics.for_each_intersection_with_circle_meters( 
 			si,
-			si.get_meters(effective_radius) * 2,
+			si.get_meters(effective_radius) * wave_shake_radius_mult,
 			explosion_location.to<b2Transform>(si),
 			filters[predefined_filter_type::CHARACTER],
 			[&](

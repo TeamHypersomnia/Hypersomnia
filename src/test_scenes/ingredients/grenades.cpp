@@ -238,6 +238,7 @@ namespace test_flavours {
 			e.inner_ring_color = yellow;
 			e.outer_ring_color = orange;
 			e.ring_duration_seconds = 0.3f;
+			e.wave_shake_radius_mult = 6;
 
 			auto& meta = get_test_flavour(flavours, test_explosion_bodies::SKULL_ROCKET_CASCADE);
 			auto& c = meta.get<invariants::cascade_explosion>();
@@ -252,6 +253,7 @@ namespace test_flavours {
 		{
 			auto e = bomb_explosion;
 			e *= 0.2f;
+			e.wave_shake_radius_mult = 6;
 			e.sound_gain = 1.f;
 			e.sound_effect = to_sound_id(test_scene_sound_id::EXPLOSION);
 			e.inner_ring_color = red;
@@ -388,6 +390,7 @@ namespace test_flavours {
 				in.sound_gain = 2.f;
 				in.sound_effect = to_sound_id(test_scene_sound_id::PED_EXPLOSION);
 				in.create_thunders_effect = true;
+				in.wave_shake_radius_mult = 6;
 
 				dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 				dmg.shake.duration_ms = 700.f;

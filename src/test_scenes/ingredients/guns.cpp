@@ -232,7 +232,7 @@ namespace test_flavours {
 
 
 			test_flavours::add_bullet_round_physics(meta);
-			meta.template get<invariants::rigid_body>().damping.linear = 2.f;
+			meta.template get<invariants::rigid_body>().damping.linear = 3.f;
 
 			invariants::missile missile;
 
@@ -257,13 +257,13 @@ namespace test_flavours {
 			missile.damage.base = 112.f;
 			missile.max_lifetime_ms = 1000.f;
 
-			missile.trace_sound.id = to_sound_id(test_scene_sound_id::STEEL_PROJECTILE_FLIGHT);
+			missile.trace_sound.id = to_sound_id(test_scene_sound_id::SKULL_ROCKET_FLIGHT);
 
 			auto& trace_modifier = missile.trace_sound.modifier;
 
 			trace_modifier.doppler_factor = 1.f;
-			trace_modifier.max_distance = 700.f;
-			trace_modifier.reference_distance = 50.f;
+			trace_modifier.max_distance = 6000.f;
+			trace_modifier.reference_distance = 800.f;
 			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
 			trace_modifier.gain = 1.3f;
 			trace_modifier.fade_on_exit = false;
@@ -1886,10 +1886,10 @@ namespace test_flavours {
 
 			invariants::gun gun_def;
 
-			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::AO44_MUZZLE);
+			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::ELON_HRL_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::BOLT_ACTION;
-			gun_def.muzzle_velocity = {3800.f, 3800.f};
+			gun_def.muzzle_velocity = {5200.f, 5200.f};
 			gun_def.shot_cooldown_ms = 0.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::REVOLVER_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = false;

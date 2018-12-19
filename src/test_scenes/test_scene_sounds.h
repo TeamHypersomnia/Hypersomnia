@@ -159,6 +159,9 @@ enum class test_scene_sound_id {
 
 	SHEATH_KNIFE,
 
+	SKULL_ROCKET_FLIGHT,
+	ELON_HRL_MUZZLE,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };
