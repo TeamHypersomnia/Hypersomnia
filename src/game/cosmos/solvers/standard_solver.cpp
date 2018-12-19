@@ -53,7 +53,11 @@ void standard_solve(const logic_step step) {
 			continue;
 		}
 
-		perform_transfers(p.second.transfers, step);
+		const auto& t = p.second.transfer;
+
+		if (t.is_set()) {
+			perform_transfer(t, step);
+		}
 	}
 
 	performance.entropy_length.measure(step.get_entropy().length());

@@ -5,6 +5,7 @@
 #include "augs/readwrite/byte_file.h"
 #include "augs/readwrite/lua_file.h"
 #include "augs/templates/can_stream.h"
+#include "augs/readwrite/to_bytes.h"
 
 const auto test_file_path = GENERATED_FILES_DIR "/test_byte_readwrite.bin";
 const auto test_lua_file_path = GENERATED_FILES_DIR "/test_lua_readwrite.lua";
@@ -124,7 +125,7 @@ bool try_to_reload_with_bytes(T& v) {
 
 	{
 		std::vector<std::byte> bytes;
-		bytes = augs::to_bytes(v);
+		augs::assign_bytes(bytes, v);
 
 		augs::save_as_bytes(bytes, path);
 	}
@@ -180,7 +181,7 @@ bool try_to_reload_with_memory_stream(T& v) {
 
 	{
 		std::vector<std::byte> bytes;
-		bytes = augs::to_bytes(v);
+		augs::assign_bytes(bytes, v);
 
 		augs::save_as_bytes(bytes, path);
 	}

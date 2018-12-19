@@ -49,3 +49,9 @@ public:
 private:
     server_adapter* m_server;
 };
+
+using translated_payload_id = yojimbo::Message*;
+
+inline bool is_valid(const translated_payload_id& t) {
+	return t != nullptr;
+}

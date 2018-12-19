@@ -1,4 +1,5 @@
 #include "augs/readwrite/memory_stream.h"
+#include "augs/readwrite/to_bytes.h"
 #include "augs/misc/serialization_buffers.h"
 
 namespace augs {

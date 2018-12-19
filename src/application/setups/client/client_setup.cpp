@@ -1,3 +1,4 @@
+#include "augs/misc/pool/pool_io.hpp"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 
@@ -9,7 +10,6 @@
 
 #include "game/cosmos/change_solvable_significant.h"
 
-#include "augs/misc/pool/pool_io.hpp"
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/memory_stream.h"
 
@@ -169,7 +169,17 @@ message_handler_result client_setup::handle_server_message(
 
 		state = client_state_type::IN_GAME;
 	}
-	else if constexpr (std::is_same_v<T, server_step_entropy_for_client>) {
+	else if constexpr (std::is_same_v<T, prestep_client_context>) {
+		if (state != client_state_type::IN_GAME) {
+			LOG("The server has sent prestep context too early (state: %x). Disconnecting.", state);
+
+			log_malicious_server();
+			return abort_v;
+		}
+
+		receiver.acquire_next_server_entropy(payload);
+	}
+	else if constexpr (std::is_same_v<T, networked_server_step_entropy>) {
 		if (state != client_state_type::IN_GAME) {
 			LOG("The server has sent entropy too early (state: %x). Disconnecting.", state);
 
@@ -177,7 +187,17 @@ message_handler_result client_setup::handle_server_message(
 			return abort_v;
 		}
 
-		receiver.acquire_next_server_entropy(payload);
+		{
+			auto mode_id_to_entity_id = [&](const mode_player_id& mode_id) {
+				return get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
+					[&](const auto& typed_mode) {
+						return typed_mode.lookup(mode_id);
+					}
+				);
+			};
+
+			receiver.acquire_next_server_entropy(payload.unpack(mode_id_to_entity_id));
+		}
 
 		const auto& max_commands = vars.max_buffered_server_commands;
 		const auto num_commands = receiver.incoming_entropies.size();
@@ -235,6 +255,8 @@ void client_setup::send_packets_if_its_time() {
 }
 
 void client_setup::log_malicious_server() {
+	last_disconnect_reason = "The client is broken or the server might be malicious.\nPlease report this fact to the developers - send them the files in cache/usr/log.";
+
 #if !IS_PRODUCTION_BUILD
 	ensure(false && "Server has sent some invalid data.");
 #endif
@@ -366,7 +388,7 @@ bool client_setup::is_connected() const {
 }
 
 void client_setup::send_to_server(
-	const total_client_entropy& new_local_entropy
+	total_client_entropy& new_local_entropy
 ) {
 	client->send_payload(
 		game_channel_type::CLIENT_COMMANDS,

@@ -238,41 +238,6 @@ namespace augs {
 		basic_ref_memory_stream(basic_ref_memory_stream&&) = delete;
 		basic_ref_memory_stream& operator=(basic_ref_memory_stream&&) = delete;
 	};
-
-	template <class T>
-	void to_bytes(std::vector<std::byte>& buffer, const T& object) {
-		auto s = ref_memory_stream(buffer);
-		augs::write_bytes(s, object);
-	}
-
-	template <class T>
-	void from_bytes(const std::vector<std::byte>& bytes, T& object) {
-		auto s = cref_memory_stream(bytes);
-		augs::read_bytes(s, object);
-	}
-
-	template <class T>
-	auto to_bytes(const T& object) {
-		std::vector<std::byte> s;
-		to_bytes(s, object);
-		return s;
-	}
-
-	struct trivial_type_marker {};
-
-	template <class T>
-	auto from_bytes(const std::vector<std::byte>& bytes) {
-		static_assert(
-			!std::is_same_v<T, trivial_type_marker>,
-			"Use the other overload that takes destination as argument."
-		);
-
-		T object;
-		from_bytes(bytes, object);
-		return object;
-	}
-
-	void from_bytes(const std::vector<std::byte>& bytes, trivial_type_marker& object);
 }
 
 namespace augs {

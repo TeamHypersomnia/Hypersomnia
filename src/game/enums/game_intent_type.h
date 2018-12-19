@@ -9,8 +9,6 @@
 
 enum class game_motion_type {
 	// GEN INTROSPECTOR enum class game_motion_type
-	INVALID,
-
 	MOVE_CROSSHAIR,
 
 	COUNT
@@ -22,8 +20,6 @@ using per_game_motion_t = augs::enum_map<game_motion_type, T>;
 
 enum class game_intent_type {
 	// GEN INTROSPECTOR enum class game_intent_type
-	INVALID,
-
 	DROP,
 	DROP_SECONDARY,
 

@@ -6,6 +6,7 @@
 
 #include "application/setups/editor/property_editor/property_editor_settings.h"
 #include "application/setups/editor/detail/maybe_different_colors.h"
+#include "augs/readwrite/to_bytes.h"
 
 template <class Defs, class I, class T>
 void read_write_defaults_buttons(
@@ -40,7 +41,7 @@ void read_write_defaults_buttons(
 
 				cmd.affected_assets = { id };
 				cmd.property_id.field = make_field_address<field_type_id>(definition_object, definition_object.meta);
-				cmd.value_after_change = augs::to_bytes(new_meta);
+				augs::assign_bytes(cmd.value_after_change, new_meta);
 				cmd.built_description = "Read defaults from " + augs::filename_first(meta_lua_path);
 
 				post_editor_command(cmd_in, std::move(cmd));

@@ -108,7 +108,7 @@ const item_button& game_gui_system::get_item_button(const entity_id id) const {
 
 void game_gui_system::queue_transfer(const entity_id& subject, const item_slot_transfer_request req) {
 	(void)subject;
-	pending.transfers.push_back(req);
+	pending.transfer = req;
 }
 
 void game_gui_system::queue_wielding(const entity_id& subject, const wielding_setup& wielding) {

@@ -6,6 +6,7 @@
 #include "application/setups/editor/editor_history.hpp"
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/memory_stream.h"
+#include "augs/readwrite/to_bytes.h"
 
 void update_size_for_new_image(
 	const edit_invariant_input in,
@@ -36,7 +37,7 @@ void update_size_for_new_image(
 			using T = decltype(invariants::sprite::size);
 			const auto original_size = T(cache.original_image_size);
 
-			cmd.value_after_change = augs::to_bytes(original_size);
+			augs::assign_bytes(cmd.value_after_change, original_size);
 			cmd.built_description = typesafe_sprintf("Set sprite size to image dimensions: %x", original_size);
 		}
 
@@ -94,7 +95,7 @@ void update_size_for_new_image(
 				cmd.property_id.field = MACRO_MAKE_FLAVOUR_FIELD_ADDRESS(invariants::text_details, name);
 				cmd.common.has_parent = true;
 				cmd.built_description = "Updated flavour name to name of the chosen image";
-				cmd.value_after_change = augs::to_bytes(new_name);
+				augs::assign_bytes(cmd.value_after_change, new_name);
 
 				post_editor_command(cmd_in, std::move(cmd));
 			}
@@ -137,7 +138,7 @@ void update_size_if_tex_changed(
 		}
 
 		{
-			cmd.value_after_change = augs::to_bytes(first_image);
+			augs::assign_bytes(cmd.value_after_change, first_image);
 			cmd.built_description = typesafe_sprintf("Set sprite image id first frame of animation");
 		}
 

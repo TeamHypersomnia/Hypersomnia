@@ -5,6 +5,7 @@
 
 #include "augs/ensure.h"
 #include "augs/readwrite/memory_stream.h"
+#include "augs/readwrite/to_bytes.h"
 
 #include "augs/image/image.h"
 

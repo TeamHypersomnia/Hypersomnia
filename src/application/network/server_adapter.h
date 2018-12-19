@@ -51,6 +51,18 @@ public:
 		Args&&... args
 	);
 
+	template <class... Args>
+	translated_payload_id translate_payload(
+		const client_id_type& client_id, 
+		Args&&... args
+	);
+
+	bool send(
+		const client_id_type& client_id, 
+		const game_channel_type& channel_id, 
+		const translated_payload_id&
+	);
+
 	bool is_client_connected(const client_id_type& id) const;
 
 	void disconnect_client(const client_id_type& id);
@@ -67,4 +79,6 @@ public:
 
 	network_info get_network_info(client_id_type) const;
 	server_network_info get_server_network_info() const;
+
+	std::size_t num_connected_clients() const;
 };

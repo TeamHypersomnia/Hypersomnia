@@ -255,3 +255,22 @@ server_network_info server_adapter::get_server_network_info() const {
 
 	return total;
 }
+
+bool server_adapter::send(
+	const client_id_type& client_id, 
+	const game_channel_type& channel_id, 
+	const translated_payload_id& new_message
+) {
+	if (!is_valid(new_message)) {
+		return false;
+	}
+
+	const auto channel_id_int = static_cast<channel_id_type>(channel_id);
+	server.SendMessage(client_id, channel_id_int, new_message);
+
+	return true;
+}
+
+std::size_t server_adapter::num_connected_clients() const {
+	return server.GetNumConnectedClients();
+}

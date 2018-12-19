@@ -21,7 +21,7 @@ struct basic_player_entropy {
 	std::optional<basic_wielding_setup<key>> wield;
 	game_intents intents;
 	game_motions motions;
-	std::vector<basic_item_slot_transfer_request<key>> transfers;
+	basic_item_slot_transfer_request<key> transfer;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const basic_player_entropy<key>& b) const;

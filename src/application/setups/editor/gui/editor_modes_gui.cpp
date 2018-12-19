@@ -192,7 +192,7 @@ mode_entropy_general editor_modes_gui::perform(const editor_settings& settings, 
 								if (!is_playtest) {
 									change_rulesets_meta_property cmd;
 									cmd.field = MACRO_MAKE_ONLY_TRIVIAL_FIELD_ADDRESS(rulesets_meta, playtest_default);
-									cmd.value_after_change = augs::to_bytes(typed_id);
+									augs::assign_bytes(cmd.value_after_change, typed_id);
 									cmd.built_description = typesafe_sprintf("Selected \"%x\" as default for playtesting", ruleset.name);
 									post_editor_command(cmd_in, cmd);
 								}
@@ -211,7 +211,7 @@ mode_entropy_general editor_modes_gui::perform(const editor_settings& settings, 
 								if (!is_server) {
 									change_rulesets_meta_property cmd;
 									cmd.field = MACRO_MAKE_ONLY_TRIVIAL_FIELD_ADDRESS(rulesets_meta, server_default);
-									cmd.value_after_change = augs::to_bytes(typed_id);
+									augs::assign_bytes(cmd.value_after_change, typed_id);
 									cmd.built_description = typesafe_sprintf("Selected \"%x\" as default for servers", ruleset.name);
 									post_editor_command(cmd_in, cmd);
 								}

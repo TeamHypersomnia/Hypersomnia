@@ -1,3 +1,4 @@
+#include "augs/misc/pool/pool_io.hpp"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/compress.h"
@@ -14,7 +15,6 @@
 #include "application/network/net_message_translation.h"
 #include "application/network/net_message_serialization.h"
 
-#include "augs/misc/pool/pool_io.hpp"
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/memory_stream.h"
 
@@ -175,30 +175,7 @@ void server_setup::accept_entropy_of_client(
 	const total_client_entropy& entropy
 ) {
 	if (!entropy.empty()) {
-		const auto client_entity_id = get_arena_handle().on_mode(
-			[&](const auto& typed_mode) {
-				if (const auto p = typed_mode.find(mode_id)) {
-					return p->controlled_character_id;
-				}
-
-				return entity_id::dead();
-			}
-		);
-
-		/* 
-			TODO SECURITY: validate the entropies for unauthorized item transfers! 
-			Remember, though, that the client could have mistakenly thought that they are alive.
-			Therefore we should not assume they are malicious and kick them, but just ignore the invalid commands.
-		*/
-
-		step_collected.accumulate(
-			mode_id,
-			client_entity_id,
-			entropy
-		);
-	}
-	else {
-
+		step_collected += { mode_id, entropy };
 	}
 }
 
@@ -294,14 +271,14 @@ void server_setup::advance_clients_state() {
 							inputs.clear();
 						}
 						else {
-							inputs.erase(inputs.begin(), inputs.begin() + num_squashed);
+							erase_first_n(inputs, num_squashed);
 						}
 
 						return static_cast<uint8_t>(num_squashed);
 					}
 
 					entropy = inputs[0];
-					inputs.erase(inputs.begin());
+					erase_first_n(inputs, 1);
 
 					return static_cast<uint8_t>(1);
 				}();
@@ -484,7 +461,7 @@ void server_setup::handle_client_messages() {
 	server->advance(server_time, message_handler);
 }
 
-void server_setup::send_server_step_entropies(const server_step_entropy& total) {
+void server_setup::send_server_step_entropies(networked_server_step_entropy& total) {
 	for (auto& c : clients) {
 		if (!c.is_set()) {
 			continue;
@@ -495,24 +472,31 @@ void server_setup::send_server_step_entropies(const server_step_entropy& total) 
 		}
 
 		const auto client_id = static_cast<client_id_type>(index_in(clients, c));
-		// const auto mode_id = to_mode_player_id(client_id);
 
-		server_step_entropy_for_client for_client;
-		for_client.num_entropies_accepted = c.num_entropies_accepted;
-		for_client.total = total;
+		{
+			prestep_client_context context;
+			context.num_entropies_accepted = c.num_entropies_accepted;
+			c.num_entropies_accepted = 0;
 
-		c.num_entropies_accepted = 0;
+			server->send_payload(
+				client_id, 
+				game_channel_type::SERVER_SOLVABLE_AND_STEPS,
 
+				context
+			);
+		}
+
+		/* TODO PERFORMANCE: only serialize the message once and multicast the same buffer to all clients! */
 		server->send_payload(
-			client_id, 
+			client_id,
 			game_channel_type::SERVER_SOLVABLE_AND_STEPS,
 
-			for_client
+			total
 		);
 	}
 }
 
-void server_setup::reinfer_if_necessary_for(const server_step_entropy& entropy) {
+void server_setup::reinfer_if_necessary_for(const networked_server_step_entropy& entropy) {
 	if (entropy.general.added_player) {
 		cosmic::reinfer_solvable(get_arena_handle().get_cosmos());
 	}
@@ -598,4 +582,16 @@ void server_setup::sleep_until_next_tick() {
 
 void server_setup::update_stats(server_network_info& info) const {
 	info = server->get_server_network_info();
+}
+
+server_step_entropy server_setup::unpack(const networked_server_step_entropy& n) const {
+	return n.unpack(
+		[&](const mode_player_id& mode_id) {
+			return get_arena_handle().on_mode(
+				[&](const auto& typed_mode) {
+					return typed_mode.lookup(mode_id);
+				}
+			);
+		}
+	);
 }

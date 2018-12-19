@@ -1,5 +1,6 @@
 #include "augs/templates/traits/variant_traits.h"
 #include "game/modes/mode_entropy.h"
+#include "augs/templates/logically_empty.h"
 
 bool total_mode_player_entropy::empty() const {
 	return mode.empty() && cosmic.empty();
@@ -48,10 +49,7 @@ void mode_player_entropy::clear() {
 }
 
 bool mode_player_entropy::empty() const {
-	return 
-		team_choice == std::nullopt
-		&& item_purchase == std::nullopt
-	;
+	return logically_empty(team_choice, item_purchase);
 }
 
 void mode_entropy::clear_dead_entities(const cosmos& cosm) {
@@ -71,15 +69,11 @@ void mode_entropy_general::clear() {
 }
 
 bool mode_entropy_general::empty() const {
-	return 
-		added_player == std::nullopt 
-		&& removed_player == std::nullopt 
-		&& holds_monostate(special_command)
-	;
+	return logically_empty(added_player, removed_player, special_command);
 }
 
 bool mode_entropy::empty() const {
-	return players.empty() && cosmic.empty() && general.empty();
+	return logically_empty(players, cosmic, general);
 }
 
 mode_player_entropy& mode_player_entropy::operator+=(const mode_player_entropy& b) {

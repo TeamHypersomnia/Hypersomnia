@@ -86,7 +86,7 @@ message_handler_result server_adapter::process_message(const client_id_type& cli
 			}
 			else {
 				auto read_payload_into = [&m](auto&&... args) {
-					auto& typed_msg = (net_message_type&)m;
+					auto& typed_msg = static_cast<net_message_type&>(m);
 
 					return typed_msg.read_payload(
 						std::forward<decltype(args)>(args)...
@@ -106,13 +106,12 @@ auto server_adapter::create_message(const client_id_type& client_id) {
 	const auto idx = net_messages::id_t::of<net_message_type*>().get_index();
 	const auto idx_int = static_cast<int>(idx);
 
-	return (net_message_type*)server.CreateMessage(client_id, idx_int);
+	return static_cast<net_message_type*>(server.CreateMessage(client_id, idx_int));
 }
 
 template <class... Args>
-bool server_adapter::send_payload(
+translated_payload_id server_adapter::translate_payload(
 	const client_id_type& client_id, 
-	const game_channel_type& channel_id, 
 	Args&&... args
 ) {
 	using net_message_type = std::remove_pointer_t<find_matching_type_in_list<
@@ -129,11 +128,6 @@ bool server_adapter::send_payload(
 			std::forward<Args>(args)...
 		);
 
-		auto send_it = [&]() {
-			const auto channel_id_int = static_cast<channel_id_type>(channel_id);
-			server.SendMessage(client_id, channel_id_int, new_message);
-		};
-
 		if constexpr (is_block_message_v) {
 			const auto serialized_bytes = translation_result;
 
@@ -144,20 +138,25 @@ bool server_adapter::send_payload(
 				std::memcpy(memory, serialized_bytes->data(), result_size);
 				get_specific().AttachBlockToMessage(client_id, new_message, memory, result_size);
 
-				send_it();
-
-				return true;
+				return new_message;
 			}
 
-			return false;
+			return nullptr;
 		}
 		else {
-			send_it();
-
-			return translation_result;
+			return new_message;
 		}
 	}
 
-	return false;
+	return nullptr;
+}
+
+template <class... Args>
+bool server_adapter::send_payload(
+	const client_id_type& client_id, 
+	const game_channel_type& channel_id, 
+	Args&&... args
+) {
+	return send(client_id, channel_id, translate_payload(client_id, std::forward<Args>(args)...));
 }
 

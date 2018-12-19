@@ -16,6 +16,7 @@
 #include "application/setups/editor/commands/detail/editor_property_accessors.h"
 #include "augs/misc/from_concave_polygon.h"
 
+#include "augs/readwrite/to_bytes.h"
 #include "augs/readwrite/byte_readwrite.h"
 #include "application/setups/editor/commands/editor_command_sanitizer.h"
 
@@ -63,8 +64,7 @@ void change_property_command<D>::refresh_other_state(const editor_command_input 
 }
 
 template <class D>
-void change_property_command<D>::rewrite_change(
-	std::vector<std::byte>&& new_value,
+void change_property_command<D>::rewrite_change_internal(
 	const editor_command_input in
 ) {
 	auto& self = *static_cast<D*>(this);
@@ -75,12 +75,10 @@ void change_property_command<D>::rewrite_change(
 		self,
 		in,
 		[&](auto& field) {
-			augs::from_bytes(new_value, field);
+			augs::from_bytes(value_after_change, field);
 			return callback_result::CONTINUE;
 		}
 	);
-
-	value_after_change = std::move(new_value);
 
 	refresh_other_state(in);
 }

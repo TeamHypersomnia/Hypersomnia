@@ -67,11 +67,14 @@ class server_setup :
 	augs::serialization_buffers buffers;
 
 	entropy_accumulator local_collected;
-	server_step_entropy step_collected;
+	networked_server_step_entropy step_collected;
 
 	augs::propagate_const<std::unique_ptr<server_adapter>> server;
 	std::array<server_client_state, max_incoming_connections_v> clients;
 	unsigned ticks_until_sending_packets = 0;
+
+	std::vector<internal_net_message_id> broadcasted_steps;
+
 	net_time_t server_time = 0.0;
 
 	/* No server state follows later in code. */
@@ -93,7 +96,7 @@ class server_setup :
 
 	void handle_client_messages();
 	void advance_clients_state();
-	void send_server_step_entropies(const server_step_entropy& total);
+	void send_server_step_entropies(networked_server_step_entropy& total);
 	void send_packets_if_its_time();
 
 	void accept_entropy_of_client(
@@ -114,7 +117,7 @@ class server_setup :
 
 	mode_player_id get_admin_player_id() const;
 
-	void reinfer_if_necessary_for(const server_step_entropy& entropy);
+	void reinfer_if_necessary_for(const networked_server_step_entropy& entropy);
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -184,20 +187,24 @@ public:
 					like player added or removed.
 				*/
 
-				const auto admin_entropy = local_collected.extract(
+				const auto admin_entropy = local_collected.assemble_for(
 					get_viewed_character(), 
 					get_admin_player_id(),
 					{ in.settings, in.screen_size }
 				);
 
-				step_collected += admin_entropy;
+				step_collected += { get_admin_player_id(), admin_entropy };
 			}
 
 			send_server_step_entropies(step_collected);
 			send_packets_if_its_time();
 
 			reinfer_if_necessary_for(step_collected);
-			get_arena_handle().advance(step_collected, callbacks);
+
+			{
+				const auto unpacked = unpack(step_collected);
+				get_arena_handle().advance(unpacked, callbacks);
+			}
 
 			++current_simulation_step;
 			server_time += get_inv_tickrate();
@@ -244,4 +251,6 @@ public:
 	void sleep_until_next_tick();
 
 	void update_stats(server_network_info&) const;
+
+	server_step_entropy unpack(const networked_server_step_entropy&) const;
 };

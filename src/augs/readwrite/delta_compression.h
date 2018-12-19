@@ -3,6 +3,7 @@
 #include "augs/templates/traits/triviality_traits.h"
 #include "augs/templates/get_index_type_for_size_of.h"
 #include "augs/templates/introspect_declaration.h"
+#include "augs/readwrite/to_bytes.h"
 
 #include "augs/ensure.h"
 
@@ -219,7 +220,7 @@ namespace augs {
 			const T& encoded_object
 		) {
 			if (!introspective_equal(base_object, encoded_object)) {
-				new_content = to_bytes(encoded_object);
+				assign_bytes(new_content, encoded_object);
 			}
 		}
 

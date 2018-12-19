@@ -1,10 +1,12 @@
 #define INCLUDE_TYPES_IN 1
+#include <fstream>
 #include "augs/filesystem/path.h"
 #include "augs/templates/type_templates.h"
 #include "augs/templates/maybe.h"
 
 #include "augs/templates/traits/is_comparable.h"
 #include "augs/templates/type_map.h"
+#include "augs/templates/logically_empty.h"
 #include "augs/readwrite/custom_lua_representations.h"
 
 #include "augs/readwrite/memory_stream.h"
@@ -22,6 +24,7 @@
 #include "game/organization/for_each_entity_type.h"
 #include "game/organization/for_each_component_type.h"
 #include "game/cosmos/entity_handle.h"
+#include "game/modes/mode_entropy.h"
 
 #include "augs/pad_bytes.h"
 
@@ -591,4 +594,8 @@ struct game_state_checks {
 	static_assert(is_comparable_v<const augs::maybe<float>&, const augs::maybe<float>&>);
 
 	static_assert(is_container_v<augs::constant_size_string<20>>);
+
+	static_assert(has_empty_v<mode_entropy>);
+	static_assert(has_empty_v<std::vector<int>>);
+	static_assert(!has_empty_v<int>);
 };

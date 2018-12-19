@@ -12,6 +12,7 @@
 #include "view/viewables/regeneration/neon_maps.h"
 
 #include "augs/readwrite/byte_file.h"
+#include "augs/readwrite/to_bytes.h"
 
 #define PIXEL_NONE rgba(0,0,0,0)
 

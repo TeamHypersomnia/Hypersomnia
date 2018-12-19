@@ -17,7 +17,10 @@ std::size_t basic_player_entropy<K>::length() const {
 
 	total += motions.size();
 	total += intents.size();
-	total += transfers.size();
+
+	if (transfer.is_set()) {
+		++total;
+	}
 
 	if (cast_spell.is_set()) {
 		++total;
@@ -72,12 +75,6 @@ void basic_cosmic_entropy<key>::clear_dead_entities(const cosmos& cosm) {
 			return true;
 		}
 
-		auto eraser = [&cosm](const auto& it) {
-			return cosm[it.item].dead();
-		};
-
-		erase_if(p.second.transfers, eraser);
-
 		return false;
 	});
 }
@@ -95,7 +92,9 @@ basic_player_entropy<K>& basic_player_entropy<K>::operator+=(const basic_player_
 		}
 	}
 
-	concatenate(transfers, r.transfers);
+	if (r.transfer.is_set()) {
+		transfer = r.transfer;
+	}
 
 	if (r.wield != std::nullopt) {
 		wield = r.wield;
@@ -115,7 +114,7 @@ bool basic_player_entropy<K>::operator==(const basic_player_entropy<K>& b) const
 		&& motions == b.motions
 		&& wield == b.wield
 		&& cast_spell == b.cast_spell
-		&& transfers == b.transfers
+		&& transfer == b.transfer
 	;
 }
 
@@ -152,7 +151,7 @@ void basic_player_entropy<K>::clear_relevant(const cosmic_entropy_recording_opti
 	if (opts.overwrite_rest) {
 		cast_spell.unset();
 		wield = std::nullopt;
-		transfers.clear();
+		transfer = {};
 	}
 }
 

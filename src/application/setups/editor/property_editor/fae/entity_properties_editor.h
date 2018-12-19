@@ -38,7 +38,7 @@ void edit_component(
 		auto cmd = command;
 
 		cmd.property_id = entity_property_id { component_id, field_id };
-		cmd.value_after_change = augs::to_bytes(new_content);
+		augs::assign_bytes(cmd.value_after_change, new_content);
 		cmd.built_description = description + property_location;
 
 		history.execute_new(cmd, cmd_in);

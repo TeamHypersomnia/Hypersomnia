@@ -394,4 +394,12 @@ namespace augs {
 	) {
 		return ranges_equal(a, b);
 	}
+
+	template <class T, unsigned C, class = std::enable_if_t<is_comparable_v<T, T>>>
+	bool operator==(
+		const constant_size_vector<T, C>& a,
+		const std::vector<T>& b
+	) {
+		return ranges_equal(a, b);
+	}
 }

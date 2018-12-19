@@ -10,6 +10,14 @@ using net_time_t = double;
 using client_id_type = int;
 using channel_id_type = int;
 
+constexpr client_id_type dead_client_id_v = -1;
+
+namespace yojimbo {
+	class Message;
+}
+
+using internal_net_message_id = yojimbo::Message*;
+
 namespace augs {
 	namespace network {
 		bool init();

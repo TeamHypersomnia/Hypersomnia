@@ -121,7 +121,7 @@ class client_setup :
 		F&& read_payload
 	);
 
-	void send_to_server(const total_client_entropy&);
+	void send_to_server(total_client_entropy&);
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -196,7 +196,7 @@ public:
 				send_pending_commands();
 
 				if (in_game) {
-					const auto new_client_entropy = new_local_entropy->get_for(
+					auto new_client_entropy = new_local_entropy->get_for(
 						get_viewed_character(), 
 						get_local_player_id()
 					);
@@ -240,6 +240,7 @@ public:
 					);
 
 					if (result.malicious_server) {
+						LOG("There was a problem unpacking steps from the server. Disconnecting.");
 						log_malicious_server();
 						disconnect();
 					}

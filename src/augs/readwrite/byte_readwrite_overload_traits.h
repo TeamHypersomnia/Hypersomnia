@@ -1,12 +1,10 @@
 #pragma once
 #include <type_traits>
-#include "augs/readwrite/memory_stream_declaration.h"
+#include "augs/templates/type_list.h"
 
 #define READWRITE_OVERLOAD_TRAITS_INCLUDED 1
 
 namespace augs {
-	class byte_counter_stream;
-	
 	template <class ArgsList, class = void>
 	struct has_byte_read_overload : std::false_type 
 	{};

@@ -5,6 +5,12 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- only serialize the server setp once and multicast the same buffer to all clients!
+	- we can use global server's allocator
+	- set the reference count to num connected clients + 1
+		- so it never gets released by any other allocator than the one we chose - global allocator
+	- when the refcount is 1, manually free memory
+
 - Performance problems on Windows...
 	- Rendering script takes too much time, it randomly takes long
 		- allocations? but where are we allocating during render?

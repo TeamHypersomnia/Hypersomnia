@@ -74,6 +74,10 @@ struct basic_item_slot_transfer_request {
 		return out;
 	}
 
+	bool is_set() const {
+		return item.is_set();
+	}
+
 	bool operator==(const request_type& b) const {
 		return trivial_compare(*this, b);
 	}

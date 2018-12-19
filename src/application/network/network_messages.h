@@ -23,11 +23,11 @@ void NSR_LOG(Args&&... args) {
 
 constexpr std::size_t chosen_packet_size_v = 1024;
 
-constexpr std::size_t total_header_bytes_v = 
+constexpr std::size_t total_header_bytes_v = (
 	yojimbo::ConservativeMessageHeaderBits
 	+ yojimbo::ConservativePacketHeaderBits 
-	+ yojimbo::ConservativeMessageHeaderBits 
-;
+	+ yojimbo::ConservativeMessageHeaderBits
+) / 8;
 
 /* 
 	Make the max message size conservative enough 
@@ -68,44 +68,6 @@ template <bool C>
 struct initial_arena_state_payload;
 
 namespace net_messages {
-	struct initial_arena_state : only_block_message {
-		bool read_payload(
-			augs::serialization_buffers&,
-			initial_arena_state_payload<false>
-		);
-
-		const std::vector<std::byte>* write_payload(
-			augs::serialization_buffers&,
-			initial_arena_state_payload<true>
-		);
-	};
-
-	//struct initial_steps_correction : only_block_message {};
-
-	struct new_server_vars : preserialized_message {
-		static constexpr bool server_to_client = true;
-		static constexpr bool client_to_server = false;
-
-		bool write_payload(const server_vars&);
-		bool read_payload(server_vars&);
-	};
-
-	struct server_step_entropy : preserialized_message {
-		static constexpr bool server_to_client = true;
-		static constexpr bool client_to_server = false;
-
-		bool write_payload(const server_step_entropy_for_client&);
-		bool read_payload(server_step_entropy_for_client&);
-	};
-
-	struct client_entropy : preserialized_message {
-		static constexpr bool server_to_client = false;
-		static constexpr bool client_to_server = true;
-
-		bool write_payload(const total_client_entropy&);
-		bool read_payload(total_client_entropy&);
-	};
-
 	struct client_welcome : public yojimbo::Message {
 		static constexpr bool server_to_client = false;
 		static constexpr bool client_to_server = true;
@@ -121,12 +83,69 @@ namespace net_messages {
 		bool read_payload(requested_client_settings&);
 	};
 
+	struct new_server_vars : preserialized_message {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = false;
+
+		bool write_payload(const server_vars&);
+		bool read_payload(server_vars&);
+	};
+
+	struct initial_arena_state : only_block_message {
+		bool read_payload(
+			augs::serialization_buffers&,
+			initial_arena_state_payload<false>
+		);
+
+		const std::vector<std::byte>* write_payload(
+			augs::serialization_buffers&,
+			initial_arena_state_payload<true>
+		);
+	};
+
+	//struct initial_steps_correction : only_block_message {};
+
+	struct prestep_client_context : yojimbo::Message {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = false;
+
+		::prestep_client_context payload;
+
+		template <typename Stream>
+		bool Serialize(Stream& stream);
+
+		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
+
+		bool write_payload(const ::prestep_client_context&);
+		bool read_payload(::prestep_client_context&);
+	};
+
+	struct server_step_entropy : preserialized_message {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = false;
+
+		bool write_payload(::networked_server_step_entropy&);
+		bool read_payload(::networked_server_step_entropy&);
+
+		using yojimbo::Message::Acquire;
+		using yojimbo::Message::Release;
+	};
+
+	struct client_entropy : preserialized_message {
+		static constexpr bool server_to_client = false;
+		static constexpr bool client_to_server = true;
+
+		bool write_payload(total_client_entropy&);
+		bool read_payload(total_client_entropy&);
+	};
+
 	using all_t = type_list<
+		client_welcome*,
+		new_server_vars*,
 		initial_arena_state*,
 		//initial_steps_correction*,
-		new_server_vars*,
+		prestep_client_context*,
 		server_step_entropy*,
-		client_welcome*,
 		client_entropy*
 	>;
 	

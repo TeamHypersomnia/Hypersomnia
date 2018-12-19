@@ -63,7 +63,7 @@ message_handler_result client_adapter::process_message(yojimbo::Message& m, H&& 
 			}
 			else {
 				auto read_payload_into = [&m](auto&&... args) {
-					auto& typed_msg = (net_message_type&)m;
+					auto& typed_msg = static_cast<net_message_type&>(m);
 
 					return typed_msg.read_payload(
 						std::forward<decltype(args)>(args)...
@@ -83,7 +83,7 @@ auto client_adapter::create_message() {
 	const auto idx = net_messages::id_t::of<net_message_type*>().get_index();
 	const auto idx_int = static_cast<int>(idx);
 
-	return (net_message_type*)client.CreateMessage(idx_int);
+	return static_cast<net_message_type*>(client.CreateMessage(idx_int));
 }
 
 template <class... Args>

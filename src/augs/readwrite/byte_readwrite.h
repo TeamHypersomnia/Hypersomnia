@@ -12,6 +12,8 @@
 #include "augs/templates/traits/is_unique_ptr.h"
 #include "augs/templates/traits/is_std_array.h"
 #include "augs/templates/for_each_type.h"
+#include "augs/templates/introspect.h"
+#include "augs/templates/traits/introspection_traits.h"
 
 #include "augs/readwrite/byte_readwrite_declaration.h"
 #include "augs/readwrite/byte_readwrite_overload_traits.h"

@@ -9,6 +9,11 @@
 template <class derived>
 class change_property_command {
 	void refresh_other_state(const editor_command_input);
+
+	void rewrite_change_internal(
+		const editor_command_input in
+	);
+
 public:
 	// GEN INTROSPECTOR class change_property_command class derived
 	editor_command_common common;
@@ -21,8 +26,9 @@ public:
 
 	std::string describe() const;
 
+	template <class T>
 	void rewrite_change(
-		std::vector<std::byte>&& new_value,
+		const T& new_value,
 		const editor_command_input in
 	);
 

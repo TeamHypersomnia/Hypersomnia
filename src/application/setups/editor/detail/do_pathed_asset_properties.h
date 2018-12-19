@@ -78,7 +78,7 @@ void do_pathed_asset_properties(
 		}
 
 		cmd.property_id.field = field_id;
-		cmd.value_after_change = augs::to_bytes(new_content);
+		augs::assign_bytes(cmd.value_after_change, new_content);
 		cmd.built_description = description + property_location;
 
 		post_editor_command(cmd_in, std::move(cmd));

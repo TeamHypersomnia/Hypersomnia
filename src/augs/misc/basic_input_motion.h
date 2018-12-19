@@ -3,7 +3,7 @@
 
 template <class motion_type_enum, class motion_offset>
 struct basic_input_motion {
-	motion_type_enum motion = motion_type_enum::INVALID;
+	motion_type_enum motion = motion_type_enum::COUNT;
 	motion_offset offset;
 
 	bool is_set() const {

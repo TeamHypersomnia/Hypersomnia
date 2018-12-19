@@ -2,6 +2,7 @@
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
 #include "augs/readwrite/memory_stream.h"
+#include "augs/readwrite/to_bytes.h"
 #include "augs/templates/for_each_std_get.h"
 
 #include "view/viewables/regeneration/images_from_commands.h"

@@ -23,7 +23,7 @@ struct steps_unpacking_result {
 
 class simulation_receiver {
 public:
-	using received_entropy_type = server_step_entropy_for_client;
+	using received_entropy_type = server_step_entropy;
 	using simulated_entropy_type = server_step_entropy;
 private:
 
@@ -61,16 +61,28 @@ private:
 
 public:
 
+	std::vector<prestep_client_context> incoming_contexts;
 	std::vector<received_entropy_type> incoming_entropies;
 	std::vector<simulated_entropy_type> predicted_entropies;
 
 	void clear() {
+		incoming_contexts.clear();
 		incoming_entropies.clear();
 		predicted_entropies.clear();
 	}
 
 	void acquire_next_server_entropy(const received_entropy_type& step) {
 		incoming_entropies.push_back(step);
+
+		if (incoming_contexts.size() < incoming_entropies.size()) {
+			incoming_contexts.emplace_back();
+
+			ensure_eq(incoming_contexts.size(), incoming_entropies.size());
+		}
+	}
+
+	void acquire_next_server_entropy(const prestep_client_context& context) {
+		incoming_contexts.push_back(context);
 	}
 
 	template <class A, class S1, class S2>
@@ -88,21 +100,27 @@ public:
 		S1 advance_referential,
 		S2 advance_predicted
 	) {
-		//auto result = unpack_deterministic_steps(referential_arena);
 		steps_unpacking_result result;
 
-		//std::size_t total_accepted = 0;
+		auto& contexts = incoming_contexts;
+		auto& entropies = incoming_entropies;
+
+		ensure_geq(contexts.size(), entropies.size());
+
+		if (contexts.size() - entropies.size() >= 2) {
+			/* Only one context can be ahead of the proper entropies. */
+			result.malicious_server = true;
+			return result;
+		}
 
 		auto& repredict = result.should_repredict;
 
 		{
 			auto p_i = std::size_t(0);
 
-			for (std::size_t i = 0; i < incoming_entropies.size(); ++i) {
-				const auto& received = incoming_entropies[i];
-
+			for (std::size_t i = 0; i < entropies.size(); ++i) {
 				/* If a new player was added, always reinfer. */
-				const auto& actual_server_step = received.total;
+				const auto& actual_server_step = entropies[i];
 				const bool shall_reinfer = actual_server_step.general.added_player != std::nullopt;
 
 				{
@@ -124,7 +142,7 @@ public:
 				}
 
 				{
-					const auto num_accepted = received.num_entropies_accepted;
+					const auto num_accepted = contexts[i].num_entropies_accepted;
 
 					if (num_accepted != 1) {
 						/* We'll need to nudge into the future or into the past. */
@@ -136,21 +154,20 @@ public:
 				}
 			}
 
-			incoming_entropies.clear();
+			erase_first_n(incoming_contexts, entropies.size());
+			entropies.clear();
 
 			const auto& total_accepted = p_i;
 
-			auto& p = predicted_entropies;
+			auto& predicted = predicted_entropies;
 
 			// LOG("TA: %x", total_accepted);
 
-			if (total_accepted <= p.size()) {
-				p.erase(p.begin(), p.begin() + total_accepted);
+			if (total_accepted <= predicted.size()) {
+				erase_first_n(predicted, total_accepted);
 			}
 			else {
-				LOG_NVPS(total_accepted, p.size());
-				LOG("Server is malicious!");
-
+				LOG_NVPS(total_accepted, predicted.size());
 				result.malicious_server = true;
 				return result;
 			}

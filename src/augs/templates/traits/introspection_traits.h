@@ -66,3 +66,10 @@ constexpr bool has_introspect_v =
 	|| has_introspect_base_v<T>
 	|| has_introspect_bases_v<T>
 ;
+
+namespace augs {
+	template <class Serialized>
+	void verify_has_introspect(const Serialized&) {
+		static_assert(has_introspect_v<Serialized>, "Attempt to serialize a type in a non-bytesafe context without i/o overloads and without introspectors!");
+	}
+}

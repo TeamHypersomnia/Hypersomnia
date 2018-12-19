@@ -4,22 +4,28 @@ template <typename Stream>
 bool preserialized_message::Serialize(Stream& stream) {
 	int length = 0;
 
-	if ( Stream::IsWriting ) {
-		length = (int) bytes.size();
+	if (Stream::IsWriting) {
+		length = static_cast<int>(bytes.size());
 	}
 
-	serialize_int( stream, length, 0, max_message_size_v );
+	serialize_int(stream, length, 0, max_message_size_v);
 
-	if ( Stream::IsReading ) {
+	if (Stream::IsReading) {
 		bytes.resize(length);
 	}
 
-	serialize_bytes( stream, (uint8_t*)bytes.data(), length );
+	serialize_bytes(stream, (uint8_t*)bytes.data(), length);
 
 	return true;
 }
 
 namespace net_messages {
+	template <typename Stream>
+	bool prestep_client_context::Serialize(Stream& stream) {
+		serialize_int(stream, payload.num_entropies_accepted, 0, 255);
+		return true;
+	}
+
 	template <typename Stream>
 	bool client_welcome::Serialize(Stream& stream) {
 		{

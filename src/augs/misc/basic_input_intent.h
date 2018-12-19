@@ -18,7 +18,7 @@ std::optional<intent_change> to_intent_change(const K& ch) {
 
 template <class intent_type_enum>
 struct basic_input_intent {
-	intent_type_enum intent = intent_type_enum::INVALID;
+	intent_type_enum intent = intent_type_enum::COUNT;
 	intent_change change = intent_change::PRESSED;
 
 	bool was_pressed() const {

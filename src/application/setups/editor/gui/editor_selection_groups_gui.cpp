@@ -10,6 +10,7 @@
 
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/memory_stream.h"
+#include "augs/readwrite/to_bytes.h"
 
 template <class C1, class C2>
 bool all_found(const C1& from, const C2& in) {
@@ -107,7 +108,7 @@ void editor_selection_groups_gui::perform(const bool has_ctrl, editor_command_in
 
 					cmd.built_description = typesafe_sprintf("Renamed %x to %x", g.name, name);
 					cmd.group_index = static_cast<unsigned>(i);
-					cmd.value_after_change = augs::to_bytes(name);
+					augs::assign_bytes(cmd.value_after_change, name);
 
 					history.execute_new(cmd, in);
 				}

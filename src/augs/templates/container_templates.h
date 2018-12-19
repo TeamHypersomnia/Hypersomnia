@@ -82,6 +82,14 @@ void erase_from_to(
 }
 
 template <class Container>
+void erase_first_n(
+	Container& v,
+	const std::size_t n
+) {
+	v.erase(v.begin(), v.begin() + n);
+}
+
+template <class Container>
 decltype(auto) unique_range(Container& v) {
 	return std::unique(v.begin(), v.end());
 }

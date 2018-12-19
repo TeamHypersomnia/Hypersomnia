@@ -34,7 +34,7 @@ void singular_edit_properties(
 		auto cmd = cmd_pattern;
 		cmd.field = field;
 
-		cmd.value_after_change = augs::to_bytes(new_content);
+		augs::assign_bytes(cmd.value_after_change, new_content);
 		cmd.built_description = description + property_location;
 
 		history.execute_new(cmd, cmd_in);

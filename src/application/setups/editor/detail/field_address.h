@@ -25,6 +25,10 @@
 struct sound_meta;
 struct image_meta;
 
+namespace augs {
+	struct trivial_type_marker;
+}
+
 template <class cmd_type>
 using field_type_id_t = decltype(decltype(cmd_type::field)::type_id);
 

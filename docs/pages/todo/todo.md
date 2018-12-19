@@ -6,6 +6,13 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Lag estimates for other players
+	- send a byte for count, and a byte for each player
+		- they can be consecutive and we don't have to include ids
+		- the order of existent ids implicitly known
+	- can be sent over the solvable stream
+		- later we could introduce advantages for players with higher ping, although may not necessarily be good idea
+
 - Detect when the initial state is being sent to optionally display progress
 	- Possibly by returning some info from ReceiveBlockData struct
 
