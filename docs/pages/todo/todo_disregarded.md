@@ -419,3 +419,6 @@ summary: Just a hidden scratchpad.
 - perhaps we should implement remote entropy and just return it from the adapter, instead of acquiring templates
 	- because we'd anyway like to log the entropies
 	- unless we log entropies at the packet level
+
+- Allow to mount directly to chamber
+

@@ -2617,3 +2617,19 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- Will we skip the gtm animation?
 			- Anyways only the rifle has distinct animations for both types
 
+- fix pickup sparkles missing at stacking pickup
+
+- If the charges don't all fit into inventory, allow to pick as many charges from the ground as possible
+	- Or do we force them to be picked by a free hand?
+		- Perhaps!
+
+- rocket launchers
+	- For the fire trace, we could take the fire muzzle shot particle effect, and repeat it with high frequency
+	- Simply add explosive invariant to the plain missile?
+		- Do we have any use for the hand fuse there?
+			- nah, it's for beeping, arming and defusing
+		- will support cascade explosions out of the box
+	- add sounds later
+
+- The rocket item entity
+	- Should be a normal cartridge

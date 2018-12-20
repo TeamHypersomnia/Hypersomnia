@@ -6,25 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- fix pickup sparkles missing at stacking pickup
-
-- If the charges don't all fit into inventory, allow to pick as many charges from the ground as possible
-	- Or do we force them to be picked by a free hand?
-		- Perhaps!
-
-- Allow to mount directly to chamber
-
-- rocket launchers
-	- For the fire trace, we could take the fire muzzle shot particle effect, and repeat it with high frequency
-	- Simply add explosive invariant to the plain missile?
-		- Do we have any use for the hand fuse there?
-			- nah, it's for beeping, arming and defusing
-		- will support cascade explosions out of the box
-	- add sounds later
-
-- The rocket item entity
-	- Should be a normal cartridge
-
 - Create randomized players like in the good olden times
 	- to test the predicted experience
 	- we might look into legacy sources for guidance

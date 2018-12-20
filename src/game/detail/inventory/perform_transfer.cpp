@@ -189,6 +189,26 @@ perform_transfer_result perform_transfer_impl(
 		return false;
 	};
 
+	auto play_pickup_particles = [&]() {
+		if (r.params.play_transfer_particles) {
+			if (is_pickup) {
+				packaged_particle_effect particles;
+
+				particles.input = common_assets.item_pickup_particles;
+
+				auto effect_transform = initial_transform_of_transferred;
+
+				if (const auto root_transform = target_root.find_logic_transform()) {
+					effect_transform.rotation = (effect_transform.pos - root_transform->pos).degrees();
+				}
+
+				particles.start = particle_effect_start_input::fire_and_forget(effect_transform);
+
+				output.transfer_particles.emplace(std::move(particles));
+			}
+		}
+	};
+
 	if (target_slot_exists) {
 		/* Try to stack the item. */
 
@@ -214,12 +234,14 @@ perform_transfer_result perform_transfer_impl(
 			/* 
 				Mere alteration of charge numbers between two items
 				does not warrant any further inference of state, nor messages posted.
+					Note that destruction itself will take care of the reinference.
 
 			   	Except if it is a pickup, then play an effect.
 				Otherwise, it is a transparent operation.
 			*/
 
 			play_pickup_or_holster_effect();
+			play_pickup_particles();
 
 			return output;
 		}
@@ -392,26 +414,9 @@ perform_transfer_result perform_transfer_impl(
 				output.transfer_sound.emplace(std::move(worn));
 			}
 		}
-
 	}
 
-	if (r.params.play_transfer_particles) {
-		if (is_pickup) {
-			packaged_particle_effect particles;
-
-			particles.input = common_assets.item_pickup_particles;
-
-			auto effect_transform = initial_transform_of_transferred;
-
-			if (const auto root_transform = target_root.find_logic_transform()) {
-				effect_transform.rotation = (effect_transform.pos - root_transform->pos).degrees();
-			}
-
-			particles.start = particle_effect_start_input::fire_and_forget(effect_transform);
-
-			output.transfer_particles.emplace(std::move(particles));
-		}
-	}
+	play_pickup_particles();
 
 	return output;
 }
