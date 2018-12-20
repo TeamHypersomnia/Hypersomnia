@@ -1920,6 +1920,7 @@ namespace test_flavours {
 
 			slots[slot_function::GUN_CHAMBER].physical_behaviour = slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY;
 			slots.erase(slot_function::GUN_DETACHABLE_MAGAZINE);
+			slots[slot_function::GUN_CHAMBER].never_reachable_for_mounting = true;
 
 			set_chambering_duration_ms(meta, 1000.f);
 

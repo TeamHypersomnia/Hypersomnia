@@ -75,7 +75,7 @@ public:
 	inventory_space_type calc_local_space_available() const;
 	inventory_space_type calc_real_space_available() const;
 
-	bool is_physically_connected_until(
+	bool is_physically_reachable_from(
 		const entity_id until_parent,
 	   	const optional_slot_flags& bypass_slots = std::nullopt
 	) const;
@@ -233,15 +233,16 @@ bool basic_inventory_slot_handle<E>::is_ancestor_mounted() const {
 }
 
 template <class E>
-bool basic_inventory_slot_handle<E>::is_physically_connected_until(
-	const entity_id until_parent,
+bool basic_inventory_slot_handle<E>::is_physically_reachable_from(
+	const entity_id from_parent,
 	const optional_slot_flags& bypass_slots
 ) const {
 	const bool passes_filter = bypass_slots != std::nullopt && bypass_slots->test(get_type());
 	const bool should_item_here_keep_physical_body = passes_filter || get().makes_physical_connection();
+	const bool reachable = should_item_here_keep_physical_body && !get().never_reachable_for_mounting;
 
-	if (get_container() == until_parent) {
-		return should_item_here_keep_physical_body;
+	if (get_container() == from_parent) {
+		return reachable;
 	}
 
 	const auto maybe_item = get_container().template find<components::item>();
@@ -250,11 +251,11 @@ bool basic_inventory_slot_handle<E>::is_physically_connected_until(
 		const auto slot = owner[maybe_item->get_current_slot()];
 
 		if (slot.alive()) {
-			return std::min(should_item_here_keep_physical_body, slot.is_physically_connected_until(until_parent));
+			return std::min(reachable, slot.is_physically_reachable_from(from_parent, bypass_slots));
 		}
 	}
 
-	return should_item_here_keep_physical_body;
+	return reachable;
 }
 
 template <class E>

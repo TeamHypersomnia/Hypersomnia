@@ -17,6 +17,7 @@ summary: That which we are brainstorming at the moment.
 	- Problem: If the gun chamber is physical, we'll be able to mount directly to it
 		- we can make a clause for the gun chamber slot type as there's no weapon that'll ever need to directly mount to the chamber
 			- we can always allow unmounting from the chamber for the cool effect
+				- although that is not important for now
 		- we'll only ever mount to the gun chamber magazine & then perform chambering
 	- Note there is no item to be unmounted, like it is the case with empty mags
 		- Will we skip the gtm animation?

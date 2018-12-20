@@ -29,7 +29,7 @@ struct inventory_slot {
 
 	real32 mounting_duration_ms = -1.f;
 	slot_physical_behaviour physical_behaviour = slot_physical_behaviour::DEACTIVATE_BODIES;
-	bool only_last_inserted_is_movable = false;
+	bool never_reachable_for_mounting = false;
 	bool always_allow_exactly_one_item = false;
 	bool contributes_to_space_occupied = true;
 	bool draw_under_container = false;

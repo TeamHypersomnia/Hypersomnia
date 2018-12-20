@@ -42,16 +42,20 @@ mounting_conditions_type calc_mounting_conditions(
 		return mounting_conditions_type::ABORT;
 	}
 
-	const auto is_reachable = [&](const auto& slot) {
-		const auto reachable_non_physical = slot_flags {
-			slot_function::GUN_CHAMBER,
+	const auto is_reachable = [&](const auto& slot, const bool for_mounting) {
+		auto reachable_non_physical = slot_flags {
 			slot_function::GUN_DETACHABLE_MAGAZINE,
 			slot_function::GUN_RAIL,
 			slot_function::GUN_MUZZLE,
 			slot_function::GUN_CHAMBER_MAGAZINE
 		};
 
-		return slot.is_physically_connected_until(capability, reachable_non_physical);
+		if (const bool for_unmounting = !for_mounting) {
+			/* Always allow to unmount from the chamber. */
+			reachable_non_physical.set(slot_function::GUN_CHAMBER);
+		}
+
+		return slot.is_physically_reachable_from(capability, reachable_non_physical);
 	};
 
 	const bool unmounting = source_mounted && !target_mounted;
@@ -74,7 +78,7 @@ mounting_conditions_type calc_mounting_conditions(
 		}
 
 		/* Target must be reachable by the capability */
-		return progress_if(is_reachable(target_slot));
+		return progress_if(is_reachable(target_slot, true));
 	}
 
 	if (unmounting) {
@@ -100,7 +104,7 @@ mounting_conditions_type calc_mounting_conditions(
 			;
 		}();
 
-		return progress_if(is_reachable(source_slot) && target_is_valid);
+		return progress_if(is_reachable(source_slot, false) && target_is_valid);
 	}
 
 	/* 
@@ -109,13 +113,13 @@ mounting_conditions_type calc_mounting_conditions(
 	*/
 
 	if (source_slot.is_ancestor_mounted()) {
-		if (!is_reachable(source_slot)) {
+		if (!is_reachable(source_slot, false)) {
 			return mounting_conditions_type::ABORT;
 		}
 	}
 
 	if (target_slot.is_ancestor_mounted()) {
-		if (target_slot.alive() && !is_reachable(target_slot)) {
+		if (target_slot.alive() && !is_reachable(target_slot, true)) {
 			return mounting_conditions_type::ABORT;
 		}
 	}
