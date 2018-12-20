@@ -233,6 +233,7 @@ namespace test_flavours {
 
 			test_flavours::add_bullet_round_physics(meta);
 			meta.template get<invariants::rigid_body>().damping.linear = 3.f;
+			meta.template get<invariants::fixtures>().filter = filters[predefined_filter_type::FLYING_COLLIDING_BULLET];
 
 			invariants::missile missile;
 
