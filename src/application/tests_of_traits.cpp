@@ -93,11 +93,11 @@ struct tests_of_traits {
 			return 20.0;	
 		});
 
-		using candidates = type_list<plain_missile, explosive_missile>;
+		using candidates = type_list<plain_missile>;
 
 		auto tester = [](auto a) -> decltype(auto) {
 			using T = remove_cref<decltype(a)>;
-			static_assert(same<T, plain_missile> || same<T, explosive_missile>);
+			static_assert(same<T, plain_missile>);
 			return 20.0;	
 		};
 
@@ -206,7 +206,7 @@ struct tests_of_traits {
 
 	//static_assert(std::is_trivially_copyable_v<absolute_or_local>);
 	static_assert(same<double, type_argument_t<std::is_trivially_copyable<double>>>);
-	static_assert(same<constrained_entity_flavour_id<invariants::missile>::matching_types, type_list<plain_missile, explosive_missile>>);
+	static_assert(same<constrained_entity_flavour_id<invariants::missile>::matching_types, type_list<plain_missile>>);
 
 	static_assert(typed_entity_handle<controlled_character>::is_specific);
 	static_assert(!const_entity_handle::is_specific);

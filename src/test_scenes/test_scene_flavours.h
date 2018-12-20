@@ -204,10 +204,6 @@ enum class test_container_items {
 	// END GEN INTROSPECTOR
 };
 
-enum class test_explosive_missiles {
-
-};
-
 enum class test_complex_decorations {
 	// GEN INTROSPECTOR enum class test_complex_decorations
 	ROTATING_FAN,
@@ -326,7 +322,6 @@ using test_flavours_map = type_map<
 	type_pair<test_plain_missiles, plain_missile>,
 	type_pair<test_finishing_traces, finishing_trace>,
 	type_pair<test_container_items, container_item>,
-	type_pair<test_explosive_missiles, explosive_missile>,
 	type_pair<test_remnant_bodies, remnant_body>,
 	type_pair<test_sound_decorations, sound_decoration>,
 	type_pair<test_particles_decorations, particles_decoration>,

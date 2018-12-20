@@ -15,7 +15,6 @@ struct static_light;
 struct hand_explosive;
 struct finishing_trace;
 struct container_item;
-struct explosive_missile;
 struct remnant_body;
 struct sound_decoration;
 struct particles_decoration;
@@ -38,7 +37,6 @@ using all_entity_types = type_list<
 	hand_explosive,
 	finishing_trace,
 	container_item,
-	explosive_missile,
 	remnant_body,
 	sound_decoration,
 	particles_decoration,

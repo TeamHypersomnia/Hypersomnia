@@ -306,42 +306,6 @@ struct container_item {
 	>;
 };
 
-struct explosive_missile {
-	static constexpr std::size_t statically_allocated_entities = 1500;
-	static constexpr std::size_t statically_allocated_flavours = 150;
-
-	using invariants = type_list<
-		invariants::sprite,
-		invariants::animation,
-
-		invariants::rigid_body,
-		invariants::fixtures,
-
-		invariants::render,
-
-		invariants::trace,
-
-		invariants::item,
-		invariants::hand_fuse,
-		invariants::missile,
-		invariants::explosive,
-
-		invariants::interpolation
-	>;
-
-	using components = type_list<
-		components::animation,
-		components::rigid_body,
-		components::hand_fuse,
-		components::item,
-		components::missile,
-		components::sender,
-		components::trace,
-
-		components::interpolation
-	>;
-};
-
 struct complex_decoration {
 	static constexpr std::size_t statically_allocated_entities = 2000;
 	static constexpr std::size_t statically_allocated_flavours = 300;
