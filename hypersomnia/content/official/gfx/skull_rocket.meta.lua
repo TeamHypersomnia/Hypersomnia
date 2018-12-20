@@ -96,8 +96,59 @@ return {
       }
     },
     non_standard_shape = {
-      convex_partition = {},
-      original_poly = {}
+      convex_partition = {
+        7,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        7,
+        8,
+        0,
+        1,
+        7
+      },
+      original_poly = {
+        {
+          x = -30,
+          y = 4
+        },
+        {
+          x = -27,
+          y = -1
+        },
+        {
+          x = -30,
+          y = -5
+        },
+        {
+          x = -31,
+          y = -13
+        },
+        {
+          x = 26,
+          y = -10
+        },
+        {
+          x = 30,
+          y = -3
+        },
+        {
+          x = 30,
+          y = 3
+        },
+        {
+          x = 26,
+          y = 10
+        },
+        {
+          x = -31,
+          y = 12
+        }
+      }
     },
     torso = {
       back = {

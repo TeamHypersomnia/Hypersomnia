@@ -6,6 +6,9 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Force proper drawing order of attachments as this really looks bad on the rocket launcher
+	- At least on guns?
+
 - Lag estimates for other players
 	- send a byte for count, and a byte for each player
 		- they can be consecutive and we don't have to include ids

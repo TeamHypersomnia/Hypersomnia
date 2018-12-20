@@ -6,8 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Force proper drawing order of attachments as this really looks bad on the rocket launcher
-	- At least on guns?
+- Reloading the rocket launcher
 
 - If the charges don't all fit into inventory, allow to pick as many charges from the ground as possible
 	- Or do we force them to be picked by a free hand?
