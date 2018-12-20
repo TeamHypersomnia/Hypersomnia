@@ -150,22 +150,27 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 
 					const auto previous_charges = transferred_item.template get<components::item>().get_charges();
 
-					::perform_transfer(transfer, step);
+					const bool due_to_be_erased = 
+						previous_charges == 1
+						|| specified_charges == 1
+					;
 
-					if (previous_charges == 1) {
+					if (due_to_be_erased) {
 						should_be_erased = true;
-						return;
-					}
+						/* 
+							IMPORTANT! The perform transfer is going to reinfer some stuff
+							probably depending on whether the mounting progress is found for some transferred subject.
+							So, we need to mark that pending mount as due to be deleted by setting progress to -1.
+						*/
 
-					if (specified_charges != -1) {
+						request.progress_ms = -1.f;
+					}
+					else {
 						--specified_charges;
 						progress = 0.f;
-
-						if (specified_charges == 0) {
-							should_be_erased = true;
-							return;
-						}
 					}
+
+					::perform_transfer(transfer, step);
 				}
 			}
 			else {

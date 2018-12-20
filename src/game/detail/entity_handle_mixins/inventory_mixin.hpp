@@ -285,7 +285,15 @@ auto inventory_mixin<E>::find_mounting_progress() const {
 	const auto& self = *static_cast<const E*>(this);
 	auto& cosm = self.get_cosmos();
 
-	return mapped_or_nullptr(cosm.get_global_solvable().pending_item_mounts, self.get_guid());
+	const auto progress = mapped_or_nullptr(cosm.get_global_solvable().pending_item_mounts, self.get_guid());
+
+	if (progress) {
+		if (!progress->is_due_to_be_erased()) {
+			return progress;
+		}
+	}
+
+	return decltype(progress)(nullptr);
 }
 
 template <class E>

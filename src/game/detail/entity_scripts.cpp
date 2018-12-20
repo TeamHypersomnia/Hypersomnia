@@ -142,14 +142,31 @@ ammunition_information calc_reloadable_ammo_info(const const_entity_handle item)
 ammunition_information calc_ammo_info(const const_entity_handle item) {
 	auto out = calc_reloadable_ammo_info(item);
 
-	const auto chamber_slot = item[slot_function::GUN_CHAMBER];
+	auto count_for = [&](const auto slot) {
+		if (slot.alive()) {
+			ensure(slot->has_limited_space());
 
-	if (chamber_slot.alive()) {
-		ensure(chamber_slot->has_limited_space());
+			out.total_charges += count_charges_inside(slot);
+			out.total_ammo_space += slot->space_available;
+			out.available_ammo_space += slot.calc_local_space_available();
+		}
+	};
 
-		out.total_charges += count_charges_inside(chamber_slot);
-		out.total_ammo_space += chamber_slot->space_available;
-		out.available_ammo_space += chamber_slot.calc_local_space_available();
+	const auto chamber = item[slot_function::GUN_CHAMBER];
+	const auto chamber_mag = item[slot_function::GUN_CHAMBER_MAGAZINE];
+
+	count_for(chamber);
+
+	if (chamber_mag && chamber) {
+		if (const auto gun = item.find<invariants::gun>()) {
+			if (!gun->allow_charge_in_chamber_magazine_when_chamber_loaded) {
+				out.available_ammo_space -= chamber_mag.calc_space_occupied_by_children();
+				out.total_charges += count_charges_inside(chamber_mag);
+			}
+			else {
+				count_for(chamber_mag);
+			}
+		}
 	}
 
 	return out;

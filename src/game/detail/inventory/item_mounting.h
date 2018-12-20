@@ -14,6 +14,10 @@ struct pending_item_mount {
 
 	real32 get_mounting_duration_ms(const const_entity_handle&) const;
 	bool is_unmounting(const const_entity_handle&) const;
+
+	bool is_due_to_be_erased() const {
+		return progress_ms == -1.f;
+	}
 };
 
 using pending_item_mounts_type = std::map<entity_guid, pending_item_mount>;

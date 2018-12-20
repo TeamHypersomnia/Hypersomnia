@@ -73,6 +73,7 @@ public:
 	float calc_density_multiplier_due_to_being_attached() const;
 
 	inventory_space_type calc_local_space_available() const;
+	inventory_space_type calc_space_occupied_by_children() const;
 	inventory_space_type calc_real_space_available() const;
 
 	bool is_physically_reachable_from(
@@ -349,24 +350,26 @@ bool basic_inventory_slot_handle<E>::can_contain_whole(const entity_id id) const
 }
 
 template <class E>
+inventory_space_type basic_inventory_slot_handle<E>::calc_space_occupied_by_children() const {
+	inventory_space_type total = 0;
+
+	for (const auto& e : get_items_inside()) {
+		total += calc_space_occupied_with_children(get_cosmos()[e]);
+	}
+
+	return total;
+}
+
+template <class E>
 inventory_space_type basic_inventory_slot_handle<E>::calc_local_space_available() const {
 	if (get().has_unlimited_space()) {
 		return max_inventory_space_v;
 	}
 
-	auto lsa = get().space_available;
-
-	for (const auto& e : get_items_inside()) {
-		const auto occupied = calc_space_occupied_with_children(get_cosmos()[e]);
-
-		if (occupied > lsa) {
-			return 0;
-		}
-
-		lsa -= occupied;
-	}
-
-	return lsa;
+	const auto space = get().space_available;
+	const auto children_occupied = calc_space_occupied_by_children();
+	
+	return space > children_occupied ? space - children_occupied : 0;
 }
 
 template <class E>

@@ -1,4 +1,5 @@
 #include "game/detail/inventory/perform_transfer.h"
+#include "game/cosmos/cosmic_functions.h"
 
 #include "game/components/item_component.h"
 #include "game/components/missile_component.h"
@@ -260,11 +261,16 @@ perform_transfer_result perform_transfer_impl(
    		because some stances might have changed completely. 
 	*/
 
+	{
+		const auto now = cosm.get_timestamp();
+		item.when_last_transferred = now;
+	}
+
 	if (source_root) {
 		source_root.infer_item_physics_recursive();
 	}
 
-	if (target_root) {
+	if (target_root && target_root != source_root) {
 		target_root.infer_item_physics_recursive();
 	}
 
@@ -407,7 +413,5 @@ perform_transfer_result perform_transfer_impl(
 		}
 	}
 
-	const auto now = cosm.get_timestamp();
-	item.when_last_transferred = now;
 	return output;
 }

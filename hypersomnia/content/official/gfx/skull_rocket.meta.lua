@@ -30,6 +30,13 @@ return {
         },
         rotation = 0
       },
+      chamber_magazine = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
       detachable_magazine = {
         pos = {
           x = 0,
@@ -69,10 +76,10 @@ return {
       },
       hand_anchor = {
         pos = {
-          x = -19,
+          x = 11,
           y = 0
         },
-        rotation = 0
+        rotation = -139.39871215820312
       },
       head_anchor = {
         pos = {

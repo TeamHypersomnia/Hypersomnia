@@ -1927,7 +1927,7 @@ namespace test_flavours {
 				auto& mag = slots[slot_function::GUN_CHAMBER_MAGAZINE];
 				mag = slots[slot_function::GUN_CHAMBER];
 				mag.never_reachable_for_mounting = false;
-				mag.mounting_duration_ms = 3000.f;
+				mag.mounting_duration_ms = 2400.f;
 			}
 
 			set_chambering_duration_ms(meta, 700.f);

@@ -216,11 +216,15 @@ std::optional<drag_and_drop_result> prepare_drag_and_drop_result(
 					const auto item_charges = dragged_item_handle.template get<components::item>().get_charges();
 
 					if (item_charges > 1) {
-						if (simulated_transfer.params.specified_quantity == static_cast<int>(drop.result.transferred_charges)) {
+						auto& requested_q = simulated_transfer.params.specified_quantity;
+						const auto& resulted_q = static_cast<int>(drop.result.transferred_charges);
+
+						if (requested_q == resulted_q) {
 							charges_text = " all";
 						}
 						else {
 							charges_text = " " + std::to_string(drop.result.transferred_charges);
+							requested_q = resulted_q;
 						}
 					}
 
