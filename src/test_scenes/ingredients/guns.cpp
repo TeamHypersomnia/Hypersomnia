@@ -1942,6 +1942,7 @@ namespace test_flavours {
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("12.0");
 
 			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
+			meta.get<invariants::item>().gratis_ammo_pieces_with_first = 2;
 		}
 
 		{
