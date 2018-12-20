@@ -1890,8 +1890,9 @@ namespace test_flavours {
 			gun_def.action_mode = gun_action_type::BOLT_ACTION;
 			gun_def.muzzle_velocity = {5200.f, 5200.f};
 			gun_def.shot_cooldown_ms = 0.f;
-			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::REVOLVER_CHAMBERING);
+			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::AUTOMATIC_SHOTGUN_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = false;
+			gun_def.allow_charge_in_chamber_magazine_when_chamber_loaded = false;
 
 			gun_def.shell_angular_velocity = {2.f, 10.f};
 			gun_def.shell_spread_degrees = 12.f;
@@ -1922,7 +1923,14 @@ namespace test_flavours {
 			slots.erase(slot_function::GUN_DETACHABLE_MAGAZINE);
 			slots[slot_function::GUN_CHAMBER].never_reachable_for_mounting = true;
 
-			set_chambering_duration_ms(meta, 1000.f);
+			{
+				auto& mag = slots[slot_function::GUN_CHAMBER_MAGAZINE];
+				mag = slots[slot_function::GUN_CHAMBER];
+				mag.never_reachable_for_mounting = false;
+				mag.mounting_duration_ms = 3000.f;
+			}
+
+			set_chambering_duration_ms(meta, 700.f);
 
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 6500;

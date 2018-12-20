@@ -43,6 +43,8 @@ std::optional<reloading_movement> calc_reloading_movement(
 	}
 
 	{
+		/* Context-full reloading. Will happen most of the time, e.g. when R is pressed or it is initialied automatically. */
+
 		const auto capability = cosm[wielded_items[0]].get_current_slot().get_container();
 
 		if (const auto transfers = capability.template find<components::item_slot_transfers>()) {
@@ -69,6 +71,8 @@ std::optional<reloading_movement> calc_reloading_movement(
 		}
 	}
 
+	/* Context-less reloading. Might happen if we manually initialize the reloading from the GUI. */
+
 	if (n == 1) {
 		const auto w0 = cosm[wielded_items[0]];
 		if (const auto mag_slot = w0[slot_function::GUN_DETACHABLE_MAGAZINE]) {
@@ -92,7 +96,10 @@ std::optional<reloading_movement> calc_reloading_movement(
 		for (int i = 0; i < 2; ++i) {
 			const auto wi = cosm[wielded_items[i]];
 
-			if (const auto mag_slot = wi[slot_function::GUN_DETACHABLE_MAGAZINE]) {
+			const auto detachable_mag_slot = wi[slot_function::GUN_DETACHABLE_MAGAZINE];
+			const auto chamber_mag_slot = wi[slot_function::GUN_CHAMBER_MAGAZINE];
+
+			if (detachable_mag_slot || chamber_mag_slot) {
 				if (const auto new_source = cosm[wielded_items[1 - i]]) {
 					if (const auto progress = new_source.find_mounting_progress(); progress && progress->progress_ms > 0.f) {
 						return reloading_movement {

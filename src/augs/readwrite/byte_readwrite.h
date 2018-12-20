@@ -8,6 +8,7 @@
 #include "augs/templates/traits/container_traits.h"
 #include "augs/templates/byte_type_for.h"
 #include "augs/templates/traits/is_variant.h"
+#include "augs/templates/traits/is_monostate.h"
 #include "augs/templates/traits/is_optional.h"
 #include "augs/templates/traits/is_unique_ptr.h"
 #include "augs/templates/traits/is_std_array.h"
@@ -122,7 +123,11 @@ namespace augs {
 
 						if (type_id == index_in_list_v<T, Serialized>) {
 							T object;
-							read_bytes(ar, object);
+
+							if constexpr(!is_monostate_v<decltype(object)>) {
+								read_bytes(ar, object);
+							}
+
 							storage.template emplace<T>(std::move(object));
 						}
 					}
@@ -225,7 +230,9 @@ namespace augs {
 
 				std::visit(
 					[&](const auto& object) {
-						write_bytes(ar, object);
+						if constexpr(!is_monostate_v<decltype(object)>) {
+							write_bytes(ar, object);
+						}
 					}, 
 					storage
 				);

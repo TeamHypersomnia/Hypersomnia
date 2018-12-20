@@ -107,6 +107,10 @@ void slot_button::draw(
 			draw_icon(necessary_image_id::DETACHABLE_MAGAZINE_SLOT_ICON);
 		}
 
+		if (slot_type == slot_function::GUN_CHAMBER_MAGAZINE) {
+			draw_icon(necessary_image_id::DETACHABLE_MAGAZINE_SLOT_ICON);
+		}
+
 		if (slot_type == slot_function::PERSONAL_DEPOSIT) {
 			draw_icon(necessary_image_id::DETACHABLE_MAGAZINE_SLOT_ICON);
 		}

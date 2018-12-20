@@ -101,7 +101,7 @@ namespace invariants {
 		real32 shot_shake_radius = 0.f;
 
 		bool allow_chambering_with_akimbo = false;
-		bool allow_charge_in_chamber_magazine_when_chamber_loaded = false;
+		bool allow_charge_in_chamber_magazine_when_chamber_loaded = true;
 		pad_bytes<2> pad;
 
 		constrained_entity_flavour_id<invariants::missile, components::sender> magic_missile_flavour;

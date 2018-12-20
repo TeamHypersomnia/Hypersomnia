@@ -6,6 +6,9 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Shouldn't we always calc reloading movement to show context-lessly?
+
+
 - Force proper drawing order of attachments as this really looks bad on the rocket launcher
 	- At least on guns?
 

@@ -29,6 +29,13 @@ return {
         },
         rotation = 0
       },
+      chamber_magazine = {
+        pos = {
+          x = 11,
+          y = 0
+        },
+        rotation = 0
+      },
       detachable_magazine = {
         pos = {
           x = 0,
