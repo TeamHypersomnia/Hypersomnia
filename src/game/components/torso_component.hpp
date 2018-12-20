@@ -11,7 +11,8 @@ struct leg_animation_usage {
 template <class E>
 auto calc_stance_id(
 	const E& typed_entity,
-	const augs::constant_size_vector<entity_id, 2>& wielded_items
+	const augs::constant_size_vector<entity_id, 2>& wielded_items,
+	const bool consider_weapon_reloading
 ) {
 	const auto& cosm = typed_entity.get_cosmos();
 	const auto n = wielded_items.size();
@@ -32,15 +33,23 @@ auto calc_stance_id(
 			return item_holding_stance::BARE_LIKE;
 		}
 
-		const auto is_reloading = ::is_currently_reloading(typed_entity.get_cosmos(), wielded_items);
-		
-		if (is_reloading) {
-			if (const auto s0 = stance_of(0); s0 != item_holding_stance::BARE_LIKE) {
-				return s0;
-			}
+		if (consider_weapon_reloading) {
+			/*
+				While reloading,
+				a magazine might be put into another hand which would naturally initiate AKIMBO.
+				However, we don't want to show akimbo during reloading, we want the particular stance of the reloaded weapon.
+			*/
 
-			if (const auto s1 = stance_of(1); s1 != item_holding_stance::BARE_LIKE) {
-				return s1;
+			const auto is_reloading = ::is_currently_reloading(typed_entity.get_cosmos(), wielded_items);
+			
+			if (is_reloading) {
+				if (const auto s0 = stance_of(0); s0 != item_holding_stance::BARE_LIKE) {
+					return s0;
+				}
+
+				if (const auto s1 = stance_of(1); s1 != item_holding_stance::BARE_LIKE) {
+					return s1;
+				}
 			}
 		}
 

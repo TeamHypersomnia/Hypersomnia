@@ -6,22 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Reloading the rocket launcher
-	- We certainly want to take advantage of the chambering mechanism to add a sequence to the animation
-	- Problem: if we make a gun chamber magazine...
-		- ...we'll effectively allow two rocket rounds to be loaded into the launcher
-			- is this bad?
-				- that would make the launcher pretty op
-				- technically we could compensate with fire rate bound
-				- alternatively we could make a clause in can_contain or query_containment_result
-	- Problem: If the gun chamber is physical, we'll be able to mount directly to it
-		- we can make a clause for the gun chamber slot type as there's no weapon that'll ever need to directly mount to the chamber
-			- we can always allow unmounting from the chamber for the cool effect
-				- although that is not important for now
-		- we'll only ever mount to the gun chamber magazine & then perform chambering
-	- Note there is no item to be unmounted, like it is the case with empty mags
-		- Will we skip the gtm animation?
-			- Anyways only the rifle has distinct animations for both types
+- fix pickup sparkles missing at stacking pickup
 
 - If the charges don't all fit into inventory, allow to pick as many charges from the ground as possible
 	- Or do we force them to be picked by a free hand?

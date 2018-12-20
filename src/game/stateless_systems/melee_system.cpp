@@ -104,7 +104,8 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 		}
 
 		const auto& torso = it.template get<invariants::torso>();
-		const auto& stance = torso.calc_stance(it, wielded_items);
+		const bool consider_weapon_reloading = true;
+		const auto& stance = torso.calc_stance(it, wielded_items, consider_weapon_reloading);
 
 		const auto chosen_action = [&]() {
 			for (std::size_t i = 0; i < hand_count_v; ++i) {

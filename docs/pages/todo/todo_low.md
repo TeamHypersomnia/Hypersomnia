@@ -4,6 +4,8 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- refactor the ammo info getters, somehow
+
 - Crosshair recoil also on finished mountings, e.g. of magazines
 
 - Proposition: instead of "logic speed mult" have a set of predictable parameters for the simulation?

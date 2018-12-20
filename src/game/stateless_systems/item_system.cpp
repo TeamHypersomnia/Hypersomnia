@@ -57,6 +57,12 @@ void RLD_LOG(Args&&... args) {
 #endif
 }
 
+#if LOG_RELOADING
+#define RLD_LOG_NVPS LOG_NVPS
+#else
+#define RLD_LOG_NVPS RLD_LOG
+#endif
+
 template <class E>
 auto calc_reloading_context(const E& capability) {
 	reloading_context ctx;
@@ -71,6 +77,46 @@ auto calc_reloading_context(const E& capability) {
 	for (const auto& i : items) {
 		const auto candidate_weapon = cosm[i];
 
+		if (const auto mag_slot = candidate_weapon[slot_function::GUN_CHAMBER_MAGAZINE]) {
+			/* That one is easy, find literally anything that fits */
+
+			RLD_LOG("Found item with chamber mag.");
+
+			entity_id found_ammo;
+
+			const auto traversed_slots = slot_flags {
+				slot_function::BACK,
+				slot_function::SHOULDER,
+				slot_function::PRIMARY_HAND,
+				slot_function::SECONDARY_HAND,
+				slot_function::ITEM_DEPOSIT,
+				slot_function::PERSONAL_DEPOSIT
+			};
+
+			capability.for_each_contained_item_recursive(
+				[&](const auto& candidate_item) {
+					if (mag_slot.can_contain(candidate_item)) {
+						found_ammo = candidate_item;
+
+						return recursive_callback_result::CONTINUE_DONT_RECURSE;
+					}
+
+					return recursive_callback_result::CONTINUE_AND_RECURSE;
+				},
+				traversed_slots
+			);
+
+			if (found_ammo.is_set()) {
+				RLD_LOG_NVPS(cosm[found_ammo]);
+				ctx.concerned_slot = mag_slot;
+				ctx.new_ammo_source = found_ammo;
+				ctx.old_ammo_source = entity_id::dead();
+
+				return ctx;
+			}
+
+			RLD_LOG("Could not find a charge fitting for the chamber.");
+		}
 		if (const auto mag_slot = candidate_weapon[slot_function::GUN_DETACHABLE_MAGAZINE]) {
 			RLD_LOG("Found item with mag.");
 
@@ -204,7 +250,8 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 	(void)step;
 	auto& cosm = step.get_cosmos();
 
-	auto transfer = [&](const auto& r) -> bool {
+	auto transfer = [&](auto r) -> bool {
+		r.params.specified_quantity = 1;
 		return ::perform_transfer(r, step).result.is_successful();
 	};
 
@@ -219,152 +266,187 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 		auto& transfers = it.template get<components::item_slot_transfers>();
 		auto& ctx = transfers.current_reloading_context;
 
-		if (const auto concerned_slot = cosm[ctx.concerned_slot]; concerned_slot.dead()) {
-			/* No current context. Automatically check if we should reload. */
+		auto is_context_alive = [&]() {
+			return cosm[ctx.concerned_slot].alive();
+		};
+
+		if (!is_context_alive()) {
+			/* 
+				No current context. 
+				Automatically check if we should reload. 
+			*/
+
 			const auto items = it.get_wielded_items();
 
-			unsigned total_charges = 0;
+			bool should_reload = false;
 
 			for (const auto& i : items) {
-				const auto ammo = calc_reloadable_ammo_info(cosm[i]);
+				const auto h = cosm[i];
 
-				total_charges += ammo.total_charges;
+				if (const auto mag = h[slot_function::GUN_DETACHABLE_MAGAZINE]) {
+					const auto mag_inside = mag.get_item_if_any();
+
+					if (!mag_inside) {
+						should_reload = true;
+						break;
+					}
+
+					if (0 == count_charges_in_deposit(mag_inside)) {
+						should_reload = true;
+						break;
+					}
+				}
+				else if (const auto chamber_mag = h[slot_function::GUN_CHAMBER_MAGAZINE]) {
+					if (0 == count_charges_inside(mag)) {
+						if (chamber_mag.calc_real_space_available() > 0) {
+							should_reload = true;
+							break;
+						}
+					}
+				}
 			}
 
-			if (total_charges == 0) {
+			if (should_reload) {
+				RLD_LOG("Starting reload automatically.");
 				ctx = calc_reloading_context(it);
+
+				if (cosm[ctx.concerned_slot].dead()) {
+					RLD_LOG("But the context is still dead.");
+				}
 			}
 		}
 
 		auto advance_context = [&]() {
-			if (const auto concerned_slot = cosm[ctx.concerned_slot]) {
-				{
-					const auto new_context = calc_reloading_context(it);
+			const auto concerned_slot = cosm[ctx.concerned_slot];
 
-					if (new_context.significantly_different_from(ctx)) {
-						RLD_LOG("Different context is viable. Interrupting reloading.");
-						/* Interrupt it */
-						return false;
+			{
+				const auto new_context = calc_reloading_context(it);
+
+				if (new_context.significantly_different_from(ctx)) {
+					RLD_LOG("Different context is viable. Interrupting reloading.");
+					/* Interrupt it */
+					return false;
+				}
+			}
+
+			auto try_hide_other_item = [&]() {
+				const auto redundant_item = it.get_wielded_other_than(concerned_slot.get_container());
+
+				if (const auto redundant_item_holster_slot = it.find_holstering_slot_for(redundant_item)) {
+					RLD_LOG("Holster for redundant_item found.");
+					const auto hide_redundant_item = item_slot_transfer_request::standard(redundant_item, redundant_item_holster_slot);
+
+					if (transfer(hide_redundant_item)) {
+						RLD_LOG("Hidden redundant item.");
+						return true;
+					}
+				}
+				else {
+					RLD_LOG("Could not find holster for the redundant item. Leaving it in hands.");
+
+					const auto drop_redundant_item = item_slot_transfer_request::drop(redundant_item);
+
+					if (transfer(drop_redundant_item)) {
+						RLD_LOG("Dropped redundant item.");
+						return true;
 					}
 				}
 
-				auto try_hide_other_item = [&]() {
-					const auto redundant_item = it.get_wielded_other_than(concerned_slot.get_container());
+				return false;
+			};
 
-					if (const auto redundant_item_holster_slot = it.find_holstering_slot_for(redundant_item)) {
-						RLD_LOG("Holster for redundant_item found.");
-						const auto hide_redundant_item = item_slot_transfer_request::standard(redundant_item, redundant_item_holster_slot);
+			if (const auto old_mag = cosm[ctx.old_ammo_source]) {
+				const auto old_mag_slot = old_mag.get_current_slot();
 
-						if (transfer(hide_redundant_item)) {
-							RLD_LOG("Hidden redundant item.");
-							return true;
+				auto drop_if_zero_ammo = [&]() {
+					if (count_charges_in_deposit(old_mag) <= 0) {
+						drop_mag_to_ground(old_mag);
+					}
+				};
+
+				if (old_mag_slot.get_id() == concerned_slot.get_id()) {
+					/* The old mag still resides in the concerned slot. */
+
+					if (const auto existing_progress = mounting_of(old_mag)) {
+						/* Continue the good work. */
+						drop_if_zero_ammo();
+						return true;
+					}
+
+					/* Init the unmount. */
+
+					const auto items = it.get_wielded_items();
+
+					if (items.size() > 1) {
+						if (!try_hide_other_item()) {
+							return false;
 						}
 					}
-					else {
-						RLD_LOG("Could not find holster for the redundant item. Leaving it in hands.");
 
-						const auto drop_redundant_item = item_slot_transfer_request::drop(redundant_item);
-
-						if (transfer(drop_redundant_item)) {
-							RLD_LOG("Dropped redundant item.");
-							return true;
-						}
+					if (const auto free_hand = it.get_first_free_hand()) {
+						RLD_LOG("Free hand for the unmount found.");
+						auto unmount_ammo = item_slot_transfer_request::standard(old_mag, free_hand);
+						unmount_ammo.params.play_transfer_sounds = false;
+						transfer(unmount_ammo);
+						drop_if_zero_ammo();
+						return true;
 					}
 
 					return false;
-				};
-
-				if (const auto old_mag = cosm[ctx.old_ammo_source]) {
-					const auto old_mag_slot = old_mag.get_current_slot();
-
-					auto drop_if_zero_ammo = [&]() {
-						if (count_charges_in_deposit(old_mag) <= 0) {
-							drop_mag_to_ground(old_mag);
-						}
-					};
-
-					if (old_mag_slot.get_id() == concerned_slot.get_id()) {
-						/* The old mag still resides in the concerned slot. */
-
-						if (const auto existing_progress = mounting_of(old_mag)) {
-							/* Continue the good work. */
-							drop_if_zero_ammo();
-							return true;
-						}
-
-						/* Init the unmount. */
-
-						const auto items = it.get_wielded_items();
-
-						if (items.size() > 1) {
-							if (!try_hide_other_item()) {
-								return false;
-							}
-						}
-
-						if (const auto free_hand = it.get_first_free_hand()) {
-							RLD_LOG("Free hand for the unmount found.");
-							auto unmount_ammo = item_slot_transfer_request::standard(old_mag, free_hand);
-							unmount_ammo.params.play_transfer_sounds = false;
-							transfer(unmount_ammo);
-							drop_if_zero_ammo();
-							return true;
-						}
-
-						return false;
-					}
-
-					if (old_mag_slot.is_hand_slot()) {
-						RLD_LOG("Old mag unmounted.");
-
-						if (try_hide_other_item()) {
-							RLD_LOG("Old mag hidden.");
-							return true;
-						}
-					}
 				}
 
-				if (const auto new_mag = cosm[ctx.new_ammo_source]) {
-					const auto new_mag_slot = new_mag.get_current_slot();
+				if (old_mag_slot.is_hand_slot()) {
+					RLD_LOG("Old mag unmounted.");
 
-					if (new_mag_slot.get_id() == concerned_slot.get_id()) {
-						RLD_LOG("New mag already mounted. Reload complete.");
-						return false;
+					if (try_hide_other_item()) {
+						RLD_LOG("Old mag hidden.");
+						return true;
+					}
+				}
+			}
+
+			if (const auto new_mag = cosm[ctx.new_ammo_source]) {
+				const auto new_mag_slot = new_mag.get_current_slot();
+
+				//RLD_LOG_NVPS(new_mag_slot.get_container(), new_mag_slot.get_type());
+
+				if (new_mag_slot.get_id() == concerned_slot.get_id()) {
+					RLD_LOG("New mag already mounted. Reload complete.");
+					return false;
+				}
+
+				RLD_LOG("New mag not yet mounted.");
+
+				if (new_mag_slot.is_hand_slot()) {
+					RLD_LOG("New mag is in hands already.");
+
+					if (const auto existing_progress = mounting_of(new_mag)) {
+						/* Continue the good work. */
+						return true;
 					}
 
-					RLD_LOG("New mag not yet mounted.");
+					const auto mount_new = item_slot_transfer_request::standard(new_mag, concerned_slot);
 
-					if (new_mag_slot.is_hand_slot()) {
-						RLD_LOG("New mag is in hands already.");
+					if (transfer(mount_new)) {
+						RLD_LOG("Started mounting new mag.");
+						return true;
+					}
+				}
+				else {
+					RLD_LOG("New mag not yet pulled out.");
+					if (const auto free_hand = it.get_first_free_hand()) {
+						RLD_LOG("Free hand found.");
 
-						if (const auto existing_progress = mounting_of(new_mag)) {
-							/* Continue the good work. */
-							return true;
-						}
+						const auto pull_new = item_slot_transfer_request::standard(new_mag, free_hand);
 
-						const auto mount_new = item_slot_transfer_request::standard(new_mag, concerned_slot);
-
-						if (transfer(mount_new)) {
-							RLD_LOG("Started mounting new mag.");
+						if (transfer(pull_new)) {
+							RLD_LOG("Pulled new mag.");
 							return true;
 						}
 					}
 					else {
-						RLD_LOG("New mag not yet pulled out.");
-						if (const auto free_hand = it.get_first_free_hand()) {
-							RLD_LOG("Free hand found.");
-
-							const auto pull_new = item_slot_transfer_request::standard(new_mag, free_hand);
-
-							if (transfer(pull_new)) {
-								RLD_LOG("Pulled new mag.");
-								return true;
-							}
-						}
-						else {
-							if (try_hide_other_item()) {
-								return true;
-							}
+						if (try_hide_other_item()) {
+							return true;
 						}
 					}
 				}
@@ -374,10 +456,12 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 		};
 
 		for (int c = 0; c < 2; ++c) {
-			const bool context_advanced_successfully = advance_context();
+			if (is_context_alive()) {
+				const bool context_advanced_successfully = advance_context();
 
-			if (!context_advanced_successfully) {
-				ctx = {};
+				if (!context_advanced_successfully) {
+					ctx = {};
+				}
 			}
 		}
 	});

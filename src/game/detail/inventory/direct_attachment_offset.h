@@ -22,7 +22,7 @@ inline transformr get_anchored_offset(
 
 struct attachment_offset_settings {
 	bool consider_mag_rotations = false;
-	bool consider_mag_reloads = false;
+	bool consider_weapon_reloading = false;
 	bool consider_weapon_shooting = false;
 
 	static auto for_logic() {
@@ -32,7 +32,7 @@ struct attachment_offset_settings {
 	static auto for_rendering() {
 		attachment_offset_settings output;
 		output.consider_mag_rotations = true;
-		output.consider_mag_reloads = true;
+		output.consider_weapon_reloading = true;
 		output.consider_weapon_shooting = true;
 		return output;
 	}
@@ -160,7 +160,7 @@ transformr direct_attachment_offset(
 		anchor.flip_vertically();
 	}
 
-	if (settings.consider_mag_reloads) {
+	if (settings.consider_weapon_reloading) {
 		auto is_reloading_and_should_flip = [&](const auto& reloading_container) {
 			if (::is_currently_reloading(reloading_container)) {
 				if (const auto* const item = attachment.template find<invariants::item>()) {
@@ -208,7 +208,7 @@ transformr direct_attachment_offset(
 
 	auto get_offsets_by_torso = [&]() {
 		if (const auto* const torso = container.template find<invariants::torso>()) {
-			const auto& stance = torso->calc_stance(container, container.get_wielded_items());
+			const auto& stance = torso->calc_stance(container, container.get_wielded_items(), settings.consider_weapon_reloading);
 
 			if (const auto fighter = container.template find<components::melee_fighter>()) {
 				if (const auto frame = find_action_frame(stance, *fighter, logicals)) {

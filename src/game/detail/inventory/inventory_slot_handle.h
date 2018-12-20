@@ -319,6 +319,25 @@ slot_function basic_inventory_slot_handle<E>::get_type() const {
 
 template <class E>
 inventory_space_type basic_inventory_slot_handle<E>::calc_real_space_available() const {
+	/* 
+		Special case: 
+		maybe report 0 space available if there're items in the chamber and chamber magazine at the same time 
+	*/
+
+	if (get_type() == slot_function::GUN_CHAMBER_MAGAZINE) {
+		const auto gun_container = get_container();
+
+		if (const auto gun = gun_container.template find<invariants::gun>()) {
+			if (!gun->allow_charge_in_chamber_magazine_when_chamber_loaded) {
+				if (const auto chamber = gun_container[slot_function::GUN_CHAMBER]) {
+					if (chamber.has_items()) {
+						return 0;
+					}
+				}
+			}
+		}
+	}
+
 	const auto lsa = calc_local_space_available();
 
 	const auto maybe_item = get_container().template find<components::item>();

@@ -270,7 +270,8 @@ FORCE_INLINE void specific_entity_drawer(
 			};
 
 			const auto wielded_items = typed_handle.get_wielded_items();
-			const auto stance_id = ::calc_stance_id(typed_handle, wielded_items);
+			const bool consider_weapon_reloading = true;
+			const auto stance_id = ::calc_stance_id(typed_handle, wielded_items, consider_weapon_reloading);
 			const auto& stance = torso.stances[stance_id];
 
 			auto four_ways = movement.four_ways_animation;

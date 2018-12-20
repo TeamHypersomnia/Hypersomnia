@@ -915,6 +915,7 @@ namespace test_flavours {
 			item.space_occupied_per_charge = to_space_units("1.0");
 			item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
 			item.stackable = true;
+			item.standard_price = static_cast<money_type>(1000);
 
 			meta.set(item);
 
@@ -1891,15 +1892,13 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {5200.f, 5200.f};
 			gun_def.shot_cooldown_ms = 0.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::AUTOMATIC_SHOTGUN_CHAMBERING);
-			gun_def.allow_chambering_with_akimbo = false;
 			gun_def.allow_charge_in_chamber_magazine_when_chamber_loaded = false;
 
 			gun_def.shell_angular_velocity = {2.f, 10.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {500.f, 2500.f};
 			gun_def.damage_multiplier = 1.f;
-			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 2;
-			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
+			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 0;
 			gun_def.recoil_multiplier = 4.f;
 			gun_def.kickback_towards_wielder = 500.f;
 
@@ -1910,6 +1909,7 @@ namespace test_flavours {
 			gun_def.adversarial.knockout_award = static_cast<money_type>(100);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+			gun_def.allow_chambering_with_akimbo = true;
 
 			meta.set(gun_def);
 
@@ -1918,6 +1918,8 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::HEAVY_LIKE, 0.f, 0.f, false, "1.0");
 
 			auto& slots = meta.get<invariants::container>().slots;
+
+			only_allow_chamber_charge(meta, test_shootable_charges::SKULL_ROCKET);
 
 			slots[slot_function::GUN_CHAMBER].physical_behaviour = slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY;
 			slots.erase(slot_function::GUN_DETACHABLE_MAGAZINE);
@@ -1928,6 +1930,8 @@ namespace test_flavours {
 				mag = slots[slot_function::GUN_CHAMBER];
 				mag.never_reachable_for_mounting = false;
 				mag.mounting_duration_ms = 2400.f;
+				mag.start_mounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_START_LOAD);
+				mag.finish_mounting_sound.id = to_sound_id(test_scene_sound_id::STANDARD_RIFLE_FINISH_LOAD);
 			}
 
 			set_chambering_duration_ms(meta, 700.f);
@@ -1936,8 +1940,6 @@ namespace test_flavours {
 			meta.get<invariants::item>().standard_price = 6500;
 			set_density_mult(meta, 1.9f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("12.0");
-
-			only_allow_chamber_charge(meta, test_shootable_charges::SKULL_ROCKET);
 
 			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
 		}

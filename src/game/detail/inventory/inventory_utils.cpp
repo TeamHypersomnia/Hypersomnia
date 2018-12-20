@@ -285,21 +285,6 @@ containment_result query_containment_result(
 			}
 			else {
 				output.result = containment_result_type::SUCCESSFUL_CONTAINMENT;
-
-				/* Special case: maybe disallow an item in the chamber and chamber magazine at the same time */
-
-				if (target_slot.get_type() == slot_function::GUN_CHAMBER_MAGAZINE) {
-					const auto gun_container = target_slot.get_container();
-					if (const auto gun = gun_container.find<invariants::gun>()) {
-						if (!gun->allow_charge_in_chamber_magazine_when_chamber_loaded) {
-							if (const auto chamber = gun_container[slot_function::GUN_CHAMBER]) {
-								if (chamber.has_items()) {
-									output.result = containment_result_type::INSUFFICIENT_SPACE;
-								}
-							}
-						}
-					}
-				}
 			}
 		}
 	}
