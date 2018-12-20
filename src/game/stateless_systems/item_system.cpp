@@ -276,42 +276,49 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 				Automatically check if we should reload. 
 			*/
 
-			const auto items = it.get_wielded_items();
+			const auto wielded = it.get_wielded_items();
 
-			bool should_reload = false;
+			if (wielded.size() > 0) {
+				auto weapons_needing_reload = std::size_t(0);
+				auto candidate_weapons = std::size_t(0);
 
-			for (const auto& i : items) {
-				const auto h = cosm[i];
+				for (const auto& w : wielded) {
+					const auto h = cosm[w];
 
-				if (const auto mag = h[slot_function::GUN_DETACHABLE_MAGAZINE]) {
-					const auto mag_inside = mag.get_item_if_any();
+					if (const auto mag = h[slot_function::GUN_DETACHABLE_MAGAZINE]) {
+						++candidate_weapons;
 
-					if (!mag_inside) {
-						should_reload = true;
-						break;
+						const auto mag_inside = mag.get_item_if_any();
+
+						if (!mag_inside) {
+							++weapons_needing_reload;
+							continue;
+						}
+
+						if (0 == count_charges_in_deposit(mag_inside)) {
+							++weapons_needing_reload;
+							continue;
+						}
 					}
+					else if (const auto chamber_mag = h[slot_function::GUN_CHAMBER_MAGAZINE]) {
+						++candidate_weapons;
 
-					if (0 == count_charges_in_deposit(mag_inside)) {
-						should_reload = true;
-						break;
-					}
-				}
-				else if (const auto chamber_mag = h[slot_function::GUN_CHAMBER_MAGAZINE]) {
-					if (0 == count_charges_inside(mag)) {
-						if (chamber_mag.calc_real_space_available() > 0) {
-							should_reload = true;
-							break;
+						if (0 == count_charges_inside(mag)) {
+							if (chamber_mag.calc_real_space_available() > 0) {
+								++weapons_needing_reload;
+								continue;
+							}
 						}
 					}
 				}
-			}
 
-			if (should_reload) {
-				RLD_LOG("Starting reload automatically.");
-				ctx = calc_reloading_context(it);
+				if (weapons_needing_reload == candidate_weapons) {
+					RLD_LOG("Starting reload automatically.");
+					ctx = calc_reloading_context(it);
 
-				if (cosm[ctx.concerned_slot].dead()) {
-					RLD_LOG("But the context is still dead.");
+					if (cosm[ctx.concerned_slot].dead()) {
+						RLD_LOG("But the context is still dead.");
+					}
 				}
 			}
 		}
