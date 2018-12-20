@@ -18,7 +18,16 @@ bool inventory_slot::makes_physical_connection() const {
 }
 
 bool inventory_slot::has_unlimited_space() const {
-	return physical_behaviour != slot_physical_behaviour::DEACTIVATE_BODIES;
+	return space_available == max_inventory_space_v;
+}
+
+bool inventory_slot::has_limited_space() const {
+	return !has_unlimited_space();
+}
+
+void inventory_slot::make_attachment_with_max_space() {
+	space_available = max_inventory_space_v;
+	physical_behaviour = slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY;
 }
 
 bool inventory_slot::is_category_compatible_with(

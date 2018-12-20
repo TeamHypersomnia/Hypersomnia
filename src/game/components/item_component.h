@@ -1,6 +1,6 @@
 #pragma once
 #include "game/detail/inventory/inventory_slot_id.h"
-#include "game/detail/inventory/inventory_space_type.h"
+#include "game/detail/inventory/inventory_slot_types.h"
 
 #include "augs/misc/timing/stepped_timing.h"
 #include "game/enums/item_category.h"

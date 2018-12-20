@@ -297,7 +297,7 @@ void item_button::draw_proc(
 			else if (element.draw_space_available_inside_container_icons) {
 				const auto ammo_info = calc_ammo_info(item);
 
-				if (ammo_info.total_ammunition_space_available > 0.f) {
+				if (ammo_info.total_ammo_space > 0.f) {
 					printing_charge_count = true;
 					bottom_number_val = ammo_info.total_charges;
 				}

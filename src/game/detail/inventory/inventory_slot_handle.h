@@ -12,8 +12,10 @@
 #include "game/detail/physics/colliders_connection.h"
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
 #include "game/detail/inventory/inventory_slot_id.h"
-#include "game/detail/inventory/inventory_space_type.h"
+#include "game/detail/inventory/inventory_slot_types.h"
 #include "game/components/transform_component.h"
+
+#include "game/detail/inventory/inventory_slot_types.h"
 
 struct inventory_slot;
 inventory_space_type calc_space_occupied_with_children(const_entity_handle item);
@@ -348,7 +350,7 @@ bool basic_inventory_slot_handle<E>::can_contain_whole(const entity_id id) const
 template <class E>
 inventory_space_type basic_inventory_slot_handle<E>::calc_local_space_available() const {
 	if (get().has_unlimited_space()) {
-		return 1000000 * SPACE_ATOMS_PER_UNIT;
+		return max_inventory_space_v;
 	}
 
 	auto lsa = get().space_available;

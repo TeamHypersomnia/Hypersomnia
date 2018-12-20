@@ -116,18 +116,24 @@ real32 assess_projectile_velocity_of_weapon(const const_entity_handle& weapon) {
 	return 0.f;
 }
 
+real32 ammunition_information::get_ammo_ratio() const {
+	return 1 - available_ammo_space / total_ammo_space;
+}
+
 ammunition_information calc_reloadable_ammo_info(const const_entity_handle item) {
 	ammunition_information out;
 
 	const auto maybe_magazine_slot = item[slot_function::GUN_DETACHABLE_MAGAZINE];
 
 	if (maybe_magazine_slot.alive() && maybe_magazine_slot.has_items()) {
-		auto mag = item.get_cosmos()[maybe_magazine_slot.get_items_inside()[0]];
-		auto ammo_depo = mag[slot_function::ITEM_DEPOSIT];
-		out.total_charges += count_charges_in_deposit(mag);
+		const auto mag = item.get_cosmos()[maybe_magazine_slot.get_items_inside()[0]];
+		const auto ammo_depo = mag[slot_function::ITEM_DEPOSIT];
 
-		out.total_ammunition_space_available += ammo_depo->space_available;
-		out.total_lsa += ammo_depo.calc_local_space_available();
+		ensure(ammo_depo->has_limited_space());
+
+		out.total_charges += count_charges_in_deposit(mag);
+		out.total_ammo_space += ammo_depo->space_available;
+		out.available_ammo_space += ammo_depo.calc_local_space_available();
 	}
 
 	return out;
@@ -139,10 +145,11 @@ ammunition_information calc_ammo_info(const const_entity_handle item) {
 	const auto chamber_slot = item[slot_function::GUN_CHAMBER];
 
 	if (chamber_slot.alive()) {
-		out.total_charges += count_charges_inside(chamber_slot);
+		ensure(chamber_slot->has_limited_space());
 
-		out.total_ammunition_space_available += chamber_slot->space_available;
-		out.total_lsa += chamber_slot.calc_local_space_available();
+		out.total_charges += count_charges_inside(chamber_slot);
+		out.total_ammo_space += chamber_slot->space_available;
+		out.available_ammo_space += chamber_slot.calc_local_space_available();
 	}
 
 	return out;

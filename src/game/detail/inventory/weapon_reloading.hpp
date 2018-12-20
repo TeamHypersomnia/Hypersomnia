@@ -83,6 +83,12 @@ std::optional<reloading_movement> calc_reloading_movement(
 	}
 
 	if (n == 2) {
+		/* 
+			Note that a mag can also be a wielded item,
+			so when we're putting a new mag into the target slot, there are 2 items wielded,
+			not 1.
+		*/
+
 		for (int i = 0; i < 2; ++i) {
 			const auto wi = cosm[wielded_items[i]];
 

@@ -10,7 +10,7 @@
 #include "augs/build_settings/compiler_defines.h"
 #include "game/detail/inventory/wielding_result.h"
 #include "augs/enums/callback_result.h"
-#include "game/detail/inventory/inventory_space_type.h"
+#include "game/detail/inventory/inventory_slot_types.h"
 #include "game/organization/special_flavour_id_types.h"
 #include "game/detail/inventory/wielding_setup.h"
 #include "game/enums/weapon_action_type.h"

@@ -81,14 +81,12 @@ namespace test_flavours {
 			{
 				inventory_slot slot_def;
 
-				slot_def.physical_behaviour = 
-					magazine_hidden ? 
-					slot_physical_behaviour::DEACTIVATE_BODIES 
-					: slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY
-				;
-
 				if (magazine_hidden) {
-					slot_def.space_available = 1000000;
+					slot_def.physical_behaviour = slot_physical_behaviour::DEACTIVATE_BODIES;
+					slot_def.space_available = max_inventory_space_v;
+				}
+				else {
+					slot_def.make_attachment_with_max_space();
 				}
 
 				slot_def.always_allow_exactly_one_item = true;
@@ -112,7 +110,7 @@ namespace test_flavours {
 
 			{
 				inventory_slot slot_def;
-				slot_def.physical_behaviour = slot_physical_behaviour::CONNECT_AS_FIXTURE_OF_BODY;
+				slot_def.make_attachment_with_max_space();
 				slot_def.always_allow_exactly_one_item = true;
 				slot_def.category_allowed = item_category::MUZZLE_ATTACHMENT;
 
@@ -1664,7 +1662,7 @@ namespace test_flavours {
 			set_density_mult(meta, 1.25);
 
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::LEWSII_DRAW);
-			meta.get<invariants::item>().standard_price = 5000;
+			meta.get<invariants::item>().standard_price = 4700;
 			set_chambering_duration_ms(meta, 700.f);
 
 			only_allow_mag(meta, test_container_items::LEWSII_MAGAZINE);
@@ -1926,7 +1924,7 @@ namespace test_flavours {
 			set_chambering_duration_ms(meta, 1000.f);
 
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
-			meta.get<invariants::item>().standard_price = 4000;
+			meta.get<invariants::item>().standard_price = 6500;
 			set_density_mult(meta, 1.9f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("12.0");
 

@@ -11,9 +11,10 @@
 #include "game/enums/slot_physical_behaviour.h"
 #include "game/cosmos/entity_flavour_id.h"
 #include "game/detail/view_input/sound_effect_input.h"
-#include "game/detail/inventory/inventory_space_type.h"
+#include "game/detail/inventory/inventory_slot_types.h"
 
 #include "game/organization/special_flavour_id_types.h"
+#include "game/detail/inventory/inventory_slot_types.h"
 
 class cosmos;
 
@@ -47,7 +48,10 @@ struct inventory_slot {
 	item_category_flagset get_allowed_categories() const;
 
 	bool has_unlimited_space() const;
+	bool has_limited_space() const;
+
 	bool makes_physical_connection() const;
+	void make_attachment_with_max_space();
 
 	bool is_category_compatible_with(
 		const entity_flavour_id&,

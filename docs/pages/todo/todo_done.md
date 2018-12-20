@@ -2594,3 +2594,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Let rockets collide
 
+- Fix crash on kartezjan's komputer
+
+- Fix ammo indicator for rl
+

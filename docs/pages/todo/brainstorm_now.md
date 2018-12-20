@@ -7,6 +7,20 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - Reloading the rocket launcher
+	- We certainly want to take advantage of the chambering mechanism to add a sequence to the animation
+	- Problem: if we make a gun chamber magazine...
+		- ...we'll effectively allow two rocket rounds to be loaded into the launcher
+			- is this bad?
+				- that would make the launcher pretty op
+				- technically we could compensate with fire rate bound
+				- alternatively we could make a clause in can_contain or query_containment_result
+	- Problem: If the gun chamber is physical, we'll be able to mount directly to it
+		- we can make a clause for the gun chamber slot type as there's no weapon that'll ever need to directly mount to the chamber
+			- we can always allow unmounting from the chamber for the cool effect
+		- we'll only ever mount to the gun chamber magazine & then perform chambering
+	- Note there is no item to be unmounted, like it is the case with empty mags
+		- Will we skip the gtm animation?
+			- Anyways only the rifle has distinct animations for both types
 
 - If the charges don't all fit into inventory, allow to pick as many charges from the ground as possible
 	- Or do we force them to be picked by a free hand?
@@ -29,8 +43,6 @@ summary: That which we are brainstorming at the moment.
 	- to test the predicted experience
 	- we might look into legacy sources for guidance
 	- fill in several artificial connections starting from the back of the client array
-
-- Fix crash on kartezjan's komputer
 
 - If we simply don't predict knockouts, we automatically don't predict the vulnerable win conditions in the mode
 	- Other win conditions are based on time so it won't be as bad

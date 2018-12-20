@@ -28,8 +28,10 @@ attitude_type calc_attitude(
 
 struct ammunition_information {
 	unsigned total_charges = 0;
-	real32 total_ammunition_space_available = 0.f;
-	real32 total_lsa = 0.f;
+	real32 total_ammo_space = 0.f;
+	real32 available_ammo_space = 0.f;
+
+	real32 get_ammo_ratio() const;
 };
 
 ammunition_information calc_ammo_info(const const_entity_handle handle);

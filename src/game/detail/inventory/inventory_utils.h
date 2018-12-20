@@ -5,7 +5,7 @@
 #include "game/detail/inventory/item_slot_transfer_request.h"
 #include "game/detail/inventory/item_transfer_result.h"
 #include "game/detail/inventory/inventory_slot_handle_declaration.h"
-#include "game/detail/inventory/inventory_space_type.h"
+#include "game/detail/inventory/inventory_slot_types.h"
 
 augs::constant_size_vector<item_slot_transfer_request, 4> swap_slots_for_items(
 	const const_entity_handle first, 

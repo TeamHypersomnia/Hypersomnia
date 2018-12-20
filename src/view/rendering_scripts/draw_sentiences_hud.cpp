@@ -112,8 +112,8 @@ augs::vertex_triangle_buffer draw_sentiences_hud(const draw_sentiences_hud_input
 
 						const auto ammo_info = calc_ammo_info(item);
 
-						if (ammo_info.total_ammunition_space_available > 0) {
-							const auto ammo_ratio = 1 - (ammo_info.total_lsa / ammo_info.total_ammunition_space_available);
+						if (ammo_info.total_ammo_space > 0) {
+							const auto ammo_ratio = ammo_info.get_ammo_ratio();
 
 							auto ammo_color = augs::interp(white, red_violet, (1 - ammo_ratio)* (1 - ammo_ratio));
 							ammo_color.a = 200;
