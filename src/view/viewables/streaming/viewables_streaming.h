@@ -3,7 +3,12 @@
 #include <future>
 #include <vector>
 
+#define EXPERIMENTAL_USE_PBO 0
+
+#if EXPERIMENTAL_USE_PBO
 #include "augs/graphics/pbo.h"
+#endif
+
 #include "augs/image/font.h"
 #include "augs/texture_atlas/atlas_profiler.h"
 #include "augs/graphics/renderer.h"
@@ -14,8 +19,6 @@
 
 #include "view/viewables/atlas_distributions.h"
 #include "view/viewables/regeneration/content_regeneration_settings.h"
-
-#define USE_PBO 1
 
 class sound_system;
 
@@ -42,9 +45,12 @@ struct viewables_finalize_input {
 };
 
 class viewables_streaming {
+#if EXPERIMENTAL_USE_PBO
 	augs::graphics::pbo uploading_pbo;
-	std::vector<rgba> pbo_fallback;
 	bool pbo_ready_to_use = false;
+#endif
+
+	std::vector<rgba> pbo_fallback;
 
 	all_loaded_gui_fonts loaded_gui_fonts;
 
