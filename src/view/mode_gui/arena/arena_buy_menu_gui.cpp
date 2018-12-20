@@ -458,19 +458,19 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 	};
 
 	auto owned_comparator = [&](const auto& a, const auto& b) {
-		return price_comparator(a.mag, b.mag);
+		return price_comparator(a.ammo_piece, b.ammo_piece);
 	};
 
 	struct owned_entry {
 		item_flavour_id weapon;
-		item_flavour_id mag;
-		int num = 1;
+		item_flavour_id ammo_piece;
+		int instances_owned = 1;
 
 		owned_entry() = default;
-		owned_entry(const item_flavour_id& weapon, const item_flavour_id& mag) : weapon(weapon), mag(mag) {};
+		owned_entry(const item_flavour_id& weapon, const item_flavour_id& ammo_piece) : weapon(weapon), ammo_piece(ammo_piece) {};
 
 		bool operator==(const owned_entry& b) const {
-			return std::tie(weapon, mag) == std::tie(b.weapon, b.mag);
+			return std::tie(weapon, ammo_piece) == std::tie(b.weapon, b.ammo_piece);
 		}
 	};
 
@@ -494,14 +494,23 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 				equipment_value += *price;
 
-				if (const auto mag = typed_item[slot_function::GUN_DETACHABLE_MAGAZINE]) {
-					const auto new_entry = owned_entry(typed_item.get_flavour_id(), mag->only_allow_flavour);
+				const auto new_entry = [&]() -> std::optional<owned_entry> {
+					if (const auto mag_slot = typed_item[slot_function::GUN_DETACHABLE_MAGAZINE]) {
+						return owned_entry(typed_item.get_flavour_id(), mag_slot->only_allow_flavour);
+					}
+					if (const auto chamber_mag_slot = typed_item[slot_function::GUN_DETACHABLE_MAGAZINE]) {
+						return owned_entry(typed_item.get_flavour_id(), chamber_mag_slot->only_allow_flavour);
+					}
 
-					if (const auto it = find_in(owned_weapons, new_entry); it != owned_weapons.end()) {
-						++it->num;
+					return std::nullopt;
+				}();
+
+				if (new_entry != std::nullopt) {
+					if (const auto it = find_in(owned_weapons, *new_entry); it != owned_weapons.end()) {
+						++it->instances_owned;
 					}
 					else {
-						owned_weapons.push_back(new_entry);
+						owned_weapons.push_back(*new_entry);
 					}
 				}
 			}
@@ -518,9 +527,9 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			ImGui::SameLine();
 			draw_owned_weapon(o.weapon); 
 
-			if (o.num > 1) {
+			if (o.instances_owned > 1) {
 				ImGui::SameLine();
-				text_disabled(typesafe_sprintf("(%xx)", o.num));
+				text_disabled(typesafe_sprintf("(%xx)", o.instances_owned));
 			}
 		}
 
@@ -538,19 +547,19 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			}
 
 			for (const auto& f : owned_weapons) {
-				if (found_in(displayed_replenishables, f.mag)) {
+				if (found_in(displayed_replenishables, f.ammo_piece)) {
 					continue;
 				}
 
-				emplace_element(displayed_replenishables, f.mag);
+				emplace_element(displayed_replenishables, f.ammo_piece);
 
 				const auto index = 1 + index_in(owned_weapons, f);
-				const bool choice_was_made = purchase_item_button(f.mag, button_type::REPLENISHABLE, index);
+				const bool choice_was_made = purchase_item_button(f.ammo_piece, button_type::REPLENISHABLE, index);
 
 				ImGui::Separator();
 
 				if (choice_was_made) {
-					set_result(f.mag);
+					set_result(f.ammo_piece);
 				}
 			}
 		}
