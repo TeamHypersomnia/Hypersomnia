@@ -437,3 +437,15 @@ const cosmos& client_setup::get_viewed_cosmos() const {
 void client_setup::update_stats(network_info& stats) const {
 	stats = client->get_network_info();
 }
+
+augs::path_type client_setup::get_unofficial_content_dir() const {
+	const auto& name = sv_vars.current_arena;
+
+	if (name.empty()) {
+		return {};
+	}
+
+	const auto paths = arena_paths(name);
+	return paths.folder_path;
+}
+

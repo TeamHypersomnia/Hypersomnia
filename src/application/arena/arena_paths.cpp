@@ -3,7 +3,7 @@
 arena_paths::arena_paths(
 	const augs::path_type& target_folder,
 	const std::string& arena_name
-) : int_paths(target_folder, arena_name) {
+) : int_paths(target_folder, arena_name), folder_path(target_folder) {
 	auto in_folder = [&](const auto ext) {
 		return target_folder / (arena_name + ext);
 	};

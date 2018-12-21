@@ -7,6 +7,7 @@
 struct arena_paths {
 	intercosm_paths int_paths;
 	augs::path_type rulesets_file;
+	augs::path_type folder_path;
 
 	arena_paths(
 		const augs::path_type& target_folder,

@@ -1982,6 +1982,10 @@ void bomb_mode::reset_players_stats(const input_type in) {
 }
 
 void bomb_mode::post_award(const input_type in, const mode_player_id id, money_type amount) {
+	if (state == arena_mode_state::WARMUP) {
+		return;
+	}
+
 	if (const auto stats = stats_of(id)) {
 		auto& current_money = stats->money;
 		amount = std::clamp(amount, -current_money, in.rules.economy.maximum_money - current_money);

@@ -374,6 +374,8 @@ void settings_gui_state::perform(
 
 				do_lag_simulator(config.server.network_simulator);
 
+				input_text<100>(SCOPE_CFG_NVP(current_arena)); revert(scope_cfg.current_arena);
+
 				break;
 			}
 			case settings_pane::EDITOR: {

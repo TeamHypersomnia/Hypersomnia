@@ -45,7 +45,10 @@ namespace augs {
 			char array[OGG_BUFFER_SIZE]; 
 
 			OggVorbis_File oggFile;
-			ov_fopen(path_str.c_str(), &oggFile);
+
+			if (0 != ov_fopen(path_str.c_str(), &oggFile)) {
+				throw sound_decoding_error("Error! Failed to load %x.", path);
+			}
 			
 			auto scope = scope_guard([&oggFile](){
 				ov_clear(&oggFile);

@@ -223,9 +223,7 @@ public:
 
 	void accept_game_gui_events(const game_gui_entropy_type&);
 
-	augs::path_type get_unofficial_content_dir() const {
-		return {};
-	}
+	augs::path_type get_unofficial_content_dir() const;
 
 	auto get_render_layer_filter() const {
 		return render_layer_filter::disabled();

@@ -126,14 +126,16 @@ void server_setup::apply(const config_lua_table& cfg) {
 }
 
 void server_setup::choose_arena(const std::string& name) {
+	LOG("Choosing arena: %x", name);
+
+	vars.current_arena = name;
+
 	::choose_arena(
 		lua,
 		get_arena_handle(),
 		vars,
 		initial_signi
 	);
-
-	vars.current_arena = name;
 
 	if (should_have_admin_character()) {
 		mode_entropy_general cmd;
@@ -594,6 +596,17 @@ server_step_entropy server_setup::unpack(const networked_server_step_entropy& n)
 			);
 		}
 	);
+}
+
+augs::path_type server_setup::get_unofficial_content_dir() const {
+	const auto& name = vars.current_arena;
+
+	if (name.empty()) {
+		return {};
+	}
+
+	const auto paths = arena_paths(name);
+	return paths.folder_path;
 }
 
 #include "augs/readwrite/to_bytes.h"

@@ -10,14 +10,19 @@ inline void choose_arena(
 	const auto& name = vars.current_arena;
 
 	if (name.empty()) {
+		LOG("Arena name empty, so making a default one.");
+
 		handle.make_default(
 			lua, 
 			initial_signi
 		);
 	}
 	else {
+		const auto paths = arena_paths(name);
+		LOG("Solv file: %x", paths.int_paths.solv_file);
+
 		handle.load_from(
-			arena_paths(name),
+			paths,
 			initial_signi
 		);
 	}
