@@ -1365,12 +1365,12 @@ set(HYPERSOMNIA_LIBS lua)
 
 if(BUILD_OPENGL)
 	message("OPENGL_LIBRARIES: ${OPENGL_LIBRARIES}")
-	find_package(OpenGL REQUIRED COMPONENTS GLX OpenGL)
+	find_package(OpenGL REQUIRED)
 
 	target_link_libraries(Hypersomnia OpenGL::GL)
-	target_link_libraries(Hypersomnia OpenGL::GLX)
+	#target_link_libraries(Hypersomnia OpenGL::GLX)
 	target_include_directories(Hypersomnia PUBLIC OpenGL::GL)
-	target_include_directories(Hypersomnia PUBLIC OpenGL::GLX)
+	#target_include_directories(Hypersomnia PUBLIC OpenGL::GLX)
 
 	message("OPENGL_LIBRARIES: ${OPENGL_LIBRARIES}")
 	message("OPENGL_glx_LIBRARY: ${OPENGL_glx_LIBRARY}")
