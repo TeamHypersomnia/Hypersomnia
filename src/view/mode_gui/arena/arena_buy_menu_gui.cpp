@@ -498,7 +498,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					if (const auto mag_slot = typed_item[slot_function::GUN_DETACHABLE_MAGAZINE]) {
 						return owned_entry(typed_item.get_flavour_id(), mag_slot->only_allow_flavour);
 					}
-					if (const auto chamber_mag_slot = typed_item[slot_function::GUN_DETACHABLE_MAGAZINE]) {
+					if (const auto chamber_mag_slot = typed_item[slot_function::GUN_CHAMBER_MAGAZINE]) {
 						return owned_entry(typed_item.get_flavour_id(), chamber_mag_slot->only_allow_flavour);
 					}
 
