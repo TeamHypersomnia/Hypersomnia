@@ -314,7 +314,7 @@ namespace test_flavours {
 				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_DESTRUCTION);
 			}
 
-			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FURY_THROWER_TRACE);
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE);
 			missile.trace_particles.modifier.colorize = rgba(202, 185, 89, 255);
 			missile.trace_particles.modifier.scale_amounts = 3.f;
 			missile.trace_particles.modifier.scale_lifetimes = 0.3f;

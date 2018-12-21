@@ -1327,6 +1327,66 @@ void load_test_scene_particle_effects(
 	}
 
 	{
+		auto& effect = acquire_effect(test_scene_particle_effect_id::STEEL_PROJECTILE_TRACE);
+
+		{
+		particles_emission em;
+		em.spread_degrees = float_range(3, 15);
+		em.particles_per_sec = float_range(20, 40);
+		em.stream_lifetime_ms = float_range(300000, 300000);
+		em.base_speed = float_range(100, 1900);
+		em.angular_offset = float_range(3, 4);
+		em.rotation_speed = float_range(0, 0);
+		em.particle_lifetime_ms = float_range(100, 1000);
+
+		for (int i = 0; i < 5; ++i) {
+			general_particle particle_definition;
+
+			particle_definition.angular_damping = 0;
+			particle_definition.linear_damping = 200;
+			
+			set_with_size(particle_definition,
+				to_image_id(test_scene_image_id::BLANK), 
+				vec2i(i % 2 + 1, i % 2 + 1), 
+				rgba(255, 255, 255, 255)
+			);
+
+			particle_definition.alpha_levels = 1;
+			particle_definition.shrink_when_ms_remaining = 100.f;
+
+			em.add_particle_definition(particle_definition);
+		}
+
+		{
+			general_particle particle_definition;
+
+			particle_definition.angular_damping = 0;
+			particle_definition.linear_damping = 100;
+			
+			set(particle_definition,
+			anim.frames[2].image_id, 
+				rgba(255, 255, 255, 255)
+			);
+
+			particle_definition.alpha_levels = 1;
+			particle_definition.shrink_when_ms_remaining = 100.f;
+
+			em.add_particle_definition(particle_definition);
+		}
+
+		em.scale_damping_to_velocity = true;
+		em.size_multiplier = float_range(1, 2.0);
+		em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
+		em.initial_rotation_variation = 0;
+		em.should_particles_look_towards_velocity = false;
+		em.randomize_spawn_point_within_circle_of_inner_radius = float_range(0.f, 10.f);
+		em.randomize_spawn_point_within_circle_of_outer_radius = float_range(12.f, 20.f);
+
+		effect.emissions.push_back(em);
+	}
+	}
+
+	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
 
 		particles_emission em;

@@ -44,7 +44,7 @@ namespace test_scenes {
 		rs.name = "Standard test ruleset";
 		rs.spawned_faction = faction_type::RESISTANCE;
 
-		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::ELON_HRL);
+		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::VINDICATOR);
 		rs.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 
 		fill_range(rs.initial_eq.spells_to_give, true);

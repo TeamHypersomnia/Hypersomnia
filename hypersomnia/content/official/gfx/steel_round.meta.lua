@@ -1,6 +1,6 @@
 return {
   extra_loadables = {
-    enabled_generate_neon_map = {
+    disabled_generate_neon_map = {
       alpha_multiplier = 1,
       amplification = 150,
       light_colors = {
@@ -23,6 +23,20 @@ return {
       bullet_spawn = {
         x = 0,
         y = 0
+      },
+      chamber = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      chamber_magazine = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       },
       detachable_magazine = {
         pos = {
