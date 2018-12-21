@@ -678,7 +678,10 @@ void bomb_mode::setup_round(
 
 	remove_test_characters(cosm);
 
-	if (in.rules.delete_lying_items_on_round_start) {
+	if (
+		state == arena_mode_state::WARMUP
+		|| in.rules.delete_lying_items_on_round_start
+	) {
 		remove_test_dropped_items(cosm);
 	}
 

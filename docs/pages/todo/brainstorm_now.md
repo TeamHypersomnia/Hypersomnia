@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Trim reach inside component please
+	- the marker type probably as well as it is annoying
+
 - Create randomized players like in the good olden times
 	- to test the predicted experience
 	- we might look into legacy sources for guidance

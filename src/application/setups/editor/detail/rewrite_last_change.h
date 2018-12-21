@@ -9,7 +9,7 @@ void change_property_command<derived>::rewrite_change(
 	const T& new_value,
 	const editor_command_input in
 ) {
-	augs::assign_bytes(values_before_change, new_value);
+	augs::assign_bytes(value_after_change, new_value);
 	rewrite_change_internal(in);
 }
 

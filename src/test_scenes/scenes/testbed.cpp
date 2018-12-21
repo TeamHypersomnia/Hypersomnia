@@ -422,8 +422,8 @@ namespace test_scenes {
 				;
 
 				{
-					const auto soil_origin = vec2(-750, 37000);
-					const auto total_soil_size = vec2i(15000, 85000);
+					const auto soil_origin = vec2(0, 0);
+					const auto total_soil_size = vec2i(1024 * 10, 1024 * 10);
 
 					create(test_sprite_decorations::SOIL, transformr(soil_origin)).set_logical_size(total_soil_size);
 				}
