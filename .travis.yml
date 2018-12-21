@@ -82,6 +82,7 @@ script:
   - export CXX=${cxx_compiler}
   - export LDFLAGS="${LDFLAGS} -L /usr/local/lib"
   - cmake/build.sh ${config} x64 "${other_cmake_flags}"
+  - cat build/current/ninja
   - ulimit -c unlimited -S
   - pushd build/current
   - ninja tests -k 0

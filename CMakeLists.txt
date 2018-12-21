@@ -168,7 +168,7 @@ set(STATICALLY_ALLOCATE_ENTITY_FLAVOURS "1" CACHE STRING "Statically allocate en
 set (BUILD_LUA_AS_CPP OFF)
 
 if (UNIX)
-	set(OpenGL_GL_PREFERENCE "GLVND")
+	set(OpenGL_GL_PREFERENCE "LEGACY")
 endif()
 
 ### ALL CUSTOMIZABLE BUILD SWITCHES END HERE ###
@@ -1364,17 +1364,16 @@ endif()
 set(HYPERSOMNIA_LIBS lua)
 
 if(BUILD_OPENGL)
-	message("OPENGL_INCLUDE_DIRS before finding: ${OPENGL_INCLUDE_DIRS}")
-	message("OPENGL_LIBRARIES before finding: ${OPENGL_LIBRARIES}")
-	find_package(OpenGL REQUIRED)
-	message("OPENGL_INCLUDE_DIRS after finding: ${OPENGL_INCLUDE_DIRS}")
-	message("OPENGL_LIBRARIES after finding: ${OPENGL_LIBRARIES}")
+	message("OPENGL_LIBRARIES: ${OPENGL_LIBRARIES}")
+	find_package(OpenGL REQUIRED COMPONENTS GLX OpenGL)
 
-	include_directories(${OPENGL_INCLUDE_DIRS})
+	target_link_libraries(Hypersomnia OpenGL::GL)
+	target_link_libraries(Hypersomnia OpenGL::GLX)
+	target_include_directories(Hypersomnia PUBLIC OpenGL::GL)
+	target_include_directories(Hypersomnia PUBLIC OpenGL::GLX)
 
-	list(APPEND HYPERSOMNIA_LIBS
-		${OPENGL_LIBRARIES}
-	)
+	message("OPENGL_LIBRARIES: ${OPENGL_LIBRARIES}")
+	message("OPENGL_glx_LIBRARY: ${OPENGL_glx_LIBRARY}")
 endif()
 
 if(BUILD_WINDOW_FRAMEWORK)
