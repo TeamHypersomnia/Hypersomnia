@@ -1,4 +1,7 @@
 return {
+  launch_mode = "MAIN_MENU",
+  log_to_live_file = false,
+
   app_controls = {
     Tilde = "SWITCH_DEVELOPER_CONSOLE"
   },
@@ -368,7 +371,6 @@ return {
     enabled = true,
     speed = 1000
   },
-  launch_mode = "MAIN_MENU",
   main_menu = {
     latest_news_url = "http://hypersomnia.xyz/latest_post/",
     menu_intro_scene_entropy_path = "abc",

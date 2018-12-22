@@ -118,17 +118,23 @@ public:
 	{}
 
 	const auto& get_meta() const {
+#if !IS_PRODUCTION_BUILD
 		ensure(alive());
+#endif
 		return *reinterpret_cast<const entity_solvable_meta*>(ptr);
 	}
 
 	auto& get(cosmos_solvable_access) const {
+#if !IS_PRODUCTION_BUILD
 		ensure(alive());
+#endif
 		return *ptr;
 	}
 
 	const auto& get() const {
+#if !IS_PRODUCTION_BUILD
 		ensure(alive());
+#endif
 		return *ptr;
 	}
 
@@ -206,7 +212,9 @@ public:
 
 	template <class List, class F>
 	FORCE_INLINE decltype(auto) conditional_dispatch_ret(F&& callback) const {
+#if !IS_PRODUCTION_BUILD
 		ensure(alive());
+#endif
 
 		return conditional_find_by_dynamic_id<List>(
 			all_entity_types(), 
@@ -268,7 +276,9 @@ public:
 
 	template <class F>
 	decltype(auto) dispatch(F&& callback) const {
+#if !IS_PRODUCTION_BUILD
 		ensure(alive());
+#endif
 
 		return get_by_dynamic_id(
 			all_entity_types(),

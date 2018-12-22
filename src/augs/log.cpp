@@ -16,6 +16,8 @@
 
 std::mutex log_mutex;
 
+extern bool log_to_live_file;
+
 program_log program_log::global_instance = 10000;
 
 program_log::program_log(const unsigned max_all_entries) 
@@ -51,9 +53,9 @@ void write_log_entry(const std::string& f) {
 	std::cout << f << std::endl;
 #endif
 
-#if OUTPUT_LOG_TO_LIVE_FILE
-	std::ofstream recording_file(LOG_FILES_DIR "/live_debug.txt", std::ios::out | std::ios::app);
-	recording_file << f << std::endl;
-#endif
+	if (log_to_live_file) {
+		std::ofstream recording_file(LOG_FILES_DIR "/live_debug.txt", std::ios::out | std::ios::app);
+		recording_file << f << std::endl;
+	}
 #endif
 }

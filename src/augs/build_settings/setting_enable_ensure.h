@@ -1,2 +1,2 @@
 #pragma once
-#define ENABLE_ENSURE !IS_PRODUCTION_BUILD
+#define ENABLE_ENSURE 1

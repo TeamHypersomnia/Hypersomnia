@@ -68,6 +68,7 @@
 #include "augs/readwrite/byte_readwrite.h"
 
 std::function<void()> ensure_handler;
+bool log_to_live_file = false;
 
 /*
 	static is used for all variables because some take massive amounts of space.
@@ -81,6 +82,18 @@ std::function<void()> ensure_handler;
 */
 
 int work(const int argc, const char* const * const argv) try {
+	if (!augs::exists(LOG_FILES_DIR)) {
+		augs::create_directories(LOG_FILES_DIR);
+
+		log_to_live_file = true;
+
+		LOG("Live log file created at %x", augs::date_time().get_readable());
+		LOG("No %x exists yet, so the game will log to the live file for the first launch.", LOG_FILES_DIR);
+	}
+	else {
+		augs::remove_file(LOG_FILES_DIR "/live_debug.txt");
+	}
+
 	static augs::timer until_first_swap;
 	bool until_first_swap_measured = false;
 
@@ -104,7 +117,8 @@ int work(const int argc, const char* const * const argv) try {
 	LOG("Started at %x", augs::date_time().get_readable());
 	LOG("Working directory: %x", augs::get_current_working_directory());
 
-	augs::create_directories(LOG_FILES_DIR);
+	LOG("Creating directories: %x %x %x", GENERATED_FILES_DIR, LOCAL_FILES_DIR);
+
 	augs::create_directories(GENERATED_FILES_DIR);
 	augs::create_directories(LOCAL_FILES_DIR);
 
@@ -113,8 +127,10 @@ int work(const int argc, const char* const * const argv) try {
 	static const auto canon_config_path = augs::path_type("config.lua");
 	static const auto local_config_path = augs::path_type(LOCAL_FILES_DIR "/config.local.lua");
 
+	LOG("Creating lua state.");
 	static auto lua = augs::create_lua_state();
 
+	LOG("Loading the config.");
 	static config_lua_table config { 
 		lua, 
 		augs::switch_path(
@@ -123,6 +139,15 @@ int work(const int argc, const char* const * const argv) try {
 		)
 	};
 
+	if (config.log_to_live_file) {
+		/* Don't disable it if it's already on. */
+		log_to_live_file = config.log_to_live_file;
+
+		LOG("Live log was enabled due to a flag in config.");
+		LOG("Live log file created at %x", augs::date_time().get_readable());
+	}
+
+	LOG("Initializing ImGui.");
 	augs::imgui::init(
 		LOCAL_FILES_DIR "/imgui.ini",
 		LOG_FILES_DIR "/imgui_log.txt",
@@ -138,9 +163,12 @@ int work(const int argc, const char* const * const argv) try {
 		last_saved_config.save(lua, local_config_path);
 	};
 
+	LOG("Parsing command-line parameters.");
 	static const auto params = cmd_line_params(argc, argv);
 
 	static augs::timer global_libraries_timer;
+
+	LOG("Initializing global libraries");
 
 	static const auto libraries = 
 		params.start_dedicated_server 
@@ -172,6 +200,7 @@ int work(const int argc, const char* const * const argv) try {
 	};
 
 	if (config.unit_tests.run) {
+		LOG("Running unit tests.");
 		augs::run_unit_tests(config.unit_tests);
 
 		LOG("All unit tests have passed.");
@@ -180,8 +209,13 @@ int work(const int argc, const char* const * const argv) try {
 			return EXIT_SUCCESS;
 		}
 	}
+	else {
+		LOG("Unit tests were disabled.");
+	}
 
 	if (params.start_dedicated_server) {
+		LOG("Starting the dedicated server at port: %x", config.default_server_start.port);
+
 		emplace_current_setup(
 			std::in_place_type_t<server_setup>(),
 			lua,
@@ -228,35 +262,46 @@ int work(const int argc, const char* const * const argv) try {
 		return EXIT_SUCCESS;
 	}
 
+	LOG("Initializing the audio context.");
+
 	static augs::audio_context audio(config.audio);
+
+	LOG("Logging all audio devices.");
 	augs::log_all_audio_devices(LOG_FILES_DIR "/audio_devices.txt");
 
+	LOG("Initializing the window.");
 	static augs::window window(config.window);
 
+	LOG("Initializing the renderer.");
 	static augs::renderer renderer;
 	LOG_NVPS(renderer.get_max_texture_size());
 
+	LOG("Initializing the necessary fbos.");
 	static all_necessary_fbos necessary_fbos(
 		window.get_screen_size(),
 		config.drawing
 	);
 
+	LOG("Initializing the necessary shaders.");
 	static all_necessary_shaders necessary_shaders(
 		"content/necessary/shaders",
 		"content/necessary/shaders",
 		config.drawing
 	);
 
+	LOG("Initializing the necessary sounds.");
 	static all_necessary_sounds necessary_sounds(
 		"content/necessary/sfx"
 	);
 
+	LOG("Initializing the necessary image definitions.");
 	static const necessary_image_definitions_map necessary_image_definitions(
 		lua,
 		"content/necessary/gfx",
 		config.content_regeneration.regenerate_every_time
 	);
 	
+	LOG("Creating the ImGui atlas.");
 	static const auto imgui_atlas = augs::imgui::create_atlas(config.gui_fonts.gui);
 
 	static const auto configurables = configuration_subscribers {
@@ -300,12 +345,14 @@ int work(const int argc, const char* const * const argv) try {
 		loaded just once or if they are for example continuously streamed.
 	*/
 
+	LOG("Initializing the streaming of viewables.");
 	static viewables_streaming streaming(renderer);
 	static auto streaming_finalize = augs::scope_guard([&]() {
 		streaming.finalize_pending_tasks();
 	});
 
 	static world_camera gameplay_camera;
+	LOG("Initializing the audiovisual state.");
 	static audiovisual_state audiovisuals;
 	
 	static auto get_audiovisuals = []() -> audiovisual_state& {

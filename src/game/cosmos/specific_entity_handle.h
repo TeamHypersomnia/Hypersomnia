@@ -146,7 +146,9 @@ public:
 	}
 
 	void ensure_alive() const {
+#if !IS_PRODUCTION_BUILD
 		ensure(subject != nullptr);
+#endif
 	}
 };
 

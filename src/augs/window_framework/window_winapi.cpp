@@ -341,6 +341,7 @@ namespace augs {
 	) : platform(std::make_unique<window::platform_data>()) {
 		// TODO: throw an exception instead of ensuring
 		static bool register_once = [](){
+			LOG("WINAPI: Registering the window class.");
 			WNDCLASSEX wcl = { 0 };
 			wcl.cbSize = sizeof(wcl);
 			wcl.style = CS_OWNDC | CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
@@ -360,6 +361,7 @@ namespace augs {
 			wcl.lpszMenuName = 0;
 			wcl.lpszClassName = L"augwin";
 
+			LOG("WINAPI: Calling RegisterClassEx.");
 			const auto register_success = RegisterClassEx(&wcl) != 0;
 
 			ensure(register_success && "class registering");
@@ -367,12 +369,15 @@ namespace augs {
 		}();
 		(void)register_once;
 
+		LOG("WINAPI: Calling GetDoubleClickTime.");
 		platform->triple_click_delay = GetDoubleClickTime();
 
 		auto make_window = [&]() {
+			LOG("WINAPI: Calling CreateWindowEx.");
 			platform->hwnd = CreateWindowEx(0, L"augwin", L"invalid_name", 0, 0, 0, 0, 0, 0, 0, GetModuleHandle(NULL), this);
 			ensure(platform->hwnd);
 
+			LOG("WINAPI: Calling GetDC.");
 			platform->hdc = GetDC(platform->hwnd);
 			ensure(platform->hdc);
 		};
@@ -389,6 +394,7 @@ namespace augs {
 
 		make_window();
 
+		LOG("WINAPI: Filling PIXELFORMATDESCRIPTOR.");
 		PIXELFORMATDESCRIPTOR p;
 		ZeroMemory(&p, sizeof(p));
 
@@ -405,10 +411,12 @@ namespace augs {
 		p.iLayerType = PFD_MAIN_PLANE;
 
 		{
+			LOG("WINAPI: Calling ChoosePixelFormat.");
 			const auto pf = ChoosePixelFormat(platform->hdc, &p);
 			(void)pf;
 			ensure(pf);
 
+			LOG("WINAPI: Calling SetPixelFormat.");
 			const auto result = SetPixelFormat(platform->hdc, pf, &p);
 			(void)result;
 			ensure(result);
@@ -419,6 +427,7 @@ namespace augs {
 			LOG("Making dummy context");
 			make_context();
 
+			LOG("WINAPI: Calling gladLoadWGL.");
 			if (!gladLoadWGL(platform->hdc)) {
 				throw window_error("Failed to initialize GLAD WGL!"); 		
 			}
@@ -452,6 +461,7 @@ namespace augs {
 			UINT numFormats;
 
 			{
+				LOG("WINAPI: Calling wglChoosePixelFormatARB.");
 				const auto result = wglChoosePixelFormatARB(platform->hdc, attribList, NULL, 1, &pixelFormat, &numFormats);
 				(void)result;
 				ensure(result);
@@ -460,6 +470,7 @@ namespace augs {
 			LOG_NVPS(pixelFormat, numFormats);
 			
 			{
+				LOG("WINAPI: Calling SetPixelFormat.");
 				const auto result = SetPixelFormat(platform->hdc, pixelFormat, &p);
 				(void)result;
 				ensure(result);
@@ -472,8 +483,12 @@ namespace augs {
 
 		show();
 
+		LOG("WINAPI: Calling SetLastError.");
 		SetLastError(0);
+
 		{
+			LOG("WINAPI: Calling SetWindowLongPtr.");
+
 			const auto result = !(SetWindowLongPtr(platform->hwnd, GWLP_USERDATA, (LONG_PTR)this) == 0 && GetLastError() != 0);
 			(void)result;
 			ensure(result);
@@ -491,6 +506,7 @@ namespace augs {
 		Rid[0].usUsage = HID_USAGE_GENERIC_MOUSE;
 		Rid[0].dwFlags = RIDEV_INPUTSINK;
 		Rid[0].hwndTarget = platform->hwnd;
+		LOG("WINAPI: Calling RegisterRawInputDevices.");
 		RegisterRawInputDevices(Rid, 1, sizeof(Rid[0]));
 
 		apply(settings, true);
@@ -499,6 +515,8 @@ namespace augs {
 		const auto app_icon_path = settings.app_icon_path.wstring();
 		
 		if (/* icon_was_specified */ !app_icon_path.empty()) {
+			LOG("WINAPI: Calling LoadImage.");
+
 			const auto app_icon = (HICON)LoadImage(NULL,
 				app_icon_path.c_str(),
 				IMAGE_ICON,       
@@ -509,6 +527,7 @@ namespace augs {
 				LR_SHARED         
 			);
 
+			LOG("WINAPI: Calling SendMessage.");
 			SendMessage(platform->hwnd, WM_SETICON, ICON_SMALL, (LPARAM)app_icon);
 			SendMessage(platform->hwnd, WM_SETICON, ICON_BIG, (LPARAM)app_icon);
 		}
@@ -519,9 +538,13 @@ namespace augs {
 			unset_if_current();
 
 #if BUILD_OPENGL
+			LOG("WINAPI: Calling wglDeleteContext.");
 			wglDeleteContext(platform->hglrc);
 #endif
+			LOG("WINAPI: Calling ReleaseDC.");
 			ReleaseDC(platform->hwnd, platform->hdc);
+
+			LOG("WINAPI: Calling DestroyWindow.");
 			DestroyWindow(platform->hwnd);
 
 			platform->hwnd = nullptr;
@@ -551,6 +574,7 @@ namespace augs {
 	}
 
 	void window::show() {
+		LOG("WINAPI: Calling ShowWindow.");
 		ShowWindow(platform->hwnd, SW_SHOW);
 	}
 
