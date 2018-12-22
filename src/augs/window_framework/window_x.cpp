@@ -164,13 +164,8 @@ namespace augs {
 							GLX_DOUBLEBUFFER    , True,
 							GLX_SAMPLE_BUFFERS  , 0,
 							GLX_SAMPLES         , 0,
-							GLX_AUX_BUFFERS, 0,
 							GLX_CONFIG_CAVEAT, GLX_NONE,
 							GLX_TRANSPARENT_TYPE, GLX_NONE,
-							GLX_ACCUM_RED_SIZE, 0,
-							GLX_ACCUM_GREEN_SIZE, 0,
-							GLX_ACCUM_BLUE_SIZE, 0,
-							GLX_ACCUM_ALPHA_SIZE, 0,
 							None
 						}
 					;
@@ -905,3 +900,4 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 		destroy();
 	}
 }
+

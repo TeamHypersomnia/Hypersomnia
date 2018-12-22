@@ -219,7 +219,7 @@ namespace augs {
 	}
 
 	void renderer::fullscreen_quad() {
-		constexpr float vertices[] = {
+		float vertices[] = {
 			1.f, 1.f,
 			1.f, 0.f,
 			0.f, 0.f,
@@ -234,7 +234,7 @@ namespace augs {
 
 		GL_CHECK(glDisableVertexAttribArray(static_cast<int>(vertex_attribute::texcoord)));
 		GL_CHECK(glDisableVertexAttribArray(static_cast<int>(vertex_attribute::color)));
-		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::position), 2, GL_FLOAT, GL_FALSE, 0, vertices));
+		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::position), 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0));
 		GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW));
 
 		GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, 6));

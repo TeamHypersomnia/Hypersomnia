@@ -132,3 +132,4 @@ namespace augs {
 		void stencil_reverse_test();
 	};
 }
+
