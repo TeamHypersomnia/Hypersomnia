@@ -20,7 +20,11 @@ int work(const int argc, const char* const * const argv);
 #if BUILD_IN_CONSOLE_MODE
 int main(const int argc, const char* const * const argv) {
 #else
-int __stdcall WinMain(HINSTANCE, HINSTANCE, char*, int) {
+
+HINSTANCE g_myhinst;
+
+int __stdcall WinMain(HINSTANCE myhinst, HINSTANCE, char*, int) {
+	g_myhinst = myhinst;
 	const auto argc = __argc;
 	const auto argv = __argv;
 #endif

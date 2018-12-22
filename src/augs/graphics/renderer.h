@@ -27,6 +27,7 @@ namespace augs {
 		GLuint triangle_buffer_id = 0xdeadbeef;
 		GLuint special_buffer_id = 0xdeadbeef;
 		GLuint imgui_elements_id = 0xdeadbeef;
+		GLuint vao_buffer = 0xdeadbeef;
 
 		bool interpolate_debug_logic_step_lines = true;
 	public:

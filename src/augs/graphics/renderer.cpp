@@ -32,19 +32,23 @@ void buffer_data(
 namespace augs {
 	renderer::renderer() {
 #if BUILD_OPENGL
+		LOG("Calling gladLoadGL: %x.", intptr_t(gladLoadGL));
 		if (!gladLoadGL()) {
+			LOG("Calling gladLoadGL failed.");
 			throw renderer_error("Failed to initialize GLAD!"); 		
 		}
 #endif
 
-		GL_CHECK(glEnable(GL_TEXTURE_2D));
-		GL_CHECK(glEnable(GL_BLEND));
+		LOG("glBlendFuncSeparate ADDR: %x", intptr_t(glBlendFuncSeparate));
 
+		LOG("Calling gladLoadGL succeeded.");
+		
+		GL_CHECK(glEnable(GL_BLEND));
+		
 		set_standard_blending();
 		set_clear_color(black);
 		 
 		GL_CHECK(glDisable(GL_DITHER));
-		GL_CHECK(glDisable(GL_POINT_SMOOTH));
 		GL_CHECK(glDisable(GL_LINE_SMOOTH));
 		GL_CHECK(glDisable(GL_POLYGON_SMOOTH));
 		GL_CHECK(glDisable(GL_MULTISAMPLE));
@@ -53,9 +57,10 @@ namespace augs {
 
 		GL_CHECK(glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST));
 		GL_CHECK(glHint(GL_TEXTURE_COMPRESSION_HINT, GL_FASTEST));
-		GL_CHECK(glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_FASTEST));
-		GL_CHECK(glHint(GL_GENERATE_MIPMAP_HINT, GL_FASTEST));
-
+		
+		GL_CHECK(glGenVertexArrays(1, &vao_buffer));
+		GL_CHECK(glBindVertexArray(vao_buffer));
+		
 		GL_CHECK(glGenBuffers(1, &imgui_elements_id));
 
 		GL_CHECK(glGenBuffers(1, &triangle_buffer_id));
@@ -225,14 +230,14 @@ namespace augs {
 		};
 		(void)vertices;
 
-		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, 0));
+		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
+
 		GL_CHECK(glDisableVertexAttribArray(static_cast<int>(vertex_attribute::texcoord)));
 		GL_CHECK(glDisableVertexAttribArray(static_cast<int>(vertex_attribute::color)));
-		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::position), 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), vertices));
+		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::position), 2, GL_FLOAT, GL_FALSE, 0, vertices));
+		GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW));
 
 		GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, 6));
-
-		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
 
 		GL_CHECK(glEnableVertexAttribArray(static_cast<int>(vertex_attribute::position)));
 		GL_CHECK(glEnableVertexAttribArray(static_cast<int>(vertex_attribute::texcoord)));

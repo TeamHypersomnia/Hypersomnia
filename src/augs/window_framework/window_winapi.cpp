@@ -18,6 +18,18 @@
 
 #include "augs/window_framework/translate_winapi_enums.h"
 
+#if BUILD_IN_CONSOLE_MODE
+extern HINSTANCE g_myhinst;
+
+auto get_hinstance() {
+	return g_myhinst;
+}
+#else
+auto get_hinstance() {
+	return GetModuleHandle(NULL);
+}
+#endif
+
 static std::string PickContainer(const std::wstring& custom_title) {
 	std::string result;
     IFileDialog *pfd;
@@ -348,7 +360,7 @@ namespace augs {
 			wcl.lpfnWndProc = wndproc;
 			wcl.cbClsExtra = 0;
 			wcl.cbWndExtra = 0;
-			wcl.hInstance = GetModuleHandle(NULL);
+			wcl.hInstance = get_hinstance();
 #if ADD_APPLICATION_ICON
 			wcl.hIcon = 0;
 			wcl.hIconSm = 0;
@@ -374,7 +386,7 @@ namespace augs {
 
 		auto make_window = [&]() {
 			LOG("WINAPI: Calling CreateWindowEx.");
-			platform->hwnd = CreateWindowEx(0, L"augwin", L"invalid_name", 0, 0, 0, 0, 0, 0, 0, GetModuleHandle(NULL), this);
+			platform->hwnd = CreateWindowEx(0, L"augwin", L"blahblahb", 0, 0, 0, 0, 0, 0, 0, get_hinstance(), this);
 			ensure(platform->hwnd);
 
 			LOG("WINAPI: Calling GetDC.");
@@ -392,6 +404,24 @@ namespace augs {
 			ensure(sc);
 		};
 
+		auto make_context_proper = [&]() {
+#if BUILD_OPENGL
+			LOG("WINAPI: Calling wglCreateContextAttribsARB.");
+			const int attribList[] = {
+    			WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+    			WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+    			WGL_CONTEXT_PROFILE_MASK_ARB, WGL_CONTEXT_CORE_PROFILE_BIT_ARB,
+    			0, 0
+			};
+
+			platform->hglrc = wglCreateContextAttribsARB(platform->hdc, NULL, attribList);
+			ensure(platform->hglrc);
+#endif
+			const auto sc = set_as_current();
+			(void)sc;
+			ensure(sc);
+		};
+
 		make_window();
 
 		LOG("WINAPI: Filling PIXELFORMATDESCRIPTOR.");
@@ -402,13 +432,7 @@ namespace augs {
 		p.nVersion = 1;
 		p.dwFlags = PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER;
 		p.iPixelType = PFD_TYPE_RGBA;
-		p.cColorBits = settings.bpp;
-		p.cAlphaBits = 8;
-		p.cStencilBits = 8;
-		p.cDepthBits = 0;
-		p.cAuxBuffers = 0;
-		p.cAccumBits = 0;
-		p.iLayerType = PFD_MAIN_PLANE;
+		p.cColorBits = 24;
 
 		{
 			LOG("WINAPI: Calling ChoosePixelFormat.");
@@ -448,13 +472,7 @@ namespace augs {
     			WGL_STENCIL_BITS_ARB, 8,
     			WGL_SAMPLE_BUFFERS_ARB, 0,
     			WGL_SAMPLES_ARB, 0,
-    			WGL_AUX_BUFFERS_ARB, 0,
-    			WGL_ACCUM_BITS_ARB, 0,
-    			WGL_ACCUM_RED_BITS_ARB, 0,
-    			WGL_ACCUM_GREEN_BITS_ARB, 0,
-    			WGL_ACCUM_BLUE_BITS_ARB, 0,
-    			WGL_ACCUM_ALPHA_BITS_ARB, 0,
-    			0,
+    			0, 0
 			};
 
 			int pixelFormat;
@@ -478,7 +496,7 @@ namespace augs {
 			
 			LOG("Making context proper");
 
-			make_context();
+			make_context_proper();
 		}
 
 		show();
