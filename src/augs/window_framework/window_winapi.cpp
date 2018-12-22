@@ -486,14 +486,6 @@ namespace augs {
 		LOG("WINAPI: Calling SetLastError.");
 		SetLastError(0);
 
-		{
-			LOG("WINAPI: Calling SetWindowLongPtr.");
-
-			const auto result = !(SetWindowLongPtr(platform->hwnd, GWLP_USERDATA, (LONG_PTR)this) == 0 && GetLastError() != 0);
-			(void)result;
-			ensure(result);
-		}
-
 #ifndef HID_USAGE_PAGE_GENERIC
 #define HID_USAGE_PAGE_GENERIC         ((USHORT) 0x01)
 #endif
