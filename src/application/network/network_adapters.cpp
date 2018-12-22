@@ -57,17 +57,13 @@ game_connection_config::game_connection_config() {
 
 	serverPerClientMemory += 1024 * 1024 * 2;
 
-#if IS_PRODUCTION_BUILD
-	networkSimulator = false;
-#else
 	networkSimulator = true;
-#endif
 
 	set_max_packet_size(2 * 1024);
 }
 
 void game_connection_config::set_max_packet_size(const unsigned s) {
-	protocolId = hypersomnia_version().commit_number;
+	protocolId = 8412;
 
 	maxPacketSize = s;
     maxPacketFragments = (int) ceil( maxPacketSize / packetFragmentSize );

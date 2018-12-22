@@ -129,7 +129,7 @@ option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ${DEFA
 option(BUILD_STENCIL_BUFFER "Build stencil buffer related code. Will be disabled in MMO setups, so everybody is equal in having wallhacks." ${DEFAULT_OPT})
 option(BUILD_PROPERTY_EDITOR "Build property editor code for the editor setup. Due to hardcore templates, this takes amazingly long time to build, so it makes sense to turn it off sometimes." ${DEFAULT_OPT})
 
-option(LINK_STATICALLY "Statically link all libraries." OFF)
+option(STATIC_LINK "Statically link all libraries." OFF)
 
 set(BUILD_IN_CONSOLE_MODE OFF CACHE STRING "0")
 
@@ -867,7 +867,7 @@ else()
 	execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${HYPERSOMNIA_VERSION_FILE_INPUT_PATH} ${HYPERSOMNIA_VERSION_FILE_CPP})
 endif()
 
-if (LINK_STATICALLY AND UNIX)
+if (STATIC_LINK AND UNIX)
 	message("Libraries will be linked statically.")
 
 	message("Default CMAKE_FIND_LIBRARY_SUFFIXES: ${CMAKE_FIND_LIBRARY_SUFFIXES}")
@@ -1420,7 +1420,7 @@ if(MSVC)
 	endif()
 elseif(CLANG)
 	if(USE_LIBCXX)
-		if(LINK_STATICALLY)
+		if(STATIC_LINK)
 			find_library(CPP c++)
 			find_library(CPPFS c++fs)
 			find_library(CPPEXPERIMENTAL c++experimental)

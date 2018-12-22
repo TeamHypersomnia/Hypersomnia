@@ -6,6 +6,15 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- bind h to buy menu
+- see if bilmer and vindicator have better intervals at 64hz
+- let q also look for the bomb if the hotbar empty
+
+- fixbomb planting duration
+- dont show defusing progress if youre tt
+- Rebuy previous
+- fix esc for that damn team selection
+
 - Trim reach inside component please
 	- the marker type probably as well as it is annoying
 

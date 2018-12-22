@@ -121,7 +121,7 @@ void settings_gui_state::perform(
 		};
 
 		auto do_lag_simulator = [&](auto& sim) {
-#if !IS_PRODUCTION_BUILD
+			//#if !IS_PRODUCTION_BUILD
 			revertable_checkbox("Enable lag simulator", sim.is_enabled);
 
 			if (sim.is_enabled) {
@@ -135,9 +135,9 @@ void settings_gui_state::perform(
 			}
 
 			text_disabled("The network simulation is always disabled in production builds.");
-#else
+			//#else
 			(void)sim;
-#endif
+			//#endif
 		};
 
 		switch (active_pane) {

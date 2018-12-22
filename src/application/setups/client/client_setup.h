@@ -253,8 +253,6 @@ public:
 				{
 					auto& p = receiver.predicted_entropies;
 
-					p.push_back(*new_local_entropy);
-
 					const auto& max_commands = vars.max_predicted_client_commands;
 					const auto num_commands = p.size();
 
@@ -269,6 +267,8 @@ public:
 					}
 
 					performance.predicted_steps.measure(num_commands);
+
+					p.push_back(*new_local_entropy);
 				}
 
 #if USE_CLIENT_PREDICTION
