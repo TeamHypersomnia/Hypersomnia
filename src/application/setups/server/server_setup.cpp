@@ -694,6 +694,9 @@ TEST_CASE("NetSerialization ServerEntropy") {
 
 	REQUIRE(received == naively_received);
 	REQUIRE(received == sent);
+
+	const auto naive_bytes_of_received = augs::to_bytes(received);
+	REQUIRE(naive_bytes_of_received == naive_bytes);
 }
 
 TEST_CASE("NetSerialization ServerEntropySecond") {
@@ -725,6 +728,12 @@ TEST_CASE("NetSerialization ServerEntropySecond") {
 		sent.players.push_back({ second, tt });
 		sent.players.push_back({ mode_player_id::first(), tt });
 		sent.players.push_back({ third, {} });
+
+		sent.general.added_player.id = mode_player_id::machine_admin();
+		sent.general.added_player.name = "proplayerrrrrrrrrr";
+		sent.general.added_player.faction = faction_type::DEFAULT;
+		sent.general.removed_player = third;
+		sent.general.special_command.emplace<mode_restart_command>();
 
 		REQUIRE(ss.write_payload(sent));
 
@@ -781,6 +790,9 @@ TEST_CASE("NetSerialization ClientEntropy") {
 
 	REQUIRE(received == naively_received);
 	REQUIRE(received == sent);
+
+	const auto naive_bytes_of_received = augs::to_bytes(received);
+	REQUIRE(naive_bytes_of_received == naive_bytes);
 }
 
 #endif

@@ -27,6 +27,16 @@ struct mode_restart_command {
 	pad_bytes<1> pad;
 	// END GEN INTROSPECTOR
 
+	/* 
+		Prevents trivial-copyability, 
+		and thus copying of the command variant by std::memcpy.
+	*/
+
+	auto& operator=(const mode_restart_command& b) {
+		pad = b.pad;
+		return *this;
+	}
+
 	bool operator==(const mode_restart_command&) const {
 		return true;
 	}

@@ -44,6 +44,46 @@ constexpr std::size_t max_server_step_size_v =
 ;
 
 namespace net_messages {
+	template <class Stream>
+	bool serialize(Stream&, mode_restart_command&) {
+		return true;
+	}
+
+	template <class Stream, class... Args>
+	bool serialize(Stream& s, std::variant<Args...>& i) {
+		static constexpr auto max_i = sizeof...(Args);
+		static_assert(std::numeric_limits<uint8_t>::max() >= max_i);
+
+		uint8_t type_id;
+
+		if (Stream::IsWriting) {
+			type_id = static_cast<uint8_t>(i.index());
+		}
+
+		serialize_int(s, type_id, 0, sizeof...(Args) - 1);
+
+		type_in_list_id<type_list<Args*...>> idx;
+		idx.set_index(type_id);
+
+		const bool result = idx.dispatch(
+			[&](auto* dummy) {
+				using T = std::remove_pointer_t<decltype(dummy)>;
+
+				if (Stream::IsReading) {
+					i.template emplace<T>();
+				}
+
+				if constexpr(!is_monostate_v<T>) {
+					serialize(s, std::get<T>(i));
+				}
+
+				return true;
+			}
+		);
+
+		return result;
+	}
+
 	template <class Stream, class V>
 	bool serialize_trivial_as_bytes(Stream& s, V& v) {
 		static_assert(augs::is_byte_readwrite_appropriate_v<augs::memory_stream, V>);
@@ -261,7 +301,7 @@ namespace net_messages {
 		}
 
 		if (has_special_command) {
-			if (!serialize_trivial_as_bytes(s, g.special_command)) {
+			if (!serialize(s, g.special_command)) {
 				return false;
 			}
 		}
