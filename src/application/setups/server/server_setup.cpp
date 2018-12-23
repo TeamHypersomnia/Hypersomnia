@@ -558,7 +558,7 @@ setup_escape_result server_setup::escape() {
 		return setup_escape_result::GO_TO_MAIN_MENU;
 	}
 
-	return setup_escape_result::IGNORE;
+	return arena_base::escape();
 }
 
 bool server_setup::is_gameplay_on() const {

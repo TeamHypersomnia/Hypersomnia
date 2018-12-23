@@ -427,7 +427,7 @@ setup_escape_result client_setup::escape() {
 		return setup_escape_result::GO_TO_MAIN_MENU;
 	}
 
-	return setup_escape_result::IGNORE;
+	return arena_base::escape();
 }
 
 const cosmos& client_setup::get_viewed_cosmos() const {
