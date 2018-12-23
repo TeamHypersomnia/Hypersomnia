@@ -33,7 +33,7 @@ bool start_server_gui_state::perform(
 
 		// auto& scope_cfg = into;
 
-		input_text<100>("Address (leave empty to find automatically)", into.ip);
+		input_text<100>("Address", into.ip);
 		text_disabled("Tip: the address can be either IPv4 or IPv6.\nFor example, you can put the IPv6 loopback address, which is \"::1\".");
 
 		{

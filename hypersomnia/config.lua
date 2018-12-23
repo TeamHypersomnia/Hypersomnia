@@ -453,7 +453,7 @@ return {
 
 	send_updates_once_every_tick = 1,
 
-	enabled_network_simulator = {
+	disabled_network_simulator = {
       latency_ms = 50,
       jitter_ms = 10,
       loss_percent = 1,
@@ -482,7 +482,7 @@ return {
 	  }
 	},
 
-	enabled_network_simulator = {
+	disabled_network_simulator = {
       latency_ms = 70,
       jitter_ms = 15,
       loss_percent = 1,

@@ -138,10 +138,26 @@ void client_adapter::connect(const client_start_input& in) {
 	uint64_t clientId;
 	yojimbo::random_bytes((uint8_t*)&clientId, 8);
 
+	const auto target_addr = yojimbo::Address(in.ip_port.c_str());
+
+	auto local_addr = yojimbo::Address("127.0.0.1", 8412);
+
+	if (target_addr.GetType() == yojimbo::AddressType::ADDRESS_IPV6) {
+		local_addr = yojimbo::Address("::1", 8412);
+	}
+
+	local_addr.SetPort(target_addr.GetPort());
+
+	yojimbo::Address addrs[2] = {
+		target_addr,
+		local_addr
+	};
+
 	client.InsecureConnect(
 		privateKey.data(), 
 		clientId,
-		yojimbo::Address(in.ip_port.c_str())
+		addrs,
+		2
 	);
 }
 
