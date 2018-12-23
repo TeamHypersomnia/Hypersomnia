@@ -6,6 +6,8 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Consider implementing a radius range for item pickups
+
 - Shouldn't we always calc reloading movement to show context-lessly?
 
 

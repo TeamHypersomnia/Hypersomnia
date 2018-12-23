@@ -6,7 +6,22 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Do something so that we don't lose work in playtesting mode
+- fix Common state crash
+
+- numeric cohices for the item shop?
+
+- drop all mags on dropping a weapon
+- Let the character see a little behind it
+	- Simply a disk overlay over the stencil
+		- Radius would be specified by mode rules
+
+- Automatically pick the bought weapon
+	- currently it is held into eq if something different is held, I think
+
 - bind h to buy menu
+	- or something else
+
 - see if bilmer and vindicator have better intervals at 64hz
 - let q also look for the bomb if the hotbar empty
 

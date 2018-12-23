@@ -1,5 +1,6 @@
 #include <iostream>
 #include <clocale>
+#include <cfenv>
 
 #include "augs/log.h"
 #include "augs/filesystem/file.h"
@@ -34,6 +35,7 @@ int main(const int argc, const char* const * const argv) {
 #error "Unsupported platform!"
 #endif
 	std::setlocale(LC_NUMERIC, "C");
+	std::fesetround(FE_TONEAREST);
 
 	if (cmd_line_params(argc, argv).help_only) {
 		std::cout << get_help_section() << std::endl;
