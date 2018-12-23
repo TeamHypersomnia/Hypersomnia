@@ -176,6 +176,3 @@ template basic_inventory_slot_id<entity_id> cosmos_solvable::deguidize<basic_inv
 
 template basic_item_slot_transfer_request<entity_guid> cosmos_solvable::guidize<basic_item_slot_transfer_request, entity_id>(const basic_item_slot_transfer_request<entity_id>&) const;
 template basic_item_slot_transfer_request<entity_id> cosmos_solvable::deguidize<basic_item_slot_transfer_request, entity_guid>(const basic_item_slot_transfer_request<entity_guid>&) const;
-
-template basic_wielding_setup<entity_guid> cosmos_solvable::guidize<basic_wielding_setup, entity_id>(const basic_wielding_setup<entity_id>&) const;
-template basic_wielding_setup<entity_id> cosmos_solvable::deguidize<basic_wielding_setup, entity_guid>(const basic_wielding_setup<entity_guid>&) const;

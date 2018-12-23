@@ -381,7 +381,7 @@ void hotbar_button::respond_to_events(
 			const auto assigned_entity = this_id->get_assigned_entity(subject);
 
 			if (assigned_entity.alive()) {
-				wielding_setup setup;
+				auto setup = wielding_setup::bare_hands();
 				setup.hand_selections[0] = assigned_entity;
 
 				//if (!setup.same_as_in(subject)) {

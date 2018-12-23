@@ -72,7 +72,8 @@ struct unversioned_entity_id {
 	}
 
 	void unset() {
-		*this = unversioned_entity_id();
+		raw.unset();
+		type_id.unset();
 	}
 
 	bool operator==(const unversioned_entity_id b) const {
@@ -119,7 +120,8 @@ struct entity_id {
 	}
 
 	void unset() {
-		*this = entity_id();
+		raw.unset();
+		type_id.unset();
 	}
 
 	bool is_set() const {

@@ -1,3 +1,4 @@
+#include "augs/templates/logically_empty.h"
 #include "augs/templates/container_templates.h"
 #include "game/stateless_systems/item_system.h"
 
@@ -761,12 +762,12 @@ void item_system::handle_wielding_requests(const logic_step step) {
 			continue;
 		}
 
-		if (p.second.wield == std::nullopt) {
+		if (logically_empty(p.second.wield)) {
 			continue;
 		}
 
 		const auto& self = cosm[p.first];
-		const auto& request = *p.second.wield;
+		const auto& request = p.second.wield;
 		const auto& selections = request.hand_selections;
 		const auto current_selection = wielding_setup::from_current(self);
 

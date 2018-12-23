@@ -33,7 +33,7 @@ bool arena_choose_team_gui::control(app_ingame_intent_input in) {
 			};
 
 			if (key == keys::key::A) {
-				make_choice(faction_type::COUNT);
+				make_choice(faction_type::DEFAULT);
 				return true;
 			}
 
@@ -170,7 +170,7 @@ std::optional<mode_commands::team_choice> arena_choose_team_gui::perform_imgui(c
 	ImGui::SameLine();
 
 	if (ImGui::Button("Auto-assign")) {
-		return make_choice(faction_type::COUNT);
+		return make_choice(faction_type::DEFAULT);
 	}
 
 	return std::nullopt;

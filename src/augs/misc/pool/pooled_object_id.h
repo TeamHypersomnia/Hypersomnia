@@ -15,8 +15,12 @@ namespace augs {
 			return !operator==(b);
 		}
 
+		void unset() {
+			indirection_index = static_cast<size_type>(-1);
+		}
+
 		bool is_set() const {
-			return *this != unversioned_id();
+			return indirection_index != static_cast<size_type>(-1);
 		}
 	};
 
@@ -37,11 +41,11 @@ namespace augs {
 		}
 
 		void unset() {
-			*this = pooled_object_id();
+			indirection_index = static_cast<size_type>(-1);
 		}
 
 		bool is_set() const {
-			return *this != pooled_object_id();
+			return indirection_index != static_cast<size_type>(-1);
 		}
 
 		bool operator==(const pooled_object_id& b) const {

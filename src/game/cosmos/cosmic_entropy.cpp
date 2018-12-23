@@ -1,3 +1,4 @@
+#include "augs/templates/logically_empty.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/introspect.h"
 #include "cosmic_entropy.h"
@@ -18,15 +19,15 @@ std::size_t basic_player_entropy<K>::length() const {
 	total += motions.size();
 	total += intents.size();
 
-	if (transfer.is_set()) {
+	if (logically_set(transfer)) {
 		++total;
 	}
 
-	if (cast_spell.is_set()) {
+	if (logically_set(cast_spell)) {
 		++total;
 	}
 
-	if (wield != std::nullopt) { 
+	if (logically_set(wield)) { 
 		++total;
 	}
 
@@ -92,15 +93,15 @@ basic_player_entropy<K>& basic_player_entropy<K>::operator+=(const basic_player_
 		}
 	}
 
-	if (r.transfer.is_set()) {
+	if (logically_set(r.transfer)) {
 		transfer = r.transfer;
 	}
 
-	if (r.wield != std::nullopt) {
+	if (logically_set(r.wield)) {
 		wield = r.wield;
 	}
 
-	if (r.cast_spell.is_set()) {
+	if (logically_set(r.cast_spell)) {
 		cast_spell = r.cast_spell;
 	}
 
@@ -150,7 +151,7 @@ void basic_player_entropy<K>::clear_relevant(const cosmic_entropy_recording_opti
 
 	if (opts.overwrite_rest) {
 		cast_spell.unset();
-		wield = std::nullopt;
+		wield = {};
 		transfer = {};
 	}
 }

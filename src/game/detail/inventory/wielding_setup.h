@@ -14,8 +14,30 @@ struct basic_wielding_setup  {
 	hand_selections_array hand_selections;
 	// END GEN INTROSPECTOR
 
+	basic_wielding_setup() {
+		hand_selections[0].unset();
+		hand_selections[1].unset();
+
+		hand_selections[0].raw.version = 1337;
+		hand_selections[1].raw.version = 1337;
+	}
+
 	template <class E>
 	static this_type from_current(const E& character_entity);
+
+	static this_type bare_hands() {
+		this_type result;
+
+		for (auto& h : result.hand_selections) {
+			h = id_type::dead();
+		}
+
+		return result;
+	}
+
+	bool is_set() const {
+		return !(*this == this_type());
+	}
 
 	bool operator==(const this_type& b) const {
 		return hand_selections == b.hand_selections;  

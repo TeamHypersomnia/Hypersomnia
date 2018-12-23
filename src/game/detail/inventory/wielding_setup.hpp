@@ -36,7 +36,7 @@ entity_id get_wieldable_if_available(
 template <class I>
 template <class E>
 auto basic_wielding_setup<I>::make_viable_setup(const E& h) const {
-	basic_wielding_setup<I> output;
+	auto output = basic_wielding_setup<I>::bare_hands();
 
 	for (std::size_t i = 0; i < hand_selections.size(); ++i) {
 		if (const auto candidate_wieldable = h.get_cosmos()[hand_selections[i]]) {
@@ -65,7 +65,7 @@ bool basic_wielding_setup<I>::is_akimbo(const C& cosm) const {
 template <class I>
 template <class E>
 basic_wielding_setup<I> basic_wielding_setup<I>::from_current(const E& character_entity) {
-	basic_wielding_setup<I> output;
+	auto output = basic_wielding_setup<I>::bare_hands();
 
 	for (std::size_t i = 0; i < output.hand_selections.size(); ++i) {
 		output.hand_selections[i] = character_entity.get_if_any_item_in_hand_no(i);

@@ -9,6 +9,7 @@ enum class faction_type {
 	ATLANTIS,
 	RESISTANCE,
 
+	DEFAULT,
 	COUNT
 	// END GEN INTROSPECTOR
 };

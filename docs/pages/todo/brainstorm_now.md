@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Gather all items to the left of the hotbar
+
+- Watch out if fpset does not cause performance problems
+
 - Do something so that we don't lose work in playtesting mode
 - fix Common state crash
 

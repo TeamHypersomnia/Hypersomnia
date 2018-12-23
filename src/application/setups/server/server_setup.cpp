@@ -499,7 +499,7 @@ void server_setup::send_server_step_entropies(networked_server_step_entropy& tot
 }
 
 void server_setup::reinfer_if_necessary_for(const networked_server_step_entropy& entropy) {
-	if (entropy.general.added_player) {
+	if (logically_set(entropy.general.added_player)) {
 		cosmic::reinfer_solvable(get_arena_handle().get_cosmos());
 	}
 }
@@ -655,9 +655,8 @@ TEST_CASE("NetSerialization ServerEntropy") {
 
 	const auto naive_bytes = [&]() {
 		total_mode_player_entropy t;
-		t.mode.team_choice = { { faction_type::METROPOLIS } };
-		t.mode.item_purchase.emplace();
-		t.mode.item_purchase->spell.set<fury_of_the_aeons>();
+		t.mode.team_choice = { faction_type::METROPOLIS };
+		t.mode.item_purchase.spell.set<fury_of_the_aeons>();
 
 		total_mode_player_entropy tt;
 		tt.cosmic.cast_spell.set<ultimate_wrath_of_the_aeons>();
@@ -705,10 +704,9 @@ TEST_CASE("NetSerialization ServerEntropySecond") {
 
 	const auto naive_bytes = [&]() {
 		total_mode_player_entropy t;
-		t.mode.item_purchase.emplace();
-		t.mode.item_purchase->item.type_id.set<shootable_weapon>();
-		t.mode.item_purchase->item.raw.indirection_index = 11;
-		t.mode.item_purchase->item.raw.version = 11;
+		t.mode.item_purchase.item.type_id.set<shootable_weapon>();
+		t.mode.item_purchase.item.raw.indirection_index = 11;
+		t.mode.item_purchase.item.raw.version = 11;
 
 		total_mode_player_entropy tt;
 		tt.cosmic.cast_spell.set<ultimate_wrath_of_the_aeons>();
@@ -756,9 +754,8 @@ TEST_CASE("NetSerialization ClientEntropy") {
 	total_client_entropy sent;
 
 	const auto naive_bytes = [&]() {
-		sent.mode.team_choice = { { faction_type::RESISTANCE } };
-		sent.mode.item_purchase.emplace();
-		sent.mode.item_purchase->spell.set<haste>();
+		sent.mode.team_choice = { faction_type::RESISTANCE };
+		sent.mode.item_purchase.spell.set<haste>();
 
 		sent.cosmic.cast_spell.set<ultimate_wrath_of_the_aeons>();
 		sent.cosmic.motions[game_motion_type::MOVE_CROSSHAIR] = { 342, 432534 };

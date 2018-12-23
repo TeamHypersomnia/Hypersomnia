@@ -18,7 +18,7 @@ template <class key>
 struct basic_player_entropy {
 	// GEN INTROSPECTOR struct basic_player_entropy class key
 	spell_id cast_spell;
-	std::optional<basic_wielding_setup<key>> wield;
+	basic_wielding_setup<key> wield;
 	game_intents intents;
 	game_motions motions;
 	basic_item_slot_transfer_request<key> transfer;

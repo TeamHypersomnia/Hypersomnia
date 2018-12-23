@@ -10,6 +10,10 @@ namespace mode_commands {
 		spell_id spell;
 		// END GEN INTROSPECTOR
 
+		bool is_set() const {
+			return item.is_set() || spell.is_set();
+		}
+
 		bool operator==(const item_purchase& b) const {
 			return 
 				item == b.item

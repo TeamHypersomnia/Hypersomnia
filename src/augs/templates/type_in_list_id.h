@@ -67,7 +67,7 @@ public:
 	}
 
 	void unset() {
-		*this = type_in_list_id();
+		index = dead_value;
 	}
 
 	template <class T>

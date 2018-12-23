@@ -18,8 +18,8 @@ class cosmos;
 
 struct mode_player_entropy {
 	// GEN INTROSPECTOR struct mode_player_entropy
-	std::optional<mode_commands::team_choice> team_choice;
-	std::optional<mode_commands::item_purchase> item_purchase;
+	mode_commands::team_choice team_choice;
+	mode_commands::item_purchase item_purchase;
 	// END GEN INTROSPECTOR
 
 	void clear();
@@ -45,8 +45,8 @@ using total_client_entropy = total_mode_player_entropy;
 
 struct mode_entropy_general {
 	// GEN INTROSPECTOR struct mode_entropy_general
-	std::optional<add_player_input> added_player;
-	std::optional<mode_player_id> removed_player;
+	add_player_input added_player;
+	mode_player_id removed_player;
 	all_general_mode_commands_variant special_command;
 	// END GEN INTROSPECTOR
 

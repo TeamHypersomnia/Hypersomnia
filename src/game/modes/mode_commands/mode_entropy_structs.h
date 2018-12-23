@@ -9,6 +9,10 @@ struct add_player_input {
 	faction_type faction = faction_type::SPECTATOR;
 	// END GEN INTROSPECTOR
 
+	bool is_set() const {
+		return id.is_set();
+	}
+
 	bool operator==(const add_player_input& b) const {
 		return 
 			id == b.id

@@ -2,7 +2,7 @@
 #include <optional>
 #include "augs/math/vec2.h"
 
-enum class intent_change : unsigned char {
+enum class intent_change {
 	PRESSED,
 	RELEASED
 };

@@ -2,7 +2,7 @@
 #include <unordered_set>
 
 #include "augs/network/jitter_buffer.h"
-
+#include "augs/templates/logically_empty.h"
 #include "game/cosmos/cosmic_functions.h"
 
 #include "view/audiovisual_state/systems/interpolation_system.h"
@@ -125,7 +125,7 @@ public:
 			for (std::size_t i = 0; i < entropies.size(); ++i) {
 				/* If a new player was added, always reinfer. */
 				const auto& actual_server_step = entropies[i];
-				const bool shall_reinfer = actual_server_step.general.added_player != std::nullopt;
+				const bool shall_reinfer = logically_set(actual_server_step.general.added_player);
 
 				{
 					auto& referential_cosmos = referential_arena.get_cosmos();

@@ -509,7 +509,7 @@ void item_button::respond_to_events(const game_gui_context context, const this_i
 				if (item.alive()) {
 					if (const auto slot = item.get_current_slot()) {
 						if (slot.get_type() != slot_function::PERSONAL_DEPOSIT) {
-							wielding_setup setup;
+							auto setup = wielding_setup::bare_hands();
 							setup.hand_selections[0] = item;
 
 							const auto subject = context.get_subject_entity();

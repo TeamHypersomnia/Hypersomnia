@@ -63,8 +63,8 @@ void mode_entropy::clear() {
 }
 
 void mode_entropy_general::clear() {
-	added_player.reset();
-	removed_player.reset();
+	added_player = {};
+	removed_player = {};
 	special_command = std::monostate();
 }
 
@@ -77,11 +77,11 @@ bool mode_entropy::empty() const {
 }
 
 mode_player_entropy& mode_player_entropy::operator+=(const mode_player_entropy& b) {
-	if (b.team_choice) {
+	if (b.team_choice.is_set()) {
 		team_choice = b.team_choice;
 	}
 
-	if (b.item_purchase) {
+	if (b.item_purchase.is_set()) {
 		item_purchase = b.item_purchase;
 	}
 
@@ -94,7 +94,7 @@ mode_player_entropy& mode_player_entropy::operator+=(const mode_player_entropy& 
 
 mode_entropy_general& mode_entropy_general::operator+=(const mode_entropy_general& b) {
 	auto override_if = [&](auto& a, const auto& b) {
-		if (b != std::nullopt) {
+		if (b.is_set()) {
 			a = b;
 		}
 	};

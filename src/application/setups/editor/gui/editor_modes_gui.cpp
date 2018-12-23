@@ -87,7 +87,7 @@ mode_entropy_general editor_modes_gui::perform(const editor_settings& settings, 
 
 								mode_entropy_general cmd;
 								cmd.added_player = add_player_input {
-									new_id, new_name, faction_type::COUNT
+									new_id, new_name, faction_type::DEFAULT
 								};
 
 								output += cmd;

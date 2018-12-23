@@ -18,6 +18,7 @@
 #include "game/modes/detail/item_purchase_logic.hpp"
 #include "game/detail/buy_area_in_range.h"
 #include "game/cosmos/delete_entity.h"
+#include "augs/templates/logically_empty.h"
 
 #include "game/detail/sentience/sentience_getters.h"
 
@@ -1195,12 +1196,12 @@ void bomb_mode::add_or_remove_players(const input_type in, const mode_entropy& e
 
 	const auto& g = entropy.general;
 
-	if (g.added_player != std::nullopt) {
-		const auto& a = *g.added_player;
+	if (logically_set(g.added_player)) {
+		const auto& a = g.added_player;
 		const auto result = add_player_custom(in, a);
 		(void)result;
 
-		if (a.faction == faction_type::COUNT) {
+		if (a.faction == faction_type::DEFAULT) {
 			auto_assign_faction(in, a.id);
 		}
 		else {
@@ -1208,8 +1209,8 @@ void bomb_mode::add_or_remove_players(const input_type in, const mode_entropy& e
 		}
 	}
 
-	if (g.removed_player != std::nullopt) {
-		remove_player(in, step, *g.removed_player);
+	if (logically_set(g.removed_player)) {
+		remove_player(in, step, g.removed_player);
 	}
 }
 
@@ -1228,14 +1229,14 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 		if (const auto player_data = find(id)) {
 			const auto& maybe_purchase = commands.item_purchase;
 
-			if (maybe_purchase && get_buy_seconds_left(in) > 0.f) {
+			if (logically_set(maybe_purchase) && get_buy_seconds_left(in) > 0.f) {
 				on_player_handle(cosm, id, [&](const auto& player_handle) {
 					if constexpr(!is_nullopt_v<decltype(player_handle)>) {
 						if (!buy_area_in_range(player_handle)) {
 							return;
 						}
 
-						const auto& p = *maybe_purchase;
+						const auto& p = maybe_purchase;
 						auto& stats = player_data->stats;
 						auto& money = stats.money;
 						auto& done_purchases = stats.round_state.done_purchases;
@@ -1314,10 +1315,10 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 				});
 			}
 
-			if (const auto& new_choice = commands.team_choice; new_choice != std::nullopt) {
+			if (const auto& new_choice = commands.team_choice; logically_set(new_choice)) {
 				const auto previous_faction = player_data->faction;
 
-				const auto f = new_choice->target_team;
+				const auto f = new_choice.target_team;
 
 				// TODO: Notify GUI about the result.
 
@@ -1385,7 +1386,7 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 						player_data->round_when_chosen_faction = current_round;
 					}
 
-					if (f == faction_type::COUNT) {
+					if (f == faction_type::DEFAULT) {
 						/* Auto-select */
 						return auto_assign_faction(in, id);
 					}

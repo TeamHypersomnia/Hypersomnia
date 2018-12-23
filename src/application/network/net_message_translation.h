@@ -105,27 +105,18 @@ namespace net_messages {
 		;
 	}
 
-	template <class Stream, class V>
-	bool serialize(Stream& s, std::optional<V>& i) {
-		if (Stream::IsReading) {
-			i.emplace();
-		}
-
-		return serialize(s, *i);
-	}
-
 	template <class Stream>
 	bool serialize(Stream& s, total_mode_player_entropy& p) {
 		auto& m = p.mode;
-		bool has_team_choice = !logically_empty(m.team_choice);
-		bool has_item_purchase = !logically_empty(m.item_purchase);
+		bool has_team_choice = logically_set(m.team_choice);
+		bool has_item_purchase = logically_set(m.item_purchase);
 
 		auto& c = p.cosmic;
-		bool has_cast_spell = !logically_empty(c.cast_spell);
-		bool has_wield = !logically_empty(c.wield);
-		bool has_intents = !logically_empty(c.intents);
-		bool has_motions = !logically_empty(c.motions);
-		bool has_transfer = !logically_empty(c.transfer);
+		bool has_cast_spell = logically_set(c.cast_spell);
+		bool has_wield = logically_set(c.wield);
+		bool has_intents = logically_set(c.intents);
+		bool has_motions = logically_set(c.motions);
+		bool has_transfer = logically_set(c.transfer);
 
 		serialize_bool(s, has_team_choice);
 		serialize_bool(s, has_item_purchase);
@@ -224,10 +215,10 @@ namespace net_messages {
 	bool serialize(Stream& s, ::networked_server_step_entropy& i) {
 		auto& g = i.general;
 
-		bool has_players = !logically_empty(i.players);
-		bool has_added_player = !logically_empty(g.added_player);
-		bool has_removed_player = !logically_empty(g.removed_player);
-		bool has_special_command = !logically_empty(g.special_command);
+		bool has_players = logically_set(i.players);
+		bool has_added_player = logically_set(g.added_player);
+		bool has_removed_player = logically_set(g.removed_player);
+		bool has_special_command = logically_set(g.special_command);
 
 		serialize_bool(s, has_players);
 		serialize_bool(s, has_added_player);

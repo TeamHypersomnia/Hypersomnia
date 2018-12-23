@@ -99,7 +99,7 @@ wielding_setup character_gui::get_setup_from_button_indices(
 	const int hotbar_button_index_for_primary_selection,
 	const int hotbar_button_index_for_secondary_selection
 ) const {
-	wielding_setup output;
+	auto output = wielding_setup::bare_hands();
 
 	const auto primary = hotbar_button_index_for_primary_selection;
 	const auto secondary = hotbar_button_index_for_secondary_selection;
@@ -219,7 +219,7 @@ wielding_setup character_gui::make_wielding_setup_for_previous_hotbar_selection_
 			HOT_LOG("Same as previous setup.");
 
 			auto make_setup_with = [&](const auto& candidate_entity) {
-				wielding_setup setup;
+				auto setup = wielding_setup::bare_hands();
 				setup.hand_selections[0] = candidate_entity;
 				return setup;
 			};
@@ -280,7 +280,7 @@ wielding_setup character_gui::make_wielding_setup_for_previous_hotbar_selection_
 			}
 
 			HOT_LOG("No owned item candidate.");
-			return wielding_setup();
+			return wielding_setup::bare_hands();
 		}
 		else {
 			HOT_LOG_NVPS(cosm[previous_hands[0]]);

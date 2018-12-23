@@ -23,7 +23,7 @@ struct character_gui {
 	std::array<action_button, 10> action_buttons;
 	std::array<value_bar, value_bar_count> value_bars;
 
-	wielding_setup last_setup;
+	wielding_setup last_setup = wielding_setup::bare_hands();
 	bool was_last_setup_set = false;
 	int currently_held_hotbar_button_index = -1;
 
