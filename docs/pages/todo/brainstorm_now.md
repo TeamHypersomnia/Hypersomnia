@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- don't turn off menus on buying replenishables
+
 - Gather all items to the left of the hotbar
 
 - Watch out if fpset does not cause performance problems
