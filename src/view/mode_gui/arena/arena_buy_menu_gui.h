@@ -39,5 +39,7 @@ struct arena_buy_menu_gui {
 	/* Always initialize as hidden */
 
 	bool control(app_ingame_intent_input);
+	bool escape();
+	void hide();
 	std::optional<mode_commands::item_purchase> perform_imgui(input);
 };

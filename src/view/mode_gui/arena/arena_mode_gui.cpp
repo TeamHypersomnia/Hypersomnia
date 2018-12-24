@@ -44,8 +44,7 @@ bool arena_gui_state::escape() {
 		return true;
 	}
 
-	if (buy_menu.show) {
-		buy_menu.show = false;
+	if (buy_menu.escape()) {
 		return true;
 	}
 

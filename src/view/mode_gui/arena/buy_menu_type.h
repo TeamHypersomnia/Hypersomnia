@@ -4,12 +4,12 @@ enum class buy_menu_type {
 	// GEN INTROSPECTOR enum class buy_menu_type
 	MAIN,
 
-	MELEE,
 	PISTOLS,
-	SUBMACHINE_GUNS,
 	RIFLES,
-	SHOTGUNS,
+	MELEE,
+	SUBMACHINE_GUNS,
 	HEAVY_GUNS,
+	SHOTGUNS,
 	GRENADES,
 	SPELLS,
 	TOOLS

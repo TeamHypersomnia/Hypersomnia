@@ -21,21 +21,50 @@
 #include "view/mode_gui/arena/arena_mode_gui_settings.h"
 #include "game/detail/buy_area_in_range.h"
 
+bool should_close_after_purchase(buy_menu_type b) {
+	switch (b) {
+		case buy_menu_type::TOOLS: return false;
+		case buy_menu_type::SPELLS: return false;
+		case buy_menu_type::MELEE: return false;
+		case buy_menu_type::GRENADES: return false;
+		default: return true;
+	}
+}
+
 static auto make_hotkey_map() {
 	using namespace augs::event::keys;
 
 	arena_buy_menu_hotkey_map m;
-	m[key::Q] = buy_menu_type::MELEE;
-	m[key::W] = buy_menu_type::PISTOLS;
-	m[key::E] = buy_menu_type::SUBMACHINE_GUNS;
-	m[key::R] = buy_menu_type::RIFLES;
-	m[key::T] = buy_menu_type::SHOTGUNS;
-	m[key::Y] = buy_menu_type::HEAVY_GUNS;
-	m[key::U] = buy_menu_type::GRENADES;
-	m[key::I] = buy_menu_type::SPELLS;
-	m[key::O] = buy_menu_type::TOOLS;
+	m[key::_1] = buy_menu_type::PISTOLS;
+	m[key::_2] = buy_menu_type::RIFLES;
+	m[key::_3] = buy_menu_type::MELEE;
+	m[key::_4] = buy_menu_type::SUBMACHINE_GUNS;
+	m[key::_5] = buy_menu_type::HEAVY_GUNS;
+	m[key::_6] = buy_menu_type::SHOTGUNS;
+	m[key::_7] = buy_menu_type::GRENADES;
+	m[key::_8] = buy_menu_type::SPELLS;
+	m[key::_9] = buy_menu_type::TOOLS;
 
 	return m;
+}
+
+void arena_buy_menu_gui::hide() {
+	show = false;
+	current_menu = buy_menu_type::MAIN;
+}
+
+bool arena_buy_menu_gui::escape() {
+	if (!show) {
+		return false;
+	}
+
+	if (current_menu != buy_menu_type::MAIN) {
+		current_menu = buy_menu_type::MAIN;
+		return true;
+	}
+
+	hide();
+	return true;
 }
 
 bool arena_buy_menu_gui::control(app_ingame_intent_input in) {
@@ -49,7 +78,13 @@ bool arena_buy_menu_gui::control(app_ingame_intent_input in) {
 
 		if (const auto it = mapped_or_nullptr(in.controls, key)) {
 			if (*it == app_ingame_intent_type::OPEN_BUY_MENU) {
-				show = !show;
+				if (show) {
+					hide();
+				}
+				else {
+					show = true;
+				}
+
 				return true;
 			}
 		}
@@ -66,9 +101,11 @@ bool arena_buy_menu_gui::control(app_ingame_intent_input in) {
 	if (ch == key_change::PRESSED) {
 		const auto key = in.e.get_key();
 
-		if (const auto it = mapped_or_nullptr(m, key)) {
-			current_menu = *it;
-			return true;
+		if (current_menu == buy_menu_type::MAIN) {
+			if (const auto it = mapped_or_nullptr(m, key)) {
+				current_menu = *it;
+				return true;
+			}
 		}
 
 		if (const auto n = get_number(key)) {
@@ -105,6 +142,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 	using namespace augs::imgui;
 	(void)in;
 
+	auto next_requested_menu = current_menu;
 	const auto& subject = in.subject;
 	const auto& cosm = subject.get_cosmos();
 	const auto money_color = in.money_indicator_color;
@@ -114,7 +152,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 	}
 
 	if (!buy_area_in_range(subject)) {
-		show = false;
+		hide();
 		return std::nullopt;
 	}
 
@@ -124,7 +162,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 	ImGui::SetNextWindowPosCenter();
 
-	ImGui::SetNextWindowSize((vec2(ImGui::GetIO().DisplaySize) * 0.5f).operator ImVec2(), ImGuiCond_FirstUseEver);
+	ImGui::SetNextWindowSize((vec2(ImGui::GetIO().DisplaySize) * 0.7f).operator ImVec2(), ImGuiCond_FirstUseEver);
 
 	const auto window_name = "Buy menu";
 	auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar);
@@ -192,6 +230,10 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		}
 
 		result = msg;
+
+		if (::should_close_after_purchase(current_menu)) {
+			next_requested_menu = buy_menu_type::MAIN;
+		}
 	};
 
 	auto general_purchase_button = [&](
@@ -293,15 +335,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		const spell_id& s_id, 
 		const int index
 	) {
-		auto& requested = requested_weapons;
 		const auto& selected = selected_weapons;
-
-		if (requested.size() > 0) {
-			if (requested.front() == index) {
-				requested.erase(requested.begin());
-				set_result(s_id);
-			}
-		}
 
 		const auto additional_id = "s";
 		const auto hotkey_text = typesafe_sprintf("(%x)", index);
@@ -338,6 +372,17 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			[&](auto num_affordable) {
 				num_affordable = std::min(num_affordable, 1);
 
+				auto& requested = requested_weapons;
+
+				if (requested.size() > 0) {
+					if (requested.front() == index) {
+						requested.erase(requested.begin());
+						if (num_affordable > 0) {
+							set_result(s_id);
+						}
+					}
+				}
+
 				_on_spell(s_id,  [&](const auto& spell_data) {
 					(void)spell_data;
 					text_disabled("(Can buy");
@@ -358,16 +403,8 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		if (!is_alive(cosm, f_id)) {
 			return false;
 		}
-
-		auto& requested = b == button_type::REPLENISHABLE ? requested_replenishables : requested_weapons;
 		const auto& selected = b == button_type::REPLENISHABLE ? selected_replenishables : selected_weapons;
 
-		if (requested.size() > 0) {
-			if (requested.front() == index) {
-				requested.erase(requested.begin());
-				set_result(f_id);
-			}
-		}
 
 		const auto num_carryable = num_carryable_pieces(
 			subject,
@@ -422,6 +459,18 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			},
 			[&](const auto num_affordable) {
 				cosm.on_flavour(f_id, [&](const auto& typed_flavour) {
+					auto& requested = b == button_type::REPLENISHABLE ? requested_replenishables : requested_weapons;
+
+					if (requested.size() > 0) {
+						if (requested.front() == index) {
+							requested.erase(requested.begin());
+
+							if (num_affordable > 0) {
+								set_result(f_id);
+							}
+						}
+					}
+
 					(void)typed_flavour;
 					text_disabled("(Can buy");
 					ImGui::SameLine();
@@ -564,38 +613,58 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			}
 		}
 
+#if BUY_CATEGORIES_SEPARATE
 		ImGui::BeginChild("Child1", ImVec2(ImGui::GetWindowContentRegionWidth() * 0.3f, 0));
+#endif
 
 		centered_text("BUY WEAPONS");
 
-		augs::for_each_enum_except_bounds([&](const buy_menu_type e) {
-			if (e == buy_menu_type::MAIN) {
-				return;
-			}
+		if (current_menu == buy_menu_type::MAIN) {
+			centered_text("CHOOSE CATEGORY");
 
-			static const auto m = make_hotkey_map();
+			auto do_buttons_for_buy_categories = [&](const buy_menu_type e) {
+				if (e == buy_menu_type::MAIN) {
+					return;
+				}
 
-			const auto bound_key = key_or_default(m, e);
+				static const auto m = make_hotkey_map();
 
-			ensure(bound_key != augs::event::keys::key::INVALID);
+				const auto bound_key = key_or_default(m, e);
 
-			const auto hotkey_text = typesafe_sprintf("(%x)", key_to_string(bound_key));
+				ensure(bound_key != augs::event::keys::key::INVALID);
 
-			text_disabled(hotkey_text);
+				const auto hotkey_text = typesafe_sprintf("(%x)", key_to_string(bound_key));
+
+				text_disabled(hotkey_text);
+				ImGui::SameLine();
+
+				const auto label = format_enum(e);
+
+				if (ImGui::Selectable(label.c_str(), e == current_menu)) {
+					next_requested_menu = e;
+				}
+			};
+
+			augs::for_each_enum_except_bounds(do_buttons_for_buy_categories);
+
+			text_disabled("   ");
 			ImGui::SameLine();
 
-			const auto label = format_enum(e);
-
-			if (ImGui::Selectable(label.c_str(), e == current_menu)) {
-				current_menu = e;
+			if (ImGui::Selectable("Cancel")) {
+				hide();
+				return result;
 			}
-		});
+		}
 
+#if BUY_CATEGORIES_SEPARATE
 		ImGui::EndChild();
+#endif
 
 		if (current_menu != buy_menu_type::MAIN) {
+#if BUY_CATEGORIES_SEPARATE
 			ImGui::SameLine();
 			ImGui::BeginChild("Child2", ImVec2(0, 0), false);
+#endif
 			centered_text(to_uppercase(format_enum(current_menu)));
 
 			auto do_item_menu = [&](
@@ -638,6 +707,13 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				if (!buyable_items.empty()) {
 					ImGui::Separator();
 				}
+
+				text_disabled("(ESC)");
+				ImGui::SameLine();
+
+				if (ImGui::Selectable("Cancel")) {
+					next_requested_menu = buy_menu_type::MAIN;
+				}
 			};
 
 			auto do_spells_menu = [&]() {
@@ -675,6 +751,13 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 				if (!buyable_spells.empty()) {
 					ImGui::Separator();
+				}
+
+				text_disabled("(ESC)");
+				ImGui::SameLine();
+
+				if (ImGui::Selectable("Cancel")) {
+					next_requested_menu = buy_menu_type::MAIN;
 				}
 			};
 
@@ -811,7 +894,9 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				default: break;
 			}
 
+#if BUY_CATEGORIES_SEPARATE
 			ImGui::EndChild();
+#endif
 		}
 		else {
 			requested_weapons.clear();
@@ -821,5 +906,6 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		text_color("You are not in the designated buy area!", red);
 	}
 
+	current_menu = next_requested_menu;
 	return result;
 }
