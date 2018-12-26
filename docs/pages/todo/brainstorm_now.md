@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- autodrop cue sound threshold mult 
+
 - Make a flag for autodropping of magazines
 	- And implement this gui-side
 	- "Autodrop magazines of dropped weapons"

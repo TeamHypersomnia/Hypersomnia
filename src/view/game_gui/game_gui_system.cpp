@@ -22,6 +22,7 @@
 #include "view/game_gui/elements/item_button.h"
 #include "game/messages/changed_identities_message.h"
 #include "game/detail/weapon_like.h"
+#include "view/game_gui/elements/game_gui_settings.h"
 
 #include "game/detail/inventory/wielding_setup.hpp"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
@@ -357,6 +358,49 @@ void game_gui_system::advance(
 	const game_gui_context context,
 	const augs::delta dt
 ) {
+	const auto subject = context.get_subject_entity();
+
+	if (subject && context.dependencies.game_gui.autocollapse_hotbar_buttons) {
+		static_assert(std::is_trivially_copyable_v<hotbar_button>);
+
+		auto& h = context.get_character_gui().hotbar_buttons;
+
+		auto is_tied_to_right = [&](const auto& b) {
+			const auto assigned_item = b.get_assigned_entity(subject);
+
+			if (assigned_item.dead()) {
+				return false;
+			}
+
+			return should_fill_hotbar_from_right(assigned_item);
+		};
+
+		auto is_tied_to_left = [&](const auto& b) {
+			const auto assigned_item = b.get_assigned_entity(subject);
+
+			if (assigned_item.dead()) {
+				return false;
+			}
+
+			return !should_fill_hotbar_from_right(assigned_item);
+		};
+
+		auto is_unassigned = [&](const auto& b) {
+			return b.get_assigned_entity(subject).dead();
+		};
+
+		const auto right_bound = find_in_if(h, is_tied_to_right);
+		const auto rright_bound = rfind_in_if(h, is_tied_to_left);
+
+		for (auto it = std::remove_if(h.begin(), right_bound, is_unassigned); it != right_bound; ++it) {
+			*it = {};
+		}
+
+		for (auto it = std::remove_if(h.rbegin(), rright_bound, is_unassigned); it != rright_bound; ++it) {
+			*it = {};
+		}
+	}
+
 	world.advance_elements(context, dt);
 }
 

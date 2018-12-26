@@ -133,6 +133,11 @@ auto find_in_if(Container& v, C callback) {
 	return std::find_if(v.begin(), v.end(), callback);
 }
 
+template<class Container, class C>
+auto rfind_in_if(Container& v, C callback) {
+	return std::find_if(v.rbegin(), v.rend(), callback);
+}
+
 template <class Container, class K>
 bool found_in(const Container& v, const K& l) {
 	if constexpr(has_member_find_v<Container, K>) {

@@ -365,7 +365,8 @@ return {
     secondary_selected_color = "86 156 214 255"
   },
   game_gui = {
-
+    autodrop_magazines_of_dropped_weapons = true,
+    autocollapse_hotbar_buttons = true
   },
   interpolation = {
     enabled = true,

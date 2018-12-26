@@ -4,6 +4,7 @@
 
 struct game_gui_settings {
 	// GEN INTROSPECTOR struct game_gui_settings
-	int dummy = 0;
+	bool autodrop_magazines_of_dropped_weapons = true;
+	bool autocollapse_hotbar_buttons = true;
 	// END GEN INTROSPECTOR
 };
