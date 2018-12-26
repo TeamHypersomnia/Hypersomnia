@@ -564,12 +564,12 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					return;
 				}
 
-				auto do_drop = [&](const auto& item_inside) {
-					if (item_inside.dead()) {
+				auto do_drop = [&](const auto& item) {
+					if (item.dead()) {
 						return;
 					}
 
-					auto request = item_slot_transfer_request::drop(item_inside);
+					auto request = item_slot_transfer_request::drop(item);
 
 					{
 						const bool apply_more_force = is_throw || r.intent == game_intent_type::THROW_SECONDARY;
@@ -672,6 +672,16 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 
 				if (is_drop_like) {
 					const auto current_setup = wielding_setup::from_current(typed_subject);
+
+					if (is_currently_reloading(typed_subject)) {
+						const auto wielded_items = typed_subject.get_wielded_items();
+
+						for (const auto& w : wielded_items) {
+							do_drop(cosm[w]);
+						}
+
+						return;
+					}
 
 					auto drop = [&](const auto& item, const auto) {
 						if constexpr(is_nullopt_v<decltype(item)>) {
