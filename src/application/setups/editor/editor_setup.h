@@ -430,4 +430,6 @@ public:
 
 	editor_arena_handle<false> get_arena_handle();
 	editor_arena_handle<true> get_arena_handle() const;
+
+	bool requires_cursor() const;
 };

@@ -12,7 +12,6 @@ enum class custom_imgui_result {
 enum class setup_escape_result {
 	IGNORE,
 	LAUNCH_INGAME_MENU,
-	SWITCH_TO_GAME_GUI,
 	GO_TO_MAIN_MENU,
 	JUST_FETCH
 };

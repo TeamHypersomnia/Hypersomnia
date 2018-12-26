@@ -127,3 +127,7 @@ void arena_gui_mixin<D>::draw_custom_gui(const draw_setup_gui_input& in) const {
 	);
 }
 
+template <class D>
+bool arena_gui_mixin<D>::requires_cursor() const {
+	return arena_gui.requires_cursor();
+}

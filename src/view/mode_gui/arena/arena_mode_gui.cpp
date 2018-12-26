@@ -651,6 +651,10 @@ void arena_gui_state::draw_mode_gui(
 	}
 }
 
+bool arena_gui_state::requires_cursor() const {
+	return choose_team.show || buy_menu.show;
+}
+
 template void arena_gui_state::draw_mode_gui(
 	const draw_setup_gui_input&,
 	const draw_mode_gui_input&,

@@ -782,7 +782,7 @@ setup_escape_result editor_setup::escape() {
 		}
 
 		player().pause();
-		return setup_escape_result::SWITCH_TO_GAME_GUI;
+		return setup_escape_result::JUST_FETCH;
 	}
 	else if (anything_opened() && view().marks.state != augs::marks_state::NONE) {
 		view().marks.close();
@@ -2071,6 +2071,14 @@ editor_arena_handle<false> editor_setup::get_arena_handle() {
 
 editor_arena_handle<true> editor_setup::get_arena_handle() const {
 	return player().get_arena_handle(folder());
+}
+
+bool editor_setup::requires_cursor() const {
+	if (is_gameplay_on()) {
+		return arena_base::requires_cursor();
+	}
+
+	return true;
 }
 
 template struct augs::marks<camera_eye>;

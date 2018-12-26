@@ -21,6 +21,7 @@ struct arena_gui_mixin {
 
 	std::optional<camera_eye> find_current_camera_eye() const;
 	void draw_custom_gui(const draw_setup_gui_input& in) const;
+	bool requires_cursor() const;
 };
 
 #include "view/mode_gui/arena/arena_gui_mixin.hpp"

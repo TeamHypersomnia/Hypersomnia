@@ -49,4 +49,6 @@ struct arena_gui_state {
 		const M& mode, 
 		const typename M::const_input&
 	) const;
+
+	bool requires_cursor() const;
 };

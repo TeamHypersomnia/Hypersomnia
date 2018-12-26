@@ -378,6 +378,12 @@ int work(const int argc, const char* const * const argv) try {
 		}
 	};
 
+	static auto setup_requires_cursor = []() {
+		return visit_current_setup([&](const auto& s) {
+			return s.requires_cursor();
+		});
+	};
+
 	static auto on_specific_setup = [&](auto callback) -> decltype(auto) {
 		using T = remove_cref<argument_t<decltype(callback), 0>>;
 
@@ -405,7 +411,7 @@ int work(const int argc, const char* const * const argv) try {
 
 	/* TODO: We need to have one game gui per cosmos. */
 	static game_gui_system game_gui;
-	static bool game_gui_mode = false;
+	static bool game_gui_mode_flag = false;
 
 	static auto load_all = [&](const all_viewables_defs& new_defs) {
 		streaming.load_all({
@@ -420,6 +426,7 @@ int work(const int argc, const char* const * const argv) try {
 	};
 
 	static auto setup_launcher = [&](auto&& setup_init_callback) {
+		game_gui_mode_flag = false;
 		get_audiovisuals().get<sound_system>().clear();
 
 		network_stats = {};
@@ -446,7 +453,7 @@ int work(const int argc, const char* const * const argv) try {
 				std::forward<decltype(args)>(args)...
 			);
 
-			game_gui_mode = true;
+			game_gui_mode_flag = true;
 		});
 	};
 
@@ -625,7 +632,7 @@ int work(const int argc, const char* const * const argv) try {
 			}
 
 			case T::SWITCH_GAME_GUI_MODE: {
-				bool& f = game_gui_mode;
+				bool& f = game_gui_mode_flag;
 				f = !f;
 				return true;
 			}
@@ -1062,6 +1069,12 @@ int work(const int argc, const char* const * const argv) try {
 			The result of the call, which is the collection of new game commands, will be passed further down the loop. 
 		*/
 
+		auto game_gui_mode = game_gui_mode_flag;
+
+		if (setup_requires_cursor()) {
+			game_gui_mode = true;
+		}
+
 		const auto result = [&]() -> input_pass_result {
 			input_pass_result out;
 
@@ -1321,7 +1334,6 @@ int work(const int argc, const char* const * const argv) try {
 						else if (!visit_current_setup([&](auto& setup) {
 							switch (setup.escape()) {
 								case setup_escape_result::LAUNCH_INGAME_MENU: ingame_menu.show = true; return true;
-								case setup_escape_result::SWITCH_TO_GAME_GUI: game_gui_mode = true; return true;
 								case setup_escape_result::JUST_FETCH: return true;
 								case setup_escape_result::GO_TO_MAIN_MENU: launch_setup(launch_type::MAIN_MENU); return true;
 								default: return false;
