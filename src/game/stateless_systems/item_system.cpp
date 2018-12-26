@@ -367,7 +367,20 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 				const auto old_mag_slot = old_mag.get_current_slot();
 
 				auto drop_if_zero_ammo = [&]() {
-					if (count_charges_in_deposit(old_mag) <= 0) {
+					const auto keep_mags_above_charges = [&]() {
+						if (concerned_slot) {
+							if (const auto maybe_gun = concerned_slot.get_container()) {
+								if (const auto gun_def = maybe_gun.template find<invariants::gun>()) {
+									const auto cued_count = gun_def->num_last_bullets_to_trigger_low_ammo_cue;
+									return cued_count;
+								}
+							}
+						}
+
+						return 0u;
+					}();
+
+					if (count_charges_in_deposit(old_mag) <= static_cast<int>(keep_mags_above_charges)) {
 						drop_mag_to_ground(old_mag);
 					}
 				};
