@@ -283,7 +283,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::item item;
-			item.space_occupied_per_charge = to_space_units("80000");
+			item.space_occupied_per_charge = to_space_units("30");
 			item.categories_for_slot_compatibility = { item_category::GENERAL, item_category::BELT_WEARABLE };
 			item.specific_to = faction_type::METROPOLIS;
 			item.standard_price = static_cast<money_type>(500);

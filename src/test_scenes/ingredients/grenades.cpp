@@ -307,7 +307,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::item item;
-			item.space_occupied_per_charge = to_space_units("40000");
+			item.space_occupied_per_charge = to_space_units("30");
 			item.categories_for_slot_compatibility = { item_category::GENERAL, item_category::BACK_WEARABLE };
 			item.wear_sound.id = to_sound_id(test_scene_sound_id::BACKPACK_WEAR);
 
@@ -323,7 +323,7 @@ namespace test_flavours {
 			fuse.set_bomb_vars(1500.f, 10000.f);
 #else
 			fuse.fuse_delay_ms = 35000.f;
-			fuse.set_bomb_vars(1500.f, 5000.f);
+			fuse.set_bomb_vars(1500.f, 7000.f);
 #endif
 			fuse.beep_sound.id = to_sound_id(test_scene_sound_id::BEEP);
 			fuse.beep_sound.modifier.doppler_factor = 0.5f;

@@ -4,7 +4,7 @@ branches:
     - master
 
 image: Visual Studio 2017 Preview
-configuration: RelWithDebInfo
+configuration: Release
 build:
   verbosity: detailed
 
