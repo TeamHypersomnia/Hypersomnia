@@ -172,7 +172,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 	cosm.for_each_having<components::gun>(
 		[&](const auto& gun_entity) {
-			const auto when_transferred = gun_entity.template get<components::item>().get_raw_component().when_last_transferred;
+			const auto when_transferred = gun_entity.when_last_transferred();
 
 			const auto gun_transform = gun_entity.get_logic_transform();
 			const auto muzzle_transform = ::calc_muzzle_transform(gun_entity, gun_transform);

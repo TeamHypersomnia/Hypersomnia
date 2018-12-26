@@ -11,6 +11,8 @@ namespace augs {
 
 		stepped_timestamp operator-(const stepped_timestamp b) const;
 
+		bool operator<(const stepped_timestamp) const;
+		bool operator>(const stepped_timestamp) const;
 		bool operator>=(const stepped_timestamp) const;
 		bool operator==(const stepped_timestamp) const;
 		bool operator!=(const stepped_timestamp) const;

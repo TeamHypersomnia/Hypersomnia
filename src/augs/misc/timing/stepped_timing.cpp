@@ -12,6 +12,14 @@ namespace augs {
 		return step >= b.step;
 	}
 
+	bool stepped_timestamp::operator>(const stepped_timestamp b) const {
+		return step > b.step;
+	}
+
+	bool stepped_timestamp::operator<(const stepped_timestamp b) const {
+		return step < b.step;
+	}
+
 	bool stepped_timestamp::operator==(const stepped_timestamp b) const {
 		return step == b.step;
 	}

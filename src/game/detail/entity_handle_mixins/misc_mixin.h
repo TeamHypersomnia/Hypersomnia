@@ -109,6 +109,11 @@ public:
 		return self.get_meta().when_born;
 	}
 
+	auto when_last_transferred() const {
+		const auto self = *static_cast<const E*>(this);
+		return self.template get<components::item>().get_raw_component().when_last_transferred;
+	}
+
 	auto get_flavour_id() const {
 		const auto self = *static_cast<const E*>(this);
 

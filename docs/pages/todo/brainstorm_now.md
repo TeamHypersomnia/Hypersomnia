@@ -8,8 +8,6 @@ summary: That which we are brainstorming at the moment.
 
 - fix nades not dropping when switching weapons
 
-- autodrop cue sound threshold mult 
-
 - Make a flag for autodropping of magazines
 	- And implement this gui-side
 	- "Autodrop magazines of dropped weapons"

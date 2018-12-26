@@ -81,18 +81,15 @@ decltype(auto) basic_wielding_setup<I>::on_more_recent_item(C& cosm, F&& callbac
 	const auto entity_1 = cosm[hand_selections[1]];
 
 	if (entity_0 && entity_1) {
-		const auto& item_0 = entity_0.template get<components::item>();
-		const auto& item_1 = entity_1.template get<components::item>();
-
 		auto when = [&](const auto& it) {
-			return it.get_raw_component().when_last_transferred.step;
+			return it.when_last_transferred();
 		};
 
-		if (when(item_0) > when(item_1)) {
+		if (when(entity_0) > when(entity_1)) {
 			return callback(entity_0, 0);
 		}
 
-		if (when(item_1) > when(item_0)) {
+		if (when(entity_1) > when(entity_0)) {
 			return callback(entity_1, 1);
 		}
 	}

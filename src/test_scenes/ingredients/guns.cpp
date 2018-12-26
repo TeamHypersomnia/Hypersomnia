@@ -1890,7 +1890,7 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::BOLT_ACTION;
 			gun_def.muzzle_velocity = {5200.f, 5200.f};
-			gun_def.shot_cooldown_ms = 350.f;
+			gun_def.shot_cooldown_ms = 150.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::AUTOMATIC_SHOTGUN_CHAMBERING);
 			gun_def.allow_charge_in_chamber_magazine_when_chamber_loaded = false;
 

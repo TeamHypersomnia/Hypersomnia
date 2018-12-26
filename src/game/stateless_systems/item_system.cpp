@@ -553,6 +553,7 @@ void item_system::pick_up_touching_items(const logic_step step) {
 void item_system::handle_throw_item_intents(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	const auto& requests = step.get_queue<messages::intent_message>();
+	const auto& clk = cosm.get_clock();
 
 	for (auto r : requests) {
 		if (r.was_pressed()) {
@@ -593,17 +594,30 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					std::array<transformr, 2> positions;
 					int thrown_melees = 0;
 
+					const auto& fighter_def = typed_subject.template get<invariants::melee_fighter>();
+
 					for (const auto& w : wielded_items) {
 						const auto h = cosm[w];
 
-						if (h.template has<components::melee>()) {
+						if (const auto melee = h.template find<invariants::melee>()) {
+							const bool transfer_cooldown_persists = clk.lasts(
+								fighter_def.throw_cooldown_ms,
+								h.when_last_transferred()
+							);
+
+							if (transfer_cooldown_persists) {
+#if ENABLE_TRANSFER_THROW_COOLDOWNS
+								thrown_melees = 0;
+								return;
+#endif
+							}
+
 							positions[thrown_melees++] = h.get_logic_transform();
 						}
 					}
 
 					if (thrown_melees > 0) {
 						auto& fighter = typed_subject.template get<components::melee_fighter>();
-						const auto& fighter_def = typed_subject.template get<invariants::melee_fighter>();
 						
 						const bool suitable_state = 
 							fighter.state == melee_fighter_state::READY
