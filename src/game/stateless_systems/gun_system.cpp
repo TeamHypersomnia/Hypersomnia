@@ -172,12 +172,17 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 	cosm.for_each_having<components::gun>(
 		[&](const auto& gun_entity) {
+			const auto when_transferred = gun_entity.template get<components::item>().get_raw_component().when_last_transferred;
+
 			const auto gun_transform = gun_entity.get_logic_transform();
 			const auto muzzle_transform = ::calc_muzzle_transform(gun_entity, gun_transform);
 
 			const auto capability = gun_entity.get_owning_transfer_capability();
 
 			auto& gun = gun_entity.template get<components::gun>();
+			const auto& gun_def = gun_entity.template get<invariants::gun>();
+
+			const bool transfer_cooldown_passed = clk.is_ready(gun_def.shot_cooldown_ms, when_transferred);
 
 			if (capability.dead()) {
 				/* Only process autonomous gun logic */
@@ -204,8 +209,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 					return out;
 				}();
-
-				const auto& gun_def = gun_entity.template get<invariants::gun>();
 
 				//const bool has_secondary_function = false;
 
@@ -245,7 +248,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 				auto try_to_fire_interval = [&]() -> bool {
 					if (primary_trigger_pressed) {
-						if (clk.try_to_fire_and_reset(gun_def.shot_cooldown_ms, gun.when_last_fired)) {
+						if (transfer_cooldown_passed && clk.try_to_fire_and_reset(gun_def.shot_cooldown_ms, gun.when_last_fired)) {
 							gun.when_last_played_trigger_effect = clk.now;
 
 							if (gun_def.action_mode != gun_action_type::AUTOMATIC) {
@@ -259,7 +262,9 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					return false;
 				};
 
-				auto try_to_play_trigger_sound = [&]() {
+				auto try_to_play_trigger_pull_sound = [&]() {
+					/* This server as a cue for that the weapon is empty. */
+
 					if (primary_trigger_pressed) {
 						if (clk.try_to_fire_and_reset(200.f, gun.when_last_played_trigger_effect)) {
 							const auto& chosen_effect = gun_def.trigger_pull_sound;
@@ -328,7 +333,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						}
 					}
 					else {
-						try_to_play_trigger_sound();
+						try_to_play_trigger_pull_sound();
 					}
 				}
 				else {
@@ -338,20 +343,33 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						return chamber_slot.get_items_inside().size();
 					};
 					
-					if (get_num_in_chamber() == 0) {
+					if (get_num_in_chamber() == 0 ) {
+						const bool feasible_wielding =
+							wielding == wielding_type::SINGLE_WIELDED
+							|| (wielding == wielding_type::DUAL_WIELDED && gun_def.allow_chambering_with_akimbo)
+						;
+
 						auto& progress = gun.chambering_progress_ms;
 
-						if (progress == 0.f) {
-							try_to_play_trigger_sound();
-						}
+						auto interrupt_chambering = [&]() {
+							if (progress > 0.f) {
+								const auto& chosen_effect = gun_def.chambering_sound;
 
-						if (const auto next_cartridge = find_next_cartridge(gun_entity); next_cartridge.is_set()) {
-							const bool feasible_wielding =
-								wielding == wielding_type::SINGLE_WIELDED
-								|| (wielding == wielding_type::DUAL_WIELDED && gun_def.allow_chambering_with_akimbo)
-							;
+								messages::stop_sound_effect stop;
+								stop.match_chased_subject = gun_entity;
+								stop.match_effect_id = chosen_effect.id;
+								step.post_message(stop);
+							}
 
-							if (feasible_wielding) {
+							progress = 0.f;
+						};
+
+						if (transfer_cooldown_passed && feasible_wielding) {
+							if (progress == 0.f) {
+								try_to_play_trigger_pull_sound();
+							}
+
+							if (const auto next_cartridge = find_next_cartridge(gun_entity); next_cartridge.is_set()) {
 								if (progress == 0.f) {
 									const auto& chosen_effect = gun_def.chambering_sound;
 									chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability));
@@ -367,20 +385,11 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 								}
 							}
 							else {
-								if (progress > 0.f) {
-									const auto& chosen_effect = gun_def.chambering_sound;
-
-									messages::stop_sound_effect stop;
-									stop.match_chased_subject = gun_entity;
-									stop.match_effect_id = chosen_effect.id;
-									step.post_message(stop);
-								}
-
-								progress = 0.f;
+								interrupt_chambering();
 							}
 						}
 						else {
-							progress = 0.f;
+							interrupt_chambering();
 						}
 					}
 
@@ -605,7 +614,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 					{
 						const auto& transfers = capability.template get<invariants::item_slot_transfers>();
-						const auto when_transferred = gun_entity.template get<components::item>().get_raw_component().when_last_transferred;
 						const auto r = clk.get_ratio_of_remaining_time(transfers.after_wield_recoil_ms, when_transferred);
 
 						const auto conceptual_mass = std::sqrt(static_cast<real32>(::calc_space_occupied_with_children(gun_entity)) / SPACE_ATOMS_PER_UNIT);
