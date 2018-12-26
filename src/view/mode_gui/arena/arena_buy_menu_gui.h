@@ -36,6 +36,7 @@ struct arena_buy_menu_gui {
 	arena_buy_menu_requested_weapons requested_weapons;
 	arena_buy_menu_requested_weapons requested_replenishables;
 	std::optional<special_purchase_request> requested_special;
+	augs::event::keys::key key_opened = augs::event::keys::key::ESC;
 	// END GEN INTROSPECTOR
 
 	/* Always initialize as hidden */

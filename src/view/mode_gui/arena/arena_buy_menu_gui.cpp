@@ -79,6 +79,8 @@ bool arena_buy_menu_gui::control(app_ingame_intent_input in) {
 
 		if (const auto it = mapped_or_nullptr(in.controls, key)) {
 			if (*it == app_ingame_intent_type::OPEN_BUY_MENU) {
+				key_opened = key;
+
 				if (show) {
 					hide();
 				}
@@ -236,6 +238,21 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		}
 	};
 
+	const auto& item_spacing = ImGui::GetStyle().ItemSpacing;
+
+	const auto line_h = ImGui::GetTextLineHeight();
+	const auto standard_button_h = line_h * 2 + item_spacing.y + 1;
+
+	auto darken_selectables = []() {
+		const auto hover_col = rgba(ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
+		const auto active_col = rgba(ImGui::GetStyle().Colors[ImGuiCol_HeaderActive]);
+
+		return std::make_tuple(
+			scoped_style_color(ImGuiCol_HeaderHovered, rgba(hover_col).multiply_rgb(1 / 2.1f)),
+			scoped_style_color(ImGuiCol_HeaderActive, rgba(active_col).multiply_rgb(1 / 1.8f))
+		);
+	};
+
 	auto general_purchase_button = [&](
 		const auto& object, 
 		const auto& selected,
@@ -260,11 +277,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		}
 
 		const auto local_pos = ImGui::GetCursorPos();
-
-		const auto& item_spacing = ImGui::GetStyle().ItemSpacing;
 		const auto size = vec2(entry.get_original_size());
-
-		const auto line_h = ImGui::GetTextLineHeight();
 		const auto button_h = std::max(size.y, line_h * 2) + item_spacing.y;
 
 		const auto num_affordable = in.available_money / price;
@@ -273,11 +286,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 		bool result = false;
 
-		const auto hover_col = rgba(ImGui::GetStyle().Colors[ImGuiCol_HeaderHovered]);
-		const auto active_col = rgba(ImGui::GetStyle().Colors[ImGuiCol_HeaderActive]);
-
-		auto scp = scoped_style_color(ImGuiCol_HeaderHovered, rgba(hover_col).multiply_rgb(1 / 2.1f));
-		auto scp2 = scoped_style_color(ImGuiCol_HeaderActive, rgba(active_col).multiply_rgb(1 / 1.8f));
+		auto darkened = darken_selectables();
 
 		const auto label_id = typesafe_sprintf("##%xr%x", index, additional_id);
 
@@ -620,6 +629,26 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 		centered_text("BUY WEAPONS");
 
+		auto category_button = [&](const auto& hotkey_text, const auto ss, const bool active = false) {
+			auto darkened = darken_selectables();
+
+			const auto category_button_size = ImVec2(0, standard_button_h * 0.8f);
+
+			const auto before_pos = ImGui::GetCursorPos();
+
+			const auto id = typesafe_sprintf("##%x", ss);
+			const bool result = ImGui::Selectable(id.c_str(), active, ImGuiSelectableFlags_None, category_button_size);
+			const auto after_pos = ImGui::GetCursorPos();
+
+			ImGui::SetCursorPos(before_pos);
+			text_disabled(hotkey_text);
+			ImGui::SameLine();
+			text(ss);
+			ImGui::SetCursorPos(after_pos);
+
+			return result;
+		};
+
 		if (current_menu == buy_menu_type::MAIN) {
 			centered_text("CHOOSE CATEGORY");
 
@@ -635,23 +664,18 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				ensure(bound_key != augs::event::keys::key::INVALID);
 
 				const auto hotkey_text = typesafe_sprintf("(%x)", key_to_string(bound_key));
-
-				text_disabled(hotkey_text);
-				ImGui::SameLine();
-
 				const auto label = format_enum(e);
 
-				if (ImGui::Selectable(label.c_str(), e == current_menu)) {
+				if (category_button(hotkey_text, label.c_str(), e == current_menu)) {
 					next_requested_menu = e;
 				}
 			};
 
 			augs::for_each_enum_except_bounds(do_buttons_for_buy_categories);
 
-			text_disabled("   ");
-			ImGui::SameLine();
+			const auto hotkey = "(" + key_to_string(key_opened) + ")";
 
-			if (ImGui::Selectable("Cancel")) {
+			if (category_button(hotkey.c_str(), "Cancel")) {
 				hide();
 				return result;
 			}
@@ -709,10 +733,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					ImGui::Separator();
 				}
 
-				text_disabled("(ESC)");
-				ImGui::SameLine();
-
-				if (ImGui::Selectable("Cancel")) {
+				if (category_button("(ESC)", "Cancel")) {
 					next_requested_menu = buy_menu_type::MAIN;
 				}
 			};
@@ -754,10 +775,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 					ImGui::Separator();
 				}
 
-				text_disabled("(ESC)");
-				ImGui::SameLine();
-
-				if (ImGui::Selectable("Cancel")) {
+				if (category_button("(ESC)", "Cancel")) {
 					next_requested_menu = buy_menu_type::MAIN;
 				}
 			};
