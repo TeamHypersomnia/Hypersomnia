@@ -680,7 +680,7 @@ void bomb_mode::setup_round(
 	remove_test_characters(cosm);
 
 	if (
-		state == arena_mode_state::WARMUP
+		(in.rules.delete_lying_items_on_warmup && state == arena_mode_state::WARMUP)
 		|| in.rules.delete_lying_items_on_round_start
 	) {
 		remove_test_dropped_items(cosm);
@@ -1223,187 +1223,228 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 	auto& cosm = in.cosm;
 
 	for (const auto& p : entropy.players) {
-		const auto& commands = p.second;
+		const auto& command_variant = p.second;
 		const auto id = p.first;
 
 		if (const auto player_data = find(id)) {
-			const auto& maybe_purchase = commands.item_purchase;
+			auto command_callback = [&](const auto& typed_command) {
+				using namespace mode_commands;
+				using C = remove_cref<decltype(typed_command)>;
 
-			if (logically_set(maybe_purchase) && get_buy_seconds_left(in) > 0.f) {
-				on_player_handle(cosm, id, [&](const auto& player_handle) {
-					if constexpr(!is_nullopt_v<decltype(player_handle)>) {
-						if (!buy_area_in_range(player_handle)) {
-							return;
-						}
+				if constexpr(is_monostate_v<C>) {
 
-						const auto& p = maybe_purchase;
-						auto& stats = player_data->stats;
-						auto& money = stats.money;
-						auto& done_purchases = stats.round_state.done_purchases;
+				}
+				else if constexpr(is_one_of_v<C, item_purchase, spell_purchase, special_purchase>) {
+					if (get_buy_seconds_left(in) <= 0.f) {
+						return;
+					}
 
-						if (const auto f_id = p.item; ::is_alive(cosm, f_id)) {
-							if (!factions_compatible(player_handle, f_id)) {
+					on_player_handle(cosm, id, [&](const auto& player_handle) {
+						if constexpr(!is_nullopt_v<decltype(player_handle)>) {
+							if (!buy_area_in_range(player_handle)) {
 								return;
 							}
 
-							const auto price = ::find_price_of(cosm, f_id);
-							const bool price_correct = price && *price != 0;
+							auto& stats = player_data->stats;
+							auto& money = stats.money;
+							auto& done_purchases = stats.round_state.done_purchases;
 
-							if (!price_correct) {
-								return;
-							}
+							if constexpr(std::is_same_v<C, item_purchase>) {
+								const auto f_id = typed_command;
 
-							if (money >= *price) {
-								if (::num_carryable_pieces(player_handle, ::get_buy_slot_opts(), f_id) == 0) {
+								if (!::is_alive(cosm, f_id)) {
 									return;
 								}
 
-								requested_equipment eq;
-
-								if (::is_magazine_like(cosm, f_id)) {
-									eq.non_standard_mag = f_id;
-									eq.num_given_ammo_pieces = 1;
+								if (!factions_compatible(player_handle, f_id)) {
+									return;
 								}
-								else {
-									if (found_in(done_purchases, f_id)) {
+
+								const auto price = ::find_price_of(cosm, f_id);
+								const bool price_correct = price && *price != 0;
+
+								if (!price_correct) {
+									return;
+								}
+
+								if (money >= *price) {
+									if (::num_carryable_pieces(player_handle, ::get_buy_slot_opts(), f_id) == 0) {
+										return;
+									}
+
+									requested_equipment eq;
+
+									if (::is_magazine_like(cosm, f_id)) {
+										eq.non_standard_mag = f_id;
 										eq.num_given_ammo_pieces = 1;
 									}
 									else {
-										done_purchases.push_back(f_id);
+										if (found_in(done_purchases, f_id)) {
+											eq.num_given_ammo_pieces = 1;
+										}
+										else {
+											done_purchases.push_back(f_id);
+										}
+
+										eq.weapon = f_id;
 									}
 
-									eq.weapon = f_id;
+									eq.generate_for(player_handle, step);
+
+									money -= *price;
 								}
 
-								eq.generate_for(player_handle, step);
-
-								money -= *price;
-							}
-
-							return;
-						}
-
-						if (const auto s_id = p.spell; ::is_alive(cosm, s_id)) {
-							if (!factions_compatible(player_handle, s_id)) {
 								return;
 							}
+							else if constexpr(std::is_same_v<C, spell_purchase>) {
+								const auto s_id = typed_command;
+								
+								if (!::is_alive(cosm, s_id)) {
+									return;
+								}
 
-							const auto price = ::find_price_of(cosm, s_id);
-							const bool price_correct = price && *price != 0;
+								if (!factions_compatible(player_handle, s_id)) {
+									return;
+								}
 
-							if (!price_correct) {
-								return;
+								const auto price = ::find_price_of(cosm, s_id);
+								const bool price_correct = price && *price != 0;
+
+								if (!price_correct) {
+									return;
+								}
+
+								const auto& sentience = player_handle.template get<components::sentience>();
+
+								if (money >= *price && !sentience.is_learnt(s_id)) {
+									requested_equipment eq;
+
+									eq.spells_to_give[s_id.get_index()] = true;
+									eq.generate_for(player_handle, step);
+
+									::play_learnt_spell_effect(player_handle, s_id, step);
+
+									money -= *price;
+								}
 							}
+							else if constexpr(std::is_same_v<C, special_purchase_request>) {
+								switch (typed_command) {
+									case special_purchase_request::REBUY_PREVIOUS: {
 
-							const auto& sentience = player_handle.template get<components::sentience>();
+										break;
+									}
 
-							if (money >= *price && !sentience.is_learnt(s_id)) {
-								requested_equipment eq;
-
-								eq.spells_to_give[s_id.get_index()] = true;
-								eq.generate_for(player_handle, step);
-
-								::play_learnt_spell_effect(player_handle, s_id, step);
-
-								money -= *price;
+									default: break;
+								}
+							}
+							else {
+								static_assert(always_false_v<C>, "Non-exhaustive std::visit");
 							}
 						}
+						else {
+							(void)player_handle;
+						}
+					});
+				}
+				else if constexpr(std::is_same_v<C, team_choice>) {
+					const auto previous_faction = player_data->faction;
+
+					const auto f = typed_command;
+
+					if (f == faction_type::COUNT) {
+						return;
 					}
-					else {
+
+					// TODO: Notify GUI about the result.
+
+					using R = messages::health_event;
+
+					const auto death_request = on_player_handle(cosm, id, [&](const auto& player_handle) -> std::optional<R> {
+						if constexpr(!is_nullopt_v<decltype(player_handle)>) {
+							if (const auto tr = player_handle.find_logic_transform()) {
+								if (const auto sentience = player_handle.template find<components::sentience>()) {
+									if (!sentience->is_dead()) {
+										damage_origin origin;
+										origin.cause.flavour = player_handle.get_flavour_id();
+										origin.cause.entity = player_handle.get_id();
+										origin.sender.set(player_handle);
+
+										return R::request_death(
+											player_handle.get_id(),
+											tr->get_direction(),
+											tr->pos,
+											origin
+										);
+									}
+								}
+							}
+						}
+
 						(void)player_handle;
-					}
-				});
-			}
+						return std::nullopt;
+					});
 
-			if (const auto& new_choice = commands.team_choice; logically_set(new_choice)) {
-				const auto previous_faction = player_data->faction;
-
-				const auto f = new_choice.target_team;
-
-				// TODO: Notify GUI about the result.
-
-				using R = messages::health_event;
-
-				const auto death_request = on_player_handle(cosm, id, [&](const auto& player_handle) -> std::optional<R> {
-					if constexpr(!is_nullopt_v<decltype(player_handle)>) {
-						if (const auto tr = player_handle.find_logic_transform()) {
-							if (const auto sentience = player_handle.template find<components::sentience>()) {
-								if (!sentience->is_dead()) {
-									damage_origin origin;
-									origin.cause.flavour = player_handle.get_flavour_id();
-									origin.cause.entity = player_handle.get_id();
-									origin.sender.set(player_handle);
-
-									return R::request_death(
-										player_handle.get_id(),
-										tr->get_direction(),
-										tr->pos,
-										origin
-									);
-								}
-							}
+					const auto result = [&]() {
+						if (previous_faction == f) {
+							return faction_choice_result::THE_SAME;
 						}
-					}
 
-					(void)player_handle;
-					return std::nullopt;
-				});
+						if (previous_faction == faction_type::SPECTATOR) {
+							const auto& game_limit = in.rules.max_players_per_team;
 
-				const auto result = [&]() {
-					if (previous_faction == f) {
-						return faction_choice_result::THE_SAME;
-					}
+							const auto num_active_players = players.size() - num_players_in(faction_type::SPECTATOR);
 
-					if (previous_faction == faction_type::SPECTATOR) {
-						const auto& game_limit = in.rules.max_players_per_team;
-
-						const auto num_active_players = players.size() - num_players_in(faction_type::SPECTATOR);
-
-						if (game_limit && num_active_players >= game_limit) {
-							return faction_choice_result::TEAM_IS_FULL;
-						}
-					}
-
-					if (f != faction_type::SPECTATOR) {
-						/* This is a serious choice */
-
-						{
-							const auto& team_limit = in.rules.max_players_per_team;
-
-							if (team_limit && num_players_in(f) >= team_limit) {
+							if (game_limit && num_active_players >= game_limit) {
 								return faction_choice_result::TEAM_IS_FULL;
 							}
 						}
 
-						if (death_request == std::nullopt) {
-							/* If we are already dead, don't allow to re-choose twice during the same round. */
+						if (f != faction_type::SPECTATOR) {
+							/* This is a serious choice */
 
-							if (player_data->round_when_chosen_faction == current_round) {
-								return faction_choice_result::CHOOSING_TOO_FAST;
+							{
+								const auto& team_limit = in.rules.max_players_per_team;
+
+								if (team_limit && num_players_in(f) >= team_limit) {
+									return faction_choice_result::TEAM_IS_FULL;
+								}
 							}
+
+							if (death_request == std::nullopt) {
+								/* If we are already dead, don't allow to re-choose twice during the same round. */
+
+								if (player_data->round_when_chosen_faction == current_round) {
+									return faction_choice_result::CHOOSING_TOO_FAST;
+								}
+							}
+
+							player_data->round_when_chosen_faction = current_round;
 						}
 
-						player_data->round_when_chosen_faction = current_round;
-					}
+						if (f == faction_type::DEFAULT) {
+							/* Auto-select */
+							return auto_assign_faction(in, id);
+						}
 
-					if (f == faction_type::DEFAULT) {
-						/* Auto-select */
-						return auto_assign_faction(in, id);
-					}
+						return choose_faction(id, f);
+					}();
 
-					return choose_faction(id, f);
-				}();
+					BMB_LOG(format_enum(result));
 
-				BMB_LOG(format_enum(result));
+					if (result == faction_choice_result::CHANGED) {
+						BMB_LOG("Changed from %x to %x", format_enum(previous_faction), format_enum(f));
 
-				if (result == faction_choice_result::CHANGED) {
-					BMB_LOG("Changed from %x to %x", format_enum(previous_faction), format_enum(f));
-
-					if (death_request != std::nullopt) {
-						step.post_message(*death_request);
+						if (death_request != std::nullopt) {
+							step.post_message(*death_request);
+						}
 					}
 				}
-			}
+				else {
+					static_assert(always_false_v<C>, "Non-exhaustive std::visit");
+				}
+			};
+
+			std::visit(command_callback, command_variant);
 		}
 	}
 }

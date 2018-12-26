@@ -1,3 +1,4 @@
+#include "augs/templates/logically_empty.h"
 #include "view/mode_gui/arena/arena_mode_gui.h"
 #include "view/viewables/images_in_atlas_map.h"
 #include "augs/gui/text/printer.h"
@@ -91,8 +92,8 @@ mode_player_entropy arena_gui_state::perform_imgui(
 					p->faction
 				});
 
-				if (choice != std::nullopt) {
-					result_entropy.team_choice = *choice;
+				if (logically_set(choice)) {
+					result_entropy = *choice;
 				}
 			}
 		}
@@ -118,8 +119,8 @@ mode_player_entropy arena_gui_state::perform_imgui(
 						mode_in.config.arena_mode_gui.buy_menu_settings
 					});
 
-					if (choice != std::nullopt) {
-						result_entropy.item_purchase = *choice;
+					if (logically_set(choice)) {
+						result_entropy = choice;
 					}
 				}
 			}

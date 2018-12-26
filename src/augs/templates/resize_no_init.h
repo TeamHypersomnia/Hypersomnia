@@ -24,6 +24,11 @@ void resize_no_init(augs::constant_size_vector<V, const_count>& v, const std::si
 	}
 }
 
+template <unsigned const_count>
+void resize_no_init(augs::constant_size_string<const_count>& v, const std::size_t n) {
+	v.resize_no_init(n);
+}
+
 inline void resize_no_init(std::string& v, const std::size_t n) {
 	v.resize(n);
 }

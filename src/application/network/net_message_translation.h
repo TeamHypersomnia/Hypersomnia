@@ -49,6 +49,41 @@ namespace net_messages {
 		return true;
 	}
 
+	template <class Stream, class V>
+	bool serialize_trivial_as_bytes(Stream& s, V& v) {
+		static_assert(augs::is_byte_readwrite_appropriate_v<augs::memory_stream, V>);
+		serialize_bytes(s, (uint8_t*)&v, sizeof(V));
+		return true;
+	}
+
+	template <class Stream, class E>
+	bool serialize_enum(Stream& s, E& e) {
+		auto ee = static_cast<int>(e);
+		serialize_int(s, ee, 0, static_cast<int>(E::COUNT));
+		e = static_cast<E>(ee);
+		return true;
+	}
+
+	template <class Stream>
+	bool serialize(Stream& s, mode_commands::team_choice& c) {
+		return serialize_enum(s, c);
+	}
+
+	template <class Stream>
+	bool serialize(Stream& s, mode_commands::item_purchase& c) {
+		return serialize_trivial_as_bytes(s, c);
+	}
+
+	template <class Stream>
+	bool serialize(Stream& s, mode_commands::spell_purchase& c) {
+		return serialize_trivial_as_bytes(s, c);
+	}
+
+	template <class Stream>
+	bool serialize(Stream& s, mode_commands::special_purchase& c) {
+		return serialize_enum(s, c);
+	}
+
 	template <class Stream, class... Args>
 	bool serialize(Stream& s, std::variant<Args...>& i) {
 		static constexpr auto max_i = sizeof...(Args);
@@ -84,37 +119,12 @@ namespace net_messages {
 		return result;
 	}
 
-	template <class Stream, class V>
-	bool serialize_trivial_as_bytes(Stream& s, V& v) {
-		static_assert(augs::is_byte_readwrite_appropriate_v<augs::memory_stream, V>);
-		serialize_bytes(s, (uint8_t*)&v, sizeof(V));
-		return true;
-	}
-
-	template <class Stream, class E>
-	bool serialize_enum(Stream& s, E& e) {
-		auto ee = static_cast<int>(e);
-		serialize_int(s, ee, 0, static_cast<int>(E::COUNT));
-		e = static_cast<E>(ee);
-		return true;
-	}
-
 	template <class Stream>
 	bool serialize(Stream& s, ::mode_player_id& i) {
 		static const auto max_val = mode_player_id::machine_admin();
 		serialize_int(s, i.value, 0, max_val.value);
 		serialize_align(s);
 		return true;
-	}
-
-	template <class Stream>
-	bool serialize(Stream& s, mode_commands::team_choice& c) {
-		return serialize_enum(s, c.target_team);
-	}
-
-	template <class Stream>
-	bool serialize(Stream& s, mode_commands::item_purchase& c) {
-		return serialize_trivial_as_bytes(s, c);
 	}
 
 	template <class Stream>
@@ -148,18 +158,17 @@ namespace net_messages {
 	template <class Stream>
 	bool serialize(Stream& s, total_mode_player_entropy& p) {
 		auto& m = p.mode;
-		bool has_team_choice = logically_set(m.team_choice);
-		bool has_item_purchase = logically_set(m.item_purchase);
-
 		auto& c = p.cosmic;
+
+		bool has_mode_command = logically_set(m);
+
 		bool has_cast_spell = logically_set(c.cast_spell);
 		bool has_wield = logically_set(c.wield);
 		bool has_intents = logically_set(c.intents);
 		bool has_motions = logically_set(c.motions);
 		bool has_transfer = logically_set(c.transfer);
 
-		serialize_bool(s, has_team_choice);
-		serialize_bool(s, has_item_purchase);
+		serialize_bool(s, has_mode_command);
 
 		serialize_bool(s, has_cast_spell);
 		serialize_bool(s, has_wield);
@@ -169,14 +178,8 @@ namespace net_messages {
 
 		serialize_align(s);
 
-		if (has_team_choice) {
-			if (!serialize(s, m.team_choice)) {
-				return false;
-			}
-		}
-
-		if (has_item_purchase) {
-			if (!serialize(s, m.item_purchase)) {
+		if (has_mode_command) {
+			if (!serialize(s, m)) {
 				return false;
 			}
 		}

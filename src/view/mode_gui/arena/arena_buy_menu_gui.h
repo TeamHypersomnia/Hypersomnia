@@ -5,6 +5,7 @@
 #include "game/cosmos/entity_handle_declaration.h"
 #include "game/detail/economy/money_type.h"
 #include "game/modes/detail/item_purchase_structs.h"
+#include "game/modes/mode_entropy.h"
 #include "augs/graphics/rgba.h"
 #include "view/mode_gui/arena/buy_menu_type.h"
 #include "view/mode_gui/arena/arena_buy_menu_hotkeys.h"
@@ -34,6 +35,7 @@ struct arena_buy_menu_gui {
 
 	arena_buy_menu_requested_weapons requested_weapons;
 	arena_buy_menu_requested_weapons requested_replenishables;
+	std::optional<special_purchase_request> requested_special;
 	// END GEN INTROSPECTOR
 
 	/* Always initialize as hidden */
@@ -41,5 +43,5 @@ struct arena_buy_menu_gui {
 	bool control(app_ingame_intent_input);
 	bool escape();
 	void hide();
-	std::optional<mode_commands::item_purchase> perform_imgui(input);
+	mode_player_entropy perform_imgui(input);
 };

@@ -76,5 +76,15 @@ namespace augs {
 		auto end() const {
 			return arr.begin() + size();
 		}
+
+		void resize_no_init(const std::size_t n) {
+			len = n;
+			arr[len] = 0;
+		}
+
+		void clear() {
+			len = 0;
+			arr[0] = 0;
+		}
 	};
 }

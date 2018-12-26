@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/templates/logically_empty.h"
 #include "game/enums/game_intent_type.h"
 #include "game/modes/mode_entropy.h"
 
@@ -28,7 +29,7 @@ struct entropy_accumulator {
 		mode_entropy out;
 		out.general = mode_general;
 
-		if (m_id.is_set() && !mode.empty()) {
+		if (logically_set(m_id, mode)) {
 			out.players[m_id] = mode;
 
 			/* Disallow controlling mode & cosmic at the same time for bandwidth optimization. */
@@ -78,7 +79,7 @@ struct entropy_accumulator {
 	}
 
 	void clear() {
-		mode.clear();
+		mode = {};
 		cosmic.clear();
 
 		motions.clear();
@@ -105,7 +106,9 @@ struct entropy_accumulator {
 			cosmic += n;
 		}
 		else if constexpr(std::is_same_v<T, mode_player_entropy>) {
-			mode += n;
+			if (logically_set(n)) {
+				mode = n;
+			}
 		}
 		else if constexpr(std::is_same_v<T, mode_entropy_general>) {
 			mode_general += n;

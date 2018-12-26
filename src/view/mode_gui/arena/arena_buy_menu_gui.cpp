@@ -1,3 +1,4 @@
+#include "augs/templates/logically_empty.h"
 #include "augs/string/format_enum.h"
 #include "augs/templates/enum_introspect.h"
 #include "view/mode_gui/arena/arena_buy_menu_gui.h"
@@ -102,9 +103,11 @@ bool arena_buy_menu_gui::control(app_ingame_intent_input in) {
 		const auto key = in.e.get_key();
 
 		if (current_menu == buy_menu_type::MAIN) {
-			if (const auto it = mapped_or_nullptr(m, key)) {
-				current_menu = *it;
-				return true;
+			if (!c.keys[key::LSHIFT]) {
+				if (const auto it = mapped_or_nullptr(m, key)) {
+					current_menu = *it;
+					return true;
+				}
 			}
 		}
 
@@ -136,7 +139,7 @@ bool arena_buy_menu_gui::control(app_ingame_intent_input in) {
 }
 
 using input_type = arena_buy_menu_gui::input;
-using result_type = std::optional<mode_commands::item_purchase>;
+using result_type = mode_player_entropy;
 
 result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 	using namespace augs::imgui;
@@ -148,16 +151,16 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 	const auto money_color = in.money_indicator_color;
 
 	if (subject.dead()) {
-		return std::nullopt;
+		return {};
 	}
 
 	if (!buy_area_in_range(subject)) {
 		hide();
-		return std::nullopt;
+		return {};
 	}
 
 	if (!show) {
-		return std::nullopt;
+		return {};
 	}
 
 	ImGui::SetNextWindowPosCenter();
@@ -219,19 +222,16 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 	result_type result;
 
-	auto set_result = [&](const auto& r) {
-		mode_commands::item_purchase msg;
+	if (logically_set(requested_special)) {
+		result = *requested_special;
+		requested_special = std::nullopt;
+		return result;
+	}
 
-		if constexpr(std::is_same_v<decltype(r), const item_flavour_id&>) {
-			msg.item = r;
-		}
-		else {
-			msg.spell = r;
-		}
+	auto set_result = [&](const auto& r, const bool maybe_close = true) {
+		result = r;
 
-		result = msg;
-
-		if (::should_close_after_purchase(current_menu)) {
+		if (maybe_close && ::should_close_after_purchase(current_menu)) {
 			next_requested_menu = buy_menu_type::MAIN;
 		}
 	};
@@ -608,7 +608,8 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 				ImGui::Separator();
 
 				if (choice_was_made) {
-					set_result(f.ammo_piece);
+					const bool maybe_close = false;
+					set_result(f.ammo_piece, maybe_close);
 				}
 			}
 		}

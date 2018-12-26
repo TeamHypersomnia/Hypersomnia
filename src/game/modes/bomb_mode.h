@@ -85,6 +85,7 @@ struct bomb_mode_ruleset {
 
 	constrained_entity_flavour_id<invariants::explosive, invariants::hand_fuse> bomb_flavour;
 	bool delete_lying_items_on_round_start = false;
+	bool delete_lying_items_on_warmup = true;
 	bool allow_game_commencing = true;
 
 	bomb_mode_economy_rules economy;

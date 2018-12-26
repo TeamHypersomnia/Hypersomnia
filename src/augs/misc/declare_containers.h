@@ -6,6 +6,9 @@ namespace augs {
 
 	template <class T, unsigned, class = void>
 	class constant_size_vector;
+
+	template <unsigned const_count>
+	class constant_size_string;
 }
 
 template <unsigned I>

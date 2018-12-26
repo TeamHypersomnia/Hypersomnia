@@ -13,7 +13,7 @@
 #include "augs/gui/formatted_string.h"
 #include "augs/misc/randomization.h"
 
-struct mode_player_entropy;
+#include "game/modes/mode_entropy.h"
 
 struct warmup_welcome_cache {
 	augs::gui::text::formatted_string current;

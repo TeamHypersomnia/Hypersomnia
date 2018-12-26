@@ -655,8 +655,8 @@ TEST_CASE("NetSerialization ServerEntropy") {
 
 	const auto naive_bytes = [&]() {
 		total_mode_player_entropy t;
-		t.mode.team_choice = { faction_type::METROPOLIS };
-		t.mode.item_purchase.spell.set<fury_of_the_aeons>();
+		t.mode = mode_commands::team_choice { faction_type::METROPOLIS };
+		t.mode = mode_commands::spell_purchase { spell_id::of<fury_of_the_aeons>() };
 
 		total_mode_player_entropy tt;
 		tt.cosmic.cast_spell.set<ultimate_wrath_of_the_aeons>();
@@ -707,9 +707,13 @@ TEST_CASE("NetSerialization ServerEntropySecond") {
 
 	const auto naive_bytes = [&]() {
 		total_mode_player_entropy t;
-		t.mode.item_purchase.item.type_id.set<shootable_weapon>();
-		t.mode.item_purchase.item.raw.indirection_index = 11;
-		t.mode.item_purchase.item.raw.version = 11;
+
+		item_flavour_id bought_item;
+		bought_item.type_id.set<shootable_weapon>();
+		bought_item.raw.indirection_index = 11;
+		bought_item.raw.version  = 11;
+
+		t.mode = bought_item;
 
 		total_mode_player_entropy tt;
 		tt.cosmic.cast_spell.set<ultimate_wrath_of_the_aeons>();
@@ -763,8 +767,8 @@ TEST_CASE("NetSerialization ClientEntropy") {
 	total_client_entropy sent;
 
 	const auto naive_bytes = [&]() {
-		sent.mode.team_choice = { faction_type::RESISTANCE };
-		sent.mode.item_purchase.spell.set<haste>();
+		sent.mode = mode_commands::team_choice { faction_type::RESISTANCE };
+		sent.mode = mode_commands::spell_purchase { spell_id::of<haste>() };
 
 		sent.cosmic.cast_spell.set<ultimate_wrath_of_the_aeons>();
 		sent.cosmic.motions[game_motion_type::MOVE_CROSSHAIR] = { 342, 432534 };

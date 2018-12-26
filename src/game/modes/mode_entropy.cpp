@@ -3,27 +3,16 @@
 #include "augs/templates/logically_empty.h"
 
 bool total_mode_player_entropy::empty() const {
-	return mode.empty() && cosmic.empty();
+	return logically_empty(mode, cosmic);
 }
 
 total_mode_player_entropy& total_mode_player_entropy::operator+=(const total_mode_player_entropy& b) {
-	mode += b.mode;
+	if (logically_set(b.mode)) {
+		mode = b.mode;
+	}
+
 	cosmic += b.cosmic;
 	return *this;
-}
-
-void mode_entropy::accumulate(
-	const mode_player_id m_id,
-	const entity_id id,
-	const total_mode_player_entropy& in
-) {
-	if (id.is_set()) {
-		cosmic[id] += in.cosmic;
-	}
-
-	if (m_id.is_set()) {
-		players[m_id] += in.mode;
-	}
 }
 
 total_mode_player_entropy mode_entropy::get_for(
@@ -41,15 +30,6 @@ total_mode_player_entropy mode_entropy::get_for(
 	}
 
 	return out;
-}
-
-void mode_player_entropy::clear() {
-	/* This is cheap enough. */
-	*this = {};
-}
-
-bool mode_player_entropy::empty() const {
-	return logically_empty(team_choice, item_purchase);
 }
 
 void mode_entropy::clear_dead_entities(const cosmos& cosm) {
@@ -76,22 +56,6 @@ bool mode_entropy::empty() const {
 	return logically_empty(players, cosmic, general);
 }
 
-mode_player_entropy& mode_player_entropy::operator+=(const mode_player_entropy& b) {
-	if (b.team_choice.is_set()) {
-		team_choice = b.team_choice;
-	}
-
-	if (b.item_purchase.is_set()) {
-		item_purchase = b.item_purchase;
-	}
-
-#if MODE_ENTROPY_HAS_QUEUES
-	queues += b.queues;
-#endif
-
-	return *this;
-}
-
 mode_entropy_general& mode_entropy_general::operator+=(const mode_entropy_general& b) {
 	auto override_if = [&](auto& a, const auto& b) {
 		if (b.is_set()) {
@@ -113,7 +77,9 @@ mode_entropy& mode_entropy::operator+=(const mode_entropy& b) {
 	cosmic += b.cosmic;
 
 	for (const auto& p : b.players) {
-		players[p.first] += p.second;
+		if (logically_set(p.second)) {
+			players[p.first] = p.second;
+		}
 	}
 
 	general += b.general;
@@ -134,13 +100,6 @@ bool mode_entropy_general::operator==(const mode_entropy_general& b) const {
 		added_player == b.added_player
 		&& removed_player == b.removed_player
 		&& special_command == b.special_command
-	;
-}
-
-bool mode_player_entropy::operator==(const mode_player_entropy& b) const {
-	return 
-		team_choice == b.team_choice
-		&& item_purchase == b.item_purchase
 	;
 }
 

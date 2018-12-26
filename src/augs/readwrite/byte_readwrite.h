@@ -7,6 +7,7 @@
 
 #include "augs/templates/traits/container_traits.h"
 #include "augs/templates/byte_type_for.h"
+#include "augs/misc/enum/is_enum_boolset.h"
 #include "augs/templates/traits/is_variant.h"
 #include "augs/templates/traits/is_monostate.h"
 #include "augs/templates/traits/is_optional.h"
@@ -79,10 +80,7 @@ namespace augs {
 	void read_bytes_no_overload(Archive& ar, Serialized& storage) {
 		verify_read_bytes<Archive, Serialized>();
 
-		if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
-			detail::read_raw_bytes(ar, &storage, 1);
-		}
-		else if constexpr(is_unique_ptr_v<Serialized>) {
+		if constexpr(is_unique_ptr_v<Serialized>) {
 			bool has_value = false;
 			read_bytes(ar, has_value);
 
@@ -140,8 +138,14 @@ namespace augs {
 		else if constexpr(is_std_array_v<Serialized> || is_enum_array_v<Serialized>) {
 			detail::read_bytes_n(ar, storage.data(), storage.size());
 		}
+		else if constexpr(is_enum_boolset_v<Serialized>) {
+			detail::read_raw_bytes(ar, &storage, 1);
+		}
 		else if constexpr(is_container_v<Serialized>) {
 			read_container_bytes(ar, storage);
+		}
+		else if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
+			detail::read_raw_bytes(ar, &storage, 1);
 		}
 		else {
 			verify_has_introspect(storage);
@@ -202,10 +206,7 @@ namespace augs {
 	void write_bytes_no_overload(Archive& ar, const Serialized& storage) {
 		verify_write_bytes<Archive, Serialized>();
 
-		if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
-			detail::write_raw_bytes(ar, &storage, 1);
-		}
-		else if constexpr(is_optional_v<Serialized>) {
+		if constexpr(is_optional_v<Serialized>) {
 			write_bytes(ar, storage.has_value());
 
 			if (storage) {
@@ -241,8 +242,14 @@ namespace augs {
 		else if constexpr(is_std_array_v<Serialized> || is_enum_array_v<Serialized>) {
 			detail::write_bytes_n(ar, storage.data(), storage.size());
 		}
+		else if constexpr(is_enum_boolset_v<Serialized>) {
+			detail::write_raw_bytes(ar, &storage, 1);
+		}
 		else if constexpr(is_container_v<Serialized>) {
 			write_container_bytes(ar, storage);
+		}
+		else if constexpr(is_byte_readwrite_appropriate_v<Archive, Serialized>) {
+			detail::write_raw_bytes(ar, &storage, 1);
 		}
 		else {
 			verify_has_introspect(storage);

@@ -81,10 +81,8 @@ std::optional<mode_commands::team_choice> arena_choose_team_gui::perform_imgui(c
 	const auto n = in.available_factions.size();
 
 	auto make_choice = [&](const faction_type f) {
-		mode_commands::team_choice choice;
-		choice.target_team = f;
 		show = false;
-		return choice;
+		return f;
 	};
 
 	ImGui::Columns(n, nullptr, true);

@@ -109,7 +109,11 @@ namespace augs {
 		void reset() {
 			fill_range(flags, false);
 		}
-	
+
+		void clear() {
+			reset();
+		}
+
 		template <class... Args, bool all_enums = (... && std::is_same_v<Args, _enum>), class = std::enable_if_t<all_enums>>
 		enum_boolset(Args... setters) {
 			reset();

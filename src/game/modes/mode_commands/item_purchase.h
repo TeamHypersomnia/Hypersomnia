@@ -3,22 +3,17 @@
 #include "game/organization/special_flavour_id_types.h"
 #include "game/detail/spells/all_spells.h"
 
+enum class special_purchase_request {
+	// GEN INTROSPECTOR enum class special_purchase_request
+	AUTOBUY,
+	REBUY_PREVIOUS,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
 namespace mode_commands {
-	struct item_purchase {
-		// GEN INTROSPECTOR struct mode_commands::item_purchase
-		item_flavour_id item;
-		spell_id spell;
-		// END GEN INTROSPECTOR
-
-		bool is_set() const {
-			return item.is_set() || spell.is_set();
-		}
-
-		bool operator==(const item_purchase& b) const {
-			return 
-				item == b.item
-				&& spell == b.spell
-			;
-		}
-	};
+	using spell_purchase = spell_id;
+	using item_purchase = item_flavour_id;
+	using special_purchase = special_purchase_request;
 }

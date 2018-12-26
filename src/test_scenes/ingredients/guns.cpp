@@ -995,9 +995,9 @@ namespace test_flavours {
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::SHOTGUN_RED_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::SHOTGUN_RED_ROUND);
 
-				cartridge.num_rounds_spawned = 10;
-				cartridge.rounds_spread_degrees = 20.f;
-				cartridge.rounds_spread_degrees_variation = 7.f;
+				cartridge.num_rounds_spawned = 12;
+				cartridge.rounds_spread_degrees = 18.f;
+				cartridge.rounds_spread_degrees_variation = 9.f;
 
 				meta.set(cartridge);
 			}

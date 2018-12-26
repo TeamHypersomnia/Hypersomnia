@@ -16,19 +16,15 @@ using mode_player_commands = augs::storage_for_message_queues<
 
 class cosmos;
 
-struct mode_player_entropy {
-	// GEN INTROSPECTOR struct mode_player_entropy
-	mode_commands::team_choice team_choice;
-	mode_commands::item_purchase item_purchase;
-	// END GEN INTROSPECTOR
+using mode_player_command_variant = std::variant<
+	std::monostate,
+	mode_commands::team_choice,
+	mode_commands::spell_purchase,
+	mode_commands::item_purchase,
+	mode_commands::special_purchase
+>;
 
-	void clear();
-	bool empty() const;
-
-	mode_player_entropy& operator+=(const mode_player_entropy&);
-
-	bool operator==(const mode_player_entropy&) const;
-};
+using mode_player_entropy = mode_player_command_variant;
 
 struct total_mode_player_entropy {
 	// GEN INTROSPECTOR struct total_mode_player_entropy
@@ -68,18 +64,12 @@ struct mode_entropy {
 	void clear_dead_entities(const cosmos& cosm);
 	void clear();
 	bool empty() const;
-	mode_entropy& operator+=(const mode_entropy& b);
-
-	void accumulate(
-		mode_player_id,
-		entity_id,
-		const total_mode_player_entropy&
-	);
 
 	total_mode_player_entropy get_for(
 		entity_id,
 		mode_player_id
 	) const;
 
+	mode_entropy& operator+=(const mode_entropy& b);
 	bool operator==(const mode_entropy&) const;
 };

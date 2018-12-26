@@ -2633,3 +2633,8 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - The rocket item entity
 	- Should be a normal cartridge
+
+
+- let team_choice/item_purchase be a variant
+	- we can already serialize variants anyway
+

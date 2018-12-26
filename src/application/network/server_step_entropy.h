@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/templates/logically_empty.h"
 #include "game/modes/mode_entropy.h"
 
 using server_step_entropy = mode_entropy;
@@ -51,14 +52,14 @@ struct networked_server_step_entropy {
 		for (const auto& p : players) {
 			const auto& t = p.total;
 
-			if (!t.mode.empty()) {
+			if (logically_set(t.mode)) {
 				out.players[p.player_id] = t.mode;
 			}
 
-			if (!t.cosmic.empty()) {
+			if (logically_set(t.cosmic)) {
 				const auto id = mode_id_to_entity_id(p.player_id);
 
-				if (id.is_set()) {
+				if (logically_set(id)) {
 					out.cosmic[id] = t.cosmic;
 				}
 			}

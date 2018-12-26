@@ -7,6 +7,32 @@
 
 #if !STATICALLY_ALLOCATE_ENTITIES
 
+TEST_CASE("LogicallyEmpty") {
+	{
+		int a = 0;
+		int b = 1;
+
+		REQUIRE(logically_empty(a));
+		REQUIRE(!logically_empty(b));
+		REQUIRE(!logically_empty(a, b));
+		REQUIRE(!logically_set(a, b));
+		REQUIRE(logically_set(b, b));
+		REQUIRE(logically_empty(a, a));
+	}
+
+	{
+		std::vector<int> a;
+		std::vector<int> b { 0 };
+
+		REQUIRE(logically_empty(a));
+		REQUIRE(!logically_empty(b));
+		REQUIRE(!logically_empty(a, b));
+		REQUIRE(!logically_set(a, b));
+		REQUIRE(logically_set(b, b));
+		REQUIRE(logically_empty(a, a));
+	}
+}
+
 TEST_CASE("GetByDynamicId") {
 	all_entity_types t;
 

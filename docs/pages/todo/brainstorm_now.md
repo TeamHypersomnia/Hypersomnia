@@ -6,6 +6,31 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Make a flag for autodropping of magazines
+	- And implement this gui-side
+	- "Autodrop magazines of dropped weapons"
+
+- We might want to predict sounds depending on the effect
+	- E.g. tie FoTA effects to the referential
+	- But UWoTA to the predicted as there is a delay
+
+- Probably simply play win and death sounds in accordance with the referential cosmos
+	- Will avoid confusion
+	- Though will introduce lag
+	- If, on the other hand, we want to predict deaths, it would be best if these were death sound entities
+		- So that they get interrupted on mis-prediction
+	- From what I can see, we already had some lag on the death sounds due to empty beginnings
+		- Around 40-80ms
+		- And we never noticed
+		- So let's just always make death sounds referential
+
+- fix arena gui showing "Disconnected"
+	- somehow cache the nick or remove the entry?
+	- this is cool actually but if someone connects right away it will show his nickname as the victim
+
+- should rebuy previous also buy magazines bought?
+	- perhaps
+
 - don't turn off menus on buying replenishables
 
 - Gather all items to the left of the hotbar

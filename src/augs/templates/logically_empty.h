@@ -39,9 +39,9 @@ bool logically_empty(const T& t) {
 	}
 }
 
-template <class T>
-bool logically_set(const T& t) {
-	return !logically_empty(t);
+template <class... Args>
+bool logically_set(const Args&... args) {
+	return (... && !logically_empty(args));
 }
 
 template <class T, class Head, class... Tail>

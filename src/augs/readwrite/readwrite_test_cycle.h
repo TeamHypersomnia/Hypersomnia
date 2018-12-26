@@ -58,7 +58,7 @@ namespace detail {
 template <class T>
 void report(const T& v, const T& reloaded) {
 	if constexpr(!std::is_base_of_v<detail::dummy_A, T> && !augs::is_pool_v<T>) {
-		LOG("Original %x\nReloaded: %x", v, reloaded);
+		LOG("(%x)\nOriginal: %x\nReloaded: %x", get_type_name<T>(), v, reloaded);
 	}
 }
 
