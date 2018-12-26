@@ -197,6 +197,10 @@ struct fuse_logic_provider {
 
 		if (fuse_def.always_release_when_armed) {
 			release_explosive();
+
+			if (const auto sentience = holder.template find<components::sentience>()) {
+				sentience->hand_flags = {};
+			}
 		}
 	}
 
