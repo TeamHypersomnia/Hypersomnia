@@ -494,7 +494,12 @@ void item_system::pick_up_touching_items(const logic_step step) {
 	const auto& collisions = step.get_queue<messages::collision_message>();
 
 	for (const auto& c : collisions) {
-		if (c.type != messages::collision_message::event_type::PRE_SOLVE) {
+		const bool interested = 
+			c.type == messages::collision_message::event_type::PRE_SOLVE
+			|| c.type == messages::collision_message::event_type::BEGIN_CONTACT
+		;
+
+		if (!interested) {
 			continue;
 		}
 
@@ -504,7 +509,11 @@ void item_system::pick_up_touching_items(const logic_step step) {
 		item_entity.dispatch_on_having_all<components::item>(
 			[&](const auto& typed_item) {
 				if (is_like_thrown_melee(typed_item)) {
-					return;
+					if (const auto sender = typed_item.template find<components::sender>()) {
+						if (!sender->is_sender_subject(picker)) {
+							return;
+						}
+					}
 				}
 
 				if (typed_item.get_owning_transfer_capability().dead()) {
@@ -539,7 +548,12 @@ void item_system::pick_up_touching_items(const logic_step step) {
 								const bool can_pick_already = transfers.pickup_timeout.try_to_fire_and_reset(clk);
 
 								if (can_pick_already) {
-									perform_transfer(item_slot_transfer_request::standard(item_to_pick, pickup_slot), step);
+									auto c = cosm[item_to_pick].get_special_physics().dropped_or_created_cooldown;
+									c.cooldown_duration_ms = 80.f;
+
+									if (c.is_ready(clk)) {
+										perform_transfer(item_slot_transfer_request::standard(item_to_pick, pickup_slot), step);
+									}
 								}
 							}
 						}
