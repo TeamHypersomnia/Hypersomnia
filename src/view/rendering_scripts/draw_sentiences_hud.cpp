@@ -171,8 +171,9 @@ augs::vertex_triangle_buffer draw_sentiences_hud(const draw_sentiences_hud_input
 				const auto text = formatted_string { info.text,{ in.gui_font, info.color } };
 				const auto bbox = get_text_bbox(text);
 				
-				const vec2i screen_space_circle_center = transform.pos;
-				const auto text_pos = screen_space_circle_center + position_rectangle_around_a_circle(radius + 6.f, bbox, info.angle) - bbox / 2;
+				const auto cam = in.text_camera;
+				const vec2i screen_space_circle_center = cam.to_screen_space(transform.pos);
+				const auto text_pos = screen_space_circle_center + position_rectangle_around_a_circle(cam.eye.zoom * (radius + 6.f), bbox, info.angle) - bbox / 2;
 				//health_points.pos = screen_space_circle_center + vec2::from_degrees(in.angle).set_length(circle_displacement_length);
 
 				augs::gui::text::print_stroked(

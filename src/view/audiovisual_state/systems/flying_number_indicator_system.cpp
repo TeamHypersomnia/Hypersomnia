@@ -51,7 +51,7 @@ void flying_number_indicator_system::draw_numbers(
 
 		augs::gui::text::print_stroked(
 			output,
-			cone.to_world_space(text_pos),
+			text_pos,
 			{ r.in.text, { font, r.in.color } },
 			{},
 			black

@@ -74,6 +74,13 @@ void illuminated_rendering(
 	const auto global_time_seconds = cosm.get_total_seconds_passed(in.interpolation_ratio);
 	const auto settings = in.drawing;
 	const auto matrix = cone.get_projection_matrix();
+
+	auto non_zoomed_cone = cone;
+	non_zoomed_cone.eye.zoom = 1.f;
+	non_zoomed_cone.eye.transform.pos = screen_size / 2;
+
+	const auto non_zoomed_matrix = non_zoomed_cone.get_projection_matrix();
+
 	const auto& visible = in.all_visible;
 	const auto& shaders = in.shaders;
 	const auto& fbos = in.fbos;
@@ -93,6 +100,11 @@ void illuminated_rendering(
 	auto set_shader_with_matrix = [&](auto& shader) {
 		shader->set_as_current();
 		shader->set_projection(matrix);
+	};
+
+	auto set_shader_with_non_zoomed_matrix = [&](auto& shader) {
+		shader->set_as_current();
+		shader->set_projection(non_zoomed_matrix);
 	};
 
 	set_shader_with_matrix(shaders.standard);
@@ -619,6 +631,7 @@ void illuminated_rendering(
 		set_center_uniform(tex);
 
 		textual_infos = draw_sentiences_hud({
+			cone,
 			visible,
 			settings,
 			output,
@@ -671,8 +684,7 @@ void illuminated_rendering(
 		);
 	}
 
-	shaders.standard->set_as_current();
-
+	set_shader_with_non_zoomed_matrix(shaders.standard);
 	renderer.call_triangles(textual_infos);
 
 	set_shader_with_matrix(shaders.exploding_rings);
