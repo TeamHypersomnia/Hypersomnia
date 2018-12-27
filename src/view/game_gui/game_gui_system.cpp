@@ -429,10 +429,12 @@ void game_gui_system::advance(
 			);
 		}
 
-		if (logically_empty(pending.transfer) && logically_set(recently_dropped) && drop_orphans) {
-			std::vector<item_flavour_id> needed_ammo_flavours;
+		const auto recently_dropped_handle = subject.get_cosmos()[recently_dropped];
 
-			const auto recently_dropped_handle = subject.get_cosmos()[recently_dropped];
+		if (logically_empty(pending.transfer) && recently_dropped_handle.alive() && drop_orphans) {
+			/* TODO: FIX THIS IF WE EVER ALLOW SAME MAG TO TWO DIFFERENT WEAPONS */
+
+			std::vector<item_flavour_id> needed_ammo_flavours;
 
 			bool has_another_like_dropped = false;
 
@@ -459,11 +461,16 @@ void game_gui_system::advance(
 				if (logically_set(needed_ammo_flavours)) {
 					subject.for_each_contained_item_recursive(
 						[&](const auto& typed_item) {
+							if (::is_weapon_like(typed_item)) {
+								return recursive_callback_result::CONTINUE_DONT_RECURSE;
+							}
+
 							if (!::is_ammo_piece_like(typed_item)) {
 								return recursive_callback_result::CONTINUE_AND_RECURSE;
 							}
 
 							if (found_in(needed_ammo_flavours, item_flavour_id(typed_item.get_flavour_id()))) {
+								LOG("found so drop");
 								queue_transfer(subject, item_slot_transfer_request::drop(typed_item));
 							}
 
