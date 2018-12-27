@@ -11,6 +11,7 @@
 
 void world_camera::tick(
 	const vec2i screen_size,
+	const fog_of_war_settings& fog_of_war,
 	const interpolation_system& interp,
 	const augs::delta dt,
 	world_camera_settings settings,
@@ -19,6 +20,16 @@ void world_camera::tick(
 	if (/* minimized */ screen_size.is_zero()) {
 		return;
 	}
+
+	const auto target_zoom = [&]() {
+		if (settings.adjust_zoom_to_available_fog_of_war_size) {
+			if (screen_size.x < fog_of_war.size.x) {
+				return screen_size.x / fog_of_war.size.x;
+			}
+		}
+
+		return 1.f;
+	}();
 
 	const auto& cosm = entity_to_chase.get_cosmos();
 
@@ -33,6 +44,7 @@ void world_camera::tick(
 
 			cone.transform = entity_to_chase.get_viewing_transform(interp);
 			cone.transform.rotation = 0;
+			cone.zoom = target_zoom;
 
 			return cone;
 		}

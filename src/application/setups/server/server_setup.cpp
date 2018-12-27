@@ -93,6 +93,10 @@ net_time_t server_setup::get_current_time() {
 
 void server_setup::customize_for_viewing(config_lua_table& config) const {
 	config.window.name = "Arena server";
+
+	if (is_gameplay_on()) {
+		get_arena_handle().adjust(config.drawing);
+	}
 }
 
 void server_setup::apply(const server_vars& new_vars, const bool force) {

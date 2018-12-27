@@ -5,8 +5,10 @@
 
 #include "application/arena/arena_utils.h"
 #include "test_scenes/test_scene_settings.h"
+#include "view/game_drawing_settings.h"
 
 struct arena_paths;
+struct game_drawing_settings;
 
 template <bool C, class ModeAndRulesType>
 class basic_arena_handle {
@@ -187,5 +189,16 @@ public:
 
 	auto& get_cosmos() const {
 		return advanced_cosm;
+	}
+
+	void adjust(game_drawing_settings& settings) const {
+		on_mode_with_input(
+			[&](const auto&, const auto& in) {
+				const auto& r = in.rules.view;
+
+				settings.draw_enemy_hud = r.show_enemy_hud;
+				settings.fog_of_war = r.fog_of_war;
+			}
+		);
 	}
 };

@@ -226,15 +226,7 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 	}
 
 	if (is_gameplay_on()) {
-		player().get_arena_handle(folder()).on_mode_with_rules(
-			[&](const auto& typed_mode, const auto& rules) {
-				using T = remove_cref<decltype(typed_mode)>;
-
-				if constexpr(!std::is_same_v<T, test_mode>) {
-					rules.view.adjust(config.drawing);
-				}
-			}
-		);
+		player().get_arena_handle(folder()).adjust(config.drawing);
 	}
 
 	return;

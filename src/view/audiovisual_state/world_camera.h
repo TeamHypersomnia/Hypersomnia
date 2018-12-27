@@ -4,6 +4,7 @@
 #include "augs/misc/smooth_value_field.h"
 #include "augs/math/camera_cone.h"
 #include "game/cosmos/entity_handle_declaration.h"
+#include "game/modes/detail/fog_of_war_settings.h"
 
 namespace augs {
 	class delta;
@@ -19,6 +20,7 @@ struct world_camera_settings {
 	float angled_look_length = 100.f;
 	float look_bound_expand = 0.5f;
 	bool enable_smoothing = true;
+	bool adjust_zoom_to_available_fog_of_war_size = true;
 	// END GEN INTROSPECTOR
 };
 
@@ -38,6 +40,7 @@ struct world_camera {
 
 	void tick(
 		const vec2i screen_size,
+		const fog_of_war_settings& fog_of_war,
 		const interpolation_system& interp, 
 		augs::delta dt,
 		world_camera_settings settings,

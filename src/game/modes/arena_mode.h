@@ -8,6 +8,7 @@
 #include "game/detail/damage_origin.h"
 #include "game/detail/economy/money_type.h"
 #include "game/modes/detail/item_purchase_structs.h"
+#include "game/modes/detail/fog_of_war_settings.h"
 
 using mode_entity_id = entity_id;
 
@@ -55,8 +56,6 @@ enum class scoreboard_icon_type {
 	// END GEN INTROSPECTOR
 };
 
-struct game_drawing_settings;
-
 struct arena_mode_view_rules {
 	using theme_flavour_type = constrained_entity_flavour_id<
 		invariants::continuous_sound
@@ -82,12 +81,10 @@ struct arena_mode_view_rules {
 	augs::enum_array<assets::image_id, scoreboard_icon_type> icons;
 	assets::image_id money_icon;
 
-	real32 fog_of_war_angle = 150.f;
+	fog_of_war_settings fog_of_war;
 	double audiovisual_speed = 1.0;
 	uint32_t keep_camera_at_dead_body_for_secs = 3;
 	// END GEN INTROSPECTOR
-
-	void adjust(game_drawing_settings&) const;
 };
 
 struct arena_mode_match_result {

@@ -57,6 +57,10 @@ entity_id client_setup::get_viewed_character_id() const {
 
 void client_setup::customize_for_viewing(config_lua_table& config) const {
 	config.window.name = "Arena client";
+
+	if (is_gameplay_on()) {
+		get_arena_handle(client_arena_type::REFERENTIAL).adjust(config.drawing);
+	}
 }
 
 void client_setup::accept_game_gui_events(const game_gui_entropy_type& events) {

@@ -315,15 +315,21 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::GAMEPLAY: {
-				revertable_slider(CONFIG_NVP(camera.look_bound_expand), 0.2f, 2.f);
-				
-				revertable_checkbox(CONFIG_NVP(camera.enable_smoothing));
+				if (auto node = scoped_tree_node("Camera")) {
+					auto& scope_cfg = config.camera;
 
-				if (config.camera.enable_smoothing) {
-					auto indent = scoped_indent();
+					revertable_slider(SCOPE_CFG_NVP(look_bound_expand), 0.2f, 2.f);
+					
+					revertable_checkbox(SCOPE_CFG_NVP(enable_smoothing));
 
-					revertable_slider(CONFIG_NVP(camera.smoothing.averages_per_sec), 0.f, 100.f); 
-					revertable_slider(CONFIG_NVP(camera.smoothing.average_factor), 0.01f, 0.95f); 
+					if (scope_cfg.enable_smoothing) {
+						auto indent = scoped_indent();
+
+						revertable_slider(SCOPE_CFG_NVP(smoothing.averages_per_sec), 0.f, 100.f); 
+						revertable_slider(SCOPE_CFG_NVP(smoothing.average_factor), 0.01f, 0.95f); 
+					}
+
+					revertable_checkbox(SCOPE_CFG_NVP(adjust_zoom_to_available_fog_of_war_size));
 				}
 
 				revertable_checkbox("Draw weapon laser", config.drawing.draw_weapon_laser);
@@ -344,7 +350,7 @@ void settings_gui_state::perform(
 				}
 
 				if (auto node = scoped_tree_node("Fog of war")) {
-					auto& scope_cfg = config.drawing.fog_of_war;
+					auto& scope_cfg = config.drawing.fog_of_war_appearance;
 					revertable_checkbox(SCOPE_CFG_NVP(overlay_color_on_visible));
 					revertable_color_edit(SCOPE_CFG_NVP(overlay_color));
 				}

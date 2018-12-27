@@ -5,6 +5,7 @@
 #include "game/cosmos/solvers/standard_solver.h"
 #include "game/modes/mode_entropy.h"
 #include "game/modes/mode_player_id.h"
+#include "game/modes/detail/fog_of_war_settings.h"
 
 using mode_entity_id = entity_id;
 
@@ -16,6 +17,8 @@ class cosmos;
 struct test_mode_view_rules {
 	// GEN INTROSPECTOR struct test_mode_view_rules
 	double audiovisual_speed = 1.0;
+	fog_of_war_settings fog_of_war;
+	bool show_enemy_hud = true;
 	// END GEN INTROSPECTOR
 };
 

@@ -786,6 +786,7 @@ int work(const int argc, const char* const * const argv) try {
 
 		gameplay_camera.tick(
 			screen_size,
+			viewing_config.drawing.fog_of_war,
 			interp,
 			frame_delta,
 			viewing_config.camera,

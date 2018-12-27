@@ -129,7 +129,7 @@ option(BUILD_TEST_SCENES "Build unscripted test scenes hardcoded in C++." ${DEFA
 option(BUILD_STENCIL_BUFFER "Build stencil buffer related code. Will be disabled in MMO setups, so everybody is equal in having wallhacks." ${DEFAULT_OPT})
 option(BUILD_PROPERTY_EDITOR "Build property editor code for the editor setup. Due to hardcore templates, this takes amazingly long time to build, so it makes sense to turn it off sometimes." ${DEFAULT_OPT})
 
-option(STATIC_LINK "Statically link all libraries." OFF)
+option(STATIC_LINK_STDLIB "Statically link the C++ standard library." OFF)
 option(PREFER_LIBCXX "Use llvm's implementation of the C++ standard library." ON)
 
 set(BUILD_IN_CONSOLE_MODE OFF CACHE STRING "0")
@@ -652,7 +652,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/game/modes/mode_entropy.cpp"
 	"src/application/input/adjust_game_motions.cpp"
 	"src/application/network/simulation_receiver.cpp"
-	"src/game/modes/arena_mode.cpp"
 	"src/application/setups/editor/gui/editor_tutorial_gui.cpp"
 	"src/application/network/network_adapters.cpp"
 	"src/application/arena/arena_paths.cpp"
@@ -868,18 +867,31 @@ else()
 	execute_process(COMMAND ${CMAKE_COMMAND} -E copy ${HYPERSOMNIA_VERSION_FILE_INPUT_PATH} ${HYPERSOMNIA_VERSION_FILE_CPP})
 endif()
 
-if (STATIC_LINK AND UNIX)
-	message("Libraries will be linked statically.")
+macro(prefer_static_libraries)
+	if (UNIX)
+		message("These libraries will be linked statically.")
 
-	message("Default CMAKE_FIND_LIBRARY_SUFFIXES: ${CMAKE_FIND_LIBRARY_SUFFIXES}")
+		message("Default CMAKE_FIND_LIBRARY_SUFFIXES: ${CMAKE_FIND_LIBRARY_SUFFIXES}")
 
-	list( REMOVE_ITEM CMAKE_FIND_LIBRARY_SUFFIXES   ".a" )
-	list( INSERT      CMAKE_FIND_LIBRARY_SUFFIXES 0 ".a" )
+		list( REMOVE_ITEM CMAKE_FIND_LIBRARY_SUFFIXES   ".a" )
+		list( INSERT      CMAKE_FIND_LIBRARY_SUFFIXES 0 ".a" )
 
-	message("CMAKE_FIND_LIBRARY_SUFFIXES after adjustment: ${CMAKE_FIND_LIBRARY_SUFFIXES}")
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++")
-endif()
+		message("CMAKE_FIND_LIBRARY_SUFFIXES after adjustment: ${CMAKE_FIND_LIBRARY_SUFFIXES}")
+	endif()
+endmacro()
 
+macro(prefer_shared_libraries)
+	if (UNIX)
+		message("These libraries will be linked dynamically.")
+
+		message("Default CMAKE_FIND_LIBRARY_SUFFIXES: ${CMAKE_FIND_LIBRARY_SUFFIXES}")
+
+		list( REMOVE_ITEM CMAKE_FIND_LIBRARY_SUFFIXES   ".so" )
+		list( INSERT      CMAKE_FIND_LIBRARY_SUFFIXES 0 ".so" )
+
+		message("CMAKE_FIND_LIBRARY_SUFFIXES after adjustment: ${CMAKE_FIND_LIBRARY_SUFFIXES}")
+	endif()
+endmacro()
 
 # We add headers to aid IntelliSense.
 
@@ -1386,7 +1398,12 @@ if(BUILD_WINDOW_FRAMEWORK)
 	if(UNIX)
 		find_package(X11 REQUIRED)
 		list(APPEND CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake/extra-cmake-modules/find-modules")
-		find_package(XCB REQUIRED COMPONENTS XCB GLX KEYSYMS)
+		find_package(XCB REQUIRED COMPONENTS XCB GLX )
+
+		prefer_static_libraries()
+		find_package(XCB REQUIRED COMPONENTS KEYSYMS)
+		prefer_shared_libraries()
+
 		find_package(X11_XCB REQUIRED)
 
 		include_directories(${X11_INCLUDE_DIR})
@@ -1426,7 +1443,9 @@ if(MSVC)
 	endif()
 elseif(CLANG)
 	if(USE_LIBCXX)
-		if(STATIC_LINK)
+		if(STATIC_LINK_STDLIB)
+			prefer_static_libraries()
+
 			find_library(CPP c++)
 			find_library(CPPFS c++fs)
 			find_library(CPPEXPERIMENTAL c++experimental)
@@ -1447,6 +1466,9 @@ elseif(CLANG)
 			endif()
 
 			set(HYPERSOMNIA_LIBS ${CPP} ${CPPABI} ${CPPFS} ${CPPEXPERIMENTAL} ${HYPERSOMNIA_LIBS})
+			set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc -static-libstdc++")
+
+			prefer_shared_libraries()
 		else()
 			list(APPEND HYPERSOMNIA_LIBS c++fs c++experimental)
 		endif()
@@ -1466,17 +1488,22 @@ if (BUILD_NETWORKING)
 		set(SODIUM_HINTS "")
 	endif()
 
+	prefer_static_libraries()
+
 	find_library(MBEDTLS NAMES mbedtls HINTS ${SODIUM_HINTS})
 	find_library(MBEDX509 NAMES mbedx509 HINTS ${SODIUM_HINTS})
 	find_library(MBEDCRYPTO NAMES mbedcrypto HINTS ${SODIUM_HINTS})
 	find_library(SODIUM NAMES sodium HINTS ${SODIUM_HINTS})
+
+	prefer_shared_libraries()
 
 	list(APPEND HYPERSOMNIA_LIBS ${SODIUM} ${MBEDTLS} ${MBEDX509} ${MBEDCRYPTO})
 endif()
 
 set_target_properties(Hypersomnia PROPERTIES DEBUG_POSTFIX "")
 
-message("All libs: ${HYPERSOMNIA_LIBS}")
+string(REPLACE ";" "\n" READABLE_ALL_LIBS_STR "${HYPERSOMNIA_LIBS}")
+message("All libs:\n${READABLE_ALL_LIBS_STR}")
 
 target_link_libraries(Hypersomnia ${HYPERSOMNIA_LIBS})
 

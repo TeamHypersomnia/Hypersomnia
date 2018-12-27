@@ -161,7 +161,7 @@ void illuminated_rendering(
 
 	const bool fog_of_war_effective = 
 		viewed_character_transform != std::nullopt 
-		&& settings.fog_of_war.enabled
+		&& settings.fog_of_war.is_enabled()
 	;
 
 #if BUILD_STENCIL_BUFFER
@@ -173,12 +173,14 @@ void illuminated_rendering(
 	thread_local visibility_responses viewed_visibility;
 
 	if (fog_of_war_effective) {
+		const auto fow_size = settings.fog_of_war.get_real_size();
+
 		auto fow_raycasts_scope = cosm.measure_raycasts(profiler.fog_of_war_raycasts);
 
 		messages::visibility_information_request request;
 		request.eye_transform = *viewed_character_transform;
 		request.filter = predefined_queries::pathfinding();
-		request.square_side = static_cast<float>(std::max(screen_size.x, screen_size.y) * 2);
+		request.square_side = static_cast<float>(std::max(fow_size.x, fow_size.y));
 		request.subject = viewed_character;
 
 		auto& requests = thread_local_visibility_requests();
@@ -233,7 +235,7 @@ void illuminated_rendering(
 
 				const auto eye_frag_pos = [&]() {
 					auto screen_space = cone.to_screen_space(eye_pos);	
-					screen_space.y = cone.screen_size.y - screen_space.y;
+					screen_space.y = screen_size.y - screen_space.y;
 					return screen_space;
 				}();
 
@@ -498,19 +500,27 @@ void illuminated_rendering(
 
 #if BUILD_STENCIL_BUFFER
 	if (fog_of_war_effective) {
-		renderer.call_and_clear_triangles();
+		const auto& appearance = settings.fog_of_war_appearance;
 
+		renderer.call_and_clear_triangles();
 		renderer.enable_stencil();
-		if (settings.fog_of_war.overlay_color_on_visible) {
+
+		if (appearance.overlay_color_on_visible) {
 			renderer.stencil_positive_test();
 		}
 		else {
 			renderer.stencil_reverse_test();
 		}
 
-		shaders.pure_color_highlight->set_as_current();
-		shaders.pure_color_highlight->set_projection(augs::orthographic_projection(vec2(screen_size)));
-		output.color_overlay(screen_size, settings.fog_of_war.overlay_color);
+		set_shader_with_matrix(shaders.pure_color_highlight);
+
+		const auto fow_size = settings.fog_of_war.get_real_size();
+
+		output.aabb(
+			ltrb::center_and_size(viewed_character_transform->pos, fow_size),
+			appearance.overlay_color
+		);
+
 		renderer.call_and_clear_triangles();
 		shaders.pure_color_highlight->set_projection(matrix);
 
