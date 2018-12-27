@@ -2675,3 +2675,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - let q also look for the bomb if the hotbar empty
 - Fix build without the editor
 
+- fixbomb planting duration
+- fix esc for that damn team selection

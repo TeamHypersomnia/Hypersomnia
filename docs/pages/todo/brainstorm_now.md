@@ -38,10 +38,8 @@ summary: That which we are brainstorming at the moment.
 
 - see if bilmer and vindicator have better intervals at 64hz
 
-- fixbomb planting duration
 - dont show defusing progress if youre tt
 - Rebuy previous
-- fix esc for that damn team selection
 
 - Trim reach inside component please
 	- the marker type probably as well as it is annoying
