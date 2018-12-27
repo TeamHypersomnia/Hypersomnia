@@ -77,8 +77,8 @@ Options:
     --connect [ip:port]         Connect to an arena server in accordance with default_client_start inside the config file.
                                 The ip:port argument is optional - if specified, it will override the ip_port field from the config file.
     --server                    Host an arena server in accordance with default_server_start inside the config file.
-	                            Contrary to the --dedicated-server option, this lets you play on your own server within the same game instance.
-	--dedicated-server          The same as --server, but applies some settings suitable for a dedicated server instance.
+                                Contrary to the --dedicated-server option, this lets you play on your own server within the same game instance.
+    --dedicated-server          The same as --server, but applies some settings suitable for a dedicated server instance.
                                 For example - the game will be started without a window.
 
 If editor_file_path is supplied and it is a directory,

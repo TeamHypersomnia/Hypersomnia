@@ -90,9 +90,6 @@ int work(const int argc, const char* const * const argv) try {
 		LOG("Live log file created at %x", augs::date_time().get_readable());
 		LOG("No %x exists yet, so the game will log to the live file for the first launch.", LOG_FILES_DIR);
 	}
-	else {
-		augs::remove_file(LOG_FILES_DIR "/live_debug.txt");
-	}
 
 	static augs::timer until_first_swap;
 	bool until_first_swap_measured = false;
@@ -140,7 +137,8 @@ int work(const int argc, const char* const * const argv) try {
 	};
 
 	if (config.log_to_live_file) {
-		/* Don't disable it if it's already on. */
+		augs::remove_file(LOG_FILES_DIR "/live_debug.txt");
+
 		log_to_live_file = config.log_to_live_file;
 
 		LOG("Live log was enabled due to a flag in config.");

@@ -11,6 +11,10 @@ summary: That which we are brainstorming at the moment.
 - Admin panel
 	- Editor-like server vars tweaker accessible by pressing ESC server-side
 		- will have to be commandized properly, just like editor setup's
+	- Should we re-use change property command?
+		- we'll only need a dummy editor folder struct
+			- we could make it more flexible
+
 - Properly sync client's changes to nickname, sensitivity or others.
 
 - Equipment generators

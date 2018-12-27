@@ -77,11 +77,14 @@ namespace augs {
 			}
 		}
 
+		LOG("X: Printing default devices.");
 		print_input_devices(display);
 
+		LOG("X: Getting default screen.");
 		int default_screen = DefaultScreen(display);
 
 		/* Get the XCB connection from the display */
+		LOG("X: calling XGetXCBConnection.");
 		connection = XGetXCBConnection(display);
 
 		if (!connection) {
@@ -89,19 +92,28 @@ namespace augs {
 			throw window_error("Can't get xcb connection from display");
 		}
 
+		LOG("X: calling xcb_key_symbols_alloc.");
 		syms = xcb_key_symbols_alloc(connection);
 
 		/* Acquire event queue ownership */
+		LOG("X: calling XSetEventQueueOwner.");
 		XSetEventQueueOwner(display, XCBOwnsEventQueue);
 
 		/* Find XCB screen */
 		xcb_screen_t *screen = 0;
-		xcb_screen_iterator_t screen_iter = xcb_setup_roots_iterator(xcb_get_setup(connection));
+
+		LOG("X: getting setup with xcb_get_setup.");
+		const auto setup = xcb_get_setup(connection);
+
+		LOG("X: calling xcb_setup_roots_iterator.");
+
+		xcb_screen_iterator_t screen_iter = xcb_setup_roots_iterator(setup);
 		for(int screen_num = default_screen;
 						screen_iter.rem && screen_num > 0;
 						--screen_num, xcb_screen_next(&screen_iter));
 		screen = screen_iter.data;
 
+		LOG("X: calling setup_and_run lambda.");
 		auto setup_and_run = [this, settings](int default_screen, xcb_screen_t *screen) {
 			auto fb_config = [&]() {
 				thread_local auto disp = display; disp = display;
@@ -172,6 +184,8 @@ namespace augs {
 
 					int fbcount;
 
+					LOG("X: calling glXChooseFBConfig.");
+
 					auto fbc = xfreed_unique(glXChooseFBConfig(
 						display, 
 						default_screen, 
@@ -183,7 +197,9 @@ namespace augs {
 						throw window_error( "Failed to retrieve a framebuffer config\n" );
 					}
 
-					return std::vector<total_config>(fbc.get(), fbc.get() + fbcount);
+					LOG("X: making a vector of configs.");
+					auto result = std::vector<total_config>(fbc.get(), fbc.get() + fbcount);
+					return result;
 				}();
 
 				LOG("Found %x matching FB configs.\n", fbc.size());
@@ -205,6 +221,8 @@ namespace augs {
 				LOG("Choosing the first fb config in list.");
 				return fbc.front();
 			}();
+
+			LOG("X: calling glXCreateNewContext.");
 
 			/* Create OpenGL context */
 			context = glXCreateNewContext(display, fb_config.fb, GLX_RGBA_TYPE, 0, True);
