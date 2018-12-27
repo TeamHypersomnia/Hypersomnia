@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Rebuy previous
+	- Plan for state early
+
+- should rebuy previous also buy magazines bought?
+	- perhaps
+
 - Automatically pick the bought weapon
 	- currently it is held into eq if something different is held, I think
 
@@ -27,9 +33,6 @@ summary: That which we are brainstorming at the moment.
 	- somehow cache the nick or remove the entry?
 	- this is cool actually but if someone connects right away it will show his nickname as the victim
 
-- should rebuy previous also buy magazines bought?
-	- perhaps
-
 - Watch out if fpset does not cause performance problems
 
 - Do something so that we don't lose work in playtesting mode
@@ -37,9 +40,6 @@ summary: That which we are brainstorming at the moment.
 - fix Common state crash
 
 - see if bilmer and vindicator have better intervals at 64hz
-
-- dont show defusing progress if youre tt
-- Rebuy previous
 
 - Trim reach inside component please
 	- the marker type probably as well as it is annoying

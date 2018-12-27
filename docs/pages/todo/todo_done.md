@@ -2677,3 +2677,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - fixbomb planting duration
 - fix esc for that damn team selection
+- dont show defusing progress if youre tt
+

@@ -52,6 +52,13 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 		}
 	};
 
+	const auto& watched_character = cosm[in.viewed_character_id];
+	const auto watched_character_faction = watched_character ? watched_character.get_official_faction() : faction_type::SPECTATOR;
+
+	auto is_authorized_faction = [&](const auto f) {
+		return watched_character_faction != faction_type::SPECTATOR && f == watched_character_faction;
+	};
+
 	cosm.for_each_having<components::hand_fuse>(
 		[&](const auto it) {
 			const auto& fuse = it.template get<components::hand_fuse>();
@@ -101,11 +108,15 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 
 				if (t == circular_bar_type::OVER_MEDIUM && fuse_def.defusing_enabled()) {
 					if (const auto amount_defused = fuse.amount_defused; amount_defused >= 0.f) {
-						const auto highlight_amount = static_cast<float>(
-							amount_defused / fuse_def.defusing_duration_ms
-						);
+						if (const auto defusing_character = cosm[fuse.character_now_defusing]) {
+							if (is_authorized_faction(defusing_character.get_official_faction())) {
+								const auto highlight_amount = static_cast<float>(
+									amount_defused / fuse_def.defusing_duration_ms
+								);
 
-						do_draw_circle(highlight_amount, white, red_violet);
+								do_draw_circle(highlight_amount, white, red_violet);
+							}
+						}
 					}
 				}
 			}
@@ -113,13 +124,6 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 	);
 
 	if (t == circular_bar_type::SMALL) {
-		const auto& watched_character = cosm[in.viewed_character_id];
-		const auto watched_character_faction = watched_character ? watched_character.get_official_faction() : faction_type::SPECTATOR;
-
-		auto is_authorized_faction = [&](const auto f) {
-			return watched_character_faction != faction_type::SPECTATOR && f != watched_character_faction;
-		};
-
 		const bool enemy_hud = in.settings.draw_enemy_hud;
 
 		cosm.for_each_having<components::gun>(
@@ -133,7 +137,7 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 						if (progress > 0.f) {
 							if (!enemy_hud) { 
 								if (const auto c = it.get_owning_transfer_capability()) {
-									if (is_authorized_faction(c.get_official_faction())) {
+									if (!is_authorized_faction(c.get_official_faction())) {
 										return;
 									}
 								}
@@ -169,7 +173,7 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 
 				if (!enemy_hud) { 
 					if (const auto c = item.get_owning_transfer_capability()) {
-						if (is_authorized_faction(c.get_official_faction())) {
+						if (!is_authorized_faction(c.get_official_faction())) {
 							return;
 						}
 					}
