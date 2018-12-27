@@ -55,10 +55,9 @@ void editor_setup::for_each_dashed_line(F&& callback) const {
 			[&](const entity_id id) {
 				const auto handle = world[id];
 
-				handle.dispatch_on_having_all<invariants::light>([&](const auto typed_handle) {
+				handle.dispatch_on_having_all<components::light>([&](const auto typed_handle) {
 					const auto center = typed_handle.get_logic_transform().pos;
 
-					const auto& light_def = typed_handle.template get<invariants::light>();
 					const auto& light = typed_handle.template get<components::light>();
 
 					const auto light_color = light.color;
@@ -78,8 +77,8 @@ void editor_setup::for_each_dashed_line(F&& callback) const {
 						);
 					};
 
-					draw_reach_indicator(light_def.calc_reach_trimmed(), light_color);
-					draw_reach_indicator(light_def.calc_wall_reach_trimmed(), rgba(light_color).mult_alpha(0.7f));
+					draw_reach_indicator(light.calc_reach_trimmed(), light_color);
+					draw_reach_indicator(light.calc_wall_reach_trimmed(), rgba(light_color).mult_alpha(0.7f));
 				});
 
 				if (is_mover_active()) {

@@ -34,14 +34,14 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_static_lights::STRONG_LAMP);
 
-			invariants::light light; 
+			components::light light; 
 			meta.set(light);
 		}
 
 		{
 			auto& meta = get_test_flavour(flavours, test_static_lights::AQUARIUM_LAMP);
 
-			invariants::light light; 
+			components::light light; 
 			light.attenuation.constant = 75;
 			light.attenuation.quadratic = 631;
 			meta.set(light);

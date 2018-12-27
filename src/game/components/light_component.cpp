@@ -5,7 +5,7 @@
 #define LINEAR_MULT 10000
 #define QUADRATIC_MULT 10000000
 
-namespace invariants {
+namespace components {
 	light::light() {
 		attenuation.constant = 0.4f * CONST_MULT;
 		attenuation.linear = 0.000005f * LINEAR_MULT;

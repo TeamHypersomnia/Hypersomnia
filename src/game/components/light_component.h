@@ -46,12 +46,22 @@ struct attenuation_properties {
 namespace invariants {
 	struct light {
 		// GEN INTROSPECTOR struct invariants::light
+		int reserved_for_future_use = 0;
+		// END GEN INTROSPECTOR
+	};
+}
+
+namespace components {
+	struct light {
+		// GEN INTROSPECTOR struct components::light
 		attenuation_properties attenuation;
 		attenuation_properties wall_attenuation;
 
 		augs::maybe<attenuation_variations> variation;
 		augs::maybe<attenuation_variations> wall_variation;
 		augs::maybe<std::array<light_value_variation, 2>> position_variations;
+
+		rgba color = white;
 		// END GEN INTROSPECTOR
 
 		light();
@@ -60,13 +70,5 @@ namespace invariants {
 
 		real32 calc_reach_trimmed() const;
 		real32 calc_wall_reach_trimmed() const;
-	};
-}
-
-namespace components {
-	struct light {
-		// GEN INTROSPECTOR struct components::light
-		rgba color = white;
-		// END GEN INTROSPECTOR
 	};
 }

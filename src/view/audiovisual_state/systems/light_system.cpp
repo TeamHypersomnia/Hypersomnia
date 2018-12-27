@@ -47,7 +47,7 @@ void light_system::advance_attenuation_variations(
 ) {
 	cosm.for_each_having<components::light>(
 		[&](const auto it) {
-			const auto& light = it.template get<invariants::light>();
+			const auto& light = it.template get<components::light>();
 			auto& cache = per_entity_cache[it];
 
 			const auto delta = dt.in_seconds();
@@ -164,9 +164,9 @@ void light_system::render_all_lights(const light_system_input in) const {
 		cosm.for_each_having<components::light>(
 			[&](const auto light_entity) {
 				const auto light_transform = light_entity.get_viewing_transform(interp);
-				const auto& light_def = light_entity.template get<invariants::light>();
+				const auto& light = light_entity.template get<components::light>();
 
-				const auto reach = light_def.calc_reach_trimmed();
+				const auto reach = light.calc_reach_trimmed();
 				const auto light_aabb = xywh::center_and_size(light_transform.pos, vec2::square(reach * 2));
 
 				if (const auto cache = mapped_or_nullptr(per_entity_cache, unversioned_entity_id(light_entity))) {
@@ -206,7 +206,6 @@ void light_system::render_all_lights(const light_system_input in) const {
 		const auto& r = responses[i];
 		const auto& light_entity = cosm[requests[i].subject];
 		const auto& light = light_entity.get<components::light>();
-		const auto& light_def = light_entity.get<invariants::light>();
 		const auto world_light_pos = requests[i].eye_transform.pos;
 		
 		const auto& cache = per_entity_cache.at(light_entity);
@@ -250,7 +249,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 			}
 
 			{
-				const auto& a = light_def.attenuation;
+				const auto& a = light.attenuation;
 
 				const auto attenuations = vec3 {
 					(variation_vals[0] + a.constant) / CONST_MULT,
@@ -281,14 +280,13 @@ void light_system::render_all_lights(const light_system_input in) const {
 	for (size_t i = 0; i < requests.size(); ++i) {
 		const auto& light_entity = cosm[requests[i].subject];
 		const auto& light = light_entity.get<components::light>();
-		const auto& light_def = light_entity.get<invariants::light>();
 		const auto world_light_pos = requests[i].eye_transform.pos;
 
 		const auto& cache = per_entity_cache.at(light_entity);
 		const auto& variation_vals = cache.all_variation_values;
 
 		const auto wall_light_aabb = [&]() {
-			const auto wall_reach = light_def.calc_wall_reach_trimmed();
+			const auto wall_reach = light.calc_wall_reach_trimmed();
 			return xywh::center_and_size(world_light_pos, vec2::square(wall_reach * 2));
 		}();
 
@@ -304,7 +302,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 			++num_wall_lights;
 
 			{
-				const auto& a = light_def.wall_attenuation;
+				const auto& a = light.wall_attenuation;
 
 				const auto attenuations = vec3 {
 					(variation_vals[3] + a.constant) / CONST_MULT,

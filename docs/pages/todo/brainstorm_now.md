@@ -12,9 +12,6 @@ summary: That which we are brainstorming at the moment.
 - should rebuy previous also buy magazines bought?
 	- perhaps
 
-- Automatically pick the bought weapon
-	- currently it is held into eq if something different is held, I think
-
 - We might want to predict sounds depending on the effect
 	- E.g. tie FoTA effects to the referential
 	- But UWoTA to the predicted as there is a delay

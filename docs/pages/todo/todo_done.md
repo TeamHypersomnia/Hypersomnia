@@ -2679,3 +2679,6 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - fix esc for that damn team selection
 - dont show defusing progress if youre tt
 
+- Automatically pick the bought weapon
+	- currently it is held into eq if something different is held, I think
+
