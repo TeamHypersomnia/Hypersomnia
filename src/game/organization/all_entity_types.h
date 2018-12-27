@@ -389,6 +389,7 @@ struct point_marker {
 	>;
 
 	using components = type_list<
+		components::marker,
 		components::transform
 	>;
 };
@@ -402,6 +403,7 @@ struct box_marker {
 	>;
 
 	using components = type_list<
+		components::marker,
 		components::transform,
 		components::overridden_geo
 	>;

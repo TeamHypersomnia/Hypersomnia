@@ -8,9 +8,8 @@ struct marker_icon {
 	rgba col = white;
 
 	template <class F>
-	marker_icon(const invariants::box_marker& p, F get_faction_color) {
+	marker_icon(const invariants::box_marker& p, const components::marker& meta, F get_faction_color) {
 		const auto type = p.type;
-		const auto meta = p.meta;
 
 		if (type == area_marker_type::BOMBSITE_A) {
 			id = I::EDITOR_ICON_BOMBSITE_A;
@@ -35,10 +34,10 @@ struct marker_icon {
 	}
 
 	template <class F>
-	marker_icon(const invariants::point_marker& p, F get_faction_color) {
+	marker_icon(const invariants::point_marker& p, const components::marker& meta, F get_faction_color) {
 		if (p.type == point_marker_type::TEAM_SPAWN) {
 			id = I::EDITOR_ICON_SPAWN;
-			col = get_faction_color(p.meta.associated_faction);
+			col = get_faction_color(meta.associated_faction);
 		}
 		else if (p.type == point_marker_type::FFA_SPAWN) {
 			id = I::EDITOR_ICON_SPAWN;
@@ -59,11 +58,13 @@ void for_each_iconed_entity(
 	};
 
 	visible.for_each<render_layer::POINT_MARKERS, render_layer::AREA_MARKERS>(cosm, [&](const auto handle) {
-		handle.template dispatch_on_having_any<invariants::point_marker, invariants::box_marker>([&](const auto typed_handle) {
+		handle.template dispatch_on_having_all<components::marker>([&](const auto& typed_handle) {
 			using E = remove_cref<decltype(typed_handle)>;
 
+			const auto& marker = typed_handle.template get<components::marker>();
+
 			if constexpr(E::template has<invariants::point_marker>()) {
-				const auto m = marker_icon(typed_handle.template get<invariants::point_marker>(), get_faction_color);
+				const auto m = marker_icon(typed_handle.template get<invariants::point_marker>(), marker, get_faction_color);
 
 				callback(
 					typed_handle,
@@ -73,7 +74,7 @@ void for_each_iconed_entity(
 				);
 			}
 			else if constexpr(E::template has<invariants::box_marker>()) {
-				const auto m = marker_icon(typed_handle.template get<invariants::box_marker>(), get_faction_color);
+				const auto m = marker_icon(typed_handle.template get<invariants::box_marker>(), marker, get_faction_color);
 
 				callback(
 					typed_handle,

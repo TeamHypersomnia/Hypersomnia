@@ -172,6 +172,14 @@ public:
 		}
 	}
 
+	void set_associated_faction(const faction_type f) const {
+		const auto self = *static_cast<const E*>(this);
+
+		if (const auto marker = self.template find<components::marker>()) {
+			marker->associated_faction = f;
+		}
+	}
+
 	faction_type get_official_faction() const {
 		const auto self = *static_cast<const E*>(this);
 
@@ -183,12 +191,8 @@ public:
 			return sender->faction_of_sender;
 		}
 
-		if (const auto marker = self.template find<invariants::box_marker>()) {
-			return marker->meta.associated_faction;
-		}
-
-		if (const auto marker = self.template find<invariants::point_marker>()) {
-			return marker->meta.associated_faction;
+		if (const auto marker = self.template find<components::marker>()) {
+			return marker->associated_faction;
 		}
 
 		return faction_type::SPECTATOR;

@@ -2682,3 +2682,6 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - Automatically pick the bought weapon
 	- currently it is held into eq if something different is held, I think
 
+
+- Trim reach inside component please
+	- the marker type probably as well as it is annoying

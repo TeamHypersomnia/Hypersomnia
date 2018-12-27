@@ -183,7 +183,7 @@ namespace test_scenes {
 			};
 
 			for (const auto& s : spawn_transforms) {
-				create(test_point_markers::RESISTANCE_SPAWN, s);
+				create(test_point_markers::BOMB_MODE_SPAWN, s).set_associated_faction(faction_type::RESISTANCE);
 			}
 		}
 
@@ -194,7 +194,7 @@ namespace test_scenes {
 			};
 
 			for (const auto& s : spawn_transforms) {
-				create(test_point_markers::METROPOLIS_SPAWN, s);
+				create(test_point_markers::BOMB_MODE_SPAWN, s).set_associated_faction(faction_type::METROPOLIS);
 			}
 		}
 
@@ -764,8 +764,8 @@ namespace test_scenes {
 		const auto orig1 = vec2(380, -1524);
 		create_aquarium(orig1);
 
-		create(test_box_markers::METROPOLIS_BUY_AREA, vec2(580, -800)).set_logical_size(vec2(600, 200));
-		create(test_box_markers::RESISTANCE_BUY_AREA, vec2(480, 200)).set_logical_size(vec2(600, 200));
+		create(test_box_markers::BUY_AREA, vec2(580, -800)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::METROPOLIS);
+		create(test_box_markers::BUY_AREA, vec2(480, 200)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::RESISTANCE);
 
 		create(test_box_markers::BOMBSITE_A, vec2(580, -400)).set_logical_size(vec2(600, 200));
 

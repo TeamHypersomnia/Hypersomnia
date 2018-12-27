@@ -84,6 +84,7 @@ namespace components {
 	struct overridden_geo;
 	struct cascade_explosion;
 	struct melee_fighter;
+	struct marker;
 }
 
 using assert_always_together = type_list<
@@ -110,7 +111,9 @@ using assert_first_implies_second = type_list<
 	type_pair<invariants::item, invariants::sprite>,
 	type_pair<invariants::wandering_pixels, components::position>,
 	type_pair<components::continuous_particles, invariants::continuous_particles>,
-	type_pair<invariants::light, components::transform>
+	type_pair<invariants::light, components::transform>,
+	type_pair<invariants::box_marker, components::marker>,
+	type_pair<invariants::point_marker, components::marker>
 >;
 
 using assert_never_together = type_list<
@@ -118,7 +121,8 @@ using assert_never_together = type_list<
 	type_pair<components::rigid_body, components::position>,
 	type_pair<components::position, components::transform>,
 	type_pair<components::rigid_body, components::wandering_pixels>,
-	type_pair<invariants::melee, invariants::missile>
+	type_pair<invariants::melee, invariants::missile>,
+	type_pair<invariants::box_marker, invariants::point_marker>
 >;
 
 using always_present_invariants = type_list<
@@ -161,7 +165,8 @@ using component_list_t = List<
 	components::remnant,
 	components::continuous_particles,
 	components::overridden_geo,
-	components::cascade_explosion
+	components::cascade_explosion,
+	components::marker
 >;
 
 template <template <class...> class List>

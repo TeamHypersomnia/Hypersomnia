@@ -52,6 +52,7 @@ void editor_summary_gui::perform(editor_setup& setup) {
 				thread_local auto compression_state = augs::make_compression_state();
 
 				input_buf.clear();
+				compressed_buf.clear();
 
 				{
 					auto s = augs::ref_memory_stream(input_buf);

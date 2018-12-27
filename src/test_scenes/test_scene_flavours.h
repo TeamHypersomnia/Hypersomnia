@@ -270,8 +270,7 @@ enum class test_particles_decorations {
 enum class test_point_markers {
 	// GEN INTROSPECTOR enum class test_point_markers
 	FFA_SPAWN,
-	METROPOLIS_SPAWN,
-	RESISTANCE_SPAWN,
+	BOMB_MODE_SPAWN,
 	COUNT
 	// END GEN INTROSPECTOR
 };
@@ -280,8 +279,7 @@ enum class test_box_markers {
 	// GEN INTROSPECTOR enum class test_box_markers
 	BOMBSITE_A,
 	BOMBSITE_B,
-	RESISTANCE_BUY_AREA,
-	METROPOLIS_BUY_AREA,
+	BUY_AREA,
 
 	ORGANISM_AREA,
 

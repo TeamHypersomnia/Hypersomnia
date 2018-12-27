@@ -8,6 +8,8 @@ summary: That which we are brainstorming at the moment.
 
 - Rebuy previous
 	- Plan for state early
+		- note that we don't need any bincompat regarding the mode solvable
+		- because anyway we are importing/exporting without that state
 
 - should rebuy previous also buy magazines bought?
 	- perhaps
@@ -37,9 +39,6 @@ summary: That which we are brainstorming at the moment.
 - fix Common state crash
 
 - see if bilmer and vindicator have better intervals at 64hz
-
-- Trim reach inside component please
-	- the marker type probably as well as it is annoying
 
 - Create randomized players like in the good olden times
 	- to test the predicted experience

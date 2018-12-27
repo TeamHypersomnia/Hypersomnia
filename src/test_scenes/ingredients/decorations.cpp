@@ -117,8 +117,12 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(in.flavours, test_box_markers::ORGANISM_AREA);
 			invariants::box_marker marker;
 			marker.type = area_marker_type::ORGANISM_AREA;
-			marker.meta.associated_faction = faction_type::SPECTATOR;
+
+			components::marker marker_meta;
+			marker_meta.associated_faction = faction_type::SPECTATOR;
+
 			meta.set(marker);
+			meta.set(marker_meta);
 
 			components::overridden_geo geo;
 			geo.size.emplace(aquarium_size * 2);

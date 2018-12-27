@@ -107,7 +107,7 @@ auto for_each_faction_spawn(const cosmos& cosm, const faction_type faction, F&& 
 			const auto& marker = typed_handle.template get<invariants::point_marker>();
 
 			if (marker.type == point_marker_type::TEAM_SPAWN) {
-				if (marker.meta.associated_faction == faction) {
+				if (typed_handle.get_official_faction() == faction) {
 					return continue_or_callback_result(std::forward<F>(callback), typed_handle);
 				}
 			}
