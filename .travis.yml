@@ -33,7 +33,7 @@ python:
 
 matrix:
   include:
-  - env: c_compiler=clang-7 cxx_compiler=clang++-7 config=RelWithDebInfo other_cmake_flags=""
+  - env: c_compiler=clang-7 cxx_compiler=clang++-7 config=RelWithDebInfo other_cmake_flags="-DSTATIC_LINK=1 -DGENERATE_DEBUG_INFORMATION=0 -DBUILD_IN_CONSOLE_MODE=1"
     compiler: clang-7
 #  - env: c_compiler=gcc-7 cxx_compiler=g++-7 config=Debug other_cmake_flags=""
 #    compiler: gcc
@@ -61,7 +61,7 @@ install:
   - cd /tmp
   - tar -zxvf /tmp/libsodium.tar.gz
   - cd libsodium-*
-  - ./configure
+  - ./configure --disable-shared
   - make
   - sudo make install
   - popd

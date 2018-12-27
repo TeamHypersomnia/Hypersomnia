@@ -157,7 +157,7 @@ namespace test_flavours {
 						clash.impulse = 750.f;
 					}
 
-					a.damage.base = 57.f;
+					a.damage.base = 50.f;
 					a.damage.impact_impulse = 40.f;
 					a.damage.impulse_multiplier_against_sentience = 10.f;
 					a.bonus_damage_speed_ratio = 1.f / 1700.f;

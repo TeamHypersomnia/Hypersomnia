@@ -450,8 +450,6 @@ int work(const int argc, const char* const * const argv) try {
 			emplace_current_setup(std::in_place_type_t<editor_setup>(),
 				std::forward<decltype(args)>(args)...
 			);
-
-			game_gui_mode_flag = true;
 		});
 	};
 

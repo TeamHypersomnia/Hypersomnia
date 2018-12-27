@@ -6,6 +6,21 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- perhaps use statically linked musl?
+
+- even test scene mode could specify its fog of war size for scaling?
+- fix HUD when scaled
+
+- bool adjust_zoom_to_available_fog_of_war_size
+	- true by default
+	- some clarification in settings gui
+
+- problem: footstep smokes might still be visible when we artificially increase zoom
+	- well the client itself knows everything anyways
+	- so we can force the zoom to be exact
+		- if someone has more than 1920x1080 they technically have the advantage but the footsteps would still be hearable
+			- one could still see some distant items thrown but come on
+
 - clientside prediction is the most important for now
 
 - fix Common state crash

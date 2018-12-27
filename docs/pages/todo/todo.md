@@ -6,6 +6,12 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- ImGui popup for progress on loading atlases
+	- the imgui atlas itself will load quickly enough
+
+- Initial popup about the zoom change
+	- or scale automatically to the server's fog of war size?
+
 - Consider implementing a radius range for item pickups
 
 - Shouldn't we always calc reloading movement to show context-lessly?
@@ -34,9 +40,6 @@ summary: Just a hidden scratchpad.
 
 - enum-less variants of enum_boolset and enum_map
 	- useful for quick mapping users in an array
-
-- ImGui popup for progress on loading atlases
-	- the imgui atlas itself will load quickly enough
 
 - So that we can change tickrate dynamically, timing logic can, instead of steps, simply hold the floating point (double) values of the seconds passed
 	- alternatively hold unsigned long longs?

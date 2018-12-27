@@ -130,6 +130,7 @@ option(BUILD_STENCIL_BUFFER "Build stencil buffer related code. Will be disabled
 option(BUILD_PROPERTY_EDITOR "Build property editor code for the editor setup. Due to hardcore templates, this takes amazingly long time to build, so it makes sense to turn it off sometimes." ${DEFAULT_OPT})
 
 option(STATIC_LINK "Statically link all libraries." OFF)
+option(PREFER_LIBCXX "Use llvm's implementation of the C++ standard library." ON)
 
 set(BUILD_IN_CONSOLE_MODE OFF CACHE STRING "0")
 
@@ -994,14 +995,19 @@ else()
 	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -std=gnu++1z")
 endif()
 
-if (CLANG AND NOT MSVC)
+if (PREFER_LIBCXX AND CLANG AND NOT MSVC)
 	set(USE_LIBCXX ON)
 endif()
 
 if(USE_LIBCXX)
+	message("Chosen standard library: libc++")
 	# Looks like stdlib=libc++ is duplicated for the linker as well,
 	# so we only have to add it to CXX.
 	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -stdlib=libc++")
+elseif(UNIX)
+	message("Chosen standard library: libstdc++")
+
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -stdlib=libstdc++")
 endif()
 
 if(CLANG)
