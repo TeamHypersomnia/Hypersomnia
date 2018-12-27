@@ -175,6 +175,14 @@ namespace augs {
 
 	void sound_source::set_velocity(const si_scaling si, vec2 v) const {
 		v = si.get_meters(v);
+
+		const bool all_finite = std::isfinite(v.x) && std::isfinite(v.y);
+
+		if (!all_finite) {
+			AL_CHECK(alSource3f(id, AL_VELOCITY, 0.f, 0.f, 0.f));
+			return;
+		}
+
 #if Y_IS_Z
 		AL_CHECK(alSource3f(id, AL_VELOCITY, v.x, 0.f, v.y));
 #else
@@ -187,6 +195,13 @@ namespace augs {
 
 	void sound_source::set_position(const si_scaling si, vec2 pos) const {
 		pos = si.get_meters(pos);
+
+		const bool all_finite = std::isfinite(pos.x) && std::isfinite(pos.y);
+
+		if (!all_finite) {
+			AL_CHECK(alSource3f(id, AL_POSITION, 0.f, 0.f, 0.f));
+			return;
+		}
 
 #if Y_IS_Z
 		AL_CHECK(alSource3f(id, AL_POSITION, pos.x, 0.f, pos.y));
@@ -322,6 +337,13 @@ namespace augs {
 	void set_listener_position(const si_scaling si, vec2 pos) {
 		pos = si.get_meters(pos);
 
+		const bool all_finite = std::isfinite(pos.x) && std::isfinite(pos.y);
+
+		if (!all_finite) {
+			AL_CHECK(alListener3f(AL_POSITION, 0.f, 0.f, 0.f));
+			return;
+		}
+
 #if Y_IS_Z
 		AL_CHECK(alListener3f(AL_POSITION, pos.x, 0.f, pos.y));
 #else
@@ -334,6 +356,13 @@ namespace augs {
 
 	void set_listener_velocity(const si_scaling si, vec2 v) {
 		v = si.get_meters(v);
+
+		const bool all_finite = std::isfinite(v.x) && std::isfinite(v.y);
+
+		if (!all_finite) {
+			AL_CHECK(alListener3f(AL_VELOCITY, 0.f, 0.f, 0.f));
+			return;
+		}
 
 #if Y_IS_Z
 		AL_CHECK(alListener3f(AL_VELOCITY, v.x, 0.f, v.y));
