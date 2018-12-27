@@ -4,6 +4,7 @@
 #include "game/detail/view_input/sound_effect_input.h"
 #include "augs/math/physics_structs.h"
 #include "game/detail/view_input/particle_effect_input.h"
+#include "game/enums/slot_function.h"
 
 namespace components {
 	struct hand_fuse {
@@ -20,6 +21,7 @@ namespace components {
 		pad_bytes<2> pad;
 
 		signi_entity_id character_now_defusing;
+		slot_function slot_when_armed = slot_function::INVALID;
 		// END GEN INTROSPECTOR
 
 		bool armed() const;

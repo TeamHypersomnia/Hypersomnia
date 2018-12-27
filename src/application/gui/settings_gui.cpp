@@ -339,6 +339,7 @@ void settings_gui_state::perform(
 					auto& scope_cfg = config.game_gui;
 
 					revertable_checkbox(SCOPE_CFG_NVP(autodrop_magazines_of_dropped_weapons));
+					revertable_checkbox(SCOPE_CFG_NVP(autodrop_holstered_armed_explosives));
 					revertable_checkbox(SCOPE_CFG_NVP(autocollapse_hotbar_buttons));
 				}
 

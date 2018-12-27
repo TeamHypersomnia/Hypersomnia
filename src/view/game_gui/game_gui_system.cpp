@@ -26,6 +26,9 @@
 
 #include "game/detail/inventory/wielding_setup.hpp"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
+#include "game/detail/weapon_like.h"
+#include "game/modes/detail/item_purchase_logic.hpp"
+#include "augs/templates/logically_empty.h"
 
 static int to_hotbar_index(const game_gui_intent_type type) {
 	switch (type) {
@@ -360,44 +363,102 @@ void game_gui_system::advance(
 ) {
 	const auto subject = context.get_subject_entity();
 
-	if (subject && context.dependencies.game_gui.autocollapse_hotbar_buttons) {
-		static_assert(std::is_trivially_copyable_v<hotbar_button>);
+	const auto& settings = context.dependencies.game_gui;
 
-		auto& h = context.get_character_gui().hotbar_buttons;
+	if (subject) {
+		if (settings.autocollapse_hotbar_buttons) {
+			static_assert(std::is_trivially_copyable_v<hotbar_button>);
 
-		auto is_tied_to_right = [&](const auto& b) {
-			const auto assigned_item = b.get_assigned_entity(subject);
+			auto& h = context.get_character_gui().hotbar_buttons;
 
-			if (assigned_item.dead()) {
-				return false;
+			auto is_tied_to_right = [&](const auto& b) {
+				const auto assigned_item = b.get_assigned_entity(subject);
+
+				if (assigned_item.dead()) {
+					return false;
+				}
+
+				return should_fill_hotbar_from_right(assigned_item);
+			};
+
+			auto is_tied_to_left = [&](const auto& b) {
+				const auto assigned_item = b.get_assigned_entity(subject);
+
+				if (assigned_item.dead()) {
+					return false;
+				}
+
+				return !should_fill_hotbar_from_right(assigned_item);
+			};
+
+			auto is_unassigned = [&](const auto& b) {
+				return b.get_assigned_entity(subject).dead();
+			};
+
+			const auto right_bound = find_in_if(h, is_tied_to_right);
+			const auto rright_bound = rfind_in_if(h, is_tied_to_left);
+
+			for (auto it = std::remove_if(h.begin(), right_bound, is_unassigned); it != right_bound; ++it) {
+				*it = {};
 			}
 
-			return should_fill_hotbar_from_right(assigned_item);
-		};
-
-		auto is_tied_to_left = [&](const auto& b) {
-			const auto assigned_item = b.get_assigned_entity(subject);
-
-			if (assigned_item.dead()) {
-				return false;
+			for (auto it = std::remove_if(h.rbegin(), rright_bound, is_unassigned); it != rright_bound; ++it) {
+				*it = {};
 			}
-
-			return !should_fill_hotbar_from_right(assigned_item);
-		};
-
-		auto is_unassigned = [&](const auto& b) {
-			return b.get_assigned_entity(subject).dead();
-		};
-
-		const auto right_bound = find_in_if(h, is_tied_to_right);
-		const auto rright_bound = rfind_in_if(h, is_tied_to_left);
-
-		for (auto it = std::remove_if(h.begin(), right_bound, is_unassigned); it != right_bound; ++it) {
-			*it = {};
 		}
 
-		for (auto it = std::remove_if(h.rbegin(), rright_bound, is_unassigned); it != rright_bound; ++it) {
-			*it = {};
+		const bool drop_armed = context.dependencies.game_gui.autodrop_holstered_armed_explosives;
+		const bool drop_orphans = context.dependencies.game_gui.autodrop_magazines_of_dropped_weapons;
+
+		if (drop_armed || drop_orphans) {
+			std::vector<item_flavour_id> needed_ammo_flavours;
+
+			subject.for_each_contained_item_recursive(
+				[&](const auto& typed_item) {
+					if (drop_armed) {
+						typed_item.template dispatch_on_having_all<components::hand_fuse>(
+							[&](const auto& expl) {
+								const auto& fuse = expl.template get<components::hand_fuse>();
+
+								if (fuse.armed() && fuse.slot_when_armed != expl.get_current_slot().get_type()) {
+									const auto impulse = subject.template get<invariants::item_slot_transfers>().standard_throw_impulse;
+									auto request = item_slot_transfer_request::drop(typed_item, impulse);
+
+									queue_transfer(subject, request);
+								}
+							}
+						);
+					}
+
+					if (drop_orphans) {
+						const auto required_ammos = ::calc_all_ammo_pieces_of(typed_item);
+						concatenate(needed_ammo_flavours, required_ammos);
+					}
+				}
+			);
+
+			if (logically_empty(pending.transfer) && drop_orphans) {
+				LOG("LOOKING!");
+				subject.for_each_contained_item_recursive(
+					[&](const auto& typed_item) {
+						if (!::is_ammo_piece_like(typed_item)) {
+							return recursive_callback_result::CONTINUE_AND_RECURSE;
+						}
+
+						LOG("%x is ammo piece like!", typed_item);
+
+						if (!found_in(needed_ammo_flavours, item_flavour_id(typed_item.get_flavour_id()))) {
+							LOG("Not found");
+							queue_transfer(subject, item_slot_transfer_request::drop(typed_item));
+						}
+						else {
+							LOG("FOUND! Don't drop");
+						}
+
+						return recursive_callback_result::CONTINUE_DONT_RECURSE;
+					}
+				);
+			}
 		}
 	}
 

@@ -91,9 +91,10 @@ struct fuse_logic_provider {
 		}();
 
 		auto request = item_slot_transfer_request::drop(fused_entity, total_impulse);
+		request.params.apply_standard_impulse = false;
 
 		if (fuse_def.override_release_impulse) {
-			request.params.apply_standard_impulse = false;
+			/* True for the bomb so it never gets thrown. */
 			request.params.additional_drop_impulse = fuse_def.additional_release_impulse;
 		}
 
@@ -187,6 +188,7 @@ struct fuse_logic_provider {
 
 	void arm_explosive() const {
 		fuse.when_armed = clk.now;
+		fuse.slot_when_armed = fused_entity.get_current_slot().get_type();
 
 		fused_entity.template get<components::sender>().set(holder);
 

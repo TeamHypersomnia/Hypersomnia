@@ -2640,3 +2640,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - autodrop cue sound threshold mult 
 
+- don't turn off menus on buying replenishables
+
+- Gather all items to the left of the hotbar
+

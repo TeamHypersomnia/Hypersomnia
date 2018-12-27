@@ -99,10 +99,29 @@ inline auto get_buy_slot_opts() {
 	};
 }
 
+inline item_flavour_id get_allowed_flavour_of_deposit(const cosmos& cosm, const item_flavour_id& mag_id) {
+	return cosm.on_flavour(mag_id, [&](const auto& typed_flavour) {
+		if (const auto c = typed_flavour.template find<invariants::container>()) {
+			if (const auto depo = mapped_or_nullptr(c->slots, slot_function::ITEM_DEPOSIT)) {
+				return depo->only_allow_flavour;
+			}
+		}
+
+		return item_flavour_id();
+	});
+}
+
 inline bool is_magazine_like(const cosmos& cosm, const item_flavour_id& id) {
 	return cosm.on_flavour(id, [&](const auto& typed_flavour) {
 		return typed_flavour.template get<invariants::item>().categories_for_slot_compatibility.test(item_category::MAGAZINE);
 	});
+}
+
+template <class H>
+inline bool is_ammo_piece_like(const H& handle) {
+	const bool is_charge_like = handle.template has<invariants::cartridge>();
+
+	return is_charge_like || ::is_magazine_like(handle.get_cosmos(), handle.get_flavour_id());
 }
 
 inline bool is_shotgun_like(const cosmos& cosm, const item_flavour_id& id) {
@@ -179,4 +198,41 @@ void play_learnt_spell_effect(
 		effect.modifier.colorize = col;
 		effect.start(step, particle_effect_start_input::orbit_local(subject, {}).set_homing(subject));
 	}
+}
+
+template <class E>
+auto calc_purchasable_ammo_piece(const E& handle) {
+	item_flavour_id result;
+
+	if (const auto mag_slot = handle[slot_function::GUN_DETACHABLE_MAGAZINE]) {
+		result = mag_slot->only_allow_flavour;
+	}
+
+	if (const auto chamber_mag_slot = handle[slot_function::GUN_CHAMBER_MAGAZINE]) {
+		result = chamber_mag_slot->only_allow_flavour;
+	}
+
+	return result;
+}
+
+template <class E>
+auto calc_all_ammo_pieces_of(const E& handle) {
+	std::vector<item_flavour_id> results;
+
+	if (const auto mag_slot = handle[slot_function::GUN_DETACHABLE_MAGAZINE]) {
+		const auto f = mag_slot->only_allow_flavour;
+
+		results.push_back(f);
+		results.push_back(get_allowed_flavour_of_deposit(handle.get_cosmos(), f));
+	}
+
+	if (const auto chamber_mag_slot = handle[slot_function::GUN_CHAMBER_MAGAZINE]) {
+		results.push_back(chamber_mag_slot->only_allow_flavour);
+	}
+
+	if (const auto chamber_slot = handle[slot_function::GUN_CHAMBER]) {
+		results.push_back(chamber_slot->only_allow_flavour);
+	}
+
+	return results;
 }

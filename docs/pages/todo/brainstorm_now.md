@@ -6,7 +6,28 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- double the impulse in hand fuse's release explosive
+	- because we no longer apply standard impulse, that was sorta stupid
+
 - fix nades not dropping when switching weapons
+	- If not in a slot type where it was originally armed, autodrop
+	- we don't have any prediction issues here
+	-  in-gui
+		- pro: cheaper to calculate 
+		- con: how do we request a throw?
+			- We sure as hell dont want another type of entropy just for this corner case
+		- we can check in logic if the drop is concerning an armed explosive
+			- and allow a standard impulse flag to determine force since it will also be used for proper releasing of the explosive
+				- If it is a standard impulse (e.g. due to a request), just put in a throw impulse
+				- the standard release explosive will 
+	- in-game
+	 	- pro: throws handled easily
+		- con: calculated for each armed explosive
+		- con: needs character settings
+			- eventually, we'll need it
+
+- Automatically pick the bought weapon
+	- currently it is held into eq if something different is held, I think
 
 - Make a flag for autodropping of magazines
 	- And implement this gui-side
@@ -33,24 +54,16 @@ summary: That which we are brainstorming at the moment.
 - should rebuy previous also buy magazines bought?
 	- perhaps
 
-- don't turn off menus on buying replenishables
-
-- Gather all items to the left of the hotbar
-
 - Watch out if fpset does not cause performance problems
 
 - Do something so that we don't lose work in playtesting mode
-- fix Common state crash
 
-- numeric cohices for the item shop?
+- fix Common state crash
 
 - drop all mags on dropping a weapon
 - Let the character see a little behind it
 	- Simply a disk overlay over the stencil
 		- Radius would be specified by mode rules
-
-- Automatically pick the bought weapon
-	- currently it is held into eq if something different is held, I think
 
 - bind h to buy menu
 	- or something else

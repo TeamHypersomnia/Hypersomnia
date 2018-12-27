@@ -414,7 +414,6 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		}
 		const auto& selected = b == button_type::REPLENISHABLE ? selected_replenishables : selected_weapons;
 
-
 		const auto num_carryable = num_carryable_pieces(
 			subject,
 			::get_buy_slot_opts(), 
@@ -552,23 +551,16 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 				equipment_value += *price;
 
-				const auto new_entry = [&]() -> std::optional<owned_entry> {
-					if (const auto mag_slot = typed_item[slot_function::GUN_DETACHABLE_MAGAZINE]) {
-						return owned_entry(typed_item.get_flavour_id(), mag_slot->only_allow_flavour);
-					}
-					if (const auto chamber_mag_slot = typed_item[slot_function::GUN_CHAMBER_MAGAZINE]) {
-						return owned_entry(typed_item.get_flavour_id(), chamber_mag_slot->only_allow_flavour);
-					}
+				const auto ammo_piece_flavour = ::calc_purchasable_ammo_piece(typed_item);
 
-					return std::nullopt;
-				}();
+				if (logically_set(ammo_piece_flavour)) {
+					const auto new_entry = owned_entry(typed_item.get_flavour_id(), ammo_piece_flavour);
 
-				if (new_entry != std::nullopt) {
-					if (const auto it = find_in(owned_weapons, *new_entry); it != owned_weapons.end()) {
+					if (const auto it = find_in(owned_weapons, new_entry); it != owned_weapons.end()) {
 						++it->instances_owned;
 					}
 					else {
-						owned_weapons.push_back(*new_entry);
+						owned_weapons.push_back(new_entry);
 					}
 				}
 			}

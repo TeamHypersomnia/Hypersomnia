@@ -5,6 +5,10 @@ permalink: todo_security
 summary: Just a hidden scratchpad.
 ---
 
+- Disallow massive forces for dropping transfers
+	- Just trim against the throw mults of the capability
+		- we can allow smaller, why not 
+
 - If client net vars are out of bounds, disconnect
 	- E.g. if it sets to never squash the entropies which could dangerously grow the client's entropies buffer
 
