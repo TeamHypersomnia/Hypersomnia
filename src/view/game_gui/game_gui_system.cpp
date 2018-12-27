@@ -448,8 +448,6 @@ void game_gui_system::advance(
 			);
 
 			if (!has_another_like_dropped) {
-				LOG("Dropped recently: %x", recently_dropped);
-
 				{
 					recently_dropped_handle.template dispatch_on_having_all<invariants::item>(
 						[&](const auto& typed_item) {
@@ -459,15 +457,11 @@ void game_gui_system::advance(
 				}
 
 				if (logically_set(needed_ammo_flavours)) {
-					LOG("Looking for orphaned mags!");
-
 					subject.for_each_contained_item_recursive(
 						[&](const auto& typed_item) {
 							if (!::is_ammo_piece_like(typed_item)) {
 								return recursive_callback_result::CONTINUE_AND_RECURSE;
 							}
-
-							LOG("%x is ammo piece like!", typed_item);
 
 							if (found_in(needed_ammo_flavours, item_flavour_id(typed_item.get_flavour_id()))) {
 								queue_transfer(subject, item_slot_transfer_request::drop(typed_item));
@@ -571,9 +565,7 @@ bool should_fill_hotbar_from_right(const E& handle) {
 	const auto& item = handle.template get<invariants::item>();
 
 	if (item.categories_for_slot_compatibility.test(item_category::BACK_WEARABLE)) {
-		if (!handle.template has<invariants::explosive>()) {
-			return true;
-		}
+		return true;
 	}
 
 	if (item.categories_for_slot_compatibility.test(item_category::BELT_WEARABLE)) {
@@ -637,7 +629,6 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 
 		if (logically_empty(recently_dropped) && transfer.result.is_drop()) {
 			recently_dropped = transferred_item;
-			LOG("Dropped recently: %x", recently_dropped);
 		}
 
 		const bool interested =

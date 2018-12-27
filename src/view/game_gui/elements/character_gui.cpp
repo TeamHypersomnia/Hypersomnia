@@ -226,7 +226,7 @@ wielding_setup character_gui::make_wielding_setup_for_previous_hotbar_selection_
 
 			auto should_wield_entity = [&](const auto& candidate_entity) {
 				if (candidate_entity.alive()) {
-					if (!is_clothing(candidate_entity.template get<invariants::item>().categories_for_slot_compatibility)) {
+					if (::is_weapon_like(candidate_entity)) {
 						const bool finally_found_differing_setup = !(make_setup_with(candidate_entity) == current_setup);
 
 						if (finally_found_differing_setup) {
@@ -263,12 +263,10 @@ wielding_setup character_gui::make_wielding_setup_for_previous_hotbar_selection_
 
 			gui_entity.for_each_contained_item_recursive(
 				[&](const auto& typed_item) {
-					if (::is_weapon_like(typed_item)) {
-						if (should_wield_entity(typed_item)) {
-							result = make_setup_with(typed_item);
-							HOT_LOG("Found owned item candidate: %x", typed_item);
-							return recursive_callback_result::ABORT;
-						}
+					if (should_wield_entity(typed_item)) {
+						result = make_setup_with(typed_item);
+						HOT_LOG("Found owned item candidate: %x", typed_item);
+						return recursive_callback_result::ABORT;
 					}
 
 					return recursive_callback_result::CONTINUE_AND_RECURSE;

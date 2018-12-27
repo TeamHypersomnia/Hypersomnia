@@ -36,11 +36,7 @@ summary: That which we are brainstorming at the moment.
 
 - fix Common state crash
 
-- bind h to buy menu
-	- or something else
-
 - see if bilmer and vindicator have better intervals at 64hz
-- let q also look for the bomb if the hotbar empty
 
 - fixbomb planting duration
 - dont show defusing progress if youre tt

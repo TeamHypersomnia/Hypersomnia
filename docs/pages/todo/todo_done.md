@@ -2669,3 +2669,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- "Autodrop magazines of dropped weapons"
 
 - drop all mags on dropping a weapon
+- bind h to buy menu
+	- or something else
+
+- let q also look for the bomb if the hotbar empty
