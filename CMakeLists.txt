@@ -1441,7 +1441,7 @@ elseif(CLANG)
 
 			if (NOT CPPEXPERIMENTAL)
 				message("CPPEXPERIMENTAL not found. Linking via c++experimental flag.")
-				set(CPPFS c++experimental)
+				set(CPPEXPERIMENTAL c++experimental)
 			else()
 				message("Static cppexperimental found.")
 			endif()
