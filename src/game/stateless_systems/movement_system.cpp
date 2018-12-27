@@ -128,9 +128,11 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 				const auto minimum_cp_to_sprint = consciousness.get_maximum_value() * def.minimum_cp_to_sprint;
 
+#if SLOW_DOWN_IF_CP_CRITICAL
 				if (consciousness.value < minimum_cp_to_sprint - AUGS_EPSILON<real32>) {
 					movement_force_mult /= 2;
 				}
+#endif
 
 				consciousness_damage_by_sprint = consciousness.calc_damage_result(
 					def.sprint_drains_cp_per_second * delta.in_seconds(),

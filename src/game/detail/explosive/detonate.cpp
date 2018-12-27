@@ -45,7 +45,8 @@ void detonate(const detonate_input in) {
 		const auto angle_dt = c_in.spawn_spread / n;
 
 		const auto t = in.location;
-		const auto left = t.rotation - c_in.spawn_spread / 2;
+		const auto rotation = subject.get_effective_velocity().degrees();
+		const auto left = rotation - c_in.spawn_spread / 2;
 
 		for (unsigned i = 0; i < n; ++i) {
 			const auto target_speed = rng.randval(c_in.initial_speed);
@@ -55,7 +56,7 @@ void detonate(const detonate_input in) {
 				return rng.randval_h(h);
 			}();
 
-			const auto vel_angle = target_angle_offset + (n == 1 ? t.rotation : left + angle_dt * i);
+			const auto vel_angle = target_angle_offset + (n == 1 ? rotation : left + angle_dt * i);
 
 			cosmic::create_entity(
 				cosm,

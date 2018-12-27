@@ -68,6 +68,15 @@ namespace test_flavours {
 			auto& dmg = in.damage;
 
 			in.type = adverse_element_type::FORCE;
+
+			{
+				auto& c = explosive.cascade[0];
+				c.flavour_id = to_entity_flavour_id(test_explosion_bodies::SKULL_ROCKET_CASCADE);
+				c.num_spawned = 1;
+				c.num_explosions = { 2, 0 };
+				c.initial_speed = { 2000.f, 0.2f };
+			}
+
 			dmg.base = 88.f;
 			in.inner_ring_color = red;
 			in.outer_ring_color = orange;
@@ -121,12 +130,12 @@ namespace test_flavours {
 			auto& in = explosive.explosion;
 			auto& dmg = in.damage;
 
-			dmg.base = 100.f;
+			dmg.base = 50.f;
 			in.inner_ring_color = yellow;
 			in.outer_ring_color = orange;
 			in.effective_radius = 450.f;
 			dmg.impact_impulse = 2.f;
-			dmg.impulse_multiplier_against_sentience = 1.f;
+			dmg.impulse_multiplier_against_sentience = 1000.f;
 			in.sound.modifier.gain = 2.2f;
 			in.sound.id = to_sound_id(test_scene_sound_id::INTERFERENCE_EXPLOSION);
 			in.type = adverse_element_type::INTERFERENCE;
