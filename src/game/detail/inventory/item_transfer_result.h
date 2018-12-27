@@ -34,4 +34,8 @@ struct item_transfer_result {
 	bool is_wield() const {
 		return wield;
 	}
+
+	bool is_drop() const {
+		return relation == capability_relation::DROP || relation == capability_relation::ANONYMOUS_DROP;
+	}
 };

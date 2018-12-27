@@ -410,54 +410,77 @@ void game_gui_system::advance(
 		const bool drop_armed = context.dependencies.game_gui.autodrop_holstered_armed_explosives;
 		const bool drop_orphans = context.dependencies.game_gui.autodrop_magazines_of_dropped_weapons;
 
-		if (drop_armed || drop_orphans) {
+		if (drop_armed) {
+			subject.for_each_contained_item_recursive(
+				[&](const auto& typed_item) {
+					typed_item.template dispatch_on_having_all<components::hand_fuse>(
+						[&](const auto& expl) {
+							const auto& fuse = expl.template get<components::hand_fuse>();
+
+							if (fuse.armed() && fuse.slot_when_armed != expl.get_current_slot().get_type()) {
+								const auto impulse = subject.template get<invariants::item_slot_transfers>().standard_throw_impulse;
+								auto request = item_slot_transfer_request::drop(typed_item, impulse);
+
+								queue_transfer(subject, request);
+							}
+						}
+					);
+				}
+			);
+		}
+
+		if (logically_empty(pending.transfer) && logically_set(recently_dropped) && drop_orphans) {
 			std::vector<item_flavour_id> needed_ammo_flavours;
+
+			const auto recently_dropped_handle = subject.get_cosmos()[recently_dropped];
+
+			bool has_another_like_dropped = false;
 
 			subject.for_each_contained_item_recursive(
 				[&](const auto& typed_item) {
-					if (drop_armed) {
-						typed_item.template dispatch_on_having_all<components::hand_fuse>(
-							[&](const auto& expl) {
-								const auto& fuse = expl.template get<components::hand_fuse>();
-
-								if (fuse.armed() && fuse.slot_when_armed != expl.get_current_slot().get_type()) {
-									const auto impulse = subject.template get<invariants::item_slot_transfers>().standard_throw_impulse;
-									auto request = item_slot_transfer_request::drop(typed_item, impulse);
-
-									queue_transfer(subject, request);
-								}
-							}
-						);
+					if (entity_flavour_id(typed_item.get_flavour_id()) == recently_dropped_handle.get_flavour_id()) {
+						has_another_like_dropped = true;
+						return recursive_callback_result::ABORT;
 					}
 
-					if (drop_orphans) {
-						const auto required_ammos = ::calc_all_ammo_pieces_of(typed_item);
-						concatenate(needed_ammo_flavours, required_ammos);
-					}
+					return recursive_callback_result::CONTINUE_AND_RECURSE;
 				}
 			);
 
-			if (logically_empty(pending.transfer) && drop_orphans) {
-				LOG("LOOKING!");
-				subject.for_each_contained_item_recursive(
-					[&](const auto& typed_item) {
-						if (!::is_ammo_piece_like(typed_item)) {
-							return recursive_callback_result::CONTINUE_AND_RECURSE;
-						}
+			if (!has_another_like_dropped) {
+				LOG("Dropped recently: %x", recently_dropped);
 
-						LOG("%x is ammo piece like!", typed_item);
-
-						if (!found_in(needed_ammo_flavours, item_flavour_id(typed_item.get_flavour_id()))) {
-							LOG("Not found");
-							queue_transfer(subject, item_slot_transfer_request::drop(typed_item));
+				{
+					recently_dropped_handle.template dispatch_on_having_all<invariants::item>(
+						[&](const auto& typed_item) {
+							needed_ammo_flavours = ::calc_all_ammo_pieces_of(typed_item);
 						}
-						else {
-							LOG("FOUND! Don't drop");
-						}
+					);
+				}
 
-						return recursive_callback_result::CONTINUE_DONT_RECURSE;
-					}
-				);
+				if (logically_set(needed_ammo_flavours)) {
+					LOG("Looking for orphaned mags!");
+
+					subject.for_each_contained_item_recursive(
+						[&](const auto& typed_item) {
+							if (!::is_ammo_piece_like(typed_item)) {
+								return recursive_callback_result::CONTINUE_AND_RECURSE;
+							}
+
+							LOG("%x is ammo piece like!", typed_item);
+
+							if (found_in(needed_ammo_flavours, item_flavour_id(typed_item.get_flavour_id()))) {
+								queue_transfer(subject, item_slot_transfer_request::drop(typed_item));
+							}
+
+							return recursive_callback_result::CONTINUE_DONT_RECURSE;
+						}
+					);
+				}
+			}
+
+			if (logically_empty(pending.transfer)) {
+				recently_dropped = {};
 			}
 		}
 	}
@@ -611,6 +634,11 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 		const auto target_slot = cosm[transfer.target_slot];
 
 		const bool same_capability = transfer.result.relation == capability_relation::THE_SAME;
+
+		if (logically_empty(recently_dropped) && transfer.result.is_drop()) {
+			recently_dropped = transferred_item;
+			LOG("Dropped recently: %x", recently_dropped);
+		}
 
 		const bool interested =
 			target_slot.alive()

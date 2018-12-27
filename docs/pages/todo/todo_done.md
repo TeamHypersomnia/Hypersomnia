@@ -2644,3 +2644,28 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Gather all items to the left of the hotbar
 
+- double the impulse in hand fuse's release explosive
+	- because we no longer apply standard impulse, that was sorta stupid
+
+- fix nades not dropping when switching weapons
+	- If not in a slot type where it was originally armed, autodrop
+	- we don't have any prediction issues here
+	-  in-gui
+		- pro: cheaper to calculate 
+		- con: how do we request a throw?
+			- We sure as hell dont want another type of entropy just for this corner case
+		- we can check in logic if the drop is concerning an armed explosive
+			- and allow a standard impulse flag to determine force since it will also be used for proper releasing of the explosive
+				- If it is a standard impulse (e.g. due to a request), just put in a throw impulse
+				- the standard release explosive will 
+	- in-game
+	 	- pro: throws handled easily
+		- con: calculated for each armed explosive
+		- con: needs character settings
+			- eventually, we'll need it
+
+- Make a flag for autodropping of magazines
+	- And implement this gui-side
+	- "Autodrop magazines of dropped weapons"
+
+- drop all mags on dropping a weapon

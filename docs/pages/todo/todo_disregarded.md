@@ -5,6 +5,11 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- Let the character see a little behind it
+	- Simply a disk overlay over the stencil
+		- Radius would be specified by mode rules
+	- problem: we'll be able to see around the corner a little
+
 - Stop the whoosh sound on obstacle hit
 
 - Can't we really avoid the need for finishing traces?

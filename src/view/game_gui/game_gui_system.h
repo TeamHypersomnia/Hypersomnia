@@ -27,6 +27,7 @@ public:
 
 	using pending_entropy_type = cosmic_player_entropy;
 
+	entity_id recently_dropped;
 	pending_entropy_type pending;
 	
 	game_gui_rect_world world;
