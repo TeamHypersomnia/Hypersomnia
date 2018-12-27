@@ -1218,7 +1218,7 @@ mode_player_id bomb_mode::find_first_free_player() const {
 	return first_free_key(players, mode_player_id::first());
 }
 
-void bomb_mode::execute_player_commands(const input_type in, const mode_entropy& entropy, const logic_step step) {
+void bomb_mode::execute_player_commands(const input_type in, mode_entropy& entropy, const logic_step step) {
 	const auto current_round = get_round_num();
 	auto& cosm = in.cosm;
 
@@ -1289,7 +1289,14 @@ void bomb_mode::execute_player_commands(const input_type in, const mode_entropy&
 										eq.weapon = f_id;
 									}
 
-									eq.generate_for(player_handle, step);
+									const auto result_weapon = eq.generate_for(player_handle, step);
+
+									if (const auto w = cosm[result_weapon]; w.alive() && ::is_weapon_like(w)) {
+										auto requested_wielding = wielding_setup::bare_hands();
+										requested_wielding.hand_selections[0] = w;
+
+										entropy.cosmic[player_handle.get_id()].wield = requested_wielding;
+									}
 
 									money -= *price;
 								}
@@ -1629,8 +1636,6 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 			}
 		}
 	}
-
-	execute_player_commands(in, entropy, step);
 }
 
 void bomb_mode::mode_post_solve(const input_type in, const mode_entropy& entropy, const const_logic_step step) {

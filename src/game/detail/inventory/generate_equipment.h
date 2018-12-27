@@ -8,7 +8,7 @@
 #include "game/modes/detail/item_purchase_logic.hpp"
 
 template <class E>
-void requested_equipment::generate_for(
+entity_id requested_equipment::generate_for(
 	const E& character, 
 	const logic_step step
 ) const {
@@ -122,8 +122,12 @@ void requested_equipment::generate_for(
 		}
 	};
 
+	entity_id result_weapon;
+
 	if (eq.weapon.is_set()) {
 		if (const auto weapon = just_create_entity(cosm, eq.weapon)) {
+			result_weapon = weapon.get_id();
+
 			/* So that the effect transform is valid */
 			weapon.set_logic_transform(character_transform);
 
@@ -221,4 +225,6 @@ void requested_equipment::generate_for(
 			}
 		}
 	}
+
+	return result_weapon;
 }

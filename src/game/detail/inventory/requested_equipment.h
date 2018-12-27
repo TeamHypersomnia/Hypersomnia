@@ -24,7 +24,7 @@ struct requested_equipment {
 	// END GEN INTROSPECTOR
 
 	template <class E>
-	void generate_for(
+	entity_id generate_for(
 		const E& character, 
 		const logic_step step
 	) const;

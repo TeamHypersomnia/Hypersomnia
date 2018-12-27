@@ -344,7 +344,7 @@ private:
 	bool give_bomb_to_random_player(input, logic_step);
 	void spawn_bomb_near_players(input);
 
-	void execute_player_commands(input, const mode_entropy&, logic_step);
+	void execute_player_commands(input, mode_entropy&, logic_step);
 	void add_or_remove_players(input, const mode_entropy&, logic_step);
 	void handle_special_commands(input, const mode_entropy&, logic_step);
 	void spawn_characters_for_recently_assigned(input, logic_step);
@@ -442,7 +442,7 @@ public:
 	template <class C>
 	void advance(
 		const input in, 
-		const mode_entropy& entropy, 
+		mode_entropy entropy, 
 		C callbacks
 	) {
 		const auto step_input = logic_step_input { in.cosm, entropy.cosmic };
@@ -453,6 +453,7 @@ public:
 				[&](const logic_step step) {
 					callbacks.pre_solve(step);
 					mode_pre_solve(in, entropy, step);
+					execute_player_commands(in, entropy, step);
 				},
 				[&](const const_logic_step step) {
 					mode_post_solve(in, entropy, step);
