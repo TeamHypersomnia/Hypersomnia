@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Fix build without the editor
-
 - Automatically pick the bought weapon
 	- currently it is held into eq if something different is held, I think
 

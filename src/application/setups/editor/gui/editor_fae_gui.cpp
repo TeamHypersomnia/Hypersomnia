@@ -1,5 +1,7 @@
 #define INCLUDE_TYPES_IN 1
 
+#include "game/cosmos/cosmos.h"
+#include "game/cosmos/entity_handle.h"
 #include "application/setups/editor/gui/editor_fae_gui.h"
 #include "application/setups/editor/editor_command_input.h"
 
@@ -19,7 +21,6 @@ void editor_fae_gui_base::interrupt_tweakers() {
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_enum_radio.h"
 
-#include "game/cosmos/entity_handle.h"
 #include "game/cosmos/for_each_entity.h"
 
 #include "application/intercosm.h"

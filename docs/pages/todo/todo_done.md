@@ -2673,3 +2673,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- or something else
 
 - let q also look for the bomb if the hotbar empty
+- Fix build without the editor
+
