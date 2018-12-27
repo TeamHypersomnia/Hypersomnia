@@ -5,6 +5,7 @@ return {
   app_controls = {
     Tilde = "SWITCH_DEVELOPER_CONSOLE"
   },
+
   app_ingame_controls = {
     Backspace = "CLEAR_DEBUG_LINES",
     F = "SWITCH_WEAPON_LASER",
@@ -12,6 +13,49 @@ return {
 	Tab = "OPEN_SCOREBOARD",
 	T = "OPEN_BUY_MENU",
 	O = "CHOOSE_TEAM"
+  },
+
+  game_controls = {
+    A = "MOVE_LEFT",
+    D = "MOVE_RIGHT",
+    E = "USE_BUTTON",
+    G = "DROP",
+    MiddleMouseButton = "THROW",
+    LeftControl = "START_PICKING_UP_ITEMS",
+    LeftMouseButton = "CROSSHAIR_PRIMARY_ACTION",
+    LeftShift = "SPRINT",
+    RightMouseButton = "CROSSHAIR_SECONDARY_ACTION",
+    S = "MOVE_BACKWARD",
+    Space = "SPACE_BUTTON",
+    W = "MOVE_FORWARD",
+	R = "RELOAD"
+  },
+
+  game_gui_controls = {
+    ["0"] = "HOTBAR_BUTTON_9",
+    ["1"] = "HOTBAR_BUTTON_0",
+    ["2"] = "HOTBAR_BUTTON_1",
+    ["3"] = "HOTBAR_BUTTON_2",
+    ["4"] = "HOTBAR_BUTTON_3",
+    ["5"] = "HOTBAR_BUTTON_4",
+    ["6"] = "HOTBAR_BUTTON_5",
+    ["7"] = "HOTBAR_BUTTON_6",
+    ["8"] = "HOTBAR_BUTTON_7",
+    ["9"] = "HOTBAR_BUTTON_8",
+    B = "SPECIAL_ACTION_BUTTON_5",
+    C = "SPECIAL_ACTION_BUTTON_3",
+    F2 = "SPECIAL_ACTION_BUTTON_8",
+    F3 = "SPECIAL_ACTION_BUTTON_9",
+    F4 = "SPECIAL_ACTION_BUTTON_10",
+    F5 = "SPECIAL_ACTION_BUTTON_11",
+    F6 = "SPECIAL_ACTION_BUTTON_12",
+    H = "HOLSTER",
+    M = "SPECIAL_ACTION_BUTTON_7",
+    N = "SPECIAL_ACTION_BUTTON_6",
+    Q = "PREVIOUS_HOTBAR_SELECTION_SETUP",
+    V = "SPECIAL_ACTION_BUTTON_4",
+    X = "SPECIAL_ACTION_BUTTON_2",
+    Z = "SPECIAL_ACTION_BUTTON_1"
   },
   audio = {
     enable_hrtf = false,
@@ -145,47 +189,6 @@ return {
 	  x = 3,
 	  y = 3
 	}
-  },
-  game_controls = {
-    A = "MOVE_LEFT",
-    D = "MOVE_RIGHT",
-    E = "USE_BUTTON",
-    G = "DROP",
-    MiddleMouseButton = "THROW",
-    LeftControl = "START_PICKING_UP_ITEMS",
-    LeftMouseButton = "CROSSHAIR_PRIMARY_ACTION",
-    LeftShift = "SPRINT",
-    RightMouseButton = "CROSSHAIR_SECONDARY_ACTION",
-    S = "MOVE_BACKWARD",
-    Space = "SPACE_BUTTON",
-    W = "MOVE_FORWARD",
-	R = "RELOAD"
-  },
-  game_gui_controls = {
-    ["0"] = "HOTBAR_BUTTON_9",
-    ["1"] = "HOTBAR_BUTTON_0",
-    ["2"] = "HOTBAR_BUTTON_1",
-    ["3"] = "HOTBAR_BUTTON_2",
-    ["4"] = "HOTBAR_BUTTON_3",
-    ["5"] = "HOTBAR_BUTTON_4",
-    ["6"] = "HOTBAR_BUTTON_5",
-    ["7"] = "HOTBAR_BUTTON_6",
-    ["8"] = "HOTBAR_BUTTON_7",
-    ["9"] = "HOTBAR_BUTTON_8",
-    B = "SPECIAL_ACTION_BUTTON_5",
-    C = "SPECIAL_ACTION_BUTTON_3",
-    F2 = "SPECIAL_ACTION_BUTTON_8",
-    F3 = "SPECIAL_ACTION_BUTTON_9",
-    F4 = "SPECIAL_ACTION_BUTTON_10",
-    F5 = "SPECIAL_ACTION_BUTTON_11",
-    F6 = "SPECIAL_ACTION_BUTTON_12",
-    H = "HOLSTER",
-    M = "SPECIAL_ACTION_BUTTON_7",
-    N = "SPECIAL_ACTION_BUTTON_6",
-    Q = "PREVIOUS_HOTBAR_SELECTION_SETUP",
-    V = "SPECIAL_ACTION_BUTTON_4",
-    X = "SPECIAL_ACTION_BUTTON_2",
-    Z = "SPECIAL_ACTION_BUTTON_1"
   },
   gui_fonts = {
 	  gui = {

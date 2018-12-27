@@ -51,6 +51,22 @@ namespace augs {
 			throw window_error("Failed to load GLX glad.");
 		}
 
+
+		{
+			int major = 0, minor = 0;
+
+			if (glXQueryVersion != nullptr) {
+				if (False == glXQueryVersion(display, &major, &minor)) {
+					LOG("Could not query GLX version! glXQueryVersion returned False!");
+				}
+
+				LOG("GLX version: %x.%x", major, minor);
+			}
+			else {
+				LOG("Could not query GLX version! glXQueryVersion is nullptr!");
+			}
+		}
+
 		/* XInput Extension available? */
 		{
 			int event;
@@ -185,6 +201,10 @@ namespace augs {
 					int fbcount;
 
 					LOG("X: calling glXChooseFBConfig.");
+
+					if (glXChooseFBConfig == nullptr) {
+						throw window_error("glXChooseFBConfig is not available on this computer.\nEnsure that your graphics card driver is up to date.");
+					}
 
 					auto fbc = xfreed_unique(glXChooseFBConfig(
 						display, 

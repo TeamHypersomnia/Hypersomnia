@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- clientside prediction is the most important for now
+
 - fix Common state crash
 
 - Admin panel
