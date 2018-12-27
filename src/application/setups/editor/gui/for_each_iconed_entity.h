@@ -43,6 +43,10 @@ struct marker_icon {
 			id = I::EDITOR_ICON_SPAWN;
 			col = gray;
 		}
+		else if (p.type == point_marker_type::EQUIPMENT_GENERATOR) {
+			id = I::DETACHABLE_MAGAZINE_SLOT_ICON;
+			col = white;
+		}
 	}
 };
 

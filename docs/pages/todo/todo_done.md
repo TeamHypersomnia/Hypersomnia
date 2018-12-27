@@ -2685,3 +2685,28 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Trim reach inside component please
 	- the marker type probably as well as it is annoying
+- Preffix the single client entropy with a byte.
+	- The first bit signifies whether it is cosmic or mode
+		- we will only allow one type per step to increase number of message types possible within remaining 7 bits
+	- Remaining 7 bits will signify whether there's data for:
+		- cast spell
+		- wielding
+		- intents
+		- mouse
+		- etc.
+		- for mode: item purchase, team selection etc.
+
+
+- General client processing loop
+	- Always check and add a mode player if the client is not yet in-game
+		- Handles restarts automatically
+	- if we do it per step, there will be a delay for the state to catch up, but:
+		- State is simpler
+		- We don't have to worry about malicious sizes
+		- We don't have to worry about message being too large due to all these nicknames
+		- Con: we might waste more bits/bytes overall but that's amortized over time
+
+- Will yojimbo handle 128hz?
+	- yeah, it even did handle 144hz!
+	- We can send packets once every second tick, so at 64hz
+

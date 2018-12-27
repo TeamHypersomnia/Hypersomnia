@@ -6,6 +6,20 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- fix Common state crash
+
+- Admin panel
+	- Editor-like server vars tweaker accessible by pressing ESC server-side
+		- will have to be commandized properly, just like editor setup's
+- Properly sync client's changes to nickname, sensitivity or others.
+
+- Equipment generators
+	- Should simply be markers that are used by the modes, depending on the flag
+		- later we'll make the testbed conforming
+	- is it important now?
+		- i guess clientside prediction is more important
+		- though we can plan for state
+
 - Rebuy previous
 	- Plan for state early
 		- note that we don't need any bincompat regarding the mode solvable
@@ -36,8 +50,6 @@ summary: That which we are brainstorming at the moment.
 
 - Do something so that we don't lose work in playtesting mode
 
-- fix Common state crash
-
 - see if bilmer and vindicator have better intervals at 64hz
 
 - Create randomized players like in the good olden times
@@ -47,8 +59,6 @@ summary: That which we are brainstorming at the moment.
 
 - If we simply don't predict knockouts, we automatically don't predict the vulnerable win conditions in the mode
 	- Other win conditions are based on time so it won't be as bad
-
-- Admin panel
 
 - Notes on assymetric latency
 	- Effectively, the client always shows AHEAD the server time by 
@@ -106,42 +116,14 @@ summary: That which we are brainstorming at the moment.
 
 - Implement steps correction sending 
 
-- General client processing loop
-	- Always check and add a mode player if the client is not yet in-game
-		- Handles restarts automatically
-	- if we do it per step, there will be a delay for the state to catch up, but:
-		- State is simpler
-		- We don't have to worry about malicious sizes
-		- We don't have to worry about message being too large due to all these nicknames
-		- Con: we might waste more bits/bytes overall but that's amortized over time
-
 - Chat-level logs
 	- server_setup has to expose events somehow
 	- can send them really as chat messages to all the clients
 		- we also need to redirect it to the server player
 
-- Preffix the single client entropy with a byte.
-	- The first bit signifies whether it is cosmic or mode
-		- we will only allow one type per step to increase number of message types possible within remaining 7 bits
-	- Remaining 7 bits will signify whether there's data for:
-		- cast spell
-		- wielding
-		- intents
-		- mouse
-		- etc.
-		- for mode: item purchase, team selection etc.
-
-- Properly sync client's changes to nickname, sensitivity or others.
-
 - Sending large step infos through yojimbo?
 	- we probably want to handle it after DM milestone
 	- Don't rely on fragmentation
-
-- Will yojimbo handle 128hz?
-	- We can send packets once every second tick, so at 64hz
-
-- Editor-like server vars tweaker accessible by pressing ESC server-side
-	- will have to be commandized properly, just like editor setup's
 
 - Game events log and chat
 	- Positioning based on input box window
