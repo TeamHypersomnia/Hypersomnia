@@ -11,18 +11,16 @@ void wandering_pixels_system::clear() {
 	per_entity_cache.clear();
 }
 
-void wandering_pixels_system::clear_dead_entities(const cosmos& new_cosmos) {
-	std::vector<unversioned_entity_id> to_erase;
+void wandering_pixels_system::clear_dead_entities(const cosmos& cosm) {
+	/* This is only for memory optimization */
+	auto dead_deleter = [&cosm](const auto& it) {
+		return cosm[it.first].dead();
+	};
 
-	for (const auto it : per_entity_cache) {
-		if (new_cosmos[it.first].dead()) {
-			to_erase.push_back(it.first);
-		}
-	}
-
-	for (const auto it : to_erase) {
-		per_entity_cache.erase(it);
-	}
+	erase_if(
+		per_entity_cache,
+		dead_deleter
+	);
 }
 
 wandering_pixels_system::cache& wandering_pixels_system::get_cache(const const_entity_handle id) {

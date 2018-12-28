@@ -351,7 +351,6 @@ void illuminated_rendering(
 			exploding_rings.draw_highlights_of_rings(
 				output,
 				cast_highlight,
-				cosm,
 				cone
 			);
 		},
@@ -716,7 +715,6 @@ void illuminated_rendering(
 	exploding_rings.draw_rings(
 		output,
 		renderer.specials,
-		cosm,
 		cone
 	);
 

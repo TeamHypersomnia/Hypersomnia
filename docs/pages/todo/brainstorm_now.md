@@ -8,6 +8,7 @@ summary: That which we are brainstorming at the moment.
 
 - BETTER CLIENTSIDE PREDICTION
 	- Battle events shall always be played referentially
+		- Not sure if always but that will be decided contextually anyway
 	- We might want to predict sounds depending on the effect type
 		- E.g. tie FoTA effects to the referential
 		- But UWoTA to the predicted as there is a delay
@@ -25,6 +26,34 @@ summary: That which we are brainstorming at the moment.
 		- never predictable
 	- deaths
 		- never predictable
+	- arena mode gui
+		- doesnt play any effects AFAIK
+			- Only the tick sound
+			- and plays the welcome message
+			- these are negliglible
+	- When to clear the dead entities from the audiovisual state?
+		- technically can the audiovisual state ever assume that the entities are alive?
+		- Standard post cleanup basically ONLY clears the dead entities
+		- the need to cleanup will be properly detected
+		- Okay the post-solve should perform cleanup depending on the cosmos of the step it was passed, not just once
+		 	- the need for cleanup will be properly detected then for the client switching between referential/predicted
+	- making the interface easier by just modifying message queues and calling solve 
+	- the test setups and so will implicitly realize the prediction_input::offline by never modify any messages
+	- we also have to advance the sounds
+		- problem: for which cosmos do we advance, referential or predicted?
+		- we'd need to keep track which effect is which
+	- do we keep two audiovisual states?
+	- we'll need to draw from two audiovisual systems
+	- isn't there a problem only for the sound systems?
+		- well there are thunders etc........
+	- can't we just advance against the predicted cosmos?
+	- if we have two avstates we can advance one against predicted and one against the referential
+		- should be easy enough
+	- we calculate interpolation only against the predicted cosmos
+	- **LOW PRIO:** okay, the audiovisual system might still need to advance some things against the referential, and some things against the predicted
+		- its a completely different problem from post solve though
+		- for now it is not so critical to confirm these, it's just variation in gun engines is all
+			- and these are quite predictable anyways
 
 - Desync issues
 	- Could it be that the predicted cosm is advanced by mistake instead of the referential one?

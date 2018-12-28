@@ -1,7 +1,7 @@
 #include "augs/misc/randomization.h"
 #include "augs/templates/container_templates.h"
 
-#include "game/cosmos/cosmos.h"
+#include "game/cosmos/cosmos_common.h"
 
 #include "view/viewables/all_viewables_declaration.h"
 #include "view/viewables/particle_effect.h"
@@ -16,7 +16,7 @@ void exploding_ring_system::clear() {
 
 void exploding_ring_system::advance(
 	randomization& rng,
-	const cosmos& cosm,
+	const common_assets& common,
 	const particle_effects_map& manager,
 	const augs::delta dt,
 	particles_simulation_system& particles_output_for_effects
@@ -40,10 +40,9 @@ void exploding_ring_system::advance(
 				const auto spawn_radius_width = (maximum_spawn_radius - minimum_spawn_radius) / 2.4f;
 
 				const auto max_particles_to_spawn = static_cast<unsigned>(160.f * maximum_spawn_radius / 400.f);
-				const auto& common_assets = cosm.get_common_assets();
 
-				const auto* const ring_smoke = mapped_or_nullptr(manager, common_assets.exploding_ring_smoke);
-				const auto* const ring_sparkles = mapped_or_nullptr(manager, common_assets.exploding_ring_sparkles);
+				const auto* const ring_smoke = mapped_or_nullptr(manager, common.exploding_ring_smoke);
+				const auto* const ring_sparkles = mapped_or_nullptr(manager, common.exploding_ring_sparkles);
 
 				if (ring_smoke != nullptr && ring_sparkles != nullptr) {
 					auto smokes_emission = ring_smoke->emissions.at(0);
@@ -137,7 +136,6 @@ void exploding_ring_system::advance(
 void exploding_ring_system::draw_rings(
 	const augs::drawer_with_default output,
 	augs::special_buffer& specials,
-	const cosmos&,
 	const camera_cone cone
 ) const {
 	const auto& eye = cone.eye;
@@ -202,7 +200,6 @@ void exploding_ring_system::draw_rings(
 void exploding_ring_system::draw_highlights_of_rings(
 	const augs::drawer output,
 	const augs::atlas_entry highlight_tex,
-	const cosmos&,
 	const camera_cone cone
 ) const {
 	for (const auto& r : rings) {

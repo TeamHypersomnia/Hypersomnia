@@ -22,7 +22,19 @@ struct basic_logic_step_input {
 
 template <bool is_const>
 class basic_logic_step {
-	using data_living_one_step_ref = maybe_const_ref_t<is_const && !is_const, data_living_one_step>;
+	/* 
+		Message queues are never const in the logic step. 
+		The is_const && !is_const expression is to make it template argument-dependent.
+
+		For example, the bomb mode is given const_logic_step in its post-solve,
+		and it may still want to post some audiovisual messages,
+		it just won't modify the cosmos at that occassion.
+	*/
+
+	using data_living_one_step_ref = maybe_const_ref_t<
+		is_const && !is_const, 
+		data_living_one_step
+	>;
 
 	const basic_logic_step_input<is_const> input;
 

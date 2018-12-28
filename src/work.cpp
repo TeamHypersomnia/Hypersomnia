@@ -847,13 +847,13 @@ int work(const int argc, const char* const * const argv) try {
 		return std::addressof(setup.get_viewed_cosmos());
 	};
 
-	static const cosmos* last_sampled_cosmos = nullptr;
-
 	static auto advance_setup = [&](
 		const augs::delta frame_delta,
 		auto& setup,
 		const input_pass_result& result
 	) {
+		static const cosmos* last_sampled_cosmos = nullptr;
+
 		const auto& viewing_config = result.viewing_config;
 
 		const auto now_sampled = get_sampled_cosmos(setup);
@@ -874,29 +874,30 @@ int work(const int argc, const char* const * const argv) try {
 		}();
 
 		if (has_cosmos_changed) {
-			const bool is_client = 
-				current_setup != std::nullopt 
-				&& std::holds_alternative<client_setup>(*current_setup)
-			;
+			{
+				const bool is_client = 
+					current_setup != std::nullopt 
+					&& std::holds_alternative<client_setup>(*current_setup)
+				;
 
-			if (!is_client) {
-				/* Don't log this for the client as it will happen all the time due to prediction */
+				if (!is_client) {
+					/* Don't log this for the client as it will happen all the time due to prediction */
 
-				LOG("Sanitizing cosmos-related audiovisuals due to possible change");
-			}	
+					LOG("Sanitizing cosmos-related audiovisuals due to a possible change");
+				}	
+			}
 
-#if 1
 			game_gui.clear_dead_entities(*now_sampled);
 			get_audiovisuals().clear_dead_entities(*now_sampled);
-#else
-			get_audiovisuals().clear();
-			game_gui = {};
-#endif
 
 			all_visible.clear_dead_entities(*now_sampled);
 
 			last_sampled_cosmos = now_sampled;
+
+#if WHY_WAS_ZERO_ADVANCE_HERE
+			/* Well, after extensive tests, it doesn't crash, so perhaps it wasn't needed at all? */
 			audiovisual_step(augs::delta::zero, setup.get_audiovisual_speed(), viewing_config);
+#endif
 		}
 
 		setup.control(result.motions);

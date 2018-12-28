@@ -12,9 +12,9 @@
 
 #include "view/view_container_sizes.h"
 
-class cosmos;
 class particles_simulation_system;
 struct randomization;
+struct common_assets;
 
 class exploding_ring_system {
 public:
@@ -35,7 +35,7 @@ public:
 
 	void advance(
 		randomization& rng,
-		const cosmos& cosm,
+		const common_assets& cosm,
 		const particle_effects_map&,
 		const augs::delta dt,
 		particles_simulation_system& particles_output_for_effects
@@ -44,14 +44,12 @@ public:
 	void draw_rings(
 		const augs::drawer_with_default output,
 		augs::special_buffer& specials,
-		const cosmos& cosm,
 		const camera_cone cone
 	) const;
 
 	void draw_highlights_of_rings(
 		const augs::drawer output,
 		const augs::atlas_entry highlight_tex,
-		const cosmos& cosm,
 		const camera_cone cone
 	) const;
 
