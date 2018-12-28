@@ -155,10 +155,14 @@ perform_transfer_result perform_transfer_impl(
 		item.charges == static_cast<int>(result.transferred_charges)
 	;
 
+	if (whole_item_grabbed) {
+		/* Somehow, the current slot is going to change. */
+		item.previous_slot = item.current_slot;
+	}
+
 	if (source_slot && whole_item_grabbed) {
 		/* The slot will no longer have this item. */
 
-		item.previous_slot = item.current_slot;
 		item.current_slot.unset();
 		items_of_slots.unset_parenthood(transferred_item, source_slot);
 
@@ -255,6 +259,7 @@ perform_transfer_result perform_transfer_impl(
 		else {
 			const auto cloned_stack = just_clone_entity(transferred_item);
 			get_item_of(cloned_stack).charges = result.transferred_charges;
+			get_item_of(cloned_stack).previous_slot = source_slot;
 
 			item.charges -= result.transferred_charges;
 			return cloned_stack;

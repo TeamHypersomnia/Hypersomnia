@@ -33,7 +33,8 @@ void play_collision_sound(
 	const const_entity_handle col,
 	const logic_step step
 ) {
-	const auto& logicals = step.get_cosmos().get_logical_assets();
+	const auto& cosm = step.get_cosmos();
+	const auto& logicals = cosm.get_logical_assets();
 	const auto subject_coll = sub.get<invariants::fixtures>();
 	const auto collider_coll = col.get<invariants::fixtures>();
 
@@ -68,13 +69,13 @@ void play_collision_sound(
 			}
 		};
 
-		const auto first_id = mapped_or_nullptr(subject_coll_material->collision_sound_matrix, collider_coll.material);
-		const auto second_id = mapped_or_nullptr(collider_coll_material->collision_sound_matrix, subject_coll.material);
+		const auto first_def = mapped_or_nullptr(subject_coll_material->collision_sound_matrix, collider_coll.material);
+		const auto second_def = mapped_or_nullptr(collider_coll_material->collision_sound_matrix, subject_coll.material);
 
-		play_sound(first_id);
+		play_sound(first_def);
 
-		if (second_id != first_id) {
-			play_sound(second_id);
+		if (second_def != first_def) {
+			play_sound(second_def);
 		}
 	}
 }
