@@ -186,7 +186,7 @@ void play_learnt_spell_effect(
 
 	{
 		const auto& effect = assets.standard_learnt_spell_sound;
-		effect.start(step, sound_effect_start_input::at_entity(subject));
+		effect.start(step, sound_effect_start_input::at_entity(subject), predictable_only_by(subject));
 	}
 
 	{
@@ -196,7 +196,7 @@ void play_learnt_spell_effect(
 
 		auto effect = assets.standard_learnt_spell_particles;
 		effect.modifier.colorize = col;
-		effect.start(step, particle_effect_start_input::orbit_local(subject, {}).set_homing(subject));
+		effect.start(step, particle_effect_start_input::orbit_local(subject, {}).set_homing(subject), predictable_only_by(subject));
 	}
 }
 

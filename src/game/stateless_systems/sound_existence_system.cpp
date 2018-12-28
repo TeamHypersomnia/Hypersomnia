@@ -63,7 +63,10 @@ void play_collision_sound(
 					start.collision_sound_cooldown_duration = sound_def->cooldown_duration;
 					start.collision_sound_occurences_before_cooldown = sound_def->occurences_before_cooldown;
 
-					effect.start(step, start);
+					/* TODO: properly determine predictability based on who thrown the item! */
+					/* TODO: properly determine predictability based on if the collider's owning capability is a player! */
+
+					effect.start(step, start, always_predictable_v);
 				}
 			}
 		};
@@ -111,13 +114,15 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 
 		const auto gun_transform = subject.get_logic_transform();
 		const auto owning_capability = subject.get_owning_transfer_capability();
+		const auto predictability = predictable_only_by(owning_capability);
 
 		{
 			const auto& effect = gun_def.muzzle_shot_sound;
 
 			effect.start(
 				step,
-				sound_effect_start_input::at_entity(subject).set_listener(owning_capability)
+				sound_effect_start_input::at_entity(subject).set_listener(owning_capability),
+				predictability
 			);
 		}
 
@@ -131,7 +136,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 					auto start = sound_effect_start_input::at_entity(cosm[r]);
 					start.clear_when_target_dead = true;
 
-					effect.start(step, start);
+					effect.start(step, start, predictability);
 				}
 			}
 		}
@@ -151,7 +156,8 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 
 					effect.start(
 						step,
-						sound_effect_start_input::fire_and_forget(gun_transform).set_listener(owning_capability)
+						sound_effect_start_input::fire_and_forget(gun_transform).set_listener(owning_capability),
+						predictability
 					);
 				}
 			}
@@ -164,9 +170,12 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 
 		sound_effect_input effect;
 
+		auto predictability = always_predictable_v;
+
 		if (h.target == messages::health_event::target_type::HEALTH) {
 			if (h.special_result == messages::health_event::result_type::DEATH) {
 				effect = sentience.death_sound;
+				predictability = never_predictable_v;
 			}
 			else if (h.effective_amount > 0) {
 				effect = sentience.health_decrease_sound;
@@ -183,6 +192,8 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 				if (h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION) {
 					effect = cosm.get_common_assets().ped_shield_destruction_sound;
 					effect.modifier.pitch *= 1.5f;
+
+					predictability = never_predictable_v;
 				}
 			}
 			else {
@@ -197,6 +208,8 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 				if (h.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS) {
 					effect = sentience.loss_of_consciousness_sound;
 					effect.modifier.pitch *= 1.5f;
+
+					predictability = never_predictable_v;
 				}
 			}
 			else {
@@ -209,7 +222,8 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 
 		effect.start(
 			step,
-			sound_effect_start_input::at_listener(subject)
+			sound_effect_start_input::at_listener(subject),
+			predictability
 		);
 	}
 
@@ -224,7 +238,8 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			if (const auto capability = subject.get_owning_transfer_capability()) {
 				d.damage.pass_through_held_item_sound.start(
 					step,
-					sound_effect_start_input::fire_and_forget( { d.point_of_impact, 0.f } ).set_listener(capability)
+					sound_effect_start_input::fire_and_forget( { d.point_of_impact, 0.f } ).set_listener(capability),
+					always_predictable_v
 				);
 
 				return;
@@ -235,7 +250,8 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			auto do_effect = [&](const auto& effect_def) {
 				effect_def.sound.start(
 					step,
-					sound_effect_start_input::fire_and_forget(d.point_of_impact).set_listener(subject)
+					sound_effect_start_input::fire_and_forget(d.point_of_impact).set_listener(subject),
+					always_predictable_v
 				);
 			};
 
@@ -272,7 +288,8 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 
 				effect.start(
 					step,
-					sound_effect_start_input::fire_and_forget(d.point_of_impact).set_listener(subject)
+					sound_effect_start_input::fire_and_forget(d.point_of_impact).set_listener(subject),
+					always_predictable_v
 				);
 			}
 		}
@@ -283,7 +300,8 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 
 		effect.start(
 			step,
-			sound_effect_start_input::at_listener(e.subject)
+			sound_effect_start_input::at_listener(e.subject),
+			predictable_only_by(e.subject)
 		);
 	}
 }

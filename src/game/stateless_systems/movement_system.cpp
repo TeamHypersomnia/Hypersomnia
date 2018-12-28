@@ -74,7 +74,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 	const auto delta_ms = delta.in_milliseconds();
 
 	cosm.for_each_having<components::movement>(
-		[&](const auto it) {
+		[&](const auto& it) {
 			auto& movement = it.template get<components::movement>();
 			auto& movement_def = it.template get<invariants::movement>();
 
@@ -305,9 +305,12 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				sound.modifier.gain *= gain_mult;
 				sound.modifier.pitch *= pitch_mult;
 
+				const auto predictability = predictable_only_by(it);
+
 				sound.start(
 					step, 
-					sound_effect_start_input::at_entity(it.get_id())
+					sound_effect_start_input::at_entity(it.get_id()),
+					predictability
 				);
 
 				const auto scale = std::max(0.8f, speed_mult);
@@ -319,7 +322,8 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 					particles.start(
 						step, 
-						particle_effect_start_input::fire_and_forget(effect_transform)
+						particle_effect_start_input::fire_and_forget(effect_transform),
+						predictability
 					);
 				}
 
@@ -334,7 +338,8 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 					particles.start(
 						step, 
-						particle_effect_start_input::fire_and_forget(effect_transform)
+						particle_effect_start_input::fire_and_forget(effect_transform),
+						predictability
 					);
 				}
 			};

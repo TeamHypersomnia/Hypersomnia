@@ -16,6 +16,7 @@
 #include "augs/misc/timing/stepped_timing.h"
 #include "augs/misc/timing/speed_vars.h"
 #include "game/modes/mode_commands/mode_entropy_structs.h"
+#include "game/detail/view_input/predictability_info.h"
 
 class cosmos;
 struct cosmos_solvable_significant;
@@ -321,10 +322,10 @@ private:
 	entity_id get_character_who_defused_bomb(const_input) const;
 	bool bomb_planted(const_input) const;
 
-	void play_faction_sound(const_logic_step, faction_type, assets::sound_id) const;
-	void play_faction_sound_for(input, const_logic_step, battle_event, faction_type) const;
+	void play_faction_sound(const_logic_step, faction_type, assets::sound_id, predictability_info) const;
+	void play_faction_sound_for(input, const_logic_step, battle_event, faction_type, predictability_info) const;
 
-	void play_sound_for(input, const_logic_step, battle_event) const;
+	void play_sound_for(input, const_logic_step, battle_event, predictability_info) const;
 	void play_win_sound(input, const_logic_step, faction_type) const;
 	void play_win_theme(input, const_logic_step, faction_type) const;
 

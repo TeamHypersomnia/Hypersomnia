@@ -263,7 +263,8 @@ void movement_path_system::advance_paths(const logic_step step) const {
 						if (next_in_ms < 0.f) {
 							bubble_effect.start(
 								step,
-								particle_effect_start_input::fire_and_forget(tip_pos)
+								particle_effect_start_input::fire_and_forget(tip_pos),
+								always_predictable_v
 							);
 						}
 					}

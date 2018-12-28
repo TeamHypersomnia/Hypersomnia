@@ -65,7 +65,8 @@ static void spawn_bullet_remnants(
 
 				effect.start(
 					step,
-					particle_effect_start_input::orbit_local(typed_remnant, { vec2::zero, 180 } )
+					particle_effect_start_input::orbit_local(typed_remnant, { vec2::zero, 180 } ),
+					always_predictable_v
 				);
 			}
 		);

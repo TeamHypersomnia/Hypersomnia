@@ -9,11 +9,13 @@
 #include "game/assets/ids/asset_ids.h"
 
 namespace messages {
-	struct start_particle_effect {
+	struct start_particle_effect : predicted_message {
+		using predicted_message::predicted_message;
 		packaged_particle_effect payload;
 	};
 
-	struct stop_particle_effect {
+	struct stop_particle_effect : predicted_message {
+		using predicted_message::predicted_message;
 		std::optional<entity_id> match_chased_subject;
 		std::optional<vec2> match_orbit_offset;
 		std::optional<assets::particle_effect_id> match_effect_id;

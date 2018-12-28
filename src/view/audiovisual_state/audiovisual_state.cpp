@@ -11,6 +11,8 @@
 #include "game/messages/health_event.h"
 #include "game/messages/performed_transfer_message.h"
 #include "game/messages/interpolation_correction_request.h"
+#include "game/messages/thunder_effect.h"
+#include "game/messages/exploding_ring_effect.h"
 
 #include "view/audiovisual_state/audiovisual_state.h"
 #include "view/audiovisual_state/systems/exploding_ring_system.hpp"
@@ -153,7 +155,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 	//reserve_caches_for_entities(cosm.get_solvable().get_entity_pool().capacity());
 
 	const auto& healths = step.get_queue<messages::health_event>();
-	const auto& new_thunders = step.get_queue<thunder_input>();
+	const auto& new_thunders = step.get_queue<messages::thunder_effect>();
 	
 	const auto& new_interpolation_corrections = step.get_queue<messages::interpolation_correction_request>();
 	auto& interp = get<interpolation_system>();
@@ -461,5 +463,5 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 		thunders.add(rng, t);
 	}
 	
-	exploding_rings.acquire_new_rings(step.get_queue<exploding_ring_input>());
+	exploding_rings.acquire_new_rings(step.get_queue<messages::exploding_ring_effect>());
 }

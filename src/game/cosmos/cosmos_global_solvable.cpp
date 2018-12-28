@@ -75,6 +75,9 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 		bool should_be_erased = true;
 
 		item_handle.template dispatch_on_having_all<components::item>([&](const auto& transferred_item) {
+			const auto capability = transferred_item.get_owning_transfer_capability();
+			const auto predictability = predictable_only_by(capability);
+
 			const auto conditions = calc_mounting_conditions(transferred_item, target_slot);
 
 			enum class sound_type {
@@ -108,7 +111,7 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 			auto stop_the_start_sound = [&]() {
 				const auto input = get_sound_effect_input(sound_type::START);
 
-				messages::stop_sound_effect s;
+				auto s = messages::stop_sound_effect(predictability);
 				s.match_chased_subject = transferred_item;
 				s.match_effect_id = input.id;
 				step.post_message(s);
@@ -119,13 +122,9 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 					/* Play start sound */
 					packaged_sound_effect sound;
 					sound.input = get_sound_effect_input(t);
+					sound.start = sound_effect_start_input::at_entity(transferred_item).set_listener(capability);
 
-					{
-						const auto capability = transferred_item.get_owning_transfer_capability();
-						sound.start = sound_effect_start_input::at_entity(transferred_item).set_listener(capability);
-					}
-
-					sound.post(step);
+					sound.post(step, predictability);
 				};
 
 				if (progress == 0.f) {

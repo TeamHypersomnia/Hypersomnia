@@ -39,12 +39,18 @@ void perform_transfer_result::notify(const logic_step step) const {
 }
 
 void perform_transfer_result::play_effects(const logic_step step) const {
+	const auto& source = result.source_root;
+	const auto& target = result.target_root;
+
+	const auto predicting = source.is_set() ? source : target;
+	const auto predictability = predicting.is_set() ? predictable_only_by(predicting) : never_predictable_v;
+
 	if (transfer_sound.has_value()) {
-		transfer_sound->post(step);
+		transfer_sound->post(step, predictability);
 	}
 
 	if (transfer_particles.has_value()) {
-		transfer_particles->post(step);
+		transfer_particles->post(step, predictability);
 	}
 }
 
@@ -105,7 +111,7 @@ perform_transfer_result perform_transfer_impl(
 	const auto source_slot_container = source_slot.get_container();
 	const auto source_root = source_slot_container.get_topmost_container();
 
-	output.result.source_root = target_root;
+	output.result.source_root = source_root;
 
 	const auto transferred_item_guid = transferred_item.get_guid();
 

@@ -22,5 +22,5 @@ void fury_of_the_aeons_instance::perform_logic(const spell_logic_input in) {
 	auto cause = damage_cause(subject);
 	cause.spell = in.this_id;
 
-	spell_data.explosion.instantiate(in.step, caster_transform, cause);
+	spell_data.explosion.instantiate(in.step, caster_transform, cause, predictable_only_by(subject));
 }

@@ -12,6 +12,7 @@
 #include "game/detail/sentience_shake.h"
 #include "game/detail/damage/damage_definition.h"
 #include "game/detail/view_input/sound_effect_input.h"
+#include "game/detail/view_input/predictability_info.h"
 
 struct damage_cause;
 
@@ -43,6 +44,7 @@ struct standard_explosion_input {
 	void instantiate(
 		logic_step step, 
 		transformr explosion_location, 
-		damage_cause cause
+		damage_cause cause,
+		predictability_info info = always_predictable_v
 	) const;
 };

@@ -24,7 +24,7 @@
 #include "game/detail/physics/physics_queries.h"
 #include "augs/misc/enum/enum_bitset.h"
 #include "game/messages/damage_message.h"
-#include "game/messages/thunder_input.h"
+#include "game/messages/thunder_effect.h"
 #include "game/detail/sentience/sentience_getters.h"
 
 using namespace augs;
@@ -185,7 +185,8 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 							effect.start(
 								step,
-								particle_effect_start_input::at_entity(it)
+								particle_effect_start_input::at_entity(it),
+								predictable_only_by(it)
 							);
 						}
 
@@ -205,7 +206,8 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 							effect.start(
 								step,
-								sound_effect_start_input::at_entity(typed_weapon).set_listener(it)
+								sound_effect_start_input::at_entity(typed_weapon).set_listener(it),
+								predictable_only_by(it)
 							);
 						}
 
@@ -214,7 +216,8 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 							effect.start(
 								step,
-								particle_effect_start_input::at_entity(typed_weapon)
+								particle_effect_start_input::at_entity(typed_weapon),
+								predictable_only_by(it)
 							);
 						}
 					}
@@ -441,7 +444,8 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 													auto play_clash = [&](const auto& def) {
 														def.sound.start(
 															step,
-															sound_effect_start_input::fire_and_forget(point_of_impact)
+															sound_effect_start_input::fire_and_forget(point_of_impact),
+															never_predictable_v
 														);
 													};
 
@@ -480,7 +484,8 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 												}
 
 												{
-													thunder_input th;
+													auto msg = messages::thunder_effect(never_predictable_v);
+													auto& th = msg.payload;
 
 													th.delay_between_branches_ms = {10.f, 35.f};
 													th.max_branch_lifetime_ms = {60.f, 85.f};
@@ -493,10 +498,10 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 													th.color = white;
 
 													th.first_branch_root = transformr(point_of_impact, impact_dir.perpendicular_cw().degrees());
-													step.post_message(th);
+													step.post_message(msg);
 
 													th.first_branch_root = transformr(point_of_impact, impact_dir.perpendicular_ccw().degrees());
-													step.post_message(th);
+													step.post_message(msg);
 												}
 											}
 										}

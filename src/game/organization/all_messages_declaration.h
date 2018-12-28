@@ -26,10 +26,9 @@ namespace messages {
 	struct exhausted_cast;
 	struct changed_identities_message;
 	struct battle_event_message;
+	struct thunder_effect;
+	struct exploding_ring_effect;
 }
-
-struct exploding_ring_input;
-struct thunder_input;
 
 using all_message_queues = augs::storage_for_message_queues<
 	messages::intent_message,
@@ -55,10 +54,11 @@ using all_message_queues = augs::storage_for_message_queues<
 	/* Purely effect messages. The only recipient is the audiovisual state. */
 	messages::start_particle_effect,
 	messages::stop_particle_effect,
+
 	messages::start_sound_effect,
 	messages::start_multi_sound_effect,
 	messages::stop_sound_effect,
 
-	exploding_ring_input,
-	thunder_input
+	messages::thunder_effect,
+	messages::exploding_ring_effect
 >;

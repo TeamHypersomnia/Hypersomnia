@@ -313,8 +313,8 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 		}
 	}
 
-	auto do_events = [&](auto dummy) {
-		using M = decltype(dummy);
+	auto do_events = [&](auto* dummy) {
+		using M = remove_cptr<decltype(dummy)>;
 
 		const auto& events = step.get_queue<M>();
 
@@ -357,8 +357,8 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 		}
 	};
 
-	do_events(messages::start_sound_effect());
-	do_events(messages::start_multi_sound_effect());
+	do_events((messages::start_sound_effect*)(nullptr));
+	do_events((messages::start_multi_sound_effect*)(nullptr));
 }
 
 void sound_system::update_sound_properties(const update_properties_input in) {

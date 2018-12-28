@@ -38,7 +38,7 @@
 #include "game/detail/organisms/startle_nearbly_organisms.h"
 #include "game/detail/explosive/detonate.h"
 #include "game/detail/melee/like_melee.h"
-#include "game/messages/thunder_input.h"
+#include "game/messages/thunder_effect.h"
 
 #define USER_RICOCHET_COOLDOWNS 0
 #define LOG_RICOCHETS 0
@@ -212,7 +212,8 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 							other_clash.particles.start(
 								step,
-								particle_effect_start_input::fire_and_forget(eff_transform)
+								particle_effect_start_input::fire_and_forget(eff_transform),
+								never_predictable_v
 							);
 
 							{
@@ -224,13 +225,15 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 								if (!avoid_clashing_same_sound) {
 									other_clash.sound.start(
 										step,
-										sound_effect_start_input::fire_and_forget(eff_transform)
+										sound_effect_start_input::fire_and_forget(eff_transform),
+										never_predictable_v
 									);
 								}
 							}
 
 							{
-								thunder_input th;
+								auto msg = messages::thunder_effect(never_predictable_v);
+								auto& th = msg.payload;
 
 								th.delay_between_branches_ms = {10.f, 25.f};
 								th.max_branch_lifetime_ms = {40.f, 65.f};
@@ -244,7 +247,7 @@ void missile_system::detonate_colliding_missiles(const logic_step step) {
 
 								th.color = white;
 
-								step.post_message(th);
+								step.post_message(msg);
 							}
 						}
 

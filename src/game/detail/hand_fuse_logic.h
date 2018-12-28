@@ -108,7 +108,8 @@ struct fuse_logic_provider {
 
 		fuse_def.release_sound.start(
 			step,
-			sound_effect_start_input::fire_and_forget(fused_transform).set_listener(holder)
+			sound_effect_start_input::fire_and_forget(fused_transform).set_listener(holder),
+			predictable_only_by(holder)
 		);
 	}
 
@@ -125,7 +126,7 @@ struct fuse_logic_provider {
 		const auto id = fused_entity.get_id();
 		const auto& effect = fuse_def.started_arming_sound;
 
-		messages::stop_sound_effect stop;
+		auto stop = messages::stop_sound_effect(predictable_only_by(holder));
 		stop.match_chased_subject = id;
 		stop.match_effect_id = effect.id;
 		step.post_message(stop);
@@ -137,7 +138,8 @@ struct fuse_logic_provider {
 
 		effect.start(
 			step,
-			sound_effect_start_input::orbit_local(id, {}).set_listener(holder)
+			sound_effect_start_input::orbit_local(id, {}).set_listener(holder),
+			predictable_only_by(holder)
 		);
 
 		stop_started_arming_sound();
@@ -152,7 +154,8 @@ struct fuse_logic_provider {
 
 		fuse_def.started_defusing_sound.start(
 			step,
-			sound_effect_start_input::fire_and_forget(fused_transform).set_listener(character_now_defusing)
+			sound_effect_start_input::fire_and_forget(fused_transform).set_listener(character_now_defusing),
+			predictable_only_by(holder)
 		);
 	}
 
@@ -160,13 +163,15 @@ struct fuse_logic_provider {
 		for (std::size_t i = 0; i < fuse_def.defused_sound.size(); ++i) {
 			fuse_def.defused_sound[i].start(
 				step,
-				sound_effect_start_input::fire_and_forget(fused_transform).set_listener(character_now_defusing)
+				sound_effect_start_input::fire_and_forget(fused_transform).set_listener(character_now_defusing),
+				never_predictable_v
 			);
 		}
 
 		fuse_def.defused_particles.start(
 			step,
-			particle_effect_start_input::fire_and_forget(fused_transform)
+			particle_effect_start_input::fire_and_forget(fused_transform),
+			never_predictable_v
 		);
 	}
 
@@ -194,7 +199,8 @@ struct fuse_logic_provider {
 
 		fuse_def.armed_sound.start(
 			step,
-			sound_effect_start_input::fire_and_forget(fused_transform).set_listener(holder)
+			sound_effect_start_input::fire_and_forget(fused_transform).set_listener(holder),
+			predictable_only_by(holder)
 		);
 
 		if (fuse_def.always_release_when_armed) {

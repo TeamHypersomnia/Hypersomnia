@@ -5,7 +5,7 @@
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
-#include "game/messages/exploding_ring_input.h"
+#include "game/messages/exploding_ring_effect.h"
 #include "game/messages/damage_message.h"
 #include "game/stateless_systems/visibility_system.h"
 #include "game/stateless_systems/sound_existence_system.h"
@@ -14,7 +14,7 @@
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/data_living_one_step.h"
 #include "game/debug_drawing_settings.h"
-#include "game/messages/thunder_input.h"
+#include "game/messages/thunder_effect.h"
 #include "game/cosmos/data_living_one_step.h"
 #include "game/detail/organisms/startle_nearbly_organisms.h"
 #include "game/detail/physics/shape_overlapping.hpp"
@@ -41,14 +41,16 @@ static bool triangle_degenerate(const std::array<vec2, 3>& v) {
 void standard_explosion_input::instantiate(
 	const logic_step step,
 	const transformr explosion_location,
-	const damage_cause cause
+	const damage_cause cause,
+	const predictability_info predictability
 ) const {
 	const auto subject_if_any = cause.entity;
 
 	if (create_thunders_effect) {
 		for (int t = 0; t < 4; ++t) {
 			static randomization rng;
-			thunder_input th;
+			auto msg = messages::thunder_effect(predictability);
+			auto& th = msg.payload;
 
 			th.delay_between_branches_ms = {10.f, 25.f};
 			th.max_branch_lifetime_ms = {40.f, 65.f};
@@ -64,14 +66,15 @@ void standard_explosion_input::instantiate(
 
 			th.color = t % 2 ? cyan : turquoise;
 
-			step.post_message(th);
+			step.post_message(msg);
 		}
 	}
 
 	{
 		sound.start(
 			step,
-			sound_effect_start_input::fire_and_forget(explosion_location).set_listener(subject_if_any)
+			sound_effect_start_input::fire_and_forget(explosion_location).set_listener(subject_if_any),
+			predictability
 		);
 	}
 
@@ -227,7 +230,8 @@ void standard_explosion_input::instantiate(
 	// TODO_PERFORMANCE: This code is unnecessary for the server
 
 	{
-		exploding_ring_input ring;
+		auto msg = messages::exploding_ring_effect(predictability);
+		auto& ring = msg.payload;
 
 		ring.outer_radius_start_value = effective_radius / 2;
 		ring.outer_radius_end_value = effective_radius;
@@ -243,11 +247,12 @@ void standard_explosion_input::instantiate(
 		ring.center = explosion_pos;
 		ring.visibility = response;
 
-		step.post_message(ring);
+		step.post_message(msg);
 	}
 
 	{
-		exploding_ring_input ring;
+		auto msg = messages::exploding_ring_effect(predictability);
+		auto& ring = msg.payload;
 
 		ring.outer_radius_start_value = effective_radius;
 		ring.outer_radius_end_value = effective_radius / 2;
@@ -263,6 +268,6 @@ void standard_explosion_input::instantiate(
 		ring.center = explosion_pos;
 		ring.visibility = response;
 
-		step.post_message(ring);
+		step.post_message(msg);
 	}
 }

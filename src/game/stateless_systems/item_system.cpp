@@ -658,7 +658,8 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 
 										effect.start(
 											step,
-											particle_effect_start_input::at_entity(h)
+											particle_effect_start_input::at_entity(h),
+											predictable_only_by(typed_subject)
 										);
 									}
 

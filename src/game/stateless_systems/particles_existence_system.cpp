@@ -15,7 +15,7 @@
 #include "game/messages/damage_message.h"
 #include "game/messages/health_event.h"
 #include "game/messages/exhausted_cast_message.h"
-#include "game/messages/exploding_ring_input.h"
+#include "game/messages/exploding_ring_effect.h"
 
 #include "game/stateless_systems/particles_existence_system.h"
 #include "game/cosmos/for_each_entity.h"
@@ -80,6 +80,10 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 	auto& cosm = step.get_cosmos();
 
 	for (const auto& g : gunshots) {
+		const auto subject = cosm[g.subject];
+		const auto owning_capability = subject.get_owning_transfer_capability();
+		const auto predictability = predictable_only_by(owning_capability);
+
 		for (auto& r : g.spawned_rounds) {
 			const auto spawned_round = cosm[r];
 
@@ -88,7 +92,8 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 				effect.start(
 					step,
-					particle_effect_start_input::orbit_absolute(cosm[g.subject], g.muzzle_transform)
+					particle_effect_start_input::orbit_absolute(cosm[g.subject], g.muzzle_transform),
+					predictability
 				);
 			}
 
@@ -100,7 +105,8 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 					effect.start(
 						step,
-						particle_effect_start_input::orbit_local(cosm[r], { vec2::zero, rotation } )
+						particle_effect_start_input::orbit_local(cosm[r], { vec2::zero, rotation } ),
+						predictability
 					);
 				}
 			}
@@ -113,7 +119,8 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 			effect.start(
 				step,
-				particle_effect_start_input::orbit_local(shell, { vec2::zero, 180 } )
+				particle_effect_start_input::orbit_local(shell, { vec2::zero, 180 } ),
+				predictability
 			);
 		}
 	}
@@ -145,14 +152,16 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 				{
 					effect.start(
 						step,
-						particle_effect_start_input::orbit_absolute(subject, impact_transform) 
+						particle_effect_start_input::orbit_absolute(subject, impact_transform),
+						always_predictable_v
 					);
 				}
 
 				if (effect_def.spawn_exploding_ring) {
 					const auto max_radius = d.damage.base * 1.5f;
 
-					exploding_ring_input ring;
+					auto msg = messages::exploding_ring_effect(always_predictable_v);
+					auto& ring = msg.payload;
 
 					ring.outer_radius_start_value = max_radius;
 					ring.outer_radius_end_value = max_radius / 1.2f;
@@ -167,7 +176,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 					ring.color = effect.modifier.colorize;
 					ring.center = impact_transform.pos;
 
-					step.post_message(ring);
+					step.post_message(msg);
 				}
 			};
 
@@ -206,7 +215,8 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 				effect.start(
 					step,
-					particle_effect_start_input::orbit_absolute(subject, impact_transform)
+					particle_effect_start_input::orbit_absolute(subject, impact_transform),
+					always_predictable_v
 				);
 			}
 		}
@@ -214,6 +224,8 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 	for (const auto& h : healths) {
 		const auto subject = cosm[h.subject];
+
+		auto predictability = always_predictable_v;
 
 		if (h.target == messages::health_event::target_type::HEALTH) {
 			const auto& sentience = subject.get<invariants::sentience>();
@@ -225,6 +237,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 					effect.modifier.scale_amounts = 0.6f;
 					effect.modifier.scale_lifetimes = 1.25f;
 					effect.modifier.colorize = red;
+					predictability = never_predictable_v;
 				}
 				else {
 					effect.modifier.colorize = red;
@@ -234,18 +247,21 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 					effect.modifier.scale_lifetimes = 1.25f + std::min(1.f, h.effective_amount / 100.f);
 				}
 
-				messages::stop_particle_effect stop;
-				stop.match_chased_subject = h.subject;
-				stop.match_orbit_offset = vec2::zero;
-				stop.match_effect_id = effect.id;
-				step.post_message(stop);
+				{
+					auto stop = messages::stop_particle_effect(predictability);
+					stop.match_chased_subject = h.subject;
+					stop.match_orbit_offset = vec2::zero;
+					stop.match_effect_id = effect.id;
+					step.post_message(stop);
+				}
 
 				auto start_in = particle_effect_start_input::orbit_local(h.subject, { vec2::zero, (h.impact_velocity).degrees() });
 				start_in.homing_target = h.subject;
 
 				effect.start(
 					step,
-					start_in
+					start_in,
+					predictability
 				);
 			}
 		}
@@ -256,7 +272,8 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 		effect.start(
 			step,
-			particle_effect_start_input::at_entity(e.subject)
+			particle_effect_start_input::at_entity(e.subject),
+			predictable_only_by(e.subject)
 		);
 	}
 }

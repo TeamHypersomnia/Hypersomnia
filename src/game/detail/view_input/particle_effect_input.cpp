@@ -7,9 +7,10 @@
 
 void particle_effect_input::start(
 	const const_logic_step step, 
-	const particle_effect_start_input start
+	const particle_effect_start_input start,
+	const predictability_info info
 ) const {
-	messages::start_particle_effect msg;
+	auto msg = messages::start_particle_effect(info);
 
 	auto& p = msg.payload;
 
@@ -19,8 +20,8 @@ void particle_effect_input::start(
 	step.post_message(msg);
 }
 
-void packaged_particle_effect::post(const const_logic_step step) const {
-	input.start(step, start);
+void packaged_particle_effect::post(const const_logic_step step, const predictability_info info) const {
+	input.start(step, start, info);
 }
 
 particle_effect_start_input particle_effect_start_input::orbit_absolute(const const_entity_handle h, transformr world_transform) {

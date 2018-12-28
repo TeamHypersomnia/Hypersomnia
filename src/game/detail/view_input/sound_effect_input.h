@@ -58,7 +58,6 @@ struct sound_effect_start_input {
 	collision_sound_source source_collision;
 	real32 collision_sound_cooldown_duration = 250.f;
 	int collision_sound_occurences_before_cooldown = 4;
-	predictability_info predictability;
 	bool clear_when_target_dead = false;
 
 	static sound_effect_start_input fire_and_forget(const transformr where) {
@@ -94,16 +93,6 @@ struct sound_effect_start_input {
 
 		return *this;
 	}
-
-	auto& predictable_only_by(const entity_id id) {
-		predictability.set_only_by(id);
-		return *this;
-	}
-
-	auto& never_predictable() {
-		predictability.type = predictability_type::NEVER;
-		return *this;
-	}
 };
 
 struct sound_effect_input {
@@ -116,14 +105,14 @@ struct sound_effect_input {
 		return modifier.max_distance + modifier.reference_distance;
 	}
 
-	void start(const_logic_step, sound_effect_start_input) const;
+	void start(const_logic_step, sound_effect_start_input, predictability_info) const;
 };
 
 struct packaged_sound_effect {
 	sound_effect_input input;
 	sound_effect_start_input start;
 
-	void post(const_logic_step step) const;
+	void post(const_logic_step step, predictability_info info) const;
 };
 
 using sound_effect_input_vector = augs::constant_size_vector<sound_effect_input, MAX_FOLLOWUP_SOUND_INPUTS>;
@@ -132,5 +121,5 @@ struct packaged_multi_sound_effect {
 	sound_effect_input_vector inputs;
 	sound_effect_start_input start;
 
-	void post(const_logic_step step) const;
+	void post(const_logic_step step, predictability_info info) const;
 };

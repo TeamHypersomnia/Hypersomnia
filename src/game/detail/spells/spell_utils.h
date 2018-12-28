@@ -13,7 +13,8 @@ void ignite_cast_sparkles(
 
 	effect.start(
 		step,
-		{ particle_effect_start_input::at_entity(subject) }
+		{ particle_effect_start_input::at_entity(subject) },
+		predictable_only_by(subject)
 	);
 }
 
@@ -29,7 +30,8 @@ void ignite_charging_particles(
 
 	effect.start(
 		step,
-		{ particle_effect_start_input::at_entity(subject).set_homing(subject) }
+		{ particle_effect_start_input::at_entity(subject).set_homing(subject) },
+		predictable_only_by(subject)
 	);
 }
 
@@ -41,7 +43,8 @@ void play_cast_successful_sound(
 ) {
 	spell_data.common.cast_successful_sound.start(
 		step,
-		sound_effect_start_input::at_listener(subject)
+		sound_effect_start_input::at_listener(subject),
+		predictable_only_by(subject)
 	);
 }
 
@@ -53,6 +56,7 @@ void play_cast_charging_sound(
 ) {
 	spell_data.charging_sound.start(
 		step,
-		sound_effect_start_input::at_listener(subject)
+		sound_effect_start_input::at_listener(subject),
+		predictable_only_by(subject)
 	);
 }

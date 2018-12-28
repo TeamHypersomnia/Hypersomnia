@@ -126,7 +126,8 @@ static void ricochet_missile_against_surface(
 
 			effect.start(
 				step,
-				particle_effect_start_input::fire_and_forget(effect_transform)
+				particle_effect_start_input::fire_and_forget(effect_transform),
+				always_predictable_v
 			);
 		}
 
@@ -138,7 +139,8 @@ static void ricochet_missile_against_surface(
 
 			effect.start(
 				step,
-				sound_effect_start_input::fire_and_forget(effect_transform)
+				sound_effect_start_input::fire_and_forget(effect_transform),
+				always_predictable_v
 			);
 		}
 	}

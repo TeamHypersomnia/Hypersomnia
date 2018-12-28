@@ -15,17 +15,19 @@ public:
 	bool play_unpredictable;
 	entity_id predicting_subject;
 
-	static auto referential() {
+	static auto referential(const entity_id with) {
 		prediction_input out;
 		out.play_predictable = false;
 		out.play_unpredictable = true;
+		out.predicting_subject = with;
 		return out;
 	}
 
-	static auto predicted() {
+	static auto predicted(const entity_id with) {
 		prediction_input out;
 		out.play_predictable = true;
 		out.play_unpredictable = false;
+		out.predicting_subject = with;
 		return out;
 	}
 
@@ -39,11 +41,39 @@ public:
 
 struct predictability_info {
 	predictability_type type = predictability_type::ALWAYS;
-	entity_id only_by;
+	entity_id predicting_subject;
 
 	void set_only_by(const entity_id& b) {
-		only_by = b;
 		type = predictability_type::ONLY_BY;
+		predicting_subject = b;
+	}
+
+	void set_never() {
+		type = predictability_type::NEVER;
+		predicting_subject = {};
+	}
+
+	void set_always() {
+		type = predictability_type::ALWAYS;
+		predicting_subject = {};
+	}
+
+	static auto never() {
+		predictability_info out;
+		out.set_never();
+		return out;
+	}
+
+	static auto always() {
+		predictability_info out;
+		out.set_always();
+		return out;
+	}
+
+	static auto only_by(const entity_id& b) {
+		predictability_info out;
+		out.set_only_by(b);
+		return out;
 	}
 
 	bool is_this_predictable(const entity_id& with) const{
@@ -52,7 +82,7 @@ struct predictability_info {
 		}
 
 		if (type == predictability_type::ONLY_BY) {
-			if (with == only_by) {
+			if (with == predicting_subject) {
 				return true;
 			}
 		}
@@ -70,3 +100,7 @@ struct predictability_info {
 		return in.play_unpredictable;
 	}
 };
+
+#define never_predictable_v predictability_info::never()
+#define always_predictable_v predictability_info::always()
+#define predictable_only_by(x) predictability_info::only_by(x)

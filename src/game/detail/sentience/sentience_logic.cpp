@@ -71,12 +71,14 @@ void perform_knockout(
 
 						effect.start(
 							step,
-							particle_effect_start_input::orbit_local(typed_entity, { vec2::zero, 180 } )
+							particle_effect_start_input::orbit_local(typed_entity, { vec2::zero, 180 } ),
+							never_predictable_v
 						);
 
 						effect.start(
 							step,
-							particle_effect_start_input::orbit_local(typed_subject, { vec2::zero, 180 } )
+							particle_effect_start_input::orbit_local(typed_subject, { vec2::zero, 180 } ),
+							never_predictable_v
 						);
 					},
 					[&](auto&&...) {}

@@ -140,14 +140,16 @@ static void cooldown_gun_heat(
 			const auto additional_intensity = gun.max_heat_after_steam_schedule / gun_def.maximum_heat;
 			gun.max_heat_after_steam_schedule = 0.f;
 
+			const auto owning_capability = gun_entity.get_owning_transfer_capability();
+			const auto predictability = owning_capability ? predictable_only_by(owning_capability) : never_predictable_v;
+
 			{
 				auto chosen_effect = gun_def.steam_burst_sound;
 
 				chosen_effect.modifier.pitch /= additional_intensity;
 				chosen_effect.modifier.gain *= additional_intensity;
 
-				const auto owning_capability = gun_entity.get_owning_transfer_capability();
-				chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability));
+				chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability), predictability);
 			}
 
 			{
@@ -156,7 +158,7 @@ static void cooldown_gun_heat(
 				chosen_effect.modifier.scale_amounts += additional_intensity;
 				chosen_effect.modifier.scale_lifetimes += additional_intensity;
 
-				chosen_effect.start(step, particle_effect_start_input::orbit_absolute(gun_entity, muzzle_transform));
+				chosen_effect.start(step, particle_effect_start_input::orbit_absolute(gun_entity, muzzle_transform), predictability);
 			}
 
 			gun.steam_burst_scheduled = false;
@@ -178,6 +180,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			const auto muzzle_transform = ::calc_muzzle_transform(gun_entity, gun_transform);
 
 			const auto capability = gun_entity.get_owning_transfer_capability();
+			const auto predictability = predictable_only_by(capability);
 
 			auto& gun = gun_entity.template get<components::gun>();
 			const auto& gun_def = gun_entity.template get<invariants::gun>();
@@ -268,7 +271,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					if (primary_trigger_pressed) {
 						if (clk.try_to_fire_and_reset(200.f, gun.when_last_played_trigger_effect)) {
 							const auto& chosen_effect = gun_def.trigger_pull_sound;
-							chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability));
+							const auto predictability = predictable_only_by(owning_capability);
+							chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability), predictability);
 						}
 					}
 				};
@@ -355,7 +359,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							if (progress > 0.f) {
 								const auto& chosen_effect = gun_def.chambering_sound;
 
-								messages::stop_sound_effect stop;
+								auto stop = messages::stop_sound_effect(predictability);
 								stop.match_chased_subject = gun_entity;
 								stop.match_effect_id = chosen_effect.id;
 								step.post_message(stop);
@@ -372,7 +376,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							if (const auto next_cartridge = find_next_cartridge(gun_entity); next_cartridge.is_set()) {
 								if (progress == 0.f) {
 									const auto& chosen_effect = gun_def.chambering_sound;
-									chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability));
+									chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability), predictability);
 								}
 
 								progress += delta.in_milliseconds();
@@ -411,11 +415,11 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 										gun.magazine.apply(50000.5f * delta.in_seconds());
 
 										const auto& chosen_effect = gun_def.heavy_heat_start_sound;
-										chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability));
+										chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability), predictability);
 									}
 									else {
 										const auto& chosen_effect = gun_def.light_heat_start_sound;
-										chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability));
+										chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability), predictability);
 									}
 
 									primary_just_pressed = false;

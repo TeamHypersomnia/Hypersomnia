@@ -213,17 +213,84 @@ public:
 			}
 
 			if (in_game) {
+				auto referential_arena = get_arena_handle(client_arena_type::REFERENTIAL);
+				auto predicted_arena = get_arena_handle(client_arena_type::PREDICTED);
+
+				auto audiovisual_post_solve = callbacks.post_solve;
+
+				auto for_each_predicted_queue = [&](const const_logic_step step, auto callback) {
+					namespace M = messages;
+
+					auto& q = step.transient.messages;
+
+					callback(q.get_queue<M::start_particle_effect>());
+					callback(q.get_queue<M::stop_particle_effect>());
+
+					callback(q.get_queue<M::start_sound_effect>());
+					callback(q.get_queue<M::stop_sound_effect>());
+					callback(q.get_queue<M::start_multi_sound_effect>());
+
+					callback(q.get_queue<M::thunder_effect>());
+					callback(q.get_queue<M::exploding_ring_effect>());
+				};
+
+				auto referential_post_solve = [&](const const_logic_step step) {
+					auto erase_predictable_messages = [&](auto& from_queue) {
+						const auto input = prediction_input::referential(get_viewed_character());
+
+						erase_if(
+							from_queue,
+							[&](const auto& m) {
+								return !m.get_predictability().should_play(input);
+							}
+						);
+					};
+
+					for_each_predicted_queue(step, erase_predictable_messages);
+					audiovisual_post_solve(step);
+				};
+
+				auto predicted_post_solve = [&](const const_logic_step step) {
+					auto erase_unpredictable_messages = [&](auto& from_queue) {
+						const auto input = prediction_input::predicted(get_viewed_character());
+
+						erase_if(
+							from_queue,
+							[&](const auto& m) {
+								return !m.get_predictability().should_play(input);
+							}
+						);
+					};
+
+					for_each_predicted_queue(step, erase_unpredictable_messages);
+					audiovisual_post_solve(step);
+				};
+
+				auto referential_callbacks = solver_callbacks(
+					default_solver_callback(),
+					referential_post_solve,
+					default_solver_callback()
+				);
+
+				auto predicted_callbacks = solver_callbacks(
+					default_solver_callback(),
+					predicted_post_solve,
+					default_solver_callback()
+				);
+
 				{
 					auto scope = measure_scope(performance.unpacking_remote_steps);
 
-					auto referential_arena = get_arena_handle(client_arena_type::REFERENTIAL);
-					auto predicted_arena = get_arena_handle(client_arena_type::PREDICTED);
-
 					auto advance_referential = [&](const auto& entropy) {
-						referential_arena.advance(entropy, solver_callbacks());
+						referential_arena.advance(entropy, referential_callbacks);
 					};
 
 					auto advance_repredicted = [&](const auto& entropy) {
+						/* 
+							Note that we do not post-solve for the re-simulation process. 
+							We only post-solve once for the predicted cosmos, when we actually move forward in time.
+						*/
+
 						predicted_arena.advance(entropy, solver_callbacks());
 					};
 
@@ -272,9 +339,9 @@ public:
 				}
 
 #if USE_CLIENT_PREDICTION
-				//LOG("PE: %x", receiver.predicted_entropies.size());
-				get_arena_handle(client_arena_type::PREDICTED).advance(*new_local_entropy, callbacks);
+				predicted_arena.advance(*new_local_entropy, predicted_callbacks);
 #else
+				(void)predicted_callbacks;
 				(void)callbacks;
 #endif
 			}

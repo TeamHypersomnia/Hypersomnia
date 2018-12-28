@@ -725,7 +725,7 @@ void bomb_mode::setup_round(
 		}
 	}
 	else {
-		play_sound_for(in, step, battle_event::START);
+		play_sound_for(in, step, battle_event::START, always_predictable_v);
 	}
 
 	if (state != arena_mode_state::WARMUP) {
@@ -1012,7 +1012,7 @@ void bomb_mode::make_win(const input_type in, const faction_type winner) {
 	}
 }
 
-void bomb_mode::play_faction_sound(const const_logic_step step, const faction_type f, const assets::sound_id id) const {
+void bomb_mode::play_faction_sound(const const_logic_step step, const faction_type f, const assets::sound_id id, const predictability_info info) const {
 	sound_effect_input effect;
 	effect.id = id;
 
@@ -1020,7 +1020,7 @@ void bomb_mode::play_faction_sound(const const_logic_step step, const faction_ty
 	input.listener_faction = f;
 	input.variation_number = get_step_rng_seed(step.get_cosmos());
 
-	effect.start(step, input);
+	effect.start(step, input, info);
 }
 
 void bomb_mode::play_win_theme(const input_type in, const const_logic_step step, const faction_type winner) const {
@@ -1032,7 +1032,7 @@ void bomb_mode::play_win_theme(const input_type in, const const_logic_step step,
 		sound_effect_start_input input;
 		input.variation_number = get_step_rng_seed(step.get_cosmos());
 
-		effect.start(step, input);
+		effect.start(step, input, never_predictable_v);
 	}
 }
 
@@ -1041,22 +1041,22 @@ void bomb_mode::play_win_sound(const input_type in, const const_logic_step step,
 
 	p.for_each([&](const faction_type t) {
 		if (const auto sound_id = in.rules.view.win_sounds[t][winner]; sound_id.is_set()) {
-			play_faction_sound(step, t, sound_id);
+			play_faction_sound(step, t, sound_id, never_predictable_v);
 		}
 	});
 }
 
-void bomb_mode::play_sound_for(const input_type in, const const_logic_step step, const battle_event event) const {
+void bomb_mode::play_sound_for(const input_type in, const const_logic_step step, const battle_event event, const predictability_info info) const {
 	const auto p = calc_participating_factions(in);
 
 	p.for_each([&](const faction_type t) {
-		play_faction_sound_for(in, step, event, t);
+		play_faction_sound_for(in, step, event, t, info);
 	});
 }
 
-void bomb_mode::play_faction_sound_for(const input_type in, const const_logic_step step, const battle_event event, const faction_type t) const {
+void bomb_mode::play_faction_sound_for(const input_type in, const const_logic_step step, const battle_event event, const faction_type t, const predictability_info info) const {
 	if (const auto sound_id = in.rules.view.event_sounds[t][event]; sound_id.is_set()) {
-		play_faction_sound(step, t, sound_id);
+		play_faction_sound(step, t, sound_id, info);
 	}
 }
 
@@ -1064,7 +1064,7 @@ void bomb_mode::play_bomb_defused_sound(const input_type in, const const_logic_s
 	const auto p = calc_participating_factions(in);
 
 	p.for_each([&](const faction_type t) {
-		messages::start_multi_sound_effect msg;
+		auto msg = messages::start_multi_sound_effect(never_predictable_v);
 
 		{
 			auto& start = msg.payload.start;
@@ -1597,7 +1597,7 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 	else if (state == arena_mode_state::LIVE) {
 		if (get_freeze_seconds_left(in) <= 0.f) {
 			if (current_round.cache_players_frozen) {
-				play_sound_for(in, step, battle_event::START);
+				play_sound_for(in, step, battle_event::START, always_predictable_v);
 			}
 
 			set_players_frozen(in, false);
@@ -1653,14 +1653,14 @@ void bomb_mode::mode_post_solve(const input_type in, const mode_entropy& entropy
 
 				if (event == battle_event::INTERRUPTED_DEFUSING) {
 					if (const auto sound_id = in.rules.view.event_sounds[faction][battle_event::IM_DEFUSING_THE_BOMB]; sound_id.is_set()) {
-						messages::stop_sound_effect stop;
+						auto stop = messages::stop_sound_effect(predictable_only_by(subject));
 						stop.match_effect_id = sound_id;
 						step.post_message(stop);
 					}
 				}
 				else {
 					if (const auto sound_id = in.rules.view.event_sounds[faction][event]; sound_id.is_set()) {
-						play_faction_sound(step, faction, sound_id);
+						play_faction_sound(step, faction, sound_id, predictable_only_by(subject));
 					}
 				}
 			}
@@ -1696,7 +1696,7 @@ void bomb_mode::mode_post_solve(const input_type in, const mode_entropy& entropy
 					const auto& clk = cosm.get_clock();
 
 					if (typed_bomb.template get<components::hand_fuse>().when_armed == clk.now) {
-						play_sound_for(in, step, battle_event::BOMB_PLANTED);
+						play_sound_for(in, step, battle_event::BOMB_PLANTED, never_predictable_v);
 
 						auto& planter = current_round.bomb_planter;
 						planter = lookup(cosm[typed_bomb.template get<components::sender>().capability_of_sender]);

@@ -46,7 +46,8 @@ void demolitions_system::detonate_fuses(const logic_step step) {
 						if (beep.should_beep_again()) {
 							fuse_def.beep_sound.start(
 								step,
-								sound_effect_start_input::fire_and_forget(fuse_logic.fused_transform)
+								sound_effect_start_input::fire_and_forget(fuse_logic.fused_transform),
+								always_predictable_v
 							);
 
 							when_beep = clk.now;
