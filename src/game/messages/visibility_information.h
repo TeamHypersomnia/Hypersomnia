@@ -12,7 +12,7 @@ struct visibility_information_request_input {
 	b2Filter filter;
 	pad_bytes<2> pad;
 
-	float square_side = 0.f;
+	vec2 queried_rect;
 	float ignore_discontinuities_shorter_than = -1.f;
 
 	vec2 offset;
@@ -53,7 +53,7 @@ namespace messages {
 			{}
 		};
 
-		float source_square_side = 0.f;
+		vec2 source_queried_rect;
 
 		/* output */
 		std::vector<edge> edges;

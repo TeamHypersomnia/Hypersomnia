@@ -21,7 +21,7 @@ namespace ingredients {
 		//pathfinding.filter = predefined_queries::pathfinding();
 		//
 		//auto& layer = visibility.full_visibility_layers[invariants::visibility::DYNAMIC_PATHFINDING];
-		//layer.square_side = 1000;
+		//layer.queried_rect = vec2::square(1000);
 		//layer.color.set(0, 255, 255, 120);
 		//layer.filter = predefined_queries::pathfinding();
 	}

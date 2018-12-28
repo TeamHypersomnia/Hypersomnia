@@ -70,7 +70,7 @@ size_t visibility_information_response::get_num_triangles() const {
 }
 
 void visibility_information_response::clear() {
-	source_square_side = 0.f;
+	source_queried_rect = {};
 	edges.clear();
 	vertex_hits.clear();
 	discontinuities.clear();
@@ -244,9 +244,9 @@ void visibility_system::calc_visibility(
 		auto& response = vis_responses[request_index];
 		response.clear();
 
-		response.source_square_side = request.square_side;
+		response.source_queried_rect = request.queried_rect;
 
-		if (request.square_side < 1.f) {
+		if (request.queried_rect.x < 1.f || request.queried_rect.y < 1.f) {
 			continue;
 		}
 
@@ -257,12 +257,12 @@ void visibility_system::calc_visibility(
 		const vec2 eye_meters = si.get_meters(transform.pos + request.offset);
 
 		/* to Box2D coordinates */
-		const auto vision_side_meters = si.get_meters(request.square_side);
+		const auto vision_meters = si.get_meters(request.queried_rect);
 
 		/* prepare maximum visibility square */
 		b2AABB aabb;
-		aabb.lowerBound = b2Vec2(eye_meters - vision_side_meters / 2);
-		aabb.upperBound = b2Vec2(eye_meters + vision_side_meters / 2);
+		aabb.lowerBound = b2Vec2(eye_meters - vision_meters / 2);
+		aabb.upperBound = b2Vec2(eye_meters + vision_meters / 2);
 
 		auto push_vertex_if_within_range = [
 			eye_meters, 
@@ -424,9 +424,9 @@ void visibility_system::calc_visibility(
 			/* extract the actual vertices from visibility AABB to cast rays to */
 			const b2Vec2 whole_vision[] = {
 				aabb.lowerBound,
-				aabb.lowerBound + b2Vec2(vision_side_meters, 0),
+				aabb.lowerBound + b2Vec2(vision_meters.x, 0),
 				aabb.upperBound,
-				aabb.upperBound - b2Vec2(vision_side_meters, 0)
+				aabb.upperBound - b2Vec2(vision_meters.x, 0)
 			};
 
 			/* prepare edge shapes given above vertices to cast rays against when no obstacle was hit
@@ -587,7 +587,7 @@ void visibility_system::calc_visibility(
 				return result;
 			}();
 
-			vec2 destination = eye_meters + direction * vision_side_meters / 2 * 1.5f;
+			vec2 destination = eye_meters + direction * vision_meters.bigger_side() / 2 * 1.5f;
 
 			for (const auto& bound : visibility_bounds) {
 				const auto edge_ray_output = segment_segment_intersection(

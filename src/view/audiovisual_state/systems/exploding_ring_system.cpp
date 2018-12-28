@@ -70,7 +70,7 @@ void exploding_ring_system::advance(
 						for (auto p = 0u; p < particles_to_spawn; ++p) {
 							const auto angular_translation_multiplier = p / static_cast<float>(particles_to_spawn);
 							const auto spawn_particle_along_line = (tri[1] + along_edge * along_edge_length * angular_translation_multiplier) - r.center;
-							const auto circle_radius = std::min(spawn_particle_along_line.length(), vis.source_square_side / 2);
+							const auto circle_radius = std::min(spawn_particle_along_line.length(), vis.source_queried_rect.x / 2);
 
 							{
 								const auto spawner = [&](auto dummy) {

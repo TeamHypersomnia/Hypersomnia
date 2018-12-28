@@ -179,10 +179,10 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 					if (queried_camera_aabb.hover(light_aabb)) {
 						request.filter = predefined_queries::line_of_sight();
-						request.square_side = reach * 2;
+						request.queried_rect = vec2::square(reach * 2);
 					}
 					else {
-						request.square_side = -1.f;
+						request.queried_rect = {};
 					}
 
 					request.subject = light_entity;

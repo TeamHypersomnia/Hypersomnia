@@ -192,7 +192,7 @@ void illuminated_rendering(
 		messages::visibility_information_request request;
 		request.eye_transform = *viewed_character_transform;
 		request.filter = predefined_queries::pathfinding();
-		request.square_side = static_cast<float>(std::max(fow_size.x, fow_size.y));
+		request.queried_rect = fow_size;
 		request.subject = viewed_character;
 
 		auto& requests = thread_local_visibility_requests();
