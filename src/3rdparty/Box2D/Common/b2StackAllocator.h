@@ -45,7 +45,7 @@ public:
 
 	int32 GetMaxAllocation() const;
 
-private:
+	//private:
 
 	char m_data[b2_stackSize];
 	int32 m_index;

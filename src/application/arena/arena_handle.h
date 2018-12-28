@@ -68,7 +68,7 @@ public:
 
 	template <class T>
 	void assign_all_solvables(const T& from) const {
-		advanced_cosm = from.advanced_cosm;
+		advanced_cosm.assign_solvable(from.advanced_cosm);
 		current_mode = from.current_mode;
 	}
 

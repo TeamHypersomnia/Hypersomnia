@@ -6,13 +6,36 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- problem: footstep smokes might still be visible when we artificially increase zoom
-	- well the client itself knows everything anyways
-	- so we can force the zoom to be exact
-		- if someone has more than 1920x1080 they technically have the advantage but the footsteps would still be hearable
-			- one could still see some distant items thrown but come on
+- BETTER CLIENTSIDE PREDICTION
+	- Battle events shall always be played referentially
+	- We might want to predict sounds depending on the effect type
+		- E.g. tie FoTA effects to the referential
+		- But UWoTA to the predicted as there is a delay
+	- We might want to give a context info for the start struct
+		- This would hold the perpetrator id
+	- Collision sounds
+		- For now - predict all except collisions with remote players and their items
+			- If a collider has a capability of a remote player - play in the past
+			- otherwie always predict
+				- Even throws should be fine
+					- although some sounds might be unplayed if e.g. something is thrown closely to the wall
+					- we could introduce a recent owner struct in item
+						- if the recent owner is a remote player, play in the past
+	- clashes
+		- never predictable
+	- deaths
+		- never predictable
 
-- clientside prediction is the most important for now
+- Desync issues
+	- Could it be that the predicted cosm is advanced by mistake instead of the referential one?
+	- Perhaps operator= of the physics system inadvertently modifies something of the world which it copies?
+		- The island only ever exists temporally.
+		- Problem: the stack allocator is rewritten. There are possibly dangling addresses.
+	
+
+- Should parti/sound existence systems translate gunshot messages or shall we leave it to the post solve?
+	- What if something is destructed?
+	- Actually during gunshot nothing except cartridge is, and it is not taken into consideration
 
 - fix Common state crash
 
@@ -39,10 +62,6 @@ summary: That which we are brainstorming at the moment.
 
 - should rebuy previous also buy magazines bought?
 	- perhaps
-
-- We might want to predict sounds depending on the effect
-	- E.g. tie FoTA effects to the referential
-	- But UWoTA to the predicted as there is a delay
 
 - Probably simply play win and death sounds in accordance with the referential cosmos
 	- Will avoid confusion

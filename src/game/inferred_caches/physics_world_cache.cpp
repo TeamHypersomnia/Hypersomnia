@@ -1,3 +1,5 @@
+#define DEBUG_PHYSICS_SYSTEM_COPY !IS_PRODUCTION_BUILD
+
 #include <cstring>
 #include <unordered_set>
 
@@ -201,23 +203,46 @@ physics_world_cache::physics_world_cache(const physics_world_cache& b) : physics
 	*this = b;
 }
 
-physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b) {
-	ray_cast_counter = b.ray_cast_counter;
-	accumulated_messages = b.accumulated_messages;
+physics_world_cache& physics_world_cache::operator=(const physics_world_cache& from_world) {
+	ray_cast_counter = from_world.ray_cast_counter;
+	accumulated_messages = from_world.accumulated_messages;
 
 	b2World& migrated_b2World = *b2world.get();
 	migrated_b2World.~b2World();
 	new (&migrated_b2World) b2World(b2Vec2(0.f, 0.f));
 
-	const b2World& source_b2World = *b.b2world.get();
+	const b2World& source_b2World = *from_world.b2world.get();
+
+#if DEBUG_PHYSICS_SYSTEM_COPY
+	ensure_eq(0, source_b2World.m_stackAllocator.m_entryCount);
+	ensure_eq(0, source_b2World.m_stackAllocator.m_index);
+#endif
 
 	// do the initial trivial copy of all fields,
 	// we will migrate all pointers shortly
 	migrated_b2World = source_b2World;
 
-	// b2BlockAllocator has a null operator=, so the source_b2World preserves its default-constructed allocator
-	// even after the above copy. No need for further operations in this regard.
-	// new (&migrated_b2World.m_blockAllocator) b2BlockAllocator;
+	{
+#if DEBUG_PHYSICS_SYSTEM_COPY
+		ensure_eq(0, migrated_b2World.m_stackAllocator.m_entryCount);
+		ensure_eq(0, migrated_b2World.m_stackAllocator.m_index);
+#endif
+
+		b2StackEntry null_entry;
+		null_entry.data = nullptr;
+
+		auto& entries = migrated_b2World.m_stackAllocator.m_entries;
+		std::fill(std::begin(entries), std::end(entries), null_entry);
+	}
+
+	/*
+	   	b2BlockAllocator has a null operator=, 
+		so the migrated_b2World preserves its default-constructed allocator even after the above copy. 
+
+		We don't even need to do this:
+
+		new (&migrated_b2World.m_blockAllocator) b2BlockAllocator;
+	*/
 
 	// reset the allocator pointer to the new one
 	migrated_b2World.m_contactManager.m_allocator = &migrated_b2World.m_blockAllocator;
@@ -496,10 +521,10 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 	colliders_caches.clear();
 	rigid_body_caches.clear();
 
-	colliders_caches.reserve(b.colliders_caches.size());
-	rigid_body_caches.reserve(b.rigid_body_caches.size());
+	colliders_caches.reserve(from_world.colliders_caches.size());
+	rigid_body_caches.reserve(from_world.rigid_body_caches.size());
 
-	for (const auto& it : b.colliders_caches) {
+	for (const auto& it : from_world.colliders_caches) {
 		auto& migrated_cache = colliders_caches[it.first];
 
 		migrated_cache = it.second;
@@ -512,7 +537,7 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 		}
 	}
 	
-	for (const auto& it : b.rigid_body_caches) {
+	for (const auto& it : from_world.rigid_body_caches) {
 		const auto b_body = it.second.body.get();
 
 		auto& migrated_cache = rigid_body_caches[it.first];
@@ -529,10 +554,10 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& b
 
 #if TODO
 	joint_caches.clear();
-	joint_caches.reserve(b.joint_caches.size());
+	joint_caches.reserve(from_world.joint_caches.size());
 
 	for (auto& it : joint_caches) {
-		const auto b_joint = b.joint_caches[it.first].joint.get();
+		const auto b_joint = from_world.joint_caches[it.first].joint.get();
 
 		if (b_joint) {
 			joint_caches[i].joint = reinterpret_cast<b2Joint*>(pointer_migrations.at(reinterpret_cast<const void*>(b_joint)));

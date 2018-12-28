@@ -85,3 +85,7 @@ void cosmos::set_fixed_delta(const augs::delta& dt) {
 		return changer_callback_result::DONT_REFRESH; 
 	});
 }
+
+void cosmos::assign_solvable(const cosmos& b) {
+	solvable = b.solvable;
+}

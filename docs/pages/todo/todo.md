@@ -6,6 +6,12 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- problem: footstep smokes might still be visible when we artificially increase zoom
+	- well the client itself knows everything anyways
+	- so we can force the zoom to be exact
+		- if someone has more than 1920x1080 they technically have the advantage but the footsteps would still be hearable
+			- one could still see some distant items thrown but come on
+
 - ImGui popup for progress on loading atlases
 	- the imgui atlas itself will load quickly enough
 
