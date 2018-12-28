@@ -835,16 +835,7 @@ int work(const int argc, const char* const * const argv) try {
 	};
 
 	static auto setup_post_cleanup = [&](const const_logic_step step) {
-		get_audiovisuals().standard_post_cleanup(step);
-		game_gui.standard_post_cleanup(step);
-		
-		if (step.any_deletion_occured()) {
-			all_visible.clear_dead_entities(step.get_cosmos());
-		}
-	};
-
-	static auto get_sampled_cosmos = [](auto& setup) {
-		return std::addressof(setup.get_viewed_cosmos());
+		(void)step;
 	};
 
 	static auto advance_setup = [&](
@@ -852,53 +843,7 @@ int work(const int argc, const char* const * const argv) try {
 		auto& setup,
 		const input_pass_result& result
 	) {
-		static const cosmos* last_sampled_cosmos = nullptr;
-
 		const auto& viewing_config = result.viewing_config;
-
-		const auto now_sampled = get_sampled_cosmos(setup);
-
-		const bool has_cosmos_changed = [&]() {
-			if (now_sampled != last_sampled_cosmos) {
-				return true;
-			}
-
-			auto& assignments = now_sampled->get_solvable().significant.assignment_detector.count;
-
-			if (assignments > 0) {
-				assignments = 0;
-				return true;
-			}
-
-			return false;
-		}();
-
-		if (has_cosmos_changed) {
-			{
-				const bool is_client = 
-					current_setup != std::nullopt 
-					&& std::holds_alternative<client_setup>(*current_setup)
-				;
-
-				if (!is_client) {
-					/* Don't log this for the client as it will happen all the time due to prediction */
-
-					LOG("Sanitizing cosmos-related audiovisuals due to a possible change");
-				}	
-			}
-
-			game_gui.clear_dead_entities(*now_sampled);
-			get_audiovisuals().clear_dead_entities(*now_sampled);
-
-			all_visible.clear_dead_entities(*now_sampled);
-
-			last_sampled_cosmos = now_sampled;
-
-#if WHY_WAS_ZERO_ADVANCE_HERE
-			/* Well, after extensive tests, it doesn't crash, so perhaps it wasn't needed at all? */
-			audiovisual_step(augs::delta::zero, setup.get_audiovisual_speed(), viewing_config);
-#endif
-		}
 
 		setup.control(result.motions);
 		setup.control(result.intents);
@@ -952,7 +897,6 @@ int work(const int argc, const char* const * const argv) try {
 				);
 			}
 		}
-
 
 		get_audiovisuals().randomizing.last_frame_delta = frame_delta;
 		audiovisual_step(frame_delta, setup.get_audiovisual_speed(), viewing_config);

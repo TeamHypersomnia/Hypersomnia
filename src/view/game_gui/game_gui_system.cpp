@@ -629,6 +629,15 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 
 	for (const auto& transfer : step.get_queue<messages::performed_transfer_message>()) {
 		const auto transferred_item = cosm[transfer.item];
+
+		if (transferred_item.dead()) {
+			continue;
+		}
+
+		if (cosm[transfer.target_root].dead()) {
+			continue;
+		}
+
 		const auto target_slot = cosm[transfer.target_slot];
 
 		const bool same_capability = transfer.result.relation == capability_relation::THE_SAME;
@@ -695,22 +704,4 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 			);
 		}
 	}
-}
-
-void game_gui_system::standard_post_cleanup(const const_logic_step step) {
-	if (step.any_deletion_occured()) {
-		clear_dead_entities(step.get_cosmos());
-	}
-}
-
-void game_gui_system::clear_dead_entities(const cosmos& new_cosmos) {
-	const auto eraser = [&](auto& caches) {
-		erase_if(caches, [&](const auto& it) {
-			return new_cosmos[it.first].dead();
-		});
-	};
-
-	eraser(character_guis);
-	eraser(item_buttons);
-	eraser(slot_buttons);
 }

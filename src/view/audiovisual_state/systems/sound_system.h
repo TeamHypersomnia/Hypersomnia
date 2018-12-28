@@ -123,7 +123,6 @@ public:
 
 	void clear();
 	void clear_sources_playing(const assets::sound_id);
-	void clear_dead_entities(const cosmos&);
 
 	//	void set_listening_character(entity_id);
 };

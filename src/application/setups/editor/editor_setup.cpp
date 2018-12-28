@@ -1204,19 +1204,19 @@ bool editor_setup::handle_input_before_game(
 		}
 	}
 
-	if (e.was_any_key_pressed()) {
-		const auto k = e.data.key.key;
+	if (is_editing_mode()) {
+		if (e.was_any_key_pressed()) {
+			const auto k = e.data.key.key;
 
-		if (has_ctrl && has_shift) {
-			switch(k) {
-				case key::BACKSPACE: finish_and_discard(); return true; 
-				case key::ENTER: finish_and_reapply(); return true;
-				default: break;
+			if (has_ctrl && has_shift) {
+				switch(k) {
+					case key::BACKSPACE: finish_and_discard(); return true; 
+					case key::ENTER: finish_and_reapply(); return true;
+					default: break;
+				}
 			}
 		}
-	}
 
-	if (is_editing_mode()) {
 		auto& cosm = work().world;
 
 		if (e.was_any_key_pressed()) {

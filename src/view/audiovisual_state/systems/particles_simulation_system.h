@@ -151,7 +151,6 @@ public:
 	audiovisual_cache_map<orbital_cache> continuous_particles_caches;
 
 	void clear();
-	void clear_dead_entities(const cosmos&);
 
 	void add_particle(const particle_layer, const general_particle&);
 	void add_particle(const particle_layer, const animated_particle&);

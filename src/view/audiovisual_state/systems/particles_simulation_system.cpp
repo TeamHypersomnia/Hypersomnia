@@ -145,13 +145,6 @@ void particles_simulation_system::clear() {
 	clearer(homing_animated_particles);
 }
 
-void particles_simulation_system::clear_dead_entities(const cosmos& new_cosmos) {
-	erase_if(orbital_emissions, [&](const auto& it) {
-		const auto target = new_cosmos[it.chasing.target];
-		return target.dead() || !target.find_logic_transform().has_value();
-	});
-}
-
 void particles_simulation_system::add_particle(const particle_layer l, const general_particle& p) {
 	auto& v = general_particles[l];
 

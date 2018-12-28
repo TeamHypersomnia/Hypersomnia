@@ -100,9 +100,5 @@ public:
 	);
 
 	void reserve_caches_for_entities(const size_t) const {}
-
 	void standard_post_solve(const const_logic_step);
-	void standard_post_cleanup(const const_logic_step);
-
-	void clear_dead_entities(const cosmos&);
 };

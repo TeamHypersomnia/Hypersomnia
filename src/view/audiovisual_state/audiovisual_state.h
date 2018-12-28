@@ -70,16 +70,10 @@ struct audiovisual_state {
 	}
 
 	void advance(const audiovisual_advance_input);
-
 	void standard_post_solve(const const_logic_step, audiovisual_post_solve_input);
-	void standard_post_cleanup(const const_logic_step);
-
 	void spread_past_infection(const const_logic_step);
-
 	void reserve_caches_for_entities(const std::size_t);
-
 	void clear();
-	void clear_dead_entities(const cosmos&);
 
 private:
 	randomization& get_rng() const {

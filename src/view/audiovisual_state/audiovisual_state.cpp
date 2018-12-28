@@ -160,12 +160,17 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 
 	for (const auto& c : new_interpolation_corrections) {
 		const auto from = cosm[c.set_previous_transform_from];
+		const auto subject = cosm[c.subject];
+
+		if (subject.dead()) {
+			continue;
+		}
 
 		if (from.alive()) {
 			//LOG_NVPS(interp.get_cache_of(c.subject).interpolated_transform.pos, interp.get_cache_of(from).interpolated_transform.pos);
 
 			interp.set_updated_interpolated_transform(
-				cosm[c.subject],
+				subject,
 				interp.get_cache_of(from).interpolated_transform
 			);
 
@@ -175,7 +180,7 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 		}
 		else {
 			interp.set_updated_interpolated_transform(
-				cosm[c.subject],
+				subject,
 				c.set_previous_transform_value
 			);
 
@@ -240,9 +245,11 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 					vn.text = "Death";
 					vn.color = number_col;
 
-					if (const auto transform = cosm[h.subject].find_logic_transform()) {
-						vn.pos = transform->pos;
-						flying_numbers.add(vn);
+					if (const auto subject = cosm[h.subject]) {
+						if (const auto transform = subject.find_logic_transform()) {
+							vn.pos = transform->pos;
+							flying_numbers.add(vn);
+						}
 					}
 				}
 
@@ -372,9 +379,11 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 					vn.text = "Unconscious";
 					vn.color = number_col;
 
-					if (const auto transform = cosm[h.subject].find_logic_transform()) {
-						vn.pos = transform->pos;
-						flying_numbers.add(vn);
+					if (const auto subject = cosm[h.subject]) {
+						if (const auto transform = subject.find_logic_transform()) {
+							vn.pos = transform->pos;
+							flying_numbers.add(vn);
+						}
 					}
 				}
 
@@ -453,18 +462,4 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 	}
 	
 	exploding_rings.acquire_new_rings(step.get_queue<exploding_ring_input>());
-}
-
-void audiovisual_state::standard_post_cleanup(const const_logic_step step) {
-	auto scope = measure_scope(performance.post_cleanup);
-
-	if (step.any_deletion_occured()) {
-		clear_dead_entities(step.get_cosmos());
-	}
-}
-
-void audiovisual_state::clear_dead_entities(const cosmos& cosm) {
-	get<sound_system>().clear_dead_entities(cosm);
-	get<particles_simulation_system>().clear_dead_entities(cosm);
-	get<wandering_pixels_system>().clear_dead_entities(cosm);
 }

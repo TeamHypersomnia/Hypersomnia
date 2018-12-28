@@ -66,32 +66,6 @@ void sound_system::clear_sources_playing(const assets::sound_id id) {
 	erase_if(continuous_sound_caches, map_erase);
 }
 
-void sound_system::clear_dead_entities(const cosmos& new_cosmos) {
-	erase_if(short_sounds, [&](generic_sound_cache& it) {
-		const auto target = it.positioning.target;
-
-		if (target.is_set()) {
-			if (new_cosmos[target].dead()) {
-				if (!it.previous_transform) {
-					return true;
-				}
-
-				it.positioning.offset = *it.previous_transform;
-				it.positioning.target = {};
-			}
-		}
-
-		return false;
-	});
-
-	auto map_erase = [&](const auto& it) {
-		return new_cosmos[it.first].dead();
-	};
-
-	erase_if(firearm_engine_caches, map_erase);
-	erase_if(continuous_sound_caches, map_erase);
-}
-
 void sound_system::update_listener(
 	const const_entity_handle listener,
 	const interpolation_system& sys

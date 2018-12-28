@@ -11,18 +11,6 @@ void wandering_pixels_system::clear() {
 	per_entity_cache.clear();
 }
 
-void wandering_pixels_system::clear_dead_entities(const cosmos& cosm) {
-	/* This is only for memory optimization */
-	auto dead_deleter = [&cosm](const auto& it) {
-		return cosm[it.first].dead();
-	};
-
-	erase_if(
-		per_entity_cache,
-		dead_deleter
-	);
-}
-
 wandering_pixels_system::cache& wandering_pixels_system::get_cache(const const_entity_handle id) {
 	return per_entity_cache[id.get_id()];
 }
