@@ -21,6 +21,7 @@ struct world_camera_settings {
 	float look_bound_expand = 0.5f;
 	bool enable_smoothing = true;
 	bool adjust_zoom_to_available_fog_of_war_size = true;
+	int adjust_zoom_if_fov_bigger_by_pixels = 10;
 	// END GEN INTROSPECTOR
 };
 

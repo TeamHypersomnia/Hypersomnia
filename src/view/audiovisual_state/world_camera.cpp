@@ -23,8 +23,11 @@ void world_camera::tick(
 
 	const auto target_zoom = [&]() {
 		if (settings.adjust_zoom_to_available_fog_of_war_size) {
-			if (screen_size.x < fog_of_war.size.x) {
-				return screen_size.x / fog_of_war.size.x;
+			const auto diff = fog_of_war.size.x - screen_size.x;
+
+			if (diff > settings.adjust_zoom_if_fov_bigger_by_pixels) {
+				const auto result = screen_size.x / fog_of_war.size.x;
+				return result;
 			}
 		}
 

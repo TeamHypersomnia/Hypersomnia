@@ -80,6 +80,7 @@ return {
     angled_look_length = 100,
     enable_smoothing = true,
 	adjust_zoom_to_available_fog_of_war_size = true,
+	adjust_zoom_if_fov_bigger_by_pixels = 10,
     look_bound_expand = 0.5,
     smoothing = {
       average_factor = 0.5,
