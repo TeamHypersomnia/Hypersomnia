@@ -11,6 +11,7 @@
 #include "game/cosmos/entity_handle_declaration.h"
 #include "game/cosmos/step_declaration.h"
 #include "game/enums/faction_type.h"
+#include "game/detail/view_input/predictability_info.h"
 
 struct sound_effect_modifier {
 	// GEN INTROSPECTOR struct sound_effect_modifier
@@ -52,12 +53,13 @@ namespace std {
 struct sound_effect_start_input {
 	absolute_or_local positioning;
 	entity_id direct_listener;
-	bool clear_when_target_dead = false;
 	faction_type listener_faction = faction_type::SPECTATOR;
 	std::size_t variation_number = static_cast<std::size_t>(-1);
 	collision_sound_source source_collision;
 	real32 collision_sound_cooldown_duration = 250.f;
 	int collision_sound_occurences_before_cooldown = 4;
+	predictability_info predictability;
+	bool clear_when_target_dead = false;
 
 	static sound_effect_start_input fire_and_forget(const transformr where) {
 		sound_effect_start_input in;
@@ -90,6 +92,16 @@ struct sound_effect_start_input {
 		source_collision.subject = sub;
 		source_collision.collider = col;
 
+		return *this;
+	}
+
+	auto& predictable_only_by(const entity_id id) {
+		predictability.set_only_by(id);
+		return *this;
+	}
+
+	auto& never_predictable() {
+		predictability.type = predictability_type::NEVER;
 		return *this;
 	}
 };

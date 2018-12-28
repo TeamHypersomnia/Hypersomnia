@@ -241,7 +241,6 @@ void bomb_mode::init_spawned(
 					[&](const auto&, auto& raw_entity) {
 						auto& item = raw_entity.template get<components::item>();
 						item.charges = i.charges;
-						//item.current_slot = target_slot;
 					},
 					[&](const auto&) {
 

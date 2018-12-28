@@ -185,17 +185,17 @@ inventory_item_address inventory_mixin<E>::get_address_from_root(const entity_id
 	auto& cosm = self.get_cosmos();
 
 	inventory_item_address output;
-	inventory_slot_id current_slot = get_current_slot();
+	inventory_slot_id slot_it = get_current_slot();
 
-	while (cosm[current_slot].alive()) {
-		output.root_container = current_slot.container_entity;
-		output.directions.push_back(current_slot.type);
+	while (cosm[slot_it].alive()) {
+		output.root_container = slot_it.container_entity;
+		output.directions.push_back(slot_it.type);
 
-		if (until == current_slot.container_entity) {
+		if (until == slot_it.container_entity) {
 			break;
 		}
 
-		current_slot = cosm[current_slot.container_entity].get_current_slot();
+		slot_it = cosm[slot_it.container_entity].get_current_slot();
 	}
 
 	std::reverse(output.directions.begin(), output.directions.end());

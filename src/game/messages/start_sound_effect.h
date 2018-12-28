@@ -7,6 +7,7 @@
 #include "game/components/transform_component.h"
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/assets/ids/asset_ids.h"
+#include "game/detail/view_input/predictability_info.h"
 
 namespace messages {
 	struct start_sound_effect {

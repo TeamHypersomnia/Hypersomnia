@@ -129,7 +129,7 @@ void cosmic::make_suitable_for_cloning(entity_solvable<E>& solvable) {
 	auto& new_components = solvable.components;
 
 	if constexpr(entity_solvable<E>::template has<components::item>()) {
-		std::get<components::item>(new_components).current_slot.unset();
+		std::get<components::item>(new_components).clear_slot_info();
 	}
 }
 

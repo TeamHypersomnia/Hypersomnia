@@ -13,8 +13,8 @@
 #include "game/cosmos/data_living_one_step.h"
 
 bool pending_item_mount::is_unmounting(const const_entity_handle& handle) const {
-	if (const auto current_slot = handle.get_current_slot()) {
-		if (const bool source_mounted = current_slot->is_mounted_slot()) {
+	if (const auto slot = handle.get_current_slot()) {
+		if (const bool source_mounted = slot->is_mounted_slot()) {
 			return true;
 		}
 	}
@@ -23,14 +23,14 @@ bool pending_item_mount::is_unmounting(const const_entity_handle& handle) const 
 }
 
 real32 pending_item_mount::get_mounting_duration_ms(const const_entity_handle& handle) const {
-	if (const auto current_slot = handle.get_current_slot()) {
+	if (const auto slot = handle.get_current_slot()) {
 		const auto& cosm = handle.get_cosmos();
 
 		const auto target_slot = cosm[target];
 
-		if (const bool source_mounted = current_slot->is_mounted_slot()) {
+		if (const bool source_mounted = slot->is_mounted_slot()) {
 			/* We're unmounting */
-			auto d = current_slot->mounting_duration_ms;
+			auto d = slot->mounting_duration_ms;
 
 			if (target_slot.dead()) {
 				/* We're dropping, so faster */
@@ -83,13 +83,13 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 			};
 
 			auto get_sound_effect_input = [&](const sound_type t) {
-				if (const auto current_slot = transferred_item.get_current_slot()) {
-					if (const bool source_mounted = current_slot->is_mounted_slot()) {
+				if (const auto slot = transferred_item.get_current_slot()) {
+					if (const bool source_mounted = slot->is_mounted_slot()) {
 						if (t == sound_type::START) {
-							return current_slot->start_unmounting_sound;
+							return slot->start_unmounting_sound;
 						}
 						else if (t == sound_type::FINISH) {
-							return current_slot->finish_unmounting_sound;
+							return slot->finish_unmounting_sound;
 						}
 					}
 					else {

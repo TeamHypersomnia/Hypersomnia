@@ -158,6 +158,7 @@ perform_transfer_result perform_transfer_impl(
 	if (source_slot && whole_item_grabbed) {
 		/* The slot will no longer have this item. */
 
+		item.previous_slot = item.current_slot;
 		item.current_slot.unset();
 		items_of_slots.unset_parenthood(transferred_item, source_slot);
 

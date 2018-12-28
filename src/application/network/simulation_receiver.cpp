@@ -29,11 +29,11 @@ void simulation_receiver::predict_intents_of_remote_entities(
 				const auto g = const_entity_handle(predicted_cosmos[g_id]);
 
 				if (g.get<components::gun>().is_trigger_pressed) {
-					const auto current_slot = g.get_current_slot();
+					const auto slot = g.get_current_slot();
 
-					const auto hand_index = current_slot.get_hand_index();
+					const auto hand_index = slot.get_hand_index();
 
-					if (current_slot.alive() && hand_index != 0xdeadbeef) {
+					if (slot.alive() && hand_index != 0xdeadbeef) {
 						game_intent release_intent;
 
 						if (hand_index == 0) {

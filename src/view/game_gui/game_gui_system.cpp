@@ -470,7 +470,6 @@ void game_gui_system::advance(
 							}
 
 							if (found_in(needed_ammo_flavours, item_flavour_id(typed_item.get_flavour_id()))) {
-								LOG("found so drop");
 								queue_transfer(subject, item_slot_transfer_request::drop(typed_item));
 							}
 

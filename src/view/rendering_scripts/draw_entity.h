@@ -338,9 +338,9 @@ FORCE_INLINE void specific_entity_drawer(
 				;
 
 				auto should_draw_under_torso = [&](const auto attachment_entity) {
-					const auto current_slot = attachment_entity.get_current_slot();
+					const auto slot = attachment_entity.get_current_slot();
 
-					if (current_slot.get_type() == slot_function::BELT) {
+					if (slot.get_type() == slot_function::BELT) {
 						return true;
 					}
 
@@ -351,7 +351,7 @@ FORCE_INLINE void specific_entity_drawer(
 						}
 					}
 
-					if (current_slot.is_hand_slot()) {
+					if (slot.is_hand_slot()) {
 						const auto required_by_stance = 
 							stance_id == item_holding_stance::HEAVY_LIKE ||
 							stance_id == item_holding_stance::PISTOL_LIKE ||

@@ -16,8 +16,14 @@ namespace components {
 		// GEN INTROSPECTOR struct components::item
 		int charges = 1;
 		signi_inventory_slot_id current_slot;
+		signi_inventory_slot_id previous_slot;
 		augs::stepped_timestamp when_last_transferred;
 		// END GEN INTROSPECTOR
+
+		void clear_slot_info() {
+			current_slot.unset();
+			previous_slot.unset();
+		}
 	};
 }
 
