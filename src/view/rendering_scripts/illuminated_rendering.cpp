@@ -75,6 +75,8 @@ void illuminated_rendering(
 	const auto settings = in.drawing;
 	const auto matrix = cone.get_projection_matrix();
 
+	const bool is_zoomed_out = cone.eye.zoom < 1.f;
+
 	auto non_zoomed_cone = cone;
 	non_zoomed_cone.eye.zoom = 1.f;
 	non_zoomed_cone.eye.transform.pos = screen_size / 2;
@@ -595,12 +597,26 @@ void illuminated_rendering(
 				in.global_time_seconds = global_time_seconds;
 				in.renderable_transform = it.get_world_crosshair_transform(interp);
 
+				if (is_zoomed_out) {
+					in.renderable_transform.pos = cone.to_screen_space(in.renderable_transform.pos);
+				}
+
 				augs::draw(s->appearance, game_images, in);
 			}
 		};
 
 		if (viewed_character) {
+			if (is_zoomed_out) {
+				renderer.call_and_clear_triangles();
+				shaders.standard->set_projection(non_zoomed_matrix);
+			}
+
 			draw_crosshair(viewed_character);
+
+			if (is_zoomed_out) {
+				renderer.call_and_clear_triangles();
+				shaders.standard->set_projection(matrix);
+			}
 		}
 	}
 	

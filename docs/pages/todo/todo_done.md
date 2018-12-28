@@ -2717,3 +2717,6 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- true by default
 	- some clarification in settings gui
 
+- Perhaps fix crosshair bounds to be zoom-invariant?
+	- And the crosshair
+

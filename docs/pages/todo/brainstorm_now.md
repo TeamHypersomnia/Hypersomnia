@@ -6,9 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Perhaps fix crosshair bounds to be zoom-invariant?
-	- And the crosshair
-
 - problem: footstep smokes might still be visible when we artificially increase zoom
 	- well the client itself knows everything anyways
 	- so we can force the zoom to be exact
