@@ -83,7 +83,7 @@ void illuminated_rendering(
 
 	const auto& visible = in.all_visible;
 	const auto& shaders = in.shaders;
-	const auto& fbos = in.fbos;
+	auto& fbos = in.fbos;
 	const auto& necessarys = in.necessary_images;
 	const auto& game_images = in.game_images;
 	const auto blank = necessarys.at(assets::necessary_image_id::BLANK);
@@ -93,8 +93,15 @@ void illuminated_rendering(
 	const auto line_output = augs::line_drawer_with_default{ renderer.get_line_buffer(), blank };
 	const auto viewed_character_transform = viewed_character ? viewed_character.find_viewing_transform(interp) : std::optional<transformr>();
 
+	const auto filtering = renderer.get_current_settings().default_filtering;
+
+	auto bind_and_set_filter = [&](auto& tex) {
+		tex.bind();
+		tex.set_filtering(filtering);
+	};
+
 	if (in.general_atlas) {
-		in.general_atlas->bind();
+		bind_and_set_filter(*in.general_atlas);
 	}
 
 	auto set_shader_with_matrix = [&](auto& shader) {
@@ -330,7 +337,7 @@ void illuminated_rendering(
 			})();
 
 			renderer.set_active_texture(3);
-			fbos.illuminating_smoke->get_texture().bind();
+			bind_and_set_filter(fbos.illuminating_smoke->get_texture());
 			renderer.set_active_texture(0);
 
 			shaders.illuminating_smoke->set_as_current();
@@ -565,7 +572,8 @@ void illuminated_rendering(
 	renderer.call_and_clear_triangles();
 
 	renderer.set_active_texture(1);
-	fbos.smoke->get_texture().bind();
+
+	bind_and_set_filter(fbos.smoke->get_texture());
 	renderer.set_active_texture(0);
 
 	shaders.smoke->set_as_current();

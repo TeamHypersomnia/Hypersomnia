@@ -9,6 +9,7 @@
 #include "augs/graphics/imgui_payload.h"
 
 #include "augs/texture_atlas/atlas_entry.h"
+#include "augs/templates/corresponding_field.h"
 
 #if PLATFORM_UNIX
 #define USE_BUFFER_SUB_DATA 0
@@ -30,7 +31,7 @@ void buffer_data(
 #endif
 
 namespace augs {
-	renderer::renderer() {
+	renderer::renderer(const renderer_settings& settings) : current_settings(settings) {
 #if BUILD_OPENGL
 		LOG("Calling gladLoadGL: %x.", intptr_t(gladLoadGL));
 		if (!gladLoadGL()) {
@@ -102,6 +103,8 @@ namespace augs {
 #else
 		max_texture_size = 0u;
 #endif
+
+		apply(settings, true);
 	}
 
 	void renderer::enable_special_vertex_attribute() {
@@ -405,5 +408,16 @@ namespace augs {
 		stencil_reverse_test();
 		GL_CHECK(glStencilMask(0x00));
 		GL_CHECK(glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE));
+	}
+
+	void renderer::apply(const renderer_settings& settings, const bool force) {
+		(void)settings;
+		(void)force;
+
+		current_settings = settings;
+	}
+
+	const renderer_settings& renderer::get_current_settings() const {
+		return current_settings;
 	}
 }

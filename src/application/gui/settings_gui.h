@@ -40,6 +40,7 @@ public:
 namespace augs {
 	class window;
 	class audio_context;
+	class renderer;
 }
 
 struct all_necessary_fbos;
@@ -52,9 +53,9 @@ struct configuration_subscribers {
 	augs::window& window;
 	all_necessary_fbos& fbos;
 	augs::audio_context& audio_context;
+	augs::renderer& renderer;
 
 #if TODO
-	augs::renderer& renderer;
 	all_necessary_shaders& shaders;
 	const all_necessary_sounds& sounds;
 	const necessary_image_definitions_map& images;

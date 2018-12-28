@@ -14,6 +14,7 @@
 
 // all settings structures stored by the config
 #include "augs/window_framework/window_settings.h"
+#include "augs/graphics/renderer_settings.h"
 #include "augs/audio/audio_settings.h"
 #include "game/debug_drawing_settings.h"
 
@@ -87,6 +88,7 @@ struct config_lua_table {
 
 	unit_tests_settings unit_tests;
 	augs::window_settings window;
+	augs::renderer_settings renderer;
 	augs::audio_settings audio;
 	augs::audio_volume_settings audio_volume;
 	debug_drawing_settings debug_drawing;

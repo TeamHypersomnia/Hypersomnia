@@ -155,8 +155,6 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 						|| specified_charges == 1
 					;
 
-					LOG_NVPS(previous_charges, specified_charges);
-
 					if (due_to_be_erased) {
 						should_be_erased = true;
 						/* 

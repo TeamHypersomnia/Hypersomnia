@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/image/image.h"
+#include "augs/graphics/renderer_settings.h"
 
 using GLuint = unsigned int;
 
@@ -12,10 +13,13 @@ namespace augs {
 			GLuint id = 0xdeadbeef;
 			bool built = false;
 			vec2u size;
+			filtering_type current_filtering = filtering_type::NEAREST_NEIGHBOR;
 			
 			void create();
 			void destroy();
-		
+
+			void set_filtering_impl(filtering_type);
+
 		public:
 			texture(const image& rgba_source);
 			texture(const vec2u size, const rgba* const source = nullptr);
@@ -37,6 +41,8 @@ namespace augs {
 			auto get_texture_id() const {
 				return id;
 			}
+
+			void set_filtering(filtering_type);
 		};
 	}
 }

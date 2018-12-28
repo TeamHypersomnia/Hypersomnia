@@ -44,13 +44,50 @@ namespace augs {
 			));
 		}
 
+		void texture::set_filtering(const filtering_type f) {
+			if (f != current_filtering) {
+				set_filtering_impl(f);
+
+				current_filtering = f;
+			}
+		}
+
+		void texture::set_filtering_impl(const filtering_type f) {
+#if BUILD_OPENGL
+			using T = filtering_type;
+
+			auto chosen_mode = GL_LINEAR;
+
+			switch (f) {
+				case T::NEAREST_NEIGHBOR: {
+					chosen_mode = GL_NEAREST;
+					break;
+				}
+
+				case T::LINEAR: {
+					chosen_mode = GL_LINEAR;
+					break;
+				}
+
+				default: {
+					chosen_mode = GL_LINEAR;
+					break;
+				}
+			}
+
+			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, chosen_mode));
+			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, chosen_mode));
+#else
+			(void)f;
+#endif
+		}
+
 		void texture::create() {
 			GL_CHECK(glGenTextures(1, &id));
 
 			bind();
 
-			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR));
-			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR));
+			set_filtering_impl(current_filtering);
 			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));
 			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE));
 
@@ -64,7 +101,8 @@ namespace augs {
 		texture::texture(texture&& b) :
 			id(b.id),
 			built(b.built),
-			size(b.size)
+			size(b.size),
+			current_filtering(b.current_filtering)
 		{
 			b.built = false;
 		}
@@ -75,6 +113,7 @@ namespace augs {
 			id = b.id;
 			built = b.built;
 			size = b.size;
+			current_filtering = b.current_filtering;
 
 			b.built = false;
 

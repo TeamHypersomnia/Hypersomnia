@@ -3,6 +3,7 @@
 
 #include "augs/templates/exception_templates.h"
 
+#include "augs/graphics/renderer_settings.h"
 #include "augs/graphics/rgba.h"
 #include "augs/graphics/vertex.h"
 #include "augs/graphics/texture.h"
@@ -30,6 +31,7 @@ namespace augs {
 		GLuint vao_buffer = 0xdeadbeef;
 
 		bool interpolate_debug_logic_step_lines = true;
+		renderer_settings current_settings;
 	public:
 		
 		vertex_triangle_buffer triangles;
@@ -38,7 +40,7 @@ namespace augs {
 
 		std::size_t num_total_triangles_drawn = 0;
 
-		renderer();
+		renderer(const renderer_settings&);
 
 		renderer(renderer&&) = delete;
 		renderer& operator=(renderer&&) = delete;
@@ -130,6 +132,9 @@ namespace augs {
 
 		void stencil_positive_test();
 		void stencil_reverse_test();
+
+		void apply(const renderer_settings&, bool force = false);
+		const renderer_settings& get_current_settings() const;
 	};
 }
 

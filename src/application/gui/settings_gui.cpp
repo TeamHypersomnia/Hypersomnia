@@ -2,6 +2,7 @@
 #include <thread>
 
 #include "augs/templates/introspect.h"
+#include "augs/graphics/renderer.h"
 #include "augs/templates/enum_introspect.h"
 #include "augs/string/format_enum.h"
 #include "augs/misc/enum/enum_array.h"
@@ -31,6 +32,7 @@ void configuration_subscribers::apply(const config_lua_table& new_config) const 
 	fbos.apply(screen_size, new_config.drawing);
 	window.apply(new_config.window);
 	audio_context.apply(new_config.audio);
+	renderer.apply(new_config.renderer);
 }
 
 #define CONFIG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), config.x
@@ -193,6 +195,18 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::GRAPHICS: {
+				enum_combo("Default filtering", config.renderer.default_filtering);
+
+				{
+					auto scope = scoped_indent();
+
+					text_disabled(
+						"The nearest neighbor filtering will give you a nostalgic, pixel-art feeling.\n"
+						"The linear filtering is a little easier on the eyes.\n"
+						"Linear filtering is enabled automatically when the camera zooms out."
+					);
+				}
+
 				revertable_checkbox("Interpolate frames", config.interpolation.enabled);
 				
 				if (config.interpolation.enabled) {

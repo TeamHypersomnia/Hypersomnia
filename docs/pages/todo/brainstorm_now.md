@@ -6,12 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- even test scene mode could specify its fog of war size for scaling?
-- fix HUD when scaled
-
-- bool adjust_zoom_to_available_fog_of_war_size
-	- true by default
-	- some clarification in settings gui
+- Perhaps fix crosshair bounds to be zoom-invariant?
+	- And the crosshair
 
 - problem: footstep smokes might still be visible when we artificially increase zoom
 	- well the client itself knows everything anyways

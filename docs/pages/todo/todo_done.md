@@ -2710,3 +2710,10 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- yeah, it even did handle 144hz!
 	- We can send packets once every second tick, so at 64hz
 
+- even test scene mode could specify its fog of war size for scaling?
+- fix HUD when scaled
+
+- bool adjust_zoom_to_available_fog_of_war_size
+	- true by default
+	- some clarification in settings gui
+

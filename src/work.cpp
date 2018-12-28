@@ -271,7 +271,7 @@ int work(const int argc, const char* const * const argv) try {
 	static augs::window window(config.window);
 
 	LOG("Initializing the renderer.");
-	static augs::renderer renderer;
+	static augs::renderer renderer(config.renderer);
 	LOG_NVPS(renderer.get_max_texture_size());
 
 	LOG("Initializing the necessary fbos.");
@@ -305,7 +305,8 @@ int work(const int argc, const char* const * const argv) try {
 	static const auto configurables = configuration_subscribers {
 		window,
 		necessary_fbos,
-		audio
+		audio,
+		renderer
 	};
 
 	static atlas_profiler atlas_performance;
@@ -1233,6 +1234,11 @@ int work(const int argc, const char* const * const argv) try {
 
 				setup.customize_for_viewing(config_copy);
 				setup.apply(config_copy);
+
+				if (get_camera_eye().zoom < 1.f) {
+					/* Force linear filtering when zooming out */
+					config_copy.renderer.default_filtering = augs::filtering_type::LINEAR;
+				}
 
 				return config_copy;
 			});

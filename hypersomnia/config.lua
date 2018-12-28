@@ -57,6 +57,9 @@ return {
     X = "SPECIAL_ACTION_BUTTON_2",
     Z = "SPECIAL_ACTION_BUTTON_1"
   },
+  renderer = {
+    default_filtering = "NEAREST_NEIGHBOR" -- alternatively: "LINEAR"
+  },
   audio = {
     enable_hrtf = false,
     max_number_of_sound_sources = 4096,

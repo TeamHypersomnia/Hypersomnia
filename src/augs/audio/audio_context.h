@@ -74,6 +74,6 @@ namespace augs {
 			return device;
 		}
 
-		void apply(const audio_settings&, const bool force = false);
+		void apply(const audio_settings&, bool force = false);
 	};
 }
