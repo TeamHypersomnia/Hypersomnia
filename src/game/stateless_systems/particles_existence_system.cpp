@@ -13,7 +13,6 @@
 #include "game/messages/start_particle_effect.h"
 #include "game/messages/queue_deletion.h"
 #include "game/messages/damage_message.h"
-#include "game/messages/melee_swing_response.h"
 #include "game/messages/health_event.h"
 #include "game/messages/exhausted_cast_message.h"
 #include "game/messages/exploding_ring_input.h"

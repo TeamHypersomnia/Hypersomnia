@@ -20,7 +20,6 @@
 #include "game/messages/gunshot_message.h"
 #include "game/messages/queue_deletion.h"
 #include "game/messages/damage_message.h"
-#include "game/messages/melee_swing_response.h"
 #include "game/messages/health_event.h"
 #include "game/messages/exhausted_cast_message.h"
 #include "game/detail/physics/calc_physical_material.hpp"

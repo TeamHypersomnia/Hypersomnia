@@ -15,7 +15,6 @@ namespace messages {
 	struct will_soon_be_deleted;
 	struct collision_message;
 	struct gunshot_message;
-	struct melee_swing_response;
 	struct health_event;
 	struct visibility_information_request;
 	struct performed_transfer_message;
@@ -35,25 +34,31 @@ struct thunder_input;
 using all_message_queues = augs::storage_for_message_queues<
 	messages::intent_message,
 	messages::motion_message,
-	messages::interpolation_correction_request,
 	messages::damage_message,
 	messages::queue_deletion,
 	messages::will_soon_be_deleted,
 	messages::collision_message,
-	messages::gunshot_message,
-	messages::melee_swing_response,
 	messages::health_event,
 	messages::visibility_information_request,
-	messages::performed_transfer_message,
+	item_slot_transfer_request,
+
+	/* Intermediates whose purpose is to ultimately generate an effect. */
+	messages::battle_event_message,
 	messages::exhausted_cast,
+	messages::gunshot_message,
+
+	/* Improves integrity of audiovisual state */
+	messages::performed_transfer_message,
+	messages::changed_identities_message,
+	messages::interpolation_correction_request,
+
+	/* Purely effect messages. The only recipient is the audiovisual state. */
 	messages::start_particle_effect,
 	messages::stop_particle_effect,
 	messages::start_sound_effect,
 	messages::start_multi_sound_effect,
 	messages::stop_sound_effect,
+
 	exploding_ring_input,
-	thunder_input,
-	item_slot_transfer_request,
-	messages::changed_identities_message,
-	messages::battle_event_message
+	thunder_input
 >;

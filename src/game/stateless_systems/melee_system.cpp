@@ -3,7 +3,6 @@
 #include "game/cosmos/entity_id.h"
 
 #include "game/messages/intent_message.h"
-#include "game/messages/melee_swing_response.h"
 
 #include "game/components/melee_component.h"
 #include "game/components/melee_fighter_component.h"
