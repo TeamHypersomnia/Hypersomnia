@@ -167,7 +167,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 				const auto& light = light_entity.template get<components::light>();
 
 				const auto reach = light.calc_reach_trimmed();
-				const auto light_aabb = xywh::center_and_size(light_transform.pos, vec2::square(reach * 2));
+				const auto light_aabb = xywh::center_and_size(light_transform.pos, reach);
 
 				if (const auto cache = mapped_or_nullptr(per_entity_cache, unversioned_entity_id(light_entity))) {
 					const auto light_displacement = vec2(cache->all_variation_values[6], cache->all_variation_values[7]);
@@ -179,7 +179,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 					if (queried_camera_aabb.hover(light_aabb)) {
 						request.filter = predefined_queries::line_of_sight();
-						request.queried_rect = vec2::square(reach * 2);
+						request.queried_rect = reach;
 					}
 					else {
 						request.queried_rect = {};
@@ -287,7 +287,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 		const auto wall_light_aabb = [&]() {
 			const auto wall_reach = light.calc_wall_reach_trimmed();
-			return xywh::center_and_size(world_light_pos, vec2::square(wall_reach * 2));
+			return xywh::center_and_size(world_light_pos, wall_reach);
 		}();
 
 		if (queried_camera_aabb.hover(wall_light_aabb)) {

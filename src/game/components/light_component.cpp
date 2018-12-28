@@ -43,7 +43,7 @@ namespace components {
 		p[1].magnitude = 20;
 	}
 
-	real32 light::calc_reach_trimmed() const {
+	vec2 light::calc_reach_trimmed() const {
 		auto props = attenuation;
 
 		if (variation.is_enabled) {
@@ -53,7 +53,7 @@ namespace components {
 		return props.calc_reach_trimmed();
 	}
 
-	real32 light::calc_wall_reach_trimmed() const {
+	vec2 light::calc_wall_reach_trimmed() const {
 		auto props = wall_attenuation;
 
 		if (wall_variation.is_enabled) {
@@ -63,7 +63,7 @@ namespace components {
 		return props.calc_reach_trimmed();
 	}
 
-	real32 light::calc_effective_reach() const {
+	vec2 light::calc_effective_reach() const {
 		return std::max(calc_wall_reach_trimmed(), calc_reach_trimmed());
 	}
 }
@@ -101,12 +101,14 @@ real32 attenuation_properties::calc_reach() const {
 	));
 }
 
-real32 attenuation_properties::calc_reach_trimmed() const {
+vec2 attenuation_properties::calc_reach_trimmed() const {
+	auto result = vec2::square(calc_reach() * 2);
+
 	if (trim_reach.is_enabled) {
-		return std::min(trim_reach.value, calc_reach());
+		result.lessen(trim_reach.value);
 	}
 
-	return calc_reach();
+	return result;
 }
 
 void attenuation_properties::add_max(const attenuation_variations& v) {

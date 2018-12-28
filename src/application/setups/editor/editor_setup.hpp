@@ -63,13 +63,10 @@ void editor_setup::for_each_dashed_line(F&& callback) const {
 					const auto light_color = light.color;
 
 					auto draw_reach_indicator = [&](const auto reach, const auto col) {
-						const auto h_size = vec2::square(reach);
-						const auto size = vec2::square(reach * 2);
-
-						callback(center, center + h_size, col);
+						callback(center, center + reach / 2, col);
 
 						augs::general_border_from_to(
-							ltrb(xywh::center_and_size(center, size)),
+							ltrb(xywh::center_and_size(center, reach)),
 							0,
 							[&](const vec2 from, const vec2 to) {
 								callback(from, to, col);

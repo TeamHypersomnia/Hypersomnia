@@ -34,11 +34,11 @@ struct attenuation_properties {
 	rgba_channel trim_alpha = 3;
 	pad_bytes<3> pad;
 
-	augs::maybe<real32> trim_reach = augs::maybe<real32>(300.f, false);
+	augs::maybe<vec2> trim_reach = augs::maybe<vec2>(vec2::square(300.f), false);
 	// END GEN INTROSPECTOR
 
 	real32 calc_reach() const;
-	real32 calc_reach_trimmed() const;
+	vec2 calc_reach_trimmed() const;
 
 	void add_max(const attenuation_variations&);
 };
@@ -66,9 +66,9 @@ namespace components {
 
 		light();
 
-		real32 calc_effective_reach() const;
+		vec2 calc_effective_reach() const;
 
-		real32 calc_reach_trimmed() const;
-		real32 calc_wall_reach_trimmed() const;
+		vec2 calc_reach_trimmed() const;
+		vec2 calc_wall_reach_trimmed() const;
 	};
 }

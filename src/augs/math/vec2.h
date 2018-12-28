@@ -389,6 +389,18 @@ struct basic_vec2 {
 		return *this;
 	}
 
+	basic_vec2& lessen(const basic_vec2& b) {
+		x = std::min(x, b.x);
+		y = std::min(y, b.y);
+		return *this;
+	}
+
+	basic_vec2& biggen(const basic_vec2& b) {
+		x = std::max(x, b.x);
+		y = std::max(y, b.y);
+		return *this;
+	}
+
 	basic_vec2& neg_x() {
 		x = -x;
 		return *this;

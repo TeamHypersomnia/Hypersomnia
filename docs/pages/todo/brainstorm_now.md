@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- perhaps use statically linked musl?
-
 - even test scene mode could specify its fog of war size for scaling?
 - fix HUD when scaled
 

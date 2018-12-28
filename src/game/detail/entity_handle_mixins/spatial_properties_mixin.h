@@ -128,7 +128,7 @@ public:
 		if (const auto* const light = handle.template find<components::light>()) {
 			return xywh::center_and_size(
 				transform.pos, 
-				vec2::square(light->calc_effective_reach() * 2)
+				light->calc_effective_reach()
 			);
 		}
 

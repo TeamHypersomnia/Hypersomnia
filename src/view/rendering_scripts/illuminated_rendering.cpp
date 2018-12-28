@@ -724,6 +724,8 @@ void illuminated_rendering(
 	renderer.call_and_clear_triangles();
 	renderer.call_and_clear_lines();
 
+	shaders.standard->set_projection(matrix);
+
 	if (in.general_atlas) {
 		in.general_atlas->bind();
 	}
