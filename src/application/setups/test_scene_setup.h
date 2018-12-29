@@ -101,7 +101,8 @@ public:
 			mode.advance(
 				{ ruleset, scene.world },
 				total,
-				callbacks
+				callbacks,
+				solve_settings()
 			);
 		}
 	}

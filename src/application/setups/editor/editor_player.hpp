@@ -37,7 +37,7 @@ auto editor_player::make_snapshotted_advance_input(const player_advance_input_t<
 			break;
 		}
 
-		get_arena_handle(folder).advance(applied_entropy, in.callbacks);
+		get_arena_handle(folder).advance(applied_entropy, in.callbacks, solve_settings());
 	};
 
 	auto record_entropy = [&](auto& existing_entropy) {

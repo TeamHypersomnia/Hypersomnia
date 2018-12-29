@@ -175,14 +175,11 @@ public:
 		target_initial_signi = advanced_cosm.get_solvable().significant;
 	}
 
-	template <class Entropy, class Callbacks>
-	void advance(
-		const Entropy& entropy,
-		const Callbacks& callbacks
-	) const {
+	template <class... Args>
+	decltype(auto) advance(Args&&... args) const {
 		on_mode_with_input(
-			[&](auto& typed_mode, const auto& in) {
-				typed_mode.advance(in, entropy, callbacks);
+			[&](auto& typed_mode, const auto& in) -> decltype(auto) {
+				return typed_mode.advance(in, std::forward<Args>(args)...);
 			}
 		);
 	}

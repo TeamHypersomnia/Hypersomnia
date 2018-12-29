@@ -6,6 +6,18 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- We were considering whether to mark the bomb as never predictable,
+	- however, the worst that could happen, is that we mispredict that we are dead due to somebody shooting us
+		- whereas we are actually alive and we have defused the bomb
+		- either way the death impact would be predicted which would be misleading
+
+- Actually, perhaps we should never predict our own death, even the impact.
+	- That is because once we're dead we don't care anymore
+	- and we should always assume we are alive so that we can still apply some valid inputs which could otherwise be impossible
+	- some step settings for that
+
+- Fix prediction of arena gui
+
 - Fix prediction of collisions
 	- Never predict collisions of remote players
 		- This might be important for not exposing tactical information

@@ -82,14 +82,15 @@ public:
 	mode_player_id lookup(const mode_entity_id&) const;
 
 	template <class C>
-	void advance(
+	decltype(auto) advance(
 		const input in, 
 		const mode_entropy& entropy, 
-		C callbacks
+		C callbacks,
+		const solve_settings settings
 	) {
-		const auto step_input = logic_step_input { in.cosm, entropy.cosmic };
+		const auto step_input = logic_step_input { in.cosm, entropy.cosmic, settings };
 
-		standard_solver()(
+		return standard_solver()(
 			step_input, 
 			solver_callbacks(
 				[&](const logic_step step) {

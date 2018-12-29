@@ -134,7 +134,8 @@ public:
 			mode.advance(
 				{ ruleset, intro.world },
 				entropy,
-				callbacks
+				callbacks,
+				solve_settings()
 			);
 
 			total_collected_entropy.clear();

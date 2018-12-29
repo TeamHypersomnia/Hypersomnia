@@ -205,7 +205,12 @@ public:
 
 			{
 				const auto unpacked = unpack(step_collected);
-				get_arena_handle().advance(unpacked, callbacks);
+
+				get_arena_handle().advance(
+					unpacked, 
+					callbacks, 
+					solve_settings()
+				);
 			}
 
 			++current_simulation_step;

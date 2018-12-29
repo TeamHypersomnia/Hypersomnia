@@ -300,7 +300,7 @@ public:
 					auto scope = measure_scope(performance.unpacking_remote_steps);
 
 					auto advance_referential = [&](const auto& entropy) {
-						referential_arena.advance(entropy, referential_callbacks);
+						referential_arena.advance(entropy, referential_callbacks, solve_settings());
 					};
 
 					auto advance_repredicted = [&](const auto& entropy) {
@@ -309,7 +309,7 @@ public:
 							We only post-solve once for the predicted cosmos, when we actually move forward in time.
 						*/
 
-						predicted_arena.advance(entropy, solver_callbacks());
+						predicted_arena.advance(entropy, solver_callbacks(), solve_settings());
 					};
 
 					const auto result = receiver.unpack_deterministic_steps(
@@ -357,7 +357,7 @@ public:
 				}
 
 #if USE_CLIENT_PREDICTION
-				predicted_arena.advance(*new_local_entropy, predicted_callbacks);
+				predicted_arena.advance(*new_local_entropy, predicted_callbacks, solve_settings());
 #else
 				(void)predicted_callbacks;
 				(void)callbacks;

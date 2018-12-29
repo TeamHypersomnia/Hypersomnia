@@ -634,10 +634,6 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 			continue;
 		}
 
-		if (cosm[transfer.target_root].dead()) {
-			continue;
-		}
-
 		const auto target_slot = cosm[transfer.target_slot];
 
 		const bool same_capability = transfer.result.relation == capability_relation::THE_SAME;
@@ -661,6 +657,10 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 		const bool always_reassign_button = 
 			transfer.result.is_pickup()
 		;
+
+		if (cosm[transfer.target_root].dead()) {
+			continue;
+		}
 
 		auto& gui = get_character_gui(transfer.target_root);
 

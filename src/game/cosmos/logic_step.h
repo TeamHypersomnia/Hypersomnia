@@ -4,6 +4,7 @@
 #include "game/messages/will_soon_be_deleted.h"
 #include "game/stateless_systems/destroy_system.h"
 #include "augs/misc/randomization_declaration.h"
+#include "game/cosmos/solvers/solve_structs.h"
 
 struct data_living_one_step;
 struct cosmos_common_significant;
@@ -14,9 +15,10 @@ struct basic_logic_step_input {
 
 	cosmos_ref cosm;
 	const cosmic_entropy& entropy;
+	const solve_settings& settings;
 
 	operator const_logic_step_input() const {
-		return { cosm, entropy };
+		return { cosm, entropy, settings };
 	}
 };
 
@@ -41,15 +43,18 @@ class basic_logic_step {
 public:
 	data_living_one_step_ref transient;
 	randomization& step_rng;
+	maybe_const_ref_t<is_const, solve_result> result;
 
 	basic_logic_step(
 		const basic_logic_step_input<is_const> input,
 		data_living_one_step_ref transient,
-		randomization& step_rng
+		randomization& step_rng,
+		maybe_const_ref_t<is_const, solve_result> result
 	) :
 		input(input),
 		transient(transient),
-		step_rng(step_rng)
+		step_rng(step_rng),
+		result(result)
 	{}
 
 	auto& get_cosmos() const {
@@ -58,6 +63,10 @@ public:
 
 	const auto& get_entropy() const {
 		return input.entropy;
+	}
+
+	const auto& get_settings() const {
+		return input.settings;
 	}
 
 	const auto& get_logical_assets() const {
@@ -69,7 +78,7 @@ public:
 	}
 
 	operator const_logic_step() const {
-		return { input, transient, step_rng };
+		return { input, transient, step_rng, result };
 	}
 	
 	bool any_deletion_occured() const {
