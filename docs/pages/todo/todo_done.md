@@ -2720,3 +2720,86 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - Perhaps fix crosshair bounds to be zoom-invariant?
 	- And the crosshair
 
+- Should parti/sound existence systems translate gunshot messages or shall we leave it to the post solve?
+	- What if something is destructed?
+	- Actually during gunshot nothing except cartridge is, and it is not taken into consideration
+
+- Honestly we should simply always be defensive about existence of entities in audiovisual post solve
+	- and only sometimes clear caches so that they don't get too big
+		- advances should just iterate caches with erase_if
+	- note that unsafe handle access is only there wherever cosmos reference is, so follow the cosmos
+
+- BETTER CLIENTSIDE PREDICTION
+	- Battle events shall always be played referentially
+		- Not sure if always but that will be decided contextually anyway
+	- We might want to predict sounds depending on the effect type
+		- E.g. tie FoTA effects to the referential
+		- But UWoTA to the predicted as there is a delay
+	- We might want to give a context info for the start struct
+		- This would hold the perpetrator id
+	- Collision sounds
+		- For now - predict all except collisions with remote players and their items
+			- If a collider has a capability of a remote player - play in the past
+			- otherwie always predict
+				- Even throws should be fine
+					- although some sounds might be unplayed if e.g. something is thrown closely to the wall
+					- we could introduce a recent owner struct in item
+						- if the recent owner is a remote player, play in the past
+	- clashes
+		- never predictable
+	- deaths
+		- never predictable
+	- arena mode gui
+		- doesnt play any effects AFAIK
+			- Only the tick sound
+			- and plays the welcome message
+			- these are negliglible
+	- When to clear the dead entities from the audiovisual state?
+		- technically can the audiovisual state ever assume that the entities are alive?
+		- Standard post cleanup basically ONLY clears the dead entities
+		- the need to cleanup will be properly detected
+		- Okay the post-solve should perform cleanup depending on the cosmos of the step it was passed, not just once
+		 	- the need for cleanup will be properly detected then for the client switching between referential/predicted
+	- making the interface easier by just modifying message queues and calling solve 
+	- the test setups and so will implicitly realize the prediction_input::offline by never modify any messages
+	- we also have to advance the sounds
+		- problem: for which cosmos do we advance, referential or predicted?
+		- we'd need to keep track which effect is which
+	- we always advance against predicted, so if something starts existing in referential suddenly...
+		- ...it will automatically exist in predicted right away
+		- problem: if we repredict after an abrupt change, the shot bullets could get some different ids
+			- so the predicted orbital caches of bullets that we shot will be deleted and will never come back
+				- well wasnt this a problem even without any additional logic?
+				- this is an edge case though, won't be much visible
+	- actually av-postsolve shouldnt do any deleting and unsafe 
+		- so maybe there's no point clearing it every post-solve, just once before it happens
+
+	- av-advance always handles important interruptions, e.g. of sounds
+	- Okay, for now just always advance against the viewed cosmos
+	- and post solve against two
+	- how do we ensure no dead entities pop up somewhere?
+		- the safest bet would be to always sanitize at post-solve
+		- post solve always (at least it should):
+			- checks whether the cosmos has changed
+				- if it did, full sanitize
+			- at post solve the entities queued for deletion were not deleted yet
+				- okay what about those deleted without msg?
+		- post cleanup as well if any deletion occured
+			- if any entities got deleted
+				- if any did, full sanitize
+		- advance should be suited for sudden deletions
+		- afaik sound system's update properties check all handles
+    - lets just always clear dead entities to be on the safe side
+	- **Idea:** two audiovisual states?
+		- Ultimately, we always draw the predicted cosmos	
+			- problem: if we advance some particles against the referential cosmos, we'll get bad homings and it might look bad
+				- so it is not a silver bullet
+		- problem: we'll need to draw from two audiovisual systems
+	- **Idea:** can't we just always advance against the predicted cosmos?
+		- Problem: some advancements might not necessarily be predictable, e.g. later we might want to handle gun engines referentially
+		- if we had two avstates we could advance one against predicted and one against the referential
+	- We should calculate interpolation and the visual systems only against the predicted cosmos?
+	- **LOW PRIO:** okay, the audiovisual system might still need to advance some things against the referential, and some things against the predicted
+		- its a completely different problem from post solve though
+		- for now it is not so critical to confirm these, it's just variation in gun engines is all
+			- and these are quite predictable anyways

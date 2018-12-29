@@ -148,188 +148,204 @@ void audiovisual_state::spread_past_infection(const const_logic_step step) {
 	}
 }
 
-void audiovisual_state::standard_post_solve(const const_logic_step step, const audiovisual_post_solve_input input) {
+void audiovisual_state::standard_post_solve(
+	const const_logic_step step, 
+	const audiovisual_post_solve_input input
+) {
 	auto scope = measure_scope(performance.post_solve);
 
 	const auto& cosm = step.get_cosmos();
 	//reserve_caches_for_entities(cosm.get_solvable().get_entity_pool().capacity());
 
-	const auto& healths = step.get_queue<messages::health_event>();
-	
-	const auto& new_interpolation_corrections = step.get_queue<messages::interpolation_correction_request>();
 	auto& interp = get<interpolation_system>();
 
-	for (const auto& c : new_interpolation_corrections) {
-		const auto from = cosm[c.set_previous_transform_from];
-		const auto subject = cosm[c.subject];
+	const auto& settings = input.settings;
 
-		if (subject.dead()) {
-			continue;
-		}
+	if (settings.correct_interpolations) {
+		const auto& new_interpolation_corrections = step.get_queue<messages::interpolation_correction_request>();
 
-		if (from.alive()) {
-			//LOG_NVPS(interp.get_cache_of(c.subject).interpolated_transform.pos, interp.get_cache_of(from).interpolated_transform.pos);
+		for (const auto& c : new_interpolation_corrections) {
+			const auto from = cosm[c.set_previous_transform_from];
+			const auto subject = cosm[c.subject];
+
+			if (subject.dead()) {
+				continue;
+			}
+
+			const auto target_transform = 
+				from 
+				? interp.get_cache_of(from).interpolated_transform
+				: c.set_previous_transform_value
+			;
 
 			interp.set_updated_interpolated_transform(
 				subject,
-				interp.get_cache_of(from).interpolated_transform
+				target_transform
 			);
-
-			//interp.get_cache_of(c.subject).interpolated_transform =
-			//	interp.get_cache_of(from).interpolated_transform
-			//;
-		}
-		else {
-			interp.set_updated_interpolated_transform(
-				subject,
-				c.set_previous_transform_value
-			);
-
-			//interp.get_cache_of(c.subject).interpolated_transform = 
-			//	c.set_previous_transform_value
-			//;
 		}
 	}
 
-	auto& rng = get_rng();
+	if (settings.acquire_effect_messages) {
+		auto& rng = get_rng();
 
-	auto& flying_numbers = get<flying_number_indicator_system>();
-	auto& highlights = get<pure_color_highlight_system>();
-	auto& particles = get<particles_simulation_system>();
-	auto& sounds = get<sound_system>();
+		{
+			const auto& new_thunders = step.get_queue<messages::thunder_effect>();
+			auto& thunders = get<thunder_system>();
 
-	particles.update_effects_from_messages(rng, step, input.particle_effects, interp);
-
-	{
-		auto ear = input.camera;
-
-		if (const auto viewed_character = ear.viewed_character) {
-			if (const auto transform = viewed_character.find_viewing_transform(interp)) {
-				ear.cone.eye.transform = *transform;
+			for (const auto& t : new_thunders) {
+				thunders.add(rng, t);
 			}
 		}
+		
+		{
+			const auto& new_rings = step.get_queue<messages::exploding_ring_effect>();
+			auto& exploding_rings = get<exploding_ring_system>();
+			exploding_rings.acquire_new_rings(new_rings);
+		}
 
-		sounds.update_effects_from_messages(
-			step, 
-			{
-				input.audio_volume,
-				input.sound_settings,
-				input.sounds, 
-				interp, 
-				ear,
-				augs::delta::zero,
-				1.0,
-				0.0
+		{
+			auto& particles = get<particles_simulation_system>();
+			particles.update_effects_from_messages(rng, step, input.particle_effects, interp);
+		}
+
+		{
+			auto& sounds = get<sound_system>();
+
+			auto ear = input.camera;
+
+			if (const auto viewed_character = ear.viewed_character) {
+				if (const auto transform = viewed_character.find_viewing_transform(interp)) {
+					ear.cone.eye.transform = *transform;
+				}
 			}
-		);
+
+			sounds.update_effects_from_messages(
+				step, 
+				{
+					input.audio_volume,
+					input.sound_settings,
+					input.sounds, 
+					interp, 
+					ear,
+					augs::delta::zero,
+					1.0,
+					0.0
+				}
+			);
+		}
 	}
 
-	for (const auto& h : healths) {
-		const bool destroyed = h.special_result != messages::health_event::result_type::NONE;
 
-		auto make_vn_input = [&]() {
-			flying_number_indicator_system::number::input vn;
+	const auto& healths = step.get_queue<messages::health_event>();
+	
+	struct color_info {
+		rgba number = white;
+		rgba highlight = white;
 
-			vn.impact_velocity = h.impact_velocity;
-			vn.maximum_duration_seconds = 0.7f;
+		color_info(const messages::health_event& h) {
+			if (h.target == messages::health_event::target_type::HEALTH) {
+				if (h.effective_amount > 0) {
+					number = red;
+					highlight = white;
+				}
+				else {
+					number = green;
+					highlight = green;
+				}
+			}
+			else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
+				if (h.effective_amount > 0) {
+					number = turquoise;
+					highlight = turquoise;
+				}
+				else {
+					number = cyan;
+					highlight = cyan;
+				}
+			}
+			else if (h.target == messages::health_event::target_type::CONSCIOUSNESS) {
+				if (h.effective_amount > 0) {
+					number = orange;
+					highlight = orange;
+				}
+				else {
+					number = yellow;
+					highlight = yellow;
+				}
+			}
+		}
+	};
 
-			return vn;
-		};
+	if (settings.acquire_flying_numbers) {
+		auto& flying_numbers = get<flying_number_indicator_system>();
 
-		rgba number_col;
-		rgba highlight_col;
+		for (const auto& h : healths) {
+			auto make_vn_input = [&]() {
+				flying_number_indicator_system::number::input vn;
 
-		if (h.target == messages::health_event::target_type::HEALTH) {
-			if (h.effective_amount > 0) {
-				number_col = red;
-				highlight_col = white;
+				vn.impact_velocity = h.impact_velocity;
+				vn.maximum_duration_seconds = 0.7f;
 
-				if (destroyed) {
-					auto vn = make_vn_input();
-					vn.text = "Death";
-					vn.color = red;
+				return vn;
+			};
 
-					if (const auto subject = cosm[h.subject]) {
-						if (const auto transform = subject.find_logic_transform()) {
-							vn.pos = transform->pos;
-							flying_numbers.add(vn);
+			const bool destroyed = h.special_result != messages::health_event::result_type::NONE;
+
+			if (h.target == messages::health_event::target_type::HEALTH) {
+				if (h.effective_amount > 0) {
+					if (destroyed) {
+						auto vn = make_vn_input();
+						vn.text = "Death";
+						vn.color = red;
+
+						if (const auto subject = cosm[h.subject]) {
+							if (const auto transform = subject.find_logic_transform()) {
+								vn.pos = transform->pos;
+								flying_numbers.add(vn);
+							}
 						}
 					}
 				}
 			}
-			else {
-				number_col = green;
-				highlight_col = green;
-			}
-		}
-		else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
-			if (h.effective_amount > 0) {
-				number_col = turquoise;
-				highlight_col = turquoise;
-			}
-			else {
-				number_col = cyan;
-				highlight_col = cyan;
-			}
-		}
-		else if (h.target == messages::health_event::target_type::CONSCIOUSNESS) {
-			if (h.effective_amount > 0) {
-				if (destroyed) {
-					auto vn = make_vn_input();
-					vn.text = "Unconscious";
-					vn.color = orange;
-
-					if (const auto subject = cosm[h.subject]) {
-						if (const auto transform = subject.find_logic_transform()) {
-							vn.pos = transform->pos;
-							flying_numbers.add(vn);
-						}
+			else if (h.target == messages::health_event::target_type::CONSCIOUSNESS) {
+				if (h.effective_amount > 0) {
+					if (destroyed) {
+						auto vn = make_vn_input();
+						vn.text = "Unconscious";
+						vn.color = orange;
 					}
 				}
-
-				number_col = orange;
-				highlight_col = orange;
 			}
-			else {
-				number_col = yellow;
-				highlight_col = yellow;
-			}
-		}
 
-		if (!augs::is_epsilon(h.effective_amount)) {
 			const auto number_value = static_cast<int>(h.effective_amount);
 
 			auto vn = make_vn_input();
 			vn.text = std::to_string(std::abs(number_value ? number_value : 1));
-			vn.color = number_col;
+			const auto cols = color_info(h);
+			vn.color = cols.number;
 			vn.pos = h.point_of_impact;
 
 			flying_numbers.add(vn);
-
-			pure_color_highlight_system::highlight::input new_highlight;
-
-			new_highlight.target = h.subject;
-			new_highlight.starting_alpha_ratio = 1.f;// std::min(1.f, h.ratio_effective_to_maximum * 5);
-
-			new_highlight.maximum_duration_seconds = 0.10f;
-			new_highlight.color = highlight_col;
-
-			highlights.add(new_highlight);
 		}
 	}
 
-	{
-		const auto& new_thunders = step.get_queue<messages::thunder_effect>();
-		auto& thunders = get<thunder_system>();
+	if (settings.acquire_highlights) {
+		auto& highlights = get<pure_color_highlight_system>();
 
-		for (const auto& t : new_thunders) {
-			thunders.add(rng, t);
+		for (const auto& h : healths) {
+			if (!augs::is_epsilon(h.effective_amount)) {
+				const auto cols = color_info(h);
+
+				pure_color_highlight_system::highlight::input new_highlight;
+
+				new_highlight.target = h.subject;
+				new_highlight.starting_alpha_ratio = 1.f;// std::min(1.f, h.ratio_effective_to_maximum * 5);
+
+				new_highlight.maximum_duration_seconds = 0.10f;
+				new_highlight.color = cols.highlight;
+
+				highlights.add(new_highlight);
+			}
 		}
-	}
-	
-	{
-		const auto& new_rings = step.get_queue<messages::exploding_ring_effect>();
-		auto& exploding_rings = get<exploding_ring_system>();
-		exploding_rings.acquire_new_rings(new_rings);
 	}
 }

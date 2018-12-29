@@ -21,6 +21,7 @@
 
 #include "view/audiovisual_state/all_audiovisual_systems.h"
 #include "view/audiovisual_state/systems/randomizing_system.h"
+#include "view/audiovisual_state/audiovisual_post_solve_settings.h"
 
 class cosmos;
 class visible_entities;
@@ -33,6 +34,7 @@ struct audiovisual_post_solve_input {
 	const augs::audio_volume_settings audio_volume;
 	const sound_system_settings& sound_settings;
 	const character_camera& camera;
+	const audiovisual_post_solve_settings settings;
 };
 
 struct audiovisual_advance_input {

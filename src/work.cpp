@@ -818,7 +818,11 @@ int work(const int argc, const char* const * const argv) try {
 		});
 	};
 
-	static auto setup_post_solve = [&](const const_logic_step step, const config_lua_table& viewing_config) {
+	static auto setup_post_solve = [&](
+		const const_logic_step step, 
+		const config_lua_table& viewing_config,
+		const audiovisual_post_solve_settings settings
+	) {
 		{
 			const auto& defs = get_viewable_defs();
 
@@ -827,7 +831,8 @@ int work(const int argc, const char* const * const argv) try {
 				streaming.loaded_sounds,
 				viewing_config.audio_volume,
 				viewing_config.sound,
-				get_character_camera()
+				get_character_camera(),
+				settings
 			});
 		}
 
@@ -850,8 +855,8 @@ int work(const int argc, const char* const * const argv) try {
 
 		setup.accept_game_gui_events(game_gui.get_and_clear_pending_events());
 		
-		auto setup_audiovisual_post_solve = [&](const const_logic_step step) {
-			setup_post_solve(step, viewing_config);
+		auto setup_audiovisual_post_solve = [&](const const_logic_step step, const audiovisual_post_solve_settings settings = {}) {
+			setup_post_solve(step, viewing_config, settings);
 		};
 
 		{

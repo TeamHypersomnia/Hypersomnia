@@ -23,6 +23,8 @@
 #include "augs/misc/serialization_buffers.h"
 
 #include "view/mode_gui/arena/arena_gui_mixin.h"
+#include "view/audiovisual_state/audiovisual_post_solve_settings.h"
+
 #include "application/network/client_state_type.h"
 #include "application/network/requested_client_settings.h"
 
@@ -247,7 +249,15 @@ public:
 					};
 
 					for_each_predicted_queue(step, erase_predictable_messages);
-					audiovisual_post_solve(step);
+
+					audiovisual_post_solve_settings settings;
+
+					settings.correct_interpolations = false;
+					settings.acquire_highlights = false;
+					settings.acquire_flying_numbers = true;
+					settings.acquire_effect_messages = true;
+
+					audiovisual_post_solve(step, settings);
 				};
 
 				auto predicted_post_solve = [&](const const_logic_step step) {
@@ -263,7 +273,15 @@ public:
 					};
 
 					for_each_predicted_queue(step, erase_unpredictable_messages);
-					audiovisual_post_solve(step);
+
+					audiovisual_post_solve_settings settings;
+
+					settings.correct_interpolations = true;
+					settings.acquire_highlights = true;
+					settings.acquire_flying_numbers = false;
+					settings.acquire_effect_messages = true;
+
+					audiovisual_post_solve(step, settings);
 				};
 
 				auto referential_callbacks = solver_callbacks(
