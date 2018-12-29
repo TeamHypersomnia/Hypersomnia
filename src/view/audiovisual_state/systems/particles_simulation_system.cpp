@@ -470,34 +470,43 @@ void particles_simulation_system::advance_visible_streams(
 
 		const auto cam_aabb = checked_cone.get_visible_world_rect_aabb();
 
-		for (auto& c : fire_and_forget_emissions) { 
+		erase_if(fire_and_forget_emissions, [&](auto& c) {
 			const auto where = c.transform;
 			const bool visible_in_camera = cam_aabb.hover(where.pos);
 
 			advance_emissions(c.emission_instances, where, visible_in_camera, c.original);
-		}
+			return c.is_over();
+		});
 
-		for (auto& c : orbital_emissions) { 
+		erase_if(orbital_emissions, [&](auto& c) {
 			const auto chase = c.chasing;
-
-			if (const auto where = find_transform(chase, cosm, interp)) {
-				const bool visible_in_camera = cam_aabb.hover(where->pos);
-
-				advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
+			const auto where = find_transform(chase, cosm, interp);
+			
+			if (where == std::nullopt) {
+				return true;
 			}
-		}
 
-		for (auto& it : firearm_engine_caches) { 
+			const bool visible_in_camera = cam_aabb.hover(where->pos);
+
+			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
+			return c.is_over();
+		});
+
+		erase_if(firearm_engine_caches, [&](auto& it ) {
 			auto& c = it.second;
 
 			const auto chase = c.chasing;
+			const auto where = find_transform(chase, cosm, interp);
 
-			if (const auto where = find_transform(chase, cosm, interp)) {
-				const bool visible_in_camera = cam_aabb.hover(where->pos);
-
-				advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
+			if (where == std::nullopt) {
+				return true;
 			}
-		}
+
+			const bool visible_in_camera = cam_aabb.hover(where->pos);
+
+			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
+			return false;
+		});
 		
 		for (auto& it : continuous_particles_caches) { 
 			auto& c = it.second;
@@ -526,9 +535,6 @@ void particles_simulation_system::advance_visible_streams(
 			}
 		}
 	}
-
-	erase_if(fire_and_forget_emissions, [](const faf_cache& c){ return c.is_over(); });
-	erase_if(orbital_emissions, [](const orbital_cache& c){ return c.is_over(); });
 
 	update_component_related_cache<components::gun>(
 		rng,
