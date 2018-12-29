@@ -58,7 +58,9 @@ struct sound_effect_start_input {
 	collision_sound_source source_collision;
 	real32 collision_sound_cooldown_duration = 250.f;
 	int collision_sound_occurences_before_cooldown = 4;
-	bool clear_when_target_dead = false;
+	bool clear_when_target_entity_deleted = false;
+	bool clear_when_target_alive = false;
+	bool clear_when_target_conscious = false;
 
 	static sound_effect_start_input fire_and_forget(const transformr where) {
 		sound_effect_start_input in;

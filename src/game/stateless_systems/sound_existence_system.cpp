@@ -134,7 +134,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 					const auto& effect = missile->trace_sound;
 
 					auto start = sound_effect_start_input::at_entity(cosm[r]);
-					start.clear_when_target_dead = true;
+					start.clear_when_target_entity_deleted = true;
 
 					effect.start(step, start, predictability);
 				}
@@ -224,9 +224,19 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			predictability = always_predictable_v;
 		}
 
+		auto start = sound_effect_start_input::at_listener(subject);
+
+		if (h.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS) {
+			start.clear_when_target_conscious = true;
+		}
+
+		if (h.special_result == messages::health_event::result_type::DEATH) {
+			start.clear_when_target_alive = true;
+		}
+
 		effect.start(
 			step,
-			sound_effect_start_input::at_listener(subject),
+			start,
 			predictability
 		);
 	}

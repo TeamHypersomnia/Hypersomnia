@@ -2803,3 +2803,9 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- its a completely different problem from post solve though
 		- for now it is not so critical to confirm these, it's just variation in gun engines is all
 			- and these are quite predictable anyways
+
+- Actually, perhaps we should never predict our own death, even the impact.
+	- That is because once we're dead we don't care anymore
+	- and we should always assume we are alive so that we can still apply some valid inputs which could otherwise be impossible
+	- some step settings for that
+

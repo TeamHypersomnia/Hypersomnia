@@ -18,6 +18,7 @@
 
 #include "augs/audio/audio_settings.h"
 #include "view/character_camera.h"
+#include "game/detail/sentience/sentience_getters.h"
 
 struct shouldnt_play {};
 
@@ -521,10 +522,29 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 	erase_if(short_sounds, [&](generic_sound_cache& cache) {
 		const auto& in = cache.original.start;
 
-		if (in.clear_when_target_dead) {
-			if (cosm[in.positioning.target].dead()) {
-				start_fading(cache);
-				return true;
+		const auto logical_subject = cosm[in.positioning.target];
+
+		auto request_erase = [&]() {
+			start_fading(cache);
+			return true;
+		};
+
+		if (!logical_subject) {
+			if (in.clear_when_target_entity_deleted) {
+				return request_erase();
+			}
+		}
+		else {
+			if (in.clear_when_target_alive) {
+				if (::sentient_and_alive(logical_subject)) {
+					return request_erase();
+				}
+			}
+
+			if (in.clear_when_target_conscious) {
+				if (::sentient_and_conscious(logical_subject)) {
+					return request_erase();
+				}
 			}
 		}
 
