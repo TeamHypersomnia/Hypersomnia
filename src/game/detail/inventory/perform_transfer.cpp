@@ -78,7 +78,8 @@ perform_transfer_result perform_transfer_impl(
 	cosmos& cosm
 ) {
 	auto deguidize = [&](const auto s) {
-		return cosm.get_solvable().deguidize(s);
+		/* No-op */
+		return s;
 	};
 
 	auto get_item_of = [access](auto handle) -> components::item& {
@@ -113,9 +114,9 @@ perform_transfer_result perform_transfer_impl(
 
 	output.result.source_root = source_root;
 
-	const auto transferred_item_guid = transferred_item.get_guid();
-
 	if (!r.params.bypass_mounting_requirements) {
+		const auto transferred_item_id = transferred_item.get_id();
+
 		const bool source_mounted = source_slot.alive() ? source_slot->is_mounted_slot() : false;
 		const bool target_mounted = target_slot.alive() ? target_slot->is_mounted_slot() : false;
 
@@ -125,7 +126,7 @@ perform_transfer_result perform_transfer_impl(
 
 			if (target_slot.dead()) {
 				/* We can always override the target slot to the dead slot, for an existing pending unmount. */
-				if (auto* const existing_request = mapped_or_nullptr(mounts, transferred_item_guid)) {
+				if (auto* const existing_request = mapped_or_nullptr(mounts, transferred_item_id)) {
 					const auto previous_target = cosm[existing_request->target];
 					const bool previous_target_mounted = previous_target.alive() ? previous_target->is_mounted_slot() : false;
 					
@@ -138,13 +139,13 @@ perform_transfer_result perform_transfer_impl(
 			}
 
 			/* Initiate the mounting operation. */
-			mounts.erase(transferred_item_guid);
+			mounts.erase(transferred_item_id);
 
 			pending_item_mount new_mount;
 			new_mount.target = target_slot;
 			new_mount.params = r.params;
 
-			mounts.try_emplace(transferred_item_guid, new_mount);
+			mounts.try_emplace(transferred_item_id, new_mount);
 			return output;
 		}
 	}

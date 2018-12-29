@@ -15,7 +15,7 @@ enum class fae_view_type {
 };
 
 struct entities_tree_state {
-	entity_guid hovered_guid;
+	entity_id hovered_id;
 };
 
 struct fae_property_editor_input {

@@ -96,14 +96,7 @@ public:
 	auto get_entities_by_flavour_id(const typed_entity_flavour_id<E> id) const {
 		thread_local std::vector<typed_entity_id<E>> ids;
 		ids	= get_map<E>().at(id);
-
-		sort_range_by(
-			ids,
-			[&](const auto id) { 
-				return cosm[id].get_guid();
-			}
-		);
-
+		sort_range(ids);
 		return ids;
 	}
 
@@ -202,7 +195,7 @@ fae_tree_output editor_selected_fae_gui::perform(
 		return {};
 	}
 
-	entities_tree_data.hovered_guid.unset();
+	entities_tree_data.hovered_id.unset();
 
 	const auto& cosm = in.command_in.get_cosmos();
 
@@ -305,7 +298,7 @@ fae_tree_output editor_fae_gui::perform(
 		return {};
 	}
 
-	entities_tree_data.hovered_guid.unset();
+	entities_tree_data.hovered_id.unset();
 
 	const auto fae_in = make_fae_input(in, false);
 
@@ -383,7 +376,7 @@ fae_tree_output editor_fae_gui::perform(
 }
 
 void editor_fae_gui_base::clear_dead_entities(const cosmos& cosm) {
-	cosm.clear_dead(entities_tree_data.hovered_guid);
+	cosm.clear_dead(entities_tree_data.hovered_id);
 }
 
 void editor_fae_gui::clear_dead_entities(const cosmos& cosm) {

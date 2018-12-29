@@ -19,11 +19,6 @@ auto subscript_handle_getter(C&, unversioned_entity_id)
 	-> basic_entity_handle<std::is_const_v<C>>
 ;
 
-template <class C>
-auto subscript_handle_getter(C&, entity_guid) 
-	-> basic_entity_handle<std::is_const_v<C>>
-;
-
 template <class C, class E>
 auto subscript_handle_getter(C& cosm, typed_entity_id<E>) 
 	-> basic_typed_entity_handle<std::is_const_v<C>, E>

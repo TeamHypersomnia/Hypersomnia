@@ -7,50 +7,6 @@
 
 #include "game/organization/all_entity_types.h"
 
-struct entity_guid {
-	using guid_value_type = unsigned;
-	// GEN INTROSPECTOR struct entity_guid
-	guid_value_type value = 0u;
-	// END GEN INTROSPECTOR
-
-	static auto dead() {
-		return entity_guid(0);
-	}
-
-	static auto first() {
-		return entity_guid(1);
-	}
-
-	entity_guid() = default;
-	entity_guid(const guid_value_type b) : value(b) {}
-	
-	entity_guid& operator=(const entity_guid& b) = default;
-
-	bool operator==(const entity_guid& b) const {
-		return value == b.value;
-	}
-
-	bool operator!=(const entity_guid& b) const {
-		return value != b.value;
-	}
-
-	operator guid_value_type() const {
-		return value;
-	}
-
-	bool is_set() const {
-		return *this != entity_guid();
-	}
-
-	bool operator<(const entity_guid& b) const {
-		return value < b.value;
-	}
-
-	void unset() {
-		*this = {};
-	}
-};
-
 struct unversioned_entity_id {
 	// GEN INTROSPECTOR struct unversioned_entity_id
 	unversioned_entity_id_base raw;
@@ -178,6 +134,10 @@ struct typed_entity_id {
 	bool is_set() const {
 		return raw.is_set();
 	}
+
+	bool operator<(const typed_entity_id<E>& b) const {
+		return raw < b.raw;
+	}
 }; 
 
 template <class T>
@@ -205,13 +165,6 @@ inline entity_id::entity_id(
 ) : entity_id(static_cast<const entity_id&>(id)) {}
 
 namespace std {
-	template <>
-	struct hash<entity_guid> {
-		std::size_t operator()(const entity_guid v) const {
-			return hash<entity_guid::guid_value_type>()(v.value);
-		}
-	};
-
 	template <>
 	struct hash<entity_id> {
 		std::size_t operator()(const entity_id v) const {

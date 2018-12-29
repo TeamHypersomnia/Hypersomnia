@@ -19,7 +19,7 @@ class editor_go_to_entity_gui {
 
 	std::string last_input;
 	unsigned selected_index = 0;
-	std::vector<entity_guid> matches;
+	std::vector<entity_id> matches;
 	bool moved_since_opening = false;
 
 public:

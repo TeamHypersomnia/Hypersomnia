@@ -31,13 +31,3 @@ template <class F>
 decltype(auto) cosmos_solvable::on_entity_meta(const entity_id id, F&& callback) const {
 	return on_entity_meta_impl(*this, id, std::forward<F>(callback));
 }	
-
-template <class F>
-decltype(auto) cosmos_solvable::on_entity_meta(const entity_guid id, F&& callback) {
-	return on_entity_meta_impl(*this, get_entity_id_by(id), std::forward<F>(callback));
-}	
-
-template <class F>
-decltype(auto) cosmos_solvable::on_entity_meta(const entity_guid id, F&& callback) const {
-	return on_entity_meta_impl(*this, get_entity_id_by(id), std::forward<F>(callback));
-}	

@@ -23,6 +23,7 @@ struct paste_entities_command {
 	template <class E>
 	struct pasted_entry {
 		entity_solvable<E> content;
+		entity_id id;
 	};
 
 	template <class T>

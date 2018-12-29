@@ -163,7 +163,7 @@ std::optional<const_entity_handle> editor_go_to_entity_gui::perform(
 					if (query.empty() || to_lowercase(name).find(query) != std::string::npos) {
 						++hits;
 	
-						self.matches.push_back(handle.get_guid());	
+						self.matches.push_back(handle.get_id());	
 					}
 				});	
 
@@ -266,7 +266,7 @@ std::optional<const_entity_handle> editor_go_to_entity_gui::perform(
 
 			ImGui::SameLine(settings.dialog_width * 0.7);
 
-			text("(guid: %x)", m);
+			text("(id: %x)", m.raw);
 		}
 	}
 

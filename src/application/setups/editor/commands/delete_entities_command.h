@@ -24,6 +24,7 @@ struct delete_entities_command {
 	template <class E>
 	struct deleted_entry {
 		entity_solvable<E> content;
+		entity_id id;
 		cosmic_pool_undo_free_input undo_delete_input;
 	};
 

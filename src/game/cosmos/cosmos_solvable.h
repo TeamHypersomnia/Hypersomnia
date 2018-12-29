@@ -20,8 +20,6 @@ struct entity_creation_input {
 };
 
 class cosmos_solvable {
-	using guid_cache = std::unordered_map<entity_guid, entity_id>;
-
 	static const cosmos_solvable zero;
 
 	template <class A, class B>
@@ -31,12 +29,10 @@ class cosmos_solvable {
 	};
 
 	template <class E>
-	auto allocate_new_entity(const entity_guid new_guid, entity_creation_input);
+	auto allocate_new_entity(entity_creation_input);
 
 	template <class E, class... Args>
 	auto detail_undo_free_entity(Args&&... args);
-
-	entity_guid clear_guid(const entity_id);
 
 	template <class C, class F>
 	static decltype(auto) on_entity_meta_impl(
@@ -47,10 +43,6 @@ class cosmos_solvable {
 
 	template <template <class> class Predicate, class S, class F>
 	static void for_each_entity_impl(S& self, F callback);
-
-	entity_guid get_guid(const entity_id&) const;
-
-	guid_cache guid_to_id;
 
 public:
 	cosmos_solvable_significant significant;
@@ -68,7 +60,7 @@ public:
 	auto undo_free_entity(Args&&... undo_free_args);
 
 	template <class E>
-	auto allocate_entity_with_specific_guid(const entity_guid specific_guid, entity_creation_input);
+	auto allocate_entity_impl(entity_creation_input);
 
 	std::optional<cosmic_pool_undo_free_input> free_entity(entity_id);
 	void undo_last_allocate_entity(entity_id);
@@ -82,24 +74,6 @@ public:
 
 	entity_id get_versioned(const unversioned_entity_id&) const;
 	entity_id find_versioned(const unversioned_entity_id&) const;
-
-	entity_id get_entity_id_by(const entity_guid&) const;
-
-	template <template <class> class Guidized>
-	Guidized<entity_guid> guidize(const Guidized<entity_guid>& id_source) const {
-		return id_source;
-	}
-
-	template <template <class> class Deguidized>
-	Deguidized<entity_id> deguidize(const Deguidized<entity_id>& id_source) const {
-		return id_source;
-	}
-
-	template <template <class> class Guidized, class source_id_type>
-	Guidized<entity_guid> guidize(const Guidized<source_id_type>& id_source) const;
-
-	template <template <class> class Deguidized, class source_id_type>
-	Deguidized<entity_id> deguidize(const Deguidized<source_id_type>& guid_source) const;
 
 	template <class E>
 	const auto& get_entities_by_flavour_id(const typed_entity_flavour_id<E>& id) const {
@@ -145,12 +119,6 @@ public:
 
 	bool empty() const;
 
-	void remap_guids();
-
-	const auto& get_guid_to_id() const {
-		return guid_to_id;
-	}
-
 	template <class E>
 	auto* dereference_entity(const typed_entity_id<E> id) {
 		return significant.get_pool<E>().find(id.raw);
@@ -166,21 +134,7 @@ public:
 
 	template <class F>
 	decltype(auto) on_entity_meta(const entity_id id, F&& callback) const;
-
-	template <class F>
-	decltype(auto) on_entity_meta(const entity_guid id, F&& callback);
-
-	template <class F>
-	decltype(auto) on_entity_meta(const entity_guid id, F&& callback) const;
 };
-
-inline entity_id cosmos_solvable::get_entity_id_by(const entity_guid& guid) const {
-	if (const auto id = mapped_or_nullptr(guid_to_id, guid)) {
-		return *id;
-	}
-
-	return {};
-}
 
 inline entity_id cosmos_solvable::get_versioned(const unversioned_entity_id& id) const {
 	return { 

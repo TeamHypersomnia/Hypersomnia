@@ -80,7 +80,7 @@ void edit_entity(
 		return index_in_list_v<remove_cref<decltype(comp)>, components_of<E>>;
 	};
 
-	text_disabled(typesafe_sprintf("(%x) guid: %x", handle.get_id(), handle.get_guid()));
+	text_disabled(typesafe_sprintf("(%x)", handle.get_id()));
 
 	for_each_through_std_get(
 		handle.get().components,

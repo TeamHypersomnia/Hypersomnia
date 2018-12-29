@@ -15,7 +15,7 @@ std::string delete_entities_command::describe() const {
 void delete_entities_command::push_entry(const const_entity_handle handle) {
 	handle.dispatch([&](const auto typed_handle) {
 		using E = entity_type_of<decltype(typed_handle)>;
-		deleted_entities.get_for<E>().push_back({ typed_handle.get(), {} });
+		deleted_entities.get_for<E>().push_back({ typed_handle.get(), handle.get_id(), {} });
 	});
 
 	deleted_grouping.push_entry(handle.get_id());
@@ -33,7 +33,7 @@ void delete_entities_command::redo(const editor_command_input in) {
 	auto& cosm = in.get_cosmos();
 
 	deleted_entities.for_each([&](auto& e) {
-		const auto handle = cosm[e.content.guid];
+		const auto handle = cosm[e.id];
 		in.clear_dead_entity(handle.get_id());
 		e.undo_delete_input = *cosmic::delete_entity(handle);
 	});
@@ -68,6 +68,6 @@ void delete_entities_command::sanitize(const editor_command_input in) {
 	deleted_grouping.sanitize(in);
 
 	sanitize_affected_entities(in, deleted_entities, [](const auto& entry) {
-		return entry.content.guid;
+		return entry.id;
 	});
 }

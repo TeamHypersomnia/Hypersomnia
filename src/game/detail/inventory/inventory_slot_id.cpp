@@ -34,4 +34,3 @@ bool basic_inventory_slot_id<T>::is_set() const {
 }
 
 template struct basic_inventory_slot_id<entity_id>;
-template struct basic_inventory_slot_id<entity_guid>;

@@ -6,7 +6,7 @@ template <class E>
 void warning_other(const E handle, const std::string& content) {
 	const auto subject_info = 
 		handle.get_name() 
-		+ typesafe_sprintf("'s (g: %x)", handle.get_guid().value)
+		+ typesafe_sprintf("'s (id: %x)", handle.get_id())
 	;
 
 	LOG("WARNING! %x %x.", subject_info, content); 

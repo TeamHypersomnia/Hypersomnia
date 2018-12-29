@@ -241,11 +241,6 @@ struct tests_of_traits {
 
 	static_assert(!augs::has_byte_readwrite_overloads_v<augs::memory_stream, value_meter>);
 
-	static_assert(
-		sizeof(entity_id) >= sizeof(entity_guid),
-		"With given memory layouts, entity_id<->entity_guid substitution will not be possible in delta encoding"
-	);
-
 	static_assert(is_container_v<augs::path_type>);
 	static_assert(!is_padding_field_v<entity_id>);
 	static_assert(is_padding_field_v<pad_bytes<4>>);
@@ -539,7 +534,6 @@ struct game_state_checks {
 			using F = entity_flavour<E>;
 
 			static_assert(!can_type_contain_v<decltype(F::invariants), entity_id_base>);
-			static_assert(!can_type_contain_v<decltype(F::invariants), entity_guid>);
 		});
 	}
 
@@ -574,7 +568,7 @@ struct game_state_checks {
 	/* Other sanity checks. */
 
 	static_assert(!can_type_contain_v<all_logical_assets, entity_id_base>);
-	static_assert(!can_type_contain_v<all_viewables_defs, entity_guid>);
+	static_assert(!can_type_contain_v<all_viewables_defs, entity_id_base>);
 
 	static_assert(can_type_contain_constructible_from_v<invariants::cartridge, typed_entity_flavour_id<shootable_charge>>);
 	static_assert(can_type_contain_constructible_from_v<cosmos_common_significant, typed_entity_flavour_id<shootable_charge>>);

@@ -20,7 +20,7 @@ void paste_entities_command::push_entry(const const_entity_handle handle) {
 		auto solvable = typed_handle.get();
 		cosmic::make_suitable_for_cloning(solvable);
 
-		pasted_entities.get<vector_type>().push_back({ solvable });
+		pasted_entities.get<vector_type>().push_back({ solvable, handle.get_id() });
 	});
 }
 
@@ -47,7 +47,6 @@ void paste_entities_command::redo(const editor_command_input in) {
 				cosm, typed_entity_flavour_id<E>(e.content.flavour_id), e.content.components
 			);
 
-			e.content.guid = pasted.get_guid();
 			selections.emplace(pasted.get_id());
 		});
 	}
@@ -62,7 +61,7 @@ void paste_entities_command::undo(const editor_command_input in) const {
 	auto& cosm = in.get_cosmos();
 
 	pasted_entities.for_each_reverse([&](auto& e) {
-		cosmic::undo_last_create_entity(cosm[e.content.guid]);
+		cosmic::undo_last_create_entity(cosm[e.id]);
 	});
 
 	/* 

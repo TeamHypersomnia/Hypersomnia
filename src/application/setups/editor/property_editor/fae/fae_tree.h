@@ -433,8 +433,8 @@ auto tree_of_entities(
 								for (const auto& e : all_having_flavour) {
 									const auto typed_handle = *cosm[e];
 
-									const auto guid = typed_handle.get_guid();
-									const auto entity_label = typesafe_sprintf("%x", guid);
+									const auto id = typed_handle.get_id();
+									const auto entity_label = typesafe_sprintf("%x", id);
 
 									const auto is_entity_selected = found_in(ticked_entities, e);
 
@@ -442,13 +442,13 @@ auto tree_of_entities(
 										ticked_entities,
 										e,
 										is_entity_selected,
-										guid
+										id
 									);
 
 									const auto entity_node = scoped_tree_node_ex(entity_label, flags);
 
 									if (ImGui::IsItemHovered()) {
-										state.hovered_guid = guid; 
+										state.hovered_id = id; 
 									}
 
 									next_column_text();

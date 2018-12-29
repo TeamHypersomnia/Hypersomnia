@@ -94,11 +94,6 @@ public:
 		return self.template get<invariants::flags>().values.test(f);
 	}
 
-	entity_guid get_guid() const {
-		const auto self = *static_cast<const E*>(this);
-		return self.get_meta().guid;
-	}
-
 	auto get_raw_flavour_id() const {
 		const auto self = *static_cast<const E*>(this);
 		return self.get_meta().flavour_id;

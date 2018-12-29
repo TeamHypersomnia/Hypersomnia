@@ -39,12 +39,6 @@ class cosmic {
 	);
 
 public:
-	class specific_guid_creation_access {
-		friend cosmic_delta;
-
-		specific_guid_creation_access() {}
-	};
-
 	static void set_specific_name(const entity_handle&, const entity_name_str&);
 	static void clear(cosmos& cosm);
 

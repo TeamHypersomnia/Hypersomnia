@@ -32,8 +32,7 @@ public:
 	};
 
 	auto get_current_slot() const {
-		const auto& cosm = this->get_handle().get_cosmos();
-		return cosm.get_solvable().deguidize(get_raw_component().current_slot);
+		return get_raw_component().current_slot;
 	}
 
 	auto get_charges() const {

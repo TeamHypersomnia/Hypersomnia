@@ -12,15 +12,12 @@ const cosmos_solvable cosmos_solvable::zero;
 void cosmos_solvable::clear() {
 	destroy_all_caches();
 	significant.entity_pools.clear();
-	guid_to_id.clear();
 	significant.clk = {};
 	significant.specific_names.clear();
 }
 
 std::size_t cosmos_solvable::get_entities_count() const {
-	std::size_t total = significant.entity_pools.size();
-	ensure_eq(guid_to_id.size(), total);
-	return total;
+	return significant.entity_pools.size();
 }
 
 bool cosmos_solvable::empty() const {
@@ -55,22 +52,6 @@ void cosmos_solvable::destroy_all_caches() {
 
 	augs::introspect(make_reserver(n), inferred);
 #endif
-}
-
-void cosmos_solvable::remap_guids() {
-	auto& guids = guid_to_id;
-	guids.clear();
-
-	for_each_entity([&](auto& subject, const auto iteration_index) {
-		using E = entity_type_of<decltype(subject)>;
-
-		const auto id = entity_id(
-			significant.template get_pool<E>().to_id(iteration_index),
-			entity_type_id::of<E>()
-		);
-
-		guids[subject.guid] = id;
-	});
 }
 
 void cosmos_solvable::increment_step() {
@@ -110,69 +91,9 @@ unsigned cosmos_solvable::get_steps_per_second() const {
 }
 
 std::optional<cosmic_pool_undo_free_input> cosmos_solvable::free_entity(const entity_id id) {
-	clear_guid(id);
-
 	return significant.on_pool(id.type_id, [id](auto& p){ return p.free(id.raw); });
 }
 
 void cosmos_solvable::undo_last_allocate_entity(const entity_id id) {
-	const auto erased_guid = clear_guid(id);
-	(void)erased_guid;
-
-	auto& next_entity_guid = significant.next_entity_guid.value;
-	--next_entity_guid;
-
-	ensure_eq(next_entity_guid, erased_guid);
-
 	return significant.on_pool(id.type_id, [id](auto& p){ return p.undo_last_allocate(id.raw); });
 }
-
-entity_guid cosmos_solvable::clear_guid(const entity_id cleared) {
-	const auto guid = get_guid(cleared);
-	const auto erased_num = guid_to_id.erase(guid);
-	(void)erased_num;
-
-	ensure_eq(erased_num, 1);
-	return guid;
-}
-
-template <template <class> class Guidized, class source_id_type>
-Guidized<entity_guid> cosmos_solvable::guidize(const Guidized<source_id_type>& id_source) const {
-	return rewrite_members_and_transform_templated_type_into<entity_guid>(
-		id_source,
-		[this](auto& guid_member, const auto& id_member) {
-			guid_member = get_guid(id_member);
-		}
-	);
-}
-
-template <template <class> class Deguidized, class source_id_type>
-Deguidized<entity_id> cosmos_solvable::deguidize(const Deguidized<source_id_type>& guid_source) const {
-	return rewrite_members_and_transform_templated_type_into<entity_id>(
-		guid_source,
-		[this](auto& id_member, const auto& guid_member) {
-			if (guid_member != entity_guid()) {
-				id_member = guid_to_id.at(guid_member);
-			}
-		}
-	);
-}
-
-entity_guid cosmos_solvable::get_guid(const entity_id& id) const {
-	return on_entity_meta(
-		id, 
-		[](const entity_solvable_meta* const e) { 
-			if (e) {
-				return e->guid;
-			}	 
-
-			return entity_guid();
-		}
-	);
-}
-
-template basic_inventory_slot_id<entity_guid> cosmos_solvable::guidize<basic_inventory_slot_id, entity_id>(const basic_inventory_slot_id<entity_id>&) const;
-template basic_inventory_slot_id<entity_id> cosmos_solvable::deguidize<basic_inventory_slot_id, entity_guid>(const basic_inventory_slot_id<entity_guid>&) const;
-
-template basic_item_slot_transfer_request<entity_guid> cosmos_solvable::guidize<basic_item_slot_transfer_request, entity_id>(const basic_item_slot_transfer_request<entity_id>&) const;
-template basic_item_slot_transfer_request<entity_id> cosmos_solvable::deguidize<basic_item_slot_transfer_request, entity_guid>(const basic_item_slot_transfer_request<entity_guid>&) const;

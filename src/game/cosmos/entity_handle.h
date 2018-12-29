@@ -174,14 +174,6 @@ public:
 		return !operator==(id);
 	}
 
-	bool operator==(const entity_guid id) const {
-		return this->get_guid() == id;
-	}
-
-	operator entity_guid() const {
-		return this->get_guid();
-	}
-
 	operator entity_id() const {
 		return raw_id;
 	}
@@ -369,11 +361,4 @@ auto subscript_handle_getter(C& cosm, const unversioned_entity_id id)
 	-> basic_entity_handle<std::is_const_v<C>>
 {
 	return subscript_handle_getter(cosm, cosm.find_versioned(id));
-}
-
-template <class C>
-auto subscript_handle_getter(C& cosm, const entity_guid guid)
-	-> basic_entity_handle<std::is_const_v<C>>
-{
-	return subscript_handle_getter(cosm, cosm.get_solvable().get_entity_id_by(guid));
 }

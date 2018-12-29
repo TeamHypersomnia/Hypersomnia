@@ -150,9 +150,6 @@ void cosmic::reinfer_all_entities(cosmos& cosm) {
 }
 
 void cosmic::reinfer_solvable(cosmos& cosm) {
-	auto& solvable = cosm.get_solvable({});
-
-	solvable.remap_guids();
 	reinfer_all_entities(cosm);
 }
 

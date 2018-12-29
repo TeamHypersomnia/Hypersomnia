@@ -46,8 +46,8 @@ struct editor_fae_gui_base : standard_window_mixin<editor_fae_gui_base> {
 
 	void interrupt_tweakers();
 
-	auto get_hovered_guid() const {
-		return entities_tree_data.hovered_guid;
+	auto get_hovered_id() const {
+		return entities_tree_data.hovered_id;
 	}
 
 	void do_view_mode_switch();

@@ -20,4 +20,4 @@ struct pending_item_mount {
 	}
 };
 
-using pending_item_mounts_type = std::map<entity_guid, pending_item_mount>;
+using pending_item_mounts_type = std::map<entity_id, pending_item_mount>;

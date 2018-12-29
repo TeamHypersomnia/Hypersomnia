@@ -9,7 +9,6 @@
 
 using mode_entity_id = entity_id;
 
-struct entity_guid;
 struct entity_id;
 
 class cosmos;

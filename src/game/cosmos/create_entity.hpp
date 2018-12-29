@@ -168,14 +168,14 @@ auto cosmic::specific_clone_entity(const handle_type source_entity) {
 }
 
 template <class E>
-auto cosmos_solvable::allocate_new_entity(const entity_guid new_guid, const entity_creation_input in) {
+auto cosmos_solvable::allocate_new_entity(const entity_creation_input in) {
 	auto& pool = significant.get_pool<E>();
 
 	if (pool.full()) {
 		throw entity_creation_error { entity_creation_error_type::POOL_FULL };
 	}
 
-	const auto result = pool.allocate(new_guid, in.flavour_id, get_timestamp());
+	const auto result = pool.allocate(in.flavour_id, get_timestamp());
 
 	allocation_result<typed_entity_id<E>, decltype(result.object)> output {
 		typed_entity_id<E>(result.key), result.object
@@ -198,27 +198,15 @@ auto cosmos_solvable::detail_undo_free_entity(Args&&... args) {
 
 template <class E>
 auto cosmos_solvable::allocate_next_entity(const entity_creation_input in) {
-	auto& guid_value = significant.next_entity_guid.value;
-
-	const auto next_guid = guid_value;
-	const auto result = allocate_entity_with_specific_guid<E>(next_guid, in);
-
-	++guid_value;
-	return result;
+	return allocate_entity_impl<E>(in);
 }
 
 template <class E, class... Args>
 auto cosmos_solvable::undo_free_entity(Args&&... undo_free_args) {
-	const auto result = detail_undo_free_entity<E>(std::forward<Args>(undo_free_args)...);
-	const auto it = guid_to_id.emplace(result.object.guid, result.key);
-	(void)it;
-	ensure(it.second);
-	return result;
+	return detail_undo_free_entity<E>(std::forward<Args>(undo_free_args)...);
 }
 
 template <class E>
-auto cosmos_solvable::allocate_entity_with_specific_guid(const entity_guid specific_guid, const entity_creation_input in) {
-	const auto result = allocate_new_entity<E>(specific_guid, in);
-	guid_to_id[specific_guid] = result.key;
-	return result;
+auto cosmos_solvable::allocate_entity_impl(const entity_creation_input in) {
+	return allocate_new_entity<E>(in);
 }
