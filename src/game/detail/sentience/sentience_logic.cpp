@@ -72,17 +72,22 @@ void perform_knockout(
 						rigid_body.get_special().during_cooldown_ignore_collision_with = typed_subject;
 
 						const auto& effect = sentience_def.detached_head_particles;
+						const auto predictability = 
+							step.get_settings().effect_prediction.predict_death_particles 
+							? always_predictable_v
+							: never_predictable_v
+						;
 
 						effect.start(
 							step,
 							particle_effect_start_input::orbit_local(typed_entity, { vec2::zero, 180 } ),
-							never_predictable_v
+							predictability
 						);
 
 						effect.start(
 							step,
 							particle_effect_start_input::orbit_local(typed_subject, { vec2::zero, 180 } ),
-							never_predictable_v
+							predictability
 						);
 					},
 					[&](auto&&...) {}
