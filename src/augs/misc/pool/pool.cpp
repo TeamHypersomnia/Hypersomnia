@@ -6,7 +6,7 @@
 #include "augs/misc/constant_size_vector.h"
 #include "augs/readwrite/readwrite_test_cycle.h"
 
-using p_t = augs::pool<int, of_size<6>::make_constant_vector, unsigned short>;
+using p_t = augs::pool<int, of_size<6>::make_nontrivial_constant_vector, unsigned short>;
 using k_t = p_t::key_type; 
 using u_t = p_t::undo_free_input_type; 
 
@@ -172,7 +172,7 @@ void test_pool() {
 }
 
 TEST_CASE("Pool Readwrite") {
-	test_pool<augs::pool<float, of_size<100>::make_constant_vector, unsigned short>>();
+	test_pool<augs::pool<float, of_size<100>::make_nontrivial_constant_vector, unsigned short>>();
 	test_pool<augs::pool<float, make_vector, unsigned char>>();
 }
 

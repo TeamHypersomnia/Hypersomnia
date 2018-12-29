@@ -14,8 +14,8 @@ void resize_no_init(std::vector<V>& v, const std::size_t n) {
 	}
 }
 
-template <class V, unsigned const_count>
-void resize_no_init(augs::constant_size_vector<V, const_count>& v, const std::size_t n) {
+template <class V, unsigned const_count, bool F>
+void resize_no_init(augs::constant_size_vector<V, const_count, F>& v, const std::size_t n) {
 	if constexpr(std::is_trivial_v<V>) {
 		v.resize_no_init(n);
 	}

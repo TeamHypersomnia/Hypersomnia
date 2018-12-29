@@ -117,7 +117,7 @@ template <class E>
 using entity_flavours_container = 
 	augs::pool<
 		entity_flavour<E>, 
-		of_size<E::statically_allocated_flavours>::template make_constant_vector,
+		of_size<E::statically_allocated_flavours>::template make_nontrivial_constant_vector,
 		unsigned short,
 		raw_flavour_id_key
 	>

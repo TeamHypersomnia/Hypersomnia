@@ -156,5 +156,5 @@ void intercosm::update_offsets_of(const assets::image_id& id, const changer_call
 }
 
 static_assert(augs::has_byte_readwrite_overloads_v<augs::memory_stream, augs::pool<int, make_vector, unsigned>>);
-static_assert(augs::has_lua_readwrite_overloads_v<augs::pool<int, of_size<300>::make_constant_vector, unsigned>>);
+static_assert(augs::has_lua_readwrite_overloads_v<augs::pool<int, of_size<300>::make_nontrivial_constant_vector, unsigned>>);
 static_assert(augs::has_lua_readwrite_overloads_v<make_entity_pool<controlled_character>>);

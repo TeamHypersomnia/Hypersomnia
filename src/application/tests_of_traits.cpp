@@ -125,10 +125,10 @@ struct tests_of_traits {
 			static_assert(same<double, decltype(okay5)>);
 		}
 
-		augs::pool<int, of_size<300>::make_constant_vector, unsigned short> ppp;
+		augs::pool<int, of_size<300>::make_nontrivial_constant_vector, unsigned short> ppp;
 
 		// ERROR: "The container can hold more elements than the pool can index with size_type!"
-		// augs::pool<int, of_size<300>::make_constant_vector, unsigned char> ppp2;
+		// augs::pool<int, of_size<300>::make_nontrivial_constant_vector, unsigned char> ppp2;
 	}
 
 	/* One-shot asserts. */
@@ -185,7 +185,7 @@ struct tests_of_traits {
 	static_assert(value_disjunction<true, false, true, false>::value);
 
 	static_assert(augs::is_pool_v<augs::pool<int, make_vector, unsigned>>);
-	static_assert(augs::is_pool_v<augs::pool<int, of_size<300>::make_constant_vector, unsigned short>>);
+	static_assert(augs::is_pool_v<augs::pool<int, of_size<300>::make_nontrivial_constant_vector, unsigned short>>);
 	static_assert(!augs::is_pool_v<std::vector<int>>);
 
 	static_assert(is_comparable_v<const int, int>);
@@ -584,7 +584,7 @@ struct game_state_checks {
 	static_assert(!can_type_contain_constructible_from_v<invariants::flags, typed_entity_flavour_id<plain_missile>>);
 
 	using S = int;
-	using some_pool_type = augs::pool<S, of_size<200>::template make_constant_vector, cosmic_pool_size_type>;
+	using some_pool_type = augs::pool<S, of_size<200>::template make_nontrivial_constant_vector, cosmic_pool_size_type>;
 
 	/* Ensures that the byte-wise writer is not invoked for a pool */
 	static_assert(!std::is_trivially_copyable_v<some_pool_type>);

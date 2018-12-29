@@ -17,7 +17,7 @@ struct entity_solvable;
 template <class T>
 using make_entity_pool = std::conditional_t<
 	statically_allocate_entities,
-	augs::pool<entity_solvable<T>, of_size<T::statically_allocated_entities>::template make_constant_vector, cosmic_pool_size_type>,
+	augs::pool<entity_solvable<T>, of_size<T::statically_allocated_entities>::template make_nontrivial_constant_vector, cosmic_pool_size_type>,
 	augs::pool<entity_solvable<T>, make_vector, cosmic_pool_size_type>
 >;
 

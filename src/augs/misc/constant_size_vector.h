@@ -321,8 +321,8 @@ namespace augs {
 		}
 	};
 
-	template <class T, unsigned N>
-	class constant_size_vector<T, N, std::enable_if_t<std::is_trivially_copyable_v<T>>>
+	template <class T, unsigned N, bool force_nontrivial_interface>
+	class constant_size_vector<T, N, force_nontrivial_interface, std::enable_if_t<!force_nontrivial_interface && std::is_trivially_copyable_v<T>>>
 		: public constant_size_vector_base<T, N> {
 
 	public:
@@ -338,8 +338,8 @@ namespace augs {
 		constant_size_vector() = default;
 	};
 
-	template <class T, unsigned N>
-	class constant_size_vector<T, N, std::enable_if_t<!std::is_trivially_copyable_v<T>>>
+	template <class T, unsigned N, bool force_nontrivial_interface>
+	class constant_size_vector<T, N, force_nontrivial_interface, std::enable_if_t<force_nontrivial_interface || !std::is_trivially_copyable_v<T>>>
 		: public constant_size_vector_base<T, N> {
 	public:
 		using base = constant_size_vector_base<T, N>;
@@ -391,17 +391,17 @@ namespace augs {
 		}
 	};
 
-	template <class T, unsigned C, class = std::enable_if_t<is_comparable_v<T, T>>>
+	template <class T, unsigned C, bool F, class = std::enable_if_t<is_comparable_v<T, T>>>
 	bool operator==(
-		const constant_size_vector<T, C>& a,
-		const constant_size_vector<T, C>& b
+		const constant_size_vector<T, C, F>& a,
+		const constant_size_vector<T, C, F>& b
 	) {
 		return ranges_equal(a, b);
 	}
 
-	template <class T, unsigned C, class = std::enable_if_t<is_comparable_v<T, T>>>
+	template <class T, unsigned C, bool F, class = std::enable_if_t<is_comparable_v<T, T>>>
 	bool operator==(
-		const constant_size_vector<T, C>& a,
+		const constant_size_vector<T, C, F>& a,
 		const std::vector<T>& b
 	) {
 		return ranges_equal(a, b);

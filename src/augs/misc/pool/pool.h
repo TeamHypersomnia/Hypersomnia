@@ -10,13 +10,9 @@
 #include "augs/misc/pool/pool_structs.h"
 #include "augs/misc/pool/pooled_object_id.h"
 
-#include "augs/misc/prevent_trivial_copy.h"
-
 namespace augs {
 	template <class T, template <class> class make_container_type, class size_type, class... id_keys>
 	class pool {
-		prevent_trivial_copy guard;
-
 	public:
 		using value_type = T;
 

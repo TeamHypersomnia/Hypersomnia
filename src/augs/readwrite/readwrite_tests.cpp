@@ -288,7 +288,7 @@ TEST_CASE("Lua readwrite General") {
 		REQUIRE(try_to_reload_with_lua(lua, mm));
 		REQUIRE(try_to_reload_with_lua(lua, v));
 
-		using P = augs::pool<T, of_size<300>::make_constant_vector, unsigned short>;
+		using P = augs::pool<T, of_size<300>::make_nontrivial_constant_vector, unsigned short>;
 		P pp;
 		pp.reserve(300);
 
