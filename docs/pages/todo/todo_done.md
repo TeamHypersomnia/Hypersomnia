@@ -2809,3 +2809,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- and we should always assume we are alive so that we can still apply some valid inputs which could otherwise be impossible
 	- some step settings for that
 
+- If we detect inconsistency of state
+

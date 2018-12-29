@@ -136,14 +136,14 @@ void arena_gui_state::draw_mode_gui(
 	const draw_mode_gui_input& mode_in,
 
 	const M& typed_mode, 
-	const typename M::const_input& mode_input
+	const typename M::const_input& mode_input,
+
+	const prediction_input prediction
 ) const {
 	const auto& cfg = in.config.arena_mode_gui;
 	const auto line_height = in.gui_fonts.gui.metrics.get_height();
 
 	if constexpr(M::round_based) {
-		scoreboard.draw_gui(in, mode_in, typed_mode, mode_input);
-
 		using namespace augs::gui::text;
 
 		const auto local_player_id = mode_in.local_player_id;
@@ -156,9 +156,7 @@ void arena_gui_state::draw_mode_gui(
 			return std::nullopt;
 		}();
 
-		auto game_screen_top = mode_in.game_screen_top;
-
-		game_screen_top += 2;
+		const auto game_screen_top = mode_in.game_screen_top + 2;
 
 		auto colored = [&](const auto& text, const auto& c) {
 			const auto text_style = style(
@@ -173,7 +171,11 @@ void arena_gui_state::draw_mode_gui(
 			return get_text_bbox(colored(text, white));;
 		};
 
-		{
+		auto draw_scoreboard = [&]() {
+			scoreboard.draw_gui(in, mode_in, typed_mode, mode_input);
+		};
+
+		auto draw_money_and_awards = [&]() {
 			// TODO: fix this for varying icon sizes
 
 			if (const auto p = typed_mode.find(local_player_id)) {
@@ -256,9 +258,9 @@ void arena_gui_state::draw_mode_gui(
 				warmup.requested.clear();
 				warmup.current.clear();
 			}
-		}
+		};
 
-		{
+		auto draw_knockouts = [&]() {
 			const auto& cosm = mode_input.cosm;
 			const auto& kos = typed_mode.current_round.knockouts;
 			const auto& clk = cosm.get_clock();
@@ -437,9 +439,9 @@ void arena_gui_state::draw_mode_gui(
 
 				pen.y = total_bbox.b();
 			}
-		}
+		};
 
-		auto draw_indicator_at = [&](const auto& val, const auto t) {
+		auto draw_text_indicator_at = [&](const auto& val, const auto t) {
 			const auto s = in.screen_size;
 
 			print_stroked(
@@ -482,29 +484,38 @@ void arena_gui_state::draw_mode_gui(
 		};
 
 		auto draw_time_at_top = [&](const std::string& val, const rgba& col) {
-			draw_indicator_at(colored(val, col), game_screen_top);
+			draw_text_indicator_at(colored(val, col), game_screen_top);
 		};
 
 		auto draw_info_indicator = [&](const auto& val) {
 			const auto one_fourth_t = in.screen_size.y / 6;
-			draw_indicator_at(val, one_fourth_t);
+			draw_text_indicator_at(val, one_fourth_t);
 		};
 
-		if (auto& commencing_left = typed_mode.commencing_timer_ms; commencing_left != -1.f) {
-			// const auto c = std::ceil(commencing_left);
+		auto draw_game_commencing = [&]() {
+			if (auto& commencing_left = typed_mode.commencing_timer_ms; commencing_left != -1.f) {
+				// const auto c = std::ceil(commencing_left);
+				draw_info_indicator(colored("Game Commencing!", white));
+				return true;
+			}
 
-			draw_info_indicator(colored("Game Commencing!", white));
-			return;
-		}
+			return false;
+		};
 
+		/* Synonym */
 		auto draw_warmup_indicator = draw_info_indicator;
 
-		if (const auto warmup_left = typed_mode.get_warmup_seconds_left(mode_input); warmup_left > 0.f) {
+		const auto warmup_left = typed_mode.get_warmup_seconds_left(mode_input);
+		const bool now_is_warmup = warmup_left > 0.f;
+
+		auto draw_warmup_timer = [&]() {
 			const auto c = std::ceil(warmup_left);
 
 			play_tick_if_soon(c, 5.f, true);
 			draw_warmup_indicator(colored("WARMUP\n" + format_mins_secs(c), white));
+		};
 
+		auto draw_warmup_welcome = [&]() {
 			const auto& original_welcome = mode_input.rules.view.warmup_welcome_message;
 			const bool non_spectator = local_player_faction && *local_player_faction != faction_type::SPECTATOR;
 
@@ -568,16 +579,12 @@ void arena_gui_state::draw_mode_gui(
 
 				last = warmup_left;
 			}
-			return;
-		}
+		};
 
-		warmup.requested.clear();
-		warmup.current.clear();
-
-		{
+		auto draw_important_match_event = [&]() {
 			if (const auto secs = typed_mode.get_seconds_since_planting(mode_input); secs >= 0.f && secs <= 3.f) {
 				draw_info_indicator(colored("The bomb has been planted!", yellow));
-				return;
+				return true;
 			}
 
 			const auto& win = typed_mode.current_round.last_win;
@@ -598,52 +605,86 @@ void arena_gui_state::draw_mode_gui(
 
 				draw_info_indicator(indicator_text);
 
+				return true;
+			}
+
+			return false;
+		};
+
+		auto draw_match_timers = [&]() {
+			if (const auto match_begins_in_seconds = typed_mode.get_match_begins_in_seconds(mode_input); match_begins_in_seconds >= 0.f) {
+				const auto c = std::ceil(match_begins_in_seconds - 1.f);
+
+				if (c > 0.f) {
+					draw_warmup_indicator(colored("Match begins in\n" + format_mins_secs(match_begins_in_seconds), yellow));
+				}
+				else {
+					draw_warmup_indicator(colored("The match has begun", yellow));
+				}
+
 				return;
 			}
-		}
 
-		if (const auto match_begins_in_seconds = typed_mode.get_match_begins_in_seconds(mode_input); match_begins_in_seconds >= 0.f) {
-			const auto c = std::ceil(match_begins_in_seconds - 1.f);
+			if (const auto freeze_left = typed_mode.get_freeze_seconds_left(mode_input); freeze_left > 0.f) {
+				const auto c = std::ceil(freeze_left);
+				const auto col = c <= 10.f ? red : white;
 
-			if (c > 0.f) {
-				draw_warmup_indicator(colored("Match begins in\n" + format_mins_secs(match_begins_in_seconds), yellow));
+				play_tick_if_soon(c, 3.f, false);
+				draw_time_at_top(format_mins_secs(c), col);
+
+				return;
+			}
+
+			if (const auto critical_left = typed_mode.get_critical_seconds_left(mode_input); critical_left > 0.f) {
+				const auto c = std::ceil(critical_left);
+				const auto col = red;
+
+				draw_time_at_top(format_mins_secs(c), col);
+
+				return;
+			}
+
+			if (const auto time_left = std::ceil(typed_mode.get_round_seconds_left(mode_input)); time_left > 0.f) {
+				const auto c = std::ceil(time_left);
+				const auto col = time_left <= 10.f ? red : white;
+
+				draw_time_at_top(format_mins_secs(c), col);
+
+				return;
+			}
+		};
+
+		if (prediction.play_unpredictable) {
+			draw_scoreboard();
+			draw_money_and_awards();
+			draw_knockouts();
+
+			if (now_is_warmup) {
+				draw_warmup_welcome();
 			}
 			else {
-				draw_warmup_indicator(colored("The match has begun", yellow));
+				warmup.requested.clear();
+				warmup.current.clear();
 			}
 
-			return;
+			draw_important_match_event();
 		}
 
-		if (const auto freeze_left = typed_mode.get_freeze_seconds_left(mode_input); freeze_left > 0.f) {
-			const auto c = std::ceil(freeze_left);
-			const auto col = c <= 10.f ? red : white;
+		if (prediction.play_predictable) {
+			if (draw_game_commencing()) {
+				return;
+			}
 
-			play_tick_if_soon(c, 3.f, false);
-			draw_time_at_top(format_mins_secs(c), col);
+			if (now_is_warmup) {
+				draw_warmup_timer();
+			}
+			else {
+				warmup.requested.clear();
+				warmup.current.clear();
 
-			return;
+				draw_match_timers();
+			}
 		}
-
-		if (const auto critical_left = typed_mode.get_critical_seconds_left(mode_input); critical_left > 0.f) {
-			const auto c = std::ceil(critical_left);
-			const auto col = red;
-
-			draw_time_at_top(format_mins_secs(c), col);
-
-			return;
-		}
-
-		if (const auto time_left = std::ceil(typed_mode.get_round_seconds_left(mode_input)); time_left > 0.f) {
-			const auto c = std::ceil(time_left);
-			const auto col = time_left <= 10.f ? red : white;
-
-			draw_time_at_top(format_mins_secs(c), col);
-
-			return;
-		}
-
-		/* If the code reaches here, it's probably the round end delay, so draw no timer. */
 	}
 	else {
 		(void)typed_mode;
@@ -659,14 +700,16 @@ template void arena_gui_state::draw_mode_gui(
 	const draw_setup_gui_input&,
 	const draw_mode_gui_input&,
 	const test_mode&, 
-	const test_mode::const_input&
+	const test_mode::const_input&,
+	prediction_input
 ) const;
 
 template void arena_gui_state::draw_mode_gui(
 	const draw_setup_gui_input&,
 	const draw_mode_gui_input&,
 	const bomb_mode&, 
-	const bomb_mode::const_input&
+	const bomb_mode::const_input&,
+	prediction_input
 ) const;
 
 template mode_player_entropy arena_gui_state::perform_imgui(

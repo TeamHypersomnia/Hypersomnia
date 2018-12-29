@@ -453,3 +453,33 @@ augs::path_type client_setup::get_unofficial_content_dir() const {
 	return paths.folder_path;
 }
 
+void client_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
+	const auto& self = *this;
+
+	if (!self.is_gameplay_on()) {
+		return;
+	}
+
+	const auto game_screen_top = 0.f;
+
+	const auto draw_mode_in = draw_mode_gui_input { 
+		game_screen_top,
+		self.get_local_player_id(), 
+		in.images_in_atlas,
+		in.config
+	};
+
+	// TODO: When spectating, draw everything through referential arena.
+
+	self.get_arena_handle(client_arena_type::REFERENTIAL).on_mode_with_input(
+		[&](const auto& typed_mode, const auto& mode_input) {
+			arena_gui.draw_mode_gui(in, draw_mode_in, typed_mode, mode_input, prediction_input::referential(self.get_viewed_character()));
+		}
+	);
+
+	self.get_arena_handle(client_arena_type::PREDICTED).on_mode_with_input(
+		[&](const auto& typed_mode, const auto& mode_input) {
+			arena_gui.draw_mode_gui(in, draw_mode_in, typed_mode, mode_input, prediction_input::predicted(self.get_viewed_character()));
+		}
+	);
+}

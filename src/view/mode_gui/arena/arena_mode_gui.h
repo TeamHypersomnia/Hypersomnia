@@ -12,6 +12,7 @@
 
 #include "augs/gui/formatted_string.h"
 #include "augs/misc/randomization.h"
+#include "game/detail/view_input/predictability_info.h"
 
 #include "game/modes/mode_entropy.h"
 
@@ -47,7 +48,9 @@ struct arena_gui_state {
 		const draw_mode_gui_input&,
 
 		const M& mode, 
-		const typename M::const_input&
+		const typename M::const_input&,
+
+		prediction_input = prediction_input::offline()
 	) const;
 
 	bool requires_cursor() const;

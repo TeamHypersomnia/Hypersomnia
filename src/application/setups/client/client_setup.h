@@ -439,4 +439,5 @@ public:
 	setup_escape_result escape();
 
 	void update_stats(network_info&) const;
+	void draw_custom_gui(const draw_setup_gui_input& in) const;
 };
