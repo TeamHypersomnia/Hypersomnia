@@ -5,6 +5,7 @@
 #include "augs/templates/unfold.h"
 #include "augs/templates/folded_finders.h"
 #include "augs/templates/container_templates.h"
+#include "augs/templates/remove_cref.h"
 
 namespace augs {
 	struct introspection_access;
@@ -28,10 +29,12 @@ namespace augs {
 		}
 
 	public:
+
 		template <class T>
-		void post(const T& message_object) {
-			check_valid<T>();
-			get_queue<T>().push_back(message_object);
+		void post(T&& message_object) {
+			using M = remove_cref<T>;
+			check_valid<M>();
+			get_queue<M>().emplace_back(std::forward<T>(message_object));
 		}
 
 		template <class T>

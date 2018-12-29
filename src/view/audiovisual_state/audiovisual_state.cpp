@@ -155,7 +155,6 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 	//reserve_caches_for_entities(cosm.get_solvable().get_entity_pool().capacity());
 
 	const auto& healths = step.get_queue<messages::health_event>();
-	const auto& new_thunders = step.get_queue<messages::thunder_effect>();
 	
 	const auto& new_interpolation_corrections = step.get_queue<messages::interpolation_correction_request>();
 	auto& interp = get<interpolation_system>();
@@ -194,8 +193,6 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 
 	auto& rng = get_rng();
 
-	auto& thunders = get<thunder_system>();
-	auto& exploding_rings = get<exploding_ring_system>();
 	auto& flying_numbers = get<flying_number_indicator_system>();
 	auto& highlights = get<pure_color_highlight_system>();
 	auto& particles = get<particles_simulation_system>();
@@ -319,160 +316,20 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 
 			highlights.add(new_highlight);
 		}
-
-		if (h.target == messages::health_event::target_type::HEALTH) {
-			if (h.effective_amount > 0) {
-				const auto base_radius = destroyed ? 80.f : h.effective_amount * 1.5f;
-
-				{
-					exploding_ring_input ring;
-
-					ring.outer_radius_start_value = base_radius / 1.5f;
-					ring.outer_radius_end_value = base_radius / 3.f;
-
-					ring.inner_radius_start_value = base_radius / 2.5f;
-					ring.inner_radius_end_value = base_radius / 3.f;
-
-					ring.emit_particles_on_ring = false;
-
-					ring.maximum_duration_seconds = 0.20f;
-
-					ring.color = red;
-					ring.center = h.point_of_impact;
-
-					exploding_rings.acquire_new_ring(std::move(ring));
-				}
-
-				{
-					exploding_ring_input ring;
-
-					ring.outer_radius_start_value = base_radius / 2.f;
-					ring.outer_radius_end_value = base_radius;
-
-					ring.inner_radius_start_value = 0.f;
-					ring.inner_radius_end_value = base_radius;
-
-					ring.emit_particles_on_ring = false;
-
-					ring.maximum_duration_seconds = 0.20f;
-
-					ring.color = red;
-					ring.center = h.point_of_impact;
-					
-					exploding_rings.acquire_new_ring(std::move(ring));
-				}
-
-				{
-					thunder_input th;
-
-					th.delay_between_branches_ms = { 5.f, 17.f };
-					th.max_branch_lifetime_ms = { 30.f, 55.f };
-					th.branch_length = { 10.f, 60.f };
-
-					th.max_all_spawned_branches = static_cast<unsigned>(h.effective_amount);
-					++th.max_all_spawned_branches;
-					th.max_branch_children = 3;
-
-					th.first_branch_root = h.point_of_impact;
-					th.first_branch_root.rotation = (-h.impact_velocity).degrees();
-					th.branch_angle_spread = 60.f;
-
-					th.color = white;
-
-					thunders.add(rng, th);
-				}
-			}
-		}
-		else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
-			if (h.effective_amount > 0) {
-				const auto base_radius = destroyed ? 80.f : h.effective_amount * 2.f;
-
-				{
-					exploding_ring_input ring;
-
-					ring.outer_radius_start_value = base_radius / 1.5f;
-					ring.outer_radius_end_value = base_radius / 3.f;
-
-					ring.inner_radius_start_value = base_radius / 2.5f;
-					ring.inner_radius_end_value = base_radius / 3.f;
-
-					ring.emit_particles_on_ring = false;
-
-					ring.maximum_duration_seconds = 0.20f;
-
-					ring.color = cyan;
-					ring.center = h.point_of_impact;
-
-					exploding_rings.acquire_new_ring(std::move(ring));
-				}
-
-				{
-					exploding_ring_input ring;
-
-					ring.outer_radius_start_value = base_radius / 2;
-					ring.outer_radius_end_value = base_radius;
-
-					ring.inner_radius_start_value = 0.f;
-					ring.inner_radius_end_value = base_radius;
-
-					ring.emit_particles_on_ring = false;
-
-					ring.maximum_duration_seconds = 0.20f;
-
-					ring.color = turquoise;
-					ring.center = h.point_of_impact;
-
-					exploding_rings.acquire_new_ring(std::move(ring));
-				}
-			}
-		}
-		else if (h.target == messages::health_event::target_type::CONSCIOUSNESS) {
-			if (h.effective_amount > 0) {
-				const auto base_radius = destroyed ? 80.f : h.effective_amount * 2.f;
-				{
-					exploding_ring_input ring;
-
-					ring.outer_radius_start_value = base_radius / 1.5f;
-					ring.outer_radius_end_value = base_radius / 3.f;
-
-					ring.inner_radius_start_value = base_radius / 2.5f;
-					ring.inner_radius_end_value = base_radius / 3.f;
-
-					ring.emit_particles_on_ring = false;
-
-					ring.maximum_duration_seconds = 0.20f;
-
-					ring.color = yellow;
-					ring.center = h.point_of_impact;
-
-					exploding_rings.acquire_new_ring(std::move(ring));
-				}
-
-				{
-					exploding_ring_input ring;
-
-					ring.outer_radius_start_value = base_radius / 2.f;
-					ring.outer_radius_end_value = base_radius;
-
-					ring.inner_radius_start_value = 0.f;
-					ring.inner_radius_end_value = base_radius;
-
-					ring.emit_particles_on_ring = false;
-
-					ring.maximum_duration_seconds = 0.20f;
-
-					ring.color = orange;
-					ring.center = h.point_of_impact;
-
-					exploding_rings.acquire_new_ring(std::move(ring));
-				}
-			}
-		}
 	}
 
-	for (const auto& t : new_thunders) {
-		thunders.add(rng, t);
+	{
+		const auto& new_thunders = step.get_queue<messages::thunder_effect>();
+		auto& thunders = get<thunder_system>();
+
+		for (const auto& t : new_thunders) {
+			thunders.add(rng, t);
+		}
 	}
 	
-	exploding_rings.acquire_new_rings(step.get_queue<messages::exploding_ring_effect>());
+	{
+		const auto& new_rings = step.get_queue<messages::exploding_ring_effect>();
+		auto& exploding_rings = get<exploding_ring_system>();
+		exploding_rings.acquire_new_rings(new_rings);
+	}
 }

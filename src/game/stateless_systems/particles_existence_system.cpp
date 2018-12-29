@@ -16,6 +16,8 @@
 #include "game/messages/health_event.h"
 #include "game/messages/exhausted_cast_message.h"
 #include "game/messages/exploding_ring_effect.h"
+#include "game/messages/exploding_ring_effect.h"
+#include "game/messages/thunder_effect.h"
 
 #include "game/stateless_systems/particles_existence_system.h"
 #include "game/cosmos/for_each_entity.h"
@@ -176,7 +178,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 					ring.color = effect.modifier.colorize;
 					ring.center = impact_transform.pos;
 
-					step.post_message(msg);
+					step.post_message(std::move(msg));
 				}
 			};
 
@@ -225,7 +227,9 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 	for (const auto& h : healths) {
 		const auto subject = cosm[h.subject];
 
-		auto predictability = always_predictable_v;
+		const bool destroyed = h.special_result != messages::health_event::result_type::NONE;
+
+		auto predictability = destroyed ? never_predictable_v : always_predictable_v;
 
 		if (h.target == messages::health_event::target_type::HEALTH) {
 			const auto& sentience = subject.get<invariants::sentience>();
@@ -233,11 +237,10 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 			if (h.effective_amount > 0) {
 				auto effect = sentience.health_decrease_particles;
 
-				if (h.special_result == messages::health_event::result_type::DEATH) {
+				if (destroyed) {
 					effect.modifier.scale_amounts = 0.6f;
 					effect.modifier.scale_lifetimes = 1.25f;
 					effect.modifier.colorize = red;
-					predictability = never_predictable_v;
 				}
 				else {
 					effect.modifier.colorize = red;
@@ -263,6 +266,170 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 					start_in,
 					predictability
 				);
+			}
+		}
+
+		auto make_ring_input = [predictability]() {
+			return messages::exploding_ring_effect(predictability);
+		};
+
+		auto make_thunder_input = [predictability]() {
+			return messages::thunder_effect(predictability);
+		};
+
+		if (h.target == messages::health_event::target_type::HEALTH) {
+			if (h.effective_amount > 0) {
+				const auto base_radius = destroyed ? 80.f : h.effective_amount * 1.5f;
+
+				{
+					auto msg = make_ring_input();
+					auto& ring = msg.payload;
+
+					ring.outer_radius_start_value = base_radius / 1.5f;
+					ring.outer_radius_end_value = base_radius / 3.f;
+
+					ring.inner_radius_start_value = base_radius / 2.5f;
+					ring.inner_radius_end_value = base_radius / 3.f;
+
+					ring.emit_particles_on_ring = false;
+
+					ring.maximum_duration_seconds = 0.20f;
+
+					ring.color = red;
+					ring.center = h.point_of_impact;
+
+					step.post_message(std::move(msg));
+				}
+
+				{
+					auto msg = make_ring_input();
+					auto& ring = msg.payload;
+
+					ring.outer_radius_start_value = base_radius / 2.f;
+					ring.outer_radius_end_value = base_radius;
+
+					ring.inner_radius_start_value = 0.f;
+					ring.inner_radius_end_value = base_radius;
+
+					ring.emit_particles_on_ring = false;
+
+					ring.maximum_duration_seconds = 0.20f;
+
+					ring.color = red;
+					ring.center = h.point_of_impact;
+					
+					step.post_message(std::move(msg));
+				}
+
+				{
+					auto msg = make_thunder_input();
+					auto& th = msg.payload;
+
+					th.delay_between_branches_ms = { 5.f, 17.f };
+					th.max_branch_lifetime_ms = { 30.f, 55.f };
+					th.branch_length = { 10.f, 60.f };
+
+					th.max_all_spawned_branches = static_cast<unsigned>(h.effective_amount);
+					++th.max_all_spawned_branches;
+					th.max_branch_children = 3;
+
+					th.first_branch_root = h.point_of_impact;
+					th.first_branch_root.rotation = (-h.impact_velocity).degrees();
+					th.branch_angle_spread = 60.f;
+
+					th.color = white;
+
+					step.post_message(std::move(msg));
+				}
+			}
+		}
+		else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
+			if (h.effective_amount > 0) {
+				const auto base_radius = destroyed ? 80.f : h.effective_amount * 2.f;
+
+				{
+					auto msg = make_ring_input();
+					auto& ring = msg.payload;
+
+					ring.outer_radius_start_value = base_radius / 1.5f;
+					ring.outer_radius_end_value = base_radius / 3.f;
+
+					ring.inner_radius_start_value = base_radius / 2.5f;
+					ring.inner_radius_end_value = base_radius / 3.f;
+
+					ring.emit_particles_on_ring = false;
+
+					ring.maximum_duration_seconds = 0.20f;
+
+					ring.color = cyan;
+					ring.center = h.point_of_impact;
+
+					step.post_message(std::move(msg));
+				}
+
+				{
+					auto msg = make_ring_input();
+					auto& ring = msg.payload;
+
+					ring.outer_radius_start_value = base_radius / 2;
+					ring.outer_radius_end_value = base_radius;
+
+					ring.inner_radius_start_value = 0.f;
+					ring.inner_radius_end_value = base_radius;
+
+					ring.emit_particles_on_ring = false;
+
+					ring.maximum_duration_seconds = 0.20f;
+
+					ring.color = turquoise;
+					ring.center = h.point_of_impact;
+
+					step.post_message(std::move(msg));
+				}
+			}
+		}
+		else if (h.target == messages::health_event::target_type::CONSCIOUSNESS) {
+			if (h.effective_amount > 0) {
+				const auto base_radius = destroyed ? 80.f : h.effective_amount * 2.f;
+				{
+					auto msg = make_ring_input();
+					auto& ring = msg.payload;
+
+					ring.outer_radius_start_value = base_radius / 1.5f;
+					ring.outer_radius_end_value = base_radius / 3.f;
+
+					ring.inner_radius_start_value = base_radius / 2.5f;
+					ring.inner_radius_end_value = base_radius / 3.f;
+
+					ring.emit_particles_on_ring = false;
+
+					ring.maximum_duration_seconds = 0.20f;
+
+					ring.color = yellow;
+					ring.center = h.point_of_impact;
+
+					step.post_message(std::move(msg));
+				}
+
+				{
+					auto msg = make_ring_input();
+					auto& ring = msg.payload;
+
+					ring.outer_radius_start_value = base_radius / 2.f;
+					ring.outer_radius_end_value = base_radius;
+
+					ring.inner_radius_start_value = 0.f;
+					ring.inner_radius_end_value = base_radius;
+
+					ring.emit_particles_on_ring = false;
+
+					ring.maximum_duration_seconds = 0.20f;
+
+					ring.color = orange;
+					ring.center = h.point_of_impact;
+
+					step.post_message(std::move(msg));
+				}
 			}
 		}
 	}

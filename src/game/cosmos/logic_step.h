@@ -82,8 +82,8 @@ public:
 	}
 
 	template <class T>
-	void post_message(const T& msg) const {
-		transient.messages.post(msg);
+	void post_message(T&& msg) const {
+		transient.messages.post(std::forward<T>(msg));
 	}
 
 	template <class T>

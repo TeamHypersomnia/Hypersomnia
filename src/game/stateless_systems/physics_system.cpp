@@ -14,7 +14,7 @@ void physics_system::post_and_clear_accumulated_collision_messages(const logic_s
 	auto& cosm = step.get_cosmos();
 	auto& physics = cosm.get_solvable_inferred({}).physics;
 	
-	step.post_message(physics.accumulated_messages);
+	step.post_messages(physics.accumulated_messages);
 	physics.accumulated_messages.clear();
 }
 
