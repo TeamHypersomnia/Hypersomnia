@@ -155,7 +155,7 @@ struct fuse_logic_provider {
 		fuse_def.started_defusing_sound.start(
 			step,
 			sound_effect_start_input::fire_and_forget(fused_transform).set_listener(character_now_defusing),
-			predictable_only_by(holder)
+			predictable_only_by(character_now_defusing)
 		);
 	}
 

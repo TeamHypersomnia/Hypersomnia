@@ -228,10 +228,16 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 	}
 
 	for (const auto& h : healths) {
-		flying_number_indicator_system::number::input vn;
+		const bool destroyed = h.special_result != messages::health_event::result_type::NONE;
 
-		vn.impact_velocity = h.impact_velocity;
-		vn.maximum_duration_seconds = 0.7f;
+		auto make_vn_input = [&]() {
+			flying_number_indicator_system::number::input vn;
+
+			vn.impact_velocity = h.impact_velocity;
+			vn.maximum_duration_seconds = 0.7f;
+
+			return vn;
+		};
 
 		rgba number_col;
 		rgba highlight_col;
@@ -241,11 +247,40 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 				number_col = red;
 				highlight_col = white;
 
-				const bool destroyed = h.special_result == messages::health_event::result_type::DEATH;
-
 				if (destroyed) {
+					auto vn = make_vn_input();
 					vn.text = "Death";
-					vn.color = number_col;
+					vn.color = red;
+
+					if (const auto subject = cosm[h.subject]) {
+						if (const auto transform = subject.find_logic_transform()) {
+							vn.pos = transform->pos;
+							flying_numbers.add(vn);
+						}
+					}
+				}
+			}
+			else {
+				number_col = green;
+				highlight_col = green;
+			}
+		}
+		else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
+			if (h.effective_amount > 0) {
+				number_col = turquoise;
+				highlight_col = turquoise;
+			}
+			else {
+				number_col = cyan;
+				highlight_col = cyan;
+			}
+		}
+		else if (h.target == messages::health_event::target_type::CONSCIOUSNESS) {
+			if (h.effective_amount > 0) {
+				if (destroyed) {
+					auto vn = make_vn_input();
+					vn.text = "Unconscious";
+					vn.color = orange;
 
 					if (const auto subject = cosm[h.subject]) {
 						if (const auto transform = subject.find_logic_transform()) {
@@ -255,7 +290,40 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 					}
 				}
 
+				number_col = orange;
+				highlight_col = orange;
+			}
+			else {
+				number_col = yellow;
+				highlight_col = yellow;
+			}
+		}
+
+		if (!augs::is_epsilon(h.effective_amount)) {
+			const auto number_value = static_cast<int>(h.effective_amount);
+
+			auto vn = make_vn_input();
+			vn.text = std::to_string(std::abs(number_value ? number_value : 1));
+			vn.color = number_col;
+			vn.pos = h.point_of_impact;
+
+			flying_numbers.add(vn);
+
+			pure_color_highlight_system::highlight::input new_highlight;
+
+			new_highlight.target = h.subject;
+			new_highlight.starting_alpha_ratio = 1.f;// std::min(1.f, h.ratio_effective_to_maximum * 5);
+
+			new_highlight.maximum_duration_seconds = 0.10f;
+			new_highlight.color = highlight_col;
+
+			highlights.add(new_highlight);
+		}
+
+		if (h.target == messages::health_event::target_type::HEALTH) {
+			if (h.effective_amount > 0) {
 				const auto base_radius = destroyed ? 80.f : h.effective_amount * 1.5f;
+
 				{
 					exploding_ring_input ring;
 
@@ -309,24 +377,16 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 					th.first_branch_root.rotation = (-h.impact_velocity).degrees();
 					th.branch_angle_spread = 60.f;
 
-					th.color = highlight_col;
+					th.color = white;
 
 					thunders.add(rng, th);
 				}
 			}
-			else {
-				number_col = green;
-				highlight_col = green;
-			}
 		}
 		else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
-			const bool destroyed = h.special_result == messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION;
-
 			if (h.effective_amount > 0) {
-				number_col = turquoise;
-				highlight_col = turquoise;
-
 				const auto base_radius = destroyed ? 80.f : h.effective_amount * 2.f;
+
 				{
 					exploding_ring_input ring;
 
@@ -365,30 +425,9 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 					exploding_rings.acquire_new_ring(std::move(ring));
 				}
 			}
-			else {
-				number_col = cyan;
-				highlight_col = cyan;
-			}
 		}
 		else if (h.target == messages::health_event::target_type::CONSCIOUSNESS) {
-			const bool destroyed = h.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS;
-
 			if (h.effective_amount > 0) {
-				number_col = orange;
-				highlight_col = orange;
-
-				if (destroyed) {
-					vn.text = "Unconscious";
-					vn.color = number_col;
-
-					if (const auto subject = cosm[h.subject]) {
-						if (const auto transform = subject.find_logic_transform()) {
-							vn.pos = transform->pos;
-							flying_numbers.add(vn);
-						}
-					}
-				}
-
 				const auto base_radius = destroyed ? 80.f : h.effective_amount * 2.f;
 				{
 					exploding_ring_input ring;
@@ -428,34 +467,6 @@ void audiovisual_state::standard_post_solve(const const_logic_step step, const a
 					exploding_rings.acquire_new_ring(std::move(ring));
 				}
 			}
-			else {
-				number_col = yellow;
-				highlight_col = yellow;
-			}
-		}
-		else {
-			continue;
-		}
-
-		if (!augs::is_epsilon(h.effective_amount)) {
-			const auto number_value = static_cast<int>(h.effective_amount);
-
-			vn.text = std::to_string(std::abs(number_value ? number_value : 1));
-			vn.color = number_col;
-
-			vn.pos = h.point_of_impact;
-
-			flying_numbers.add(vn);
-
-			pure_color_highlight_system::highlight::input new_highlight;
-
-			new_highlight.target = h.subject;
-			new_highlight.starting_alpha_ratio = 1.f;// std::min(1.f, h.ratio_effective_to_maximum * 5);
-
-			new_highlight.maximum_duration_seconds = 0.10f;
-			new_highlight.color = highlight_col;
-
-			highlights.add(new_highlight);
 		}
 	}
 
