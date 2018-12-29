@@ -173,14 +173,21 @@ public:
 		const client_advance_input& in,
 		const Callbacks& callbacks
 	) {
+		const auto referential_solve_settings = [&]() {
+			solve_settings out;
+			out.effect_prediction = in.lag_compensation.effect_prediction;
+			return out;
+		}();
+
 		const auto predicted_solve_settings = [&]() {
-			if (in.lag_compensation.always_confirm_played_character_death) {
-				solve_settings settings;
-				settings.disable_knockouts = get_viewed_character();
-				return settings;
+			solve_settings out;
+			out.effect_prediction = in.lag_compensation.effect_prediction;
+
+			if (in.lag_compensation.confirm_controlled_character_death) {
+				out.disable_knockouts = get_viewed_character();
 			}
 
-			return solve_settings();
+			return out;
 		}();
 
 		auto schedule_reprediction_if_inconsistent = [&](const auto result) {
@@ -317,7 +324,7 @@ public:
 					auto scope = measure_scope(performance.unpacking_remote_steps);
 
 					auto advance_referential = [&](const auto& entropy) {
-						referential_arena.advance(entropy, referential_callbacks, solve_settings());
+						referential_arena.advance(entropy, referential_callbacks, referential_solve_settings);
 					};
 
 					auto advance_repredicted = [&](const auto& entropy) {

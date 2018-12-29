@@ -220,6 +220,10 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			continue;
 		}
 
+		if (step.get_settings().effect_prediction.predict_death_sounds) {
+			predictability = always_predictable_v;
+		}
+
 		effect.start(
 			step,
 			sound_effect_start_input::at_listener(subject),

@@ -231,6 +231,10 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 
 		auto predictability = destroyed ? never_predictable_v : always_predictable_v;
 
+		if (step.get_settings().effect_prediction.predict_death_particles) {
+			predictability = always_predictable_v;
+		}
+
 		if (h.target == messages::health_event::target_type::HEALTH) {
 			const auto& sentience = subject.get<invariants::sentience>();
 

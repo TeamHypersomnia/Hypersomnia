@@ -383,7 +383,14 @@ void settings_gui_state::perform(
 
 					{
 						auto& scope_cfg = config.lag_compensation;
-						revertable_checkbox(SCOPE_CFG_NVP(always_confirm_played_character_death));
+						revertable_checkbox(SCOPE_CFG_NVP(confirm_controlled_character_death));
+
+						augs::introspect(
+							[&](const std::string& label, auto& field){
+								revertable_checkbox(format_field_name(label), field);
+							},
+							scope_cfg.effect_prediction
+						); 
 					}
 				}
 

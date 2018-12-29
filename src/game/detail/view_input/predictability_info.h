@@ -39,6 +39,13 @@ public:
 	}
 };
 
+struct effect_prediction_settings {
+	// GEN INTROSPECTOR struct effect_prediction_settings
+	bool predict_death_particles = false;
+	bool predict_death_sounds = false;
+	// END GEN INTROSPECTOR
+};
+
 struct predictability_info {
 	predictability_type type = predictability_type::ALWAYS;
 	entity_id predicting_subject;

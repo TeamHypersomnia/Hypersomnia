@@ -79,7 +79,12 @@ return {
     misprediction_smoothing_multiplier = 1.2000000476837158
   },
   lag_compensation = {
-    always_confirm_played_character_death = true
+    confirm_controlled_character_death = true,
+
+	effect_prediction = {
+	  predict_death_particles = true,
+	  predict_death_sounds = false
+	}
   },
   camera = {
     additional_position_smoothing = {
