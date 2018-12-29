@@ -69,6 +69,8 @@ public:
 	std::vector<received_entropy_type> incoming_entropies;
 	std::vector<simulated_entropy_type> predicted_entropies;
 
+	bool schedule_reprediction = false;
+
 	void clear() {
 		incoming_contexts.clear();
 		incoming_entropies.clear();
@@ -118,6 +120,13 @@ public:
 		}
 
 		auto& repredict = result.should_repredict;
+
+		if (schedule_reprediction) {
+			if (!entropies.empty()) {
+				repredict = true;
+				schedule_reprediction = false;
+			}
+		}
 
 		{
 			auto p_i = static_cast<std::size_t>(0);

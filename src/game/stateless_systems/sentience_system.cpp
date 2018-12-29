@@ -313,6 +313,18 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 		sort_range(owners);
 	};
 
+	auto allow_special_result = [&]() {
+		const auto disable_knockouts = step.get_settings().disable_knockouts;
+
+		if (disable_knockouts.is_set() && subject && disable_knockouts == subject) {
+			step.result.state_inconsistent = true;
+
+			return false;
+		}
+
+		return true;
+	};
+
 	switch (h.target) {
 		case messages::health_event::target_type::HEALTH: {
 			const auto amount = h.effective_amount;
@@ -331,11 +343,18 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 			const auto consciousness_ratio = consciousness.get_ratio();
 			const auto health_ratio = health.get_ratio();
 
+			const auto prev_consciousness = consciousness.value;
 			consciousness.value = static_cast<meter_value_type>(std::min(consciousness_ratio, health_ratio) * consciousness.maximum);
 
 			if (!health.is_positive()) {
-				h.special_result = messages::health_event::result_type::DEATH;
-				h.was_conscious = was_conscious;
+				if (allow_special_result()) {
+					h.special_result = messages::health_event::result_type::DEATH;
+					h.was_conscious = was_conscious;
+				}
+				else {
+					/* Assume previous consciousness so that the running ability is unimpaired */
+					consciousness.value = prev_consciousness;
+				}
 			}
 
 			break;
@@ -347,7 +366,9 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 			consciousness.value -= amount;
 
 			if (!consciousness.is_positive()) {
-				h.special_result = messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS;
+				if (allow_special_result()) {
+					h.special_result = messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS;
+				}
 			}
 
 			break;

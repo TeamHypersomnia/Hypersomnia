@@ -177,7 +177,7 @@ public:
 
 	template <class... Args>
 	decltype(auto) advance(Args&&... args) const {
-		on_mode_with_input(
+		return on_mode_with_input(
 			[&](auto& typed_mode, const auto& in) -> decltype(auto) {
 				return typed_mode.advance(in, std::forward<Args>(args)...);
 			}

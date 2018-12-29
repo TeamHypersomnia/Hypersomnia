@@ -75,6 +75,12 @@ return {
 	sync_sounds_longer_than_secs = 5,
 	max_divergence_before_sync_secs = 1
   },
+  simulation_receiver = {
+    misprediction_smoothing_multiplier = 1.2000000476837158
+  },
+  lag_compensation = {
+    always_confirm_played_character_death = true
+  },
   camera = {
     additional_position_smoothing = {
       average_factor = 0.5,
@@ -398,9 +404,6 @@ return {
   test_scene = {
     create_minimal_test_scene = false,
     scene_tickrate = 128
-  },
-  simulation_receiver = {
-    misprediction_smoothing_multiplier = 1.2000000476837158
   },
   unit_tests = {
     break_on_failure = true,

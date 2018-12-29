@@ -27,6 +27,7 @@ class interpolation_system;
 class past_infection_system;
 struct network_profiler;
 struct network_info;
+struct lag_compensation_settings;
 
 struct server_advance_input {
 	const vec2i screen_size;
@@ -41,6 +42,7 @@ struct client_advance_input {
 	const input_settings& settings;
 
 	const simulation_receiver_settings& simulation_receiver;
+	const lag_compensation_settings& lag_compensation;
 
 	network_profiler& network_performance;
 	network_info& network_stats;

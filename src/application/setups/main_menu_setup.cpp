@@ -172,7 +172,8 @@ main_menu_setup::main_menu_setup(
 			mode.advance(
 				{ ruleset, cosm },
 				mode_entropy(),
-				solver_callbacks()
+				solver_callbacks(),
+				solve_settings()
 			);
 		}
 	}

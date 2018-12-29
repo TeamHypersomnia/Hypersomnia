@@ -39,6 +39,7 @@
 #include "application/setups/server/server_vars.h"
 #include "application/setups/client/client_start_input.h"
 #include "application/setups/client/client_vars.h"
+#include "application/setups/client/lag_compensation_settings.h"
 #include "application/app_intent_type.h"
 #include "application/network/simulation_receiver_settings.h"
 
@@ -100,6 +101,7 @@ struct config_lua_table {
 	interpolation_settings interpolation;
 	sound_system_settings sound;
 	simulation_receiver_settings simulation_receiver;
+	lag_compensation_settings lag_compensation;
 	content_regeneration_settings content_regeneration;
 	main_menu_settings main_menu;
 

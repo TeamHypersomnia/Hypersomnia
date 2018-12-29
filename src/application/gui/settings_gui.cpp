@@ -375,6 +375,18 @@ void settings_gui_state::perform(
 			case settings_pane::CLIENT: {
 				auto& scope_cfg = config.client;
 
+				if (auto node = scoped_tree_node("Lag compensation techniques")) {
+					{
+						auto& scope_cfg = config.simulation_receiver;
+						revertable_slider(SCOPE_CFG_NVP(misprediction_smoothing_multiplier), 0.f, 3.f);
+					}
+
+					{
+						auto& scope_cfg = config.lag_compensation;
+						revertable_checkbox(SCOPE_CFG_NVP(always_confirm_played_character_death));
+					}
+				}
+
 				if (auto node = scoped_tree_node("Requested network settings")) {
 					auto& scope_cfg = config.client.net.jitter;
 

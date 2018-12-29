@@ -876,6 +876,7 @@ int work(const int argc, const char* const * const argv) try {
 						window.get_screen_size(), 
 						viewing_config.input, 
 						viewing_config.simulation_receiver, 
+						viewing_config.lag_compensation, 
 						network_performance,
 						network_stats,
 						get_audiovisuals().get<interpolation_system>(),

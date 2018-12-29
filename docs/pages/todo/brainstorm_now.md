@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- If we detect inconsistency of state
+
 - We were considering whether to mark the bomb as never predictable,
 	- however, the worst that could happen, is that we mispredict that we are dead due to somebody shooting us
 		- whereas we are actually alive and we have defused the bomb

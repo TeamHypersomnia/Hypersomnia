@@ -30,6 +30,7 @@
 
 #include "application/network/simulation_receiver.h"
 #include "application/session_profiler.h"
+#include "application/setups/client/lag_compensation_settings.h"
 
 struct config_lua_table;
 
@@ -172,6 +173,22 @@ public:
 		const client_advance_input& in,
 		const Callbacks& callbacks
 	) {
+		const auto predicted_solve_settings = [&]() {
+			if (in.lag_compensation.always_confirm_played_character_death) {
+				solve_settings settings;
+				settings.disable_knockouts = get_viewed_character();
+				return settings;
+			}
+
+			return solve_settings();
+		}();
+
+		auto schedule_reprediction_if_inconsistent = [&](const auto result) {
+			if (result.state_inconsistent) {
+				receiver.schedule_reprediction = true;
+			}
+		};
+
 		auto& performance = in.network_performance;
 
 		const auto current_time = get_current_time();
@@ -309,7 +326,9 @@ public:
 							We only post-solve once for the predicted cosmos, when we actually move forward in time.
 						*/
 
-						predicted_arena.advance(entropy, solver_callbacks(), solve_settings());
+						schedule_reprediction_if_inconsistent(
+							predicted_arena.advance(entropy, solver_callbacks(), predicted_solve_settings)
+						);
 					};
 
 					const auto result = receiver.unpack_deterministic_steps(
@@ -357,7 +376,13 @@ public:
 				}
 
 #if USE_CLIENT_PREDICTION
-				predicted_arena.advance(*new_local_entropy, predicted_callbacks, solve_settings());
+				schedule_reprediction_if_inconsistent(
+					predicted_arena.advance(
+						*new_local_entropy, 
+						predicted_callbacks, 
+						predicted_solve_settings
+					)
+				);
 #else
 				(void)predicted_callbacks;
 				(void)callbacks;

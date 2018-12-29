@@ -12,15 +12,13 @@ void perform_knockout(
 	const vec2 direction,
 	const damage_origin& origin
 ) {
-	if (step.get_settings().disable_knockouts == subject_id) {
-		step.result.state_inconsistent = true;
-
-		return;
-	}
-
 	auto& cosm = step.get_cosmos(); 
 
 	const auto subject = cosm[subject_id];
+
+	if (subject.dead()) {
+		return;
+	}
 
 	subject.dispatch_on_having_all<invariants::sentience>([&](const auto& typed_subject) {
 		auto& sentience = typed_subject.template get<components::sentience>();
