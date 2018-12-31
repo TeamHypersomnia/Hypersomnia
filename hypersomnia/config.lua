@@ -467,7 +467,7 @@ return {
 	admin_nickname = "GameMaster",
 
 	kick_if_inactive_for_secs = 60,
-	time_limit_to_enter_game_since_connection = 10,
+	time_limit_to_enter_game_since_connection = 15,
 
 	send_updates_once_every_tick = 1,
 

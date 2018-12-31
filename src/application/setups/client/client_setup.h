@@ -83,7 +83,7 @@ class client_setup :
 	net_time_t client_time = 0.0;
 	net_time_t when_initiated_connection = 0.0;
 
-	double default_inv_tickrate = 1 / 60.0;
+	double default_inv_tickrate = 1 / 128.0;
 
 	std::string last_disconnect_reason;
 

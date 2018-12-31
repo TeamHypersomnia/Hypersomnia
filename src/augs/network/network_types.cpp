@@ -1,12 +1,34 @@
+#include "3rdparty/yojimbo/yojimbo.h"
 #include "augs/network/network_types.h"
+#include "augs/log.h"
+#include <cstdio>
+#include <stdarg.h> 
 
 bool InitializeYojimbo();
 void ShutdownYojimbo();
 
+int custom_print(const char* Format,...)
+{
+// the “…” indicates that this function accepts a variable number of arguments
+char Buffer[5000]; // you can define your own buffer’s size
+va_list args;
+va_start(args,Format);
+vsprintf(Buffer,Format,args);
+va_end(args);
+// now everything is written on “Buffer” , so it is ready for use with “InGamePrint”
+
+LOG(Buffer);  // finaly print the text
+return 0;
+}
+
 namespace augs {
 	namespace network {
 		bool init() {
-			return InitializeYojimbo();
+			const bool result = InitializeYojimbo();
+
+			//yojimbo_log_level(YOJIMBO_LOG_LEVEL_DEBUG);
+			//yojimbo_set_printf_function(custom_print);
+			return result;
 		}
 
 		bool deinit() {

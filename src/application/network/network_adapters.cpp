@@ -41,6 +41,8 @@ game_connection_config::game_connection_config() {
 		solvable_stream.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
 		solvable_stream.maxBlockSize = 1024 * 1024 * 2;
 		solvable_stream.messageResendTime = 0.f;
+		solvable_stream.messageSendQueueSize = 1024 * 3;
+		solvable_stream.messageReceiveQueueSize = 1024 * 3;
 	}
 
 	{
@@ -48,6 +50,8 @@ game_connection_config::game_connection_config() {
 		client_entropies.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
 		/* these are like, super critical. */
 		client_entropies.messageResendTime = 0.f;
+		client_entropies.messageSendQueueSize = 1024 * 2;
+		client_entropies.messageReceiveQueueSize = 1024 * 2;
 	}
 
 	{

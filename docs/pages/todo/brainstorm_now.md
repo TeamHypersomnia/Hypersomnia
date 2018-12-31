@@ -6,6 +6,62 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Desync issues
+	- Could it be that the predicted cosm is advanced by mistake instead of the referential one?
+	- Perhaps operator= of the physics system inadvertently modifies something of the world which it copies?
+		- The island only ever exists temporally.
+		- Problem: the stack allocator is rewritten. There are possibly dangling addresses.
+	- There is a case where Data and Shuncio were synchronized with each other, but both had non-canonical version of the world, while I had it canonical
+
+- during akimbo, only drop when the G is released, not right away when it is pressed
+	- when G is still held, you can press either LPM or RPM to decide which weapon to drop
+	- if G was released without holding lpm or rpm, drop the most recently wielded item as always
+	- if G is still held while we have only one item left in hands, still allow to drop by pressing either LPM or RPM  
+
+- bug: remove screen resolution advantage
+- 2 seconds longer freeze time
+- left/right hands fire buttons are swapped, hard to decide what to press
+- autoswitch on weapon drop
+- autoswitch on empty ammo
+
+- (Shuncio) some possible crash before start of the next round
+- fix winapi crash on start with hlgrc
+
+- knockouter is dead if someone disconnects after having shot and that bullet kills another player
+- remove ensure false from 174 in server setup
+- autodrop of magazines sometimes doesnt work...
+- could chambering sound be omitted under some occasions?
+- bomb soon explodes theme gets repeated
+
+- more mana, less shield absorption
+	- perhaps only reduce damage instead of absorbing
+	- so we can still cast some things
+- autocast bought spells, especially shield
+- autofill magazines on start of round
+- dont reload when mag is full only to fill the bullet in the chamber
+- dont show bomb planting hud when you are ct
+- balance
+  - ao44 should be explosive
+    - or just burst fire
+  - UWoTA should have less delays and could propel
+  - electric triad should explode on hit
+  - grenades could explode even more in all directions
+  - mostly it is the low velocity that makes weapons underpowered
+  - more mana points at start
+  - less recoil for pro90 and more damage, maybe more velocity
+  - less delay for automatic shotgun, more damaging pellets, higher velocity
+  - dont do live logging for the first time as the performance will be shit 
+
+- bug: after knockout, some weapons remain tied to the player
+	- this only happens in online play
+
+- particles don't get properly predicted on deaths sometimes?
+
+- if the referential post solve determines that the predicted post solve has missed something predictable (e.g. a bullet impact)
+	- we should somehow try to replay it
+
+- increase max predicted from 130 to more 
+
 - We were considering whether to mark the bomb as never predictable,
 	- however, the worst that could happen, is that we mispredict that we are dead due to somebody shooting us
 		- whereas we are actually alive and we have defused the bomb
@@ -18,11 +74,6 @@ summary: That which we are brainstorming at the moment.
 		- This might be important for not exposing tactical information
 	- Predict collisions with items only if they weren't just recently dropped by a remote player
 
-- Desync issues
-	- Could it be that the predicted cosm is advanced by mistake instead of the referential one?
-	- Perhaps operator= of the physics system inadvertently modifies something of the world which it copies?
-		- The island only ever exists temporally.
-		- Problem: the stack allocator is rewritten. There are possibly dangling addresses.
 	
 - fix Common state crash
 
