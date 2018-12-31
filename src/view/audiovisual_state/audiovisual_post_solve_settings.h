@@ -5,5 +5,6 @@ struct audiovisual_post_solve_settings {
 	bool acquire_highlights = true;
 	bool acquire_flying_numbers = true;
 	bool acquire_effect_messages = true;
+	bool notify_gui = true;
 };
 

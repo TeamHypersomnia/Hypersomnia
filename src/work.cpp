@@ -82,14 +82,7 @@ bool log_to_live_file = false;
 */
 
 int work(const int argc, const char* const * const argv) try {
-	if (!augs::exists(LOG_FILES_DIR)) {
-		augs::create_directories(LOG_FILES_DIR);
-
-		log_to_live_file = true;
-
-		LOG("Live log file created at %x", augs::date_time().get_readable());
-		LOG("No %x exists yet, so the game will log to the live file for the first launch.", LOG_FILES_DIR);
-	}
+	augs::create_directories(LOG_FILES_DIR);
 
 	static augs::timer until_first_swap;
 	bool until_first_swap_measured = false;
@@ -139,7 +132,7 @@ int work(const int argc, const char* const * const argv) try {
 	if (config.log_to_live_file) {
 		augs::remove_file(LOG_FILES_DIR "/live_debug.txt");
 
-		log_to_live_file = config.log_to_live_file;
+		log_to_live_file = true;
 
 		LOG("Live log was enabled due to a flag in config.");
 		LOG("Live log file created at %x", augs::date_time().get_readable());
@@ -836,7 +829,9 @@ int work(const int argc, const char* const * const argv) try {
 			});
 		}
 
-		game_gui.standard_post_solve(step);
+		if (settings.notify_gui) {
+			game_gui.standard_post_solve(step);
+		}
 	};
 
 	static auto setup_post_cleanup = [&](const const_logic_step step) {

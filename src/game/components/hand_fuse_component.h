@@ -32,7 +32,7 @@ namespace components {
 namespace invariants {
 	struct hand_fuse {
 		// GEN INTROSPECTOR struct invariants::hand_fuse
-		real32 fuse_delay_ms = 1000.f;
+		real32 fuse_delay_ms = 800.f;
 
 		bool can_only_arm_at_bombsites = false;
 		bool always_release_when_armed = false;

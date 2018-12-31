@@ -23,9 +23,9 @@ void load_test_scene_sentience_properties(
 	{
 		auto& d = std::get<haste>(spells);
 		d.common.cooldown_ms = 5000;
-		d.common.personal_electricity_required = 60;
+		d.common.personal_electricity_required = 110;
 		d.common.associated_color = green_spell_color;
-		d.perk_duration_seconds = 33;
+		d.perk_duration_seconds = 25;
 
 		d.appearance.incantation = "treximo";
 
@@ -57,7 +57,7 @@ void load_test_scene_sentience_properties(
 		);
 
 		d.appearance.icon = to_image_id(test_scene_image_id::SPELL_EXALTATION_ICON);
-		d.basic_healing_amount = 34;
+		d.basic_healing_amount = 150;
 
 		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
 		d.common.cast_sparkles.id = to_particle_effect_id(test_scene_particle_effect_id::CAST_SPARKLES);
@@ -114,7 +114,7 @@ void load_test_scene_sentience_properties(
 		{
 			auto& in = d.explosion;
 
-			in.effective_radius = 250.f;
+			in.effective_radius = 320.f;
 			in.damage.base = 88.f;
 			in.damage.impact_impulse = 150.f;
 			in.damage.impulse_multiplier_against_sentience = 1.f;
@@ -154,7 +154,7 @@ void load_test_scene_sentience_properties(
 	{
 		auto& d = std::get<ultimate_wrath_of_the_aeons>(spells);
 		d.common.cooldown_ms = 2000;
-		d.common.personal_electricity_required = 260;
+		d.common.personal_electricity_required = 200;
 		d.common.associated_color = blue_spell_border;
 
 		d.appearance.incantation = "megalyteri aiones via";
@@ -184,7 +184,7 @@ void load_test_scene_sentience_properties(
 			in.type = adverse_element_type::FORCE;
 
 			{
-				in.effective_radius = 200.f;
+				in.effective_radius = 300.f;
 				in.damage.impact_impulse = 150.f;
 				in.sound.modifier.gain = 1.2f;
 				in.sound.id = to_sound_id(test_scene_sound_id::EXPLOSION);
@@ -197,7 +197,7 @@ void load_test_scene_sentience_properties(
 			}
 			
 			{
-				in.effective_radius = 400.f;
+				in.effective_radius = 450.f;
 				in.damage.impact_impulse = 200.f;
 				in.sound.modifier.gain = 1.0f;
 				in.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
@@ -210,7 +210,7 @@ void load_test_scene_sentience_properties(
 			}
 			
 			{
-				in.effective_radius = 600.f;
+				in.effective_radius = 650.f;
 				in.damage.impact_impulse = 250.f;
 				in.sound.modifier.gain = 1.2f;
 				in.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);

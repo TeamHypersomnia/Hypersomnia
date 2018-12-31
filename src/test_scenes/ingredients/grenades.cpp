@@ -57,7 +57,7 @@ namespace test_flavours {
 
 				fuse.released_image_id = to_image_id(test_scene_image_id::FORCE_GRENADE_RELEASED);
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
-				fuse.additional_release_impulse.linear = 2000.f;
+				fuse.additional_release_impulse.linear = 4000.f;
 
 				meta.set(fuse);
 			}
@@ -72,9 +72,9 @@ namespace test_flavours {
 			{
 				auto& c = explosive.cascade[0];
 				c.flavour_id = to_entity_flavour_id(test_explosion_bodies::SKULL_ROCKET_CASCADE);
-				c.num_spawned = 1;
+				c.num_spawned = 3;
 				c.num_explosions = { 2, 0 };
-				c.initial_speed = { 2000.f, 0.2f };
+				c.initial_speed = { 1300.f, 0.2f };
 			}
 
 			dmg.base = 88.f;
@@ -120,7 +120,7 @@ namespace test_flavours {
 				fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
 				fuse.released_image_id = to_image_id(test_scene_image_id::INTERFERENCE_GRENADE_RELEASED);
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
-				fuse.additional_release_impulse.linear = 2000.f;
+				fuse.additional_release_impulse.linear = 4000.f;
 
 				meta.set(fuse);
 			}
@@ -176,7 +176,7 @@ namespace test_flavours {
 
 				fuse.released_image_id = to_image_id(test_scene_image_id::PED_GRENADE_RELEASED);
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
-				fuse.additional_release_impulse.linear = 2000.f;
+				fuse.additional_release_impulse.linear = 4000.f;
 
 				meta.set(fuse);
 			}
@@ -186,10 +186,10 @@ namespace test_flavours {
 			auto& in = explosive.explosion;
 			auto& dmg = in.damage;
 
-			dmg.base = 88.f;
+			dmg.base = 150.f;
 			in.inner_ring_color = cyan;
 			in.outer_ring_color = turquoise;
-			in.effective_radius = 350.f;
+			in.effective_radius = 500.f;
 			dmg.impact_impulse = 2.f;
 			dmg.impulse_multiplier_against_sentience = 1.f;
 			in.sound.modifier.gain = 2.2f;
@@ -211,7 +211,7 @@ namespace test_flavours {
 			dmg.base = 348.f;
 			in.inner_ring_color = cyan;
 			in.outer_ring_color = white;
-			in.effective_radius = 500.f;
+			in.effective_radius = 600.f;
 			dmg.impact_impulse = 950.f;
 			dmg.impulse_multiplier_against_sentience = 1.f;
 			in.sound.modifier.gain = 2.f;
