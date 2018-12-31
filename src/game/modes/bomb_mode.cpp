@@ -837,9 +837,21 @@ void bomb_mode::count_knockout(const input_type in, const entity_id victim, cons
 	const auto& cosm = in.cosm;
 	const auto& clk = cosm.get_clock();
 	const auto& origin = sentience.knockout_origin;
-	const auto knockouter = origin.get_guilty_of_damaging(cosm[victim]);
+	const auto victim_handle = cosm[victim];
 
-	ensure(knockouter.alive());
+	if (victim_handle.dead()) {
+		return;
+	}
+
+	const auto knockouter = [&]() {
+		if (const auto candidate = origin.get_guilty_of_damaging(victim_handle)) {
+			return candidate;
+		}
+
+		LOG("The knockouter had disconnected before the kill occurred. Counting this a suicide.");
+
+		return victim_handle;
+	}();
 
 	auto assists = sentience.damage_owners;
 
@@ -860,7 +872,7 @@ void bomb_mode::count_knockout(const input_type in, const entity_id victim, cons
 	ko.origin = origin;
 
 	ko.knockouter = lookup(knockouter);
-	ko.victim = lookup(victim);
+	ko.victim = lookup(victim_handle);
 
 	count_knockout(in, ko);
 }

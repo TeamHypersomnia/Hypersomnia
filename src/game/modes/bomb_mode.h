@@ -74,7 +74,7 @@ struct bomb_mode_ruleset {
 	unsigned max_players_per_team = 32;
 	unsigned round_secs = 120;
 	unsigned round_end_secs = 5;
-	unsigned freeze_secs = 7;
+	unsigned freeze_secs = 10;
 	unsigned buy_secs_after_freeze = 10;
 	unsigned warmup_secs = 45;
 	unsigned warmup_respawn_after_ms = 2000;

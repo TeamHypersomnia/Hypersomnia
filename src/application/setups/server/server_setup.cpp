@@ -171,7 +171,6 @@ void server_setup::unset_client(const client_id_type& id) {
 }
 
 void server_setup::disconnect_and_unset(const client_id_type& id) {
-	ensure(false);
 	server->disconnect_client(id);
 	unset_client(id);
 }
