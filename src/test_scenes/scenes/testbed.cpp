@@ -65,7 +65,7 @@ namespace test_scenes {
 		rs.bot_quota = rs.bot_names.size();
 
 		rs.name = "Standard bomb ruleset";
-		rs.economy.initial_money = 1000;
+		rs.economy.initial_money = 2000;
 
 		{
 			auto& resistance = rs.factions[faction_type::RESISTANCE];

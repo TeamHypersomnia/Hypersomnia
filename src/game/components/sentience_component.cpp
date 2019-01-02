@@ -2,11 +2,11 @@
 
 namespace components {
 	bool sentience::is_conscious() const {
-		return get<health_meter_instance>().is_positive() && get<consciousness_meter_instance>().is_positive();
+		return get<health_meter_instance>().is_positive(); //&& get<consciousness_meter_instance>().is_positive();
 	}
 
 	bool sentience::unconscious_but_alive() const {
-		return get<health_meter_instance>().is_positive() && !get<consciousness_meter_instance>().is_positive();
+		return false;//get<health_meter_instance>().is_positive() && !get<consciousness_meter_instance>().is_positive();
 	}
 
 	bool sentience::is_dead() const {

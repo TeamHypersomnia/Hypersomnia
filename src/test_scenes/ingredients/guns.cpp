@@ -1166,7 +1166,7 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("0.40");
+			charge_deposit_def.space_available = to_space_units("0.50");
 			charge_deposit_def.mounting_duration_ms = 700.f;
 			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
@@ -1180,7 +1180,7 @@ namespace test_flavours {
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
 				item.space_occupied_per_charge = to_space_units("0.5");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
-				item.standard_price = 180;
+				item.standard_price = 250;
 				meta.set(item);
 			}
 		}
@@ -1799,7 +1799,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::PLASMA_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {4400.f, 4400.f};
+			gun_def.muzzle_velocity = {4700.f, 4700.f};
 			gun_def.shot_cooldown_ms = 105.f;
 
 			gun_def.shell_angular_velocity = {2.f, 14.f};
@@ -1830,7 +1830,7 @@ namespace test_flavours {
 
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1500.f, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::PLASMA_DRAW);
-			meta.get<invariants::item>().standard_price = 4000;
+			meta.get<invariants::item>().standard_price = 4300;
 			set_chambering_duration_ms(meta, 900.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			only_allow_mag(meta, test_container_items::DATUM_GUN_MAGAZINE);

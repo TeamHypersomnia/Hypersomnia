@@ -244,7 +244,7 @@ void load_test_scene_sentience_properties(
 		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
 		d.common.cast_sparkles.id = to_particle_effect_id(test_scene_particle_effect_id::CAST_SPARKLES);
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
-		d.common.standard_price = static_cast<money_type>(900);
+		d.common.standard_price = static_cast<money_type>(1500);
 	}
 
 	{

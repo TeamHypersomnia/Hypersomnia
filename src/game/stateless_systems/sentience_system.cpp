@@ -257,7 +257,7 @@ static void handle_special_result(const logic_step step, const messages::health_
 	}
 	else if (h.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS) {
 		consciousness.value = 0.f;
-		knockout();
+		//knockout();
 	}
 }
 
@@ -282,7 +282,7 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 	auto& consciousness = sentience.get<consciousness_meter_instance>();
 	auto& personal_electricity = sentience.get<personal_electricity_meter_instance>();
 	const auto& origin = h.origin;
-	const bool was_conscious = consciousness.value > 0.f;
+	const bool was_conscious = health.value > 0.f; //&& consciousness.value > 0.f;
 
 	auto contribute_to_damage = [&](const auto contributed_amount) {
 		const auto inflicting_capability = origin.get_guilty_of_damaging(subject);

@@ -75,19 +75,15 @@ struct fuse_logic_provider {
 		// const auto& explosive = fused_entity.template get<invariants::explosive>();
 
 		const auto total_impulse = [&]() {
-			auto impulse = fuse_def.additional_release_impulse;
-
 			if (const auto capability = holder.template find<invariants::item_slot_transfers>()) {
-				const auto considered_impulse = 
-					fuse.armed_as_secondary_action ? 
-					capability->standard_drop_impulse :
-					capability->standard_throw_impulse
-				;
+				if (fuse.armed_as_secondary_action) {
+					return capability->standard_drop_impulse;
+				}
 
-				impulse = impulse + considered_impulse;
+				return capability->standard_throw_impulse + fuse_def.additional_release_impulse;
 			}
 
-			return impulse;
+			return impulse_mults();
 		}();
 
 		auto request = item_slot_transfer_request::drop(fused_entity, total_impulse);

@@ -30,7 +30,7 @@ struct bomb_mode_faction_rules {
 
 struct bomb_mode_economy_rules {
 	// GEN INTROSPECTOR struct bomb_mode_economy_rules
-	money_type initial_money = 1000;
+	money_type initial_money = 2000;
 	money_type maximum_money = 16000;
 	money_type warmup_initial_money = 16000;
 

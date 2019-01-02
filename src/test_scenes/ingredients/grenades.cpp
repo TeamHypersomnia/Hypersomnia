@@ -47,7 +47,7 @@ namespace test_flavours {
 
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("1.0");
-			item.standard_price = 400;
+			item.standard_price = 800;
 			meta.set(item);
 
 			{
@@ -57,7 +57,8 @@ namespace test_flavours {
 
 				fuse.released_image_id = to_image_id(test_scene_image_id::FORCE_GRENADE_RELEASED);
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
-				fuse.additional_release_impulse.linear = 4000.f;
+				fuse.additional_release_impulse.linear = 6000.f;
+				fuse.fuse_delay_ms = 1000.f;
 
 				meta.set(fuse);
 			}
@@ -72,7 +73,7 @@ namespace test_flavours {
 			{
 				auto& c = explosive.cascade[0];
 				c.flavour_id = to_entity_flavour_id(test_explosion_bodies::SKULL_ROCKET_CASCADE);
-				c.num_spawned = 3;
+				c.num_spawned = 2;
 				c.num_explosions = { 2, 0 };
 				c.initial_speed = { 1300.f, 0.2f };
 			}
@@ -80,7 +81,7 @@ namespace test_flavours {
 			dmg.base = 88.f;
 			in.inner_ring_color = red;
 			in.outer_ring_color = orange;
-			in.effective_radius = 300.f;
+			in.effective_radius = 380.f;
 			dmg.impact_impulse = 550.f;
 			dmg.impulse_multiplier_against_sentience = 1.f;
 			in.sound.modifier.gain = 1.8f;
@@ -110,7 +111,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::item item;
-			item.standard_price = 500;
+			item.standard_price = 1000;
 			item.space_occupied_per_charge = to_space_units("1.0");
 			meta.set(item);
 
@@ -120,7 +121,8 @@ namespace test_flavours {
 				fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
 				fuse.released_image_id = to_image_id(test_scene_image_id::INTERFERENCE_GRENADE_RELEASED);
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
-				fuse.additional_release_impulse.linear = 4000.f;
+				fuse.additional_release_impulse.linear = 6000.f;
+				fuse.fuse_delay_ms = 800.f;
 
 				meta.set(fuse);
 			}
@@ -135,14 +137,44 @@ namespace test_flavours {
 			in.outer_ring_color = orange;
 			in.effective_radius = 450.f;
 			dmg.impact_impulse = 2.f;
-			dmg.impulse_multiplier_against_sentience = 1000.f;
+			dmg.impulse_multiplier_against_sentience = 2000.f;
 			in.sound.modifier.gain = 2.2f;
 			in.sound.id = to_sound_id(test_scene_sound_id::INTERFERENCE_EXPLOSION);
 			in.type = adverse_element_type::INTERFERENCE;
 
 			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
-			dmg.shake.duration_ms = 800.f;
-			dmg.shake.mult = 1.5f;
+			dmg.shake.duration_ms = 2500.f;
+			dmg.shake.mult = 1.6f;
+
+			{
+				auto e = in;
+				e *= 0.6f;
+				e.wave_shake_radius_mult = 6;
+				e.sound.modifier.gain = 1.f;
+				e.sound.id = to_sound_id(test_scene_sound_id::INTERFERENCE_EXPLOSION);
+				e.sound.modifier.gain = 0.1f;
+				e.sound.modifier.pitch = 0.75f;
+				e.inner_ring_color = orange;
+				e.outer_ring_color = yellow;
+				e.ring_duration_seconds = 0.3f;
+
+				auto& meta = get_test_flavour(flavours, test_explosion_bodies::INTERFERENCE_CASCADE);
+				auto& c = meta.get<invariants::cascade_explosion>();
+				c.explosion = e;
+				c.explosion_interval_ms = { 200.f, 0.4f };
+				c.circle_collider_radius = 50.f;
+				c.max_explosion_angle_displacement = 10.f;
+
+				test_flavours::add_explosion_body(meta);
+			}
+
+			{
+				auto& c = explosive.cascade[0];
+				c.flavour_id = to_entity_flavour_id(test_explosion_bodies::INTERFERENCE_CASCADE);
+				c.num_spawned = 3;
+				c.num_explosions = { 2, 0 };
+				c.initial_speed = { 1400.f, 0.3f };
+			}
 
 			meta.set(explosive);
 		}
@@ -164,7 +196,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::item item;
-			item.standard_price = 300;
+			item.standard_price = 800;
 			item.space_occupied_per_charge = to_space_units("1.0");
 			meta.set(item);
 
@@ -176,7 +208,7 @@ namespace test_flavours {
 
 				fuse.released_image_id = to_image_id(test_scene_image_id::PED_GRENADE_RELEASED);
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
-				fuse.additional_release_impulse.linear = 4000.f;
+				fuse.additional_release_impulse.linear = 6000.f;
 
 				meta.set(fuse);
 			}
