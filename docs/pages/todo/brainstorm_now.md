@@ -6,7 +6,21 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- separate dash logic for reuse in different contexts
+
+- a hot for wielding a knife and an akimbo knife
+
+- in case the gui still acts up
+	- always keep this personal deposit open
+	- recalculate hotbar on every round start?
+
+- autofill all magazines to full on start of each round
+
+- check windows dll dependencies for determinism
+
 - Desync issues
+	- order of collisions happening?
+		- probably not
 	- Could it be that the predicted cosm is advanced by mistake instead of the referential one?
 	- Perhaps operator= of the physics system inadvertently modifies something of the world which it copies?
 		- The island only ever exists temporally.

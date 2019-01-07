@@ -114,15 +114,16 @@ void load_test_scene_sentience_properties(
 		{
 			auto& in = d.explosion;
 
-			in.effective_radius = 320.f;
+			in.effective_radius = 400.f;
 			in.damage.base = 88.f;
 			in.damage.impact_impulse = 150.f;
-			in.damage.impulse_multiplier_against_sentience = 1.f;
+			in.damage.impulse_multiplier_against_sentience = 3.f;
 			in.inner_ring_color = cyan;
 			in.outer_ring_color = white;
 			in.sound.id = to_sound_id(test_scene_sound_id::EXPLOSION);
 			in.sound.modifier.gain = 1.2f;
 			in.type = adverse_element_type::FORCE;
+			in.wave_shake_radius_mult = 6.f;
 
 			in.subject_shake.duration_ms = 600.f;
 			in.subject_shake.mult = 1.f;
@@ -184,7 +185,7 @@ void load_test_scene_sentience_properties(
 			in.type = adverse_element_type::FORCE;
 
 			{
-				in.effective_radius = 300.f;
+				in.effective_radius = 350.f;
 				in.damage.impact_impulse = 150.f;
 				in.sound.modifier.gain = 1.2f;
 				in.sound.id = to_sound_id(test_scene_sound_id::EXPLOSION);
@@ -197,7 +198,7 @@ void load_test_scene_sentience_properties(
 			}
 			
 			{
-				in.effective_radius = 450.f;
+				in.effective_radius = 500.f;
 				in.damage.impact_impulse = 200.f;
 				in.sound.modifier.gain = 1.0f;
 				in.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
@@ -210,7 +211,7 @@ void load_test_scene_sentience_properties(
 			}
 			
 			{
-				in.effective_radius = 650.f;
+				in.effective_radius = 700.f;
 				in.damage.impact_impulse = 250.f;
 				in.sound.modifier.gain = 1.2f;
 				in.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);

@@ -2811,3 +2811,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - If we detect inconsistency of state
 
+- dont call gui post solve for both predicted and referential
+- less music volume by default, e.g. 0.3
