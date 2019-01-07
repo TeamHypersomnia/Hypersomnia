@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- separate dash logic for reuse in different contexts
-
 - a hot for wielding a knife and an akimbo knife
 
 - in case the gui still acts up

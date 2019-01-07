@@ -26,6 +26,7 @@
 #include "game/messages/damage_message.h"
 #include "game/messages/thunder_effect.h"
 #include "game/detail/sentience/sentience_getters.h"
+#include "game/detail/movement/dash_logic.h"
 
 using namespace augs;
 
@@ -156,32 +157,28 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 					typed_weapon.infer_colliders_from_scratch();
 
-					const auto& body = it.template get<components::rigid_body>();
-					const auto vel_dir = vec2(body.get_velocity()).normalize();
-
 					if (const auto crosshair = it.find_crosshair()) {
 						fighter.overridden_crosshair_base_offset = crosshair->base_offset;
 
 						const auto cross_dir = vec2(crosshair->base_offset).normalize();
+						const auto& dash_dir = cross_dir;
 
-						const auto impulse_mult = (vel_dir.dot(cross_dir) + 1) / 2;
-
-						const auto& movement_def  = it.template get<invariants::movement>();
-						const auto conceptual_max_speed = std::max(1.f, movement_def.max_speed_for_animation);
-						const auto current_velocity = body.get_velocity();
-						const auto current_speed = current_velocity.length();
-
-						const auto speed_mult = current_speed / conceptual_max_speed;
+						const auto effect_mult = ::perform_dash(
+							it,
+							dash_dir,
+							current_attack_def.wielder_impulse,
+							current_attack_def.wielder_inert_for_ms
+						);
 
 						{
 							const auto min_effect = chosen_action == weapon_action_type::PRIMARY ? 0.8f : 0.f;
 							const auto max_effect = chosen_action == weapon_action_type::PRIMARY ? 1.3f : 1.1f;
 
-							const auto total_mult = std::min(max_effect, std::max(min_effect, speed_mult * impulse_mult));
+							const auto chosen_mult = std::clamp(effect_mult, min_effect, max_effect);
 
 							auto effect = current_attack_def.wielder_init_particles;
-							effect.modifier.scale_amounts = total_mult;
-							effect.modifier.scale_lifetimes = total_mult;
+							effect.modifier.scale_amounts = chosen_mult;
+							effect.modifier.scale_lifetimes = chosen_mult;
 
 							effect.start(
 								step,
@@ -190,19 +187,14 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 							);
 						}
 
-						body.apply_impulse(impulse_mult * cross_dir * body.get_mass() * current_attack_def.wielder_impulse);
-
-						auto& movement = it.template get<components::movement>();
-						movement.linear_inertia_ms += current_attack_def.wielder_inert_for_ms;
-
 						{
 							const auto min_effect = 0.88f;
 							const auto max_effect = 1.f;
 
-							const auto total_mult = std::min(max_effect, std::max(min_effect, speed_mult * impulse_mult));
+							const auto chosen_mult = std::clamp(effect_mult, min_effect, max_effect);
 
 							auto effect = current_attack_def.init_sound;
-							effect.modifier.pitch = total_mult;
+							effect.modifier.pitch = chosen_mult;
 
 							effect.start(
 								step,

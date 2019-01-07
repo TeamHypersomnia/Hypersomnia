@@ -269,14 +269,12 @@ struct basic_vec2 {
 		return (*this) *= required_length;
 	}
 
-	basic_vec2& normalize_hint(const real suggested_length) {
-		const real len = suggested_length;
-		
+	basic_vec2& normalize_hint(const real len) {
 		if (std::abs(len) < std::numeric_limits<real>::epsilon()) {
 			return *this;
 		}
 
-		const real inv_len = static_cast<real>(1) / len;
+		const auto inv_len = static_cast<real>(1) / len;
 
 		x = static_cast<type>(static_cast<real>(x) * inv_len);
 		y = static_cast<type>(static_cast<real>(y) * inv_len);
