@@ -6,6 +6,10 @@
 
 #include "augs/pad_bytes.h"
 
+#include "game/detail/view_input/particle_effect_input.h"
+#include "game/detail/view_input/sound_effect_input.h"
+#include "augs/misc/minmax.h"
+
 namespace invariants {
 	struct movement;
 }
@@ -63,7 +67,8 @@ struct movement_flags {
 
 	bool walking = false;
 	bool picking = false;
-	bool sprint = false;
+	bool sprinting = false;
+	bool dashing = false;
 	// END GEN INTROSPECTOR
 
 	bool any_moving_requested() const {
@@ -77,11 +82,11 @@ namespace components {
 		movement_flags flags;
 
 		bool frozen = false;
-
 		bool was_sprint_effective = false;
 		bool was_walk_effective = false;
-		pad_bytes<2> pad;
+		pad_bytes<1> pad;
 
+		real32 dash_cooldown_ms = 0.f;
 		real32 const_inertia_ms = 0.f;
 		real32 linear_inertia_ms = 0.f;
 
@@ -118,6 +123,16 @@ namespace invariants {
 		real32 max_speed_for_animation = 700.f;
 		unsigned animation_frame_ms = 30;
 		unsigned animation_frame_num = 5;
+
+		real32 dash_cooldown_ms = 1000.f;
+
+		real32 dash_impulse = 1163.f;
+		real32 dash_inert_ms = 400.f;
+
+		particle_effect_input dash_particles;
+		sound_effect_input dash_sound;
+
+		augs::minmax<real32> dash_effect_bound = augs::minmax<real32> { 0.88f, 1.0f };
 		// END GEN INTROSPECTOR
 	};
 }

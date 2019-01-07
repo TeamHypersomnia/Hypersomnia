@@ -192,7 +192,6 @@ namespace test_flavours {
 					slot_def.category_allowed = item_category::SHOULDER_WEARABLE;
 					slot_def.make_attachment_with_max_space();
 					slot_def.always_allow_exactly_one_item = true;
-					slot_def.attachment_density_multiplier = 0.2f;
 					container.slots[slot_function::SHOULDER] = slot_def;
 				}
 
@@ -201,7 +200,7 @@ namespace test_flavours {
 					slot_def.category_allowed = item_category::PERSONAL_DEPOSIT_WEARABLE;
 					slot_def.physical_behaviour = slot_physical_behaviour::DEACTIVATE_BODIES;
 					slot_def.always_allow_exactly_one_item = true;
-					slot_def.space_available = to_space_units("1000");;
+					slot_def.space_available = to_space_units("1000");
 					container.slots[slot_function::PERSONAL_DEPOSIT] = slot_def;
 				}
 
@@ -245,15 +244,22 @@ namespace test_flavours {
 			meta.set(sentience);
 			meta.set(sentience_inst);
 
-			invariants::movement movement;
+			{
+				invariants::movement movement;
 
-			movement.input_acceleration_axes.set(1, 1);
-			movement.acceleration_length = 3569;
-			movement.braking_damping = 12.5f;
-			movement.standard_linear_damping = 20.f;
-			movement.max_linear_inertia_when_movement_possible = 500.f;
+				movement.input_acceleration_axes.set(1, 1);
+				movement.acceleration_length = 3569;
+				movement.braking_damping = 12.5f;
+				movement.standard_linear_damping = 20.f;
+				movement.max_linear_inertia_when_movement_possible = 500.f;
 
-			meta.set(movement);
+				movement.dash_impulse = 1163.f;
+
+				movement.dash_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_DASH);
+				movement.dash_sound.id = to_sound_id(test_scene_sound_id::STANDARD_DASH);
+
+				meta.set(movement);
+			}
 
 			{
 				invariants::crosshair crosshair; 

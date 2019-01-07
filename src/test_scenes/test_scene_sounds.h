@@ -162,6 +162,8 @@ enum class test_scene_sound_id {
 	SKULL_ROCKET_DESTRUCTION,
 	ELON_HRL_MUZZLE,
 
+	STANDARD_DASH,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

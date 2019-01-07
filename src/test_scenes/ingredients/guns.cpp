@@ -35,8 +35,11 @@ namespace test_flavours {
 
 		/* Types for bullets etc. */
 
+		static const auto density_mult = 0.4f;
+		static const auto kickback_mult = 1.5f;
+
 		auto set_density_mult = [&](auto& meta, const auto density) {
-			meta.template get<invariants::fixtures>().density = .25f * density;
+			meta.template get<invariants::fixtures>().density = density_mult * density;
 		};
 
 		auto set_chambering_duration_ms = [&](auto& meta, const auto duration_ms) {
@@ -120,7 +123,12 @@ namespace test_flavours {
 			meta.set(container);
 
 			invariants::item item;
-			item.space_occupied_per_charge = to_space_units(typesafe_sprintf("%x", real32(meta.template get<invariants::sprite>().size.area()) / 450));
+
+			item.space_occupied_per_charge = 
+				(meta.template get<invariants::fixtures>().density / density_mult)
+				* to_space_units(typesafe_sprintf("%x", real32(meta.template get<invariants::sprite>().size.area()) / 450))
+			;
+
 			item.holding_stance = stance;
 			item.wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
 			item.gratis_ammo_pieces_with_first = 3;
@@ -1583,7 +1591,7 @@ namespace test_flavours {
 			gun_def.damage_multiplier = 3.f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 8;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
-			gun_def.kickback_towards_wielder = 25.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 25.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(250);
 
 			gun_def.maximum_heat = 2.f;
@@ -1599,7 +1607,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BILMER2000, white);
 			test_flavours::add_lying_item_dynamic_body(meta).density = 0.1f;
-			set_density_mult(meta, 0.75f);
+			set_density_mult(meta, 1.5);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1000.f);
 			meta.get<invariants::item>().standard_price = 3100;
 			set_chambering_duration_ms(meta, 450.f);
@@ -1633,10 +1641,10 @@ namespace test_flavours {
 			gun_def.shell_angular_velocity = {2.f, 14.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
-			gun_def.damage_multiplier = 1.8;
+			gun_def.damage_multiplier = 2.0;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
-			gun_def.kickback_towards_wielder = 40.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 70.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(500);
 			gun_def.recoil_multiplier = 1.1f;
 
@@ -1652,7 +1660,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::PRO90, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 0.6f);
+			set_density_mult(meta, 0.9f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1000.f, 0.f, true);
 			meta.get<invariants::item>().standard_price = 2900;
 			set_chambering_duration_ms(meta, 400.f);
@@ -1691,7 +1699,7 @@ namespace test_flavours {
 			gun_def.damage_multiplier = 4.5f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
-			gun_def.kickback_towards_wielder = 70.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 70.f;
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.062f;
@@ -1708,7 +1716,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::VINDICATOR_SHOT_1, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 1.15f);
+			set_density_mult(meta, 1.8f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1200.f, 0.f);
 			meta.get<invariants::item>().standard_price = 2900;
 			set_chambering_duration_ms(meta, 550.f);
@@ -1745,7 +1753,7 @@ namespace test_flavours {
 			gun_def.damage_multiplier = 3.3f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 15;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
-			gun_def.kickback_towards_wielder = 80.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 80.f;
 
 			gun_def.heavy_heat_start_sound.id = to_sound_id(test_scene_sound_id::HEAVY_HEAT_START);
 			gun_def.light_heat_start_sound.id = to_sound_id(test_scene_sound_id::LIGHT_HEAT_START);
@@ -1770,7 +1778,7 @@ namespace test_flavours {
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::LEWSII, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			make_default_gun_container(meta, item_holding_stance::HEAVY_LIKE, 2000.f, 0.f, false, "0.01", true);
-			set_density_mult(meta, 1.25);
+			set_density_mult(meta, 2.2f);
 
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::LEWSII_DRAW);
 			meta.get<invariants::item>().standard_price = 4700;
@@ -1808,7 +1816,7 @@ namespace test_flavours {
 			gun_def.damage_multiplier = 3.1f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
-			gun_def.kickback_towards_wielder = 80.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 80.f;
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.072f;
@@ -1826,7 +1834,7 @@ namespace test_flavours {
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::DATUM_GUN, white);
 
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 1.45f);
+			set_density_mult(meta, 2.f);
 
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1500.f, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::PLASMA_DRAW);
@@ -1960,7 +1968,7 @@ namespace test_flavours {
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 3;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.recoil_multiplier = 2.f;
-			gun_def.kickback_towards_wielder = 70.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 70.f;
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.202f;
@@ -1978,7 +1986,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 700;
 			set_chambering_duration_ms(meta, 300.f);
-			set_density_mult(meta, 0.9f);
+			set_density_mult(meta, 1.3f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("3.5");
 			only_allow_mag(meta, test_container_items::AO44_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
@@ -2010,7 +2018,7 @@ namespace test_flavours {
 			gun_def.damage_multiplier = 1.f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 0;
 			gun_def.recoil_multiplier = 4.f;
-			gun_def.kickback_towards_wielder = 500.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 500.f;
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.202f;
@@ -2048,7 +2056,7 @@ namespace test_flavours {
 
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 6500;
-			set_density_mult(meta, 1.9f);
+			set_density_mult(meta, 2.5f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("12.0");
 
 			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
@@ -2082,7 +2090,7 @@ namespace test_flavours {
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 4;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.recoil_multiplier = 2.3f;
-			gun_def.kickback_towards_wielder = 130.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 130.f;
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.242f;
@@ -2100,7 +2108,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
 			meta.get<invariants::item>().standard_price = 2900;
 			set_chambering_duration_ms(meta, 650.f);
-			set_density_mult(meta, 1.3f);
+			set_density_mult(meta, 1.5f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("7.5");
 			only_allow_mag(meta, test_container_items::WARX_FQ12_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
@@ -2132,7 +2140,7 @@ namespace test_flavours {
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.recoil_multiplier = 1.25f;
-			gun_def.kickback_towards_wielder = 30.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 30.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(550);
 
 			gun_def.maximum_heat = 2.f;
@@ -2152,7 +2160,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 650;
 			set_chambering_duration_ms(meta, 500.f);
-			set_density_mult(meta, 0.7f);
+			set_density_mult(meta, 1.1f);
 			only_allow_mag(meta, test_container_items::CALICO_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
 			meta.get<invariants::item>().specific_to = faction_type::SPECTATOR;

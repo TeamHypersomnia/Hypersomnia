@@ -25,6 +25,8 @@ struct standard_explosion_input {
 	sentience_shake subject_shake;
 
 	real32 subject_impulse = 0.f;
+	real32 subject_inert_ms = 0.f;
+
 	real32 wave_shake_radius_mult = 2.f;
 	rgba inner_ring_color = cyan;
 	rgba outer_ring_color = white;
@@ -39,6 +41,9 @@ struct standard_explosion_input {
 		damage *= scalar;
 		effective_radius *= scalar;
 		subject_shake *= scalar;
+		subject_impulse *= scalar;
+		subject_inert_ms *= scalar;
+
 		return *this;
 	}
 

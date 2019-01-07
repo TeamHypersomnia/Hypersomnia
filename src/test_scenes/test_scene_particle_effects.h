@@ -53,6 +53,8 @@ enum class test_scene_particle_effect_id {
 	STANDARD_KNIFE_PRIMARY_SMOKE,
 	STANDARD_KNIFE_SECONDARY_SMOKE,
 
+	STANDARD_DASH,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

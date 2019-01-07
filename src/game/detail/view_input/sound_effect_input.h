@@ -81,6 +81,11 @@ struct sound_effect_start_input {
 		return *this;	
 	}
 
+	auto& face_velocity() {
+		positioning.face_velocity = true;
+		return *this;	
+	}
+
 	static sound_effect_start_input at_entity(const entity_id id) {
 		return orbit_local(id, {});
 	}

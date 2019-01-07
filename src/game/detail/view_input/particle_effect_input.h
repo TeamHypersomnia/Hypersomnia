@@ -37,6 +37,11 @@ struct particle_effect_start_input {
 		homing_target = id;
 		return *this;	
 	}
+
+	auto& face_velocity() {
+		positioning.face_velocity = true;
+		return *this;	
+	}
 };
 
 struct particle_effect_input {

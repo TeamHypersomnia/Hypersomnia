@@ -48,6 +48,7 @@ enum class game_intent_type {
 	RELOAD,
 
 	SWITCH_LOOK,
+	DASH,
 
 	COUNT
 	// END GEN INTROSPECTOR

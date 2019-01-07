@@ -27,6 +27,7 @@
 #include "game/messages/thunder_effect.h"
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/movement/dash_logic.h"
+#include "game/detail/movement/movement_getters.h"
 
 using namespace augs;
 
@@ -160,25 +161,25 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 					if (const auto crosshair = it.find_crosshair()) {
 						fighter.overridden_crosshair_base_offset = crosshair->base_offset;
 
-						const auto cross_dir = vec2(crosshair->base_offset).normalize();
-						const auto& dash_dir = cross_dir;
+						const auto effect_mult = 
+							::dash_conditions_fulfilled(it) 
+							? ::perform_dash_towards_crosshair(
+								it,
+								current_attack_def.wielder_impulse,
+								current_attack_def.wielder_inert_for_ms,
+								dash_flags()
+							)
+							: 0.f
+						;
 
-						const auto effect_mult = ::perform_dash(
-							it,
-							dash_dir,
-							current_attack_def.wielder_impulse,
-							current_attack_def.wielder_inert_for_ms
-						);
-
-						{
+						if (effect_mult > 0.f) {
 							const auto min_effect = chosen_action == weapon_action_type::PRIMARY ? 0.8f : 0.f;
 							const auto max_effect = chosen_action == weapon_action_type::PRIMARY ? 1.3f : 1.1f;
 
 							const auto chosen_mult = std::clamp(effect_mult, min_effect, max_effect);
 
 							auto effect = current_attack_def.wielder_init_particles;
-							effect.modifier.scale_amounts = chosen_mult;
-							effect.modifier.scale_lifetimes = chosen_mult;
+							effect.modifier *= chosen_mult;
 
 							effect.start(
 								step,
@@ -194,7 +195,7 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 							const auto chosen_mult = std::clamp(effect_mult, min_effect, max_effect);
 
 							auto effect = current_attack_def.init_sound;
-							effect.modifier.pitch = chosen_mult;
+							effect.modifier.pitch *= chosen_mult;
 
 							effect.start(
 								step,

@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- rename minmax to bound
 - a hot for wielding a knife and an akimbo knife
 
 - in case the gui still acts up

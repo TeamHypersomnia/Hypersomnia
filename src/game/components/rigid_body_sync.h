@@ -229,35 +229,7 @@ void component_synchronizer<E, components::rigid_body>::apply_force(
 	const vec2 center_offset, 
 	const bool wake
 ) const {
-	if (pixels.is_epsilon(2.f)) {
-		return;
-	}
-
-	if (const auto body = find_body()) {
-		auto& data = get_raw_component({});
-
-		const auto force = handle.get_cosmos().get_fixed_delta().in_seconds() * to_meters(pixels);
-		const auto location = vec2(body->GetWorldCenter() + b2Vec2(to_meters(center_offset)));
-
-		body->ApplyLinearImpulse(
-			b2Vec2(force), 
-			b2Vec2(location), 
-			wake
-		);
-
-		data.angular_velocity = body->GetAngularVelocity();
-		data.velocity = body->GetLinearVelocity();
-
-		if (DEBUG_DRAWING.draw_forces && force.non_zero()) {
-			/* 
-				Warning: bodies like player's crosshair recoil might have their forces drawn 
-				in the vicinity of (0, 0) coordinates instead of near wherever the player is.
-			*/
-
-			auto& lines = DEBUG_LOGIC_STEP_LINES;
-			lines.emplace_back(green, to_pixels(location) + to_pixels(force), to_pixels(location));
-		}
-	}
+	apply_impulse(handle.get_cosmos().get_fixed_delta().in_seconds() * pixels, center_offset, wake);
 }
 
 template <class E>
@@ -281,13 +253,18 @@ void component_synchronizer<E, components::rigid_body>::apply_impulse(
 		return;
 	}
 
-	if (auto body = find_body()) {
+	if (const auto body = find_body()) {
 		auto& data = get_raw_component({});
 
-		const vec2 force = to_meters(pixels);
-		const vec2 location = vec2(body->GetWorldCenter()) + to_meters(center_offset);
+		const auto force = to_meters(pixels);
+		const auto location = vec2(body->GetWorldCenter()) + to_meters(center_offset);
 
-		body->ApplyLinearImpulse(b2Vec2(force), b2Vec2(location), wake);
+		body->ApplyLinearImpulse(
+			b2Vec2(force), 
+			b2Vec2(location), 
+			wake
+		);
+
 		data.angular_velocity = body->GetAngularVelocity();
 		data.velocity = body->GetLinearVelocity();
 
@@ -297,7 +274,8 @@ void component_synchronizer<E, components::rigid_body>::apply_impulse(
 				in the vicinity of (0, 0) coordinates instead of near wherever the player is.
 			*/
 
-			DEBUG_PERSISTENT_LINES.emplace_back(green, to_pixels(location) + pixels, to_pixels(location));
+			auto& lines = DEBUG_LOGIC_STEP_LINES;
+			lines.emplace_back(green, to_pixels(location) + pixels, to_pixels(location));
 		}
 	}
 }

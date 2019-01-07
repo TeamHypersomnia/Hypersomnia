@@ -5,10 +5,9 @@
 #include "game/components/transform_component.h"
 
 struct absolute_or_local {
-	// GEN INTROSPECTOR struct absolute_or_local
 	entity_id target;
 	transformr offset;
-	// END GEN INTROSPECTOR
+	bool face_velocity = false;
 
 	template <class S, class C, class I>
 	static std::optional<transformr> find_transform_impl(S& self, C& cosm, I& interp) {
@@ -16,7 +15,11 @@ struct absolute_or_local {
 			const auto target_handle = cosm[self.target];
 
 			if (target_handle) {
-				if (const auto target_transform = target_handle.find_viewing_transform(interp)) {
+				if (auto target_transform = target_handle.find_viewing_transform(interp)) {
+					if (self.face_velocity) {
+						target_transform->rotation = target_handle.get_effective_velocity().degrees();
+					}
+
 					return *target_transform * self.offset;
 				}
 			}

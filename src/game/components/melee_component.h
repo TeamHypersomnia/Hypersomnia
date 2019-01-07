@@ -33,7 +33,7 @@ struct melee_attack_definition {
 	real32 obstacle_hit_kickback_impulse = 80.f;
 	real32 sentience_hit_recoil = 10.f;
 
-	real32 wielder_impulse = 20.f;
+	real32 wielder_impulse = 717.f;
 	real32 wielder_inert_for_ms = 250.f;
 	real32 obstacle_hit_rotation_inertia_ms = 350.f;
 	real32 obstacle_hit_recoil_mult = 1.2f;

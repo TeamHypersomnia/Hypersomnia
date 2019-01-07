@@ -23,6 +23,8 @@
 #include "game/detail/sentience/sentience_getters.h"
 
 #include "game/detail/physics/infer_damping.hpp"
+#include "game/detail/movement/dash_logic.h"
+#include "game/detail/movement/movement_getters.h"
 
 using namespace augs;
 
@@ -52,7 +54,13 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 							movement->flags.walking = it.was_pressed();
 							break;
 						case game_intent_type::SPRINT:
-							movement->flags.sprint = it.was_pressed();
+							movement->flags.sprinting = it.was_pressed();
+							break;
+						case game_intent_type::DASH:
+							movement->flags.dashing = it.was_pressed();
+							break;
+						case game_intent_type::SPACE_BUTTON:
+							movement->flags.dashing = it.was_pressed();
 							break;
 						case game_intent_type::START_PICKING_UP_ITEMS:
 							movement->flags.picking = it.was_pressed();
@@ -76,7 +84,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 	cosm.for_each_having<components::movement>(
 		[&](const auto& it) {
 			auto& movement = it.template get<components::movement>();
-			auto& movement_def = it.template get<invariants::movement>();
+			const auto& movement_def = it.template get<invariants::movement>();
 
 			const auto& rigid_body = it.template get<components::rigid_body>();
 
@@ -94,9 +102,9 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 			auto movement_force_mult = 1.f;
 
-			movement.was_sprint_effective = movement.flags.sprint;
+			movement.was_sprint_effective = movement.flags.sprinting;
 
-			value_meter::damage_result consciousness_damage_by_sprint;
+			value_meter::damage_result cp_damage_by_sprint;
 
 			enum class haste_type {
 				NONE,
@@ -121,25 +129,28 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				return haste_type::NONE;
 			}();
 
+			const auto requested_by_input = movement.get_force_requested_by_input(movement_def.input_acceleration_axes);
+			const bool non_zero_requested = requested_by_input.non_zero();
+
 			if (is_sentient) {
 				const auto& def = it.template get<invariants::sentience>();
 
-				auto& consciousness = sentience->get<consciousness_meter_instance>();
+				auto& cp = sentience->get<consciousness_meter_instance>();
 
-				const auto minimum_cp_to_sprint = consciousness.get_maximum_value() * def.minimum_cp_to_sprint;
+				const auto minimum_cp_to_sprint = cp.get_maximum_value() * def.minimum_cp_to_sprint;
 
 #if SLOW_DOWN_IF_CP_CRITICAL
-				if (consciousness.value < minimum_cp_to_sprint - AUGS_EPSILON<real32>) {
+				if (cp.value < minimum_cp_to_sprint - AUGS_EPSILON<real32>) {
 					movement_force_mult /= 2;
 				}
 #endif
 
-				consciousness_damage_by_sprint = consciousness.calc_damage_result(
+				cp_damage_by_sprint = cp.calc_damage_result(
 					def.sprint_drains_cp_per_second * delta.in_seconds(),
 					minimum_cp_to_sprint
 				);
 
-				if (consciousness_damage_by_sprint.excessive > 0) {
+				if (cp_damage_by_sprint.excessive > 0) {
 					movement.was_sprint_effective = false;
 				}
 
@@ -149,18 +160,65 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				else if (current_haste == haste_type::NORMAL) {
 					movement_force_mult *= 1.3f;
 				}
+
+				if (movement.flags.dashing) {
+					if (::dash_conditions_fulfilled(it)) {
+						if (const auto crosshair_offset = it.find_crosshair_offset()) {
+							const auto cp_damage_by_dash = cp.calc_damage_result(
+								def.dash_drains_cp,
+								minimum_cp_to_sprint
+							);
+
+							if (cp_damage_by_dash.excessive <= 0) {
+								const auto final_direction = 
+									non_zero_requested
+									? vec2(requested_by_input).normalize()
+									: vec2(it.get_effective_velocity()).normalize()
+								;
+
+								const auto dash_effect_mult = ::perform_dash(
+									it,
+									final_direction,
+
+									movement_def.dash_impulse,
+									movement_def.dash_inert_ms,
+									dash_flag::PROPORTIONAL_TO_CURRENT_SPEED
+								);
+
+								if (dash_effect_mult > 0.f) {
+									::perform_dash_effects(
+										step,
+										it,
+										dash_effect_mult,
+										predictable_only_by(it)
+									);
+
+									cp.value -= cp_damage_by_dash.effective;
+
+									movement.dash_cooldown_ms = movement_def.dash_cooldown_ms;
+								}
+							}
+						}
+					}
+
+					movement.flags.dashing = false;
+				}
 			}
 
 			const bool constant_inertia = movement.const_inertia_ms > 0.f;
 
 			if (constant_inertia) {
-				movement.const_inertia_ms -= static_cast<float>(delta_ms);
+				movement.const_inertia_ms -= delta_ms;
+			}
+
+			if (movement.dash_cooldown_ms > 0.f) {
+				movement.dash_cooldown_ms -= delta_ms;
 			}
 
 			const bool linear_inertia = movement.linear_inertia_ms > 0.f;
 
 			if (linear_inertia) {
-				movement.linear_inertia_ms -= static_cast<float>(delta_ms);
+				movement.linear_inertia_ms -= delta_ms;
 			}
 
 			const auto num_frames = movement_def.animation_frame_num;
@@ -185,16 +243,14 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			movement.was_walk_effective = is_walking;
 
 			const bool should_decelerate_due_to_walk = is_walking && movement.animation_amount >= num_frames * frame_ms - 60.f;
-
-			const auto requested_by_input = movement.get_force_requested_by_input(movement_def.input_acceleration_axes);
-			const bool propelling = !should_decelerate_due_to_walk && requested_by_input.non_zero();
+			const bool propelling = !should_decelerate_due_to_walk && non_zero_requested;
 
 			if (propelling) {
 				if (movement.was_sprint_effective) {
 					movement_force_mult /= 2.f;
 
 					if (is_sentient) {
-						sentience->get<consciousness_meter_instance>().value -= consciousness_damage_by_sprint.effective;
+						sentience->get<consciousness_meter_instance>().value -= cp_damage_by_sprint.effective;
 					}
 				}
 
@@ -226,7 +282,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				);
 			}
 
-			const auto duration_bound = static_cast<float>(num_frames * frame_ms);
+			const auto duration_bound = static_cast<real32>(num_frames * frame_ms);
 
 			const auto conceptual_max_speed = std::max(1.f, movement_def.max_speed_for_animation);
 			const auto current_velocity = rigid_body.get_velocity();
@@ -344,13 +400,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				}
 			};
 
-			const bool legs_frozen =
-				movement.const_inertia_ms
-				+ movement.linear_inertia_ms
-				> movement_def.freeze_legs_when_inertia_exceeds
-			;
-
-			const auto animation_dt = legs_frozen ? 0.f : delta_ms * speed_mult;
+			const auto animation_dt = ::legs_frozen(it) ? 0.f : delta_ms * speed_mult;
 
 			auto& backward = movement.four_ways_animation.backward;
 			auto& amount = movement.animation_amount;

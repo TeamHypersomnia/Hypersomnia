@@ -16,18 +16,22 @@ return {
   },
 
   game_controls = {
+    W = "MOVE_FORWARD",
+    S = "MOVE_BACKWARD",
     A = "MOVE_LEFT",
     D = "MOVE_RIGHT",
-    E = "USE_BUTTON",
+
+    LeftShift = "SPRINT",
+    Space = "SPACE_BUTTON", -- dashing or hand brake
+
+    LeftMouseButton = "CROSSHAIR_PRIMARY_ACTION",
+    RightMouseButton = "CROSSHAIR_SECONDARY_ACTION",
+
+    LeftControl = "START_PICKING_UP_ITEMS",
     G = "DROP",
     MiddleMouseButton = "THROW",
-    LeftControl = "START_PICKING_UP_ITEMS",
-    LeftMouseButton = "CROSSHAIR_PRIMARY_ACTION",
-    LeftShift = "SPRINT",
-    RightMouseButton = "CROSSHAIR_SECONDARY_ACTION",
-    S = "MOVE_BACKWARD",
-    Space = "SPACE_BUTTON",
-    W = "MOVE_FORWARD",
+
+    E = "USE_BUTTON",
 	R = "RELOAD"
   },
 

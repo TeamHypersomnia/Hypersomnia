@@ -8,4 +8,10 @@ struct particle_effect_modifier {
 	real32 scale_amounts = 1.f;
 	real32 scale_lifetimes = 1.f;
 	// END GEN INTROSPECTOR
+
+	auto& operator*=(const real32 scalar) {
+		scale_amounts *= scalar;
+		scale_lifetimes *= scalar;
+		return *this;
+	}
 };	

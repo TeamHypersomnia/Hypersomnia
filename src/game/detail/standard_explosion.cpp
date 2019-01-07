@@ -19,6 +19,7 @@
 #include "game/detail/organisms/startle_nearbly_organisms.h"
 #include "game/detail/physics/shape_overlapping.hpp"
 #include "game/detail/damage_origin.hpp"
+#include "game/detail/movement/dash_logic.h"
 
 static bool triangle_degenerate(const std::array<vec2, 3>& v) {
 	constexpr auto eps_triangle_degenerate = 0.5f;
@@ -89,6 +90,27 @@ void standard_explosion_input::instantiate(
 	if (subject_alive) {
 		if (const auto sentience = subject.find<components::sentience>()) {
 			subject_shake.apply(now, *sentience);
+		}
+
+		if (subject_impulse > 0.f) {
+			if (const auto movement_def = subject.find<invariants::movement>()) {
+				const auto dash_effect_mult = ::perform_dash(
+					subject,
+					vec2(subject.get_effective_velocity()).normalize(),
+
+					subject_impulse,
+					subject_inert_ms,
+
+					dash_flags()
+				);
+
+				::perform_dash_effects(
+					step,
+					subject,
+					dash_effect_mult,
+					predictability
+				);
+			}
 		}
 	}
 

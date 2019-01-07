@@ -56,6 +56,15 @@ public:
 		return self.template find<components::crosshair>();
 	};
 
+	vec2* find_crosshair_offset() const {
+		/* If it were other entity for some reason */
+		if (const auto c = find_crosshair()) {
+			return std::addressof(c->base_offset);
+		}
+
+		return nullptr;
+	};
+
 	auto* find_crosshair_def() const {
 		/* If it were other entity for some reason */
 		const auto self = *static_cast<const E*>(this);

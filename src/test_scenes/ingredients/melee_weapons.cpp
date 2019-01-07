@@ -95,7 +95,7 @@ namespace test_flavours {
 					a.obstacle_hit_recoil_mult = 1.1f;
 					a.obstacle_hit_kickback_impulse = 2500.f;
 					a.obstacle_hit_linear_inertia_ms = 140.f;
-					a.wielder_impulse = 1000.f;
+					a.wielder_impulse = 387.f;
 					a.wielder_inert_for_ms = 200.f;
 					a.cooldown_ms = 200.f;
 					a.cp_required = 1.f;
@@ -136,7 +136,7 @@ namespace test_flavours {
 					a.init_particles.modifier.colorize = color;
 					a.damage.shake.mult *= 1.15f;
 					a.wielder_init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_SECONDARY_SMOKE);
-					a.wielder_impulse = 1850.f;
+					a.wielder_impulse = 717.f;
 					a.wielder_inert_for_ms = 300.f;
 					a.obstacle_hit_linear_inertia_ms = 100.f;
 					a.cp_required = 2.f;
