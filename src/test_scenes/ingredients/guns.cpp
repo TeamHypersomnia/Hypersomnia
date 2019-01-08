@@ -1777,8 +1777,8 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::LEWSII, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			make_default_gun_container(meta, item_holding_stance::HEAVY_LIKE, 2000.f, 0.f, false, "0.01", true);
 			set_density_mult(meta, 2.2f);
+			make_default_gun_container(meta, item_holding_stance::HEAVY_LIKE, 2000.f, 0.f, false, "0.01", true);
 
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::LEWSII_DRAW);
 			meta.get<invariants::item>().standard_price = 4700;
@@ -1881,12 +1881,12 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::KEK9, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
+			set_density_mult(meta, 0.8f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1000.f, 0.f, false);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 500;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(350);
 			set_chambering_duration_ms(meta, 390.f);
-			set_density_mult(meta, 0.8f);
 			only_allow_mag(meta, test_container_items::KEK9_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			meta.get<invariants::item>().specific_to = faction_type::RESISTANCE;
@@ -1931,11 +1931,11 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::SN69, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
+			set_density_mult(meta, 0.7f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1100.f, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 500;
 			set_chambering_duration_ms(meta, 350.f);
-			set_density_mult(meta, 0.7f);
 			only_allow_mag(meta, test_container_items::SN69_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			meta.get<invariants::item>().specific_to = faction_type::METROPOLIS;
@@ -1982,11 +1982,11 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
+			set_density_mult(meta, 1.3f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1200.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 700;
 			set_chambering_duration_ms(meta, 300.f);
-			set_density_mult(meta, 1.3f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("3.5");
 			only_allow_mag(meta, test_container_items::AO44_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
@@ -2033,6 +2033,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::ELON_HRL, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
+			set_density_mult(meta, 2.5f);
 			make_default_gun_container(meta, item_holding_stance::HEAVY_LIKE, 0.f, 0.f, false, "1.0");
 
 			auto& slots = meta.get<invariants::container>().slots;
@@ -2056,7 +2057,6 @@ namespace test_flavours {
 
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 6500;
-			set_density_mult(meta, 2.5f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("12.0");
 
 			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
@@ -2104,11 +2104,11 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::WARX_FQ12, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
+			set_density_mult(meta, 1.5f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1400.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
 			meta.get<invariants::item>().standard_price = 2900;
 			set_chambering_duration_ms(meta, 650.f);
-			set_density_mult(meta, 1.5f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("7.5");
 			only_allow_mag(meta, test_container_items::WARX_FQ12_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
@@ -2156,11 +2156,11 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::CALICO, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
+			set_density_mult(meta, 1.1f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1500.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 650;
 			set_chambering_duration_ms(meta, 500.f);
-			set_density_mult(meta, 1.1f);
 			only_allow_mag(meta, test_container_items::CALICO_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
 			meta.get<invariants::item>().specific_to = faction_type::SPECTATOR;
@@ -2192,6 +2192,7 @@ namespace test_flavours {
 			meta.set(gun_def);
 
 			default_gun_props(meta);
+			set_density_mult(meta, 0.8f);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::AMPLIFIER_ARM, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
@@ -2202,7 +2203,6 @@ namespace test_flavours {
 			item.gratis_ammo_pieces_with_first = 0;
 			meta.set(item);
 			meta.get<invariants::item>().standard_price = 2500;
-			set_density_mult(meta, 0.8f);
 		}
 	}
 }
