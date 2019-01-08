@@ -47,8 +47,14 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 		filters[predefined_filter_type::FLYING_ITEM]
 	);
 
-	for (unsigned i = 0; i < 3 && i < static_cast<unsigned>(hostiles.size()); ++i) {
-		const auto next_hostile = cosm[hostiles[i]];
+	if (hostiles.empty()) {
+		return;
+	}
+
+	const auto num_enemies = hostiles.size();
+
+	for (std::size_t i = 0; i < 3; ++i) {
+		const auto next_hostile = cosm[hostiles[std::min(i, num_enemies - 1)]];
 #if MORE_LOGS
 		LOG_NVPS(next_hostile.get_id());
 #endif
@@ -57,18 +63,48 @@ void electric_triad_instance::perform_logic(const spell_logic_input in) {
 			cosm, 
 			spell_data.missile_flavour,
 			[&](const auto new_energy_ball, auto&&...) {
+				const auto target_vector = next_hostile.get_logic_transform().pos - caster_transform.pos;
+				const auto target_degrees = target_vector.degrees();
+
 				auto new_energy_ball_transform = caster_transform;
 
-				new_energy_ball_transform.rotation = 
-					(next_hostile.get_logic_transform().pos - caster_transform.pos).degrees()
-				;
+				auto& rot = new_energy_ball_transform.rotation;
+
+				{
+					const bool lacking_hostiles = num_enemies < i + 1;
+
+					if (lacking_hostiles) {
+						if (num_enemies == 1) {
+							const auto spread = spell_data.spread_in_absence_of_hostiles;
+
+							rot = target_degrees;
+
+							if (i == 1) {
+								rot += spread / 2;
+							}
+							else {
+								rot -= spread / 2;
+							}
+						}
+						else if (num_enemies == 2) {
+							const auto prev_hostile = cosm[hostiles[0]];
+							const auto prev_target_vector = prev_hostile.get_logic_transform().pos - caster_transform.pos;
+							const auto avg_vector = (prev_target_vector + target_vector) / 2;
+
+							rot = avg_vector.degrees();
+						}
+					}	
+					else {
+						rot = target_degrees;
+					}
+				}
 
 				new_energy_ball.set_logic_transform(new_energy_ball_transform);
 
 				new_energy_ball.template get<components::sender>().set(caster);
 				new_energy_ball.template get<components::missile>().particular_homing_target = next_hostile;
 
-				const auto energy_ball_velocity = new_energy_ball_transform.get_direction() * 2000;
+				const auto energy_ball_velocity = new_energy_ball_transform.get_direction() * spell_data.missile_velocity;
 				new_energy_ball.template get<components::rigid_body>().set_velocity(energy_ball_velocity);
 			},
 			[&](const auto) {}

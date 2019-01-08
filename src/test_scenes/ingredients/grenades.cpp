@@ -276,6 +276,46 @@ namespace test_flavours {
 
 		{
 			auto e = bomb_explosion;
+			e *= 0.3f;
+			e.sound.modifier.gain = 1.f;
+			e.sound.id = to_sound_id(test_scene_sound_id::SKULL_ROCKET_DESTRUCTION);
+			e.inner_ring_color = cyan;
+			e.outer_ring_color = white;
+			e.ring_duration_seconds = 0.3f;
+			e.wave_shake_radius_mult = 6;
+
+			auto& meta = get_test_flavour(flavours, test_explosion_bodies::ELECTRIC_MISSILE_CASCADE);
+			auto& c = meta.get<invariants::cascade_explosion>();
+			c.explosion = e;
+			c.explosion_interval_ms = { 200.f, 0.4f };
+			c.circle_collider_radius = 50.f;
+			c.max_explosion_angle_displacement = 10.f;
+
+			test_flavours::add_explosion_body(meta);
+		}
+
+		{
+			auto e = bomb_explosion;
+			e *= 0.1f;
+			e.wave_shake_radius_mult = 6;
+			e.sound.modifier.gain = 1.f;
+			e.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
+			e.inner_ring_color = white;
+			e.outer_ring_color = cyan;
+			e.ring_duration_seconds = 0.3f;
+
+			auto& meta = get_test_flavour(flavours, test_explosion_bodies::ELECTRIC_MISSILE_CASCADE_SMALLER);
+			auto& c = meta.get<invariants::cascade_explosion>();
+			c.explosion = e;
+			c.explosion_interval_ms = { 200.f, 0.4f };
+			c.circle_collider_radius = 50.f;
+			c.max_explosion_angle_displacement = 10.f;
+
+			test_flavours::add_explosion_body(meta);
+		}
+
+		{
+			auto e = bomb_explosion;
 			e *= 0.4f;
 			e.sound.modifier.gain = 1.f;
 			e.sound.id = to_sound_id(test_scene_sound_id::SKULL_ROCKET_DESTRUCTION);

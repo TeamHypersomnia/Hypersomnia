@@ -787,6 +787,52 @@ namespace test_flavours {
 			trace_modifier.fade_on_exit = false;
 
 			meta.set(missile);
+
+			invariants::explosive explosive; 
+
+			standard_explosion_input in;
+			auto& dmg = in.damage;
+
+			in.type = adverse_element_type::FORCE;
+			dmg.base = 40.f;
+			in.inner_ring_color = cyan;
+			in.outer_ring_color = white;
+			in.effective_radius = 400.f;
+			dmg.impact_impulse = 450.f;
+			dmg.impulse_multiplier_against_sentience = 1.f;
+			in.sound.modifier.gain = 2.f;
+			in.sound.id = to_sound_id(test_scene_sound_id::SKULL_ROCKET_DESTRUCTION);
+			in.sound.modifier.max_distance = 8000.f;
+			in.sound.modifier.reference_distance = 1400.f;
+			in.sound.modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
+
+			in.create_thunders_effect = true;
+			in.wave_shake_radius_mult = 6;
+
+			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+			dmg.shake.duration_ms = 700.f;
+			dmg.shake.mult = 1.4f;
+
+			explosive.explosion = in;
+
+			{
+				auto& c = explosive.cascade[0];
+				c.flavour_id = to_entity_flavour_id(test_explosion_bodies::ELECTRIC_MISSILE_CASCADE);
+				c.num_spawned = 2;
+				c.num_explosions = { 2, 0 };
+				c.initial_speed = { 1000.f, 0.2f };
+			}
+
+			{
+				auto& c = explosive.cascade[1];
+				c.flavour_id = to_entity_flavour_id(test_explosion_bodies::ELECTRIC_MISSILE_CASCADE_SMALLER);
+				c.num_spawned = 2;
+				c.num_explosions = { 2, 0 };
+				c.initial_speed = { 1200.f, 0.6f };
+				c.spawn_angle_variation = 0.5f;
+			}
+
+			meta.set(explosive);
 		}
 
 		{

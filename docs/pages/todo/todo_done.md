@@ -2818,3 +2818,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - cooldown the dash on switching weapons to balance insta switching
 
 - rename bound to bound
+
+- ao44 should be explosive
+	- or just burst fire
+  - electric triad should explode on hit

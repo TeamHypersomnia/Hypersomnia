@@ -8,6 +8,7 @@
 #include "game/detail/perks/all_perks.h"
 
 #include "test_scenes/test_scene_images.h"
+#include "test_scenes/test_scene_flavours.h"
 
 void load_test_scene_sentience_properties(
 	cosmos_common_significant& state
@@ -150,6 +151,7 @@ void load_test_scene_sentience_properties(
 		d.common.cast_sparkles.id = to_particle_effect_id(test_scene_particle_effect_id::CAST_SPARKLES);
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 		d.common.standard_price = static_cast<money_type>(1600);
+		d.missile_flavour = to_entity_flavour_id(test_plain_missiles::ELECTRIC_MISSILE);
 	}
 
 	{
