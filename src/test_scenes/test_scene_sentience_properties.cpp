@@ -118,7 +118,7 @@ void load_test_scene_sentience_properties(
 			in.effective_radius = 400.f;
 			in.damage.base = 88.f;
 			in.damage.impact_impulse = 150.f;
-			in.damage.impulse_multiplier_against_sentience = 3.f;
+			in.damage.impulse_multiplier_against_sentience = 30.f;
 			in.inner_ring_color = cyan;
 			in.outer_ring_color = white;
 			in.sound.id = to_sound_id(test_scene_sound_id::EXPLOSION);
@@ -135,7 +135,7 @@ void load_test_scene_sentience_properties(
 	{
 		auto& d = std::get<electric_triad>(spells);
 		d.common.cooldown_ms = 3000;
-		d.common.personal_electricity_required = 120;
+		d.common.personal_electricity_required = 220;
 		d.common.associated_color = blue_spell_border;
 
 		d.appearance.incantation = "energeia triada";
@@ -150,7 +150,7 @@ void load_test_scene_sentience_properties(
 		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
 		d.common.cast_sparkles.id = to_particle_effect_id(test_scene_particle_effect_id::CAST_SPARKLES);
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
-		d.common.standard_price = static_cast<money_type>(1600);
+		d.common.standard_price = static_cast<money_type>(6000);
 		d.missile_flavour = to_entity_flavour_id(test_plain_missiles::ELECTRIC_MISSILE);
 	}
 

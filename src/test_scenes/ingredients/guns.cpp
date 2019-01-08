@@ -774,7 +774,7 @@ namespace test_flavours {
 			missile.damage.effects.destruction.sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
 
 			missile.homing_towards_hostile_strength = 1.0f;
-			missile.damage.base = 64;
+			missile.damage.base = 24;
 			missile.ricochet_born_cooldown_ms = 17.f;
 
 			auto& trace_modifier = missile.trace_sound.modifier;
@@ -787,6 +787,13 @@ namespace test_flavours {
 			trace_modifier.fade_on_exit = false;
 
 			meta.set(missile);
+
+			{
+				/* Make it identical except explosions */
+				auto& amp = get_test_flavour(flavours, test_plain_missiles::AMPLIFIER_ARM_MISSILE);
+				amp.get<invariants::text_details>().name = "Amplifier arm missile";
+				amp = meta;
+			}
 
 			invariants::explosive explosive; 
 
@@ -1706,7 +1713,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::PRO90, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 0.9f);
+			set_density_mult(meta, 1.7f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1000.f, 0.f, true);
 			meta.get<invariants::item>().standard_price = 2900;
 			set_chambering_duration_ms(meta, 400.f);
@@ -2014,7 +2021,7 @@ namespace test_flavours {
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 3;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.recoil_multiplier = 2.f;
-			gun_def.kickback_towards_wielder = kickback_mult * 70.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 100.f;
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.202f;
@@ -2033,12 +2040,12 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 1.3f);
+			set_density_mult(meta, 5.f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1200.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 700;
 			set_chambering_duration_ms(meta, 300.f);
-			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("3.5");
+			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("6");
 			only_allow_mag(meta, test_container_items::AO44_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
 		}
@@ -2237,7 +2244,7 @@ namespace test_flavours {
 			gun_def.damage_multiplier = 0.5f;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
-			gun_def.magic_missile_flavour = to_entity_flavour_id(test_plain_missiles::ELECTRIC_MISSILE);
+			gun_def.magic_missile_flavour = to_entity_flavour_id(test_plain_missiles::AMPLIFIER_ARM_MISSILE);
 			gun_def.adversarial.knockout_award = static_cast<money_type>(150);
 
 			meta.set(gun_def);
