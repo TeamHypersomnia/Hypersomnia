@@ -25,6 +25,7 @@
 #include "game/detail/physics/infer_damping.hpp"
 #include "game/detail/movement/dash_logic.h"
 #include "game/detail/movement/movement_getters.h"
+#include "game/detail/sentience/tool_getters.h"
 
 using namespace augs;
 
@@ -271,7 +272,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				auto applied_force = requested_by_input;
 
 				if (movement_def.acceleration_length > 0) {
-					applied_force.set_length(movement_def.acceleration_length);
+					applied_force.set_length(movement_def.acceleration_length * ::get_movement_speed_mult(it));
 				}
 
 				applied_force *= movement_force_mult;
