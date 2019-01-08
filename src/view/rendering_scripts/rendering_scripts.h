@@ -52,15 +52,13 @@ struct draw_sentiences_hud_input {
 	const augs::atlas_entry circular_bar_tex;
 };
 
-struct draw_cast_spells_highlights_input {
+struct draw_explosion_body_highlights_input {
 	const augs::drawer output;
 	const interpolation_system& interpolation;
 	const cosmos& cosm;
 	const double global_time_seconds;
 	const augs::atlas_entry cast_highlight_tex;
 };
-
-using draw_explosion_body_highlights_input = draw_cast_spells_highlights_input;
 
 enum class circular_bar_type {
 	SMALL,
