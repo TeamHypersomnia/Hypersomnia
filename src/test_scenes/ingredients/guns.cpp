@@ -1978,6 +1978,11 @@ namespace test_flavours {
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 
+			gun_def.burst_spread_degrees = 11.f;
+			gun_def.burst_spread_degrees_variation = 0.f;
+			gun_def.after_burst_chambering_ms = 1000.f;
+			gun_def.num_burst_bullets = 3;
+
 			meta.set(gun_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::AO44, white);

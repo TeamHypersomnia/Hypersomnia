@@ -23,10 +23,18 @@
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/detail/sentience_shake.h"
 #include "game/enums/weapon_action_type.h"
+#include "augs/pad_bytes.h"
 
 namespace augs {
 	struct introspection_access;
 }
+
+enum class gun_special_state {
+	// GEN INTROSPECTOR enum class gun_special_state
+	NONE,
+	AFTER_BURST
+	// END GEN INTROSPECTOR
+};
 
 namespace components {
 	struct gun {
@@ -35,9 +43,11 @@ namespace components {
 		real32 chambering_progress_ms = 0.f;
 		real32 max_heat_after_steam_schedule = 0.f;
 
-		bool is_chambering_handle_being_pulled = false;
+		gun_special_state special_state = gun_special_state::NONE;
+
 		bool steam_burst_scheduled = false;
-		augs::enum_boolset<weapon_action_type, 2> just_pressed;
+		pad_bytes<1> pad;
+		augs::enum_boolset<weapon_action_type, 1> just_pressed;
 
 		augs::stepped_timestamp when_last_fired;
 		augs::stepped_timestamp when_last_played_trigger_effect;
@@ -47,11 +57,6 @@ namespace components {
 
 		simple_rot_vel magazine;
 		// END GEN INTROSPECTOR
-
-		void set_chambering_handle_pulling(
-			const bool enabled,
-			const augs::stepped_timestamp now
-		);
 	};
 }
 
@@ -62,6 +67,11 @@ namespace invariants {
 
 		gun_action_type action_mode = gun_action_type::INVALID;
 		unsigned num_last_bullets_to_trigger_low_ammo_cue = 0;
+
+		unsigned num_burst_bullets = 0;
+		real32 burst_spread_degrees = 0.f;
+		real32 burst_spread_degrees_variation = 0.f;
+		real32 after_burst_chambering_ms = 1000.f;
 
 		augs::bound<real32> muzzle_velocity = { 2000.f, 2000.f };
 

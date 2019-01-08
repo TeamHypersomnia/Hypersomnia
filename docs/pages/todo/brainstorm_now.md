@@ -7,6 +7,7 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - a hot for wielding a knife and an akimbo knife
+- let fota have a high impact
 
 - in case the gui still acts up
 	- always keep this personal deposit open

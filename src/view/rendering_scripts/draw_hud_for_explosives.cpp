@@ -13,6 +13,7 @@
 #include "game/detail/bombsite_in_range.h"
 #include "view/game_drawing_settings.h"
 #include "game/detail/gun/shell_offset.h"
+#include "game/detail/gun/gun_cooldowns.h"
 
 void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 	const auto dt = in.cosm.get_fixed_delta();
@@ -127,11 +128,11 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 		const bool enemy_hud = in.settings.draw_enemy_hud;
 
 		cosm.for_each_having<components::gun>(
-			[&](const auto it) {
+			[&](const auto& it) {
 				if (const auto tr = it.find_viewing_transform(in.interpolation)) {
 					const auto& gun = it.template get<components::gun>();
 
-					if (const auto& chamber_slot = it[slot_function::GUN_CHAMBER]; chamber_slot.alive() && chamber_slot->is_mounted_slot()) {
+					if (const auto chambering_duration = ::calc_current_chambering_duration(it); augs::is_positive_epsilon(chambering_duration)) {
 						const auto& progress = gun.chambering_progress_ms;
 
 						if (progress > 0.f) {
@@ -143,7 +144,7 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 								}
 							}
 
-							const auto highlight_amount = progress / chamber_slot->mounting_duration_ms;
+							const auto highlight_amount = progress / chambering_duration;
 
 							auto shell_spawn_offset = ::calc_shell_offset(it);
 							shell_spawn_offset.pos.rotate(tr->rotation);
