@@ -47,6 +47,7 @@ namespace test_scenes {
 		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::VINDICATOR);
 		rs.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 		rs.initial_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_SHIELD_ARMOR);
+		rs.initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::YELLOW_DAGGER);
 
 		fill_range(rs.initial_eq.spells_to_give, true);
 	}
@@ -74,6 +75,9 @@ namespace test_scenes {
 
 			resistance.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 			metropolis.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+
+			resistance.initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::YELLOW_DAGGER);
+			metropolis.initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::CYAN_SCYTHE);
 
 			resistance.warmup_initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 			metropolis.warmup_initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
@@ -443,9 +447,10 @@ namespace test_scenes {
 			give_weapon(transformr(vec2(-800 - k * 150, 1200)), test_melee_weapons::CYAN_SCYTHE);
 			give_weapon(transformr(vec2(-800 - k * 150, 1400)), test_melee_weapons::ELECTRIC_RAPIER);
 			give_weapon(transformr(vec2(-800 - k * 150, 1600)), test_melee_weapons::POSEIDON);
+			give_weapon(transformr(vec2(-800 - k * 150, 1800)), test_melee_weapons::YELLOW_DAGGER);
 
-			give_weapon(transformr(vec2(-800 - k * 150, 1800)), test_shootable_weapons::ELON_HRL);
-			give_charge(transformr(vec2(-800 - k * 150, 2000)), test_shootable_charges::SKULL_ROCKET, 5);
+			give_weapon(transformr(vec2(-800 - k * 150, 2000)), test_shootable_weapons::ELON_HRL);
+			give_charge(transformr(vec2(-800 - k * 150, 2200)), test_shootable_charges::SKULL_ROCKET, 5);
 		}
 
 		give_weapon(transformr(vec2(-300, -500 + 50)), test_shootable_weapons::AMPLIFIER_ARM);

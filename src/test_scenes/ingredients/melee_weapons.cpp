@@ -215,6 +215,15 @@ namespace test_flavours {
 			cyan
 		);
 
+		make_knife(
+			test_melee_weapons::YELLOW_DAGGER,
+			test_scene_image_id::YELLOW_DAGGER,
+			static_cast<money_type>(250),
+			faction_type::RESISTANCE,
+			1.f,
+			yellow
+		);
+
 		{
 			auto& meta = make_knife(
 				test_melee_weapons::POSEIDON,

@@ -116,6 +116,7 @@ enum class test_melee_weapons {
 	ELECTRIC_RAPIER,
 	CYAN_SCYTHE,
 	POSEIDON,
+	YELLOW_DAGGER,
 
 	COUNT
 	// END GEN INTROSPECTOR
