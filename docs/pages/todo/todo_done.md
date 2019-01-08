@@ -2822,3 +2822,8 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - ao44 should be explosive
 	- or just burst fire
   - electric triad should explode on hit
+
+- more mana, less shield absorption
+	- perhaps only reduce damage instead of absorbing
+	- so we can still cast some things
+- autocast bought spells, especially shield

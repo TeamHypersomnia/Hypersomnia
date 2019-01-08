@@ -27,6 +27,7 @@
 #include "view/audiovisual_state/systems/light_system.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/audiovisual_state/systems/particles_simulation_system.h"
+#include "view/rendering_scripts/draw_character_glow.h"
 
 #define CONST_MULT 100
 #define LINEAR_MULT 10000
@@ -349,30 +350,45 @@ void light_system::render_all_lights(const light_system_input in) const {
 	>();
 
 #if BUILD_STENCIL_BUFFER
+	auto draw_lights_for = [&](const auto& handle) {
+		::draw_neon_map(handle, drawing_in);
+		::draw_character_glow(
+			handle, 
+			{
+				output,
+				interp,
+				global_time_seconds,
+				in.cast_highlight_tex
+			}
+		);
+	};
+
 	if (const auto fog_of_war_character = cosm[in.fog_of_war_character ? *in.fog_of_war_character : entity_id()]) {
 		renderer.call_and_clear_triangles();
 		in.fill_stencil();
 		renderer.stencil_positive_test();
 		standard_shader.set_as_current();
 
-		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
+		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
 			if (handle.get_official_faction() != fog_of_war_character.get_official_faction()) {
-				::draw_neon_map(handle, drawing_in);
+				draw_lights_for(handle);
 			}
 		});
-
+		
 		renderer.call_and_clear_triangles();
 
 		renderer.disable_stencil();
 
-		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
+		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
 			if (handle.get_official_faction() == fog_of_war_character.get_official_faction()) {
-				::draw_neon_map(handle, drawing_in);
+				draw_lights_for(handle);
 			}
 		});
 	}
 	else {
-		helper.draw_neons<render_layer::SENTIENCES>();
+		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
+			draw_lights_for(handle);
+		});
 	}
 #else
 	helper.draw_neons<render_layer::SENTIENCES>();

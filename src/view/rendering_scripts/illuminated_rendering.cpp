@@ -315,14 +315,6 @@ void illuminated_rendering(
 				});
 			}
 
-			draw_cast_spells_highlights({
-				output,
-				interp,
-				cosm,
-				global_time_seconds,
-				cast_highlight
-			});
-
 			draw_explosion_body_highlights({
 				output,
 				interp,
@@ -361,6 +353,7 @@ void illuminated_rendering(
 		particles,
 		anims,
 		visible,
+		cast_highlight,
 		drawing_input
 	});
 

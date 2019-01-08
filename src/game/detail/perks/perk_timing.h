@@ -14,7 +14,7 @@ struct perk_timing {
 		duration.set(ms, now);
 	}
 
-	float get_ratio(const augs::stepped_clock& clk) const {
+	real32 get_ratio(const augs::stepped_clock& clk) const {
 		return duration.get_ratio_of_remaining_time(clk);
 	}
 

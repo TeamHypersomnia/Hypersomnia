@@ -46,10 +46,6 @@ summary: That which we are brainstorming at the moment.
 - could chambering sound be omitted under some occasions?
 - bomb soon explodes theme gets repeated
 
-- more mana, less shield absorption
-	- perhaps only reduce damage instead of absorbing
-	- so we can still cast some things
-- autocast bought spells, especially shield
 - autofill magazines on start of round
 - dont reload when mag is full only to fill the bullet in the chamber
 - dont show bomb planting hud when you are ct

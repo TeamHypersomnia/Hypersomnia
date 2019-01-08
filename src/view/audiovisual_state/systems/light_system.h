@@ -47,6 +47,7 @@ struct light_system_input {
 	const plain_animations_pool& plain_animations;
 	const visible_entities& visible;
 
+	const augs::atlas_entry cast_highlight_tex;
 	const draw_renderable_input& drawing_in;
 };
 

@@ -7,7 +7,7 @@ struct value_meter {
 	struct damage_result {
 		meter_value_type effective = 0;
 		meter_value_type excessive = 0;
-		float ratio_effective_to_maximum = 0.f;
+		real32 ratio_effective_to_maximum = 0.f;
 	};
 
 	// GEN INTROSPECTOR struct value_meter
@@ -30,6 +30,6 @@ struct value_meter {
 	void set_value(const meter_value_type);
 	void set_maximum_value(const meter_value_type);
 
-	float get_ratio() const;
+	real32 get_ratio() const;
 	void make_full();
 };

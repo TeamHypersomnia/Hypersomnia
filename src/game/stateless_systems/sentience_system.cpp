@@ -251,7 +251,9 @@ static void handle_special_result(const logic_step step, const messages::health_
 
 		personal_electricity.value = 0.f;
 
+		LOG("Destruction.");
 		if (const auto active_absorption = ::find_active_pe_absorption(subject)) {
+			LOG_NVPS(active_absorption->second);
 			step.post_message(messages::queue_deletion(active_absorption->second));
 		}
 	}
@@ -477,7 +479,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 
 				if (is_shield_enabled) {
 					const auto mult = std::max(0.01f, absorption->first.hp);
-					after_shield_damage = apply_ped(amount / mult).excessive;
+					after_shield_damage = apply_ped(amount / mult).excessive * mult;
 				}
 
 				if (after_shield_damage > 0) {
@@ -499,7 +501,8 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 				auto after_shield_damage = amount;
 
 				if (is_shield_enabled) {
-					after_shield_damage = apply_ped(amount / absorption->first.cp).excessive;
+					const auto mult = std::max(0.01f, absorption->first.cp);
+					after_shield_damage = apply_ped(amount / mult).excessive * mult;
 				}
 
 				if (after_shield_damage > 0) {
