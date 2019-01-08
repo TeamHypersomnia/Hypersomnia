@@ -293,7 +293,7 @@ namespace test_flavours {
 			tool.pe_absorption.cp = 0.6f;
 			tool.glow_color = turquoise;
 			tool.glow_color.a = 210;
-			tool.movement_speed_mult = 0.8f;
+			tool.movement_speed_mult = 0.85f;
 			meta.set(tool);
 		}
 
