@@ -579,6 +579,10 @@ bool should_fill_hotbar_from_right(const E& handle) {
 		return true;
 	}
 
+	if (item.categories_for_slot_compatibility.test(item_category::TORSO_ARMOR)) {
+		return true;
+	}
+
 	return false;
 }
 
@@ -646,7 +650,7 @@ void game_gui_system::standard_post_solve(const const_logic_step step) {
 		const bool interested =
 			target_slot.alive()
 			&& transferred_item.alive()
-			&& is_weapon_like(transferred_item)
+			&& (is_weapon_like(transferred_item) || is_armor_like(transferred_item))
 			&& target_slot.get_type() != slot_function::PERSONAL_DEPOSIT
 			&& (transfer.result.is_pickup() || (same_capability && !target_slot->is_mounted_slot()))
 		;

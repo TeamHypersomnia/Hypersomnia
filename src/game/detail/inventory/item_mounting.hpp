@@ -47,7 +47,8 @@ mounting_conditions_type calc_mounting_conditions(
 			slot_function::GUN_DETACHABLE_MAGAZINE,
 			slot_function::GUN_RAIL,
 			slot_function::GUN_MUZZLE,
-			slot_function::GUN_CHAMBER_MAGAZINE
+			slot_function::GUN_CHAMBER_MAGAZINE,
+			slot_function::TORSO_ARMOR
 		};
 
 		if (const bool for_unmounting = !for_mounting) {

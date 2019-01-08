@@ -22,6 +22,7 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/data_living_one_step.h"
+#include "game/detail/weapon_like.h"
 
 using namespace augs;
 
@@ -155,6 +156,20 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 			callee_handle.dispatch_on_having_all<components::gun>(
 				[&](const auto& typed_gun) {
 					typed_gun.template get<components::gun>().just_pressed[action_type] = true;
+				}
+			);
+
+			callee_handle.dispatch_on_having_all<invariants::item>(
+				[&](const auto& typed_item) {
+					if (::is_armor_like(typed_item)) {
+						if (const auto armor_slot = subject[slot_function::TORSO_ARMOR]) {
+							if (armor_slot.is_empty_slot()) {
+								if (it.was_pressed() && typed_item.find_mounting_progress() == nullptr) {
+									perform_transfer(item_slot_transfer_request::standard(typed_item, armor_slot), step);
+								}
+							}
+						}
+					}
 				}
 			);
 

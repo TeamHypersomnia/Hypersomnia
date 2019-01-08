@@ -182,21 +182,27 @@ perform_transfer_result perform_transfer_impl(
 	const bool is_pickup = result.is_pickup();
 
 	auto play_pickup_or_holster_effect = [&]() {
-		if (target_slot_exists && target_slot.get_id().type == slot_function::ITEM_DEPOSIT) {
+		if (target_slot_exists) {
 			packaged_sound_effect sound;
 
-			if (is_pickup) {
-				sound.input = common_assets.item_pickup_to_deposit_sound;
+			if (target_slot.get_id().type == slot_function::ITEM_DEPOSIT) {
+				if (is_pickup) {
+					sound.input = common_assets.item_pickup_to_deposit_sound;
+				}
+				else if (result.is_holster()) {
+					sound.input = common_assets.item_holster_sound;
+				}
 			}
-			else if (result.is_holster()) {
-				sound.input = common_assets.item_holster_sound;
+			else {
+				sound.input = target_slot->finish_mounting_sound;
 			}
 
-			sound.start = sound_effect_start_input::at_entity(target_root);
+			if (sound.input.id.is_set()) {
+				sound.start = sound_effect_start_input::at_entity(target_root);
+				output.transfer_sound.emplace(std::move(sound));
 
-			output.transfer_sound.emplace(std::move(sound));
-
-			return true;
+				return true;
+			}
 		}
 
 		return false;

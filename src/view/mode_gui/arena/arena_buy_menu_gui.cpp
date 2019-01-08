@@ -815,8 +815,6 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			};
 
 			auto for_each_tool = [&](auto&& callback) {
-				cosm.for_each_flavour_having<invariants::tool>(callback);
-
 				cosm.for_each_flavour_having<invariants::container, invariants::item>(
 					[&](const auto& id, const auto& flavour) {
 						if (::is_backpack_like(flavour)) {
@@ -824,6 +822,8 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 						}
 					}
 				);
+
+				cosm.for_each_flavour_having<invariants::tool>(callback);
 			};
 
 			auto for_each_grenade = [&](auto&& callback) {

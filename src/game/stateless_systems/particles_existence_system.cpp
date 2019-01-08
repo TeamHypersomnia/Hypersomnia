@@ -349,7 +349,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 		}
 		else if (h.target == messages::health_event::target_type::PERSONAL_ELECTRICITY) {
 			if (h.effective_amount > 0) {
-				const auto base_radius = destroyed ? 80.f : h.effective_amount * 2.f;
+				const auto base_radius = destroyed ? 250.f : h.effective_amount * 1.2f;
 
 				{
 					auto msg = make_ring_input();

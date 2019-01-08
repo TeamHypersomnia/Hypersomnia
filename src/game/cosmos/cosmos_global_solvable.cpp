@@ -100,7 +100,7 @@ void cosmos_global_solvable::solve_item_mounting(const logic_step step) {
 							return target_slot->start_mounting_sound;
 						}
 						else if (t == sound_type::FINISH) {
-							return target_slot->finish_mounting_sound;
+							return sound_effect_input();
 						}
 					}
 				}

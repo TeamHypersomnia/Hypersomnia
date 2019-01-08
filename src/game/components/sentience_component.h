@@ -172,8 +172,6 @@ namespace invariants {
 		real32 dash_drains_cp = 15.f;
 		real32 base_detached_head_speed = 2000.f;
 
-		real32 shield_damage_absorption_mult = 0.5f;
-
 		particle_effect_input detached_head_particles;
 
 		detached_body_parts_flavours detached_flavours;

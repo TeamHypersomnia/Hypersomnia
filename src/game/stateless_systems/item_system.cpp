@@ -542,7 +542,7 @@ void item_system::pick_up_touching_items(const logic_step step) {
 							(pick_list.empty() && transfers.pick_all_touched_items_if_list_to_pick_empty)
 							|| found_on_subscription_list
 						) {
-							const auto pickup_slot = typed_picker.find_pickup_target_slot_for(cosm[item_to_pick]);
+							const auto pickup_slot = typed_picker.find_pickup_target_slot_for(cosm[item_to_pick], { slot_finding_opt::OMIT_MOUNTED_SLOTS });
 
 							if (pickup_slot.alive()) {
 								const bool can_pick_already = transfers.pickup_timeout.try_to_fire_and_reset(clk);

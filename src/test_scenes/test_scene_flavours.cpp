@@ -271,6 +271,31 @@ namespace test_flavours {
 
 		{
 			auto& meta = flavour_with_sprite(
+				test_tool_items::ELECTRIC_SHIELD_ARMOR,
+				test_scene_image_id::ELECTRIC_SHIELD_ARMOR,
+				render_layer::SMALL_DYNAMIC_BODY
+			);
+
+			test_flavours::add_lying_item_dynamic_body(meta);
+
+			invariants::item item;
+			item.space_occupied_per_charge = to_space_units("5");
+			item.categories_for_slot_compatibility = { item_category::GENERAL, item_category::TORSO_ARMOR };
+			item.standard_price = static_cast<money_type>(1800);
+
+			meta.template get<invariants::fixtures>().density *= 2.f;
+			meta.template get<invariants::fixtures>().restitution = 0.7f;
+
+			meta.set(item);
+
+			invariants::tool tool;
+			tool.pe_absorption.hp = 0.33f;
+			tool.pe_absorption.cp = 0.66f;
+			meta.set(tool);
+		}
+
+		{
+			auto& meta = flavour_with_sprite(
 				test_tool_items::DEFUSE_KIT,
 				test_scene_image_id::DEFUSE_KIT,
 				render_layer::SMALL_DYNAMIC_BODY
@@ -288,6 +313,10 @@ namespace test_flavours {
 			meta.template get<invariants::fixtures>().restitution = 0.7f;
 
 			meta.set(item);
+
+			invariants::tool tool;
+			tool.defusing_speed_mult = 2.f;
+			meta.set(tool);
 		}
 
 		{

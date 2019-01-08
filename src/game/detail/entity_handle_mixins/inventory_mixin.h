@@ -40,6 +40,7 @@ enum class candidate_holster_type {
 
 enum class slot_finding_opt {
 	ALL_CHARGES_MUST_FIT,
+	OMIT_MOUNTED_SLOTS,
 	COUNT
 };
 
@@ -94,7 +95,7 @@ public:
 	inventory_slot_handle_type find_holstering_slot_for(const handle_type holstered_item) const;
 
 	template <class handle_type>
-	inventory_slot_handle_type find_pickup_target_slot_for(const handle_type picked_item) const;
+	inventory_slot_handle_type find_pickup_target_slot_for(const handle_type picked_item, slot_finding_opts = slot_finding_opts()) const;
 	
 	inventory_slot_handle_type get_current_slot() const;
 

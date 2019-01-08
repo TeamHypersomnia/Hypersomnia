@@ -17,6 +17,7 @@ struct requested_equipment {
 	item_flavour_id belt_wearable;
 	item_flavour_id personal_deposit_wearable;
 	item_flavour_id shoulder_wearable;
+	item_flavour_id armor_wearable;
 
 	other_equipment_vector other_equipment;
 

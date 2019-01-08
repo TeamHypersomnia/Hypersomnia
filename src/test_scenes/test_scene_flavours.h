@@ -313,6 +313,11 @@ enum class test_tool_items {
 	// GEN INTROSPECTOR enum class test_tool_items
 	DEFUSE_KIT,
 
+	ELECTRIC_SHIELD_ARMOR,
+
+	MAGE_ARMOR,
+	MAGE_APPARATUS,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

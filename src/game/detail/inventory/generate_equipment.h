@@ -57,6 +57,7 @@ entity_id requested_equipment::generate_for(
 	make_wearable(eq.belt_wearable, slot_function::BELT);
 	make_wearable(eq.personal_deposit_wearable, slot_function::PERSONAL_DEPOSIT);
 	make_wearable(eq.shoulder_wearable, slot_function::SHOULDER);
+	make_wearable(eq.armor_wearable, slot_function::TORSO_ARMOR);
 
 	auto get_pickup_slot_for = [&](const auto& new_item) {
 		if constexpr (to_the_ground) {

@@ -117,6 +117,12 @@ inline bool is_magazine_like(const cosmos& cosm, const item_flavour_id& id) {
 	});
 }
 
+inline bool is_armor_like(const cosmos& cosm, const item_flavour_id& id) {
+	return cosm.on_flavour(id, [&](const auto& typed_flavour) {
+		return typed_flavour.template get<invariants::item>().categories_for_slot_compatibility.test(item_category::TORSO_ARMOR);
+	});
+}
+
 template <class H>
 inline bool is_ammo_piece_like(const H& handle) {
 	const bool is_charge_like = handle.template has<invariants::cartridge>();
@@ -170,8 +176,20 @@ bool is_backpack_like(const T& handle) {
 }
 
 inline bool makes_sense_to_only_own_one(const cosmos& cosm, const item_flavour_id& id) {
+	if (::is_armor_like(cosm, id)) {
+		return true;
+	}
+
 	return cosm.on_flavour(id, [&](const auto& typed_flavour) {
-		return typed_flavour.template has<invariants::tool>() || is_backpack_like(typed_flavour);
+		if (const auto tool = typed_flavour.template find<invariants::tool>()) {
+			if (tool->spell_cost_amortization > 0.f) {
+				return false;
+			}
+
+			return true;
+		}
+
+		return ::is_backpack_like(typed_flavour);
 	});
 }
 

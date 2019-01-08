@@ -79,6 +79,12 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find
 			return;
 		}
 
+		if (opts.test(slot_finding_opt::OMIT_MOUNTED_SLOTS)) {
+			if (slot->is_mounted_slot()) {
+				return;
+			}
+		}
+
 		if (opts.test(slot_finding_opt::ALL_CHARGES_MUST_FIT)) {
 			if (slot.can_contain_whole(item)) {
 				target_slot = slot;
@@ -102,12 +108,12 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find
 template <class E>
 template <class handle_type>
 typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find_holstering_slot_for(const handle_type holstered_item) const {
-	return find_slot_for(holstered_item, { candidate_holster_type::WEARABLES, candidate_holster_type::CONTAINERS }, { slot_finding_opt::ALL_CHARGES_MUST_FIT } );
+	return find_slot_for(holstered_item, { candidate_holster_type::WEARABLES, candidate_holster_type::CONTAINERS }, { slot_finding_opt::ALL_CHARGES_MUST_FIT, slot_finding_opt::OMIT_MOUNTED_SLOTS } );
 }
 
 template <class E>
 template <class handle_type>
-typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find_pickup_target_slot_for(const handle_type picked_item) const {
+typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find_pickup_target_slot_for(const handle_type picked_item, const slot_finding_opts opts) const {
 	auto finding_order = candidate_holster_types { 
 		candidate_holster_type::WEARABLES, 
 		candidate_holster_type::CONTAINERS, 
@@ -115,7 +121,7 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find
 	};
 
 	{
-		if (is_weapon_like(picked_item)) {
+		if (::is_weapon_like(picked_item)) {
 			/* If it is a weapon, try to hold them in hands before trying containers. */
 
 			const auto& searched_root_container = *static_cast<const E*>(this);
@@ -125,7 +131,13 @@ typename inventory_mixin<E>::inventory_slot_handle_type inventory_mixin<E>::find
 				std::swap(finding_order.front(), finding_order.back());
 			}
 		}
+
+		if (::is_armor_like(picked_item)) {
+			/* If it is an armor, try to hold them in hands before trying containers. */
+
+			std::swap(finding_order.front(), finding_order.back());
+		}
 	}
 
-	return find_slot_for(picked_item, finding_order, slot_finding_opts());
+	return find_slot_for(picked_item, finding_order, opts);
 }

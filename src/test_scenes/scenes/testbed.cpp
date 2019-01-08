@@ -46,6 +46,7 @@ namespace test_scenes {
 
 		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::VINDICATOR);
 		rs.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
+		rs.initial_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_SHIELD_ARMOR);
 
 		fill_range(rs.initial_eq.spells_to_give, true);
 	}

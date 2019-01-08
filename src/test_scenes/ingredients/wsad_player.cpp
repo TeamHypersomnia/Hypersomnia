@@ -204,13 +204,23 @@ namespace test_flavours {
 					container.slots[slot_function::PERSONAL_DEPOSIT] = slot_def;
 				}
 
+				{
+					inventory_slot slot_def;
+					slot_def.category_allowed = item_category::TORSO_ARMOR;
+					slot_def.physical_behaviour = slot_physical_behaviour::DEACTIVATE_BODIES;
+					slot_def.always_allow_exactly_one_item = true;
+					slot_def.space_available = to_space_units("1000");
+					slot_def.mounting_duration_ms = 1000.f;
+					slot_def.finish_mounting_sound.id = to_sound_id(test_scene_sound_id::BACKPACK_WEAR);
+					container.slots[slot_function::TORSO_ARMOR] = slot_def;
+				}
+
 				meta.set(container);
 			}
 
 			invariants::sentience sentience; 
 			components::sentience sentience_inst;
 
-			sentience.shield_damage_absorption_mult = 0.33f;
 			sentience.max_inertia_when_rotation_possible = 1000.f;
 			sentience.detached_flavours.head = to_entity_flavour_id(test_plain_sprited_bodies::DETACHED_METROPOLIS_HEAD);
 			sentience.base_detached_head_speed = -4000.f;

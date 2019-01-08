@@ -1289,6 +1289,9 @@ void bomb_mode::execute_player_commands(const input_type in, mode_entropy& entro
 										eq.non_standard_mag = f_id;
 										eq.num_given_ammo_pieces = 1;
 									}
+									else if (::is_armor_like(cosm, f_id)) {
+										eq.armor_wearable = f_id;
+									}
 									else {
 										if (found_in(done_purchases, f_id)) {
 											eq.num_given_ammo_pieces = 1;

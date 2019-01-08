@@ -36,6 +36,8 @@
 #include "game/detail/sentience/sentience_logic.h"
 #include "game/detail/crosshair_math.hpp"
 #include "game/detail/sentience/sentience_getters.h"
+#include "game/detail/sentience/tool_getters.h"
+#include "augs/templates/logically_empty.h"
 
 damage_cause::damage_cause(const const_entity_handle& handle) {
 	entity = handle;
@@ -248,6 +250,10 @@ static void handle_special_result(const logic_step step, const messages::health_
 		sentience.get<electric_shield_perk_instance>() = electric_shield_perk_instance();
 
 		personal_electricity.value = 0.f;
+
+		if (const auto active_absorption = ::find_active_pe_absorption(subject)) {
+			step.post_message(messages::queue_deletion(active_absorption->second));
+		}
 	}
 	else if (h.special_result == messages::health_event::result_type::DEATH) {
 		health.value = 0.f;
@@ -445,7 +451,8 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 			auto& consciousness = s.get<consciousness_meter_instance>();
 			auto& personal_electricity = s.get<personal_electricity_meter_instance>();
 
-			const bool is_shield_enabled = s.get<electric_shield_perk_instance>().timing.is_enabled(clk);
+			const auto absorption = ::find_active_pe_absorption(subject);
+			const bool is_shield_enabled = logically_set(absorption);
 
 			auto apply_ped = [event_template, &personal_electricity, &process_and_post_health](const meter_value_type amount) {
 				auto event = event_template;
@@ -469,9 +476,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 				auto after_shield_damage = amount;
 
 				if (is_shield_enabled) {
-					const auto& sentience_def = subject.get<invariants::sentience>();
-
-					const auto mult = std::max(0.01f, sentience_def.shield_damage_absorption_mult);
+					const auto mult = std::max(0.01f, absorption->first.hp);
 					after_shield_damage = apply_ped(amount / mult).excessive;
 				}
 
@@ -494,8 +499,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 				auto after_shield_damage = amount;
 
 				if (is_shield_enabled) {
-					constexpr meter_value_type absorption_by_shield_mult = 2;
-					after_shield_damage = absorption_by_shield_mult * apply_ped(amount / absorption_by_shield_mult).excessive;
+					after_shield_damage = apply_ped(amount / absorption->first.cp).excessive;
 				}
 
 				if (after_shield_damage > 0) {
