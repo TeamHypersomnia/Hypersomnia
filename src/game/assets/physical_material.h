@@ -5,14 +5,14 @@
 #include "game/detail/view_input/sound_effect_input.h"
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/detail/view_input/sound_effect_input.h"
-#include "augs/misc/minmax.h"
+#include "augs/misc/bound.h"
 
 struct collision_sound_def {
-	using minmax = augs::minmax<real32>;
+	using bound = augs::bound<real32>;
 
 	// GEN INTROSPECTOR struct collision_sound_def
 	sound_effect_input effect;
-	minmax pitch = minmax(0.9f, 1.5f);
+	bound pitch = bound(0.9f, 1.5f);
 	real32 gain_mult = 1.f / 225.f;
 	real32 pitch_mult = 1.f / 185.f;
 

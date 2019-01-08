@@ -4,7 +4,7 @@
 
 #include "augs/misc/randomization_declaration.h"
 
-#include "augs/misc/minmax.h"
+#include "augs/misc/bound.h"
 #include "augs/math/vec2.h"
 #include "augs/templates/variated.h"
 
@@ -64,8 +64,8 @@ struct basic_randomization {
 		return randval_vm(v.value, v.variation);
 	}
 
-	float randval_h(float minmax);
-	int randval_h(int minmax);
+	float randval_h(float bound);
+	int randval_h(int bound);
 	
 	std::vector<float> make_random_intervals(
 		const std::size_t n, 
@@ -85,7 +85,7 @@ struct basic_randomization {
 
 	template<class T>
 	auto randval(const augs::random_bound<T> r) {
-		return augs::minmax<T>(randval(r.first), randval(r.second));
+		return augs::bound<T>(randval(r.first), randval(r.second));
 	}
 
 	template <class T>

@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/misc/timing/delta.h"
-#include "augs/misc/minmax.h"
+#include "augs/misc/bound.h"
 
 #include "augs/graphics/vertex.h"
 

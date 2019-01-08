@@ -19,7 +19,7 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 		all_definitions.allocate().object.name = format_enum(id);
 	});
 
-	using minmax = augs::minmax<real32>;
+	using bound = augs::bound<real32>;
 
 	const auto set_pair = [&](
 		const test_scene_physical_material_id a,
@@ -48,7 +48,7 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 
 	{
 		collision_sound_def def;
-		def.pitch = minmax(0.9f, 1.25f);
+		def.pitch = bound(0.9f, 1.25f);
 		def.gain_mult *= 5.0f;
 
 		def.occurences_before_cooldown = 1;

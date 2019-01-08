@@ -4,7 +4,7 @@
 
 #include "augs/math/simple_physics.h"
 #include "augs/misc/timing/stepped_timing.h"
-#include "augs/misc/minmax.h"
+#include "augs/misc/bound.h"
 #include "augs/misc/enum/enum_boolset.h"
 
 #include "game/enums/gun_action_type.h"
@@ -63,12 +63,12 @@ namespace invariants {
 		gun_action_type action_mode = gun_action_type::INVALID;
 		unsigned num_last_bullets_to_trigger_low_ammo_cue = 0;
 
-		augs::minmax<real32> muzzle_velocity = { 2000.f, 2000.f };
+		augs::bound<real32> muzzle_velocity = { 2000.f, 2000.f };
 
 		real32 damage_multiplier = 1.f;
 
-		augs::minmax<real32> shell_velocity = { 300.f, 1700.f };
-		augs::minmax<real32> shell_angular_velocity = { 2.f, 14.f };
+		augs::bound<real32> shell_velocity = { 300.f, 1700.f };
+		augs::bound<real32> shell_angular_velocity = { 2.f, 14.f };
 
 		real32 shell_spread_degrees = 20.f;
 

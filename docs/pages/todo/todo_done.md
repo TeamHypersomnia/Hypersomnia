@@ -284,8 +284,8 @@ we consider whole type overrides too complex architeciturally:
 	- because we will disallow any other action
 - in gameplay mode, the address may suddenly change
 -->
-- rename minmax to "bound"
-- use range widgets for minmaxes, with proper min/max labels
+- rename bound to "bound"
+- use range widgets for bounds, with proper min/max labels
 - check imgui's id stack logic and see if the activity change logic can't be made simpler, without flavour prop id, thanks to the stacks
 
 - remove that heresy which is flip_flags, oh boy
@@ -2817,3 +2817,4 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - cooldown the dash on switching weapons to balance insta switching
 
+- rename bound to bound

@@ -37,7 +37,7 @@ static constexpr bool inline_with_members_v =
 template <class T>
 static constexpr bool has_direct_widget_v = 
 	is_one_of_v<T, std::string, bool, vec2, vec2i, rgba, b2Filter>
-	|| is_arithmetic_minmax_v<T>
+	|| is_arithmetic_bound_v<T>
 	|| std::is_arithmetic_v<T>
 	|| std::is_enum_v<T>
 ;
@@ -111,8 +111,8 @@ std::optional<tweaker_type> detail_direct_edit(
 			return tweaker_type::CONTINUOUS;
 		}
 	}
-	else if constexpr(is_arithmetic_minmax_v<M>) {
-		if (drag_minmax(identity_label, altered)) { 
+	else if constexpr(is_arithmetic_bound_v<M>) {
+		if (drag_bound(identity_label, altered)) { 
 			return tweaker_type::CONTINUOUS;
 		}
 	}

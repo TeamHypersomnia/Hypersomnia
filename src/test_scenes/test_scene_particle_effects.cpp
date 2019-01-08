@@ -34,7 +34,7 @@
 
 template <class A, class B>
 auto float_range(const A a, const B b) {
-	return augs::minmax<float>(static_cast<float>(a), static_cast<float>(b));
+	return augs::bound<float>(static_cast<float>(a), static_cast<float>(b));
 }
 
 void load_test_scene_particle_effects(

@@ -1,15 +1,15 @@
 #pragma once
-#include "augs/misc/minmax.h"
+#include "augs/misc/bound.h"
 #include "augs/graphics/rgba.h"
 
 #include "game/components/transform_component.h"
 
 struct thunder_input {
-	using minmax = augs::minmax<float>;
+	using bound = augs::bound<float>;
 
-	minmax delay_between_branches_ms = minmax(0.f, 0.f);
-	minmax max_branch_lifetime_ms = minmax(0.f, 0.f);
-	minmax branch_length = minmax(0.f, 0.f);
+	bound delay_between_branches_ms = bound(0.f, 0.f);
+	bound max_branch_lifetime_ms = bound(0.f, 0.f);
+	bound branch_length = bound(0.f, 0.f);
 	unsigned max_depth = 8;
 	unsigned max_branch_children = 4;
 	unsigned max_all_spawned_branches = 40;

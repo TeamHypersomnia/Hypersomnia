@@ -5,7 +5,7 @@
 
 #include "augs/misc/constant_size_vector.h"
 
-#include "augs/misc/minmax.h"
+#include "augs/misc/bound.h"
 #include "game/enums/particle_layer.h"
 #include "view/viewables/particle_types.h"
 
@@ -14,7 +14,7 @@
 struct particle_effect_modifier;
 
 struct particles_emission {
-	using minmax = augs::minmax<float>;
+	using bound = augs::bound<float>;
 	using random_bound = augs::random_bound<float>;
 
 	template <class T>
@@ -23,33 +23,33 @@ struct particles_emission {
 	using particle_definitions_vectors = per_type_container<list_of_particle_types_t<>, make_particle_vector>;
 
 	// GEN INTROSPECTOR struct particles_emission
-	minmax spread_degrees = minmax(0.f, 0.f);
-	minmax base_speed = minmax(0.f, 0.f);
-	minmax base_speed_variation = minmax(0.f, 0.f);
-	minmax rotation_speed = minmax(0.f, 0.f);
-	minmax particles_per_sec = minmax(0.f, 0.f);
-	minmax stream_lifetime_ms = minmax(0.f, 0.f);
-	minmax particle_lifetime_ms = minmax(0.f, 0.f);
-	minmax size_multiplier = minmax(1.f, 1.f);
-	minmax acceleration = minmax(0.f, 0.f);
-	minmax angular_offset = minmax(0.f, 0.f);
-	minmax swing_spread = minmax(0.f, 0.f);
-	minmax swings_per_sec = minmax(0.f, 0.f);
+	bound spread_degrees = bound(0.f, 0.f);
+	bound base_speed = bound(0.f, 0.f);
+	bound base_speed_variation = bound(0.f, 0.f);
+	bound rotation_speed = bound(0.f, 0.f);
+	bound particles_per_sec = bound(0.f, 0.f);
+	bound stream_lifetime_ms = bound(0.f, 0.f);
+	bound particle_lifetime_ms = bound(0.f, 0.f);
+	bound size_multiplier = bound(1.f, 1.f);
+	bound acceleration = bound(0.f, 0.f);
+	bound angular_offset = bound(0.f, 0.f);
+	bound swing_spread = bound(0.f, 0.f);
+	bound swings_per_sec = bound(0.f, 0.f);
 	random_bound swing_spread_bound = { { 0.f, 0.f }, { 0.f, 0.f } };
 	random_bound swings_per_sec_bound = { { 0.f, 0.f }, { 0.f, 0.f } };
-	minmax swing_spread_change_rate = minmax(0.f, 0.f);
-	minmax swing_speed_change_rate = minmax(0.f, 0.f);
-	minmax fade_when_ms_remaining = minmax(0.f, 0.f);
-	minmax num_of_particles_to_spawn_initially = minmax(0.f, 0.f);
+	bound swing_spread_change_rate = bound(0.f, 0.f);
+	bound swing_speed_change_rate = bound(0.f, 0.f);
+	bound fade_when_ms_remaining = bound(0.f, 0.f);
+	bound num_of_particles_to_spawn_initially = bound(0.f, 0.f);
 
-	minmax randomize_spawn_point_within_circle_of_outer_radius = minmax(0.f, 0.f);
-	minmax randomize_spawn_point_within_circle_of_inner_radius = minmax(0.f, 0.f);
+	bound randomize_spawn_point_within_circle_of_outer_radius = bound(0.f, 0.f);
+	bound randomize_spawn_point_within_circle_of_inner_radius = bound(0.f, 0.f);
 
-	minmax starting_spawn_circle_size_multiplier = minmax(1.f, 1.f);
-	minmax ending_spawn_circle_size_multiplier = minmax(1.f, 1.f);
+	bound starting_spawn_circle_size_multiplier = bound(1.f, 1.f);
+	bound ending_spawn_circle_size_multiplier = bound(1.f, 1.f);
 
-	minmax starting_homing_force = minmax(0.f, 0.f);
-	minmax ending_homing_force = minmax(0.f, 0.f);
+	bound starting_homing_force = bound(0.f, 0.f);
+	bound ending_homing_force = bound(0.f, 0.f);
 
 	float initial_rotation_variation = 0.f;
 	bool randomize_acceleration = false;

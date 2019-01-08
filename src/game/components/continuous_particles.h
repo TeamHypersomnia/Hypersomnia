@@ -1,13 +1,13 @@
 #pragma once
 #include "augs/math/declare_math.h"
 #include "augs/templates/maybe.h"
-#include "augs/misc/minmax.h"
+#include "augs/misc/bound.h"
 #include "game/detail/view_input/particle_effect_input.h"
 
 struct stream_wandering {
 	// GEN INTROSPECTOR struct stream_wandering
 	real32 additional_radius = 10.f;
-	augs::minmax<real32> duration_ms = augs::minmax<real32>(200.f, 2000.f);
+	augs::bound<real32> duration_ms = augs::bound<real32>(200.f, 2000.f);
 	// END GEN INTROSPECTOR
 };
 

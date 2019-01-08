@@ -8,7 +8,7 @@
 
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/detail/view_input/sound_effect_input.h"
-#include "augs/misc/minmax.h"
+#include "augs/misc/bound.h"
 
 namespace invariants {
 	struct movement;
@@ -133,7 +133,7 @@ namespace invariants {
 		particle_effect_input dash_particles;
 		sound_effect_input dash_sound;
 
-		augs::minmax<real32> dash_effect_bound = augs::minmax<real32> { 0.88f, 1.0f };
+		augs::bound<real32> dash_effect_bound = augs::bound<real32> { 0.88f, 1.0f };
 		// END GEN INTROSPECTOR
 	};
 }

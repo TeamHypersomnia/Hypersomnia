@@ -22,7 +22,7 @@ namespace invariants {
 		assets::plain_animation_id animation_id;
 		unsigned max_direction_ms = 4000;
 		unsigned direction_interp_ms = 700;
-		augs::minmax<unsigned> base_velocity = { 3, 38 };
+		augs::bound<unsigned> base_velocity = { 3, 38 };
 		// END GEN INTROSPECTOR
 	};
 }

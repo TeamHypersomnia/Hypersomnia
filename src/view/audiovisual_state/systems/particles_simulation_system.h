@@ -3,7 +3,7 @@
 #include "augs/misc/simple_pair.h"
 
 #include "augs/misc/timing/delta.h"
-#include "augs/misc/minmax.h"
+#include "augs/misc/bound.h"
 
 #include "game/cosmos/entity_handle_declaration.h"
 #include "game/cosmos/step_declaration.h"
@@ -21,7 +21,7 @@ struct randomization;
 class particles_simulation_system {
 public:
 	struct emission_instance {
-		using minmax = augs::minmax<float>;
+		using bound = augs::bound<float>;
 
 		float angular_offset = 0.f;
 
@@ -38,8 +38,8 @@ public:
 
 		float swing_spread = 0.f;
 		float swings_per_sec = 0.f;
-		minmax swing_spread_bound = {};
-		minmax swings_per_sec_bound = {};
+		bound swing_spread_bound = {};
+		bound swings_per_sec_bound = {};
 		float swing_spread_change = 0.f;
 		float swing_speed_change = 0.f;
 
@@ -52,7 +52,7 @@ public:
 		float starting_spawn_circle_size_multiplier = 0.f;
 		float ending_spawn_circle_size_multiplier = 0.f;
 
-		minmax particle_speed;
+		bound particle_speed;
 
 		float fade_when_ms_remaining = 0.f;
 
@@ -162,7 +162,7 @@ public:
 	auto spawn_particle(
 		rng_type& rng,
 		const float angular_offset,
-		const augs::minmax<float> speed,
+		const augs::bound<float> speed,
 		const vec2 position,
 		const float basic_velocity_degrees,
 		const float spread,

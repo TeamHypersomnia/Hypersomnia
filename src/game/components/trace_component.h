@@ -1,6 +1,6 @@
 #pragma once
 #include "augs/math/vec2.h"
-#include "augs/misc/minmax.h"
+#include "augs/misc/bound.h"
 #include "augs/pad_bytes.h"
 
 #include "game/cosmos/entity_flavour_id.h"
@@ -36,19 +36,19 @@ namespace components {
 
 namespace invariants {
 	struct trace {
-		using minmax = augs::minmax<float>;
+		using bound = augs::bound<float>;
 		using finishing_trace_flavour_type = constrained_entity_flavour_id<
 			components::trace,
 			components::interpolation
 		>; 
 
 		// GEN INTROSPECTOR struct invariants::trace
-		minmax max_multiplier_x = minmax(1.f, 1.f);
-		minmax max_multiplier_y = minmax(1.f, 1.f);
+		bound max_multiplier_x = bound(1.f, 1.f);
+		bound max_multiplier_y = bound(1.f, 1.f);
 
 		vec2 additional_multiplier;
 
-		minmax lengthening_duration_ms = minmax(200.f, 400.f);
+		bound lengthening_duration_ms = bound(200.f, 400.f);
 
 		finishing_trace_flavour_type finishing_trace_flavour;
 

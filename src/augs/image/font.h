@@ -8,7 +8,7 @@
 #include "augs/image/image.h"
 #include "augs/texture_atlas/atlas_entry.h"
 #include "augs/utf32_point.h"
-#include "augs/misc/minmax.h"
+#include "augs/misc/bound.h"
 
 #if BUILD_FREETYPE
 struct FT_Glyph_Metrics_;
@@ -16,7 +16,7 @@ typedef FT_Glyph_Metrics_ FT_Glyph_Metrics;
 #endif
 
 namespace augs {
-	using utf32_ranges = std::vector<augs::minmax<utf32_point>>;
+	using utf32_ranges = std::vector<augs::bound<utf32_point>>;
 
 	struct font_loading_error : error_with_typesafe_sprintf {
 		using error_with_typesafe_sprintf::error_with_typesafe_sprintf;

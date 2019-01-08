@@ -1,5 +1,5 @@
 #pragma once
-#include "augs/misc/minmax.h"
+#include "augs/misc/bound.h"
 #include "augs/misc/timing/delta.h"
 #include "augs/graphics/rgba.h"
 

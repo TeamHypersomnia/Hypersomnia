@@ -439,15 +439,15 @@ struct tests_of_traits {
 
 	static_assert(std::is_trivially_copyable_v<augs::maybe<int>>);
 
-	static_assert(is_minmax_v<augs::minmax<float>>);
-	static_assert(is_minmax_v<augs::minmax<int>>);
-	static_assert(!is_minmax_v<augs::simple_pair<float, int>>);
+	static_assert(is_bound_v<augs::bound<float>>);
+	static_assert(is_bound_v<augs::bound<int>>);
+	static_assert(!is_bound_v<augs::simple_pair<float, int>>);
 
-	static_assert(is_arithmetic_minmax_v<augs::minmax<float>>);
-	static_assert(is_arithmetic_minmax_v<augs::minmax<int>>);
+	static_assert(is_arithmetic_bound_v<augs::bound<float>>);
+	static_assert(is_arithmetic_bound_v<augs::bound<int>>);
 
-	static_assert(!is_arithmetic_minmax_v<augs::minmax<std::string>>);
-	static_assert(!is_arithmetic_minmax_v<augs::minmax<augs::minmax<float>>>);
+	static_assert(!is_arithmetic_bound_v<augs::bound<std::string>>);
+	static_assert(!is_arithmetic_bound_v<augs::bound<augs::bound<float>>>);
 
 	static_assert(!is_typed_flavour_id_v<assets::image_id>);
 	static_assert(is_enum_map_v<decltype(invariants::container().slots)>);
