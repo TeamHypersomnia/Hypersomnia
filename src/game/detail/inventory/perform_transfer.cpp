@@ -15,6 +15,7 @@
 #include "game/cosmos/data_living_one_step.h"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/just_create_entity.h"
+#include "game/detail/weapon_like.h"
 
 #include "augs/templates/container_templates.h"
 #include "game/cosmos/cosmos.h"
@@ -387,6 +388,17 @@ perform_transfer_result perform_transfer_impl(
 			}
 			else if (result.is_holster()) {
 				do_recoil(-0.6f);
+			}
+
+			if (::is_weapon_like(grabbed_item_part_handle)) {
+				if (const auto movement = target_root.find<components::movement>()) {
+					const auto& movement_def = target_root.get<invariants::movement>();
+
+					movement->dash_cooldown_ms = std::max(
+						movement->dash_cooldown_ms,
+						movement_def.dash_cooldown_ms * movement_def.dash_cooldown_mult_after_transfer
+					);
+				}
 			}
 		}
 	}

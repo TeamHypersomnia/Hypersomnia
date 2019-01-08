@@ -1644,7 +1644,7 @@ namespace test_flavours {
 			gun_def.damage_multiplier = 2.0;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
-			gun_def.kickback_towards_wielder = kickback_mult * 70.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 50.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(500);
 			gun_def.recoil_multiplier = 1.1f;
 
@@ -1716,7 +1716,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::VINDICATOR_SHOT_1, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 1.8f);
+			set_density_mult(meta, 1.7);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1200.f, 0.f);
 			meta.get<invariants::item>().standard_price = 2900;
 			set_chambering_duration_ms(meta, 550.f);

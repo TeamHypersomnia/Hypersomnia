@@ -2815,3 +2815,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - less music volume by default, e.g. 0.3
 - separate dash logic for reuse in different contexts
 
+- cooldown the dash on switching weapons to balance insta switching
+

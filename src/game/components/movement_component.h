@@ -125,6 +125,7 @@ namespace invariants {
 		unsigned animation_frame_num = 5;
 
 		real32 dash_cooldown_ms = 1000.f;
+		real32 dash_cooldown_mult_after_transfer = 0.2f;
 
 		real32 dash_impulse = 1163.f;
 		real32 dash_inert_ms = 400.f;
