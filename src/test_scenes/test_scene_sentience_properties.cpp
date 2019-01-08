@@ -18,6 +18,7 @@ void load_test_scene_sentience_properties(
 	auto& meters = state.meters;
 
 	const rgba turqoise_spell_color = turquoise;
+	(void)turqoise_spell_color;
 	const rgba blue_spell_border = cyan; //{ 0, 128, 209, 255 };
 	const rgba green_spell_color = { 0, 255, 0, 255 };
 
@@ -235,6 +236,7 @@ void load_test_scene_sentience_properties(
 		}
 	}
 
+#if ELECTRIC_SHIELD_AS_SPELL
 	{
 		auto& d = std::get<electric_shield>(spells);
 		d.common.cooldown_ms = 5000;
@@ -257,6 +259,7 @@ void load_test_scene_sentience_properties(
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 		d.common.standard_price = static_cast<money_type>(1500);
 	}
+#endif
 
 	{
 		auto& p = std::get<electric_shield_perk>(perks);

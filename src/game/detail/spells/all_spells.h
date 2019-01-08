@@ -18,7 +18,9 @@ using spell_list_t = List<
 	haste,
 	fury_of_the_aeons,
 	ultimate_wrath_of_the_aeons,
+#if ELECTRIC_SHIELD_AS_SPELL
 	electric_shield,
+#endif
 	electric_triad,
 	exaltation,
 	echoes_of_the_higher_realms
