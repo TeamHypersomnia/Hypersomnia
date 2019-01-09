@@ -25,6 +25,16 @@ using perk_tuple = perk_list_t<std::tuple>;
 using spell_meta_id = type_in_list_id<spell_tuple>;
 using perk_meta_id = type_in_list_id<meter_tuple>;
 
+struct default_sound_properties_info {
+	// GEN INTROSPECTOR struct default_sound_properties_info
+	real32 max_distance = 3500.f;
+	real32 reference_distance = 200.f;
+	augs::distance_model distance_model = augs::distance_model::LINEAR_DISTANCE_CLAMPED;
+	real32 basic_nonlinear_rolloff = 20.f;
+	real32 air_absorption = 2.f;
+	// END GEN INTROSPECTOR
+};
+
 struct cosmos_common_significant {
 	// GEN INTROSPECTOR struct cosmos_common_significant
 	all_logical_assets logical_assets;
@@ -41,6 +51,8 @@ struct cosmos_common_significant {
 	perk_tuple perks;
 
 	rgba ambient_light_color = { 25, 51, 51, 255 };
+
+	default_sound_properties_info default_sound_properties;
 	// END GEN INTROSPECTOR
 
 private:

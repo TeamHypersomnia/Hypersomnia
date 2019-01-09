@@ -57,7 +57,7 @@ namespace test_flavours {
 
 				fuse.released_image_id = to_image_id(test_scene_image_id::FORCE_GRENADE_RELEASED);
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
-				fuse.additional_release_impulse.linear = 6000.f;
+				fuse.additional_release_impulse.linear = 3000.f;
 				fuse.fuse_delay_ms = 1000.f;
 
 				meta.set(fuse);
@@ -84,8 +84,9 @@ namespace test_flavours {
 			in.effective_radius = 380.f;
 			dmg.impact_impulse = 550.f;
 			dmg.impulse_multiplier_against_sentience = 1.f;
-			in.sound.modifier.gain = 1.8f;
 			in.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
+			in.sound.modifier.max_distance = 8000.f;
+			in.sound.modifier.reference_distance = 2000.f;
 
 			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 			dmg.shake.duration_ms = 500.f;
@@ -121,7 +122,7 @@ namespace test_flavours {
 				fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
 				fuse.released_image_id = to_image_id(test_scene_image_id::INTERFERENCE_GRENADE_RELEASED);
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
-				fuse.additional_release_impulse.linear = 6000.f;
+				fuse.additional_release_impulse.linear = 3000.f;
 				fuse.fuse_delay_ms = 800.f;
 
 				meta.set(fuse);
@@ -137,9 +138,10 @@ namespace test_flavours {
 			in.outer_ring_color = orange;
 			in.effective_radius = 450.f;
 			dmg.impact_impulse = 2.f;
-			dmg.impulse_multiplier_against_sentience = 2000.f;
-			in.sound.modifier.gain = 2.2f;
+			dmg.impulse_multiplier_against_sentience = 3000.f;
 			in.sound.id = to_sound_id(test_scene_sound_id::INTERFERENCE_EXPLOSION);
+			in.sound.modifier.max_distance = 8000.f;
+			in.sound.modifier.reference_distance = 2000.f;
 			in.type = adverse_element_type::INTERFERENCE;
 
 			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
@@ -149,11 +151,14 @@ namespace test_flavours {
 			{
 				auto e = in;
 				e *= 0.6f;
+				e.damage.impact_impulse = 2.f * 0.6f;
 				e.wave_shake_radius_mult = 6;
 				e.sound.modifier.gain = 1.f;
 				e.sound.id = to_sound_id(test_scene_sound_id::INTERFERENCE_EXPLOSION);
 				e.sound.modifier.gain = 0.1f;
 				e.sound.modifier.pitch = 0.75f;
+				e.sound.modifier.max_distance = 8000.f;
+				e.sound.modifier.reference_distance = 2000.f;
 				e.inner_ring_color = orange;
 				e.outer_ring_color = yellow;
 				e.ring_duration_seconds = 0.3f;
@@ -208,7 +213,7 @@ namespace test_flavours {
 
 				fuse.released_image_id = to_image_id(test_scene_image_id::PED_GRENADE_RELEASED);
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
-				fuse.additional_release_impulse.linear = 6000.f;
+				fuse.additional_release_impulse.linear = 3000.f;
 
 				meta.set(fuse);
 			}
@@ -224,8 +229,9 @@ namespace test_flavours {
 			in.effective_radius = 500.f;
 			dmg.impact_impulse = 2.f;
 			dmg.impulse_multiplier_against_sentience = 1.f;
-			in.sound.modifier.gain = 2.2f;
 			in.sound.id = to_sound_id(test_scene_sound_id::PED_EXPLOSION);
+			in.sound.modifier.max_distance = 8000.f;
+			in.sound.modifier.reference_distance = 2000.f;
 			in.type = adverse_element_type::PED;
 			in.create_thunders_effect = true;
 
@@ -246,8 +252,9 @@ namespace test_flavours {
 			in.effective_radius = 600.f;
 			dmg.impact_impulse = 950.f;
 			dmg.impulse_multiplier_against_sentience = 1.f;
-			in.sound.modifier.gain = 2.f;
 			in.sound.id = to_sound_id(test_scene_sound_id::BOMB_EXPLOSION);
+			in.sound.modifier.max_distance = 8000.f;
+			in.sound.modifier.reference_distance = 2000.f;
 
 			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 			dmg.shake.duration_ms = 700.f;
@@ -277,7 +284,6 @@ namespace test_flavours {
 		{
 			auto e = bomb_explosion;
 			e *= 0.3f;
-			e.sound.modifier.gain = 1.f;
 			e.sound.id = to_sound_id(test_scene_sound_id::SKULL_ROCKET_DESTRUCTION);
 			e.inner_ring_color = cyan;
 			e.outer_ring_color = white;
@@ -298,7 +304,6 @@ namespace test_flavours {
 			auto e = bomb_explosion;
 			e *= 0.1f;
 			e.wave_shake_radius_mult = 6;
-			e.sound.modifier.gain = 1.f;
 			e.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
 			e.inner_ring_color = white;
 			e.outer_ring_color = cyan;
@@ -317,7 +322,6 @@ namespace test_flavours {
 		{
 			auto e = bomb_explosion;
 			e *= 0.4f;
-			e.sound.modifier.gain = 1.f;
 			e.sound.id = to_sound_id(test_scene_sound_id::SKULL_ROCKET_DESTRUCTION);
 			e.inner_ring_color = yellow;
 			e.outer_ring_color = orange;
@@ -338,7 +342,6 @@ namespace test_flavours {
 			auto e = bomb_explosion;
 			e *= 0.2f;
 			e.wave_shake_radius_mult = 6;
-			e.sound.modifier.gain = 1.f;
 			e.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
 			e.inner_ring_color = red;
 			e.outer_ring_color = orange;
@@ -357,7 +360,6 @@ namespace test_flavours {
 		{
 			auto smaller_bomb_cascade_explosion = bomb_explosion;
 			smaller_bomb_cascade_explosion *= 0.07f;
-			smaller_bomb_cascade_explosion.sound.modifier.gain = 1.f;
 			smaller_bomb_cascade_explosion.sound.id = to_sound_id(test_scene_sound_id::FIREWORK);
 			smaller_bomb_cascade_explosion.inner_ring_color = green;
 			smaller_bomb_cascade_explosion.outer_ring_color = dark_green;
@@ -471,10 +473,9 @@ namespace test_flavours {
 				in.effective_radius = 400.f;
 				dmg.impact_impulse = 450.f;
 				dmg.impulse_multiplier_against_sentience = 1.f;
-				in.sound.modifier.gain = 2.f;
 				in.sound.id = to_sound_id(test_scene_sound_id::SKULL_ROCKET_DESTRUCTION);
 				in.sound.modifier.max_distance = 8000.f;
-				in.sound.modifier.reference_distance = 1400.f;
+				in.sound.modifier.reference_distance = 2000.f;
 				in.sound.modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
 
 				in.create_thunders_effect = true;
@@ -491,7 +492,7 @@ namespace test_flavours {
 					c.flavour_id = to_entity_flavour_id(test_explosion_bodies::SKULL_ROCKET_CASCADE);
 					c.num_spawned = 2;
 					c.num_explosions = { 2, 0 };
-					c.initial_speed = { 1000.f, 0.2f };
+					c.initial_speed = { 1300.f, 0.2f };
 				}
 
 				{

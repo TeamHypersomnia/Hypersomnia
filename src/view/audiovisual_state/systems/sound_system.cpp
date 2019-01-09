@@ -168,8 +168,6 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 		|| (target_faction != faction_type::SPECTATOR && faction == target_faction)
 	;
 
-	const auto listener_pos = listening_character.get_viewing_transform(in.interp).pos;
-
 	const auto& cosm = listening_character.get_cosmos();
 	const auto si = cosm.get_si();
 	const auto maybe_transform = in.find_transform(positioning);
@@ -180,13 +178,20 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 
 	const auto current_transform = *maybe_transform;
 
+	const auto& common = cosm.get_common_significant();
+	const auto& defaults = common.default_sound_properties;
+
 	if (is_direct_listener) {
 		source.set_air_absorption_factor(0.f);
 	}
 	else {
+#if 0
+		const auto listener_pos = listening_character.get_viewing_transform(in.interp).pos;
+
 		const auto dist_from_listener = (listener_pos - current_transform.pos).length();
-		const auto absorption = std::min(10.f, static_cast<float>(pow(std::max(0.f, dist_from_listener - 2220.f)/520.f, 2)));
-		source.set_air_absorption_factor(absorption);
+		const auto absorption = 1.f + 0 * std::min(10.f, 3 * static_cast<float>(pow(std::max(0.f, dist_from_listener - 2220.f)/520.f, 2)));
+#endif
+		source.set_air_absorption_factor(std::clamp(defaults.air_absorption, 0.f, 10.f));
 	}
 
 	if (previous_transform && !is_direct_listener && !(in.dt == augs::delta::zero)) {
@@ -215,25 +220,28 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 	const auto& input = original.input;
 	const auto& m = input.modifier;
 
-	auto g_mult = 1.f;
-	
-	if (m.distance_model != augs::distance_model::LINEAR_DISTANCE
-		&& m.distance_model != augs::distance_model::LINEAR_DISTANCE_CLAMPED
-	) {
-		/* Correct the gain of non-linear sources so that they eventually become silent. */
-		const auto d = (listener_pos - current_transform.pos).length();
+	auto max_dist = m.max_distance;
+	auto ref_dist = m.reference_distance;
+	auto dist_model = m.distance_model;
 
-		const auto md = m.max_distance;
-		const auto rd = m.reference_distance ;
-
-		const auto thres = md - rd;
-
-		if (rd > 0.f && d > thres) {
-			g_mult = std::max(0.f, 1.f - ((d - thres) / rd));
-		}
+	if (dist_model == augs::distance_model::NONE) {
+		dist_model = defaults.distance_model;
 	}
 
-	const auto chosen_mult = [&]() {
+	if (max_dist < 0.f) {
+		max_dist = defaults.max_distance;
+	}
+
+	if (ref_dist < 0.f) {
+		ref_dist = defaults.reference_distance;
+	}
+
+	const bool is_linear = 
+		dist_model == augs::distance_model::LINEAR_DISTANCE
+		|| dist_model == augs::distance_model::LINEAR_DISTANCE_CLAMPED
+	;
+
+	const auto mult_via_settings = [&]() {
 		if (original.input.modifier.always_direct_listener) {
 			if (const auto buf = source.get_bound_buffer()) {
 				if (buf->get_length_in_seconds() > in.settings.treat_as_music_sounds_longer_than_secs) {
@@ -246,13 +254,25 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 	}();
 
 	source.set_pitch(m.pitch * in.speed_multiplier);
-	source.set_gain(g_mult * m.gain * chosen_mult);
-	source.set_max_distance(si, std::max(0.f, m.max_distance));
-	source.set_reference_distance(si, std::max(0.f, m.reference_distance));
+	source.set_gain(std::clamp(m.gain, 0.f, 1.f) * mult_via_settings);
+	source.set_reference_distance(si, ref_dist);
 	source.set_looping(m.repetitions == -1);
-	source.set_distance_model(m.distance_model);
+	source.set_distance_model(dist_model);
 	source.set_doppler_factor(std::max(0.f, m.doppler_factor));
-	source.set_rolloff_factor(std::max(0.f, m.rolloff_factor));
+
+	if (is_linear) {
+		source.set_max_distance(si, max_dist);
+	}
+	else {
+		/* 
+			rolloff does not make sense for linear models. 
+			Simply decrease the max_distance parameter instead.
+
+			Here we estimate the rolloff factor based on what we want as the max_distance.
+		*/
+
+		source.set_rolloff_factor(std::max(0.f, defaults.basic_nonlinear_rolloff * (ref_dist / max_dist)));
+	}
 
 	source.set_spatialize(!is_direct_listener);
 	source.set_direct_channels(is_direct_listener);

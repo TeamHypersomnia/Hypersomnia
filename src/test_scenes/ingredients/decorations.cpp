@@ -315,7 +315,8 @@ namespace test_flavours {
 			const auto distance_model,
 			const auto ref_distance,
 			const auto max_distance,
-			const float doppler = 1.f
+			const real32 doppler = 1.f,
+			const real32 gain = 1.f
 		) {
 			auto& meta = get_test_flavour(flavours, flavour_id);
 
@@ -325,6 +326,7 @@ namespace test_flavours {
 			sound_def.effect.modifier.reference_distance = ref_distance;
 			sound_def.effect.modifier.max_distance = max_distance;
 			sound_def.effect.modifier.doppler_factor = doppler;
+			sound_def.effect.modifier.gain = gain;
 			meta.set(sound_def);
 		};
 
@@ -358,9 +360,11 @@ namespace test_flavours {
 		flavour_with_sound(
 			test_sound_decorations::LOUDY_FAN,
 			test_scene_sound_id::LOUDY_FAN,
-			augs::distance_model::INVERSE_DISTANCE_CLAMPED,
-			150.f,
-			500.f
+			augs::distance_model::LINEAR_DISTANCE_CLAMPED,
+			20.f,
+			400.f,
+			1.f,
+			0.5f
 		);
 
 		{

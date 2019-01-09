@@ -251,9 +251,7 @@ static void handle_special_result(const logic_step step, const messages::health_
 
 		personal_electricity.value = 0.f;
 
-		LOG("Destruction.");
 		if (const auto active_absorption = ::find_active_pe_absorption(subject)) {
-			LOG_NVPS(active_absorption->second);
 			step.post_message(messages::queue_deletion(active_absorption->second));
 		}
 	}

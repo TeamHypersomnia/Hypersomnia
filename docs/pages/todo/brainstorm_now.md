@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- when inverse or exponent model, use max_distance for reference distance as it works somewhat this way then
+
 - a hot for wielding a knife and an akimbo knife
 - let fota have a high impact
 

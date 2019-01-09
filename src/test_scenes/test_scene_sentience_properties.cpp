@@ -27,7 +27,7 @@ void load_test_scene_sentience_properties(
 		d.common.cooldown_ms = 5000;
 		d.common.personal_electricity_required = 110;
 		d.common.associated_color = green_spell_color;
-		d.perk_duration_seconds = 25;
+		d.perk_duration_seconds = 15;
 
 		d.appearance.incantation = "treximo";
 
@@ -42,7 +42,7 @@ void load_test_scene_sentience_properties(
 		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
 		d.common.cast_sparkles.id = to_particle_effect_id(test_scene_particle_effect_id::CAST_SPARKLES);
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
-		d.common.standard_price = static_cast<money_type>(500);
+		d.common.standard_price = static_cast<money_type>(1800);
 	}
 
 	{
@@ -66,7 +66,7 @@ void load_test_scene_sentience_properties(
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 		d.common.cast_sparkles.modifier.scale_amounts = 1.3f;
 		d.common.cast_sparkles.modifier.scale_lifetimes = 1.3f;
-		d.common.standard_price = static_cast<money_type>(700);
+		d.common.standard_price = static_cast<money_type>(2500);
 	}
 
 	{
@@ -90,7 +90,7 @@ void load_test_scene_sentience_properties(
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 		d.common.cast_sparkles.modifier.scale_amounts = 1.3f;
 		d.common.cast_sparkles.modifier.scale_lifetimes = 1.3f;
-		d.common.standard_price = static_cast<money_type>(300);
+		d.common.standard_price = static_cast<money_type>(1500);
 	}
 
 	{
@@ -111,7 +111,7 @@ void load_test_scene_sentience_properties(
 		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
 		d.common.cast_sparkles.id = to_particle_effect_id(test_scene_particle_effect_id::CAST_SPARKLES);
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
-		d.common.standard_price = static_cast<money_type>(2100);
+		d.common.standard_price = static_cast<money_type>(2500);
 
 		{
 			auto& in = d.explosion;
@@ -123,7 +123,8 @@ void load_test_scene_sentience_properties(
 			in.inner_ring_color = cyan;
 			in.outer_ring_color = white;
 			in.sound.id = to_sound_id(test_scene_sound_id::EXPLOSION);
-			in.sound.modifier.gain = 1.2f;
+			in.sound.modifier.max_distance = 8000.f;
+			in.sound.modifier.reference_distance = 2000.f;
 			in.type = adverse_element_type::FORCE;
 			in.wave_shake_radius_mult = 6.f;
 
@@ -151,7 +152,7 @@ void load_test_scene_sentience_properties(
 		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
 		d.common.cast_sparkles.id = to_particle_effect_id(test_scene_particle_effect_id::CAST_SPARKLES);
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
-		d.common.standard_price = static_cast<money_type>(6000);
+		d.common.standard_price = static_cast<money_type>(5000);
 		d.missile_flavour = to_entity_flavour_id(test_plain_missiles::ELECTRIC_MISSILE);
 	}
 
@@ -177,7 +178,7 @@ void load_test_scene_sentience_properties(
 		d.charging_particles.id = to_particle_effect_id(test_scene_particle_effect_id::CAST_CHARGING);
 		d.charging_particles.modifier.scale_lifetimes = 1.3f;
 		d.charging_sound.id = to_sound_id(test_scene_sound_id::CAST_CHARGING);
-		d.common.standard_price = static_cast<money_type>(3100);
+		d.common.standard_price = static_cast<money_type>(3000);
 
 		{
 			standard_explosion_input in;
@@ -190,7 +191,8 @@ void load_test_scene_sentience_properties(
 				in.effective_radius = 350.f;
 				in.damage.base = 88.f;
 				in.damage.impact_impulse = 150.f;
-				in.sound.modifier.gain = 1.2f;
+				in.sound.modifier.max_distance = 8000.f;
+				in.sound.modifier.reference_distance = 2000.f;
 				in.sound.id = to_sound_id(test_scene_sound_id::EXPLOSION);
 
 				in.subject_shake.duration_ms = 400.f;
@@ -206,7 +208,8 @@ void load_test_scene_sentience_properties(
 				in.effective_radius = 500.f;
 				in.damage.base = 112.f;
 				in.damage.impact_impulse = 200.f;
-				in.sound.modifier.gain = 1.0f;
+				in.sound.modifier.max_distance = 8000.f;
+				in.sound.modifier.reference_distance = 2000.f;
 				in.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
 
 				in.subject_shake.duration_ms = 500.f;
@@ -222,7 +225,8 @@ void load_test_scene_sentience_properties(
 				in.effective_radius = 700.f;
 				in.damage.base = 130.f;
 				in.damage.impact_impulse = 250.f;
-				in.sound.modifier.gain = 1.2f;
+				in.sound.modifier.max_distance = 8000.f;
+				in.sound.modifier.reference_distance = 2000.f;
 				in.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
 				in.subject_impulse = 1938.f;
 				in.subject_inert_ms = 400.f;

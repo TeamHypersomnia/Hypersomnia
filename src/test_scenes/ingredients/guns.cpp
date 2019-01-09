@@ -238,7 +238,7 @@ namespace test_flavours {
 
 
 			test_flavours::add_bullet_round_physics(meta);
-			meta.template get<invariants::rigid_body>().damping.linear = 3.f;
+			meta.template get<invariants::rigid_body>().damping.linear = 2.8f;
 			meta.template get<invariants::fixtures>().filter = filters[predefined_filter_type::FLYING_COLLIDING_BULLET];
 
 			invariants::missile missile;
@@ -269,10 +269,9 @@ namespace test_flavours {
 			auto& trace_modifier = missile.trace_sound.modifier;
 
 			trace_modifier.doppler_factor = 1.f;
-			trace_modifier.max_distance = 6000.f;
-			trace_modifier.reference_distance = 1000.f;
+			trace_modifier.max_distance = 8000.f;
+			trace_modifier.reference_distance = 2000.f;
 			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
-			trace_modifier.gain = 1.3f;
 			trace_modifier.fade_on_exit = false;
 
 			meta.set(missile);
@@ -349,7 +348,6 @@ namespace test_flavours {
 			trace_modifier.max_distance = 700.f;
 			trace_modifier.reference_distance = 50.f;
 			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
-			trace_modifier.gain = 1.3f;
 			trace_modifier.fade_on_exit = false;
 
 			meta.set(missile);
@@ -424,7 +422,6 @@ namespace test_flavours {
 			trace_modifier.max_distance = 700.f;
 			trace_modifier.reference_distance = 50.f;
 			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
-			trace_modifier.gain = 1.3f;
 			trace_modifier.fade_on_exit = false;
 
 			meta.set(missile);
@@ -499,7 +496,6 @@ namespace test_flavours {
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
 			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
-			trace_modifier.gain = 1.3f;
 			trace_modifier.fade_on_exit = false;
 
 			meta.set(missile);
@@ -574,7 +570,6 @@ namespace test_flavours {
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
 			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
-			trace_modifier.gain = 1.3f;
 			trace_modifier.fade_on_exit = false;
 
 			meta.set(missile);
@@ -651,7 +646,6 @@ namespace test_flavours {
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
 			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
-			trace_modifier.gain = 1.3f;
 			trace_modifier.fade_on_exit = false;
 
 			meta.set(missile);
@@ -723,7 +717,6 @@ namespace test_flavours {
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
 			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
-			trace_modifier.gain = 1.3f;
 			trace_modifier.fade_on_exit = false;
 
 			meta.set(missile);
@@ -775,6 +768,8 @@ namespace test_flavours {
 
 			missile.homing_towards_hostile_strength = 1.0f;
 			missile.damage.base = 24;
+			missile.damage.impact_impulse = 450.f;
+			missile.damage.impulse_multiplier_against_sentience = 1.f;
 			missile.ricochet_born_cooldown_ms = 17.f;
 
 			auto& trace_modifier = missile.trace_sound.modifier;
@@ -783,7 +778,6 @@ namespace test_flavours {
 			trace_modifier.max_distance = 1020.f;
 			trace_modifier.reference_distance = 100.f;
 			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
-			trace_modifier.gain = 1.3f;
 			trace_modifier.fade_on_exit = false;
 
 			meta.set(missile);
@@ -801,16 +795,15 @@ namespace test_flavours {
 			auto& dmg = in.damage;
 
 			in.type = adverse_element_type::FORCE;
-			dmg.base = 40.f;
+			dmg.base = 32.f;
 			in.inner_ring_color = cyan;
 			in.outer_ring_color = white;
 			in.effective_radius = 400.f;
-			dmg.impact_impulse = 450.f;
+			dmg.impact_impulse = 750.f;
 			dmg.impulse_multiplier_against_sentience = 1.f;
-			in.sound.modifier.gain = 2.f;
 			in.sound.id = to_sound_id(test_scene_sound_id::SKULL_ROCKET_DESTRUCTION);
 			in.sound.modifier.max_distance = 8000.f;
-			in.sound.modifier.reference_distance = 1400.f;
+			in.sound.modifier.reference_distance = 2000.f;
 			in.sound.modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
 
 			in.create_thunders_effect = true;

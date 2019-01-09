@@ -65,6 +65,15 @@ void populate_test_scene_common(const loaded_image_caches_map& caches, cosmos_co
 
 	common.ambient_light_color = { 53, 97, 102, 255 }; // Brighten it up a little
 
+	{
+		auto& defs = common.default_sound_properties;
+
+		defs.max_distance = 4500.f;
+		defs.reference_distance = 2000.f;
+		defs.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
+		defs.basic_nonlinear_rolloff = 15.f;
+	}
+
 	auto& common_assets = common.assets;
 	common_assets.item_holster_sound.id = to_sound_id(test_scene_sound_id::STANDARD_HOLSTER);
 	common_assets.item_pickup_to_deposit_sound.id = to_sound_id(test_scene_sound_id::BACKPACK_INSERT);
