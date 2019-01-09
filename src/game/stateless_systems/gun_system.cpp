@@ -177,14 +177,29 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 			const bool transfer_cooldown_passed = clk.is_ready(gun_def.shot_cooldown_ms, when_transferred);
 
-			if (capability.dead()) {
-				/* Only process autonomous gun logic */
+			auto interrupt_burst_fire = [&]() {
+				gun.remaining_burst_shots = 0;
+			};
+
+			auto process_autonomous_gun_logic = [&]() {
 				cooldown_gun_heat(step, muzzle_transform, gun_entity);
 				gun.chambering_progress_ms = 0.f;
+				interrupt_burst_fire();
+			};
+
+			if (capability.dead()) {
+				process_autonomous_gun_logic();
 				return;
 			}
 
 			capability.template dispatch_on_having_all<components::sentience>([&](const auto& owning_capability) {
+				const auto wielding = owning_capability.get_wielding_of(gun_entity);
+
+				if (wielding == wielding_type::NOT_WIELDED) {
+					process_autonomous_gun_logic();
+					return;
+				}
+
 				components::sentience& sentience = owning_capability.template get<components::sentience>();
 
 				const auto triggers = [&]() {
@@ -233,8 +248,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					secondary_just_pressed = false;
 				}
 
-				const auto wielding = owning_capability ? owning_capability.get_wielding_of(gun_entity) : wielding_type::NOT_WIELDED;
-
 				auto make_gunshot_message = [&](){
 					messages::gunshot_message response;
 
@@ -252,6 +265,18 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				};
 
 				auto try_to_fire_interval = [&]() -> std::optional<weapon_action_type> {
+					if (gun.remaining_burst_shots > 0) {
+						if (clk.try_to_fire_and_reset(gun_def.burst_interval_ms, gun.when_last_fired)) {
+							gun.when_last_played_trigger_effect = clk.now;
+							--gun.remaining_burst_shots;
+
+							LOG("Shot. Remaining: %x", gun.remaining_burst_shots);
+							return weapon_action_type::PRIMARY;
+						}
+
+						return std::nullopt;
+					}
+
 					if (transfer_cooldown_passed) {
 						if (primary_trigger_pressed || secondary_trigger_pressed) {
 							if (clk.try_to_fire_and_reset(gun_def.shot_cooldown_ms, gun.when_last_fired)) {
@@ -365,6 +390,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					};
 					
 					if (get_num_in_chamber() == 0) {
+						interrupt_burst_fire();
+
 						const bool feasible_wielding =
 							wielding == wielding_type::SINGLE_WIELDED
 							|| (wielding == wielding_type::DUAL_WIELDED && gun_def.allow_chambering_with_akimbo)
@@ -452,6 +479,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							}
 						}
 						else if (const auto requested_action = try_to_fire_interval()) {
+							LOG("There is an action");
 							if (gun_def.minimum_heat_to_shoot > 0.f && gun.magazine.angular_velocity < 5000) {
 								gun.magazine.angular_velocity = 5000;
 							}
@@ -615,33 +643,54 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 								}
 							};
 
+							auto burst_autoload_next_cartridge = [&]() {
+								if (gun_def.action_mode < gun_action_type::SEMI_AUTOMATIC) {
+									/* The gun might not necessarily load the cartridges automatically */
+
+									if (gun.remaining_burst_shots > 0) {
+										::find_and_load_next_cartridge(gun_entity, step);
+									}
+								}
+							};
+
 							if (requested_action == weapon_action_type::PRIMARY) {
+								LOG("There is primary");
 								fire_cartridge(std::nullopt);
+
+								if (gun.remaining_burst_shots > 0) {
+									burst_autoload_next_cartridge();
+								}
 							}
 							else if (requested_action == weapon_action_type::SECONDARY) {
+								LOG("There is secondary");
 								if (secondary_is_burst) {
-									auto remaining_shots = gun_def.num_burst_bullets;
+									if (gun_def.burst_interval_ms > 0.f) {
+										gun.remaining_burst_shots = gun_def.num_burst_bullets;
 
-									const auto cartridge_in_chamber = cosm[chamber_slot.get_items_inside()[0]];
-									auto burst_rng = cosm.get_nontemporal_rng_for(cartridge_in_chamber);
+										fire_cartridge(std::nullopt);
+										--gun.remaining_burst_shots;
 
-									while (get_num_in_chamber() > 0 && remaining_shots--) {
-										if (remaining_shots == 0) {
-											fire_cartridge(std::nullopt);
-										}
-										else {
-											const auto hv = burst_rng.randval_h(gun_def.burst_spread_degrees_variation / 2);
-											const auto h = (gun_def.burst_spread_degrees + hv) / 2;
+										burst_autoload_next_cartridge();
+										LOG("Start fire. %x", gun.remaining_burst_shots);
+									}
+									else {
+										auto remaining_shots = gun_def.num_burst_bullets;
 
-											fire_cartridge(burst_rng.randval_h(h));
-										}
+										const auto cartridge_in_chamber = cosm[chamber_slot.get_items_inside()[0]];
+										auto burst_rng = cosm.get_nontemporal_rng_for(cartridge_in_chamber);
 
-										if (gun_def.action_mode < gun_action_type::SEMI_AUTOMATIC) {
-											/* The gun might not necessarily load the cartridges automatically */
-
-											if (remaining_shots > 0) {
-												::find_and_load_next_cartridge(gun_entity, step);
+										while (get_num_in_chamber() > 0 && remaining_shots--) {
+											if (remaining_shots == 0) {
+												fire_cartridge(std::nullopt);
 											}
+											else {
+												const auto hv = burst_rng.randval_h(gun_def.burst_spread_degrees_variation / 2);
+												const auto h = (gun_def.burst_spread_degrees + hv) / 2;
+
+												fire_cartridge(burst_rng.randval_h(h));
+											}
+
+											burst_autoload_next_cartridge();
 										}
 									}
 

@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- make crosshair go to the very bounds of screen even when zoomed
+	- it's a problem even with equal aspect ratio
+
 - when inverse or exponent model, use max_distance for reference distance as it works somewhat this way then
 
 - a hot for wielding a knife and an akimbo knife

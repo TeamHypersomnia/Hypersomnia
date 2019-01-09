@@ -46,7 +46,7 @@ namespace components {
 		gun_special_state special_state = gun_special_state::NONE;
 
 		bool steam_burst_scheduled = false;
-		pad_bytes<1> pad;
+		unsigned char remaining_burst_shots = 0;
 		augs::enum_boolset<weapon_action_type, 1> just_pressed;
 
 		augs::stepped_timestamp when_last_fired;
@@ -72,6 +72,7 @@ namespace invariants {
 		real32 burst_spread_degrees = 0.f;
 		real32 burst_spread_degrees_variation = 0.f;
 		real32 after_burst_chambering_ms = 1000.f;
+		real32 burst_interval_ms = 20.f;
 
 		augs::bound<real32> muzzle_velocity = { 2000.f, 2000.f };
 
