@@ -123,7 +123,7 @@ void load_test_scene_sentience_properties(
 			in.inner_ring_color = cyan;
 			in.outer_ring_color = white;
 			in.sound.id = to_sound_id(test_scene_sound_id::EXPLOSION);
-			in.sound.modifier.max_distance = 8000.f;
+			in.sound.modifier.max_distance = 6000.f;
 			in.sound.modifier.reference_distance = 2000.f;
 			in.type = adverse_element_type::FORCE;
 			in.wave_shake_radius_mult = 6.f;
@@ -191,7 +191,7 @@ void load_test_scene_sentience_properties(
 				in.effective_radius = 350.f;
 				in.damage.base = 88.f;
 				in.damage.impact_impulse = 150.f;
-				in.sound.modifier.max_distance = 8000.f;
+				in.sound.modifier.max_distance = 6000.f;
 				in.sound.modifier.reference_distance = 2000.f;
 				in.sound.id = to_sound_id(test_scene_sound_id::EXPLOSION);
 
@@ -208,7 +208,7 @@ void load_test_scene_sentience_properties(
 				in.effective_radius = 500.f;
 				in.damage.base = 112.f;
 				in.damage.impact_impulse = 200.f;
-				in.sound.modifier.max_distance = 8000.f;
+				in.sound.modifier.max_distance = 6000.f;
 				in.sound.modifier.reference_distance = 2000.f;
 				in.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
 
@@ -225,7 +225,7 @@ void load_test_scene_sentience_properties(
 				in.effective_radius = 700.f;
 				in.damage.base = 130.f;
 				in.damage.impact_impulse = 250.f;
-				in.sound.modifier.max_distance = 8000.f;
+				in.sound.modifier.max_distance = 6000.f;
 				in.sound.modifier.reference_distance = 2000.f;
 				in.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
 				in.subject_impulse = 1938.f;

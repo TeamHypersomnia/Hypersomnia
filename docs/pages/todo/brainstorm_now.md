@@ -33,7 +33,6 @@ summary: That which we are brainstorming at the moment.
 	- if G was released without holding lpm or rpm, drop the most recently wielded item as always
 	- if G is still held while we have only one item left in hands, still allow to drop by pressing either LPM or RPM  
 
-- bug: remove screen resolution advantage
 - 2 seconds longer freeze time
 - left/right hands fire buttons are swapped, hard to decide what to press
 - autoswitch on weapon drop

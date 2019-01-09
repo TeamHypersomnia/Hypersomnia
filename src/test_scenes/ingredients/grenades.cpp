@@ -85,7 +85,7 @@ namespace test_flavours {
 			dmg.impact_impulse = 550.f;
 			dmg.impulse_multiplier_against_sentience = 1.f;
 			in.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
-			in.sound.modifier.max_distance = 8000.f;
+			in.sound.modifier.max_distance = 6000.f;
 			in.sound.modifier.reference_distance = 2000.f;
 
 			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
@@ -140,7 +140,7 @@ namespace test_flavours {
 			dmg.impact_impulse = 2.f;
 			dmg.impulse_multiplier_against_sentience = 3000.f;
 			in.sound.id = to_sound_id(test_scene_sound_id::INTERFERENCE_EXPLOSION);
-			in.sound.modifier.max_distance = 8000.f;
+			in.sound.modifier.max_distance = 6000.f;
 			in.sound.modifier.reference_distance = 2000.f;
 			in.type = adverse_element_type::INTERFERENCE;
 
@@ -157,7 +157,7 @@ namespace test_flavours {
 				e.sound.id = to_sound_id(test_scene_sound_id::INTERFERENCE_EXPLOSION);
 				e.sound.modifier.gain = 0.1f;
 				e.sound.modifier.pitch = 0.75f;
-				e.sound.modifier.max_distance = 8000.f;
+				e.sound.modifier.max_distance = 6000.f;
 				e.sound.modifier.reference_distance = 2000.f;
 				e.inner_ring_color = orange;
 				e.outer_ring_color = yellow;
@@ -230,7 +230,7 @@ namespace test_flavours {
 			dmg.impact_impulse = 2.f;
 			dmg.impulse_multiplier_against_sentience = 1.f;
 			in.sound.id = to_sound_id(test_scene_sound_id::PED_EXPLOSION);
-			in.sound.modifier.max_distance = 8000.f;
+			in.sound.modifier.max_distance = 6000.f;
 			in.sound.modifier.reference_distance = 2000.f;
 			in.type = adverse_element_type::PED;
 			in.create_thunders_effect = true;
@@ -253,7 +253,7 @@ namespace test_flavours {
 			dmg.impact_impulse = 950.f;
 			dmg.impulse_multiplier_against_sentience = 1.f;
 			in.sound.id = to_sound_id(test_scene_sound_id::BOMB_EXPLOSION);
-			in.sound.modifier.max_distance = 8000.f;
+			in.sound.modifier.max_distance = 6000.f;
 			in.sound.modifier.reference_distance = 2000.f;
 
 			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
@@ -474,7 +474,7 @@ namespace test_flavours {
 				dmg.impact_impulse = 450.f;
 				dmg.impulse_multiplier_against_sentience = 1.f;
 				in.sound.id = to_sound_id(test_scene_sound_id::SKULL_ROCKET_DESTRUCTION);
-				in.sound.modifier.max_distance = 8000.f;
+				in.sound.modifier.max_distance = 6000.f;
 				in.sound.modifier.reference_distance = 2000.f;
 				in.sound.modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
 

@@ -2827,3 +2827,4 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- perhaps only reduce damage instead of absorbing
 	- so we can still cast some things
 - autocast bought spells, especially shield
+- bug: remove screen resolution advantage

@@ -17,7 +17,7 @@ entity_id requested_equipment::generate_for(
 	const auto& eq = *this;
 	auto& cosm = step.get_cosmos();
 
-	auto transfer = [&step](const auto from, const auto to) {
+	auto transfer = [&step](const auto from, const auto to, const bool play_effects = true) {
 		if (to.dead()) {
 			return;
 		}
@@ -32,6 +32,9 @@ entity_id requested_equipment::generate_for(
 
 		auto request = item_slot_transfer_request::standard(from, to);
 		request.params.bypass_mounting_requirements = true;
+		request.params.play_transfer_sounds = play_effects;
+		request.params.play_transfer_particles = play_effects;
+
 		perform_transfer(request, step);
 	};
 
@@ -144,7 +147,7 @@ entity_id requested_equipment::generate_for(
 						c.set_charges(1);
 
 						if (chamber_slot) {
-							transfer(c, chamber_slot);
+							transfer(c, chamber_slot, false);
 						}
 					}
 				}
@@ -167,7 +170,7 @@ entity_id requested_equipment::generate_for(
 
 				if (ammo_pieces_to_generate_left > 0) {
 					if (const auto new_mag = make_ammo_piece(final_mag_flavour)) {
-						transfer(new_mag, magazine_slot);
+						transfer(new_mag, magazine_slot, false);
 						--ammo_pieces_to_generate_left;
 
 						if (const auto loaded_charge = new_mag[slot_function::ITEM_DEPOSIT].get_item_if_any()) {

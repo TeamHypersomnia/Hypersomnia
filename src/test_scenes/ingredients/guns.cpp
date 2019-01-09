@@ -269,7 +269,7 @@ namespace test_flavours {
 			auto& trace_modifier = missile.trace_sound.modifier;
 
 			trace_modifier.doppler_factor = 1.f;
-			trace_modifier.max_distance = 8000.f;
+			trace_modifier.max_distance = 6000.f;
 			trace_modifier.reference_distance = 2000.f;
 			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
 			trace_modifier.fade_on_exit = false;
@@ -802,7 +802,7 @@ namespace test_flavours {
 			dmg.impact_impulse = 750.f;
 			dmg.impulse_multiplier_against_sentience = 1.f;
 			in.sound.id = to_sound_id(test_scene_sound_id::SKULL_ROCKET_DESTRUCTION);
-			in.sound.modifier.max_distance = 8000.f;
+			in.sound.modifier.max_distance = 6000.f;
 			in.sound.modifier.reference_distance = 2000.f;
 			in.sound.modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
 
@@ -1758,7 +1758,7 @@ namespace test_flavours {
 			gun_def.shell_angular_velocity = {2.f, 14.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
-			gun_def.damage_multiplier = 4.5f;
+			gun_def.damage_multiplier = 4.f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 6;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = kickback_mult * 70.f;

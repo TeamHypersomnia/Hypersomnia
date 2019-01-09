@@ -72,6 +72,7 @@ void populate_test_scene_common(const loaded_image_caches_map& caches, cosmos_co
 		defs.reference_distance = 2000.f;
 		defs.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
 		defs.basic_nonlinear_rolloff = 15.f;
+		defs.air_absorption = 2.5f;
 	}
 
 	auto& common_assets = common.assets;
@@ -82,6 +83,8 @@ void populate_test_scene_common(const loaded_image_caches_map& caches, cosmos_co
 	common_assets.standard_footstep.sound.id = to_sound_id(test_scene_sound_id::STANDARD_FOOTSTEP);
 	common_assets.standard_footstep.sound.modifier.pitch = 1.25f;
 	common_assets.standard_footstep.sound.modifier.gain = 0.4;
+	common_assets.standard_footstep.sound.modifier.max_distance = 1800.f;
+	common_assets.standard_footstep.sound.modifier.reference_distance = 1500.f;
 	common_assets.cast_unsuccessful_sound.id = to_sound_id(test_scene_sound_id::CAST_UNSUCCESSFUL);
 	common_assets.ped_shield_impact_sound.id = to_sound_id(test_scene_sound_id::EXPLOSION);
 	common_assets.ped_shield_destruction_sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
