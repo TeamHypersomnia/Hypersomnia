@@ -760,9 +760,13 @@ namespace test_flavours {
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
 			missile.trace_particles.modifier.colorize = cyan;
+			missile.trace_particles.modifier.scale_amounts = 2.5f;
+			missile.trace_particles.modifier.scale_lifetimes = 2.f;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
 			missile.muzzle_leave_particles.modifier.colorize = cyan;
+			missile.muzzle_leave_particles.modifier.scale_amounts = 1.8f;
+			missile.muzzle_leave_particles.modifier.scale_lifetimes = 1.4f;
 
 			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
 			missile.damage.effects.destruction.sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
@@ -2408,6 +2412,7 @@ namespace test_flavours {
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {5000.f, 5000.f};
 			gun_def.shot_cooldown_ms = 1500.f;
+			gun_def.after_transfer_shot_cooldown_mult = 0.4f;
 
 			gun_def.damage_multiplier = 1.f;
 

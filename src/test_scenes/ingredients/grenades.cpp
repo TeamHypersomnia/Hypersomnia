@@ -226,7 +226,7 @@ namespace test_flavours {
 			dmg.base = 150.f;
 			in.inner_ring_color = cyan;
 			in.outer_ring_color = turquoise;
-			in.effective_radius = 500.f;
+			in.effective_radius = 570.f;
 			dmg.impact_impulse = 2.f;
 			dmg.impulse_multiplier_against_sentience = 1.f;
 			in.sound.id = to_sound_id(test_scene_sound_id::PED_EXPLOSION);

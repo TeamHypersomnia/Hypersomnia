@@ -162,7 +162,10 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 						if (cooldown > 1000.f) {
 							if (const auto slot = it.get_current_slot(); slot && slot.is_hand_slot()) {
 								const auto r = clk.get_ratio_of_remaining_time(cooldown, gun.when_last_fired);
-								const auto transfer_r = clk.get_ratio_of_remaining_time(gun_def.shot_cooldown_ms, it.when_last_transferred());
+								const auto transfer_r = clk.get_ratio_of_remaining_time(
+									gun_def.get_transfer_shot_cooldown(), 
+									it.when_last_transferred()
+								);
 
 								const auto later_r = std::max(r, transfer_r);
 

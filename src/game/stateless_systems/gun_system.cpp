@@ -175,7 +175,10 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 			auto& gun = gun_entity.template get<components::gun>();
 			const auto& gun_def = gun_entity.template get<invariants::gun>();
 
-			const bool transfer_cooldown_passed = clk.is_ready(gun_def.shot_cooldown_ms, when_transferred);
+			const bool transfer_cooldown_passed = clk.is_ready(
+				gun_def.get_transfer_shot_cooldown(), 
+				when_transferred
+			);
 
 			auto interrupt_burst_fire = [&]() {
 				gun.remaining_burst_shots = 0;

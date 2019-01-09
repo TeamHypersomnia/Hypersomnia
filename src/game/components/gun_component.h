@@ -64,6 +64,7 @@ namespace invariants {
 	struct gun {
 		// GEN INTROSPECTOR struct invariants::gun
 		real32 shot_cooldown_ms = 100.f;
+		real32 after_transfer_shot_cooldown_mult = 1.f;
 
 		gun_action_type action_mode = gun_action_type::INVALID;
 		unsigned num_last_bullets_to_trigger_low_ammo_cue = 0;
@@ -128,6 +129,10 @@ namespace invariants {
 
 		auto get_steam_perform_diff() const {
 			return steam_burst_perform_diff * maximum_heat;
+		}
+
+		auto get_transfer_shot_cooldown() const {
+			return shot_cooldown_ms * after_transfer_shot_cooldown_mult;
 		}
 	};
 }
