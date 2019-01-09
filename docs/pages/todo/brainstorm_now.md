@@ -6,10 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- autofill all magazines to full on start of each round
+
 - make crosshair go to the very bounds of screen even when zoomed
 	- it's a problem even with equal aspect ratio
-
-- when inverse or exponent model, use max_distance for reference distance as it works somewhat this way then
 
 - a hot for wielding a knife and an akimbo knife
 - let fota have a high impact
@@ -17,8 +17,6 @@ summary: That which we are brainstorming at the moment.
 - in case the gui still acts up
 	- always keep this personal deposit open
 	- recalculate hotbar on every round start?
-
-- autofill all magazines to full on start of each round
 
 - check windows dll dependencies for determinism
 

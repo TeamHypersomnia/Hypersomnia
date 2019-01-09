@@ -2828,3 +2828,6 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- so we can still cast some things
 - autocast bought spells, especially shield
 - bug: remove screen resolution advantage
+
+- when inverse or exponent model, use max_distance for reference distance as it works somewhat this way then
+

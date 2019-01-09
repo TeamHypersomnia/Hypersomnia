@@ -37,6 +37,8 @@ enum class test_scene_image_id {
 	PRO90,
 	LEWSII,
 	ELON_HRL,
+	BLUNAZ,
+	BLUNAZ_SHOT_1,
 
 	FLOWER_PINK_1,
 	FLOWER_CYAN_1,

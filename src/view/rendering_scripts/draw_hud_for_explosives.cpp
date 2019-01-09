@@ -21,6 +21,7 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 	const auto& cosm = in.cosm;
 	const auto tex = in.circular_bar_tex;
 	const auto t = in.only_type;
+	const auto clk = cosm.get_clock();
 
 	auto draw_circle_at = [&](const auto& tr, const auto highlight_amount, const rgba first_col, const rgba second_col) {
 		if (highlight_amount >= 0.f && highlight_amount <= 1.f) {
@@ -132,6 +133,13 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 				if (const auto tr = it.find_viewing_transform(in.interpolation)) {
 					const auto& gun = it.template get<components::gun>();
 
+					auto draw_progress = [&](const auto& amount) {
+						auto shell_spawn_offset = ::calc_shell_offset(it);
+						shell_spawn_offset.pos.rotate(tr->rotation);
+
+						draw_circle(it, amount, white, red_violet, shell_spawn_offset.pos);
+					};
+
 					if (const auto chambering_duration = ::calc_current_chambering_duration(it); augs::is_positive_epsilon(chambering_duration)) {
 						const auto& progress = gun.chambering_progress_ms;
 
@@ -144,12 +152,24 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 								}
 							}
 
-							const auto highlight_amount = progress / chambering_duration;
+							draw_progress(progress / chambering_duration);
+						}
+					}
+					else {
+						const auto& gun_def = it.template get<invariants::gun>();
+						const auto cooldown = gun_def.shot_cooldown_ms;
 
-							auto shell_spawn_offset = ::calc_shell_offset(it);
-							shell_spawn_offset.pos.rotate(tr->rotation);
+						if (cooldown > 1000.f) {
+							if (const auto slot = it.get_current_slot(); slot && slot.is_hand_slot()) {
+								const auto r = clk.get_ratio_of_remaining_time(cooldown, gun.when_last_fired);
+								const auto transfer_r = clk.get_ratio_of_remaining_time(gun_def.shot_cooldown_ms, it.when_last_transferred());
 
-							draw_circle(it, highlight_amount, white, red_violet, shell_spawn_offset.pos);
+								const auto later_r = std::max(r, transfer_r);
+
+								if (augs::is_positive_epsilon(later_r)) {
+									draw_progress(1.f - later_r);
+								}
+							}
 						}
 					}
 				}

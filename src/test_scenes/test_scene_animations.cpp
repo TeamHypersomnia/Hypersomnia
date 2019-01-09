@@ -178,6 +178,16 @@ void load_test_scene_animations(
 
 			make_shoot_durations(anim.frames, 1.f);
 		} 
+
+		{
+			auto& anim = make_plain(
+				test_id_type::BLUNAZ_SHOT,
+				test_scene_image_id::BLUNAZ_SHOT_1,
+				50.0f
+			);
+
+			(void)anim;
+		} 
 	}
 
 	{

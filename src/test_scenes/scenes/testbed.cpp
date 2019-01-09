@@ -451,6 +451,8 @@ namespace test_scenes {
 
 			give_weapon(transformr(vec2(-800 - k * 150, 2000)), test_shootable_weapons::ELON_HRL);
 			give_charge(transformr(vec2(-800 - k * 150, 2200)), test_shootable_charges::SKULL_ROCKET, 5);
+
+			give_weapon(transformr(vec2(-800 - k * 150, 2400)), test_shootable_weapons::BLUNAZ);
 		}
 
 		give_weapon(transformr(vec2(-300, -500 + 50)), test_shootable_weapons::AMPLIFIER_ARM);

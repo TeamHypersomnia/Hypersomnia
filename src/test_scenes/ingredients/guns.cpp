@@ -723,6 +723,124 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_plain_missiles::BLUNAZ_MISSILE);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::FLYING_BULLETS;
+
+				meta.set(render_def);
+			}
+
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::ELECTRIC_MISSILE, cyan);
+			{
+				invariants::trace trace_def;
+
+				trace_def.max_multiplier_x = {2.0f, 0.f};
+				trace_def.max_multiplier_y = {0.f, 0.f};
+				trace_def.lengthening_duration_ms = {300.f, 350.f};
+				trace_def.additional_multiplier = vec2(1.f, 1.f);
+
+				trace_def.finishing_trace_flavour = to_entity_flavour_id(test_finishing_traces::ELECTRIC_MISSILE_FINISHING_TRACE);
+
+				meta.set(trace_def);
+			}
+
+			test_flavours::add_bullet_round_physics(meta);
+			meta.template get<invariants::rigid_body>().damping.linear = 7.8f;
+
+			invariants::missile missile;
+
+			{
+				auto& dest_eff = missile.damage.effects.destruction;
+				dest_eff.particles.modifier.colorize = cyan;
+				dest_eff.particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_DESTRUCTION);
+			}
+
+			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
+			missile.trace_particles.modifier.colorize = cyan;
+
+			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PIXEL_MUZZLE_LEAVE_EXPLOSION);
+			missile.muzzle_leave_particles.modifier.colorize = cyan;
+
+			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
+			missile.damage.effects.destruction.sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
+
+			missile.homing_towards_hostile_strength = 1.0f;
+			missile.damage.base = 10;
+			missile.damage.impact_impulse = 450.f;
+			missile.damage.impulse_multiplier_against_sentience = 1.f;
+			missile.ricochet_born_cooldown_ms = 17.f;
+			missile.max_lifetime_ms = 200.f;
+			missile.pe_damage_ratio = 0.f;
+
+			auto& trace_modifier = missile.trace_sound.modifier;
+
+			trace_modifier.doppler_factor = 0.6f;
+			trace_modifier.max_distance = 1020.f;
+			trace_modifier.reference_distance = 100.f;
+			trace_modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
+			trace_modifier.fade_on_exit = false;
+
+			meta.set(missile);
+
+			{
+				/* Make it identical except explosions */
+				auto& amp = get_test_flavour(flavours, test_plain_missiles::AMPLIFIER_ARM_MISSILE);
+				amp.get<invariants::text_details>().name = "Amplifier arm missile";
+				amp = meta;
+			}
+
+			invariants::explosive explosive; 
+
+			standard_explosion_input in;
+			auto& dmg = in.damage;
+
+			in.type = adverse_element_type::PED;
+			dmg.base = 64.f;
+			in.inner_ring_color = cyan;
+			in.outer_ring_color = white;
+			in.effective_radius = 400.f;
+			dmg.impact_impulse = 750.f;
+			dmg.impulse_multiplier_against_sentience = 1.f;
+			in.sound.id = to_sound_id(test_scene_sound_id::PED_EXPLOSION);
+			in.sound.modifier.max_distance = 6000.f;
+			in.sound.modifier.reference_distance = 2000.f;
+			in.sound.modifier.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
+
+			in.create_thunders_effect = true;
+			in.wave_shake_radius_mult = 6;
+
+			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+			dmg.shake.duration_ms = 200.f;
+			dmg.shake.mult = 1.2f;
+
+			explosive.explosion = in;
+
+			{
+				auto& c = explosive.cascade[0];
+				c.flavour_id = to_entity_flavour_id(test_explosion_bodies::BLUNAZ_MISSILE_CASCADE);
+				c.num_spawned = 2;
+				c.num_explosions = { 2, 0 };
+				c.initial_speed = { 1500.f, 0.2f };
+				c.spawn_spread = 45.f;
+			}
+
+			{
+				auto& c = explosive.cascade[1];
+				c.flavour_id = to_entity_flavour_id(test_explosion_bodies::BLUNAZ_MISSILE_CASCADE_SMALLER);
+				c.num_spawned = 2;
+				c.num_explosions = { 3, 0 };
+				c.initial_speed = { 1800.f, 0.6f };
+				c.spawn_angle_variation = 0.5f;
+				c.spawn_spread = 45.f;
+			}
+
+			meta.set(explosive);
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::ELECTRIC_MISSILE);
 
 			{
@@ -2271,6 +2389,49 @@ namespace test_flavours {
 			item.gratis_ammo_pieces_with_first = 0;
 			meta.set(item);
 			meta.get<invariants::item>().standard_price = 2500;
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_shootable_weapons::BLUNAZ);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			invariants::gun gun_def;
+
+			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::BLUNAZ_MUZZLE);
+
+			gun_def.action_mode = gun_action_type::AUTOMATIC;
+			gun_def.muzzle_velocity = {5000.f, 5000.f};
+			gun_def.shot_cooldown_ms = 1500.f;
+
+			gun_def.damage_multiplier = 1.f;
+
+			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+			gun_def.magic_missile_flavour = to_entity_flavour_id(test_plain_missiles::BLUNAZ_MISSILE);
+			gun_def.adversarial.knockout_award = static_cast<money_type>(1150);
+			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::BLUNAZ_SHOT);
+			gun_def.kickback_towards_wielder = kickback_mult * 150.f;
+			gun_def.recoil_multiplier = 3.25f;
+
+			meta.set(gun_def);
+
+			default_gun_props(meta);
+			set_density_mult(meta, 0.7f);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::BLUNAZ, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+
+			invariants::item item;
+			item.space_occupied_per_charge = to_space_units("5.0");
+			item.holding_stance = item_holding_stance::RIFLE_LIKE;
+			item.gratis_ammo_pieces_with_first = 0;
+			meta.set(item);
+			meta.get<invariants::item>().standard_price = 2600;
 		}
 	}
 }

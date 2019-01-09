@@ -25,7 +25,7 @@ void load_test_scene_sentience_properties(
 	{
 		auto& d = std::get<haste>(spells);
 		d.common.cooldown_ms = 5000;
-		d.common.personal_electricity_required = 110;
+		d.common.personal_electricity_required = 120;
 		d.common.associated_color = green_spell_color;
 		d.perk_duration_seconds = 15;
 
