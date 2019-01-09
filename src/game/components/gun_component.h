@@ -74,6 +74,7 @@ namespace invariants {
 		real32 burst_spread_degrees_variation = 0.f;
 		real32 after_burst_chambering_ms = 1000.f;
 		real32 burst_interval_ms = 20.f;
+		real32 burst_recoil_mult = 1.f;
 
 		augs::bound<real32> muzzle_velocity = { 2000.f, 2000.f };
 

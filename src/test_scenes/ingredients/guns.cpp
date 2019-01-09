@@ -2167,6 +2167,7 @@ namespace test_flavours {
 			gun_def.burst_spread_degrees_variation = 0.f;
 			gun_def.after_burst_chambering_ms = 1000.f;
 			gun_def.num_burst_bullets = 3;
+			gun_def.burst_recoil_mult = 0.4f;
 
 			meta.set(gun_def);
 

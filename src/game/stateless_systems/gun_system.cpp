@@ -180,6 +180,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				when_transferred
 			);
 
+			const bool had_burst = gun.remaining_burst_shots > 0;
+
 			auto interrupt_burst_fire = [&]() {
 				gun.remaining_burst_shots = 0;
 			};
@@ -737,6 +739,11 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 						impulse_input in;
 						in.angular = total_recoil * recoil_value;
+
+						if (had_burst) {
+							in.angular *= gun_def.burst_recoil_mult;
+						}
+
 						owning_capability.apply_crosshair_recoil(in);
 					}
 
