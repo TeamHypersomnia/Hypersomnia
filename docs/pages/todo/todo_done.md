@@ -2831,3 +2831,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - when inverse or exponent model, use max_distance for reference distance as it works somewhat this way then
 
+- remove ensure false from 174 in server setup
+
+- autodrop of magazines sometimes doesnt work...
+	- it was perhaps due to post solving gui twice

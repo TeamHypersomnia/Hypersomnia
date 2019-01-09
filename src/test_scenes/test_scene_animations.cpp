@@ -183,7 +183,7 @@ void load_test_scene_animations(
 			auto& anim = make_plain(
 				test_id_type::BLUNAZ_SHOT,
 				test_scene_image_id::BLUNAZ_SHOT_1,
-				50.0f
+				1500.f / 6
 			);
 
 			(void)anim;

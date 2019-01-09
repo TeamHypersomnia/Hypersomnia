@@ -5,6 +5,9 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- fix winapi crash on start with hlgrc
+	- it is due to a low opengl version
+
 - Let the character see a little behind it
 	- Simply a disk overlay over the stencil
 		- Radius would be specified by mode rules

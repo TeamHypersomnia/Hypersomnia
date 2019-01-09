@@ -1168,6 +1168,13 @@ else()
 	endif()
 endif()
 
+# We configure MSVC to use static runtime libraries ("/MT" switch),
+# instead of DLL ones.
+# The definition of this function is found in cmake/configure_runtime_library.cmake
+
+include(configure_runtime_library)
+configure_msvc_runtime()
+
 message("All CXX flags: ${CMAKE_CXX_FLAGS}")
 message("Debug CXX flags: ${CMAKE_CXX_FLAGS_DEBUG}")
 message("RelWithDebInfo CXX flags: ${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
@@ -1177,13 +1184,6 @@ message("ALl linker flags: ${CMAKE_EXE_LINKER_FLAGS}")
 message("Linker Debug flags: ${CMAKE_EXE_LINKER_FLAGS_DEBUG}")
 message("Linker RelWithDebInfo flags: ${CMAKE_EXE_LINKER_FLAGS_RELWITHDEBINFO}")
 message("Linker Release flags: ${CMAKE_EXE_LINKER_FLAGS_RELEASE}")
-
-# We configure MSVC to use static runtime libraries ("/MT" switch),
-# instead of DLL ones.
-# The definition of this function is found in cmake/configure_runtime_library.cmake
-
-include(configure_runtime_library)
-configure_msvc_runtime()
 
 # We build Lua manually as there is no up-to-date CMakeLists for Lua.
 

@@ -201,7 +201,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::item item;
-			item.standard_price = 800;
+			item.standard_price = 600;
 			item.space_occupied_per_charge = to_space_units("1.0");
 			meta.set(item);
 
@@ -341,7 +341,7 @@ namespace test_flavours {
 
 		{
 			auto e = bomb_explosion;
-			e *= 0.1f;
+			e *= 0.2f;
 			e.wave_shake_radius_mult = 6;
 			e.sound.id = to_sound_id(test_scene_sound_id::PED_EXPLOSION);
 			e.inner_ring_color = turquoise;

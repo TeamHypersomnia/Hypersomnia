@@ -6,10 +6,19 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- autofill all magazines to full on start of each round
-
 - make crosshair go to the very bounds of screen even when zoomed
 	- it's a problem even with equal aspect ratio
+
+- during akimbo, only drop when the G is released, not right away when it is pressed
+	- when G is still held, you can press either LPM or RPM to decide which weapon to drop
+	- if G was released without holding lpm or rpm, drop the most recently wielded item as always
+	- if G is still held while we have only one item left in hands, still allow to drop by pressing either LPM or RPM  
+
+- left/right hands fire buttons are swapped, hard to decide what to press
+- autofill all magazines to full on start of each round
+
+- autopick previous weapon after throwing a nade
+	- but only if no more items left
 
 - a hot for wielding a knife and an akimbo knife
 - let fota have a high impact
@@ -28,23 +37,16 @@ summary: That which we are brainstorming at the moment.
 		- The island only ever exists temporally.
 		- Problem: the stack allocator is rewritten. There are possibly dangling addresses.
 	- There is a case where Data and Shuncio were synchronized with each other, but both had non-canonical version of the world, while I had it canonical
-
-- during akimbo, only drop when the G is released, not right away when it is pressed
-	- when G is still held, you can press either LPM or RPM to decide which weapon to drop
-	- if G was released without holding lpm or rpm, drop the most recently wielded item as always
-	- if G is still held while we have only one item left in hands, still allow to drop by pressing either LPM or RPM  
+	- possibly bad packet payload?
+		- why would a client on the same machine not desync?
 
 - 2 seconds longer freeze time
-- left/right hands fire buttons are swapped, hard to decide what to press
 - autoswitch on weapon drop
 - autoswitch on empty ammo
 
 - (Shuncio) some possible crash before start of the next round
-- fix winapi crash on start with hlgrc
 
 - knockouter is dead if someone disconnects after having shot and that bullet kills another player
-- remove ensure false from 174 in server setup
-- autodrop of magazines sometimes doesnt work...
 - could chambering sound be omitted under some occasions?
 - bomb soon explodes theme gets repeated
 
