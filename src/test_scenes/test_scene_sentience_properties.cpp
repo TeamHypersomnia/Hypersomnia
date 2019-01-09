@@ -137,7 +137,7 @@ void load_test_scene_sentience_properties(
 	{
 		auto& d = std::get<electric_triad>(spells);
 		d.common.cooldown_ms = 3000;
-		d.common.personal_electricity_required = 220;
+		d.common.personal_electricity_required = 250;
 		d.common.associated_color = blue_spell_border;
 
 		d.appearance.incantation = "energeia triada";
@@ -159,7 +159,7 @@ void load_test_scene_sentience_properties(
 	{
 		auto& d = std::get<ultimate_wrath_of_the_aeons>(spells);
 		d.common.cooldown_ms = 2000;
-		d.common.personal_electricity_required = 200;
+		d.common.personal_electricity_required = 250;
 		d.common.associated_color = blue_spell_border;
 
 		d.appearance.incantation = "megalyteri aiones via";

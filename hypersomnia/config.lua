@@ -208,7 +208,9 @@ return {
 	mouse_sensitivity = {
 	  x = 3,
 	  y = 3
-	}
+	},
+
+	swap_mouse_buttons_in_akimbo = false
   },
   gui_fonts = {
 	  gui = {

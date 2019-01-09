@@ -325,6 +325,7 @@ void settings_gui_state::perform(
 				auto& scope_cfg = config.input;
 
 				revertable_drag_vec2(SCOPE_CFG_NVP(mouse_sensitivity));
+				revertable_checkbox(SCOPE_CFG_NVP(swap_mouse_buttons_in_akimbo));
 
 				break;
 			}

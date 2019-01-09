@@ -51,7 +51,22 @@ struct entropy_accumulator {
 				}
 			}
 
-			concatenate(player.intents, intents);
+			auto new_intents = intents;
+
+			if (in.settings.swap_mouse_buttons_in_akimbo) {
+				if (handle.get_wielded_items().size() > 1) {
+					for (auto& i : new_intents) {
+						if (i.intent == game_intent_type::CROSSHAIR_PRIMARY_ACTION) {
+							i.intent = game_intent_type::CROSSHAIR_SECONDARY_ACTION;
+						}
+						else if (i.intent == game_intent_type::CROSSHAIR_SECONDARY_ACTION) {
+							i.intent = game_intent_type::CROSSHAIR_PRIMARY_ACTION;
+						}
+					}
+				}
+			}
+
+			concatenate(player.intents, new_intents);
 
 			player += cosmic;
 		}
