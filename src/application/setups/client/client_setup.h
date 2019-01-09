@@ -211,7 +211,7 @@ public:
 					return total_collected.extract(
 						get_viewed_character(), 
 						get_local_player_id(), 
-						{ in.settings, in.screen_size }
+						in.make_accumulator_input()
 					);
 				}
 

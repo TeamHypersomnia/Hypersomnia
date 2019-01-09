@@ -3,6 +3,8 @@
 #include "view/necessary_resources.h"
 #include "application/input/input_settings.h"
 #include "application/app_intent_type.h"
+#include "augs/math/camera_cone.h"
+#include "application/input/entropy_accumulator.h"
 
 enum class custom_imgui_result {
 	NONE,
@@ -20,6 +22,15 @@ struct setup_advance_input {
 	const augs::delta frame_delta;
 	const vec2i screen_size;
 	const input_settings& settings;
+	const zoom_type zoom;
+
+	auto make_accumulator_input() const {
+		return entropy_accumulator::input {
+			settings,
+			screen_size,
+			zoom
+		};
+	}
 };
 
 struct simulation_receiver_settings;
@@ -32,14 +43,24 @@ struct lag_compensation_settings;
 struct server_advance_input {
 	const vec2i screen_size;
 	const input_settings& settings;
+	const zoom_type zoom;
 
 	network_profiler& network_performance;
 	server_network_info& server_stats;
+
+	auto make_accumulator_input() const {
+		return entropy_accumulator::input {
+			settings,
+			screen_size,
+			zoom
+		};
+	}
 };
 
 struct client_advance_input {
 	const vec2i& screen_size;
 	const input_settings& settings;
+	const zoom_type zoom;
 
 	const simulation_receiver_settings& simulation_receiver;
 	const lag_compensation_settings& lag_compensation;
@@ -49,6 +70,14 @@ struct client_advance_input {
 
 	interpolation_system& interp;
 	past_infection_system& past_infection;
+
+	auto make_accumulator_input() const {
+		return entropy_accumulator::input {
+			settings,
+			screen_size,
+			zoom
+		};
+	}
 };
 
 namespace augs {

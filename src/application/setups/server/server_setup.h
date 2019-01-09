@@ -190,7 +190,7 @@ public:
 				const auto admin_entropy = local_collected.assemble_for(
 					get_viewed_character(), 
 					get_admin_player_id(),
-					{ in.settings, in.screen_size }
+					in.make_accumulator_input()
 				);
 
 				step_collected += { get_admin_player_id(), admin_entropy };

@@ -2835,3 +2835,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - autodrop of magazines sometimes doesnt work...
 	- it was perhaps due to post solving gui twice
+
+- make crosshair go to the very bounds of screen even when zoomed
+	- it's a problem even with equal aspect ratio
+

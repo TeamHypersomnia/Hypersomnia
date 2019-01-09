@@ -11,9 +11,11 @@ struct basic_camera_eye {
 	using vec2_type = basic_vec2<T>;
 	using ltrb = basic_ltrb<T>;
 
+	using zoom_type = T;
+
 	// GEN INTROSPECTOR struct basic_camera_eye class T
 	basic_transform<T> transform;
-	T zoom;
+	zoom_type zoom;
 	// END GEN INTROSPECTOR
 
 	basic_camera_eye(
@@ -89,3 +91,5 @@ struct camera_cone {
 		return eye.transform.pos + (cursor_pos - screen_size / 2) / eye.zoom;
 	}
 };
+
+using zoom_type = camera_eye::zoom_type;

@@ -95,7 +95,7 @@ public:
 			const auto total = total_collected.extract(
 				get_viewed_character(), 
 				local_player_id, 
-				{ in.settings, in.screen_size }
+				in.make_accumulator_input()
 			);
 
 			mode.advance(

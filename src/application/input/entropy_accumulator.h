@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/templates/logically_empty.h"
+#include "augs/math/camera_cone.h"
 #include "game/enums/game_intent_type.h"
 #include "game/modes/mode_entropy.h"
 
@@ -10,6 +11,7 @@ struct entropy_accumulator {
 	struct input {
 		const input_settings& settings;
 		const vec2i screen_size;
+		const zoom_type zoom;
 	};
 
 	mode_player_entropy mode;
@@ -42,7 +44,8 @@ struct entropy_accumulator {
 
 			if (const auto crosshair_motion = mapped_or_nullptr(motions, game_motion_type::MOVE_CROSSHAIR)) {
 				if (const auto crosshair = handle.find_crosshair()) {
-					const auto motion = to_game_motion(*crosshair_motion, crosshair->base_offset, in.settings.mouse_sensitivity, in.screen_size);
+					const auto total_bound = vec2(in.screen_size) / in.zoom;
+					const auto motion = to_game_motion(*crosshair_motion, crosshair->base_offset, in.settings.mouse_sensitivity, total_bound);
 
 					player.motions[motion.motion] = motion.offset;
 				}

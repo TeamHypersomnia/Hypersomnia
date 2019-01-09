@@ -72,13 +72,13 @@ bool log_to_live_file = false;
 
 /*
 	static is used for all variables because some take massive amounts of space.
-	They would normally cause a stack overflow.
+	They would otherwise cause a stack overflow.
 	For example, Windows provides us with mere 1MB of stack space by default.
 	
 	To preserve the destruction in the order of definition,
 	we must also make all other variables static to avoid bugs.
 
-	This function will, anyway, only be called once during the lifetime of the program.
+	This function will only be entered ONCE during the lifetime of the program.
 */
 
 int work(const int argc, const char* const * const argv) try {
@@ -237,10 +237,13 @@ int work(const int argc, const char* const * const argv) try {
 			}
 #endif
 
+			const auto zoom = 1.f;
+
 			server.advance(
 				{
 					vec2i(),
 					config.input,
+					zoom,
 					network_performance,
 					server_stats
 				},
@@ -863,6 +866,8 @@ int work(const int argc, const char* const * const argv) try {
 				setup_post_cleanup
 			);
 
+			const auto zoom = get_camera_eye().zoom;
+
 			if constexpr(std::is_same_v<S, client_setup>) {
 				/* The client needs more goodies */
 
@@ -870,6 +875,7 @@ int work(const int argc, const char* const * const argv) try {
 					{ 
 						window.get_screen_size(), 
 						viewing_config.input, 
+						zoom,
 						viewing_config.simulation_receiver, 
 						viewing_config.lag_compensation, 
 						network_performance,
@@ -885,6 +891,7 @@ int work(const int argc, const char* const * const argv) try {
 					{ 
 						window.get_screen_size(), 
 						viewing_config.input, 
+						zoom,
 						network_performance,
 						server_stats
 					},
@@ -893,7 +900,12 @@ int work(const int argc, const char* const * const argv) try {
 			}
 			else {
 				setup.advance(
-					{ frame_delta, window.get_screen_size(), viewing_config.input },
+					{ 
+						frame_delta, 
+						window.get_screen_size(), 
+						viewing_config.input, 
+						zoom 
+					},
 					callbacks
 				);
 			}
