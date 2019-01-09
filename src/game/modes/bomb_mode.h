@@ -88,6 +88,8 @@ struct bomb_mode_ruleset {
 	bool delete_lying_items_on_round_start = false;
 	bool delete_lying_items_on_warmup = true;
 	bool allow_game_commencing = true;
+	bool refill_all_mags_on_round_start = true;
+	bool refill_chambers_on_round_start = true;
 
 	bomb_mode_economy_rules economy;
 	bomb_mode_view_rules view;

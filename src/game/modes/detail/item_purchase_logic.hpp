@@ -234,22 +234,53 @@ auto calc_purchasable_ammo_piece(const E& handle) {
 }
 
 template <class E>
+auto calc_default_charge_flavour(const E& handle) {
+	if (const auto chamber_slot = handle[slot_function::GUN_CHAMBER]) {
+		if (const auto f = chamber_slot->only_allow_flavour; f.is_set()) {
+			return f;
+		}
+	}
+
+	if (const auto chamber_slot = handle[slot_function::GUN_CHAMBER_MAGAZINE]) {
+		if (const auto f = chamber_slot->only_allow_flavour; f.is_set()) {
+			return f;
+		}
+	}
+
+	if (const auto mag_slot = handle[slot_function::GUN_DETACHABLE_MAGAZINE]) {
+		if (const auto only_mag = mag_slot->only_allow_flavour; only_mag.is_set()) {
+			if (const auto f = get_allowed_flavour_of_deposit(handle.get_cosmos(), only_mag); f.is_set()) {
+				return f;
+			}
+		}
+	}
+
+	return item_flavour_id();
+}
+
+template <class E>
 auto calc_all_ammo_pieces_of(const E& handle) {
 	std::vector<item_flavour_id> results;
+
+	auto push_if_set = [&results](const auto f) {
+		if (f.is_set()) {
+			results.push_back(f);
+		}
+	};
 
 	if (const auto mag_slot = handle[slot_function::GUN_DETACHABLE_MAGAZINE]) {
 		const auto f = mag_slot->only_allow_flavour;
 
-		results.push_back(f);
-		results.push_back(get_allowed_flavour_of_deposit(handle.get_cosmos(), f));
+		push_if_set(f);
+		push_if_set(get_allowed_flavour_of_deposit(handle.get_cosmos(), f));
 	}
 
 	if (const auto chamber_mag_slot = handle[slot_function::GUN_CHAMBER_MAGAZINE]) {
-		results.push_back(chamber_mag_slot->only_allow_flavour);
+		push_if_set(chamber_mag_slot->only_allow_flavour);
 	}
 
 	if (const auto chamber_slot = handle[slot_function::GUN_CHAMBER]) {
-		results.push_back(chamber_slot->only_allow_flavour);
+		push_if_set(chamber_slot->only_allow_flavour);
 	}
 
 	return results;

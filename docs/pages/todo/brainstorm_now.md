@@ -11,9 +11,6 @@ summary: That which we are brainstorming at the moment.
 	- if G was released without holding lpm or rpm, drop the most recently wielded item as always
 	- if G is still held while we have only one item left in hands, still allow to drop by pressing either LPM or RPM  
 
-- left/right hands fire buttons are swapped, hard to decide what to press
-- autofill all magazines to full on start of each round
-
 - autopick previous weapon after throwing a nade
 	- but only if no more items left
 
@@ -47,7 +44,6 @@ summary: That which we are brainstorming at the moment.
 - could chambering sound be omitted under some occasions?
 - bomb soon explodes theme gets repeated
 
-- autofill magazines on start of round
 - dont reload when mag is full only to fill the bullet in the chamber
 - dont show bomb planting hud when you are ct
 - balance

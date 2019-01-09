@@ -2839,3 +2839,8 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - make crosshair go to the very bounds of screen even when zoomed
 	- it's a problem even with equal aspect ratio
 
+- left/right hands fire buttons are swapped, hard to decide what to press
+
+- autofill all magazines to full on start of each round
+
+- autofill magazines on start of round

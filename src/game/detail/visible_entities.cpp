@@ -54,7 +54,6 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 
 	thread_local auto unique_flags = all_flags();
 	thread_local auto unique_from_physics = std::vector<entity_id>();
-
 	unique_from_physics.clear();
 
 	auto get_flag_for = [&](const entity_id& e) -> bool& {
@@ -62,6 +61,15 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 			return typed_flags[e.raw.indirection_index];
 		});
 	};
+
+	auto unset_all_on_exit = augs::scope_guard(
+		[&]() {
+			for (const auto& a : unique_from_physics) {
+				register_visible(cosm, a);
+				get_flag_for(a) = false;
+			}
+		}
+	);
 
 	auto register_unique = [&](const entity_id& e) {
 		auto& f = get_flag_for(e);
@@ -121,11 +129,6 @@ void visible_entities::acquire_physical(const visible_entities_query input) {
 				return callback_result::CONTINUE;
 			}
 		);
-	}
-
-	for (const auto& a : unique_from_physics) {
-		register_visible(cosm, a);
-		get_flag_for(a) = false;
 	}
 }
 

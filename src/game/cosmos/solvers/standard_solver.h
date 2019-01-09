@@ -1,5 +1,4 @@
 #pragma once
-#include "augs/misc/scope_guard.h"
 #include "game/cosmos/logic_step.h"
 #include "game/cosmos/data_living_one_step.h"
 #include "game/cosmos/cosmic_functions.h"
@@ -19,14 +18,12 @@ struct standard_solver {
 		C&& callbacks
 	) {
 		thread_local data_living_one_step queues;
+		queues.clear();
+
 		auto step_rng = randomization(input.cosm.get_total_steps_passed());
 
 		solve_result result;
 		const auto step = logic_step(input, queues, step_rng, result);
-
-		auto scope = augs::scope_guard([](){
-			queues.clear();
-		});
 
 		cosmic::increment_step(input.cosm);
 		callbacks.pre_solve(step);

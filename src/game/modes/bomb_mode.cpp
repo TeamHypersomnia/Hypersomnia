@@ -227,13 +227,45 @@ void bomb_mode::init_spawned(
 
 			for (const auto& i : eq.items) {
 				const auto& idx = i.container_index;
-				const auto target_container = 
+				const auto target_container_id = 
 					idx < created_items.size() ? 
 					created_items[idx] : 
 					entity_id(typed_handle.get_id())
 				;
 
-				const auto target_slot = inventory_slot_id { i.slot_type, target_container };
+				const auto target_slot_id = inventory_slot_id { i.slot_type, target_container_id };
+				const auto target_slot = cosm[target_slot_id];
+
+				auto skip_creation = [&]() {
+					transferred->msg.changes[i.source_entity_id] = entity_id();
+					created_items.push_back(entity_id());
+				};
+
+				{
+					/* 
+						If we are refilling, don't create entities for magazines and chambers,
+						because we will do it manually.
+					*/
+
+					const auto target_container = cosm[target_container_id];
+
+					if (in.rules.refill_all_mags_on_round_start) {
+						if (::is_magazine_like(target_container)) {
+							skip_creation();
+							continue;
+						}
+					}
+
+					if (in.rules.refill_chambers_on_round_start) {
+						if (
+							target_slot_id.type == slot_function::GUN_CHAMBER
+							|| target_slot_id.type == slot_function::GUN_CHAMBER_MAGAZINE
+						) {
+							skip_creation();
+							continue;
+						}
+					}
+				}
 
 				const auto new_item = cosmic::create_entity(
 					cosm,
@@ -248,19 +280,72 @@ void bomb_mode::init_spawned(
 				);
 
 				if (new_item) {
-					auto request = item_slot_transfer_request::standard(new_item.get_id(), target_slot);
-					request.params.bypass_mounting_requirements = true;
+					{
+						auto request = item_slot_transfer_request::standard(new_item, target_slot);
+						request.params.bypass_mounting_requirements = true;
 
-					const auto result = perform_transfer_no_step(request, cosm);
-					result.notify_logical(step);
+						const auto result = perform_transfer_no_step(request, cosm);
+						result.notify_logical(step);
+					}
 
-					const auto new_id = new_item.get_id();
-					transferred->msg.changes[i.source_entity_id] = new_id;
+					{
+						const auto new_id = new_item.get_id();
+						transferred->msg.changes[i.source_entity_id] = new_id;
 
-					created_items.push_back(new_id);
+						created_items.push_back(new_id);
+					}
+
+					auto fill_or_refill = [&cosm, &step](const auto slot) {
+						if (const auto charge_inside = slot.get_item_if_any()) {
+							charge_inside.set_charges(charge_inside.num_charges_fitting_in(slot));
+						}
+						else {
+							auto charge_flavour = slot->only_allow_flavour;
+
+							if (!charge_flavour.is_set()) {
+								charge_flavour = ::calc_default_charge_flavour(slot.get_container());
+							}
+
+							if (charge_flavour.is_set()) {
+								const auto charge = just_create_entity(cosm, charge_flavour);
+
+								charge.set_charges(charge.num_charges_fitting_in(slot));
+
+								auto request = item_slot_transfer_request::standard(charge, slot);
+								request.params.bypass_mounting_requirements = true;
+
+								const auto result = perform_transfer_no_step(request, cosm);
+								result.notify_logical(step);
+							}
+						}
+					};
+
+					if (in.rules.refill_all_mags_on_round_start) {
+						if (::is_magazine_like(new_item)) {
+							if (const auto depo = new_item[slot_function::ITEM_DEPOSIT]) {
+								fill_or_refill(depo);
+							}
+						}
+					}
+
+					if (in.rules.refill_chambers_on_round_start) {
+						const auto chamber = new_item[slot_function::GUN_CHAMBER];
+
+						if (chamber) {
+							fill_or_refill(chamber);
+
+							if (const auto chamber_mag = new_item[slot_function::GUN_CHAMBER_MAGAZINE]) {
+								if (const auto gun = new_item.template find<invariants::gun>()) {
+									if (gun->allow_charge_in_chamber_magazine_when_chamber_loaded) {
+										fill_or_refill(chamber_mag);
+									}
+								}
+							}
+						}
+					}
 				}
 				else {
-					transferred->msg.changes[i.source_entity_id] = entity_id();
+					skip_creation();
 				}
 			}
 		}

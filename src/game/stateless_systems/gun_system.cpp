@@ -270,7 +270,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							gun.when_last_played_trigger_effect = clk.now;
 							--gun.remaining_burst_shots;
 
-							LOG("Shot. Remaining: %x", gun.remaining_burst_shots);
 							return weapon_action_type::PRIMARY;
 						}
 
@@ -479,7 +478,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							}
 						}
 						else if (const auto requested_action = try_to_fire_interval()) {
-							LOG("There is an action");
 							if (gun_def.minimum_heat_to_shoot > 0.f && gun.magazine.angular_velocity < 5000) {
 								gun.magazine.angular_velocity = 5000;
 							}
@@ -654,7 +652,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							};
 
 							if (requested_action == weapon_action_type::PRIMARY) {
-								LOG("There is primary");
 								fire_cartridge(std::nullopt);
 
 								if (gun.remaining_burst_shots > 0) {
@@ -662,7 +659,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 								}
 							}
 							else if (requested_action == weapon_action_type::SECONDARY) {
-								LOG("There is secondary");
 								if (secondary_is_burst) {
 									if (gun_def.burst_interval_ms > 0.f) {
 										gun.remaining_burst_shots = gun_def.num_burst_bullets;
@@ -671,7 +667,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 										--gun.remaining_burst_shots;
 
 										burst_autoload_next_cartridge();
-										LOG("Start fire. %x", gun.remaining_burst_shots);
 									}
 									else {
 										auto remaining_shots = gun_def.num_burst_bullets;
