@@ -2844,3 +2844,13 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - autofill all magazines to full on start of each round
 
 - autofill magazines on start of round
+
+- balance
+  - UWoTA should have less delays and could propel
+  - grenades could explode even more in all directions
+  - more mana points at start
+  - less recoil for pro90 and more damage, maybe more velocity
+  - less delay for automatic shotgun, more damaging pellets, higher velocity
+  - mostly it is the low velocity that makes weapons underpowered
+  - dont do live logging for the first time as the performance will be shit 
+- dont show bomb planting hud when you are ct

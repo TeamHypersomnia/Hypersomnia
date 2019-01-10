@@ -48,15 +48,6 @@ summary: That which we are brainstorming at the moment.
 - bomb soon explodes theme gets repeated
 
 - dont reload when mag is full only to fill the bullet in the chamber
-- dont show bomb planting hud when you are ct
-- balance
-  - UWoTA should have less delays and could propel
-  - grenades could explode even more in all directions
-  - mostly it is the low velocity that makes weapons underpowered
-  - more mana points at start
-  - less recoil for pro90 and more damage, maybe more velocity
-  - less delay for automatic shotgun, more damaging pellets, higher velocity
-  - dont do live logging for the first time as the performance will be shit 
 
 - bug: after knockout, some weapons remain tied to the player
 	- this only happens in online play

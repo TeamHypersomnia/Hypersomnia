@@ -72,26 +72,30 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 
 			if (t == circular_bar_type::MEDIUM && fuse_def.has_delayed_arming()) {
 				if (fuse.arming_requested) {
-					auto first_col = white;
-					auto second_col = red_violet;
+					if (const auto slot = it.get_current_slot()) {
+						if (is_authorized_faction(slot.get_container().get_official_faction())) {
+							auto first_col = white;
+							auto second_col = red_violet;
 
-					if (!::bombsite_in_range(it)) {
-						first_col = red;
-						second_col = red;
+							if (!::bombsite_in_range(it)) {
+								first_col = red;
+								second_col = red;
+							}
+
+							const auto when_started_arming = 
+								fuse.when_started_arming.was_set() ? 
+								fuse.when_started_arming.in_seconds(dt) :
+								in.global_time_seconds
+							;
+
+							const auto highlight_amount = static_cast<float>(
+								(in.global_time_seconds - when_started_arming)
+								/ (fuse_def.arming_duration_ms / 1000.f) 
+							);
+
+							do_draw_circle(highlight_amount, first_col, second_col);
+						}
 					}
-
-					const auto when_started_arming = 
-						fuse.when_started_arming.was_set() ? 
-						fuse.when_started_arming.in_seconds(dt) :
-						in.global_time_seconds
-					;
-
-					const auto highlight_amount = static_cast<float>(
-						(in.global_time_seconds - when_started_arming)
-						/ (fuse_def.arming_duration_ms / 1000.f) 
-					);
-
-					do_draw_circle(highlight_amount, first_col, second_col);
 				}
 			}
 
