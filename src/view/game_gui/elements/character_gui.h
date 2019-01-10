@@ -84,7 +84,7 @@ struct character_gui {
 		const wielding_setup new_setup
 	);
 
-	wielding_setup make_wielding_setup_for_previous_hotbar_selection_setup(
+	wielding_setup make_wielding_setup_for_last_hotbar_selection_setup(
 		const const_entity_handle gui_entity
 	);
 

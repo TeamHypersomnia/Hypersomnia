@@ -196,27 +196,27 @@ void character_gui::assign_item_to_first_free_hotbar_button(
 	}
 }
 
-wielding_setup character_gui::make_wielding_setup_for_previous_hotbar_selection_setup(
+wielding_setup character_gui::make_wielding_setup_for_last_hotbar_selection_setup(
 	const const_entity_handle gui_entity
 ) {
 	const auto& cosm = gui_entity.get_cosmos();
 
-	const auto previous_setup = last_setup.make_viable_setup(gui_entity);
+	const auto viable_last_setup = last_setup.make_viable_setup(gui_entity);
 	const auto current_setup = wielding_setup::from_current(gui_entity);
 
 	const auto& current_hands = current_setup.hand_selections;
-	const auto& previous_hands = previous_setup.hand_selections;
+	const auto& last_hands = viable_last_setup.hand_selections;
 
 	HOT_LOG_NVPS(cosm[current_hands[0]]);
 	HOT_LOG_NVPS(cosm[current_hands[1]]);
 
 	auto chosen_new_setup = [&]() {
-		if (!was_last_setup_set || previous_setup == current_setup || previous_setup.is_bare_hands(cosm)) {
-			/* Previous is identical so wield first item from hotbar */
+		if (!was_last_setup_set || viable_last_setup == current_setup || viable_last_setup.is_bare_hands(cosm)) {
+			/* Last is identical so wield first item from hotbar */
 
 			was_last_setup_set = true;
 
-			HOT_LOG("Same as previous setup.");
+			HOT_LOG("Same as last setup.");
 
 			auto make_setup_with = [&](const auto& candidate_entity) {
 				auto setup = wielding_setup::bare_hands();
@@ -281,11 +281,11 @@ wielding_setup character_gui::make_wielding_setup_for_previous_hotbar_selection_
 			return wielding_setup::bare_hands();
 		}
 		else {
-			HOT_LOG_NVPS(cosm[previous_hands[0]]);
-			HOT_LOG_NVPS(cosm[previous_hands[1]]);
+			HOT_LOG_NVPS(cosm[last_hands[0]]);
+			HOT_LOG_NVPS(cosm[last_hands[1]]);
 
 			HOT_LOG("Different setups, standard request.");
-			return previous_setup;
+			return viable_last_setup;
 		}
 	}();
 

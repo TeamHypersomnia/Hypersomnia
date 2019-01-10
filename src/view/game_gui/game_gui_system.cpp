@@ -342,8 +342,8 @@ void game_gui_system::control_hotbar_and_action_button(
 				}
 			}
 		}
-		else if (i.intent == game_gui_intent_type::PREVIOUS_HOTBAR_SELECTION_SETUP && i.was_pressed()) {
-			const auto wielding = gui.make_wielding_setup_for_previous_hotbar_selection_setup(gui_entity);
+		else if (i.intent == game_gui_intent_type::LAST_HOTBAR_SELECTION_SETUP && i.was_pressed()) {
+			const auto wielding = gui.make_wielding_setup_for_last_hotbar_selection_setup(gui_entity);
 
 			//if (!wielding.same_as_in(gui_entity)) {
 				queue_wielding(gui_entity, wielding);
