@@ -186,6 +186,8 @@ namespace augs {
 				BACKSLASH,
 				CLOSE_SQUARE_BRACKET,
 				APOSTROPHE,
+				WHEELUP,
+				WHEELDOWN,
 
 				COUNT = 256,
 			};

@@ -57,6 +57,30 @@ namespace augs {
 		if (const auto mouse_change = sync_mouse_on_click_activate(ch)) {
 			output.push_back(ch);
 		}
+
+		if (ch.msg == message::wheel) {
+			if (ch.data.scroll.amount != 0) {
+				event::change new_ch;
+				new_ch.timestamp = ch.timestamp;
+
+				const auto is_up = ch.data.scroll.amount > 0;
+				auto times = std::abs(ch.data.scroll.amount);
+
+				while (times--) {
+					const auto key = is_up ? keys::key::WHEELUP : keys::key::WHEELDOWN;
+
+					new_ch.msg = message::keydown;
+					new_ch.data.key.key = key;
+
+					output.push_back(new_ch);
+					++new_ch.timestamp;
+
+					new_ch.msg = message::keyup;
+					output.push_back(new_ch);
+					++new_ch.timestamp;
+				}
+			}
+		}
 	}
 
 	local_entropy window::collect_entropy() {

@@ -386,6 +386,8 @@ namespace augs {
 				case key::BACKSLASH: return "Backslash"; break;
 				case key::CLOSE_SQUARE_BRACKET: return "Close Square Bracket"; break;
 				case key::APOSTROPHE: return "Apostrophe"; break;
+				case key::WHEELUP: return "Wheel Up"; break;
+				case key::WHEELDOWN: return "Wheel Down"; break;
 				default: return "Invalid key"; break;
 				}
 			}
