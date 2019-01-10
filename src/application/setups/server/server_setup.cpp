@@ -472,7 +472,11 @@ void server_setup::send_server_step_entropies(networked_server_step_entropy& tot
 			continue;
 		}
 
-		if (c.state < client_state_type::RECEIVING_INITIAL_STATE) {
+		const bool its_time_already = 
+			c.state >= client_state_type::RECEIVING_INITIAL_STATE
+		;
+
+		if (!its_time_already) {
 			continue;
 		}
 
@@ -503,6 +507,7 @@ void server_setup::send_server_step_entropies(networked_server_step_entropy& tot
 
 void server_setup::reinfer_if_necessary_for(const networked_server_step_entropy& entropy) {
 	if (logically_set(entropy.general.added_player)) {
+		LOG("Server: Added player in the next entropy. Will reinfer to sync.");
 		cosmic::reinfer_solvable(get_arena_handle().get_cosmos());
 	}
 }

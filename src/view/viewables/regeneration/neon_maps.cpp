@@ -204,7 +204,7 @@ void generate_gauss_kernel(const neon_map_input& input, std::vector<double>& res
 	}
 
 	for (unsigned i = 0; i < total_pixels; ++i) {
-		result[i] = exp(-1 * (pow(index[i].first, 2) + pow(index[i].second, 2)) / 2 / pow(input.standard_deviation, 2)) / PI<float> / 2 / pow(input.standard_deviation, 2);
+		result[i] = std::exp(-1 * (std::pow(index[i].first, 2) + std::pow(index[i].second, 2)) / 2 / std::pow(input.standard_deviation, 2)) / PI<float> / 2 / std::pow(input.standard_deviation, 2);
 	}
 
 	double sum = 0.f;

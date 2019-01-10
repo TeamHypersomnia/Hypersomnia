@@ -6,7 +6,20 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Hotkeys for:
+	- Knife wielding
+		- Won't 1 and 1+2 be enough?
+	- Maybe automatic knife throwing?
+		- mouse wheel up would be good
+			- in this case the throw button itself would become useless
+		- Would always return to the last picked weapon
+		- though that will work out of the box
+	- Grenade wielding
+		- A settings flag for whether to arm automatically and release on button release
+
 - hotbar selection through wheel won't always succeed
+	- actually that's probably not needed, it'd take way too long to navigate to the weapon of choice
+	- it will be a LOT more useful to bind wheelup/wheeldown for pulling out a particular class of a weapon, or e.g. throwing a nade
 	- even so we must somehow keep track of the current index to allow scrolling further
 
 - during akimbo, only drop when the G is released, not right away when it is pressed
@@ -17,7 +30,6 @@ summary: That which we are brainstorming at the moment.
 - autopick previous weapon after throwing a nade
 	- but only if no more items left
 
-- a hot for wielding a knife and an akimbo knife
 - let fota have a high impact
 
 - in case the gui still acts up
@@ -27,6 +39,18 @@ summary: That which we are brainstorming at the moment.
 - check windows dll dependencies for determinism
 
 - Desync issues
+	- Resources:
+		- https://software.intel.com/en-us/articles/getting-reproducible-results-with-intel-mkl
+		- https://scicomp.stackexchange.com/questions/24423/small-unpredictable-results-in-runs-of-a-deterministic-model
+		- https://software.intel.com/en-us/forums/intel-c-compiler/topic/518464
+		- https://www.hemispheregames.com/2017/05/08/osmos-updates-and-floating-point-determinism/
+		- https://stackoverflow.com/questions/20963419/cross-platform-floating-point-consistency
+		- http://nicolas.brodu.net/en/programmation/streflop/index.html
+	- flags to think about
+		- ffast-math
+	- a client receives a state at N and does a complete reinference on it
+	- the entropy for N+1 contains a "player added" entry which forces a complete reinference
+	- shikashi, the clients did not reinfer state at N which the client has received
 	- order of collisions happening?
 		- probably not
 	- Could it be that the predicted cosm is advanced by mistake instead of the referential one?
@@ -36,9 +60,20 @@ summary: That which we are brainstorming at the moment.
 	- There is a case where Data and Shuncio were synchronized with each other, but both had non-canonical version of the world, while I had it canonical
 	- possibly bad packet payload?
 		- why would a client on the same machine not desync?
+	- turn off fused add and multiply
+	- test if replaying editor session yields same results if forcing a re-serialize of the solvable every frame
+		- and if serialized bytes are identical after re-serialization cycle
+		- make sure to use Release on Windows
+		- we can re-serialize random number of times to avoid the need for relaunch
+			- sometimes 0
+	- to test reinference determinism, test if completely reinferring arbitrary number of times yields equal result as reinferring always just once
+	- perhaps reinference inadvertently modifies something of the solvable?
+		- however, everybody reinfers all the same
+	- doesnt the joined player reinfer twice? once on load, another time on shall reinfer
 
 - 2 seconds longer freeze time
 - autoswitch on weapon drop
+	- this can be done gui-side when post solving the drops
 - autoswitch on empty ammo
 
 - (Shuncio) some possible crash before start of the next round
@@ -46,6 +81,7 @@ summary: That which we are brainstorming at the moment.
 - knockouter is dead if someone disconnects after having shot and that bullet kills another player
 - could chambering sound be omitted under some occasions?
 - bomb soon explodes theme gets repeated
+	- unimportant: perhaps it was 
 
 - dont reload when mag is full only to fill the bullet in the chamber
 

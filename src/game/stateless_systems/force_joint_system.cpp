@@ -53,8 +53,11 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 				float force_length = force_joint.force_towards_chased_entity;
 
 				if (distance < force_joint.distance_when_force_easing_starts) {
+#if TODO
+					// DONT USE POW!
 					const auto mult = distance / force_joint.distance_when_force_easing_starts;
-					force_length *= pow(mult, force_joint.power_of_force_easing_multiplier);
+					force_length *= std::pow(mult, force_joint.power_of_force_easing_multiplier);
+#endif
 				}
 
 				const auto force_for_chaser = direction * force_length * (1.f - force_joint.percent_applied_to_chased_entity);

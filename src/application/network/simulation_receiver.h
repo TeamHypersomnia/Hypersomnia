@@ -140,6 +140,7 @@ public:
 					auto& referential_cosmos = referential_arena.get_cosmos();
 
 					if (shall_reinfer) {
+						LOG("Added player in the next entropy. Will reinfer to sync.");
 						cosmic::reinfer_solvable(referential_cosmos);
 					}
 

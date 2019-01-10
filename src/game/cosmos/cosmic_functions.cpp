@@ -143,6 +143,8 @@ void cosmic::increment_step(cosmos& cosm) {
 }
 
 void cosmic::reinfer_all_entities(cosmos& cosm) {
+	LOG("Reinferring all entities at step: %x", cosm.get_timestamp().step);
+
 	auto scope = measure_scope(cosm.profiler.reinferring_all_entities);
 
 	cosm.get_solvable({}).destroy_all_caches();

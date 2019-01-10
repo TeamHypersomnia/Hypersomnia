@@ -1,3 +1,6 @@
+#if __FAST_MATH__
+#error "Don't do this"
+#endif
 
 #if BUILD_UNIT_TESTS
 #include <Catch/single_include/catch2/catch.hpp>

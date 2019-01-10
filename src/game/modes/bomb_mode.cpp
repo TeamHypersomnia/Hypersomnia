@@ -1206,6 +1206,7 @@ void bomb_mode::process_win_conditions(const input_type in, const logic_step ste
 
 	auto stop_bomb_detonation_theme = [&]() {
 		if (bomb_detonation_theme.is_set()) {
+			LOG("Bomb detonation theme interrupted.");
 			step.post_message(messages::queue_deletion(bomb_detonation_theme));
 			bomb_detonation_theme.unset();
 		}
@@ -1814,16 +1815,20 @@ void bomb_mode::mode_post_solve(const input_type in, const mode_entropy& entropy
 				if (!bomb_detonation_theme.is_set()) {
 					const auto theme = in.rules.view.bomb_soon_explodes_theme;
 
-					bomb_detonation_theme = cosmic::create_entity(
-						cosm, 
-						theme,
-						[&](const auto&, auto&) {
+					if (theme.is_set()) {
+						LOG("Bomb detonation theme started.");
 
-						},
-						[&](auto&) {
+						bomb_detonation_theme = cosmic::create_entity(
+							cosm, 
+							theme,
+							[&](const auto&, auto&) {
 
-						}
-					);
+							},
+							[&](auto&) {
+
+							}
+						);
+					}
 				}
 			}
 		}
