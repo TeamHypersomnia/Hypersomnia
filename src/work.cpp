@@ -29,6 +29,7 @@
 #include "game/organization/all_component_includes.h"
 #include "game/organization/all_messages_includes.h"
 #include "game/detail/inventory/inventory_slot_handle.h"
+#include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 
 #include "game/cosmos/data_living_one_step.h"
 #include "game/cosmos/cosmos.h"
