@@ -533,7 +533,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_bullet_round_physics(meta);
-			meta.template get<invariants::rigid_body>().damping.linear = 1.5f;
+			meta.template get<invariants::rigid_body>().damping.linear = 2.4f;
 
 			invariants::missile missile;
 
@@ -609,7 +609,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_bullet_round_physics(meta);
-			meta.template get<invariants::rigid_body>().damping.linear = 3.8f;
+			meta.template get<invariants::rigid_body>().damping.linear = 3.3f;
 
 			invariants::missile missile;
 
@@ -1342,7 +1342,7 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("0.50");
+			charge_deposit_def.space_available = to_space_units("0.55");
 			charge_deposit_def.mounting_duration_ms = 700.f;
 			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::CYAN_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
@@ -1486,7 +1486,7 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("0.9");
+			charge_deposit_def.space_available = to_space_units("0.8");
 			charge_deposit_def.mounting_duration_ms = 500.f;
 			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::SHOTGUN_RED_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
@@ -1828,7 +1828,7 @@ namespace test_flavours {
 			gun_def.damage_multiplier = 2.0;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
-			gun_def.kickback_towards_wielder = kickback_mult * 50.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 30.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(500);
 			gun_def.recoil_multiplier = 1.1f;
 
@@ -2005,7 +2005,7 @@ namespace test_flavours {
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.072f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
-			gun_def.recoil_multiplier = 1.3f;
+			gun_def.recoil_multiplier = 0.9f;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);

@@ -1,4 +1,3 @@
-#include <cfenv>
 #include "game/organization/all_messages_includes.h"
 #include "game/organization/all_component_includes.h"
 
@@ -38,8 +37,6 @@
 #include "game/stateless_systems/remnant_system.h"
 
 void standard_solve(const logic_step step) {
-	ensure_eq(std::fegetround(), FE_TONEAREST);
-
 	auto& cosm = step.get_cosmos();
 	auto& performance = cosm.profiler;
 	auto& global = cosm.get_global_solvable();

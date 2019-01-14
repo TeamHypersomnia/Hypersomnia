@@ -2,6 +2,7 @@
 #include <csignal>
 #endif
 
+#include <cfenv>
 #include <functional>
 
 #include "augs/unit_tests.h"
@@ -988,6 +989,8 @@ int work(const int argc, const char* const * const argv) try {
 	LOG("Entered the main loop.");
 
 	while (!should_quit) {
+		ensure_eq(std::fegetround(), FE_TONEAREST);
+
 		auto scope = measure_scope(performance.fps);
 		
 #if PLATFORM_UNIX

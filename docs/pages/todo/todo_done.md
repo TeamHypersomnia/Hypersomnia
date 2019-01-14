@@ -2854,3 +2854,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
   - mostly it is the low velocity that makes weapons underpowered
   - dont do live logging for the first time as the performance will be shit 
 - dont show bomb planting hud when you are ct
+- let fota have a high impact
+
