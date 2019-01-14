@@ -758,11 +758,20 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					return;
 				}
 
+				int requested_knives = 0;
+
 				if (r.intent == game_intent_type::THROW_ANY_KNIFE) {
+					requested_knives = 1;
+				}
+				if (r.intent == game_intent_type::THROW_ANY_TWO_KNIVES) {
+					requested_knives = 2;
+				}
+
+				if (requested_knives > 0) {
 					const auto n = typed_subject.get_wielded_melees().size();
 
 					if (n == 2) {
-						/* Special case: if we already have melee(s) in hands and don't require a throw, just require a throw. */
+						/* Special case: if we already have a two melees in hands and don't require a throw, just require a throw. */
 						if (!transfers_state.when_throw_requested.was_set()) {
 							transfers_state.when_throw_requested = clk.now;
 						}
@@ -771,12 +780,24 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					}
 
 					if (n == 1 && typed_subject.get_wielded_items().size() == 2) {
-						/* Special case: if we already have melee(s) in hands and don't require a throw, just require a throw. */
+						/* Special case: if we already have a melee in hand and something else in the other, and don't require a throw, just require a throw. */
 						if (!transfers_state.when_throw_requested.was_set()) {
 							transfers_state.when_throw_requested = clk.now;
 						}
 
 						return;
+					}
+
+					if (requested_knives == 1) {
+						if (n == 1 && typed_subject.get_wielded_items().size() == 1) {
+							/* Special case: if we already have a melee in hand and nothing else in the other, prevent the pulling of another knife if we want to only throw one at a time. */
+
+							if (!transfers_state.when_throw_requested.was_set()) {
+								transfers_state.when_throw_requested = clk.now;
+							}
+
+							return;
+						}
 					}
 
 					auto requested_wield = wielding_setup::from_current(typed_subject);

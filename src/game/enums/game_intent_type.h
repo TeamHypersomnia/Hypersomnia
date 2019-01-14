@@ -27,6 +27,7 @@ enum class game_intent_type {
 	THROW_SECONDARY,
 
 	THROW_ANY_KNIFE,
+	THROW_ANY_TWO_KNIVES,
 	
 	THROW_ANY_FORCE,
 	THROW_ANY_PED,
