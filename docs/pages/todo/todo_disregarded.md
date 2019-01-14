@@ -5,6 +5,13 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+
+- hotbar selection through wheel won't always succeed
+	- actually that's probably not needed, it'd take way too long to navigate to the weapon of choice
+	- it will be a LOT more useful to bind wheelup/wheeldown for pulling out a particular class of a weapon, or e.g. throwing a nade
+	- even so we must somehow keep track of the current index to allow scrolling further
+- dont reload when mag is full only to fill the bullet in the chamber
+
 - fix winapi crash on start with hlgrc
 	- it is due to a low opengl version
 

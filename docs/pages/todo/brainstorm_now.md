@@ -17,11 +17,6 @@ summary: That which we are brainstorming at the moment.
 	- Grenade wielding
 		- A settings flag for whether to arm automatically and release on button release
 
-- hotbar selection through wheel won't always succeed
-	- actually that's probably not needed, it'd take way too long to navigate to the weapon of choice
-	- it will be a LOT more useful to bind wheelup/wheeldown for pulling out a particular class of a weapon, or e.g. throwing a nade
-	- even so we must somehow keep track of the current index to allow scrolling further
-
 - during akimbo, only drop when the G is released, not right away when it is pressed
 	- when G is still held, you can press either LPM or RPM to decide which weapon to drop
 	- if G was released without holding lpm or rpm, drop the most recently wielded item as always
@@ -114,8 +109,6 @@ summary: That which we are brainstorming at the moment.
 - could chambering sound be omitted under some occasions?
 - bomb soon explodes theme gets repeated
 	- unimportant: perhaps it was 
-
-- dont reload when mag is full only to fill the bullet in the chamber
 
 - bug: after knockout, some weapons remain tied to the player
 	- this only happens in online play

@@ -61,6 +61,7 @@ struct melee_throw_def {
 
 	real32 throw_angular_speed = 0.f;
 	real32 clash_angular_speed = 360 * 20.f;
+	real32 after_transfer_throw_cooldown_mult = 0.5f;
 	// END GEN INTROSPECTOR
 };
 

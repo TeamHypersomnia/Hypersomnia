@@ -613,17 +613,15 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					for (const auto& w : wielded_items) {
 						const auto h = cosm[w];
 
-						if (const auto melee = h.template find<invariants::melee>()) {
+						if (const auto melee_def = h.template find<invariants::melee>()) {
 							const bool transfer_cooldown_persists = clk.lasts(
-								fighter_def.throw_cooldown_ms,
+								fighter_def.throw_cooldown_ms * melee_def->throw_def.after_transfer_throw_cooldown_mult,
 								h.when_last_transferred()
 							);
 
 							if (transfer_cooldown_persists) {
-#if ENABLE_TRANSFER_THROW_COOLDOWNS
 								thrown_melees = 0;
 								return;
-#endif
 							}
 
 							positions[thrown_melees++] = h.get_logic_transform();
