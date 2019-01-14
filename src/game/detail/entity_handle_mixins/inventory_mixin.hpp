@@ -233,6 +233,21 @@ augs::constant_size_vector<entity_id, 2> inventory_mixin<E>::get_wielded_guns() 
 }
 
 template <class E>
+augs::constant_size_vector<entity_id, 2> inventory_mixin<E>::get_wielded_melees() const {
+	const auto& self = *static_cast<const E*>(this);
+	auto result = self.get_wielded_items();
+
+	erase_if(
+		result, 
+		[&](const auto item) {
+			return !self.get_cosmos()[item].template has<components::melee>();
+		}
+	);
+
+	return result;
+}
+
+template <class E>
 augs::constant_size_vector<entity_id, 2> inventory_mixin<E>::get_wielded_items() const {
 	const auto& self = *static_cast<const E*>(this);
 	augs::constant_size_vector<entity_id, 2> result;

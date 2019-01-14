@@ -31,6 +31,8 @@ return {
     G = "DROP",
     MiddleMouseButton = "THROW",
 
+    WheelUp = "THROW_ANY_KNIFE",
+
     E = "USE_BUTTON",
 	R = "RELOAD"
   },

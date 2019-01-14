@@ -39,6 +39,7 @@
 #include "game/cosmos/data_living_one_step.h"
 #include "game/enums/item_transfer_result_type.h"
 
+#include "game/detail/inventory/wielding_setup.h"
 #include "game/detail/physics/physics_scripts.h"
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 #include "game/detail/inventory/weapon_reloading.hpp"
@@ -46,6 +47,7 @@
 #include "game/detail/melee/like_melee.h"
 
 #include "game/detail/sentience/sentience_getters.h"
+#include "game/detail/inventory/perform_wielding.hpp"
 
 #define LOG_RELOADING 0
 
@@ -569,437 +571,309 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 	const auto& requests = step.get_queue<messages::intent_message>();
 	const auto& clk = cosm.get_clock();
 
-	for (auto r : requests) {
-		if (r.was_pressed()) {
-			cosm[r.subject].dispatch_on_having_all<components::item_slot_transfers>([&](const auto& typed_subject) {
-				const bool is_throw = r.intent == game_intent_type::THROW;
-				const bool is_drop = r.intent == game_intent_type::DROP;
+	auto do_drop_or_throw = [&](const auto& typed_subject, const bool is_throw, const bool is_drop, const bool is_secondary_like) {
+		if (is_throw && typed_subject.is_frozen()) {
+			return;
+		}
 
-				if (is_throw && typed_subject.is_frozen()) {
-					return;
+		auto do_drop = [&](const auto& item) {
+			if (item.dead()) {
+				return;
+			}
+
+			auto request = item_slot_transfer_request::drop(item);
+
+			{
+				const bool apply_more_force = is_throw;
+
+				if (apply_more_force) {
+					const auto& transfers_def = typed_subject.template get<invariants::item_slot_transfers>();
+
+					request.params.apply_standard_impulse = false;
+					request.params.additional_drop_impulse = transfers_def.standard_throw_impulse;
 				}
+			}
 
-				auto do_drop = [&](const auto& item) {
-					if (item.dead()) {
+			request.params.set_source_root_as_sender = is_throw;
+
+			perform_transfer(request, step);
+		};
+
+		if (is_throw) {
+			const auto wielded_items = typed_subject.get_wielded_items();
+
+			std::array<transformr, 2> positions;
+			int thrown_melees = 0;
+
+			const auto& fighter_def = typed_subject.template get<invariants::melee_fighter>();
+
+			for (const auto& w : wielded_items) {
+				const auto h = cosm[w];
+
+				if (const auto melee_def = h.template find<invariants::melee>()) {
+					const bool transfer_cooldown_persists = clk.lasts(
+						fighter_def.throw_cooldown_ms * melee_def->throw_def.after_transfer_throw_cooldown_mult,
+						h.when_last_transferred()
+					);
+
+					if (transfer_cooldown_persists) {
+						thrown_melees = 0;
 						return;
 					}
 
-					auto request = item_slot_transfer_request::drop(item);
+					positions[thrown_melees++] = h.get_logic_transform();
+				}
+			}
 
-					{
-						const bool apply_more_force = is_throw || r.intent == game_intent_type::THROW_SECONDARY;
+			if (thrown_melees > 0) {
+				auto& fighter = typed_subject.template get<components::melee_fighter>();
+				
+				const bool suitable_state = 
+					fighter.state == melee_fighter_state::READY
+					|| fighter.state == melee_fighter_state::COOLDOWN
+				;
 
-						if (apply_more_force) {
-							const auto& transfers_def = typed_subject.template get<invariants::item_slot_transfers>();
+				const bool cooldown_persists = fighter.throw_cooldown_ms > 0.f || !suitable_state;
 
-							request.params.apply_standard_impulse = false;
-							request.params.additional_drop_impulse = transfers_def.standard_throw_impulse;
-						}
-					}
-
-					request.params.set_source_root_as_sender = is_throw;
-
-					perform_transfer(request, step);
-				};
-
-				if (is_throw) {
-					const auto wielded_items = typed_subject.get_wielded_items();
-
-					std::array<transformr, 2> positions;
-					int thrown_melees = 0;
-
-					const auto& fighter_def = typed_subject.template get<invariants::melee_fighter>();
-
+				if (!cooldown_persists) {
 					for (const auto& w : wielded_items) {
 						const auto h = cosm[w];
 
 						if (const auto melee_def = h.template find<invariants::melee>()) {
-							const bool transfer_cooldown_persists = clk.lasts(
-								fighter_def.throw_cooldown_ms * melee_def->throw_def.after_transfer_throw_cooldown_mult,
-								h.when_last_transferred()
-							);
+							int mult = 1;
 
-							if (transfer_cooldown_persists) {
-								thrown_melees = 0;
-								return;
+							if (h.get_current_slot().get_type() == slot_function::SECONDARY_HAND) {
+								mult = -1;
 							}
 
-							positions[thrown_melees++] = h.get_logic_transform();
+							do_drop(h);
+
+							{
+								const auto& effect = melee_def->actions.at(weapon_action_type::PRIMARY).init_particles;
+
+								effect.start(
+									step,
+									particle_effect_start_input::at_entity(h),
+									predictable_only_by(typed_subject)
+								);
+							}
+
+							const auto body = h.template get<components::rigid_body>();
+
+							body.set_angular_velocity(mult * melee_def->throw_def.throw_angular_speed);
 						}
 					}
 
-					if (thrown_melees > 0) {
-						auto& fighter = typed_subject.template get<components::melee_fighter>();
-						
-						const bool suitable_state = 
-							fighter.state == melee_fighter_state::READY
-							|| fighter.state == melee_fighter_state::COOLDOWN
-						;
+					if (thrown_melees == 2) {
+						/* 
+							If we want both knives thrown from the exact positions that they were held in 
+							during akimbo, we need to restore their positions before one of them was dropped.
 
-						const bool cooldown_persists = fighter.throw_cooldown_ms > 0.f || !suitable_state;
-
-						if (!cooldown_persists) {
-							for (const auto& w : wielded_items) {
-								const auto h = cosm[w];
-
-								if (const auto melee_def = h.template find<invariants::melee>()) {
-									int mult = 1;
-
-									if (h.get_current_slot().get_type() == slot_function::SECONDARY_HAND) {
-										mult = -1;
-									}
-
-									do_drop(h);
-
-									{
-										const auto& effect = melee_def->actions.at(weapon_action_type::PRIMARY).init_particles;
-
-										effect.start(
-											step,
-											particle_effect_start_input::at_entity(h),
-											predictable_only_by(typed_subject)
-										);
-									}
-
-									const auto body = h.template get<components::rigid_body>();
-
-									body.set_angular_velocity(mult * melee_def->throw_def.throw_angular_speed);
-								}
-							}
-
-							if (thrown_melees == 2) {
-								/* 
-									If we want both knives thrown from the exact positions that they were held in 
-									during akimbo, we need to restore their positions before one of them was dropped.
-
-									That is because a drop will instantly switch to a one-handed stance 
-									which will significantly displace the other knife.
-								*/
-
-								for (const auto& w : wielded_items) {
-									const auto h = cosm[w];
-									const auto corrected_transform = positions[index_in(wielded_items, w)];
-									h.set_logic_transform(corrected_transform);
-
-									const auto body = h.template get<components::rigid_body>();
-									auto vel = body.get_velocity();
-									const auto l = vel.length();
-									body.set_velocity(corrected_transform.get_direction() * l);
-								}
-							}
-
-							fighter.throw_cooldown_ms = fighter_def.throw_cooldown_ms;
-						}
-
-						return;
-					}
-				}
-
-				const bool is_drop_like = is_throw || is_drop;
-
-				if (is_drop_like) {
-					const auto current_setup = wielding_setup::from_current(typed_subject);
-
-					if (is_currently_reloading(typed_subject)) {
-						const auto wielded_items = typed_subject.get_wielded_items();
+							That is because a drop will instantly switch to a one-handed stance 
+							which will significantly displace the other knife.
+						*/
 
 						for (const auto& w : wielded_items) {
-							do_drop(cosm[w]);
+							const auto h = cosm[w];
+							const auto corrected_transform = positions[index_in(wielded_items, w)];
+							h.set_logic_transform(corrected_transform);
+
+							const auto body = h.template get<components::rigid_body>();
+							auto vel = body.get_velocity();
+							const auto l = vel.length();
+							body.set_velocity(corrected_transform.get_direction() * l);
+						}
+					}
+
+					fighter.throw_cooldown_ms = fighter_def.throw_cooldown_ms;
+
+					auto& transfers_state = typed_subject.template get<components::item_slot_transfers>();
+					transfers_state.when_throw_requested = {};
+				}
+
+				return;
+			}
+		}
+
+		const bool is_drop_like = is_throw || is_drop;
+
+		if (is_drop_like) {
+			const auto current_setup = wielding_setup::from_current(typed_subject);
+
+			if (is_currently_reloading(typed_subject)) {
+				const auto wielded_items = typed_subject.get_wielded_items();
+
+				for (const auto& w : wielded_items) {
+					do_drop(cosm[w]);
+				}
+
+				return;
+			}
+
+			auto drop = [&](const auto& item, const auto) {
+				if constexpr(is_nullopt_v<decltype(item)>) {
+					return false;
+				}
+				else {
+					do_drop(item);
+					return true;
+				}
+			};
+
+			if (current_setup.on_more_recent_item(cosm, drop)) {
+				return;
+			}
+		}
+
+		auto requested_index = static_cast<std::size_t>(-1);
+
+		if (is_secondary_like) {
+			requested_index = 1;
+		}
+		else {
+			requested_index = 0;
+		}
+
+		if (requested_index != static_cast<std::size_t>(-1)) {
+			const auto& item_inside = typed_subject.calc_hand_action(requested_index).held_item;
+			do_drop(cosm[item_inside]);
+		}
+	};
+
+	for (auto r : requests) {
+		if (r.was_pressed()) {
+			cosm[r.subject].dispatch_on_having_all<components::item_slot_transfers>([&](const auto& typed_subject) {
+				auto& transfers_state = typed_subject.template get<components::item_slot_transfers>();
+
+				const bool is_throw = r.intent == game_intent_type::THROW || r.intent == game_intent_type::THROW_SECONDARY;
+				const bool is_drop = r.intent == game_intent_type::DROP || r.intent == game_intent_type::DROP_SECONDARY;
+				const bool is_secondary_like = r.intent == game_intent_type::DROP_SECONDARY || r.intent == game_intent_type::THROW_SECONDARY;
+
+				if (is_throw || is_drop) {
+					do_drop_or_throw(typed_subject, is_throw, is_drop, is_secondary_like);
+					return;
+				}
+
+				if (r.intent == game_intent_type::THROW_ANY_KNIFE) {
+					const auto n = typed_subject.get_wielded_melees().size();
+
+					if (n == 2) {
+						/* Special case: if we already have melee(s) in hands and don't require a throw, just require a throw. */
+						if (!transfers_state.when_throw_requested.was_set()) {
+							transfers_state.when_throw_requested = clk.now;
 						}
 
 						return;
 					}
 
-					auto drop = [&](const auto& item, const auto) {
-						if constexpr(is_nullopt_v<decltype(item)>) {
-							return false;
+					if (n == 1 && typed_subject.get_wielded_items().size() == 2) {
+						/* Special case: if we already have melee(s) in hands and don't require a throw, just require a throw. */
+						if (!transfers_state.when_throw_requested.was_set()) {
+							transfers_state.when_throw_requested = clk.now;
 						}
-						else {
-							do_drop(item);
-							return true;
-						}
+
+						return;
+					}
+
+					auto requested_wield = wielding_setup::from_current(typed_subject);
+
+					auto is_melee_like = [&](const auto& entity) {
+						return entity.template has<components::melee>();
 					};
 
-					if (current_setup.on_more_recent_item(cosm, drop)) {
-						return;
+					int target_index = 1;
+
+					if (requested_wield.is_bare_hands(cosm)) {
+						/* Only engage the primary hand if both are free, though this probably won't happen often */
+						target_index = 0;
 					}
-				}
 
-				auto requested_index = static_cast<std::size_t>(-1);
+					if (const auto maybe_melee_already = cosm[requested_wield.hand_selections[target_index]]) {
+						if (is_melee_like(maybe_melee_already)) {
+							return;
+						}
+					}
 
-				const bool is_secondary_like = r.intent == game_intent_type::DROP_SECONDARY;
+					bool any_found = false;
 
-				if (is_drop_like) {
-					requested_index = 0;
-				}
-				else if (is_secondary_like) {
-					requested_index = 1;
-				}
+					typed_subject.for_each_contained_item_recursive(
+						[&](const auto& candidate_item) {
+							if (candidate_item.get_current_slot().is_hand_slot()) {
+								return recursive_callback_result::CONTINUE_AND_RECURSE;
+							}
 
-				if (requested_index != static_cast<std::size_t>(-1)) {
-					const auto& item_inside = typed_subject.calc_hand_action(requested_index).held_item;
-					do_drop(cosm[item_inside]);
+							if (is_melee_like(candidate_item)) {
+								requested_wield.hand_selections[target_index] = candidate_item;
+								any_found = true;
+
+								return recursive_callback_result::ABORT;
+							}
+
+							return recursive_callback_result::CONTINUE_AND_RECURSE;
+						}
+					);
+
+					if (any_found) {
+						::perform_wielding(
+							step,
+							typed_subject,
+							requested_wield
+						);
+
+						transfers_state.when_throw_requested = clk.now;
+					}
+					else if (typed_subject.get_wielded_melees().size() > 0) {
+						transfers_state.when_throw_requested = clk.now;
+					}
+
+					/*
+						No need to check for wielding success, 
+						because the request will not pass a test of checking "when_throw_requested" against "when_transferred" of a held_item.
+					*/
 				}
 			});
 		}
 	}
+
+	cosm.for_each_having<components::melee_fighter>([&](const auto& it) {
+		auto& transfers_state = it.template get<components::item_slot_transfers>();
+		const auto& wielded_melees = it.get_wielded_melees();
+
+		auto interrupt_throw_request = [&]() {
+			transfers_state.when_throw_requested = {};
+		};
+
+		if (wielded_melees.empty()) {
+			interrupt_throw_request();
+			return;
+		}
+
+		if (transfers_state.when_throw_requested.was_set()) {
+			const bool is_throw = true;
+			const bool is_drop = false;
+			const bool is_secondary_like = false;
+
+			do_drop_or_throw(it, is_throw, is_drop, is_secondary_like);
+		}
+	});
 }
-
-#define LOG_WIELDING 0
-
-template <class... Args>
-void WLD_LOG(Args&&... args) {
-#if LOG_WIELDING
-	LOG(std::forward<Args>(args)...);
-#else
-	((void)args, ...);
-#endif
-}
-
-#if LOG_WIELDING
-#define WLD_LOG_NVPS LOG_NVPS
-#else
-#define WLD_LOG_NVPS WLD_LOG
-#endif
 
 void item_system::handle_wielding_requests(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 
 	const auto& entropy = step.get_entropy();
 
-	auto swap_wielded = [&](const auto& self, const bool play_effects_at_all = true) {
-		wielding_result result;
-
-		const bool both_hands_available = self.get_hand_no(0).alive() && self.get_hand_no(1).alive();
-
-		if (both_hands_available) {
-			const auto in_primary = self.get_if_any_item_in_hand_no(0);
-			const auto in_secondary = self.get_if_any_item_in_hand_no(1);
-
-			auto& transfers = result.transfers;
-
-			if (in_primary.alive() && in_secondary.alive()) {
-				transfers = swap_slots_for_items(in_primary, in_secondary);
-			}
-			else if (in_primary.alive()) {
-				transfers.push_back(item_slot_transfer_request::standard(in_primary, self.get_secondary_hand()));
-			}
-			else if (in_secondary.alive()) {
-				transfers.push_back(item_slot_transfer_request::standard(in_secondary, self.get_primary_hand()));
-			}
-
-			result.result = wielding_result::type::SUCCESSFUL;
-		}
-
-		if (play_effects_at_all) {
-			result.play_effects_only_in_first();
-		}
-		else {
-			for (auto& r : result.transfers) {
-				r.params.play_transfer_sounds = false;
-			}
-		}
-
-		for (auto& r : result.transfers) {
-			r.params.play_transfer_particles = false;
-		}
-
-		result.apply(step);
-	};
-
 	for (const auto& p : entropy.players) {
-		if (cosm[p.first].dead()) {
+		const auto self = cosm[p.first];
+
+		if (self.dead()) {
 			continue;
 		}
 
-		if (logically_empty(p.second.wield)) {
-			continue;
-		}
-
-		const auto& self = cosm[p.first];
-		const auto& request = p.second.wield;
-		const auto& selections = request.hand_selections;
-		const auto current_selection = wielding_setup::from_current(self);
-
-		const auto first_held = cosm[current_selection.hand_selections[0]];
-		const auto second_held = cosm[current_selection.hand_selections[1]];
-
-		const bool total_holster = first_held.dead() && second_held.dead();
-
-		WLD_LOG_NVPS(cosm[selections[0]]);
-		WLD_LOG_NVPS(cosm[selections[1]]);
-
-		if (!total_holster && (first_held == selections[1] && second_held == selections[0])) {
-			WLD_LOG("Required swapped. Swap.");
-			swap_wielded(self);
-			continue;
-		}
-
-		/* if (current_selection == request) { */
-		/* 	WLD_LOG("Same setup. Swap."); */
-		/* 	swap_wielded(self); */
-		/* 	continue; */
-		/* } */
-
-#if 1
-		if (request.is_akimbo(cosm)
-			&& first_held == selections[1]
-			&& second_held == entity_id()
-		) {
-			WLD_LOG("Move to secondary and draw.");
-
-			wielding_result result;
-
-			result.transfers.push_back(item_slot_transfer_request::standard(
-				self.get_hand_no(0).get_item_if_any(), 
-				self.get_hand_no(1)
-			));
-
-			result.transfers.push_back(item_slot_transfer_request::standard(
-				selections[0],
-				self.get_hand_no(0)
-			));
-
-			result.result = wielding_result::type::SUCCESSFUL;
-			result.play_effects_only_in_last();
-			result.apply(step);
-			continue;
-		}
-
-		/* Swap now if we have to. */
-		if (first_held == selections[1] || second_held == selections[0]) {
-			swap_wielded(self, false);
-		}
-
-		struct transfer_record {
-
-		};
-
-		thread_local std::vector<perform_transfer_result> results;
-		results.clear();
-
-		/* Now we can consider each hand separately. */
-		auto transfer = [&](const auto& from, const auto& to) {
-			if (from.dead()) {
-				return;
-			}
-
-			auto request = item_slot_transfer_request::standard(from, to);
-			request.params.play_transfer_particles = false;
-			const auto result = perform_transfer_no_step(request, cosm);
-
-			result.notify(step);
-			results.push_back(result);
-		};
-
-		std::array<bool, hand_count_v> failed_hands = {};
-
-		auto try_hand = [&](const std::size_t i) {
-			failed_hands[i] = false;
-
-			const auto hand = self.get_hand_no(i);
-
-			const auto item_for_hand = cosm[selections[i]];
-			const auto item_in_hand = hand.get_item_if_any();
-
-			WLD_LOG_NVPS(i, item_for_hand, item_in_hand);
-
-			const bool identical_outcome =
-				(item_in_hand.dead() && item_for_hand.dead())
-				|| item_in_hand == item_for_hand
-			;
-
-			if (identical_outcome) {
-				WLD_LOG("Identical outcome.");
-				return;
-			}
-
-			if (item_in_hand.alive()) {
-				WLD_LOG("Has to holster existing item.");
-
-				const auto holstering_slot = self.find_holstering_slot_for(item_in_hand);
-
-				if (holstering_slot.alive()) {
-					WLD_LOG("Holster found.");
-					WLD_LOG_NVPS(holstering_slot);
-					transfer(item_in_hand, holstering_slot);
-					transfer(item_for_hand, hand);
-				}
-				else {
-					WLD_LOG("Holster failed.");
-					failed_hands[i] = true;
-				}
-			}
-			else {
-				WLD_LOG("No need to holster, draw right away.");
-				transfer(item_for_hand, hand);
-			}
-		};
-
-		for (std::size_t i = 0; i < hand_count_v; ++i) {
-			try_hand(i);
-		}
-
-		for (std::size_t i = 0; i < hand_count_v; ++i) {
-			const auto other_hand = self.get_hand_no(1 - i);
-
-			if (failed_hands[i]) {
-				WLD_LOG("Hand %x failed, so retry.", i);
-				/* */
-				try_hand(i);
-
-				if (failed_hands[i]) {
-					WLD_LOG("Hand %x still fails...", i);
-					if (other_hand.is_empty_slot()) {
-						const auto hand = self.get_hand_no(i);
-
-						const auto item_in_hand = hand.get_item_if_any();
-						const auto item_for_hand = cosm[selections[i]];
-						
-						transfer(item_in_hand, other_hand);
-						transfer(item_for_hand, hand);
-						WLD_LOG("Hand %x failed, but other is empty so switch the hands.", i);
-						break;
-					}
-				}
-			}
-		}
-
-		for (std::size_t i = 0; i < hand_count_v; ++i) {
-			/* Finally, try to holster whatever can be holstered now. */
-			try_hand(i);
-		}
-
-		for (const auto& r : reverse(results)) {
-			if (r.result.result.is_wear()) {
-				r.play_effects(step);
-			}
-		}
-
-		bool wield_played = false;
-
-		for (const auto& r : reverse(results)) {
-			if (r.result.result.is_wield()) {
-				r.play_effects(step);
-				wield_played = true;
-				break;
-			}
-		}
-
-		if (!wield_played) {
-			for (const auto& r : reverse(results)) {
-				if (r.result.result.is_holster()) {
-					r.play_effects(step);
-				}
-			}
-		}
-
-#else
-		/* Brute force approach: 
-			1. Drop whatever is held.
-			2. Draw required items.
-			3. Holster dropped items.
-		*/
-#endif
+		::perform_wielding(
+			step,
+			self,
+			p.second.wield
+		);
 	}
 }

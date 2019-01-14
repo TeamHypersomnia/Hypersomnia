@@ -117,6 +117,7 @@ public:
 
 	augs::constant_size_vector<entity_id, 2> get_wielded_guns() const;
 	augs::constant_size_vector<entity_id, 2> get_wielded_items() const;
+	augs::constant_size_vector<entity_id, 2> get_wielded_melees() const;
 	generic_handle_type get_wielded_other_than(entity_id) const;
 
 	inventory_item_address get_address_from_root(const entity_id until = entity_id()) const;

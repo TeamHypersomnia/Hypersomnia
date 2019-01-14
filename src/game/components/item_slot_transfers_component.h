@@ -26,6 +26,7 @@ namespace components {
 	struct item_slot_transfers {
 		// GEN INTROSPECTOR struct components::item_slot_transfers
 		augs::stepped_cooldown pickup_timeout = augs::stepped_cooldown(200);
+		augs::stepped_timestamp when_throw_requested;
 
 		only_pick_these_items_vector only_pick_these_items = {};
 
