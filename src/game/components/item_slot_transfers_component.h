@@ -27,6 +27,7 @@ namespace components {
 		// GEN INTROSPECTOR struct components::item_slot_transfers
 		augs::stepped_cooldown pickup_timeout = augs::stepped_cooldown(200);
 		augs::stepped_timestamp when_throw_requested;
+		augs::stepped_timestamp when_last_armed_explosive;
 
 		only_pick_these_items_vector only_pick_these_items = {};
 
@@ -47,6 +48,7 @@ namespace invariants {
 		impulse_mults after_wield_recoil_mults = { 0.2f, 0.4f };
 		real32 after_wield_recoil_ms = 200.f;
 		real32 disable_collision_on_drop_for_ms = 300.f;
+		real32 arm_explosive_cooldown_ms = 250.f;
 		// END GEN INTROSPECTOR
 	};
 }

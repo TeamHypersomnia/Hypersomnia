@@ -6,16 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Hotkeys for:
-	- Knife wielding
-		- Won't 1 and 1+2 be enough?
-	- Maybe automatic knife throwing?
-		- mouse wheel up would be good
-			- in this case the throw button itself would become useless
-		- Would always return to the last picked weapon
-		- though that will work out of the box
-	- Grenade wielding
-		- A settings flag for whether to arm automatically and release on button release
+- Problem of predictability of autodrops?
+	- It anyway begins with an unpredictable entropy of a drop
+		- Except when a nade is thrown
+		- Though the post solving input might arrive in time?
+		- The release of explosive is unpredictable though
+
+- autoswitch on weapon drop
+	- this can be done gui-side when post solving the drops
 
 - during akimbo, only drop when the G is released, not right away when it is pressed
 	- when G is still held, you can press either LPM or RPM to decide which weapon to drop
@@ -99,8 +97,6 @@ summary: That which we are brainstorming at the moment.
 	- doesnt the joined player reinfer twice? once on load, another time on shall reinfer
 
 - 2 seconds longer freeze time
-- autoswitch on weapon drop
-	- this can be done gui-side when post solving the drops
 - autoswitch on empty ammo
 
 - (Shuncio) some possible crash before start of the next round

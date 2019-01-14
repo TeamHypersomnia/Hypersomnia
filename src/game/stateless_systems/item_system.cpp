@@ -48,6 +48,7 @@
 
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/inventory/perform_wielding.hpp"
+#include "game/detail/hand_fuse_logic.h"
 
 #define LOG_RELOADING 0
 
@@ -745,10 +746,8 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 	};
 
 	for (auto r : requests) {
-		if (r.was_pressed()) {
-			cosm[r.subject].dispatch_on_having_all<components::item_slot_transfers>([&](const auto& typed_subject) {
-				auto& transfers_state = typed_subject.template get<components::item_slot_transfers>();
-
+		cosm[r.subject].dispatch_on_having_all<components::item_slot_transfers>([&](const auto& typed_subject) {
+			if (r.was_pressed()) {
 				const bool is_throw = r.intent == game_intent_type::THROW || r.intent == game_intent_type::THROW_SECONDARY;
 				const bool is_drop = r.intent == game_intent_type::DROP || r.intent == game_intent_type::DROP_SECONDARY;
 				const bool is_secondary_like = r.intent == game_intent_type::DROP_SECONDARY || r.intent == game_intent_type::THROW_SECONDARY;
@@ -757,15 +756,119 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					do_drop_or_throw(typed_subject, is_throw, is_drop, is_secondary_like);
 					return;
 				}
+			}
 
+			{
+				auto requested_force_type = adverse_element_type::INVALID;
+
+				switch (r.intent) {
+					case game_intent_type::THROW_ANY_FORCE: requested_force_type = adverse_element_type::FORCE; break;
+					case game_intent_type::THROW_ANY_PED: requested_force_type = adverse_element_type::PED; break;
+					case game_intent_type::THROW_ANY_INTERFERENCE: requested_force_type = adverse_element_type::INTERFERENCE; break;
+					default: break;
+				}
+
+				if (requested_force_type != adverse_element_type::INVALID) {
+					auto requested_wield = wielding_setup::from_current(typed_subject);
+
+					auto is_required_like = [&](const auto& entity) {
+						if (const auto e = entity.template find<invariants::explosive>()) {
+							return e->explosion.type == requested_force_type;
+						}
+
+						return false;
+					};
+
+					int target_index = 1;
+
+					if (requested_wield.is_bare_hands(cosm)) {
+						/* Only engage the primary hand if both are free, though this probably won't happen often */
+						target_index = 0;
+					}
+
+					const auto wielded_items = typed_subject.get_wielded_items();
+
+					if (r.was_released()) {
+						for (const auto& w : wielded_items) {
+							if (const auto maybe_required_already = cosm[w]) {
+								if (is_required_like(maybe_required_already)) {
+									bool released = false;
+
+									maybe_required_already.template dispatch_on_having_all<invariants::hand_fuse>([&](const auto& typed_candidate) { 
+										const auto fuse_logic = fuse_logic_provider(typed_candidate, step);
+
+										if (fuse_logic.fuse.armed()) {
+											fuse_logic.release_explosive_if_armed();
+											released = true;
+										}
+									});
+
+									if (released) {
+										return;
+									}
+								}
+							}
+						}
+
+						return;
+					}
+
+					entity_id found_fused;
+
+					auto finder = [&](const auto& candidate_item) {
+						if (found_fused.is_set()) {
+							return recursive_callback_result::ABORT;
+						}
+
+						if (is_required_like(candidate_item)) {
+							if (const auto h = candidate_item.template find<components::hand_fuse>()) {
+								if (h->armed()) {
+									return recursive_callback_result::CONTINUE_AND_RECURSE;
+								}
+							}
+
+							requested_wield.hand_selections[target_index] = candidate_item;
+							found_fused = candidate_item;
+
+							return recursive_callback_result::ABORT;
+						}
+
+						return recursive_callback_result::CONTINUE_AND_RECURSE;
+					};
+
+					for (const auto& w : wielded_items) {
+						cosm[w].template dispatch_on_having_all<components::item>(finder);
+					}
+
+					typed_subject.for_each_contained_item_recursive(finder);
+
+					if (found_fused.is_set()) {
+						::perform_wielding(
+							step,
+							typed_subject,
+							requested_wield
+						);
+
+						cosm[found_fused].template dispatch_on_having_all<invariants::hand_fuse>([&](const auto& typed_candidate) { 
+							if (typed_candidate.get_current_slot().is_hand_slot()) {
+								const auto fuse_logic = fuse_logic_provider(typed_candidate, step);
+								fuse_logic.arm_explosive();
+							}
+						});
+					}
+				}
+			}
+
+			if (r.was_pressed()) {
 				int requested_knives = 0;
 
-				if (r.intent == game_intent_type::THROW_ANY_KNIFE) {
-					requested_knives = 1;
+				switch (r.intent) {
+					case game_intent_type::THROW_ANY_KNIFE: requested_knives = 1; break;
+					case game_intent_type::THROW_ANY_TWO_KNIVES: requested_knives = 2; break;
+					default: break;
 				}
-				if (r.intent == game_intent_type::THROW_ANY_TWO_KNIVES) {
-					requested_knives = 2;
-				}
+
+				auto& transfers_state = typed_subject.template get<components::item_slot_transfers>();
 
 				if (requested_knives > 0) {
 					const auto n = typed_subject.get_wielded_melees().size();
@@ -779,18 +882,21 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 						return;
 					}
 
-					if (n == 1 && typed_subject.get_wielded_items().size() == 2) {
-						/* Special case: if we already have a melee in hand and something else in the other, and don't require a throw, just require a throw. */
-						if (!transfers_state.when_throw_requested.was_set()) {
-							transfers_state.when_throw_requested = clk.now;
+					if (n == 1) {
+						if (requested_knives == 1) {
+							if (n == 1 && typed_subject.get_wielded_items().size() == 1) {
+								/* Special case: if we already have a melee in hand and nothing else in the other, prevent the pulling of another knife if we want to only throw one at a time. */
+
+								if (!transfers_state.when_throw_requested.was_set()) {
+									transfers_state.when_throw_requested = clk.now;
+								}
+
+								return;
+							}
 						}
 
-						return;
-					}
-
-					if (requested_knives == 1) {
-						if (n == 1 && typed_subject.get_wielded_items().size() == 1) {
-							/* Special case: if we already have a melee in hand and nothing else in the other, prevent the pulling of another knife if we want to only throw one at a time. */
+						if (typed_subject.get_wielded_items().size() == 2) {
+							/* Special case: if we already have a melee in hand and something else in the other, and don't require a throw, just require a throw. */
 
 							if (!transfers_state.when_throw_requested.was_set()) {
 								transfers_state.when_throw_requested = clk.now;
@@ -799,6 +905,7 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 							return;
 						}
 					}
+
 
 					auto requested_wield = wielding_setup::from_current(typed_subject);
 
@@ -856,8 +963,8 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 						because the request will not pass a test of checking "when_throw_requested" against "when_transferred" of a held_item.
 					*/
 				}
-			});
-		}
+			}
+		});
 	}
 
 	cosm.for_each_having<components::melee_fighter>([&](const auto& it) {

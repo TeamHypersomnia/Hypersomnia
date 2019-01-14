@@ -3,13 +3,13 @@ return {
   log_to_live_file = false,
 
   app_controls = {
-    Tilde = "SWITCH_DEVELOPER_CONSOLE"
+    F1 = "SWITCH_DEVELOPER_CONSOLE"
   },
 
   app_ingame_controls = {
     Backspace = "CLEAR_DEBUG_LINES",
     F = "SWITCH_WEAPON_LASER",
-    MouseButton4 = "SWITCH_GAME_GUI_MODE",
+    Tilde = "SWITCH_GAME_GUI_MODE",
 	Tab = "OPEN_SCOREBOARD",
 	T = "OPEN_BUY_MENU",
 	O = "CHOOSE_TEAM"
@@ -29,9 +29,12 @@ return {
 
     LeftControl = "START_PICKING_UP_ITEMS",
     G = "DROP",
-    MiddleMouseButton = "THROW",
 
-    WheelUp = "THROW_ANY_KNIFE",
+    MiddleMouseButton = "THROW_ANY_FORCE",
+    MouseButton5 = "THROW_ANY_PED",
+    MouseButton4 = "THROW_ANY_INTERFERENCE",
+
+    WheelUp = "THROW_ANY_TWO_KNIVES",
 
     E = "USE_BUTTON",
 	R = "RELOAD"

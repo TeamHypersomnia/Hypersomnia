@@ -72,7 +72,7 @@ namespace test_flavours {
 
 			{
 				auto& c = explosive.cascade[0];
-				c.flavour_id = to_entity_flavour_id(test_explosion_bodies::SKULL_ROCKET_CASCADE);
+				c.flavour_id = to_entity_flavour_id(test_explosion_bodies::FORCE_GRENADE_CASCADE);
 				c.num_spawned = 2;
 				c.num_explosions = { 2, 0 };
 				c.initial_speed = { 1300.f, 0.2f };
@@ -95,6 +95,35 @@ namespace test_flavours {
 			meta.set(explosive);
 		}
 
+		{
+			standard_explosion_input e;
+			auto& dmg = e.damage;
+
+			e.type = adverse_element_type::FORCE;
+			dmg.base = 60.f;
+			e.effective_radius = 600.f * 0.4f;
+			dmg.impact_impulse = 950.f;
+			dmg.impulse_multiplier_against_sentience = 1.f;
+			e.sound.modifier.max_distance = 6000.f;
+			e.sound.modifier.reference_distance = 2000.f;
+			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+			dmg.shake.duration_ms = 700.f;
+			dmg.shake.mult = 1.4f;
+			e.sound.id = to_sound_id(test_scene_sound_id::SKULL_ROCKET_DESTRUCTION);
+			e.inner_ring_color = yellow;
+			e.outer_ring_color = orange;
+			e.ring_duration_seconds = 0.3f;
+			e.wave_shake_radius_mult = 6;
+
+			auto& meta = get_test_flavour(flavours, test_explosion_bodies::FORCE_GRENADE_CASCADE);
+			auto& c = meta.get<invariants::cascade_explosion>();
+			c.explosion = e;
+			c.explosion_interval_ms = { 240.f, 0.2f };
+			c.circle_collider_radius = 50.f;
+			c.max_explosion_angle_displacement = 10.f;
+
+			test_flavours::add_explosion_body(meta);
+		}
 		{
 			auto& meta = get_test_flavour(flavours, test_hand_explosives::INTERFERENCE_GRENADE);
 
@@ -371,7 +400,7 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_explosion_bodies::SKULL_ROCKET_CASCADE);
 			auto& c = meta.get<invariants::cascade_explosion>();
 			c.explosion = e;
-			c.explosion_interval_ms = { 200.f, 0.4f };
+			c.explosion_interval_ms = { 220.f, 0.4f };
 			c.circle_collider_radius = 50.f;
 			c.max_explosion_angle_displacement = 10.f;
 
@@ -380,7 +409,7 @@ namespace test_flavours {
 
 		{
 			auto e = bomb_explosion;
-			e *= 0.2f;
+			e *= 0.35f;
 			e.wave_shake_radius_mult = 6;
 			e.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
 			e.inner_ring_color = red;
@@ -507,11 +536,11 @@ namespace test_flavours {
 				auto& dmg = in.damage;
 
 				in.type = adverse_element_type::FORCE;
-				dmg.base = 112.f;
+				dmg.base = 142.f;
 				in.inner_ring_color = orange;
 				in.outer_ring_color = red;
-				in.effective_radius = 400.f;
-				dmg.impact_impulse = 450.f;
+				in.effective_radius = 500.f;
+				dmg.impact_impulse = 350.f;
 				dmg.impulse_multiplier_against_sentience = 1.f;
 				in.sound.id = to_sound_id(test_scene_sound_id::SKULL_ROCKET_DESTRUCTION);
 				in.sound.modifier.max_distance = 6000.f;

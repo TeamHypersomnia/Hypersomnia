@@ -27,6 +27,10 @@ struct basic_input_intent {
 		return change == intent_change::PRESSED;
 	}
 
+	bool was_released() const {
+		return change == intent_change::RELEASED;
+	}
+
 	bool is_set() const {
 		return intent != intent_type_enum::INVALID;
 	}

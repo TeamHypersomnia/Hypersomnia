@@ -188,6 +188,16 @@ struct fuse_logic_provider {
 	}
 
 	void arm_explosive() const {
+		if (const auto transfers = holder.template find<components::item_slot_transfers>()) {
+			if (const auto transfers_def = holder.template find<invariants::item_slot_transfers>()) {
+				if (clk.lasts(transfers_def->arm_explosive_cooldown_ms, transfers->when_last_armed_explosive)) {
+					return;
+				}
+			}
+
+			transfers->when_last_armed_explosive = clk.now;
+		}
+
 		fuse.when_armed = clk.now;
 		fuse.slot_when_armed = fused_entity.get_current_slot().get_type();
 

@@ -2856,3 +2856,15 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - dont show bomb planting hud when you are ct
 - let fota have a high impact
 
+	- Knife wielding
+		- Won't 1 and 1+2 be enough?
+	- Maybe automatic knife throwing?
+		- mouse wheel up would be good
+			- in this case the throw button itself would become useless
+		- Would always return to the last picked weapon
+		- though that will work out of the box
+
+- Hotkeys for:
+	- Grenade wielding
+		- A settings flag for whether to arm automatically and release on button release
+

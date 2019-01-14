@@ -789,13 +789,6 @@ namespace test_flavours {
 
 			meta.set(missile);
 
-			{
-				/* Make it identical except explosions */
-				auto& amp = get_test_flavour(flavours, test_plain_missiles::AMPLIFIER_ARM_MISSILE);
-				amp.get<invariants::text_details>().name = "Amplifier arm missile";
-				amp = meta;
-			}
-
 			invariants::explosive explosive; 
 
 			standard_explosion_input in;
@@ -907,8 +900,10 @@ namespace test_flavours {
 			{
 				/* Make it identical except explosions */
 				auto& amp = get_test_flavour(flavours, test_plain_missiles::AMPLIFIER_ARM_MISSILE);
-				amp.get<invariants::text_details>().name = "Amplifier arm missile";
 				amp = meta;
+
+				amp.get<invariants::text_details>().name = "Amplifier arm missile";
+				amp.get<invariants::missile>().damage.base = 32;
 			}
 
 			invariants::explosive explosive; 
@@ -2374,7 +2369,7 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {2000.f, 2000.f};
 			gun_def.shot_cooldown_ms = 300.f;
 
-			gun_def.damage_multiplier = 0.5f;
+			gun_def.damage_multiplier = 1.f;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.magic_missile_flavour = to_entity_flavour_id(test_plain_missiles::AMPLIFIER_ARM_MISSILE);
