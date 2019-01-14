@@ -273,6 +273,10 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 			return cosm[ctx.concerned_slot].alive();
 		};
 
+		if (transfers.when_throw_requested.was_set()) {
+			return;
+		}
+
 		if (!is_context_alive()) {
 			/* 
 				No current context. 
