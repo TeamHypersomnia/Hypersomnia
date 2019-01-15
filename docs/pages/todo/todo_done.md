@@ -2868,3 +2868,20 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- Grenade wielding
 		- A settings flag for whether to arm automatically and release on button release
 
+- Autohide empty weapons during akimbo?
+
+- Problem of predictability of autodrops?
+	- It anyway begins with an unpredictable entropy of a drop
+		- Except when a nade is thrown
+		- Though the post solving input might arrive in time?
+		- The release of explosive is unpredictable though
+
+- autoswitch on weapon drop
+	- actually maybe no because the walk makes us faster
+	- this can be done gui-side when post solving the drops
+
+
+- autopick previous weapon after throwing a nade
+	- not really, let us be fast
+	- but only if no more items left
+- autoswitch on empty ammo

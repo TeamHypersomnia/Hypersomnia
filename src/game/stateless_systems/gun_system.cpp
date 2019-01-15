@@ -39,6 +39,8 @@
 #include "game/detail/inventory/calc_reloading_context.hpp"
 #include "game/detail/entity_scripts.h"
 #include "game/detail/inventory/perform_wielding.hpp"
+#include "game/detail/inventory/wielding_setup.hpp"
+#include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 
 using namespace augs;
 
