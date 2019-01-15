@@ -38,6 +38,7 @@
 #include "game/detail/gun/gun_cooldowns.h"
 #include "game/detail/inventory/calc_reloading_context.hpp"
 #include "game/detail/entity_scripts.h"
+#include "game/detail/inventory/perform_wielding.hpp"
 
 using namespace augs;
 
@@ -334,13 +335,46 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 					const auto ammo_info = calc_ammo_info(gun_entity);
 
 					if (ammo_info.total_ammo_space > 0 && ammo_info.total_charges == 0) {
+						/* 
+							No ammo in mag and chamber. 
+							If no ammo whatsoever, try to hide. 
+						
+							Otherwise if in akimbo, try to hide in inventory.
+						*/
+
+						auto requested_wield = wielding_setup::from_current(owning_capability);
+						auto& hs = requested_wield.hand_selections;
+
+						for (auto& h : hs) {
+							if (h == gun_entity) {
+								h.unset();
+							}
+						}
+
+						if (hs[1].is_set() && !hs[0].is_set()) {
+							requested_wield.flip();
+						}
+
 						if (std::nullopt == calc_reloading_context_for(capability, gun_entity)) {
 							perform_transfer(item_slot_transfer_request::drop(gun_entity), step);
 
 							if (hand_index != static_cast<std::size_t>(-1)) {
-								sentience.hand_flags[hand_index] = false;
-								sentience.when_hand_pressed[hand_index] = {};
+								//sentience.hand_flags[hand_index] = false;
+								//sentience.when_hand_pressed[hand_index] = {};
 							}
+
+							::perform_wielding(
+								step,
+								owning_capability,
+								requested_wield
+							);
+						}
+						else if (wielding == wielding_type::DUAL_WIELDED) {
+							::perform_wielding(
+								step,
+								owning_capability,
+								requested_wield
+							);
 						}
 					}
 				};
