@@ -36,6 +36,8 @@
 #include "game/inferred_caches/physics_world_cache.h"
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/gun/gun_cooldowns.h"
+#include "game/detail/inventory/calc_reloading_context.hpp"
+#include "game/detail/entity_scripts.h"
 
 using namespace augs;
 
@@ -207,6 +209,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 				components::sentience& sentience = owning_capability.template get<components::sentience>();
 
+				auto hand_index = static_cast<std::size_t>(-1);
+
 				const auto triggers = [&]() {
 					augs::enum_boolset<weapon_action_type> out;
 
@@ -216,6 +220,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 							if (action.held_item == gun_entity) {
 								out.set(action.type);
+								hand_index = action.hand_index;
 							}
 						}
 					}
@@ -325,6 +330,21 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				float total_recoil = 0.f;
 				bool decrease_heat_in_aftermath = true;
 
+				auto drop_if_empty = [&]() {
+					const auto ammo_info = calc_ammo_info(gun_entity);
+
+					if (ammo_info.total_ammo_space > 0 && ammo_info.total_charges == 0) {
+						if (std::nullopt == calc_reloading_context_for(capability, gun_entity)) {
+							perform_transfer(item_slot_transfer_request::drop(gun_entity), step);
+
+							if (hand_index != static_cast<std::size_t>(-1)) {
+								sentience.hand_flags[hand_index] = false;
+								sentience.when_hand_pressed[hand_index] = {};
+							}
+						}
+					}
+				};
+
 				if (const auto magic_missile_flavour_id = gun_def.magic_missile_flavour; magic_missile_flavour_id.is_set()) {
 					const auto& missile_def = cosm.on_flavour(
 						magic_missile_flavour_id,
@@ -416,11 +436,9 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							progress = 0.f;
 						};
 
-						if (transfer_cooldown_passed && feasible_wielding) {
-							if (progress == 0.f) {
-								try_to_play_trigger_pull_sound();
-							}
+						try_to_play_trigger_pull_sound();
 
+						if (transfer_cooldown_passed && feasible_wielding) {
 							if (const auto next_cartridge = find_next_cartridge(gun_entity); next_cartridge.is_set()) {
 								if (progress == 0.f) {
 									const auto& chosen_effect = gun_def.chambering_sound;
@@ -766,6 +784,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 	#else
 					(void)logicals;
 	#endif
+
+					drop_if_empty();
 				}
 				else if (decrease_heat_in_aftermath) {
 					cooldown_gun_heat(step, muzzle_transform, gun_entity);

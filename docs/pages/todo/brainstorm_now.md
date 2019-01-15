@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Autohide empty weapons during akimbo?
+
 - Problem of predictability of autodrops?
 	- It anyway begins with an unpredictable entropy of a drop
 		- Except when a nade is thrown
