@@ -266,7 +266,13 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				}
 
 				if (is_sentient) {
-					sentience->time_of_last_exertion = cosm.get_timestamp();
+					const auto& sentience_def = it.template get<invariants::sentience>();
+					const auto regen_mult = sentience_def.cp_regen_mult_when_moving;
+					const bool count_walk_as_exertion = regen_mult == 0.f;
+
+					if (count_walk_as_exertion || movement.was_sprint_effective) {
+						sentience->time_of_last_exertion = cosm.get_timestamp();
+					}
 				}
 
 				auto applied_force = requested_by_input;

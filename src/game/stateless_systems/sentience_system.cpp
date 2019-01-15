@@ -168,7 +168,15 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 					const auto passed_ms = (now - sentience.time_of_last_exertion).in_milliseconds(delta);
 
 					if (passed_ms >= sentience_def.exertion_cooldown_for_cp_regen_ms && passed % make_interval_in_steps(consciousness) == 0) {
-						consciousness.value -= consciousness.calc_damage_result(-consciousness.regeneration_unit).effective;
+						auto considered_unit = -consciousness.regeneration_unit;
+
+						const auto min_speed_to_consider_as_moving = 100.f;
+
+						if (subject.get_effective_velocity().length_sq() >= min_speed_to_consider_as_moving * min_speed_to_consider_as_moving) {
+							considered_unit *= sentience_def.cp_regen_mult_when_moving;
+						}
+
+						consciousness.value -= consciousness.calc_damage_result(considered_unit).effective;
 					}
 				}
 

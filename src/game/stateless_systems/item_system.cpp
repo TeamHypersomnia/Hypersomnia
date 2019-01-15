@@ -768,7 +768,7 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 
 					int target_index = 1;
 
-					if (requested_wield.is_bare_hands(cosm)) {
+					if (cosm[requested_wield.hand_selections[0]].dead()) {
 						/* Only engage the primary hand if both are free, though this probably won't happen often */
 						target_index = 0;
 					}

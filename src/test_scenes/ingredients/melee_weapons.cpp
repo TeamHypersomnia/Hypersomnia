@@ -98,7 +98,7 @@ namespace test_flavours {
 					a.wielder_impulse = 387.f;
 					a.wielder_inert_for_ms = 200.f;
 					a.cooldown_ms = 200.f;
-					a.cp_required = 1.f;
+					a.cp_required = 3.f;
 
 					a.obstacle_hit_recoil = 40.f;
 					a.sentience_hit_recoil = 10.f;
@@ -139,7 +139,7 @@ namespace test_flavours {
 					a.wielder_impulse = 717.f;
 					a.wielder_inert_for_ms = 300.f;
 					a.obstacle_hit_linear_inertia_ms = 100.f;
-					a.cp_required = 2.f;
+					a.cp_required = 6.f;
 
 					a.obstacle_hit_kickback_impulse = 3600.f;
 					a.obstacle_hit_rotation_inertia_ms = 1000.f;

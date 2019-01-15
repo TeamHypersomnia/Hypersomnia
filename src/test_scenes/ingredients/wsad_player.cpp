@@ -238,6 +238,11 @@ namespace test_flavours {
 			sentience.loss_of_consciousness_sound.id = to_sound_id(test_scene_sound_id::DEATH);
 			sentience.consciousness_decrease_sound.id = to_sound_id(test_scene_sound_id::IMPACT);
 
+			sentience.sprint_drains_cp_per_second = 20.f;
+			sentience.exertion_cooldown_for_cp_regen_ms = 500.f;
+			sentience.dash_drains_cp = 40.f;
+			sentience.cp_regen_mult_when_moving = 0.5f;
+
 			sentience_inst.get<health_meter_instance>().set_value(100);
 			sentience_inst.get<health_meter_instance>().set_maximum_value(100);
 			sentience_inst.get<health_meter_instance>().regeneration_unit = 2;
@@ -246,10 +251,10 @@ namespace test_flavours {
 			sentience_inst.get<personal_electricity_meter_instance>().set_maximum_value(340);
 			sentience_inst.get<personal_electricity_meter_instance>().regeneration_unit = 4;
 			sentience_inst.get<personal_electricity_meter_instance>().regeneration_interval_ms = 2000;
-			sentience_inst.get<consciousness_meter_instance>().set_value(250);
-			sentience_inst.get<consciousness_meter_instance>().set_maximum_value(250);
-			sentience_inst.get<consciousness_meter_instance>().regeneration_unit = 4;
-			sentience_inst.get<consciousness_meter_instance>().regeneration_interval_ms = 250;
+			sentience_inst.get<consciousness_meter_instance>().set_value(320);
+			sentience_inst.get<consciousness_meter_instance>().set_maximum_value(320);
+			sentience_inst.get<consciousness_meter_instance>().regeneration_unit = 7;
+			sentience_inst.get<consciousness_meter_instance>().regeneration_interval_ms = 200;
 
 			meta.set(sentience);
 			meta.set(sentience_inst);

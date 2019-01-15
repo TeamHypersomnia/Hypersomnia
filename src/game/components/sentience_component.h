@@ -178,6 +178,7 @@ namespace invariants {
 
 		detached_body_parts_flavours detached_flavours;
 		real32 max_inertia_when_rotation_possible = 500.f;
+		real32 cp_regen_mult_when_moving = 1.f;
 		// END GEN INTROSPECTOR
 	};
 }
