@@ -1,4 +1,6 @@
 #pragma once
+#include "augs/math/repro_math.h"
+
 #include <algorithm>
 #include <sstream>
 #include <cmath>
@@ -101,15 +103,15 @@ struct basic_vec2 {
 
 	static auto from_degrees(const real degrees) {
 		const auto radians = degrees * DEG_TO_RAD<real>;
-		return basic_vec2<type>(static_cast<type>(cos(radians)), static_cast<type>(sin(radians)));
+		return basic_vec2<type>(static_cast<type>(repro::cos(radians)), static_cast<type>(repro::sin(radians)));
 	}
 
 	static auto from_radians(const real radians) {
-		return basic_vec2<type>(static_cast<type>(cos(radians)), static_cast<type>(sin(radians)));
+		return basic_vec2<type>(static_cast<type>(repro::cos(radians)), static_cast<type>(repro::sin(radians)));
 	}
 
 	real distance_from(const segment_type s) const {
-		return std::sqrt(sq_distance_from(s));
+		return repro::sqrt(sq_distance_from(s));
 	}
 
 	real get_projection_multiplier(const basic_vec2 start, const basic_vec2 end) const {
@@ -183,7 +185,7 @@ struct basic_vec2 {
 	}
 
 	real length() const {
-		return static_cast<real>(sqrt(length_sq()));
+		return static_cast<real>(repro::sqrt(length_sq()));
 	}
 
 	type length_sq() const {
@@ -191,7 +193,12 @@ struct basic_vec2 {
 	}
 
 	real radians() const {
-		return static_cast<real>(atan2(y, x));
+		if constexpr(std::is_integral_v<type>) {
+			return static_cast<real>(repro::atan2(real(y), real(x)));
+		}
+		else {
+			return static_cast<real>(repro::atan2(y, x));
+		}
 	}
 
 	real degrees() const {
@@ -211,13 +218,13 @@ struct basic_vec2 {
 			dotted = -1;
 		}
 
-		auto result = std::acos(dotted);
+		auto result = repro::acos(dotted);
 
 		return static_cast<real>(result);
 	}
 
 	auto full_radians_between(const basic_vec2& v) const {
-		return std::atan2(cross(v), dot(v));
+		return repro::atan2(cross(v), dot(v));
 	}
 
 	auto full_degrees_between(const basic_vec2& v) const {
@@ -270,7 +277,7 @@ struct basic_vec2 {
 	}
 
 	basic_vec2& normalize_hint(const real len) {
-		if (std::abs(len) < std::numeric_limits<real>::epsilon()) {
+		if (repro::fabs(len) < std::numeric_limits<real>::epsilon()) {
 			return *this;
 		}
 
@@ -426,8 +433,8 @@ struct basic_vec2 {
 	auto& rotate_radians(const R radians) {
 		static_assert(std::is_floating_point_v<R>);
 
-		const auto s = static_cast<real>(sin(radians));
-		const auto c = static_cast<real>(cos(radians));
+		const auto s = static_cast<real>(repro::sin(radians));
+		const auto c = static_cast<real>(repro::cos(radians));
 
 		const auto new_x = x * c - y * s;
 		const auto new_y = x * s + y * c;
@@ -537,27 +544,27 @@ struct basic_vec2 {
 
 	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
 	bool x_non_zero(const real eps = AUGS_EPSILON<real>) const {
-		return std::abs(x) > eps;
+		return repro::fabs(x) > eps;
 	}
 
 	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
 	bool y_non_zero(const real eps = AUGS_EPSILON<real>) const {
-		return std::abs(y) > eps;
+		return repro::fabs(y) > eps;
 	}
 
 	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
 	bool non_zero(const real eps = AUGS_EPSILON<real>) const {
-		return std::abs(x) > eps || std::abs(y) > eps;
+		return repro::fabs(x) > eps || repro::fabs(y) > eps;
 	}
 
 	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
 	bool neither_zero(const real eps = AUGS_EPSILON<real>) const {
-		return std::abs(x) > eps && std::abs(y) > eps;
+		return repro::fabs(x) > eps && repro::fabs(y) > eps;
 	}
 
 	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
 	bool is_zero(const real eps = AUGS_EPSILON<real>) const {
-		return std::abs(x) <= eps && std::abs(y) <= eps;
+		return repro::fabs(x) <= eps && repro::fabs(y) <= eps;
 	}
 
 	template <class A = type, class = std::enable_if_t<std::is_integral_v<A>>>
@@ -577,16 +584,18 @@ struct basic_vec2 {
 
 	basic_vec2 operator-() const { return basic_vec2(x * -1, y * -1); }
 
+	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
 	bool compare_abs(const basic_vec2& b, const real epsilon = AUGS_EPSILON<real>) const {
-		if (std::abs(x - b.x) < epsilon && std::abs(y - b.y) < epsilon) {
+		if (repro::fabs(x - b.x) < epsilon && repro::fabs(y - b.y) < epsilon) {
 			return true;
 		}
 
 		return false;
 	}
 
+	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
 	bool is_epsilon(const real epsilon = AUGS_EPSILON<real>) const {
-		if (std::abs(x) < epsilon && std::abs(y) < epsilon) {
+		if (repro::fabs(x) < epsilon && repro::fabs(y) < epsilon) {
 			return true;
 		}
 

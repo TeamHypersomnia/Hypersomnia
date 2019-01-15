@@ -60,7 +60,7 @@ struct general_particle {
 		if (shrink_when_ms_remaining > 0.f) {
 			const auto alivity_multiplier = std::min(1.f, (max_lifetime_ms - current_lifetime_ms) / shrink_when_ms_remaining);
 
-			size_mult *= sqrt(alivity_multiplier);
+			size_mult *= std::sqrt(alivity_multiplier);
 
 			//const auto desired_alpha = static_cast<rgba_channel>(alivity_multiplier * static_cast<float>(temp_alpha));
 			//

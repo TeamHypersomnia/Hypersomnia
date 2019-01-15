@@ -135,7 +135,7 @@ struct basic_transform {
 			pos = to.pos;
 		}
 
-		if (std::abs(rotation - to.rotation) > epsilon) {
+		if (repro::fabs(rotation - to.rotation) > epsilon) {
 			rotation = to.rotation;
 		}
 
@@ -152,7 +152,7 @@ struct basic_transform {
 			pos = to.pos;
 		}
 
-		if (std::abs(rotation - to.rotation) > rotational_epsilon) {
+		if (repro::fabs(rotation - to.rotation) > rotational_epsilon) {
 			rotation = to.rotation;
 		}
 		
@@ -188,7 +188,7 @@ struct basic_transform {
 		const A positional_eps = AUGS_EPSILON<A>,
 		const B rotational_eps = AUGS_EPSILON<B>
 	) const {
-		return pos.compare_abs(b.pos, positional_eps) && std::abs(rotation - b.rotation) <= rotational_eps;
+		return pos.compare_abs(b.pos, positional_eps) && repro::fabs(rotation - b.rotation) <= rotational_eps;
 	}
 
 	bool negliglible() const {

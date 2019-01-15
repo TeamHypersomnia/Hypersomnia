@@ -131,7 +131,7 @@ void homing_animated_particle::integrate(
 		std::swap(dirs[0], dirs[1]);
 	}
 
-	vel += dirs[0].set_length(sqrt(sqrt(homing_vector.length()))) * homing_force * dt;
+	vel += dirs[0].set_length(std::sqrt(std::sqrt(homing_vector.length()))) * homing_force * dt;
 
 	generic_integrate_particle(*this, dt);
 	animation.advance(dt * 1000, anims);

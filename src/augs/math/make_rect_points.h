@@ -17,8 +17,8 @@ namespace augs {
 
 		const auto radians = DEG_TO_RAD<float> * degrees;
 
-		const auto s = static_cast<float>(sin(radians));
-		const auto c = static_cast<float>(cos(radians));
+		const auto s = static_cast<float>(repro::sin(radians));
+		const auto c = static_cast<float>(repro::cos(radians));
 
 		for (auto& vv : v) {
 			const auto new_x = vv.x * c - vv.y * s;

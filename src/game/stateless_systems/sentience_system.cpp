@@ -542,7 +542,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 				if (const auto* const crosshair = subject.find_crosshair()) {
 					const auto recoil_amount = crosshair->recoil.rotation;
 					const auto recoil_dir = augs::sgn(recoil_amount);
-					const auto considered_amount = (recoil_dir == 0 ? 1 : recoil_dir) * std::min(1.f, std::max(std::abs(recoil_amount), 0.2f));
+					const auto considered_amount = (recoil_dir == 0 ? 1 : recoil_dir) * std::min(1.f, std::max(repro::fabs(recoil_amount), 0.2f));
 
 					const auto& head_def = subject.get<invariants::head>();
 

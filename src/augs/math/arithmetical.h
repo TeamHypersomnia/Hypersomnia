@@ -18,7 +18,7 @@ constexpr T PI = static_cast<T>(3.1415926535897932384626433832795);
 namespace augs {
 	template<class T>
 	T normalize_degrees(const T degrees) {
-		return std::fmod(degrees + 180, 360) - 180;
+		return repro::fmod(degrees + 180, 360) - 180;
 	}
 
 	template <class T>
@@ -52,7 +52,7 @@ namespace augs {
 
 	template <class T>
 	bool is_epsilon(const T& t) {
-		return std::abs(t) <= AUGS_EPSILON<T>;
+		return repro::fabs(t) <= AUGS_EPSILON<T>;
 	}
 
 	template <class T>
@@ -112,7 +112,7 @@ namespace augs {
 
 	template <class T>
 	bool compare(const T a, const T b, const T eps = AUGS_EPSILON<T>) {
-		return std::abs(a - b) < eps;
+		return repro::fabs(a - b) < eps;
 	}
 
 	template <class T, class A>

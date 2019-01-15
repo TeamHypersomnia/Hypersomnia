@@ -145,8 +145,8 @@ void wandering_pixels_system::advance_for(
 			auto prev_pos = p.pos;
 			p.pos += considered_direction * vel * dt_secs;
 
-			const auto sin_secs = static_cast<float>(sin(p.current_lifetime_ms / 1000));
-			const auto cos_secs = static_cast<float>(cos(p.current_lifetime_ms / 1000));
+			const auto sin_secs = static_cast<float>(std::sin(p.current_lifetime_ms / 1000));
+			const auto cos_secs = static_cast<float>(std::cos(p.current_lifetime_ms / 1000));
 
 			if (considered_direction.x > 0) {
 				p.pos.y += considered_direction.x * sin_secs * vel * dt_secs * 1.2f;

@@ -377,7 +377,7 @@ perform_transfer_result perform_transfer_impl(
 	if (r.params.perform_recoils) {
 		if (target_slot) {
 			auto do_recoil = [&](const auto& mult) {
-				const auto conceptual_mass = std::sqrt(std::sqrt(static_cast<real32>(::calc_space_occupied_with_children(grabbed_item_part_handle)) / SPACE_ATOMS_PER_UNIT));
+				const auto conceptual_mass = repro::sqrt(repro::sqrt(static_cast<real32>(::calc_space_occupied_with_children(grabbed_item_part_handle)) / SPACE_ATOMS_PER_UNIT));
 				const auto capability_def = target_root.find<invariants::item_slot_transfers>();
 
 				if (capability_def) {

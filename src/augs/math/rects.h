@@ -6,6 +6,7 @@
 #include <cmath>
 #include "declare_math.h"
 #include "augs/math/si_scaling.h"
+#include "augs/math/repro_math.h"
 #include "augs/string/typesafe_sprintf.h"
 
 enum rectangle_sticking {
@@ -316,7 +317,7 @@ struct basic_ltrb {
 	}
 
 	T diagonal() const {
-		return sqrt(w()*w() + h()*h());
+		return repro::sqrt(w()*w() + h()*h());
 	}
 
 	bool good() const {

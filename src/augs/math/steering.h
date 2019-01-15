@@ -146,7 +146,7 @@ namespace augs {
 			}
 		}
 
-		dist_to_closest = std::sqrt(dist_to_closest);
+		dist_to_closest = repro::sqrt(dist_to_closest);
 
 		/* Finally, correct velocities against the walls */
 

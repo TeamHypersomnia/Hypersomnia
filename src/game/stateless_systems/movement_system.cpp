@@ -423,7 +423,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 			if (!propelling && current_speed <= conceptual_max_speed / 2) {
 				/* Animation is finishing. */
-				const auto decreasing_dt = delta_ms * std::max(sqrt(sqrt(speed_mult)), 0.2f);
+				const auto decreasing_dt = delta_ms * std::max(repro::sqrt(repro::sqrt(speed_mult)), 0.2f);
 				amount = std::max(0.f, amount - decreasing_dt);
 			}
 			else {

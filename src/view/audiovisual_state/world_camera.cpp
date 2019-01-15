@@ -112,7 +112,7 @@ void world_camera::tick(
 
 			target_value = (player_pos - player_position_previously_seen) * cosm.get_fixed_delta().in_milliseconds();
 
-			if (target_value.length() < additional_position_smoothing.value.length()) {
+			if (target_value.length() < vec2(additional_position_smoothing.value).length()) {
 				// braking
 				settings.additional_position_smoothing.averages_per_sec += 3.5;
 			}

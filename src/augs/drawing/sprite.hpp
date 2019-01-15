@@ -7,6 +7,7 @@
 #include "augs/build_settings/compiler_defines.h"
 #include "augs/drawing/sprite.h"
 #include "augs/math/grid_math.h"
+#include "augs/drawing/make_sprite_points.h"
 
 namespace augs {
 	template <class I, class F>

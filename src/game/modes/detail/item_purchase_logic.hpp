@@ -133,7 +133,7 @@ inline bool is_ammo_piece_like(const H& handle) {
 inline bool is_shotgun_like(const cosmos& cosm, const item_flavour_id& id) {
 	return cosm.on_flavour(id, [&](const auto& typed_flavour) {
 		if (const auto gun = typed_flavour.template find<invariants::gun>()) {
-			return gun->shot_cooldown_ms >= 200.f && std::fabs(gun->muzzle_velocity.first - gun->muzzle_velocity.second) >= 1000.f;
+			return gun->shot_cooldown_ms >= 200.f && repro::fabs(gun->muzzle_velocity.first - gun->muzzle_velocity.second) >= 1000.f;
 		}
 
 		return false;

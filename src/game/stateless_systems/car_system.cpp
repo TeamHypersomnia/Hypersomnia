@@ -152,7 +152,7 @@ void car_system::apply_movement_forces(const logic_step step) {
 
 			if (angular_resistance > 0.f) {
 				auto angular_speed = angular_velocity * DEG_TO_RAD<float>;
-				//rigid_body.body->ApplyTorque((angular_resistance * sqrt(sqrt(angular_speed * angular_speed)) + 0.2 * angular_speed * angular_speed)* -augs::sgn(angular_speed) * b->GetInertia(), true);
+				//rigid_body.body->ApplyTorque((angular_resistance * repro::sqrt(repro::sqrt(angular_speed * angular_speed)) + 0.2 * angular_speed * angular_speed)* -augs::sgn(angular_speed) * b->GetInertia(), true);
 				rigid_body.apply_angular_impulse(delta.in_seconds() * (angular_resistance * angular_speed * angular_speed)* -augs::sgn(angular_speed) * rigid_body.get_inertia());
 			}
 
@@ -182,8 +182,8 @@ void car_system::apply_movement_forces(const logic_step step) {
 			const float pitch = 0.3f 
 				+ speed 
 					* 1.2f / car.speed_for_pitch_unit
-				+ std::abs(angular_velocity / 780.f) 
-					* sqrt(rigid_body.get_mass())
+				+ repro::fabs(angular_velocity / 780.f) 
+					* repro::sqrt(rigid_body.get_mass())
 			;
 
 			if (sound_entity.alive() && sound_entity.has<components::sound_existence>()) {

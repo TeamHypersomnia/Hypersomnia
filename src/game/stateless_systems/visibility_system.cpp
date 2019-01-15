@@ -57,7 +57,7 @@ void VIS_LOG(Args&&... args) {
 
 FORCE_INLINE auto comparable_angle(const vec2 diff) {
 	return std::copysign(
-		1 - diff.x / (std::abs(diff.x) + std::abs(diff.y)), diff.y 
+		1 - diff.x / (repro::fabs(diff.x) + repro::fabs(diff.y)), diff.y 
 	);
 }
 
@@ -204,7 +204,7 @@ void visibility_system::calc_visibility(
 
 	const auto settings = [&cosm](){ 
 		auto absolutize = [](float& f) {
-			f = std::fabs(f);
+			f = repro::fabs(f);
 		};
 
 		auto s = cosm.get_common_significant().visibility;

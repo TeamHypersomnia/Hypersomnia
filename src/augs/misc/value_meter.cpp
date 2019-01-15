@@ -1,6 +1,6 @@
 #include <algorithm>
-#include <cmath>
 
+#include "augs/math/repro_math.h"
 #include "augs/misc/value_meter.h"
 #include "augs/ensure.h"
 
@@ -60,7 +60,7 @@ value_meter::damage_result value_meter::calc_damage_result(
 		}
 	}
 
-	result.ratio_effective_to_maximum = std::fabs(result.effective) / static_cast<float>(maximum);
+	result.ratio_effective_to_maximum = repro::fabs(result.effective) / static_cast<float>(maximum);
 
 	return result;
 }
