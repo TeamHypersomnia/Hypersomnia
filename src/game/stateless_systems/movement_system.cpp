@@ -202,7 +202,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 						}
 					}
 
-					movement.flags.dashing = false;
+					//movement.flags.dashing = false;
 				}
 			}
 

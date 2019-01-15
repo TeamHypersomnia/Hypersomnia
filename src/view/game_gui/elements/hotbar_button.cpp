@@ -11,6 +11,8 @@
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "view/game_gui/game_gui_system.h"
 
+#include "game/detail/gun/ammo_logic.h"
+
 #include "view/game_gui/elements/hotbar_settings.h"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 
@@ -160,6 +162,14 @@ void hotbar_button::draw(
 	if (pushed) {
 		inside_col.a += 40;
 		border_col.a = 255;
+	}
+
+	if (has_assigned_entity) {
+		if (is_ammo_depleted(assigned_entity, owner_transfer_capability)) {
+			colorize = red;
+			border_col = red;
+			distinguished_border_color = red;
+		}
 	}
 
 	inside_col *= colorize;

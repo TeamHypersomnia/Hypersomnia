@@ -358,18 +358,28 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						}
 
 						if (std::nullopt == calc_reloading_context_for(capability, gun_entity)) {
-							perform_transfer(item_slot_transfer_request::drop(gun_entity), step);
+							const bool try_to_hide_before_dropping_depleted = false;
+
+							auto drop_if_still_in_hand = [&]() {
+								if (gun_entity.get_current_slot().is_hand_slot()) {
+									perform_transfer(item_slot_transfer_request::drop(gun_entity), step);
+								}
+							};
 
 							if (hand_index != static_cast<std::size_t>(-1)) {
 								//sentience.hand_flags[hand_index] = false;
 								//sentience.when_hand_pressed[hand_index] = {};
 							}
 
-							::perform_wielding(
-								step,
-								owning_capability,
-								requested_wield
-							);
+							if (try_to_hide_before_dropping_depleted) {
+								::perform_wielding(
+									step,
+									owning_capability,
+									requested_wield
+								);
+							}
+
+							drop_if_still_in_hand();
 						}
 						else if (wielding == wielding_type::DUAL_WIELDED) {
 							::perform_wielding(

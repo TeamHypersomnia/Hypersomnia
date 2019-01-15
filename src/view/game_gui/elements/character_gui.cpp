@@ -230,6 +230,10 @@ wielding_setup character_gui::make_wielding_setup_for_last_hotbar_selection_setu
 						const bool finally_found_differing_setup = !(make_setup_with(candidate_entity) == current_setup);
 
 						if (finally_found_differing_setup) {
+							if (is_ammo_depleted(candidate_entity, gui_entity)) {
+								return false;
+							}
+
 							HOT_LOG("Found candidate: %x", candidate_entity);
 							return true;
 						}

@@ -44,11 +44,6 @@ struct character_gui {
 
 	void save_as_last_setup(const wielding_setup);
 
-	static entity_id get_wieldable_if_available(
-		const const_entity_handle gui_entity,
-		const const_entity_handle assigned_entity
-	);
-
 	wielding_setup get_setup_from_button_indices(
 		const const_entity_handle gui_entity,
 		const int hotbar_button_index_for_primary_selection,

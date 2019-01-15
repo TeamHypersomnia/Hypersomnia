@@ -1,5 +1,6 @@
 #include "game/detail/inventory/wielding_setup.h"
 #include "game/detail/weapon_like.h"
+#include "game/detail/gun/ammo_logic.h"
 
 template <class I>
 template <class C>
@@ -35,13 +36,13 @@ entity_id get_wieldable_if_available(
 
 template <class I>
 template <class E>
-auto basic_wielding_setup<I>::make_viable_setup(const E& h) const {
+auto basic_wielding_setup<I>::make_viable_setup(const E& gui_entity) const {
 	auto output = basic_wielding_setup<I>::bare_hands();
 
 	for (std::size_t i = 0; i < hand_selections.size(); ++i) {
-		if (const auto candidate_wieldable = h.get_cosmos()[hand_selections[i]]) {
+		if (const auto candidate_wieldable = gui_entity.get_cosmos()[hand_selections[i]]) {
 			if (::is_weapon_like(candidate_wieldable)) {
-				output.hand_selections[i] = get_wieldable_if_available(h, candidate_wieldable);
+				output.hand_selections[i] = get_wieldable_if_available(gui_entity, candidate_wieldable);
 			}
 		}
 
