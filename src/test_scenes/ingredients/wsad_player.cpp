@@ -241,15 +241,15 @@ namespace test_flavours {
 			sentience_inst.get<health_meter_instance>().set_value(100);
 			sentience_inst.get<health_meter_instance>().set_maximum_value(100);
 			sentience_inst.get<health_meter_instance>().regeneration_unit = 2;
-			sentience_inst.get<health_meter_instance>().regeneration_interval_secs = 3;
+			sentience_inst.get<health_meter_instance>().regeneration_interval_ms = 3000;
 			sentience_inst.get<personal_electricity_meter_instance>().set_value(260);
 			sentience_inst.get<personal_electricity_meter_instance>().set_maximum_value(340);
 			sentience_inst.get<personal_electricity_meter_instance>().regeneration_unit = 4;
-			sentience_inst.get<personal_electricity_meter_instance>().regeneration_interval_secs = 2;
+			sentience_inst.get<personal_electricity_meter_instance>().regeneration_interval_ms = 2000;
 			sentience_inst.get<consciousness_meter_instance>().set_value(250);
 			sentience_inst.get<consciousness_meter_instance>().set_maximum_value(250);
 			sentience_inst.get<consciousness_meter_instance>().regeneration_unit = 4;
-			sentience_inst.get<consciousness_meter_instance>().regeneration_interval_secs = 0.5;
+			sentience_inst.get<consciousness_meter_instance>().regeneration_interval_ms = 250;
 
 			meta.set(sentience);
 			meta.set(sentience_inst);

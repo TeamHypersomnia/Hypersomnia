@@ -207,7 +207,7 @@ void standard_explosion_input::instantiate(
 						if (type == adverse_element_type::INTERFERENCE) {
 							// TODO: move this calculation after refactoring sentience system to not use messages?
 							auto& amount = damage_msg.damage.base;
-							amount *= 1 + victim.get_effective_velocity().length() / 400.f;
+							amount *= 1 + victim.get_effective_velocity().length() / 1000.f;
 						}
 
 						step.post_message(damage_msg);

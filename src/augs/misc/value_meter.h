@@ -14,7 +14,7 @@ struct value_meter {
 	meter_value_type value = 100;
 	meter_value_type maximum = 100;
 	real32 regeneration_unit = 2;
-	real32 regeneration_interval_secs = 3;
+	real32 regeneration_interval_ms = 3000;
 	// END GEN INTROSPECTOR
 
 	damage_result calc_damage_result(

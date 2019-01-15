@@ -140,7 +140,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 	const auto delta = cosm.get_fixed_delta();
 
 	auto make_interval_in_steps = [delta](const auto& m) {
-		return static_cast<unsigned>(1 / delta.in_seconds() * m.regeneration_interval_secs);
+		return static_cast<unsigned>(1 / delta.in_milliseconds() * m.regeneration_interval_ms);
 	};
 
 	cosm.for_each_having<components::sentience>(
@@ -165,8 +165,9 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 
 				if (consciousness.is_enabled()) {
 					const auto passed = (now.step - sentience.time_of_last_exertion.step);
+					const auto passed_ms = (now - sentience.time_of_last_exertion).in_milliseconds(delta);
 
-					if (passed > 0 && passed % make_interval_in_steps(consciousness) == 0) {
+					if (passed_ms >= sentience_def.exertion_cooldown_for_cp_regen_ms && passed % make_interval_in_steps(consciousness) == 0) {
 						consciousness.value -= consciousness.calc_damage_result(-consciousness.regeneration_unit).effective;
 					}
 				}
