@@ -347,6 +347,9 @@ void settings_gui_state::perform(
 					revertable_checkbox(SCOPE_CFG_NVP(adjust_zoom_to_available_fog_of_war_size));
 				}
 
+				revertable_checkbox("Draw Personal Electricity HUD", config.drawing.draw_pe_bar);
+				revertable_checkbox("Draw Consciousness HUD", config.drawing.draw_cp_bar);
+
 				revertable_checkbox("Draw weapon laser", config.drawing.draw_weapon_laser);
 				revertable_checkbox("Draw crosshairs", config.drawing.draw_crosshairs);
 				revertable_checkbox("Draw area markers", config.drawing.draw_area_markers.is_enabled);

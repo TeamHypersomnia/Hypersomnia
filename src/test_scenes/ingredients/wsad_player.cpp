@@ -242,6 +242,7 @@ namespace test_flavours {
 			sentience.exertion_cooldown_for_cp_regen_ms = 500.f;
 			sentience.dash_drains_cp = 40.f;
 			sentience.cp_regen_mult_when_moving = 0.5f;
+			sentience.minimum_cp_to_sprint = 0.08f;
 
 			sentience_inst.get<health_meter_instance>().set_value(100);
 			sentience_inst.get<health_meter_instance>().set_maximum_value(100);

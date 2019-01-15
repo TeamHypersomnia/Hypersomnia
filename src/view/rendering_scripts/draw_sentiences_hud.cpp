@@ -45,13 +45,52 @@ augs::vertex_triangle_buffer draw_sentiences_hud(const draw_sentiences_hud_input
 		if (const auto* const sentience = v.template find<components::sentience>();
 			sentience && sentience->is_conscious()
 		) {
-			const auto& health = sentience->template get<health_meter_instance>();
-			const auto hr = health.get_ratio();
+			struct bar_info {
+				bool is_health = false;
+				rgba color;
+				real32 ratio;
+				real32 value;
+			};
 
-			const auto pulse_duration = static_cast<int>(1250 - 1000 * (1 - hr));
-			const float time_pulse_ratio = (timestamp_ms % pulse_duration) / float(pulse_duration);
+			const auto info = [&]() -> bar_info {
+				return in.meter.dispatch(
+					[&](auto d) {
+						using I = decltype(d);
+						using M = typename I::meta_type;
 
-			const auto health_col = sentience->calc_health_color(time_pulse_ratio);
+						bar_info out;
+						const auto& m = sentience->template get<I>();
+
+						out.ratio = m.get_ratio();
+						out.value = m.value;
+
+						if constexpr(std::is_same_v<M, health_meter>) {
+							out.is_health = true;
+
+							const auto pulse_duration = static_cast<int>(1250 - 1000 * (1 - out.ratio));
+							const float time_pulse_ratio = (timestamp_ms % pulse_duration) / float(pulse_duration);
+
+							out.color = sentience->calc_health_color(time_pulse_ratio);
+						}
+						else {
+							const auto& meta = std::get<M>(cosm.get_common_significant().meters);
+
+							out.is_health = false;
+							out.color = meta.appearance.bar_color;
+						}
+
+						return out;
+					}
+				);
+			}();
+
+			const bool should_draw_textuals = info.is_health;
+			const bool should_draw_ammo = info.is_health;
+
+			const auto hr = info.ratio;
+			const auto value = info.value;
+
+			const auto health_col = info.color;
 
 			const auto transform = v.get_viewing_transform(interp);
 
@@ -63,11 +102,11 @@ augs::vertex_triangle_buffer draw_sentiences_hud(const draw_sentiences_hud_input
 
 			if (v == watched_character) {
 				starting_health_angle = watched_character_transform.rotation + 135;
-				ending_health_angle = starting_health_angle + health.get_ratio() * 90.f;
+				ending_health_angle = starting_health_angle + hr * 90.f;
 			}
 			else {
 				starting_health_angle = (v.get_viewing_transform(interp).pos - watched_character_transform.pos).degrees() - 45;
-				ending_health_angle = starting_health_angle + health.get_ratio() * 90.f;
+				ending_health_angle = starting_health_angle + hr * 90.f;
 			}
 
 			const auto push_angles = [&](
@@ -100,7 +139,13 @@ augs::vertex_triangle_buffer draw_sentiences_hud(const draw_sentiences_hud_input
 
 			std::vector<circle_info> textual_infos;
 
-			if (v == watched_character) {
+			auto push_textual_info = [&](const circle_info& i) {
+				if (should_draw_textuals) {
+					textual_infos.push_back(i);
+				}
+			};
+
+			if (should_draw_ammo && v == watched_character) {
 				const auto examine_item_slot = [&](
 					const const_inventory_slot_handle id,
 					const float lower_outside,
@@ -138,7 +183,7 @@ augs::vertex_triangle_buffer draw_sentiences_hud(const draw_sentiences_hud_input
 							new_info.text = std::to_string(ammo_info.total_charges);
 							new_info.color = ammo_color;
 
-							textual_infos.push_back(new_info);
+							push_textual_info(new_info);
 						}
 					}
 				};
@@ -148,15 +193,15 @@ augs::vertex_triangle_buffer draw_sentiences_hud(const draw_sentiences_hud_input
 			}
 
 			const int radius = in.circular_bar_tex.get_original_size().x / 2;
-			const auto empty_health_amount = static_cast<int>((1 - health.get_ratio()) * 90);
+			const auto empty_health_amount = static_cast<int>((1 - hr) * 90);
 
-			textual_infos.push_back({
+			push_textual_info({
 				starting_health_angle + 90 - empty_health_amount / 2,
-				std::to_string(int(health.value) == 0 ? 1 : int(health.value)),
+				std::to_string(int(value) == 0 ? 1 : int(value)),
 				health_col
 			});
 
-			textual_infos.push_back({
+			push_textual_info({
 				starting_health_angle,
 				get_bbcoded_entity_name(v),
 				health_col

@@ -18,6 +18,8 @@ struct game_drawing_settings {
 	bool draw_aabb_highlighter = true;
 	augs::maybe<float> draw_area_markers = augs::maybe<float>(0.5f, true);
 	bool draw_enemy_hud = false;
+	bool draw_cp_bar = true;
+	bool draw_pe_bar = false;
 
 	fog_of_war_settings fog_of_war;
 	fog_of_war_appearance_settings fog_of_war_appearance;

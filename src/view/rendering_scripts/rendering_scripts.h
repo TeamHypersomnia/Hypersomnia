@@ -50,6 +50,7 @@ struct draw_sentiences_hud_input {
 
 	const augs::baked_font& gui_font;
 	const augs::atlas_entry circular_bar_tex;
+	const meter_id meter;
 };
 
 struct draw_explosion_body_highlights_input {

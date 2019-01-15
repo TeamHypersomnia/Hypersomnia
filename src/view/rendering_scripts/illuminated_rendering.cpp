@@ -642,25 +642,65 @@ void illuminated_rendering(
 	augs::vertex_triangle_buffer textual_infos;
 
 	if (viewed_character) {
-		const auto tex = necessarys.at(assets::necessary_image_id::CIRCULAR_BAR_LARGE);
+		auto make_input_for = [&](const auto& tex_type, const auto meter) {
+			const auto tex = necessarys.at(tex_type);
 
-		set_center_uniform(tex);
+			set_center_uniform(tex);
 
-		textual_infos = draw_sentiences_hud({
-			cone,
-			visible,
-			settings,
-			output,
-			renderer.get_special_buffer(),
-			cosm,
-			viewed_character,
-			interp,
-			global_time_seconds,
-			gui_font,
-			tex
-		});
+			return draw_sentiences_hud_input {
+				cone,
+				visible,
+				settings,
+				output,
+				renderer.get_special_buffer(),
+				cosm,
+				viewed_character,
+				interp,
+				global_time_seconds,
+				gui_font,
+				tex,
+				meter
+			};
+		};
+
+		std::array<assets::necessary_image_id, 3> circles = {
+			assets::necessary_image_id::CIRCULAR_BAR_LARGE,
+			assets::necessary_image_id::CIRCULAR_BAR_UNDER_LARGE,
+			assets::necessary_image_id::CIRCULAR_BAR_UNDER_UNDER_LARGE
+		};
+
+		int current_circle = 0;
+
+		textual_infos = draw_sentiences_hud(
+			make_input_for(
+				circles[current_circle++], 
+				meter_id::of<health_meter_instance>()
+			)
+		);
 
 		renderer.call_and_clear_triangles();
+
+		if (settings.draw_pe_bar) {
+			draw_sentiences_hud(
+				make_input_for(
+					circles[current_circle++], 
+					meter_id::of<personal_electricity_meter_instance>()
+				)
+			);
+
+			renderer.call_and_clear_triangles();
+		}
+
+		if (settings.draw_cp_bar) {
+			draw_sentiences_hud(
+				make_input_for(
+					circles[current_circle++], 
+					meter_id::of<consciousness_meter_instance>()
+				)
+			);
+
+			renderer.call_and_clear_triangles();
+		}
 	}
 	
 	{
