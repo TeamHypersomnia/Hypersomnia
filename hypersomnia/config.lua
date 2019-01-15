@@ -1,6 +1,7 @@
 return {
   launch_mode = "MAIN_MENU",
   log_to_live_file = false,
+  perform_float_consistency_test = true,
 
   app_controls = {
     F1 = "SWITCH_DEVELOPER_CONSOLE"

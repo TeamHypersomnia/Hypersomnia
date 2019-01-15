@@ -2,8 +2,9 @@
 #include <csignal>
 #endif
 
-#include <cfenv>
 #include <functional>
+
+#include "fp_consistency_tests.h"
 
 #include "augs/unit_tests.h"
 #include "augs/global_libraries.h"
@@ -84,6 +85,8 @@ bool log_to_live_file = false;
 */
 
 int work(const int argc, const char* const * const argv) try {
+	setup_float_flags();
+
 	augs::create_directories(LOG_FILES_DIR);
 
 	static augs::timer until_first_swap;
@@ -115,6 +118,9 @@ int work(const int argc, const char* const * const argv) try {
 	augs::create_directories(LOCAL_FILES_DIR);
 
 	dump_detailed_sizeof_information(LOG_FILES_DIR "/detailed_sizeofs.txt");
+
+	static const auto float_tests_succeeded = ::perform_float_consistency_tests();
+	(void)float_tests_succeeded;
 
 	static const auto canon_config_path = augs::path_type("config.lua");
 	static const auto local_config_path = augs::path_type(LOCAL_FILES_DIR "/config.local.lua");
@@ -989,7 +995,7 @@ int work(const int argc, const char* const * const argv) try {
 	LOG("Entered the main loop.");
 
 	while (!should_quit) {
-		ensure_eq(std::fegetround(), FE_TONEAREST);
+		ensure_float_flags_hold();
 
 		auto scope = measure_scope(performance.fps);
 		

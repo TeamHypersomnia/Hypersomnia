@@ -20,6 +20,7 @@
 #define B2_MATH_H
 
 #include <Box2D/Common/b2Settings.h>
+#include "augs/math/repro_math.h"
 #include <math.h>
 
 /// This function is used to ensure that a floating point number is not a NaN or infinity.
@@ -28,8 +29,8 @@ inline bool b2IsValid(float32 x)
 	return isfinite(x);
 }
 
-#define	b2Sqrt(x)	sqrtf(x)
-#define	b2Atan2(y, x)	atan2f(y, x)
+#define	b2Sqrt(x)	repro::sqrt(x)
+#define	b2Atan2(y, x)	repro::atan2f(y, x)
 
 #include "augs/math/declare_math.h"
 
@@ -295,16 +296,16 @@ struct b2Rot
 	explicit b2Rot(float32 angle)
 	{
 		/// TODO_ERIN optimize
-		s = sinf(angle);
-		c = cosf(angle);
+		s = repro::sinf(angle);
+		c = repro::cosf(angle);
 	}
 
 	/// Set using an angle in radians.
 	void Set(float32 angle)
 	{
 		/// TODO_ERIN optimize
-		s = sinf(angle);
-		c = cosf(angle);
+		s = repro::sinf(angle);
+		c = repro::cosf(angle);
 	}
 
 	/// Set to the identity rotation

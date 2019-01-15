@@ -37,6 +37,7 @@ summary: That which we are brainstorming at the moment.
 
 - Desync issues
 	- Resources:
+		- https://techdecoded.intel.io/resources/floating-point-reproducibility-in-intel-software-tools/
 		- https://software.intel.com/en-us/articles/getting-reproducible-results-with-intel-mkl
 		- https://scicomp.stackexchange.com/questions/24423/small-unpredictable-results-in-runs-of-a-deterministic-model
 			- Multithreaded computations on parallel cores. Modern computers typically have 2, 4, 8, or even more processor cores that can work in parallel. If your code is using parallel threads to compute a dot product on multiple processors, then any random perturbation of the system (e.g. the user moved his mouse and one of the processor cores has to process that mouse movement before returning to the dot product) could result in a change in the order of the additions. 

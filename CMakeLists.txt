@@ -657,6 +657,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/application/arena/arena_paths.cpp"
 	"src/application/arena/intercosm_paths.cpp"
 	"src/augs/misc/compress.cpp"
+	"src/fp_consistency_tests.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.
@@ -1070,6 +1071,9 @@ endif()
 
 # We configure some preprocessor defines.
 
+add_definitions(-DSTREFLOP_SSE)
+add_definitions(-DLIBM_COMPILING_FLT32)
+
 if(UNIX)
 	add_definitions(-DLUA_USE_LINUX)
 endif()
@@ -1250,6 +1254,8 @@ if(BUILD_OPENAL)
 	add_include_dirs_of("OpenAL")
 endif()
 
+add_subdirectory("${PROJECT_SOURCE_DIR}/src/3rdparty/streflop")
+
 # We build the remaining libraries.
 
 if(BUILD_NETWORKING)
@@ -1379,7 +1385,7 @@ endif()
 
 # We define libraries upon which Hypersomnia depends.
 
-set(HYPERSOMNIA_LIBS lua)
+set(HYPERSOMNIA_LIBS lua streflop)
 
 if(BUILD_OPENGL)
 	message("OPENGL_LIBRARIES: ${OPENGL_LIBRARIES}")
