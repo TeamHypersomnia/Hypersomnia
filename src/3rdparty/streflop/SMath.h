@@ -67,7 +67,7 @@ using streflop::Extended;
 	extern Simple __ldexpf(Simple value, int exp);
 	extern Simple __logbf(Simple x);
 	extern int __ilogbf(Simple x);
-	extern Simple __copysignf(Simple x);
+	extern Simple __copysignf(Simple x, Simple y);
 	extern int __signbitf(Simple x);
 	extern Simple __nextafterf(Simple x, Simple y);
 	extern Simple __expm1f(Simple x);
@@ -259,7 +259,7 @@ enum
 	inline Simple ldexp(Simple value, int exp) {return streflop_libm::__ldexpf(value,exp);}
 	inline Simple logb(Simple x) {return streflop_libm::__logbf(x);}
 	inline int ilogb(Simple x) {return streflop_libm::__ilogbf(x);}
-	inline Simple copysign(Simple x) {return streflop_libm::__copysignf(x);}
+	inline Simple copysign(Simple x, Simple y) {return streflop_libm::__copysignf(x, y);}
 #undef signbit
 	inline int signbit (Simple x) {return streflop_libm::__signbitf(x);}
 	inline Simple nextafter(Simple x, Simple y) {return streflop_libm::__nextafterf(x,y);}
@@ -389,7 +389,7 @@ enum
 	inline Simple ldexpf(Simple value, int exp) {return ldexp(value,exp);}
 	inline Simple logbf(Simple x) {return logb(x);}
 	inline int ilogbf(Simple x) {return ilogb(x);}
-	inline Simple copysignf(Simple x) {return copysign(x);}
+	inline Simple copysignf(Simple x, Simple y) {return copysign(x, y);}
 	inline int signbitf(Simple x) {return signbit(x);}
 	inline Simple nextafterf(Simple x, Simple y) {return nextafter(x, y);}
 

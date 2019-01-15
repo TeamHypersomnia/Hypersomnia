@@ -56,7 +56,7 @@ void force_joint_system::apply_forces_towards_target_entities(const logic_step s
 #if TODO
 					// DONT USE POW!
 					const auto mult = distance / force_joint.distance_when_force_easing_starts;
-					force_length *= std::pow(mult, force_joint.power_of_force_easing_multiplier);
+					force_length *= repro::pow(mult, force_joint.power_of_force_easing_multiplier);
 #endif
 				}
 

@@ -85,10 +85,10 @@ struct basic_ltrb {
 
 	template <class A = T, class = std::enable_if_t<std::is_floating_point_v<A>>>
 	auto& round_fract() {
-		l = std::round(l);
-		t = std::round(t);
-		r = std::round(r);
-		b = std::round(b);
+		l = repro::round(l);
+		t = repro::round(t);
+		r = repro::round(r);
+		b = repro::round(b);
 
 		return *this;
 	}
@@ -467,10 +467,10 @@ struct basic_xywh {
 
 	template <class A = T, class = std::enable_if_t<std::is_floating_point_v<A>>>
 	auto& round_fract() {
-		x = std::round(x);
-		y = std::round(y);
-		w = std::round(w);
-		h = std::round(h);
+		x = repro::round(x);
+		y = repro::round(y);
+		w = repro::round(w);
+		h = repro::round(h);
 
 		return *this;
 	}

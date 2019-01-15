@@ -62,7 +62,7 @@ void world_camera::tick(
 
 	if (enable_smoothing) {
 		/* variable time step target_cone smoothing by averaging last position with the current */
-		float averaging_constant = 1.0f - static_cast<float>(pow(average_factor, averages_per_sec * dt.in_seconds()));
+		float averaging_constant = 1.0f - static_cast<float>(std::pow(average_factor, averages_per_sec * dt.in_seconds()));
 
 		if (dont_smooth_once)
 			averaging_constant = 0.0f;

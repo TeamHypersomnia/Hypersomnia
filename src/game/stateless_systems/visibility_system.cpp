@@ -1,3 +1,5 @@
+#include "augs/math/repro_math.h"
+
 #include <limits>
 #include <unordered_set>
 
@@ -56,7 +58,7 @@ void VIS_LOG(Args&&... args) {
 */
 
 FORCE_INLINE auto comparable_angle(const vec2 diff) {
-	return std::copysign(
+	return repro::copysignf(
 		1 - diff.x / (repro::fabs(diff.x) + repro::fabs(diff.y)), diff.y 
 	);
 }
@@ -118,10 +120,10 @@ std::vector<vec2> visibility_information_response::get_world_polygon(
 
 	for (size_t i = 0; i < edges.size(); ++i) {
 		if (
-			std::isnan(edges[i].first.x) ||
-			std::isnan(edges[i].first.y) ||
-			std::isnan(edges[i].second.x) ||
-			std::isnan(edges[i].second.y)
+			repro::isnan(edges[i].first.x) ||
+			repro::isnan(edges[i].first.y) ||
+			repro::isnan(edges[i].second.x) ||
+			repro::isnan(edges[i].second.y)
 		) {
 			break;
 		}
@@ -302,15 +304,15 @@ void visibility_system::calc_visibility(
 		const auto invisible_eps = si.get_meters(settings.epsilon_distance_vertex_hit);
 
 		auto add_surely_invisible = [invisible_eps](const vec2 v) {
-			const auto x = static_cast<int>(std::round(v.x / invisible_eps));
-			const auto y = static_cast<int>(std::round(v.y / invisible_eps));
+			const auto x = static_cast<int>(repro::round(v.x / invisible_eps));
+			const auto y = static_cast<int>(repro::round(v.y / invisible_eps));
 
 			surely_invisible_positions.emplace(x, y);
 		};
 
 		auto is_invisible = [invisible_eps](const vec2 v) {
-			const auto x = static_cast<int>(std::round(v.x / invisible_eps));
-			const auto y = static_cast<int>(std::round(v.y / invisible_eps));
+			const auto x = static_cast<int>(repro::round(v.x / invisible_eps));
+			const auto y = static_cast<int>(repro::round(v.y / invisible_eps));
 
 			return found_in(surely_invisible_positions, vec2i(x, y));
 		};
@@ -544,8 +546,8 @@ void visibility_system::calc_visibility(
 			}
 
 			/* save new double_ray if it is not degenerate */
-			if ((std::fpclassify(p2.x) == FP_NORMAL || std::fpclassify(p2.x) == FP_ZERO)
-				&& (std::fpclassify(p2.y) == FP_NORMAL || std::fpclassify(p2.y) == FP_ZERO)
+			if ((repro::fpclassify(p2.x) == FP_NORMAL || repro::fpclassify(p2.x) == FP_ZERO)
+				&& (repro::fpclassify(p2.y) == FP_NORMAL || repro::fpclassify(p2.y) == FP_ZERO)
 				&& p2.x == p2.x
 				&& p2.y == p2.y
 			) {

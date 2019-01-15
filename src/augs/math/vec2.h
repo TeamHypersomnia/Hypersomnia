@@ -302,8 +302,8 @@ struct basic_vec2 {
 
 	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
 	basic_vec2& round_fract() {
-		x = std::round(x);
-		y = std::round(y);
+		x = repro::round(x);
+		y = repro::round(y);
 		return *this;
 	}
 

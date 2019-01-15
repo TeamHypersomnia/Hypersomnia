@@ -122,8 +122,8 @@ void interpolation_system::integrate_interpolated_transforms(
 				}
 			}
 
-			const auto positional_averaging_constant = 1.0f - static_cast<float>(pow(def.base_exponent, considered_positional_speed * seconds));
-			const auto rotational_averaging_constant = 1.0f - static_cast<float>(pow(def.base_exponent, considered_rotational_speed * seconds));
+			const auto positional_averaging_constant = 1.0f - static_cast<float>(std::pow(def.base_exponent, considered_positional_speed * seconds));
+			const auto rotational_averaging_constant = 1.0f - static_cast<float>(std::pow(def.base_exponent, considered_rotational_speed * seconds));
 
 			auto& recorded_pob = cache.recorded_place_of_birth;
 			auto& recorded_ver = cache.recorded_version;

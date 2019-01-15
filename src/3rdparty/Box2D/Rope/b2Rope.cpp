@@ -109,7 +109,7 @@ void b2Rope::Step(float32 h, int32 iterations)
 		return;
 	}
 
-	float32 d = expf(- h * m_damping);
+	float32 d = repro::expf(- h * m_damping);
 
 	for (int32 i = 0; i < m_count; ++i)
 	{
