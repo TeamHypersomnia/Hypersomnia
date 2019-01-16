@@ -359,7 +359,15 @@ void item_system::pick_up_touching_items(const logic_step step) {
 			continue;
 		}
 
-		const auto picker = cosm[c.subject];
+		const bool allow_pickup_with_held_items = true;
+
+		const auto subject = cosm[c.subject];
+		const auto picker = allow_pickup_with_held_items ? subject.get_owning_transfer_capability() : subject;
+
+		if (picker.dead()) {
+			continue;
+		}
+
 		const auto item_entity = cosm[c.collider];
 
 		item_entity.dispatch_on_having_all<components::item>(

@@ -380,6 +380,13 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							}
 
 							drop_if_still_in_hand();
+
+							/* Perform wielding anyway */
+							::perform_wielding(
+								step,
+								owning_capability,
+								requested_wield
+							);
 						}
 						else if (wielding == wielding_type::DUAL_WIELDED) {
 							::perform_wielding(
