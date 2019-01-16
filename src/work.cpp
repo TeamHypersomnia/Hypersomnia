@@ -140,8 +140,6 @@ int work(const int argc, const char* const * const argv) try {
 		: true
 	;
 
-	(void)float_tests_succeeded;
-
 	if (config.log_to_live_file) {
 		augs::remove_file(LOG_FILES_DIR "/live_debug.txt");
 
@@ -1194,7 +1192,8 @@ int work(const int argc, const char* const * const argv) try {
 				ingame_menu.show,
 				has_current_setup(),
 
-				in_direct_gameplay
+				in_direct_gameplay,
+				float_tests_succeeded
 			);
 			
 			const auto viewing_config = visit_current_setup([&](auto& setup) {

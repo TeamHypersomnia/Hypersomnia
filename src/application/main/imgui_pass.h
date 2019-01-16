@@ -27,5 +27,7 @@ void perform_imgui_pass(
 
 	const bool ingame_menu_active,
 	const bool has_gameplay_setup,
-	const bool should_freeze_cursor
+	const bool should_freeze_cursor,
+
+	const bool float_tests_succeeded
 );

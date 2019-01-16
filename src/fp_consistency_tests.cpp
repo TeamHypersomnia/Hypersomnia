@@ -188,8 +188,11 @@ bool perform_float_consistency_tests() {
 	}
 	
 	if (all_succeeded) {
-		LOG("(FP consistency test) Passed the test. Canonical results match the actual results.");
+		LOG("(FP consistency test) Passed the test. Canonical result matches the actual results.");
+	}
+	else {
+		LOG("(FP consistency test) Failed the test. Canonical result does not match the actual results.");
 	}
 
-	return true;
+	return all_succeeded;
 }
