@@ -191,6 +191,7 @@ message_handler_result client_setup::handle_server_message(
 
 		state = client_state_type::IN_GAME;
 	}
+#if CONTEXTS_SEPARATE
 	else if constexpr (std::is_same_v<T, prestep_client_context>) {
 		if (state != client_state_type::IN_GAME) {
 			LOG("The server has sent prestep context too early (state: %x). Disconnecting.", state);
@@ -201,6 +202,7 @@ message_handler_result client_setup::handle_server_message(
 
 		receiver.acquire_next_server_entropy(payload);
 	}
+#endif
 	else if constexpr (std::is_same_v<T, networked_server_step_entropy>) {
 		if (state != client_state_type::IN_GAME) {
 			LOG("The server has sent entropy too early (state: %x). Disconnecting.", state);
@@ -218,7 +220,8 @@ message_handler_result client_setup::handle_server_message(
 				);
 			};
 
-			receiver.acquire_next_server_entropy(payload.unpack(mode_id_to_entity_id));
+			receiver.acquire_next_server_entropy(payload.context);
+			receiver.acquire_next_server_entropy(payload.payload.unpack(mode_id_to_entity_id));
 		}
 
 		const auto& max_commands = vars.max_buffered_server_commands;

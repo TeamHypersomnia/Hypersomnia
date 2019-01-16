@@ -19,23 +19,7 @@ summary: That which we are brainstorming at the moment.
 
 - check windows dll dependencies for determinism
 
-- learn about -frounding-math -fsignaling-nans
-- replace std::shuffle with something simpler or just
-
-- test libm linkage with our single cpp files
-	- and maybe float stress testing as well
-
-- Stress testing the floating point determinism
-	- Launch a test only once on startup when no cache folder is yet detected
-	- if it fails, show a warning window to contact the devs immediately
-	- Procedure
-		- Spawn 3*cores threads (to see what happens under heavy loads and if the registers might)
-
-
 - enable/disable warm starting?
-
-- RNG consistency
-	- we'll need a portable uniform float distribution
 
 - Desync issues
 	- Resources:

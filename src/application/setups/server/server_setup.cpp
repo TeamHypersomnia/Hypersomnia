@@ -466,7 +466,10 @@ void server_setup::handle_client_messages() {
 	server->advance(server_time, message_handler);
 }
 
-void server_setup::send_server_step_entropies(networked_server_step_entropy& total) {
+void server_setup::send_server_step_entropies(const compact_server_step_entropy& total_input) {
+	networked_server_step_entropy total;
+	total.payload = total_input;
+
 	for (auto& c : clients) {
 		if (!c.is_set()) {
 			continue;
@@ -483,16 +486,23 @@ void server_setup::send_server_step_entropies(networked_server_step_entropy& tot
 		const auto client_id = static_cast<client_id_type>(index_in(clients, c));
 
 		{
-			prestep_client_context context;
-			context.num_entropies_accepted = c.num_entropies_accepted;
+			{
+				prestep_client_context context;
+				context.num_entropies_accepted = c.num_entropies_accepted;
+
+#if CONTEXTS_SEPARATE
+				server->send_payload(
+					client_id, 
+					game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+
+					context
+				);
+#else
+				total.context = context;
+#endif
+			}
+
 			c.num_entropies_accepted = 0;
-
-			server->send_payload(
-				client_id, 
-				game_channel_type::SERVER_SOLVABLE_AND_STEPS,
-
-				context
-			);
 		}
 
 		/* TODO PERFORMANCE: only serialize the message once and multicast the same buffer to all clients! */
@@ -505,7 +515,7 @@ void server_setup::send_server_step_entropies(networked_server_step_entropy& tot
 	}
 }
 
-void server_setup::reinfer_if_necessary_for(const networked_server_step_entropy& entropy) {
+void server_setup::reinfer_if_necessary_for(const compact_server_step_entropy& entropy) {
 	if (logically_set(entropy.general.added_player)) {
 		LOG("Server: Added player in the next entropy. Will reinfer to sync.");
 		cosmic::reinfer_solvable(get_arena_handle().get_cosmos());
@@ -594,7 +604,7 @@ void server_setup::update_stats(server_network_info& info) const {
 	info = server->get_server_network_info();
 }
 
-server_step_entropy server_setup::unpack(const networked_server_step_entropy& n) const {
+server_step_entropy server_setup::unpack(const compact_server_step_entropy& n) const {
 	return n.unpack(
 		[&](const mode_player_id& mode_id) {
 			return get_arena_handle().on_mode(
@@ -636,7 +646,8 @@ TEST_CASE("NetSerialization EmptyEntropies") {
 			networked_server_step_entropy sent;
 			ss.write_payload(sent);
 
-			REQUIRE(ss.bytes.size() == 1);
+			/* One byte for num of entropies accepted, second byte for signifying empty entropy */
+			REQUIRE(ss.bytes.size() == 2);
 		}
 	}
 
@@ -678,10 +689,10 @@ TEST_CASE("NetSerialization ServerEntropy") {
 		auto third = second;
 		third.value++;
 
-		sent.players.push_back({ mode_player_id::machine_admin(), t });
-		sent.players.push_back({ second, {} });
-		sent.players.push_back({ third, tt });
-		sent.players.push_back({ mode_player_id::first(), {} });
+		sent.payload.players.push_back({ mode_player_id::machine_admin(), t });
+		sent.payload.players.push_back({ second, {} });
+		sent.payload.players.push_back({ third, tt });
+		sent.payload.players.push_back({ mode_player_id::first(), {} });
 
 		REQUIRE(ss.write_payload(sent));
 
@@ -736,16 +747,16 @@ TEST_CASE("NetSerialization ServerEntropySecond") {
 		auto third = second;
 		third.value++;
 
-		sent.players.push_back({ mode_player_id::machine_admin(), {} });
-		sent.players.push_back({ second, tt });
-		sent.players.push_back({ mode_player_id::first(), tt });
-		sent.players.push_back({ third, {} });
+		sent.payload.players.push_back({ mode_player_id::machine_admin(), {} });
+		sent.payload.players.push_back({ second, tt });
+		sent.payload.players.push_back({ mode_player_id::first(), tt });
+		sent.payload.players.push_back({ third, {} });
 
-		sent.general.added_player.id = mode_player_id::machine_admin();
-		sent.general.added_player.name = "proplayerrrrrrrrrr";
-		sent.general.added_player.faction = faction_type::DEFAULT;
-		sent.general.removed_player = third;
-		sent.general.special_command.emplace<mode_restart_command>();
+		sent.payload.general.added_player.id = mode_player_id::machine_admin();
+		sent.payload.general.added_player.name = "proplayerrrrrrrrrr";
+		sent.payload.general.added_player.faction = faction_type::DEFAULT;
+		sent.payload.general.removed_player = third;
+		sent.payload.general.special_command.emplace<mode_restart_command>();
 
 		REQUIRE(ss.write_payload(sent));
 

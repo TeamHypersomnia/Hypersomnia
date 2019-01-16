@@ -111,6 +111,7 @@ namespace net_messages {
 
 	//struct initial_steps_correction : only_block_message {};
 
+#if CONTEXTS_SEPARATE
 	struct prestep_client_context : yojimbo::Message {
 		static constexpr bool server_to_client = true;
 		static constexpr bool client_to_server = false;
@@ -125,6 +126,7 @@ namespace net_messages {
 		bool write_payload(const ::prestep_client_context&);
 		bool read_payload(::prestep_client_context&);
 	};
+#endif
 
 	struct server_step_entropy : preserialized_message {
 		static constexpr bool server_to_client = true;
@@ -150,7 +152,9 @@ namespace net_messages {
 		new_server_vars*,
 		initial_arena_state*,
 		//initial_steps_correction*,
+#if CONTEXTS_SEPARATE
 		prestep_client_context*,
+#endif
 		server_step_entropy*,
 		client_entropy*
 	>;

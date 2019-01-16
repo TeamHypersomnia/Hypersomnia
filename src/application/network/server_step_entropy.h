@@ -5,7 +5,13 @@
 using server_step_entropy = mode_entropy;
 
 struct prestep_client_context {
+	// GEN INTROSPECTOR struct prestep_client_context
 	uint8_t num_entropies_accepted = 1;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const prestep_client_context& b) const {
+		return num_entropies_accepted == b.num_entropies_accepted;
+	}
 };
 
 struct client_entropy_entry {
@@ -19,13 +25,13 @@ struct client_entropy_entry {
 	}
 };
 
-struct networked_server_step_entropy {
-	// GEN INTROSPECTOR struct networked_server_step_entropy
+struct compact_server_step_entropy {
+	// GEN INTROSPECTOR struct compact_server_step_entropy
 	std::vector<client_entropy_entry> players;
 	mode_entropy_general general;
 	// END GEN INTROSPECTOR
 
-	bool operator==(const networked_server_step_entropy& b) const {
+	bool operator==(const compact_server_step_entropy& b) const {
 		return players == b.players && general == b.general;
 	}
 
@@ -74,3 +80,13 @@ struct networked_server_step_entropy {
 	}
 };
 
+struct networked_server_step_entropy {
+	// GEN INTROSPECTOR struct networked_server_step_entropy
+	prestep_client_context context;
+	compact_server_step_entropy payload;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const networked_server_step_entropy& b) const {
+		return context == b.context && payload == b.payload;
+	}
+};

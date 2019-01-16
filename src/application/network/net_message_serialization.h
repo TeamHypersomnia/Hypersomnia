@@ -20,11 +20,16 @@ bool preserialized_message::Serialize(Stream& stream) {
 }
 
 namespace net_messages {
+#if CONTEXTS_SEPARATE
 	template <typename Stream>
 	bool prestep_client_context::Serialize(Stream& stream) {
-		serialize_int(stream, payload.num_entropies_accepted, 0, 255);
+		if (!serialize(stream, payload)) {
+			return false;
+		}
+
 		return true;
 	}
+#endif
 
 	template <typename Stream>
 	bool client_welcome::Serialize(Stream& stream) {

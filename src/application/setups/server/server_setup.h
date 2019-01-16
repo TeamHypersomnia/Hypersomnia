@@ -67,7 +67,7 @@ class server_setup :
 	augs::serialization_buffers buffers;
 
 	entropy_accumulator local_collected;
-	networked_server_step_entropy step_collected;
+	compact_server_step_entropy step_collected;
 
 	augs::propagate_const<std::unique_ptr<server_adapter>> server;
 	std::array<server_client_state, max_incoming_connections_v> clients;
@@ -96,7 +96,7 @@ class server_setup :
 
 	void handle_client_messages();
 	void advance_clients_state();
-	void send_server_step_entropies(networked_server_step_entropy& total);
+	void send_server_step_entropies(const compact_server_step_entropy& total);
 	void send_packets_if_its_time();
 
 	void accept_entropy_of_client(
@@ -117,7 +117,7 @@ class server_setup :
 
 	mode_player_id get_admin_player_id() const;
 
-	void reinfer_if_necessary_for(const networked_server_step_entropy& entropy);
+	void reinfer_if_necessary_for(const compact_server_step_entropy& entropy);
 
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
@@ -257,5 +257,5 @@ public:
 
 	void update_stats(server_network_info&) const;
 
-	server_step_entropy unpack(const networked_server_step_entropy&) const;
+	server_step_entropy unpack(const compact_server_step_entropy&) const;
 };

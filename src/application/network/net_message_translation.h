@@ -45,6 +45,12 @@ constexpr std::size_t max_server_step_size_v =
 
 namespace net_messages {
 	template <class Stream>
+	bool serialize(Stream& s, ::prestep_client_context& c) {
+		serialize_int(s, c.num_entropies_accepted, 0, 255);
+		return true;
+	}
+
+	template <class Stream>
 	bool serialize(Stream&, mode_restart_command&) {
 		return true;
 	}
@@ -255,8 +261,15 @@ namespace net_messages {
 	}
 
 	template <class Stream>
-	bool serialize(Stream& s, ::networked_server_step_entropy& i) {
+	bool serialize(Stream& s, ::networked_server_step_entropy& total_networked) {
+		auto& i = total_networked.payload;
 		auto& g = i.general;
+
+#if !CONTEXTS_SEPARATE
+		if (!serialize(s, total_networked.context)) {
+			return false;
+		}
+#endif
 
 		bool has_players = logically_set(i.players);
 		bool has_added_player = logically_set(g.added_player);
@@ -332,6 +345,7 @@ namespace net_messages {
 		return serialize(s, payload);
 	}
 
+#if CONTEXTS_SEPARATE
 	inline bool prestep_client_context::write_payload(const ::prestep_client_context& input) {
 		payload = input;
 		return true;
@@ -341,6 +355,7 @@ namespace net_messages {
 		output = payload;
 		return true;
 	}
+#endif
 
 	inline bool server_step_entropy::read_payload(::networked_server_step_entropy& output) {
 		return safe_read(bytes, output);

@@ -2885,3 +2885,20 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- not really, let us be fast
 	- but only if no more items left
 - autoswitch on empty ammo
+
+- learn about -frounding-math -fsignaling-nans
+- replace std::shuffle with something simpler or just
+
+- test libm linkage with our single cpp files
+	- and maybe float stress testing as well
+
+- Stress testing the floating point determinism
+	- Launch a test only once on startup when no cache folder is yet detected
+	- if it fails, show a warning window to contact the devs immediately
+	- Procedure
+		- Spawn 3*cores threads (to see what happens under heavy loads and if the registers might)
+
+
+- RNG consistency
+	- we'll need a portable uniform float distribution
+

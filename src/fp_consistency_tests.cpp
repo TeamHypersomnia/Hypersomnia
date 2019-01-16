@@ -24,6 +24,7 @@ void ensure_float_flags_hold() {
 }
 
 #include <thread>
+#include <atomic>
 #include <bitset>
 #include <random>
 
