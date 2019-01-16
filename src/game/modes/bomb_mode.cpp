@@ -488,7 +488,7 @@ void bomb_mode::reshuffle_spawns(const cosmos& cosm, const faction_type faction)
 
 	for_each_faction_spawn(cosm, faction, adder);
 
-	shuffle_range(spawns, rng.generator);
+	shuffle_range(spawns, rng);
 
 	if (last_spawn.is_set() && spawns.size() > 1) {
 		if (spawns.back() == last_spawn) {

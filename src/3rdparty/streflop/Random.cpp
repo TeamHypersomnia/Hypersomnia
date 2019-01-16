@@ -462,41 +462,31 @@ EXPERIMENTAL:
     => this gives the maximum precision for floats, because a random number is chosen between exactly how many
     numbers can be represented with that float format in that range
 
+*/
 
 #define SPECIALIZE_RANDOM_FOR_SIMPLE_ULP(X,Y) \
-Simple ULP_Random ## X ## Y(Simple min, Simple max) { \
+Simple ULP_Random ## X ## Y(Simple min, Simple max, RandomState& state) { \
  \
-    // Convert to signed integer for quick test of bit sign \
     SizedInteger<32>::Type imin = *reinterpret_cast<SizedUnsignedInteger<32>::Type*>(&min); \
     SizedInteger<32>::Type imax = *reinterpret_cast<SizedUnsignedInteger<32>::Type*>(&max); \
  \
-    // Infinity is a perfectly fine number, with a bit pattern contiguous to the min and max floats \
-    // This makes sense if excluding bounds: RandomEE(-inf,+inf) returns a possible float at random \
  \
-    // Rule out NaNs \
     if (imin&0x7fffffff > 0x7f800000) return SimpleNaN; \
     if (imax&0x7fffffff > 0x7f800000) return SimpleNaN; \
  \
-    // Convert to 2-complement representation \
     if (imin<0) imin = 0x80000000 - imin; \
     if (imax<0) imax = 0x80000000 - imax; \
  \
-    // Now magically get an integer at random in that range \
-    // This gives EXACTLY one choice per representable float \
-    // It is non-uniform in the float space, but uniform in the bit-pattern space \
-    SizedInteger<32>::Type iret = Random ## X ## Y(imin,imax); \
+    SizedInteger<32>::Type iret = Random ## X ## Y(imin,imax, state); \
  \
-    // convert back to 2-complement to IEEE754 \
     if (iret<0) iret = 0x80000000 - iret; \
  \
-    // cast to float \
     return *reinterpret_cast<Simple*>(&iret); \
 }
 SPECIALIZE_RANDOM_FOR_SIMPLE_ULP(E,I)
 SPECIALIZE_RANDOM_FOR_SIMPLE_ULP(E,E)
 SPECIALIZE_RANDOM_FOR_SIMPLE_ULP(I,E)
 SPECIALIZE_RANDOM_FOR_SIMPLE_ULP(I,I)
-*/
 
 
 // Return a random float
@@ -961,10 +951,6 @@ template<> Extended NRandom(Extended mean, Extended std_dev, Extended *secondary
 #endif
 */
 
-SizedUnsignedInteger<32>::Type RandomInit(RandomState&) {
-    return RandomInit(SizedUnsignedInteger<32>::Type(0));
-}
-
 SizedUnsignedInteger<32>::Type RandomInit(SizedUnsignedInteger<32>::Type seed, RandomState& state) {
     init_genrand(seed,state);
     return state.seed;
@@ -973,8 +959,5 @@ SizedUnsignedInteger<32>::Type RandomInit(SizedUnsignedInteger<32>::Type seed, R
 SizedUnsignedInteger<32>::Type RandomSeed(RandomState& state) {
     return state.seed;
 }
-
-// Default state holder, so single threaded applications don't bother setting up an object
-RandomState DefaultRandomState;
 
 } // end streflop namespace

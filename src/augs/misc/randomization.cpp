@@ -1,9 +1,10 @@
+#include "augs/math/repro_math.h"
 #include "augs/misc/randomization.h"
 #include "augs/templates/algorithm_templates.h"
 
 template <class T>
 basic_randomization<T>::basic_randomization(const rng_seed_type seed) {
-	generator.seed(seed);
+	streflop::RandomInit(seed, generator);
 }
 
 template <class T>
@@ -15,7 +16,7 @@ int basic_randomization<T>::randval(
 		return min;
 	}
 
-	return std::uniform_int_distribution<int>(min, max)(generator);
+	return streflop::RandomII<int>(min, max, generator);
 }
 
 template <class T>
@@ -27,19 +28,19 @@ unsigned basic_randomization<T>::randval(
 		return min;
 	}
 
-	return std::uniform_int_distribution<unsigned>(min, max)(generator);
+	return streflop::RandomII<unsigned>(min, max, generator);
 }
 
 template <class T>
-float basic_randomization<T>::randval(
-	const float min, 
-	const float max
+real32 basic_randomization<T>::randval(
+	const real32 min, 
+	const real32 max
 ) {
 	if (min == max) {
 		return min;
 	}
 
-	return std::uniform_real_distribution<float>(min, max)(generator);
+	return streflop::RandomII<real32>(min, max, generator);
 }
 
 template <class T>
@@ -51,18 +52,18 @@ std::size_t basic_randomization<T>::randval(
 		return min;
 	}
 
-	return std::uniform_int_distribution<std::size_t>(min, max)(generator);
+	return streflop::RandomII<std::size_t>(min, max, generator);
 }
 
 template <class T>
-float basic_randomization<T>::randval_h(const float h) {
+real32 basic_randomization<T>::randval_h(const real32 h) {
 	return randval(-h, h);
 }
 
 template <class T>
-float basic_randomization<T>::randval_v(
-	float base_value, 
-	float variation
+real32 basic_randomization<T>::randval_v(
+	real32 base_value, 
+	real32 variation
 ) {
 	return randval(base_value - variation, base_value + variation);
 }
@@ -76,9 +77,9 @@ int basic_randomization<T>::randval_v(
 }
 
 template <class T>
-float basic_randomization<T>::randval_vm(
-	float base_value, 
-	float variation_mult
+real32 basic_randomization<T>::randval_vm(
+	real32 base_value, 
+	real32 variation_mult
 ) {
 	const auto h = (base_value * variation_mult) / 2;
 	const auto result = randval(base_value - h, base_value + h);
@@ -91,11 +92,11 @@ int basic_randomization<T>::randval_h(const int h) {
 }
 
 template <class T>
-std::vector<float> basic_randomization<T>::make_random_intervals(
+std::vector<real32> basic_randomization<T>::make_random_intervals(
 	const std::size_t n, 
-	const float maximum
+	const real32 maximum
 ) {
-	std::vector<float> result;
+	std::vector<real32> result;
 	result.resize(n);
 
 	for (size_t i = 0; i < n; ++i) {
@@ -108,15 +109,15 @@ std::vector<float> basic_randomization<T>::make_random_intervals(
 }
 
 template <class T>
-std::vector<float> basic_randomization<T>::make_random_intervals(
+std::vector<real32> basic_randomization<T>::make_random_intervals(
 	const std::size_t n, 
-	const float maximum, 
-	const float variation_multiplier
+	const real32 maximum, 
+	const real32 variation_multiplier
 ) {
-	std::vector<float> result;
+	std::vector<real32> result;
 	result.resize(n);
 
-	const float interval_length = maximum / n;
+	const real32 interval_length = maximum / n;
 
 	for (size_t i = 0; i < n; ++i) {
 		result[i] = interval_length * i + randval(-variation_multiplier, variation_multiplier) * interval_length;
@@ -129,5 +130,4 @@ std::vector<float> basic_randomization<T>::make_random_intervals(
 	return result;
 }
 
-template struct basic_randomization<std::mt19937>;
-template struct basic_randomization<std::minstd_rand0>;
+template struct basic_randomization<streflop::RandomState>;

@@ -390,9 +390,9 @@ void value_bar::rebuild_layouts(
 	rc.set_position(lt);
 	rc.set_size(with_bar_size);
 
-	if (this_id->particles.empty()) {
-		fast_randomization rng(this_id.get_location().vertical_index);
+	thread_local randomization rng;
 
+	if (this_id->particles.empty()) {
 		const auto value_bar_size = get_value_bar_rect(context, this_id, rc).get_size();
 
 		constexpr auto num_particles_to_spawn = 40u;

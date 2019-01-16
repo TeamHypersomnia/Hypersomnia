@@ -19,7 +19,7 @@ static void spawn_bullet_remnants(
 ) {
 	auto& cosm = step.get_cosmos();
 
-	shuffle_range(flavours, rng.generator);
+	shuffle_range(flavours, rng);
 
 	auto total_spawned = std::min(static_cast<int>(flavours.size()), 1);
 

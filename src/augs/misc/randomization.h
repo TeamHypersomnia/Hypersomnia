@@ -1,7 +1,7 @@
 #pragma once
-#include <random>
 #include <vector>
 
+#include "3rdparty/streflop/streflop.h"
 #include "augs/misc/randomization_declaration.h"
 
 #include "augs/misc/bound.h"
@@ -34,19 +34,19 @@ struct basic_randomization {
 		std::size_t max
 	);
 
-	float randval(
-		float min, 
-		float max
+	real32 randval(
+		real32 min, 
+		real32 max
 	);
 
-	float randval_v(
-		float base_value, 
-		float variation
+	real32 randval_v(
+		real32 base_value, 
+		real32 variation
 	);
 
-	float randval_vm(
-		float base_value, 
-		float variation_mult
+	real32 randval_vm(
+		real32 base_value, 
+		real32 variation_mult
 	);
 
 	template <class T>
@@ -64,18 +64,18 @@ struct basic_randomization {
 		return randval_vm(v.value, v.variation);
 	}
 
-	float randval_h(float bound);
+	real32 randval_h(real32 bound);
 	int randval_h(int bound);
 	
-	std::vector<float> make_random_intervals(
+	std::vector<real32> make_random_intervals(
 		const std::size_t n, 
-		const float maximum
+		const real32 maximum
 	);
 
-	std::vector<float> make_random_intervals(
+	std::vector<real32> make_random_intervals(
 		const std::size_t n,
-		const float maximum, 
-		const float variation_multiplier
+		const real32 maximum, 
+		const real32 variation_multiplier
 	);
 
 	template <class A, class B>
@@ -131,10 +131,6 @@ struct basic_randomization {
 	}
 };
 
-struct randomization : basic_randomization<std::mt19937> {
-	using basic_randomization<std::mt19937>::basic_randomization;
-};
-
-struct fast_randomization : basic_randomization<std::minstd_rand0> {
-	using basic_randomization<std::minstd_rand0>::basic_randomization;
+struct randomization : basic_randomization<streflop::RandomState> {
+	using basic_randomization<streflop::RandomState>::basic_randomization;
 };

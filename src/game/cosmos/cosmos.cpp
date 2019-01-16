@@ -54,10 +54,6 @@ randomization cosmos::get_nontemporal_rng_for(const entity_id id) const {
 	return h;
 }
 
-fast_randomization cosmos::get_fast_rng_for(const entity_id id) const {
-	return{ get_rng_seed_for(id) };
-}
-
 bool cosmos::empty() const {
 	return get_solvable().empty();
 }

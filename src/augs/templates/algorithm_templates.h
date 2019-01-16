@@ -57,9 +57,17 @@ auto& sort_range(Container& v, T&& l) {
 	return v;
 }
 
-template<class Container, class... T>
-auto& shuffle_range(Container& v, T&&... args) {
-	std::shuffle(v.begin(), v.end(), std::forward<T>(args)...);
+template<class Container, class T>
+auto& shuffle_range(Container& v, T& rng) {
+	auto first = v.begin();
+	auto last = v.end();
+    auto n = last - first;
+
+    for (auto i = n-1; i > 0; --i) {
+        using std::swap;
+		swap(first[i], first[rng.randval(0, i)]);
+    }
+
 	return v;
 }
 
