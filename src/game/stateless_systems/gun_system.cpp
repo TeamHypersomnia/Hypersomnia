@@ -389,11 +389,15 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							);
 						}
 						else if (wielding == wielding_type::DUAL_WIELDED) {
-							::perform_wielding(
-								step,
-								owning_capability,
-								requested_wield
-							);
+							if (::is_weapon_like(cosm[requested_wield.hand_selections[0]])) {
+								/* Prevent the wield when the other item is not a weapon, e.g. we are reloading */
+
+								::perform_wielding(
+									step,
+									owning_capability,
+									requested_wield
+								);
+							}
 						}
 					}
 				};
