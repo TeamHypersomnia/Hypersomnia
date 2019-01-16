@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- write to streflop dev about that copysign should be bivariate
+
 - during akimbo, only drop when the G is released, not right away when it is pressed
 	- when G is still held, you can press either LPM or RPM to decide which weapon to drop
 	- if G was released without holding lpm or rpm, drop the most recently wielded item as always

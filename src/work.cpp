@@ -119,9 +119,6 @@ int work(const int argc, const char* const * const argv) try {
 
 	dump_detailed_sizeof_information(LOG_FILES_DIR "/detailed_sizeofs.txt");
 
-	static const auto float_tests_succeeded = ::perform_float_consistency_tests();
-	(void)float_tests_succeeded;
-
 	static const auto canon_config_path = augs::path_type("config.lua");
 	static const auto local_config_path = augs::path_type(LOCAL_FILES_DIR "/config.local.lua");
 
@@ -136,6 +133,14 @@ int work(const int argc, const char* const * const argv) try {
 			local_config_path
 		)
 	};
+
+	static const auto float_tests_succeeded = 
+		config.perform_float_consistency_test 
+		? perform_float_consistency_tests() 
+		: true
+	;
+
+	(void)float_tests_succeeded;
 
 	if (config.log_to_live_file) {
 		augs::remove_file(LOG_FILES_DIR "/live_debug.txt");

@@ -71,8 +71,8 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 				const auto current_dir = transform.get_direction();
 
-				const float comfort_zone_radius = 50.f;
-				const float cohesion_zone_radius = 60.f;
+				const real32 comfort_zone_radius = 50.f;
+				const real32 cohesion_zone_radius = 60.f;
 
 				auto for_each_neighbor_within = [&](const auto radius, auto callback) {
 					auto& neighbors = thread_local_visible_entities();
@@ -90,17 +90,19 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 					neighbors.for_all(cosm, [&](const auto handle) {
 						handle.template dispatch_on_having_all<components::movement_path>([&](const auto typed_neighbor) {
-							if (typed_neighbor.get_id() != subject.get_id()) {
-								const auto neighbor_tip = *typed_neighbor.find_logical_tip();
-								const auto offset = neighbor_tip - tip_pos;
-
-								const auto facing = current_dir.degrees_between(offset);
-
-								if (facing < fov_half_degrees) {
-									callback(typed_neighbor);
-								}
+							if (typed_neighbor.get_id() == subject.get_id()) {
+								/* Don't measure against itself */
+								return;
 							}
-							/* Otherwise, don't measure against itself */
+
+							const auto neighbor_tip = *typed_neighbor.find_logical_tip();
+							const auto offset = neighbor_tip - tip_pos;
+
+							const auto facing = current_dir.degrees_between(offset);
+
+							if (facing < fov_half_degrees) {
+								callback(typed_neighbor);
+							}
 						});
 					});
 				};

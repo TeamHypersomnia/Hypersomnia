@@ -86,7 +86,7 @@ struct config_lua_table {
 	// GEN INTROSPECTOR struct config_lua_table
 	launch_type launch_mode = launch_type::TEST_SCENE;
 	bool log_to_live_file = false;
-	bool perform_float_consistency_test = false;
+	bool perform_float_consistency_test = true;
 
 	unit_tests_settings unit_tests;
 	augs::window_settings window;
