@@ -997,13 +997,16 @@ if(GCC)
 endif()
 
 if(MSVC_SPECIFIC)
-	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} /MP /Gm- /GL")
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} /MP /GL")
 endif()
 
+# Latest features of C++17 will be enabled.
+
 if(MSVC)
-	# Latest features of C++17 will be enabled.
+	# Inline a lot. Default is /Ob1.
+	string(REPLACE "/Ob1" "/Ob2" CMAKE_CXX_FLAGS_RELWITHDEBINFO ${CMAKE_CXX_FLAGS_RELWITHDEBINFO})
+	
 	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} /std:c++latest /fp:strict /bigobj /permissive-")
-	set(HYPERSOMNIA_CXX_RELWITHDEBINFO_FLAGS "/Ob2 /Oi")
 else()
 	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -std=gnu++1z")
 endif()
