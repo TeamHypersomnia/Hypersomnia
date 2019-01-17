@@ -87,7 +87,6 @@ set(HYPERSOMNIA_RESOURCES_FOLDER_NAME "hypersomnia")
 set(HYPERSOMNIA_EXE_RESOURCES_DIR "${PROJECT_SOURCE_DIR}/${HYPERSOMNIA_RESOURCES_FOLDER_NAME}")
 
 ## Application packaging switches.
-option(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE "Add command to archive builds in Release." ${DEFAULT_OPT})
 option(ADD_APPLICATION_ICON "Add application icon." ${DEFAULT_OPT})
 
 ## Hardcoded, relative paths for directories that the executable might use.
@@ -203,22 +202,6 @@ if(UNIX)
 	message("Changing unsupported UNIX defaults to off...")
 	
 	set(BUILD_HTTP_REQUESTS OFF)
-	set(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE OFF)
-endif()
-
-if(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE)
-	if (NOT HYPERSOMNIA_RUNTIME_ARCHIVE_DIR)
-		# By default, we set output directory for archives to completely outside of the source tree,
-		# because it might be useful to preserve some older builds even if the repository is deleted.
-	
-		set(HYPERSOMNIA_RUNTIME_ARCHIVE_DIR
-			"${PROJECT_SOURCE_DIR}/../build_database"
-		)
-	
-		file(MAKE_DIRECTORY ${HYPERSOMNIA_RUNTIME_ARCHIVE_DIR})
-
-		message("Built Hypersomnia archives will be copied to ${HYPERSOMNIA_RUNTIME_ARCHIVE_DIR}")
-	endif()
 endif()
 
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
@@ -851,7 +834,6 @@ message("Git path: ${GIT_EXECUTABLE}")
 
 if(NOT (GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git"))
 	set(BUILD_VERSION_FILE_GENERATOR FALSE)
-	set(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE FALSE)
 	message("Git not found. Some functionality will be disabled.")
 endif()
 
@@ -1522,27 +1504,6 @@ if(MSVC_SPECIFIC)
 endif()
 
 # We add a command to automatically create an archive for every Release build.
-
-if(ADD_COMMAND_TO_ARCHIVE_BUILDS_IN_RELEASE)
-	add_custom_command(
-		TARGET Hypersomnia
-		POST_BUILD
-		COMMAND ${CMAKE_COMMAND}
-			-DCONFIG=$<CONFIGURATION>
-			-DEXE_PATH=$<TARGET_FILE:Hypersomnia>
-			-DARCHIVE_OUTPUT_DIR=${HYPERSOMNIA_RUNTIME_ARCHIVE_DIR}
-			-DRESOURCES_DIR=${HYPERSOMNIA_EXE_RESOURCES_DIR}
-			-DPYTHON_EXE=${PYTHON_EXECUTABLE}
-			-DGIT_EXE=${GIT_EXECUTABLE}
-			-DCREATE_ARCHIVE_PY_PATH=${CMAKE_MODULE_PATH}/create_archive.py.in
-			-DRESOURCES_FOLDER_NAME=${HYPERSOMNIA_RESOURCES_FOLDER_NAME}
-			-P ${CMAKE_MODULE_PATH}/create_build_archive.cmake
-		DEPENDS ${CMAKE_MODULE_PATH}/create_build_archive.cmake
-		WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-		COMMENT "Archiving the executable and resources..."
-		VERBATIM
-	)
-endif()
 
 # Custom targets for Makefile
 if(${CMAKE_GENERATOR} STREQUAL "Unix makefiles" OR ${CMAKE_GENERATOR} STREQUAL "Ninja")
