@@ -254,8 +254,8 @@ namespace test_flavours {
 			sentience_inst.get<personal_electricity_meter_instance>().regeneration_interval_ms = 2000;
 			sentience_inst.get<consciousness_meter_instance>().set_value(350);
 			sentience_inst.get<consciousness_meter_instance>().set_maximum_value(350);
-			sentience_inst.get<consciousness_meter_instance>().regeneration_unit = 8;
-			sentience_inst.get<consciousness_meter_instance>().regeneration_interval_ms = 150;
+			sentience_inst.get<consciousness_meter_instance>().regeneration_unit = 10;
+			sentience_inst.get<consciousness_meter_instance>().regeneration_interval_ms = 100;
 
 			meta.set(sentience);
 			meta.set(sentience_inst);
