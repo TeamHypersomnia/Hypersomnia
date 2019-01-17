@@ -473,7 +473,7 @@ return {
   },
 
   server = {
-	current_arena = "",
+	current_arena = "fy_minilab",
 	override_default_ruleset = "",
 
 	admin_nickname = "GameMaster",

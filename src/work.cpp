@@ -353,7 +353,8 @@ int work(const int argc, const char* const * const argv) try {
 
 	LOG("Initializing the streaming of viewables.");
 	static viewables_streaming streaming(renderer);
-	static auto streaming_finalize = augs::scope_guard([&]() {
+
+	auto streaming_finalize = augs::scope_guard([&]() {
 		streaming.finalize_pending_tasks();
 	});
 

@@ -100,6 +100,7 @@ public:
 					if (ImGui::Selectable(displayed_name.c_str(), is_current)) {
 						ImGui::CloseCurrentPopup();
 
+						LOG_NVPS("Choosing button path: %x ", button_path);
 						on_choice(button_path);
 					}
 				},

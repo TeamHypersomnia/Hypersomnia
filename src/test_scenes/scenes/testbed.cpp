@@ -183,23 +183,27 @@ namespace test_scenes {
 
 		{
 			std::vector<transformr> spawn_transforms = {
-				{ { 318, 267 }, -90 },
-				{ { 638, 267 }, -90 }
+				{ { 350, -1900 }, 90 },
+				{ { 500, -1900 }, 90 },
+				{ { 650, -1900 }, 90 },
+				{ { 800, -1900 }, 90 }
 			};
 
 			for (const auto& s : spawn_transforms) {
-				create(test_point_markers::BOMB_MODE_SPAWN, s).set_associated_faction(faction_type::RESISTANCE);
+				create(test_point_markers::BOMB_MODE_SPAWN, s).set_associated_faction(faction_type::METROPOLIS);
 			}
 		}
 
 		{
 			std::vector<transformr> spawn_transforms = {
-				{ { 0, -930 }, 90 },
-				{ { 1041, -833 }, 90 }
+				{ { 250, 190 }, -90 },
+				{ { 400, 190 }, -90 },
+				{ { 550, 190 }, -90 },
+				{ { 700, 190 }, -90 }
 			};
 
 			for (const auto& s : spawn_transforms) {
-				create(test_point_markers::BOMB_MODE_SPAWN, s).set_associated_faction(faction_type::METROPOLIS);
+				create(test_point_markers::BOMB_MODE_SPAWN, s).set_associated_faction(faction_type::RESISTANCE);
 			}
 		}
 
@@ -404,8 +408,8 @@ namespace test_scenes {
 
 
 				//const vec2 floor_size = get_size_of(test_scene_image_id::FLOOR);
-				const auto total_floor_size = vec2i(1280, 1280);
-				const auto floor_origin = vec2(512, -768);
+				const auto total_floor_size = vec2i(1280, 2176);
+				const auto floor_origin = vec2(512, -1216);
 
 				auto floor_align = [&](const auto flavour_id) {
 					return make_cascade_aligner(
@@ -772,7 +776,7 @@ namespace test_scenes {
 		const auto orig1 = vec2(380, -1524);
 		create_aquarium(orig1);
 
-		create(test_box_markers::BUY_AREA, vec2(580, -800)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::METROPOLIS);
+		create(test_box_markers::BUY_AREA, vec2(556, -1892)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::METROPOLIS);
 		create(test_box_markers::BUY_AREA, vec2(480, 200)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::RESISTANCE);
 
 		create(test_box_markers::BOMBSITE_A, vec2(580, -400)).set_logical_size(vec2(600, 200));

@@ -36,7 +36,7 @@
 #include "application/setups/editor/detail/do_pathed_asset_properties.h"
 #include "application/setups/editor/detail/do_forget_button.h"
 
-#if IS_PRODUCTION_BUILD
+#if NDEBUG
 #define BUILD_LOCATION_FINDERS 1
 #else
 #define BUILD_LOCATION_FINDERS 0

@@ -14,6 +14,10 @@ void viewables_streaming::finalize_pending_tasks() {
 	}
 }
 
+viewables_streaming::~viewables_streaming() {
+	finalize_pending_tasks();
+}
+
 viewables_streaming::viewables_streaming(augs::renderer& renderer) {
 	LOG_NVPS(std::thread::hardware_concurrency());
 	(void)renderer;

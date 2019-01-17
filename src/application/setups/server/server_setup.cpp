@@ -112,8 +112,11 @@ void server_setup::apply(const server_vars& new_vars, const bool force) {
 			*/
 
 			/* This should never really happen as we'll always check before allowing admin to set a map name. */
-			LOG("Arena named %x was not found on the server!");
-			ensure(false);
+
+			LOG("Arena named \"%x\" was not found on the server!\nLoading the default arena instead.", new_vars.current_arena);
+
+			const auto test_scene_arena = "";
+			choose_arena(test_scene_arena);
 		}
 	}
 

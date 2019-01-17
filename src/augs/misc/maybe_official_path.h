@@ -72,6 +72,11 @@ struct maybe_official_path {
 	}
 };
 
+template<class T>
+std::ostream& operator<<(std::ostream& out, const maybe_official_path<T>& x) {
+	return out << typesafe_sprintf("%x (%x)", x.path, x.is_official ? "official" : "project");
+}
+
 template <class T>
 struct is_maybe_official_path : std::false_type {};
 

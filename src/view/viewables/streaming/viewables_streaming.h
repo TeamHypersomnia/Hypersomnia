@@ -78,6 +78,7 @@ public:
 	atlas_profiler neon_map_atlas_performance;
 
 	viewables_streaming(augs::renderer& renderer);
+	~viewables_streaming();
 
 	void load_all(viewables_load_input);
 	void finalize_load(viewables_finalize_input);
