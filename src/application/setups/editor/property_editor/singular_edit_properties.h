@@ -12,7 +12,7 @@ template <
 >
 void singular_edit_properties(
 	const commanding_property_editor_input& in,
-	T&& parent_altered,
+	const T& parent_altered,
 	const std::string& property_location,
 	const cmd_type& cmd_pattern = cmd_type(),
 	S special_widget_provider = {},
@@ -47,7 +47,7 @@ void singular_edit_properties(
 
 	general_edit_properties<field_type_id, Behaviour>(
 		in.prop_in, 
-		std::forward<T>(parent_altered),
+		parent_altered,
 		post_new_change,
 		rewrite_last_change,
 		true_returner(),

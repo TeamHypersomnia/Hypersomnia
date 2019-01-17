@@ -2902,3 +2902,4 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - RNG consistency
 	- we'll need a portable uniform float distribution
 
+- fix bounds editing of position variations in light

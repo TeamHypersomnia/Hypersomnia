@@ -440,3 +440,5 @@ summary: Just a hidden scratchpad.
 - believe some guys on the net and use crlibm as it seems more solid
 	- or just openlibm?
 
+- enable/disable warm starting?
+

@@ -196,16 +196,18 @@ template <
 	class D,
 	class Eq,
 	class F,
-	class T
+	class TT
 >
 void detail_general_edit_properties(
 	detail_edit_properties_input<S, D> input,
 	Eq equality_predicate,
 	F notify_change_of,
 	const std::string& label,
-	T& altered,
+	TT& altered,
 	const bool nodify_introspected = true
 ) {
+	using T = std::remove_const_t<TT>;
+
 	/* Suppress warnings */
 	(void)input; (void)equality_predicate; (void)notify_change_of; (void)label; (void)altered; (void)nodify_introspected;
 
@@ -215,6 +217,17 @@ void detail_general_edit_properties(
 	;
 
 	if constexpr(!should_skip) {
+		auto get_mut = [&](auto& which) -> decltype(auto) {
+			if constexpr(std::is_const_v<TT>) {
+				return [&]() -> auto {
+					return which;
+				}();
+			}
+			else {
+				return which;
+			}
+		};
+
 		const auto formatted_label = format_field_name(label);
 		const auto identity_label = "##" + label;
 
@@ -222,8 +235,12 @@ void detail_general_edit_properties(
 			if constexpr(inline_properties) {
 				auto colors = ::maybe_different_value_cols(input.settings, !equality_predicate(altered, std::nullopt)); 
 
-				if (auto result = handler_or_direct(input.special_widget_provider, identity_label, altered)) {
-					notify_change_of(formatted_label, *result, altered, std::nullopt);
+				{
+					decltype(auto) mut_altered = get_mut(altered);
+
+					if (auto result = handler_or_direct(input.special_widget_provider, identity_label, mut_altered)) {
+						notify_change_of(formatted_label, *result, altered, mut_altered, std::nullopt);
+					}
 				}
 
 				ImGui::PopItemWidth();
@@ -233,8 +250,12 @@ void detail_general_edit_properties(
 				auto scope = bulleted_property_name(formatted_label, input.extra_columns);
 				auto colors = ::maybe_different_value_cols(input.settings, !equality_predicate(altered, std::nullopt)); 
 
-				if (auto result = handler_or_direct(input.special_widget_provider, identity_label, altered)) {
-					notify_change_of(formatted_label, *result, altered, std::nullopt);
+				{
+					decltype(auto) mut_altered = get_mut(altered);
+
+					if (auto result = handler_or_direct(input.special_widget_provider, identity_label, mut_altered)) {
+						notify_change_of(formatted_label, *result, altered, mut_altered, std::nullopt);
+					}
 				}
 			}
 		}
@@ -246,25 +267,27 @@ void detail_general_edit_properties(
 					auto scope = bulleted_property_name(formatted_label, input.extra_columns);
 					auto colors = ::maybe_different_value_cols(input.settings, !all_equal); 
 
-					if (const auto result = augs::imgui::checkbox(identity_label, altered.is_enabled)) {
-						notify_change_of(formatted_label, tweaker_type::DISCRETE, altered.is_enabled, std::nullopt);
+					{
+						decltype(auto) mut_is_enabled = get_mut(altered.is_enabled);
+
+						if (const auto result = augs::imgui::checkbox(identity_label, mut_is_enabled)) {
+							notify_change_of(formatted_label, tweaker_type::DISCRETE, altered.is_enabled, mut_is_enabled, std::nullopt);
+						}
 					}
 				}
 
 				const bool value_enabled = all_equal && altered.is_enabled;
 				const bool nodify = false;
 
+				auto ind = augs::imgui::scoped_indent();
+				auto id = augs::imgui::scoped_id(formatted_label);
+
 #if HIDE_DISABLED_MAYBES
 				if (value_enabled) {
-					auto id = augs::imgui::scoped_id(formatted_label + "maybe");
-
 					detail_general_edit_properties<Behaviour, pass_notifier_through, inline_properties>(input, equality_predicate, notify_change_of, label, altered.value, nodify);
 				}
 #else
 				auto colors = maybe_disabled_cols(input.settings, !value_enabled);
-
-				auto id = augs::imgui::scoped_id(formatted_label + "maybe");
-
 				detail_general_edit_properties<Behaviour, pass_notifier_through, inline_properties>(input, equality_predicate, notify_change_of, label, altered.value, nodify);
 #endif
 			}
@@ -315,12 +338,15 @@ void detail_general_edit_properties(
 									);
 								}
 								else {
+									static_assert(std::is_const_v<TT>);
+									auto mut_altered_element = *value;
+
 									detail_general_edit_properties<Behaviour, true, inline_properties>(
 										input, 
 										[&equality_predicate, i, &altered] (auto&&...) { return equality_predicate(altered, i); },
-										[&notify_change_of, i, &altered] (const auto& l, const tweaker_type t, auto&&...) { notify_change_of(l, t, altered, i); },
+										[&notify_change_of, i, &altered, &mut_altered_element] (const auto& l, const tweaker_type t, auto&&...) { notify_change_of(l, t, altered, mut_altered_element, i); },
 										element_label,
-										*value
+										mut_altered_element
 									);
 								}
 							}
@@ -357,8 +383,12 @@ void detail_general_edit_properties(
 							if constexpr(S::template handles_prologue<T>) {
 								ImGui::NextColumn();
 
-								if (input.special_widget_provider.handle_prologue(displayed_container_label, altered)) {
-									notify_change_of(formatted_label, tweaker_type::DISCRETE, altered, std::nullopt);
+								{
+									decltype(auto) mut_altered = get_mut(altered);
+
+									if (input.special_widget_provider.handle_prologue(displayed_container_label, mut_altered)) {
+										notify_change_of(formatted_label, tweaker_type::DISCRETE, altered, mut_altered, std::nullopt);
+									}
 								}
 
 								augs::imgui::next_columns(input.extra_columns + 1);
@@ -372,9 +402,11 @@ void detail_general_edit_properties(
 										auto colors = maybe_disabled_cols(input.settings, altered.size() >= altered.max_size());
 
 										if (ImGui::Button("D")) {
-											auto duplicated = altered.at(i);
-											altered.insert(altered.begin() + i + 1, std::move(duplicated));
-											notify_change_of(formatted_label, tweaker_type::DISCRETE, altered, std::nullopt);
+											decltype(auto) mut_altered = get_mut(altered);
+											auto duplicated = mut_altered.at(i);
+
+											mut_altered.insert(mut_altered.begin() + i + 1, std::move(duplicated));
+											notify_change_of(formatted_label, tweaker_type::DISCRETE, altered, mut_altered, std::nullopt);
 											break;
 										}
 
@@ -389,8 +421,9 @@ void detail_general_edit_properties(
 										);
 
 										if (ImGui::Button("-")) {
-											altered.erase(altered.begin() + i);
-											notify_change_of(formatted_label, tweaker_type::DISCRETE, altered, std::nullopt);
+											decltype(auto) mut_altered = get_mut(altered);
+											mut_altered.erase(mut_altered.begin() + i);
+											notify_change_of(formatted_label, tweaker_type::DISCRETE, altered, mut_altered, std::nullopt);
 											break;
 										}
 									}
@@ -410,12 +443,15 @@ void detail_general_edit_properties(
 									);
 								}
 								else {
+									static_assert(std::is_const_v<TT>);
+									auto mut_altered_element = altered.at(i);
+
 									detail_general_edit_properties<Behaviour, true, inline_properties>(
 										input, 
 										[&equality_predicate, i, &altered] (auto&&...) { return equality_predicate(altered, i); },
-										[&notify_change_of, i, &altered] (const auto& l, const tweaker_type t, auto&&...) { notify_change_of(l, t, altered, i); },
+										[&notify_change_of, i, &altered, &mut_altered_element] (const auto& l, const tweaker_type t, auto&&...) { notify_change_of(l, t, altered, mut_altered_element, i); },
 										element_label,
-										altered.at(i)
+										mut_altered_element
 									);
 								}
 							}
@@ -423,8 +459,10 @@ void detail_general_edit_properties(
 							if constexpr (resizable) {
 								if (altered.size() < altered.max_size()) {
 									if (ImGui::Button("+")) {
-										altered.emplace_back(input.sane_defaults.template construct<typename T::value_type>());
-										notify_change_of(formatted_label, tweaker_type::DISCRETE, altered, std::nullopt);
+										decltype(auto) mut_altered = get_mut(altered);
+
+										mut_altered.emplace_back(input.sane_defaults.template construct<typename T::value_type>());
+										notify_change_of(formatted_label, tweaker_type::DISCRETE, altered, mut_altered, std::nullopt);
 									}
 
 									augs::imgui::next_columns(input.extra_columns + 2);
@@ -441,6 +479,8 @@ void detail_general_edit_properties(
 
 				if (nodify_introspected) {
 					if constexpr(inline_with_members_v<T>) {
+						auto id = augs::imgui::scoped_id(formatted_label);
+
 						augs::imgui::text(formatted_label);
 						augs::imgui::next_columns(1);
 
@@ -492,7 +532,7 @@ template <
 >
 void general_edit_properties(
 	const property_editor_input prop_in,
-	T parent_altered,
+	const T& parent_altered,
 	G post_new_change,
 	H rewrite_last,
 	Eq field_equality_predicate = {},
@@ -529,8 +569,11 @@ void general_edit_properties(
 		}
 	};
 
-	auto traverse = [&](const auto& member_label, auto& member) {
-		auto equality_predicate = [&parent_altered, &field_equality_predicate](const auto& modified, const auto index) {
+	auto traverse = [&](const auto& member_label, const auto& member) {
+		auto equality_predicate = [&parent_altered, &field_equality_predicate](
+			const auto& modified, 
+			const auto index
+		) {
 			using I = std::remove_const_t<decltype(index)>;
 
 			auto addr = ::make_field_address<field_type_id>(parent_altered, modified);
@@ -544,24 +587,27 @@ void general_edit_properties(
 			}
 		};
 
-		auto notify_change_of = [&parent_altered, &do_tweaker](const std::string& formatted_label, const tweaker_type t, const auto& modified, const auto index) {
+		auto notify_change_of = [&parent_altered, &do_tweaker](
+			const std::string& formatted_label, 
+			const tweaker_type t, 
+			const auto& modified_location, 
+			const auto& new_value, 
+			const auto index
+		) {
 			/* notify_change_of */
 			using I = std::remove_const_t<decltype(index)>;
 
-			auto addr = ::make_field_address<field_type_id>(parent_altered, modified);
+			auto addr = ::make_field_address<field_type_id>(parent_altered, modified_location);
 
 			if constexpr(std::is_same_v<I, unsigned>) {
 				addr.element_index = index;
+			}
 
-				do_tweaker(tweaker_input<field_type_id, remove_cref<decltype(modified.at(index))>>{
-					t, formatted_label, addr, modified.at(index)
-				});
-			}
-			else {
-				do_tweaker(tweaker_input<field_type_id, remove_cref<decltype(modified)>>{
-					t, formatted_label, addr, modified
-				});
-			}
+			using tweaker_input_type = tweaker_input<field_type_id, remove_cref<decltype(new_value)>>;
+
+			do_tweaker(tweaker_input_type {
+				t, formatted_label, addr, new_value
+			});
 		};
 
 		detail_general_edit_properties<Behaviour, false, false>(

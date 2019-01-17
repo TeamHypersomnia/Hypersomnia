@@ -25,8 +25,6 @@ summary: That which we are brainstorming at the moment.
 
 - check windows dll dependencies for determinism
 
-- enable/disable warm starting?
-
 - Desync issues
 	- Resources:
 		- https://techdecoded.intel.io/resources/floating-point-reproducibility-in-intel-software-tools/
