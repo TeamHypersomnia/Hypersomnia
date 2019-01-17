@@ -2041,7 +2041,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::KEK9_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
-			gun_def.muzzle_velocity = {5900.f, 5900.f};
+			gun_def.muzzle_velocity = {5800.f, 5800.f};
 			gun_def.shot_cooldown_ms = 100.f;
 
 			gun_def.shell_angular_velocity = {2.f, 14.f};
@@ -2089,7 +2089,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::SN69_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
-			gun_def.muzzle_velocity = {5900.f, 5900.f};
+			gun_def.muzzle_velocity = {5800.f, 5800.f};
 			gun_def.shot_cooldown_ms = 90.f;
 
 			gun_def.shell_angular_velocity = {2.f, 10.f};

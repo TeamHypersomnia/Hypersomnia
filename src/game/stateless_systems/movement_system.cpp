@@ -195,7 +195,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 									);
 
 									cp.value -= cp_damage_by_dash.effective;
-
+									sentience->time_of_last_exertion = cosm.get_timestamp();
 									movement.dash_cooldown_ms = movement_def.dash_cooldown_ms;
 								}
 							}

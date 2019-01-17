@@ -240,7 +240,7 @@ namespace test_flavours {
 
 			sentience.sprint_drains_cp_per_second = 30.f;
 			sentience.exertion_cooldown_for_cp_regen_ms = 500.f;
-			sentience.dash_drains_cp = 30.f;
+			sentience.dash_drains_cp = 60.f;
 			sentience.cp_regen_mult_when_moving = 0.3f;
 			sentience.minimum_cp_to_sprint = 0.08f;
 
@@ -255,7 +255,7 @@ namespace test_flavours {
 			sentience_inst.get<consciousness_meter_instance>().set_value(350);
 			sentience_inst.get<consciousness_meter_instance>().set_maximum_value(350);
 			sentience_inst.get<consciousness_meter_instance>().regeneration_unit = 10;
-			sentience_inst.get<consciousness_meter_instance>().regeneration_interval_ms = 100;
+			sentience_inst.get<consciousness_meter_instance>().regeneration_interval_ms = 150;
 
 			meta.set(sentience);
 			meta.set(sentience_inst);

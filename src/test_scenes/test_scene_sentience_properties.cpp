@@ -83,7 +83,7 @@ void load_test_scene_sentience_properties(
 		);
 
 		d.appearance.icon = to_image_id(test_scene_image_id::SPELL_ECHOES_OF_THE_HIGHER_REALMS_ICON);
-		d.basic_healing_amount = 132;
+		d.basic_healing_amount = 400;
 
 		d.common.cast_successful_sound.id = to_sound_id(test_scene_sound_id::CAST_SUCCESSFUL);
 		d.common.cast_sparkles.id = to_particle_effect_id(test_scene_particle_effect_id::CAST_SPARKLES);
