@@ -305,7 +305,7 @@ public:
 					settings.acquire_highlights = true;
 					settings.acquire_flying_numbers = false;
 					settings.acquire_effect_messages = true;
-					settings.notify_gui = false;
+					settings.notify_gui = true;
 
 					audiovisual_post_solve(step, settings);
 				};

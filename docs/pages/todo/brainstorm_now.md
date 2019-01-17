@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- allow modifications after re-export
+
+- in flavours, identify by filenames and flavour names not by ids
+
 - believe some guys on the net and use crlibm as it seems more solid
 	- or just openlibm?
 
