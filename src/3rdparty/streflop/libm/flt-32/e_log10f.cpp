@@ -33,9 +33,7 @@ log10_2hi  =  3.0102920532e-01f, /* 0x3e9a2080 */
 log10_2lo  =  7.9034151668e-07f; /* 0x355427db */
 
 #ifdef __STDC__
-static const Simple zero   =  0.0f;
 #else
-static Simple zero   =  0.0f;
 #endif
 
 #ifdef __STDC__

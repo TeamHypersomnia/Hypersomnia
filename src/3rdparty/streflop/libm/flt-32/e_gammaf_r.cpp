@@ -46,7 +46,7 @@ __ieee754_gammaf_r (Simple x, int *signgamp)
       *signgamp = 0;
       return (x - x) / (x - x);
     }
-  if (hx == 0xff800000)
+	if ((u_int32_t)hx == 0xff800000)
     {
       /* x == -Inf.  According to ISO this is NaN.  */
       *signgamp = 0;

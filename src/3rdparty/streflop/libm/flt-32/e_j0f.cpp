@@ -289,9 +289,9 @@ static Simple pS2[5] = {
 #endif
 {
 #ifdef __STDC__
-	const Simple *p,*q;
+	const Simple *p=nullptr,*q=nullptr;
 #else
-	Simple *p,*q;
+	Simple *p=nullptr,*q=nullptr;
 #endif
 	Simple z,r,s;
 	int32_t ix;
@@ -425,9 +425,9 @@ static Simple qS2[6] = {
 #endif
 {
 #ifdef __STDC__
-	const Simple *p,*q;
+	const Simple *p=nullptr,*q=nullptr;
 #else
-	Simple *p,*q;
+	Simple *p=nullptr,*q=nullptr;
 #endif
 	Simple s,r,z;
 	int32_t ix;
