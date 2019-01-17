@@ -546,11 +546,7 @@ void visibility_system::calc_visibility(
 			}
 
 			/* save new double_ray if it is not degenerate */
-			if ((repro::fpclassify(p2.x) == FP_NORMAL || repro::fpclassify(p2.x) == FP_ZERO)
-				&& (repro::fpclassify(p2.y) == FP_NORMAL || repro::fpclassify(p2.y) == FP_ZERO)
-				&& p2.x == p2.x
-				&& p2.y == p2.y
-			) {
+			if (repro::isfinite(p2.x) || repro::isfinite(p2.y)) {
 				double_rays.push_back(ray_b);
 				return true;
 			}
