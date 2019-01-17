@@ -4,10 +4,10 @@
 #include "augs/math/vec2.h"
 
 namespace augs {
-	template <bool reproducible = true, class S, class P>
+	template <bool reproducible = true, class P, class S>
 	FORCE_INLINE auto make_rect_points(
-		const basic_vec2<S> size, 
 		const P& pos, 
+		const basic_vec2<S> size, 
 		const std::conditional_t<reproducible, real32, float> degrees
 	) {
 		std::array<vec2, 4> v;

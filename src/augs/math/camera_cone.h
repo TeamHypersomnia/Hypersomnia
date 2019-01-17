@@ -73,8 +73,8 @@ struct camera_cone {
 		const auto visible_world_area = get_visible_world_area();
 
 		const auto rotated_rect_verts = augs::make_rect_points(
-			visible_world_area, 
 			eye.transform.pos, 
+			visible_world_area, 
 			eye.transform.rotation
 		);
 

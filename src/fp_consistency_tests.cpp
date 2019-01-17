@@ -51,7 +51,6 @@ bool perform_float_consistency_tests() {
 
 	static constexpr auto num_operations = 5000;
 	static const auto num_threads = 2 * std::thread::hardware_concurrency();
-	(void)num_threads;
 
 	/* Perform a random walk with randomized mathematical operations */
 

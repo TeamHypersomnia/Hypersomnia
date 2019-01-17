@@ -208,7 +208,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 								return augs::steer_to_avoid_edges(
 									velocity,
 									tip_pos,
-									augs::make_rect_points(size, tr->pos, tr->rotation),
+									augs::make_rect_points(tr->pos, size, tr->rotation),
 									tr->pos,
 									40.f,
 									0.2f

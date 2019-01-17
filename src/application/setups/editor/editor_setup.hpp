@@ -40,7 +40,7 @@ void editor_setup::for_each_dashed_line(F&& callback) const {
 		if (const auto handle = world[selector.get_hovered()]) {
 			if (const auto tr = handle.find_logic_transform()) {
 				/* Draw dashed lines around the selected entity */
-				const auto ps = augs::make_rect_points(handle.get_logical_size(), tr->pos, tr->rotation);
+				const auto ps = augs::make_rect_points(tr->pos, handle.get_logical_size(), tr->rotation);
 
 				for (std::size_t i = 0; i < ps.size(); ++i) {
 					const auto& v = ps[i];
