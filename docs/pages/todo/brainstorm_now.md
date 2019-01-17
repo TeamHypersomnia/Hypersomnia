@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- believe some guys on the net and use crlibm as it seems more solid
+	- or just openlibm?
+
 - write to streflop dev about that copysign should be bivariate
 
 - during akimbo, only drop when the G is released, not right away when it is pressed

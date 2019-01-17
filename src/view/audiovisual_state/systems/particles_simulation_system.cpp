@@ -334,9 +334,11 @@ void particles_simulation_system::advance_visible_streams(
 	const cosmos& cosm,
 	const particle_effects_map& manager,
 	const plain_animations_pool& anims,
-	const augs::delta delta,
+	const augs::delta& delta,
 	const interpolation_system& interp
 ) {
+	const auto dt_secs = delta.in_seconds();
+
 	auto advance_emissions = [&](
 		emission_instances_type& instances, 
 		const transformr current_transform,
@@ -392,7 +394,7 @@ void particles_simulation_system::advance_visible_streams(
 
 			for (int i = 0; i < to_spawn; ++i) {
 				const float t = (static_cast<float>(i) / to_spawn);
-				const float time_elapsed = (1.f - t) * delta.in_seconds();
+				const float time_elapsed = (1.f - t) * dt_secs;
 
 				vec2 final_particle_position = augs::interp(segment_A, segment_B, rng.randval(0.f, 1.f));
 				

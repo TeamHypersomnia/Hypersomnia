@@ -76,7 +76,7 @@ SET(libm_flt32_source
 SET(cxxflags "-DLIBM_COMPILING_FLT32 -Wno-unused-parameter -I\"${CMAKE_CURRENT_SOURCE_DIR}/libm/headers\"")
 
 if (CLANG OR GCC)
-	SET(cxxflags "${cxxflags} -mfpmath=sse -msse2")
+	SET(cxxflags "${cxxflags} -fno-strict-aliasing -msse -msse2")
 endif()
 
 SET_SOURCE_FILES_PROPERTIES(${libm_flt32_source} PROPERTIES COMPILE_FLAGS "${cxxflags}")

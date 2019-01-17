@@ -471,8 +471,8 @@ Simple ULP_Random ## X ## Y(Simple min, Simple max, RandomState& state) { \
     SizedInteger<32>::Type imax = *reinterpret_cast<SizedUnsignedInteger<32>::Type*>(&max); \
  \
  \
-    if (imin&0x7fffffff > 0x7f800000) return SimpleNaN; \
-    if (imax&0x7fffffff > 0x7f800000) return SimpleNaN; \
+    if ((imin&0x7fffffff) > 0x7f800000) return SimpleNaN; \
+    if ((imax&0x7fffffff) > 0x7f800000) return SimpleNaN; \
  \
     if (imin<0) imin = 0x80000000 - imin; \
     if (imax<0) imax = 0x80000000 - imax; \

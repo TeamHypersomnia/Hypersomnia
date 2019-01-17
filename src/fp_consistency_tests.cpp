@@ -12,15 +12,15 @@
 #include "augs/misc/timing/timer.h"
 #include "augs/misc/scope_guard.h"
 
-static_assert(std::is_same_v<repro::Simple, float>);
+static_assert(std::is_same_v<streflop::Simple, float>);
 
 void setup_float_flags() {
-	repro::fesetround(repro::FE_TONEAREST);
-	repro::streflop_init<repro::Simple>();
+	streflop::fesetround(streflop::FE_TONEAREST);
+	streflop::streflop_init<streflop::Simple>();
 }
 
 void ensure_float_flags_hold() {
-	ensure_eq(repro::fegetround(), repro::FE_TONEAREST);
+	ensure_eq(streflop::fegetround(), streflop::FE_TONEAREST);
 }
 
 #include <thread>
@@ -28,7 +28,11 @@ void ensure_float_flags_hold() {
 #include <bitset>
 #include <random>
 
+#if PLATFORM_UNIX
 #define CANONICAL_RESULT "11000110001101111100111000111011"
+#elif PLATFORM_WINDOWS
+#define CANONICAL_RESULT "11000101110000011001110101001110"
+#endif
 
 bool perform_float_consistency_tests() {
 	auto timer = augs::timer();
@@ -59,13 +63,13 @@ bool perform_float_consistency_tests() {
 		auto rng = randomization(1337u);
 		auto ndt_rng = randomization(std::random_device()());
 
-		repro::Simple trash = 4938493.f;
-		repro::Simple total = 0.f;
+		real32 trash = 4938493.f;
+		real32 total = 0.f;
 
 		for (int i = 0; i < num_operations; ++i) {
 			const auto opcode = rng.randval(0, 19);
 
-			repro::Simple r = 0.f;
+			real32 r = 0.f;
 
 			switch(opcode) {
 				case 0:

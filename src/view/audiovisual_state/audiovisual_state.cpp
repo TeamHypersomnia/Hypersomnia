@@ -42,7 +42,10 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	const auto viewed_character = input.camera.viewed_character;
 	const auto cone = input.camera.cone;
 	const auto& cosm = viewed_character.get_cosmos();
-	const auto dt = augs::delta(input.frame_delta) *= input.speed_multiplier;
+	
+	auto dt = input.frame_delta;
+	dt *= input.speed_multiplier;
+	
 	const auto& anims = input.plain_animations;
 
 	auto& rng = get_rng();

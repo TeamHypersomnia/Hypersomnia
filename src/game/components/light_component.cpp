@@ -120,7 +120,9 @@ void attenuation_properties::add_max(const attenuation_variations& v) {
 }
 
 void light_value_variation::update_value(randomization& rng, atten_t& val, const float dt_seconds) const {
-	val += dt_seconds * rng.randval(-change_speed, change_speed);
+	const auto speed_dt = rng.randval(-change_speed, change_speed);
+	const auto total_dt = dt_seconds * speed_dt;
+	val += total_dt;
 	const auto h = magnitude / 2;
 	val = std::clamp(val, -h, h);
 }

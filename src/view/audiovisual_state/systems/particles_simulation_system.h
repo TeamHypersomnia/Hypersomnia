@@ -231,7 +231,7 @@ public:
 		const cosmos&,
 		const particle_effects_map&,
 		const plain_animations_pool&,
-		augs::delta dt,
+		const augs::delta& dt,
 		const interpolation_system&
 	);
 

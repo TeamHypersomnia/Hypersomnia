@@ -1,13 +1,27 @@
 #pragma once
+#include "augs/log.h"
+#include "augs/build_settings/compiler_defines.h"
 #include "augs/math/vec2.h"
 
 namespace augs {
-	template <class T, class S, class P, class D>
-	auto make_rect_points(const basic_vec2<S> size, const P& pos, const D degrees) {
-		std::array<T, 4> v;
+	template <bool reproducible = true, class S, class P>
+	FORCE_INLINE auto make_rect_points(
+		const basic_vec2<S> size, 
+		const P& pos, 
+		const std::conditional_t<reproducible, real32, float> degrees
+	) {
+		std::array<vec2, 4> v;
 
-		v[0] = v[1] = v[2] = v[3] = -size / 2;
+		{
+			const auto h_size = -size / 2;
 
+			v[0] = h_size;
+			v[1] = h_size;
+			v[2] = h_size;
+			v[3] = h_size;
+		}
+	
+		// v[0];
 		v[1].x += size.x;
 
 		v[2].x += size.x;
@@ -15,10 +29,19 @@ namespace augs {
 
 		v[3].y += size.y;
 
-		const auto radians = DEG_TO_RAD<float> * degrees;
+		const auto radians = DEG_TO_RAD<remove_cref<decltype(degrees)>> * degrees;
 
-		const auto s = static_cast<float>(repro::sin(radians));
-		const auto c = static_cast<float>(repro::cos(radians));
+		real32 s = 0.f;
+		real32 c = 0.f;
+
+		if constexpr(reproducible) {
+			s = repro::sin(radians);
+			c = repro::cos(radians);
+		}
+		else {
+			s = static_cast<real32>(std::sin(radians));
+			c = static_cast<real32>(std::cos(radians));
+		}
 
 		for (auto& vv : v) {
 			const auto new_x = vv.x * c - vv.y * s;
@@ -26,7 +49,7 @@ namespace augs {
 
 			vv.x = new_x;
 			vv.y = new_y;
-			
+
 			vv += pos;
 		}
 

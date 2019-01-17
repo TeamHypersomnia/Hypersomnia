@@ -46,12 +46,12 @@ void light_system::advance_attenuation_variations(
 	const cosmos& cosm,
 	const augs::delta dt
 ) {
+	const auto delta = dt.in_seconds();
+
 	cosm.for_each_having<components::light>(
 		[&](const auto it) {
 			const auto& light = it.template get<components::light>();
 			auto& cache = per_entity_cache[it];
-
-			const auto delta = dt.in_seconds();
 
 			auto& vals = cache.all_variation_values;
 

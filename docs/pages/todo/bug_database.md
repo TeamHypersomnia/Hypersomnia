@@ -5,6 +5,15 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- Strange crash and glitches on windows related to STREFLOP
+	- visibility glitch was due to fpclassify malfunctioning
+		- we replaced it with isfinite and it's ok
+	- crash was due to usage of reproducible funcs in make_rect_points
+		- Does not occur when we use LOG_NVPS on the values, so it's probably an optimization problem
+		- Still, it broke some calculations when a call to get_visible_world_area was made from within particles simulation system
+			- it would overwrite the delta
+			- well there's lots of UB in streflop
+
 - why logic speed mult enters 0?
 	- rewrite change didn't save the new value to values_after_change
 
