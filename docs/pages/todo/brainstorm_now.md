@@ -6,10 +6,27 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- separate slot for the bomb, OVER_SHOULDER
 
-- fix ctrl+v on windows
 - bug: after knockout, some weapons remain tied to the player
 	- this only happens in online play
+	- The client might have sent some wielding requests after its death, 
+		- because it falsely predicted that it would stay alive.
+		- I remember this occuring even during recordings in editor
+	- The wielding and transfers are not really that checked for validity, I think.
+
+- Separate slot for the bomb so that the carrier can have a backpack.
+	- It would always be drawn over the backpack.
+
+- We might decrease the bomb density a little so that the bomber isn't too heavy.
+
+- forbid arming grenades when frozen
+- freeze the player that has just joined
+
+- fix smoke particles becoming bubbles as we still have a good repro
+	- perhaps effect ids remain the same but content is different
+
+- fix ctrl+v on windows
 
 - check if editor now launches in windows release build (not relwithdebinfo)
 
@@ -45,6 +62,9 @@ summary: That which we are brainstorming at the moment.
 		- but the referential state for the bomb mode should properly have the kill
 
 - knives should not be thrown if wheelup is pressed during freeze
+	- simply dont allow to request throw during freeze
+	- fetch wheelup in the arena gui also in case you buy something after the freeze
+
 - can probably buy when dead
 - the problem still persists with weapons being glued to someone
 - freeze someone on connection if they connect

@@ -36,6 +36,7 @@ return {
     MouseButton4 = "THROW_ANY_INTERFERENCE",
 
     WheelUp = "THROW_ANY_TWO_KNIVES",
+    WheelDown = "THROW_ANY_KNIFE",
 
     E = "USE_BUTTON",
 	R = "RELOAD"

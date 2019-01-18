@@ -1281,7 +1281,7 @@ namespace test_flavours {
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::SHOTGUN_RED_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::SHOTGUN_RED_ROUND);
 
-				cartridge.num_rounds_spawned = 11;
+				cartridge.num_rounds_spawned = 12;
 				cartridge.rounds_spread_degrees = 18.f;
 				cartridge.rounds_spread_degrees_variation = 9.f;
 
@@ -1820,7 +1820,7 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4300.f, 4300.f};
-			gun_def.shot_cooldown_ms = 50.f;
+			gun_def.shot_cooldown_ms = 60.f;
 
 			gun_def.shell_angular_velocity = {2.f, 14.f};
 			gun_def.shell_spread_degrees = 20.f;
@@ -1929,7 +1929,7 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4400.f, 4400.f};
-			gun_def.shot_cooldown_ms = 50.f;
+			gun_def.shot_cooldown_ms = 60.f;
 
 			gun_def.shell_angular_velocity = {2.f, 14.f};
 			gun_def.shell_spread_degrees = 20.f;
@@ -1965,7 +1965,7 @@ namespace test_flavours {
 			make_default_gun_container(meta, item_holding_stance::HEAVY_LIKE, 2000.f, 0.f, false, "0.01", true);
 
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::LEWSII_DRAW);
-			meta.get<invariants::item>().standard_price = 4700;
+			meta.get<invariants::item>().standard_price = 5000;
 			set_chambering_duration_ms(meta, 700.f);
 
 			only_allow_mag(meta, test_container_items::LEWSII_MAGAZINE);
@@ -2022,7 +2022,7 @@ namespace test_flavours {
 
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1500.f, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::PLASMA_DRAW);
-			meta.get<invariants::item>().standard_price = 4300;
+			meta.get<invariants::item>().standard_price = 3600;
 			set_chambering_duration_ms(meta, 900.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			only_allow_mag(meta, test_container_items::DATUM_GUN_MAGAZINE);
@@ -2269,7 +2269,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::WARX_FQ12_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = { 4000.f, 4800.f };
+			gun_def.muzzle_velocity = { 4000.f, 5000.f };
 			gun_def.shot_cooldown_ms = 200.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::AUTOMATIC_SHOTGUN_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = false;
@@ -2277,7 +2277,7 @@ namespace test_flavours {
 			gun_def.shell_angular_velocity = {2.f, 10.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {900.f, 3500.f};
-			gun_def.damage_multiplier = 1.f;
+			gun_def.damage_multiplier = 0.8f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 4;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.recoil_multiplier = 2.3f;
