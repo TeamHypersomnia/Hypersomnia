@@ -100,7 +100,10 @@ void server_setup::customize_for_viewing(config_lua_table& config) const {
 }
 
 void server_setup::apply(const server_vars& new_vars, const bool force) {
-	if (force || vars.current_arena != new_vars.current_arena) {
+	const auto old_vars = vars;
+	vars = new_vars;
+
+	if (force || old_vars.current_arena != new_vars.current_arena) {
 		try {
 			choose_arena(new_vars.current_arena);
 		}
@@ -120,11 +123,9 @@ void server_setup::apply(const server_vars& new_vars, const bool force) {
 		}
 	}
 
-	if (force || vars.network_simulator != new_vars.network_simulator) {
+	if (force || old_vars.network_simulator != new_vars.network_simulator) {
 		server->set(new_vars.network_simulator);
 	}
-
-	vars = new_vars;
 }
 
 void server_setup::apply(const config_lua_table& cfg) {

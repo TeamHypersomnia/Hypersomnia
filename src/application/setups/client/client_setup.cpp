@@ -15,6 +15,8 @@
 
 #include "application/arena/choose_arena.h"
 
+#include "augs/filesystem/file.h"
+
 client_setup::client_setup(
 	sol::state& lua,
 	const client_start_input& in
@@ -144,13 +146,32 @@ message_handler_result client_setup::handle_server_message(
 			LOG("Received corrected vars from the server");
 		}
 
-		if (are_initial_vars || sv_vars.current_arena != new_vars.current_arena) {
-			::choose_arena(
-				lua,
-				get_arena_handle(client_arena_type::REFERENTIAL),
-				new_vars,
-				initial_signi
-			);
+		const auto& new_arena = new_vars.current_arena;
+		if (are_initial_vars || new_arena != sv_vars.current_arena) {
+			LOG("Client loads arena: %x", new_arena);
+
+			try {
+				::choose_arena(
+					lua,
+					get_arena_handle(client_arena_type::REFERENTIAL),
+					new_vars,
+					initial_signi
+				);
+			}
+			catch (const augs::file_open_error& err) {
+				last_disconnect_reason = typesafe_sprintf(
+					"Failed to load arena: \"%x\".\n"
+					"The arena files might be corrupt, or they might be missing.\n"
+					"Please check if \"%x\" folder resides within \"%x\" directory.\n"
+					"\nDetails: \n%x",
+					new_arena,
+					new_arena,
+					"arenas",
+					err.what()
+				);
+
+				return abort_v;
+			}
 
 			/* Prepare the predicted cosmos. */
 			predicted_cosmos = scene.world;
@@ -308,7 +329,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				return;
 			}
 
-			text("Reason: \n%x", last_disconnect_reason);
+			text("Reason:\n\n%x", last_disconnect_reason);
 		};
 
 		const auto window_name = "Connection status";
