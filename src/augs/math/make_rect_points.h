@@ -35,8 +35,7 @@ namespace augs {
 		real32 c = 0.f;
 
 		if constexpr(reproducible) {
-			s = repro::sin(radians);
-			c = repro::cos(radians);
+			repro::sincosf(radians, s, c);
 		}
 		else {
 			s = static_cast<real32>(std::sin(radians));

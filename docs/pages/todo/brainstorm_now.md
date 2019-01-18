@@ -7,6 +7,22 @@ summary: That which we are brainstorming at the moment.
 ---
 
 
+- fix ctrl+v on windows
+- bug: after knockout, some weapons remain tied to the player
+	- this only happens in online play
+
+- check if editor now launches in windows release build (not relwithdebinfo)
+
+- when re-exporting
+	- fix spells
+	- remnants
+	- weapons
+	- character stats
+
+- Apparently, we still get desyncs even with a reproducible float library.
+	- check out these reinferences because maybe desyncs are due to them
+		- stress testing needed
+
 - increase range of secondary throw
 - check if performance problems persisted in older versions, those played with kartezjan and before repro math
 
@@ -23,7 +39,6 @@ summary: That which we are brainstorming at the moment.
 - disable buying in warmup
 	- or just 0 money
 
-- check out these reinferences because maybe desyncs are due to them
 - arena gui predicts wrong
 	- draw deaths only for referential, i think it might be the other way around
 	- problem is, it draws based on state not on events?
@@ -34,7 +49,6 @@ summary: That which we are brainstorming at the moment.
 - the problem still persists with weapons being glued to someone
 - freeze someone on connection if they connect
 
-- fix ctrl+v on windows
 - fix those dangling particle streams as they may give away positions 
 
 - Bug: path specification for assets doesnt fully work on Windows
@@ -115,9 +129,6 @@ summary: That which we are brainstorming at the moment.
 - bomb soon explodes theme gets repeated
 	- unimportant: perhaps it was 
 
-- bug: after knockout, some weapons remain tied to the player
-	- this only happens in online play
-
 - particles don't get properly predicted on deaths sometimes?
 
 - if the referential post solve determines that the predicted post solve has missed something predictable (e.g. a bullet impact)
@@ -138,8 +149,6 @@ summary: That which we are brainstorming at the moment.
 	- Predict collisions with items only if they weren't just recently dropped by a remote player
 
 	
-- fix Common state crash
-
 - Admin panel
 	- Editor-like server vars tweaker accessible by pressing ESC server-side
 		- will have to be commandized properly, just like editor setup's

@@ -968,8 +968,8 @@ namespace test_flavours {
 			test_flavours::add_shell_dynamic_body(meta);
 
 			invariants::remnant remnant;
-			remnant.lifetime_secs = 20.f;
-			remnant.start_shrinking_when_remaining_ms = 7000.f;
+			remnant.lifetime_secs = 5.f;
+			remnant.start_shrinking_when_remaining_ms = 3000.f;
 			meta.set(remnant);
 		}
 
@@ -987,8 +987,8 @@ namespace test_flavours {
 			test_flavours::add_shell_dynamic_body(meta);
 
 			invariants::remnant remnant;
-			remnant.lifetime_secs = 20.f;
-			remnant.start_shrinking_when_remaining_ms = 7000.f;
+			remnant.lifetime_secs = 5.f;
+			remnant.start_shrinking_when_remaining_ms = 3000.f;
 			meta.set(remnant);
 		}
 
@@ -1007,7 +1007,7 @@ namespace test_flavours {
 
 			invariants::remnant remnant;
 			remnant.lifetime_secs = 20.f;
-			remnant.start_shrinking_when_remaining_ms = 2000.f;
+			remnant.start_shrinking_when_remaining_ms = 5000.f;
 			meta.set(remnant);
 		}
 
@@ -1025,8 +1025,8 @@ namespace test_flavours {
 			test_flavours::add_shell_dynamic_body(meta);
 
 			invariants::remnant remnant;
-			remnant.lifetime_secs = 20.f;
-			remnant.start_shrinking_when_remaining_ms = 7000.f;
+			remnant.lifetime_secs = 3.f;
+			remnant.start_shrinking_when_remaining_ms = 1500.f;
 			meta.set(remnant);
 		}
 
@@ -1044,8 +1044,8 @@ namespace test_flavours {
 			test_flavours::add_shell_dynamic_body(meta);
 
 			invariants::remnant remnant;
-			remnant.lifetime_secs = 20.f;
-			remnant.start_shrinking_when_remaining_ms = 7000.f;
+			remnant.lifetime_secs = 5.f;
+			remnant.start_shrinking_when_remaining_ms = 3000.f;
 			meta.set(remnant);
 		}
 

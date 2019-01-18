@@ -63,8 +63,10 @@ namespace augs {
 			io.IniFilename = ini_filename;
 			io.LogFilename = log_filename;
 
+#if PLATFORM_UNIX
 			io.SetClipboardTextFn = augs_SetClipboardText;
 			io.GetClipboardTextFn = augs_GetClipboardText;
+#endif
 
 			io.MouseDoubleClickMaxDist = 100.f;
 			GetStyle() = initial_style;

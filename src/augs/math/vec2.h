@@ -103,11 +103,22 @@ struct basic_vec2 {
 
 	static auto from_degrees(const real degrees) {
 		const auto radians = degrees * DEG_TO_RAD<real>;
-		return basic_vec2<type>(static_cast<type>(repro::cos(radians)), static_cast<type>(repro::sin(radians)));
+
+		real32 sx = 0.f;
+		real32 cx = 0.f;
+
+		repro::sincosf(radians, sx, cx);
+
+		return basic_vec2<type>(cx, sx);
 	}
 
 	static auto from_radians(const real radians) {
-		return basic_vec2<type>(static_cast<type>(repro::cos(radians)), static_cast<type>(repro::sin(radians)));
+		real32 sx = 0.f;
+		real32 cx = 0.f;
+
+		repro::sincosf(radians, sx, cx);
+
+		return basic_vec2<type>(cx, sx);
 	}
 
 	real distance_from(const segment_type s) const {
@@ -433,8 +444,10 @@ struct basic_vec2 {
 	auto& rotate_radians(const R radians) {
 		static_assert(std::is_floating_point_v<R>);
 
-		const auto s = static_cast<real>(repro::sin(radians));
-		const auto c = static_cast<real>(repro::cos(radians));
+		real32 s = 0.f;
+		real32 c = 0.f;
+
+		repro::sincosf(radians, s, c);
 
 		const auto new_x = x * c - y * s;
 		const auto new_y = x * s + y * c;

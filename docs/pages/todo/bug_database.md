@@ -5,6 +5,9 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- fix Common state crash
+	- it was due to a stack overflow.
+
 - Strange crash and glitches on windows related to STREFLOP
 	- visibility glitch was due to fpclassify malfunctioning
 		- we replaced it with isfinite and it's ok
