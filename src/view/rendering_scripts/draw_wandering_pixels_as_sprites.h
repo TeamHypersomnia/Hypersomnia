@@ -14,28 +14,29 @@ void draw_wandering_pixels_as_sprites(
 ) {
 	subject_handle.template dispatch_on_having_all<invariants::wandering_pixels>([&](const auto subject) {
 		const auto& wandering_def = subject.template get<invariants::wandering_pixels>();
-		const auto& cache = sys.get_cache(subject);
 
-		for (const auto& p : cache.particles) {
-			basic_input.renderable_transform = p.pos;
+		if (const auto cache = sys.find_cache(subject)) {
+			for (const auto& p : cache->particles) {
+				basic_input.renderable_transform = p.pos;
 
-			{
-				const auto& wandering = subject.template get<components::wandering_pixels>();
-				basic_input.colorize = wandering.colorize;
-			}
+				{
+					const auto& wandering = subject.template get<components::wandering_pixels>();
+					basic_input.colorize = wandering.colorize;
+				}
 
-			const auto& cosm = subject_handle.get_cosmos();
-			const auto& logicals = cosm.get_logical_assets();
+				const auto& cosm = subject_handle.get_cosmos();
+				const auto& logicals = cosm.get_logical_assets();
 
-			if (const auto displayed_animation = logicals.find(wandering_def.animation_id)) {
-				const auto animation_time_ms = p.current_lifetime_ms;
-				const auto image_id = ::calc_current_frame_looped(*displayed_animation, animation_time_ms).image_id;
+				if (const auto displayed_animation = logicals.find(wandering_def.animation_id)) {
+					const auto animation_time_ms = p.current_lifetime_ms;
+					const auto image_id = ::calc_current_frame_looped(*displayed_animation, animation_time_ms).image_id;
 
-				invariants::sprite animated;
-				animated.image_id = image_id;
-				animated.size = manager.at(image_id).get_original_size();
+					invariants::sprite animated;
+					animated.image_id = image_id;
+					animated.size = manager.at(image_id).get_original_size();
 
-				augs::draw(animated, manager, basic_input);
+					augs::draw(animated, manager, basic_input);
+				}
 			}
 		}
 	});

@@ -112,6 +112,8 @@ particles_simulation_system::basic_cache::basic_cache(
 			}
 
 			emission_instances.emplace_back(emission, rng);
+			auto& e = emission_instances.back();
+			e.stream_particles_to_spawn *= original.input.modifier.scale_amounts;
 		}
 	}
 	else {
@@ -388,9 +390,7 @@ void particles_simulation_system::advance_visible_streams(
 			
 			const auto homing_target_pos = cosm[homing_target].alive() ? cosm[homing_target].get_viewing_transform(interp).pos : vec2();
 
-			const auto to_spawn = static_cast<int>(std::floor(
-				instance.stream_particles_to_spawn * modifier.scale_amounts
-			));
+			const auto to_spawn = static_cast<int>(instance.stream_particles_to_spawn);
 
 			for (int i = 0; i < to_spawn; ++i) {
 				const float t = (static_cast<float>(i) / to_spawn);

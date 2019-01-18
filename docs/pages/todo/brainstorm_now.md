@@ -6,6 +6,37 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+
+- increase range of secondary throw
+- check if performance problems persisted in older versions, those played with kartezjan and before repro math
+
+- the personal depo still gets closed sometimes
+- prefer low dampings
+- maybe allow running for longer as it is a running heavy game
+- prevent trigger pull sound during chambering
+- reinferences should NOT occur at all during play because we are cloning	
+- log if client does not have the map that's on the server
+
+- walking around many shells slows down so it's probably due to logic
+
+- always hide the weapon first if reloading
+- disable buying in warmup
+	- or just 0 money
+
+- check out these reinferences because maybe desyncs are due to them
+- arena gui predicts wrong
+	- draw deaths only for referential, i think it might be the other way around
+	- problem is, it draws based on state not on events?
+		- but the referential state for the bomb mode should properly have the kill
+
+- knives should not be thrown if wheelup is pressed during freeze
+- can probably buy when dead
+- the problem still persists with weapons being glued to someone
+- freeze someone on connection if they connect
+
+- fix ctrl+v on windows
+- fix those dangling particle streams as they may give away positions 
+
 - Bug: path specification for assets doesnt fully work on Windows
 
 - allow modifications after re-export

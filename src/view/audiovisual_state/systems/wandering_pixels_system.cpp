@@ -15,8 +15,8 @@ wandering_pixels_system::cache& wandering_pixels_system::get_cache(const const_e
 	return per_entity_cache[id.get_id()];
 }
 
-const wandering_pixels_system::cache& wandering_pixels_system::get_cache(const const_entity_handle id) const {
-	return per_entity_cache.at(id.get_id());
+const wandering_pixels_system::cache* wandering_pixels_system::find_cache(const const_entity_handle id) const {
+	return mapped_or_nullptr(per_entity_cache, id.get_id());
 }
 
 void wandering_pixels_system::advance_for(

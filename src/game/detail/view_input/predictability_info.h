@@ -15,19 +15,19 @@ public:
 	bool play_unpredictable;
 	entity_id predicting_subject;
 
-	static auto referential(const entity_id with) {
+	static auto unpredictable_for(const entity_id whom) {
 		prediction_input out;
 		out.play_predictable = false;
 		out.play_unpredictable = true;
-		out.predicting_subject = with;
+		out.predicting_subject = whom;
 		return out;
 	}
 
-	static auto predicted(const entity_id with) {
+	static auto predictable_for(const entity_id whom) {
 		prediction_input out;
 		out.play_predictable = true;
 		out.play_unpredictable = false;
-		out.predicting_subject = with;
+		out.predicting_subject = whom;
 		return out;
 	}
 

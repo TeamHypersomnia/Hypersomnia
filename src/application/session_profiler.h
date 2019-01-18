@@ -20,7 +20,9 @@ struct network_profiler : public augs::profiler_mixin<network_profiler> {
 	augs::amount_measurements<std::size_t> accepted_commands = 1;
 
 	augs::time_measurements unpacking_remote_steps;
+	augs::time_measurements stepping_forward;
 	augs::time_measurements sending_messages;
+	augs::time_measurements sending_packets;
 	augs::time_measurements receiving_messages;
 	// END GEN INTROSPECTOR
 };

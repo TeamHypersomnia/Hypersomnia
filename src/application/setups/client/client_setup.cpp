@@ -476,13 +476,13 @@ void client_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
 
 	self.get_arena_handle(client_arena_type::REFERENTIAL).on_mode_with_input(
 		[&](const auto& typed_mode, const auto& mode_input) {
-			arena_gui.draw_mode_gui(in, draw_mode_in, typed_mode, mode_input, prediction_input::referential(self.get_viewed_character()));
+			arena_gui.draw_mode_gui(in, draw_mode_in, typed_mode, mode_input, prediction_input::unpredictable_for(self.get_viewed_character()));
 		}
 	);
 
 	self.get_arena_handle(client_arena_type::PREDICTED).on_mode_with_input(
 		[&](const auto& typed_mode, const auto& mode_input) {
-			arena_gui.draw_mode_gui(in, draw_mode_in, typed_mode, mode_input, prediction_input::predicted(self.get_viewed_character()));
+			arena_gui.draw_mode_gui(in, draw_mode_in, typed_mode, mode_input, prediction_input::predictable_for(self.get_viewed_character()));
 		}
 	);
 }

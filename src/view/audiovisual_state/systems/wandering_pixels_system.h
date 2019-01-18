@@ -39,7 +39,7 @@ public:
 	audiovisual_cache_map<cache> per_entity_cache;
 
 	cache& get_cache(const const_entity_handle);
-	const cache& get_cache(const const_entity_handle) const;
+	const cache* find_cache(const const_entity_handle) const;
 
 	void advance_for(
 		randomization& rng,

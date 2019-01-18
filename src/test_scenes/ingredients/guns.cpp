@@ -459,7 +459,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_bullet_round_physics(meta);
-			meta.template get<invariants::rigid_body>().damping.linear = 2.8f;
+			meta.template get<invariants::rigid_body>().damping.linear = 2.f;
 
 			invariants::missile missile;
 
@@ -533,7 +533,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_bullet_round_physics(meta);
-			meta.template get<invariants::rigid_body>().damping.linear = 2.4f;
+			meta.template get<invariants::rigid_body>().damping.linear = 1.5f;
 
 			invariants::missile missile;
 
@@ -609,7 +609,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_bullet_round_physics(meta);
-			meta.template get<invariants::rigid_body>().damping.linear = 3.8f;
+			meta.template get<invariants::rigid_body>().damping.linear = 1.5f;
 
 			invariants::missile missile;
 
@@ -625,9 +625,11 @@ namespace test_flavours {
 
 			missile.trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::ELECTRIC_PROJECTILE_TRACE);
 			missile.trace_particles.modifier.colorize = pro90_round_col;
+			missile.trace_particles.modifier.scale_amounts = 0.5f;
 
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::PISTOL_MUZZLE_LEAVE_EXPLOSION);
 			missile.muzzle_leave_particles.modifier.colorize = pro90_round_col;
+			missile.muzzle_leave_particles.modifier.scale_amounts *= 0.5f;
 			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 
 			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_RICOCHET);
@@ -1279,7 +1281,7 @@ namespace test_flavours {
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::SHOTGUN_RED_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::SHOTGUN_RED_ROUND);
 
-				cartridge.num_rounds_spawned = 12;
+				cartridge.num_rounds_spawned = 11;
 				cartridge.rounds_spread_degrees = 18.f;
 				cartridge.rounds_spread_degrees_variation = 9.f;
 
@@ -1484,7 +1486,7 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("0.9");
+			charge_deposit_def.space_available = to_space_units("1.3");
 			charge_deposit_def.mounting_duration_ms = 500.f;
 			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::SHOTGUN_RED_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
@@ -1520,7 +1522,7 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("0.67");
+			charge_deposit_def.space_available = to_space_units("0.70");
 			charge_deposit_def.mounting_duration_ms = 300.f;
 			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::PRO90_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
@@ -1817,13 +1819,13 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::PRO90_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {6000.f, 6000.f};
+			gun_def.muzzle_velocity = {4300.f, 4300.f};
 			gun_def.shot_cooldown_ms = 50.f;
 
 			gun_def.shell_angular_velocity = {2.f, 14.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
-			gun_def.damage_multiplier = 1.1;
+			gun_def.damage_multiplier = 1.2;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = kickback_mult * 15.f;
@@ -2041,7 +2043,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::KEK9_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
-			gun_def.muzzle_velocity = {5800.f, 5800.f};
+			gun_def.muzzle_velocity = {4700.f, 4700.f};
 			gun_def.shot_cooldown_ms = 100.f;
 
 			gun_def.shell_angular_velocity = {2.f, 14.f};
@@ -2089,7 +2091,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::SN69_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::SEMI_AUTOMATIC;
-			gun_def.muzzle_velocity = {5800.f, 5800.f};
+			gun_def.muzzle_velocity = {4700.f, 4700.f};
 			gun_def.shot_cooldown_ms = 90.f;
 
 			gun_def.shell_angular_velocity = {2.f, 10.f};
@@ -2267,7 +2269,7 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::WARX_FQ12_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = { 4100.f, 6000.f };
+			gun_def.muzzle_velocity = { 4000.f, 4800.f };
 			gun_def.shot_cooldown_ms = 200.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::AUTOMATIC_SHOTGUN_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = false;
@@ -2279,7 +2281,7 @@ namespace test_flavours {
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 4;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.recoil_multiplier = 2.3f;
-			gun_def.kickback_towards_wielder = kickback_mult * 130.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 60.f;
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.242f;

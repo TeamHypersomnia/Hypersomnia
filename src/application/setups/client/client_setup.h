@@ -200,7 +200,7 @@ public:
 
 		const auto current_time = get_current_time();
 
-		while (client_time <= current_time) {
+		if (client_time <= current_time) {
 			{
 				auto scope = measure_scope(performance.receiving_messages);
 				handle_server_messages();
@@ -221,6 +221,8 @@ public:
 			const bool in_game = new_local_entropy != std::nullopt;
 
 			if (is_connected()) {
+				auto scope = measure_scope(performance.sending_messages);
+
 				send_pending_commands();
 
 				if (in_game) {
@@ -234,7 +236,7 @@ public:
 			}
 
 			{
-				auto scope = measure_scope(performance.sending_messages);
+				auto scope = measure_scope(performance.sending_packets);
 				send_packets_if_its_time();
 			}
 
@@ -260,70 +262,39 @@ public:
 					callback(q.get_queue<M::exploding_ring_effect>());
 				};
 
-				auto referential_post_solve = [&](const const_logic_step step) {
-					auto erase_predictable_messages = [&](auto& from_queue) {
-						const auto input = prediction_input::referential(get_viewed_character());
-
-						erase_if(
-							from_queue,
-							[&](const auto& m) {
-								return !m.get_predictability().should_play(input);
-							}
-						);
-					};
-
-					for_each_predicted_queue(step, erase_predictable_messages);
-
-					audiovisual_post_solve_settings settings;
-
-					settings.correct_interpolations = false;
-					settings.acquire_highlights = false;
-					settings.acquire_flying_numbers = true;
-					settings.acquire_effect_messages = true;
-					settings.notify_gui = false;
-
-					audiovisual_post_solve(step, settings);
-				};
-
-				auto predicted_post_solve = [&](const const_logic_step step) {
-					auto erase_unpredictable_messages = [&](auto& from_queue) {
-						const auto input = prediction_input::predicted(get_viewed_character());
-
-						erase_if(
-							from_queue,
-							[&](const auto& m) {
-								return !m.get_predictability().should_play(input);
-							}
-						);
-					};
-
-					for_each_predicted_queue(step, erase_unpredictable_messages);
-
-					audiovisual_post_solve_settings settings;
-
-					settings.correct_interpolations = true;
-					settings.acquire_highlights = true;
-					settings.acquire_flying_numbers = false;
-					settings.acquire_effect_messages = true;
-					settings.notify_gui = true;
-
-					audiovisual_post_solve(step, settings);
-				};
-
-				auto referential_callbacks = solver_callbacks(
-					default_solver_callback(),
-					referential_post_solve,
-					default_solver_callback()
-				);
-
-				auto predicted_callbacks = solver_callbacks(
-					default_solver_callback(),
-					predicted_post_solve,
-					default_solver_callback()
-				);
-
 				{
 					auto scope = measure_scope(performance.unpacking_remote_steps);
+
+					auto referential_post_solve = [&](const const_logic_step step) {
+						auto erase_predictable_messages = [&](auto& from_queue) {
+							const auto input = prediction_input::unpredictable_for(get_viewed_character());
+
+							erase_if(
+								from_queue,
+								[&](const auto& m) {
+									return !m.get_predictability().should_play(input);
+								}
+							);
+						};
+
+						for_each_predicted_queue(step, erase_predictable_messages);
+
+						audiovisual_post_solve_settings settings;
+
+						settings.correct_interpolations = false;
+						settings.acquire_highlights = false;
+						settings.acquire_flying_numbers = true;
+						settings.acquire_effect_messages = true;
+						settings.notify_gui = false;
+
+						audiovisual_post_solve(step, settings);
+					};
+
+					auto referential_callbacks = solver_callbacks(
+						default_solver_callback(),
+						referential_post_solve,
+						default_solver_callback()
+					);
 
 					auto advance_referential = [&](const auto& entropy) {
 						referential_arena.advance(entropy, referential_callbacks, referential_solve_settings);
@@ -335,9 +306,13 @@ public:
 							We only post-solve once for the predicted cosmos, when we actually move forward in time.
 						*/
 
-						schedule_reprediction_if_inconsistent(
-							predicted_arena.advance(entropy, solver_callbacks(), predicted_solve_settings)
+						const auto reprediction_result = predicted_arena.advance(
+							entropy, 
+							solver_callbacks(), 
+							predicted_solve_settings
 						);
+
+						schedule_reprediction_if_inconsistent(reprediction_result);
 					};
 
 					const auto result = receiver.unpack_deterministic_steps(
@@ -363,6 +338,8 @@ public:
 					}
 				}
 
+				auto scope = measure_scope(performance.stepping_forward);
+
 				{
 					auto& p = receiver.predicted_entropies;
 
@@ -384,14 +361,45 @@ public:
 					p.push_back(*new_local_entropy);
 				}
 
-#if USE_CLIENT_PREDICTION
-				schedule_reprediction_if_inconsistent(
-					predicted_arena.advance(
-						*new_local_entropy, 
-						predicted_callbacks, 
-						predicted_solve_settings
-					)
+				auto predicted_post_solve = [&](const const_logic_step step) {
+					auto erase_unpredictable_messages = [&](auto& from_queue) {
+						const auto input = prediction_input::predictable_for(get_viewed_character());
+
+						erase_if(
+							from_queue,
+							[&](const auto& m) {
+								return !m.get_predictability().should_play(input);
+							}
+						);
+					};
+
+					for_each_predicted_queue(step, erase_unpredictable_messages);
+
+					audiovisual_post_solve_settings settings;
+
+					settings.correct_interpolations = true;
+					settings.acquire_highlights = true;
+					settings.acquire_flying_numbers = false;
+					settings.acquire_effect_messages = true;
+					settings.notify_gui = true;
+
+					audiovisual_post_solve(step, settings);
+				};
+
+				auto predicted_callbacks = solver_callbacks(
+					default_solver_callback(),
+					predicted_post_solve,
+					default_solver_callback()
 				);
+
+#if USE_CLIENT_PREDICTION
+				const auto forward_step_result = predicted_arena.advance(
+					*new_local_entropy, 
+					predicted_callbacks, 
+					predicted_solve_settings
+				);
+
+				schedule_reprediction_if_inconsistent(forward_step_result);
 #else
 				(void)predicted_callbacks;
 				(void)callbacks;

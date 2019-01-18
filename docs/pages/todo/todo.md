@@ -6,6 +6,8 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- maybe don't save the last launch unless in debug
+
 - problem: footstep smokes might still be visible when we artificially increase zoom
 	- well the client itself knows everything anyways
 	- so we can force the zoom to be exact

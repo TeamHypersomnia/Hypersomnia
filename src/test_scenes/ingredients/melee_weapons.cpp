@@ -200,7 +200,7 @@ namespace test_flavours {
 		make_knife(
 			test_melee_weapons::ELECTRIC_RAPIER,
 			test_scene_image_id::ELECTRIC_RAPIER,
-			static_cast<money_type>(1000),
+			static_cast<money_type>(700),
 			faction_type::SPECTATOR,
 			1.2f,
 			white
@@ -209,7 +209,7 @@ namespace test_flavours {
 		make_knife(
 			test_melee_weapons::CYAN_SCYTHE,
 			test_scene_image_id::CYAN_SCYTHE,
-			static_cast<money_type>(1000),
+			static_cast<money_type>(700),
 			faction_type::METROPOLIS,
 			1.f,
 			cyan
@@ -218,7 +218,7 @@ namespace test_flavours {
 		make_knife(
 			test_melee_weapons::YELLOW_DAGGER,
 			test_scene_image_id::YELLOW_DAGGER,
-			static_cast<money_type>(1000),
+			static_cast<money_type>(700),
 			faction_type::RESISTANCE,
 			1.f,
 			yellow
@@ -228,7 +228,7 @@ namespace test_flavours {
 			auto& meta = make_knife(
 				test_melee_weapons::POSEIDON,
 				test_scene_image_id::POSEIDON,
-				static_cast<money_type>(1500),
+				static_cast<money_type>(700),
 				faction_type::SPECTATOR,
 				1.2f,
 				white

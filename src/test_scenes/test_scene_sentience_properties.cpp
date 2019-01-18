@@ -206,7 +206,7 @@ void load_test_scene_sentience_properties(
 			
 			{
 				in.effective_radius = 500.f;
-				in.damage.base = 112.f;
+				in.damage.base = 88.f;
 				in.damage.impact_impulse = 200.f;
 				in.sound.modifier.max_distance = 6000.f;
 				in.sound.modifier.reference_distance = 2000.f;
@@ -223,7 +223,7 @@ void load_test_scene_sentience_properties(
 			
 			{
 				in.effective_radius = 700.f;
-				in.damage.base = 130.f;
+				in.damage.base = 90.f;
 				in.damage.impact_impulse = 250.f;
 				in.sound.modifier.max_distance = 6000.f;
 				in.sound.modifier.reference_distance = 2000.f;
