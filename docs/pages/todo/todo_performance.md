@@ -5,6 +5,9 @@ permalink: todo_perf
 summary: Just a hidden scratchpad.
 ---
 
+- Perhaps conditionally remove the logs for deletions in relwithdebinfo?
+- Perhaps conditionally remove the checking if the inventory slots are valid?
+
 - only serialize the server setp once and multicast the same buffer to all clients!
 	- we can use global server's allocator
 	- set the reference count to num connected clients + 1

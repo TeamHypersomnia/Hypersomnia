@@ -111,7 +111,7 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 
 		// delete only once
 		if (charges == 0) {
-			step.post_message(messages::queue_deletion(typed_missile));
+			step.queue_deletion_of(typed_missile, "Missile collision");
 			damage_msg.inflictor_destructed = true;
 
 			auto rng = cosm.get_nontemporal_rng_for(typed_missile);

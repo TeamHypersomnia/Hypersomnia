@@ -759,6 +759,14 @@ void bomb_mode::setup_round(
 	round_speeds = in.rules.speeds;
 
 	cosm.set(in.initial_signi);
+
+	/* 
+		If there are any entries in message queues, 
+		they become invalid when we assign the initial_signi.
+	*/
+
+	step.transient.clear();
+
 	cosm.set_fixed_delta(round_speeds.calc_fixed_delta());
 
 	remove_test_characters(cosm);
@@ -1205,9 +1213,8 @@ void bomb_mode::process_win_conditions(const input_type in, const logic_step ste
 	/* Bomb-based win-conditions */
 
 	auto stop_bomb_detonation_theme = [&]() {
-		if (bomb_detonation_theme.is_set()) {
-			LOG("Bomb detonation theme interrupted.");
-			step.post_message(messages::queue_deletion(bomb_detonation_theme));
+		if (cosm[bomb_detonation_theme]) {
+			step.queue_deletion_of(bomb_detonation_theme, "Bomb detonation theme interrupted.");
 			bomb_detonation_theme.unset();
 		}
 	};

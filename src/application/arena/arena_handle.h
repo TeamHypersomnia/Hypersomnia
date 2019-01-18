@@ -158,6 +158,7 @@ public:
 
 		bomb_ruleset.bot_quota = 0;
 		bomb_ruleset.bot_names.clear();
+		bomb_ruleset.warmup_secs = 0;
 
 		const auto bomb_ruleset_id = raw_ruleset_id(0);
 		rulesets.all.template get_for<bomb_mode>().try_emplace(bomb_ruleset_id, std::move(bomb_ruleset));

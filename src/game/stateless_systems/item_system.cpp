@@ -857,15 +857,19 @@ void item_system::handle_wielding_requests(const logic_step step) {
 	const auto& entropy = step.get_entropy();
 
 	for (const auto& p : entropy.players) {
-		const auto self = cosm[p.first];
+		const auto player_entity = cosm[p.first];
 
-		if (self.dead()) {
+		if (player_entity.dead()) {
+			continue;
+		}
+
+		if (!sentient_and_conscious(player_entity)) {
 			continue;
 		}
 
 		::perform_wielding(
 			step,
-			self,
+			player_entity,
 			p.second.wield
 		);
 	}

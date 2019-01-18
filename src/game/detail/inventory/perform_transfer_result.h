@@ -10,7 +10,7 @@
 #include "game/detail/inventory/item_transfer_result.h"
 
 struct perform_transfer_result {
-	std::optional<messages::queue_deletion> destructed;
+	std::optional<entity_id> destructed;
 	std::vector<messages::interpolation_correction_request> interpolation_corrected;
 	messages::performed_transfer_message result;
 

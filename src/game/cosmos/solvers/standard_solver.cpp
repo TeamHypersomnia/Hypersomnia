@@ -9,6 +9,7 @@
 
 #include "game/detail/inventory/perform_transfer.h"
 #include "game/detail/physics/contact_listener.h"
+#include "game/detail/sentience/sentience_getters.h"
 
 #include "game/stateless_systems/movement_system.h"
 #include "game/stateless_systems/visibility_system.h"
@@ -36,10 +37,32 @@
 #include "game/stateless_systems/animation_system.h"
 #include "game/stateless_systems/remnant_system.h"
 
+#define STRESS_TEST_REINFERENCES 0
+
+#if STRESS_TEST_REINFERENCES
+#include <random>
+#endif
+
 void standard_solve(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	auto& performance = cosm.profiler;
 	auto& global = cosm.get_global_solvable();
+
+#if STRESS_TEST_REINFERENCES
+	{
+		auto& s_rng = step.step_rng;
+
+		if (const auto v = s_rng.randval(0, 4); v == 4) {
+			auto rrr = randomization(std::random_device()());
+			const auto times = rrr.randval(1, 9);
+
+			for (int i = 0; i < times; ++i) {
+				cosmic::reinfer_solvable(cosm);
+			}
+		}
+	}
+#endif
+
 	ensure_greater(step.get_delta().in_seconds(), 0.f);
 
 	auto logic_scope = measure_scope(performance.logic);
@@ -49,14 +72,33 @@ void standard_solve(const logic_step step) {
 	contact_listener listener(cosm);
 
 	for (const auto& p : step.get_entropy().players) {
-		if (cosm[p.first].dead()) {
+		const auto player_entity = cosm[p.first];
+
+		if (player_entity.dead()) {
 			continue;
 		}
 
-		const auto& t = p.second.transfer;
+		if (!sentient_and_conscious(player_entity)) {
+			continue;
+		}
+
+		auto t = p.second.transfer;
+		t.params.set_source_root_as_sender = false;
+		t.params.bypass_mounting_requirements = false;
+		t.params.bypass_unmatching_capabilities = false;
 
 		if (t.is_set()) {
-			perform_transfer(t, step);
+			const auto result = ::match_transfer_capabilities(cosm, t);
+
+			if (
+				result.relation_type == capability_relation::THE_SAME
+				|| result.relation_type == capability_relation::DROP
+			) {
+				/* TODO: Allow storing drops if we are in close proximity. */
+				if (result.authorized_capability == player_entity) {
+					perform_transfer(t, step);
+				}
+			}
 		}
 	}
 

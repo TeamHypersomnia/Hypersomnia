@@ -2908,3 +2908,6 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- just use dots and crosses
 	- look for more occurences of this
 
+## About this: we just flush the queues
+
+## Rest

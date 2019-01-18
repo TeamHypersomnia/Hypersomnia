@@ -141,7 +141,7 @@ public:
 
 	auto get_interpolation_ratio() const {
 		const auto dt =  get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
-		return (get_current_time() - server_time) / dt;
+		return std::min(1.0, (get_current_time() - server_time) / dt);
 	}
 
 	entity_id get_viewed_character_id() const;

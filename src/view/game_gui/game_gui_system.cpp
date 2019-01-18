@@ -111,6 +111,7 @@ const item_button& game_gui_system::get_item_button(const entity_id id) const {
 
 void game_gui_system::queue_transfer(const entity_id& subject, const item_slot_transfer_request req) {
 	(void)subject;
+	ensure(req.target_slot.is_valid());
 	pending.transfer = req;
 }
 

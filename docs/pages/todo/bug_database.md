@@ -5,6 +5,39 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- There might be some unspecified problems if the client does not keep up with the client simulation.
+	- This is because we only advance once to keep better framerate.
+	- Note that the client will anyway keep up because it always simulates ALL referential frames that it receives to catch up,
+		- so it makes no sense to further strain it
+
+- HUD shows bad bomb progress
+	- It was due to client setup not keeping up with current time.
+
+## Unexplained
+
+### there was a request to transfer or wield an item that had an invalid slot set 
+
+ but the target container id was set to some value.
+didn't you confuse an item with target container id?
+item was set but to some trash value that did not exist. maybe the target slot was wholely unset after all.
+
+### One crash for dispatch at line 272 was due to queueing a non-existent entity for deletion.
+
+- I can't really remember if it happened right after defuse or on round restart, 
+	- but most probably it was at the moment of defuse.
+- It was during reprediction.
+- It would try to iterate over children of the entity.
+- happened once during bomb plant but unexplained ever since.
+ 
+- Basically all queues need to be flushed upon any non-standard alteration to signi
+- We need to either restart at the very beginning or clear all queues upon restart
+- what if bomb theme is queued for deletion the moment that the round is also set in pre solve?
+	- Assuming the crash happened after round restart, anything could have happened because significant is invalidated completely by being assigned to
+- Could some deletion queues remain dangling after we re-assign the cosmos on start of round?
+	- Even so, why would it happen even before that reassignment (right in the moment of defuse)
+	- Would it be due to deletion of lying items on the ground?
+
+## Others 
 - fix Common state crash
 	- it was due to a stack overflow.
 

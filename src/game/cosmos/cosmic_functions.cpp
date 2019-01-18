@@ -237,22 +237,23 @@ std::optional<cosmic_pool_undo_free_input> cosmic::delete_entity(const entity_ha
 	return result;
 }
 
-void delete_entity_with_children(const entity_handle handle) {
-	if (handle.dead()) {
-		return;
-	}
-
-	reverse_perform_deletions(make_deletion_queue(handle), handle.get_cosmos());
-}
-
 void make_deletion_queue(
 	const const_entity_handle h,
 	deletion_queue& q
 ) {
+#if LOG_DELETIONS
+	LOG("Pushing to deletion queue: %x (root)", h);
+#endif
+
 	q.push_back({ h.get_id() });
 
 	h.for_each_child_entity_recursive([&](const child_entity_id descendant) {
 		q.push_back(descendant);
+
+#if LOG_DELETIONS
+		LOG("Pushing to deletion queue: %x (child)", h.get_cosmos()[descendant]);
+#endif
+
 		return callback_result::CONTINUE;
 	});
 }
@@ -268,16 +269,8 @@ void make_deletion_queue(
 }
 
 deletion_queue make_deletion_queue(const const_entity_handle h) {
-	thread_local deletion_queue q;
-	q.clear();
-
-	q.push_back({ h.get_id() });
-
-	h.for_each_child_entity_recursive([&](const child_entity_id descendant) {
-		q.push_back(descendant);
-		return callback_result::CONTINUE;
-	});
-
+	deletion_queue q;
+	make_deletion_queue(h, q);
 	return q;
 }
 

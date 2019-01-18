@@ -107,7 +107,7 @@ void demolitions_system::advance_cascade_explosions(const logic_step step) {
 				--cascade.explosions_left;
 
 				if (0 == cascade.explosions_left) {
-					step.post_message(messages::queue_deletion(it));
+					step.queue_deletion_of(it, "Cascade explosions exhausted");
 				}
 			}
 		}

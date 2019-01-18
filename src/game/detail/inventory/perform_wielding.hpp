@@ -28,6 +28,17 @@ void perform_wielding(
 		return;
 	}
 
+	auto& cosm = self.get_cosmos();
+
+	for (const auto& h : request.hand_selections) {
+		if (const auto& requested_item = cosm[h]) {
+			if (requested_item.get_owning_transfer_capability() != self) {
+				/* This is an invalid request. */
+				return;
+			}
+		}
+	}
+
 	auto swap_wielded = [&](const bool play_effects_at_all = true) {
 		wielding_result result;
 
@@ -68,7 +79,6 @@ void perform_wielding(
 		result.apply(step);
 	};
 
-	auto& cosm = self.get_cosmos();
 	const auto& selections = request.hand_selections;
 	const auto current_selection = wielding_setup::from_current(self);
 

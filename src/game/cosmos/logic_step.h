@@ -2,9 +2,12 @@
 #include "augs/misc/timing/delta.h"
 #include "game/cosmos/cosmic_entropy.h"
 #include "game/messages/will_soon_be_deleted.h"
+#include "game/messages/queue_deletion.h"
 #include "game/stateless_systems/destroy_system.h"
 #include "augs/misc/randomization_declaration.h"
 #include "game/cosmos/solvers/solve_structs.h"
+
+#define LOG_DELETIONS !IS_PRODUCTION_BUILD
 
 struct data_living_one_step;
 struct cosmos_common_significant;
@@ -92,19 +95,40 @@ public:
 
 	template <class T>
 	void post_message(T&& msg) const {
+		static_assert(!std::is_same_v<T, messages::queue_deletion>, "Use queue_deletion_of for better logging.");
+
 		transient.messages.post(std::forward<T>(msg));
 	}
 
 	template <class T>
 	void post_messages(const T& msgs) const {
+		static_assert(!std::is_same_v<typename T::value_type, messages::queue_deletion>, "Use queue_deletion_of for better logging.");
+
 		transient.messages.post(msgs);
 	}
 
 	template <class T>
 	void post_message_if(const std::optional<T>& msg) const {
+		static_assert(!std::is_same_v<T, messages::queue_deletion>, "Use queue_deletion_of for better logging.");
+
 		if (msg.has_value()) {
 			transient.messages.post(*msg);
 		}
+	}
+
+	template <class T>
+	void queue_deletion_of(T&& t, const char* const due_to) const {
+		(void)due_to;
+#if LOG_DELETIONS
+		if constexpr(std::is_same_v<T, entity_id>) {
+			LOG("Queuing deletion of %x (Due to %x): ", std::forward<T>(t), get_cosmos()[due_to]);
+		}
+		else {
+			LOG("Queuing deletion of %x (Due to %x): ", std::forward<T>(t), due_to);
+		}
+#endif
+
+		transient.messages.post(messages::queue_deletion(std::forward<T>(t)));
 	}
 
 	template <bool C = !is_const, class = std::enable_if_t<C>>

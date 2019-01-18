@@ -20,6 +20,8 @@ class write_synchronized_component_access {
 	template <class H>
 	friend void construct_pre_inference(H);
 
+	friend struct perform_transfer_impl;
+
 	write_synchronized_component_access() {}
 };
 

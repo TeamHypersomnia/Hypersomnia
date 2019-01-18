@@ -362,7 +362,7 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 
 						missile.saved_point_of_impact_before_death = current_tr;
 						detonate_if(it, current_tr.pos, step);
-						step.post_message(messages::queue_deletion(it));
+						step.queue_deletion_of(it, "Missile lifetime expiration");
 					}
 				}
 			}

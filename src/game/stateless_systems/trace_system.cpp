@@ -60,7 +60,7 @@ void trace_system::destroy_outdated_traces(const logic_step step) const {
 				trace.lengthening_time_passed_ms = trace.chosen_lengthening_duration_ms;
 
 				if (trace.is_it_a_finishing_trace) {
-					step.post_message(messages::queue_deletion(t));
+					step.queue_deletion_of(t, "Trace expiration");
 				}
 			}
 		}

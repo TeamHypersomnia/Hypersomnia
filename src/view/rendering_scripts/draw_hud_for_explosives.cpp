@@ -22,6 +22,7 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 	const auto tex = in.circular_bar_tex;
 	const auto t = in.only_type;
 	const auto clk = cosm.get_clock();
+	const auto global_time_seconds = in.global_time_seconds;
 
 	auto draw_circle_at = [&](const auto& tr, const auto highlight_amount, const rgba first_col, const rgba second_col) {
 		if (highlight_amount >= 0.f && highlight_amount <= 1.f) {
@@ -85,11 +86,11 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 							const auto when_started_arming = 
 								fuse.when_started_arming.was_set() ? 
 								fuse.when_started_arming.in_seconds(dt) :
-								in.global_time_seconds
+								global_time_seconds
 							;
 
 							const auto highlight_amount = static_cast<float>(
-								(in.global_time_seconds - when_started_arming)
+								(global_time_seconds - when_started_arming)
 								/ (fuse_def.arming_duration_ms / 1000.f) 
 							);
 
@@ -101,7 +102,7 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 
 			if (fuse.armed()) {
 				const auto highlight_amount = static_cast<float>(1 - (
-					(in.global_time_seconds - fuse.when_armed.in_seconds(dt))
+					(global_time_seconds - fuse.when_armed.in_seconds(dt))
 					/ (fuse_def.fuse_delay_ms / 1000.f) 
 				));
 

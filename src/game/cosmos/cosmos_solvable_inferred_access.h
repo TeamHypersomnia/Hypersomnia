@@ -32,5 +32,7 @@ class cosmos_solvable_inferred_access {
 	template <class>
 	friend class physics_mixin;
 
+	friend struct perform_transfer_impl;
+
 	cosmos_solvable_inferred_access() {}
 };

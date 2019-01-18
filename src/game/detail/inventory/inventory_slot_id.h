@@ -10,11 +10,11 @@
 template <class id_type>
 struct basic_inventory_slot_id {
 	// GEN INTROSPECTOR struct basic_inventory_slot_id class id_type
-	slot_function type;
+	slot_function type = slot_function::INVALID;
 	id_type container_entity;
 	// END GEN INTROSPECTOR
 
-	basic_inventory_slot_id();
+	basic_inventory_slot_id() = default;
 	basic_inventory_slot_id(const slot_function, const id_type);
 
 	bool is_set() const;
@@ -23,6 +23,8 @@ struct basic_inventory_slot_id {
 
 	bool operator==(const basic_inventory_slot_id b) const;
 	bool operator!=(const basic_inventory_slot_id b) const;
+
+	bool is_valid() const;
 };
 
 struct inventory_item_address {

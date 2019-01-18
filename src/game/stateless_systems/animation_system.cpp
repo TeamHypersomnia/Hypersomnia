@@ -26,7 +26,7 @@ void animation_system::advance_stateful_animations(const logic_step step) const 
 	const auto& logicals = cosm.get_logical_assets();
 
 	cosm.for_each_having<components::animation>(
-		[&](const auto t) {
+		[&](const auto& t) {
 			auto& animation = t.template get<components::animation>();
 			const auto& animation_def = t.template get<invariants::animation>();
 
@@ -44,7 +44,7 @@ void animation_system::advance_stateful_animations(const logic_step step) const 
 					);
 
 					if (finished) {
-						step.post_message(messages::queue_deletion(t.get_id()));
+						step.queue_deletion_of(t, "Animation has finished");
 					}
 				}
 			}

@@ -30,7 +30,9 @@ void drop_from_all_slots(const invariants::container& container, const entity_ha
 }
 
 void perform_transfer_result::notify_logical(const logic_step step) const {
-	step.post_message_if(destructed);
+	if (destructed) {
+		step.queue_deletion_of(*destructed, "Post-transfer deletion");
+	}
 }
 
 void perform_transfer_result::notify(const logic_step step) const {
@@ -69,15 +71,16 @@ perform_transfer_result perform_transfer_no_step(
 	const item_slot_transfer_request r, 
 	cosmos& cosm
 ) {
-	return cosm[r.item].get<components::item>().perform_transfer(r, cosm);
+	return perform_transfer_impl()(r, cosm);
 }
 
-perform_transfer_result perform_transfer_impl(
-	const write_synchronized_component_access access,
-	const cosmos_solvable_inferred_access inferred_access,
+perform_transfer_result perform_transfer_impl::operator()(
 	const item_slot_transfer_request r, 
 	cosmos& cosm
-) {
+) const {
+	const auto access = write_synchronized_component_access();
+	const auto inferred_access = cosmos_solvable_inferred_access();
+
 	auto deguidize = [&](const auto s) {
 		/* No-op */
 		return s;

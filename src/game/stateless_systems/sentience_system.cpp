@@ -261,7 +261,7 @@ static void handle_special_result(const logic_step step, const messages::health_
 		personal_electricity.value = 0.f;
 
 		if (const auto active_absorption = ::find_active_pe_absorption(subject)) {
-			step.post_message(messages::queue_deletion(active_absorption->second));
+			step.queue_deletion_of(active_absorption->second, "Absorption provider destructed due to PE destruction");
 		}
 	}
 	else if (h.special_result == messages::health_event::result_type::DEATH) {
