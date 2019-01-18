@@ -165,7 +165,8 @@ void for_each_intersection_with_triangle(
 	const b2Filter filter,
 	F callback
 ) {
-	const auto null_transform = b2Transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
+	b2Transform null_transform;
+	null_transform.SetIdentity();
 
 	for_each_intersection_with_shape_meters(
 		b2world,
@@ -213,7 +214,9 @@ void for_each_intersection_with_polygon(
 		return poly_shape;
 	}();
 
-	const auto queried_transform = b2Transform(b2Vec2(average_meters), b2Rot(0.f));
+	b2Transform queried_transform;
+	queried_transform.SetIdentity();
+	queried_transform.p = b2Vec2(average_meters);
 
 	for_each_intersection_with_shape_meters(
 		b2world,

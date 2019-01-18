@@ -2903,3 +2903,8 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- we'll need a portable uniform float distribution
 
 - fix bounds editing of position variations in light
+
+- don't use degrees_between in fish logic
+	- just use dots and crosses
+	- look for more occurences of this
+

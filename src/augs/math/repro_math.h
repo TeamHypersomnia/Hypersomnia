@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/build_settings/compiler_defines.h"
 
-#define USE_STREFLOP 1
+#define USE_STREFLOP 0
 
 #if FORCE_DISABLE_STREFLOP
 #undef USE_STREFLOP

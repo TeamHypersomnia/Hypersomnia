@@ -445,7 +445,7 @@ return {
       x = 1200,
       y = 700
     },
-	vsync_mode = "ADAPTIVE"
+	vsync_mode = "OFF"
   },
   faction_view = {
 	colors = {

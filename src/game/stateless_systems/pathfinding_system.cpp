@@ -274,7 +274,8 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 						sensor_edge.Set(si.get_meters(b2Vec2(nav.location)), si.get_meters(b2Vec2(nav.sensor)));
 
 						/* prepare null transform, both bodies are already in the same frame of reference */
-						b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
+						b2Transform null_transform;
+						null_transform.SetIdentity();
 
 						/* if shortest distance between body and sensor fits in distance_navpoint_hit */
 						if (b2TestOverlap(&sensor_edge, 0, &body_poly, 0, null_transform, null_transform, si.get_meters(pathfinding.distance_navpoint_hit))) {
@@ -517,7 +518,8 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 								/* we don't need to transform edge or ray since they are in the same space
 								but we have to prepare dummy b2Transform as argument for b2EdgeShape::RayCast
 								*/
-								b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
+								b2Transform null_transform;
+								null_transform.SetIdentity();
 
 								if (marked_hole.RayCast(&output, input, null_transform, 0)) {
 									rays_hit = false;

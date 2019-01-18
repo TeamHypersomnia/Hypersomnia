@@ -41,7 +41,7 @@ void ensure_float_flags_hold() {
 #include <random>
 
 #if PLATFORM_UNIX
-#define CANONICAL_RESULT "11000110001101111100111000111011"
+#define CANONICAL_RESULT "11000110000100100001100011100101"
 #elif PLATFORM_WINDOWS
 #define CANONICAL_RESULT "11000101110000011001110101001110"
 #endif
@@ -78,7 +78,7 @@ bool perform_float_consistency_tests() {
 		real32 total = 0.f;
 
 		for (int i = 0; i < num_operations; ++i) {
-			const auto opcode = rng.randval(0, 19);
+			const auto opcode = rng.randval(0, 20);
 
 			real32 r = 0.f;
 
@@ -99,7 +99,7 @@ bool perform_float_consistency_tests() {
 					r = rng.randval(0.f, 10.f) / 0.f;
 					break;
 				case 5:
-					r = repro::sqrt(rng.randval(-30.f, -54.f));
+					r = repro::sqrt(rng.randval(0.f, 5400.f));
 					break;
 				case 6:
 					r = repro::sin(rng.randval(-1000.f, 1000.f));
@@ -142,6 +142,9 @@ bool perform_float_consistency_tests() {
 					break;
 				case 19:
 					r = repro::pow(rng.randval(1.f, 8.f), rng.randval(-2.f, 2.f));
+					break;
+				case 20:
+					r = repro::sqrt(rng.randval(-5400.f, 0.f));
 					break;
 
 				default:

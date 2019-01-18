@@ -949,7 +949,8 @@ void visibility_system::calc_visibility(
 					/* we don't need to transform edge or ray since they are in the same space
 					but we have to prepare dummy b2Transform as argument for b2EdgeShape::RayCast
 					*/
-					b2Transform null_transform(b2Vec2(0.f, 0.f), b2Rot(0.f));
+					b2Transform null_transform;
+					null_transform.SetIdentity();
 
 					return (marked_hole.RayCast(&output, input, null_transform, 0));
 				}), discs_copy.end());

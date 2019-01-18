@@ -23,6 +23,9 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 	auto& npo = cosm.get_solvable_inferred({}).tree_of_npo;
 
+	static const auto fov_half_degrees = real32((360 - 90) / 2);
+	static const auto fov_half_degrees_cos = repro::cos(fov_half_degrees);
+
 	cosm.for_each_having<components::movement_path>(
 		[&](const auto subject) {
 			const auto& movement_path_def = subject.template get<invariants::movement_path>();
@@ -56,7 +59,6 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				const auto boost_mult = static_cast<real32>(global_time_sine * global_time_sine);
 				const auto speed_boost = boost_mult * max_speed_boost;
 
-				const auto fov_half_degrees = real32((360 - 90) / 2);
 				const auto max_avoidance_speed = 20 + speed_boost / 2;
 				const auto max_startle_speed = 250 + 4*speed_boost;
 				const auto max_lighter_startle_speed = 200 + 4*speed_boost;
@@ -96,11 +98,11 @@ void movement_path_system::advance_paths(const logic_step step) const {
 							}
 
 							const auto neighbor_tip = *typed_neighbor.find_logical_tip();
-							const auto offset = neighbor_tip - tip_pos;
+							const auto offset_dir = (neighbor_tip - tip_pos).normalize();
 
-							const auto facing = current_dir.degrees_between(offset);
+							const auto facing = current_dir.dot(offset_dir);
 
-							if (facing < fov_half_degrees) {
+							if (facing < fov_half_degrees_cos) {
 								callback(typed_neighbor);
 							}
 						});
