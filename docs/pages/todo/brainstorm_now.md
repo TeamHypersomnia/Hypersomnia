@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- minimize use of b2Rot() constructor for angle, use SetIdentity
 - separate slot for the bomb, OVER_SHOULDER
 
 - bug: after knockout, some weapons remain tied to the player

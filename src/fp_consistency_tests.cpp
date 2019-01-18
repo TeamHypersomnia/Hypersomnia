@@ -14,13 +14,25 @@
 
 static_assert(std::is_same_v<streflop::Simple, float>);
 
+#if !USE_STREFLOP
+#include <cfenv>
+#endif
+
 void setup_float_flags() {
+#if USE_STREFLOP
 	streflop::fesetround(streflop::FE_TONEAREST);
 	streflop::streflop_init<streflop::Simple>();
+#else
+	std::fesetround(FE_TONEAREST);
+#endif
 }
 
 void ensure_float_flags_hold() {
+#if USE_STREFLOP
 	ensure_eq(streflop::fegetround(), streflop::FE_TONEAREST);
+#else
+	ensure_eq(std::fegetround(), FE_TONEAREST);
+#endif
 }
 
 #include <thread>

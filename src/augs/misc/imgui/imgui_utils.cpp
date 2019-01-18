@@ -13,6 +13,7 @@
 
 using namespace ImGui;
 
+#if PLATFORM_UNIX
 static const char* augs_GetClipboardText(void*) {
 	thread_local std::string sss;
 	sss = augs::get_clipboard_data();
@@ -22,6 +23,7 @@ static const char* augs_GetClipboardText(void*) {
 static void augs_SetClipboardText(void*, const char* text) {
 	augs::set_clipboard_data(text);
 }
+#endif
 
 namespace augs {
 	namespace imgui {
