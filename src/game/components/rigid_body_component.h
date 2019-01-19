@@ -72,7 +72,7 @@ namespace components {
 		physics_engine_transforms physics_transforms;
 
 		vec2 velocity;
-		float angular_velocity = 0.f;
+		real32 angular_velocity = 0.f;
 
 		special_physics special;
 

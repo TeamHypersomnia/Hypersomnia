@@ -180,6 +180,7 @@ void entity_deleter(
 	auto& cosm = handle.get_cosmos();
 
 	if (handle.dead()) {
+		LOG("WARNING! Trying to delete an entity that is dead already: %x.", handle.get_id());
 		return;
 	}
 
@@ -241,6 +242,11 @@ void make_deletion_queue(
 	const const_entity_handle h,
 	deletion_queue& q
 ) {
+	if (h.dead()) {
+		LOG("WARNING! Trying to make a deletion queue out of a dead entity.");
+		return;
+	}
+
 #if LOG_DELETIONS
 	LOG("Pushing to deletion queue: %x (root)", h);
 #endif

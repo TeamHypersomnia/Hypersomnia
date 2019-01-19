@@ -67,7 +67,7 @@ public:
 	const cosmos_solvable_significant& initial_signi;
 
 	template <class T>
-	void assign_all_solvables(const T& from) const {
+	void assign_all_solvables(const T& from) {
 		advanced_cosm.assign_solvable(from.advanced_cosm);
 		current_mode = from.current_mode;
 	}

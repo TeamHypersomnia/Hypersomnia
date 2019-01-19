@@ -211,6 +211,11 @@ message_handler_result client_setup::handle_server_message(
 		LOG("Received client id: %x", client_player_id);
 
 		state = client_state_type::IN_GAME;
+
+		auto predicted = get_arena_handle(client_arena_type::PREDICTED);
+		const auto referential = get_arena_handle(client_arena_type::REFERENTIAL);
+
+		predicted.assign_all_solvables(referential);
 	}
 #if CONTEXTS_SEPARATE
 	else if constexpr (std::is_same_v<T, prestep_client_context>) {
@@ -242,7 +247,7 @@ message_handler_result client_setup::handle_server_message(
 			};
 
 			receiver.acquire_next_server_entropy(payload.context);
-			receiver.acquire_next_server_entropy(payload.payload.unpack(mode_id_to_entity_id));
+			receiver.acquire_next_server_entropy(payload.meta, payload.payload.unpack(mode_id_to_entity_id));
 		}
 
 		const auto& max_commands = vars.max_buffered_server_commands;

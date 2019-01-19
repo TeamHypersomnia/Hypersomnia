@@ -2911,3 +2911,8 @@ i			- if the newly calculated target is different than last_reload_target, reset
 ## About this: we just flush the queues
 
 ## Rest
+
+- Why does the client play bomb being dropped after having received the initial state?
+	- Does it simulate something?
+	- it simulates the predicted world in the meantime.
+

@@ -360,6 +360,8 @@ void server_setup::advance_clients_state() {
 					sent_client_id
 				}
 			);
+
+			LOG("Sending initial payload for %x at step: %x", client_id, scene.world.get_total_steps_passed());
 		};
 
 		if (!added_someone_already) {
@@ -473,6 +475,19 @@ void server_setup::handle_client_messages() {
 void server_setup::send_server_step_entropies(const compact_server_step_entropy& total_input) {
 	networked_server_step_entropy total;
 	total.payload = total_input;
+
+	total.meta.state_hash = [&]() -> decltype(total.meta.state_hash) {
+		auto& ticks_remaining = ticks_until_sending_hash;
+
+		if (ticks_remaining == 0) {
+			ticks_remaining = vars.state_hash_once_every_tick;
+			--ticks_remaining;
+
+			return get_arena_handle().get_cosmos().calculate_solvable_signi_hash<uint32_t>();
+		}
+
+		return std::nullopt;
+	}();
 
 	for (auto& c : clients) {
 		if (!c.is_set()) {
@@ -656,6 +671,22 @@ TEST_CASE("NetSerialization EmptyEntropies") {
 	}
 
 	{
+		net_messages::server_step_entropy ss;
+		ss.Release();
+
+		{
+			REQUIRE(ss.bytes.size() == 0);
+
+			networked_server_step_entropy sent;
+			sent.meta.state_hash = 0xdeadbeef;
+			ss.write_payload(sent);
+
+			/* One byte for num of entropies accepted, second byte for signifying empty entropy and existent hash, additional bytes for hash */
+			REQUIRE(ss.bytes.size() == 2 + sizeof(decltype(sent.meta.state_hash)::value_type));
+		}
+	}
+
+	{
 		net_messages::client_entropy ss;
 		ss.Release();
 
@@ -727,6 +758,7 @@ TEST_CASE("NetSerialization ServerEntropySecond") {
 	ss.Release();
 
 	networked_server_step_entropy sent;
+	sent.meta.state_hash = 0xdeadbeef;
 
 	const auto naive_bytes = [&]() {
 		total_mode_player_entropy t;

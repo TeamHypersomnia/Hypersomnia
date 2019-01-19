@@ -80,13 +80,28 @@ struct compact_server_step_entropy {
 	}
 };
 
+struct server_step_entropy_meta {
+	static constexpr bool force_read_field_by_field = true;
+
+	// GEN INTROSPECTOR struct server_step_entropy_meta
+	std::optional<uint32_t> state_hash;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const server_step_entropy_meta& b) const {
+		return state_hash == b.state_hash;
+	}
+};
+
 struct networked_server_step_entropy {
+	static constexpr bool force_read_field_by_field = true;
+
 	// GEN INTROSPECTOR struct networked_server_step_entropy
 	prestep_client_context context;
+	server_step_entropy_meta meta;
 	compact_server_step_entropy payload;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const networked_server_step_entropy& b) const {
-		return context == b.context && payload == b.payload;
+		return context == b.context && meta == b.meta && payload == b.payload;
 	}
 };

@@ -72,6 +72,7 @@ class server_setup :
 	augs::propagate_const<std::unique_ptr<server_adapter>> server;
 	std::array<server_client_state, max_incoming_connections_v> clients;
 	unsigned ticks_until_sending_packets = 0;
+	unsigned ticks_until_sending_hash = 0;
 
 	std::vector<internal_net_message_id> broadcasted_steps;
 

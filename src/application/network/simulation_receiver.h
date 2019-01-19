@@ -22,6 +22,7 @@ struct misprediction_candidate_entry {
 struct steps_unpacking_result {
 	bool should_repredict = false;
 	bool malicious_server = false;
+	bool desync = false;
 	std::size_t total_accepted = static_cast<std::size_t>(-1);
 };
 
@@ -65,8 +66,13 @@ private:
 
 public:
 
+	struct incoming_entropy_entry {
+		server_step_entropy_meta meta;
+		received_entropy_type payload;
+	};
+
 	std::vector<prestep_client_context> incoming_contexts;
-	std::vector<received_entropy_type> incoming_entropies;
+	std::vector<incoming_entropy_entry> incoming_entropies;
 	std::vector<simulated_entropy_type> predicted_entropies;
 
 	bool schedule_reprediction = false;
@@ -77,8 +83,11 @@ public:
 		predicted_entropies.clear();
 	}
 
-	void acquire_next_server_entropy(const received_entropy_type& step) {
-		incoming_entropies.push_back(step);
+	void acquire_next_server_entropy(
+		const server_step_entropy_meta& meta,
+		const received_entropy_type& payload
+	) {
+		incoming_entropies.push_back({meta, payload});
 
 		if (incoming_contexts.size() < incoming_entropies.size()) {
 			incoming_contexts.emplace_back();
@@ -134,23 +143,40 @@ public:
 			for (std::size_t i = 0; i < entropies.size(); ++i) {
 				/* If a new player was added, always reinfer. */
 				const auto& actual_server_step = entropies[i];
-				const bool shall_reinfer = logically_set(actual_server_step.general.added_player);
+				const auto& actual_server_entropy = actual_server_step.payload;
+				const bool shall_reinfer = logically_set(actual_server_entropy.general.added_player);
+
+				auto& referential_cosmos = referential_arena.get_cosmos();
 
 				{
-					auto& referential_cosmos = referential_arena.get_cosmos();
+					const auto received_hash = actual_server_step.meta.state_hash;
 
+					if (received_hash != std::nullopt) {
+						const auto client_state_hash = 
+							referential_cosmos.template calculate_solvable_signi_hash<uint32_t>()
+						;
+
+						if (*received_hash != client_state_hash) {
+							result.desync = true;
+							clear();
+							return result;
+						}
+					}
+				}
+
+				{
 					if (shall_reinfer) {
 						LOG("Added player in the next entropy. Will reinfer to sync.");
 						cosmic::reinfer_solvable(referential_cosmos);
 					}
 
-					advance_referential(actual_server_step);
+					advance_referential(actual_server_entropy);
 				}
 
 				if (!repredict) {
-					const auto& predicted_server_step = predicted_entropies[p_i];
+					const auto& predicted_server_entropy = predicted_entropies[p_i];
 
-					if (shall_reinfer || !(actual_server_step == predicted_server_step)) {
+					if (shall_reinfer || !(actual_server_entropy == predicted_server_entropy)) {
 						repredict = true;
 					}
 				}

@@ -6,8 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Why does the client play bomb being dropped after having received the initial state?
-	- Does it simulate something?
+- instead of notify_gui, have more flags, e.g. for pickup notifications
+	- pickups are not that predictable after all
+
+- Once we could reproduce a desync right after a connection, so is it a problem with connection init?
 
 - We totally need a hash comparison so we know right away what causes a desync
 
@@ -21,9 +23,6 @@ summary: That which we are brainstorming at the moment.
 - Wields might have occured for items that do not exist already.
 	- Especially after they get deleted
 	- Wields must be checked if targets belong to the entity
-
-- instead of notify_gui, have more flags, e.g. for pickup notifications
-	- pickups are not that predictable after all
 
 - We could opt for a longer float test running in the background for a second or two
 

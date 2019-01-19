@@ -17,6 +17,20 @@ cosmos::cosmos(const cosmic_pool_size_type reserved_entities)
 
 const cosmos cosmos::zero = {};
 
+template <class T>
+T cosmos::calculate_solvable_signi_hash() const {
+	if constexpr(std::is_same_v<T, uint32_t>) {
+		return 0u;
+	}
+	else {
+		static_assert(always_false_v<T>, "Unsupported hash type.");
+	}
+
+	return 0u;
+}
+
+template uint32_t cosmos::calculate_solvable_signi_hash() const;
+
 std::string cosmos::summary() const {
 	return typesafe_sprintf("Entities: %x\n", get_entities_count());
 }

@@ -491,7 +491,8 @@ return {
 	  duplicates_percent = 1,
 	},
 
-	max_buffered_client_commands = 255
+	max_buffered_client_commands = 255,
+	state_hash_once_every_tick = 1
   },
 
   dedicated_server = {

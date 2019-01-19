@@ -296,4 +296,7 @@ public:
 	void set_fixed_delta(const augs::delta& dt);
 
 	void assign_solvable(const cosmos& b);
+
+	template <class T>
+	T calculate_solvable_signi_hash() const;
 };

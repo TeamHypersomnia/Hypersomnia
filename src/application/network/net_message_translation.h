@@ -271,6 +271,11 @@ namespace net_messages {
 		}
 #endif
 
+		auto& state_hash = total_networked.meta.state_hash;
+		bool has_state_hash = logically_set(state_hash);
+
+		serialize_bool(s, has_state_hash);
+
 		bool has_players = logically_set(i.players);
 		bool has_added_player = logically_set(g.added_player);
 		bool has_removed_player = logically_set(g.removed_player);
@@ -282,6 +287,17 @@ namespace net_messages {
 		serialize_bool(s, has_special_command);
 
 		serialize_align(s);
+
+		if (has_state_hash) {
+			if (state_hash == std::nullopt) {
+				state_hash.emplace();
+			}
+
+			serialize_uint32(s, *state_hash);
+		}
+		else {
+			state_hash = std::nullopt;
+		}
 
 		if (has_players) {
 			auto& p = i.players;

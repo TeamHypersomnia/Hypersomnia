@@ -336,6 +336,15 @@ public:
 						log_malicious_server();
 						disconnect();
 					}
+
+					if (result.desync) {
+						last_disconnect_reason = typesafe_sprintf(
+							"The client has desynchronized from the server."
+						);
+
+						disconnect();
+						ensure(false);
+					}
 				}
 
 				auto scope = measure_scope(performance.stepping_forward);
