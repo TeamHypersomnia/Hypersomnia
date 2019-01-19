@@ -13,6 +13,7 @@
 
 /* Prediction is too costly in debug builds. */
 #define USE_CLIENT_PREDICTION NDEBUG
+#define TEST_DESYNC_DETECTION 0
 
 struct misprediction_candidate_entry {
 	entity_id id;
@@ -152,11 +153,29 @@ public:
 					const auto received_hash = actual_server_step.meta.state_hash;
 
 					if (received_hash != std::nullopt) {
+#if TEST_DESYNC_DETECTION
+						if (referential_cosmos.get_total_steps_passed() == 2000) {
+							const auto it = referential_cosmos[locally_controlled_entity];
+
+							auto& s = it.template get<components::sentience>();
+							s.template get<health_meter_instance>().maximum += 1.f;
+						}
+						else {
+							LOG_NVPS(referential_cosmos.get_total_steps_passed());
+						}
+#endif
+
 						const auto client_state_hash = 
 							referential_cosmos.template calculate_solvable_signi_hash<uint32_t>()
 						;
 
 						if (*received_hash != client_state_hash) {
+							LOG(
+								"Client desynchronized. Hashes differ.\nExpected: %x\nActual: %x\n",
+							   	*received_hash,
+							   	client_state_hash
+							);
+
 							result.desync = true;
 							clear();
 							return result;

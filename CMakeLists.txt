@@ -653,6 +653,8 @@ set(HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
 	"src/3rdparty/imgui/imgui_draw.cpp"
 	"src/3rdparty/imgui/imgui_demo.cpp"
 	"src/augs/misc/imgui/addons/imguitabwindow/imguitabwindow.cpp"
+
+	"src/3rdparty/crc32/crc32.c"
 )
 
 # These headers will be input to the Introspector-generator.

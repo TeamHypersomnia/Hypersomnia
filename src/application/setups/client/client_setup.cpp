@@ -353,7 +353,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 		}
 		else if (client->has_connection_failed()) {
 			if (state == C::IN_GAME) {
-				text("You have been kicked from the server.");
+				text("Server is shutting down.");
 
 				print_reason_if_any();
 

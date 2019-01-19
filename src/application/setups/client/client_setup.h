@@ -343,7 +343,6 @@ public:
 						);
 
 						disconnect();
-						ensure(false);
 					}
 				}
 

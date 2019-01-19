@@ -1,3 +1,5 @@
+#include "3rdparty/crc32/crc32.h"
+
 #include "augs/readwrite/memory_stream.h"
 
 #include "augs/misc/randomization.h"
@@ -11,6 +13,8 @@
 #include "augs/readwrite/lua_readwrite.h"
 #include "augs/readwrite/byte_readwrite.h"
 
+#include "game/cosmos/for_each_entity.h"
+
 cosmos::cosmos(const cosmic_pool_size_type reserved_entities) 
 	: solvable(reserved_entities) 
 {}
@@ -20,7 +24,23 @@ const cosmos cosmos::zero = {};
 template <class T>
 T cosmos::calculate_solvable_signi_hash() const {
 	if constexpr(std::is_same_v<T, uint32_t>) {
-		return 0u;
+		augs::memory_stream ss;
+
+		augs::write_bytes(ss, get_clock());
+		augs::write_bytes(ss, get_entities_count());
+
+		for_each_having<components::sentience>(
+			[&](const auto& it) {
+				const auto& b = it.template get<components::rigid_body>();
+				const auto& c = b.get_raw_component();
+				const auto& s = it.template get<components::sentience>();
+
+				augs::write_bytes(ss, c);
+				augs::write_bytes(ss, s.meters);
+			}
+		);
+
+		return crc32buf(reinterpret_cast<char*>(ss.data()), ss.get_write_pos());
 	}
 	else {
 		static_assert(always_false_v<T>, "Unsupported hash type.");
