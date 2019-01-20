@@ -141,7 +141,7 @@ public:
 	}
 
 	auto get_interpolation_ratio() const {
-		const auto dt =  get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
+		const auto dt = get_viewed_cosmos().get_fixed_delta().in_seconds<double>();
 		return std::min(1.0, (get_current_time() - server_time) / dt);
 	}
 

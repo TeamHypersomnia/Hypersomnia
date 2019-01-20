@@ -1,5 +1,5 @@
 #pragma once
-#include <unordered_map>
+#include <map>
 #include "augs/misc/constant_size_vector.h"
 #include "augs/misc/pool/pool.h"
 
@@ -21,7 +21,7 @@ struct cosmos_solvable_significant {
 	all_entity_pools entity_pools;
 	cosmos_clock clk;
 
-	std::unordered_map<entity_id, entity_name_str> specific_names;
+	std::map<entity_id, entity_name_str> specific_names;
 	cosmos_global_solvable global;
 	// END GEN INTROSPECTOR
 

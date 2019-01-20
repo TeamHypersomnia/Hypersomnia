@@ -40,7 +40,7 @@ real32 basic_randomization<T>::randval(
 		return min;
 	}
 
-	return streflop::RandomII<real32>(min, max, generator);
+	return streflop::RandomIE<real32>(min, max, generator);
 }
 
 template <class T>

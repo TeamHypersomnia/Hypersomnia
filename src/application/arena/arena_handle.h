@@ -105,7 +105,7 @@ public:
 				return 1.0;
 			}
 			else {
-				const auto current_logic_speed = m.round_speeds.logic_speed_mult;
+				const auto current_logic_speed = static_cast<double>(m.round_speeds.logic_speed_mult);
 				const auto chosen_audiovisual_speed = rules.view.audiovisual_speed;
 
 				return std::max(current_logic_speed, chosen_audiovisual_speed);

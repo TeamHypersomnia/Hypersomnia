@@ -4,10 +4,9 @@
 
 namespace augs {
 	template <class T, class... SaverArgs>
-	void save_as_lua_table(
+	auto to_lua_string(
 		sol::state& lua,
 		T&& object, 
-		const path_type& target_path, 
 		SaverArgs&&... args
 	) {
 		auto output_table = lua.create_named_table("my_table");
@@ -18,8 +17,20 @@ namespace augs {
 			std::forward<SaverArgs>(args)...
 		);
 
-		const auto file_contents = std::string("return ") + serialized_table;
-		save_as_text(target_path, file_contents);
+		return std::string("return ") + serialized_table;
+	}
+
+	template <class T, class... SaverArgs>
+	void save_as_lua_table(
+		sol::state& lua,
+		T&& object, 
+		const path_type& target_path, 
+		SaverArgs&&... args
+	) {
+		save_as_text(
+			target_path, 
+			to_lua_string(lua, object, std::forward<SaverArgs>(args)...)
+		);
 	}
 
 	template <class T>

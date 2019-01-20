@@ -6,7 +6,7 @@ namespace augs {
 	struct speed_vars {
 		// GEN INTROSPECTOR struct augs::speed_vars
 		unsigned tickrate = 60u;
-		real64 logic_speed_mult = 1.0; 
+		real32 logic_speed_mult = 1.f;
 		// END GEN INTROSPECTOR
 
 		auto calc_inv_tickrate() const {
@@ -18,11 +18,11 @@ namespace augs {
 		}
 
 		auto calc_fixed_delta() const {
-			if (logic_speed_mult == 1.0) {
+			if (logic_speed_mult == 1.f) {
 				return calc_ticking_delta();
 			}
 
-			return augs::delta::from_milliseconds(logic_speed_mult * real64(1000.0) / tickrate);
+			return augs::delta::from_milliseconds(logic_speed_mult * real32(1000.f) / tickrate);
 		}
 	};
 }

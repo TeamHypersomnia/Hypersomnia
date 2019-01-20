@@ -372,8 +372,8 @@ public:
 	bool should_commence_when_ready = false;
 	real32 commencing_timer_ms = -1.f;
 	unsigned current_num_bots = 0;
-	augs::speed_vars round_speeds;
 	entity_id bomb_detonation_theme;
+	augs::speed_vars round_speeds;
 	// END GEN INTROSPECTOR
 
 	mode_player_id add_player(input, const entity_name_str& chosen_name);

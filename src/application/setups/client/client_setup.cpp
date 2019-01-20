@@ -28,6 +28,8 @@ client_setup::client_setup(
 }
 
 void client_setup::init_connection(const client_start_input& in) {
+	LOG("Initializing connection with %x", in.ip_port);
+
 	last_start = in;
 
 	state = client_state_type::INVALID;
@@ -280,7 +282,131 @@ void client_setup::handle_server_messages() {
 	client->advance(client_time, message_handler);
 }
 
+#define STRESS_TEST_ARENA_SERIALIZATION 0
+#if STRESS_TEST_ARENA_SERIALIZATION
+#include <random>
+#include "augs/readwrite/lua_file.h"
+#include <sys/types.h>
+#include <unistd.h>
+#include "augs/readwrite/to_bytes.h"
+#endif
+
 void client_setup::send_pending_commands() {
+#if STRESS_TEST_ARENA_SERIALIZATION
+	static auto ndt_rng = randomization(std::random_device()());
+
+	const auto times = ndt_rng.randval(0, 4);
+
+	if (times > 0) {
+		const auto this_nickname = [&]() {
+			if (const auto ch = get_viewed_character()) {
+				return ch.get_name();
+			}
+
+			return std::string("noentity");
+		}();
+			
+		const auto pid = ::getpid();
+
+		const auto preffix = this_nickname + "_" + std::to_string(pid) + "_";
+
+		const auto original_signi = scene.world.get_solvable().significant;
+		const auto original_signi_bytes = augs::to_bytes(original_signi);
+
+		const auto original_mode = current_mode;
+		const auto original_mode_bytes = augs::to_bytes(original_mode);
+
+		uint32_t exchanged_client_id = 0xdeadbeef;
+
+		std::vector<std::byte> initial_buf;
+
+		for (int i = 0; i < times; ++i) {
+			net_messages::initial_arena_state ss;
+			ss.Release();
+
+			auto write_all = [&]() {
+				return ss.write_payload(
+					buffers,
+
+					initial_arena_state_payload<true> {
+						scene.world.get_solvable().significant,
+						current_mode,
+						exchanged_client_id
+					}
+				);
+			};
+
+			auto written = write_all();
+
+			if (initial_buf.empty()) {
+				initial_buf = *written;
+			}
+			else {
+				if (initial_buf != *written) {
+					auto as_text = [&](const auto& bytes) {
+						std::string ss;
+
+						for (const auto& b : bytes) {
+							ss += std::to_string(int(b)) + "\n";
+						}
+
+						return ss;
+					};
+
+					auto make_path = [&](const auto& of) {
+						return augs::path_type(preffix + of);
+					};
+
+					const auto& tampered_signi = scene.world.get_solvable().significant;
+					const auto& tampered_mode = current_mode;
+
+					augs::save_as_text(make_path("original_signi_bytes.txt"), as_text(original_signi_bytes));
+					augs::save_as_text(make_path("tampered_signi_bytes.txt"), as_text(augs::to_bytes(tampered_signi)));
+
+					augs::save_as_text(make_path("original_mode_bytes.txt"), as_text(original_mode_bytes));
+					augs::save_as_text(make_path("tampered_mode_bytes.txt"), as_text(augs::to_bytes(tampered_mode)));
+
+					augs::save_as_text(make_path("original_bytes.txt"), as_text(initial_buf));
+					augs::save_as_text(make_path("tampered_bytes.txt"), as_text(*written));
+
+					augs::save_as_lua_table(lua, original_signi, make_path("original_signi.lua"));
+					augs::save_as_lua_table(lua, original_mode, make_path("original_mode.lua"));
+
+					augs::save_as_lua_table(lua, tampered_signi, make_path("tampered_signi.lua"));
+					augs::save_as_lua_table(lua, tampered_mode, make_path("tampered_mode.lua"));
+
+					ensure(false && "The serialization cycle is unstable. This might be a cause for indeterminism.");
+				}
+			}
+
+			auto read_all = [&]() {
+				cosmic::change_solvable_significant(
+					scene.world, 
+					[&](cosmos_solvable_significant& signi) {
+						ss.AttachBlock(yojimbo::GetDefaultAllocator(), reinterpret_cast<uint8_t*>(initial_buf.data()), initial_buf.size());
+
+						ss.read_payload(
+							buffers,
+
+							initial_payload {
+								signi,
+								current_mode,
+								exchanged_client_id
+							}
+						);
+
+						ss.DetachBlock();
+
+						return changer_callback_result::DONT_REFRESH;
+					}
+				);
+			};
+
+			read_all();
+		}
+	}
+#endif
+
 	using C = client_state_type;
 
 	const bool init_send = state == C::INVALID;

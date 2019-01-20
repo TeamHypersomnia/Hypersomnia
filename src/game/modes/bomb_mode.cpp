@@ -473,7 +473,10 @@ mode_entity_id bomb_mode::lookup(const mode_player_id& id) const {
 }
 
 void bomb_mode::reshuffle_spawns(const cosmos& cosm, const faction_type faction) {
-	auto rng = randomization(get_step_rng_seed(cosm) + static_cast<int>(faction));
+	const auto reshuffle_seed = get_step_rng_seed(cosm) + static_cast<unsigned>(faction);
+	LOG_NVPS(reshuffle_seed);
+
+	auto rng = randomization(reshuffle_seed);
 
 	auto& faction_state = factions[faction];
 
@@ -951,10 +954,10 @@ void bomb_mode::count_knockout(const input_type in, const entity_id victim, cons
 	bomb_mode_knockout ko;
 
 	for (const auto& candidate : assists) {
-		if (const auto who = cosm[candidate.who]) {
-			if (who != knockouter) {
+		if (const auto candidate_assistant = cosm[candidate.who]) {
+			if (candidate_assistant != knockouter) {
 				if (candidate.amount >= in.rules.minimal_damage_for_assist) {
-					ko.assist = lookup(cosm[assists.front().who]);
+					ko.assist = lookup(candidate_assistant);
 					break;
 				}
 			}
@@ -1784,10 +1787,14 @@ void bomb_mode::mode_post_solve(const input_type in, const mode_entropy& entropy
 					count_knockout(in, victim, victim.get<components::sentience>());
 				};
 
-				if (e.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS) {
-					make_it_count();
-				}
-				else if (e.special_result == messages::health_event::result_type::DEATH) {
+				/*
+					For now, loss of consciousness does not imply a knockout.
+
+					if (e.special_result == messages::health_event::result_type::LOSS_OF_CONSCIOUSNESS) {
+						make_it_count();
+					}
+				*/
+				if (e.special_result == messages::health_event::result_type::DEATH) {
 					/* Don't count two kills on a single character. */
 					if (e.was_conscious) {
 						make_it_count();

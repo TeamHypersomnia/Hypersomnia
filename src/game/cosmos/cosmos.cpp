@@ -26,7 +26,7 @@ T cosmos::calculate_solvable_signi_hash() const {
 	if constexpr(std::is_same_v<T, uint32_t>) {
 		augs::memory_stream ss;
 
-		augs::write_bytes(ss, get_clock());
+		augs::write_bytes(ss, get_clock().now);
 		augs::write_bytes(ss, get_entities_count());
 
 		for_each_having<components::sentience>(

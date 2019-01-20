@@ -171,7 +171,8 @@ public:
 
 						if (*received_hash != client_state_hash) {
 							LOG(
-								"Client desynchronized. Hashes differ.\nExpected: %x\nActual: %x\n",
+								"Client desynchronized at step: %x. Hashes differ.\nExpected: %x\nActual: %x\n",
+								referential_cosmos.get_total_steps_passed(),
 							   	*received_hash,
 							   	client_state_hash
 							);

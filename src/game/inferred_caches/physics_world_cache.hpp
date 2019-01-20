@@ -368,13 +368,34 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		return;
 	}
 
+	const auto& logicals = cosm.get_logical_assets();
+
 	if (const auto image_id = handle.get_image_id(); image_id.is_set()) {
-		const auto& offsets = cosm.get_logical_assets().get_offsets(image_id);
+		const auto& offsets = logicals.get_offsets(image_id);
 
 		if (const auto& shape = offsets.non_standard_shape; !shape.empty()) {
 			from_convex_partition(shape);
 		}
 		else {
+			const auto stance_rotation = [&]() {
+				const auto& typed_self = handle;
+
+				if (const auto torso = typed_self.template find<invariants::torso>()) {
+					const bool consider_reloading = true;
+					const auto stance = torso->calc_stance(typed_self, typed_self.get_wielded_items(), consider_reloading);
+
+					const auto& logicals = cosm.get_logical_assets();
+
+					if (const auto anim = logicals.find(stance.carry)) {
+						if (anim->frames.size() > 0) {
+							return logicals.get_offsets(anim->frames[0].image_id).torso.back.rotation;
+						}
+					}
+				}
+
+				return 0.f;
+			}();
+
 			auto size = handle.get_logical_size();
 
 			size.x = std::max(1.f, size.x);
@@ -382,19 +403,26 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 
 			size = si.get_meters(size);
 
-			b2PolygonShape ps;
-			ps.SetAsBox(size.x * 0.5f, size.y * 0.5f);
+			const auto hx = size.x / 2;
+			const auto hy = size.y / 2;
+
+			std::array<vec2, 4> verts;
+
+			verts[0].set(-hx, -hy);
+			verts[1].set( hx, -hy);
+			verts[2].set( hx,  hy);
+			verts[3].set(-hx,  hy);
 
 			const auto off_meters = si.get_meters(connection.shape_offset.pos);
+			const auto total_rotation = stance_rotation + connection.shape_offset.rotation;
 
-			for (int i = 0; i < 4; ++i) {
-				vec2 out = ps.m_vertices[i];
-
-				out.rotate(connection.shape_offset.rotation);
-				out += off_meters;
-
-				ps.m_vertices[i] = b2Vec2(out);
+			for (auto& v : verts) {
+				v.rotate(total_rotation);
+				v += off_meters;
 			}
+
+			b2PolygonShape ps;
+			ps.Set(verts.data(), verts.size());
 
 			fixdef.shape = &ps;
 			b2Fixture* const new_fix = owner_b2Body.CreateFixture(&fixdef);

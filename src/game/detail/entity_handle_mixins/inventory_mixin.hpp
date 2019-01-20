@@ -316,7 +316,7 @@ void inventory_mixin<E>::infer_item_physics_recursive() const {
 	const auto& self = *static_cast<const E*>(this);
 	ensure(self);
 
-	self.infer_colliders();
+	self.infer_colliders_from_scratch();
 
 	self.for_each_contained_item_recursive([](const auto& h) {
 		h.infer_colliders();	

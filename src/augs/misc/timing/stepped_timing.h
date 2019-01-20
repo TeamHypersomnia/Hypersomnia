@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/misc/timing/delta.h"
+#include "augs/pad_bytes.h"
 
 namespace augs {
 	class delta;
@@ -25,8 +26,8 @@ namespace augs {
 
 	struct stepped_clock {
 		// GEN INTROSPECTOR struct augs::stepped_clock
-		stepped_timestamp now = { static_cast<unsigned>(0) };
 		delta dt = delta::steps_per_second(60);
+		stepped_timestamp now = { static_cast<unsigned>(0) };
 		// END GEN INTROSPECTOR
 
 		auto diff_seconds(const stepped_clock& lesser) const {
@@ -99,6 +100,8 @@ namespace augs {
 			return get_remaining_ms(cooldown_ms, stamp) / 1000;
 		}
 	};
+
+	static_assert(sizeof(stepped_clock) == sizeof(delta) + sizeof(stepped_timestamp));
 
 	struct stepped_cooldown {
 		// GEN INTROSPECTOR struct augs::stepped_cooldown

@@ -5,6 +5,12 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- Why do we have player (+player) ?
+	- Nothing important, just written a wrong player as assister
+
+- Why suicides are shown even though they had not happened?
+	- Because a loss of consciousness was mistakenly counted as a knockout.
+
 - There might be some unspecified problems if the client does not keep up with the client simulation.
 	- This is because we only advance once to keep better framerate.
 	- Note that the client will anyway keep up because it always simulates ALL referential frames that it receives to catch up,

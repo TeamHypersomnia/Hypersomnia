@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- A desync still happens locally
+	- Setup round is probably the trigger
+
 - instead of notify_gui, have more flags, e.g. for pickup notifications
 	- pickups are not that predictable after all
 

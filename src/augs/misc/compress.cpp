@@ -1,6 +1,14 @@
 #include "augs/misc/compress.h"
 #include "3rdparty/lz4/lz4.c"
 #include "augs/log.h"
+#include "augs/templates/container_templates.h"
+
+#define DISABLE_COMPRESSION 0
+
+#if DISABLE_COMPRESSION
+#else
+#define ENABLE_COMPRESSION 1
+#endif
 
 namespace augs {
 	std::vector<std::byte> make_compression_state() {
@@ -23,6 +31,10 @@ namespace augs {
 		const std::vector<std::byte>& input,
 		std::vector<std::byte>& output
 	) {
+#if DISABLE_COMPRESSION
+		(void)state;
+		concatenate(output, input);
+#else
 		const auto size_bound = LZ4_compressBound(input.size());
 		const auto prev_size = output.size();
 		output.resize(prev_size + size_bound);
@@ -37,6 +49,7 @@ namespace augs {
 		);
 
 		output.resize(prev_size + bytes_written);
+#endif
 	}
 
 	std::vector<std::byte> decompress(
@@ -62,6 +75,9 @@ namespace augs {
 		const std::size_t byte_count,
 		std::vector<std::byte>& output
 	) {
+#if DISABLE_COMPRESSION
+		output.assign(input, input + byte_count);
+#else
 		const auto uncompressed_size = output.size();
 
 		const auto bytes_read = LZ4_decompress_safe(
@@ -80,6 +96,7 @@ namespace augs {
 			output.clear();
 			throw decompression_error("Decompression failure. Read %x bytes, but expected %x.", bytes_read, uncompressed_size);
 		}
+#endif
 	}
 }
 
@@ -109,7 +126,11 @@ TEST_CASE("Ca CompressionDecompression") {
 		auto state = augs::make_compression_state();
 		const auto compressed = augs::compress(state, input);
 
+#if DISABLE_COMPRESSION
+		REQUIRE(compressed == input);
+#else
 		REQUIRE(compressed != input);
+#endif
 
 		{
 			const auto decompressed = augs::decompress(augs::compress(state, input), input.size());
@@ -123,7 +144,9 @@ TEST_CASE("Ca CompressionDecompression") {
 
 			try {
 				augs::decompress(augs::compress(state, input), bad_decompressed);
+#if ENABLE_COMPRESSION
 				REQUIRE(false);
+#endif
 			}
 			catch(const augs::decompression_error&) { 
 				REQUIRE(bad_decompressed.empty());
@@ -136,7 +159,9 @@ TEST_CASE("Ca CompressionDecompression") {
 
 			try {
 				augs::decompress(augs::compress(state, input), bad_decompressed);
+#if ENABLE_COMPRESSION
 				REQUIRE(false);
+#endif
 			}
 			catch(const augs::decompression_error&) { 
 				REQUIRE(bad_decompressed.empty());

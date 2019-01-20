@@ -14,33 +14,28 @@ namespace augs {
 		using double_type = real64;
 
 		// GEN INTROSPECTOR class augs::delta
-		double_type secs = 0.0;
-		double_type ms = 0.0;
-
 		default_t secsf = 0.f;
 		default_t msf = 0.f;
 		// END GEN INTROSPECTOR
 		
 		explicit delta(const double_type secs) :
-			secs(secs),
-			ms(secs * 1000),
 			secsf(static_cast<default_t>(secs)),
-			msf(static_cast<default_t>(ms))
+			msf(static_cast<default_t>(secs * 1000))
 		{}
 
 	public:
 		static delta zero;
 
 		static delta steps_per_second(const unsigned steps) {
-			return delta{ steps ? 1.0 / steps : 0.0 };
+			return delta{ steps ? 1.f / steps : 0.f };
 		}
 
 		static delta from_milliseconds(const double_type ms) {
-			return delta{ ms / 1000 };
+			return delta{ ms / 1000.f };
 		}
 
 		bool operator==(const delta& b) const {
-			return secs == b.secs;
+			return secsf == b.secsf;
 		}
 
 		template <class T = default_t>
@@ -49,7 +44,7 @@ namespace augs {
 				return { secsf };
 			}
 			else if constexpr(std::is_same_v<T, double_type>) {
-				return { secs };
+				return { secsf };
 			}
 			else {
 				static_assert(always_false_v<T>, "Can't call in_seconds with this type.");
@@ -62,7 +57,7 @@ namespace augs {
 				return { msf };
 			}
 			else if constexpr(std::is_same_v<T, double_type>) {
-				return { ms };
+				return { msf };
 			}
 			else {
 				static_assert(always_false_v<T>, "Can't call in_milliseconds with this type.");
@@ -81,18 +76,18 @@ namespace augs {
 
 		template <class T>
 		auto& operator*=(const T scalar) {
-			*this = delta { secs * scalar };
+			*this = delta { secsf * scalar };
 			return *this;
 		}
 
 		template <class T>
 		auto& operator/=(const T scalar) {
-			*this = delta { secs / scalar };
+			*this = delta { secsf / scalar };
 			return *this;
 		}
 
 		auto in_steps_per_second() const {
-			return static_cast<unsigned>(1.0 / secs);
+			return static_cast<unsigned>(1.f / secsf);
 		}
 	};
 }
