@@ -725,6 +725,11 @@ entity_id bomb_mode::create_character_for_player(
 		if (handle.alive()) {
 			cosmic::set_specific_name(handle, p.chosen_name);
 			p.controlled_character_id = handle;
+
+			if (get_freeze_seconds_left(in) > 0.f) {
+				handle.set_frozen(true);
+			}
+
 			return p.controlled_character_id;
 		}
 		else {

@@ -32,7 +32,6 @@ summary: That which we are brainstorming at the moment.
 - Don't give release build for testing as it has commented out ensures.
 - Perhaps always use find instead of get?
 
-- minimize use of b2Rot() constructor for angle, use SetIdentity
 - separate slot for the bomb, OVER_SHOULDER
 
 - bug: after knockout, some weapons remain tied to the player
@@ -48,7 +47,6 @@ summary: That which we are brainstorming at the moment.
 - We might decrease the bomb density a little so that the bomber isn't too heavy.
 
 - forbid arming grenades when frozen
-- freeze the player that has just joined
 
 - fix smoke particles becoming bubbles as we still have a good repro
 	- perhaps effect ids remain the same but content is different

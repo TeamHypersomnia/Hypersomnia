@@ -1,4 +1,5 @@
 
+- minimize use of b2Rot() constructor for angle, use SetIdentity
 
 ### Microplanned implementation order (done):  
 
@@ -2916,3 +2917,4 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- Does it simulate something?
 	- it simulates the predicted world in the meantime.
 
+- freeze the player that has just joined
