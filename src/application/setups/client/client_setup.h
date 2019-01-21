@@ -249,7 +249,7 @@ public:
 
 				auto audiovisual_post_solve = callbacks.post_solve;
 
-				auto for_each_predicted_queue = [&](const const_logic_step step, auto callback) {
+				auto for_each_effect_queue = [&](const const_logic_step step, auto callback) {
 					namespace M = messages;
 
 					auto& q = step.transient.messages;
@@ -269,9 +269,9 @@ public:
 					auto scope = measure_scope(performance.unpacking_remote_steps);
 
 					auto referential_post_solve = [&](const const_logic_step step) {
-						auto erase_predictable_messages = [&](auto& from_queue) {
-							const auto input = prediction_input::unpredictable_for(get_viewed_character());
+						const auto input = prediction_input::unpredictable_for(get_viewed_character());
 
+						auto erase_predictable_messages = [&](auto& from_queue) {
 							erase_if(
 								from_queue,
 								[&](const auto& m) {
@@ -280,15 +280,10 @@ public:
 							);
 						};
 
-						for_each_predicted_queue(step, erase_predictable_messages);
+						for_each_effect_queue(step, erase_predictable_messages);
 
 						audiovisual_post_solve_settings settings;
-
-						settings.correct_interpolations = false;
-						settings.acquire_highlights = false;
-						settings.acquire_flying_numbers = true;
-						settings.acquire_effect_messages = true;
-						settings.notify_gui = false;
+						settings.prediction = input;
 
 						audiovisual_post_solve(step, settings);
 					};
@@ -400,9 +395,9 @@ public:
 				}
 
 				auto predicted_post_solve = [&](const const_logic_step step) {
-					auto erase_unpredictable_messages = [&](auto& from_queue) {
-						const auto input = prediction_input::predictable_for(get_viewed_character());
+					const auto input = prediction_input::predictable_for(get_viewed_character());
 
+					auto erase_unpredictable_messages = [&](auto& from_queue) {
 						erase_if(
 							from_queue,
 							[&](const auto& m) {
@@ -411,15 +406,10 @@ public:
 						);
 					};
 
-					for_each_predicted_queue(step, erase_unpredictable_messages);
+					for_each_effect_queue(step, erase_unpredictable_messages);
 
 					audiovisual_post_solve_settings settings;
-
-					settings.correct_interpolations = true;
-					settings.acquire_highlights = true;
-					settings.acquire_flying_numbers = false;
-					settings.acquire_effect_messages = true;
-					settings.notify_gui = true;
+					settings.prediction = input;
 
 					audiovisual_post_solve(step, settings);
 				};

@@ -164,7 +164,11 @@ void audiovisual_state::standard_post_solve(
 
 	const auto& settings = input.settings;
 
-	if (settings.correct_interpolations) {
+	const auto correct_interpolations = always_predictable_v;
+	const auto acquire_flying_numbers = never_predictable_v;
+	const auto acquire_highlights = always_predictable_v;
+
+	if (correct_interpolations.should_play(settings.prediction)) {
 		const auto& new_interpolation_corrections = step.get_queue<messages::interpolation_correction_request>();
 
 		for (const auto& c : new_interpolation_corrections) {
@@ -188,7 +192,7 @@ void audiovisual_state::standard_post_solve(
 		}
 	}
 
-	if (settings.acquire_effect_messages) {
+	{
 		auto& rng = get_rng();
 
 		{
@@ -279,7 +283,7 @@ void audiovisual_state::standard_post_solve(
 		}
 	};
 
-	if (settings.acquire_flying_numbers) {
+	if (acquire_flying_numbers.should_play(settings.prediction)) {
 		auto& flying_numbers = get<flying_number_indicator_system>();
 
 		for (const auto& h : healths) {
@@ -332,7 +336,7 @@ void audiovisual_state::standard_post_solve(
 		}
 	}
 
-	if (settings.acquire_highlights) {
+	if (acquire_highlights.should_play(settings.prediction)) {
 		auto& highlights = get<pure_color_highlight_system>();
 
 		for (const auto& h : healths) {

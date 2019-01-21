@@ -844,9 +844,10 @@ int work(const int argc, const char* const * const argv) try {
 			});
 		}
 
-		if (settings.notify_gui) {
-			game_gui.standard_post_solve(step);
-		}
+		game_gui.standard_post_solve(
+			step, 
+			{ settings.prediction }
+		);
 	};
 
 	static auto setup_post_cleanup = [&](const const_logic_step step) {

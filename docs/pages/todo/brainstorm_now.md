@@ -8,6 +8,7 @@ summary: That which we are brainstorming at the moment.
 
 - instead of notify_gui, have more flags, e.g. for pickup notifications
 	- pickups are not that predictable after all
+	- problem: a pickup could remain undetected
 
 - We could opt for a longer float test running in the background for a second or two
 

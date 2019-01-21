@@ -1,10 +1,7 @@
 #pragma once
+#include "game/detail/view_input/predictability_info.h"
 
 struct audiovisual_post_solve_settings {
-	bool correct_interpolations = true;
-	bool acquire_highlights = true;
-	bool acquire_flying_numbers = true;
-	bool acquire_effect_messages = true;
-	bool notify_gui = true;
+	prediction_input prediction = prediction_input::offline();
 };
 

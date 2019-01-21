@@ -19,8 +19,8 @@ struct item_button : game_gui_rect_node {
 
 	augs::gui::appearance_detector detector;
 
+	std::string recorded_name;
 	bool is_container_open = false;
-	bool started_drag = false;
 	bool initialized = false;
 	pad_bytes<1> pad;
 

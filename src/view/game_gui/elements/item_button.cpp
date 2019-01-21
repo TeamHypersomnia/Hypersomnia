@@ -453,6 +453,11 @@ void item_button::rebuild_layouts(const game_gui_context context, const this_in_
 	{
 		auto& initialized = this_id->initialized;
 
+		if (this_id->recorded_name != item.get_name()) {
+			this_id->recorded_name = item.get_name();
+			initialized = false;
+		}
+
 		if (!initialized) {
 			const auto t = parent_slot.get_type();
 
@@ -527,8 +532,6 @@ void item_button::respond_to_events(const game_gui_context context, const this_i
 			}
 
 			if (info == gui_event::lfinisheddrag) {
-				this_id->started_drag = false;
-
 				drag_and_drop_callback(context, prepare_drag_and_drop_result(context, this_id, rect_world.rect_hovered), info.total_dragged_amount);
 			}
 		}

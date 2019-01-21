@@ -140,6 +140,7 @@ bool game_gui_system::control_gui_world(
 			if (change.was_pressed(augs::event::keys::key::RMOUSE)) {
 				if (world.held_rect_is_dragged) {
 					queue_transfer(root_entity, item_slot_transfer_request::drop_some(item_entity, dragged_charges));
+					world.unhover_and_undrag(context);
 					return true;
 				}
 			}
@@ -585,127 +586,143 @@ bool should_fill_hotbar_from_right(const E& handle) {
 	return false;
 }
 
-void game_gui_system::standard_post_solve(const const_logic_step step) {
+void game_gui_system::standard_post_solve(
+	const const_logic_step step,
+	const game_gui_post_solve_settings settings
+) {
 	const auto& cosm = step.get_cosmos();
 
-	auto migrate_nodes = [&](auto& migrated, const auto& key_map) {
-		using M = remove_cref<decltype(migrated)>;
+	const auto pickups = always_predictable_v;
+	const auto identities = always_predictable_v;
 
-		M result;
+	if (identities.should_play(settings.prediction)) {
+		auto migrate_nodes = [&](auto& migrated, const auto& key_map) {
+			using M = remove_cref<decltype(migrated)>;
 
-		for (auto& it : migrated) {
-			if (const auto new_id = mapped_or_nullptr(key_map, it.first)) {
-				result.try_emplace(*new_id, std::move(it.second));
+			M result;
+
+			for (auto& it : migrated) {
+				if (const auto new_id = mapped_or_nullptr(key_map, it.first)) {
+					result.try_emplace(*new_id, std::move(it.second));
+				}
+				else {
+					result.try_emplace(it.first, std::move(it.second));
+				}
 			}
-			else {
-				result.try_emplace(it.first, std::move(it.second));
-			}
-		}
 
-		migrated = std::move(result);
-	};
-
-	for (const auto& changed : step.get_queue<messages::changed_identities_message>()) {
-		migrate_nodes(item_buttons, changed.changes);
-		migrate_nodes(character_guis, changed.changes);
-
-		auto migrate_id = [&](auto& id) {
-			if (const auto new_id = mapped_or_nullptr(changed.changes, id)) {
-				id = *new_id;
-			}
-			else {
-				id = {};
-			}
+			migrated = std::move(result);
 		};
 
-		for (auto& it : character_guis) {
-			auto& ch = it.second;
+		for (const auto& changed : step.get_queue<messages::changed_identities_message>()) {
+			migrate_nodes(item_buttons, changed.changes);
+			migrate_nodes(character_guis, changed.changes);
 
-			for (auto& h : ch.hotbar_buttons) {
-				migrate_id(h.last_assigned_entity);
-			}
+			auto migrate_id = [&](auto& id) {
+				if (const auto new_id = mapped_or_nullptr(changed.changes, id)) {
+					id = *new_id;
+				}
+				else {
+					id = {};
+				}
+			};
 
-			for (auto& s : ch.last_setup.hand_selections) {
-				migrate_id(s);
+			for (auto& it : character_guis) {
+				auto& ch = it.second;
+
+				for (auto& h : ch.hotbar_buttons) {
+					migrate_id(h.last_assigned_entity);
+				}
+
+				for (auto& s : ch.last_setup.hand_selections) {
+					migrate_id(s);
+				}
 			}
 		}
 	}
 
-	for (const auto& transfer : step.get_queue<messages::performed_transfer_message>()) {
-		const auto transferred_item = cosm[transfer.item];
+	{
+		/* 
+			We don't want to miss a pickup and we want it to always be predicted,
+			so we handle pickups from both referential and predicted cosmoi.
+		*/
+		(void)pickups;
 
-		if (transferred_item.dead()) {
-			continue;
-		}
+		for (const auto& transfer : step.get_queue<messages::performed_transfer_message>()) {
+			const auto transferred_item = cosm[transfer.item];
 
-		const auto target_slot = cosm[transfer.target_slot];
-
-		const bool same_capability = transfer.result.relation == capability_relation::THE_SAME;
-
-		if (logically_empty(recently_dropped) && transfer.result.is_drop()) {
-			recently_dropped = transferred_item;
-		}
-
-		const bool interested =
-			target_slot.alive()
-			&& transferred_item.alive()
-			&& (is_weapon_like(transferred_item) || is_armor_like(transferred_item))
-			&& target_slot.get_type() != slot_function::PERSONAL_DEPOSIT
-			&& (transfer.result.is_pickup() || (same_capability && !target_slot->is_mounted_slot()))
-		;
-
-		if (!interested) {
-			continue;
-		}
-
-		const bool always_reassign_button = 
-			transfer.result.is_pickup()
-		;
-
-		if (cosm[transfer.target_root].dead()) {
-			continue;
-		}
-
-		auto& gui = get_character_gui(transfer.target_root);
-
-		if (!always_reassign_button) {
-			if (gui.hotbar_assignment_exists_for(transferred_item)) {
+			if (transferred_item.dead()) {
 				continue;
 			}
-		}
 
-		auto add = [&](const auto handle) {
-			gui.assign_item_to_first_free_hotbar_button(
-				cosm[transfer.target_root],
-				handle,
-				should_fill_hotbar_from_right(handle)
-			);
-		};
+			const auto target_slot = cosm[transfer.target_slot];
 
-		add(transferred_item);
+			const bool same_capability = transfer.result.relation == capability_relation::THE_SAME;
 
-		auto should_recurse = [](const auto item_entity) {
-			const auto& item = item_entity.template get<invariants::item>();
-
-			if (item.categories_for_slot_compatibility.test(item_category::BACK_WEARABLE)) {
-				return true;
+			if (logically_empty(recently_dropped) && transfer.result.is_drop()) {
+				recently_dropped = transferred_item;
 			}
 
-			return false;
-		};
+			const bool interested =
+				target_slot.alive()
+				&& transferred_item.alive()
+				&& (is_weapon_like(transferred_item) || is_armor_like(transferred_item))
+				&& target_slot.get_type() != slot_function::PERSONAL_DEPOSIT
+				&& (transfer.result.is_pickup() || (same_capability && !target_slot->is_mounted_slot()))
+			;
 
-		if (should_recurse(transferred_item)) {
-			transferred_item.for_each_contained_item_recursive(
-				[&add, should_recurse](const auto child_item) {
-					add(child_item);
+			if (!interested) {
+				continue;
+			}
 
-					if (should_recurse(child_item)) {
-						return recursive_callback_result::CONTINUE_AND_RECURSE;
-					}
+			const bool always_reassign_button = 
+				transfer.result.is_pickup()
+			;
 
-					return recursive_callback_result::CONTINUE_DONT_RECURSE;
+			if (cosm[transfer.target_root].dead()) {
+				continue;
+			}
+
+			auto& gui = get_character_gui(transfer.target_root);
+
+			if (!always_reassign_button) {
+				if (gui.hotbar_assignment_exists_for(transferred_item)) {
+					continue;
 				}
-			);
+			}
+
+			auto add = [&](const auto handle) {
+				gui.assign_item_to_first_free_hotbar_button(
+					cosm[transfer.target_root],
+					handle,
+					should_fill_hotbar_from_right(handle)
+				);
+			};
+
+			add(transferred_item);
+
+			auto should_recurse = [](const auto item_entity) {
+				const auto& item = item_entity.template get<invariants::item>();
+
+				if (item.categories_for_slot_compatibility.test(item_category::BACK_WEARABLE)) {
+					return true;
+				}
+
+				return false;
+			};
+
+			if (should_recurse(transferred_item)) {
+				transferred_item.for_each_contained_item_recursive(
+					[&add, should_recurse](const auto child_item) {
+						add(child_item);
+
+						if (should_recurse(child_item)) {
+							return recursive_callback_result::CONTINUE_AND_RECURSE;
+						}
+
+						return recursive_callback_result::CONTINUE_DONT_RECURSE;
+					}
+				);
+			}
 		}
 	}
 }

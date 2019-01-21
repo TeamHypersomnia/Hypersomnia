@@ -18,6 +18,12 @@
 #include "view/game_gui/elements/item_button.h"
 #include "game/detail/inventory/wielding_setup.h"
 
+#include "game/detail/view_input/predictability_info.h"
+
+struct game_gui_post_solve_settings {
+	prediction_input prediction;
+};
+
 class game_gui_system {
 public:
 	std::unordered_map<entity_id, item_button> item_buttons;
@@ -100,5 +106,8 @@ public:
 	);
 
 	void reserve_caches_for_entities(const size_t) const {}
-	void standard_post_solve(const const_logic_step);
+	void standard_post_solve(
+		const_logic_step, 
+		game_gui_post_solve_settings
+	);
 };
