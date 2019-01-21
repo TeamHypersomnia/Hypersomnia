@@ -69,7 +69,13 @@ basic_wielding_setup<I> basic_wielding_setup<I>::from_current(const E& character
 	auto output = basic_wielding_setup<I>::bare_hands();
 
 	for (std::size_t i = 0; i < output.hand_selections.size(); ++i) {
-		output.hand_selections[i] = character_entity.get_if_any_item_in_hand_no(i);
+		const auto candidate_wieldable = character_entity.get_if_any_item_in_hand_no(i);
+
+		if (candidate_wieldable) {
+			if (::is_weapon_like(candidate_wieldable)) {
+				output.hand_selections[i] = candidate_wieldable;
+			}
+		}
 	}
 
 	return output;

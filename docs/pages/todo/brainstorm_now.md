@@ -202,9 +202,6 @@ summary: That which we are brainstorming at the moment.
 
 - always calculate the tickrate from the referential player in case the tickrate suddenly changes
 
-- server_setup
-- client_setup
-
 - plan for full server replays
 	- it's just about saving the entropies
 	- server shall be frozen and never advance when there are no players

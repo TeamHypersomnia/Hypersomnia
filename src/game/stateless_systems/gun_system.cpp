@@ -338,10 +338,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 					if (ammo_info.total_ammo_space > 0 && ammo_info.total_charges == 0) {
 						/* 
-							No ammo in mag and chamber. 
-							If no ammo whatsoever, try to hide. 
-						
-							Otherwise if in akimbo, try to hide in inventory.
+							Has ammo space but no charges in mag and in chamber.
+							If no ammo left in inventory, try to drop. 
 						*/
 
 						auto requested_wield = wielding_setup::from_current(owning_capability);
@@ -389,9 +387,16 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							);
 						}
 						else if (wielding == wielding_type::DUAL_WIELDED) {
-							if (::is_weapon_like(cosm[requested_wield.hand_selections[0]])) {
-								/* Prevent the wield when the other item is not a weapon, e.g. we are reloading */
+							/* 
+								Otherwise if in akimbo, try to hide in inventory,
+								but only if we have a weapon-like thing in the other hand.
 
+								This prevents the wield when the other item is not a weapon, e.g. we are reloading.
+							*/
+
+							const auto other_item = cosm[requested_wield.hand_selections[0]];
+
+							if (other_item && ::is_weapon_like(other_item)) {
 								::perform_wielding(
 									step,
 									owning_capability,

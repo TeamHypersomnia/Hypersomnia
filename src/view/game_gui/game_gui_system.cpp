@@ -218,7 +218,11 @@ void game_gui_system::control_hotbar_and_action_button(
 		auto r = intent;
 
 		if (r.was_pressed()) {
-			auto request_setup = [&](const auto& new_setup, const auto& current_setup) {
+			auto request_setup = [&](auto new_setup, const auto& current_setup) {
+				if (::is_currently_reloading(gui_entity)) {
+					new_setup = wielding_setup::bare_hands();
+				}
+
 				queue_wielding(gui_entity, new_setup);
 				gui.save_as_last_setup(current_setup);
 			};
