@@ -82,6 +82,21 @@ public:
 		return this->on_mode_with_rules_impl(*this, std::forward<Args>(args)...);
 	}
 
+	auto get_round_num() const {
+		return this->on_mode(
+			[&](const auto& typed_mode) {
+				using M = remove_cref<decltype(typed_mode)>;
+
+				if constexpr(std::is_same_v<test_mode, M>) {
+					return 0u;
+				}
+				else {
+					return typed_mode.get_round_num();
+				}
+			}
+		);
+	}
+
 	double get_inv_tickrate() const {
 		return this->on_mode(
 			[&](const auto& typed_mode) {
@@ -91,7 +106,7 @@ public:
 					return advanced_cosm.get_fixed_delta().template in_seconds<double>();
 				}
 				else {
-					return typed_mode.round_speeds.calc_inv_tickrate();
+					return typed_mode.get_round_speeds().calc_inv_tickrate();
 				}
 			}
 		);
@@ -105,7 +120,7 @@ public:
 				return 1.0;
 			}
 			else {
-				const auto current_logic_speed = static_cast<double>(m.round_speeds.logic_speed_mult);
+				const auto current_logic_speed = static_cast<double>(m.get_round_speeds().logic_speed_mult);
 				const auto chosen_audiovisual_speed = rules.view.audiovisual_speed;
 
 				return std::max(current_logic_speed, chosen_audiovisual_speed);

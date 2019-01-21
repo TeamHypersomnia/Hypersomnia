@@ -98,7 +98,7 @@ mode_entropy_general editor_modes_gui::perform(const editor_settings& settings, 
 						auto players_node = scoped_tree_node(players_node_label);
 
 						if (players_node) {
-							for (const auto& p : typed_mode.players) {
+							for (const auto& p : typed_mode.get_players()) {
 								const auto this_player_label = typesafe_sprintf("%x (id: %x)", p.second.chosen_name, p.first.value);
 
 								if (const auto this_player_node = scoped_tree_node(this_player_label.c_str())) {

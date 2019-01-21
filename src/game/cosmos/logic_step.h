@@ -7,7 +7,7 @@
 #include "augs/misc/randomization_declaration.h"
 #include "game/cosmos/solvers/solve_structs.h"
 
-#define LOG_DELETIONS !IS_PRODUCTION_BUILD
+#define LOG_DELETIONS 0
 
 struct data_living_one_step;
 struct cosmos_common_significant;

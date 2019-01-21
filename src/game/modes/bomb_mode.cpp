@@ -740,15 +740,41 @@ entity_id bomb_mode::create_character_for_player(
 	return entity_id::dead();
 }
 
+#include "augs/build_settings/setting_dump.h"
+#if DUMP_BEFORE_AND_AFTER_ROUND_START
+
+#include "game/modes/dump_for_debugging.h"
+#include "augs/misc/getpid.h"
+#endif
+
 void bomb_mode::setup_round(
 	const input_type in, 
 	const logic_step step, 
 	const bomb_mode::round_transferred_players& transfers
 ) {
+#if DUMP_BEFORE_AND_AFTER_ROUND_START
+	{
+		LOG("LOOL PISZEMY");
+		thread_local auto lua = augs::create_lua_state();
+
+		const auto pid = augs::getpid();
+		const auto preffix = typesafe_sprintf("%x_befset%x_", pid, get_round_num());
+
+		::dump_for_debugging(
+			lua,
+			preffix,
+			in.cosm,
+			*this
+		);
+	}
+#endif
+
 	clear_players_round_state(in);
 
 	auto& cosm = in.cosm;
 	clock_before_setup = cosm.get_clock();
+
+	LOG_NVPS(clock_before_setup.now.step);
 
 	const auto former_ids = [&]() {
 		std::unordered_map<mode_player_id, entity_id> result;
@@ -854,11 +880,13 @@ void bomb_mode::setup_round(
 bomb_mode::round_transferred_players bomb_mode::make_transferred_players(const input_type in) const {
 	round_transferred_players result;
 
-	for (auto& it : players) {
-		const auto id = it.first;
-		auto& player_data = it.second;
+	const auto& cosm = in.cosm;
 
-		if (const auto handle = in.cosm[player_data.controlled_character_id]) {
+	for (const auto& it : players) {
+		const auto id = it.first;
+		const auto& player_data = it.second;
+
+		if (const auto handle = cosm[player_data.controlled_character_id]) {
 			auto& pm = result[id];
 			pm.movement = handle.get<components::movement>().flags;
 
@@ -875,7 +903,7 @@ bomb_mode::round_transferred_players bomb_mode::make_transferred_players(const i
 			pm.survived = true;
 
 			handle.for_each_contained_item_recursive(
-				[&](const auto typed_item) {
+				[&](const auto& typed_item) {
 					const auto flavour_id = typed_item.get_flavour_id();
 
 					if (entity_flavour_id(flavour_id) == entity_flavour_id(in.rules.bomb_flavour)) {
@@ -1324,6 +1352,10 @@ void bomb_mode::add_or_remove_players(const input_type in, const mode_entropy& e
 	if (logically_set(g.removed_player)) {
 		remove_player(in, step, g.removed_player);
 	}
+
+	if (logically_set(g.removed_player) && logically_set(g.added_player)) {
+		ensure(g.removed_player != g.added_player.id);
+	}
 }
 
 mode_player_id bomb_mode::find_first_free_player() const {
@@ -1723,6 +1755,10 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 	}
 	else if (state == arena_mode_state::ROUND_END_DELAY) {
 		if (get_round_end_seconds_left(in) <= 0.f) {
+			{
+
+			}
+
 			start_next_round(in, step);
 		}
 	}

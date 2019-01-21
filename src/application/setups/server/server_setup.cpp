@@ -214,6 +214,8 @@ void server_setup::advance_clients_state() {
 		const auto mode_id = to_mode_player_id(client_id);
 
 		auto remove_from_mode = [&]() {
+			ensure(!removed_someone_already);
+
 			mode_entropy_general cmd;
 			cmd.removed_player = mode_id;
 

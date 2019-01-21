@@ -299,7 +299,7 @@ double editor_folder::get_inv_tickrate() const {
 					return commanded->work.world.get_fixed_delta().in_seconds<double>();
 				}
 				else {
-					return typed_mode.round_speeds.calc_inv_tickrate();
+					return typed_mode.get_round_speeds().calc_inv_tickrate();
 				}
 			},
 			player.get_current_mode()

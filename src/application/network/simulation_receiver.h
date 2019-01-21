@@ -29,7 +29,7 @@ struct steps_unpacking_result {
 
 class simulation_receiver {
 public:
-	using received_entropy_type = server_step_entropy;
+	using received_entropy_type = compact_server_step_entropy;
 	using simulated_entropy_type = server_step_entropy;
 private:
 
@@ -101,7 +101,7 @@ public:
 		incoming_contexts.push_back(context);
 	}
 
-	template <class A, class S1, class S2>
+	template <class F, class A, class S1, class S2>
 	steps_unpacking_result unpack_deterministic_steps(
 		const simulation_receiver_settings& settings,
 
@@ -109,6 +109,8 @@ public:
 		past_infection_system& past,
 
 		const entity_id locally_controlled_entity, 
+
+		F&& unpack_entropy,
 
 		A& referential_arena, 
 		A& predicted_arena, 
@@ -144,17 +146,15 @@ public:
 			for (std::size_t i = 0; i < entropies.size(); ++i) {
 				/* If a new player was added, always reinfer. */
 				const auto& actual_server_step = entropies[i];
-				const auto& actual_server_entropy = actual_server_step.payload;
-				const bool shall_reinfer = logically_set(actual_server_entropy.general.added_player);
 
-				auto& referential_cosmos = referential_arena.get_cosmos();
+				const auto& referential_cosmos = referential_arena.get_cosmos();
 
 				{
 					const auto received_hash = actual_server_step.meta.state_hash;
 
 					if (received_hash != std::nullopt) {
 #if TEST_DESYNC_DETECTION
-						if (referential_cosmos.get_total_steps_passed() == 2000) {
+						if (referential_cosmos.get_total_steps_passed() == 1) {
 							const auto it = referential_cosmos[locally_controlled_entity];
 
 							auto& s = it.template get<components::sentience>();
@@ -185,19 +185,25 @@ public:
 				}
 
 				{
+					const bool shall_reinfer = logically_set(actual_server_step.payload.general.added_player);
+
 					if (shall_reinfer) {
 						LOG("Added player in the next entropy. Will reinfer to sync.");
-						cosmic::reinfer_solvable(referential_cosmos);
+						cosmic::reinfer_solvable(referential_arena.get_cosmos());
 					}
 
-					advance_referential(actual_server_entropy);
-				}
+					{
+						const auto& actual_server_entropy = unpack_entropy(actual_server_step.payload);
 
-				if (!repredict) {
-					const auto& predicted_server_entropy = predicted_entropies[p_i];
+						advance_referential(actual_server_entropy);
 
-					if (shall_reinfer || !(actual_server_entropy == predicted_server_entropy)) {
-						repredict = true;
+						if (!repredict) {
+							const auto& predicted_server_entropy = predicted_entropies[p_i];
+
+							if (shall_reinfer || !(actual_server_entropy == predicted_server_entropy)) {
+								repredict = true;
+							}
+						}
 					}
 				}
 

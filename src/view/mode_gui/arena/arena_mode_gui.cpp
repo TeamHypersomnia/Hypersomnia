@@ -262,7 +262,7 @@ void arena_gui_state::draw_mode_gui(
 
 		auto draw_knockouts = [&]() {
 			const auto& cosm = mode_input.cosm;
-			const auto& kos = typed_mode.current_round.knockouts;
+			const auto& kos = typed_mode.get_current_round().knockouts;
 			const auto& clk = cosm.get_clock();
 
 			const auto knockouts_to_show = std::min(
@@ -493,7 +493,7 @@ void arena_gui_state::draw_mode_gui(
 		};
 
 		auto draw_game_commencing = [&]() {
-			if (auto& commencing_left = typed_mode.commencing_timer_ms; commencing_left != -1.f) {
+			if (auto commencing_left = typed_mode.get_commencing_left_ms(); commencing_left != -1.f) {
 				// const auto c = std::ceil(commencing_left);
 				draw_info_indicator(colored("Game Commencing!", white));
 				return true;
@@ -587,12 +587,12 @@ void arena_gui_state::draw_mode_gui(
 				return true;
 			}
 
-			const auto& win = typed_mode.current_round.last_win;
+			const auto& win = typed_mode.get_current_round().last_win;
 
 			if (win.was_set()) {
 				auto indicator_text = colored(format_enum(win.winner) + " wins!", yellow);
 
-				if (typed_mode.state == arena_mode_state::MATCH_SUMMARY) {
+				if (typed_mode.get_state() == arena_mode_state::MATCH_SUMMARY) {
 					indicator_text += colored(typed_mode.is_halfway_round(mode_input) ? "\n\nHalftime\n" : "\n\nIntermission\n", white);
 
 					{

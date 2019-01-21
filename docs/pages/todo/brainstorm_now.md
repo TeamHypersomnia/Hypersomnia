@@ -8,6 +8,7 @@ summary: That which we are brainstorming at the moment.
 
 - A desync still happens locally
 	- Setup round is probably the trigger
+	- It once happened on step 700+ possibly triggered by a disconnection?
 
 - instead of notify_gui, have more flags, e.g. for pickup notifications
 	- pickups are not that predictable after all

@@ -32,6 +32,9 @@
 #include "application/session_profiler.h"
 #include "application/setups/client/lag_compensation_settings.h"
 
+#include "augs/misc/getpid.h"
+#include "game/modes/dump_for_debugging.h"
+
 struct config_lua_table;
 
 class client_adapter;
@@ -315,12 +318,26 @@ public:
 						schedule_reprediction_if_inconsistent(reprediction_result);
 					};
 
+					auto unpack = [&](const compact_server_step_entropy& entropy) {
+						auto mode_id_to_entity_id = [&](const mode_player_id& mode_id) {
+							return get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
+								[&](const auto& typed_mode) {
+									return typed_mode.lookup(mode_id);
+								}
+							);
+						};
+
+						return entropy.unpack(mode_id_to_entity_id);
+					};
+
 					const auto result = receiver.unpack_deterministic_steps(
 						in.simulation_receiver,
 						in.interp,
 						in.past_infection,
 
 						get_viewed_character(),
+
+						unpack,
 
 						referential_arena,
 						predicted_arena,
@@ -340,6 +357,19 @@ public:
 					if (result.desync) {
 						last_disconnect_reason = typesafe_sprintf(
 							"The client has desynchronized from the server."
+						);
+
+						const auto preffix = typesafe_sprintf("%x_desync%x_", augs::getpid(), referential_arena.get_round_num());
+
+						referential_arena.on_mode(
+							[&](const auto& mode) {
+								::dump_for_debugging(
+									lua,
+									preffix,
+									referential_arena.get_cosmos(),
+									mode
+								);
+							}
 						);
 
 						disconnect();

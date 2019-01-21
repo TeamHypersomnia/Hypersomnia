@@ -26,6 +26,14 @@
 #include "view/mode_gui/arena/arena_gui_mixin.h"
 #include "application/network/network_common.h"
 
+#include "augs/build_settings/setting_dump.h"
+
+#if DUMP_BEFORE_AND_AFTER_ROUND_START
+#include "game/modes/dump_for_debugging.h"
+#endif
+
+#include "augs/misc/getpid.h"
+
 struct config_lua_table;
 struct draw_setup_gui_input;
 
@@ -206,12 +214,31 @@ public:
 
 			{
 				const auto unpacked = unpack(step_collected);
+				const auto arena = get_arena_handle();
 
-				get_arena_handle().advance(
+				arena.advance(
 					unpacked, 
 					callbacks, 
 					solve_settings()
 				);
+
+#if DUMP_BEFORE_AND_AFTER_ROUND_START
+				if (arena.get_cosmos().get_total_steps_passed() == 1) {
+					const auto pid = augs::getpid();
+					const auto preffix = typesafe_sprintf("%x_server_aftset%x_", pid, arena.get_round_num());
+
+					arena.on_mode(
+						[&](const auto& mode) {
+							::dump_for_debugging(
+								lua,
+								preffix,
+								arena.get_cosmos(),
+								mode
+							);
+						}
+					);
+				}
+#endif
 			}
 
 			++current_simulation_step;

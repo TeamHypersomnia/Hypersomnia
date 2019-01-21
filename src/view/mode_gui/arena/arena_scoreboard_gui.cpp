@@ -40,7 +40,7 @@ void arena_scoreboard_gui::draw_gui(
 ) const {
 	using namespace augs::gui::text;
 
-	const bool should_show = show || typed_mode.state == arena_mode_state::MATCH_SUMMARY;
+	const bool should_show = show || typed_mode.get_state() == arena_mode_state::MATCH_SUMMARY;
 
 	if (!should_show) {
 		return;
@@ -82,7 +82,7 @@ void arena_scoreboard_gui::draw_gui(
 	const auto participants = typed_mode.calc_participating_factions(mode_input);
 
 	auto estimated_window_height = [&]() {
-		const auto player_cells_h = cell_h * typed_mode.players.size();
+		const auto player_cells_h = cell_h * typed_mode.get_players().size();
 		const auto headline_cells_h = cell_h * 3 * participants.size();
 
 		const auto num_spectators = typed_mode.num_players_in(faction_type::SPECTATOR);
@@ -265,7 +265,7 @@ void arena_scoreboard_gui::draw_gui(
 
 		const auto& bg_dark = colors.background_dark;
 
-		const auto faction_state = typed_mode.factions[faction];
+		const auto faction_state = typed_mode.get_factions_state()[faction];
 
 		auto draw_headline = [&]() {
 			const auto bg_height = cell_h * 3;

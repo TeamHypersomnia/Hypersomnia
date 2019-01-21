@@ -205,6 +205,8 @@ enum class round_start_type {
 	DONT_KEEP_EQUIPMENTS
 };
 
+struct editor_property_accessors;
+
 class bomb_mode {
 public:
 	using ruleset_type = bomb_mode_ruleset;
@@ -292,7 +294,6 @@ private:
 	round_transferred_players make_transferred_players(input) const;
 
 	bool still_freezed() const;
-	unsigned get_round_index() const;
 	void make_win(input, faction_type);
 
 	entity_id create_character_for_player(input, logic_step, mode_player_id, std::optional<transfer_meta> = std::nullopt);
@@ -358,7 +359,31 @@ private:
 	template <class S>
 	static auto find_player_by_impl(S& self, const entity_name_str& chosen_name);
 
-public:
+	/* A server might provide its own integer-based identifiers */
+	bool add_player_custom(input, const add_player_input&);
+
+	void remove_player(input, logic_step, const mode_player_id&);
+	mode_player_id add_player(input, const entity_name_str& chosen_name);
+
+	faction_choice_result auto_assign_faction(input, const mode_player_id&);
+	faction_choice_result choose_faction(const mode_player_id&, const faction_type faction);
+
+	void restart(input, logic_step);
+
+	void reset_players_stats(input);
+	void set_players_money_to_initial(input);
+	void clear_players_round_state(input);
+
+	void post_award(input, mode_player_id, money_type amount);
+
+	bomb_mode_player* find_player_by(const entity_name_str& chosen_name);
+	bomb_mode_player* find(const mode_player_id&);
+
+	template <class C, class F>
+	decltype(auto) on_player_handle(C&, const mode_player_id&, F&& callback) const;
+
+	template <class C, class F>
+	void for_each_player_handle_in(C&, faction_type, F&& callback) const;
 
 	// GEN INTROSPECTOR class bomb_mode
 	unsigned rng_seed_offset = 0;
@@ -376,15 +401,11 @@ public:
 	augs::speed_vars round_speeds;
 	// END GEN INTROSPECTOR
 
-	mode_player_id add_player(input, const entity_name_str& chosen_name);
+	friend augs::introspection_access;
+	friend editor_property_accessors;
 
-	/* A server might provide its own integer-based identifiers */
-	bool add_player_custom(input, const add_player_input&);
+public:
 
-	void remove_player(input, logic_step, const mode_player_id&);
-
-	faction_choice_result auto_assign_faction(input, const mode_player_id&);
-	faction_choice_result choose_faction(const mode_player_id&, const faction_type faction);
 	faction_type get_player_faction(const mode_player_id&) const;
 
 	mode_entity_id lookup(const mode_player_id&) const;
@@ -419,28 +440,11 @@ public:
 
 	unsigned get_score(faction_type) const;
 
-	void restart(input, logic_step);
-
-	void reset_players_stats(input);
-	void set_players_money_to_initial(input);
-	void clear_players_round_state(input);
-
-	void post_award(input, mode_player_id, money_type amount);
-
-	bomb_mode_player* find_player_by(const entity_name_str& chosen_name);
 	const bomb_mode_player* find_player_by(const entity_name_str& chosen_name) const;
-
-	bomb_mode_player* find(const mode_player_id&);
 	const bomb_mode_player* find(const mode_player_id&) const;
-
-	template <class C, class F>
-	decltype(auto) on_player_handle(C&, const mode_player_id&, F&& callback) const;
 
 	template <class F>
 	void for_each_player_in(faction_type, F&& callback) const;
-
-	template <class C, class F>
-	void for_each_player_handle_in(C&, faction_type, F&& callback) const;
 
 	template <class C>
 	decltype(auto) advance(
@@ -466,5 +470,29 @@ public:
 				callbacks.post_cleanup
 			)
 		);
+	}
+
+	const auto& get_round_speeds() const {
+		return round_speeds;
+	}
+
+	auto get_commencing_left_ms() const {
+		return commencing_timer_ms;
+	}
+
+	const auto& get_current_round() const {
+		return current_round;
+	}
+
+	const auto& get_players() const {
+		return players;
+	}
+
+	auto get_state() const {
+		return state;
+	}
+
+	const auto& get_factions_state() const {
+		return factions;
 	}
 };

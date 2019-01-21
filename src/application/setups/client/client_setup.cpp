@@ -240,16 +240,8 @@ message_handler_result client_setup::handle_server_message(
 		}
 
 		{
-			auto mode_id_to_entity_id = [&](const mode_player_id& mode_id) {
-				return get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
-					[&](const auto& typed_mode) {
-						return typed_mode.lookup(mode_id);
-					}
-				);
-			};
-
+			receiver.acquire_next_server_entropy(payload.meta, payload.payload);
 			receiver.acquire_next_server_entropy(payload.context);
-			receiver.acquire_next_server_entropy(payload.meta, payload.payload.unpack(mode_id_to_entity_id));
 		}
 
 		const auto& max_commands = vars.max_buffered_server_commands;
@@ -282,13 +274,13 @@ void client_setup::handle_server_messages() {
 	client->advance(client_time, message_handler);
 }
 
-#define STRESS_TEST_ARENA_SERIALIZATION 0
+#define STRESS_TEST_ARENA_SERIALIZATION 1
 #if STRESS_TEST_ARENA_SERIALIZATION
 #include <random>
 #include "augs/readwrite/lua_file.h"
-#include <sys/types.h>
-#include <unistd.h>
 #include "augs/readwrite/to_bytes.h"
+#include "augs/misc/getpid.h"
+#include "game/modes/dump_for_debugging.h"
 #endif
 
 void client_setup::send_pending_commands() {
@@ -306,9 +298,9 @@ void client_setup::send_pending_commands() {
 			return std::string("noentity");
 		}();
 			
-		const auto pid = ::getpid();
+		const auto pid = augs::getpid();
 
-		const auto preffix = this_nickname + "_" + std::to_string(pid) + "_";
+		const auto preffix = this_nickname + "_srl_" + std::to_string(pid) + "_";
 
 		const auto original_signi = scene.world.get_solvable().significant;
 		const auto original_signi_bytes = augs::to_bytes(original_signi);
@@ -343,6 +335,18 @@ void client_setup::send_pending_commands() {
 			}
 			else {
 				if (initial_buf != *written) {
+					{
+						const auto& tampered_cosm = scene.world;
+						const auto& tampered_mode = current_mode;
+
+						dump_for_debugging(
+							lua,
+							preffix + "tampered_",
+							tampered_cosm,
+							tampered_mode
+						);
+					}
+
 					auto as_text = [&](const auto& bytes) {
 						std::string ss;
 
@@ -357,23 +361,14 @@ void client_setup::send_pending_commands() {
 						return augs::path_type(preffix + of);
 					};
 
-					const auto& tampered_signi = scene.world.get_solvable().significant;
-					const auto& tampered_mode = current_mode;
-
-					augs::save_as_text(make_path("original_signi_bytes.txt"), as_text(original_signi_bytes));
-					augs::save_as_text(make_path("tampered_signi_bytes.txt"), as_text(augs::to_bytes(tampered_signi)));
-
-					augs::save_as_text(make_path("original_mode_bytes.txt"), as_text(original_mode_bytes));
-					augs::save_as_text(make_path("tampered_mode_bytes.txt"), as_text(augs::to_bytes(tampered_mode)));
+					augs::save_as_text(make_path("tampered_bytes.txt"), as_text(*written));
 
 					augs::save_as_text(make_path("original_bytes.txt"), as_text(initial_buf));
-					augs::save_as_text(make_path("tampered_bytes.txt"), as_text(*written));
+					augs::save_as_text(make_path("original_signi_bytes.txt"), as_text(original_signi_bytes));
+					augs::save_as_text(make_path("original_mode_bytes.txt"), as_text(original_mode_bytes));
 
 					augs::save_as_lua_table(lua, original_signi, make_path("original_signi.lua"));
 					augs::save_as_lua_table(lua, original_mode, make_path("original_mode.lua"));
-
-					augs::save_as_lua_table(lua, tampered_signi, make_path("tampered_signi.lua"));
-					augs::save_as_lua_table(lua, tampered_mode, make_path("tampered_mode.lua"));
 
 					ensure(false && "The serialization cycle is unstable. This might be a cause for indeterminism.");
 				}

@@ -85,8 +85,9 @@ entity_handle cosmic::create_entity(
 	);
 }
 
-void cosmic::infer_caches_for(const entity_handle& h) {
-	auto& cosm = h.get_cosmos();
+void cosmic::infer_caches_for(const entity_handle& in) {
+	auto& inferred = in.get_cosmos().get_solvable_inferred({});
+	const auto h = const_entity_handle(in);
 
 	h.dispatch([&](const auto& typed_handle) {
 		auto constructor = [&](auto, auto& sys) {
@@ -97,21 +98,22 @@ void cosmic::infer_caches_for(const entity_handle& h) {
 			}
 		};
 
-		augs::introspect(constructor, cosm.get_solvable_inferred({}));
+		augs::introspect(constructor, inferred);
 	});
 }
 
-void cosmic::destroy_caches_of(const entity_handle& h) {
-	auto& cosm = h.get_cosmos();
+void cosmic::destroy_caches_of(const entity_handle& in) {
+	auto& inferred = in.get_cosmos().get_solvable_inferred({});
+	const auto h = const_entity_handle(in);
 
 	auto destructor = [&h](auto, auto& sys) {
 		sys.destroy_cache_of(h);
 	};
 
-	augs::introspect(destructor, cosm.get_solvable_inferred({}));
+	augs::introspect(destructor, inferred);
 }
 
-void cosmic::infer_all_entities(cosmos& cosm) {
+void cosmic::infer_all_entities(cosmos& in) {
 	/* 
 		Infer domain-wise.
 
@@ -127,11 +129,12 @@ void cosmic::infer_all_entities(cosmos& cosm) {
 		The inferred systems are ordered in such a way that dependencies always go first.
 	*/
 
-	auto constructor = [&cosm](auto, auto& sys) {
+	auto constructor = [&in](auto, auto& sys) {
+		const auto& cosm = in;
 		sys.infer_all(cosm);
 	};
 
-	augs::introspect(constructor, cosm.get_solvable_inferred({}));
+	augs::introspect(constructor, in.get_solvable_inferred({}));
 }
 
 void cosmic::reserve_storage_for_entities(cosmos& cosm, const cosmic_pool_size_type s) {
