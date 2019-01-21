@@ -672,21 +672,35 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 						barrel_center.rotate(-subject_transform.rotation, mc);
 						muzzle.rotate(-subject_transform.rotation, mc);
 
-						if (/* centers_apart */ !mc.compare_abs(barrel_center)) {
-							requested_angle = collinearize_AB_with_C(mc, barrel_center, muzzle, crosshair_transform.pos, debug_line_drawer);
+						barrel_center -= mc;
+						muzzle -= mc;
+						auto crosshair = crosshair_transform.pos - mc;
+
+						if (barrel_center.is_nonzero()) {
+							auto translated_drawer = [&](const auto col, const auto a, const auto b) {
+								debug_line_drawer(col, a + mc, b + mc);
+							};
+
+							requested_angle = collinearize_AB_with_C(barrel_center, muzzle, crosshair, translated_drawer);
 						}
 					}
 					else if (is_weapon_like(subject_item)) {
-						auto throwable_transform = subject_item.get_logic_transform();
-						auto throwable_target_vector = throwable_transform.pos + throwable_transform.get_direction();
-
 						const auto mc = subject_transform.pos;
+
+						auto throwable_transform = subject_item.get_logic_transform();
+						throwable_transform.pos -= mc;
+
+						auto throwable_target_vector = throwable_transform.pos + throwable_transform.get_direction();
 
 						throwable_transform.pos.rotate(-subject_transform.rotation, mc);
 						throwable_target_vector.rotate(-subject_transform.rotation, mc);
 
 						if (/* centers_apart */ !mc.compare_abs(throwable_transform.pos)) {
-							requested_angle = collinearize_AB_with_C(mc, throwable_transform.pos, throwable_target_vector, crosshair_transform.pos, debug_line_drawer);
+							auto translated_drawer = [&](const auto col, const auto a, const auto b) {
+								debug_line_drawer(col, a + mc, b + mc);
+							};
+
+							requested_angle = collinearize_AB_with_C(throwable_transform.pos, throwable_target_vector, crosshair_transform.pos, translated_drawer);
 						}
 					}
 				}

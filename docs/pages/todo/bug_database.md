@@ -19,6 +19,58 @@ summary: Notable bugs.
 - HUD shows bad bomb progress
 	- It was due to client setup not keeping up with current time.
 
+## Desync issues
+
+- Resources:
+	- https://techdecoded.intel.io/resources/floating-point-reproducibility-in-intel-software-tools/
+	- https://software.intel.com/en-us/articles/getting-reproducible-results-with-intel-mkl
+	- https://scicomp.stackexchange.com/questions/24423/small-unpredictable-results-in-runs-of-a-deterministic-model
+		- Multithreaded computations on parallel cores. Modern computers typically have 2, 4, 8, or even more processor cores that can work in parallel. If your code is using parallel threads to compute a dot product on multiple processors, then any random perturbation of the system (e.g. the user moved his mouse and one of the processor cores has to process that mouse movement before returning to the dot product) could result in a change in the order of the additions. 
+		- I think this is only a problem with Intel MKL
+	- https://software.intel.com/en-us/forums/intel-c-compiler/topic/518464
+	- https://www.hemispheregames.com/2017/05/08/osmos-updates-and-floating-point-determinism/
+	- https://stackoverflow.com/questions/20963419/cross-platform-floating-point-consistency
+	- http://nicolas.brodu.net/en/programmation/streflop/index.html
+		- Even then, the IEEE754 standard has some loopholes concerning NaN types. In particular, when serializing results, binary files may differ. This problem is solved by comparing the logical signification of NaNs, and not their bit patterns.
+		- ALignment of data and vector instructions. Modern Intel processors have a special set of instructions that can operate on (for example) for floating point numbers at a time. These vector instructions work best if the data is aligned on 16 byte boundaries. Typically, a dot product loop would break the data up into sections of 16 bytes (4 floats at a time.) If you rerun the code a second time the data might be aligned differently with the 16 byte blocks of memory so that the additions are performed in a different order, resulting in a different answer. 
+			- Fortunately for us malloc aligns to 16-byte boundaries for us
+			- what about static allocations?
+	- https://stackoverflow.com/questions/26497891/inconsistent-float-operation-results-between-clang-and-gcc
+	- http://christian-seiler.de/projekte/fpmath/
+	- use openlibm or crlibm?
+	- use fp strict on linux as well, there's a switch
+	- ensure that fpmodel holds every frame
+		- actually we do already 
+		- the guy on Box2D forum checked only that nearest mode and something else?
+			- It was _MCW_PC which is unsupported on x64 per the msdn docs and intel forums here:
+				- https://software.intel.com/en-us/forums/software-tuning-performance-optimization-platform-monitoring/topic/277738
+	- https://stackoverflow.com/a/26502092/503776
+- flags to think about
+	- ffast-math
+- a client receives a state at N and does a complete reinference on it
+- the entropy for N+1 contains a "player added" entry which forces a complete reinference
+- shikashi, the clients did not reinfer state at N which the client has received
+- order of collisions happening?
+	- probably not
+- Could it be that the predicted cosm is advanced by mistake instead of the referential one?
+- Perhaps operator= of the physics system inadvertently modifies something of the world which it copies?
+	- The island only ever exists temporally.
+	- Problem: the stack allocator is rewritten. There are possibly dangling addresses.
+- There is a case where Data and Shuncio were synchronized with each other, but both had non-canonical version of the world, while I had it canonical
+- possibly bad packet payload?
+	- why would a client on the same machine not desync?
+- turn off fused add and multiply
+- test if replaying editor session yields same results if forcing a re-serialize of the solvable every frame
+	- and if serialized bytes are identical after re-serialization cycle
+	- make sure to use Release on Windows
+	- we can re-serialize random number of times to avoid the need for relaunch
+		- sometimes 0
+- to test reinference determinism, test if completely reinferring arbitrary number of times yields equal result as reinferring always just once
+- perhaps reinference inadvertently modifies something of the solvable?
+	- however, everybody reinfers all the same
+- doesnt the joined player reinfer twice? once on load, another time on shall reinfer
+- check windows dll dependencies for determinism
+
 ## Unexplained
 
 ### there was a request to transfer or wield an item that had an invalid slot set 
