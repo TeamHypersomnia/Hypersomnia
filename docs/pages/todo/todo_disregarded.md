@@ -6,6 +6,14 @@ summary: Just a hidden scratchpad.
 ---
 
 
+- We could opt for a longer float test running in the background for a second or two
+
+- Don't give release build for testing as it has commented out ensures.
+- Perhaps always use find instead of get?
+
+- instead of notify_gui, have more flags, e.g. for pickup notifications
+	- pickups are not that predictable after all
+	- problem: a pickup could remain undetected
 - hotbar selection through wheel won't always succeed
 	- actually that's probably not needed, it'd take way too long to navigate to the weapon of choice
 	- it will be a LOT more useful to bind wheelup/wheeldown for pulling out a particular class of a weapon, or e.g. throwing a nade

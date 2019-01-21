@@ -493,7 +493,9 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							progress = 0.f;
 						};
 
-						try_to_play_trigger_pull_sound();
+						if (progress == 0.f) {
+							try_to_play_trigger_pull_sound();
+						}
 
 						if (transfer_cooldown_passed && feasible_wielding) {
 							if (const auto next_cartridge = find_next_cartridge(gun_entity); next_cartridge.is_set()) {

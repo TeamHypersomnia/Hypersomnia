@@ -2979,3 +2979,8 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - increase range of secondary throw
 
+- fix smoke particles becoming bubbles as we still have a good repro
+	- perhaps effect ids remain the same but content is different
+
+- the personal depo still gets closed sometimes
+- prevent trigger pull sound during chambering

@@ -6,21 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- instead of notify_gui, have more flags, e.g. for pickup notifications
-	- pickups are not that predictable after all
-	- problem: a pickup could remain undetected
-
-- We could opt for a longer float test running in the background for a second or two
-
-- Don't give release build for testing as it has commented out ensures.
-- Perhaps always use find instead of get?
-
 - separate slot for the bomb, OVER_SHOULDER
 	- It would always be drawn over the backpack.
 	- We might decrease the bomb density a little so that the bomber isn't too heavy.
-
-- fix smoke particles becoming bubbles as we still have a good repro
-	- perhaps effect ids remain the same but content is different
 
 - when re-exporting
 	- fix spells
@@ -28,8 +16,6 @@ summary: That which we are brainstorming at the moment.
 	- weapons
 	- character stats
 
-- the personal depo still gets closed sometimes
-- prevent trigger pull sound during chambering
 - log if client does not have the map that's on the server
 
 - always holster the weapon first if reloading
