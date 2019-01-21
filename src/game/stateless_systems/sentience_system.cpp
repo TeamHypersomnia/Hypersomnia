@@ -663,18 +663,20 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 				if (items.size() > 0) {
 					const auto subject_item = cosm[items[0]];
 
+					const auto mc = subject_transform.pos;
+					const auto crosshair = crosshair_transform.pos - mc;
+
 					if (const auto* const maybe_gun_def = subject_item.template find<invariants::gun>()) {
 						const auto rifle_transform = subject_item.get_logic_transform();
+
 						auto barrel_center = calc_barrel_center(subject_item, rifle_transform);
 						auto muzzle = calc_muzzle_transform(subject_item, rifle_transform).pos;
-						const auto mc = subject_transform.pos;
-
-						barrel_center.rotate(-subject_transform.rotation, mc);
-						muzzle.rotate(-subject_transform.rotation, mc);
 
 						barrel_center -= mc;
 						muzzle -= mc;
-						auto crosshair = crosshair_transform.pos - mc;
+
+						barrel_center.rotate(-subject_transform.rotation);
+						muzzle.rotate(-subject_transform.rotation);
 
 						if (barrel_center.is_nonzero()) {
 							auto translated_drawer = [&](const auto col, const auto a, const auto b) {
@@ -685,22 +687,20 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 						}
 					}
 					else if (is_weapon_like(subject_item)) {
-						const auto mc = subject_transform.pos;
-
 						auto throwable_transform = subject_item.get_logic_transform();
 						throwable_transform.pos -= mc;
 
 						auto throwable_target_vector = throwable_transform.pos + throwable_transform.get_direction();
 
-						throwable_transform.pos.rotate(-subject_transform.rotation, mc);
-						throwable_target_vector.rotate(-subject_transform.rotation, mc);
+						throwable_transform.pos.rotate(-subject_transform.rotation);
+						throwable_target_vector.rotate(-subject_transform.rotation);
 
 						if (/* centers_apart */ !mc.compare_abs(throwable_transform.pos)) {
 							auto translated_drawer = [&](const auto col, const auto a, const auto b) {
 								debug_line_drawer(col, a + mc, b + mc);
 							};
 
-							requested_angle = collinearize_AB_with_C(throwable_transform.pos, throwable_target_vector, crosshair_transform.pos, translated_drawer);
+							requested_angle = collinearize_AB_with_C(throwable_transform.pos, throwable_target_vector, crosshair, translated_drawer);
 						}
 					}
 				}
