@@ -121,7 +121,7 @@ return {
   },
   debug_drawing = {
     draw_cast_rays = false,
-    draw_colinearization = false,
+    draw_collinearization = false,
     draw_discontinuities = false,
     draw_explosion_forces = false,
     draw_forces = false,

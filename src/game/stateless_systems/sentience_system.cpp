@@ -598,7 +598,7 @@ void sentience_system::cooldown_aimpunches(const logic_step step) const {
 
 void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic_step step) const {
 	auto debug_line_drawer = [](const rgba col, const vec2 a, const vec2 b){
-		if (DEBUG_DRAWING.draw_colinearization) {
+		if (DEBUG_DRAWING.draw_collinearization) {
 			DEBUG_LOGIC_STEP_LINES.emplace_back(col, a, b);
 		}
 	};
@@ -671,7 +671,7 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 						muzzle.rotate(-subject_transform.rotation, mc);
 
 						if (/* centers_apart */ !mc.compare_abs(barrel_center)) {
-							requested_angle = colinearize_AB_with_C(mc, barrel_center, muzzle, target_transform.pos, debug_line_drawer);
+							requested_angle = collinearize_AB_with_C(mc, barrel_center, muzzle, target_transform.pos, debug_line_drawer);
 						}
 					}
 					else if (is_weapon_like(subject_item)) {
@@ -684,7 +684,7 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 						throwable_target_vector.rotate(-subject_transform.rotation, mc);
 
 						if (/* centers_apart */ !mc.compare_abs(throwable_transform.pos)) {
-							requested_angle = colinearize_AB_with_C(mc, throwable_transform.pos, throwable_target_vector, target_transform.pos, debug_line_drawer);
+							requested_angle = collinearize_AB_with_C(mc, throwable_transform.pos, throwable_target_vector, target_transform.pos, debug_line_drawer);
 						}
 					}
 				}

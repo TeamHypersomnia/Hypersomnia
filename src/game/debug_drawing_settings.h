@@ -22,7 +22,7 @@ struct debug_drawing_settings {
 	// GEN INTROSPECTOR struct debug_drawing_settings
 	bool enabled = false;
 
-	bool draw_colinearization = false;
+	bool draw_collinearization = false;
 	bool draw_melee_info = false;
 	bool draw_forces = false;
 	bool draw_friction_field_collisions_of_entering = false;

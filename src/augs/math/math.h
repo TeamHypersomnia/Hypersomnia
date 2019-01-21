@@ -50,7 +50,7 @@ vec2 position_rectangle_around_a_circle(
 );
 
 template <class F>
-float colinearize_AB_with_C(
+real32 collinearize_AB_with_C(
 	const vec2 O_center_of_rotation, 
 	vec2 A_barrel_center, 
 	vec2 B_muzzle, 
@@ -70,7 +70,7 @@ float colinearize_AB_with_C(
 
 	C_crosshair = O_center_of_rotation + crosshair_vector;
 
-	const float oc_radius = crosshair_vector.length();
+	const auto oc_radius = crosshair_vector.length();
 
 	const auto intersection = circle_ray_intersection(B_muzzle, A_barrel_center, O_center_of_rotation, oc_radius);
 	
