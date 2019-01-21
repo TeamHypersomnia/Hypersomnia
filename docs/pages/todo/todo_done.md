@@ -2984,3 +2984,13 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - the personal depo still gets closed sometimes
 - prevent trigger pull sound during chambering
+- disable buying in warmup
+	- or just 0 money
+		- but we can still get awards so better to just disable it 
+
+- can probably buy when dead
+- the problem still persists with weapons being glued to someone
+- freeze someone on connection if they connect
+
+- fix those dangling particle streams as they may give away positions 
+

@@ -91,6 +91,9 @@ struct bomb_mode_ruleset {
 	bool refill_all_mags_on_round_start = true;
 	bool refill_chambers_on_round_start = true;
 
+	bool enable_item_shop = true;
+	bool warmup_enable_item_shop = false;
+
 	bomb_mode_economy_rules economy;
 	bomb_mode_view_rules view;
 

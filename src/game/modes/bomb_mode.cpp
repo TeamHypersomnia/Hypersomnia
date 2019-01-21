@@ -890,7 +890,7 @@ bomb_mode::round_transferred_players bomb_mode::make_transferred_players(const i
 			auto& pm = result[id];
 			pm.movement = handle.get<components::movement>().flags;
 
-			if (sentient_and_unconscious(handle)) {
+			if (::sentient_and_unconscious(handle)) {
 				continue;
 			}
 
@@ -1954,7 +1954,15 @@ float bomb_mode::get_freeze_seconds_left(const const_input_type in) const {
 
 float bomb_mode::get_buy_seconds_left(const const_input_type in) const {
 	if (state == arena_mode_state::WARMUP) {
+		if (!in.rules.warmup_enable_item_shop) {
+			return 0.f;
+		}
+
 		return get_warmup_seconds_left(in);
+	}
+
+	if (!in.rules.enable_item_shop) {
+		return 0.f;
 	}
 
 	return static_cast<float>(in.rules.freeze_secs + in.rules.buy_secs_after_freeze) - get_total_seconds(in);

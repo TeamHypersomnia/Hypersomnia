@@ -20,15 +20,6 @@ summary: That which we are brainstorming at the moment.
 
 - always holster the weapon first if reloading
 
-- disable buying in warmup
-	- or just 0 money
-
-- can probably buy when dead
-- the problem still persists with weapons being glued to someone
-- freeze someone on connection if they connect
-
-- fix those dangling particle streams as they may give away positions 
-
 - Bug: path specification for assets doesnt fully work on Windows
 
 - allow modifications after re-export
