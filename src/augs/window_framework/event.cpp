@@ -240,6 +240,8 @@ namespace augs {
 					case key::MMOUSE: return true;
 					case key::MOUSE4: return true;
 					case key::MOUSE5: return true;
+					case key::WHEELUP: return true;
+					case key::WHEELDOWN: return true;
 					default: return false;
 				}
 			}

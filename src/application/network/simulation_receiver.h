@@ -85,9 +85,11 @@ public:
 	}
 
 	void acquire_next_server_entropy(
+		const prestep_client_context& context,
 		const server_step_entropy_meta& meta,
 		const received_entropy_type& payload
 	) {
+		incoming_contexts.push_back(context);
 		incoming_entropies.push_back({meta, payload});
 
 		if (incoming_contexts.size() < incoming_entropies.size()) {
@@ -95,10 +97,6 @@ public:
 
 			ensure_eq(incoming_contexts.size(), incoming_entropies.size());
 		}
-	}
-
-	void acquire_next_server_entropy(const prestep_client_context& context) {
-		incoming_contexts.push_back(context);
 	}
 
 	template <class F, class A, class S1, class S2>

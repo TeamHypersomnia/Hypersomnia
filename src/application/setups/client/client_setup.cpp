@@ -239,10 +239,11 @@ message_handler_result client_setup::handle_server_message(
 			return abort_v;
 		}
 
-		{
-			receiver.acquire_next_server_entropy(payload.meta, payload.payload);
-			receiver.acquire_next_server_entropy(payload.context);
-		}
+		receiver.acquire_next_server_entropy(
+			payload.context,
+			payload.meta, 
+			payload.payload
+		);
 
 		const auto& max_commands = vars.max_buffered_server_commands;
 		const auto num_commands = receiver.incoming_entropies.size();
@@ -274,7 +275,7 @@ void client_setup::handle_server_messages() {
 	client->advance(client_time, message_handler);
 }
 
-#define STRESS_TEST_ARENA_SERIALIZATION 1
+#define STRESS_TEST_ARENA_SERIALIZATION 0
 #if STRESS_TEST_ARENA_SERIALIZATION
 #include <random>
 #include "augs/readwrite/lua_file.h"
