@@ -300,19 +300,31 @@ void update_component_related_cache(
 			const auto id = typed_handle.get_id().to_unversioned();
 
 			if (const auto item = typed_handle.template find<components::item>()) {
-				if (typed_handle.find_colliders_connection() == std::nullopt) {
-					caches.erase(id);
-					return;
+				if (const auto slot = typed_handle.get_current_slot(); slot.alive()) {
+					/* 
+						Disable effects for holstered items and items on the body,
+						to prevent giving away of the positions.
+					*/
+
+					if (!slot.is_hand_slot()) {
+						caches.erase(id);
+						return;
+					}
+
+					if (typed_handle.find_colliders_connection() == std::nullopt) {
+						caches.erase(id);
+						return;
+					}
 				}
 			}
 
 			if (const auto particles = effect_provider(typed_handle)) {
 				if (auto* const existing = mapped_or_nullptr(caches, id)) {
-					existing->original = *particles;
+					existing->cache.original = *particles;
 				}
 				else {
 					try {
-						caches.try_emplace(id, particles->start.positioning, *particles, manager, rng);
+						caches.try_emplace(id, particles_simulation_system::continuous_particles_cache { { particles->start.positioning, *particles, manager, rng }, { typed_handle.get_name() } });
 					}
 					catch (const particles_simulation_system::effect_not_found&) {
 
@@ -494,8 +506,8 @@ void particles_simulation_system::advance_visible_streams(
 			return c.is_over();
 		});
 
-		erase_if(firearm_engine_caches, [&](auto& it ) {
-			auto& c = it.second;
+		erase_if(firearm_engine_caches, [&](auto& it) {
+			auto& c = it.second.cache;
 
 			const auto chase = c.chasing;
 			const auto where = find_transform(chase, cosm, interp);
@@ -504,38 +516,55 @@ void particles_simulation_system::advance_visible_streams(
 				return true;
 			}
 
+			if (const auto subject = cosm[it.first]) {
+				if (subject.get_name() != it.second.recorded.name) {
+					return true;
+				}
+			}
+
 			const bool visible_in_camera = cam_aabb.hover(where->pos);
 
 			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
 			return false;
 		});
 		
-		for (auto& it : continuous_particles_caches) { 
-			auto& c = it.second;
+		erase_if(continuous_particles_caches, [&](auto& it) { 
+			auto& c = it.second.cache;
 			const auto chase = c.chasing;
 
-			if (auto where = find_transform(chase, cosm, interp)) {
-				const auto displacement = [&]() {
-					if (const auto subject = cosm[it.first]) {
-						return subject.dispatch_on_having_all_ret<components::continuous_particles>([](const auto& typed_subject) {
-							if constexpr(is_nullopt_v<decltype(typed_subject)>) {
-								return transformr();
-							}
-							else {
-								return transformr(typed_subject.template get<components::continuous_particles>().wandering_state.current, 0);
-							}
-						});
-					}
+			auto where = find_transform(chase, cosm, interp);
 
-					return transformr();
-				}();
-
-				*where += displacement;
-				const bool visible_in_camera = cam_aabb.hover(where->pos);
-
-				advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
+			if (where == std::nullopt) {
+				return true;
 			}
-		}
+
+			if (const auto subject = cosm[it.first]) {
+				if (subject.get_name() != it.second.recorded.name) {
+					return true;
+				}
+			}
+
+			const auto displacement = [&]() {
+				if (const auto subject = cosm[it.first]) {
+					return subject.template dispatch_on_having_all_ret<components::continuous_particles>([](const auto& typed_subject) {
+						if constexpr(is_nullopt_v<decltype(typed_subject)>) {
+							return transformr();
+						}
+						else {
+							return transformr(typed_subject.template get<components::continuous_particles>().wandering_state.current, 0);
+						}
+					});
+				}
+
+				return transformr();
+			}();
+
+			*where += displacement;
+			const bool visible_in_camera = cam_aabb.hover(where->pos);
+
+			advance_emissions(c.emission_instances, *where, visible_in_camera, c.original);
+			return false;
+		});
 	}
 
 	update_component_related_cache<components::gun>(
@@ -553,7 +582,7 @@ void particles_simulation_system::advance_visible_streams(
 		manager,
 		cosm,
 		continuous_particles_caches,
-		[](const auto h) {
+		[](const auto h) -> std::optional<packaged_particle_effect> {
 			const auto& continuous_particles = h.template get<invariants::continuous_particles>();
 
 			packaged_particle_effect particles;
@@ -562,6 +591,10 @@ void particles_simulation_system::advance_visible_streams(
 			particles.start.stream_infinitely = true;
 
 			particles.input = continuous_particles.effect;
+
+			if (!particles.input.id.is_set()) {
+				return std::nullopt;
+			}
 
 			return std::make_optional(particles);
 		}

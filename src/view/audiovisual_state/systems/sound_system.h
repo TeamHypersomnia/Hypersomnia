@@ -92,8 +92,18 @@ class sound_system {
 	};
 
 	augs::constant_size_vector<generic_sound_cache, MAX_SHORT_SOUNDS> short_sounds;
-	audiovisual_cache_map<generic_sound_cache> firearm_engine_caches;
-	audiovisual_cache_map<generic_sound_cache> continuous_sound_caches;
+
+	struct recorded_meta {
+		std::string name;
+	};
+
+	struct continuous_sound_cache {
+		generic_sound_cache cache;
+		recorded_meta recorded;
+	};
+
+	audiovisual_cache_map<continuous_sound_cache> firearm_engine_caches;
+	audiovisual_cache_map<continuous_sound_cache> continuous_sound_caches;
 
 	augs::constant_size_vector<fading_source, MAX_FADING_SOURCES> fading_sources;
 	std::unordered_map<collision_sound_source, collision_sound_cooldown> collision_sound_cooldowns;
@@ -101,7 +111,7 @@ class sound_system {
 	template <class T>
 	void fade_and_erase(T& caches, const unversioned_entity_id id, const float fade_per_sec = 3.f) {
 		if (auto* const cache = mapped_or_nullptr(caches, id)) {
-			start_fading(*cache, fade_per_sec);
+			start_fading(cache->cache, fade_per_sec);
 			caches.erase(id);
 		}
 	}

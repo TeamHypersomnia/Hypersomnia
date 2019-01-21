@@ -147,8 +147,17 @@ public:
 	augs::constant_size_vector<orbital_cache, MAX_ORBITAL_EMISSIONS> orbital_emissions;
 	augs::constant_size_vector<faf_cache, MAX_FIRE_AND_FORGET_EMISSIONS> fire_and_forget_emissions;
 
-	audiovisual_cache_map<orbital_cache> firearm_engine_caches;
-	audiovisual_cache_map<orbital_cache> continuous_particles_caches;
+	struct recorded_meta {
+		std::string name;
+	};
+
+	struct continuous_particles_cache {
+		orbital_cache cache;
+		recorded_meta recorded;
+	};
+
+	audiovisual_cache_map<continuous_particles_cache> firearm_engine_caches;
+	audiovisual_cache_map<continuous_particles_cache> continuous_particles_caches;
 
 	void clear();
 

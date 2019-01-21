@@ -59,7 +59,7 @@ void sound_system::clear_sources_playing(const assets::sound_id id) {
 	};
 
 	auto map_erase = [linear_erase](const auto& it) {
-		return linear_erase(it.second);
+		return linear_erase(it.second.cache);
 	};
 
 	erase_if(short_sounds, linear_erase);
@@ -399,15 +399,15 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 
 			if (const auto sound = ::calc_firearm_engine_sound(gun_entity)) {
 				if (auto* const existing = mapped_or_nullptr(firearm_engine_caches, id)) {
-					existing->original = *sound;
+					existing->cache.original = *sound;
 
-					if (!existing->rebind_buffer(in)) {
+					if (!existing->cache.rebind_buffer(in)) {
 						fade_and_erase(firearm_engine_caches, id);
 					}
 				}
 				else {
 					try {
-						firearm_engine_caches.try_emplace(id, *sound, in);
+						firearm_engine_caches.try_emplace(id, continuous_sound_cache { { *sound, in }, gun_entity.get_name() });
 					}
 					catch (...) {
 
@@ -431,15 +431,15 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 			sound.input = continuous_sound.effect;
 
 			if (auto* const existing = mapped_or_nullptr(continuous_sound_caches, id)) {
-				existing->original = sound;
+				existing->cache.original = sound;
 
-				if (!existing->rebind_buffer(in)) {
+				if (!existing->cache.rebind_buffer(in)) {
 					fade_and_erase(continuous_sound_caches, id);
 				}
 			}
 			else {
 				try {
-					continuous_sound_caches.try_emplace(id, sound, in);
+					continuous_sound_caches.try_emplace(id, continuous_sound_cache { { sound, in }, sound_entity.get_name() } );
 				}
 				catch (...) {
 
@@ -456,9 +456,17 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 	};
 
 	erase_if(firearm_engine_caches, [&](auto& it) {
-		auto& cache = it.second;
+		const auto& recorded = it.second.recorded;
+		const auto handle = cosm[it.first];
 
-		if (cosm[it.first].dead()) {
+		auto& cache = it.second.cache;
+
+		if (handle.dead()) {
+			start_fading(cache);
+			return true;
+		}
+
+		if (recorded.name != handle.get_name()) {
 			start_fading(cache);
 			return true;
 		}
@@ -521,11 +529,22 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 	};
 
 	erase_if(continuous_sound_caches, [&](auto& it) {
-		auto& cache = it.second;
-
+		const auto& recorded = it.second.recorded;
 		const auto handle = cosm[it.first];
 
+		auto& cache = it.second.cache;
+
+		if (handle.dead()) {
+			start_fading(cache);
+			return true;
+		}
+
 		if (!can_have_continuous_sound(handle)) {
+			start_fading(cache);
+			return true;
+		}
+
+		if (recorded.name != handle.get_name()) {
 			start_fading(cache);
 			return true;
 		}
