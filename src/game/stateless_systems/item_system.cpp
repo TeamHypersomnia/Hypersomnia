@@ -616,6 +616,11 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 			}
 
 			{
+				if (typed_subject.is_frozen()) {
+					/* Forbid unarming and throwing nades when frozen */
+					return;
+				}
+
 				auto requested_force_type = adverse_element_type::INVALID;
 
 				switch (r.intent) {
@@ -721,6 +726,11 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 			}
 
 			if (r.was_pressed()) {
+				if (typed_subject.is_frozen()) {
+					/* Forbid throwing knives when frozen */
+					return;
+				}
+
 				int requested_knives = 0;
 
 				switch (r.intent) {
