@@ -555,44 +555,59 @@ struct basic_vec2 {
 		return *this;
 	}
 
-	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
 	bool x_non_zero(const real eps = AUGS_EPSILON<real>) const {
-		return repro::fabs(x) > eps;
+		if constexpr(std::is_integral_v<type>) {
+			return x != 0;
+		}
+		else {
+			return repro::fabs(x) > eps;
+		}
 	}
 
-	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
 	bool y_non_zero(const real eps = AUGS_EPSILON<real>) const {
-		return repro::fabs(y) > eps;
+		if constexpr(std::is_integral_v<type>) {
+			return y != 0;
+		}
+		else {
+			return repro::fabs(y) > eps;
+		}
 	}
 
-	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
-	bool non_zero(const real eps = AUGS_EPSILON<real>) const {
-		return repro::fabs(x) > eps || repro::fabs(y) > eps;
+	template <class R>
+	bool is_epsilon(const R epsilon) const {
+		if constexpr(std::is_integral_v<type>) {
+			return x <= epsilon && y <= epsilon;
+		}
+		else {
+			return repro::fabs(x) <= epsilon && repro::fabs(y) <= epsilon;
+		}
 	}
 
-	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
-	bool neither_zero(const real eps = AUGS_EPSILON<real>) const {
-		return repro::fabs(x) > eps && repro::fabs(y) > eps;
+	bool is_nonzero() const {
+		if constexpr(std::is_integral_v<type>) {
+			return x != 0 || y != 0;
+		}
+		else {
+			return repro::fabs(x) > AUGS_EPSILON<real> || repro::fabs(y) > AUGS_EPSILON<real>;
+		}
 	}
 
-	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
-	bool is_zero(const real eps = AUGS_EPSILON<real>) const {
-		return repro::fabs(x) <= eps && repro::fabs(y) <= eps;
-	}
-
-	template <class A = type, class = std::enable_if_t<std::is_integral_v<A>>>
-	bool non_zero() const {
-		return x != 0 || y != 0;
-	}
-
-	template <class A = type, class = std::enable_if_t<std::is_integral_v<A>>>
 	bool neither_zero() const {
-		return x != 0 && y != 0;
+		if constexpr(std::is_integral_v<type>) {
+			return x != 0 && y != 0;
+		}
+		else {
+			return repro::fabs(x) > AUGS_EPSILON<real> && repro::fabs(y) > AUGS_EPSILON<real>;
+		}
 	}
 
-	template <class A = type, class = std::enable_if_t<std::is_integral_v<A>>>
 	bool is_zero() const {
-		return x == 0 && y == 0;
+		if constexpr(std::is_integral_v<type>) {
+			return x == 0 && y == 0;
+		}
+		else {
+			return repro::fabs(x) <= AUGS_EPSILON<real> && repro::fabs(y) <= AUGS_EPSILON<real>;
+		}
 	}
 
 	basic_vec2 operator-() const { return basic_vec2(x * -1, y * -1); }
@@ -607,14 +622,6 @@ struct basic_vec2 {
 	}
 
 	template <class A = type, class = std::enable_if_t<std::is_floating_point_v<A>>>
-	bool is_epsilon(const real epsilon = AUGS_EPSILON<real>) const {
-		if (repro::fabs(x) < epsilon && repro::fabs(y) < epsilon) {
-			return true;
-		}
-
-		return false;
-	}
-
 	bool compare(const basic_vec2& b, const real epsilon = AUGS_EPSILON<real>) const {
 		if ((*this - b).length_sq() <= epsilon*epsilon) {
 			return true;

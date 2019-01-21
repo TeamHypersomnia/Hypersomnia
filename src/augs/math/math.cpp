@@ -28,8 +28,8 @@ intersection_output circle_ray_intersection(
 
 	b2RayCastInput in;
 	in.maxFraction = 1.f;
-	in.p1 = b2Vec2(b + (b-a).set_length(4000.f));
-	in.p2 = b2Vec2(a);
+	in.p1 = b2Vec2(a);
+	in.p2 = b2Vec2(b);
 
 	b2RayCastOutput out;
 	b2Transform id;

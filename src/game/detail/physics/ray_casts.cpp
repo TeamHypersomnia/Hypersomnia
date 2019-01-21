@@ -126,7 +126,7 @@ vec2 physics_world_cache::push_away_from_walls(
 		}
 	}
 
-	if (resultant.non_zero()) {
+	if (resultant.is_nonzero()) {
 		return position + (-resultant).set_length(radius - worst_distance);
 	}
 	else {

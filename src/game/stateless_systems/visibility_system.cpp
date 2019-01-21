@@ -346,7 +346,7 @@ void visibility_system::calc_visibility(
 
 						const auto side = (eye_local - vert).cross(next_vert - vert);
 
-						if (augs::is_epsilon(side)) {
+						if (augs::is_zero(side)) {
 							/* A collinear edge. The closer vertex is always visible, the further is not. */
 
 							if (eye_local - vec2(vert) < eye_local - vec2(next_vert)) {

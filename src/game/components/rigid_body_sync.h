@@ -268,7 +268,7 @@ void component_synchronizer<E, components::rigid_body>::apply_impulse(
 		data.angular_velocity = body->GetAngularVelocity();
 		data.velocity = body->GetLinearVelocity();
 
-		if (DEBUG_DRAWING.draw_forces && pixels.non_zero()) {
+		if (DEBUG_DRAWING.draw_forces && pixels.is_nonzero()) {
 			/* 
 				Warning: bodies like player's crosshair recoil might have their forces drawn 
 				in the vicinity of (0, 0) coordinates instead of near wherever the player is.

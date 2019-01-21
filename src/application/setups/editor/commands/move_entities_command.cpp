@@ -366,7 +366,7 @@ static void resize_entities(
 						if (found_reference_point) {
 							set_size(desired_size);
 
-							if (!augs::is_epsilon(rot)) {
+							if (augs::is_nonzero(rot)) {
 								desired_pos.rotate(original_transform);
 							}
 

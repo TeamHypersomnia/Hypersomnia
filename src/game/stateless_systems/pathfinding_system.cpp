@@ -380,7 +380,7 @@ void pathfinding_system::advance_pathfinding_sessions(const logic_step step) {
 						lines.emplace_back(disc.location, disc.sensor, rgba(0, 127, 255, 255));
 
 					for (auto& disc : pathfinding.session().discovered_vertices)
-						//if(disc.sensor.non_zero())
+						//if(disc.sensor.is_nonzero())
 						lines.emplace_back(disc.location, disc.location + vec2(0, pathfinding.target_offset), rgba(0, 255, 0, 255));
 				}
 

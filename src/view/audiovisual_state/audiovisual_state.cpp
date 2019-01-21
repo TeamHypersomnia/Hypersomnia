@@ -336,7 +336,7 @@ void audiovisual_state::standard_post_solve(
 		auto& highlights = get<pure_color_highlight_system>();
 
 		for (const auto& h : healths) {
-			if (!augs::is_epsilon(h.effective_amount)) {
+			if (augs::is_nonzero(h.effective_amount)) {
 				const auto cols = color_info(h);
 
 				pure_color_highlight_system::highlight::input new_highlight;

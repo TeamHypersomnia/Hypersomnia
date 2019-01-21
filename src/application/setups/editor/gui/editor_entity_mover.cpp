@@ -280,7 +280,7 @@ bool editor_entity_mover::do_mousemotion(const input_type in, vec2 world_cursor_
 				const auto old_vector = initial_world_cursor_pos - center;
 				const auto new_vector = new_cursor_pos - center;
 
-				if (old_vector.non_zero() && new_vector.non_zero()) {
+				if (old_vector.is_nonzero() && new_vector.is_nonzero()) {
 					const auto degrees = old_vector.full_degrees_between(new_vector);
 					auto new_delta = transformr(vec2::zero, degrees);
 

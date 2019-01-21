@@ -34,7 +34,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 			const auto& rotation_speed = movement_path_def.continuous_rotation_speed;
 
-			if (!augs::is_epsilon(rotation_speed)) {
+			if (augs::is_nonzero(rotation_speed)) {
 				transform.rotation += rotation_speed * delta.in_seconds();
 			}
 

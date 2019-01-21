@@ -160,7 +160,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 					const auto tracified_size = vec2(sprite.size) * trace.last_size_mult;
 
 					if (const auto center_offset = tracified_size * trace.last_center_offset_mult;
-						center_offset.non_zero()
+						center_offset.is_nonzero()
 					) {
 						const auto final_rotation = input.renderable_transform.rotation;
 						input.renderable_transform.pos -= vec2(center_offset).rotate(final_rotation);

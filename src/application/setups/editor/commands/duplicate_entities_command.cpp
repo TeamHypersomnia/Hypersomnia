@@ -40,7 +40,7 @@ void duplicate_entities_command::redo(const editor_command_input in) {
 
 	auto& cosm = in.get_cosmos();
 
-	const bool does_mirroring = mirror_direction.non_zero();
+	const bool does_mirroring = mirror_direction.is_nonzero();
 
 	const auto new_group_suffix = [this](){
 		if (mirror_direction.is_zero()) {

@@ -26,7 +26,7 @@ damping_mults calc_damping_mults(const E& handle, const invariants::rigid_body& 
 
 		const auto requested_by_input = movement.get_force_requested_by_input(movement_def.input_acceleration_axes);
 
-		if (requested_by_input.non_zero()) {
+		if (requested_by_input.is_nonzero()) {
 			if (movement.was_sprint_effective) {
 				if (!is_inert) {
 					damping.linear /= 4;

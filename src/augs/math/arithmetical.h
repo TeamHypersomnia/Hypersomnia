@@ -51,13 +51,23 @@ namespace augs {
 	}
 
 	template <class T>
-	bool is_epsilon(const T& t) {
+	bool is_epsilon(const T& t, const T eps) {
+		return repro::fabs(t) <= eps;
+	}
+
+	template <class T>
+	bool is_zero(const T& t) {
 		return repro::fabs(t) <= AUGS_EPSILON<T>;
 	}
 
 	template <class T>
+	bool is_nonzero(const T& t) {
+		return repro::fabs(t) > AUGS_EPSILON<T>;
+	}
+
+	template <class T>
 	bool is_positive_epsilon(const T& t) {
-		return t > AUGS_EPSILON<T>;
+		return t >= AUGS_EPSILON<T>;
 	}
 
 	template <class T>

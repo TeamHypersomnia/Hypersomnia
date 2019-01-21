@@ -72,7 +72,7 @@ void car_system::apply_movement_forces(const logic_step step) {
 				resultant.set_length(car.acceleration_length);
 			}
 
-			if (resultant.non_zero()) {
+			if (resultant.is_nonzero()) {
 				const vec2 force = resultant.x * forward_dir + right_normal * resultant.y;
 				const vec2 forward_tire_force = vec2(forward_dir).set_length(force.length()) * augs::sgn(resultant.x);
 

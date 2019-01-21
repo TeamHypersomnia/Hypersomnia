@@ -131,7 +131,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			}();
 
 			const auto requested_by_input = movement.get_force_requested_by_input(movement_def.input_acceleration_axes);
-			const bool non_zero_requested = requested_by_input.non_zero();
+			const bool non_zero_requested = requested_by_input.is_nonzero();
 
 			if (is_sentient) {
 				const auto& def = it.template get<invariants::sentience>();

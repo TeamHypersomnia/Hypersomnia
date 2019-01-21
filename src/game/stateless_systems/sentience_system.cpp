@@ -39,6 +39,8 @@
 #include "game/detail/sentience/tool_getters.h"
 #include "augs/templates/logically_empty.h"
 
+#include "augs/math/collinearize_AB_with_C.h"
+
 damage_cause::damage_cause(const const_entity_handle& handle) {
 	entity = handle;
 	flavour = handle.get_flavour_id();
@@ -55,7 +57,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 	const auto now = clk.now;
 	const auto dt = clk.dt;
 
-	constexpr float standard_cooldown_for_all_spells_ms = 2000.f;
+	constexpr real32 standard_cooldown_for_all_spells_ms = 2000.f;
 
 	for (const auto& players : step.get_entropy().players) {
 		const auto subject = cosm[players.first];
@@ -641,14 +643,14 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 					base_offset = fighter.overridden_crosshair_base_offset;
 				}
 
-				const auto target_transform = subject.get_world_crosshair_transform();
+				const auto crosshair_transform = subject.get_world_crosshair_transform();
 
 				if (override_base_offset) {
 					base_offset = prev_base_offset;
 				}
 
 				{
-					const auto diff = target_transform.pos - subject_transform.pos;
+					const auto diff = crosshair_transform.pos - subject_transform.pos;
 
 					if (diff.is_epsilon(1.f)) {
 						requested_angle = 0.f;
@@ -671,7 +673,7 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 						muzzle.rotate(-subject_transform.rotation, mc);
 
 						if (/* centers_apart */ !mc.compare_abs(barrel_center)) {
-							requested_angle = collinearize_AB_with_C(mc, barrel_center, muzzle, target_transform.pos, debug_line_drawer);
+							requested_angle = collinearize_AB_with_C(mc, barrel_center, muzzle, crosshair_transform.pos, debug_line_drawer);
 						}
 					}
 					else if (is_weapon_like(subject_item)) {
@@ -684,7 +686,7 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 						throwable_target_vector.rotate(-subject_transform.rotation, mc);
 
 						if (/* centers_apart */ !mc.compare_abs(throwable_transform.pos)) {
-							requested_angle = collinearize_AB_with_C(mc, throwable_transform.pos, throwable_target_vector, target_transform.pos, debug_line_drawer);
+							requested_angle = collinearize_AB_with_C(mc, throwable_transform.pos, throwable_target_vector, crosshair_transform.pos, debug_line_drawer);
 						}
 					}
 				}
