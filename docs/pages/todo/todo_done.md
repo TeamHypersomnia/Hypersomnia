@@ -2963,3 +2963,17 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - (Shuncio) some possible crash before start of the next round
 
+- forbid arming grenades when frozen
+	- happens only for mouse hotkeys
+
+- walking around many shells slows down so it's probably due to logic
+
+
+- arena gui predicts wrong
+	- draw deaths only for referential, i think it might be the other way around
+	- problem is, it draws based on state not on events?
+		- but the referential state for the bomb mode should properly have the kill
+- knives should not be thrown if wheelup is pressed during freeze
+	- simply dont allow to request throw during freeze
+	- fetch wheelup in the arena gui also in case you buy something after the freeze
+

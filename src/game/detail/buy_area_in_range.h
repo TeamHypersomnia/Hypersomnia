@@ -1,11 +1,16 @@
 #pragma once
 #include "game/detail/visible_entities.h"
+#include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/physics/shape_overlapping.hpp"
 #include "game/detail/entity_handle_mixins/get_owning_transfer_capability.hpp"
 
 template <class E>
 bool buy_area_in_range(const E& subject) {
 	const auto& cosm = subject.get_cosmos();
+
+	if (!::sentient_and_conscious(subject)) {
+		return false;
+	}
 
 	const auto capability = subject.get_owning_transfer_capability();
 	const auto matched_faction = capability.alive() ? capability.get_official_faction() : faction_type::SPECTATOR;

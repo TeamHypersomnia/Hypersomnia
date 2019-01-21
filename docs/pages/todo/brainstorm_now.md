@@ -18,9 +18,6 @@ summary: That which we are brainstorming at the moment.
 	- It would always be drawn over the backpack.
 	- We might decrease the bomb density a little so that the bomber isn't too heavy.
 
-- forbid arming grenades when frozen
-	- happens only for mouse hotkeys
-
 - fix smoke particles becoming bubbles as we still have a good repro
 	- perhaps effect ids remain the same but content is different
 
@@ -36,20 +33,10 @@ summary: That which we are brainstorming at the moment.
 - prevent trigger pull sound during chambering
 - log if client does not have the map that's on the server
 
-- walking around many shells slows down so it's probably due to logic
+- always holster the weapon first if reloading
 
-- always hide the weapon first if reloading
 - disable buying in warmup
 	- or just 0 money
-
-- arena gui predicts wrong
-	- draw deaths only for referential, i think it might be the other way around
-	- problem is, it draws based on state not on events?
-		- but the referential state for the bomb mode should properly have the kill
-
-- knives should not be thrown if wheelup is pressed during freeze
-	- simply dont allow to request throw during freeze
-	- fetch wheelup in the arena gui also in case you buy something after the freeze
 
 - can probably buy when dead
 - the problem still persists with weapons being glued to someone
