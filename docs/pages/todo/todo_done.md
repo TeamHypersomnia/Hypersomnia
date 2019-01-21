@@ -2977,3 +2977,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- simply dont allow to request throw during freeze
 	- fetch wheelup in the arena gui also in case you buy something after the freeze
 
+- increase range of secondary throw
+

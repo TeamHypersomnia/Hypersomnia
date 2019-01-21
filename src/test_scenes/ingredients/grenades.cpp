@@ -58,6 +58,7 @@ namespace test_flavours {
 				fuse.released_image_id = to_image_id(test_scene_image_id::FORCE_GRENADE_RELEASED);
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 				fuse.additional_release_impulse.linear = 3000.f;
+				fuse.additional_secondary_release_impulse.linear = 2000.f;
 				fuse.fuse_delay_ms = 1000.f;
 
 				meta.set(fuse);
@@ -152,6 +153,7 @@ namespace test_flavours {
 				fuse.released_image_id = to_image_id(test_scene_image_id::INTERFERENCE_GRENADE_RELEASED);
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 				fuse.additional_release_impulse.linear = 3000.f;
+				fuse.additional_secondary_release_impulse.linear = 2000.f;
 				fuse.fuse_delay_ms = 800.f;
 
 				meta.set(fuse);
@@ -243,6 +245,7 @@ namespace test_flavours {
 				fuse.released_image_id = to_image_id(test_scene_image_id::PED_GRENADE_RELEASED);
 				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
 				fuse.additional_release_impulse.linear = 3000.f;
+				fuse.additional_secondary_release_impulse.linear = 2000.f;
 
 				meta.set(fuse);
 			}
@@ -473,6 +476,7 @@ namespace test_flavours {
 			fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
 			fuse.override_release_impulse = true;
 			fuse.additional_release_impulse = {};
+			fuse.additional_secondary_release_impulse = {};
 #if 0
 			fuse.fuse_delay_ms = 35000.f;
 			fuse.set_bomb_vars(1500.f, 10000.f);

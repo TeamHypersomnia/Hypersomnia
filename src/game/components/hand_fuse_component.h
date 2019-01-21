@@ -43,6 +43,7 @@ namespace invariants {
 		real32 defusing_duration_ms = -1.f;
 
 		impulse_mults additional_release_impulse;
+		impulse_mults additional_secondary_release_impulse;
 
 		sound_effect_input beep_sound;
 		real32 beep_time_mult = 0.05f;

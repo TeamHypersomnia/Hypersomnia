@@ -27,8 +27,6 @@ summary: That which we are brainstorming at the moment.
 	- weapons
 	- character stats
 
-- increase range of secondary throw
-
 - the personal depo still gets closed sometimes
 - prevent trigger pull sound during chambering
 - log if client does not have the map that's on the server
