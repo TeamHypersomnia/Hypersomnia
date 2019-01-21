@@ -2994,3 +2994,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - fix those dangling particle streams as they may give away positions 
 
+- separate slot for the bomb, OVER_SHOULDER
+	- It would always be drawn over the backpack.
+	- We might decrease the bomb density a little so that the bomber isn't too heavy.
+

@@ -197,6 +197,7 @@ item_transfer_result query_transfer_result(
 					t == slot_function::PERSONAL_DEPOSIT
 					|| t == slot_function::BELT
 					|| t == slot_function::BACK
+					|| t == slot_function::OVER_BACK
 					|| t == slot_function::TORSO_ARMOR
 					|| t == slot_function::SHOULDER
 					|| t == slot_function::HAT

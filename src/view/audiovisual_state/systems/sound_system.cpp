@@ -407,7 +407,7 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 				}
 				else {
 					try {
-						firearm_engine_caches.try_emplace(id, continuous_sound_cache { { *sound, in }, gun_entity.get_name() });
+						firearm_engine_caches.try_emplace(id, continuous_sound_cache { { *sound, in }, { gun_entity.get_name() } });
 					}
 					catch (...) {
 

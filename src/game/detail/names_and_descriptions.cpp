@@ -75,6 +75,10 @@ entity_name_str get_bbcoded_slot_function_name(const slot_function f) {
 		return{
 			"Back",
 		};
+	case slot_function::OVER_BACK:
+		return{
+			"Over back",
+		};
 	case slot_function::SHOULDER:
 		return{
 			"Shoulder",
@@ -128,6 +132,10 @@ entity_name_str get_bbcoded_slot_function_description(const slot_function f) {
 	case slot_function::BACK:
 		return{
 			"For backpacks."
+		};
+	case slot_function::OVER_BACK:
+		return{
+			"For bombs and other heavy objects."
 		};
 	case slot_function::SHOULDER:
 		return{

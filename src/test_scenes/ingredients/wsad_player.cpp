@@ -181,6 +181,14 @@ namespace test_flavours {
 
 				{
 					inventory_slot slot_def;
+					slot_def.category_allowed = item_category::OVER_BACK_WEARABLE;
+					slot_def.make_attachment_with_max_space();
+					slot_def.always_allow_exactly_one_item = true;
+					container.slots[slot_function::OVER_BACK] = slot_def;
+				}
+
+				{
+					inventory_slot slot_def;
 					slot_def.category_allowed = item_category::BELT_WEARABLE;
 					slot_def.make_attachment_with_max_space();
 					slot_def.always_allow_exactly_one_item = true;

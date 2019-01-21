@@ -6,10 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- separate slot for the bomb, OVER_SHOULDER
-	- It would always be drawn over the backpack.
-	- We might decrease the bomb density a little so that the bomber isn't too heavy.
-
 - when re-exporting
 	- fix spells
 	- remnants
@@ -22,11 +18,8 @@ summary: That which we are brainstorming at the moment.
 
 - Bug: path specification for assets doesnt fully work on Windows
 
-- allow modifications after re-export
-
-- in flavours, identify by filenames and flavour names not by ids
-
-- write to streflop dev about that copysign should be bivariate
+- in editor, allow modifications after re-export
+- in exported flavours, identify by filenames and flavour names not by ids
 
 - during akimbo, only drop when the G is released, not right away when it is pressed
 	- when G is still held, you can press either LPM or RPM to decide which weapon to drop
@@ -38,7 +31,9 @@ summary: That which we are brainstorming at the moment.
 	- recalculate hotbar on every round start?
 
 - knockouter is dead if someone disconnects after having shot and that bullet kills another player
+
 - could chambering sound be omitted under some occasions?
+
 - bomb soon explodes theme gets repeated
 	- unimportant: perhaps it was 
 
@@ -56,7 +51,6 @@ summary: That which we are brainstorming at the moment.
 	- Never predict collisions of remote players
 		- This might be important for not exposing tactical information
 	- Predict collisions with items only if they weren't just recently dropped by a remote player
-
 	
 - Admin panel
 	- Editor-like server vars tweaker accessible by pressing ESC server-side
@@ -95,6 +89,8 @@ summary: That which we are brainstorming at the moment.
 - fix arena gui showing "Disconnected"
 	- somehow cache the nick or remove the entry?
 	- this is cool actually but if someone connects right away it will show his nickname as the victim
+		- due to id collision
+		- maybe store nickname?
 
 - Watch out if fpset does not cause performance problems
 

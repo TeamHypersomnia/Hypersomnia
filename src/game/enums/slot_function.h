@@ -22,6 +22,7 @@ enum class slot_function {
 
 	BELT,
 	BACK,
+	OVER_BACK,
 	TORSO_ARMOR,
 	SHOULDER,
 	HAT,
@@ -37,6 +38,7 @@ inline bool is_torso_attachment(const slot_function f) {
 
 		case slot_function::BELT: return true;
 		case slot_function::BACK: return true;
+		case slot_function::OVER_BACK: return true;
 		case slot_function::SHOULDER: return true;
 		case slot_function::TORSO_ARMOR: return true;
 		case slot_function::HAT: return true;

@@ -31,6 +31,7 @@ void inventory_mixin<E>::for_each_candidate_slot(
 		if (t == candidate_holster_type::WEARABLES) {
 			callback(searched_root_container[slot_function::BELT]);
 			callback(searched_root_container[slot_function::BACK]);
+			callback(searched_root_container[slot_function::OVER_BACK]);
 			callback(searched_root_container[slot_function::SHOULDER]);
 			callback(searched_root_container[slot_function::TORSO_ARMOR]);
 			callback(searched_root_container[slot_function::HAT]);
@@ -48,6 +49,12 @@ void inventory_mixin<E>::for_each_candidate_slot(
 			}
 
 			if (const auto back_slot = searched_root_container[slot_function::BACK]) {
+				if (const auto back_wearable = back_slot.get_item_if_any()) {
+					callback(back_wearable[slot_function::ITEM_DEPOSIT]);
+				}
+			}
+
+			if (const auto back_slot = searched_root_container[slot_function::OVER_BACK]) {
 				if (const auto back_wearable = back_slot.get_item_if_any()) {
 					callback(back_wearable[slot_function::ITEM_DEPOSIT]);
 				}

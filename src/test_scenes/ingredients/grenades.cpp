@@ -466,7 +466,7 @@ namespace test_flavours {
 
 			invariants::item item;
 			item.space_occupied_per_charge = to_space_units("30");
-			item.categories_for_slot_compatibility = { item_category::GENERAL, item_category::BACK_WEARABLE };
+			item.categories_for_slot_compatibility = { item_category::GENERAL, item_category::OVER_BACK_WEARABLE };
 			item.wear_sound.id = to_sound_id(test_scene_sound_id::BACKPACK_WEAR);
 
 			meta.set(item);

@@ -575,6 +575,10 @@ bool should_fill_hotbar_from_right(const E& handle) {
 		return true;
 	}
 
+	if (item.categories_for_slot_compatibility.test(item_category::OVER_BACK_WEARABLE)) {
+		return true;
+	}
+
 	if (item.categories_for_slot_compatibility.test(item_category::BELT_WEARABLE)) {
 		return true;
 	}

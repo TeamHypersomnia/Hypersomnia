@@ -6,6 +6,8 @@ summary: Just a hidden scratchpad.
 ---
 
 
+- write to streflop dev about that copysign should be bivariate
+
 - We could opt for a longer float test running in the background for a second or two
 
 - Don't give release build for testing as it has commented out ensures.

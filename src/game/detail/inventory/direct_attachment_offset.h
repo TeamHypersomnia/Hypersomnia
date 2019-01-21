@@ -120,6 +120,11 @@ transformr direct_attachment_offset(
 			anchor = anchors.back_anchor;
 			break;
 
+		case slot_function::OVER_BACK: 
+			attachment_offset = get_actual_offsets_by_torso().back;
+			anchor = anchors.back_anchor;
+			break;
+
 		case slot_function::SHOULDER: 
 			attachment_offset = get_actual_offsets_by_torso().shoulder;
 			anchor = anchors.shoulder_anchor;

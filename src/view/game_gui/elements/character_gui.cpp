@@ -73,7 +73,8 @@ xywh character_gui::get_rectangle_for_slot_function(const slot_function f) {
 		case slot_function::PERSONAL_DEPOSIT: return xywh(-unit * 1, 0, 33, 33);
 		case slot_function::SHOULDER: return xywh(0, 0, 33, 33);
 		case slot_function::BELT: return xywh(unit, 0, 33, 33);
-		case slot_function::BACK: return xywh(unit * 2, 0, 33, 33);
+		case slot_function::BACK: return xywh(unit * 2, -unit * 1, 33, 33);
+		case slot_function::OVER_BACK: return xywh(unit * 2, 0, 33, 33);
 		case slot_function::TORSO_ARMOR: return xywh(unit * 3, 0, 33, 33);
 
 		case slot_function::ITEM_DEPOSIT: return xywh(0, 0, 33, 33);
