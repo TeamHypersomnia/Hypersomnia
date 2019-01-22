@@ -1,4 +1,5 @@
 #pragma once
+#if DUMP_BEFORE_AND_AFTER_ROUND_START
 #include "game/cosmos/cosmos.h"
 #include "augs/misc/lua/lua_utils.h"
 #include "augs/readwrite/lua_file.h"
@@ -33,3 +34,4 @@ void dump_for_debugging(
 	augs::save_as_lua_table(lua, signi, make_path("signi.lua"));
 	augs::save_as_lua_table(lua, mode, make_path("mode.lua"));
 }
+#endif

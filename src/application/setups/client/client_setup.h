@@ -354,6 +354,7 @@ public:
 							"The client has desynchronized from the server."
 						);
 
+#if DUMP_BEFORE_AND_AFTER_ROUND_START
 						const auto preffix = typesafe_sprintf("%x_desync%x_", augs::getpid(), referential_arena.get_round_num());
 
 						referential_arena.on_mode(
@@ -366,6 +367,7 @@ public:
 								);
 							}
 						);
+#endif
 
 						disconnect();
 					}
