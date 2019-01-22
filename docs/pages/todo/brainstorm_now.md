@@ -40,6 +40,9 @@ summary: That which we are brainstorming at the moment.
 		- This might be important for not exposing tactical information
 	- Predict collisions with items only if they weren't just recently dropped by a remote player
 	
+- test O3 with and without flto?
+	- Could save us much of the build times for production
+
 - Admin panel
 	- Editor-like server vars tweaker accessible by pressing ESC server-side
 		- will have to be commandized properly, just like editor setup's
