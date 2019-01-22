@@ -3001,3 +3001,10 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - server_setup
 - client_setup
+
+- always holster the weapon first if reloading
+
+- Watch out if fpset does not cause performance problems
+
+- knockouter is dead if someone disconnects after having shot and that bullet kills another player
+

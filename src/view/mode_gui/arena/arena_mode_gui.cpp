@@ -288,33 +288,19 @@ void arena_gui_state::draw_mode_gui(
 
 				const auto& ko = kos[i];
 
-				auto get_col = [&](const mode_player_id id) {
-					if (const auto p = typed_mode.find(id)) {
-						if (const auto this_player_handle = cosm[p->controlled_character_id]) {
-							return in.config.faction_view.colors[this_player_handle.get_official_faction()].standard;
-						}
-					}
-
-					return gray;
+				auto get_col = [&](const auto& participant) {
+					return in.config.faction_view.colors[participant.faction].standard;
 				};
 
-				auto get_name = [&](const auto id) -> entity_name_str {
-					if (!id.is_set()) {
-						return "";
-					}
-
-					if (const auto p = typed_mode.find(id)) {
-						return p->chosen_name;
-					}
-
-					return "Disconnected";
+				auto get_name = [&](const auto& entry) -> const auto& {
+					return entry.name;
 				};
 
-				const auto knockouter = get_name(ko.knockouter);
-				const auto assist = get_name(ko.assist);
-				const auto victim = get_name(ko.victim);
+				const auto& knockouter = get_name(ko.knockouter);
+				const auto& assist = get_name(ko.assist);
+				const auto& victim = get_name(ko.victim);
 
-				const bool is_suicide = ko.knockouter == ko.victim;
+				const bool is_suicide = ko.knockouter.id == ko.victim.id;
 				(void)is_suicide;
 
 				const auto lhs_text = 
@@ -333,11 +319,11 @@ void arena_gui_state::draw_mode_gui(
 					rgba background;
 					rgba border;
 				} cols = [&]() -> colors {
-					if (local_player_id == ko.victim) {
+					if (local_player_id == ko.victim.id) {
 						return { rgba(150, 0, 0, 170), rgba(0, 0, 0, 0) };
 					}
 
-					if (local_player_id == ko.knockouter || local_player_id == ko.assist) {
+					if (local_player_id == ko.knockouter.id || local_player_id == ko.assist.id) {
 						return { black, rgba(180, 0, 0, 255) };
 					}
 					

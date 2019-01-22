@@ -210,7 +210,7 @@ message_handler_result client_setup::handle_server_message(
 		client_player_id = static_cast<mode_player_id>(read_client_id);
 
 		LOG("Received initial state from the server at step: %x.", scene.world.get_timestamp().step);
-		LOG("Received client id: %x", client_player_id);
+		LOG("Received client id: %x", client_player_id.value);
 
 		state = client_state_type::IN_GAME;
 

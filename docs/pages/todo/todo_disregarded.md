@@ -6,6 +6,14 @@ summary: Just a hidden scratchpad.
 ---
 
 
+- Remember to reset input flags of the character itself on performing transfer
+	- why? it's good to keep shooting once you change
+
+
+- We were considering whether to mark the bomb as never predictable,
+	- however, the worst that could happen, is that we mispredict that we are dead due to somebody shooting us
+		- whereas we are actually alive and we have defused the bomb
+		- either way the death impact would be predicted which would be misleading
 - write to streflop dev about that copysign should be bivariate
 
 - We could opt for a longer float test running in the background for a second or two

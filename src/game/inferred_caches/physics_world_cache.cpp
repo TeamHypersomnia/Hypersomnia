@@ -1,4 +1,4 @@
-#define DEBUG_PHYSICS_SYSTEM_COPY !IS_PRODUCTION_BUILD
+#define DEBUG_PHYSICS_SYSTEM_COPY 0
 
 #include <cstring>
 #include <unordered_set>

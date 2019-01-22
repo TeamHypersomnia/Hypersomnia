@@ -4,6 +4,9 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- bomb soon explodes theme gets repeated
+	- unimportant: perhaps it was 
+
 - refactor the ammo info getters, somehow
 
 - Crosshair recoil also on finished mountings, e.g. of magazines

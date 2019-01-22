@@ -23,13 +23,26 @@ struct arena_mode_win {
 	}
 };
 
+/*
+	Storing just an id is insufficient because a player might disconnect
+	during the same round.
+*/
+
+struct knockout_participant {
+	// GEN INTROSPECTOR struct knockout_participant
+	mode_player_id id;
+	std::string name;
+	faction_type faction = faction_type::SPECTATOR;
+	// END GEN INTROSPECTOR
+};
+
 struct arena_mode_knockout {
 	// GEN INTROSPECTOR struct arena_mode_knockout
 	augs::stepped_clock when;
 
-	mode_player_id knockouter;
-	mode_player_id assist;
-	mode_player_id victim;
+	knockout_participant knockouter;
+	knockout_participant assist;
+	knockout_participant victim;
 
 	damage_origin origin;
 	// END GEN INTROSPECTOR

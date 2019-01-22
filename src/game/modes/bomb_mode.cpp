@@ -986,11 +986,23 @@ void bomb_mode::count_knockout(const input_type in, const entity_id victim, cons
 
 	bomb_mode_knockout ko;
 
+	auto make_participant = [&](auto& participant, const auto& handle) {
+		participant = {};
+
+		if (const auto mode_id = lookup(handle.get_id()); mode_id.is_set()) {
+			if (const auto player_data = find(mode_id)) {
+				participant.id = mode_id;
+				participant.name = player_data->chosen_name;
+				participant.faction = player_data->faction;
+			}
+		}
+	};
+
 	for (const auto& candidate : assists) {
 		if (const auto candidate_assistant = cosm[candidate.who]) {
 			if (candidate_assistant != knockouter) {
 				if (candidate.amount >= in.rules.minimal_damage_for_assist) {
-					ko.assist = lookup(candidate_assistant);
+					make_participant(ko.assist, candidate_assistant);
 					break;
 				}
 			}
@@ -1000,8 +1012,8 @@ void bomb_mode::count_knockout(const input_type in, const entity_id victim, cons
 	ko.when = clk;
 	ko.origin = origin;
 
-	ko.knockouter = lookup(knockouter);
-	ko.victim = lookup(victim_handle);
+	make_participant(ko.knockouter, knockouter);
+	make_participant(ko.victim, victim_handle);
 
 	count_knockout(in, ko);
 }
@@ -1017,23 +1029,15 @@ bomb_mode_player_stats* bomb_mode::stats_of(const mode_player_id& id) {
 void bomb_mode::count_knockout(const input_type in, const arena_mode_knockout ko) {
 	current_round.knockouts.push_back(ko);
 
-	auto faction_of = [&](const auto a) {
-		return in.cosm[lookup(a)].get_official_faction();
-	};
-
-	auto same_faction = [&](const auto a, const auto b) {
-		return faction_of(a) == faction_of(b);
-	};
-
 	{
 		int knockouts_dt = 1;
 
-		if (ko.knockouter == ko.victim) {
+		if (ko.knockouter.id == ko.victim.id) {
 			knockouts_dt = 0;
 		}
-		else if (same_faction(ko.knockouter, ko.victim)) {
+		else if (ko.knockouter.faction == ko.victim.faction) {
 			knockouts_dt = -1;
-			post_award(in, ko.knockouter, in.rules.economy.team_kill_penalty * -1);
+			post_award(in, ko.knockouter.id, in.rules.economy.team_kill_penalty * -1);
 		}
 
 		if (knockouts_dt > 0) {
@@ -1049,27 +1053,27 @@ void bomb_mode::count_knockout(const input_type in, const arena_mode_knockout ko
 			});
 
 			if (award != std::nullopt) {
-				post_award(in, ko.knockouter, *award);
+				post_award(in, ko.knockouter.id, *award);
 			}
 		}
 
-		if (const auto s = stats_of(ko.knockouter)) {
+		if (const auto s = stats_of(ko.knockouter.id)) {
 			s->knockouts += knockouts_dt;
 		}
 
-		if (const auto s = stats_of(ko.victim)) {
+		if (const auto s = stats_of(ko.victim.id)) {
 			s->deaths += 1;
 		}
 	}
 
-	if (ko.assist.is_set()) {
+	if (ko.assist.id.is_set()) {
 		int assists_dt = 1;
 
-		if (same_faction(ko.assist, ko.victim)) {
+		if (ko.assist.faction == ko.victim.faction) {
 			assists_dt = -1;
 		}
 
-		if (const auto s = stats_of(ko.assist)) {
+		if (const auto s = stats_of(ko.assist.id)) {
 			s->deaths += assists_dt;
 		}
 	}

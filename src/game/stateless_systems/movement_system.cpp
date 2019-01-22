@@ -153,7 +153,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 				if (cp_damage_by_sprint.excessive > 0) {
 					movement.was_sprint_effective = false;
-					movement.flags.sprinting = false;
+					//movement.flags.sprinting = false;
 				}
 
 				if (current_haste == haste_type::GREATER) {

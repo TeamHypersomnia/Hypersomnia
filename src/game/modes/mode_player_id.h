@@ -39,7 +39,11 @@ struct mode_player_id {
 		return *this;
 	}
 
-	operator id_value_type() const {
+	bool operator<(const mode_player_id& b) const {
+		return value < b.value;
+	}
+
+	explicit operator id_value_type() const {
 		return value;
 	}
 

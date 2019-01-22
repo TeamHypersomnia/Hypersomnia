@@ -14,8 +14,6 @@ summary: That which we are brainstorming at the moment.
 
 - log if client does not have the map that's on the server
 
-- always holster the weapon first if reloading
-
 - Bug: path specification for assets doesnt fully work on Windows
 
 - in editor, allow modifications after re-export
@@ -30,22 +28,12 @@ summary: That which we are brainstorming at the moment.
 	- always keep this personal deposit open
 	- recalculate hotbar on every round start?
 
-- knockouter is dead if someone disconnects after having shot and that bullet kills another player
-
 - could chambering sound be omitted under some occasions?
-
-- bomb soon explodes theme gets repeated
-	- unimportant: perhaps it was 
 
 - particles don't get properly predicted on deaths sometimes?
 
 - if the referential post solve determines that the predicted post solve has missed something predictable (e.g. a bullet impact)
 	- we should somehow try to replay it
-
-- We were considering whether to mark the bomb as never predictable,
-	- however, the worst that could happen, is that we mispredict that we are dead due to somebody shooting us
-		- whereas we are actually alive and we have defused the bomb
-		- either way the death impact would be predicted which would be misleading
 
 - Fix prediction of collisions
 	- Never predict collisions of remote players
@@ -91,8 +79,6 @@ summary: That which we are brainstorming at the moment.
 	- this is cool actually but if someone connects right away it will show his nickname as the victim
 		- due to id collision
 		- maybe store nickname?
-
-- Watch out if fpset does not cause performance problems
 
 - Do something so that we don't lose work in playtesting mode
 
@@ -226,9 +212,6 @@ summary: That which we are brainstorming at the moment.
 	- we should let a map select some sensible defaults?
 	- audiovisual state can accept speed mult separately
 		- which could be also changed when a proper tick is check
-
-- Remember to reset input flags of the character itself on performing transfer
-	- why? it's good to keep shooting once you change
 
 - Easily spawn loaded weapons or magazines
 	- For now, let instantiation load them all by default
