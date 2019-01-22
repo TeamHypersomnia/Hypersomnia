@@ -388,7 +388,13 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 
 					if (const auto anim = logicals.find(stance.carry)) {
 						if (anim->frames.size() > 0) {
-							return logicals.get_offsets(anim->frames[0].image_id).torso.back.rotation;
+							auto considered_offsets = logicals.get_offsets(anim->frames[0].image_id).torso;
+
+							if (typed_self.only_secondary_holds_item()) {
+								considered_offsets.flip_vertically();
+							}
+
+							return considered_offsets.back.rotation;
 						}
 					}
 				}

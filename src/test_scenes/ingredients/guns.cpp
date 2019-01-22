@@ -2176,7 +2176,7 @@ namespace test_flavours {
 			set_density_mult(meta, 5.f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1200.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
-			meta.get<invariants::item>().standard_price = 700;
+			meta.get<invariants::item>().standard_price = 800;
 			set_chambering_duration_ms(meta, 300.f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("6");
 			only_allow_mag(meta, test_container_items::AO44_MAGAZINE);
@@ -2350,7 +2350,7 @@ namespace test_flavours {
 			set_density_mult(meta, 1.1f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1500.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
-			meta.get<invariants::item>().standard_price = 650;
+			meta.get<invariants::item>().standard_price = 700;
 			set_chambering_duration_ms(meta, 500.f);
 			only_allow_mag(meta, test_container_items::CALICO_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
