@@ -191,10 +191,25 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				gun.remaining_burst_shots = 0;
 			};
 
+			auto interrupt_chambering = [&]() {
+				const auto& chosen_effect = gun_def.chambering_sound;
+
+				auto& progress = gun.chambering_progress_ms;
+
+				if (progress > 0.f) {
+					auto stop = messages::stop_sound_effect(predictability);
+					stop.match_chased_subject = gun_entity;
+					stop.match_effect_id = chosen_effect.id;
+					step.post_message(stop);
+				}
+
+				progress = 0.f;
+			};
+
 			auto process_autonomous_gun_logic = [&]() {
 				cooldown_gun_heat(step, muzzle_transform, gun_entity);
-				gun.chambering_progress_ms = 0.f;
 				interrupt_burst_fire();
+				interrupt_chambering();
 			};
 
 			if (capability.dead()) {
@@ -479,34 +494,27 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						interrupt_burst_fire();
 
 						const bool feasible_wielding =
-							wielding == wielding_type::SINGLE_WIELDED
+							!is_currently_reloading(capability)
+							&&
+							(wielding == wielding_type::SINGLE_WIELDED
 							|| (wielding == wielding_type::DUAL_WIELDED && gun_def.allow_chambering_with_akimbo)
+							)
 						;
 
 						auto& progress = gun.chambering_progress_ms;
-
-						auto interrupt_chambering = [&]() {
-							if (progress > 0.f) {
-								const auto& chosen_effect = gun_def.chambering_sound;
-
-								auto stop = messages::stop_sound_effect(predictability);
-								stop.match_chased_subject = gun_entity;
-								stop.match_effect_id = chosen_effect.id;
-								step.post_message(stop);
-							}
-
-							progress = 0.f;
-						};
 
 						if (progress == 0.f) {
 							try_to_play_trigger_pull_sound();
 						}
 
-						if (transfer_cooldown_passed && feasible_wielding) {
+						const bool shot_cooldown_passed = clk.is_ready(gun_def.shot_cooldown_ms, gun.when_last_fired);
+
+						if (transfer_cooldown_passed && shot_cooldown_passed && feasible_wielding) {
 							if (const auto next_cartridge = find_next_cartridge(gun_entity); next_cartridge.is_set()) {
 								if (progress == 0.f) {
 									const auto& chosen_effect = gun_def.chambering_sound;
 									chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability), predictability);
+									LOG("PLAY!!");
 								}
 
 								progress += delta.in_milliseconds();
@@ -850,6 +858,11 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 	#endif
 
 					drop_if_empty();
+
+					auto& transfers = capability.template get<components::item_slot_transfers>();
+
+					/* Interrupt any reloading context */
+					transfers.current_reloading_context = {};
 				}
 				else if (decrease_heat_in_aftermath) {
 					cooldown_gun_heat(step, muzzle_transform, gun_entity);

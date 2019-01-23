@@ -38,6 +38,7 @@ enum class test_scene_image_id {
 	LEWSII,
 	ELON_HRL,
 	BLUNAZ,
+	GRADOBICIE,
 	BLUNAZ_SHOT_1,
 
 	FLOWER_PINK_1,
@@ -255,6 +256,10 @@ enum class test_scene_image_id {
 
 	SNACKBAR,
 	SNACKBAR_CAPTION,
+
+	GRADOBICIE_CHARGE,
+	GRADOBICIE_SHELL,
+	GRADOBICIE_ROUND,
 
 	COUNT
 	// END GEN INTROSPECTOR

@@ -160,7 +160,7 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 					else if (const auto chamber_mag = h[slot_function::GUN_CHAMBER_MAGAZINE]) {
 						++candidate_weapons;
 
-						if (0 == count_charges_inside(mag)) {
+						if (0 == count_charges_inside(chamber_mag)) {
 							if (chamber_mag.calc_real_space_available() > 0) {
 								++weapons_needing_reload;
 								continue;
@@ -337,7 +337,14 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 				const bool context_advanced_successfully = advance_context();
 
 				if (!context_advanced_successfully) {
+					const auto concerned_slot = ctx.concerned_slot;
 					ctx = {};
+
+					if (const auto slot = cosm[concerned_slot]; slot && slot.get_type() == slot_function::GUN_CHAMBER_MAGAZINE) {
+						if (const auto new_ctx = calc_reloading_context_for(it, slot.get_container())) {
+							ctx = *new_ctx;
+						}
+					}
 				}
 			}
 		}

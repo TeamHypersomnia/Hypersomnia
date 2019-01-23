@@ -140,14 +140,25 @@ entity_id requested_equipment::generate_for(
 			}
 
 			const auto chamber_slot = weapon[slot_function::GUN_CHAMBER];
+			const auto chamber_mag_slot = weapon[slot_function::GUN_CHAMBER_MAGAZINE];
 
 			auto create_charge_in_chamber = [&](const auto& charge_flavour) {
 				if (charge_flavour.is_set()) {
-					if (const auto c = just_create_entity(cosm, charge_flavour)) {
-						c.set_charges(1);
+					if (chamber_slot) {
+						if (const auto c = just_create_entity(cosm, charge_flavour)) {
+							c.set_charges(1);
 
-						if (chamber_slot) {
 							transfer(c, chamber_slot, false);
+
+							if (chamber_mag_slot) {
+								if (const auto num_fitting = c.num_charges_fitting_in(chamber_mag_slot); num_fitting > 0) {
+									if (const auto cm = just_create_entity(cosm, charge_flavour)) {
+										cm.set_charges(num_fitting);
+
+										transfer(cm, chamber_mag_slot, false);
+									}
+								}
+							}
 						}
 					}
 				}

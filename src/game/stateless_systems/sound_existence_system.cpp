@@ -25,6 +25,8 @@
 #include "game/detail/physics/calc_physical_material.hpp"
 #include "game/detail/sentience/sentience_getters.h"
 
+#include "augs/misc/randomization.h"
+
 void play_collision_sound(
 	const real32 strength,
 	const vec2 location,
@@ -274,7 +276,10 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 			const auto& e = d.damage.effects;
 
 			if (d.inflictor_destructed) {
-				do_effect(e.destruction);
+				auto eff = e.destruction;
+				eff.sound.modifier.pitch *= step.step_rng.randval(0.8f, 1.2f);
+
+				do_effect(eff);
 
 				if (sentient) {
 					do_effect(e.sentience_impact);

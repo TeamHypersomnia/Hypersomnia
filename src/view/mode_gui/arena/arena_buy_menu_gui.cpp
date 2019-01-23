@@ -458,7 +458,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 								ImGui::SameLine();
 								text("%x", g);
 								ImGui::SameLine();
-								text_disabled("mags)");
+								text_disabled("ammo pieces)");
 								ImGui::SameLine();
 							}
 						}
