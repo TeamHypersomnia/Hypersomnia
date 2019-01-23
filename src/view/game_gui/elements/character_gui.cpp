@@ -42,7 +42,7 @@
 #include "game/detail/inventory/wielding_setup.hpp"
 #include "game/detail/weapon_like.h"
 
-#define LOG_HOTBAR 1
+#define LOG_HOTBAR 0
 
 template <class... Args>
 void HOT_LOG(Args&&... args) {

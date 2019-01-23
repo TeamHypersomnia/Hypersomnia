@@ -514,7 +514,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 								if (progress == 0.f) {
 									const auto& chosen_effect = gun_def.chambering_sound;
 									chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability), predictability);
-									LOG("PLAY!!");
 								}
 
 								progress += delta.in_milliseconds();

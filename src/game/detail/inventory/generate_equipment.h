@@ -17,7 +17,9 @@ entity_id requested_equipment::generate_for(
 	const auto& eq = *this;
 	auto& cosm = step.get_cosmos();
 
-	auto transfer = [&step](const auto from, const auto to, const bool play_effects = true) {
+	int max_effects_played = 2;
+
+	auto transfer = [&step, &max_effects_played](const auto from, const auto to, const bool play_effects = true) {
 		if (to.dead()) {
 			return;
 		}
@@ -32,10 +34,14 @@ entity_id requested_equipment::generate_for(
 
 		auto request = item_slot_transfer_request::standard(from, to);
 		request.params.bypass_mounting_requirements = true;
-		request.params.play_transfer_sounds = play_effects;
-		request.params.play_transfer_particles = play_effects;
+		request.params.play_transfer_sounds = max_effects_played > 0 && play_effects;
+		request.params.play_transfer_particles = max_effects_played > 0 && play_effects;
 
 		perform_transfer(request, step);
+
+		if (play_effects) {
+			--max_effects_played;
+		}
 	};
 
 	auto make_wearable = [&, character](const auto& from, const slot_function slot) {
@@ -93,6 +99,8 @@ entity_id requested_equipment::generate_for(
 	auto make_ammo_piece = [&](const auto& flavour) {
 		if (flavour.is_set()) {
 			if (const auto piece = just_create_entity(cosm, flavour)) {
+				piece.set_charges(1);
+
 				if (const auto mag_deposit = piece[slot_function::ITEM_DEPOSIT]) {
 					const auto final_charge_flavour = [&]() {
 						if (eq.non_standard_charge.is_set()) {

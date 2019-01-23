@@ -51,6 +51,13 @@
 #include "game/detail/hand_fuse_logic.h"
 #include "game/detail/inventory/calc_reloading_context.hpp"
 
+enum class reload_advance_result {
+	DIFFERENT_VIABLE,
+	INTERRUPT,
+	CONTINUE,
+	COMPLETE
+};
+
 template <class E>
 void drop_mag_to_ground(const E& mag) {
 	auto& cosm = mag.get_cosmos();
@@ -180,8 +187,12 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 			}
 		}
 
-		auto advance_context = [&]() {
+		auto advance_context = [&]() -> reload_advance_result {
 			const auto concerned_slot = cosm[ctx.concerned_slot];
+
+			if (cosm[ctx.new_ammo_source].dead()) {
+				return reload_advance_result::COMPLETE;
+			}
 
 			{
 				const auto new_context = calc_reloading_context(it);
@@ -189,7 +200,7 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 				if (new_context.significantly_different_from(ctx)) {
 					RLD_LOG("Different context is viable. Interrupting reloading.");
 					/* Interrupt it */
-					return false;
+					return reload_advance_result::DIFFERENT_VIABLE;
 				}
 			}
 
@@ -247,7 +258,7 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 					if (const auto existing_progress = mounting_of(old_mag)) {
 						/* Continue the good work. */
 						drop_if_zero_ammo();
-						return true;
+						return reload_advance_result::CONTINUE;
 					}
 
 					/* Init the unmount. */
@@ -256,7 +267,7 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 
 					if (items.size() > 1) {
 						if (!try_hide_other_item()) {
-							return false;
+							return reload_advance_result::INTERRUPT;
 						}
 					}
 
@@ -266,10 +277,10 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 						unmount_ammo.params.play_transfer_sounds = false;
 						transfer(unmount_ammo);
 						drop_if_zero_ammo();
-						return true;
+						return reload_advance_result::CONTINUE;
 					}
 
-					return false;
+					return reload_advance_result::INTERRUPT;
 				}
 
 				if (old_mag_slot.is_hand_slot()) {
@@ -277,7 +288,7 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 
 					if (try_hide_other_item()) {
 						RLD_LOG("Old mag hidden.");
-						return true;
+						return reload_advance_result::CONTINUE;
 					}
 				}
 			}
@@ -289,7 +300,7 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 
 				if (new_mag_slot.get_id() == concerned_slot.get_id()) {
 					RLD_LOG("New mag already mounted. Reload complete.");
-					return false;
+					return reload_advance_result::COMPLETE;
 				}
 
 				RLD_LOG("New mag not yet mounted.");
@@ -299,14 +310,14 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 
 					if (const auto existing_progress = mounting_of(new_mag)) {
 						/* Continue the good work. */
-						return true;
+						return reload_advance_result::CONTINUE;
 					}
 
 					const auto mount_new = item_slot_transfer_request::standard(new_mag, concerned_slot);
 
 					if (transfer(mount_new)) {
 						RLD_LOG("Started mounting new mag.");
-						return true;
+						return reload_advance_result::CONTINUE;
 					}
 				}
 				else {
@@ -314,35 +325,62 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 					if (const auto free_hand = it.get_first_free_hand()) {
 						RLD_LOG("Free hand found.");
 
-						const auto pull_new = item_slot_transfer_request::standard(new_mag, free_hand);
+						const auto old_slot = new_mag.get_current_slot();
 
-						if (transfer(pull_new)) {
+						auto pull_new = item_slot_transfer_request::standard(new_mag, free_hand);
+						const auto result = ::perform_transfer(pull_new, step).result.is_successful();
+
+						if (result) {
 							RLD_LOG("Pulled new mag.");
-							return true;
+
+							const auto n = new_mag.get_charges();
+
+							if (n > 1) {
+								auto hide_rest_to_where_it_was = item_slot_transfer_request::standard(new_mag, old_slot);
+								auto& p = hide_rest_to_where_it_was.params;
+								p.specified_quantity = n - 1;
+								p.play_transfer_sounds = false;
+								p.play_transfer_particles = false;
+								p.perform_recoils = false;
+
+								const auto result = ::perform_transfer(hide_rest_to_where_it_was, step).result.is_successful();
+
+								if (result) {
+									return reload_advance_result::CONTINUE;
+								}
+							}
+							else {
+								return reload_advance_result::CONTINUE;
+							}
 						}
 					}
 					else {
 						if (try_hide_other_item()) {
-							return true;
+							return reload_advance_result::CONTINUE;
 						}
 					}
 				}
 			}
+			else {
+				return reload_advance_result::COMPLETE;
+			}
 
-			return false;
+			return reload_advance_result::INTERRUPT;
 		};
 
 		for (int c = 0; c < 2; ++c) {
 			if (is_context_alive()) {
-				const bool context_advanced_successfully = advance_context();
+				const auto result = advance_context();
 
-				if (!context_advanced_successfully) {
+				if (result != reload_advance_result::CONTINUE) {
 					const auto concerned_slot = ctx.concerned_slot;
 					ctx = {};
 
-					if (const auto slot = cosm[concerned_slot]; slot && slot.get_type() == slot_function::GUN_CHAMBER_MAGAZINE) {
-						if (const auto new_ctx = calc_reloading_context_for(it, slot.get_container())) {
-							ctx = *new_ctx;
+					if (result == reload_advance_result::COMPLETE) {
+						if (const auto slot = cosm[concerned_slot]; slot && slot.get_type() == slot_function::GUN_CHAMBER_MAGAZINE) {
+							if (const auto new_ctx = calc_reloading_context_for(it, slot.get_container())) {
+								ctx = *new_ctx;
+							}
 						}
 					}
 				}
