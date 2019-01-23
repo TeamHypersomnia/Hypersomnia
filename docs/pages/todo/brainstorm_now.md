@@ -6,6 +6,24 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- when post-solving referential, one could see if a similar-enough effect has happened in the predicted post solve.
+	- if not, we want to post it, because a predicted cosmos might have not predicted this effect occurring.
+	- this could be done for id-insensitive events like effects tied to weapons and characters
+	- and not necessarily for bullets 
+
+- balance exaltation, perhaps higher mana cost - 100?
+- lower price for interference nade
+- maybe increase max predicted commands
+- there was a desync on win 8.1
+- lessen shake even more
+- why would a shotgun be reloaded?
+	- is another mag chosen for it?
+	- do we use strict greater inequality to acquire the better mag?
+
+- save last player nickname used to connect
+- fix client being unable to reconnect
+- fix effects of shot weapons that were just thrown 
+
 - when re-exporting
 	- fix spells
 	- remnants
