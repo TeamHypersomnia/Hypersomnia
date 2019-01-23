@@ -190,14 +190,30 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 		auto advance_context = [&]() -> reload_advance_result {
 			const auto concerned_slot = cosm[ctx.concerned_slot];
 
-			if (cosm[ctx.new_ammo_source].dead()) {
-				return reload_advance_result::COMPLETE;
+			{
+				/* Check for completion early */
+				const auto new_mag = cosm[ctx.new_ammo_source];
+
+				if (new_mag.dead()) {
+					RLD_LOG("(Begin) New ammo source is dead. Reload complete.");
+					return reload_advance_result::COMPLETE;
+				}
+				else {
+					const auto new_mag_slot = new_mag.get_current_slot();
+
+					if (new_mag_slot.get_id() == concerned_slot.get_id()) {
+						RLD_LOG("New mag already mounted. Reload complete.");
+						return reload_advance_result::COMPLETE;
+					}
+				}
 			}
 
 			{
 				const auto new_context = calc_reloading_context(it);
 
 				if (new_context.significantly_different_from(ctx)) {
+					RLD_LOG_NVPS(cosm[ctx.concerned_slot], ctx.new_ammo_source, cosm[new_context.concerned_slot], new_context.new_ammo_source);
+
 					RLD_LOG("Different context is viable. Interrupting reloading.");
 					/* Interrupt it */
 					return reload_advance_result::DIFFERENT_VIABLE;
@@ -361,7 +377,9 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 					}
 				}
 			}
-			else {
+
+			if (cosm[ctx.new_ammo_source].dead()) {
+				RLD_LOG("(Begin) New ammo source is dead. Reload complete.");
 				return reload_advance_result::COMPLETE;
 			}
 

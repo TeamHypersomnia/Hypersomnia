@@ -2508,7 +2508,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::GRADOBICIE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 1.2f);
+			set_density_mult(meta, 0.9f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1400.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
 			meta.get<invariants::item>().standard_price = 2100;
