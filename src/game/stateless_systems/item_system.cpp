@@ -187,6 +187,19 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 			}
 		}
 
+		auto is_different_viable = [&]() {
+			const auto new_context = calc_reloading_context(it);
+
+			if (new_context.significantly_different_from(ctx)) {
+				RLD_LOG_NVPS(cosm[ctx.concerned_slot], ctx.new_ammo_source, cosm[new_context.concerned_slot], new_context.new_ammo_source);
+
+				RLD_LOG("Different context is viable. Interrupting reloading.");
+				return true;
+			}
+
+			return false;
+		};
+
 		auto advance_context = [&]() -> reload_advance_result {
 			const auto concerned_slot = cosm[ctx.concerned_slot];
 
@@ -208,16 +221,8 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 				}
 			}
 
-			{
-				const auto new_context = calc_reloading_context(it);
-
-				if (new_context.significantly_different_from(ctx)) {
-					RLD_LOG_NVPS(cosm[ctx.concerned_slot], ctx.new_ammo_source, cosm[new_context.concerned_slot], new_context.new_ammo_source);
-
-					RLD_LOG("Different context is viable. Interrupting reloading.");
-					/* Interrupt it */
-					return reload_advance_result::DIFFERENT_VIABLE;
-				}
+			if (is_different_viable()) {
+				return reload_advance_result::DIFFERENT_VIABLE;
 			}
 
 			auto try_hide_other_item = [&]() {
@@ -388,16 +393,32 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 
 		for (int c = 0; c < 2; ++c) {
 			if (is_context_alive()) {
+				const auto& concerned_slot = ctx.concerned_slot;
+				const auto slot = cosm[concerned_slot];
+
+				const auto gun_entity = slot.get_container();
+
+				if (gun_shot_cooldown_or_chambering(gun_entity)) {
+					if (is_different_viable()) {
+						ctx = {};
+					}
+
+					break;
+				}
+
 				const auto result = advance_context();
 
 				if (result != reload_advance_result::CONTINUE) {
-					const auto concerned_slot = ctx.concerned_slot;
 					ctx = {};
 
 					if (result == reload_advance_result::COMPLETE) {
-						if (const auto slot = cosm[concerned_slot]; slot && slot.get_type() == slot_function::GUN_CHAMBER_MAGAZINE) {
-							if (const auto new_ctx = calc_reloading_context_for(it, slot.get_container())) {
-								ctx = *new_ctx;
+						if (slot.get_type() == slot_function::GUN_CHAMBER_MAGAZINE) {
+							if (const auto chamber = slot.get_container()[slot_function::GUN_CHAMBER]) {
+								if (chamber.get_item_if_any()) {
+									if (const auto new_ctx = calc_reloading_context_for(it, slot.get_container())) {
+										ctx = *new_ctx;
+									}
+								}
 							}
 						}
 					}

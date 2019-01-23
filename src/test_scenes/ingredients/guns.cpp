@@ -2359,7 +2359,7 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::BOLT_ACTION;
 			gun_def.muzzle_velocity = {5200.f, 5200.f};
-			gun_def.shot_cooldown_ms = 150.f;
+			gun_def.shot_cooldown_ms = 350.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::AUTOMATIC_SHOTGUN_CHAMBERING);
 			gun_def.allow_charge_in_chamber_magazine_when_chamber_loaded = false;
 
@@ -2459,7 +2459,7 @@ namespace test_flavours {
 			set_density_mult(meta, 1.5f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1400.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
-			meta.get<invariants::item>().standard_price = 2900;
+			meta.get<invariants::item>().standard_price = 3500;
 			set_chambering_duration_ms(meta, 650.f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("7.5");
 			only_allow_mag(meta, test_container_items::WARX_FQ12_MAGAZINE);
@@ -2511,7 +2511,7 @@ namespace test_flavours {
 			set_density_mult(meta, 0.9f);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1400.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
-			meta.get<invariants::item>().standard_price = 2100;
+			meta.get<invariants::item>().standard_price = 2300;
 			set_chambering_duration_ms(meta, 550.f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("6.5");
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;

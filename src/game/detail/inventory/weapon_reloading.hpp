@@ -25,6 +25,39 @@ struct reloading_movement {
 	real32 progress_ms;
 };
 
+template <class E>
+bool gun_shot_cooldown_or_chambering(const E& gun_entity) {
+	const auto& cosm = gun_entity.get_cosmos();
+
+	if (const auto gun_def = gun_entity.template find<invariants::gun>()) {
+		if (const auto gun = gun_entity.template find<components::gun>()) {
+			const auto& clk = cosm.get_clock();
+			const auto when_transferred = gun_entity.when_last_transferred();
+
+			const bool shot_cooldown_passed = clk.is_ready(gun_def->shot_cooldown_ms, gun->when_last_fired);
+
+			const bool transfer_cooldown_passed = clk.is_ready(
+				gun_def->get_transfer_shot_cooldown(), 
+				when_transferred
+			);
+
+			if (!transfer_cooldown_passed || !shot_cooldown_passed) {
+				return true;
+			}
+
+			if (gun_entity[slot_function::GUN_CHAMBER].is_empty_slot()) {
+				if (const auto mag_chamber = gun_entity[slot_function::GUN_CHAMBER_MAGAZINE]) {
+					if (mag_chamber.has_items()) {
+						return true;
+					}
+				}
+			}
+		}
+	}
+	
+	return false;
+}
+
 template <class C, class W>
 std::optional<reloading_movement> calc_reloading_movement(
 	const C& cosm,
@@ -55,8 +88,14 @@ std::optional<reloading_movement> calc_reloading_movement(
 					}
 				}
 
+				const auto container = w0.get_container();
+
+				if (gun_shot_cooldown_or_chambering(container)) {
+					return std::nullopt;
+				}
+
 				return reloading_movement {
-					w0.get_container(),
+					container,
 					source,
 					n == 1 ? reloading_movement_type::GRIP_TO_MAG : reloading_movement_type::POCKET_TO_MAG,
 					progress_ms
@@ -69,6 +108,11 @@ std::optional<reloading_movement> calc_reloading_movement(
 
 	if (n == 1) {
 		const auto w0 = cosm[wielded_items[0]];
+
+		if (gun_shot_cooldown_or_chambering(w0)) {
+			return std::nullopt;
+		}
+
 		if (const auto mag_slot = w0[slot_function::GUN_DETACHABLE_MAGAZINE]) {
 			if (const auto mag = mag_slot.get_item_if_any()) {
 				if (const auto progress = mag.find_mounting_progress(); progress && progress->progress_ms > 0.f) {
@@ -96,6 +140,10 @@ std::optional<reloading_movement> calc_reloading_movement(
 			if (detachable_mag_slot || chamber_mag_slot) {
 				if (const auto new_source = cosm[wielded_items[1 - i]]) {
 					if (const auto progress = new_source.find_mounting_progress(); progress && progress->progress_ms > 0.f) {
+						if (gun_shot_cooldown_or_chambering(wi)) {
+							return std::nullopt;
+						}
+
 						return reloading_movement {
 							wi, new_source, reloading_movement_type::POCKET_TO_MAG, progress->progress_ms
 						};

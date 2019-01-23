@@ -494,8 +494,6 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						interrupt_burst_fire();
 
 						const bool feasible_wielding =
-							!is_currently_reloading(capability)
-							&&
 							(wielding == wielding_type::SINGLE_WIELDED
 							|| (wielding == wielding_type::DUAL_WIELDED && gun_def.allow_chambering_with_akimbo)
 							)
