@@ -139,6 +139,7 @@ namespace invariants {
 	struct sentience {
 		// GEN INTROSPECTOR struct invariants::sentience
 		real32 shake_mult = 0.5f;
+		real32 maximum_shake_mult = 1.f;
 		real32 dash_impulse_mult = 1.f;
 
 		real32 comfort_zone = 500.f;

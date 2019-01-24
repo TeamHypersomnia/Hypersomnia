@@ -13,7 +13,6 @@ summary: That which we are brainstorming at the moment.
 
 - maybe increase max predicted commands
 - there was a desync on win 8.1
-- lessen shake even more
 - why would a shotgun be reloaded?
 	- is another mag chosen for it?
 	- do we use strict greater inequality to acquire the better mag?

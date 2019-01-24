@@ -195,7 +195,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 			const auto shake_amount = (sentience.shake.duration_ms - since_last_shake.in_milliseconds(delta)) / sentience.shake.duration_ms;
 
 			if (shake_amount > 0.f) {
-				const auto shake_mult = shake_amount * shake_amount * sentience.shake.mult * sentience_def.shake_mult;
+				const auto shake_mult = std::min(sentience_def.maximum_shake_mult, shake_amount * shake_amount * sentience.shake.mult * sentience_def.shake_mult);
 
 				auto& rng = step.step_rng;
 				impulse_input in;
