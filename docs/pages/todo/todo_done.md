@@ -3012,3 +3012,6 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - lower price for interference nade
 - lessen shake even more
 - save last player nickname used to connect
+
+- fix effects of shot weapons that were just thrown 
+

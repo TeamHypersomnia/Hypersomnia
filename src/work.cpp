@@ -668,6 +668,13 @@ int work(const int argc, const char* const * const argv) try {
 				start_client_gui.open();
 
 				if (common_input_state[augs::event::keys::key::LSHIFT]) {
+					change_with_save(
+						[&](auto& cfg) {
+							cfg.default_client_start = config.default_client_start;
+							cfg.client = config.client;
+						}
+					);
+
 					launch_setup(launch_type::CLIENT);
 				}
 

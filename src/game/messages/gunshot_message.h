@@ -10,5 +10,6 @@ namespace messages {
 
 		std::vector<entity_id> spawned_rounds;
 		entity_id spawned_shell;
+		entity_id capability;
 	};
 }

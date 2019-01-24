@@ -22,8 +22,6 @@ summary: That which we are brainstorming at the moment.
 
 - check if steam engine works when item is thrown
 
-- fix effects of shot weapons that were just thrown 
-
 - when re-exporting
 	- fix spells
 	- remnants

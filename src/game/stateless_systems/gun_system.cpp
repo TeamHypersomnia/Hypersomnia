@@ -281,6 +281,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 					response.muzzle_transform = muzzle_transform;
 					response.subject = gun_entity;
+					response.capability = capability;
 					return response;
 				};
 

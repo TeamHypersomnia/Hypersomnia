@@ -115,7 +115,7 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 		const auto& gun_def = subject.get<invariants::gun>();
 
 		const auto gun_transform = subject.get_logic_transform();
-		const auto owning_capability = subject.get_owning_transfer_capability();
+		const auto owning_capability = cosm[g.capability];
 		const auto predictability = predictable_only_by(owning_capability);
 
 		{

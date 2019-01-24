@@ -82,9 +82,7 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 	auto& cosm = step.get_cosmos();
 
 	for (const auto& g : gunshots) {
-		const auto subject = cosm[g.subject];
-		const auto owning_capability = subject.get_owning_transfer_capability();
-		const auto predictability = predictable_only_by(owning_capability);
+		const auto predictability = predictable_only_by(g.capability);
 
 		for (auto& r : g.spawned_rounds) {
 			const auto spawned_round = cosm[r];
