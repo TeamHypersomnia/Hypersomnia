@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- consider always autoloading the shotgun?
+	- NO! Simply add WAAAY more recoil and kickback for shots if we are reloading
+		- Pro: nice effect for the last shot as well
+		- we can also go pretty wild since pathological weapons like ELON HRL won't ever be shot during reloading
+
 - what could cause a predicted effect to be played a second time?
 	- wrong3
 

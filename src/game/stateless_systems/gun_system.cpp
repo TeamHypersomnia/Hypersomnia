@@ -346,7 +346,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 				};
 
 				/* For common aftermath */
-				float total_recoil = 0.f;
+				real32 total_recoil = 0.f;
+				bool was_reloading = false;
 				bool decrease_heat_in_aftermath = true;
 
 				auto drop_if_empty = [&]() {
@@ -573,6 +574,14 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						else if (const auto requested_action = try_to_fire_interval()) {
 							if (gun_def.minimum_heat_to_shoot > 0.f && gun.magazine.angular_velocity < 5000) {
 								gun.magazine.angular_velocity = 5000;
+							}
+
+							{
+								const auto wielded = owning_capability.get_wielded_items();
+
+								if (wielded.size() > 1) {
+									was_reloading = cosm[wielded[0]].find_mounting_progress() || cosm[wielded[1]].find_mounting_progress();
+								}
 							}
 
 							auto fire_cartridge = [&](const std::optional<real32> cartridge_rotational_offset) {
@@ -807,6 +816,11 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						if (wielded_items.size() == 2) {
 							total_recoil *= 2.2f;
 							total_kickback *= 1.5f;
+
+							if (was_reloading) {
+								total_recoil *= 3.0f;
+								total_kickback *= 1.4f;
+							}
 						}
 					}
 

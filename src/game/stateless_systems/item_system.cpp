@@ -326,18 +326,26 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 
 				RLD_LOG("New mag not yet mounted.");
 
-				if (new_mag_slot.is_hand_slot()) {
+				auto start_mounting_new_mag = [&]() {
 					RLD_LOG("New mag is in hands already.");
 
 					if (const auto existing_progress = mounting_of(new_mag)) {
 						/* Continue the good work. */
-						return reload_advance_result::CONTINUE;
+						return true;
 					}
 
 					const auto mount_new = item_slot_transfer_request::standard(new_mag, concerned_slot);
 
 					if (transfer(mount_new)) {
 						RLD_LOG("Started mounting new mag.");
+						return true;
+					}
+
+					return false;
+				};
+
+				if (new_mag_slot.is_hand_slot()) {
+					if (start_mounting_new_mag()) {
 						return reload_advance_result::CONTINUE;
 					}
 				}
@@ -367,11 +375,15 @@ void item_system::advance_reloading_contexts(const logic_step step) {
 								const auto result = ::perform_transfer(hide_rest_to_where_it_was, step).result.is_successful();
 
 								if (result) {
-									return reload_advance_result::CONTINUE;
+									if (start_mounting_new_mag()) {
+										return reload_advance_result::CONTINUE;
+									}
 								}
 							}
 							else {
-								return reload_advance_result::CONTINUE;
+								if (start_mounting_new_mag()) {
+									return reload_advance_result::CONTINUE;
+								}
 							}
 						}
 					}
