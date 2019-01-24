@@ -3011,3 +3011,4 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - balance exaltation, perhaps higher mana cost - 100?
 - lower price for interference nade
 - lessen shake even more
+- save last player nickname used to connect

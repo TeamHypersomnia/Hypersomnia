@@ -17,8 +17,11 @@ summary: That which we are brainstorming at the moment.
 	- is another mag chosen for it?
 	- do we use strict greater inequality to acquire the better mag?
 
-- save last player nickname used to connect
 - fix client being unable to reconnect
+	- the effects are being made unpredictable due to being thrown
+
+- check if steam engine works when item is thrown
+
 - fix effects of shot weapons that were just thrown 
 
 - when re-exporting

@@ -1154,6 +1154,7 @@ int work(const int argc, const char* const * const argv) try {
 							change_with_save(
 								[&](auto& cfg) {
 									cfg.default_client_start = config.default_client_start;
+									cfg.client = config.client;
 								}
 							);
 
