@@ -108,11 +108,21 @@ transformr direct_attachment_offset(
 		case slot_function::PRIMARY_HAND: 
 			attachment_offset = get_actual_offsets_by_torso().primary_hand;
 			anchor = anchors.hand_anchor;
+
+			if (const auto h = container[slot_function::SECONDARY_HAND]; h && h.has_items()) {
+				anchor.rotation = 0;
+			}
+
 			break;
 
 		case slot_function::SECONDARY_HAND: 
 			attachment_offset = get_actual_offsets_by_torso().secondary_hand;
 			anchor = anchors.hand_anchor;
+
+			if (const auto h = container[slot_function::PRIMARY_HAND]; h && h.has_items()) {
+				anchor.rotation = 0;
+			}
+
 			break;
 
 		case slot_function::BACK: 
