@@ -1,7 +1,8 @@
-#version 300 es
+#version 140
+#extension GL_ARB_explicit_attrib_location : enable
+
 precision mediump int;
 precision mediump float;
-
 
 uniform mat4 projection_matrix;
 layout(location = 0) in vec2 position;
