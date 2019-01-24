@@ -5,6 +5,9 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- what could cause a predicted effect to be played a second time?
+	- wrong3
+
 
 - Remember to reset input flags of the character itself on performing transfer
 	- why? it's good to keep shooting once you change

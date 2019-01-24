@@ -6,22 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- consider always autoloading the shotgun?
-	- NO! Simply add WAAAY more recoil and kickback for shots if we are reloading
-		- Pro: nice effect for the last shot as well
-		- we can also go pretty wild since pathological weapons like ELON HRL won't ever be shot during reloading
-
-- what could cause a predicted effect to be played a second time?
-	- wrong3
-
 - when post-solving referential, one could see if a similar-enough effect has happened in the predicted post solve.
 	- if not, we want to post it, because a predicted cosmos might have not predicted this effect occurring.
 	- this could be done for id-insensitive events like effects tied to weapons and characters
 	- and not necessarily for bullets 
 
-- maybe increase max predicted commands
 - there was a desync on win 8.1
-- why would a shotgun be reloaded?
+
+- why would a warx fq12 be reloaded?
 	- is another mag chosen for it?
 	- do we use strict greater inequality to acquire the better mag?
 

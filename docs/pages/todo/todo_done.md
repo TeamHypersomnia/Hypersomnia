@@ -3015,3 +3015,9 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - fix effects of shot weapons that were just thrown 
 
+- consider always autoloading the shotgun?
+	- NO! Simply add WAAAY more recoil and kickback for shots if we are reloading
+		- Pro: nice effect for the last shot as well
+		- we can also go pretty wild since pathological weapons like ELON HRL won't ever be shot during reloading
+
+- maybe increase max predicted commands

@@ -200,7 +200,7 @@ void illuminated_rendering(
 
 		messages::visibility_information_request request;
 		request.eye_transform = *viewed_character_transform;
-		request.filter = predefined_queries::pathfinding();
+		request.filter = predefined_queries::line_of_sight();
 		request.queried_rect = fow_size;
 		request.subject = viewed_character;
 

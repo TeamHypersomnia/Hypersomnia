@@ -818,8 +818,8 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							total_kickback *= 1.5f;
 
 							if (was_reloading) {
-								total_recoil *= 3.0f;
-								total_kickback *= 1.4f;
+								total_recoil *= 2.f;
+								total_kickback *= 2.f;
 							}
 						}
 					}
