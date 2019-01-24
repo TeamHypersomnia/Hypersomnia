@@ -184,7 +184,7 @@ perform_transfer_result perform_transfer_impl::operator()(
 
 	const bool is_pickup = result.is_pickup();
 
-	auto play_pickup_or_holster_effect = [&]() {
+	auto play_pickup_or_holster_sound = [&]() {
 		if (target_slot_exists) {
 			packaged_sound_effect sound;
 
@@ -262,7 +262,10 @@ perform_transfer_result perform_transfer_impl::operator()(
 				Otherwise, it is a transparent operation.
 			*/
 
-			play_pickup_or_holster_effect();
+			if (r.params.play_transfer_sounds) {
+				play_pickup_or_holster_sound();
+			}
+
 			play_pickup_particles();
 
 			return output;
@@ -434,7 +437,7 @@ perform_transfer_result perform_transfer_impl::operator()(
 
 				output.transfer_sound.emplace(std::move(wielded));
 			}
-			else if (play_pickup_or_holster_effect()) {
+			else if (play_pickup_or_holster_sound()) {
 
 			}
 			else {

@@ -11,8 +11,6 @@ summary: That which we are brainstorming at the moment.
 	- this could be done for id-insensitive events like effects tied to weapons and characters
 	- and not necessarily for bullets 
 
-- balance exaltation, perhaps higher mana cost - 100?
-- lower price for interference nade
 - maybe increase max predicted commands
 - there was a desync on win 8.1
 - lessen shake even more

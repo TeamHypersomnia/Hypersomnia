@@ -27,6 +27,7 @@ struct requested_equipment {
 	template <class E>
 	entity_id generate_for(
 		const E& character, 
-		const logic_step step
+		logic_step step,
+		int max_effects_played = 2
 	) const;
 };

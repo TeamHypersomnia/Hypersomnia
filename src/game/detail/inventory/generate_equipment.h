@@ -10,14 +10,13 @@
 template <class E>
 entity_id requested_equipment::generate_for(
 	const E& character, 
-	const logic_step step
+	const logic_step step,
+	int max_effects_played
 ) const {
 	static constexpr bool to_the_ground = std::is_same_v<E, transformr>;
 
 	const auto& eq = *this;
 	auto& cosm = step.get_cosmos();
-
-	int max_effects_played = 2;
 
 	auto transfer = [&step, &max_effects_played](const auto from, const auto to, const bool play_effects = true) {
 		if (to.dead()) {

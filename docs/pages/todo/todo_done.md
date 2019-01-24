@@ -3008,3 +3008,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - knockouter is dead if someone disconnects after having shot and that bullet kills another player
 
+- balance exaltation, perhaps higher mana cost - 100?
+- lower price for interference nade

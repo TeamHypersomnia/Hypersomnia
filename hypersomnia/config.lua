@@ -522,6 +522,6 @@ return {
 	},
 
 	max_buffered_server_commands = 1000,
-	max_predicted_client_commands = 1000
+	max_predicted_client_commands = 3000
   }
 }

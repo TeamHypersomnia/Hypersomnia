@@ -21,6 +21,7 @@
 #include "augs/templates/logically_empty.h"
 
 #include "game/detail/sentience/sentience_getters.h"
+#include "game/detail/inventory/perform_wielding.hpp"
 
 #define LOG_BOMB_MODE 0
 
@@ -283,6 +284,9 @@ void bomb_mode::init_spawned(
 					{
 						auto request = item_slot_transfer_request::standard(new_item, target_slot);
 						request.params.bypass_mounting_requirements = true;
+						request.params.play_transfer_sounds = false;
+						request.params.play_transfer_particles = false;
+						request.params.perform_recoils = false;
 
 						const auto result = perform_transfer_no_step(request, cosm);
 						result.notify_logical(step);
@@ -313,6 +317,9 @@ void bomb_mode::init_spawned(
 
 								auto request = item_slot_transfer_request::standard(charge, slot);
 								request.params.bypass_mounting_requirements = true;
+								request.params.play_transfer_sounds = false;
+								request.params.play_transfer_particles = false;
+								request.params.perform_recoils = false;
 
 								const auto result = perform_transfer_no_step(request, cosm);
 								result.notify_logical(step);
@@ -356,7 +363,7 @@ void bomb_mode::init_spawned(
 				: faction_rules.initial_eq
 			;
 
-			eq.generate_for(typed_handle, step);
+			eq.generate_for(typed_handle, step, 1);
 		}
 
 		{
@@ -366,6 +373,13 @@ void bomb_mode::init_spawned(
 
 		if (transferred != std::nullopt) {
 			typed_handle.template get<components::movement>().flags = transferred->player.movement;
+
+			/* Reset the wielding to hide some mags/bullets that were in hands due to reloading */
+			::perform_wielding(
+				step,
+				typed_handle,
+				wielding_setup::from_current(typed_handle)
+			);
 		}
 	});
 }

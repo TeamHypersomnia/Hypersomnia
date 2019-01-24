@@ -409,7 +409,7 @@ void settings_gui_state::perform(
 				}
 
 				revertable_slider(SCOPE_CFG_NVP(max_buffered_server_commands), 0u, 10000u);
-				revertable_slider(SCOPE_CFG_NVP(max_predicted_client_commands), 0u, 1000u);
+				revertable_slider(SCOPE_CFG_NVP(max_predicted_client_commands), 0u, 3000u);
 
 				do_lag_simulator(config.client.network_simulator);
 
