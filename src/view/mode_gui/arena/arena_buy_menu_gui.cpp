@@ -464,9 +464,13 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 						}
 					}
 					else if (b == button_type::REPLENISHABLE) {
-						ImGui::SameLine();
-						text("(x%x)", typed_flavour.template get<components::item>().charges);
-						ImGui::SameLine();
+						const auto num_charges = typed_flavour.template get<components::item>().charges;
+
+						if (num_charges > 1) {
+							ImGui::SameLine();
+							text("(x%x)", num_charges);
+							ImGui::SameLine();
+						}
 					}
 				});
 			},
