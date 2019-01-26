@@ -44,7 +44,7 @@ namespace test_scenes {
 		rs.name = "Standard test ruleset";
 		rs.spawned_faction = faction_type::RESISTANCE;
 
-		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::GRADOBICIE);
+		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BAKA47);
 		rs.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 		rs.initial_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_SHIELD_ARMOR);
 		rs.initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::YELLOW_DAGGER);
@@ -300,7 +300,7 @@ namespace test_scenes {
 					new_character.get<components::crosshair>().base_offset.x = -500;
 				}
 
-				give_weapon(new_character, is_metropolis ? test_shootable_weapons::BILMER2000 : test_shootable_weapons::VINDICATOR);
+				give_weapon(new_character, is_metropolis ? test_shootable_weapons::BILMER2000 : test_shootable_weapons::BAKA47);
 			}
 
 			if (i == 7 || i == 8 || i == 9) {
@@ -465,7 +465,7 @@ namespace test_scenes {
 		give_weapon(transformr(vec2(-300, -500 + 50)), test_shootable_weapons::AMPLIFIER_ARM);
 		give_weapon(transformr(vec2(280, -750)), test_shootable_weapons::DATUM_GUN);
 
-		give_weapon(transformr(vec2(280, -150)), test_shootable_weapons::VINDICATOR);
+		give_weapon(transformr(vec2(280, -150)), test_shootable_weapons::BAKA47);
 		give_weapon(transformr(vec2(280, -250)), test_shootable_weapons::BILMER2000);
 
 		give_weapon(transformr(vec2(300, -100)), test_shootable_weapons::LEWSII);

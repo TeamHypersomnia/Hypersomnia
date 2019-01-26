@@ -104,24 +104,40 @@ void inventory_mixin<E>::for_each_attachment_recursive(
 
 		cosm[it.child].template dispatch_on_having_any<invariants::container, components::item>(
 			[&](const auto this_attachment) {
-				auto current_offset = it.offset;
-
-				if (it.parent.container_entity.is_set()) {
-					/* Don't do it for the root */
-					const auto direct_offset = direct_attachment_offset(
-						cosm[it.parent.container_entity],
-						this_attachment,
+				auto get_attachment_offset_for = [&settings, &get_offsets_by_torso](
+					const auto for_container,
+					const auto for_attachment,
+					const auto for_type
+				) {
+					return direct_attachment_offset(
+						for_container,
+						for_attachment,
 						get_offsets_by_torso,
 						settings,
-						it.parent.type
+						for_type
 					);
+				};
 
-					current_offset *= direct_offset;
+				const auto total_offset = [&]() {
+					if (it.parent.container_entity.is_set()) {
+						/* Don't do it for the root */
+						const auto next_offset = get_attachment_offset_for(
+							cosm[it.parent.container_entity],
+							this_attachment,
+							it.parent.type
+						);
 
-					this_attachment.template dispatch_on_having_all<components::item>([&](const auto& typed_attachment) {
-						attachment_callback(typed_attachment, current_offset);
-					});
-				}
+						const auto total_offset = it.offset * next_offset;
+
+						this_attachment.template dispatch_on_having_all<components::item>([&](const auto& typed_attachment) {
+							attachment_callback(typed_attachment, total_offset);
+						});
+
+						return total_offset;
+					}
+
+					return it.offset;
+				}();
 
 				const auto& this_container = this_attachment;
 
@@ -133,13 +149,41 @@ void inventory_mixin<E>::for_each_attachment_recursive(
 							const auto this_container_id = this_container.get_id();
 
 							for (const auto& id : get_items_inside(this_container, type)) {
-								auto insert_where = container_stack.end();
+								auto insert_where = container_stack.size();
 
 								if (flip_hands_order && type == slot_function::SECONDARY_HAND && container_stack.back().parent.type == slot_function::PRIMARY_HAND) {
 									insert_where--;
 								}
 
-								container_stack.insert(insert_where, { { type, this_container_id }, id, current_offset });
+#if 1
+								const auto inside_item_handle = cosm[id];
+
+								{
+									const auto& maybe_gun = inside_item_handle;
+
+									if (const auto mag_slot = maybe_gun[slot_function::GUN_DETACHABLE_MAGAZINE]; mag_slot && mag_slot.has_items()) {
+										if (mag_slot->draw_under_container) {
+											const auto mag_inside = mag_slot.get_item_if_any();
+
+											container_stack.insert(
+												container_stack.begin() + insert_where, 
+												{ 
+													{ slot_function::GUN_DETACHABLE_MAGAZINE, maybe_gun.get_id() }, 
+													mag_inside.get_id(), 
+													total_offset * get_attachment_offset_for(this_container, maybe_gun, type) 
+												}
+											);
+
+											++insert_where;
+										}
+									}
+									else if (const auto slot = inside_item_handle.get_current_slot(); slot && slot.get_type() == slot_function::GUN_DETACHABLE_MAGAZINE && slot->draw_under_container) {
+										continue;
+									}
+								}
+#endif
+
+								container_stack.insert(container_stack.begin() + insert_where, { { type, this_container_id }, id, total_offset });
 							}
 						}
 					}

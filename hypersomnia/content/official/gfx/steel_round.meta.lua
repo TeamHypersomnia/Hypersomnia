@@ -1,14 +1,11 @@
 return {
   extra_loadables = {
-    disabled_generate_neon_map = {
+    enabled_generate_neon_map = {
       alpha_multiplier = 1,
       amplification = 150,
       light_colors = {
         "255 255 255 255",
-        "167 167 167 255",
-        "207 207 207 255",
-        "202 185 89 255",
-        "206 189 90 255"
+        "255 255 255 255"
       },
       radius = {
         x = 100,
@@ -107,24 +104,28 @@ return {
       convex_partition = {},
       original_poly = {
         {
-          x = -16.5,
-          y = -6
-        },
-        {
-          x = 8,
-          y = -6
-        },
-        {
-          x = 16.5,
+          x = -17,
           y = 0
         },
         {
-          x = 8,
-          y = 6
+          x = -15,
+          y = -5
         },
         {
-          x = -16.5,
-          y = 6
+          x = 7,
+          y = -5
+        },
+        {
+          x = 17,
+          y = 0
+        },
+        {
+          x = 7,
+          y = 5
+        },
+        {
+          x = -15,
+          y = 5
         }
       }
     },

@@ -6,7 +6,7 @@ enum class test_scene_plain_animation_id {
 	// GEN INTROSPECTOR enum class test_scene_plain_animation_id
 	CAST_BLINK,
 	WANDERING_PIXELS_ANIMATION,
-	VINDICATOR_SHOT,
+	BAKA47_SHOT,
 	DATUM_GUN_SHOT,
 	BLUNAZ_SHOT,
 	CALICO_SHOT,

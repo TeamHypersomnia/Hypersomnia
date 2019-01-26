@@ -132,14 +132,12 @@ void load_test_scene_animations(
 
 		{
 			auto& anim = make_plain(
-				test_id_type::VINDICATOR_SHOT,
-				test_scene_image_id::VINDICATOR_SHOT_1,
-				40.0f
+				test_id_type::BAKA47_SHOT,
+				test_scene_image_id::BAKA47_SHOT_1,
+				20.0f
 			);
 
-			reverse_range(anim.frames);
-
-			anim.frames[0].duration_milliseconds = 50.f;
+			(void)anim;
 		} 
 
 		{

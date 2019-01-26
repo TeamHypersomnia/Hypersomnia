@@ -94,7 +94,7 @@ enum class test_plain_sprited_bodies {
 enum class test_shootable_weapons {
 	// GEN INTROSPECTOR enum class test_shootable_weapons
 	BILMER2000,
-	VINDICATOR,
+	BAKA47,
 	LEWSII,
 	KEK9,
 	SN69,
@@ -202,7 +202,7 @@ enum class test_container_items {
 	BROWN_BACKPACK,
 	BILMER2000_MAGAZINE,
 	DATUM_GUN_MAGAZINE,
-	VINDICATOR_MAGAZINE,
+	BAKA47_MAGAZINE,
 	KEK9_MAGAZINE,
 	SN69_MAGAZINE,
 	AO44_MAGAZINE,

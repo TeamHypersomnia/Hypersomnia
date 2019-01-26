@@ -1247,6 +1247,8 @@ namespace test_flavours {
 			}
 		}
 
+		const auto steel_color = rgba(202, 186, 89, 255);
+
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_charges::STEEL_CHARGE);
 
@@ -1257,7 +1259,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_CHARGE, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::STEEL_CHARGE, steel_color);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::item item;
@@ -1271,7 +1273,7 @@ namespace test_flavours {
 				invariants::cartridge cartridge; 
 
 				cartridge.shell_trace_particles.id = to_particle_effect_id(test_scene_particle_effect_id::SHELL_FIRE);
-				cartridge.shell_trace_particles.modifier.colorize = rgba(202, 186, 89, 255);
+				cartridge.shell_trace_particles.modifier.colorize = steel_color;
 
 				cartridge.shell_flavour = to_entity_flavour_id(test_remnant_bodies::STEEL_SHELL);
 				cartridge.round_flavour = to_entity_flavour_id(test_plain_missiles::STEEL_ROUND);
@@ -1505,7 +1507,7 @@ namespace test_flavours {
 		}
 
 		{
-			auto& meta = get_test_flavour(flavours, test_container_items::VINDICATOR_MAGAZINE);
+			auto& meta = get_test_flavour(flavours, test_container_items::BAKA47_MAGAZINE);
 
 			{
 				invariants::render render_def;
@@ -1514,7 +1516,7 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::VINDICATOR_MAGAZINE, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::BAKA47_MAGAZINE, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::container container; 
@@ -1934,12 +1936,12 @@ namespace test_flavours {
 			gun_def.damage_multiplier = 3.f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 8;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
-			gun_def.kickback_towards_wielder = kickback_mult * 25.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 16.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(250);
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.052f;
-			gun_def.recoil_multiplier = 0.82f;
+			gun_def.recoil_multiplier = 0.75;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
@@ -2015,7 +2017,7 @@ namespace test_flavours {
 			item.draw_mag_over_when_reloading = false;
 		}
 		{
-			auto& meta = get_test_flavour(flavours, test_shootable_weapons::VINDICATOR);
+			auto& meta = get_test_flavour(flavours, test_shootable_weapons::BAKA47);
 
 			{
 				invariants::render render_def;
@@ -2030,7 +2032,7 @@ namespace test_flavours {
 
 			invariants::gun gun_def;
 
-			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::VINDICATOR_MUZZLE);
+			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::LEWSII_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4500.f, 4500.f};
@@ -2047,24 +2049,25 @@ namespace test_flavours {
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.062f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
-			gun_def.recoil_multiplier = 0.93f;
+			gun_def.recoil_multiplier = 0.97f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(400);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
-			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::VINDICATOR_SHOT);
+			gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::BAKA47_SHOT);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::RIFLE_CHAMBERING);
 
 			meta.set(gun_def);
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::VINDICATOR_SHOT_1, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::BAKA47, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 1.7);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1400.f, 0.f);
+			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
 			meta.get<invariants::item>().standard_price = 2900;
-			set_chambering_duration_ms(meta, 550.f);
+			set_chambering_duration_ms(meta, 700.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
-			only_allow_mag(meta, test_container_items::VINDICATOR_MAGAZINE);
+			only_allow_mag(meta, test_container_items::BAKA47_MAGAZINE);
 			meta.get<invariants::item>().specific_to = faction_type::RESISTANCE;
 		}
 
@@ -2084,7 +2087,7 @@ namespace test_flavours {
 
 			invariants::gun gun_def;
 
-			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::VINDICATOR_MUZZLE);
+			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::LEWSII_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4400.f, 4400.f};
@@ -2113,7 +2116,7 @@ namespace test_flavours {
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
-			//gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::VINDICATOR_SHOT);
+			//gun_def.shoot_animation = to_animation_id(test_scene_plain_animation_id::BAKA47_SHOT);
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::RIFLE_CHAMBERING);
 
 			meta.set(gun_def);

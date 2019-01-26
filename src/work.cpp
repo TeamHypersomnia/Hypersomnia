@@ -202,6 +202,9 @@ int work(const int argc, const char* const * const argv) try {
 	};
 
 	if (config.unit_tests.run) {
+		/* Needed by some unit tests */
+		augs::network_raii raii;
+
 		LOG("Running unit tests.");
 		augs::run_unit_tests(config.unit_tests);
 

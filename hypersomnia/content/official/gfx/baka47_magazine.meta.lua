@@ -2,20 +2,15 @@ return {
   extra_loadables = {
     enabled_generate_neon_map = {
       alpha_multiplier = 1,
-      amplification = 60,
+      amplification = 90,
       light_colors = {
-        "0 255 255 255",
-        "255 0 0 255",
-        "255 0 255 255",
-        "0 255 174 255",
-        "255 0 228 255",
-        "0 198 255 255"
+        "244 213 156 255"
       },
       radius = {
         x = 80,
         y = 80
       },
-      standard_deviation = 6
+      standard_deviation = 7
     },
     generate_desaturation = false
   },
@@ -23,7 +18,7 @@ return {
     gun = {
       bullet_spawn = {
         x = 0,
-        y = -2
+        y = 0
       },
       chamber = {
         pos = {
@@ -41,17 +36,17 @@ return {
       },
       detachable_magazine = {
         pos = {
-          x = -26,
-          y = 6
+          x = 0,
+          y = 0
         },
-        rotation = 90
+        rotation = 0
       },
       shell_spawn = {
         pos = {
-          x = 3,
-          y = -3
+          x = 0,
+          y = 0
         },
-        rotation = -71.565048217773438
+        rotation = 0
       }
     },
     item = {
@@ -78,10 +73,10 @@ return {
       },
       hand_anchor = {
         pos = {
-          x = -25,
-          y = 3
+          x = 0,
+          y = 0
         },
-        rotation = -1
+        rotation = 0
       },
       head_anchor = {
         pos = {
@@ -105,75 +100,8 @@ return {
       }
     },
     non_standard_shape = {
-      convex_partition = {
-        3,
-        4,
-        5,
-        6,
-        3,
-        6,
-        7,
-        8,
-        9,
-        1,
-        2,
-        6,
-        9,
-        10,
-        0,
-        1,
-        9,
-        6,
-        2,
-        3,
-        6
-      },
-      original_poly = {
-        {
-          x = -52,
-          y = -5
-        },
-        {
-          x = -29,
-          y = -11
-        },
-        {
-          x = -11,
-          y = -9
-        },
-        {
-          x = -9,
-          y = -5
-        },
-        {
-          x = 52,
-          y = -2
-        },
-        {
-          x = 51,
-          y = 3
-        },
-        {
-          x = -17,
-          y = 4
-        },
-        {
-          x = -20,
-          y = 10
-        },
-        {
-          x = -33,
-          y = 10
-        },
-        {
-          x = -33,
-          y = 6
-        },
-        {
-          x = -52,
-          y = 5
-        }
-      }
+      convex_partition = {},
+      original_poly = {}
     },
     torso = {
       back = {
