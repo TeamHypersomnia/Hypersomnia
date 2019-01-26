@@ -20,8 +20,6 @@ summary: That which we are brainstorming at the moment.
 - fix client being unable to reconnect
 	- the effects are being made unpredictable due to being thrown
 
-- check if steam engine works when item is thrown
-
 - when re-exporting
 	- fix spells
 	- remnants

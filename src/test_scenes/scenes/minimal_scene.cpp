@@ -40,44 +40,55 @@ namespace test_scenes {
 			return create_test_scene_entity(world, std::forward<decltype(args)>(args)...);
 		};
 
+		(void)create;
+
 		auto get_size_of = [&caches](const auto id) {
 			return vec2i(caches.at(to_image_id(id)).get_original_size());
 		};
 
-		const int num_characters = 1;
+		auto give_weapon = [&](const auto& character, const auto w) {
+			requested_equipment r;
+			r.weapon = to_entity_flavour_id(w);
 
-		std::vector<entity_id> new_characters;
-		new_characters.resize(num_characters);
-
-		for (int i = 0; i < num_characters; ++i) {
-			transformr transform;
-
-			if (i == 0) {
+			if constexpr(std::is_same_v<const transformr&, decltype(character)>) {
+				r.num_given_ammo_pieces = 1;
 			}
-			else if (i == 1) {
-				transform.pos.x += 200;
+			else {
+				r.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 			}
 
-			const auto metropolis_type = test_controlled_characters::METROPOLIS_SOLDIER;
-			const auto new_character = create(metropolis_type, transform);
+			r.generate_for(character, step);
+		};
 
-			new_characters[i] = new_character;
+		{
+			for (int i = 0; i < 1; ++i) {
+				transformr transform;
 
-			if (i == 0) {
-				new_character.get<components::sentience>().get<health_meter_instance>().set_value(100);
-				new_character.get<components::sentience>().get<health_meter_instance>().set_maximum_value(100);
-				new_character.get<components::attitude>().official_faction = faction_type::RESISTANCE;
+				if (i == 0) {
+				}
+				else if (i == 1) {
+					transform.pos.x += 200;
+				}
+
+				const auto metropolis_type = test_controlled_characters::METROPOLIS_SOLDIER;
+				const auto new_character = create(metropolis_type, transform);
+
+				if (i == 0) {
+					new_character.get<components::sentience>().get<health_meter_instance>().set_value(100);
+					new_character.get<components::sentience>().get<health_meter_instance>().set_maximum_value(100);
+					new_character.get<components::attitude>().official_faction = faction_type::RESISTANCE;
+				}
+				else if (i == 1) {
+					new_character.get<components::sentience>().get<health_meter_instance>().set_value(100);
+					new_character.get<components::sentience>().get<health_meter_instance>().set_maximum_value(100);
+					new_character.get<components::attitude>().official_faction = faction_type::METROPOLIS;
+				}
+
+				auto& sentience = new_character.get<components::sentience>();
+
+
+				fill_range(sentience.learnt_spells, true);
 			}
-			else if (i == 1) {
-				new_character.get<components::sentience>().get<health_meter_instance>().set_value(100);
-				new_character.get<components::sentience>().get<health_meter_instance>().set_maximum_value(100);
-				new_character.get<components::attitude>().official_faction = faction_type::METROPOLIS;
-			}
-
-			auto& sentience = new_character.get<components::sentience>();
-
-
-			fill_range(sentience.learnt_spells, true);
 		}
 
 		{
@@ -96,8 +107,12 @@ namespace test_scenes {
 			floor_align(test_sprite_decorations::FLOOR).set_size(total_floor_size);
 		}
 
-		create(test_hand_explosives::BOMB, vec2(580, 200));
 		cosmic::reinfer_all_entities(world);
+
+		give_weapon(transformr(), test_shootable_weapons::BILMER2000);
+		give_weapon(transformr(), test_shootable_weapons::BILMER2000);
+
+		create(test_point_markers::BOMB_MODE_SPAWN, transformr()).set_associated_faction(faction_type::METROPOLIS);
 
 		// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 	}

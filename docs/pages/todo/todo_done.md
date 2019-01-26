@@ -3025,3 +3025,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - reinfer when loading ends?
 	- it should be handled by the transfer though wtf
 
+- check if steam engine works when item is thrown
+

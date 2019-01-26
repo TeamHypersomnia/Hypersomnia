@@ -281,6 +281,7 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 		source.set_relative_and_zero_vel_pos();
 	}
 	else {
+		source.set_relative(false);
 		source.set_position(si, current_transform.pos);
 	}
 }
