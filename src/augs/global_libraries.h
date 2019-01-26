@@ -23,7 +23,7 @@ namespace augs {
 		static std::unique_ptr<FT_Library> freetype_library;
 #endif
 
-		global_libraries(const library_flagset = { library::FREETYPE, library::NETWORKING });
+		global_libraries(library_flagset);
 		
 		global_libraries(const global_libraries&) = delete;
 		global_libraries& operator=(const global_libraries&) = delete;
@@ -35,5 +35,16 @@ namespace augs {
 
 		void init		(library_flagset = { library::FREETYPE, library::NETWORKING });
 		void deinit		(library_flagset);
+	};
+
+	struct network_raii {
+		network_raii();
+		~network_raii();
+
+		network_raii(const network_raii&) = delete;
+		network_raii(network_raii&&) = delete;
+
+		network_raii& operator=(const network_raii&) = delete;
+		network_raii& operator=(network_raii&&) = delete;
 	};
 };

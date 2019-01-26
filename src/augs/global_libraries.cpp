@@ -71,4 +71,13 @@ namespace augs {
 	global_libraries::~global_libraries() {
 		deinit(initialized);
 	}
+
+
+	network_raii::network_raii() {
+		network::init();
+	}
+
+	network_raii::~network_raii() {
+		network::deinit();
+	}
 };

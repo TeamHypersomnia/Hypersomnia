@@ -1,7 +1,10 @@
 #pragma once
+#include "augs/global_libraries.h"
 #include "application/network/network_adapters.h"
 
 class server_adapter {
+	augs::network_raii raii;
+
 	std::array<uint8_t, yojimbo::KeyBytes> privateKey = {};
 	game_connection_config connection_config;
 	GameAdapter adapter;

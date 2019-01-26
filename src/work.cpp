@@ -174,8 +174,8 @@ int work(const int argc, const char* const * const argv) try {
 
 	static const auto libraries = 
 		params.start_dedicated_server 
-		? augs::global_libraries(augs::global_libraries::library::NETWORKING) 
-		: augs::global_libraries() 
+		? augs::global_libraries({}) 
+		: augs::global_libraries(augs::global_libraries::library::FREETYPE) 
 	;
 
 	LOG("Initializing global libraries took: %x ms", global_libraries_timer.template extract<std::chrono::milliseconds>());

@@ -24,6 +24,7 @@ return 0;
 namespace augs {
 	namespace network {
 		bool init() {
+			LOG("Initializing the network library.");
 			const bool result = InitializeYojimbo();
 
 			//yojimbo_log_level(YOJIMBO_LOG_LEVEL_DEBUG);
@@ -32,6 +33,7 @@ namespace augs {
 		}
 
 		bool deinit() {
+			LOG("Shutting down the network library.");
 			ShutdownYojimbo();
 			return true;
 		}
