@@ -705,6 +705,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 											const auto& rigid_body = shell_entity.template get<components::rigid_body>();
 											rigid_body.set_velocity(vec2::from_degrees(muzzle_transform.rotation + spread_component).set_length(rng.randval(gun_def.shell_velocity)));
+											rigid_body.set_angular_velocity(rng.randval(gun_def.shell_angular_velocity));
 
 											auto& ignored = rigid_body.get_special().during_cooldown_ignore_collision_with;
 

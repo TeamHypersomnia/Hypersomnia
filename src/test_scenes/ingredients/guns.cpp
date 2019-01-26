@@ -1928,7 +1928,7 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4500.f, 4500.f};
 			gun_def.shot_cooldown_ms = 84.f;
 
-			gun_def.shell_angular_velocity = {2.f, 14.f};
+			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 3.f;
@@ -1981,7 +1981,7 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4300.f, 4300.f};
 			gun_def.shot_cooldown_ms = 60.f;
 
-			gun_def.shell_angular_velocity = {2.f, 14.f};
+			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 1.2;
@@ -2036,7 +2036,7 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4500.f, 4500.f};
 			gun_def.shot_cooldown_ms = 100.f;
 
-			gun_def.shell_angular_velocity = {2.f, 14.f};
+			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 4.f;
@@ -2090,7 +2090,7 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4400.f, 4400.f};
 			gun_def.shot_cooldown_ms = 60.f;
 
-			gun_def.shell_angular_velocity = {2.f, 14.f};
+			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 3.3f;
@@ -2153,7 +2153,7 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4700.f, 4700.f};
 			gun_def.shot_cooldown_ms = 105.f;
 
-			gun_def.shell_angular_velocity = {2.f, 14.f};
+			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 3.1f;
@@ -2205,7 +2205,7 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4700.f, 4700.f};
 			gun_def.shot_cooldown_ms = 100.f;
 
-			gun_def.shell_angular_velocity = {2.f, 14.f};
+			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 2.f;
@@ -2253,7 +2253,7 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4700.f, 4700.f};
 			gun_def.shot_cooldown_ms = 90.f;
 
-			gun_def.shell_angular_velocity = {2.f, 10.f};
+			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {300.f, 1900.f};
 			gun_def.damage_multiplier = 1.8f;
@@ -2306,7 +2306,7 @@ namespace test_flavours {
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::REVOLVER_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = true;
 
-			gun_def.shell_angular_velocity = {2.f, 10.f};
+			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {500.f, 2500.f};
 			gun_def.damage_multiplier = 6.f;
@@ -2363,7 +2363,7 @@ namespace test_flavours {
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::AUTOMATIC_SHOTGUN_CHAMBERING);
 			gun_def.allow_charge_in_chamber_magazine_when_chamber_loaded = false;
 
-			gun_def.shell_angular_velocity = {2.f, 10.f};
+			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {500.f, 2500.f};
 			gun_def.damage_multiplier = 1.f;
@@ -2435,7 +2435,7 @@ namespace test_flavours {
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::AUTOMATIC_SHOTGUN_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = false;
 
-			gun_def.shell_angular_velocity = {2.f, 10.f};
+			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {900.f, 3500.f};
 			gun_def.damage_multiplier = 0.8f;
@@ -2487,7 +2487,7 @@ namespace test_flavours {
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::GRADOBICIE_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = false;
 
-			gun_def.shell_angular_velocity = {2.f, 10.f};
+			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 13.f;
 			gun_def.shell_velocity = {900.f, 3500.f};
 			gun_def.damage_multiplier = 1.2f;
@@ -2557,7 +2557,7 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4100.f, 4100.f};
 			gun_def.shot_cooldown_ms = 110.f;
 
-			gun_def.shell_angular_velocity = {2.f, 10.f};
+			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 12.f;
 			gun_def.shell_velocity = {300.f, 1900.f};
 			gun_def.damage_multiplier = 4.f;

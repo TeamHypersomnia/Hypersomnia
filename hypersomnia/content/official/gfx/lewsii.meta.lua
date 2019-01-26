@@ -24,12 +24,33 @@ return {
         x = 0,
         y = 0
       },
+      chamber = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      chamber_magazine = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
       detachable_magazine = {
         pos = {
           x = -6,
           y = -1
         },
         rotation = 0
+      },
+      shell_spawn = {
+        pos = {
+          x = 26,
+          y = -6
+        },
+        rotation = -69.443954467773438
       }
     },
     item = {
@@ -67,6 +88,13 @@ return {
           y = 0
         },
         rotation = 0
+      },
+      shoulder_anchor = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       }
     },
     legs = {
@@ -74,6 +102,10 @@ return {
         x = 0,
         y = 0
       }
+    },
+    non_standard_shape = {
+      convex_partition = {},
+      original_poly = {}
     },
     torso = {
       back = {
@@ -110,7 +142,22 @@ return {
           y = 0
         },
         rotation = 0
-      }
+      },
+      secondary_shoulder = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      shoulder = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      strafe_facing_offset = 0
     }
   },
   usage_as_button = {

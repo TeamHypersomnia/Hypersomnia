@@ -3021,3 +3021,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- we can also go pretty wild since pathological weapons like ELON HRL won't ever be shot during reloading
 
 - maybe increase max predicted commands
+
+- reinfer when loading ends?
+	- it should be handled by the transfer though wtf
+

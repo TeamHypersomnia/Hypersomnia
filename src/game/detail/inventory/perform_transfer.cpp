@@ -268,6 +268,12 @@ perform_transfer_result perform_transfer_impl::operator()(
 
 			play_pickup_particles();
 
+			if (whole_item_grabbed) {
+				if (source_root) {
+					source_root.infer_item_physics_recursive();
+				}
+			}
+
 			return output;
 		}
 	}

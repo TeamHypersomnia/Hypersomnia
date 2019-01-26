@@ -22,6 +22,20 @@ return {
         x = 0,
         y = -6
       },
+      chamber = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      chamber_magazine = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
       detachable_magazine = {
         pos = {
           x = 1,
@@ -31,10 +45,10 @@ return {
       },
       shell_spawn = {
         pos = {
-          x = 0,
-          y = 0
+          x = -1,
+          y = -6
         },
-        rotation = 0
+        rotation = -90
       }
     },
     item = {
@@ -67,6 +81,13 @@ return {
         rotation = 0
       },
       head_anchor = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      shoulder_anchor = {
         pos = {
           x = 0,
           y = 0
@@ -150,6 +171,13 @@ return {
         rotation = 0
       },
       secondary_hand = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      secondary_shoulder = {
         pos = {
           x = 0,
           y = 0
