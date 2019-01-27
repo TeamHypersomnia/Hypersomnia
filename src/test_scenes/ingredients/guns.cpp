@@ -2157,7 +2157,7 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4700.f, 4700.f};
-			gun_def.shot_cooldown_ms = 105.f;
+			gun_def.shot_cooldown_ms = 95.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
@@ -2165,12 +2165,12 @@ namespace test_flavours {
 			gun_def.damage_multiplier = 3.1f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
-			gun_def.kickback_towards_wielder = kickback_mult * 80.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 85.f;
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.072f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
-			gun_def.recoil_multiplier = 0.9f;
+			gun_def.recoil_multiplier = 0.84f;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
