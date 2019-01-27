@@ -50,7 +50,11 @@ struct pathed_asset_widget {
 		thread_local asset_path_chooser<T> chooser;
 
 		/* Definitions might get altered so we need to keep a copy */
-		const auto current_source = definitions[object].get_source_path();
+		const auto found_def = mapped_or_nullptr(definitions, object);
+
+		using P = remove_cref<decltype(found_def->get_source_path())>;
+
+		const auto current_source = found_def ? P(found_def->get_source_path()) : P();
 
 		chooser.perform(identity_label, current_source, project_path, on_choice, true_returner());
 

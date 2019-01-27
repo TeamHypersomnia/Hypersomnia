@@ -30,8 +30,9 @@ public:
 		const std::string& disallowed_paths_displayed_name = ""
 	) {
 		using namespace augs::imgui;
+		using P = maybe_official_path<I>;
 
-		const auto displayed_str = current_source.get_prettified_full();
+		const auto displayed_str = current_source.path.empty() ? std::string("(Invalid)") : current_source.get_prettified_full();
 
 		if (auto combo = scoped_combo(label.c_str(), displayed_str.c_str(), ImGuiComboFlags_HeightLargest)) {
 			if (base::check_opened_first_time()) {
@@ -57,7 +58,7 @@ public:
 				};
 
 				{
-					const auto in_official_path = current_source.get_in_official();
+					const auto in_official_path = P::get_in_official();
 
 					if (augs::exists(in_official_path)) {
 						augs::for_each_in_directory_recursive(
@@ -67,7 +68,7 @@ public:
 						);
 					}
 
-					const auto in_project_path = project_path / current_source.get_content_suffix();
+					const auto in_project_path = project_path / P::get_content_suffix();
 
 					if (augs::exists(in_project_path)) {
 						augs::for_each_in_directory_recursive(
