@@ -227,12 +227,6 @@ void perform_wielding(
 		try_hand(i);
 	}
 
-	for (const auto& r : reverse(results)) {
-		if (r.result.result.is_wear()) {
-			r.play_effects(step);
-		}
-	}
-
 	bool wield_played = false;
 
 	for (const auto& r : reverse(results)) {
@@ -245,7 +239,7 @@ void perform_wielding(
 
 	if (!wield_played) {
 		for (const auto& r : reverse(results)) {
-			if (r.result.result.is_holster()) {
+			if (r.result.result.is_wear() || r.result.result.is_holster()) {
 				r.play_effects(step);
 			}
 		}
