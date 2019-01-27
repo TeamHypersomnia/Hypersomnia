@@ -2,7 +2,7 @@ return {
   extra_loadables = {
     enabled_generate_neon_map = {
       alpha_multiplier = 1,
-      amplification = 60,
+      amplification = 85,
       light_colors = {
         "0 255 255 255",
         "255 0 0 255",
@@ -15,7 +15,7 @@ return {
         x = 80,
         y = 80
       },
-      standard_deviation = 6
+      standard_deviation = 7
     },
     generate_desaturation = false
   },
@@ -41,7 +41,7 @@ return {
       },
       detachable_magazine = {
         pos = {
-          x = -26,
+          x = -36,
           y = 6
         },
         rotation = 90
@@ -78,7 +78,7 @@ return {
       },
       hand_anchor = {
         pos = {
-          x = -25,
+          x = -34,
           y = 3
         },
         rotation = -1

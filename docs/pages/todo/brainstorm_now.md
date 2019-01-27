@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- check if export/import of rulesets works correctly
+
 - when post-solving referential, one could see if a similar-enough effect has happened in the predicted post solve.
 	- if not, we want to post it, because a predicted cosmos might have not predicted this effect occurring.
 	- this could be done for id-insensitive events like effects tied to weapons and characters

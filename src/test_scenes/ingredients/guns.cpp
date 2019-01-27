@@ -1631,7 +1631,7 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("1.0");
+			charge_deposit_def.space_available = to_space_units("1.1");
 			charge_deposit_def.mounting_duration_ms = 500.f;
 			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::SHOTGUN_RED_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
@@ -1925,6 +1925,8 @@ namespace test_flavours {
 			invariants::gun gun_def;
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::BILMER2000_MUZZLE);
+			gun_def.muzzle_shot_sound.modifier.reference_distance = 300.f;
+			gun_def.muzzle_shot_sound.modifier.max_distance = 500.f;
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4500.f, 4500.f};
@@ -1959,6 +1961,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			only_allow_mag(meta, test_container_items::BILMER2000_MAGAZINE);
 			meta.get<invariants::item>().specific_to = faction_type::METROPOLIS;
+			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("6.4");
 		}
 
 		{
