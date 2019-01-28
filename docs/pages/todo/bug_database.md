@@ -5,6 +5,8 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- Client was initializing clientTime to 0.0 and had to catch up to the current time, which is why we had delays for connecting.
+
 - Why do we have player (+player) ?
 	- Nothing important, just written a wrong player as assister
 

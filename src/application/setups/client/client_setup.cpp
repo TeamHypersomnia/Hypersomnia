@@ -24,6 +24,7 @@ client_setup::client_setup(
 	lua(lua),
 	client(std::make_unique<client_adapter>())
 {
+	LOG("Client setup ctor");
 	init_connection(in);
 }
 
@@ -37,9 +38,11 @@ void client_setup::init_connection(const client_start_input& in) {
 	when_initiated_connection = get_current_time();
 	receiver.clear();
 	last_disconnect_reason.clear();
+	client_time = get_current_time();
 }
 
 client_setup::~client_setup() {
+	LOG("Client setup dtor");
 	disconnect();
 }
 
