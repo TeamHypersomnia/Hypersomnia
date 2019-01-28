@@ -1753,7 +1753,7 @@ namespace test_flavours {
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
 				item.space_occupied_per_charge = to_space_units("1.0");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
-				item.standard_price = 120;
+				item.standard_price = 100;
 				meta.set(item);
 			}
 		}
@@ -1789,7 +1789,7 @@ namespace test_flavours {
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
 				item.space_occupied_per_charge = to_space_units("1.0");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
-				item.standard_price = 140;
+				item.standard_price = 100;
 				meta.set(item);
 			}
 		}
@@ -2674,7 +2674,7 @@ namespace test_flavours {
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULWARK, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
-			set_density_mult(meta, 1.1f);
+			set_density_mult(meta, 1.85f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1300.f, 0.f, false, "0.01");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 500;
