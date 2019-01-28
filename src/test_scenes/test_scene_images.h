@@ -263,6 +263,9 @@ enum class test_scene_image_id {
 
 	BAKA47,
 
+	BULWARK,
+	BULWARK_MAGAZINE,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

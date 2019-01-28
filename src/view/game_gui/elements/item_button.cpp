@@ -268,6 +268,9 @@ void item_button::draw_proc(
 				) {
 					drawer(attachment_entity, viewing_transform * attachment_offset);
 				},
+				[](const auto&) {
+					return true;
+				},
 				[]() {
 					return torso_offsets();
 				},

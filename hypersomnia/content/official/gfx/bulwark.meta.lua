@@ -4,13 +4,14 @@ return {
       alpha_multiplier = 1,
       amplification = 90,
       light_colors = {
-        "244 213 156 255"
+        "255 0 0 255",
+        "255 252 252 255"
       },
       radius = {
         x = 80,
         y = 80
       },
-      standard_deviation = 7
+      standard_deviation = 6
     },
     generate_desaturation = false
   },
@@ -18,7 +19,7 @@ return {
     gun = {
       bullet_spawn = {
         x = 0,
-        y = 0
+        y = -6
       },
       chamber = {
         pos = {
@@ -36,17 +37,17 @@ return {
       },
       detachable_magazine = {
         pos = {
-          x = 0,
-          y = 0
+          x = -16,
+          y = 4
         },
         rotation = 0
       },
       shell_spawn = {
         pos = {
-          x = 0,
-          y = 0
+          x = 8,
+          y = -8
         },
-        rotation = 0
+        rotation = -90
       }
     },
     item = {
@@ -73,8 +74,8 @@ return {
       },
       hand_anchor = {
         pos = {
-          x = 0,
-          y = 0
+          x = -15,
+          y = 3
         },
         rotation = 0
       },
@@ -100,23 +101,57 @@ return {
       }
     },
     non_standard_shape = {
-      convex_partition = {},
+      convex_partition = {
+        2,
+        3,
+        4,
+        5,
+        6,
+        1,
+        2,
+        0,
+        1,
+        6,
+        7,
+        8,
+        0
+      },
       original_poly = {
         {
-          x = -5.5,
-          y = -9.5
+          x = -21,
+          y = 2
         },
         {
-          x = 1,
+          x = -16,
+          y = -2
+        },
+        {
+          x = -21,
+          y = -5
+        },
+        {
+          x = -21,
           y = -9
         },
         {
-          x = 5.5,
-          y = 9.5
+          x = 22,
+          y = -9.5
         },
         {
-          x = -2,
+          x = 20,
+          y = -2
+        },
+        {
+          x = -9,
+          y = -1
+        },
+        {
+          x = -15,
           y = 9
+        },
+        {
+          x = -21,
+          y = 7
         }
       }
     },

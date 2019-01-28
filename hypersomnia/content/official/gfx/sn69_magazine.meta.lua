@@ -23,6 +23,20 @@ return {
         x = 0,
         y = 0
       },
+      chamber = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      chamber_magazine = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
       detachable_magazine = {
         pos = {
           x = 0,
@@ -73,12 +87,54 @@ return {
           y = 0
         },
         rotation = 0
+      },
+      shoulder_anchor = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       }
     },
     legs = {
       foot = {
         x = 0,
         y = 0
+      }
+    },
+    non_standard_shape = {
+      convex_partition = {
+        0,
+        1,
+        2,
+        4,
+        0,
+        4,
+        2,
+        3,
+        4
+      },
+      original_poly = {
+        {
+          x = 1,
+          y = -7.179999828338623
+        },
+        {
+          x = 5.5,
+          y = -7.5
+        },
+        {
+          x = 0,
+          y = 4
+        },
+        {
+          x = 1.559999942779541,
+          y = 7.5
+        },
+        {
+          x = -5.4000000953674316,
+          y = 7.5100002288818359
+        }
       }
     },
     torso = {
@@ -111,6 +167,20 @@ return {
         rotation = 0
       },
       secondary_hand = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      secondary_shoulder = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      shoulder = {
         pos = {
           x = 0,
           y = 0

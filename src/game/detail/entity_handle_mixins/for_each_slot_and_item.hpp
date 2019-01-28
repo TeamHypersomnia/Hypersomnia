@@ -76,9 +76,10 @@ callback_result inventory_mixin<E>::for_each_contained_slot_and_item_recursive(
 }
 
 template <class E>
-template <class A, class G>
+template <class A, class B, class G>
 void inventory_mixin<E>::for_each_attachment_recursive(
 	A attachment_callback,
+	B should_recurse,
 	G get_offsets_by_torso,
 	const attachment_offset_settings& settings,
 	const bool flip_hands_order
@@ -149,14 +150,17 @@ void inventory_mixin<E>::for_each_attachment_recursive(
 							const auto this_container_id = this_container.get_id();
 
 							for (const auto& id : get_items_inside(this_container, type)) {
+								const auto inside_item_handle = cosm[id];
+
+								if (!should_recurse(inside_item_handle)) {
+									continue;
+								}
+
 								auto insert_where = container_stack.size();
 
 								if (flip_hands_order && type == slot_function::SECONDARY_HAND && container_stack.back().parent.type == slot_function::PRIMARY_HAND) {
 									insert_where--;
 								}
-
-#if 1
-								const auto inside_item_handle = cosm[id];
 
 								{
 									const auto& maybe_gun = inside_item_handle;
@@ -181,7 +185,6 @@ void inventory_mixin<E>::for_each_attachment_recursive(
 										continue;
 									}
 								}
-#endif
 
 								container_stack.insert(container_stack.begin() + insert_where, { { type, this_container_id }, id, total_offset });
 							}
@@ -224,6 +227,9 @@ ltrb inventory_mixin<E>::calc_attachments_aabb(G&& get_offsets_by_torso) const {
 			const auto attachment_offset
 		) {
 			result.contain(attachment_entity.get_aabb(attachment_offset));
+		},
+		[](const auto&) {
+			return true;
 		},
 		std::forward<G>(get_offsets_by_torso),
 		attachment_offset_settings::for_logic()

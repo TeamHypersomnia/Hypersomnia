@@ -1739,7 +1739,7 @@ namespace test_flavours {
 
 			inventory_slot charge_deposit_def;
 			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
-			charge_deposit_def.space_available = to_space_units("1.5");
+			charge_deposit_def.space_available = to_space_units("1.6");
 			charge_deposit_def.mounting_duration_ms = 500.f;
 			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::ORANGE_CHARGE);
 			charge_deposit_def.contributes_to_space_occupied = false;
@@ -1754,6 +1754,42 @@ namespace test_flavours {
 				item.space_occupied_per_charge = to_space_units("1.0");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
 				item.standard_price = 120;
+				meta.set(item);
+			}
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_container_items::BULWARK_MAGAZINE);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULWARK_MAGAZINE, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+
+			invariants::container container; 
+
+			inventory_slot charge_deposit_def;
+			charge_deposit_def.category_allowed = item_category::SHOT_CHARGE;
+			charge_deposit_def.space_available = to_space_units("0.13");
+			charge_deposit_def.mounting_duration_ms = 500.f;
+			charge_deposit_def.only_allow_flavour = to_entity_flavour_id(test_shootable_charges::STEEL_CHARGE);
+			charge_deposit_def.contributes_to_space_occupied = false;
+
+			container.slots[slot_function::ITEM_DEPOSIT] = charge_deposit_def;
+			meta.set(container);
+
+			{
+				invariants::item item;
+
+				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
+				item.space_occupied_per_charge = to_space_units("1.0");
+				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
+				item.standard_price = 140;
 				meta.set(item);
 			}
 		}
@@ -2233,7 +2269,7 @@ namespace test_flavours {
 			set_density_mult(meta, 0.8f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1000.f, 0.f, false);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
-			meta.get<invariants::item>().standard_price = 500;
+			meta.get<invariants::item>().standard_price = 350;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(350);
 			set_chambering_duration_ms(meta, 390.f);
 			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
@@ -2284,7 +2320,7 @@ namespace test_flavours {
 			set_density_mult(meta, 0.7f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1000.f, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
-			meta.get<invariants::item>().standard_price = 500;
+			meta.get<invariants::item>().standard_price = 350;
 			set_chambering_duration_ms(meta, 350.f);
 			only_allow_mag(meta, test_container_items::SN69_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
@@ -2597,6 +2633,58 @@ namespace test_flavours {
 			meta.get<invariants::item>().draw_mag_over_when_reloading = true;
 			meta.get<invariants::item>().specific_to = faction_type::SPECTATOR;
 		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_shootable_weapons::BULWARK);
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+
+			invariants::gun gun_def;
+
+			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::BULWARK_MUZZLE);
+
+			gun_def.action_mode = gun_action_type::AUTOMATIC;
+			gun_def.muzzle_velocity = {4150.f, 4150.f};
+			gun_def.shot_cooldown_ms = 140.f;
+
+			gun_def.shell_angular_velocity = {10000.f, 40000.f};
+			gun_def.shell_spread_degrees = 12.f;
+			gun_def.shell_velocity = {300.f, 1900.f};
+			gun_def.damage_multiplier = 4.7f;
+			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 4;
+			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
+			gun_def.recoil_multiplier = 1.25f;
+			gun_def.kickback_towards_wielder = kickback_mult * 50.f;
+			gun_def.adversarial.knockout_award = static_cast<money_type>(800);
+
+			gun_def.maximum_heat = 2.f;
+			gun_def.gunshot_adds_heat = 0.092f;
+			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
+			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
+
+			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
+			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::CALICO_CHAMBERING);
+
+			meta.set(gun_def);
+
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULWARK, white);
+			test_flavours::add_lying_item_dynamic_body(meta);
+			set_density_mult(meta, 1.1f);
+			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1500.f, 0.f, false, "0.01");
+			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
+			meta.get<invariants::item>().standard_price = 500;
+			set_chambering_duration_ms(meta, 500.f);
+			only_allow_mag(meta, test_container_items::BULWARK_MAGAZINE);
+			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
+			meta.get<invariants::item>().specific_to = faction_type::SPECTATOR;
+			meta.get<invariants::container>().slots[slot_function::GUN_DETACHABLE_MAGAZINE].draw_under_container = true;
+		}
+
 		{
 			auto& meta = get_test_flavour(flavours, test_shootable_weapons::AMPLIFIER_ARM);
 

@@ -388,38 +388,43 @@ FORCE_INLINE void specific_entity_drawer(
 							const auto attachment_entity,
 							const auto attachment_offset
 						) {
-							if (under_torso == should_draw_under_torso(attachment_entity)) {
-								attachment_entity.template dispatch_on_having_all<invariants::item>(
-									[&](const auto typed_attachment_handle) {
-										const bool additional_flip = [&]() {
-											if (!currently_reloading) {
-												return false;
-											}
-
-											const auto type = typed_attachment_handle.get_current_slot().get_type();
-
-											if (
-												type == slot_function::PRIMARY_HAND 
-												|| type == slot_function::SECONDARY_HAND
-												|| type == slot_function::GUN_DETACHABLE_MAGAZINE
-												|| type == slot_function::GUN_MUZZLE
-											) {
-												return flip_for_reloading;
-											}
-
+							attachment_entity.template dispatch_on_having_all<invariants::item>(
+								[&](const auto typed_attachment_handle) {
+									const bool additional_flip = [&]() {
+										if (!currently_reloading) {
 											return false;
-										}();
+										}
 
-										detail_specific_entity_drawer(
-											typed_attachment_handle,
-											in,
-											render_visitor,
-											viewing_transform * attachment_offset,
-											additional_flip
-										);
-									}
-								);
+										const auto type = typed_attachment_handle.get_current_slot().get_type();
+
+										if (
+											type == slot_function::PRIMARY_HAND 
+											|| type == slot_function::SECONDARY_HAND
+											|| type == slot_function::GUN_DETACHABLE_MAGAZINE
+											|| type == slot_function::GUN_MUZZLE
+										) {
+											return flip_for_reloading;
+										}
+
+										return false;
+									}();
+
+									detail_specific_entity_drawer(
+										typed_attachment_handle,
+										in,
+										render_visitor,
+										viewing_transform * attachment_offset,
+										additional_flip
+									);
+								}
+							);
+						},
+						[under_torso, &should_draw_under_torso](const auto& attachment_entity) {
+							if (attachment_entity.get_current_slot().is_hand_slot()) {
+								return under_torso == should_draw_under_torso(attachment_entity);
 							}
+
+							return true;
 						},
 						get_offsets_by_torso,
 						attachment_offset_settings::for_rendering(),

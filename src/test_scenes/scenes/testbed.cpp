@@ -44,7 +44,7 @@ namespace test_scenes {
 		rs.name = "Standard test ruleset";
 		rs.spawned_faction = faction_type::RESISTANCE;
 
-		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BAKA47);
+		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::BULWARK);
 		rs.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 		rs.initial_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_SHIELD_ARMOR);
 		rs.initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::YELLOW_DAGGER);
@@ -460,6 +460,8 @@ namespace test_scenes {
 
 			give_weapon(transformr(vec2(-800 - k * 150, 2600)), test_shootable_weapons::GRADOBICIE);
 			give_charge(transformr(vec2(-800 - k * 150, 2800)), test_shootable_charges::GRADOBICIE_CHARGE, 8);
+
+			give_weapon(transformr(vec2(-800 - k * 150, 3000)), test_shootable_weapons::BULWARK);
 		}
 
 		give_weapon(transformr(vec2(-300, -500 + 50)), test_shootable_weapons::AMPLIFIER_ARM);

@@ -107,6 +107,7 @@ enum class test_shootable_weapons {
 	ELON_HRL,
 	BLUNAZ,
 	GRADOBICIE,
+	BULWARK,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -210,6 +211,7 @@ enum class test_container_items {
 	PRO90_MAGAZINE,
 	LEWSII_MAGAZINE,
 	WARX_FQ12_MAGAZINE,
+	BULWARK_MAGAZINE,
 
 	COUNT
 	// END GEN INTROSPECTOR

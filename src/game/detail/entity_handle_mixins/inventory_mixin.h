@@ -129,9 +129,10 @@ public:
 		const optional_slot_flags& filter
 	) const;
 
-	template <class A, class G>
+	template <class A, class B, class G>
 	void for_each_attachment_recursive(
 		A attachment_callback,
+		B should_recurse,
 		G get_offsets_by_torso,
 		const attachment_offset_settings& settings,
 		const bool reverse_hand_order = false
