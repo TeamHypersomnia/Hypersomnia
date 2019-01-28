@@ -78,9 +78,13 @@ public:
 
 	bool schedule_reprediction = false;
 
-	void clear() {
+	void clear_incoming() {
 		incoming_contexts.clear();
 		incoming_entropies.clear();
+	}
+
+	void clear() {
+		clear_incoming();
 		predicted_entropies.clear();
 	}
 
@@ -147,19 +151,24 @@ public:
 
 				const auto& referential_cosmos = referential_arena.get_cosmos();
 
+				const auto& meta = actual_server_step.meta;
+
 				{
-					const auto received_hash = actual_server_step.meta.state_hash;
+					const auto received_hash = meta.state_hash;
 
 					if (received_hash != std::nullopt) {
 #if TEST_DESYNC_DETECTION
-						if (referential_cosmos.get_total_steps_passed() == 1) {
-							const auto it = referential_cosmos[locally_controlled_entity];
+						if (referential_cosmos.get_total_steps_passed() == 1 || referential_cosmos.get_total_steps_passed() % (128 * 5) == 0) {
+							const auto it = referential_arena.get_cosmos()[locally_controlled_entity];
 
-							auto& s = it.template get<components::sentience>();
-							s.template get<health_meter_instance>().maximum += 1.f;
-						}
-						else {
-							LOG_NVPS(referential_cosmos.get_total_steps_passed());
+							if (it) {
+								LOG("Altering the state for a test.");
+								auto& s = it.template get<components::sentience>();
+								s.template get<health_meter_instance>().maximum += 1.f;
+							}
+							else {
+								LOG("Looks like controlled entity is dead!");
+							}
 						}
 #endif
 
@@ -176,14 +185,12 @@ public:
 							);
 
 							result.desync = true;
-							clear();
-							return result;
 						}
 					}
 				}
 
 				{
-					const bool shall_reinfer = logically_set(actual_server_step.payload.general.added_player);
+					const bool shall_reinfer = meta.reinference_required || logically_set(actual_server_step.payload.general.added_player);
 
 					if (shall_reinfer) {
 						LOG("Added player in the next entropy. Will reinfer to sync.");

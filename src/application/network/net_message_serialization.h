@@ -1,4 +1,5 @@
 #pragma once
+#include "application/network/net_serialization_helpers.h"
 
 template <typename Stream>
 bool preserialized_message::Serialize(Stream& stream) {
@@ -30,6 +31,15 @@ namespace net_messages {
 		return true;
 	}
 #endif
+
+	template <typename Stream>
+	bool special_client_request::Serialize(Stream& stream) {
+		if (!serialize_enum(stream, payload)) {
+			return false;
+		}
+
+		return true;
+	}
 
 	template <typename Stream>
 	bool client_welcome::Serialize(Stream& stream) {

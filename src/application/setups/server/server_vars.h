@@ -12,6 +12,9 @@ struct server_vars {
 	unsigned kick_if_inactive_for_secs = 60;
 	unsigned time_limit_to_enter_game_since_connection = 10;
 
+	unsigned reset_resync_timer_once_every_secs = 10;
+	unsigned max_client_resyncs = 3;
+
 	unsigned send_updates_once_every_tick = 1;
 
 	unsigned max_buffered_client_commands = 1000;

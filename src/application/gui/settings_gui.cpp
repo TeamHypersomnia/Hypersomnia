@@ -379,6 +379,11 @@ void settings_gui_state::perform(
 			case settings_pane::CLIENT: {
 				auto& scope_cfg = config.client;
 
+				{
+					auto& scope_cfg = config.arena_mode_gui;
+					revertable_checkbox(SCOPE_CFG_NVP(show_client_resyncing_notifier));
+				}
+
 				if (auto node = scoped_tree_node("Lag compensation techniques")) {
 					{
 						auto& scope_cfg = config.simulation_receiver;

@@ -461,6 +461,44 @@ message_handler_result server_setup::handle_client_message(
 		c.pending_entropies.emplace_back(std::move(payload));
 		//LOG("Received %x th command from client. ", c.pending_entropies.size());
 	}
+	else if constexpr (std::is_same_v<T, special_client_request>) {
+		switch (payload) {
+			case special_client_request::RESYNC:
+				if (server_time >= c.last_resync_counter_reset_at + vars.reset_resync_timer_once_every_secs) {
+					c.resyncs_counter = 0;
+					c.last_resync_counter_reset_at = server_time;
+					LOG("Resetting the resync counter.");
+				}
+
+				++c.resyncs_counter;
+
+				LOG("Client has asked for a resync no %x.", c.resyncs_counter);
+
+				if (c.resyncs_counter > vars.max_client_resyncs) {
+					LOG("Client is asking for a resync too often! Kicking.");
+					return abort_v;
+				}
+
+				server->send_payload(
+					client_id, 
+					game_channel_type::SERVER_SOLVABLE_AND_STEPS, 
+
+					buffers,
+
+					initial_arena_state_payload<true> {
+						scene.world.get_solvable().significant,
+						current_mode,
+						client_id
+					}
+				);
+
+				reinference_necessary = true;
+
+				break;
+
+			default: return abort_v;
+		}
+	}
 	else {
 		static_assert(always_false_v<T>, "Unhandled payload type.");
 	}
@@ -477,7 +515,7 @@ void server_setup::handle_client_messages() {
 void server_setup::send_server_step_entropies(const compact_server_step_entropy& total_input) {
 	networked_server_step_entropy total;
 	total.payload = total_input;
-
+	total.meta.reinference_required = reinference_necessary;
 	total.meta.state_hash = [&]() -> decltype(total.meta.state_hash) {
 		auto& ticks_remaining = ticks_until_sending_hash;
 
@@ -538,9 +576,10 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 }
 
 void server_setup::reinfer_if_necessary_for(const compact_server_step_entropy& entropy) {
-	if (logically_set(entropy.general.added_player)) {
-		LOG("Server: Added player in the next entropy. Will reinfer to sync.");
+	if (reinference_necessary || logically_set(entropy.general.added_player)) {
+		LOG("Server: Added player or reinference_necessary. Will reinfer to sync.");
 		cosmic::reinfer_solvable(get_arena_handle().get_cosmos());
+		reinference_necessary = false;
 	}
 }
 
@@ -762,6 +801,7 @@ TEST_CASE("NetSerialization ServerEntropySecond") {
 
 	networked_server_step_entropy sent;
 	sent.meta.state_hash = 0xdeadbeef;
+	sent.meta.reinference_required = true;
 
 	const auto naive_bytes = [&]() {
 		total_mode_player_entropy t;

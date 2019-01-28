@@ -3032,3 +3032,6 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - decrease price of fota?
 - fix behaviour of container component in editor
 
+- we still have problem with reconnection even after re-initializing the net lib
+	- even on linux
+

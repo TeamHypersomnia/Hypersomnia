@@ -55,6 +55,8 @@ struct arena_mode_gui_settings {
 
 	unsigned show_recent_awards_num = 5;
 	float keep_recent_awards_for_seconds = 8.f;
+
+	bool show_client_resyncing_notifier = true;
 	// END GEN INTROSPECTOR
 };
 

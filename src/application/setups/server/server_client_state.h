@@ -19,6 +19,9 @@ struct server_client_state {
 	client_pending_entropies pending_entropies;
 	uint8_t num_entropies_accepted = 0;
 
+	unsigned resyncs_counter = 0;
+	net_time_t last_resync_counter_reset_at = 0;
+
 	server_client_state() = default;
 
 	server_client_state(const net_time_t server_time) {

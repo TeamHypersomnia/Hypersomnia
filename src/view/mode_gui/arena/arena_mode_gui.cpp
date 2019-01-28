@@ -641,6 +641,13 @@ void arena_gui_state::draw_mode_gui(
 		};
 
 		if (prediction.play_unpredictable) {
+			if (cfg.show_client_resyncing_notifier && resyncing_notifier) {
+				const auto warning = colored("WARNING! Resynchronizing client with the server.", orange);
+
+				const auto where = in.screen_size.y / 8;
+				draw_text_indicator_at(warning, where);
+			}
+
 			draw_scoreboard();
 			draw_money_and_awards();
 			draw_knockouts();

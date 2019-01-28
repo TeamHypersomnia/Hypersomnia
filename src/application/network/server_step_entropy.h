@@ -85,10 +85,11 @@ struct server_step_entropy_meta {
 
 	// GEN INTROSPECTOR struct server_step_entropy_meta
 	std::optional<uint32_t> state_hash;
+	bool reinference_required = false;
 	// END GEN INTROSPECTOR
 
 	bool operator==(const server_step_entropy_meta& b) const {
-		return state_hash == b.state_hash;
+		return state_hash == b.state_hash && reinference_required == b.reinference_required;
 	}
 };
 

@@ -488,8 +488,6 @@ mode_entity_id bomb_mode::lookup(const mode_player_id& id) const {
 
 void bomb_mode::reshuffle_spawns(const cosmos& cosm, const faction_type faction) {
 	const auto reshuffle_seed = get_step_rng_seed(cosm) + static_cast<unsigned>(faction);
-	LOG_NVPS(reshuffle_seed);
-
 	auto rng = randomization(reshuffle_seed);
 
 	auto& faction_state = factions[faction];

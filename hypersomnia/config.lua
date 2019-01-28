@@ -341,6 +341,8 @@ return {
     }
   },
   arena_mode_gui = {
+    show_client_resyncing_notifier = true,
+
     between_knockout_boxes_pad = 6,
     inside_knockout_box_pad = 4,
     weapon_icon_horizontal_pad = 10,
@@ -483,6 +485,8 @@ return {
 	time_limit_to_enter_game_since_connection = 15,
 
 	send_updates_once_every_tick = 1,
+	reset_resync_timer_once_every_secs = 10,
+	max_client_resyncs = 3,
 
 	disabled_network_simulator = {
       latency_ms = 50,
@@ -521,7 +525,7 @@ return {
 	  duplicates_percent = 1,
 	},
 
-	max_buffered_server_commands = 1000,
+	max_buffered_server_commands = 10000,
 	max_predicted_client_commands = 3000
   }
 }

@@ -3,6 +3,7 @@
 #include "game/modes/mode_entropy.h"
 #include "augs/misc/serialization_buffers.h"
 #include "application/network/server_step_entropy.h"
+#include "application/network/special_client_request.h"
 
 #define LOG_NET_SERIALIZATION !IS_PRODUCTION_BUILD
 
@@ -89,6 +90,21 @@ namespace net_messages {
 		bool read_payload(requested_client_settings&);
 	};
 
+	struct special_client_request : public yojimbo::Message {
+		static constexpr bool server_to_client = false;
+		static constexpr bool client_to_server = true;
+
+		template <typename Stream>
+		bool Serialize(Stream& stream);
+
+		::special_client_request payload;
+
+		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
+
+		bool write_payload(const ::special_client_request&);
+		bool read_payload(::special_client_request&);
+	};
+
 	struct new_server_vars : preserialized_message {
 		static constexpr bool server_to_client = true;
 		static constexpr bool client_to_server = false;
@@ -156,7 +172,8 @@ namespace net_messages {
 		prestep_client_context*,
 #endif
 		server_step_entropy*,
-		client_entropy*
+		client_entropy*,
+		special_client_request*
 	>;
 	
 	using id_t = type_in_list_id<all_t>;

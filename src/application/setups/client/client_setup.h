@@ -35,6 +35,8 @@
 #include "augs/misc/getpid.h"
 #include "game/modes/dump_for_debugging.h"
 
+#include "application/network/special_client_request.h"
+
 struct config_lua_table;
 
 class client_adapter;
@@ -66,6 +68,9 @@ class client_setup :
 
 	cosmos predicted_cosmos;
 	online_mode_and_rules predicted_mode;
+
+	special_client_request pending_request = special_client_request::NONE;
+	bool now_resyncing = false;
 
 	/* The rest is client-specific */
 	sol::state& lua;
@@ -349,10 +354,9 @@ public:
 						disconnect();
 					}
 
-					if (result.desync) {
-						last_disconnect_reason = typesafe_sprintf(
-							"The client has desynchronized from the server."
-						);
+					if (result.desync && !now_resyncing) {
+						pending_request = special_client_request::RESYNC;
+						now_resyncing = true;
 
 #if DUMP_BEFORE_AND_AFTER_ROUND_START
 						const auto preffix = typesafe_sprintf("%x_desync%x_", augs::getpid(), referential_arena.get_round_num());
@@ -369,71 +373,79 @@ public:
 						);
 #endif
 
+#if DISCONNECT_ON_DESYNC
+						last_disconnect_reason = typesafe_sprintf(
+							"The client has desynchronized from the server."
+						);
+
 						disconnect();
+#endif
 					}
 				}
-
-				auto scope = measure_scope(performance.stepping_forward);
 
 				{
-					auto& p = receiver.predicted_entropies;
+					auto scope = measure_scope(performance.stepping_forward);
 
-					const auto& max_commands = vars.max_predicted_client_commands;
-					const auto num_commands = p.size();
+					{
+						auto& p = receiver.predicted_entropies;
 
-					if (num_commands > max_commands) {
-						last_disconnect_reason = typesafe_sprintf(
-							"Number of predicted commands (%x) exceeded max_predicted_client_commands (%x).", 
-							num_commands,
-							max_commands
-						);
+						const auto& max_commands = vars.max_predicted_client_commands;
+						const auto num_commands = p.size();
 
-						disconnect();
+						if (num_commands > max_commands) {
+							last_disconnect_reason = typesafe_sprintf(
+								"Number of predicted commands (%x) exceeded max_predicted_client_commands (%x).", 
+								num_commands,
+								max_commands
+							);
+
+							disconnect();
+						}
+
+						performance.predicted_steps.measure(num_commands);
+
+						p.push_back(*new_local_entropy);
 					}
 
-					performance.predicted_steps.measure(num_commands);
+					auto predicted_post_solve = [&](const const_logic_step step) {
+						const auto input = prediction_input::predictable_for(get_viewed_character());
 
-					p.push_back(*new_local_entropy);
-				}
+						auto erase_unpredictable_messages = [&](auto& from_queue) {
+							erase_if(
+								from_queue,
+								[&](const auto& m) {
+									return !m.get_predictability().should_play(input);
+								}
+							);
+						};
 
-				auto predicted_post_solve = [&](const const_logic_step step) {
-					const auto input = prediction_input::predictable_for(get_viewed_character());
+						for_each_effect_queue(step, erase_unpredictable_messages);
 
-					auto erase_unpredictable_messages = [&](auto& from_queue) {
-						erase_if(
-							from_queue,
-							[&](const auto& m) {
-								return !m.get_predictability().should_play(input);
-							}
-						);
+						audiovisual_post_solve_settings settings;
+						settings.prediction = input;
+
+						audiovisual_post_solve(step, settings);
 					};
 
-					for_each_effect_queue(step, erase_unpredictable_messages);
-
-					audiovisual_post_solve_settings settings;
-					settings.prediction = input;
-
-					audiovisual_post_solve(step, settings);
-				};
-
-				auto predicted_callbacks = solver_callbacks(
-					default_solver_callback(),
-					predicted_post_solve,
-					default_solver_callback()
-				);
+					auto predicted_callbacks = solver_callbacks(
+						default_solver_callback(),
+						predicted_post_solve,
+						default_solver_callback()
+					);
 
 #if USE_CLIENT_PREDICTION
-				const auto forward_step_result = predicted_arena.advance(
-					*new_local_entropy, 
-					predicted_callbacks, 
-					predicted_solve_settings
-				);
+					const auto forward_step_result = predicted_arena.advance(
+						*new_local_entropy, 
+						predicted_callbacks, 
+						predicted_solve_settings
+					);
 
-				schedule_reprediction_if_inconsistent(forward_step_result);
+					schedule_reprediction_if_inconsistent(forward_step_result);
 #else
-				(void)predicted_callbacks;
-				(void)callbacks;
+					(void)predicted_callbacks;
+					(void)callbacks;
 #endif
+				}
 			}
 
 			if (in_game) {

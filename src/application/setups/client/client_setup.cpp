@@ -39,6 +39,8 @@ void client_setup::init_connection(const client_start_input& in) {
 	receiver.clear();
 	last_disconnect_reason.clear();
 	client_time = get_current_time();
+	pending_request = special_client_request::NONE;
+	now_resyncing = false;
 }
 
 client_setup::~client_setup() {
@@ -129,6 +131,7 @@ message_handler_result client_setup::handle_server_message(
 	F&& read_payload
 ) {
 	constexpr auto abort_v = message_handler_result::ABORT_AND_DISCONNECT;
+	constexpr auto continue_v = message_handler_result::CONTINUE;
 	constexpr bool is_easy_v = payload_easily_movable_v<T>;
 
 	std::conditional_t<is_easy_v, T, std::monostate> payload;
@@ -185,11 +188,13 @@ message_handler_result client_setup::handle_server_message(
 		sv_vars = new_vars;
 	}
 	else if constexpr (std::is_same_v<T, initial_payload>) {
-		if (state != client_state_type::RECEIVING_INITIAL_STATE) {
+		if (!now_resyncing && state != client_state_type::RECEIVING_INITIAL_STATE) {
 			LOG("The server has sent initial state early (state: %x). Disconnecting.", state);
 			log_malicious_server();
 			return abort_v;
 		}
+
+		now_resyncing = false;
 
 		uint32_t read_client_id;
 
@@ -221,6 +226,7 @@ message_handler_result client_setup::handle_server_message(
 		const auto referential = get_arena_handle(client_arena_type::REFERENTIAL);
 
 		predicted.assign_all_solvables(referential);
+		receiver.clear_incoming();
 	}
 #if CONTEXTS_SEPARATE
 	else if constexpr (std::is_same_v<T, prestep_client_context>) {
@@ -258,6 +264,8 @@ message_handler_result client_setup::handle_server_message(
 				max_commands
 			);
 
+			LOG_NVPS(last_disconnect_reason);
+
 			return abort_v;
 		}
 
@@ -268,7 +276,7 @@ message_handler_result client_setup::handle_server_message(
 		static_assert(always_false_v<T>, "Unhandled payload type.");
 	}
 
-	return message_handler_result::CONTINUE;
+	return continue_v;
 }
 
 void client_setup::handle_server_messages() {
@@ -424,6 +432,18 @@ void client_setup::send_pending_commands() {
 			LOG("Sent repeated client configuration to the server.");
 		}
 	}
+
+	if (pending_request == special_client_request::RESYNC) {
+		LOG("Sending the request resync command.");
+
+		client->send_payload(
+			game_channel_type::CLIENT_COMMANDS,
+			pending_request
+		);
+
+		pending_request = special_client_request::NONE;
+	}
+
 }
 
 void client_setup::send_packets_if_its_time() {
@@ -443,6 +463,8 @@ custom_imgui_result client_setup::perform_custom_imgui(
 ) {
 	using C = client_state_type;
 	using namespace augs::imgui;
+
+	arena_gui.resyncing_notifier = now_resyncing;
 
 	const bool is_gameplay_on = client->is_connected() && state == C::IN_GAME;
 
@@ -521,26 +543,31 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			}
 		}
 		else if (client->is_connected()) {
-			text_color(typesafe_sprintf("Connected to %x.", last_start.ip_port), green);
-
-			if (state == C::PENDING_WELCOME) {
-				text("Sending the client configuration.");
-			}
-			else if (state == C::RECEIVING_INITIAL_STATE) {
-				text("Receiving the initial state:");
-			}
-			else if (state == C::RECEIVING_INITIAL_STATE_CORRECTION) {
-				text("Receiving the initial state correction:");
+			if (now_resyncing) {
+				text("The client has desynchronized.\nDownloading the complete state snapshot.");
 			}
 			else {
-				text("Unknown error.");
-			}
+				text_color(typesafe_sprintf("Connected to %x.", last_start.ip_port), green);
 
-			text("\n");
-			ImGui::Separator();
+				if (state == C::PENDING_WELCOME) {
+					text("Sending the client configuration.");
+				}
+				else if (state == C::RECEIVING_INITIAL_STATE) {
+					text("Receiving the initial state:");
+				}
+				else if (state == C::RECEIVING_INITIAL_STATE_CORRECTION) {
+					text("Receiving the initial state correction:");
+				}
+				else {
+					text("Unknown error.");
+				}
 
-			if (ImGui::Button("Abort")) {
-				disconnect();
+				text("\n");
+				ImGui::Separator();
+
+				if (ImGui::Button("Abort")) {
+					disconnect();
+				}
 			}
 		}
 	}

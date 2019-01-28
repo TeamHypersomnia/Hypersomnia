@@ -76,6 +76,7 @@ class server_setup :
 
 	entropy_accumulator local_collected;
 	compact_server_step_entropy step_collected;
+	bool reinference_necessary = false;
 
 	augs::propagate_const<std::unique_ptr<server_adapter>> server;
 	std::array<server_client_state, max_incoming_connections_v> clients;

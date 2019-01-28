@@ -4,7 +4,7 @@
 #include "augs/misc/compress.h"
 #include "augs/misc/readable_bytesize.h"
 #include "augs/templates/logically_empty.h"
-#include "augs/readwrite/byte_readwrite_traits.h"
+#include "application/network/net_serialization_helpers.h"
 
 template <bool C>
 struct initial_arena_state_payload {
@@ -52,21 +52,6 @@ namespace net_messages {
 
 	template <class Stream>
 	bool serialize(Stream&, mode_restart_command&) {
-		return true;
-	}
-
-	template <class Stream, class V>
-	bool serialize_trivial_as_bytes(Stream& s, V& v) {
-		static_assert(augs::is_byte_readwrite_appropriate_v<augs::memory_stream, V>);
-		serialize_bytes(s, (uint8_t*)&v, sizeof(V));
-		return true;
-	}
-
-	template <class Stream, class E>
-	bool serialize_enum(Stream& s, E& e) {
-		auto ee = static_cast<int>(e);
-		serialize_int(s, ee, 0, static_cast<int>(E::COUNT));
-		e = static_cast<E>(ee);
 		return true;
 	}
 
@@ -286,6 +271,8 @@ namespace net_messages {
 		serialize_bool(s, has_removed_player);
 		serialize_bool(s, has_special_command);
 
+		serialize_bool(s, total_networked.meta.reinference_required);
+
 		serialize_align(s);
 
 		if (has_state_hash) {
@@ -404,6 +391,20 @@ namespace net_messages {
 
 	inline bool client_welcome::write_payload(
 		const decltype(client_welcome::payload)& input
+	) {
+		payload = input;
+		return true;
+	}
+
+	inline bool special_client_request::read_payload(
+		decltype(special_client_request::payload)& output
+	) {
+		output = std::move(payload);
+		return true;
+	}
+
+	inline bool special_client_request::write_payload(
+		const decltype(special_client_request::payload)& input
 	) {
 		payload = input;
 		return true;
