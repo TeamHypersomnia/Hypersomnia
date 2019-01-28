@@ -2668,17 +2668,17 @@ namespace test_flavours {
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
-			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::CALICO_CHAMBERING);
+			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::HEAVY_PISTOL_CHAMBERING);
 
 			meta.set(gun_def);
 
 			test_flavours::add_sprite(meta, caches, test_scene_image_id::BULWARK, white);
 			test_flavours::add_lying_item_dynamic_body(meta);
 			set_density_mult(meta, 1.1f);
-			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1500.f, 0.f, false, "0.01");
+			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1300.f, 0.f, false, "0.01");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
 			meta.get<invariants::item>().standard_price = 500;
-			set_chambering_duration_ms(meta, 500.f);
+			set_chambering_duration_ms(meta, 450.f);
 			only_allow_mag(meta, test_container_items::BULWARK_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			meta.get<invariants::item>().specific_to = faction_type::SPECTATOR;
