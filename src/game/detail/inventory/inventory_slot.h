@@ -36,7 +36,7 @@ struct inventory_slot {
 
 	inventory_space_type space_available = 0;
 
-	float attachment_density_multiplier = 1.f;
+	real32 attachment_density_multiplier = 1.f;
 
 	sound_effect_input start_mounting_sound;
 	sound_effect_input finish_mounting_sound;

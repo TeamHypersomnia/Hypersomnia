@@ -14,6 +14,7 @@
 #include "game/components/missile_component.h"
 #include "game/components/attitude_component.h"
 #include "game/components/melee_fighter_component.h"
+#include "game/components/container_component.h"
 #include "game/modes/arena_mode.h"
 #include "view/maybe_official_path_declaration.h"
 #include "game/detail/inventory/requested_equipment.h"
@@ -51,7 +52,8 @@ using flavour_field_type_id = type_in_list_id<
 		augs::trivial_type_marker,
 		std::string,
 		wandering_pixels_frames,
-		remnant_flavour_vector
+		remnant_flavour_vector,
+		container_slots_type
 	>
 >;
 

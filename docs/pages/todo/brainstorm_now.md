@@ -9,6 +9,8 @@ summary: That which we are brainstorming at the moment.
 - we still have problem with reconnection even after re-initializing the net lib
 	- even on linux
 
+- do something about going through walls with bilmer and elon hrl
+
 - check if export/import of rulesets works correctly
 
 - when post-solving referential, one could see if a similar-enough effect has happened in the predicted post solve.

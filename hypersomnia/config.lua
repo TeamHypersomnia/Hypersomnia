@@ -32,8 +32,8 @@ return {
     G = "DROP",
 
     MiddleMouseButton = "THROW_ANY_FORCE",
-    MouseButton5 = "THROW_ANY_PED",
-    MouseButton4 = "THROW_ANY_INTERFERENCE",
+    MouseButton5 = "THROW_ANY_INTERFERENCE",
+    MouseButton4 = "THROW_ANY_PED",
 
     WheelUp = "THROW_ANY_TWO_KNIVES",
     WheelDown = "THROW_ANY_KNIFE",
@@ -79,7 +79,7 @@ return {
   },
   audio_volume = {
     gui = 1,
-    music = 0.3,
+    music = 0.12,
     sound_effects = 1
   },
   sound = {

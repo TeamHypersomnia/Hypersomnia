@@ -578,12 +578,12 @@ void general_edit_properties(
 
 			auto addr = ::make_field_address<field_type_id>(parent_altered, modified);
 
-			if constexpr(std::is_same_v<I, unsigned>) {
-				addr.element_index = index;
-				return field_equality_predicate(modified.at(index), addr);
+			if constexpr(is_nullopt_v<I>) {
+				return field_equality_predicate(modified, addr);
 			}
 			else {
-				return field_equality_predicate(modified, addr);
+				addr.element_index = static_cast<unsigned>(index);
+				return field_equality_predicate(modified.at(index), addr);
 			}
 		};
 
@@ -599,8 +599,8 @@ void general_edit_properties(
 
 			auto addr = ::make_field_address<field_type_id>(parent_altered, modified_location);
 
-			if constexpr(std::is_same_v<I, unsigned>) {
-				addr.element_index = index;
+			if constexpr(!is_nullopt_v<I>) {
+				addr.element_index = static_cast<unsigned>(index);
 			}
 
 			using tweaker_input_type = tweaker_input<field_type_id, remove_cref<decltype(new_value)>>;

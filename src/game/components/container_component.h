@@ -4,12 +4,14 @@
 
 #include "augs/misc/enum/enum_map.h"
 
+using container_slots_type = augs::enum_map<slot_function, inventory_slot>;
+
 namespace invariants {
 	struct container {
 		static constexpr bool reinfer_when_tweaking = true;
 
 		// GEN INTROSPECTOR struct invariants::container
-		augs::enum_map<slot_function, inventory_slot> slots;
+		container_slots_type slots;
 		// END GEN INTROSPECTOR
 	};
 }

@@ -1,4 +1,5 @@
 #pragma once
+#include "augs/templates/traits/is_enum_map.h"
 #include "augs/templates/get_by_dynamic_id.h"
 #include "application/setups/editor/detail/field_address.h"
 
@@ -29,7 +30,20 @@ decltype(auto) on_field_address(
 		const auto object_location = reinterpret_cast<byte_type>(std::addressof(object));
 		const auto field_location = reinterpret_cast<location_ptr_type>(object_location + address.offset);
 
-		if constexpr(can_access_data_v<T>) {
+		if constexpr(is_enum_map_v<T>) {
+			const auto index = address.element_index;
+
+			if (index == static_cast<unsigned>(-1)) {
+				return callback(*field_location);
+			}
+			else if (const auto mapped = mapped_or_nullptr(*field_location, static_cast<typename T::key_type>(index))) {
+				return callback(*mapped);
+			}
+			else {
+				return callback(std::nullopt);
+			}
+		}
+		else if constexpr(can_access_data_v<T>) {
 			const auto index = address.element_index;
 
 			if (index == static_cast<unsigned>(-1)) {

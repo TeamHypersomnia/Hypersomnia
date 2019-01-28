@@ -3027,3 +3027,8 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - check if steam engine works when item is thrown
 
+- decrease smg density
+- increase price of exaltation and of uwota
+- decrease price of fota?
+- fix behaviour of container component in editor
+
