@@ -266,6 +266,10 @@ enum class test_scene_image_id {
 	BULWARK,
 	BULWARK_MAGAZINE,
 
+	ZAMIEC,
+	ZAMIEC_SHOT_1,
+	ZAMIEC_MAGAZINE,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

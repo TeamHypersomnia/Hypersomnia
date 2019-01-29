@@ -142,6 +142,16 @@ void load_test_scene_animations(
 
 		{
 			auto& anim = make_plain(
+				test_id_type::ZAMIEC_SHOT,
+				test_scene_image_id::ZAMIEC_SHOT_1,
+				20.0f
+			);
+
+			ping_pong_range(anim.frames);
+		} 
+
+		{
+			auto& anim = make_plain(
 				test_id_type::DATUM_GUN_SHOT,
 				test_scene_image_id::DATUM_GUN_SHOT_1,
 				10.0f

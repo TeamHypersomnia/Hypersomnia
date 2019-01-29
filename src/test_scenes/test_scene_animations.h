@@ -86,6 +86,8 @@ enum class test_scene_plain_animation_id {
 	BOMB,
 	BOMB_ARMED,
 
+	ZAMIEC_SHOT,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };
