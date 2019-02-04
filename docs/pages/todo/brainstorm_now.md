@@ -6,6 +6,21 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Note that message buffer might overflow during resynchro, causing a disconnection
+- random shutdowns might be to lag spikes as well
+- well, just increase message buffer sizes?
+
+-balance
+	- m4 damage: 33
+	- ak damage: 38
+
+- re-freeze when match starts and someone respawns at warmup
+
+- increase prices of uwota and triad? theyre soo op
+- mark backpack as already owned if we already own a backpack of the opposing faction
+
+- fix shot cooldown progress visible behind walls
+
 - do something about going through walls with bilmer and elon hrl
 
 - check if export/import of rulesets works correctly

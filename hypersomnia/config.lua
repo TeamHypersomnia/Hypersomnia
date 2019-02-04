@@ -79,7 +79,7 @@ return {
   },
   audio_volume = {
     gui = 1,
-    music = 0.12,
+    music = 0.25,
     sound_effects = 1
   },
   sound = {
