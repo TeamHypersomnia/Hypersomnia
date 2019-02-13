@@ -1172,3 +1172,28 @@ fixtures can form scene graph as they have relative transforms.
 - intercosm should become a handle of a cosmos + viewables 
 	- it should not force storage of these together.
 
+
+## About re-buying
+
+1. Jeśli nie mamy backpacka i w poprzedniej rundzie zginęliśmy z backpackiem, to kupmy go
+	- W szczególności jeśli samodzielnie wyrzuciliśmy backpack z jakiegoś powodu to nie re-kupujemy go
+2. Jeśli posiadamy tylko podstawową broń, to kup ostatnią broń palną jaką kupiliśmy
+	- Jeśli w jednej z poprzednich rund kupiliśmy 3 noże lub więcej, to też liczymy to jako broń palna
+	- Secondary broń i więcej sobie dokupisz sam
+3. Granaty kupione tylko w poprzedniej rundzie
+4. Spelle których byliśmy nauczeni w poprzedniej rundzie
+5. Toole, np. defuser kit
+
+State
+
+- in non-round, match-specific player stats
+	- item flav: prev_consumables
+		- grow with every purchase
+	- item flav: last_bought_primary
+		- updated every purchase
+	- boolset: last mastered spells
+		- updated every end of round
+	- item flav: last wearable
+		- updated every end of round
+- make it a struct passed to the buy menu as a whole
+- reset on warmup

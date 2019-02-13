@@ -6,6 +6,22 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- consider putting nades to the primary hand for better aiming consistency when quickthrowing
+- minimally buff pro90 over zamieć: perhaps increase the round's impact a little?
+
+- The rocket launcher still glitches during reloading, sometimes
+	- watch the footage from chrzan
+
+- correct those footstep sounds, maybe make the distance model linear?
+- Indeed, there is a problem when importing project-specific gfx on windows, but not on linux
+- enable hrtf crash on windows
+
+- add markers for allies that are off-screen
+- simply clamp the nicknames to bounds and maybe add an arrow
+	- then just clamp to a smaller bound to account for an arrow
+
+- fix neon maps being generated in the project folder
+
 - Note that message buffer might overflow during resynchro, causing a disconnection
 - random shutdowns might be to lag spikes as well
 - well, just increase message buffer sizes?
