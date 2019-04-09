@@ -24,7 +24,7 @@ namespace test_flavours {
 
 			meta.set(render_def);
 
-			test_flavours::add_sprite(meta, caches, test_scene_image_id::BACKPACK, white);
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::METROPOLIS_BACKPACK, white);
 
 			auto& fixtures = test_flavours::add_lying_item_dynamic_body(meta);
 			fixtures.density *= 0.3f;
@@ -48,11 +48,11 @@ namespace test_flavours {
 			meta.set(item);
 
 			{
-				auto& brown = get_test_flavour(flavours, test_container_items::BROWN_BACKPACK);
+				auto& brown = get_test_flavour(flavours, test_container_items::RESISTANCE_BACKPACK);
 				brown = meta;
-				brown.get<invariants::text_details>().name = format_enum(test_container_items::BROWN_BACKPACK);
+				brown.get<invariants::text_details>().name = format_enum(test_container_items::RESISTANCE_BACKPACK);
 				brown.get<invariants::item>().specific_to = faction_type::RESISTANCE;
-				test_flavours::add_sprite(brown, caches, test_scene_image_id::BROWN_BACKPACK, white);
+				test_flavours::add_sprite(brown, caches, test_scene_image_id::RESISTANCE_BACKPACK, white);
 			}
 		}
 

@@ -163,7 +163,7 @@ namespace test_scenes {
 		const auto interference_type = test_hand_explosives::INTERFERENCE_GRENADE;
 
 		const auto sample_backpack = test_container_items::SAMPLE_BACKPACK;
-		const auto brown_backpack = test_container_items::BROWN_BACKPACK;
+		const auto brown_backpack = test_container_items::RESISTANCE_BACKPACK;
 
 #if TODO_CARS
 		const auto car = prefabs::create_car(step, transformr( { 1490, 340 }, -180));
