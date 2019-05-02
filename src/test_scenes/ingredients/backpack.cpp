@@ -31,7 +31,7 @@ namespace test_flavours {
 
 			invariants::container container; 
 			inventory_slot slot_def;
-			slot_def.space_available = to_space_units("20");
+			slot_def.space_available = to_space_units("25");
 
 			container.slots[slot_function::ITEM_DEPOSIT] = slot_def;
 			meta.set(container);
@@ -41,7 +41,7 @@ namespace test_flavours {
 			item.space_occupied_per_charge = to_space_units("1");
 			item.categories_for_slot_compatibility.set(item_category::BACK_WEARABLE);
 
-			item.standard_price = 800;
+			item.standard_price = 900;
 			item.wear_sound.id = to_sound_id(test_scene_sound_id::BACKPACK_WEAR);
 			item.specific_to = faction_type::METROPOLIS;
 
@@ -52,6 +52,8 @@ namespace test_flavours {
 				brown = meta;
 				brown.get<invariants::text_details>().name = format_enum(test_container_items::RESISTANCE_BACKPACK);
 				brown.get<invariants::item>().specific_to = faction_type::RESISTANCE;
+				brown.get<invariants::item>().standard_price = 700;
+				brown.get<invariants::container>().slots[slot_function::ITEM_DEPOSIT].space_available = to_space_units("20");
 				test_flavours::add_sprite(brown, caches, test_scene_image_id::RESISTANCE_BACKPACK, white);
 			}
 		}
