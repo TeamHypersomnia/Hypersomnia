@@ -198,36 +198,36 @@ void load_test_scene_animations(
 		} 
 	}
 
+	auto rng = randomization(3);
+
+	auto make_random_walk = [&rng](int s, const int l, const int r, int n) {
+		std::vector<int> indices;
+
+		indices.push_back(s);
+		n--;
+
+		while (n--) {
+			const auto dir = rng.randval(0, 1);
+
+			if (dir) {
+				++s;
+			}
+			else {
+				--s;
+			}
+
+			s = std::clamp(s, l, r);
+			indices.push_back(s);
+		}
+
+		return indices;
+	};
+
 	{
 		auto make_torso = make_plain;
 
 		auto standard_walk = [&](const T test_id, const I first_frame_id) {
 			make_torso(test_id, first_frame_id, 30.0f);
-		};
-
-		auto rng = randomization(3);
-
-		auto make_random_walk = [&](int s, const int l, const int r, int n) {
-			std::vector<int> indices;
-
-			indices.push_back(s);
-			n--;
-
-			while (n--) {
-				const auto dir = rng.randval(0, 1);
-
-				if (dir) {
-					++s;
-				}
-				else {
-					--s;
-				}
-
-				s = std::clamp(s, l, r);
-				indices.push_back(s);
-			}
-
-			return indices;
 		};
 
 		auto standard_ptm = [&](const T test_id, const I first_frame_id, const float base_duration_ms, const int how_many_in_variation, int how_many_first_frames_to_erase) -> auto& {
@@ -625,7 +625,9 @@ void load_test_scene_animations(
 
 			anim.meta.flip_when_cycling.horizontally = true;
 		}
+	}
 
+	{
 		make_plain(
 			test_id_type::YELLOW_FISH,
 			test_scene_image_id::YELLOW_FISH_1,
@@ -753,5 +755,26 @@ void load_test_scene_animations(
 			test_scene_image_id::BOMB_ARMED_1,
 			30.0f
 		);
+
+		{
+			auto& anim = make_plain(
+				test_id_type::ASSAULT_RATTLE,
+				test_scene_image_id::ASSAULT_RATTLE_1,
+				40.0f
+			);
+
+			const auto prev_n = anim.frames.size();
+
+			const auto new_frames = make_random_walk(
+				prev_n - 3,
+				prev_n - 3,
+				prev_n - 1,
+				anim.frames.max_size() - anim.frames.size()
+			);
+
+			for (std::size_t i = 0; i < new_frames.size(); ++i) {
+				anim.frames.push_back(anim.frames[new_frames[i]]);
+			}
+		}
 	}
 }

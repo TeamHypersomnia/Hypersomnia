@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- spectators
+	- preferably only in the client setup
+
 - consider putting nades to the primary hand for better aiming consistency when quickthrowing
 - minimally buff pro90 over zamieć: perhaps increase the round's impact a little?
 
@@ -17,18 +20,14 @@ summary: That which we are brainstorming at the moment.
 - enable hrtf crash on windows
 
 - add markers for allies that are off-screen
-- simply clamp the nicknames to bounds and maybe add an arrow
-	- then just clamp to a smaller bound to account for an arrow
+	- simply clamp the nicknames to bounds and maybe add an arrow
+		- then just clamp to a smaller bound to account for an arrow
 
 - fix neon maps being generated in the project folder
 
 - Note that message buffer might overflow during resynchro, causing a disconnection
 - random shutdowns might be to lag spikes as well
 - well, just increase message buffer sizes?
-
--balance
-	- m4 damage: 33
-	- ak damage: 38
 
 - re-freeze when match starts and someone respawns at warmup
 
@@ -226,9 +225,6 @@ summary: That which we are brainstorming at the moment.
 		- wrapping will introduce a problem I guess but only the starting content will be colorized
 			- yeah only the preffix will ever have colors
 		- always wrap when inactive, but when active we can just as well wrap
-
-- spectators
-	- preferably only in the client setup
 
 - Delta compress the solvable to send against the initial solvable
 

@@ -88,6 +88,8 @@ enum class test_scene_plain_animation_id {
 
 	ZAMIEC_SHOT,
 
+	ASSAULT_RATTLE,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

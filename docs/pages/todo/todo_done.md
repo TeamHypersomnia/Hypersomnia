@@ -3035,3 +3035,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - we still have problem with reconnection even after re-initializing the net lib
 	- even on linux
 
+-balance
+	- m4 damage: 33
+	- ak damage: 38
+

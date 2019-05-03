@@ -281,12 +281,12 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 
 				do_effect(eff);
 
-				if (sentient) {
+				if (sentient && e.sentience_impact.sound.id.is_set()) {
 					do_effect(e.sentience_impact);
 				}
 			}
 			else {
-				if (sentient) {
+				if (sentient && e.sentience_impact.sound.id.is_set()) {
 					do_effect(e.sentience_impact);
 				}
 				else {

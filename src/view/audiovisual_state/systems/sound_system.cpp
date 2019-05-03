@@ -429,7 +429,23 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 			packaged_sound_effect sound;
 
 			sound.start = sound_effect_start_input::at_entity(sound_entity);
+			sound.start.set_listener(sound_entity.get_owning_transfer_capability());
+
 			sound.input = continuous_sound.effect;
+
+			if (const auto item = sound_entity.template find<components::item>()) {
+				if (const auto slot = sound_entity.get_current_slot(); slot.alive()) {
+					if (!slot.is_hand_slot()) {
+						fade_and_erase(continuous_sound_caches, id);
+						return;
+					}
+
+					if (sound_entity.find_colliders_connection() == std::nullopt) {
+						fade_and_erase(continuous_sound_caches, id);
+						return;
+					}
+				}
+			}
 
 			if (auto* const existing = mapped_or_nullptr(continuous_sound_caches, id)) {
 				existing->cache.original = sound;

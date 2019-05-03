@@ -122,6 +122,8 @@ enum class test_melee_weapons {
 	POSEIDON,
 	YELLOW_DAGGER,
 
+	ASSAULT_RATTLE,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

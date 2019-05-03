@@ -187,12 +187,12 @@ void particles_existence_system::play_particles_from_events(const logic_step ste
 			if (d.inflictor_destructed) {
 				do_effect(e.destruction);
 
-				if (sentient) {
+				if (sentient && e.sentience_impact.particles.id.is_set()) {
 					do_effect(e.sentience_impact);
 				}
 			}
 			else {
-				if (sentient) {
+				if (sentient && e.sentience_impact.particles.id.is_set()) {
 					do_effect(e.sentience_impact);
 				}
 				else {

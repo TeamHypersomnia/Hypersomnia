@@ -270,6 +270,8 @@ enum class test_scene_image_id {
 	ZAMIEC_SHOT_1,
 	ZAMIEC_MAGAZINE,
 
+	ASSAULT_RATTLE_1,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

@@ -463,6 +463,8 @@ namespace test_scenes {
 
 			give_weapon(transformr(vec2(-800 - k * 150, 3000)), test_shootable_weapons::BULWARK);
 			give_weapon(transformr(vec2(-800 - k * 150, 3200)), test_shootable_weapons::ZAMIEC);
+
+			give_weapon(transformr(vec2(-800 - k * 150, 3400)), test_melee_weapons::ASSAULT_RATTLE);
 		}
 
 		give_weapon(transformr(vec2(-300, -500 + 50)), test_shootable_weapons::AMPLIFIER_ARM);

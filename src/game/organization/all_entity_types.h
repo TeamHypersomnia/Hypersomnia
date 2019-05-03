@@ -108,19 +108,22 @@ struct melee_weapon {
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariants = type_list<
+		invariants::sprite,
+		invariants::animation,
 		invariants::melee,
 		invariants::item,
 
 		invariants::rigid_body,
 		invariants::fixtures,
-		invariants::sprite,
 		invariants::render,
 
 		invariants::interpolation,
-		invariants::continuous_particles
+		invariants::continuous_particles,
+		invariants::continuous_sound
 	>;
 
 	using components = type_list<
+		components::animation,
 		components::continuous_particles,
 		components::melee,
 		components::item,

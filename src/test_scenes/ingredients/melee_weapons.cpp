@@ -4,6 +4,7 @@
 
 #include "game/assets/ids/asset_ids.h"
 #include "test_scenes/test_scene_particle_effects.h"
+#include "test_scenes/test_scene_animations.h"
 
 #include "game/components/sender_component.h"
 #include "game/components/missile_component.h"
@@ -18,16 +19,14 @@ namespace test_flavours {
 		auto& caches = in.caches;
 
 		auto make_knife = [&](
-			const auto f,
-			const auto i,
+			const auto flavour_id,
+			const auto image_id,
 			const auto price,
 			const auto specific_to,
-			const auto weight_ratio,
+			const auto weight_mult,
 			const auto color
 		) -> auto& {
-			(void)weight_ratio;
-
-			auto& meta = get_test_flavour(flavours, f);
+			auto& meta = get_test_flavour(flavours, flavour_id);
 
 			{
 				invariants::render render_def;
@@ -36,11 +35,11 @@ namespace test_flavours {
 				meta.set(render_def);
 			}
 
-			test_flavours::add_sprite(meta, caches, i, white);
+			test_flavours::add_sprite(meta, caches, image_id, white);
 
 			{
 				auto& fixtures = test_flavours::add_lying_item_dynamic_body(meta);
-				fixtures.density *= 1.5f;
+				fixtures.density *= 1.5f * weight_mult;
 				fixtures.restitution *= 1.5f;
 				fixtures.material = to_physical_material_id(test_scene_physical_material_id::KNIFE);
 			}
@@ -70,7 +69,7 @@ namespace test_flavours {
 
 					auto& d = t.damage;
 					d.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
-					d.base = 88.f;
+					d.base = 88.f * weight_mult;
 					auto& eff = d.effects;
 
 					eff.sentience_impact.sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SENTIENCE_IMPACT);
@@ -92,16 +91,16 @@ namespace test_flavours {
 					a.init_particles.modifier.colorize = color;
 					a.wielder_init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_PRIMARY_SMOKE);
 					a.obstacle_hit_rotation_inertia_ms = 1000.f;
-					a.obstacle_hit_recoil_mult = 1.1f;
+					a.obstacle_hit_recoil_mult = 1.1f * weight_mult;
 					a.obstacle_hit_kickback_impulse = 2500.f;
 					a.obstacle_hit_linear_inertia_ms = 140.f;
 					a.wielder_impulse = 387.f;
-					a.wielder_inert_for_ms = 200.f;
-					a.cooldown_ms = 200.f;
-					a.cp_required = 3.f;
+					a.wielder_inert_for_ms = 200.f * weight_mult;
+					a.cooldown_ms = 200.f * weight_mult;
+					a.cp_required = static_cast<int>(3.f * weight_mult);
 
 					a.obstacle_hit_recoil = 40.f;
-					a.sentience_hit_recoil = 10.f;
+					a.sentience_hit_recoil = 10.f * weight_mult;
 
 					a.returning_animation_on_finish = false;
 
@@ -110,11 +109,11 @@ namespace test_flavours {
 
 						clash.sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_CLASH);
 						clash.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_CLASH);
-						clash.victim_inert_for_ms = 500.f;
-						clash.impulse = 450.f;
+						clash.victim_inert_for_ms = 500.f * weight_mult;
+						clash.impulse = 450.f * weight_mult;
 					}
 
-					a.damage.base = 27.f;
+					a.damage.base = 27.f * weight_mult;
 					a.damage.shake.mult *= 0.9f;
 					a.damage.impact_impulse = 20.f;
 					a.damage.impulse_multiplier_against_sentience = 10.f;
@@ -137,14 +136,16 @@ namespace test_flavours {
 					a.damage.shake.mult *= 1.15f;
 					a.wielder_init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_SECONDARY_SMOKE);
 					a.wielder_impulse = 717.f;
-					a.wielder_inert_for_ms = 300.f;
+					a.wielder_inert_for_ms = 300.f * weight_mult;
+					a.cooldown_ms = 500.f * weight_mult;
 					a.obstacle_hit_linear_inertia_ms = 100.f;
-					a.cp_required = 6.f;
+					a.cp_required = static_cast<int>(6.f * weight_mult);
+					a.obstacle_hit_recoil_mult = 1.2f * weight_mult;
 
 					a.obstacle_hit_kickback_impulse = 3600.f;
 					a.obstacle_hit_rotation_inertia_ms = 1000.f;
-					a.obstacle_hit_recoil = 80.f;
-					a.sentience_hit_recoil = 20.f;
+					a.obstacle_hit_recoil = 80.f * weight_mult;
+					a.sentience_hit_recoil = 20.f * weight_mult;
 
 					a.returning_animation_on_finish = true;
 
@@ -153,11 +154,11 @@ namespace test_flavours {
 
 						clash.sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_CLASH);
 						clash.particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_KNIFE_CLASH);
-						clash.victim_inert_for_ms = 850.f;
-						clash.impulse = 750.f;
+						clash.victim_inert_for_ms = 850.f * weight_mult;
+						clash.impulse = 750.f * weight_mult;
 					}
 
-					a.damage.base = 50.f;
+					a.damage.base = 50.f * weight_mult;
 					a.damage.impact_impulse = 40.f;
 					a.damage.impulse_multiplier_against_sentience = 10.f;
 					a.bonus_damage_speed_ratio = 1.f / 1700.f;
@@ -181,7 +182,7 @@ namespace test_flavours {
 			auto& meta = make_knife(
 				test_melee_weapons::FURY_THROWER,
 				test_scene_image_id::FURY_THROWER,
-				static_cast<money_type>(1500),
+				static_cast<money_type>(1000),
 				faction_type::RESISTANCE,
 				1.1f,
 				white
@@ -202,7 +203,7 @@ namespace test_flavours {
 			test_scene_image_id::ELECTRIC_RAPIER,
 			static_cast<money_type>(700),
 			faction_type::SPECTATOR,
-			1.2f,
+			1.f,
 			white
 		);
 
@@ -228,9 +229,9 @@ namespace test_flavours {
 			auto& meta = make_knife(
 				test_melee_weapons::POSEIDON,
 				test_scene_image_id::POSEIDON,
-				static_cast<money_type>(700),
+				static_cast<money_type>(1000),
 				faction_type::SPECTATOR,
-				1.2f,
+				1.1f,
 				white
 			);
 			
@@ -242,6 +243,60 @@ namespace test_flavours {
 			for (auto& a : meta.get<invariants::melee>().actions) {
 				a.init_particles.id = to_particle_effect_id(test_scene_particle_effect_id::POSEIDON_THROWER_ATTACK);
 			}
+		}
+
+		{
+			auto& meta = make_knife(
+				test_melee_weapons::ASSAULT_RATTLE,
+				test_scene_image_id::ASSAULT_RATTLE_1,
+				static_cast<money_type>(1700),
+				faction_type::SPECTATOR,
+				1.8f,
+				cyan
+			);
+
+			auto& melee = meta.template get<invariants::melee>();
+
+			melee.throw_def.damage.effects.sentience_impact.sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_SECONDARY_IMPACT);
+			melee.throw_def.clash.sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_CLASH);
+			melee.throw_def.throw_angular_speed = 360.f * 25.f;
+
+			{
+				auto& a = melee.actions[weapon_action_type::PRIMARY];
+				a.init_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_PRIMARY);
+				a.clash.sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_CLASH);
+
+				auto& eff = a.damage.effects;
+				eff.impact.sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_SECONDARY_IMPACT);
+				eff.sentience_impact = {};
+			}
+
+			{
+				auto& a = melee.actions[weapon_action_type::SECONDARY];
+				a.init_sound.id = to_sound_id(test_scene_sound_id::STANDARD_KNIFE_SECONDARY);
+				a.clash.sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_CLASH);
+
+				auto& eff = a.damage.effects;
+				eff.impact.sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_SECONDARY_IMPACT);
+				eff.sentience_impact = {};
+			}
+
+			auto& snd = meta.template get<invariants::continuous_sound>().effect;
+			snd.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_HUMMING);
+			snd.modifier.gain *= 0.15f;
+
+			auto& modifier = snd.modifier;
+
+			modifier.distance_model = augs::distance_model::LINEAR_DISTANCE_CLAMPED;
+			modifier.reference_distance = 50.f;
+			modifier.max_distance = 150.f;
+
+			invariants::animation anim;
+			anim.id = to_animation_id(test_scene_plain_animation_id::ASSAULT_RATTLE);
+			meta.set(anim);
+
+			meta.template get<invariants::fixtures>().material = to_physical_material_id(test_scene_physical_material_id::METAL);
+			meta.template get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_DRAW);
 		}
 	}
 }
