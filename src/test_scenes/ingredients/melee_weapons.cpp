@@ -297,6 +297,7 @@ namespace test_flavours {
 
 			meta.template get<invariants::fixtures>().material = to_physical_material_id(test_scene_physical_material_id::METAL);
 			meta.template get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::ASSAULT_RATTLE_DRAW);
+			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("3.0");
 		}
 	}
 }

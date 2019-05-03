@@ -82,7 +82,7 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 		for (const auto subject_item_id : in.character.get_wielded_items()) {
 			const auto subject_item = cosm[subject_item_id];
 
-			if (subject_item.has<components::gun>()) {
+			if (subject_item.has<components::gun>() || is_weapon_like(subject_item)) {
 				const auto rifle_transform = subject_item.get_viewing_transform(in.interpolation);
 				const auto barrel_center = calc_barrel_center(subject_item, rifle_transform);
 				const auto muzzle = calc_muzzle_transform(subject_item, rifle_transform).pos;
@@ -92,26 +92,6 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 				if (proj > 1.f) {
 					const auto line_from = muzzle;
 					const auto line_to = barrel_center + (muzzle - barrel_center) * proj;
-
-					make_laser_from_to(
-						subject_item,
-						line_from,
-						line_to
-					);
-				}
-			}
-			else if (is_weapon_like(subject_item)) {
-				const auto explosive_transform = subject_item.get_viewing_transform(in.interpolation);
-				const auto explosive_target_vector = explosive_transform.pos + explosive_transform.get_direction();
-
-				const auto proj = crosshair_pos.get_projection_multiplier(
-					explosive_transform.pos,
-					explosive_target_vector
-				);
-
-				if (proj > 1.f) {
-					const auto line_from = explosive_transform.pos;
-					const auto line_to = explosive_transform.pos + (explosive_target_vector - explosive_transform.pos) * proj;
 
 					make_laser_from_to(
 						subject_item,
