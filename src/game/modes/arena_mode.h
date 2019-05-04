@@ -9,6 +9,7 @@
 #include "game/detail/economy/money_type.h"
 #include "game/modes/detail/item_purchase_structs.h"
 #include "game/modes/detail/fog_of_war_settings.h"
+#include "game/modes/arena_player_order.h"
 
 using mode_entity_id = entity_id;
 

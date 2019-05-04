@@ -164,6 +164,10 @@ struct bomb_mode_player {
 	bool operator<(const bomb_mode_player& b) const;
 
 	bool is_set() const;
+
+	arena_player_order_info get_order() const {
+		return { chosen_name, stats.calc_score() };
+	}
 };
 
 enum class arena_mode_state {
@@ -383,9 +387,6 @@ private:
 	bomb_mode_player* find(const mode_player_id&);
 
 	template <class C, class F>
-	decltype(auto) on_player_handle(C&, const mode_player_id&, F&& callback) const;
-
-	template <class C, class F>
 	void for_each_player_handle_in(C&, faction_type, F&& callback) const;
 
 	// GEN INTROSPECTOR class bomb_mode
@@ -497,5 +498,26 @@ public:
 
 	const auto& get_factions_state() const {
 		return factions;
+	}
+
+	mode_player_id get_next_to_spectate(
+		const_input, 
+		const arena_player_order_info& after, 
+		const mode_player_id& by_spectator, 
+		int offset
+	) const;
+
+	bool suitable_for_spectating(const_input, const mode_player_id& who, const mode_player_id& by) const;
+	bool conscious_or_can_still_spectate(const_input, const mode_player_id& who) const;
+
+	template <class C, class F>
+	decltype(auto) on_player_handle(C& cosm, const mode_player_id& id, F&& callback) const {
+		if (const auto player_data = find(id)) {
+			if (const auto handle = cosm[player_data->controlled_character_id]) {
+				return callback(handle);
+			}
+		}
+
+		return callback(std::nullopt);
 	}
 };

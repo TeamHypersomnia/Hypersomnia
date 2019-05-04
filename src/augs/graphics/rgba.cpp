@@ -261,3 +261,5 @@ FORCE_INLINE rgba& rgba::set_hsl(const hsl input) {
 FORCE_INLINE hsl rgba::get_hsl() const {
 	return RGBToHSL(rgb());
 }
+
+rgba rgba::zero = rgba(0, 0, 0, 0);

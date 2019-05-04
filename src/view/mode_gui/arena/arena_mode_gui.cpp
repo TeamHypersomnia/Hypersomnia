@@ -36,6 +36,10 @@ bool arena_gui_state::control(
 		return true;
 	}
 
+	if (spectator.control(in)) {
+		return true;
+	}
+
 	return false;
 }
 
@@ -95,6 +99,12 @@ mode_player_entropy arena_gui_state::perform_imgui(
 				if (logically_set(choice)) {
 					result_entropy = *choice;
 				}
+
+				spectator.advance(
+					player_id,
+					typed_mode,
+					mode_input
+				);
 			}
 		}
 
@@ -173,6 +183,10 @@ void arena_gui_state::draw_mode_gui(
 
 		auto draw_scoreboard = [&]() {
 			scoreboard.draw_gui(in, mode_in, typed_mode, mode_input);
+		};
+
+		auto draw_spectator = [&]() {
+			spectator.draw_gui(in, mode_in, typed_mode, mode_input);
 		};
 
 		auto draw_money_and_awards = [&]() {
@@ -320,14 +334,14 @@ void arena_gui_state::draw_mode_gui(
 					rgba border;
 				} cols = [&]() -> colors {
 					if (local_player_id == ko.victim.id) {
-						return { rgba(150, 0, 0, 170), rgba(0, 0, 0, 0) };
+						return { rgba(150, 0, 0, 170), rgba::zero };
 					}
 
 					if (local_player_id == ko.knockouter.id || local_player_id == ko.assist.id) {
 						return { black, rgba(180, 0, 0, 255) };
 					}
 					
-					return { { 0, 0, 0, 80 }, rgba(0, 0, 0, 0) };
+					return { { 0, 0, 0, 80 }, rgba::zero };
 				}();
 
 				cols.background.mult_alpha(bg_alpha);
@@ -474,8 +488,8 @@ void arena_gui_state::draw_mode_gui(
 		};
 
 		auto draw_info_indicator = [&](const auto& val) {
-			const auto one_fourth_t = in.screen_size.y / 6;
-			draw_text_indicator_at(val, one_fourth_t);
+			const auto one_sixth_t = in.screen_size.y / 6;
+			draw_text_indicator_at(val, one_sixth_t);
 		};
 
 		auto draw_game_commencing = [&]() {
@@ -649,6 +663,7 @@ void arena_gui_state::draw_mode_gui(
 			}
 
 			draw_scoreboard();
+			draw_spectator();
 			draw_money_and_awards();
 			draw_knockouts();
 

@@ -36,6 +36,8 @@ struct rgba {
 		operator vec3() const;
 	};
 
+	static rgba zero;
+
 	// GEN INTROSPECTOR struct rgba
 	rgba_channel r;
 	rgba_channel g;

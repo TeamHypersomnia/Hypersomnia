@@ -2,7 +2,7 @@
 
 namespace components {
 	bool sentience::is_conscious() const {
-		return get<health_meter_instance>().is_positive(); //&& get<consciousness_meter_instance>().is_positive();
+		return !when_knocked_out.was_set(); //&& get<consciousness_meter_instance>().is_positive();
 	}
 
 	bool sentience::unconscious_but_alive() const {
@@ -10,7 +10,7 @@ namespace components {
 	}
 
 	bool sentience::is_dead() const {
-		return !get<health_meter_instance>().is_positive();
+		return when_knocked_out.was_set() && !get<health_meter_instance>().is_positive();
 	}
 
 	rgba sentience::calc_health_color(const float time_pulse_multiplier) const {

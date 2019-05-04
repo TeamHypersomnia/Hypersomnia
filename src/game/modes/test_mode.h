@@ -101,4 +101,13 @@ public:
 			)
 		);
 	}
+
+	template <class... Args>
+	mode_player_id get_next_to_spectate(Args&&...) const { return {}; }
+
+	template <class... Args>
+	bool suitable_for_spectating(Args&&...) const { return true; }
+
+	template <class... Args>
+	bool conscious_or_can_still_spectate(Args&&...) const { return true; }
 };

@@ -94,14 +94,10 @@ static void delete_with_held_items(const input_type in, const logic_step step, c
 }
 
 bool bomb_mode_player::operator<(const bomb_mode_player& b) const {
-	const auto as = stats.calc_score();
-	const auto bs = b.stats.calc_score();
+	const auto ao = arena_player_order { chosen_name, stats.calc_score() };
+	const auto bo = arena_player_order { b.chosen_name, b.stats.calc_score() };
 
-	if (as == bs) {
-		return chosen_name < b.chosen_name;
-	}
-
-	return as > bs;
+	return ao < bo;
 }
 
 std::size_t bomb_mode::get_round_rng_seed(const cosmos& cosm) const {
@@ -530,17 +526,6 @@ void bomb_mode::for_each_player_handle_in(C& cosm, const faction_type faction, F
 
 		return callback_result::CONTINUE;
 	});
-}
-
-template <class C, class F>
-decltype(auto) bomb_mode::on_player_handle(C& cosm, const mode_player_id& id, F&& callback) const {
-	if (const auto player_data = find(id)) {
-		if (const auto handle = cosm[player_data->controlled_character_id]) {
-			return callback(handle);
-		}
-	}
-
-	return callback(std::nullopt);
 }
 
 std::size_t bomb_mode::num_conscious_players_in(const cosmos& cosm, const faction_type faction) const {
@@ -1919,7 +1904,7 @@ void bomb_mode::respawn_the_dead(const input_type in, const logic_step step, con
 
 		on_player_handle(cosm, id, [&](const auto& player_handle) {
 			if constexpr(!is_nullopt_v<decltype(player_handle)>) {
-				auto& sentience = player_handle.template get<components::sentience>();
+				const auto& sentience = player_handle.template get<components::sentience>();
 
 				if (sentience.when_knocked_out.was_set() && clk.is_ready(
 					after_ms,
@@ -2233,4 +2218,93 @@ void bomb_mode::post_award(const input_type in, const mode_player_id id, money_t
 			stats->round_state.awards.emplace_back(award);
 		}
 	}
+}
+
+bool bomb_mode::suitable_for_spectating(const const_input in, const mode_player_id& who, const mode_player_id& by) const {
+	if (const auto by_data = find(by)) {
+		if (const auto who_data = find(who)) {
+			if (who_data->faction == by_data->faction) {
+				return conscious_or_can_still_spectate(in, who);
+			}
+		}
+	}
+
+	return false;
+}
+
+bool bomb_mode::conscious_or_can_still_spectate(const const_input in, const mode_player_id& who) const {
+	const auto max_secs = in.rules.view.can_spectate_dead_body_for_secs;
+	const auto& clk = in.cosm.get_clock();
+
+	return on_player_handle(in.cosm, who, [&](const auto& player_handle) {
+		if constexpr(!is_nullopt_v<decltype(player_handle)>) {
+			const auto& sentience = player_handle.template get<components::sentience>();
+
+			if (sentience.is_conscious()) {
+				return true;
+			}
+
+			return clk.lasts(
+				max_secs * 1000,
+				sentience.when_knocked_out
+			); 
+		}
+
+		return false;
+	});
+}
+
+mode_player_id bomb_mode::get_next_to_spectate(
+	const const_input_type in, 
+	const arena_player_order_info& after, 
+	const mode_player_id& by_spectator, 
+	const int offset
+) const {
+	std::vector<arena_player_order_info> sorted_players;
+
+	const auto spectator_data = find(by_spectator);
+
+	if (spectator_data == nullptr) {
+		return {};
+	}
+
+	for_each_player_in(spectator_data->faction, [&](
+		const auto& id, 
+		const auto& player
+	) {
+		if (suitable_for_spectating(in, id, by_spectator)) {
+			sorted_players.emplace_back(player.get_order());
+		}
+	});
+
+	if (sorted_players.empty()) {
+		return mode_player_id();
+	}
+
+	sort_range(sorted_players);
+
+	if (offset < 0) {
+		reverse_range(sorted_players);
+	}
+
+	auto cmp = [&](const auto& a, const auto& b){
+		if (offset > 0) { 
+			return a < b;
+		}
+	
+		return b < a;
+	};
+
+	auto it = std::upper_bound(sorted_players.begin(), sorted_players.end(), after, cmp);
+
+	if (it == sorted_players.end()) {
+		it = sorted_players.begin();
+	}
+
+	// TODO: Optimize
+	if (const auto player = find_player_by(it->chosen_name)) {
+		return lookup(player->controlled_character_id);
+	}
+
+	return {};
 }

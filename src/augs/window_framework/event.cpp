@@ -270,10 +270,10 @@ namespace augs {
 				case key::PAGEDOWN: return "Page Down"; break;
 				case key::END: return "End"; break;
 				case key::HOME: return "Home"; break;
-				case key::LEFT: return "Left Arrow"; break;
-				case key::UP: return "Up Arrow"; break;
-				case key::RIGHT: return "Right Arrow"; break;
-				case key::DOWN: return "Down Arrow"; break;
+				case key::LEFT: return "Left"; break;
+				case key::UP: return "Up"; break;
+				case key::RIGHT: return "Right"; break;
+				case key::DOWN: return "Down"; break;
 				case key::SELECT: return "Select"; break;
 				case key::PRINT: return "Print"; break;
 				case key::EXECUTE: return "Execute"; break;

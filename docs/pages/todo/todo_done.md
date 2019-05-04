@@ -3039,3 +3039,20 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- m4 damage: 33
 	- ak damage: 38
 
+
+- spectators
+	- preferably only in the client setup
+		- this state should be held in arena gui 
+			- arena_spectator_gui
+	- limit for spectating dead bodies
+	- spectated player identified by mode_player_id
+		- it can become unapplicable due to many reasons
+			- misprediction
+			- after death delay passed
+			- uninitialized (e.g. when entering the game for the first time and can't spawn yet)
+		- whenever it becomes unapplicable, search the next to apply automatically  
+			- based on the last saved ranking
+			- if uninitialized, whatever comes first
+			- last score could be a good rank
+			- followed by the nickname
+		- store last rank to preserve some kind of ordering

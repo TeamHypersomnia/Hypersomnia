@@ -13,7 +13,10 @@ return {
     Tilde = "SWITCH_GAME_GUI_MODE",
 	Tab = "OPEN_SCOREBOARD",
 	T = "OPEN_BUY_MENU",
-	O = "CHOOSE_TEAM"
+	O = "CHOOSE_TEAM",
+
+	Right = "SPECTATE_NEXT",
+	Left = "SPECTATE_PREV"
   },
 
   game_controls = {

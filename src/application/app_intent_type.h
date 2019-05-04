@@ -25,6 +25,9 @@ enum class app_ingame_intent_type {
 
 	CHOOSE_TEAM,
 
+	SPECTATE_PREV,
+	SPECTATE_NEXT,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

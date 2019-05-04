@@ -158,9 +158,14 @@ public:
 	}
 
 	entity_id get_viewed_character_id() const;
+	entity_id get_controlled_character_id() const;
 
 	auto get_viewed_character() const {
 		return get_viewed_cosmos()[get_viewed_character_id()];
+	}
+
+	auto get_controlled_character() const {
+		return get_viewed_cosmos()[get_controlled_character_id()];
 	}
 
 	const auto& get_viewable_defs() const {
@@ -217,7 +222,7 @@ public:
 			const auto new_local_entropy = [&]() -> std::optional<mode_entropy> {
 				if (is_gameplay_on()) {
 					return total_collected.extract(
-						get_viewed_character(), 
+						get_controlled_character(), 
 						get_local_player_id(), 
 						in.make_accumulator_input()
 					);
