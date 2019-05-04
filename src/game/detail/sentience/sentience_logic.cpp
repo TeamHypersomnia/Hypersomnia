@@ -55,8 +55,6 @@ void perform_knockout(
 		}
 
 		sentience.when_knocked_out = cosm.get_timestamp();
-		LOG("KNOCKOUT!!!");
-		LOG_NVPS(typed_subject, sentience.when_knocked_out.step);
 		sentience.knockout_origin = origin;
 
 		if (sentience.is_dead()) {

@@ -76,9 +76,7 @@ void arena_spectator_gui::draw_gui(
 	const auto font_h = in.gui_fonts.gui.metrics.get_height();
 	const auto cell_h = font_h + cell_pad.y * 2;
 
-	const auto window_name = "Currently spectating:";
-
-	//const auto estimated_window_height = window_name_size * 2;
+	const auto top_caption = "Currently spectating:";
 
 	const auto s = in.screen_size;
 
@@ -96,7 +94,7 @@ void arena_spectator_gui::draw_gui(
 
 	const auto one_sixth_t = in.screen_size.y / 5;
 
-	draw_text_indicator_at(fmt(window_name, yellow), one_sixth_t);
+	draw_text_indicator_at(fmt(top_caption, yellow), one_sixth_t);
 	draw_text_indicator_at(fmt(spectated->chosen_name, white), one_sixth_t + cell_h);
 
 	const auto& key_map = in.config.app_ingame_controls;
@@ -147,9 +145,6 @@ void arena_spectator_gui::advance(
 		return;
 	}
 
-	const auto& clk = in.cosm.get_clock();
-	const auto max_secs = in.rules.view.can_spectate_dead_body_for_secs;
-
 	auto cache_order_of = [&](const mode_player_id& id) {
 		if (const auto data = mode.find(id)) {
 			cached_order = data->get_order();
@@ -163,20 +158,6 @@ void arena_spectator_gui::advance(
 		hide();
 	}
 	else {
-		LOG("FIRST unc and cant");
-
-		mode.on_player_handle(in.cosm, local_player, [&](const auto& player_handle) {
-			if constexpr(!is_nullopt_v<decltype(player_handle)>) {
-				const auto& sentience = player_handle.template get<components::sentience>();
-
-				LOG_NVPS(sentience.is_conscious());
-				LOG_NVPS(clk.lasts(max_secs * 1000,sentience.when_knocked_out));
-				LOG_NVPS(sentience.when_knocked_out.step);
-				LOG_NVPS(clk.now.step);
-				LOG_NVPS(player_handle);
-			}
-		});
-
 		if (!show) {
 			cache_order_of(local_player);
 			show = true;
@@ -199,28 +180,6 @@ void arena_spectator_gui::advance(
 	};
 
 	if (!mode.suitable_for_spectating(in, now_spectating, local_player)) {
-		if (!now_spectating.is_set()) {
-			LOG("Initializing spect from dead ids");
-		}
-		else {
-			if (!mode.conscious_or_can_still_spectate(in, now_spectating)) {
-				LOG("unc and cant");
-
-				mode.on_player_handle(in.cosm, now_spectating, [&](const auto& player_handle) {
-					if constexpr(!is_nullopt_v<decltype(player_handle)>) {
-						const auto& sentience = player_handle.template get<components::sentience>();
-
-						LOG_NVPS(sentience.is_conscious());
-						LOG_NVPS(clk.lasts(max_secs * 1000,sentience.when_knocked_out));
-						LOG_NVPS(sentience.when_knocked_out.step);
-						LOG_NVPS(clk.now.step);
-					}
-				});
-			}
-
-			LOG("Unsuitable for spect");
-		}
-
 		switch_spectated_by(1);
 	}
 
