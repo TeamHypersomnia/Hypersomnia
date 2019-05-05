@@ -428,9 +428,9 @@ void sound_system::advance_flash(const const_entity_handle listener, const augs:
 
 	const auto mult = get_flash_audio_mult(listener);
 
-	if (mult > 0.f) {
-		auto& last_mult = last_registered_flash_mult;
+	auto& last_mult = last_registered_flash_mult;
 
+	if (mult > 0.f) {
 		if (mult > last_mult) {
 			after_flash_passed_ms += dt.in_milliseconds();
 
@@ -441,13 +441,13 @@ void sound_system::advance_flash(const const_entity_handle listener, const augs:
 				last_mult = mult;
 			}
 		}
-		
-		if (mult <= last_mult) {
-			last_mult = mult;
-		}
 	}
 	else {
 		after_flash_passed_ms = 0.f;
+	}
+
+	if (mult <= last_mult) {
+		last_mult = mult;
 	}
 }
 
@@ -467,26 +467,21 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 
 		const auto& last_mult = last_registered_flash_mult;
 
-		if (last_mult > 0.f) {
-			const auto effect = cosm.get_common_assets().flash_noise_sound;
+		const auto effect = cosm.get_common_assets().flash_noise_sound;
 
-			if (auto buf = mapped_or_nullptr(in.manager, effect.id)) {
-				auto& source = flash_noise_source;
+		if (auto buf = mapped_or_nullptr(in.manager, effect.id)) {
+			auto& source = flash_noise_source;
 
-				if (!source.is_playing()) {
-					source.bind_buffer(*buf, 0);
-					source.set_spatialize(false);
-					source.set_direct_channels(true);
-					source.set_relative_and_zero_vel_pos();
-					source.set_looping(true);
-					source.play();
-				}
-
-				source.set_gain(last_mult * in.volume.sound_effects);
+			if (!source.is_playing()) {
+				source.bind_buffer(*buf, 0);
+				source.set_spatialize(false);
+				source.set_direct_channels(true);
+				source.set_relative_and_zero_vel_pos();
+				source.set_looping(true);
+				source.play();
 			}
-		}
-		else {
-			//flash_noise_source.stop();
+
+			source.set_gain(last_mult * in.volume.sound_effects);
 		}
 	}
 
