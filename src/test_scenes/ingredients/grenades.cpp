@@ -242,7 +242,7 @@ namespace test_flavours {
 				fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
 				fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
 				fuse.released_image_id = to_image_id(test_scene_image_id::FLASHBANG_RELEASED);
-				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
+				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::FLASHBANG);
 				fuse.additional_release_impulse.linear = 3000.f;
 				fuse.additional_secondary_release_impulse.linear = 2000.f;
 				fuse.fuse_delay_ms = 800.f;

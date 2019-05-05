@@ -30,6 +30,18 @@ namespace augs {
 			return *current_instance;
 		}
 
+		static derived* find_current() {
+			return current_instance;
+		}
+
+		static void set_current_to(derived* const which) {
+			if (which == nullptr) {
+				set_current_to_none();
+			}
+
+			which->set_as_current();
+		}
+
 		static void set_current_to_none() {
 			derived::set_current_to_none_impl();
 			current_instance = nullptr;

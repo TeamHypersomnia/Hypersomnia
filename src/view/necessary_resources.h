@@ -41,6 +41,7 @@ struct all_necessary_fbos {
 	optional_fbo illuminating_smoke;
 	optional_fbo smoke;
 	optional_fbo light;
+	optional_fbo flash_afterimage;
 
 	all_necessary_fbos(
 		const vec2i screen_size, 
@@ -66,6 +67,7 @@ struct all_necessary_shaders {
 	optional_shader exploding_rings;
 	optional_shader light;
 	optional_shader textured_light;
+	optional_shader flash_afterimage;
 	// END GEN INTROSPECTOR
 
 	all_necessary_shaders(

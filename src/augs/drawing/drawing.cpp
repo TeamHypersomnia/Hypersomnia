@@ -15,9 +15,10 @@ namespace augs {
 	const drawer& drawer::color_overlay(
 		const atlas_entry tex,
 		const vec2i screen_size,
-		const rgba color
+		const rgba color,
+		const flip_flags flip
 	) const {
-		return aabb(tex, { { 0, 0 }, { screen_size } }, color);
+		return aabb(tex, { { 0, 0 }, { screen_size } }, color, flip);
 	}
 
 	const drawer& drawer::aabb(

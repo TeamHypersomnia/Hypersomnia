@@ -38,6 +38,7 @@ void all_necessary_fbos::apply(
 	reset(illuminating_smoke);
 	reset(smoke);
 	reset(light, augs::graphics::fbo_opt::WITH_STENCIL);
+	reset(flash_afterimage);
 }
 
 all_necessary_shaders::all_necessary_shaders(
@@ -117,6 +118,11 @@ all_necessary_shaders::all_necessary_shaders(
 	if (textured_light) {
 		textured_light->set_as_current();
 		textured_light->set_uniform("basic_texture", 0);
+	}
+
+	if (flash_afterimage) {
+		flash_afterimage->set_as_current();
+		flash_afterimage->set_uniform("afterimage_texture", 0);
 	}
 }
 

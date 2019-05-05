@@ -45,6 +45,8 @@ void illuminated_rendering(
 	const illuminated_rendering_input in,
 	const std::vector<additional_highlight>& additional_highlights
 ) {
+	const auto* default_fbo = augs::graphics::fbo::find_current();
+
 	auto& profiler = in.frame_performance;
 
 	auto& renderer = in.renderer;
@@ -153,7 +155,7 @@ void illuminated_rendering(
 	
 	renderer.set_standard_blending();
 
-	augs::graphics::fbo::set_current_to_none();
+	augs::graphics::fbo::set_current_to(default_fbo);
 
 	const auto& light = av.get<light_system>();
 	

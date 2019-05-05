@@ -91,6 +91,8 @@ void light_system::advance_attenuation_variations(
 }
 
 void light_system::render_all_lights(const light_system_input in) const {
+	const auto* default_fbo = augs::graphics::fbo::find_current();
+
 	auto& renderer = in.renderer;
 	auto& performance = in.profiler;
 
@@ -424,7 +426,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	renderer.set_standard_blending();
 
-	augs::graphics::fbo::set_current_to_none();
+	augs::graphics::fbo::set_current_to(default_fbo);
 
 	renderer.set_active_texture(2);
 	in.light_fbo.get_texture().bind();
