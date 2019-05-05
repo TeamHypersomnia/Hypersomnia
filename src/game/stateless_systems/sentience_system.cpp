@@ -545,17 +545,32 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 			}
 			
 			else if (d.type == adverse_element_type::FLASH) {
-				auto& secs = sentience->audio_flash_secs;
-				secs = std::max(0.f, secs);
-
 				const auto flashbang = cosm[d.origin.cause.entity];
 
 				if (const auto explosive = flashbang.template find<invariants::explosive>()) {
-					const auto distance_from_epicentre = (d.point_of_impact - flashbang.get_logic_transform().pos).length();
+					const auto epicentre_vec = flashbang.get_logic_transform().pos - d.point_of_impact;
+					const auto distance_from_epicentre = epicentre_vec.length();
 					const auto max_distance = explosive->explosion.effective_radius;
 					const auto r = std::sqrt(1 - distance_from_epicentre / max_distance);
+					{
+						auto& secs = sentience->audio_flash_secs;
 
-					secs = std::max(secs, r * amount);
+						secs = std::max(0.f, secs);
+						secs = std::max(secs, r * amount);
+					}
+
+					{
+						auto& secs = sentience->visual_flash_secs;
+
+						const auto epicentre_dir = epicentre_vec / distance_from_epicentre;
+
+						const auto look_dir = subject.get_logic_transform().get_direction();
+						const auto until = subject.get<invariants::sentience>().soften_flash_until_look_mult;
+						const auto look_mult = std::max(until, (look_dir.dot(epicentre_dir) + 1) / 2);
+
+						secs = std::max(0.f, secs);
+						secs = std::max(secs, r * amount * look_mult);
+					}
 				}
 			}
 		}

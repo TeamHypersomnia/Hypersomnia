@@ -1815,6 +1815,15 @@ int work(const int argc, const char* const * const argv) try {
 			}
 		}
 
+		if (const auto flash_mult = gameplay_camera.get_effective_flash_mult(); flash_mult > 0) {
+			renderer.call_and_clear_triangles();
+
+			auto flash_overlay_col = white;
+			flash_overlay_col.mult_alpha(flash_mult);
+
+			get_drawer().color_overlay(screen_size, flash_overlay_col);
+		}
+
 		if (new_viewing_config.session.show_developer_console) {
 			auto scope = measure_scope(frame_performance.debug_details);
 

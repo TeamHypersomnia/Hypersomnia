@@ -188,6 +188,9 @@ namespace invariants {
 
 		real32 flash_audio_easing_secs = 1.5f;
 		real32 flash_visual_easing_secs = 1.5f;
+
+		real32 flash_visual_damage_mult = 0.5f;
+		real32 soften_flash_until_look_mult = 0.4f;
 		// END GEN INTROSPECTOR
 	};
 }

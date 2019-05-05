@@ -54,6 +54,19 @@ struct world_camera {
 		const vec2 screen_size
 	) const;
 
+	auto get_effective_flash_mult() const {
+		return last_registered_flash_mult;
+	}
+
+	bool is_flash_afterimage_requested() const {
+		return request_afterimage;
+	}
+
 private:
 	camera_eye current_eye;
+
+	void advance_flash(const_entity_handle viewer, augs::delta dt);
+	float after_flash_passed_ms = 0.f;
+	float last_registered_flash_mult = 0.f;
+	bool request_afterimage = false;
 };

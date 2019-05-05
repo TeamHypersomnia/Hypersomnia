@@ -8,6 +8,7 @@
 #include "game/components/fixtures_component.h"
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "game/detail/crosshair_math.hpp"
+#include "view/audiovisual_state/flashbang_math.h"
 
 void world_camera::tick(
 	const vec2i screen_size,
@@ -144,6 +145,8 @@ void world_camera::tick(
 	}
 
 	dont_smooth_once = false;
+
+	advance_flash(entity_to_chase, dt);
 }
 
 vec2 world_camera::get_camera_offset_due_to_character_crosshair(
@@ -178,4 +181,44 @@ vec2 world_camera::get_camera_offset_due_to_character_crosshair(
 	}
 
 	return camera_crosshair_offset;
+}
+
+void world_camera::advance_flash(const const_entity_handle viewer, const augs::delta dt) {
+	request_afterimage = false;
+
+	if (viewer.dead()) {
+		return;
+	}
+
+	const auto sentience = viewer.template find<invariants::sentience>();
+
+	if (sentience == nullptr) {
+		return;
+	}
+
+	const auto mult = get_flash_visual_mult(viewer);
+
+	auto& last_mult = last_registered_flash_mult;
+
+	if (mult > 0.f) {
+		if (mult > last_mult) {
+			after_flash_passed_ms += dt.in_milliseconds();
+
+			const auto delay_ms = sentience->flash_effect_delay_ms;
+
+			if (after_flash_passed_ms >= delay_ms) {
+				after_flash_passed_ms = 0;
+				last_mult = mult;
+
+				request_afterimage = true;
+			}
+		}
+	}
+	else {
+		after_flash_passed_ms = 0.f;
+	}
+
+	if (mult <= last_mult) {
+		last_mult = mult;
+	}
 }
