@@ -160,6 +160,7 @@ enum class test_hand_explosives {
 	FORCE_GRENADE,
 	PED_GRENADE,
 	INTERFERENCE_GRENADE,
+	FLASHBANG,
 
 	BOMB,
 

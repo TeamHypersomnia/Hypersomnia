@@ -35,11 +35,11 @@ return {
     G = "DROP",
 
     MiddleMouseButton = "THROW_ANY_FORCE",
-    MouseButton5 = "THROW_ANY_INTERFERENCE",
+    MouseButton5 = "THROW_ANY_FLASH",
     MouseButton4 = "THROW_ANY_PED",
 
-    WheelUp = "THROW_ANY_TWO_KNIVES",
-    WheelDown = "THROW_ANY_KNIFE",
+    WheelUp = "THROW_ANY_TWO_MELEES",
+    WheelDown = "THROW_ANY_MELEE",
 
     E = "USE_BUTTON",
 	R = "RELOAD"

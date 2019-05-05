@@ -19,6 +19,14 @@
 #include "augs/audio/audio_settings.h"
 #include "view/character_camera.h"
 #include "game/detail/sentience/sentience_getters.h"
+#include "view/audiovisual_state/flashbang_math.h"
+
+#if BUILD_OPENAL
+#include <AL/al.h>
+#include <AL/alc.h>
+#include <AL/alext.h>
+#include <AL/efx.h>
+#endif
 
 struct shouldnt_play {};
 
@@ -253,8 +261,22 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 		return in.volume.sound_effects;
 	}();
 
+	const auto flash_mult = in.owner.get_effective_flash_mult();
+
+#if BUILD_OPENAL
+	if (flash_mult > 0.f) {
+		if (const auto filter_id = in.owner.get_lowpass_filter()) {
+			alFilterf(*filter_id, AL_LOWPASS_GAINHF, 1.f - flash_mult);
+			alSourcei(source.get_id(), AL_DIRECT_FILTER, *filter_id);
+		}
+	}
+	else {
+		alSourcei(source.get_id(), AL_DIRECT_FILTER, AL_FILTER_NULL);
+	}
+#endif
+
 	source.set_pitch(m.pitch * in.speed_multiplier);
-	source.set_gain(std::clamp(m.gain, 0.f, 1.f) * mult_via_settings);
+	source.set_gain((1 - flash_mult) * std::clamp(m.gain, 0.f, 1.f) * mult_via_settings);
 	source.set_reference_distance(si, ref_dist);
 	source.set_looping(m.repetitions == -1);
 	source.set_distance_model(dist_model);
@@ -383,6 +405,52 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 	do_events((messages::start_multi_sound_effect*)(nullptr));
 }
 
+void sound_system::advance_flash(const const_entity_handle listener, const augs::delta dt) {
+#if BUILD_OPENAL
+	if (lowpass_filter_id == std::nullopt) {
+		ALuint id;
+		alGenFilters(1, &id);
+		alFilteri(id, AL_FILTER_TYPE, AL_FILTER_LOWPASS);
+
+		lowpass_filter_id = id;
+	}
+#endif
+
+	if (listener.dead()) {
+		return;
+	}
+
+	const auto sentience = listener.template find<invariants::sentience>();
+
+	if (sentience == nullptr) {
+		return;
+	}
+
+	const auto mult = get_flash_audio_mult(listener);
+
+	if (mult > 0.f) {
+		auto& last_mult = last_registered_flash_mult;
+
+		if (mult > last_mult) {
+			after_flash_passed_ms += dt.in_milliseconds();
+
+			const auto delay_ms = sentience->flash_effect_delay_ms;
+
+			if (after_flash_passed_ms >= delay_ms) {
+				after_flash_passed_ms = 0;
+				last_mult = mult;
+			}
+		}
+		
+		if (mult <= last_mult) {
+			last_mult = mult;
+		}
+	}
+	else {
+		after_flash_passed_ms = 0.f;
+	}
+}
+
 void sound_system::update_sound_properties(const update_properties_input in) {
 #if 0
 	auto queried_size = cone.visible_world_area;
@@ -393,6 +461,34 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 	update_listener(listening_character, in.interp);
 
 	const auto& cosm = listening_character.get_cosmos();
+
+	{
+		advance_flash(listening_character, in.dt);
+
+		const auto& last_mult = last_registered_flash_mult;
+
+		if (last_mult > 0.f) {
+			const auto effect = cosm.get_common_assets().flash_noise_sound;
+
+			if (auto buf = mapped_or_nullptr(in.manager, effect.id)) {
+				auto& source = flash_noise_source;
+
+				if (!source.is_playing()) {
+					source.bind_buffer(*buf, 0);
+					source.set_spatialize(false);
+					source.set_direct_channels(true);
+					source.set_relative_and_zero_vel_pos();
+					source.set_looping(true);
+					source.play();
+				}
+
+				source.set_gain(last_mult * in.volume.sound_effects);
+			}
+		}
+		else {
+			//flash_noise_source.stop();
+		}
+	}
 
 	cosm.for_each_having<components::gun>(
 		[&](const auto gun_entity) {
@@ -609,6 +705,8 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 }
 
 void sound_system::fade_sources(const augs::delta dt) {
+	(void)after_flash_passed_ms;
+
 	erase_if (collision_sound_cooldowns, [&](auto& it) {
 		auto& c = it.second;
 

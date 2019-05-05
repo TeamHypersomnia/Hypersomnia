@@ -28,5 +28,7 @@ struct common_assets {
 
 	sound_effect_input standard_learnt_spell_sound;
 	particle_effect_input standard_learnt_spell_particles;
+
+	sound_effect_input flash_noise_sound;
 	// END GEN INTROSPECTOR
 };

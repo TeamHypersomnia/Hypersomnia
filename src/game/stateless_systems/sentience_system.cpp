@@ -207,6 +207,14 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 				sentience.shake.mult = 1.f;
 			}
 
+			if (sentience.audio_flash_secs > 0.f) {
+				sentience.audio_flash_secs -= delta.in_seconds();
+			}
+
+			if (sentience.visual_flash_secs > 0.f) {
+				sentience.visual_flash_secs -= delta.in_seconds();
+			}
+
 			if (sentience.is_spell_being_cast()) {
 				sentience.currently_casted_spell.dispatch(
 					[&](auto s) {
@@ -533,6 +541,21 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 				}
 				else {
 					apply_ped(amount);
+				}
+			}
+			
+			else if (d.type == adverse_element_type::FLASH) {
+				auto& secs = sentience->audio_flash_secs;
+				secs = std::max(0.f, secs);
+
+				const auto flashbang = cosm[d.origin.cause.entity];
+
+				if (const auto explosive = flashbang.template find<invariants::explosive>()) {
+					const auto distance_from_epicentre = (d.point_of_impact - flashbang.get_logic_transform().pos).length();
+					const auto max_distance = explosive->explosion.effective_radius;
+					const auto r = std::sqrt(1 - distance_from_epicentre / max_distance);
+
+					secs = std::max(secs, r * amount);
 				}
 			}
 		}

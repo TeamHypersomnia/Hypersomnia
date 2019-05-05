@@ -28,6 +28,7 @@ namespace augs {
 
 class sound_system {
 	struct update_properties_input {
+		const sound_system& owner;
 		const augs::audio_volume_settings& volume;
 		const sound_system_settings& settings;
 		const loaded_sounds_map& manager;
@@ -123,6 +124,12 @@ class sound_system {
 
 	void start_fading(generic_sound_cache&, float fade_per_sec = 3.f);
 
+	float after_flash_passed_ms = 0.f;
+	float last_registered_flash_mult = 0.f;
+
+	augs::sound_source flash_noise_source;
+	std::optional<unsigned int> lowpass_filter_id;
+
 public:
 	void reserve_caches_for_entities(const std::size_t) const {}
 
@@ -133,6 +140,16 @@ public:
 
 	void clear();
 	void clear_sources_playing(const assets::sound_id);
+
+	void advance_flash(const_entity_handle listener, augs::delta dt);
+
+	auto get_effective_flash_mult() const {
+		return last_registered_flash_mult;
+	}
+
+	auto get_lowpass_filter() const {
+		return lowpass_filter_id;
+	}
 
 	//	void set_listening_character(entity_id);
 };

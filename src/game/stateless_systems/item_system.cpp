@@ -723,6 +723,7 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					case game_intent_type::THROW_ANY_FORCE: requested_force_type = adverse_element_type::FORCE; break;
 					case game_intent_type::THROW_ANY_PED: requested_force_type = adverse_element_type::PED; break;
 					case game_intent_type::THROW_ANY_INTERFERENCE: requested_force_type = adverse_element_type::INTERFERENCE; break;
+					case game_intent_type::THROW_ANY_FLASH: requested_force_type = adverse_element_type::FLASH; break;
 					default: break;
 				}
 
@@ -830,8 +831,8 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 				int requested_knives = 0;
 
 				switch (r.intent) {
-					case game_intent_type::THROW_ANY_KNIFE: requested_knives = 1; break;
-					case game_intent_type::THROW_ANY_TWO_KNIVES: requested_knives = 2; break;
+					case game_intent_type::THROW_ANY_MELEE: requested_knives = 1; break;
+					case game_intent_type::THROW_ANY_TWO_MELEES: requested_knives = 2; break;
 					default: break;
 				}
 

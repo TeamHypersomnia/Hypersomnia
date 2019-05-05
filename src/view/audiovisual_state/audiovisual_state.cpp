@@ -119,6 +119,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		
 		sounds.update_sound_properties(
 			{
+				sounds,
 				input.audio_volume,
 				input.sound_settings,
 				input.sounds,
@@ -229,6 +230,7 @@ void audiovisual_state::standard_post_solve(
 			sounds.update_effects_from_messages(
 				step, 
 				{
+					sounds,
 					input.audio_volume,
 					input.sound_settings,
 					input.sounds, 

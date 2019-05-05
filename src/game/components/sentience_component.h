@@ -89,6 +89,9 @@ namespace components {
 		std::array<augs::stepped_timestamp, hand_count_v> when_hand_pressed = {};
 
 		real32 rotation_inertia_ms = 0.1f;
+
+		real32 audio_flash_secs = 0.f;
+		real32 visual_flash_secs = 0.f;
 		// END GEN INTROSPECTOR
 
 		bool is_learnt(const spell_id id) const {
@@ -180,6 +183,11 @@ namespace invariants {
 		detached_body_parts_flavours detached_flavours;
 		real32 max_inertia_when_rotation_possible = 500.f;
 		real32 cp_regen_mult_when_moving = 1.f;
+
+		real32 flash_effect_delay_ms = 200.f;
+
+		real32 flash_audio_easing_secs = 1.5f;
+		real32 flash_visual_easing_secs = 1.5f;
 		// END GEN INTROSPECTOR
 	};
 }

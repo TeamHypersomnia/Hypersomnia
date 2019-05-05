@@ -161,6 +161,7 @@ namespace test_scenes {
 		const auto force_type = test_hand_explosives::FORCE_GRENADE;
 		const auto ped_type = test_hand_explosives::PED_GRENADE;
 		const auto interference_type = test_hand_explosives::INTERFERENCE_GRENADE;
+		const auto flash_type = test_hand_explosives::FLASHBANG;
 
 		const auto sample_backpack = test_container_items::SAMPLE_BACKPACK;
 		const auto brown_backpack = test_container_items::RESISTANCE_BACKPACK;
@@ -176,6 +177,7 @@ namespace test_scenes {
 #endif
 
 		for (int i = 0; i < 10; ++i) {
+			create(flash_type, vec2{ 304, 611 + i * 100.f });
 			create(force_type, vec2{ 254, 611 + i *100.f });
 			create(ped_type, vec2{ 204, 611 + i * 100.f });
 			create(interference_type, vec2{ 154, 611 + i * 100.f });

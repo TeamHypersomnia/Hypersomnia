@@ -103,6 +103,8 @@ void populate_test_scene_common(const loaded_image_caches_map& caches, cosmos_co
 	common_assets.standard_learnt_spell_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_LEARNT_SPELL);
 	common_assets.standard_learnt_spell_sound.id = to_sound_id(test_scene_sound_id::STANDARD_LEARNT_SPELL);
 
+	common_assets.flash_noise_sound.id = to_sound_id(test_scene_sound_id::FLASH_NOISE);
+
 	load_test_scene_sentience_properties(common);
 	// _controlfp(0, _EM_OVERFLOW | _EM_ZERODIVIDE | _EM_INVALID | _EM_DENORMAL);
 }

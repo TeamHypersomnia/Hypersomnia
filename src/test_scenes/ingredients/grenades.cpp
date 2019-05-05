@@ -216,6 +216,64 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_hand_explosives::FLASHBANG);
+
+			meta.get<invariants::text_details>().description =
+				"Throwable explosive with a one second delay.\nDeals damage to [color=orange]Consciousness[/color].\nCauses massive aimpunch."
+			;
+
+			{
+				invariants::render render_def;
+				render_def.layer = render_layer::SMALL_DYNAMIC_BODY;
+
+				meta.set(render_def);
+			}
+			test_flavours::add_sprite(meta, caches, test_scene_image_id::FLASHBANG, white);
+			auto& fixtures = test_flavours::add_lying_item_dynamic_body(meta);
+			fixtures.restitution = 1.f;
+
+			invariants::item item;
+			item.standard_price = 1000;
+			item.space_occupied_per_charge = to_space_units("1.0");
+			meta.set(item);
+
+			{
+				invariants::hand_fuse fuse; 
+				fuse.release_sound.id = to_sound_id(test_scene_sound_id::GRENADE_THROW);
+				fuse.armed_sound.id = to_sound_id(test_scene_sound_id::GRENADE_UNPIN);
+				fuse.released_image_id = to_image_id(test_scene_image_id::FLASHBANG_RELEASED);
+				fuse.released_physical_material = to_physical_material_id(test_scene_physical_material_id::GRENADE);
+				fuse.additional_release_impulse.linear = 3000.f;
+				fuse.additional_secondary_release_impulse.linear = 2000.f;
+				fuse.fuse_delay_ms = 800.f;
+
+				meta.set(fuse);
+			}
+
+			invariants::explosive explosive; 
+
+			auto& in = explosive.explosion;
+			auto& dmg = in.damage;
+
+			dmg.base = 6.f;
+			in.inner_ring_color = white;
+			in.outer_ring_color = white;
+			in.effective_radius = 1000.f;
+			dmg.impact_impulse = 0.f;
+			dmg.impulse_multiplier_against_sentience = 0.f;
+			in.sound.id = to_sound_id(test_scene_sound_id::FLASHBANG_EXPLOSION);
+			in.sound.modifier.max_distance = 6000.f;
+			in.sound.modifier.reference_distance = 2000.f;
+			in.type = adverse_element_type::FLASH;
+
+			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
+			dmg.shake.duration_ms = 300.f;
+			dmg.shake.mult = 0.9f;
+
+			meta.set(explosive);
+		}
+
+		{
 			auto& meta = get_test_flavour(flavours, test_hand_explosives::PED_GRENADE);
 
 			meta.get<invariants::text_details>().description =
