@@ -254,8 +254,8 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 
 	const auto mult_via_settings = [&]() {
 		if (original.input.modifier.always_direct_listener) {
-			if (const auto buf = source.get_bound_buffer()) {
-				if (buf->get_length_in_seconds() > in.settings.treat_as_music_sounds_longer_than_secs) {
+			if (const auto buf = source.get_bound_buffer_meta(); buf.is_set()) {
+				if (buf.computed_length_in_seconds > in.settings.treat_as_music_sounds_longer_than_secs) {
 					return in.volume.music;
 				}
 			}
@@ -601,8 +601,8 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		const auto& source = cache.source;
 		const auto& m = cache.original.input.modifier;
 
-		if (const auto buf = source.get_bound_buffer()) {
-			const auto secs = buf->get_length_in_seconds();
+		if (const auto buf = source.get_bound_buffer_meta(); buf.is_set()) {
+			const auto secs = buf.computed_length_in_seconds;
 
 			if (secs > in.settings.sync_sounds_longer_than_secs) {
 				const auto when_born = subject.when_born().step;

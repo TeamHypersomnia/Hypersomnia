@@ -5,6 +5,7 @@
 #include "augs/math/vec2.h"
 #include "augs/math/si_scaling.h"
 #include "augs/audio/distance_model.h"
+#include "augs/audio/sound_buffer_structs.h"
 
 typedef unsigned int ALuint;
 
@@ -26,7 +27,8 @@ namespace augs {
 	class sound_source {
 		bool initialized = false;
 		ALuint id = 0;
-		const single_sound_buffer* attached_buffer = nullptr;
+		ALuint attached_buffer = -1;
+		sound_buffer_meta buffer_meta;
 
 		void destroy();
 	public:
@@ -74,7 +76,10 @@ namespace augs {
 		void just_play(const single_sound_buffer&, float gain = -1.f);
 
 		void unbind_buffer();
-		const single_sound_buffer* get_bound_buffer() const;
+
+		const sound_buffer_meta& get_bound_buffer_meta() const {
+			return buffer_meta;
+		}
 
 		ALuint get_id() const;
 		operator ALuint() const;

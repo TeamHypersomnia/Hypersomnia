@@ -13,7 +13,7 @@ namespace augs {
 	ALenum get_openal_format_of(const sound_data&);
 
 	class single_sound_buffer {
-		double computed_length_in_seconds = 0.0;
+		sound_buffer_meta meta;
 		ALuint id = 0;
 		bool initialized = false;
 		
@@ -36,6 +36,10 @@ namespace augs {
 
 		ALuint get_id() const;
 		operator ALuint() const;
+
+		const auto& get_meta() const {
+			return meta;
+		}
 	};
 
 	class sound_buffer {

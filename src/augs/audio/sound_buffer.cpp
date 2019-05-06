@@ -51,21 +51,23 @@ namespace augs {
 	}
 
 	single_sound_buffer::single_sound_buffer(single_sound_buffer&& b) : 
-		computed_length_in_seconds(b.computed_length_in_seconds),
+		meta(std::move(b.meta)),
 		id(b.id),
 		initialized(b.initialized)
 	{
 		b.initialized = false;
+		b.meta = {};
 	}
 
 	single_sound_buffer& single_sound_buffer::operator=(single_sound_buffer&& b) {
 		destroy();
 
-		computed_length_in_seconds = b.computed_length_in_seconds;
+		meta = std::move(b.meta);
 		id = b.id;
 		initialized = b.initialized;
 
 		b.initialized = false;
+		b.meta = {};
 
 		return *this;
 	}
@@ -108,7 +110,7 @@ namespace augs {
 		const auto passed_format = get_openal_format_of(new_data);
 		const auto passed_frequency = new_data.frequency;
 		const auto passed_bytesize = new_data.samples.size() * sizeof(sound_sample_type);
-		computed_length_in_seconds = new_data.compute_length_in_seconds();
+		meta.computed_length_in_seconds = new_data.compute_length_in_seconds();
 
 #if LOG_AUDIO_BUFFERS
 		LOG("Passed format: %x\nPassed frequency: %x\nPassed bytesize: %x", passed_format, passed_frequency, passed_bytesize);
@@ -121,7 +123,7 @@ namespace augs {
 	}
 
 	double single_sound_buffer::get_length_in_seconds() const {
-		return computed_length_in_seconds;
+		return meta.computed_length_in_seconds;
 	}
 
 	sound_buffer::sound_buffer(const sound_buffer_loading_input input) {

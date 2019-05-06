@@ -50,9 +50,11 @@ namespace augs {
 	sound_source::sound_source(sound_source&& b) :
 		initialized(b.initialized),
 		id(b.id),
-		attached_buffer(b.attached_buffer)
+		attached_buffer(b.attached_buffer),
+		buffer_meta(std::move(b.buffer_meta))
 	{
 		b.initialized = false;
+		b.buffer_meta = {};
 	}
 
 	sound_source& sound_source::operator=(sound_source&& b) {
@@ -61,7 +63,9 @@ namespace augs {
 		initialized = b.initialized;
 		id = b.id;
 		attached_buffer = b.attached_buffer;
+		buffer_meta = std::move(b.buffer_meta);
 
+		b.buffer_meta = {};
 		b.initialized = false;
 
 		return *this;
@@ -76,7 +80,8 @@ namespace augs {
 #endif
 			AL_CHECK(alDeleteSources(1, &id));
 			initialized = false;
-			attached_buffer = nullptr;
+			attached_buffer = -1;
+			buffer_meta = {};
 		}
 	}
 
@@ -279,17 +284,17 @@ namespace augs {
 		std::optional<float> previous_seconds;
 
 		{
-			const auto buf_addr = std::addressof(buf);
+			const auto buf_addr = buf.get_id();
 
 			if (attached_buffer == buf_addr) {
 				return;
 			}
 
-			if (attached_buffer != nullptr) {
+			if (buffer_meta.is_set()) {
 				previous_seconds = get_time_in_seconds();
 			}
 
-			attached_buffer = &buf;
+			attached_buffer = buf_addr;
 		}
 
 		if (previous_seconds) {
@@ -315,7 +320,8 @@ namespace augs {
 	}
 
 	void sound_source::unbind_buffer() {
-		attached_buffer = nullptr;
+		attached_buffer = 0;
+		buffer_meta = {};
 		AL_CHECK(alSourcei(id, AL_BUFFER, 0));
 	}
 	
@@ -328,10 +334,6 @@ namespace augs {
 		bind_buffer(buffer);
 		set_direct_channels(true);
 		play();
-	}
-
-	const single_sound_buffer* sound_source::get_bound_buffer() const {
-		return attached_buffer;
 	}
 
 	void set_listener_position(const si_scaling si, vec2 pos) {
