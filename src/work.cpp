@@ -1863,6 +1863,15 @@ int work(const int argc, const char* const * const argv) try {
 					renderer.call_and_clear_triangles();
 
 					auto flash_overlay_col = white;
+
+					if (viewed_character) {
+						if (const auto sentience = viewed_character.find<components::sentience>()) {
+							if (!sentience->is_conscious()) {
+								flash_overlay_col = rgba(255, 40, 40, 255);
+							}
+						}
+					}
+
 					flash_overlay_col.mult_alpha(flash_mult);
 
 					get_drawer().color_overlay(screen_size, flash_overlay_col);

@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- bug: crash in openal when creating new tab in editor after having played in the first tab
+
 - consider putting nades to the primary hand for better aiming consistency when quickthrowing
 - minimally buff pro90 over zamieć: perhaps increase the round's impact a little?
 
