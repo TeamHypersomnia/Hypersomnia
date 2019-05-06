@@ -3056,3 +3056,6 @@ i			- if the newly calculated target is different than last_reload_target, reset
 			- last score could be a good rank
 			- followed by the nickname
 		- store last rank to preserve some kind of ordering
+
+- bug: crash in openal when creating new tab in editor after having played in the first tab
+

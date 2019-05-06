@@ -73,6 +73,9 @@ void sound_system::clear_sources_playing(const assets::sound_id id) {
 	erase_if(short_sounds, linear_erase);
 	erase_if(firearm_engine_caches, map_erase);
 	erase_if(continuous_sound_caches, map_erase);
+
+	flash_noise_source.stop();
+	flash_noise_source.unbind_buffer();
 }
 
 void sound_system::update_listener(
