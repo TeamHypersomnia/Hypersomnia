@@ -415,12 +415,36 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 												return true;
 											};
 
+											auto create_clash_thunders = [&](const auto& impact_dir) {
+												auto msg = messages::thunder_effect(never_predictable_v);
+												auto& th = msg.payload;
+
+												th.delay_between_branches_ms = {10.f, 35.f};
+												th.max_branch_lifetime_ms = {60.f, 85.f};
+												th.branch_length = {30.f, 150.f};
+
+												th.max_all_spawned_branches = 80;
+												th.max_branch_children = 2;
+
+												th.branch_angle_spread = 40.f;
+												th.color = white;
+
+												th.first_branch_root = transformr(point_of_impact, impact_dir.perpendicular_cw().degrees());
+												step.post_message(msg);
+
+												th.first_branch_root = transformr(point_of_impact, impact_dir.perpendicular_ccw().degrees());
+												step.post_message(msg);
+											};
+
+											const auto& clash_def = current_attack_def.clash;
+
+											const auto subject_owner_pos = it.get_logic_transform().pos;
+
 											if (is_like_melee_in_action(victim) && try_pass_cooldown(melee.when_clashed, 5)) {
 												clash_applied = true;
 
 												const auto victim_owner = victim.get_owning_transfer_capability();
 												const auto victim_owner_pos = victim_owner.get_logic_transform().pos;
-												const auto subject_owner_pos = it.get_logic_transform().pos;
 												const auto impact_dir = (victim_owner_pos - subject_owner_pos).normalize();
 
 												const auto& v_melee_def = victim.template get<invariants::melee>();
@@ -429,7 +453,6 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 
 												v_melee.when_clashed = now;
 
-												const auto& clash_def = current_attack_def.clash;
 												const auto& v_attack = v_melee_def.actions[v_fighter.action];
 												const auto& v_clash_def = v_attack.clash;
 
@@ -449,13 +472,11 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 													}
 												}
 
-												{
-													const auto subject_impact = -v_clash_def.impulse * impact_dir;
-													const auto victim_impact = clash_def.impulse * impact_dir;
+												const auto subject_impact = -v_clash_def.impulse * impact_dir;
+												const auto victim_impact = clash_def.impulse * impact_dir;
 
-													body.apply_impulse(subject_impact);
-													victim.template get<components::rigid_body>().apply_impulse(victim_impact);
-												}
+												body.apply_impulse(subject_impact);
+												victim.template get<components::rigid_body>().apply_impulse(victim_impact);
 
 												{
 													auto subject_shake = v_attack.damage.shake;
@@ -476,26 +497,52 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 													victim_owner.template get<components::movement>().linear_inertia_ms += victim_inertia;
 												}
 
+												create_clash_thunders(impact_dir);
+											}
+
+											if (is_like_thrown_melee(victim) && try_pass_cooldown(melee.when_clashed, 5)) {
+												const auto victim_pos = victim.get_logic_transform().pos;
+												const auto impact_dir = (victim_pos - subject_owner_pos).normalize();
+
+												clash_applied = true;
+
+												const auto& v_melee_def = victim.template get<invariants::melee>();
+												const auto& v_attack = v_melee_def.throw_def;
+												const auto& v_clash_def = v_attack.clash;
+
 												{
-													auto msg = messages::thunder_effect(never_predictable_v);
-													auto& th = msg.payload;
+													auto play_clash = [&](const auto& def) {
+														def.sound.start(
+															step,
+															sound_effect_start_input::fire_and_forget(point_of_impact),
+															never_predictable_v
+														);
+													};
 
-													th.delay_between_branches_ms = {10.f, 35.f};
-													th.max_branch_lifetime_ms = {60.f, 85.f};
-													th.branch_length = {30.f, 150.f};
+													//const auto& throw_clash_def = melee_def.throw_def.clash;
 
-													th.max_all_spawned_branches = 80;
-													th.max_branch_children = 2;
+													const auto subject_impact = -v_clash_def.impulse * impact_dir;
+													
+													const auto make_returned_boomerang_more_offensive = 1.1f;
+													const auto victim_impact = (v_attack.boomerang_impulse.linear + clash_def.impulse + it.get_effective_velocity().length()) * make_returned_boomerang_more_offensive * impact_dir;
 
-													th.branch_angle_spread = 40.f;
-													th.color = white;
+													body.apply_impulse(subject_impact);
 
-													th.first_branch_root = transformr(point_of_impact, impact_dir.perpendicular_cw().degrees());
-													step.post_message(msg);
+													const auto& victim_body = victim.template get<components::rigid_body>();
 
-													th.first_branch_root = transformr(point_of_impact, impact_dir.perpendicular_ccw().degrees());
-													step.post_message(msg);
+													victim_body.set_transform({ victim_pos, impact_dir.degrees() });
+													victim_body.set_velocity(victim_impact);
+
+													play_clash(clash_def);
+
+													if (clash_def.sound.id != v_clash_def.sound.id) {
+														play_clash(v_clash_def);
+													}
 												}
+
+												create_clash_thunders(impact_dir);
+
+												victim.template get<components::sender>().set(it);
 											}
 										}
 
