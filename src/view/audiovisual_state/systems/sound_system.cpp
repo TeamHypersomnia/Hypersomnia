@@ -371,7 +371,19 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 				const auto& s = start.source_collision;
 
 				if (!(s == collision_sound_source())) {
-					const auto it = collision_sound_cooldowns.try_emplace(s);
+					collision_cooldown_key key;
+					key.participants = s;
+
+					if constexpr(std::is_same_v<decltype(dummy), messages::start_sound_effect*>) {
+						key.id = e.payload.input.id;
+					}
+					else {
+						if (e.payload.inputs.size() > 0) {
+							key.id = e.payload.inputs[0].id;
+						}
+					}
+
+					const auto it = collision_sound_cooldowns.try_emplace(key);
 
 					auto& cooldown = (*it.first).second;
 

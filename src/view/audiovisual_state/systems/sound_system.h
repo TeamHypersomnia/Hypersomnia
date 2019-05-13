@@ -2,6 +2,7 @@
 #include <unordered_map>
 
 #include "augs/misc/timing/delta.h"
+#include "augs/templates/hash_templates.h"
 
 #include "augs/audio/sound_source.h"
 #include "augs/math/camera_cone.h"
@@ -24,6 +25,24 @@ class cosmos;
 
 namespace augs {
 	struct audio_volume_settings;
+}
+
+struct collision_cooldown_key {
+	collision_sound_source participants;
+	assets::sound_id id;
+
+	bool operator==(const collision_cooldown_key& b) const {
+		return participants == b.participants && id == b.id;
+	}
+};
+
+namespace std {
+	template <>
+	struct hash<collision_cooldown_key> {
+		std::size_t operator()(const collision_cooldown_key& v) const {
+			return hash_multiple(v.participants.subject, v.participants.collider, v.id);
+		}
+	};
 }
 
 class sound_system {
@@ -107,7 +126,7 @@ class sound_system {
 	audiovisual_cache_map<continuous_sound_cache> continuous_sound_caches;
 
 	augs::constant_size_vector<fading_source, MAX_FADING_SOURCES> fading_sources;
-	std::unordered_map<collision_sound_source, collision_sound_cooldown> collision_sound_cooldowns;
+	std::unordered_map<collision_cooldown_key, collision_sound_cooldown> collision_sound_cooldowns;
 
 	template <class T>
 	void fade_and_erase(T& caches, const unversioned_entity_id id, const float fade_per_sec = 3.f) {

@@ -40,15 +40,6 @@ struct collision_sound_source {
 	}
 };
 
-namespace std {
-	template <>
-	struct hash<collision_sound_source> {
-		std::size_t operator()(const collision_sound_source& v) const {
-			return std::hash<entity_id>()(v.subject) + std::hash<entity_id>()(v.collider);
-		}
-	};
-}
-
 struct sound_effect_start_input {
 	absolute_or_local positioning;
 	entity_id direct_listener;
