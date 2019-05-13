@@ -1490,8 +1490,13 @@ augs::maybe<render_layer_filter> editor_setup::get_render_layer_filter() const {
 }
 
 void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
-	auto on_screen = [in](const auto p) {
-		return in.cone.to_screen_space(p);
+	auto cone = in.cone;
+
+	auto& eye = cone.eye;
+	eye.transform.pos.discard_fract();
+
+	auto on_screen = [&](const auto p) {
+		return cone.to_screen_space(p);
 	};
 
 	auto& triangles = in.drawer;
@@ -1548,43 +1553,39 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 				border_input { 1, 2 }
 			);
 
-			::draw_area_indicator(typed_handle, lines, screen_space, in.cone.eye.zoom, 1.f, drawn_indicator_type::EDITOR, color);
+			::draw_area_indicator(typed_handle, lines, screen_space, eye.zoom, 1.f, drawn_indicator_type::EDITOR, color);
 		}	
 	);
 
-	if (auto eye = find_current_camera_eye()) {
-		eye->transform.pos.discard_fract();
-
-		if (const auto view = find_view()) {
-			if (view->show_grid && is_editing_mode()) {
-				triangles.grid(
-					screen_size,
-					view->grid.unit_pixels,
-					*eye,
-					editor_cfg.grid.render
-				);
-			}
-		}
-
-		if (const auto selection_aabb = find_selection_aabb()) {
-			auto col = white;
-
-			if (is_mover_active()) {
-				col.a = 120;
-			}
-
-			triangles.border(
-				camera_cone(*eye, screen_size).to_screen_space(*selection_aabb),
-				col,
-				border_input { 1, -1 }
+	if (const auto view = find_view()) {
+		if (view->show_grid && is_editing_mode()) {
+			triangles.grid(
+				screen_size,
+				view->grid.unit_pixels,
+				eye,
+				editor_cfg.grid.render
 			);
 		}
 	}
 
+	if (const auto selection_aabb = find_selection_aabb()) {
+		auto col = white;
+
+		if (is_mover_active()) {
+			col.a = 120;
+		}
+
+		triangles.border(
+			cone.to_screen_space(*selection_aabb),
+			col,
+			border_input { 1, -1 }
+		);
+	}
+
 	for_each_dashed_line(
 		[&](vec2 from, vec2 to, const rgba color, const double secs = 0.0, bool fatten = false) {
-			const auto a = on_screen(from.round_fract());
-			const auto b = on_screen(to.round_fract());
+			const auto a = on_screen(from);
+			const auto b = on_screen(to);
 
 			lines.dashed_line(a, b, color, 5.f, 5.f, secs);
 

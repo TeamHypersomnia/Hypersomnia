@@ -161,13 +161,27 @@ static void move_entities(
 				using T = remove_cref<decltype(tr)>;
 
 				if constexpr(std::is_same_v<T, physics_engine_transforms>) {
-					tr.set(tr.get() + dt_si);
+					auto total_tr = tr.get();
+					total_tr += dt_si;
+
+					if (augs::is_epsilon(total_tr.rotation, AUGS_EPSILON<real32>)) {
+						total_tr.pos = si.get_meters(vec2(si.get_pixels(total_tr.pos)).round_fract());
+						total_tr.rotation = 0.f;
+					}
+
+					tr.set(total_tr);
 				}
 				else if constexpr(std::is_same_v<T, transformr>) {
 					tr += dt;
+
+					if (augs::is_epsilon(tr.rotation, AUGS_EPSILON<real32>)) {
+						tr.pos.round_fract();
+						tr.rotation = 0.f;
+					}
 				}
 				else if constexpr(std::is_same_v<T, vec2>) {
 					tr += dt.pos;
+					tr.round_fract();
 				}
 				else {
 					static_assert(always_false_v<T>, "Unknown transform type.");
@@ -183,24 +197,43 @@ static void resize_entities(
 	const cosmos_solvable_access key,
 	cosmos& cosm,
 	const resized_entities_type& subjects,
-	const vec2& world_ref,
+	const resizing_reference_point& reference_point,
 	const active_edges& edges,
 	const bool both_axes_simultaneously
 ) {
 	const auto si = cosm.get_si();
 
+	const auto& world_reference_point = reference_point.snapped;
+
 	subjects.for_each(
 		[&](const auto& i) {
 			const auto typed_handle = cosm[i];
-			std::optional<vec2i> size_unit;
 
-			if constexpr(typed_handle.template has<invariants::sprite>()) {
-				const auto& spr = typed_handle.template get<invariants::sprite>();
+			const auto size_unit = [&]() {
+				std::optional<vec2i> result;
 
-				if (spr.tile_excess_size) { 
-					size_unit = spr.size;
+				if constexpr(typed_handle.template has<invariants::sprite>()) {
+					const auto& spr = typed_handle.template get<invariants::sprite>();
+
+					if (spr.tile_excess_size) { 
+						result = spr.size;
+					}
 				}
-			}
+
+				if (reference_point.used_grid != std::nullopt) {
+					const auto unit = reference_point.used_grid->unit_pixels;
+
+					if (result != std::nullopt) {
+						result->x = std::max(result->x, unit);
+						result->y = std::max(result->y, unit);
+					}
+					else {
+						result = vec2i::square(unit);
+					}
+				}
+
+				return result;
+			}();
 
 			if constexpr(typed_handle.template has<components::overridden_geo>()) {
 				typed_handle.access_independent_transform(
@@ -229,13 +262,13 @@ static void resize_entities(
 						const auto rot = original_transform.rotation;
 						const auto current_size = typed_handle.get_logical_size();
 
-						const auto ref = vec2(world_ref).rotate(-rot, pos);
+						const auto ref = vec2(world_reference_point).rotate(-rot, pos);
 						const auto rect = ltrb::center_and_size(pos, current_size);
 
 						auto set_size = [&](const vec2 new_size) {
 							auto& overridden_geo = typed_handle.get(key).template get<components::overridden_geo>();
 
-							if (size_unit.has_value()) {
+							if (size_unit != std::nullopt) {
 								vec2i s = new_size;
 								s /= size_unit.value();
 								s *= size_unit.value();
@@ -250,13 +283,25 @@ static void resize_entities(
 							if constexpr(std::is_same_v<T, physics_engine_transforms>) {
 								auto t = transform.get();
 								t.pos = si.get_meters(new_pos);
+
+								if (augs::is_epsilon(t.rotation, AUGS_EPSILON<real32>)) {
+									t.pos = si.get_meters(vec2(si.get_pixels(t.pos)).round_fract());
+									t.rotation = 0.f;
+								}
+
 								transform.set(t);
 							}
 							else if constexpr(std::is_same_v<T, transformr>) {
 								transform.pos = new_pos;
+
+								if (augs::is_epsilon(transform.rotation, AUGS_EPSILON<real32>)) {
+									transform.pos.round_fract();
+									transform.rotation = 0.f;
+								}
 							}
 							else if constexpr(std::is_same_v<T, vec2>) {
 								transform = new_pos;
+								transform.round_fract();
 							}
 							else {
 								static_assert(always_false_v<T>);
@@ -278,7 +323,7 @@ static void resize_entities(
 						auto unitize_diff_x = [&](const real32 diff_x) {
 							const auto would_be_w = static_cast<int>(current_size.x + diff_x);
 
-							if (size_unit.has_value()) {
+							if (size_unit != std::nullopt) {
 								auto snapped_w = would_be_w;
 
 								snapped_w /= size_unit->x;
@@ -307,7 +352,7 @@ static void resize_entities(
 						auto unitize_diff_y = [&](const real32 diff_y) {
 							const auto would_be_h = static_cast<int>(current_size.y + diff_y);
 
-							if (size_unit.has_value()) {
+							if (size_unit != std::nullopt) {
 								auto snapped_h = would_be_h;
 
 								snapped_h /= size_unit->y;
@@ -546,7 +591,7 @@ void resize_entities_command::resize_entities(cosmos& cosm) {
 		);
 	}
 
-	::resize_entities({}, cosm, resized_entities, reference_point.snapped, edges, both_axes_simultaneously);
+	::resize_entities({}, cosm, resized_entities, reference_point, edges, both_axes_simultaneously);
 }
 
 void resize_entities_command::rewrite_change(

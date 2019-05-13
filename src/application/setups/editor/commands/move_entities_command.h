@@ -137,6 +137,7 @@ struct resizing_reference_point {
 	// GEN INTROSPECTOR struct resizing_reference_point
 	vec2 actual;
 	vec2 snapped;
+	std::optional<snapping_grid> used_grid;
 	// END GEN INTROSPECTOR
 };
 

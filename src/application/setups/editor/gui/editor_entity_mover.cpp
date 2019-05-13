@@ -79,7 +79,13 @@ resizing_reference_point get_reference_point(entity_mover_input in, std::optiona
 	const auto new_reference_point = world_cursor_pos.has_value() ? world_cursor_pos.value() : s.find_world_cursor_pos().value().discard_fract();
 	const auto snapped_reference_point = v.snapping_enabled ? vec2(v.grid.get_snapping_corner(new_reference_point)) : new_reference_point;
 
-	return { new_reference_point, snapped_reference_point };
+	std::optional<snapping_grid> used_grid;
+
+	if (v.snapping_enabled) {
+		used_grid = v.grid;
+	}
+
+	return { new_reference_point, snapped_reference_point, used_grid };
 }
 
 void editor_entity_mover::start_resizing_selection(
