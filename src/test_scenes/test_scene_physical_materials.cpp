@@ -1,3 +1,4 @@
+
 #include "augs/templates/enum_introspect.h"
 #include "test_scenes/test_scene_physical_materials.h"
 #include "test_scenes/test_scenes_content.h"
@@ -26,11 +27,20 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 		const test_scene_physical_material_id b,
 		const test_scene_sound_id c,
 		const bool both_ways = true,
-		collision_sound_def def_template = {}
+		std::optional<collision_sound_def> maybe_def_template = std::nullopt
 	) {
 		const auto a_id = to_physical_material_id(a);
 		const auto b_id = to_physical_material_id(b);
 		const auto c_id = to_sound_id(c);
+
+		collision_sound_def def_template;
+
+		if (maybe_def_template != std::nullopt) {
+			def_template = *maybe_def_template;
+		}
+		else {
+			def_template.occurences_before_cooldown = 3;
+		}
 
 		{
 			auto& entry = all_definitions[a_id].collision_sound_matrix[b_id];
@@ -85,10 +95,29 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 	set_pair(test_scene_physical_material_id::GRENADE, test_scene_physical_material_id::GLASS, test_scene_sound_id::COLLISION_GRENADE, false);
 	set_pair(test_scene_physical_material_id::GLASS, test_scene_physical_material_id::GRENADE, test_scene_sound_id::COLLISION_GLASS, false);
 
+	set_pair(test_scene_physical_material_id::GRENADE, test_scene_physical_material_id::AIR_DUCT, test_scene_sound_id::COLLISION_GRENADE, false);
+	set_pair(test_scene_physical_material_id::AIR_DUCT, test_scene_physical_material_id::GRENADE, test_scene_sound_id::AIR_DUCT_IMPACT, false);
+
 	set_pair(test_scene_physical_material_id::FLASHBANG, test_scene_physical_material_id::GLASS, test_scene_sound_id::COLLISION_FLASHBANG, false);
 	set_pair(test_scene_physical_material_id::GLASS, test_scene_physical_material_id::FLASHBANG, test_scene_sound_id::COLLISION_GLASS, false);
 
+	set_pair(test_scene_physical_material_id::FLASHBANG, test_scene_physical_material_id::AIR_DUCT, test_scene_sound_id::COLLISION_FLASHBANG, false);
+	set_pair(test_scene_physical_material_id::AIR_DUCT, test_scene_physical_material_id::FLASHBANG, test_scene_sound_id::AIR_DUCT_IMPACT, false);
+
 	set_pair(test_scene_physical_material_id::GLASS, test_scene_physical_material_id::GLASS, test_scene_sound_id::COLLISION_GLASS);
+
+
+	{
+		collision_sound_def def;
+		def.occurences_before_cooldown = 1;
+
+		set_pair(test_scene_physical_material_id::AIR_DUCT, test_scene_physical_material_id::WOOD, test_scene_sound_id::AIR_DUCT_IMPACT, true, def);
+		set_pair(test_scene_physical_material_id::AIR_DUCT, test_scene_physical_material_id::GLASS, test_scene_sound_id::AIR_DUCT_IMPACT, true, def);
+		set_pair(test_scene_physical_material_id::AIR_DUCT, test_scene_physical_material_id::METAL, test_scene_sound_id::AIR_DUCT_IMPACT, true, def);
+
+		set_pair(test_scene_physical_material_id::AIR_DUCT, test_scene_physical_material_id::KNIFE, test_scene_sound_id::AIR_DUCT_IMPACT, false, def);
+		set_pair(test_scene_physical_material_id::KNIFE, test_scene_physical_material_id::AIR_DUCT, test_scene_sound_id::COLLISION_KNIFE_METAL, false, def);
+	}
 
 	{
 		auto& metal = all_definitions[to_physical_material_id(test_scene_physical_material_id::METAL)];
@@ -96,6 +125,15 @@ void load_test_scene_physical_materials(physical_materials_pool& all_definitions
 		metal.standard_damage_particles.id = to_particle_effect_id(test_scene_particle_effect_id::METAL_DAMAGE);
 		metal.standard_damage_particles.modifier.colorize = rgba(251, 255, 181, 255);
 		metal.unit_effect_damage = 20.f;
+	}
+
+	{
+		auto& air_duct = all_definitions[to_physical_material_id(test_scene_physical_material_id::AIR_DUCT)];
+		air_duct.standard_damage_sound.id = to_sound_id(test_scene_sound_id::AIR_DUCT_IMPACT);
+		air_duct.standard_damage_sound.modifier.pitch = 1.f;
+		air_duct.standard_damage_particles.id = to_particle_effect_id(test_scene_particle_effect_id::METAL_DAMAGE);
+		air_duct.standard_damage_particles.modifier.colorize = rgba(251, 255, 181, 255);
+		air_duct.unit_effect_damage = 20.f;
 	}
 
 	{

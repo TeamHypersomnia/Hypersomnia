@@ -9,6 +9,7 @@ enum class test_scene_physical_material_id {
 	FLASHBANG,
 	GLASS,
 	KNIFE,
+	AIR_DUCT,
 	COUNT
 	// END GEN INTROSPECTOR
 };

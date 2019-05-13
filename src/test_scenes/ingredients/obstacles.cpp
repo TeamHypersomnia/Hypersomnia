@@ -85,7 +85,7 @@ namespace test_flavours {
 				render_layer::DYNAMIC_BODY
 			),
 
-			test_scene_physical_material_id::METAL,
+			test_scene_physical_material_id::AIR_DUCT,
 			0.2f,
 			20.f
 		);
