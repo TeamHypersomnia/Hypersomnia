@@ -340,7 +340,11 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 					const auto ground_id = get_hovered_world_entity(
 						cosm,
+#if 0
 						effect_transform.pos,
+#else
+						transform.pos,
+#endif
 						[&cosm](const auto id) {
 							return cosm[id].template has<invariants::ground>();
 						},
@@ -382,7 +386,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 				sound.start(
 					step, 
-					sound_effect_start_input::at_entity(it.get_id()),
+					sound_effect_start_input::at_listener(it.get_id()),
 					predictability
 				);
 
