@@ -338,15 +338,24 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				{
 					/* Choose effect based on where the foot has landed */
 
-					const auto ground_id = get_hovered_world_entity(
+					get_hovered_world_entity(
 						cosm,
 #if 0
 						effect_transform.pos,
 #else
 						transform.pos,
 #endif
-						[&cosm](const auto id) {
-							return cosm[id].template has<invariants::ground>();
+						[&](const auto ground_id) {
+							if (const auto ground_entity = cosm[ground_id]) {
+								const auto& ground = ground_entity.template get<invariants::ground>();
+
+								if (ground.footstep_effect.is_enabled) {
+									chosen_effect = ground.footstep_effect.value;
+									return true;
+								}
+							}
+
+							return false;
 						},
 						render_layer_filter::whitelist(
 							render_layer::CAR_INTERIOR,
@@ -357,14 +366,6 @@ void movement_system::apply_movement_forces(const logic_step step) {
 							render_layer::UNDER_GROUND
 						)
 					);
-
-					if (const auto ground_entity = cosm[ground_id]) {
-						const auto& ground = ground_entity.template get<invariants::ground>();
-
-						if (ground.footstep_effect.is_enabled) {
-							chosen_effect = ground.footstep_effect.value;
-						}
-					}
 				}
 
 				auto& sound = chosen_effect.sound;
