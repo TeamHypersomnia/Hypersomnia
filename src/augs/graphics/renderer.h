@@ -71,7 +71,9 @@ namespace augs {
 		void set_clear_color(const rgba);
 		void clear_current_fbo();
 
+		void set_blending(bool);
 		void set_standard_blending();
+		void set_overwriting_blending();
 		void set_additive_blending();
 		
 		void enable_special_vertex_attribute();

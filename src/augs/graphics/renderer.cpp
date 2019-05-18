@@ -44,8 +44,8 @@ namespace augs {
 
 		LOG("Calling gladLoadGL succeeded.");
 		
-		GL_CHECK(glEnable(GL_BLEND));
-		
+		set_blending(true);
+
 		set_standard_blending();
 		set_clear_color(black);
 		 
@@ -107,6 +107,15 @@ namespace augs {
 		apply(settings, true);
 	}
 
+	void renderer::set_blending(const bool on) {
+		if (on) {
+			GL_CHECK(glEnable(GL_BLEND));
+		}
+		else {
+			GL_CHECK(glDisable(GL_BLEND));
+		}
+	}
+
 	void renderer::enable_special_vertex_attribute() {
 		GL_CHECK(glEnableVertexAttribArray(static_cast<int>(vertex_attribute::special)));
 	}
@@ -127,6 +136,10 @@ namespace augs {
 
 	void renderer::set_standard_blending() {
 		GL_CHECK(glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE));
+	}
+
+	void renderer::set_overwriting_blending() {
+		GL_CHECK(glBlendFuncSeparate(GL_ONE, GL_ZERO, GL_ONE, GL_ZERO));
 	}
 
 	void renderer::set_additive_blending() {

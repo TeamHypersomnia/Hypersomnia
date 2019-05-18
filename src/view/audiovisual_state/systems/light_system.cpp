@@ -116,6 +116,30 @@ void light_system::render_all_lights(const light_system_input in) const {
 	renderer.clear_current_fbo();
 	renderer.set_clear_color({ 0, 0, 0, 0 });
 
+	renderer.set_additive_blending();
+	standard_shader.set_as_current();
+
+	const auto helper = helper_drawer {
+		in.visible,
+		cosm,
+		drawing_in,
+		in.total_layer_scope
+	};
+
+	helper.draw_neons<
+		render_layer::FLOOR_AND_ROAD
+	>();
+
+	renderer.call_and_clear_triangles();
+
+	helper.draw<
+		render_layer::FLOOR_NEON_OVERLAY
+	>();
+
+	renderer.set_overwriting_blending();
+	renderer.call_and_clear_triangles();
+	renderer.set_additive_blending();
+
 	light_shader.set_as_current();
 
 	struct light_uniforms {
@@ -137,13 +161,6 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	const auto& interp = drawing_in.interp;
 	const auto& particles = in.particles;
-	
-	const auto helper = helper_drawer {
-		in.visible,
-		cosm,
-		drawing_in,
-		in.total_layer_scope
-	};
 
 	auto& requests = thread_local_visibility_requests();
 	auto& responses = thread_local_visibility_responses();
@@ -403,7 +420,6 @@ void light_system::render_all_lights(const light_system_input in) const {
 		render_layer::CAR_INTERIOR,
 		render_layer::CAR_WHEEL,
 		render_layer::NEON_CAPTIONS,
-		render_layer::FLOOR_AND_ROAD,
 		render_layer::ON_FLOOR,
 		render_layer::ON_ON_FLOOR,
 		render_layer::PLANTED_BOMBS,

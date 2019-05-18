@@ -47,6 +47,9 @@ enum class render_layer {
 	GROUND,
 	UNDER_GROUND,
 
+	FLOOR_NEON_OVERLAY,
+	BODY_NEON_OVERLAY,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };
