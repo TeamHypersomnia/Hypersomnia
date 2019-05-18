@@ -6,7 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- consider putting nades to the primary hand for better aiming consistency when quickthrowing
+- fix cosine of angle being wrongly compared causing a bug in movement path system
+
+- fix knives not giving rewards
+
+- Editor errata
+	- fix confusing undo behaviour when duplicating entities
+
 - minimally buff pro90 over zamieć: perhaps increase the round's impact a little?
 
 - The rocket launcher still glitches during reloading, sometimes

@@ -5,9 +5,11 @@ permalink: todo_disregarded
 summary: Just a hidden scratchpad.
 ---
 
+- consider putting nades and knives to the primary hand for better aiming consistency when quickthrowing
+	- problematic because the gun will stop shooting and it will be displaced
+
 - what could cause a predicted effect to be played a second time?
 	- wrong3
-
 
 - Remember to reset input flags of the character itself on performing transfer
 	- why? it's good to keep shooting once you change
