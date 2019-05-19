@@ -565,6 +565,8 @@ void illuminated_rendering(
 	helper.draw<render_layer::SENTIENCES>();
 #endif
 
+	helper.draw<render_layer::INSECTS>();
+
 	renderer.call_and_clear_triangles();
 
 	renderer.set_active_texture(1);

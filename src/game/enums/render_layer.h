@@ -50,6 +50,8 @@ enum class render_layer {
 	FLOOR_NEON_OVERLAY,
 	BODY_NEON_OVERLAY,
 
+	INSECTS,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

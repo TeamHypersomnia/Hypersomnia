@@ -17,6 +17,7 @@ std::optional<tree_of_npo_node_input> create_default_for(const E& handle) {
 		if (
 			layer == render_layer::UPPER_FISH 
 			|| layer == render_layer::BOTTOM_FISH
+			|| layer == render_layer::INSECTS
 		) {
 			result.type = tree_of_npo_type::ORGANISMS;
 		}

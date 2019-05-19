@@ -21,7 +21,8 @@ void startle_nearby_organisms(
 		visible_entities_query::accuracy_type::PROXIMATE,
 		render_layer_filter::whitelist(
 			render_layer::UPPER_FISH,
-			render_layer::BOTTOM_FISH
+			render_layer::BOTTOM_FISH,
+			render_layer::INSECTS
 		),
 		{ tree_of_npo_type::ORGANISMS }
 	});

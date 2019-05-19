@@ -426,6 +426,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 		render_layer::AQUARIUM_FLOWERS,
 		render_layer::BOTTOM_FISH,
 		render_layer::UPPER_FISH,
+		render_layer::INSECTS,
 		render_layer::AQUARIUM_BUBBLES
 	>();
 
