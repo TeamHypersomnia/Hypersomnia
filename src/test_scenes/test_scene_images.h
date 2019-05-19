@@ -275,6 +275,9 @@ enum class test_scene_image_id {
 
 	ASSAULT_RATTLE_1,
 
+	SZTURM,
+	SZTURM_MAGAZINE,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

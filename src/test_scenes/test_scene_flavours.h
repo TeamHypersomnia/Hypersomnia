@@ -109,6 +109,7 @@ enum class test_shootable_weapons {
 	GRADOBICIE,
 	BULWARK,
 	ZAMIEC,
+	SZTURM,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -139,6 +140,7 @@ enum class test_shootable_charges {
 	SKULL_ROCKET,
 	GRADOBICIE_CHARGE,
 	ZAMIEC_CHARGE,
+	SZTURM_CHARGE,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -182,6 +184,7 @@ enum class test_plain_missiles {
 	BLUNAZ_MISSILE,
 	GRADOBICIE_ROUND,
 	ZAMIEC_ROUND,
+	SZTURM_ROUND,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -219,6 +222,7 @@ enum class test_container_items {
 	WARX_FQ12_MAGAZINE,
 	BULWARK_MAGAZINE,
 	ZAMIEC_MAGAZINE,
+	SZTURM_MAGAZINE,
 
 	COUNT
 	// END GEN INTROSPECTOR

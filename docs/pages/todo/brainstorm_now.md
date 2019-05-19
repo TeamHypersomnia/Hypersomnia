@@ -6,6 +6,23 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- A command to add official flavours to the map
+	- Would not add existing ones
+	- Check if one exists before adding?
+	- well, what about to_image_id? we'd have to worry about creating everything in order
+	- Eventually, we will make a division between flavours of weapons and the rest of the map
+		- Although do we really want to do this architecturally?
+	- update_official_content command
+		- Creates a test intercosm on the side
+		- When a test cosmos is fully created, it adds flavours to the current cosmos if cannot find one with the same name
+		- Adding just allocates and copies the contents
+		- After everything is added
+			- In the destination cosmos, introspects all flavours for identificators (easy as they are trivial plus 
+			- Looks for other, portable/reliable means of identifications like names
+			- existing id can be converted back to an enum and this to a name
+		- This could be done automatically whenever a map is loaded, actually
+		- can look for introspection code that checks where an image is used, maybe reuse it
+
 - fix cosine of angle being wrongly compared causing a bug in movement path system
 
 - fix knives not giving rewards

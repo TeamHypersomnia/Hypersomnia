@@ -715,8 +715,6 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 }
 
 void sound_system::fade_sources(const augs::delta dt) {
-	(void)after_flash_passed_ms;
-
 	erase_if (collision_sound_cooldowns, [&](auto& it) {
 		auto& c = it.second;
 
