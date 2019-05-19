@@ -10,7 +10,8 @@ void startle_nearby_organisms(
 	const vec2 startle_origin,
 	const real32 startle_radius,
 	const real32 startle_force,
-	const startle_type type
+	const startle_type type,
+	const render_layer_filter organism_types
 ) {
 	auto& neighbors = thread_local_visible_entities();
 
@@ -19,11 +20,7 @@ void startle_nearby_organisms(
 		cosm,
 		{ camera_eye(startle_origin), vec2::square(startle_radius * 2) },
 		visible_entities_query::accuracy_type::PROXIMATE,
-		render_layer_filter::whitelist(
-			render_layer::UPPER_FISH,
-			render_layer::BOTTOM_FISH,
-			render_layer::INSECTS
-		),
+		organism_types,
 		{ tree_of_npo_type::ORGANISMS }
 	});
 

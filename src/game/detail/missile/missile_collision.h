@@ -106,6 +106,7 @@ static std::optional<missile_collision_result> collide_missile_against_surface(
 
 			if (augs::is_positive_epsilon(total_damage_amount)) {
 				startle_nearby_organisms(cosm, point, total_damage_amount * 12.f, 27.f, startle_type::LIGHTER);
+				startle_nearby_organisms(cosm, point, total_damage_amount * 6.f, 50.f + total_damage_amount * 2.f, startle_type::IMMEDIATE, render_layer_filter::whitelist(render_layer::INSECTS));
 			}
 		}
 

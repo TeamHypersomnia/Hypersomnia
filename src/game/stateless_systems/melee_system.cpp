@@ -28,6 +28,7 @@
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/movement/dash_logic.h"
 #include "game/detail/movement/movement_getters.h"
+#include "game/detail/organisms/startle_nearbly_organisms.h"
 
 using namespace augs;
 
@@ -252,6 +253,25 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 						return;
 					}
 
+					const auto& current_attack_def = melee_def.actions.at(fighter.action);
+					const auto& damage_def = current_attack_def.damage;
+
+					const auto speed = it.get_effective_velocity().length();
+					const auto bonus_mult = speed * current_attack_def.bonus_damage_speed_ratio;
+
+					{
+						const auto startle_mult = 0.8f + (1 + bonus_mult) * 3.5f;
+
+						startle_nearby_organisms(
+							cosm,
+							to.pos,
+							damage_def.base * startle_mult * 1.4f,
+							damage_def.base * startle_mult,
+							startle_type::IMMEDIATE,
+							render_layer_filter::whitelist(render_layer::INSECTS)
+						);
+					}
+
 					const auto impact_velocity = (to.pos - from.pos) * dt.in_steps_per_second();
 
 					const auto image_id = typed_weapon.get_image_id();
@@ -324,9 +344,6 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 									}
 									else if (is_yet_unaffected) {
 										already_hit.emplace_back(victim_id);
-
-										const auto& current_attack_def = melee_def.actions.at(fighter.action);
-										const auto& def = current_attack_def.damage;
 
 										if (is_solid_obstacle && already_hit.size() == 1) {
 											{
@@ -549,11 +566,9 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 										if (!clash_applied) {
 											messages::damage_message damage_msg;
 
-											const auto speed = it.get_effective_velocity().length();
-											const auto bonus_mult = speed * current_attack_def.bonus_damage_speed_ratio;
 											const auto mult = 1.f + bonus_mult;
 
-											damage_msg.damage = def;
+											damage_msg.damage = damage_def;
 											damage_msg.damage *= mult;
 
 											damage_msg.type = adverse_element_type::FORCE;

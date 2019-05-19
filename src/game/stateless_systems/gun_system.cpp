@@ -41,6 +41,7 @@
 #include "game/detail/inventory/perform_wielding.hpp"
 #include "game/detail/inventory/wielding_setup.hpp"
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
+#include "game/detail/organisms/startle_nearbly_organisms.h"
 
 using namespace augs;
 
@@ -804,6 +805,9 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 				if (total_recoil != 0.f) {
 	#if ENABLE_RECOIL
+					startle_nearby_organisms(cosm, muzzle_transform.pos, total_recoil * 300.f, 60.f, startle_type::IMMEDIATE);
+					startle_nearby_organisms(cosm, muzzle_transform.pos, total_recoil * 300.f, 60.f, startle_type::LIGHTER);
+
 					auto total_kickback = total_recoil;
 
 					if (sentience.use_button == use_button_state::DEFUSING) {
