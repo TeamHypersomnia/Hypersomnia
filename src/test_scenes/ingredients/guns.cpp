@@ -2260,7 +2260,7 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4500.f, 4500.f};
-			gun_def.shot_cooldown_ms = 84.f;
+			gun_def.shot_cooldown_ms = 90.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
@@ -2329,7 +2329,7 @@ namespace test_flavours {
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.052f;
-			gun_def.recoil_multiplier = 0.73;
+			gun_def.recoil_multiplier = 0.68;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);

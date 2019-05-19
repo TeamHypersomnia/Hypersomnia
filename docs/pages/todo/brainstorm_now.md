@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Optional variation for movement of moths, in movement path system
+- Layer for flying organisms
+
 - A command to add official flavours to the map
 	- Would not add existing ones
 	- Check if one exists before adding?
