@@ -1583,6 +1583,73 @@ void load_test_scene_particle_effects(
 	}
 
 	{
+		auto make_insect_sparkles = [&](
+			const auto id, 
+			const rgba col_1,
+			const rgba col_2
+		) {
+			auto& effect = acquire_effect(id);
+
+			particles_emission em;
+			em.spread_degrees = float_range(15, 126);
+			em.particles_per_sec = float_range(20, 141);
+			em.stream_lifetime_ms = float_range(31, 54);
+			em.base_speed = float_range(10, 20);
+			em.rotation_speed = float_range(0, 0);
+			em.particle_lifetime_ms = float_range(100, 2000);
+
+			for (int i = 0; i < 5; ++i) {
+				general_particle particle_definition;
+
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 0;
+				
+				set_with_size(particle_definition,
+					to_image_id(test_scene_image_id::BLANK), 
+					vec2i(i % 2 + 1, i % 2 + 1), 
+					(i == 0 || i == 4) ? col_2 : col_1
+				);
+
+				particle_definition.alpha_levels = 1;
+				particle_definition.shrink_when_ms_remaining = 100.f;
+
+				em.add_particle_definition(particle_definition);
+			}
+
+			{
+				general_particle particle_definition;
+
+				particle_definition.angular_damping = 0;
+				particle_definition.linear_damping = 0;
+				particle_definition.acc = { 40, -40 };
+				
+				set(particle_definition, anim.frames[2].image_id, col_1);
+
+				particle_definition.alpha_levels = 1;
+				particle_definition.shrink_when_ms_remaining = 100.f;
+
+				em.add_particle_definition(particle_definition);
+			}
+
+			em.size_multiplier = float_range(1, 1.5);
+			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
+			em.initial_rotation_variation = 0;
+			em.should_particles_look_towards_velocity = false;
+
+			em.randomize_spawn_point_within_circle_of_inner_radius = float_range(1.f, 3.f);
+			em.randomize_spawn_point_within_circle_of_outer_radius = float_range(4.f, 9.f);
+
+			em.randomize_acceleration = true;
+
+			effect.emissions.push_back(em);
+		};
+
+		make_insect_sparkles(test_scene_particle_effect_id::GREEN_RED_INSECT_SPARKLES, green, red);
+		make_insect_sparkles(test_scene_particle_effect_id::CYAN_BLUE_INSECT_SPARKLES, cyan, ltblue);
+		make_insect_sparkles(test_scene_particle_effect_id::VIOLET_GREEN_INSECT_SPARKLES, green, violet);
+	}
+
+	{
 		auto& effect = acquire_effect(test_scene_particle_effect_id::ROUND_ROTATING_BLOOD_STREAM);
 
 		particles_emission em;

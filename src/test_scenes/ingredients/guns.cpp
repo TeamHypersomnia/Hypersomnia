@@ -2268,12 +2268,12 @@ namespace test_flavours {
 			gun_def.damage_multiplier = 3.3f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 8;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
-			gun_def.kickback_towards_wielder = kickback_mult * 13.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 8.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(450);
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.052f;
-			gun_def.recoil_multiplier = 0.57;
+			gun_def.recoil_multiplier = 0.5;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);

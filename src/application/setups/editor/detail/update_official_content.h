@@ -6,26 +6,7 @@
 #include "augs/misc/pool/pool_allocate.h"
 #include "augs/templates/introspection_utils/introspective_equal.h"
 
-template <class P, class I>
-auto find_asset_id_by_name(
-	const std::string& searched_name,
-	const P& definitions,
-	const I& image_defs
-) {
-	using K = typename P::key_type;
-
-	std::optional<K> result_id;
-
-	for_each_id_and_object(definitions,
-		[&](const auto id, const auto& l) {
-			if (searched_name == ::get_displayed_name(l, image_defs)) {
-				result_id = id;
-			}
-		}
-	);
-
-	return result_id;
-}
+#include "application/setups/editor/detail/find_asset_id.h"
 
 template <class T, class F>
 void on_each_object_in_object(T& object, F&& callback) {

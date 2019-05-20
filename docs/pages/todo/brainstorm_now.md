@@ -30,6 +30,8 @@ summary: That which we are brainstorming at the moment.
 
 - Editor errata
 	- fix confusing undo behaviour when duplicating entities
+	- particle delete command does not show message
+	- if duplicate names in project, the button just does not work in asset file choice dialog
 
 - minimally buff pro90 over zamieć: perhaps increase the round's impact a little?
 
