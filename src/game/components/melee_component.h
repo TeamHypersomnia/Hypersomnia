@@ -12,6 +12,7 @@
 #include "game/container_sizes.h"
 #include "augs/pad_bytes.h"
 #include "augs/math/physics_structs.h"
+#include "game/detail/adversarial_meta.h"
 
 struct melee_clash_def {
 	// GEN INTROSPECTOR struct melee_clash_def
@@ -71,6 +72,7 @@ namespace invariants {
 		augs::enum_array<melee_attack_definition, weapon_action_type> actions;
 		melee_throw_def throw_def;
 		real32 movement_speed_bonus = 1.1f;
+		adversarial_meta adversarial = { static_cast<money_type>(1200) };
 		// END GEN INTROSPECTOR
 	};
 }

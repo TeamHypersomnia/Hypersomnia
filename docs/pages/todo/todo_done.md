@@ -3059,3 +3059,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - bug: crash in openal when creating new tab in editor after having played in the first tab
 
+- fix knives not giving rewards
+

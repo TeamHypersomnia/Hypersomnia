@@ -13,6 +13,9 @@ struct fish_movement_def {
 	real32 base_bubble_interval_ms = 1000.f;
 	unsigned seed_offset = 0u;
 	particle_effect_input bubble_effect;
+
+	real32 sine_wandering_amplitude = 10.f;
+	real32 sine_wandering_period = 50.f;
 	// END GEN INTROSPECTOR
 };
 

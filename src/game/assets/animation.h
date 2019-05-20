@@ -174,6 +174,7 @@ struct plain_animation_meta {
 
 struct plain_animation : animation_mixin<plain_animation> {
 	// GEN INTROSPECTOR struct plain_animation
+	std::string name_suffix;
 	plain_animation_frames_type frames = {};
 	plain_animation_meta meta;
 	// END GEN INTROSPECTOR

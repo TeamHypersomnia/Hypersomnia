@@ -11,6 +11,9 @@ const adversarial_meta* find_adversarial_meta(const E& from) {
 	else if constexpr(E::template has<invariants::explosive>()) {
 		return std::addressof(from.template get<invariants::explosive>().adversarial);
 	}
+	else if constexpr(E::template has<invariants::melee>()) {
+		return std::addressof(from.template get<invariants::melee>().adversarial);
+	}
 
 	return nullptr;
 }

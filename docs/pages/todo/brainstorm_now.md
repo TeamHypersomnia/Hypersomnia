@@ -28,8 +28,6 @@ summary: That which we are brainstorming at the moment.
 
 - fix cosine of angle being wrongly compared causing a bug in movement path system
 
-- fix knives not giving rewards
-
 - Editor errata
 	- fix confusing undo behaviour when duplicating entities
 
