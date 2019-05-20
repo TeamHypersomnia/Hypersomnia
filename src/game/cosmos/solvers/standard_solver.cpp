@@ -124,8 +124,11 @@ void standard_solve(const logic_step step) {
 		animation_system().advance_stateful_animations(step);
 	}
 
-	movement_system().set_movement_flags_from_input(step);
-	movement_system().apply_movement_forces(step);
+	{
+		auto scope = measure_scope(performance.movement);
+		movement_system().set_movement_flags_from_input(step);
+		movement_system().apply_movement_forces(step);
+	}
 
 	crosshair_system().handle_crosshair_intents(step);
 	crosshair_system().update_base_offsets(step);

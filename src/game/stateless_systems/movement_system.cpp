@@ -247,6 +247,47 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			const bool should_decelerate_due_to_walk = is_walking && movement.animation_amount >= num_frames * frame_ms - 60.f;
 			const bool propelling = !should_decelerate_due_to_walk && non_zero_requested;
 
+			real32 chosen_ground_speed_mult = 1.f;
+			const auto& common_assets = cosm.get_common_assets();
+			auto standard_effect = common_assets.standard_footstep;
+			auto chosen_effect = standard_effect;
+			
+			const auto transform = it.get_logic_transform();
+
+			{
+				/* Choose effect based on where the foot has landed */
+
+				get_hovered_world_entity(
+					cosm,
+#if 0
+					effect_transform.pos,
+#else
+					transform.pos,
+#endif
+					[&](const auto ground_id) {
+						if (const auto ground_entity = cosm[ground_id]) {
+							const auto& ground = ground_entity.template get<invariants::ground>();
+
+							if (ground.footstep_effect.is_enabled) {
+								chosen_effect = ground.footstep_effect.value;
+								chosen_ground_speed_mult = ground.movement_speed_mult;
+								return true;
+							}
+						}
+
+						return false;
+					},
+					render_layer_filter::whitelist(
+						render_layer::CAR_INTERIOR,
+						render_layer::ON_ON_FLOOR,
+						render_layer::ON_FLOOR,
+						render_layer::FLOOR_AND_ROAD,
+						render_layer::GROUND,
+						render_layer::UNDER_GROUND
+					)
+				);
+			}
+
 			if (propelling) {
 				if (movement.was_sprint_effective) {
 					movement_force_mult /= 2.f;
@@ -283,6 +324,7 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				}
 
 				applied_force *= movement_force_mult;
+				applied_force *= chosen_ground_speed_mult;
 
 				rigid_body.apply_force(
 					applied_force, 
@@ -299,8 +341,6 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			const auto speed_mult = current_speed / conceptual_max_speed;
 
 			auto start_footstep_effect = [&]() {
-				const auto transform = it.get_logic_transform();
-
 				const auto velocity_degrees = current_velocity.degrees();
 				auto effect_transform = transformr(transform.pos, velocity_degrees);
 
@@ -329,43 +369,6 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					}
 
 					effect_transform *= transformr(offset);
-				}
-
-				const auto& common_assets = cosm.get_common_assets();
-				auto standard_effect = common_assets.standard_footstep;
-				auto chosen_effect = standard_effect;
-				
-				{
-					/* Choose effect based on where the foot has landed */
-
-					get_hovered_world_entity(
-						cosm,
-#if 0
-						effect_transform.pos,
-#else
-						transform.pos,
-#endif
-						[&](const auto ground_id) {
-							if (const auto ground_entity = cosm[ground_id]) {
-								const auto& ground = ground_entity.template get<invariants::ground>();
-
-								if (ground.footstep_effect.is_enabled) {
-									chosen_effect = ground.footstep_effect.value;
-									return true;
-								}
-							}
-
-							return false;
-						},
-						render_layer_filter::whitelist(
-							render_layer::CAR_INTERIOR,
-							render_layer::ON_ON_FLOOR,
-							render_layer::ON_FLOOR,
-							render_layer::FLOOR_AND_ROAD,
-							render_layer::GROUND,
-							render_layer::UNDER_GROUND
-						)
-					);
 				}
 
 				auto& sound = chosen_effect.sound;
