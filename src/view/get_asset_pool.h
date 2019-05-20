@@ -62,6 +62,6 @@ decltype(auto) get_displayed_name(const T& object, const D& image_defs) {
 		return cut_trailing_number_and_spaces(::get_displayed_name(image_defs[image_id]));
 	}
 	else {
-		return object.name;
+		return object.get_name();
 	}
 }

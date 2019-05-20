@@ -11,6 +11,8 @@
 #include "application/setups/editor/detail/maybe_different_colors.h"
 #include "augs/misc/readable_bytesize.h"
 
+#include "application/setups/editor/detail/update_official_content.h"
+
 void editor_player_gui::perform(const editor_command_input cmd_in) {
 	using namespace augs::imgui;
 
@@ -162,5 +164,16 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 		else {
 			text_disabled("Writing entropies to a live file is disabled.");
 		}
+	}
+
+	thread_local update_official_content_settings settings;
+
+	checkbox("Overwrite recoils", settings.overwrite_recoils);
+	checkbox("Overwrite physical_materials", settings.overwrite_physical_materials);
+	checkbox("Overwrite common assets", settings.overwrite_common_assets);
+	checkbox("Overwrite non-decoration flavours", settings.overwrite_non_decoration_flavours);
+
+	if (ImGui::Button("Update official content")) {
+		update_official_content(cmd_in, settings);
 	}
 }
