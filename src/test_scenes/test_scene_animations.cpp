@@ -339,7 +339,7 @@ void load_test_scene_animations(
 			}
 		};
 
-		auto bare_or_akimbo_shoot = [&](const T test_id, const I first_frame_id) {
+		auto bare_or_akimbo_shoot = [&](const T test_id, const I first_frame_id) -> auto& {
 			auto& anim = make_torso(test_id, first_frame_id, 20.0f);
 
 			if (anim.frames.size() == 6) {
@@ -347,6 +347,7 @@ void load_test_scene_animations(
 			}
 
 			make_shoot_durations(anim.frames);
+			return anim;
 		};
 
 		auto walk_with_flip = [&](const T test_id, const I first_frame_id) {
@@ -364,10 +365,14 @@ void load_test_scene_animations(
 				I::METROPOLIS_TORSO_BARE_WALK_SHOT_1
 			);
 
-			bare_or_akimbo_shoot(
-				T::METROPOLIS_TORSO_BARE_SHOT,
-				I::METROPOLIS_TORSO_BARE_WALK_SHOT_1
-			);
+			{
+				auto& anim = bare_or_akimbo_shoot(
+					T::METROPOLIS_TORSO_BARE_SHOT,
+					I::METROPOLIS_TORSO_BARE_WALK_SHOT_1
+				);
+
+				anim.name_suffix = "(shot)";
+			}
 
 			standard_walk(
 				T::METROPOLIS_TORSO_RIFLE_WALK,
@@ -413,6 +418,8 @@ void load_test_scene_animations(
 					I::METROPOLIS_TORSO_KNIFE_SECD_1
 				);
 
+				anim.name_suffix = "return";
+
 				reverse_range(anim.frames);
 			}
 
@@ -429,11 +436,15 @@ void load_test_scene_animations(
 				2
 			);
 
-			pistol_gtm(
-				T::METROPOLIS_TORSO_PISTOL_GTM,
-				I::METROPOLIS_TORSO_PISTOL_PTM_1,
-				50.f
-			);
+			{
+				auto& anim = pistol_gtm(
+					T::METROPOLIS_TORSO_PISTOL_GTM,
+					I::METROPOLIS_TORSO_PISTOL_PTM_1,
+					50.f
+				);
+
+				anim.name_suffix = "(gtm)";
+			}
 
 			standard_shoot(
 				T::METROPOLIS_TORSO_RIFLE_SHOT,
@@ -476,10 +487,14 @@ void load_test_scene_animations(
 				I::METROPOLIS_TORSO_AKIMBO_WALK_SHOT_1
 			);
 
-			bare_or_akimbo_shoot(
-				T::METROPOLIS_TORSO_AKIMBO_SHOT,
-				I::METROPOLIS_TORSO_AKIMBO_WALK_SHOT_1
-			);
+			{
+				auto& anim = bare_or_akimbo_shoot(
+					T::METROPOLIS_TORSO_AKIMBO_SHOT,
+					I::METROPOLIS_TORSO_AKIMBO_WALK_SHOT_1
+				);
+
+				anim.name_suffix = "(shot)";
+			}
 		}
 
 		{
@@ -488,10 +503,14 @@ void load_test_scene_animations(
 				I::RESISTANCE_TORSO_BARE_WALK_SHOT_1
 			);
 
-			bare_or_akimbo_shoot(
-				T::RESISTANCE_TORSO_BARE_SHOT,
-				I::RESISTANCE_TORSO_BARE_WALK_SHOT_1
-			);
+			{
+				auto& anim = bare_or_akimbo_shoot(
+					T::RESISTANCE_TORSO_BARE_SHOT,
+					I::RESISTANCE_TORSO_BARE_WALK_SHOT_1
+				);
+
+				anim.name_suffix = "(shot)";
+			}
 
 			standard_walk(
 				T::RESISTANCE_TORSO_RIFLE_WALK,
@@ -537,6 +556,8 @@ void load_test_scene_animations(
 					I::RESISTANCE_TORSO_KNIFE_SECD_1
 				);
 
+				anim.name_suffix = "return";
+
 				reverse_range(anim.frames);
 			}
 
@@ -553,11 +574,15 @@ void load_test_scene_animations(
 				2
 			);
 
-			pistol_gtm(
-				T::RESISTANCE_TORSO_PISTOL_GTM,
-				I::RESISTANCE_TORSO_PISTOL_PTM_1,
-				50.f
-			);
+			{
+				auto& anim = pistol_gtm(
+					T::RESISTANCE_TORSO_PISTOL_GTM,
+					I::RESISTANCE_TORSO_PISTOL_PTM_1,
+					50.f
+				);
+
+				anim.name_suffix = "(gtm)";
+			}
 
 			standard_shoot(
 				T::RESISTANCE_TORSO_RIFLE_SHOT,
@@ -600,10 +625,14 @@ void load_test_scene_animations(
 				I::RESISTANCE_TORSO_AKIMBO_WALK_SHOT_1
 			);
 
-			bare_or_akimbo_shoot(
-				T::RESISTANCE_TORSO_AKIMBO_SHOT,
-				I::RESISTANCE_TORSO_AKIMBO_WALK_SHOT_1
-			);
+			{
+				auto& anim = bare_or_akimbo_shoot(
+					T::RESISTANCE_TORSO_AKIMBO_SHOT,
+					I::RESISTANCE_TORSO_AKIMBO_WALK_SHOT_1
+				);
+
+				anim.name_suffix = "(shot)";
+			}
 		}
 	}
 

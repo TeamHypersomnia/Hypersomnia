@@ -59,7 +59,7 @@ template <class T, class D>
 decltype(auto) get_displayed_name(const T& object, const D& image_defs) {
 	if constexpr(has_frames_v<T>) {
 		const auto image_id = object.frames[0].image_id;
-		return cut_trailing_number_and_spaces(::get_displayed_name(image_defs[image_id]));
+		return cut_trailing_number_and_spaces(::get_displayed_name(image_defs[image_id])) + " " + object.name_suffix;
 	}
 	else {
 		return object.get_name();
