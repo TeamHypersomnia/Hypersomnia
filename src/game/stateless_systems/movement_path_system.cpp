@@ -112,7 +112,13 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 							const auto facing = current_dir.dot(offset_dir);
 
-							if (facing < fov_half_degrees_cos) {
+							/*
+								Facing can be between -1 (180) and 1 (0)
+								fov_half_degrees_cos = -0.70710...
+								thus facing must be gequal than fov_half_degrees_cos.
+							*/
+
+							if (facing >= fov_half_degrees_cos) {
 								callback(typed_neighbor);
 							}
 						});
@@ -220,7 +226,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 									tip_pos,
 									augs::make_rect_points(tr->pos, size, tr->rotation),
 									tr->pos,
-									40.f,
+									60.f,
 									0.2f
 								);
 							}
