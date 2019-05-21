@@ -142,21 +142,48 @@ namespace test_flavours {
 			dirt.particles.id = to_particle_effect_id(test_scene_particle_effect_id::FOOTSTEP_SMOKE);
 
 			ground_def.footstep_effect.emplace(dirt);
+			ground_def.movement_speed_mult = 0.95f;
 
 			meta.set(ground_def);
 		}
 
-		flavour_with_sprite(
-			test_sprite_decorations::ROAD_DIRT,
-			test_scene_image_id::ROAD_FRONT_DIRT,
-			render_layer::FLOOR_AND_ROAD
-		);
+		{
+			auto& meta = flavour_with_sprite(
+				test_sprite_decorations::ROAD_DIRT,
+				test_scene_image_id::ROAD_FRONT_DIRT,
+				render_layer::FLOOR_AND_ROAD
+			);
 
-		flavour_with_tiled_sprite(
-			test_sprite_decorations::ROAD,
-			test_scene_image_id::ROAD,
-			render_layer::FLOOR_AND_ROAD
-		);
+			invariants::ground ground_def;
+
+			footstep_effect_input road;
+			road.sound.id = to_sound_id(test_scene_sound_id::STANDARD_FOOTSTEP);
+			road.sound.modifier.gain = .35f;
+			road.particles.id = to_particle_effect_id(test_scene_particle_effect_id::FOOTSTEP_SMOKE);
+
+			ground_def.footstep_effect.emplace(road);
+
+			meta.set(ground_def);
+		}
+
+		{
+			auto& meta = flavour_with_tiled_sprite(
+				test_sprite_decorations::ROAD,
+				test_scene_image_id::ROAD,
+				render_layer::FLOOR_AND_ROAD
+			);
+
+			invariants::ground ground_def;
+
+			footstep_effect_input road;
+			road.sound.id = to_sound_id(test_scene_sound_id::STANDARD_FOOTSTEP);
+			road.sound.modifier.gain = .35f;
+			road.particles.id = to_particle_effect_id(test_scene_particle_effect_id::FOOTSTEP_SMOKE);
+
+			ground_def.footstep_effect.emplace(road);
+
+			meta.set(ground_def);
+		}
 
 		{
 			auto& meta = flavour_with_tiled_sprite(

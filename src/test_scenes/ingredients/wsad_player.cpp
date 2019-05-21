@@ -288,6 +288,8 @@ namespace test_flavours {
 
 				movement.dash_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STANDARD_DASH);
 				movement.dash_sound.id = to_sound_id(test_scene_sound_id::STANDARD_DASH);
+				movement.surface_slowdown_max_ms = 500.f;
+				movement.surface_slowdown_unit_ms = 300.f;
 
 				meta.set(movement);
 			}

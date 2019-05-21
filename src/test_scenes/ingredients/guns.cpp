@@ -2286,7 +2286,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta).density = 0.1f;
 			set_density_mult(meta, 1.5);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1200.f);
-			meta.get<invariants::item>().standard_price = 3100;
+			meta.get<invariants::item>().standard_price = 3000;
 			set_chambering_duration_ms(meta, 450.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			only_allow_mag(meta, test_container_items::BILMER2000_MAGAZINE);
@@ -2342,7 +2342,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta).density = 0.1f;
 			set_density_mult(meta, 1.4);
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1100.f);
-			meta.get<invariants::item>().standard_price = 3300;
+			meta.get<invariants::item>().standard_price = 3400;
 			set_chambering_duration_ms(meta, 450.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			only_allow_mag(meta, test_container_items::SZTURM_MAGAZINE);
@@ -2623,7 +2623,7 @@ namespace test_flavours {
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.072f;
 			gun_def.firing_engine_sound.modifier.pitch = 0.5f;
-			gun_def.recoil_multiplier = 0.84f;
+			gun_def.recoil_multiplier = 0.74f;
 
 			gun_def.recoil.id = to_recoil_id(test_scene_recoil_id::GENERIC);
 			gun_def.firing_engine_sound.id = to_sound_id(test_scene_sound_id::FIREARM_ENGINE);
@@ -2640,7 +2640,7 @@ namespace test_flavours {
 
 			make_default_gun_container(meta, item_holding_stance::RIFLE_LIKE, 1500.f, 0.f, true);
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::PLASMA_DRAW);
-			meta.get<invariants::item>().standard_price = 3600;
+			meta.get<invariants::item>().standard_price = 3800;
 			set_chambering_duration_ms(meta, 900.f);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			only_allow_mag(meta, test_container_items::DATUM_GUN_MAGAZINE);

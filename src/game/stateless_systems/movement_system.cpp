@@ -207,21 +207,13 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				}
 			}
 
-			const bool constant_inertia = movement.const_inertia_ms > 0.f;
-
-			if (constant_inertia) {
-				movement.const_inertia_ms -= delta_ms;
-			}
-
 			if (movement.dash_cooldown_ms > 0.f) {
 				movement.dash_cooldown_ms -= delta_ms;
 			}
 
 			const bool linear_inertia = movement.linear_inertia_ms > 0.f;
-
-			if (linear_inertia) {
-				movement.linear_inertia_ms -= delta_ms;
-			}
+			const bool surface_slowdown = movement.surface_slowdown_ms > 0.f;
+			const bool constant_inertia = movement.const_inertia_ms > 0.f;
 
 			const auto num_frames = movement_def.animation_frame_num;
 			const auto frame_ms = movement_def.animation_frame_ms;
@@ -247,47 +239,6 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			const bool should_decelerate_due_to_walk = is_walking && movement.animation_amount >= num_frames * frame_ms - 60.f;
 			const bool propelling = !should_decelerate_due_to_walk && non_zero_requested;
 
-			real32 chosen_ground_speed_mult = 1.f;
-			const auto& common_assets = cosm.get_common_assets();
-			auto standard_effect = common_assets.standard_footstep;
-			auto chosen_effect = standard_effect;
-			
-			const auto transform = it.get_logic_transform();
-
-			{
-				/* Choose effect based on where the foot has landed */
-
-				get_hovered_world_entity(
-					cosm,
-#if 0
-					effect_transform.pos,
-#else
-					transform.pos,
-#endif
-					[&](const auto ground_id) {
-						if (const auto ground_entity = cosm[ground_id]) {
-							const auto& ground = ground_entity.template get<invariants::ground>();
-
-							if (ground.footstep_effect.is_enabled) {
-								chosen_effect = ground.footstep_effect.value;
-								chosen_ground_speed_mult = ground.movement_speed_mult;
-								return true;
-							}
-						}
-
-						return false;
-					},
-					render_layer_filter::whitelist(
-						render_layer::CAR_INTERIOR,
-						render_layer::ON_ON_FLOOR,
-						render_layer::ON_FLOOR,
-						render_layer::FLOOR_AND_ROAD,
-						render_layer::GROUND,
-						render_layer::UNDER_GROUND
-					)
-				);
-			}
-
 			if (propelling) {
 				if (movement.was_sprint_effective) {
 					movement_force_mult /= 2.f;
@@ -299,6 +250,10 @@ void movement_system::apply_movement_forces(const logic_step step) {
 
 				if (constant_inertia) {
 					movement_force_mult *= movement_def.const_inertia_mult;
+				}
+
+				if (surface_slowdown) {
+					movement_force_mult *= movement.surface_slowdown_ms / movement_def.surface_slowdown_max_ms;
 				}
 
 				if (linear_inertia) {
@@ -324,7 +279,6 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				}
 
 				applied_force *= movement_force_mult;
-				applied_force *= chosen_ground_speed_mult;
 
 				rigid_body.apply_force(
 					applied_force, 
@@ -341,6 +295,8 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			const auto speed_mult = current_speed / conceptual_max_speed;
 
 			auto start_footstep_effect = [&]() {
+				const auto transform = it.get_logic_transform();
+
 				const auto velocity_degrees = current_velocity.degrees();
 				auto effect_transform = transformr(transform.pos, velocity_degrees);
 
@@ -369,6 +325,56 @@ void movement_system::apply_movement_forces(const logic_step step) {
 					}
 
 					effect_transform *= transformr(offset);
+				}
+
+				const auto& common_assets = cosm.get_common_assets();
+				auto standard_effect = common_assets.standard_footstep;
+				auto chosen_effect = standard_effect;
+				
+				{
+					/* Choose effect based on where the foot has landed */
+
+					real32 chosen_speed_mult = 1.f;
+
+					get_hovered_world_entity(
+						cosm,
+#if 0
+						effect_transform.pos,
+#else
+						transform.pos,
+#endif
+						[&](const auto ground_id) {
+							if (const auto ground_entity = cosm[ground_id]) {
+								const auto& ground = ground_entity.template get<invariants::ground>();
+
+								if (ground.footstep_effect.is_enabled) {
+									chosen_effect = ground.footstep_effect.value;
+									chosen_speed_mult = ground.movement_speed_mult;
+									return true;
+								}
+							}
+
+							return false;
+						},
+						render_layer_filter::whitelist(
+							render_layer::CAR_INTERIOR,
+							render_layer::ON_ON_FLOOR,
+							render_layer::ON_FLOOR,
+							render_layer::FLOOR_AND_ROAD,
+							render_layer::GROUND,
+							render_layer::UNDER_GROUND
+						)
+					);
+
+					const auto drag_mult = 1 - chosen_speed_mult;
+
+					rigid_body.apply_impulse(
+						(current_velocity * -1 * drag_mult) * movement_def.surface_drag_mult,
+						movement_def.applied_force_offset
+					);
+
+					movement.surface_slowdown_ms += movement_def.surface_slowdown_unit_ms * drag_mult;
+					movement.surface_slowdown_ms = std::min(movement.surface_slowdown_ms, movement_def.surface_slowdown_max_ms);
 				}
 
 				auto& sound = chosen_effect.sound;
@@ -467,6 +473,18 @@ void movement_system::apply_movement_forces(const logic_step step) {
 			}
 
 			rigid_body.infer_damping();
+
+			if (surface_slowdown) {
+				movement.surface_slowdown_ms -= delta_ms;
+			}
+
+			if (constant_inertia) {
+				movement.const_inertia_ms -= delta_ms;
+			}
+
+			if (linear_inertia) {
+				movement.linear_inertia_ms -= delta_ms;
+			}
 		}
 	);
 }

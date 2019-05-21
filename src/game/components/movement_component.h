@@ -86,6 +86,8 @@ namespace components {
 		bool was_walk_effective = false;
 		pad_bytes<1> pad;
 
+		real32 surface_slowdown_ms = 0.f;
+
 		real32 dash_cooldown_ms = 0.f;
 		real32 const_inertia_ms = 0.f;
 		real32 linear_inertia_ms = 0.f;
@@ -134,6 +136,10 @@ namespace invariants {
 		sound_effect_input dash_sound;
 
 		augs::bound<real32> dash_effect_bound = augs::bound<real32> { 0.88f, 1.0f };
+
+		real32 surface_slowdown_max_ms = 200.f;
+		real32 surface_slowdown_unit_ms = 100.f;
+		real32 surface_drag_mult = 0.5f;
 		// END GEN INTROSPECTOR
 	};
 }

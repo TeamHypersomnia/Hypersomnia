@@ -3061,3 +3061,8 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - fix knives not giving rewards
 
+- Introduce gradual slowdown when stepping on an unfriendly surface
+	- amount_ms
+		- const vs linear? we'll test
+	- damn, we need to reimport
+
