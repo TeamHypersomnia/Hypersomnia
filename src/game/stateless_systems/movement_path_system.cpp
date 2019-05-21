@@ -76,7 +76,17 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				const real32 comfort_zone_radius = 50.f;
 				const real32 cohesion_zone_radius = 60.f;
 
+				const auto current_speed_mult = movement_path.last_speed / max_speed;
+				const auto wandering_sine = repro::sin(real32(global_time / def.sine_wandering_period * current_speed_mult)) * def.sine_wandering_amplitude * current_speed_mult;
+				const auto perpendicular_dir = current_dir.perpendicular_cw();
+
+				const auto subject_layer = subject.template get<invariants::render>().layer;
+
 				auto for_each_neighbor_within = [&](const auto radius, auto callback) {
+					if (subject_layer == render_layer::INSECTS) {
+						return;
+					}
+
 					auto& neighbors = thread_local_visible_entities();
 
 					neighbors.acquire_non_physical({
@@ -85,8 +95,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 						visible_entities_query::accuracy_type::PROXIMATE,
 						render_layer_filter::whitelist(
 							render_layer::UPPER_FISH,
-							render_layer::BOTTOM_FISH,
-							render_layer::INSECTS
+							render_layer::BOTTOM_FISH
 						),
 						{ tree_of_npo_type::ORGANISMS }
 					});
@@ -110,7 +119,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 					});
 				};
 
-				auto velocity = current_dir * min_speed;
+				auto velocity = current_dir * min_speed + perpendicular_dir * wandering_sine;
 
 				real32 total_startle_applied = 0.f;
 
@@ -137,8 +146,6 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 				{
 					auto greatest_avoidance = vec2::zero;
-
-					const auto subject_layer = subject.template get<invariants::render>().layer;
 
 					for_each_neighbor_within(comfort_zone_radius, [&](const auto typed_neighbor) {
 						const auto neighbor_layer = typed_neighbor.template get<invariants::render>().layer;

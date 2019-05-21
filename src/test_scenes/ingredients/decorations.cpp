@@ -109,6 +109,10 @@ namespace test_flavours {
 				def.bubble_effect.id = to_particle_effect_id(test_scene_particle_effect_id::FISH_BUBBLE);
 				def.bubble_effect.modifier.colorize = bubble_neon;
 				def.base_bubble_interval_ms = 200.f;
+
+				def.sine_wandering_amplitude = 1.f;
+				def.sine_wandering_period = 1.2f;
+
 				meta.set(movement_path_def);
 			}
 		};
