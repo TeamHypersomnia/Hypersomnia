@@ -65,6 +65,10 @@ void play_collision_sound(
 					start.collision_sound_cooldown_duration = sound_def->cooldown_duration;
 					start.collision_sound_occurences_before_cooldown = sound_def->occurences_before_cooldown;
 
+					// TODO: PARAMETRIZE!
+					effect.modifier.max_distance = 2700.f;
+					effect.modifier.reference_distance = 700.f;
+
 					/* TODO: properly determine predictability based on who thrown the item! */
 					/* TODO: properly determine predictability based on if the collider's owning capability is a player! */
 

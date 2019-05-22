@@ -339,9 +339,15 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 					if (primary_trigger_pressed) {
 						if (clk.try_to_fire_and_reset(200.f, gun.when_last_played_trigger_effect)) {
-							const auto& chosen_effect = gun_def.trigger_pull_sound;
+							auto t = gun_def.trigger_pull_sound;
+
+							// TODO: PARAMETRIZE!
+
+							t.modifier.max_distance = 2000.f;
+							t.modifier.reference_distance = 600.f;
+
 							const auto predictability = predictable_only_by(owning_capability);
-							chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability), predictability);
+							t.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability), predictability);
 						}
 					}
 				};
@@ -513,8 +519,14 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 						if (transfer_cooldown_passed && shot_cooldown_passed && feasible_wielding) {
 							if (const auto next_cartridge = find_next_cartridge(gun_entity); next_cartridge.is_set()) {
 								if (progress == 0.f) {
-									const auto& chosen_effect = gun_def.chambering_sound;
-									chosen_effect.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability), predictability);
+									auto t = gun_def.chambering_sound;
+
+									// TODO: PARAMETRIZE!
+
+									t.modifier.max_distance = 2000.f;
+									t.modifier.reference_distance = 600.f;
+
+									t.start(step, sound_effect_start_input::at_entity(gun_entity).set_listener(owning_capability), predictability);
 								}
 
 								progress += delta.in_milliseconds();

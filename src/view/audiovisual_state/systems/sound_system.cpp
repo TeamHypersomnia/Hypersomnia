@@ -247,10 +247,16 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 		ref_dist = defaults.reference_distance;
 	}
 
+	if (max_dist == 0.f) {
+		max_dist = 1.f;
+	}
+
 	const bool is_linear = 
 		dist_model == augs::distance_model::LINEAR_DISTANCE
 		|| dist_model == augs::distance_model::LINEAR_DISTANCE_CLAMPED
 	;
+
+	const bool is_nonlinear = !is_linear && dist_model != augs::distance_model::NONE;
 
 	const auto mult_via_settings = [&]() {
 		if (original.input.modifier.always_direct_listener) {
@@ -278,26 +284,32 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 	}
 #endif
 
-	source.set_pitch(m.pitch * in.speed_multiplier);
-	source.set_gain((1 - flash_mult) * std::clamp(m.gain, 0.f, 1.f) * mult_via_settings);
-	source.set_reference_distance(si, ref_dist);
-	source.set_looping(m.repetitions == -1);
-	source.set_distance_model(dist_model);
-	source.set_doppler_factor(std::max(0.f, m.doppler_factor));
+	float custom_dist_gain_mult = 1.f;
 
 	if (is_linear) {
 		source.set_max_distance(si, max_dist);
 	}
-	else {
-		/* 
-			rolloff does not make sense for linear models. 
-			Simply decrease the max_distance parameter instead.
+	else if (is_nonlinear && !is_direct_listener && listening_character) {
+		/* Let's just do our custom gain calculation */
 
-			Here we estimate the rolloff factor based on what we want as the max_distance.
-		*/
+		const auto dist = (current_transform.pos - listening_character.get_viewing_transform(in.interp).pos).length();
 
-		source.set_rolloff_factor(std::max(0.f, defaults.basic_nonlinear_rolloff * (ref_dist / max_dist)));
+		if (dist > ref_dist) {
+			custom_dist_gain_mult *= 1 - std::clamp(dist - ref_dist, 0.f, max_dist) / max_dist;
+		}
+
+		custom_dist_gain_mult *= custom_dist_gain_mult;
+
+		//source.set_max_distance(si, max_dist);
+		//source.set_rolloff_factor(std::max(0.f, defaults.basic_nonlinear_rolloff * (ref_dist / max_dist)));
 	}
+
+	source.set_pitch(m.pitch * in.speed_multiplier);
+	source.set_gain(std::clamp((1 - flash_mult) * std::clamp(m.gain, 0.f, 1.f) * mult_via_settings * custom_dist_gain_mult, 0.f, 1.f));
+	source.set_reference_distance(si, ref_dist);
+	source.set_looping(m.repetitions == -1);
+	source.set_distance_model(dist_model);
+	source.set_doppler_factor(std::max(0.f, m.doppler_factor));
 
 	source.set_spatialize(!is_direct_listener);
 	source.set_direct_channels(is_direct_listener);

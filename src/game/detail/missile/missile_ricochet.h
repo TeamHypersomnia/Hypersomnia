@@ -137,6 +137,10 @@ static void ricochet_missile_against_surface(
 			auto effect = missile_def.ricochet_sound;
 			effect.modifier.pitch = pitch;
 
+			// TODO: PARAMETRIZE!
+			effect.modifier.max_distance = 3000.f;
+			effect.modifier.reference_distance = 1000.f;
+
 			effect.start(
 				step,
 				sound_effect_start_input::fire_and_forget(effect_transform),
