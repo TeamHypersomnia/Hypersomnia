@@ -6,10 +6,26 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- fish optimization: a simple grid
+	- we can also put an upper bound of the processed neighbors, e.g. process 3 at most
+	- linear time
+
+- fix those knife offsets 
+
+- fix szturm sound being the same as bilmer
+- vent hit sound is too silent
+
+- remember to fix your system time before hosting
+
+- fix that damn connect token
+
+- bomb falls outside the map
 - Editor errata
 	- fix confusing undo behaviour when duplicating entities
 	- particle delete command does not show message
 	- if duplicate names in project, the button just does not work in asset file choice dialog
+
+- flipping of the other hand in akimbo?
 
 - minimally buff pro90 over zamieć: perhaps increase the round's impact a little?
 
