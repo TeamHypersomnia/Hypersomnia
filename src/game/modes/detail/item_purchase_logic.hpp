@@ -204,7 +204,7 @@ void play_learnt_spell_effect(
 
 	{
 		const auto& effect = assets.standard_learnt_spell_sound;
-		effect.start(step, sound_effect_start_input::at_entity(subject), predictable_only_by(subject));
+		effect.start(step, sound_effect_start_input::at_listener(subject), predictable_only_by(subject));
 	}
 
 	{

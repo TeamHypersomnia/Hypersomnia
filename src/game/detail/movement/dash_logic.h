@@ -110,7 +110,7 @@ auto perform_dash_effects(
 
 			effect.start(
 				step,
-				sound_effect_start_input::at_entity(subject).set_listener(subject).face_velocity(),
+				sound_effect_start_input::at_listener(subject).face_velocity(),
 				predictability
 			);
 		}

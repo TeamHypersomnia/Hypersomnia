@@ -206,7 +206,7 @@ perform_transfer_result perform_transfer_impl::operator()(
 			}
 
 			if (sound.input.id.is_set()) {
-				sound.start = sound_effect_start_input::at_entity(target_root);
+				sound.start = sound_effect_start_input::at_listener(target_root);
 				output.transfer_sound.emplace(std::move(sound));
 
 				return true;
@@ -444,7 +444,7 @@ perform_transfer_result perform_transfer_impl::operator()(
 				const auto& item_def = transferred_item.get<invariants::item>();
 
 				wielded.input = item_def.wield_sound;
-				wielded.start = sound_effect_start_input::at_entity(target_root);
+				wielded.start = sound_effect_start_input::at_listener(target_root);
 
 				output.transfer_sound.emplace(std::move(wielded));
 			}
@@ -457,7 +457,7 @@ perform_transfer_result perform_transfer_impl::operator()(
 				const auto& item_def = transferred_item.get<invariants::item>();
 
 				worn.input = item_def.wear_sound;
-				worn.start = sound_effect_start_input::at_entity(target_root);
+				worn.start = sound_effect_start_input::at_listener(target_root);
 
 				output.transfer_sound.emplace(std::move(worn));
 			}
