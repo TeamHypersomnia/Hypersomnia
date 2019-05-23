@@ -2311,8 +2311,6 @@ namespace test_flavours {
 			invariants::gun gun_def;
 
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::SZTURM_MUZZLE);
-			gun_def.muzzle_shot_sound.modifier.reference_distance = 300.f;
-			gun_def.muzzle_shot_sound.modifier.max_distance = 500.f;
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4500.f, 4500.f};
@@ -2322,7 +2320,7 @@ namespace test_flavours {
 			gun_def.shell_spread_degrees = 20.f;
 			gun_def.shell_velocity = {300.f, 2500.f};
 			gun_def.damage_multiplier = 3.3f;
-			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 8;
+			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 10;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = kickback_mult * 22.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(350);

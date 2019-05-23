@@ -3089,3 +3089,4 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- can look for introspection code that checks where an image is used, maybe reuse it
 
 - correct those footstep sounds, maybe make the distance model linear?
+- fix szturm sound being the same as bilmer
