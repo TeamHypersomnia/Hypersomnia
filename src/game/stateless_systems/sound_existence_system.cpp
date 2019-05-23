@@ -59,7 +59,7 @@ void play_collision_sound(
 
 					const auto& pitch_bound = sound_def->pitch;
 					effect.modifier.pitch *= std::max(pitch_bound.first, pitch_bound.second - pitch_mult);
-					effect.modifier.gain *= gain_mult;
+					effect.modifier.gain *= std::min(1.f, gain_mult);
 
 					auto start = sound_effect_start_input::fire_and_forget(location).mark_source_collision(sub, col);
 					start.collision_sound_cooldown_duration = sound_def->cooldown_duration;

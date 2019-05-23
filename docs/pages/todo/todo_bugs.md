@@ -5,6 +5,9 @@ permalink: todo_bugs
 summary: Just a hidden scratchpad.
 ---
 
+- remember to fix your system time before hosting
+	- fix that damn connect token
+
 - Possibly disallow some editor ops when in gameplay/gui mode?
 	- E.g. there was a crash after instantiating cause the world cursor pos could not be found in gameplay mode
 

@@ -205,6 +205,8 @@ enum class test_scene_sound_id {
 	SZTURM_FINISH_UNLOAD,
 	SZTURM_FINISH_LOAD,
 
+	AIR_DUCT_COLLISION,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

@@ -3090,3 +3090,6 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - correct those footstep sounds, maybe make the distance model linear?
 - fix szturm sound being the same as bilmer
+
+- vent hit sound is too silent
+

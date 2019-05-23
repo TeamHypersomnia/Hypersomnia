@@ -13,13 +13,7 @@ summary: That which we are brainstorming at the moment.
 	- we can also put an upper bound of the processed neighbors, e.g. process 3 at most
 	- linear time
 
-- fix those knife offsets 
-
-- vent hit sound is too silent
-
-- remember to fix your system time before hosting
-
-- fix that damn connect token
+- fix those knife offsets on character
 
 - bomb falls outside the map
 - Editor errata
