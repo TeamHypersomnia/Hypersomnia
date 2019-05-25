@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Always aim with the hand that has an armed explosive
+	- If both have, prioritize primary
+	- Also if we have a scheduled throw, aim with the first melee weapon
+
+- make layer with insects hoverable
+
+- some strange recurring problem with H (temporarily hiding layers) not working
+
 - actually make two rulesets for server and playtesting
 	- perhaps do so from test scene content and replace on update official content
 

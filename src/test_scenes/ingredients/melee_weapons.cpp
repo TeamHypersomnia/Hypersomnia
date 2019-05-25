@@ -227,6 +227,21 @@ namespace test_flavours {
 
 		{
 			auto& meta = make_knife(
+				test_melee_weapons::MINI_KNIFE,
+				test_scene_image_id::MINI_KNIFE,
+				static_cast<money_type>(500),
+				faction_type::SPECTATOR,
+				0.7f,
+				white
+			);
+
+			for (auto& a : meta.get<invariants::melee>().actions) {
+				a.init_particles.id = {};
+			}
+		}
+
+		{
+			auto& meta = make_knife(
 				test_melee_weapons::POSEIDON,
 				test_scene_image_id::POSEIDON,
 				static_cast<money_type>(1000),

@@ -124,6 +124,7 @@ enum class test_melee_weapons {
 	YELLOW_DAGGER,
 
 	ASSAULT_RATTLE,
+	MINI_KNIFE,
 
 	COUNT
 	// END GEN INTROSPECTOR

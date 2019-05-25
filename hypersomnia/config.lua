@@ -479,7 +479,7 @@ return {
   },
 
   server = {
-	current_arena = "fy_minilab",
+	current_arena = "de_cyberaqua",
 	override_default_ruleset = "",
 
 	admin_nickname = "GameMaster",
@@ -489,7 +489,7 @@ return {
 
 	send_updates_once_every_tick = 1,
 	reset_resync_timer_once_every_secs = 10,
-	max_client_resyncs = 3,
+	max_client_resyncs = 10,
 
 	disabled_network_simulator = {
       latency_ms = 50,

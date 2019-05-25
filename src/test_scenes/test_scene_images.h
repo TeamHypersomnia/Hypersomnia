@@ -278,6 +278,8 @@ enum class test_scene_image_id {
 	SZTURM,
 	SZTURM_MAGAZINE,
 
+	MINI_KNIFE,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

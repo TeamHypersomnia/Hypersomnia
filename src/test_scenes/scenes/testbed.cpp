@@ -441,32 +441,37 @@ namespace test_scenes {
 			}
 		}
 
-		for (int k = 0; k < 2; ++k) {
-			give_weapon(transformr(vec2(-800 - k * 150, -200)), test_shootable_weapons::KEK9);
-			give_weapon(transformr(vec2(-800 - k * 150, 0)), test_shootable_weapons::SN69);
-			give_weapon(transformr(vec2(-800 - k * 150, 200)), test_shootable_weapons::AO44);
-			give_weapon(transformr(vec2(-800 - k * 150, 400)), test_shootable_weapons::PRO90);
-			give_weapon(transformr(vec2(-800 - k * 150, 600)), test_shootable_weapons::CALICO);
-			give_weapon(transformr(vec2(-800 - k * 150, 800)), test_shootable_weapons::WARX_FQ12);
+		{
+			int y_off = -1000;
 
-			give_weapon(transformr(vec2(-800 - k * 150, 1000)), test_melee_weapons::FURY_THROWER);
-			give_weapon(transformr(vec2(-800 - k * 150, 1200)), test_melee_weapons::CYAN_SCYTHE);
-			give_weapon(transformr(vec2(-800 - k * 150, 1400)), test_melee_weapons::ELECTRIC_RAPIER);
-			give_weapon(transformr(vec2(-800 - k * 150, 1600)), test_melee_weapons::POSEIDON);
-			give_weapon(transformr(vec2(-800 - k * 150, 1800)), test_melee_weapons::YELLOW_DAGGER);
+			for (int k = 0; k < 2; ++k) {
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + -200)), test_shootable_weapons::KEK9);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + 0)), test_shootable_weapons::SN69);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + 200)), test_shootable_weapons::AO44);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + 400)), test_shootable_weapons::PRO90);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + 600)), test_shootable_weapons::CALICO);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + 800)), test_shootable_weapons::WARX_FQ12);
 
-			give_weapon(transformr(vec2(-800 - k * 150, 2000)), test_shootable_weapons::ELON_HRL);
-			give_charge(transformr(vec2(-800 - k * 150, 2200)), test_shootable_charges::SKULL_ROCKET, 5);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + 1000)), test_melee_weapons::FURY_THROWER);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + 1200)), test_melee_weapons::CYAN_SCYTHE);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + 1400)), test_melee_weapons::ELECTRIC_RAPIER);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + 1600)), test_melee_weapons::POSEIDON);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + 1800)), test_melee_weapons::YELLOW_DAGGER);
 
-			give_weapon(transformr(vec2(-800 - k * 150, 2400)), test_shootable_weapons::BLUNAZ);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + 2000)), test_shootable_weapons::ELON_HRL);
+				give_charge(transformr(vec2(-800 - k * 150, y_off + 2200)), test_shootable_charges::SKULL_ROCKET, 5);
 
-			give_weapon(transformr(vec2(-800 - k * 150, 2600)), test_shootable_weapons::GRADOBICIE);
-			give_charge(transformr(vec2(-800 - k * 150, 2800)), test_shootable_charges::GRADOBICIE_CHARGE, 8);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + 2400)), test_shootable_weapons::BLUNAZ);
 
-			give_weapon(transformr(vec2(-800 - k * 150, 3000)), test_shootable_weapons::BULWARK);
-			give_weapon(transformr(vec2(-800 - k * 150, 3200)), test_shootable_weapons::ZAMIEC);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + 2600)), test_shootable_weapons::GRADOBICIE);
+				give_charge(transformr(vec2(-800 - k * 150, y_off + 2800)), test_shootable_charges::GRADOBICIE_CHARGE, 8);
 
-			give_weapon(transformr(vec2(-800 - k * 150, 3400)), test_melee_weapons::ASSAULT_RATTLE);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + 3000)), test_shootable_weapons::BULWARK);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + 3200)), test_shootable_weapons::ZAMIEC);
+
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + 3400)), test_melee_weapons::ASSAULT_RATTLE);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + 3600)), test_melee_weapons::MINI_KNIFE);
+			}
 		}
 
 		give_weapon(transformr(vec2(-300, -500 + 50)), test_shootable_weapons::AMPLIFIER_ARM);
