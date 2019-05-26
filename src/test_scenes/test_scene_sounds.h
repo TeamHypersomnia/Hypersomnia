@@ -207,6 +207,9 @@ enum class test_scene_sound_id {
 
 	AIR_DUCT_COLLISION,
 
+	DEAGLE_MUZZLE,
+	DEAGLE_CHAMBERING,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

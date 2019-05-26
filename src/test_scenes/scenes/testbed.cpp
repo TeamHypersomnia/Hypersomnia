@@ -44,10 +44,10 @@ namespace test_scenes {
 		rs.name = "Standard test ruleset";
 		rs.spawned_faction = faction_type::RESISTANCE;
 
-		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::SZTURM);
+		rs.initial_eq.weapon = to_entity_flavour_id(test_shootable_weapons::DEAGLE);
 		rs.initial_eq.personal_deposit_wearable = to_entity_flavour_id(test_container_items::STANDARD_PERSONAL_DEPOSIT);
 		rs.initial_eq.armor_wearable = to_entity_flavour_id(test_tool_items::ELECTRIC_SHIELD_ARMOR);
-		rs.initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::YELLOW_DAGGER);
+		rs.initial_eq.shoulder_wearable = to_entity_flavour_id(test_melee_weapons::MINI_KNIFE);
 
 		fill_range(rs.initial_eq.spells_to_give, true);
 	}
@@ -471,6 +471,7 @@ namespace test_scenes {
 
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + 3400)), test_melee_weapons::ASSAULT_RATTLE);
 				give_weapon(transformr(vec2(-800 - k * 150, y_off + 3600)), test_melee_weapons::MINI_KNIFE);
+				give_weapon(transformr(vec2(-800 - k * 150, y_off + 3800)), test_shootable_weapons::DEAGLE);
 			}
 		}
 
