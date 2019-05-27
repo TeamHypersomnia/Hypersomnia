@@ -5,6 +5,8 @@
 
 #include <Box2D/Box2D.h>
 
+#include "augs/templates/range_workers.h"
+
 #include "augs/math/math.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/algorithm_templates.h"
@@ -238,7 +240,7 @@ void visibility_system::calc_visibility(
 
 	using ray_output = physics_raycast_output;
 
-	for (const auto& request : vis_requests) {
+	auto worker = [&](const messages::visibility_information_request& request) {
 		const auto ignored_entity = request.subject;
 		const auto transform = request.eye_transform;
 		const auto request_index = index_in(vis_requests, request);
@@ -249,7 +251,7 @@ void visibility_system::calc_visibility(
 		response.source_queried_rect = request.queried_rect;
 
 		if (request.queried_rect.x < 1.f || request.queried_rect.y < 1.f) {
-			continue;
+			return;
 		}
 
 		thread_local std::vector <target_vertex> all_vertices_transformed;
@@ -983,5 +985,17 @@ void visibility_system::calc_visibility(
 				}
 			}
 		}
+	};
+
+#if 1
+	const auto num_workers = std::min(4u, std::thread::hardware_concurrency());
+	static augs::range_workers<decltype(worker)> workers = num_workers;
+	workers.resize_workers(num_workers);
+	workers.process(worker, vis_requests);
+#else
+	for (const auto& request : vis_requests) {
+		worker(request);
 	}
+#endif
+
 }
