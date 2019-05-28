@@ -14,6 +14,8 @@
 
 #include "game/stateless_systems/movement_path_system.h"
 #include "game/inferred_caches/tree_of_npo_cache.hpp"
+#include "game/inferred_caches/organism_cache.hpp"
+#include "game/inferred_caches/organism_cache_query.hpp"
 
 void movement_path_system::advance_paths(const logic_step step) const {
 	auto& cosm = step.get_cosmos();
@@ -21,28 +23,28 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 	auto& step_rng = step.step_rng;
 
-	auto& npo = cosm.get_solvable_inferred({}).tree_of_npo;
+	auto& grids = cosm.get_solvable_inferred({}).organisms;
 
 	static const auto fov_half_degrees = real32((360 - 90) / 2);
 	static const auto fov_half_degrees_cos = repro::cos(fov_half_degrees);
 
 	cosm.for_each_having<components::movement_path>(
-		[&](const auto subject) {
+		[&](const auto& subject) {
 			const auto& movement_path_def = subject.template get<invariants::movement_path>();
-
-			auto& transform = subject.template get<components::transform>();
 
 			const auto& rotation_speed = movement_path_def.continuous_rotation_speed;
 
 			if (augs::is_nonzero(rotation_speed)) {
+				auto& transform = subject.template get<components::transform>();
 				transform.rotation += rotation_speed * delta.in_seconds();
 			}
 
 			if (movement_path_def.fish_movement.is_enabled) {
 				auto& movement_path = subject.template get<components::movement_path>();
 
+				const auto& transform = subject.template get<components::transform>();
 				const auto& pos = transform.pos;
-				const auto tip_pos = *subject.find_logical_tip();
+				const auto tip_pos = subject.get_logical_tip(transform);
 
 				const auto& def = movement_path_def.fish_movement.value;
 
@@ -73,7 +75,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 				const auto current_dir = transform.get_direction();
 
-				const real32 comfort_zone_radius = 50.f;
+				const real32 comfort_zone_radius = movement_path_neighbor_query_radius_v;
 				const real32 cohesion_zone_radius = 60.f;
 
 				const auto current_speed_mult = movement_path.last_speed / max_speed;
@@ -87,27 +89,23 @@ void movement_path_system::advance_paths(const logic_step step) const {
 						return;
 					}
 
-					auto& neighbors = thread_local_visible_entities();
+					constexpr auto max_handled_organisms = std::size_t(3);
 
-					neighbors.acquire_non_physical({
-						cosm,
-						camera_cone(camera_eye(tip_pos), vec2::square(radius * 2)),
-						visible_entities_query::accuracy_type::PROXIMATE,
-						render_layer_filter::whitelist(
-							render_layer::UPPER_FISH,
-							render_layer::BOTTOM_FISH
-						),
-						{ tree_of_npo_type::ORGANISMS }
-					});
+					auto cell_callback = [&](const auto& cell) {
+						const auto& orgs = cell.organisms;
+						const auto cnt = std::min(orgs.size(), max_handled_organisms);
 
-					neighbors.for_all(cosm, [&](const auto handle) {
-						handle.template dispatch_on_having_all<components::movement_path>([&](const auto typed_neighbor) {
-							if (typed_neighbor.get_id() == subject.get_id()) {
+						for (std::size_t i = 0; i < cnt; ++i) {
+							const auto org_id = orgs[i];
+
+							if (org_id == subject.get_id()) {
 								/* Don't measure against itself */
-								return;
+								continue;
 							}
 
-							const auto neighbor_tip = *typed_neighbor.find_logical_tip();
+							const auto typed_neighbor = cosm[org_id];
+							const auto neighbor_transform = typed_neighbor.get_logic_transform();
+							const auto neighbor_tip = typed_neighbor.get_logical_tip(neighbor_transform);
 							const auto offset_dir = (neighbor_tip - tip_pos).normalize();
 
 							const auto facing = current_dir.dot(offset_dir);
@@ -119,10 +117,16 @@ void movement_path_system::advance_paths(const logic_step step) const {
 							*/
 
 							if (facing >= fov_half_degrees_cos) {
-								callback(typed_neighbor);
+								callback(typed_neighbor, neighbor_transform, neighbor_tip);
 							}
-						});
-					});
+						}
+					};
+
+					grids.for_each_cell_of_grid(
+						origin.get_id(),
+						ltrb::center_and_size(tip_pos, vec2::square(radius * 2)),
+						cell_callback
+					);
 				};
 
 				auto velocity = current_dir * min_speed + perpendicular_dir * wandering_sine;
@@ -153,7 +157,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 				{
 					auto greatest_avoidance = vec2::zero;
 
-					for_each_neighbor_within(comfort_zone_radius, [&](const auto typed_neighbor) {
+					for_each_neighbor_within(comfort_zone_radius, [&](const auto& typed_neighbor, const auto& neighbor_transform, const auto& neighbor_tip) {
 						const auto neighbor_layer = typed_neighbor.template get<invariants::render>().layer;
 
 						if (int(subject_layer) > int(neighbor_layer)) {
@@ -165,13 +169,11 @@ void movement_path_system::advance_paths(const logic_step step) const {
 						const auto& neighbor_path = typed_neighbor.template get<components::movement_path>();
 
 						if (neighbor_path_def.fish_movement.is_enabled) {
-							const auto neighbor_transform = typed_neighbor.get_logic_transform();
 							const auto neighbor_vel = neighbor_transform.get_direction() * neighbor_path.last_speed;
-							const auto neighbor_tip = *typed_neighbor.find_logical_tip();
 
 							const auto avoidance = augs::immediate_avoidance(
 								tip_pos,
-								vec2(velocity).set_length(movement_path.last_speed),
+								current_dir * movement_path.last_speed,
 								neighbor_tip,
 								neighbor_vel,
 								comfort_zone_radius,
@@ -182,7 +184,7 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 							if (typed_neighbor.get_flavour_id() == subject.get_flavour_id()) {
 								average_pos += neighbor_transform.pos;
-								average_vel += neighbor_transform.get_direction() * neighbor_path.last_speed;
+								average_vel += neighbor_vel;
 								++counted_neighbors;
 							}
 						}
@@ -251,47 +253,59 @@ void movement_path_system::advance_paths(const logic_step step) const {
 
 				movement_path.last_speed = total_speed;
 
-				transform.pos += velocity * delta.in_seconds();
-				transform.rotation = velocity.degrees();//augs::interp(transform.rotation, velocity.degrees(), 50.f * delta.in_seconds());
+				{
+					const auto speed_mult = total_speed / max_speed;
+					const auto elapsed_anim_ms = delta.in_milliseconds() * speed_mult;
 
-				const auto speed_mult = total_speed / max_speed;
-				const auto elapsed_anim_ms = delta.in_milliseconds() * speed_mult;
+					{
+						const auto& bubble_effect = def.bubble_effect;
 
-				const auto& bubble_effect = def.bubble_effect;
+						if (bubble_effect.id.is_set()) {
+							/* Resolve bubbles and bubble intervals */
 
-				if (bubble_effect.id.is_set()) {
-					/* Resolve bubbles and bubble intervals */
+							auto& next_in_ms = movement_path.next_bubble_in_ms;
+							
+							auto choose_new_interval = [&step_rng, &next_in_ms, &def]() {
+								const auto interval = def.base_bubble_interval_ms;
+								const auto h = interval / 1.5f;
 
-					auto& next_in_ms = movement_path.next_bubble_in_ms;
-					
-					auto choose_new_interval = [&step_rng, &next_in_ms, &def]() {
-						const auto interval = def.base_bubble_interval_ms;
-						const auto h = interval / 1.5f;
+								next_in_ms = step_rng.randval(interval - h, interval + h);
+							};
 
-						next_in_ms = step_rng.randval(interval - h, interval + h);
-					};
+							if (next_in_ms < 0.f) {
+								choose_new_interval();
+							}
+							else {
+								next_in_ms -= elapsed_anim_ms;
 
-					if (next_in_ms < 0.f) {
-						choose_new_interval();
-					}
-					else {
-						next_in_ms -= elapsed_anim_ms;
-
-						if (next_in_ms < 0.f) {
-							bubble_effect.start(
-								step,
-								particle_effect_start_input::orbit_local(subject, transformr(vec2(subject.get_logical_size().x / 3, 0), 0)),
-								always_predictable_v
-							);
+								if (next_in_ms < 0.f) {
+									bubble_effect.start(
+										step,
+										particle_effect_start_input::orbit_local(subject, transformr(vec2(subject.get_logical_size().x / 3, 0), 0)),
+										always_predictable_v
+									);
+								}
+							}
 						}
 					}
+
+
+					auto& anim_state = subject.template get<components::animation>().state;
+					anim_state.frame_elapsed_ms += elapsed_anim_ms;
 				}
 
-				auto& anim_state = subject.template get<components::animation>().state;
-				anim_state.frame_elapsed_ms += elapsed_anim_ms;
-			}
+				{
+					auto& mut_transform = subject.template get<components::transform>();
+					mut_transform.rotation = velocity.degrees();//augs::interp(transform.rotation, velocity.degrees(), 50.f * delta.in_seconds());
 
-			npo.specific_infer_cache_for(subject);
+					const auto old_position = transform.pos;
+					const auto new_position = old_position + velocity * delta.in_seconds();
+
+					grids.recalculate_cell_for(origin, subject.get_id(), old_position, new_position);
+
+					mut_transform.pos = new_position;
+				}
+			}
 		}
 	);
 }

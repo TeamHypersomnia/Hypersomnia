@@ -27,8 +27,8 @@ namespace augs {
 			LOG("Initializing the network library.");
 			const bool result = InitializeYojimbo();
 
-			//yojimbo_log_level(YOJIMBO_LOG_LEVEL_DEBUG);
-			//yojimbo_set_printf_function(custom_print);
+			yojimbo_log_level(YOJIMBO_LOG_LEVEL_DEBUG);
+			yojimbo_set_printf_function(custom_print);
 			return result;
 		}
 

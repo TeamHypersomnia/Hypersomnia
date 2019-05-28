@@ -180,13 +180,17 @@ public:
 		return handle;
 	}
 
+	vec2 get_logical_tip(const transformr& t) const {
+		const auto& handle = *static_cast<const entity_handle_type*>(this);
+		const auto w = handle.get_logical_size().x;
+		return t.pos + t.get_direction() * (w / 2);
+	}
+
 	std::optional<vec2> find_logical_tip() const {
 		const auto& handle = *static_cast<const entity_handle_type*>(this);
 
-		const auto w = handle.get_logical_size().x;
-
 		if (const auto t = handle.find_logic_transform()) {
-			return t->pos + t->get_direction() * (w / 2);
+			return get_logical_tip(*t);
 		}
 
 		return std::nullopt;

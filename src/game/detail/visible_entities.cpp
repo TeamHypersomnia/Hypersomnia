@@ -13,6 +13,8 @@
 
 #include "game/inferred_caches/tree_of_npo_cache.h"
 #include "game/inferred_caches/physics_world_cache.h"
+#include "game/inferred_caches/organism_cache_query.hpp"
+#include "game/inferred_caches/organism_cache.hpp"
 
 #include "game/detail/passes_filter.h"
 #include "game/detail/calc_render_layer.h"
@@ -138,61 +140,77 @@ void visible_entities::acquire_non_physical(const visible_entities_query input) 
 	const auto camera_aabb = camera.get_visible_world_rect_aabb();
 
 	const auto& tree_of_npo = cosm.get_solvable_inferred().tree_of_npo;
+	const auto& organisms = cosm.get_solvable_inferred().organisms;
 	
 	auto acquire_from = [&](const tree_of_npo_type type) {
-		tree_of_npo.for_each_in_camera(
-			[&](const unversioned_entity_id unversioned_id) {
-				const auto id = cosm.get_versioned(unversioned_id);
-				
-				if (!::passes_filter(input.filter, cosm, id)) {
-					return;
-				}
+		auto add_visible = [&](const auto& id) {
+			if (!::passes_filter(input.filter, cosm, id)) {
+				return;
+			}
 
-				if (input.accuracy == EXACT) {
-					const bool visible = cosm[id].dispatch([&](const auto typed_handle) {
-						const auto aabb = typed_handle.find_aabb();
+			if (input.accuracy == EXACT) {
+				const bool visible = cosm[id].dispatch([&](const auto typed_handle) {
+					const auto aabb = typed_handle.find_aabb();
 
-						if (aabb == std::nullopt) {
-							return false;
-						}
+					if (aabb == std::nullopt) {
+						return false;
+					}
 
-						if (!camera_aabb.hover(*aabb)) {
-							return false;
-						}
+					if (!camera_aabb.hover(*aabb)) {
+						return false;
+					}
 
-						if (camera.screen_size == vec2i::square(1)) {
-							/* This is an infinitely small point. */
-							if (const auto transform = typed_handle.find_logic_transform()) {
-								const auto size = typed_handle.get_logical_size();
+					if (camera.screen_size == vec2i::square(1)) {
+						/* This is an infinitely small point. */
+						if (const auto transform = typed_handle.find_logic_transform()) {
+							const auto size = typed_handle.get_logical_size();
 
-								if (!point_in_rect(
-									transform->pos,
-									transform->rotation,
-									size,
-									camera.eye.transform.pos
-								)) {
-									return false;
-								}
-							}
-							else {
+							if (!point_in_rect(
+								transform->pos,
+								transform->rotation,
+								size,
+								camera.eye.transform.pos
+							)) {
 								return false;
 							}
 						}
-
-						return true;
-					});
-
-					if (visible) {
-						register_visible(cosm, id);
+						else {
+							return false;
+						}
 					}
-				}
-				else {
+
+					return true;
+				});
+
+				if (visible) {
 					register_visible(cosm, id);
 				}
-			},
-			camera,
-			type
-		);
+			}
+			else {
+				register_visible(cosm, id);
+			}
+		};
+
+		if (type == tree_of_npo_type::ORGANISMS) {
+			organisms.for_each_cell_of_all_grids(
+				camera.get_visible_world_rect_aabb(),
+				[&](const auto& cell) {
+					for (const auto& o : cell.organisms) {
+						add_visible(o);
+					}
+				}
+			);
+		}
+		else {
+			tree_of_npo.for_each_in_camera(
+				[&](const auto& unversioned_id) {
+					const auto id = cosm.get_versioned(unversioned_id);
+					add_visible(id);
+				},
+				camera,
+				type
+			);
+		}
 	};
 
 	augs::for_each_enum_except_bounds(

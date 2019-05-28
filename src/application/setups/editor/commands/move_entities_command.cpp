@@ -9,6 +9,7 @@
 #include "application/setups/editor/gui/find_aabb_of.h"
 #include "application/setups/editor/detail/editor_transform_utils.h"
 #include "application/setups/editor/commands/editor_command_sanitizer.h"
+#include "game/inferred_caches/organism_cache.hpp"
 
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"

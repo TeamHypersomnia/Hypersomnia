@@ -8,6 +8,7 @@
 #include "game/inferred_caches/relational_cache.h"
 #include "game/inferred_caches/flavour_id_cache.h"
 #include "game/inferred_caches/processing_lists_cache.h"
+#include "game/inferred_caches/organism_cache.h"
 
 #include "game/detail/inventory/inventory_slot_id.h"
 
@@ -27,5 +28,6 @@ struct cosmos_solvable_inferred {
 	physics_world_cache physics;
 	processing_lists_cache processing;
 	tree_of_npo_cache tree_of_npo;
+	organism_cache organisms;
 	// END GEN INTROSPECTOR
 };

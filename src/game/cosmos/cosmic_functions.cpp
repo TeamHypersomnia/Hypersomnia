@@ -10,6 +10,7 @@
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 
 #include "game/inferred_caches/tree_of_npo_cache.hpp"
+#include "game/inferred_caches/organism_cache.hpp"
 #include "game/inferred_caches/relational_cache.hpp"
 #include "game/inferred_caches/processing_lists_cache.hpp"
 #include "game/inferred_caches/flavour_id_cache.hpp"

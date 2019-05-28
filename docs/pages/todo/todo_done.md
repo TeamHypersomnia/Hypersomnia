@@ -3093,3 +3093,4 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - vent hit sound is too silent
 
+- multithread light vis calculation

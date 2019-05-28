@@ -19,7 +19,8 @@ std::optional<tree_of_npo_node_input> create_default_for(const E& handle) {
 			|| layer == render_layer::BOTTOM_FISH
 			|| layer == render_layer::INSECTS
 		) {
-			result.type = tree_of_npo_type::ORGANISMS;
+			/* Handled by the grids in organism cache */
+			return std::nullopt;
 		}
 		else if (layer == render_layer::CONTINUOUS_PARTICLES) {
 			result.type = tree_of_npo_type::PARTICLE_STREAMS;
