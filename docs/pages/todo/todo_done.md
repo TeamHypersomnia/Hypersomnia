@@ -3094,3 +3094,17 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - vent hit sound is too silent
 
 - multithread light vis calculation
+
+- organism_cache
+	- do we do inferrers for both areas and organisms? 
+	- plan 1: just infer organisms
+		- infer all just iterates over all organisms like any other cache
+		- what if an organism area suddenly changes geometry?
+			- we can have a refresh function for when that happens
+			- and reinfer everything when altering this in editor?
+				- well then just use that refresh function
+			- "recalc grid"
+	- Infer both organisms and areas
+		- Need to account for a moment when an editor alters any of these
+- New settings tab: Performance
+	- A flag: simulate_small_organisms_during_net_reconciliation

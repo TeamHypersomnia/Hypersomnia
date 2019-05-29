@@ -6,17 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- organism_cache
-	- do we do inferrers for both areas and organisms? 
-	- plan 1: just infer organisms
-		- infer all just iterates over all organisms like any other cache
-		- what if an organism area suddenly changes geometry?
-			- we can have a refresh function for when that happens
-			- and reinfer everything when altering this in editor?
-				- well then just use that refresh function
-			- "recalc grid"
-	- Infer both organisms and areas
-		- Need to account for a moment when an editor alters any of these
 
 - Always aim with the hand that has an armed explosive
 	- If both have, prioritize primary

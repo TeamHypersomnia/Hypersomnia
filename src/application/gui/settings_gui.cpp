@@ -583,6 +583,15 @@ void settings_gui_state::perform(
 
 				break;
 			}
+			case settings_pane::PERFORMANCE: {
+				auto& scope_cfg = config.lag_compensation;
+
+				{
+					revertable_checkbox(SCOPE_CFG_NVP(simulate_decorative_organisms_during_reconciliation));
+				}
+
+				break;
+			}
 			case settings_pane::ADVANCED: {
 				text(u8"Test: いい товарищ żółćńźś");
 

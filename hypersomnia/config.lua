@@ -94,6 +94,7 @@ return {
   },
   lag_compensation = {
     confirm_controlled_character_death = true,
+	simulate_decorative_organisms_during_reconciliation = false,
 
 	effect_prediction = {
 	  predict_death_particles = true,

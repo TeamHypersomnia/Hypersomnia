@@ -192,7 +192,7 @@ public:
 			return out;
 		}();
 
-		const auto predicted_solve_settings = [&]() {
+		const auto repredicted_solve_settings = [&]() {
 			solve_settings out;
 			out.effect_prediction = in.lag_compensation.effect_prediction;
 
@@ -200,6 +200,14 @@ public:
 				out.disable_knockouts = get_viewed_character();
 			}
 
+			out.simulate_decorative_organisms = in.lag_compensation.simulate_decorative_organisms_during_reconciliation;
+
+			return out;
+		}();
+
+		const auto predicted_solve_settings = [&]() {
+			auto out = repredicted_solve_settings;
+			out.simulate_decorative_organisms = true;
 			return out;
 		}();
 
@@ -317,7 +325,7 @@ public:
 						const auto reprediction_result = predicted_arena.advance(
 							entropy, 
 							solver_callbacks(), 
-							predicted_solve_settings
+							repredicted_solve_settings
 						);
 
 						schedule_reprediction_if_inconsistent(reprediction_result);

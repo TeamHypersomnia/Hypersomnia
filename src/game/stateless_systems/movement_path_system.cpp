@@ -18,6 +18,10 @@
 #include "game/inferred_caches/organism_cache_query.hpp"
 
 void movement_path_system::advance_paths(const logic_step step) const {
+	if (!step.get_settings().simulate_decorative_organisms) {
+		return;
+	}
+
 	auto& cosm = step.get_cosmos();
 	const auto delta = step.get_delta();
 
