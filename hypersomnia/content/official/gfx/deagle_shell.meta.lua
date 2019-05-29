@@ -6,7 +6,9 @@ return {
       light_colors = {
         "255 255 255 255",
         "193 177 85 255",
-        "202 185 89 255"
+        "202 185 89 255",
+        "193 133 37 255",
+        "227 172 82 255"
       },
       radius = {
         x = 80,
@@ -22,7 +24,28 @@ return {
         x = 0,
         y = 0
       },
+      chamber = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      chamber_magazine = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
       detachable_magazine = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      shell_spawn = {
         pos = {
           x = 0,
           y = 0
@@ -65,6 +88,13 @@ return {
           y = 0
         },
         rotation = 0
+      },
+      shoulder_anchor = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
       }
     },
     legs = {
@@ -72,6 +102,10 @@ return {
         x = 0,
         y = 0
       }
+    },
+    non_standard_shape = {
+      convex_partition = {},
+      original_poly = {}
     },
     torso = {
       back = {
@@ -108,7 +142,22 @@ return {
           y = 0
         },
         rotation = 0
-      }
+      },
+      secondary_shoulder = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      shoulder = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      strafe_facing_offset = 0
     }
   },
   usage_as_button = {

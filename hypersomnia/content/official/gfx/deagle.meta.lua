@@ -39,8 +39,8 @@ return {
       },
       detachable_magazine = {
         pos = {
-          x = -16,
-          y = 6
+          x = -18,
+          y = 5
         },
         rotation = 0
       },
