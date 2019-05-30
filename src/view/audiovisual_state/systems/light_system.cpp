@@ -90,11 +90,56 @@ void light_system::advance_attenuation_variations(
 	);
 }
 
+void light_system::gather_vis_requests(const light_system_input& in) const {
+	auto& requests = thread_local_visibility_requests();
+
+	const auto& cosm = in.cosm;
+	const auto drawing_in = in.drawing_in;
+	const auto& interp = drawing_in.interp;
+
+	const auto cone = in.cone;
+
+	const auto queried_camera_aabb = [&]() {
+		auto c = cone;
+		c.eye.zoom /= in.camera_query_mult;
+
+		return c.get_visible_world_rect_aabb();
+	}();
+
+	cosm.template for_each_having<components::light>(
+		[&](const auto light_entity) {
+			const auto light_transform = light_entity.get_viewing_transform(interp);
+			const auto& light = light_entity.template get<components::light>();
+
+			const auto reach = light.calc_reach_trimmed();
+			const auto light_aabb = xywh::center_and_size(light_transform.pos, reach);
+
+			if (const auto cache = mapped_or_nullptr(per_entity_cache, unversioned_entity_id(light_entity))) {
+				const auto light_displacement = vec2(cache->all_variation_values[6], cache->all_variation_values[7]);
+
+				messages::visibility_information_request request;
+
+				request.eye_transform = light_transform;
+				request.eye_transform.pos += light_displacement;
+
+				if (queried_camera_aabb.hover(light_aabb)) {
+					request.filter = predefined_queries::line_of_sight();
+					request.queried_rect = reach;
+					request.subject = light_entity;
+
+					requests.emplace_back(std::move(request));
+				}
+			}
+		}
+	);
+}
+
 void light_system::render_all_lights(const light_system_input in) const {
 	const auto* default_fbo = augs::graphics::fbo::find_current();
 
 	auto& renderer = in.renderer;
 	auto& performance = in.profiler;
+	auto scope = measure_scope(performance.light_rendering);
 
 	const auto drawing_in = in.drawing_in;
 	const auto global_time_seconds = drawing_in.global_time_seconds;
@@ -105,8 +150,6 @@ void light_system::render_all_lights(const light_system_input in) const {
 	const auto& standard_shader = in.standard_shader;
 
 	const auto& cosm = in.cosm;
-
-	auto light_raycasts_scope = cosm.measure_raycasts(performance.light_raycasts);
 
 	ensure_eq(0, renderer.get_triangle_count());
 
@@ -178,45 +221,6 @@ void light_system::render_all_lights(const light_system_input in) const {
 		return c.get_visible_world_rect_aabb();
 	}();
 
-	{
-		auto scope = measure_scope(performance.light_visibility);
-
-		cosm.for_each_having<components::light>(
-			[&](const auto light_entity) {
-				const auto light_transform = light_entity.get_viewing_transform(interp);
-				const auto& light = light_entity.template get<components::light>();
-
-				const auto reach = light.calc_reach_trimmed();
-				const auto light_aabb = xywh::center_and_size(light_transform.pos, reach);
-
-				if (const auto cache = mapped_or_nullptr(per_entity_cache, unversioned_entity_id(light_entity))) {
-					const auto light_displacement = vec2(cache->all_variation_values[6], cache->all_variation_values[7]);
-
-					messages::visibility_information_request request;
-
-					request.eye_transform = light_transform;
-					request.eye_transform.pos += light_displacement;
-
-					if (queried_camera_aabb.hover(light_aabb)) {
-						request.filter = predefined_queries::line_of_sight();
-						request.queried_rect = reach;
-					}
-					else {
-						request.queried_rect = {};
-					}
-
-					request.subject = light_entity;
-
-					requests.emplace_back(std::move(request));
-				}
-			}
-		);
-
-		visibility_system(DEBUG_FRAME_LINES).calc_visibility(cosm, requests, responses, in.perf_settings);
-	}
-
-	auto scope = measure_scope(performance.light_rendering);
-
 	renderer.set_additive_blending();
 
 	std::size_t num_lights = 0;
@@ -225,7 +229,13 @@ void light_system::render_all_lights(const light_system_input in) const {
 	for (size_t i = 0; i < requests.size(); ++i) {
 		const auto& r = responses[i];
 		const auto& light_entity = cosm[requests[i].subject];
-		const auto& light = light_entity.get<components::light>();
+		const auto maybe_light = light_entity.find<components::light>();
+
+		if (maybe_light == nullptr) {
+			continue;
+		}
+
+		const auto& light = *maybe_light;
 		const auto world_light_pos = requests[i].eye_transform.pos;
 		
 		const auto& cache = per_entity_cache.at(light_entity);
@@ -299,7 +309,14 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	for (size_t i = 0; i < requests.size(); ++i) {
 		const auto& light_entity = cosm[requests[i].subject];
-		const auto& light = light_entity.get<components::light>();
+		const auto maybe_light = light_entity.find<components::light>();
+
+		if (maybe_light == nullptr) {
+			continue;
+		}
+
+		const auto& light = *maybe_light;
+
 		const auto world_light_pos = requests[i].eye_transform.pos;
 
 		const auto& cache = per_entity_cache.at(light_entity);

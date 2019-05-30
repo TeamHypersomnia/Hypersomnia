@@ -189,37 +189,11 @@ void illuminated_rendering(
 		&& settings.fog_of_war.is_enabled()
 	;
 
+	const messages::visibility_information_response* fow_response = nullptr;
+
 #if BUILD_STENCIL_BUFFER
-	/* 
-		We need a separate TLS because the one returned by thread_local_visibility_responses
-		would get overwritten by light calculations before the call to fill_stencil.
-	*/
-
-	thread_local visibility_responses viewed_visibility;
-
-	if (fog_of_war_effective) {
-		const auto fow_size = settings.fog_of_war.get_real_size();
-
-		auto fow_raycasts_scope = cosm.measure_raycasts(profiler.fog_of_war_raycasts);
-
-		messages::visibility_information_request request;
-		request.eye_transform = *viewed_character_transform;
-		request.filter = predefined_queries::line_of_sight();
-		request.queried_rect = fow_size;
-		request.subject = viewed_character;
-
-		auto& requests = thread_local_visibility_requests();
-		requests.clear();
-		requests.push_back(request);
-
-		performance_settings settings;
-		settings.light_calculation_threads = 1;
-
-		visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(cosm, requests, viewed_visibility, settings);
-	}
-
 	auto fill_stencil = [&]() {
-		if (viewed_visibility.size() > 0 && !viewed_visibility[0].empty()) {
+		if (fow_response != nullptr) {
 			renderer.enable_stencil();
 
 			renderer.start_writing_stencil();
@@ -227,7 +201,7 @@ void illuminated_rendering(
 			renderer.clear_stencil();
 
 			const auto eye_pos = viewed_character_transform->pos;
-			const auto& r = viewed_visibility[0];
+			const auto& r = *fow_response;
 
 			for (std::size_t t = 0; t < r.get_num_triangles(); ++t) {
 				const auto world_light_tri = r.get_world_triangle(t, eye_pos);
@@ -276,19 +250,14 @@ void illuminated_rendering(
 			renderer.start_testing_stencil();
 		}
 	};
-
-	if (fog_of_war_effective) {
-		renderer.call_and_clear_triangles();
-		fill_stencil();
-		renderer.disable_stencil();
-	}
 #else
+	(void)fow_response;
 	auto fill_stencil = [&]() {
 
 	};
 #endif
 
-	light.render_all_lights({
+	const auto light_input = light_system_input {
 		renderer,
 		profiler,
 		total_layer_scope,
@@ -363,7 +332,57 @@ void illuminated_rendering(
 		cast_highlight,
 		drawing_input,
 		in.perf_settings
-	});
+	};
+
+	auto& vis_requests = fresh_thread_local_visibility_requests();
+	auto& vis_responses = thread_local_visibility_responses();
+
+	light.gather_vis_requests(light_input);
+
+	auto invoke_visibility_calculations = [&]() {
+		auto scope = measure_scope(profiler.light_visibility);
+		auto light_raycasts_scope = cosm.measure_raycasts(profiler.light_raycasts);
+
+		visibility_system(DEBUG_FRAME_LINES).calc_visibility(cosm, vis_requests, vis_responses, in.perf_settings);
+	};
+
+#if BUILD_STENCIL_BUFFER
+	if (fog_of_war_effective) {
+		const auto fow_size = settings.fog_of_war.get_real_size();
+
+		auto fow_raycasts_scope = cosm.measure_raycasts(profiler.fog_of_war_raycasts);
+
+		messages::visibility_information_request request;
+		request.eye_transform = *viewed_character_transform;
+		request.filter = predefined_queries::line_of_sight();
+		request.queried_rect = fow_size;
+		request.subject = viewed_character;
+
+		vis_requests.push_back(request);
+	}
+
+	invoke_visibility_calculations();
+
+	if (fog_of_war_effective) {
+		const auto fow_response_index = vis_requests.size() - 1;
+
+		if (vis_responses.size() > fow_response_index) {
+			const auto& fow_resp = vis_responses[fow_response_index];
+
+		   	if (!fow_resp.empty()) {
+				fow_response = std::addressof(fow_resp);
+			}
+		}
+
+		renderer.call_and_clear_triangles();
+		fill_stencil();
+		renderer.disable_stencil();
+	}
+#else
+	invoke_visibility_calculations();
+#endif
+
+	light.render_all_lights(light_input);
 
 	set_shader_with_matrix(shaders.illuminated);
 

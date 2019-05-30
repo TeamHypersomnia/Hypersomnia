@@ -70,4 +70,5 @@ struct light_system {
 	);
 
 	void render_all_lights(const light_system_input) const;
+	void gather_vis_requests(const light_system_input&) const;
 };

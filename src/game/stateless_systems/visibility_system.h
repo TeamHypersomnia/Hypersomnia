@@ -10,10 +10,14 @@ using visibility_responses = std::vector<messages::visibility_information_respon
 
 inline auto& thread_local_visibility_requests() {
 	thread_local visibility_requests requests;
-	requests.clear();
 	return requests;
 }
 
+inline auto& fresh_thread_local_visibility_requests() {
+	auto& r = thread_local_visibility_requests();
+	r.clear();
+	return r;
+}
 
 struct performance_settings;
 

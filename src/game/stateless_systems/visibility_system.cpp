@@ -182,7 +182,7 @@ messages::visibility_information_response& visibility_system::calc_visibility(
 	const cosmos& cosm,
 	const messages::visibility_information_request& request
 ) const {
-	auto& req = thread_local_visibility_requests();
+	auto& req = fresh_thread_local_visibility_requests();
 	auto& res = thread_local_visibility_responses();
 
 	req.emplace_back(request);
