@@ -10,6 +10,7 @@
 #include "view/audiovisual_state/systems/audiovisual_cache_common.h"
 
 #include "game/detail/visible_entities.h"
+#include "application/performance_settings.h"
 
 class interpolation_system;
 class particles_simulation_system;
@@ -49,6 +50,7 @@ struct light_system_input {
 
 	const augs::atlas_entry cast_highlight_tex;
 	const draw_renderable_input& drawing_in;
+	const performance_settings& perf_settings;
 };
 
 struct light_system {

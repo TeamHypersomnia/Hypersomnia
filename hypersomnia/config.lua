@@ -531,5 +531,9 @@ return {
 
 	max_buffered_server_commands = 10000,
 	max_predicted_client_commands = 3000
+  },
+
+  performance = {
+    light_calculation_threads = 0
   }
 }

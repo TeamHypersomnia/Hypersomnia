@@ -18,6 +18,7 @@ struct frame_profiler;
 struct audiovisual_state;
 struct all_necessary_shaders;
 struct all_necessary_fbos;
+struct performance_settings;
 
 class images_in_atlas_map;
 class visible_entities;
@@ -42,6 +43,7 @@ struct illuminated_rendering_input {
 	illuminated_rendering_fbos& fbos;
 	const illuminated_rendering_shaders& shaders;
 	const visible_entities& all_visible;
+	const performance_settings& perf_settings;
 };
 
 struct additional_highlight {

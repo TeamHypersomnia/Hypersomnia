@@ -590,6 +590,17 @@ void settings_gui_state::perform(
 					revertable_checkbox(SCOPE_CFG_NVP(simulate_decorative_organisms_during_reconciliation));
 				}
 
+				{
+					auto& scope_cfg = config.performance;
+
+					const auto concurrency = std::thread::hardware_concurrency();
+					const auto t_max = static_cast<int>(concurrency);
+
+					text_disabled(typesafe_sprintf("(Value of 0 means to take a default of\nstd::clamp(concurrency - 1u, 1u, 5u), which equals %x)", performance_settings { 0 }.get_light_calculation_threads()));
+					text_disabled(typesafe_sprintf("(std::thread::hardware_concurrency() = %x)", concurrency));
+
+					revertable_slider(SCOPE_CFG_NVP(light_calculation_threads), 0, t_max);
+				}
 				break;
 			}
 			case settings_pane::ADVANCED: {

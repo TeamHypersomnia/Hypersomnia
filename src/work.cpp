@@ -1674,7 +1674,8 @@ int work(const int argc, const char* const * const argv) try {
 						streaming.general_atlas,
 						necessary_fbos,
 						necessary_shaders,
-						all_visible
+						all_visible,
+						new_viewing_config.performance
 					},
 					highlights
 				);

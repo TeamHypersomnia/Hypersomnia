@@ -33,6 +33,7 @@
 
 #include "game/detail/entity_scripts.h"
 #include "game/detail/physics/physics_scripts.h"
+#include "application/performance_settings.h"
 
 using namespace augs;
 using namespace messages;
@@ -58,6 +59,21 @@ void VIS_LOG(Args&&... args) {
 	Thanks to:
 	https://stackoverflow.com/questions/16542042/fastest-way-to-sort-vectors-by-angle-without-actually-computing-that-angle
 */
+
+int performance_settings::get_light_calculation_threads() const {
+	if (light_calculation_threads > 0) {
+		return light_calculation_threads;
+	}
+
+	const auto concurrency = std::thread::hardware_concurrency();
+	const auto default_count = std::clamp(concurrency - 1u, 1u, 5u);
+
+	return default_count;
+}
+
+int performance_settings::get_light_calculation_workers() const {
+	return get_light_calculation_threads() - 1;
+}
 
 FORCE_INLINE auto comparable_angle(const vec2 diff) {
 	return repro::copysignf(
@@ -146,9 +162,13 @@ void visibility_system::calc_visibility(const logic_step step) const {
 #if TODO_PERFORMANCE
 	const auto& vis_requests = step.get_queue<messages::visibility_information_request>();
 
+	performance_settings settings;
+	settings.light_calculation_threads = 1;
+
 	const auto vis_responses = calc_visibility(
 		step.get_cosmos(),
-		vis_requests
+		vis_requests,
+		settings
 	);
 
 	for (size_t i = 0; i < vis_requests.size(); ++i) {
@@ -167,7 +187,10 @@ messages::visibility_information_response& visibility_system::calc_visibility(
 
 	req.emplace_back(request);
 
-	calc_visibility(cosm, req, res);
+	performance_settings settings;
+	settings.light_calculation_threads = 1;
+
+	calc_visibility(cosm, req, res, settings);
 	return res[0];
 }
 
@@ -189,7 +212,8 @@ struct target_vertex {
 void visibility_system::calc_visibility(
 	const cosmos& cosm,
 	const visibility_requests& vis_requests,
-	visibility_responses& vis_responses
+	visibility_responses& vis_responses,
+	const performance_settings& perf_settings
 ) const {
 	if (vis_responses.size() < vis_requests.size()) {
 		vis_responses.resize(vis_requests.size());
@@ -987,15 +1011,26 @@ void visibility_system::calc_visibility(
 		}
 	};
 
-#if 1
-	const auto num_workers = std::min(4u, std::thread::hardware_concurrency());
-	static augs::range_workers<decltype(worker)> workers = num_workers;
-	workers.resize_workers(num_workers);
-	workers.process(worker, vis_requests);
-#else
-	for (const auto& request : vis_requests) {
-		worker(request);
+	auto single_threaded = [&]() {
+		for (const auto& request : vis_requests) {
+			worker(request);
+		}
+	};
+
+	const auto num_workers = perf_settings.get_light_calculation_workers();
+
+	auto multi_threaded = [&]() {
+		static augs::range_workers<decltype(worker)> workers = num_workers;
+
+		workers.resize_workers(num_workers);
+		workers.process(worker, vis_requests);
+	};
+
+	if (num_workers == 0 || vis_requests.size() <= 1) {
+		single_threaded();
 	}
-#endif
+	else {
+		multi_threaded();
+	}
 
 }

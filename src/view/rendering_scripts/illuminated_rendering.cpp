@@ -41,6 +41,8 @@
 #include "view/rendering_scripts/illuminated_rendering.h"
 #include "game/detail/crosshair_math.hpp"
 
+#include "application/performance_settings.h"
+
 void illuminated_rendering(
 	const illuminated_rendering_input in,
 	const std::vector<additional_highlight>& additional_highlights
@@ -210,7 +212,10 @@ void illuminated_rendering(
 		requests.clear();
 		requests.push_back(request);
 
-		visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(cosm, requests, viewed_visibility);
+		performance_settings settings;
+		settings.light_calculation_threads = 1;
+
+		visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(cosm, requests, viewed_visibility, settings);
 	}
 
 	auto fill_stencil = [&]() {
@@ -356,7 +361,8 @@ void illuminated_rendering(
 		anims,
 		visible,
 		cast_highlight,
-		drawing_input
+		drawing_input,
+		in.perf_settings
 	});
 
 	set_shader_with_matrix(shaders.illuminated);

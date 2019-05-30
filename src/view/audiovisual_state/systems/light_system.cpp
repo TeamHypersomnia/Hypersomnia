@@ -212,7 +212,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 			}
 		);
 
-		visibility_system(DEBUG_FRAME_LINES).calc_visibility(cosm, requests, responses);
+		visibility_system(DEBUG_FRAME_LINES).calc_visibility(cosm, requests, responses, in.perf_settings);
 	}
 
 	auto scope = measure_scope(performance.light_rendering);

@@ -15,6 +15,8 @@ inline auto& thread_local_visibility_requests() {
 }
 
 
+struct performance_settings;
+
 inline auto& thread_local_visibility_responses() {
 	thread_local visibility_responses responses;
 	return responses;
@@ -35,7 +37,8 @@ public:
 	void calc_visibility(
 		const cosmos&,
 		const visibility_requests&,
-		visibility_responses&
+		visibility_responses&,
+		const performance_settings&
 	) const;
 
 	void calc_visibility(const logic_step) const;

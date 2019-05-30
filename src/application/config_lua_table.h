@@ -42,6 +42,7 @@
 #include "application/setups/client/lag_compensation_settings.h"
 #include "application/app_intent_type.h"
 #include "application/network/simulation_receiver_settings.h"
+#include "application/performance_settings.h"
 
 enum class launch_type {
 	// GEN INTROSPECTOR enum class launch_type
@@ -128,6 +129,7 @@ struct config_lua_table {
 
 	client_start_input default_client_start;
 	client_vars client;
+	performance_settings performance;
 
 #if TODO
 	std::string connect_address;
