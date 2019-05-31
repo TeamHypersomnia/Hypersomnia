@@ -517,7 +517,7 @@ return {
 	net = {
 	  jitter = {
 	  	buffer_ms = 33,
-		merge_commands_when_above_ms = 50,
+		merge_commands_when_above_ms = 20,
 		max_commands_to_squash_at_once = 255
 	  }
 	},
