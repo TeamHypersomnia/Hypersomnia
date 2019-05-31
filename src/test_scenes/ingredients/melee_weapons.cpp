@@ -238,6 +238,8 @@ namespace test_flavours {
 			for (auto& a : meta.get<invariants::melee>().actions) {
 				a.init_particles.id = {};
 			}
+
+			meta.template get<invariants::melee>().throw_def.damage.base = 49.f;
 		}
 
 		{

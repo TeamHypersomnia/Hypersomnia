@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Communicate with the server somehow from localhost?
+- At some point we might want to give different jitter buffer length values to 60tick and 128tick
+
 - We should somehow re-adjust the amount of predicted steps
 	- Sometimes even if the latency is low, the amount of predicted steps is high
 	- Do we properly take squashing into account?
