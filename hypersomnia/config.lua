@@ -140,7 +140,7 @@ return {
     draw_character_gui = true,
     draw_crosshairs = true,
     draw_weapon_laser = true,
-	disabled_draw_area_markers = 0.85,
+	enabled_draw_area_markers = 1.0,
 	fog_of_war = {
 	  overlay_color_on_visible = true,
 	  overlay_color = "255 255 255 2",

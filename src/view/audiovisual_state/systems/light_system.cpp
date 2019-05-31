@@ -170,7 +170,8 @@ void light_system::render_all_lights(const light_system_input in) const {
 	};
 
 	helper.draw_neons<
-		render_layer::FLOOR_AND_ROAD
+		render_layer::FLOOR_AND_ROAD,
+		render_layer::ON_FLOOR
 	>();
 
 	renderer.call_and_clear_triangles();
@@ -357,7 +358,8 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 			helper.draw<
 				render_layer::DYNAMIC_BODY,
-				render_layer::OVER_DYNAMIC_BODY
+				render_layer::OVER_DYNAMIC_BODY,
+				render_layer::OVER_SENTIENCES
 			>();
 
 			renderer.call_triangles();
@@ -382,7 +384,8 @@ void light_system::render_all_lights(const light_system_input in) const {
 		render_layer::OVER_DYNAMIC_BODY,
 		render_layer::GLASS_BODY,
 		render_layer::SMALL_DYNAMIC_BODY,
-		render_layer::OVER_SMALL_DYNAMIC_BODY
+		render_layer::OVER_SMALL_DYNAMIC_BODY,
+		render_layer::OVER_SENTIENCES
 	>();
 
 #if BUILD_STENCIL_BUFFER
@@ -437,7 +440,6 @@ void light_system::render_all_lights(const light_system_input in) const {
 		render_layer::CAR_INTERIOR,
 		render_layer::CAR_WHEEL,
 		render_layer::NEON_CAPTIONS,
-		render_layer::ON_FLOOR,
 		render_layer::ON_ON_FLOOR,
 		render_layer::PLANTED_BOMBS,
 		render_layer::AQUARIUM_FLOWERS,

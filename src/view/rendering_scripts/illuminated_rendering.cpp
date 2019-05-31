@@ -590,7 +590,10 @@ void illuminated_rendering(
 	helper.draw<render_layer::SENTIENCES>();
 #endif
 
-	helper.draw<render_layer::INSECTS>();
+	helper.draw<
+		render_layer::INSECTS,
+		render_layer::OVER_SENTIENCES
+	>();
 
 	renderer.call_and_clear_triangles();
 

@@ -51,6 +51,7 @@ enum class render_layer {
 	BODY_NEON_OVERLAY,
 
 	INSECTS,
+	OVER_SENTIENCES,
 
 	COUNT
 	// END GEN INTROSPECTOR
