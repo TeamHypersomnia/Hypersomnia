@@ -132,7 +132,7 @@ void settings_gui_state::perform(
 
 				revertable_slider(SCOPE_CFG_NVP(latency_ms), 0.f, 200.f);
 				revertable_slider(SCOPE_CFG_NVP(jitter_ms), 0.f, 100.f);
-				revertable_slider(SCOPE_CFG_NVP(loss_percent), 0.f, 99.f);
+				revertable_slider(SCOPE_CFG_NVP(loss_percent), 0.f, 100.f);
 				revertable_slider(SCOPE_CFG_NVP(duplicates_percent), 0.f, 99.f);
 			}
 

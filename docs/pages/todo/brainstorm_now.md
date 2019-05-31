@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Start to version these maps
+	- just ignore histories and views etc 
 
 - Always aim with the hand that has an armed explosive
 	- If both have, prioritize primary

@@ -313,6 +313,11 @@ void client_setup::handle_server_messages() {
 	namespace N = net_messages;
 
 	auto& message_handler = *this;
+
+	if (vars.network_simulator.value.loss_percent >= 100.f) {
+		return;
+	}
+
 	client->advance(client_time, message_handler);
 }
 
@@ -477,6 +482,10 @@ void client_setup::send_pending_commands() {
 }
 
 void client_setup::send_packets_if_its_time() {
+	if (vars.network_simulator.value.loss_percent >= 100.f) {
+		return;
+	}
+
 	client->send_packets();
 }
 

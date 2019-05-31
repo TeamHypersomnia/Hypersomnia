@@ -3108,3 +3108,9 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- Need to account for a moment when an editor alters any of these
 - New settings tab: Performance
 	- A flag: simulate_small_organisms_during_net_reconciliation
+- Connectivity issues
+	- Random disconnects
+		- Safely allocate even 20mb per client
+		- increase timeout in yojimbo and others?
+	- Check why "server shutting down" would occur
+

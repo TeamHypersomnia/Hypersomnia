@@ -489,8 +489,8 @@ return {
 	time_limit_to_enter_game_since_connection = 15,
 
 	send_updates_once_every_tick = 1,
-	reset_resync_timer_once_every_secs = 10,
-	max_client_resyncs = 10,
+	reset_resync_timer_once_every_secs = 8,
+	max_client_resyncs = 30,
 
 	disabled_network_simulator = {
       latency_ms = 50,
@@ -499,7 +499,7 @@ return {
 	  duplicates_percent = 1,
 	},
 
-	max_buffered_client_commands = 255,
+	max_buffered_client_commands = 1280,
 	state_hash_once_every_tick = 1
   },
 
