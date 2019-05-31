@@ -3114,3 +3114,10 @@ i			- if the newly calculated target is different than last_reload_target, reset
 		- increase timeout in yojimbo and others?
 	- Check why "server shutting down" would occur
 
+- Start to version these maps
+	- just ignore histories and views etc 
+
+- fish optimization: a simple grid
+	- we can also put an upper bound of the processed neighbors, e.g. process 3 at most
+	- linear time
+

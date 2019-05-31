@@ -6,9 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Start to version these maps
-	- just ignore histories and views etc 
-
 - Always aim with the hand that has an armed explosive
 	- If both have, prioritize primary
 	- Also if we have a scheduled throw, aim with the first melee weapon
@@ -19,10 +16,6 @@ summary: That which we are brainstorming at the moment.
 
 - actually make two rulesets for server and playtesting
 	- perhaps do so from test scene content and replace on update official content
-
-- fish optimization: a simple grid
-	- we can also put an upper bound of the processed neighbors, e.g. process 3 at most
-	- linear time
 
 - fix those knife offsets on character
 

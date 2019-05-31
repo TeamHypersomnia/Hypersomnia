@@ -6,7 +6,9 @@ if [ -f "$EXE_PATH" ]; then
 
 	cp build/current/Hypersomnia hypersomnia
 	pushd hypersomnia
-	tar -czf Hypersomnia-x64.tar.gz arenas content scripts web config.lua Hypersomnia
+	rm -r cache
+	popd
+	tar -czf Hypersomnia-x64.tar.gz hypersomnia
 	python ../cmake/upload.py Hypersomnia-x64.tar.gz $1
 else
 	echo "No exe found. Not uploading."
