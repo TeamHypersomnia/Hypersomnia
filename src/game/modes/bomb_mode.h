@@ -31,22 +31,22 @@ struct bomb_mode_faction_rules {
 struct bomb_mode_economy_rules {
 	// GEN INTROSPECTOR struct bomb_mode_economy_rules
 	money_type initial_money = 2000;
-	money_type maximum_money = 16000;
-	money_type warmup_initial_money = 16000;
+	money_type maximum_money = 20000;
+	money_type warmup_initial_money = 20000;
 
-	money_type losing_faction_award = 1500;
-	money_type winning_faction_award = 3250;
+	money_type losing_faction_award = 1700;
+	money_type winning_faction_award = 3700;
 	money_type consecutive_loss_bonus = 500;
 	unsigned max_consecutive_loss_bonuses = 4;
 
-	money_type team_kill_penalty = 500;
+	money_type team_kill_penalty = 1000;
 
-	money_type lost_but_bomb_planted_team_bonus = 500;
-	money_type defused_team_bonus = 800;
+	money_type lost_but_bomb_planted_team_bonus = 800;
+	money_type defused_team_bonus = 1200;
 
-	money_type bomb_plant_award = 250;
-	money_type bomb_explosion_award = 350;
-	money_type bomb_defuse_award = 500;
+	money_type bomb_plant_award = 400;
+	money_type bomb_explosion_award = 800;
+	money_type bomb_defuse_award = 800;
 
 	bool give_extra_mags_on_first_purchase = true;
 	// END GEN INTROSPECTOR

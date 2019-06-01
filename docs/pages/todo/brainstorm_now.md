@@ -6,6 +6,26 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Flag: show spectator in past
+
+- Theory: weak clients don't catch up with the steps they have to re-simulate after desyncing
+	- Why would they then be able to do so on connection init?
+
+- Treat holster as last setup flag?
+
+- Use debug mode to simulate a slow computer
+
+- Radar
+	- Also show bomb
+
+- friendlies off-screen indicators
+	- meters instead of pixels, because of varying levels of zoom
+
+- Stress test connection under desyncs
+- Fix spectator to show the past
+
+- Crash when turning on drawing of cast raycasts
+
 - Communicate with the server somehow from localhost?
 - At some point we might want to give different jitter buffer length values to 60tick and 128tick
 

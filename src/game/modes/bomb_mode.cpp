@@ -446,6 +446,10 @@ bool bomb_mode::add_player_custom(const input_type in, const add_player_input& a
 	}
 	else {
 		new_player.stats.money = in.rules.economy.initial_money;
+
+		if (get_round_num() != 0) {
+			new_player.stats.money /= 2;
+		}
 	}
 
 	return true;

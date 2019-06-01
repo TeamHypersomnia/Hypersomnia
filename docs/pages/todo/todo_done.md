@@ -3121,3 +3121,10 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- we can also put an upper bound of the processed neighbors, e.g. process 3 at most
 	- linear time
 
+- fix naming in raycast profiler (fow vs light vs visibility)
+
+- Definitely increase the reward for win
+	- Maybe increase reward for loss just a little?
+
+- Decrease flashbang price to around 700$
+- Increase bomb planting time by half a second

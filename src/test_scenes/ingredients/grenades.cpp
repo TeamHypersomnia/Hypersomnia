@@ -233,7 +233,7 @@ namespace test_flavours {
 			fixtures.restitution = 1.f;
 
 			invariants::item item;
-			item.standard_price = 1000;
+			item.standard_price = 700;
 			item.space_occupied_per_charge = to_space_units("1.0");
 			meta.set(item);
 
@@ -540,7 +540,7 @@ namespace test_flavours {
 			fuse.set_bomb_vars(1500.f, 10000.f);
 #else
 			fuse.fuse_delay_ms = 35000.f;
-			fuse.set_bomb_vars(1500.f, 7000.f);
+			fuse.set_bomb_vars(2500.f, 8000.f);
 #endif
 			fuse.beep_sound.id = to_sound_id(test_scene_sound_id::BEEP);
 			fuse.beep_sound.modifier.doppler_factor = 0.5f;

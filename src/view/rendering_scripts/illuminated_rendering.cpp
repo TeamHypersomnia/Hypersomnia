@@ -341,7 +341,7 @@ void illuminated_rendering(
 
 	auto invoke_visibility_calculations = [&]() {
 		auto scope = measure_scope(profiler.light_visibility);
-		auto light_raycasts_scope = cosm.measure_raycasts(profiler.light_raycasts);
+		auto light_raycasts_scope = cosm.measure_raycasts(profiler.visibility_raycasts);
 
 		visibility_system(DEBUG_FRAME_LINES).calc_visibility(cosm, vis_requests, vis_responses, in.perf_settings);
 	};
@@ -349,8 +349,6 @@ void illuminated_rendering(
 #if BUILD_STENCIL_BUFFER
 	if (fog_of_war_effective) {
 		const auto fow_size = settings.fog_of_war.get_real_size();
-
-		auto fow_raycasts_scope = cosm.measure_raycasts(profiler.fog_of_war_raycasts);
 
 		messages::visibility_information_request request;
 		request.eye_transform = *viewed_character_transform;
