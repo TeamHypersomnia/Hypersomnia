@@ -35,16 +35,12 @@
 #include "augs/misc/getpid.h"
 #include "game/modes/dump_for_debugging.h"
 
+#include "view/client_arena_type.h"
 #include "application/network/special_client_request.h"
 
 struct config_lua_table;
 
 class client_adapter;
-
-enum class client_arena_type {
-	PREDICTED,
-	REFERENTIAL
-};
 
 class client_setup : 
 	public default_setup_settings,
@@ -287,21 +283,26 @@ public:
 					auto scope = measure_scope(performance.unpacking_remote_steps);
 
 					auto referential_post_solve = [&](const const_logic_step step) {
-						const auto input = prediction_input::unpredictable_for(get_viewed_character());
-
-						auto erase_predictable_messages = [&](auto& from_queue) {
-							erase_if(
-								from_queue,
-								[&](const auto& m) {
-									return !m.get_predictability().should_play(input);
-								}
-							);
-						};
-
-						for_each_effect_queue(step, erase_predictable_messages);
-
 						audiovisual_post_solve_settings settings;
-						settings.prediction = input;
+
+						if (is_spectating_referential()) {
+							settings.prediction = prediction_input::offline();
+						}
+						else {
+							const auto input = prediction_input::unpredictable_for(get_viewed_character());
+
+							auto erase_predictable_messages = [&](auto& from_queue) {
+								erase_if(
+									from_queue,
+									[&](const auto& m) {
+										return !m.get_predictability().should_play(input);
+									}
+								);
+							};
+
+							for_each_effect_queue(step, erase_predictable_messages);
+							settings.prediction = input;
+						}
 
 						audiovisual_post_solve(step, settings);
 					};
@@ -421,6 +422,10 @@ public:
 					}
 
 					auto predicted_post_solve = [&](const const_logic_step step) {
+						if (is_spectating_referential()) {
+							return;
+						}
+
 						const auto input = prediction_input::predictable_for(get_viewed_character());
 
 						auto erase_unpredictable_messages = [&](auto& from_queue) {
@@ -504,5 +509,5 @@ public:
 	setup_escape_result escape();
 
 	void update_stats(network_info&) const;
-	void draw_custom_gui(const draw_setup_gui_input& in) const;
+	bool is_spectating_referential() const;
 };

@@ -24,6 +24,8 @@ struct client_vars {
 	augs::maybe_network_simulator network_simulator;
 
 	unsigned max_buffered_server_commands = 1000;
-	unsigned max_predicted_client_commands = 255;
+	unsigned max_predicted_client_commands = 3000u;
+
+	bool spectate_referential_state = true;
 	// END GEN INTROSPECTOR
 };

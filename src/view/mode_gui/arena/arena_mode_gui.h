@@ -40,7 +40,9 @@ struct arena_gui_state {
 	mode_player_entropy perform_imgui(
 		draw_mode_gui_input, 
 		const M& mode, 
-		const typename M::const_input&
+		const typename M::const_input&,
+
+		prediction_input = prediction_input::offline()
 	);
 
 	template <class M>

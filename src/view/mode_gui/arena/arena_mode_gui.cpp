@@ -60,7 +60,9 @@ template <class M>
 mode_player_entropy arena_gui_state::perform_imgui(
 	draw_mode_gui_input mode_in, 
 	const M& typed_mode, 
-	const typename M::const_input& mode_input
+	const typename M::const_input& mode_input,
+
+	const prediction_input prediction
 ) {
 	mode_player_entropy result_entropy;
 
@@ -69,23 +71,23 @@ mode_player_entropy arena_gui_state::perform_imgui(
 	}
 
 	if constexpr(M::round_based) {
-		const auto p = typed_mode.calc_participating_factions(mode_input);
+		if (prediction.play_unpredictable) {
+			const auto p = typed_mode.calc_participating_factions(mode_input);
 
-		using I = arena_choose_team_gui::input::faction_info;
+			using I = arena_choose_team_gui::input::faction_info;
 
-		const auto max_players_in_each = mode_input.rules.max_players_per_team;
+			const auto max_players_in_each = mode_input.rules.max_players_per_team;
 
-		std::vector<I> factions;
+			std::vector<I> factions;
 
-		auto add = [&](const auto f) {
-			const auto col = mode_in.config.faction_view.colors[f].standard;
-			factions.push_back({ f, col, typed_mode.num_players_in(f), max_players_in_each });
-		};
+			auto add = [&](const auto f) {
+				const auto col = mode_in.config.faction_view.colors[f].standard;
+				factions.push_back({ f, col, typed_mode.num_players_in(f), max_players_in_each });
+			};
 
-		add(p.defusing);
-		add(p.bombing);
+			add(p.defusing);
+			add(p.bombing);
 
-		{
 			const auto player_id = mode_in.local_player_id;
 
 			if (const auto p = typed_mode.find(player_id)) {
@@ -108,7 +110,7 @@ mode_player_entropy arena_gui_state::perform_imgui(
 			}
 		}
 
-		{
+		if (prediction.play_predictable) {
 			const auto& cosm = mode_input.cosm;
 
 			if (typed_mode.get_buy_seconds_left(mode_input) <= 0.f) {
@@ -723,11 +725,13 @@ template void arena_gui_state::draw_mode_gui(
 template mode_player_entropy arena_gui_state::perform_imgui(
 	draw_mode_gui_input, 
 	const bomb_mode&, 
-	const typename bomb_mode::const_input&
+	const typename bomb_mode::const_input&,
+	prediction_input
 );
 
 template mode_player_entropy arena_gui_state::perform_imgui(
 	draw_mode_gui_input, 
 	const test_mode&, 
-	const typename test_mode::const_input&
+	const typename test_mode::const_input&,
+	prediction_input
 );

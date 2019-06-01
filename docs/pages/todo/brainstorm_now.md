@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Flag: show spectator in past
-
 - Theory: weak clients don't catch up with the steps they have to re-simulate after desyncing
 	- Why would they then be able to do so on connection init?
 

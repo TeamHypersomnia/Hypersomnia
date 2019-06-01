@@ -530,7 +530,8 @@ return {
 	},
 
 	max_buffered_server_commands = 10000,
-	max_predicted_client_commands = 3000
+	max_predicted_client_commands = 3000,
+    spectate_referential_state = true
   },
 
   performance = {

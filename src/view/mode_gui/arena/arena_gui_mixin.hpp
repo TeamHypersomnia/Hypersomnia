@@ -1,6 +1,9 @@
 #pragma once
 #include "view/mode_gui/arena/arena_gui_mixin.h"
 #include "application/setups/draw_setup_gui_input.h"
+#include "view/client_arena_type.h"
+
+class client_setup;
 
 template <class D>
 std::optional<camera_eye> arena_gui_mixin<D>::find_current_camera_eye() const {
@@ -57,17 +60,33 @@ custom_imgui_result arena_gui_mixin<D>::perform_custom_imgui(
 		in.config
 	};
 
-	self.get_arena_handle().on_mode_with_input(
-		[&](const auto& typed_mode, const auto& mode_input) {
-			const auto new_entropy = arena_gui.perform_imgui(
-				draw_mode_in, 
-				typed_mode, 
-				mode_input
-			);
+	auto perform_with = [&](const prediction_input input, const auto... args) {
+		self.get_arena_handle(args...).on_mode_with_input(
+			[&](const auto& typed_mode, const auto& mode_input) {
+				const auto new_entropy = arena_gui.perform_imgui(
+					draw_mode_in, 
+					typed_mode, 
+					mode_input,
+					input
+				);
 
-			self.control(new_entropy);
+				self.control(new_entropy);
+			}
+		);
+	};
+
+	if constexpr(std::is_same_v<client_setup, D>) {
+		if (self.is_spectating_referential()) {
+			perform_with(prediction_input::offline());
 		}
-	);
+		else {
+			perform_with(prediction_input::unpredictable_for(self.get_viewed_character()), client_arena_type::REFERENTIAL);
+			perform_with(prediction_input::predictable_for(self.get_viewed_character()), client_arena_type::PREDICTED);
+		}
+	}
+	else {
+		perform_with(prediction_input::offline());
+	}
 
 	return custom_imgui_result::NONE;
 }
@@ -120,11 +139,24 @@ void arena_gui_mixin<D>::draw_custom_gui(const draw_setup_gui_input& in) const {
 		in.config
 	};
 
-	self.get_arena_handle().on_mode_with_input(
-		[&](const auto& typed_mode, const auto& mode_input) {
-			arena_gui.draw_mode_gui(in, draw_mode_in, typed_mode, mode_input);
+	auto draw_with = [&](const prediction_input input, const auto... args) {
+		self.get_arena_handle(args...).on_mode_with_input([&](const auto& typed_mode, const auto& mode_input) {
+			arena_gui.draw_mode_gui(in, draw_mode_in, typed_mode, mode_input, input);
+		});
+	};
+
+	if constexpr(std::is_same_v<client_setup, D>) {
+		if (self.is_spectating_referential()) {
+			draw_with(prediction_input::offline());
 		}
-	);
+		else {
+			draw_with(prediction_input::unpredictable_for(self.get_viewed_character()), client_arena_type::REFERENTIAL);
+			draw_with(prediction_input::predictable_for(self.get_viewed_character()), client_arena_type::PREDICTED);
+		}
+	}
+	else {
+		draw_with(prediction_input::offline());
+	}
 }
 
 template <class D>

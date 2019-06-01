@@ -3128,3 +3128,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Decrease flashbang price to around 700$
 - Increase bomb planting time by half a second
+- Flag: show spectator in past
+

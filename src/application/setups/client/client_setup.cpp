@@ -106,14 +106,21 @@ void client_setup::accept_game_gui_events(const game_gui_entropy_type& events) {
 	control(events);
 }
 
+bool client_setup::is_spectating_referential() const {
+	return vars.spectate_referential_state && arena_gui.spectator.show;
+}
+
 client_arena_type client_setup::get_viewed_arena_type() const {
+	if (is_spectating_referential()) {
+		return client_arena_type::REFERENTIAL;
+	}
+
 #if USE_CLIENT_PREDICTION
 	return client_arena_type::PREDICTED;
 #else
 	return client_arena_type::REFERENTIAL;
 #endif
 
-	// TODO: For spectating the game, use the referential arena with jitter.
 }
 
 online_arena_handle<false> client_setup::get_arena_handle(std::optional<client_arena_type> c) {
@@ -671,35 +678,4 @@ augs::path_type client_setup::get_unofficial_content_dir() const {
 
 	const auto paths = arena_paths(name);
 	return paths.folder_path;
-}
-
-void client_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
-	const auto& self = *this;
-
-	if (!self.is_gameplay_on()) {
-		return;
-	}
-
-	const auto game_screen_top = 0.f;
-
-	const auto draw_mode_in = draw_mode_gui_input { 
-		game_screen_top,
-		self.get_local_player_id(), 
-		in.images_in_atlas,
-		in.config
-	};
-
-	// TODO: When spectating, draw everything through referential arena.
-
-	self.get_arena_handle(client_arena_type::REFERENTIAL).on_mode_with_input(
-		[&](const auto& typed_mode, const auto& mode_input) {
-			arena_gui.draw_mode_gui(in, draw_mode_in, typed_mode, mode_input, prediction_input::unpredictable_for(self.get_viewed_character()));
-		}
-	);
-
-	self.get_arena_handle(client_arena_type::PREDICTED).on_mode_with_input(
-		[&](const auto& typed_mode, const auto& mode_input) {
-			arena_gui.draw_mode_gui(in, draw_mode_in, typed_mode, mode_input, prediction_input::predictable_for(self.get_viewed_character()));
-		}
-	);
 }
