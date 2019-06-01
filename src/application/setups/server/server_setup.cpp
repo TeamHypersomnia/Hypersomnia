@@ -515,7 +515,7 @@ void server_setup::handle_client_messages() {
 void server_setup::send_server_step_entropies(const compact_server_step_entropy& total_input) {
 	networked_server_step_entropy total;
 	total.payload = total_input;
-	total.meta.reinference_required = reinference_necessary;
+	total.meta.reinference_necessary = reinference_necessary;
 	total.meta.state_hash = [&]() -> decltype(total.meta.state_hash) {
 		auto& ticks_remaining = ticks_until_sending_hash;
 
@@ -801,7 +801,7 @@ TEST_CASE("NetSerialization ServerEntropySecond") {
 
 	networked_server_step_entropy sent;
 	sent.meta.state_hash = 0xdeadbeef;
-	sent.meta.reinference_required = true;
+	sent.meta.reinference_necessary = true;
 
 	const auto naive_bytes = [&]() {
 		total_mode_player_entropy t;

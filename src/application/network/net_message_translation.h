@@ -271,7 +271,7 @@ namespace net_messages {
 		serialize_bool(s, has_removed_player);
 		serialize_bool(s, has_special_command);
 
-		serialize_bool(s, total_networked.meta.reinference_required);
+		serialize_bool(s, total_networked.meta.reinference_necessary);
 
 		serialize_align(s);
 

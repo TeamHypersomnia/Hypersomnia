@@ -190,7 +190,7 @@ public:
 				}
 
 				{
-					const bool shall_reinfer = meta.reinference_required || logically_set(actual_server_step.payload.general.added_player);
+					const bool shall_reinfer = meta.reinference_necessary || logically_set(actual_server_step.payload.general.added_player);
 
 					if (shall_reinfer) {
 						LOG("Added player in the next entropy. Will reinfer to sync.");
