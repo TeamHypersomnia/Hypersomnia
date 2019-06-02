@@ -460,6 +460,7 @@ public:
 
 					schedule_reprediction_if_inconsistent(forward_step_result);
 #else
+					(void)predicted_solve_settings;
 					(void)predicted_callbacks;
 					(void)callbacks;
 #endif

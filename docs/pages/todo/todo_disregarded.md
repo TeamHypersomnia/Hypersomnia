@@ -465,3 +465,6 @@ summary: Just a hidden scratchpad.
 
 - enable/disable warm starting?
 
+- Prevent re-simulation of ever more steps during resynchronization
+	- No steps get resimulated when we have no incoming entropies
+

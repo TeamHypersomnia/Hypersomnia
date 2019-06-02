@@ -489,7 +489,7 @@ return {
 	time_limit_to_enter_game_since_connection = 15,
 
 	send_updates_once_every_tick = 1,
-	reset_resync_timer_once_every_secs = 8,
+	reset_resync_timer_once_every_secs = 4,
 	max_client_resyncs = 30,
 
 	disabled_network_simulator = {

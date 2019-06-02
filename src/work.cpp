@@ -1757,6 +1757,10 @@ int work(const int argc, const char* const * const argv) try {
 
 				main_menu->gui.advance(context, frame_delta);
 
+#if MENU_ART
+				get_drawer().aabb(streaming.necessary_images_in_atlas[assets::necessary_image_id::ART_1], ltrb(0, 0, screen_size.x, screen_size.y), white);
+#endif
+
 				/* #5 */
 				const auto cursor = main_menu->gui.draw({ context, get_drawer() });
 

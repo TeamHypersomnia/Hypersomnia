@@ -37,6 +37,19 @@ game_connection_config::game_connection_config() {
 	numChannels = 3;
 	timeout = 10;
 
+#if RESYNCS_CHANNEL
+	{
+		auto& resyncs = channel[static_cast<int>(game_channel_type::RESYNCS)];
+		resyncs.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
+		resyncs.maxBlockSize = 1024 * 1024 * 2;
+		resyncs.sentPacketBufferSize = 16;
+		resyncs.messageResendTime = 0.f;
+		resyncs.messageSendQueueSize = 16;
+		resyncs.messageReceiveQueueSize = 16;
+		resyncs.packetBudget = 600;
+	}
+#endif
+
 	{
 		auto& solvable_stream = channel[static_cast<int>(game_channel_type::SERVER_SOLVABLE_AND_STEPS)];
 		solvable_stream.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;

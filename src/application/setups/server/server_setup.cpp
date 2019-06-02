@@ -466,10 +466,10 @@ message_handler_result server_setup::handle_client_message(
 			case special_client_request::RESYNC:
 				if (server_time >= c.last_resync_counter_reset_at + vars.reset_resync_timer_once_every_secs) {
 					c.resyncs_counter = 0;
-					c.last_resync_counter_reset_at = server_time;
 					LOG("Resetting the resync counter.");
 				}
 
+				c.last_resync_counter_reset_at = server_time;
 				++c.resyncs_counter;
 
 				LOG("Client has asked for a resync no %x.", c.resyncs_counter);

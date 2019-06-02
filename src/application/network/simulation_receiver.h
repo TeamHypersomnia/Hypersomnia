@@ -13,7 +13,7 @@
 
 /* Prediction is too costly in debug builds. */
 #define USE_CLIENT_PREDICTION NDEBUG
-#define TEST_DESYNC_DETECTION 0
+#define TEST_DESYNC_DETECTION !NDEBUG
 
 struct misprediction_candidate_entry {
 	entity_id id;
@@ -158,7 +158,16 @@ public:
 
 					if (received_hash != std::nullopt) {
 #if TEST_DESYNC_DETECTION
-						if (referential_cosmos.get_total_steps_passed() == 1 || referential_cosmos.get_total_steps_passed() % (128 * 5) == 0) {
+						auto total = referential_cosmos.get_total_steps_passed();
+						bool simulate_desync = false;
+
+						for (auto i = total; i < total + 1; ++i) {
+							if (i % (128 * 6) == 0) {
+								simulate_desync = true;
+							}
+						}
+
+						if (simulate_desync) {
 							const auto it = referential_arena.get_cosmos()[locally_controlled_entity];
 
 							if (it) {

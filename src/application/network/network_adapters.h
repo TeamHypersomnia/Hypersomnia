@@ -18,6 +18,9 @@
 #include "application/network/custom_yojimbo_factory.h"
 
 enum class game_channel_type {
+#if RESYNCS_CHANNEL
+	RESYNCS,
+#endif
 	SERVER_SOLVABLE_AND_STEPS,
 	CLIENT_COMMANDS,
 	COMMUNICATIONS,
