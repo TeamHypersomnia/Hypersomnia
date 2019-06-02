@@ -3136,3 +3136,8 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- If both have, prioritize primary
 	- Also if we have a scheduled throw, aim with the first melee weapon
 
+- We should somehow re-adjust the amount of predicted steps
+	- Sometimes even if the latency is low, the amount of predicted steps is high
+	- Do we properly take squashing into account?
+	- Ah, it will most probably depend on the jitter buffer length of the server and the current value
+

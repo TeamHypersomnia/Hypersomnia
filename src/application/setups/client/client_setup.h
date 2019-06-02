@@ -86,6 +86,7 @@ class client_setup :
 	augs::propagate_const<std::unique_ptr<client_adapter>> client;
 	net_time_t client_time = 0.0;
 	net_time_t when_initiated_connection = 0.0;
+	net_time_t when_sent_client_settings = 0.0;
 
 	double default_inv_tickrate = 1 / 128.0;
 

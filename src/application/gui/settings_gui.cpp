@@ -19,6 +19,7 @@
 
 #include "application/config_lua_table.h"
 #include "application/gui/settings_gui.h"
+#include "augs/network/network_types.h"
 
 void configuration_subscribers::sync_back_into(config_lua_table& into) const {
 	window.sync_back_into(into.window);
@@ -378,6 +379,8 @@ void settings_gui_state::perform(
 			}
 			case settings_pane::CLIENT: {
 				auto& scope_cfg = config.client;
+
+				input_text<max_nickname_length_v>("Chosen nickname (3-30 characters)", scope_cfg.nickname);
 
 				{
 					auto& scope_cfg = config.arena_mode_gui;

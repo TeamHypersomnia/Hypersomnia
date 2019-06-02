@@ -17,6 +17,8 @@
 
 #include "augs/filesystem/file.h"
 
+#include "augs/templates/introspection_utils/introspective_equal.h"
+
 client_setup::client_setup(
 	sol::state& lua,
 	const client_start_input& in
@@ -460,7 +462,7 @@ void client_setup::send_pending_commands() {
 
 	const bool init_send = state == C::INVALID;
 
-	if (resend_requested_settings || init_send) {
+	auto send_settings = [&]() {
 		client->send_payload(
 			game_channel_type::CLIENT_COMMANDS,
 			std::as_const(requested_settings)
@@ -472,6 +474,18 @@ void client_setup::send_pending_commands() {
 		}
 		else {
 			LOG("Sent repeated client configuration to the server.");
+		}
+
+		when_sent_client_settings = client_time;
+	};
+
+	if (init_send) {
+		send_settings();
+	}
+	else if (resend_requested_settings) {
+		if (client_time - when_sent_client_settings > 1.0) {
+			send_settings();
+			resend_requested_settings = false;
 		}
 	}
 
@@ -624,12 +638,18 @@ custom_imgui_result client_setup::perform_custom_imgui(
 void client_setup::apply(const config_lua_table& cfg) {
 	vars = cfg.client;
 
+	auto old_requested_settings = requested_settings;
+
 	auto& r = requested_settings;
 	r.chosen_nickname = vars.nickname;
 	r.net = vars.net;
 	r.public_settings.mouse_sensitivity = cfg.input.mouse_sensitivity;
 
 	client->set(vars.network_simulator);
+
+	if (!augs::introspective_equal(old_requested_settings, requested_settings)) {
+		resend_requested_settings = true;
+	}
 }
 
 bool client_setup::is_connected() const {

@@ -28,11 +28,6 @@ summary: That which we are brainstorming at the moment.
 
 - Communicate with the server somehow from localhost?
 
-- We should somehow re-adjust the amount of predicted steps
-	- Sometimes even if the latency is low, the amount of predicted steps is high
-	- Do we properly take squashing into account?
-	- Ah, it will most probably depend on the jitter buffer length of the server and the current value
-
 - make layer with insects hoverable in editor
 
 - some strange recurring problem with H (temporarily hiding layers) not working

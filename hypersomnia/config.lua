@@ -516,7 +516,7 @@ return {
 
 	net = {
 	  jitter = {
-	  	buffer_at_least_steps = 2,
+	  	buffer_at_least_steps = 3,
 		buffer_at_least_ms = 20,
 		max_commands_to_squash_at_once = 255
 	  }
