@@ -4,8 +4,8 @@
 
 struct client_jitter_vars {
 	// GEN INTROSPECTOR struct client_jitter_vars
-	uint32_t buffer_ms = 33;
-	uint32_t merge_commands_when_above_ms = 50;
+	uint32_t buffer_at_least_steps = 2;
+	uint32_t buffer_at_least_ms = 20;
 	uint8_t max_commands_to_squash_at_once = 255;
 	// END GEN INTROSPECTOR
 };

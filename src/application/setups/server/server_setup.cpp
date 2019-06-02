@@ -196,7 +196,7 @@ void server_setup::advance_clients_state() {
 	const auto inv_simulation_delta_ms = 1.0 / (get_inv_tickrate() * 1000.0);
 
 	auto in_steps = [inv_simulation_delta_ms](const auto ms) {
-		return ms * inv_simulation_delta_ms;
+		return static_cast<uint32_t>(ms * inv_simulation_delta_ms);
 	};
 
 	auto character_exists_for = [&](const mode_player_id mode_id) {
@@ -256,7 +256,7 @@ void server_setup::advance_clients_state() {
 #endif
 
 			const auto jitter_vars = c.settings.net.jitter;
-			const auto jitter_squash_steps = in_steps(jitter_vars.merge_commands_when_above_ms);
+			const auto jitter_squash_steps = std::max(jitter_vars.buffer_at_least_steps, in_steps(jitter_vars.buffer_at_least_ms));
 
 			auto& inputs = c.pending_entropies;
 

@@ -407,8 +407,8 @@ void settings_gui_state::perform(
 					auto& scope_cfg = config.client.net.jitter;
 
 					if (auto node = scoped_tree_node("Jitter")) {
-						revertable_slider(SCOPE_CFG_NVP(buffer_ms), 0u, 200u);
-						revertable_slider(SCOPE_CFG_NVP(merge_commands_when_above_ms), 0u, 1000u);
+						revertable_slider(SCOPE_CFG_NVP(buffer_at_least_steps), 0u, 10u);
+						revertable_slider(SCOPE_CFG_NVP(buffer_at_least_ms), 0u, 100u);
 						revertable_slider(SCOPE_CFG_NVP(max_commands_to_squash_at_once), uint8_t(0), uint8_t(255));
 					}
 				}
