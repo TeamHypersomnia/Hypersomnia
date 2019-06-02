@@ -95,5 +95,5 @@ void print_input_devices(Display* const display) {
 
 	total_info += "\nDevice info end.";
 
-	augs::save_as_text(LOG_FILES_DIR "/input_devices.txt", total_info);
+	augs::save_as_text(get_path_in_log_files("input_devices.txt"), total_info);
 }

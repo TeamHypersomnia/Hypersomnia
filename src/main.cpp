@@ -35,7 +35,11 @@ int main(const int argc, const char* const * const argv) {
 #endif
 	std::setlocale(LC_NUMERIC, "C");
 
-	if (cmd_line_params(argc, argv).help_only) {
+	const auto params = cmd_line_params(argc, argv);
+
+	::is_dedicated_server = params.start_dedicated_server;
+
+	if (params.help_only) {
 		std::cout << get_help_section() << std::endl;
 		
 		return EXIT_SUCCESS;
@@ -48,10 +52,10 @@ int main(const int argc, const char* const * const argv) {
 
 		switch (exit_code) {
 			case EXIT_SUCCESS: 
-				augs::save_as_text(LOG_FILES_DIR "/exit_success_debug_log.txt", logs); 
+				augs::save_as_text(get_path_in_log_files("exit_success_debug_log.txt"), logs); 
 				break;
 			case EXIT_FAILURE: {
-				const auto failure_log_path = augs::path_type(LOG_FILES_DIR "/exit_failure_debug_log.txt");
+				const auto failure_log_path = augs::path_type(get_path_in_log_files("exit_failure_debug_log.txt"));
 				augs::save_as_text(failure_log_path, logs);
 				
 				augs::open_text_editor(failure_log_path.string());

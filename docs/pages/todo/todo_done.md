@@ -3141,3 +3141,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- Do we properly take squashing into account?
 	- Ah, it will most probably depend on the jitter buffer length of the server and the current value
 
+- log if client does not have the map that's on the server
+

@@ -129,7 +129,7 @@ void editor_setup::set_popup(const editor_popup p) {
 
 	LOG(logged);
 
-	augs::save_as_text(LOG_FILES_DIR "/last_editor_message.txt", augs::date_time().get_readable() + '\n' + logged);
+	augs::save_as_text(get_path_in_log_files("last_editor_message.txt"), augs::date_time().get_readable() + '\n' + logged);
 }
 
 mode_player_id editor_setup::get_local_player_id() const {

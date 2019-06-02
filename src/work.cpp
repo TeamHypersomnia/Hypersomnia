@@ -72,6 +72,7 @@
 
 std::function<void()> ensure_handler;
 bool log_to_live_file = false;
+bool is_dedicated_server = false;
 
 /*
 	static is used for all variables because some take massive amounts of space.
@@ -88,6 +89,7 @@ int work(const int argc, const char* const * const argv) try {
 	setup_float_flags();
 
 	augs::create_directories(LOG_FILES_DIR);
+	augs::create_directories(SERVER_LOG_FILES_DIR);
 
 	static augs::timer until_first_swap;
 	bool until_first_swap_measured = false;
@@ -117,7 +119,7 @@ int work(const int argc, const char* const * const argv) try {
 	augs::create_directories(GENERATED_FILES_DIR);
 	augs::create_directories(LOCAL_FILES_DIR);
 
-	dump_detailed_sizeof_information(LOG_FILES_DIR "/detailed_sizeofs.txt");
+	dump_detailed_sizeof_information(get_path_in_log_files("detailed_sizeofs.txt"));
 
 	static const auto canon_config_path = augs::path_type("config.lua");
 	static const auto local_config_path = augs::path_type(LOCAL_FILES_DIR "/config.local.lua");
@@ -141,7 +143,7 @@ int work(const int argc, const char* const * const argv) try {
 	;
 
 	if (config.log_to_live_file) {
-		augs::remove_file(LOG_FILES_DIR "/live_debug.txt");
+		augs::remove_file(get_path_in_log_files("live_debug.txt"));
 
 		log_to_live_file = true;
 
@@ -150,9 +152,18 @@ int work(const int argc, const char* const * const argv) try {
 	}
 
 	LOG("Initializing ImGui.");
+
+	static const auto imgui_ini_path = 
+		is_dedicated_server ? 
+		LOCAL_FILES_DIR "/server_imgui.ini"
+		: LOCAL_FILES_DIR "/imgui.ini"
+	;
+
+	static const auto imgui_log_path = get_path_in_log_files("imgui_log.txt");
+
 	augs::imgui::init(
-		LOCAL_FILES_DIR "/imgui.ini",
-		LOG_FILES_DIR "/imgui_log.txt",
+		imgui_ini_path,
+		imgui_log_path.c_str(),
 		config.gui_style
 	);
 
@@ -275,7 +286,7 @@ int work(const int argc, const char* const * const argv) try {
 	static augs::audio_context audio(config.audio);
 
 	LOG("Logging all audio devices.");
-	augs::log_all_audio_devices(LOG_FILES_DIR "/audio_devices.txt");
+	augs::log_all_audio_devices(get_path_in_log_files("audio_devices.txt"));
 
 	LOG("Initializing the window.");
 	static augs::window window(config.window);

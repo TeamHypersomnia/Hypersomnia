@@ -18,6 +18,14 @@ std::mutex log_mutex;
 
 extern bool log_to_live_file;
 
+std::string get_path_in_log_files(const std::string& name) {
+	if (is_dedicated_server) {
+		return std::string(SERVER_LOG_FILES_DIR) + "/server_" + name;
+	}
+
+	return std::string(LOG_FILES_DIR) + "/" + name;
+}
+
 program_log program_log::global_instance = 10000;
 
 program_log::program_log(const unsigned max_all_entries) 
@@ -54,7 +62,7 @@ void write_log_entry(const std::string& f) {
 #endif
 
 	if (log_to_live_file) {
-		std::ofstream recording_file(LOG_FILES_DIR "/live_debug.txt", std::ios::out | std::ios::app);
+		std::ofstream recording_file(get_path_in_log_files("live_debug.txt"), std::ios::out | std::ios::app);
 		recording_file << f << std::endl;
 	}
 #endif

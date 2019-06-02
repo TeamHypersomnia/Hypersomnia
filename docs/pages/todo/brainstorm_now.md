@@ -7,13 +7,12 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - Still, if we are able to always connect and catch up with inputs, it should never disconnect if we resync mid-game
+	- Using debug mode to simulate a slow computer does not reproduce the issue
 
 - Theory: weak clients don't catch up with the steps they have to re-simulate after desyncing
 	- Why would they then be able to do so on connection init?
 
 - Treat holster as last setup flag?
-
-- Use debug mode to simulate a slow computer
 
 - Radar
 	- Also show bomb
@@ -93,8 +92,6 @@ summary: That which we are brainstorming at the moment.
 	- remnants
 	- weapons
 	- character stats
-
-- log if client does not have the map that's on the server
 
 - Bug: path specification for assets doesnt fully work on Windows
 

@@ -24,9 +24,11 @@ inline auto static_allocations_info() {
 inline auto directories_info() {
 	return typesafe_sprintf(
 		"LOG_FILES_DIR=%x\n"
+		"SERVER_LOG_FILES_DIR=%x\n"
 		"GENERATED_FILES_DIR=%x\n"
 		"LOCAL_FILES_DIR=%x\n",
 		LOG_FILES_DIR,
+		SERVER_LOG_FILES_DIR,
 		GENERATED_FILES_DIR,
 		LOCAL_FILES_DIR
 	);

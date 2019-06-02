@@ -20,7 +20,7 @@ FORCE_NOINLINE void save_log_and_terminate() {
 	}
 	
 	const auto logs = program_log::get_current().get_complete();
-	const auto failure_log_path = augs::path_type(LOG_FILES_DIR "/ensure_failed_debug_log.txt");
+	const auto failure_log_path = augs::path_type(get_path_in_log_files("ensure_failed_debug_log.txt"));
 
 	augs::save_as_text(failure_log_path, logs);
 
