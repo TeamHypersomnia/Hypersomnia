@@ -6,6 +6,7 @@
 #include "hypersomnia_version.h"
 
 #include "application/network/net_message_serialization.h"
+#include "3rdparty/yojimbo/netcode.io/netcode.c"
 
 static_assert(max_incoming_connections_v == yojimbo::MaxClients);
 
@@ -306,4 +307,14 @@ bool server_adapter::send(
 
 std::size_t server_adapter::num_connected_clients() const {
 	return server.GetNumConnectedClients();
+}
+
+yojimbo::Address server_adapter::get_client_address(const client_id_type& id) const {
+	const auto s = server.GetServerDetail();
+	auto addr = s->client_address[id];
+
+	char buffer[NETCODE_MAX_ADDRESS_STRING_LENGTH];
+	netcode_address_to_string(&addr, buffer);
+	
+	return yojimbo::Address(buffer);
 }

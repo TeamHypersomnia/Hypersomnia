@@ -84,4 +84,6 @@ public:
 	server_network_info get_server_network_info() const;
 
 	std::size_t num_connected_clients() const;
+
+	yojimbo::Address get_client_address(const client_id_type& id) const;
 };

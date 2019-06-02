@@ -164,7 +164,16 @@ void server_setup::accept_game_gui_events(const game_gui_entropy_type& events) {
 }
 
 void server_setup::init_client(const client_id_type& id) {
-	clients[id].init(server_time);
+	auto& new_client = clients[id];
+	new_client.init(server_time);
+
+	if (vars.auto_authorize_loopback_for_rcon) {
+		if (server->get_client_address(id).IsLoopback()) {
+			LOG("Authorizing loopback client for rcon.");
+
+			new_client.rcon_authorized = true;
+		}
+	}
 
 	LOG("Client connected. Details:\n%x", describe_client(id));
 }
@@ -687,6 +696,10 @@ augs::path_type server_setup::get_unofficial_content_dir() const {
 
 	const auto paths = arena_paths(name);
 	return paths.folder_path;
+}
+
+bool server_setup::is_authorized_for_rcon(const client_id_type& id) const { 
+	return clients[id].rcon_authorized;
 }
 
 #include "augs/readwrite/to_bytes.h"

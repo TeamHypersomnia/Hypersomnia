@@ -500,7 +500,9 @@ return {
 	},
 
 	max_buffered_client_commands = 1280,
-	state_hash_once_every_tick = 1
+	state_hash_once_every_tick = 1,
+
+    auto_authorize_loopback_for_rcon = true
   },
 
   dedicated_server = {

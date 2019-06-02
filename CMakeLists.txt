@@ -741,7 +741,6 @@ if(BUILD_NETWORKING)
 	list(APPEND HYPERSOMNIA_TRIVIAL_3RDPARTY_CPPS
 		"src/3rdparty/yojimbo/yojimbo.cpp"
 		"src/3rdparty/yojimbo/tlsf/tlsf.c"
-		"src/3rdparty/yojimbo/netcode.io/netcode.c"
 		"src/3rdparty/yojimbo/reliable.io/reliable.c"
 	)
 

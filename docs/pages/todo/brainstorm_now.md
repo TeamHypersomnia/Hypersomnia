@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- RCON password
+- Write editor write date to version.txt file
+	
 - Still, if we are able to always connect and catch up with inputs, it should never disconnect if we resync mid-game
 	- Using debug mode to simulate a slow computer does not reproduce the issue
 

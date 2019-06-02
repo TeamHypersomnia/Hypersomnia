@@ -22,5 +22,7 @@ struct server_vars {
 	unsigned state_hash_once_every_tick = 1;
 
 	augs::maybe_network_simulator network_simulator;
+
+	bool auto_authorize_loopback_for_rcon = true;
 	// END GEN INTROSPECTOR
 };

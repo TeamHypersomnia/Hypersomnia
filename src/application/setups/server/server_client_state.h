@@ -21,6 +21,7 @@ struct server_client_state {
 
 	unsigned resyncs_counter = 0;
 	net_time_t last_resync_counter_reset_at = 0;
+	bool rcon_authorized = false;
 
 	server_client_state() = default;
 

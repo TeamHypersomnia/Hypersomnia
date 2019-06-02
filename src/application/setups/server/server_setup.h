@@ -287,4 +287,5 @@ public:
 	void update_stats(server_network_info&) const;
 
 	server_step_entropy unpack(const compact_server_step_entropy&) const;
+	bool is_authorized_for_rcon(const client_id_type&) const;
 };
