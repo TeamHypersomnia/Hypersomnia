@@ -699,7 +699,27 @@ void sentience_system::rotate_towards_crosshairs_and_driven_vehicles(const logic
 				}
 
 				if (items.size() > 0) {
-					const auto subject_item = cosm[items[0]];
+					auto item_aimed_with = items[0];
+
+					if (items.size() > 1) {
+						auto is_non_gun = [&](const auto id) {
+							return !cosm[id].template has<invariants::gun>();
+						};
+
+						/* 
+							Aim with the first non-gun as it might have been pulled out for a special reason, like throwing. 
+							If both are guns, this will leave item_aimed_with set to the gun in the primary hand.
+						*/
+
+						if (is_non_gun(items[0])) {
+							item_aimed_with = items[0];
+						}
+						else if (is_non_gun(items[1])) {
+							item_aimed_with = items[1];
+						}
+					}
+
+					const auto subject_item = cosm[item_aimed_with];
 
 					const auto mc = subject_transform.pos;
 					const auto crosshair = crosshair_transform.pos - mc;

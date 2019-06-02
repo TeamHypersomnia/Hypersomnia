@@ -3130,3 +3130,9 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - Increase bomb planting time by half a second
 - Flag: show spectator in past
 
+- At some point we might want to give different jitter buffer length values to 60tick and 128tick
+
+- Always aim with the hand that has an armed explosive
+	- If both have, prioritize primary
+	- Also if we have a scheduled throw, aim with the first melee weapon
+

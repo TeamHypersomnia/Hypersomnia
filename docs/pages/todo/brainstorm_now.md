@@ -6,12 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- At some point we might want to give different jitter buffer length values to 60tick and 128tick
-- At some point we might want to give different jitter buffer length values to 60tick and 128tick
-- At some point we might want to give different jitter buffer length values to 60tick and 128tick
-- At some point we might want to give different jitter buffer length values to 60tick and 128tick
-- At some point we might want to give different jitter buffer length values to 60tick and 128tick
-
 - Still, if we are able to always connect and catch up with inputs, it should never disconnect if we resync mid-game
 
 - Theory: weak clients don't catch up with the steps they have to re-simulate after desyncing
@@ -38,10 +32,6 @@ summary: That which we are brainstorming at the moment.
 	- Sometimes even if the latency is low, the amount of predicted steps is high
 	- Do we properly take squashing into account?
 	- Ah, it will most probably depend on the jitter buffer length of the server and the current value
-
-- Always aim with the hand that has an armed explosive
-	- If both have, prioritize primary
-	- Also if we have a scheduled throw, aim with the first melee weapon
 
 - make layer with insects hoverable in editor
 
