@@ -65,21 +65,22 @@ decltype(auto) find_frame(
 
 template <class T>
 frame_type_t<T>* find_shoot_frame(
+	const invariants::gun& gun_def,
 	const components::gun& gun,
 	T& anim, 
 	const cosmos_clock& clk
 ) {
-	const auto animation_time_ms = (clk.now - gun.when_last_fired).in_milliseconds(clk.dt);
-	return calc_current_frame(anim, animation_time_ms);
+	return calc_current_frame(anim, clk.get_passed_ms(gun_def.shot_cooldown_ms, gun.fire_cooldown_object));
 }
 
 template <class T, class C>
 frame_type_t<T>* find_shoot_frame(
+	const invariants::gun& gun_def,
 	const components::gun& gun,
 	T& anim, 
 	const C& cosm
 ) {
-	return ::find_shoot_frame(gun, anim, cosm.get_clock());
+	return ::find_shoot_frame(gun_def, gun, anim, cosm.get_clock());
 }
 
 template <class T>
@@ -200,11 +201,11 @@ auto calc_stance_usage(
 
 		if (const auto gun = cosm[wielded_items[0]].template find<components::gun>()) {
 			if (const auto shoot_animation = logicals.find(stance.actions[weapon_action_type::PRIMARY].perform)) {
-				const auto frame = ::find_shoot_frame(*gun, *shoot_animation, cosm);
+				const auto frame = ::find_shoot_frame(cosm[wielded_items[0]].template get<invariants::gun>(), *gun, *shoot_animation, cosm);
 				const auto second_frame = [n, &cosm, shoot_animation, &wielded_items]() -> decltype(frame) {
 					if (n == 2) {
 						if (const auto second_gun = cosm[wielded_items[1]].template find<components::gun>()) {
-							return ::find_shoot_frame(*second_gun, *shoot_animation, cosm);
+							return ::find_shoot_frame(cosm[wielded_items[1]].template get<invariants::gun>(), *second_gun, *shoot_animation, cosm);
 						}
 					}
 

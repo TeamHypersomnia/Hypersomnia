@@ -43,6 +43,21 @@
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 #include "game/detail/organisms/startle_nearbly_organisms.h"
 
+template <class T>
+bool gun_try_to_fire_and_reset(
+	const cosmos_clock& clk,
+	const T cooldown_ms, 
+	augs::real_cooldown& current_cooldown_ms
+) {
+	if (current_cooldown_ms <= 0.f) {
+		const auto rmdr = std::fmod(-current_cooldown_ms, clk.dt.in_milliseconds());
+		current_cooldown_ms = cooldown_ms - rmdr;
+		return true;
+	}
+
+	return false;
+}
+
 using namespace augs;
 
 #define ENABLE_RECOIL 1
@@ -124,7 +139,7 @@ static void cooldown_gun_heat(
 
 	const auto& clk = cosm.get_clock();
 
-	if (clk.is_ready(gun_def.shot_cooldown_ms, gun.when_last_fired)) {
+	if (clk.is_ready(gun_def.shot_cooldown_ms, gun.fire_cooldown_object)) {
 		/* Apply idle cooldown */
 		gun.recoil.cooldown(gun_def.recoil, delta.in_milliseconds());
 		heat = std::max(0.f, heat - (gun_def.heat_cooldown_speed_mult * delta.in_seconds()) / gun_def.maximum_heat);
@@ -167,6 +182,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 	const auto& clk = cosm.get_clock();
 	const auto delta = clk.dt;
 	const auto& logicals = step.get_logical_assets();
+	const auto delta_ms = delta.in_milliseconds();
 
 	cosm.for_each_having<components::gun>(
 		[&](const auto& gun_entity) {
@@ -180,6 +196,23 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 			auto& gun = gun_entity.template get<components::gun>();
 			const auto& gun_def = gun_entity.template get<invariants::gun>();
+
+			static_assert(std::is_same_v<decltype(gun.fire_cooldown_object), real32>);
+
+			if constexpr(std::is_same_v<decltype(gun.fire_cooldown_object), real32>) {
+				/* 
+					The number 200 is arbitrary. 
+					We need to allow the cooldown counter to go a little down past 0
+					for the sake of frame calculation code for animations that last shorter
+					than the shot interval.
+
+					Otherwise, the weapons would appear in the middle of a shot frame during idle.
+				*/
+
+				if (gun.fire_cooldown_object > -200.f) {
+					gun.fire_cooldown_object -= delta_ms;
+				}
+			}
 
 			const bool transfer_cooldown_passed = clk.is_ready(
 				gun_def.get_transfer_shot_cooldown(), 
@@ -296,7 +329,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 				auto try_to_fire_interval = [&]() -> std::optional<weapon_action_type> {
 					if (gun.remaining_burst_shots > 0) {
-						if (clk.try_to_fire_and_reset(gun_def.burst_interval_ms, gun.when_last_fired)) {
+						if (gun_try_to_fire_and_reset(clk, gun_def.burst_interval_ms, gun.fire_cooldown_object)) {
 							gun.when_last_played_trigger_effect = clk.now;
 							--gun.remaining_burst_shots;
 
@@ -308,7 +341,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 					if (transfer_cooldown_passed) {
 						if (primary_trigger_pressed || secondary_trigger_pressed) {
-							if (clk.try_to_fire_and_reset(gun_def.shot_cooldown_ms, gun.when_last_fired)) {
+							if (gun_try_to_fire_and_reset(clk, gun_def.shot_cooldown_ms, gun.fire_cooldown_object)) {
 								gun.when_last_played_trigger_effect = clk.now;
 
 								if (gun_def.action_mode != gun_action_type::AUTOMATIC) {
@@ -514,7 +547,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 							try_to_play_trigger_pull_sound();
 						}
 
-						const bool shot_cooldown_passed = clk.is_ready(gun_def.shot_cooldown_ms, gun.when_last_fired);
+						const bool shot_cooldown_passed = clk.is_ready(gun_def.shot_cooldown_ms, gun.fire_cooldown_object);
 
 						if (transfer_cooldown_passed && shot_cooldown_passed && feasible_wielding) {
 							if (const auto next_cartridge = find_next_cartridge(gun_entity); next_cartridge.is_set()) {

@@ -24,6 +24,8 @@ namespace augs {
 		bool was_set() const;
 	};
 
+	using real_cooldown = real32;
+
 	struct stepped_clock {
 		// GEN INTROSPECTOR struct augs::stepped_clock
 		delta dt = delta::steps_per_second(60);
@@ -80,6 +82,10 @@ namespace augs {
 			return 1.f - ((now - stamp).in_milliseconds(dt) / cooldown_ms);
 		}
 
+		auto get_passed_ms(const stepped_timestamp stamp) const {
+			return (now - stamp).in_milliseconds(dt);
+		}
+		
 		template <class T>
 		auto get_remaining_ms(
 			const T cooldown_ms, 
@@ -98,6 +104,45 @@ namespace augs {
 			const stepped_timestamp stamp
 		) const {
 			return get_remaining_ms(cooldown_ms, stamp) / 1000;
+		}
+
+		template <class T>
+		bool is_ready(
+			const T cooldown_ms, 
+			const real_cooldown current_cooldown_ms
+		) const {
+			(void)cooldown_ms;
+
+			return current_cooldown_ms <= 0.f;
+		}
+
+		template <class T>
+		bool try_to_fire_and_reset(
+			const T cooldown_ms, 
+			real_cooldown& current_cooldown_ms
+		) const {
+			if (current_cooldown_ms <= 0.f) {
+				current_cooldown_ms += cooldown_ms;
+				return true;
+			}
+
+			return false;
+		}
+
+		template <class T>
+		auto get_passed_ms(
+			const T cooldown_ms,
+			const real_cooldown current_cooldown_ms
+		) const {
+			return cooldown_ms - current_cooldown_ms;
+		}
+
+		template <class T>
+		auto get_ratio_of_remaining_time(
+			const T cooldown_ms, 
+			const real_cooldown current_cooldown_ms
+		) const {
+			return std::max(0.f, current_cooldown_ms / cooldown_ms);
 		}
 	};
 

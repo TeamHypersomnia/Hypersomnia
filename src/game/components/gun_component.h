@@ -49,7 +49,7 @@ namespace components {
 		unsigned char remaining_burst_shots = 0;
 		augs::enum_boolset<weapon_action_type, 1> just_pressed;
 
-		augs::stepped_timestamp when_last_fired;
+		augs::real_cooldown fire_cooldown_object = 0.f;
 		augs::stepped_timestamp when_last_played_trigger_effect;
 		augs::stepped_timestamp when_began_pulling_chambering_handle;
 

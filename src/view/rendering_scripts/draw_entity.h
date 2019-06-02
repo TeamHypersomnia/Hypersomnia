@@ -192,7 +192,7 @@ FORCE_INLINE void detail_specific_entity_drawer(
 				const auto& logicals = cosm.get_logical_assets();
 
 				if (const auto shoot_animation = logicals.find(gun_def.shoot_animation)) {
-					if (const auto* const frame = ::find_shoot_frame(gun, *shoot_animation, cosm)) {
+					if (const auto* const frame = ::find_shoot_frame(gun_def, gun, *shoot_animation, cosm)) {
 						auto animated = sprite;
 						animated.image_id = frame->image_id;
 						animated.size = in.manager.at(frame->image_id).get_original_size();

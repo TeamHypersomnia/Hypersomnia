@@ -34,7 +34,7 @@ bool gun_shot_cooldown_or_chambering(const E& gun_entity) {
 			const auto& clk = cosm.get_clock();
 			const auto when_transferred = gun_entity.when_last_transferred();
 
-			const bool shot_cooldown_passed = clk.is_ready(gun_def->shot_cooldown_ms, gun->when_last_fired);
+			const bool shot_cooldown_passed = clk.is_ready(gun_def->shot_cooldown_ms, gun->fire_cooldown_object);
 
 			const bool transfer_cooldown_passed = clk.is_ready(
 				gun_def->get_transfer_shot_cooldown(), 

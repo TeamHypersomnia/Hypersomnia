@@ -63,7 +63,7 @@ transformr direct_attachment_offset(
 				if (const auto gun = container.template find<components::gun>()) {
 					if (const auto gun_def = container.template find<invariants::gun>()) {
 						if (const auto shoot_animation = logicals.find(gun_def->shoot_animation)) {
-							if (const auto* const frame = ::find_shoot_frame(*gun, *shoot_animation, cosm)) {
+							if (const auto* const frame = ::find_shoot_frame(*gun_def, *gun, *shoot_animation, cosm)) {
 								return frame->image_id;
 							}
 						}
