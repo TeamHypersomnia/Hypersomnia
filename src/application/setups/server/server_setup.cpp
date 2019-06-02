@@ -562,6 +562,7 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 #endif
 			}
 
+			/* Reset the counter */
 			c.num_entropies_accepted = 0;
 		}
 

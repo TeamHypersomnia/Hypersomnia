@@ -29,6 +29,32 @@
 
 using namespace augs;
 
+namespace augs {
+	template <class T>
+	bool flip_if_gt(T& value, const T& bound) {
+		const auto diff = value - bound;
+
+		if (diff > static_cast<T>(0)) {
+			value = bound - diff;
+			return true;
+		}
+
+		return false;
+	}
+
+	template <class T>
+	bool flip_if_lt(T& value, const T& bound) {
+		const auto diff = value - bound;
+
+		if (diff < static_cast<T>(0)) {
+			value = bound - diff;
+			return true;
+		}
+
+		return false;
+	}
+}
+
 void movement_system::set_movement_flags_from_input(const logic_step step) {
 	auto& cosm = step.get_cosmos();
 	const auto& events = step.get_queue<messages::intent_message>();

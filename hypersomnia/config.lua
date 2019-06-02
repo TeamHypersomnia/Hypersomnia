@@ -181,7 +181,7 @@ return {
       num_lines = 15,
     },
     test_scene = {
-      scene_tickrate = 128,
+      scene_tickrate = 60,
       start_bomb_mode = true
     },
     camera = {
@@ -427,7 +427,7 @@ return {
   },
   test_scene = {
     create_minimal_test_scene = false,
-    scene_tickrate = 128
+    scene_tickrate = 60
   },
   unit_tests = {
     break_on_failure = true,

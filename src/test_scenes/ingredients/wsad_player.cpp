@@ -283,6 +283,7 @@ namespace test_flavours {
 				movement.braking_damping = 12.5f;
 				movement.standard_linear_damping = 20.f;
 				movement.max_linear_inertia_when_movement_possible = 500.f;
+				movement.animation_frame_ms = 34.f;
 
 				movement.dash_impulse = 1163.f;
 

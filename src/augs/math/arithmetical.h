@@ -27,30 +27,6 @@ namespace augs {
 	}
 
 	template <class T>
-	bool flip_if_gt(T& value, const T& bound) {
-		const auto diff = value - bound;
-
-		if (diff > static_cast<T>(0)) {
-			value -= diff;
-			return true;
-		}
-
-		return false;
-	}
-
-	template <class T>
-	bool flip_if_lt(T& value, const T& bound) {
-		const auto diff = value - bound;
-
-		if (diff < static_cast<T>(0)) {
-			value += diff;
-			return true;
-		}
-
-		return false;
-	}
-
-	template <class T>
 	bool is_epsilon(const T& t, const T eps) {
 		return repro::fabs(t) <= eps;
 	}

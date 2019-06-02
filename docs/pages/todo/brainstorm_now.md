@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- At some point we might want to give different jitter buffer length values to 60tick and 128tick
+- At some point we might want to give different jitter buffer length values to 60tick and 128tick
+- At some point we might want to give different jitter buffer length values to 60tick and 128tick
+- At some point we might want to give different jitter buffer length values to 60tick and 128tick
+- At some point we might want to give different jitter buffer length values to 60tick and 128tick
+
+- Still, if we are able to always connect and catch up with inputs, it should never disconnect if we resync mid-game
+
 - Theory: weak clients don't catch up with the steps they have to re-simulate after desyncing
 	- Why would they then be able to do so on connection init?
 
@@ -25,7 +33,6 @@ summary: That which we are brainstorming at the moment.
 - Crash when turning on drawing of cast raycasts
 
 - Communicate with the server somehow from localhost?
-- At some point we might want to give different jitter buffer length values to 60tick and 128tick
 
 - We should somehow re-adjust the amount of predicted steps
 	- Sometimes even if the latency is low, the amount of predicted steps is high
