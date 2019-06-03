@@ -16,7 +16,8 @@ void world_camera::tick(
 	const interpolation_system& interp,
 	const augs::delta dt,
 	world_camera_settings settings,
-	const const_entity_handle entity_to_chase
+	const const_entity_handle entity_to_chase,
+	const vec2 crosshair_displacement
 ) {
 	if (/* minimized */ screen_size.is_zero()) {
 		return;
@@ -56,7 +57,7 @@ void world_camera::tick(
 		return current_eye;
 	}();
 
-	const vec2 camera_crosshair_offset = get_camera_offset_due_to_character_crosshair(entity_to_chase, settings, screen_size);
+	const vec2 camera_crosshair_offset = get_camera_offset_due_to_character_crosshair(entity_to_chase, settings, screen_size, crosshair_displacement);
 
 	current_eye = target_cone;
 	current_eye.transform.pos += camera_crosshair_offset;
@@ -152,7 +153,8 @@ void world_camera::tick(
 vec2 world_camera::get_camera_offset_due_to_character_crosshair(
 	const const_entity_handle entity_to_chase,
 	const world_camera_settings settings,
-	const vec2 screen_size
+	const vec2 screen_size,
+	const vec2 crosshair_displacement
 ) const {
 	vec2 camera_crosshair_offset;
 
@@ -162,7 +164,7 @@ vec2 world_camera::get_camera_offset_due_to_character_crosshair(
 
 	if (const auto crosshair = entity_to_chase.find_crosshair()) {
 		if (crosshair->orbit_mode != crosshair_orbit_type::NONE) {
-			camera_crosshair_offset = calc_crosshair_displacement(entity_to_chase);
+			camera_crosshair_offset = calc_crosshair_displacement(entity_to_chase) + crosshair_displacement;
 
 			if (crosshair->orbit_mode == crosshair_orbit_type::ANGLED) {
 				camera_crosshair_offset.set_length(settings.angled_look_length);

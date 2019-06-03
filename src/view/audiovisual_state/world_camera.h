@@ -45,14 +45,9 @@ struct world_camera {
 		const interpolation_system& interp, 
 		augs::delta dt,
 		world_camera_settings settings,
-		const_entity_handle entity_to_chase
+		const_entity_handle entity_to_chase,
+		const vec2 crosshair_displacement
 	);
-
-	vec2 get_camera_offset_due_to_character_crosshair(
-		const const_entity_handle,
-		const world_camera_settings,
-		const vec2 screen_size
-	) const;
 
 	auto get_effective_flash_mult() const {
 		return last_registered_flash_mult;
@@ -69,4 +64,12 @@ private:
 	float after_flash_passed_ms = 0.f;
 	float last_registered_flash_mult = 0.f;
 	bool request_afterimage = false;
+
+	vec2 get_camera_offset_due_to_character_crosshair(
+		const const_entity_handle,
+		const world_camera_settings,
+		const vec2 screen_size,
+		const vec2 crosshair_displacement
+	) const;
+
 };

@@ -226,8 +226,8 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 
 		if (!m.disable_velocity) {
 			if (interp_enabled || when_set_velocity != cosm.get_timestamp()) {
-			source.set_velocity(si, effective_velocity);
-		}
+				source.set_velocity(si, effective_velocity);
+			}
 		}
 
 		when_set_velocity = cosm.get_timestamp();
