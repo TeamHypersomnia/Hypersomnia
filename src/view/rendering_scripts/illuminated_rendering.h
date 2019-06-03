@@ -30,6 +30,7 @@ using illuminated_rendering_shaders = all_necessary_shaders;
 
 struct illuminated_rendering_input {
 	const character_camera camera;
+	const vec2 pre_step_crosshair_displacement;
 	const float camera_query_mult;
 	const audiovisual_state& audiovisuals;
 	const game_drawing_settings drawing;

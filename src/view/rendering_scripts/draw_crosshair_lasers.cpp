@@ -32,7 +32,7 @@ void draw_crosshair_lasers(const draw_crosshair_lasers_input in) {
 		const auto& cosm = in.character.get_cosmos();
 		const auto& physics = cosm.get_solvable_inferred().physics;
 
-		const vec2 crosshair_pos = subject_with_crosshair.get_world_crosshair_transform(in.interpolation).pos;
+		const vec2 crosshair_pos = in.crosshair_displacement + subject_with_crosshair.get_world_crosshair_transform(in.interpolation).pos;
 
 		auto calc_color = [&](const const_entity_handle target) {
 			const auto att = calc_attitude(in.character, target);

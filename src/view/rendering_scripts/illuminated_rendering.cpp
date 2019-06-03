@@ -226,7 +226,7 @@ void illuminated_rendering(
 			else {
 				set_shader_with_matrix(shaders.fog_of_war);
 
-				auto dir = calc_crosshair_displacement(viewed_character);
+				auto dir = calc_crosshair_displacement(viewed_character) + in.pre_step_crosshair_displacement;
 
 				if (dir.is_zero()) {
 					dir.set(1, 0);
@@ -287,7 +287,8 @@ void illuminated_rendering(
 					},
 					[](const vec2, const vec2, const rgba) {},
 					interp,
-					viewed_character
+					viewed_character,
+					in.pre_step_crosshair_displacement
 				});
 			}
 
@@ -614,16 +615,16 @@ void illuminated_rendering(
 	if (settings.draw_crosshairs) {
 		auto draw_crosshair = [&](const auto it) {
 			if (const auto s = it.find_crosshair_def()) {
-				auto in = drawing_input.make_input_for<invariants::sprite>();
+				auto sprite_in = drawing_input.make_input_for<invariants::sprite>();
 
-				in.global_time_seconds = global_time_seconds;
-				in.renderable_transform = it.get_world_crosshair_transform(interp);
+				sprite_in.global_time_seconds = global_time_seconds;
+				sprite_in.renderable_transform = it.get_world_crosshair_transform(interp) + in.pre_step_crosshair_displacement;
 
 				if (is_zoomed_out) {
-					in.renderable_transform.pos = cone.to_screen_space(in.renderable_transform.pos);
+					sprite_in.renderable_transform.pos = cone.to_screen_space(sprite_in.renderable_transform.pos);
 				}
 
-				augs::draw(s->appearance, game_images, in);
+				augs::draw(s->appearance, game_images, sprite_in);
 			}
 		};
 
@@ -649,7 +650,8 @@ void illuminated_rendering(
 			line_output_wrapper { line_output, laser },
 			dashed_line_output_wrapper  { line_output, laser, 10.f, 40.f, global_time_seconds },
 			interp, 
-			viewed_character
+			viewed_character,
+			in.pre_step_crosshair_displacement
 		});
 
 		renderer.call_and_clear_lines();

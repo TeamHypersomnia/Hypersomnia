@@ -3143,3 +3143,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - log if client does not have the map that's on the server
 
+- Just append the accumulated motions to the current crosshair position in illuminated rendering
+	- That way we have a smooth crosshair even under low tickrates
+	- And we always have shots directly to where we were aiming, unless we move a bit after the shot but before the step
+

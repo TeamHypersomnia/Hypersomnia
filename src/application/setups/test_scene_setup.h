@@ -130,4 +130,8 @@ public:
 
 	void ensure_handler() {}
 	bool requires_cursor() const { return false; }
+
+	const entropy_accumulator& get_entropy_accumulator() const {
+		return total_collected;
+	}
 };

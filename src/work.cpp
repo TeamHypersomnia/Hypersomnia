@@ -1670,9 +1670,32 @@ int work(const int argc, const char* const * const argv) try {
 					}
 				});
 
+				const auto pre_step_crosshair_displacement = visit_current_setup([&](const auto& setup) {
+					using T = remove_cref<decltype(setup)>;
+
+					if constexpr(!std::is_same_v<T, main_menu_setup>) {
+						const auto& total_collected = setup.get_entropy_accumulator();
+
+						if (const auto motion = total_collected.calc_motion(
+							get_viewed_character(), 
+							game_motion_type::MOVE_CROSSHAIR,
+							entropy_accumulator::input {
+								new_viewing_config.input, 
+								window.get_screen_size(), 
+								get_camera_eye().zoom 
+							}
+						)) {
+							return motion->offset;
+						}
+					}
+
+					return vec2::zero;
+				});
+
 				illuminated_rendering(
 					{
 						{ viewed_character, cone },
+						pre_step_crosshair_displacement,
 						new_viewing_config.session.camera_query_aabb_mult,
 						get_audiovisuals(),
 						new_viewing_config.drawing,

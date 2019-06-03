@@ -428,4 +428,8 @@ public:
 	editor_arena_handle<true> get_arena_handle() const;
 
 	bool requires_cursor() const;
+
+	const entropy_accumulator& get_entropy_accumulator() const {
+		return total_collected;
+	}
 };

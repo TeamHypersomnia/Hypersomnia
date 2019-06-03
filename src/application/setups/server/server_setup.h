@@ -288,4 +288,8 @@ public:
 
 	server_step_entropy unpack(const compact_server_step_entropy&) const;
 	bool is_authorized_for_rcon(const client_id_type&) const;
+
+	const entropy_accumulator& get_entropy_accumulator() const {
+		return local_collected;
+	}
 };

@@ -23,6 +23,24 @@ struct entropy_accumulator {
 	mode_entropy_general mode_general;
 
 	template <class E>
+	std::optional<game_motion> calc_motion(
+		const E& handle,
+		const game_motion_type motion_type,
+		const input in
+	) const {
+		if (handle) {
+			if (const auto crosshair_motion = mapped_or_nullptr(motions, motion_type)) {
+				if (const auto crosshair = handle.find_crosshair()) {
+					const auto total_bound = vec2(in.screen_size) / in.zoom;
+					return to_game_motion(*crosshair_motion, crosshair->base_offset, in.settings.mouse_sensitivity, total_bound);
+				}
+			}
+		}
+
+		return std::nullopt;
+	}
+
+	template <class E>
 	auto assemble(
 		const E& handle,
 		const mode_player_id& m_id,
@@ -42,13 +60,8 @@ struct entropy_accumulator {
 			const auto player_id = handle.get_id();
 			auto& player = out.cosmic[player_id];
 
-			if (const auto crosshair_motion = mapped_or_nullptr(motions, game_motion_type::MOVE_CROSSHAIR)) {
-				if (const auto crosshair = handle.find_crosshair()) {
-					const auto total_bound = vec2(in.screen_size) / in.zoom;
-					const auto motion = to_game_motion(*crosshair_motion, crosshair->base_offset, in.settings.mouse_sensitivity, total_bound);
-
-					player.motions[motion.motion] = motion.offset;
-				}
+			if (const auto new_motion = calc_motion(handle, game_motion_type::MOVE_CROSSHAIR, in)) {
+				player.motions[new_motion->motion] = new_motion->offset;
 			}
 
 			auto new_intents = intents;

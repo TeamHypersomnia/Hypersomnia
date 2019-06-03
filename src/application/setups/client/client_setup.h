@@ -512,4 +512,8 @@ public:
 
 	void update_stats(network_info&) const;
 	bool is_spectating_referential() const;
+
+	const entropy_accumulator& get_entropy_accumulator() const {
+		return total_collected;
+	}
 };

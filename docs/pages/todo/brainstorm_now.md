@@ -6,6 +6,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Interpolate velocity value to avoid an ugly trace sound when shooting the rocket launcher at 60hz
+
+- Keep timestamps in log structures and, when writing the logs to a file, preffix the log entries with time
+	- Will later be good to separate logs via date, for the dedicated server
+
+- Dump logs once every 1000 or so
+- Rcon can download the log
+
+- Rcon should have a reserved slot to enter in case of emergency
+
 - RCON password
 - Write editor write date to version.txt file
 	
