@@ -3,7 +3,7 @@
 #include "augs/math/transform.h"
 #include "augs/misc/convex_partitioned_shape.h"
 
-using image_shape_type = basic_convex_partitioned_shape<real32, 12, 12 * 4>;
+using image_shape_type = basic_convex_partitioned_shape<real32, 16, 16 * 4>;
 
 struct torso_offsets {
 	// GEN INTROSPECTOR struct torso_offsets
