@@ -22,7 +22,7 @@ struct sound_effect_modifier {
 	real32 doppler_factor = 1.f;
 	char repetitions = 1;
 	bool fade_on_exit = true;
-	bool sync_against_born_time = false;
+	bool disable_velocity = false;
 	bool always_direct_listener = false;
 	augs::distance_model distance_model = augs::distance_model::NONE;
 	// END GEN INTROSPECTOR

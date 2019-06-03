@@ -468,3 +468,5 @@ summary: Just a hidden scratchpad.
 - Prevent re-simulation of ever more steps during resynchronization
 	- No steps get resimulated when we have no incoming entropies
 
+- Interpolate velocity value to avoid an ugly trace sound when shooting the rocket launcher at 60hz
+

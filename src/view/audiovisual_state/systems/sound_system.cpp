@@ -205,6 +205,9 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 		source.set_air_absorption_factor(std::clamp(defaults.air_absorption, 0.f, 10.f));
 	}
 
+	const auto& input = original.input;
+	const auto& m = input.modifier;
+
 	if (previous_transform && !is_direct_listener && !(in.dt == augs::delta::zero)) {
 		const bool interp_enabled = in.interp.is_enabled();
 		const auto frame_dt_in_steps = in.dt.in_steps_per_second();
@@ -221,15 +224,14 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 
 		previous_transform = current_transform;
 
-		if (interp_enabled || when_set_velocity != cosm.get_timestamp()) {
+		if (!m.disable_velocity) {
+			if (interp_enabled || when_set_velocity != cosm.get_timestamp()) {
 			source.set_velocity(si, effective_velocity);
+		}
 		}
 
 		when_set_velocity = cosm.get_timestamp();
 	}
-
-	const auto& input = original.input;
-	const auto& m = input.modifier;
 
 	auto max_dist = m.max_distance;
 	auto ref_dist = m.reference_distance;

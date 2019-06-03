@@ -6,7 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Interpolate velocity value to avoid an ugly trace sound when shooting the rocket launcher at 60hz
+- Perhaps interpolate velocity values if we detect that they are ugly at 60hz, apart from the case with skull rocket?
 
 - Keep timestamps in log structures and, when writing the logs to a file, preffix the log entries with time
 	- Will later be good to separate logs via date, for the dedicated server

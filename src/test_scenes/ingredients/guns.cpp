@@ -270,6 +270,7 @@ namespace test_flavours {
 			missile.max_lifetime_ms = 1000.f;
 
 			missile.trace_sound.id = to_sound_id(test_scene_sound_id::SKULL_ROCKET_FLIGHT);
+			missile.trace_sound.modifier.disable_velocity = true;
 
 			auto& trace_modifier = missile.trace_sound.modifier;
 
