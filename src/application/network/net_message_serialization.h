@@ -44,20 +44,31 @@ namespace net_messages {
 	template <typename Stream>
 	bool client_welcome::Serialize(Stream& stream) {
 		{
-			constexpr auto buffer_size = requested_client_settings::buf_len;
-			const auto s = payload.chosen_nickname.data();
+			auto serialize_str = [&](auto& str, const auto buffer_size) {
+				const auto s = str.data();
 
-			int length = 0;
-			if ( Stream::IsWriting )
-			{
-				length = payload.chosen_nickname.size();
+				int length = 0;
+				if ( Stream::IsWriting )
+				{
+					length = str.size();
+				}
+
+				serialize_int( stream, length, 0, buffer_size - 1 );
+				serialize_bytes( stream, (uint8_t*)s, length );
+
+				if ( Stream::IsReading ) {
+					s[length] = '\0';
+				}
+
+				return true;
+			};
+
+			if (!serialize_str(payload.chosen_nickname, requested_client_settings::nick_buf_len)) {
+				return false;
 			}
 
-			serialize_int( stream, length, 0, buffer_size - 1 );
-			serialize_bytes( stream, (uint8_t*)s, length );
-
-			if ( Stream::IsReading ) {
-				s[length] = '\0';
+			if (!serialize_str(payload.rcon_password, requested_client_settings::rcon_buf_len)) {
+				return false;
 			}
 		}
 
@@ -67,6 +78,15 @@ namespace net_messages {
 		serialize_uint32(stream, payload.net.jitter.buffer_at_least_steps);
 		serialize_uint32(stream, payload.net.jitter.buffer_at_least_ms);
 		serialize_int(stream, payload.net.jitter.max_commands_to_squash_at_once, 0, 255);
+
+		return true;
+	}
+
+	template <typename Stream>
+	bool rcon_command::Serialize(Stream& stream) {
+		if (!serialize(stream, payload)) {
+			return false;
+		}
 
 		return true;
 	}

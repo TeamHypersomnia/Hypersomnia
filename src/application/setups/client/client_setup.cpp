@@ -43,6 +43,7 @@ void client_setup::init_connection(const client_start_input& in) {
 	client_time = get_current_time();
 	pending_request = special_client_request::NONE;
 	now_resyncing = false;
+	rcon = rcon_level::NONE;
 }
 
 client_setup::~client_setup() {
@@ -246,7 +247,8 @@ message_handler_result client_setup::handle_server_message(
 					initial_payload {
 						signi,
 						current_mode,
-						read_client_id
+						read_client_id,
+						rcon
 					}
 				);
 
@@ -379,7 +381,8 @@ void client_setup::send_pending_commands() {
 					initial_arena_state_payload<true> {
 						scene.world.get_solvable().significant,
 						current_mode,
-						exchanged_client_id
+						exchanged_client_id,
+						rcon
 					}
 				);
 			};
@@ -642,6 +645,7 @@ void client_setup::apply(const config_lua_table& cfg) {
 
 	auto& r = requested_settings;
 	r.chosen_nickname = vars.nickname;
+	r.rcon_password = vars.rcon_password;
 	r.net = vars.net;
 	r.public_settings.mouse_sensitivity = cfg.input.mouse_sensitivity;
 
@@ -698,4 +702,8 @@ augs::path_type client_setup::get_unofficial_content_dir() const {
 
 	const auto paths = arena_paths(name);
 	return paths.folder_path;
+}
+
+bool client_setup::is_loopback() const {
+	return is_connected() && client->get_server_address().IsLoopback();
 }

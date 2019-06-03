@@ -6,7 +6,11 @@
 #include "hypersomnia_version.h"
 
 #include "application/network/net_message_serialization.h"
+
 #include "3rdparty/yojimbo/netcode.io/netcode.c"
+
+#undef SendMessage
+#undef SetPort
 
 static_assert(max_incoming_connections_v == yojimbo::MaxClients);
 
@@ -317,4 +321,8 @@ yojimbo::Address server_adapter::get_client_address(const client_id_type& id) co
 	netcode_address_to_string(&addr, buffer);
 	
 	return yojimbo::Address(buffer);
+}
+
+yojimbo::Address client_adapter::get_server_address() const {
+	return client.GetAddress();
 }

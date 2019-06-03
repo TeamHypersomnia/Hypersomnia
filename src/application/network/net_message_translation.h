@@ -11,6 +11,7 @@ struct initial_arena_state_payload {
 	maybe_const_ref_t<C, cosmos_solvable_significant> signi;
 	maybe_const_ref_t<C, online_mode_and_rules> mode;
 	maybe_const_ref_t<C, uint32_t> client_id;
+	maybe_const_ref_t<C, rcon_level> rcon;
 };
 
 using ref_net_stream = augs::basic_ref_memory_stream<message_bytes_type>;
@@ -44,108 +45,6 @@ constexpr std::size_t max_server_step_size_v =
 ;
 
 namespace net_messages {
-	template <class Stream>
-	bool serialize(Stream& s, ::prestep_client_context& c) {
-		serialize_int(s, c.num_entropies_accepted, 0, 255);
-		return true;
-	}
-
-	template <class Stream>
-	bool serialize(Stream&, mode_restart_command&) {
-		return true;
-	}
-
-	template <class Stream>
-	bool serialize(Stream& s, mode_commands::team_choice& c) {
-		return serialize_enum(s, c);
-	}
-
-	template <class Stream>
-	bool serialize(Stream& s, mode_commands::item_purchase& c) {
-		return serialize_trivial_as_bytes(s, c);
-	}
-
-	template <class Stream>
-	bool serialize(Stream& s, mode_commands::spell_purchase& c) {
-		return serialize_trivial_as_bytes(s, c);
-	}
-
-	template <class Stream>
-	bool serialize(Stream& s, mode_commands::special_purchase& c) {
-		return serialize_enum(s, c);
-	}
-
-	template <class Stream, class... Args>
-	bool serialize(Stream& s, std::variant<Args...>& i) {
-		static constexpr auto max_i = sizeof...(Args);
-		static_assert(std::numeric_limits<uint8_t>::max() >= max_i);
-
-		uint8_t type_id;
-
-		if (Stream::IsWriting) {
-			type_id = static_cast<uint8_t>(i.index());
-		}
-
-		serialize_int(s, type_id, 0, sizeof...(Args) - 1);
-
-		type_in_list_id<type_list<Args*...>> idx;
-		idx.set_index(type_id);
-
-		const bool result = idx.dispatch(
-			[&](auto* dummy) {
-				using T = std::remove_pointer_t<decltype(dummy)>;
-
-				if (Stream::IsReading) {
-					i.template emplace<T>();
-				}
-
-				if constexpr(!is_monostate_v<T>) {
-					serialize(s, std::get<T>(i));
-				}
-
-				return true;
-			}
-		);
-
-		return result;
-	}
-
-	template <class Stream>
-	bool serialize(Stream& s, ::mode_player_id& i) {
-		static const auto max_val = mode_player_id::machine_admin();
-		serialize_int(s, i.value, 0, max_val.value);
-		serialize_align(s);
-		return true;
-	}
-
-	template <class Stream>
-	bool serialize_stdstring(Stream& s, std::string& e, const int mini, const int maxi) {
-		auto length = static_cast<int>(e.length());
-
-		serialize_int(s, length, mini, maxi);
-
-		if (Stream::IsReading) {
-			e.resize(length);
-		}
-
-		serialize_bytes(s, (uint8_t*)e.data(), length);
-		return true;
-	}
-
-	template <class Stream>
-	bool serialize(Stream& s, wielding_setup& p) {
-		return serialize_trivial_as_bytes(s, p);
-	}
-
-	template <class Stream>
-	bool serialize(Stream& s, add_player_input& p) {
-		return 
-			serialize(s, p.id)
-			&& serialize_stdstring(s, p.name, min_nickname_length_v, max_nickname_length_v)
-			&& serialize_enum(s, p.faction)
-		;
-	}
-
 	template <class Stream>
 	bool serialize(Stream& s, total_mode_player_entropy& p) {
 		auto& m = p.mode;
@@ -403,6 +302,20 @@ namespace net_messages {
 		return true;
 	}
 
+	inline bool rcon_command::write_payload(
+		const decltype(rcon_command::payload)& input
+	) {
+		payload = input;
+		return true;
+	}
+
+	inline bool rcon_command::read_payload(
+		decltype(rcon_command::payload)& output
+	) {
+		output = std::move(payload);
+		return true;
+	}
+
 	inline bool special_client_request::write_payload(
 		const decltype(special_client_request::payload)& input
 	) {
@@ -476,6 +389,7 @@ namespace net_messages {
 		augs::read_bytes(s, in.signi);
 		augs::read_bytes(s, in.mode);
 		augs::read_bytes(s, in.client_id);
+		augs::read_bytes(s, in.rcon);
 
 		NSR_LOG_NVPS(in.client_id);
 
@@ -490,6 +404,7 @@ namespace net_messages {
 			augs::write_bytes(s, in.signi);
 			augs::write_bytes(s, in.mode);
 			augs::write_bytes(s, in.client_id);
+			augs::write_bytes(s, in.rcon);
 		};
 
 		NSR_LOG("SENDING INITIAL STATE");

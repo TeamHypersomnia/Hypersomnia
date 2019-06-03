@@ -21,17 +21,23 @@
 #include "application/arena/arena_handle.h"
 #include "application/arena/choose_arena.h"
 
-/* To avoid incomplete type error */
-server_setup::~server_setup() {
+void server_setup::shutdown() {
 	if (server->is_running()) {
+		LOG("Shutting down the server.");
 		server->stop();
 	}
+}
+
+/* To avoid incomplete type error */
+server_setup::~server_setup() {
+	shutdown();
 }
 
 server_setup::server_setup(
 	sol::state& lua,
 	const server_start_input& in,
 	const server_vars& initial_vars,
+	const private_server_vars& private_initial_vars,
 	const std::optional<augs::dedicated_server_input> dedicated
 ) : 
 	lua(lua),
@@ -42,6 +48,15 @@ server_setup::server_setup(
 {
 	const bool force = true;
 	apply(initial_vars, force);
+	apply(private_initial_vars, force);
+
+	if (private_initial_vars.master_rcon_password.empty()) {
+		LOG("WARNING! The master rcon password is empty! This means that only the localhost can access the master rcon.");
+	}
+
+	if (private_initial_vars.rcon_password.empty()) {
+		LOG("WARNING! The rcon password is empty! This means that only the localhost can access the rcon.");
+	}
 }
 
 mode_player_id server_setup::get_admin_player_id() const {
@@ -97,6 +112,13 @@ void server_setup::customize_for_viewing(config_lua_table& config) const {
 	if (is_gameplay_on()) {
 		get_arena_handle().adjust(config.drawing);
 	}
+}
+
+void server_setup::apply(const private_server_vars& private_new_vars, const bool force) {
+	const auto old_vars = private_vars;
+	private_vars = private_new_vars;
+
+	(void)force;
 }
 
 void server_setup::apply(const server_vars& new_vars, const bool force) {
@@ -166,14 +188,6 @@ void server_setup::accept_game_gui_events(const game_gui_entropy_type& events) {
 void server_setup::init_client(const client_id_type& id) {
 	auto& new_client = clients[id];
 	new_client.init(server_time);
-
-	if (vars.auto_authorize_loopback_for_rcon) {
-		if (server->get_client_address(id).IsLoopback()) {
-			LOG("Authorizing loopback client for rcon.");
-
-			new_client.rcon_authorized = true;
-		}
-	}
 
 	LOG("Client connected. Details:\n%x", describe_client(id));
 }
@@ -359,6 +373,8 @@ void server_setup::advance_clients_state() {
 				vars
 			);
 
+			const auto rcon_level = get_rcon_level(client_id);
+
 			server->send_payload(
 				client_id, 
 				game_channel_type::SERVER_SOLVABLE_AND_STEPS, 
@@ -368,7 +384,8 @@ void server_setup::advance_clients_state() {
 				initial_arena_state_payload<true> {
 					scene.world.get_solvable().significant,
 					current_mode,
-					sent_client_id
+					sent_client_id,
+					rcon_level
 				}
 			);
 
@@ -449,6 +466,55 @@ message_handler_result server_setup::handle_client_message(
 			c.state = S::WELCOME_ARRIVED;
 		}
 	}
+	else if constexpr (std::is_same_v<T, rcon_command_variant>) {
+		const auto level = get_rcon_level(client_id);
+
+		LOG("Detected rcon level: %x", static_cast<int>(level));
+
+		if (level != rcon_level::NONE) {
+			const auto result = std::visit(
+				[&](const auto& typed_payload) {
+					using P = remove_cref<decltype(typed_payload)>;
+					using namespace rcon_commands;
+
+					if constexpr(std::is_same_v<P, special>) {
+						switch (typed_payload) {
+							case special::SHUTDOWN:
+							LOG("Shutting down due to rcon's request.");
+							shutdown();
+
+							return abort_v;
+							break;
+
+							default:
+
+							LOG("Unsupported rcon command.");
+							return message_handler_result::CONTINUE;
+							break;
+						}
+					}
+					else {
+						static_assert(always_false_v<P>, "Unhandled rcon command type!");
+						return abort_v;
+					}
+				},
+				payload
+			);
+
+			if (result == abort_v) {
+				return result;
+			}
+		}
+		else {
+			++c.unauthorized_rcon_commands;
+
+			if (c.unauthorized_rcon_commands > vars.max_unauthorized_rcon_commands) {
+				LOG("unauthorized_rcon_commands exceeded max_unauthorized_rcon_commands (%x). Kicking client.", vars.max_unauthorized_rcon_commands);
+
+				return abort_v;
+			}
+		}
+	}
 	else if constexpr (std::is_same_v<T, total_mode_player_entropy>) {
 		if (c.state == S::RECEIVING_INITIAL_STATE) {
 			c.set_in_game(server_time);
@@ -488,18 +554,23 @@ message_handler_result server_setup::handle_client_message(
 					return abort_v;
 				}
 
-				server->send_payload(
-					client_id, 
-					game_channel_type::SERVER_SOLVABLE_AND_STEPS, 
+				{
+					const auto rcon_level = get_rcon_level(client_id);
 
-					buffers,
+					server->send_payload(
+						client_id, 
+						game_channel_type::SERVER_SOLVABLE_AND_STEPS, 
 
-					initial_arena_state_payload<true> {
-						scene.world.get_solvable().significant,
-						current_mode,
-						client_id
-					}
-				);
+						buffers,
+
+						initial_arena_state_payload<true> {
+							scene.world.get_solvable().significant,
+							current_mode,
+							client_id,
+							rcon_level
+						}
+					);
+				}
 
 				reinference_necessary = true;
 
@@ -698,8 +769,50 @@ augs::path_type server_setup::get_unofficial_content_dir() const {
 	return paths.folder_path;
 }
 
-bool server_setup::is_authorized_for_rcon(const client_id_type& id) const { 
-	return clients[id].rcon_authorized;
+bool safe_equal(const decltype(requested_client_settings::rcon_password)& candidate_password, const std::string& actual_password) {
+	const bool rcon_is_disabled = actual_password.empty();
+
+	if (rcon_is_disabled) {
+		return false;
+	}
+
+	int matches = 0;
+
+	for (std::size_t i = 0; i < std::min(static_cast<std::size_t>(candidate_password.size()), actual_password.size()); ++i) {
+		if (candidate_password.data()[i] == actual_password[i]) {
+			matches++;
+		}
+		else {
+			matches--;
+		}
+	}
+
+	return matches == static_cast<int>(actual_password.size());
+}
+
+rcon_level server_setup::get_rcon_level(const client_id_type& id) const { 
+	const auto& c = clients[id];
+
+	if (vars.auto_authorize_loopback_for_rcon) {
+		if (server->get_client_address(id).IsLoopback()) {
+			LOG("Auto-authorizing the loopback client for master rcon.");
+			return rcon_level::MASTER;
+		}
+	}
+
+	if (::safe_equal(c.settings.rcon_password, private_vars.master_rcon_password)) {
+		LOG("Authorized the remote client for master rcon.");
+		return rcon_level::MASTER;
+	}
+
+	if (::safe_equal(c.settings.rcon_password, private_vars.rcon_password)) {
+		LOG("Authorized the remote client for basic rcon.");
+		return rcon_level::BASIC;
+	}
+
+	LOG("RCON disabled for this client.");
+
+	return rcon_level::NONE;
 }
 
 #include "augs/readwrite/to_bytes.h"

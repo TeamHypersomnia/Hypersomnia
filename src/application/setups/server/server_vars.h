@@ -24,5 +24,13 @@ struct server_vars {
 	augs::maybe_network_simulator network_simulator;
 
 	bool auto_authorize_loopback_for_rcon = true;
+	unsigned max_unauthorized_rcon_commands = 100;
+	// END GEN INTROSPECTOR
+};
+
+struct private_server_vars {
+	// GEN INTROSPECTOR struct private_server_vars
+	std::string master_rcon_password = "";
+	std::string rcon_password = "";
 	// END GEN INTROSPECTOR
 };

@@ -125,6 +125,7 @@ struct config_lua_table {
 
 	server_start_input default_server_start;
 	server_vars server;
+	private_server_vars private_server;
 	augs::dedicated_server_input dedicated_server;
 
 	client_start_input default_client_start;

@@ -15,6 +15,11 @@ return {
 	T = "OPEN_BUY_MENU",
 	O = "CHOOSE_TEAM",
 
+	Y = "OPEN_CHAT",
+	U = "OPEN_TEAM_CHAT",
+
+	F8 = "OPEN_RCON_MENU",
+
 	Right = "SPECTATE_NEXT",
 	Left = "SPECTATE_PREV"
   },
@@ -502,7 +507,13 @@ return {
 	max_buffered_client_commands = 1280,
 	state_hash_once_every_tick = 1,
 
-    auto_authorize_loopback_for_rcon = true
+    auto_authorize_loopback_for_rcon = true,
+	max_unauthorized_rcon_commands = 100
+  },
+
+  private_server_vars = {
+    master_rcon_password = "",
+    rcon_password = ""
   },
 
   dedicated_server = {

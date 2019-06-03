@@ -157,7 +157,7 @@ main_menu_setup::main_menu_setup(
 	}
 
 	gui.root.buttons[main_menu_button_type::CONNECT_TO_OFFICIAL_UNIVERSE].set_appearing_caption("Login to official universe");
-	gui.root.buttons[main_menu_button_type::BROWSE_UNOFFICIAL_UNIVERSES].set_appearing_caption("Browse unofficial universes");
+	gui.root.buttons[main_menu_button_type::BROWSE_COMMUNITY_SERVERS].set_appearing_caption("Browse unofficial universes");
 	gui.root.buttons[main_menu_button_type::HOST_UNIVERSE].set_appearing_caption("Host universe");
 	gui.root.buttons[main_menu_button_type::CONNECT_TO_UNIVERSE].set_appearing_caption("Connect to universe");
 	gui.root.buttons[main_menu_button_type::LOCAL_UNIVERSE].set_appearing_caption("Local universe");

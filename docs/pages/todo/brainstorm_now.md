@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Remember to keep the old master rcon password so that basic level rcons cannot change it
+
 - Perhaps interpolate velocity values if we detect that they are ugly at 60hz, apart from the case with skull rocket?
 
 - Keep timestamps in log structures and, when writing the logs to a file, preffix the log entries with time

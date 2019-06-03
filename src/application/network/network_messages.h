@@ -4,6 +4,7 @@
 #include "augs/misc/serialization_buffers.h"
 #include "application/network/server_step_entropy.h"
 #include "application/network/special_client_request.h"
+#include "application/network/rcon_command.h"
 
 #define LOG_NET_SERIALIZATION !IS_PRODUCTION_BUILD
 
@@ -163,6 +164,21 @@ namespace net_messages {
 		bool read_payload(total_client_entropy&);
 	};
 
+	struct rcon_command : public yojimbo::Message {
+		static constexpr bool server_to_client = false;
+		static constexpr bool client_to_server = true;
+
+		template <typename Stream>
+		bool Serialize(Stream& stream);
+
+		::rcon_command_variant payload;
+
+		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
+
+		bool write_payload(const ::rcon_command_variant&);
+		bool read_payload(::rcon_command_variant&);
+	};
+
 	using all_t = type_list<
 		client_welcome*,
 		new_server_vars*,
@@ -173,7 +189,9 @@ namespace net_messages {
 #endif
 		server_step_entropy*,
 		client_entropy*,
-		special_client_request*
+		special_client_request*,
+
+		rcon_command*
 	>;
 	
 	using id_t = type_in_list_id<all_t>;

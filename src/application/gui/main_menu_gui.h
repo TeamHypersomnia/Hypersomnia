@@ -64,7 +64,7 @@ struct main_menu_gui {
 		}
 
 		if (change.was_pressed(augs::event::keys::key::B)) {
-			button_callback(main_menu_button_type::BROWSE_UNOFFICIAL_UNIVERSES);
+			button_callback(main_menu_button_type::BROWSE_COMMUNITY_SERVERS);
 			return true;
 		}
 

@@ -1,4 +1,4 @@
-Revision no.: 6736 (dirty)
-Build date: Mon Jun 3 01:36:55 2019
+Revision no.: 6742 (dirty)
+Build date: Mon Jun 3 15:12:29 2019
 Commit message:
-Authorizing loopback client fo(...)
+Fixed a bug in burst fire calc(...)

@@ -237,6 +237,7 @@ int work(const int argc, const char* const * const argv) try {
 			lua,
 			config.default_server_start,
 			config.server,
+			config.private_server,
 			config.dedicated_server
 		);
 
@@ -509,6 +510,7 @@ int work(const int argc, const char* const * const argv) try {
 						lua,
 						config.default_server_start,
 						config.server,
+						config.private_server,
 						std::nullopt
 					);
 				});

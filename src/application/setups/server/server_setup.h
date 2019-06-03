@@ -33,6 +33,7 @@
 #endif
 
 #include "augs/misc/getpid.h"
+#include "application/setups/server/rcon_level.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -62,7 +63,9 @@ class server_setup :
 
 	/* Other replicated state */
 	online_mode_and_rules current_mode;
+
 	server_vars vars;
+	private_server_vars private_vars;
 
 	/* The rest is server-specific */
 	sol::state& lua;
@@ -138,6 +141,7 @@ public:
 		sol::state& lua,
 		const server_start_input&,
 		const server_vars&,
+		const private_server_vars&,
 		std::optional<augs::dedicated_server_input>
 	);
 
@@ -168,6 +172,7 @@ public:
 
 	void apply(const config_lua_table&);
 	void apply(const server_vars&, bool force);
+	void apply(const private_server_vars&, bool force);
 
 	void choose_arena(const std::string& name);
 
@@ -287,9 +292,12 @@ public:
 	void update_stats(server_network_info&) const;
 
 	server_step_entropy unpack(const compact_server_step_entropy&) const;
-	bool is_authorized_for_rcon(const client_id_type&) const;
+
+	rcon_level get_rcon_level(const client_id_type&) const;
 
 	const entropy_accumulator& get_entropy_accumulator() const {
 		return local_collected;
 	}
+
+	void shutdown();
 };

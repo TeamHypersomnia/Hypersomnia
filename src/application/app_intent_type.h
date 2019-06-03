@@ -28,6 +28,11 @@ enum class app_ingame_intent_type {
 	SPECTATE_PREV,
 	SPECTATE_NEXT,
 
+	OPEN_CHAT,
+	OPEN_TEAM_CHAT,
+
+	OPEN_RCON_MENU,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

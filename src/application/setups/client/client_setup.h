@@ -15,7 +15,7 @@
 #include "application/network/network_common.h"
 
 #include "augs/network/network_types.h"
-#include "application/setups/server/server_vars.h"
+#include "application/setups/server/rcon_level.h"
 
 #include "application/predefined_rulesets.h"
 #include "application/arena/mode_and_rules.h"
@@ -79,6 +79,7 @@ class client_setup :
 	client_vars vars;
 	requested_client_settings requested_settings;
 	bool resend_requested_settings = false;
+	rcon_level rcon = rcon_level::NONE;
 
 	entropy_accumulator total_collected;
 	augs::serialization_buffers buffers;
@@ -512,6 +513,8 @@ public:
 
 	void update_stats(network_info&) const;
 	bool is_spectating_referential() const;
+
+	bool is_loopback() const;
 
 	const entropy_accumulator& get_entropy_accumulator() const {
 		return total_collected;

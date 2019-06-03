@@ -54,12 +54,12 @@ struct ingame_menu_gui {
 		}
 
 		if (change.was_pressed(augs::event::keys::key::B)) {
-			button_callback(ingame_menu_button_type::BROWSE_UNOFFICIAL_UNIVERSES);
+			button_callback(ingame_menu_button_type::BROWSE_COMMUNITY_SERVERS);
 			return true;
 		}
 
 		if (change.was_pressed(augs::event::keys::key::C)) {
-			button_callback(ingame_menu_button_type::CONNECTION_INFO);
+			button_callback(ingame_menu_button_type::SERVER_DETAILS);
 			return true;
 		}
 

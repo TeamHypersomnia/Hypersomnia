@@ -27,5 +27,6 @@ struct client_vars {
 	unsigned max_predicted_client_commands = 3000u;
 
 	bool spectate_referential_state = true;
+	std::string rcon_password = "";
 	// END GEN INTROSPECTOR
 };

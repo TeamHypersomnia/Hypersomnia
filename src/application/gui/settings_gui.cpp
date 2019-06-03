@@ -422,6 +422,9 @@ void settings_gui_state::perform(
 
 				do_lag_simulator(config.client.network_simulator);
 
+				input_text<max_rcon_password_length_v>(SCOPE_CFG_NVP(rcon_password)); revert(scope_cfg.rcon_password);
+				text_disabled("The default rcon password to be sent to the server on init.");
+
 				break;
 			}
 			case settings_pane::SERVER: {
@@ -433,6 +436,18 @@ void settings_gui_state::perform(
 				input_text<100>(SCOPE_CFG_NVP(override_default_ruleset)); revert(scope_cfg.override_default_ruleset);
 
 				do_lag_simulator(config.server.network_simulator);
+
+				if (auto node = scoped_tree_node("RCON")) {
+					auto& scope_cfg = config.private_server;
+
+					input_text<max_rcon_password_length_v>(SCOPE_CFG_NVP(rcon_password)); revert(scope_cfg.rcon_password);
+					text_disabled("A rcon can change maps, alter modes, kick/ban players and perform other administrative activities.");
+
+					input_text<max_rcon_password_length_v>(SCOPE_CFG_NVP(master_rcon_password)); revert(scope_cfg.master_rcon_password);
+					text_disabled("A master rcon can additionally change the rcon password in case of an emergency.");
+				}
+
+				revertable_checkbox(SCOPE_CFG_NVP(auto_authorize_loopback_for_rcon));
 
 				input_text<100>(SCOPE_CFG_NVP(current_arena)); revert(scope_cfg.current_arena);
 
