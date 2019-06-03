@@ -44,30 +44,11 @@ namespace net_messages {
 	template <typename Stream>
 	bool client_welcome::Serialize(Stream& stream) {
 		{
-			auto serialize_str = [&](auto& str, const auto buffer_size) {
-				const auto s = str.data();
-
-				int length = 0;
-				if ( Stream::IsWriting )
-				{
-					length = str.size();
-				}
-
-				serialize_int( stream, length, 0, buffer_size - 1 );
-				serialize_bytes( stream, (uint8_t*)s, length );
-
-				if ( Stream::IsReading ) {
-					s[length] = '\0';
-				}
-
-				return true;
-			};
-
-			if (!serialize_str(payload.chosen_nickname, requested_client_settings::nick_buf_len)) {
+			if (!serialize_fixed_size_str(stream, payload.chosen_nickname)) {
 				return false;
 			}
 
-			if (!serialize_str(payload.rcon_password, requested_client_settings::rcon_buf_len)) {
+			if (!serialize_fixed_size_str(stream, payload.rcon_password)) {
 				return false;
 			}
 		}
@@ -84,6 +65,24 @@ namespace net_messages {
 
 	template <typename Stream>
 	bool rcon_command::Serialize(Stream& stream) {
+		if (!serialize(stream, payload)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	template <typename Stream>
+	bool client_requested_chat::Serialize(Stream& stream) {
+		if (!serialize(stream, payload)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	template <typename Stream>
+	bool server_broadcasted_chat::Serialize(Stream& stream) {
 		if (!serialize(stream, payload)) {
 			return false;
 		}

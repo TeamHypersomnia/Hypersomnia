@@ -5,6 +5,7 @@
 constexpr std::size_t max_incoming_connections_v = 64;
 constexpr std::size_t max_nickname_length_v = 30;
 constexpr std::size_t max_rcon_password_length_v = 30;
+constexpr std::size_t max_chat_message_length_v = 180;
 constexpr std::size_t min_nickname_length_v = 3;
 
 using net_time_t = double;

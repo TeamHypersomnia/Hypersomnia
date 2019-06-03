@@ -18,6 +18,59 @@ namespace net_messages {
 	}
 
 	template <class Stream>
+	bool serialize(Stream& s, ::mode_player_id& i) {
+		static const auto max_val = mode_player_id::machine_admin();
+		serialize_int(s, i.value, 0, max_val.value);
+		serialize_align(s);
+		return true;
+	}
+
+	template <class Stream, unsigned buffer_size>
+	bool serialize_fixed_size_str(Stream& stream, augs::constant_size_string<buffer_size>& str) {
+		const auto s = str.data();
+
+		int length = 0;
+		if ( Stream::IsWriting )
+		{
+			length = str.size();
+		}
+
+		serialize_int( stream, length, 0, buffer_size - 1 );
+		serialize_bytes( stream, (uint8_t*)s, length );
+
+		if ( Stream::IsReading ) {
+			s[length] = '\0';
+		}
+
+		return true;
+	}
+
+	template <class Stream>
+	bool serialize(Stream& s, ::client_requested_chat& c) {
+		if (!serialize_enum(s, c.target)) {
+			LOG("FAILED TO SERIALIZE ENUM! %x", int(c.target));
+			return false;
+		}
+
+			
+		if (!serialize_fixed_size_str(s, c.message)) {
+			LOG("FAILED TO SERIALIZE MSG! %x", int(c.target));
+			return false;
+		}
+
+		return true;
+	}
+
+	template <class Stream>
+	bool serialize(Stream& s, ::server_broadcasted_chat& c) {
+		return 
+			serialize(s, c.author)
+			&& serialize_enum(s, c.target)
+			&& serialize_fixed_size_str(s, c.message)
+		;
+	}
+
+	template <class Stream>
 	bool serialize(Stream& s, rcon_commands::special& c) {
 		return serialize_enum(s, c);
 	}
@@ -51,14 +104,6 @@ namespace net_messages {
 	template <class Stream>
 	bool serialize(Stream& s, mode_commands::special_purchase& c) {
 		return serialize_enum(s, c);
-	}
-
-	template <class Stream>
-	bool serialize(Stream& s, ::mode_player_id& i) {
-		static const auto max_val = mode_player_id::machine_admin();
-		serialize_int(s, i.value, 0, max_val.value);
-		serialize_align(s);
-		return true;
 	}
 
 	template <class Stream>
@@ -114,7 +159,9 @@ namespace net_messages {
 				}
 
 				if constexpr(!is_monostate_v<T>) {
-					serialize(s, std::get<T>(i));
+					if (!serialize(s, std::get<T>(i))) {
+						return false;
+					}
 				}
 
 				return true;

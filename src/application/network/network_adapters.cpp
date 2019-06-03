@@ -78,6 +78,11 @@ game_connection_config::game_connection_config() {
 	{
 		auto& communications = channel[static_cast<int>(game_channel_type::COMMUNICATIONS)];
 		communications.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
+
+		communications.sentPacketBufferSize = 1024;
+		communications.messageResendTime = 0.3f;
+		communications.messageSendQueueSize = 1024;
+		communications.messageReceiveQueueSize = 1024;
 	}
 
 	serverPerClientMemory += 1024 * 1024 * 7;

@@ -5,6 +5,7 @@
 #include "application/network/server_step_entropy.h"
 #include "application/network/special_client_request.h"
 #include "application/network/rcon_command.h"
+#include "application/setups/server/chat_structs.h"
 
 #define LOG_NET_SERIALIZATION !IS_PRODUCTION_BUILD
 
@@ -179,6 +180,36 @@ namespace net_messages {
 		bool read_payload(::rcon_command_variant&);
 	};
 
+	struct client_requested_chat : public yojimbo::Message {
+		static constexpr bool server_to_client = false;
+		static constexpr bool client_to_server = true;
+
+		template <typename Stream>
+		bool Serialize(Stream& stream);
+
+		::client_requested_chat payload;
+
+		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
+
+		bool write_payload(const ::client_requested_chat&);
+		bool read_payload(::client_requested_chat&);
+	};
+
+	struct server_broadcasted_chat : public yojimbo::Message {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = false;
+
+		template <typename Stream>
+		bool Serialize(Stream& stream);
+
+		::server_broadcasted_chat payload;
+
+		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
+
+		bool write_payload(const ::server_broadcasted_chat&);
+		bool read_payload(::server_broadcasted_chat&);
+	};
+
 	using all_t = type_list<
 		client_welcome*,
 		new_server_vars*,
@@ -191,7 +222,9 @@ namespace net_messages {
 		client_entropy*,
 		special_client_request*,
 
-		rcon_command*
+		rcon_command*,
+		client_requested_chat*,
+		server_broadcasted_chat*
 	>;
 	
 	using id_t = type_in_list_id<all_t>;

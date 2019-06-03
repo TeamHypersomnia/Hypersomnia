@@ -20,6 +20,7 @@
 
 #include "application/arena/arena_handle.h"
 #include "application/arena/choose_arena.h"
+#include "application/setups/client/chat_gui.h"
 
 void server_setup::shutdown() {
 	if (server->is_running()) {
@@ -481,7 +482,7 @@ message_handler_result server_setup::handle_client_message(
 						switch (typed_payload) {
 							case special::SHUTDOWN:
 							LOG("Shutting down due to rcon's request.");
-							shutdown();
+							schedule_shutdown = true;
 
 							return abort_v;
 							break;
@@ -492,6 +493,9 @@ message_handler_result server_setup::handle_client_message(
 							return message_handler_result::CONTINUE;
 							break;
 						}
+					}
+					else if constexpr(std::is_same_v<P, std::monostate>) {
+						return abort_v;
 					}
 					else {
 						static_assert(always_false_v<P>, "Unhandled rcon command type!");
@@ -512,6 +516,68 @@ message_handler_result server_setup::handle_client_message(
 				LOG("unauthorized_rcon_commands exceeded max_unauthorized_rcon_commands (%x). Kicking client.", vars.max_unauthorized_rcon_commands);
 
 				return abort_v;
+			}
+		}
+	}
+	else if constexpr (std::is_same_v<T, client_requested_chat>) {
+		if (c.state == S::IN_GAME) {
+			server_broadcasted_chat message;
+
+			message.author = to_mode_player_id(client_id);
+			message.message = std::string(payload.message);
+			message.target = payload.target;
+
+			const auto sender_player = get_arena_handle().on_mode(
+				[&](const auto& typed_mode) {
+					return typed_mode.find(message.author);
+				}
+			);
+
+			if (sender_player != nullptr) {
+
+				const auto sender_player_faction = sender_player->faction;
+				const auto sender_player_nickname = sender_player->chosen_name;
+
+				{
+					chat_entry_type new_entry;
+
+					new_entry.timestamp = get_current_time();
+					new_entry.author = sender_player_nickname;
+					new_entry.author_faction = sender_player_faction;
+					new_entry.message = std::string(payload.message);
+					new_entry.faction_specific = payload.target == chat_target_type::TEAM_ONLY;
+
+					LOG(new_entry.operator std::string());
+				}
+
+				for (auto& c : clients) {
+					if (!c.is_set()) {
+						continue;
+					}
+
+					const auto recipient_client_id = static_cast<client_id_type>(index_in(clients, c));
+
+					if (message.target == chat_target_type::TEAM_ONLY) {
+						const auto recipient_player = get_arena_handle().on_mode(
+							[&](const auto& typed_mode) {
+								return typed_mode.find(to_mode_player_id(recipient_client_id));
+							}
+						);
+
+						const auto recipient_player_faction = recipient_player ? recipient_player->faction : faction_type::SPECTATOR;
+
+						if (sender_player_faction != recipient_player_faction) {
+							continue;
+						}
+					}
+
+					server->send_payload(
+						recipient_client_id,
+						game_channel_type::COMMUNICATIONS,
+
+						message
+					);
+				}
 			}
 		}
 	}

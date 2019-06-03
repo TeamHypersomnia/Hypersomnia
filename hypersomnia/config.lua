@@ -544,7 +544,11 @@ return {
 
 	max_buffered_server_commands = 10000,
 	max_predicted_client_commands = 3000,
-    spectate_referential_state = true
+    spectate_referential_state = true,
+
+    chat_window_width = 500,
+    show_recent_chat_messages_num = 7,
+    keep_recent_chat_messages_for_seconds = 15,
   },
 
   performance = {

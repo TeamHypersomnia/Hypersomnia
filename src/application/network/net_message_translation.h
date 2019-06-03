@@ -316,6 +316,34 @@ namespace net_messages {
 		return true;
 	}
 
+	inline bool client_requested_chat::write_payload(
+		const decltype(client_requested_chat::payload)& input
+	) {
+		payload = input;
+		return true;
+	}
+
+	inline bool client_requested_chat::read_payload(
+		decltype(client_requested_chat::payload)& output
+	) {
+		output = std::move(payload);
+		return true;
+	}
+
+	inline bool server_broadcasted_chat::write_payload(
+		const decltype(server_broadcasted_chat::payload)& input
+	) {
+		payload = input;
+		return true;
+	}
+
+	inline bool server_broadcasted_chat::read_payload(
+		decltype(server_broadcasted_chat::payload)& output
+	) {
+		output = std::move(payload);
+		return true;
+	}
+
 	inline bool special_client_request::write_payload(
 		const decltype(special_client_request::payload)& input
 	) {

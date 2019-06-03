@@ -89,6 +89,7 @@ class server_setup :
 	std::vector<internal_net_message_id> broadcasted_steps;
 
 	net_time_t server_time = 0.0;
+	bool schedule_shutdown = false;
 
 	/* No server state follows later in code. */
 
@@ -187,6 +188,12 @@ public:
 		const server_advance_input& in,
 		const C& callbacks
 	) {
+		if (schedule_shutdown) {
+			shutdown();
+			schedule_shutdown = false;
+			return;
+		}
+
 		const auto current_time = get_current_time();
 
 		while (server_time <= current_time) {

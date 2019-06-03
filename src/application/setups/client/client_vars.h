@@ -28,5 +28,11 @@ struct client_vars {
 
 	bool spectate_referential_state = true;
 	std::string rcon_password = "";
+
+	unsigned chat_window_width = 300;
+
+	unsigned show_recent_chat_messages_num = 5;
+	float keep_recent_chat_messages_for_seconds = 8.f;
+	float chat_messages_fade_last_seconds = 2.f;
 	// END GEN INTROSPECTOR
 };

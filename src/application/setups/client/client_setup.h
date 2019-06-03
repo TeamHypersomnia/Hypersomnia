@@ -37,6 +37,8 @@
 
 #include "view/client_arena_type.h"
 #include "application/network/special_client_request.h"
+#include "application/setups/client/rcon_gui.h"
+#include "application/setups/client/chat_gui.h"
 
 struct config_lua_table;
 
@@ -93,6 +95,8 @@ class client_setup :
 
 	std::string last_disconnect_reason;
 
+	rcon_gui_state rcon_gui;
+	chat_gui_state chat_gui;
 	/* No client state follows later in code. */
 
 	static net_time_t get_current_time();
@@ -519,4 +523,10 @@ public:
 	const entropy_accumulator& get_entropy_accumulator() const {
 		return total_collected;
 	}
+
+	bool handle_input_before_game(
+		handle_input_before_game_input
+	);
+
+	void draw_custom_gui(const draw_setup_gui_input& in) const;
 };

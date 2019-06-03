@@ -425,6 +425,11 @@ void settings_gui_state::perform(
 				input_text<max_rcon_password_length_v>(SCOPE_CFG_NVP(rcon_password)); revert(scope_cfg.rcon_password);
 				text_disabled("The default rcon password to be sent to the server on init.");
 
+				revertable_slider(SCOPE_CFG_NVP(chat_window_width), 100u, 500u);
+
+				revertable_slider(SCOPE_CFG_NVP(show_recent_chat_messages_num), 0u, 20u);
+				revertable_slider(SCOPE_CFG_NVP(keep_recent_chat_messages_for_seconds), 0.f, 20.f);
+
 				break;
 			}
 			case settings_pane::SERVER: {

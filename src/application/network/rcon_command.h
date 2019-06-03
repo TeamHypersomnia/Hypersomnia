@@ -10,5 +10,6 @@ namespace rcon_commands {
 };
 
 using rcon_command_variant = std::variant<
+	std::monostate,
 	rcon_commands::special
 >;
