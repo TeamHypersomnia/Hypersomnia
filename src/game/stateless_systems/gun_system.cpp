@@ -341,7 +341,7 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 
 					if (transfer_cooldown_passed) {
 						if (primary_trigger_pressed || secondary_trigger_pressed) {
-							if (gun_try_to_fire_and_reset(clk, gun_def.shot_cooldown_ms, gun.fire_cooldown_object)) {
+							if (gun.fire_cooldown_object <= 0.f) {
 								gun.when_last_played_trigger_effect = clk.now;
 
 								if (gun_def.action_mode != gun_action_type::AUTOMATIC) {
@@ -355,10 +355,12 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 								}
 
 								if (primary_trigger_pressed) {
+									ensure(gun_try_to_fire_and_reset(clk, gun_def.shot_cooldown_ms, gun.fire_cooldown_object));
 									return weapon_action_type::PRIMARY;
 								}
 
 								if (secondary_trigger_pressed) {
+									ensure(gun_try_to_fire_and_reset(clk, gun_def.burst_interval_ms, gun.fire_cooldown_object));
 									return weapon_action_type::SECONDARY;
 								}
 							}

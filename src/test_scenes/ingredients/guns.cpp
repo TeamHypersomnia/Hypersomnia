@@ -2945,7 +2945,7 @@ namespace test_flavours {
 			gun_def.muzzle_velocity = {4500.f, 4500.f};
 			gun_def.shot_cooldown_ms = 100.f;
 			gun_def.after_transfer_shot_cooldown_mult = 1.5f;
-			gun_def.burst_interval_ms = 40.f;
+			gun_def.burst_interval_ms = 45.f;
 			gun_def.chambering_sound.id = to_sound_id(test_scene_sound_id::REVOLVER_CHAMBERING);
 			gun_def.allow_chambering_with_akimbo = true;
 
