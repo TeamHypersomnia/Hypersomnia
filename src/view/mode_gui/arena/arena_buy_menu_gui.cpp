@@ -414,9 +414,16 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		}
 		const auto& selected = b == button_type::REPLENISHABLE ? selected_replenishables : selected_weapons;
 
+		auto buy_opts = ::get_buy_slot_opts();
+
+		if (b == button_type::REPLENISHABLE) {
+			/* Don't count hands as a space for replenishables, e.g. mags */
+			erase_element(buy_opts, candidate_holster_type::HANDS);
+		}
+
 		const auto num_carryable = num_carryable_pieces(
 			subject,
-			::get_buy_slot_opts(), 
+			buy_opts, 
 			f_id
 		);
 

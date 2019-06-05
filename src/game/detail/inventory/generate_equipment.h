@@ -142,10 +142,6 @@ entity_id requested_equipment::generate_for(
 			/* So that the effect transform is valid */
 			weapon.set_logic_transform(character_transform);
 
-			if constexpr(!to_the_ground) {
-				pickup(weapon);
-			}
-
 			const auto chamber_slot = weapon[slot_function::GUN_CHAMBER];
 			const auto chamber_mag_slot = weapon[slot_function::GUN_CHAMBER_MAGAZINE];
 
@@ -218,6 +214,10 @@ entity_id requested_equipment::generate_for(
 
 					generate_spares(final_charge_flavour);
 				}
+			}
+
+			if constexpr(!to_the_ground) {
+				pickup(weapon);
 			}
 		}
 	}

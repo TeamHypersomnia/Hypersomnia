@@ -2144,7 +2144,7 @@ namespace test_flavours {
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
 				item.space_occupied_per_charge = to_space_units("0.5");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
-				item.standard_price = 100;
+				item.standard_price = 150;
 				meta.set(item);
 			}
 		}
@@ -3107,7 +3107,7 @@ namespace test_flavours {
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_GUN_DRAW);
 			meta.get<invariants::item>().standard_price = 3500;
 			set_chambering_duration_ms(meta, 650.f);
-			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("7.5");
+			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("6");
 			only_allow_mag(meta, test_container_items::WARX_FQ12_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
 			meta.get<invariants::item>().flip_when_reloading = true;
@@ -3334,7 +3334,7 @@ namespace test_flavours {
 			set_density_mult(meta, 2.6f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1500.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
-			meta.get<invariants::item>().standard_price = 1500;
+			meta.get<invariants::item>().standard_price = 1100;
 			set_chambering_duration_ms(meta, 500.f);
 			only_allow_mag(meta, test_container_items::DEAGLE_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
