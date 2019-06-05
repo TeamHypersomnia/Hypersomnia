@@ -58,6 +58,8 @@ enum class game_intent_type {
 	SWITCH_LOOK,
 	DASH,
 
+	WIELD_BOMB,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

@@ -709,6 +709,23 @@ void item_system::handle_throw_item_intents(const logic_step step) {
 					do_drop_or_throw(typed_subject, is_throw, is_drop, is_secondary_like);
 					return;
 				}
+
+				if (r.intent == game_intent_type::WIELD_BOMB) {
+					if (const auto over_back = typed_subject[slot_function::OVER_BACK]) {
+						if (const auto item_over_back = over_back.get_item_if_any()) {
+							auto requested_wield = wielding_setup::from_current(typed_subject);
+							requested_wield.hand_selections[0] = item_over_back;
+
+							::perform_wielding(
+								step,
+								typed_subject,
+								requested_wield
+							);
+
+							return;
+						}
+					}
+				}
 			}
 
 			{

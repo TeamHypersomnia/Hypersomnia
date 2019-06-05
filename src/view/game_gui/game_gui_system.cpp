@@ -29,6 +29,7 @@
 #include "game/detail/weapon_like.h"
 #include "game/modes/detail/item_purchase_logic.hpp"
 #include "augs/templates/logically_empty.h"
+#include "game/detail/explosive/like_explosive.h"
 
 static int to_hotbar_index(const game_gui_intent_type type) {
 	switch (type) {
@@ -79,9 +80,9 @@ character_gui& game_gui_system::get_character_gui(const entity_id id) {
 		new_gui.action_buttons[0].bound_spell.set<haste>();
 		new_gui.action_buttons[1].bound_spell.set<fury_of_the_aeons>();
 		new_gui.action_buttons[2].bound_spell.set<ultimate_wrath_of_the_aeons>();
-		new_gui.action_buttons[3].bound_spell.set<exaltation>();
-		new_gui.action_buttons[4].bound_spell.set<electric_triad>();
-		new_gui.action_buttons[5].bound_spell.set<echoes_of_the_higher_realms>();
+		new_gui.action_buttons[3].bound_spell.set<electric_triad>();
+		new_gui.action_buttons[4].bound_spell.set<echoes_of_the_higher_realms>();
+		new_gui.action_buttons[5].bound_spell.set<exaltation>();
 		
 		return new_gui;
 	}
@@ -673,8 +674,9 @@ void game_gui_system::standard_post_solve(
 			const bool interested =
 				target_slot.alive()
 				&& transferred_item.alive()
-				&& (is_weapon_like(transferred_item) || is_armor_like(transferred_item))
+				&& (is_weapon_like(transferred_item))
 				&& target_slot.get_type() != slot_function::PERSONAL_DEPOSIT
+				&& !is_like_plantable_bomb(transferred_item)
 				&& (transfer.result.is_pickup() || (same_capability && !target_slot->is_mounted_slot()))
 			;
 
