@@ -357,7 +357,21 @@ void settings_gui_state::perform(
 
 				if (config.drawing.draw_area_markers.is_enabled) {
 					auto indent = scoped_indent();
-					revertable_slider("Alpha", config.drawing.draw_area_markers.value, 0.f, 1.f);
+					revertable_slider("Alpha##markers", config.drawing.draw_area_markers.value, 0.f, 1.f);
+				}
+
+				revertable_checkbox("Draw callout indicators", config.drawing.draw_callout_indicators.is_enabled);
+
+				if (config.drawing.draw_area_markers.is_enabled) {
+					auto indent = scoped_indent();
+					revertable_slider("Alpha##callouts", config.drawing.draw_callout_indicators.value, 0.f, 1.f);
+				}
+
+				{
+					auto& scope_cfg = config.drawing;
+
+					revertable_checkbox(SCOPE_CFG_NVP(print_character_location));
+					revertable_drag_vec2(SCOPE_CFG_NVP(radar_pos));
 				}
 
 				if (auto node = scoped_tree_node("Game GUI")) {

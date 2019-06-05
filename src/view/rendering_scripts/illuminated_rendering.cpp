@@ -42,6 +42,8 @@
 #include "game/detail/crosshair_math.hpp"
 
 #include "application/performance_settings.h"
+#include "augs/gui/text/printer.h"
+#include "augs/math/simple_calculations.h"
 
 void illuminated_rendering(
 	const illuminated_rendering_input in,
@@ -774,6 +776,66 @@ void illuminated_rendering(
 
 	set_shader_with_non_zoomed_matrix(shaders.standard);
 	renderer.call_triangles(textual_infos);
+
+	{
+		const auto& callouts = settings.draw_callout_indicators;
+
+		if (callouts.is_enabled) {
+			visible.for_each<render_layer::CALLOUT_MARKERS, render_layer::OVERLAID_CALLOUT_MARKERS>(cosm, [&](const auto e) {
+				e.template dispatch_on_having_all<invariants::box_marker>([&](const auto typed_handle) { 
+					const auto where = typed_handle.get_logic_transform();
+					const auto& callout_alpha = callouts.value;
+					::draw_area_indicator(typed_handle, line_output, where, cone.eye.zoom, callout_alpha, drawn_indicator_type::INGAME);
+
+					using namespace augs::gui::text;
+
+					const auto& callout_name = typed_handle.get_name();
+
+					print_stroked(
+						output,
+						cone.to_screen_space(typed_handle.get_logic_transform().pos),
+						formatted_string { callout_name, { gui_font, white } },
+						{ augs::ralign::CX, augs::ralign::CY }
+					);
+				});
+			});
+
+			renderer.call_and_clear_triangles();
+		}
+	}
+
+	if (settings.print_character_location) {
+		if (const auto tr = viewed_character.find_viewing_transform(interp)) {
+			const auto indicator_pos = augs::get_screen_pos_from_offset(screen_size, settings.radar_pos); 
+			
+			auto& entities = thread_local_visible_entities();
+
+			tree_of_npo_filter tree_types;
+			tree_types.types[tree_of_npo_type::CALLOUT_MARKERS] = true;
+
+			entities.acquire_non_physical({
+				cosm,
+				camera_cone(camera_eye(tr->pos, 1.f), vec2i::square(1)),
+				visible_entities_query::accuracy_type::EXACT,
+				render_layer_filter::all(),
+				tree_types
+			});
+
+			if (const auto result = entities.get_first_fulfilling([](auto&&...){ return true; }); result.is_set()) {
+				const auto& name = cosm[result].get_name();
+
+				using namespace augs::gui::text;
+
+				print_stroked(
+					output,
+					indicator_pos,
+					formatted_string { name, { gui_font, yellow } }
+				);
+			}
+		}
+
+		renderer.call_and_clear_triangles();
+	}
 
 	set_shader_with_matrix(shaders.exploding_rings);
 

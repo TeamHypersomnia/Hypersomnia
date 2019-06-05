@@ -146,13 +146,21 @@ return {
     draw_crosshairs = true,
     draw_weapon_laser = true,
 	enabled_draw_area_markers = 1.0,
+	disabled_draw_callout_indicators = 1.0,
+    print_character_location = true,
 	fog_of_war = {
 	  overlay_color_on_visible = true,
 	  overlay_color = "255 255 255 2",
 	  enabled = true,
 	  angle = 150
 	},
-	draw_enemy_hud = false
+	draw_enemy_hud = false,
+	draw_cp_bar = true,
+	draw_pe_bar = false,
+    radar_pos = {
+		x = -201,
+		y = 84
+	}
   },
   editor = {
 	player = {

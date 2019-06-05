@@ -16,6 +16,8 @@
 #include "game/detail/damage_origin.hpp"
 #include "augs/misc/action_list/standard_actions.h"
 
+#include "augs/math/simple_calculations.h"
+
 const auto default_popul = augs::populate_with_delays_impl(
 	100.f,
 	0.65f
@@ -199,29 +201,8 @@ void arena_gui_state::draw_mode_gui(
 
 				auto drawn_current_money = stats.money;
 
-				const auto money_indicator_pos = [&]() {
-					// const auto max_money_indicator_w = calc_size("999999$").x;
-
-					const auto& off = cfg.money_indicator_pos;
-
-					auto x = off.x;
-
-					if (x < 0) {
-						x = in.screen_size.x + x;
-					}
-
-					auto y = off.y;
-
-					if (y < 0) {
-						y = in.screen_size.y + y;
-					}
-					else {
-						y += game_screen_top;
-					}
-
-					return vec2i(x, y);
-				}();
-
+				const auto money_indicator_pos = augs::get_screen_pos_from_offset(in.screen_size, cfg.money_indicator_pos, game_screen_top); 
+				
 				{
 					const auto& cosm = mode_input.cosm;
 					const auto& awards = stats.round_state.awards;

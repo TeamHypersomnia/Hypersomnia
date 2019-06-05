@@ -56,8 +56,6 @@ public:
 	void acquire_physical(const visible_entities_query);
 	void acquire_non_physical(const visible_entities_query);
 	
-	void sort_per_layer(const cosmos&);
-
 	void clear_dead_entities(const cosmos&);
 	void clear();
 

@@ -925,10 +925,6 @@ void client_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
 	using namespace augs::gui::text;
 	const auto& kos = chat_gui.history;
 
-	if (kos.empty()) {
-		return;
-	}
-
 	const auto knockouts_to_show = std::min(
 		kos.size(), 
 		static_cast<std::size_t>(vars.show_recent_chat_messages_num)

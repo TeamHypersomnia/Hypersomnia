@@ -1,4 +1,4 @@
-Revision no.: 6742 (dirty)
-Build date: Mon Jun 3 15:12:29 2019
+Revision no.: 6726 (dirty)
+Build date: Sat Jun 1 20:33:21 2019
 Commit message:
-Fixed a bug in burst fire calc(...)
+renames

@@ -6,6 +6,81 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+
+
+- Assign colors to players like in CS GO
+	- Then show colors on radar
+	- And also indicators should just be colored arrows without nicknames
+		- You can always check the nickname after pressing TAB
+	- The indicators will also have the distance in meters and callout name under it
+	- When somebody dies the indicator turns to a cross
+	- Show a red pistol indicator when a shot is heard
+
+
+
+- Callout markers
+	- Separate trees
+	- names
+		- catwalk
+		- pump
+		- generator
+		- toxic a/toxic b
+		- horse
+		- turns
+		- helipad
+		- radars
+		- cache
+		- t vent
+		- computers
+		- ct computers
+		- mid vent
+		- green mid
+		- office
+		- brains
+		- connector 
+		- knight (konik)
+		- stairs
+		- turns
+		- long b
+		- ninja
+		- fern
+		- b lobby
+		- b gate
+		- neck
+		- gate
+		- fork
+		- glass
+		- hole
+		- mixer
+		- secret (instead of knight)
+		- b vent
+		- mid vent
+		- back vent
+		
+- two layers for callouts so we can stack one on top of another
+
+
+
+
+- Tinfoil hat
+	- Grants a 50% protection from magic
+	- Can't use spells
+	- 1900$
+
+
+- In-game tip system
+	- Contextual
+		- Press "T" to buy items.
+		- Press "B" to pull out the bomb.
+	- Randomized
+		- Stay still to regenerate stamina faster.
+		- Double-tap R to drop the old mag for a faster reload. Near-empty mags are dropped automatically.
+		- Melee blows are stronger when you run.
+		- Electric Shield lets you live longer, but slows down your movement.
+
+- More GUI responses
+	- 
+
 - Remember to keep the old master rcon password so that basic level rcons cannot change it
 
 - Perhaps interpolate velocity values if we detect that they are ugly at 60hz, apart from the case with skull rocket?

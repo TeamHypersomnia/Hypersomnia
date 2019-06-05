@@ -223,6 +223,7 @@ void editor_setup::customize_for_viewing(config_lua_table& config) const {
 		config.drawing.draw_aabb_highlighter = false;
 		config.interpolation.enabled = false;
 		config.drawing.draw_area_markers = {};
+		config.drawing.draw_callout_indicators = {};
 	}
 
 	if (is_gameplay_on()) {
@@ -1510,7 +1511,8 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 		[&](const auto typed_handle, const auto image_id, const transformr world_transform, const rgba color) {
 			const auto screen_space = transformr(vec2i(on_screen(world_transform.pos)), world_transform.rotation);
 
-			const auto image_size = in.necessary_images[image_id].get_original_size();
+			const auto is_invalid = image_id == assets::necessary_image_id::INVALID;
+			const auto image_size = is_invalid ? vec2u::square(32) : in.necessary_images[image_id].get_original_size();
 
 			const auto blank_tex = triangles.default_texture;
 
@@ -1537,21 +1539,35 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 				);
 			}
 
-			augs::detail_sprite(
-				triangles.output_buffer,
-				in.necessary_images.at(image_id),
-				screen_space.pos,
-				screen_space.rotation,
-				color
-			);
+			if (is_invalid) {
+				using namespace augs::gui::text;
 
-			lines.border(
-				image_size,
-				screen_space.pos,
-				screen_space.rotation,
-				color,
-				border_input { 1, 2 }
-			);
+				const auto& callout_name = typed_handle.get_name();
+
+				print_stroked(
+					triangles,
+					on_screen(typed_handle.get_logic_transform().pos),
+					formatted_string { callout_name, { in.gui_fonts.gui, white } },
+					{ augs::ralign::CX, augs::ralign::CY }
+				);
+			}
+			else {
+				augs::detail_sprite(
+					triangles.output_buffer,
+					in.necessary_images.at(image_id),
+					screen_space.pos,
+					screen_space.rotation,
+					color
+				);
+
+				lines.border(
+					image_size,
+					screen_space.pos,
+					screen_space.rotation,
+					color,
+					border_input { 1, 2 }
+				);
+			}
 
 			::draw_area_indicator(typed_handle, lines, screen_space, eye.zoom, 1.f, drawn_indicator_type::EDITOR, color);
 		}	

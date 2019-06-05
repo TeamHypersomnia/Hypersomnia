@@ -31,6 +31,12 @@ std::optional<tree_of_npo_node_input> create_default_for(const E& handle) {
 		else if (layer == render_layer::LIGHTS) {
 			result.type = tree_of_npo_type::LIGHTS;
 		}
+		else if (
+			layer == render_layer::CALLOUT_MARKERS
+			|| layer == render_layer::OVERLAID_CALLOUT_MARKERS
+		) {
+			result.type = tree_of_npo_type::CALLOUT_MARKERS;
+		}
 		else {
 			result.type = tree_of_npo_type::RENDERABLES;
 		}

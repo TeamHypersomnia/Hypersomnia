@@ -9,6 +9,7 @@ enum class tree_of_npo_type {
 	LIGHTS,
 	PARTICLE_STREAMS,
 	SOUND_SOURCES,
+	CALLOUT_MARKERS,
 	COUNT
 	// END GEN INTROSPECTOR
 };

@@ -1056,7 +1056,7 @@ namespace test_flavours {
 			}
 
 			test_flavours::add_bullet_round_physics(meta);
-			meta.template get<invariants::rigid_body>().damping.linear = 7.8f;
+			meta.template get<invariants::rigid_body>().damping.linear = 3.5f;
 
 			invariants::missile missile;
 
@@ -1127,8 +1127,8 @@ namespace test_flavours {
 				auto& c = explosive.cascade[0];
 				c.flavour_id = to_entity_flavour_id(test_explosion_bodies::BLUNAZ_MISSILE_CASCADE);
 				c.num_spawned = 2;
-				c.num_explosions = { 2, 0 };
-				c.initial_speed = { 1500.f, 0.2f };
+				c.num_explosions = { 3, 0 };
+				c.initial_speed = { 1600.f, 0.2f };
 				c.spawn_spread = 45.f;
 			}
 
@@ -1137,7 +1137,7 @@ namespace test_flavours {
 				c.flavour_id = to_entity_flavour_id(test_explosion_bodies::BLUNAZ_MISSILE_CASCADE_SMALLER);
 				c.num_spawned = 2;
 				c.num_explosions = { 3, 0 };
-				c.initial_speed = { 1800.f, 0.6f };
+				c.initial_speed = { 2000.f, 0.6f };
 				c.spawn_angle_variation = 0.5f;
 				c.spawn_spread = 45.f;
 			}
@@ -3399,7 +3399,7 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {5000.f, 5000.f};
-			gun_def.shot_cooldown_ms = 1500.f;
+			gun_def.shot_cooldown_ms = 1800.f;
 			gun_def.after_transfer_shot_cooldown_mult = 0.4f;
 
 			gun_def.damage_multiplier = 1.f;

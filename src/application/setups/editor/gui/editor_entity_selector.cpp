@@ -221,7 +221,8 @@ void editor_entity_selector::do_mousemotion(
 
 	auto remove_non_hovering_icons_from = [&](auto& container, const auto world_range) {
 		auto get_icon_aabb = [&](const auto icon_id, const transformr where) {
-			return xywh::center_and_size(where.pos, vec2(sizes_for_icons.at(icon_id).get_original_size()) / eye.zoom);
+			const auto size = icon_id == assets::necessary_image_id::INVALID ? vec2::square(32.f) : vec2(sizes_for_icons.at(icon_id).get_original_size());
+			return xywh::center_and_size(where.pos, size / eye.zoom);
 		};
 
 		::for_each_iconed_entity(

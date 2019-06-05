@@ -16,7 +16,10 @@ enum class area_marker_type {
 	BOMBSITE_C,
 	BUY_AREA,
 
-	ORGANISM_AREA
+	ORGANISM_AREA,
+
+	CALLOUT,
+	OVERLAID_CALLOUT
 	// END GEN INTROSPECTOR
 };
 

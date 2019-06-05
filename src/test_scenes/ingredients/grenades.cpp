@@ -258,7 +258,7 @@ namespace test_flavours {
 			dmg.base = 6.f;
 			in.inner_ring_color = white;
 			in.outer_ring_color = white;
-			in.effective_radius = 1000.f;
+			in.effective_radius = 1150.f;
 			dmg.impact_impulse = 0.f;
 			dmg.impulse_multiplier_against_sentience = 0.f;
 			in.sound.id = to_sound_id(test_scene_sound_id::FLASHBANG_EXPLOSION);
@@ -316,7 +316,7 @@ namespace test_flavours {
 			dmg.base = 150.f;
 			in.inner_ring_color = cyan;
 			in.outer_ring_color = turquoise;
-			in.effective_radius = 570.f;
+			in.effective_radius = 750.f;
 			dmg.impact_impulse = 2.f;
 			dmg.impulse_multiplier_against_sentience = 1.f;
 			in.sound.id = to_sound_id(test_scene_sound_id::PED_EXPLOSION);
@@ -422,7 +422,7 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_explosion_bodies::BLUNAZ_MISSILE_CASCADE);
 			auto& c = meta.get<invariants::cascade_explosion>();
 			c.explosion = e;
-			c.explosion_interval_ms = { 200.f, 0.4f };
+			c.explosion_interval_ms = { 240.f, 0.5f };
 			c.circle_collider_radius = 50.f;
 			c.max_explosion_angle_displacement = 10.f;
 
@@ -442,7 +442,7 @@ namespace test_flavours {
 			auto& meta = get_test_flavour(flavours, test_explosion_bodies::BLUNAZ_MISSILE_CASCADE_SMALLER);
 			auto& c = meta.get<invariants::cascade_explosion>();
 			c.explosion = e;
-			c.explosion_interval_ms = { 200.f, 0.4f };
+			c.explosion_interval_ms = { 220.f, 0.5f };
 			c.circle_collider_radius = 50.f;
 			c.max_explosion_angle_displacement = 10.f;
 
