@@ -6,6 +6,11 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Show only allies' colors by deafult, like in CS GO 
+
+- panel -> ct computers
+- fix in-game indicators wrongly drawn when zoomed out
+	- they can still be drawn zoomed out in-game if the monitor is smaller than 1920x1080 for example
 
 
 - Assign colors to players like in CS GO

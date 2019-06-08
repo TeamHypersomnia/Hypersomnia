@@ -502,8 +502,8 @@ void melee_system::initiate_and_update_moves(const logic_step step) {
 													subject_shake *= 2;
 													victim_shake *= 2;
 
-													victim_shake.apply(now, victim_owner.template get<components::sentience>());
-													subject_shake.apply(now, it.template get<components::sentience>());
+													victim_shake.apply(now, victim_owner.template get<invariants::sentience>(), victim_owner.template get<components::sentience>());
+													subject_shake.apply(now, it.template get<invariants::sentience>(), it.template get<components::sentience>());
 												}
 
 												{

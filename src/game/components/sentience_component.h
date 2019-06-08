@@ -72,7 +72,7 @@ namespace components {
 
 		augs::stepped_timestamp time_of_last_shake;
 		augs::stepped_timestamp when_knocked_out;
-		sentience_shake shake;
+		sentience_shake shake = sentience_shake::zero();
 
 		use_button_state use_button = use_button_state::IDLE;
 		use_button_query_result last_use_result = use_button_query_result::NONE_FOUND;
@@ -141,8 +141,7 @@ namespace components {
 namespace invariants {
 	struct sentience {
 		// GEN INTROSPECTOR struct invariants::sentience
-		real32 shake_mult = 0.5f;
-		real32 maximum_shake_mult = 1.f;
+		sentience_shake_settings shake_settings;
 		real32 dash_impulse_mult = 1.f;
 
 		real32 comfort_zone = 500.f;

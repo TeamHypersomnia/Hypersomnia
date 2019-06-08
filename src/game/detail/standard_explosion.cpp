@@ -89,7 +89,7 @@ void standard_explosion_input::instantiate(
 
 	if (subject_alive) {
 		if (const auto sentience = subject.find<components::sentience>()) {
-			subject_shake.apply(now, *sentience);
+			subject_shake.apply(now, subject.template get<invariants::sentience>(), *sentience);
 		}
 
 		if (subject_impulse > 0.f) {
@@ -239,8 +239,8 @@ void standard_explosion_input::instantiate(
 
 					if (const auto sentience = victim.find<components::sentience>()) {
 						auto lesser_shake = damage.shake;
-						lesser_shake *= 0.4f;
-						lesser_shake.apply(now, *sentience);
+						lesser_shake.duration_ms *= 0.8f;
+						lesser_shake.apply(now, victim.get<invariants::sentience>(), *sentience);
 					}
 				}
 

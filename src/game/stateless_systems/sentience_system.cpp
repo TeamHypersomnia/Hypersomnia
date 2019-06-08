@@ -192,10 +192,10 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 			}
 
 			const auto since_last_shake = (now - sentience.time_of_last_shake);
-			const auto shake_amount = (sentience.shake.duration_ms - since_last_shake.in_milliseconds(delta)) / sentience.shake.duration_ms;
+			const auto shake_amount = (sentience.shake.duration_ms - since_last_shake.in_milliseconds(delta)) / sentience_def.shake_settings.duration_unit;
 
 			if (shake_amount > 0.f) {
-				const auto shake_mult = std::min(sentience_def.maximum_shake_mult, shake_amount * shake_amount * sentience.shake.mult * sentience_def.shake_mult);
+				const auto shake_mult = shake_amount * shake_amount * sentience_def.shake_settings.final_mult;
 
 				auto& rng = step.step_rng;
 				impulse_input in;
@@ -204,7 +204,7 @@ void sentience_system::regenerate_values_and_advance_spell_logic(const logic_ste
 				subject.apply_crosshair_recoil(in);
 			}
 			else {
-				sentience.shake.mult = 1.f;
+				sentience.shake = sentience_shake::zero();
 			}
 
 			if (sentience.audio_flash_secs > 0.f) {
@@ -595,11 +595,8 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 					const auto& sentience_def = typed_victim.template get<invariants::sentience>();
 					auto& sentience = typed_victim.template get<components::sentience>();
 
-					const auto mult = sentience_def.aimpunch_mult;
-
 					auto considered_shake = d.damage.shake;
-					considered_shake *= mult;
-					considered_shake.apply(now, sentience);
+					considered_shake.apply(now, sentience_def, sentience);
 				});
 			};
 

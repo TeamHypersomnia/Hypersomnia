@@ -98,6 +98,7 @@ struct bomb_mode_ruleset {
 	bomb_mode_view_rules view;
 
 	augs::speed_vars speeds;
+	augs::maybe<sentience_shake_settings> override_shake;
 	// END GEN INTROSPECTOR
 
 	auto get_num_rounds() const {

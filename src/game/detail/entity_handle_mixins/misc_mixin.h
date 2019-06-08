@@ -83,7 +83,11 @@ public:
 		const auto self = *static_cast<const E*>(this);
 
 		if (const auto s = self.template find<components::sentience>()) {
-			shake.apply(self.get_cosmos().get_timestamp(), *s);
+			shake.apply(
+				self.get_cosmos().get_timestamp(), 
+				self.template get<invariants::sentience>(),
+				*s
+			);
 		}
 	}
 

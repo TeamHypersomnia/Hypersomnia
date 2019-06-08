@@ -362,7 +362,7 @@ void settings_gui_state::perform(
 
 				revertable_checkbox("Draw callout indicators", config.drawing.draw_callout_indicators.is_enabled);
 
-				if (config.drawing.draw_area_markers.is_enabled) {
+				if (config.drawing.draw_callout_indicators.is_enabled) {
 					auto indent = scoped_indent();
 					revertable_slider("Alpha##callouts", config.drawing.draw_callout_indicators.value, 0.f, 1.f);
 				}

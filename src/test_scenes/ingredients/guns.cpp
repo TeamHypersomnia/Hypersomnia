@@ -411,7 +411,7 @@ namespace test_flavours {
 			missile.muzzle_leave_particles.id = to_particle_effect_id(test_scene_particle_effect_id::FIRE_MUZZLE_LEAVE_EXPLOSION);
 			missile.muzzle_leave_particles.modifier.colorize = white;//{ 255, 218, 5, 255 };
 			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
-			missile.damage.shake *= 1 / 1.3f;
+			//missile.damage.shake *= 1 / 1.3f;
 
 			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::STEEL_RICOCHET);
 			missile.ricochet_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_RICOCHET);
@@ -490,7 +490,7 @@ namespace test_flavours {
 			missile.muzzle_leave_particles.modifier *= 2.f;
 			missile.damage.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
 			missile.damage.impact_impulse *= 1.5f;
-			missile.damage.shake *= 1 / 1.3f;
+			//missile.damage.shake *= 1 / 1.3f;
 
 			missile.ricochet_sound.id = to_sound_id(test_scene_sound_id::STEEL_RICOCHET);
 			missile.ricochet_particles.id = to_particle_effect_id(test_scene_particle_effect_id::STEEL_RICOCHET);
@@ -571,7 +571,7 @@ namespace test_flavours {
 
 			missile.damage.effects.destruction.sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_DISCHARGE_EXPLOSION);
 			missile.damage.base = 10;
-			missile.damage.shake *= 0.85f;
+			//missile.damage.shake *= 0.85f;
 			missile.max_lifetime_ms = 550.f;
 
 			missile.trace_sound.id = to_sound_id(test_scene_sound_id::ELECTRIC_PROJECTILE_FLIGHT);
@@ -2564,7 +2564,7 @@ namespace test_flavours {
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = kickback_mult * 15.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(500);
-			gun_def.recoil_multiplier = 0.9f;
+			gun_def.recoil_multiplier = 0.75f;
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.052f;
@@ -2624,7 +2624,7 @@ namespace test_flavours {
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = kickback_mult * 10.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(500);
-			gun_def.recoil_multiplier = 0.85f;
+			gun_def.recoil_multiplier = 0.65;
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.052f;
