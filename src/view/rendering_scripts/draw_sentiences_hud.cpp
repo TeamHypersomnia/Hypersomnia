@@ -21,6 +21,7 @@
 #include "augs/drawing/sprite_helpers.h"
 #include "game/detail/sentience/sentience_logic.h"
 #include "game/detail/sentience/callout_logic.h"
+#include "view/rendering_scripts/draw_offscreen_indicator.h"
 
 using namespace augs::gui::text;
 
@@ -259,11 +260,11 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 			auto col = sentience->last_assigned_color;
 
 			if (indicators_enabled && (is_conscious || koed_recently) && col.a > 0) {
-				const auto bbox = indicator_tex.get_original_size();
-				
 				const auto cam = in.text_camera;
 				const vec2i screen_space_circle_center = cam.to_screen_space(transform.pos);
 				const auto angle = starting_health_angle + in.color_indicator_angle;
+				const auto bbox = indicator_tex.get_original_size();
+
 				const auto indicator_pos = screen_space_circle_center + ::position_rectangle_around_a_circle(cam.eye.zoom * (circle_radius + 6.f), bbox, angle) - bbox / 2;
 
 				col.mult_alpha(inds.value);
@@ -275,129 +276,46 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 					}
 				}
 
+				auto indicators_output = augs::drawer { out.color_indicators };
+
+				std::optional<augs::atlas_entry> next_tex;
+
+				if (in.indicator_meta.bomb_owner == v.get_id()) {
+					next_tex = in.bomb_indicator_tex;
+				}
+
+				if (in.indicator_meta.now_defusing == v.get_id()) {
+					next_tex = in.defusing_indicator_tex;
+				}
+
+				std::string primary_text;
+				std::string secondary_text;
+
+				if (in.settings.draw_offscreen_callouts) {
+					if (const auto callout = cosm[::get_current_callout(v, interp)]) {
+						primary_text = callout.get_name();
+					}
+				}
+
+				const bool draw_offscreen = in.draw_offscreen_indicators;
+				const bool draw_onscreen = true;
+
 				const auto screen_size = cam.screen_size;
-				auto raycasted_aabb = ltrb(vec2::zero, screen_size);
-				raycasted_aabb.r -= bbox.x;
-				raycasted_aabb.b -= bbox.y;
 
-				const bool is_offscreen = !raycasted_aabb.hover(indicator_pos);
-
-				if (in.draw_offscreen_indicators && is_offscreen) {
-					const real32 indicator_angles[4] = {
-						-180,
-						-90,
-						0,
-						90
-					};
-
-					std::optional<augs::atlas_entry> next_tex;
-
-					if (in.indicator_meta.bomb_owner == v.get_id()) {
-						next_tex = in.bomb_indicator_tex;
-					}
-
-					if (in.indicator_meta.now_defusing == v.get_id()) {
-						next_tex = in.defusing_indicator_tex;
-					}
-
-					const auto raycast_a = indicator_pos;
-					const auto raycast_b = raycasted_aabb.get_center();
-
-					const auto edges = raycasted_aabb.make_edges();
-
-					for (std::size_t e = 0; e < edges.size(); ++e) {
-						const auto intersection = segment_segment_intersection(raycast_a, raycast_b, edges[e][0], edges[e][1]);
-
-						if (intersection.hit) {
-							const auto hit_location = intersection.intersection;
-							const auto final_indicator_location = hit_location + bbox / 2;
-
-							auto indicator_angle = 0.f;
-
-							if (should_rotate_indicator_tex) {
-								indicator_angle = indicator_angles[e];
-							}
-
-							auto indicator_aabb = ltrb(hit_location, bbox);
-
-							augs::detail_sprite(out.color_indicators, indicator_tex, final_indicator_location, indicator_angle, col);
-
-							if (next_tex != std::nullopt) {
-								const auto bbox_a = vec2(bbox);
-								const auto bbox_b = vec2(next_tex->get_original_size());
-
-								const auto x_off = bbox_b.x / 2 + bbox_a.x / 2;
-								const auto y_off = bbox_b.y / 2 + bbox_a.y / 2;
-
-								const vec2 additional_icon_offsets[4] = {
-									vec2(0, y_off),
-									vec2(-x_off, 0),
-									vec2(0, -y_off),
-									vec2(x_off, 0)
-								};
-
-								const auto next_indicator_location = vec2(final_indicator_location + additional_icon_offsets[e]);
-
-								augs::detail_sprite(out.color_indicators, *next_tex, next_indicator_location, 0, col);
-
-								indicator_aabb.contain(ltrb::center_and_size(next_indicator_location, next_tex->get_original_size()));
-							}
-
-							if (in.settings.draw_offscreen_callouts) {
-								if (const auto callout = cosm[::get_current_callout(v, interp)]) {
-									augs::ralign_flags flags;
-									auto text_pos = indicator_pos;
-
-									if (e == 0) {
-										if (indicator_pos.x < screen_size.x / 2) {
-											text_pos = indicator_aabb.right_top();
-										}
-										else {
-											text_pos = indicator_aabb.left_top();
-											flags.set(augs::ralign::R);
-										}
-									}
-
-									if (e == 2) {
-										flags.set(augs::ralign::B);
-
-										if (indicator_pos.x < screen_size.x / 2) {
-											text_pos = indicator_aabb.right_bottom();
-										}
-										else {
-											text_pos = indicator_aabb.left_bottom();
-											flags.set(augs::ralign::R);
-										}
-									}
-
-									if (e == 1) {
-										text_pos.set(indicator_aabb.l, indicator_aabb.get_center().y);
-										flags.set(augs::ralign::R);
-										flags.set(augs::ralign::CY);
-									}
-									if (e == 3) {
-										text_pos.set(indicator_aabb.r, indicator_aabb.get_center().y);
-										flags.set(augs::ralign::CY);
-									}
-
-									const auto text = formatted_string { callout.get_name(), { in.gui_font, col } };
-
-									augs::gui::text::print_stroked(
-										augs::drawer { out.color_indicators },
-										text_pos,
-										text,
-										flags
-									);
-								}
-							}
-
-							break;
-						}
-					}
-				}
-				else {
-					augs::drawer { out.color_indicators }.aabb_lt(indicator_tex, indicator_pos, col);
-				}
+				::draw_offscreen_indicator(
+					indicators_output,
+					draw_offscreen,
+					draw_onscreen,
+					col,
+					indicator_tex,
+					indicator_pos,
+					screen_size,
+					should_rotate_indicator_tex,
+					next_tex,
+					in.gui_font,
+					primary_text,
+					secondary_text
+				);
 			}
 		}
 	};
