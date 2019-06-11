@@ -710,6 +710,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 				necessarys.at(assets::necessary_image_id::DANGER_INDICATOR),
 				necessarys.at(assets::necessary_image_id::DEATH_INDICATOR),
 				necessarys.at(assets::necessary_image_id::BOMB_INDICATOR),
+				necessarys.at(assets::necessary_image_id::DEFUSING_INDICATOR),
 
 				color_indicator_angle,
 				in.indicator_meta

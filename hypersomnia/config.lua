@@ -534,7 +534,9 @@ return {
 	state_hash_once_every_tick = 1,
 
     auto_authorize_loopback_for_rcon = true,
-	max_unauthorized_rcon_commands = 100
+	max_unauthorized_rcon_commands = 100,
+	connected_message = " connected.",
+	disconnected_message = " disconnected."
   },
 
   private_server_vars = {

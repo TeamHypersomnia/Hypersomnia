@@ -60,6 +60,7 @@ struct draw_sentiences_hud_input {
 	const augs::atlas_entry danger_indicator_tex;
 	const augs::atlas_entry death_indicator_tex;
 	const augs::atlas_entry bomb_indicator_tex;
+	const augs::atlas_entry defusing_indicator_tex;
 
 	const real32 color_indicator_angle;
 	const special_indicator_meta& indicator_meta;

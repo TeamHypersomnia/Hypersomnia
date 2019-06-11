@@ -10,4 +10,5 @@ struct special_indicator {
 
 struct special_indicator_meta {
 	entity_id bomb_owner;
+	entity_id now_defusing;
 };

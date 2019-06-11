@@ -7,10 +7,15 @@ summary: That which we are brainstorming at the moment.
 ---
 
 
+- show defusing character like we show character with the bomb
+	- copy the defuser icon from scoreboard
+
 - mark backpack as already owned if we already own a backpack of the opposing faction
 
 - client metadatas
 	- avatars
+	- separate atlas so that we don't repack every time a new client appears
+	- separate drawcall
 
 - ping
 

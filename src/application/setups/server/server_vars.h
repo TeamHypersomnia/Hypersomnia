@@ -25,6 +25,9 @@ struct server_vars {
 
 	bool auto_authorize_loopback_for_rcon = true;
 	unsigned max_unauthorized_rcon_commands = 100;
+
+	std::string connected_message = " connected.";
+	std::string disconnected_message = " disconnected.";
 	// END GEN INTROSPECTOR
 };
 

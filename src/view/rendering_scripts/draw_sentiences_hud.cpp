@@ -256,7 +256,9 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 
 			const bool indicators_enabled = inds.is_enabled && inds.value > 0.f;
 
-			if (indicators_enabled && (is_conscious || koed_recently)) {
+			auto col = sentience->last_assigned_color;
+
+			if (indicators_enabled && (is_conscious || koed_recently) && col.a > 0) {
 				const auto bbox = indicator_tex.get_original_size();
 				
 				const auto cam = in.text_camera;
@@ -264,7 +266,6 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 				const auto angle = starting_health_angle + in.color_indicator_angle;
 				const auto indicator_pos = screen_space_circle_center + ::position_rectangle_around_a_circle(cam.eye.zoom * (circle_radius + 6.f), bbox, angle) - bbox / 2;
 
-				auto col = sentience->last_assigned_color;
 				col.mult_alpha(inds.value);
 
 				if (koed_recently) {
@@ -295,6 +296,9 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 						next_tex = in.bomb_indicator_tex;
 					}
 
+					if (in.indicator_meta.now_defusing == v.get_id()) {
+						next_tex = in.defusing_indicator_tex;
+					}
 
 					const auto raycast_a = indicator_pos;
 					const auto raycast_b = raycasted_aabb.get_center();

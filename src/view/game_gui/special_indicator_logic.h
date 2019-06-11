@@ -16,11 +16,10 @@ void gather_special_indicators(
 			[&](const auto& bomb) {
 				if constexpr(!is_nullopt_v<decltype(bomb)>) {
 					const auto participants = mode.calc_participating_factions(mode_input);
+					const auto capability = bomb.get_owning_transfer_capability();
+					meta.bomb_owner = capability;
 
 					if (viewer_faction == participants.bombing) {
-						const auto capability = bomb.get_owning_transfer_capability();
-						meta.bomb_owner = capability;
-
 						if (capability.dead() || capability.get_official_faction() != viewer_faction) {
 							special_indicators.push_back({
 								bomb.get_logic_transform(),
@@ -29,6 +28,13 @@ void gather_special_indicators(
 								necessarys.at(assets::necessary_image_id::BOMB_INDICATOR),
 								necessarys.at(assets::necessary_image_id::BOMB_INDICATOR)
 							});
+						}
+					}
+					else if (viewer_faction == participants.defusing) {
+						if (const auto fuse = bomb.template find<components::hand_fuse>()) {
+							if (fuse->armed()) {
+								meta.now_defusing = fuse->character_now_defusing;
+							}
 						}
 					}
 				}
