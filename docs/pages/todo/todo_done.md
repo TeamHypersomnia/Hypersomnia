@@ -3147,3 +3147,12 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- That way we have a smooth crosshair even under low tickrates
 	- And we always have shots directly to where we were aiming, unless we move a bit after the shot but before the step
 
+- Fix cue being too loud
+	- Or just fix it for bilmer
+
+- random shutdowns might be to lag spikes as well
+- well, just increase message buffer sizes?
+- If a player wears a bomb, don't show a separate bomb on top of it. Just show the bomb icon next to the arrow icon and color it appropriately.
+
+- Make indicator image a square anyway so that it rotates nicely
+- Raycast against a smaller rectangle to smoothly transition from left to top edge etc

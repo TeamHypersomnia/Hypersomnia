@@ -44,11 +44,11 @@
 #include "application/performance_settings.h"
 #include "augs/gui/text/printer.h"
 #include "augs/math/simple_calculations.h"
+#include "game/detail/sentience/callout_logic.h"
 
-void illuminated_rendering(
-	const illuminated_rendering_input in,
-	const std::vector<additional_highlight>& additional_highlights
-) {
+void illuminated_rendering(const illuminated_rendering_input in) {
+	const auto& additional_highlights = in.additional_highlights;
+	const auto& special_indicators = in.special_indicators;
 	const auto* default_fbo = augs::graphics::fbo::find_current();
 
 	auto& profiler = in.frame_performance;
@@ -673,13 +673,21 @@ void illuminated_rendering(
 		shaders.circular_bars->set_uniform("texture_center", tex.get_center());
 	};
 
-	augs::vertex_triangle_buffer textual_infos;
+	draw_sentiences_hud_output sentiences_hud;
 
 	if (viewed_character) {
 		auto make_input_for = [&](const auto& tex_type, const auto meter) {
 			const auto tex = necessarys.at(tex_type);
+			const bool is_health = meter == meter_id::of<health_meter_instance>();
+			const bool draw_other_indicators = is_health;
 
 			set_center_uniform(tex);
+
+			real32 color_indicator_angle = 45.f;
+
+			if (!settings.draw_nicknames) {
+				color_indicator_angle = 0.f;
+			}
 
 			return draw_sentiences_hud_input {
 				cone,
@@ -693,7 +701,18 @@ void illuminated_rendering(
 				global_time_seconds,
 				gui_font,
 				tex,
-				meter
+				meter,
+
+				draw_other_indicators,
+				draw_other_indicators ? settings.draw_color_indicators : augs::maybe<float>{},
+
+				necessarys.at(assets::necessary_image_id::BIG_COLOR_INDICATOR),
+				necessarys.at(assets::necessary_image_id::DANGER_INDICATOR),
+				necessarys.at(assets::necessary_image_id::DEATH_INDICATOR),
+				necessarys.at(assets::necessary_image_id::BOMB_INDICATOR),
+
+				color_indicator_angle,
+				in.indicator_meta
 			};
 		};
 
@@ -705,7 +724,7 @@ void illuminated_rendering(
 
 		int current_circle = 0;
 
-		textual_infos = draw_sentiences_hud(
+		sentiences_hud = draw_sentiences_hud(
 			make_input_for(
 				circles[current_circle++], 
 				meter_id::of<health_meter_instance>()
@@ -775,7 +794,23 @@ void illuminated_rendering(
 	}
 
 	set_shader_with_non_zoomed_matrix(shaders.standard);
-	renderer.call_triangles(textual_infos);
+
+	if (settings.draw_nicknames) {
+		renderer.call_triangles(sentiences_hud.nicknames);
+	}
+
+	if (settings.draw_health_numbers) {
+		renderer.call_triangles(sentiences_hud.health_numbers);
+	}
+
+	if (settings.draw_color_indicators.is_enabled) {
+		renderer.call_triangles(sentiences_hud.color_indicators);
+	}
+
+	for (const auto& special : special_indicators) {
+		(void)special;
+
+	}
 
 	{
 		const auto& callouts = settings.draw_callout_indicators;
@@ -804,34 +839,19 @@ void illuminated_rendering(
 		}
 	}
 
-	if (settings.print_character_location) {
-		if (const auto tr = viewed_character.find_viewing_transform(interp)) {
+	if (settings.print_current_character_callout) {
+		if (const auto result = cosm[::get_current_callout(viewed_character, interp)]) {
+			const auto& name = result.get_name();
+
+			using namespace augs::gui::text;
+
 			const auto indicator_pos = augs::get_screen_pos_from_offset(screen_size, settings.radar_pos); 
-			
-			auto& entities = thread_local_visible_entities();
 
-			tree_of_npo_filter tree_types;
-			tree_types.types[tree_of_npo_type::CALLOUT_MARKERS] = true;
-
-			entities.acquire_non_physical({
-				cosm,
-				camera_cone(camera_eye(tr->pos, 1.f), vec2i::square(1)),
-				visible_entities_query::accuracy_type::EXACT,
-				render_layer_filter::all(),
-				tree_types
-			});
-
-			if (const auto result = entities.get_first_fulfilling([](auto&&...){ return true; }); result.is_set()) {
-				const auto& name = cosm[result].get_name();
-
-				using namespace augs::gui::text;
-
-				print_stroked(
-					output,
-					indicator_pos,
-					formatted_string { name, { gui_font, yellow } }
-				);
-			}
+			print_stroked(
+				output,
+				indicator_pos,
+				formatted_string { name, { gui_font, yellow } }
+			);
 		}
 
 		renderer.call_and_clear_triangles();

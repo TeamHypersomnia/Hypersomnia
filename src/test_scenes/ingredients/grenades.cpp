@@ -347,7 +347,7 @@ namespace test_flavours {
 			in.sound.modifier.reference_distance = 2000.f;
 
 			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
-			dmg.shake.duration_ms = 1200.f;
+			dmg.shake.duration_ms = 2500.f;
 			dmg.shake.mult = 1.4f;
 
 			return in;
@@ -613,7 +613,7 @@ namespace test_flavours {
 				in.wave_shake_radius_mult = 6;
 
 				dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
-				dmg.shake.duration_ms = 800.f;
+				dmg.shake.duration_ms = 2100.f;
 				dmg.shake.mult = 1.4f;
 
 				explosive.explosion = in;

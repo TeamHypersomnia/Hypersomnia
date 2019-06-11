@@ -19,8 +19,6 @@
 #include "application/setups/editor/editor_camera.h"
 #include "application/setups/editor/editor_history.hpp"
 
-#include "application/arena/arena_handle.h"
-
 #include "application/setups/editor/gui/editor_tab_gui.h"
 #include "application/setups/draw_setup_gui_input.h"
 #include "view/rendering_scripts/draw_area_indicator.h"
@@ -1657,7 +1655,7 @@ void editor_setup::draw_status_bar(const draw_setup_gui_input& in) {
 				in.drawer,
 				vec2i(padding.x, ss.y - padding.y),
 				formatted_string(world_cursor_pos_text, st),
-				augs::ralign::LB
+				augs::ralign::B
 			);
 		}
 #endif
@@ -1725,7 +1723,7 @@ void editor_setup::draw_status_bar(const draw_setup_gui_input& in) {
 				in.drawer,
 				vec2i(padding.x, ss.y - padding.y),
 				formatted_status_bar_text,
-				augs::ralign::LB
+				augs::ralign::B
 			);
 		}
 	}
@@ -1961,13 +1959,6 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 				);
 			}
 		}
-	}
-}
-
-template <class F>
-void editor_setup::on_mode_with_input(F&& callback) const {
-	if (anything_opened() && player().has_testing_started()) {
-		player().get_arena_handle(folder()).on_mode_with_input(std::forward<F>(callback));
 	}
 }
 

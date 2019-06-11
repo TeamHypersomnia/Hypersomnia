@@ -53,6 +53,7 @@
 #include "application/gui/start_server_gui.h"
 #include "application/gui/ingame_menu_gui.h"
 
+#include "application/network/network_common.h"
 #include "application/setups/all_setups.h"
 
 #include "application/main/imgui_pass.h"
@@ -69,6 +70,7 @@
 #include "build_info.h"
 
 #include "augs/readwrite/byte_readwrite.h"
+#include "view/game_gui/special_indicator_logic.h"
 
 std::function<void()> ensure_handler;
 bool log_to_live_file = false;
@@ -1687,7 +1689,7 @@ int work(const int argc, const char* const * const argv) try {
 				thread_local std::vector<additional_highlight> highlights;
 				highlights.clear();
 
-				visit_current_setup([&](auto& setup) {
+				visit_current_setup([&](const auto& setup) {
 					using T = remove_cref<decltype(setup)>;
 
 					if constexpr(T::has_additional_highlights) {
@@ -1697,27 +1699,47 @@ int work(const int argc, const char* const * const argv) try {
 					}
 				});
 
-				illuminated_rendering(
-					{
-						{ viewed_character, cone },
-						calc_pre_step_crosshair_displacement(new_viewing_config),
-						new_viewing_config.session.camera_query_aabb_mult,
-						get_audiovisuals(),
-						new_viewing_config.drawing,
-						streaming.necessary_images_in_atlas,
-						streaming.get_loaded_gui_fonts().gui,
-						streaming.images_in_atlas,
-						interpolation_ratio,
-						renderer,
-						frame_performance,
-						streaming.general_atlas,
-						necessary_fbos,
-						necessary_shaders,
-						all_visible,
-						new_viewing_config.performance
-					},
-					highlights
-				);
+				thread_local std::vector<special_indicator> special_indicators;
+				special_indicators.clear();
+				special_indicator_meta indicator_meta;
+
+				if (viewed_character) {
+					visit_current_setup([&](const auto& setup) {
+						setup.on_mode_with_input(
+							[&](const auto&... args) {
+								::gather_special_indicators(
+									args..., 
+									viewed_character.get_official_faction(), 
+									streaming.necessary_images_in_atlas, 
+									special_indicators,
+									indicator_meta
+								);
+							}
+						);
+					});
+				}
+
+				illuminated_rendering({
+					{ viewed_character, cone },
+					calc_pre_step_crosshair_displacement(new_viewing_config),
+					new_viewing_config.session.camera_query_aabb_mult,
+					get_audiovisuals(),
+					new_viewing_config.drawing,
+					streaming.necessary_images_in_atlas,
+					streaming.get_loaded_gui_fonts().gui,
+					streaming.images_in_atlas,
+					interpolation_ratio,
+					renderer,
+					frame_performance,
+					streaming.general_atlas,
+					necessary_fbos,
+					necessary_shaders,
+					all_visible,
+					new_viewing_config.performance,
+					highlights,
+					special_indicators,
+					indicator_meta
+				});
 			}
 
 			if (DEBUG_DRAWING.enabled) {

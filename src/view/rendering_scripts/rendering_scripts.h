@@ -6,6 +6,7 @@
 #include "game/cosmos/entity_handle.h"
 #include "augs/texture_atlas/atlas_entry.h"
 
+#include "view/game_gui/special_indicator.h"
 #include "augs/drawing/drawing.h"
 
 namespace augs {
@@ -51,6 +52,17 @@ struct draw_sentiences_hud_input {
 	const augs::baked_font& gui_font;
 	const augs::atlas_entry circular_bar_tex;
 	const meter_id meter;
+
+	const bool draw_offscreen_indicators;
+
+	const augs::maybe<float> draw_color_indicators;
+	const augs::atlas_entry color_indicator_tex;
+	const augs::atlas_entry danger_indicator_tex;
+	const augs::atlas_entry death_indicator_tex;
+	const augs::atlas_entry bomb_indicator_tex;
+
+	const real32 color_indicator_angle;
+	const special_indicator_meta& indicator_meta;
 };
 
 struct draw_explosion_body_highlights_input {
@@ -90,7 +102,13 @@ struct draw_crosshair_lasers_input {
 	const vec2 crosshair_displacement;
 };
 
-augs::vertex_triangle_buffer draw_sentiences_hud(const draw_sentiences_hud_input);
+struct draw_sentiences_hud_output {
+	augs::vertex_triangle_buffer nicknames;
+	augs::vertex_triangle_buffer health_numbers;
+	augs::vertex_triangle_buffer color_indicators;
+};
+
+draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input);
 void draw_explosion_body_highlights(const draw_explosion_body_highlights_input);
 void draw_hud_for_explosives(const draw_hud_for_explosives_input);
 void draw_crosshair_lasers(const draw_crosshair_lasers_input);

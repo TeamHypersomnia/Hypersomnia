@@ -2452,7 +2452,9 @@ namespace test_flavours {
 			gun_def.shell_velocity = {300.f, 1700.f};
 			gun_def.damage_multiplier = 3.3f;
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 8;
-			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
+			gun_def.low_ammo_cue_sound.modifier.reference_distance = 300.f;
+			gun_def.low_ammo_cue_sound.modifier.max_distance = 500.f;
+
 			gun_def.kickback_towards_wielder = kickback_mult * 8.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(450);
 

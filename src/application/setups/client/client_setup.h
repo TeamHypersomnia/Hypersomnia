@@ -529,4 +529,9 @@ public:
 	);
 
 	void draw_custom_gui(const draw_setup_gui_input& in) const;
+
+	template <class F>
+	decltype(auto) on_mode_with_input(F&& callback) const {
+		return get_arena_handle().on_mode_with_input(std::forward<F>(callback));
+	}
 };

@@ -8,7 +8,7 @@
 
 namespace augs {
 	enum class ralign {
-		CX, CY, RT, RB, LB, COUNT
+		CX, CY, L, T, R, B, RB, COUNT
 	};
 
 	using ralign_flags = augs::enum_boolset<ralign>;

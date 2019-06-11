@@ -348,33 +348,66 @@ void settings_gui_state::perform(
 					revertable_checkbox(SCOPE_CFG_NVP(adjust_zoom_to_available_fog_of_war_size));
 				}
 
-				revertable_checkbox("Draw Personal Electricity HUD", config.drawing.draw_pe_bar);
-				revertable_checkbox("Draw Consciousness HUD", config.drawing.draw_cp_bar);
-
-				revertable_checkbox("Draw weapon laser", config.drawing.draw_weapon_laser);
-				revertable_checkbox("Draw crosshairs", config.drawing.draw_crosshairs);
-				revertable_checkbox("Draw area markers", config.drawing.draw_area_markers.is_enabled);
-
-				if (config.drawing.draw_area_markers.is_enabled) {
-					auto indent = scoped_indent();
-					revertable_slider("Alpha##markers", config.drawing.draw_area_markers.value, 0.f, 1.f);
-				}
-
-				revertable_checkbox("Draw callout indicators", config.drawing.draw_callout_indicators.is_enabled);
-
-				if (config.drawing.draw_callout_indicators.is_enabled) {
-					auto indent = scoped_indent();
-					revertable_slider("Alpha##callouts", config.drawing.draw_callout_indicators.value, 0.f, 1.f);
-				}
-
 				{
 					auto& scope_cfg = config.drawing;
 
-					revertable_checkbox(SCOPE_CFG_NVP(print_character_location));
-					revertable_drag_vec2(SCOPE_CFG_NVP(radar_pos));
+					if (auto node = scoped_tree_node("In-world HUD")) {
+						revertable_checkbox("Draw Personal Electricity bar", config.drawing.draw_pe_bar);
+						revertable_checkbox("Draw Consciousness bar", config.drawing.draw_cp_bar);
+
+						revertable_checkbox(SCOPE_CFG_NVP(draw_weapon_laser));
+						revertable_checkbox(SCOPE_CFG_NVP(draw_crosshairs));
+						revertable_checkbox(SCOPE_CFG_NVP(draw_nicknames));
+						revertable_checkbox(SCOPE_CFG_NVP(draw_health_numbers));
+
+						revertable_checkbox("Draw color indicators", config.drawing.draw_color_indicators.is_enabled);
+
+						if (config.drawing.draw_color_indicators.is_enabled) {
+							auto indent = scoped_indent();
+							revertable_slider("Alpha##colors", config.drawing.draw_color_indicators.value, 0.f, 1.f);
+						}
+
+						revertable_checkbox(SCOPE_CFG_NVP(draw_offscreen_indicators));
+
+						if (scope_cfg.draw_offscreen_indicators) {
+							auto indent = scoped_indent();
+
+							revertable_checkbox(SCOPE_CFG_NVP(draw_offscreen_callouts));
+
+							revertable_slider(SCOPE_CFG_NVP(show_danger_indicator_for_seconds), 0.f, 20.f);
+							revertable_slider(SCOPE_CFG_NVP(fade_danger_indicator_for_seconds), 0.f, 20.f);
+
+							revertable_slider(SCOPE_CFG_NVP(show_death_indicator_for_seconds), 0.f, 20.f);
+							revertable_slider(SCOPE_CFG_NVP(fade_death_indicator_for_seconds), 0.f, 20.f);
+						}
+
+						if (auto node = scoped_tree_node("Areas")) {
+							revertable_checkbox("Draw callout indicators", config.drawing.draw_callout_indicators.is_enabled);
+
+							if (config.drawing.draw_callout_indicators.is_enabled) {
+								auto indent = scoped_indent();
+								revertable_slider("Alpha##callouts", config.drawing.draw_callout_indicators.value, 0.f, 1.f);
+							}
+
+							revertable_checkbox("Draw area markers", config.drawing.draw_area_markers.is_enabled);
+
+							if (config.drawing.draw_area_markers.is_enabled) {
+								auto indent = scoped_indent();
+								revertable_slider("Alpha##markers", config.drawing.draw_area_markers.value, 0.f, 1.f);
+							}
+						}
+					}
+
+					if (auto node = scoped_tree_node("Static HUD")) {
+						revertable_checkbox(SCOPE_CFG_NVP(print_current_character_callout));
+
+						{
+							revertable_drag_vec2(SCOPE_CFG_NVP(radar_pos));
+						}
+					}
 				}
 
-				if (auto node = scoped_tree_node("Game GUI")) {
+				if (auto node = scoped_tree_node("Inventory behaviour")) {
 					auto& scope_cfg = config.game_gui;
 
 					revertable_checkbox(SCOPE_CFG_NVP(autodrop_magazines_of_dropped_weapons));

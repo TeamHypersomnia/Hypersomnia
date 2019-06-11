@@ -316,6 +316,10 @@ enum class test_box_markers {
 
 	ORGANISM_AREA,
 
+	T_SPAWN,
+	CT_SPAWN,
+	ROOM,
+
 	COUNT
 	// END GEN INTROSPECTOR
 };

@@ -68,6 +68,9 @@ struct bomb_mode_ruleset {
 	std::string name = "Unnamed bomb mode ruleset";
 
 	std::vector<entity_name_str> bot_names;
+	std::vector<rgba> player_colors;
+	rgba fallback_player_color = orange;
+	bool enable_player_colors = true;
 	unsigned bot_quota = 8;
 
 	unsigned allow_spawn_for_secs_after_starting = 10;
@@ -152,6 +155,7 @@ struct bomb_mode_player {
 	// GEN INTROSPECTOR struct bomb_mode_player
 	entity_id controlled_character_id;
 	entity_name_str chosen_name;
+	rgba assigned_color = rgba::zero;
 	faction_type faction = faction_type::SPECTATOR;
 	bomb_mode_player_stats stats;
 	uint32_t round_when_chosen_faction = static_cast<uint32_t>(-1); 
@@ -326,9 +330,6 @@ private:
 
 	void respawn_the_dead(input, logic_step, unsigned after_ms);
 
-	template <class F>
-	decltype(auto) on_bomb_entity(const_input, F) const;
-
 	bool bomb_exploded(const const_input) const;
 	entity_id get_character_who_defused_bomb(const_input) const;
 	bool bomb_planted(const_input) const;
@@ -374,7 +375,7 @@ private:
 	mode_player_id add_player(input, const entity_name_str& chosen_name);
 
 	faction_choice_result auto_assign_faction(input, const mode_player_id&);
-	faction_choice_result choose_faction(const mode_player_id&, const faction_type faction);
+	faction_choice_result choose_faction(const_input, const mode_player_id&, const faction_type faction);
 
 	void restart(input, logic_step);
 
@@ -408,6 +409,8 @@ private:
 
 	friend augs::introspection_access;
 	friend editor_property_accessors;
+
+	void on_faction_changed_for(const_input, const mode_player_id&);
 
 public:
 
@@ -520,5 +523,29 @@ public:
 		}
 
 		return callback(std::nullopt);
+	}
+
+	template <class F>
+	decltype(auto) on_bomb_entity(const const_input in, F callback) const {
+		auto& rules = in.rules;
+		auto& cosm = in.cosm;
+
+		const auto bomb_flavour = rules.bomb_flavour;
+		const auto& flavours = cosm.get_solvable_inferred().flavour_ids;
+
+		if (!bomb_flavour.is_set()) {
+			return callback(std::nullopt);
+		}
+
+		return bomb_flavour.dispatch([&](const auto& typed_bomb_flavour_id) {
+			const auto& bombs = flavours.get_entities_by_flavour_id(typed_bomb_flavour_id);
+
+			if (bombs.size() == 1) {
+				return callback(cosm[*bombs.begin()]);
+			}
+			else {
+				return callback(std::nullopt);
+			}
+		});
 	}
 };

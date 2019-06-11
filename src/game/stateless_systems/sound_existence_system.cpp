@@ -25,6 +25,7 @@
 #include "game/detail/physics/calc_physical_material.hpp"
 #include "game/detail/sentience/sentience_getters.h"
 
+#include "game/detail/sentience/sentience_logic.h"
 #include "augs/misc/randomization.h"
 
 void play_collision_sound(
@@ -130,6 +131,8 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 				sound_effect_start_input::at_entity(subject).set_listener(owning_capability),
 				predictability
 			);
+
+			::mark_caused_danger(owning_capability, effect.modifier.max_distance);
 		}
 
 		for (auto& r : g.spawned_rounds) {

@@ -87,6 +87,7 @@ using mode_field_type_id  = type_in_list_id<
 		std::string,
 		std::vector<mode_entity_id>,
 		std::vector<entity_name_str>,
+		std::vector<rgba>,
 		arena_mode_knockouts_vector,
 		arena_mode_awards_vector,
 		std::vector<mode_player_id>,

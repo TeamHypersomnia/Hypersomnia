@@ -174,6 +174,7 @@ void arena_scoreboard_gui::draw_gui(
 	std::vector<column> columns = {
 		{ calc_size("9999").x, "Ping", true },
 		{ 22, " " },
+		{ 16, " " },
 		{ sz.x, "Player" },
 		{ calc_size("999999$").x, "Money", true },
 
@@ -186,7 +187,7 @@ void arena_scoreboard_gui::draw_gui(
 
 	pen.y += cell_h;
 
-	auto& player_col = columns[2];
+	auto& player_col = columns[3];
 
 	for (auto& c : columns) {
 		if (&c != &player_col) {
@@ -388,6 +389,8 @@ void arena_scoreboard_gui::draw_gui(
 				return faction_type::SPECTATOR;
 			}();
 
+			const bool is_viewer_faction = faction == local_player_faction;
+
 			const auto faction_bg_col = [&]() {
 				auto col = colors.standard;
 
@@ -540,7 +543,7 @@ void arena_scoreboard_gui::draw_gui(
 					show_icon();
 				}
 				else {
-					if (faction == local_player_faction) {
+					if (is_viewer_faction) {
 						show_icon();
 					}
 					else {
@@ -551,6 +554,36 @@ void arena_scoreboard_gui::draw_gui(
 							show_icon();
 						}
 					}
+				}
+			}
+
+			next_col();
+
+			if (is_viewer_faction && mode_input.rules.enable_player_colors) {
+				const auto color_indicator_image = assets::necessary_image_id::SMALL_COLOR_INDICATOR;
+
+				if (const auto& entry = in.necessary_images.at(color_indicator_image); entry.exists()) {
+					const auto size = entry.get_original_size();
+
+					const auto& c = *current_column;
+
+					auto icon_orig = ltrbi(vec2i::zero, size);
+					icon_orig.l = (c.l + c.r) / 2 - size.x / 2;
+					icon_orig.r = icon_orig.l + size.x;
+					icon_orig.t++;
+					icon_orig.b++;
+
+					auto total_alpha = cfg.icon_alpha;
+
+					if (!is_conscious) {
+						total_alpha *= cfg.dead_player_text_alpha_mult;
+					}
+
+					aabb_img(
+						entry,
+						icon_orig,
+						rgba(player_data.assigned_color).mult_alpha(total_alpha)
+					);
 				}
 			}
 
@@ -567,7 +600,7 @@ void arena_scoreboard_gui::draw_gui(
 					do_money();
 				}
 				else {
-					if (faction == local_player_faction) {
+					if (is_viewer_faction) {
 						do_money();
 					}
 				}
@@ -617,12 +650,12 @@ void arena_scoreboard_gui::draw_gui(
 
 			aabb(faction_bg_orig, bg_dark);
 
-			print_col_text(columns[2], typesafe_sprintf("Spectators (%x)", num_spectators), column_label_color);
+			print_col_text(columns[3], typesafe_sprintf("Spectators (%x)", num_spectators), column_label_color);
 
 			pen.y += cell_h;
 
 			for (const auto& p : sorted_players) {
-				print_col_text(columns[2], p.first.chosen_name, column_label_color);
+				print_col_text(columns[3], p.first.chosen_name, column_label_color);
 				pen.y += cell_h;
 			}
 		}

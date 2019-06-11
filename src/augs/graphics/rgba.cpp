@@ -109,6 +109,15 @@ std::istream& operator>>(std::istream& in, rgba& x) {
 	return x.from_stream(in);
 }
 
+rgba::rgba(const uint32_t v) :
+	rgba(
+		v >> 16,
+		v >> 8,
+		v,
+		v >> 24
+	)
+{}
+
 rgba::rgba(const ImVec4& v) :
 	rgba(
 		to_0_255(v.x),

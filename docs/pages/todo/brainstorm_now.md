@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+
+- mark backpack as already owned if we already own a backpack of the opposing faction
+
+- client metadatas
+	- avatars
+
+- ping
+
 - Show only allies' colors by deafult, like in CS GO 
 
 - panel -> ct computers
@@ -154,13 +162,10 @@ summary: That which we are brainstorming at the moment.
 - fix neon maps being generated in the project folder
 
 - Note that message buffer might overflow during resynchro, causing a disconnection
-- random shutdowns might be to lag spikes as well
-- well, just increase message buffer sizes?
 
 - re-freeze when match starts and someone respawns at warmup
 
 - increase prices of uwota and triad? theyre soo op
-- mark backpack as already owned if we already own a backpack of the opposing faction
 
 - fix shot cooldown progress visible behind walls
 

@@ -29,6 +29,23 @@ namespace test_scenes {
 
 	void minimal_scene::setup(bomb_mode_ruleset& rs) {
 		rs.bot_names = { "First", "Second", "Third", "Fourth", "Fifth", "Sixth" };
+
+		rs.player_colors = {
+			rgba(255, 34, 30, 255), // red
+			rgba(0, 116, 255, 255), // blue
+			rgba(0, 255, 0, 255), // green
+			rgba(255, 255, 0, 255), // yellow
+			rgba(255, 136, 0, 255), // orange
+			rgba(121, 48, 255, 255), // purple
+			rgba(255, 72, 255, 255), // pink
+			rgba(0, 255, 255, 255), // cyan
+			rgba(86, 34, 0, 255), // brown
+			rgba(133, 133, 133, 255), // gray
+			rgba(119, 187, 255, 255), // light blue
+			rgba(17, 102, 68, 255), // dark green
+			rgba(0, 0, 0, 255) // black
+		};
+
 		rs.name = "Minimal bomb ruleset";
 		rs.bot_quota = rs.bot_names.size();
 	}

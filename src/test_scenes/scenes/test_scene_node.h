@@ -16,7 +16,8 @@ class test_scene_node {
 		test_complex_decorations,
 		test_sprite_decorations,
 		test_sound_decorations,
-		test_particles_decorations
+		test_particles_decorations,
+		test_box_markers
 	> enum_id;
 public:
 	test_scene_node() = default;

@@ -109,41 +109,20 @@ std::size_t bomb_mode::get_step_rng_seed(const cosmos& cosm) const {
 	return get_round_rng_seed(cosm) + cosm.get_total_steps_passed();
 }
 
-faction_choice_result bomb_mode::choose_faction(const mode_player_id& id, const faction_type faction) {
+faction_choice_result bomb_mode::choose_faction(const const_input_type in, const mode_player_id& id, const faction_type faction) {
 	if (const auto entry = find(id)) {
 		if (entry->faction == faction) {
 			return faction_choice_result::THE_SAME;
 		}
 
 		entry->faction = faction;
+
+		on_faction_changed_for(in, id);
+
 		return faction_choice_result::CHANGED;
 	}
 
 	return faction_choice_result::FAILED;
-}
-
-template <class F>
-decltype(auto) bomb_mode::on_bomb_entity(const const_input_type in, F callback) const {
-	auto& rules = in.rules;
-	auto& cosm = in.cosm;
-
-	const auto bomb_flavour = rules.bomb_flavour;
-	const auto& flavours = cosm.get_solvable_inferred().flavour_ids;
-
-	if (!bomb_flavour.is_set()) {
-		return callback(std::nullopt);
-	}
-
-	return bomb_flavour.dispatch([&](const auto& typed_bomb_flavour_id) {
-		const auto& bombs = flavours.get_entities_by_flavour_id(typed_bomb_flavour_id);
-
-		if (bombs.size() == 1) {
-			return callback(cosm[*bombs.begin()]);
-		}
-		else {
-			return callback(std::nullopt);
-		}
-	});
 }
 
 bomb_mode::participating_factions bomb_mode::calc_participating_factions(const const_input_type in) const {
@@ -554,6 +533,42 @@ std::size_t bomb_mode::num_players_in(const faction_type faction) const {
 	return total;
 }
 
+void bomb_mode::on_faction_changed_for(const const_input_type in, const mode_player_id& id) { 
+	if (const auto entry = find(id)) {
+		entry->assigned_color = rgba::zero;
+
+		if (entry->faction == faction_type::SPECTATOR) {
+			return;
+		}
+
+		if (in.rules.enable_player_colors) {
+			for (const auto& candidate_color : in.rules.player_colors) {
+				bool collision_found = false;
+
+				for (const auto& it : players) {
+					const auto& player_data = it.second;
+
+					if (player_data.faction == entry->faction) {
+						if (player_data.assigned_color == candidate_color) {
+							collision_found = true;
+							break;
+						}
+					}
+				}
+
+				if (!collision_found) {
+					entry->assigned_color = candidate_color;
+					break;
+				}
+			}
+
+			if (entry->assigned_color == rgba::zero) {
+				entry->assigned_color = in.rules.fallback_player_color;
+			}
+		}
+	}
+}
+
 faction_choice_result bomb_mode::auto_assign_faction(const input_type in, const mode_player_id& id) {
 	if (const auto entry = find(id)) {
 		auto& f = entry->faction;
@@ -564,7 +579,13 @@ faction_choice_result bomb_mode::auto_assign_faction(const input_type in, const 
 		f = calc_weakest_faction(in);
 
 		const bool faction_changed = f != previous_faction;
-		return faction_changed ? faction_choice_result::CHANGED : faction_choice_result::BEST_BALANCE_ALREADY;
+
+		if (faction_changed) {
+			on_faction_changed_for(in, id);
+			return faction_choice_result::CHANGED;
+		}
+
+		return faction_choice_result::BEST_BALANCE_ALREADY;
 	}
 
 	return faction_choice_result::FAILED;
@@ -725,8 +746,17 @@ entity_id bomb_mode::create_character_for_player(
 
 		if (handle.alive()) {
 			cosmic::set_specific_name(handle, p.chosen_name);
-			p.controlled_character_id = handle;
 
+			if (const auto sentience = handle.template find<components::sentience>()) {
+				if (in.rules.enable_player_colors) {
+					sentience->last_assigned_color = p.assigned_color;
+				}
+				else {
+					sentience->last_assigned_color = in.rules.fallback_player_color;
+				}
+			}
+
+			p.controlled_character_id = handle;
 
 			if (state == arena_mode_state::LIVE) {
 				if (get_freeze_seconds_left(in) > 0.f) {
@@ -1353,7 +1383,7 @@ void bomb_mode::add_or_remove_players(const input_type in, const mode_entropy& e
 			auto_assign_faction(in, a.id);
 		}
 		else {
-			choose_faction(a.id, a.faction);
+			choose_faction(in, a.id, a.faction);
 		}
 	}
 
@@ -1588,7 +1618,7 @@ void bomb_mode::execute_player_commands(const input_type in, mode_entropy& entro
 							return auto_assign_faction(in, id);
 						}
 
-						return choose_faction(id, f);
+						return choose_faction(in, id, f);
 					}();
 
 					BMB_LOG(format_enum(result));

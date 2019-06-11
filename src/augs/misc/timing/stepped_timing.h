@@ -86,6 +86,10 @@ namespace augs {
 			return (now - stamp).in_milliseconds(dt);
 		}
 		
+		auto get_passed_secs(const stepped_timestamp stamp) const {
+			return (now - stamp).in_seconds(dt);
+		}
+
 		template <class T>
 		auto get_remaining_ms(
 			const T cooldown_ms, 
@@ -135,6 +139,14 @@ namespace augs {
 			const real_cooldown current_cooldown_ms
 		) const {
 			return cooldown_ms - current_cooldown_ms;
+		}
+
+		template <class T>
+		auto get_passed_secs(
+			const T cooldown_ms,
+			const real_cooldown current_cooldown_ms
+		) const {
+			return (cooldown_ms - current_cooldown_ms) / 1000;
 		}
 
 		template <class T>

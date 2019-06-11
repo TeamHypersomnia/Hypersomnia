@@ -297,6 +297,31 @@ namespace test_flavours {
 		}
 
 		{
+			auto& meta = get_test_flavour(flavours, test_box_markers::T_SPAWN);
+
+			invariants::box_marker marker;
+			marker.type = area_marker_type::OVERLAID_CALLOUT;
+			meta.set(marker);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_box_markers::CT_SPAWN);
+
+			invariants::box_marker marker;
+			marker.type = area_marker_type::OVERLAID_CALLOUT;
+			meta.set(marker);
+		}
+
+		{
+			auto& meta = get_test_flavour(flavours, test_box_markers::ROOM);
+
+			invariants::box_marker marker;
+			marker.type = area_marker_type::CALLOUT;
+			meta.set(marker);
+		}
+
+
+		{
 			auto& meta = flavour_with_sprite(
 				test_tool_items::ELECTRIC_SHIELD_ARMOR,
 				test_scene_image_id::ELECTRIC_SHIELD_ARMOR,

@@ -50,6 +50,7 @@
 
 #include "application/input/entropy_accumulator.h"
 #include "view/mode_gui/arena/arena_gui_mixin.h"
+#include "application/arena/arena_handle.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -187,9 +188,6 @@ class editor_setup : public arena_gui_mixin<editor_setup> {
 	}
 
 	void draw_mode_gui(const draw_setup_gui_input&) const;
-
-	template <class F>
-	void on_mode_with_input(F&& callback) const;
 
 	float get_menu_bar_height() const;
 	float get_game_screen_top() const;
@@ -431,5 +429,12 @@ public:
 
 	const entropy_accumulator& get_entropy_accumulator() const {
 		return total_collected;
+	}
+
+	template <class F>
+	void on_mode_with_input(F&& callback) const {
+		if (anything_opened() && player().has_testing_started()) {
+			player().get_arena_handle(folder()).on_mode_with_input(std::forward<F>(callback));
+		}
 	}
 };

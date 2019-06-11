@@ -151,7 +151,21 @@ return {
     draw_weapon_laser = true,
 	enabled_draw_area_markers = 1.0,
 	disabled_draw_callout_indicators = 1.0,
-    print_character_location = true,
+	enabled_draw_callout_indicators = 0.8,
+	draw_nicknames = false,
+	draw_health_numbers = true,
+    draw_offscreen_indicators = true,
+    print_current_character_callout = true,
+
+    show_death_indicator_for_seconds = 5,
+    fade_death_indicator_for_seconds = 2,
+
+    show_danger_indicator_for_seconds = 5,
+    fade_danger_indicator_for_seconds = 2,
+
+    draw_offscreen_callouts = true,
+	enabled_draw_color_indicators = 1,
+
 	fog_of_war = {
 	  overlay_color_on_visible = true,
 	  overlay_color = "255 255 255 2",

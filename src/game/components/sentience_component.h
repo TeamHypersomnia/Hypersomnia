@@ -92,6 +92,11 @@ namespace components {
 
 		real32 audio_flash_secs = 0.f;
 		real32 visual_flash_secs = 0.f;
+		rgba last_assigned_color = rgba::zero;
+
+		transformr transform_when_danger_caused;
+		augs::stepped_timestamp time_of_last_caused_danger;
+		real32 radius_of_last_caused_danger = 0.f;
 		// END GEN INTROSPECTOR
 
 		bool is_learnt(const spell_id id) const {

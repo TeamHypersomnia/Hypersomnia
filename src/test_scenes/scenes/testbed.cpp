@@ -61,8 +61,29 @@ namespace test_scenes {
 			"adam.jensen",
 			"Spicmir",
 			"Pythagoras",
-			"Billan"
+			"Billan",
+			"Billans",
+			"bilmik"
 		};
+
+		rs.player_colors = {
+			rgba(0, 255, 0, 255), // green
+			rgba(0, 255, 255, 255), // cyan
+			rgba(255, 255, 0, 255), // yellow
+			rgba(255, 90, 255, 255), // pink
+			rgba(255, 136, 0, 255), // orange
+			rgba(255, 34, 30, 255), // red
+			rgba(121, 48, 255, 255), // purple
+			rgba(0, 116, 255, 255), // blue
+#if OBSCURE_COLORS
+			,rgba(86, 34, 0, 255), // brown
+			rgba(133, 133, 133, 255), // gray
+			rgba(119, 187, 255, 255), // light blue
+			rgba(0, 0, 0, 255), // black
+#endif
+		};
+
+		rs.fallback_player_color = yellow;
 
 		rs.bot_quota = rs.bot_names.size();
 
@@ -422,6 +443,8 @@ namespace test_scenes {
 				};
 
 				floor_align(test_sprite_decorations::WATER_ROOM_FLOOR).set_size(total_floor_size);
+				floor_align(test_box_markers::ROOM).set_size(total_floor_size);
+
 				floor_align(test_plain_sprited_bodies::BRICK_WALL)
 					.ro().ti().stretch_b().again()
 					.ro().bi().nr().extend_r(2).again()
@@ -795,6 +818,9 @@ namespace test_scenes {
 
 		create(test_box_markers::BUY_AREA, vec2(556, -1892)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::METROPOLIS);
 		create(test_box_markers::BUY_AREA, vec2(480, 200)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::RESISTANCE);
+
+		create(test_box_markers::CT_SPAWN, vec2(556, -1892)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::METROPOLIS);
+		create(test_box_markers::T_SPAWN, vec2(480, 200)).set_logical_size(vec2(600, 200)).set_associated_faction(faction_type::RESISTANCE);
 
 		create(test_box_markers::BOMBSITE_A, vec2(580, -400)).set_logical_size(vec2(600, 200));
 

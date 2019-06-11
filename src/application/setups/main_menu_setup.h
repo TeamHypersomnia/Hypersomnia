@@ -174,4 +174,9 @@ public:
 
 	void ensure_handler() {}
 	bool requires_cursor() const { return false; }
+
+	template <class F>
+	void on_mode_with_input(F&& callback) const {
+		callback(mode, test_mode::const_input { ruleset, intro.world });
+	}
 };

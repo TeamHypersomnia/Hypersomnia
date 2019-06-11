@@ -307,4 +307,9 @@ public:
 	}
 
 	void shutdown();
+
+	template <class F>
+	decltype(auto) on_mode_with_input(F&& callback) const {
+		return get_arena_handle().on_mode_with_input(std::forward<F>(callback));
+	}
 };

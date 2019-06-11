@@ -1,7 +1,6 @@
 #include "augs/misc/pool/pool_io.hpp"
 #include "augs/misc/imgui/imgui_scope_wrappers.h"
 #include "augs/misc/imgui/imgui_control_wrappers.h"
-#include "application/setups/editor/editor_setup.h"
 
 #include "application/setups/client/client_setup.h"
 #include "application/config_lua_table.h"
@@ -62,7 +61,7 @@ entity_id client_setup::get_controlled_character_id() const {
 		return entity_id::dead();
 	}
 
-	return get_arena_handle().on_mode_with_input(
+	return on_mode_with_input(
 		[&](const auto& typed_mode, const auto& in) {
 			(void)in;
 
@@ -79,7 +78,7 @@ entity_id client_setup::get_viewed_character_id() const {
 		return entity_id::dead();
 	}
 
-	return get_arena_handle().on_mode_with_input(
+	return on_mode_with_input(
 		[&](const auto& typed_mode, const auto& in) {
 			(void)in;
 

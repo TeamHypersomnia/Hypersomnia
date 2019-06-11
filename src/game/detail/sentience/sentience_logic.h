@@ -12,3 +12,28 @@ void perform_knockout(
 	const vec2 direction,
 	const damage_origin& origin
 );
+
+template <class E>
+void mark_caused_danger(const E& handle, const real32 radius) {
+	if (const auto sentience = handle.template find<components::sentience>()) {
+		sentience->time_of_last_caused_danger = handle.get_cosmos().get_timestamp();
+		sentience->transform_when_danger_caused = handle.get_logic_transform();
+		sentience->radius_of_last_caused_danger = radius;
+	}
+}
+
+template <class E>
+std::optional<real32> secs_since_knockout(const E& handle) {
+	if (const auto sentience = handle.template find<components::sentience>()) {
+		if (sentience->is_conscious()) {
+			return std::nullopt;
+		}
+
+		const auto& cosm = handle.get_cosmos();
+		const auto when = sentience->when_knocked_out;
+
+		return cosm.get_clock().get_passed_secs(when);
+	}
+
+	return std::nullopt;
+}

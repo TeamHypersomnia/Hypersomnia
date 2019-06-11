@@ -297,11 +297,19 @@ namespace augs {
 					pos -= draft.get_bbox();
 				}
 
-				if (c.test(ralign::LB)) {
+				if (c.test(ralign::T)) {
+
+				}
+
+				if (c.test(ralign::B)) {
 					pos.y -= draft.get_bbox().y;
 				}
 
-				if (c.test(ralign::RT)) {
+				if (c.test(ralign::L)) {
+
+				}
+
+				if (c.test(ralign::R)) {
 					pos.x -= draft.get_bbox().x;
 				}
 

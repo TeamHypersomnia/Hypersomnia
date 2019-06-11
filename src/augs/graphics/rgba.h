@@ -49,6 +49,8 @@ struct rgba {
 	rgba(const vec4&);
 	rgba(const ImVec4&);
 
+	explicit rgba(uint32_t);
+
 	rgba(
 		const hsv,
 		const rgba_channel alpha = 255

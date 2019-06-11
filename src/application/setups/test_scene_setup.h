@@ -134,4 +134,9 @@ public:
 	const entropy_accumulator& get_entropy_accumulator() const {
 		return total_collected;
 	}
+
+	template <class F>
+	void on_mode_with_input(F&& callback) const {
+		callback(mode, test_mode::const_input { ruleset, scene.world });
+	}
 };
