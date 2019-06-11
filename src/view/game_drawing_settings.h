@@ -26,7 +26,9 @@ struct game_drawing_settings {
 	bool draw_offscreen_callouts = true;
 	bool draw_nicknames = true;
 	bool draw_health_numbers = true;
-	augs::maybe<float> draw_color_indicators = augs::maybe<float>(0.8f, true);
+	augs::maybe<float> draw_teammate_indicators = augs::maybe<float>(1.f, true);
+	augs::maybe<rgba> draw_danger_indicators = augs::maybe<rgba>(rgba(255, 50, 50, 255), true);
+	augs::maybe<float> draw_tactical_indicators = augs::maybe<float>(1.f, true);
 
 	float show_danger_indicator_for_seconds = 5.f;
 	float fade_danger_indicator_for_seconds = 2.f;

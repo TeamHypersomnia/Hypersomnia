@@ -164,7 +164,9 @@ return {
     fade_danger_indicator_for_seconds = 2,
 
     draw_offscreen_callouts = true,
-	enabled_draw_color_indicators = 1,
+	enabled_draw_teammate_indicators = 1,
+	enabled_draw_tactical_indicators = 1,
+	enabled_draw_danger_indicators = "255 50 50 255",
 
 	fog_of_war = {
 	  overlay_color_on_visible = true,

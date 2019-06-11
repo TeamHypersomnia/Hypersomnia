@@ -1,7 +1,8 @@
 #pragma once
+#include "augs/math/math.h"
 
 inline void draw_offscreen_indicator(
-	augs::drawer& output,
+	const augs::drawer& output,
 	const bool draw_if_onscreen,
 	const bool draw_if_offscreen,
 	const rgba col,

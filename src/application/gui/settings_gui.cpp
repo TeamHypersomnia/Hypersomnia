@@ -360,11 +360,26 @@ void settings_gui_state::perform(
 						revertable_checkbox(SCOPE_CFG_NVP(draw_nicknames));
 						revertable_checkbox(SCOPE_CFG_NVP(draw_health_numbers));
 
-						revertable_checkbox("Draw color indicators", config.drawing.draw_color_indicators.is_enabled);
+						revertable_checkbox("Draw teammate indicators", config.drawing.draw_teammate_indicators.is_enabled);
 
-						if (config.drawing.draw_color_indicators.is_enabled) {
+						if (config.drawing.draw_teammate_indicators.is_enabled) {
 							auto indent = scoped_indent();
-							revertable_slider("Alpha##colors", config.drawing.draw_color_indicators.value, 0.f, 1.f);
+							revertable_slider("Alpha##colors", config.drawing.draw_teammate_indicators.value, 0.f, 1.f);
+						}
+
+						revertable_checkbox("Draw tactical indicators", config.drawing.draw_teammate_indicators.is_enabled);
+						text_disabled("(for example, the dropped bomb's location)");
+
+						if (config.drawing.draw_tactical_indicators.is_enabled) {
+							auto indent = scoped_indent();
+							revertable_slider("Alpha##colors", config.drawing.draw_tactical_indicators.value, 0.f, 1.f);
+						}
+
+						revertable_checkbox("Draw danger indicators", config.drawing.draw_danger_indicators.is_enabled);
+
+						if (config.drawing.draw_danger_indicators.is_enabled) {
+							auto indent = scoped_indent();
+							revertable_color_edit("Color", config.drawing.draw_danger_indicators.value);
 						}
 
 						revertable_checkbox(SCOPE_CFG_NVP(draw_offscreen_indicators));

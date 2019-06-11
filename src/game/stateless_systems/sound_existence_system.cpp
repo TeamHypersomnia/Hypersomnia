@@ -115,6 +115,8 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 		}
 	}
 
+	const auto& common = cosm.get_common_significant();
+
 	for (const auto& g : gunshots) {
 		const auto subject = cosm[g.subject];
 		const auto& gun_def = subject.get<invariants::gun>();
@@ -132,7 +134,18 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 				predictability
 			);
 
-			::mark_caused_danger(owning_capability, effect.modifier.max_distance);
+			auto max_dist = effect.modifier.max_distance;
+			auto ref_dist = effect.modifier.reference_distance;
+
+			if (max_dist < 0) {
+				max_dist = common.default_sound_properties.max_distance;
+			}
+
+			if (ref_dist < 0) {
+				ref_dist = common.default_sound_properties.reference_distance;
+			}
+
+			::mark_caused_danger(owning_capability, max_dist + ref_dist);
 		}
 
 		for (auto& r : g.spawned_rounds) {

@@ -37,3 +37,15 @@ std::optional<real32> secs_since_knockout(const E& handle) {
 
 	return std::nullopt;
 }
+
+template <class E>
+std::optional<real32> secs_since_caused_danger(const E& handle) {
+	if (const auto sentience = handle.template find<components::sentience>()) {
+		const auto& cosm = handle.get_cosmos();
+		const auto when = sentience->time_of_last_caused_danger;
+
+		return cosm.get_clock().get_passed_secs(when);
+	}
+
+	return std::nullopt;
+}

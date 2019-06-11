@@ -21,13 +21,17 @@ void gather_special_indicators(
 
 					if (viewer_faction == participants.bombing) {
 						if (capability.dead() || capability.get_official_faction() != viewer_faction) {
-							special_indicators.push_back({
-								bomb.get_logic_transform(),
-								white,
+							if (const auto fuse = bomb.template find<components::hand_fuse>()) {
+								if (!fuse->armed()) {
+									special_indicators.push_back({
+										bomb.get_logic_transform(),
+										white,
 
-								necessarys.at(assets::necessary_image_id::BOMB_INDICATOR),
-								necessarys.at(assets::necessary_image_id::BOMB_INDICATOR)
-							});
+										necessarys.at(assets::necessary_image_id::BOMB_INDICATOR),
+										necessarys.at(assets::necessary_image_id::BOMB_INDICATOR)
+									});
+								}
+							}
 						}
 					}
 					else if (viewer_faction == participants.defusing) {

@@ -307,7 +307,7 @@ void sound_system::generic_sound_cache::update_properties(const update_propertie
 	}
 
 	source.set_pitch(m.pitch * in.speed_multiplier);
-	source.set_gain(std::clamp((1 - flash_mult) * std::clamp(m.gain, 0.f, 1.f) * mult_via_settings * custom_dist_gain_mult, 0.f, 1.f));
+	source.set_gain(std::clamp((1 - flash_mult) * std::clamp(m.gain, 0.f, 1.f) * std::clamp(mult_via_settings, 0.f, 1.f) * custom_dist_gain_mult, 0.f, 1.f));
 	source.set_reference_distance(si, ref_dist);
 	source.set_looping(m.repetitions == -1);
 	source.set_distance_model(dist_model);

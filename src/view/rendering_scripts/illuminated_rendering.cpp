@@ -45,6 +45,8 @@
 #include "augs/gui/text/printer.h"
 #include "augs/math/simple_calculations.h"
 #include "game/detail/sentience/callout_logic.h"
+#include "view/rendering_scripts/draw_offscreen_indicator.h"
+#include "game/detail/sentience/callout_logic.h"
 
 void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto& additional_highlights = in.additional_highlights;
@@ -704,7 +706,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 				meter,
 
 				draw_other_indicators,
-				draw_other_indicators ? settings.draw_color_indicators : augs::maybe<float>{},
 
 				necessarys.at(assets::necessary_image_id::BIG_COLOR_INDICATOR),
 				necessarys.at(assets::necessary_image_id::DANGER_INDICATOR),
@@ -804,13 +805,41 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		renderer.call_triangles(sentiences_hud.health_numbers);
 	}
 
-	if (settings.draw_color_indicators.is_enabled) {
-		renderer.call_triangles(sentiences_hud.color_indicators);
-	}
+	renderer.call_triangles(sentiences_hud.indicators);
 
-	for (const auto& special : special_indicators) {
-		(void)special;
+	if (settings.draw_tactical_indicators.is_enabled) {
+		const auto alpha = settings.draw_tactical_indicators.value;
 
+		for (const auto& special : special_indicators) {
+			auto col = special.color;
+			col.mult_alpha(alpha);
+
+			const auto world_pos = special.transform.pos;
+			const auto pos = cone.to_screen_space(world_pos);
+
+			std::string primary_text;
+
+			if (const auto callout = cosm[::get_current_callout(cosm, world_pos)]) {
+				primary_text = callout.get_name();
+			}
+
+			const auto& tex = special.offscreen_tex;
+
+			::draw_offscreen_indicator(
+				output,
+				true,
+				settings.draw_offscreen_indicators,
+				col,
+				tex,
+				pos,
+				screen_size,
+				false,
+				std::nullopt,
+				in.gui_font,
+				primary_text,
+				{}
+			);
+		}
 	}
 
 	{

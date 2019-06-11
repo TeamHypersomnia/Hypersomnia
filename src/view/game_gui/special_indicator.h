@@ -2,7 +2,7 @@
 
 struct special_indicator {
 	transformr transform;
-	rgba col;
+	rgba color;
 
 	augs::atlas_entry offscreen_tex;
 	augs::atlas_entry radar_tex;

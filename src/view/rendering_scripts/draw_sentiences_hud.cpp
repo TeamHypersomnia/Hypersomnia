@@ -33,6 +33,7 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 	auto& specials = in.specials;
 
 	const auto& watched_character = cosm[in.viewed_character_id];
+	const auto watched_character_transform = watched_character.get_viewing_transform(interp);
 
 	auto viewer_faction_matches = [&](const auto f) {
 		if (!watched_character) {
@@ -48,11 +49,74 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 	draw_sentiences_hud_output out;
 
 	auto draw_sentience = [&](const auto& v) {
-		if (!in.settings.draw_enemy_hud && !viewer_faction_matches(v)) {
-			return;
-		}
-
 		if (const auto* const sentience = v.template find<components::sentience>()) {
+			const bool is_enemy = !viewer_faction_matches(v);
+			auto indicators_output = augs::drawer { out.indicators };
+
+			if (is_enemy) {
+				const auto& danger_indicators = in.settings.draw_danger_indicators;
+
+				if (danger_indicators.is_enabled) {
+					const auto show_danger_secs = in.settings.show_danger_indicator_for_seconds;
+					const auto fade_danger_secs = in.settings.fade_danger_indicator_for_seconds;
+
+					const auto since_danger = ::secs_since_caused_danger(v);
+					const bool dangered_recently = since_danger && since_danger <= show_danger_secs;
+
+					if (dangered_recently) {
+						auto col = danger_indicators.value;
+
+						if (dangered_recently) {
+							if (fade_danger_secs > 0.f) {
+								const auto fade_mult = std::clamp((show_danger_secs - *since_danger) / fade_danger_secs, 0.f, 1.f);
+								col.mult_alpha(fade_mult);
+							}
+						}
+
+						const auto danger_pos = sentience->transform_when_danger_caused.pos;
+						const auto danger_radius = sentience->radius_of_last_caused_danger;
+						const auto distance_to_danger_sq = (watched_character_transform.pos - danger_pos).length_sq() ;
+
+						if (distance_to_danger_sq <= danger_radius * danger_radius) {
+							const auto indicator_pos = in.text_camera.to_screen_space(danger_pos);
+							const auto& indicator_tex = in.danger_indicator_tex;
+
+							std::string primary_text;
+
+							if (in.settings.draw_offscreen_callouts) {
+								if (const auto callout = cosm[::get_current_callout(cosm, danger_pos)]) {
+									primary_text = callout.get_name();
+								}
+							}
+
+							const bool draw_offscreen = in.settings.draw_offscreen_indicators;
+							const bool draw_onscreen = true;
+
+							const auto screen_size = in.text_camera.screen_size;
+
+							::draw_offscreen_indicator(
+								indicators_output,
+								draw_offscreen,
+								draw_onscreen,
+								col,
+								indicator_tex,
+								indicator_pos,
+								screen_size,
+								false,
+								std::nullopt,
+								in.gui_font,
+								primary_text,
+								{}
+							);
+						}
+					}
+				}
+
+				if (!in.settings.draw_enemy_hud) {
+					return;
+				}
+			}
+
 			struct bar_info {
 				bool is_health = false;
 				rgba color;
@@ -96,8 +160,6 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 
 			float starting_health_angle = 0.f;
 			float ending_health_angle = 0.f;
-
-			const auto watched_character_transform = watched_character.get_viewing_transform(interp);
 
 			if (v == watched_character) {
 				starting_health_angle = watched_character_transform.rotation + 135;
@@ -244,7 +306,7 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 				}
 			}
 
-			const auto& inds = in.draw_color_indicators;
+			const auto& teammate_indicators = in.settings.draw_teammate_indicators;
 
 			const auto show_ko_secs = in.settings.show_death_indicator_for_seconds;
 			const auto fade_ko_secs = in.settings.fade_death_indicator_for_seconds;
@@ -255,7 +317,7 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 			const auto indicator_tex = is_conscious ? in.color_indicator_tex : in.death_indicator_tex;
 			const bool should_rotate_indicator_tex = is_conscious;
 
-			const bool indicators_enabled = inds.is_enabled && inds.value > 0.f;
+			const bool indicators_enabled = teammate_indicators.is_enabled && teammate_indicators.value > 0.f;
 
 			auto col = sentience->last_assigned_color;
 
@@ -267,7 +329,7 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 
 				const auto indicator_pos = screen_space_circle_center + ::position_rectangle_around_a_circle(cam.eye.zoom * (circle_radius + 6.f), bbox, angle) - bbox / 2;
 
-				col.mult_alpha(inds.value);
+				col.mult_alpha(teammate_indicators.value);
 
 				if (koed_recently) {
 					if (fade_ko_secs > 0.f) {
@@ -275,8 +337,6 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 						col.mult_alpha(fade_mult);
 					}
 				}
-
-				auto indicators_output = augs::drawer { out.color_indicators };
 
 				std::optional<augs::atlas_entry> next_tex;
 
@@ -297,7 +357,7 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 					}
 				}
 
-				const bool draw_offscreen = in.draw_offscreen_indicators;
+				const bool draw_offscreen = in.settings.draw_offscreen_indicators;
 				const bool draw_onscreen = true;
 
 				const auto screen_size = cam.screen_size;
@@ -320,7 +380,7 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 		}
 	};
 
-	if (in.draw_offscreen_indicators) {
+	if (in.settings.draw_offscreen_indicators) {
 		cosm.for_each_having<components::sentience>(draw_sentience);
 	}
 	else {

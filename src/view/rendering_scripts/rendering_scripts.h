@@ -53,9 +53,8 @@ struct draw_sentiences_hud_input {
 	const augs::atlas_entry circular_bar_tex;
 	const meter_id meter;
 
-	const bool draw_offscreen_indicators;
+	const bool draw_other_indicators;
 
-	const augs::maybe<float> draw_color_indicators;
 	const augs::atlas_entry color_indicator_tex;
 	const augs::atlas_entry danger_indicator_tex;
 	const augs::atlas_entry death_indicator_tex;
@@ -106,7 +105,7 @@ struct draw_crosshair_lasers_input {
 struct draw_sentiences_hud_output {
 	augs::vertex_triangle_buffer nicknames;
 	augs::vertex_triangle_buffer health_numbers;
-	augs::vertex_triangle_buffer color_indicators;
+	augs::vertex_triangle_buffer indicators;
 };
 
 draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input);
