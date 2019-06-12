@@ -385,7 +385,7 @@ struct particles_decoration {
 
 struct point_marker {
 	static constexpr std::size_t statically_allocated_entities = 1000;
-	static constexpr std::size_t statically_allocated_flavours = 50;
+	static constexpr std::size_t statically_allocated_flavours = 100;
 
 	using invariants = type_list<
 		invariants::point_marker
@@ -399,7 +399,7 @@ struct point_marker {
 
 struct box_marker {
 	static constexpr std::size_t statically_allocated_entities = 1000;
-	static constexpr std::size_t statically_allocated_flavours = 50;
+	static constexpr std::size_t statically_allocated_flavours = 150;
 
 	using invariants = type_list<
 		invariants::box_marker

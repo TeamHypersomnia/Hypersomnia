@@ -173,6 +173,7 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 	checkbox("Overwrite common assets", settings.overwrite_common_assets);
 	checkbox("Overwrite non-decoration flavours", settings.overwrite_non_decoration_flavours);
 	checkbox("Overwrite economy vars of the first created bomb ruleset", settings.overwrite_economy_vars);
+	checkbox("Overwrite whole ruleset", settings.overwrite_whole_ruleset);
 
 	if (ImGui::Button("Update official content")) {
 		update_official_content(cmd_in, settings);

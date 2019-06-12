@@ -51,6 +51,7 @@ struct update_official_content_settings {
 	bool overwrite_common_assets = true;
 	bool overwrite_non_decoration_flavours = true;
 	bool overwrite_economy_vars = true;
+	bool overwrite_whole_ruleset = true;
 };
 
 inline void update_official_content(const editor_command_input cmd_in, update_official_content_settings settings) {
@@ -300,6 +301,10 @@ inline void update_official_content(const editor_command_input cmd_in, update_of
 
 	if (settings.overwrite_economy_vars) {
 		(*folder.commanded->rulesets.all.get_for<bomb_mode>().begin()).second.economy = bt.economy;
+	}
+
+	if (settings.overwrite_whole_ruleset) {
+		(*folder.commanded->rulesets.all.get_for<bomb_mode>().begin()).second = bt;
 	}
 
 	folder.commanded->work.post_load_state_correction();
