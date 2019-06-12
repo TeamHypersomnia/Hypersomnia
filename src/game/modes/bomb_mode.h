@@ -69,7 +69,10 @@ struct bomb_mode_ruleset {
 
 	std::vector<entity_name_str> bot_names;
 	std::vector<rgba> player_colors;
-	rgba fallback_player_color = orange;
+
+	rgba excess_player_color = orange;
+	rgba default_player_color = orange;
+
 	bool enable_player_colors = true;
 	unsigned bot_quota = 8;
 
@@ -548,4 +551,6 @@ public:
 			}
 		});
 	}
+
+	augs::maybe<rgba> get_current_fallback_color_for(const_input, faction_type faction) const;
 };

@@ -351,6 +351,24 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 				std::string primary_text;
 				std::string secondary_text;
 
+				{
+					const auto& fallback_color = in.indicator_meta.draw_nicknames_for_fallback;
+
+					if (fallback_color.is_enabled) {
+						if (col == fallback_color.value) {
+							secondary_text = v.get_name();
+
+							const auto max_char_count = static_cast<std::size_t>(in.settings.nickname_characters_for_offscreen_indicators);
+
+							if (secondary_text.size() > max_char_count) {
+								secondary_text.resize(max_char_count);
+							}
+
+							secondary_text = "(" + secondary_text + ")";
+						}
+					}
+				}
+
 				if (in.settings.draw_offscreen_callouts) {
 					if (const auto callout = cosm[::get_current_callout(v, interp)]) {
 						primary_text = callout.get_name();

@@ -12,7 +12,7 @@ inline void draw_offscreen_indicator(
 	const bool should_rotate_indicator_tex,
 	const std::optional<augs::atlas_entry> next_tex,
 	const augs::baked_font& gui_font,
-	const std::string& primary_text,
+	std::string primary_text,
 	const std::string& secondary_text
 ) {
 	using namespace augs::gui::text;
@@ -92,9 +92,10 @@ inline void draw_offscreen_indicator(
 				indicator_aabb.contain(ltrb::center_and_size(next_indicator_location, next_tex->get_original_size()));
 			}
 
-			if (primary_text.size() > 0) {
+			{
 				const bool has_secondary = secondary_text.size();
-				(void)has_secondary;
+				auto& primary = primary_text;
+				const auto& secondary = secondary_text;
 
 				augs::ralign_flags flags;
 				auto text_pos = indicator_pos;
@@ -106,6 +107,10 @@ inline void draw_offscreen_indicator(
 					else {
 						text_pos = indicator_aabb.left_top();
 						flags.set(augs::ralign::R);
+					}
+
+					if (has_secondary) {
+						primary = primary + "\n" + secondary;
 					}
 				}
 
@@ -119,16 +124,28 @@ inline void draw_offscreen_indicator(
 						text_pos = indicator_aabb.left_bottom();
 						flags.set(augs::ralign::R);
 					}
+
+					if (has_secondary) {
+						primary = secondary + "\n" + primary;
+					}
 				}
 
 				if (e == 1) {
 					text_pos.set(indicator_aabb.l, indicator_aabb.get_center().y);
 					flags.set(augs::ralign::R);
 					flags.set(augs::ralign::CY);
+
+					if (has_secondary) {
+						primary = secondary + " " + primary;
+					}
 				}
 				if (e == 3) {
 					text_pos.set(indicator_aabb.r, indicator_aabb.get_center().y);
 					flags.set(augs::ralign::CY);
+
+					if (has_secondary) {
+						primary = primary + " " + secondary;
+					}
 				}
 
 				const auto text = formatted_string { primary_text, { gui_font, col } };

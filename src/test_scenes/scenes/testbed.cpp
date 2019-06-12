@@ -74,7 +74,8 @@ namespace test_scenes {
 			rgba(255, 136, 0, 255), // orange
 			rgba(255, 34, 30, 255), // red
 			rgba(121, 48, 255, 255), // purple
-			rgba(0, 116, 255, 255), // blue
+			rgba(0, 121, 255, 255), // blue
+			rgba(32, 141, 0, 255) // dark green
 #if OBSCURE_COLORS
 			,rgba(86, 34, 0, 255), // brown
 			rgba(133, 133, 133, 255), // gray
@@ -83,7 +84,8 @@ namespace test_scenes {
 #endif
 		};
 
-		rs.fallback_player_color = yellow;
+		rs.excess_player_color = rgba(210, 210, 210, 255);
+		rs.default_player_color = rgba(255, 255, 0, 255);
 
 		rs.bot_quota = rs.bot_names.size();
 

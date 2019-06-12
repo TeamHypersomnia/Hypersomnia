@@ -542,7 +542,7 @@ std::size_t bomb_mode::num_players_in(const faction_type faction) const {
 }
 
 void bomb_mode::assign_free_color_to_best_uncolored(const const_input_type in, const faction_type previous_faction, const rgba free_color) {
-	const auto fallback_color = in.rules.fallback_player_color;
+	const auto fallback_color = in.rules.excess_player_color;
 
 	if (free_color == rgba::zero) {
 		return;
@@ -619,9 +619,12 @@ void bomb_mode::on_faction_changed_for(const const_input_type in, const faction_
 			}
 
 			if (entry->assigned_color == rgba::zero) {
-				const auto fallback_color = in.rules.fallback_player_color;
+				const auto fallback_color = in.rules.excess_player_color;
 				entry->assigned_color = fallback_color;
 			}
+		}
+		else {
+			entry->assigned_color = in.rules.default_player_color;
 		}
 	}
 }
@@ -809,7 +812,7 @@ entity_id bomb_mode::create_character_for_player(
 					sentience->last_assigned_color = p.assigned_color;
 				}
 				else {
-					sentience->last_assigned_color = in.rules.fallback_player_color;
+					sentience->last_assigned_color = in.rules.default_player_color;
 				}
 			}
 
@@ -2395,6 +2398,34 @@ mode_player_id bomb_mode::get_next_to_spectate(
 	// TODO: Optimize
 	if (const auto player = find_player_by(it->chosen_name)) {
 		return lookup(player->controlled_character_id);
+	}
+
+	return {};
+}
+
+augs::maybe<rgba> bomb_mode::get_current_fallback_color_for(const const_input_type in, const faction_type faction) const {
+	const auto& r = in.rules;
+
+	if (!r.enable_player_colors) {
+		return r.default_player_color;
+	}
+
+	if (faction == faction_type::SPECTATOR) {
+		return {};
+	}
+
+	int faction_count = 0;
+
+	for (const auto& it : players) {
+		const auto& player_data = it.second;
+
+		if (player_data.faction == faction) {
+			++faction_count;
+		}
+	}
+
+	if (faction_count > static_cast<int>(r.player_colors.size())) {
+		return r.excess_player_color;
 	}
 
 	return {};

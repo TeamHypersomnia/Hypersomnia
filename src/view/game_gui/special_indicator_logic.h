@@ -13,6 +13,8 @@ void gather_special_indicators(
 	const E& viewed_character
 ) {
 	if constexpr(std::is_same_v<T, bomb_mode>) {
+		meta.draw_nicknames_for_fallback = mode.get_current_fallback_color_for(mode_input, viewer_faction);
+
 		mode.on_bomb_entity(
 			mode_input,
 			[&](const auto& bomb) {

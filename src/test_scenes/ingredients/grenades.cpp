@@ -258,7 +258,7 @@ namespace test_flavours {
 			dmg.base = 6.f;
 			in.inner_ring_color = white;
 			in.outer_ring_color = white;
-			in.effective_radius = 1150.f;
+			in.effective_radius = 1250.f;
 			dmg.impact_impulse = 0.f;
 			dmg.impulse_multiplier_against_sentience = 0.f;
 			in.sound.id = to_sound_id(test_scene_sound_id::FLASHBANG_EXPLOSION);
