@@ -392,6 +392,8 @@ void settings_gui_state::perform(
 
 							revertable_checkbox(SCOPE_CFG_NVP(draw_offscreen_callouts));
 
+							revertable_slider(SCOPE_CFG_NVP(nickname_characters_for_offscreen_indicators), 0, static_cast<int>(max_nickname_length_v));
+
 							revertable_slider(SCOPE_CFG_NVP(show_danger_indicator_for_seconds), 0.f, 20.f);
 							revertable_slider(SCOPE_CFG_NVP(fade_danger_indicator_for_seconds), 0.f, 20.f);
 

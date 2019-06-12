@@ -211,6 +211,18 @@ public:
 
 				settings.draw_enemy_hud = r.show_enemy_hud;
 				settings.fog_of_war = r.fog_of_war;
+
+				if (!r.enable_danger_indicators) {
+					settings.draw_danger_indicators.is_enabled = false;
+				}
+
+				if (!r.enable_teammate_indicators) {
+					settings.draw_teammate_indicators.is_enabled = false;
+				}
+
+				if (!r.enable_tactical_indicators) {
+					settings.draw_tactical_indicators.is_enabled = false;
+				}
 			}
 		);
 	}

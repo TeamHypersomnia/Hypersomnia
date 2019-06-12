@@ -410,8 +410,8 @@ private:
 	friend augs::introspection_access;
 	friend editor_property_accessors;
 
-	void on_faction_changed_for(const_input, const mode_player_id&);
-
+	void on_faction_changed_for(const_input, faction_type previous_faction, const mode_player_id&);
+	void assign_free_color_to_best_uncolored(const_input in, faction_type previous_faction, rgba free_color);
 public:
 
 	faction_type get_player_faction(const mode_player_id&) const;

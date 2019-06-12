@@ -111,13 +111,15 @@ std::size_t bomb_mode::get_step_rng_seed(const cosmos& cosm) const {
 
 faction_choice_result bomb_mode::choose_faction(const const_input_type in, const mode_player_id& id, const faction_type faction) {
 	if (const auto entry = find(id)) {
-		if (entry->faction == faction) {
+		const auto previous_faction = entry->faction;
+
+		if (previous_faction == faction) {
 			return faction_choice_result::THE_SAME;
 		}
 
 		entry->faction = faction;
 
-		on_faction_changed_for(in, id);
+		on_faction_changed_for(in, previous_faction, id);
 
 		return faction_choice_result::CHANGED;
 	}
@@ -454,7 +456,13 @@ void bomb_mode::remove_player(input_type in, const logic_step step, const mode_p
 
 	delete_with_held_items(in, step, in.cosm[controlled_character_id]);
 
-	erase_element(players, id);
+	if (const auto entry = find(id)) {
+		const auto previous_faction = entry->faction;
+		const auto free_color = entry->assigned_color;
+
+		erase_element(players, id);
+		assign_free_color_to_best_uncolored(in, previous_faction, free_color);
+	}
 }
 
 mode_entity_id bomb_mode::lookup(const mode_player_id& id) const {
@@ -533,8 +541,56 @@ std::size_t bomb_mode::num_players_in(const faction_type faction) const {
 	return total;
 }
 
-void bomb_mode::on_faction_changed_for(const const_input_type in, const mode_player_id& id) { 
+void bomb_mode::assign_free_color_to_best_uncolored(const const_input_type in, const faction_type previous_faction, const rgba free_color) {
+	const auto fallback_color = in.rules.fallback_player_color;
+
+	if (free_color == rgba::zero) {
+		return;
+	}
+
+	if (free_color == fallback_color) {
+		return;
+	}
+
+	auto& best_uncolored_player_of_this_faction = maximum_of(
+		players,
+		[&](const auto& a, const auto& b) {
+			if (a.second.assigned_color != fallback_color) {
+				return true;
+			}
+
+			if (b.second.assigned_color != fallback_color) {
+				return false;
+			}
+
+			if (a.second.faction != previous_faction) {
+				return true;
+			}
+
+			if (b.second.faction != previous_faction) {
+				return false;
+			}
+
+			return a.second.stats.calc_score() < b.second.stats.calc_score();
+		}
+	);
+
+	auto& best = best_uncolored_player_of_this_faction.second;
+
+	if (best.assigned_color == fallback_color) {
+		if (best.faction == previous_faction) {
+			best.assigned_color = free_color;
+		}
+	}
+}
+
+void bomb_mode::on_faction_changed_for(const const_input_type in, const faction_type previous_faction, const mode_player_id& id) { 
 	if (const auto entry = find(id)) {
+		{
+			const auto free_color = entry->assigned_color;
+			assign_free_color_to_best_uncolored(in, previous_faction, free_color);
+		}
+
 		entry->assigned_color = rgba::zero;
 
 		if (entry->faction == faction_type::SPECTATOR) {
@@ -563,7 +619,8 @@ void bomb_mode::on_faction_changed_for(const const_input_type in, const mode_pla
 			}
 
 			if (entry->assigned_color == rgba::zero) {
-				entry->assigned_color = in.rules.fallback_player_color;
+				const auto fallback_color = in.rules.fallback_player_color;
+				entry->assigned_color = fallback_color;
 			}
 		}
 	}
@@ -581,7 +638,7 @@ faction_choice_result bomb_mode::auto_assign_faction(const input_type in, const 
 		const bool faction_changed = f != previous_faction;
 
 		if (faction_changed) {
-			on_faction_changed_for(in, id);
+			on_faction_changed_for(in, previous_faction, id);
 			return faction_choice_result::CHANGED;
 		}
 

@@ -38,6 +38,7 @@ struct game_drawing_settings {
 
 	vec2 radar_pos = vec2i(-40, 20 + 16 * 4);
 	bool print_current_character_callout = false;
+	int nickname_characters_for_offscreen_indicators = 4;
 
 	fog_of_war_settings fog_of_war;
 	fog_of_war_appearance_settings fog_of_war_appearance;

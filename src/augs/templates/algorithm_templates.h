@@ -15,22 +15,22 @@ decltype(auto) maximum_i(const Container& v, T&& pred) {
 }
 
 template <class Container, class T>
-decltype(auto) minimum_of(const Container& v, T&& pred) {
+decltype(auto) minimum_of(Container& v, T&& pred) {
 	return *std::min_element(v.begin(), v.end(), std::forward<T>(pred));
 }
 
 template <class Container, class T>
-decltype(auto) maximum_of(const Container& v, T&& pred) {
+decltype(auto) maximum_of(Container& v, T&& pred) {
 	return *std::max_element(v.begin(), v.end(), std::forward<T>(pred));
 }
 
 template <class Container>
-decltype(auto) minimum_of(const Container& v) {
+decltype(auto) minimum_of(Container& v) {
 	return *std::min_element(v.begin(), v.end());
 }
 
 template <class Container>
-decltype(auto) maximum_of(const Container& v) {
+decltype(auto) maximum_of(Container& v) {
 	return *std::max_element(v.begin(), v.end());
 }
 

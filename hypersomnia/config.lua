@@ -156,6 +156,7 @@ return {
 	draw_health_numbers = true,
     draw_offscreen_indicators = true,
     print_current_character_callout = true,
+    nickname_characters_for_offscreen_indicators = 4,
 
     show_death_indicator_for_seconds = 5,
     fade_death_indicator_for_seconds = 2,

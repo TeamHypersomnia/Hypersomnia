@@ -18,6 +18,10 @@ struct test_mode_view_rules {
 	double audiovisual_speed = 1.0;
 	fog_of_war_settings fog_of_war;
 	bool show_enemy_hud = true;
+
+	bool enable_danger_indicators = true;
+	bool enable_teammate_indicators = true;
+	bool enable_tactical_indicators = true;
 	// END GEN INTROSPECTOR
 };
 
