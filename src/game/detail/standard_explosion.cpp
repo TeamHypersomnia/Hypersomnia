@@ -20,6 +20,7 @@
 #include "game/detail/physics/shape_overlapping.hpp"
 #include "game/detail/damage_origin.hpp"
 #include "game/detail/movement/dash_logic.h"
+#include "game/detail/sentience/sentience_logic.h"
 
 static bool triangle_degenerate(const std::array<vec2, 3>& v) {
 	constexpr auto eps_triangle_degenerate = 0.5f;
@@ -86,6 +87,17 @@ void standard_explosion_input::instantiate(
 
 	const auto subject = cosm[subject_if_any];
 	const auto subject_alive = subject.alive();
+
+	if (subject_alive) {
+		if (subject.template has<components::sentience>()) {
+			::mark_caused_danger(subject, sound.modifier, explosion_location);
+		}
+		else if (const auto sender = subject.template find<components::sender>()) {
+			if (const auto sender_capability = cosm[sender->capability_of_sender]) {
+				::mark_caused_danger(sender_capability, sound.modifier, explosion_location);
+			}
+		}
+	}
 
 	if (subject_alive) {
 		if (const auto sentience = subject.find<components::sentience>()) {

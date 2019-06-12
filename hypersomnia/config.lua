@@ -161,7 +161,7 @@ return {
     show_death_indicator_for_seconds = 5,
     fade_death_indicator_for_seconds = 2,
 
-    show_danger_indicator_for_seconds = 5,
+    show_danger_indicator_for_seconds = 10,
     fade_danger_indicator_for_seconds = 2,
 
     draw_offscreen_callouts = true,
