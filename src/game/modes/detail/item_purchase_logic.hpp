@@ -175,21 +175,35 @@ bool is_backpack_like(const T& handle) {
 	return false;
 }
 
-inline bool makes_sense_to_only_own_one(const cosmos& cosm, const item_flavour_id& id) {
+enum class once_owning_category {
+	NONE,
+
+	DEFUSER_LIKE,
+	ARMOR_LIKE,
+	BACKPACK_LIKE
+};
+
+inline once_owning_category calc_once_owning_category(const cosmos& cosm, const item_flavour_id& id) {
 	if (::is_armor_like(cosm, id)) {
-		return true;
+		return once_owning_category::ARMOR_LIKE;
 	}
 
 	return cosm.on_flavour(id, [&](const auto& typed_flavour) {
 		if (const auto tool = typed_flavour.template find<invariants::tool>()) {
 			if (tool->spell_cost_amortization > 0.f) {
-				return false;
+				return once_owning_category::NONE;
 			}
 
-			return true;
+			if (tool->defusing_speed_mult > 1.f) {
+				return once_owning_category::DEFUSER_LIKE;
+			}
 		}
 
-		return ::is_backpack_like(typed_flavour);
+		if (::is_backpack_like(typed_flavour)) {
+			return once_owning_category::BACKPACK_LIKE;
+		}
+
+		return once_owning_category::NONE;
 	});
 }
 

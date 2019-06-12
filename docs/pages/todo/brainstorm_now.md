@@ -10,8 +10,6 @@ summary: That which we are brainstorming at the moment.
 	- No means of identification in-world when colors are exhausted
 		- 4 first characters of nickname as secondary_text
 
-- mark backpack as already owned if we already own a backpack of the opposing faction
-
 - client metadatas
 	- avatars
 	- separate atlas so that we don't repack every time a new client appears

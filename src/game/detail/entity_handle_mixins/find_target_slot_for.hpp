@@ -4,12 +4,13 @@
 #include "game/detail/weapon_like.h"
 
 template <class E>
-int inventory_mixin<E>::count_contained(const item_flavour_id& id) const {
+template <class F>
+int inventory_mixin<E>::count_contained(F predicate) const {
 	int n = 0;
 
 	for_each_contained_item_recursive(
 		[&](const auto& typed_item) {
-			if (item_flavour_id(typed_item.get_flavour_id()) == id) {
+			if (predicate(typed_item)) {
 				++n;
 			}
 		},
@@ -17,6 +18,15 @@ int inventory_mixin<E>::count_contained(const item_flavour_id& id) const {
 	);
 
 	return n;
+}
+
+template <class E>
+int inventory_mixin<E>::count_contained(const item_flavour_id& id) const {
+	return count_contained(
+		[&id](const auto& typed_item) { 
+			return item_flavour_id(typed_item.get_flavour_id()) == id; 
+		}
+	);
 }
 
 template <class E>

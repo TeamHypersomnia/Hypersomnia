@@ -7,6 +7,9 @@ struct buy_menu_gui_settings {
 
 	rgba already_owns_bg = rgba(0, 170, 0, 90);
 	rgba already_owns_active_bg = rgba(0, 180, 0, 150);
+
+	rgba already_owns_other_type_bg = rgba(0, 170, 0, 90);
+	rgba already_owns_other_type_active_bg = rgba(0, 180, 0, 150);
 	// END GEN INTROSPECTOR
 };
 

@@ -3169,4 +3169,5 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- When somebody dies the indicator turns to a cross
 	- Show a red pistol indicator when a shot is heard
 
+- mark backpack as already owned if we already own a backpack of the opposing faction
 

@@ -253,10 +253,16 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		);
 	};
 
+	enum class owning_type {
+		UNOWNED,
+		OWNED,
+		OWNED_OF_THE_SAME_TYPE
+	};
+
 	auto general_purchase_button = [&](
 		const auto& object, 
 		const auto& selected,
-		const bool is_owned,
+		const owning_type owning,
 		const std::optional<int> num_carryable,
 		const int index,
 		const std::string& additional_id,
@@ -292,8 +298,13 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 
 		const bool active = found_in(selected, index);
 
-		if (is_owned) {
+		if (owning == owning_type::OWNED) {
 			const auto col = active ? in.settings.already_owns_active_bg : in.settings.already_owns_bg;
+			const auto selectable_size = ImVec2(ImGui::GetContentRegionAvailWidth(), 2 * item_spacing.y + button_h);
+			rect_filled(selectable_size, col, vec2(0, -item_spacing.y + 1));
+		}
+		else if (owning == owning_type::OWNED_OF_THE_SAME_TYPE) {
+			const auto col = active ? in.settings.already_owns_other_type_active_bg : in.settings.already_owns_other_type_bg;
 			const auto selectable_size = ImVec2(ImGui::GetContentRegionAvailWidth(), 2 * item_spacing.y + button_h);
 			rect_filled(selectable_size, col, vec2(0, -item_spacing.y + 1));
 		}
@@ -325,8 +336,11 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		ImGui::SetCursorPosY(prev_y);
 		ImGui::SetCursorPosX(x);
 
-		if (is_owned) {
+		if (owning == owning_type::OWNED) {
 			text("Owned already");
+		}
+		else if (owning == owning_type::OWNED_OF_THE_SAME_TYPE) {
+			text("Owned other item of the same type");
 		}
 		else {
 			text_color(typesafe_sprintf("%x$", price_of(object)), money_color);
@@ -358,7 +372,7 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		return general_purchase_button(
 			s_id,
 			selected,
-			learnt,
+			learnt ? owning_type::OWNED : owning_type::UNOWNED,
 			1,
 			index,
 			additional_id,
@@ -432,14 +446,27 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 		const bool is_replenishable = b == button_type::REPLENISHABLE;
 		const auto hotkey_text = typesafe_sprintf(is_replenishable ? "(Shift+%x)" : "(%x)", index);
 
-		const auto num_owned = subject.count_contained(f_id);
+		const auto this_owning_category = ::calc_once_owning_category(cosm, f_id);
 
-		const bool owned_status = [&]() {
-			if (::makes_sense_to_only_own_one(cosm, f_id)) {
-				return num_owned >= 1;
+		const auto num_owned = subject.count_contained(f_id);
+		const auto num_owned_of_same_once_category = subject.count_contained([&](const auto& typed_item) {
+			if (this_owning_category == ::calc_once_owning_category(cosm, typed_item.get_flavour_id())) {
+				return true;
 			}
 
 			return false;
+		});
+
+		const auto owned_status = [&]() {
+			if (this_owning_category == once_owning_category::NONE) {
+				return owning_type::UNOWNED;
+			}
+
+			if (num_owned >= 1) {
+				return owning_type::OWNED;
+			}
+
+			return num_owned_of_same_once_category >= 1 ? owning_type::OWNED_OF_THE_SAME_TYPE : owning_type::UNOWNED;
 		}();
 
 		return general_purchase_button(

@@ -67,6 +67,9 @@ public:
 	int num_charges_fitting_in(const inventory_slot_handle_type&) const;
 	int count_contained(const item_flavour_id&) const;
 
+	template <class F>
+	int count_contained(F predicate) const;
+
 	void set_charges(int) const;
 	int get_charges() const;
 

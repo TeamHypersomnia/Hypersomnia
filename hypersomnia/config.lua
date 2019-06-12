@@ -401,7 +401,9 @@ return {
 		disabled_bg = "75 0 0 180",
 		disabled_active_bg = "90 0 0 220",
 		already_owns_active_bg = "0 130 0 150",
-		already_owns_bg = "0 76 0 91"
+		already_owns_bg = "0 76 0 91",
+		already_owns_other_type_bg = "94 12 255 91",
+		already_owns_other_type_active_bg = "94 101 255 120"
 	},
 
     scoreboard_settings = {
