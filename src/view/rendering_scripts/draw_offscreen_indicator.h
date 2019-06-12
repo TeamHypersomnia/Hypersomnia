@@ -133,11 +133,15 @@ inline void draw_offscreen_indicator(
 
 				const auto text = formatted_string { primary_text, { gui_font, col } };
 
+				auto stroke_color = black;
+				stroke_color.a = col.a;
+
 				augs::gui::text::print_stroked(
 					output,
 					text_pos,
 					text,
-					flags
+					flags,
+					stroke_color
 				);
 			}
 

@@ -1,14 +1,16 @@
 #pragma once
 #include "view/game_gui/special_indicator.h"
+#include "game/detail/hand_fuse_math.h"
 
-template <class T, class MI>
+template <class T, class MI, class E>
 void gather_special_indicators(
 	const T& mode, 
 	const MI& mode_input, 
 	const faction_type viewer_faction,
 	const necessary_images_in_atlas_map& necessarys,
 	std::vector<special_indicator>& special_indicators,
-	special_indicator_meta& meta
+	special_indicator_meta& meta,
+	const E& viewed_character
 ) {
 	if constexpr(std::is_same_v<T, bomb_mode>) {
 		mode.on_bomb_entity(
@@ -22,15 +24,29 @@ void gather_special_indicators(
 					if (viewer_faction == participants.bombing) {
 						if (capability.dead() || capability.get_official_faction() != viewer_faction) {
 							if (const auto fuse = bomb.template find<components::hand_fuse>()) {
-								if (!fuse->armed()) {
-									special_indicators.push_back({
-										bomb.get_logic_transform(),
-										white,
+								/* Draw the bomb icon on screen only if it is unarmed yet. */
+								const bool armed = fuse->armed();
+								const bool draw_onscreen = !armed;
 
-										necessarys.at(assets::necessary_image_id::BOMB_INDICATOR),
-										necessarys.at(assets::necessary_image_id::BOMB_INDICATOR)
-									});
+								auto col = white;
+
+								if (armed) {
+									const auto fuse_math = beep_math { *fuse, bomb.template get<invariants::hand_fuse>(), viewed_character.get_cosmos().get_clock() };
+									const auto mult = fuse_math.get_beep_light_mult();
+
+									col.multiply_rgb(mult);
+									col.r = 255;
 								}
+
+								special_indicators.push_back({
+									bomb.get_logic_transform(),
+									col,
+
+									necessarys.at(assets::necessary_image_id::BOMB_INDICATOR),
+									necessarys.at(assets::necessary_image_id::BOMB_INDICATOR),
+
+									draw_onscreen
+								});
 							}
 						}
 					}

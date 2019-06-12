@@ -6,9 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-
-- show defusing character like we show character with the bomb
-	- copy the defuser icon from scoreboard
+- fallback for when colors are exhausted
+	- No means of identification in-world when colors are exhausted
+		- 4 first characters of nickname as secondary_text
 
 - mark backpack as already owned if we already own a backpack of the opposing faction
 
@@ -19,22 +19,9 @@ summary: That which we are brainstorming at the moment.
 
 - ping
 
-- Show only allies' colors by deafult, like in CS GO 
-
 - panel -> ct computers
 - fix in-game indicators wrongly drawn when zoomed out
 	- they can still be drawn zoomed out in-game if the monitor is smaller than 1920x1080 for example
-
-
-- Assign colors to players like in CS GO
-	- Then show colors on radar
-	- And also indicators should just be colored arrows without nicknames
-		- You can always check the nickname after pressing TAB
-	- The indicators will also have the distance in meters and callout name under it
-	- When somebody dies the indicator turns to a cross
-	- Show a red pistol indicator when a shot is heard
-
-
 
 - Callout markers
 	- Separate trees

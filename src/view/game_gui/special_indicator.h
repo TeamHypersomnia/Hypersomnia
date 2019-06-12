@@ -6,6 +6,8 @@ struct special_indicator {
 
 	augs::atlas_entry offscreen_tex;
 	augs::atlas_entry radar_tex;
+
+	bool draw_onscreen = true;
 };
 
 struct special_indicator_meta {

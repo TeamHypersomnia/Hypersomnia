@@ -1712,7 +1712,8 @@ int work(const int argc, const char* const * const argv) try {
 									viewed_character.get_official_faction(), 
 									streaming.necessary_images_in_atlas, 
 									special_indicators,
-									indicator_meta
+									indicator_meta,
+									viewed_character
 								);
 							}
 						);

@@ -3156,3 +3156,17 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Make indicator image a square anyway so that it rotates nicely
 - Raycast against a smaller rectangle to smoothly transition from left to top edge etc
+
+- show defusing character like we show character with the bomb
+	- copy the defuser icon from scoreboard
+- Show only allies' colors by deafult, like in CS GO 
+
+- Assign colors to players like in CS GO
+	- Then show colors on radar
+	- And also indicators should just be colored arrows without nicknames
+		- You can always check the nickname after pressing TAB
+	- The indicators will also have the distance in meters and callout name under it
+	- When somebody dies the indicator turns to a cross
+	- Show a red pistol indicator when a shot is heard
+
+
