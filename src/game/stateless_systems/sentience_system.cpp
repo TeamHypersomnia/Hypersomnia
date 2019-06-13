@@ -306,37 +306,7 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 	auto& health = sentience.get<health_meter_instance>();
 	auto& consciousness = sentience.get<consciousness_meter_instance>();
 	auto& personal_electricity = sentience.get<personal_electricity_meter_instance>();
-	const auto& origin = h.origin;
 	const bool was_conscious = health.value > 0.f; //&& consciousness.value > 0.f;
-
-	auto contribute_to_damage = [&](const auto contributed_amount) {
-		const auto inflicting_capability = origin.get_guilty_of_damaging(subject);
-
-		auto& owners = sentience.damage_owners;
-		bool found = false;
-
-		for (auto& o : owners) {
-			if (o.who == inflicting_capability) {
-				o.amount += contributed_amount;
-				found = true;
-			}
-		}
-
-		if (!found) {
-			const auto new_one = damage_owner { inflicting_capability, contributed_amount };
-
-			if (owners.size() == owners.max_size()) {
-				if (owners.back() < new_one) {
-					owners.back() = new_one;
-				}
-			}
-			else {
-				owners.push_back(new_one);
-			}
-		}
-
-		sort_range(owners);
-	};
 
 	auto allow_special_result = [&]() {
 		const auto disable_knockouts = step.get_settings().disable_knockouts;
@@ -354,7 +324,6 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 		case messages::health_event::target_type::HEALTH: {
 			const auto amount = h.effective_amount;
 
-			contribute_to_damage(amount);
 			health.value -= amount;
 
 			ensure_geq(health.value, 0);
@@ -387,7 +356,6 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 
 		case messages::health_event::target_type::CONSCIOUSNESS: {
 			const auto amount = h.effective_amount;
-			contribute_to_damage(amount / 5);
 			consciousness.value -= amount;
 
 			if (!consciousness.is_positive()) {
@@ -402,7 +370,6 @@ messages::health_event sentience_system::process_health_event(messages::health_e
 		case messages::health_event::target_type::PERSONAL_ELECTRICITY: {
 			const auto amount = h.effective_amount;
 			personal_electricity.value -= amount;
-			contribute_to_damage(amount / 8);
 
 			if (!personal_electricity.is_positive()) {
 				h.special_result = messages::health_event::result_type::PERSONAL_ELECTRICITY_DESTRUCTION;
@@ -466,6 +433,39 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 		if (sentience) {
 			const auto& s = *sentience;
 
+			auto contribute_to_damage = [&](const auto applied, const auto hp, const auto pe) {
+				const auto& origin = d.origin;
+				const auto inflicting_capability = origin.get_guilty_of_damaging(subject);
+
+				auto& owners = sentience->damage_owners;
+				bool found = false;
+
+				for (auto& o : owners) {
+					if (o.who == inflicting_capability) {
+						o.applied_damage += applied;
+						o.hp_loss += hp;
+						o.pe_loss += pe;
+						++o.hits;
+						found = true;
+					}
+				}
+
+				if (!found) {
+					const auto new_one = damage_owner { inflicting_capability, 1, applied, hp, pe };
+
+					if (owners.size() == owners.max_size()) {
+						if (owners.back() < new_one) {
+							owners.back() = new_one;
+						}
+					}
+					else {
+						owners.push_back(new_one);
+					}
+				}
+
+				sort_range(owners);
+			};
+
 			auto& health = s.get<health_meter_instance>();
 			auto& consciousness = s.get<consciousness_meter_instance>();
 			auto& personal_electricity = s.get<personal_electricity_meter_instance>();
@@ -473,15 +473,19 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 			const auto absorption = ::find_active_pe_absorption(subject);
 			const bool is_shield_enabled = logically_set(absorption);
 
-			auto apply_ped = [event_template, &personal_electricity, &process_and_post_health](const meter_value_type amount) {
+			meter_value_type reported_pe_damage = 0;
+			meter_value_type reported_hp_damage = 0;
+
+			auto apply_ped = [event_template, &reported_pe_damage, &personal_electricity, &process_and_post_health](const meter_value_type amount) {
 				auto event = event_template;
 
 				event.target = messages::health_event::target_type::PERSONAL_ELECTRICITY;
 
 				const auto damaged = personal_electricity.calc_damage_result(amount);
 				event.effective_amount = damaged.effective;
-				event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
+				reported_pe_damage = damaged.effective;
 
+				event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
 				if (event.effective_amount != 0) {
 					process_and_post_health(event);
 				}
@@ -504,6 +508,7 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 
 					const auto damaged = health.calc_damage_result(after_shield_damage);
 					event.effective_amount = damaged.effective;
+					reported_hp_damage = damaged.effective;
 					event.ratio_effective_to_maximum = damaged.ratio_effective_to_maximum;
 
 					if (event.effective_amount != 0) {
@@ -572,6 +577,10 @@ void sentience_system::apply_damage_and_generate_health_events(const logic_step 
 						secs = std::max(secs, r * amount * look_mult);
 					}
 				}
+			}
+
+			if (reported_hp_damage > 0 || reported_pe_damage > 0) {
+				contribute_to_damage(amount, reported_hp_damage, reported_pe_damage);
 			}
 		}
 

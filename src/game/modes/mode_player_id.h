@@ -4,7 +4,7 @@
 constexpr std::size_t max_mode_players_v = max_incoming_connections_v + 1;
 
 struct mode_player_id {
-	using id_value_type = unsigned;
+	using id_value_type = uint32_t;
 	// GEN INTROSPECTOR struct mode_player_id
 	id_value_type value = static_cast<id_value_type>(-1);
 	// END GEN INTROSPECTOR

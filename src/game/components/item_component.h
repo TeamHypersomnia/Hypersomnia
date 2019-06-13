@@ -9,6 +9,12 @@
 #include "game/detail/economy/money_type.h"
 #include "game/detail/view_input/sound_effect_input.h"
 
+struct item_purchase_meta {
+	// GEN INTROSPECTOR struct item_purchase_meta
+	signi_entity_id original_buyer;
+	// END GEN INTROSPECTOR
+};
+
 namespace components {
 	struct item {
 		static constexpr bool is_synchronized = true;
@@ -18,6 +24,7 @@ namespace components {
 		signi_inventory_slot_id current_slot;
 		signi_inventory_slot_id previous_slot;
 		augs::stepped_timestamp when_last_transferred;
+		item_purchase_meta purchase_meta;
 		// END GEN INTROSPECTOR
 
 		void clear_slot_info() {

@@ -193,7 +193,7 @@ void bomb_mode::init_spawned(
 	const auto handle = cosm[id];
 	const auto& faction_rules = in.rules.factions[handle.get_official_faction()];
 
-	handle.dispatch_on_having_all<components::sentience>([&](const auto typed_handle) {
+	handle.dispatch_on_having_all<components::sentience>([&](const auto& typed_handle) {
 		if (transferred != std::nullopt && transferred->player.survived) {
 			const auto& eq = transferred->player.saved_eq;
 
@@ -251,6 +251,7 @@ void bomb_mode::init_spawned(
 					[&](const auto&, auto& raw_entity) {
 						auto& item = raw_entity.template get<components::item>();
 						item.charges = i.charges;
+						item.purchase_meta.original_buyer = typed_handle.get_id();
 					},
 					[&](const auto&) {
 
@@ -1095,7 +1096,7 @@ void bomb_mode::count_knockout(const input_type in, const entity_id victim, cons
 	for (const auto& candidate : assists) {
 		if (const auto candidate_assistant = cosm[candidate.who]) {
 			if (candidate_assistant != knockouter) {
-				if (candidate.amount >= in.rules.minimal_damage_for_assist) {
+				if (candidate.applied_damage >= in.rules.minimal_damage_for_assist) {
 					make_participant(ko.assist, candidate_assistant);
 					break;
 				}

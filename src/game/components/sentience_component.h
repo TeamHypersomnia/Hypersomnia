@@ -38,16 +38,19 @@
 struct damage_owner {
 	// GEN INTROSPECTOR struct damage_owner
 	signi_entity_id who;
-	meter_value_type amount = 0;
+	int hits = 1;
+	meter_value_type applied_damage = 0;
+	meter_value_type hp_loss = 0;
+	meter_value_type pe_loss = 0;
 	// END GEN INTROSPECTOR
 
 	bool operator<(const damage_owner& b) const {
 		/* Bigger come first */
-		return amount > b.amount;
+		return applied_damage > b.applied_damage;
 	}
 };
 
-using damage_owners_vector = augs::constant_size_vector<damage_owner, 3>;
+using damage_owners_vector = augs::constant_size_vector<damage_owner, 4>;
 
 namespace components {
 	struct sentience {
