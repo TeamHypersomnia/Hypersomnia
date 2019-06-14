@@ -19,6 +19,8 @@
 
 #include "view/viewables/atlas_distributions.h"
 #include "view/viewables/regeneration/content_regeneration_settings.h"
+#include "view/viewables/avatars_in_atlas_map.h"
+#include "augs/texture_atlas/loaded_png_vector.h"
 
 class sound_system;
 
@@ -35,6 +37,7 @@ struct viewables_load_input {
 
 	augs::renderer& renderer;
 	const unsigned max_atlas_size;
+	std::optional<arena_player_metas>& new_player_metas;
 };
 
 struct viewables_finalize_input {
@@ -51,6 +54,7 @@ class viewables_streaming {
 #endif
 
 	std::vector<rgba> pbo_fallback;
+	std::vector<rgba> avatar_pbo_fallback;
 
 	all_loaded_gui_fonts loaded_gui_fonts;
 
@@ -58,6 +62,7 @@ class viewables_streaming {
 	all_gui_fonts_inputs future_gui_fonts;
 
 	std::future<general_atlas_output> future_general_atlas;
+	std::future<avatar_atlas_output> future_avatar_atlas;
 
 	all_viewables_defs now_loaded_viewables_defs;
 	all_gui_fonts_inputs now_loaded_gui_font_defs;
@@ -68,10 +73,13 @@ class viewables_streaming {
 
 public:
 	std::optional<augs::graphics::texture> general_atlas;
+	std::optional<augs::graphics::texture> avatar_atlas;
+
 	viewables_streaming_profiler performance;
 
 	loaded_sounds_map loaded_sounds;
 	images_in_atlas_map images_in_atlas;
+	avatars_in_atlas_map avatars_in_atlas;
 	necessary_images_in_atlas_map necessary_images_in_atlas;
 
 	atlas_profiler general_atlas_performance;
@@ -88,4 +96,6 @@ public:
 	}
 
 	void finalize_pending_tasks();
+
+	bool finished_loading_player_metas() const;
 };

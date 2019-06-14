@@ -3171,3 +3171,14 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - mark backpack as already owned if we already own a backpack of the opposing faction
 
+- re-assign colors to players with fallback color when someone lefts
+
+- fallback for when colors are exhausted
+	- No means of identification in-world when colors are exhausted
+		- 4 first characters of nickname as secondary_text
+	- We anyway have to have the arrows to show the direction off-screen
+	- It would be stupid to disable all colors if we sometimes exceed the player count by just one
+	- So let's have a fallback color, light gray?
+
+- two layers for callouts so we can stack one on top of another
+

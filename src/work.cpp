@@ -438,6 +438,14 @@ int work(const int argc, const char* const * const argv) try {
 	static bool game_gui_mode_flag = false;
 
 	static auto load_all = [&](const all_viewables_defs& new_defs) {
+		std::optional<arena_player_metas> new_player_metas;
+
+		if (streaming.finished_loading_player_metas()) {
+			on_specific_setup([&](client_setup& setup) {
+				new_player_metas = setup.get_new_player_metas();
+			});
+		}
+
 		streaming.load_all({
 			new_defs,
 			necessary_image_definitions,
@@ -445,7 +453,9 @@ int work(const int argc, const char* const * const argv) try {
 			config.content_regeneration,
 			get_unofficial_content_dir(),
 			renderer,
-			renderer.get_max_texture_size()
+			renderer.get_max_texture_size(),
+
+			new_player_metas
 		});
 	};
 
@@ -1200,7 +1210,7 @@ int work(const int argc, const char* const * const argv) try {
 				lua,
 				[&]() {
 					if (!has_current_setup()) {
-						if (start_client_gui.perform(config.default_client_start, config.client)) {
+						if (start_client_gui.perform(window, config.default_client_start, config.client)) {
 							change_with_save(
 								[&](auto& cfg) {
 									cfg.default_client_start = config.default_client_start;
@@ -1782,7 +1792,11 @@ int work(const int argc, const char* const * const argv) try {
 					get_line_drawer(),
 					new_viewing_config,
 					streaming.necessary_images_in_atlas,
+					streaming.general_atlas,
+					streaming.avatar_atlas,
 					streaming.images_in_atlas,
+					streaming.avatars_in_atlas,
+					renderer,
 					common_input_state.mouse.pos,
 					screen_size,
 					streaming.get_loaded_gui_fonts(),

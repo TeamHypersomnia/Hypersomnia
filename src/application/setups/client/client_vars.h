@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include "augs/network/network_simulator_settings.h"
+#include "augs/filesystem/path_declaration.h"
 
 struct client_jitter_vars {
 	// GEN INTROSPECTOR struct client_jitter_vars
@@ -34,5 +35,6 @@ struct client_vars {
 	unsigned show_recent_chat_messages_num = 5;
 	float keep_recent_chat_messages_for_seconds = 8.f;
 	float chat_messages_fade_last_seconds = 2.f;
+	augs::path_type avatar_image_path;
 	// END GEN INTROSPECTOR
 };

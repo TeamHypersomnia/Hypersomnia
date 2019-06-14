@@ -6,6 +6,9 @@
 #include "view/viewables/all_viewables_declaration.h"
 #include "view/viewables/images_in_atlas_map.h"
 #include "view/viewables/regeneration/content_regeneration_settings.h"
+#include "view/mode_gui/arena/arena_player_meta.h"
+#include "view/viewables/avatars_in_atlas_map.h"
+#include "augs/texture_atlas/loaded_png_vector.h"
 
 /* 
 	The standard atlas distribution is the simplest one where
@@ -58,3 +61,18 @@ general_atlas_output create_general_atlas(
 	atlas_profiler&,
 	augs::time_measurements& neon_regeneration_performance
 );
+
+struct avatar_atlas_output {
+	avatars_in_atlas_map atlas_entries;
+	vec2u atlas_size;
+};
+
+struct avatar_atlas_input {
+	arena_player_metas subjects;
+	const unsigned max_atlas_size;
+
+	rgba* const atlas_image_output;
+	std::vector<rgba>& fallback_output;
+};
+
+avatar_atlas_output create_avatar_atlas(avatar_atlas_input in);

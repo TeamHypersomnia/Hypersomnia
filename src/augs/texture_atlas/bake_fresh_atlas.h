@@ -6,16 +6,24 @@
 #include "augs/image/font.h"
 #include "augs/texture_atlas/atlas_profiler.h"
 
+#include "augs/texture_atlas/loaded_png_vector.h"
+
 using source_image_identifier = augs::path_type;
 using source_font_identifier = augs::font_loading_input;
 
 struct atlas_input_subjects {
 	std::vector<source_image_identifier> images;
 	std::vector<source_font_identifier> fonts;
+	loaded_png_vector loaded_pngs;
 
 	void clear() {
 		images.clear();
 		fonts.clear();
+		loaded_pngs.clear();
+	}
+
+	std::size_t count_images() const {
+		return images.size() + loaded_pngs.size();
 	}
 };
 
@@ -24,6 +32,7 @@ struct baked_atlas {
 
 	std::unordered_map<source_image_identifier, augs::atlas_entry> images;
 	std::unordered_map<source_font_identifier, augs::stored_baked_font> fonts;
+	std::vector<augs::atlas_entry> loaded_pngs;
 
 	void clear() {
 		atlas_image_size = {};

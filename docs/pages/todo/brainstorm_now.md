@@ -6,24 +6,42 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- re-assign colors to players with fallback color when someone lefts
+- Preview the avatar in client start gui, give it a separate texture and use some special imgui logic to show it?
 
-- fallback for when colors are exhausted
-	- No means of identification in-world when colors are exhausted
-		- 4 first characters of nickname as secondary_text
-	- We anyway have to have the arrows to show the direction off-screen
-	- It would be stupid to disable all colors if we sometimes exceed the player count by just one
-	- So let's have a fallback color, light gray?
+- Fix that clipboard on all platforms at last
+- And fix polish characters in chat breaking stuff on Windows
+
+- Test avatars on windows, especially the filter
+- In host a server menu option, simply spawn a separate dedicated server process and use locally created client_setup to connect
+	- Something to check if the servers is already on
+
+- Test assists after fixing the damage owner logic
+
+- Port cyberaqua again from the same lua files to avoid re-importing and loss of accuracy
+
+- Death screen
+	- [Avatar] Billan
+		- Killed you with their Bilmer2000
+		- Damage given: 32 in 2 hits
+			- Count real contribution in damage owners, not mana decreased when shield owned
+		- Damage taken: 4 hits, 384 applied damage, 100 HP lost, 0 PE lost.
+		- Damage given: 2 hits, 180 applied damage, 0 HP lost, 289 PE lost.
+
+- Avatars
+- max: 80x80, 64k
+	- resize automatically in-game
+	- Actually implement them before ping because you will anyway store ping next to avatar data
+	- So dont store it in logic 
+
+- ping
 
 - client metadatas
 	- avatars
 	- separate atlas so that we don't repack every time a new client appears
 	- separate drawcall
 
-- ping
-
 - panel -> ct computers
-- fix in-game indicators wrongly drawn when zoomed out
+- fix in-game area indicators wrongly drawn when zoomed out
 	- they can still be drawn zoomed out in-game if the monitor is smaller than 1920x1080 for example
 
 - Callout markers
@@ -65,8 +83,6 @@ summary: That which we are brainstorming at the moment.
 		- mid vent
 		- back vent
 		
-- two layers for callouts so we can stack one on top of another
-
 
 
 

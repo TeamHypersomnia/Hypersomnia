@@ -171,6 +171,9 @@ void arena_scoreboard_gui::draw_gui(
 		int r;
 	};
 
+	const auto scoreboard_avatar_icon_side = 22;
+	(void)scoreboard_avatar_icon_side;
+
 	std::vector<column> columns = {
 		{ calc_size("9999").x, "Ping", true },
 		{ 22, " " },
@@ -243,6 +246,29 @@ void arena_scoreboard_gui::draw_gui(
 		orig.b += pen.y;
 
 		o.base::aabb(img, orig, col);
+	};
+
+	augs::vertex_triangle_buffer avatar_triangles;
+	augs::vertex_triangle_buffer color_indicator_triangles;
+
+	auto avatar_aabb_img = [&](auto img, auto orig, rgba col = white) {
+		orig.l += pen.x;
+		orig.t += pen.y;
+		orig.r += pen.x;
+		orig.b += pen.y;
+
+		auto avatar_output = augs::drawer { avatar_triangles };
+		avatar_output.aabb(img, orig, col);
+	};
+
+	auto color_indicator_aabb_img = [&](auto img, auto orig, rgba col = white) {
+		orig.l += pen.x;
+		orig.t += pen.y;
+		orig.r += pen.x;
+		orig.b += pen.y;
+
+		auto avatar_output = augs::drawer { color_indicator_triangles };
+		avatar_output.aabb(img, orig, col);
 	};
 
 	const auto max_score = typed_mode.calc_max_faction_score();
@@ -373,6 +399,8 @@ void arena_scoreboard_gui::draw_gui(
 			const auto col_border_orig = ltrbi(c.l, 0, c.l + 1, h - 1);
 			aabb(col_border_orig, bg_dark);
 		}
+
+		const bool avatars_enabled = in.general_atlas != std::nullopt && in.avatar_atlas != std::nullopt;
 
 		for (const auto& p : sorted_players) {
 			const auto& player_id = p.second;
@@ -559,6 +587,25 @@ void arena_scoreboard_gui::draw_gui(
 
 			next_col();
 
+			if (avatars_enabled) {
+				if (const auto& entry = in.avatars_in_atlas.at(player_id.value); entry.exists()) {
+					const auto& c = *current_column;
+					const auto& cell_orig = ltrbi(c.l + 1, 1, c.r, cell_h);
+
+					auto total_alpha = cfg.avatar_alpha;
+						
+					if (!is_conscious) {
+						total_alpha *= cfg.dead_player_text_alpha_mult;
+					}
+
+					avatar_aabb_img(
+						entry,
+						cell_orig,
+						rgba(white).mult_alpha(total_alpha)
+					);
+				}
+			}
+
 			if (is_viewer_faction && mode_input.rules.enable_player_colors) {
 				const auto color_indicator_image = assets::necessary_image_id::SMALL_COLOR_INDICATOR;
 
@@ -579,7 +626,7 @@ void arena_scoreboard_gui::draw_gui(
 						total_alpha *= cfg.dead_player_text_alpha_mult;
 					}
 
-					aabb_img(
+					color_indicator_aabb_img(
 						entry,
 						icon_orig,
 						rgba(player_data.assigned_color).mult_alpha(total_alpha)
@@ -660,6 +707,22 @@ void arena_scoreboard_gui::draw_gui(
 			}
 		}
 	}
+
+	if (avatar_triangles.size() > 0) {
+		// TODO: Use find_current instead of explicitly using general atlas!!!
+		in.renderer.call_and_clear_triangles();
+		in.avatar_atlas->bind();
+
+		in.renderer.call_triangles(avatar_triangles);
+
+		in.renderer.call_and_clear_triangles();
+		in.general_atlas->bind();
+	}
+
+	if (color_indicator_triangles.size() > 0) {
+		in.renderer.call_triangles(color_indicator_triangles);
+	}
+
 }
 
 

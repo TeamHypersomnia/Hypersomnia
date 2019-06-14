@@ -149,6 +149,29 @@ namespace augs {
 		}
 	}
 
+	vec2u image::get_png_size(const std::vector<std::byte>& bytes) {
+#if BUILD_IMAGE
+		const auto minimum_bytes = 16 + 4 + 4 + 1;
+
+		if (bytes.size() < minimum_bytes) {
+			throw image_loading_error("Failed to read size of byte vector. The number of bytes is %x, has to be at least %x.", bytes.size(), minimum_bytes);
+		}
+
+		uint32_t width;
+		uint32_t height;
+
+		std::memcpy(&width, &bytes[16], sizeof(uint32_t));
+		std::memcpy(&height, &bytes[20], sizeof(uint32_t));
+
+		width = ntohl(width);
+		height = ntohl(height);
+
+		return { width, height };
+#else
+		return vec2u::zero;
+#endif
+	}
+
 	vec2u image::get_size(const path_type& file_path) {
 #if BUILD_IMAGE
 		try {
@@ -463,6 +486,16 @@ namespace augs {
 			LOG("Warning: %x has unknown extension: %x! Saving as binary.", path, extension);
 			save_as_binary_file(path);
 		}
+	}
+
+	std::vector<std::byte> image::to_png_bytes() const {
+		std::vector<std::byte> saved_bytes;
+
+		if (const auto lodepng_result = encode_rgba(saved_bytes, v, size.x, size.y)) {
+			LOG("Failed to image to png bytes: lodepng returned %x.", lodepng_result);
+		}
+
+		return saved_bytes;
 	}
 
 	void image::save_as_png(const path_type& path) const {

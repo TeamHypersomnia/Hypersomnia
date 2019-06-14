@@ -647,6 +647,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/fp_consistency_tests.cpp"
 	"src/view/mode_gui/arena/arena_spectator_gui.cpp"
 	"src/game/inferred_caches/organism_cache.cpp"
+	"src/view/viewables/avatar_atlas.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

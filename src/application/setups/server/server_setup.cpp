@@ -21,6 +21,7 @@
 #include "application/arena/arena_handle.h"
 #include "application/arena/choose_arena.h"
 #include "application/setups/client/chat_gui.h"
+#include "application/network/payload_easily_movable.h"
 
 void server_setup::shutdown() {
 	if (server->is_running()) {
@@ -390,6 +391,23 @@ void server_setup::advance_clients_state() {
 				}
 			);
 
+			for (const auto& cc : clients) {
+				if (!cc.is_set()) {
+					continue;
+				}
+
+				const auto recipient_client_id = client_id;
+				const auto client_id_of_avatar = static_cast<client_id_type>(index_in(clients, cc));
+
+				server->send_payload(
+					recipient_client_id,
+					game_channel_type::COMMUNICATIONS,
+
+					client_id_of_avatar,
+					cc.meta.avatar
+				);
+			}
+
 			LOG("Sending initial payload for %x at step: %x", client_id, scene.world.get_total_steps_passed());
 		};
 
@@ -428,9 +446,6 @@ void server_setup::advance_clients_state() {
 		}
 	}
 }
-
-template <class T>
-constexpr bool payload_easily_movable_v = true;
 
 template <class T, class F>
 message_handler_result server_setup::handle_client_message(
@@ -645,6 +660,37 @@ message_handler_result server_setup::handle_client_message(
 			default: return abort_v;
 		}
 	}
+	else if constexpr (std::is_same_v<T, arena_player_avatar_payload>) {
+		{
+			uint32_t dummy_id = 0;
+			arena_player_avatar_payload payload;
+
+			read_payload(
+				dummy_id,
+				payload
+			);
+
+			c.meta.avatar = std::move(payload);
+		}
+
+
+		for (const auto& cc : clients) {
+			if (!cc.is_set()) {
+				continue;
+			}
+
+			const auto client_id_of_avatar = client_id;
+			const auto recipient_client_id = static_cast<client_id_type>(index_in(clients, cc));
+
+			server->send_payload(
+				recipient_client_id,
+				game_channel_type::COMMUNICATIONS,
+
+				client_id_of_avatar,
+				c.meta.avatar
+			);
+		}
+	}
 	else {
 		static_assert(always_false_v<T>, "Unhandled payload type.");
 	}
@@ -719,6 +765,40 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 
 			total
 		);
+	}
+
+	{
+		if (server_time - when_last_sent_net_statistics > vars.send_net_statistics_update_once_every_secs) {
+			net_statistics_update update;
+
+			for (auto& c : clients) {
+				if (!c.is_set()) {
+					continue;
+				}
+
+				const auto client_id = static_cast<client_id_type>(index_in(clients, c));
+
+				const auto info = server->get_network_info(client_id);
+				update.ping_values.push_back(static_cast<uint8_t>(std::round(info.rtt_ms)));
+			}
+
+			for (auto& c : clients) {
+				if (!c.is_set()) {
+					continue;
+				}
+
+				const auto client_id = static_cast<client_id_type>(index_in(clients, c));
+
+				server->send_payload(
+					client_id,
+					game_channel_type::COMMUNICATIONS,
+
+					update
+				);
+			}
+
+			when_last_sent_net_statistics = server_time;
+		}
 	}
 }
 

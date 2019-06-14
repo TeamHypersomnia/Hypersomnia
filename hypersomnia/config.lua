@@ -420,6 +420,8 @@ return {
       dead_player_text_lumi_mult = 0.80000001192092896,
       cell_bg_alpha = 0.56000000238418579,
       faction_logo_alpha = 0.80000001192092896,
+      avatar_alpha = 1,
+	  icon_alpha = 0.8,
       player_row_inner_padding = {
         x = 4,
         y = 4
@@ -537,6 +539,7 @@ return {
 
 	max_buffered_client_commands = 1280,
 	state_hash_once_every_tick = 1,
+    send_net_statistics_update_once_every_secs = 1,
 
     auto_authorize_loopback_for_rcon = true,
 	max_unauthorized_rcon_commands = 100,

@@ -344,6 +344,20 @@ namespace net_messages {
 		return true;
 	}
 
+	inline bool net_statistics_update::write_payload(
+		const decltype(net_statistics_update::payload)& input
+	) {
+		payload = input;
+		return true;
+	}
+
+	inline bool net_statistics_update::read_payload(
+		decltype(net_statistics_update::payload)& output
+	) {
+		output = std::move(payload);
+		return true;
+	}
+
 	inline bool special_client_request::write_payload(
 		const decltype(special_client_request::payload)& input
 	) {
@@ -366,6 +380,49 @@ namespace net_messages {
 		return unsafe_write_message(*this, input);
 	}
 
+	inline bool player_avatar_exchange::read_payload(
+		uint32_t& client_id,
+		arena_player_avatar_payload& payload
+	) {
+		auto data = reinterpret_cast<const std::byte*>(GetBlockData());
+		auto size = static_cast<std::size_t>(GetBlockSize());
+
+		const bool client_id_written_properly = size >= sizeof(uint32_t);
+
+		if (!client_id_written_properly) {
+			return false;
+		}
+
+		client_id = *reinterpret_cast<const uint32_t*>(data);
+
+		data += sizeof(uint32_t);
+		size -= sizeof(uint32_t);
+
+		if (size > max_avatar_bytes_v) {
+			return false;
+		}
+
+		payload.png_bytes.resize(size);
+		std::memcpy(payload.png_bytes.data(), data, size);
+
+		return true;
+	}
+
+	template <class F>
+	inline bool player_avatar_exchange::write_payload(
+		F block_allocator,
+		const uint32_t& client_id,
+		const arena_player_avatar_payload& payload
+	) {
+		const auto& png = payload.png_bytes;
+		auto block = block_allocator(sizeof(uint32_t) + png.size());
+
+		std::memcpy(block, &client_id, sizeof(client_id));
+		std::memcpy(block + sizeof(client_id), png.data(), png.size());
+
+		return true;
+	}
+
 	inline bool initial_arena_state::read_payload(
 		augs::serialization_buffers& buffers,
 		const initial_arena_state_payload<false> in
@@ -377,7 +434,9 @@ namespace net_messages {
 
 		NSR_LOG("Compressed stream size: %x", size);
 
-		if (size < sizeof(uint32_t)) {
+		const bool size_written_properly = size >= sizeof(uint32_t);
+
+		if (!size_written_properly) {
 			return false;
 		}
 
@@ -424,7 +483,9 @@ namespace net_messages {
 		return true;
 	}
 
-	inline const std::vector<std::byte>* initial_arena_state::write_payload(
+	template <class F>
+	inline bool initial_arena_state::write_payload(
+		F block_allocator,
 		augs::serialization_buffers& buffers,
 		const initial_arena_state_payload<true> in
 	) {
@@ -474,6 +535,9 @@ namespace net_messages {
 			NSR_LOG("Compressed stream size: %x", c.size());
 		}
 
-		return std::addressof(c);
+		auto block = block_allocator(c.size());
+		std::memcpy(block, c.data(), c.size());
+
+		return true;
 	}
 }

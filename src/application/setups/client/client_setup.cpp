@@ -19,6 +19,8 @@
 
 #include "augs/templates/introspection_utils/introspective_equal.h"
 #include "augs/gui/text/printer.h"
+#include "augs/readwrite/byte_file.h"
+#include "application/network/payload_easily_movable.h"
 
 client_setup::client_setup(
 	sol::state& lua,
@@ -160,12 +162,6 @@ double client_setup::get_audiovisual_speed() const {
 }
 
 using initial_payload = initial_arena_state_payload<false>;
-
-template <class T>
-constexpr bool payload_easily_movable_v = !is_one_of_v<
-	T,
-	initial_payload
->;
 
 std::string chat_entry_type::get_author_string() const {
 	auto result = author;
@@ -371,6 +367,25 @@ message_handler_result client_setup::handle_server_message(
 		//LOG("Received %x th entropy from the server", receiver.incoming_entropies.size());
 		//LOG_NVPS(payload.num_entropies_accepted);
 	}
+	else if constexpr (std::is_same_v<T, net_statistics_update>) {
+
+	}
+	else if constexpr (std::is_same_v<T, arena_player_avatar_payload>) {
+		uint32_t client_id;
+		arena_player_avatar_payload new_avatar;
+
+		const bool result = read_payload(
+			client_id,
+			new_avatar
+		);
+
+		if (!result) {
+			return abort_v;
+		}
+
+		player_metas[client_id].avatar = std::move(new_avatar);
+		rebuild_player_meta_viewables = true;
+	}
 	else {
 		static_assert(always_false_v<T>, "Unhandled payload type.");
 	}
@@ -542,6 +557,24 @@ void client_setup::send_pending_commands() {
 
 	if (init_send) {
 		send_settings();
+
+		const auto& avatar_path = vars.avatar_image_path;
+
+		if (!avatar_path.empty()) {
+			arena_player_avatar_payload payload;
+			payload.png_bytes = augs::file_to_bytes(avatar_path);
+
+			if (payload.png_bytes.size() <= max_avatar_bytes_v) {
+				uint32_t dummy_client_id = 0;
+
+				client->send_payload(
+					game_channel_type::COMMUNICATIONS,
+
+					dummy_client_id,
+					payload
+				);
+			}
+		}
 	}
 	else if (resend_requested_settings) {
 		if (client_time - when_sent_client_settings > 1.0) {
@@ -986,4 +1019,13 @@ void client_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
 	}
 
 	arena_base::draw_custom_gui(in);
+}
+
+std::optional<arena_player_metas> client_setup::get_new_player_metas() {
+	if (rebuild_player_meta_viewables) {
+		rebuild_player_meta_viewables = false;
+		return player_metas;
+	}
+
+	return std::nullopt;
 }

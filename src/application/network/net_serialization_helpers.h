@@ -46,6 +46,20 @@ namespace net_messages {
 	}
 
 	template <class Stream>
+	bool serialize_vector_uint8_t(Stream& s, std::vector<uint8_t>& e, const int mini, const int maxi) {
+		auto length = static_cast<int>(e.size());
+
+		serialize_int(s, length, mini, maxi);
+
+		if (Stream::IsReading) {
+			e.resize(length);
+		}
+
+		serialize_bytes(s, (uint8_t*)e.data(), length);
+		return true;
+	}
+
+	template <class Stream>
 	bool serialize(Stream& s, ::client_requested_chat& c) {
 		if (!serialize_enum(s, c.target)) {
 			LOG("FAILED TO SERIALIZE ENUM! %x", int(c.target));
@@ -68,6 +82,11 @@ namespace net_messages {
 			&& serialize_enum(s, c.target)
 			&& serialize_fixed_size_str(s, c.message)
 		;
+	}
+
+	template <class Stream>
+	bool serialize(Stream& s, ::net_statistics_update& c) {
+		return serialize_vector_uint8_t(s, c.ping_values, 0, max_incoming_connections_v);
 	}
 
 	template <class Stream>

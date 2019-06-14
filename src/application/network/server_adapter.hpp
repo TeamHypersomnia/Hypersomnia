@@ -27,7 +27,7 @@ void server_adapter::advance(const net_time_t server_time, H&& handler) {
 
 	process_connections_disconnections(std::forward<H>(handler));
 
-    for (int i = 0; i < yojimbo::MaxClients; i++) {
+	for (int i = 0; i < static_cast<int>(max_incoming_connections_v); i++) {
         if (server.IsClientConnected(i)) {
             for (int j = 0; j < connection_config.numChannels; j++) {
 				auto receive_next = [&]() {
@@ -124,27 +124,37 @@ translated_payload_id server_adapter::translate_payload(
 	if (const auto new_message = create_message<net_message_type>(client_id)) {
 		auto& m = *new_message;
 
-		const auto translation_result = m.write_payload(
-			std::forward<Args>(args)...
-		);
-
 		if constexpr (is_block_message_v) {
-			const auto serialized_bytes = translation_result;
+			uint8_t* allocated_block = nullptr;
+			std::size_t allocated_size = 0;
 
-			if (serialized_bytes != nullptr) {
-				const auto result_size = serialized_bytes->size();
-				const auto memory = get_specific().AllocateBlock(client_id, result_size);
+			auto allocate_block = [&](const std::size_t requested_size) {
+				allocated_size = requested_size;
+				allocated_block = get_specific().AllocateBlock(client_id, requested_size);
 
-				std::memcpy(memory, serialized_bytes->data(), result_size);
-				get_specific().AttachBlockToMessage(client_id, new_message, memory, result_size);
+				return allocated_block;
+			};
 
+			const auto translation_result = m.write_payload(
+				allocate_block,
+				std::forward<Args>(args)...
+			);
+
+			if (translation_result && allocated_block != nullptr) {
+				get_specific().AttachBlockToMessage(client_id, new_message, allocated_block, allocated_size);
 				return new_message;
 			}
 
-			return nullptr;
+			get_specific().FreeBlock(client_id, allocated_block);
 		}
 		else {
-			return new_message;
+			const auto translation_result = m.write_payload(
+				std::forward<Args>(args)...
+			);
+
+			if (translation_result) {
+				return new_message;
+			}
 		}
 	}
 

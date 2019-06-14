@@ -20,6 +20,7 @@ struct server_vars {
 	unsigned max_buffered_client_commands = 1000;
 
 	unsigned state_hash_once_every_tick = 1;
+	float send_net_statistics_update_once_every_secs = 1;
 
 	augs::maybe_network_simulator network_simulator;
 

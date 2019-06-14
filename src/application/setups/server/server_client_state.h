@@ -7,6 +7,8 @@
 #include "application/network/requested_client_settings.h"
 #include "application/network/client_state_type.h"
 
+#include "view/mode_gui/arena/arena_player_meta.h"
+
 using client_pending_entropies = std::vector<total_client_entropy>;
 
 struct server_client_state {
@@ -22,6 +24,8 @@ struct server_client_state {
 	unsigned resyncs_counter = 0;
 	net_time_t last_resync_counter_reset_at = 0;
 	unsigned unauthorized_rcon_commands = 0;
+
+	arena_player_meta meta;
 
 	server_client_state() = default;
 

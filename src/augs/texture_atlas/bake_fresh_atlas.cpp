@@ -37,9 +37,9 @@ void bake_fresh_atlas(
 
 	std::unordered_map<source_font_identifier, augs::font> loaded_fonts;
 
-	static std::vector<rect_xywhf> rects_for_packer;
+	thread_local std::vector<rect_xywhf> rects_for_packer;
 	rects_for_packer.clear();
-	rects_for_packer.reserve(subjects.images.size());
+	rects_for_packer.reserve(subjects.count_images());
 
 #if DEBUG_FILL_IMGS_WITH_COLOR
 	thread_local randomization rng;
@@ -55,6 +55,30 @@ void bake_fresh_atlas(
 				const auto u_size = [&]() { 
 					auto sc = measure_scope(scope); 
 					return augs::image::get_size(input_img_id); 
+				}();
+
+				out_entry.cached_original_size_pixels = u_size;
+
+				const auto size = vec2i(u_size);
+				rects_for_packer.push_back(rect_xywh(0, 0, size.x, size.y));
+			}
+			catch (const augs::image_loading_error& err) {
+				out_entry.cached_original_size_pixels = vec2u::zero;
+				rects_for_packer.push_back(rect_xywh(0, 0, 0, 0));
+			}
+		}
+
+		baked.loaded_pngs.resize(subjects.loaded_pngs.size());
+
+		for (const auto& input_png_bytes : subjects.loaded_pngs) {
+			const auto input_img_id = index_in(subjects.loaded_pngs, input_png_bytes);
+
+			auto& out_entry = baked.loaded_pngs[input_img_id];
+
+			try {
+				const auto u_size = [&]() { 
+					auto sc = measure_scope(scope); 
+					return augs::image::get_png_size(input_png_bytes); 
 				}();
 
 				out_entry.cached_original_size_pixels = u_size;
@@ -172,16 +196,16 @@ void bake_fresh_atlas(
 #endif
 
 	{
-		static std::vector<std::vector<std::byte>> all_loaded_bytes;
+		thread_local std::vector<std::vector<std::byte>> all_loaded_bytes;
 
 		{
 			auto scope = measure_scope(out.profiler.loading_images);
 
 			const auto images_n = subjects.images.size();
 
-			if (images_n > all_loaded_bytes.size()) {
-				all_loaded_bytes.resize(images_n);
-			}
+				if (images_n > all_loaded_bytes.size()) {
+					all_loaded_bytes.resize(images_n);
+				}
 
 			for (const auto& input_img_id : subjects.images) {
 				const auto current_rect = index_in(subjects.images, input_img_id);
@@ -208,14 +232,22 @@ void bake_fresh_atlas(
 			}
 		};
 
-		static std::vector<worker_input> worker_inputs;
+		thread_local std::vector<worker_input> worker_inputs;
 
 		{
 			auto scope = measure_scope(out.profiler.making_worker_inputs);
-			worker_inputs.resize(subjects.images.size());
+			worker_inputs.resize(subjects.count_images());
 
-			for (auto& r : subjects.images) {
+			for (const auto& r : subjects.images) {
 				const auto current_rect = static_cast<unsigned>(index_in(subjects.images, r));
+				const auto area = static_cast<unsigned>(rects_for_packer[current_rect].area());
+
+				worker_inputs[current_rect].image_area = area;
+				worker_inputs[current_rect].original_index = current_rect;
+			}
+
+			for (const auto& r : subjects.loaded_pngs) {
+				const auto current_rect = subjects.images.size() + static_cast<unsigned>(index_in(subjects.loaded_pngs, r));
 				const auto area = static_cast<unsigned>(rects_for_packer[current_rect].area());
 
 				worker_inputs[current_rect].image_area = area;
@@ -228,11 +260,21 @@ void bake_fresh_atlas(
 		auto scope = measure_scope(out.profiler.blitting_images);
 
 		auto worker = [&output_image, &subjects, &baked, output_image_size](const worker_input& input) {
+			const bool is_loaded_png = input.original_index >= subjects.images.size();
+			const auto loaded_png_index = input.original_index - subjects.images.size();
+
 			const auto current_rect = input.original_index;
-			const auto& input_img_id = subjects.images[current_rect];
+
+			const auto& input_img_id = 
+				is_loaded_png ? 
+				augs::path_type() : 
+				subjects.images[current_rect]
+			;
+
 			const auto packed_rect = rects_for_packer[current_rect];
 
-			auto& output_entry = baked.images[input_img_id];
+			auto& output_entry = is_loaded_png ? baked.loaded_pngs[loaded_png_index] : baked.images[input_img_id];
+			const auto& error_reported_img_id = input_img_id;
 
 			auto set_glitch_uv = [&output_entry, output_image_size](){
 				output_entry.atlas_space.set(0.f, 0.f, 1.f, 1.f);
@@ -263,15 +305,21 @@ void bake_fresh_atlas(
 			output_entry.was_flipped = packed_rect.flipped;
 			output_entry.was_successfully_packed = true;
 
-			thread_local augs::image loaded_image;
+			thread_local augs::image loaded_png;
 
-			if (all_loaded_bytes[current_rect].empty()) {
+			const auto& source_bytes = 
+				is_loaded_png ?
+				subjects.loaded_pngs[loaded_png_index] :
+				all_loaded_bytes[current_rect]
+			;
+
+			if (source_bytes.empty()) {
 				set_glitch_uv();
 				return;
 			}
 
 			try {
-				loaded_image.from_png(all_loaded_bytes[current_rect], input_img_id);
+				loaded_png.from_png(source_bytes, error_reported_img_id);
 			}
 			catch (...) {
 				set_glitch_uv();
@@ -279,11 +327,11 @@ void bake_fresh_atlas(
 			}
 
 #if DEBUG_FILL_IMGS_WITH_COLOR
-			loaded_image.fill(rgba(white).set_hsv({ rng.randval(0.0f, 1.0f), rng.randval(0.3f, 1.0f), rng.randval(0.3f, 1.0f) }));
+			loaded_png.fill(rgba(white).set_hsv({ rng.randval(0.0f, 1.0f), rng.randval(0.3f, 1.0f), rng.randval(0.3f, 1.0f) }));
 #endif
 			augs::blit(
 				output_image,
-				loaded_image,
+				loaded_png,
 				{
 					static_cast<unsigned>(packed_rect.x + 1),
 					static_cast<unsigned>(packed_rect.y + 1)
@@ -293,7 +341,7 @@ void bake_fresh_atlas(
 
 			augs::blit_border(
 				output_image,
-				loaded_image,
+				loaded_png,
 				{
 					static_cast<unsigned>(packed_rect.x + 1),
 					static_cast<unsigned>(packed_rect.y + 1)
@@ -303,13 +351,13 @@ void bake_fresh_atlas(
 		};
 
 #if 1
-		for (auto& r : subjects.images) {
-			worker(worker_inputs[index_in(subjects.images, r)]);
+		for (const auto& w : worker_inputs) {
+			worker(w);
 		}
 #else
 		const auto num_workers = std::size_t(in.blitting_threads);
 
-		static augs::range_workers<decltype(worker)> workers = num_workers;
+		thread_local augs::range_workers<decltype(worker)> workers = num_workers;
 		workers.resize_workers(num_workers);
 		workers.process(worker, worker_inputs);
 #endif

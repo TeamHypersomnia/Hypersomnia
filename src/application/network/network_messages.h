@@ -6,6 +6,8 @@
 #include "application/network/special_client_request.h"
 #include "application/network/rcon_command.h"
 #include "application/setups/server/chat_structs.h"
+#include "application/setups/server/net_statistics_update.h"
+#include "view/mode_gui/arena/arena_player_meta.h"
 
 #define LOG_NET_SERIALIZATION !IS_PRODUCTION_BUILD
 
@@ -56,8 +58,6 @@ struct preserialized_message : public yojimbo::Message {
 };
 
 struct only_block_message : public yojimbo::BlockMessage {
-	/* The client will never send blocks */
-
 	static constexpr bool server_to_client = true;
 	static constexpr bool client_to_server = false;
 
@@ -121,7 +121,9 @@ namespace net_messages {
 			initial_arena_state_payload<false>
 		);
 
-		const std::vector<std::byte>* write_payload(
+		template <class F>
+		bool write_payload(
+			F block_allocator,
 			augs::serialization_buffers&,
 			initial_arena_state_payload<true>
 		);
@@ -210,6 +212,38 @@ namespace net_messages {
 		bool read_payload(::server_broadcasted_chat&);
 	};
 
+	struct net_statistics_update : public yojimbo::Message {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = false;
+
+		template <typename Stream>
+		bool Serialize(Stream& stream);
+
+		::net_statistics_update payload;
+
+		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
+
+		bool write_payload(const ::net_statistics_update&);
+		bool read_payload(::net_statistics_update&);
+	};
+
+	struct player_avatar_exchange : only_block_message {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = true;
+
+		bool read_payload(
+			uint32_t& client_id,
+			arena_player_avatar_payload&
+		);
+
+		template <class F>
+		bool write_payload(
+			F block_allocator,
+			const uint32_t& client_id,
+			const arena_player_avatar_payload&
+		);
+	};
+
 	using all_t = type_list<
 		client_welcome*,
 		new_server_vars*,
@@ -224,7 +258,9 @@ namespace net_messages {
 
 		rcon_command*,
 		client_requested_chat*,
-		server_broadcasted_chat*
+		server_broadcasted_chat*,
+		net_statistics_update*,
+		player_avatar_exchange*
 	>;
 	
 	using id_t = type_in_list_id<all_t>;

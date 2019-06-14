@@ -12,6 +12,10 @@ void viewables_streaming::finalize_pending_tasks() {
 	if (future_general_atlas.valid()) {
 		future_general_atlas.get();
 	}
+
+	if (future_avatar_atlas.valid()) {
+		future_avatar_atlas.get();
+	}
 }
 
 viewables_streaming::~viewables_streaming() {
@@ -35,6 +39,10 @@ viewables_streaming::viewables_streaming(augs::renderer& renderer) {
 #endif
 }
 
+bool viewables_streaming::finished_loading_player_metas() const {
+	return !future_avatar_atlas.valid();
+}
+
 void viewables_streaming::load_all(const viewables_load_input in) {
 	const auto& new_all_defs = in.new_defs;
 	auto& now_all_defs = now_loaded_viewables_defs;
@@ -45,7 +53,29 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 	const auto& unofficial_content_dir = in.unofficial_content_dir;
 	const auto max_atlas_size = in.max_atlas_size;
 
-	/* Atlas pass */
+	/* Avatar atlas pass */
+	if (finished_loading_player_metas()) {
+		if (in.new_player_metas != std::nullopt) {
+			avatar_pbo_fallback.clear();
+
+			auto avatar_atlas_in = avatar_atlas_input {
+				std::move(*in.new_player_metas),
+				max_atlas_size,
+
+				nullptr,
+				avatar_pbo_fallback
+			};
+
+			future_avatar_atlas = std::async(
+				std::launch::async,
+				[avatar_atlas_in]() { 
+					return create_avatar_atlas(avatar_atlas_in);
+				}
+			);
+		}
+	}
+
+	/* General atlas pass */
 
 	if (!future_general_atlas.valid()) {
 		bool new_atlas_required = settings.regenerate_every_time;
@@ -232,6 +262,15 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 
 void viewables_streaming::finalize_load(viewables_finalize_input in) {
 	auto& now_all_defs = now_loaded_viewables_defs;
+
+	if (valid_and_is_ready(future_avatar_atlas)) {
+		auto result = future_avatar_atlas.get();
+
+		avatars_in_atlas = std::move(result.atlas_entries);
+
+		const auto atlas_size = result.atlas_size;
+		avatar_atlas.emplace(atlas_size, avatar_pbo_fallback.data());
+	}
 
 	/* Unpack results of asynchronous asset loading */
 

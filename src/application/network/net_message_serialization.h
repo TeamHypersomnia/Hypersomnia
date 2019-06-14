@@ -89,4 +89,13 @@ namespace net_messages {
 
 		return true;
 	}
+
+	template <typename Stream>
+	bool net_statistics_update::Serialize(Stream& stream) {
+		if (!serialize(stream, payload)) {
+			return false;
+		}
+
+		return true;
+	}
 }

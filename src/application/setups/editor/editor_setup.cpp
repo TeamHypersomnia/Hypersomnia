@@ -705,7 +705,7 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 		}
 	}
 
-	if (open_folder_dialog.valid() && is_ready(open_folder_dialog)) {
+	if (::valid_and_is_ready(open_folder_dialog)) {
 		const auto result_path = open_folder_dialog.get();
 
 		if (result_path) {
@@ -714,7 +714,7 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 	}
 
 	if (anything_opened()) {
-		if (save_folder_dialog.valid() && is_ready(save_folder_dialog)) {
+		if (::valid_and_is_ready(save_folder_dialog)) {
 			if (const auto result_path = save_folder_dialog.get()) {
 				const auto& p = *result_path;
 
@@ -727,7 +727,7 @@ custom_imgui_result editor_setup::perform_custom_imgui(const perform_custom_imgu
 			}
 		}
 
-		if (export_folder_dialog.valid() && is_ready(export_folder_dialog)) {
+		if (::valid_and_is_ready(export_folder_dialog)) {
 			if (const auto result_path = export_folder_dialog.get()) {
 				const auto& p = *result_path;
 

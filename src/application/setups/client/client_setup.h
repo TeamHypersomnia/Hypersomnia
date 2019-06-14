@@ -39,6 +39,8 @@
 #include "application/network/special_client_request.h"
 #include "application/setups/client/rcon_gui.h"
 #include "application/setups/client/chat_gui.h"
+#include "view/mode_gui/arena/arena_player_meta.h"
+#include "augs/texture_atlas/loaded_png_vector.h"
 
 struct config_lua_table;
 
@@ -70,6 +72,8 @@ class client_setup :
 	special_client_request pending_request = special_client_request::NONE;
 	bool now_resyncing = false;
 
+	std::array<arena_player_meta, max_incoming_connections_v> player_metas;
+
 	/* The rest is client-specific */
 	sol::state& lua;
 
@@ -97,6 +101,7 @@ class client_setup :
 
 	rcon_gui_state rcon_gui;
 	chat_gui_state chat_gui;
+	bool rebuild_player_meta_viewables = false;
 	/* No client state follows later in code. */
 
 	static net_time_t get_current_time();
@@ -534,4 +539,6 @@ public:
 	decltype(auto) on_mode_with_input(F&& callback) const {
 		return get_arena_handle().on_mode_with_input(std::forward<F>(callback));
 	}
+
+	std::optional<arena_player_metas> get_new_player_metas();
 };

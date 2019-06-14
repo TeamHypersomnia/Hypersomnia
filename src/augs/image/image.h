@@ -67,8 +67,14 @@ namespace augs {
 		vec2u size;
 	public:
 
+		enum class scale_method {
+			NEAREST,
+			BILINEAR
+		};
+
 		static vec2u get_size(const path_type& file_path);
-		
+		static vec2u get_png_size(const std::vector<std::byte>& bytes);
+
 		image(const vec2u image_size = {});
 		
 		image(
@@ -115,6 +121,7 @@ namespace augs {
 
 		void from_binary_file(const path_type& path);
 
+		std::vector<std::byte> to_png_bytes() const;
 		void save_as_png(const path_type& path) const;
 		void save_as_binary_file(const path_type& path) const;
 

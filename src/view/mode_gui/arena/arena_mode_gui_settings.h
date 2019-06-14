@@ -37,6 +37,7 @@ struct scoreboard_gui_settings {
 
 	float faction_logo_alpha = 0.8f;
 	float icon_alpha = 0.8f;
+	float avatar_alpha = 1.f;
 	bool dark_color_overlay_under_score = false;
 	// END GEN INTROSPECTOR
 };
