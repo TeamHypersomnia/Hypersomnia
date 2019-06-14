@@ -428,7 +428,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/necessary_resources.cpp"
 	"src/view/audiovisual_state/audiovisual_state.cpp"
 	"src/view/viewables/loaded_sounds_map.cpp"
-	"src/view/viewables/atlas_distributions.cpp"
+	"src/view/viewables/standard_atlas_distribution.cpp"
 	"src/view/viewables/all_viewables_defs.cpp"
 	"src/view/audiovisual_state/audiovisual_profiler.cpp"
 	"src/view/viewables/image_cache.cpp"
