@@ -4,6 +4,10 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Fix crash when server starts with a non-existent map?
+	- Actually that's a solvable error
+	- Would be nice to gracefully quit though
+
 - bomb soon explodes theme gets repeated
 	- unimportant: perhaps it was 
 

@@ -709,14 +709,16 @@ void arena_scoreboard_gui::draw_gui(
 	}
 
 	if (avatar_triangles.size() > 0) {
-		// TODO: Use find_current instead of explicitly using general atlas!!!
+		auto previous_texture = augs::graphics::texture::find_current();
+
 		in.renderer.call_and_clear_triangles();
-		in.avatar_atlas->bind();
+		in.avatar_atlas->set_as_current();
 
 		in.renderer.call_triangles(avatar_triangles);
 
 		in.renderer.call_and_clear_triangles();
-		in.general_atlas->bind();
+
+		augs::graphics::texture::set_current_to(previous_texture);
 	}
 
 	if (color_indicator_triangles.size() > 0) {

@@ -106,7 +106,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto filtering = renderer.get_current_settings().default_filtering;
 
 	auto bind_and_set_filter = [&](auto& tex) {
-		tex.bind();
+		tex.set_as_current();
 		tex.set_filtering(filtering);
 	};
 
@@ -926,6 +926,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	shaders.standard->set_projection(matrix);
 
 	if (in.general_atlas) {
-		in.general_atlas->bind();
+		in.general_atlas->set_as_current();
 	}
 }

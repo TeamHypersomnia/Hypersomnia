@@ -1672,6 +1672,11 @@ int work(const int argc, const char* const * const argv) try {
 					- Or, the cursor of the game gui, with maybe tooltip, with maybe dragged item's ghost, if we're in-game in GUI mode.
 		*/
 
+		if (streaming.general_atlas == std::nullopt) {
+			/* Set imgui atlas as a fallback texture as it has some white pixels */
+			imgui_atlas.set_as_current();
+		}
+
 		renderer.set_viewport({ vec2i{0, 0}, screen_size });
 
 		const bool rendering_flash_afterimage = gameplay_camera.is_flash_afterimage_requested();
@@ -1807,7 +1812,10 @@ int work(const int argc, const char* const * const argv) try {
 			});
 		}
 		else {
-			streaming.general_atlas->bind();
+			if (streaming.general_atlas != std::nullopt) {
+				streaming.general_atlas->set_as_current();
+			}
+
 			necessary_shaders.standard->set_as_current();
 			necessary_shaders.standard->set_projection(augs::orthographic_projection(vec2(screen_size)));
 
@@ -1857,12 +1865,23 @@ int work(const int argc, const char* const * const argv) try {
 			/* #6 */
 			auto scope = measure_scope(frame_performance.imgui);
 
+			const augs::graphics::texture* game_world_atlas = nullptr;
+			const augs::graphics::texture* avatar_atlas = nullptr;
+			const augs::graphics::texture* avatar_preview_atlas = nullptr;
+
 			if (streaming.general_atlas.has_value()) {
-				renderer.draw_call_imgui(imgui_atlas, std::addressof(streaming.general_atlas.value()));
+				game_world_atlas = std::addressof(streaming.general_atlas.value());
 			}
-			else {
-				renderer.draw_call_imgui(imgui_atlas, nullptr);
+			
+			if (streaming.avatar_atlas.has_value()) {
+				avatar_atlas = std::addressof(streaming.avatar_atlas.value());
 			}
+
+			if (start_client_gui.avatar_preview_tex.has_value()) {
+				avatar_preview_atlas = std::addressof(start_client_gui.avatar_preview_tex.value());
+			}
+
+			renderer.draw_call_imgui(imgui_atlas, game_world_atlas, avatar_atlas, avatar_preview_atlas);
 		}
 
 		{
@@ -1901,7 +1920,7 @@ int work(const int argc, const char* const * const argv) try {
 			}
 		}
 
-		{
+		if (streaming.general_atlas != std::nullopt) {
 			const auto flash_mult = gameplay_camera.get_effective_flash_mult();
 
 			if (flash_mult > 0 || rendering_flash_afterimage) {
@@ -1914,7 +1933,7 @@ int work(const int argc, const char* const * const argv) try {
 					augs::graphics::fbo::set_current_to_none();
 				}
 
-				necessary_fbos.flash_afterimage->get_texture().bind();
+				necessary_fbos.flash_afterimage->get_texture().set_as_current();
 				necessary_shaders.flash_afterimage->set_as_current();
 				necessary_shaders.flash_afterimage->set_projection(augs::orthographic_projection(vec2(screen_size)));
 
@@ -1934,7 +1953,7 @@ int work(const int argc, const char* const * const argv) try {
 				renderer.call_and_clear_triangles();
 
 				necessary_shaders.standard->set_as_current();
-				streaming.general_atlas->bind();
+				streaming.general_atlas->set_as_current();
 			}
 
 			if (!rendering_flash_afterimage) {

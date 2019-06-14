@@ -43,6 +43,7 @@ void client_setup::init_connection(const client_start_input& in) {
 	when_initiated_connection = get_current_time();
 	receiver.clear();
 	last_disconnect_reason.clear();
+	print_only_disconnect_reason = false;
 	client_time = get_current_time();
 	pending_request = special_client_request::NONE;
 	now_resyncing = false;
@@ -222,7 +223,7 @@ message_handler_result client_setup::handle_server_message(
 				);
 			}
 			catch (const augs::file_open_error& err) {
-				last_disconnect_reason = typesafe_sprintf(
+				set_disconnect_reason(typesafe_sprintf(
 					"Failed to load arena: \"%x\".\n"
 					"The arena files might be corrupt, or they might be missing.\n"
 					"Please check if \"%x\" folder resides within \"%x\" directory.\n"
@@ -231,7 +232,7 @@ message_handler_result client_setup::handle_server_message(
 					new_arena,
 					"arenas",
 					err.what()
-				);
+				));
 
 				return abort_v;
 			}
@@ -251,35 +252,42 @@ message_handler_result client_setup::handle_server_message(
 			}
 		);
 
+		std::string sender_player_nickname;
+		auto sender_player_faction = faction_type::SPECTATOR;
+
 		if (sender_player != nullptr) {
-			const auto& sender_player_nickname = sender_player->chosen_name;
-			const auto& sender_player_faction = sender_player->faction;
-
-			chat_entry_type new_entry;
-
-			new_entry.timestamp = get_current_time();
-			new_entry.author = sender_player_nickname;
-			new_entry.author_faction = sender_player_faction;
-			new_entry.message = payload.message;
-
-			new_entry.faction_specific = payload.target == chat_target_type::TEAM_ONLY;
-
-			LOG(new_entry.operator std::string());
-			chat_gui.history.emplace_back(std::move(new_entry));
+			sender_player_faction = sender_player->faction;
+			sender_player_nickname = sender_player->chosen_name;
 		}
-		else {
-			chat_entry_type new_entry;
 
-			new_entry.timestamp = get_current_time();
-			new_entry.faction_specific = false;
-			new_entry.author_faction = faction_type::DEFAULT;
-			new_entry.message = payload.message;
+		auto new_entry = payload.translate(
+			get_current_time(),
+			sender_player_nickname,
+			sender_player_faction
+		);
 
-			new_entry.special_message_color = rgba(200, 200, 200, 255);
+		LOG(new_entry.operator std::string());
+		chat_gui.history.emplace_back(std::move(new_entry));
 
-			LOG(new_entry.operator std::string());
-			chat_gui.history.emplace_back(std::move(new_entry));
-		}
+		if (payload.should_disconnect_now(client_player_id)) {
+			std::string kicked_or_banned;
+
+			if (payload.target == chat_target_type::KICK) {
+				kicked_or_banned = "kicked";
+			}
+			else if (payload.target == chat_target_type::BAN) {
+				kicked_or_banned = "banned";
+			}
+
+			set_disconnect_reason(typesafe_sprintf(
+				"You were %x from the server.\nReason: %x", 
+				kicked_or_banned,
+				std::string(payload.message)
+			), true);
+
+			LOG_NVPS(last_disconnect_reason);
+			return abort_v;
+		}	
 	}
 	else if constexpr (std::is_same_v<T, initial_payload>) {
 		if (!now_resyncing && state != client_state_type::RECEIVING_INITIAL_STATE) {
@@ -353,11 +361,11 @@ message_handler_result client_setup::handle_server_message(
 		const auto num_commands = receiver.incoming_entropies.size();
 
 		if (num_commands > max_commands) {
-			last_disconnect_reason = typesafe_sprintf(
+			set_disconnect_reason(typesafe_sprintf(
 				"Number of buffered server commands (%x) exceeded max_buffered_server_commands (%x).", 
 				num_commands,
 				max_commands
-			);
+			));
 
 			LOG_NVPS(last_disconnect_reason);
 
@@ -605,7 +613,7 @@ void client_setup::send_packets_if_its_time() {
 }
 
 void client_setup::log_malicious_server() {
-	last_disconnect_reason = "The client is broken or the server might be malicious.\nPlease report this fact to the developers - send them the files in cache/usr/log.";
+	set_disconnect_reason("The client is broken or the server might be malicious.\nPlease report this fact to the developers - send them the files in cache/usr/log.", true);
 
 #if !IS_PRODUCTION_BUILD
 	ensure(false && "Server has sent some invalid data.");
@@ -746,7 +754,12 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				return;
 			}
 
-			text("Reason:\n\n%x", last_disconnect_reason);
+			if (print_only_disconnect_reason) {
+				text(last_disconnect_reason);
+			}
+			else {
+				text("Reason:\n\n%x", last_disconnect_reason);
+			}
 		};
 
 		const auto window_name = "Connection status";
@@ -796,7 +809,9 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			}
 		}
 		else if (client->is_disconnected()) {
-			text("Connection has ended.");
+			if (!print_only_disconnect_reason) {
+				text("Connection has ended.");
+			}
 
 			print_reason_if_any();
 
@@ -1001,7 +1016,7 @@ void client_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
 		const auto author_text = ko.get_author_string();
 
 		const auto author_col = get_col(ko.author_faction);
-		const auto message_col = ko.special_message_color == rgba::zero ? white : ko.special_message_color;
+		const auto message_col = ko.overridden_message_color == rgba::zero ? white : ko.overridden_message_color;
 
 		const auto total_text = colored(author_text, author_col) + colored(ko.message, message_col);
 

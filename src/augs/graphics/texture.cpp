@@ -4,11 +4,12 @@
 
 namespace augs {
 	namespace graphics {
-		void texture::bind() const {
+		bool texture::set_as_current_impl() const {
 			GL_CHECK(glBindTexture(GL_TEXTURE_2D, id));
+			return true;
 		}
 
-		void texture::unbind() {
+		void texture::set_current_to_none_impl() {
 			GL_CHECK(glBindTexture(GL_TEXTURE_2D, 0));
 		}
 
@@ -85,7 +86,7 @@ namespace augs {
 		void texture::create() {
 			GL_CHECK(glGenTextures(1, &id));
 
-			bind();
+			set_as_current();
 
 			set_filtering_impl(current_filtering);
 			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));

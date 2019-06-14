@@ -27,6 +27,7 @@
 #include "application/network/network_common.h"
 
 #include "augs/build_settings/setting_dump.h"
+#include "application/setups/server/chat_structs.h"
 
 #if DUMP_BEFORE_AND_AFTER_ROUND_START
 #include "game/modes/dump_for_debugging.h"
@@ -283,6 +284,10 @@ public:
 
 	void disconnect_and_unset(const client_id_type&);
 
+	void kick(const client_id_type&, const std::string& reason);
+	void kick_if_debug(const client_id_type&, const std::string& reason);
+	void ban(const client_id_type&, const std::string& reason);
+
 	mode_player_id get_local_player_id() const {
 		return get_admin_player_id();
 	}
@@ -313,4 +318,7 @@ public:
 	decltype(auto) on_mode_with_input(F&& callback) const {
 		return get_arena_handle().on_mode_with_input(std::forward<F>(callback));
 	}
+
+	void broadcast(const ::server_broadcasted_chat&);
+	std::string find_client_nickname(const client_id_type&) const;
 };

@@ -266,12 +266,16 @@ namespace augs {
 
 	void renderer::draw_call_imgui(
 		const graphics::texture& imgui_atlas,
-		const graphics::texture* game_world_atlas
+		const graphics::texture* game_world_atlas,
+		const graphics::texture* avatar_atlas,
+		const graphics::texture* avatar_preview_atlas
 	) {
 		const auto* const draw_data = ImGui::GetDrawData();
 
+		const auto previous_texture = graphics::texture::find_current();
+
 		if (draw_data != nullptr) {
-			imgui_atlas.bind();
+			imgui_atlas.set_as_current();
 
 			ImGuiIO& io = ImGui::GetIO();
 			// const int fb_width = static_cast<int>(io.DisplaySize.x * io.DisplayFramebufferScale.x);
@@ -299,7 +303,21 @@ namespace augs {
 
 					if (atlas_type == augs::imgui_atlas_type::GAME) {
 						if (game_world_atlas != nullptr) {
-							game_world_atlas->bind();
+							game_world_atlas->set_as_current();
+							rebind = true;
+						}
+					}
+
+					if (atlas_type == augs::imgui_atlas_type::AVATARS) {
+						if (avatar_atlas != nullptr) {
+							avatar_atlas->set_as_current();
+							rebind = true;
+						}
+					}
+					
+					if (atlas_type == augs::imgui_atlas_type::AVATAR_PREVIEW) {
+						if (avatar_preview_atlas != nullptr) {
+							avatar_preview_atlas->set_as_current();
 							rebind = true;
 						}
 					}
@@ -310,16 +328,14 @@ namespace augs {
 					idx_buffer_offset += pcmd->ElemCount;
 
 					if (rebind) {
-						imgui_atlas.bind();
+						imgui_atlas.set_as_current();
 					}
 				}
 			}
 
 			GL_CHECK(glDisable(GL_SCISSOR_TEST));
 
-			if (game_world_atlas != nullptr) {
-				game_world_atlas->bind();
-			}
+			augs::graphics::texture::set_current_to(previous_texture);
 		}
 	}
 

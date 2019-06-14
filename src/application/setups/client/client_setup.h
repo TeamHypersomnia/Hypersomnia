@@ -98,11 +98,18 @@ class client_setup :
 	double default_inv_tickrate = 1 / 128.0;
 
 	std::string last_disconnect_reason;
+	bool print_only_disconnect_reason = false;
 
 	rcon_gui_state rcon_gui;
 	chat_gui_state chat_gui;
 	bool rebuild_player_meta_viewables = false;
 	/* No client state follows later in code. */
+
+	template <class T>
+	void set_disconnect_reason(T&& reason, bool print_only_reason = false) {
+		last_disconnect_reason = std::forward<T>(reason);
+		print_only_disconnect_reason = print_only_reason;
+	}
 
 	static net_time_t get_current_time();
 
@@ -397,14 +404,6 @@ public:
 							}
 						);
 #endif
-
-#if DISCONNECT_ON_DESYNC
-						last_disconnect_reason = typesafe_sprintf(
-							"The client has desynchronized from the server."
-						);
-
-						disconnect();
-#endif
 					}
 				}
 
@@ -418,11 +417,11 @@ public:
 						const auto num_commands = p.size();
 
 						if (num_commands > max_commands) {
-							last_disconnect_reason = typesafe_sprintf(
+							set_disconnect_reason(typesafe_sprintf(
 								"Number of predicted commands (%x) exceeded max_predicted_client_commands (%x).", 
 								num_commands,
 								max_commands
-							);
+							));
 
 							disconnect();
 						}

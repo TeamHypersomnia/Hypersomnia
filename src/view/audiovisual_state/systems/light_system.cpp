@@ -465,6 +465,6 @@ void light_system::render_all_lights(const light_system_input in) const {
 	augs::graphics::fbo::set_current_to(default_fbo);
 
 	renderer.set_active_texture(2);
-	in.light_fbo.get_texture().bind();
+	in.light_fbo.get_texture().set_as_current();
 	renderer.set_active_texture(0);
 }

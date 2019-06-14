@@ -10,7 +10,7 @@ struct chat_entry_type {
 	bool faction_specific = false;
 
 	std::string message;
-	rgba special_message_color = rgba::zero;
+	rgba overridden_message_color = rgba::zero;
 
 	std::string get_author_string() const;
 	explicit operator std::string() const;

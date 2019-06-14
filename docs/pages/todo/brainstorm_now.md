@@ -6,6 +6,15 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Fix black textures in team selection
+- Why does client not get notified of disconnection properly?
+	- It has two server addresses so it waits for disconnection from the other one
+	- solved with kicks
+
+- Writeout the config before starting a server process from the menu
+- Always set filtering to linear when rendering avatars
+- Show a smaller avatar preview next to the big preview
+
 - Preview the avatar in client start gui, give it a separate texture and use some special imgui logic to show it?
 
 - Fix that clipboard on all platforms at last

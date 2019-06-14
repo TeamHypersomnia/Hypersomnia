@@ -22,6 +22,8 @@ struct server_vars {
 	unsigned state_hash_once_every_tick = 1;
 	float send_net_statistics_update_once_every_secs = 1;
 
+	float max_kick_ban_linger_secs = 2;
+
 	augs::maybe_network_simulator network_simulator;
 
 	bool auto_authorize_loopback_for_rcon = true;

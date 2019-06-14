@@ -1,7 +1,7 @@
 #pragma once
 
 namespace augs {
-	template <class derived>
+	template <class derived, bool always_force_set = false>
 	class settable_as_current_mixin {
 		static derived* current_instance;
 		static constexpr bool is_const = std::is_const_v<derived>;
@@ -67,7 +67,7 @@ namespace augs {
 		bool set_as_current() {
 			auto& self = static_cast<derived&>(*this);
 
-			if (!is_current()) {
+			if (!is_current() || always_force_set) {
 				current_instance = std::addressof(self);
 				return self.set_as_current_impl();
 			}
@@ -79,7 +79,7 @@ namespace augs {
 		bool set_as_current() const {
 			const auto& self = static_cast<derived&>(*this);
 
-			if (!is_current()) {
+			if (!is_current() || always_force_set) {
 				current_instance = std::addressof(self);
 				return self.set_as_current_impl();
 			}
@@ -88,6 +88,6 @@ namespace augs {
 		}
 	};
 
-	template <class T>
-	T* settable_as_current_mixin<T>::current_instance = nullptr;
+	template <class T, bool A>
+	T* settable_as_current_mixin<T, A>::current_instance = nullptr;
 }

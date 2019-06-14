@@ -24,6 +24,7 @@ struct server_client_state {
 	unsigned resyncs_counter = 0;
 	net_time_t last_resync_counter_reset_at = 0;
 	unsigned unauthorized_rcon_commands = 0;
+	std::optional<net_time_t> when_kicked;
 
 	arena_player_meta meta;
 
@@ -53,15 +54,13 @@ struct server_client_state {
 	}
 
 	void init(const net_time_t server_time) {
+		ensure(!is_set());
+
 		state = type::PENDING_WELCOME;
 		last_valid_activity_time = server_time;
-		settings = {};
-		pending_entropies.clear();
-		num_entropies_accepted = 0;
 	}
 
 	void unset() {
-		state = type::INVALID;
-		pending_entropies.clear();
+		*this = {};
 	}
 };

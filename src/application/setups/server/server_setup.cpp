@@ -96,11 +96,37 @@ void server_setup::log_malicious_client(const client_id_type id) {
 #endif
 }
 
+std::string server_setup::find_client_nickname(const client_id_type& id) const {
+	const auto& c = clients[id];
+
+	if (!c.is_set()) {
+		return {};
+	}
+
+	std::string nickname = "";
+
+	get_arena_handle().on_mode(
+		[&](const auto& mode) {
+			if (const auto entry = mode.find(to_mode_player_id(id))) {
+				nickname = ": " + entry->chosen_name;
+			}
+		}
+	);
+
+	if (nickname.empty()) {
+		nickname = c.settings.chosen_nickname;
+	}
+
+	return nickname;
+}
+
 std::string server_setup::describe_client(const client_id_type id) const {
+	std::string nickname = find_client_nickname(id);
+
 	return typesafe_sprintf(
-		"Id: %x\nNickname: %x",
+		"Id: %x\nNickname%x",
 		id,
-		"not implemented"
+		nickname.empty() ? std::string(" unknown") : std::string(": " + nickname)
 	);
 }
 
@@ -191,7 +217,7 @@ void server_setup::init_client(const client_id_type& id) {
 	auto& new_client = clients[id];
 	new_client.init(server_time);
 
-	LOG("Client connected. Details:\n%x", describe_client(id));
+	LOG("Client %x connected.", id);
 }
 
 void server_setup::unset_client(const client_id_type& id) {
@@ -248,18 +274,21 @@ void server_setup::advance_clients_state() {
 			removed_someone_already = true;
 		};
 
-		{
-			const auto num_commands = c.pending_entropies.size();
-			const auto max_commands = vars.max_buffered_client_commands;
+		if (c.is_set()) {
+			{
+				const auto num_commands = c.pending_entropies.size();
+				const auto max_commands = vars.max_buffered_client_commands;
 
-			if (num_commands > max_commands) {
-				LOG(
-					"Disconnecting the client because the number of pending commands (%x) exceeds the maximum of %x.", 
-					num_commands,
-					max_commands
-				);
+				if (num_commands > max_commands) {
+					const auto reason = typesafe_sprintf("number of pending commands (%x) exceeded the maximum of %x.", num_commands, max_commands);
+					kick(client_id, reason);
+				}
+			}
 
-				disconnect_and_unset(client_id);
+			if (c.when_kicked != std::nullopt) {
+				if (server_time - *c.when_kicked > vars.max_kick_ban_linger_secs) {
+					disconnect_and_unset(client_id);
+				}
 			}
 		}
 
@@ -360,7 +389,7 @@ void server_setup::advance_clients_state() {
 
 		auto kick_if_afk = [&](){
 			if (c.should_kick_due_to_inactivity(vars, server_time)) {
-				disconnect_and_unset(client_id);
+				kick(client_id, "AFK for too long!");
 				remove_from_mode();
 			}
 		};
@@ -479,6 +508,7 @@ message_handler_result server_setup::handle_client_message(
 		c.settings = std::move(payload);
 
 		if (c.state == S::PENDING_WELCOME) {
+			LOG("Client %x requested nickname: %x", client_id, std::string(c.settings.chosen_nickname));
 			c.state = S::WELCOME_ARRIVED;
 		}
 	}
@@ -542,58 +572,7 @@ message_handler_result server_setup::handle_client_message(
 			message.message = std::string(payload.message);
 			message.target = payload.target;
 
-			const auto sender_player = get_arena_handle().on_mode(
-				[&](const auto& typed_mode) {
-					return typed_mode.find(message.author);
-				}
-			);
-
-			if (sender_player != nullptr) {
-
-				const auto sender_player_faction = sender_player->faction;
-				const auto sender_player_nickname = sender_player->chosen_name;
-
-				{
-					chat_entry_type new_entry;
-
-					new_entry.timestamp = get_current_time();
-					new_entry.author = sender_player_nickname;
-					new_entry.author_faction = sender_player_faction;
-					new_entry.message = std::string(payload.message);
-					new_entry.faction_specific = payload.target == chat_target_type::TEAM_ONLY;
-
-					LOG(new_entry.operator std::string());
-				}
-
-				for (auto& c : clients) {
-					if (!c.is_set()) {
-						continue;
-					}
-
-					const auto recipient_client_id = static_cast<client_id_type>(index_in(clients, c));
-
-					if (message.target == chat_target_type::TEAM_ONLY) {
-						const auto recipient_player = get_arena_handle().on_mode(
-							[&](const auto& typed_mode) {
-								return typed_mode.find(to_mode_player_id(recipient_client_id));
-							}
-						);
-
-						const auto recipient_player_faction = recipient_player ? recipient_player->faction : faction_type::SPECTATOR;
-
-						if (sender_player_faction != recipient_player_faction) {
-							continue;
-						}
-					}
-
-					server->send_payload(
-						recipient_client_id,
-						game_channel_type::COMMUNICATIONS,
-
-						message
-					);
-				}
-			}
+			broadcast(message);
 		}
 	}
 	else if constexpr (std::is_same_v<T, total_mode_player_entropy>) {
@@ -669,6 +648,18 @@ message_handler_result server_setup::handle_client_message(
 				dummy_id,
 				payload
 			);
+
+			try {
+				const auto size = augs::image::get_png_size(payload.png_bytes);
+
+				if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
+					const auto disconnect_reason = typesafe_sprintf("sending an avatar of size %xx%x", size.x, size.y);
+					kick_if_debug(client_id, disconnect_reason);
+				}
+			}
+			catch (...) {
+				kick_if_debug(client_id, "sending an invalid avatar");
+			}
 
 			c.meta.avatar = std::move(payload);
 		}
@@ -959,6 +950,154 @@ rcon_level server_setup::get_rcon_level(const client_id_type& id) const {
 	LOG("RCON disabled for this client.");
 
 	return rcon_level::NONE;
+}
+
+chat_entry_type server_broadcasted_chat::translate(
+	const net_time_t timestamp,
+	const std::string& author,
+	const faction_type author_faction
+) const {
+	chat_entry_type new_entry;
+
+	new_entry.timestamp = timestamp;
+	new_entry.author_faction = author_faction;
+
+	const auto message_str = std::string(message);
+
+	new_entry.author = author;
+	new_entry.message = message_str;
+
+	if (author.empty()) {
+		new_entry.overridden_message_color = rgba(200, 200, 200, 255);
+	}
+
+	switch (target) {
+		case chat_target_type::KICK:
+			new_entry.author.clear();
+			new_entry.message = typesafe_sprintf("%x was kicked from the server.\nReason: %x", author, message_str);
+			new_entry.overridden_message_color = rgba(255, 34, 30, 255);
+			break;
+
+		case chat_target_type::BAN:
+			new_entry.author.clear();
+			new_entry.message = typesafe_sprintf("%x was banned from the server.\nReason: %x", author, message_str);
+			new_entry.overridden_message_color = rgba(255, 34, 30, 255);
+			break;
+
+		case chat_target_type::INFO:
+			new_entry.overridden_message_color = yellow;
+
+		case chat_target_type::INFO_CRITICAL:
+			new_entry.overridden_message_color = orange;
+
+		default:
+			break;
+	}
+
+	new_entry.faction_specific = target == chat_target_type::TEAM_ONLY;
+	return new_entry;
+}
+
+void server_setup::broadcast(const ::server_broadcasted_chat& payload) {
+	const auto sender_player = get_arena_handle().on_mode(
+		[&](const auto& typed_mode) {
+			return typed_mode.find(payload.author);
+		}
+	);
+
+	std::string sender_player_nickname;
+	auto sender_player_faction = faction_type::SPECTATOR;
+
+	if (sender_player != nullptr) {
+		sender_player_faction = sender_player->faction;
+		sender_player_nickname = sender_player->chosen_name;
+	}
+
+	{
+		const auto new_entry = payload.translate(
+			get_current_time(),
+			sender_player_nickname,
+			sender_player_faction
+		);
+
+		LOG(new_entry.operator std::string());
+	}
+
+	for (auto& c : clients) {
+		if (!c.is_set()) {
+			continue;
+		}
+
+		const auto recipient_client_id = static_cast<client_id_type>(index_in(clients, c));
+
+		if (payload.target == chat_target_type::TEAM_ONLY) {
+			const auto recipient_player = get_arena_handle().on_mode(
+				[&](const auto& typed_mode) {
+					return typed_mode.find(to_mode_player_id(recipient_client_id));
+				}
+			);
+
+			const auto recipient_player_faction = recipient_player ? recipient_player->faction : faction_type::SPECTATOR;
+
+			if (sender_player_faction != recipient_player_faction) {
+				continue;
+			}
+		}
+
+		server->send_payload(
+			recipient_client_id,
+			game_channel_type::COMMUNICATIONS,
+
+			payload
+		);
+	}
+}
+
+void server_setup::kick_if_debug(const client_id_type& id, const std::string& reason) {
+#if IS_PRODUCTION_BUILD
+	LOG(find_player_nickname(id) + " was forcefully disconnected the server. Reason: %x", reason);
+	disconnect_and_unset(id);
+#else
+	kick(id, reason);
+#endif
+}
+
+void server_setup::kick(const client_id_type& id, const std::string& reason) {
+	auto& c = clients[id];
+
+	if (!c.is_set()) {
+		return;
+	}
+
+	if (c.when_kicked == std::nullopt) {
+		c.when_kicked = server_time;
+	}
+
+	server_broadcasted_chat message;
+	message.message = reason;
+	message.target = chat_target_type::KICK;
+	message.author = to_mode_player_id(id);
+
+	broadcast(message);
+}
+
+void server_setup::ban(const client_id_type& id, const std::string& reason) {
+	auto& c = clients[id];
+
+	if (!c.is_set()) {
+		return;
+	}
+
+	if (c.when_kicked == std::nullopt) {
+		c.when_kicked = server_time;
+	}
+
+	server_broadcasted_chat message;
+	message.message = reason;
+	message.target = chat_target_type::BAN;
+	message.author = to_mode_player_id(id);
+
+	broadcast(message);
 }
 
 #include "augs/readwrite/to_bytes.h"

@@ -317,7 +317,15 @@ namespace augs {
 
 		thread_local std::vector<std::byte> loaded_bytes;
 		loaded_bytes.clear();
-		augs::file_to_bytes(path, loaded_bytes);
+
+		try {
+			augs::file_to_bytes(path, loaded_bytes);
+		}
+		catch (const augs::file_open_error& err) {
+			throw image_loading_error(
+				"Failed to open the avatar file:\n%x\nEnsure that the file exists and the path is correct.\n\nDetails:\n%x", path, err.what()
+			);
+		}
 
 		if (const auto lodepng_result = decode_rgba(v, width, height, loaded_bytes)) {
 			throw image_loading_error(

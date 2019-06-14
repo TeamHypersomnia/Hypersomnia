@@ -38,7 +38,7 @@ namespace augs {
 		}
 
 		template <class T>
-		void game_image(const augs::atlas_entry& entry, const T& size, const rgba col = white, const vec2 offset = vec2::zero) {
+		void game_image(const augs::atlas_entry& entry, const T& size, const rgba col = white, const vec2 offset = vec2::zero, const imgui_atlas_type atlas_type = imgui_atlas_type::GAME) {
 			const auto imsize = static_cast<ImVec2>(size);
 
 			std::array<vec2, 4> texcoords = {
@@ -55,7 +55,7 @@ namespace augs {
 			const auto cpos = vec2(ImGui::GetCursorScreenPos()) + offset;
 
 			ImGui::GetWindowDrawList()->AddImageQuad(
-				reinterpret_cast<ImTextureID>(augs::imgui_atlas_type::GAME),
+				reinterpret_cast<ImTextureID>(atlas_type),
 				static_cast<ImVec2>(cpos),
 				{ cpos.x + imsize.x, cpos.y },
 				{ cpos.x + imsize.x, cpos.y + imsize.y },
@@ -69,8 +69,8 @@ namespace augs {
 			);
 		}
 
-		inline void game_image(const augs::atlas_entry& entry, const rgba col = white, const vec2 offset = vec2::zero) {
-			game_image(entry, entry.get_original_size(), col, offset);
+		inline void game_image(const augs::atlas_entry& entry, const rgba col = white, const vec2 offset = vec2::zero, const imgui_atlas_type atlas_type = imgui_atlas_type::GAME) {
+			game_image(entry, entry.get_original_size(), col, offset, atlas_type);
 		}
 
 		struct colors_nha {
@@ -88,7 +88,7 @@ namespace augs {
 		};
 
 		template <class T>
-		bool game_image_button(const std::string& id, const augs::atlas_entry& entry, const T& size, const colors_nha cols = colors_nha{}) {
+		bool game_image_button(const std::string& id, const augs::atlas_entry& entry, const T& size, const colors_nha cols = colors_nha{}, const imgui_atlas_type atlas_type = imgui_atlas_type::GAME) {
 			const auto local_pos = ImGui::GetCursorPos();
 			const auto result = invisible_button(id, size);
 			const auto after_pos = ImGui::GetCursorPos();
@@ -104,14 +104,14 @@ namespace augs {
 			}
 
 			ImGui::SetCursorPos(local_pos);
-			game_image(entry, size, target_color);
+			game_image(entry, size, target_color, vec2::zero, atlas_type);
 			ImGui::SetCursorPos(after_pos);
 
 			return result;
 		}
 
-		inline bool game_image_button(const std::string& id, const augs::atlas_entry& entry, const colors_nha cols = colors_nha{}) {
-			return game_image_button(id, entry, entry.get_original_size(), cols);
+		inline bool game_image_button(const std::string& id, const augs::atlas_entry& entry, const colors_nha cols = colors_nha{}, const imgui_atlas_type atlas_type = imgui_atlas_type::GAME) {
+			return game_image_button(id, entry, entry.get_original_size(), cols, atlas_type);
 		}
 	}
 }

@@ -268,8 +268,13 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 
 		avatars_in_atlas = std::move(result.atlas_entries);
 
+		const auto previous_texture = augs::graphics::texture::find_current();
+
 		const auto atlas_size = result.atlas_size;
 		avatar_atlas.emplace(atlas_size, avatar_pbo_fallback.data());
+		avatar_atlas->set_filtering(augs::filtering_type::LINEAR);
+
+		augs::graphics::texture::set_current_to(previous_texture);
 	}
 
 	/* Unpack results of asynchronous asset loading */
