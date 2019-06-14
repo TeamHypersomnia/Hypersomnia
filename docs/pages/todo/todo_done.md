@@ -3193,3 +3193,7 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - Preview the avatar in client start gui, give it a separate texture and use some special imgui logic to show it?
 - why hotkey for team selection works late
 
+- Avatars
+- max: 80x80, 64k
+	- resize automatically in-game
+

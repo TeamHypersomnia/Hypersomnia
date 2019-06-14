@@ -21,6 +21,7 @@
 #include "augs/gui/text/printer.h"
 #include "augs/readwrite/byte_file.h"
 #include "application/network/payload_easily_movable.h"
+#include "augs/misc/readable_bytesize.h"
 
 client_setup::client_setup(
 	sol::state& lua,
@@ -572,11 +573,7 @@ void client_setup::send_pending_commands() {
 			arena_player_avatar_payload payload;
 			payload.png_bytes = augs::file_to_bytes(avatar_path);
 
-#if IS_PRODUCTION_BUILD
 			if (payload.png_bytes.size() <= max_avatar_bytes_v) {
-#else
-			{
-#endif
 				uint32_t dummy_client_id = 0;
 
 				client->send_payload(
@@ -585,6 +582,16 @@ void client_setup::send_pending_commands() {
 					dummy_client_id,
 					payload
 				);
+			}
+			else {
+				const auto reason = typesafe_sprintf(
+					"The avatar file (%x) exceeds the maximum size of %x.\nSupply a less entropic PNG file.", 
+					readable_bytesize(payload.png_bytes.size()), 
+					readable_bytesize(max_avatar_bytes_v)
+				);
+
+				set_disconnect_reason(reason);
+				disconnect();
 			}
 		}
 	}

@@ -112,7 +112,7 @@ bool start_client_gui_state::perform(
 			}
 		};
 
-		std::string p = into_vars.avatar_image_path;
+		std::string p = into_vars.avatar_image_path.string();
 
 		if (input_text<512>("Avatar image", p, ImGuiInputTextFlags_EnterReturnsTrue)) {
 			reload_avatar(p);
@@ -196,11 +196,13 @@ bool start_client_gui_state::perform(
 			text_disabled(typesafe_sprintf("%xx%x", icon_size.x, icon_size.y));
 		}
 
+		const auto size_str = typesafe_sprintf("%xx%x", first_size.x, first_size.y);
+
 		if (was_shrinked) {
-			text_disabled(typesafe_sprintf("The chosen image was automatically shrinked to %xx%x.\nTo ensure the best quality,\nsupply an image cropped to exactly this size.\n\n", first_size.x, first_size.y));
+			text_disabled(typesafe_sprintf("The chosen image was automatically shrinked to %x.\nTo ensure the best quality,\nsupply an image cropped to exactly %x.\n\n", size_str, size_str));
 		}
 		else if (will_be_upscaled) {
-			text_disabled(typesafe_sprintf("The chosen image will be automatically upscaled to %xx%x.\nTo ensure the best quality,\nsupply an image cropped to exactly this size.\n\n", first_size.x, first_size.y));
+			text_disabled(typesafe_sprintf("The chosen image will be automatically upscaled to %x.\nTo ensure the best quality,\nsupply an image cropped to exactly %x.\n\n", size_str, size_str));
 		}
 
 		if (::valid_and_is_ready(avatar_loading_result)) {

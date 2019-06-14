@@ -6,16 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Avatars
-- max: 80x80, 64k
-	- resize automatically in-game
+- ping
+- Test avatars on windows, especially the png filename filter
 
 - Writeout the config before starting a server process from the menu
 
 - Fix that clipboard on all platforms at last
 - And fix polish characters in chat breaking stuff on Windows
-
-- Test avatars on windows, especially the png filename filter
 
 - In host a server menu option, simply spawn a separate dedicated server process and use locally created client_setup to connect
 	- Something to check if the servers is already on
@@ -32,13 +29,6 @@ summary: That which we are brainstorming at the moment.
 		- Damage taken: 4 hits, 384 applied damage, 100 HP lost, 0 PE lost.
 		- Damage given: 2 hits, 180 applied damage, 0 HP lost, 289 PE lost.
 
-
-- ping
-
-- client metadatas
-	- avatars
-	- separate atlas so that we don't repack every time a new client appears
-	- separate drawcall
 
 - panel -> ct computers
 - fix in-game area indicators wrongly drawn when zoomed out
