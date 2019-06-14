@@ -52,6 +52,36 @@ bool start_client_gui_state::perform(
 			std::optional<std::string> new_path;
 			augs::image loaded_image;
 			std::string error_message;
+
+			bool was_shrinked = false;
+			bool will_be_upscaled = false;
+
+			void load_image(const augs::path_type& from) {
+				loaded_image.from_png(from);
+
+				const auto max_s = static_cast<unsigned>(max_avatar_side_v);
+
+				auto sz = loaded_image.get_size();
+
+				if (sz != vec2u::square(max_s)) {
+					sz.x = std::min(sz.x, max_s);
+					sz.y = std::min(sz.x, max_s);
+
+					if (sz != loaded_image.get_size()) {
+						was_shrinked = true;
+
+						loaded_image.scale(sz);
+
+						const auto resized_file_path = LOCAL_FILES_DIR "/avatar_resized.png";
+						loaded_image.save_as_png(resized_file_path);
+
+						new_path = resized_file_path;
+					}
+					else {
+						will_be_upscaled = true;
+					}
+				}
+			}
 		};
 
 		thread_local std::future<loading_result> avatar_loading_result;
@@ -66,7 +96,7 @@ bool start_client_gui_state::perform(
 							out.new_path = from_path;
 
 							try {
-								out.loaded_image.from_png(from_path);
+								out.load_image(from_path);
 							}
 							catch (const augs::image_loading_error& err) {
 								out.error_message = err.what();
@@ -104,7 +134,7 @@ bool start_client_gui_state::perform(
 
 					if (out.new_path != std::nullopt) {
 						try {
-							out.loaded_image.from_png(*out.new_path);
+							out.load_image(*out.new_path);
 						}
 						catch (const augs::image_loading_error& err) {
 							out.error_message = err.what();
@@ -125,6 +155,8 @@ bool start_client_gui_state::perform(
 			if (ImGui::Button("Clear") && !error_popup) {
 				p = "";
 				avatar_preview_tex.reset();
+				was_shrinked = false;
+				will_be_upscaled = false;
 			}
 		}
 
@@ -164,13 +196,19 @@ bool start_client_gui_state::perform(
 			text_disabled(typesafe_sprintf("%xx%x", icon_size.x, icon_size.y));
 		}
 
-		if (was_resized) {
-			text_disabled(typesafe_sprintf("The chosen image was automatically resized to %xx%x.\nTo ensure the best quality, supply an image cropped to exactly this size.\n\n", first_size.x, first_size.y));
+		if (was_shrinked) {
+			text_disabled(typesafe_sprintf("The chosen image was automatically shrinked to %xx%x.\nTo ensure the best quality,\nsupply an image cropped to exactly this size.\n\n", first_size.x, first_size.y));
+		}
+		else if (will_be_upscaled) {
+			text_disabled(typesafe_sprintf("The chosen image will be automatically upscaled to %xx%x.\nTo ensure the best quality,\nsupply an image cropped to exactly this size.\n\n", first_size.x, first_size.y));
 		}
 
 		if (::valid_and_is_ready(avatar_loading_result)) {
 			const auto result = avatar_loading_result.get();
 			const auto& error_msg = result.error_message;
+
+			was_shrinked = false;
+			will_be_upscaled = false;
 
 			if (error_msg.size() > 0) {
 				error_popup = editor_popup();
@@ -186,6 +224,9 @@ bool start_client_gui_state::perform(
 				avatar_preview_tex->set_filtering(augs::filtering_type::LINEAR);
 
 				augs::graphics::texture::set_current_to(previous_texture);
+
+				was_shrinked = result.was_shrinked;
+				will_be_upscaled  = result.will_be_upscaled;
 			}
 		}
 

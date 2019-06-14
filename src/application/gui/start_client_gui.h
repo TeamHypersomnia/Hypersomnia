@@ -19,7 +19,8 @@ public:
 	std::optional<editor_popup> error_popup;
 	std::optional<augs::graphics::texture> avatar_preview_tex;
 
-	bool was_resized = false;
+	bool was_shrinked = false;
+	bool will_be_upscaled = false;
 	bool do_initial_load = true;
 
 	bool perform(

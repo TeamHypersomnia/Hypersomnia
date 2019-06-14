@@ -16,6 +16,9 @@
 #include "augs/image/blit.h"
 #include "augs/readwrite/byte_file.h"
 
+#define STB_IMAGE_RESIZE_IMPLEMENTATION
+#include "3rdparty/stb/stb_image_resize.h"
+
 #if PLATFORM_UNIX
 #include <arpa/inet.h>
 #else
@@ -556,11 +559,15 @@ namespace augs {
 	}
 
 	void image::scale(const vec2u new_size, const scaling_method method) {
-		if (method == scaling_method::BILINEAR) {
-			(void)new_size;
-		}
-		else {
+		if (method == scaling_method::STB) {
+			image new_image;
+			new_image.resize_no_fill(new_size);
 
+			const auto in_ptr = v.data();
+			const auto out_ptr = new_image.v.data();
+			::stbir_resize_uint8(&in_ptr->r, size.x, size.y, 0, &out_ptr->r, new_size.x, new_size.y, 0, 4);
+
+			*this = std::move(new_image);
 		}
 	}
 }

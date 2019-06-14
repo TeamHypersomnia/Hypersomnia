@@ -68,8 +68,7 @@ namespace augs {
 	public:
 
 		enum class scaling_method {
-			NEAREST,
-			BILINEAR
+			STB
 		};
 
 		static vec2u get_size(const path_type& file_path);
@@ -101,7 +100,7 @@ namespace augs {
 			v.resize(new_size.area());
 		}
 
-		void scale(vec2u new_size, scaling_method);
+		void scale(vec2u new_size, scaling_method = scaling_method::STB);
 
 		void resize_fill(const vec2u new_size, const rgba col = rgba(0, 0, 0, 0)) {
 			size = new_size;
