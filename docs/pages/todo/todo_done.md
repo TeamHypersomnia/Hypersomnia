@@ -3182,3 +3182,14 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - two layers for callouts so we can stack one on top of another
 
+- Fix black textures in team selection
+- Why does client not get notified of disconnection properly?
+	- It has two server addresses so it waits for disconnection from the other one
+	- solved with kicks
+
+- Always set filtering to linear when rendering avatars
+- Show a smaller avatar preview next to the big preview
+
+- Preview the avatar in client start gui, give it a separate texture and use some special imgui logic to show it?
+- why hotkey for team selection works late
+

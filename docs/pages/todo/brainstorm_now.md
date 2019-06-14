@@ -6,21 +6,17 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Fix black textures in team selection
-- Why does client not get notified of disconnection properly?
-	- It has two server addresses so it waits for disconnection from the other one
-	- solved with kicks
+- Avatars
+- max: 80x80, 64k
+	- resize automatically in-game
 
 - Writeout the config before starting a server process from the menu
-- Always set filtering to linear when rendering avatars
-- Show a smaller avatar preview next to the big preview
-
-- Preview the avatar in client start gui, give it a separate texture and use some special imgui logic to show it?
 
 - Fix that clipboard on all platforms at last
 - And fix polish characters in chat breaking stuff on Windows
 
-- Test avatars on windows, especially the filter
+- Test avatars on windows, especially the png filename filter
+
 - In host a server menu option, simply spawn a separate dedicated server process and use locally created client_setup to connect
 	- Something to check if the servers is already on
 
@@ -36,11 +32,6 @@ summary: That which we are brainstorming at the moment.
 		- Damage taken: 4 hits, 384 applied damage, 100 HP lost, 0 PE lost.
 		- Damage given: 2 hits, 180 applied damage, 0 HP lost, 289 PE lost.
 
-- Avatars
-- max: 80x80, 64k
-	- resize automatically in-game
-	- Actually implement them before ping because you will anyway store ping next to avatar data
-	- So dont store it in logic 
 
 - ping
 

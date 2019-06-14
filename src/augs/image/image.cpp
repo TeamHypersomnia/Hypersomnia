@@ -554,6 +554,15 @@ namespace augs {
 
 		return *this;
 	}
+
+	void image::scale(const vec2u new_size, const scaling_method method) {
+		if (method == scaling_method::BILINEAR) {
+			(void)new_size;
+		}
+		else {
+
+		}
+	}
 }
 
 

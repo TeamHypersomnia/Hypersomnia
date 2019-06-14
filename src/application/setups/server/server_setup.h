@@ -285,7 +285,7 @@ public:
 	void disconnect_and_unset(const client_id_type&);
 
 	void kick(const client_id_type&, const std::string& reason);
-	void kick_if_debug(const client_id_type&, const std::string& reason);
+	message_handler_result abort_or_kick_if_debug(const client_id_type&, const std::string& reason);
 	void ban(const client_id_type&, const std::string& reason);
 
 	mode_player_id get_local_player_id() const {

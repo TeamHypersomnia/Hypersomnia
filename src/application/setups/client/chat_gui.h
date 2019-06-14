@@ -20,8 +20,6 @@ struct chat_gui_state {
 	bool show = false;
 	chat_target_type target = chat_target_type::GENERAL;
 
-	vec2 last_window_pos;
-
 	std::string current_message;
 	std::vector<chat_entry_type> history;
 };

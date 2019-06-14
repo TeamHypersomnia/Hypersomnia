@@ -31,6 +31,7 @@ struct client_vars {
 	std::string rcon_password = "";
 
 	unsigned chat_window_width = 300;
+	vec2i chat_window_offset = vec2i(10, 300);
 
 	unsigned show_recent_chat_messages_num = 5;
 	float keep_recent_chat_messages_for_seconds = 8.f;

@@ -493,6 +493,7 @@ void settings_gui_state::perform(
 				text_disabled("The default rcon password to be sent to the server on init.");
 
 				revertable_slider(SCOPE_CFG_NVP(chat_window_width), 100u, 500u);
+				revertable_drag_rect_bounded_vec2i(SCOPE_CFG_NVP(chat_window_offset), 0.3f, -vec2i(screen_size), vec2i(screen_size));
 
 				revertable_slider(SCOPE_CFG_NVP(show_recent_chat_messages_num), 0u, 20u);
 				revertable_slider(SCOPE_CFG_NVP(keep_recent_chat_messages_for_seconds), 0.f, 20.f);

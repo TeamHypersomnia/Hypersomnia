@@ -583,6 +583,10 @@ return {
     spectate_referential_state = true,
 
     chat_window_width = 500,
+	chat_window_offset = {
+		x = 10,
+		y = 300
+	},
     show_recent_chat_messages_num = 7,
     keep_recent_chat_messages_for_seconds = 15,
   },

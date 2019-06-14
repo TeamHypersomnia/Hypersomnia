@@ -644,42 +644,42 @@ message_handler_result server_setup::handle_client_message(
 			uint32_t dummy_id = 0;
 			arena_player_avatar_payload payload;
 
-			read_payload(
-				dummy_id,
-				payload
-			);
+			if (read_payload(dummy_id, payload)) {
+				try {
+					const auto size = augs::image::get_png_size(payload.png_bytes);
 
-			try {
-				const auto size = augs::image::get_png_size(payload.png_bytes);
+					if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
+						const auto disconnect_reason = typesafe_sprintf("sending an avatar of size %xx%x", size.x, size.y);
+						kick(client_id, disconnect_reason);
+					}
+					else {
+						c.meta.avatar = std::move(payload);
 
-				if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
-					const auto disconnect_reason = typesafe_sprintf("sending an avatar of size %xx%x", size.x, size.y);
-					kick_if_debug(client_id, disconnect_reason);
+						for (const auto& cc : clients) {
+							if (!cc.is_set()) {
+								continue;
+							}
+
+							const auto client_id_of_avatar = client_id;
+							const auto recipient_client_id = static_cast<client_id_type>(index_in(clients, cc));
+
+							server->send_payload(
+								recipient_client_id,
+								game_channel_type::COMMUNICATIONS,
+
+								client_id_of_avatar,
+								c.meta.avatar
+							);
+						}
+					}
+				}
+				catch (...) {
+					kick(client_id, "sending an invalid avatar");
 				}
 			}
-			catch (...) {
-				kick_if_debug(client_id, "sending an invalid avatar");
+			else {
+				kick(client_id, "sending an invalid avatar");
 			}
-
-			c.meta.avatar = std::move(payload);
-		}
-
-
-		for (const auto& cc : clients) {
-			if (!cc.is_set()) {
-				continue;
-			}
-
-			const auto client_id_of_avatar = client_id;
-			const auto recipient_client_id = static_cast<client_id_type>(index_in(clients, cc));
-
-			server->send_payload(
-				recipient_client_id,
-				game_channel_type::COMMUNICATIONS,
-
-				client_id_of_avatar,
-				c.meta.avatar
-			);
 		}
 	}
 	else {
@@ -975,13 +975,13 @@ chat_entry_type server_broadcasted_chat::translate(
 		case chat_target_type::KICK:
 			new_entry.author.clear();
 			new_entry.message = typesafe_sprintf("%x was kicked from the server.\nReason: %x", author, message_str);
-			new_entry.overridden_message_color = rgba(255, 34, 30, 255);
+			new_entry.overridden_message_color = rgba(255, 100, 30, 255);
 			break;
 
 		case chat_target_type::BAN:
 			new_entry.author.clear();
 			new_entry.message = typesafe_sprintf("%x was banned from the server.\nReason: %x", author, message_str);
-			new_entry.overridden_message_color = rgba(255, 34, 30, 255);
+			new_entry.overridden_message_color = rgba(255, 100, 30, 255);
 			break;
 
 		case chat_target_type::INFO:
@@ -1053,12 +1053,13 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload) {
 	}
 }
 
-void server_setup::kick_if_debug(const client_id_type& id, const std::string& reason) {
+message_handler_result server_setup::abort_or_kick_if_debug(const client_id_type& id, const std::string& reason) {
 #if IS_PRODUCTION_BUILD
 	LOG(find_player_nickname(id) + " was forcefully disconnected the server. Reason: %x", reason);
-	disconnect_and_unset(id);
+	return message_handler_result::ABORT;
 #else
 	kick(id, reason);
+	return message_handler_result::CONTINUE;
 #endif
 }
 

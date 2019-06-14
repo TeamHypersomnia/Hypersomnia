@@ -572,7 +572,11 @@ void client_setup::send_pending_commands() {
 			arena_player_avatar_payload payload;
 			payload.png_bytes = augs::file_to_bytes(avatar_path);
 
+#if IS_PRODUCTION_BUILD
 			if (payload.png_bytes.size() <= max_avatar_bytes_v) {
+#else
+			{
+#endif
 				uint32_t dummy_client_id = 0;
 
 				client->send_payload(
@@ -674,17 +678,17 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			ImGui::GetTextLineHeight() * 3.f
 		};
 
-		const auto initial_offset = vec2(10, 300);
-		const auto initial_pos = vec2(initial_offset.x, screen_size.y - size.y - initial_offset.y);
+		const auto window_offset = vars.chat_window_offset;
+		const auto window_pos = vec2(window_offset.x, screen_size.y - size.y - window_offset.y);
 
-		ImGui::SetNextWindowPos(ImVec2(initial_pos), ImGuiCond_FirstUseEver);
-		//ImGui::SetNextWindowSize(ImVec2(size), ImGuiCond_Always);
+		ImGui::SetNextWindowPos(ImVec2(window_pos));
 
 		auto go_to_entity = scoped_window(
 			"ChatWindow", 
 			&chat_gui.show,
 			ImGuiWindowFlags_NoTitleBar 
 			| ImGuiWindowFlags_NoResize 
+			| ImGuiWindowFlags_NoMove 
 			| ImGuiWindowFlags_NoScrollbar 
 			| ImGuiWindowFlags_NoScrollWithMouse
 			| ImGuiWindowFlags_NoSavedSettings
@@ -693,8 +697,6 @@ custom_imgui_result client_setup::perform_custom_imgui(
 
 		bool was_acquired = false;
 		
-		chat_gui.last_window_pos = ImGui::GetWindowPos();
-
 		if (ImGui::GetCurrentWindow()->GetID("##ChatInput") != GImGui->ActiveId) {
 			ImGui::SetKeyboardFocusHere();
 			was_acquired = true;
@@ -1008,7 +1010,15 @@ void client_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
 		return get_text_bbox(colored(text, white), wrapping);
 	};
 
-	auto pen = chat_gui.last_window_pos;
+	const auto size = vec2 {
+		static_cast<float>(vars.chat_window_width),
+		ImGui::GetTextLineHeight() * 3.f
+	};
+
+	const auto window_offset = vars.chat_window_offset;
+	const auto window_pos = vec2(window_offset.x, in.screen_size.y - size.y - window_offset.y);
+
+	auto pen = window_pos;
 
 	for (int i = kos.size() - 1; i >= starting_i; --i) {
 		const auto& ko = kos[i];
