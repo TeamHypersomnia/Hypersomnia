@@ -3,6 +3,7 @@
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_utils.h"
 #include "application/setups/editor/detail/maybe_different_colors.h"
+#include "augs/misc/imgui/imgui_enum_radio.h"
 
 #define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
 
@@ -19,12 +20,67 @@ bool start_server_gui_state::perform(
 
 	bool result = false;
 
-	centered_size_mult = 0.35f;
+	centered_size_mult = 0.45f;
 
 	auto window = make_scoped_window();
 
 	if (!window) {
 		return false;
+	}
+
+	if (show_help) {
+		const auto tutorial_col = rgba(210, 210, 210, 255);
+
+		auto result = augs::imgui::cond_scoped_window(show_help, "Help", &show_help, ImGuiWindowFlags_AlwaysAutoResize);
+
+		text_color("Integrated server instance:", yellow);
+
+		const auto help_1 = R"(
+Simplified server running in the game's process.
+The server will be shut down as soon as you exit the game.
+As a host, you will experience no lag whatsoever - your experience will be seamless.
+
+This option is perfect for quick matches between friends and duels of honor.
+
+)";
+
+		text_color(help_1, tutorial_col);
+
+		ImGui::Separator();
+
+		text_color("Dedicated server instance:", orange);
+
+		const auto help_2 = R"(
+Fully featured, separate server process designed to run 24/7.
+It will be running even after exiting the game.
+You can shut it down only through a RCON command accessible to authorized clients.
+To play, you will need to connect to localhost after launching the server. 
+You will experience a minimal lag (on the order of 10ms). 
+For balance, you can increase the lag via Settings->Client->Enable lag simulator.
+
+This option is perfect for hosting a persistent server on your machine.
+
+)";
+
+		text_color(help_2, tutorial_col);
+
+		ImGui::Separator();
+
+		const auto help_3 = R"(
+Unless lag simulation is enabled, the host has an immense advantage over the other players,
+especially if the host is running an integrated server instance.
+
+Next time, consider letting your friend be the one to host the server,
+so that they can experience seamless gameplay too,
+as well as to test your skills in a laggy environment.
+
+)";
+
+		text_color(help_3, tutorial_col);
+
+		if (ImGui::Button("Close")) {
+			show_help = false;
+		}
 	}
 
 	{
@@ -43,10 +99,29 @@ bool start_server_gui_state::perform(
 			into.port = static_cast<unsigned short>(std::clamp(chosen_port, 1024, 65535));
 		}
 
-		slider("Max incoming connections", into.max_connections, 1, 64);
-		text_disabled("Tip: this number does not include the player at the server machine.\nIf you want to play a 1v1 with someone and not allow anyone else to join or watch,\nyou want to set this value to 1.\n\n");
+		{
+			ImGui::Separator();
+			text("Server instance type:");
 
-		text_disabled("Tip: you can tweak many other settings when the server is up and running.\nYou can edit the defaults inside the cache/usr/config.local.lua file,\nin the server section.");
+			ImGui::SameLine();
+
+			if (ImGui::Button ("?")) {
+				show_help = true;
+			}
+
+			enum_radio(instance_type);
+			ImGui::Separator();
+		}
+
+		if (instance_type == server_instance_type::INTEGRATED) {
+			slider("Max incoming connections", into.max_connections, 1, 64);
+			text_disabled("Tip: this number does not include the integrated, local player on the server.\nIf you want to play a 1v1 with someone and not allow anyone else to join or watch,\nyou want to set this value to 1.\n\n");
+		}
+		else {
+			slider("Max incoming connections", into.max_connections, 2, 64);
+		}
+
+		text_disabled("See Settings->Server for more options to tweak.\n\n");
 
 		text_disabled("Tip: to quickly host a server, you can press Shift+H here or in the main menu,\ninstead of clicking \"Launch!\" with your mouse.");
 	}

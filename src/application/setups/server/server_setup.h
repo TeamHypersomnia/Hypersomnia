@@ -65,6 +65,7 @@ class server_setup :
 	/* Other replicated state */
 	online_mode_and_rules current_mode;
 
+	client_vars integrated_client_vars;
 	server_vars vars;
 	private_server_vars private_vars;
 
@@ -144,6 +145,7 @@ public:
 		sol::state& lua,
 		const server_start_input&,
 		const server_vars&,
+		const client_vars& integrated_client_vars,
 		const private_server_vars&,
 		std::optional<augs::dedicated_server_input>
 	);

@@ -26,7 +26,7 @@ bool start_client_gui_state::perform(
 	
 	using namespace augs::imgui;
 
-	centered_size_mult = 0.3f;
+	centered_size_mult = 0.4f;
 	
 	auto imgui_window = make_scoped_window();
 
@@ -36,8 +36,6 @@ bool start_client_gui_state::perform(
 
 	bool result = false;
 
-	auto settings = scoped_window("Connect to server", &show);
-	
 	{
 		auto child = scoped_child("connect view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
 		auto width = scoped_item_width(ImGui::GetWindowWidth() * 0.35f);

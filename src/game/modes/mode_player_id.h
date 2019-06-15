@@ -1,8 +1,6 @@
 #pragma once
 #include "augs/network/network_types.h"
 
-constexpr std::size_t max_mode_players_v = max_incoming_connections_v + 1;
-
 struct mode_player_id {
 	using id_value_type = uint32_t;
 	// GEN INTROSPECTOR struct mode_player_id
@@ -18,7 +16,7 @@ struct mode_player_id {
 	}
 
 	static auto machine_admin() {
-		return mode_player_id(static_cast<id_value_type>(max_mode_players_v));
+		return mode_player_id(static_cast<id_value_type>(max_mode_players_v - 1));
 	}
 
 	mode_player_id() = default;

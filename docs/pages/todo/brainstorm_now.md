@@ -6,7 +6,56 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- ping
+- Keeping an integrated server option has the advantage that it will force you to keep the client code clean
+
+- Host a server menu
+	- Radio box
+		- Integrated server instance
+		- Dedicated server instance
+	- Might still make sense to have integrated server instances for slower computers
+		- Will have to refactor the chat, though, and avatar handling
+			- Separation of concerns might be useful here as our client setup class is a god object
+	- What about machine admin player id?
+		- if it is equal to max clients, we might miss it accidentally if we use max_incoming_connections_v in loops
+		- if it is equal to max clients - 1, it wastes a single connection slot?
+	- For checking whether a dedicated server instance is running, we can keep a lockfile named after the port
+
+- chat notifier: X has joined the Resistance/Metropolis
+- chat notifier: X is now a spectator
+	- Except when connected for the first time?
+
+- Allow spectator to watch everything
+	- Automatically assign a player to watch on connect
+	- Don't show the spectator text overlay if we're choosing teams
+
+- In-game tip system
+	- Contextual
+		- Press "T" to buy items.
+		- Press "C" to pull out the bomb.
+		- Stay still while planting the bomb.
+	- Randomized
+		- Stay still to regenerate stamina faster.
+		- Double-tap R to drop the old mag for a faster reload. Near-empty mags are dropped automatically.
+		- Melee blows are stronger when you run.
+		- Electric Shield lets you live longer, but slows down your movement.
+
+- Sounds for grenade throwing 
+	- Flashbang out
+	- Throwing frag
+	- Frag out
+	- EMP
+	- Interference!
+
+- Death screen
+	- [Avatar] Billan
+		- Killed you with their Bilmer2000
+		- Damage given: 32 in 2 hits
+			- Count real contribution in damage owners, not mana decreased when shield owned
+		- Damage taken: 4 hits, 384 applied damage, 100 HP lost, 0 PE lost.
+		- Damage given: 2 hits, 180 applied damage, 0 HP lost, 289 PE lost.
+
+- "X connected" notifiers in chat, in gray
+
 - Test avatars on windows, especially the png filename filter
 
 - Writeout the config before starting a server process from the menu
@@ -21,13 +70,6 @@ summary: That which we are brainstorming at the moment.
 
 - Port cyberaqua again from the same lua files to avoid re-importing and loss of accuracy
 
-- Death screen
-	- [Avatar] Billan
-		- Killed you with their Bilmer2000
-		- Damage given: 32 in 2 hits
-			- Count real contribution in damage owners, not mana decreased when shield owned
-		- Damage taken: 4 hits, 384 applied damage, 100 HP lost, 0 PE lost.
-		- Damage given: 2 hits, 180 applied damage, 0 HP lost, 289 PE lost.
 
 
 - panel -> ct computers
@@ -81,16 +123,6 @@ summary: That which we are brainstorming at the moment.
 	- Can't use spells
 	- 1900$
 
-
-- In-game tip system
-	- Contextual
-		- Press "T" to buy items.
-		- Press "B" to pull out the bomb.
-	- Randomized
-		- Stay still to regenerate stamina faster.
-		- Double-tap R to drop the old mag for a faster reload. Near-empty mags are dropped automatically.
-		- Melee blows are stronger when you run.
-		- Electric Shield lets you live longer, but slows down your movement.
 
 - More GUI responses
 	- 

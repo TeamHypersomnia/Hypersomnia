@@ -86,7 +86,7 @@ namespace net_messages {
 
 	template <class Stream>
 	bool serialize(Stream& s, ::net_statistics_update& c) {
-		return serialize_vector_uint8_t(s, c.ping_values, 0, max_incoming_connections_v);
+		return serialize_vector_uint8_t(s, c.ping_values, 0, max_mode_players_v);
 	}
 
 	template <class Stream>

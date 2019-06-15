@@ -97,6 +97,7 @@ struct bomb_mode_ruleset {
 	bool allow_game_commencing = true;
 	bool refill_all_mags_on_round_start = true;
 	bool refill_chambers_on_round_start = true;
+	bool allow_spectator_to_see_both_teams = true;
 
 	bool enable_item_shop = true;
 	bool warmup_enable_item_shop = false;

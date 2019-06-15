@@ -39,9 +39,11 @@ server_setup::server_setup(
 	sol::state& lua,
 	const server_start_input& in,
 	const server_vars& initial_vars,
+	const client_vars& integrated_client_vars,
 	const private_server_vars& private_initial_vars,
 	const std::optional<augs::dedicated_server_input> dedicated
 ) : 
+	integrated_client_vars(integrated_client_vars),
 	lua(lua),
 	last_start(in),
 	dedicated(dedicated),
@@ -181,6 +183,8 @@ void server_setup::apply(const server_vars& new_vars, const bool force) {
 void server_setup::apply(const config_lua_table& cfg) {
 	const bool force = false;
 	apply(cfg.server, force);
+
+	integrated_client_vars = cfg.client;
 }
 
 void server_setup::choose_arena(const std::string& name) {
@@ -200,7 +204,7 @@ void server_setup::choose_arena(const std::string& name) {
 
 		cmd.added_player = add_player_input {
 			get_admin_player_id(),
-			vars.admin_nickname,
+			integrated_client_vars.nickname,
 			faction_type::SPECTATOR
 		};
 
@@ -1060,8 +1064,8 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload) {
 
 message_handler_result server_setup::abort_or_kick_if_debug(const client_id_type& id, const std::string& reason) {
 #if IS_PRODUCTION_BUILD
-	LOG(find_player_nickname(id) + " was forcefully disconnected the server. Reason: %x", reason);
-	return message_handler_result::ABORT;
+	LOG(find_client_nickname(id) + " was forcefully disconnected the server. Reason: %x", reason);
+	return message_handler_result::ABORT_AND_DISCONNECT;
 #else
 	kick(id, reason);
 	return message_handler_result::CONTINUE;

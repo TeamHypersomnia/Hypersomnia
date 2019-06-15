@@ -270,7 +270,7 @@ message_handler_result client_setup::handle_server_message(
 		LOG(new_entry.operator std::string());
 		chat_gui.history.emplace_back(std::move(new_entry));
 
-		if (payload.should_disconnect_now(client_player_id)) {
+		if (payload.should_disconnect_now(get_local_player_id())) {
 			std::string kicked_or_banned;
 
 			if (payload.target == chat_target_type::KICK) {

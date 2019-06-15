@@ -521,8 +521,6 @@ return {
 	current_arena = "de_cyberaqua",
 	override_default_ruleset = "",
 
-	admin_nickname = "GameMaster",
-
 	kick_if_inactive_for_secs = 60,
 	time_limit_to_enter_game_since_connection = 15,
 

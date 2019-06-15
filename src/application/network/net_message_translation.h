@@ -189,7 +189,7 @@ namespace net_messages {
 			auto& p = i.players;
 			auto cnt = static_cast<int>(p.size());
 
-			serialize_int(s, cnt, 1, max_incoming_connections_v + 1);
+			serialize_int(s, cnt, 1, max_mode_players_v);
 
 			if (Stream::IsReading) {
 				p.resize(cnt);

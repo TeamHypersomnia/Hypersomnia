@@ -3197,3 +3197,4 @@ i			- if the newly calculated target is different than last_reload_target, reset
 - max: 80x80, 64k
 	- resize automatically in-game
 
+- ping

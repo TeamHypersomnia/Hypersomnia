@@ -7,8 +7,6 @@ struct server_vars {
 	std::string current_arena = "";
 	std::string override_default_ruleset = "";
 
-	std::string admin_nickname = "GameMaster";
-
 	unsigned kick_if_inactive_for_secs = 60;
 	unsigned time_limit_to_enter_game_since_connection = 10;
 

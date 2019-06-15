@@ -19,6 +19,8 @@ FORCE_NOINLINE void save_log_and_terminate() {
 		augs::window::get_current().disable_cursor_clipping();
 	}
 	
+	LOG("\nIf the game crashes repeatedly, consider deleting the \"cache\" folder.");
+
 	const auto logs = program_log::get_current().get_complete();
 	const auto failure_log_path = augs::path_type(get_path_in_log_files("ensure_failed_debug_log.txt"));
 

@@ -7,7 +7,7 @@ struct arena_player_avatar_payload {
 };
 
 struct arena_player_network_stats {
-	int ping = -1;
+	int ping = 0;
 };
 
 struct arena_player_meta {
@@ -19,4 +19,4 @@ struct arena_player_meta {
 	}
 };
 
-using arena_player_metas = std::array<arena_player_meta, max_incoming_connections_v>;
+using arena_player_metas = std::array<arena_player_meta, max_mode_players_v>;

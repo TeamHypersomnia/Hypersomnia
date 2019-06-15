@@ -113,6 +113,7 @@ int work(const int argc, const char* const * const argv) try {
 	static network_info network_stats;
 	static server_network_info server_stats;
 
+	LOG("If the game crashes repeatedly, consider deleting the \"cache\" folder.\n");
 	LOG("Started at %x", augs::date_time().get_readable());
 	LOG("Working directory: %x", augs::get_current_working_directory());
 
@@ -239,6 +240,7 @@ int work(const int argc, const char* const * const argv) try {
 			lua,
 			config.default_server_start,
 			config.server,
+			config.client,
 			config.private_server,
 			config.dedicated_server
 		);
@@ -522,6 +524,7 @@ int work(const int argc, const char* const * const argv) try {
 						lua,
 						config.default_server_start,
 						config.server,
+						config.client,
 						config.private_server,
 						std::nullopt
 					);
