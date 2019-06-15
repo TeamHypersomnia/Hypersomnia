@@ -20,6 +20,8 @@ summary: That which we are brainstorming at the moment.
 		- if it is equal to max clients - 1, it wastes a single connection slot?
 	- For checking whether a dedicated server instance is running, we can keep a lockfile named after the port
 
+- "X connected" notifiers in chat, in gray
+
 - chat notifier: X has joined the Resistance/Metropolis
 - chat notifier: X is now a spectator
 	- Except when connected for the first time?
@@ -39,13 +41,6 @@ summary: That which we are brainstorming at the moment.
 		- Melee blows are stronger when you run.
 		- Electric Shield lets you live longer, but slows down your movement.
 
-- Sounds for grenade throwing 
-	- Flashbang out
-	- Throwing frag
-	- Frag out
-	- EMP
-	- Interference!
-
 - Death screen
 	- [Avatar] Billan
 		- Killed you with their Bilmer2000
@@ -53,8 +48,6 @@ summary: That which we are brainstorming at the moment.
 			- Count real contribution in damage owners, not mana decreased when shield owned
 		- Damage taken: 4 hits, 384 applied damage, 100 HP lost, 0 PE lost.
 		- Damage given: 2 hits, 180 applied damage, 0 HP lost, 289 PE lost.
-
-- "X connected" notifiers in chat, in gray
 
 - Test avatars on windows, especially the png filename filter
 

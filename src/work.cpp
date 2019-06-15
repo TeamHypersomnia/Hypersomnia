@@ -692,6 +692,9 @@ int work(const int argc, const char* const * const argv) try {
 
 	static augs::event::state common_input_state;
 
+	static bool client_start_requested = false;
+	static bool server_start_requested = false;
+
 	static auto do_main_menu_option = [&](const main_menu_button_type t) {
 		using T = decltype(t);
 
@@ -700,14 +703,7 @@ int work(const int argc, const char* const * const argv) try {
 				start_client_gui.open();
 
 				if (common_input_state[augs::event::keys::key::LSHIFT]) {
-					change_with_save(
-						[&](auto& cfg) {
-							cfg.default_client_start = config.default_client_start;
-							cfg.client = config.client;
-						}
-					);
-
-					launch_setup(launch_type::CLIENT);
+					client_start_requested = true;
 				}
 
 				break;
@@ -716,7 +712,7 @@ int work(const int argc, const char* const * const argv) try {
 				start_server_gui.open();
 
 				if (common_input_state[augs::event::keys::key::LSHIFT]) {
-					launch_setup(launch_type::SERVER);
+					server_start_requested = true;
 				}
 
 				break;
@@ -1214,7 +1210,9 @@ int work(const int argc, const char* const * const argv) try {
 				lua,
 				[&]() {
 					if (!has_current_setup()) {
-						if (start_client_gui.perform(window, config.default_client_start, config.client)) {
+						if (start_client_gui.perform(window, config.default_client_start, config.client) || client_start_requested) {
+							client_start_requested = false;
+
 							change_with_save(
 								[&](auto& cfg) {
 									cfg.default_client_start = config.default_client_start;
@@ -1225,7 +1223,9 @@ int work(const int argc, const char* const * const argv) try {
 							launch_setup(launch_type::CLIENT);
 						}
 
-						if (start_server_gui.perform(config.default_server_start)) {
+						if (start_server_gui.perform(config.default_server_start) || server_start_requested) {
+							server_start_requested = false;
+
 							change_with_save(
 								[&](auto& cfg) {
 									cfg.default_server_start = config.default_server_start;

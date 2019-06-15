@@ -6,6 +6,13 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+
+- Sounds for grenade throwing 
+	- Flashbang out
+	- Throwing frag
+	- Frag out
+	- EMP
+	- Interference!
 - maybe don't save the last launch unless in debug
 
 - problem: footstep smokes might still be visible when we artificially increase zoom
