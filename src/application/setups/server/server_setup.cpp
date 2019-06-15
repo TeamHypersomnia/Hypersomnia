@@ -787,7 +787,7 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 
 				server->send_payload(
 					client_id,
-					game_channel_type::COMMUNICATIONS,
+					game_channel_type::VOLATILE_STATISTICS,
 
 					update
 				);

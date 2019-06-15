@@ -39,7 +39,7 @@ void server_adapter::client_disconnected(const client_id_type id) {
 }
 
 game_connection_config::game_connection_config() {
-	numChannels = 3;
+	numChannels = static_cast<int>(game_channel_type::COUNT);
 	timeout = 10;
 
 #if RESYNCS_CHANNEL
@@ -83,6 +83,11 @@ game_connection_config::game_connection_config() {
 		communications.messageResendTime = 0.3f;
 		communications.messageSendQueueSize = 1024;
 		communications.messageReceiveQueueSize = 1024;
+	}
+
+	{
+		auto& stats = channel[static_cast<int>(game_channel_type::VOLATILE_STATISTICS)];
+		stats.type = yojimbo::CHANNEL_TYPE_UNRELIABLE_UNORDERED;
 	}
 
 	serverPerClientMemory += 1024 * 1024 * 7;
