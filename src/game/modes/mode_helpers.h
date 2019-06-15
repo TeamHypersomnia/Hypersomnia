@@ -16,7 +16,7 @@ void for_each_faction(F callback) {
 }
 
 inline auto calc_spawnable_factions(const cosmos& cosm) {
-	per_faction_t<bool> result = {};
+	per_actual_faction<bool> result = {};
 
 	for_each_faction([&](const auto faction) {
 		for_each_faction_spawn(cosm, faction, [&](const auto&) {

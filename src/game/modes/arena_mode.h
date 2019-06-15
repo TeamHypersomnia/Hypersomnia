@@ -81,13 +81,13 @@ struct arena_mode_view_rules {
 
 	theme_flavour_type warmup_theme;
 
-	per_faction_t<assets::sound_id> win_themes;
+	per_actual_faction<assets::sound_id> win_themes;
 
-	per_faction_t<per_faction_t<assets::sound_id>> win_sounds;
-	per_faction_t<augs::enum_array<assets::sound_id, battle_event>> event_sounds;
+	per_actual_faction<per_actual_faction<assets::sound_id>> win_sounds;
+	per_actual_faction<augs::enum_array<assets::sound_id, battle_event>> event_sounds;
 
-	per_faction_t<assets::image_id> logos;
-	per_faction_t<assets::image_id> square_logos;
+	per_actual_faction<assets::image_id> logos;
+	per_actual_faction<assets::image_id> square_logos;
 	bool show_money_of_opponents = false;
 	bool show_info_icons_of_opponents = false;
 	bool show_enemy_hud = false;

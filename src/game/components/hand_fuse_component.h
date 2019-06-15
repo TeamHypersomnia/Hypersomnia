@@ -5,6 +5,7 @@
 #include "augs/math/physics_structs.h"
 #include "game/detail/view_input/particle_effect_input.h"
 #include "game/enums/slot_function.h"
+#include "game/enums/faction_type.h"
 
 namespace components {
 	struct hand_fuse {
@@ -62,6 +63,8 @@ namespace invariants {
 		assets::physical_material_id released_physical_material;
 
 		real32 circle_shape_radius_when_released = 9.f;
+
+		per_actual_faction<sound_effect_input> radio_sounds_on_throw;
 		// END GEN INTROSPECTOR
 
 		bool has_delayed_arming() const;

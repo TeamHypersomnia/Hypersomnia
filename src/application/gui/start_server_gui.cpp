@@ -54,7 +54,7 @@ This option is perfect for quick matches between friends and duels of honor.
 Fully featured, separate server process designed to run 24/7.
 It will be running even after exiting the game.
 You can shut it down only through a RCON command accessible to authorized clients.
-To play, you will need to connect to localhost after launching the server. 
+To play, you will need to manually connect to localhost after launching the server. 
 You will experience a minimal lag (on the order of 10ms). 
 For balance, you can increase the lag via Settings->Client->Enable lag simulator.
 
@@ -83,14 +83,21 @@ as well as to test your skills in a laggy environment.
 		}
 	}
 
+#if NDEBUG
+	const bool is_dedicated = instance_type == server_instance_type::DEDICATED;
+	const bool is_disabled = is_dedicated && PLATFORM_UNIX;
+#else
+	const bool is_disabled = false;
+#endif
+
 	{
 		auto child = scoped_child("host view", ImVec2(0, -(ImGui::GetFrameHeightWithSpacing() + 4)));
 		auto width = scoped_item_width(ImGui::GetWindowWidth() * 0.35f);
 
 		// auto& scope_cfg = into;
 
-		input_text<100>("Address", into.ip);
-		text_disabled("Tip: the address can be either IPv4 or IPv6.\nFor example, you can put the IPv6 loopback address, which is \"::1\".");
+		input_text<100>("Address (IPv4 or IPv6)", into.ip);
+		// text_disabled("Tip: the address can be either IPv4 or IPv6.\nFor example, you can put the IPv6 loopback address, which is \"::1\".");
 
 		{
 			auto chosen_port = static_cast<int>(into.port);
@@ -109,21 +116,26 @@ as well as to test your skills in a laggy environment.
 				show_help = true;
 			}
 
-			enum_radio(instance_type);
+			enum_radio(instance_type, true);
 			ImGui::Separator();
 		}
 
-		if (instance_type == server_instance_type::INTEGRATED) {
-			slider("Max incoming connections", into.max_connections, 1, 64);
-			text_disabled("Tip: this number does not include the integrated, local player on the server.\nIf you want to play a 1v1 with someone and not allow anyone else to join or watch,\nyou want to set this value to 1.\n\n");
+		if (is_disabled) {
+			text_color("On Linux, please use the command line to spawn a dedicated server.", red);
 		}
 		else {
-			slider("Max incoming connections", into.max_connections, 2, 64);
+			if (instance_type == server_instance_type::INTEGRATED) {
+				slider("Max incoming connections", into.max_connections, 1, 64);
+				text_disabled("Tip: this number does not include the integrated, local player on the server.\nIf you want to play a 1v1 with someone and not allow anyone else to join or watch,\nyou want to set this value to 1.\n\n");
+			}
+			else {
+				slider("Max incoming connections", into.max_connections, 2, 64);
+			}
+
+			text_disabled("See Settings->Server for more options to tweak.\n\n");
+
+			text_disabled("Tip: to quickly host a server, you can press Shift+H here or in the main menu,\ninstead of clicking \"Launch!\" with your mouse.");
 		}
-
-		text_disabled("See Settings->Server for more options to tweak.\n\n");
-
-		text_disabled("Tip: to quickly host a server, you can press Shift+H here or in the main menu,\ninstead of clicking \"Launch!\" with your mouse.");
 	}
 
 	{
@@ -132,6 +144,8 @@ as well as to test your skills in a laggy environment.
 		ImGui::Separator();
 
 		{
+			auto scope = maybe_disabled_cols({}, is_disabled);
+
 			if (ImGui::Button("Launch!")) {
 				result = true;
 				//show = false;

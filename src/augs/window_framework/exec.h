@@ -11,7 +11,7 @@
 #endif
 
 namespace augs {
-	std::string exec(const std::string cmd) {
+	inline std::string exec(const std::string cmd) {
 		std::array<char, 128> buffer;
 		std::string result;
 		std::shared_ptr<FILE> pipe(_popen(cmd.c_str(), "r"), _pclose);

@@ -89,7 +89,7 @@ struct bomb_mode_ruleset {
 	unsigned match_summary_seconds = 15;
 	unsigned game_commencing_seconds = 3;
 	meter_value_type minimal_damage_for_assist = 41;
-	per_faction_t<bomb_mode_faction_rules> factions;
+	per_actual_faction<bomb_mode_faction_rules> factions;
 
 	constrained_entity_flavour_id<invariants::explosive, invariants::hand_fuse> bomb_flavour;
 	bool delete_lying_items_on_round_start = false;
@@ -401,7 +401,7 @@ private:
 
 	cosmos_clock clock_before_setup;
 	arena_mode_state state = arena_mode_state::INIT;
-	per_faction_t<bomb_mode_faction_state> factions;
+	per_actual_faction<bomb_mode_faction_state> factions;
 	std::map<mode_player_id, bomb_mode_player> players;
 	bomb_mode_round_state current_round;
 

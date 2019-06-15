@@ -71,6 +71,7 @@
 
 #include "augs/readwrite/byte_readwrite.h"
 #include "view/game_gui/special_indicator_logic.h"
+#include "augs/window_framework/create_process.h"
 
 std::function<void()> ensure_handler;
 bool log_to_live_file = false;
@@ -1228,10 +1229,19 @@ int work(const int argc, const char* const * const argv) try {
 							change_with_save(
 								[&](auto& cfg) {
 									cfg.default_server_start = config.default_server_start;
+									cfg.client = config.client;
 								}
 							);
 
-							launch_setup(launch_type::SERVER);
+							if (start_server_gui.instance_type == server_instance_type::INTEGRATED) {
+								launch_setup(launch_type::SERVER);
+							}
+							else {
+								augs::spawn_detached_process(params.exe_path, "--dedicated-server");
+								config.default_client_start.ip_port = typesafe_sprintf("%x:%x", config.default_server_start.ip, config.default_server_start.port);
+
+								launch_setup(launch_type::CLIENT);
+							}
 						}
 					}
 

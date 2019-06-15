@@ -132,7 +132,7 @@ namespace test_scenes {
 			re[battle_event::BOMB_PLANTED] = to_sound_id(test_scene_sound_id::RE_BOMB_PLANTED);
 		}
 
-		for (auto& t : rs.view.win_themes) {
+		for (auto& t : rs.view.win_themes.items) {
 			t = to_sound_id(test_scene_sound_id::BLANK);
 		}
 
