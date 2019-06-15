@@ -72,7 +72,7 @@ class client_setup :
 	special_client_request pending_request = special_client_request::NONE;
 	bool now_resyncing = false;
 
-	std::array<arena_player_meta, max_incoming_connections_v> player_metas;
+	arena_player_metas player_metas;
 
 	/* The rest is client-specific */
 	sol::state& lua;
@@ -540,4 +540,8 @@ public:
 	}
 
 	std::optional<arena_player_metas> get_new_player_metas();
+
+	const arena_player_metas* find_player_metas() const {
+		return std::addressof(player_metas);
+	}
 };

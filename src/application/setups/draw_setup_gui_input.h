@@ -6,6 +6,7 @@
 #include "view/gui_fonts.h"
 #include "view/viewables/avatars_in_atlas_map.h"
 #include "augs/graphics/renderer.h"
+#include "view/mode_gui/arena/arena_player_meta.h"
 
 class images_in_atlas_map;
 class visible_entities;
@@ -32,4 +33,5 @@ struct draw_setup_gui_input {
 	const vec2i screen_size;
 	const all_loaded_gui_fonts& gui_fonts;
 	const all_necessary_sounds& sounds;
+	const arena_player_metas* const player_metas;
 };

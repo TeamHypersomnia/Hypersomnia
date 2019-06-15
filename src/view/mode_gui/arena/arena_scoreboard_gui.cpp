@@ -488,12 +488,17 @@ void arena_scoreboard_gui::draw_gui(
 				print_col_text(*current_column, text, faction_text_col);
 			};
 
-			const auto ping = 0;
-			const auto ping_str = typesafe_sprintf("%x", ping);
+			if (in.player_metas != nullptr) {
+				const auto ping = (*in.player_metas)[player_id.value].stats.ping;
+				auto ping_str = typesafe_sprintf("%x", ping);
 
-			const auto& stats = player_data.stats;
+				if (ping == 255) {
+					ping_str = ">254";
+				}
 
-			col_text(ping_str);
+				col_text(ping_str);
+			}
+
 			next_col();
 
 			if (player_handle.alive()) {
@@ -637,6 +642,8 @@ void arena_scoreboard_gui::draw_gui(
 			next_col();
 			col_text(player_data.chosen_name);
 			next_col();
+
+			const auto& stats = player_data.stats;
 
 			{
 				auto do_money = [&]() {

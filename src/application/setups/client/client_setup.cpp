@@ -377,6 +377,25 @@ message_handler_result client_setup::handle_server_message(
 		//LOG_NVPS(payload.num_entropies_accepted);
 	}
 	else if constexpr (std::is_same_v<T, net_statistics_update>) {
+		const auto& ping_values = payload.ping_values;
+
+		int ping_value_i = 0;
+
+		get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
+			[&](const auto& typed_mode) {
+				typed_mode.for_each_player_id(
+					[&](const mode_player_id& id) {
+						if (ping_value_i < static_cast<int>(ping_values.size())) {
+							player_metas[id.value].stats.ping = ping_values[ping_value_i++];
+
+							return callback_result::CONTINUE;
+						}
+
+						return callback_result::ABORT;
+					}
+				);
+			}
+		);
 
 	}
 	else if constexpr (std::is_same_v<T, arena_player_avatar_payload>) {

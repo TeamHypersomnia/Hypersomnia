@@ -1788,6 +1788,12 @@ int work(const int argc, const char* const * const argv) try {
 				game_gui.world.draw(context);
 			}
 
+			const arena_player_metas* player_metas = nullptr;
+
+			on_specific_setup([&](client_setup& setup) {
+				player_metas = setup.find_player_metas();
+			});
+
 			/* #4 */
 			visit_current_setup([&](auto& setup) {
 				setup.draw_custom_gui({
@@ -1805,7 +1811,8 @@ int work(const int argc, const char* const * const argv) try {
 					common_input_state.mouse.pos,
 					screen_size,
 					streaming.get_loaded_gui_fonts(),
-					necessary_sounds
+					necessary_sounds,
+					player_metas
 				});
 
 				renderer.call_and_clear_lines();

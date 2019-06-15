@@ -769,8 +769,13 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 
 				const auto client_id = static_cast<client_id_type>(index_in(clients, c));
 
+				const auto max_ping = std::numeric_limits<uint8_t>::max();
 				const auto info = server->get_network_info(client_id);
-				update.ping_values.push_back(static_cast<uint8_t>(std::round(info.rtt_ms)));
+				const auto rounded_ping = static_cast<int>(std::round(info.rtt_ms));
+
+				const auto clamped_ping = std::clamp(rounded_ping, 0, int(max_ping));
+
+				update.ping_values.push_back(static_cast<uint8_t>(clamped_ping));
 			}
 
 			for (auto& c : clients) {

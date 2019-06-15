@@ -17,6 +17,7 @@
 #include "augs/misc/timing/speed_vars.h"
 #include "game/modes/mode_commands/mode_entropy_structs.h"
 #include "game/detail/view_input/predictability_info.h"
+#include "augs/enums/callback_result.h"
 
 class cosmos;
 struct cosmos_solvable_significant;
@@ -553,4 +554,13 @@ public:
 	}
 
 	augs::maybe<rgba> get_current_fallback_color_for(const_input, faction_type faction) const;
+
+	template <class F>
+	void for_each_player_id(F callback) const {
+		for (const auto& p : players) {
+			if (callback(p.first) == callback_result::ABORT) {
+				return;
+			}
+		}
+	}
 };
