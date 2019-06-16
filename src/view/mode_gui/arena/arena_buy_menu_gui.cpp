@@ -379,16 +379,8 @@ result_type arena_buy_menu_gui::perform_imgui(const input_type in) {
 			hotkey_text,
 			[&]() {
 				_on_spell(s_id, [&](const auto& spell_data) {
-					const auto f = augs::gui::text::from_bbcode(spell_data.appearance.name, { dummy, white });
-
-					if (f.empty()) {
-						return;
-					}
-
-					const auto col = f[0].format.color;
-					const auto ss = f.operator std::string();
-
-					text_color(ss, col);
+					const auto col = spell_data.appearance.name_color;
+					text_color(spell_data.appearance.name, col);
 					ImGui::SameLine();
 				});
 			},

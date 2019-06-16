@@ -38,4 +38,8 @@ public:
 	auto* operator->() const {
 		return this;
 	}
+
+	auto& get_owner_meta() const {
+		return this->component->owner_meta;
+	}
 };

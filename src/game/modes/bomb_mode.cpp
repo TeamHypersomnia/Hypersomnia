@@ -251,7 +251,7 @@ void bomb_mode::init_spawned(
 					[&](const auto&, auto& raw_entity) {
 						auto& item = raw_entity.template get<components::item>();
 						item.charges = i.charges;
-						item.purchase_meta.original_buyer = typed_handle.get_id();
+						item.owner_meta = i.owner_meta;
 					},
 					[&](const auto&) {
 
@@ -277,7 +277,7 @@ void bomb_mode::init_spawned(
 						created_items.push_back(new_id);
 					}
 
-					auto fill_or_refill = [&cosm, &step](const auto slot) {
+					auto fill_or_refill = [&cosm, &step, &typed_handle](const auto slot) {
 						if (const auto charge_inside = slot.get_item_if_any()) {
 							charge_inside.set_charges(charge_inside.num_charges_fitting_in(slot));
 						}
@@ -290,6 +290,7 @@ void bomb_mode::init_spawned(
 
 							if (charge_flavour.is_set()) {
 								const auto charge = just_create_entity(cosm, charge_flavour);
+								set_original_owner(charge, typed_handle);
 
 								charge.set_charges(charge.num_charges_fitting_in(slot));
 
@@ -997,6 +998,8 @@ bomb_mode::round_transferred_players bomb_mode::make_transferred_players(const i
 			auto& items = eq.items;
 			pm.survived = true;
 
+			std::unordered_map<entity_id, std::size_t> id_to_container_idx;
+
 			handle.for_each_contained_item_recursive(
 				[&](const auto& typed_item) {
 					const auto flavour_id = typed_item.get_flavour_id();
@@ -1008,7 +1011,7 @@ bomb_mode::round_transferred_players bomb_mode::make_transferred_players(const i
 					const auto slot = typed_item.get_current_slot();
 					const auto container_id = slot.get_container().get_id();
 					const auto container_index = mapped_or_default(
-						eq.id_to_container_idx, 
+						id_to_container_idx, 
 						container_id, 
 						static_cast<std::size_t>(-1)
 					);
@@ -1017,15 +1020,15 @@ bomb_mode::round_transferred_players bomb_mode::make_transferred_players(const i
 						ensure_eq(handle.get_id(), container_id);
 					}
 
-					const auto charges = typed_item.template get<components::item>().get_charges();
-
 					if (typed_item.template has<invariants::container>()) {
 						const auto new_idx = eq.items.size();
-						eq.id_to_container_idx.try_emplace(typed_item.get_id(), new_idx);
+						id_to_container_idx.try_emplace(typed_item.get_id(), new_idx);
 					}
 
 					const auto source_entity_id = typed_item.get_id();
-					items.push_back({ flavour_id, charges, container_index, slot.get_type(), source_entity_id });
+					const auto& item = typed_item.template get<components::item>();
+
+					items.push_back({ flavour_id, item.get_charges(), item.get_raw_component().owner_meta, container_index, slot.get_type(), source_entity_id });
 
 					return recursive_callback_result::CONTINUE_AND_RECURSE;
 				}

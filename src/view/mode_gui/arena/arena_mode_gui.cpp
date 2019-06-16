@@ -185,6 +185,165 @@ void arena_gui_state::draw_mode_gui(
 			return get_text_bbox(colored(text, white));;
 		};
 
+		augs::vertex_triangle_buffer avatar_triangles;
+
+		auto draw_death_summary = [&]() {
+			const auto viewed_player_id = spectator.show ? spectator.now_spectating : local_player_id;
+			const auto viewed_player_data = typed_mode.find(viewed_player_id);
+
+			const auto window_padding = vec2i(4, 8);
+			const auto item_padding = vec2i(4, 4);
+
+			if (viewed_player_data == nullptr) {
+				return;
+			}
+
+			const auto& cosm = mode_input.cosm;
+			const auto viewed_player_handle = cosm[viewed_player_data->controlled_character_id];
+
+			if (viewed_player_handle.dead()) {
+				return;
+			}
+
+			const bool is_dead = viewed_player_handle.alive() && viewed_player_handle.template get<components::sentience>().is_dead();
+
+			if (!is_dead) {
+				return;
+			}
+
+			mode_player_id killer_player_id;
+			damage_origin killer_origin;
+			std::string killer_name;
+
+			{
+				const auto& kos = typed_mode.get_current_round().knockouts;
+
+				for (const auto& k : reverse(kos)) {
+					if (k.victim.id == viewed_player_id) {
+						killer_player_id = k.knockouter.id;
+						killer_origin = k.origin;
+						killer_name = k.knockouter.name;
+						break;
+					}
+				}
+			}
+
+			if (!killer_player_id.is_set()) {
+				return;
+			}
+
+			const bool is_suicide = viewed_player_id == killer_player_id;
+
+			mode_player_id tool_owner;
+
+			const auto tool_name = killer_origin.on_tool_used(cosm, [&](const auto& tool) -> std::string {
+				if constexpr(is_spell_v<decltype(tool)>) {
+					return tool.appearance.name;
+				}
+				else {
+					return tool.get_name();
+				}
+			});
+
+			auto try_get_owner_from = [&](const auto& entity) {
+				if (tool_owner.is_set()) {
+					return;
+				}
+
+				if (const auto tool_entity = cosm[entity]) {
+					if (const auto tool_item = tool_entity.template find<components::item>()) {
+						const auto tool_owner_entity = tool_item.get_owner_meta().original_owner;
+						tool_owner = typed_mode.lookup(tool_owner_entity);
+					}
+				}
+			};
+
+			try_get_owner_from(killer_origin.cause.entity);
+			try_get_owner_from(killer_origin.sender.direct_sender);
+
+			const bool is_weapon_your_own = tool_owner == viewed_player_id;
+			const bool is_weapon_killers = tool_owner == killer_player_id;
+
+			auto larger_colored = [&](const auto& text, const auto& c) {
+				const auto text_style = style(
+					in.gui_fonts.larger_gui,
+					c
+				);
+
+				return formatted_string(text, text_style);
+			};
+
+			const auto killed_you_str = is_suicide ? "killed yourself" : "killed you with";
+			const auto owner_str = [&]() -> std::string {
+				if (is_weapon_your_own) {
+					return "your own";
+				}
+
+				if (is_weapon_killers) {
+					return "their";
+				}
+
+				if (tool_owner.is_set()) {
+					if (const auto owner_data = typed_mode.find(tool_owner)) {
+						return owner_data->chosen_name + "'s";
+					}
+				}
+
+				return "";
+			}();
+
+			auto total_subtext = colored(std::string("   ") + killed_you_str, is_suicide ? yellow : white);
+
+			if (tool_name) {
+				total_subtext += colored(" with ", white);
+
+				if (owner_str.size() > 0) {
+					total_subtext += colored(owner_str + " ", white);
+				}
+
+				total_subtext += colored(*tool_name, cyan);
+			}
+
+			const auto& killer_nickname_text = larger_colored((is_suicide ? std::string("YOU") : killer_name) + "\n", white);
+			const auto total_text = killer_nickname_text + total_subtext;
+			const auto total_text_size = get_text_bbox(total_text);
+			const auto displayed_avatar_size = vec2i::square(max_avatar_side_v);
+
+			const auto predicted_size = window_padding * 2 + displayed_avatar_size + vec2i(total_text_size.x + item_padding.x, 0);
+			const auto off_mult = cfg.death_summary_offset_mult;
+			const auto popup_lt = vec2(in.screen_size.x / 2 - predicted_size.x / 2, in.screen_size.y * off_mult);
+
+			const bool avatars_enabled = in.general_atlas != std::nullopt && in.avatar_atlas != std::nullopt;
+
+			if (avatars_enabled) {
+				if (const auto& entry = in.avatars_in_atlas.at(killer_player_id.value); entry.exists()) {
+					const auto& avatar_orig = ltrbi(popup_lt + window_padding, displayed_avatar_size);
+
+					auto avatar_output = augs::drawer { avatar_triangles };
+					avatar_output.aabb(entry, avatar_orig, white);
+				}
+			}
+
+			const auto total_text_pos = popup_lt + window_padding + vec2i(item_padding.x + displayed_avatar_size.x, 0);
+
+			print_stroked(
+				in.drawer,
+				total_text_pos,
+				total_text
+			);
+
+			if (avatar_triangles.size() > 0) {
+				in.renderer.call_and_clear_triangles();
+
+				auto previous_texture = augs::graphics::texture::find_current();
+
+				in.avatar_atlas->set_as_current();
+				in.renderer.call_triangles(avatar_triangles);
+
+				augs::graphics::texture::set_current_to(previous_texture);
+			}
+		};
+
 		auto draw_scoreboard = [&]() {
 			scoreboard.draw_gui(in, mode_in, typed_mode, mode_input);
 		};
@@ -298,7 +457,6 @@ void arena_gui_state::draw_mode_gui(
 				const auto& victim = get_name(ko.victim);
 
 				const bool is_suicide = ko.knockouter.id == ko.victim.id;
-				(void)is_suicide;
 
 				const auto lhs_text = 
 					colored(is_suicide ? "" : knockouter, get_col(ko.knockouter))
@@ -645,6 +803,7 @@ void arena_gui_state::draw_mode_gui(
 				draw_text_indicator_at(warning, where);
 			}
 
+			draw_death_summary();
 			draw_scoreboard();
 			draw_spectator();
 			draw_money_and_awards();

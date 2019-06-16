@@ -286,12 +286,12 @@ private:
 			constrained_entity_flavour_id<components::item> flavour;
 
 			int charges = -1;
+			item_owner_meta owner_meta;
 			std::size_t container_index = static_cast<std::size_t>(-1);
 			slot_function slot_type = slot_function::INVALID;
 			entity_id source_entity_id;
 		};
 
-		std::unordered_map<entity_id, std::size_t> id_to_container_idx;
 		std::vector<item> items;
 	};
 

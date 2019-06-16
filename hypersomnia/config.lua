@@ -268,6 +268,16 @@ return {
 		settings = {},
 		source_font_path = "content/necessary/fonts/unifont.ttf"
 	  },
+	  larger_gui = {
+		unicode_ranges = {
+		  { 0x0020, 0x00FF }, -- Basic Latin + Latin Supplement
+		  { 0x0100, 0x017F }  -- Latin Extended-A
+		},
+		size_in_pixels = 32,
+		add_japanese_ranges = false,
+		settings = {},
+		source_font_path = "content/necessary/fonts/unifont.ttf"
+	  },
 	  large_numbers = {
 		unicode_ranges = {
 		  { 0x0030, 0x0039 }, -- Only numbers

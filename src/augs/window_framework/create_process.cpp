@@ -5,6 +5,7 @@
 
 #include "augs/window_framework/shell.h"
 #include "augs/ensure.h"
+
 #if PLATFORM_WINDOWS
 #include <Windows.h>
 #endif

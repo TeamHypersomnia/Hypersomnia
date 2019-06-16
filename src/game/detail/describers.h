@@ -52,7 +52,7 @@ entity_name_str get_bbcoded_spell_description(
 		spell.common.cooldown_ms
 	);
 
-	return spell.appearance.name + "\n" + properties + "\n" + spell.appearance.description;
+	return properties + "\n" + spell.appearance.description;
 }
 
 using name_accumulator = std::map<entity_name_str, std::size_t>;

@@ -6,6 +6,7 @@
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 #include "game/modes/detail/item_purchase_logic.hpp"
+#include "game/modes/detail/owner_meta_logic.h"
 
 template <class E>
 entity_id requested_equipment::generate_for(
@@ -17,6 +18,16 @@ entity_id requested_equipment::generate_for(
 
 	const auto& eq = *this;
 	auto& cosm = step.get_cosmos();
+
+	auto make_owned_item = [&](const auto& flavour) {
+		const auto new_entity = just_create_entity(cosm, flavour);
+
+		if constexpr (!to_the_ground) {
+			::set_original_owner(new_entity, character);
+		}
+
+		return new_entity;
+	};
 
 	auto transfer = [&step, &max_effects_played](const auto from, const auto to, const bool play_effects = true) {
 		if (to.dead()) {
@@ -50,12 +61,12 @@ entity_id requested_equipment::generate_for(
 
 		if constexpr (!to_the_ground) {
 			if (const auto target_slot = character[slot]; target_slot.is_empty_slot()) {
-				const auto new_wearable = just_create_entity(cosm, from);
+				const auto new_wearable = make_owned_item(from);
 				transfer(new_wearable, target_slot);
 			}
 		}
 		else {
-			just_create_entity(cosm, from);
+			make_owned_item(from);
 			(void)slot;
 			(void)character;
 		}
@@ -97,7 +108,7 @@ entity_id requested_equipment::generate_for(
 
 	auto make_ammo_piece = [&](const auto& flavour) {
 		if (flavour.is_set()) {
-			if (const auto piece = just_create_entity(cosm, flavour)) {
+			if (const auto piece = make_owned_item(flavour)) {
 				piece.set_charges(1);
 
 				if (const auto mag_deposit = piece[slot_function::ITEM_DEPOSIT]) {
@@ -110,7 +121,7 @@ entity_id requested_equipment::generate_for(
 					}();
 
 					if (final_charge_flavour.is_set()) {
-						if (const auto c = just_create_entity(cosm, final_charge_flavour)) {
+						if (const auto c = make_owned_item(final_charge_flavour)) {
 							c.set_charges(c.num_charges_fitting_in(mag_deposit));
 
 							transfer(c, mag_deposit);
@@ -136,7 +147,7 @@ entity_id requested_equipment::generate_for(
 	entity_id result_weapon;
 
 	if (eq.weapon.is_set()) {
-		if (const auto weapon = just_create_entity(cosm, eq.weapon)) {
+		if (const auto weapon = make_owned_item(eq.weapon)) {
 			result_weapon = weapon.get_id();
 
 			/* So that the effect transform is valid */
@@ -148,14 +159,14 @@ entity_id requested_equipment::generate_for(
 			auto create_charge_in_chamber = [&](const auto& charge_flavour) {
 				if (charge_flavour.is_set()) {
 					if (chamber_slot) {
-						if (const auto c = just_create_entity(cosm, charge_flavour)) {
+						if (const auto c = make_owned_item(charge_flavour)) {
 							c.set_charges(1);
 
 							transfer(c, chamber_slot, false);
 
 							if (chamber_mag_slot) {
 								if (const auto num_fitting = c.num_charges_fitting_in(chamber_mag_slot); num_fitting > 0) {
-									if (const auto cm = just_create_entity(cosm, charge_flavour)) {
+									if (const auto cm = make_owned_item(charge_flavour)) {
 										cm.set_charges(num_fitting);
 
 										transfer(cm, chamber_mag_slot, false);
@@ -232,7 +243,7 @@ entity_id requested_equipment::generate_for(
 		const auto& f = it.second;
 
 		while (n--) {
-			pickup(just_create_entity(cosm, f));
+			pickup(make_owned_item(f));
 		}
 	}
 

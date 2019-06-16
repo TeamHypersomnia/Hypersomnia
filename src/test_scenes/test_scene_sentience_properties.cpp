@@ -31,7 +31,8 @@ void load_test_scene_sentience_properties(
 
 		d.appearance.incantation = "treximo";
 
-		d.appearance.name = "[color=green]Haste[/color]";
+		d.appearance.name = "Haste";
+		d.appearance.name_color = green;
 		d.appearance.description = typesafe_sprintf(
 			"[color=vsdarkgray]Increases movement speed for %x seconds.[/color]", 
 			d.perk_duration_seconds
@@ -53,7 +54,8 @@ void load_test_scene_sentience_properties(
 
 		d.appearance.incantation = "efforia";
 
-		d.appearance.name = "[color=green]Exaltation[/color]";
+		d.appearance.name = "Exaltation";
+		d.appearance.name_color = green;
 		d.appearance.description = typesafe_sprintf(
 			"[color=vsdarkgray]Stabilizes functions of the physical body.[/color]"
 		);
@@ -77,7 +79,8 @@ void load_test_scene_sentience_properties(
 
 		d.appearance.incantation = "armonia";
 
-		d.appearance.name = "[color=yellow]Echoes of the higher realms[/color]";
+		d.appearance.name = "Echoes of the higher realms";
+		d.appearance.name_color = yellow;
 		d.appearance.description = typesafe_sprintf(
 			"[color=vsdarkgray]Restores resonance of mind with the body.[/color]"
 		);
@@ -101,7 +104,8 @@ void load_test_scene_sentience_properties(
 
 		d.appearance.incantation = "mania aiones";
 
-		d.appearance.name = "[color=cyan]Fury of the Aeons[/color]";
+		d.appearance.name = "Fury of the Aeons";
+		d.appearance.name_color = cyan;
 		d.appearance.description = typesafe_sprintf(
 			"[color=vsdarkgray]Causes instant damage around the caster.[/color]"
 		);
@@ -142,7 +146,8 @@ void load_test_scene_sentience_properties(
 
 		d.appearance.incantation = "energeia triada";
 
-		d.appearance.name = "[color=cyan]Electric Triad[/color]";
+		d.appearance.name = "Electric Triad";
+		d.appearance.name_color = cyan;
 		d.appearance.description = typesafe_sprintf(
 			"[color=vsdarkgray]Spawns three electric missiles\nhoming towards hostile entities.[/color]"
 		);
@@ -164,7 +169,8 @@ void load_test_scene_sentience_properties(
 
 		d.appearance.incantation = "megalyteri aiones via";
 
-		d.appearance.name = "[color=cyan]Ultimate Wrath of the Aeons[/color]";
+		d.appearance.name = "Ultimate Wrath of the Aeons";
+		d.appearance.name_color = cyan;
 		d.appearance.description = typesafe_sprintf(
 			"[color=vsdarkgray]Causes massive damage around the caster.\nRequires delay to initiate.[/color]"
 		);
@@ -250,7 +256,8 @@ void load_test_scene_sentience_properties(
 
 		d.appearance.incantation = "energeia aspida";
 
-		d.appearance.name = "[color=turquoise]Electric Shield[/color]";
+		d.appearance.name = "Electric Shield";
+		d.appearance.name_color = turquoise;
 		d.appearance.description = typesafe_sprintf(
 			"[color=vsdarkgray]For %x seconds, damage is absorbed\nby [/color][color=cyan]Personal Electricity[/color][color=vsdarkgray] instead of [/color][color=red]Health[/color][color=vsdarkgray].[/color]",
 			d.perk_duration_seconds

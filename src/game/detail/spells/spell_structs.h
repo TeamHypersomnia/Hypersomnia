@@ -32,6 +32,7 @@ struct spell_common_data {
 struct spell_appearance {
 	// GEN INTROSPECTOR struct spell_appearance
 	assets::image_id icon;
+	rgba name_color = white;
 	entity_name_str incantation;
 	entity_name_str name;
 	entity_name_str description;

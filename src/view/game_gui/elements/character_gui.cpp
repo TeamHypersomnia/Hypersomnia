@@ -536,14 +536,18 @@ void character_gui::draw_tooltip_from_hover_or_world_highlight(
 							[&](auto s) {
 								using S = decltype(s);
 								const auto& spell_data = std::get<S>(cosm.get_common_significant().spells);
+								const auto spell_title_style = text::style(context.get_gui_font(), spell_data.appearance.name_color);
 
-								return text::from_bbcode(
-									get_bbcoded_spell_description(
-										gui_entity,
-										spell_data
-									),
-									description_style
-								);
+								return 
+									formatted_string(spell_data.appearance.name + "\n", spell_title_style) +
+									text::from_bbcode(
+										get_bbcoded_spell_description(
+											gui_entity,
+											spell_data
+										),
+										description_style
+									)
+								;
 							}
 						);
 					}

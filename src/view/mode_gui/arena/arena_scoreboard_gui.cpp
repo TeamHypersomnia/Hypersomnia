@@ -267,8 +267,8 @@ void arena_scoreboard_gui::draw_gui(
 		orig.r += pen.x;
 		orig.b += pen.y;
 
-		auto avatar_output = augs::drawer { color_indicator_triangles };
-		avatar_output.aabb(img, orig, col);
+		auto color_indicator_output = augs::drawer { color_indicator_triangles };
+		color_indicator_output.aabb(img, orig, col);
 	};
 
 	const auto max_score = typed_mode.calc_max_faction_score();

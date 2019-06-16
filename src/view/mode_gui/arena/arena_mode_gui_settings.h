@@ -61,6 +61,8 @@ struct arena_mode_gui_settings {
 	float keep_recent_awards_for_seconds = 8.f;
 
 	bool show_client_resyncing_notifier = true;
+
+	float death_summary_offset_mult = 0.7f;
 	// END GEN INTROSPECTOR
 };
 
