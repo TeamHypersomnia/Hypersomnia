@@ -6,6 +6,15 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Allow to spectate others right away after death
+	- Just spectate right away and always hide the spectator gui overlay when showing our body
+		- The death screen is enough of an indicator
+
+- It would be nice if we didn't crash on loading a corrupted map, at least if we manage to hit an ensure before sigsegv
+- at least set config to main menu on crashing
+
+- Test on windows what's gonna happen if we try to host a server twice on the same port, also on linux
+
 - Keeping an integrated server option has the advantage that it will force you to keep the client code clean
 
 - Host a server menu

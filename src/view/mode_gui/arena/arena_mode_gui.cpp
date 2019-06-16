@@ -191,24 +191,33 @@ void arena_gui_state::draw_mode_gui(
 			const auto viewed_player_id = spectator.show ? spectator.now_spectating : local_player_id;
 			const auto viewed_player_data = typed_mode.find(viewed_player_id);
 
-			const auto window_padding = vec2i(4, 8);
-			const auto item_padding = vec2i(4, 4);
+			const auto window_padding = vec2i(16, 16);
+			const auto item_padding = vec2i(10, 10);
 
 			if (viewed_player_data == nullptr) {
 				return;
 			}
 
 			const auto& cosm = mode_input.cosm;
+
 			const auto viewed_player_handle = cosm[viewed_player_data->controlled_character_id];
 
 			if (viewed_player_handle.dead()) {
 				return;
 			}
 
-			const bool is_dead = viewed_player_handle.alive() && viewed_player_handle.template get<components::sentience>().is_dead();
+			const auto viewed_sentience = viewed_player_handle.template find<components::sentience>();
 
-			if (!is_dead) {
+			if (viewed_sentience == nullptr) {
 				return;
+			}
+
+			{
+				const bool is_dead = viewed_sentience->is_dead();
+
+				if (!is_dead) {
+					return;
+				}
 			}
 
 			mode_player_id killer_player_id;
@@ -289,39 +298,131 @@ void arena_gui_state::draw_mode_gui(
 					}
 				}
 
-				return "";
+				return is_suicide ? "your own" : "their";
 			}();
 
-			auto total_subtext = colored(std::string("   ") + killed_you_str, is_suicide ? yellow : white);
+			const auto killed_color = rgba(255, 50, 50, 255);
+
+			auto total_subtext = colored(std::string("  ") + killed_you_str, killed_color);
 
 			if (tool_name) {
-				total_subtext += colored(" with ", white);
+				total_subtext += colored(" with ", killed_color);
 
 				if (owner_str.size() > 0) {
-					total_subtext += colored(owner_str + " ", white);
+					total_subtext += colored(owner_str + " ", killed_color);
 				}
 
 				total_subtext += colored(*tool_name, cyan);
 			}
 
+			total_subtext += colored("\n", white);
+
+			auto get_stat_text = [&](const auto preffix, const damage_owner& o) {
+				const auto text_col = rgba(150, 150, 150, 255);
+				const auto stat_col = white;
+
+				auto total_stats_text = colored(preffix, text_col);
+
+				total_stats_text += colored(typesafe_sprintf("%x dmg ", static_cast<int>(o.applied_damage)), stat_col);
+				total_stats_text += colored("in ", text_col);
+				total_stats_text += colored(typesafe_sprintf("%x hits", o.hits), stat_col);
+				total_stats_text += colored(", ", text_col);
+				total_stats_text += colored(typesafe_sprintf("%x HP", static_cast<int>(o.hp_loss)), stat_col);
+				total_stats_text += colored(" loss, ", text_col);
+				total_stats_text += colored(typesafe_sprintf("%x PE", static_cast<int>(o.pe_loss)), stat_col);
+				total_stats_text += colored(" loss.", text_col);
+
+				return total_stats_text;
+			};
+
+			if (const auto killer_character_id = typed_mode.lookup(killer_player_id); killer_character_id.is_set()) {
+				for (const auto& o : viewed_sentience->damage_owners) {
+					if (o.who == killer_character_id) {
+						total_subtext += get_stat_text("\nTaken: ", o);
+					}
+				}
+
+				if (const auto killer_character = cosm[killer_character_id]) {
+					if (const auto killer_sentience = killer_character.template find<components::sentience>()) {
+						for (const auto& o : killer_sentience->damage_owners) {
+							if (o.who == viewed_player_handle) {
+								total_subtext += get_stat_text("\nGiven: ", o);
+							}
+						}
+					}
+				}
+			}
+
 			const auto& killer_nickname_text = larger_colored((is_suicide ? std::string("YOU") : killer_name) + "\n", white);
+			const auto killer_nickname_text_size = get_text_bbox(killer_nickname_text);
+
 			const auto total_text = killer_nickname_text + total_subtext;
 			const auto total_text_size = get_text_bbox(total_text);
-			const auto displayed_avatar_size = vec2i::square(max_avatar_side_v);
 
-			const auto predicted_size = window_padding * 2 + displayed_avatar_size + vec2i(total_text_size.x + item_padding.x, 0);
+			const auto free_w_for_tool = total_text_size.x - killer_nickname_text_size.x;
+
+			const auto tool_image_id = killer_origin.on_tool_used(cosm, [&](const auto& tool) -> assets::image_id {
+				if constexpr(is_spell_v<decltype(tool)>) {
+					return tool.appearance.icon;
+				}
+				else {
+					return tool.get_image_id();
+				}
+			});
+
+			const auto& tool_image_entry = tool_image_id != std::nullopt ? in.images_in_atlas.at(*tool_image_id).diffuse : augs::atlas_entry();
+
+			const bool tool_image_drawn = tool_image_entry.exists();
+			const auto tool_image_size = static_cast<vec2i>(tool_image_entry.get_original_size());
+
+			const auto w_for_tool_image = [&]() {
+				if (tool_image_drawn) {
+					const auto requested_w = tool_image_size.x;
+
+					if (requested_w > free_w_for_tool) {
+						return requested_w - free_w_for_tool;
+					}
+				}
+
+				return 0;
+			}();
+
+			const auto& avatar_atlas_entry = in.avatars_in_atlas.at(killer_player_id.value); 
+			const bool avatars_enabled = in.general_atlas != std::nullopt && in.avatar_atlas != std::nullopt;
+			const bool avatar_displayed = avatar_atlas_entry.exists() && avatars_enabled;
+
+			const auto displayed_avatar_size = vec2i::square(avatar_displayed ? max_avatar_side_v : 0);
+			
+			const auto predicted_size = 
+				vec2i(
+					window_padding.x * 2 + displayed_avatar_size.x + total_text_size.x + item_padding.x + w_for_tool_image,
+					window_padding.x * 2 + std::max(displayed_avatar_size.y, total_text_size.y)
+				)
+			;
+			
+			/* if (tool_image_drawn) { */
+			/* 	predicted_size.x += item_padding.x + tool_image_size.x; */
+			/* } */
+
 			const auto off_mult = cfg.death_summary_offset_mult;
 			const auto popup_lt = vec2(in.screen_size.x / 2 - predicted_size.x / 2, in.screen_size.y * off_mult);
+			const auto window_bg_rect = ltrb(popup_lt, predicted_size);
 
-			const bool avatars_enabled = in.general_atlas != std::nullopt && in.avatar_atlas != std::nullopt;
+			// TODO give it its own settings struct
+			{
+				const auto& cfg = in.config.arena_mode_gui.scoreboard_settings;
 
-			if (avatars_enabled) {
-				if (const auto& entry = in.avatars_in_atlas.at(killer_player_id.value); entry.exists()) {
-					const auto& avatar_orig = ltrbi(popup_lt + window_padding, displayed_avatar_size);
+				in.drawer.aabb_with_border(window_bg_rect, cfg.background_color, killed_color);
+			}
 
-					auto avatar_output = augs::drawer { avatar_triangles };
-					avatar_output.aabb(entry, avatar_orig, white);
-				}
+			if (avatar_displayed) {
+				const auto avatar_orig = ltrbi(popup_lt + window_padding, displayed_avatar_size);
+
+				//const auto& cfg = in.config.arena_mode_gui.scoreboard_settings;
+				//in.drawer.border(avatar_orig, cfg.border_color);
+
+				auto avatar_output = augs::drawer { avatar_triangles };
+				avatar_output.aabb(avatar_atlas_entry, avatar_orig, white);
 			}
 
 			const auto total_text_pos = popup_lt + window_padding + vec2i(item_padding.x + displayed_avatar_size.x, 0);
@@ -331,6 +432,21 @@ void arena_gui_state::draw_mode_gui(
 				total_text_pos,
 				total_text
 			);
+
+			if (tool_image_drawn) {
+				const auto tool_image_padding = window_padding;
+				const auto tool_window_size = tool_image_size + tool_image_padding * 2;
+				const auto tool_window_orig = ltrbi(window_bg_rect.right_top() + vec2i(-tool_window_size.x, 0), tool_window_size);
+
+				// TODO give it its own settings struct
+				{
+					//const auto& cfg = in.config.arena_mode_gui.scoreboard_settings;
+					//in.drawer.aabb_with_border(tool_window_orig, cfg.background_color, cfg.border_color);
+				}
+
+				const auto tool_image_orig = ltrbi(tool_window_orig.left_top() + tool_image_padding, tool_image_size);
+				in.drawer.base::aabb(tool_image_entry, tool_image_orig, white);
+			}
 
 			if (avatar_triangles.size() > 0) {
 				in.renderer.call_and_clear_triangles();

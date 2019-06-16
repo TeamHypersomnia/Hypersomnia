@@ -54,7 +54,7 @@ namespace test_scenes {
 
 	void testbed::setup(bomb_mode_ruleset& rs) {
 		rs.bot_names = {
-			"daedalus",
+			"daedalus lkjgfdskl kljf8394833",
 			"icarus",
 			"geneotech",
 			"pbc",

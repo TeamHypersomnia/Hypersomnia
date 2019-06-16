@@ -83,9 +83,9 @@ as well as to test your skills in a laggy environment.
 		}
 	}
 
-#if NDEBUG
+#if NDEBUG && PLATFORM_UNIX
 	const bool is_dedicated = instance_type == server_instance_type::DEDICATED;
-	const bool is_disabled = is_dedicated && PLATFORM_UNIX;
+	const bool is_disabled = is_dedicated;
 #else
 	const bool is_disabled = false;
 #endif

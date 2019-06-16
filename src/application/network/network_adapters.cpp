@@ -59,7 +59,7 @@ game_connection_config::game_connection_config() {
 		auto& solvable_stream = channel[static_cast<int>(game_channel_type::SERVER_SOLVABLE_AND_STEPS)];
 		solvable_stream.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
 		solvable_stream.maxBlockSize = 1024 * 1024 * 2;
-		solvable_stream.sentPacketBufferSize = 1024;
+		solvable_stream.sentPacketBufferSize = 1024 * 2;
 		solvable_stream.messageResendTime = 0.f;
 		solvable_stream.messageSendQueueSize = 1024 * 8;
 		solvable_stream.messageReceiveQueueSize = 1024 * 8;
@@ -69,7 +69,7 @@ game_connection_config::game_connection_config() {
 		auto& client_entropies = channel[static_cast<int>(game_channel_type::CLIENT_COMMANDS)];
 		client_entropies.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
 		/* these are like, super critical. */
-		client_entropies.sentPacketBufferSize = 1024;
+		client_entropies.sentPacketBufferSize = 1024 * 2;
 		client_entropies.messageResendTime = 0.f;
 		client_entropies.messageSendQueueSize = 1024 * 8;
 		client_entropies.messageReceiveQueueSize = 1024 * 8;
@@ -79,7 +79,7 @@ game_connection_config::game_connection_config() {
 		auto& communications = channel[static_cast<int>(game_channel_type::COMMUNICATIONS)];
 		communications.type = yojimbo::CHANNEL_TYPE_RELIABLE_ORDERED;
 
-		communications.sentPacketBufferSize = 1024;
+		communications.sentPacketBufferSize = 1024 * 2;
 		communications.messageResendTime = 0.3f;
 		communications.messageSendQueueSize = 1024;
 		communications.messageReceiveQueueSize = 1024;

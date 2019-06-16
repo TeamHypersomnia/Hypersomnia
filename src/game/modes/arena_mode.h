@@ -97,7 +97,7 @@ struct arena_mode_view_rules {
 
 	fog_of_war_settings fog_of_war;
 	double audiovisual_speed = 1.0;
-	uint32_t can_spectate_dead_body_for_secs = 3;
+	uint32_t can_spectate_dead_body_for_secs = 5;
 
 	bool enable_danger_indicators = true;
 	bool enable_teammate_indicators = true;

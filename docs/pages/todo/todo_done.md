@@ -3198,3 +3198,6 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- resize automatically in-game
 
 - ping
+
+- Dealt:
+- Given:

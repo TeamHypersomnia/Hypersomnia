@@ -217,6 +217,8 @@ namespace test_flavours {
 		{
 			auto& meta = get_test_flavour(flavours, test_plain_missiles::SKULL_ROCKET_FLYING);
 
+			meta.template get<invariants::text_details>().name = "Skull rocket";
+
 			{
 				invariants::render render_def;
 				render_def.layer = render_layer::FLYING_BULLETS;

@@ -6,6 +6,9 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- Pulse "your own" color for a funny effect
+
+- Fix owner tracking for grenades as they get deleted and the death summary can't know whose that grenade really was
 
 - Sounds for grenade throwing 
 	- Flashbang out
