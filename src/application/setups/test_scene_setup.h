@@ -139,4 +139,8 @@ public:
 	void on_mode_with_input(F&& callback) const {
 		callback(mode, test_mode::const_input { ruleset, scene.world });
 	}
+
+	auto get_game_gui_subject_id() const {
+		return get_viewed_character_id();
+	}
 };

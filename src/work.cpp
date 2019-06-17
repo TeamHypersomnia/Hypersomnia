@@ -581,6 +581,18 @@ int work(const int argc, const char* const * const argv) try {
 		};
 	};
 
+	static auto get_game_gui_subject = [&]() -> const_entity_handle {
+		const auto& viewed_cosmos = visit_current_setup([](auto& setup) -> const cosmos& {
+			return setup.get_viewed_cosmos();
+		});
+
+		const auto gui_character_id = visit_current_setup([](auto& setup) {
+			return setup.get_game_gui_subject_id();
+		});
+
+		return viewed_cosmos[gui_character_id];
+	};
+
 	static auto get_viewed_character = [&]() -> const_entity_handle {
 		const auto& viewed_cosmos = visit_current_setup([](auto& setup) -> const cosmos& {
 			return setup.get_viewed_cosmos();
@@ -1035,7 +1047,7 @@ int work(const int argc, const char* const * const argv) try {
 			return game_gui.create_context(
 				window.get_screen_size(),
 				common_input_state,
-				get_viewed_character(),
+				get_game_gui_subject(),
 				create_game_gui_deps(viewing_config)
 			);
 		};
@@ -1498,7 +1510,7 @@ int work(const int argc, const char* const * const argv) try {
 							}
 							if (const auto it = mapped_or_nullptr(viewing_config.game_gui_controls, key)) {
 								if (should_draw_game_gui()) {
-									game_gui.control_hotbar_and_action_button(viewed_character, { *it, *key_change });
+									game_gui.control_hotbar_and_action_button(get_game_gui_subject(), { *it, *key_change });
 
 									if (was_pressed) {
 										continue;
@@ -1924,7 +1936,7 @@ int work(const int argc, const char* const * const argv) try {
 			}
 			else if (game_gui_mode && should_draw_game_gui()) {
 				if (viewed_character) {
-					const auto& character_gui = game_gui.get_character_gui(viewed_character);
+					const auto& character_gui = game_gui.get_character_gui(get_game_gui_subject());
 
 					character_gui.draw_cursor_with_tooltip(context, should_draw_our_cursor);
 				}

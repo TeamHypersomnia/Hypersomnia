@@ -934,7 +934,27 @@ void arena_gui_state::draw_mode_gui(
 				draw_spectator();
 			}
 
-			draw_money_and_awards();
+			const bool draw_money = [&]() {
+				if (mode_input.rules.hide_details_when_spectating_enemies) {
+					if (local_player_faction && *local_player_faction != faction_type::SPECTATOR) {
+						const auto viewed_player_id = spectator.show ? spectator.now_spectating : local_player_id;
+						const auto viewed_player_data = typed_mode.find(viewed_player_id);
+
+						if (viewed_player_data == nullptr) {
+							return false;
+						}
+
+						return viewed_player_data->faction == *local_player_faction;
+					}
+				}
+
+				return true;
+			}();
+
+			if (draw_money) {
+				draw_money_and_awards();
+			}
+
 			draw_knockouts();
 
 			if (now_is_warmup) {

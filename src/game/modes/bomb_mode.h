@@ -99,6 +99,8 @@ struct bomb_mode_ruleset {
 	bool refill_chambers_on_round_start = true;
 	bool allow_spectator_to_see_both_teams = true;
 	bool forbid_going_to_spectator_unless_character_alive = true;
+	bool allow_spectate_enemy_if_no_conscious_players = true;
+	bool hide_details_when_spectating_enemies = true;
 
 	bool enable_item_shop = true;
 	bool warmup_enable_item_shop = false;

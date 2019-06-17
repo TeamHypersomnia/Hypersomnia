@@ -77,31 +77,6 @@ entity_id client_setup::get_controlled_character_id() const {
 	);
 }
 
-entity_id client_setup::get_viewed_character_id() const {
-	if (!is_gameplay_on()) {
-		return entity_id::dead();
-	}
-
-	return on_mode_with_input(
-		[&](const auto& typed_mode, const auto& in) {
-			(void)in;
-
-			const auto local_id = get_local_player_id();
-			const auto local_character = typed_mode.lookup(local_id);
-
-			if (arena_gui.spectator.show) {
-				const auto spectating = arena_gui.spectator.now_spectating;
-
-				if (spectating.is_set()) {
-					return typed_mode.lookup(spectating);
-				}
-			}
-
-			return local_character;
-		}
-	);
-}
-
 void client_setup::customize_for_viewing(config_lua_table& config) const {
 	config.window.name = "Arena client";
 

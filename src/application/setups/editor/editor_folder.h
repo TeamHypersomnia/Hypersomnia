@@ -57,7 +57,7 @@ struct editor_folder {
 
 	editor_paths get_paths() const;
 
-	entity_id get_viewed_character_id() const;
+	entity_id get_controlled_character_id() const;
 
 	void autosave_if_needed() const;
 

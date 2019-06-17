@@ -489,9 +489,9 @@ void game_gui_system::advance(
 				recently_dropped = {};
 			}
 		}
-	}
 
-	world.advance_elements(context, dt);
+		world.advance_elements(context, dt);
+	}
 }
 
 void game_gui_system::rebuild_layouts(

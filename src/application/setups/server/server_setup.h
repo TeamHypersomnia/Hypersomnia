@@ -323,4 +323,8 @@ public:
 
 	void broadcast(const ::server_broadcasted_chat&);
 	std::string find_client_nickname(const client_id_type&) const;
+
+	auto get_game_gui_subject_id() const {
+		return get_viewed_character_id();
+	}
 };

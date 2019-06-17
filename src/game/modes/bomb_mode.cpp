@@ -2337,7 +2337,7 @@ bool bomb_mode::suitable_for_spectating(
 		const bool can_watch_anybody = spectator_faction == faction_type::SPECTATOR && in.rules.allow_spectator_to_see_both_teams;
 
 		const auto num_conscious_teammates = num_conscious_players_in(in.cosm, spectator_faction);
-		const bool all_teammates_unconscious = 0 == num_conscious_teammates;
+		const bool all_teammates_unconscious = in.rules.allow_spectate_enemy_if_no_conscious_players && 0 == num_conscious_teammates;
 
 		if (const auto who_data = find(who)) {
 			if (can_watch_anybody || all_teammates_unconscious || who_data->faction == spectator_faction) {
@@ -2416,7 +2416,7 @@ mode_player_id bomb_mode::get_next_to_spectate(
 	else {
 		const auto num_conscious_teammates = num_conscious_players_in(in.cosm, spectator_faction);
 
-		if (num_conscious_teammates == 0) {
+		if (in.rules.allow_spectate_enemy_if_no_conscious_players && num_conscious_teammates == 0) {
 			gather_candidates_from_all_players();
 		}
 		else {

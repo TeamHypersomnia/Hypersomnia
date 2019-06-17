@@ -150,6 +150,12 @@ class client_setup :
 
 	client_arena_type get_viewed_arena_type() const;
 
+	entity_id get_controlled_character_id() const;
+
+	auto get_controlled_character() const {
+		return get_viewed_cosmos()[get_controlled_character_id()];
+	}
+
 public:
 	static constexpr auto loading_strategy = viewables_loading_type::LOAD_ALL;
 	static constexpr bool handles_window_input = true;
@@ -171,15 +177,8 @@ public:
 		return std::min(1.0, (get_current_time() - client_time) / dt);
 	}
 
-	entity_id get_viewed_character_id() const;
-	entity_id get_controlled_character_id() const;
-
 	auto get_viewed_character() const {
 		return get_viewed_cosmos()[get_viewed_character_id()];
-	}
-
-	auto get_controlled_character() const {
-		return get_viewed_cosmos()[get_controlled_character_id()];
 	}
 
 	const auto& get_viewable_defs() const {

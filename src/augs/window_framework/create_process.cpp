@@ -1,7 +1,8 @@
 #include "augs/window_framework/create_process.h"
-#include <cstdio>
-#include <stdio.h>
+
+#if PLATFORM_UNIX
 #include <unistd.h>
+#endif
 
 #include "augs/window_framework/shell.h"
 #include "augs/ensure.h"

@@ -171,7 +171,6 @@ void arena_spectator_gui::advance(
 	};
 
 	(void)local_faction;
-	//const auto num_conscious = typed_mode.num_conscious_players_in(mode_input.cosm, local_faction);
 
 	auto hide_if_match_summary = [&]() {
 		if (mode.get_state() == arena_mode_state::MATCH_SUMMARY) {

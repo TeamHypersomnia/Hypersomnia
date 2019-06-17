@@ -71,7 +71,14 @@ double editor_setup::get_interpolation_ratio() const {
 
 entity_id editor_setup::get_viewed_character_id() const {
 	if (anything_opened()) {
-		return folder().get_viewed_character_id();
+		const auto& f = folder();
+		const auto& overridden = f.view.overridden_viewed;
+
+		if (overridden.is_set()) {
+			return overridden;
+		}
+
+		return arena_base::get_viewed_character_id();
 	}
 
 	return {};

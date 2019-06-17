@@ -148,7 +148,7 @@ bool editor_folder::allow_close() const {
 }
 
 
-entity_id editor_folder::get_viewed_character_id() const {
+entity_id editor_folder::get_controlled_character_id() const {
 	const auto& overridden = view.overridden_viewed;
 
 	if (overridden.is_set()) {

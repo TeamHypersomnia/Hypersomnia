@@ -322,7 +322,7 @@ void editor_player::adjust_entropy(const editor_folder& folder, editor_player_en
 		}
 	}
 
-	const auto currently_viewed = folder.get_viewed_character_id();
+	const auto currently_viewed = folder.get_controlled_character_id();
 
 	if (auto p = mapped_or_nullptr(entropy.cosmic.players, currently_viewed)) {
 		auto opts = cosmic_recording_options;
