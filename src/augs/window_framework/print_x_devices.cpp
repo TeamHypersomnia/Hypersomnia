@@ -1,3 +1,4 @@
+#include "augs/log_path_getters.h"
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/window_framework/print_x_devices.h"
 #include "augs/filesystem/file.h"

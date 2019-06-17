@@ -6,7 +6,7 @@ struct config_lua_table;
 
 enum class settings_pane {
 	// GEN INTROSPECTOR enum class settings_pane
-	WINDOW,
+	GENERAL,
 	GRAPHICS,
 	AUDIO,
 	CONTROLS,
@@ -23,7 +23,7 @@ enum class settings_pane {
 };
 
 class settings_gui_state : public standard_window_mixin<settings_gui_state> {
-	settings_pane active_pane = settings_pane::WINDOW;
+	settings_pane active_pane = settings_pane::GENERAL;
 
 public:
 	using base = standard_window_mixin<settings_gui_state>;

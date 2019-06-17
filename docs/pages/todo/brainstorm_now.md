@@ -6,18 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-Looks like the game crashed since last time.
-Consider sending developers the log file located at:
-%x
-
-If you experience repeated crashes, 
-you might try to reset all your settings,
-which can be done from Settings->Reset to factory default
-
 - It would be nice if we didn't crash on loading a corrupted map, at least if we manage to hit an ensure before sigsegv
-
-- at least set config to main menu on crashing
-	- We could compare write dates of exit success with ensure failed to see if we can take the local config
 
 - Test on windows what's gonna happen if we try to host a server twice on the same port, also on linux
 

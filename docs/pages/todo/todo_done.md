@@ -3225,3 +3225,14 @@ i			- if the newly calculated target is different than last_reload_target, reset
 	- Allow to choose spectator team only if you have an alive character (or for the first time, when you're already connected)
 		- This will prevent griefing when someone goes to spectate the opposing team right after their death
 
+Looks like the game crashed since last time.
+Consider sending developers the log file located at:
+%x
+
+If you experience repeated crashes, 
+you might try to reset all your settings,
+which can be done from Settings->Reset all settings to factory default.
+
+- at least set config to main menu on crashing
+	- We could compare write dates of exit success with ensure failed to see if we can take the local config
+

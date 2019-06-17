@@ -158,6 +158,10 @@ bool start_client_gui_state::perform(
 			}
 		}
 
+		if (p.empty()) {
+			avatar_preview_tex.reset();
+		}
+
 		const auto first_size = vec2(max_avatar_side_v, max_avatar_side_v);
 		const auto half_size = first_size / 2;
 		const auto icon_size = vec2(22, 22);

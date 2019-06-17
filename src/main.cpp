@@ -2,6 +2,7 @@
 #include <clocale>
 
 #include "augs/log.h"
+#include "augs/log_path_getters.h"
 #include "augs/filesystem/file.h"
 #include "augs/window_framework/shell.h"
 
@@ -52,13 +53,13 @@ int main(const int argc, const char* const * const argv) {
 
 		switch (exit_code) {
 			case EXIT_SUCCESS: 
-				augs::save_as_text(get_path_in_log_files("exit_success_debug_log.txt"), logs); 
+				augs::save_as_text(get_exit_success_path(), logs); 
 				break;
 			case EXIT_FAILURE: {
-				const auto failure_log_path = augs::path_type(get_path_in_log_files("exit_failure_debug_log.txt"));
+				const auto failure_log_path = get_exit_failure_path();
+
 				augs::save_as_text(failure_log_path, logs);
-				
-				augs::open_text_editor(failure_log_path.string());
+				augs::open_text_editor(failure_log_path);
 
 				break;
 			}

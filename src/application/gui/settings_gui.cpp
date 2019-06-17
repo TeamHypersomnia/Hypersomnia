@@ -144,7 +144,7 @@ void settings_gui_state::perform(
 		};
 
 		switch (active_pane) {
-			case settings_pane::WINDOW: {
+			case settings_pane::GENERAL: {
 				enum_combo("Launch on game's startup", config.launch_mode);
 
 				revertable_checkbox("Fullscreen", config.window.fullscreen);
@@ -192,6 +192,12 @@ void settings_gui_state::perform(
 				revertable_checkbox("Automatically hide settings in-game", config.session.automatically_hide_settings_ingame);
 
 				enum_combo("Vsync mode", config.window.vsync_mode);
+
+				ImGui::Separator();
+
+				if (ImGui::Button("Reset all settings to factory defaults")) {
+					config = config_lua_table(lua, augs::path_type("config.lua"));
+				}
 
 				break;
 			}

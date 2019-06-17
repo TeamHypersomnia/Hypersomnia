@@ -17,6 +17,7 @@
 
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/lua_readwrite.h"
+#include "augs/log_path_getters.h"
 
 TEST_CASE("StateTest0 PaddingSanityCheck1") {
 	struct ok {

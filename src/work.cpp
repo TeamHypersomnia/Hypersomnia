@@ -6,6 +6,7 @@
 
 #include "fp_consistency_tests.h"
 
+#include "augs/log_path_getters.h"
 #include "augs/unit_tests.h"
 #include "augs/global_libraries.h"
 
@@ -72,6 +73,7 @@
 #include "augs/readwrite/byte_readwrite.h"
 #include "view/game_gui/special_indicator_logic.h"
 #include "augs/window_framework/create_process.h"
+#include "application/setups/editor/editor_popup.h"
 
 std::function<void()> ensure_handler;
 bool log_to_live_file = false;
@@ -179,6 +181,29 @@ int work(const int argc, const char* const * const argv) try {
 
 		last_saved_config.save(lua, local_config_path);
 	};
+
+	static auto last_exit_incorrect_popup = std::optional<editor_popup>();
+
+	if (const auto last_failure_log = find_last_incorrect_exit(); last_failure_log.size() > 0) {
+		change_with_save([](config_lua_table& cfg) {
+			cfg.launch_mode = launch_type::MAIN_MENU;
+		});
+
+		last_exit_incorrect_popup = editor_popup {
+			"Warning",
+			typesafe_sprintf(R"(Looks like the game crashed since last time.
+Consider sending developers the log file located at:
+
+%x
+
+If you experience repeated crashes, 
+you might try to reset all your settings,
+which can be done by pressing "Reset to factory default" in Settings->General,
+and then hitting Save settings.
+)", last_failure_log),
+			""
+		};
+	}
 
 	LOG("Parsing command-line parameters.");
 	static const auto params = cmd_line_params(argc, argv);
@@ -1273,6 +1298,12 @@ int work(const int argc, const char* const * const argv) try {
 							launch_setup(launch_type::MAIN_MENU);
 						}
 					});
+
+					if (last_exit_incorrect_popup != std::nullopt) {
+						if (last_exit_incorrect_popup->perform()) {
+							last_exit_incorrect_popup = std::nullopt;
+						}
+					}
 				},
 
 				/* Flags controlling IMGUI behaviour */

@@ -6,6 +6,7 @@
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/shell.h"
 #include "augs/build_settings/compiler_defines.h"
+#include "augs/log_path_getters.h"
 
 extern std::function<void()> ensure_handler;
 //void (*ensure_handler)() = nullptr;
@@ -22,7 +23,7 @@ FORCE_NOINLINE void save_log_and_terminate() {
 	LOG("\nIf the game crashes repeatedly, consider deleting the \"cache\" folder.");
 
 	const auto logs = program_log::get_current().get_complete();
-	const auto failure_log_path = augs::path_type(get_path_in_log_files("ensure_failed_debug_log.txt"));
+	const auto failure_log_path = augs::path_type(get_ensure_failed_path());
 
 	augs::save_as_text(failure_log_path, logs);
 

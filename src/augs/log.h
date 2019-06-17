@@ -73,4 +73,3 @@ std::ostream& write_nvps(
 #endif
 
 extern bool is_dedicated_server;
-std::string get_path_in_log_files(const std::string& name);
