@@ -12,6 +12,12 @@
 #endif
 
 namespace augs {
+#elif PLATFORM_WINDOWS
+	std::wstring widen(const std::string& s) {
+		return std::wstring(s.begin(), s.end());
+	}
+#endif
+
 	bool spawn_detached_process(const std::string& executable, const std::string& arguments) {
 #if PLATFORM_UNIX
 		(void)executable;
@@ -36,10 +42,12 @@ namespace augs {
 
 		const auto cmd = "\"" + executable + "\" " + arguments;
 
+		const auto cmd_wide = widen(cmd);
+
 		// Start the child process. 
 		const auto result = CreateProcess( 
 			NULL,   // No module name (use command line)
-			cmd.c_str(),        // Command line
+			cmd_wide.c_str(),        // Command line
 			NULL,           // Process handle not inheritable
 			NULL,           // Thread handle not inheritable
 			FALSE,          // Set handle inheritance to FALSE
