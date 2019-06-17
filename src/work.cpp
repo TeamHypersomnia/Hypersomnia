@@ -1237,7 +1237,7 @@ int work(const int argc, const char* const * const argv) try {
 								launch_setup(launch_type::SERVER);
 							}
 							else {
-								augs::spawn_detached_process(params.exe_path, "--dedicated-server");
+								augs::spawn_detached_process(params.exe_path.string(), "--dedicated-server");
 								config.default_client_start.ip_port = typesafe_sprintf("%x:%x", config.default_server_start.ip, config.default_server_start.port);
 
 								launch_setup(launch_type::CLIENT);

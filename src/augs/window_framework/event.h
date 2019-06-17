@@ -197,6 +197,7 @@ namespace augs {
 			std::optional<int> get_number(const key);
 
 			std::string key_to_string(const key);
+			std::string key_to_string_shortened(const key);
 			key string_to_key(const std::string&);
 		}
 

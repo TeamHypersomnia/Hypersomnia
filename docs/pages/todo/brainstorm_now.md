@@ -6,12 +6,18 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Allow to spectate others right away after death
-	- Just spectate right away and always hide the spectator gui overlay when showing our body
-		- The death screen is enough of an indicator
+Looks like the game crashed since last time.
+Consider sending developers the log file located at:
+%x
+
+If you experience repeated crashes, 
+you might try to reset all your settings,
+which can be done from Settings->Reset to factory default
 
 - It would be nice if we didn't crash on loading a corrupted map, at least if we manage to hit an ensure before sigsegv
+
 - at least set config to main menu on crashing
+	- We could compare write dates of exit success with ensure failed to see if we can take the local config
 
 - Test on windows what's gonna happen if we try to host a server twice on the same port, also on linux
 
@@ -35,10 +41,6 @@ summary: That which we are brainstorming at the moment.
 - chat notifier: X is now a spectator
 	- Except when connected for the first time?
 
-- Allow spectator to watch everything
-	- Automatically assign a player to watch on connect
-	- Don't show the spectator text overlay if we're choosing teams
-
 - In-game tip system
 	- Contextual
 		- Press "T" to buy items.
@@ -49,14 +51,6 @@ summary: That which we are brainstorming at the moment.
 		- Double-tap R to drop the old mag for a faster reload. Near-empty mags are dropped automatically.
 		- Melee blows are stronger when you run.
 		- Electric Shield lets you live longer, but slows down your movement.
-
-- Death screen
-	- [Avatar] Billan
-		- Killed you with their Bilmer2000
-		- Damage given: 32 in 2 hits
-			- Count real contribution in damage owners, not mana decreased when shield owned
-		- Damage taken: 4 hits, 384 applied damage, 100 HP lost, 0 PE lost.
-		- Damage given: 2 hits, 180 applied damage, 0 HP lost, 289 PE lost.
 
 - Test avatars on windows, especially the png filename filter
 

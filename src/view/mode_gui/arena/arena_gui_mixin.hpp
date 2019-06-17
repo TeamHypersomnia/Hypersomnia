@@ -13,6 +13,8 @@ std::optional<camera_eye> arena_gui_mixin<D>::find_current_camera_eye() const {
 		return camera_eye();
 	}
 
+	return std::nullopt;
+#if 0
 	return self.get_arena_handle().on_mode(
 		[&](const auto& typed_mode) -> std::optional<camera_eye> {
 			if (const auto player = typed_mode.find(self.get_local_player_id())) {
@@ -24,6 +26,7 @@ std::optional<camera_eye> arena_gui_mixin<D>::find_current_camera_eye() const {
 			return std::nullopt;
 		}
 	);
+#endif
 }
 
 template <class D>

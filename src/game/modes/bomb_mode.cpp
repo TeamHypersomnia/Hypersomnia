@@ -1605,9 +1605,9 @@ void bomb_mode::execute_player_commands(const input_type in, mode_entropy& entro
 				else if constexpr(std::is_same_v<C, team_choice>) {
 					const auto previous_faction = player_data->faction;
 
-					const auto f = typed_command;
+					const auto requested_faction = typed_command;
 
-					if (f == faction_type::COUNT) {
+					if (requested_faction == faction_type::COUNT) {
 						return;
 					}
 
@@ -1641,8 +1641,16 @@ void bomb_mode::execute_player_commands(const input_type in, mode_entropy& entro
 					});
 
 					const auto result = [&]() {
-						if (previous_faction == f) {
+						if (previous_faction == requested_faction) {
 							return faction_choice_result::THE_SAME;
+						}
+
+						if (in.rules.forbid_going_to_spectator_unless_character_alive) {
+							if (death_request == std::nullopt) {
+								if (requested_faction == faction_type::SPECTATOR) {
+									return faction_choice_result::NEED_TO_BE_ALIVE_FOR_SPECTATOR;
+								}
+							}
 						}
 
 						if (previous_faction == faction_type::SPECTATOR) {
@@ -1655,13 +1663,13 @@ void bomb_mode::execute_player_commands(const input_type in, mode_entropy& entro
 							}
 						}
 
-						if (f != faction_type::SPECTATOR) {
+						if (requested_faction != faction_type::SPECTATOR) {
 							/* This is a serious choice */
 
 							{
 								const auto& team_limit = in.rules.max_players_per_team;
 
-								if (team_limit && num_players_in(f) >= team_limit) {
+								if (team_limit && num_players_in(requested_faction) >= team_limit) {
 									return faction_choice_result::TEAM_IS_FULL;
 								}
 							}
@@ -1677,18 +1685,18 @@ void bomb_mode::execute_player_commands(const input_type in, mode_entropy& entro
 							player_data->round_when_chosen_faction = current_round;
 						}
 
-						if (f == faction_type::DEFAULT) {
+						if (requested_faction == faction_type::DEFAULT) {
 							/* Auto-select */
 							return auto_assign_faction(in, id);
 						}
 
-						return choose_faction(in, id, f);
+						return choose_faction(in, id, requested_faction);
 					}();
 
 					BMB_LOG(format_enum(result));
 
 					if (result == faction_choice_result::CHANGED) {
-						BMB_LOG("Changed from %x to %x", format_enum(previous_faction), format_enum(f));
+						BMB_LOG("Changed from %x to %x", format_enum(previous_faction), format_enum(requested_faction));
 
 						if (death_request != std::nullopt) {
 							step.post_message(*death_request);
@@ -2318,11 +2326,22 @@ void bomb_mode::post_award(const input_type in, const mode_player_id id, money_t
 	}
 }
 
-bool bomb_mode::suitable_for_spectating(const const_input in, const mode_player_id& who, const mode_player_id& by) const {
+bool bomb_mode::suitable_for_spectating(
+	const const_input in, 
+	const mode_player_id& who, 
+	const mode_player_id& by, 
+	const real32 limit_in_seconds
+) const {
 	if (const auto by_data = find(by)) {
+		const auto spectator_faction = by_data->faction;
+		const bool can_watch_anybody = spectator_faction == faction_type::SPECTATOR && in.rules.allow_spectator_to_see_both_teams;
+
+		const auto num_conscious_teammates = num_conscious_players_in(in.cosm, spectator_faction);
+		const bool all_teammates_unconscious = 0 == num_conscious_teammates;
+
 		if (const auto who_data = find(who)) {
-			if (who_data->faction == by_data->faction) {
-				return conscious_or_can_still_spectate(in, who);
+			if (can_watch_anybody || all_teammates_unconscious || who_data->faction == spectator_faction) {
+				return conscious_or_can_still_spectate(in, who, limit_in_seconds);
 			}
 		}
 	}
@@ -2330,8 +2349,12 @@ bool bomb_mode::suitable_for_spectating(const const_input in, const mode_player_
 	return false;
 }
 
-bool bomb_mode::conscious_or_can_still_spectate(const const_input in, const mode_player_id& who) const {
-	const auto max_secs = in.rules.view.can_spectate_dead_body_for_secs;
+bool bomb_mode::conscious_or_can_still_spectate(
+	const const_input in, 
+	const mode_player_id& who, 
+	const real32 limit_in_seconds
+) const {
+	const auto max_secs = std::min(limit_in_seconds, static_cast<real32>(in.rules.view.can_spectate_dead_body_for_secs));
 	const auto& clk = in.cosm.get_clock();
 
 	return on_player_handle(in.cosm, who, [&](const auto& player_handle) {
@@ -2356,7 +2379,8 @@ mode_player_id bomb_mode::get_next_to_spectate(
 	const const_input_type in, 
 	const arena_player_order_info& after, 
 	const mode_player_id& by_spectator, 
-	const int offset
+	const int offset,
+	const real32 limit_in_seconds
 ) const {
 	std::vector<arena_player_order_info> sorted_players;
 
@@ -2366,14 +2390,45 @@ mode_player_id bomb_mode::get_next_to_spectate(
 		return {};
 	}
 
-	for_each_player_in(spectator_data->faction, [&](
-		const auto& id, 
-		const auto& player
-	) {
-		if (suitable_for_spectating(in, id, by_spectator)) {
-			sorted_players.emplace_back(player.get_order());
+	const auto spectator_faction = spectator_data->faction;
+
+	auto can_still_spectate = [&](const auto& who) {
+		return conscious_or_can_still_spectate(in, who, limit_in_seconds);
+	};
+
+	auto gather_candidates_from_all_players = [&]() {
+		for (const auto& p : players) {
+			if (p.second.faction != faction_type::SPECTATOR) {
+				if (can_still_spectate(p.first)) {
+					sorted_players.emplace_back(p.second.get_order());
+				}
+			}
 		}
-	});
+	};
+
+	if (spectator_faction == faction_type::SPECTATOR) {
+		if (!in.rules.allow_spectator_to_see_both_teams) {
+			return {};
+		}
+
+		gather_candidates_from_all_players();
+	}
+	else {
+		const auto num_conscious_teammates = num_conscious_players_in(in.cosm, spectator_faction);
+
+		if (num_conscious_teammates == 0) {
+			gather_candidates_from_all_players();
+		}
+		else {
+			for (const auto& p : players) {
+				if (p.second.faction == spectator_faction) {
+					if (can_still_spectate(p.first)) {
+						sorted_players.emplace_back(p.second.get_order());
+					}
+				}
+			}
+		}
+	}
 
 	if (sorted_players.empty()) {
 		return mode_player_id();

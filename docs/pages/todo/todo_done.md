@@ -3201,3 +3201,27 @@ i			- if the newly calculated target is different than last_reload_target, reset
 
 - Dealt:
 - Given:
+- Death screen
+	- [Avatar] Billan
+		- Killed you with their Bilmer2000
+		- Damage given: 32 in 2 hits
+			- Count real contribution in damage owners, not mana decreased when shield owned
+		- Damage taken: 4 hits, 384 applied damage, 100 HP lost, 0 PE lost.
+		- Damage given: 2 hits, 180 applied damage, 0 HP lost, 289 PE lost.
+
+- Allow to spectate others right away after death
+	- Always hide when viewing us
+	- Let LPM and RPM navigate through players
+		- However let them work only a second after dying 
+	- Let the default delay for friendlies be a second
+		- Dont show stats for friendlies
+	- Let the spectator gui track time instead of having these variables in bomb mode ruleset
+	- Just spectate right away and always hide the spectator gui overlay when showing our body
+		- The death screen is enough of an indicator
+
+- Allow spectator to watch everything
+	- Automatically assign a player to watch on connect
+	- For choosing response, don't show the spectator text overlay if we're choosing teams
+	- Allow to choose spectator team only if you have an alive character (or for the first time, when you're already connected)
+		- This will prevent griefing when someone goes to spectate the opposing team right after their death
+

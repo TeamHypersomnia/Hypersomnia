@@ -246,6 +246,15 @@ namespace augs {
 				}
 			}
 
+			std::string key_to_string_shortened(const key k) {
+				switch (k) {
+					case key::LMOUSE: return "LMB";
+					case key::RMOUSE: return "RMB";
+					case key::MMOUSE: return "MMB";
+					default: return key_to_string(k);
+				}
+			}
+
 			std::string key_to_string(const key k) {
 				switch (k) {
 				case key::INVALID: return "INVALID"; break;

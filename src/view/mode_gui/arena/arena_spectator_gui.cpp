@@ -9,12 +9,16 @@
 #include "application/config_lua_table.h"
 #include "game/modes/mode_helpers.h"
 #include "view/viewables/images_in_atlas_map.h"
+#include "game/detail/sentience/sentience_getters.h"
+
+const auto secs_before_accepting_inputs_after_death = 1.0;
+const auto secs_until_switching_dead_teammate = 1.0;
 
 bool arena_spectator_gui::control(const app_ingame_intent_input in) {
 	using namespace augs::event;
 	using namespace augs::event::keys;
 
-	if (!show) {
+	if (!accept_inputs) {
 		return false;
 	}
 
@@ -118,14 +122,22 @@ void arena_spectator_gui::draw_gui(
 	else if (num_conscious > 0) {
 		const auto instructions = 
 			fmt("<<< ", white)
-			+ fmt(key_to_string(bound_left), white)
+			+ fmt(key_to_string_shortened(bound_left), white)
 			+ fmt("   (change player)   ", gray4)
-			+ fmt(key_to_string(bound_right), white)
+			+ fmt(key_to_string_shortened(bound_right), white)
 			+ fmt(" >>>", white)
 		;
 			
 		draw_text_indicator_at(instructions, one_sixth_t + 2 * cell_h, rgba(0, 0, 0, 150));
 	}
+}
+
+void arena_spectator_gui::hide() {
+	accept_inputs = false;
+	show = false;
+	now_spectating = {};
+	cached_order = {};
+	when_local_player_knocked_out = std::nullopt;
 }
 
 template <class M>
@@ -134,16 +146,45 @@ void arena_spectator_gui::advance(
 	const M& mode, 
 	const typename M::const_input& in
 ) {
-	auto hide = [&]() {
-		show = false;
-		now_spectating = {};
-		cached_order = {};
+	const auto& cosm = in.cosm;
+
+	auto local_faction = faction_type::DEFAULT;
+
+	auto hide_if_local_is_conscious = [&]() {
+		const auto player_data = mode.find(local_player);
+
+		if (player_data == nullptr) {
+			hide();
+			return true;
+		}
+
+		local_faction = player_data->faction;
+
+		if (const auto controlled = cosm[player_data->controlled_character_id]) {
+			if (::sentient_and_conscious(controlled)) {
+				hide();
+				return true;
+			}
+		}
+
+		return false;
 	};
 
-	if (mode.get_state() == arena_mode_state::MATCH_SUMMARY) {
-		hide();
-		return;
-	}
+	(void)local_faction;
+	//const auto num_conscious = typed_mode.num_conscious_players_in(mode_input.cosm, local_faction);
+
+	auto hide_if_match_summary = [&]() {
+		if (mode.get_state() == arena_mode_state::MATCH_SUMMARY) {
+			hide();
+			return true;
+		}
+
+		return false;
+	};
+
+	auto show_or_unshow_if_spectating_local = [&]() {
+		show = now_spectating != local_player;
+	};
 
 	auto cache_order_of = [&](const mode_player_id& id) {
 		if (const auto data = mode.find(id)) {
@@ -154,19 +195,27 @@ void arena_spectator_gui::advance(
 		}
 	};
 
-	if (mode.conscious_or_can_still_spectate(in, local_player)) {
-		hide();
-	}
-	else {
-		if (!show) {
-			cache_order_of(local_player);
-			show = true;
-		}
-	}
+	auto init_order_and_timer_if_showing_for_the_first_time = [&]() {
+		auto& when = when_local_player_knocked_out;
 
-	if (!show) {
-		return;
-	}
+		auto init_spectator = [&]() {
+			when = augs::timer();
+			now_spectating = local_player;
+			cache_order_of(local_player);
+		};
+
+		if (when == std::nullopt) {
+			init_spectator();
+		}
+	};
+
+	auto allow_inputs_if_knocked_out_for_long_enough = [&]() {
+		auto& when = when_local_player_knocked_out;
+
+		if (when.value().get<std::chrono::seconds>() > secs_before_accepting_inputs_after_death) {
+			accept_inputs = true;
+		}
+	};
 
 	auto switch_spectated_by = [&](const int off) {
 		auto reference_order = cached_order;
@@ -175,20 +224,51 @@ void arena_spectator_gui::advance(
 			reference_order = data->get_order();
 		}
 
-		now_spectating = mode.get_next_to_spectate(in, reference_order, local_player, off);
+		now_spectating = mode.get_next_to_spectate(
+			in, 
+			reference_order, 
+			local_player, 
+			off, 
+			secs_until_switching_dead_teammate
+		);
+
 		cache_order_of(now_spectating);
 	};
 
-	if (!mode.suitable_for_spectating(in, now_spectating, local_player)) {
-		switch_spectated_by(1);
+	auto switch_if_current_unsuitable_already = [&]() {
+		const bool spectating_local = now_spectating == local_player;
+		const auto limit_secs = spectating_local ? 10000.f : secs_until_switching_dead_teammate;
+
+		if (!mode.suitable_for_spectating(in, now_spectating, local_player, limit_secs)) {
+			switch_spectated_by(1);
+		}
+	};
+
+	auto switch_if_requested_by_key = [&]() {
+		auto& off = key_requested_offset;
+
+		if (off) {
+			switch_spectated_by(off);
+			off = 0;
+		}
+	};
+
+	accept_inputs = false;
+
+	if (hide_if_local_is_conscious()) {
+		return;
 	}
 
-	auto& off = key_requested_offset;
-
-	if (off) {
-		switch_spectated_by(off);
-		off = 0;
+	if (hide_if_match_summary()) {
+		return;
 	}
+
+	init_order_and_timer_if_showing_for_the_first_time();
+	allow_inputs_if_knocked_out_for_long_enough();
+
+	show_or_unshow_if_spectating_local();
+	switch_if_current_unsuitable_already();
+	switch_if_requested_by_key();
 }
 
 template void arena_spectator_gui::draw_gui(

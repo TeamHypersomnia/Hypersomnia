@@ -18,6 +18,8 @@
 
 #include "augs/math/simple_calculations.h"
 
+const bool show_death_summary_for_teammates = false;
+
 const auto default_popul = augs::populate_with_delays_impl(
 	100.f,
 	0.65f
@@ -192,7 +194,13 @@ void arena_gui_state::draw_mode_gui(
 			const auto viewed_player_data = typed_mode.find(viewed_player_id);
 
 			const auto window_padding = vec2i(16, 16);
-			const auto item_padding = vec2i(10, 10);
+			const auto item_padding = window_padding;//vec2i(10, 10);
+
+			if (!show_death_summary_for_teammates) {
+				if (viewed_player_id != local_player_id) {
+					return;
+				}
+			}
 
 			if (viewed_player_data == nullptr) {
 				return;
@@ -325,7 +333,7 @@ void arena_gui_state::draw_mode_gui(
 
 				total_stats_text += colored(typesafe_sprintf("%x dmg ", static_cast<int>(o.applied_damage)), stat_col);
 				total_stats_text += colored("in ", text_col);
-				total_stats_text += colored(typesafe_sprintf("%x hits", o.hits), stat_col);
+				total_stats_text += colored(typesafe_sprintf(o.hits == 1 ? "%x hit" : "%x hits", o.hits), stat_col);
 				total_stats_text += colored(", ", text_col);
 				total_stats_text += colored(typesafe_sprintf("%x HP", static_cast<int>(o.hp_loss)), stat_col);
 				total_stats_text += colored(" loss, ", text_col);
@@ -921,7 +929,11 @@ void arena_gui_state::draw_mode_gui(
 
 			draw_death_summary();
 			draw_scoreboard();
-			draw_spectator();
+
+			if (!choose_team.show) {
+				draw_spectator();
+			}
+
 			draw_money_and_awards();
 			draw_knockouts();
 

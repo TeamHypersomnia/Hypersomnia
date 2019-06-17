@@ -98,6 +98,7 @@ struct bomb_mode_ruleset {
 	bool refill_all_mags_on_round_start = true;
 	bool refill_chambers_on_round_start = true;
 	bool allow_spectator_to_see_both_teams = true;
+	bool forbid_going_to_spectator_unless_character_alive = true;
 
 	bool enable_item_shop = true;
 	bool warmup_enable_item_shop = false;
@@ -213,6 +214,7 @@ enum class faction_choice_result {
 	BEST_BALANCE_ALREADY,
 	TEAM_IS_FULL,
 	GAME_IS_FULL,
+	NEED_TO_BE_ALIVE_FOR_SPECTATOR,
 	CHANGED
 	// END GEN INTROSPECTOR
 };
@@ -513,11 +515,17 @@ public:
 		const_input, 
 		const arena_player_order_info& after, 
 		const mode_player_id& by_spectator, 
-		int offset
+		int offset,
+		real32 limit_in_seconds
 	) const;
 
-	bool suitable_for_spectating(const_input, const mode_player_id& who, const mode_player_id& by) const;
-	bool conscious_or_can_still_spectate(const_input, const mode_player_id& who) const;
+	bool suitable_for_spectating(
+		const_input, 
+		const mode_player_id& who, 
+		const mode_player_id& by, 
+		real32 limit_in_seconds
+	) const;
+	bool conscious_or_can_still_spectate(const_input, const mode_player_id& who, real32 limit_in_seconds) const;
 
 	template <class C, class F>
 	decltype(auto) on_player_handle(C& cosm, const mode_player_id& id, F&& callback) const {

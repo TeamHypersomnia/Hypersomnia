@@ -87,7 +87,7 @@ namespace test_scenes {
 		rs.excess_player_color = rgba(210, 210, 210, 255);
 		rs.default_player_color = rgba(255, 255, 0, 255);
 
-		rs.bot_quota = rs.bot_names.size();
+		rs.bot_quota = 2;
 
 		rs.name = "Standard bomb ruleset";
 		rs.economy.initial_money = 2000;

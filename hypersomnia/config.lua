@@ -20,8 +20,8 @@ return {
 
 	F8 = "OPEN_RCON_MENU",
 
-	Right = "SPECTATE_NEXT",
-	Left = "SPECTATE_PREV"
+	RightMouseButton = "SPECTATE_PREV",
+	LeftMouseButton = "SPECTATE_NEXT"
   },
 
   game_controls = {
