@@ -513,7 +513,8 @@ void settings_gui_state::perform(
 			case settings_pane::SERVER: {
 				auto& scope_cfg = config.server;
 
-				revertable_slider(SCOPE_CFG_NVP(kick_if_inactive_for_secs), 0u, 300u);
+				revertable_slider(SCOPE_CFG_NVP(kick_if_no_messages_for_secs), 0u, 300u);
+				revertable_slider(SCOPE_CFG_NVP(kick_if_away_from_keyboard_for_secs), 0u, 6000u);
 				revertable_slider(SCOPE_CFG_NVP(time_limit_to_enter_game_since_connection), 0u, 300u);
 
 				input_text<100>(SCOPE_CFG_NVP(override_default_ruleset)); revert(scope_cfg.override_default_ruleset);

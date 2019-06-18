@@ -1443,6 +1443,16 @@ void bomb_mode::add_or_remove_players(const input_type in, const mode_entropy& e
 		const auto result = add_player_custom(in, a);
 		(void)result;
 
+		if (const auto entry = find(a.id)) {
+			messages::game_notification notification;
+
+			notification.subject_mode_id = a.id;
+			notification.subject_name = entry->chosen_name;
+			notification.payload = messages::joined_or_left::JOINED;
+
+			step.post_message(std::move(notification));
+		}
+
 		if (a.faction == faction_type::DEFAULT) {
 			auto_assign_faction(in, a.id);
 		}
@@ -1452,6 +1462,16 @@ void bomb_mode::add_or_remove_players(const input_type in, const mode_entropy& e
 	}
 
 	if (logically_set(g.removed_player)) {
+		if (const auto entry = find(g.removed_player)) {
+			messages::game_notification notification;
+
+			notification.subject_mode_id = g.removed_player;
+			notification.subject_name = entry->chosen_name;
+			notification.payload = messages::joined_or_left::LEFT;
+
+			step.post_message(std::move(notification));
+		}
+
 		remove_player(in, step, g.removed_player);
 	}
 
@@ -1693,15 +1713,26 @@ void bomb_mode::execute_player_commands(const input_type in, mode_entropy& entro
 						return choose_faction(in, id, requested_faction);
 					}();
 
-					BMB_LOG(format_enum(result));
+					const auto final_faction = player_data->faction;
 
 					if (result == faction_choice_result::CHANGED) {
-						BMB_LOG("Changed from %x to %x", format_enum(previous_faction), format_enum(requested_faction));
+						BMB_LOG("Changed from %x to %x", format_enum(previous_faction), format_enum(final_faction));
 
 						if (death_request != std::nullopt) {
 							step.post_message(*death_request);
 						}
 					}
+
+					messages::faction_choice choice;
+					choice.result = result;
+					choice.target_faction = final_faction;
+
+					messages::game_notification notification;
+					notification.subject_mode_id = id;
+					notification.subject_name = player_data->chosen_name;
+					notification.payload = choice;
+
+					step.post_message(std::move(notification));
 				}
 				else {
 					static_assert(always_false_v<C>, "Non-exhaustive std::visit");

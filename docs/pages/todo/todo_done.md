@@ -3238,3 +3238,18 @@ which can be done from Settings->Reset all settings to factory default.
 
 - Writeout the config before starting a server process from the menu
 
+- Actually just hide the less important notifications of other players to not make spamming easier
+
+- Game notification variant
+	- Subject
+	- Faction choice result
+	- Daedalus, you're changing teams too fast.
+	- Daedalus, you can't go to spectator if you're not alive.
+	- Some would be hijacked by chat gui and others by the main notification system
+
+	
+- "X connected" notifiers in chat, in gray
+- chat notifier: X has joined the Resistance/Metropolis
+- chat notifier: X is now a spectator
+	- Except when connected for the first time?
+

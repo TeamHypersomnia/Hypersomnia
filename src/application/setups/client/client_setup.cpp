@@ -22,7 +22,6 @@
 #include "augs/readwrite/byte_file.h"
 #include "application/network/payload_easily_movable.h"
 #include "augs/misc/readable_bytesize.h"
-#include "application/gui/client/chat_gui_logic.h"
 
 client_setup::client_setup(
 	sol::state& lua,
@@ -141,24 +140,6 @@ double client_setup::get_audiovisual_speed() const {
 
 using initial_payload = initial_arena_state_payload<false>;
 
-std::string chat_entry_type::get_author_string() const {
-	auto result = author;
-
-	if (faction_specific) {
-		result += std::string(" (") + std::string(augs::enum_to_string(author_faction)) + ")";
-	}
-
-	if (result.size() > 0) {
-		result += ": ";
-	}
-
-	return result;
-}
-
-chat_entry_type::operator std::string() const {
-	return get_author_string() + message;
-}
-
 template <class T, class F>
 message_handler_result client_setup::handle_server_message(
 	F&& read_payload
@@ -236,15 +217,21 @@ message_handler_result client_setup::handle_server_message(
 			sender_player_faction = sender_player->faction;
 			sender_player_nickname = sender_player->chosen_name;
 		}
+		else {
+			sender_player_nickname = "Client";
+		}
 
-		auto new_entry = payload.translate(
-			get_current_time(),
-			sender_player_nickname,
-			sender_player_faction
-		);
+		{
+			auto new_entry = chat_gui_entry::from(
+				payload,
+				get_current_time(),
+				sender_player_nickname,
+				sender_player_faction
+			);
 
-		LOG(new_entry.operator std::string());
-		client_gui.chat.add_entry(std::move(new_entry));
+			LOG(new_entry.operator std::string());
+			client_gui.chat.add_entry(std::move(new_entry));
+		}
 
 		if (payload.should_disconnect_now(get_local_player_id())) {
 			std::string kicked_or_banned;
@@ -385,6 +372,24 @@ message_handler_result client_setup::handle_server_message(
 
 		if (!result) {
 			return abort_v;
+		}
+
+		if (new_avatar.png_bytes.size() > 0) {
+			try {
+				const auto size = augs::image::get_png_size(new_avatar.png_bytes);
+
+				if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
+					LOG("The server has tried to send an avatar of size %xx%x!", size.x, size.y);
+					log_malicious_server();
+					return abort_v;
+				}
+			}
+			catch (const augs::image_loading_error& err) {
+				LOG("The server has tried to send an invalid avatar!");
+				LOG(err.what());
+				log_malicious_server();
+				return abort_v;
+			}
 		}
 
 		player_metas[client_id].avatar = std::move(new_avatar);
@@ -566,9 +571,15 @@ void client_setup::send_pending_commands() {
 
 		if (!avatar_path.empty()) {
 			arena_player_avatar_payload payload;
-			payload.png_bytes = augs::file_to_bytes(avatar_path);
 
-			if (payload.png_bytes.size() <= max_avatar_bytes_v) {
+			try {
+				payload.png_bytes = augs::file_to_bytes(avatar_path);
+			}
+			catch (...) {
+				payload.png_bytes.clear();
+			}
+
+			if (payload.png_bytes.size() > 0 && payload.png_bytes.size() <= max_avatar_bytes_v) {
 				uint32_t dummy_client_id = 0;
 
 				client->send_payload(
@@ -619,7 +630,7 @@ void client_setup::send_packets_if_its_time() {
 }
 
 void client_setup::log_malicious_server() {
-	set_disconnect_reason("The client is broken or the server might be malicious.\nPlease report this fact to the developers - send them the files in cache/usr/log.", true);
+	set_disconnect_reason("The client is out of date, or the server might be malicious.\nIf your game is up to date, please report this fact to the developers\n - send them the files in cache/usr/log.", true);
 
 #if !IS_PRODUCTION_BUILD
 	ensure(false && "Server has sent some invalid data.");

@@ -17,3 +17,4 @@
 #include "game/detail/inventory/item_slot_transfer_request.h"
 #include "game/messages/changed_identities_message.h"
 #include "game/messages/battle_event_message.h"
+#include "game/messages/game_notification.h"

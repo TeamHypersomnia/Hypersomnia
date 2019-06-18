@@ -4,6 +4,10 @@
 #include "augs/network/network_types.h"
 #include "augs/math/vec2.h"
 
+namespace messages {
+	struct game_notification;
+};
+
 namespace augs {
 	struct baked_font;
 	struct drawer;
@@ -12,7 +16,16 @@ namespace augs {
 struct client_chat_settings;
 struct faction_view_settings;
 
-struct chat_entry_type {
+struct server_broadcasted_chat;
+
+struct chat_gui_entry {
+	static chat_gui_entry from(
+		const ::server_broadcasted_chat&,
+		net_time_t timestamp,
+		const std::string& author,
+		const faction_type author_faction
+	);
+
 	net_time_t timestamp = 0.0;
 
 	std::string author;
@@ -31,7 +44,7 @@ struct chat_gui_state {
 	chat_target_type target = chat_target_type::GENERAL;
 
 	std::string current_message;
-	std::vector<chat_entry_type> history;
+	std::vector<chat_gui_entry> history;
 
 	template <class T>
 	void add_entry(T&& entry) {
@@ -41,6 +54,12 @@ struct chat_gui_state {
 			history.erase(history.begin(), history.begin() + 1000);
 		}
 	}
+
+	bool add_entry_from_game_notification(
+		net_time_t,
+		const messages::game_notification&,
+		const mode_player_id current_mode_id
+	);
 
 	bool perform_input_bar(const client_chat_settings&);
 

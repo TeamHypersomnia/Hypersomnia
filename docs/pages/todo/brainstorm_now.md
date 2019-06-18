@@ -29,15 +29,11 @@ summary: That which we are brainstorming at the moment.
 
 
 - fix those knife offsets on character
-- "X connected" notifiers in chat, in gray
 
 - Cooldowns for chat
 	- Both client side and server side
 	- Although maybe later, at least we'll ban griefers early
 
-- chat notifier: X has joined the Resistance/Metropolis
-- chat notifier: X is now a spectator
-	- Except when connected for the first time?
 
 - In-game tip system
 	- Contextual

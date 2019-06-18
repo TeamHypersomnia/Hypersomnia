@@ -46,7 +46,7 @@ namespace augs {
 
 		std::vector<wchar_t> cmd_line;
 		cmd_line.resize(cmd_wide.size());
-		std::mecmpy(cmd_line.data(), cmd_wide.c_str(), sizeof(wchar_t) * (cmd_wide.size() + 1));
+		std::memcpy(cmd_line.data(), cmd_wide.c_str(), sizeof(wchar_t) * (cmd_wide.size() + 1));
 
 		// Start the child process. 
 		const auto result = CreateProcess( 

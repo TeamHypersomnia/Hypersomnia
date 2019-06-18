@@ -321,6 +321,16 @@ public:
 							settings.prediction = input;
 						}
 
+						{
+							auto& notifications = step.get_queue<messages::game_notification>();
+
+							const auto current_time = get_current_time();
+
+							erase_if(notifications, [this, current_time](const auto& msg) {
+								return client_gui.chat.add_entry_from_game_notification(current_time, msg, get_local_player_id());
+							});
+						}
+
 						audiovisual_post_solve(step, settings);
 					};
 

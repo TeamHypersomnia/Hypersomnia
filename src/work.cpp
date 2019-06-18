@@ -649,7 +649,7 @@ and then hitting Save settings.
 			}
 		}
 
-		const auto viewed = get_viewed_character();
+		const auto viewed = get_game_gui_subject();
 
 		if (!viewed.alive()) {
 			return false;

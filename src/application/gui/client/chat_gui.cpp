@@ -5,6 +5,188 @@
 #include "view/faction_view_settings.h"
 #include "augs/gui/text/printer.h"
 #include "augs/drawing/drawing.h"
+#include "augs/string/format_enum.h"
+#include "game/messages/game_notification.h"
+#include "augs/templates/identity_templates.h"
+
+const auto standard_gray_v = rgba(200, 200, 200, 255);
+
+bool chat_gui_state::add_entry_from_game_notification(
+	const net_time_t timestamp,
+	const messages::game_notification& msg,
+	const mode_player_id current_mode_id
+) {
+	using namespace messages;
+
+	auto do_entry = [&](const auto& str, const rgba& col) {
+		chat_gui_entry new_entry;
+		new_entry.timestamp = timestamp;
+		new_entry.author = "";
+		new_entry.message = str;
+		new_entry.overridden_message_color = col;
+
+		add_entry(std::move(new_entry));
+	};
+
+	auto handle_payload = [&](const auto& payload) {
+		using P = remove_cref<decltype(payload)>;
+		using F = faction_choice;
+
+		if constexpr(std::is_same_v<P, F>) {
+			auto make_entry = [&](auto&&... args) {
+				if (current_mode_id != msg.subject_mode_id) {
+					return;
+				}
+
+				do_entry(
+					typesafe_sprintf(std::forward<decltype(args)>(args)...),
+					orange
+				);
+			};
+
+			auto make_public_entry = [&](auto&&... args) {
+				do_entry(
+					typesafe_sprintf(std::forward<decltype(args)>(args)...),
+					standard_gray_v
+				);
+			};
+
+			const auto result = payload.result;
+			const auto target = payload.target_faction;
+
+			using FR = faction_choice_result;
+
+			switch (result) {
+				case FR::FAILED:
+					make_entry("Unknown problem encountered while trying to change team.");
+					break;
+				case FR::THE_SAME:
+#if 0
+					if (target == faction_type::SPECTATOR) {
+						make_entry("You are already a %x", format_enum(target));
+					}
+					else {
+						make_entry("You are already in %x", format_enum(target));
+					}
+#endif
+					break;
+				case FR::CHOOSING_TOO_FAST:
+					make_entry("You are choosing too fast! Wait for the next round."); 
+					break;
+				case FR::BEST_BALANCE_ALREADY:
+					make_entry("The teams are already balanced."); 
+					break;
+				case FR::TEAM_IS_FULL:
+					make_entry("You can't join %x - it is full.", target); 
+					break;
+				case FR::GAME_IS_FULL:
+					make_entry("You can't join %x - the game is full.", target); 
+					break;
+				case FR::NEED_TO_BE_ALIVE_FOR_SPECTATOR:
+					make_entry("You can join Spectators only when you have a character to sacrifice.", target); 
+					break;
+				case FR::CHANGED:
+					if (target == faction_type::SPECTATOR) {
+						make_public_entry("%x has joined the Spectators.", msg.subject_name, target); 
+					}
+					else {
+						make_public_entry("%x has joined the %x.", msg.subject_name, format_enum(target)); 
+					}
+
+					break;
+			}
+
+			return true;
+		}
+		else if constexpr(std::is_same_v<P, joined_or_left>) {
+			const auto action = [&]() {
+				if (payload == joined_or_left::JOINED) {
+					return "connected";
+				}
+
+				return "disconnected";
+			}();
+
+			do_entry(
+				typesafe_sprintf("%x %x.", msg.subject_name, action),
+				standard_gray_v
+			);
+
+			return true;
+		}
+		else {
+			static_assert(always_false_v<P>);
+			return false;
+		}
+	};
+
+	return std::visit(handle_payload, msg.payload);
+}
+
+std::string chat_gui_entry::get_author_string() const {
+	auto result = author;
+
+	if (faction_specific) {
+		result += std::string(" (") + std::string(augs::enum_to_string(author_faction)) + ")";
+	}
+
+	if (result.size() > 0) {
+		result += ": ";
+	}
+
+	return result;
+}
+
+chat_gui_entry::operator std::string() const {
+	return get_author_string() + message;
+}
+
+chat_gui_entry chat_gui_entry::from(
+	const ::server_broadcasted_chat& payload,
+	const net_time_t timestamp,
+	const std::string& author,
+	const faction_type author_faction
+) {
+	chat_gui_entry new_entry;
+
+	new_entry.timestamp = timestamp;
+	new_entry.author_faction = author_faction;
+
+	const auto message_str = std::string(payload.message);
+
+	new_entry.author = author;
+	new_entry.message = message_str;
+
+	if (author.empty()) {
+		new_entry.overridden_message_color = rgba(200, 200, 200, 255);
+	}
+
+	switch (payload.target) {
+		case chat_target_type::KICK:
+			new_entry.author.clear();
+			new_entry.message = typesafe_sprintf("%x was kicked from the server.\nReason: %x", author, message_str);
+			new_entry.overridden_message_color = rgba(255, 100, 30, 255);
+			break;
+
+		case chat_target_type::BAN:
+			new_entry.author.clear();
+			new_entry.message = typesafe_sprintf("%x was banned from the server.\nReason: %x", author, message_str);
+			new_entry.overridden_message_color = rgba(255, 100, 30, 255);
+			break;
+
+		case chat_target_type::INFO:
+			new_entry.overridden_message_color = yellow;
+
+		case chat_target_type::INFO_CRITICAL:
+			new_entry.overridden_message_color = orange;
+
+		default:
+			break;
+	}
+
+	new_entry.faction_specific = payload.target == chat_target_type::TEAM_ONLY;
+	return new_entry;
+}
 
 void chat_gui_state::open_input_bar(const chat_target_type t) {
 	show = true;

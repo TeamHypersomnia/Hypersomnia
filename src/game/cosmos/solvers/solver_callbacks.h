@@ -4,6 +4,17 @@
 using default_solver_callback = empty_callback;
 
 template <
+	class PreSolve = default_solver_callback,
+	class PostSolve = default_solver_callback,
+	class PostCleanup = default_solver_callback
+>
+auto solver_callbacks(
+	PreSolve pre_solve = default_solver_callback(),
+	PostSolve post_solve = default_solver_callback(),
+	PostCleanup post_cleanup = default_solver_callback()
+);
+
+template <
 	class PreSolve,
 	class PostSolve,
 	class PostCleanup
@@ -44,7 +55,7 @@ struct solver_callbacks_t {
 			}
 		};
 
-		return solver_callbacks_t(
+		return solver_callbacks(
 			combiner(new_pre_solve, pre_solve),
 			combiner(new_post_solve, post_solve),
 			combiner(new_post_cleanup, post_cleanup)
@@ -53,14 +64,14 @@ struct solver_callbacks_t {
 };
 
 template <
-	class PreSolve = default_solver_callback,
-	class PostSolve = default_solver_callback,
-	class PostCleanup = default_solver_callback
+	class PreSolve,
+	class PostSolve,
+	class PostCleanup
 >
 auto solver_callbacks(
-	PreSolve pre_solve = default_solver_callback(),
-	PostSolve post_solve = default_solver_callback(),
-	PostCleanup post_cleanup = default_solver_callback()
+	PreSolve pre_solve,
+	PostSolve post_solve,
+	PostCleanup post_cleanup
 ) {
 	return solver_callbacks_t(
 		pre_solve,

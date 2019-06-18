@@ -508,7 +508,7 @@ return {
 		  background_dark = "0 0 0 0"
 	  },
       METROPOLIS = {
-		  standard = "200 0 255 255",
+		  standard = "230 40 255 255",
 		  background_dark = "20 0 75 255"
 	  },
       ATLANTIS = {
@@ -531,7 +531,8 @@ return {
 	current_arena = "de_cyberaqua",
 	override_default_ruleset = "",
 
-	kick_if_inactive_for_secs = 60,
+	kick_if_no_messages_for_secs = 10,
+	kick_if_away_from_keyboard_for_secs = 180,
 	time_limit_to_enter_game_since_connection = 15,
 
 	send_updates_once_every_tick = 1,
@@ -550,9 +551,7 @@ return {
     send_net_statistics_update_once_every_secs = 1,
 
     auto_authorize_loopback_for_rcon = true,
-	max_unauthorized_rcon_commands = 100,
-	connected_message = " connected.",
-	disconnected_message = " disconnected."
+	max_unauthorized_rcon_commands = 100
   },
 
   private_server_vars = {
@@ -591,13 +590,13 @@ return {
     spectate_referential_state = true,
 
 	client_chat = {
-      chat_window_width = 500,
+      chat_window_width = 600,
 	  chat_window_offset = {
 		  x = 10,
 		  y = 300
 	  },
-      show_recent_chat_messages_num = 7,
-      keep_recent_chat_messages_for_seconds = 15,
+      show_recent_chat_messages_num = 20,
+      keep_recent_chat_messages_for_seconds = 18,
 	}
   },
 

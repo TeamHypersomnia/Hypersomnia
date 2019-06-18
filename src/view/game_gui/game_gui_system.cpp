@@ -360,6 +360,14 @@ void game_gui_system::control_hotbar_and_action_button(
 }
 
 void game_gui_system::build_tree_data(const game_gui_context context) {
+	if (context.get_subject_entity().dead()) {
+		return;
+	}
+
+	if (!context.get_subject_entity().template has<components::item_slot_transfers>()) {
+		return;
+	}
+
 	world.build_tree_data_into(context);
 }
 
@@ -498,6 +506,11 @@ void game_gui_system::rebuild_layouts(
 	const game_gui_context context
 ) {
 	const auto root_entity = context.get_subject_entity();
+
+	if (root_entity.dead()) {
+		return;
+	}
+
 	const auto& necessarys = context.get_necessary_images();
 	const auto& image_defs = context.get_image_metas();
 	auto& element = context.get_character_gui();

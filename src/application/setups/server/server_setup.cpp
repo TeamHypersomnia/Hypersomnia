@@ -68,7 +68,24 @@ server_setup::server_setup(
 
 	if (dedicated == std::nullopt) {
 		integrated_client.init(server_time);
-		integrated_client.meta.avatar.png_bytes = augs::file_to_bytes(integrated_client_vars.avatar_image_path);
+
+		if (!integrated_client_vars.avatar_image_path.empty()) {
+			auto& png = integrated_client.meta.avatar.png_bytes;
+
+			try {
+				png = augs::file_to_bytes(integrated_client_vars.avatar_image_path);
+
+				const auto size = augs::image::get_png_size(png);
+
+				if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
+					png.clear();
+				}
+			}
+			catch (...) {
+				png.clear();
+			}
+		}
+
 		rebuild_player_meta_viewables = true;
 	}
 }
@@ -297,16 +314,6 @@ void server_setup::advance_clients_state() {
 		using S = client_state_type;
 		const auto mode_id = to_mode_player_id(client_id);
 
-		auto remove_from_mode = [&]() {
-			ensure(!removed_someone_already);
-
-			mode_entropy_general cmd;
-			cmd.removed_player = mode_id;
-
-			local_collected.control(cmd);
-			removed_someone_already = true;
-		};
-
 		if (c.is_set()) {
 			{
 				const auto num_commands = c.pending_entropies.size();
@@ -318,9 +325,11 @@ void server_setup::advance_clients_state() {
 				}
 			}
 
-			if (c.when_kicked != std::nullopt) {
-				if (server_time - *c.when_kicked > vars.max_kick_ban_linger_secs) {
-					disconnect_and_unset(client_id);
+			if (!removed_someone_already) {
+				if (c.when_kicked != std::nullopt) {
+					if (server_time - *c.when_kicked > vars.max_kick_ban_linger_secs) {
+						disconnect_and_unset(client_id);
+					}
 				}
 			}
 		}
@@ -328,7 +337,13 @@ void server_setup::advance_clients_state() {
 		if (!c.is_set()) {
 			if (!removed_someone_already) {
 				if (character_exists_for(mode_id)) {
-					remove_from_mode();
+					ensure(!removed_someone_already);
+
+					mode_entropy_general cmd;
+					cmd.removed_player = mode_id;
+
+					local_collected.control(cmd);
+					removed_someone_already = true;
 				}
 			}
 
@@ -422,8 +437,11 @@ void server_setup::advance_clients_state() {
 
 		auto kick_if_afk = [&](){
 			if (c.should_kick_due_to_inactivity(vars, server_time)) {
-				kick(client_id, "AFK for too long!");
-				remove_from_mode();
+				kick(client_id, "No messages arrived for too long!");
+			}
+
+			if (c.should_kick_due_to_afk(vars, server_time)) {
+				kick(client_id, "AFK!");
 			}
 		};
 
@@ -486,7 +504,7 @@ void server_setup::advance_clients_state() {
 			}
 		}
 
-		if (!removed_someone_already) {
+		if (c.state == client_state_type::IN_GAME) {
 			kick_if_afk();
 		}
 
@@ -541,6 +559,8 @@ message_handler_result server_setup::handle_client_message(
 			LOG("Client %x requested nickname: %x", client_id, std::string(c.settings.chosen_nickname));
 			c.state = S::WELCOME_ARRIVED;
 		}
+
+		c.last_keyboard_activity_time = server_time;
 	}
 	else if constexpr (std::is_same_v<T, rcon_command_variant>) {
 		const auto level = get_rcon_level(client_id);
@@ -583,6 +603,8 @@ message_handler_result server_setup::handle_client_message(
 			if (result == abort_v) {
 				return result;
 			}
+
+			c.last_keyboard_activity_time = server_time;
 		}
 		else {
 			++c.unauthorized_rcon_commands;
@@ -603,6 +625,8 @@ message_handler_result server_setup::handle_client_message(
 			message.target = payload.target;
 
 			broadcast(message);
+
+			c.last_keyboard_activity_time = server_time;
 		}
 	}
 	else if constexpr (std::is_same_v<T, total_mode_player_entropy>) {
@@ -621,6 +645,10 @@ message_handler_result server_setup::handle_client_message(
 			LOG("Client has sent its command too early (state: %x). Disconnecting.", c.state);
 
 			return abort_v;
+		}
+
+		if (!payload.empty()) {
+			c.last_keyboard_activity_time = server_time;
 		}
 
 		c.pending_entropies.emplace_back(std::move(payload));
@@ -712,7 +740,7 @@ message_handler_result server_setup::handle_client_message(
 		static_assert(always_false_v<T>, "Unhandled payload type.");
 	}
 
-	c.last_valid_activity_time = server_time;
+	c.last_valid_message_time = server_time;
 	return message_handler_result::CONTINUE;
 }
 
@@ -987,52 +1015,6 @@ rcon_level server_setup::get_rcon_level(const client_id_type& id) const {
 	return rcon_level::NONE;
 }
 
-chat_entry_type server_broadcasted_chat::translate(
-	const net_time_t timestamp,
-	const std::string& author,
-	const faction_type author_faction
-) const {
-	chat_entry_type new_entry;
-
-	new_entry.timestamp = timestamp;
-	new_entry.author_faction = author_faction;
-
-	const auto message_str = std::string(message);
-
-	new_entry.author = author;
-	new_entry.message = message_str;
-
-	if (author.empty()) {
-		new_entry.overridden_message_color = rgba(200, 200, 200, 255);
-	}
-
-	switch (target) {
-		case chat_target_type::KICK:
-			new_entry.author.clear();
-			new_entry.message = typesafe_sprintf("%x was kicked from the server.\nReason: %x", author, message_str);
-			new_entry.overridden_message_color = rgba(255, 100, 30, 255);
-			break;
-
-		case chat_target_type::BAN:
-			new_entry.author.clear();
-			new_entry.message = typesafe_sprintf("%x was banned from the server.\nReason: %x", author, message_str);
-			new_entry.overridden_message_color = rgba(255, 100, 30, 255);
-			break;
-
-		case chat_target_type::INFO:
-			new_entry.overridden_message_color = yellow;
-
-		case chat_target_type::INFO_CRITICAL:
-			new_entry.overridden_message_color = orange;
-
-		default:
-			break;
-	}
-
-	new_entry.faction_specific = target == chat_target_type::TEAM_ONLY;
-	return new_entry;
-}
-
 void server_setup::broadcast(const ::server_broadcasted_chat& payload) {
 	const auto sender_player = get_arena_handle().on_mode(
 		[&](const auto& typed_mode) {
@@ -1050,7 +1032,8 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload) {
 
 	bool integrated_received = false;
 
-	const auto new_entry = payload.translate(
+	const auto new_entry = chat_gui_entry::from(
+		payload,
 		get_current_time(),
 		sender_player_nickname,
 		sender_player_faction
@@ -1112,9 +1095,11 @@ void server_setup::kick(const client_id_type& id, const std::string& reason) {
 		return;
 	}
 
-	if (c.when_kicked == std::nullopt) {
-		c.when_kicked = server_time;
+	if (c.when_kicked != std::nullopt) {
+		return;
 	}
+
+	c.when_kicked = server_time;
 
 	server_broadcasted_chat message;
 	message.message = reason;

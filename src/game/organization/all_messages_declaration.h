@@ -28,6 +28,7 @@ namespace messages {
 	struct battle_event_message;
 	struct thunder_effect;
 	struct exploding_ring_effect;
+	struct game_notification;
 }
 
 using all_message_queues = augs::storage_for_message_queues<
@@ -60,5 +61,7 @@ using all_message_queues = augs::storage_for_message_queues<
 	messages::stop_sound_effect,
 
 	messages::thunder_effect,
-	messages::exploding_ring_effect
+	messages::exploding_ring_effect,
+
+	messages::game_notification
 >;

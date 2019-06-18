@@ -18,6 +18,7 @@
 #include "game/modes/mode_commands/mode_entropy_structs.h"
 #include "game/detail/view_input/predictability_info.h"
 #include "augs/enums/callback_result.h"
+#include "game/enums/faction_choice_result.h"
 
 class cosmos;
 struct cosmos_solvable_significant;
@@ -205,19 +206,6 @@ struct bomb_mode_round_state {
 	bomb_mode_win last_win;
 	arena_mode_knockouts_vector knockouts;
 	mode_player_id bomb_planter;
-	// END GEN INTROSPECTOR
-};
-
-enum class faction_choice_result {
-	// GEN INTROSPECTOR enum class faction_choice_result
-	FAILED,
-	THE_SAME,
-	CHOOSING_TOO_FAST,
-	BEST_BALANCE_ALREADY,
-	TEAM_IS_FULL,
-	GAME_IS_FULL,
-	NEED_TO_BE_ALIVE_FOR_SPECTATOR,
-	CHANGED
 	// END GEN INTROSPECTOR
 };
 

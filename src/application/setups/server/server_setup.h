@@ -238,11 +238,38 @@ public:
 				const auto unpacked = unpack(step_collected);
 				const auto arena = get_arena_handle();
 
-				arena.advance(
-					unpacked, 
-					callbacks, 
-					solve_settings()
-				);
+				if (is_dedicated()) {
+					arena.advance(
+						unpacked, 
+						callbacks, 
+						solve_settings()
+					);
+				}
+				else {
+					auto post_solve = [&](auto old_callback, const const_logic_step step) {
+						auto& notifications = step.get_queue<messages::game_notification>();
+
+						const auto current_time = get_current_time();
+
+						erase_if(notifications, [this, current_time](const auto& msg) {
+							return integrated_client_gui.chat.add_entry_from_game_notification(current_time, msg, get_local_player_id());
+						});
+
+						old_callback(step);
+					};
+
+					auto new_callbacks = callbacks.combine(
+						default_solver_callback(),
+						post_solve,
+						default_solver_callback()
+					);
+
+					arena.advance(
+						unpacked, 
+						new_callbacks, 
+						solve_settings()
+					);
+				}
 
 #if DUMP_BEFORE_AND_AFTER_ROUND_START
 				if (arena.get_cosmos().get_total_steps_passed() == 1) {

@@ -7,7 +7,8 @@ struct server_vars {
 	std::string current_arena = "";
 	std::string override_default_ruleset = "";
 
-	unsigned kick_if_inactive_for_secs = 60;
+	unsigned kick_if_no_messages_for_secs = 60;
+	unsigned kick_if_away_from_keyboard_for_secs = 240;
 	unsigned time_limit_to_enter_game_since_connection = 10;
 
 	unsigned reset_resync_timer_once_every_secs = 10;
@@ -26,9 +27,6 @@ struct server_vars {
 
 	bool auto_authorize_loopback_for_rcon = true;
 	unsigned max_unauthorized_rcon_commands = 100;
-
-	std::string connected_message = " connected.";
-	std::string disconnected_message = " disconnected.";
 	// END GEN INTROSPECTOR
 };
 
