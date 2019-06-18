@@ -650,6 +650,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/viewables/avatar_atlas.cpp"
 	"src/augs/window_framework/create_process.cpp"
 	"src/application/gui/client/chat_gui.cpp"
+	"src/application/gui/client/client_gui_state.cpp"
 )
 
 # The rest of 3rdparty libraries with minimal amount of source files.

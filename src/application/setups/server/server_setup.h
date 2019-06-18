@@ -28,6 +28,7 @@
 
 #include "augs/build_settings/setting_dump.h"
 #include "application/setups/server/chat_structs.h"
+#include "application/gui/client/client_gui_state.h"
 
 #if DUMP_BEFORE_AND_AFTER_ROUND_START
 #include "game/modes/dump_for_debugging.h"
@@ -91,14 +92,13 @@ class server_setup :
 	unsigned ticks_until_sending_hash = 0;
 	net_time_t when_last_sent_net_statistics = 0;
 
-	std::vector<internal_net_message_id> broadcasted_steps;
-
 	net_time_t server_time = 0.0;
 	bool schedule_shutdown = false;
 
 	bool rebuild_player_meta_viewables = false;
 	arena_player_metas last_player_metas;
 
+	client_gui_state integrated_client_gui;
 	/* No server state follows later in code. */
 
 	augs::ref_memory_stream make_serialization_stream();
@@ -347,4 +347,13 @@ public:
 
 	template <class F>
 	void for_each_id_and_client(F&& callback, for_each_flags = {});
+
+	bool handle_input_before_game(
+		const handle_input_before_game_input in
+	);
+
+	void draw_custom_gui(const draw_setup_gui_input& in) const;
+
+	bool is_integrated() const;
+	bool is_dedicated() const;
 };

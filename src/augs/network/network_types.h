@@ -25,8 +25,6 @@ namespace yojimbo {
 	class Message;
 }
 
-using internal_net_message_id = yojimbo::Message*;
-
 namespace augs {
 	namespace network {
 		bool init();

@@ -44,10 +44,14 @@ namespace augs {
 
 		const auto cmd_wide = widen(cmd);
 
+		std::vector<wchar_t> cmd_line;
+		cmd_line.resize(cmd_wide.size());
+		std::mecmpy(cmd_line.data(), cmd_wide.c_str(), sizeof(wchar_t) * (cmd_wide.size() + 1));
+
 		// Start the child process. 
 		const auto result = CreateProcess( 
 			NULL,   // No module name (use command line)
-			cmd_wide.c_str(),        // Command line
+			cmd_line.data(),        // Command line
 			NULL,           // Process handle not inheritable
 			NULL,           // Thread handle not inheritable
 			FALSE,          // Set handle inheritance to FALSE

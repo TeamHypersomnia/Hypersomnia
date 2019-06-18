@@ -6,6 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- A way to view dedicated server stats?
+	- Rcon could have access to it 
+
 - Perhaps replace shift+c with some other shortcut?
 
 - Test on windows what's gonna happen if we try to host a server twice on the same port, also on linux
@@ -24,7 +27,13 @@ summary: That which we are brainstorming at the moment.
 		- if it is equal to max clients - 1, it wastes a single connection slot?
 	- For checking whether a dedicated server instance is running, we can keep a lockfile named after the port
 
+
+- fix those knife offsets on character
 - "X connected" notifiers in chat, in gray
+
+- Cooldowns for chat
+	- Both client side and server side
+	- Although maybe later, at least we'll ban griefers early
 
 - chat notifier: X has joined the Resistance/Metropolis
 - chat notifier: X is now a spectator
@@ -151,8 +160,6 @@ summary: That which we are brainstorming at the moment.
 
 - actually make two rulesets for server and playtesting
 	- perhaps do so from test scene content and replace on update official content
-
-- fix those knife offsets on character
 
 - bomb falls outside the map
 - Editor errata

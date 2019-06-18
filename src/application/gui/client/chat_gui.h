@@ -33,6 +33,15 @@ struct chat_gui_state {
 	std::string current_message;
 	std::vector<chat_entry_type> history;
 
+	template <class T>
+	void add_entry(T&& entry) {
+		history.emplace_back(std::forward<T>(entry));
+
+		if (history.size() > 10000) {
+			history.erase(history.begin(), history.begin() + 1000);
+		}
+	}
+
 	bool perform_input_bar(const client_chat_settings&);
 
 	void open_input_bar(chat_target_type);

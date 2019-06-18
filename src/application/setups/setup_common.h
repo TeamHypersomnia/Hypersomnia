@@ -89,6 +89,7 @@ namespace sol {
 }
 
 struct config_lua_table;
+class images_in_atlas_map;
 
 struct perform_custom_imgui_input {
 	sol::state& lua;

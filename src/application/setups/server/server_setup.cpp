@@ -24,6 +24,9 @@
 #include "application/gui/client/chat_gui.h"
 #include "application/network/payload_easily_movable.h"
 
+const auto connected_and_integrated_v = server_setup::for_each_flags { server_setup::for_each_flag::WITH_INTEGRATED, server_setup::for_each_flag::ONLY_CONNECTED };
+const auto only_connected_v = server_setup::for_each_flags { server_setup::for_each_flag::ONLY_CONNECTED };
+
 void server_setup::shutdown() {
 	if (server->is_running()) {
 		LOG("Shutting down the server.");
@@ -84,8 +87,10 @@ void server_setup::for_each_id_and_client(F&& callback, const server_setup::for_
 		callback(client_id, c);
 	}
 
-	if (flags[for_each_flag::WITH_INTEGRATED]) {
-		callback(static_cast<client_id_type>(get_admin_player_id().value), integrated_client);
+	if (is_integrated()) {
+		if (flags[for_each_flag::WITH_INTEGRATED]) {
+			callback(static_cast<client_id_type>(get_admin_player_id().value), integrated_client);
+		}
 	}
 }
 
@@ -458,7 +463,7 @@ void server_setup::advance_clients_state() {
 				);
 			};
 
-			for_each_id_and_client(broadcast_avatar, { for_each_flag::WITH_INTEGRATED, for_each_flag::ONLY_CONNECTED });
+			for_each_id_and_client(broadcast_avatar, connected_and_integrated_v);
 
 			LOG("Sending initial payload for %x at step: %x", client_id, scene.world.get_total_steps_passed());
 		};
@@ -690,7 +695,7 @@ message_handler_result server_setup::handle_client_message(
 							);
 						};
 
-						for_each_id_and_client(update_avatar, { for_each_flag::ONLY_CONNECTED });
+						for_each_id_and_client(update_avatar, only_connected_v);
 						rebuild_player_meta_viewables = true;
 					}
 				}
@@ -773,19 +778,13 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 		);
 	};
 
-	for_each_id_and_client(process_client, { for_each_flag::ONLY_CONNECTED });
+	for_each_id_and_client(process_client, only_connected_v);
 
 	{
 		if (server_time - when_last_sent_net_statistics > vars.send_net_statistics_update_once_every_secs) {
 			net_statistics_update update;
 
-			for (auto& c : clients) {
-				if (!c.is_set()) {
-					continue;
-				}
-
-				const auto client_id = static_cast<client_id_type>(index_in(clients, c));
-
+			auto gather_stats = [&](const auto client_id, auto&) {
 				const auto max_ping = std::numeric_limits<uint8_t>::max();
 				const auto info = server->get_network_info(client_id);
 				const auto rounded_ping = static_cast<int>(std::round(info.rtt_ms));
@@ -793,22 +792,19 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 				const auto clamped_ping = std::clamp(rounded_ping, 0, int(max_ping));
 
 				update.ping_values.push_back(static_cast<uint8_t>(clamped_ping));
-			}
+			};
 
-			for (auto& c : clients) {
-				if (!c.is_set()) {
-					continue;
-				}
-
-				const auto client_id = static_cast<client_id_type>(index_in(clients, c));
-
+			auto send_stats  = [&](const auto client_id, auto&) {
 				server->send_payload(
 					client_id,
 					game_channel_type::VOLATILE_STATISTICS,
 
 					update
 				);
-			}
+			};
+
+			for_each_id_and_client(gather_stats, only_connected_v);
+			for_each_id_and_client(send_stats, only_connected_v);
 
 			when_last_sent_net_statistics = server_time;
 		}
@@ -866,6 +862,23 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 
 		if (ImGui::Button("Go back")) {
 			return custom_imgui_result::GO_TO_MAIN_MENU;
+		}
+	}
+	else {
+		if (is_integrated()) {
+			auto& chat = integrated_client_gui.chat;
+
+			if (chat.perform_input_bar(integrated_client_vars.client_chat)) {
+				server_broadcasted_chat message;
+
+				message.author = get_admin_player_id();
+				message.message = std::string(chat.current_message);
+				message.target = chat.target;
+
+				broadcast(message);
+
+				chat.current_message.clear();
+			}
 		}
 	}
 
@@ -1035,23 +1048,15 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload) {
 		sender_player_nickname = sender_player->chosen_name;
 	}
 
-	{
-		const auto new_entry = payload.translate(
-			get_current_time(),
-			sender_player_nickname,
-			sender_player_faction
-		);
+	bool integrated_received = false;
 
-		LOG(new_entry.operator std::string());
-	}
+	const auto new_entry = payload.translate(
+		get_current_time(),
+		sender_player_nickname,
+		sender_player_faction
+	);
 
-	for (auto& c : clients) {
-		if (!c.is_set()) {
-			continue;
-		}
-
-		const auto recipient_client_id = static_cast<client_id_type>(index_in(clients, c));
-
+	auto send_it = [&](const auto recipient_client_id, auto&) {
 		if (payload.target == chat_target_type::TEAM_ONLY) {
 			const auto recipient_player = get_arena_handle().on_mode(
 				[&](const auto& typed_mode) {
@@ -1062,16 +1067,31 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload) {
 			const auto recipient_player_faction = recipient_player ? recipient_player->faction : faction_type::SPECTATOR;
 
 			if (sender_player_faction != recipient_player_faction) {
-				continue;
+				return;
 			}
 		}
 
-		server->send_payload(
-			recipient_client_id,
-			game_channel_type::COMMUNICATIONS,
+		if (to_mode_player_id(recipient_client_id) == get_admin_player_id()) {
+			integrated_received = true;
+		}
+		else {
+			server->send_payload(
+				recipient_client_id,
+				game_channel_type::COMMUNICATIONS,
 
-			payload
-		);
+				payload
+			);
+		}
+	};
+
+	for_each_id_and_client(send_it, connected_and_integrated_v);
+
+	if (integrated_received) {
+		integrated_client_gui.chat.add_entry(std::move(new_entry));
+	}
+
+	if (is_dedicated() || integrated_received) {
+		LOG(new_entry.operator std::string());
 	}
 }
 
@@ -1131,7 +1151,7 @@ std::optional<arena_player_metas> server_setup::get_new_player_metas() {
 			metas[client_id].avatar.png_bytes = cc.meta.avatar.png_bytes;
 		};
 
-		for_each_id_and_client(make_meta, { for_each_flag::WITH_INTEGRATED, for_each_flag::ONLY_CONNECTED });
+		for_each_id_and_client(make_meta, connected_and_integrated_v);
 
 		rebuild_player_meta_viewables = false;
 		return metas;
@@ -1144,6 +1164,46 @@ const arena_player_metas* server_setup::find_player_metas() const {
 	return std::addressof(last_player_metas);
 }
 	
+bool server_setup::handle_input_before_game(
+	const handle_input_before_game_input in
+) {
+	ensure(is_integrated());
+
+	if (arena_base::handle_input_before_game(in)) {
+		return true;
+	}
+
+	if (integrated_client_gui.control(in)) {
+		return true;
+	}
+
+	return false;
+}
+
+void server_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
+	ensure(is_integrated());
+
+	using namespace augs::gui::text;
+
+	integrated_client_gui.chat.draw_recent_messages(
+		in.drawer,
+		integrated_client_vars.client_chat,
+		in.config.faction_view,
+		in.gui_fonts.gui,
+		get_current_time()
+	);
+
+	arena_base::draw_custom_gui(in);
+}
+
+bool server_setup::is_integrated() const {
+	return dedicated == std::nullopt;
+}
+
+bool server_setup::is_dedicated() const {
+	return dedicated != std::nullopt;
+}
+
 #include "augs/readwrite/to_bytes.h"
 
 #if BUILD_UNIT_TESTS

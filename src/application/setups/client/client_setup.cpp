@@ -244,7 +244,7 @@ message_handler_result client_setup::handle_server_message(
 		);
 
 		LOG(new_entry.operator std::string());
-		client_gui.chat.history.emplace_back(std::move(new_entry));
+		client_gui.chat.add_entry(std::move(new_entry));
 
 		if (payload.should_disconnect_now(get_local_player_id())) {
 			std::string kicked_or_banned;
@@ -883,35 +883,8 @@ bool client_setup::handle_input_before_game(
 		return true;
 	}
 
-	using namespace augs::event;
-	using namespace augs::event::keys;
-
-	const auto ch = in.e.get_key_change();
-
-	if (ch == key_change::PRESSED) {
-		const auto key = in.e.get_key();
-
-		if (const auto it = mapped_or_nullptr(in.app_controls, key)) {
-			if (*it == app_ingame_intent_type::OPEN_RCON_MENU) {
-				auto& s = client_gui.rcon.show;
-				s = !s;
-				return true;
-			}
-
-			auto invoke_chat = [&](const chat_target_type t) {
-				client_gui.chat.open_input_bar(t);
-			};
-
-			if (*it == app_ingame_intent_type::OPEN_CHAT) {
-				invoke_chat(chat_target_type::GENERAL);
-				return true;
-			}
-
-			if (*it == app_ingame_intent_type::OPEN_TEAM_CHAT) {
-				invoke_chat(chat_target_type::TEAM_ONLY);
-				return true;
-			}
-		}
+	if (client_gui.control(in)) {
+		return true;
 	}
 
 	return false;
