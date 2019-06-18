@@ -42,6 +42,8 @@
 #include "view/mode_gui/arena/arena_player_meta.h"
 #include "augs/texture_atlas/loaded_png_vector.h"
 
+#include "application/network/client_gui_state.h"
+
 struct config_lua_table;
 
 class client_adapter;

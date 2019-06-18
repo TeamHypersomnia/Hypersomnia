@@ -6,6 +6,8 @@ permalink: todo
 summary: Just a hidden scratchpad.
 ---
 
+- It would be nice if we didn't crash on loading a corrupted map, at least if we manage to hit an ensure before sigsegv
+
 - Pulse "your own" color for a funny effect
 
 - Fix owner tracking for grenades as they get deleted and the death summary can't know whose that grenade really was

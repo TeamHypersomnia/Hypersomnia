@@ -437,4 +437,12 @@ public:
 			player().get_arena_handle(folder()).on_mode_with_input(std::forward<F>(callback));
 		}
 	}
+
+	std::optional<arena_player_metas> get_new_player_metas() {
+		return std::nullopt;
+	}
+
+	const arena_player_metas* find_player_metas() const {
+		return nullptr;
+	}
 };

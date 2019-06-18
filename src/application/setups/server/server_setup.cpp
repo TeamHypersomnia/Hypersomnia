@@ -17,6 +17,7 @@
 
 #include "augs/readwrite/byte_readwrite.h"
 #include "augs/readwrite/memory_stream.h"
+#include "augs/readwrite/byte_file.h"
 
 #include "application/arena/arena_handle.h"
 #include "application/arena/choose_arena.h"
@@ -60,6 +61,31 @@ server_setup::server_setup(
 
 	if (private_initial_vars.rcon_password.empty()) {
 		LOG("WARNING! The rcon password is empty! This means that only the localhost can access the rcon.");
+	}
+
+	if (dedicated == std::nullopt) {
+		integrated_client.init(server_time);
+		integrated_client.meta.avatar.png_bytes = augs::file_to_bytes(integrated_client_vars.avatar_image_path);
+		rebuild_player_meta_viewables = true;
+	}
+}
+
+template <class F>
+void server_setup::for_each_id_and_client(F&& callback, const server_setup::for_each_flags flags) {
+	for (auto& c : clients) {
+		const auto client_id = static_cast<client_id_type>(index_in(clients, c));
+
+		if (flags[for_each_flag::ONLY_CONNECTED]) {
+			if (!c.is_set()) {
+				continue;
+			}
+		}
+
+		callback(client_id, c);
+	}
+
+	if (flags[for_each_flag::WITH_INTEGRATED]) {
+		callback(static_cast<client_id_type>(get_admin_player_id().value), integrated_client);
 	}
 }
 
@@ -261,11 +287,9 @@ void server_setup::advance_clients_state() {
 			}
 		);
 	};
-	
-	for (auto& c : clients) {
-		using S = client_state_type;
 
-		const auto client_id = static_cast<client_id_type>(index_in(clients, c));
+	auto process_client = [&](const client_id_type client_id, auto& c) {
+		using S = client_state_type;
 		const auto mode_id = to_mode_player_id(client_id);
 
 		auto remove_from_mode = [&]() {
@@ -303,7 +327,7 @@ void server_setup::advance_clients_state() {
 				}
 			}
 
-			continue;
+			return;
 		}
 
 		auto contribute_to_step_entropy = [&]() {
@@ -424,14 +448,7 @@ void server_setup::advance_clients_state() {
 				}
 			);
 
-			for (const auto& cc : clients) {
-				if (!cc.is_set()) {
-					continue;
-				}
-
-				const auto recipient_client_id = client_id;
-				const auto client_id_of_avatar = static_cast<client_id_type>(index_in(clients, cc));
-
+			auto broadcast_avatar = [this, recipient_client_id = client_id](const auto client_id_of_avatar, auto& cc) {
 				server->send_payload(
 					recipient_client_id,
 					game_channel_type::COMMUNICATIONS,
@@ -439,7 +456,9 @@ void server_setup::advance_clients_state() {
 					client_id_of_avatar,
 					cc.meta.avatar
 				);
-			}
+			};
+
+			for_each_id_and_client(broadcast_avatar, { for_each_flag::WITH_INTEGRATED, for_each_flag::ONLY_CONNECTED });
 
 			LOG("Sending initial payload for %x at step: %x", client_id, scene.world.get_total_steps_passed());
 		};
@@ -456,7 +475,7 @@ void server_setup::advance_clients_state() {
 					}
 					else {
 						disconnect_and_unset(client_id);
-						continue;
+						return;
 					}
 				}
 			}
@@ -477,7 +496,9 @@ void server_setup::advance_clients_state() {
 		if (c.state == S::IN_GAME) {
 			contribute_to_step_entropy();
 		}
-	}
+	};
+
+	for_each_id_and_client(process_client);
 }
 
 template <class T, class F>
@@ -659,22 +680,18 @@ message_handler_result server_setup::handle_client_message(
 					else {
 						c.meta.avatar = std::move(payload);
 
-						for (const auto& cc : clients) {
-							if (!cc.is_set()) {
-								continue;
-							}
-
-							const auto client_id_of_avatar = client_id;
-							const auto recipient_client_id = static_cast<client_id_type>(index_in(clients, cc));
-
+						auto update_avatar = [this, client_id_of_avatar = client_id, &client_with_updated_avatar = c](const auto recipient_client_id, auto&) {
 							server->send_payload(
 								recipient_client_id,
 								game_channel_type::COMMUNICATIONS,
 
 								client_id_of_avatar,
-								c.meta.avatar
+								client_with_updated_avatar.meta.avatar
 							);
-						}
+						};
+
+						for_each_id_and_client(update_avatar, { for_each_flag::ONLY_CONNECTED });
+						rebuild_player_meta_viewables = true;
 					}
 				}
 				catch (...) {
@@ -717,20 +734,14 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 		return std::nullopt;
 	}();
 
-	for (auto& c : clients) {
-		if (!c.is_set()) {
-			continue;
-		}
-
+	auto process_client = [&](const auto client_id, auto& c) {
 		const bool its_time_already = 
 			c.state >= client_state_type::RECEIVING_INITIAL_STATE
 		;
 
 		if (!its_time_already) {
-			continue;
+			return;
 		}
-
-		const auto client_id = static_cast<client_id_type>(index_in(clients, c));
 
 		{
 			{
@@ -760,7 +771,9 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 
 			total
 		);
-	}
+	};
+
+	for_each_id_and_client(process_client, { for_each_flag::ONLY_CONNECTED });
 
 	{
 		if (server_time - when_last_sent_net_statistics > vars.send_net_statistics_update_once_every_secs) {
@@ -1110,6 +1123,27 @@ void server_setup::ban(const client_id_type& id, const std::string& reason) {
 	broadcast(message);
 }
 
+std::optional<arena_player_metas> server_setup::get_new_player_metas() {
+	if (rebuild_player_meta_viewables) {
+		auto& metas = last_player_metas;
+		
+		auto make_meta = [&](const auto client_id, const auto& cc) {
+			metas[client_id].avatar.png_bytes = cc.meta.avatar.png_bytes;
+		};
+
+		for_each_id_and_client(make_meta, { for_each_flag::WITH_INTEGRATED, for_each_flag::ONLY_CONNECTED });
+
+		rebuild_player_meta_viewables = false;
+		return metas;
+	}
+
+	return std::nullopt;
+}
+
+const arena_player_metas* server_setup::find_player_metas() const {
+	return std::addressof(last_player_metas);
+}
+	
 #include "augs/readwrite/to_bytes.h"
 
 #if BUILD_UNIT_TESTS

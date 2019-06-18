@@ -85,6 +85,8 @@ class server_setup :
 
 	augs::propagate_const<std::unique_ptr<server_adapter>> server;
 	std::array<server_client_state, max_incoming_connections_v> clients;
+	server_client_state integrated_client;
+
 	unsigned ticks_until_sending_packets = 0;
 	unsigned ticks_until_sending_hash = 0;
 	net_time_t when_last_sent_net_statistics = 0;
@@ -93,6 +95,9 @@ class server_setup :
 
 	net_time_t server_time = 0.0;
 	bool schedule_shutdown = false;
+
+	bool rebuild_player_meta_viewables = false;
+	arena_player_metas last_player_metas;
 
 	/* No server state follows later in code. */
 
@@ -327,4 +332,19 @@ public:
 	auto get_game_gui_subject_id() const {
 		return get_viewed_character_id();
 	}
+
+	const arena_player_metas* find_player_metas() const;
+	std::optional<arena_player_metas> get_new_player_metas();
+
+	enum class for_each_flag {
+		ONLY_CONNECTED,
+		WITH_INTEGRATED,
+
+		COUNT
+	};
+
+	using for_each_flags = augs::enum_boolset<for_each_flag>;
+
+	template <class F>
+	void for_each_id_and_client(F&& callback, for_each_flags = {});
 };

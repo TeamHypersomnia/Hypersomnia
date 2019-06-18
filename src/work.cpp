@@ -469,7 +469,7 @@ and then hitting Save settings.
 		std::optional<arena_player_metas> new_player_metas;
 
 		if (streaming.finished_loading_player_metas()) {
-			on_specific_setup([&](client_setup& setup) {
+			visit_current_setup([&](auto& setup) {
 				new_player_metas = setup.get_new_player_metas();
 			});
 		}
@@ -1844,10 +1844,8 @@ and then hitting Save settings.
 				game_gui.world.draw(context);
 			}
 
-			const arena_player_metas* player_metas = nullptr;
-
-			on_specific_setup([&](client_setup& setup) {
-				player_metas = setup.find_player_metas();
+			const auto player_metas = visit_current_setup([&](auto& setup) {
+				return setup.find_player_metas();
 			});
 
 			/* #4 */

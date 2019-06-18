@@ -6,7 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- It would be nice if we didn't crash on loading a corrupted map, at least if we manage to hit an ensure before sigsegv
+- Perhaps replace shift+c with some other shortcut?
 
 - Test on windows what's gonna happen if we try to host a server twice on the same port, also on linux
 
@@ -43,8 +43,6 @@ summary: That which we are brainstorming at the moment.
 
 - Test avatars on windows, especially the png filename filter
 
-- Writeout the config before starting a server process from the menu
-
 - Fix that clipboard on all platforms at last
 - And fix polish characters in chat breaking stuff on Windows
 
@@ -54,7 +52,6 @@ summary: That which we are brainstorming at the moment.
 - Test assists after fixing the damage owner logic
 
 - Port cyberaqua again from the same lua files to avoid re-importing and loss of accuracy
-
 
 
 - panel -> ct computers

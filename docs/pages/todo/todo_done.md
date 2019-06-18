@@ -3236,3 +3236,5 @@ which can be done from Settings->Reset all settings to factory default.
 - at least set config to main menu on crashing
 	- We could compare write dates of exit success with ensure failed to see if we can take the local config
 
+- Writeout the config before starting a server process from the menu
+

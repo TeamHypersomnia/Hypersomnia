@@ -15,6 +15,7 @@
 #include "application/debug_settings.h"
 #include "application/input/entropy_accumulator.h"
 #include "application/setups/setup_common.h"
+#include "view/mode_gui/arena/arena_player_meta.h"
 
 struct config_lua_table;
 struct draw_setup_gui_input;
@@ -142,5 +143,13 @@ public:
 
 	auto get_game_gui_subject_id() const {
 		return get_viewed_character_id();
+	}
+
+	std::nullopt_t get_new_player_metas() {
+		return std::nullopt;
+	}
+
+	const arena_player_metas* find_player_metas() const {
+		return nullptr;
 	}
 };

@@ -12,7 +12,7 @@
 #endif
 
 namespace augs {
-#elif PLATFORM_WINDOWS
+#if PLATFORM_WINDOWS
 	std::wstring widen(const std::string& s) {
 		return std::wstring(s.begin(), s.end());
 	}
