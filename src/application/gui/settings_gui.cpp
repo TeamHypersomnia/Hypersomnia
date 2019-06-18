@@ -498,11 +498,15 @@ void settings_gui_state::perform(
 				input_text<max_rcon_password_length_v>(SCOPE_CFG_NVP(rcon_password)); revert(scope_cfg.rcon_password);
 				text_disabled("The default rcon password to be sent to the server on init.");
 
-				revertable_slider(SCOPE_CFG_NVP(chat_window_width), 100u, 500u);
-				revertable_drag_rect_bounded_vec2i(SCOPE_CFG_NVP(chat_window_offset), 0.3f, -vec2i(screen_size), vec2i(screen_size));
+				{
+					auto& scope_cfg = config.client.client_chat;
 
-				revertable_slider(SCOPE_CFG_NVP(show_recent_chat_messages_num), 0u, 20u);
-				revertable_slider(SCOPE_CFG_NVP(keep_recent_chat_messages_for_seconds), 0.f, 20.f);
+					revertable_slider(SCOPE_CFG_NVP(chat_window_width), 100u, 500u);
+					revertable_drag_rect_bounded_vec2i(SCOPE_CFG_NVP(chat_window_offset), 0.3f, -vec2i(screen_size), vec2i(screen_size));
+
+					revertable_slider(SCOPE_CFG_NVP(show_recent_chat_messages_num), 0u, 20u);
+					revertable_slider(SCOPE_CFG_NVP(keep_recent_chat_messages_for_seconds), 0.f, 20.f);
+				}
 
 				break;
 			}

@@ -21,7 +21,7 @@
 
 #include "application/arena/arena_handle.h"
 #include "application/arena/choose_arena.h"
-#include "application/setups/client/chat_gui.h"
+#include "application/gui/client/chat_gui.h"
 #include "application/network/payload_easily_movable.h"
 
 void server_setup::shutdown() {

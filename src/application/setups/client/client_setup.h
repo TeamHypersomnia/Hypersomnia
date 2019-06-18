@@ -37,12 +37,11 @@
 
 #include "view/client_arena_type.h"
 #include "application/network/special_client_request.h"
-#include "application/setups/client/rcon_gui.h"
-#include "application/setups/client/chat_gui.h"
+#include "application/gui/client/rcon_gui.h"
+#include "application/gui/client/chat_gui.h"
+#include "application/gui/client/client_gui_state.h"
 #include "view/mode_gui/arena/arena_player_meta.h"
 #include "augs/texture_atlas/loaded_png_vector.h"
-
-#include "application/network/client_gui_state.h"
 
 struct config_lua_table;
 
@@ -102,9 +101,8 @@ class client_setup :
 	std::string last_disconnect_reason;
 	bool print_only_disconnect_reason = false;
 
-	rcon_gui_state rcon_gui;
-	chat_gui_state chat_gui;
 	bool rebuild_player_meta_viewables = false;
+	client_gui_state client_gui;
 	/* No client state follows later in code. */
 
 	template <class T>

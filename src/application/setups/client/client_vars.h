@@ -17,6 +17,17 @@ struct client_net_vars {
 	// END GEN INTROSPECTOR
 };
 
+struct client_chat_settings {
+	// GEN INTROSPECTOR struct client_chat_settings
+	unsigned chat_window_width = 300;
+	vec2i chat_window_offset = vec2i(10, 300);
+
+	unsigned show_recent_chat_messages_num = 5;
+	float keep_recent_chat_messages_for_seconds = 8.f;
+	float chat_messages_fade_last_seconds = 2.f;
+	// END GEN INTROSPECTOR
+};
+
 struct client_vars {
 	// GEN INTROSPECTOR struct client_vars
 	std::string nickname = "Player";
@@ -29,13 +40,7 @@ struct client_vars {
 
 	bool spectate_referential_state = true;
 	std::string rcon_password = "";
-
-	unsigned chat_window_width = 300;
-	vec2i chat_window_offset = vec2i(10, 300);
-
-	unsigned show_recent_chat_messages_num = 5;
-	float keep_recent_chat_messages_for_seconds = 8.f;
-	float chat_messages_fade_last_seconds = 2.f;
+	client_chat_settings client_chat;
 	augs::path_type avatar_image_path;
 	// END GEN INTROSPECTOR
 };

@@ -22,6 +22,7 @@
 #include "augs/readwrite/byte_file.h"
 #include "application/network/payload_easily_movable.h"
 #include "augs/misc/readable_bytesize.h"
+#include "application/gui/client/chat_gui_logic.h"
 
 client_setup::client_setup(
 	sol::state& lua,
@@ -243,7 +244,7 @@ message_handler_result client_setup::handle_server_message(
 		);
 
 		LOG(new_entry.operator std::string());
-		chat_gui.history.emplace_back(std::move(new_entry));
+		client_gui.chat.history.emplace_back(std::move(new_entry));
 
 		if (payload.should_disconnect_now(get_local_player_id())) {
 			std::string kicked_or_banned;
@@ -635,6 +636,8 @@ custom_imgui_result client_setup::perform_custom_imgui(
 
 	const bool is_gameplay_on = client->is_connected() && state == C::IN_GAME;
 
+	auto& rcon_gui = client_gui.rcon;
+
 	if (rcon_gui.show) {
 		const auto window_name = "Remote Control (RCON)";
 		auto window = scoped_window(window_name, nullptr);
@@ -671,76 +674,21 @@ custom_imgui_result client_setup::perform_custom_imgui(
 		}
 	}
 
-	if (chat_gui.show) {
-		const auto screen_size = vec2i(ImGui::GetIO().DisplaySize);
+	{
+		auto& chat = client_gui.chat;
 
-		const auto size = vec2 {
-			static_cast<float>(vars.chat_window_width),
-			ImGui::GetTextLineHeight() * 3.f
-		};
+		if (chat.perform_input_bar(vars.client_chat)) {
+			::client_requested_chat message;
 
-		const auto window_offset = vars.chat_window_offset;
-		const auto window_pos = vec2(window_offset.x, screen_size.y - size.y - window_offset.y);
+			message.target = chat.target;
+			message.message = chat.current_message;
 
-		ImGui::SetNextWindowPos(ImVec2(window_pos));
+			client->send_payload(
+				game_channel_type::COMMUNICATIONS,
+				message
+			);
 
-		auto go_to_entity = scoped_window(
-			"ChatWindow", 
-			&chat_gui.show,
-			ImGuiWindowFlags_NoTitleBar 
-			| ImGuiWindowFlags_NoResize 
-			| ImGuiWindowFlags_NoMove 
-			| ImGuiWindowFlags_NoScrollbar 
-			| ImGuiWindowFlags_NoScrollWithMouse
-			| ImGuiWindowFlags_NoSavedSettings
-			| ImGuiWindowFlags_AlwaysAutoResize
-		);
-
-		bool was_acquired = false;
-		
-		if (ImGui::GetCurrentWindow()->GetID("##ChatInput") != GImGui->ActiveId) {
-			ImGui::SetKeyboardFocusHere();
-			was_acquired = true;
-		}
-
-		auto scope = augs::scope_guard([&](){
-			if (!was_acquired && ImGui::GetCurrentWindow()->GetID("##ChatInput") != GImGui->ActiveId) {
-				chat_gui.show = false;
-			}
-		});
-
-		std::string label;
-
-		switch (chat_gui.target) {
-			case chat_target_type::GENERAL: label = "(Say to all)"; break;
-			case chat_target_type::TEAM_ONLY: label = "(Say to team)"; break;
-			default: break;
-		}
-
-		text_disabled(label);
-
-		ImGui::SameLine();
-
-		{
-			auto scope = augs::imgui::scoped_item_width(size.x);
-
-			if (input_text<max_chat_message_length_v>("##ChatInput", chat_gui.current_message, ImGuiInputTextFlags_EnterReturnsTrue)) {
-				if (chat_gui.current_message.size() > 0) {
-					::client_requested_chat message;
-
-					message.target = chat_gui.target;
-					message.message = chat_gui.current_message;
-
-					client->send_payload(
-						game_channel_type::COMMUNICATIONS,
-						message
-					);
-
-					chat_gui.current_message.clear();
-				}
-
-				chat_gui.show = false;
-			}
+			chat.current_message.clear();
 		}
 	}
 
@@ -945,15 +893,13 @@ bool client_setup::handle_input_before_game(
 
 		if (const auto it = mapped_or_nullptr(in.app_controls, key)) {
 			if (*it == app_ingame_intent_type::OPEN_RCON_MENU) {
-				rcon_gui.show = !rcon_gui.show;
+				auto& s = client_gui.rcon.show;
+				s = !s;
 				return true;
 			}
 
 			auto invoke_chat = [&](const chat_target_type t) {
-				chat_gui.show = true;
-				chat_gui.target = t;
-
-				ImGui::SetWindowFocus("ChatWindow");
+				client_gui.chat.open_input_bar(t);
 			};
 
 			if (*it == app_ingame_intent_type::OPEN_CHAT) {
@@ -973,76 +919,14 @@ bool client_setup::handle_input_before_game(
 
 void client_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
 	using namespace augs::gui::text;
-	const auto& kos = chat_gui.history;
 
-	const auto knockouts_to_show = std::min(
-		kos.size(), 
-		static_cast<std::size_t>(vars.show_recent_chat_messages_num)
+	client_gui.chat.draw_recent_messages(
+		in.drawer,
+		vars.client_chat,
+		in.config.faction_view,
+		in.gui_fonts.gui,
+		get_current_time()
 	);
-
-	const auto now = get_current_time();
-
-	const auto starting_i = [&]() {
-		auto i = kos.size() - knockouts_to_show;
-
-		while (i < kos.size() && now - kos[i].timestamp >= vars.keep_recent_chat_messages_for_seconds) {
-			++i;
-		}
-
-		return static_cast<int>(i);
-	}();
-
-	auto get_col = [&](const auto& faction) {
-		return in.config.faction_view.colors[faction].standard;
-	};
-
-	auto colored = [&](const auto& text, const auto& c) {
-		const auto text_style = style(
-			in.gui_fonts.gui,
-			c
-		);
-
-		return formatted_string(text, text_style);
-	};
-
-	const auto wrapping = vars.chat_window_width;
-
-	auto calc_size = [&](const auto& text) { 
-		return get_text_bbox(colored(text, white), wrapping);
-	};
-
-	const auto size = vec2 {
-		static_cast<float>(vars.chat_window_width),
-		ImGui::GetTextLineHeight() * 3.f
-	};
-
-	const auto window_offset = vars.chat_window_offset;
-	const auto window_pos = vec2(window_offset.x, in.screen_size.y - size.y - window_offset.y);
-
-	auto pen = window_pos;
-
-	for (int i = kos.size() - 1; i >= starting_i; --i) {
-		const auto& ko = kos[i];
-
-		const auto author_text = ko.get_author_string();
-
-		const auto author_col = get_col(ko.author_faction);
-		const auto message_col = ko.overridden_message_color == rgba::zero ? white : ko.overridden_message_color;
-
-		const auto total_text = colored(author_text, author_col) + colored(ko.message, message_col);
-
-		const auto bbox = calc_size(total_text);
-		pen.y -= bbox.y + 1;
-
-		print_stroked(
-			in.drawer,
-			pen,
-			total_text,
-			augs::ralign_flags{},
-			black,
-			wrapping
-		);
-	}
 
 	arena_base::draw_custom_gui(in);
 }
