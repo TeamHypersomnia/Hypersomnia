@@ -69,7 +69,7 @@ void regenerate_neon_map(
 		source_image.save(neon_map_path);
 
 		augs::create_directories_for(neon_map_stamp_path);
-		augs::save_as_bytes(new_stamp_bytes, neon_map_stamp_path);
+		augs::bytes_to_file(new_stamp_bytes, neon_map_stamp_path);
 	}
 }
 catch (...) {

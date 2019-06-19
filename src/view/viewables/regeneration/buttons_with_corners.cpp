@@ -66,7 +66,7 @@ void regenerate_button_with_corners(
 			new_stamp
 		);
 
-		augs::save_as_bytes(new_stamp_bytes, button_with_corners_stamp_path);
+		augs::bytes_to_file(new_stamp_bytes, button_with_corners_stamp_path);
 	}
 }
 

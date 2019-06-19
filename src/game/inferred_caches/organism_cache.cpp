@@ -9,7 +9,7 @@ void organism_cache::grid::erase_organism(const organism_id_type id) {
 #if PRODUCTION_BUILD
 
 #else
-	LOG("WARNING! Running a fallback organism_cache routine that may slow down the logic.");
+	//LOG("WARNING! Running a fallback organism_cache routine that may slow down the logic.");
 	//ensure(false && "WARNING! Running a fallback organism_cache routine that may slow down the logic.");
 #endif
 

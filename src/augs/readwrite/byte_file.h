@@ -37,11 +37,15 @@ namespace augs {
 
 	template <class O>
 	void save_as_bytes(const O& object, const path_type& path) {
+		if constexpr(has_value_type_v<O>) {
+			static_assert(!std::is_same_v<typename O::value_type, std::byte>, "Use file_to_bytes for directly writing the binary files!");
+		}
+
 		auto out = open_binary_output_stream(path);
 		write_bytes(out, object);
 	}
 
-	inline void save_as_bytes(const std::vector<std::byte>& bytes, const path_type& path) {
+	inline void bytes_to_file(const std::vector<std::byte>& bytes, const path_type& path) {
 		auto out = open_binary_output_stream(path);
 		out.write(reinterpret_cast<const byte_type_for_t<decltype(out)>*>(bytes.data()), bytes.size());
 	}

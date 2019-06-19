@@ -49,7 +49,7 @@ void regenerate_desaturation(
 		augs::image(source_path).desaturate().save(output_path);
 
 		augs::create_directories_for(desaturation_stamp_path);
-		augs::save_as_bytes(new_stamp_bytes, desaturation_stamp_path);
+		augs::bytes_to_file(new_stamp_bytes, desaturation_stamp_path);
 	}
 }
 catch (...) {

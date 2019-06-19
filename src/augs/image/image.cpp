@@ -519,7 +519,7 @@ namespace augs {
 			LOG("Failed to save %x: lodepng returned %x. Ensure that the target directory exists.", path, lodepng_result);
 		}
 		else {
-			augs::save_as_bytes(saved_bytes, path);
+			augs::bytes_to_file(saved_bytes, path);
 		}
 	}
 

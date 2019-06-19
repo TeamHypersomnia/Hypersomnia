@@ -127,7 +127,7 @@ bool try_to_reload_with_bytes(T& v) {
 		std::vector<std::byte> bytes;
 		augs::assign_bytes(bytes, v);
 
-		augs::save_as_bytes(bytes, path);
+		augs::bytes_to_file(bytes, path);
 	}
 
 	augs::load_from_bytes(v, path);
@@ -183,7 +183,7 @@ bool try_to_reload_with_memory_stream(T& v) {
 		std::vector<std::byte> bytes;
 		augs::assign_bytes(bytes, v);
 
-		augs::save_as_bytes(bytes, path);
+		augs::bytes_to_file(bytes, path);
 	}
 
 	auto bytes = augs::file_to_bytes(path);
