@@ -28,9 +28,9 @@ enum class game_intent_type {
 	MOVE_LEFT,
 	MOVE_RIGHT,
 
-	SPRINT,
 	DASH,
-	START_PICKING_UP_ITEMS,
+	SPRINT,
+	PICK_TOUCHING_ITEMS,
 
 	USE,
 	RELOAD,

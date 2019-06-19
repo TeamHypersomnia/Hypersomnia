@@ -48,6 +48,7 @@ public:
 	void perform(
 		sol::state& lua,
 		const augs::path_type& path_for_saving,
+		const config_lua_table& canon_config,
 		config_lua_table& into,
 		config_lua_table& last_saved,
 		vec2i screen_size

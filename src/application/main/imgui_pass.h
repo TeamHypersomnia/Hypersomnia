@@ -18,6 +18,7 @@ void perform_imgui_pass(
 	augs::local_entropy& window_inputs,
 	const vec2i screen_size,
 	const augs::delta delta,
+	const config_lua_table& canon_config,
 	config_lua_table& config,
 	config_lua_table& last_saved_config,
 	const augs::path_type& path_for_saving_config,

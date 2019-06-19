@@ -134,6 +134,12 @@ int work(const int argc, const char* const * const argv) try {
 	static auto lua = augs::create_lua_state();
 
 	LOG("Loading the config.");
+
+	static const config_lua_table canon_config {
+		lua,
+		canon_config_path
+	};
+
 	static config_lua_table config { 
 		lua, 
 		augs::switch_path(
@@ -1249,6 +1255,7 @@ and then hitting Save settings.
 				new_window_entropy,
 				window.get_screen_size(),
 				frame_delta,
+				canon_config,
 				config,
 				last_saved_config,
 				local_config_path,

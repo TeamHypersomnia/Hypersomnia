@@ -19,7 +19,7 @@ return {
     LeftMouseButton = "CROSSHAIR_PRIMARY_ACTION",
     RightMouseButton = "CROSSHAIR_SECONDARY_ACTION",
 
-    LeftControl = "START_PICKING_UP_ITEMS",
+    LeftControl = "PICK_TOUCHING_ITEMS",
     G = "DROP",
 
     MiddleMouseButton = "THROW_ANY_FORCE",

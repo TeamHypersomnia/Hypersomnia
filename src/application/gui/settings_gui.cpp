@@ -50,6 +50,7 @@ void settings_gui_state::set_hijacked_key(const augs::event::keys::key k) {
 void settings_gui_state::perform(
 	sol::state& lua,
 	const augs::path_type& config_path_for_saving,
+	const config_lua_table& canon_config,
 	config_lua_table& config,
 	config_lua_table& last_saved_config,
 	vec2i screen_size
@@ -593,6 +594,21 @@ void settings_gui_state::perform(
 				do_bindings_map("General GUI bindings", config.general_gui_controls);
 				text_disabled("\n\n");
 				do_bindings_map("Inventory GUI bindings", config.inventory_gui_controls);
+				text_disabled("\n\n");
+
+				ImGui::Columns(1);
+
+				ImGui::Separator();
+
+				text_disabled("\n");
+
+				if (ImGui::Button("Restore all keybindings from factory defaults")) {
+					config.app_controls = canon_config.app_controls;
+					config.game_controls = canon_config.game_controls;
+					config.general_gui_controls = canon_config.general_gui_controls;
+					config.inventory_gui_controls = canon_config.inventory_gui_controls;
+				}
+
 
 				break;
 			}

@@ -13,9 +13,7 @@
 
 namespace augs {
 #if PLATFORM_WINDOWS
-	std::wstring widen(const std::string& s) {
-		return std::wstring(s.begin(), s.end());
-	}
+	std::wstring widen(const std::string& s);
 #endif
 
 	bool spawn_detached_process(const std::string& executable, const std::string& arguments) {
