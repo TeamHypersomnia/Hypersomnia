@@ -6,14 +6,25 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- In-game tip system
+	- Contextual
+		- Press "E" to defuse the bomb.
+		- Stay still while defusing the bomb.
+		- Press "T" to buy items.
+		- Press "C" to pull out the bomb.
+		- Stay still while planting the bomb.
+		- You are a Spectator. Press "O" to select a team.
+	- Define "Context"
+		- The entire arena handle, I suppose?
+		- Should then arena gui mixin manage it?
+			- I guess...
+	- Randomized
+		- Stay still to regenerate stamina faster.
+		- Double-tap R to drop the old mag for a faster reload. Near-empty mags are dropped automatically.
+		- Melee blows are stronger when you run.
+		- Electric Shield lets you live longer, but slows down your movement.
+
 - Test polish characters on Windows again
-
-- Add imgui popup whenever regenerating neons or atlas, but only in the main menu
-
-Would you like keep the old settings,
-or reset them to factory defaults?
-
-[ Keep ] [ Reset ]
 
 - A way to view dedicated server stats?
 	- Rcon could have access to it 
@@ -24,16 +35,6 @@ or reset them to factory defaults?
 
 - fix those knife offsets on character
 
-- In-game tip system
-	- Contextual
-		- Press "T" to buy items.
-		- Press "C" to pull out the bomb.
-		- Stay still while planting the bomb.
-	- Randomized
-		- Stay still to regenerate stamina faster.
-		- Double-tap R to drop the old mag for a faster reload. Near-empty mags are dropped automatically.
-		- Melee blows are stronger when you run.
-		- Electric Shield lets you live longer, but slows down your movement.
 
 - Test avatars on windows, especially the png filename filter
 
@@ -43,7 +44,6 @@ or reset them to factory defaults?
 	- Something to check if the servers is already on
 
 - Port cyberaqua again from the same lua files to avoid re-importing and loss of accuracy
-
 
 - panel -> ct computers
 - fix in-game area indicators wrongly drawn when zoomed out

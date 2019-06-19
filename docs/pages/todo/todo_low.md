@@ -4,6 +4,11 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+Would you like keep the old settings,
+or reset them to factory defaults?
+
+[ Keep ] [ Reset ]
+
 - Rebuy previous
 	- Plan for state early
 		- note that we don't need any bincompat regarding the mode solvable

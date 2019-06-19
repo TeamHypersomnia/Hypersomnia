@@ -837,7 +837,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 				std::nullopt,
 				in.gui_font,
 				primary_text,
-				{}
+				{},
+				cone.to_screen_space(viewed_character.get_viewing_transform(interp).pos),
+				settings.offscreen_reference_mode
 			);
 		}
 	}

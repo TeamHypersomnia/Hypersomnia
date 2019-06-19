@@ -106,7 +106,9 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 								std::nullopt,
 								in.gui_font,
 								primary_text,
-								{}
+								{},
+								in.text_camera.to_screen_space(watched_character_transform.pos),
+								in.settings.offscreen_reference_mode
 							);
 						}
 					}
@@ -392,7 +394,9 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 					next_tex,
 					in.gui_font,
 					primary_text,
-					secondary_text
+					secondary_text,
+					in.text_camera.to_screen_space(watched_character_transform.pos),
+					in.settings.offscreen_reference_mode
 				);
 			}
 		}

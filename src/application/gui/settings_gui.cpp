@@ -168,6 +168,11 @@ void settings_gui_state::perform(
 			revert(f);
 		};
 
+		auto revertable_enum = [&](auto l, auto& f, auto&&... args) {
+			enum_combo(l, f, std::forward<decltype(args)>(args)...);
+			revert(f);
+		};
+
 		auto do_lag_simulator = [&](auto& sim) {
 			//#if !IS_PRODUCTION_BUILD
 			revertable_checkbox("Enable lag simulator", sim.is_enabled);
@@ -190,7 +195,7 @@ void settings_gui_state::perform(
 
 		switch (active_pane) {
 			case settings_pane::GENERAL: {
-				enum_combo("Launch on game's startup", config.launch_mode);
+				revertable_enum("Launch on game's startup", config.launch_mode);
 
 				revertable_checkbox("Fullscreen", config.window.fullscreen);
 				if (!config.window.fullscreen) {
@@ -669,6 +674,7 @@ void settings_gui_state::perform(
 						if (scope_cfg.draw_offscreen_indicators) {
 							auto indent = scoped_indent();
 
+							revertable_enum(SCOPE_CFG_NVP(offscreen_reference_mode));
 							revertable_checkbox(SCOPE_CFG_NVP(draw_offscreen_callouts));
 
 							revertable_slider(SCOPE_CFG_NVP(nickname_characters_for_offscreen_indicators), 0, static_cast<int>(max_nickname_length_v));

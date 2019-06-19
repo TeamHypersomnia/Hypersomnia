@@ -13,6 +13,7 @@ namespace invariants {
 		real32 defusing_speed_mult = 1.f;
 		real32 pe_regeneration_mult = 1.f;
 		real32 movement_speed_mult = 1.f;
+		real32 hyperfocus_mult = 1.f;
 		pe_absorption_info pe_absorption;
 		real32 spell_cost_amortization = 0.f;
 		rgba glow_color = rgba(0, 0, 0, 0);

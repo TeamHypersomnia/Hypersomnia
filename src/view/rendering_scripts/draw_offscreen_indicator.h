@@ -13,7 +13,9 @@ inline void draw_offscreen_indicator(
 	const std::optional<augs::atlas_entry> next_tex,
 	const augs::baked_font& gui_font,
 	std::string primary_text,
-	const std::string& secondary_text
+	const std::string& secondary_text,
+	const vec2 viewed_character_pos,
+	const offscreen_reference_type reference_type
 ) {
 	using namespace augs::gui::text;
 
@@ -42,8 +44,14 @@ inline void draw_offscreen_indicator(
 		}
 	}
 
+	const auto reference_pos = 
+		reference_type == offscreen_reference_type::SCREEN_CENTER ?
+		vec2(screen_size) / 2 :
+		viewed_character_pos
+	;
+
 	const auto raycast_a = indicator_pos;
-	const auto raycast_b = raycasted_aabb.get_center();
+	const auto raycast_b = reference_pos;
 
 	const auto edges = raycasted_aabb.make_edges();
 

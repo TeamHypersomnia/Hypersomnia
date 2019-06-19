@@ -11,6 +11,13 @@ struct fog_of_war_appearance_settings {
 	// END GEN INTROSPECTOR
 };
 
+enum class offscreen_reference_type {
+	// GEN INTROSPECTOR enum class offscreen_reference_type
+	SCREEN_CENTER,
+	CHARACTER_POSITION
+	// END GEN INTROSPECTOR
+};
+
 struct game_drawing_settings {
 	// GEN INTROSPECTOR struct game_drawing_settings
 	bool draw_crosshairs = true;
@@ -26,6 +33,9 @@ struct game_drawing_settings {
 	bool draw_offscreen_callouts = true;
 	bool draw_nicknames = true;
 	bool draw_health_numbers = true;
+
+	offscreen_reference_type offscreen_reference_mode = offscreen_reference_type::CHARACTER_POSITION;
+
 	augs::maybe<float> draw_teammate_indicators = augs::maybe<float>(1.f, true);
 	augs::maybe<rgba> draw_danger_indicators = augs::maybe<rgba>(rgba(255, 50, 50, 255), true);
 	augs::maybe<float> draw_tactical_indicators = augs::maybe<float>(1.f, true);

@@ -197,12 +197,11 @@ int work(const int argc, const char* const * const argv) try {
 
 		last_exit_incorrect_popup = editor_popup {
 			"Warning",
-			typesafe_sprintf(R"(Looks like the game crashed since last time.
+			typesafe_sprintf(R"(Looks like the game has crashed since last time.
 Consider sending developers the log file located at:
 
 %x
 
-The settings have been reset to factory defaults.
 If you experience repeated crashes, 
 you might try to reset all your settings,
 which can be done by pressing "Reset to factory default" in Settings->General,
