@@ -34,7 +34,12 @@ int main(const int argc, const char* const * const argv) {
 #else
 #error "Unsupported platform!"
 #endif
-	std::setlocale(LC_NUMERIC, "C");
+	/* 
+		At least on Linux, 
+		we need to call this in order to be able to write non-English characters. 
+	*/
+
+	std::setlocale(LC_ALL, "");
 
 	const auto params = cmd_line_params(argc, argv);
 

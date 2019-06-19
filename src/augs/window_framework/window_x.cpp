@@ -622,7 +622,19 @@ namespace augs {
 
 			if (XLookupString(&keyev, buf.data(), buf.size(), nullptr, nullptr)) {
 				if (get_current_settings().log_keystrokes) {
-					LOG("Ch press: %x, len: %x", buf.data(), strlen(buf.data()));
+					std::string numbers;
+
+					const auto len = strlen(buf.data());
+
+					for (unsigned long i = 0; i < len; ++i) {
+						if (i) {
+							numbers += " ";
+						}
+
+						numbers += std::to_string(int(buf[i]));
+					}
+
+					LOG("Ch press: %x, (%x) len: %x", std::string(buf.data()), numbers, len);
 				}
 				
 				unsigned int c = 0;

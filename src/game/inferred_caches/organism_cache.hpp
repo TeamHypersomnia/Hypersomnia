@@ -40,7 +40,9 @@ template <class E>
 bool organism_cache::reset_grid_for(const E& area) {
 	const auto id = area.get_id().to_unversioned();
 
+#if 0
 	LOG("Resetting grid for %x", area);
+#endif
 
 	if (const auto marker = area.template find<invariants::box_marker>()) {
 		if (marker->type == area_marker_type::ORGANISM_AREA) {

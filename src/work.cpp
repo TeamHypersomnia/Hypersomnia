@@ -120,7 +120,7 @@ int work(const int argc, const char* const * const argv) try {
 	LOG("Started at %x", augs::date_time().get_readable());
 	LOG("Working directory: %x", augs::get_current_working_directory());
 
-	LOG("Creating directories: %x %x %x", GENERATED_FILES_DIR, LOCAL_FILES_DIR);
+	LOG("Creating directories: %x %x", GENERATED_FILES_DIR, LOCAL_FILES_DIR);
 
 	augs::create_directories(GENERATED_FILES_DIR);
 	augs::create_directories(LOCAL_FILES_DIR);

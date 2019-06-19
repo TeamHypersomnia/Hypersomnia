@@ -177,7 +177,9 @@ bool perform_float_consistency_tests() {
 			}
 		}
 
+#if 0
 		LOG("Trash stuff: %x", trash);
+#endif
 
 		uint32_t bits = 0;
 		std::memcpy(std::addressof(bits), std::addressof(total), sizeof(bits));

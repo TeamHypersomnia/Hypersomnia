@@ -3280,3 +3280,5 @@ which can be done from Settings->Reset all settings to factory default.
 
 
 - Communicate with the server somehow from localhost?
+
+- And fix polish characters in chat breaking stuff on Windows

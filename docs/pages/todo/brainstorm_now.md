@@ -6,9 +6,9 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Add imgui popup whenever regenerating neons or atlas, but only in the main menu
+- Test polish characters on Windows again
 
-- And fix polish characters in chat breaking stuff on Windows
+- Add imgui popup whenever regenerating neons or atlas, but only in the main menu
 
 Would you like keep the old settings,
 or reset them to factory defaults?
