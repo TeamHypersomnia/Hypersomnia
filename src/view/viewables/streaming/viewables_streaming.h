@@ -21,6 +21,7 @@
 #include "view/viewables/regeneration/content_regeneration_settings.h"
 #include "view/viewables/avatars_in_atlas_map.h"
 #include "augs/texture_atlas/loaded_png_vector.h"
+#include "view/viewables/regeneration/atlas_progress_structs.h"
 
 class sound_system;
 
@@ -71,6 +72,8 @@ class viewables_streaming {
 	std::vector<std::pair<assets::sound_id, augs::sound_buffer_loading_input>> sound_requests;
 	std::future<std::vector<std::optional<augs::sound_buffer>>> future_loaded_buffers;
 
+	std::optional<atlas_progress_structs> general_atlas_progress;
+
 public:
 	std::optional<augs::graphics::texture> general_atlas;
 	std::optional<augs::graphics::texture> avatar_atlas;
@@ -98,4 +101,5 @@ public:
 	void finalize_pending_tasks();
 
 	bool finished_loading_player_metas() const;
+	void display_loading_progress() const;
 };

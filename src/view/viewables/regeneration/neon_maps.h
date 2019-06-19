@@ -1,5 +1,6 @@
 #pragma once
 #include <vector>
+#include <cstddef>
 #include <chrono>
 
 #include "augs/graphics/rgba.h"
@@ -28,9 +29,20 @@ struct neon_map_stamp {
 	// END GEN INTROSPECTOR
 };
 
-void regenerate_neon_map(
+struct cached_neon_map_in {
+	std::vector<std::byte> new_stamp_bytes;
+};
+
+std::optional<cached_neon_map_in> should_regenerate_neon_map(
 	const augs::path_type& input_image_path,
 	const augs::path_type& output_image_path,
 	const neon_map_input in,
 	const bool force_regenerate
+);
+
+void regenerate_neon_map(
+	const augs::path_type& input_image_path,
+	const augs::path_type& output_image_path,
+	const neon_map_input in,
+	cached_neon_map_in
 );

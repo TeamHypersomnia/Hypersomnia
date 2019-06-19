@@ -56,7 +56,9 @@ struct image_definition_view : asset_definition_view<const image_definition> {
 	std::optional<augs::path_type> find_desaturation_path() const;
 
 	void regenerate_desaturation(const bool force_regenerate) const;
-	void regenerate_neon_map(const bool force_regenerate) const;
+
+	std::optional<cached_neon_map_in> should_regenerate_neon_map(const bool force_regenerate) const;
+	void regenerate_neon_map(const cached_neon_map_in&) const;
 
 	augs::path_type get_source_image_path() const;
 	vec2u read_source_image_size() const;

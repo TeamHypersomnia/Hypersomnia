@@ -21,11 +21,54 @@ void make_neon(
 	augs::image& source
 );
 
-void regenerate_neon_map(
+std::optional<cached_neon_map_in> should_regenerate_neon_map(
 	const augs::path_type& input_image_path,
 	const augs::path_type& output_image_path,
 	const neon_map_input in,
 	const bool force_regenerate
+) {
+	neon_map_stamp new_stamp;
+	new_stamp.input = in;
+	new_stamp.last_write_time_of_source = augs::last_write_time(input_image_path);
+
+	const auto neon_map_path = output_image_path;
+	const auto neon_map_stamp_path = augs::path_type(neon_map_path).replace_extension(".stamp");
+
+	auto new_stamp_bytes = augs::to_bytes(new_stamp);
+
+	auto make_output = [&]() {
+		return cached_neon_map_in { std::move(new_stamp_bytes) };;
+	};
+
+	if (force_regenerate) {
+		return make_output();
+	}
+
+	if (!augs::exists(neon_map_path)) {
+		return make_output();
+	}
+	else {
+		if (!augs::exists(neon_map_stamp_path)) {
+			return make_output();
+		}
+		else {
+			const auto existent_stamp_bytes = augs::file_to_bytes(neon_map_stamp_path);
+			const bool are_stamps_identical = (new_stamp_bytes == existent_stamp_bytes);
+
+			if (!are_stamps_identical) {
+				return make_output();
+			}
+		}
+	}
+
+	return std::nullopt;
+}
+
+void regenerate_neon_map(
+	const augs::path_type& input_image_path,
+	const augs::path_type& output_image_path,
+	const neon_map_input in,
+	cached_neon_map_in cached_in
 ) try {
 	neon_map_stamp new_stamp;
 	new_stamp.input = in;
@@ -36,41 +79,16 @@ void regenerate_neon_map(
 
 	const auto new_stamp_bytes = augs::to_bytes(new_stamp);
 
-	bool should_regenerate = force_regenerate;
+	thread_local augs::image source_image;
+	source_image.clear();
+	source_image.from_file(input_image_path);
 
-	if (!augs::exists(neon_map_path)) {
-		should_regenerate = true;
-	}
-	else {
-		if (!augs::exists(neon_map_stamp_path)) {
-			should_regenerate = true;
-		}
-		else {
-			const auto existent_stamp_bytes = augs::file_to_bytes(neon_map_stamp_path);
-			const bool are_stamps_identical = (new_stamp_bytes == existent_stamp_bytes);
+	make_neon(in, source_image);
 
-			if (!are_stamps_identical) {
-				should_regenerate = true;
-			}
-		}
-	}
+	source_image.save(neon_map_path);
 
-	if (should_regenerate) {
-#if 0
-		LOG("Regenerating neon map for %x", input_image_path);
-#endif
-
-		thread_local augs::image source_image;
-		source_image.clear();
-		source_image.from_file(input_image_path);
-
-		make_neon(new_stamp.input, source_image);
-
-		source_image.save(neon_map_path);
-
-		augs::create_directories_for(neon_map_stamp_path);
-		augs::bytes_to_file(new_stamp_bytes, neon_map_stamp_path);
-	}
+	augs::create_directories_for(neon_map_stamp_path);
+	augs::bytes_to_file(cached_in.new_stamp_bytes, neon_map_stamp_path);
 }
 catch (...) {
 	augs::remove_file(output_image_path);

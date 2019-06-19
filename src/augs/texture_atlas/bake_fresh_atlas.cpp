@@ -355,7 +355,7 @@ void bake_fresh_atlas(
 			worker(w);
 		}
 #else
-		const auto num_workers = std::size_t(in.blitting_threads);
+		const auto num_workers = std::size_t(in.blitting_threads - 1);
 
 		thread_local augs::range_workers<decltype(worker)> workers = num_workers;
 		workers.resize_workers(num_workers);

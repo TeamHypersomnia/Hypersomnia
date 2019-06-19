@@ -21,6 +21,7 @@
 */
 
 struct atlas_profiler;
+struct atlas_progress_structs;
 
 struct subjects_gathering_input {
 	const content_regeneration_settings settings;
@@ -31,6 +32,7 @@ struct subjects_gathering_input {
 	const image_definitions_map image_definitions;
 	const all_gui_fonts_inputs& gui_font_inputs;
 	const augs::path_type unofficial_project_dir;
+	atlas_progress_structs* const progress;
 };
 
 struct general_atlas_input {

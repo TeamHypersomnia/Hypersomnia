@@ -250,6 +250,10 @@ namespace augs {
 			return objects.data();
 		}
 
+		const auto& get_objects() const {
+			return objects;
+		};
+
 		auto size() const {
 			return static_cast<size_type>(slots.size());
 		}

@@ -1036,8 +1036,8 @@ void settings_gui_state::perform(
 					text_disabled("(Value of 0 tells regenerators to not spawn any additional workers)");
 					text_disabled(typesafe_sprintf("(std::thread::hardware_concurrency() = %x)", concurrency));
 
-					revertable_slider(SCOPE_CFG_NVP(atlas_blitting_threads), 0u, t_max);
-					revertable_slider(SCOPE_CFG_NVP(neon_regeneration_threads), 0u, t_max);
+					revertable_slider(SCOPE_CFG_NVP(atlas_blitting_threads), 1u, t_max);
+					revertable_slider(SCOPE_CFG_NVP(neon_regeneration_threads), 1u, t_max);
 				}
 
 				break;

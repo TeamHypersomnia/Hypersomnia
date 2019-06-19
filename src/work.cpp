@@ -1296,6 +1296,8 @@ and then hitting Save settings.
 								launch_setup(launch_type::CLIENT);
 							}
 						}
+
+						streaming.display_loading_progress();
 					}
 
 					/*

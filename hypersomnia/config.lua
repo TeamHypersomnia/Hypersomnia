@@ -127,7 +127,9 @@ return {
     }
   },
   content_regeneration = {
-    regenerate_every_time = false
+    regenerate_every_time = false,
+	atlas_blitting_threads = 3,
+	neon_regeneration_threads = 3
   },
   debug = {
     determinism_test_cloned_cosmoi_count = 0,

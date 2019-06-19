@@ -5,6 +5,7 @@
 #include "view/viewables/image_definition.h"
 #include "augs/templates/range_workers.h"
 #include "augs/templates/introspect.h"
+#include "view/viewables/regeneration/atlas_progress_structs.h"
 
 void regenerate_and_gather_subjects(
 	const subjects_gathering_input in,
@@ -22,20 +23,51 @@ void regenerate_and_gather_subjects(
 			output.images.emplace_back(r.second.get_source_path().path);
 		}
 
-		auto worker = [make_view, in](const image_definition& d) {
+		int total_to_regenerate = 0;
+
+		std::vector<std::optional<cached_neon_map_in>> neon_regen_inputs;
+
+		for (const auto& d : in.image_definitions) {
+			const bool force = in.settings.regenerate_every_time;
+
+			const auto def = make_view(d);
+
+			auto result = def.should_regenerate_neon_map(force);
+
+			if (result != std::nullopt) {
+				++total_to_regenerate;
+			}
+
+			neon_regen_inputs.emplace_back(std::move(result));
+		}
+
+		if (in.progress) {
+			in.progress->max_neon_maps.store(total_to_regenerate);
+		}
+
+		auto worker = [make_view, &in, &neon_regen_inputs](const image_definition& d) {
+			const auto this_i = index_in(in.image_definitions.get_objects(), d);
+
+			const auto this_cached_in = neon_regen_inputs[this_i];
 			const auto def = make_view(d);
 
 			const bool force = in.settings.regenerate_every_time;
-
 			def.regenerate_desaturation(force);
-			def.regenerate_neon_map(force);
+
+			if (this_cached_in) {
+				if (in.progress) {
+					in.progress->current_neon_map_num.fetch_add(1, std::memory_order_relaxed);
+				}
+
+				def.regenerate_neon_map(*this_cached_in);
+			}
 		};
 
 		{
 			auto scope = measure_scope(neon_regeneration_performance);
 
 #if 1
-			const auto num_workers = std::size_t(in.settings.neon_regeneration_threads);
+			const auto num_workers = std::size_t(in.settings.neon_regeneration_threads - 1);
 			static augs::range_workers<decltype(worker)> workers = num_workers;
 			workers.resize_workers(num_workers);
 			workers.process(worker, in.image_definitions);

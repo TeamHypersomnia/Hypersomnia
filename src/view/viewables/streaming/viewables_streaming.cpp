@@ -4,6 +4,10 @@
 #include "view/audiovisual_state/systems/sound_system.h"
 #include "augs/templates/introspection_utils/introspective_equal.h"
 
+#include "view/viewables/regeneration/atlas_progress_structs.h"
+#include "augs/misc/imgui/imgui_control_wrappers.h"
+#include "augs/misc/imgui/imgui_scope_wrappers.h"
+
 void viewables_streaming::finalize_pending_tasks() {
 	if (future_loaded_buffers.valid()) {
 		future_loaded_buffers.get();
@@ -144,13 +148,17 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 				pbo_fallback.clear();
 			}
 
+			general_atlas_progress.emplace();
+
 			auto general_atlas_in = general_atlas_input {
 				{
 					settings,
 					necessary_image_definitions,
 					new_defs,
 					gui_fonts,
-					unofficial_content_dir
+					unofficial_content_dir,
+
+					std::addressof(*general_atlas_progress)
 				},
 
 				max_atlas_size,
@@ -303,6 +311,8 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 
 		auto result = future_general_atlas.get();
 
+		general_atlas_progress = std::nullopt;
+
 		images_in_atlas = std::move(result.atlas_entries);
 		necessary_images_in_atlas = std::move(result.necessary_atlas_entries);
 		loaded_gui_fonts = std::move(result.gui_fonts);
@@ -369,5 +379,49 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 		/* Done, overwrite */
 		now_loaded_defs = new_loaded_defs;
 		sound_requests.clear();
+	}
+}
+
+void viewables_streaming::display_loading_progress() const {
+	using namespace augs::imgui;
+
+	std::string loading_message;
+
+	const auto& progress = general_atlas_progress;
+	float progress_percent = -1.f;
+
+	if (progress != std::nullopt) {
+		const auto& a_neon_i = progress->current_neon_map_num;
+		const auto neon_i = a_neon_i.load();
+
+		const auto& a_neon_max_i = progress->max_neon_maps;
+		const auto neon_max_i = a_neon_max_i.load();
+
+		const auto neons_finished = neon_i == 0 || neon_i == neon_max_i;
+
+		if (!neons_finished) {
+			loading_message = typesafe_sprintf("Regenerating neon map %x of %x...", neon_i, neon_max_i);
+
+			progress_percent = float(neon_i) / neon_max_i;
+		}
+		else {
+			loading_message = "Loading the game atlas...";
+		}
+	}
+
+	if (loading_message.size() > 0) {
+		loading_message += "\n";
+
+		ImGui::SetNextWindowPosCenter();
+		auto loading_window = scoped_window("Loading in progress", nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
+
+		text_color("The game is regenerating resources. Please be patient.\n", yellow);
+		ImGui::Separator();
+
+		text(loading_message);
+
+		if (progress_percent >= 0.f) {
+			ImGui::ProgressBar(progress_percent, ImVec2(-1.0f,0.0f));
+		}
 	}
 }
