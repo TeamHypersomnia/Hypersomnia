@@ -86,9 +86,6 @@ void movement_system::set_movement_flags_from_input(const logic_step step) {
 						case game_intent_type::DASH:
 							movement->flags.dashing = it.was_pressed();
 							break;
-						case game_intent_type::SPACE_BUTTON:
-							movement->flags.dashing = it.was_pressed();
-							break;
 						case game_intent_type::START_PICKING_UP_ITEMS:
 							movement->flags.picking = it.was_pressed();
 							break;

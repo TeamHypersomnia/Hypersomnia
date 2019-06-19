@@ -9,7 +9,7 @@
 
 #include "application/app_intent_type.h"
 
-bool arena_choose_team_gui::control(app_ingame_intent_input in) {
+bool arena_choose_team_gui::control(general_gui_intent_input in) {
 	using namespace augs::event;
 	using namespace augs::event::keys;
 
@@ -19,7 +19,7 @@ bool arena_choose_team_gui::control(app_ingame_intent_input in) {
 		const auto key = in.e.get_key();
 
 		if (const auto it = mapped_or_nullptr(in.controls, key)) {
-			if (*it == app_ingame_intent_type::CHOOSE_TEAM) {
+			if (*it == general_gui_intent_type::CHOOSE_TEAM) {
 				show = !show;
 				return true;
 			}

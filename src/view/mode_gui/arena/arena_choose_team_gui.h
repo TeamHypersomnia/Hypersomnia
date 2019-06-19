@@ -7,7 +7,7 @@
 #include "game/assets/ids/asset_ids.h"
 
 class images_in_atlas_map;
-struct app_ingame_intent_input;
+struct general_gui_intent_input;
 
 struct arena_choose_team_gui {
 	struct input {
@@ -32,6 +32,6 @@ struct arena_choose_team_gui {
 
 	/* Always initialize as hidden */
 
-	bool control(app_ingame_intent_input);
+	bool control(general_gui_intent_input);
 	std::optional<mode_commands::team_choice> perform_imgui(input);
 };

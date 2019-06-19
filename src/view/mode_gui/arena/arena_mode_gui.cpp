@@ -26,7 +26,7 @@ const auto default_popul = augs::populate_with_delays_impl(
 );
 
 bool arena_gui_state::control(
-	const app_ingame_intent_input in
+	const general_gui_intent_input in
 ) {
 	if (scoreboard.control(in)) {
 		return true;

@@ -3253,3 +3253,30 @@ which can be done from Settings->Reset all settings to factory default.
 - chat notifier: X is now a spectator
 	- Except when connected for the first time?
 
+- Keeping an integrated server option has the advantage that it will force you to keep the client code clean
+
+
+- Host a server menu
+	- Radio box
+		- Integrated server instance
+		- Dedicated server instance
+	- Might still make sense to have integrated server instances for slower computers
+		- Will have to refactor the chat, though, and avatar handling
+			- Separation of concerns might be useful here as our client setup class is a god object
+	- What about machine admin player id?
+		- if it is equal to max clients, we might miss it accidentally if we use max_incoming_connections_v in loops
+		- if it is equal to max clients - 1, it wastes a single connection slot?
+	- For checking whether a dedicated server instance is running, we can keep a lockfile named after the port
+- Controls
+- Test assists after fixing the damage owner logic
+
+- see if bilmer and vindicator have better intervals at 64hz
+
+
+- fix shot cooldown progress visible behind walls
+- add markers for allies that are off-screen
+	- simply clamp the nicknames to bounds and maybe add an arrow
+		- then just clamp to a smaller bound to account for an arrow
+
+
+- Communicate with the server somehow from localhost?

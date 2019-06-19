@@ -24,7 +24,7 @@ void crosshair_system::handle_crosshair_intents(const logic_step step) {
 		const auto subject = cosm[it.subject];
 		
 		if (const auto crosshair = subject.find_crosshair()) {
-			if (it.intent == game_intent_type::SWITCH_LOOK && it.was_pressed()) {
+			if (it.intent == game_intent_type::SWITCH_CROSSHAIR_CHASE_TYPE && it.was_pressed()) {
 				auto& mode = crosshair->orbit_mode;
 
 				if (mode == crosshair_orbit_type::LOOK) {

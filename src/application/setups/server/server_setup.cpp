@@ -1258,7 +1258,7 @@ TEST_CASE("NetSerialization ServerEntropy") {
 		total_mode_player_entropy tt;
 		tt.cosmic.cast_spell.set<ultimate_wrath_of_the_aeons>();
 		tt.cosmic.motions[game_motion_type::MOVE_CROSSHAIR] = { 342, 432534 };
-		tt.cosmic.intents.push_back({ game_intent_type::USE_BUTTON, intent_change::PRESSED });
+		tt.cosmic.intents.push_back({ game_intent_type::USE, intent_change::PRESSED });
 		tt.cosmic.intents.push_back({ game_intent_type::MOVE_FORWARD, intent_change::RELEASED });
 
 		auto second = mode_player_id::first();
@@ -1371,7 +1371,7 @@ TEST_CASE("NetSerialization ClientEntropy") {
 
 		sent.cosmic.cast_spell.set<ultimate_wrath_of_the_aeons>();
 		sent.cosmic.motions[game_motion_type::MOVE_CROSSHAIR] = { 342, 432534 };
-		sent.cosmic.intents.push_back({ game_intent_type::USE_BUTTON, intent_change::PRESSED });
+		sent.cosmic.intents.push_back({ game_intent_type::USE, intent_change::PRESSED });
 		sent.cosmic.intents.push_back({ game_intent_type::MOVE_FORWARD, intent_change::RELEASED });
 
 		ss.write_payload(sent);

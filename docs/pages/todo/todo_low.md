@@ -4,6 +4,12 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Rebuy previous
+	- Plan for state early
+		- note that we don't need any bincompat regarding the mode solvable
+		- because anyway we are importing/exporting without that state
+
+
 - Fix crash when server starts with a non-existent map?
 	- Actually that's a solvable error
 	- Would be nice to gracefully quit though

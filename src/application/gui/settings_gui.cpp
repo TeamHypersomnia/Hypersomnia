@@ -36,6 +36,14 @@ void configuration_subscribers::apply(const config_lua_table& new_config) const 
 	renderer.apply(new_config.renderer);
 }
 
+bool settings_gui_state::should_hijack_key() const {
+	return hijacking.for_idx != std::nullopt;
+}
+
+void settings_gui_state::set_hijacked_key(const augs::event::keys::key k) {
+	hijacking.captured = k;
+}
+
 #define CONFIG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), config.x
 #define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
 
@@ -46,9 +54,45 @@ void settings_gui_state::perform(
 	config_lua_table& last_saved_config,
 	vec2i screen_size
 ) {
+	auto for_each_input_map = [&](auto callback) {
+		callback(config.app_controls);
+		callback(config.game_controls);
+		callback(config.general_gui_controls);
+		callback(config.inventory_gui_controls);
+	};
+
+	if (already_bound_popup) {
+		const auto buttons = std::vector<editor_popup::button> {
+			{
+				"Reassign",
+				rgba(200, 80, 0, 255),
+				rgba(25, 20, 0, 255),
+			},
+
+			{
+				"Cancel",
+				rgba::zero,
+				rgba::zero,
+			}
+		};
+
+		if (const auto result = already_bound_popup->perform(buttons)) {
+			if (result == 1) {
+				for_each_input_map([&](auto& m) {
+					m.erase(*reassignment_request.captured);
+				});
+
+				hijacking = reassignment_request;
+				reassignment_request = {};
+			}
+
+			already_bound_popup = std::nullopt;
+		}
+	}
+
 	using namespace augs::imgui;
 
-	centered_size_mult = 0.6f;
+	centered_size_mult = 0.65f;
 	
 	auto settings = make_scoped_window();
 
@@ -336,6 +380,219 @@ void settings_gui_state::perform(
 
 				revertable_drag_vec2(SCOPE_CFG_NVP(mouse_sensitivity));
 				revertable_checkbox(SCOPE_CFG_NVP(swap_mouse_buttons_in_akimbo));
+
+				const auto binding_text_color = rgba(255, 255, 255, 255);
+				const auto bindings_title_color = rgba(255, 255, 0, 255);
+
+				int control_i = 0;
+				int map_i = 0;
+
+				auto do_bindings_map = [&](const auto& preffix, auto& m) {
+					auto id = scoped_id(map_i++);
+					using K = typename remove_cref<decltype(m)>::key_type;
+					using A = typename remove_cref<decltype(m)>::mapped_type;
+
+					thread_local std::unordered_map<A, std::vector<K>> action_to_keys;
+					action_to_keys.clear();
+
+					for (const auto& ka : m) {
+						action_to_keys[ka.second].push_back(ka.first);
+					}
+
+					ImGui::Separator();
+					text_color(preffix, bindings_title_color);
+					ImGui::NextColumn();
+					ImGui::NextColumn();
+					ImGui::NextColumn();
+					ImGui::Separator();
+					(void)m;
+					
+					augs::for_each_enum_except_bounds([&](const A a) {
+						auto id = scoped_id(static_cast<int>(a));
+
+						auto find_already_assigned_action_in = [&](const auto& mm, const auto key) -> std::optional<std::string> {
+							if (const auto found = mapped_or_nullptr(mm, key)) {
+								return format_enum(*found);
+							}
+
+							return std::nullopt;
+						};
+
+						auto find_already_assigned_action = [&](const auto key) -> std::optional<std::string> {
+							if (const auto found = find_already_assigned_action_in(config.app_controls, key)) {
+								return *found;
+							}
+
+							if (const auto found = find_already_assigned_action_in(config.game_controls, key)) {
+								return *found;
+							}
+
+							if (const auto found = find_already_assigned_action_in(config.general_gui_controls, key)) {
+								return *found;
+							}
+
+							if (const auto found = find_already_assigned_action_in(config.inventory_gui_controls, key)) {
+								return *found;
+							}
+
+							return std::nullopt;
+						};
+
+						const bool capturing_this_action = hijacking.for_idx == control_i;
+						const auto label = format_enum(a);
+
+						{
+							auto scope = scoped_style_color(ImGuiCol_Text, binding_text_color);
+							text(label);
+						}
+
+						ImGui::NextColumn();
+
+						auto& bindings = action_to_keys[a];
+
+						const auto first_key = [&]() -> std::optional<K> {
+							if (bindings.size() > 0) {
+								return bindings[0];
+							}
+
+							return std::nullopt;
+						}();
+
+						const auto second_key = [&]() -> std::optional<K> {
+							if (bindings.size() > 1) {
+								return bindings[1];
+							}
+
+							return std::nullopt;
+						}();
+
+						auto do_button = [&](const auto key, bool is_secondary) {
+							const bool captured = capturing_this_action && is_secondary == hijacking.for_secondary;
+
+							const auto label = [&]() -> std::string {
+								if (captured) {
+									return "Press a key, ESC to clear, Enter to abort...";
+								}
+
+								return key ? key_to_string_shortened(*key) : "(Unassigned)";
+							}();
+
+							const auto captured_bg_col = rgba(255, 20, 0, 80);
+
+							const auto text_color = [&]() {
+								if (captured) {
+									return rgba(255, 40, 0, 255);
+								}
+
+								if (key) {
+									return white;
+								}
+
+								return rgba(255, 255, 255, 120);
+							}();
+
+							const auto colors = std::make_tuple(
+								cond_scoped_style_color(captured, ImGuiCol_Header, captured_bg_col),
+								cond_scoped_style_color(captured, ImGuiCol_HeaderHovered, captured_bg_col),
+								cond_scoped_style_color(captured, ImGuiCol_HeaderActive, captured_bg_col),
+								scoped_style_color(ImGuiCol_Text, text_color)
+							);
+
+							if (ImGui::Selectable(label.c_str(), captured)) {
+								if (!should_hijack_key()) {
+									hijacking.for_idx = control_i;
+									hijacking.for_secondary = is_secondary;
+								}
+							}
+						};
+
+						do_button(first_key, false);
+						ImGui::NextColumn();
+						do_button(second_key, true);
+						ImGui::NextColumn();
+
+						const bool captured_successfully = hijacking.for_idx && hijacking.captured;
+
+						if (capturing_this_action && captured_successfully) {
+							const auto new_key = *hijacking.captured;
+
+							if (new_key != augs::event::keys::key::ENTER) {
+								const bool should_clear = new_key == augs::event::keys::key::ESC;
+								const auto found = find_already_assigned_action(new_key);
+
+								auto make_popup = [&]() {
+									const auto key_name = key_to_string_shortened(new_key);
+									const auto current_action_str = format_enum(a);
+
+									const auto description = typesafe_sprintf(
+										"\"%x\" is already assigned to \"%x\"!\n\nPress \"Reassign\" to clear \"%x\" from \"%x\"\nand assign \"%x\" to \"%x\".\n\n",
+										key_name, *found, key_name, *found, key_name, current_action_str
+									);
+
+									reassignment_request = hijacking;
+
+									already_bound_popup = editor_popup {
+										"Failed",
+										description,
+										""
+									};
+								};
+
+								if (hijacking.for_secondary) {
+									if (!should_clear && found) {
+										make_popup();
+									}
+									else {
+										if (second_key) {
+											m.erase(*second_key);
+										}
+
+										if (!should_clear) {
+											m[new_key] = a;
+										}
+									}
+								}
+								else {
+									if (!should_clear && found) {
+										make_popup();
+									}
+									else {
+										if (first_key) {
+											m.erase(*first_key);
+										}
+
+										if (!should_clear) {
+											m[new_key] = a;
+										}
+									}
+								}
+							}
+
+							hijacking = {};
+						}
+
+						++control_i;
+					});
+				};
+
+				ImGui::Columns(3);
+
+				text_disabled("Action");
+				ImGui::NextColumn();
+
+				text_disabled("Key");
+				ImGui::NextColumn();
+
+				text_disabled("Alternative key");
+				ImGui::NextColumn();
+
+				do_bindings_map("Top-level application bindings", config.app_controls);
+				text_disabled("\n\n");
+				do_bindings_map("Gameplay bindings", config.game_controls);
+				text_disabled("\n\n");
+				do_bindings_map("General GUI bindings", config.general_gui_controls);
+				text_disabled("\n\n");
+				do_bindings_map("Inventory GUI bindings", config.inventory_gui_controls);
 
 				break;
 			}

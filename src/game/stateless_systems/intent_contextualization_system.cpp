@@ -33,7 +33,7 @@ void intent_contextualization_system::handle_use_button_presses(const logic_step
 	for (auto& e : intents) {
 		const auto subject = cosm[e.subject];
 
-		if (e.intent == game_intent_type::USE_BUTTON) {
+		if (e.intent == game_intent_type::USE) {
 			if (const auto sentience = subject.find<components::sentience>()) {
 				auto& u = sentience->use_button;
 
@@ -196,6 +196,7 @@ void intent_contextualization_system::contextualize_crosshair_action_intents(con
 }
 
 void intent_contextualization_system::contextualize_movement_intents(const logic_step step) {
+#if LEGACY
 	auto& cosm = step.get_cosmos();
 	auto& intents = step.get_queue<messages::intent_message>();
 
@@ -204,6 +205,7 @@ void intent_contextualization_system::contextualize_movement_intents(const logic
 		bool callee_resolved = false;
 
 		const auto subject = cosm[e.subject];
+
 
 		const auto* const maybe_driver = subject.find<components::driver>();
 
@@ -224,8 +226,6 @@ void intent_contextualization_system::contextualize_movement_intents(const logic
 				e.intent = game_intent_type::HAND_BRAKE;
 			}
 		}
-		
-#if LEGACY
 
 		if (!callee_resolved) {
 			if (const auto* const maybe_container = subject.find<invariants::container>();) {
@@ -239,10 +239,12 @@ void intent_contextualization_system::contextualize_movement_intents(const logic
 				}
 			}
 		}
-#endif
 
 		if (callee_resolved) {
 			e.subject = callee;
 		}
 	}
+#else
+	(void)step;
+#endif
 }

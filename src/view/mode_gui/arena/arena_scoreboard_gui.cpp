@@ -10,7 +10,7 @@
 #include "augs/string/format_enum.h"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 
-bool arena_scoreboard_gui::control(app_ingame_intent_input in) {
+bool arena_scoreboard_gui::control(general_gui_intent_input in) {
 	using namespace augs::event;
 	using namespace augs::event::keys;
 
@@ -20,7 +20,7 @@ bool arena_scoreboard_gui::control(app_ingame_intent_input in) {
 		const auto key = in.e.get_key();
 
 		if (const auto it = mapped_or_nullptr(in.controls, key)) {
-			if (*it == app_ingame_intent_type::OPEN_SCOREBOARD) {
+			if (*it == general_gui_intent_type::OPEN_SCOREBOARD) {
 				show = ch == key_change::PRESSED;
 				return true;
 			}

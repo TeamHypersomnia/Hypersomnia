@@ -18,7 +18,7 @@
 #include "augs/audio/audio_settings.h"
 #include "game/debug_drawing_settings.h"
 
-#include "view/game_gui/game_gui_intent_type.h"
+#include "view/game_gui/inventory_gui_intent_type.h"
 #include "view/game_gui/elements/hotbar_settings.h"
 #include "view/viewables/regeneration/content_regeneration_settings.h"
 #include "view/audiovisual_state/systems/interpolation_settings.h"
@@ -107,10 +107,10 @@ struct config_lua_table {
 	content_regeneration_settings content_regeneration;
 	main_menu_settings main_menu;
 
-	game_intent_map game_controls;
-	game_gui_intent_map game_gui_controls;
 	app_intent_map app_controls;
-	app_ingame_intent_map app_ingame_controls;
+	game_intent_map game_controls;
+	general_gui_intent_map general_gui_controls;
+	inventory_gui_intent_map inventory_gui_controls;
 	
 	ImGuiStyle gui_style;
 	debug_settings debug;

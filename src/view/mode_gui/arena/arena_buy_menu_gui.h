@@ -11,7 +11,7 @@
 #include "view/mode_gui/arena/arena_buy_menu_hotkeys.h"
 
 class images_in_atlas_map;
-struct app_ingame_intent_input;
+struct general_gui_intent_input;
 struct buy_menu_gui_settings;
 
 struct arena_buy_menu_gui {
@@ -41,7 +41,7 @@ struct arena_buy_menu_gui {
 
 	/* Always initialize as hidden */
 
-	bool control(app_ingame_intent_input);
+	bool control(general_gui_intent_input);
 	bool escape();
 	void hide();
 	mode_player_entropy perform_imgui(input);

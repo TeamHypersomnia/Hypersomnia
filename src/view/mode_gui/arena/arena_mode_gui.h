@@ -33,7 +33,7 @@ struct arena_gui_state {
 	mutable std::optional<float> last_seconds_value;
 	mutable warmup_welcome_cache warmup;
 
-	bool control(app_ingame_intent_input);
+	bool control(general_gui_intent_input);
 	bool escape();
 
 	template <class M>

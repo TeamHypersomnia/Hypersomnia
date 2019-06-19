@@ -5,6 +5,10 @@ permalink: todo_security
 summary: Just a hidden scratchpad.
 ---
 
+- Cooldowns for chat
+	- Both client side and server side
+	- Although maybe later, at least we'll ban griefers early
+
 - Disallow massive forces for dropping transfers
 	- Just trim against the throw mults of the capability
 		- we can allow smaller, why not 

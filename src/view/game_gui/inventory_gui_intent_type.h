@@ -4,9 +4,11 @@
 
 #include "augs/window_framework/event.h"
 
-enum class game_gui_intent_type {
-	// GEN INTROSPECTOR enum class game_gui_intent_type
+enum class inventory_gui_intent_type {
+	// GEN INTROSPECTOR enum class inventory_gui_intent_type
 	INVALID,
+
+	LAST_HOTBAR_SELECTION_SETUP,
 
 	HOLSTER,
 	HOLSTER_SECONDARY,
@@ -22,8 +24,6 @@ enum class game_gui_intent_type {
 	HOTBAR_BUTTON_8,
 	HOTBAR_BUTTON_9,
 
-	LAST_HOTBAR_SELECTION_SETUP,
-
 	SPECIAL_ACTION_BUTTON_1,
 	SPECIAL_ACTION_BUTTON_2,
 	SPECIAL_ACTION_BUTTON_3,
@@ -37,16 +37,13 @@ enum class game_gui_intent_type {
 	SPECIAL_ACTION_BUTTON_11,
 	SPECIAL_ACTION_BUTTON_12,
 
-	PREV_HOTBAR_ITEM,
-	NEXT_HOTBAR_ITEM,
-
 	COUNT
 	// END GEN INTROSPECTOR
 };
 
-using game_gui_intent = basic_input_intent<game_gui_intent_type>;
+using inventory_gui_intent = basic_input_intent<inventory_gui_intent_type>;
 
-using game_gui_intent_map = augs::enum_map<
+using inventory_gui_intent_map = augs::enum_map<
 	augs::event::keys::key,
-	game_gui_intent_type
+	inventory_gui_intent_type
 >;

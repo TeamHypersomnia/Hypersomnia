@@ -11,7 +11,7 @@
 
 #include "view/game_gui/game_gui_context.h"
 #include "view/game_gui/elements/game_gui_root.h"
-#include "view/game_gui/game_gui_intent_type.h"
+#include "view/game_gui/inventory_gui_intent_type.h"
 
 #include "view/game_gui/elements/character_gui.h"
 #include "view/game_gui/elements/slot_button.h"
@@ -91,7 +91,7 @@ public:
 
 	void control_hotbar_and_action_button(
 		const const_entity_handle root_entity,
-		const game_gui_intent intent
+		const inventory_gui_intent intent
 	);
 
 	void advance(

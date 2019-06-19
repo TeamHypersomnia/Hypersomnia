@@ -12,26 +12,27 @@ enum class app_intent_type {
 	// END GEN INTROSPECTOR
 };
 
-enum class app_ingame_intent_type {
-	// GEN INTROSPECTOR enum class app_ingame_intent_type
+enum class general_gui_intent_type {
+	// GEN INTROSPECTOR enum class general_gui_intent_type
 	INVALID,
 
-	CLEAR_DEBUG_LINES,
+	TOGGLE_MOUSE_CURSOR,
 	SWITCH_WEAPON_LASER,
-	SWITCH_GAME_GUI_MODE,
-
-	OPEN_BUY_MENU,
-	OPEN_SCOREBOARD,
 
 	CHOOSE_TEAM,
 
-	SPECTATE_PREV,
-	SPECTATE_NEXT,
+	OPEN_SCOREBOARD,
+
+	OPEN_BUY_MENU,
+	OPEN_RCON_MENU,
 
 	OPEN_CHAT,
 	OPEN_TEAM_CHAT,
 
-	OPEN_RCON_MENU,
+	SPECTATE_PREV,
+	SPECTATE_NEXT,
+
+	CLEAR_DEBUG_LINES,
 
 	COUNT
 	// END GEN INTROSPECTOR
@@ -42,13 +43,13 @@ using app_intent_map = augs::enum_map<
 	app_intent_type
 >;
 
-using app_ingame_intent_map = augs::enum_map<
+using general_gui_intent_map = augs::enum_map<
 	augs::event::keys::key, 
-	app_ingame_intent_type
+	general_gui_intent_type
 >;
 
-struct app_ingame_intent_input {
-	const app_ingame_intent_map& controls;
+struct general_gui_intent_input {
+	const general_gui_intent_map& controls;
 	const augs::event::state& common_input_state;
 	const augs::event::change e;
 };

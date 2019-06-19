@@ -47,8 +47,14 @@ struct editor_popup {
 	std::string message;
 	std::string details;
 
+	struct button {
+		std::string label;
+		rgba col = rgba::zero;
+		rgba increment = rgba::zero;
+	};
+
 	bool details_expanded = false;
-	bool perform();
+	int perform(const std::vector<button>& buttons = {});
 };
 
 using editor_warning = editor_popup;

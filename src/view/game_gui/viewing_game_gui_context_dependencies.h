@@ -5,7 +5,7 @@
 
 #include "game/cosmos/entity_handle_declaration.h"
 
-#include "view/game_gui/game_gui_intent_type.h"
+#include "view/game_gui/inventory_gui_intent_type.h"
 #include "view/game_gui/elements/hotbar_settings.h"
 
 #include "view/game_drawing_settings.h"
@@ -18,7 +18,7 @@ struct viewing_game_gui_context_dependencies {
 	const aabb_highlighter& world_hover_highlighter;
 	const hotbar_settings hotbar;
 	const game_drawing_settings settings;
-	const game_gui_intent_map input_information;
+	const inventory_gui_intent_map input_information;
 	const camera_eye camera;
 	const augs::drawer_with_default output;
 };

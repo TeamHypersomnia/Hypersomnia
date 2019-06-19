@@ -42,9 +42,11 @@ void car_system::set_steering_flags_from_intents(const logic_step step) {
 		case game_intent_type::MOVE_RIGHT:
 			car.turning_right = it.was_pressed();
 			break;
+#if LEGACY
 		case game_intent_type::HAND_BRAKE:
 			car.hand_brake = it.was_pressed();
 			break;
+#endif
 		default: break;
 		}
 	}

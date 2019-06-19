@@ -5,7 +5,7 @@
 #include "application/app_intent_type.h"
 #include "augs/misc/timing/timer.h"
 
-struct app_ingame_intent_input;
+struct general_gui_intent_input;
 struct draw_setup_gui_input;
 struct draw_mode_gui_input;
 
@@ -20,7 +20,7 @@ struct arena_spectator_gui {
 
 	std::optional<augs::timer> when_local_player_knocked_out;
 
-	bool control(app_ingame_intent_input);
+	bool control(general_gui_intent_input);
 	void hide();
 
 	template <class M>

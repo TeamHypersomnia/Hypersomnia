@@ -1,6 +1,7 @@
 #pragma once
 #include "augs/filesystem/path.h"
 #include "augs/misc/imgui/standard_window_mixin.h"
+#include "application/setups/editor/editor_popup.h"
 
 struct config_lua_table;
 
@@ -22,12 +23,27 @@ enum class settings_pane {
 	// END GEN INTROSPECTOR
 };
 
+struct key_hijack_request {
+	bool for_secondary = false;
+	std::optional<int> for_idx;
+	std::optional<augs::event::keys::key> captured;
+};
+
 class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	settings_pane active_pane = settings_pane::GENERAL;
+
+
+	std::optional<editor_popup> already_bound_popup;
+
+	key_hijack_request reassignment_request;
+	key_hijack_request hijacking;
 
 public:
 	using base = standard_window_mixin<settings_gui_state>;
 	using base::base;
+
+	bool should_hijack_key() const;
+	void set_hijacked_key(augs::event::keys::key);
 
 	void perform(
 		sol::state& lua,

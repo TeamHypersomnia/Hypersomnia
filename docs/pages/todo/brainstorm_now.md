@@ -6,6 +6,15 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Add imgui popup whenever regenerating neons or atlas, but only in the main menu
+
+- And fix polish characters in chat breaking stuff on Windows
+
+Would you like keep the old settings,
+or reset them to factory defaults?
+
+[ Keep ] [ Reset ]
+
 - A way to view dedicated server stats?
 	- Rcon could have access to it 
 
@@ -13,27 +22,7 @@ summary: That which we are brainstorming at the moment.
 
 - Test on windows what's gonna happen if we try to host a server twice on the same port, also on linux
 
-- Keeping an integrated server option has the advantage that it will force you to keep the client code clean
-
-- Host a server menu
-	- Radio box
-		- Integrated server instance
-		- Dedicated server instance
-	- Might still make sense to have integrated server instances for slower computers
-		- Will have to refactor the chat, though, and avatar handling
-			- Separation of concerns might be useful here as our client setup class is a god object
-	- What about machine admin player id?
-		- if it is equal to max clients, we might miss it accidentally if we use max_incoming_connections_v in loops
-		- if it is equal to max clients - 1, it wastes a single connection slot?
-	- For checking whether a dedicated server instance is running, we can keep a lockfile named after the port
-
-
 - fix those knife offsets on character
-
-- Cooldowns for chat
-	- Both client side and server side
-	- Although maybe later, at least we'll ban griefers early
-
 
 - In-game tip system
 	- Contextual
@@ -49,12 +38,9 @@ summary: That which we are brainstorming at the moment.
 - Test avatars on windows, especially the png filename filter
 
 - Fix that clipboard on all platforms at last
-- And fix polish characters in chat breaking stuff on Windows
 
 - In host a server menu option, simply spawn a separate dedicated server process and use locally created client_setup to connect
 	- Something to check if the servers is already on
-
-- Test assists after fixing the damage owner logic
 
 - Port cyberaqua again from the same lua files to avoid re-importing and loss of accuracy
 
@@ -148,8 +134,6 @@ summary: That which we are brainstorming at the moment.
 
 - Crash when turning on drawing of cast raycasts
 
-- Communicate with the server somehow from localhost?
-
 - make layer with insects hoverable in editor
 
 - some strange recurring problem with H (temporarily hiding layers) not working
@@ -173,10 +157,6 @@ summary: That which we are brainstorming at the moment.
 - Indeed, there is a problem when importing project-specific gfx on windows, but not on linux
 - enable hrtf crash on windows
 
-- add markers for allies that are off-screen
-	- simply clamp the nicknames to bounds and maybe add an arrow
-		- then just clamp to a smaller bound to account for an arrow
-
 - fix neon maps being generated in the project folder
 
 - Note that message buffer might overflow during resynchro, causing a disconnection
@@ -184,8 +164,6 @@ summary: That which we are brainstorming at the moment.
 - re-freeze when match starts and someone respawns at warmup
 
 - increase prices of uwota and triad? theyre soo op
-
-- fix shot cooldown progress visible behind walls
 
 - do something about going through walls with bilmer and elon hrl
 
@@ -256,11 +234,6 @@ summary: That which we are brainstorming at the moment.
 		- i guess clientside prediction is more important
 		- though we can plan for state
 
-- Rebuy previous
-	- Plan for state early
-		- note that we don't need any bincompat regarding the mode solvable
-		- because anyway we are importing/exporting without that state
-
 - should rebuy previous also buy magazines bought?
 	- perhaps
 
@@ -281,8 +254,6 @@ summary: That which we are brainstorming at the moment.
 		- maybe store nickname?
 
 - Do something so that we don't lose work in playtesting mode
-
-- see if bilmer and vindicator have better intervals at 64hz
 
 - Create randomized players like in the good olden times
 	- to test the predicted experience

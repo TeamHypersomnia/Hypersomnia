@@ -68,7 +68,7 @@ bool arena_buy_menu_gui::escape() {
 	return true;
 }
 
-bool arena_buy_menu_gui::control(app_ingame_intent_input in) {
+bool arena_buy_menu_gui::control(general_gui_intent_input in) {
 	using namespace augs::event;
 	using namespace augs::event::keys;
 
@@ -78,7 +78,7 @@ bool arena_buy_menu_gui::control(app_ingame_intent_input in) {
 		const auto key = in.e.get_key();
 
 		if (const auto it = mapped_or_nullptr(in.controls, key)) {
-			if (*it == app_ingame_intent_type::OPEN_BUY_MENU) {
+			if (*it == general_gui_intent_type::OPEN_BUY_MENU) {
 				key_opened = key;
 
 				if (show) {

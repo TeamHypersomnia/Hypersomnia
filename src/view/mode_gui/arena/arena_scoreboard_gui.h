@@ -2,7 +2,7 @@
 #include "view/mode_gui/draw_mode_gui_input.h"
 #include "augs/window_framework/event.h"
 
-struct app_ingame_intent_input;
+struct general_gui_intent_input;
 struct draw_setup_gui_input;
 
 struct arena_scoreboard_gui {
@@ -10,7 +10,7 @@ struct arena_scoreboard_gui {
 	bool show = false;
 	// END GEN INTROSPECTOR
 
-	bool control(app_ingame_intent_input);
+	bool control(general_gui_intent_input);
 
 	template <class M>
 	void draw_gui(

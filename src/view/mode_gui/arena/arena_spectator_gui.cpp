@@ -14,7 +14,7 @@
 const auto secs_before_accepting_inputs_after_death = 1.0;
 const auto secs_until_switching_dead_teammate = 1.0;
 
-bool arena_spectator_gui::control(const app_ingame_intent_input in) {
+bool arena_spectator_gui::control(const general_gui_intent_input in) {
 	using namespace augs::event;
 	using namespace augs::event::keys;
 
@@ -28,12 +28,12 @@ bool arena_spectator_gui::control(const app_ingame_intent_input in) {
 		const auto key = in.e.get_key();
 
 		if (const auto it = mapped_or_nullptr(in.controls, key)) {
-			if (*it == app_ingame_intent_type::SPECTATE_NEXT) {
+			if (*it == general_gui_intent_type::SPECTATE_NEXT) {
 				key_requested_offset = 1;
 				return true;
 			}
 
-			if (*it == app_ingame_intent_type::SPECTATE_PREV) {
+			if (*it == general_gui_intent_type::SPECTATE_PREV) {
 				key_requested_offset = -1;
 				return true;
 			}
@@ -101,10 +101,10 @@ void arena_spectator_gui::draw_gui(
 	draw_text_indicator_at(fmt(top_caption, yellow), one_sixth_t);
 	draw_text_indicator_at(fmt(spectated->chosen_name, white), one_sixth_t + cell_h);
 
-	const auto& key_map = in.config.app_ingame_controls;
+	const auto& key_map = in.config.general_gui_controls;
 
-	const auto bound_left = key_or_default(key_map, app_ingame_intent_type::SPECTATE_PREV);
-	const auto bound_right = key_or_default(key_map, app_ingame_intent_type::SPECTATE_NEXT);
+	const auto bound_left = key_or_default(key_map, general_gui_intent_type::SPECTATE_PREV);
+	const auto bound_right = key_or_default(key_map, general_gui_intent_type::SPECTATE_NEXT);
 
 	const bool spectated_is_conscious = typed_mode.on_player_handle(mode_input.cosm, now_spectating, [&](const auto& player_handle) {
 		if constexpr(!is_nullopt_v<decltype(player_handle)>) {

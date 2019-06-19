@@ -196,10 +196,12 @@ Consider sending developers the log file located at:
 
 %x
 
+The settings have been reset to factory defaults.
 If you experience repeated crashes, 
 you might try to reset all your settings,
 which can be done by pressing "Reset to factory default" in Settings->General,
 and then hitting Save settings.
+
 )", last_failure_log),
 			""
 		};
@@ -691,7 +693,7 @@ and then hitting Save settings.
 		}
 	};
 	
-	static auto handle_app_ingame_intent = [&](const app_ingame_intent_type intent) {
+	static auto handle_general_gui_intent = [&](const general_gui_intent_type intent) {
 		using T = decltype(intent);
 
 		switch (intent) {
@@ -705,7 +707,7 @@ and then hitting Save settings.
 				return true;
 			}
 
-			case T::SWITCH_GAME_GUI_MODE: {
+			case T::TOGGLE_MOUSE_CURSOR: {
 				bool& f = game_gui_mode_flag;
 				f = !f;
 				return true;
@@ -1196,6 +1198,13 @@ and then hitting Save settings.
 						return true;
 					}
 
+					if (settings_gui.should_hijack_key()) {
+						if (e.was_any_key_pressed()) {
+							settings_gui.set_hijacked_key(e.get_key());
+							return true;
+						}
+					}
+
 					if (!ingame_menu.show) {
 						if (visit_current_setup([&](auto& setup) {
 							using T = remove_cref<decltype(setup)>;
@@ -1508,10 +1517,10 @@ and then hitting Save settings.
 							if (!streaming.necessary_images_in_atlas.empty()) {
 								/* Viewables reloading happens later so it might not be ready yet */
 
-								const auto& app_ingame_controls = viewing_config.app_ingame_controls;
+								const auto& general_gui_controls = viewing_config.general_gui_controls;
 
 								return setup.handle_input_before_game({
-									app_ingame_controls, streaming.necessary_images_in_atlas, common_input_state, e, window
+									general_gui_controls, streaming.necessary_images_in_atlas, common_input_state, e, window
 								});
 							}
 						}
@@ -1532,14 +1541,14 @@ and then hitting Save settings.
 						const auto key = e.get_key();
 
 						if (was_released || direct_gameplay || game_gui_effective) {
-							if (const auto it = mapped_or_nullptr(viewing_config.app_ingame_controls, key)) {
+							if (const auto it = mapped_or_nullptr(viewing_config.general_gui_controls, key)) {
 								if (was_pressed) {
-									if (handle_app_ingame_intent(*it)) {
+									if (handle_general_gui_intent(*it)) {
 										continue;
 									}
 								}
 							}
-							if (const auto it = mapped_or_nullptr(viewing_config.game_gui_controls, key)) {
+							if (const auto it = mapped_or_nullptr(viewing_config.inventory_gui_controls, key)) {
 								if (should_draw_game_gui()) {
 									game_gui.control_hotbar_and_action_button(get_game_gui_subject(), { *it, *key_change });
 
@@ -1695,7 +1704,7 @@ and then hitting Save settings.
 				get_audiovisuals().world_hover_highlighter,
 				new_viewing_config.hotbar,
 				new_viewing_config.drawing,
-				new_viewing_config.game_gui_controls,
+				new_viewing_config.inventory_gui_controls,
 				get_camera_eye(),
 				get_drawer()
 			}

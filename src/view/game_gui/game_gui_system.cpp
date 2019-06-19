@@ -31,36 +31,36 @@
 #include "augs/templates/logically_empty.h"
 #include "game/detail/explosive/like_explosive.h"
 
-static int to_hotbar_index(const game_gui_intent_type type) {
+static int to_hotbar_index(const inventory_gui_intent_type type) {
 	switch (type) {
-	case game_gui_intent_type::HOTBAR_BUTTON_0: return 0;
-	case game_gui_intent_type::HOTBAR_BUTTON_1: return 1;
-	case game_gui_intent_type::HOTBAR_BUTTON_2: return 2;
-	case game_gui_intent_type::HOTBAR_BUTTON_3: return 3;
-	case game_gui_intent_type::HOTBAR_BUTTON_4: return 4;
-	case game_gui_intent_type::HOTBAR_BUTTON_5: return 5;
-	case game_gui_intent_type::HOTBAR_BUTTON_6: return 6;
-	case game_gui_intent_type::HOTBAR_BUTTON_7: return 7;
-	case game_gui_intent_type::HOTBAR_BUTTON_8: return 8;
-	case game_gui_intent_type::HOTBAR_BUTTON_9: return 9;
+	case inventory_gui_intent_type::HOTBAR_BUTTON_0: return 0;
+	case inventory_gui_intent_type::HOTBAR_BUTTON_1: return 1;
+	case inventory_gui_intent_type::HOTBAR_BUTTON_2: return 2;
+	case inventory_gui_intent_type::HOTBAR_BUTTON_3: return 3;
+	case inventory_gui_intent_type::HOTBAR_BUTTON_4: return 4;
+	case inventory_gui_intent_type::HOTBAR_BUTTON_5: return 5;
+	case inventory_gui_intent_type::HOTBAR_BUTTON_6: return 6;
+	case inventory_gui_intent_type::HOTBAR_BUTTON_7: return 7;
+	case inventory_gui_intent_type::HOTBAR_BUTTON_8: return 8;
+	case inventory_gui_intent_type::HOTBAR_BUTTON_9: return 9;
 	default: return -1;
 	}
 }
 
-static int to_special_action_index(const game_gui_intent_type type) {
+static int to_special_action_index(const inventory_gui_intent_type type) {
 	switch (type) {
-	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_1: return 0;
-	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_2: return 1;
-	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_3: return 2;
-	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_4: return 3;
-	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_5: return 4;
-	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_6: return 5;
-	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_7: return 6;
-	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_8: return 7;
-	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_9: return 8;
-	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_10: return 9;
-	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_11: return 10;
-	case game_gui_intent_type::SPECIAL_ACTION_BUTTON_12: return 11;
+	case inventory_gui_intent_type::SPECIAL_ACTION_BUTTON_1: return 0;
+	case inventory_gui_intent_type::SPECIAL_ACTION_BUTTON_2: return 1;
+	case inventory_gui_intent_type::SPECIAL_ACTION_BUTTON_3: return 2;
+	case inventory_gui_intent_type::SPECIAL_ACTION_BUTTON_4: return 3;
+	case inventory_gui_intent_type::SPECIAL_ACTION_BUTTON_5: return 4;
+	case inventory_gui_intent_type::SPECIAL_ACTION_BUTTON_6: return 5;
+	case inventory_gui_intent_type::SPECIAL_ACTION_BUTTON_7: return 6;
+	case inventory_gui_intent_type::SPECIAL_ACTION_BUTTON_8: return 7;
+	case inventory_gui_intent_type::SPECIAL_ACTION_BUTTON_9: return 8;
+	case inventory_gui_intent_type::SPECIAL_ACTION_BUTTON_10: return 9;
+	case inventory_gui_intent_type::SPECIAL_ACTION_BUTTON_11: return 10;
+	case inventory_gui_intent_type::SPECIAL_ACTION_BUTTON_12: return 11;
 	default: return -1;
 	}
 }
@@ -200,7 +200,7 @@ bool game_gui_system::control_gui_world(
 
 void game_gui_system::control_hotbar_and_action_button(
 	const const_entity_handle gui_entity,
-	const game_gui_intent intent
+	const inventory_gui_intent intent
 ) {
 	if (gui_entity.dead()) {
 		return;
@@ -228,7 +228,7 @@ void game_gui_system::control_hotbar_and_action_button(
 				gui.save_as_last_setup(current_setup);
 			};
 
-			if (r.intent == game_gui_intent_type::HOLSTER) {
+			if (r.intent == inventory_gui_intent_type::HOLSTER) {
 				const auto& cosm = gui_entity.get_cosmos();
 
 				const auto current_setup = wielding_setup::from_current(gui_entity);
@@ -254,10 +254,10 @@ void game_gui_system::control_hotbar_and_action_button(
 
 			auto requested_index = static_cast<std::size_t>(-1);
 
-			if (r.intent == game_gui_intent_type::HOLSTER) {
+			if (r.intent == inventory_gui_intent_type::HOLSTER) {
 				requested_index = 0;
 			}
-			else if (r.intent == game_gui_intent_type::HOLSTER_SECONDARY) {
+			else if (r.intent == inventory_gui_intent_type::HOLSTER_SECONDARY) {
 				requested_index = 1;
 			}
 
@@ -349,7 +349,7 @@ void game_gui_system::control_hotbar_and_action_button(
 				}
 			}
 		}
-		else if (i.intent == game_gui_intent_type::LAST_HOTBAR_SELECTION_SETUP && i.was_pressed()) {
+		else if (i.intent == inventory_gui_intent_type::LAST_HOTBAR_SELECTION_SETUP && i.was_pressed()) {
 			const auto wielding = gui.make_wielding_setup_for_last_hotbar_selection_setup(gui_entity);
 
 			//if (!wielding.same_as_in(gui_entity)) {

@@ -7,23 +7,6 @@ return {
     F1 = "SWITCH_DEVELOPER_CONSOLE"
   },
 
-  app_ingame_controls = {
-    Backspace = "CLEAR_DEBUG_LINES",
-    F = "SWITCH_WEAPON_LASER",
-    Tilde = "SWITCH_GAME_GUI_MODE",
-	Tab = "OPEN_SCOREBOARD",
-	T = "OPEN_BUY_MENU",
-	O = "CHOOSE_TEAM",
-
-	Y = "OPEN_CHAT",
-	U = "OPEN_TEAM_CHAT",
-
-	F8 = "OPEN_RCON_MENU",
-
-	RightMouseButton = "SPECTATE_PREV",
-	LeftMouseButton = "SPECTATE_NEXT"
-  },
-
   game_controls = {
     W = "MOVE_FORWARD",
     S = "MOVE_BACKWARD",
@@ -31,7 +14,7 @@ return {
     D = "MOVE_RIGHT",
 
     LeftShift = "SPRINT",
-    Space = "SPACE_BUTTON", -- dashing or hand brake
+    Space = "DASH",
 
     LeftMouseButton = "CROSSHAIR_PRIMARY_ACTION",
     RightMouseButton = "CROSSHAIR_SECONDARY_ACTION",
@@ -46,13 +29,31 @@ return {
     WheelUp = "THROW_ANY_TWO_MELEES",
     WheelDown = "THROW_ANY_MELEE",
 
-    E = "USE_BUTTON",
+    E = "USE",
 	R = "RELOAD",
 
 	C = "WIELD_BOMB"
   },
 
-  game_gui_controls = {
+  general_gui_controls = {
+    Tilde = "TOGGLE_MOUSE_CURSOR",
+    F = "SWITCH_WEAPON_LASER",
+	Tab = "OPEN_SCOREBOARD",
+	T = "OPEN_BUY_MENU",
+	O = "CHOOSE_TEAM",
+
+	Y = "OPEN_CHAT",
+	U = "OPEN_TEAM_CHAT",
+
+	F8 = "OPEN_RCON_MENU",
+
+	RightMouseButton = "SPECTATE_PREV",
+	LeftMouseButton = "SPECTATE_NEXT",
+
+    Backspace = "CLEAR_DEBUG_LINES"
+  },
+
+  inventory_gui_controls = {
     ["0"] = "HOTBAR_BUTTON_9",
     ["1"] = "HOTBAR_BUTTON_0",
     ["2"] = "HOTBAR_BUTTON_1",

@@ -20,8 +20,8 @@ void action_button::draw(
 	const viewing_game_gui_context context,
 	const const_this_in_item this_id
 ) {
-	const auto intent_for_this_button = static_cast<game_gui_intent_type>(
-		static_cast<int>(game_gui_intent_type::SPECIAL_ACTION_BUTTON_1) + this_id.get_location().index
+	const auto intent_for_this_button = static_cast<inventory_gui_intent_type>(
+		static_cast<int>(inventory_gui_intent_type::SPECIAL_ACTION_BUTTON_1) + this_id.get_location().index
 	);
 
 	if (
