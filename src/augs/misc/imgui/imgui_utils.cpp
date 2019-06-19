@@ -212,8 +212,12 @@ namespace augs {
 			{
 				auto unicode_ranges = in.unicode_ranges;
 
-				if (in.add_japanese_ranges) {
+				if (_should(in.add_japanese_ranges)) {
 					concat_ranges(unicode_ranges, ImGui::GetIO().Fonts->GetGlyphRangesJapanese());
+				}
+
+				if (_should(in.add_cyrillic_ranges)) {
+					concat_ranges(unicode_ranges, ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
 				}
 
 				for (const auto& r : unicode_ranges) {

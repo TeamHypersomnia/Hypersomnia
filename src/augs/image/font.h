@@ -99,13 +99,30 @@ namespace augs {
 		}
 	};
 
+	enum class ranges_add_condition {
+		// GEN INTROSPECTOR enum class augs::ranges_add_condition
+		ALWAYS,
+		NEVER,
+		ONLY_IN_PRODUCTION
+		// END GEN INTROSPECTOR enum class ranges_add_condition
+	};
+
+	inline bool _should(const ranges_add_condition& cond) {
+#if IS_PRODUCTION_BUILD
+		return cond == ranges_add_condition::ALWAYS || cond == ranges_add_condition::ONLY_IN_PRODUCTION;
+#else
+		return cond == ranges_add_condition::ALWAYS;
+#endif
+	}
+
 	struct font_loading_input {
 		// GEN INTROSPECTOR struct augs::font_loading_input
 		font_settings settings;
 		path_type source_font_path;
 		utf32_ranges unicode_ranges;
 		float size_in_pixels = 0u;
-		bool add_japanese_ranges = false;
+		ranges_add_condition add_japanese_ranges = ranges_add_condition::NEVER;
+		ranges_add_condition add_cyrillic_ranges = ranges_add_condition::NEVER;
 		// END GEN INTROSPECTOR
 
 		bool operator==(const font_loading_input& b) const {
@@ -114,6 +131,7 @@ namespace augs {
 				&& unicode_ranges == b.unicode_ranges 
 				&& size_in_pixels == b.size_in_pixels
 				&& add_japanese_ranges == b.add_japanese_ranges
+				&& add_cyrillic_ranges == b.add_cyrillic_ranges
 			;
 		}
 

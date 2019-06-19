@@ -86,8 +86,12 @@ namespace augs {
 		try {
 			auto ranges = in.unicode_ranges;
 
-			if (in.add_japanese_ranges) {
+			if (_should(in.add_japanese_ranges)) {
 				augs::imgui::concat_ranges(ranges, ImGui::GetIO().Fonts->GetGlyphRangesJapanese());
+			}
+
+			if (_should(in.add_cyrillic_ranges)) {
+				augs::imgui::concat_ranges(ranges, ImGui::GetIO().Fonts->GetGlyphRangesCyrillic());
 			}
 
 			std::size_t total = 0;

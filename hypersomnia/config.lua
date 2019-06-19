@@ -265,7 +265,8 @@ return {
 		  { 0x0100, 0x017F }  -- Latin Extended-A
 		},
 		size_in_pixels = 16,
-		add_japanese_ranges = false,
+		add_japanese_ranges = "NEVER",
+		add_cyrillic_ranges = "ONLY_IN_PRODUCTION",
 		settings = {},
 		source_font_path = "content/necessary/fonts/unifont.ttf"
 	  },
@@ -275,7 +276,8 @@ return {
 		  { 0x0100, 0x017F }  -- Latin Extended-A
 		},
 		size_in_pixels = 32,
-		add_japanese_ranges = false,
+		add_japanese_ranges = "NEVER",
+		add_cyrillic_ranges = "ONLY_IN_PRODUCTION",
 		settings = {},
 		source_font_path = "content/necessary/fonts/unifont.ttf"
 	  },
@@ -284,7 +286,8 @@ return {
 		  { 0x0030, 0x0039 }, -- Only numbers
 		},
 		size_in_pixels = 64,
-		add_japanese_ranges = false,
+		add_japanese_ranges = "NEVER",
+		add_cyrillic_ranges = "NEVER",
 		settings = {},
 		source_font_path = "content/necessary/fonts/unifont.ttf"
 	  }
