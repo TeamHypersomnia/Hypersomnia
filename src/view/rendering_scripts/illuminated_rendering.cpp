@@ -488,7 +488,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 				e.template dispatch_on_having_all<invariants::box_marker>([&](const auto typed_handle) { 
 					const auto where = typed_handle.get_logic_transform();
 					const auto& marker_alpha = markers.value;
-					::draw_area_indicator(typed_handle, line_output, where, cone.eye.zoom, marker_alpha, drawn_indicator_type::INGAME);
+					::draw_area_indicator(typed_handle, line_output, where, marker_alpha, drawn_indicator_type::INGAME);
 				});
 			});
 		}
@@ -852,7 +852,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 				e.template dispatch_on_having_all<invariants::box_marker>([&](const auto typed_handle) { 
 					const auto where = typed_handle.get_logic_transform();
 					const auto& callout_alpha = callouts.value;
-					::draw_area_indicator(typed_handle, line_output, where, cone.eye.zoom, callout_alpha, drawn_indicator_type::INGAME);
+
+					::draw_area_indicator(typed_handle, line_output, where, callout_alpha, drawn_indicator_type::INGAME);
 
 					using namespace augs::gui::text;
 

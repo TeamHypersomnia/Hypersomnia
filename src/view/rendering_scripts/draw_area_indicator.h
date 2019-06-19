@@ -13,7 +13,6 @@ void draw_area_indicator(
 	const E& typed_handle, 
 	const augs::line_drawer_with_default& drawer,
 	const transformr where,
-	const float zoom,
 	const float alpha,
 	const drawn_indicator_type type,
 	std::optional<rgba> color = std::nullopt
@@ -45,7 +44,7 @@ void draw_area_indicator(
 		color->mult_alpha(alpha);
 
 		drawer.border_dashed(
-			size * zoom,
+			size,
 			where.pos,
 			where.rotation,
 			*color,

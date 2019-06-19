@@ -1576,7 +1576,7 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 				);
 			}
 
-			::draw_area_indicator(typed_handle, lines, screen_space, eye.zoom, 1.f, drawn_indicator_type::EDITOR, color);
+			::draw_area_indicator(typed_handle, lines, screen_space, eye.zoom, drawn_indicator_type::EDITOR, color);
 		}	
 	);
 

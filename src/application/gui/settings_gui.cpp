@@ -659,7 +659,7 @@ void settings_gui_state::perform(
 
 						if (config.drawing.draw_tactical_indicators.is_enabled) {
 							auto indent = scoped_indent();
-							revertable_slider("Alpha##colors", config.drawing.draw_tactical_indicators.value, 0.f, 1.f);
+							revertable_slider("Alpha##colors2", config.drawing.draw_tactical_indicators.value, 0.f, 1.f);
 						}
 
 						revertable_checkbox("Draw danger indicators", config.drawing.draw_danger_indicators.is_enabled);

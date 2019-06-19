@@ -3284,3 +3284,6 @@ which can be done from Settings->Reset all settings to factory default.
 - And fix polish characters in chat breaking stuff on Windows
 - Add imgui popup whenever regenerating neons or atlas, but only in the main menu
 
+- fix in-game area indicators wrongly drawn when zoomed out
+	- they can still be drawn zoomed out in-game if the monitor is smaller than 1920x1080 for example
+

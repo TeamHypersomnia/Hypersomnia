@@ -46,8 +46,6 @@ summary: That which we are brainstorming at the moment.
 - Port cyberaqua again from the same lua files to avoid re-importing and loss of accuracy
 
 - panel -> ct computers
-- fix in-game area indicators wrongly drawn when zoomed out
-	- they can still be drawn zoomed out in-game if the monitor is smaller than 1920x1080 for example
 
 - Callout markers
 	- Separate trees
