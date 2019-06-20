@@ -618,6 +618,21 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::GAMEPLAY: {
+				{
+					auto& scope_cfg = config.arena_mode_gui;
+					revertable_checkbox("Show contextual tips", scope_cfg.context_tip_settings.is_enabled);
+
+					if (scope_cfg.context_tip_settings.is_enabled) {
+						auto& scope_cfg = config.arena_mode_gui.context_tip_settings.value;
+						auto indent = scoped_indent();
+
+						revertable_slider(SCOPE_CFG_NVP(tip_offset_mult), 0.f, 1.f);
+
+						revertable_color_edit(SCOPE_CFG_NVP(tip_text_color));
+						revertable_color_edit(SCOPE_CFG_NVP(bound_key_color));
+					}
+				}
+
 				if (auto node = scoped_tree_node("Camera")) {
 					auto& scope_cfg = config.camera;
 
@@ -708,21 +723,6 @@ void settings_gui_state::perform(
 							revertable_drag_vec2(SCOPE_CFG_NVP(radar_pos));
 						}
 
-						{
-
-							auto& scope_cfg = config.arena_mode_gui;
-							revertable_checkbox("Draw context tip", scope_cfg.context_tip_settings.is_enabled);
-
-							if (scope_cfg.context_tip_settings.is_enabled) {
-								auto& scope_cfg = config.arena_mode_gui.context_tip_settings.value;
-								auto indent = scoped_indent();
-
-								revertable_slider(SCOPE_CFG_NVP(tip_offset_mult), 0.f, 1.f);
-
-								revertable_color_edit(SCOPE_CFG_NVP(tip_text_color));
-								revertable_color_edit(SCOPE_CFG_NVP(bound_key_color));
-							}
-						}
 					}
 				}
 
@@ -736,8 +736,25 @@ void settings_gui_state::perform(
 
 				if (auto node = scoped_tree_node("Fog of war")) {
 					auto& scope_cfg = config.drawing.fog_of_war_appearance;
-					revertable_checkbox(SCOPE_CFG_NVP(overlay_color_on_visible));
-					revertable_color_edit(SCOPE_CFG_NVP(overlay_color));
+
+					revertable_color_edit("Field of view overlay color", scope_cfg.overlay_color);
+
+					text("Overlay color on:");
+
+					{
+						auto indent = scoped_indent();
+
+						auto& f = scope_cfg.overlay_color_on_visible;
+						if (ImGui::RadioButton("Visible area", f)) {
+							f = true;
+						}
+
+						if (ImGui::RadioButton("The occlusion fog", !f)) {
+							f = false;
+						}
+						text("\n");
+						revert(f);
+					}
 				}
 
 				// revertable_checkbox("Draw gameplay GUI", config.drawing.draw_character_gui); revert(config.drawing.draw_character_gui);
