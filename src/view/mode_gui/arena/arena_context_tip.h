@@ -158,6 +158,17 @@ inline void draw_context_tip(
 			return cosm[result];
 		}();
 
+		if (bomb) {
+			const auto participants = typed_mode.calc_participating_factions(mode_input);
+
+			if (participants.defusing == current_faction) {
+				text("You've stolen the bomb! Escape!");
+				break_line();
+				text("Careful, enemies know where you go with the bomb.");
+				return total_text;
+			}
+		}
+
 		if (bomb_being_armed) {
 			text("Stay still while planting the bomb!");
 
