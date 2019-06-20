@@ -42,6 +42,14 @@ struct scoreboard_gui_settings {
 	// END GEN INTROSPECTOR
 };
 
+struct arena_context_tip_settings {
+	// GEN INTROSPECTOR struct arena_context_tip_settings
+	float tip_offset_mult = 0.7f;
+	rgba tip_text_color = white;
+	rgba bound_key_color = yellow;
+	// END GEN INTROSPECTOR
+};
+
 struct arena_mode_gui_settings {
 	// GEN INTROSPECTOR struct arena_mode_gui_settings
 	unsigned between_knockout_boxes_pad = 4;
@@ -63,6 +71,8 @@ struct arena_mode_gui_settings {
 	bool show_client_resyncing_notifier = true;
 
 	float death_summary_offset_mult = 0.7f;
+
+	augs::maybe<arena_context_tip_settings> context_tip_settings;
 	// END GEN INTROSPECTOR
 };
 

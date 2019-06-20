@@ -16,6 +16,8 @@
 #include "game/detail/damage_origin.hpp"
 #include "augs/misc/action_list/standard_actions.h"
 
+#include "view/mode_gui/arena/arena_context_tip.h"
+
 #include "augs/math/simple_calculations.h"
 
 const bool show_death_summary_for_teammates = false;
@@ -919,6 +921,29 @@ void arena_gui_state::draw_mode_gui(
 			}
 		};
 
+		auto draw_context_tip = [&]() {
+			const auto viewed_player_data = typed_mode.find(local_player_id);
+
+			if (viewed_player_data == nullptr) {
+				return;
+			}
+
+			const auto& cosm = mode_input.cosm;
+			const auto viewed_player_handle = cosm[viewed_player_data->controlled_character_id];
+
+			::draw_context_tip(
+				typed_mode,
+				mode_input,
+				mode_in.config,
+				in.drawer,
+				in.screen_size,
+				in.gui_fonts.gui,
+				viewed_player_handle,
+				viewed_player_data->faction,
+				!choose_team.show
+			);
+		};
+
 		if (prediction.play_unpredictable) {
 			if (cfg.show_client_resyncing_notifier && resyncing_notifier) {
 				const auto warning = colored("WARNING! Resynchronizing client with the server.", orange);
@@ -982,6 +1007,8 @@ void arena_gui_state::draw_mode_gui(
 
 				draw_match_timers();
 			}
+
+			draw_context_tip();
 		}
 	}
 	else {

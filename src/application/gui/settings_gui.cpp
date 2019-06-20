@@ -686,20 +686,18 @@ void settings_gui_state::perform(
 							revertable_slider(SCOPE_CFG_NVP(fade_death_indicator_for_seconds), 0.f, 20.f);
 						}
 
-						if (auto node = scoped_tree_node("Areas")) {
-							revertable_checkbox("Draw callout indicators", config.drawing.draw_callout_indicators.is_enabled);
+						revertable_checkbox("Draw callout indicators", config.drawing.draw_callout_indicators.is_enabled);
 
-							if (config.drawing.draw_callout_indicators.is_enabled) {
-								auto indent = scoped_indent();
-								revertable_slider("Alpha##callouts", config.drawing.draw_callout_indicators.value, 0.f, 1.f);
-							}
+						if (config.drawing.draw_callout_indicators.is_enabled) {
+							auto indent = scoped_indent();
+							revertable_slider("Alpha##callouts", config.drawing.draw_callout_indicators.value, 0.f, 1.f);
+						}
 
-							revertable_checkbox("Draw area markers", config.drawing.draw_area_markers.is_enabled);
+						revertable_checkbox("Draw area markers", config.drawing.draw_area_markers.is_enabled);
 
-							if (config.drawing.draw_area_markers.is_enabled) {
-								auto indent = scoped_indent();
-								revertable_slider("Alpha##markers", config.drawing.draw_area_markers.value, 0.f, 1.f);
-							}
+						if (config.drawing.draw_area_markers.is_enabled) {
+							auto indent = scoped_indent();
+							revertable_slider("Alpha##markers", config.drawing.draw_area_markers.value, 0.f, 1.f);
 						}
 					}
 
@@ -708,6 +706,22 @@ void settings_gui_state::perform(
 
 						{
 							revertable_drag_vec2(SCOPE_CFG_NVP(radar_pos));
+						}
+
+						{
+
+							auto& scope_cfg = config.arena_mode_gui;
+							revertable_checkbox("Draw context tip", scope_cfg.context_tip_settings.is_enabled);
+
+							if (scope_cfg.context_tip_settings.is_enabled) {
+								auto& scope_cfg = config.arena_mode_gui.context_tip_settings.value;
+								auto indent = scoped_indent();
+
+								revertable_slider(SCOPE_CFG_NVP(tip_offset_mult), 0.f, 1.f);
+
+								revertable_color_edit(SCOPE_CFG_NVP(tip_text_color));
+								revertable_color_edit(SCOPE_CFG_NVP(bound_key_color));
+							}
 						}
 					}
 				}

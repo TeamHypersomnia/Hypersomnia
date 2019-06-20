@@ -449,6 +449,12 @@ return {
         y = 8
       }
     },
+
+    enabled_context_tip_settings = {
+      tip_offset_mult = 0.7,
+      tip_text_color = "255 255 255 255",
+      bound_key_color = "255 255 0 255"
+	}
   },
   hotbar = {
     colorize_inside_when_selected = true,

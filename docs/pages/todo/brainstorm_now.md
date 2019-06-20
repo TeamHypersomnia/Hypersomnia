@@ -6,6 +6,16 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+
+- Per-character settings to store within entropy
+	- They could be stored inside the per-character entropy itself
+	- The cosmos-ready entropy could hold it, but the packed one would simply take it from the settings
+	- Any change to settings to these would go along the client_commands channel
+	- pros
+		- We can save on the mouse movements
+		- We could compress them even down to two bytes per movement in the most optimistic case
+		- just one bit to determine the range
+
 - In-game tip system
 	- Contextual
 		- Press "E" to defuse the bomb.
@@ -18,6 +28,10 @@ summary: That which we are brainstorming at the moment.
 		- The entire arena handle, I suppose?
 		- Should then arena gui mixin manage it?
 			- I guess...
+	- Draw somewhere around where the death summary shows
+		- Nothing should appear once we're dead
+	- Notifications like "can't holster" will be drawn a little above the context tip
+		- So that both can appear at once
 	- Randomized
 		- Stay still to regenerate stamina faster.
 		- Double-tap R to drop the old mag for a faster reload. Near-empty mags are dropped automatically.
@@ -34,7 +48,6 @@ summary: That which we are brainstorming at the moment.
 - Test on windows what's gonna happen if we try to host a server twice on the same port, also on linux
 
 - fix those knife offsets on character
-
 
 - Test avatars on windows, especially the png filename filter
 
