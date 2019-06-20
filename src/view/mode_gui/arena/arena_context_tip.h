@@ -101,6 +101,7 @@ inline void draw_context_tip(
 		}
 
 		bool is_bomb_in_hand = false;
+		bool bomb_being_armed = false;
 		std::size_t bomb_hand_index;
 
 		const auto bomb = [&]() -> const_entity_handle {
@@ -115,6 +116,12 @@ inline void draw_context_tip(
 							const auto slot = typed_item.get_current_slot();
 							is_bomb_in_hand = slot.is_hand_slot();
 							bomb_hand_index = slot.get_hand_index();
+
+							if (const auto hand_fuse_comp = typed_item.template find<components::hand_fuse>()) {
+								if (hand_fuse_comp->when_started_arming.was_set()) {
+									bomb_being_armed = true;
+								}
+							}
 						}
 					}
 				}
@@ -122,6 +129,12 @@ inline void draw_context_tip(
 
 			return cosm[result];
 		}();
+
+		if (bomb_being_armed) {
+			text("Stay still while planting the bomb!");
+
+			return total_text;
+		}
 
 		if (is_bomb_in_hand) {
 			if (::bombsite_in_range(bomb)) {
