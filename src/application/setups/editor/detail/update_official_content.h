@@ -178,6 +178,9 @@ inline void update_official_content(const editor_command_input cmd_in, update_of
 				const auto added_name = ::get_displayed_name(o) + " (" + type_name + ")";
 				added_names.push_back(added_name);
 			}
+			else {
+				to[*existing_asset] = o;
+			}
 		}
 	};
 

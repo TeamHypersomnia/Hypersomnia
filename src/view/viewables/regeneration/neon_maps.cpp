@@ -26,7 +26,7 @@ std::optional<cached_neon_map_in> should_regenerate_neon_map(
 	const augs::path_type& output_image_path,
 	const neon_map_input in,
 	const bool force_regenerate
-) {
+) try {
 	neon_map_stamp new_stamp;
 	new_stamp.input = in;
 	new_stamp.last_write_time_of_source = augs::last_write_time(input_image_path);
@@ -61,6 +61,9 @@ std::optional<cached_neon_map_in> should_regenerate_neon_map(
 		}
 	}
 
+	return std::nullopt;
+}
+catch (...) {
 	return std::nullopt;
 }
 
