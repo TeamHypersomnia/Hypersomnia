@@ -940,7 +940,8 @@ void arena_gui_state::draw_mode_gui(
 				in.gui_fonts.gui,
 				viewed_player_handle,
 				viewed_player_data->faction,
-				!choose_team.show
+				choose_team.show,
+				buy_menu.show
 			);
 		};
 

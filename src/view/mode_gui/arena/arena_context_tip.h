@@ -1,5 +1,7 @@
 #pragma once
 #include "game/detail/buy_area_in_range.h"
+#include "game/detail/bombsite_in_range.h"
+#include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
 
 template <class E, class M, class I>
 inline void draw_context_tip(
@@ -11,10 +13,13 @@ inline void draw_context_tip(
 	const augs::baked_font& font,
 	const E& viewed_character,
 	const faction_type current_faction,
-	const bool show_choose_team_notice
+	const bool team_choice_opened,
+	const bool buy_menu_opened
 ) {
 	using namespace augs::gui::text;
 	using namespace augs::event;
+
+	const auto& cosm = mode_input.cosm;
 
 	auto colored = [&](const auto& text, const auto& c) {
 		const auto text_style = style(font, c);
@@ -50,6 +55,9 @@ inline void draw_context_tip(
 			if constexpr(std::is_same_v<H, general_gui_intent_type>) {
 				return format_key(config.general_gui_controls, h);
 			}
+			else if constexpr(std::is_same_v<H, game_intent_type>) {
+				return format_key(config.game_controls, h);
+			}
 			else {
 				static_assert(always_false_v<H>);
 			}
@@ -64,7 +72,7 @@ inline void draw_context_tip(
 		};
 
 		if (current_faction == faction_type::SPECTATOR) {
-			if (show_choose_team_notice) {
+			if (!team_choice_opened) {
 				text("You are a Spectator. Press");
 				hotkey(general_gui_intent_type::CHOOSE_TEAM);
 				text("to change teams.");
@@ -78,16 +86,65 @@ inline void draw_context_tip(
 		}
 
 		if (::buy_area_in_range(viewed_character)) {
-			if (typed_mode.get_buy_seconds_left(mode_input) <= 0.f) {
-				text("It is too late to buy items now.");
-				return total_text;
+			if (!buy_menu_opened) {
+				if (typed_mode.get_buy_seconds_left(mode_input) <= 0.f) {
+					text("It is too late to buy items.");
+					return total_text;
+				}
+
+				text("Press");
+				hotkey(general_gui_intent_type::OPEN_BUY_MENU);
+				text("to buy items.");
 			}
 
-			text("Press");
-			hotkey(general_gui_intent_type::OPEN_BUY_MENU);
-			text("to buy items.");
-
 			return total_text;
+		}
+
+		bool is_bomb_in_hand = false;
+		std::size_t bomb_hand_index;
+
+		const auto bomb = [&]() -> const_entity_handle {
+			entity_id result;
+
+			viewed_character.for_each_contained_item_recursive(
+				[&](const auto& typed_item) {
+					if (const auto hand_fuse = typed_item.template find<invariants::hand_fuse>()) {
+						if (hand_fuse->is_like_plantable_bomb()) {
+							result = typed_item;
+
+							const auto slot = typed_item.get_current_slot();
+							is_bomb_in_hand = slot.is_hand_slot();
+							bomb_hand_index = slot.get_hand_index();
+						}
+					}
+				}
+			);
+
+			return cosm[result];
+		}();
+
+		if (is_bomb_in_hand) {
+			if (::bombsite_in_range(bomb)) {
+				text("Press and hold");
+				hotkey(bomb_hand_index == 0 ? game_intent_type::CROSSHAIR_PRIMARY_ACTION : game_intent_type::CROSSHAIR_SECONDARY_ACTION);
+				text("to plant the bomb.");
+
+				return total_text;
+			}
+			else {
+				text("You cannot plant the bomb here.\nFind the bombsite!");
+				return total_text;
+			}
+		}
+
+		if (::bombsite_in_range_of_entity(viewed_character)) {
+			if (bomb) {
+				text("Press");
+				hotkey(game_intent_type::WIELD_BOMB);
+				text("to pull out the bomb.");
+
+				return total_text;
+			}
 		}
 
 		(void)viewed_character;

@@ -168,6 +168,7 @@ return {
     fade_danger_indicator_for_seconds = 2,
 
     draw_offscreen_callouts = true,
+	offscreen_reference_mode = "SCREEN_CENTER",
 	enabled_draw_teammate_indicators = 1,
 	enabled_draw_tactical_indicators = 1,
 	enabled_draw_danger_indicators = "255 50 50 255",
@@ -451,7 +452,7 @@ return {
     },
 
     enabled_context_tip_settings = {
-      tip_offset_mult = 0.7,
+      tip_offset_mult = 0.78,
       tip_text_color = "255 255 255 255",
       bound_key_color = "255 255 0 255"
 	}

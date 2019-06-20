@@ -40,6 +40,7 @@ int main(const int argc, const char* const * const argv) {
 	*/
 
 	std::setlocale(LC_ALL, "");
+	std::setlocale(LC_NUMERIC, "C");
 
 	const auto params = cmd_line_params(argc, argv);
 
