@@ -3287,3 +3287,18 @@ which can be done from Settings->Reset all settings to factory default.
 - fix in-game area indicators wrongly drawn when zoomed out
 	- they can still be drawn zoomed out in-game if the monitor is smaller than 1920x1080 for example
 
+	- Contextual
+		- Press "E" to defuse the bomb.
+		- Stay still while defusing the bomb.
+		- Press "T" to buy items.
+		- Press "C" to pull out the bomb.
+		- Stay still while planting the bomb.
+		- You are a Spectator. Press "O" to select a team.
+	- Define "Context"
+		- The entire arena handle, I suppose?
+		- Should then arena gui mixin manage it?
+			- I guess...
+	- Draw somewhere around where the death summary shows
+		- Nothing should appear once we're dead
+- fix those knife offsets on character
+

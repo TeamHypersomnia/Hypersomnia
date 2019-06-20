@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Fix annoying corners on cyberaqua
 
 - Per-character settings to store within entropy
 	- They could be stored inside the per-character entropy itself
@@ -17,19 +18,6 @@ summary: That which we are brainstorming at the moment.
 		- just one bit to determine the range
 
 - In-game tip system
-	- Contextual
-		- Press "E" to defuse the bomb.
-		- Stay still while defusing the bomb.
-		- Press "T" to buy items.
-		- Press "C" to pull out the bomb.
-		- Stay still while planting the bomb.
-		- You are a Spectator. Press "O" to select a team.
-	- Define "Context"
-		- The entire arena handle, I suppose?
-		- Should then arena gui mixin manage it?
-			- I guess...
-	- Draw somewhere around where the death summary shows
-		- Nothing should appear once we're dead
 	- Notifications like "can't holster" will be drawn a little above the context tip
 		- So that both can appear at once
 	- Randomized
@@ -46,8 +34,6 @@ summary: That which we are brainstorming at the moment.
 - Perhaps replace shift+c with some other shortcut?
 
 - Test on windows what's gonna happen if we try to host a server twice on the same port, also on linux
-
-- fix those knife offsets on character
 
 - Test avatars on windows, especially the png filename filter
 

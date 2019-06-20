@@ -22,6 +22,20 @@ return {
         x = 0,
         y = 0
       },
+      chamber = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
+      chamber_magazine = {
+        pos = {
+          x = 0,
+          y = 0
+        },
+        rotation = 0
+      },
       detachable_magazine = {
         pos = {
           x = 0,
@@ -129,10 +143,10 @@ return {
       },
       secondary_shoulder = {
         pos = {
-          x = 0,
-          y = 0
+          x = -10,
+          y = 19
         },
-        rotation = 0
+        rotation = -138.81407165527344
       },
       shoulder = {
         pos = {
