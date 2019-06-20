@@ -60,9 +60,12 @@ void intent_contextualization_system::advance_use_button(const logic_step step) 
 			if (sentience.use_button == use_button_state::QUERYING) {
 				if (const auto transform = subject.find_logic_transform()) {
 					auto& u = sentience.last_use_result;
-					u = start_defusing_nearby_bomb(step, subject);
 
-					if (u == use_button_query_result::SUCCESS) {
+					const auto result = query_defusing_nearby_bomb(subject);
+					u = result.result;
+
+					if (result.success()) {
+						result.perform(cosm);
 						sentience.use_button = use_button_state::DEFUSING;
 						return;
 					}

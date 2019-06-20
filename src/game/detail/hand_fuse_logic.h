@@ -9,19 +9,22 @@
 #include "game/detail/physics/shape_overlapping.hpp"
 #include "game/detail/bombsite_in_range.h"
 #include "game/messages/battle_event_message.h"
+#include "game/detail/sentience/sentience_getters.h"
 
 template <class E>
-struct fuse_logic_provider {
+struct stepless_fuse_logic_provider {
+	static constexpr bool is_const = is_handle_const_v<E>;
+	using handle_type = basic_entity_handle<is_const>;
+
 	const E& fused_entity;
-	const logic_step step;
-	components::hand_fuse& fuse;
+	maybe_const_ref_t<is_const, components::hand_fuse> fuse;
 	const invariants::hand_fuse& fuse_def;
 	const transformr fused_transform;
-	const entity_handle holder;
-	cosmos& cosm;
+	const handle_type holder;
+	maybe_const_ref_t<is_const, cosmos> cosm;
 	const augs::stepped_clock& clk;
 
-	const entity_handle character_now_defusing;
+	const handle_type character_now_defusing;
 	vec2 character_now_defusing_pos;
 
 	template <class T>
@@ -33,14 +36,13 @@ struct fuse_logic_provider {
 		return false;
 	}
 
-	fuse_logic_provider(const E& fused_entity, const logic_step step) : 
+	stepless_fuse_logic_provider(const E& fused_entity) : 
 		fused_entity(fused_entity), 
-		step(step),
 		fuse(fused_entity.template get<components::hand_fuse>()),
 		fuse_def(fused_entity.template get<invariants::hand_fuse>()),
 		fused_transform(fused_entity.get_logic_transform()),
 		holder(fused_entity.get_owning_transfer_capability()),
-		cosm(step.get_cosmos()),
+		cosm(fused_entity.get_cosmos()),
 		clk(cosm.get_clock()),
 		character_now_defusing(cosm[fuse.character_now_defusing])
 	{
@@ -58,17 +60,171 @@ struct fuse_logic_provider {
 		return fuse.amount_defused >= fuse_def.defusing_duration_ms;
 	}
 
-	void interrupt_arming() const {
-		fuse.when_started_arming = {};
-		stop_started_arming_sound();
+	void refresh_fused_physics() const {
+		fused_entity.infer_rigid_body();
+		fused_entity.infer_colliders();
 	}
 
-	void release_explosive_if_armed() const {
-		if (fuse.armed()) {
-			release_explosive();
+	void defuse() const {
+		fuse.when_armed = {};
+	}
+
+	void start_arming() const {
+		fuse.when_started_arming = clk.now;
+	}
+
+	void start_defusing() const {
+		fuse.amount_defused = 0.f;
+	}
+
+	bool has_started_arming() const {
+		return fuse.when_started_arming.was_set();
+	}
+
+	bool has_started_defusing() const {
+		return fuse.amount_defused >= 0.f;
+	}
+
+	bool bombsite_in_range() const {
+		return ::bombsite_in_range(fused_entity);
+	}
+
+	bool arming_conditions_fulfilled() const {
+		if (holder.dead()) {
+			return false;
 		}
 
-		interrupt_arming();
+		if (fuse_def.must_stand_still_to_arm) {
+			if (!is_standing_still(holder)) {
+				return false;
+			}
+		}
+
+		if (!bombsite_in_range()) {
+			return false;
+		}
+
+		return true;
+	}
+
+	template <class C>
+	bool defusing_character_in_range(const C& candidate) const {
+		return 
+			candidate.get_official_faction() != fused_entity.get_official_faction() 
+			&& use_button_overlaps(candidate, fused_entity).has_value()
+		;
+	}
+
+	template <class C>
+	bool defusing_conditions_fulfilled(const C& candidate) const {
+		return 
+			fuse_def.defusing_enabled()
+			&& candidate.alive() 
+			&& ::sentient_and_conscious(candidate)
+			&& candidate.get_official_faction() != fused_entity.get_official_faction()
+			&& is_standing_still(candidate)
+		;
+	}
+
+	bool defusing_character_still_in_range() const {
+		return defusing_character_in_range(character_now_defusing);
+	}
+
+	bool defusing_conditions_still_fulfilled() const {
+		return defusing_conditions_fulfilled(character_now_defusing);
+	}
+
+	bool arming_requested() const {
+		return holder.alive() && fuse.arming_requested;
+	}
+
+	bool defusing_requested() const {
+		return character_now_defusing.alive() && character_now_defusing.template get<components::sentience>().use_button == use_button_state::DEFUSING; 
+	}
+};
+
+template <class E>
+struct fuse_logic_provider : public stepless_fuse_logic_provider<E> {
+	using base = stepless_fuse_logic_provider<E>;
+	using base::fused_entity;
+	using base::fuse;
+	using base::fuse_def;
+	using base::fused_transform;
+	using base::holder;
+	using base::cosm;
+	using base::clk;
+	using base::character_now_defusing;
+	using base::character_now_defusing_pos;
+
+	using base::start_defusing;
+	using base::arming_requested;
+	using base::arming_delay_complete;
+	using base::arming_conditions_fulfilled;
+	using base::has_started_arming;
+	using base::start_arming;
+	using base::defusing_requested;
+	using base::defusing_delay_complete;
+	using base::defuse;
+	using base::defusing_conditions_still_fulfilled;
+	using base::refresh_fused_physics;
+	using base::defusing_character_still_in_range;
+	using base::has_started_defusing;
+
+	const logic_step step;
+
+	fuse_logic_provider(const E& fused_entity, const logic_step step) : 
+		base(fused_entity), step(step) 
+	{}
+
+	void arm_explosive() const {
+		if (const auto transfers = holder.template find<components::item_slot_transfers>()) {
+			if (const auto transfers_def = holder.template find<invariants::item_slot_transfers>()) {
+				if (clk.lasts(transfers_def->arm_explosive_cooldown_ms, transfers->when_last_armed_explosive)) {
+					return;
+				}
+			}
+
+			transfers->when_last_armed_explosive = clk.now;
+		}
+
+		fuse.when_armed = clk.now;
+		fuse.slot_when_armed = fused_entity.get_current_slot().get_type();
+
+		fused_entity.template get<components::sender>().set(holder);
+
+		fuse_def.armed_sound.start(
+			step,
+			sound_effect_start_input::fire_and_forget(fused_transform).set_listener(holder),
+			predictable_only_by(holder)
+		);
+
+		if (fuse_def.always_release_when_armed) {
+			release_explosive();
+
+			if (const auto sentience = holder.template find<components::sentience>()) {
+				sentience->hand_flags = {};
+			}
+		}
+	}
+
+	void interrupt_defusing() const {
+		messages::battle_event_message msg;
+		msg.subject = character_now_defusing;
+		msg.event = battle_event::INTERRUPTED_DEFUSING;
+		step.post_message(msg);
+
+		if (character_now_defusing.alive()) {
+			if (const auto sentience = character_now_defusing.template find<components::sentience>()) {
+				auto& u = sentience->use_button;
+
+				if (u == use_button_state::DEFUSING) {
+					u = use_button_state::QUERYING;
+				}
+			}
+		}
+
+		fuse.character_now_defusing = {}; 
+		fuse.amount_defused = -1.f;
 	}
 
 	void release_explosive() const {
@@ -109,13 +265,9 @@ struct fuse_logic_provider {
 		);
 	}
 
-	void refresh_fused_physics() const {
-		fused_entity.infer_rigid_body();
-		fused_entity.infer_colliders();
-	}
-
-	void defuse() const {
-		fuse.when_armed = {};
+	void interrupt_arming() const {
+		fuse.when_started_arming = {};
+		stop_started_arming_sound();
 	}
 
 	void stop_started_arming_sound() const {
@@ -171,117 +323,12 @@ struct fuse_logic_provider {
 		);
 	}
 
-	void start_arming() const {
-		fuse.when_started_arming = clk.now;
-	}
-
-	void start_defusing() const {
-		fuse.amount_defused = 0.f;
-	}
-
-	bool has_started_arming() const {
-		return fuse.when_started_arming.was_set();
-	}
-
-	bool has_started_defusing() const {
-		return fuse.amount_defused >= 0.f;
-	}
-
-	void arm_explosive() const {
-		if (const auto transfers = holder.template find<components::item_slot_transfers>()) {
-			if (const auto transfers_def = holder.template find<invariants::item_slot_transfers>()) {
-				if (clk.lasts(transfers_def->arm_explosive_cooldown_ms, transfers->when_last_armed_explosive)) {
-					return;
-				}
-			}
-
-			transfers->when_last_armed_explosive = clk.now;
-		}
-
-		fuse.when_armed = clk.now;
-		fuse.slot_when_armed = fused_entity.get_current_slot().get_type();
-
-		fused_entity.template get<components::sender>().set(holder);
-
-		fuse_def.armed_sound.start(
-			step,
-			sound_effect_start_input::fire_and_forget(fused_transform).set_listener(holder),
-			predictable_only_by(holder)
-		);
-
-		if (fuse_def.always_release_when_armed) {
+	void release_explosive_if_armed() const {
+		if (fuse.armed()) {
 			release_explosive();
-
-			if (const auto sentience = holder.template find<components::sentience>()) {
-				sentience->hand_flags = {};
-			}
-		}
-	}
-
-	void interrupt_defusing() const {
-		messages::battle_event_message msg;
-		msg.subject = character_now_defusing;
-		msg.event = battle_event::INTERRUPTED_DEFUSING;
-		step.post_message(msg);
-
-		if (character_now_defusing.alive()) {
-			if (const auto sentience = character_now_defusing.find<components::sentience>()) {
-				auto& u = sentience->use_button;
-
-				if (u == use_button_state::DEFUSING) {
-					u = use_button_state::QUERYING;
-				}
-			}
 		}
 
-		fuse.character_now_defusing = {}; 
-		fuse.amount_defused = -1.f;
-	}
-
-	bool bombsite_in_range() const {
-		return ::bombsite_in_range(fused_entity);
-	}
-
-	bool arming_conditions_fulfilled() const {
-		if (holder.dead()) {
-			return false;
-		}
-
-		if (fuse_def.must_stand_still_to_arm) {
-			if (!is_standing_still(holder)) {
-				return false;
-			}
-		}
-
-		if (!bombsite_in_range()) {
-			return false;
-		}
-
-		return true;
-	}
-
-	bool defusing_character_in_range() const {
-		return 
-			character_now_defusing.get_official_faction() != fused_entity.get_official_faction() 
-			&& use_button_overlaps(character_now_defusing, fused_entity).has_value()
-		;
-	}
-
-	bool defusing_conditions_fulfilled() const {
-		return 
-			fuse_def.defusing_enabled()
-			&& character_now_defusing.alive() 
-			&& character_now_defusing.get_official_faction() != fused_entity.get_official_faction()
-			&& is_standing_still(character_now_defusing)
-		;
-	}
-
-	bool arming_requested() const {
-		return holder.alive() && fuse.arming_requested;
-	}
-
-	bool defusing_requested() const {
-		return character_now_defusing.alive() && character_now_defusing.get<components::sentience>().use_button == use_button_state::DEFUSING; 
+		interrupt_arming();
 	}
 
 	void advance_arming_and_defusing() const {
@@ -320,7 +367,7 @@ struct fuse_logic_provider {
 						return;
 					}
 
-					if (defusing_conditions_fulfilled() && defusing_character_in_range()) {
+					if (defusing_conditions_still_fulfilled() && defusing_character_still_in_range()) {
 						if (!has_started_defusing()) {
 							start_defusing();
 							play_started_defusing_sound();

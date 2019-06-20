@@ -2,6 +2,7 @@
 #include "game/detail/buy_area_in_range.h"
 #include "game/detail/bombsite_in_range.h"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
+#include "game/detail/start_defusing_nearby_bomb.h"
 
 template <class E, class M, class I>
 inline void draw_context_tip(
@@ -45,9 +46,29 @@ inline void draw_context_tip(
 		return colored(" \"" + key_to_string_shortened(found_k) + "\" ", settings.bound_key_color);
 	};
 
+	const auto final_pos = vec2i(screen_size.x / 2, settings.tip_offset_mult * screen_size.y);
+	const auto line_height = font.metrics.get_height();
+
+	auto pen = final_pos;
+
+	auto do_line = [&](const auto& with_text) {
+		print_stroked(
+			out,
+			pen,
+			with_text,
+			{ augs::ralign::CX, augs::ralign::CY }
+		);
+
+		pen.y += line_height;
+	};
+
 	const auto total_text = [&]() {
 		formatted_string total_text;
 
+		auto break_line = [&]() {
+			do_line(total_text);
+			total_text.clear();
+		};
 
 		auto get_key_str = [&](auto h) {
 			using H = decltype(h);
@@ -57,6 +78,9 @@ inline void draw_context_tip(
 			}
 			else if constexpr(std::is_same_v<H, game_intent_type>) {
 				return format_key(config.game_controls, h);
+			}
+			else if constexpr(std::is_same_v<H, inventory_gui_intent_type>) {
+				return format_key(config.inventory_gui_controls, h);
 			}
 			else {
 				static_assert(always_false_v<H>);
@@ -82,6 +106,10 @@ inline void draw_context_tip(
 		}
 
 		if (viewed_character.dead()) {
+			return total_text;
+		}
+
+		if (!sentient_and_conscious(viewed_character)) {
 			return total_text;
 		}
 
@@ -145,7 +173,9 @@ inline void draw_context_tip(
 				return total_text;
 			}
 			else {
-				text("You cannot plant the bomb here.\nFind the bombsite!");
+				text("You cannot plant the bomb here.");
+				break_line();
+				text("Find the bombsite!");
 				return total_text;
 			}
 		}
@@ -160,16 +190,34 @@ inline void draw_context_tip(
 			}
 		}
 
+		const auto defuse_request = ::query_defusing_nearby_bomb(viewed_character); 
+
+		if (defuse_request.defusing_already) {
+			text("Stay still while defusing.");
+
+			if (viewed_character.get_wielded_items().size() > 0) {
+				break_line();
+				text("Hide items with");
+				hotkey(inventory_gui_intent_type::HOLSTER);
+				text("or drop them with");
+				hotkey(game_intent_type::DROP);
+				text("to defuse faster!");
+			}
+
+			return total_text;
+		}
+
+		if (defuse_request.success()) {
+			text("Press");
+			hotkey(game_intent_type::USE);
+			text("to defuse the bomb.");
+
+			return total_text;
+		}
+
 		(void)viewed_character;
 		return total_text;
 	}();
 
-	const auto final_pos = vec2i(screen_size.x / 2, settings.tip_offset_mult * screen_size.y);
-
-	print_stroked(
-		out,
-		final_pos,
-		total_text,
-		{ augs::ralign::CX, augs::ralign::CY }
-	);
+	do_line(total_text);
 }
