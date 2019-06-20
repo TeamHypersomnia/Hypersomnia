@@ -1,4 +1,0 @@
-Revision no.: 6786 (clean)
-Build date: Wed Jun 19 20:41:09 2019
-Commit message:
-To avoid confusion, show loadi(...)
