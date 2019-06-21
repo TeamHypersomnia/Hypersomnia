@@ -1,6 +1,6 @@
 #pragma once
-#include <experimental/filesystem>
+#include <filesystem>
 
 namespace augs {
-	using path_type = std::experimental::filesystem::path;
+	using path_type = std::filesystem::path;
 }

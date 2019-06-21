@@ -81,7 +81,7 @@ namespace std {
 	template <>
 	struct hash<augs::path_type> {
 		size_t operator()(const augs::path_type& k) const {
-			return std::experimental::filesystem::hash_value(k);
+			return std::filesystem::hash_value(k);
 		}
 	};
 }

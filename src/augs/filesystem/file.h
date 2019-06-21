@@ -7,7 +7,7 @@
 #include <algorithm>
 
 #include <fstream>
-#include <experimental/filesystem>
+#include <filesystem>
 
 #include "augs/string/typesafe_sprintf.h"
 #include "augs/filesystem/path.h"
@@ -34,28 +34,28 @@ namespace augs {
 	}
 
 	using file_open_error = std::ifstream::failure;
-	using filesystem_error = std::experimental::filesystem::filesystem_error;
+	using filesystem_error = std::filesystem::filesystem_error;
 	
 	inline auto last_write_time(const path_type& path) {
-		return std::experimental::filesystem::last_write_time(path);
+		return std::filesystem::last_write_time(path);
 	}
 
 	inline bool exists(const path_type& path) {
-		return std::experimental::filesystem::exists(path);
+		return std::filesystem::exists(path);
 	}
 
 	inline bool is_empty(const path_type& path) {
-		return std::experimental::filesystem::is_empty(path);
+		return std::filesystem::is_empty(path);
 	}
 
 	inline decltype(auto) remove_file(const path_type& path) {
 		std::error_code err;
-		return std::experimental::filesystem::remove(path, err);
+		return std::filesystem::remove(path, err);
 	}
 
 	inline decltype(auto) remove_directory(const path_type& path) {
 		std::error_code err;
-		return std::experimental::filesystem::remove_all(path, err);
+		return std::filesystem::remove_all(path, err);
 	}
 
 	enum class free_path_type {

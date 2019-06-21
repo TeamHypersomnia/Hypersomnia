@@ -48,7 +48,7 @@ namespace augs {
 #elif PLATFORM_UNIX
 namespace augs {
 	void open_text_editor(const std::string& on_file) {
-		const auto full_path = std::experimental::filesystem::absolute(augs::path_type(on_file));
+		const auto full_path = std::filesystem::absolute(augs::path_type(on_file));
 		const auto command = augs::path_type("$VISUAL ") += full_path;
 
 		augs::shell(command.string());

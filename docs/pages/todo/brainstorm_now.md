@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- research ping behaviour under low performance
+
 - blurred text if zoomed out
 - hrtf still crashes on windows
 	- let's test it thoroughly on linux

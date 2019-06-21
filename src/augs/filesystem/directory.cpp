@@ -2,7 +2,7 @@
 #include "augs/filesystem/file.h"
 
 namespace augs {
-	namespace fs = std::experimental::filesystem;
+	namespace fs = std::filesystem;
 
 	bool create_directory(const path_type& input_path) {
 		return fs::create_directory(input_path);

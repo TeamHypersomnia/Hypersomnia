@@ -3353,3 +3353,4 @@ which can be done from Settings->Reset all settings to factory default.
 	- Solution: Simply never interrupt the reloading when all other candidates EQUALLY good or worse
 - Fix gradobicie price
 
+- show ping on integrated server

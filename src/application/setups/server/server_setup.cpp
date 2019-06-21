@@ -819,6 +819,8 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 
 				const auto clamped_ping = std::clamp(rounded_ping, 0, int(max_ping));
 
+				last_player_metas[client_id].stats.ping = clamped_ping;
+
 				update.ping_values.push_back(static_cast<uint8_t>(clamped_ping));
 			};
 

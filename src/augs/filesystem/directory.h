@@ -2,7 +2,7 @@
 #include <vector>
 #include <string>
 
-#include <experimental/filesystem>
+#include <filesystem>
 
 #include "augs/filesystem/path.h"
 
@@ -20,7 +20,7 @@ namespace augs {
 		D directory_callback,
 		F file_callback
 	) {
-		using namespace std::experimental::filesystem;
+		using namespace std::filesystem;
 
 		for (recursive_directory_iterator i(dir_path), end; i != end; ++i) {
 			const auto p = i->path();
