@@ -28,30 +28,44 @@ std::optional<reloading_context> calc_reloading_context_for(const E& capability,
 
 		entity_id found_ammo;
 
-		const auto traversed_slots = slot_flags {
-			slot_function::BACK,
-			slot_function::SHOULDER,
-			slot_function::PRIMARY_HAND,
-			slot_function::SECONDARY_HAND,
-			slot_function::ITEM_DEPOSIT,
-			slot_function::PERSONAL_DEPOSIT
+		auto try_item = [&](const auto& candidate_item) {
+			if (mag_slot.can_contain(candidate_item)) {
+				found_ammo = candidate_item;
+
+				return recursive_callback_result::ABORT;
+			}
+
+			return recursive_callback_result::CONTINUE_AND_RECURSE;
 		};
 
-		capability.for_each_contained_item_recursive(
-			[&](const auto& candidate_item) {
-				if (mag_slot.can_contain(candidate_item)) {
-					found_ammo = candidate_item;
+		/* 
+			Let hands have precedence so that they break ties 
+			once we decide on the charge item.
 
-					return recursive_callback_result::CONTINUE_DONT_RECURSE;
-				}
+			This fixes the rocket launcher reloading going haywire.
+		*/
 
-				return recursive_callback_result::CONTINUE_AND_RECURSE;
-			},
-			traversed_slots
-		);
+		const auto wielded_items = capability.get_wielded_items();
+
+		for (const auto& w : wielded_items) {
+			if (try_item(w) == recursive_callback_result::ABORT) {
+				break;
+			}
+		}
+
+		if (!found_ammo.is_set()) {
+			const auto traversed_slots = slot_flags {
+				slot_function::PERSONAL_DEPOSIT,
+				slot_function::ITEM_DEPOSIT,
+				slot_function::SHOULDER,
+				slot_function::BACK
+			};
+
+			capability.for_each_contained_item_recursive(try_item, traversed_slots);
+		}
 
 		if (found_ammo.is_set()) {
-			RLD_LOG_NVPS(cosm[found_ammo]);
+			RLD_LOG_NVPS(cosm[found_ammo], cosm[found_ammo].get_current_slot());
 
 			reloading_context ctx;
 
