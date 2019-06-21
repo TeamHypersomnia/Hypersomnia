@@ -13,9 +13,7 @@ namespace augs {
 		date_time();
 		date_time(const std::time_t& t) : t(t) {}
 		date_time(const std::chrono::system_clock::time_point&);
-#if !PLATFORM_WINDOWS
 		date_time(const file_time_type&);
-#endif
 
 		operator std::time_t() const {
 			return t;
