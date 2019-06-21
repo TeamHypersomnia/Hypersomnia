@@ -111,6 +111,12 @@ namespace augs {
 				else if (in.msg == message::keyup) {
 					io.KeysDown[static_cast<int>(in.data.key.key)] = false;
 				}
+				else if (in.msg == message::syskeydown) {
+					io.KeysDown[static_cast<int>(in.data.key.key)] = true;
+				}
+				else if (in.msg == message::syskeyup) {
+					io.KeysDown[static_cast<int>(in.data.key.key)] = false;
+				}
 				else if (in.msg == message::character) {
 					const auto c = in.data.character.code_point;
 

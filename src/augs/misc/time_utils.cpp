@@ -27,7 +27,16 @@ augs::date_time::date_time(
 {
 }
 
-#if !PLATFORM_WINDOWS
+// TODO: FIX date_time acquisition on Windows!!!!
+
+#if PLATFORM_WINDOWS
+augs::date_time::date_time(
+	const augs::file_time_type&
+) : 
+	date_time({}) 
+{
+}
+#else
 augs::date_time::date_time(
 	const augs::file_time_type& tp
 ) : 
