@@ -5,9 +5,9 @@
 #include "augs/audio/audio_settings.h"
 
 /** Opaque device handle */
-typedef struct ALCdevice_struct ALCdevice;
+typedef struct ALCdevice ALCdevice;
 /** Opaque context handle */
-typedef struct ALCcontext_struct ALCcontext;
+typedef struct ALCcontext ALCcontext;
 
 namespace augs {
 	struct audio_error : error_with_typesafe_sprintf {
