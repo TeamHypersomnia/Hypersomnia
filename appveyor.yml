@@ -3,7 +3,7 @@ branches:
   only:
     - master
 
-image: Visual Studio 2017 Preview
+image: Visual Studio 2019 Preview
 configuration: Release
 build:
   verbosity: detailed
@@ -21,7 +21,7 @@ install:
   - set PATH=C:\projects\deps\ninja;%PATH%
   - ninja --version
 
-  - appveyor DownloadFile http://releases.llvm.org/7.0.1/LLVM-7.0.1-win64.exe -FileName llvm-installer.exe
+  - appveyor DownloadFile http://releases.llvm.org/8.0.0/LLVM-8.0.0-win64.exe -FileName llvm-installer.exe
   - START /WAIT llvm-installer.exe /S /D=C:\"Program Files\LLVM"
 
 notifications:
@@ -37,7 +37,7 @@ artifacts:
     name: Hypersomnia (64-bit)
 
 before_build:
-  - call "C:\Program Files (x86)\Microsoft Visual Studio\Preview\Community\VC\Auxiliary\Build\vcvarsall.bat" x64
+  - call "C:\Program Files (x86)\Microsoft Visual Studio\2019\Preview\VC\Auxiliary\Build\vcvarsall.bat" x64
   - cd C:\projects\hypersomnia
 
 build_script:
