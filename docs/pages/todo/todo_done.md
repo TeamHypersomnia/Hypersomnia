@@ -3345,3 +3345,11 @@ which can be done from Settings->Reset all settings to factory default.
 		- b vent
 		- mid vent
 		- back vent
+- Strange bug when reloading the rocket launcher
+	- It might be due to ids changing when un-stacking to put a charge in the hand
+		- Then the id of the wielded stack (of one rocket) is different from id of the original stack
+			- and the reloading gets interrupted, and the rocket gets stacked into the original stack
+				- ad infinitum
+	- Solution: Simply never interrupt the reloading when all other candidates EQUALLY good or worse
+- Fix gradobicie price
+

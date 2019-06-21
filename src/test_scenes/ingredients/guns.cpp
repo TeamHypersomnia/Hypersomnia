@@ -1758,7 +1758,7 @@ namespace test_flavours {
 				item.space_occupied_per_charge = to_space_units("0.1");
 				item.categories_for_slot_compatibility.set(item_category::SHOT_CHARGE);
 				item.stackable = true;
-				item.standard_price = static_cast<money_type>(800);
+				item.standard_price = static_cast<money_type>(150);
 
 				meta.set(item);
 			}
@@ -2034,7 +2034,7 @@ namespace test_flavours {
 				item.categories_for_slot_compatibility.set(item_category::MAGAZINE);
 				item.space_occupied_per_charge = to_space_units("0.8");
 				item.wield_sound.id = to_sound_id(test_scene_sound_id::MAGAZINE_DRAW);
-				item.standard_price = 140;
+				item.standard_price = 200;
 				meta.set(item);
 			}
 		}
@@ -3384,7 +3384,7 @@ namespace test_flavours {
 			item.holding_stance = item_holding_stance::RIFLE_LIKE;
 			item.gratis_ammo_pieces_with_first = 0;
 			meta.set(item);
-			meta.get<invariants::item>().standard_price = 2500;
+			meta.get<invariants::item>().standard_price = 3500;
 		}
 
 		{

@@ -6,15 +6,23 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- fix area indicator zoom in editor
-- Strange bug when reloading the rocket launcher
-	- It might be due to ids changing when un-stacking to put a charge in the hand
-		- Then the id of the wielded stack (of one rocket) is different from id of the original stack
-			- and the reloading gets interrupted, and the rocket gets stacked into the original stack
-				- ad infinitum
-	- Solution: Simply never interrupt the reloading when all other candidates EQUALLY good or worse
+- blurred text if zoomed out
+- hrtf still crashes on windows
+	- let's test it thoroughly on linux
 
-- Fix gradobicie price
+- hide indicators for yourself
+- Upgrade appveyor
+
+- Advanced RCON functionality
+	- Rcon can download the log
+	- Rcon should have a reserved slot to enter in case of emergency
+	- RCON password
+	- Switch teams
+	- Restart
+	- A way to view dedicated server stats?
+
+- Remember to keep the old master rcon password so that basic level rcons cannot change it
+- fix area indicator zoom in editor
 
 - 1 byte in entropy = 60 bytes/sec for recordings
 - 10 bytes (2 floats + 2 flags) = 600 bytes/sec for recordings = 2mb / hr
@@ -37,9 +45,6 @@ summary: That which we are brainstorming at the moment.
 
 - Test polish characters on Windows again
 
-- A way to view dedicated server stats?
-	- Rcon could have access to it 
-
 - Perhaps replace shift+c with some other shortcut?
 
 - Test on windows what's gonna happen if we try to host a server twice on the same port, also on linux
@@ -58,19 +63,12 @@ summary: That which we are brainstorming at the moment.
 	- Can't use spells
 	- 1900$
 
-- Remember to keep the old master rcon password so that basic level rcons cannot change it
-
 - Perhaps interpolate velocity values if we detect that they are ugly at 60hz, apart from the case with skull rocket?
 
 - Keep timestamps in log structures and, when writing the logs to a file, preffix the log entries with time
 	- Will later be good to separate logs via date, for the dedicated server
 
 - Dump logs once every 1000 or so
-- Rcon can download the log
-
-- Rcon should have a reserved slot to enter in case of emergency
-
-- RCON password
 - Write editor write date to version.txt file
 	
 - Still, if we are able to always connect and catch up with inputs, it should never disconnect if we resync mid-game
@@ -113,7 +111,6 @@ summary: That which we are brainstorming at the moment.
 	- watch the footage from chrzan
 
 - Indeed, there is a problem when importing project-specific gfx on windows, but not on linux
-- enable hrtf crash on windows
 
 - fix neon maps being generated in the project folder
 

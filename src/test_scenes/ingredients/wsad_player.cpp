@@ -231,8 +231,8 @@ namespace test_flavours {
 			components::sentience sentience_inst;
 
 			sentience.shake_settings.max_duration_ms = 1800.f;
-			sentience.shake_settings.duration_mult = 0.7f;
-			sentience.shake_settings.final_mult = 0.9f;
+			sentience.shake_settings.duration_mult = 0.65f;
+			sentience.shake_settings.final_mult = 0.7f;
 
 			sentience.knockout_impulse.linear *= 1.3f;
 

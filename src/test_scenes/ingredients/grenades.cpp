@@ -142,7 +142,7 @@ namespace test_flavours {
 			test_flavours::add_lying_item_dynamic_body(meta);
 
 			invariants::item item;
-			item.standard_price = 400;
+			item.standard_price = 500;
 			item.space_occupied_per_charge = to_space_units("1.0");
 			meta.set(item);
 
@@ -176,8 +176,8 @@ namespace test_flavours {
 			in.type = adverse_element_type::INTERFERENCE;
 
 			dmg.pass_through_held_item_sound.id = to_sound_id(test_scene_sound_id::BULLET_PASSES_THROUGH_HELD_ITEM);
-			dmg.shake.duration_ms = 2500.f;
-			dmg.shake.mult = 1.7f;
+			dmg.shake.duration_ms = 2000.f;
+			dmg.shake.mult = 1.6f;
 
 			{
 				auto e = in;
@@ -208,8 +208,8 @@ namespace test_flavours {
 				auto& c = explosive.cascade[0];
 				c.flavour_id = to_entity_flavour_id(test_explosion_bodies::INTERFERENCE_CASCADE);
 				c.num_spawned = 3;
-				c.num_explosions = { 2, 0 };
-				c.initial_speed = { 1400.f, 0.3f };
+				c.num_explosions = { 3, 0 };
+				c.initial_speed = { 2000.f, 0.3f };
 			}
 
 			meta.set(explosive);
