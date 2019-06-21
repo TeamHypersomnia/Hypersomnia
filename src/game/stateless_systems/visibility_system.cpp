@@ -199,9 +199,16 @@ struct target_vertex {
 	vec2 pos;
 	bool is_on_a_bound;
 	int vision_extends = 0;
+	real32 dist_sq;
 
 	bool operator<(const target_vertex& b) const {
-		return angle < b.angle;
+		const auto diff = angle - b.angle;
+
+		if (augs::is_epsilon(diff, 0.00001f)) {
+			return dist_sq > b.dist_sq;
+		}
+
+		return diff < 0;
 	}
 
 	bool operator==(const target_vertex& b) const {
@@ -307,6 +314,7 @@ void visibility_system::calc_visibility(
 
 			new_vertex.angle = comparable_angle(diff);
 			new_vertex.is_on_a_bound = false;
+			new_vertex.dist_sq = diff.length_sq();
 
 			all_vertices_transformed.push_back(new_vertex);
 			return std::addressof(all_vertices_transformed.back());
@@ -320,6 +328,7 @@ void visibility_system::calc_visibility(
 
 			new_vertex.angle = comparable_angle(diff);
 			new_vertex.is_on_a_bound = true;
+			new_vertex.dist_sq = diff.length_sq();
 
 			all_vertices_transformed.push_back(new_vertex);
 		};
@@ -709,8 +718,8 @@ void visibility_system::calc_visibility(
 					const auto distance_from_origin = (vertex.pos - eye_meters).length();
 
 					if ((ray_callback.intersection - eye_meters).length() + epsilon_threshold_obstacle_hit_meters < distance_from_origin) {
+						VIS_LOG("obstructed");
 						if (DEBUG_DRAWING.draw_cast_rays) {
-							VIS_LOG("obstructed");
 							draw_line(vertex.pos, ray_obstructed_col);
 						}
 					}
@@ -774,6 +783,26 @@ void visibility_system::calc_visibility(
 							}
 						}
 					}
+					else {
+						/*
+							This would happen if the vertex that has extend vision = 0
+							is almost collinear with the eye and the vertex that begins to have a non-zero extended vision
+
+							We choose to register it as a vertex hit
+						*/
+
+						VIS_LOG("collinear vtx hit");
+						if (push_double_ray(vertex.pos)) {
+							response.vertex_hits.emplace_back(
+								static_cast<int>(double_rays.size()) - 1, 
+								si.get_pixels(vertex.pos)
+							);
+
+							if (DEBUG_DRAWING.draw_cast_rays) {
+								draw_line(vertex.pos, vtx_hit_col);
+							}
+						}
+					}
 				}
 				else {
 					/* 
@@ -828,7 +857,7 @@ void visibility_system::calc_visibility(
 							}
 							else {
 								VIS_LOG("boundary hit: vtx hit");
-								if (push_double_ray(boundary_intersection)) {
+								if (push_double_ray(vertex.pos)) {
 									response.vertex_hits.emplace_back(
 										static_cast<int>(double_rays.size()) - 1, 
 										si.get_pixels(vertex.pos)

@@ -6,7 +6,18 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Fix annoying corners on cyberaqua
+- fix area indicator zoom in editor
+- Strange bug when reloading the rocket launcher
+	- It might be due to ids changing when un-stacking to put a charge in the hand
+		- Then the id of the wielded stack (of one rocket) is different from id of the original stack
+			- and the reloading gets interrupted, and the rocket gets stacked into the original stack
+				- ad infinitum
+	- Solution: Simply never interrupt the reloading when all other candidates EQUALLY good or worse
+
+- Fix gradobicie price
+
+- 1 byte in entropy = 60 bytes/sec for recordings
+- 10 bytes (2 floats + 2 flags) = 600 bytes/sec for recordings = 2mb / hr
 
 - Per-character settings to store within entropy
 	- They could be stored inside the per-character entropy itself
@@ -16,15 +27,13 @@ summary: That which we are brainstorming at the moment.
 		- We can save on the mouse movements
 		- We could compress them even down to two bytes per movement in the most optimistic case
 		- just one bit to determine the range
+	- what if there is no map entry for the current character entropy?
+		- Then in theory there should be no need to use these settings, e.g. there will be no applications of force or crosshair movements
+		- We could always cache some last observed values
 
 - In-game tip system
 	- Notifications like "can't holster" will be drawn a little above the context tip
 		- So that both can appear at once
-	- Randomized
-		- Stay still to regenerate stamina faster.
-		- Double-tap R to drop the old mag for a faster reload. Near-empty mags are dropped automatically.
-		- Melee blows are stronger when you run.
-		- Electric Shield lets you live longer, but slows down your movement.
 
 - Test polish characters on Windows again
 
@@ -42,60 +51,12 @@ summary: That which we are brainstorming at the moment.
 - In host a server menu option, simply spawn a separate dedicated server process and use locally created client_setup to connect
 	- Something to check if the servers is already on
 
-- Port cyberaqua again from the same lua files to avoid re-importing and loss of accuracy
-
 - panel -> ct computers
-
-- Callout markers
-	- Separate trees
-	- names
-		- catwalk
-		- pump
-		- generator
-		- toxic a/toxic b
-		- horse
-		- turns
-		- helipad
-		- radars
-		- cache
-		- t vent
-		- computers
-		- ct computers
-		- mid vent
-		- green mid
-		- office
-		- brains
-		- connector 
-		- knight (konik)
-		- stairs
-		- turns
-		- long b
-		- ninja
-		- fern
-		- b lobby
-		- b gate
-		- neck
-		- gate
-		- fork
-		- glass
-		- hole
-		- mixer
-		- secret (instead of knight)
-		- b vent
-		- mid vent
-		- back vent
 		
-
-
-
 - Tinfoil hat
 	- Grants a 50% protection from magic
 	- Can't use spells
 	- 1900$
-
-
-- More GUI responses
-	- 
 
 - Remember to keep the old master rcon password so that basic level rcons cannot change it
 

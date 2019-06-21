@@ -3302,3 +3302,46 @@ which can be done from Settings->Reset all settings to factory default.
 		- Nothing should appear once we're dead
 - fix those knife offsets on character
 
+- Fix annoying corners on cyberaqua
+
+- Port cyberaqua again from the same lua files to avoid re-importing and loss of accuracy
+
+
+- Callout markers
+	- Separate trees
+	- names
+		- catwalk
+		- pump
+		- generator
+		- toxic a/toxic b
+		- horse
+		- turns
+		- helipad
+		- radars
+		- cache
+		- t vent
+		- computers
+		- ct computers
+		- mid vent
+		- green mid
+		- office
+		- brains
+		- connector 
+		- knight (konik)
+		- stairs
+		- turns
+		- long b
+		- ninja
+		- fern
+		- b lobby
+		- b gate
+		- neck
+		- gate
+		- fork
+		- glass
+		- hole
+		- mixer
+		- secret (instead of knight)
+		- b vent
+		- mid vent
+		- back vent

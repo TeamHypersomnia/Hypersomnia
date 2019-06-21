@@ -4,6 +4,8 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Fix parallel visibility queries
+
 Would you like keep the old settings,
 or reset them to factory defaults?
 
