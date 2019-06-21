@@ -8,6 +8,8 @@ summary: That which we are brainstorming at the moment.
 
 - Separate thread for render queue
 	- We'll just queue commands for now
+	- The finalizers can happen in the rendering thread
+	- We can still query for the need of new atlases in the main/logic thread
 	- Perhaps the same with openal if hrtf proves to decrease performance
 
 - research ping behaviour under low performance

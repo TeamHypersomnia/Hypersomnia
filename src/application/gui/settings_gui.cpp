@@ -1017,7 +1017,9 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::ADVANCED: {
+#if !PLATFORM_WINDOWS
 				text(u8"Test: いい товарищ żółćńźś");
+#endif
 
 				revertable_checkbox("Show developer console", config.session.show_developer_console);
 				revertable_checkbox("Log keystrokes", config.window.log_keystrokes);
