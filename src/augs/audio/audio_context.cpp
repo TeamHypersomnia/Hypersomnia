@@ -15,6 +15,19 @@
 #include "augs/audio/audio_settings.h"
 #include "augs/templates/corresponding_field.h"
 
+#if PLATFORM_WINDOWS
+int setenv(const char *name, const char *value, int overwrite)
+{
+    int errcode = 0;
+    if(!overwrite) {
+        size_t envsize = 0;
+        errcode = getenv_s(&envsize, NULL, 0, name);
+        if(errcode || envsize) return errcode;
+    }
+    return _putenv_s(name, value);
+}
+#endif
+
 #if BUILD_OPENAL
 static std::string list_audio_devices(const ALCchar * const devices) {
 	const ALCchar *device = devices, *next = devices + 1;
@@ -54,6 +67,11 @@ namespace augs {
 
 	audio_device::audio_device(const std::string& device_name) {
 #if BUILD_OPENAL
+		const auto hrtf_path = (std::filesystem::current_path() / "content" / "hrtf").string();
+		LOG_NVPS(hrtf_path);
+
+		setenv("ALSOFT_LOCAL_PATH", hrtf_path.c_str(), 0);
+
 		device = alcOpenDevice(device_name.size() > 0 ? device_name.c_str() : nullptr);
 		
 		AL_CHECK_DEVICE(device);

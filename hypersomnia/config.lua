@@ -85,7 +85,7 @@ return {
     default_filtering = "NEAREST_NEIGHBOR" -- alternatively: "LINEAR"
   },
   audio = {
-    enable_hrtf = false,
+    enable_hrtf = true,
     max_number_of_sound_sources = 4096,
     output_device_name = "",
 	sound_meters_per_second = 150

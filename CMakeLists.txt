@@ -1473,7 +1473,7 @@ elseif(CLANG)
 
 			prefer_shared_libraries()
 		else()
-			list(APPEND HYPERSOMNIA_LIBS c++fs c++experimental)
+			list(APPEND HYPERSOMNIA_LIBS c++fs)
 		endif()
 	endif()
 elseif(GCC)

@@ -123,12 +123,29 @@ namespace augs {
 			throw sound_decoding_error("Failed to decode %x as a sound file: unknown extension.", path);
 		}
 
+#define MONO_TO_STEREO 1
+
+#if MONO_TO_STEREO
+		if (channels == 1) {
+			channels = 2;
+
+			decltype(samples) new_samples;
+			new_samples.resize(samples.size() * 2);
+
+			for (std::size_t i = 0; i < samples.size(); ++i) {
+				new_samples[i * 2] = samples[i];
+				new_samples[i * 2 + 1] = samples[i];
+			}
+
+			samples = std::move(new_samples);
+		}
+#endif
+
 #if LOG_AUDIO_BUFFERS
-		LOG("Sound: %x\nSample rate: %x\nChannels: %x\nFormat: %x\nLength in seconds: %x",
+		LOG("Sound: %x\nFrequency: %x\nChannels: %x\nLength in seconds: %x",
 			path,
-			info.samplerate,
-			info.channels,
-			info.format,
+			frequency,
+			channels,
 			compute_length_in_seconds()
 		);
 #endif

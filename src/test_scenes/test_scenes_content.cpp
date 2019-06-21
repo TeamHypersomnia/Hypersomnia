@@ -72,7 +72,7 @@ void populate_test_scene_common(const loaded_image_caches_map& caches, cosmos_co
 		defs.reference_distance = 1000.f;
 		defs.distance_model = augs::distance_model::INVERSE_DISTANCE_CLAMPED;
 		defs.basic_nonlinear_rolloff = 1.f;
-		defs.air_absorption = 5.f;
+		defs.air_absorption = 2.f;
 	}
 
 	auto& common_assets = common.assets;

@@ -168,6 +168,10 @@ namespace test_flavours {
 				mag.finish_unmounting_sound.id = to_sound_id(test_scene_sound_id::SZTURM_FINISH_UNLOAD);
 			}
 
+			if (meta.get_name() == "Ao44") {
+				mag.finish_mounting_sound.id = to_sound_id(test_scene_sound_id::AO44_FINISH_LOAD);
+			}
+
 			meta.set(item);
 		};
 	

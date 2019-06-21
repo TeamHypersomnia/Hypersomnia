@@ -6,11 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Separate thread for render queue
+	- We'll just queue commands for now
+	- Perhaps the same with openal if hrtf proves to decrease performance
+
 - research ping behaviour under low performance
 
 - blurred text if zoomed out
 - hrtf still crashes on windows
-	- let's test it thoroughly on linux
 
 - hide indicators for yourself
 - Upgrade appveyor

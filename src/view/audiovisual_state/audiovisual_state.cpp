@@ -111,8 +111,10 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 
 	auto& sounds = get<sound_system>();
 
+	auto additive_sound_scope = measure_scope_additive(performance.sound_logic);
+
 	if (viewed_character) {
-		auto scope = measure_scope(performance.sound_logic);
+		auto scope = measure_scope(additive_sound_scope);
 
 		auto ear = input.camera;
 		ear.cone.eye.transform = viewed_character.get_viewing_transform(interp);
@@ -132,7 +134,11 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		);
 	}
 
-	sounds.fade_sources(input.frame_delta);
+	{
+		auto scope = measure_scope(additive_sound_scope);
+
+		sounds.fade_sources(input.frame_delta);
+	}
 }
 
 void audiovisual_state::spread_past_infection(const const_logic_step step) {
