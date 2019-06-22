@@ -29,6 +29,10 @@ struct key_hijack_request {
 	std::optional<augs::event::keys::key> captured;
 };
 
+namespace augs {
+	class audio_context;
+};
+
 class settings_gui_state : public standard_window_mixin<settings_gui_state> {
 	settings_pane active_pane = settings_pane::GENERAL;
 
@@ -47,6 +51,7 @@ public:
 
 	void perform(
 		sol::state& lua,
+		const augs::audio_context& audio,
 		const augs::path_type& path_for_saving,
 		const config_lua_table& canon_config,
 		config_lua_table& into,

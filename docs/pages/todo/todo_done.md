@@ -3364,3 +3364,5 @@ which can be done from Settings->Reset all settings to factory default.
 
 - Increase buy time
 - How do we even kick bots on the server?
+- Show last HRTF status below Enable HRTF
+

@@ -1259,6 +1259,7 @@ and then hitting Save settings.
 				last_saved_config,
 				local_config_path,
 				settings_gui,
+				audio,
 				lua,
 				[&]() {
 					if (!has_current_setup()) {

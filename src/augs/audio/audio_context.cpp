@@ -114,24 +114,30 @@ namespace augs {
 	}
 
 	void audio_device::log_hrtf_status() const {
+		const auto stat = get_hrtf_status();
+		LOG(stat.message);
+	}
+
+	audio_device::hrtf_stat audio_device::get_hrtf_status() const {
 #if BUILD_OPENAL
 		ALint hrtf_status;
 		alcGetIntegerv(device, ALC_HRTF_STATUS_SOFT, 1, &hrtf_status);
 		AL_CHECK_DEVICE(device);
 
 		std::string status;
+		bool succ = false;
 
 		switch (hrtf_status) {
 		case ALC_HRTF_DISABLED_SOFT: status = "ALC_HRTF_DISABLED_SOFT"; break;
-		case ALC_HRTF_ENABLED_SOFT: status = "ALC_HRTF_ENABLED_SOFT"; break;
+		case ALC_HRTF_ENABLED_SOFT: succ = true; status = "ALC_HRTF_ENABLED_SOFT"; break;
 		case ALC_HRTF_DENIED_SOFT: status = "ALC_HRTF_DENIED_SOFT"; break;
-		case ALC_HRTF_REQUIRED_SOFT: status = "ALC_HRTF_REQUIRED_SOFT"; break;
-		case ALC_HRTF_HEADPHONES_DETECTED_SOFT: status = "ALC_HRTF_HEADPHONES_DETECTED_SOFT"; break;
+		case ALC_HRTF_REQUIRED_SOFT: succ = true; status = "ALC_HRTF_REQUIRED_SOFT"; break;
+		case ALC_HRTF_HEADPHONES_DETECTED_SOFT: succ = true; status = "ALC_HRTF_HEADPHONES_DETECTED_SOFT"; break;
 		case ALC_HRTF_UNSUPPORTED_FORMAT_SOFT: status = "ALC_HRTF_UNSUPPORTED_FORMAT_SOFT"; break;
 		default: status = "Unknown"; break;
 		}
 
-		LOG("HRTF status: %x", status);
+		return { succ, status };
 #endif
 	}
 

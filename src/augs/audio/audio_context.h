@@ -33,7 +33,13 @@ namespace augs {
 		audio_device& operator=(const audio_device&) = delete;
 
 	public:
+		struct hrtf_stat {
+			bool success = false;
+			std::string message;
+		};
+
 		void reset_device(audio_settings);
+		hrtf_stat get_hrtf_status() const;
 		void log_hrtf_status() const;
 
 		operator ALCdevice*() {

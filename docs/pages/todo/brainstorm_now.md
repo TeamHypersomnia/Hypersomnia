@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Show last HRTF status below Enable HRTF
-
 - fix these project-relative paths for neons at last, so that stamps dont get versioned
 - editor too should have a loading notice, at least in editing mode
 - for variation, don't switch teams after match summary

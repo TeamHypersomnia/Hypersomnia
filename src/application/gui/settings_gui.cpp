@@ -49,6 +49,7 @@ void settings_gui_state::set_hijacked_key(const augs::event::keys::key k) {
 
 void settings_gui_state::perform(
 	sol::state& lua,
+	const augs::audio_context& audio,
 	const augs::path_type& config_path_for_saving,
 	const config_lua_table& canon_config,
 	config_lua_table& config,
@@ -376,8 +377,22 @@ void settings_gui_state::perform(
 				revertable_slider("Sound effects volume", config.audio_volume.sound_effects, 0.f, 1.f);
 				revertable_slider("GUI volume", config.audio_volume.gui, 0.f, 1.f);
 
-				revertable_checkbox("Enable HRTF", config.audio.enable_hrtf);
 				revertable_slider("Speed of sound (m/s)", config.audio.sound_meters_per_second, 50.f, 400.f);
+
+				ImGui::Separator();
+
+				revertable_checkbox("Enable HRTF", config.audio.enable_hrtf);
+
+				{
+					auto scope = scoped_indent(); 
+
+					const auto stat = audio.get_device().get_hrtf_status();
+					text(" Status:");
+					ImGui::SameLine();
+
+					const auto col = stat.success ? green : red;
+					text_color(stat.message, col);
+				}
 
 				break;
 			}
