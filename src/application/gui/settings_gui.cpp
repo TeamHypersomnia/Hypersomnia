@@ -402,6 +402,11 @@ void settings_gui_state::perform(
 				revertable_drag_vec2(SCOPE_CFG_NVP(mouse_sensitivity));
 				revertable_checkbox(SCOPE_CFG_NVP(swap_mouse_buttons_in_akimbo));
 
+				{
+					auto& scope_cfg = config.input.game_gui;
+					revertable_checkbox(SCOPE_CFG_NVP(allow_switching_to_bare_hands_as_previous_wielded_weapon));
+				}
+
 				const auto binding_text_color = rgba(255, 255, 255, 255);
 				const auto bindings_title_color = rgba(255, 255, 0, 255);
 

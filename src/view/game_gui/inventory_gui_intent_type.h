@@ -8,7 +8,7 @@ enum class inventory_gui_intent_type {
 	// GEN INTROSPECTOR enum class inventory_gui_intent_type
 	INVALID,
 
-	LAST_HOTBAR_SELECTION_SETUP,
+	PREVIOUSLY_WIELDED_WEAPON,
 
 	HOLSTER,
 	HOLSTER_SECONDARY,

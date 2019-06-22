@@ -18,6 +18,8 @@
 #include "view/game_gui/elements/value_bar.h"
 #include "game/detail/inventory/wielding_setup.h"
 
+struct game_gui_input_settings;
+
 struct character_gui {
 	std::array<hotbar_button, 10> hotbar_buttons;
 	std::array<action_button, 10> action_buttons;
@@ -80,7 +82,8 @@ struct character_gui {
 	);
 
 	wielding_setup make_wielding_setup_for_last_hotbar_selection_setup(
-		const const_entity_handle gui_entity
+		const const_entity_handle gui_entity,
+		const game_gui_input_settings& input
 	);
 
 	static entity_id get_hovered_world_entity(

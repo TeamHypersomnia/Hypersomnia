@@ -79,7 +79,7 @@ return {
     F7 = "SPECIAL_ACTION_BUTTON_12",
 
     H = "HOLSTER",
-    Q = "LAST_HOTBAR_SELECTION_SETUP"
+    Q = "PREVIOUSLY_WIELDED_WEAPON"
   },
   renderer = {
     default_filtering = "NEAREST_NEIGHBOR" -- alternatively: "LINEAR"
@@ -259,7 +259,11 @@ return {
 	  y = 3
 	},
 
-	swap_mouse_buttons_in_akimbo = false
+	swap_mouse_buttons_in_akimbo = false,
+
+	game_gui = {
+      allow_switching_to_bare_hands_as_previous_wielded_weapon = true
+	}
   },
   gui_fonts = {
 	  gui = {

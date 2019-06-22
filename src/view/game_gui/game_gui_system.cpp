@@ -200,7 +200,8 @@ bool game_gui_system::control_gui_world(
 
 void game_gui_system::control_hotbar_and_action_button(
 	const const_entity_handle gui_entity,
-	const inventory_gui_intent intent
+	const inventory_gui_intent intent,
+	const game_gui_input_settings& input
 ) {
 	if (gui_entity.dead()) {
 		return;
@@ -349,8 +350,8 @@ void game_gui_system::control_hotbar_and_action_button(
 				}
 			}
 		}
-		else if (i.intent == inventory_gui_intent_type::LAST_HOTBAR_SELECTION_SETUP && i.was_pressed()) {
-			const auto wielding = gui.make_wielding_setup_for_last_hotbar_selection_setup(gui_entity);
+		else if (i.intent == inventory_gui_intent_type::PREVIOUSLY_WIELDED_WEAPON && i.was_pressed()) {
+			const auto wielding = gui.make_wielding_setup_for_last_hotbar_selection_setup(gui_entity, input);
 
 			//if (!wielding.same_as_in(gui_entity)) {
 				queue_wielding(gui_entity, wielding);

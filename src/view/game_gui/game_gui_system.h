@@ -24,6 +24,8 @@ struct game_gui_post_solve_settings {
 	prediction_input prediction;
 };
 
+struct game_gui_input_settings;
+
 class game_gui_system {
 public:
 	std::unordered_map<entity_id, item_button> item_buttons;
@@ -91,7 +93,8 @@ public:
 
 	void control_hotbar_and_action_button(
 		const const_entity_handle root_entity,
-		const inventory_gui_intent intent
+		const inventory_gui_intent intent,
+		const game_gui_input_settings&
 	);
 
 	void advance(

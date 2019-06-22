@@ -1559,7 +1559,7 @@ and then hitting Save settings.
 							}
 							if (const auto it = mapped_or_nullptr(viewing_config.inventory_gui_controls, key)) {
 								if (should_draw_game_gui()) {
-									game_gui.control_hotbar_and_action_button(get_game_gui_subject(), { *it, *key_change });
+									game_gui.control_hotbar_and_action_button(get_game_gui_subject(), { *it, *key_change }, viewing_config.input.game_gui);
 
 									if (was_pressed) {
 										continue;

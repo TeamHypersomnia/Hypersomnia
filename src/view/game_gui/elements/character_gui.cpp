@@ -42,6 +42,8 @@
 #include "game/detail/inventory/wielding_setup.hpp"
 #include "game/detail/weapon_like.h"
 
+#include "view/game_gui_input_settings.h"
+
 #define LOG_HOTBAR 0
 
 template <class... Args>
@@ -198,7 +200,8 @@ void character_gui::assign_item_to_first_free_hotbar_button(
 }
 
 wielding_setup character_gui::make_wielding_setup_for_last_hotbar_selection_setup(
-	const const_entity_handle gui_entity
+	const const_entity_handle gui_entity,
+	const game_gui_input_settings& input
 ) {
 	const auto& cosm = gui_entity.get_cosmos();
 
@@ -211,9 +214,26 @@ wielding_setup character_gui::make_wielding_setup_for_last_hotbar_selection_setu
 	HOT_LOG_NVPS(cosm[current_hands[0]]);
 	HOT_LOG_NVPS(cosm[current_hands[1]]);
 
+	const bool allow_bare = input.allow_switching_to_bare_hands_as_previous_wielded_weapon;
+
 	auto chosen_new_setup = [&]() {
-		if (!was_last_setup_set || viable_last_setup == current_setup || viable_last_setup.is_bare_hands(cosm)) {
-			/* Last is identical so wield first item from hotbar */
+		const bool last_was_bare = viable_last_setup.is_bare_hands(cosm);
+
+		const bool last_setup_viable = 
+			was_last_setup_set 
+			&& !(viable_last_setup == current_setup)
+			&& (!last_was_bare || allow_bare)
+		;
+
+		if (last_setup_viable) {
+			HOT_LOG_NVPS(cosm[last_hands[0]]);
+			HOT_LOG_NVPS(cosm[last_hands[1]]);
+
+			HOT_LOG("Different setups, standard request.");
+			return viable_last_setup;
+		}
+		else {
+			/* Last was identical or infeasible so wield first item from hotbar */
 
 			was_last_setup_set = true;
 
@@ -284,13 +304,6 @@ wielding_setup character_gui::make_wielding_setup_for_last_hotbar_selection_setu
 
 			HOT_LOG("No owned item candidate.");
 			return wielding_setup::bare_hands();
-		}
-		else {
-			HOT_LOG_NVPS(cosm[last_hands[0]]);
-			HOT_LOG_NVPS(cosm[last_hands[1]]);
-
-			HOT_LOG("Different setups, standard request.");
-			return viable_last_setup;
 		}
 	}();
 
