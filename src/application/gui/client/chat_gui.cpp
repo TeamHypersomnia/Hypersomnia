@@ -25,6 +25,7 @@ bool chat_gui_state::add_entry_from_game_notification(
 		new_entry.message = str;
 		new_entry.overridden_message_color = col;
 
+		LOG(new_entry.operator std::string());
 		add_entry(std::move(new_entry));
 	};
 

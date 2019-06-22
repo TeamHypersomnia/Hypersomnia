@@ -132,8 +132,8 @@ void load_test_scene_sentience_properties(
 			in.type = adverse_element_type::FORCE;
 			in.wave_shake_radius_mult = 6.f;
 
-			in.subject_shake.duration_ms = 600.f;
-			in.subject_shake.mult = 1.f;
+			in.subject_shake.duration_ms = 1000.f;
+			in.subject_shake.mult = 2.f;
 			in.damage.shake = in.subject_shake;
 		}
 	}
@@ -201,7 +201,7 @@ void load_test_scene_sentience_properties(
 				in.sound.modifier.reference_distance = 2000.f;
 				in.sound.id = to_sound_id(test_scene_sound_id::EXPLOSION);
 
-				in.subject_shake.duration_ms = 400.f;
+				in.subject_shake.duration_ms = 1000.f;
 				in.subject_shake.mult = 1.f;
 				in.damage.shake = in.subject_shake;
 				in.subject_impulse = 1550.f;
@@ -218,7 +218,7 @@ void load_test_scene_sentience_properties(
 				in.sound.modifier.reference_distance = 2000.f;
 				in.sound.id = to_sound_id(test_scene_sound_id::GREAT_EXPLOSION);
 
-				in.subject_shake.duration_ms = 500.f;
+				in.subject_shake.duration_ms = 1000.f;
 				in.subject_shake.mult = 1.46f;
 				in.damage.shake = in.subject_shake;
 				in.subject_impulse = 2326.f;
@@ -237,7 +237,7 @@ void load_test_scene_sentience_properties(
 				in.subject_impulse = 1938.f;
 				in.subject_inert_ms = 400.f;
 
-				in.subject_shake.duration_ms = 730.f;
+				in.subject_shake.duration_ms = 1000.f;
 				in.subject_shake.mult = 2.f;
 				in.damage.shake = in.subject_shake;
 

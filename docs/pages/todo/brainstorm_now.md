@@ -6,14 +6,21 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Show last HRTF status below Enable HRTF
+
+- fix these project-relative paths for neons at last, so that stamps dont get versioned
+- editor too should have a loading notice, at least in editing mode
+- for variation, don't switch teams after match summary
+- Port fy_minilab
+
+- Release triggers on match summary and halftime
+
+- (flag) Treat holstered as a separate setup for Q
+
 - Things to update for windows
 	- Appveyor script: llvm 8 when the visual studio 2019 is ready to take the new filesystem
 		- We had differing versions, the one on our computer is newer so it builds everything
 	- augs::date_time constructor for file write type, used to display last write times of lua meta files, although that's low priority
-
-- HRTF does not crash on Windows but it does not work anyway
-	AL lib: (EE) Failed to set Stereo, got 5.1 Surround (Rear) instead
-	AL lib: (EE) Failed to set 44100hz, got 48000hz instead
 
 - Separate thread for render queue
 	- We'll just queue commands for now

@@ -5,6 +5,16 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+- The server (rightfully) kicks the bots because it sees them as lingering characters for clients who are not yet set
+	- That only means that if we ever get to implement bots,
+
+- HRTF
+	- Windows was crashing when HRTF was unsupported, but only on release. Now as HRTF can find the mhr files, it does not crash
+	- But you need drivers for it to work properly, or a different frequency was set by default for my headphones
+	- A drop in quality even for stereo sounds could be heard if 32khz mhr file was found in content/hrtf
+		- It is particularly evident for the knife wielding sound
+
+
 - Client was initializing clientTime to 0.0 and had to catch up to the current time, which is why we had delays for connecting.
 
 - Why do we have player (+player) ?

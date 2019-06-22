@@ -174,7 +174,7 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 	checkbox("Overwrite common assets", settings.overwrite_common_assets);
 	checkbox("Overwrite non-decoration flavours", settings.overwrite_non_decoration_flavours);
 	checkbox("Overwrite economy vars of the first created bomb ruleset", settings.overwrite_economy_vars);
-	checkbox("Overwrite whole ruleset", settings.overwrite_whole_ruleset);
+	checkbox("Overwrite whole ruleset (except bot quota and other very specific)", settings.overwrite_whole_ruleset);
 	checkbox("Overwrite spells", settings.overwrite_spells);
 	checkbox("Overwrite meters", settings.overwrite_meters);
 	checkbox("Overwrite perks", settings.overwrite_perks);

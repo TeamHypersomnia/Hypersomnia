@@ -32,7 +32,7 @@ struct electric_triad {
 	spell_common_data common;
 	spell_appearance appearance;
 	missile_flavour_type missile_flavour;
-	real32 spread_in_absence_of_hostiles = 60.f;
+	real32 spread_in_absence_of_hostiles = 40.f;
 	real32 missile_velocity = 2500.f;
 	// END GEN INTROSPECTOR
 

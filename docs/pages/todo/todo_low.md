@@ -4,6 +4,7 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Fix neons shining through the character body
 - Bind buying to E so that we can release T for other purposes
 
 - Fix parallel visibility queries

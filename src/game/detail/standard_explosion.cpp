@@ -102,6 +102,11 @@ void standard_explosion_input::instantiate(
 	if (subject_alive) {
 		if (const auto sentience = subject.find<components::sentience>()) {
 			subject_shake.apply(now, subject.template get<invariants::sentience>(), *sentience);
+
+			impulse_input in;
+			in.angular = damage.base / 15.f;
+
+			subject.apply_crosshair_recoil(in);
 		}
 
 		if (subject_impulse > 0.f) {

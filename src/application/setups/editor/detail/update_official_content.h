@@ -322,7 +322,17 @@ inline void update_official_content(const editor_command_input cmd_in, update_of
 	}
 
 	if (settings.overwrite_whole_ruleset) {
-		(*folder.commanded->rulesets.all.get_for<bomb_mode>().begin()).second = bt;
+		auto& overwritten = (*folder.commanded->rulesets.all.get_for<bomb_mode>().begin()).second;
+		const auto previous = overwritten;
+
+		overwritten = bt;
+
+		overwritten.bot_quota = previous.bot_quota;
+		overwritten.max_players_per_team = previous.max_players_per_team;
+		overwritten.freeze_secs = previous.freeze_secs;
+		overwritten.warmup_secs = previous.warmup_secs;
+		overwritten.max_rounds = previous.max_rounds;
+		overwritten.round_end_secs = previous.round_end_secs;
 	}
 
 	folder.commanded->work.post_load_state_correction();

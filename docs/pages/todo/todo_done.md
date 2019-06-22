@@ -3358,3 +3358,9 @@ which can be done from Settings->Reset all settings to factory default.
 	- let's test it thoroughly on linux
 
 - hrtf still crashes on windows
+- HRTF does not crash on Windows but it does not work anyway
+	AL lib: (EE) Failed to set Stereo, got 5.1 Surround (Rear) instead
+	AL lib: (EE) Failed to set 44100hz, got 48000hz instead
+
+- Increase buy time
+- How do we even kick bots on the server?
