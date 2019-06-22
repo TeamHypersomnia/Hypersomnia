@@ -52,6 +52,9 @@ struct update_official_content_settings {
 	bool overwrite_non_decoration_flavours = true;
 	bool overwrite_economy_vars = true;
 	bool overwrite_whole_ruleset = true;
+	bool overwrite_meters = true;
+	bool overwrite_spells = true;
+	bool overwrite_perks = true;
 };
 
 inline void update_official_content(const editor_command_input cmd_in, update_official_content_settings settings) {
@@ -220,7 +223,19 @@ inline void update_official_content(const editor_command_input cmd_in, update_of
 			}
 
 			if (settings.overwrite_common_assets) {
-				comm.assets = test->world.get_common_assets();
+				comm.assets = from_cosm.get_common_assets();
+			}
+
+			if (settings.overwrite_spells) {
+				comm.spells = from_cosm.get_common_significant().spells;
+			}
+
+			if (settings.overwrite_perks) {
+				comm.perks = from_cosm.get_common_significant().perks;
+			}
+
+			if (settings.overwrite_meters) {
+				comm.meters = from_cosm.get_common_significant().meters;
 			}
 
 			add_unpathed_assets(mut_to_logicals.plain_animations, from_logicals.plain_animations, "Animation");

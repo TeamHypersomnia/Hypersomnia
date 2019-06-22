@@ -1,4 +1,4 @@
-Revision no.: 6786 (clean)
-Build date: Wed Jun 19 20:41:09 2019
+Revision no.: 6805 (dirty)
+Build date: Fri Jun 21 17:24:54 2019
 Commit message:
-To avoid confusion, show loadi(...)
+Resampled wavs to 44.1

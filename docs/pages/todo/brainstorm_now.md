@@ -6,6 +6,18 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+
+- Bind buying to E so that we can release T for other purposes
+
+- Things to update for windows
+	- Appveyor script: llvm 8 when the visual studio 2019 is ready to take the new filesystem
+		- We had differing versions, the one on our computer is newer so it builds everything
+	- augs::date_time constructor for file write type, used to display last write times of lua meta files, although that's low priority
+
+- HRTF does not crash on Windows but it does not work anyway
+	AL lib: (EE) Failed to set Stereo, got 5.1 Surround (Rear) instead
+	AL lib: (EE) Failed to set 44100hz, got 48000hz instead
+
 - Separate thread for render queue
 	- We'll just queue commands for now
 	- The finalizers can happen in the rendering thread
