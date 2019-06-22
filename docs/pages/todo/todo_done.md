@@ -3356,3 +3356,5 @@ which can be done from Settings->Reset all settings to factory default.
 - show ping on integrated server
 - ao44 finish load sound is unused!!
 	- let's test it thoroughly on linux
+
+- hrtf still crashes on windows

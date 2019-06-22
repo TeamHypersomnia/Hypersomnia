@@ -6,9 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-
-- Bind buying to E so that we can release T for other purposes
-
 - Things to update for windows
 	- Appveyor script: llvm 8 when the visual studio 2019 is ready to take the new filesystem
 		- We had differing versions, the one on our computer is newer so it builds everything
@@ -25,9 +22,10 @@ summary: That which we are brainstorming at the moment.
 	- Perhaps the same with openal if hrtf proves to decrease performance
 
 - research ping behaviour under low performance
+	- Our 140-150 rtt matched against the server-reported ping in scoreboard
+		- so it was probably a case of low fps at kartezjan's
 
 - blurred text if zoomed out
-- hrtf still crashes on windows
 
 - hide indicators for yourself
 - Upgrade appveyor

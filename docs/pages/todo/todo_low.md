@@ -4,6 +4,8 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- Bind buying to E so that we can release T for other purposes
+
 - Fix parallel visibility queries
 
 Would you like keep the old settings,
