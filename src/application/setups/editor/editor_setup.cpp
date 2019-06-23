@@ -805,17 +805,35 @@ bool editor_setup::confirm_modal_popup() {
 	return false;
 }
 
+augs::path_type make_relative_if_possible(augs::path_type original) {
+	const auto relative = std::filesystem::relative(original);
+
+	if (begins_with(relative.string(), "..")) {
+		return original;
+	}
+
+	return relative;
+}
+
+auto make_chooser_lambda(const augs::window& window, const char* const message) {
+	return [&window, message](){
+		auto result = window.choose_directory_dialog(message);
+
+		if (result) {
+			result = make_relative_if_possible(*result).string();
+		}
+
+		return result;
+	};
+}
+
 void editor_setup::open(const augs::window& window) {
 	if (ok_only_popup) {
 		return;
 	}
 
-	open_folder_dialog = std::async(
-		std::launch::async,
-		[&](){
-			return window.choose_directory_dialog("Open folder with project files");
-		}
-	);
+	const auto message = "Open folder with project files";
+	open_folder_dialog = std::async(std::launch::async, make_chooser_lambda(window, message));
 }
 
 void editor_setup::save(const augs::window& window) {
@@ -849,12 +867,8 @@ void editor_setup::save_as(const augs::window& window) {
 		return;
 	}
 
-	save_folder_dialog = std::async(
-		std::launch::async,
-		[&](){
-			return window.choose_directory_dialog("Choose folder for project files");
-		}
-	);
+	const auto message = "Choose folder for project files";
+	save_folder_dialog = std::async(std::launch::async, make_chooser_lambda(window, message));
 }
 
 void editor_setup::undo() {
