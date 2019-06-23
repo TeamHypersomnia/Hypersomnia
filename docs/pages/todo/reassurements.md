@@ -5,6 +5,9 @@ permalink: reassurements
 summary: We don't need to do this yet, because...
 ---
 
+- We'll separate servers by tickrate
+	- So for now don't bother worrying about calculating tickrate based on number of players
+
 - Ensure that the main's presolve doesn't change the solvable
 	- Indeed it is only about debug lines
 

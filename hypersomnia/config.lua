@@ -97,7 +97,9 @@ return {
   },
   sound = {
 	sync_sounds_longer_than_secs = 5,
-	max_divergence_before_sync_secs = 1
+	max_divergence_before_sync_secs = 1,
+	set_listener_orientation_to_character_orientation = false,
+	listener_reference = "CHARACTER_POSITION"
   },
   simulation_receiver = {
     misprediction_smoothing_multiplier = 1.2000000476837158

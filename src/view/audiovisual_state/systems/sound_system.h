@@ -53,6 +53,7 @@ class sound_system {
 		const loaded_sounds_map& manager;
 		const interpolation_system& interp;
 		const character_camera& ear;
+		const camera_cone camera;
 		const augs::delta dt;
 		const double speed_multiplier;
 		const double inv_tickrate;
@@ -138,7 +139,9 @@ class sound_system {
 
 	void update_listener(
 		const const_entity_handle subject,
-		const interpolation_system& sys
+		const interpolation_system& sys,
+		const sound_system_settings& settings,
+		const vec2 world_screen_center
 	);
 
 	void start_fading(generic_sound_cache&, float fade_per_sec = 3.f);

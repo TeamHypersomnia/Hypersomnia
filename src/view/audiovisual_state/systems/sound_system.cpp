@@ -80,14 +80,35 @@ void sound_system::clear_sources_playing(const assets::sound_id id) {
 
 void sound_system::update_listener(
 	const const_entity_handle listener,
-	const interpolation_system& sys
+	const interpolation_system& sys,
+	const sound_system_settings& settings,
+	const vec2 world_screen_center
 ) {
 	const auto si = listener.get_cosmos().get_si();
-	const auto listener_pos = listener.get_viewing_transform(sys).pos;
+	const auto character_transform = listener.get_viewing_transform(sys);
 
-	augs::set_listener_position(si, listener_pos);
+	{
+		const auto character_pos = character_transform.pos;
+
+		const auto listener_pos = 
+			settings.listener_reference == listener_position_reference::SCREEN_CENTER ?
+			world_screen_center :
+			character_pos
+		;
+
+		augs::set_listener_position(si, listener_pos);
+	}
+
 	augs::set_listener_velocity(si, listener.get_effective_velocity());
-	augs::set_listener_orientation({ 0.f, -1.f, 0.f, 0.f, 0.f, -1.f });
+
+	vec2 orientation = vec2(0, -1.f);
+
+	if (settings.set_listener_orientation_to_character_orientation) {
+		orientation = vec2(1, 0);
+		orientation.rotate(character_transform.rotation);
+	}
+
+	augs::set_listener_orientation({ 0.f, -1.f, 0.f, orientation.x, 0.f, orientation.y });
 }
 
 void sound_system::generic_sound_cache::init(update_properties_input in) {
@@ -487,7 +508,14 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 #endif
 	const auto listening_character = in.get_listener();
 
-	update_listener(listening_character, in.interp);
+	const auto screen_center = in.camera.get_world_screen_center();
+
+	update_listener(
+		listening_character, 
+		in.interp, 
+		in.settings,
+		screen_center
+	);
 
 	const auto& cosm = listening_character.get_cosmos();
 

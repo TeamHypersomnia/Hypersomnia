@@ -127,6 +127,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 				input.sounds,
 				interp,
 				ear,
+				input.camera.cone,
 				dt,
 				input.speed_multiplier,
 				input.inv_tickrate
@@ -242,6 +243,7 @@ void audiovisual_state::standard_post_solve(
 					input.sounds, 
 					interp, 
 					ear,
+					input.camera.cone,
 					augs::delta::zero,
 					1.0,
 					0.0

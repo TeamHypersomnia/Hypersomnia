@@ -9,6 +9,7 @@
 
 #include "augs/misc/imgui/imgui_control_wrappers.h"
 #include "augs/misc/imgui/imgui_enum_combo.h"
+#include "augs/misc/imgui/imgui_enum_radio.h"
 #include "augs/misc/imgui/imgui_utils.h"
 #include "augs/audio/audio_context.h"
 
@@ -174,6 +175,17 @@ void settings_gui_state::perform(
 			revert(f);
 		};
 
+		auto revertable_enum_radio = [&](auto l, auto& f, auto&&... args) {
+			std::string ss = l;
+			cut_trailing(ss, "#0123456789");
+			text(ss);
+
+			auto scope = scoped_indent();
+
+			enum_radio(f, std::forward<decltype(args)>(args)...);
+			//revert(f);
+		};
+
 		auto do_lag_simulator = [&](auto& sim) {
 			//#if !IS_PRODUCTION_BUILD
 			revertable_checkbox("Enable lag simulator", sim.is_enabled);
@@ -240,9 +252,9 @@ void settings_gui_state::perform(
 				}
 
 				input_text<100>(CONFIG_NVP(window.name), ImGuiInputTextFlags_EnterReturnsTrue); revert(config.window.name);
-				revertable_checkbox("Automatically hide settings in-game", config.session.automatically_hide_settings_ingame);
 
-				enum_combo("Vsync mode", config.window.vsync_mode);
+				revertable_enum_radio("Vsync mode", config.window.vsync_mode);
+				revertable_checkbox("Automatically hide settings in-game", config.session.automatically_hide_settings_ingame);
 
 				ImGui::Separator();
 
@@ -373,11 +385,23 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::AUDIO: {
-				revertable_slider("Music volume", config.audio_volume.music, 0.f, 1.f);
-				revertable_slider("Sound effects volume", config.audio_volume.sound_effects, 0.f, 1.f);
-				revertable_slider("GUI volume", config.audio_volume.gui, 0.f, 1.f);
+				text_color("Volume settings", yellow);
 
-				revertable_slider("Speed of sound (m/s)", config.audio.sound_meters_per_second, 50.f, 400.f);
+				ImGui::Separator();
+
+				{
+					auto& scope_cfg = config.audio_volume;
+
+					revertable_slider(SCOPE_CFG_NVP(music), 0.f, 1.f);
+					revertable_slider(SCOPE_CFG_NVP(sound_effects), 0.f, 1.f);
+					revertable_slider("GUI", scope_cfg.gui, 0.f, 1.f);
+				}
+
+				text_disabled("\n\n");
+
+				ImGui::Separator();
+
+				text_color("Sound effect spatialization", yellow);
 
 				ImGui::Separator();
 
@@ -387,12 +411,28 @@ void settings_gui_state::perform(
 					auto scope = scoped_indent(); 
 
 					const auto stat = audio.get_device().get_hrtf_status();
-					text(" Status:");
+					text(" Status on device:");
 					ImGui::SameLine();
 
 					const auto col = stat.success ? green : red;
 					text_color(stat.message, col);
 				}
+
+				{
+
+					auto& scope_cfg = config.sound;
+
+					revertable_enum_radio("Keep listener position at:", scope_cfg.listener_reference);
+					revertable_checkbox("Make listener face the same direction as character", scope_cfg.set_listener_orientation_to_character_orientation);
+				}
+
+				text_disabled("\n\n");
+
+				ImGui::Separator();
+				text_color("Miscellaneous", yellow);
+				ImGui::Separator();
+
+				revertable_slider("Speed of sound (m/s)", config.audio.sound_meters_per_second, 50.f, 400.f);
 
 				break;
 			}
@@ -709,7 +749,7 @@ void settings_gui_state::perform(
 						if (scope_cfg.draw_offscreen_indicators) {
 							auto indent = scoped_indent();
 
-							revertable_enum(SCOPE_CFG_NVP(offscreen_reference_mode));
+							revertable_enum_radio(SCOPE_CFG_NVP(offscreen_reference_mode));
 							revertable_checkbox(SCOPE_CFG_NVP(draw_offscreen_callouts));
 
 							revertable_slider(SCOPE_CFG_NVP(nickname_characters_for_offscreen_indicators), 0, static_cast<int>(max_nickname_length_v));

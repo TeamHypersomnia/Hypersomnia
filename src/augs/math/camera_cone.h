@@ -90,6 +90,10 @@ struct camera_cone {
 		// TODO: support rotation
 		return eye.transform.pos + (cursor_pos - screen_size / 2) / eye.zoom;
 	}
+
+	auto get_world_screen_center() const {
+		return to_world_space(vec2(screen_size) / 2);
+	}
 };
 
 using zoom_type = camera_eye::zoom_type;
