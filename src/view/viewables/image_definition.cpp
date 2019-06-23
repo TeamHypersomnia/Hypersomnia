@@ -70,8 +70,6 @@ std::optional<cached_neon_map_in> image_definition_view::should_regenerate_neon_
 
 		const auto generated_neon_map_path = find_generated_neon_map_path().value();
 
-		LOG_NVPS(project_dir);
-
 		return ::should_regenerate_neon_map(
 			diffuse_path,
 			generated_neon_map_path,
