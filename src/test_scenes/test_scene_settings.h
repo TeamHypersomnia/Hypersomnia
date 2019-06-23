@@ -3,6 +3,6 @@
 struct test_scene_settings {
 	// GEN INTROSPECTOR struct test_scene_settings
 	bool create_minimal = false;
-	unsigned scene_tickrate = 144;
+	unsigned scene_tickrate = 60;
 	// END GEN INTROSPECTOR
 };

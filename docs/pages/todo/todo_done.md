@@ -3367,3 +3367,10 @@ which can be done from Settings->Reset all settings to factory default.
 - Show last HRTF status below Enable HRTF
 
 - editor too should have a loading notice, at least in editing mode
+- fix these project-relative paths for neons at last, so that stamps dont get versioned
+	- Reason: When picking a path, ranger and others probably return the full path, instead of relative
+	- However, a server or a client, when given just "arenas/de_cyberaqua", detect the adjacent neons files to be custom neons
+	- Actually this way is maybe better because we don't have to regenerate them a million times
+
+- (flag) Treat holstered as a separate setup for Q
+

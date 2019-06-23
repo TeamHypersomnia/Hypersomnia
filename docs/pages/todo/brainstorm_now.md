@@ -6,17 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- fix these project-relative paths for neons at last, so that stamps dont get versioned
-	- Reason: When picking a path, ranger and others probably return the full path, instead of relative
-	- However, a server or a client, when given just "arenas/de_cyberaqua", detect the adjacent neons files to be custom neons
-	- Actually this way is maybe better because we don't have to regenerate them a million times
+- Do we send the client back their own entropy?
+	- If no and we just add num accepted commands, a desync may occur if the server can modify for some reason the entropy after receiving it from the client
+	- if yes, that's a slight optimization opportunity, although it may complicate stuff a little
 
 - for variation, don't switch teams after match summary
 - Port fy_minilab
 
 - Release triggers on match summary and halftime
-
-- (flag) Treat holstered as a separate setup for Q
 
 - Things to update for windows
 	- Appveyor script: llvm 8 when the visual studio 2019 is ready to take the new filesystem
