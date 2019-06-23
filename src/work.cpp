@@ -1296,9 +1296,9 @@ and then hitting Save settings.
 								launch_setup(launch_type::CLIENT);
 							}
 						}
-
-						streaming.display_loading_progress();
 					}
+
+					streaming.display_loading_progress();
 
 					/*
 						The editor setup might want to use IMGUI to create views of entities or resources,

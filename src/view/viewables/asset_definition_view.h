@@ -15,6 +15,7 @@ protected:
 	}
 
 	const augs::path_type resolved_source_path;
+	const asset_location_context& project_dir;
 
 public:
 	asset_definition_view(
@@ -22,7 +23,8 @@ public:
 		T& d
 	) : 
 		def(d), 
-		resolved_source_path(d.get_source_path().resolve(project_dir))
+		resolved_source_path(d.get_source_path().resolve(project_dir)),
+		project_dir(project_dir)
 	{
 	}
 

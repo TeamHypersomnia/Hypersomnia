@@ -1,4 +1,4 @@
-Revision no.: 6805 (dirty)
-Build date: Fri Jun 21 17:24:54 2019
+Revision no.: 6813 (dirty)
+Build date: Sun Jun 23 01:13:19 2019
 Commit message:
-Resampled wavs to 44.1
+Print status for HRTF in setti(...)

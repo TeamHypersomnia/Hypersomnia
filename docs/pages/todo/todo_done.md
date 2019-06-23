@@ -3366,3 +3366,4 @@ which can be done from Settings->Reset all settings to factory default.
 - How do we even kick bots on the server?
 - Show last HRTF status below Enable HRTF
 
+- editor too should have a loading notice, at least in editing mode

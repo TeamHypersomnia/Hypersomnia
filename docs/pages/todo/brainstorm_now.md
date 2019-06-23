@@ -7,7 +7,10 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - fix these project-relative paths for neons at last, so that stamps dont get versioned
-- editor too should have a loading notice, at least in editing mode
+	- Reason: When picking a path, ranger and others probably return the full path, instead of relative
+	- However, a server or a client, when given just "arenas/de_cyberaqua", detect the adjacent neons files to be custom neons
+	- Actually this way is maybe better because we don't have to regenerate them a million times
+
 - for variation, don't switch teams after match summary
 - Port fy_minilab
 
