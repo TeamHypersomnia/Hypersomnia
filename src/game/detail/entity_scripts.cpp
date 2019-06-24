@@ -31,6 +31,11 @@ void unset_input_flags_of_orphaned_entity(const entity_handle& e) {
 	if (auto* const hand_fuse = e.find<components::hand_fuse>()) {
 		hand_fuse->arming_requested = false;
 	}
+
+	if (auto* const sentience = e.find<components::sentience>()) {
+		sentience->hand_flags = {};
+		sentience->block_flag = false;
+	}
 }
 
 identified_danger assess_danger(

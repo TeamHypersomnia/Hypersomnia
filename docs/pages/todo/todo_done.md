@@ -3374,3 +3374,6 @@ which can be done from Settings->Reset all settings to factory default.
 
 - (flag) Treat holstered as a separate setup for Q
 
+
+- Release triggers on match summary and halftime
+- for variation, don't switch teams after match summary

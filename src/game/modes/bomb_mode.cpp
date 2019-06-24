@@ -1907,16 +1907,17 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 		if (get_match_summary_seconds_left(in) <= 0.f) {
 			const auto p = calc_participating_factions(in);
 
-			for (auto& it : players) {
-				auto& player_data = it.second;
-				p.make_swapped(player_data.faction);
-			}
-
 			if (is_final_round(in)) {
 				restart(in, step);
 			}
 			else {
-				/* Switch sides */
+				/* Switch teams */
+
+				for (auto& it : players) {
+					auto& player_data = it.second;
+					p.make_swapped(player_data.faction);
+				}
+
 				std::swap(factions[p.bombing].score, factions[p.defusing].score);
 
 				p.for_each([&](const auto f) {

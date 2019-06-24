@@ -6,14 +6,13 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Clear particle systems when switching setups or cosmoi
+
 - Do we send the client back their own entropy?
 	- If no and we just add num accepted commands, a desync may occur if the server can modify for some reason the entropy after receiving it from the client
 	- if yes, that's a slight optimization opportunity, although it may complicate stuff a little
 
-- for variation, don't switch teams after match summary
 - Port fy_minilab
-
-- Release triggers on match summary and halftime
 
 - Things to update for windows
 	- Appveyor script: llvm 8 when the visual studio 2019 is ready to take the new filesystem
