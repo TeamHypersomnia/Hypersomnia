@@ -526,6 +526,8 @@ and then hitting Save settings.
 
 	static auto launch_setup = [&](const launch_type mode) {
 		LOG("Launched mode: %x", augs::enum_to_string(mode));
+
+		get_audiovisuals().get<particles_simulation_system>().clear();
 		
 		change_with_save([mode](config_lua_table& cfg) {
 			cfg.launch_mode = mode;

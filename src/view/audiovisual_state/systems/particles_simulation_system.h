@@ -133,6 +133,15 @@ public:
 		{}
 	};
 
+	struct recorded_meta {
+		std::string name;
+	};
+
+	struct continuous_particles_cache {
+		orbital_cache cache;
+		recorded_meta recorded;
+	};
+
 	template <class T>
 	using make_particle_vector = augs::constant_size_vector<T, T::statically_allocate>;
 
@@ -146,15 +155,6 @@ public:
 	/* Current streams vectors */
 	augs::constant_size_vector<orbital_cache, MAX_ORBITAL_EMISSIONS> orbital_emissions;
 	augs::constant_size_vector<faf_cache, MAX_FIRE_AND_FORGET_EMISSIONS> fire_and_forget_emissions;
-
-	struct recorded_meta {
-		std::string name;
-	};
-
-	struct continuous_particles_cache {
-		orbital_cache cache;
-		recorded_meta recorded;
-	};
 
 	audiovisual_cache_map<continuous_particles_cache> firearm_engine_caches;
 	audiovisual_cache_map<continuous_particles_cache> continuous_particles_caches;

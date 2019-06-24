@@ -145,6 +145,9 @@ void particles_simulation_system::clear() {
 	clearer(general_particles);
 	clearer(animated_particles);
 	clearer(homing_animated_particles);
+
+	firearm_engine_caches.clear();
+	continuous_particles_caches.clear();
 }
 
 void particles_simulation_system::add_particle(const particle_layer l, const general_particle& p) {

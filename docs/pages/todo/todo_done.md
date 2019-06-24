@@ -3383,3 +3383,5 @@ which can be done from Settings->Reset all settings to factory default.
 - Zero out the crosshair displacement when spectating
 - Fix spectator for integrated server
 
+- Clear particle systems when switching setups
+

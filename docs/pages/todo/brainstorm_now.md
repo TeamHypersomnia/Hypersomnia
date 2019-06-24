@@ -6,8 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- Clear particle systems when switching setups or cosmoi
-
 - Do we send the client back their own entropy?
 	- If no and we just add num accepted commands, a desync may occur if the server can modify for some reason the entropy after receiving it from the client
 	- if yes, that's a slight optimization opportunity, although it may complicate stuff a little
