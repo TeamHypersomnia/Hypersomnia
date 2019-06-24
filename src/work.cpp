@@ -636,6 +636,18 @@ and then hitting Save settings.
 
 		return viewed_cosmos[viewed_character_id];
 	};
+
+	static auto get_controlled_character = [&]() -> const_entity_handle {
+		const auto& viewed_cosmos = visit_current_setup([](auto& setup) -> const cosmos& {
+			return setup.get_viewed_cosmos();
+		});
+
+		const auto controlled_character_id = visit_current_setup([](auto& setup) {
+			return setup.get_controlled_character_id();
+		});
+
+		return viewed_cosmos[controlled_character_id];
+	};
 		
 	static auto should_draw_game_gui = [&]() {
 		{
@@ -849,6 +861,10 @@ and then hitting Save settings.
 	};
 
 	static auto calc_pre_step_crosshair_displacement = [&](const auto& viewing_config) {
+		if (get_viewed_character() != get_controlled_character()) {
+			return vec2::zero;
+		}
+
 		return visit_current_setup([&](const auto& setup) {
 			using T = remove_cref<decltype(setup)>;
 

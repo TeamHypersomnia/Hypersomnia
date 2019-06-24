@@ -130,10 +130,15 @@ online_arena_handle<true> server_setup::get_arena_handle() const {
 	return get_arena_handle_impl<online_arena_handle<true>>(*this);
 }
 
-entity_id server_setup::get_viewed_character_id() const {
-	return get_arena_handle().on_mode(
-		[&](const auto& typed_mode) {
-			return typed_mode.lookup(get_admin_player_id());
+entity_id server_setup::get_controlled_character_id() const {
+	return on_mode_with_input(
+		[&](const auto& typed_mode, const auto& in) {
+			(void)in;
+
+			const auto local_id = get_local_player_id();
+			const auto local_character = typed_mode.lookup(local_id);
+
+			return local_character;
 		}
 	);
 }
@@ -185,7 +190,9 @@ net_time_t server_setup::get_current_time() {
 }
 
 void server_setup::customize_for_viewing(config_lua_table& config) const {
+#if !IS_PRODUCTION_BUILD
 	config.window.name = "Arena server";
+#endif
 
 	if (is_gameplay_on()) {
 		get_arena_handle().adjust(config.drawing);

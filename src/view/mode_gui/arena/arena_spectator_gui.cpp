@@ -63,6 +63,10 @@ void arena_spectator_gui::draw_gui(
 		return;
 	}
 
+	if (its_match_summary) {
+		return;
+	}
+
 	const auto spectated = typed_mode.find(now_spectating);
 
 	if (spectated == nullptr) {
@@ -135,6 +139,7 @@ void arena_spectator_gui::draw_gui(
 void arena_spectator_gui::hide() {
 	accept_inputs = false;
 	show = false;
+	its_match_summary = false;
 	now_spectating = {};
 	cached_order = {};
 	when_local_player_knocked_out = std::nullopt;
@@ -147,6 +152,8 @@ void arena_spectator_gui::advance(
 	const typename M::const_input& in
 ) {
 	const auto& cosm = in.cosm;
+
+	its_match_summary = false;
 
 	auto local_faction = faction_type::DEFAULT;
 
@@ -174,7 +181,7 @@ void arena_spectator_gui::advance(
 
 	auto hide_if_match_summary = [&]() {
 		if (mode.get_state() == arena_mode_state::MATCH_SUMMARY) {
-			hide();
+			its_match_summary = true;
 			return true;
 		}
 

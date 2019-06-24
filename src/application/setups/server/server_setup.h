@@ -168,7 +168,7 @@ public:
 		return std::min(1.0, (get_current_time() - server_time) / dt);
 	}
 
-	entity_id get_viewed_character_id() const;
+	entity_id get_controlled_character_id() const;
 
 	auto get_viewed_character() const {
 		return get_viewed_cosmos()[get_viewed_character_id()];

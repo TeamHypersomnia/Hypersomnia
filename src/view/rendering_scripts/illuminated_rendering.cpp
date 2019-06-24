@@ -827,8 +827,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 			::draw_offscreen_indicator(
 				output,
-				special.draw_onscreen,
 				settings.draw_offscreen_indicators,
+				special.draw_onscreen,
 				col,
 				tex,
 				pos,

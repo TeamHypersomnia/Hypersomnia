@@ -16,6 +16,7 @@ struct arena_spectator_gui {
 	int key_requested_offset = 0;
 
 	bool show = false;
+	bool its_match_summary = false;
 	bool accept_inputs = false;
 
 	std::optional<augs::timer> when_local_player_knocked_out;

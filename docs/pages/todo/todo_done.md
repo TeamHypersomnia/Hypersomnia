@@ -3377,3 +3377,9 @@ which can be done from Settings->Reset all settings to factory default.
 
 - Release triggers on match summary and halftime
 - for variation, don't switch teams after match summary
+- re-freeze when match starts and someone respawns at warmup
+
+- hide indicators for yourself
+- Zero out the crosshair displacement when spectating
+- Fix spectator for integrated server
+

@@ -57,6 +57,10 @@ public:
 		return viewed_character_id;
 	}
 
+	auto get_controlled_character_id() const {
+		return get_viewed_character_id();
+	}
+
 	auto get_viewed_character() const {
 		return get_viewed_cosmos()[get_viewed_character_id()];
 	}

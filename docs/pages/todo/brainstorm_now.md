@@ -31,7 +31,6 @@ summary: That which we are brainstorming at the moment.
 
 - blurred text if zoomed out
 
-- hide indicators for yourself
 - Upgrade appveyor
 
 - Advanced RCON functionality
@@ -136,8 +135,6 @@ summary: That which we are brainstorming at the moment.
 - fix neon maps being generated in the project folder
 
 - Note that message buffer might overflow during resynchro, causing a disconnection
-
-- re-freeze when match starts and someone respawns at warmup
 
 - increase prices of uwota and triad? theyre soo op
 

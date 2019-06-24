@@ -3,8 +3,8 @@
 
 inline void draw_offscreen_indicator(
 	const augs::drawer& output,
-	const bool draw_if_onscreen,
 	const bool draw_if_offscreen,
+	const bool draw_if_onscreen,
 	const rgba col,
 	const augs::atlas_entry& indicator_tex,
 	const vec2 indicator_pos,
@@ -21,11 +21,23 @@ inline void draw_offscreen_indicator(
 
 	const auto bbox = indicator_tex.get_original_size();
 
-	auto raycasted_aabb = ltrb(vec2::zero, screen_size);
+	const auto screen_aabb = ltrb(vec2::zero, screen_size);
+
+	auto raycasted_aabb = screen_aabb;
 	raycasted_aabb.r -= bbox.x;
 	raycasted_aabb.b -= bbox.y;
 
 	{
+		if (draw_if_onscreen && !draw_if_offscreen) {
+			const auto indicator_rect = ltrb(indicator_pos, indicator_tex.get_original_size());
+
+			if (screen_aabb.hover(indicator_rect)) {
+				output.aabb_lt(indicator_tex, indicator_pos, col);
+			}
+
+			return;
+		}
+		
 		const bool is_onscreen = raycasted_aabb.hover(indicator_pos);
 		const bool is_offscreen = !is_onscreen;
 

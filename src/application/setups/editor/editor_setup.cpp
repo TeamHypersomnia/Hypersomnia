@@ -84,6 +84,15 @@ entity_id editor_setup::get_viewed_character_id() const {
 	return {};
 }
 
+entity_id editor_setup::get_controlled_character_id() const {
+	if (anything_opened()) {
+		const auto& f = folder();
+		return f.get_controlled_character_id();
+	}
+
+	return get_viewed_character_id();
+}
+
 const_entity_handle editor_setup::get_viewed_character() const {
 	return get_viewed_cosmos()[get_viewed_character_id()];
 }
@@ -218,10 +227,10 @@ void editor_setup::accept_game_gui_events(const game_gui_entropy_type& entropy) 
 
 void editor_setup::customize_for_viewing(config_lua_table& config) const {
 	if (anything_opened()) {
-		config.window.name = "Editor - " + folder().get_display_path();
+		config.window.name = "Hypersomnia Editor - " + folder().get_display_path();
 	}
 	else {
-		config.window.name = "Editor";
+		config.window.name = "Hypersomnia Editor";
 	}
 
 	if (!anything_opened() || is_editing_mode()) {

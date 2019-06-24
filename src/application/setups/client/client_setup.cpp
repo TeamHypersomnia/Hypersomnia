@@ -78,7 +78,9 @@ entity_id client_setup::get_controlled_character_id() const {
 }
 
 void client_setup::customize_for_viewing(config_lua_table& config) const {
+#if !IS_PRODUCTION_BUILD
 	config.window.name = "Arena client";
+#endif
 
 	if (is_gameplay_on()) {
 		get_arena_handle(client_arena_type::REFERENTIAL).adjust(config.drawing);

@@ -377,7 +377,8 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 					}
 				}
 
-				const bool draw_offscreen = in.settings.draw_offscreen_indicators;
+				const bool its_somebody_else = watched_character != v;
+				const bool draw_offscreen = its_somebody_else && in.settings.draw_offscreen_indicators;
 				const bool draw_onscreen = true;
 
 				const auto screen_size = cam.screen_size;

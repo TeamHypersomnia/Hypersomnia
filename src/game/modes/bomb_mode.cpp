@@ -826,6 +826,12 @@ entity_id bomb_mode::create_character_for_player(
 				}
 			}
 
+			if (state == arena_mode_state::WARMUP) {
+				if (get_warmup_seconds_left(in) <= 0.f) {
+					handle.set_frozen(true);
+				}
+			}
+
 			return p.controlled_character_id;
 		}
 		else {
@@ -943,7 +949,6 @@ void bomb_mode::setup_round(
 	if (in.rules.freeze_secs > 0.f) {
 		if (state != arena_mode_state::WARMUP) {
 			set_players_frozen(in, true);
-
 			release_triggers_of_weapons_of_players(in);
 		}
 	}
@@ -1871,9 +1876,7 @@ void bomb_mode::mode_pre_solve(const input_type in, const mode_entropy& entropy,
 		if (get_warmup_seconds_left(in) <= 0.f) {
 			if (!current_round.cache_players_frozen) {
 				set_players_frozen(in, true);
-#if CLEAR_TRIGGERS_AFTER_WARMUP_ENDS
 				release_triggers_of_weapons_of_players(in);
-#endif
 			}
 
 			if (get_match_begins_in_seconds(in) <= 0.f) {
