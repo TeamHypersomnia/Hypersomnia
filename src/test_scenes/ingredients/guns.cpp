@@ -2562,7 +2562,7 @@ namespace test_flavours {
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
 			gun_def.muzzle_velocity = {4300.f, 4300.f};
-			gun_def.shot_cooldown_ms = 60.f;
+			gun_def.shot_cooldown_ms = 57.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
@@ -2621,8 +2621,8 @@ namespace test_flavours {
 			gun_def.muzzle_shot_sound.id = to_sound_id(test_scene_sound_id::ZAMIEC_MUZZLE);
 
 			gun_def.action_mode = gun_action_type::AUTOMATIC;
-			gun_def.muzzle_velocity = {4600.f, 4600.f};
-			gun_def.shot_cooldown_ms = 84.f;
+			gun_def.muzzle_velocity = {4550.f, 4550.f};
+			gun_def.shot_cooldown_ms = 75.f;
 
 			gun_def.shell_angular_velocity = {10000.f, 40000.f};
 			gun_def.shell_spread_degrees = 20.f;
@@ -2632,7 +2632,7 @@ namespace test_flavours {
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.kickback_towards_wielder = kickback_mult * 10.f;
 			gun_def.adversarial.knockout_award = static_cast<money_type>(500);
-			gun_def.recoil_multiplier = 0.65;
+			gun_def.recoil_multiplier = 0.62;
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.052f;
@@ -2964,7 +2964,7 @@ namespace test_flavours {
 			gun_def.num_last_bullets_to_trigger_low_ammo_cue = 3;
 			gun_def.low_ammo_cue_sound.id = to_sound_id(test_scene_sound_id::LOW_AMMO_CUE);
 			gun_def.recoil_multiplier = 2.f;
-			gun_def.kickback_towards_wielder = kickback_mult * 100.f;
+			gun_def.kickback_towards_wielder = kickback_mult * 120.f;
 
 			gun_def.maximum_heat = 2.f;
 			gun_def.gunshot_adds_heat = 0.202f;
@@ -2987,7 +2987,7 @@ namespace test_flavours {
 			set_density_mult(meta, 1.5f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1200.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
-			meta.get<invariants::item>().standard_price = 800;
+			meta.get<invariants::item>().standard_price = 1000;
 			set_chambering_duration_ms(meta, 200.f);
 			meta.template get<invariants::item>().space_occupied_per_charge = to_space_units("6");
 			only_allow_mag(meta, test_container_items::AO44_MAGAZINE);
@@ -3342,7 +3342,7 @@ namespace test_flavours {
 			set_density_mult(meta, 2.6f);
 			make_default_gun_container(meta, item_holding_stance::PISTOL_LIKE, 1500.f, 0.f, false, "0.1");
 			meta.get<invariants::item>().wield_sound.id = to_sound_id(test_scene_sound_id::STANDARD_PISTOL_DRAW);
-			meta.get<invariants::item>().standard_price = 1100;
+			meta.get<invariants::item>().standard_price = 1400;
 			set_chambering_duration_ms(meta, 500.f);
 			only_allow_mag(meta, test_container_items::DEAGLE_MAGAZINE);
 			meta.get<invariants::item>().draw_mag_over_when_reloading = false;
