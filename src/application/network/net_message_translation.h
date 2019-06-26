@@ -223,13 +223,12 @@ namespace net_messages {
 		auto& state_hash = total_networked.meta.state_hash;
 		bool has_state_hash = logically_set(state_hash);
 
-		serialize_bool(s, has_state_hash);
-
 		bool has_players = logically_set(i.players);
 		bool has_added_player = logically_set(g.added_player);
 		bool has_removed_player = logically_set(g.removed_player);
 		bool has_special_command = logically_set(g.special_command);
 
+		serialize_bool(s, has_state_hash);
 		serialize_bool(s, has_players);
 		serialize_bool(s, has_added_player);
 		serialize_bool(s, has_removed_player);

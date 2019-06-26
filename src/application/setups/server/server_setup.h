@@ -217,13 +217,18 @@ public:
 					like player added or removed.
 				*/
 
-				const auto admin_entropy = local_collected.assemble_for(
-					get_viewed_character(), 
-					get_admin_player_id(),
-					in.make_accumulator_input()
-				);
+				{
+					const auto admin_entropy = local_collected.assemble_for(
+						get_viewed_character(), 
+						get_admin_player_id(),
+						in.make_accumulator_input()
+					);
 
-				step_collected += { get_admin_player_id(), admin_entropy };
+					if (!admin_entropy.empty()) {
+						step_collected += { get_admin_player_id(), admin_entropy };
+					}
+				}
+
 				step_collected.general += local_collected.mode_general;
 				local_collected.clear();
 			}

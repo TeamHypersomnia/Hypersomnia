@@ -456,16 +456,6 @@ void server_setup::advance_clients_state() {
 			return true;
 		};
 
-		auto kick_if_afk = [&](){
-			if (c.should_kick_due_to_inactivity(vars, server_time)) {
-				kick(client_id, "No messages arrived for too long!");
-			}
-
-			if (c.should_kick_due_to_afk(vars, server_time)) {
-				kick(client_id, "AFK!");
-			}
-		};
-
 		auto send_state_for_the_first_time = [&]() {
 			const auto sent_client_id = static_cast<uint32_t>(client_id);
 
@@ -529,7 +519,15 @@ void server_setup::advance_clients_state() {
 		}
 
 		if (c.state == client_state_type::IN_GAME) {
-			kick_if_afk();
+			if (c.should_kick_due_to_afk(vars, server_time)) {
+				kick(client_id, "AFK!");
+			}
+		}
+
+		if (c.state > client_state_type::INVALID) {
+			if (c.should_kick_due_to_inactivity(vars, server_time)) {
+				kick(client_id, "No messages arrived for too long!");
+			}
 		}
 
 #if 0

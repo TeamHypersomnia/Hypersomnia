@@ -3391,3 +3391,25 @@ which can be done from Settings->Reset all settings to factory default.
 	- We need some kind of contexts for these serializers
 - Do the same optimization for objects that haven't changed their positions, e.g. crates
 
+- Check wielding logic
+
+- Per-character settings to store within entropy
+	- Implementation
+		- We still have one bit free inside the player entropy so we could dedicate it to 
+		- Or have a separate message and better optimize the mouse
+		- To have some struct coherency, we might mve out the settings of basic_player_commands to a separate map
+			- as it won't sit well with additions and it will be sorta left out of the client commands serialization procedure
+			- still it will be in cosmic entropy which is not sent through network but reconstructed instead
+	- They could be stored inside the per-character entropy itself
+	- The cosmos-ready entropy could hold it, but the packed one would simply take it from the settings
+	- Any change to settings to these would go along the client_commands channel
+		- Note that the server has to broadcast these settings deterministically
+		- public settings might be a part of client meta
+	- pros
+		- We can save on the mouse movements
+		- We could compress them even down to two bytes per movement in the most optimistic case
+		- just one bit to determine the range
+	- what if there is no map entry for the current character entropy?
+		- Then in theory there should be no need to use these settings, e.g. there will be no applications of force or crosshair movements
+		- We could always cache some last observed values
+
