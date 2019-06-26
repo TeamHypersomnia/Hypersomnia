@@ -12,6 +12,10 @@ namespace augs {
 
 		serialization_buffers() : compression_state(make_compression_state()) {}
 
-		ref_memory_stream make_serialization_stream();
+		template <class T = ref_memory_stream, class... Args>
+		T make_serialization_stream(Args&&... args) {
+			serialization.clear();
+			return T(std::forward<Args>(args)..., serialization);
+		}
 	};
 }

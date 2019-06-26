@@ -3,11 +3,6 @@
 #include "augs/misc/serialization_buffers.h"
 
 namespace augs {
-	ref_memory_stream serialization_buffers::make_serialization_stream() {
-		serialization.clear();
-		return augs::ref_memory_stream(serialization);
-	}
-
 	void from_bytes(const std::vector<std::byte>& bytes, trivial_type_marker& object) {
 		std::memcpy(
 			reinterpret_cast<std::byte*>(std::addressof(object)),

@@ -107,7 +107,7 @@ namespace test_flavours {
 		body_def.damping.linear = 6.5f;
 		body_def.damping.angular = 6.5f;
 
-		body_def.body_type = rigid_body_type::STATIC;
+		body_def.body_type = rigid_body_type::ALWAYS_STATIC;
 
 		fixtures_def.filter = filters[predefined_filter_type::WALL];
 		fixtures_def.density = 1;

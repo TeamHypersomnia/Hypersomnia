@@ -1,4 +1,4 @@
-Revision no.: 6813 (dirty)
-Build date: Sun Jun 23 01:13:19 2019
+Revision no.: 6820 (clean)
+Build date: Mon Jun 24 21:03:38 2019
 Commit message:
-Print status for HRTF in setti(...)
+Fixes to match summary logic D(...)

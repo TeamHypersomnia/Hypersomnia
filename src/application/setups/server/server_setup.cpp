@@ -470,6 +470,8 @@ void server_setup::advance_clients_state() {
 
 				buffers,
 
+				scene.world.get_common_significant().flavours,
+
 				initial_arena_state_payload<true> {
 					scene.world.get_solvable().significant,
 					current_mode,
@@ -687,6 +689,8 @@ message_handler_result server_setup::handle_client_message(
 						game_channel_type::SERVER_SOLVABLE_AND_STEPS, 
 
 						buffers,
+
+						scene.world.get_common_significant().flavours,
 
 						initial_arena_state_payload<true> {
 							scene.world.get_solvable().significant,

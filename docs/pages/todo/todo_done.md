@@ -3385,3 +3385,7 @@ which can be done from Settings->Reset all settings to factory default.
 
 - Clear particle systems when switching setups
 
+
+- Flags for serialization of specific entity types through the network
+	- We could really stop serializing sprite decorations and static physics bodies
+	- We need some kind of contexts for these serializers

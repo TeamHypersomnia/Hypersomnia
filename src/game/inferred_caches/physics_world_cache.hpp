@@ -11,6 +11,7 @@
 inline auto to_b2Body_type(const rigid_body_type t) {
 	switch (t) {
 		case rigid_body_type::STATIC: 
+		case rigid_body_type::ALWAYS_STATIC: 
 			return b2BodyType::b2_staticBody;
 		case rigid_body_type::KINEMATIC: 
 			return b2BodyType::b2_kinematicBody;

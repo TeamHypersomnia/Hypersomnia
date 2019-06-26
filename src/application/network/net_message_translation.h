@@ -5,6 +5,7 @@
 #include "augs/misc/readable_bytesize.h"
 #include "augs/templates/logically_empty.h"
 #include "application/network/net_serialization_helpers.h"
+#include "application/network/net_solvable_stream.h"
 
 template <bool C>
 struct initial_arena_state_payload {
@@ -425,6 +426,7 @@ namespace net_messages {
 
 	inline bool initial_arena_state::read_payload(
 		augs::serialization_buffers& buffers,
+		const cosmos_solvable_significant& initial_signi,
 		const initial_arena_state_payload<false> in
 	) {
 		const auto data = reinterpret_cast<const std::byte*>(GetBlockData());
@@ -471,7 +473,7 @@ namespace net_messages {
 			return false;
 		}
 
-		auto s = augs::cref_memory_stream(uncompressed_buf);
+		auto s = net_solvable_stream_cref(initial_signi, uncompressed_buf);
 
 		augs::read_bytes(s, in.signi);
 		augs::read_bytes(s, in.mode);
@@ -487,6 +489,7 @@ namespace net_messages {
 	inline bool initial_arena_state::write_payload(
 		F block_allocator,
 		augs::serialization_buffers& buffers,
+		const all_entity_flavours& all_flavours,
 		const initial_arena_state_payload<true> in
 	) {
 		auto write_all_to = [&in](auto& s) {
@@ -508,7 +511,7 @@ namespace net_messages {
 			NSR_LOG("Reserved size: %x", s.size());
 
 			{
-				auto s = buffers.make_serialization_stream();
+				auto s = buffers.make_serialization_stream<net_solvable_stream_ref>(all_flavours, in.signi);
 				write_all_to(s);
 			}
 

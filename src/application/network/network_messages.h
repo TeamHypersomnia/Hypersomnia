@@ -8,8 +8,11 @@
 #include "application/setups/server/chat_structs.h"
 #include "application/setups/server/net_statistics_update.h"
 #include "view/mode_gui/arena/arena_player_meta.h"
+#include "game/common_state/entity_flavours.h"
 
 #define LOG_NET_SERIALIZATION !IS_PRODUCTION_BUILD
+
+struct cosmos_solvable_significant;
 
 template <class... Args>
 void NSR_LOG(Args&&... args) {
@@ -118,6 +121,7 @@ namespace net_messages {
 	struct initial_arena_state : only_block_message {
 		bool read_payload(
 			augs::serialization_buffers&,
+			const cosmos_solvable_significant& initial_signi,
 			initial_arena_state_payload<false>
 		);
 
@@ -125,6 +129,7 @@ namespace net_messages {
 		bool write_payload(
 			F block_allocator,
 			augs::serialization_buffers&,
+			const all_entity_flavours& all_flavours,
 			initial_arena_state_payload<true>
 		);
 	};

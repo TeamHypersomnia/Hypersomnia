@@ -12,7 +12,8 @@ namespace invariants {
 		assets::plain_animation_id id;
 		int delete_entity_after_loops = 0;
 		bool shuffle_frames = false;
-		pad_bytes<3> pad;
+		bool is_irrelevant_to_logic = false;
+		pad_bytes<2> pad;
 		// END GEN INTROSPECTOR
 
 		bool loops_infinitely() const {

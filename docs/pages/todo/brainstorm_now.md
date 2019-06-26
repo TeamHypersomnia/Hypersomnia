@@ -5,6 +5,45 @@ hide_sidebar: true
 permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
+	
+
+- Thread pools
+	- The game loop
+		- Setup posts a job to complete n steps
+	- Interpolation, particles, sound, drawing layers, all these can be calculated independently
+		- Actually they all need to join before illuminated rendering, or just before their respective layers
+	- Game gui too can be drawn independently
+	- Start with std::async?
+		- Actually some nice interface for completion could come in handy
+
+- Benefits of demos
+	- Deterministic repros
+	- Can record without performance hit
+	- Can later record in highest quality only the highlights
+	- Fun moments will never be lost
+
+- We can automatically record demos for every server session
+	- Demos could just be network messages applied at step x
+	- We could pretty much resimulate the entire client setup this way, just without sending messages
+	- Also makes it easier to debug
+	- Snapshots could prove a little hard but we could just resimulate from the beginning if we want to seek backwards
+
+- Default camera mode in settings, maybe controls?
+
+- for sound and rendering, readerwriterqueue?
+
+- Completely wrongly assigned metas
+	- EMPIREFAN had fortesq's avatar
+	- The integrated host appeared to have some unique ping to all other players even though it should be zero
+	- FortesQ didn't see his own chat messages, only after reconnecting
+	- Since viewing logic does not write the state, we can parallelize it heavily with thread pools
+
+- Fix the sudden increase in upload rate when someone timeouts 
+	- After some time, we could send initial state instead of inputs
+	- Aggressively disconnect?
+
+- Looks like we have drastically less FPS with character on screen compared to no character
+	- Would it be only sound logic?
 
 - Do we send the client back their own entropy?
 	- If no and we just add num accepted commands, a desync may occur if the server can modify for some reason the entropy after receiving it from the client

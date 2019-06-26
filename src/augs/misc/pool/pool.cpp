@@ -14,7 +14,7 @@ using uv_t = std::vector<u_t>;
 using kv_t = std::vector<k_t>;
 
 TEST_CASE("Pool SimpleBackAndForth") {
-	p_t p = 6;
+	p_t p = p_t(6);
 	kv_t keys;
 	keys.resize(6);
 
@@ -41,7 +41,7 @@ TEST_CASE("Pool SimpleBackAndForth") {
 }
 
 TEST_CASE("Pool UndoAllocations") {
-	p_t p = 6;
+	p_t p = p_t(6);
 	kv_t keys;
 	keys.resize(6);
 	kv_t keys_after;
@@ -79,7 +79,7 @@ TEST_CASE("Pool UndoAllocations") {
 }
 
 TEST_CASE("Pool UndoDeletes") {
-	p_t p = 6;
+	p_t p = p_t(6);
 	kv_t keys;
 	uv_t undos;
 

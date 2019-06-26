@@ -1,6 +1,7 @@
 #pragma once
 #include <type_traits>
 #include "augs/templates/type_list.h"
+#include "augs/readwrite/special_readwrite_traits.h"
 
 #define READWRITE_OVERLOAD_TRAITS_INCLUDED 1
 

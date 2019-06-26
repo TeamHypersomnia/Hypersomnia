@@ -101,8 +101,6 @@ class server_setup :
 	client_gui_state integrated_client_gui;
 	/* No server state follows later in code. */
 
-	augs::ref_memory_stream make_serialization_stream();
-
 	static net_time_t get_current_time();
 
 	template <class H, class S>

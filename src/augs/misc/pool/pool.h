@@ -23,11 +23,11 @@ namespace augs {
 
 		using used_size_type = size_type;
 
+		using object_pool_type = make_container_type<mapped_type>;
 	protected:
 		using pool_slot_type = pool_slot<size_type>;
 		using pool_indirector_type = pool_indirector<size_type>;
 
-		using object_pool_type = make_container_type<mapped_type>;
 		static constexpr bool constexpr_max_size = has_constexpr_max_size_v<object_pool_type>;
 
 		make_container_type<pool_slot_type> slots;
@@ -71,7 +71,9 @@ namespace augs {
 		}
 
 	public:
-		pool(const size_type slot_count = 0u) {
+		pool() : pool(0u) {}
+
+		explicit pool(const size_type slot_count) {
 			if constexpr(constexpr_max_size) {
 				static_assert(
 					object_pool_type::max_size() <= 

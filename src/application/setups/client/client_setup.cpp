@@ -28,7 +28,7 @@ client_setup::client_setup(
 	const client_start_input& in
 ) : 
 	lua(lua),
-	client(std::make_unique<client_adapter>())
+	adapter(std::make_unique<client_adapter>())
 {
 	LOG("Client setup ctor");
 	init_connection(in);
@@ -40,7 +40,7 @@ void client_setup::init_connection(const client_start_input& in) {
 	last_start = in;
 
 	state = client_state_type::INVALID;
-	client->connect(in);
+	adapter->connect(in);
 	when_initiated_connection = get_current_time();
 	receiver.clear();
 	last_disconnect_reason.clear();
@@ -272,6 +272,8 @@ message_handler_result client_setup::handle_server_message(
 				read_payload(
 					buffers,
 
+					initial_signi,
+
 					initial_payload {
 						signi,
 						current_mode,
@@ -413,7 +415,7 @@ void client_setup::handle_server_messages() {
 		return;
 	}
 
-	client->advance(client_time, message_handler);
+	adapter->advance(client_time, message_handler);
 }
 
 #define STRESS_TEST_ARENA_SERIALIZATION 0
@@ -550,7 +552,7 @@ void client_setup::send_pending_commands() {
 	const bool init_send = state == C::INVALID;
 
 	auto send_settings = [&]() {
-		client->send_payload(
+		adapter->send_payload(
 			game_channel_type::CLIENT_COMMANDS,
 			std::as_const(requested_settings)
 		);
@@ -584,7 +586,7 @@ void client_setup::send_pending_commands() {
 			if (payload.png_bytes.size() > 0 && payload.png_bytes.size() <= max_avatar_bytes_v) {
 				uint32_t dummy_client_id = 0;
 
-				client->send_payload(
+				adapter->send_payload(
 					game_channel_type::COMMUNICATIONS,
 
 					dummy_client_id,
@@ -613,7 +615,7 @@ void client_setup::send_pending_commands() {
 	if (pending_request == special_client_request::RESYNC) {
 		LOG("Sending the request resync command.");
 
-		client->send_payload(
+		adapter->send_payload(
 			game_channel_type::CLIENT_COMMANDS,
 			pending_request
 		);
@@ -628,7 +630,7 @@ void client_setup::send_packets_if_its_time() {
 		return;
 	}
 
-	client->send_packets();
+	adapter->send_packets();
 }
 
 void client_setup::log_malicious_server() {
@@ -647,7 +649,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 
 	arena_gui.resyncing_notifier = now_resyncing;
 
-	const bool is_gameplay_on = client->is_connected() && state == C::IN_GAME;
+	const bool is_gameplay_on = adapter->is_connected() && state == C::IN_GAME;
 
 	auto& rcon_gui = client_gui.rcon;
 
@@ -655,7 +657,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 		const auto window_name = "Remote Control (RCON)";
 		auto window = scoped_window(window_name, nullptr);
 
-		if (client->is_connected()) {
+		if (adapter->is_connected()) {
 			if (rcon == rcon_level::MASTER) {
 				text_color("Master Access granted.", green);
 			}
@@ -674,7 +676,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				rcon_command_variant payload;
 				payload = rcon_commands::special::SHUTDOWN;
 
-				client->send_payload(
+				adapter->send_payload(
 					game_channel_type::CLIENT_COMMANDS,
 					payload
 				);
@@ -696,7 +698,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			message.target = chat.target;
 			message.message = chat.current_message;
 
-			client->send_payload(
+			adapter->send_payload(
 				game_channel_type::COMMUNICATIONS,
 				message
 			);
@@ -729,7 +731,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 		const auto window_name = "Connection status";
 		auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
 
-		if (client->is_connecting()) {
+		if (adapter->is_connecting()) {
 			text("Connecting to %x\nTime: %2f seconds", last_start.ip_port, get_current_time() - when_initiated_connection);
 
 			text("\n");
@@ -740,7 +742,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				return custom_imgui_result::GO_TO_MAIN_MENU;
 			}
 		}
-		else if (client->has_connection_failed()) {
+		else if (adapter->has_connection_failed()) {
 			if (state == C::IN_GAME) {
 				text("Server is shutting down.");
 
@@ -772,7 +774,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				}
 			}
 		}
-		else if (client->is_disconnected()) {
+		else if (adapter->is_disconnected()) {
 			if (!print_only_disconnect_reason) {
 				text("Connection has ended.");
 			}
@@ -786,7 +788,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				return custom_imgui_result::GO_TO_MAIN_MENU;
 			}
 		}
-		else if (client->is_connected()) {
+		else if (adapter->is_connected()) {
 			if (now_resyncing) {
 				text("The client has desynchronized.\nDownloading the complete state snapshot.");
 			}
@@ -830,7 +832,7 @@ void client_setup::apply(const config_lua_table& cfg) {
 	r.net = vars.net;
 	r.public_settings.mouse_sensitivity = cfg.input.mouse_sensitivity;
 
-	client->set(vars.network_simulator);
+	adapter->set(vars.network_simulator);
 
 	if (!augs::introspective_equal(old_requested_settings, requested_settings)) {
 		resend_requested_settings = true;
@@ -838,20 +840,20 @@ void client_setup::apply(const config_lua_table& cfg) {
 }
 
 bool client_setup::is_connected() const {
-	return client->is_connected();
+	return adapter->is_connected();
 }
 
 void client_setup::send_to_server(
 	total_client_entropy& new_local_entropy
 ) {
-	client->send_payload(
+	adapter->send_payload(
 		game_channel_type::CLIENT_COMMANDS,
 		new_local_entropy
 	);
 }
 
 void client_setup::disconnect() {
-	client->disconnect();
+	adapter->disconnect();
 }
 
 bool client_setup::is_gameplay_on() const {
@@ -871,7 +873,7 @@ const cosmos& client_setup::get_viewed_cosmos() const {
 }
 
 void client_setup::update_stats(network_info& stats) const {
-	stats = client->get_network_info();
+	stats = adapter->get_network_info();
 }
 
 augs::path_type client_setup::get_unofficial_content_dir() const {
@@ -886,7 +888,7 @@ augs::path_type client_setup::get_unofficial_content_dir() const {
 }
 
 bool client_setup::is_loopback() const {
-	return is_connected() && client->get_server_address().IsLoopback();
+	return is_connected() && adapter->get_server_address().IsLoopback();
 }
 
 bool client_setup::handle_input_before_game(

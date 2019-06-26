@@ -167,7 +167,10 @@ namespace augs {
 	void read_bytes(Archive& ar, Serialized& storage) {
 		verify_read_bytes<Archive, Serialized>();
 
-		if constexpr(has_byte_read_overload_v<Archive, Serialized>) {
+		if constexpr(has_special_read_v<Archive, Serialized>) {
+			ar.special_read(storage);
+		}
+		else if constexpr(has_byte_read_overload_v<Archive, Serialized>) {
 			static_assert(has_byte_write_overload_v<Archive, Serialized>, "Has read_object_bytes overload, but no write_object_bytes overload.");
 
 			read_object_bytes(ar, storage);
@@ -269,7 +272,10 @@ namespace augs {
 
 	template <class Archive, class Serialized>
 	void write_bytes(Archive& ar, const Serialized& storage) {
-		if constexpr(has_byte_write_overload_v<Archive, Serialized>) {
+		if constexpr(has_special_write_v<Archive, Serialized>) {
+			ar.special_write(storage);
+		}
+		else if constexpr(has_byte_write_overload_v<Archive, Serialized>) {
 			static_assert(has_byte_read_overload_v<Archive, remove_cref<Serialized>&>, "Has write_object_bytes overload, but no read_object_bytes overload.");
 
 			write_object_bytes(ar, storage);

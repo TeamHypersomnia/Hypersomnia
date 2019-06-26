@@ -15,6 +15,8 @@
 #include "augs/readwrite/memory_stream.h"
 #include "augs/readwrite/byte_readwrite.h"
 
+#include "application/network/net_solvable_stream.h"
+
 void editor_summary_gui::perform(editor_setup& setup) {
 	using namespace augs::imgui;
 
@@ -44,7 +46,7 @@ void editor_summary_gui::perform(editor_setup& setup) {
 
 			text("Solvable size: %x", readable_bytesize(counter_stream.size()));
 
-			if (auto scope = scoped_tree_node("Test compression")) {
+			if (auto scope = scoped_tree_node("(Net) Test compression")) {
 				augs::timer t;
 
 				thread_local std::vector<std::byte> input_buf;
@@ -55,9 +57,12 @@ void editor_summary_gui::perform(editor_setup& setup) {
 				compressed_buf.clear();
 
 				{
-					auto s = augs::ref_memory_stream(input_buf);
+					auto s = net_solvable_stream_ref(cosm.get_common_significant().flavours, solvable, input_buf);
 					augs::write_bytes(s, solvable);
 				}
+
+				text("\n(Net) Solvable size: %x", readable_bytesize(input_buf.size()));
+
 				text("Raw write time: %x ms", t.template get<std::chrono::milliseconds>());
 
 				t.reset();

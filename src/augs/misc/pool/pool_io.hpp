@@ -14,7 +14,7 @@ namespace augs {
 	void pool<A, B, C, D...>::write_object_bytes(Archive& ar) const {
 		auto w = [&ar](const auto& object) {
 			augs::write_capacity_bytes(ar, object);
-			augs::write_container_bytes(ar, object);
+			augs::write_bytes(ar, object);
 		};
 
 		w(objects);
@@ -28,7 +28,7 @@ namespace augs {
 	void pool<A, B, C, D...>::read_object_bytes(Archive& ar) {
 		auto r = [&ar](auto& object) {
 			augs::read_capacity_bytes(ar, object);
-			augs::read_container_bytes(ar, object);
+			augs::read_bytes(ar, object);
 		};
 
 		r(objects);

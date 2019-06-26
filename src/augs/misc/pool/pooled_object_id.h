@@ -60,6 +60,12 @@ namespace augs {
 			return indirection_index;
 		}
 
+		auto to_unversioned() const {
+			unversioned_id<size_type> un;
+			un.indirection_index = indirection_index;
+			return un;
+		}
+
 		operator unversioned_id<size_type>() const {
 			unversioned_id<size_type> un;
 			un.indirection_index = indirection_index;
