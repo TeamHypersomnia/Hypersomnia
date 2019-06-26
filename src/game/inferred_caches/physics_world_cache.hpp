@@ -142,7 +142,7 @@ void physics_world_cache::specific_infer_rigid_body_from_scratch(const E& handle
 
 	cache.body = b2world->CreateBody(&def);
 
-	cache.body->SetAngledDampingEnabled(physics_def.angled_damping);
+	cache.body->SetAngledDampingEnabled(::calc_angled_damping_enabled(handle));
 	cache.body->SetLinearDampingVec(b2Vec2(damping.linear_axis_aligned));
 
 	/*
@@ -248,7 +248,9 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 		return;
 	}
 
-	specific_infer_rigid_body_existence(new_owner);
+	new_owner.template dispatch_on_having_all<invariants::rigid_body>([&](const auto& typed_new_owner) {
+		specific_infer_rigid_body_existence(typed_new_owner);
+	});
 
 	const auto body_cache = find_rigid_body_cache(new_owner);
 

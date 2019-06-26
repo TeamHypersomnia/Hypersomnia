@@ -26,6 +26,7 @@
 #include "game/detail/movement/dash_logic.h"
 #include "game/detail/movement/movement_getters.h"
 #include "game/detail/sentience/tool_getters.h"
+#include "game/detail/crosshair_math.hpp"
 
 using namespace augs;
 
@@ -153,8 +154,16 @@ void movement_system::apply_movement_forces(const logic_step step) {
 				return haste_type::NONE;
 			}();
 
-			const auto requested_by_input = movement.get_force_requested_by_input(movement_def.input_acceleration_axes);
-			const bool non_zero_requested = requested_by_input.is_nonzero();
+			const auto requested_by_input_aa = movement.get_force_requested_by_input(movement_def.input_acceleration_axes);
+			const bool non_zero_requested = requested_by_input_aa.is_nonzero();
+			const auto requested_by_input = [&]() {
+				if (!movement.keep_movement_forces_relative_to_crosshair) {
+					return requested_by_input_aa;
+				}
+
+				const auto angle = ::calc_crosshair_displacement(it).degrees();
+				return vec2(requested_by_input_aa).rotate(angle + 90);
+			}();
 
 			if (is_sentient) {
 				const auto& def = it.template get<invariants::sentience>();

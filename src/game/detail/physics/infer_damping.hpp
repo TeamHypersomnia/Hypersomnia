@@ -1,6 +1,21 @@
 #pragma once
 
 template <class E>
+bool calc_angled_damping_enabled(const E& handle) {
+	static_assert(E::is_specific);
+
+	if (handle.template get<invariants::rigid_body>().angled_damping) {
+		if constexpr(E::template has<components::movement>()) {
+			return !handle.template get<components::movement>().keep_movement_forces_relative_to_crosshair;
+		}
+
+		return true;
+	}
+
+	return false;
+}
+
+template <class E>
 damping_mults calc_damping_mults(const E& handle, const invariants::rigid_body& def) {
 	damping_mults damping = def.damping;
 
@@ -56,6 +71,6 @@ void infer_damping(const E& handle, B& b) {
 	b.SetLinearDamping(damping.linear);
 	b.SetAngularDamping(damping.angular);
 	b.SetLinearDampingVec(b2Vec2(damping.linear_axis_aligned));
-	b.SetAngledDampingEnabled(def.angled_damping);
+	b.SetAngledDampingEnabled(::calc_angled_damping_enabled(handle));
 }
 
