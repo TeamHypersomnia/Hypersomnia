@@ -13,7 +13,7 @@
 
 /* Prediction is too costly in debug builds. */
 #define USE_CLIENT_PREDICTION NDEBUG
-#define TEST_DESYNC_DETECTION !NDEBUG
+#define TEST_DESYNC_DETECTION 0
 
 struct misprediction_candidate_entry {
 	entity_id id;

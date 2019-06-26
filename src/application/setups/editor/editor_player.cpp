@@ -343,7 +343,7 @@ void editor_player::adjust_entropy(const editor_folder& folder, editor_player_en
 			opts.neg();
 		}
 
-		p->clear_relevant(opts);
+		p->commands.clear_relevant(opts);
 	}
 }
 

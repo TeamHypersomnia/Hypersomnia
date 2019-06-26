@@ -50,7 +50,6 @@ class main_menu_setup : public default_setup_settings {
 	entity_id viewed_character_id;
 
 	augs::fixed_delta_timer timer = { 5, augs::lag_spike_handling_type::DISCARD };
-	cosmic_entropy total_collected_entropy;
 
 	sol::table menu_config_patch;
 
@@ -131,10 +130,7 @@ public:
 		auto steps = timer.extract_num_of_logic_steps(get_inv_tickrate());
 
 		while (steps--) {
-			total_collected_entropy.clear_dead_entities(intro.world);
-
 			mode_entropy entropy;
-			entropy.cosmic = total_collected_entropy;
 
 			mode.advance(
 				{ ruleset, intro.world },
@@ -142,8 +138,6 @@ public:
 				callbacks,
 				solve_settings()
 			);
-
-			total_collected_entropy.clear();
 		}
 	}
 

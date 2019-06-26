@@ -343,6 +343,9 @@ message_handler_result client_setup::handle_server_message(
 		//LOG("Received %x th entropy from the server", receiver.incoming_entropies.size());
 		//LOG_NVPS(payload.num_entropies_accepted);
 	}
+	else if constexpr (std::is_same_v<T, public_settings_update>) {
+		player_metas[payload.subject_id.value].public_settings = payload.new_settings;
+	}
 	else if constexpr (std::is_same_v<T, net_statistics_update>) {
 		const auto& ping_values = payload.ping_values;
 
@@ -551,6 +554,9 @@ void client_setup::send_pending_commands() {
 
 	const bool init_send = state == C::INVALID;
 
+	const bool can_already_resend_settings = client_time - when_sent_client_settings > 1.0;
+	const bool resend_requested_settings  = can_already_resend_settings && !augs::introspective_equal(current_requested_settings, requested_settings);
+
 	auto send_settings = [&]() {
 		adapter->send_payload(
 			game_channel_type::CLIENT_COMMANDS,
@@ -566,6 +572,7 @@ void client_setup::send_pending_commands() {
 		}
 
 		when_sent_client_settings = client_time;
+		current_requested_settings = requested_settings;
 	};
 
 	if (init_send) {
@@ -606,10 +613,7 @@ void client_setup::send_pending_commands() {
 		}
 	}
 	else if (resend_requested_settings) {
-		if (client_time - when_sent_client_settings > 1.0) {
-			send_settings();
-			resend_requested_settings = false;
-		}
+		send_settings();
 	}
 
 	if (pending_request == special_client_request::RESYNC) {
@@ -824,19 +828,13 @@ custom_imgui_result client_setup::perform_custom_imgui(
 void client_setup::apply(const config_lua_table& cfg) {
 	vars = cfg.client;
 
-	auto old_requested_settings = requested_settings;
-
 	auto& r = requested_settings;
 	r.chosen_nickname = vars.nickname;
 	r.rcon_password = vars.rcon_password;
 	r.net = vars.net;
-	r.public_settings.mouse_sensitivity = cfg.input.mouse_sensitivity;
+	r.public_settings.character_input = cfg.input.character;
 
 	adapter->set(vars.network_simulator);
-
-	if (!augs::introspective_equal(old_requested_settings, requested_settings)) {
-		resend_requested_settings = true;
-	}
 }
 
 bool client_setup::is_connected() const {

@@ -21,7 +21,7 @@ enum class setup_escape_result {
 struct setup_advance_input {
 	const augs::delta frame_delta;
 	const vec2i screen_size;
-	const input_settings& settings;
+	const input_settings settings;
 	const zoom_type zoom;
 
 	auto make_accumulator_input() const {
@@ -42,7 +42,7 @@ struct lag_compensation_settings;
 
 struct server_advance_input {
 	const vec2i screen_size;
-	const input_settings& settings;
+	const input_settings settings;
 	const zoom_type zoom;
 
 	network_profiler& network_performance;
@@ -59,7 +59,7 @@ struct server_advance_input {
 
 struct client_advance_input {
 	const vec2i& screen_size;
-	const input_settings& settings;
+	const input_settings settings;
 	const zoom_type zoom;
 
 	const simulation_receiver_settings& simulation_receiver;

@@ -7,6 +7,8 @@
 #include "application/network/net_serialization_helpers.h"
 #include "application/network/net_solvable_stream.h"
 
+#include "augs/window_framework/mouse_rel_bound.h"
+
 template <bool C>
 struct initial_arena_state_payload {
 	maybe_const_ref_t<C, cosmos_solvable_significant> signi;
@@ -51,6 +53,10 @@ namespace net_messages {
 		auto& m = p.mode;
 		auto& c = p.cosmic;
 
+		auto get_motion = [&]() -> auto& {
+			return c.motions[game_motion_type::MOVE_CROSSHAIR];
+		};
+
 		bool has_mode_command = logically_set(m);
 
 		bool has_cast_spell = logically_set(c.cast_spell);
@@ -59,15 +65,26 @@ namespace net_messages {
 		bool has_motions = logically_set(c.motions);
 		bool has_transfer = logically_set(c.transfer);
 
-		serialize_bool(s, has_mode_command);
+		auto one_byte_pred = [&](const auto& coord) {
+			return coord >= -7 && coord <= 8;
+		};
 
+		auto two_byte_pred = [&](const auto& coord) {
+			return coord >= -127 && coord <= 128;
+		};
+
+		bool motion_writable_in_one_byte = has_motions && one_byte_pred(get_motion().x) && one_byte_pred(get_motion().y);
+		bool motion_writable_in_two_bytes = has_motions && two_byte_pred(get_motion().x) && two_byte_pred(get_motion().y);
+
+		serialize_bool(s, has_mode_command);
 		serialize_bool(s, has_cast_spell);
 		serialize_bool(s, has_wield);
 		serialize_bool(s, has_intents);
 		serialize_bool(s, has_motions);
 		serialize_bool(s, has_transfer);
 
-		serialize_align(s);
+		serialize_bool(s, motion_writable_in_one_byte);
+		serialize_bool(s, motion_writable_in_two_bytes);
 
 		if (has_mode_command) {
 			if (!serialize(s, m)) {
@@ -125,15 +142,62 @@ namespace net_messages {
 		if (has_motions) {
 			static_assert(int(game_motion_type::COUNT) == 1);
 
-			/* 
-				TODO BANDWIDTH: 
-				use shorts and let the server multiply these by the sensitivity. 
-			*/
+			int pos_before = 0;
+			pos_before = s.GetBytesProcessed();
 
-			auto& mot = c.motions[game_motion_type::MOVE_CROSSHAIR];
+			int min_bound = 0;
+			int max_bound = 0;
 
-			serialize_float(s, mot.x);
-			serialize_float(s, mot.y);
+			if (motion_writable_in_one_byte) {
+				min_bound = -7;
+				max_bound = 8;
+			}
+			else if (motion_writable_in_two_bytes) {
+				min_bound = -127;
+				max_bound = 128;
+			}
+			else {
+				min_bound = mouse_rel_min_v;
+				max_bound = mouse_rel_max_v;
+			}
+
+			const auto offset = -min_bound;
+
+			const auto min_io_bound = 0;
+			const auto max_io_bound = max_bound + offset;
+
+			if (Stream::IsReading) {
+				auto& mot = get_motion();
+
+				serialize_int(s, mot.x, min_io_bound, max_io_bound);
+				serialize_int(s, mot.y, min_io_bound, max_io_bound);
+
+				mot.x -= offset;
+				mot.y -= offset;
+			}
+			else {
+				auto mot = get_motion();
+
+				mot.x += offset;
+				mot.y += offset;
+
+				serialize_int(s, mot.x, min_io_bound, max_io_bound);
+				serialize_int(s, mot.y, min_io_bound, max_io_bound);
+			}
+
+			{
+				const auto pos_after = s.GetBytesProcessed();
+
+				if (motion_writable_in_one_byte) {
+					ensure_eq(1, pos_after - pos_before);
+				}
+				else if (motion_writable_in_two_bytes) {
+					ensure_eq(2, pos_after - pos_before);
+				}
+				else {
+					ensure_eq(3, pos_after - pos_before);
+				}
+			}
 		}
 
 		if (has_transfer) {
@@ -354,6 +418,20 @@ namespace net_messages {
 
 	inline bool net_statistics_update::read_payload(
 		decltype(net_statistics_update::payload)& output
+	) {
+		output = std::move(payload);
+		return true;
+	}
+
+	inline bool public_settings_update::write_payload(
+		const decltype(public_settings_update::payload)& input
+	) {
+		payload = input;
+		return true;
+	}
+
+	inline bool public_settings_update::read_payload(
+		decltype(public_settings_update::payload)& output
 	) {
 		output = std::move(payload);
 		return true;

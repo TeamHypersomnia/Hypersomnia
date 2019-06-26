@@ -7,10 +7,16 @@
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/platform_utils.h"
 
+#include "augs/window_framework/mouse_rel_bound.h"
+
 /* Common interface */
 
 namespace augs {
-	event::change window::do_raw_motion(const basic_vec2<short> motion) {
+	event::change window::do_raw_motion(basic_vec2<short> motion) {
+		/* Clamp it out of consideration for network */
+		motion.x = std::clamp(motion.x, mouse_rel_min_v, mouse_rel_max_v);
+		motion.y = std::clamp(motion.y, mouse_rel_min_v, mouse_rel_max_v);
+
 		event::change change;
 		
 		change.data.mouse.rel = motion;

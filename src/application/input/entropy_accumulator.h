@@ -6,10 +6,11 @@
 
 #include "application/input/input_settings.h"
 #include "application/input/adjust_game_motions.h"
+#include "game/per_character_input_settings.h"
 
 struct entropy_accumulator {
 	struct input {
-		const input_settings& settings;
+		input_settings settings;
 		const vec2i screen_size;
 		const zoom_type zoom;
 	};
@@ -23,7 +24,7 @@ struct entropy_accumulator {
 	mode_entropy_general mode_general;
 
 	template <class E>
-	std::optional<game_motion> calc_motion(
+	std::optional<raw_game_motion> calc_motion(
 		const E& handle,
 		const game_motion_type motion_type,
 		const input in
@@ -32,7 +33,7 @@ struct entropy_accumulator {
 			if (const auto crosshair_motion = mapped_or_nullptr(motions, motion_type)) {
 				if (const auto crosshair = handle.find_crosshair()) {
 					const auto total_bound = vec2(in.screen_size) / in.zoom;
-					return to_game_motion(*crosshair_motion, crosshair->base_offset, in.settings.mouse_sensitivity, total_bound);
+					return to_game_motion(*crosshair_motion, crosshair->base_offset, in.settings.character.crosshair_sensitivity, total_bound);
 				}
 			}
 		}
@@ -58,7 +59,10 @@ struct entropy_accumulator {
 
 		if (handle) {
 			const auto player_id = handle.get_id();
-			auto& player = out.cosmic[player_id];
+			auto& player_entry = out.cosmic[player_id];
+			player_entry.settings = in.settings.character;
+
+			auto& player = player_entry.commands;
 
 			if (const auto new_motion = calc_motion(handle, game_motion_type::MOVE_CROSSHAIR, in)) {
 				player.motions[new_motion->motion] = new_motion->offset;
@@ -121,7 +125,7 @@ struct entropy_accumulator {
 
 	template <class T>
 	void control(const T& n) {
-		if constexpr(std::is_same_v<T, raw_game_motions>) {
+		if constexpr(std::is_same_v<T, raw_game_motion_vector>) {
 			for (const auto& m : n) {
 				auto& motion_entry = motions[m.motion];
 				const auto total_offset = motion_entry.offset + m.offset;

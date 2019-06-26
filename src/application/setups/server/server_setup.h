@@ -91,6 +91,7 @@ class server_setup :
 	unsigned ticks_until_sending_packets = 0;
 	unsigned ticks_until_sending_hash = 0;
 	net_time_t when_last_sent_net_statistics = 0;
+	net_time_t when_last_sent_admin_public_settings = 0;
 
 	net_time_t server_time = 0.0;
 	bool schedule_shutdown = false;

@@ -230,17 +230,19 @@ public:
 	) {
 		global_time_seconds += in.frame_delta.in_seconds();
 
+		auto extract_collected_entropy = [&]() {
+			return total_collected.extract(
+				get_viewed_character(), 
+				view().local_player_id, 
+				in.make_accumulator_input()
+			);
+		};
+
 		if (anything_opened()) {
 			player().advance_player(
 				in.frame_delta,
 				make_player_input(callbacks),
-				[&]() {
-					return total_collected.extract(
-						get_viewed_character(), 
-						view().local_player_id, 
-						in.make_accumulator_input()
-					);
-				}
+				extract_collected_entropy
 			);
 		}
 	}

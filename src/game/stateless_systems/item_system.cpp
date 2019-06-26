@@ -981,6 +981,7 @@ void item_system::handle_wielding_requests(const logic_step step) {
 	const auto& entropy = step.get_entropy();
 
 	for (const auto& p : entropy.players) {
+		const auto& commands = p.second.commands;
 		const auto player_entity = cosm[p.first];
 
 		if (player_entity.dead()) {
@@ -994,7 +995,7 @@ void item_system::handle_wielding_requests(const logic_step step) {
 		::perform_wielding(
 			step,
 			player_entity,
-			p.second.wield
+			commands.wield
 		);
 	}
 }

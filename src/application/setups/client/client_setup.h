@@ -85,7 +85,7 @@ class client_setup :
 
 	client_vars vars;
 	requested_client_settings requested_settings;
-	bool resend_requested_settings = false;
+	requested_client_settings current_requested_settings;
 	rcon_level rcon = rcon_level::NONE;
 
 	entropy_accumulator total_collected;
@@ -193,6 +193,12 @@ public:
 	double get_audiovisual_speed() const;
 	double get_inv_tickrate() const;
 
+	auto make_accumulator_input(const client_advance_input& in) {
+		auto accumulator_in = in.make_accumulator_input();
+		accumulator_in.settings.character = current_requested_settings.public_settings.character_input;
+		return accumulator_in;
+	}
+
 	template <class Callbacks>
 	void advance(
 		const client_advance_input& in,
@@ -244,7 +250,7 @@ public:
 					return total_collected.extract(
 						get_controlled_character(), 
 						get_local_player_id(), 
-						in.make_accumulator_input()
+						make_accumulator_input(in)
 					);
 				}
 
@@ -367,7 +373,11 @@ public:
 							);
 						};
 
-						return entropy.unpack(mode_id_to_entity_id);
+						auto get_settings_for = [&](const mode_player_id& mode_id) {
+							return player_metas[mode_id.value].public_settings.character_input;
+						};
+
+						return entropy.unpack(mode_id_to_entity_id, get_settings_for);
 					};
 
 					const auto result = receiver.unpack_deterministic_steps(
@@ -551,5 +561,9 @@ public:
 
 	const arena_player_metas* find_player_metas() const {
 		return std::addressof(player_metas);
+	}
+
+	auto get_current_requested_settings() const {
+		return current_requested_settings;
 	}
 };

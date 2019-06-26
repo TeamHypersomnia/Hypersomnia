@@ -11,28 +11,53 @@
 #include "game/detail/spells/all_spells.h"
 #include "game/detail/inventory/wielding_setup.h"
 
+#include "game/per_character_input_settings.h"
+
 struct cosmic_entropy_recording_options;
 class cosmos;
 
 template <class key>
-struct basic_player_entropy {
-	// GEN INTROSPECTOR struct basic_player_entropy class key
+struct basic_player_commands {
+	// GEN INTROSPECTOR struct basic_player_commands class key
 	spell_id cast_spell;
 	basic_wielding_setup<key> wield;
 	game_intents intents;
-	game_motions motions;
+	raw_game_motion_map motions;
 	basic_item_slot_transfer_request<key> transfer;
 	// END GEN INTROSPECTOR
 
-	bool operator==(const basic_player_entropy<key>& b) const;
-	bool operator!=(const basic_player_entropy<key>& b) const;
-	basic_player_entropy& operator+=(const basic_player_entropy& b);
+	bool operator==(const basic_player_commands<key>& b) const;
+	bool operator!=(const basic_player_commands<key>& b) const;
+	basic_player_commands& operator+=(const basic_player_commands& b);
 
 	void clear_relevant(cosmic_entropy_recording_options);
 	void clear();
 
 	std::size_t length() const;
 	bool empty() const;
+};
+
+template <class key>
+struct basic_player_entropy {
+	// GEN INTROSPECTOR struct basic_player_entropy class key
+	basic_player_commands<key> commands;
+	per_character_input_settings settings;
+	// END GEN INTROSPECTOR
+
+	bool operator==(const basic_player_entropy& b) const {
+		return commands == commands && settings == b.settings;
+	}
+
+	bool operator!=(const basic_player_entropy& b) const {
+		return !operator==(b);
+	}
+
+	auto& operator+=(const basic_player_entropy& b) {
+		commands += b.commands;
+		settings = b.settings;
+
+		return *this;
+	}
 };
 
 template <class key>
@@ -63,7 +88,7 @@ struct basic_cosmic_entropy {
 	bool operator!=(const basic_cosmic_entropy<key>&) const;
 };
 
-using cosmic_player_entropy = basic_player_entropy<signi_entity_id>;
+using cosmic_player_entropy = basic_player_commands<signi_entity_id>;
 using game_gui_entropy_type = cosmic_player_entropy;
 
 struct cosmic_entropy;
@@ -75,9 +100,10 @@ struct cosmic_entropy : basic_cosmic_entropy<entity_id> {
 	cosmic_entropy() = default;
 	
 	explicit cosmic_entropy(
+		const per_character_input_settings& settings,
 		const entity_id controlled_entity,
 		const game_intents&,
-		const game_motions&
+		const raw_game_motion_map&
 	);
 
 	cosmic_entropy& operator+=(const cosmic_entropy& b) {

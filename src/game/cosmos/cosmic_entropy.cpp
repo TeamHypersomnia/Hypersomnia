@@ -13,7 +13,7 @@
 
 
 template <class K>
-std::size_t basic_player_entropy<K>::length() const {
+std::size_t basic_player_commands<K>::length() const {
 	std::size_t total = 0;
 
 	total += motions.size();
@@ -35,7 +35,7 @@ std::size_t basic_player_entropy<K>::length() const {
 }
 
 template <class K>
-bool basic_player_entropy<K>::empty() const {
+bool basic_player_commands<K>::empty() const {
 	return length() == 0;
 }
 
@@ -44,7 +44,7 @@ std::size_t basic_cosmic_entropy<key>::length() const {
 	std::size_t total = 0;
 
 	for (const auto& p : players) {
-		total += p.second.length();
+		total += p.second.commands.length();
 	}
 
 	return total;
@@ -81,7 +81,7 @@ void basic_cosmic_entropy<key>::clear_dead_entities(const cosmos& cosm) {
 }
 
 template <class K>
-basic_player_entropy<K>& basic_player_entropy<K>::operator+=(const basic_player_entropy<K>& r) {
+basic_player_commands<K>& basic_player_commands<K>::operator+=(const basic_player_commands<K>& r) {
 	concatenate(intents, r.intents);
 	
 	for (const auto& it : r.motions) {
@@ -109,7 +109,7 @@ basic_player_entropy<K>& basic_player_entropy<K>::operator+=(const basic_player_
 }
 
 template <class K>
-bool basic_player_entropy<K>::operator==(const basic_player_entropy<K>& b) const {
+bool basic_player_commands<K>::operator==(const basic_player_commands<K>& b) const {
 	return
 		intents == b.intents
 		&& motions == b.motions
@@ -120,7 +120,7 @@ bool basic_player_entropy<K>::operator==(const basic_player_entropy<K>& b) const
 }
 
 template <class K>
-bool basic_player_entropy<K>::operator!=(const basic_player_entropy<K>& b) const {
+bool basic_player_commands<K>::operator!=(const basic_player_commands<K>& b) const {
 	return !operator==(b);
 }
 
@@ -135,12 +135,12 @@ bool basic_cosmic_entropy<K>::operator!=(const basic_cosmic_entropy<K>& b) const
 }
 
 template <class K>
-void basic_player_entropy<K>::clear() {
+void basic_player_commands<K>::clear() {
 	clear_relevant({});
 }
 
 template <class K>
-void basic_player_entropy<K>::clear_relevant(const cosmic_entropy_recording_options opts) {
+void basic_player_commands<K>::clear_relevant(const cosmic_entropy_recording_options opts) {
 	if (opts.overwrite_intents) {
 		intents.clear();
 	}
@@ -157,14 +157,16 @@ void basic_player_entropy<K>::clear_relevant(const cosmic_entropy_recording_opti
 }
 
 cosmic_entropy::cosmic_entropy(
+	const per_character_input_settings& settings,
 	const entity_id controlled_entity,
 	const game_intents& intents,
-	const game_motions& motions
+	const raw_game_motion_map& motions
 ) {
 	auto& p = players[controlled_entity];
-	p.intents = intents;
-	p.motions = motions;
+	p.settings = settings;
+	p.commands.intents = intents;
+	p.commands.motions = motions;
 }
 
 template struct basic_cosmic_entropy<entity_id>;
-template struct basic_player_entropy<entity_id>;
+template struct basic_player_commands<entity_id>;

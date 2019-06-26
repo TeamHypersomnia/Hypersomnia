@@ -1,6 +1,7 @@
 #pragma once
 #include <array>
 #include "augs/network/network_types.h"
+#include "application/network/requested_client_settings.h"
 
 struct arena_player_avatar_payload {
 	std::vector<std::byte> png_bytes;
@@ -13,6 +14,7 @@ struct arena_player_network_stats {
 struct arena_player_meta {
 	arena_player_avatar_payload avatar;
 	arena_player_network_stats stats;
+	public_client_settings public_settings;
 
 	void clear() {
 		avatar.png_bytes.clear();

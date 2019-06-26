@@ -256,9 +256,13 @@ return {
     different_values_frame_active_bg = "168 158 0 255"
   },
   input = {
-	mouse_sensitivity = {
-	  x = 3,
-	  y = 3
+	character = {
+	  crosshair_sensitivity = {
+	    x = 3,
+	    y = 3
+	  },
+
+      keep_movement_forces_relative_to_crosshair = false
 	},
 
 	swap_mouse_buttons_in_akimbo = false,

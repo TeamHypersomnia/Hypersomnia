@@ -53,8 +53,9 @@ namespace net_messages {
 			}
 		}
 
-		serialize_float(stream, payload.public_settings.mouse_sensitivity.x);
-		serialize_float(stream, payload.public_settings.mouse_sensitivity.y);
+		if (!serialize(stream, payload.public_settings)) {
+			return false;
+		}
 
 		serialize_uint32(stream, payload.net.jitter.buffer_at_least_steps);
 		serialize_uint32(stream, payload.net.jitter.buffer_at_least_ms);
@@ -93,6 +94,19 @@ namespace net_messages {
 	template <typename Stream>
 	bool net_statistics_update::Serialize(Stream& stream) {
 		if (!serialize(stream, payload)) {
+			return false;
+		}
+
+		return true;
+	}
+
+	template <typename Stream>
+	bool public_settings_update::Serialize(Stream& stream) {
+		if (!serialize(stream, payload.subject_id)) {
+			return false;
+		}
+
+		if (!serialize(stream, payload.new_settings)) {
 			return false;
 		}
 

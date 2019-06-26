@@ -23,6 +23,7 @@
 #include "application/arena/choose_arena.h"
 #include "application/gui/client/chat_gui.h"
 #include "application/network/payload_easily_movable.h"
+#include "augs/templates/introspection_utils/introspective_equal.h"
 
 const auto connected_and_integrated_v = server_setup::for_each_flags { server_setup::for_each_flag::WITH_INTEGRATED, server_setup::for_each_flag::ONLY_CONNECTED };
 const auto only_connected_v = server_setup::for_each_flags { server_setup::for_each_flag::ONLY_CONNECTED };
@@ -240,6 +241,19 @@ void server_setup::apply(const config_lua_table& cfg) {
 	apply(cfg.server, force);
 
 	integrated_client_vars = cfg.client;
+
+	auto& current_requested_settings = integrated_client.settings.public_settings;
+
+	auto requested_settings = current_requested_settings;
+	requested_settings.character_input = cfg.input.character;
+
+	const bool can_already_resend_settings = server_time - when_last_sent_admin_public_settings > 1.0;
+	const bool resend_requested_settings = can_already_resend_settings && !augs::introspective_equal(current_requested_settings, requested_settings);
+
+	if (resend_requested_settings) {
+		current_requested_settings = requested_settings;
+		integrated_client.rebroadcast_public_settings = true;
+	}
 }
 
 void server_setup::choose_arena(const std::string& name) {
@@ -570,6 +584,7 @@ message_handler_result server_setup::handle_client_message(
 			c.state = S::WELCOME_ARRIVED;
 		}
 
+		c.rebroadcast_public_settings = true;
 		c.last_keyboard_activity_time = server_time;
 	}
 	else if constexpr (std::is_same_v<T, rcon_command_variant>) {
@@ -763,6 +778,36 @@ void server_setup::handle_client_messages() {
 }
 
 void server_setup::send_server_step_entropies(const compact_server_step_entropy& total_input) {
+	{
+		auto process_client = [&](const auto client_id, auto& c) {
+			if (c.rebroadcast_public_settings) {
+				if (to_mode_player_id(client_id) == get_local_player_id()) {
+					when_last_sent_admin_public_settings = server_time;
+				}
+
+				c.rebroadcast_public_settings = false;
+
+				::public_settings_update update;
+
+				update.subject_id = to_mode_player_id(client_id);
+				update.new_settings = c.settings.public_settings;
+
+				auto update_for_client = [this, &update](const auto recipient_client_id, auto&) {
+					server->send_payload(
+						recipient_client_id, 
+						game_channel_type::SERVER_SOLVABLE_AND_STEPS,
+
+						update
+					);
+				};
+
+				for_each_id_and_client(update_for_client, only_connected_v);
+			}
+		};
+
+		for_each_id_and_client(process_client, connected_and_integrated_v);
+	}
+
 	networked_server_step_entropy total;
 	total.payload = total_input;
 	total.meta.reinference_necessary = reinference_necessary;
@@ -962,15 +1007,23 @@ void server_setup::update_stats(server_network_info& info) const {
 }
 
 server_step_entropy server_setup::unpack(const compact_server_step_entropy& n) const {
-	return n.unpack(
-		[&](const mode_player_id& mode_id) {
-			return get_arena_handle().on_mode(
-				[&](const auto& typed_mode) {
-					return typed_mode.lookup(mode_id);
-				}
-			);
+	auto mode_id_to_entity_id = [&](const mode_player_id& mode_id) {
+		return get_arena_handle().on_mode(
+			[&](const auto& typed_mode) {
+				return typed_mode.lookup(mode_id);
+			}
+		);
+	};
+
+	auto get_settings_for = [&](const mode_player_id& mode_id) {
+		if (mode_id == mode_player_id::machine_admin()) {
+			return integrated_client.settings.public_settings.character_input;
 		}
-	);
+
+		return clients[mode_id.value].settings.public_settings.character_input;
+	};
+
+	return n.unpack(mode_id_to_entity_id, get_settings_for);
 }
 
 augs::path_type server_setup::get_unofficial_content_dir() const {
@@ -1259,6 +1312,46 @@ TEST_CASE("NetSerialization EmptyEntropies") {
 	}
 }
 
+TEST_CASE("NetSerialization ClientEntropy") {
+	net_messages::client_entropy ss;
+	ss.Release();
+
+	total_client_entropy sent;
+
+	const auto naive_bytes = [&]() {
+		sent.mode = mode_commands::team_choice { faction_type::RESISTANCE };
+		sent.mode = mode_commands::spell_purchase { spell_id::of<haste>() };
+
+		sent.cosmic.cast_spell.set<ultimate_wrath_of_the_aeons>();
+		sent.cosmic.motions[game_motion_type::MOVE_CROSSHAIR] = { -2047, 2048 };
+		sent.cosmic.intents.push_back({ game_intent_type::USE, intent_change::PRESSED });
+		sent.cosmic.intents.push_back({ game_intent_type::MOVE_FORWARD, intent_change::RELEASED });
+
+		ss.write_payload(sent);
+
+		return augs::to_bytes(sent);	
+	}();
+
+	total_client_entropy received;
+	REQUIRE(ss.read_payload(received));
+
+	const auto naively_received = augs::from_bytes<total_client_entropy>(naive_bytes);
+
+	if (!(received == sent) || !(received == naively_received)) {
+		auto lua = augs::create_lua_state();
+
+		augs::save_as_lua_table(lua, sent, "sent.lua");
+		augs::save_as_lua_table(lua, received, "received.lua");
+	}
+
+	REQUIRE(received.cosmic.motions.at(game_motion_type::MOVE_CROSSHAIR) == naively_received.cosmic.motions.at(game_motion_type::MOVE_CROSSHAIR));
+	REQUIRE(received == naively_received);
+	REQUIRE(received == sent);
+
+	const auto naive_bytes_of_received = augs::to_bytes(received);
+	REQUIRE(naive_bytes_of_received == naive_bytes);
+}
+
 TEST_CASE("NetSerialization ServerEntropy") {
 	net_messages::server_step_entropy ss;
 	ss.Release();
@@ -1272,7 +1365,7 @@ TEST_CASE("NetSerialization ServerEntropy") {
 
 		total_mode_player_entropy tt;
 		tt.cosmic.cast_spell.set<ultimate_wrath_of_the_aeons>();
-		tt.cosmic.motions[game_motion_type::MOVE_CROSSHAIR] = { 342, 432534 };
+		tt.cosmic.motions[game_motion_type::MOVE_CROSSHAIR] = { 1, 1 };
 		tt.cosmic.intents.push_back({ game_intent_type::USE, intent_change::PRESSED });
 		tt.cosmic.intents.push_back({ game_intent_type::MOVE_FORWARD, intent_change::RELEASED });
 
@@ -1331,7 +1424,7 @@ TEST_CASE("NetSerialization ServerEntropySecond") {
 
 		total_mode_player_entropy tt;
 		tt.cosmic.cast_spell.set<ultimate_wrath_of_the_aeons>();
-		tt.cosmic.motions[game_motion_type::MOVE_CROSSHAIR] = { 34, 111 };
+		tt.cosmic.motions[game_motion_type::MOVE_CROSSHAIR] = { -127, 128 };
 		tt.cosmic.intents.push_back({ game_intent_type::DROP, intent_change::RELEASED });
 		tt.cosmic.intents.push_back({ game_intent_type::DROP, intent_change::RELEASED });
 		tt.cosmic.intents.push_back({ game_intent_type::DROP, intent_change::RELEASED });
@@ -1372,45 +1465,6 @@ TEST_CASE("NetSerialization ServerEntropySecond") {
 
 	REQUIRE(received == naively_received);
 	REQUIRE(received == sent);
-}
-
-TEST_CASE("NetSerialization ClientEntropy") {
-	net_messages::client_entropy ss;
-	ss.Release();
-
-	total_client_entropy sent;
-
-	const auto naive_bytes = [&]() {
-		sent.mode = mode_commands::team_choice { faction_type::RESISTANCE };
-		sent.mode = mode_commands::spell_purchase { spell_id::of<haste>() };
-
-		sent.cosmic.cast_spell.set<ultimate_wrath_of_the_aeons>();
-		sent.cosmic.motions[game_motion_type::MOVE_CROSSHAIR] = { 342, 432534 };
-		sent.cosmic.intents.push_back({ game_intent_type::USE, intent_change::PRESSED });
-		sent.cosmic.intents.push_back({ game_intent_type::MOVE_FORWARD, intent_change::RELEASED });
-
-		ss.write_payload(sent);
-
-		return augs::to_bytes(sent);	
-	}();
-
-	total_client_entropy received;
-	const auto naively_received = augs::from_bytes<total_client_entropy>(naive_bytes);
-
-	REQUIRE(ss.read_payload(received));
-
-	if (!(received == sent) || !(received == naively_received)) {
-		auto lua = augs::create_lua_state();
-
-		augs::save_as_lua_table(lua, sent, "sent.lua");
-		augs::save_as_lua_table(lua, received, "received.lua");
-	}
-
-	REQUIRE(received == naively_received);
-	REQUIRE(received == sent);
-
-	const auto naive_bytes_of_received = augs::to_bytes(received);
-	REQUIRE(naive_bytes_of_received == naive_bytes);
 }
 
 #endif

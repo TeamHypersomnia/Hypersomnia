@@ -22,7 +22,7 @@ total_mode_player_entropy mode_entropy::get_for(
 	total_mode_player_entropy out;
 
 	if (const auto found_cosmic = mapped_or_nullptr(cosmic.players, id)) {
-		out.cosmic = *found_cosmic;
+		out.cosmic = found_cosmic->commands;
 	}
 
 	if (const auto found_mode = mapped_or_nullptr(players, m_id)) {

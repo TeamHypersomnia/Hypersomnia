@@ -82,7 +82,7 @@ void standard_solve(const logic_step step) {
 			continue;
 		}
 
-		auto t = p.second.transfer;
+		auto t = p.second.commands.transfer;
 		t.params.set_source_root_as_sender = false;
 		t.params.bypass_mounting_requirements = false;
 		t.params.bypass_unmatching_capabilities = false;

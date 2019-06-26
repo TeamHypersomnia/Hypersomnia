@@ -1569,7 +1569,11 @@ void bomb_mode::execute_player_commands(const input_type in, mode_entropy& entro
 										auto requested_wielding = wielding_setup::bare_hands();
 										requested_wielding.hand_selections[0] = w;
 
-										entropy.cosmic[player_handle.get_id()].wield = requested_wielding;
+										::perform_wielding(
+											step,
+											player_handle,
+											requested_wielding
+										);
 									}
 
 									money -= *price;

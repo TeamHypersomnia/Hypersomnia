@@ -10,27 +10,36 @@
 #include "game/cosmos/cosmos.h"
 
 void input_system::make_input_messages(const logic_step step) {
-	const auto& cosm = step.get_cosmos();
+	auto& cosm = step.get_cosmos();
 
 	for (const auto& p : step.get_entropy().players) {
-		if (cosm[p.first].dead()) {
+		const auto subject = cosm[p.first];
+
+		if (subject.dead()) {
 			continue;
 		}
 
-		for (const auto& intent : p.second.intents) {
+		const auto& commands = p.second.commands;
+		const auto& settings = p.second.settings;
+
+		if (const auto movement = subject.template find<components::movement>()) {
+			movement->keep_movement_forces_relative_to_crosshair = settings.keep_movement_forces_relative_to_crosshair;
+		}
+
+		for (const auto& intent : commands.intents) {
 			auto msg = messages::intent_message();
 			msg.game_intent::operator=(intent);
 			msg.subject = p.first;
 			step.post_message(msg);
 		}
 
-		for (const auto& motion : p.second.motions) {
+		for (const auto& motion : commands.motions) {
 			auto msg = messages::motion_message();
 
 			const auto type = motion.first;
 
 			msg.motion = type;
-			msg.offset = motion.second;
+			msg.offset = vec2(motion.second) * settings.crosshair_sensitivity;
 			msg.subject = p.first;
 			step.post_message(msg);
 		}

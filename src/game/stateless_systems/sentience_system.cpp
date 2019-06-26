@@ -61,7 +61,7 @@ void sentience_system::cast_spells(const logic_step step) const {
 
 	for (const auto& players : step.get_entropy().players) {
 		const auto subject = cosm[players.first];
-		const auto spell = players.second.cast_spell;
+		const auto spell = players.second.commands.cast_spell;
 
 		if (subject.dead()) {
 			continue;

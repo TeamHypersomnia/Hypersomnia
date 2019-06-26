@@ -18,6 +18,7 @@ struct server_client_state {
 	net_time_t last_valid_message_time = -1.0;
 	net_time_t last_keyboard_activity_time = -1.0;
 	requested_client_settings settings;
+	bool rebroadcast_public_settings = false;
 
 	client_pending_entropies pending_entropies;
 	uint8_t num_entropies_accepted = 0;

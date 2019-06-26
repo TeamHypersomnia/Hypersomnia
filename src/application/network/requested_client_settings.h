@@ -2,10 +2,11 @@
 #include "augs/network/network_types.h"
 #include "augs/misc/constant_size_string.h"
 #include "application/setups/client/client_vars.h"
+#include "game/per_character_input_settings.h"
 
 struct public_client_settings {
 	// GEN INTROSPECTOR struct public_client_settings
-	vec2 mouse_sensitivity;
+	per_character_input_settings character_input;
 	// END GEN INTROSPECTOR
 };
 

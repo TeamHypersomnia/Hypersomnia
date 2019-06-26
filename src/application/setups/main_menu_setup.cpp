@@ -168,7 +168,6 @@ main_menu_setup::main_menu_setup(
 
 	if (is_recording_available) {
 		while (cosm.get_total_seconds_passed() < settings.rewind_intro_scene_by_secs) {
-			//const auto entropy = cosmic_entropy(director.get_entropy_for_step(cosm.get_total_steps_passed() - initial_step_number), cosm);
 			mode.advance(
 				{ ruleset, cosm },
 				mode_entropy(),

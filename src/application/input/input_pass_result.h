@@ -4,7 +4,7 @@
 
 struct input_pass_result {
 	game_intents intents;
-	raw_game_motions motions;
+	raw_game_motion_vector motions;
 	config_lua_table viewing_config;
 };
 

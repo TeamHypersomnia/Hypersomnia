@@ -50,8 +50,8 @@ struct compact_server_step_entropy {
 		players.push_back(e);
 	}
 
-	template <class F>
-	auto unpack(F&& mode_id_to_entity_id) const {
+	template <class F, class G>
+	auto unpack(F&& mode_id_to_entity_id, G&& get_settings_for) const {
 		server_step_entropy out;
 		out.general = general;
 
@@ -66,7 +66,9 @@ struct compact_server_step_entropy {
 				const auto id = mode_id_to_entity_id(p.player_id);
 
 				if (logically_set(id)) {
-					out.cosmic[id] = t.cosmic;
+					auto& entry = out.cosmic[id];
+					entry.commands = t.cosmic;
+					entry.settings = get_settings_for(p.player_id);
 				}
 			}
 		}

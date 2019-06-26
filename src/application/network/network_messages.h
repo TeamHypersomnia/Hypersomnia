@@ -9,6 +9,7 @@
 #include "application/setups/server/net_statistics_update.h"
 #include "view/mode_gui/arena/arena_player_meta.h"
 #include "game/common_state/entity_flavours.h"
+#include "application/setups/server/public_settings_update.h"
 
 #define LOG_NET_SERIALIZATION !IS_PRODUCTION_BUILD
 
@@ -93,6 +94,21 @@ namespace net_messages {
 
 		bool write_payload(const requested_client_settings&);
 		bool read_payload(requested_client_settings&);
+	};
+
+	struct public_settings_update : public yojimbo::Message {
+		static constexpr bool server_to_client = true;
+		static constexpr bool client_to_server = false;
+
+		::public_settings_update payload;
+
+		template <typename Stream>
+		bool Serialize(Stream& stream);
+
+		YOJIMBO_VIRTUAL_SERIALIZE_FUNCTIONS();
+
+		bool write_payload(const ::public_settings_update&);
+		bool read_payload(::public_settings_update&);
 	};
 
 	struct special_client_request : public yojimbo::Message {
@@ -252,6 +268,7 @@ namespace net_messages {
 
 	using all_t = type_list<
 		client_welcome*,
+		public_settings_update*, 
 		new_server_vars*,
 		initial_arena_state*,
 		//initial_steps_correction*,

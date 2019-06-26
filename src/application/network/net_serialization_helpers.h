@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/readwrite/byte_readwrite_traits.h"
+#include "application/setups/server/public_settings_update.h"
 
 namespace net_messages {
 	template <class Stream, class V>
@@ -97,6 +98,18 @@ namespace net_messages {
 	template <class Stream>
 	bool serialize(Stream& s, ::prestep_client_context& c) {
 		serialize_int(s, c.num_entropies_accepted, 0, 255);
+		return true;
+	}
+
+	template <class Stream>
+	bool serialize(Stream& s, ::public_client_settings& p) {
+		auto& settings = p.character_input;
+
+		serialize_float(s, settings.crosshair_sensitivity.x);
+		serialize_float(s, settings.crosshair_sensitivity.y);
+
+		serialize_bool(s, settings.keep_movement_forces_relative_to_crosshair);
+
 		return true;
 	}
 

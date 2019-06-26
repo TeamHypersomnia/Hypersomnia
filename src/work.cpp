@@ -695,6 +695,16 @@ and then hitting Save settings.
 		return gameplay_camera.get_current_eye();
 	};
 
+	static auto get_current_input_settings = [&](const auto& cfg) {
+		auto settings = cfg.input;
+
+		on_specific_setup([&](client_setup& setup) {
+			settings.character = setup.get_current_requested_settings().public_settings.character_input;
+		});
+
+		return settings;
+	};
+
 	static auto handle_app_intent = [&](const app_intent_type intent) {
 		using T = decltype(intent);
 
@@ -873,16 +883,18 @@ and then hitting Save settings.
 			if constexpr(!std::is_same_v<T, main_menu_setup>) {
 				const auto& total_collected = setup.get_entropy_accumulator();
 
+				const auto input_cfg = get_current_input_settings(viewing_config);
+
 				if (const auto motion = total_collected.calc_motion(
 					get_viewed_character(), 
 					game_motion_type::MOVE_CROSSHAIR,
 					entropy_accumulator::input {
-						viewing_config.input, 
+						input_cfg, 
 						window.get_screen_size(), 
 						get_camera_eye().zoom 
 					}
 				)) {
-					return motion->offset;
+					return vec2(motion->offset) * input_cfg.character.crosshair_sensitivity;
 				}
 			}
 
@@ -1002,6 +1014,7 @@ and then hitting Save settings.
 			);
 
 			const auto zoom = get_camera_eye().zoom;
+			const auto input_cfg = get_current_input_settings(viewing_config);
 
 			if constexpr(std::is_same_v<S, client_setup>) {
 				/* The client needs more goodies */
@@ -1009,7 +1022,7 @@ and then hitting Save settings.
 				setup.advance(
 					{ 
 						window.get_screen_size(), 
-						viewing_config.input, 
+						input_cfg, 
 						zoom,
 						viewing_config.simulation_receiver, 
 						viewing_config.lag_compensation, 
@@ -1025,7 +1038,7 @@ and then hitting Save settings.
 				setup.advance(
 					{ 
 						window.get_screen_size(), 
-						viewing_config.input, 
+						input_cfg, 
 						zoom,
 						network_performance,
 						server_stats
@@ -1038,7 +1051,7 @@ and then hitting Save settings.
 					{ 
 						frame_delta, 
 						window.get_screen_size(), 
-						viewing_config.input, 
+						input_cfg, 
 						zoom 
 					},
 					callbacks
@@ -1577,7 +1590,8 @@ and then hitting Save settings.
 							}
 							if (const auto it = mapped_or_nullptr(viewing_config.inventory_gui_controls, key)) {
 								if (should_draw_game_gui()) {
-									game_gui.control_hotbar_and_action_button(get_game_gui_subject(), { *it, *key_change }, viewing_config.input.game_gui);
+									const auto input_cfg = get_current_input_settings(viewing_config);
+									game_gui.control_hotbar_and_action_button(get_game_gui_subject(), { *it, *key_change }, input_cfg.game_gui);
 
 									if (was_pressed) {
 										continue;
