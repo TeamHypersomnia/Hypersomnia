@@ -6,6 +6,7 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 	
+- Do the same optimization for objects that haven't changed their positions, e.g. crates
 
 - Thread pools
 	- The game loop

@@ -489,6 +489,7 @@ namespace net_messages {
 	inline bool initial_arena_state::write_payload(
 		F block_allocator,
 		augs::serialization_buffers& buffers,
+		const cosmos_solvable_significant& initial_signi,
 		const all_entity_flavours& all_flavours,
 		const initial_arena_state_payload<true> in
 	) {
@@ -511,7 +512,7 @@ namespace net_messages {
 			NSR_LOG("Reserved size: %x", s.size());
 
 			{
-				auto s = buffers.make_serialization_stream<net_solvable_stream_ref>(all_flavours, in.signi);
+				auto s = buffers.make_serialization_stream<net_solvable_stream_ref>(all_flavours, initial_signi, in.signi);
 				write_all_to(s);
 			}
 

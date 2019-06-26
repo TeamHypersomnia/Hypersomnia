@@ -57,7 +57,9 @@ void editor_summary_gui::perform(editor_setup& setup) {
 				compressed_buf.clear();
 
 				{
-					auto s = net_solvable_stream_ref(cosm.get_common_significant().flavours, solvable, input_buf);
+					const auto& initial_signi = setup.is_gameplay_on() ? setup.get_arena_handle().initial_signi : solvable;
+
+					auto s = net_solvable_stream_ref(cosm.get_common_significant().flavours, initial_signi, solvable, input_buf);
 					augs::write_bytes(s, solvable);
 				}
 

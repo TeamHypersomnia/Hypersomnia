@@ -352,6 +352,22 @@ namespace augs {
 			return id;
 		}
 
+		auto find_nth_id(const size_type i) const {
+			key_type id;
+
+			if (i < slots.size()) {
+				const auto& s = slots[i];
+
+				id.indirection_index = s.pointing_indirector;
+
+				if (s.pointing_indirector < indirectors.size()) {
+					id.version = indirectors[s.pointing_indirector].version;
+				}
+			}
+
+			return id;
+		}
+
 		void clear() {
 			const auto c = capacity();
 

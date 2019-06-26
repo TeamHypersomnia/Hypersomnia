@@ -20,16 +20,19 @@ struct net_solvable_stream_ref : augs::ref_memory_stream {
 	using base = augs::ref_memory_stream;
 
 	const all_entity_flavours& flavours;
+	const cosmos_solvable_significant& initial_signi;
 	const cosmos_solvable_significant& serialized_signi;
 
 	template <class... Args>
 	net_solvable_stream_ref(
 		const all_entity_flavours& flavours,
+		const cosmos_solvable_significant& initial_signi,
 		const cosmos_solvable_significant& serialized_signi,
 		Args&&... args
 	) : 
 		base(std::forward<Args>(args)...),
 		flavours(flavours),
+		initial_signi(initial_signi),
 		serialized_signi(serialized_signi)
 	{}
 
@@ -44,21 +47,38 @@ struct net_solvable_stream_ref : augs::ref_memory_stream {
 
 		const auto& body_flavours = flavours.template get_for<E>();
 		const auto& serialized_pool = serialized_signi.entity_pools.get_for<E>();
+		const auto& original_pool = initial_signi.entity_pools.get_for<E>();
 
 		augs::write_bytes(*this, storage.size());
 
 		for (const auto& s : storage) {
 			const bool is_always_static = pred(body_flavours[s.flavour_id]);
-			const char static_byte = is_always_static ? 1 : 0;
+			const auto this_idx = index_in(storage, s);
+			const auto this_id = serialized_pool.find_nth_id(this_idx);
 
+			const auto static_byte = [&]() -> char {
+				if (is_always_static) {
+					return 1;
+				}
+
+				static_assert(std::is_trivially_copyable_v<remove_cref<decltype(s)>>);
+
+				if (const auto correspondent_initial = original_pool.find(this_id)) {
+					if (!std::memcmp(std::addressof(s), correspondent_initial, sizeof(*correspondent_initial))) {
+						return 2;
+					}
+				}
+
+				return 0;
+			}();
+			 
 			augs::write_bytes(*this, static_byte);
 			
-			if (!is_always_static) {
+			if (static_byte == 0) {
 				augs::write_bytes(*this, s);
 			}
 			else {
-				const auto id = serialized_pool.get_nth_id(index_in(storage, s));
-				augs::write_bytes(*this, id.to_unversioned());
+				augs::write_bytes(*this, this_id.to_unversioned());
 			}
 		}
 	}

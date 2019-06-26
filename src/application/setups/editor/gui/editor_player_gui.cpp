@@ -12,6 +12,7 @@
 #include "augs/misc/readable_bytesize.h"
 
 #include "application/setups/editor/detail/update_official_content.h"
+#include "application/setups/editor/commands/detail/editor_property_accessors.h"
 
 void editor_player_gui::perform(const editor_command_input cmd_in) {
 	using namespace augs::imgui;
@@ -181,5 +182,12 @@ void editor_player_gui::perform(const editor_command_input cmd_in) {
 
 	if (ImGui::Button("Update official content")) {
 		update_official_content(cmd_in, settings);
+	}
+
+	text_disabled(typesafe_sprintf("Current cosmos clock: %x", folder.commanded->work.world.get_clock().now.step));
+
+	if (ImGui::Button("Force reset cosmos clock")) {
+		auto& csm = folder.commanded->work.world;
+		editor_property_accessors::force_set_clock(csm, 0);
 	}
 }

@@ -12,6 +12,11 @@ static constexpr bool should_reinfer_after_change(const T&) {
 }
 
 struct editor_property_accessors {
+	template <class C, class V>
+	static void force_set_clock(C& cosm, V value) {
+		cosm.get_solvable({}).significant.clk.now.step = value;
+	}
+
 	template <class C, class F>
 	static bool access(
 		const flavour_property_id& self,

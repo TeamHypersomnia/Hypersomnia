@@ -470,6 +470,7 @@ void server_setup::advance_clients_state() {
 
 				buffers,
 
+				initial_signi,
 				scene.world.get_common_significant().flavours,
 
 				initial_arena_state_payload<true> {
@@ -690,6 +691,7 @@ message_handler_result server_setup::handle_client_message(
 
 						buffers,
 
+						initial_signi,
 						scene.world.get_common_significant().flavours,
 
 						initial_arena_state_payload<true> {

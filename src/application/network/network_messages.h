@@ -129,6 +129,7 @@ namespace net_messages {
 		bool write_payload(
 			F block_allocator,
 			augs::serialization_buffers&,
+			const cosmos_solvable_significant& initial_signi,
 			const all_entity_flavours& all_flavours,
 			initial_arena_state_payload<true>
 		);
