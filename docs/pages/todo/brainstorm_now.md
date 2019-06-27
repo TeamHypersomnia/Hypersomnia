@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 	
+- Benefits of demos
+	- Deterministic repros
+	- Can record without performance hit
+	- Can later record in highest quality only the highlights
+	- Fun moments will never be lost
+
 - Thread pools
 	- The game loop
 		- Setup posts a job to complete n steps
@@ -15,12 +21,6 @@ summary: That which we are brainstorming at the moment.
 	- Start with std::async?
 		- Actually some nice interface for completion could come in handy
 
-- Benefits of demos
-	- Deterministic repros
-	- Can record without performance hit
-	- Can later record in highest quality only the highlights
-	- Fun moments will never be lost
-
 - We can automatically record demos for every server session
 	- Demos could just be network messages applied at step x
 	- We could pretty much resimulate the entire client setup this way, just without sending messages
@@ -29,7 +29,7 @@ summary: That which we are brainstorming at the moment.
 
 - Default camera mode in settings, maybe controls?
 
-- for sound and rendering, readerwriterqueue?
+- for sound and rendering, use readerwriterqueue repository?
 
 - Completely wrongly assigned metas
 	- EMPIREFAN had fortesq's avatar

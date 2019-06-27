@@ -610,7 +610,7 @@ return {
 	},
 
 	max_buffered_server_commands = 10000,
-	max_predicted_client_commands = 3000,
+	max_predicted_client_commands = 1500,
     spectate_referential_state = true,
 
 	client_chat = {
