@@ -1,4 +1,4 @@
-Revision no.: 6820 (clean)
-Build date: Mon Jun 24 21:03:38 2019
+Revision no.: 6825 (dirty)
+Build date: Wed Jun 26 19:30:53 2019
 Commit message:
-Fixes to match summary logic D(...)
+Only send the entities that ha(...)
