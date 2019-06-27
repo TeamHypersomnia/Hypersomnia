@@ -26,6 +26,12 @@ namespace net_messages {
 		return true;
 	}
 
+	template <class Stream>
+	bool serialize(Stream& s, ::session_id_type& i) {
+		serialize_uint32(s, i.value);
+		return true;
+	}
+
 	template <class Stream, unsigned buffer_size>
 	bool serialize_fixed_size_str(Stream& stream, augs::constant_size_string<buffer_size>& str) {
 		const auto s = str.data();
@@ -78,11 +84,19 @@ namespace net_messages {
 
 	template <class Stream>
 	bool serialize(Stream& s, ::server_broadcasted_chat& c) {
-		return 
-			serialize(s, c.author)
-			&& serialize_enum(s, c.target)
-			&& serialize_fixed_size_str(s, c.message)
-		;
+		if (!serialize(s, c.author)) {
+			return false;
+		}
+
+		serialize_bool(s, c.recipient_shall_kindly_leave);
+
+		if (!serialize_enum(s, c.target)) {
+			return false;
+		}
+
+		serialize_align(s);
+
+		return serialize_fixed_size_str(s, c.message);
 	}
 
 	template <class Stream>

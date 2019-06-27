@@ -255,11 +255,8 @@ bool start_client_gui_state::perform(
 
 		ImGui::Separator();
 
-		const auto len = into_vars.nickname.length();
-		const auto clamped_len = std::clamp(len, min_nickname_length_v, max_nickname_length_v);
-
 		{
-			auto scope = maybe_disabled_cols({}, len != clamped_len);
+			auto scope = maybe_disabled_cols({}, ::nickname_len_in_range(into_vars.nickname.length()));
 
 			if (ImGui::Button("Connect!")) {
 				result = true;

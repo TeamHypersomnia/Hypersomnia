@@ -422,7 +422,10 @@ bool bomb_mode::add_player_custom(const input_type in, const add_player_input& a
 		return false;
 	}
 
+	LOG_NVPS(new_id.value, next_session_id.value);
 	new_player.chosen_name = add_in.name;
+	new_player.session_id = next_session_id;
+	++next_session_id;
 
 	if (state == arena_mode_state::WARMUP) {
 		new_player.stats.money = in.rules.economy.warmup_initial_money;
@@ -2266,27 +2269,58 @@ std::optional<arena_mode_match_result> bomb_mode::calc_match_result(const const_
 	return result;
 }
 
-template <class S>
-auto bomb_mode::find_player_by_impl(S& self, const entity_name_str& chosen_name) {
-	using R = maybe_const_ptr_t<std::is_const_v<S>, bomb_mode_player>;
+template <class S, class E>
+auto bomb_mode::find_player_by_impl(S& self, const E& identifier) {
+	using R = maybe_const_ptr_t<std::is_const_v<S>, std::pair<const mode_player_id, bomb_mode_player>>;
 
 	for (auto& it : self.players) {
 		auto& player_data = it.second;
 
-		if (player_data.chosen_name == chosen_name) {
-			return std::addressof(player_data);
+		if constexpr(std::is_same_v<entity_name_str, E>) {
+			if (player_data.chosen_name == identifier) {
+				return std::addressof(it);
+			}
+		}
+		else if constexpr(std::is_same_v<session_id_type, E>) {
+			if (player_data.session_id == identifier) {
+				return std::addressof(it);
+			}
 		}
 	}
 
 	return R(nullptr);
 }
 
+mode_player_id bomb_mode::lookup(const session_id_type& session_id) const {
+	if (const auto r = find_player_by_impl(*this, session_id)) {
+		return r->first;
+	}
+
+	return {};
+}
+
+const bomb_mode_player* bomb_mode::find(const session_id_type& session_id) const {
+	if (const auto r = find_player_by_impl(*this, session_id)) {
+		return std::addressof(r->second);
+	}
+
+	return nullptr;
+}
+
 bomb_mode_player* bomb_mode::find_player_by(const entity_name_str& chosen_name) {
-	return find_player_by_impl(*this, chosen_name);
+	if (const auto r = find_player_by_impl(*this, chosen_name)) {
+		return std::addressof(r->second);
+	}
+
+	return nullptr;
 }
 
 const bomb_mode_player* bomb_mode::find_player_by(const entity_name_str& chosen_name) const {
-	return find_player_by_impl(*this, chosen_name);
+	if (const auto r = find_player_by_impl(*this, chosen_name)) {
+		return std::addressof(r->second);
+	}
+
+	return nullptr;
 }
 
 void bomb_mode::restart(const input_type in, const logic_step step) {

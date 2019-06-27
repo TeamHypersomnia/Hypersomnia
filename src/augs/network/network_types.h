@@ -15,6 +15,10 @@ constexpr std::size_t max_rcon_password_length_v = 30;
 constexpr std::size_t max_chat_message_length_v = 180;
 constexpr std::size_t min_nickname_length_v = 3;
 
+inline bool nickname_len_in_range(const std::size_t len) {
+	return len >= min_nickname_length_v && len <= max_chat_message_length_v;
+}
+
 using net_time_t = double;
 using client_id_type = int;
 using channel_id_type = int;

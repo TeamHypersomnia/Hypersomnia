@@ -3413,3 +3413,49 @@ which can be done from Settings->Reset all settings to factory default.
 		- Then in theory there should be no need to use these settings, e.g. there will be no applications of force or crosshair movements
 		- We could always cache some last observed values
 
+- Clientside, avatar update received
+	- Non-existent session id arrives
+		- case: The player is already gone here
+			- Then the session id will be less than next mode session id
+		- case: The player is not yet added
+			- Add it to pending meta updates
+	- existent session id arrives
+		- all fine and dandy, assign to meta
+	- add player arrives
+		- clear the current meta for that player
+		- check the queue for early ids
+			- if no matching, wait until new one arrives
+
+- Clientside, chat kick received
+	- Non-existent session id arrives
+		- case: The player is already gone here
+			- Then the session id will be less than next mode session id as it was added already
+		- case: The player is not yet added, either latency or was kicked before being added
+			- Add it to pending chats
+			- the case for being kicked before can be signified with session id = 0
+
+- It sorta can't be helped because we want a deterministic, uninterrupted stream of inputs and asynchroonusly send less important, complementary info
+	- Each add should then pop and process the pending commands for this session id
+		- remove does not have to do anything as the add player clears relevant fields
+	- if only we could confirm on the server that the step at which a player was added, was indeed confirmed...
+		- although that's more to screw on the server and more latency introducted?
+
+
+
+- Completely wrongly assigned metas
+	- Solution: session index
+	- EMPIREFAN had fortesq's avatar
+	- The integrated host appeared to have some unique ping to all other players even though it should be zero
+	- FortesQ didn't see his own chat messages, only after reconnecting
+	- Since viewing logic does not write the state, we can parallelize it heavily with thread pools
+	- integrated server client might be screwing up order of ping values and avatars?
+	- Explanation for pings
+		- Net stats could have arrived before the client has appeared on the server
+		- later, the stats for integrated client were never pushed to the end of vector of pings (because we were taking only connected)
+		- So it was frozen to some ping value of the client when they arrived
+	- The avatars might'be been left uncleaned, simply
+		- Both on the client and on the integrated server, billan saw orh's face in empirefan's avatar even though there was no avatar
+		- We only rebuild when a NEW one is sent, but we never clean them and if someone does not have an avatar no message arrives
+			- so it cannot be told if the avatar has not yet arrived or if there is none
+			- CLIENT-SIDE, we need to clean it somehow, though the avatar might arrive before or after we get a notice that someone's connected
+

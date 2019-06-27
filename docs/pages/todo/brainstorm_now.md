@@ -31,11 +31,6 @@ summary: That which we are brainstorming at the moment.
 
 - for sound and rendering, use readerwriterqueue repository?
 
-- Completely wrongly assigned metas
-	- EMPIREFAN had fortesq's avatar
-	- The integrated host appeared to have some unique ping to all other players even though it should be zero
-	- FortesQ didn't see his own chat messages, only after reconnecting
-	- Since viewing logic does not write the state, we can parallelize it heavily with thread pools
 
 - Fix the sudden increase in upload rate when someone timeouts 
 	- After some time, we could send initial state instead of inputs

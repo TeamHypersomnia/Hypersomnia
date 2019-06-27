@@ -10,6 +10,7 @@
 #include "view/mode_gui/arena/arena_player_meta.h"
 #include "game/common_state/entity_flavours.h"
 #include "application/setups/server/public_settings_update.h"
+#include "game/modes/session_id.h"
 
 #define LOG_NET_SERIALIZATION !IS_PRODUCTION_BUILD
 
@@ -254,14 +255,14 @@ namespace net_messages {
 		static constexpr bool client_to_server = true;
 
 		bool read_payload(
-			uint32_t& client_id,
+			session_id_type& session_id,
 			arena_player_avatar_payload&
 		);
 
 		template <class F>
 		bool write_payload(
 			F block_allocator,
-			const uint32_t& client_id,
+			const session_id_type& session_id,
 			const arena_player_avatar_payload&
 		);
 	};

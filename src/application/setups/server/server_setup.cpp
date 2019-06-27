@@ -89,6 +89,27 @@ server_setup::server_setup(
 
 		rebuild_player_meta_viewables = true;
 	}
+
+	const bool conditions_fulfilled = [&]() {
+		if (dedicated == std::nullopt) {
+			if (!nickname_len_in_range(integrated_client_vars.nickname.length())) {
+				failure_reason = typesafe_sprintf(
+					"The nickname should have between %x and %x bytes.", 
+					min_nickname_length_v,
+					max_nickname_length_v
+				);
+
+				return false;
+			}
+		}
+
+		return true;
+
+	}();
+
+	if (!conditions_fulfilled) {
+		shutdown();
+	}
 }
 
 template <class F>
@@ -121,6 +142,18 @@ mode_player_id server_setup::to_mode_player_id(const client_id_type& id) {
 	out.value = static_cast<mode_player_id::id_value_type>(id);
 
 	return out;
+}
+
+std::optional<session_id_type> server_setup::find_session_id(const client_id_type& id) {
+	return get_arena_handle().on_mode(
+		[&](const auto& mode) -> std::optional<session_id_type> {
+			if (const auto entry = mode.find(to_mode_player_id(id))) {
+				return entry->session_id;
+			}
+
+			return std::nullopt;
+		}
+	);
 }
 
 online_arena_handle<false> server_setup::get_arena_handle() {
@@ -485,17 +518,21 @@ void server_setup::advance_clients_state() {
 				}
 			);
 
-			auto broadcast_avatar = [this, recipient_client_id = client_id](const auto client_id_of_avatar, auto& cc) {
-				server->send_payload(
-					recipient_client_id,
-					game_channel_type::COMMUNICATIONS,
+			auto download_existing_avatar = [this, recipient_client_id = client_id](const auto client_id_of_avatar, auto& cc) {
+				const auto session_id_of_avatar = find_session_id(client_id_of_avatar);
 
-					client_id_of_avatar,
-					cc.meta.avatar
-				);
+				if (session_id_of_avatar) {
+					server->send_payload(
+						recipient_client_id,
+						game_channel_type::COMMUNICATIONS,
+
+						*session_id_of_avatar,
+						cc.meta.avatar
+					);
+				}
 			};
 
-			for_each_id_and_client(broadcast_avatar, connected_and_integrated_v);
+			for_each_id_and_client(download_existing_avatar, connected_and_integrated_v);
 
 			LOG("Sending initial payload for %x at step: %x", client_id, scene.world.get_total_steps_passed());
 		};
@@ -641,15 +678,17 @@ message_handler_result server_setup::handle_client_message(
 	}
 	else if constexpr (std::is_same_v<T, client_requested_chat>) {
 		if (c.state == S::IN_GAME) {
-			server_broadcasted_chat message;
+			if (const auto session_id = find_session_id(client_id)) {
+				server_broadcasted_chat message;
 
-			message.author = to_mode_player_id(client_id);
-			message.message = std::string(payload.message);
-			message.target = payload.target;
+				message.author = *session_id;
+				message.message = std::string(payload.message);
+				message.target = payload.target;
 
-			broadcast(message);
+				broadcast(message);
 
-			c.last_keyboard_activity_time = server_time;
+				c.last_keyboard_activity_time = server_time;
+			}
 		}
 	}
 	else if constexpr (std::is_same_v<T, total_mode_player_entropy>) {
@@ -725,7 +764,7 @@ message_handler_result server_setup::handle_client_message(
 	}
 	else if constexpr (std::is_same_v<T, arena_player_avatar_payload>) {
 		{
-			uint32_t dummy_id = 0;
+			session_id_type dummy_id;
 			arena_player_avatar_payload payload;
 
 			if (read_payload(dummy_id, payload)) {
@@ -739,18 +778,23 @@ message_handler_result server_setup::handle_client_message(
 					else {
 						c.meta.avatar = std::move(payload);
 
-						auto update_avatar = [this, client_id_of_avatar = client_id, &client_with_updated_avatar = c](const auto recipient_client_id, auto&) {
-							server->send_payload(
-								recipient_client_id,
-								game_channel_type::COMMUNICATIONS,
+						if (const auto session_id_of_avatar = find_session_id(client_id)) {
+							auto broadcast_avatar = [this, session_id_of_avatar, &client_with_updated_avatar = c](const auto recipient_client_id, auto&) {
+								server->send_payload(
+									recipient_client_id,
+									game_channel_type::COMMUNICATIONS,
 
-								client_id_of_avatar,
-								client_with_updated_avatar.meta.avatar
-							);
-						};
+									*session_id_of_avatar,
+									client_with_updated_avatar.meta.avatar
+								);
+							};
 
-						for_each_id_and_client(update_avatar, only_connected_v);
-						rebuild_player_meta_viewables = true;
+							for_each_id_and_client(broadcast_avatar, only_connected_v);
+							rebuild_player_meta_viewables = true;
+						}
+						else {
+							kick(client_id, "sending an avatar too early");
+						}
 					}
 				}
 				catch (...) {
@@ -868,19 +912,32 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 		if (server_time - when_last_sent_net_statistics > vars.send_net_statistics_update_once_every_secs) {
 			net_statistics_update update;
 
-			auto gather_stats = [&](const auto client_id, auto&) {
-				const auto max_ping = std::numeric_limits<uint8_t>::max();
-				const auto info = server->get_network_info(client_id);
-				const auto rounded_ping = static_cast<int>(std::round(info.rtt_ms));
+			auto gather_stats = [&](const auto client_id, const auto& c) {
+				if (c.state != client_state_type::IN_GAME) {
+					return;
+				}
 
-				const auto clamped_ping = std::clamp(rounded_ping, 0, int(max_ping));
+				const auto max_ping = std::numeric_limits<uint8_t>::max();
+				const auto clamped_ping = [&]() {
+					if (to_mode_player_id(client_id) == get_local_player_id()) {
+						return 0;
+					}
+
+					const auto info = server->get_network_info(client_id);
+					const auto rounded_ping = static_cast<int>(std::round(info.rtt_ms));
+					return std::clamp(rounded_ping, 1, int(max_ping));
+				}();
 
 				last_player_metas[client_id].stats.ping = clamped_ping;
 
 				update.ping_values.push_back(static_cast<uint8_t>(clamped_ping));
 			};
 
-			auto send_stats  = [&](const auto client_id, auto&) {
+			auto send_stats = [&](const auto client_id, const auto& c) {
+				if (c.state != client_state_type::IN_GAME) {
+					return;
+				}
+
 				server->send_payload(
 					client_id,
 					game_channel_type::VOLATILE_STATISTICS,
@@ -889,7 +946,7 @@ void server_setup::send_server_step_entropies(const compact_server_step_entropy&
 				);
 			};
 
-			for_each_id_and_client(gather_stats, only_connected_v);
+			for_each_id_and_client(gather_stats, connected_and_integrated_v);
 			for_each_id_and_client(send_stats, only_connected_v);
 
 			when_last_sent_net_statistics = server_time;
@@ -935,12 +992,17 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 		const auto window_name = "Connection status";
 		auto window = scoped_window(window_name, nullptr, ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_AlwaysAutoResize);
 
-		const auto addr = yojimbo::Address(last_start.ip.c_str(), last_start.port);
+		if (failure_reason.size() > 0) {
+			text(failure_reason);
+		}
+		else {
+			const auto addr = yojimbo::Address(last_start.ip.c_str(), last_start.port);
 
-		{
-			char buffer[256];
-			addr.ToString(buffer, sizeof(buffer));
-			text("Failed to host the server at address: %x", buffer);
+			{
+				char buffer[256];
+				addr.ToString(buffer, sizeof(buffer));
+				text("Failed to host the server at address: %x", buffer);
+			}
 		}
 
 		text("\n");
@@ -957,7 +1019,10 @@ custom_imgui_result server_setup::perform_custom_imgui(const perform_custom_imgu
 			if (chat.perform_input_bar(integrated_client_vars.client_chat)) {
 				server_broadcasted_chat message;
 
-				message.author = get_admin_player_id();
+				const auto session_id = find_session_id(static_cast<client_id_type>(get_admin_player_id().value));
+				ensure(session_id != std::nullopt);
+
+				message.author = *session_id;
 				message.message = std::string(chat.current_message);
 				message.target = chat.target;
 
@@ -1081,7 +1146,7 @@ rcon_level server_setup::get_rcon_level(const client_id_type& id) const {
 	return rcon_level::NONE;
 }
 
-void server_setup::broadcast(const ::server_broadcasted_chat& payload) {
+void server_setup::broadcast(const ::server_broadcasted_chat& payload, const std::optional<client_id_type> except) {
 	const auto sender_player = get_arena_handle().on_mode(
 		[&](const auto& typed_mode) {
 			return typed_mode.find(payload.author);
@@ -1106,6 +1171,10 @@ void server_setup::broadcast(const ::server_broadcasted_chat& payload) {
 	);
 
 	auto send_it = [&](const auto recipient_client_id, auto&) {
+		if (except != std::nullopt && *except == recipient_client_id) {
+			return;
+		}
+
 		if (payload.target == chat_target_type::TEAM_ONLY) {
 			const auto recipient_player = get_arena_handle().on_mode(
 				[&](const auto& typed_mode) {
@@ -1154,8 +1223,8 @@ message_handler_result server_setup::abort_or_kick_if_debug(const client_id_type
 #endif
 }
 
-void server_setup::kick(const client_id_type& id, const std::string& reason) {
-	auto& c = clients[id];
+void server_setup::kick(const client_id_type& kicked_id, const std::string& reason) {
+	auto& c = clients[kicked_id];
 
 	if (!c.is_set()) {
 		return;
@@ -1165,33 +1234,34 @@ void server_setup::kick(const client_id_type& id, const std::string& reason) {
 		return;
 	}
 
+
 	c.when_kicked = server_time;
 
 	server_broadcasted_chat message;
 	message.message = reason;
 	message.target = chat_target_type::KICK;
-	message.author = to_mode_player_id(id);
 
-	broadcast(message);
+	if (const auto session_id = find_session_id(kicked_id)) {
+		message.author = *session_id;
+	}
+
+	const auto except = kicked_id;
+	broadcast(message, except);
+
+	message.recipient_shall_kindly_leave = true;
+
+	server->send_payload(
+		kicked_id,
+		game_channel_type::COMMUNICATIONS,
+
+		message
+	);
 }
 
 void server_setup::ban(const client_id_type& id, const std::string& reason) {
-	auto& c = clients[id];
-
-	if (!c.is_set()) {
-		return;
-	}
-
-	if (c.when_kicked == std::nullopt) {
-		c.when_kicked = server_time;
-	}
-
-	server_broadcasted_chat message;
-	message.message = reason;
-	message.target = chat_target_type::BAN;
-	message.author = to_mode_player_id(id);
-
-	broadcast(message);
+	// TODO!!!
+	(void)id;
+	(void)reason;
 }
 
 std::optional<arena_player_metas> server_setup::get_new_player_metas() {
@@ -1253,6 +1323,10 @@ bool server_setup::is_integrated() const {
 
 bool server_setup::is_dedicated() const {
 	return dedicated != std::nullopt;
+}
+
+void server_setup::handle_new_session(const add_player_input&) {
+	rebuild_player_meta_viewables = true;
 }
 
 #include "augs/readwrite/to_bytes.h"

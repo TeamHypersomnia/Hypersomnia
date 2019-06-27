@@ -100,6 +100,7 @@ class server_setup :
 	arena_player_metas last_player_metas;
 
 	client_gui_state integrated_client_gui;
+	std::string failure_reason;
 	/* No server state follows later in code. */
 
 	static net_time_t get_current_time();
@@ -157,6 +158,7 @@ public:
 	~server_setup();
 
 	static mode_player_id to_mode_player_id(const client_id_type&);
+	std::optional<session_id_type> find_session_id(const client_id_type&);
 
 	const auto& get_viewed_cosmos() const {
 		return scene.world;
@@ -273,6 +275,10 @@ public:
 						new_callbacks, 
 						solve_settings()
 					);
+
+					if (logically_set(unpacked.general.added_player)) {
+						handle_new_session(unpacked.general.added_player);
+					}
 				}
 
 #if DUMP_BEFORE_AND_AFTER_ROUND_START
@@ -357,7 +363,7 @@ public:
 		return get_arena_handle().on_mode_with_input(std::forward<F>(callback));
 	}
 
-	void broadcast(const ::server_broadcasted_chat&);
+	void broadcast(const ::server_broadcasted_chat&, std::optional<client_id_type> except = std::nullopt);
 	std::string find_client_nickname(const client_id_type&) const;
 
 	auto get_game_gui_subject_id() const {
@@ -387,4 +393,6 @@ public:
 
 	bool is_integrated() const;
 	bool is_dedicated() const;
+
+	void handle_new_session(const add_player_input& in);
 };

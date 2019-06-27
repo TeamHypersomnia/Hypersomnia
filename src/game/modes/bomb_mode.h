@@ -19,6 +19,7 @@
 #include "game/detail/view_input/predictability_info.h"
 #include "augs/enums/callback_result.h"
 #include "game/enums/faction_choice_result.h"
+#include "game/modes/session_id.h"
 
 class cosmos;
 struct cosmos_solvable_significant;
@@ -169,6 +170,7 @@ struct bomb_mode_player {
 	bomb_mode_player_stats stats;
 	uint32_t round_when_chosen_faction = static_cast<uint32_t>(-1); 
 	bool is_bot = false;
+	session_id_type session_id = session_id_type::dead();
 	// END GEN INTROSPECTOR
 
 	bomb_mode_player(const entity_name_str& chosen_name = {}) : 
@@ -362,8 +364,8 @@ private:
 
 	void handle_game_commencing(input, logic_step);
 
-	template <class S>
-	static auto find_player_by_impl(S& self, const entity_name_str& chosen_name);
+	template <class S, class E>
+	static auto find_player_by_impl(S& self, const E& identifier);
 
 	/* A server might provide its own integer-based identifiers */
 	bool add_player_custom(input, const add_player_input&);
@@ -402,6 +404,7 @@ private:
 	unsigned current_num_bots = 0;
 	entity_id bomb_detonation_theme;
 	augs::speed_vars round_speeds;
+	session_id_type next_session_id = session_id_type::first();
 	// END GEN INTROSPECTOR
 
 	friend augs::introspection_access;
@@ -447,6 +450,9 @@ public:
 
 	const bomb_mode_player* find_player_by(const entity_name_str& chosen_name) const;
 	const bomb_mode_player* find(const mode_player_id&) const;
+
+	const bomb_mode_player* find(const session_id_type&) const;
+	mode_player_id lookup(const session_id_type&) const;
 
 	template <class F>
 	void for_each_player_in(faction_type, F&& callback) const;
@@ -561,5 +567,9 @@ public:
 				return;
 			}
 		}
+	}
+
+	auto get_next_session_id() const {
+		return next_session_id;
 	}
 };

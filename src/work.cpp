@@ -547,7 +547,8 @@ and then hitting Save settings.
 				setup_launcher([&]() {
 					emplace_current_setup(std::in_place_type_t<client_setup>(),
 						lua,
-						config.default_client_start
+						config.default_client_start,
+						config.client
 					);
 				});
 
@@ -1345,6 +1346,14 @@ and then hitting Save settings.
 
 						if (result == custom_imgui_result::GO_TO_MAIN_MENU) {
 							launch_setup(launch_type::MAIN_MENU);
+						}
+
+						using S = remove_cref<decltype(setup)>;
+
+						if constexpr(std::is_same_v<S, client_setup>) {
+							if (result == custom_imgui_result::RETRY) {
+								launch_setup(launch_type::CLIENT);
+							}
 						}
 					});
 

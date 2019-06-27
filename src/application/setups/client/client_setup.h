@@ -102,8 +102,24 @@ class client_setup :
 	bool print_only_disconnect_reason = false;
 
 	bool rebuild_player_meta_viewables = false;
+	augs::path_type last_sent_avatar;
 	client_gui_state client_gui;
+
+	using untimely_payload_variant = std::variant<arena_player_avatar_payload>;
+
+	struct untimely_payload {
+		session_id_type associated_id;
+		untimely_payload_variant payload;
+	};
+
+	std::vector<untimely_payload> untimely_payloads;
 	/* No client state follows later in code. */
+
+	template <class U>
+	bool handle_untimely(U&, session_id_type);
+
+	bool push_or_handle(untimely_payload&);
+	void handle_new_session(const add_player_input& in);
 
 	template <class T>
 	void set_disconnect_reason(T&& reason, bool print_only_reason = false) {
@@ -160,12 +176,11 @@ public:
 
 	client_setup(
 		sol::state& lua,
-		const client_start_input&
+		const client_start_input&,
+		const client_vars& initial_vars
 	);
 
 	~client_setup();
-
-	void init_connection(const client_start_input&);
 
 	const cosmos& get_viewed_cosmos() const;
 
@@ -347,6 +362,12 @@ public:
 
 					auto advance_referential = [&](const auto& entropy) {
 						referential_arena.advance(entropy, referential_callbacks, referential_solve_settings);
+
+						const auto& added = entropy.general.added_player;
+
+						if (logically_set(added)) {
+							handle_new_session(added);
+						}
 					};
 
 					auto advance_repredicted = [&](const auto& entropy) {
@@ -522,9 +543,10 @@ public:
 
 	void ensure_handler() {}
 
-	mode_player_id get_local_player_id() const {
-		return client_player_id;
-	}
+	mode_player_id get_local_player_id() const;
+	std::optional<session_id_type> find_local_session_id() const;
+	std::optional<session_id_type> find_session_id(mode_player_id) const;
+	mode_player_id find_by(session_id_type) const;
 
 	online_arena_handle<false> get_arena_handle(std::optional<client_arena_type> = std::nullopt);
 	online_arena_handle<true> get_arena_handle(std::optional<client_arena_type> = std::nullopt) const;

@@ -25,30 +25,30 @@
 
 client_setup::client_setup(
 	sol::state& lua,
-	const client_start_input& in
+	const client_start_input& in,
+	const client_vars& initial_vars
 ) : 
 	lua(lua),
-	adapter(std::make_unique<client_adapter>())
+	last_start(in),
+	vars(initial_vars),
+	adapter(std::make_unique<client_adapter>()),
+	client_time(get_current_time()),
+	when_initiated_connection(get_current_time())
 {
-	LOG("Client setup ctor");
-	init_connection(in);
-}
-
-void client_setup::init_connection(const client_start_input& in) {
 	LOG("Initializing connection with %x", in.ip_port);
 
-	last_start = in;
+	if (!nickname_len_in_range(vars.nickname.length())) {
+		const auto reason = typesafe_sprintf(
+			"The nickname should be between %x and %x bytes.", 
+			min_nickname_length_v,
+			max_nickname_length_v
+		);
 
-	state = client_state_type::INVALID;
-	adapter->connect(in);
-	when_initiated_connection = get_current_time();
-	receiver.clear();
-	last_disconnect_reason.clear();
-	print_only_disconnect_reason = false;
-	client_time = get_current_time();
-	pending_request = special_client_request::NONE;
-	now_resyncing = false;
-	rcon = rcon_level::NONE;
+		set_disconnect_reason(reason);
+	}
+	else {
+		adapter->connect(in);
+	}
 }
 
 client_setup::~client_setup() {
@@ -220,7 +220,12 @@ message_handler_result client_setup::handle_server_message(
 			sender_player_nickname = sender_player->chosen_name;
 		}
 		else {
-			sender_player_nickname = "Client";
+			if (!author_id.is_set()) {
+				sender_player_nickname = "Client";
+			}
+			else {
+				sender_player_nickname = "Unknown player";
+			}
 		}
 
 		{
@@ -235,7 +240,7 @@ message_handler_result client_setup::handle_server_message(
 			client_gui.chat.add_entry(std::move(new_entry));
 		}
 
-		if (payload.should_disconnect_now(get_local_player_id())) {
+		if (payload.recipient_shall_kindly_leave) {
 			std::string kicked_or_banned;
 
 			if (payload.target == chat_target_type::KICK) {
@@ -344,6 +349,14 @@ message_handler_result client_setup::handle_server_message(
 		//LOG_NVPS(payload.num_entropies_accepted);
 	}
 	else if constexpr (std::is_same_v<T, public_settings_update>) {
+		/* 
+			We can assign it right away and it won't desync,
+			because it only affects the incoming entropies and they are unpacked on the go
+			whenever networked_server_step_entropy arrives.
+
+			networked_server_step_entropy and public_settings_update are on the same channel.
+		*/
+
 		player_metas[payload.subject_id.value].public_settings = payload.new_settings;
 	}
 	else if constexpr (std::is_same_v<T, net_statistics_update>) {
@@ -369,17 +382,61 @@ message_handler_result client_setup::handle_server_message(
 
 	}
 	else if constexpr (std::is_same_v<T, arena_player_avatar_payload>) {
-		uint32_t client_id;
+		session_id_type session_id;
 		arena_player_avatar_payload new_avatar;
 
 		const bool result = read_payload(
-			client_id,
+			session_id,
 			new_avatar
 		);
 
 		if (!result) {
 			return abort_v;
 		}
+
+		auto p = untimely_payload { session_id, std::move(new_avatar) };
+
+		if (!push_or_handle(p)) {
+			return abort_v;
+		}
+	}
+	else {
+		static_assert(always_false_v<T>, "Unhandled payload type.");
+	}
+
+	return continue_v;
+}
+
+bool client_setup::push_or_handle(untimely_payload& p) {
+	const auto session_id = p.associated_id;
+
+	if (logically_set(find_by(session_id))) {
+		const auto typed_handler = [&](auto& typed_payload) {
+			return handle_untimely(typed_payload, session_id);
+		};
+
+		return std::visit(typed_handler, p.payload);
+	}
+
+	const auto next_session_id = get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
+		[&](const auto& mode) {
+			return mode.get_next_session_id();
+		}
+	);
+
+	const bool can_still_appear = p.associated_id.value >= next_session_id.value;
+
+	if (can_still_appear) {
+		untimely_payloads.emplace_back(p);
+	}
+
+	return true;
+}
+
+template <class U>
+bool client_setup::handle_untimely(U& u, const session_id_type session_id) {
+	if constexpr(std::is_same_v<U, arena_player_avatar_payload>) {
+		auto& new_avatar = u;
 
 		if (new_avatar.png_bytes.size() > 0) {
 			try {
@@ -388,25 +445,28 @@ message_handler_result client_setup::handle_server_message(
 				if (size.x > max_avatar_side_v || size.y > max_avatar_side_v) {
 					LOG("The server has tried to send an avatar of size %xx%x!", size.x, size.y);
 					log_malicious_server();
-					return abort_v;
+					return false;
 				}
 			}
 			catch (const augs::image_loading_error& err) {
 				LOG("The server has tried to send an invalid avatar!");
 				LOG(err.what());
 				log_malicious_server();
-				return abort_v;
+				return false;
 			}
 		}
 
-		player_metas[client_id].avatar = std::move(new_avatar);
+		const auto player_id = find_by(session_id);
+		ensure(logically_set(player_id));
+
+		player_metas[player_id.value].avatar = std::move(new_avatar);
 		rebuild_player_meta_viewables = true;
 	}
 	else {
-		static_assert(always_false_v<T>, "Unhandled payload type.");
+		static_assert(always_false_v<U>);
 	}
 
-	return continue_v;
+	return true;
 }
 
 void client_setup::handle_server_messages() {
@@ -444,7 +504,7 @@ void client_setup::send_pending_commands() {
 
 			return std::string("noentity");
 		}();
-			
+
 		const auto pid = augs::getpid();
 
 		const auto preffix = this_nickname + "_srl_" + std::to_string(pid) + "_";
@@ -555,7 +615,7 @@ void client_setup::send_pending_commands() {
 	const bool init_send = state == C::INVALID;
 
 	const bool can_already_resend_settings = client_time - when_sent_client_settings > 1.0;
-	const bool resend_requested_settings  = can_already_resend_settings && !augs::introspective_equal(current_requested_settings, requested_settings);
+	const bool resend_requested_settings = can_already_resend_settings && !augs::introspective_equal(current_requested_settings, requested_settings);
 
 	auto send_settings = [&]() {
 		adapter->send_payload(
@@ -575,45 +635,48 @@ void client_setup::send_pending_commands() {
 		current_requested_settings = requested_settings;
 	};
 
-	if (init_send) {
+	if (init_send || resend_requested_settings) {
 		send_settings();
-
-		const auto& avatar_path = vars.avatar_image_path;
-
-		if (!avatar_path.empty()) {
-			arena_player_avatar_payload payload;
-
-			try {
-				payload.png_bytes = augs::file_to_bytes(avatar_path);
-			}
-			catch (...) {
-				payload.png_bytes.clear();
-			}
-
-			if (payload.png_bytes.size() > 0 && payload.png_bytes.size() <= max_avatar_bytes_v) {
-				uint32_t dummy_client_id = 0;
-
-				adapter->send_payload(
-					game_channel_type::COMMUNICATIONS,
-
-					dummy_client_id,
-					payload
-				);
-			}
-			else {
-				const auto reason = typesafe_sprintf(
-					"The avatar file (%x) exceeds the maximum size of %x.\nSupply a less entropic PNG file.", 
-					readable_bytesize(payload.png_bytes.size()), 
-					readable_bytesize(max_avatar_bytes_v)
-				);
-
-				set_disconnect_reason(reason);
-				disconnect();
-			}
-		}
 	}
-	else if (resend_requested_settings) {
-		send_settings();
+
+	const auto& avatar_path = vars.avatar_image_path;
+
+	if (state == C::IN_GAME) {
+		if (last_sent_avatar.empty()) {
+			if (!avatar_path.empty()) {
+				arena_player_avatar_payload payload;
+
+				try {
+					payload.png_bytes = augs::file_to_bytes(avatar_path);
+				}
+				catch (...) {
+					payload.png_bytes.clear();
+				}
+
+				if (payload.png_bytes.size() > 0 && payload.png_bytes.size() <= max_avatar_bytes_v) {
+					const auto dummy_client_id = session_id_type::dead();
+
+					adapter->send_payload(
+						game_channel_type::COMMUNICATIONS,
+
+						dummy_client_id,
+						payload
+					);
+				}
+				else {
+					const auto reason = typesafe_sprintf(
+						"The avatar file (%x) exceeds the maximum size of %x.\nSupply a less entropic PNG file.", 
+						readable_bytesize(payload.png_bytes.size()), 
+						readable_bytesize(max_avatar_bytes_v)
+					);
+
+					set_disconnect_reason(reason);
+					disconnect();
+				}
+			}
+
+			last_sent_avatar = avatar_path;
+		}
 	}
 
 	if (pending_request == special_client_request::RESYNC) {
@@ -626,7 +689,6 @@ void client_setup::send_pending_commands() {
 
 		pending_request = special_client_request::NONE;
 	}
-
 }
 
 void client_setup::send_packets_if_its_time() {
@@ -768,7 +830,7 @@ custom_imgui_result client_setup::perform_custom_imgui(
 				ImGui::Separator();
 
 				if (ImGui::Button("Retry")) {
-					init_connection(last_start);
+					return custom_imgui_result::RETRY;
 				}
 
 				ImGui::SameLine();
@@ -799,7 +861,10 @@ custom_imgui_result client_setup::perform_custom_imgui(
 			else {
 				text_color(typesafe_sprintf("Connected to %x.", last_start.ip_port), green);
 
-				if (state == C::PENDING_WELCOME) {
+				if (state == C::INVALID) {
+					text("Initializing connection...");
+				}
+				else if (state == C::PENDING_WELCOME) {
 					text("Sending the client configuration.");
 				}
 				else if (state == C::RECEIVING_INITIAL_STATE) {
@@ -924,4 +989,64 @@ std::optional<arena_player_metas> client_setup::get_new_player_metas() {
 	}
 
 	return std::nullopt;
+}
+
+mode_player_id client_setup::get_local_player_id() const {
+	return client_player_id;
+}
+
+mode_player_id client_setup::find_by(const session_id_type id) const {
+	return get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
+		[&](const auto& mode) {
+			return mode.lookup(id);
+		}
+	);
+}
+
+std::optional<session_id_type> client_setup::find_session_id(const mode_player_id id) const {
+	return get_arena_handle(client_arena_type::REFERENTIAL).on_mode(
+		[&](const auto& mode) -> std::optional<session_id_type> {
+			if (const auto entry = mode.find(id)) {
+				return entry->session_id;
+			}
+
+			return std::nullopt;
+		}
+	);
+}
+
+std::optional<session_id_type> client_setup::find_local_session_id() const {
+	return find_session_id(get_local_player_id());
+}
+
+void client_setup::handle_new_session(const add_player_input& in) {
+	const auto new_player = in.id;
+	const auto new_session_id = find_session_id(new_player);
+
+	ensure(new_session_id != std::nullopt);
+
+	auto& meta = player_metas[new_player.value];
+	meta.clear();
+	meta.session_id = *new_session_id;
+
+	auto untimely_handler = [&](auto& untimely) {
+		if (logically_set(find_by(untimely.associated_id))) {
+			const auto typed_handler = [&](auto& typed_payload) {
+				return handle_untimely(typed_payload, untimely.associated_id);
+			};
+
+			const auto result = std::visit(typed_handler, untimely.payload);
+
+			if (!result) {
+				disconnect();
+			}
+
+			return true;
+		}
+
+		return false;
+	};
+
+	erase_if(untimely_payloads, untimely_handler);
+	rebuild_player_meta_viewables = true;
 }

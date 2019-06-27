@@ -23,6 +23,8 @@ public:
 	bool will_be_upscaled = false;
 	bool do_initial_load = true;
 
+	bool allow_start = false;
+
 	bool perform(
 		augs::window& window,
 		client_start_input&,
