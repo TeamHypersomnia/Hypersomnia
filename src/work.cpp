@@ -2120,8 +2120,7 @@ and then hitting Save settings.
 
 		renderer.call_and_clear_triangles();
 
-		frame_performance.num_triangles.measure(renderer.num_total_triangles_drawn);
-		renderer.num_total_triangles_drawn = 0u;
+		frame_performance.num_triangles.measure(renderer.extract_num_total_triangles_drawn());
 
 		if (!until_first_swap_measured) {
 			LOG("Time until first swap: %x ms", until_first_swap.extract<std::chrono::milliseconds>());

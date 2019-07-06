@@ -32,13 +32,13 @@ namespace augs {
 
 		bool interpolate_debug_logic_step_lines = true;
 		renderer_settings current_settings;
-	public:
-		
+
 		vertex_triangle_buffer triangles;
 		vertex_line_buffer lines;
 		special_buffer specials;
 
 		std::size_t num_total_triangles_drawn = 0;
+	public:
 
 		renderer(const renderer_settings&);
 
@@ -139,6 +139,12 @@ namespace augs {
 
 		void apply(const renderer_settings&, bool force = false);
 		const renderer_settings& get_current_settings() const;
+
+		std::size_t extract_num_total_triangles_drawn() {
+			auto out = num_total_triangles_drawn;
+			out = 0;
+			return out;
+		}
 	};
 }
 

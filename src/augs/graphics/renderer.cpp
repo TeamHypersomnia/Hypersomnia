@@ -382,30 +382,6 @@ namespace augs {
 		GL_CHECK(glFinish());
 	}
 
-	GLsync renderer::fence() const {
-#if BUILD_OPENGL
-		const auto s = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-		return s;
-#else
-		return 0;
-#endif
-	}
-
-	bool renderer::wait_sync(const GLsync sync, const GLuint64 timeout) const {
-#if BUILD_OPENGL
-		const auto result = glClientWaitSync(sync, GL_SYNC_FLUSH_COMMANDS_BIT, timeout);
-		return !(result == GL_TIMEOUT_EXPIRED || result == GL_WAIT_FAILED);
-#else
-		(void)sync;
-		(void)timeout;
-
-		(void)triangle_buffer_id;
-		(void)special_buffer_id;
-		(void)imgui_elements_id;
-		return false;
-#endif
-	}
-
 	void renderer::enable_stencil() {
 		GL_CHECK(glEnable(GL_STENCIL_TEST));
 	}

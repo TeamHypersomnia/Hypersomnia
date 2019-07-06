@@ -894,7 +894,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	exploding_rings.draw_rings(
 		output,
-		renderer.specials,
+		renderer.get_special_buffer(),
 		cone
 	);
 
