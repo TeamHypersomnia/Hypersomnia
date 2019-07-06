@@ -48,7 +48,7 @@ void load_test_scene_sentience_properties(
 
 	{
 		auto& d = std::get<exaltation>(spells);
-		d.common.cooldown_ms = 4000;
+		d.common.cooldown_ms = 5000;
 		d.common.personal_electricity_required = 100;
 		d.common.associated_color = green;
 
@@ -68,7 +68,7 @@ void load_test_scene_sentience_properties(
 		d.common.cast_sparkles.modifier.colorize = d.common.associated_color;
 		d.common.cast_sparkles.modifier.scale_amounts = 1.3f;
 		d.common.cast_sparkles.modifier.scale_lifetimes = 1.3f;
-		d.common.standard_price = static_cast<money_type>(2500);
+		d.common.standard_price = static_cast<money_type>(2800);
 	}
 
 	{

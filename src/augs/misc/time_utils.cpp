@@ -29,18 +29,18 @@ augs::date_time::date_time(
 
 // TODO: FIX date_time acquisition on Windows!!!!
 
-#if PLATFORM_WINDOWS
-augs::date_time::date_time(
-	const augs::file_time_type&
-) : 
-	date_time({}) 
-{
-}
-#else
+#if defined(__clang__) && defined(PLATFORM_UNIX) 
 augs::date_time::date_time(
 	const augs::file_time_type& tp
 ) : 
 	date_time(augs::file_time_type::clock::to_time_t(tp)) 
+{
+}
+#else
+augs::date_time::date_time(
+	const augs::file_time_type&
+) : 
+	date_time({}) 
 {
 }
 #endif

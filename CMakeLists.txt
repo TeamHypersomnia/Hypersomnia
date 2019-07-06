@@ -61,6 +61,12 @@ else()
 	message(FATAL_ERROR "Unknown system.")
 endif()
 
+if(CLANG)
+	set(XCLANG_STR "-Xclang")
+else()
+	set(XCLANG_STR "")
+endif()
+
 ##################################################
 ### ALL CUSTOMIZABLE BUILD SWITCHES BEGIN HERE ###
 
@@ -921,11 +927,11 @@ if(GCC OR CLANG)
 		set(HYPERSOMNIA_C_FLAGS "${HYPERSOMNIA_C_FLAGS} -m64")
 	endif()
 
-	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -Xclang -fno-threadsafe-statics")
+	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} ${XCLANG_STR} -fno-threadsafe-statics")
 
 	message("-O0 will be specified for Debug build.")
-	set(HYPERSOMNIA_CXX_DEBUG_FLAGS "${HYPERSOMNIA_CXX_DEBUG_FLAGS} -Xclang -O0")
-	set(HYPERSOMNIA_C_DEBUG_FLAGS "${HYPERSOMNIA_C_DEBUG_FLAGS} -Xclang -O0")
+	set(HYPERSOMNIA_CXX_DEBUG_FLAGS "${HYPERSOMNIA_CXX_DEBUG_FLAGS} ${XCLANG_STR} -O0")
+	set(HYPERSOMNIA_C_DEBUG_FLAGS "${HYPERSOMNIA_C_DEBUG_FLAGS} ${XCLANG_STR} -O0")
 
 	if(NOT MSVC)
 		# Generate debug information (we don't care about C libraries at this point)
@@ -1008,15 +1014,17 @@ if (PREFER_LIBCXX AND CLANG AND NOT MSVC)
 	set(USE_LIBCXX ON)
 endif()
 
-if(USE_LIBCXX)
-	message("Chosen standard library: libc++")
-	# Looks like stdlib=libc++ is duplicated for the linker as well,
-	# so we only have to add it to CXX.
-	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -stdlib=libc++")
-elseif(UNIX)
-	message("Chosen standard library: libstdc++")
+if(CLANG)
+	if(USE_LIBCXX)
+		message("Chosen standard library: libc++")
+		# Looks like stdlib=libc++ is duplicated for the linker as well,
+		# so we only have to add it to CXX.
+		set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -stdlib=libc++")
+	elseif(UNIX)
+		message("Chosen standard library: libstdc++")
 
-	set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -stdlib=libstdc++")
+		set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -stdlib=libstdc++")
+	endif()
 endif()
 
 if(CLANG)

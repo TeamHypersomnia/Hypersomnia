@@ -1,8 +1,8 @@
 #!/usr/bin/env bash 
 CONFIGURATION=$1
 ARCHITECTURE=$2
-C_COMPILER=$CC
-CXX_COMPILER=$CXX
+C_COMPILER=$3
+CXX_COMPILER=$4
 
 if [[ ! -z "$3" ]] && [[ -z "$4" ]]
 then

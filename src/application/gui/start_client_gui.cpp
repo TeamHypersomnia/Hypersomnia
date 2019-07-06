@@ -256,7 +256,7 @@ bool start_client_gui_state::perform(
 		ImGui::Separator();
 
 		{
-			auto scope = maybe_disabled_cols({}, ::nickname_len_in_range(into_vars.nickname.length()));
+			auto scope = maybe_disabled_cols({}, !::nickname_len_in_range(into_vars.nickname.length()));
 
 			if (ImGui::Button("Connect!")) {
 				result = true;
