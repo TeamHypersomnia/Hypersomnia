@@ -3,12 +3,6 @@
 #include <future>
 #include <vector>
 
-#define EXPERIMENTAL_USE_PBO 0
-
-#if EXPERIMENTAL_USE_PBO
-#include "augs/graphics/pbo.h"
-#endif
-
 #include "augs/image/font.h"
 #include "augs/texture_atlas/atlas_profiler.h"
 #include "augs/graphics/renderer.h"
@@ -49,11 +43,6 @@ struct viewables_finalize_input {
 };
 
 class viewables_streaming {
-#if EXPERIMENTAL_USE_PBO
-	augs::graphics::pbo uploading_pbo;
-	bool pbo_ready_to_use = false;
-#endif
-
 	std::vector<rgba> pbo_fallback;
 	std::vector<rgba> avatar_pbo_fallback;
 
@@ -88,7 +77,7 @@ public:
 	atlas_profiler general_atlas_performance;
 	atlas_profiler neon_map_atlas_performance;
 
-	viewables_streaming(augs::renderer& renderer);
+	viewables_streaming() = default;
 	~viewables_streaming();
 
 	void load_all(viewables_load_input);

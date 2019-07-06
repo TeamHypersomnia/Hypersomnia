@@ -404,7 +404,7 @@ and then hitting Save settings.
 	*/
 
 	LOG("Initializing the streaming of viewables.");
-	static viewables_streaming streaming(renderer);
+	static viewables_streaming streaming;
 
 	auto streaming_finalize = augs::scope_guard([&]() {
 		streaming.finalize_pending_tasks();
