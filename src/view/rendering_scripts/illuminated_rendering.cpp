@@ -48,14 +48,20 @@
 #include "view/rendering_scripts/draw_offscreen_indicator.h"
 #include "game/detail/sentience/callout_logic.h"
 
+#include "augs/graphics/shader.hpp"
+
 void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto& additional_highlights = in.additional_highlights;
 	const auto& special_indicators = in.special_indicators;
-	const auto* default_fbo = augs::graphics::fbo::find_current();
+	augs::graphics::fbo::mark_current(in.renderer);
 
 	auto& profiler = in.frame_performance;
 
 	auto& renderer = in.renderer;
+
+	auto set_uniform = [&](auto&& sh, auto&&... args) {
+		sh->set_uniform(renderer, std::forward<decltype(args)>(args)...);
+	};
 	
 	const auto viewed_character = in.camera.viewed_character;
 
@@ -106,8 +112,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto filtering = renderer.get_current_settings().default_filtering;
 
 	auto bind_and_set_filter = [&](auto& tex) {
-		tex.set_as_current();
-		tex.set_filtering(filtering);
+		tex.set_as_current(renderer);
+		tex.set_filtering(renderer, filtering);
 	};
 
 	if (in.general_atlas) {
@@ -115,18 +121,18 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	}
 
 	auto set_shader_with_matrix = [&](auto& shader) {
-		shader->set_as_current();
-		shader->set_projection(matrix);
+		shader->set_as_current(renderer);
+		shader->set_projection(renderer, matrix);
 	};
 
 	auto set_shader_with_non_zoomed_matrix = [&](auto& shader) {
-		shader->set_as_current();
-		shader->set_projection(non_zoomed_matrix);
+		shader->set_as_current(renderer);
+		shader->set_projection(renderer, non_zoomed_matrix);
 	};
 
 	set_shader_with_matrix(shaders.standard);
 
-	fbos.smoke->set_as_current();
+	fbos.smoke->set_as_current(renderer);
 
 	renderer.clear_current_fbo();
 	renderer.set_additive_blending();
@@ -152,7 +158,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	renderer.call_and_clear_triangles();
 
-	fbos.illuminating_smoke->set_as_current();
+	fbos.illuminating_smoke->set_as_current(renderer);
 	renderer.clear_current_fbo();
 
 	draw_particles(particle_layer::ILLUMINATING_SMOKES);
@@ -161,7 +167,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	
 	renderer.set_standard_blending();
 
-	augs::graphics::fbo::set_current_to(default_fbo);
+	augs::graphics::fbo::set_current_to_marked(in.renderer);
 
 	const auto& light = av.get<light_system>();
 	
@@ -198,7 +204,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 #if BUILD_STENCIL_BUFFER
 	auto fill_stencil = [&]() {
 		if (fow_response != nullptr) {
-			renderer.enable_stencil();
+			renderer.set_stencil(true);
 
 			renderer.start_writing_stencil();
 			renderer.set_clear_color(rgba(0, 0, 0, 0));
@@ -245,9 +251,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 					return screen_space;
 				}();
 
-				shaders.fog_of_war->set_uniform("startingAngleVec", left_dir);
-				shaders.fog_of_war->set_uniform("endingAngleVec", right_dir);
-				shaders.fog_of_war->set_uniform("eye_frag_pos", eye_frag_pos);
+				set_uniform(shaders.fog_of_war, "startingAngleVec", left_dir);
+				set_uniform(shaders.fog_of_war, "endingAngleVec", right_dir);
+				set_uniform(shaders.fog_of_war, "eye_frag_pos", eye_frag_pos);
 			}
 
 			renderer.call_and_clear_triangles();
@@ -315,11 +321,11 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			bind_and_set_filter(fbos.illuminating_smoke->get_texture());
 			renderer.set_active_texture(0);
 
-			shaders.illuminating_smoke->set_as_current();
+			shaders.illuminating_smoke->set_as_current(renderer);
 
 			renderer.fullscreen_quad();
 
-			shaders.standard->set_as_current();
+			shaders.standard->set_as_current(renderer);
 
 			exploding_rings.draw_highlights_of_rings(
 				output,
@@ -379,7 +385,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 		renderer.call_and_clear_triangles();
 		fill_stencil();
-		renderer.disable_stencil();
+		renderer.set_stencil(false);
 	}
 #else
 	invoke_visibility_calculations();
@@ -422,7 +428,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	renderer.call_and_clear_triangles();
 
-	shaders.illuminated->set_as_current();
+	shaders.illuminated->set_as_current(renderer);
 
 	helper.draw<
 		render_layer::WATER_COLOR_OVERLAYS,
@@ -453,7 +459,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	if (fog_of_war_effective) {
 		renderer.call_and_clear_triangles();
 
-		renderer.enable_stencil();
+		renderer.set_stencil(true);
 		renderer.stencil_positive_test();
 
 		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
@@ -463,7 +469,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		});
 
 		renderer.call_and_clear_triangles();
-		renderer.disable_stencil();
+		renderer.set_stencil(false);
 
 		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
 			if (handle.get_official_faction() == viewed_character.get_official_faction()) {
@@ -530,7 +536,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	renderer.call_and_clear_lines();
 
-	shaders.illuminated->set_as_current();
+	shaders.illuminated->set_as_current(renderer);
 
 	helper.draw<
 		render_layer::DYNAMIC_BODY,
@@ -546,7 +552,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		const auto& appearance = settings.fog_of_war_appearance;
 
 		renderer.call_and_clear_triangles();
-		renderer.enable_stencil();
+		renderer.set_stencil(true);
 
 		if (appearance.overlay_color_on_visible) {
 			renderer.stencil_positive_test();
@@ -565,11 +571,11 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		);
 
 		renderer.call_and_clear_triangles();
-		shaders.pure_color_highlight->set_projection(matrix);
+		shaders.pure_color_highlight->set_projection(renderer, matrix);
 
 		renderer.stencil_positive_test();
 
-		shaders.illuminated->set_as_current();
+		shaders.illuminated->set_as_current(renderer);
 
 		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
 			if (handle.get_official_faction() != viewed_character.get_official_faction()) {
@@ -578,7 +584,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		});
 
 		renderer.call_and_clear_triangles();
-		renderer.disable_stencil();
+		renderer.set_stencil(false);
 
 		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
 			if (handle.get_official_faction() == viewed_character.get_official_faction()) {
@@ -605,11 +611,11 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	bind_and_set_filter(fbos.smoke->get_texture());
 	renderer.set_active_texture(0);
 
-	shaders.smoke->set_as_current();
+	shaders.smoke->set_as_current(renderer);
 
 	renderer.fullscreen_quad();
 
-	shaders.standard->set_as_current();
+	shaders.standard->set_as_current(renderer);
 	
 	helper.draw<
 		render_layer::FLYING_BULLETS,
@@ -635,14 +641,14 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		if (viewed_character) {
 			if (is_zoomed_out) {
 				renderer.call_and_clear_triangles();
-				shaders.standard->set_projection(non_zoomed_matrix);
+				shaders.standard->set_projection(renderer, non_zoomed_matrix);
 			}
 
 			draw_crosshair(viewed_character);
 
 			if (is_zoomed_out) {
 				renderer.call_and_clear_triangles();
-				shaders.standard->set_projection(matrix);
+				shaders.standard->set_projection(renderer, matrix);
 			}
 		}
 	}
@@ -672,7 +678,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	set_shader_with_matrix(shaders.circular_bars);
 
 	const auto set_center_uniform = [&](const augs::atlas_entry& tex) {
-		shaders.circular_bars->set_uniform("texture_center", tex.get_center());
+		set_uniform(shaders.circular_bars, "texture_center", tex.get_center());
 	};
 
 	draw_sentiences_hud_output sentiences_hud;
@@ -798,14 +804,14 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	set_shader_with_non_zoomed_matrix(shaders.standard);
 
 	if (settings.draw_nicknames) {
-		renderer.call_triangles(sentiences_hud.nicknames);
+		renderer.call_triangles(std::move(sentiences_hud.nicknames));
 	}
 
 	if (settings.draw_health_numbers) {
-		renderer.call_triangles(sentiences_hud.health_numbers);
+		renderer.call_triangles(std::move(sentiences_hud.health_numbers));
 	}
 
-	renderer.call_triangles(sentiences_hud.indicators);
+	renderer.call_triangles(std::move(sentiences_hud.indicators));
 
 	if (settings.draw_tactical_indicators.is_enabled) {
 		const auto alpha = settings.draw_tactical_indicators.value;
@@ -900,7 +906,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	renderer.call_and_clear_triangles();
 
-	shaders.pure_color_highlight->set_as_current();
+	shaders.pure_color_highlight->set_as_current(renderer);
 
 	highlights.draw_highlights(cosm, drawing_input);
 
@@ -915,7 +921,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	renderer.call_and_clear_triangles();
 	renderer.call_and_clear_lines();
 
-	shaders.standard->set_as_current();
+	shaders.standard->set_as_current(renderer);
 
 	flying_numbers.draw_numbers(
 		gui_font,
@@ -926,9 +932,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	renderer.call_and_clear_triangles();
 	renderer.call_and_clear_lines();
 
-	shaders.standard->set_projection(matrix);
+	shaders.standard->set_projection(renderer, matrix);
 
 	if (in.general_atlas) {
-		in.general_atlas->set_as_current();
+		in.general_atlas->set_as_current(renderer);
 	}
 }

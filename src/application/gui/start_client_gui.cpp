@@ -16,6 +16,8 @@
 #define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
 
 bool start_client_gui_state::perform(
+	augs::renderer& renderer,
+	augs::graphics::texture& avatar_preview_tex,
 	augs::window& window,
 	client_start_input& into_start,
 	client_vars& into_vars
@@ -83,30 +85,31 @@ bool start_client_gui_state::perform(
 		};
 
 		thread_local std::future<loading_result> avatar_loading_result;
+		thread_local loading_result last_loading_result;
 
 		auto reload_avatar = [&](const std::string& from_path) {
-			if (!avatar_loading_result.valid()) {
-				if (from_path.size() > 0 && avatar_preview_tex == std::nullopt) {
-					avatar_loading_result = std::async(
-						std::launch::async,
-						[from_path]() {
-							loading_result out;
-							out.new_path = from_path;
+			const bool avatar_upload_completed = renderer.has_completed(avatar_submitted_when);
 
-							try {
-								out.load_image(from_path);
-							}
-							catch (const augs::image_loading_error& err) {
-								out.error_message = err.what();
-							}
-							catch (const augs::file_open_error& err) {
-								out.error_message = err.what();
-							}
+			if (avatar_upload_completed && !avatar_loading_result.valid() && from_path.size() > 0) {
+				avatar_loading_result = std::async(
+					std::launch::async,
+					[from_path]() {
+						loading_result out;
+						out.new_path = from_path;
 
-							return out;
+						try {
+							out.load_image(from_path);
 						}
-					);
-				}
+						catch (const augs::image_loading_error& err) {
+							out.error_message = err.what();
+						}
+						catch (const augs::file_open_error& err) {
+							out.error_message = err.what();
+						}
+
+						return out;
+					}
+				);
 			}
 		};
 
@@ -147,26 +150,21 @@ bool start_client_gui_state::perform(
 			);
 		}
 
-		if (avatar_preview_tex != std::nullopt) {
+		if (p.size() > 0) {
 			ImGui::SameLine();
 
 			if (ImGui::Button("Clear") && !error_popup) {
 				p = "";
-				avatar_preview_tex.reset();
 				was_shrinked = false;
 				will_be_upscaled = false;
 			}
-		}
-
-		if (p.empty()) {
-			avatar_preview_tex.reset();
 		}
 
 		const auto first_size = vec2(max_avatar_side_v, max_avatar_side_v);
 		const auto half_size = first_size / 2;
 		const auto icon_size = vec2(22, 22);
 
-		if (avatar_preview_tex != std::nullopt) {
+		if (p.size() > 0) {
 			augs::atlas_entry entry;
 			entry.atlas_space = xywh(0, 0, 1, 1);
 
@@ -208,7 +206,9 @@ bool start_client_gui_state::perform(
 		}
 
 		if (::valid_and_is_ready(avatar_loading_result)) {
-			const auto result = avatar_loading_result.get();
+			last_loading_result = avatar_loading_result.get();
+
+			auto& result = last_loading_result;
 			const auto& error_msg = result.error_message;
 
 			was_shrinked = false;
@@ -222,12 +222,11 @@ bool start_client_gui_state::perform(
 			else if (result.new_path != std::nullopt) {
 				p = *result.new_path;
 
-				auto previous_texture = augs::graphics::texture::find_current();
+				avatar_preview_tex.texImage2D(renderer, result.loaded_image);
+				avatar_preview_tex.set_filtering(renderer, augs::filtering_type::LINEAR);
 
-				avatar_preview_tex.emplace(result.loaded_image);
-				avatar_preview_tex->set_filtering(augs::filtering_type::LINEAR);
-
-				augs::graphics::texture::set_current_to(previous_texture);
+				augs::graphics::texture::set_current_to_previous(renderer);
+				avatar_submitted_when = renderer.get_frame_num();
 
 				was_shrinked = result.was_shrinked;
 				will_be_upscaled  = result.will_be_upscaled;

@@ -28,6 +28,7 @@
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "view/audiovisual_state/systems/particles_simulation_system.h"
 #include "view/rendering_scripts/draw_character_glow.h"
+#include "augs/graphics/shader.hpp"
 
 #define CONST_MULT 100
 #define LINEAR_MULT 10000
@@ -135,9 +136,14 @@ void light_system::gather_vis_requests(const light_system_input& in) const {
 }
 
 void light_system::render_all_lights(const light_system_input in) const {
-	const auto* default_fbo = augs::graphics::fbo::find_current();
+	augs::graphics::fbo::mark_current(in.renderer);
 
 	auto& renderer = in.renderer;
+
+	auto set_uniform = [&](auto&& sh, auto&&... args) {
+		sh.set_uniform(renderer, std::forward<decltype(args)>(args)...);
+	};
+	
 	auto& performance = in.profiler;
 	auto scope = measure_scope(performance.light_rendering);
 
@@ -153,14 +159,14 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	ensure_eq(0, renderer.get_triangle_count());
 
-	in.light_fbo.set_as_current();
+	in.light_fbo.set_as_current(renderer);
 	
 	renderer.set_clear_color(cosm.get_common_significant().ambient_light_color);
 	renderer.clear_current_fbo();
 	renderer.set_clear_color({ 0, 0, 0, 0 });
 
 	renderer.set_additive_blending();
-	standard_shader.set_as_current();
+	standard_shader.set_as_current(renderer);
 
 	const auto helper = helper_drawer {
 		in.visible,
@@ -184,19 +190,21 @@ void light_system::render_all_lights(const light_system_input in) const {
 	renderer.call_and_clear_triangles();
 	renderer.set_additive_blending();
 
-	light_shader.set_as_current();
+	light_shader.set_as_current(renderer);
 
 	struct light_uniforms {
-		GLint pos;
-		GLint distance_mult;
-		GLint attenuation;
-		GLint multiply_color;
+		const char* pos;
+		const char* distance_mult;
+		const char* attenuation;
+		const char* multiply_color;
 
 		light_uniforms(const augs::graphics::shader_program& s) {
-			pos = s.get_uniform_location("light_pos");
-			distance_mult = s.get_uniform_location("distance_mult");
-			attenuation = s.get_uniform_location("light_attenuation");
-			multiply_color = s.get_uniform_location("multiply_color");
+			(void)s;
+
+			pos = "light_pos";
+			distance_mult = "distance_mult";
+			attenuation = "light_attenuation";
+			multiply_color = "multiply_color";
 		}
 	};
 
@@ -212,8 +220,8 @@ void light_system::render_all_lights(const light_system_input in) const {
 	const auto cone = in.cone;
 	const auto eye = cone.eye;
 
-	light_shader.set_projection(in.cone.get_projection_matrix());
-	light_shader.set_uniform(light_uniform.distance_mult, 1.f / eye.zoom);
+	light_shader.set_projection(renderer, in.cone.get_projection_matrix());
+	set_uniform(light_shader, light_uniform.distance_mult, 1.f / eye.zoom);
 
 	const auto queried_camera_aabb = [&]() {
 		auto c = cone;
@@ -249,7 +257,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 				return screen_space;
 			}();
 
-			light_shader.set_uniform(light_uniform.pos, light_frag_pos);
+			set_uniform(light_shader, light_uniform.pos, light_frag_pos);
 		}
 
 		const bool was_visibility_calculated = !r.empty();
@@ -288,24 +296,24 @@ void light_system::render_all_lights(const light_system_input in) const {
 					(variation_vals[2] + a.quadratic) / QUADRATIC_MULT
 				};
 
-				light_shader.set_uniform(light_uniform.attenuation, attenuations);
+				set_uniform(light_shader, light_uniform.attenuation, attenuations);
 			}
 
-			light_shader.set_uniform(
+			set_uniform(
+				light_shader, 
 				light_uniform.multiply_color,
 				white.rgb()
 			);
 
-			renderer.call_triangles();
-			renderer.clear_triangles();
+			renderer.call_and_clear_triangles();
 		}
 
 	}
 
 	if (std::addressof(wall_light_shader) != std::addressof(light_shader)) {
-		wall_light_shader.set_as_current();
-		wall_light_shader.set_projection(in.cone.get_projection_matrix());
-		wall_light_shader.set_uniform(wall_light_uniform.distance_mult, 1.f / eye.zoom);
+		wall_light_shader.set_as_current(renderer);
+		wall_light_shader.set_projection(renderer, in.cone.get_projection_matrix());
+		set_uniform(wall_light_shader, wall_light_uniform.distance_mult, 1.f / eye.zoom);
 	}
 
 	for (size_t i = 0; i < requests.size(); ++i) {
@@ -335,7 +343,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 				return screen_space;
 			}();
 
-			wall_light_shader.set_uniform(wall_light_uniform.pos, light_frag_pos);
+			set_uniform(wall_light_shader, wall_light_uniform.pos, light_frag_pos);
 
 			++num_wall_lights;
 
@@ -348,10 +356,11 @@ void light_system::render_all_lights(const light_system_input in) const {
 					(variation_vals[5] + a.quadratic) / QUADRATIC_MULT
 				};
 
-				wall_light_shader.set_uniform(wall_light_uniform.attenuation, attenuations);
+				set_uniform(wall_light_shader, wall_light_uniform.attenuation, attenuations);
 			}
 
-			wall_light_shader.set_uniform(
+			set_uniform(
+				wall_light_shader, 
 				wall_light_uniform.multiply_color,
 				light.color.rgb()
 			);
@@ -362,10 +371,10 @@ void light_system::render_all_lights(const light_system_input in) const {
 				render_layer::OVER_SENTIENCES
 			>();
 
-			renderer.call_triangles();
-			renderer.clear_triangles();
+			renderer.call_and_clear_triangles();
 
-			wall_light_shader.set_uniform(
+			set_uniform(
+				wall_light_shader, 
 				wall_light_uniform.multiply_color,
 				white.rgb()
 			);
@@ -375,7 +384,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	performance.num_drawn_lights.measure(num_lights);
 	performance.num_drawn_wall_lights.measure(num_wall_lights);
 
-	standard_shader.set_as_current();
+	standard_shader.set_as_current(renderer);
 
 	/* Draw neon maps */
 
@@ -406,7 +415,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 		renderer.call_and_clear_triangles();
 		in.fill_stencil();
 		renderer.stencil_positive_test();
-		standard_shader.set_as_current();
+		standard_shader.set_as_current(renderer);
 
 		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
 			if (handle.get_official_faction() != fog_of_war_character.get_official_faction()) {
@@ -416,7 +425,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 		
 		renderer.call_and_clear_triangles();
 
-		renderer.disable_stencil();
+		renderer.set_stencil(false);
 
 		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
 			if (handle.get_official_faction() == fog_of_war_character.get_official_faction()) {
@@ -462,9 +471,9 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	renderer.set_standard_blending();
 
-	augs::graphics::fbo::set_current_to(default_fbo);
+	augs::graphics::fbo::set_current_to_marked(in.renderer);
 
 	renderer.set_active_texture(2);
-	in.light_fbo.get_texture().set_as_current();
+	in.light_fbo.get_texture().set_as_current(renderer);
 	renderer.set_active_texture(0);
 }

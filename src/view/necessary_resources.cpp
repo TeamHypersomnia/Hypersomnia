@@ -13,6 +13,9 @@
 #include "view/viewables/regeneration/procedural_image_definition.h"
 
 #include "augs/readwrite/lua_file.h"
+#include "augs/graphics/renderer_command.h"
+#include "augs/graphics/renderer.h"
+#include "augs/graphics/shader.hpp"
 
 all_necessary_fbos::all_necessary_fbos(
 	const vec2i screen_size,
@@ -42,6 +45,7 @@ void all_necessary_fbos::apply(
 }
 
 all_necessary_shaders::all_necessary_shaders(
+	augs::renderer& renderer,
 	const augs::path_type& canon_directory,
 	const augs::path_type& local_directory,
 	const game_drawing_settings /* settings */
@@ -78,51 +82,51 @@ all_necessary_shaders::all_necessary_shaders(
 	);
 
 	if (illuminated) {
-		illuminated->set_as_current();
-		illuminated->set_uniform("basic_texture", 0);
-		illuminated->set_uniform("light_texture", 2);
+		illuminated->set_as_current(renderer);
+		illuminated->set_uniform(renderer, "basic_texture", 0);
+		illuminated->set_uniform(renderer, "light_texture", 2);
 	}
 
 	if (standard) {
-		standard->set_as_current();
-		standard->set_uniform("basic_texture", 0);
+		standard->set_as_current(renderer);
+		standard->set_uniform(renderer, "basic_texture", 0);
 	}
 
 	if (pure_color_highlight) {
-		pure_color_highlight->set_as_current();
-		pure_color_highlight->set_uniform("basic_texture", 0);
+		pure_color_highlight->set_as_current(renderer);
+		pure_color_highlight->set_uniform(renderer, "basic_texture", 0);
 	}
 
 	if (circular_bars) {
-		circular_bars->set_as_current();
-		circular_bars->set_uniform("basic_texture", 0);
+		circular_bars->set_as_current(renderer);
+		circular_bars->set_uniform(renderer, "basic_texture", 0);
 	}
 
 	if (smoke) {
-		smoke->set_as_current();
-		smoke->set_uniform("smoke_texture", 1);
-		smoke->set_uniform("light_texture", 2);
+		smoke->set_as_current(renderer);
+		smoke->set_uniform(renderer, "smoke_texture", 1);
+		smoke->set_uniform(renderer, "light_texture", 2);
 	}
 
 	if (illuminating_smoke) {
-		illuminating_smoke->set_as_current();
-		illuminating_smoke->set_uniform("smoke_texture", 3);
+		illuminating_smoke->set_as_current(renderer);
+		illuminating_smoke->set_uniform(renderer, "smoke_texture", 3);
 	}
 
 	if (specular_highlights) {
-		specular_highlights->set_as_current();
-		specular_highlights->set_uniform("basic_texture", 0);
-		specular_highlights->set_uniform("light_texture", 2);
+		specular_highlights->set_as_current(renderer);
+		specular_highlights->set_uniform(renderer, "basic_texture", 0);
+		specular_highlights->set_uniform(renderer, "light_texture", 2);
 	}
 
 	if (textured_light) {
-		textured_light->set_as_current();
-		textured_light->set_uniform("basic_texture", 0);
+		textured_light->set_as_current(renderer);
+		textured_light->set_uniform(renderer, "basic_texture", 0);
 	}
 
 	if (flash_afterimage) {
-		flash_afterimage->set_as_current();
-		flash_afterimage->set_uniform("afterimage_texture", 0);
+		flash_afterimage->set_as_current(renderer);
+		flash_afterimage->set_uniform(renderer, "afterimage_texture", 0);
 	}
 }
 

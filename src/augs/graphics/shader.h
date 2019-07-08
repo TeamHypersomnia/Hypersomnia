@@ -8,13 +8,20 @@
 #include "augs/math/vec2.h"
 #include "augs/filesystem/path.h"
 
+#include "augs/graphics/shader_commands.h"
+#include "augs/templates/settable_commandizer.h"
+
 using GLuint = unsigned int;
 using GLint = int;
 
 #define STORE_SHADERS_IN_PROGRAM 0
 
 namespace augs {
+	class renderer;
+
 	namespace graphics {
+		class backend_access;
+
 		class shader {
 		public:
 			enum class type {
@@ -50,7 +57,7 @@ namespace augs {
 			shader& operator=(const shader&) = delete;
 		};
 
-		class shader_program : public settable_as_current_mixin<const shader_program> {
+		class shader_program : public settable_commandizer<const shader_program, renderer> {
 			GLuint id = 0xdeadbeef;
 			bool built = false;
 
@@ -59,13 +66,28 @@ namespace augs {
 			shader fragment;
 #endif
 
+			using base = settable_commandizer<const shader_program, renderer>;
 			using settable_as_current_base = settable_as_current_mixin<const shader_program>;
 			friend settable_as_current_base;
 
-			bool set_as_current_impl() const;
-			static void set_current_to_none_impl();
+			bool set_as_current_impl(backend_access) const;
+			static void set_current_to_none_impl(backend_access);
 
 			void destroy();
+
+			GLint get_uniform_location(const std::string& uniform_name) const;
+
+			void set_projection(const std::array<float, 16> matrix) const;
+
+			void set_uniform(const GLint id, const vec2) const;
+			void set_uniform(const GLint id, const vec2i) const;
+			void set_uniform(const GLint id, const rgba) const;
+			void set_uniform(const GLint id, const rgba::rgb_type) const;
+			void set_uniform(const GLint id, const vec3) const;
+			void set_uniform(const GLint id, const vec4) const;
+			void set_uniform(const GLint id, const float) const;
+			void set_uniform(const GLint id, const int) const;
+
 		public:
 			shader_program(
 				shader&& vertex,
@@ -79,30 +101,20 @@ namespace augs {
 
 			~shader_program();
 
-			shader_program(shader_program&&);
-			shader_program& operator=(shader_program&&);
+			shader_program(shader_program&&) = delete;
+			shader_program& operator=(shader_program&&) = delete;
 
 			shader_program(const shader_program&) = delete;
 			shader_program& operator=(const shader_program&) = delete;
-
-			GLint get_uniform_location(const std::string& uniform_name) const;
 			
-			void set_projection(const std::array<float, 16> matrix) const;
-			void set_projection(const vec2 for_screen_size) const;
-
-			void set_uniform(const GLint id, const vec2) const;
-			void set_uniform(const GLint id, const vec2i) const;
-			void set_uniform(const GLint id, const rgba) const;
-			void set_uniform(const GLint id, const rgba::rgb_type) const;
-			void set_uniform(const GLint id, const vec3) const;
-			void set_uniform(const GLint id, const vec4) const;
-			void set_uniform(const GLint id, const float) const;
-			void set_uniform(const GLint id, const int) const;
-
 			template <class... Args>
-			void set_uniform(const std::string& name, Args&&... args) const {
-				set_uniform(get_uniform_location(name), std::forward<Args>(args)...);
-			}
+			void set_uniform(renderer&, const char* name, Args&&... args) const;
+
+			void set_projection(renderer&, const std::array<float, 16> matrix) const;
+
+			void perform(backend_access, const set_uniform_command&) const;
+			void perform(backend_access, const set_projection_command&) const;
+			using base::perform;
 		};
 
 		struct shader_error : error_with_typesafe_sprintf {

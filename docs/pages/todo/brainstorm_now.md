@@ -6,6 +6,55 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 	
+- Minimize reads from GPU by precaching the uniform locations
+
+- Things to think about after introducing commandized renderer
+	- Textures after creation are bound but this fact is not registered in settable_as_current
+		- This may just be ok
+	- watch out if clearing (moving from) the triangle vector does not screw things up
+	- void clear_special_vertex_data(); was really never used?
+
+- object_command<T>
+	- if has_object
+		- dispatch
+			- if static then object::perform(payload)
+			- if not then object->perform(payload)
+	- set_uniform will have a payload variant for simplicity
+	- command and command_payload
+	- set_uniform
+	- set_uniform_payload payload
+
+- Let textures and all construct normally
+	- The standard "set as current" interface simply pushes a command to a renderer
+	- Similarly with shaders
+
+- To avoid repeated allocations, we can have a pool of triangle vectors
+	- Although for now I guess the driver does a similar thing so let's forget about it
+
+- The multithreaded model
+	- The main thread
+		- Problem: augs::window might be needed in some other areas, not just in opengl thread
+			- e.g. spawning dialogs - can't be static because it needs a hwnd
+		- Always performs the simulation logic
+		- Dispatches work for viewing
+		- Initializes the workers
+			- Audio command thread (sleeps on condition variable)
+			- Rendering command thread (sleeps on condition variable)
+			- We don't need thread pools for these yet as these can be standalone threads
+			- We can later poolize the work for all remaining viewing logic
+	- (second concept) The main thread
+		- We could make it actually hold all window related stuff
+		- The rendering thread
+		- Also initializes the workers
+		- Spawns the game thread or just a job?
+		- game_frame_buffer
+			- this will be swapped
+			- it will contain the local entropy vector as well
+		- logic won't sleep between intervals, it will just continuously calculate new audiovisual state and wait for frames
+		- what about imgui drawcalls
+			- the audiovisual step produces a new one each time
+	
+
 - Benefits of demos
 	- Deterministic repros
 	- Can record without performance hit
@@ -30,7 +79,6 @@ summary: That which we are brainstorming at the moment.
 - Default camera mode in settings, maybe controls?
 
 - for sound and rendering, use readerwriterqueue repository?
-
 
 - Fix the sudden increase in upload rate when someone timeouts 
 	- After some time, we could send initial state instead of inputs

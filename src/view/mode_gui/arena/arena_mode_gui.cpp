@@ -398,7 +398,7 @@ void arena_gui_state::draw_mode_gui(
 			}();
 
 			const auto& avatar_atlas_entry = in.avatars_in_atlas.at(killer_player_id.value); 
-			const bool avatars_enabled = in.general_atlas != std::nullopt && in.avatar_atlas != std::nullopt;
+			const bool avatars_enabled = logically_set(in.general_atlas, in.avatar_atlas);
 			const bool avatar_displayed = avatar_atlas_entry.exists() && avatars_enabled;
 
 			const auto displayed_avatar_size = vec2i::square(avatar_displayed ? max_avatar_side_v : 0);
@@ -461,12 +461,10 @@ void arena_gui_state::draw_mode_gui(
 			if (avatar_triangles.size() > 0) {
 				in.renderer.call_and_clear_triangles();
 
-				auto previous_texture = augs::graphics::texture::find_current();
+				in.avatar_atlas->set_as_current(in.renderer);
+				in.renderer.call_triangles(std::move(avatar_triangles));
 
-				in.avatar_atlas->set_as_current();
-				in.renderer.call_triangles(avatar_triangles);
-
-				augs::graphics::texture::set_current_to(previous_texture);
+				augs::graphics::texture::set_current_to_previous(in.renderer);
 			}
 		};
 

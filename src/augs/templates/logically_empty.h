@@ -28,6 +28,9 @@ bool logically_empty(const T& t) {
 	else if constexpr(has_is_set_v<T>) {
 		return !t.is_set();
 	}
+	else if constexpr(std::is_pointer_v<T>) {
+		return t == nullptr;
+	}
 	else if constexpr(is_optional_v<T>) {
 		return t == std::nullopt;
 	}

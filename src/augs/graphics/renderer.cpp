@@ -1,9 +1,7 @@
+#include "augs/graphics/renderer.h"
 #include "3rdparty/imgui/imgui.h"
 
 #include "augs/templates/container_templates.h"
-#include "augs/graphics/OpenGL_includes.h"
-#include "augs/graphics/renderer.h"
-#include "augs/graphics/fbo.h"
 
 #include "augs/drawing/drawing.h"
 #include "augs/graphics/imgui_payload.h"
@@ -11,188 +9,30 @@
 #include "augs/texture_atlas/atlas_entry.h"
 #include "augs/templates/corresponding_field.h"
 
-#if PLATFORM_UNIX
-#define USE_BUFFER_SUB_DATA 0
-#endif
-
-#if BUILD_OPENGL
-void buffer_data(
-	GLenum target,
-  	GLsizeiptr size,
-  	const GLvoid * data,
-  	GLenum usage
-) {
-#if USE_BUFFER_SUB_DATA
-	GL_CHECK(glBufferSubData(target, 0, size, data));
-#else
-	GL_CHECK(glBufferData(target, size, data, usage));
-#endif
-}
-#endif
-
 namespace augs {
+	bool renderer::has_frame_completed(const frame_num_type n) const {
+		return get_frame_num() > n + 1;
+	}
+
+	bool renderer::has_completed(std::optional<frame_num_type> n) const {
+		return !n || has_frame_completed(*n);
+	}
+
 	renderer::renderer(const renderer_settings& settings) : current_settings(settings) {
-#if BUILD_OPENGL
-		LOG("Calling gladLoadGL: %x.", intptr_t(gladLoadGL));
-		if (!gladLoadGL()) {
-			LOG("Calling gladLoadGL failed.");
-			throw renderer_error("Failed to initialize GLAD!"); 		
-		}
-#endif
-
-		LOG("glBlendFuncSeparate ADDR: %x", intptr_t(glBlendFuncSeparate));
-
-		LOG("Calling gladLoadGL succeeded.");
-		
-		set_blending(true);
-
-		set_standard_blending();
-		set_clear_color(black);
-		 
-		GL_CHECK(glDisable(GL_DITHER));
-		GL_CHECK(glDisable(GL_LINE_SMOOTH));
-		GL_CHECK(glDisable(GL_POLYGON_SMOOTH));
-		GL_CHECK(glDisable(GL_MULTISAMPLE));
-		GL_CHECK(glDisable(GL_DEPTH_TEST));
-		GL_CHECK(glDepthMask(GL_FALSE));
-
-		GL_CHECK(glHint(GL_POLYGON_SMOOTH_HINT, GL_FASTEST));
-		GL_CHECK(glHint(GL_TEXTURE_COMPRESSION_HINT, GL_FASTEST));
-		
-		GL_CHECK(glGenVertexArrays(1, &vao_buffer));
-		GL_CHECK(glBindVertexArray(vao_buffer));
-		
-		GL_CHECK(glGenBuffers(1, &imgui_elements_id));
-
-		GL_CHECK(glGenBuffers(1, &triangle_buffer_id));
-		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
-
-		GL_CHECK(glEnableVertexAttribArray(static_cast<int>(vertex_attribute::position)));
-		GL_CHECK(glEnableVertexAttribArray(static_cast<int>(vertex_attribute::texcoord)));
-		GL_CHECK(glEnableVertexAttribArray(static_cast<int>(vertex_attribute::color)));
-
-		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::position), 2, GL_FLOAT, GL_FALSE, sizeof(vertex), nullptr));
-		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::texcoord), 2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<char*>(sizeof(float) * 2)));
-		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::color), 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), reinterpret_cast<char*>(sizeof(float) * 2 + sizeof(float) * 2)));
-
-		GL_CHECK(glGenBuffers(1, &special_buffer_id));
-		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, special_buffer_id));
-
-		enable_special_vertex_attribute();
-		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::special), sizeof(special) / sizeof(float), GL_FLOAT, GL_FALSE, sizeof(special), nullptr));
-		disable_special_vertex_attribute();
-
-		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
-	
-#if USE_BUFFER_SUB_DATA
-		/* Preallocate necessary space */
-
-		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
-		GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(vertex) * 30000, nullptr, GL_STREAM_DRAW));
-		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, special_buffer_id));
-		GL_CHECK(glBufferData(GL_ARRAY_BUFFER, sizeof(special) * 6000, nullptr, GL_STREAM_DRAW));
-		GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, imgui_elements_id));
-		GL_CHECK(glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(unsigned) * 12000, nullptr, GL_STREAM_DRAW));
-#endif
-
-#if BUILD_OPENGL
-		GLint read_size = 0;
-		GL_CHECK(glGetIntegerv(GL_MAX_TEXTURE_SIZE, &read_size));
-		ensure(read_size >= 0);
-		max_texture_size = static_cast<unsigned>(read_size);
-#else
-		max_texture_size = 0u;
-#endif
-
 		apply(settings, true);
 	}
 
-	void renderer::set_blending(const bool on) {
-		if (on) {
-			GL_CHECK(glEnable(GL_BLEND));
-		}
-		else {
-			GL_CHECK(glDisable(GL_BLEND));
-		}
-	}
-
-	void renderer::enable_special_vertex_attribute() {
-		GL_CHECK(glEnableVertexAttribArray(static_cast<int>(vertex_attribute::special)));
-	}
-
-	void renderer::disable_special_vertex_attribute() {
-		GL_CHECK(glDisableVertexAttribArray(static_cast<int>(vertex_attribute::special)));
-	}
-
-	void renderer::set_clear_color(const rgba col) {
-		const auto v = vec4(col);
-		(void)v;
-		GL_CHECK(glClearColor(v[0], v[1], v[2], v[3]));
-	}
-
-	void renderer::clear_current_fbo() {
-		GL_CHECK(glClear(GL_COLOR_BUFFER_BIT));
-	}
-
-	void renderer::set_standard_blending() {
-		GL_CHECK(glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE));
-	}
-
-	void renderer::set_overwriting_blending() {
-		GL_CHECK(glBlendFuncSeparate(GL_ONE, GL_ZERO, GL_ONE, GL_ZERO));
-	}
-
-	void renderer::set_additive_blending() {
-		GL_CHECK(glBlendFuncSeparate(GL_SRC_ALPHA, GL_ONE, GL_ONE, GL_ONE));
-	}
-
-	void renderer::set_active_texture(const unsigned n) {
-		GL_CHECK(glActiveTexture(GL_TEXTURE0 + n));
-		(void)n;
-	}
-
-	void renderer::call_triangles() {
-		if (triangles.empty()) {
+	void renderer::call_triangles(vertex_triangle_buffer&& buffer) {
+		if (buffer.empty()) {
 			return;
 		}
 
-		if (!specials.empty()) {
-			enable_special_vertex_attribute();
-			GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, special_buffer_id));
-			GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(special) * specials.size(), specials.data(), GL_STREAM_DRAW));
-		}
-
-		call_triangles(triangles);
-
-		if (!specials.empty()) {
-			disable_special_vertex_attribute();
-		}
-	}
-
-	void renderer::call_triangles(const vertex_triangle_buffer& buffer) {
-		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
-
-		GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertex_triangle) * buffer.size(), buffer.data(), GL_STREAM_DRAW));
-		GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(buffer.size()) * 3));
 		num_total_triangles_drawn += buffer.size();
-	}
 
-	void renderer::call_lines() {
-		if (lines.empty()) return;
+		drawcall_command cmd;
+		cmd.triangles = std::move(buffer);
 
-		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
-		GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertex_line) * lines.size(), lines.data(), GL_STREAM_DRAW));
-		GL_CHECK(glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(lines.size()) * 2));
-	}
-
-
-	void renderer::set_viewport(const xywhi xywh) {
-		GL_CHECK(glViewport(xywh.x, xywh.y, xywh.w, xywh.h));
-		(void)xywh;
-	}
-
-	void renderer::clear_special_vertex_data() {
-		specials.clear();
+		push_command(std::move(cmd));
 	}
 
 	void renderer::clear_triangles() {
@@ -201,12 +41,31 @@ namespace augs {
 	}
 
 	void renderer::call_and_clear_triangles() {
-		call_triangles();
+		if (triangles.empty()) {
+			return;
+		}
+
+		num_total_triangles_drawn += triangles.size();
+
+		drawcall_command cmd;
+		cmd.triangles = std::move(triangles);
+		cmd.specials = std::move(specials);
+
+		push_command(std::move(cmd));
+
 		clear_triangles();
 	}
 
 	void renderer::call_and_clear_lines() {
-		call_lines();
+		if (lines.empty()) {
+			return;
+		}
+
+		drawcall_command cmd;
+		cmd.lines = std::move(lines);
+
+		push_command(std::move(cmd));
+
 		clear_lines();
 	}
 
@@ -234,36 +93,6 @@ namespace augs {
 		prev_logic_step_lines = lines;
 	}
 
-	void renderer::fullscreen_quad() {
-		float vertices[] = {
-			1.f, 1.f,
-			1.f, 0.f,
-			0.f, 0.f,
-
-			0.f, 0.f,
-			0.f, 1.f,
-			1.f, 1.f
-		};
-		(void)vertices;
-
-		GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
-
-		GL_CHECK(glDisableVertexAttribArray(static_cast<int>(vertex_attribute::texcoord)));
-		GL_CHECK(glDisableVertexAttribArray(static_cast<int>(vertex_attribute::color)));
-		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::position), 2, GL_FLOAT, GL_FALSE, 2 * sizeof(float), 0));
-		GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STREAM_DRAW));
-
-		GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, 6));
-
-		GL_CHECK(glEnableVertexAttribArray(static_cast<int>(vertex_attribute::position)));
-		GL_CHECK(glEnableVertexAttribArray(static_cast<int>(vertex_attribute::texcoord)));
-		GL_CHECK(glEnableVertexAttribArray(static_cast<int>(vertex_attribute::color)));
-
-		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::position), 2, GL_FLOAT, GL_FALSE, sizeof(vertex), nullptr));
-		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::texcoord), 2, GL_FLOAT, GL_FALSE, sizeof(vertex), reinterpret_cast<char*>(sizeof(float) * 2)));
-		GL_CHECK(glVertexAttribPointer(static_cast<int>(vertex_attribute::color), 4, GL_UNSIGNED_BYTE, GL_TRUE, sizeof(vertex), reinterpret_cast<char*>(sizeof(float) * 2 + sizeof(float) * 2)));
-	}
-
 	void renderer::draw_call_imgui(
 		const graphics::texture& imgui_atlas,
 		const graphics::texture* game_world_atlas,
@@ -272,27 +101,21 @@ namespace augs {
 	) {
 		const auto* const draw_data = ImGui::GetDrawData();
 
-		const auto previous_texture = graphics::texture::find_current();
+		graphics::texture::mark_current(*this);
 
 		if (draw_data != nullptr) {
-			imgui_atlas.set_as_current();
+			imgui_atlas.set_as_current(*this);
 
-			ImGuiIO& io = ImGui::GetIO();
-			// const int fb_width = static_cast<int>(io.DisplaySize.x * io.DisplayFramebufferScale.x);
-			const int fb_height = static_cast<int>(io.DisplaySize.y * io.DisplayFramebufferScale.y);
-			(void)fb_height;
-
-			GL_CHECK(glEnable(GL_SCISSOR_TEST));
+			set_scissor(true);
 
 			for (int n = 0; n < draw_data->CmdListsCount; ++n) {
 				const ImDrawList* cmd_list = draw_data->CmdLists[n];
-				const ImDrawIdx* idx_buffer_offset = 0;
 
-				GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, triangle_buffer_id));
-				GL_CHECK(buffer_data(GL_ARRAY_BUFFER, (GLsizeiptr)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert), (const GLvoid*)cmd_list->VtxBuffer.Data, GL_STREAM_DRAW));
+				if (cmd_list->CmdBuffer.Size == 0) {
+					continue;
+				}
 
-				GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, imgui_elements_id));
-				GL_CHECK(buffer_data(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx), (const GLvoid*)cmd_list->IdxBuffer.Data, GL_STREAM_DRAW));
+				push_command(setup_imgui_list { cmd_list->CloneOutput() } );
 
 				for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; ++cmd_i) {
 					const ImDrawCmd* const pcmd = &cmd_list->CmdBuffer[cmd_i];
@@ -303,39 +126,36 @@ namespace augs {
 
 					if (atlas_type == augs::imgui_atlas_type::GAME) {
 						if (game_world_atlas != nullptr) {
-							game_world_atlas->set_as_current();
+							game_world_atlas->set_as_current(*this);
 							rebind = true;
 						}
 					}
 
 					if (atlas_type == augs::imgui_atlas_type::AVATARS) {
 						if (avatar_atlas != nullptr) {
-							avatar_atlas->set_as_current();
+							avatar_atlas->set_as_current(*this);
 							rebind = true;
 						}
 					}
 					
 					if (atlas_type == augs::imgui_atlas_type::AVATAR_PREVIEW) {
 						if (avatar_preview_atlas != nullptr) {
-							avatar_preview_atlas->set_as_current();
+							avatar_preview_atlas->set_as_current(*this);
 							rebind = true;
 						}
 					}
 					
-					GL_CHECK(glScissor((int)pcmd->ClipRect.x, (int)(fb_height - pcmd->ClipRect.w), (int)(pcmd->ClipRect.z - pcmd->ClipRect.x), (int)(pcmd->ClipRect.w - pcmd->ClipRect.y)));
-					GL_CHECK(glDrawElements(GL_TRIANGLES, (GLsizei)pcmd->ElemCount, sizeof(ImDrawIdx) == 2 ? GL_UNSIGNED_SHORT : GL_UNSIGNED_INT, idx_buffer_offset));
-
-					idx_buffer_offset += pcmd->ElemCount;
+					push_no_arg(no_arg_command::IMGUI_CMD);
 
 					if (rebind) {
-						imgui_atlas.set_as_current();
+						imgui_atlas.set_as_current(*this);
 					}
 				}
 			}
 
-			GL_CHECK(glDisable(GL_SCISSOR_TEST));
+			set_scissor(false);
 
-			augs::graphics::texture::set_current_to(previous_texture);
+			graphics::texture::set_current_to_marked(*this);
 		}
 	}
 
@@ -374,47 +194,6 @@ namespace augs {
 		for_each_in(frame_lines, line_lambda);
 	}
 
-	unsigned renderer::get_max_texture_size() const {
-		return max_texture_size;
-	}
-
-	void renderer::finish() {
-		GL_CHECK(glFinish());
-	}
-
-	void renderer::enable_stencil() {
-		GL_CHECK(glEnable(GL_STENCIL_TEST));
-	}
-
-	void renderer::disable_stencil() {
-		GL_CHECK(glDisable(GL_STENCIL_TEST));
-	}
-
-	void renderer::clear_stencil() {
-		GL_CHECK(glClear(GL_STENCIL_BUFFER_BIT));
-	}
-
-	void renderer::start_writing_stencil() {
-		GL_CHECK(glStencilFunc(GL_ALWAYS, 1, 0xFF));
-		GL_CHECK(glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE));
-		GL_CHECK(glStencilMask(0xFF));
-		GL_CHECK(glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE));
-	}
-
-	void renderer::stencil_reverse_test() {
-		GL_CHECK(glStencilFunc(GL_EQUAL, 0, 0xFF));
-	}
-
-	void renderer::stencil_positive_test() {
-		GL_CHECK(glStencilFunc(GL_EQUAL, 1, 0xFF));
-	}
-
-	void renderer::start_testing_stencil() {
-		stencil_reverse_test();
-		GL_CHECK(glStencilMask(0x00));
-		GL_CHECK(glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE));
-	}
-
 	void renderer::apply(const renderer_settings& settings, const bool force) {
 		(void)settings;
 		(void)force;
@@ -425,4 +204,73 @@ namespace augs {
 	const renderer_settings& renderer::get_current_settings() const {
 		return current_settings;
 	}
+
+	void renderer::fullscreen_quad() {
+		push_no_arg(no_arg_command::FULLSCREEN_QUAD);
+	}
+
+	void renderer::set_blending(const bool on) {
+		push_toggle(toggle_command_type::BLENDING, on);
+	}
+
+	void renderer::set_clear_color(const rgba col) {
+		push_command(set_clear_color_command { col });
+	}
+
+	void renderer::clear_current_fbo() {
+		push_no_arg(no_arg_command::CLEAR_CURRENT_FBO);
+	}
+
+	void renderer::set_standard_blending() {
+		push_no_arg(no_arg_command::SET_STANDARD_BLENDING);
+	}
+
+	void renderer::set_overwriting_blending() {
+		push_no_arg(no_arg_command::SET_OVERWRITING_BLENDING);
+	}
+
+	void renderer::set_additive_blending() {
+		push_no_arg(no_arg_command::SET_ADDITIVE_BLENDING);
+	}
+
+	void renderer::set_active_texture(const unsigned n) {
+		push_command(set_active_texture_command { n });
+	}
+
+	void renderer::set_viewport(const xywhi xywh) {
+		push_command(set_viewport_command { xywh });
+	}
+
+	void renderer::set_scissor(const bool f) {
+		push_toggle(toggle_command_type::SCISSOR, f);
+	}
+
+	void renderer::set_scissor_bounds(const xywhi xywh) {
+		push_command(set_scissor_bounds_command { xywh });
+	}
+
+	void renderer::set_stencil(const bool f) {
+		push_toggle(toggle_command_type::STENCIL, f);
+	}
+
+	void renderer::clear_stencil() {
+		push_no_arg(no_arg_command::CLEAR_STENCIL);
+	}
+
+	void renderer::start_writing_stencil() {
+		push_no_arg(no_arg_command::START_WRITING_STENCIL);
+	}
+
+	void renderer::stencil_reverse_test() {
+		push_no_arg(no_arg_command::STENCIL_REVERSE_TEST);
+	}
+
+	void renderer::stencil_positive_test() {
+		push_no_arg(no_arg_command::STENCIL_POSITIVE_TEST);
+	}
+
+	void renderer::start_testing_stencil() {
+		push_no_arg(no_arg_command::START_TESTING_STENCIL);
+	}
+
 }

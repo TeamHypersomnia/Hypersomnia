@@ -1,34 +1,26 @@
 #pragma once
 #include "augs/math/vec2.h"
-
-#include "augs/templates/exception_templates.h"
+#include "augs/templates/object_command.h"
 
 #include "augs/graphics/renderer_settings.h"
 #include "augs/graphics/rgba.h"
 #include "augs/graphics/vertex.h"
 #include "augs/graphics/texture.h"
 #include "augs/graphics/debug_line.h"
-
-typedef struct __GLsync *GLsync;
-typedef uint64_t GLuint64;
+#include "augs/graphics/renderer_command_enums.h"
+#include "augs/graphics/renderer_command.h"
 
 namespace augs {
 	namespace graphics {
 		class texture;
+
+		struct renderer_command;
 	}
 	
-	struct renderer_error : error_with_typesafe_sprintf {
-		using error_with_typesafe_sprintf::error_with_typesafe_sprintf; 
-	};
+	using frame_num_type = std::size_t;
 
 	class renderer {
-		unsigned max_texture_size = static_cast<unsigned>(-1);
 		debug_lines prev_logic_step_lines;
-
-		GLuint triangle_buffer_id = 0xdeadbeef;
-		GLuint special_buffer_id = 0xdeadbeef;
-		GLuint imgui_elements_id = 0xdeadbeef;
-		GLuint vao_buffer = 0xdeadbeef;
 
 		bool interpolate_debug_logic_step_lines = true;
 		renderer_settings current_settings;
@@ -38,20 +30,13 @@ namespace augs {
 		special_buffer specials;
 
 		std::size_t num_total_triangles_drawn = 0;
+		frame_num_type current_frame = 0;
+
 	public:
+		std::vector<graphics::renderer_command> commands;
 
 		renderer(const renderer_settings&);
 
-		renderer(renderer&&) = delete;
-		renderer& operator=(renderer&&) = delete;
-
-		renderer(const renderer&) = delete;
-		renderer& operator=(const renderer&) = delete;
-
-		void set_active_texture(const unsigned);
-
-		void fullscreen_quad();
-		
 		void save_debug_logic_step_lines_for_interpolation(const debug_lines&);
 
 		void draw_call_imgui(
@@ -69,23 +54,6 @@ namespace augs {
 			const augs::atlas_entry line_texture, 
 			const float interpolation_ratio
 		);
-
-		void set_clear_color(const rgba);
-		void clear_current_fbo();
-
-		void set_blending(bool);
-		void set_standard_blending();
-		void set_overwriting_blending();
-		void set_additive_blending();
-		
-		void enable_special_vertex_attribute();
-		void disable_special_vertex_attribute();
-		void call_triangles();
-		void call_triangles(const vertex_triangle_buffer&);
-		void call_lines();
-		void set_viewport(const xywhi);
-
-		void finish();
 
 		void push_line(const augs::vertex_line& line) {
 			lines.push_back(line);
@@ -109,33 +77,17 @@ namespace augs {
 			specials.push_back(s3);
 		}
 
-		void clear_special_vertex_data();
 		void clear_triangles();
 		void clear_lines();
 
 		void call_and_clear_lines();
 		void call_and_clear_triangles();
 
-		unsigned get_max_texture_size() const;
-
-		std::size_t get_triangle_count() const;
-
-		GLsync fence() const;
-		bool wait_sync(GLsync, GLuint64 timeout = 0) const;
-
 		vertex_triangle_buffer& get_triangle_buffer();
 		vertex_line_buffer& get_line_buffer();
 		special_buffer& get_special_buffer();
 
-		void enable_stencil();
-		void disable_stencil();
-		void clear_stencil();
-
-		void start_writing_stencil();
-		void start_testing_stencil();
-
-		void stencil_positive_test();
-		void stencil_reverse_test();
+		std::size_t get_triangle_count() const;
 
 		void apply(const renderer_settings&, bool force = false);
 		const renderer_settings& get_current_settings() const;
@@ -145,6 +97,79 @@ namespace augs {
 			out = 0;
 			return out;
 		}
+
+		void increment_frame() {
+			++current_frame;
+		}
+
+		frame_num_type get_frame_num() const {
+			return current_frame;
+		}
+
+		bool has_frame_completed(frame_num_type) const;
+		bool has_completed(std::optional<frame_num_type>) const;
+
+		template <class T>
+		void push_command(T&& t) {
+			commands.emplace_back(graphics::renderer_command { std::forward<T>(t) });
+		}
+
+		void push_toggle(const toggle_command_type type, const bool flag) {
+			push_command(toggle_command { type, flag });
+		}
+
+		void push_no_arg(const no_arg_command type) {
+			push_command(type);
+		}
+
+		template <class Payload, class This>
+		void push_object_command(This& t, Payload&& p) {
+			graphics::renderer_command cmd;
+
+			cmd.payload = object_command<This, Payload> {
+				std::addressof(t),
+				std::forward<Payload>(p)
+			};
+
+			commands.emplace_back(std::move(cmd));
+		}
+
+		template <class This, class Payload>
+		void push_static_object_command(Payload&& p) {
+			graphics::renderer_command cmd;
+
+			cmd.payload = static_object_command<This, Payload> {
+				std::forward<Payload>(p)
+			};
+
+			commands.emplace_back(std::move(cmd));
+		}
+
+		/* Graphics commands */
+		void set_active_texture(const unsigned);
+		void fullscreen_quad();
+
+		void set_clear_color(const rgba);
+		void clear_current_fbo();
+
+		void set_blending(bool);
+		void set_scissor(bool);
+		void set_stencil(bool);
+		void set_scissor_bounds(xywhi);
+
+		void set_standard_blending();
+		void set_overwriting_blending();
+		void set_additive_blending();
+		
+		void call_triangles(vertex_triangle_buffer&&);
+		void set_viewport(const xywhi);
+
+		void clear_stencil();
+
+		void start_writing_stencil();
+		void start_testing_stencil();
+
+		void stencil_positive_test();
+		void stencil_reverse_test();
 	};
 }
-

@@ -23,6 +23,7 @@
 #include "augs/misc/lua/lua_utils.h"
 
 #include "augs/graphics/renderer.h"
+#include "augs/graphics/renderer_backend.h"
 
 #include "augs/window_framework/shell.h"
 #include "augs/window_framework/window.h"
@@ -329,9 +330,16 @@ and then hitting Save settings.
 	LOG("Initializing the window.");
 	static augs::window window(config.window);
 
-	LOG("Initializing the renderer.");
-	static augs::renderer renderer(config.renderer);
-	LOG_NVPS(renderer.get_max_texture_size());
+	LOG("Initializing the renderer backend.");
+	static augs::graphics::renderer_backend renderer_backend;
+
+	static augs::renderer illuminated_renderer(config.renderer);
+	static augs::renderer gui_renderer(config.renderer);
+
+	// temporary
+	static auto& renderer = illuminated_renderer;
+
+	LOG_NVPS(renderer_backend.get_max_texture_size());
 
 	LOG("Initializing the necessary fbos.");
 	static all_necessary_fbos necessary_fbos(
@@ -341,6 +349,7 @@ and then hitting Save settings.
 
 	LOG("Initializing the necessary shaders.");
 	static all_necessary_shaders necessary_shaders(
+		renderer,
 		"content/necessary/shaders",
 		"content/necessary/shaders",
 		config.drawing
@@ -475,7 +484,7 @@ and then hitting Save settings.
 	static auto load_all = [&](const all_viewables_defs& new_defs) {
 		std::optional<arena_player_metas> new_player_metas;
 
-		if (streaming.finished_loading_player_metas()) {
+		if (streaming.finished_loading_player_metas(renderer)) {
 			visit_current_setup([&](auto& setup) {
 				new_player_metas = setup.get_new_player_metas();
 			});
@@ -488,7 +497,7 @@ and then hitting Save settings.
 			config.content_regeneration,
 			get_unofficial_content_dir(),
 			renderer,
-			renderer.get_max_texture_size(),
+			renderer_backend.get_max_texture_size(),
 
 			new_player_metas
 		});
@@ -1295,7 +1304,15 @@ and then hitting Save settings.
 				lua,
 				[&]() {
 					if (!has_current_setup()) {
-						if (start_client_gui.perform(window, config.default_client_start, config.client) || client_start_requested) {
+						const bool perform_result = start_client_gui.perform(
+							renderer, 
+							streaming.avatar_preview_tex, 
+							window, 
+							config.default_client_start, 
+							config.client
+						);
+
+						if (perform_result || client_start_requested) {
 							client_start_requested = false;
 
 							change_with_save(
@@ -1787,20 +1804,15 @@ and then hitting Save settings.
 					- Or, the cursor of the game gui, with maybe tooltip, with maybe dragged item's ghost, if we're in-game in GUI mode.
 		*/
 
-		if (streaming.general_atlas == std::nullopt) {
-			/* Set imgui atlas as a fallback texture as it has some white pixels */
-			imgui_atlas.set_as_current();
-		}
-
 		renderer.set_viewport({ vec2i{0, 0}, screen_size });
 
 		const bool rendering_flash_afterimage = gameplay_camera.is_flash_afterimage_requested();
 
 		if (rendering_flash_afterimage) {
-			necessary_fbos.flash_afterimage->set_as_current();
+			necessary_fbos.flash_afterimage->set_as_current(renderer);
 		}
-		else if (augs::graphics::fbo::current_exists()) {
-			augs::graphics::fbo::set_current_to_none();
+		else {
+			augs::graphics::fbo::set_current_to_none(renderer);
 		}
 
 		renderer.clear_current_fbo();
@@ -1862,7 +1874,7 @@ and then hitting Save settings.
 					interpolation_ratio,
 					renderer,
 					frame_performance,
-					streaming.general_atlas,
+					std::addressof(streaming.general_atlas),
 					necessary_fbos,
 					necessary_shaders,
 					all_visible,
@@ -1889,7 +1901,7 @@ and then hitting Save settings.
 
 			auto scope = measure_scope(frame_performance.game_gui);
 
-			necessary_shaders.standard->set_projection(augs::orthographic_projection(vec2(screen_size)));
+			necessary_shaders.standard->set_projection(renderer, augs::orthographic_projection(vec2(screen_size)));
 
 			/*
 				Illuminated rendering leaves the renderer in a state
@@ -1916,8 +1928,8 @@ and then hitting Save settings.
 					get_line_drawer(),
 					new_viewing_config,
 					streaming.necessary_images_in_atlas,
-					streaming.general_atlas,
-					streaming.avatar_atlas,
+					std::addressof(streaming.general_atlas),
+					std::addressof(streaming.avatar_atlas),
 					streaming.images_in_atlas,
 					streaming.avatars_in_atlas,
 					renderer,
@@ -1932,12 +1944,10 @@ and then hitting Save settings.
 			});
 		}
 		else {
-			if (streaming.general_atlas != std::nullopt) {
-				streaming.general_atlas->set_as_current();
-			}
+			streaming.general_atlas.set_as_current(renderer);
 
-			necessary_shaders.standard->set_as_current();
-			necessary_shaders.standard->set_projection(augs::orthographic_projection(vec2(screen_size)));
+			necessary_shaders.standard->set_as_current(renderer);
+			necessary_shaders.standard->set_projection(renderer, augs::orthographic_projection(vec2(screen_size)));
 
 			get_drawer().color_overlay(screen_size, darkgray);
 		}
@@ -1985,23 +1995,12 @@ and then hitting Save settings.
 			/* #6 */
 			auto scope = measure_scope(frame_performance.imgui);
 
-			const augs::graphics::texture* game_world_atlas = nullptr;
-			const augs::graphics::texture* avatar_atlas = nullptr;
-			const augs::graphics::texture* avatar_preview_atlas = nullptr;
-
-			if (streaming.general_atlas.has_value()) {
-				game_world_atlas = std::addressof(streaming.general_atlas.value());
-			}
-			
-			if (streaming.avatar_atlas.has_value()) {
-				avatar_atlas = std::addressof(streaming.avatar_atlas.value());
-			}
-
-			if (start_client_gui.avatar_preview_tex.has_value()) {
-				avatar_preview_atlas = std::addressof(start_client_gui.avatar_preview_tex.value());
-			}
-
-			renderer.draw_call_imgui(imgui_atlas, game_world_atlas, avatar_atlas, avatar_preview_atlas);
+			renderer.draw_call_imgui(
+				imgui_atlas, 
+				std::addressof(streaming.general_atlas), 
+				std::addressof(streaming.avatar_atlas), 
+				std::addressof(streaming.avatar_preview_tex)
+			);
 		}
 
 		{
@@ -2040,7 +2039,7 @@ and then hitting Save settings.
 			}
 		}
 
-		if (streaming.general_atlas != std::nullopt) {
+		{
 			const auto flash_mult = gameplay_camera.get_effective_flash_mult();
 
 			if (flash_mult > 0 || rendering_flash_afterimage) {
@@ -2050,12 +2049,12 @@ and then hitting Save settings.
 				*/
 
 				if (rendering_flash_afterimage) {
-					augs::graphics::fbo::set_current_to_none();
+					augs::graphics::fbo::set_current_to_none(renderer);
 				}
 
-				necessary_fbos.flash_afterimage->get_texture().set_as_current();
-				necessary_shaders.flash_afterimage->set_as_current();
-				necessary_shaders.flash_afterimage->set_projection(augs::orthographic_projection(vec2(screen_size)));
+				necessary_fbos.flash_afterimage->get_texture().set_as_current(renderer);
+				necessary_shaders.flash_afterimage->set_as_current(renderer);
+				necessary_shaders.flash_afterimage->set_projection(renderer, augs::orthographic_projection(vec2(screen_size)));
 
 				{
 					auto flash_afterimage_col = white;
@@ -2072,8 +2071,8 @@ and then hitting Save settings.
 
 				renderer.call_and_clear_triangles();
 
-				necessary_shaders.standard->set_as_current();
-				streaming.general_atlas->set_as_current();
+				necessary_shaders.standard->set_as_current(renderer);
+				streaming.general_atlas.set_as_current(renderer);
 			}
 
 			if (!rendering_flash_afterimage) {
@@ -2128,8 +2127,24 @@ and then hitting Save settings.
 		}
 
 		{
+			auto scope = measure_scope(performance.renderer_commands);
+
+			auto& cmds = renderer.commands;
+
+			renderer_backend.perform(
+				cmds.data(),
+				cmds.size()
+			);
+
+			cmds.clear();
+		}
+
+		{
 			auto scope = measure_scope(performance.swap_buffers);
 			window.swap_buffers();
+
+			illuminated_renderer.increment_frame();
+			gui_renderer.increment_frame();
 		}
 	}
 
@@ -2151,7 +2166,7 @@ catch (const augs::window_error& err) {
 	LOG("Failed to create an OpenGL window:\n%x", err.what());
 	return EXIT_FAILURE;
 }
-catch (const augs::renderer_error& err) {
+catch (const augs::graphics::renderer_error& err) {
 	LOG("Failed to initialize the renderer: %x", err.what());
 	return EXIT_FAILURE;
 }

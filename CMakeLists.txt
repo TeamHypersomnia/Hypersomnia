@@ -527,6 +527,7 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/augs/graphics/fbo.cpp"
 	"src/augs/graphics/rgba.cpp"
 	"src/augs/graphics/renderer.cpp"
+	"src/augs/graphics/renderer_backend.cpp"
 	"src/augs/graphics/shader.cpp"
 	"src/augs/graphics/vertex.cpp"
 	"src/augs/gui/dragger.cpp"

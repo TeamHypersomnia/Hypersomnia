@@ -2,14 +2,43 @@
 #include "augs/graphics/texture.h"
 #include "augs/graphics/pbo.h"
 
+#include "augs/graphics/backend_access.h"
+#include "augs/graphics/renderer.h"
+
 namespace augs {
 	namespace graphics {
-		bool texture::set_as_current_impl() const {
+		void texture::perform(backend_access, const texImage2D_command& cmd) { 
+			texImage2D(cmd.size, cmd.source);
+		}
+
+		void texture::perform(backend_access, const set_filtering_command& cmd) { 
+			set_filtering(cmd.type);
+		}
+
+		void texture::texImage2D(renderer& r, const vec2u size, const unsigned char* const source) {
+			r.push_object_command(
+				*this,
+				texImage2D_command { size, source }
+			);
+		}
+
+		void texture::texImage2D(renderer& r, const image& rgba_source) {
+			texImage2D(r, rgba_source.get_size(), rgba_source.get_data());
+		}
+
+		void texture::set_filtering(renderer& r, const filtering_type type) {
+			r.push_object_command(
+				*this,
+				set_filtering_command { type }
+			);
+		}
+
+		bool texture::set_as_current_impl(backend_access) const {
 			GL_CHECK(glBindTexture(GL_TEXTURE_2D, id));
 			return true;
 		}
 
-		void texture::set_current_to_none_impl() {
+		void texture::set_current_to_none_impl(backend_access) {
 			GL_CHECK(glBindTexture(GL_TEXTURE_2D, 0));
 		}
 
@@ -20,12 +49,11 @@ namespace augs {
 
 		texture::texture(const image& source) {
 			create();
-			texImage2D(source.get_size(), source.get_data());
+			texImage2D(source);
 		}
 
-		void texture::start_upload_from(const pbo& p) {
-			p.set_as_current();
-			GL_CHECK(glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, size.x, size.y, GL_RGBA, GL_UNSIGNED_BYTE, 0));
+		void texture::texImage2D(const image& source) {
+			texImage2D(source.get_size(), source.get_data());
 		}
 
 		void texture::texImage2D(const vec2u new_size, const unsigned char* const source) {
@@ -85,8 +113,7 @@ namespace augs {
 
 		void texture::create() {
 			GL_CHECK(glGenTextures(1, &id));
-
-			set_as_current();
+			GL_CHECK(glBindTexture(GL_TEXTURE_2D, id));
 
 			set_filtering_impl(current_filtering);
 			GL_CHECK(glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE));

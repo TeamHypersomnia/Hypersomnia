@@ -9,6 +9,7 @@
 #include "view/viewables/images_in_atlas_map.h"
 #include "augs/string/format_enum.h"
 #include "game/detail/entity_handle_mixins/for_each_slot_and_item.hpp"
+#include "augs/templates/logically_empty.h"
 
 bool arena_scoreboard_gui::control(general_gui_intent_input in) {
 	using namespace augs::event;
@@ -400,7 +401,7 @@ void arena_scoreboard_gui::draw_gui(
 			aabb(col_border_orig, bg_dark);
 		}
 
-		const bool avatars_enabled = in.general_atlas != std::nullopt && in.avatar_atlas != std::nullopt;
+		const bool avatars_enabled = logically_set(in.general_atlas, in.avatar_atlas);
 
 		for (const auto& p : sorted_players) {
 			const auto& player_id = p.second;
@@ -722,16 +723,14 @@ void arena_scoreboard_gui::draw_gui(
 	in.renderer.call_and_clear_triangles();
 
 	if (avatar_triangles.size() > 0) {
-		auto previous_texture = augs::graphics::texture::find_current();
+		in.avatar_atlas->set_as_current(in.renderer);
+		in.renderer.call_triangles(std::move(avatar_triangles));
 
-		in.avatar_atlas->set_as_current();
-		in.renderer.call_triangles(avatar_triangles);
-
-		augs::graphics::texture::set_current_to(previous_texture);
+		augs::graphics::texture::set_current_to_previous(in.renderer);
 	}
 
 	if (color_indicator_triangles.size() > 0) {
-		in.renderer.call_triangles(color_indicator_triangles);
+		in.renderer.call_triangles(std::move(color_indicator_triangles));
 	}
 }
 

@@ -19,10 +19,6 @@
 
 class sound_system;
 
-namespace augs {
-	class renderer;
-}
-
 struct viewables_load_input {
 	const all_viewables_defs& new_defs;
 	const necessary_image_definitions_map& necessary_image_definitions;
@@ -63,9 +59,13 @@ class viewables_streaming {
 
 	std::optional<atlas_progress_structs> general_atlas_progress;
 
+	std::optional<augs::frame_num_type> general_atlas_submitted_when;
+	std::optional<augs::frame_num_type> avatar_atlas_submitted_when;
+
 public:
-	std::optional<augs::graphics::texture> general_atlas;
-	std::optional<augs::graphics::texture> avatar_atlas;
+	augs::graphics::texture avatar_atlas = augs::image::white_pixel();
+	augs::graphics::texture avatar_preview_tex = augs::image::white_pixel();
+	augs::graphics::texture general_atlas = augs::image::white_pixel();
 
 	viewables_streaming_profiler performance;
 
@@ -89,6 +89,6 @@ public:
 
 	void finalize_pending_tasks();
 
-	bool finished_loading_player_metas() const;
+	bool finished_loading_player_metas(augs::renderer& renderer) const;
 	void display_loading_progress() const;
 };

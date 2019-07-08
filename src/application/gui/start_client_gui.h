@@ -6,6 +6,7 @@
 #include "augs/misc/imgui/standard_window_mixin.h"
 #include "augs/graphics/texture.h"
 #include "application/setups/editor/editor_popup.h"
+#include "augs/graphics/renderer.h"
 
 namespace augs {
 	class window;
@@ -17,15 +18,17 @@ public:
 	using base::base;
 
 	std::optional<editor_popup> error_popup;
-	std::optional<augs::graphics::texture> avatar_preview_tex;
 
 	bool was_shrinked = false;
 	bool will_be_upscaled = false;
 	bool do_initial_load = true;
 
 	bool allow_start = false;
+	std::optional<augs::frame_num_type> avatar_submitted_when;
 
 	bool perform(
+		augs::renderer& renderer,
+		augs::graphics::texture& avatar_preview_tex,
 		augs::window& window,
 		client_start_input&,
 		client_vars& 

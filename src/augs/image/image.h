@@ -71,6 +71,7 @@ namespace augs {
 			STB
 		};
 
+		static image white_pixel();
 		static vec2u get_size(const path_type& file_path);
 		static vec2u get_png_size(const std::vector<std::byte>& bytes);
 

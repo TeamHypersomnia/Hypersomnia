@@ -4,6 +4,8 @@
 #include "augs/math/matrix.h"
 
 #include "augs/graphics/OpenGL_includes.h"
+#include "augs/graphics/backend_access.h"
+#include "augs/graphics/renderer.h"
 
 namespace augs {
 	namespace graphics {
@@ -125,6 +127,7 @@ namespace augs {
 			}
 		}
 		
+#if 0
 		shader_program::shader_program(shader_program&& b) :
 			settable_as_current_base(static_cast<settable_as_current_base&&>(b)),
 			id(b.id),
@@ -153,6 +156,7 @@ namespace augs {
 
 			return *this;
 		}
+#endif
 
 		shader_program::~shader_program() { 
 			destroy(); 
@@ -202,15 +206,31 @@ namespace augs {
 			}
 		}
 
-		void shader_program::set_current_to_none_impl() {
+		void shader_program::set_current_to_none_impl(backend_access) {
 			GL_CHECK(glUseProgram(0));
 		}
 
-		bool shader_program::set_as_current_impl() const {
+		bool shader_program::set_as_current_impl(backend_access) const {
 			GL_CHECK(glUseProgram(id));
 			return true;
 		}
 		
+		void shader_program::perform(backend_access, const set_uniform_command& cmd) const {
+			auto uniform_setter = [&](const auto& typed_payload){
+				set_uniform(get_uniform_location(cmd.name), typed_payload);
+			};
+
+			std::visit(uniform_setter, cmd.payload);
+		}
+
+		void shader_program::perform(backend_access, const set_projection_command& cmd) const {
+			set_projection(cmd.payload);
+		}
+
+		void shader_program::set_projection(renderer& r, const std::array<float, 16> matrix) const {
+			r.push_object_command(*this, set_projection_command { matrix });
+		}
+
 		GLint shader_program::get_uniform_location(const std::string& uniform_name) const {
 #if BUILD_OPENGL
 			return glGetUniformLocation(id, uniform_name.c_str());
@@ -223,10 +243,6 @@ namespace augs {
 		void shader_program::set_projection(const std::array<float, 16> matrix) const {
 			GL_CHECK(glUniformMatrix4fv(get_uniform_location("projection_matrix"), 1, GL_FALSE, matrix.data()));
 			(void)matrix;
-		}
-
-		void shader_program::set_projection(const vec2 for_screen_size) const {
-			set_projection(augs::orthographic_projection(for_screen_size));
 		}
 
 		void shader_program::set_uniform(const GLint id, const vec2 v) const {

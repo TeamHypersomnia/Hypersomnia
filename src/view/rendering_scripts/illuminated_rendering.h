@@ -46,7 +46,7 @@ struct illuminated_rendering_input {
 	const double interpolation_ratio = 0.0;
 	augs::renderer& renderer;
 	frame_profiler& frame_performance;
-	std::optional<augs::graphics::texture>& general_atlas;
+	augs::graphics::texture* general_atlas;
 	illuminated_rendering_fbos& fbos;
 	const illuminated_rendering_shaders& shaders;
 	const visible_entities& all_visible;

@@ -1,6 +1,7 @@
 #include "fbo.h"
 #include "augs/log.h"
 #include "augs/graphics/OpenGL_includes.h"
+#include "augs/graphics/backend_access.h"
 
 namespace augs {
 	namespace graphics {
@@ -16,7 +17,7 @@ namespace augs {
 			}
 #endif
 
-			set_as_current();
+			GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, id));
 
 			GL_CHECK(glFramebufferTexture2D(
 				GL_FRAMEBUFFER,
@@ -42,9 +43,10 @@ namespace augs {
 			}
 #endif
 
-			set_current_to_none();
+			GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 		}
 
+#if 0
 		fbo::fbo(fbo&& b) :
 			settable_as_current_base(static_cast<settable_as_current_base&&>(b)),
 			created(b.created),
@@ -71,13 +73,14 @@ namespace augs {
 
 			return *this;
 		}
+#endif
 
-		bool fbo::set_as_current_impl() const {
+		bool fbo::set_as_current_impl(backend_access) const {
 			GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, id));
 			return true;
 		}
 
-		void fbo::set_current_to_none_impl() {
+		void fbo::set_current_to_none_impl(backend_access) {
 			GL_CHECK(glBindFramebuffer(GL_FRAMEBUFFER, 0));
 		}
 

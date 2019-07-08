@@ -37,6 +37,10 @@ struct game_drawing_settings;
 using optional_fbo = std::optional<augs::graphics::fbo>;
 using optional_shader = std::optional<augs::graphics::shader_program>;
  
+namespace augs {
+	class renderer;
+};
+
 struct all_necessary_fbos {
 	optional_fbo illuminating_smoke;
 	optional_fbo smoke;
@@ -71,6 +75,7 @@ struct all_necessary_shaders {
 	// END GEN INTROSPECTOR
 
 	all_necessary_shaders(
+		augs::renderer& in,
 		const augs::path_type& canon_directory,
 		const augs::path_type& local_directory,
 		const game_drawing_settings

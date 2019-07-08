@@ -26,8 +26,8 @@ viewables_streaming::~viewables_streaming() {
 	finalize_pending_tasks();
 }
 
-bool viewables_streaming::finished_loading_player_metas() const {
-	return !future_avatar_atlas.valid();
+bool viewables_streaming::finished_loading_player_metas(augs::renderer& renderer) const {
+	return !future_avatar_atlas.valid() && renderer.has_completed(avatar_atlas_submitted_when);
 }
 
 void viewables_streaming::load_all(const viewables_load_input in) {
@@ -41,7 +41,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 	const auto max_atlas_size = in.max_atlas_size;
 
 	/* Avatar atlas pass */
-	if (finished_loading_player_metas()) {
+	if (finished_loading_player_metas(in.renderer)) {
 		if (in.new_player_metas != std::nullopt) {
 			avatar_pbo_fallback.clear();
 
@@ -64,7 +64,10 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 
 	/* General atlas pass */
 
-	if (!future_general_atlas.valid()) {
+	const bool atlas_upload_complete = in.renderer.has_completed(general_atlas_submitted_when);
+	const bool atlas_generation_complete = !future_general_atlas.valid();
+
+	if (atlas_upload_complete && atlas_generation_complete) {
 		bool new_atlas_required = settings.regenerate_every_time;
 
 		auto& now_defs = now_all_defs.image_definitions;
@@ -105,7 +108,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 			new_atlas_required = true;
 		}
 
-		if (!general_atlas.has_value()) {
+		if (general_atlas.empty()) {
 			new_atlas_required = true;
 		}
 
@@ -232,24 +235,16 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 
 		avatars_in_atlas = std::move(result.atlas_entries);
 
-		const auto previous_texture = augs::graphics::texture::find_current();
-
 		const auto atlas_size = result.atlas_size;
-		avatar_atlas.emplace(atlas_size, avatar_pbo_fallback.data());
-		avatar_atlas->set_filtering(augs::filtering_type::LINEAR);
+		avatar_atlas.texImage2D(in.renderer, atlas_size, std::addressof(avatar_pbo_fallback.data()->r));
+		avatar_atlas.set_filtering(in.renderer, augs::filtering_type::LINEAR);
 
-		augs::graphics::texture::set_current_to(previous_texture);
+		augs::graphics::texture::set_current_to_previous(in.renderer);
 	}
 
 	/* Unpack results of asynchronous asset loading */
 
 	if (valid_and_is_ready(future_general_atlas)) {
-		const bool measure_atlas_uploading = in.measure_atlas_upload;
-
-		if (measure_atlas_uploading) {
-			in.renderer.finish();
-		}
-
 		auto scope = measure_scope(performance.atlas_upload_to_gpu);
 
 		auto result = future_general_atlas.get();
@@ -268,15 +263,8 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 		/* Done, overwrite */
 		now_loaded_defs = new_loaded_defs;
 
-		const auto atlas_size = result.atlas_size;
-
-		{
-			general_atlas.emplace(atlas_size, pbo_fallback.data());
-		}
-
-		if (measure_atlas_uploading) {
-			in.renderer.finish();
-		}
+		general_atlas.texImage2D(in.renderer, result.atlas_size, std::addressof(pbo_fallback.data()->r));
+		general_atlas_submitted_when = in.renderer.get_frame_num();
 	}
 
 	if (valid_and_is_ready(future_loaded_buffers)) {

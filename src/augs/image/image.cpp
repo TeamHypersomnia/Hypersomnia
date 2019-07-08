@@ -216,6 +216,14 @@ namespace augs {
 #endif
 	}
 
+	image image::white_pixel() {
+		auto out = image(vec2i(1, 1));
+	
+		out.fill(white);
+
+		return out;
+	}
+
 	image::image(const vec2u new_size) {
 		resize_fill(new_size);
 	}
