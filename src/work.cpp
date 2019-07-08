@@ -191,6 +191,14 @@ int work(const int argc, const char* const * const argv) try {
 
 	static auto last_exit_incorrect_popup = std::optional<editor_popup>();
 
+	static auto perform_last_exit_incorrect = [&]() {
+		if (last_exit_incorrect_popup != std::nullopt) {
+			if (last_exit_incorrect_popup->perform()) {
+				last_exit_incorrect_popup = std::nullopt;
+			}
+		}
+	};
+
 	if (const auto last_failure_log = find_last_incorrect_exit(); last_failure_log.size() > 0) {
 		change_with_save([](config_lua_table& cfg) {
 			cfg.launch_mode = launch_type::MAIN_MENU;
@@ -599,6 +607,55 @@ and then hitting Save settings.
 		}
 	};
 
+	static bool client_start_requested = false;
+	static bool server_start_requested = false;
+
+	static auto perform_start_client = []() {
+		const bool perform_result = start_client_gui.perform(
+			renderer, 
+			streaming.avatar_preview_tex, 
+			window, 
+			config.default_client_start, 
+			config.client
+		);
+
+		if (perform_result || client_start_requested) {
+			client_start_requested = false;
+
+			change_with_save(
+				[&](auto& cfg) {
+					cfg.default_client_start = config.default_client_start;
+					cfg.client = config.client;
+				}
+			);
+
+			launch_setup(launch_type::CLIENT);
+		}
+	};
+
+	static auto perform_start_server = []() {
+		if (start_server_gui.perform(config.default_server_start) || server_start_requested) {
+			server_start_requested = false;
+
+			change_with_save(
+				[&](auto& cfg) {
+					cfg.default_server_start = config.default_server_start;
+					cfg.client = config.client;
+				}
+			);
+
+			if (start_server_gui.instance_type == server_instance_type::INTEGRATED) {
+				launch_setup(launch_type::SERVER);
+			}
+			else {
+				augs::spawn_detached_process(params.exe_path.string(), "--dedicated-server");
+				config.default_client_start.ip_port = typesafe_sprintf("%x:%x", config.default_server_start.ip, config.default_server_start.port);
+
+				launch_setup(launch_type::CLIENT);
+			}
+		}
+	};
+
 	static auto get_viewable_defs = [&]() -> const all_viewables_defs& {
 		return visit_current_setup([](auto& setup) -> const all_viewables_defs& {
 			return setup.get_viewable_defs();
@@ -705,6 +762,109 @@ and then hitting Save settings.
 		return gameplay_camera.get_current_eye();
 	};
 
+	static auto get_setup_customized_config = [&]() {
+		return visit_current_setup([&](auto& setup) {
+			auto config_copy = config;
+
+			/*
+				For example, the main menu might want to disable HUD or tune down the sound effects.
+				Editor might want to change the window name to the current file.
+			*/
+
+			setup.customize_for_viewing(config_copy);
+			setup.apply(config_copy);
+
+			if (get_camera_eye().zoom < 1.f) {
+				/* Force linear filtering when zooming out */
+				config_copy.renderer.default_filtering = augs::filtering_type::LINEAR;
+			}
+
+			return config_copy;
+		});
+	};
+
+	static auto perform_setup_custom_imgui = [&]() {
+		/*
+			The editor setup might want to use IMGUI to create views of entities or resources,
+			thus we ask the current setup for its custom ImGui logic.
+
+			Similarly, client and server setups might want to perform ImGui for things like team selection.
+		*/
+
+		visit_current_setup([&](auto& setup) {
+			const auto result = setup.perform_custom_imgui({ 
+				lua, window, streaming.images_in_atlas, config 
+			});
+
+			if (result == custom_imgui_result::GO_TO_MAIN_MENU) {
+				launch_setup(launch_type::MAIN_MENU);
+			}
+
+			using S = remove_cref<decltype(setup)>;
+
+			if constexpr(std::is_same_v<S, client_setup>) {
+				if (result == custom_imgui_result::RETRY) {
+					launch_setup(launch_type::CLIENT);
+				}
+			}
+		});
+	};
+
+	static auto do_imgui_pass = [](auto& new_window_entropy, const auto& frame_delta, const bool in_direct_gameplay) {
+		perform_imgui_pass(
+			new_window_entropy,
+			window.get_screen_size(),
+			frame_delta,
+			canon_config,
+			config,
+			last_saved_config,
+			local_config_path,
+			settings_gui,
+			audio,
+			lua,
+			[&]() {
+				if (!has_current_setup()) {
+					perform_start_client();
+					perform_start_server();
+				}
+
+				streaming.display_loading_progress();
+
+				perform_setup_custom_imgui();
+				perform_last_exit_incorrect();
+			},
+
+			/* Flags controlling IMGUI behaviour */
+
+			ingame_menu.show,
+			has_current_setup(),
+
+			in_direct_gameplay,
+			float_tests_succeeded
+		);
+	};
+
+	static auto decide_on_cursor_clipping = [](const bool in_direct_gameplay, const auto& cfg) {
+		if (window.is_active()
+			&& (
+				in_direct_gameplay
+				|| (
+					cfg.window.raw_mouse_input
+#if TODO
+					&& !cfg.session.use_system_cursor_for_gui
+#endif
+				)
+			)
+		) {
+			window.clip_system_cursor();
+			window.set_cursor_visible(false);
+		}
+		else {
+			window.disable_cursor_clipping();
+			window.set_cursor_visible(true);
+		}
+	};
+
 	static auto get_current_input_settings = [&](const auto& cfg) {
 		auto settings = cfg.input;
 
@@ -769,9 +929,6 @@ and then hitting Save settings.
 	static bool should_quit = false;
 
 	static augs::event::state common_input_state;
-
-	static bool client_start_requested = false;
-	static bool server_start_requested = false;
 
 	static auto do_main_menu_option = [&](const main_menu_button_type t) {
 		using T = decltype(t);
@@ -1201,6 +1358,11 @@ and then hitting Save settings.
 			releases.append_releases(new_window_entropy, common_input_state);
 			releases = {};
 
+			{
+				auto scope = measure_scope(performance.local_entropy);
+				window.collect_entropy(new_window_entropy);
+			}
+
 			if (get_viewed_character().dead()) {
 				game_gui_mode = true;
 			}
@@ -1210,11 +1372,6 @@ and then hitting Save settings.
 				&& has_current_setup()
 				&& !ingame_menu.show
 			;
-
-			{
-				auto scope = measure_scope(performance.local_entropy);
-				window.collect_entropy(new_window_entropy);
-			}
 
 			/*
 				Top-level events, higher than IMGUI.
@@ -1290,147 +1447,16 @@ and then hitting Save settings.
 			*/
 
 			window.set_mouse_pos_paused(in_direct_gameplay);
-
-			perform_imgui_pass(
-				new_window_entropy,
-				window.get_screen_size(),
-				frame_delta,
-				canon_config,
-				config,
-				last_saved_config,
-				local_config_path,
-				settings_gui,
-				audio,
-				lua,
-				[&]() {
-					if (!has_current_setup()) {
-						const bool perform_result = start_client_gui.perform(
-							renderer, 
-							streaming.avatar_preview_tex, 
-							window, 
-							config.default_client_start, 
-							config.client
-						);
-
-						if (perform_result || client_start_requested) {
-							client_start_requested = false;
-
-							change_with_save(
-								[&](auto& cfg) {
-									cfg.default_client_start = config.default_client_start;
-									cfg.client = config.client;
-								}
-							);
-
-							launch_setup(launch_type::CLIENT);
-						}
-
-						if (start_server_gui.perform(config.default_server_start) || server_start_requested) {
-							server_start_requested = false;
-
-							change_with_save(
-								[&](auto& cfg) {
-									cfg.default_server_start = config.default_server_start;
-									cfg.client = config.client;
-								}
-							);
-
-							if (start_server_gui.instance_type == server_instance_type::INTEGRATED) {
-								launch_setup(launch_type::SERVER);
-							}
-							else {
-								augs::spawn_detached_process(params.exe_path.string(), "--dedicated-server");
-								config.default_client_start.ip_port = typesafe_sprintf("%x:%x", config.default_server_start.ip, config.default_server_start.port);
-
-								launch_setup(launch_type::CLIENT);
-							}
-						}
-					}
-
-					streaming.display_loading_progress();
-
-					/*
-						The editor setup might want to use IMGUI to create views of entities or resources,
-						thus we ask the current setup for its custom ImGui logic.
-
-						Similarly, client and server setups might want to perform ImGui for things like team selection.
-					*/
-
-					visit_current_setup([&](auto& setup) {
-						const auto result = setup.perform_custom_imgui({ 
-							lua, window, streaming.images_in_atlas, config 
-						});
-
-						if (result == custom_imgui_result::GO_TO_MAIN_MENU) {
-							launch_setup(launch_type::MAIN_MENU);
-						}
-
-						using S = remove_cref<decltype(setup)>;
-
-						if constexpr(std::is_same_v<S, client_setup>) {
-							if (result == custom_imgui_result::RETRY) {
-								launch_setup(launch_type::CLIENT);
-							}
-						}
-					});
-
-					if (last_exit_incorrect_popup != std::nullopt) {
-						if (last_exit_incorrect_popup->perform()) {
-							last_exit_incorrect_popup = std::nullopt;
-						}
-					}
-				},
-
-				/* Flags controlling IMGUI behaviour */
-
-				ingame_menu.show,
-				has_current_setup(),
-
-				in_direct_gameplay,
-				float_tests_succeeded
-			);
 			
-			const auto viewing_config = visit_current_setup([&](auto& setup) {
-				auto config_copy = config;
+			do_imgui_pass(new_window_entropy, frame_delta, in_direct_gameplay);
 
-				/*
-					For example, the main menu might want to disable HUD or tune down the sound effects.
-					Editor might want to change the window name to the current file.
-				*/
-
-				setup.customize_for_viewing(config_copy);
-				setup.apply(config_copy);
-
-				if (get_camera_eye().zoom < 1.f) {
-					/* Force linear filtering when zooming out */
-					config_copy.renderer.default_filtering = augs::filtering_type::LINEAR;
-				}
-
-				return config_copy;
-			});
-
+			const auto viewing_config = get_setup_customized_config();
 			out.viewing_config = viewing_config;
 
 			configurables.apply(viewing_config);
 
-			if (window.is_active()
-				&& (
-					in_direct_gameplay
-					|| (
-						viewing_config.window.raw_mouse_input
-#if TODO
-						&& !viewing_config.session.use_system_cursor_for_gui
-#endif
-					)
-				)
-			) {
-				window.clip_system_cursor();
-				window.set_cursor_visible(false);
-			}
-			else {
-				window.disable_cursor_clipping();
-				window.set_cursor_visible(true);
-			}
+
+			decide_on_cursor_clipping(in_direct_gameplay, viewing_config);
 
 			releases.set_due_to_imgui(ImGui::GetIO());
 
