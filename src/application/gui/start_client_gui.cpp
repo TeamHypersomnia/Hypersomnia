@@ -16,6 +16,7 @@
 #define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
 
 bool start_client_gui_state::perform(
+	const augs::frame_num_type current_frame,
 	augs::renderer& renderer,
 	augs::graphics::texture& avatar_preview_tex,
 	augs::window& window,
@@ -88,7 +89,7 @@ bool start_client_gui_state::perform(
 		thread_local loading_result last_loading_result;
 
 		auto reload_avatar = [&](const std::string& from_path) {
-			const bool avatar_upload_completed = renderer.has_completed(avatar_submitted_when);
+			const bool avatar_upload_completed = augs::has_completed(current_frame, avatar_submitted_when);
 
 			if (avatar_upload_completed && !avatar_loading_result.valid() && from_path.size() > 0) {
 				avatar_loading_result = std::async(
@@ -226,7 +227,7 @@ bool start_client_gui_state::perform(
 				avatar_preview_tex.set_filtering(renderer, augs::filtering_type::LINEAR);
 
 				augs::graphics::texture::set_current_to_previous(renderer);
-				avatar_submitted_when = renderer.get_frame_num();
+				avatar_submitted_when = current_frame;
 
 				was_shrinked = result.was_shrinked;
 				will_be_upscaled  = result.will_be_upscaled;

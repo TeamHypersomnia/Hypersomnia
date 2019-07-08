@@ -10,6 +10,8 @@
 #include "augs/graphics/renderer_command_enums.h"
 #include "augs/graphics/renderer_command.h"
 
+using render_command_buffer = std::vector<augs::graphics::renderer_command>;
+
 namespace augs {
 	namespace graphics {
 		class texture;
@@ -17,8 +19,6 @@ namespace augs {
 		struct renderer_command;
 	}
 	
-	using frame_num_type = std::size_t;
-
 	class renderer {
 		debug_lines prev_logic_step_lines;
 
@@ -30,10 +30,9 @@ namespace augs {
 		special_buffer specials;
 
 		std::size_t num_total_triangles_drawn = 0;
-		frame_num_type current_frame = 0;
 
 	public:
-		std::vector<graphics::renderer_command> commands;
+		render_command_buffer commands;
 
 		renderer(const renderer_settings&);
 
@@ -97,17 +96,6 @@ namespace augs {
 			out = 0;
 			return out;
 		}
-
-		void increment_frame() {
-			++current_frame;
-		}
-
-		frame_num_type get_frame_num() const {
-			return current_frame;
-		}
-
-		bool has_frame_completed(frame_num_type) const;
-		bool has_completed(std::optional<frame_num_type>) const;
 
 		template <class T>
 		void push_command(T&& t) {

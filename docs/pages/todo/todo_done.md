@@ -3459,3 +3459,17 @@ which can be done from Settings->Reset all settings to factory default.
 			- so it cannot be told if the avatar has not yet arrived or if there is none
 			- CLIENT-SIDE, we need to clean it somehow, though the avatar might arrive before or after we get a notice that someone's connected
 
+- object_command<T>
+	- if has_object
+		- dispatch
+			- if static then object::perform(payload)
+			- if not then object->perform(payload)
+	- set_uniform will have a payload variant for simplicity
+	- command and command_payload
+	- set_uniform
+	- set_uniform_payload payload
+
+- Let textures and all construct normally
+	- The standard "set as current" interface simply pushes a command to a renderer
+	- Similarly with shaders
+

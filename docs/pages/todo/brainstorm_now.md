@@ -14,20 +14,6 @@ summary: That which we are brainstorming at the moment.
 	- watch out if clearing (moving from) the triangle vector does not screw things up
 	- void clear_special_vertex_data(); was really never used?
 
-- object_command<T>
-	- if has_object
-		- dispatch
-			- if static then object::perform(payload)
-			- if not then object->perform(payload)
-	- set_uniform will have a payload variant for simplicity
-	- command and command_payload
-	- set_uniform
-	- set_uniform_payload payload
-
-- Let textures and all construct normally
-	- The standard "set as current" interface simply pushes a command to a renderer
-	- Similarly with shaders
-
 - To avoid repeated allocations, we can have a pool of triangle vectors
 	- Although for now I guess the driver does a similar thing so let's forget about it
 

@@ -7,6 +7,7 @@
 #include "augs/graphics/texture.h"
 #include "application/setups/editor/editor_popup.h"
 #include "augs/graphics/renderer.h"
+#include "augs/graphics/frame_num_type.h"
 
 namespace augs {
 	class window;
@@ -27,6 +28,7 @@ public:
 	std::optional<augs::frame_num_type> avatar_submitted_when;
 
 	bool perform(
+		augs::frame_num_type current_frame,
 		augs::renderer& renderer,
 		augs::graphics::texture& avatar_preview_tex,
 		augs::window& window,

@@ -10,14 +10,6 @@
 #include "augs/templates/corresponding_field.h"
 
 namespace augs {
-	bool renderer::has_frame_completed(const frame_num_type n) const {
-		return get_frame_num() > n + 1;
-	}
-
-	bool renderer::has_completed(std::optional<frame_num_type> n) const {
-		return !n || has_frame_completed(*n);
-	}
-
 	renderer::renderer(const renderer_settings& settings) : current_settings(settings) {
 		apply(settings, true);
 	}

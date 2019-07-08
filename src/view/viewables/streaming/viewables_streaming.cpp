@@ -26,11 +26,12 @@ viewables_streaming::~viewables_streaming() {
 	finalize_pending_tasks();
 }
 
-bool viewables_streaming::finished_loading_player_metas(augs::renderer& renderer) const {
-	return !future_avatar_atlas.valid() && renderer.has_completed(avatar_atlas_submitted_when);
+bool viewables_streaming::finished_loading_player_metas(const augs::frame_num_type current_frame) const {
+	return !future_avatar_atlas.valid() && augs::has_completed(current_frame, avatar_atlas_submitted_when);
 }
 
 void viewables_streaming::load_all(const viewables_load_input in) {
+	const auto current_frame = in.current_frame;
 	const auto& new_all_defs = in.new_defs;
 	auto& now_all_defs = now_loaded_viewables_defs;
 
@@ -41,7 +42,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 	const auto max_atlas_size = in.max_atlas_size;
 
 	/* Avatar atlas pass */
-	if (finished_loading_player_metas(in.renderer)) {
+	if (finished_loading_player_metas(current_frame)) {
 		if (in.new_player_metas != std::nullopt) {
 			avatar_pbo_fallback.clear();
 
@@ -64,7 +65,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 
 	/* General atlas pass */
 
-	const bool atlas_upload_complete = in.renderer.has_completed(general_atlas_submitted_when);
+	const bool atlas_upload_complete = augs::has_completed(current_frame, general_atlas_submitted_when);
 	const bool atlas_generation_complete = !future_general_atlas.valid();
 
 	if (atlas_upload_complete && atlas_generation_complete) {
@@ -228,6 +229,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 }
 
 void viewables_streaming::finalize_load(viewables_finalize_input in) {
+	const auto current_frame = in.current_frame;
 	auto& now_all_defs = now_loaded_viewables_defs;
 
 	if (valid_and_is_ready(future_avatar_atlas)) {
@@ -264,7 +266,7 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 		now_loaded_defs = new_loaded_defs;
 
 		general_atlas.texImage2D(in.renderer, result.atlas_size, std::addressof(pbo_fallback.data()->r));
-		general_atlas_submitted_when = in.renderer.get_frame_num();
+		general_atlas_submitted_when = current_frame;
 	}
 
 	if (valid_and_is_ready(future_loaded_buffers)) {

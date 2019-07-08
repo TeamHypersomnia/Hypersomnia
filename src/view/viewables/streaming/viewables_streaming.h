@@ -16,10 +16,12 @@
 #include "view/viewables/avatars_in_atlas_map.h"
 #include "augs/texture_atlas/loaded_png_vector.h"
 #include "view/viewables/regeneration/atlas_progress_structs.h"
+#include "augs/graphics/frame_num_type.h"
 
 class sound_system;
 
 struct viewables_load_input {
+	const augs::frame_num_type current_frame;
 	const all_viewables_defs& new_defs;
 	const necessary_image_definitions_map& necessary_image_definitions;
 	const all_gui_fonts_inputs& gui_fonts;
@@ -32,6 +34,7 @@ struct viewables_load_input {
 };
 
 struct viewables_finalize_input {
+	const augs::frame_num_type current_frame;
 	const bool measure_atlas_upload;
 	augs::renderer& renderer;
 
@@ -89,6 +92,6 @@ public:
 
 	void finalize_pending_tasks();
 
-	bool finished_loading_player_metas(augs::renderer& renderer) const;
+	bool finished_loading_player_metas(augs::frame_num_type) const;
 	void display_loading_progress() const;
 };
