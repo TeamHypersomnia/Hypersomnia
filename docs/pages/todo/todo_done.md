@@ -3481,3 +3481,18 @@ which can be done from Settings->Reset all settings to factory default.
 
 - Implement guards for cursor clipping functions
 - set_cursor_clipping(bool enabled)
+
+- minimize access to window whenever game loops
+	- somehow maybe watch for changes to screen size?
+	- or for now just acquire the screen rect once
+- look for a event-based way to keep track of screen size
+- Separate thread for render queue
+	- We'll just queue commands for now
+	- The finalizers can happen in the rendering thread
+	- We can still query for the need of new atlases in the main/logic thread
+	- Perhaps the same with openal if hrtf proves to decrease performance
+
+- research ping behaviour under low performance
+	- Our 140-150 rtt matched against the server-reported ping in scoreboard
+		- so it was probably a case of low fps at kartezjan's
+

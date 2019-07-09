@@ -340,6 +340,14 @@ namespace augs {
 			change.msg = translate_enum(static_cast<UINT>(wParam));
 			return change;
 
+		case WM_SIZE:
+			default_proc();
+			return ch;
+
+		case WM_MOVE:
+			default_proc();
+			return ch;
+
 		default: default_proc(); return std::nullopt;
 		}
 	}
@@ -575,7 +583,7 @@ namespace augs {
 		SetWindowLongPtr(platform->hwnd, GWL_STYLE, platform->style);
 
 		SetWindowPos(platform->hwnd, NULL, 0, 0, 0, 0, SWP_FRAMECHANGED | SWP_NOMOVE | SWP_NOZORDER | SWP_NOOWNERZORDER);
-		set_window_rect(get_window_rect());
+		set_window_rect(get_window_rect_impl());
 		show();
 	}
 
@@ -637,7 +645,7 @@ namespace augs {
 		ensure(result);
 	}
 
-	xywhi window::get_window_rect() const {
+	xywhi window::get_window_rect_impl() const {
 		static RECT r;
 		GetClientRect(platform->hwnd, &r);
 		ClientToScreen(platform->hwnd, (POINT*)&r);
@@ -797,7 +805,7 @@ namespace augs {
 		if (flag) {
 			thread_local RECT r;
 			
-			const ltrbi lt = get_window_rect();
+			const ltrbi lt = get_window_rect_impl();
 
 			r.bottom = lt.b;
 			r.left = lt.l;

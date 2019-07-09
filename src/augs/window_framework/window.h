@@ -91,6 +91,7 @@ namespace augs {
 
 		bool mouse_pos_paused = false;
 		vec2i last_mouse_pos;
+		xywhi current_rect;
 
 		std::optional<event::change> handle_mousemove(
 			const basic_vec2<short> new_position
@@ -119,6 +120,8 @@ namespace augs {
 		void set_cursor_clipping_impl(bool flag); 
 
 		void destroy();
+
+		xywhi get_window_rect_impl() const;
 	public:
 		window(const window_settings&);
 		~window();

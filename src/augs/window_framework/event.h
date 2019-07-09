@@ -20,6 +20,7 @@ namespace augs {
 			close,
 			quit,
 			move,
+			resize,
 			activate,
 			deactivate,
 			click_activate,

@@ -21,11 +21,6 @@ summary: That which we are brainstorming at the moment.
 - Audio parallelization
 	- We might just use a concurrentqueue to push audio jobs, preferably with a set maximum
 
-- minimize access to window whenever game loops
-	- somehow maybe watch for changes to screen size?
-	- or for now just acquire the screen rect once
-- look for a event-based way to keep track of screen size
-
 - Determine how could we possibly have over 1000 fps on linux in the past
 	- Really just movement paths?
 	- More debug details?
@@ -107,16 +102,6 @@ summary: That which we are brainstorming at the moment.
 	- Appveyor script: llvm 8 when the visual studio 2019 is ready to take the new filesystem
 		- We had differing versions, the one on our computer is newer so it builds everything
 	- augs::date_time constructor for file write type, used to display last write times of lua meta files, although that's low priority
-
-- Separate thread for render queue
-	- We'll just queue commands for now
-	- The finalizers can happen in the rendering thread
-	- We can still query for the need of new atlases in the main/logic thread
-	- Perhaps the same with openal if hrtf proves to decrease performance
-
-- research ping behaviour under low performance
-	- Our 140-150 rtt matched against the server-reported ping in scoreboard
-		- so it was probably a case of low fps at kartezjan's
 
 - blurred text if zoomed out
 

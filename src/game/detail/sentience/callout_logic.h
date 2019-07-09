@@ -23,8 +23,10 @@ inline auto get_current_callout(const cosmos& cosm, const vec2 pos) {
 
 template <class E, class I>
 entity_id get_current_callout(const E& viewed_character, const I& interp) {
-	if (const auto tr = viewed_character.find_viewing_transform(interp)) {
-		return ::get_current_callout(viewed_character.get_cosmos(), tr->pos);
+	if (viewed_character) {
+		if (const auto tr = viewed_character.find_viewing_transform(interp)) {
+			return ::get_current_callout(viewed_character.get_cosmos(), tr->pos);
+		}
 	}
 
 	return entity_id();

@@ -11,6 +11,7 @@ message translate_enum(const UINT m) {
 	switch (m) {
 	case SC_CLOSE:						return message::close; 
 	case WM_MOVE:						return message::move; 
+	case WM_SIZE:						return message::resize; 
 	case WM_QUIT:						return message::quit; 
 	case SC_MINIMIZE:					return message::minimize; 
 	case SC_MAXIMIZE:					return message::maximize; 

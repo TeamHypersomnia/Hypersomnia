@@ -589,6 +589,21 @@ namespace augs {
 					default: return std::nullopt;
 				}
 			}
+			case XCB_CONFIGURE_NOTIFY: {
+				ch.msg = message::move;
+
+#if 0
+				const auto* const cfgEvent = reinterpret_cast<const xcb_configure_notify_event_t *>(event);
+
+				current_rect.x = cfgEvent->x;
+				current_rect.y = cfgEvent->y;
+				current_rect.w = cfgEvent->width;
+				current_rect.w = cfgEvent->height;
+#endif
+
+				return ch;
+			}
+
 /*
 		    case XCB_CLIENT_MESSAGE: {
 										 if((*(xcb_client_message_event_t*)event).data.data32[0] == (*reply2).atom) {
@@ -767,7 +782,7 @@ namespace augs {
 			values
 		);
 
-		if (get_window_rect() != r) {
+		if (get_window_rect_impl() != r) {
 			can_control_window_geometry = false;
 		}
 	}
@@ -781,7 +796,7 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 #endif
 	}
 
-	xywhi window::get_window_rect() const { 
+	xywhi window::get_window_rect_impl() const { 
 		xcb_get_geometry_cookie_t  geomCookie = xcb_get_geometry (connection, window_id);
 		
 		const auto geom = freed_unique(

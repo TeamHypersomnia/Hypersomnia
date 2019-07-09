@@ -60,6 +60,10 @@ namespace augs {
 			active = false;
 		}
 
+		if (ch.msg == message::move || ch.msg == message::resize) {
+			current_rect = get_window_rect_impl();
+		}
+
 		if (const auto mouse_change = sync_mouse_on_click_activate(ch)) {
 			output.push_back(ch);
 		}
@@ -95,8 +99,12 @@ namespace augs {
 		return output;
 	}
 
+	xywhi window::get_window_rect() const {
+		return current_rect;
+	}
+
 	vec2i window::get_screen_size() const {
-		return get_window_rect().get_size();	
+		return current_rect.get_size();	
 	}
 
 	void window::set_fullscreen_geometry(const bool flag) {
@@ -179,13 +187,17 @@ namespace augs {
 			}
 	
 			if (force || changed(settings.position)) {
-				auto r = get_window_rect();
+				auto r = get_window_rect_impl();
 				r.set_position(settings.position);
 				set_window_rect(r);
 			}
 		}
 
 		current_settings = settings;
+
+		if (force) {
+			current_rect = get_window_rect_impl();
+		}
 	}
 
 	window_settings window::get_current_settings() const {
@@ -207,6 +219,7 @@ namespace augs {
 		}
 
 		set_cursor_clipping_impl(flag);
+
 		cursor_clipping = flag;
 	}
 
@@ -216,6 +229,7 @@ namespace augs {
 		}
 
 		set_cursor_visible_impl(flag);
+
 		cursor_visible = flag;
 	}
 
