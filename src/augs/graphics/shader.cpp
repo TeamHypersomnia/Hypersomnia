@@ -6,6 +6,7 @@
 #include "augs/graphics/OpenGL_includes.h"
 #include "augs/graphics/backend_access.h"
 #include "augs/graphics/renderer.h"
+#include "augs/templates/enum_introspect.h"
 
 namespace augs {
 	namespace graphics {
@@ -196,6 +197,10 @@ namespace augs {
 #endif
 
 			built = true;
+
+			for_each_enum_except_bounds([&](const common_uniform_name u) {
+				uniform_map[u] = get_uniform_location(enum_to_string(u));
+			});
 		}
 
 		void shader_program::destroy() {
@@ -217,7 +222,7 @@ namespace augs {
 		
 		void shader_program::perform(backend_access, const set_uniform_command& cmd) const {
 			auto uniform_setter = [&](const auto& typed_payload){
-				set_uniform(get_uniform_location(cmd.name), typed_payload);
+				set_uniform(cmd.uniform_id, typed_payload);
 			};
 
 			std::visit(uniform_setter, cmd.payload);
@@ -241,7 +246,7 @@ namespace augs {
 		}
 
 		void shader_program::set_projection(const std::array<float, 16> matrix) const {
-			GL_CHECK(glUniformMatrix4fv(get_uniform_location("projection_matrix"), 1, GL_FALSE, matrix.data()));
+			GL_CHECK(glUniformMatrix4fv(uniform_map[common_uniform_name::projection_matrix], 1, GL_FALSE, matrix.data()));
 			(void)matrix;
 		}
 

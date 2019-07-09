@@ -81,52 +81,54 @@ all_necessary_shaders::all_necessary_shaders(
 		*this
 	);
 
+	using U = augs::common_uniform_name;
+
 	if (illuminated) {
 		illuminated->set_as_current(renderer);
-		illuminated->set_uniform(renderer, "basic_texture", 0);
-		illuminated->set_uniform(renderer, "light_texture", 2);
+		illuminated->set_uniform(renderer, U::basic_texture, 0);
+		illuminated->set_uniform(renderer, U::light_texture, 2);
 	}
 
 	if (standard) {
 		standard->set_as_current(renderer);
-		standard->set_uniform(renderer, "basic_texture", 0);
+		standard->set_uniform(renderer, U::basic_texture, 0);
 	}
 
 	if (pure_color_highlight) {
 		pure_color_highlight->set_as_current(renderer);
-		pure_color_highlight->set_uniform(renderer, "basic_texture", 0);
+		pure_color_highlight->set_uniform(renderer, U::basic_texture, 0);
 	}
 
 	if (circular_bars) {
 		circular_bars->set_as_current(renderer);
-		circular_bars->set_uniform(renderer, "basic_texture", 0);
+		circular_bars->set_uniform(renderer, U::basic_texture, 0);
 	}
 
 	if (smoke) {
 		smoke->set_as_current(renderer);
-		smoke->set_uniform(renderer, "smoke_texture", 1);
-		smoke->set_uniform(renderer, "light_texture", 2);
+		smoke->set_uniform(renderer, U::smoke_texture, 1);
+		smoke->set_uniform(renderer, U::light_texture, 2);
 	}
 
 	if (illuminating_smoke) {
 		illuminating_smoke->set_as_current(renderer);
-		illuminating_smoke->set_uniform(renderer, "smoke_texture", 3);
+		illuminating_smoke->set_uniform(renderer, U::smoke_texture, 3);
 	}
 
 	if (specular_highlights) {
 		specular_highlights->set_as_current(renderer);
-		specular_highlights->set_uniform(renderer, "basic_texture", 0);
-		specular_highlights->set_uniform(renderer, "light_texture", 2);
+		specular_highlights->set_uniform(renderer, U::basic_texture, 0);
+		specular_highlights->set_uniform(renderer, U::light_texture, 2);
 	}
 
 	if (textured_light) {
 		textured_light->set_as_current(renderer);
-		textured_light->set_uniform(renderer, "basic_texture", 0);
+		textured_light->set_uniform(renderer, U::basic_texture, 0);
 	}
 
 	if (flash_afterimage) {
 		flash_afterimage->set_as_current(renderer);
-		flash_afterimage->set_uniform(renderer, "afterimage_texture", 0);
+		flash_afterimage->set_uniform(renderer, U::afterimage_texture, 0);
 	}
 }
 

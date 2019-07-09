@@ -59,6 +59,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	auto& renderer = in.renderer;
 
+	using U = augs::common_uniform_name;
+
 	auto set_uniform = [&](auto&& sh, auto&&... args) {
 		sh->set_uniform(renderer, std::forward<decltype(args)>(args)...);
 	};
@@ -251,9 +253,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 					return screen_space;
 				}();
 
-				set_uniform(shaders.fog_of_war, "startingAngleVec", left_dir);
-				set_uniform(shaders.fog_of_war, "endingAngleVec", right_dir);
-				set_uniform(shaders.fog_of_war, "eye_frag_pos", eye_frag_pos);
+				set_uniform(shaders.fog_of_war, U::startingAngleVec, left_dir);
+				set_uniform(shaders.fog_of_war, U::endingAngleVec, right_dir);
+				set_uniform(shaders.fog_of_war, U::eye_frag_pos, eye_frag_pos);
 			}
 
 			renderer.call_and_clear_triangles();
@@ -678,7 +680,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	set_shader_with_matrix(shaders.circular_bars);
 
 	const auto set_center_uniform = [&](const augs::atlas_entry& tex) {
-		set_uniform(shaders.circular_bars, "texture_center", tex.get_center());
+		set_uniform(shaders.circular_bars, U::texture_center, tex.get_center());
 	};
 
 	draw_sentiences_hud_output sentiences_hud;

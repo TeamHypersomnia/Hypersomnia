@@ -192,19 +192,16 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	light_shader.set_as_current(renderer);
 
+	using U = augs::common_uniform_name;
+
 	struct light_uniforms {
-		const char* pos;
-		const char* distance_mult;
-		const char* attenuation;
-		const char* multiply_color;
+		U pos = U::light_pos;
+		U distance_mult = U::distance_mult;
+		U attenuation = U::light_attenuation;
+		U multiply_color = U::multiply_color;
 
 		light_uniforms(const augs::graphics::shader_program& s) {
 			(void)s;
-
-			pos = "light_pos";
-			distance_mult = "distance_mult";
-			attenuation = "light_attenuation";
-			multiply_color = "multiply_color";
 		}
 	};
 

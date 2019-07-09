@@ -6,10 +6,22 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- If the render thread sleeps, we would've been able to use it to speed up the frame preparation in jobs system
+	- Otherwise we have to be conservative in the number of threads by one
+	- Why not just post render jobs?
+	- game thread could post all the jobs, incl. rendering
+	- process_jobs_until(game waiting_already)
+		- or just until empty since the thread pool will be emptied of jobs by the end of each frame
+		- same for audio?
+			- if audio has nothing to do, it can help in producing the next frame as well
+	- game thread itself will process jobs
+
+- Audio parallelization
+	- We might just use a concurrentqueue to push audio jobs, preferably with a set maximum
+
 - The atlas in arena server might be screwed the same way that avatar preview screws everything
 	- probably wrong texture is set after teximage2d
 
-- minimize use of get_uniform_location
 - Implement guards for cursor clipping functions
 - set_cursor_clipping(bool enabled)
 - minimize access to window whenever game loops
@@ -22,8 +34,6 @@ summary: That which we are brainstorming at the moment.
 	- More debug details?
 	- Why does having a character on screen decrease the fps so much?
 		- Test it by going to spectator
-
-- Minimize reads from GPU by precaching the uniform locations
 
 - Things to think about after introducing commandized renderer
 	- Textures after creation are bound but this fact is not registered in settable_as_current

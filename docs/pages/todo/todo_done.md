@@ -3473,3 +3473,6 @@ which can be done from Settings->Reset all settings to factory default.
 	- The standard "set as current" interface simply pushes a command to a renderer
 	- Similarly with shaders
 
+- minimize use of get_uniform_location
+- Minimize reads from GPU by precaching the uniform locations
+

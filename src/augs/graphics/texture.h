@@ -15,7 +15,7 @@ namespace augs {
 	namespace graphics {
 		class backend_access;
 
-		class texture : public settable_commandizer<const texture, renderer, true> {
+		class texture : public settable_commandizer<const texture, renderer> {
 			friend class fbo;
 
 			GLuint id = 0xdeadbeef;
@@ -28,8 +28,8 @@ namespace augs {
 
 			void set_filtering_impl(filtering_type);
 
-			using base = settable_commandizer<const texture, renderer, true>;
-			using settable_as_current_base = settable_as_current_mixin<const texture, true>;
+			using base = settable_commandizer<const texture, renderer>;
+			using settable_as_current_base = settable_as_current_mixin<const texture>;
 			friend settable_as_current_base;
 
 			bool set_as_current_impl(backend_access) const;

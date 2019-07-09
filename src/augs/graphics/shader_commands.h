@@ -1,5 +1,7 @@
 #pragma once
 
+using GLint = int;
+
 namespace augs {
 	namespace graphics {
 		using uniform_payload_variant = std::variant<
@@ -14,7 +16,7 @@ namespace augs {
 		>;
 
 		struct set_uniform_command {
-			const char* name;
+			GLint uniform_id;
 			uniform_payload_variant payload;
 		};
 

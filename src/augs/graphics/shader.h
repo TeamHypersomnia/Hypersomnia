@@ -10,6 +10,8 @@
 
 #include "augs/graphics/shader_commands.h"
 #include "augs/templates/settable_commandizer.h"
+#include "augs/misc/enum/enum_array.h"
+#include "augs/graphics/common_uniform_name.h"
 
 using GLuint = unsigned int;
 using GLint = int;
@@ -61,6 +63,8 @@ namespace augs {
 			GLuint id = 0xdeadbeef;
 			bool built = false;
 
+			enum_array<GLint, common_uniform_name> uniform_map;
+
 #if STORE_SHADERS_IN_PROGRAM
 			shader vertex;
 			shader fragment;
@@ -108,7 +112,7 @@ namespace augs {
 			shader_program& operator=(const shader_program&) = delete;
 			
 			template <class... Args>
-			void set_uniform(renderer&, const char* name, Args&&... args) const;
+			void set_uniform(renderer&, common_uniform_name name, Args&&... args) const;
 
 			void set_projection(renderer&, const std::array<float, 16> matrix) const;
 
