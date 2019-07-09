@@ -6,9 +6,12 @@
 struct game_frame_buffer {
 	augs::local_entropy new_window_entropy;
 	render_command_buffer commands;
+	augs::window_settings new_settings;
+
+	bool should_clip_cursor = false;
 };
 
-struct game_frame_buffer_swapper {
+class game_frame_buffer_swapper {
 	std::atomic<bool> already_waiting = false;
 	std::atomic<bool> swap_complete = false;
 
@@ -18,6 +21,7 @@ struct game_frame_buffer_swapper {
 	std::condition_variable swapper_cv;
 	std::condition_variable waiter_cv;
 
+public:
 	template <class T>
 	void swap_buffers(
 		game_frame_buffer& read_buffer, 
@@ -38,13 +42,25 @@ struct game_frame_buffer_swapper {
 			synchronized_op();
 		}
 
-		swap_complete.store(true);
+		notify_swap_completion();
+	}
+
+	void notify_swap_completion() {
+		{
+			std::unique_lock<std::mutex> lk(waiter_m);
+			swap_complete.store(true);
+		}
+
 		waiter_cv.notify_all();
 	}
 
 	void wait_swap() {
 		swap_complete.store(false);
-		already_waiting.store(true);
+		
+		{
+			std::unique_lock<std::mutex> lk(swapper_m);
+			already_waiting.store(true);
+		}
 
 		swapper_cv.notify_all();
 

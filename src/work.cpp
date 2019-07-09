@@ -858,7 +858,7 @@ and then hitting Save settings.
 	};
 
 	static auto decide_on_cursor_clipping = [](const bool in_direct_gameplay, const auto& cfg) {
-		if (window.is_active()
+		write_buffer.should_clip_cursor = window.is_active()
 			&& (
 				in_direct_gameplay
 				|| (
@@ -868,14 +868,7 @@ and then hitting Save settings.
 #endif
 				)
 			)
-		) {
-			window.clip_system_cursor();
-			window.set_cursor_visible(false);
-		}
-		else {
-			window.disable_cursor_clipping();
-			window.set_cursor_visible(true);
-		}
+		;
 	};
 
 	static auto get_current_input_settings = [&](const auto& cfg) {
@@ -945,6 +938,7 @@ and then hitting Save settings.
 	static auto request_quit = []() {
 		should_quit = true;
 		should_quit_logic.store(true);
+		buffer_swapper.notify_swap_completion();
 	};
 
 	static augs::event::state common_input_state;
@@ -1487,7 +1481,7 @@ and then hitting Save settings.
 				out.viewing_config = viewing_config;
 
 				configurables.apply(viewing_config);
-
+				write_buffer.new_settings = viewing_config.window;
 				decide_on_cursor_clipping(in_direct_gameplay, viewing_config);
 
 				releases.set_due_to_imgui(ImGui::GetIO());
@@ -2228,6 +2222,18 @@ and then hitting Save settings.
 
 			buffer_swapper.swap_buffers(read_buffer, write_buffer, game_main_thread_synced_op);
 		}
+
+		if (read_buffer.should_clip_cursor)
+		{
+			window.clip_system_cursor();
+			window.set_cursor_visible(false);
+		}
+		else {
+			window.disable_cursor_clipping();
+			window.set_cursor_visible(true);
+		}
+
+		configurables.apply_main_thread(read_buffer.new_settings);
 	}
 
 	return EXIT_SUCCESS;

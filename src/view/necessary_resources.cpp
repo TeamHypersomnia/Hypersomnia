@@ -21,12 +21,12 @@ all_necessary_fbos::all_necessary_fbos(
 	const vec2i screen_size,
 	const game_drawing_settings settings
 ) {
-	apply(screen_size, settings);
+	(void)settings;
+	apply(screen_size);
 }
 
 void all_necessary_fbos::apply(
-	const vec2i screen_size,
-	const game_drawing_settings /* settings */
+	const vec2i screen_size
 ) {
 	if (/* just_minimized */ screen_size.is_zero()) {
 		return;

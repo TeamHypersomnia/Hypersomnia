@@ -53,8 +53,7 @@ struct all_necessary_fbos {
 	);
 
 	void apply(
-		const vec2i screen_size,
-		const game_drawing_settings
+		const vec2i screen_size
 	);
 };
 

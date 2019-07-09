@@ -64,6 +64,7 @@ namespace augs {
 	class window;
 	class audio_context;
 	class renderer;
+	struct window_settings;
 }
 
 struct all_necessary_fbos;
@@ -85,5 +86,7 @@ struct configuration_subscribers {
 #endif
 
 	void apply(const config_lua_table&) const;
+
+	void apply_main_thread(const augs::window_settings&) const;
 	void sync_back_into(config_lua_table&) const;
 };

@@ -29,12 +29,15 @@ void configuration_subscribers::sync_back_into(config_lua_table& into) const {
 void configuration_subscribers::apply(const config_lua_table& new_config) const {
 	DEBUG_DRAWING = new_config.debug_drawing;
 	
-	const auto screen_size = window.get_screen_size();
-
-	fbos.apply(screen_size, new_config.drawing);
-	window.apply(new_config.window);
 	audio_context.apply(new_config.audio);
 	renderer.apply(new_config.renderer);
+}
+
+void configuration_subscribers::apply_main_thread(const augs::window_settings& settings) const {
+	window.apply(settings);
+
+	const auto screen_size = window.get_screen_size();
+	fbos.apply(screen_size);
 }
 
 bool settings_gui_state::should_hijack_key() const {

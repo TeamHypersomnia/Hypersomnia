@@ -5,7 +5,12 @@ hide_sidebar: true
 permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
-	
+
+- Determine how could we possibly have over 1000 fps on linux in the past
+	- Really just movement paths?
+	- Why does having a character on screen decrease the fps so much?
+		- Test it by going to spectator
+
 - Minimize reads from GPU by precaching the uniform locations
 
 - Things to think about after introducing commandized renderer
