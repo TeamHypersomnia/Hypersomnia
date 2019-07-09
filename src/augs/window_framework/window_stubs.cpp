@@ -36,10 +36,6 @@ namespace augs {
 
 	void window::set_cursor_pos(vec2i) {}
 
-	void window::clip_system_cursor() {}
-	void window::disable_cursor_clipping() {}
-	void window::set_cursor_visible(const bool) {}
-
 	std::optional<std::string> window::open_file_dialog(
 		const std::vector<file_dialog_filter>&,
 		const std::string& 

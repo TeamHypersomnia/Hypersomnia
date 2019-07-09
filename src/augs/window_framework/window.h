@@ -86,8 +86,11 @@ namespace augs {
 
 		bool active = false;
 
-		vec2i last_mouse_pos;
+		bool cursor_clipping = false;
+		bool cursor_visible = true;
+
 		bool mouse_pos_paused = false;
+		vec2i last_mouse_pos;
 
 		std::optional<event::change> handle_mousemove(
 			const basic_vec2<short> new_position
@@ -111,6 +114,9 @@ namespace augs {
 		void set_fullscreen_hint(const bool);
 
 		window_settings current_settings;
+
+		void set_cursor_visible_impl(bool flag); 
+		void set_cursor_clipping_impl(bool flag); 
 
 		void destroy();
 	public:
@@ -139,8 +145,7 @@ namespace augs {
 		xywhi get_window_rect() const;
 
 		void set_cursor_pos(vec2i);
-		void clip_system_cursor();
-		void disable_cursor_clipping();
+		void set_cursor_clipping(bool flag); 
 		void set_cursor_visible(bool flag); 
 
 		bool is_active() const;

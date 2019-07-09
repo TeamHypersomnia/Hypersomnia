@@ -836,25 +836,26 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 		XSync(display, False);
 	}
 
-	void window::clip_system_cursor() {
-		XGrabPointer(
-			display,
-		   	window_id,
-		   	True,
-		   	0,
-            GrabModeAsync, 
-			GrabModeAsync,
-            window_id,
-		   	None,
-		   	CurrentTime
-		);
+	void window::set_cursor_clipping_impl(const bool flag) {
+		if (flag) {
+			XGrabPointer(
+				display,
+				window_id,
+				True,
+				0,
+				GrabModeAsync, 
+				GrabModeAsync,
+				window_id,
+				None,
+				CurrentTime
+			);
+		}
+		else {
+			XUngrabPointer(display, CurrentTime);
+		}
 	}
 
-	void window::disable_cursor_clipping() {
-		XUngrabPointer(display, CurrentTime);
-	}
-
-	void window::set_cursor_visible(const bool flag) {
+	void window::set_cursor_visible_impl(const bool flag) {
 		if (!flag) {
 			static const auto sharedInvisibleCursor = [this](){
 				// Thanks to:

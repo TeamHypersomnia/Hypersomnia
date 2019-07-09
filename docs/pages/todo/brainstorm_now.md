@@ -21,11 +21,6 @@ summary: That which we are brainstorming at the moment.
 - Audio parallelization
 	- We might just use a concurrentqueue to push audio jobs, preferably with a set maximum
 
-- The atlas in arena server might be screwed the same way that avatar preview screws everything
-	- probably wrong texture is set after teximage2d
-
-- Implement guards for cursor clipping functions
-- set_cursor_clipping(bool enabled)
 - minimize access to window whenever game loops
 	- somehow maybe watch for changes to screen size?
 	- or for now just acquire the screen rect once

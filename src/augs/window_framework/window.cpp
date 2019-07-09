@@ -201,6 +201,24 @@ namespace augs {
 		mouse_pos_paused = flag;
 	}
 	
+	void window::set_cursor_clipping(const bool flag) {
+		if (flag == cursor_clipping) {
+			return;
+		}
+
+		set_cursor_clipping_impl(flag);
+		cursor_clipping = flag;
+	}
+
+	void window::set_cursor_visible(const bool flag) {
+		if (flag == cursor_visible) {
+			return;
+		}
+
+		set_cursor_visible_impl(flag);
+		cursor_visible = flag;
+	}
+
 	bool window::is_mouse_pos_paused() const {
 		return mouse_pos_paused;
 	}

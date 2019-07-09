@@ -3476,3 +3476,8 @@ which can be done from Settings->Reset all settings to factory default.
 - minimize use of get_uniform_location
 - Minimize reads from GPU by precaching the uniform locations
 
+- The atlas in arena server might be screwed the same way that avatar preview screws everything
+	- probably wrong texture is set after teximage2d
+
+- Implement guards for cursor clipping functions
+- set_cursor_clipping(bool enabled)

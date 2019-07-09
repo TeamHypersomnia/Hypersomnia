@@ -17,7 +17,7 @@ FORCE_NOINLINE void save_log_and_terminate() {
 	}
 
 	if (augs::window::current_exists()) {
-		augs::window::get_current().disable_cursor_clipping();
+		augs::window::get_current().set_cursor_clipping(false);
 	}
 	
 	LOG("\nIf the game crashes repeatedly, consider deleting the \"cache\" folder.");

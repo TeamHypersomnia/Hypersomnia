@@ -793,24 +793,25 @@ namespace augs {
 		SetCursorPos(pos.x, pos.y);
 	}
 
-	void window::clip_system_cursor() {
-		thread_local RECT r;
-		
-		const ltrbi lt = get_window_rect();
+	void window::set_cursor_clipping_impl(const bool flag) {
+		if (flag) {
+			thread_local RECT r;
+			
+			const ltrbi lt = get_window_rect();
 
-		r.bottom = lt.b;
-		r.left = lt.l;
-		r.right = lt.r;
-		r.top = lt.t;
+			r.bottom = lt.b;
+			r.left = lt.l;
+			r.right = lt.r;
+			r.top = lt.t;
 
-		ClipCursor(&r);
+			ClipCursor(&r);
+		}
+		else {
+			ClipCursor(NULL);
+		}
 	}
 
-	void window::disable_cursor_clipping() {
-		ClipCursor(NULL);
-	}
-
-	void window::set_cursor_visible(const bool flag) {
+	void window::set_cursor_visible_impl(const bool flag) {
 		if (!flag) {
 			while (ShowCursor(FALSE) >= 0);
 		}

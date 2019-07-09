@@ -865,17 +865,15 @@ and then hitting Save settings.
 	};
 
 	static auto decide_on_cursor_clipping = [](const bool in_direct_gameplay, const auto& cfg) {
-		write_buffer.should_clip_cursor = window.is_active()
-			&& (
-				in_direct_gameplay
-				|| (
-					cfg.window.raw_mouse_input
+		write_buffer.should_clip_cursor = (
+			in_direct_gameplay
+			|| (
+				cfg.window.raw_mouse_input
 #if TODO
-					&& !cfg.session.use_system_cursor_for_gui
+				&& !cfg.session.use_system_cursor_for_gui
 #endif
-				)
 			)
-		;
+		);
 	};
 
 	static auto get_current_input_settings = [&](const auto& cfg) {
@@ -2246,13 +2244,13 @@ and then hitting Save settings.
 
 		window.set_mouse_pos_paused(read_buffer.should_pause_cursor);
 
-		if (read_buffer.should_clip_cursor)
+		if (window.is_active() && read_buffer.should_clip_cursor)
 		{
-			window.clip_system_cursor();
+			window.set_cursor_clipping(true);
 			window.set_cursor_visible(false);
 		}
 		else {
-			window.disable_cursor_clipping();
+			window.set_cursor_clipping(false);
 			window.set_cursor_visible(true);
 		}
 
