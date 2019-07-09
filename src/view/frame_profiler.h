@@ -13,7 +13,9 @@ struct frame_profiler : public augs::profiler_mixin<frame_profiler> {
 	augs::time_measurements drawing_layers;
 	augs::time_measurements imgui;
 	augs::time_measurements menu_gui;
-	augs::time_measurements game_gui;
+	augs::time_measurements draw_game_gui;
+	augs::time_measurements draw_setup_custom_gui;
+	augs::time_measurements advance_game_gui;
 	augs::time_measurements debug_details;
 	augs::time_measurements debug_lines;
 	augs::time_measurements light_visibility;

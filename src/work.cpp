@@ -1348,6 +1348,8 @@ and then hitting Save settings.
 	};
 
 	static auto advance_game_gui = [&](const auto context, const auto frame_delta) {
+		auto scope = measure_scope(frame_performance.advance_game_gui);
+
 		game_gui.advance(context, frame_delta);
 		game_gui.rebuild_layouts(context);
 		game_gui.build_tree_data(context);
@@ -1948,8 +1950,6 @@ and then hitting Save settings.
 					);
 				}
 
-				auto scope = measure_scope(frame_performance.game_gui);
-
 				necessary_shaders.standard->set_projection(renderer, augs::orthographic_projection(vec2(screen_size)));
 
 				/*
@@ -1961,8 +1961,12 @@ and then hitting Save settings.
 
 				if (should_draw_game_gui()) {
 					/* #3 */
+					auto scope = measure_scope(frame_performance.draw_game_gui);
+
 					game_gui.world.draw(context);
 				}
+
+				auto scope = measure_scope(frame_performance.draw_setup_custom_gui);
 
 				const auto player_metas = visit_current_setup([&](auto& setup) {
 					return setup.find_player_metas();
@@ -2020,9 +2024,9 @@ and then hitting Save settings.
 
 					main_menu->gui.advance(context, frame_delta);
 
-	#if MENU_ART
+#if MENU_ART
 					get_drawer().aabb(streaming.necessary_images_in_atlas[assets::necessary_image_id::ART_1], ltrb(0, 0, screen_size.x, screen_size.y), white);
-	#endif
+#endif
 
 					/* #5 */
 					const auto cursor = main_menu->gui.draw({ context, get_drawer() });
@@ -2147,6 +2151,8 @@ and then hitting Save settings.
 				}
 			}
 
+			frame_performance.num_triangles.measure(renderer.extract_num_total_triangles_drawn());
+
 			if (new_viewing_config.session.show_developer_console) {
 				auto scope = measure_scope(frame_performance.debug_details);
 
@@ -2168,7 +2174,8 @@ and then hitting Save settings.
 
 			renderer.call_and_clear_triangles();
 
-			frame_performance.num_triangles.measure(renderer.extract_num_total_triangles_drawn());
+			/* Don't count the debug details */
+			renderer.extract_num_total_triangles_drawn();
 
 			write_buffer.commands.clear();
 			write_buffer.commands.assign(renderer.commands.begin(), renderer.commands.end());
