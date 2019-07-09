@@ -5,6 +5,24 @@ permalink: bug_database
 summary: Notable bugs.
 ---
 
+-
+[xcb] Unknown sequence number while processing reply
+[xcb] Most likely this is a multi-threaded client and XInitThreads has not been called
+[xcb] Aborting, sorry about that.
+X connection to :0 broken (explicit kill or server shutdown).
+Hypersomnia: xcb_io.c:643: _XReply: Assertion `!xcb_xlib_threads_sequence_lost' failed.
+[1]    10087 abort (core dumped)  ../build/current/Hypersomnia --connect
+
+#0  augs::window::get_window_rect() const ()
+[Current thread is 1 (Thread 0x7fb0d72465c0 (LWP 10703))]
+#0  augs::window::get_window_rect() const ()
+#1  augs::window::get_screen_size() const ()
+#2  work(int, char const* const*) ()
+#3  main ()
+
+- most probably fixed by setting cursor paused synchronously, similarly to screen size case
+
+
 - The server (rightfully) kicks the bots because it sees them as lingering characters for clients who are not yet set
 	- That only means that if we ever get to implement bots,
 

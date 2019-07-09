@@ -1480,7 +1480,7 @@ and then hitting Save settings.
 					(it does not physically freeze the cursor, it just remembers the position)
 				*/
 
-				window.set_mouse_pos_paused(in_direct_gameplay);
+				write_buffer.should_pause_cursor = in_direct_gameplay;
 				
 				do_imgui_pass(get_current_frame_num(), new_window_entropy, frame_delta, in_direct_gameplay);
 
@@ -2231,6 +2231,9 @@ and then hitting Save settings.
 
 			buffer_swapper.swap_buffers(read_buffer, write_buffer, game_main_thread_synced_op);
 		}
+
+
+		window.set_mouse_pos_paused(read_buffer.should_pause_cursor);
 
 		if (read_buffer.should_clip_cursor)
 		{
