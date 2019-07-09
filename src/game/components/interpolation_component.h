@@ -4,8 +4,16 @@
 namespace components {
 	struct interpolation {
 		// GEN INTROSPECTOR struct components::interpolation
-		transformr place_of_birth;
+		mutable transformr desired_transform;
+		mutable transformr interpolated_transform;
+		mutable float rotational_slowdown_multiplier = 1.f;
+		mutable float positional_slowdown_multiplier = 1.f;
 		// END GEN INTROSPECTOR
+
+		template <class T>
+		void set_place_of_birth(T&& t) {
+			interpolated_transform = std::forward<T>(t);
+		}
 	};
 }
 

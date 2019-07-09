@@ -128,9 +128,9 @@ struct melee_weapon {
 		components::melee,
 		components::item,
 		components::rigid_body,
-		components::interpolation,
+		components::sender,
 
-		components::sender
+		components::interpolation
 	>;
 };
 
@@ -350,8 +350,8 @@ struct remnant_body {
 		components::sprite,
 		components::rigid_body,
 
-		components::interpolation,
-		components::remnant
+		components::remnant,
+		components::interpolation
 	>;
 };
 

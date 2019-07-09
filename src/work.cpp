@@ -1084,6 +1084,8 @@ and then hitting Save settings.
 		});
 	};
 
+	static bool interpolation_needs_to_update_desired_transforms = true;
+
 	static auto audiovisual_step = [&](
 		const augs::delta frame_delta,
 		const double speed_multiplier,
@@ -1099,6 +1101,11 @@ and then hitting Save settings.
 
 		{
 			auto scope = measure_scope(get_audiovisuals().performance.interpolation);
+
+			if (interpolation_needs_to_update_desired_transforms) {
+				interp.update_desired_transforms(cosm);
+				interpolation_needs_to_update_desired_transforms = false;
+			}
 
 			interp.integrate_interpolated_transforms(
 				viewing_config.interpolation, 
@@ -1147,6 +1154,8 @@ and then hitting Save settings.
 		const config_lua_table& viewing_config,
 		const audiovisual_post_solve_settings settings
 	) {
+		interpolation_needs_to_update_desired_transforms = true;
+
 		{
 			const auto& defs = get_viewable_defs();
 

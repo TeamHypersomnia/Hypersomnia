@@ -154,3 +154,4 @@ struct net_solvable_stream_cref : augs::cref_memory_stream {
 	}
 };
 
+static_assert(augs::has_special_read_v<net_solvable_stream_cref, complex_decorations_vector>);

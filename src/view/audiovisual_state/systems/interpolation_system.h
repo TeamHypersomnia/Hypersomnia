@@ -33,8 +33,6 @@ public:
 
 	entity_id id_to_integerize;
 
-	audiovisual_cache_map<cache> per_entity_cache;
-
 	void integrate_interpolated_transforms(
 		const interpolation_settings&,
 		const cosmos&,
@@ -42,18 +40,51 @@ public:
 		const augs::delta fixed_delta_for_slowdowns
 	);
 
-	std::optional<transformr> find_interpolated(const const_entity_handle) const;
-	transformr& get_interpolated(const const_entity_handle);
+	void update_desired_transforms(const cosmos&);
+
+	template <class E>
+	std::optional<transformr> find_interpolated(const E& handle) const {
+		auto result = [&]() -> std::optional<transformr> {
+			if (enabled) {
+				if (const auto interp = handle.template find<components::interpolation>()) {
+					return interp->interpolated_transform;
+				}
+			}
+
+			return handle.find_logic_transform();
+		}();
+
+		/*
+			Here, we integerize the transform of the viewed entity, (and later possibly of the vehicle that it drives)
+			so that the rendered player does not shake when exactly followed by the camera,
+			which is also integerized for pixel-perfect rendering.
+
+			Ideally we shouldn't do it here because it introduces more state, but that's about the simplest solution
+			that doesn't make a mess out of rendering scripts for this special case.	
+
+			Additionally, if someone does not use interpolation (there should be no need to disable it, really)
+			they will still suffer from the problem of shaky controlled player. We don't have time for now to handle it better.
+		*/
+
+		const auto id = handle.get_id();
+
+		if (entity_id(id) == id_to_integerize) {
+			if (result) {
+				result->pos.discard_fract();
+			}
+		}
+
+		return result;
+	}
 
 	void reserve_caches_for_entities(const size_t);
-	void clear();
-
-	cache& get_cache_of(const entity_id);
 
 	void set_updated_interpolated_transform(
 		const const_entity_handle subject,
 		const transformr updated_value
 	);
+
+	void clear();
 
 	bool is_enabled() const {
 		return enabled;

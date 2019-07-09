@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- WARNING! Interpolation should be run before parallelizing other systems because it might affect transforms!
+
 - If the render thread sleeps, we would've been able to use it to speed up the frame preparation in jobs system
 	- Otherwise we have to be conservative in the number of threads by one
 	- Why not just post render jobs?

@@ -189,7 +189,7 @@ void audiovisual_state::standard_post_solve(
 
 			const auto target_transform = 
 				from 
-				? interp.get_cache_of(from).interpolated_transform
+				? *interp.find_interpolated(from)
 				: c.set_previous_transform_value
 			;
 

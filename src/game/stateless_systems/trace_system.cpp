@@ -103,7 +103,7 @@ void trace_system::spawn_finishing_traces_for_deleted_entities(const logic_step 
 				[&](const auto typed_handle) {
 					{
 						auto& interp = typed_handle.template get<components::interpolation>();
-						interp.place_of_birth = transform_of_finishing;
+						interp.set_place_of_birth(transform_of_finishing);
 					}
 
 					{
