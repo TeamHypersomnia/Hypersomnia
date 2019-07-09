@@ -13,16 +13,24 @@
 void draw_explosion_body_highlights(const draw_explosion_body_highlights_input in) {
 	const auto& cosm = in.cosm;
 
+	const auto queried_camera_aabb = in.queried_cone.get_visible_world_rect_aabb();
+
 	cosm.for_each_having<invariants::cascade_explosion>(
-		[&](const auto it) {
+		[&](const auto& it) {
 			if (const auto tr = it.find_viewing_transform(in.interpolation)) {
 				const auto& cascade_def = it.template get<invariants::cascade_explosion>();
 
 				const auto highlight_col = cascade_def.explosion.outer_ring_color;
 
-				in.output.aabb_centered(
+				const auto highlight_ltrb = ltrb::center_and_size(tr->pos, in.cast_highlight_tex.get_original_size());
+
+				if (!queried_camera_aabb.hover(highlight_ltrb)) {
+					return;
+				}
+
+				in.output.aabb(
 					in.cast_highlight_tex,
-					tr->pos,
+					highlight_ltrb,
 					highlight_col
 				);
 			}

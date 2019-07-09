@@ -57,13 +57,15 @@ public:
 	void advance(
 		randomization&,
 		const cosmos&,
+		const camera_cone queried_cone,
 		const particle_effects_map&,
 		const augs::delta dt,
 		particles_simulation_system& particles_output_for_effects
 	);
 
 	void draw_thunders(
-		const augs::line_drawer_with_default output
+		augs::line_drawer_with_default output,
+		camera_cone queried_cone
 	) const;
 
 	void reserve_caches_for_entities(const std::size_t) const {}

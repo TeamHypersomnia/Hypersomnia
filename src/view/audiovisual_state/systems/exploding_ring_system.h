@@ -35,6 +35,7 @@ public:
 
 	void advance(
 		randomization& rng,
+		const camera_cone queried_cone,
 		const common_assets& cosm,
 		const particle_effects_map&,
 		const augs::delta dt,

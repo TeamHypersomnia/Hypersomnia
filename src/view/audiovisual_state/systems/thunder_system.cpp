@@ -60,10 +60,13 @@ void thunder_system::add(
 void thunder_system::advance(
 	randomization& rng,
 	const cosmos& cosm,
+	const camera_cone queried_cone,
 	const particle_effects_map& manager,
 	const augs::delta dt,
 	particles_simulation_system& particles_output_for_effects
 ) {
+	const auto queried_camera_aabb = queried_cone.get_visible_world_rect_aabb();
+
 	for (thunder& t : thunders) {
 		t.until_next_branching_ms -= dt.in_milliseconds();
 
@@ -134,8 +137,9 @@ void thunder_system::advance(
 			
 			if (b.activated && b.current_lifetime_ms > b.max_lifetime_ms) {
 				const bool is_leaf = b.children.empty();
+				const bool visible = queried_camera_aabb.hover(ltrb::from_points(b.from, b.to));
 
-				if (is_leaf) {
+				if (is_leaf && visible) {
 					const auto* const remnants = mapped_or_nullptr(manager, cosm.get_common_assets().thunder_remnants);
 
 					if (remnants != nullptr) {
@@ -177,12 +181,17 @@ void thunder_system::advance(
 }
 
 void thunder_system::draw_thunders(
-	const augs::line_drawer_with_default output
+	const augs::line_drawer_with_default output,
+	const camera_cone queried_cone
 ) const {
+	const auto queried_camera_aabb = queried_cone.get_visible_world_rect_aabb();
+
 	for (const auto& t : thunders) {
 		for (const auto& b : t.branches) {
 			if (b.activated) {
-				output.line(b.from, b.to, t.in.color);
+				if (queried_camera_aabb.hover(ltrb::from_points(b.from, b.to))) {
+					output.line(b.from, b.to, t.in.color);
+				}
 			}
 		}
 	}

@@ -59,8 +59,15 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 
 	interp.id_to_integerize = viewed_character;
 
-	thunders.advance(rng, cosm, input.particle_effects, dt, particles);
-	exploding_rings.advance(rng, cosm.get_common_assets(), input.particle_effects, dt, particles);
+	thunders.advance(rng, cosm, cone, input.particle_effects, dt, particles);
+
+	{
+		auto cone_for_explosion_particles = cone;
+		cone_for_explosion_particles.eye.zoom *= 0.9f;
+
+		exploding_rings.advance(rng, cone_for_explosion_particles, cosm.get_common_assets(), input.particle_effects, dt, particles);
+	}
+
 	flying_numbers.advance(dt);
 	highlights.advance(dt);
 

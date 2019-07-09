@@ -306,6 +306,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 			draw_explosion_body_highlights({
 				output,
+				queried_cone,
 				interp,
 				cosm,
 				global_time_seconds,
@@ -332,7 +333,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			exploding_rings.draw_highlights_of_rings(
 				output,
 				cast_highlight,
-				cone
+				queried_cone
 			);
 		},
 		fill_stencil,
@@ -903,7 +904,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	exploding_rings.draw_rings(
 		output,
 		renderer.get_special_buffer(),
-		cone
+		queried_cone
 	);
 
 	renderer.call_and_clear_triangles();
@@ -917,7 +918,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	}
 
 	thunders.draw_thunders(
-		line_output
+		line_output,
+		queried_cone
 	);
 
 	renderer.call_and_clear_triangles();

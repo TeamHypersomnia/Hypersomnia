@@ -67,6 +67,7 @@ struct draw_sentiences_hud_input {
 
 struct draw_explosion_body_highlights_input {
 	const augs::drawer output;
+	const camera_cone queried_cone;
 	const interpolation_system& interpolation;
 	const cosmos& cosm;
 	const double global_time_seconds;

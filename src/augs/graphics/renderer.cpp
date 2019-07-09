@@ -53,6 +53,8 @@ namespace augs {
 			return;
 		}
 
+		num_total_lines_drawn += lines.size();
+
 		drawcall_command cmd;
 		cmd.lines = std::move(lines);
 

@@ -16,11 +16,14 @@ void exploding_ring_system::clear() {
 
 void exploding_ring_system::advance(
 	randomization& rng,
+	const camera_cone queried_cone,
 	const common_assets& common,
 	const particle_effects_map& manager,
 	const augs::delta dt,
 	particles_simulation_system& particles_output_for_effects
 ) {
+	const auto queried_camera_aabb = queried_cone.get_visible_world_rect_aabb();
+
 	auto& particles = particles_output_for_effects;
 
 	global_time_seconds += dt.in_seconds();
@@ -39,12 +42,14 @@ void exploding_ring_system::advance(
 				const auto maximum_spawn_radius = std::max(r.outer_radius_start_value, r.outer_radius_end_value);
 				const auto spawn_radius_width = (maximum_spawn_radius - minimum_spawn_radius) / 2.4f;
 
+				const bool visible = queried_camera_aabb.hover(ltrb::center_and_size(r.center, vec2::square(maximum_spawn_radius * 2)));
+
 				const auto max_particles_to_spawn = static_cast<unsigned>(160.f * maximum_spawn_radius / 400.f);
 
 				const auto* const ring_smoke = mapped_or_nullptr(manager, common.exploding_ring_smoke);
 				const auto* const ring_sparkles = mapped_or_nullptr(manager, common.exploding_ring_sparkles);
 
-				if (ring_smoke != nullptr && ring_sparkles != nullptr) {
+				if (visible && ring_smoke != nullptr && ring_sparkles != nullptr) {
 					auto smokes_emission = ring_smoke->emissions.at(0);
 					smokes_emission.target_layer = particle_layer::DIM_SMOKES;
 					const auto& sparkles_emission = ring_sparkles->emissions.at(0);
@@ -140,8 +145,11 @@ void exploding_ring_system::draw_rings(
 ) const {
 	const auto& eye = cone.eye;
 
+	const auto queried_camera_aabb = cone.get_visible_world_rect_aabb();
+
 	for (const auto& e : rings) {
 		const auto& r = e.in;
+		const auto world_explosion_center = r.center;
 
 		const auto passed = global_time_seconds - e.time_of_occurence_seconds;
 		auto ratio = passed / r.maximum_duration_seconds;
@@ -149,7 +157,12 @@ void exploding_ring_system::draw_rings(
 		const auto inner_radius_now = augs::interp(r.inner_radius_start_value, r.inner_radius_end_value, ratio) / eye.zoom;
 		const auto outer_radius_now = augs::interp(r.outer_radius_start_value, r.outer_radius_end_value, ratio) / eye.zoom;
 
-		const auto world_explosion_center = r.center;
+		const auto aabb_size = vec2::square(outer_radius_now * 2);
+		const auto explosion_ltrb = ltrbi::center_and_size(world_explosion_center, aabb_size);
+
+		if (!queried_camera_aabb.hover(explosion_ltrb)) {
+			continue;
+		}
 
 		augs::special sp;
 		sp.v1 = cone.to_screen_space(world_explosion_center);
@@ -184,9 +197,8 @@ void exploding_ring_system::draw_rings(
 			}
 		}
 		else {
-			output.aabb_centered(
-				world_explosion_center, 
-				vec2(outer_radius_now * 2, outer_radius_now * 2),
+			output.aabb(
+				explosion_ltrb,
 				considered_color
 			);
 
@@ -202,6 +214,8 @@ void exploding_ring_system::draw_highlights_of_rings(
 	const augs::atlas_entry highlight_tex,
 	const camera_cone cone
 ) const {
+	const auto queried_camera_aabb = cone.get_visible_world_rect_aabb();
+
 	for (const auto& r : rings) {
 		const auto passed = global_time_seconds - r.time_of_occurence_seconds;
 		auto ratio = passed / (r.in.maximum_duration_seconds * 1.2);
@@ -211,13 +225,19 @@ void exploding_ring_system::draw_highlights_of_rings(
 
 		const auto highlight_amount = 1.f - ratio;
 
+		const auto aabb_size = vec2::square(radius * 2);
+		const auto explosion_ltrb = ltrbi::center_and_size(r.in.center, aabb_size);
+
+		if (!queried_camera_aabb.hover(explosion_ltrb)) {
+			continue;
+		}
+
 		if (highlight_amount > 0.f) {
 			highlight_col.a = static_cast<rgba_channel>(255 * highlight_amount);
 
-			output.aabb_centered(
+			output.aabb(
 				highlight_tex,
-				r.in.center,
-				vec2(radius, radius),
+				explosion_ltrb,
 				highlight_col
 			);
 		}

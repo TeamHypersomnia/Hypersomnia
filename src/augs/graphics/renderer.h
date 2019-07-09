@@ -30,6 +30,7 @@ namespace augs {
 		special_buffer specials;
 
 		std::size_t num_total_triangles_drawn = 0;
+		std::size_t num_total_lines_drawn = 0;
 
 	public:
 		render_command_buffer commands;
@@ -93,7 +94,13 @@ namespace augs {
 
 		std::size_t extract_num_total_triangles_drawn() {
 			auto out = num_total_triangles_drawn;
-			out = 0;
+			num_total_triangles_drawn = 0;
+			return out;
+		}
+
+		std::size_t extract_num_total_lines_drawn() {
+			auto out = num_total_lines_drawn;
+			num_total_lines_drawn = 0;
 			return out;
 		}
 
