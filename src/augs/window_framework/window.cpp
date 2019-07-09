@@ -110,8 +110,10 @@ namespace augs {
 
 	void window::sync_back_into(window_settings& into) {
 		if (!current_settings.fullscreen && can_control_window_geometry) {
-			into.size = get_window_rect().get_size();
-			into.position = get_window_rect().get_position();
+			const auto rect = get_window_rect();
+
+			into.size = rect.get_size();
+			into.position = rect.get_position();
 		}
 	}
 

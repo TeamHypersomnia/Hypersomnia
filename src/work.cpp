@@ -351,6 +351,13 @@ and then hitting Save settings.
 	static game_frame_buffer read_buffer;
 	static game_frame_buffer write_buffer;
 
+	write_buffer.screen_size = window.get_screen_size();
+	read_buffer.new_settings = config.window;
+
+	static auto logic_get_screen_size = []() {
+		return write_buffer.screen_size;
+	};
+
 	// temporary
 	static auto& renderer = illuminated_renderer;
 
@@ -358,7 +365,7 @@ and then hitting Save settings.
 
 	LOG("Initializing the necessary fbos.");
 	static all_necessary_fbos necessary_fbos(
-		window.get_screen_size(),
+		logic_get_screen_size(),
 		config.drawing
 	);
 
@@ -826,7 +833,7 @@ and then hitting Save settings.
 	static auto do_imgui_pass = [](const auto frame_num, auto& new_window_entropy, const auto& frame_delta, const bool in_direct_gameplay) {
 		perform_imgui_pass(
 			new_window_entropy,
-			window.get_screen_size(),
+			logic_get_screen_size(),
 			frame_delta,
 			canon_config,
 			config,
@@ -1026,7 +1033,7 @@ and then hitting Save settings.
 	static visible_entities all_visible;
 
 	static auto get_character_camera = [&]() -> character_camera {
-		return { get_viewed_character(), { get_camera_eye(), window.get_screen_size() } };
+		return { get_viewed_character(), { get_camera_eye(), logic_get_screen_size() } };
 	};
 
 	static auto reacquire_visible_entities = [](
@@ -1070,7 +1077,7 @@ and then hitting Save settings.
 					game_motion_type::MOVE_CROSSHAIR,
 					entropy_accumulator::input {
 						input_cfg, 
-						window.get_screen_size(), 
+						logic_get_screen_size(), 
 						get_camera_eye().zoom 
 					}
 				)) {
@@ -1087,7 +1094,7 @@ and then hitting Save settings.
 		const double speed_multiplier,
 		const config_lua_table& viewing_config
 	) {
-		const auto screen_size = window.get_screen_size();
+		const auto screen_size = logic_get_screen_size();
 		const auto viewed_character = get_viewed_character();
 		const auto& cosm = viewed_character.get_cosmos();
 		
@@ -1201,7 +1208,7 @@ and then hitting Save settings.
 
 				setup.advance(
 					{ 
-						window.get_screen_size(), 
+						logic_get_screen_size(), 
 						input_cfg, 
 						zoom,
 						viewing_config.simulation_receiver, 
@@ -1217,7 +1224,7 @@ and then hitting Save settings.
 			else if constexpr(std::is_same_v<S, server_setup>) {
 				setup.advance(
 					{ 
-						window.get_screen_size(), 
+						logic_get_screen_size(), 
 						input_cfg, 
 						zoom,
 						network_performance,
@@ -1230,7 +1237,7 @@ and then hitting Save settings.
 				setup.advance(
 					{ 
 						frame_delta, 
-						window.get_screen_size(), 
+						logic_get_screen_size(), 
 						input_cfg, 
 						zoom 
 					},
@@ -1288,7 +1295,7 @@ and then hitting Save settings.
 	static auto make_create_game_gui_context = [&](const config_lua_table& viewing_config) {
 		return [&]() {
 			return game_gui.create_context(
-				window.get_screen_size(),
+				logic_get_screen_size(),
 				common_input_state,
 				get_game_gui_subject(),
 				create_game_gui_deps(viewing_config)
@@ -1299,7 +1306,7 @@ and then hitting Save settings.
 	static auto make_create_menu_context = [&](const config_lua_table& cfg) {
 		return [&](auto& gui) {
 			return gui.create_context(
-				window.get_screen_size(),
+				logic_get_screen_size(),
 				common_input_state,
 				create_menu_context_deps(cfg)
 			);
@@ -1724,7 +1731,7 @@ and then hitting Save settings.
 				get_audiovisuals().get<sound_system>()
 			});
 
-			const auto screen_size = window.get_screen_size();
+			const auto screen_size = logic_get_screen_size();
 
 			auto create_menu_context = make_create_menu_context(new_viewing_config);
 			auto create_game_gui_context = make_create_game_gui_context(new_viewing_config);
@@ -2218,6 +2225,8 @@ and then hitting Save settings.
 				next_entropy.clear();
 
 				window.collect_entropy(next_entropy);
+
+				read_buffer.screen_size = window.get_screen_size();
 			}
 
 			buffer_swapper.swap_buffers(read_buffer, write_buffer, game_main_thread_synced_op);

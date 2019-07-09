@@ -9,6 +9,7 @@ struct game_frame_buffer {
 	augs::window_settings new_settings;
 
 	bool should_clip_cursor = false;
+	vec2i screen_size;
 };
 
 class game_frame_buffer_swapper {
