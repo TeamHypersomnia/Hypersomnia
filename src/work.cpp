@@ -2195,17 +2195,6 @@ and then hitting Save settings.
 			It will eat from the window input vector that is later passed to the game and other GUIs.	
 		*/
 
-		window.set_mouse_pos_paused(read_buffer.should_pause_cursor);
-
-		if (window.is_active() && read_buffer.should_clip_cursor) {
-			window.set_cursor_clipping(true);
-			window.set_cursor_visible(false);
-		}
-		else {
-			window.set_cursor_clipping(false);
-			window.set_cursor_visible(true);
-		}
-
 		configurables.sync_back_into(config);
 		configurables.apply_main_thread(read_buffer.new_settings);
 	};
@@ -2251,6 +2240,19 @@ and then hitting Save settings.
 			}
 
 			buffer_swapper.swap_buffers(read_buffer, write_buffer, game_main_thread_synced_op);
+		}
+
+
+		window.set_mouse_pos_paused(read_buffer.should_pause_cursor);
+
+		if (window.is_active() && read_buffer.should_clip_cursor)
+		{
+			window.set_cursor_clipping(true);
+			window.set_cursor_visible(false);
+		}
+		else {
+			window.set_cursor_clipping(false);
+			window.set_cursor_visible(true);
 		}
 	} while(!read_buffer.should_quit);
 

@@ -1,10 +1,15 @@
 #!/usr/bin/env bash 
 CONFIGURATION=$1
 ARCHITECTURE=$2
-C_COMPILER=$3
-CXX_COMPILER=$4
+C_COMPILER=$CC
+CXX_COMPILER=$CXX
 
-if [[ ! -z "$3" ]] && [[ -z "$4" ]]
+if [[ ! -z "$C_COMPILER" ]] && [[ -z "$CXX_COMPILER" ]]
+then
+	echo "You must specify both a C and a C++ compiler, or leave both unspecified."
+fi
+
+if [[ ! -z "$CXX_COMPILER" ]] && [[ -z "$C_COMPILER" ]]
 then
 	echo "You must specify both a C and a C++ compiler, or leave both unspecified."
 fi
