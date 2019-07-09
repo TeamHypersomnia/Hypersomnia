@@ -864,9 +864,13 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 				None,
 				CurrentTime
 			);
+
+			XSync(display, False);
 		}
 		else {
 			XUngrabPointer(display, CurrentTime);
+
+			XSync(display, False);
 		}
 	}
 
@@ -899,9 +903,11 @@ xcb_ewmh_init_atoms_replies(&EWMH, EWMHCookie, NULL);
 			}();
 
 			XDefineCursor(display,window_id, sharedInvisibleCursor);
+			XSync(display, False);
 		}
 		else {
 			XUndefineCursor(display,window_id);
+			XSync(display, False);
 		}
 	}
 

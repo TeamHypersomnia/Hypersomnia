@@ -342,11 +342,11 @@ namespace augs {
 
 		case WM_SIZE:
 			default_proc();
-			return ch;
+			return change;
 
 		case WM_MOVE:
 			default_proc();
-			return ch;
+			return change;
 
 		default: default_proc(); return std::nullopt;
 		}
