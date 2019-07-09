@@ -6,8 +6,20 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- The atlas in arena server might be screwed the same way that avatar preview screws everything
+	- probably wrong texture is set after teximage2d
+
+- minimize use of get_uniform_location
+- Implement guards for cursor clipping functions
+- set_cursor_clipping(bool enabled)
+- minimize access to window whenever game loops
+	- somehow maybe watch for changes to screen size?
+	- or for now just acquire the screen rect once
+- look for a event-based way to keep track of screen size
+
 - Determine how could we possibly have over 1000 fps on linux in the past
 	- Really just movement paths?
+	- More debug details?
 	- Why does having a character on screen decrease the fps so much?
 		- Test it by going to spectator
 

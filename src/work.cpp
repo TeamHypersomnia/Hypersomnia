@@ -939,16 +939,11 @@ and then hitting Save settings.
 
 	::ensure_handler = main_ensure_handler;
 
-	static std::atomic<bool> should_quit_logic;
 	static bool should_quit = false;
 
-	static auto request_quit = []() {
-		should_quit = true;
-		should_quit_logic.store(true);
-		buffer_swapper.notify_swap_completion();
-	};
-
 	static augs::event::state common_input_state;
+
+	static void(*request_quit)() = nullptr;
 
 	static auto do_main_menu_option = [&](const main_menu_button_type t) {
 		using T = decltype(t);
@@ -1360,7 +1355,26 @@ and then hitting Save settings.
 	LOG("Entered the main loop.");
 
 	static auto game_thread_worker = []() {
-		while (!should_quit_logic.load()) {
+		while (!should_quit) {
+#if PLATFORM_UNIX
+			if (signal_status != 0) {
+				const auto sig = signal_status;
+
+				LOG("%x received.", strsignal(sig));
+
+				if(
+					sig == SIGINT
+					|| sig == SIGSTOP
+					|| sig == SIGTERM
+				) {
+					LOG("Gracefully shutting down.");
+					request_quit();
+					
+					break;
+				}
+			}
+#endif
+
 			ensure_float_flags_hold();
 
 			const auto current_frame_num = current_frame.load();
@@ -2161,6 +2175,13 @@ and then hitting Save settings.
 
 	static auto game_thread = std::thread(game_thread_worker);
 
+	auto game_thread_joiner = augs::scope_guard([]() { game_thread.join(); });
+
+	request_quit = []() {
+		write_buffer.should_quit = true;
+		should_quit = true;
+	};
+
 	static auto game_main_thread_synced_op = []() {
 		/* 
 			IMGUI is our top GUI whose priority precedes everything else. 
@@ -2170,28 +2191,9 @@ and then hitting Save settings.
 		configurables.sync_back_into(config);
 	};
 
-	while (!should_quit) {
+	do {
 		auto scope = measure_scope(performance.fps);
 		
-#if PLATFORM_UNIX
-		if (signal_status != 0) {
-			const auto sig = signal_status;
-
-			LOG("%x received.", strsignal(sig));
-
-			if(
-				sig == SIGINT
-				|| sig == SIGSTOP
-				|| sig == SIGTERM
-			) {
-				LOG("Gracefully shutting down.");
-				request_quit();
-				
-				break;
-			}
-		}
-#endif
-
 		{
 			auto scope = measure_scope(performance.renderer_commands);
 
@@ -2246,7 +2248,7 @@ and then hitting Save settings.
 		}
 
 		configurables.apply_main_thread(read_buffer.new_settings);
-	}
+	} while(!read_buffer.should_quit);
 
 	return EXIT_SUCCESS;
 }
@@ -2282,21 +2284,6 @@ catch (const augs::unit_test_session_error& err) {
 	LOG("Unit test session failure:\n%x\ncout:%x\ncerr:%x\nclog:%x\n", 
 		err.what(), err.cout_content, err.cerr_content, err.clog_content
 	);
-
-	return EXIT_FAILURE;
-}
-catch (const augs::too_many_sound_sources_error& err) {
-	LOG("std::runtime_error thrown: %x", err.what());
-
-	return EXIT_FAILURE;
-}
-catch (const augs::filesystem_error& err) {
-	LOG("std::filesystem_error thrown: %x\npath1: %x\npath2: %x", err.what(), err.path1(), err.path2());
-
-	return EXIT_FAILURE;
-}
-catch (const entity_creation_error& err) {
-	LOG("Unhandled entity creation error: %x", format_enum(err.type));
 
 	return EXIT_FAILURE;
 }

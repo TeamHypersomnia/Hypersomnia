@@ -10,6 +10,7 @@ struct game_frame_buffer {
 
 	bool should_clip_cursor = false;
 	bool should_pause_cursor = false;
+	bool should_quit = false;
 	vec2i screen_size;
 };
 

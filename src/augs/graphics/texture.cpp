@@ -16,6 +16,8 @@ namespace augs {
 		}
 
 		void texture::texImage2D(renderer& r, const vec2u size, const unsigned char* const source) {
+			set_as_current(r);
+
 			r.push_object_command(
 				*this,
 				texImage2D_command { size, source }
@@ -27,6 +29,8 @@ namespace augs {
 		}
 
 		void texture::set_filtering(renderer& r, const filtering_type type) {
+			set_as_current(r);
+
 			r.push_object_command(
 				*this,
 				set_filtering_command { type }
