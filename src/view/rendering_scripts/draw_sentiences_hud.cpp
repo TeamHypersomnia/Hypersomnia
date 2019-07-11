@@ -34,6 +34,7 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 
 	const auto& watched_character = cosm[in.viewed_character_id];
 	const auto watched_character_transform = watched_character.get_viewing_transform(interp);
+	const auto queried_camera_aabb = in.queried_cone.get_visible_world_rect_aabb();
 
 	auto viewer_faction_matches = [&](const auto f) {
 		if (!watched_character) {
@@ -176,7 +177,10 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 
 			const bool is_conscious = sentience->is_conscious();
 
-			if (is_conscious) {
+			const auto bar_aabb = ltrb::center_and_size(transform.pos, in.circular_bar_tex.get_original_size());
+			const bool bar_visible = bar_aabb.hover(queried_camera_aabb);
+
+			if (is_conscious && bar_visible) {
 				const bool should_draw_textuals = info.is_health;
 				const bool should_draw_ammo = info.is_health;
 

@@ -267,7 +267,7 @@ void settings_gui_state::perform(
 
 				break;
 			}
-			case settings_pane::GRAPHICS: {
+			case settings_pane::RENDERING: {
 				enum_combo("Default filtering", config.renderer.default_filtering);
 
 				{

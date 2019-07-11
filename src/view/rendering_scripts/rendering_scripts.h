@@ -38,6 +38,7 @@ struct dashed_line_output_wrapper {
 
 struct draw_sentiences_hud_input {
 	const camera_cone text_camera;
+	const camera_cone queried_cone;
 	const visible_entities& all;
 	const game_drawing_settings& settings;
 	

@@ -8,7 +8,7 @@ struct config_lua_table;
 enum class settings_pane {
 	// GEN INTROSPECTOR enum class settings_pane
 	GENERAL,
-	GRAPHICS,
+	RENDERING,
 	AUDIO,
 	CONTROLS,
 	GAMEPLAY,

@@ -700,8 +700,12 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 				color_indicator_angle = 0.f;
 			}
 
+			auto sentience_queried_cone = queried_cone;
+			sentience_queried_cone.eye.zoom *= 0.8f;
+
 			return draw_sentiences_hud_input {
 				cone,
+				sentience_queried_cone,
 				visible,
 				settings,
 				output,
