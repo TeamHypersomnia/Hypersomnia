@@ -14,6 +14,7 @@
 #include "view/audiovisual_state/systems/audiovisual_cache_common.h"
 #include "view/viewables/all_viewables_declaration.h"
 #include "view/viewables/particle_effect.h"
+#include "view/audiovisual_state/special_effects_settings.h"
 
 class interpolation_system;
 struct randomization;
@@ -97,7 +98,8 @@ public:
 		basic_cache(
 			const packaged_particle_effect& original,
 			const particle_effects_map& manager,
-			randomization& rng
+			randomization& rng,
+			const special_effects_settings&
 		);
 
 		bool is_over() const {
@@ -237,6 +239,7 @@ public:
 	void advance_visible_streams(
 		randomization& rng,
 		camera_cone,
+		const special_effects_settings&,
 		const cosmos&,
 		const particle_effects_map&,
 		const plain_animations_pool&,
@@ -248,7 +251,8 @@ public:
 		randomization& rng,
 		const_logic_step step,
 		const particle_effects_map& manager,
-		const interpolation_system& interp
+		const interpolation_system& interp,
+		const special_effects_settings&
 	);
 
 	template <class M>

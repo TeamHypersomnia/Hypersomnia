@@ -4,6 +4,9 @@ hide_sidebar: true
 permalink: todo_low
 ---
 
+- introduce particle multiplier for ring explosions
+	- set a reasonable value for things like rocket launcher
+
 - Fix neons shining through the character body
 - Bind buying to E so that we can release T for other purposes
 

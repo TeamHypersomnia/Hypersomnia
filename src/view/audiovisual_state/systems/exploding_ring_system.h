@@ -15,6 +15,7 @@
 class particles_simulation_system;
 struct randomization;
 struct common_assets;
+struct explosions_settings;
 
 class exploding_ring_system {
 public:
@@ -39,6 +40,7 @@ public:
 		const common_assets& cosm,
 		const particle_effects_map&,
 		const augs::delta dt,
+		const explosions_settings& settings,
 		particles_simulation_system& particles_output_for_effects
 	);
 

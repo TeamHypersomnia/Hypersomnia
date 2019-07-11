@@ -27,6 +27,7 @@ class cosmos;
 class visible_entities;
 
 struct character_camera;
+struct special_effects_settings;
 
 struct audiovisual_post_solve_input {
 	const particle_effects_map& particle_effects;
@@ -34,6 +35,7 @@ struct audiovisual_post_solve_input {
 	const augs::audio_volume_settings audio_volume;
 	const sound_system_settings& sound_settings;
 	const character_camera& camera;
+	const special_effects_settings& special_effects;
 	const audiovisual_post_solve_settings settings;
 };
 
@@ -51,6 +53,7 @@ struct audiovisual_advance_input {
 	const loaded_sounds_map& sounds;
 	const augs::audio_volume_settings& audio_volume;
 	const sound_system_settings& sound_settings;
+	const special_effects_settings& special_effects;
 };
 
 struct audiovisual_state {

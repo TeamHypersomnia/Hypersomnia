@@ -101,7 +101,8 @@ particles_simulation_system::emission_instance::emission_instance(
 particles_simulation_system::basic_cache::basic_cache(
 	const packaged_particle_effect& original,
 	const particle_effects_map& manager,
-	randomization& rng
+	randomization& rng,
+	const special_effects_settings& settings
 ) : original(original) {
 	if (const auto* const source_effect = mapped_or_nullptr(manager, original.input.id)) {
 		emission_instances.reserve(source_effect->emissions.size());
@@ -110,6 +111,10 @@ particles_simulation_system::basic_cache::basic_cache(
 			if (container_full(emission_instances)) {
 				break;
 			}
+
+			auto& num = emission.num_of_particles_to_spawn_initially;
+			num.first = num.first * settings.particle_burst_amount;
+			num.second = num.second * settings.particle_burst_amount;
 
 			emission_instances.emplace_back(emission, rng);
 			auto& e = emission_instances.back();
@@ -178,7 +183,8 @@ void particles_simulation_system::update_effects_from_messages(
 	randomization& rng,
 	const const_logic_step step,
 	const particle_effects_map& manager,
-	const interpolation_system& 
+	const interpolation_system&,
+	const special_effects_settings& settings
 ) {
 	{
 		const auto& events = step.get_queue<messages::stop_particle_effect>();
@@ -221,7 +227,8 @@ void particles_simulation_system::update_effects_from_messages(
 
 						e.payload,
 						manager,
-						rng
+						rng,
+						settings
 					);
 				}
 			}
@@ -232,7 +239,8 @@ void particles_simulation_system::update_effects_from_messages(
 
 						e.payload,
 						manager,
-						rng
+						rng,
+						settings
 					);
 				}
 			}
@@ -296,7 +304,8 @@ void update_component_related_cache(
 	const particle_effects_map& manager,
 	const cosmos& cosm,
 	Caches& caches,
-	EffectProvider effect_provider
+	EffectProvider effect_provider,
+	const special_effects_settings& settings
 ) {
 	cosm.for_each_having<Component>(
 		[&](const auto& typed_handle) {
@@ -327,7 +336,7 @@ void update_component_related_cache(
 				}
 				else {
 					try {
-						caches.try_emplace(id, particles_simulation_system::continuous_particles_cache { { particles->start.positioning, *particles, manager, rng }, { typed_handle.get_name() } });
+						caches.try_emplace(id, particles_simulation_system::continuous_particles_cache { { particles->start.positioning, *particles, manager, rng, settings }, { typed_handle.get_name() } });
 					}
 					catch (const particles_simulation_system::effect_not_found&) {
 
@@ -348,6 +357,7 @@ void update_component_related_cache(
 void particles_simulation_system::advance_visible_streams(
 	randomization& rng,
 	const camera_cone current_cone, 
+	const special_effects_settings& settings,
 	const cosmos& cosm,
 	const particle_effects_map& manager,
 	const plain_animations_pool& anims,
@@ -374,8 +384,10 @@ void particles_simulation_system::advance_visible_streams(
 				continue;
 			}
 
+			const auto total_amount_mult = modifier.scale_amounts * settings.particle_stream_amount;
+
 			auto new_particles_to_spawn_by_time = 
-				(instance.particles_per_sec * modifier.scale_amounts) * 
+				(instance.particles_per_sec * total_amount_mult) * 
 				(stream_delta / 1000.f)
 			;
 
@@ -577,7 +589,8 @@ void particles_simulation_system::advance_visible_streams(
 		firearm_engine_caches,
 		[](const auto h) {
 			return ::calc_firearm_engine_particles(h);
-		}
+		},
+		settings
 	);
 
 	update_component_related_cache<components::continuous_particles>(
@@ -600,6 +613,7 @@ void particles_simulation_system::advance_visible_streams(
 			}
 
 			return std::make_optional(particles);
-		}
+		},
+		settings
 	);
 }

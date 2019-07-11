@@ -1143,7 +1143,8 @@ and then hitting Save settings.
 			streaming.loaded_sounds,
 
 			viewing_config.audio_volume,
-			viewing_config.sound
+			viewing_config.sound,
+			viewing_config.performance.special_effects
 		});
 	};
 
@@ -1163,7 +1164,8 @@ and then hitting Save settings.
 				viewing_config.audio_volume,
 				viewing_config.sound,
 				get_character_camera(),
-				settings
+				viewing_config.performance.special_effects,
+				settings,
 			});
 		}
 

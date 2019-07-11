@@ -3496,3 +3496,8 @@ which can be done from Settings->Reset all settings to factory default.
 	- Our 140-150 rtt matched against the server-reported ping in scoreboard
 		- so it was probably a case of low fps at kartezjan's
 
+- performance settings
+	- explo sparkles
+	- explo smokes
+	- explo thunders
+

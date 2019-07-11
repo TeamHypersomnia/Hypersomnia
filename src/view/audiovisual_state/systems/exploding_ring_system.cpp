@@ -9,6 +9,7 @@
 
 #include "view/audiovisual_state/systems/exploding_ring_system.h"
 #include "view/audiovisual_state/systems/particles_simulation_system.h"
+#include "view/audiovisual_state/special_effects_settings.h"
 
 void exploding_ring_system::clear() {
 	rings.clear();
@@ -20,6 +21,7 @@ void exploding_ring_system::advance(
 	const common_assets& common,
 	const particle_effects_map& manager,
 	const augs::delta dt,
+	const explosions_settings& settings,
 	particles_simulation_system& particles_output_for_effects
 ) {
 	const auto queried_camera_aabb = queried_cone.get_visible_world_rect_aabb();
@@ -44,7 +46,7 @@ void exploding_ring_system::advance(
 
 				const bool visible = queried_camera_aabb.hover(ltrb::center_and_size(r.center, vec2::square(maximum_spawn_radius * 2)));
 
-				const auto max_particles_to_spawn = static_cast<unsigned>(160.f * maximum_spawn_radius / 400.f);
+				const auto max_particles_to_spawn = static_cast<unsigned>(160.f * maximum_spawn_radius / 400.f) * settings.sparkle_amount;
 
 				const auto* const ring_smoke = mapped_or_nullptr(manager, common.exploding_ring_smoke);
 				const auto* const ring_sparkles = mapped_or_nullptr(manager, common.exploding_ring_sparkles);
@@ -69,10 +71,11 @@ void exploding_ring_system::advance(
 						const auto angular_translation = edge_v1.degrees_between(edge_v2);
 						const auto particles_amount_ratio = angular_translation / 360.f;
 
-						const auto particles_to_spawn = max_particles_to_spawn * particles_amount_ratio;
+						const auto sparkles_to_spawn = static_cast<float>(max_particles_to_spawn) * particles_amount_ratio * settings.sparkle_amount;
+						const auto smokes_to_spawn = static_cast<float>(max_particles_to_spawn) * particles_amount_ratio * settings.smoke_amount;
 
-						for (auto p = 0u; p < particles_to_spawn; ++p) {
-							const auto angular_translation_multiplier = p / static_cast<float>(particles_to_spawn);
+						for (auto p = 0u; p < sparkles_to_spawn; ++p) {
+							const auto angular_translation_multiplier = p / sparkles_to_spawn;
 							const auto spawn_particle_along_line = (tri[1] + along_edge * along_edge_length * angular_translation_multiplier) - r.center;
 							const auto circle_radius = std::min(spawn_particle_along_line.length(), vis.source_queried_rect.x / 2);
 
@@ -104,6 +107,12 @@ void exploding_ring_system::advance(
 								spawner(animated_particle());
 								spawner(general_particle());
 							}
+						}
+
+						for (auto p = 0u; p < smokes_to_spawn; ++p) {
+							const auto angular_translation_multiplier = p / smokes_to_spawn;
+							const auto spawn_particle_along_line = (tri[1] + along_edge * along_edge_length * angular_translation_multiplier) - r.center;
+							const auto circle_radius = std::min(spawn_particle_along_line.length(), vis.source_queried_rect.x / 2);
 
 							if (smokes_emission.has<general_particle>()) {
 								auto new_p = particles.spawn_particle<general_particle>(

@@ -17,6 +17,7 @@
 #include "view/audiovisual_state/audiovisual_state.h"
 #include "view/audiovisual_state/systems/exploding_ring_system.hpp"
 #include "view/audiovisual_state/systems/interpolation_system.h"
+#include "view/audiovisual_state/special_effects_settings.h"
 
 #include "view/character_camera.h"
 
@@ -65,7 +66,15 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		auto cone_for_explosion_particles = cone;
 		cone_for_explosion_particles.eye.zoom *= 0.9f;
 
-		exploding_rings.advance(rng, cone_for_explosion_particles, cosm.get_common_assets(), input.particle_effects, dt, particles);
+		exploding_rings.advance(
+			rng, 
+			cone_for_explosion_particles, 
+			cosm.get_common_assets(), 
+			input.particle_effects, 
+			dt, 
+			input.special_effects.explosions,
+			particles
+		);
 	}
 
 	flying_numbers.advance(dt);
@@ -91,6 +100,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			particles.advance_visible_streams(
 				rng,
 				cone,
+				input.special_effects,
 				cosm,
 				input.particle_effects,
 				anims,
@@ -215,7 +225,16 @@ void audiovisual_state::standard_post_solve(
 			auto& thunders = get<thunder_system>();
 
 			for (const auto& t : new_thunders) {
-				thunders.add(rng, t);
+				const auto thunder_mult = input.special_effects.explosions.thunder_amount;
+
+				auto new_t = t;
+
+				auto& spawned = new_t.payload.max_all_spawned_branches;
+				spawned = static_cast<float>(spawned) * thunder_mult;
+
+				if (spawned > 0) {
+					thunders.add(rng, new_t);
+				}
 			}
 		}
 		
@@ -227,7 +246,7 @@ void audiovisual_state::standard_post_solve(
 
 		{
 			auto& particles = get<particles_simulation_system>();
-			particles.update_effects_from_messages(rng, step, input.particle_effects, interp);
+			particles.update_effects_from_messages(rng, step, input.particle_effects, interp, input.special_effects);
 		}
 
 		{

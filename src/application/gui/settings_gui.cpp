@@ -1067,11 +1067,49 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::PERFORMANCE: {
+				ImGui::Separator();
+
+				text_color("General effects", yellow);
+
+				ImGui::Separator();
+
+				{
+					auto& scope_cfg = config.performance.special_effects;
+					revertable_slider(SCOPE_CFG_NVP(particle_stream_amount), 0.f, 1.f);
+					revertable_slider(SCOPE_CFG_NVP(particle_burst_amount), 0.f, 1.f);
+				}
+
+				ImGui::Separator();
+
+				text_color("Explosion effects intensity", yellow);
+
+				ImGui::Separator();
+
+				{
+					auto& scope_cfg = config.performance.special_effects.explosions;
+
+					revertable_slider(SCOPE_CFG_NVP(sparkle_amount), 0.f, 1.f);
+					revertable_slider(SCOPE_CFG_NVP(thunder_amount), 0.f, 1.f);
+					revertable_slider(SCOPE_CFG_NVP(smoke_amount), 0.f, 1.f);
+				}
+
+				ImGui::Separator();
+
+				text_color("Decorations", yellow);
+
+				ImGui::Separator();
+
 				auto& scope_cfg = config.lag_compensation;
 
 				{
 					revertable_checkbox(SCOPE_CFG_NVP(simulate_decorative_organisms_during_reconciliation));
 				}
+
+				ImGui::Separator();
+
+				text_color("Multithreading", yellow);
+
+				ImGui::Separator();
 
 				{
 					auto& scope_cfg = config.performance;
@@ -1079,7 +1117,7 @@ void settings_gui_state::perform(
 					const auto concurrency = std::thread::hardware_concurrency();
 					const auto t_max = static_cast<int>(concurrency);
 
-					text_disabled(typesafe_sprintf("(Value of 0 means to take a default of\nstd::clamp(concurrency - 1u, 1u, 5u), which equals %x)", performance_settings { 0 }.get_light_calculation_threads()));
+					text_disabled(typesafe_sprintf("(Value of 0 means to take a default of\nstd::clamp(concurrency - 1u, 1u, 5u), which equals %x)", performance_settings { 0, {} }.get_light_calculation_threads()));
 					text_disabled(typesafe_sprintf("(std::thread::hardware_concurrency() = %x)", concurrency));
 
 					revertable_slider(SCOPE_CFG_NVP(light_calculation_threads), 0, t_max);

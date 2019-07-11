@@ -625,6 +625,16 @@ return {
   },
 
   performance = {
-    light_calculation_threads = 0
+    light_calculation_threads = 0,
+
+    special_effects = {
+	  explosions = {
+	    sparkle_amount = 1,
+	    thunder_amount = 1,
+	    smoke_amount = 0.7
+	  },
+	  particle_stream_amount = 1,
+	  particle_burst_amount = 1
+    }
   }
 }
