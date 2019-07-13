@@ -459,7 +459,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 		drawing_in.manager,
 		in.plain_animations,
 		draw_particles_input { output, true },
-		particle_layer::ILLUMINATING_PARTICLES
+		particle_layer::NEONING_PARTICLES
 	);
 
 	in.neon_callback();

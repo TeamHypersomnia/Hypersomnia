@@ -809,7 +809,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(1., 2.);
-			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
+			em.target_layer = particle_layer::NEONING_PARTICLES;
 			em.initial_rotation_variation = 0;
 
 			effect.emissions.push_back(em);
@@ -885,7 +885,7 @@ void load_test_scene_particle_effects(
 			}
 
 			em.size_multiplier = float_range(1.0, 1.5);
-			em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
+			em.target_layer = particle_layer::NEONING_PARTICLES;
 			em.initial_rotation_variation = 0;
 
 			effect.emissions.push_back(em);
@@ -1091,7 +1091,7 @@ void load_test_scene_particle_effects(
 		}
 
 		em.size_multiplier = float_range(1.0, 1.3);
-		em.target_layer = particle_layer::ILLUMINATING_PARTICLES;
+		em.target_layer = particle_layer::NEONING_PARTICLES;
 		em.initial_rotation_variation = 0;
 
 		effect.emissions.push_back(em);

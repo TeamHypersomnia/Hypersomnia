@@ -670,6 +670,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		renderer.call_and_clear_lines();
 	}
 
+	draw_particles(particle_layer::NEONING_PARTICLES);
 	draw_particles(particle_layer::ILLUMINATING_PARTICLES);
 
 	visible.for_each<render_layer::ILLUMINATING_WANDERING_PIXELS>(cosm, [&](const auto e) {
