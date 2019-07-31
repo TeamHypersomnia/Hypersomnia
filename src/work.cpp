@@ -343,9 +343,6 @@ and then hitting Save settings.
 	LOG("Initializing the renderer backend.");
 	static augs::graphics::renderer_backend renderer_backend;
 
-	static augs::renderer illuminated_renderer(config.renderer);
-	static augs::renderer gui_renderer(config.renderer);
-
 	static game_frame_buffer_swapper buffer_swapper;
 
 	static game_frame_buffer read_buffer;
@@ -359,7 +356,7 @@ and then hitting Save settings.
 	};
 
 	// temporary
-	static auto& renderer = illuminated_renderer;
+	static auto& renderer = write_buffer.renderers.general;
 
 	LOG_NVPS(renderer_backend.get_max_texture_size());
 
@@ -1144,7 +1141,10 @@ and then hitting Save settings.
 
 			viewing_config.audio_volume,
 			viewing_config.sound,
-			viewing_config.performance.special_effects
+			viewing_config.performance,
+
+			streaming.images_in_atlas,
+			write_buffer.particle_buffers
 		});
 	};
 
@@ -1164,8 +1164,8 @@ and then hitting Save settings.
 				viewing_config.audio_volume,
 				viewing_config.sound,
 				get_character_camera(),
-				viewing_config.performance.special_effects,
-				settings,
+				viewing_config.performance,
+				settings
 			});
 		}
 
@@ -1798,17 +1798,14 @@ and then hitting Save settings.
 
 			auto frame = measure_scope(frame_performance.total);
 			
+			auto get_blank_texture = []() {
+				return streaming.necessary_images_in_atlas[assets::necessary_image_id::BLANK];
+			};
+
 			auto get_drawer = [&]() { 
 				return augs::drawer_with_default {
 					renderer.get_triangle_buffer(),
-					streaming.necessary_images_in_atlas[assets::necessary_image_id::BLANK]
-				};
-			};
-
-			auto get_line_drawer = [&]() { 
-				return augs::line_drawer_with_default {
-					renderer.get_line_buffer(),
-					streaming.necessary_images_in_atlas[assets::necessary_image_id::BLANK]
+					get_blank_texture()
 				};
 			};
 
@@ -1816,18 +1813,20 @@ and then hitting Save settings.
 				return setup.get_interpolation_ratio();
 			});
 
-			const auto context = viewing_game_gui_context {
-				create_game_gui_context(),
+			auto create_viewing_game_gui_context = [&]() {
+				return viewing_game_gui_context {
+					create_game_gui_context(),
 
-				{
-					get_audiovisuals().get<interpolation_system>(),
-					get_audiovisuals().world_hover_highlighter,
-					new_viewing_config.hotbar,
-					new_viewing_config.drawing,
-					new_viewing_config.inventory_gui_controls,
-					get_camera_eye(),
-					get_drawer()
-				}
+					{
+						get_audiovisuals().get<interpolation_system>(),
+						get_audiovisuals().world_hover_highlighter,
+						new_viewing_config.hotbar,
+						new_viewing_config.drawing,
+						new_viewing_config.inventory_gui_controls,
+						get_camera_eye(),
+						get_drawer()
+					}
+				};
 			};
 
 			/*
@@ -1932,9 +1931,11 @@ and then hitting Save settings.
 						necessary_shaders,
 						all_visible,
 						new_viewing_config.performance,
+						new_viewing_config.renderer,
 						highlights,
 						special_indicators,
-						indicator_meta
+						indicator_meta,
+						write_buffer.particle_buffers
 					});
 				}
 
@@ -1965,7 +1966,7 @@ and then hitting Save settings.
 					/* #3 */
 					auto scope = measure_scope(frame_performance.draw_game_gui);
 
-					game_gui.world.draw(context);
+					game_gui.world.draw(create_viewing_game_gui_context());
 				}
 
 				auto scope = measure_scope(frame_performance.draw_setup_custom_gui);
@@ -1979,8 +1980,7 @@ and then hitting Save settings.
 					setup.draw_custom_gui({
 						all_visible,
 						cone,
-						get_drawer(),
-						get_line_drawer(),
+						get_blank_texture(),
 						new_viewing_config,
 						streaming.necessary_images_in_atlas,
 						std::addressof(streaming.general_atlas),
@@ -2080,7 +2080,7 @@ and then hitting Save settings.
 					if (viewed_character) {
 						const auto& character_gui = game_gui.get_character_gui(get_game_gui_subject());
 
-						character_gui.draw_cursor_with_tooltip(context, should_draw_our_cursor);
+						character_gui.draw_cursor_with_tooltip(create_viewing_game_gui_context(), should_draw_our_cursor);
 					}
 				}
 				else {
@@ -2179,13 +2179,12 @@ and then hitting Save settings.
 			/* Don't count the debug details */
 			renderer.extract_num_total_triangles_drawn();
 
-			write_buffer.commands.clear();
-			write_buffer.commands.assign(renderer.commands.begin(), renderer.commands.end());
-
-			illuminated_renderer.commands.clear();
-			gui_renderer.commands.clear();
-
 			buffer_swapper.wait_swap();
+
+			write_buffer.renderers.general.next_frame();
+			write_buffer.renderers.game_gui.next_frame();
+
+			write_buffer.particle_buffers.clear();
 		}
 	};
 
@@ -2214,16 +2213,17 @@ and then hitting Save settings.
 		{
 			auto scope = measure_scope(performance.renderer_commands);
 
-			auto& cmds = read_buffer.commands;
+			auto perform_commands_of = [&](auto& r) {
+				renderer_backend.perform(
+					r.commands.data(),
+					r.commands.size()
+				);
+			};
 
-			renderer_backend.perform(
-				cmds.data(),
-				cmds.size()
-			);
+			perform_commands_of(read_buffer.renderers.general);
+			perform_commands_of(read_buffer.renderers.game_gui);
 
 			current_frame.fetch_add(1, std::memory_order_relaxed);
-
-			cmds.clear();
 		}
 
 		if (!until_first_swap_measured) {

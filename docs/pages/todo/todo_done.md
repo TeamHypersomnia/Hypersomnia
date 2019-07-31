@@ -3501,3 +3501,5 @@ which can be done from Settings->Reset all settings to factory default.
 	- explo smokes
 	- explo thunders
 
+- check shake for bomb explosion
+

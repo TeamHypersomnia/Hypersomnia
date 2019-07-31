@@ -25,6 +25,7 @@
 #include "test_scenes/test_scene_animations.h"
 #include "test_scenes/test_scene_images.h"
 #include "augs/templates/enum_introspect.h"
+#include "view/viewables/particle_types.hpp"
 
 /* 
 	This code is shit. 

@@ -160,6 +160,7 @@ void arena_gui_state::draw_mode_gui(
 ) const {
 	const auto& cfg = in.config.arena_mode_gui;
 	const auto line_height = in.gui_fonts.gui.metrics.get_height();
+	auto general_drawer = in.get_drawer();
 
 	if constexpr(M::round_based) {
 		using namespace augs::gui::text;
@@ -189,7 +190,7 @@ void arena_gui_state::draw_mode_gui(
 			return get_text_bbox(colored(text, white));;
 		};
 
-		augs::vertex_triangle_buffer avatar_triangles;
+		auto& avatar_triangles = in.renderer.dedicated[augs::dedicated_triangle_buffer::DEATH_SUMMARY_AVATAR];
 
 		auto draw_death_summary = [&]() {
 			const auto viewed_player_id = spectator.show ? spectator.now_spectating : local_player_id;
@@ -422,14 +423,14 @@ void arena_gui_state::draw_mode_gui(
 			{
 				const auto& cfg = in.config.arena_mode_gui.scoreboard_settings;
 
-				in.drawer.aabb_with_border(window_bg_rect, cfg.background_color, killed_color);
+				general_drawer.aabb_with_border(window_bg_rect, cfg.background_color, killed_color);
 			}
 
 			if (avatar_displayed) {
 				const auto avatar_orig = ltrbi(popup_lt + window_padding, displayed_avatar_size);
 
 				//const auto& cfg = in.config.arena_mode_gui.scoreboard_settings;
-				//in.drawer.border(avatar_orig, cfg.border_color);
+				//general_drawer.border(avatar_orig, cfg.border_color);
 
 				auto avatar_output = augs::drawer { avatar_triangles };
 				avatar_output.aabb(avatar_atlas_entry, avatar_orig, white);
@@ -438,7 +439,7 @@ void arena_gui_state::draw_mode_gui(
 			const auto total_text_pos = popup_lt + window_padding + vec2i(item_padding.x + displayed_avatar_size.x, 0);
 
 			print_stroked(
-				in.drawer,
+				general_drawer,
 				total_text_pos,
 				total_text
 			);
@@ -451,11 +452,11 @@ void arena_gui_state::draw_mode_gui(
 				// TODO give it its own settings struct
 				{
 					//const auto& cfg = in.config.arena_mode_gui.scoreboard_settings;
-					//in.drawer.aabb_with_border(tool_window_orig, cfg.background_color, cfg.border_color);
+					//general_drawer.aabb_with_border(tool_window_orig, cfg.background_color, cfg.border_color);
 				}
 
 				const auto tool_image_orig = ltrbi(tool_window_orig.left_top() + tool_image_padding, tool_image_size);
-				in.drawer.base::aabb(tool_image_entry, tool_image_orig, white);
+				general_drawer.base::aabb(tool_image_entry, tool_image_orig, white);
 			}
 
 			if (avatar_triangles.size() > 0) {
@@ -518,7 +519,7 @@ void arena_gui_state::draw_mode_gui(
 						award_indicator_pos.y += line_height * (i + 1 - starting_i);
 
 						print_stroked(
-							in.drawer,
+							general_drawer,
 							award_indicator_pos - vec2i(award_text_w, 0),
 							colored(award_text, award_color)
 						);
@@ -529,7 +530,7 @@ void arena_gui_state::draw_mode_gui(
 				const auto money_text_w = calc_size(money_text).x;
 
 				print_stroked(
-					in.drawer,
+					general_drawer,
 					money_indicator_pos - vec2i(money_text_w, 0),
 					colored(money_text, cfg.money_indicator_color)
 				);
@@ -651,7 +652,7 @@ void arena_gui_state::draw_mode_gui(
 					cfg.inside_knockout_box_pad * 2 + std::max(tool_size.y, std::max(lhs_bbox.y, rhs_bbox.y))
 				);
 
-				in.drawer.aabb_with_border(
+				general_drawer.aabb_with_border(
 					total_bbox,
 					cols.background,
 					cols.border,
@@ -675,7 +676,7 @@ void arena_gui_state::draw_mode_gui(
 				pen.y = icon_drawn_aabb.get_center().y;
 
 				print_stroked(
-					in.drawer,
+					general_drawer,
 					pen,
 					lhs_text,
 					{ augs::ralign::CY }
@@ -685,7 +686,7 @@ void arena_gui_state::draw_mode_gui(
 				pen.x += cfg.weapon_icon_horizontal_pad;
 
 				{
-					in.drawer.base::aabb(
+					general_drawer.base::aabb(
 						entry.diffuse,
 						icon_drawn_aabb,
 						white
@@ -696,7 +697,7 @@ void arena_gui_state::draw_mode_gui(
 				pen.x += cfg.weapon_icon_horizontal_pad;
 
 				print_stroked(
-					in.drawer,
+					general_drawer,
 					pen,
 					rhs_text,
 					{ augs::ralign::CY }
@@ -710,7 +711,7 @@ void arena_gui_state::draw_mode_gui(
 			const auto s = in.screen_size;
 
 			print_stroked(
-				in.drawer,
+				general_drawer,
 				{ s.x / 2, static_cast<int>(t) },
 				val,
 				{ augs::ralign::CX }
@@ -834,7 +835,7 @@ void arena_gui_state::draw_mode_gui(
 					}
 
 					print_stroked(
-						in.drawer,
+						general_drawer,
 						target_pos,
 						target,
 						{ augs::ralign::CX },
@@ -933,7 +934,7 @@ void arena_gui_state::draw_mode_gui(
 				typed_mode,
 				mode_input,
 				mode_in.config,
-				in.drawer,
+				general_drawer,
 				in.screen_size,
 				in.gui_fonts.gui,
 				viewed_player_handle,

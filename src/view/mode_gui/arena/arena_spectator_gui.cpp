@@ -90,7 +90,7 @@ void arena_spectator_gui::draw_gui(
 
 	auto draw_text_indicator_at = [&](const auto& val, const auto t, const rgba stroke_col = black) {
 		print_stroked(
-			in.drawer,
+			in.get_drawer(),
 			{ s.x / 2, static_cast<int>(t) },
 			val,
 			{ augs::ralign::CX },

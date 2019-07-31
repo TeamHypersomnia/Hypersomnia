@@ -148,29 +148,32 @@ namespace augs {
 						typed_cmd(access);
 					}
 					else if constexpr(same<C, drawcall_command>) {
-						auto& triangles = typed_cmd.triangles;
-						auto& lines = typed_cmd.lines;
-						auto& specials = typed_cmd.specials;
+						const auto triangles = typed_cmd.triangles;
+						const auto lines = typed_cmd.lines;
+						const auto specials = typed_cmd.specials;
 
-						if (!specials.empty()) {
+						const auto cnt = static_cast<GLsizei>(typed_cmd.count);
+						const auto specials_cnt = cnt * 3;
+
+						if (specials) {
 							enable_special_vertex_attribute();
 							GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, p.special_buffer_id));
-							GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(special) * specials.size(), specials.data(), GL_STREAM_DRAW));
+							GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(special) * specials_cnt, specials, GL_STREAM_DRAW));
 						}
 
 						GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, p.triangle_buffer_id));
 
-						if (!triangles.empty()) {
-							GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertex_triangle) * triangles.size(), triangles.data(), GL_STREAM_DRAW));
-							GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, static_cast<GLsizei>(triangles.size()) * 3));
+						if (triangles) {
+							GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertex_triangle) * cnt, triangles, GL_STREAM_DRAW));
+							GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, cnt * 3));
 						}
 
-						if (!lines.empty()) {
-							GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertex_line) * lines.size(), lines.data(), GL_STREAM_DRAW));
-							GL_CHECK(glDrawArrays(GL_LINES, 0, static_cast<GLsizei>(lines.size()) * 2));
+						if (lines) {
+							GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertex_line) * cnt, lines, GL_STREAM_DRAW));
+							GL_CHECK(glDrawArrays(GL_LINES, 0, cnt * 2));
 						}
 
-						if (!specials.empty()) {
+						if (specials) {
 							disable_special_vertex_attribute();
 						}
 					}

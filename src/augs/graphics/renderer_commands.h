@@ -39,9 +39,11 @@ namespace augs {
 	};
 
 	struct drawcall_command {
-		vertex_triangle_buffer triangles;
-		vertex_line_buffer lines;
-		special_buffer specials;
+		const vertex_triangle* triangles = nullptr;
+		const vertex_line* lines = nullptr;
+		const special* specials = nullptr;
+
+		uint32_t count = 0;
 	};
 
 	struct set_viewport_command {

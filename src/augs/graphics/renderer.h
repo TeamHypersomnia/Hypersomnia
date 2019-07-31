@@ -2,7 +2,8 @@
 #include "augs/math/vec2.h"
 #include "augs/templates/object_command.h"
 
-#include "augs/graphics/renderer_settings.h"
+#include "augs/misc/enum/enum_array.h"
+
 #include "augs/graphics/rgba.h"
 #include "augs/graphics/vertex.h"
 #include "augs/graphics/texture.h"
@@ -19,15 +20,61 @@ namespace augs {
 		struct renderer_command;
 	}
 	
+	enum class dedicated_triangle_buffer {
+		AVATARS,
+		DEATH_SUMMARY_AVATAR,
+
+		NICKNAMES,
+		HEALTH_NUMBERS,
+		INDICATORS,
+
+		SCOREBOARD_COLOR_INDICATORS,
+
+		COUNT
+	};
+
 	class renderer {
 		debug_lines prev_logic_step_lines;
 
 		bool interpolate_debug_logic_step_lines = true;
-		renderer_settings current_settings;
 
-		vertex_triangle_buffer triangles;
-		vertex_line_buffer lines;
-		special_buffer specials;
+		template <class T>
+		class buffers_and_index {
+			std::vector<T> all;
+			std::size_t current = 0;
+
+		public:
+			buffers_and_index() {
+				all.resize(5000);
+			}
+
+			auto& get() {
+				return all[current];
+			}
+
+			const auto& get() const {
+				return all[current];
+			}
+
+			void reset() {
+				current = 0;
+				get().clear();
+			}
+
+			void request_next() {
+				++current;
+
+				if (current >= all.size()) {
+					all.resize(current + 1);
+				}
+
+				get().clear();
+			}
+		};
+
+		buffers_and_index<vertex_triangle_buffer> triangle_buffers;
+		buffers_and_index<vertex_line_buffer> line_buffers;
+		buffers_and_index<special_buffer> special_buffers;
 
 		std::size_t num_total_triangles_drawn = 0;
 		std::size_t num_total_lines_drawn = 0;
@@ -35,7 +82,7 @@ namespace augs {
 	public:
 		render_command_buffer commands;
 
-		renderer(const renderer_settings&);
+		enum_array<vertex_triangle_buffer, dedicated_triangle_buffer> dedicated;
 
 		void save_debug_logic_step_lines_for_interpolation(const debug_lines&);
 
@@ -56,29 +103,12 @@ namespace augs {
 		);
 
 		void push_line(const augs::vertex_line& line) {
-			lines.push_back(line);
+			get_line_buffer().push_back(line);
 		}
 
 		void push_triangle(const augs::vertex_triangle& tri) {
-			triangles.push_back(tri);
+			get_triangle_buffer().push_back(tri);
 		}
-
-		void push_triangles(const augs::vertex_triangle_buffer& added) {
-			triangles.insert(triangles.end(), added.begin(), added.end());
-		}
-
-		void push_special_vertex_triangle(
-			const augs::special s1,
-			const augs::special s2,
-			const augs::special s3
-		) {
-			specials.push_back(s1);
-			specials.push_back(s2);
-			specials.push_back(s3);
-		}
-
-		void clear_triangles();
-		void clear_lines();
 
 		void call_and_clear_lines();
 		void call_and_clear_triangles();
@@ -88,9 +118,6 @@ namespace augs {
 		special_buffer& get_special_buffer();
 
 		std::size_t get_triangle_count() const;
-
-		void apply(const renderer_settings&, bool force = false);
-		const renderer_settings& get_current_settings() const;
 
 		std::size_t extract_num_total_triangles_drawn() {
 			auto out = num_total_triangles_drawn;
@@ -156,7 +183,7 @@ namespace augs {
 		void set_overwriting_blending();
 		void set_additive_blending();
 		
-		void call_triangles(vertex_triangle_buffer&&);
+		void call_triangles(const vertex_triangle_buffer&);
 		void set_viewport(const xywhi);
 
 		void clear_stencil();
@@ -166,5 +193,7 @@ namespace augs {
 
 		void stencil_positive_test();
 		void stencil_reverse_test();
+
+		void next_frame();
 	};
 }

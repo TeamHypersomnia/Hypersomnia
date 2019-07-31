@@ -20,8 +20,7 @@ namespace augs {
 struct draw_setup_gui_input {
 	const visible_entities& all_visible;
 	const camera_cone cone;
-	const augs::drawer_with_default& drawer;
-	const augs::line_drawer_with_default& line_drawer;
+	const augs::atlas_entry blank_texture;
 	const config_lua_table& config;
 	const necessary_images_in_atlas_map& necessary_images;
 	const augs::graphics::texture* general_atlas;
@@ -34,4 +33,12 @@ struct draw_setup_gui_input {
 	const all_loaded_gui_fonts& gui_fonts;
 	const all_necessary_sounds& sounds;
 	const arena_player_metas* const player_metas;
+
+	auto get_drawer() const {
+		return augs::drawer_with_default { renderer.get_triangle_buffer(), blank_texture };
+	}
+
+	auto get_line_drawer() const {
+		return augs::line_drawer_with_default { renderer.get_line_buffer(), blank_texture };
+	}
 };

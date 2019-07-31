@@ -21,6 +21,9 @@
 #include "view/audiovisual_state/systems/interpolation_system.h"
 #include "augs/templates/traits/is_nullopt.h"
 #include "game/detail/gun/firearm_engine.h"
+#include "augs/templates/enum_introspect.h"
+#include "view/viewables/particle_types.hpp"
+#include "view/viewables/images_in_atlas_map.h"
 
 using emi_inst = particles_simulation_system::emission_instance;
 
@@ -124,6 +127,19 @@ particles_simulation_system::basic_cache::basic_cache(
 	else {
 		throw effect_not_found {};
 	}
+}
+
+std::size_t particles_simulation_system::count_particles_on_layer(const particle_layer p) const {
+	std::size_t total = 0;
+
+	total += general_particles[p].size();
+	total += animated_particles[p].size();
+
+	for (const auto& v : homing_animated_particles[p]) {
+		total += v.second.size();
+	}
+
+	return total;
 }
 
 std::size_t particles_simulation_system::count_all_particles() const {
@@ -251,50 +267,222 @@ void particles_simulation_system::update_effects_from_messages(
 	}
 }
 
-void particles_simulation_system::integrate_all_particles(
-	const cosmos& cosm,
-	const augs::delta delta,
-	const plain_animations_pool& anims,
-	const interpolation_system& interp
+template <class F>
+void particles_simulation_system::for_each_particle_in_range(
+	const cosmos& cosm, 
+	const interpolation_system& interp,
+	const int from, 
+	const int to, 
+	F callback
 ) {
+	int current_i = 0;
+
+	per_particle_layer_t<int> layer_indices;
+	fill_range(layer_indices, 0);
+
+	auto maybe_process = [&](const auto layer, auto& range, auto&&... args) {
+		auto& li = layer_indices[layer];
+		const auto range_n = static_cast<int>(range.size());
+
+		const auto range_left = current_i;
+		const auto range_right = current_i + range_n;
+
+		if (range_left == to) {
+			/* Already past */
+			return;
+		}
+
+		if (range_right < from) {
+			/* Not yet */
+			current_i = range_right;
+			li += range_n;
+			return;
+		}
+
+		const auto trimmed_range_left = std::max(range_left, from);
+		const auto trimmed_range_right = std::min(range_right, to);
+
+		{
+			const auto real_range_left = trimmed_range_left - range_left;
+			const auto real_range_right = trimmed_range_right - range_left;
+
+			li += real_range_left;
+			callback(layer, range, li, real_range_left, real_range_right, std::forward<decltype(args)>(args)...);
+			li += real_range_right - real_range_left;
+		}
+
+		current_i = trimmed_range_right;
+	};
+
+	augs::for_each_enum_except_bounds([&](const particle_layer p) {
+		maybe_process(p, general_particles[p]);
+	});
+
+	augs::for_each_enum_except_bounds([&](const particle_layer p) {
+		maybe_process(p, animated_particles[p]);
+	});
+
+	augs::for_each_enum_except_bounds([&](const particle_layer p) {
+		for (auto& cluster : homing_animated_particles[p]) {
+			const auto homing_target = cosm[cluster.first];
+
+			if (homing_target.alive()) {
+				const auto homing_transform = cosm[cluster.first].get_viewing_transform(interp);
+
+				maybe_process(p, cluster.second, homing_transform.pos);
+			}
+		}
+	});
+}
+
+void particles_simulation_system::remove_dead_particles(const cosmos& cosm) {
 	const auto dead_particles_remover = [](auto& container) {
 		erase_if(container, [](const auto& a) { return a.is_dead(); });
 	};
 
 	for (auto& particle_layer : general_particles) {
 		dead_particles_remover(particle_layer);
-
-		for (auto& p : particle_layer) {
-			p.integrate(delta.in_seconds());
-		}
 	}
 
 	for (auto& particle_layer : animated_particles) {
 		dead_particles_remover(particle_layer);
-
-		for (auto& p : particle_layer) {
-			p.integrate(delta.in_seconds(), anims);
-		}
 	}
 
 	for (auto& particle_layer : homing_animated_particles) {
 		erase_if(particle_layer, [&](auto& cluster) {
 			const auto homing_target = cosm[cluster.first];
 
-			if (homing_target.alive()) {
-				dead_particles_remover(cluster.second);
-
-				const auto homing_transform = cosm[cluster.first].get_viewing_transform(interp);
-
-				for (auto& p : cluster.second) {
-					p.integrate(delta.in_seconds(), homing_transform.pos, anims);
-				}
-
-				return cluster.second.empty();
+			if (homing_target.dead()) {
+				return true;
 			}
 
-			return true;
+			dead_particles_remover(cluster.second);
+
+			return cluster.second.empty();
 		});
+	}
+}
+
+void particles_simulation_system::integrate_and_draw_all_particles(const integrate_and_draw_all_particles_input in) {
+
+	/* 
+		This can run in a separate job. 
+		Remember that it depends on the cosmos, so it can't advance while the job for this is running. 
+	*/
+
+	remove_dead_particles(in.cosm);
+
+	const auto delta = in.dt.in_seconds();
+
+	auto generic_integrate = [&](const particle_layer, auto& range, int, int from_i, const int till_i, auto&&... args) {
+		using P = typename remove_cref<decltype(range)>::value_type;
+
+		for (; from_i < till_i; ++from_i) {
+			auto& particle = range[from_i];
+
+			if constexpr(std::is_same_v<P, general_particle>) {
+				particle.integrate(delta);
+			}
+			else if constexpr(std::is_same_v<P, animated_particle>) {
+				particle.integrate(delta, in.anims);
+			}
+			else if constexpr(std::is_same_v<P, homing_animated_particle>) {
+				particle.integrate(delta, in.anims, std::forward<decltype(args)>(args)...);
+			}
+			else {
+				static_assert(always_false_v<P>, "Unimplemented!");
+			}
+		}
+	};
+
+	auto generic_draw = [&](const particle_layer p, auto& range, const int layer_index, const int from_i, const int till_i, auto&&...) {
+		{
+			auto& target_buffer = in.output.diffuse[p];
+
+			auto li = layer_index;
+
+			for (int i = from_i; i < till_i; ++i) {
+				auto& particle = range[i];
+
+				auto& t1 = target_buffer[2 * li];
+				auto& t2 = target_buffer[2 * li + 1];
+
+				particle.template draw_as_sprite<false>(t1, t2, in.game_images, in.anims);
+
+				++li;
+			}
+		}
+
+		if (p == particle_layer::NEONING_PARTICLES) {
+			auto& target_buffer = in.output.neons;
+
+			auto li = layer_index;
+
+			for (int i = from_i; i < till_i; ++i) {
+				auto& particle = range[i];
+
+				auto& t1 = target_buffer[2 * li];
+				auto& t2 = target_buffer[2 * li + 1];
+
+				particle.template draw_as_sprite<true>(t1, t2, in.game_images, in.anims);
+
+				++li;
+			}
+		}
+	};
+
+	auto integrate_worker = [&](const int from, const int to) {
+		for_each_particle_in_range(
+			in.cosm,
+			in.interp,
+			from,
+			to, 
+			generic_integrate
+		);
+	};
+
+	auto draw_worker = [&](const int from, const int to) {
+		for_each_particle_in_range(
+			in.cosm,
+			in.interp,
+			from, 
+			to, 
+			generic_draw
+		);
+	};
+
+	augs::for_each_enum_except_bounds([&](const particle_layer p) {
+		const auto total_on_layer = count_particles_on_layer(p);
+		const auto total_triangles_on_layer = total_on_layer * 2;
+
+		{
+			auto& target_buffer = in.output.diffuse[p];
+			target_buffer.resize(total_triangles_on_layer);
+		}
+
+		if (p == particle_layer::NEONING_PARTICLES) {
+			auto& target_buffer = in.output.neons;
+			target_buffer.resize(total_triangles_on_layer);
+		}
+	});
+
+	const auto total_n = static_cast<int>(count_all_particles());
+
+	if (total_n == 0) {
+		return;
+	}
+
+	const auto max_per_job_n = in.max_particles_in_single_job;
+	const auto jobs_n = 1 + total_n / max_per_job_n;
+	const auto per_job_n = total_n / jobs_n;
+
+	for (int i = 0; i < jobs_n; ++i) {
+		const bool is_last = i == jobs_n - 1;
+		const auto from = i * per_job_n;
+		const auto to = is_last ? total_n : from + per_job_n;
+
+		integrate_worker(from, to);
+		draw_worker(from, to);
 	}
 }
 
@@ -483,7 +671,7 @@ void particles_simulation_system::advance_visible_streams(
 						stream_alivity_mult
 					);
 
-					new_homing_animated.integrate(time_elapsed, homing_target_pos, anims);
+					new_homing_animated.integrate(time_elapsed, anims, homing_target_pos);
 					add_particle(emission.target_layer, homing_target, new_homing_animated);
 				}
 			}

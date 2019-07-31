@@ -1307,7 +1307,7 @@ void server_setup::draw_custom_gui(const draw_setup_gui_input& in) const {
 	using namespace augs::gui::text;
 
 	integrated_client_gui.chat.draw_recent_messages(
-		in.drawer,
+		in.get_drawer(),
 		integrated_client_vars.client_chat,
 		in.config.faction_view,
 		in.gui_fonts.gui,

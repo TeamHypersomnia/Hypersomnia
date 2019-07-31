@@ -21,11 +21,6 @@ struct has_lifetime<T, decltype(std::declval<T&>().current_lifetime_ms, void())>
 template <class T>
 constexpr bool has_lifetime_v = has_lifetime<T>::value;
 
-struct draw_particles_input {
-	augs::drawer output;
-	bool use_neon_map = false;
-};
-
 struct general_particle {
 	static constexpr std::size_t statically_allocate = 5000;
 
@@ -50,10 +45,12 @@ struct general_particle {
 
 	void integrate(const float dt);
 
-	template <class M>
+	template <bool use_neon_maps, class M>
 	void draw_as_sprite(
+		augs::vertex_triangle& t1,
+		augs::vertex_triangle& t2,
 		const M& manager,
-		const draw_particles_input in
+		const plain_animations_pool&
 	) const {
 		float size_mult = 1.f;
 
@@ -79,11 +76,11 @@ struct general_particle {
 		}
 
 		auto draw = [&](const vec2i drawn_size) {
-			if (in.use_neon_map) {
-				augs::detail_neon_sprite(in.output.output_buffer, manager.at(image_id), drawn_size, pos, rotation, color);
+			if constexpr(use_neon_maps) {
+				augs::detail_write_neon_sprite(t1, t2, manager.at(image_id), drawn_size, pos, rotation, color);
 			}
 			else {
-				augs::detail_sprite(in.output.output_buffer, manager.at(image_id), drawn_size, pos, rotation, color);
+				augs::detail_write_sprite(t1, t2, manager.at(image_id), drawn_size, pos, rotation, color);
 			}
 		};
 
@@ -175,19 +172,20 @@ struct animated_particle {
 
 	void integrate(const float dt, const plain_animations_pool& anims);
 
-	template <class M>
+	template <bool use_neon_maps, class M>
 	void draw_as_sprite(
+		augs::vertex_triangle& t1,
+		augs::vertex_triangle& t2,
 		const M& manager,
-		const plain_animations_pool& anims,
-		const draw_particles_input in
+		const plain_animations_pool& anims
 	) const {
 		const auto image_id = animation.get_image_id(anims);
 
-		if (in.use_neon_map) {
-			augs::detail_neon_sprite(in.output.output_buffer, manager.at(image_id), pos, 0, color);
+		if constexpr(use_neon_maps) {
+			augs::detail_write_neon_sprite(t1, t2, manager.at(image_id), pos, 0, color);
 		}
 		else {
-			augs::detail_sprite(in.output.output_buffer, manager.at(image_id), pos, 0, color);
+			augs::detail_write_sprite(t1, t2, manager.at(image_id), pos, 0, color);
 		}
 	}
 
@@ -224,23 +222,24 @@ struct homing_animated_particle {
 
 	void integrate(
 		const float dt, 
-		const vec2 homing_target,
-		const plain_animations_pool& anims
+		const plain_animations_pool& anims,
+		const vec2 homing_target
 	);
 
-	template <class M>
+	template <bool use_neon_maps, class M>
 	void draw_as_sprite(
+		augs::vertex_triangle& t1,
+		augs::vertex_triangle& t2,
 		const M& manager,
-		const plain_animations_pool& anims,
-		const draw_particles_input in
+		const plain_animations_pool& anims
 	) const {
 		const auto image_id = animation.get_image_id(anims);
 
-		if (in.use_neon_map) {
-			augs::detail_neon_sprite(in.output.output_buffer, manager.at(image_id), pos, 0, color);
+		if constexpr(use_neon_maps) {
+			augs::detail_write_neon_sprite(t1, t2, manager.at(image_id), pos, 0, color);
 		}
 		else {
-			augs::detail_sprite(in.output.output_buffer, manager.at(image_id), pos, 0, color);
+			augs::detail_write_sprite(t1, t2, manager.at(image_id), pos, 0, color);
 		}
 	}
 

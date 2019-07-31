@@ -1530,8 +1530,8 @@ void editor_setup::draw_custom_gui(const draw_setup_gui_input& in) {
 		return cone.to_screen_space(p);
 	};
 
-	auto& triangles = in.drawer;
-	auto& lines = in.line_drawer;
+	auto triangles = in.get_drawer();
+	auto lines = in.get_line_drawer();
 	const auto screen_size = in.screen_size;
 	auto& editor_cfg = in.config.editor;
 
@@ -1672,7 +1672,7 @@ void editor_setup::draw_status_bar(const draw_setup_gui_input& in) {
 			const auto zoom_text = typesafe_sprintf("%x%", zoom);
 
 			print_stroked(
-				in.drawer,
+				in.get_drawer(),
 				ss - padding,
 				formatted_string(zoom_text, st),
 				augs::ralign::RB
@@ -1684,7 +1684,7 @@ void editor_setup::draw_status_bar(const draw_setup_gui_input& in) {
 			const auto world_cursor_pos_text = typesafe_sprintf("X: %x Y: %x", wp->x, wp->y);
 
 			print_stroked(
-				in.drawer,
+				in.get_drawer(),
 				vec2i(padding.x, ss.y - padding.y),
 				formatted_string(world_cursor_pos_text, st),
 				augs::ralign::B
@@ -1752,7 +1752,7 @@ void editor_setup::draw_status_bar(const draw_setup_gui_input& in) {
 			}
 
 			print_stroked(
-				in.drawer,
+				in.get_drawer(),
 				vec2i(padding.x, ss.y - padding.y),
 				formatted_status_bar_text,
 				augs::ralign::B
@@ -1814,12 +1814,12 @@ void editor_setup::draw_marks_gui(const draw_setup_gui_input& in) {
 
 			const auto text_padding = cfg.text_padding;
 
-			const auto& out = in.drawer;
-
 			const auto rect_pos = ss / 2 - bbox / 2 - text_padding * 2;
 			const auto text_pos = rect_pos + text_padding;
 			const auto rect_size = bbox + text_padding * 2;
 			const auto rect = xywh(rect_pos, rect_size);
+
+			const auto& out = in.get_drawer();
 
 			out.aabb_with_border(rect, cfg.bg_color, cfg.bg_border_color);
 
@@ -1972,7 +1972,7 @@ void editor_setup::draw_recent_message(const draw_setup_gui_input& in) {
 				//const auto line_h = static_cast<int>(fnt.metrics.get_height());
 				//bbox.y = std::max(bbox.y, line_h * 2);
 
-				const auto& out = in.drawer;
+				const auto& out = in.get_drawer();
 
 				const auto rect_pos = ss - rb_space - bbox - text_padding * 2;
 				const auto text_pos = rect_pos + text_padding;

@@ -10,11 +10,19 @@
 #include "augs/templates/corresponding_field.h"
 
 namespace augs {
-	renderer::renderer(const renderer_settings& settings) : current_settings(settings) {
-		apply(settings, true);
+	void renderer::next_frame() {
+		commands.clear();
+
+		triangle_buffers.reset();
+		line_buffers.reset();
+		special_buffers.reset();
+
+		for (auto& d : dedicated) {
+			d.clear();
+		}
 	}
 
-	void renderer::call_triangles(vertex_triangle_buffer&& buffer) {
+	void renderer::call_triangles(const vertex_triangle_buffer& buffer) {
 		if (buffer.empty()) {
 			return;
 		}
@@ -22,17 +30,16 @@ namespace augs {
 		num_total_triangles_drawn += buffer.size();
 
 		drawcall_command cmd;
-		cmd.triangles = std::move(buffer);
+		cmd.triangles = buffer.data();
+		cmd.count = buffer.size();
 
 		push_command(std::move(cmd));
 	}
 
-	void renderer::clear_triangles() {
-		triangles.clear();
-		specials.clear();
-	}
-
 	void renderer::call_and_clear_triangles() {
+		const auto& triangles = triangle_buffers.get();
+		const auto& specials = special_buffers.get();
+
 		if (triangles.empty()) {
 			return;
 		}
@@ -40,15 +47,24 @@ namespace augs {
 		num_total_triangles_drawn += triangles.size();
 
 		drawcall_command cmd;
-		cmd.triangles = std::move(triangles);
-		cmd.specials = std::move(specials);
+		cmd.triangles = triangles.data();
+
+		if (specials.size() > 0) {
+			cmd.specials = specials.data();
+			ensure_eq(specials.size(), triangles.size() * 3);
+		}
+
+		cmd.count = triangles.size();
 
 		push_command(std::move(cmd));
 
-		clear_triangles();
+		triangle_buffers.request_next();
+		special_buffers.request_next();
 	}
 
 	void renderer::call_and_clear_lines() {
+		const auto& lines = line_buffers.get();
+
 		if (lines.empty()) {
 			return;
 		}
@@ -56,31 +72,28 @@ namespace augs {
 		num_total_lines_drawn += lines.size();
 
 		drawcall_command cmd;
-		cmd.lines = std::move(lines);
+		cmd.lines = lines.data();
+		cmd.count = lines.size();
 
 		push_command(std::move(cmd));
 
-		clear_lines();
-	}
-
-	void renderer::clear_lines() {
-		lines.clear();
+		line_buffers.request_next();
 	}
 
 	std::size_t renderer::get_triangle_count() const {
-		return triangles.size();
+		return triangle_buffers.get().size();
 	}
 
 	vertex_triangle_buffer& renderer::get_triangle_buffer() {
-		return triangles;
+		return triangle_buffers.get();
 	}
 
 	vertex_line_buffer& renderer::get_line_buffer() {
-		return lines;
+		return line_buffers.get();
 	}
 
 	special_buffer& renderer::get_special_buffer() {
-		return specials;
+		return special_buffers.get();
 	}
 	
 	void renderer::save_debug_logic_step_lines_for_interpolation(const decltype(prev_logic_step_lines)& lines) {
@@ -186,17 +199,6 @@ namespace augs {
 
 		for_each_in(persistent_lines, line_lambda);
 		for_each_in(frame_lines, line_lambda);
-	}
-
-	void renderer::apply(const renderer_settings& settings, const bool force) {
-		(void)settings;
-		(void)force;
-
-		current_settings = settings;
-	}
-
-	const renderer_settings& renderer::get_current_settings() const {
-		return current_settings;
 	}
 
 	void renderer::fullscreen_quad() {

@@ -72,7 +72,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			cosm.get_common_assets(), 
 			input.particle_effects, 
 			dt, 
-			input.special_effects.explosions,
+			input.performance.special_effects.explosions,
 			particles
 		);
 	}
@@ -84,12 +84,15 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		{
 			auto scope = measure_scope(performance.integrate_particles);
 
-			particles.integrate_all_particles(
+			particles.integrate_and_draw_all_particles({
 				cosm,
 				dt,
+				interp,
+				input.game_images,
 				anims,
-				interp
-			);
+				input.performance.max_particles_in_single_job,
+				input.particles_output
+			});
 
 			performance.num_particles.measure(particles.count_all_particles());
 		}
@@ -100,7 +103,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			particles.advance_visible_streams(
 				rng,
 				cone,
-				input.special_effects,
+				input.performance.special_effects,
 				cosm,
 				input.particle_effects,
 				anims,
@@ -225,7 +228,7 @@ void audiovisual_state::standard_post_solve(
 			auto& thunders = get<thunder_system>();
 
 			for (const auto& t : new_thunders) {
-				const auto thunder_mult = input.special_effects.explosions.thunder_amount;
+				const auto thunder_mult = input.performance.special_effects.explosions.thunder_amount;
 
 				auto new_t = t;
 
@@ -246,7 +249,7 @@ void audiovisual_state::standard_post_solve(
 
 		{
 			auto& particles = get<particles_simulation_system>();
-			particles.update_effects_from_messages(rng, step, input.particle_effects, interp, input.special_effects);
+			particles.update_effects_from_messages(rng, step, input.particle_effects, interp, input.performance.special_effects);
 		}
 
 		{

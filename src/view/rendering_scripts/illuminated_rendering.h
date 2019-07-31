@@ -5,6 +5,8 @@
 #include "view/game_drawing_settings.h"
 #include "view/necessary_resources.h"
 #include "view/game_gui/special_indicator.h"
+#include "view/audiovisual_state/particle_triangle_buffers.h"
+#include "augs/graphics/renderer_settings.h"
 
 namespace augs {
 	namespace graphics { 
@@ -51,9 +53,11 @@ struct illuminated_rendering_input {
 	const illuminated_rendering_shaders& shaders;
 	const visible_entities& all_visible;
 	const performance_settings& perf_settings;
+	const augs::renderer_settings& renderer_settings;
 	const std::vector<additional_highlight>& additional_highlights;
 	const std::vector<special_indicator>& special_indicators;
 	const special_indicator_meta& indicator_meta;
+	const particle_triangle_buffers& drawn_particles;
 };
 
 void illuminated_rendering(const illuminated_rendering_input in);

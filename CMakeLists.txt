@@ -422,7 +422,6 @@ set(HYPERSOMNIA_CODEBASE_CPPS
 	"src/view/game_gui/elements/game_gui_root.cpp"
 	"src/view/game_gui/elements/value_bar.cpp"
 	"src/view/game_gui/elements/slot_button.cpp"
-	"src/view/viewables/particle_types.cpp"
 	"src/view/audiovisual_state/systems/exploding_ring_system.cpp"
 	"src/view/game_gui/game_gui_system.cpp"
 	"src/view/audiovisual_state/systems/light_system.cpp"

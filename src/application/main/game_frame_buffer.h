@@ -3,15 +3,25 @@
 #include <atomic>
 #include <condition_variable>
 
+#include "game/enums/particle_layer.h"
+#include "view/audiovisual_state/particle_triangle_buffers.h"
+
+struct all_game_renderers {
+	augs::renderer general;
+	augs::renderer game_gui;
+};
+
 struct game_frame_buffer {
 	augs::local_entropy new_window_entropy;
-	render_command_buffer commands;
 	augs::window_settings new_settings;
 
 	bool should_clip_cursor = false;
 	bool should_pause_cursor = false;
 	bool should_quit = false;
 	vec2i screen_size;
+
+	all_game_renderers renderers;
+	particle_triangle_buffers particle_buffers;
 };
 
 class game_frame_buffer_swapper {

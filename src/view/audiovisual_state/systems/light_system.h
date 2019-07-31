@@ -44,12 +44,10 @@ struct light_system_input {
 	const camera_cone cone;
 	std::optional<entity_id> fog_of_war_character;
 	const float camera_query_mult;
-	const particles_simulation_system& particles;
-	const plain_animations_pool& plain_animations;
 	const visible_entities& visible;
 
 	const augs::atlas_entry cast_highlight_tex;
-	const draw_renderable_input& drawing_in;
+	std::function<draw_renderable_input()> make_drawing_in;
 	const performance_settings& perf_settings;
 };
 

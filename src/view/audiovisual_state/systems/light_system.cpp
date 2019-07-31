@@ -95,8 +95,7 @@ void light_system::gather_vis_requests(const light_system_input& in) const {
 	auto& requests = thread_local_visibility_requests();
 
 	const auto& cosm = in.cosm;
-	const auto drawing_in = in.drawing_in;
-	const auto& interp = drawing_in.interp;
+	const auto& interp  = in.make_drawing_in().interp;
 
 	const auto cone = in.cone;
 
@@ -147,9 +146,8 @@ void light_system::render_all_lights(const light_system_input in) const {
 	auto& performance = in.profiler;
 	auto scope = measure_scope(performance.light_rendering);
 
-	const auto drawing_in = in.drawing_in;
-	const auto global_time_seconds = drawing_in.global_time_seconds;
-	const auto output = augs::drawer{ renderer.get_triangle_buffer() };
+	const auto& get_drawing_in = in.make_drawing_in;
+	const auto global_time_seconds = get_drawing_in().global_time_seconds;
 	const auto& light_shader = in.light_shader;
 	const auto& wall_light_shader = in.textured_light_shader;
 
@@ -168,21 +166,23 @@ void light_system::render_all_lights(const light_system_input in) const {
 	renderer.set_additive_blending();
 	standard_shader.set_as_current(renderer);
 
-	const auto helper = helper_drawer {
-		in.visible,
-		cosm,
-		drawing_in,
-		in.total_layer_scope
+	auto make_helper = [&]() {
+		return helper_drawer {
+			in.visible,
+			cosm,
+			get_drawing_in(),
+			in.total_layer_scope
+		};
 	};
 
-	helper.draw_neons<
+	make_helper().draw_neons<
 		render_layer::FLOOR_AND_ROAD,
 		render_layer::ON_FLOOR
 	>();
 
 	renderer.call_and_clear_triangles();
 
-	helper.draw<
+	make_helper().draw<
 		render_layer::FLOOR_NEON_OVERLAY
 	>();
 
@@ -208,8 +208,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	const auto light_uniform = light_uniforms(light_shader);
 	const auto& wall_light_uniform = light_uniforms(wall_light_shader);
 
-	const auto& interp = drawing_in.interp;
-	const auto& particles = in.particles;
+	const auto& interp = get_drawing_in().interp;
 
 	auto& requests = thread_local_visibility_requests();
 	auto& responses = thread_local_visibility_responses();
@@ -362,7 +361,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 				light.color.rgb()
 			);
 
-			helper.draw<
+			make_helper().draw<
 				render_layer::DYNAMIC_BODY,
 				render_layer::OVER_DYNAMIC_BODY,
 				render_layer::OVER_SENTIENCES
@@ -385,7 +384,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	/* Draw neon maps */
 
-	helper.draw_neons<
+	make_helper().draw_neons<
 		render_layer::DYNAMIC_BODY,
 		render_layer::OVER_DYNAMIC_BODY,
 		render_layer::GLASS_BODY,
@@ -395,51 +394,53 @@ void light_system::render_all_lights(const light_system_input in) const {
 	>();
 
 #if BUILD_STENCIL_BUFFER
-	auto draw_lights_for = [&](const auto& handle) {
-		::draw_neon_map(handle, drawing_in);
-		::draw_character_glow(
-			handle, 
-			{
-				output,
-				interp,
-				global_time_seconds,
-				in.cast_highlight_tex
-			}
-		);
-	};
+	{
+		auto draw_lights_for = [&](const auto& handle) {
+			::draw_neon_map(handle, get_drawing_in());
+			::draw_character_glow(
+				handle, 
+				{
+					augs::drawer{ renderer.get_triangle_buffer() },
+					interp,
+					global_time_seconds,
+					in.cast_highlight_tex
+				}
+			);
+		};
 
-	if (const auto fog_of_war_character = cosm[in.fog_of_war_character ? *in.fog_of_war_character : entity_id()]) {
-		renderer.call_and_clear_triangles();
-		in.fill_stencil();
-		renderer.stencil_positive_test();
-		standard_shader.set_as_current(renderer);
+		if (const auto fog_of_war_character = cosm[in.fog_of_war_character ? *in.fog_of_war_character : entity_id()]) {
+			renderer.call_and_clear_triangles();
+			in.fill_stencil();
+			renderer.stencil_positive_test();
+			standard_shader.set_as_current(renderer);
 
-		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
-			if (handle.get_official_faction() != fog_of_war_character.get_official_faction()) {
+			in.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
+				if (handle.get_official_faction() != fog_of_war_character.get_official_faction()) {
+					draw_lights_for(handle);
+				}
+			});
+			
+			renderer.call_and_clear_triangles();
+
+			renderer.set_stencil(false);
+
+			in.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
+				if (handle.get_official_faction() == fog_of_war_character.get_official_faction()) {
+					draw_lights_for(handle);
+				}
+			});
+		}
+		else {
+			in.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
 				draw_lights_for(handle);
-			}
-		});
-		
-		renderer.call_and_clear_triangles();
-
-		renderer.set_stencil(false);
-
-		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
-			if (handle.get_official_faction() == fog_of_war_character.get_official_faction()) {
-				draw_lights_for(handle);
-			}
-		});
-	}
-	else {
-		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
-			draw_lights_for(handle);
-		});
+			});
+		}
 	}
 #else
-	helper.draw_neons<render_layer::SENTIENCES>();
+	make_helper().draw_neons<render_layer::SENTIENCES>();
 #endif
 
-	helper.draw_neons<
+	make_helper().draw_neons<
 		render_layer::FLYING_BULLETS,
 		render_layer::WATER_COLOR_OVERLAYS,
 		render_layer::WATER_SURFACES,
@@ -455,12 +456,6 @@ void light_system::render_all_lights(const light_system_input in) const {
 		render_layer::AQUARIUM_BUBBLES
 	>();
 
-	particles.draw_particles(
-		drawing_in.manager,
-		in.plain_animations,
-		draw_particles_input { output, true },
-		particle_layer::NEONING_PARTICLES
-	);
 
 	in.neon_callback();
 

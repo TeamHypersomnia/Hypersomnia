@@ -15,9 +15,20 @@
 #include "view/viewables/all_viewables_declaration.h"
 #include "view/viewables/particle_effect.h"
 #include "view/audiovisual_state/special_effects_settings.h"
+#include "view/audiovisual_state/particle_triangle_buffers.h"
 
 class interpolation_system;
 struct randomization;
+
+struct integrate_and_draw_all_particles_input {
+	const cosmos& cosm;
+	const augs::delta dt;
+	const interpolation_system& interp;
+	const images_in_atlas_map& game_images;
+	const plain_animations_pool& anims;
+	const int max_particles_in_single_job;
+	particle_triangle_buffers& output;
+};
 
 class particles_simulation_system {
 public:
@@ -168,6 +179,7 @@ public:
 	void add_particle(const particle_layer, const entity_id, const homing_animated_particle&);
 
 	std::size_t count_all_particles() const;
+	std::size_t count_particles_on_layer(particle_layer) const;
 
 	template <class particle_type, class rng_type>
 	auto spawn_particle(
@@ -229,13 +241,6 @@ public:
 		return new_particle;
 	}
 
-	void integrate_all_particles(
-		const cosmos&,
-		augs::delta dt,
-		const plain_animations_pool& anims,
-		const interpolation_system&
-	);
-
 	void advance_visible_streams(
 		randomization& rng,
 		camera_cone,
@@ -255,25 +260,15 @@ public:
 		const special_effects_settings&
 	);
 
-	template <class M>
-	void draw_particles(
-		const M& manager,
-		const plain_animations_pool& anims,
-		const draw_particles_input input,
-		const particle_layer layer
-	) const {
-		for (const auto& it : general_particles[layer]) {
-			it.draw_as_sprite(manager, input);
-		}
+	template <class F>
+	void for_each_particle_in_range(
+		const cosmos& cosm,
+		const interpolation_system& interp,
+		int from,
+		int to,
+		F callback
+	);
 
-		for (const auto& it : animated_particles[layer]) {
-			it.draw_as_sprite(manager, anims, input);
-		}
-
-		for (const auto& cluster : homing_animated_particles[layer]) {
-			for (const auto& it : cluster.second) {
-				it.draw_as_sprite(manager, anims, input);
-			}
-		}
-	}
+	void integrate_and_draw_all_particles(integrate_and_draw_all_particles_input);
+	void remove_dead_particles(const cosmos& cosm);
 };

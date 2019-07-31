@@ -68,7 +68,7 @@ void draw_debug_details(
 
 	total_details += { typesafe_sprintf("Entities: %x\n", cosm.get_entities_count()), text_style };
 
-	if (viewed_character.alive()) {
+	if (false && viewed_character.alive()) {
 		if (const auto transform = viewed_character.find_logic_transform()) {
 			const auto coords = transform->pos;
 			const auto rot = transform->rotation;
@@ -187,7 +187,7 @@ void draw_debug_details(
 
 		total_details += { "Cosmos\n", category_style };
 
-		if (viewed_character.alive()) {
+		if (false && viewed_character.alive()) {
 			total_details += { viewed_character.get_cosmos().profiler.summary(), text_style };
 		}
 

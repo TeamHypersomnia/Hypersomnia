@@ -55,7 +55,7 @@ void arena_scoreboard_gui::draw_gui(
 	const auto content_pad = cfg.window_padding;
 	const auto cell_pad = cfg.player_row_inner_padding;
 
-	const auto& o = in.drawer;
+	const auto& o = in.get_drawer();
 
 	auto fmt = [&](const auto& text, const rgba col = white) {
 		return formatted_string(text, style(in.gui_fonts.gui, col));
@@ -249,8 +249,8 @@ void arena_scoreboard_gui::draw_gui(
 		o.base::aabb(img, orig, col);
 	};
 
-	augs::vertex_triangle_buffer avatar_triangles;
-	augs::vertex_triangle_buffer color_indicator_triangles;
+	auto& avatar_triangles = in.renderer.dedicated[augs::dedicated_triangle_buffer::AVATARS];
+	auto& color_indicator_triangles = in.renderer.dedicated[augs::dedicated_triangle_buffer::SCOREBOARD_COLOR_INDICATORS];
 
 	auto avatar_aabb_img = [&](auto img, auto orig, rgba col = white) {
 		orig.l += pen.x;
@@ -724,13 +724,13 @@ void arena_scoreboard_gui::draw_gui(
 
 	if (avatar_triangles.size() > 0) {
 		in.avatar_atlas->set_as_current(in.renderer);
-		in.renderer.call_triangles(std::move(avatar_triangles));
+		in.renderer.call_triangles(avatar_triangles);
 
 		augs::graphics::texture::set_current_to_previous(in.renderer);
 	}
 
 	if (color_indicator_triangles.size() > 0) {
-		in.renderer.call_triangles(std::move(color_indicator_triangles));
+		in.renderer.call_triangles(color_indicator_triangles);
 	}
 }
 

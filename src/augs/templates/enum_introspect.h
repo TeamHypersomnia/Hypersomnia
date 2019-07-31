@@ -48,21 +48,23 @@ namespace augs {
 		enum_to_args_impl(
 			Enum(),
 			[callback](const auto... all_enums) {
-				for (const auto _enum : { all_enums... }) {
+				auto perform = [callback](const Enum e) {
 					if constexpr(has_COUNT_v<Enum>) {
-						if (_enum == Enum::COUNT) {
-							continue;
+						if (e == Enum::COUNT) {
+							return;
 						}
 					}
 					
 					if constexpr(has_INVALID_v<Enum>) {
-						if (_enum == Enum::INVALID) {
-							continue;
+						if (e == Enum::INVALID) {
+							return;
 						}
 					}
-					
-					callback(_enum);
-				}
+
+					callback(e);
+				};
+
+				(perform(all_enums), ...);
 			}
 		);
 	}

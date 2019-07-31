@@ -30,7 +30,6 @@ void configuration_subscribers::apply(const config_lua_table& new_config) const 
 	DEBUG_DRAWING = new_config.debug_drawing;
 	
 	audio_context.apply(new_config.audio);
-	renderer.apply(new_config.renderer);
 }
 
 void configuration_subscribers::apply_main_thread(const augs::window_settings& settings) const {
@@ -1115,13 +1114,20 @@ void settings_gui_state::perform(
 					auto& scope_cfg = config.performance;
 
 					const auto concurrency = std::thread::hardware_concurrency();
+
+					text("Concurrent threads:");
+					ImGui::SameLine();
+					text_color(typesafe_sprintf("%x\n\n", concurrency), green);
+
+					revertable_slider(SCOPE_CFG_NVP(max_particles_in_single_job), 1000, 20000);
+
 					const auto t_max = static_cast<int>(concurrency);
 
-					text_disabled(typesafe_sprintf("(Value of 0 means to take a default of\nstd::clamp(concurrency - 1u, 1u, 5u), which equals %x)", performance_settings { 0, {} }.get_light_calculation_threads()));
-					text_disabled(typesafe_sprintf("(std::thread::hardware_concurrency() = %x)", concurrency));
+					text_disabled(typesafe_sprintf("(Value of 0 means to take a default of\nstd::clamp(concurrent_threads - 1u, 1u, 5u), which equals %x)", performance_settings { 0, {} }.get_light_calculation_threads()));
 
 					revertable_slider(SCOPE_CFG_NVP(light_calculation_threads), 0, t_max);
 				}
+
 				break;
 			}
 			case settings_pane::ADVANCED: {

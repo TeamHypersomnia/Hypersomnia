@@ -77,11 +77,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	const auto& cosm = viewed_character.get_cosmos();
 	
-	const auto& anims = cosm.get_logical_assets().plain_animations;
-
 	const auto& av = in.audiovisuals;
 	const auto& interp = av.get<interpolation_system>();
-	const auto& particles = av.get<particles_simulation_system>();
 	const auto& wandering_pixels = av.get<wandering_pixels_system>();
 	const auto& exploding_rings = av.get<exploding_ring_system>();
 	const auto& flying_numbers = av.get<flying_number_indicator_system>();
@@ -107,11 +104,17 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto blank = necessarys.at(assets::necessary_image_id::BLANK);
 	const auto& gui_font = in.gui_font;
 
-	const auto output = augs::drawer_with_default{ renderer.get_triangle_buffer(), blank };
-	const auto line_output = augs::line_drawer_with_default{ renderer.get_line_buffer(), blank };
+	auto get_drawer = [&]() {
+		return augs::drawer_with_default { renderer.get_triangle_buffer(), blank };
+	};
+
+	auto get_line_drawer = [&]() {
+		return augs::line_drawer_with_default{ renderer.get_line_buffer(), blank };
+	};
+
 	const auto viewed_character_transform = viewed_character ? viewed_character.find_viewing_transform(interp) : std::optional<transformr>();
 
-	const auto filtering = renderer.get_current_settings().default_filtering;
+	const auto filtering = in.renderer_settings.default_filtering;
 
 	auto bind_and_set_filter = [&](auto& tex) {
 		tex.set_as_current(renderer);
@@ -139,20 +142,15 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	renderer.clear_current_fbo();
 	renderer.set_additive_blending();
 	
-	const auto draw_particles_in = draw_particles_input{ output, false };
-
 	auto total_particles_scope = measure_scope_additive(profiler.particles_rendering);
 	auto total_layer_scope = measure_scope_additive(profiler.drawing_layers);
 
 	auto draw_particles = [&](const particle_layer layer) {
-		auto scope = measure_scope(total_particles_scope);
+		renderer.call_triangles(in.drawn_particles.diffuse[layer]);
+	};
 
-		particles.draw_particles(
-			game_images,
-			anims,
-			draw_particles_in,
-			layer
-		);
+	auto draw_particles_neons = [&]() {
+		renderer.call_triangles(in.drawn_particles.neons);
 	};
 
 	draw_particles(particle_layer::DIM_SMOKES);
@@ -184,16 +182,18 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		return c;
 	}();
 
-	const auto drawing_input = draw_renderable_input { 
-		{
-			output, 
-			game_images, 
-			global_time_seconds,
-			flip_flags(),
-			av.randomizing,
-			queried_cone
-		},
-		interp
+	auto make_drawing_input = [&]() {
+		return draw_renderable_input { 
+			{
+				get_drawer(), 
+				game_images, 
+				global_time_seconds,
+				flip_flags(),
+				av.randomizing,
+				queried_cone
+			},
+			interp
+		};
 	};
 
 	const bool fog_of_war_effective = 
@@ -280,6 +280,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		*shaders.textured_light, 
 		*shaders.standard, 
 		[&]() {
+			draw_particles_neons();
+
 			if (viewed_character) {
 				draw_crosshair_lasers({
 					[&](const vec2 from, const vec2 to, const rgba col) {
@@ -289,13 +291,13 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 						const vec2 edge_size = static_cast<vec2>(glow_edge_tex.get_original_size());
 
-						output.line(laser_glow, from, to, edge_size.y / 3.f, col);
+						get_drawer().line(laser_glow, from, to, edge_size.y / 3.f, col);
 
 						const auto edge_dir = (to - from).normalize();
 						const auto edge_offset = edge_dir * edge_size.x;
 
-						output.line(glow_edge_tex, to, to + edge_offset, edge_size.y / 3.f, col);
-						output.line(glow_edge_tex, from - edge_offset + edge_dir, from + edge_dir, edge_size.y / 3.f, col, flip_flags::make_horizontally());
+						get_drawer().line(glow_edge_tex, to, to + edge_offset, edge_size.y / 3.f, col);
+						get_drawer().line(glow_edge_tex, from - edge_offset + edge_dir, from + edge_dir, edge_size.y / 3.f, col, flip_flags::make_horizontally());
 					},
 					[](const vec2, const vec2, const rgba) {},
 					interp,
@@ -305,7 +307,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			}
 
 			draw_explosion_body_highlights({
-				output,
+				get_drawer(),
 				queried_cone,
 				interp,
 				cosm,
@@ -314,7 +316,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			});
 
 			draw_beep_lights({
-				output,
+				get_drawer(),
 				interp,
 				cosm,
 				cast_highlight
@@ -331,7 +333,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			shaders.standard->set_as_current(renderer);
 
 			exploding_rings.draw_highlights_of_rings(
-				output,
+				get_drawer(),
 				cast_highlight,
 				queried_cone
 			);
@@ -340,11 +342,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		cone,
 		fog_of_war_effective ? viewed_character : std::optional<entity_id>(),
 		in.camera_query_mult,
-		particles,
-		anims,
 		visible,
 		cast_highlight,
-		drawing_input,
+		make_drawing_input,
 		in.perf_settings
 	};
 
@@ -398,14 +398,16 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	set_shader_with_matrix(shaders.illuminated);
 
-	const auto helper = helper_drawer {
-		visible,
-		cosm,
-		drawing_input,
-		total_layer_scope
+	auto make_helper = [&]() {
+		return helper_drawer {
+			visible,
+			cosm,
+			make_drawing_input(),
+			total_layer_scope
+		};
 	};
 
-	helper.draw<
+	make_helper().draw<
 		render_layer::UNDER_GROUND,
 		render_layer::GROUND,
 		render_layer::FLOOR_AND_ROAD,
@@ -421,9 +423,13 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		render_layer::AQUARIUM_BUBBLES
 	>();
 
-	visible.for_each<render_layer::DIM_WANDERING_PIXELS>(cosm, [&](const auto e) {
-		draw_wandering_pixels_as_sprites(wandering_pixels, e, game_images, drawing_input.make_input_for<invariants::sprite>());
-	});
+	{
+		auto drawing_input = make_drawing_input();
+
+		visible.for_each<render_layer::DIM_WANDERING_PIXELS>(cosm, [&](const auto e) {
+			draw_wandering_pixels_as_sprites(wandering_pixels, e, game_images, drawing_input.make_input_for<invariants::sprite>());
+		});
+	}
 
 	renderer.call_and_clear_triangles();
 
@@ -433,7 +439,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	shaders.illuminated->set_as_current(renderer);
 
-	helper.draw<
+	make_helper().draw<
 		render_layer::WATER_COLOR_OVERLAYS,
 		render_layer::WATER_SURFACES,
 		render_layer::CAR_INTERIOR,
@@ -465,26 +471,32 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		renderer.set_stencil(true);
 		renderer.stencil_positive_test();
 
-		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
-			if (handle.get_official_faction() != viewed_character.get_official_faction()) {
-				::draw_border(handle, drawing_input, standard_border_provider);
-			}
-		});
+		{
+			auto drawing_input = make_drawing_input();
+
+			visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
+				if (handle.get_official_faction() != viewed_character.get_official_faction()) {
+					::draw_border(handle, drawing_input, standard_border_provider);
+				}
+			});
+		}
 
 		renderer.call_and_clear_triangles();
 		renderer.set_stencil(false);
 
-		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
+		auto drawing_input = make_drawing_input();
+
+		visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
 			if (handle.get_official_faction() == viewed_character.get_official_faction()) {
 				::draw_border(handle, drawing_input, standard_border_provider);
 			}
 		});
 	}
 	else {
-		helper.draw_border<render_layer::SENTIENCES>(standard_border_provider);
+		make_helper().draw_border<render_layer::SENTIENCES>(standard_border_provider);
 	}
 #else
-	helper.draw_border<render_layer::SENTIENCES>(standard_border_provider);
+	make_helper().draw_border<render_layer::SENTIENCES>(standard_border_provider);
 #endif
 
 	renderer.call_and_clear_triangles();
@@ -497,7 +509,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 				e.template dispatch_on_having_all<invariants::box_marker>([&](const auto typed_handle) { 
 					const auto where = typed_handle.get_logic_transform();
 					const auto& marker_alpha = markers.value;
-					::draw_area_indicator(typed_handle, line_output, where, marker_alpha, drawn_indicator_type::INGAME);
+					::draw_area_indicator(typed_handle, get_line_drawer(), where, marker_alpha, drawn_indicator_type::INGAME);
 				});
 			});
 		}
@@ -522,7 +534,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 							const auto& p = tr->pos;
 							const auto dash_len = 5.f;
 
-							line_output.dashed_circular_sector(
+							get_line_drawer().dashed_circular_sector(
 								p,
 								r,
 								col,
@@ -541,7 +553,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	shaders.illuminated->set_as_current(renderer);
 
-	helper.draw<
+	make_helper().draw<
 		render_layer::DYNAMIC_BODY,
 		render_layer::OVER_DYNAMIC_BODY,
 		render_layer::SMALL_DYNAMIC_BODY,
@@ -568,7 +580,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 		const auto fow_size = settings.fog_of_war.get_real_size();
 
-		output.aabb(
+		get_drawer().aabb(
 			ltrb::center_and_size(viewed_character_transform->pos, fow_size),
 			appearance.overlay_color
 		);
@@ -580,29 +592,35 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 		shaders.illuminated->set_as_current(renderer);
 
-		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
-			if (handle.get_official_faction() != viewed_character.get_official_faction()) {
-				::draw_entity(handle, drawing_input);
-			}
-		});
+		{
+			auto drawing_input = make_drawing_input();
+
+			visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
+				if (handle.get_official_faction() != viewed_character.get_official_faction()) {
+					::draw_entity(handle, drawing_input);
+				}
+			});
+		}
 
 		renderer.call_and_clear_triangles();
 		renderer.set_stencil(false);
 
-		helper.visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
+		auto drawing_input = make_drawing_input();
+
+		visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
 			if (handle.get_official_faction() == viewed_character.get_official_faction()) {
 				::draw_entity(handle, drawing_input);
 			}
 		});
 	}
 	else {
-		helper.draw<render_layer::SENTIENCES>();
+		make_helper().draw<render_layer::SENTIENCES>();
 	}
 #else
-	helper.draw<render_layer::SENTIENCES>();
+	make_helper().draw<render_layer::SENTIENCES>();
 #endif
 
-	helper.draw<
+	make_helper().draw<
 		render_layer::INSECTS,
 		render_layer::OVER_SENTIENCES
 	>();
@@ -620,7 +638,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	shaders.standard->set_as_current(renderer);
 	
-	helper.draw<
+	make_helper().draw<
 		render_layer::FLYING_BULLETS,
 		render_layer::NEON_CAPTIONS
 	>();
@@ -628,6 +646,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	if (settings.draw_crosshairs) {
 		auto draw_crosshair = [&](const auto it) {
 			if (const auto s = it.find_crosshair_def()) {
+				auto drawing_input = make_drawing_input();
 				auto sprite_in = drawing_input.make_input_for<invariants::sprite>();
 
 				sprite_in.global_time_seconds = global_time_seconds;
@@ -660,8 +679,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		const auto laser = necessarys.at(assets::necessary_image_id::LASER);
 		
 		draw_crosshair_lasers({
-			line_output_wrapper { line_output, laser },
-			dashed_line_output_wrapper  { line_output, laser, 10.f, 40.f, global_time_seconds },
+			line_output_wrapper { get_line_drawer(), laser },
+			dashed_line_output_wrapper  { get_line_drawer(), laser, 10.f, 40.f, global_time_seconds },
 			interp, 
 			viewed_character,
 			in.pre_step_crosshair_displacement
@@ -673,9 +692,14 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	draw_particles(particle_layer::NEONING_PARTICLES);
 	draw_particles(particle_layer::ILLUMINATING_PARTICLES);
 
-	visible.for_each<render_layer::ILLUMINATING_WANDERING_PIXELS>(cosm, [&](const auto e) {
-		draw_wandering_pixels_as_sprites(wandering_pixels, e, game_images, drawing_input.make_input_for<invariants::sprite>());
-	});
+	{
+		auto drawing_input = make_drawing_input();
+
+		visible.for_each<render_layer::ILLUMINATING_WANDERING_PIXELS>(cosm, [&](const auto e) {
+			draw_wandering_pixels_as_sprites(wandering_pixels, e, game_images, drawing_input.make_input_for<invariants::sprite>());
+		});
+	}
+
 
 	renderer.call_and_clear_triangles();
 
@@ -685,7 +709,11 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		set_uniform(shaders.circular_bars, U::texture_center, tex.get_center());
 	};
 
-	draw_sentiences_hud_output sentiences_hud;
+	using D = augs::dedicated_triangle_buffer;
+
+	auto& nicknames_output = renderer.dedicated[D::NICKNAMES];
+	auto& health_numbers_output = renderer.dedicated[D::HEALTH_NUMBERS];
+	auto& indicators_output = renderer.dedicated[D::INDICATORS];
 
 	if (viewed_character) {
 		auto make_input_for = [&](const auto& tex_type, const auto meter) {
@@ -705,11 +733,14 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			sentience_queried_cone.eye.zoom *= 0.8f;
 
 			return draw_sentiences_hud_input {
+				nicknames_output,
+				health_numbers_output,
+				indicators_output,
 				cone,
 				sentience_queried_cone,
 				visible,
 				settings,
-				output,
+				get_drawer(),
 				renderer.get_special_buffer(),
 				cosm,
 				viewed_character,
@@ -740,7 +771,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 		int current_circle = 0;
 
-		sentiences_hud = draw_sentiences_hud(
+		draw_sentiences_hud(
 			make_input_for(
 				circles[current_circle++], 
 				meter_id::of<health_meter_instance>()
@@ -779,7 +810,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			set_center_uniform(tex);
 
 			draw_hud_for_explosives({
-				output,
+				get_drawer(),
 				renderer.get_special_buffer(),
 				settings,
 				interp,
@@ -812,14 +843,14 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	set_shader_with_non_zoomed_matrix(shaders.standard);
 
 	if (settings.draw_nicknames) {
-		renderer.call_triangles(std::move(sentiences_hud.nicknames));
+		renderer.call_triangles(nicknames_output);
 	}
 
 	if (settings.draw_health_numbers) {
-		renderer.call_triangles(std::move(sentiences_hud.health_numbers));
+		renderer.call_triangles(health_numbers_output);
 	}
 
-	renderer.call_triangles(std::move(sentiences_hud.indicators));
+	renderer.call_triangles(indicators_output);
 
 	if (settings.draw_tactical_indicators.is_enabled) {
 		const auto alpha = settings.draw_tactical_indicators.value;
@@ -840,7 +871,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			const auto& tex = special.offscreen_tex;
 
 			::draw_offscreen_indicator(
-				output,
+				get_drawer(),
 				settings.draw_offscreen_indicators,
 				special.draw_onscreen,
 				col,
@@ -867,14 +898,14 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 					const auto where = typed_handle.get_logic_transform();
 					const auto& callout_alpha = callouts.value;
 
-					::draw_area_indicator(typed_handle, line_output, where, callout_alpha, drawn_indicator_type::INGAME);
+					::draw_area_indicator(typed_handle, get_line_drawer(), where, callout_alpha, drawn_indicator_type::INGAME);
 
 					using namespace augs::gui::text;
 
 					const auto& callout_name = typed_handle.get_name();
 
 					print_stroked(
-						output,
+						get_drawer(),
 						cone.to_screen_space(typed_handle.get_logic_transform().pos),
 						formatted_string { callout_name, { gui_font, white } },
 						{ augs::ralign::CX, augs::ralign::CY }
@@ -895,7 +926,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 			const auto indicator_pos = augs::get_screen_pos_from_offset(screen_size, settings.radar_pos); 
 
 			print_stroked(
-				output,
+				get_drawer(),
 				indicator_pos,
 				formatted_string { name, { gui_font, yellow } }
 			);
@@ -907,7 +938,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	set_shader_with_matrix(shaders.exploding_rings);
 
 	exploding_rings.draw_rings(
-		output,
+		get_drawer(),
 		renderer.get_special_buffer(),
 		queried_cone
 	);
@@ -916,14 +947,17 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	shaders.pure_color_highlight->set_as_current(renderer);
 
-	highlights.draw_highlights(cosm, drawing_input);
+	{
+		auto drawing_input = make_drawing_input();
+		highlights.draw_highlights(cosm, drawing_input);
 
-	for (const auto& h : additional_highlights) {
-		draw_color_highlight(cosm[h.id], h.col, drawing_input);
+		for (const auto& h : additional_highlights) {
+			draw_color_highlight(cosm[h.id], h.col, drawing_input);
+		}
 	}
 
 	thunders.draw_thunders(
-		line_output,
+		get_line_drawer(),
 		queried_cone
 	);
 
@@ -934,7 +968,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	flying_numbers.draw_numbers(
 		gui_font,
-		output, 
+		get_drawer(), 
 		cone
 	);
 

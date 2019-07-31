@@ -6,6 +6,27 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- drawing particles depends on completion of multiple jobs. we might want to have a more complex system here
+	- Simpler solution: let a single posted job do:
+		- create n jobs for the particles
+		- join in the effort until last completed?
+		- the same thread posts a rendering job
+	- however, after processing 2k particles, we can post a job to render them right away
+		- why not make a job do both? process a range of particles and then draw the same range!
+	- we'll need to avoid races on output particle triangle vector
+		- so let's preallocate a vector with the target number of particles
+
+- setting: split particle jobs once every n particles
+
+- Thread pools
+	- The game loop
+		- Setup posts a job to complete n steps
+	- Interpolation, particles, sound, drawing layers, all these can be calculated independently
+		- Actually they all need to join before illuminated rendering, or just before their respective layers
+	- Game gui too can be drawn independently
+	- Start with std::async?
+		- Actually some nice interface for completion could come in handy
+
 - WARNING! Interpolation should be run before parallelizing other systems because it might affect transforms!
 
 - If the render thread sleeps, we would've been able to use it to speed up the frame preparation in jobs system
@@ -65,15 +86,6 @@ summary: That which we are brainstorming at the moment.
 	- Can record without performance hit
 	- Can later record in highest quality only the highlights
 	- Fun moments will never be lost
-
-- Thread pools
-	- The game loop
-		- Setup posts a job to complete n steps
-	- Interpolation, particles, sound, drawing layers, all these can be calculated independently
-		- Actually they all need to join before illuminated rendering, or just before their respective layers
-	- Game gui too can be drawn independently
-	- Start with std::async?
-		- Actually some nice interface for completion could come in handy
 
 - We can automatically record demos for every server session
 	- Demos could just be network messages applied at step x

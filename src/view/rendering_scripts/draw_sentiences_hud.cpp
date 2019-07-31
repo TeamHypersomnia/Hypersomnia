@@ -25,7 +25,7 @@
 
 using namespace augs::gui::text;
 
-draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input in) {
+void draw_sentiences_hud(const draw_sentiences_hud_input in) {
 	const auto& visible_entities = in.all;
 	const auto& cosm = in.cosm;
 	const auto& interp = in.interpolation;
@@ -47,17 +47,16 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 	const auto timestamp_ms = static_cast<unsigned>(in.global_time_seconds * 1000);
 	const auto circle_radius = static_cast<int>(in.circular_bar_tex.get_original_size().x / 2);
 
-	draw_sentiences_hud_output out;
+	auto indicators_output = augs::drawer { in.indicators };
 
 	auto draw_sentience = [&](const auto& v) {
 		if (const auto* const sentience = v.template find<components::sentience>()) {
 			const bool is_enemy = !viewer_faction_matches(v);
-			auto indicators_output = augs::drawer { out.indicators };
 
 			if (is_enemy) {
 				const auto& danger_indicators = in.settings.draw_danger_indicators;
 
-				if (danger_indicators.is_enabled) {
+				if (in.draw_other_indicators && danger_indicators.is_enabled) {
 					const auto show_danger_secs = in.settings.show_danger_indicator_for_seconds;
 					const auto fade_danger_secs = in.settings.fade_danger_indicator_for_seconds;
 
@@ -305,7 +304,7 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 					//health_points.pos = screen_space_circle_center + vec2::from_degrees(in.angle).set_length(circle_displacement_length);
 
 					augs::gui::text::print_stroked(
-						augs::drawer { info.is_nickname ? out.nicknames : out.health_numbers },
+						augs::drawer { info.is_nickname ? in.nicknames : in.health_numbers },
 						text_pos,
 						text
 					);
@@ -327,7 +326,7 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 
 			auto col = sentience->last_assigned_color;
 
-			if (indicators_enabled && (is_conscious || koed_recently) && col.a > 0) {
+			if (in.draw_other_indicators && indicators_enabled && (is_conscious || koed_recently) && col.a > 0) {
 				const auto cam = in.text_camera;
 				const vec2i screen_space_circle_center = cam.to_screen_space(transform.pos);
 				const auto angle = starting_health_angle + in.color_indicator_angle;
@@ -413,6 +412,4 @@ draw_sentiences_hud_output draw_sentiences_hud(const draw_sentiences_hud_input i
 	else {
 		visible_entities.for_each<render_layer::SENTIENCES>(cosm, draw_sentience);
 	}
-
-	return out;
 }
