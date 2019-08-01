@@ -10,6 +10,7 @@
 #include "view/audiovisual_state/systems/exploding_ring_system.h"
 #include "view/audiovisual_state/systems/particles_simulation_system.h"
 #include "view/audiovisual_state/special_effects_settings.h"
+#include "view/viewables/particle_types.hpp"
 
 void exploding_ring_system::clear() {
 	rings.clear();

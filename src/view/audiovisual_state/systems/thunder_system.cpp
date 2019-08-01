@@ -14,6 +14,7 @@
 
 #include "view/audiovisual_state/systems/particles_simulation_system.h"
 #include "view/audiovisual_state/systems/thunder_system.h"
+#include "view/viewables/particle_types.hpp"
 
 void thunder_system::clear() {
 	thunders.clear();
