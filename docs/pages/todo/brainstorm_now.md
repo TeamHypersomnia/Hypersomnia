@@ -6,9 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-
 - Task dependency graph
 	- The particles don't have to be completed before illuminated rendering - just preallocate the buffers so that the pointer values don't change
+	- Separate renderer for game gui
+	- Separate renderer for post-game gui
 
 
 - The multithreaded model

@@ -363,6 +363,23 @@ void particles_simulation_system::remove_dead_particles(const cosmos& cosm) {
 	}
 }
 
+void particles_simulation_system::preallocate_particle_buffers(particle_triangle_buffers& buffers) const {
+	augs::for_each_enum_except_bounds([&](const particle_layer p) {
+		const auto total_on_layer = count_particles_on_layer(p);
+		const auto total_triangles_on_layer = total_on_layer * 2;
+
+		{
+			auto& target_buffer = buffers.diffuse[p];
+			target_buffer.resize(total_triangles_on_layer);
+		}
+
+		if (p == particle_layer::NEONING_PARTICLES) {
+			auto& target_buffer = buffers.neons;
+			target_buffer.resize(total_triangles_on_layer);
+		}
+	});
+}
+
 void particles_simulation_system::integrate_and_draw_all_particles(const integrate_and_draw_all_particles_input in) {
 
 	/* 
@@ -371,6 +388,7 @@ void particles_simulation_system::integrate_and_draw_all_particles(const integra
 	*/
 
 	remove_dead_particles(in.cosm);
+	preallocate_particle_buffers(in.output);
 
 	const auto delta = in.dt.in_seconds();
 
@@ -450,21 +468,6 @@ void particles_simulation_system::integrate_and_draw_all_particles(const integra
 			generic_draw
 		);
 	};
-
-	augs::for_each_enum_except_bounds([&](const particle_layer p) {
-		const auto total_on_layer = count_particles_on_layer(p);
-		const auto total_triangles_on_layer = total_on_layer * 2;
-
-		{
-			auto& target_buffer = in.output.diffuse[p];
-			target_buffer.resize(total_triangles_on_layer);
-		}
-
-		if (p == particle_layer::NEONING_PARTICLES) {
-			auto& target_buffer = in.output.neons;
-			target_buffer.resize(total_triangles_on_layer);
-		}
-	});
 
 	const auto total_n = static_cast<int>(count_all_particles());
 

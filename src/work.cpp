@@ -357,7 +357,7 @@ and then hitting Save settings.
 	};
 
 	// temporary
-	static auto& renderer = write_buffer.renderers.general;
+	static auto& general_renderer = write_buffer.renderers.all[renderer_type::GENERAL];
 
 	LOG_NVPS(renderer_backend.get_max_texture_size());
 
@@ -369,7 +369,7 @@ and then hitting Save settings.
 
 	LOG("Initializing the necessary shaders.");
 	static all_necessary_shaders necessary_shaders(
-		renderer,
+		general_renderer,
 		"content/necessary/shaders",
 		"content/necessary/shaders",
 		config.drawing
@@ -394,7 +394,7 @@ and then hitting Save settings.
 		window,
 		necessary_fbos,
 		audio,
-		renderer
+		general_renderer
 	};
 
 	static atlas_profiler atlas_performance;
@@ -439,9 +439,9 @@ and then hitting Save settings.
 		return streaming.necessary_images_in_atlas[assets::necessary_image_id::BLANK];
 	};
 
-	static auto get_drawer = [&]() { 
+	static auto get_drawer_for = [&](augs::renderer& chosen_renderer) { 
 		return augs::drawer_with_default {
-			renderer.get_triangle_buffer(),
+			chosen_renderer.get_triangle_buffer(),
 			get_blank_texture()
 		};
 	};
@@ -538,7 +538,7 @@ and then hitting Save settings.
 			config.gui_fonts,
 			config.content_regeneration,
 			get_unofficial_content_dir(),
-			renderer,
+			general_renderer,
 			renderer_backend.get_max_texture_size(),
 
 			new_player_metas
@@ -647,7 +647,7 @@ and then hitting Save settings.
 	static auto perform_start_client = [](const auto frame_num) {
 		const bool perform_result = start_client_gui.perform(
 			frame_num,
-			renderer, 
+			general_renderer, 
 			streaming.avatar_preview_tex, 
 			window, 
 			config.default_client_start, 
@@ -1033,7 +1033,7 @@ and then hitting Save settings.
 	};
 
 	static auto setup_pre_solve = [&](auto...) {
-		renderer.save_debug_logic_step_lines_for_interpolation(DEBUG_LOGIC_STEP_LINES);
+		general_renderer.save_debug_logic_step_lines_for_interpolation(DEBUG_LOGIC_STEP_LINES);
 		DEBUG_LOGIC_STEP_LINES.clear();
 	};
 
@@ -1772,7 +1772,7 @@ and then hitting Save settings.
 				streaming.finalize_load({
 					get_current_frame_num(),
 					new_viewing_config.debug.measure_atlas_uploading,
-					renderer,
+					general_renderer,
 					get_audiovisuals().get<sound_system>()
 				});
 			};
@@ -1790,7 +1790,7 @@ and then hitting Save settings.
 				advance_current_setup(frame_delta, with_result);
 			};
 
-			auto create_viewing_game_gui_context = [&](const config_lua_table& viewing_config) {
+			auto create_viewing_game_gui_context = [&](augs::renderer& chosen_renderer, const config_lua_table& viewing_config) {
 				return viewing_game_gui_context {
 					make_create_game_gui_context(viewing_config)(),
 
@@ -1801,29 +1801,29 @@ and then hitting Save settings.
 						viewing_config.drawing,
 						viewing_config.inventory_gui_controls,
 						get_camera_eye(),
-						get_drawer()
+						get_drawer_for(chosen_renderer)
 					}
 				};
 			};
 
 			/* View lambdas */ 
 
-			auto setup_the_first_fbo = [&]() {
-				renderer.set_viewport({ vec2i{0, 0}, screen_size });
+			auto setup_the_first_fbo = [&](augs::renderer& chosen_renderer) {
+				chosen_renderer.set_viewport({ vec2i{0, 0}, screen_size });
 
 				const bool rendering_flash_afterimage = gameplay_camera.is_flash_afterimage_requested();
 
 				if (rendering_flash_afterimage) {
-					necessary_fbos.flash_afterimage->set_as_current(renderer);
+					necessary_fbos.flash_afterimage->set_as_current(chosen_renderer);
 				}
 				else {
-					augs::graphics::fbo::set_current_to_none(renderer);
+					augs::graphics::fbo::set_current_to_none(chosen_renderer);
 				}
 
-				renderer.clear_current_fbo();
+				chosen_renderer.clear_current_fbo();
 			};
 
-			auto draw_debug_lines = [&](const auto& new_viewing_config) {
+			auto draw_debug_lines = [&](augs::renderer& chosen_renderer, const config_lua_table& new_viewing_config) {
 				if (DEBUG_DRAWING.enabled) {
 					auto scope = measure_scope(frame_performance.debug_lines);
 
@@ -1831,28 +1831,26 @@ and then hitting Save settings.
 
 					::draw_debug_lines(
 						viewed_character.get_cosmos(),
-						renderer,
+						chosen_renderer,
 						get_interpolation_ratio(),
-						get_drawer().default_texture,
+						get_drawer_for(chosen_renderer).default_texture,
 						new_viewing_config,
 						get_camera_cone()
 					);
 				}
 			};
 
-			auto setup_standard_projection = [&]() {
-				necessary_shaders.standard->set_projection(renderer, augs::orthographic_projection(vec2(screen_size)));
+			auto setup_standard_projection = [&](augs::renderer& chosen_renderer) {
+				necessary_shaders.standard->set_projection(chosen_renderer, augs::orthographic_projection(vec2(screen_size)));
 			};
 
-			auto draw_game_gui = [&](const config_lua_table& viewing_config) {
-				if (should_draw_game_gui()) {
-					auto scope = measure_scope(frame_performance.draw_game_gui);
+			auto draw_game_gui = [&](augs::renderer& chosen_renderer, const config_lua_table& viewing_config) {
+				auto scope = measure_scope(frame_performance.draw_game_gui);
 
-					game_gui.world.draw(create_viewing_game_gui_context(viewing_config));
-				}
+				game_gui.world.draw(create_viewing_game_gui_context(chosen_renderer, viewing_config));
 			};
 
-			auto draw_mode_and_setup_custom_gui = [&](const auto& new_viewing_config) {
+			auto draw_mode_and_setup_custom_gui = [&](augs::renderer& chosen_renderer, const config_lua_table& new_viewing_config) {
 				auto scope = measure_scope(frame_performance.draw_setup_custom_gui);
 
 				const auto player_metas = visit_current_setup([&](auto& setup) {
@@ -1870,7 +1868,7 @@ and then hitting Save settings.
 						std::addressof(streaming.avatar_atlas),
 						streaming.images_in_atlas,
 						streaming.avatars_in_atlas,
-						renderer,
+						chosen_renderer,
 						common_input_state.mouse.pos,
 						screen_size,
 						streaming.get_loaded_gui_fonts(),
@@ -1878,21 +1876,25 @@ and then hitting Save settings.
 						player_metas
 					});
 
-					renderer.call_and_clear_lines();
+					chosen_renderer.call_and_clear_lines();
 				});
 			};
 
-			auto fallback_overlay_gray_color = [&]() {
-				streaming.general_atlas.set_as_current(renderer);
+			auto fallback_overlay_gray_color = [&](augs::renderer& chosen_renderer) {
+				streaming.general_atlas.set_as_current(chosen_renderer);
 
-				necessary_shaders.standard->set_as_current(renderer);
-				setup_standard_projection();
+				necessary_shaders.standard->set_as_current(chosen_renderer);
+				setup_standard_projection(chosen_renderer);
 
-				get_drawer().color_overlay(screen_size, darkgray);
+				get_drawer_for(chosen_renderer).color_overlay(screen_size, darkgray);
 			};
 
-			auto draw_and_choose_menu_cursor = [&](auto&& create_menu_context) {
+			auto draw_and_choose_menu_cursor = [&](augs::renderer& chosen_renderer, auto&& create_menu_context) {
 				auto scope = measure_scope(frame_performance.menu_gui);
+
+				auto get_drawer = [&]() {
+					return get_drawer_for(chosen_renderer);
+				};
 
 				if (has_current_setup()) {
 					if (ingame_menu.show) {
@@ -1926,9 +1928,13 @@ and then hitting Save settings.
 				}
 			};
 
-			auto draw_non_menu_cursor = [&](const config_lua_table& viewing_config, const assets::necessary_image_id menu_chosen_cursor) {
+			auto draw_non_menu_cursor = [&](augs::renderer& chosen_renderer, const config_lua_table& viewing_config, const assets::necessary_image_id menu_chosen_cursor) {
 				const bool should_draw_our_cursor = viewing_config.window.raw_mouse_input && !window.is_mouse_pos_paused();
 				const auto cursor_drawing_pos = common_input_state.mouse.pos;
+
+				auto get_drawer = [&]() {
+					return get_drawer_for(chosen_renderer);
+				};
 
 				if (ImGui::GetIO().WantCaptureMouse) {
 					if (should_draw_our_cursor) {
@@ -1946,7 +1952,7 @@ and then hitting Save settings.
 					if (get_viewed_character()) {
 						const auto& character_gui = game_gui.get_character_gui(get_game_gui_subject());
 
-						character_gui.draw_cursor_with_tooltip(create_viewing_game_gui_context(viewing_config), should_draw_our_cursor);
+						character_gui.draw_cursor_with_tooltip(create_viewing_game_gui_context(chosen_renderer, viewing_config), should_draw_our_cursor);
 					}
 				}
 				else {
@@ -1960,7 +1966,7 @@ and then hitting Save settings.
 				}
 			};
 
-			auto perform_illuminated_rendering = [&](const config_lua_table& viewing_config) {
+			auto perform_illuminated_rendering = [&](augs::renderer& chosen_renderer, const config_lua_table& viewing_config) {
 				auto scope = measure_scope(frame_performance.rendering_script);
 
 				thread_local std::vector<additional_highlight> highlights;
@@ -2009,7 +2015,7 @@ and then hitting Save settings.
 					streaming.get_loaded_gui_fonts().gui,
 					streaming.images_in_atlas,
 					get_interpolation_ratio(),
-					renderer,
+					chosen_renderer,
 					frame_performance,
 					std::addressof(streaming.general_atlas),
 					necessary_fbos,
@@ -2024,12 +2030,12 @@ and then hitting Save settings.
 				});
 			};
 
-			auto draw_call_imgui = [&]() {
-				renderer.call_and_clear_triangles();
+			auto draw_call_imgui = [&](augs::renderer& chosen_renderer) {
+				chosen_renderer.call_and_clear_triangles();
 
 				auto scope = measure_scope(frame_performance.imgui);
 
-				renderer.draw_call_imgui(
+				chosen_renderer.draw_call_imgui(
 					imgui_atlas, 
 					std::addressof(streaming.general_atlas), 
 					std::addressof(streaming.avatar_atlas), 
@@ -2037,14 +2043,18 @@ and then hitting Save settings.
 				);
 			};
 
-			auto do_flash_afterimage = [&]() {
+			auto do_flash_afterimage = [&](augs::renderer& chosen_renderer) {
 				const auto flash_mult = gameplay_camera.get_effective_flash_mult();
 				const bool rendering_flash_afterimage = gameplay_camera.is_flash_afterimage_requested();
 
 				const auto viewed_character = get_viewed_character();
 
+				auto get_drawer = [&]() {
+					return get_drawer_for(chosen_renderer);
+				};
+
 				::handle_flash_afterimage(
-					renderer,
+					chosen_renderer,
 					necessary_shaders,
 					necessary_fbos,
 					streaming.general_atlas,
@@ -2056,18 +2066,22 @@ and then hitting Save settings.
 				);
 			};
 
-			auto measure_num_drawn_triangles = [&]() {
-				frame_performance.num_triangles.measure(renderer.extract_num_total_triangles_drawn());
+			auto extract_num_total_drawn_triangles = []() {
+				return write_buffer.renderers.extract_num_total_triangles_drawn();
 			};
 
-			auto show_developer_details = [&](const config_lua_table& viewing_config) {
+			auto measure_num_drawn_triangles = [&]() {
+				frame_performance.num_triangles.measure(extract_num_total_drawn_triangles());
+			};
+
+			auto show_developer_details = [&](augs::renderer& chosen_renderer, const config_lua_table& viewing_config) {
 				if (viewing_config.session.show_developer_console) {
 					auto scope = measure_scope(frame_performance.debug_details);
 
 					const auto viewed_character = get_viewed_character();
 
 					draw_debug_details(
-						get_drawer(),
+						get_drawer_for(chosen_renderer),
 						streaming.get_loaded_gui_fonts().gui,
 						screen_size,
 						viewed_character,
@@ -2084,16 +2098,15 @@ and then hitting Save settings.
 			};
 
 			auto finalize_frame_and_swap = [&]() {
-				renderer.call_and_clear_triangles();
+				for (auto& r : write_buffer.renderers.all) {
+					r.call_and_clear_triangles();
+				}
 
-				/* Don't count the debug details */
-				renderer.extract_num_total_triangles_drawn();
+				measure_num_drawn_triangles();
 
 				buffer_swapper.wait_swap();
 
-				write_buffer.renderers.general.next_frame();
-				write_buffer.renderers.game_gui.next_frame();
-
+				write_buffer.renderers.next_frame();
 				write_buffer.particle_buffers.clear();
 			};
 
@@ -2118,16 +2131,6 @@ and then hitting Save settings.
 
 			auto create_menu_context = make_create_menu_context(new_viewing_config);
 			auto create_game_gui_context = make_create_game_gui_context(new_viewing_config);
-
-			/*
-				Game GUI might have been altered by the step's post-solve,
-				therefore we need to rebuild its layouts (and from them, the tree data)
-				for immediate visual response.
-			*/
-
-			if (should_draw_game_gui()) {
-				advance_game_gui(create_game_gui_context(), frame_delta);
-			}
 
 			/* 
 				What follows is strictly view part,
@@ -2170,17 +2173,22 @@ and then hitting Save settings.
 
 			auto frame = measure_scope(frame_performance.total);
 
-			setup_the_first_fbo();
+			setup_the_first_fbo(general_renderer);
 
 			const auto viewed_character = get_viewed_character();
+			const bool non_zero_cosmos = std::addressof(viewed_character.get_cosmos()) != std::addressof(cosmos::zero);
 
-			if (std::addressof(viewed_character.get_cosmos()) != std::addressof(cosmos::zero)) {
+			auto& game_gui_renderer = write_buffer.renderers.all[renderer_type::GAME_GUI];
+			auto& post_game_gui_renderer = write_buffer.renderers.all[renderer_type::POST_GAME_GUI];
+			auto& debug_details_renderer = write_buffer.renderers.all[renderer_type::DEBUG_DETAILS];
+
+			if (non_zero_cosmos) {
 				/* #1 */
-				perform_illuminated_rendering(new_viewing_config);
+				perform_illuminated_rendering(general_renderer, new_viewing_config);
 				/* #2 */
-				draw_debug_lines(new_viewing_config);
+				draw_debug_lines(general_renderer, new_viewing_config);
 
-				setup_standard_projection();
+				setup_standard_projection(general_renderer);
 
 				/*
 					Illuminated rendering leaves the renderer in a state
@@ -2190,28 +2198,38 @@ and then hitting Save settings.
 				*/
 
 				/* #3 */
-				draw_game_gui(new_viewing_config);
 
-				/* #4 */
-				draw_mode_and_setup_custom_gui(new_viewing_config);
-			}
-			else {
-				fallback_overlay_gray_color();
+				if (should_draw_game_gui()) {
+					advance_game_gui(create_game_gui_context(), frame_delta);
+					draw_game_gui(game_gui_renderer, new_viewing_config);
+				}
 			}
 
-			/* #5 */
-			const auto menu_chosen_cursor = draw_and_choose_menu_cursor(create_menu_context);
+			auto post_game_gui = [&]() {
+				auto& chosen_renderer = post_game_gui_renderer;
 
-			/* #6 */
-			draw_call_imgui();
+				if (non_zero_cosmos) {
+					/* #4 */
+					draw_mode_and_setup_custom_gui(chosen_renderer, new_viewing_config);
+				}
+				else {
+					fallback_overlay_gray_color(chosen_renderer);
+				}
 
-			/* #7 */
-			draw_non_menu_cursor(new_viewing_config, menu_chosen_cursor);
+				/* #5 */
+				const auto menu_chosen_cursor = draw_and_choose_menu_cursor(chosen_renderer, create_menu_context);
 
-			do_flash_afterimage();
+				/* #6 */
+				draw_call_imgui(chosen_renderer);
 
-			measure_num_drawn_triangles();
-			show_developer_details(new_viewing_config);
+				/* #7 */
+				draw_non_menu_cursor(chosen_renderer, new_viewing_config, menu_chosen_cursor);
+
+				do_flash_afterimage(chosen_renderer);
+			};
+
+			post_game_gui();
+			show_developer_details(debug_details_renderer, new_viewing_config);
 			finalize_frame_and_swap();
 		}
 	};
@@ -2241,15 +2259,12 @@ and then hitting Save settings.
 		{
 			auto scope = measure_scope(performance.renderer_commands);
 
-			auto perform_commands_of = [&](auto& r) {
+			for (auto& r : read_buffer.renderers.all) {
 				renderer_backend.perform(
 					r.commands.data(),
 					r.commands.size()
 				);
-			};
-
-			perform_commands_of(read_buffer.renderers.general);
-			perform_commands_of(read_buffer.renderers.game_gui);
+			}
 
 			current_frame.fetch_add(1, std::memory_order_relaxed);
 		}

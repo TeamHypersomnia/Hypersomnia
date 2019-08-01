@@ -6,9 +6,39 @@
 #include "game/enums/particle_layer.h"
 #include "view/audiovisual_state/particle_triangle_buffers.h"
 
+enum class renderer_type {
+	// GEN INTROSPECTOR enum class renderer_type
+	GENERAL,
+	GAME_GUI,
+	POST_GAME_GUI,
+	DEBUG_DETAILS,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
 struct all_game_renderers {
-	augs::renderer general;
-	augs::renderer game_gui;
+	augs::enum_array<augs::renderer, renderer_type> all;
+
+	void next_frame() {
+		for (auto& a : all) {
+			a.next_frame();
+		}
+	}
+
+	std::size_t extract_num_total_triangles_drawn() {
+		std::size_t total = 0;
+
+		augs::for_each_enum_except_bounds([&](const renderer_type t) {
+			if (t == renderer_type::DEBUG_DETAILS) {
+				return;
+			}
+
+			total += all[t].extract_num_total_triangles_drawn();
+		});
+
+		return total;
+	}
 };
 
 struct game_frame_buffer {

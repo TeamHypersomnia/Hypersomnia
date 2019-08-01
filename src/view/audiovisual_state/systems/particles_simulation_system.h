@@ -269,6 +269,7 @@ public:
 		F callback
 	);
 
+	void preallocate_particle_buffers(particle_triangle_buffers&) const;
 	void integrate_and_draw_all_particles(integrate_and_draw_all_particles_input);
 	void remove_dead_particles(const cosmos& cosm);
 };
