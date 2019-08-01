@@ -60,9 +60,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 
 	interp.id_to_integerize = viewed_character;
 
-	thunders.advance(rng, cosm, cone, input.particle_effects, dt, particles);
-
-	{
+	auto advance_exploding_rings = [&]() {
 		auto cone_for_explosion_particles = cone;
 		cone_for_explosion_particles.eye.zoom *= 0.9f;
 
@@ -75,47 +73,44 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			input.performance.special_effects.explosions,
 			particles
 		);
-	}
+	};
 
-	flying_numbers.advance(dt);
-	highlights.advance(dt);
+	auto integrate_and_draw_all_particles = [&]() {
+		auto scope = measure_scope(performance.integrate_particles);
 
-	{
-		{
-			auto scope = measure_scope(performance.integrate_particles);
+		particles.integrate_and_draw_all_particles({
+			cosm,
+			dt,
+			interp,
+			input.game_images,
+			anims,
+			input.performance.max_particles_in_single_job,
+			input.particles_output
+		});
 
-			particles.integrate_and_draw_all_particles({
-				cosm,
-				dt,
-				interp,
-				input.game_images,
-				anims,
-				input.performance.max_particles_in_single_job,
-				input.particles_output
-			});
+		performance.num_particles.measure(particles.count_all_particles());
+	};
 
-			performance.num_particles.measure(particles.count_all_particles());
-		}
+	auto advance_visible_particle_streams = [&]() {
+		auto scope = measure_scope(performance.advance_particle_streams);
 
-		{
-			auto scope = measure_scope(performance.advance_particle_streams);
+		particles.advance_visible_streams(
+			rng,
+			cone,
+			input.performance.special_effects,
+			cosm,
+			input.particle_effects,
+			anims,
+			dt,
+			interp
+		);
+	};
 
-			particles.advance_visible_streams(
-				rng,
-				cone,
-				input.performance.special_effects,
-				cosm,
-				input.particle_effects,
-				anims,
-				dt,
-				interp
-			);
-		}
-	}
+	auto advance_attenuation_variations = [&]() {
+		get<light_system>().advance_attenuation_variations(rng, cosm, dt);
+	};
 
-	get<light_system>().advance_attenuation_variations(rng, cosm, dt);
-
-	{
+	auto advance_wandering_pixels = [&]() {
 		auto scope = measure_scope(performance.wandering_pixels);
 
 		get<wandering_pixels_system>().advance_for(
@@ -124,42 +119,75 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			cosm,
 			dt
 		);
-	}
+	};
 
-	world_hover_highlighter.cycle_duration_ms = 400;
-	world_hover_highlighter.update(input.frame_delta);
-
-	auto& sounds = get<sound_system>();
+	auto advance_world_hover_highlighter = [&]() {
+		world_hover_highlighter.cycle_duration_ms = 400;
+		world_hover_highlighter.update(input.frame_delta);
+	};
 
 	auto additive_sound_scope = measure_scope_additive(performance.sound_logic);
 
-	if (viewed_character) {
+	auto update_sound_properties = [&]() {
+		auto& sounds = get<sound_system>();
+
+		if (viewed_character) {
+			auto scope = measure_scope(additive_sound_scope);
+
+			auto ear = input.camera;
+			ear.cone.eye.transform = viewed_character.get_viewing_transform(interp);
+			
+			sounds.update_sound_properties(
+				{
+					sounds,
+					input.audio_volume,
+					input.sound_settings,
+					input.sounds,
+					interp,
+					ear,
+					input.camera.cone,
+					dt,
+					input.speed_multiplier,
+					input.inv_tickrate
+				}
+			);
+		}
+	};
+
+	auto fade_sound_sources = [&]() {
 		auto scope = measure_scope(additive_sound_scope);
 
-		auto ear = input.camera;
-		ear.cone.eye.transform = viewed_character.get_viewing_transform(interp);
-		
-		sounds.update_sound_properties(
-			{
-				sounds,
-				input.audio_volume,
-				input.sound_settings,
-				input.sounds,
-				interp,
-				ear,
-				input.camera.cone,
-				dt,
-				input.speed_multiplier,
-				input.inv_tickrate
-			}
-		);
-	}
-
-	{
-		auto scope = measure_scope(additive_sound_scope);
-
+		auto& sounds = get<sound_system>();
 		sounds.fade_sources(input.frame_delta);
-	}
+	};
+
+	auto advance_thunders = [&]() {
+		thunders.advance(rng, cosm, cone, input.particle_effects, dt, particles);
+	};
+
+	auto advance_flying_numbers = [&]() {
+		flying_numbers.advance(dt);
+	};
+
+	auto advance_highlights = [&]() {
+		highlights.advance(dt);
+	};
+
+	advance_thunders();
+	advance_highlights();
+	advance_exploding_rings();
+	advance_flying_numbers();
+
+	integrate_and_draw_all_particles();
+	advance_visible_particle_streams();
+
+	advance_attenuation_variations();
+	advance_wandering_pixels();
+
+	advance_world_hover_highlighter();
+
+	update_sound_properties();
+	fade_sound_sources();
 }
 
 void audiovisual_state::spread_past_infection(const const_logic_step step) {
