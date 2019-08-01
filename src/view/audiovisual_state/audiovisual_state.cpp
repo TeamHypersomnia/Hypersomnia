@@ -75,37 +75,6 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		);
 	};
 
-	auto integrate_and_draw_all_particles = [&]() {
-		auto scope = measure_scope(performance.integrate_particles);
-
-		particles.integrate_and_draw_all_particles({
-			cosm,
-			dt,
-			interp,
-			input.game_images,
-			anims,
-			input.performance.max_particles_in_single_job,
-			input.particles_output
-		});
-
-		performance.num_particles.measure(particles.count_all_particles());
-	};
-
-	auto advance_visible_particle_streams = [&]() {
-		auto scope = measure_scope(performance.advance_particle_streams);
-
-		particles.advance_visible_streams(
-			rng,
-			cone,
-			input.performance.special_effects,
-			cosm,
-			input.particle_effects,
-			anims,
-			dt,
-			interp
-		);
-	};
-
 	auto advance_attenuation_variations = [&]() {
 		get<light_system>().advance_attenuation_variations(rng, cosm, dt);
 	};
@@ -173,21 +142,62 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		highlights.advance(dt);
 	};
 
-	advance_thunders();
-	advance_highlights();
-	advance_exploding_rings();
+	auto advance_visible_particle_streams = [&]() {
+		auto scope = measure_scope(performance.advance_particle_streams);
+
+		particles.advance_visible_streams(
+			rng,
+			cone,
+			input.performance.special_effects,
+			cosm,
+			input.particle_effects,
+			anims,
+			dt,
+			interp
+		);
+	};
+
+	auto synchronous_facade = [&]() {
+		advance_visible_particle_streams();
+		advance_world_hover_highlighter();
+		advance_highlights();
+		advance_attenuation_variations();
+
+		advance_thunders();
+		advance_exploding_rings();
+
+		particles.remove_dead_particles(cosm);
+		particles.preallocate_particle_buffers(input.particles_output);
+	};
+
+	auto launch_particle_jobs = [&]() {
+		auto scope = measure_scope(performance.integrate_particles);
+
+		particles.integrate_and_draw_all_particles({
+			cosm,
+			dt,
+			interp,
+			input.game_images,
+			anims,
+			input.performance.max_particles_in_single_job,
+			input.particles_output
+		});
+
+		performance.num_particles.measure(particles.count_all_particles());
+	};
+
+	auto audio_job = [&]() {
+		update_sound_properties();
+		fade_sound_sources();
+	};
+
+	synchronous_facade();
+
 	advance_flying_numbers();
-
-	integrate_and_draw_all_particles();
-	advance_visible_particle_streams();
-
-	advance_attenuation_variations();
 	advance_wandering_pixels();
 
-	advance_world_hover_highlighter();
-
-	update_sound_properties();
-	fade_sound_sources();
+	launch_particle_jobs();
+	audio_job();
 }
 
 void audiovisual_state::spread_past_infection(const const_logic_step step) {

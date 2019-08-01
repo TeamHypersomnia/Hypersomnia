@@ -2199,9 +2199,13 @@ and then hitting Save settings.
 
 				/* #3 */
 
-				if (should_draw_game_gui()) {
+				auto game_gui_job = [&]() {
 					advance_game_gui(create_game_gui_context(), frame_delta);
 					draw_game_gui(game_gui_renderer, new_viewing_config);
+				};
+
+				if (should_draw_game_gui()) {
+					game_gui_job();
 				}
 			}
 

@@ -6,10 +6,50 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Backend accepts renderer so that it has access to dedicated buffers
+	- Can post a drawcall with an enum instead of pointer for a delayed call?
+
+- We either queue these particles or synchronously advance thunders and explosions
+	- Drawing can happen separately anyway
+	- We would anyway need to synchronously copy the particles so lets just go with synchronised advance
+
+- Problem: exploding rings and thunders spawn particles upon advance
+- Remember to post the heaviest tasks as the first, so audiovisual advancements go last probably
+
 - Task dependency graph
 	- The particles don't have to be completed before illuminated rendering - just preallocate the buffers so that the pointer values don't change
 	- Separate renderer for game gui
 	- Separate renderer for post-game gui
+
+	all jobs:
+		advance_thunders();
+		advance_exploding_rings();
+		advance_flying_numbers();
+		advance_wandering_pixels();
+
+		launch_particle_jobs();
+		audio_job();
+
+		perform_illuminated_rendering();
+			- could be further parallelized
+
+			Depends:
+			-> advance_thunders()
+			-> advance_exploding_rings()
+			-> advance_flying_numbers()
+			-> advance_wandering_pixels()
+
+		actually why not just preallocate and draw after advancement to avoid dependencies at all?
+		we could later similarly jobify tasks per layer
+
+		game_gui_job();
+		post_game_gui();
+
+		show_developer_details()
+
+		join all
+
+		
 
 
 - The multithreaded model

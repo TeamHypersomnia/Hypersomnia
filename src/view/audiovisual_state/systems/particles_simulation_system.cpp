@@ -387,9 +387,6 @@ void particles_simulation_system::integrate_and_draw_all_particles(const integra
 		Remember that it depends on the cosmos, so it can't advance while the job for this is running. 
 	*/
 
-	remove_dead_particles(in.cosm);
-	preallocate_particle_buffers(in.output);
-
 	const auto delta = in.dt.in_seconds();
 
 	auto generic_integrate = [&](const particle_layer, auto& range, int, int from_i, const int till_i, auto&&... args) {
