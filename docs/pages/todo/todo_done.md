@@ -3503,3 +3503,23 @@ which can be done from Settings->Reset all settings to factory default.
 
 - check shake for bomb explosion
 
+- Measure performance of dead particle removal 
+	- how does it measure against integration itself?
+		- looks like for 10k particles it's just around 0.02 ms so it's really not worth parallelizing
+		- perhaps just launch in a separate job but even that might be an overkill
+
+- drawing particles depends on completion of multiple jobs. we might want to have a more complex system here
+	- Simpler solution: let a single posted job do:
+		- create n jobs for the particles
+		- join in the effort until last completed?
+		- the same thread posts a rendering job
+	- however, after processing 2k particles, we can post a job to render them right away
+		- why not make a job do both? process a range of particles and then draw the same range!
+	- we'll need to avoid races on output particle triangle vector
+		- so let's preallocate a vector with the target number of particles
+
+- To avoid repeated allocations, we can have a pool of triangle vectors
+	- Although for now I guess the driver does a similar thing so let's forget about it
+
+- setting: split particle jobs once every n particles
+

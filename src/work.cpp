@@ -62,6 +62,7 @@
 #include "application/main/draw_debug_details.h"
 #include "application/main/draw_debug_lines.h"
 #include "application/main/release_flags.h"
+#include "application/main/flash_afterimage.h"
 #include "application/setups/editor/editor_player.hpp"
 
 #include "application/input/input_pass_result.h"
@@ -434,6 +435,17 @@ and then hitting Save settings.
 	LOG("Initializing the streaming of viewables.");
 	static viewables_streaming streaming;
 
+	static auto get_blank_texture = []() {
+		return streaming.necessary_images_in_atlas[assets::necessary_image_id::BLANK];
+	};
+
+	static auto get_drawer = [&]() { 
+		return augs::drawer_with_default {
+			renderer.get_triangle_buffer(),
+			get_blank_texture()
+		};
+	};
+
 	auto streaming_finalize = augs::scope_guard([&]() {
 		streaming.finalize_pending_tasks();
 	});
@@ -468,6 +480,12 @@ and then hitting Save settings.
 	static auto setup_requires_cursor = []() {
 		return visit_current_setup([&](const auto& s) {
 			return s.requires_cursor();
+		});
+	};
+
+	static auto get_interpolation_ratio = []() {
+		return visit_current_setup([](auto& setup) {
+			return setup.get_interpolation_ratio();
 		});
 	};
 
@@ -777,6 +795,10 @@ and then hitting Save settings.
 		}
 		
 		return gameplay_camera.get_current_eye();
+	};
+
+	static auto get_camera_cone = []() {		
+		return camera_cone(get_camera_eye(), logic_get_screen_size());
 	};
 
 	static auto get_setup_customized_config = [&]() {
@@ -1367,57 +1389,58 @@ and then hitting Save settings.
 
 	static auto game_thread_worker = []() {
 		while (!should_quit) {
-#if PLATFORM_UNIX
-			if (signal_status != 0) {
-				const auto sig = signal_status;
+			/* Setup variables required by the lambdas */
 
-				LOG("%x received.", strsignal(sig));
-
-				if(
-					sig == SIGINT
-					|| sig == SIGSTOP
-					|| sig == SIGTERM
-				) {
-					LOG("Gracefully shutting down.");
-					request_quit();
-					
-					break;
-				}
-			}
-#endif
-
-			ensure_float_flags_hold();
-
+			const auto screen_size = logic_get_screen_size();
+			const auto frame_delta = frame_timer.extract_delta();
 			const auto current_frame_num = current_frame.load();
+			auto game_gui_mode = game_gui_mode_flag;
+
+			/* Lambdas */
 
 			auto get_current_frame_num = [&]() {
 				return current_frame_num;
 			};
 
-			const auto frame_delta = frame_timer.extract_delta();
+			auto should_quit_due_to_signal = []() {
+#if PLATFORM_UNIX
+				if (signal_status != 0) {
+					const auto sig = signal_status;
 
-			/* 
-				The centralized transformation of all window inputs.
-				No window inputs will be acquired and/or used beyond the scope of this lambda,
-				to the exception of remote packets, received by the client/server setups.
-				
-				This is necessary because we need some complicated interactions between multiple GUI contexts,
-				primarily in deciding what events should be propagated further, down to the gameplay itself.
-				It is the easiest if every possibility is considered in one place. 
-				We have decided that some stronger decoupling here would benefit nobody.
+					LOG("%x received.", strsignal(sig));
 
-				The lambda is called right away, like so: 
-					result = [...](){...}().
-				The result of the call, which is the collection of new game commands, will be passed further down the loop. 
-			*/
+					if(
+						sig == SIGINT
+						|| sig == SIGSTOP
+						|| sig == SIGTERM
+					) {
+						LOG("Gracefully shutting down.");
+						request_quit();
+						
+						return true;
+					}
+				}
+#endif
 
-			auto game_gui_mode = game_gui_mode_flag;
+				return false;
+			};
 
-			if (setup_requires_cursor()) {
-				game_gui_mode = true;
-			}
+			auto perform_input_pass = [&]() -> input_pass_result {
+				/* 
+					The centralized transformation of all window inputs.
+					No window inputs will be acquired and/or used beyond the scope of this lambda,
+					to the exception of remote packets, received by the client/server setups.
+					
+					This is necessary because we need some complicated interactions between multiple GUI contexts,
+					primarily in deciding what events should be propagated further, down to the gameplay itself.
+					It is the easiest if every possibility is considered in one place. 
+					We have decided that some stronger decoupling here would benefit nobody.
 
-			const auto result = [&]() -> input_pass_result {
+					The lambda is called right away, like so: 
+						result = [...](){...}().
+					The result of the call, which is the collection of new game commands, will be passed further down the loop. 
+				*/
+
 				input_pass_result out;
 
 				augs::local_entropy new_window_entropy;
@@ -1719,61 +1742,92 @@ and then hitting Save settings.
 				*/
 
 				return out;
-			}();
+			};
 
-			const auto& new_viewing_config = result.viewing_config;
+			auto reload_needed_viewables = [&]() {
+				visit_current_setup(
+					[&](const auto& setup) {
+						using T = remove_cref<decltype(setup)>;
+						using S = viewables_loading_type;
 
-			/* 
-				Viewables reloading pass.
-			*/
+						constexpr auto s = T::loading_strategy;
 
-			visit_current_setup(
-				[&](const auto& setup) {
-					using T = remove_cref<decltype(setup)>;
-					using S = viewables_loading_type;
-
-					constexpr auto s = T::loading_strategy;
-
-					if constexpr(s == S::LOAD_ALL) {
-						load_all(setup.get_viewable_defs());
+						if constexpr(s == S::LOAD_ALL) {
+							load_all(setup.get_viewable_defs());
+						}
+						else if constexpr(s == S::LOAD_ONLY_NEAR_CAMERA) {
+							static_assert(always_false_v<T>, "Unimplemented");
+						}
+						else if constexpr(T::loading_strategy == S::LOAD_ALL_ONLY_ONCE) {
+							/* Do nothing */
+						}
+						else {
+							static_assert(always_false_v<T>, "Unknown viewables loading strategy.");
+						}
 					}
-					else if constexpr(s == S::LOAD_ONLY_NEAR_CAMERA) {
-						static_assert(always_false_v<T>, "Unimplemented");
-					}
-					else if constexpr(T::loading_strategy == S::LOAD_ALL_ONLY_ONCE) {
-						/* Do nothing */
-					}
-					else {
-						static_assert(always_false_v<T>, "Unknown viewables loading strategy.");
-					}
-				}
-			);
+				);
+			};
 
-			streaming.finalize_load({
-				get_current_frame_num(),
-				new_viewing_config.debug.measure_atlas_uploading,
-				renderer,
-				get_audiovisuals().get<sound_system>()
-			});
+			auto finalize_loading_viewables = [&](const auto& new_viewing_config) {
+				streaming.finalize_load({
+					get_current_frame_num(),
+					new_viewing_config.debug.measure_atlas_uploading,
+					renderer,
+					get_audiovisuals().get<sound_system>()
+				});
+			};
 
-			const auto screen_size = logic_get_screen_size();
+			auto do_advance_setup = [&](auto& with_result) {
+				/* 
+					Advance the current setup's logic,
+					and let the audiovisual_state sample the game world 
+					that it chooses via get_viewed_cosmos.
+
+					This also advances the audiovisual state, based on the cosmos returned by the setup.
+				*/
+
+				auto scope = measure_scope(frame_performance.advance_setup);
+				advance_current_setup(frame_delta, with_result);
+			};
+
+			/* Flow */
+
+			if (should_quit_due_to_signal()) {
+				break;
+			}
+
+			ensure_float_flags_hold();
+
+			if (setup_requires_cursor()) {
+				game_gui_mode = true;
+			}
+
+			const auto input_result = perform_input_pass();
+			const auto& new_viewing_config = input_result.viewing_config;
+
+			reload_needed_viewables();
+			finalize_loading_viewables(new_viewing_config);
+			do_advance_setup(input_result);
 
 			auto create_menu_context = make_create_menu_context(new_viewing_config);
 			auto create_game_gui_context = make_create_game_gui_context(new_viewing_config);
 
-			/* 
-				Advance the current setup's logic,
-				and let the audiovisual_state sample the game world 
-				that it chooses via get_viewed_cosmos.
+			auto create_viewing_game_gui_context = [&]() {
+				return viewing_game_gui_context {
+					create_game_gui_context(),
 
-				This also advances the audiovisual state, based on the cosmos returned by the setup.
-			*/
+					{
+						get_audiovisuals().get<interpolation_system>(),
+						get_audiovisuals().world_hover_highlighter,
+						new_viewing_config.hotbar,
+						new_viewing_config.drawing,
+						new_viewing_config.inventory_gui_controls,
+						get_camera_eye(),
+						get_drawer()
+					}
+				};
+			};
 
-			{
-				auto scope = measure_scope(frame_performance.advance_setup);
-				advance_current_setup(frame_delta, result);
-			}
-			
 			/*
 				Game GUI might have been altered by the step's post-solve,
 				therefore we need to rebuild its layouts (and from them, the tree data)
@@ -1797,189 +1851,62 @@ and then hitting Save settings.
 			}
 
 			auto frame = measure_scope(frame_performance.total);
-			
-			auto get_blank_texture = []() {
-				return streaming.necessary_images_in_atlas[assets::necessary_image_id::BLANK];
-			};
-
-			auto get_drawer = [&]() { 
-				return augs::drawer_with_default {
-					renderer.get_triangle_buffer(),
-					get_blank_texture()
-				};
-			};
-
-			const auto interpolation_ratio = visit_current_setup([](auto& setup) {
-				return setup.get_interpolation_ratio();
-			});
-
-			auto create_viewing_game_gui_context = [&]() {
-				return viewing_game_gui_context {
-					create_game_gui_context(),
-
-					{
-						get_audiovisuals().get<interpolation_system>(),
-						get_audiovisuals().world_hover_highlighter,
-						new_viewing_config.hotbar,
-						new_viewing_config.drawing,
-						new_viewing_config.inventory_gui_controls,
-						get_camera_eye(),
-						get_drawer()
-					}
-				};
-			};
-
-			/*
-				Canonical rendering order of the Hypersomnia Universe:
-				
-				1.  Draw the cosmos in the vicinity of the viewed character.
-					Both the cosmos and the character are specified by the current setup (main menu is a setup, too).
-				
-				2.	Draw the debug lines over the game world, if so is appropriate.
-				
-				3.	Draw the game GUI, if so is appropriate.
-					Game GUI involves things like inventory buttons, hotbar and health bars.
-
-				4.  Draw the mode GUI.
-					Mode GUI involves things like team selection, weapon shop, round time remaining etc.
-
-				5.	Draw either the main menu buttons, or the in-game menu overlay accessed by ESC.
-					These two are almost identical, except the layouts of the first (e.g. tweened buttons) 
-					may also be influenced by a playing intro.
-
-				6.	Draw IMGUI, which is the highest priority GUI. 
-					This involves settings window, developer console and the like.
-
-				7.	Draw the GUI cursor. It may be:
-						- The cursor of the IMGUI, if it wants to capture the mouse.
-						- Or, the cursor of the main menu or the in-game menu overlay, if either is currently active.
-						- Or, the cursor of the game gui, with maybe tooltip, with maybe dragged item's ghost, if we're in-game in GUI mode.
-			*/
-
-			renderer.set_viewport({ vec2i{0, 0}, screen_size });
-
-			const bool rendering_flash_afterimage = gameplay_camera.is_flash_afterimage_requested();
-
-			if (rendering_flash_afterimage) {
-				necessary_fbos.flash_afterimage->set_as_current(renderer);
-			}
-			else {
-				augs::graphics::fbo::set_current_to_none(renderer);
-			}
-
-			renderer.clear_current_fbo();
 
 			const auto viewed_character = get_viewed_character();
 
-			if (const auto& viewed_cosmos = viewed_character.get_cosmos();
-				std::addressof(viewed_cosmos) != std::addressof(cosmos::zero)
-			) {
-				const auto cone = camera_cone(get_camera_eye(), screen_size);
-
-				{
-					/* #1 */
-					auto scope = measure_scope(frame_performance.rendering_script);
-
-					thread_local std::vector<additional_highlight> highlights;
-					highlights.clear();
-
-					visit_current_setup([&](const auto& setup) {
-						using T = remove_cref<decltype(setup)>;
-
-						if constexpr(T::has_additional_highlights) {
-							setup.for_each_highlight([&](auto&&... args) {
-								highlights.push_back({ std::forward<decltype(args)>(args)... });
-							});
-						}
-					});
-
-					thread_local std::vector<special_indicator> special_indicators;
-					special_indicators.clear();
-					special_indicator_meta indicator_meta;
-
-					if (viewed_character) {
-						visit_current_setup([&](const auto& setup) {
-							setup.on_mode_with_input(
-								[&](const auto&... args) {
-									::gather_special_indicators(
-										args..., 
-										viewed_character.get_official_faction(), 
-										streaming.necessary_images_in_atlas, 
-										special_indicators,
-										indicator_meta,
-										viewed_character
-									);
-								}
-							);
-						});
-					}
-
-					illuminated_rendering({
-						{ viewed_character, cone },
-						calc_pre_step_crosshair_displacement(new_viewing_config),
-						new_viewing_config.session.camera_query_aabb_mult,
-						get_audiovisuals(),
-						new_viewing_config.drawing,
-						streaming.necessary_images_in_atlas,
-						streaming.get_loaded_gui_fonts().gui,
-						streaming.images_in_atlas,
-						interpolation_ratio,
-						renderer,
-						frame_performance,
-						std::addressof(streaming.general_atlas),
-						necessary_fbos,
-						necessary_shaders,
-						all_visible,
-						new_viewing_config.performance,
-						new_viewing_config.renderer,
-						highlights,
-						special_indicators,
-						indicator_meta,
-						write_buffer.particle_buffers
-					});
-				}
-
+			auto draw_debug_lines = [&]() {
 				if (DEBUG_DRAWING.enabled) {
-					/* #2 */
 					auto scope = measure_scope(frame_performance.debug_lines);
 
-					draw_debug_lines(
-						viewed_cosmos,
+					::draw_debug_lines(
+						viewed_character.get_cosmos(),
 						renderer,
-						interpolation_ratio,
+						get_interpolation_ratio(),
 						get_drawer().default_texture,
 						new_viewing_config,
-						cone
+						get_camera_cone()
 					);
 				}
+			};
 
+			auto setup_the_first_fbo = [&]() {
+				renderer.set_viewport({ vec2i{0, 0}, screen_size });
+
+				const bool rendering_flash_afterimage = gameplay_camera.is_flash_afterimage_requested();
+
+				if (rendering_flash_afterimage) {
+					necessary_fbos.flash_afterimage->set_as_current(renderer);
+				}
+				else {
+					augs::graphics::fbo::set_current_to_none(renderer);
+				}
+
+				renderer.clear_current_fbo();
+			};
+
+			auto setup_standard_projection = [&]() {
 				necessary_shaders.standard->set_projection(renderer, augs::orthographic_projection(vec2(screen_size)));
+			};
 
-				/*
-					Illuminated rendering leaves the renderer in a state
-					where the default shader is being used and the game world atlas is still bound.
-
-					It is the configuration required for further viewing of GUI.
-				*/
-
+			auto draw_game_gui = [&]() {
 				if (should_draw_game_gui()) {
-					/* #3 */
 					auto scope = measure_scope(frame_performance.draw_game_gui);
 
 					game_gui.world.draw(create_viewing_game_gui_context());
 				}
+			};
 
+			auto draw_mode_and_setup_custom_gui = [&]() {
 				auto scope = measure_scope(frame_performance.draw_setup_custom_gui);
 
 				const auto player_metas = visit_current_setup([&](auto& setup) {
 					return setup.find_player_metas();
 				});
 
-				/* #4 */
 				visit_current_setup([&](auto& setup) {
 					setup.draw_custom_gui({
 						all_visible,
-						cone,
+						get_camera_cone(),
 						get_blank_texture(),
 						new_viewing_config,
 						streaming.necessary_images_in_atlas,
@@ -1997,17 +1924,18 @@ and then hitting Save settings.
 
 					renderer.call_and_clear_lines();
 				});
-			}
-			else {
+			};
+
+			auto fallback_overlay_gray_color = [&]() {
 				streaming.general_atlas.set_as_current(renderer);
 
 				necessary_shaders.standard->set_as_current(renderer);
-				necessary_shaders.standard->set_projection(renderer, augs::orthographic_projection(vec2(screen_size)));
+				setup_standard_projection();
 
 				get_drawer().color_overlay(screen_size, darkgray);
-			}
+			};
 
-			const auto menu_chosen_cursor = [&](){
+			auto draw_and_choose_menu_cursor = [&]() {
 				auto scope = measure_scope(frame_performance.menu_gui);
 
 				if (has_current_setup()) {
@@ -2015,7 +1943,6 @@ and then hitting Save settings.
 						const auto context = create_menu_context(ingame_menu);
 						ingame_menu.advance(context, frame_delta);
 
-						/* #5 */
 						return ingame_menu.draw({ context, get_drawer() });
 					}
 
@@ -2030,7 +1957,6 @@ and then hitting Save settings.
 					get_drawer().aabb(streaming.necessary_images_in_atlas[assets::necessary_image_id::ART_1], ltrb(0, 0, screen_size.x, screen_size.y), white);
 #endif
 
-					/* #5 */
 					const auto cursor = main_menu->gui.draw({ context, get_drawer() });
 
 					main_menu->draw_overlays(
@@ -2042,25 +1968,9 @@ and then hitting Save settings.
 
 					return cursor;
 				}
-			}();
-			
-			renderer.call_and_clear_triangles();
+			};
 
-			{
-				/* #6 */
-				auto scope = measure_scope(frame_performance.imgui);
-
-				renderer.draw_call_imgui(
-					imgui_atlas, 
-					std::addressof(streaming.general_atlas), 
-					std::addressof(streaming.avatar_atlas), 
-					std::addressof(streaming.avatar_preview_tex)
-				);
-			}
-
-			{
-				/* #7 */
-
+			auto draw_non_menu_cursor = [&](const assets::necessary_image_id menu_chosen_cursor) {
 				const bool should_draw_our_cursor = new_viewing_config.window.raw_mouse_input && !window.is_mouse_pos_paused();
 				const auto cursor_drawing_pos = common_input_state.mouse.pos;
 
@@ -2092,99 +2002,207 @@ and then hitting Save settings.
 						});
 					}
 				}
-			}
+			};
 
-			{
-				const auto flash_mult = gameplay_camera.get_effective_flash_mult();
+			auto perform_illuminated_rendering = [&]() {
+				auto scope = measure_scope(frame_performance.rendering_script);
 
-				if (flash_mult > 0 || rendering_flash_afterimage) {
-					/* 
-						While capturing, overlay the afterimage onto the final fbo and go back to the default fbo. 
-						This is to avoid a single black frame before the afterimage actually kicks in.
-					*/
+				thread_local std::vector<additional_highlight> highlights;
+				highlights.clear();
 
-					if (rendering_flash_afterimage) {
-						augs::graphics::fbo::set_current_to_none(renderer);
+				visit_current_setup([&](const auto& setup) {
+					using T = remove_cref<decltype(setup)>;
+
+					if constexpr(T::has_additional_highlights) {
+						setup.for_each_highlight([&](auto&&... args) {
+							highlights.push_back({ std::forward<decltype(args)>(args)... });
+						});
 					}
+				});
 
-					necessary_fbos.flash_afterimage->get_texture().set_as_current(renderer);
-					necessary_shaders.flash_afterimage->set_as_current(renderer);
-					necessary_shaders.flash_afterimage->set_projection(renderer, augs::orthographic_projection(vec2(screen_size)));
+				thread_local std::vector<special_indicator> special_indicators;
+				special_indicators.clear();
+				special_indicator_meta indicator_meta;
 
-					{
-						auto flash_afterimage_col = white;
-						flash_afterimage_col.mult_alpha(flash_mult);
-
-						auto whole_texture = augs::atlas_entry();
-						whole_texture.atlas_space.x = 0.f;
-						whole_texture.atlas_space.y = 0.f;
-						whole_texture.atlas_space.w = 1.f;
-						whole_texture.atlas_space.h = 1.f;
-
-						get_drawer().color_overlay(whole_texture, screen_size, flash_afterimage_col, flip_flags::make_vertically());
-					}
-
-					renderer.call_and_clear_triangles();
-
-					necessary_shaders.standard->set_as_current(renderer);
-					streaming.general_atlas.set_as_current(renderer);
-				}
-
-				if (!rendering_flash_afterimage) {
-					/* Don't draw white blinding overlay while we are capturing the flash afterimage */
-
-					if (flash_mult > 0) {
-						renderer.call_and_clear_triangles();
-
-						auto flash_overlay_col = white;
-
-						if (viewed_character) {
-							if (const auto sentience = viewed_character.find<components::sentience>()) {
-								if (!sentience->is_conscious()) {
-									flash_overlay_col = rgba(255, 40, 40, 255);
-								}
+				if (viewed_character) {
+					visit_current_setup([&](const auto& setup) {
+						setup.on_mode_with_input(
+							[&](const auto&... args) {
+								::gather_special_indicators(
+									args..., 
+									viewed_character.get_official_faction(), 
+									streaming.necessary_images_in_atlas, 
+									special_indicators,
+									indicator_meta,
+									viewed_character
+								);
 							}
-						}
-
-						flash_overlay_col.mult_alpha(flash_mult);
-
-						get_drawer().color_overlay(screen_size, flash_overlay_col);
-					}
+						);
+					});
 				}
-			}
 
-			frame_performance.num_triangles.measure(renderer.extract_num_total_triangles_drawn());
-
-			if (new_viewing_config.session.show_developer_console) {
-				auto scope = measure_scope(frame_performance.debug_details);
-
-				draw_debug_details(
-					get_drawer(),
+				illuminated_rendering({
+					{ viewed_character, get_camera_cone() },
+					calc_pre_step_crosshair_displacement(new_viewing_config),
+					new_viewing_config.session.camera_query_aabb_mult,
+					get_audiovisuals(),
+					new_viewing_config.drawing,
+					streaming.necessary_images_in_atlas,
 					streaming.get_loaded_gui_fonts().gui,
-					screen_size,
-					viewed_character,
+					streaming.images_in_atlas,
+					get_interpolation_ratio(),
+					renderer,
 					frame_performance,
-					network_performance,
-					network_stats,
-					server_stats,
-					streaming.performance,
-					streaming.general_atlas_performance,
-					performance,
-					get_audiovisuals().performance
+					std::addressof(streaming.general_atlas),
+					necessary_fbos,
+					necessary_shaders,
+					all_visible,
+					new_viewing_config.performance,
+					new_viewing_config.renderer,
+					highlights,
+					special_indicators,
+					indicator_meta,
+					write_buffer.particle_buffers
+				});
+			};
+
+			auto draw_call_imgui = [&]() {
+				renderer.call_and_clear_triangles();
+
+				auto scope = measure_scope(frame_performance.imgui);
+
+				renderer.draw_call_imgui(
+					imgui_atlas, 
+					std::addressof(streaming.general_atlas), 
+					std::addressof(streaming.avatar_atlas), 
+					std::addressof(streaming.avatar_preview_tex)
 				);
+			};
+
+			auto do_flash_afterimage = [&]() {
+				const auto flash_mult = gameplay_camera.get_effective_flash_mult();
+				const bool rendering_flash_afterimage = gameplay_camera.is_flash_afterimage_requested();
+
+				::handle_flash_afterimage(
+					renderer,
+					necessary_shaders,
+					necessary_fbos,
+					streaming.general_atlas,
+					viewed_character,
+					get_drawer,
+					flash_mult,
+					rendering_flash_afterimage,
+					screen_size
+				);
+			};
+
+			auto measure_num_drawn_triangles = [&]() {
+				frame_performance.num_triangles.measure(renderer.extract_num_total_triangles_drawn());
+			};
+
+			auto show_developer_details = [&]() {
+				if (new_viewing_config.session.show_developer_console) {
+					auto scope = measure_scope(frame_performance.debug_details);
+
+					draw_debug_details(
+						get_drawer(),
+						streaming.get_loaded_gui_fonts().gui,
+						screen_size,
+						viewed_character,
+						frame_performance,
+						network_performance,
+						network_stats,
+						server_stats,
+						streaming.performance,
+						streaming.general_atlas_performance,
+						performance,
+						get_audiovisuals().performance
+					);
+				}
+			};
+
+			auto finalize_frame_and_swap = [&]() {
+				renderer.call_and_clear_triangles();
+
+				/* Don't count the debug details */
+				renderer.extract_num_total_triangles_drawn();
+
+				buffer_swapper.wait_swap();
+
+				write_buffer.renderers.general.next_frame();
+				write_buffer.renderers.game_gui.next_frame();
+
+				write_buffer.particle_buffers.clear();
+			};
+
+			/*
+				Canonical rendering order of the Hypersomnia Universe:
+				
+				1.  Draw the cosmos in the vicinity of the viewed character.
+					Both the cosmos and the character are specified by the current setup (main menu is a setup, too).
+				
+				2.	Draw the debug lines over the game world, if so is appropriate.
+				
+				3.	Draw the game GUI, if so is appropriate.
+					Game GUI involves things like inventory buttons, hotbar and health bars.
+
+				4.  Draw the mode GUI.
+					Mode GUI involves things like team selection, weapon shop, round time remaining etc.
+
+				5.	Draw either the main menu buttons, or the in-game menu overlay accessed by ESC.
+					These two are almost identical, except the layouts of the first (e.g. tweened buttons) 
+					may also be influenced by a playing intro.
+
+				6.	Draw IMGUI, which is the highest priority GUI. 
+					This involves settings window, developer console and the like.
+
+				7.	Draw the GUI cursor. It may be:
+						- The cursor of the IMGUI, if it wants to capture the mouse.
+						- Or, the cursor of the main menu or the in-game menu overlay, if either is currently active.
+						- Or, the cursor of the game gui, with maybe tooltip, with maybe dragged item's ghost, if we're in-game in GUI mode.
+			*/
+
+			setup_the_first_fbo();
+
+			if (std::addressof(viewed_character.get_cosmos()) != std::addressof(cosmos::zero)) {
+				/* #1 */
+				perform_illuminated_rendering();
+				/* #2 */
+				draw_debug_lines();
+
+				setup_standard_projection();
+
+				/*
+					Illuminated rendering leaves the renderer in a state
+					where the default shader is being used and the game world atlas is still bound.
+
+					It is the configuration required for further viewing of GUI.
+				*/
+
+				/* #3 */
+				draw_game_gui();
+
+				/* #4 */
+				draw_mode_and_setup_custom_gui();
+			}
+			else {
+				fallback_overlay_gray_color();
 			}
 
-			renderer.call_and_clear_triangles();
+			/* #5 */
+			const auto menu_chosen_cursor = draw_and_choose_menu_cursor();
 
-			/* Don't count the debug details */
-			renderer.extract_num_total_triangles_drawn();
+			/* #6 */
+			draw_call_imgui();
 
-			buffer_swapper.wait_swap();
+			/* #7 */
+			draw_non_menu_cursor(menu_chosen_cursor);
 
-			write_buffer.renderers.general.next_frame();
-			write_buffer.renderers.game_gui.next_frame();
+			do_flash_afterimage();
 
-			write_buffer.particle_buffers.clear();
+			measure_num_drawn_triangles();
+			show_developer_details();
+			finalize_frame_and_swap();
 		}
 	};
 
