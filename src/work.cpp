@@ -697,7 +697,7 @@ and then hitting Save settings.
 		});
 	};
 
-	static auto create_game_gui_deps = [&](const auto& viewing_config) {
+	static auto create_game_gui_deps = [&](const config_lua_table& viewing_config) {
 		return game_gui_context_dependencies {
 			get_viewable_defs().image_definitions,
 			streaming.images_in_atlas,
@@ -708,7 +708,7 @@ and then hitting Save settings.
 		};
 	};
 
-	static auto create_menu_context_deps = [&](const auto& viewing_config) {
+	static auto create_menu_context_deps = [&](const config_lua_table& viewing_config) {
 		return menu_context_dependencies{
 			streaming.necessary_images_in_atlas,
 			streaming.get_loaded_gui_fonts().gui,
@@ -1071,7 +1071,7 @@ and then hitting Save settings.
 		frame_performance.num_visible_entities.measure(all_visible.count_all());
 	};
 
-	static auto calc_pre_step_crosshair_displacement = [&](const auto& viewing_config) {
+	static auto calc_pre_step_crosshair_displacement = [&](const config_lua_table& viewing_config) {
 		if (get_viewed_character() != get_controlled_character()) {
 			return vec2::zero;
 		}
@@ -1206,7 +1206,7 @@ and then hitting Save settings.
 		auto& setup,
 		const input_pass_result& result
 	) {
-		const auto& viewing_config = result.viewing_config;
+		const config_lua_table& viewing_config = result.viewing_config;
 
 		setup.control(result.motions);
 		setup.control(result.intents);
@@ -1396,7 +1396,7 @@ and then hitting Save settings.
 			const auto current_frame_num = current_frame.load();
 			auto game_gui_mode = game_gui_mode_flag;
 
-			/* Lambdas */
+			/* Logic lambdas */
 
 			auto get_current_frame_num = [&]() {
 				return current_frame_num;
@@ -1790,84 +1790,23 @@ and then hitting Save settings.
 				advance_current_setup(frame_delta, with_result);
 			};
 
-			/* Flow */
-
-			if (should_quit_due_to_signal()) {
-				break;
-			}
-
-			ensure_float_flags_hold();
-
-			if (setup_requires_cursor()) {
-				game_gui_mode = true;
-			}
-
-			const auto input_result = perform_input_pass();
-			const auto& new_viewing_config = input_result.viewing_config;
-
-			reload_needed_viewables();
-			finalize_loading_viewables(new_viewing_config);
-			do_advance_setup(input_result);
-
-			auto create_menu_context = make_create_menu_context(new_viewing_config);
-			auto create_game_gui_context = make_create_game_gui_context(new_viewing_config);
-
-			auto create_viewing_game_gui_context = [&]() {
+			auto create_viewing_game_gui_context = [&](const config_lua_table& viewing_config) {
 				return viewing_game_gui_context {
-					create_game_gui_context(),
+					make_create_game_gui_context(viewing_config)(),
 
 					{
 						get_audiovisuals().get<interpolation_system>(),
 						get_audiovisuals().world_hover_highlighter,
-						new_viewing_config.hotbar,
-						new_viewing_config.drawing,
-						new_viewing_config.inventory_gui_controls,
+						viewing_config.hotbar,
+						viewing_config.drawing,
+						viewing_config.inventory_gui_controls,
 						get_camera_eye(),
 						get_drawer()
 					}
 				};
 			};
 
-			/*
-				Game GUI might have been altered by the step's post-solve,
-				therefore we need to rebuild its layouts (and from them, the tree data)
-				for immediate visual response.
-			*/
-
-			if (should_draw_game_gui()) {
-				advance_game_gui(create_game_gui_context(), frame_delta);
-			}
-
-			/* 
-				What follows is strictly view part,
-				without advancement of any kind.
-				
-				No state is altered beyond this point,
-				except for usage of graphical resources and profilers.
-			*/
-
-			if (/* minimized */ screen_size.is_zero()) {
-				continue;
-			}
-
-			auto frame = measure_scope(frame_performance.total);
-
-			const auto viewed_character = get_viewed_character();
-
-			auto draw_debug_lines = [&]() {
-				if (DEBUG_DRAWING.enabled) {
-					auto scope = measure_scope(frame_performance.debug_lines);
-
-					::draw_debug_lines(
-						viewed_character.get_cosmos(),
-						renderer,
-						get_interpolation_ratio(),
-						get_drawer().default_texture,
-						new_viewing_config,
-						get_camera_cone()
-					);
-				}
-			};
+			/* View lambdas */ 
 
 			auto setup_the_first_fbo = [&]() {
 				renderer.set_viewport({ vec2i{0, 0}, screen_size });
@@ -1884,19 +1823,36 @@ and then hitting Save settings.
 				renderer.clear_current_fbo();
 			};
 
+			auto draw_debug_lines = [&](const auto& new_viewing_config) {
+				if (DEBUG_DRAWING.enabled) {
+					auto scope = measure_scope(frame_performance.debug_lines);
+
+					const auto viewed_character = get_viewed_character();
+
+					::draw_debug_lines(
+						viewed_character.get_cosmos(),
+						renderer,
+						get_interpolation_ratio(),
+						get_drawer().default_texture,
+						new_viewing_config,
+						get_camera_cone()
+					);
+				}
+			};
+
 			auto setup_standard_projection = [&]() {
 				necessary_shaders.standard->set_projection(renderer, augs::orthographic_projection(vec2(screen_size)));
 			};
 
-			auto draw_game_gui = [&]() {
+			auto draw_game_gui = [&](const config_lua_table& viewing_config) {
 				if (should_draw_game_gui()) {
 					auto scope = measure_scope(frame_performance.draw_game_gui);
 
-					game_gui.world.draw(create_viewing_game_gui_context());
+					game_gui.world.draw(create_viewing_game_gui_context(viewing_config));
 				}
 			};
 
-			auto draw_mode_and_setup_custom_gui = [&]() {
+			auto draw_mode_and_setup_custom_gui = [&](const auto& new_viewing_config) {
 				auto scope = measure_scope(frame_performance.draw_setup_custom_gui);
 
 				const auto player_metas = visit_current_setup([&](auto& setup) {
@@ -1935,7 +1891,7 @@ and then hitting Save settings.
 				get_drawer().color_overlay(screen_size, darkgray);
 			};
 
-			auto draw_and_choose_menu_cursor = [&]() {
+			auto draw_and_choose_menu_cursor = [&](auto&& create_menu_context) {
 				auto scope = measure_scope(frame_performance.menu_gui);
 
 				if (has_current_setup()) {
@@ -1970,8 +1926,8 @@ and then hitting Save settings.
 				}
 			};
 
-			auto draw_non_menu_cursor = [&](const assets::necessary_image_id menu_chosen_cursor) {
-				const bool should_draw_our_cursor = new_viewing_config.window.raw_mouse_input && !window.is_mouse_pos_paused();
+			auto draw_non_menu_cursor = [&](const config_lua_table& viewing_config, const assets::necessary_image_id menu_chosen_cursor) {
+				const bool should_draw_our_cursor = viewing_config.window.raw_mouse_input && !window.is_mouse_pos_paused();
 				const auto cursor_drawing_pos = common_input_state.mouse.pos;
 
 				if (ImGui::GetIO().WantCaptureMouse) {
@@ -1987,10 +1943,10 @@ and then hitting Save settings.
 					}
 				}
 				else if (game_gui_mode && should_draw_game_gui()) {
-					if (viewed_character) {
+					if (get_viewed_character()) {
 						const auto& character_gui = game_gui.get_character_gui(get_game_gui_subject());
 
-						character_gui.draw_cursor_with_tooltip(create_viewing_game_gui_context(), should_draw_our_cursor);
+						character_gui.draw_cursor_with_tooltip(create_viewing_game_gui_context(viewing_config), should_draw_our_cursor);
 					}
 				}
 				else {
@@ -2004,7 +1960,7 @@ and then hitting Save settings.
 				}
 			};
 
-			auto perform_illuminated_rendering = [&]() {
+			auto perform_illuminated_rendering = [&](const config_lua_table& viewing_config) {
 				auto scope = measure_scope(frame_performance.rendering_script);
 
 				thread_local std::vector<additional_highlight> highlights;
@@ -2023,6 +1979,8 @@ and then hitting Save settings.
 				thread_local std::vector<special_indicator> special_indicators;
 				special_indicators.clear();
 				special_indicator_meta indicator_meta;
+
+				const auto viewed_character = get_viewed_character();
 
 				if (viewed_character) {
 					visit_current_setup([&](const auto& setup) {
@@ -2043,10 +2001,10 @@ and then hitting Save settings.
 
 				illuminated_rendering({
 					{ viewed_character, get_camera_cone() },
-					calc_pre_step_crosshair_displacement(new_viewing_config),
-					new_viewing_config.session.camera_query_aabb_mult,
+					calc_pre_step_crosshair_displacement(viewing_config),
+					viewing_config.session.camera_query_aabb_mult,
 					get_audiovisuals(),
-					new_viewing_config.drawing,
+					viewing_config.drawing,
 					streaming.necessary_images_in_atlas,
 					streaming.get_loaded_gui_fonts().gui,
 					streaming.images_in_atlas,
@@ -2057,8 +2015,8 @@ and then hitting Save settings.
 					necessary_fbos,
 					necessary_shaders,
 					all_visible,
-					new_viewing_config.performance,
-					new_viewing_config.renderer,
+					viewing_config.performance,
+					viewing_config.renderer,
 					highlights,
 					special_indicators,
 					indicator_meta,
@@ -2083,6 +2041,8 @@ and then hitting Save settings.
 				const auto flash_mult = gameplay_camera.get_effective_flash_mult();
 				const bool rendering_flash_afterimage = gameplay_camera.is_flash_afterimage_requested();
 
+				const auto viewed_character = get_viewed_character();
+
 				::handle_flash_afterimage(
 					renderer,
 					necessary_shaders,
@@ -2100,9 +2060,11 @@ and then hitting Save settings.
 				frame_performance.num_triangles.measure(renderer.extract_num_total_triangles_drawn());
 			};
 
-			auto show_developer_details = [&]() {
-				if (new_viewing_config.session.show_developer_console) {
+			auto show_developer_details = [&](const config_lua_table& viewing_config) {
+				if (viewing_config.session.show_developer_console) {
 					auto scope = measure_scope(frame_performance.debug_details);
+
+					const auto viewed_character = get_viewed_character();
 
 					draw_debug_details(
 						get_drawer(),
@@ -2135,6 +2097,50 @@ and then hitting Save settings.
 				write_buffer.particle_buffers.clear();
 			};
 
+			/* Flow */
+
+			if (should_quit_due_to_signal()) {
+				break;
+			}
+
+			ensure_float_flags_hold();
+
+			if (setup_requires_cursor()) {
+				game_gui_mode = true;
+			}
+
+			const auto input_result = perform_input_pass();
+			const auto& new_viewing_config = input_result.viewing_config;
+
+			reload_needed_viewables();
+			finalize_loading_viewables(new_viewing_config);
+			do_advance_setup(input_result);
+
+			auto create_menu_context = make_create_menu_context(new_viewing_config);
+			auto create_game_gui_context = make_create_game_gui_context(new_viewing_config);
+
+			/*
+				Game GUI might have been altered by the step's post-solve,
+				therefore we need to rebuild its layouts (and from them, the tree data)
+				for immediate visual response.
+			*/
+
+			if (should_draw_game_gui()) {
+				advance_game_gui(create_game_gui_context(), frame_delta);
+			}
+
+			/* 
+				What follows is strictly view part,
+				without advancement of any kind.
+				
+				No state is altered beyond this point,
+				except for usage of graphical resources and profilers.
+			*/
+
+			if (/* minimized */ screen_size.is_zero()) {
+				continue;
+			}
+
 			/*
 				Canonical rendering order of the Hypersomnia Universe:
 				
@@ -2162,13 +2168,17 @@ and then hitting Save settings.
 						- Or, the cursor of the game gui, with maybe tooltip, with maybe dragged item's ghost, if we're in-game in GUI mode.
 			*/
 
+			auto frame = measure_scope(frame_performance.total);
+
 			setup_the_first_fbo();
+
+			const auto viewed_character = get_viewed_character();
 
 			if (std::addressof(viewed_character.get_cosmos()) != std::addressof(cosmos::zero)) {
 				/* #1 */
-				perform_illuminated_rendering();
+				perform_illuminated_rendering(new_viewing_config);
 				/* #2 */
-				draw_debug_lines();
+				draw_debug_lines(new_viewing_config);
 
 				setup_standard_projection();
 
@@ -2180,28 +2190,28 @@ and then hitting Save settings.
 				*/
 
 				/* #3 */
-				draw_game_gui();
+				draw_game_gui(new_viewing_config);
 
 				/* #4 */
-				draw_mode_and_setup_custom_gui();
+				draw_mode_and_setup_custom_gui(new_viewing_config);
 			}
 			else {
 				fallback_overlay_gray_color();
 			}
 
 			/* #5 */
-			const auto menu_chosen_cursor = draw_and_choose_menu_cursor();
+			const auto menu_chosen_cursor = draw_and_choose_menu_cursor(create_menu_context);
 
 			/* #6 */
 			draw_call_imgui();
 
 			/* #7 */
-			draw_non_menu_cursor(menu_chosen_cursor);
+			draw_non_menu_cursor(new_viewing_config, menu_chosen_cursor);
 
 			do_flash_afterimage();
 
 			measure_num_drawn_triangles();
-			show_developer_details();
+			show_developer_details(new_viewing_config);
 			finalize_frame_and_swap();
 		}
 	};
