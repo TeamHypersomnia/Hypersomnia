@@ -198,12 +198,14 @@ void standard_solve(const logic_step step) {
 	particles_existence_system().displace_streams(step);
 	sound_existence_system().play_sounds_from_events(step);
 
+#if TODO_VISIBILITY
 	{
 		auto scope = measure_scope(performance.visibility);
 		auto visibility_raycasts_scope = cosm.measure_raycasts(performance.visibility_raycasts);
 
 		visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(step);
 	}
+#endif
 
 	{
 		auto scope = measure_scope(performance.ai);

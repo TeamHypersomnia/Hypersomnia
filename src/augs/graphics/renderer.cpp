@@ -17,9 +17,30 @@ namespace augs {
 		line_buffers.reset();
 		special_buffers.reset();
 
-		for (auto& d : dedicated) {
-			d.clear();
+		for (auto& d : dedicated.single) {
+			d.triangles.clear();
+			d.specials.clear();
 		}
+
+		for (auto& d : dedicated.vectors) {
+			for (auto& v : d) {
+				v.triangles.clear();
+				v.specials.clear();
+			}
+		}
+	}
+
+	void renderer::call_triangles(const dedicated_buffer_vector type, const uint32_t index) {
+		drawcall_dedicated_vector_command cmd;
+		cmd.type = type;
+		cmd.index = index;
+		push_command(std::move(cmd));
+	}
+
+	void renderer::call_triangles(const dedicated_buffer type) {
+		drawcall_dedicated_command cmd;
+		cmd.type = type;
+		push_command(std::move(cmd));
 	}
 
 	void renderer::call_triangles(const vertex_triangle_buffer& buffer) {

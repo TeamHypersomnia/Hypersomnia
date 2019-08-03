@@ -2,14 +2,14 @@
 #include "augs/math/vec2.h"
 #include "augs/templates/object_command.h"
 
-#include "augs/misc/enum/enum_array.h"
-
 #include "augs/graphics/rgba.h"
 #include "augs/graphics/vertex.h"
 #include "augs/graphics/texture.h"
 #include "augs/graphics/debug_line.h"
 #include "augs/graphics/renderer_command_enums.h"
 #include "augs/graphics/renderer_command.h"
+
+#include "augs/graphics/dedicated_buffers.h"
 
 using render_command_buffer = std::vector<augs::graphics::renderer_command>;
 
@@ -20,19 +20,6 @@ namespace augs {
 		struct renderer_command;
 	}
 	
-	enum class dedicated_triangle_buffer {
-		AVATARS,
-		DEATH_SUMMARY_AVATAR,
-
-		NICKNAMES,
-		HEALTH_NUMBERS,
-		INDICATORS,
-
-		SCOREBOARD_COLOR_INDICATORS,
-
-		COUNT
-	};
-
 	class renderer {
 		debug_lines prev_logic_step_lines;
 
@@ -82,7 +69,7 @@ namespace augs {
 	public:
 		render_command_buffer commands;
 
-		enum_array<vertex_triangle_buffer, dedicated_triangle_buffer> dedicated;
+		dedicated_buffers dedicated;
 
 		void save_debug_logic_step_lines_for_interpolation(const debug_lines&);
 
@@ -184,6 +171,10 @@ namespace augs {
 		void set_additive_blending();
 		
 		void call_triangles(const vertex_triangle_buffer&);
+
+		void call_triangles(dedicated_buffer_vector, uint32_t index);
+		void call_triangles(dedicated_buffer);
+
 		void set_viewport(const xywhi);
 
 		void clear_stencil();

@@ -5,25 +5,12 @@
 #include "game/debug_drawing_settings.h"
 #include "game/cosmos/step_declaration.h"
 
-using visibility_requests = std::vector<messages::visibility_information_request>;
-using visibility_responses = std::vector<messages::visibility_information_response>;
+using visibility_request = messages::visibility_information_request;
+using visibility_response = messages::visibility_information_response;
 
-inline auto& thread_local_visibility_requests() {
-	thread_local visibility_requests requests;
-	return requests;
-}
-
-inline auto& fresh_thread_local_visibility_requests() {
-	auto& r = thread_local_visibility_requests();
-	r.clear();
-	return r;
-}
-
-struct performance_settings;
-
-inline auto& thread_local_visibility_responses() {
-	thread_local visibility_responses responses;
-	return responses;
+inline auto& thread_local_visibility_response() {
+	thread_local visibility_response response;
+	return response;
 }
 
 class visibility_system {
@@ -33,17 +20,9 @@ public:
 	lines_ref DEBUG_LINES_TARGET;
 	visibility_system(lines_ref ref) : DEBUG_LINES_TARGET(ref) {}
 
-	messages::visibility_information_response& calc_visibility(
-		const cosmos&,
-		const messages::visibility_information_request&
-	) const;
-
 	void calc_visibility(
 		const cosmos&,
-		const visibility_requests&,
-		visibility_responses&,
-		const performance_settings&
+		const visibility_request&,
+		visibility_response&
 	) const;
-
-	void calc_visibility(const logic_step) const;
 };

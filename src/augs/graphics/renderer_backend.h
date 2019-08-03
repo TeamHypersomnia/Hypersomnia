@@ -8,6 +8,9 @@
 #include "augs/templates/exception_templates.h"
 
 namespace augs {
+	struct dedicated_buffers;
+	struct drawcall_command;
+
 	namespace graphics {
 		struct renderer_error : error_with_typesafe_sprintf {
 			using error_with_typesafe_sprintf::error_with_typesafe_sprintf; 
@@ -49,6 +52,8 @@ namespace augs {
 			void stencil_positive_test();
 			void stencil_reverse_test();
 
+			void perform(const drawcall_command&);
+
 		public:
 			unsigned get_max_texture_size() const;
 
@@ -61,7 +66,11 @@ namespace augs {
 			renderer_backend(const renderer_backend&) = delete;
 			renderer_backend& operator=(const renderer_backend&) = delete;
 
-			void perform(renderer_command*, std::size_t n);
+			void perform(
+				const renderer_command*, 
+				std::size_t n,
+				const dedicated_buffers&
+			);
 		};
 	}
 }

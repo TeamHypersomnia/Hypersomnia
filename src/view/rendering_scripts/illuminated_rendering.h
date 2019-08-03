@@ -22,6 +22,7 @@ struct audiovisual_state;
 struct all_necessary_shaders;
 struct all_necessary_fbos;
 struct performance_settings;
+struct cached_visibility_data;
 
 class images_in_atlas_map;
 class visible_entities;
@@ -58,6 +59,7 @@ struct illuminated_rendering_input {
 	const std::vector<special_indicator>& special_indicators;
 	const special_indicator_meta& indicator_meta;
 	const particle_triangle_buffers& drawn_particles;
+	cached_visibility_data& cached_visibility;
 };
 
 void illuminated_rendering(const illuminated_rendering_input in);

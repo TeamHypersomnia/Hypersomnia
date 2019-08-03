@@ -8,7 +8,7 @@ struct fog_of_war_settings {
 	// END GEN INTROSPECTOR
 
 	bool is_enabled() const {
-		return angle > 0.f;
+		return angle > 0.f && angle < 360.f;
 	}
 
 	auto get_real_size() const {

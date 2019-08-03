@@ -143,7 +143,8 @@ void standard_explosion_input::instantiate(
 	request.queried_rect = vec2::square(effective_radius * 2);
 	request.subject = subject_if_any;
 
-	auto& response = visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(cosm, request);
+	auto& response = thread_local_visibility_response();
+	visibility_system(DEBUG_LOGIC_STEP_LINES).calc_visibility(cosm, request, response);
 
 	if (response.empty()) {
 		return;

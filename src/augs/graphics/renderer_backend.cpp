@@ -124,7 +124,44 @@ namespace augs {
 			return max_texture_size;
 		}
 
-		void renderer_backend::perform(renderer_command* c, const std::size_t n) {
+		void renderer_backend::perform(const drawcall_command& cmd) {
+			const auto& p = *platform;
+
+			const auto triangles = cmd.triangles;
+			const auto lines = cmd.lines;
+			const auto specials = cmd.specials;
+
+			const auto cnt = static_cast<GLsizei>(cmd.count);
+			const auto specials_cnt = cnt * 3;
+
+			if (specials) {
+				enable_special_vertex_attribute();
+				GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, p.special_buffer_id));
+				GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(special) * specials_cnt, specials, GL_STREAM_DRAW));
+			}
+
+			GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, p.triangle_buffer_id));
+
+			if (triangles) {
+				GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertex_triangle) * cnt, triangles, GL_STREAM_DRAW));
+				GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, cnt * 3));
+			}
+
+			if (lines) {
+				GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertex_line) * cnt, lines, GL_STREAM_DRAW));
+				GL_CHECK(glDrawArrays(GL_LINES, 0, cnt * 2));
+			}
+
+			if (specials) {
+				disable_special_vertex_attribute();
+			}
+		}
+
+		void renderer_backend::perform(
+			const renderer_command* const c, 
+			const std::size_t n,
+			const dedicated_buffers& dedicated
+		) {
 #if BUILD_OPENGL
 			using A = backend_access;
 			A access;
@@ -139,43 +176,42 @@ namespace augs {
 			const int fb_height = static_cast<int>(io.DisplaySize.y * io.DisplayFramebufferScale.y);
 
 			for (std::size_t i = 0; i < n; ++i) {
-				auto& cmd = c[i];
+				const auto& cmd = c[i];
 
-				auto command_handler = [&](auto& typed_cmd) {
+				auto command_handler = [&](const auto& typed_cmd) {
 					using C = remove_cref<decltype(typed_cmd)>;
+
+					auto perform_drawcall_for = [&](const auto& buffers) {
+						const auto triangles_n = buffers.triangles.size();
+
+						if (triangles_n > 0) {
+							drawcall_command translated_cmd;
+
+							translated_cmd.triangles = buffers.triangles.data();
+							translated_cmd.count = triangles_n;
+
+							if (buffers.specials.size() > 0) {
+								translated_cmd.specials = buffers.specials.data();
+							}
+
+							perform(translated_cmd);
+						}
+					};
 
 					if constexpr(std::is_invocable_v<C, A>) {
 						typed_cmd(access);
 					}
 					else if constexpr(same<C, drawcall_command>) {
-						const auto triangles = typed_cmd.triangles;
-						const auto lines = typed_cmd.lines;
-						const auto specials = typed_cmd.specials;
+						perform(typed_cmd);
+					}
+					else if constexpr(same<C, drawcall_dedicated_command>) {
+						const auto& buffers = dedicated[typed_cmd.type];
+						perform_drawcall_for(buffers);
+					}
+					else if constexpr(same<C, drawcall_dedicated_vector_command>) {
+						const auto& buffers = dedicated[typed_cmd.type][typed_cmd.index];
+						perform_drawcall_for(buffers);
 
-						const auto cnt = static_cast<GLsizei>(typed_cmd.count);
-						const auto specials_cnt = cnt * 3;
-
-						if (specials) {
-							enable_special_vertex_attribute();
-							GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, p.special_buffer_id));
-							GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(special) * specials_cnt, specials, GL_STREAM_DRAW));
-						}
-
-						GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, p.triangle_buffer_id));
-
-						if (triangles) {
-							GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertex_triangle) * cnt, triangles, GL_STREAM_DRAW));
-							GL_CHECK(glDrawArrays(GL_TRIANGLES, 0, cnt * 3));
-						}
-
-						if (lines) {
-							GL_CHECK(buffer_data(GL_ARRAY_BUFFER, sizeof(vertex_line) * cnt, lines, GL_STREAM_DRAW));
-							GL_CHECK(glDrawArrays(GL_LINES, 0, cnt * 2));
-						}
-
-						if (specials) {
-							disable_special_vertex_attribute();
-						}
 					}
 					else if constexpr(same<C, setup_imgui_list>) {
 						cmd_list = typed_cmd.cmd_list;

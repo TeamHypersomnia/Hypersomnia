@@ -91,49 +91,6 @@ void light_system::advance_attenuation_variations(
 	);
 }
 
-void light_system::gather_vis_requests(const light_system_input& in) const {
-	auto& requests = thread_local_visibility_requests();
-
-	const auto& cosm = in.cosm;
-	const auto& interp  = in.make_drawing_in().interp;
-
-	const auto cone = in.cone;
-
-	const auto queried_camera_aabb = [&]() {
-		auto c = cone;
-		c.eye.zoom /= in.camera_query_mult;
-
-		return c.get_visible_world_rect_aabb();
-	}();
-
-	cosm.template for_each_having<components::light>(
-		[&](const auto light_entity) {
-			const auto light_transform = light_entity.get_viewing_transform(interp);
-			const auto& light = light_entity.template get<components::light>();
-
-			const auto reach = light.calc_reach_trimmed();
-			const auto light_aabb = xywh::center_and_size(light_transform.pos, reach);
-
-			if (const auto cache = mapped_or_nullptr(per_entity_cache, unversioned_entity_id(light_entity))) {
-				const auto light_displacement = vec2(cache->all_variation_values[6], cache->all_variation_values[7]);
-
-				messages::visibility_information_request request;
-
-				request.eye_transform = light_transform;
-				request.eye_transform.pos += light_displacement;
-
-				if (queried_camera_aabb.hover(light_aabb)) {
-					request.filter = predefined_queries::line_of_sight();
-					request.queried_rect = reach;
-					request.subject = light_entity;
-
-					requests.emplace_back(std::move(request));
-				}
-			}
-		}
-	);
-}
-
 void light_system::render_all_lights(const light_system_input in) const {
 	augs::graphics::fbo::mark_current(in.renderer);
 
@@ -210,8 +167,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 	const auto& interp = get_drawing_in().interp;
 
-	auto& requests = thread_local_visibility_requests();
-	auto& responses = thread_local_visibility_responses();
+	const auto& requests = in.requests;
 
 	const auto cone = in.cone;
 	const auto eye = cone.eye;
@@ -232,8 +188,8 @@ void light_system::render_all_lights(const light_system_input in) const {
 	std::size_t num_wall_lights = 0;
 
 	for (size_t i = 0; i < requests.size(); ++i) {
-		const auto& r = responses[i];
-		const auto& light_entity = cosm[requests[i].subject];
+		const auto& request = requests[i];
+		const auto& light_entity = cosm[request.subject];
 		const auto maybe_light = light_entity.find<components::light>();
 
 		if (maybe_light == nullptr) {
@@ -241,7 +197,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 		}
 
 		const auto& light = *maybe_light;
-		const auto world_light_pos = requests[i].eye_transform.pos;
+		const auto world_light_pos = request.eye_transform.pos;
 		
 		const auto& cache = per_entity_cache.at(light_entity);
 		const auto& variation_vals = cache.all_variation_values;
@@ -256,32 +212,10 @@ void light_system::render_all_lights(const light_system_input in) const {
 			set_uniform(light_shader, light_uniform.pos, light_frag_pos);
 		}
 
-		const bool was_visibility_calculated = !r.empty();
+		const bool was_visibility_calculated = request.valid();
 
 		if (was_visibility_calculated) {
 			++num_lights;
-
-			for (std::size_t t = 0; t < r.get_num_triangles(); ++t) {
-				const auto world_light_tri = r.get_world_triangle(t, world_light_pos);
-				augs::vertex_triangle renderable_light_tri;
-
-				renderable_light_tri.vertices[0].pos = world_light_tri[0];
-				renderable_light_tri.vertices[1].pos = world_light_tri[1];
-				renderable_light_tri.vertices[2].pos = world_light_tri[2];
-
-				auto considered_color = light.color;
-
-				if (considered_color == black) {
-					/* Easter egg: a completely black light gives a color wave. Pretty suitable for parties. */
-					considered_color.set_hsv({ fmod(global_time_seconds / 16.f, 1.f), 1.0, 1.0 });
-				}
-
-				renderable_light_tri.vertices[0].color = considered_color;
-				renderable_light_tri.vertices[1].color = considered_color;
-				renderable_light_tri.vertices[2].color = considered_color;
-
-				renderer.push_triangle(renderable_light_tri);
-			}
 
 			{
 				const auto& a = light.attenuation;
@@ -301,9 +235,8 @@ void light_system::render_all_lights(const light_system_input in) const {
 				white.rgb()
 			);
 
-			renderer.call_and_clear_triangles();
+			renderer.call_triangles(augs::dedicated_buffer_vector::LIGHT_VISIBILITY, i);
 		}
-
 	}
 
 	if (std::addressof(wall_light_shader) != std::addressof(light_shader)) {
@@ -313,7 +246,8 @@ void light_system::render_all_lights(const light_system_input in) const {
 	}
 
 	for (size_t i = 0; i < requests.size(); ++i) {
-		const auto& light_entity = cosm[requests[i].subject];
+		const auto& request = requests[i];
+		const auto& light_entity = cosm[request.subject];
 		const auto maybe_light = light_entity.find<components::light>();
 
 		if (maybe_light == nullptr) {
@@ -322,7 +256,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 		const auto& light = *maybe_light;
 
-		const auto world_light_pos = requests[i].eye_transform.pos;
+		const auto world_light_pos = request.eye_transform.pos;
 
 		const auto& cache = per_entity_cache.at(light_entity);
 		const auto& variation_vals = cache.all_variation_values;
@@ -393,7 +327,6 @@ void light_system::render_all_lights(const light_system_input in) const {
 		render_layer::OVER_SENTIENCES
 	>();
 
-#if BUILD_STENCIL_BUFFER
 	{
 		auto draw_lights_for = [&](const auto& handle) {
 			::draw_neon_map(handle, get_drawing_in());
@@ -410,7 +343,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 
 		if (const auto fog_of_war_character = cosm[in.fog_of_war_character ? *in.fog_of_war_character : entity_id()]) {
 			renderer.call_and_clear_triangles();
-			in.fill_stencil();
+			in.write_fow_to_stencil();
 			renderer.stencil_positive_test();
 			standard_shader.set_as_current(renderer);
 
@@ -436,9 +369,6 @@ void light_system::render_all_lights(const light_system_input in) const {
 			});
 		}
 	}
-#else
-	make_helper().draw_neons<render_layer::SENTIENCES>();
-#endif
 
 	make_helper().draw_neons<
 		render_layer::FLYING_BULLETS,

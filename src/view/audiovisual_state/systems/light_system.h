@@ -6,6 +6,8 @@
 #include "augs/misc/randomization.h"
 #include "augs/math/camera_cone.h"
 
+#include "game/stateless_systems/visibility_system.h"
+
 #include "view/viewables/all_viewables_declaration.h"
 #include "view/audiovisual_state/systems/audiovisual_cache_common.h"
 
@@ -40,7 +42,7 @@ struct light_system_input {
 	const augs::graphics::shader_program& textured_light_shader;
 	const augs::graphics::shader_program& standard_shader;
 	std::function<void()> neon_callback;
-	std::function<void()> fill_stencil;
+	std::function<void()> write_fow_to_stencil;
 	const camera_cone cone;
 	std::optional<entity_id> fog_of_war_character;
 	const float camera_query_mult;
@@ -49,6 +51,7 @@ struct light_system_input {
 	const augs::atlas_entry cast_highlight_tex;
 	std::function<draw_renderable_input()> make_drawing_in;
 	const performance_settings& perf_settings;
+	const std::vector<visibility_request>& requests;
 };
 
 struct light_system {
@@ -68,5 +71,9 @@ struct light_system {
 	);
 
 	void render_all_lights(const light_system_input) const;
-	void gather_vis_requests(const light_system_input&) const;
+	void gather_vis_requests(
+		const cosmos& cosm,
+		const interpolation_system& interp,
+		ltrb queried_camera_aabb
+	) const;
 };

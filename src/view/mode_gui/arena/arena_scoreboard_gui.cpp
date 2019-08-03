@@ -249,8 +249,8 @@ void arena_scoreboard_gui::draw_gui(
 		o.base::aabb(img, orig, col);
 	};
 
-	auto& avatar_triangles = in.renderer.dedicated[augs::dedicated_triangle_buffer::AVATARS];
-	auto& color_indicator_triangles = in.renderer.dedicated[augs::dedicated_triangle_buffer::SCOREBOARD_COLOR_INDICATORS];
+	auto& avatar_triangles = in.renderer.dedicated[augs::dedicated_buffer::AVATARS].triangles;
+	auto& color_indicator_triangles = in.renderer.dedicated[augs::dedicated_buffer::SCOREBOARD_COLOR_INDICATORS].triangles;
 
 	auto avatar_aabb_img = [&](auto img, auto orig, rgba col = white) {
 		orig.l += pen.x;

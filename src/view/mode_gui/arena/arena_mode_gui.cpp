@@ -190,7 +190,7 @@ void arena_gui_state::draw_mode_gui(
 			return get_text_bbox(colored(text, white));;
 		};
 
-		auto& avatar_triangles = in.renderer.dedicated[augs::dedicated_triangle_buffer::DEATH_SUMMARY_AVATAR];
+		auto& avatar_triangles = in.renderer.dedicated[augs::dedicated_buffer::DEATH_SUMMARY_AVATAR].triangles;
 
 		auto draw_death_summary = [&]() {
 			const auto viewed_player_id = spectator.show ? spectator.now_spectating : local_player_id;

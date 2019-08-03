@@ -625,7 +625,6 @@ return {
   },
 
   performance = {
-    light_calculation_threads = 0,
 	max_particles_in_single_job = 2500,
 
     special_effects = {

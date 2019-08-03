@@ -16,6 +16,7 @@ struct visibility_information_request_input {
 	float ignore_discontinuities_shorter_than = -1.f;
 
 	vec2 offset;
+	rgba color;
 };
 
 namespace messages {
@@ -25,6 +26,8 @@ namespace messages {
 		}
 
 		transformr eye_transform;
+
+		bool valid() const;
 	};
 
 	struct visibility_information_response {

@@ -6,6 +6,34 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- We could at least make light drawing a separate job 
+	- with its separate renderer
+
+- Since we're going to clear the task pool we could just use a vector instead of a queue
+	- And we would not need to hold a mutex for getting the next task
+	- Though I guess it's premature
+
+
+- We'll somehow remove the multithreading facility completely from the visibility system
+	- We'll take control
+	- Actually, we won't even need the responses because the tasks will fill the data themselves
+	- FoW for our character will be a separate job
+	- Somehow pass a pointer to the target triangle buffer to fill. If it's null
+	- Light system simply does a delayed call_triangles(dedicated_buffer_category::VISIBILITY, i);
+
+- Caling dedicated buffers in a delayed manner
+	- dedicated_buffer_type::FLYING_NUMBERS
+	- FoW buffer
+		- similarly, call_triangles(dedicated_buffer_type::FOW)
+	- We can later give dedicated buffers to the render layers similarly, just a separate enum type and enum array
+		- this only has the disadvantage that it will incur more drawcalls so maybe we could do it later
+
+- Illuminated rendering could trivially post all jobs for layers at the very beginning and only then prepare the commands
+	- Jobs in visibility system
+		- We'll remove the range workers completely and the parameter for threads, we'll simply have jobs
+		- Each job could draw the light right away to once again avoid dependencies
+		- We can still do this before introducing the pool
+
 - Backend accepts renderer so that it has access to dedicated buffers
 	- Can post a drawcall with an enum instead of pointer for a delayed call?
 

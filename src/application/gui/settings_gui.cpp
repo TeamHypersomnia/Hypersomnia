@@ -1120,12 +1120,6 @@ void settings_gui_state::perform(
 					text_color(typesafe_sprintf("%x\n\n", concurrency), green);
 
 					revertable_slider(SCOPE_CFG_NVP(max_particles_in_single_job), 1000, 20000);
-
-					const auto t_max = static_cast<int>(concurrency);
-
-					text_disabled(typesafe_sprintf("(Value of 0 means to take a default of\nstd::clamp(concurrent_threads - 1u, 1u, 5u), which equals %x)", performance_settings { 0, {} }.get_light_calculation_threads()));
-
-					revertable_slider(SCOPE_CFG_NVP(light_calculation_threads), 0, t_max);
 				}
 
 				break;

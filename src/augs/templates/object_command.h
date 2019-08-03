@@ -7,7 +7,7 @@ namespace augs {
 		P payload;
 
 		template <class A>
-		void operator()(const A access) {
+		void operator()(const A access) const {
 			this_ptr->perform(access, payload);
 		}
 	};
@@ -17,7 +17,7 @@ namespace augs {
 		P payload;
 
 		template <class A>
-		void operator()(const A access) {
+		void operator()(const A access) const {
 			T::perform_static(access, payload);
 		}
 	};

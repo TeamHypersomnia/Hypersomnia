@@ -2,6 +2,7 @@
 #include "augs/graphics/renderer_command_enums.h"
 #include "3rdparty/imgui/imgui.h"
 #include "augs/graphics/vertex.h"
+#include "augs/graphics/dedicated_buffers.h"
 
 namespace augs {
 	enum class no_arg_command {
@@ -44,6 +45,15 @@ namespace augs {
 		const special* specials = nullptr;
 
 		uint32_t count = 0;
+	};
+
+	struct drawcall_dedicated_command {
+		dedicated_buffer type;
+	};
+
+	struct drawcall_dedicated_vector_command {
+		dedicated_buffer_vector type;
+		uint32_t index = 0;
 	};
 
 	struct set_viewport_command {

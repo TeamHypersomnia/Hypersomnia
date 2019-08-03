@@ -77,6 +77,7 @@
 #include "augs/window_framework/create_process.h"
 #include "application/setups/editor/editor_popup.h"
 #include "application/main/game_frame_buffer.h"
+#include "application/main/cached_visibility_data.h"
 #include "augs/graphics/frame_num_type.h"
 
 std::function<void()> ensure_handler;
@@ -1385,7 +1386,7 @@ and then hitting Save settings.
 
 	ImGui::GetIO().MousePos = { 0, 0 };
 
-	LOG("Entered the main loop.");
+	static cached_visibility_data cached_visibility;
 
 	static auto game_thread_worker = []() {
 		while (!should_quit) {
@@ -2026,7 +2027,8 @@ and then hitting Save settings.
 					highlights,
 					special_indicators,
 					indicator_meta,
-					write_buffer.particle_buffers
+					write_buffer.particle_buffers,
+					cached_visibility
 				});
 			};
 
@@ -2266,7 +2268,8 @@ and then hitting Save settings.
 			for (auto& r : read_buffer.renderers.all) {
 				renderer_backend.perform(
 					r.commands.data(),
-					r.commands.size()
+					r.commands.size(),
+					r.dedicated
 				);
 			}
 

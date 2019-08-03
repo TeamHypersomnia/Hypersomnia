@@ -49,8 +49,14 @@
 #include "game/detail/sentience/callout_logic.h"
 
 #include "augs/graphics/shader.hpp"
+#include "view/rendering_scripts/for_each_vis_request.h"
+#include "application/main/cached_visibility_data.h"
+#include "view/rendering_scripts/vis_response_to_triangles.h"
+#include "view/rendering_scripts/launch_visibility_jobs.h"
 
 void illuminated_rendering(const illuminated_rendering_input in) {
+	using D = augs::dedicated_buffer;
+
 	const auto& additional_highlights = in.additional_highlights;
 	const auto& special_indicators = in.special_indicators;
 	augs::graphics::fbo::mark_current(in.renderer);
@@ -78,6 +84,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto& cosm = viewed_character.get_cosmos();
 	
 	const auto& av = in.audiovisuals;
+	const auto& light = av.get<light_system>();
 	const auto& interp = av.get<interpolation_system>();
 	const auto& wandering_pixels = av.get<wandering_pixels_system>();
 	const auto& exploding_rings = av.get<exploding_ring_system>();
@@ -113,6 +120,47 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	};
 
 	const auto viewed_character_transform = viewed_character ? viewed_character.find_viewing_transform(interp) : std::optional<transformr>();
+
+	const auto queried_cone = [&]() {
+		auto c = cone;
+		c.eye.zoom /= in.camera_query_mult;
+		return c;
+	}();
+
+	auto& light_requests = in.cached_visibility.light_requests;
+	light_requests.clear();
+
+	for_each_vis_request(
+		[&](const visibility_request& request) {
+			light_requests.emplace_back(request);
+		},
+
+		cosm,
+
+		light.per_entity_cache,
+		interp,
+		queried_cone.get_visible_world_rect_aabb()
+	);
+
+#if BUILD_STENCIL_BUFFER
+	const bool fog_of_war_effective = 
+		viewed_character_transform != std::nullopt 
+		&& settings.fog_of_war.is_enabled()
+	;
+#else
+	const bool fog_of_war_effective = false;
+#endif
+
+	::launch_visibility_jobs(
+		cosm,
+		renderer.dedicated,
+		in.cached_visibility,
+
+		fog_of_war_effective,
+		viewed_character,
+		viewed_character_transform ? *viewed_character_transform : transformr(),
+		settings.fog_of_war
+	);
 
 	const auto filtering = in.renderer_settings.default_filtering;
 
@@ -169,18 +217,10 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	augs::graphics::fbo::set_current_to_marked(in.renderer);
 
-	const auto& light = av.get<light_system>();
-	
 	const auto laser_glow = necessarys.at(assets::necessary_image_id::LASER_GLOW);
 	const auto glow_edge_tex = necessarys.at(assets::necessary_image_id::LASER_GLOW_EDGE);
 
 	const auto cast_highlight = necessarys.at(assets::necessary_image_id::CAST_HIGHLIGHT);
-
-	const auto queried_cone = [&]() {
-		auto c = cone;
-		c.eye.zoom /= in.camera_query_mult;
-		return c;
-	}();
 
 	auto make_drawing_input = [&]() {
 		return draw_renderable_input { 
@@ -196,78 +236,40 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		};
 	};
 
-	const bool fog_of_war_effective = 
-		viewed_character_transform != std::nullopt 
-		&& settings.fog_of_war.is_enabled()
-	;
+	auto write_fow_to_stencil = [&]() {
+		renderer.set_stencil(true);
 
-	const messages::visibility_information_response* fow_response = nullptr;
+		renderer.start_writing_stencil();
+		renderer.set_clear_color(rgba(0, 0, 0, 0));
+		renderer.clear_stencil();
 
-#if BUILD_STENCIL_BUFFER
-	auto fill_stencil = [&]() {
-		if (fow_response != nullptr) {
-			renderer.set_stencil(true);
+		const auto eye_pos = viewed_character_transform->pos;
 
-			renderer.start_writing_stencil();
-			renderer.set_clear_color(rgba(0, 0, 0, 0));
-			renderer.clear_stencil();
+		set_shader_with_matrix(shaders.fog_of_war);
 
-			const auto eye_pos = viewed_character_transform->pos;
-			const auto& r = *fow_response;
+		auto dir = calc_crosshair_displacement(viewed_character) + in.pre_step_crosshair_displacement;
 
-			for (std::size_t t = 0; t < r.get_num_triangles(); ++t) {
-				const auto world_light_tri = r.get_world_triangle(t, eye_pos);
-				augs::vertex_triangle renderable_light_tri;
-
-				renderable_light_tri.vertices[0].pos = world_light_tri[0];
-				renderable_light_tri.vertices[1].pos = world_light_tri[1];
-				renderable_light_tri.vertices[2].pos = world_light_tri[2];
-
-				renderable_light_tri.vertices[0].color = white;
-				renderable_light_tri.vertices[1].color = white;
-				renderable_light_tri.vertices[2].color = white;
-
-				renderer.push_triangle(renderable_light_tri);
-			}
-
-			const auto& angle = settings.fog_of_war.angle;
-
-			if (angle >= 360.f) {
-				set_shader_with_matrix(shaders.pure_color_highlight);
-			}
-			else {
-				set_shader_with_matrix(shaders.fog_of_war);
-
-				auto dir = calc_crosshair_displacement(viewed_character) + in.pre_step_crosshair_displacement;
-
-				if (dir.is_zero()) {
-					dir.set(1, 0);
-				}
-
-				const auto left_dir = vec2(dir).rotate(-angle / 2).neg_y();
-				const auto right_dir = vec2(dir).rotate(angle / 2).neg_y();
-
-				const auto eye_frag_pos = [&]() {
-					auto screen_space = cone.to_screen_space(eye_pos);	
-					screen_space.y = screen_size.y - screen_space.y;
-					return screen_space;
-				}();
-
-				set_uniform(shaders.fog_of_war, U::startingAngleVec, left_dir);
-				set_uniform(shaders.fog_of_war, U::endingAngleVec, right_dir);
-				set_uniform(shaders.fog_of_war, U::eye_frag_pos, eye_frag_pos);
-			}
-
-			renderer.call_and_clear_triangles();
-			renderer.start_testing_stencil();
+		if (dir.is_zero()) {
+			dir.set(1, 0);
 		}
-	};
-#else
-	(void)fow_response;
-	auto fill_stencil = [&]() {
 
+		const auto& angle = settings.fog_of_war.angle;
+		const auto left_dir = vec2(dir).rotate(-angle / 2).neg_y();
+		const auto right_dir = vec2(dir).rotate(angle / 2).neg_y();
+
+		const auto eye_frag_pos = [&]() {
+			auto screen_space = cone.to_screen_space(eye_pos);	
+			screen_space.y = screen_size.y - screen_space.y;
+			return screen_space;
+		}();
+
+		set_uniform(shaders.fog_of_war, U::startingAngleVec, left_dir);
+		set_uniform(shaders.fog_of_war, U::endingAngleVec, right_dir);
+		set_uniform(shaders.fog_of_war, U::eye_frag_pos, eye_frag_pos);
+
+		renderer.call_triangles(D::FOG_OF_WAR);
+		renderer.start_testing_stencil();
 	};
-#endif
 
 	const auto light_input = light_system_input {
 		renderer,
@@ -338,61 +340,22 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 				queried_cone
 			);
 		},
-		fill_stencil,
+		write_fow_to_stencil,
 		cone,
 		fog_of_war_effective ? viewed_character : std::optional<entity_id>(),
 		in.camera_query_mult,
 		visible,
 		cast_highlight,
 		make_drawing_input,
-		in.perf_settings
+		in.perf_settings,
+		light_requests
 	};
 
-	auto& vis_requests = fresh_thread_local_visibility_requests();
-	auto& vis_responses = thread_local_visibility_responses();
-
-	light.gather_vis_requests(light_input);
-
-	auto invoke_visibility_calculations = [&]() {
-		auto scope = measure_scope(profiler.light_visibility);
-		auto light_raycasts_scope = cosm.measure_raycasts(profiler.visibility_raycasts);
-
-		visibility_system(DEBUG_FRAME_LINES).calc_visibility(cosm, vis_requests, vis_responses, in.perf_settings);
-	};
-
-#if BUILD_STENCIL_BUFFER
 	if (fog_of_war_effective) {
-		const auto fow_size = settings.fog_of_war.get_real_size();
-
-		messages::visibility_information_request request;
-		request.eye_transform = *viewed_character_transform;
-		request.filter = predefined_queries::line_of_sight();
-		request.queried_rect = fow_size;
-		request.subject = viewed_character;
-
-		vis_requests.push_back(request);
-	}
-
-	invoke_visibility_calculations();
-
-	if (fog_of_war_effective) {
-		const auto fow_response_index = vis_requests.size() - 1;
-
-		if (vis_responses.size() > fow_response_index) {
-			const auto& fow_resp = vis_responses[fow_response_index];
-
-		   	if (!fow_resp.empty()) {
-				fow_response = std::addressof(fow_resp);
-			}
-		}
-
 		renderer.call_and_clear_triangles();
-		fill_stencil();
+		write_fow_to_stencil();
 		renderer.set_stencil(false);
 	}
-#else
-	invoke_visibility_calculations();
-#endif
 
 	light.render_all_lights(light_input);
 
@@ -464,7 +427,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		return result;
 	};
 
-#if BUILD_STENCIL_BUFFER
 	if (fog_of_war_effective) {
 		renderer.call_and_clear_triangles();
 
@@ -495,9 +457,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	else {
 		make_helper().draw_border<render_layer::SENTIENCES>(standard_border_provider);
 	}
-#else
-	make_helper().draw_border<render_layer::SENTIENCES>(standard_border_provider);
-#endif
 
 	renderer.call_and_clear_triangles();
 
@@ -562,7 +521,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	>();
 	
 
-#if BUILD_STENCIL_BUFFER
 	if (fog_of_war_effective) {
 		const auto& appearance = settings.fog_of_war_appearance;
 
@@ -616,9 +574,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	else {
 		make_helper().draw<render_layer::SENTIENCES>();
 	}
-#else
-	make_helper().draw<render_layer::SENTIENCES>();
-#endif
 
 	make_helper().draw<
 		render_layer::INSECTS,
@@ -709,11 +664,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		set_uniform(shaders.circular_bars, U::texture_center, tex.get_center());
 	};
 
-	using D = augs::dedicated_triangle_buffer;
-
-	auto& nicknames_output = renderer.dedicated[D::NICKNAMES];
-	auto& health_numbers_output = renderer.dedicated[D::HEALTH_NUMBERS];
-	auto& indicators_output = renderer.dedicated[D::INDICATORS];
+	auto& nicknames_output = renderer.dedicated[D::NICKNAMES].triangles;
+	auto& health_numbers_output = renderer.dedicated[D::HEALTH_NUMBERS].triangles;
+	auto& indicators_output = renderer.dedicated[D::INDICATORS].triangles;
 
 	if (viewed_character) {
 		auto make_input_for = [&](const auto& tex_type, const auto meter) {
