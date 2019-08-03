@@ -51,6 +51,7 @@ int performance_settings::get_default_num_pool_workers() {
 	const auto concurrency = static_cast<int>(std::thread::hardware_concurrency());
 
 	const auto audio_threads = 1;
+	const auto openal_threads = 1;
 	const auto rendering_threads = 1;
 	const auto main_threads = 1;
 
@@ -58,6 +59,7 @@ int performance_settings::get_default_num_pool_workers() {
 		audio_threads
 		+ rendering_threads
 		+ main_threads
+		+ openal_threads
 	;
 
 	return std::max(0, concurrency - total_other_threads);

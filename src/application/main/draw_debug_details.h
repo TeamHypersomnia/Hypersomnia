@@ -16,17 +16,34 @@ namespace augs {
 	struct baked_font;
 }
 
+struct debug_details_summaries {
+	std::string frame;
+	std::string network;
+	std::string network_stats;
+	std::string server_stats;
+	std::string streaming;
+	std::string general_atlas;
+	std::string session;
+	std::string audiovisual;
+	std::string cosmic;
+
+	void acquire(
+		const cosmos&,
+		const frame_profiler& frame_performance,
+		const network_profiler& network_performance,
+		const network_info& network_stats,
+		const server_network_info& server_stats,
+		const viewables_streaming_profiler& streaming_performance,
+		const atlas_profiler& general_atlas_performance,
+		const session_profiler& session_performance,
+		const audiovisual_profiler& audiovisual_performance
+	);
+};
+
 void draw_debug_details(
 	const augs::drawer output,
 	const augs::baked_font& gui_font,
 	const vec2i screen_size,
 	const const_entity_handle viewed_character,
-	const frame_profiler& frame_performance,
-	const network_profiler& network_performance,
-	const network_info& network_stats,
-	const server_network_info& server_stats,
-	const viewables_streaming_profiler& streaming_performance,
-	const atlas_profiler& general_atlas_performance,
-	const session_profiler& session_performance,
-	const audiovisual_profiler& audiovisual_performance
+	const debug_details_summaries&
 );

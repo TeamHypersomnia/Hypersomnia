@@ -1391,6 +1391,7 @@ and then hitting Save settings.
 	ImGui::GetIO().MousePos = { 0, 0 };
 
 	static cached_visibility_data cached_visibility;
+	static debug_details_summaries debug_summaries;
 
 	static auto game_thread_worker = []() {
 		while (!should_quit) {
@@ -2103,14 +2104,7 @@ and then hitting Save settings.
 						streaming.get_loaded_gui_fonts().gui,
 						screen_size,
 						viewed_character,
-						frame_performance,
-						network_performance,
-						network_stats,
-						server_stats,
-						streaming.performance,
-						streaming.general_atlas_performance,
-						performance,
-						get_audiovisuals().performance
+						debug_summaries
 					);
 				}
 			};
@@ -2261,10 +2255,13 @@ and then hitting Save settings.
 			thread_pool.enqueue(show_developer_details_job);
 			thread_pool.enqueue(post_game_gui_job);
 
-			thread_pool.help_until_no_tasks();
+			{
+				auto scope = measure_scope(frame_performance.main_help);
+				thread_pool.help_until_no_tasks();
+			}
 
 			{
-				auto scope = measure_scope(frame_performance.wait_completion);
+				auto scope = measure_scope(frame_performance.main_wait);
 				thread_pool.wait_for_all_tasks_to_complete();
 			}
 
@@ -2282,6 +2279,8 @@ and then hitting Save settings.
 	};
 
 	static auto game_main_thread_synced_op = []() {
+		auto scope = measure_scope(frame_performance.synced_op);
+
 		/* 
 			IMGUI is our top GUI whose priority precedes everything else. 
 			It will eat from the window input vector that is later passed to the game and other GUIs.	
@@ -2289,6 +2288,22 @@ and then hitting Save settings.
 
 		configurables.sync_back_into(config);
 		configurables.apply_main_thread(read_buffer.new_settings);
+
+		if (config.session.show_developer_console) {
+			const auto viewed_character = get_viewed_character();
+
+			debug_summaries.acquire(
+				viewed_character.get_cosmos(),
+				frame_performance,
+				network_performance,
+				network_stats,
+				server_stats,
+				streaming.performance,
+				streaming.general_atlas_performance,
+				performance,
+				get_audiovisuals().performance
+			);
+		}
 	};
 
 	do {
@@ -2330,8 +2345,15 @@ and then hitting Save settings.
 				read_buffer.screen_size = window.get_screen_size();
 			}
 
-			thread_pool.help_until_no_tasks();
-			buffer_swapper.swap_buffers(read_buffer, write_buffer, game_main_thread_synced_op);
+			{
+				auto scope = measure_scope(frame_performance.render_help);
+				thread_pool.help_until_no_tasks();
+			}
+
+			{
+				auto scope = measure_scope(frame_performance.render_wait);
+				buffer_swapper.swap_buffers(read_buffer, write_buffer, game_main_thread_synced_op);
+			}
 		}
 
 		if (window.is_active() && read_buffer.should_clip_cursor) {

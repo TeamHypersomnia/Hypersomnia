@@ -14,11 +14,8 @@
 
 #include "build_info.h"
 
-void draw_debug_details(
-	const augs::drawer output,
-	const augs::baked_font& gui_font,
-	const vec2i screen_size,
-	const const_entity_handle viewed_character,
+void debug_details_summaries::acquire(
+	const cosmos& cosm,
 	const frame_profiler& frame_performance,
 	const network_profiler& network_performance,
 	const network_info& network_stats,
@@ -27,6 +24,70 @@ void draw_debug_details(
 	const atlas_profiler& general_atlas_performance,
 	const session_profiler& session_performance,
 	const audiovisual_profiler& audiovisual_performance
+) {
+	frame = frame_performance.summary();
+	network = network_performance.summary();
+	streaming = streaming_performance.summary();
+	general_atlas = general_atlas_performance.summary();
+	session = session_performance.summary();
+	audiovisual = audiovisual_performance.summary();
+
+	if (std::addressof(cosm) == std::addressof(cosmos::zero)) {
+		cosmic.clear();
+	}
+	else {
+		cosmic = cosm.profiler.summary();
+	}
+
+	auto make_readable = [&](const auto kbits) {
+		const bool in_bytes = false;
+
+		if (in_bytes) {
+			return readable_bytesize(kbits / 8 * 1000);
+		}
+
+		return readable_bitsize(kbits * 1000);
+	};
+
+	if (server_stats.are_set()) {
+		this->server_stats = typesafe_sprintf(
+			"Sent: %x/s" "\n"
+			"Rcvd: %x/s" "\n",
+			make_readable(server_stats.sent_kbps),
+			make_readable(server_stats.received_kbps)
+		);
+	}
+
+	if (network_stats.are_set()) {
+		const auto loss_percent = 
+			typesafe_sprintf("Loss: %2f", network_stats.loss_percent) + "%" "\n"
+		;
+
+		this->network_stats = loss_percent + typesafe_sprintf(
+			"RTT: %x ms" "\n"
+			"Sent: %x/s" "\n"
+			"Rcvd: %x/s" "\n"
+			"Ackd: %x/s" "\n"
+			"# sent: %x" "\n"
+			"# rcvd: %x" "\n"
+			"# ackd: %x" "\n",
+			network_stats.rtt_ms,
+			make_readable(network_stats.sent_kbps),
+			make_readable(network_stats.received_kbps),
+			make_readable(network_stats.acked_kbps),
+			network_stats.packets_sent,
+			network_stats.packets_received,
+			network_stats.packets_acked
+		);
+	}
+}
+
+void draw_debug_details(
+	const augs::drawer output,
+	const augs::baked_font& gui_font,
+	const vec2i screen_size,
+	const const_entity_handle viewed_character,
+	const debug_details_summaries& summaries
 ) {
 	using namespace augs::gui::text;
 
@@ -68,7 +129,7 @@ void draw_debug_details(
 
 	total_details += { typesafe_sprintf("Entities: %x\n", cosm.get_entities_count()), text_style };
 
-	if (false && viewed_character.alive()) {
+	if (viewed_character.alive()) {
 		if (const auto transform = viewed_character.find_logic_transform()) {
 			const auto coords = transform->pos;
 			const auto rot = transform->rotation;
@@ -102,19 +163,19 @@ void draw_debug_details(
 	}
 
 	total_details += { "Session\n", category_style };
-	total_details += { session_performance.summary(), text_style };
+	total_details += { summaries.session, text_style };
 	total_details += { "Frame\n", category_style };
-	total_details += { frame_performance.summary(), text_style };
+	total_details += { summaries.frame, text_style };
 
 
 	total_details += { "Audiovisual\n", category_style };
-	total_details += { audiovisual_performance.summary(), text_style };
+	total_details += { summaries.audiovisual, text_style };
 
 	total_details += { "Viewables streaming\n", category_style };
-	total_details += { streaming_performance.summary(), text_style };
+	total_details += { summaries.streaming, text_style };
 
 	total_details += { "General atlas\n", category_style };
-	total_details += { general_atlas_performance.summary(), text_style };
+	total_details += { summaries.general_atlas, text_style };
 
 	print(output, { 0, 0 }, total_details);
 
@@ -122,56 +183,16 @@ void draw_debug_details(
 		total_details.clear();
 
 		total_details += { "Network\n", category_style };
-		total_details += { network_performance.summary(), text_style };
+		total_details += { summaries.network, text_style };
 
-		const bool in_bytes = false;
-
-		auto make_readable = [&](const auto kbits) {
-			if (in_bytes) {
-				return readable_bytesize(kbits / 8 * 1000);
-			}
-			
-			return readable_bitsize(kbits * 1000);
-		};
-
-		if (network_stats.are_set()) {
+		if (summaries.network_stats.size() > 0) {
 			total_details += { "Connection stats\n", category_style };
-
-			const auto loss_percent = 
-				typesafe_sprintf("Loss: %2f", network_stats.loss_percent) + "%" "\n"
-			;
-
-			const auto stats_summary = loss_percent + typesafe_sprintf(
-				"RTT: %x ms" "\n"
-				"Sent: %x/s" "\n"
-				"Rcvd: %x/s" "\n"
-				"Ackd: %x/s" "\n"
-				"# sent: %x" "\n"
-				"# rcvd: %x" "\n"
-				"# ackd: %x" "\n",
-				network_stats.rtt_ms,
-				make_readable(network_stats.sent_kbps),
-				make_readable(network_stats.received_kbps),
-				make_readable(network_stats.acked_kbps),
-				network_stats.packets_sent,
-				network_stats.packets_received,
-				network_stats.packets_acked
-			);
-
-			total_details += { stats_summary, text_style };
+			total_details += { summaries.network_stats, text_style };
 		}
 
-		if (server_stats.are_set()) {
+		if (summaries.server_stats.size() > 0) {
 			total_details += { "Server stats\n", category_style };
-
-			const auto stats_summary = typesafe_sprintf(
-				"Sent: %x/s" "\n"
-				"Rcvd: %x/s" "\n",
-				make_readable(server_stats.sent_kbps),
-				make_readable(server_stats.received_kbps)
-			);
-
-			total_details += { stats_summary, text_style };
+			total_details += { summaries.server_stats, text_style };
 		}
 
 		print(
@@ -186,10 +207,7 @@ void draw_debug_details(
 		total_details.clear();
 
 		total_details += { "Cosmos\n", category_style };
-
-		if (false && viewed_character.alive()) {
-			total_details += { viewed_character.get_cosmos().profiler.summary(), text_style };
-		}
+		total_details += { summaries.cosmic, text_style };
 
 		print(
 			output, 
