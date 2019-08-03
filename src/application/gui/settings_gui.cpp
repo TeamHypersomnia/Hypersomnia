@@ -47,6 +47,30 @@ void settings_gui_state::set_hijacked_key(const augs::event::keys::key k) {
 	hijacking.captured = k;
 }
 
+int performance_settings::get_default_num_pool_workers() {
+	const auto concurrency = static_cast<int>(std::thread::hardware_concurrency());
+
+	const auto audio_threads = 1;
+	const auto rendering_threads = 1;
+	const auto main_threads = 1;
+
+	const auto total_other_threads = 
+		audio_threads
+		+ rendering_threads
+		+ main_threads
+	;
+
+	return std::max(0, concurrency - total_other_threads);
+}
+
+int performance_settings::get_num_pool_workers() const {
+	if (custom_num_pool_workers.is_enabled) {
+		return std::max(0, custom_num_pool_workers.value);
+	}
+
+	return get_default_num_pool_workers();
+}
+
 #define CONFIG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), config.x
 #define SCOPE_CFG_NVP(x) format_field_name(std::string(#x)) + "##" + std::to_string(field_id++), scope_cfg.x
 
@@ -1113,11 +1137,31 @@ void settings_gui_state::perform(
 				{
 					auto& scope_cfg = config.performance;
 
-					const auto concurrency = std::thread::hardware_concurrency();
+					const auto concurrency = static_cast<int>(std::thread::hardware_concurrency());
 
-					text("Concurrent threads:");
-					ImGui::SameLine();
-					text_color(typesafe_sprintf("%x\n\n", concurrency), green);
+					{
+						text("Concurrent hardware threads:");
+						ImGui::SameLine();
+						text_color(typesafe_sprintf("%x\n\n", concurrency), green);
+					}
+
+					{
+						const auto default_n = performance_settings::get_default_num_pool_workers();
+						text("Default number of thread pool workers: ");
+						ImGui::SameLine();
+						text_color(typesafe_sprintf("%x\n\n", default_n), default_n == 0 ? red : green);
+					}
+
+
+					{
+						auto& cn = scope_cfg.custom_num_pool_workers;
+						revertable_checkbox("Custom number of thread pool workers", cn.is_enabled);
+
+						if (cn.is_enabled) {
+							auto indent = scoped_indent();
+							revertable_slider("##ThreadCount", cn.value, 0, concurrency * 3);
+						}
+					}
 
 					revertable_slider(SCOPE_CFG_NVP(max_particles_in_single_job), 1000, 20000);
 				}

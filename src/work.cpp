@@ -14,6 +14,7 @@
 #include "augs/templates/container_templates.h"
 #include "augs/templates/history.hpp"
 #include "augs/templates/traits/in_place.h"
+#include "augs/templates/thread_pool.h"
 
 #include "augs/filesystem/file.h"
 #include "augs/filesystem/directory.h"
@@ -1103,6 +1104,7 @@ and then hitting Save settings.
 	};
 
 	static bool interpolation_needs_to_update_desired_transforms = true;
+	static auto thread_pool = augs::thread_pool(config.performance.get_num_pool_workers());
 
 	static auto audiovisual_step = [&](
 		const augs::delta frame_delta,
@@ -1390,6 +1392,17 @@ and then hitting Save settings.
 
 	static auto game_thread_worker = []() {
 		while (!should_quit) {
+			{
+				/* The thread pool is always empty of tasks on the beginning of the game frame. */
+
+				const auto requested_num_workers = config.performance.get_num_pool_workers();
+				const auto current_num_workers = static_cast<int>(thread_pool.size());
+
+				if (current_num_workers != requested_num_workers) {
+					thread_pool.resize(requested_num_workers);
+				}
+			}
+
 			/* Setup variables required by the lambdas */
 
 			const auto screen_size = logic_get_screen_size();
@@ -2236,6 +2249,10 @@ and then hitting Save settings.
 
 			post_game_gui();
 			show_developer_details(debug_details_renderer, new_viewing_config);
+
+			thread_pool.help_until_no_tasks();
+			thread_pool.wait_for_all_tasks_to_complete();
+
 			finalize_frame_and_swap();
 		}
 	};
@@ -2298,6 +2315,7 @@ and then hitting Save settings.
 				read_buffer.screen_size = window.get_screen_size();
 			}
 
+			thread_pool.help_until_no_tasks();
 			buffer_swapper.swap_buffers(read_buffer, write_buffer, game_main_thread_synced_op);
 		}
 
