@@ -20,6 +20,10 @@
 class interpolation_system;
 struct randomization;
 
+namespace augs {
+	class thread_pool;
+}
+
 struct integrate_and_draw_all_particles_input {
 	const cosmos& cosm;
 	const augs::delta dt;
@@ -28,6 +32,8 @@ struct integrate_and_draw_all_particles_input {
 	const plain_animations_pool& anims;
 	const int max_particles_in_single_job;
 	particle_triangle_buffers& output;
+
+	augs::thread_pool& pool;
 };
 
 class particles_simulation_system {

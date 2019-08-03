@@ -24,6 +24,7 @@
 #include "augs/templates/enum_introspect.h"
 #include "view/viewables/particle_types.hpp"
 #include "view/viewables/images_in_atlas_map.h"
+#include "augs/templates/thread_pool.h"
 
 using emi_inst = particles_simulation_system::emission_instance;
 
@@ -381,6 +382,11 @@ void particles_simulation_system::preallocate_particle_buffers(particle_triangle
 }
 
 void particles_simulation_system::integrate_and_draw_all_particles(const integrate_and_draw_all_particles_input in) {
+	auto& cosm = in.cosm;
+	auto& interp = in.interp;
+	auto& output_buffers = in.output;
+	auto& anims = in.anims;
+	auto& game_images = in.game_images;
 
 	/* 
 		This can run in a separate job. 
@@ -389,7 +395,7 @@ void particles_simulation_system::integrate_and_draw_all_particles(const integra
 
 	const auto delta = in.dt.in_seconds();
 
-	auto generic_integrate = [&](const particle_layer, auto& range, int, int from_i, const int till_i, auto&&... args) {
+	auto generic_integrate = [&anims, delta](const particle_layer, auto& range, int, int from_i, const int till_i, auto&&... args) {
 		using P = typename remove_cref<decltype(range)>::value_type;
 
 		for (; from_i < till_i; ++from_i) {
@@ -399,10 +405,10 @@ void particles_simulation_system::integrate_and_draw_all_particles(const integra
 				particle.integrate(delta);
 			}
 			else if constexpr(std::is_same_v<P, animated_particle>) {
-				particle.integrate(delta, in.anims);
+				particle.integrate(delta, anims);
 			}
 			else if constexpr(std::is_same_v<P, homing_animated_particle>) {
-				particle.integrate(delta, in.anims, std::forward<decltype(args)>(args)...);
+				particle.integrate(delta, anims, std::forward<decltype(args)>(args)...);
 			}
 			else {
 				static_assert(always_false_v<P>, "Unimplemented!");
@@ -410,9 +416,9 @@ void particles_simulation_system::integrate_and_draw_all_particles(const integra
 		}
 	};
 
-	auto generic_draw = [&](const particle_layer p, auto& range, const int layer_index, const int from_i, const int till_i, auto&&...) {
+	auto generic_draw = [&output_buffers, &game_images, &anims](const particle_layer p, auto& range, const int layer_index, const int from_i, const int till_i, auto&&...) {
 		{
-			auto& target_buffer = in.output.diffuse[p];
+			auto& target_buffer = output_buffers.diffuse[p];
 
 			auto li = layer_index;
 
@@ -422,14 +428,14 @@ void particles_simulation_system::integrate_and_draw_all_particles(const integra
 				auto& t1 = target_buffer[2 * li];
 				auto& t2 = target_buffer[2 * li + 1];
 
-				particle.template draw_as_sprite<false>(t1, t2, in.game_images, in.anims);
+				particle.template draw_as_sprite<false>(t1, t2, game_images, anims);
 
 				++li;
 			}
 		}
 
 		if (p == particle_layer::NEONING_PARTICLES) {
-			auto& target_buffer = in.output.neons;
+			auto& target_buffer = output_buffers.neons;
 
 			auto li = layer_index;
 
@@ -439,27 +445,27 @@ void particles_simulation_system::integrate_and_draw_all_particles(const integra
 				auto& t1 = target_buffer[2 * li];
 				auto& t2 = target_buffer[2 * li + 1];
 
-				particle.template draw_as_sprite<true>(t1, t2, in.game_images, in.anims);
+				particle.template draw_as_sprite<true>(t1, t2, game_images, anims);
 
 				++li;
 			}
 		}
 	};
 
-	auto integrate_worker = [&](const int from, const int to) {
+	auto integrate_worker = [this, &cosm, &interp, generic_integrate](const int from, const int to) {
 		for_each_particle_in_range(
-			in.cosm,
-			in.interp,
+			cosm,
+			interp,
 			from,
 			to, 
 			generic_integrate
 		);
 	};
 
-	auto draw_worker = [&](const int from, const int to) {
+	auto draw_worker = [this, &cosm, &interp, generic_draw](const int from, const int to) {
 		for_each_particle_in_range(
-			in.cosm,
-			in.interp,
+			cosm,
+			interp,
 			from, 
 			to, 
 			generic_draw
@@ -472,18 +478,22 @@ void particles_simulation_system::integrate_and_draw_all_particles(const integra
 		return;
 	}
 
-	const auto max_per_job_n = in.max_particles_in_single_job;
+	const auto max_per_job_n = std::max(1, in.max_particles_in_single_job);
 	const auto jobs_n = 1 + total_n / max_per_job_n;
 	const auto per_job_n = total_n / jobs_n;
 
-	for (int i = 0; i < jobs_n; ++i) {
-		const bool is_last = i == jobs_n - 1;
-		const auto from = i * per_job_n;
-		const auto to = is_last ? total_n : from + per_job_n;
+	in.pool.enqueue_multiple([&](auto&& enqueue) {
+		for (int i = 0; i < jobs_n; ++i) {
+			const bool is_last = i == jobs_n - 1;
+			const auto from = i * per_job_n;
+			const auto to = is_last ? total_n : from + per_job_n;
 
-		integrate_worker(from, to);
-		draw_worker(from, to);
-	}
+			enqueue([from, to, integrate_worker, draw_worker]() {
+				integrate_worker(from, to);
+				draw_worker(from, to);
+			});
+		}
+	});
 }
 
 template <class Component, class Caches, class EffectProvider>

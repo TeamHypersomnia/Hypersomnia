@@ -1169,7 +1169,9 @@ and then hitting Save settings.
 			viewing_config.performance,
 
 			streaming.images_in_atlas,
-			write_buffer.particle_buffers
+			write_buffer.particle_buffers,
+
+			thread_pool
 		});
 	};
 
@@ -2041,7 +2043,8 @@ and then hitting Save settings.
 					special_indicators,
 					indicator_meta,
 					write_buffer.particle_buffers,
-					cached_visibility
+					cached_visibility,
+					thread_pool
 				});
 			};
 
@@ -2198,12 +2201,14 @@ and then hitting Save settings.
 			auto& debug_details_renderer = write_buffer.renderers.all[renderer_type::DEBUG_DETAILS];
 
 			if (non_zero_cosmos) {
-				/* #1 */
-				perform_illuminated_rendering(general_renderer, new_viewing_config);
-				/* #2 */
-				draw_debug_lines(general_renderer, new_viewing_config);
+				auto illuminated_rendering_job = [&]() {
+					/* #1 */
+					perform_illuminated_rendering(general_renderer, new_viewing_config);
+					/* #2 */
+					draw_debug_lines(general_renderer, new_viewing_config);
 
-				setup_standard_projection(general_renderer);
+					setup_standard_projection(general_renderer);
+				};
 
 				/*
 					Illuminated rendering leaves the renderer in a state
@@ -2211,6 +2216,8 @@ and then hitting Save settings.
 
 					It is the configuration required for further viewing of GUI.
 				*/
+
+				thread_pool.enqueue(illuminated_rendering_job);
 
 				/* #3 */
 
@@ -2220,11 +2227,11 @@ and then hitting Save settings.
 				};
 
 				if (should_draw_game_gui()) {
-					game_gui_job();
+					thread_pool.enqueue(game_gui_job);
 				}
 			}
 
-			auto post_game_gui = [&]() {
+			auto post_game_gui_job = [&]() {
 				auto& chosen_renderer = post_game_gui_renderer;
 
 				if (non_zero_cosmos) {
@@ -2247,11 +2254,19 @@ and then hitting Save settings.
 				do_flash_afterimage(chosen_renderer);
 			};
 
-			post_game_gui();
-			show_developer_details(debug_details_renderer, new_viewing_config);
+			auto show_developer_details_job = [&]() {
+				show_developer_details(debug_details_renderer, new_viewing_config);
+			};
+
+			thread_pool.enqueue(show_developer_details_job);
+			thread_pool.enqueue(post_game_gui_job);
 
 			thread_pool.help_until_no_tasks();
-			thread_pool.wait_for_all_tasks_to_complete();
+
+			{
+				auto scope = measure_scope(frame_performance.wait_completion);
+				thread_pool.wait_for_all_tasks_to_complete();
+			}
 
 			finalize_frame_and_swap();
 		}

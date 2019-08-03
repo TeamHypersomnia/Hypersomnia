@@ -9,6 +9,8 @@
 #include "augs/graphics/renderer_settings.h"
 
 namespace augs {
+	class thread_pool;
+
 	namespace graphics { 
 		class texture;
 	}
@@ -60,6 +62,7 @@ struct illuminated_rendering_input {
 	const special_indicator_meta& indicator_meta;
 	const particle_triangle_buffers& drawn_particles;
 	cached_visibility_data& cached_visibility;
+	augs::thread_pool& pool;
 };
 
 void illuminated_rendering(const illuminated_rendering_input in);

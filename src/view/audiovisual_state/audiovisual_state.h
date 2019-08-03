@@ -28,6 +28,10 @@
 class cosmos;
 class visible_entities;
 
+namespace augs {
+	class thread_pool;
+}
+
 struct character_camera;
 
 struct audiovisual_post_solve_input {
@@ -57,6 +61,8 @@ struct audiovisual_advance_input {
 	const performance_settings& performance;
 	const images_in_atlas_map& game_images;
 	particle_triangle_buffers& particles_output;
+
+	augs::thread_pool& pool;
 };
 
 struct audiovisual_state {

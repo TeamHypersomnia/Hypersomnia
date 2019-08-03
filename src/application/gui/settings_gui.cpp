@@ -1142,12 +1142,12 @@ void settings_gui_state::perform(
 					{
 						text("Concurrent hardware threads:");
 						ImGui::SameLine();
-						text_color(typesafe_sprintf("%x\n\n", concurrency), green);
+						text_color(typesafe_sprintf("%x", concurrency), green);
 					}
 
 					{
 						const auto default_n = performance_settings::get_default_num_pool_workers();
-						text("Default number of thread pool workers: ");
+						text("Default number of thread pool workers:");
 						ImGui::SameLine();
 						text_color(typesafe_sprintf("%x\n\n", default_n), default_n == 0 ? red : green);
 					}

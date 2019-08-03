@@ -20,6 +20,7 @@
 #include "view/audiovisual_state/special_effects_settings.h"
 
 #include "view/character_camera.h"
+#include "augs/templates/thread_pool.h"
 
 void audiovisual_state::clear() {
 	systems.for_each([](auto& sys) {
@@ -41,16 +42,19 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	auto scope = measure_scope(performance.advance);
 
 	const auto viewed_character = input.camera.viewed_character;
-	const auto cone = input.camera.cone;
+	const auto input_camera = input.camera;
+	const auto cone = input_camera.cone;
 	const auto& cosm = viewed_character.get_cosmos();
 	
-	auto dt = input.frame_delta;
+	const auto frame_dt = input.frame_delta;
+	auto dt = frame_dt;
 	dt *= input.speed_multiplier;
 	
 	const auto& anims = input.plain_animations;
 
 	auto& rng = get_rng();
 
+	auto& sounds = get<sound_system>();
 	auto& thunders = get<thunder_system>();
 	auto& exploding_rings = get<exploding_ring_system>();
 	auto& flying_numbers = get<flying_number_indicator_system>();
@@ -95,41 +99,6 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		world_hover_highlighter.update(input.frame_delta);
 	};
 
-	auto additive_sound_scope = measure_scope_additive(performance.sound_logic);
-
-	auto update_sound_properties = [&]() {
-		auto& sounds = get<sound_system>();
-
-		if (viewed_character) {
-			auto scope = measure_scope(additive_sound_scope);
-
-			auto ear = input.camera;
-			ear.cone.eye.transform = viewed_character.get_viewing_transform(interp);
-			
-			sounds.update_sound_properties(
-				{
-					sounds,
-					input.audio_volume,
-					input.sound_settings,
-					input.sounds,
-					interp,
-					ear,
-					input.camera.cone,
-					dt,
-					input.speed_multiplier,
-					input.inv_tickrate
-				}
-			);
-		}
-	};
-
-	auto fade_sound_sources = [&]() {
-		auto scope = measure_scope(additive_sound_scope);
-
-		auto& sounds = get<sound_system>();
-		sounds.fade_sources(input.frame_delta);
-	};
-
 	auto advance_thunders = [&]() {
 		thunders.advance(rng, cosm, cone, input.particle_effects, dt, particles);
 	};
@@ -168,6 +137,9 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 
 		particles.remove_dead_particles(cosm);
 		particles.preallocate_particle_buffers(input.particles_output);
+
+		advance_flying_numbers();
+		advance_wandering_pixels();
 	};
 
 	auto launch_particle_jobs = [&]() {
@@ -180,24 +152,53 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			input.game_images,
 			anims,
 			input.performance.max_particles_in_single_job,
-			input.particles_output
+			input.particles_output,
+			input.pool
 		});
 
 		performance.num_particles.measure(particles.count_all_particles());
 	};
 
-	auto audio_job = [&]() {
+	auto update_sound_properties = [viewed_character, dt, input, &sounds, &interp, input_camera]() {
+		if (viewed_character.dead()) {
+			return;
+		}
+
+		auto ear = input_camera;
+		ear.cone.eye.transform = viewed_character.get_viewing_transform(interp);
+		
+		sounds.update_sound_properties(
+			{
+				sounds,
+				input.audio_volume,
+				input.sound_settings,
+				input.sounds,
+				interp,
+				ear,
+				input_camera.cone,
+				dt,
+				input.speed_multiplier,
+				input.inv_tickrate
+			}
+		);
+	};
+
+	auto fade_sound_sources = [&sounds, frame_dt]() {
+		sounds.fade_sources(frame_dt);
+	};
+
+	auto audio_job = [this, update_sound_properties, fade_sound_sources]() {
+		auto scope = measure_scope(performance.sound_logic);
+
 		update_sound_properties();
 		fade_sound_sources();
 	};
 
 	synchronous_facade();
 
-	advance_flying_numbers();
-	advance_wandering_pixels();
-
 	launch_particle_jobs();
-	audio_job();
+
+	input.pool.enqueue(audio_job);
 }
 
 void audiovisual_state::spread_past_infection(const const_logic_step step) {

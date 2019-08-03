@@ -28,8 +28,10 @@ namespace augs {
 		}
 
 		void register_completion() {
-			auto lock = std::unique_lock<std::mutex>(completion_mutex);
-			++tasks_completed;
+			{
+				auto lock = std::unique_lock<std::mutex>(completion_mutex);
+				++tasks_completed;
+			}
 
 			if (all_tasks_completed()) {
 				completion_variable.notify_all();
@@ -160,7 +162,7 @@ namespace augs {
 
 		void wait_for_all_tasks_to_complete() {
 			auto lock = std::unique_lock<std::mutex>(completion_mutex);
-			cv.wait(lock, [this]{ return all_tasks_completed(); });
+			completion_variable.wait(lock, [this]{ return all_tasks_completed(); });
 
 			tasks_completed = 0;
 			tasks_posted = 0;

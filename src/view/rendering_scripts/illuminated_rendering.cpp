@@ -52,6 +52,7 @@
 #include "view/rendering_scripts/for_each_vis_request.h"
 #include "application/main/cached_visibility_data.h"
 #include "view/rendering_scripts/vis_response_to_triangles.h"
+#include "augs/templates/thread_pool.h"
 #include "view/rendering_scripts/launch_visibility_jobs.h"
 
 void illuminated_rendering(const illuminated_rendering_input in) {
@@ -152,6 +153,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 #endif
 
 	::launch_visibility_jobs(
+		in.pool,
+
 		cosm,
 		renderer.dedicated,
 		in.cached_visibility,

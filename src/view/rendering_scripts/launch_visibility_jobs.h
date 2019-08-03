@@ -1,9 +1,11 @@
 #pragma once
 
 inline void launch_visibility_jobs(
+	augs::thread_pool& pool,
+
 	const cosmos& cosm,
 	augs::dedicated_buffers& dedicated,
-	cached_visibility_data cached_visibility,
+	cached_visibility_data& cached_visibility,
 
 	const bool fow_effective,
 	const entity_id subject,
@@ -23,18 +25,20 @@ inline void launch_visibility_jobs(
 		auto& light_triangles_vectors = dedicated[DV::LIGHT_VISIBILITY];
 		light_triangles_vectors.resize(lights_n);
 
-		for (std::size_t i = 0; i < lights_n; ++i) {
-			const auto& request = light_requests[i];
-			auto& response = light_responses[i];
-			auto& triangles = light_triangles_vectors[i].triangles;
+		pool.enqueue_multiple([&](auto&& enqueue) {
+			for (std::size_t i = 0; i < lights_n; ++i) {
+				const auto& request = light_requests[i];
+				auto& response = light_responses[i];
+				auto& triangles = light_triangles_vectors[i].triangles;
 
-			auto light_job = [&cosm, request, &response, &triangles]() {
-				visibility_system(DEBUG_FRAME_LINES).calc_visibility(cosm, request, response);
-				vis_response_to_triangles(response, triangles, request.color, request.eye_transform.pos);
-			};
+				auto light_job = [&cosm, request, &response, &triangles]() {
+					visibility_system(DEBUG_FRAME_LINES).calc_visibility(cosm, request, response);
+					vis_response_to_triangles(response, triangles, request.color, request.eye_transform.pos);
+				};
 
-			light_job();
-		}
+				enqueue(light_job);
+			}
+		});
 	};
 
 	launch_light_jobs();
@@ -56,11 +60,7 @@ inline void launch_visibility_jobs(
 			vis_response_to_triangles(fow_response, fow_triangles, white, request.eye_transform.pos);
 		};
 
-		auto launch_fow_job = [&]() {
-			fow_job();
-		};
-
-		launch_fow_job();
+		pool.enqueue(fow_job);
 	}
 }
 
