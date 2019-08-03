@@ -1,6 +1,5 @@
 #pragma once
 #include <vector>
-#include <queue>
 #include <thread>
 #include <mutex>
 #include <atomic>
@@ -10,7 +9,7 @@
 namespace augs {
 	class thread_pool {
 		std::vector<std::thread> workers;
-		std::queue<std::function<void()>> tasks;
+		std::vector<std::function<void()>> tasks;
 
 		int tasks_completed = 0;
 		int tasks_posted = 0;
@@ -27,14 +26,18 @@ namespace augs {
 			return std::unique_lock<std::mutex>(queue_mutex);
 		}
 
+		auto lock_completion() {
+			return std::unique_lock<std::mutex>(completion_mutex);
+		}
+
 		void register_completion() {
 			{
-				auto lock = std::unique_lock<std::mutex>(completion_mutex);
+				auto lock = lock_completion();
 				++tasks_completed;
-			}
 
-			if (all_tasks_completed()) {
-				completion_variable.notify_all();
+				if (tasks_completed == tasks_posted) {
+					completion_variable.notify_all();
+				}
 			}
 		}
 
@@ -51,8 +54,8 @@ namespace augs {
 							return;
 						}
 
-						task = std::move(tasks.front());
-						tasks.pop();
+						task = std::move(tasks.back());
+						tasks.pop_back();
 					}
 
 					task();
@@ -101,14 +104,18 @@ namespace augs {
 			int now_posted = 0;
 
 			auto enqueuer = [&](auto&& new_job) {
-				tasks.emplace(std::forward<decltype(new_job)>(new_job));
+				tasks.emplace_back(std::forward<decltype(new_job)>(new_job));
 				++now_posted;
-				++tasks_posted;
 			};
 
 			{
 				auto lock = lock_queue();
 				job_provider(enqueuer);
+
+				{
+					auto lock = lock_completion();
+					tasks_posted += now_posted;
+				}
 			}
 
 			if (now_posted >= static_cast<int>(size())) {
@@ -125,8 +132,12 @@ namespace augs {
 		void enqueue(F&& f) {
 			{
 				auto lock = lock_queue();
-				tasks.emplace(std::forward<F>(f));
-				++tasks_posted;
+				tasks.emplace_back(std::forward<F>(f));
+
+				{
+					auto lock = lock_completion();
+					++tasks_posted;
+				}
 			}
 
 			cv.notify_one();
@@ -143,8 +154,8 @@ namespace augs {
 						return;
 					}
 
-					task = std::move(tasks.front());
-					tasks.pop();
+					task = std::move(tasks.back());
+					tasks.pop_back();
 				}
 
 				task();
@@ -156,13 +167,9 @@ namespace augs {
 			return workers.size();
 		}
 
-		bool all_tasks_completed() const {
-			return tasks_completed == tasks_posted;
-		}
-
 		void wait_for_all_tasks_to_complete() {
-			auto lock = std::unique_lock<std::mutex>(completion_mutex);
-			completion_variable.wait(lock, [this]{ return all_tasks_completed(); });
+			auto lock = lock_completion();
+			completion_variable.wait(lock, [this]{ return tasks_posted == tasks_completed; });
 
 			tasks_completed = 0;
 			tasks_posted = 0;

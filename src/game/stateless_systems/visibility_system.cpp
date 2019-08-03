@@ -863,7 +863,8 @@ void visibility_system::calc_visibility(
 		discs_copy.erase(std::remove_if(discs_copy.begin(), discs_copy.end(),
 			[&request, edges_num, &transform, &wrap, &lines, &marked_holes, &response]
 		(const discontinuity& d) {
-			std::vector<vec2> points_too_close;
+			thread_local std::vector<vec2> points_too_close;
+			points_too_close.clear();
 
 			/* let's handle both CW and CCW cases in one go, only the sign differs somewhere */
 			const int cw = d.winding == d.RIGHT ? 1 : -1;

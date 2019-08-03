@@ -1392,7 +1392,7 @@ and then hitting Save settings.
 	static debug_details_summaries debug_summaries;
 
 	static auto game_thread_worker = []() {
-		while (!should_quit) {
+		auto prepare_next_game_frame = [&]() {
 			auto frame = measure_scope(game_thread_performance.total);
 
 			{
@@ -2085,14 +2085,6 @@ and then hitting Save settings.
 				);
 			};
 
-			auto extract_num_total_drawn_triangles = []() {
-				return write_buffer.renderers.extract_num_total_triangles_drawn();
-			};
-
-			auto measure_num_drawn_triangles = [&]() {
-				game_thread_performance.num_triangles.measure(extract_num_total_drawn_triangles());
-			};
-
 			auto show_developer_details = [&](augs::renderer& chosen_renderer, const config_lua_table& viewing_config) {
 				if (viewing_config.session.show_developer_console) {
 					auto scope = measure_scope(game_thread_performance.debug_details);
@@ -2121,23 +2113,10 @@ and then hitting Save settings.
 				}
 			};
 
-			auto finalize_frame_and_swap = [&]() {
-				for (auto& r : write_buffer.renderers.all) {
-					r.call_and_clear_triangles();
-				}
-
-				measure_num_drawn_triangles();
-
-				buffer_swapper.wait_swap();
-
-				write_buffer.renderers.next_frame();
-				write_buffer.particle_buffers.clear();
-			};
-
 			/* Flow */
 
 			if (should_quit_due_to_signal()) {
-				break;
+				return;
 			}
 
 			ensure_float_flags_hold();
@@ -2165,7 +2144,7 @@ and then hitting Save settings.
 			*/
 
 			if (/* minimized */ screen_size.is_zero()) {
-				continue;
+				return;
 			}
 
 			/*
@@ -2265,16 +2244,35 @@ and then hitting Save settings.
 			thread_pool.enqueue(show_developer_details_job);
 			thread_pool.enqueue(post_game_gui_job);
 
-			{
-				auto scope = measure_scope(game_thread_performance.main_help);
-				thread_pool.help_until_no_tasks();
-			}
+			auto scope = measure_scope(game_thread_performance.main_help);
+			thread_pool.help_until_no_tasks();
+		};
+
+		while (!should_quit) {
+			auto extract_num_total_drawn_triangles = []() {
+				return write_buffer.renderers.extract_num_total_triangles_drawn();
+			};
+
+			auto finalize_frame_and_swap = [&]() {
+				for (auto& r : write_buffer.renderers.all) {
+					r.call_and_clear_triangles();
+				}
+
+				game_thread_performance.num_triangles.measure(extract_num_total_drawn_triangles());
+
+				buffer_swapper.wait_swap();
+
+				write_buffer.renderers.next_frame();
+				write_buffer.particle_buffers.clear();
+			};
 
 			{
-				auto scope = measure_scope(game_thread_performance.main_wait);
+				auto scope = measure_scope(game_thread_performance.total);
+				prepare_next_game_frame();
 				thread_pool.wait_for_all_tasks_to_complete();
 			}
 
+			auto scope = measure_scope(game_thread_performance.main_wait);
 			finalize_frame_and_swap();
 		}
 	};

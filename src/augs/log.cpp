@@ -120,5 +120,7 @@ void write_log_entry(const std::string& f) {
 		std::ofstream recording_file(get_path_in_log_files("live_debug.txt"), std::ios::out | std::ios::app);
 		recording_file << f << std::endl;
 	}
+#else
+	(void)f;
 #endif
 }

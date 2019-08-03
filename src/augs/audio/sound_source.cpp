@@ -151,6 +151,7 @@ namespace augs {
 	}
 
 	void sound_source::set_spatialize(const bool f) const {
+		(void)f;
 		AL_CHECK(alSourcei(id, AL_SOURCE_SPATIALIZE_SOFT, f ? AL_TRUE : AL_FALSE));
 	}
 

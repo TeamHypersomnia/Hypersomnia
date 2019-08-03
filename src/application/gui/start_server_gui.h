@@ -13,7 +13,6 @@ public:
 	server_instance_type instance_type = server_instance_type::INTEGRATED;
 
 	bool show_help = false;
-	augs::timer lockfile_query_timer;
 
 	bool perform(
 		server_start_input& into

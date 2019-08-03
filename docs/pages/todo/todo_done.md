@@ -3523,3 +3523,4 @@ which can be done from Settings->Reset all settings to factory default.
 
 - setting: split particle jobs once every n particles
 
+- Properly show timing values minus the time waiting for the other thread

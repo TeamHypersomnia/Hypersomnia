@@ -138,6 +138,8 @@ namespace augs {
 		}
 
 		return { succ, status };
+#else
+		return { false, "ALC_HRTF_DISABLED_SOFT" };
 #endif
 	}
 
@@ -236,6 +238,7 @@ namespace augs {
 	}
 
 	void audio_context::speed_of_sound(const float meters_per_sec) {
+		(void)meters_per_sec;
 		AL_CHECK(alSpeedOfSound(meters_per_sec));
 	}
 
