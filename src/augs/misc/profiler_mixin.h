@@ -36,6 +36,17 @@ namespace augs {
 			);
 		}
 	
+		void prepare_summary_info() {
+			auto& self = *static_cast<derived*>(this);
+
+			for_each_measurement(
+				[](const auto&, auto& m) {
+					m.prepare_summary_info();
+				},
+				self
+			);
+		}
+
 		auto summary() const {
 			std::vector<const time_measurements*> all_with_time;
 			std::string times_summary;

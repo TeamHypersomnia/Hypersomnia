@@ -7,9 +7,11 @@ struct session_profiler : public augs::profiler_mixin<session_profiler> {
 
 	// GEN INTROSPECTOR struct session_profiler
 	augs::time_measurements fps;
-	augs::time_measurements swap_buffers;
+	augs::time_measurements swap_window_buffers;
 	augs::time_measurements renderer_commands;
 	augs::time_measurements local_entropy;
+	augs::time_measurements render_help;
+	augs::time_measurements render_wait;
 	// END GEN INTROSPECTOR
 };
 

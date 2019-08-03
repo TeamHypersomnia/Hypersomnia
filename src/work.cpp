@@ -117,7 +117,7 @@ int work(const int argc, const char* const * const argv) try {
 	std::signal(SIGSTOP, signal_handler);
 #endif
 
-	static session_profiler performance;
+	static session_profiler render_thread_performance;
 	static network_profiler network_performance;
 	static network_info network_stats;
 	static server_network_info server_stats;
@@ -295,8 +295,6 @@ and then hitting Save settings.
 		auto& server = std::get<server_setup>(*current_setup);
 
 		while (server.is_running()) {
-			auto scope = measure_scope(performance.fps);
-
 #if PLATFORM_UNIX
 			if (signal_status != 0) {
 				const auto sig = signal_status;
@@ -400,7 +398,7 @@ and then hitting Save settings.
 	};
 
 	static atlas_profiler atlas_performance;
-	static frame_profiler frame_performance;
+	static frame_profiler game_thread_performance;
 
 	/* 
 		unique_ptr is used to avoid stack overflow.
@@ -1055,7 +1053,7 @@ and then hitting Save settings.
 		const const_entity_handle& viewed_character,
 		const config_lua_table& viewing_config
 	) {
-		auto scope = measure_scope(frame_performance.camera_visibility_query);
+		auto scope = measure_scope(game_thread_performance.camera_visibility_query);
 
 		auto queried_eye = get_camera_eye();
 		queried_eye.zoom /= viewing_config.session.camera_query_aabb_mult;
@@ -1070,7 +1068,7 @@ and then hitting Save settings.
 			tree_of_npo_filter::all()
 		});
 
-		frame_performance.num_visible_entities.measure(all_visible.count_all());
+		game_thread_performance.num_visible_entities.measure(all_visible.count_all());
 	};
 
 	static auto calc_pre_step_crosshair_displacement = [&](const config_lua_table& viewing_config) {
@@ -1377,7 +1375,7 @@ and then hitting Save settings.
 	};
 
 	static auto advance_game_gui = [&](const auto context, const auto frame_delta) {
-		auto scope = measure_scope(frame_performance.advance_game_gui);
+		auto scope = measure_scope(game_thread_performance.advance_game_gui);
 
 		game_gui.advance(context, frame_delta);
 		game_gui.rebuild_layouts(context);
@@ -1395,6 +1393,8 @@ and then hitting Save settings.
 
 	static auto game_thread_worker = []() {
 		while (!should_quit) {
+			auto frame = measure_scope(game_thread_performance.total);
+
 			{
 				/* The thread pool is always empty of tasks on the beginning of the game frame. */
 
@@ -1803,7 +1803,7 @@ and then hitting Save settings.
 					This also advances the audiovisual state, based on the cosmos returned by the setup.
 				*/
 
-				auto scope = measure_scope(frame_performance.advance_setup);
+				auto scope = measure_scope(game_thread_performance.advance_setup);
 				advance_current_setup(frame_delta, with_result);
 			};
 
@@ -1842,7 +1842,7 @@ and then hitting Save settings.
 
 			auto draw_debug_lines = [&](augs::renderer& chosen_renderer, const config_lua_table& new_viewing_config) {
 				if (DEBUG_DRAWING.enabled) {
-					auto scope = measure_scope(frame_performance.debug_lines);
+					auto scope = measure_scope(game_thread_performance.debug_lines);
 
 					const auto viewed_character = get_viewed_character();
 
@@ -1862,13 +1862,13 @@ and then hitting Save settings.
 			};
 
 			auto draw_game_gui = [&](augs::renderer& chosen_renderer, const config_lua_table& viewing_config) {
-				auto scope = measure_scope(frame_performance.draw_game_gui);
+				auto scope = measure_scope(game_thread_performance.draw_game_gui);
 
 				game_gui.world.draw(create_viewing_game_gui_context(chosen_renderer, viewing_config));
 			};
 
 			auto draw_mode_and_setup_custom_gui = [&](augs::renderer& chosen_renderer, const config_lua_table& new_viewing_config) {
-				auto scope = measure_scope(frame_performance.draw_setup_custom_gui);
+				auto scope = measure_scope(game_thread_performance.draw_setup_custom_gui);
 
 				const auto player_metas = visit_current_setup([&](auto& setup) {
 					return setup.find_player_metas();
@@ -1907,7 +1907,7 @@ and then hitting Save settings.
 			};
 
 			auto draw_and_choose_menu_cursor = [&](augs::renderer& chosen_renderer, auto&& create_menu_context) {
-				auto scope = measure_scope(frame_performance.menu_gui);
+				auto scope = measure_scope(game_thread_performance.menu_gui);
 
 				auto get_drawer = [&]() {
 					return get_drawer_for(chosen_renderer);
@@ -1984,7 +1984,7 @@ and then hitting Save settings.
 			};
 
 			auto perform_illuminated_rendering = [&](augs::renderer& chosen_renderer, const config_lua_table& viewing_config) {
-				auto scope = measure_scope(frame_performance.rendering_script);
+				auto scope = measure_scope(game_thread_performance.rendering_script);
 
 				thread_local std::vector<additional_highlight> highlights;
 				highlights.clear();
@@ -2033,7 +2033,7 @@ and then hitting Save settings.
 					streaming.images_in_atlas,
 					get_interpolation_ratio(),
 					chosen_renderer,
-					frame_performance,
+					game_thread_performance,
 					std::addressof(streaming.general_atlas),
 					necessary_fbos,
 					necessary_shaders,
@@ -2052,7 +2052,7 @@ and then hitting Save settings.
 			auto draw_call_imgui = [&](augs::renderer& chosen_renderer) {
 				chosen_renderer.call_and_clear_triangles();
 
-				auto scope = measure_scope(frame_performance.imgui);
+				auto scope = measure_scope(game_thread_performance.imgui);
 
 				chosen_renderer.draw_call_imgui(
 					imgui_atlas, 
@@ -2090,14 +2090,26 @@ and then hitting Save settings.
 			};
 
 			auto measure_num_drawn_triangles = [&]() {
-				frame_performance.num_triangles.measure(extract_num_total_drawn_triangles());
+				game_thread_performance.num_triangles.measure(extract_num_total_drawn_triangles());
 			};
 
 			auto show_developer_details = [&](augs::renderer& chosen_renderer, const config_lua_table& viewing_config) {
 				if (viewing_config.session.show_developer_console) {
-					auto scope = measure_scope(frame_performance.debug_details);
+					auto scope = measure_scope(game_thread_performance.debug_details);
 
 					const auto viewed_character = get_viewed_character();
+
+					debug_summaries.acquire(
+						viewed_character.get_cosmos(),
+						game_thread_performance,
+						network_performance,
+						network_stats,
+						server_stats,
+						streaming.performance,
+						streaming.general_atlas_performance,
+						render_thread_performance,
+						get_audiovisuals().performance
+					);
 
 					draw_debug_details(
 						get_drawer_for(chosen_renderer),
@@ -2183,8 +2195,6 @@ and then hitting Save settings.
 						- Or, the cursor of the game gui, with maybe tooltip, with maybe dragged item's ghost, if we're in-game in GUI mode.
 			*/
 
-			auto frame = measure_scope(frame_performance.total);
-
 			setup_the_first_fbo(general_renderer);
 
 			const auto viewed_character = get_viewed_character();
@@ -2256,12 +2266,12 @@ and then hitting Save settings.
 			thread_pool.enqueue(post_game_gui_job);
 
 			{
-				auto scope = measure_scope(frame_performance.main_help);
+				auto scope = measure_scope(game_thread_performance.main_help);
 				thread_pool.help_until_no_tasks();
 			}
 
 			{
-				auto scope = measure_scope(frame_performance.main_wait);
+				auto scope = measure_scope(game_thread_performance.main_wait);
 				thread_pool.wait_for_all_tasks_to_complete();
 			}
 
@@ -2279,7 +2289,7 @@ and then hitting Save settings.
 	};
 
 	static auto game_main_thread_synced_op = []() {
-		auto scope = measure_scope(frame_performance.synced_op);
+		auto scope = measure_scope(game_thread_performance.synced_op);
 
 		/* 
 			IMGUI is our top GUI whose priority precedes everything else. 
@@ -2292,25 +2302,21 @@ and then hitting Save settings.
 		if (config.session.show_developer_console) {
 			const auto viewed_character = get_viewed_character();
 
-			debug_summaries.acquire(
-				viewed_character.get_cosmos(),
-				frame_performance,
-				network_performance,
-				network_stats,
-				server_stats,
-				streaming.performance,
-				streaming.general_atlas_performance,
-				performance,
-				get_audiovisuals().performance
-			);
+			viewed_character.get_cosmos().profiler.prepare_summary_info();
+			game_thread_performance.prepare_summary_info();
+			network_performance.prepare_summary_info();
+			streaming.performance.prepare_summary_info();
+			streaming.general_atlas_performance.prepare_summary_info();
+			render_thread_performance.prepare_summary_info();
+			get_audiovisuals().performance.prepare_summary_info();
 		}
 	};
 
 	do {
-		auto scope = measure_scope(performance.fps);
+		auto scope = measure_scope(render_thread_performance.fps);
 		
 		{
-			auto scope = measure_scope(performance.renderer_commands);
+			auto scope = measure_scope(render_thread_performance.renderer_commands);
 
 			for (auto& r : read_buffer.renderers.all) {
 				renderer_backend.perform(
@@ -2329,13 +2335,13 @@ and then hitting Save settings.
 		}
 
 		{
-			auto scope = measure_scope(performance.swap_buffers);
+			auto scope = measure_scope(render_thread_performance.swap_window_buffers);
 			window.swap_buffers();
 		}
 
 		{
 			{
-				auto scope = measure_scope(performance.local_entropy);
+				auto scope = measure_scope(render_thread_performance.local_entropy);
 
 				auto& next_entropy = read_buffer.new_window_entropy;
 				next_entropy.clear();
@@ -2346,12 +2352,12 @@ and then hitting Save settings.
 			}
 
 			{
-				auto scope = measure_scope(frame_performance.render_help);
+				auto scope = measure_scope(render_thread_performance.render_help);
 				thread_pool.help_until_no_tasks();
 			}
 
 			{
-				auto scope = measure_scope(frame_performance.render_wait);
+				auto scope = measure_scope(render_thread_performance.render_wait);
 				buffer_swapper.swap_buffers(read_buffer, write_buffer, game_main_thread_synced_op);
 			}
 		}

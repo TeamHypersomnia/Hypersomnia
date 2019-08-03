@@ -20,6 +20,13 @@ namespace augs {
 
 		bool measured = false;
 
+		struct summary_data {
+			bool measured = false;
+			T last_average = T();
+		};
+
+		summary_data summary_info;
+
 	public:
 		std::string title = "Untitled";
 		std::vector<T> tracked;
@@ -83,7 +90,12 @@ namespace augs {
 		}
 
 		bool was_measured() const {
-			return measured;
+			return summary_info.measured;
+		}
+
+		void prepare_summary_info() {
+			summary_info.measured = measured;
+			summary_info.last_average = last_average;
 		}
 	};
 
@@ -93,7 +105,7 @@ namespace augs {
 		friend base;
 
 		auto summary_impl() const {
-			return typesafe_sprintf("%x: %f2\n", base::title, base::get_average_units());
+			return typesafe_sprintf("%x: %f2\n", base::title, base::summary_info.last_average);
 		}
 
 	public:
@@ -108,7 +120,7 @@ namespace augs {
 		friend base;
 
 		auto summary_impl() const {
-			const auto avg_secs = get_average_units();
+			const auto avg_secs = base::summary_info.last_average;
 			const bool division_by_secs_safe = std::abs(avg_secs) > AUGS_EPSILON<double>;
 
 			if (division_by_secs_safe) {

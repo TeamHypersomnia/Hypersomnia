@@ -9,8 +9,7 @@
 
 void regenerate_and_gather_subjects(
 	const subjects_gathering_input in,
-	atlas_input_subjects& output,
-	augs::time_measurements& neon_regeneration_performance
+	atlas_input_subjects& output
 ) {
 	auto make_view = [&in](const auto& def) {
 		return image_definition_view(in.unofficial_project_dir, def);
@@ -64,8 +63,6 @@ void regenerate_and_gather_subjects(
 		};
 
 		{
-			auto scope = measure_scope(neon_regeneration_performance);
-
 #if 1
 			const auto num_workers = std::size_t(in.settings.neon_regeneration_threads - 1);
 			static augs::range_workers<decltype(worker)> workers = num_workers;
@@ -111,8 +108,7 @@ void regenerate_and_gather_subjects(
 
 general_atlas_output create_general_atlas(
 	const general_atlas_input in,
-	atlas_profiler& performance,
-	augs::time_measurements& neon_regeneration_performance
+	atlas_profiler& performance
 ) {
 	auto total = measure_scope(performance.whole_regeneration);
 
@@ -120,7 +116,7 @@ general_atlas_output create_general_atlas(
 
 	{
 		auto scope = measure_scope(performance.gathering_subjects);
-		regenerate_and_gather_subjects(in.subjects, atlas_subjects, neon_regeneration_performance);
+		regenerate_and_gather_subjects(in.subjects, atlas_subjects);
 	}
 
 	thread_local baked_atlas baked;

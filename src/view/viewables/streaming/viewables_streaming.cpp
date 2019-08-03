@@ -145,7 +145,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 			future_general_atlas = std::async(
 				std::launch::async,
 				[general_atlas_in, this]() { 
-					return create_general_atlas(general_atlas_in, general_atlas_performance, performance.neon_maps_regeneration);
+					return create_general_atlas(general_atlas_in, general_atlas_performance);
 				}
 			);
 
@@ -199,8 +199,6 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 				[&](){
 					using value_type = decltype(future_loaded_buffers.get());
 
-					auto scope = measure_scope(performance.reloading_sounds);
-
 					value_type result;
 
 					for (const auto& r : sound_requests) {
@@ -247,8 +245,6 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 	/* Unpack results of asynchronous asset loading */
 
 	if (valid_and_is_ready(future_general_atlas)) {
-		auto scope = measure_scope(performance.atlas_upload_to_gpu);
-
 		auto result = future_general_atlas.get();
 
 		general_atlas_progress = std::nullopt;

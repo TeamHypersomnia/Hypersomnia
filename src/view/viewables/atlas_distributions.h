@@ -60,8 +60,7 @@ void regenerate_and_gather_subjects(
 
 general_atlas_output create_general_atlas(
 	general_atlas_input in,
-	atlas_profiler&,
-	augs::time_measurements& neon_regeneration_performance
+	atlas_profiler&
 );
 
 struct avatar_atlas_output {
