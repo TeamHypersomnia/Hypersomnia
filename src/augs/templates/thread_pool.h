@@ -10,6 +10,7 @@ namespace augs {
 	class thread_pool {
 		std::vector<std::thread> workers;
 		std::vector<std::function<void()>> tasks;
+		std::vector<std::function<void()>> cold_tasks;
 
 		int tasks_completed = 0;
 		int tasks_posted = 0;
@@ -100,47 +101,35 @@ namespace augs {
 		}
 
 		template <class F>
-		void enqueue_multiple(F job_provider) {
-			int now_posted = 0;
-
-			auto enqueuer = [&](auto&& new_job) {
-				tasks.emplace_back(std::forward<decltype(new_job)>(new_job));
-				++now_posted;
-			};
-
-			{
-				auto lock = lock_queue();
-				job_provider(enqueuer);
-
-				{
-					auto lock = lock_completion();
-					tasks_posted += now_posted;
-				}
-			}
-
-			if (now_posted >= static_cast<int>(size())) {
-				cv.notify_all();
-			}
-			else {
-				while (now_posted--) {
-					cv.notify_one();
-				}
-			}
+		void enqueue(F&& f) {
+			cold_tasks.emplace_back(std::move(f));
 		}
 
-		template <class F>
-		void enqueue(F&& f) {
+		void submit() {
 			{
 				auto lock = lock_queue();
-				tasks.emplace_back(std::forward<F>(f));
+				ensure(tasks.empty());
+				std::swap(cold_tasks, tasks);
 
 				{
 					auto lock = lock_completion();
-					++tasks_posted;
+					tasks_completed = 0;
+					tasks_posted = tasks.size();
 				}
 			}
 
-			cv.notify_one();
+			cold_tasks.clear();
+			completion_variable.notify_all();
+			cv.notify_all();
+		}
+
+		std::size_t size() const {
+			return workers.size();
+		}
+
+		void sleep_until_tasks_posted() {
+			auto lock = lock_completion();
+			completion_variable.wait(lock, [this]{ return tasks_posted > 0; });
 		}
 
 		void help_until_no_tasks() {
@@ -163,16 +152,9 @@ namespace augs {
 			}
 		}
 
-		std::size_t size() const {
-			return workers.size();
-		}
-
 		void wait_for_all_tasks_to_complete() {
 			auto lock = lock_completion();
 			completion_variable.wait(lock, [this]{ return tasks_posted == tasks_completed; });
-
-			tasks_completed = 0;
-			tasks_posted = 0;
 		}
 	};
 }

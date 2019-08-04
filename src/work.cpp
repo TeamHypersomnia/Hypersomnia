@@ -81,6 +81,9 @@
 #include "application/main/game_frame_buffer.h"
 #include "application/main/cached_visibility_data.h"
 #include "augs/graphics/frame_num_type.h"
+#include "view/rendering_scripts/launch_visibility_jobs.h"
+#include "view/rendering_scripts/for_each_vis_request.h"
+#include "game/cosmos/for_each_entity.h"
 
 std::function<void()> ensure_handler;
 bool log_to_live_file = false;
@@ -802,6 +805,18 @@ and then hitting Save settings.
 		return camera_cone(get_camera_eye(), logic_get_screen_size());
 	};
 
+	static auto get_queried_cone = [](const config_lua_table& config) {		
+		const auto query_mult = config.session.camera_query_aabb_mult;
+
+		const auto queried_cone = [&]() {
+			auto c = get_camera_cone();
+			c.eye.zoom /= query_mult;
+			return c;
+		}();
+
+		return queried_cone;
+	};
+
 	static auto get_setup_customized_config = [&]() {
 		return visit_current_setup([&](auto& setup) {
 			auto config_copy = config;
@@ -1414,6 +1429,10 @@ and then hitting Save settings.
 			const auto current_frame_num = current_frame.load();
 			auto game_gui_mode = game_gui_mode_flag;
 
+			auto& game_gui_renderer = write_buffer.renderers.all[renderer_type::GAME_GUI];
+			auto& post_game_gui_renderer = write_buffer.renderers.all[renderer_type::POST_GAME_GUI];
+			auto& debug_details_renderer = write_buffer.renderers.all[renderer_type::DEBUG_DETAILS];
+
 			/* Logic lambdas */
 
 			auto get_current_frame_num = [&]() {
@@ -2025,8 +2044,8 @@ and then hitting Save settings.
 
 				illuminated_rendering({
 					{ viewed_character, get_camera_cone() },
+					get_queried_cone(viewing_config),
 					calc_pre_step_crosshair_displacement(viewing_config),
-					viewing_config.session.camera_query_aabb_mult,
 					get_audiovisuals(),
 					viewing_config.drawing,
 					streaming.necessary_images_in_atlas,
@@ -2045,7 +2064,7 @@ and then hitting Save settings.
 					special_indicators,
 					indicator_meta,
 					write_buffer.particle_buffers,
-					cached_visibility,
+					cached_visibility.light_requests,
 					thread_pool
 				});
 			};
@@ -2178,42 +2197,65 @@ and then hitting Save settings.
 			setup_the_first_fbo(general_renderer);
 
 			const auto viewed_character = get_viewed_character();
-			const bool non_zero_cosmos = std::addressof(viewed_character.get_cosmos()) != std::addressof(cosmos::zero);
+			const auto& viewed_cosmos = viewed_character.get_cosmos();
+			const bool non_zero_cosmos = std::addressof(viewed_cosmos) != std::addressof(cosmos::zero);
 
-			auto& game_gui_renderer = write_buffer.renderers.all[renderer_type::GAME_GUI];
-			auto& post_game_gui_renderer = write_buffer.renderers.all[renderer_type::POST_GAME_GUI];
-			auto& debug_details_renderer = write_buffer.renderers.all[renderer_type::DEBUG_DETAILS];
+			auto enqueue_visibility_jobs = [&]() {
+				const auto& interp = get_audiovisuals().get<interpolation_system>();
+				auto& light_requests = cached_visibility.light_requests;
+				light_requests.clear();
 
-			if (non_zero_cosmos) {
-				auto illuminated_rendering_job = [&]() {
-					/* #1 */
-					perform_illuminated_rendering(general_renderer, new_viewing_config);
-					/* #2 */
-					draw_debug_lines(general_renderer, new_viewing_config);
+				::for_each_vis_request(
+					[&](const visibility_request& request) {
+						light_requests.emplace_back(request);
+					},
 
-					setup_standard_projection(general_renderer);
-				};
+					viewed_cosmos,
 
-				/*
-					Illuminated rendering leaves the renderer in a state
-					where the default shader is being used and the game world atlas is still bound.
+					get_audiovisuals().get<light_system>().per_entity_cache,
+					interp,
+					get_queried_cone(new_viewing_config).get_visible_world_rect_aabb()
+				);
 
-					It is the configuration required for further viewing of GUI.
-				*/
+				const auto& fog_of_war = new_viewing_config.drawing.fog_of_war;
+				const auto viewed_character_transform = viewed_character ? viewed_character.find_viewing_transform(interp) : std::optional<transformr>();
 
-				thread_pool.enqueue(illuminated_rendering_job);
+#if BUILD_STENCIL_BUFFER
+				const bool fog_of_war_effective = 
+					viewed_character_transform != std::nullopt 
+					&& fog_of_war.is_enabled()
+				;
+#else
+				const bool fog_of_war_effective = false;
+#endif
 
-				/* #3 */
+				::enqueue_visibility_jobs(
+					thread_pool,
 
-				auto game_gui_job = [&]() {
-					advance_game_gui(create_game_gui_context(), frame_delta);
-					draw_game_gui(game_gui_renderer, new_viewing_config);
-				};
+					viewed_cosmos,
+					general_renderer.dedicated,
+					cached_visibility,
 
-				if (should_draw_game_gui()) {
-					thread_pool.enqueue(game_gui_job);
-				}
-			}
+					fog_of_war_effective,
+					viewed_character,
+					viewed_character_transform ? *viewed_character_transform : transformr(),
+					fog_of_war
+				);
+			};
+
+			auto illuminated_rendering_job = [&]() {
+				/* #1 */
+				perform_illuminated_rendering(general_renderer, new_viewing_config);
+				/* #2 */
+				draw_debug_lines(general_renderer, new_viewing_config);
+
+				setup_standard_projection(general_renderer);
+			};
+
+			auto game_gui_job = [&]() {
+				advance_game_gui(create_game_gui_context(), frame_delta);
+				draw_game_gui(game_gui_renderer, new_viewing_config);
+			};
 
 			auto post_game_gui_job = [&]() {
 				auto& chosen_renderer = post_game_gui_renderer;
@@ -2242,10 +2284,31 @@ and then hitting Save settings.
 				show_developer_details(debug_details_renderer, new_viewing_config);
 			};
 
+			if (non_zero_cosmos) {
+				/*
+					Illuminated rendering leaves the renderer in a state
+					where the default shader is being used and the game world atlas is still bound.
+
+					It is the configuration required for further viewing of GUI.
+				*/
+
+				thread_pool.enqueue(illuminated_rendering_job);
+
+				/* #3 */
+				if (should_draw_game_gui()) {
+					thread_pool.enqueue(game_gui_job);
+				}
+			}
+
+			enqueue_visibility_jobs();
+
 			thread_pool.enqueue(show_developer_details_job);
 			thread_pool.enqueue(post_game_gui_job);
 
+			thread_pool.submit();
+
 			auto scope = measure_scope(game_thread_performance.main_help);
+
 			thread_pool.help_until_no_tasks();
 		};
 
@@ -2328,14 +2391,14 @@ and then hitting Save settings.
 			current_frame.fetch_add(1, std::memory_order_relaxed);
 		}
 
-		if (!until_first_swap_measured) {
-			LOG("Time until first swap: %x ms", until_first_swap.extract<std::chrono::milliseconds>());
-			until_first_swap_measured = true;
-		}
-
 		{
 			auto scope = measure_scope(render_thread_performance.swap_window_buffers);
 			window.swap_buffers();
+
+			if (!until_first_swap_measured) {
+				LOG("Time until first swap: %x ms", until_first_swap.extract<std::chrono::milliseconds>());
+				until_first_swap_measured = true;
+			}
 		}
 
 		{
@@ -2352,6 +2415,7 @@ and then hitting Save settings.
 
 			{
 				auto scope = measure_scope(render_thread_performance.render_help);
+				thread_pool.sleep_until_tasks_posted();
 				thread_pool.help_until_no_tasks();
 			}
 

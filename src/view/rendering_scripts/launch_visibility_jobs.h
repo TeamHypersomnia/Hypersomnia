@@ -1,6 +1,8 @@
 #pragma once
+#include "view/rendering_scripts/vis_response_to_triangles.h"
+#include "game/enums/filters.h"
 
-inline void launch_visibility_jobs(
+inline void enqueue_visibility_jobs(
 	augs::thread_pool& pool,
 
 	const cosmos& cosm,
@@ -25,20 +27,18 @@ inline void launch_visibility_jobs(
 		auto& light_triangles_vectors = dedicated[DV::LIGHT_VISIBILITY];
 		light_triangles_vectors.resize(lights_n);
 
-		pool.enqueue_multiple([&](auto&& enqueue) {
-			for (std::size_t i = 0; i < lights_n; ++i) {
-				const auto& request = light_requests[i];
-				auto& response = light_responses[i];
-				auto& triangles = light_triangles_vectors[i].triangles;
+		for (std::size_t i = 0; i < lights_n; ++i) {
+			const auto& request = light_requests[i];
+			auto& response = light_responses[i];
+			auto& triangles = light_triangles_vectors[i].triangles;
 
-				auto light_job = [&cosm, request, &response, &triangles]() {
-					visibility_system(DEBUG_FRAME_LINES).calc_visibility(cosm, request, response);
-					vis_response_to_triangles(response, triangles, request.color, request.eye_transform.pos);
-				};
+			auto light_job = [&cosm, request, &response, &triangles]() {
+				visibility_system(DEBUG_FRAME_LINES).calc_visibility(cosm, request, response);
+				vis_response_to_triangles(response, triangles, request.color, request.eye_transform.pos);
+			};
 
-				enqueue(light_job);
-			}
-		});
+			pool.enqueue(light_job);
+		}
 	};
 
 	launch_light_jobs();

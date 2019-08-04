@@ -45,7 +45,7 @@ struct light_system_input {
 	std::function<void()> write_fow_to_stencil;
 	const camera_cone cone;
 	std::optional<entity_id> fog_of_war_character;
-	const float camera_query_mult;
+	const camera_cone queried_cone;
 	const visible_entities& visible;
 
 	const augs::atlas_entry cast_highlight_tex;

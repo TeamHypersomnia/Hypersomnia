@@ -482,18 +482,16 @@ void particles_simulation_system::integrate_and_draw_all_particles(const integra
 	const auto jobs_n = 1 + total_n / max_per_job_n;
 	const auto per_job_n = total_n / jobs_n;
 
-	in.pool.enqueue_multiple([&](auto&& enqueue) {
-		for (int i = 0; i < jobs_n; ++i) {
-			const bool is_last = i == jobs_n - 1;
-			const auto from = i * per_job_n;
-			const auto to = is_last ? total_n : from + per_job_n;
+	for (int i = 0; i < jobs_n; ++i) {
+		const bool is_last = i == jobs_n - 1;
+		const auto from = i * per_job_n;
+		const auto to = is_last ? total_n : from + per_job_n;
 
-			enqueue([from, to, integrate_worker, draw_worker]() {
-				integrate_worker(from, to);
-				draw_worker(from, to);
-			});
-		}
-	});
+		in.pool.enqueue([from, to, integrate_worker, draw_worker]() {
+			integrate_worker(from, to);
+			draw_worker(from, to);
+		});
+	}
 }
 
 template <class Component, class Caches, class EffectProvider>

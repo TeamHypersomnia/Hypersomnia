@@ -238,17 +238,16 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 
 	const auto it = colliders_caches.try_emplace(handle.get_id().to_unversioned());
 
-	auto& cached_connection = handle.get().template get<components::rigid_body>().cached_colliders_connection;
-	cached_connection = connection;
-
 	auto& cache = (*it.first).second;
 	cache.clear(*this);
+
+	auto& cached_connection = handle.get().template get<components::rigid_body>().cached_colliders_connection;
+	cached_connection.owner = {};
 
 	const auto new_owner = cosm[connection.owner];
 
 	if (new_owner.dead()) {
 		colliders_caches.erase(it.first);
-		cached_connection.owner = {};
 		return;
 	}
 
@@ -283,6 +282,8 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 	fixdef.restitution = colliders_data.restitution;
 	fixdef.isSensor = colliders_data.sensor;
 	fixdef.filter = calc_filters(handle);
+
+	cached_connection = connection;
 
 	auto& constructed_fixtures = cache.constructed_fixtures;
 	ensure(constructed_fixtures.empty());

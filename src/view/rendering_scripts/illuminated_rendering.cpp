@@ -49,11 +49,8 @@
 #include "game/detail/sentience/callout_logic.h"
 
 #include "augs/graphics/shader.hpp"
-#include "view/rendering_scripts/for_each_vis_request.h"
 #include "application/main/cached_visibility_data.h"
-#include "view/rendering_scripts/vis_response_to_triangles.h"
 #include "augs/templates/thread_pool.h"
-#include "view/rendering_scripts/launch_visibility_jobs.h"
 
 void illuminated_rendering(const illuminated_rendering_input in) {
 	using D = augs::dedicated_buffer;
@@ -121,27 +118,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	};
 
 	const auto viewed_character_transform = viewed_character ? viewed_character.find_viewing_transform(interp) : std::optional<transformr>();
-
-	const auto queried_cone = [&]() {
-		auto c = cone;
-		c.eye.zoom /= in.camera_query_mult;
-		return c;
-	}();
-
-	auto& light_requests = in.cached_visibility.light_requests;
-	light_requests.clear();
-
-	for_each_vis_request(
-		[&](const visibility_request& request) {
-			light_requests.emplace_back(request);
-		},
-
-		cosm,
-
-		light.per_entity_cache,
-		interp,
-		queried_cone.get_visible_world_rect_aabb()
-	);
+	const auto queried_cone = in.queried_cone;
 
 #if BUILD_STENCIL_BUFFER
 	const bool fog_of_war_effective = 
@@ -151,19 +128,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 #else
 	const bool fog_of_war_effective = false;
 #endif
-
-	::launch_visibility_jobs(
-		in.pool,
-
-		cosm,
-		renderer.dedicated,
-		in.cached_visibility,
-
-		fog_of_war_effective,
-		viewed_character,
-		viewed_character_transform ? *viewed_character_transform : transformr(),
-		settings.fog_of_war
-	);
 
 	const auto filtering = in.renderer_settings.default_filtering;
 
@@ -346,12 +310,12 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		write_fow_to_stencil,
 		cone,
 		fog_of_war_effective ? viewed_character : std::optional<entity_id>(),
-		in.camera_query_mult,
+		in.queried_cone,
 		visible,
 		cast_highlight,
 		make_drawing_input,
 		in.perf_settings,
-		light_requests
+		in.light_requests
 	};
 
 	if (fog_of_war_effective) {

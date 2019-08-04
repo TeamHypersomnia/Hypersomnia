@@ -175,12 +175,7 @@ void light_system::render_all_lights(const light_system_input in) const {
 	light_shader.set_projection(renderer, in.cone.get_projection_matrix());
 	set_uniform(light_shader, light_uniform.distance_mult, 1.f / eye.zoom);
 
-	const auto queried_camera_aabb = [&]() {
-		auto c = cone;
-		c.eye.zoom /= in.camera_query_mult;
-
-		return c.get_visible_world_rect_aabb();
-	}();
+	const auto queried_camera_aabb = in.queried_cone.get_visible_world_rect_aabb(); 
 
 	renderer.set_additive_blending();
 

@@ -7,6 +7,7 @@
 #include "view/game_gui/special_indicator.h"
 #include "view/audiovisual_state/particle_triangle_buffers.h"
 #include "augs/graphics/renderer_settings.h"
+#include "game/stateless_systems/visibility_system.h"
 
 namespace augs {
 	class thread_pool;
@@ -24,7 +25,6 @@ struct audiovisual_state;
 struct all_necessary_shaders;
 struct all_necessary_fbos;
 struct performance_settings;
-struct cached_visibility_data;
 
 class images_in_atlas_map;
 class visible_entities;
@@ -41,8 +41,8 @@ struct additional_highlight {
 
 struct illuminated_rendering_input {
 	const character_camera camera;
+	const camera_cone queried_cone;
 	const vec2 pre_step_crosshair_displacement;
-	const float camera_query_mult;
 	const audiovisual_state& audiovisuals;
 	const game_drawing_settings drawing;
 	const necessary_images_in_atlas_map& necessary_images;
@@ -61,7 +61,8 @@ struct illuminated_rendering_input {
 	const std::vector<special_indicator>& special_indicators;
 	const special_indicator_meta& indicator_meta;
 	const particle_triangle_buffers& drawn_particles;
-	cached_visibility_data& cached_visibility;
+	
+	const std::vector<visibility_request>& light_requests;
 	augs::thread_pool& pool;
 };
 

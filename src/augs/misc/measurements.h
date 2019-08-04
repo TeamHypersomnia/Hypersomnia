@@ -22,7 +22,7 @@ namespace augs {
 
 		struct summary_data {
 			bool measured = false;
-			T last_average = T();
+			T value = T();
 		};
 
 		summary_data summary_info;
@@ -95,7 +95,7 @@ namespace augs {
 
 		void prepare_summary_info() {
 			summary_info.measured = measured;
-			summary_info.last_average = last_average;
+			summary_info.value = last_measurement;
 		}
 	};
 
@@ -105,7 +105,7 @@ namespace augs {
 		friend base;
 
 		auto summary_impl() const {
-			return typesafe_sprintf("%x: %f2\n", base::title, base::summary_info.last_average);
+			return typesafe_sprintf("%x: %f2\n", base::title, base::summary_info.value);
 		}
 
 	public:
@@ -120,22 +120,22 @@ namespace augs {
 		friend base;
 
 		auto summary_impl() const {
-			const auto avg_secs = base::summary_info.last_average;
-			const bool division_by_secs_safe = std::abs(avg_secs) > AUGS_EPSILON<double>;
+			const auto value = base::summary_info.value;
+			const bool division_by_secs_safe = std::abs(value) > AUGS_EPSILON<double>;
 
 			if (division_by_secs_safe) {
 				return typesafe_sprintf(
 					"%x: %f2 ms (%f2 FPS)\n", 
 					title,
-					avg_secs * 1000,
-					1 / avg_secs
+					value * 1000,
+					1 / value
 				);
 			}
 			else {
 				return typesafe_sprintf(
 					"%x: %f2 ms\n", 
 					title,
-					avg_secs * 1000
+					value * 1000
 				);
 			}
 		}
