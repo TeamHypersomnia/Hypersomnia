@@ -1,5 +1,6 @@
 #pragma once
 #include "augs/math/math.h"
+#include "augs/drawing/drawing.hpp"
 
 inline void draw_offscreen_indicator(
 	const augs::drawer& output,

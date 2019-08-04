@@ -6,6 +6,12 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- We might want to somehow decrease heap contention between threads
+	- Best would be per-thread heaps
+		- Even better just no allocations
+		- Though even something as trivial as draw debug details will do a lot of allocations
+	- Use hoard allocator?
+
 - Allow delayed invocation of renderers
 
 - Allow audio to be processed only once per logic frame

@@ -19,6 +19,7 @@
 #include "view/game_gui/elements/game_gui_root.h"
 
 #include "view/game_gui/game_gui_system.h"
+#include "augs/drawing/drawing.hpp"
 
 using namespace augs::gui::text;
 

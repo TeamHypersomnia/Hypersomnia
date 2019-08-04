@@ -1,6 +1,6 @@
 #include <algorithm>
 
-#include "augs/drawing/drawing.h"
+#include "augs/drawing/drawing.hpp"
 
 #include "augs/gui/text/ui.h"
 #include "augs/gui/text/drafter.h"

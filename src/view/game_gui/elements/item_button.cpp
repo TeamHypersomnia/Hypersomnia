@@ -1,5 +1,5 @@
 #include "augs/ensure.h"
-#include "augs/drawing/drawing.h"
+#include "augs/drawing/drawing.hpp"
 #include "augs/gui/text/printer.h"
 #include "augs/string/string_templates.h"
 

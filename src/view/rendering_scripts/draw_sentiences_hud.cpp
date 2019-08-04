@@ -22,6 +22,7 @@
 #include "game/detail/sentience/sentience_logic.h"
 #include "game/detail/sentience/callout_logic.h"
 #include "view/rendering_scripts/draw_offscreen_indicator.h"
+#include "augs/drawing/drawing.hpp"
 
 using namespace augs::gui::text;
 

@@ -30,6 +30,7 @@
 #include "augs/window_framework/window.h"
 #include "augs/window_framework/platform_utils.h"
 #include "augs/audio/audio_context.h"
+#include "augs/drawing/drawing.hpp"
 
 #include "game/organization/all_component_includes.h"
 #include "game/organization/all_messages_includes.h"

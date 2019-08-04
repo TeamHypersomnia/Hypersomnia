@@ -1,7 +1,7 @@
 #pragma once
 
 #include "rendering_scripts.h"
-#include "augs/drawing/drawing.h"
+#include "augs/drawing/drawing.hpp"
 #include "augs/templates/get_by_dynamic_id.h"
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/for_each_entity.h"

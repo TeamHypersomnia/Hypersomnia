@@ -1,7 +1,7 @@
 #include "game/cosmos/cosmos.h"
 #include "game/components/sentience_component.h"
 
-#include "augs/drawing/drawing.h"
+#include "augs/drawing/drawing.hpp"
 #include "augs/gui/text/printer.h"
 #include "augs/templates/container_templates.h"
 #include "augs/templates/get_by_dynamic_id.h"

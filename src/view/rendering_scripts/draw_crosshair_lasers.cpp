@@ -17,6 +17,8 @@
 #include "game/detail/weapon_like.h"
 #include "game/detail/crosshair_math.hpp"
 
+#include "augs/drawing/drawing.hpp"
+
 void line_output_wrapper::operator()(const vec2 from, const vec2 to, const rgba col) const {
 	output.line(line_tex, from, to, col);
 }

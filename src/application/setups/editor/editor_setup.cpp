@@ -1,3 +1,4 @@
+#include "augs/drawing/drawing.hpp"
 #include "augs/log_path_getters.h"
 #include "augs/misc/marks.hpp"
 #include "game/detail/inventory/inventory_slot_handle.h"

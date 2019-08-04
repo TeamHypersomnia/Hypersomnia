@@ -2,6 +2,7 @@
 #include "view/game_gui/game_gui_element_location.h"
 #include "view/game_gui/elements/character_gui.h"
 
+#include "augs/drawing/drawing.hpp"
 #include "augs/gui/text/printer.h"
 #include "augs/templates/identity_templates.h"
 
