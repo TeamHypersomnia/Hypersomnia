@@ -47,9 +47,17 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	const auto& cosm = viewed_character.get_cosmos();
 	
 	const auto frame_dt = input.frame_delta;
+
+	const auto state_dt = input.new_state_delta;
+	auto scaled_state_dt = state_dt;
+
 	auto dt = frame_dt;
 	dt *= input.speed_multiplier;
 	
+	if (scaled_state_dt) {
+		*scaled_state_dt *= input.speed_multiplier;
+	}
+
 	const auto& anims = input.plain_animations;
 
 	auto& rng = get_rng();
@@ -159,7 +167,10 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		performance.num_particles.measure(particles.count_all_particles());
 	};
 
-	auto update_sound_properties = [viewed_character, dt, input, &sounds, &interp, input_camera]() {
+	const auto& sound_freq = input.sound_settings.processing_frequency;
+	const bool sound_every_step = sound_freq == sound_processing_frequency::EVERY_SIMULATION_STEP;
+
+	auto update_sound_properties = [sound_every_step, scaled_state_dt, viewed_character, dt, input, &sounds, &interp, input_camera]() {
 		if (viewed_character.dead()) {
 			return;
 		}
@@ -176,15 +187,15 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 				interp,
 				ear,
 				input_camera.cone,
-				dt,
+				sound_every_step ? *scaled_state_dt : dt,
 				input.speed_multiplier,
 				input.inv_tickrate
 			}
 		);
 	};
 
-	auto fade_sound_sources = [&sounds, frame_dt]() {
-		sounds.fade_sources(frame_dt);
+	auto fade_sound_sources = [sound_every_step, &sounds, frame_dt, state_dt]() {
+		sounds.fade_sources(sound_every_step ? *state_dt : frame_dt);
 	};
 
 	auto audio_job = [this, update_sound_properties, fade_sound_sources]() {
@@ -199,14 +210,12 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	launch_particle_jobs();
 
 	const bool should_update_audio = [&]() {
-		const auto& freq = input.sound_settings.processing_frequency;
-
-		if (freq == sound_processing_frequency::EVERY_SINGLE_FRAME) {
+		if (sound_freq == sound_processing_frequency::EVERY_SINGLE_FRAME) {
 			return true;
 		}
 
-		if (freq == sound_processing_frequency::EVERY_SIMULATION_STEP) {
-			return input.pending_new_state_sample;
+		if (sound_every_step) {
+			return input.new_state_delta != std::nullopt;
 		}
 
 		return false;

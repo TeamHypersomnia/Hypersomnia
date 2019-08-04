@@ -1164,6 +1164,8 @@ and then hitting Save settings.
 			return setup.get_inv_tickrate();
 		});
 
+		static augs::timer state_changed_timer;
+
 		get_audiovisuals().advance(audiovisual_advance_input {
 			frame_delta,
 			speed_multiplier,
@@ -1183,7 +1185,7 @@ and then hitting Save settings.
 
 			streaming.images_in_atlas,
 			write_buffer.particle_buffers,
-			pending_new_state_sample,
+			pending_new_state_sample ? state_changed_timer.extract_delta() : std::optional<augs::delta>(),
 
 			thread_pool
 		});
