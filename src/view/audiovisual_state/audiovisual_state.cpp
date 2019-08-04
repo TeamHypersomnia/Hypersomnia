@@ -198,7 +198,23 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 
 	launch_particle_jobs();
 
-	input.pool.enqueue(audio_job);
+	const bool should_update_audio = [&]() {
+		const auto& freq = input.sound_settings.processing_frequency;
+
+		if (freq == sound_processing_frequency::EVERY_SINGLE_FRAME) {
+			return true;
+		}
+
+		if (freq == sound_processing_frequency::EVERY_SIMULATION_STEP) {
+			return input.pending_new_state_sample;
+		}
+
+		return false;
+	}();
+
+	if (should_update_audio) {
+		input.pool.enqueue(audio_job);
+	}
 }
 
 void audiovisual_state::spread_past_infection(const const_logic_step step) {

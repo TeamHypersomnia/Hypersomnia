@@ -1117,7 +1117,7 @@ and then hitting Save settings.
 		});
 	};
 
-	static bool interpolation_needs_to_update_desired_transforms = true;
+	static bool pending_new_state_sample = true;
 	static auto thread_pool = augs::thread_pool(config.performance.get_num_pool_workers());
 
 	static auto audiovisual_step = [&](
@@ -1136,9 +1136,8 @@ and then hitting Save settings.
 		{
 			auto scope = measure_scope(get_audiovisuals().performance.interpolation);
 
-			if (interpolation_needs_to_update_desired_transforms) {
+			if (pending_new_state_sample) {
 				interp.update_desired_transforms(cosm);
-				interpolation_needs_to_update_desired_transforms = false;
 			}
 
 			interp.integrate_interpolated_transforms(
@@ -1184,9 +1183,12 @@ and then hitting Save settings.
 
 			streaming.images_in_atlas,
 			write_buffer.particle_buffers,
+			pending_new_state_sample,
 
 			thread_pool
 		});
+
+		pending_new_state_sample = false;
 	};
 
 	static auto setup_post_solve = [&](
@@ -1194,7 +1196,7 @@ and then hitting Save settings.
 		const config_lua_table& viewing_config,
 		const audiovisual_post_solve_settings settings
 	) {
-		interpolation_needs_to_update_desired_transforms = true;
+		pending_new_state_sample = true;
 
 		{
 			const auto& defs = get_viewable_defs();

@@ -61,6 +61,7 @@ struct audiovisual_advance_input {
 	const performance_settings& performance;
 	const images_in_atlas_map& game_images;
 	particle_triangle_buffers& particles_output;
+	const bool pending_new_state_sample;
 
 	augs::thread_pool& pool;
 };

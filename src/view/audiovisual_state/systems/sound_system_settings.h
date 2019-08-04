@@ -1,5 +1,14 @@
 #pragma once
 
+enum class sound_processing_frequency {
+	// GEN INTROSPECTOR enum class sound_processing_frequency
+	EVERY_SINGLE_FRAME,
+	EVERY_SIMULATION_STEP,
+
+	COUNT
+	// END GEN INTROSPECTOR
+};
+
 enum class listener_position_reference {
 	// GEN INTROSPECTOR enum class listener_position_reference
 	SCREEN_CENTER,
@@ -15,5 +24,7 @@ struct sound_system_settings {
 
 	listener_position_reference listener_reference = listener_position_reference::CHARACTER_POSITION;
 	bool set_listener_orientation_to_character_orientation = false;
+
+	sound_processing_frequency processing_frequency = sound_processing_frequency::EVERY_SIMULATION_STEP;
 	// END GEN INTROSPECTOR
 };

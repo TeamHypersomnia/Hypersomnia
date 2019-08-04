@@ -14,8 +14,6 @@ summary: That which we are brainstorming at the moment.
 
 - Allow delayed invocation of renderers
 
-- Allow audio to be processed only once per logic frame
-
 - Problem: if we want audio thread to help processing tasks, we must somehow guarantee that it will exit once it has new jobs
 	- Help until there are no audio frames
 		- which is also cool if audio thread only has jobs per a logic frame 

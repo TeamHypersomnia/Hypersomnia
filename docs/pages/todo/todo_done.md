@@ -3527,3 +3527,4 @@ which can be done from Settings->Reset all settings to factory default.
 - Render thread might begin helping when there are still no jobs posted
 	- So it should become a legit worker thread instead
 
+- Allow audio to be processed only once per logic frame

@@ -1092,6 +1092,17 @@ void settings_gui_state::perform(
 				break;
 			}
 			case settings_pane::PERFORMANCE: {
+				text_color("Sound quality", yellow);
+
+				ImGui::Separator();
+
+				{
+					auto& scope_cfg = config.sound;
+
+					revertable_enum_radio(SCOPE_CFG_NVP(processing_frequency));
+				}
+
+
 				ImGui::Separator();
 
 				text_color("General effects", yellow);
