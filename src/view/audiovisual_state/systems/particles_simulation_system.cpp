@@ -521,7 +521,7 @@ void update_component_related_cache(
 						return;
 					}
 
-					if (typed_handle.find_colliders_connection() == std::nullopt) {
+					if (typed_handle.find_colliders_connection() == nullptr) {
 						caches.erase(id);
 						return;
 					}

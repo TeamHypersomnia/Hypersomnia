@@ -588,7 +588,7 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 						return;
 					}
 
-					if (sound_entity.find_colliders_connection() == std::nullopt) {
+					if (sound_entity.find_colliders_connection() == nullptr) {
 						fade_and_erase(continuous_sound_caches, id);
 						return;
 					}

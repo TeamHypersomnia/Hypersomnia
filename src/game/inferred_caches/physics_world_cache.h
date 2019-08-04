@@ -32,8 +32,6 @@ struct colliders_cache {
 		POLY_VERTEX_COUNT
 	> constructed_fixtures;
 
-	colliders_connection connection;
-
 	void clear(physics_world_cache&);
 
 	bool is_constructed() const {

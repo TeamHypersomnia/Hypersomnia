@@ -24,7 +24,7 @@ public:
 		return handle.template get<components::rigid_body>().get_special();
 	}
 
-	std::optional<colliders_connection> find_colliders_connection() const;
+	const colliders_connection* find_colliders_connection() const;
 	std::optional<colliders_connection> calc_colliders_connection() const;
 
 	/* Shortcut for getting only the entity handle without shape offset */
@@ -79,15 +79,18 @@ real32 physics_mixin<E>::calc_density(
 }
 
 template <class E>
-std::optional<colliders_connection> physics_mixin<E>::find_colliders_connection() const {
+const colliders_connection* physics_mixin<E>::find_colliders_connection() const {
 	const auto self = *static_cast<const E*>(this);
-	auto& cosm = self.get_cosmos();
 
-	if (const auto cache = cosm.get_solvable_inferred().physics.find_colliders_cache(self)) {
-		return cache->connection;
+	if (const auto rb = self.template find<components::rigid_body>()) {
+		const auto& cached = rb.get_raw_component().cached_colliders_connection;
+
+		if (cached.owner.is_set()) {
+			return std::addressof(cached);
+		}
 	}
 
-	return std::nullopt;
+	return nullptr;
 }
 
 template <class E>

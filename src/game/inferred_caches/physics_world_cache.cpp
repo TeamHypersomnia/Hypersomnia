@@ -78,11 +78,9 @@ void rigid_body_cache::clear(physics_world_cache& owner) {
 	body = nullptr;
 }
 
-void colliders_cache::clear(physics_world_cache& owner) {
-	auto owner_body_cache = owner.find_rigid_body_cache(connection.owner);
-
+void colliders_cache::clear(physics_world_cache&) {
 	for (b2Fixture* f : constructed_fixtures) {
-		owner_body_cache->body->DestroyFixture(f);
+		f->GetBody()->DestroyFixture(f);
 	}
 
 	constructed_fixtures.clear();

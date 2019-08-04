@@ -238,6 +238,9 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 
 	const auto it = colliders_caches.try_emplace(handle.get_id().to_unversioned());
 
+	auto& cached_connection = handle.get().template get<components::rigid_body>().cached_colliders_connection;
+	cached_connection = connection;
+
 	auto& cache = (*it.first).second;
 	cache.clear(*this);
 
@@ -245,6 +248,7 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 
 	if (new_owner.dead()) {
 		colliders_caches.erase(it.first);
+		cached_connection.owner = {};
 		return;
 	}
 
@@ -279,8 +283,6 @@ void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle,
 	fixdef.restitution = colliders_data.restitution;
 	fixdef.isSensor = colliders_data.sensor;
 	fixdef.filter = calc_filters(handle);
-
-	cache.connection = connection;
 
 	auto& constructed_fixtures = cache.constructed_fixtures;
 	ensure(constructed_fixtures.empty());
@@ -472,8 +474,10 @@ void physics_world_cache::specific_infer_colliders(const E& handle) {
 	if (!it.second) {
 		/* Cache already existed. */
 		bool only_update_properties = true;
+
+		const auto& cached_connection = handle.get().template get<components::rigid_body>().cached_colliders_connection;
 		
-		if (get_calculated_connection() != cache.connection) {
+		if (get_calculated_connection() != cached_connection) {
 			only_update_properties = false;
 		}
 

@@ -17,6 +17,7 @@
 #include "game/enums/rigid_body_type.h"
 
 #include "augs/math/physics_structs.h"
+#include "game/detail/physics/colliders_connection.h"
 
 struct friction_connection {
 	// GEN INTROSPECTOR struct friction_connection
@@ -76,6 +77,7 @@ namespace components {
 
 		special_physics special;
 
+		mutable colliders_connection cached_colliders_connection;
 		// END GEN INTROSPECTOR
 	};
 }

@@ -246,16 +246,24 @@ void audiovisual_state::standard_post_solve(
 				continue;
 			}
 
-			const auto target_transform = 
-				from 
-				? *interp.find_interpolated(from)
-				: c.set_previous_transform_value
-			;
+			if (from) {
+				from.dispatch_on_having_all<components::interpolation>([&](const auto& typed_from) {
+					const auto target_transform = interp.get_interpolated(typed_from);
 
-			interp.set_updated_interpolated_transform(
-				subject,
-				target_transform
-			);
+					interp.set_updated_interpolated_transform(
+						subject,
+						target_transform
+					);
+				});
+			}
+			else {
+				const auto target_transform = c.set_previous_transform_value;
+
+				interp.set_updated_interpolated_transform(
+					subject,
+					target_transform
+				);
+			}
 		}
 	}
 

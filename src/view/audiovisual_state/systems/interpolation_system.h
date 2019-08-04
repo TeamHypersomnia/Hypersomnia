@@ -43,16 +43,8 @@ public:
 	void update_desired_transforms(const cosmos&);
 
 	template <class E>
-	std::optional<transformr> find_interpolated(const E& handle) const {
-		auto result = [&]() -> std::optional<transformr> {
-			if (enabled) {
-				if (const auto interp = handle.template find<components::interpolation>()) {
-					return interp->interpolated_transform;
-				}
-			}
-
-			return handle.find_logic_transform();
-		}();
+	transformr get_interpolated(const E& handle) const {
+		auto result = handle.template get<components::interpolation>().interpolated_transform;
 
 		/*
 			Here, we integerize the transform of the viewed entity, (and later possibly of the vehicle that it drives)
@@ -69,9 +61,7 @@ public:
 		const auto id = handle.get_id();
 
 		if (entity_id(id) == id_to_integerize) {
-			if (result) {
-				result->pos.discard_fract();
-			}
+			result.pos.discard_fract();
 		}
 
 		return result;

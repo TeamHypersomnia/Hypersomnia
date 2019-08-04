@@ -53,30 +53,71 @@ public:
 	std::optional<transformr> find_logic_transform() const;
 	std::optional<transformr> find_independent_transform() const;
 
-	template <class interpolation_system_type>
-	std::optional<transformr> find_viewing_transform(const interpolation_system_type& sys) const {
-		const auto handle = *static_cast<const entity_handle_type*>(this);
-		const auto& cosm = handle.get_cosmos();
+	transformr get_cached_logic_transform() const {
+		using E = entity_handle_type;
 
-		if (const auto connection = handle.find_colliders_connection()) {
-			if (connection->owner != handle.get_id()) {
-				if (auto body_transform = sys.find_interpolated(cosm[connection->owner])) {
-					auto bt = *body_transform;
+		const auto& handle = *static_cast<const entity_handle_type*>(this);
 
-					auto displacement = connection->shape_offset;
-
-					if (!displacement.pos.is_zero()) {
-						displacement.pos.rotate(bt.rotation, vec2(0, 0));
-					}
-
-					return bt + displacement;
-				}
-
-				return std::nullopt;
+		if constexpr(E::is_specific) {
+			if constexpr(E::template has<components::interpolation>()) {
+				return handle.template get<components::interpolation>().desired_transform;
+			}
+			else if constexpr(E::template has<components::transform>()) {
+				return handle.template get<components::transform>();
+			}
+			else if constexpr(E::template has<components::position>()) {
+				return handle.template get<components::position>();
+			}
+			else {
+				static_assert(always_false_v<E>, "Not implemented");
 			}
 		}
-		
-		return sys.find_interpolated(handle);
+		else {
+			static_assert(always_false_v<E>, "Not implemented for non-specific handles.");
+		}
+	}
+
+	template <class interpolation_system_type>
+	std::optional<transformr> find_viewing_transform(const interpolation_system_type& sys) const {
+		using E = entity_handle_type;
+
+		const auto& handle = *static_cast<const entity_handle_type*>(this);
+
+		if constexpr(!E::is_specific) {
+			return handle.dispatch([&](const auto& typed_handle) {
+				return typed_handle.find_viewing_transform(sys);
+			});
+		}
+		else {
+			if constexpr (E::template has<components::interpolation>()) {
+				if (sys.is_enabled()) {
+					const auto& cosm = handle.get_cosmos();
+
+					if (const auto connection = handle.find_colliders_connection()) {
+						if (connection->owner == handle.get_id()) {
+							return sys.get_interpolated(handle);
+						}
+						else {
+							transformr bt;
+
+							cosm[connection->owner].template dispatch_on_having_all<components::rigid_body>([&](const auto& typed_body) {
+								bt = sys.get_interpolated(typed_body);
+							});
+
+							auto displacement = connection->shape_offset;
+
+							if (!displacement.pos.is_zero()) {
+								displacement.pos.rotate(bt.rotation, vec2(0, 0));
+							}
+
+							return bt + displacement;
+						}
+					}
+				}
+			}
+
+			return handle.get_cached_logic_transform();
+		}
 	}
 	
 	vec2 get_effective_velocity() const;

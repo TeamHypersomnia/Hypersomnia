@@ -229,36 +229,38 @@ void contact_listener::EndContact(b2Contact* contact) {
 		const auto collider_fixtures = collider.get<invariants::fixtures>();
 #endif
 
-		auto& collider_physics = collider.get_owner_of_colliders().get_special_physics();
+		if (const auto collider_owner = collider.get_owner_of_colliders()) {
+			auto& collider_physics = collider_owner.get_special_physics();
 
-		if (subject_fixtures.is_friction_ground() && during_step) {
-#if FRICTION_FIELDS_COLLIDE
-			if (!collider_fixtures.is_friction_ground)
-#endif
-			{
-#if TODO_CARS
-				for (auto it = collider_physics.owner_friction_grounds.begin(); it != collider_physics.owner_friction_grounds.end(); ++it) {
-					if ((*it).target == subject.get_owner_of_colliders()) {
-						auto& fixtures_connected = (*it).fixtures_connected;
-						ensure(fixtures_connected > 0);
+			if (subject_fixtures.is_friction_ground() && during_step) {
+	#if FRICTION_FIELDS_COLLIDE
+				if (!collider_fixtures.is_friction_ground)
+	#endif
+				{
+	#if TODO_CARS
+					for (auto it = collider_physics.owner_friction_grounds.begin(); it != collider_physics.owner_friction_grounds.end(); ++it) {
+						if ((*it).target == subject.get_owner_of_colliders()) {
+							auto& fixtures_connected = (*it).fixtures_connected;
+							ensure(fixtures_connected > 0);
 
-						--fixtures_connected;
+							--fixtures_connected;
 
-						if (fixtures_connected == 0) {
-							 LOG("Unreg: %x", subject.get_owner_of_colliders().get_id());
-							collider_physics.owner_friction_grounds.erase(it);
-							sys.rechoose_owner_friction_body(collider.get_owner_of_colliders());
+							if (fixtures_connected == 0) {
+								 LOG("Unreg: %x", subject.get_owner_of_colliders().get_id());
+								collider_physics.owner_friction_grounds.erase(it);
+								sys.rechoose_owner_friction_body(collider.get_owner_of_colliders());
+							}
+							else {
+								 LOG("Decr: %x", subject.get_owner_of_colliders().get_id());
+							}
+
+							break;
 						}
-						else {
-							 LOG("Decr: %x", subject.get_owner_of_colliders().get_id());
-						}
-
-						break;
 					}
+	#else
+					(void)collider_physics;
+	#endif
 				}
-#else
-				(void)collider_physics;
-#endif
 			}
 		}
 

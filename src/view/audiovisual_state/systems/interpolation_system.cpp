@@ -18,10 +18,6 @@ void interpolation_system::set_updated_interpolated_transform(
 }
 
 void interpolation_system::update_desired_transforms(const cosmos& cosm) {
-	if (!enabled) {
-		return;
-	}
-
 	cosm.for_each_having<components::interpolation>( 
 		[&](const auto& e) {
 			if (const auto current = e.find_logic_transform()) {
