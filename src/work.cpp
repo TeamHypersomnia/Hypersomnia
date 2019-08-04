@@ -2352,6 +2352,8 @@ and then hitting Save settings.
 		should_quit = true;
 	};
 
+	static augs::graphics::renderer_backend::result_info renderer_backend_result;
+
 	static auto game_main_thread_synced_op = []() {
 		auto scope = measure_scope(game_thread_performance.synced_op);
 
@@ -2370,9 +2372,17 @@ and then hitting Save settings.
 			game_thread_performance.prepare_summary_info();
 			network_performance.prepare_summary_info();
 			streaming.performance.prepare_summary_info();
-			streaming.general_atlas_performance.prepare_summary_info();
+
+			if (streaming.finished_generating_atlas()) {
+				streaming.general_atlas_performance.prepare_summary_info();
+			}
+
 			render_thread_performance.prepare_summary_info();
 			get_audiovisuals().performance.prepare_summary_info();
+		}
+
+		for (const auto& f : renderer_backend_result.imgui_lists_to_delete) {
+			IM_DELETE(f);
 		}
 	};
 
@@ -2382,8 +2392,11 @@ and then hitting Save settings.
 		{
 			auto scope = measure_scope(render_thread_performance.renderer_commands);
 
+			renderer_backend_result.clear();
+
 			for (auto& r : read_buffer.renderers.all) {
 				renderer_backend.perform(
+					renderer_backend_result,
 					r.commands.data(),
 					r.commands.size(),
 					r.dedicated

@@ -267,14 +267,8 @@ public:
 	}
 
 	template <class M>
-	auto measure_raycasts(M& measurement) const {
-		const auto& num_ray_casts = get_solvable_inferred().physics.ray_cast_counter;
-		const auto before = num_ray_casts;
-
-		return augs::scope_guard([&num_ray_casts, &measurement, before](){
-			const auto surplus = num_ray_casts - before;
-			measurement.measure(surplus);
-		});
+	auto measure_raycasts(M&) const {
+		return augs::scope_guard([](){});
 	}
 
 	template <class C>

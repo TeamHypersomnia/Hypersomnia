@@ -147,6 +147,13 @@ set(BUILD_IN_CONSOLE_MODE OFF CACHE STRING "0")
 ## These may speed up build times.
 
 option(GENERATE_DEBUG_INFORMATION "Generate source-level debug information. If 0, -g flag will be removed to speed up the build." ${DEFAULT_OPT})
+option(ENABLE_THREADSANITIZER "Enable ThreadSanitizer." OFF)
+
+if (ENABLE_THREADSANITIZER)
+	message("Game will build with the thread sanitizer.")
+	set(GENERATE_DEBUG_INFORMATION ON)
+	message("Forcing GENERATE_DEBUG_INFORMATION to ON.")
+endif()
 
 # Other self-explanatory static allocation switches. Possible values are one or zero.
 
@@ -1024,6 +1031,10 @@ if(CLANG)
 		message("Chosen standard library: libstdc++")
 
 		set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -stdlib=libstdc++")
+	endif()
+
+	if (ENABLE_THREADSANITIZER)
+		set(HYPERSOMNIA_CXX_FLAGS "${HYPERSOMNIA_CXX_FLAGS} -fsanitize=thread")
 	endif()
 endif()
 

@@ -1,3 +1,4 @@
+#include <mutex>
 #include "augs/log.h"
 
 #include "augs/string/string_templates.h"
@@ -6,6 +7,8 @@
 #include "augs/gui/formatted_string.h"
 
 int ImTextCharFromUtf8(unsigned int* out_char, const char* in_text, const char* in_text_end);
+
+extern std::mutex log_mutex;
 
 namespace augs {
 	namespace gui {
@@ -42,6 +45,8 @@ namespace augs {
 				std::size_t lines_remaining
 			) {
 				formatted_string result;
+
+				std::unique_lock<std::mutex> lock(log_mutex);
 
 				auto& entries = program_log::get_current().all_entries;
 

@@ -239,6 +239,9 @@ public:
 
 	int32 m_flags;
 
+	b2ContactFilter defaultFilter;
+	b2ContactListener defaultListener;
+
 	b2ContactManager m_contactManager;
 
 	b2Body* m_bodyList;

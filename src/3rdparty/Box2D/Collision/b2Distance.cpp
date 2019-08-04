@@ -22,9 +22,6 @@
 #include <Box2D/Collision/Shapes/b2ChainShape.h>
 #include <Box2D/Collision/Shapes/b2PolygonShape.h>
 
-// GJK using Voronoi regions (Christer Ericson) and Barycentric coordinates.
-int32 b2_gjkCalls, b2_gjkIters, b2_gjkMaxIters;
-
 void b2DistanceProxy::Set(const b2Shape* shape, int32 index)
 {
 	switch (shape->GetType())
@@ -445,8 +442,6 @@ void b2Distance(b2DistanceOutput* output,
 				b2SimplexCache* cache,
 				const b2DistanceInput* input)
 {
-	++b2_gjkCalls;
-
 	const b2DistanceProxy* proxyA = &input->proxyA;
 	const b2DistanceProxy* proxyB = &input->proxyB;
 
@@ -541,7 +536,6 @@ void b2Distance(b2DistanceOutput* output,
 
 		// Iteration count is equated to the number of support point calls.
 		++iter;
-		++b2_gjkIters;
 
 		// Check for duplicate support points. This is the main termination criteria.
 		bool duplicate = false;
@@ -563,8 +557,6 @@ void b2Distance(b2DistanceOutput* output,
 		// New vertex is ok and needed.
 		++simplex.m_count;
 	}
-
-	b2_gjkMaxIters = b2Max(b2_gjkMaxIters, iter);
 
 	// Prepare output.
 	simplex.GetWitnessPoints(&output->pointA, &output->pointB);

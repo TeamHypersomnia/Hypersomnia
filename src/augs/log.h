@@ -14,6 +14,9 @@ class program_log {
 	static program_log global_instance;
 	unsigned max_all_entries;
 
+	void push_entry(const log_entry&);
+	friend void write_log_entry(const std::string& f);
+
 public:
 	static auto& get_current() {
 		return global_instance;
@@ -22,8 +25,6 @@ public:
 	program_log(const unsigned max_all_entries);
 
 	std::vector<log_entry> all_entries;
-
-	void push_entry(const log_entry&);
 
 	std::string get_complete() const;
 };

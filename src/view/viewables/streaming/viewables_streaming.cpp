@@ -30,6 +30,10 @@ bool viewables_streaming::finished_loading_player_metas(const augs::frame_num_ty
 	return !future_avatar_atlas.valid() && augs::has_completed(current_frame, avatar_atlas_submitted_when);
 }
 
+bool viewables_streaming::finished_generating_atlas() const {
+	return !future_general_atlas.valid();
+}
+
 void viewables_streaming::load_all(const viewables_load_input in) {
 	const auto current_frame = in.current_frame;
 	const auto& new_all_defs = in.new_defs;
@@ -66,7 +70,7 @@ void viewables_streaming::load_all(const viewables_load_input in) {
 	/* General atlas pass */
 
 	const bool atlas_upload_complete = augs::has_completed(current_frame, general_atlas_submitted_when);
-	const bool atlas_generation_complete = !future_general_atlas.valid();
+	const bool atlas_generation_complete = finished_generating_atlas();
 
 	if (atlas_upload_complete && atlas_generation_complete) {
 		bool new_atlas_required = settings.regenerate_every_time;

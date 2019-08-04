@@ -15,7 +15,6 @@
 
 #include "augs/readwrite/byte_file.h"
 #include "augs/filesystem/directory.h"
-#include "augs/templates/range_workers.h"
 
 #define DEBUG_FILL_IMGS_WITH_COLOR 0
 #define TEST_SAVE_ATLAS 0
@@ -350,17 +349,9 @@ void bake_fresh_atlas(
 			);
 		};
 
-#if 1
 		for (const auto& w : worker_inputs) {
 			worker(w);
 		}
-#else
-		const auto num_workers = std::size_t(in.blitting_threads - 1);
-
-		thread_local augs::range_workers<decltype(worker)> workers = num_workers;
-		workers.resize_workers(num_workers);
-		workers.process(worker, worker_inputs);
-#endif
 	}
 
 	{

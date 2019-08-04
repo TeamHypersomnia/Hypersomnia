@@ -97,6 +97,8 @@ void program_log::push_entry(const log_entry& new_entry) {
 }
 
 std::string program_log::get_complete() const {
+	std::unique_lock<std::mutex> lock(log_mutex);
+
 	auto logs = std::string();
 
 	for (const auto& e : all_entries) {

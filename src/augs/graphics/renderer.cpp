@@ -143,7 +143,10 @@ namespace augs {
 					continue;
 				}
 
-				push_command(setup_imgui_list { cmd_list->CloneOutput() } );
+				const auto& io = ImGui::GetIO();
+				const int fb_height = static_cast<int>(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+
+				push_command(setup_imgui_list { cmd_list->CloneOutput(), fb_height } );
 
 				for (int cmd_i = 0; cmd_i < cmd_list->CmdBuffer.Size; ++cmd_i) {
 					const ImDrawCmd* const pcmd = &cmd_list->CmdBuffer[cmd_i];

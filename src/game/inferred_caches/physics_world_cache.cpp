@@ -202,7 +202,6 @@ physics_world_cache::physics_world_cache(const physics_world_cache& b) : physics
 }
 
 physics_world_cache& physics_world_cache::operator=(const physics_world_cache& from_world) {
-	ray_cast_counter = from_world.ray_cast_counter;
 	accumulated_messages = from_world.accumulated_messages;
 
 	b2World& migrated_b2World = *b2world.get();
@@ -244,6 +243,8 @@ physics_world_cache& physics_world_cache::operator=(const physics_world_cache& f
 
 	// reset the allocator pointer to the new one
 	migrated_b2World.m_contactManager.m_allocator = &migrated_b2World.m_blockAllocator;
+	migrated_b2World.m_contactManager.m_contactFilter = &migrated_b2World.defaultFilter;
+	migrated_b2World.m_contactManager.m_contactListener = &migrated_b2World.defaultListener;
 
 	std::unordered_map<const void*, void*> pointer_migrations;
 	std::unordered_map<const void*, bool> contact_edge_a_or_b_in_contacts;

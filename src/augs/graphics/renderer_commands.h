@@ -66,5 +66,6 @@ namespace augs {
 
 	struct setup_imgui_list {
 		ImDrawList* cmd_list;
+		int fb_height = -1;
 	};
 }

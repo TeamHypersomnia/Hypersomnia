@@ -93,5 +93,6 @@ public:
 	void finalize_pending_tasks();
 
 	bool finished_loading_player_metas(augs::frame_num_type) const;
+	bool finished_generating_atlas() const;
 	void display_loading_progress() const;
 };

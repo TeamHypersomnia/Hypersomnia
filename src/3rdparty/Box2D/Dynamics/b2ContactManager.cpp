@@ -22,15 +22,12 @@
 #include <Box2D/Dynamics/b2WorldCallbacks.h>
 #include <Box2D/Dynamics/Contacts/b2Contact.h>
 
-b2ContactFilter b2_defaultFilter;
-b2ContactListener b2_defaultListener;
-
-b2ContactManager::b2ContactManager()
+b2ContactManager::b2ContactManager(b2ContactFilter& contactFilter, b2ContactListener& contactListener)
 {
 	m_contactList = NULL;
 	m_contactCount = 0;
-	m_contactFilter = &b2_defaultFilter;
-	m_contactListener = &b2_defaultListener;
+	m_contactFilter = &contactFilter;
+	m_contactListener = &contactListener;
 	m_allocator = NULL;
 }
 

@@ -170,8 +170,6 @@ public:
 	void step_and_set_new_transforms(const logic_step);
 	void post_and_clear_accumulated_collision_messages(const logic_step);
 
-	mutable std::size_t ray_cast_counter = 0u;
-
 	rigid_body_cache* find_rigid_body_cache(const entity_id);
 	colliders_cache* find_colliders_cache(const entity_id);
 	joint_cache* find_joint_cache(const entity_id);

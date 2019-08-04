@@ -30,7 +30,7 @@ class b2BlockAllocator;
 class b2ContactManager
 {
 public:
-	b2ContactManager();
+	b2ContactManager(b2ContactFilter&, b2ContactListener&);
 
 	// Broad-phase callback.
 	void AddPair(void* proxyUserDataA, void* proxyUserDataB);

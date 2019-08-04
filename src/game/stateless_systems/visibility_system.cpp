@@ -174,14 +174,14 @@ void visibility_system::calc_visibility(
 ) const {
 	const auto si = cosm.get_si();
 
-	static const auto vtx_hit_col = yellow;
-	static const auto ray_obstructed_col = red;
-	static const auto extended_vision_hit_col = blue;
-	static const auto discontinuity_col = rgba(0, 127, 255, 255);
-	static const auto vis_rect_col = rgba(white).mult_alpha(0.7f);
-	static const auto free_area_col = pink;
-	static const auto triangle_edge_col = violet;
-	static const auto unreachable_area_col = white;
+	const auto vtx_hit_col = yellow;
+	const auto ray_obstructed_col = red;
+	const auto extended_vision_hit_col = blue;
+	const auto discontinuity_col = rgba(0, 127, 255, 255);
+	const auto vis_rect_col = rgba(white).mult_alpha(0.7f);
+	const auto free_area_col = pink;
+	const auto triangle_edge_col = violet;
+	const auto unreachable_area_col = white;
 
 	const auto settings = [&cosm](){ 
 		auto absolutize = [](float& f) {
@@ -861,7 +861,7 @@ void visibility_system::calc_visibility(
 
 		/* for every discontinuity, remove if there exists any edge that is too close to the discontinuity's vertex */
 		discs_copy.erase(std::remove_if(discs_copy.begin(), discs_copy.end(),
-			[&request, edges_num, &transform, &wrap, &lines, &marked_holes, &response]
+			[unreachable_area_col, &request, edges_num, &transform, &wrap, &lines, &marked_holes, &response]
 		(const discontinuity& d) {
 			thread_local std::vector<vec2> points_too_close;
 			points_too_close.clear();

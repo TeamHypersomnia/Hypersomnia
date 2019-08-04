@@ -158,11 +158,14 @@ namespace augs {
 		}
 
 		void renderer_backend::perform(
+			result_info& output,
 			const renderer_command* const c, 
 			const std::size_t n,
 			const dedicated_buffers& dedicated
 		) {
 #if BUILD_OPENGL
+			auto& lists_to_delete = output.imgui_lists_to_delete;
+
 			using A = backend_access;
 			A access;
 
@@ -171,9 +174,7 @@ namespace augs {
 			ImDrawList* cmd_list = nullptr;
 			std::size_t cmd_i = 0;
 			const ImDrawIdx* idx_buffer_offset = 0;
-
-			ImGuiIO& io = ImGui::GetIO();
-			const int fb_height = static_cast<int>(io.DisplaySize.y * io.DisplayFramebufferScale.y);
+			int fb_height = -1;
 
 			for (std::size_t i = 0; i < n; ++i) {
 				const auto& cmd = c[i];
@@ -215,13 +216,13 @@ namespace augs {
 					}
 					else if constexpr(same<C, setup_imgui_list>) {
 						cmd_list = typed_cmd.cmd_list;
+						fb_height = typed_cmd.fb_height;
 
 						GL_CHECK(glBindBuffer(GL_ARRAY_BUFFER, p.triangle_buffer_id));
 						buffer_data(GL_ARRAY_BUFFER, (GLsizeiptr)cmd_list->VtxBuffer.Size * sizeof(ImDrawVert), (const GLvoid*)cmd_list->VtxBuffer.Data, GL_STREAM_DRAW);
 
 						GL_CHECK(glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, p.imgui_elements_id));
 						buffer_data(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)cmd_list->IdxBuffer.Size * sizeof(ImDrawIdx), (const GLvoid*)cmd_list->IdxBuffer.Data, GL_STREAM_DRAW);
-
 					}
 					else if constexpr(same<C, no_arg_command>) {
 						using N = no_arg_command;
@@ -239,6 +240,7 @@ namespace augs {
 							case N::STENCIL_REVERSE_TEST: stencil_reverse_test(); break;
 
 							case N::IMGUI_CMD: {
+								ensure(fb_height > -1);
 								const auto& cc = cmd_list->CmdBuffer[cmd_i++];
 								const auto bounds = xywhi(
 									(int)cc.ClipRect.x, (int)(fb_height - cc.ClipRect.w), (int)(cc.ClipRect.z - cc.ClipRect.x), (int)(cc.ClipRect.w - cc.ClipRect.y)
@@ -250,7 +252,7 @@ namespace augs {
 								idx_buffer_offset += cc.ElemCount;
 
 								if (static_cast<int>(cmd_i) == cmd_list->CmdBuffer.size()) {
-									IM_DELETE(cmd_list);
+									lists_to_delete.emplace_back(cmd_list);
 
 									cmd_list = nullptr;
 									cmd_i = 0;

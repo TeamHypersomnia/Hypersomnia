@@ -7,6 +7,8 @@
 
 #include "augs/templates/exception_templates.h"
 
+struct ImDrawList;
+
 namespace augs {
 	struct dedicated_buffers;
 	struct drawcall_command;
@@ -66,7 +68,16 @@ namespace augs {
 			renderer_backend(const renderer_backend&) = delete;
 			renderer_backend& operator=(const renderer_backend&) = delete;
 
+			struct result_info {
+				std::vector<ImDrawList*> imgui_lists_to_delete;
+
+				void clear() {
+					imgui_lists_to_delete.clear();
+				}
+			};
+
 			void perform(
+				result_info& output,
 				const renderer_command*, 
 				std::size_t n,
 				const dedicated_buffers&

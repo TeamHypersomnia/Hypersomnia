@@ -127,6 +127,7 @@ namespace augs {
 			cv.notify_all();
 			wait_complete();
 
+			std::unique_lock<std::mutex> lk(m);
 			count = 0;
 		}
 
