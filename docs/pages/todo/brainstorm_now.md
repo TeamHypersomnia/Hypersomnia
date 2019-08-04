@@ -6,55 +6,18 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Allow delayed invocation of renderers
+	- We could at least make light drawing a separate job 
+		- with its separate renderer
+
+- Backend accepts renderer so that it has access to dedicated buffers
+	- Can post a drawcall with an enum instead of pointer for a delayed call?
+
 - We might want to somehow decrease heap contention between threads
 	- Best would be per-thread heaps
 		- Even better just no allocations
 		- Though even something as trivial as draw debug details will do a lot of allocations
 	- Use hoard allocator?
-
-- Allow delayed invocation of renderers
-
-- Problem: if we want audio thread to help processing tasks, we must somehow guarantee that it will exit once it has new jobs
-	- Help until there are no audio frames
-		- which is also cool if audio thread only has jobs per a logic frame 
-
-- We could at least make light drawing a separate job 
-	- with its separate renderer
-
-- Since we're going to clear the task pool we could just use a vector instead of a queue
-	- And we would not need to hold a mutex for getting the next task
-	- Though I guess it's premature
-
-
-- We'll somehow remove the multithreading facility completely from the visibility system
-	- We'll take control
-	- Actually, we won't even need the responses because the tasks will fill the data themselves
-	- FoW for our character will be a separate job
-	- Somehow pass a pointer to the target triangle buffer to fill. If it's null
-	- Light system simply does a delayed call_triangles(dedicated_buffer_category::VISIBILITY, i);
-
-- Caling dedicated buffers in a delayed manner
-	- dedicated_buffer_type::FLYING_NUMBERS
-	- FoW buffer
-		- similarly, call_triangles(dedicated_buffer_type::FOW)
-	- We can later give dedicated buffers to the render layers similarly, just a separate enum type and enum array
-		- this only has the disadvantage that it will incur more drawcalls so maybe we could do it later
-
-- Illuminated rendering could trivially post all jobs for layers at the very beginning and only then prepare the commands
-	- Jobs in visibility system
-		- We'll remove the range workers completely and the parameter for threads, we'll simply have jobs
-		- Each job could draw the light right away to once again avoid dependencies
-		- We can still do this before introducing the pool
-
-- Backend accepts renderer so that it has access to dedicated buffers
-	- Can post a drawcall with an enum instead of pointer for a delayed call?
-
-- We either queue these particles or synchronously advance thunders and explosions
-	- Drawing can happen separately anyway
-	- We would anyway need to synchronously copy the particles so lets just go with synchronised advance
-
-- Problem: exploding rings and thunders spawn particles upon advance
-- Remember to post the heaviest tasks as the first, so audiovisual advancements go last probably
 
 - Task dependency graph
 	- The particles don't have to be completed before illuminated rendering - just preallocate the buffers so that the pointer values don't change
@@ -123,18 +86,6 @@ summary: That which we are brainstorming at the moment.
 	- Game gui too can be drawn independently
 	- Start with std::async?
 		- Actually some nice interface for completion could come in handy
-
-- WARNING! Interpolation should be run before parallelizing other systems because it might affect transforms!
-
-- If the render thread sleeps, we should be able to use it to speed up the frame preparation in jobs system
-	- Otherwise we have to be conservative in the number of threads by one
-	- Why not just post render jobs?
-	- game thread could post all the jobs, incl. rendering
-	- process_jobs_until(game waiting_already)
-		- or just until empty since the thread pool will be emptied of jobs by the end of each frame
-		- same for audio?
-			- if audio has nothing to do, it can help in producing the next frame as well
-	- game thread itself will process jobs
 
 - Audio parallelization
 	- We might just use a concurrentqueue to push audio jobs, preferably with a set maximum

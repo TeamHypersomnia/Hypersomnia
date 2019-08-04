@@ -25,18 +25,18 @@ void debug_details_summaries::acquire(
 	const session_profiler& session_performance,
 	const audiovisual_profiler& audiovisual_performance
 ) {
-	frame = frame_performance.summary();
-	network = network_performance.summary();
-	streaming = streaming_performance.summary();
-	general_atlas = general_atlas_performance.summary();
-	session = session_performance.summary();
-	audiovisual = audiovisual_performance.summary();
+	frame_performance.summary(frame);
+	network_performance.summary(network);
+	streaming_performance.summary(streaming);
+	general_atlas_performance.summary(general_atlas);
+	session_performance.summary(session);
+	audiovisual_performance.summary(audiovisual);
 
 	if (std::addressof(cosm) == std::addressof(cosmos::zero)) {
 		cosmic.clear();
 	}
 	else {
-		cosmic = cosm.profiler.summary();
+		cosm.profiler.summary(cosmic);
 	}
 
 	auto make_readable = [&](const auto kbits) {

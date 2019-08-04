@@ -47,10 +47,15 @@ namespace augs {
 			);
 		}
 
-		auto summary() const {
-			std::vector<const time_measurements*> all_with_time;
-			std::string times_summary;
-			std::string amounts_summary;
+		void summary(std::string& output) const {
+			thread_local std::vector<const time_measurements*> all_with_time;
+			thread_local std::string amounts_summary;
+
+			auto& times_summary = output;
+
+			all_with_time.clear();
+			times_summary.clear();
+			amounts_summary.clear();
 			
 			auto& self = *static_cast<const derived*>(this);
 	
@@ -71,7 +76,7 @@ namespace augs {
 			sort_range(
 				all_with_time, 
 				[](const auto* a, const auto* b) {
-					return *a > *b; 
+					return a->get_summary_info().value > b->get_summary_info().value;
 				}
 			);
 	
@@ -79,7 +84,7 @@ namespace augs {
 				times_summary += t->summary();
 			}
 	
-			return times_summary + amounts_summary;
+			output += amounts_summary;
 		}
 	};
 }

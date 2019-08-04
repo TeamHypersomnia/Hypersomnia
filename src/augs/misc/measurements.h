@@ -65,14 +65,6 @@ namespace augs {
 			return self.summary_impl();
 		}
 
-		bool operator<(const measurements& b) const {
-			return get_average_units() < b.get_average_units();
-		}
-
-		bool operator>(const measurements& b) const {
-			return get_average_units() > b.get_average_units();
-		}
-
 		T get_average_units() const {
 			return last_average;
 		}
@@ -97,6 +89,10 @@ namespace augs {
 			summary_info.measured = measured;
 			summary_info.value = last_measurement;
 		}
+
+		const auto& get_summary_info() const {
+			return summary_info;
+		}
 	};
 
 	template <class T>
@@ -109,7 +105,6 @@ namespace augs {
 		}
 
 	public:
-		using base::operator<;
 		using base::base;
 	};
 
@@ -141,7 +136,6 @@ namespace augs {
 		}
 
 	public:
-		using base::operator<;
 		using base::base;
 		using base::measure;
 

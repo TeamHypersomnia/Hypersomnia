@@ -3528,3 +3528,44 @@ which can be done from Settings->Reset all settings to factory default.
 	- So it should become a legit worker thread instead
 
 - Allow audio to be processed only once per logic frame
+
+- Problem: if we want audio thread to help processing tasks, we must somehow guarantee that it will exit once it has new jobs
+	- Help until there are no audio frames
+		- which is also cool if audio thread only has jobs per a logic frame 
+
+- Since we're going to clear the task pool we could just use a vector instead of a queue
+	- And we would not need to hold a mutex for getting the next task
+	- Though I guess it's premature
+- We'll somehow remove the multithreading facility completely from the visibility system
+	- We'll take control
+	- Actually, we won't even need the responses because the tasks will fill the data themselves
+	- FoW for our character will be a separate job
+	- Somehow pass a pointer to the target triangle buffer to fill. If it's null
+	- Light system simply does a delayed call_triangles(dedicated_buffer_category::VISIBILITY, i);
+
+- Caling dedicated buffers in a delayed manner
+	- dedicated_buffer_type::FLYING_NUMBERS
+	- FoW buffer
+		- similarly, call_triangles(dedicated_buffer_type::FOW)
+	- We can later give dedicated buffers to the render layers similarly, just a separate enum type and enum array
+		- this only has the disadvantage that it will incur more drawcalls so maybe we could do it later
+
+- We either queue these particles or synchronously advance thunders and explosions
+	- Drawing can happen separately anyway
+	- We would anyway need to synchronously copy the particles so lets just go with synchronised advance
+
+- Problem: exploding rings and thunders spawn particles upon advance
+- Remember to post the heaviest tasks as the first, so audiovisual advancements go last probably
+
+- WARNING! Interpolation should be run before parallelizing other systems because it might affect transforms!
+
+- If the render thread sleeps, we should be able to use it to speed up the frame preparation in jobs system
+	- Otherwise we have to be conservative in the number of threads by one
+	- Why not just post render jobs?
+	- game thread could post all the jobs, incl. rendering
+	- process_jobs_until(game waiting_already)
+		- or just until empty since the thread pool will be emptied of jobs by the end of each frame
+		- same for audio?
+			- if audio has nothing to do, it can help in producing the next frame as well
+	- game thread itself will process jobs
+

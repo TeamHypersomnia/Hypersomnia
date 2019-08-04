@@ -470,3 +470,9 @@ summary: Just a hidden scratchpad.
 
 - Interpolate velocity value to avoid an ugly trace sound when shooting the rocket launcher at 60hz
 
+- Illuminated rendering could trivially post all jobs for layers at the very beginning and only then prepare the commands
+	- Jobs in visibility system
+		- We'll remove the range workers completely and the parameter for threads, we'll simply have jobs
+		- Each job could draw the light right away to once again avoid dependencies
+		- We can still do this before introducing the pool
+
