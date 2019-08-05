@@ -1,7 +1,7 @@
 #include "augs/math/camera_cone.h"
 #include "augs/math/matrix.h"
 
-#include "augs/drawing/drawing.h"
+#include "augs/drawing/drawing.hpp"
 
 #include "augs/graphics/renderer.h"
 #include "augs/graphics/shader.h"

@@ -4,8 +4,6 @@
 #include "game/detail/entity_handle_mixins/inventory_mixin.hpp"
 #include "game/components/gun_component.h"
 #include "game/components/explosive_component.h"
-#include "augs/drawing/drawing.h"
-
 #include "game/inferred_caches/physics_world_cache.h"
 #include "game/enums/filters.h"
 #include "game/detail/entity_scripts.h"

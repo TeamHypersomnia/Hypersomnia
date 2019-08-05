@@ -1,6 +1,6 @@
 #include "augs/misc/randomization.h"
 #include "augs/templates/container_templates.h"
-#include "augs/drawing/drawing.h"
+#include "augs/drawing/drawing.hpp"
 
 #include "game/enums/filters.h"
 

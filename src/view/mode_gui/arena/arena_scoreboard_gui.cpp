@@ -1,3 +1,4 @@
+#include "augs/drawing/drawing.hpp"
 #include "augs/gui/text/printer.h"
 #include "view/mode_gui/arena/arena_scoreboard_gui.h"
 #include "game/cosmos/cosmos.h"
