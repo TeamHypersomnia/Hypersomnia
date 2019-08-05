@@ -68,10 +68,6 @@ namespace augs {
 			bool empty() const {
 				return size.is_zero();
 			}
-
-			auto get_texture_id() const {
-				return id;
-			}
 		};
 	}
 }

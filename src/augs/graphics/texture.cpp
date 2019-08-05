@@ -15,12 +15,14 @@ namespace augs {
 			set_filtering(cmd.type);
 		}
 
-		void texture::texImage2D(renderer& r, const vec2u size, const unsigned char* const source) {
+		void texture::texImage2D(renderer& r, const vec2u new_size, const unsigned char* const source) {
 			set_as_current(r);
+
+			size = new_size;
 
 			r.push_object_command(
 				*this,
-				texImage2D_command { size, source }
+				texImage2D_command { new_size, source }
 			);
 		}
 
@@ -61,15 +63,14 @@ namespace augs {
 		}
 
 		void texture::texImage2D(const vec2u new_size, const unsigned char* const source) {
-			size = new_size;
-
 			(void)source;
+
 			GL_CHECK(glTexImage2D(
 				GL_TEXTURE_2D,
 				0,
 				GL_RGBA,
-				size.x,
-				size.y,
+				new_size.x,
+				new_size.y,
 				0,
 				GL_RGBA,
 				GL_UNSIGNED_BYTE,

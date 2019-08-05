@@ -188,8 +188,8 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			all_visible.for_each<render_layer::ILLUMINATING_WANDERING_PIXELS>(cosm, [&](const auto& e) {
 				e.template dispatch_on_having_all<invariants::wandering_pixels>(
 					[&](const auto& typed_wandering_pixels) {
-						auto job = [&triangles, current_index, &wandering_pixels, &rng, &game_images, typed_wandering_pixels, dt]() {
-							wandering_pixels.advance_for(rng, typed_wandering_pixels, dt);
+						auto job = [&triangles, current_index, &wandering_pixels, &game_images, typed_wandering_pixels, dt]() {
+							wandering_pixels.advance_for(typed_wandering_pixels, dt);
 							draw_wandering_pixels_as_sprites(triangles, current_index, wandering_pixels, typed_wandering_pixels, game_images);
 						};
 
@@ -221,8 +221,8 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 			all_visible.for_each<render_layer::DIM_WANDERING_PIXELS>(cosm, [&](const auto& e) {
 				e.template dispatch_on_having_all<invariants::wandering_pixels>(
 					[&](const auto& typed_wandering_pixels) {
-						auto job = [&triangles, current_index, &wandering_pixels, &rng, &game_images, typed_wandering_pixels, dt]() {
-							wandering_pixels.advance_for(rng, typed_wandering_pixels, dt);
+						auto job = [&triangles, current_index, &wandering_pixels, &game_images, typed_wandering_pixels, dt]() {
+							wandering_pixels.advance_for(typed_wandering_pixels, dt);
 							draw_wandering_pixels_as_sprites(triangles, current_index, wandering_pixels, typed_wandering_pixels, game_images);
 						};
 

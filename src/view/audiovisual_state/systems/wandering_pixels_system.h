@@ -54,7 +54,6 @@ public:
 
 	template <class E>
 	void advance_for(
-		randomization& rng,
 		const E& subject,
 		const augs::delta dt
 	);

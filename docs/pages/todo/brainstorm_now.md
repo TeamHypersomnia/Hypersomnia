@@ -6,6 +6,10 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Use pointers for sound source identification?
+	- We could also "request" new sound source to be put into a unique ptr
+
+
 - We might want to somehow decrease heap contention between threads
 	- Best would be per-thread heaps
 		- Even better just no allocations

@@ -21,10 +21,11 @@ const wandering_pixels_system::cache* wandering_pixels_system::find_cache(const 
 
 template <class E>
 void wandering_pixels_system::advance_for(
-	randomization& rng,
 	const E& it, 
 	const augs::delta dt
 ) {
+	thread_local randomization rng;
+
 	const auto dt_secs = dt.in_seconds();
 	const auto dt_ms = dt.in_milliseconds();
 
