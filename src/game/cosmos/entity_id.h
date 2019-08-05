@@ -106,6 +106,7 @@ struct entity_id {
 template <class E>
 struct typed_entity_id {
 	using raw_type = entity_id_base;
+	using used_entity_type = E;
 
 	// GEN INTROSPECTOR struct typed_entity_id class E
 	raw_type raw;

@@ -17,7 +17,7 @@ void draw_wandering_pixels_as_sprites(
 
 	offset *= 2;
 
-	if (const auto cache = sys.find_cache(subject)) {
+	if (const auto cache = sys.find_cache(subject.get_id())) {
 		const auto& particles = cache->particles;
 
 		for (std::size_t i = 0; i < particles.size(); ++i) {

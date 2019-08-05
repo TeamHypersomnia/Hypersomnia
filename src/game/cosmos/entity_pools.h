@@ -9,8 +9,6 @@
 #include "game/cosmos/pool_size_type.h"
 #include "game/cosmos/per_entity_type.h"
 
-static constexpr bool statically_allocate_entities = STATICALLY_ALLOCATE_ENTITIES;
-
 template <class E>
 struct entity_solvable;
 

@@ -12,7 +12,6 @@ summary: That which we are brainstorming at the moment.
 		- Though even something as trivial as draw debug details will do a lot of allocations
 	- Use hoard allocator?
 
-
 - Audio parallelization
 	- We might just use a concurrentqueue to push audio jobs, preferably with a set maximum
 

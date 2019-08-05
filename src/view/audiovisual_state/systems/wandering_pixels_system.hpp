@@ -1,6 +1,23 @@
 #pragma once
 #include "view/audiovisual_state/systems/wandering_pixels_system.h"
+#include "game/cosmos/specific_entity_handle_declaration.h"
 #include "augs/math/steering.h"
+
+template <class E>
+wandering_pixels_system::cache& wandering_pixels_system::get_cache(const E& id) {
+	return per_entity_cache.all.template get_for<entity_type_of<E>>().value[id.raw.indirection_index];
+}
+
+template <class E>
+const wandering_pixels_system::cache* wandering_pixels_system::find_cache(const E& id) const {
+	auto& ch = per_entity_cache.all.template get_for<entity_type_of<E>>().value[id.raw.indirection_index];
+
+	if (ch.is_set()) {
+		return std::addressof(ch);
+	}
+
+	return nullptr;
+}
 
 template <class E>
 void wandering_pixels_system::advance_for(
@@ -11,7 +28,7 @@ void wandering_pixels_system::advance_for(
 	const auto dt_secs = dt.in_seconds();
 	const auto dt_ms = dt.in_milliseconds();
 
-	auto& cache = get_cache(it);
+	auto& cache = get_cache(it.get_id());
 	auto& used_rng = rng;
 
 	const auto& wandering = it.template get<components::wandering_pixels>();

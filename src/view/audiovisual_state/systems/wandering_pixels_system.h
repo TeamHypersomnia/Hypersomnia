@@ -9,6 +9,7 @@
 #include "game/components/wandering_pixels_component.h"
 
 #include "view/audiovisual_state/systems/audiovisual_cache_common.h"
+#include "view/audiovisual_state/systems/linear_cache_map.h"
 
 class visible_entities;
 
@@ -31,24 +32,25 @@ public:
 		xywh recorded_reach;
 
 		std::vector<particle> particles;
-		bool constructed = false;
+
+		bool is_set() const {
+			return recorded_particle_count > 0;
+		}
 	};
 
 	double global_time_seconds = 0.0;
 
-	audiovisual_cache_map<cache> per_entity_cache;
+	linear_cache_map<cache, entity_types_having_all_of<components::wandering_pixels>> per_entity_cache;
 
 	void clear() {
 		per_entity_cache.clear();
 	}
 
-	cache& get_cache(const const_entity_handle id) {
-		return per_entity_cache[id.get_id()];
-	}
+	template <class E>
+	cache& get_cache(const E& id);
 
-	const cache* find_cache(const const_entity_handle id) const {
-		return mapped_or_nullptr(per_entity_cache, id.get_id());
-	}
+	template <class E>
+	const cache* find_cache(const E& id) const;
 
 	template <class E>
 	void advance_for(
@@ -57,5 +59,7 @@ public:
 		const augs::delta dt
 	);
 
-	void reserve_caches_for_entities(const size_t) const {}
+	void reserve_caches_for_entities(const std::size_t n) {
+		per_entity_cache.reserve(n);
+	}
 };

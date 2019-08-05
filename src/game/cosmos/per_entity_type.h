@@ -5,6 +5,8 @@
 #include "augs/templates/per_type.h"
 #include "game/organization/all_entity_types_declaration.h"
 
+static constexpr bool statically_allocate_entities = STATICALLY_ALLOCATE_ENTITIES;
+
 template <template <class> class Mod>
 using per_entity_type = per_type_t<all_entity_types, Mod>;
 
