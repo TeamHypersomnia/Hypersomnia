@@ -30,6 +30,7 @@ class visible_entities;
 
 namespace augs {
 	class thread_pool;
+	struct dedicated_buffers;
 }
 
 struct character_camera;
@@ -50,6 +51,7 @@ struct audiovisual_advance_input {
 	const double inv_tickrate;
 
 	const character_camera& camera;
+	const camera_cone queried_cone;
 
 	const visible_entities& all_visible;
 	const particle_effects_map& particle_effects;
@@ -61,6 +63,7 @@ struct audiovisual_advance_input {
 	const performance_settings& performance;
 	const images_in_atlas_map& game_images;
 	particle_triangle_buffers& particles_output;
+	augs::dedicated_buffers& dedicated;
 	const std::optional<augs::delta> new_state_delta;
 
 	augs::thread_pool& pool;

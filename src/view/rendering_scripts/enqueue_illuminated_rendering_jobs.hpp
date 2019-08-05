@@ -16,7 +16,6 @@ void enqueue_illuminated_rendering_jobs(
 	const auto& av = in.audiovisuals;
 	const auto& thunders = av.get<thunder_system>();
 	const auto& exploding_rings = av.get<exploding_ring_system>();
-	const auto& wandering_pixels = av.get<wandering_pixels_system>();
 	const auto& screen_size = cone.screen_size;
 	const auto& settings = in.drawing;
 	const auto& queried_cone = in.queried_cone;
@@ -461,23 +460,7 @@ void enqueue_illuminated_rendering_jobs(
 		}
 	};
 
-	auto special_effects_job = [&exploding_rings, &cosm, &dedicated, get_drawer_for, &visible, &thunders, &wandering_pixels, &game_images, queried_cone, get_line_drawer_for, make_drawing_input]() {
-		{
-			const auto drawing_input = make_drawing_input(D::DIM_WANDERING_PIXELS);
-
-			visible.for_each<render_layer::DIM_WANDERING_PIXELS>(cosm, [&](const auto& e) {
-				draw_wandering_pixels_as_sprites(wandering_pixels, e, game_images, drawing_input.make_input_for<invariants::sprite>());
-			});
-		}
-
-		{
-			const auto drawing_input = make_drawing_input(D::ILLUMINATING_WANDERING_PIXELS);
-
-			visible.for_each<render_layer::ILLUMINATING_WANDERING_PIXELS>(cosm, [&](const auto& e) {
-				draw_wandering_pixels_as_sprites(wandering_pixels, e, game_images, drawing_input.make_input_for<invariants::sprite>());
-			});
-		}
-
+	auto special_effects_job = [&exploding_rings, &dedicated, get_drawer_for, &thunders, queried_cone, get_line_drawer_for]() {
 		{
 			thunders.draw_thunders(
 				get_line_drawer_for(D::THUNDERS),

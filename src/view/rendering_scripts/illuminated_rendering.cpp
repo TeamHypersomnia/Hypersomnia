@@ -25,7 +25,6 @@
 
 #include "view/rendering_scripts/rendering_scripts.h"
 #include "view/rendering_scripts/illuminated_rendering.h"
-#include "view/rendering_scripts/draw_wandering_pixels_as_sprites.h"
 #include "view/rendering_scripts/helper_drawer.h"
 #include "view/rendering_scripts/draw_area_indicator.h"
 
@@ -318,8 +317,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	set_shader_with_matrix(shaders.illuminated);
 
-	renderer.call_triangles(D::DIM_WANDERING_PIXELS);
 	renderer.call_triangles(D::GROUND_FLOORS_DECORS);
+	renderer.call_triangles(D::DIM_WANDERING_PIXELS);
 
 	set_shader_with_matrix(shaders.specular_highlights);
 

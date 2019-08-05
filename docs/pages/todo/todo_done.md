@@ -3569,3 +3569,84 @@ which can be done from Settings->Reset all settings to factory default.
 			- if audio has nothing to do, it can help in producing the next frame as well
 	- game thread itself will process jobs
 
+- Allow delayed invocation of renderers
+	- We could at least make light drawing a separate job 
+		- with its separate renderer
+
+- Backend accepts renderer so that it has access to dedicated buffers
+	- Can post a drawcall with an enum instead of pointer for a delayed call?
+
+- Task dependency graph
+	- The particles don't have to be completed before illuminated rendering - just preallocate the buffers so that the pointer values don't change
+	- Separate renderer for game gui
+	- Separate renderer for post-game gui
+
+	all jobs:
+		advance_thunders();
+		advance_exploding_rings();
+		advance_flying_numbers();
+		advance_wandering_pixels();
+
+		launch_particle_jobs();
+		audio_job();
+
+		perform_illuminated_rendering();
+			- could be further parallelized
+
+			Depends:
+			-> advance_thunders()
+			-> advance_exploding_rings()
+			-> advance_flying_numbers()
+			-> advance_wandering_pixels()
+
+		actually why not just preallocate and draw after advancement to avoid dependencies at all?
+		we could later similarly jobify tasks per layer
+
+		game_gui_job();
+		post_game_gui();
+
+		show_developer_details()
+
+		join all
+
+		
+
+- The multithreaded model
+	- The main thread
+		- Problem: augs::window might be needed in some other areas, not just in opengl thread
+			- e.g. spawning dialogs - can't be static because it needs a hwnd
+		- Always performs the simulation logic
+		- Dispatches work for viewing
+		- Initializes the workers
+			- Audio command thread (sleeps on condition variable)
+			- Rendering command thread (sleeps on condition variable)
+			- We don't need thread pools for these yet as these can be standalone threads
+			- We can later poolize the work for all remaining viewing logic
+	- (second concept) The main thread
+		- We could make it actually hold all window related stuff
+		- The rendering thread
+		- Also initializes the workers
+		- Spawns the game thread or just a job?
+		- game_frame_buffer
+			- this will be swapped
+			- it will contain the local entropy vector as well
+		- logic won't sleep between intervals, it will just continuously calculate new audiovisual state and wait for frames
+		- what about imgui drawcalls
+			- the audiovisual step produces a new one each time
+	
+- Thread pools
+	- The game loop
+		- Setup posts a job to complete n steps
+	- Interpolation, particles, sound, drawing layers, all these can be calculated independently
+		- Actually they all need to join before illuminated rendering, or just before their respective layers
+	- Game gui too can be drawn independently
+	- Start with std::async?
+		- Actually some nice interface for completion could come in handy
+
+- Things to think about after introducing commandized renderer
+	- Textures after creation are bound but this fact is not registered in settable_as_current
+		- This may just be ok
+	- watch out if clearing (moving from) the triangle vector does not screw things up
+	- void clear_special_vertex_data(); was really never used?
+
+

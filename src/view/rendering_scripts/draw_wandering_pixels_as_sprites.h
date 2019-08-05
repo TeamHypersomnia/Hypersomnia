@@ -7,38 +7,43 @@
 
 template <class E, class M>
 void draw_wandering_pixels_as_sprites(
+	augs::vertex_triangle_buffer& triangles,
+	int offset,
 	const wandering_pixels_system& sys,
-	const E subject_handle,
-	const M& manager,
-	invariants::sprite::drawing_input basic_input
+	const E& subject,
+	const M& manager
 ) {
-	subject_handle.template dispatch_on_having_all<invariants::wandering_pixels>([&](const auto subject) {
-		const auto& wandering_def = subject.template get<invariants::wandering_pixels>();
+	const auto& wandering_def = subject.template get<invariants::wandering_pixels>();
 
-		if (const auto cache = sys.find_cache(subject)) {
-			for (const auto& p : cache->particles) {
-				basic_input.renderable_transform = p.pos;
+	offset *= 2;
 
-				{
-					const auto& wandering = subject.template get<components::wandering_pixels>();
-					basic_input.colorize = wandering.colorize;
-				}
+	if (const auto cache = sys.find_cache(subject)) {
+		const auto& particles = cache->particles;
 
-				const auto& cosm = subject_handle.get_cosmos();
-				const auto& logicals = cosm.get_logical_assets();
+		for (std::size_t i = 0; i < particles.size(); ++i) {
+			const auto& p = particles[i];
+			const auto& wandering = subject.template get<components::wandering_pixels>();
 
-				if (const auto displayed_animation = logicals.find(wandering_def.animation_id)) {
-					const auto animation_time_ms = p.current_lifetime_ms;
-					const auto image_id = ::calc_current_frame_looped(*displayed_animation, animation_time_ms).image_id;
+			const auto& cosm = subject.get_cosmos();
+			const auto& logicals = cosm.get_logical_assets();
 
-					invariants::sprite animated;
-					animated.image_id = image_id;
-					animated.size = manager.at(image_id).get_original_size();
+			if (const auto displayed_animation = logicals.find(wandering_def.animation_id)) {
+				const auto animation_time_ms = p.current_lifetime_ms;
+				const auto image_id = ::calc_current_frame_looped(*displayed_animation, animation_time_ms).image_id;
 
-					augs::draw(animated, manager, basic_input);
-				}
+				auto& t1 = triangles[offset + i * 2];
+				auto& t2 = triangles[offset + i * 2 + 1];
+
+				augs::detail_write_sprite(
+					t1,
+					t2,
+					manager.at(image_id),
+					p.pos,
+					0,
+					wandering.colorize
+				);
 			}
 		}
-	});
+	}
 }
 

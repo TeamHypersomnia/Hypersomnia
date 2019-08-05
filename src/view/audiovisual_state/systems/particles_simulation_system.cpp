@@ -552,7 +552,7 @@ void update_component_related_cache(
 
 void particles_simulation_system::advance_visible_streams(
 	randomization& rng,
-	const camera_cone current_cone, 
+	const camera_cone queried_cone, 
 	const special_effects_settings& settings,
 	const cosmos& cosm,
 	const particle_effects_map& manager,
@@ -690,7 +690,7 @@ void particles_simulation_system::advance_visible_streams(
 	};
 
 	{
-		auto checked_cone = current_cone;
+		auto checked_cone = queried_cone;
 		checked_cone.eye.zoom /= 2.5f;
 
 		const auto cam_aabb = checked_cone.get_visible_world_rect_aabb();

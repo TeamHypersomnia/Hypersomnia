@@ -38,23 +38,24 @@ public:
 
 	audiovisual_cache_map<cache> per_entity_cache;
 
-	cache& get_cache(const const_entity_handle);
-	const cache* find_cache(const const_entity_handle) const;
+	void clear() {
+		per_entity_cache.clear();
+	}
 
+	cache& get_cache(const const_entity_handle id) {
+		return per_entity_cache[id.get_id()];
+	}
+
+	const cache* find_cache(const const_entity_handle id) const {
+		return mapped_or_nullptr(per_entity_cache, id.get_id());
+	}
+
+	template <class E>
 	void advance_for(
 		randomization& rng,
-		const visible_entities& subjects,
-		const cosmos&,
-		const augs::delta dt
-	);
-
-	void advance_for(
-		randomization& rng,
-		const const_entity_handle subject,
+		const E& subject,
 		const augs::delta dt
 	);
 
 	void reserve_caches_for_entities(const size_t) const {}
-
-	void clear();
 };

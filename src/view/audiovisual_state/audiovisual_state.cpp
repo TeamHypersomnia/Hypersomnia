@@ -1,4 +1,6 @@
 #include "augs/string/string_templates.h"
+#include "augs/drawing/drawing_input_base.h"
+#include "augs/drawing/sprite.h"
 #include "game/components/interpolation_component.h"
 #include "game/components/flags_component.h"
 #include "game/components/fixtures_component.h"
@@ -21,6 +23,10 @@
 
 #include "view/character_camera.h"
 #include "augs/templates/thread_pool.h"
+#include "view/viewables/images_in_atlas_map.h"
+#include "augs/graphics/dedicated_buffers.h"
+#include "view/rendering_scripts/draw_wandering_pixels_as_sprites.h"
+#include "view/audiovisual_state/systems/wandering_pixels_system.hpp"
 
 void audiovisual_state::clear() {
 	systems.for_each([](auto& sys) {
@@ -39,11 +45,13 @@ void audiovisual_state::reserve_caches_for_entities(const std::size_t n) {
 }
 
 void audiovisual_state::advance(const audiovisual_advance_input input) {
+	using D = augs::dedicated_buffer;
+
 	auto scope = measure_scope(performance.advance);
 
 	const auto viewed_character = input.camera.viewed_character;
 	const auto input_camera = input.camera;
-	const auto cone = input_camera.cone;
+	const auto queried_cone = input.queried_cone;
 	const auto& cosm = viewed_character.get_cosmos();
 	
 	const auto frame_dt = input.frame_delta;
@@ -69,11 +77,14 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	auto& highlights = get<pure_color_highlight_system>();
 	auto& interp = get<interpolation_system>();
 	auto& particles = get<particles_simulation_system>();
+	auto& wandering_pixels = get<wandering_pixels_system>();
+	auto& all_visible = input.all_visible;
+	auto& game_images = input.game_images;
 
 	interp.id_to_integerize = viewed_character;
 
 	auto advance_exploding_rings = [&]() {
-		auto cone_for_explosion_particles = cone;
+		auto cone_for_explosion_particles = queried_cone;
 		cone_for_explosion_particles.eye.zoom *= 0.9f;
 
 		exploding_rings.advance(
@@ -91,24 +102,13 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		get<light_system>().advance_attenuation_variations(rng, cosm, dt);
 	};
 
-	auto advance_wandering_pixels = [&]() {
-		auto scope = measure_scope(performance.wandering_pixels);
-
-		get<wandering_pixels_system>().advance_for(
-			rng,
-			input.all_visible,
-			cosm,
-			dt
-		);
-	};
-
 	auto advance_world_hover_highlighter = [&]() {
 		world_hover_highlighter.cycle_duration_ms = 400;
 		world_hover_highlighter.update(input.frame_delta);
 	};
 
 	auto advance_thunders = [&]() {
-		thunders.advance(rng, cosm, cone, input.particle_effects, dt, particles);
+		thunders.advance(rng, cosm, queried_cone, input.particle_effects, dt, particles);
 	};
 
 	auto advance_flying_numbers = [&]() {
@@ -124,7 +124,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 
 		particles.advance_visible_streams(
 			rng,
-			cone,
+			queried_cone,
 			input.performance.special_effects,
 			cosm,
 			input.particle_effects,
@@ -147,7 +147,6 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		particles.preallocate_particle_buffers(input.particles_output);
 
 		advance_flying_numbers();
-		advance_wandering_pixels();
 	};
 
 	auto launch_particle_jobs = [&]() {
@@ -165,6 +164,76 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 		});
 
 		performance.num_particles.measure(particles.count_all_particles());
+	};
+
+	auto launch_wandering_pixels_jobs = [&]() {
+		auto& dedicated = input.dedicated;
+
+		{
+			const auto total = [&]() {
+				int total = 0;
+
+				all_visible.for_each<render_layer::ILLUMINATING_WANDERING_PIXELS>(cosm, [&total](const auto& e) {
+					total += e.template get<components::wandering_pixels>().particles_count;
+				});
+
+				return total;
+			}();
+
+			auto& triangles = dedicated[D::ILLUMINATING_WANDERING_PIXELS].triangles;
+			triangles.resize(total * 2);
+
+			int current_index = 0;
+
+			all_visible.for_each<render_layer::ILLUMINATING_WANDERING_PIXELS>(cosm, [&](const auto& e) {
+				e.template dispatch_on_having_all<invariants::wandering_pixels>(
+					[&](const auto& typed_wandering_pixels) {
+						auto job = [&triangles, current_index, &wandering_pixels, &rng, &game_images, typed_wandering_pixels, dt]() {
+							wandering_pixels.advance_for(rng, typed_wandering_pixels, dt);
+							draw_wandering_pixels_as_sprites(triangles, current_index, wandering_pixels, typed_wandering_pixels, game_images);
+						};
+
+						const auto current_count = typed_wandering_pixels.template get<components::wandering_pixels>().particles_count;;
+						current_index += current_count;
+
+						input.pool.enqueue(job);
+					}
+				);
+			});
+		}
+
+		{
+			const auto total = [&]() {
+				int total = 0;
+
+				all_visible.for_each<render_layer::DIM_WANDERING_PIXELS>(cosm, [&total](const auto& e) {
+					total += e.template get<components::wandering_pixels>().particles_count;
+				});
+
+				return total;
+			}();
+
+			auto& triangles = dedicated[D::DIM_WANDERING_PIXELS].triangles;
+			triangles.resize(total * 2);
+
+			int current_index = 0;
+
+			all_visible.for_each<render_layer::DIM_WANDERING_PIXELS>(cosm, [&](const auto& e) {
+				e.template dispatch_on_having_all<invariants::wandering_pixels>(
+					[&](const auto& typed_wandering_pixels) {
+						auto job = [&triangles, current_index, &wandering_pixels, &rng, &game_images, typed_wandering_pixels, dt]() {
+							wandering_pixels.advance_for(rng, typed_wandering_pixels, dt);
+							draw_wandering_pixels_as_sprites(triangles, current_index, wandering_pixels, typed_wandering_pixels, game_images);
+						};
+
+						const auto current_count = typed_wandering_pixels.template get<components::wandering_pixels>().particles_count;;
+						current_index += current_count;
+
+						input.pool.enqueue(job);
+					}
+				);
+			});
+		}
 	};
 
 	const auto& sound_freq = input.sound_settings.processing_frequency;
@@ -208,6 +277,7 @@ void audiovisual_state::advance(const audiovisual_advance_input input) {
 	synchronous_facade();
 
 	launch_particle_jobs();
+	launch_wandering_pixels_jobs();
 
 	const bool should_update_audio = [&]() {
 		if (sound_freq == sound_processing_frequency::EVERY_SINGLE_FRAME) {

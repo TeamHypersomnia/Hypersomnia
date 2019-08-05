@@ -1172,6 +1172,7 @@ and then hitting Save settings.
 			inv_tickrate,
 
 			get_character_camera(),
+			get_queried_cone(viewing_config),
 			all_visible,
 
 			get_viewable_defs().particle_effects,
@@ -1185,6 +1186,7 @@ and then hitting Save settings.
 
 			streaming.images_in_atlas,
 			write_buffer.particle_buffers,
+			general_renderer.dedicated,
 			pending_new_state_sample ? state_changed_timer.extract_delta() : std::optional<augs::delta>(),
 
 			thread_pool
