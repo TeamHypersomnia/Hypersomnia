@@ -1,3 +1,4 @@
+#include "augs/drawing/drawing.hpp"
 #include "drag_and_drop_target_drop_item.h"
 #include "view/game_gui/elements/character_gui.h"
 #include "view/game_gui/elements/character_gui.h"

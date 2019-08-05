@@ -70,6 +70,7 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	};
 	
 	const auto viewed_character = in.camera.viewed_character;
+	const auto viewed_character_faction = viewed_character ? viewed_character.get_official_faction() : faction_type::SPECTATOR;
 
 	const auto cone = [&in](){ 
 		auto result = in.camera.cone;
@@ -382,16 +383,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	const auto timestamp_ms = static_cast<unsigned>(global_time_seconds * 1000);
 	
-	auto standard_border_provider = [timestamp_ms](const const_entity_handle sentience) {
-		std::optional<rgba> result;
-
-		sentience.dispatch_on_having_all<components::sentience>(
-			[&](const auto typed_handle) {
-				result = typed_handle.template get<components::sentience>().find_low_health_border(timestamp_ms);
-			}
-		);
-
-		return result;
+	auto standard_border_provider = [timestamp_ms](const auto& typed_handle) {
+		return typed_handle.template get<components::sentience>().find_low_health_border(timestamp_ms);
 	};
 
 	if (fog_of_war_effective) {
@@ -403,10 +396,14 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		{
 			auto drawing_input = make_drawing_input();
 
-			visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
-				if (handle.get_official_faction() != viewed_character.get_official_faction()) {
-					::draw_border(handle, drawing_input, standard_border_provider);
-				}
+			visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
+				handle.template dispatch_on_having_all<components::sentience>(
+					[&](const auto& typed_sentience) {
+						if (typed_sentience.get_official_faction() != viewed_character_faction) {
+							::specific_draw_border(typed_sentience, drawing_input, standard_border_provider);
+						}
+					}
+				);
 			});
 		}
 
@@ -415,14 +412,26 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 		auto drawing_input = make_drawing_input();
 
-		visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
-			if (handle.get_official_faction() == viewed_character.get_official_faction()) {
-				::draw_border(handle, drawing_input, standard_border_provider);
-			}
+		visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
+			handle.template dispatch_on_having_all<components::sentience>(
+				[&](const auto& typed_sentience) {
+					if (typed_sentience.get_official_faction() == viewed_character_faction) {
+						::specific_draw_border(typed_sentience, drawing_input, standard_border_provider);
+					}
+				}
+			);
 		});
 	}
 	else {
-		make_helper().draw_border<render_layer::SENTIENCES>(standard_border_provider);
+		auto drawing_input = make_drawing_input();
+
+		visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
+			handle.template dispatch_on_having_all<components::sentience>(
+				[&](const auto& typed_sentience) {
+					::specific_draw_border(typed_sentience, drawing_input, standard_border_provider);
+				}
+			);
+		});
 	}
 
 	renderer.call_and_clear_triangles();
@@ -520,10 +529,14 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		{
 			auto drawing_input = make_drawing_input();
 
-			visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
-				if (handle.get_official_faction() != viewed_character.get_official_faction()) {
-					::draw_entity(handle, drawing_input);
-				}
+			visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
+				handle.template dispatch_on_having_all<components::sentience>(
+					[&](const auto& typed_sentience) {
+						if (typed_sentience.get_official_faction() != viewed_character_faction) {
+							::specific_draw_entity(typed_sentience, drawing_input);
+						}
+					}
+				);
 			});
 		}
 
@@ -532,10 +545,14 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 		auto drawing_input = make_drawing_input();
 
-		visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto handle) {
-			if (handle.get_official_faction() == viewed_character.get_official_faction()) {
-				::draw_entity(handle, drawing_input);
-			}
+		visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
+			handle.template dispatch_on_having_all<components::sentience>(
+				[&](const auto& typed_sentience) {
+					if (typed_sentience.get_official_faction() == viewed_character_faction) {
+						::specific_draw_entity(typed_sentience, drawing_input);
+					}
+				}
+			);
 		});
 	}
 	else {

@@ -1,4 +1,5 @@
 #include "slot_button.h"
+#include "augs/drawing/drawing.hpp"
 #include "game/cosmos/entity_handle.h"
 #include "game/cosmos/cosmos.h"
 
