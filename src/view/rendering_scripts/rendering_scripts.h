@@ -8,6 +8,7 @@
 
 #include "view/game_gui/special_indicator.h"
 #include "augs/drawing/drawing.h"
+#include "augs/graphics/dedicated_buffers.h"
 
 namespace augs {
 	struct baked_font;
@@ -36,6 +37,18 @@ struct dashed_line_output_wrapper {
 	void operator()(vec2 from, vec2 to, rgba col) const;
 };
 
+struct requested_sentience_meter {
+	augs::atlas_entry tex;
+	meter_id id;
+
+	augs::triangles_and_specials& output;
+};
+
+struct requested_explosive_hud {
+	augs::atlas_entry tex;
+	augs::triangles_and_specials* output = nullptr;
+};
+
 struct draw_sentiences_hud_input {
 	augs::vertex_triangle_buffer& nicknames;
 	augs::vertex_triangle_buffer& health_numbers;
@@ -46,19 +59,14 @@ struct draw_sentiences_hud_input {
 	const visible_entities& all;
 	const game_drawing_settings& settings;
 	
-	const augs::drawer output;
-	augs::special_buffer& specials;
-
 	const cosmos& cosm;
 	const entity_id viewed_character_id;
 	const interpolation_system& interpolation;
 	const double global_time_seconds;
 
 	const augs::baked_font& gui_font;
-	const augs::atlas_entry circular_bar_tex;
-	const meter_id meter;
 
-	const bool draw_other_indicators;
+	const augs::constant_size_vector<requested_sentience_meter, 3> meters;
 
 	const augs::atlas_entry color_indicator_tex;
 	const augs::atlas_entry danger_indicator_tex;
@@ -83,21 +91,20 @@ enum class circular_bar_type {
 	SMALL,
 	MEDIUM,
 	OVER_MEDIUM,
-	LARGE
+	LARGE,
+
+	COUNT
 };
 
-struct draw_hud_for_explosives_input {
-	const augs::drawer output;
-	augs::special_buffer& specials;
-	const game_drawing_settings& settings;
+using requested_explosive_huds = augs::enum_array<requested_explosive_hud, circular_bar_type>;
 
+struct draw_hud_for_explosives_input {
+	const game_drawing_settings& settings;
+	const requested_explosive_huds requests;
 	const interpolation_system& interpolation;
 	const cosmos& cosm;
 	const entity_id viewed_character_id;
 	const double global_time_seconds;
-
-	const augs::atlas_entry circular_bar_tex;
-	const circular_bar_type only_type;
 };
 
 struct draw_crosshair_lasers_input {

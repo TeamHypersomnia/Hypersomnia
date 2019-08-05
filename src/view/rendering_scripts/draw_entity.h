@@ -593,7 +593,7 @@ FORCE_INLINE void specific_draw_neon_map(
 /* Dispatching helpers */
 
 FORCE_INLINE void draw_entity(
-	const const_entity_handle handle,
+	const const_entity_handle& handle,
 	const draw_renderable_input& in
 ) {
 	handle.conditional_dispatch<entities_with_renderables>([&in](const auto typed_handle) {
@@ -602,7 +602,7 @@ FORCE_INLINE void draw_entity(
 }
 
 FORCE_INLINE void draw_neon_map(
-	const const_entity_handle handle,
+	const const_entity_handle& handle,
 	const draw_renderable_input& in
 ) {
 	handle.conditional_dispatch<entities_with_renderables>([&in](const auto typed_handle) {
@@ -611,7 +611,7 @@ FORCE_INLINE void draw_neon_map(
 }
 
 FORCE_INLINE void draw_color_highlight(
-	const const_entity_handle handle,
+	const const_entity_handle& handle,
 	const rgba color,
 	const draw_renderable_input& in
 ) {
@@ -622,7 +622,7 @@ FORCE_INLINE void draw_color_highlight(
 
 template <class B>
 FORCE_INLINE void draw_border(
-	const const_entity_handle handle,
+	const const_entity_handle& handle,
 	const draw_renderable_input& in,
 	B&& borders
 ) {

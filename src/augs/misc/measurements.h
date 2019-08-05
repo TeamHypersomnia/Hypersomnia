@@ -31,7 +31,7 @@ namespace augs {
 		std::string title = "Untitled";
 		std::vector<T> tracked;
 
-		measurements(const std::size_t tracked_count = 20u) {
+		measurements(const std::size_t tracked_count = 50u) {
 			/* A value of 0 would cause division by 0. */
 			ensure_greater(tracked_count, 0);
 			tracked.resize(tracked_count);
@@ -87,7 +87,7 @@ namespace augs {
 
 		void prepare_summary_info() {
 			summary_info.measured = measured;
-			summary_info.value = last_measurement;
+			summary_info.value = last_average;
 		}
 
 		const auto& get_summary_info() const {

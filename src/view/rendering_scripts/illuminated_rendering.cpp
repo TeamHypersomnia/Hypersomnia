@@ -52,15 +52,16 @@
 #include "application/main/cached_visibility_data.h"
 #include "augs/templates/thread_pool.h"
 
+#include "view/rendering_scripts/enqueue_illuminated_rendering_jobs.hpp"
+
 void illuminated_rendering(const illuminated_rendering_input in) {
 	using D = augs::dedicated_buffer;
+	using DV = augs::dedicated_buffer_vector;
 
 	const auto& additional_highlights = in.additional_highlights;
-	const auto& special_indicators = in.special_indicators;
 	augs::graphics::fbo::mark_current(in.renderer);
 
 	auto& profiler = in.frame_performance;
-
 	auto& renderer = in.renderer;
 
 	using U = augs::common_uniform_name;
@@ -70,14 +71,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	};
 	
 	const auto viewed_character = in.camera.viewed_character;
-	const auto viewed_character_faction = viewed_character ? viewed_character.get_official_faction() : faction_type::SPECTATOR;
 
-	const auto cone = [&in](){ 
-		auto result = in.camera.cone;
-		result.eye.transform.pos.discard_fract();
-		return result;
-	}();
-
+	const auto cone = in.camera.cone;
 	const auto screen_size = cone.screen_size;
 
 	const auto& cosm = viewed_character.get_cosmos();
@@ -85,11 +80,9 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto& av = in.audiovisuals;
 	const auto& light = av.get<light_system>();
 	const auto& interp = av.get<interpolation_system>();
-	const auto& wandering_pixels = av.get<wandering_pixels_system>();
 	const auto& exploding_rings = av.get<exploding_ring_system>();
 	const auto& flying_numbers = av.get<flying_number_indicator_system>();
 	const auto& highlights = av.get<pure_color_highlight_system>();
-	const auto& thunders = av.get<thunder_system>();
 	const auto global_time_seconds = cosm.get_total_seconds_passed(in.interpolation_ratio);
 	const auto settings = in.drawing;
 	const auto matrix = cone.get_projection_matrix();
@@ -158,9 +151,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	renderer.clear_current_fbo();
 	renderer.set_additive_blending();
 	
-	auto total_particles_scope = measure_scope_additive(profiler.particles_rendering);
-	auto total_layer_scope = measure_scope_additive(profiler.drawing_layers);
-
 	auto draw_particles = [&](const particle_layer layer) {
 		renderer.call_triangles(in.drawn_particles.diffuse[layer]);
 	};
@@ -242,7 +232,6 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	const auto light_input = light_system_input {
 		renderer,
 		profiler,
-		total_layer_scope,
 		cosm, 
 		matrix,
 		fbos.light.value(),
@@ -329,109 +318,28 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	set_shader_with_matrix(shaders.illuminated);
 
-	auto make_helper = [&]() {
-		return helper_drawer {
-			visible,
-			cosm,
-			make_drawing_input(),
-			total_layer_scope
-		};
-	};
-
-	make_helper().draw<
-		render_layer::UNDER_GROUND,
-		render_layer::GROUND,
-		render_layer::FLOOR_AND_ROAD,
-		render_layer::ON_FLOOR,
-		render_layer::ON_ON_FLOOR,
-
-		render_layer::PLANTED_BOMBS,
-
-		render_layer::AQUARIUM_FLOWERS,
-		render_layer::AQUARIUM_DUNES,
-		render_layer::BOTTOM_FISH,
-		render_layer::UPPER_FISH,
-		render_layer::AQUARIUM_BUBBLES
-	>();
-
-	{
-		auto drawing_input = make_drawing_input();
-
-		visible.for_each<render_layer::DIM_WANDERING_PIXELS>(cosm, [&](const auto e) {
-			draw_wandering_pixels_as_sprites(wandering_pixels, e, game_images, drawing_input.make_input_for<invariants::sprite>());
-		});
-	}
-
-	renderer.call_and_clear_triangles();
+	renderer.call_triangles(D::DIM_WANDERING_PIXELS);
+	renderer.call_triangles(D::GROUND_FLOORS_DECORS);
 
 	set_shader_with_matrix(shaders.specular_highlights);
 
-	renderer.call_and_clear_triangles();
-
 	shaders.illuminated->set_as_current(renderer);
 
-	make_helper().draw<
-		render_layer::WATER_COLOR_OVERLAYS,
-		render_layer::WATER_SURFACES,
-		render_layer::CAR_INTERIOR,
-		render_layer::CAR_WHEEL
-	>();
-
-	renderer.call_and_clear_triangles();
+	renderer.call_triangles(D::WATER_AND_CARS);
 
 	set_shader_with_matrix(shaders.pure_color_highlight);
 
-	const auto timestamp_ms = static_cast<unsigned>(global_time_seconds * 1000);
-	
-	auto standard_border_provider = [timestamp_ms](const auto& typed_handle) {
-		return typed_handle.template get<components::sentience>().find_low_health_border(timestamp_ms);
-	};
-
 	if (fog_of_war_effective) {
-		renderer.call_and_clear_triangles();
-
 		renderer.set_stencil(true);
 		renderer.stencil_positive_test();
 
-		{
-			auto drawing_input = make_drawing_input();
-
-			visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
-				handle.template dispatch_on_having_all<components::sentience>(
-					[&](const auto& typed_sentience) {
-						if (typed_sentience.get_official_faction() != viewed_character_faction) {
-							::specific_draw_border(typed_sentience, drawing_input, standard_border_provider);
-						}
-					}
-				);
-			});
-		}
-
-		renderer.call_and_clear_triangles();
+		renderer.call_triangles(D::BORDERS_ENEMY_SENTIENCES);
 		renderer.set_stencil(false);
 
-		auto drawing_input = make_drawing_input();
-
-		visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
-			handle.template dispatch_on_having_all<components::sentience>(
-				[&](const auto& typed_sentience) {
-					if (typed_sentience.get_official_faction() == viewed_character_faction) {
-						::specific_draw_border(typed_sentience, drawing_input, standard_border_provider);
-					}
-				}
-			);
-		});
+		renderer.call_triangles(D::BORDERS_FRIENDLY_SENTIENCES);
 	}
 	else {
-		auto drawing_input = make_drawing_input();
-
-		visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
-			handle.template dispatch_on_having_all<components::sentience>(
-				[&](const auto& typed_sentience) {
-					::specific_draw_border(typed_sentience, drawing_input, standard_border_provider);
-				}
-			);
-		});
+		renderer.call_triangles(D::BORDERS_FRIENDLY_SENTIENCES);
 	}
 
 	renderer.call_and_clear_triangles();
@@ -488,14 +396,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	shaders.illuminated->set_as_current(renderer);
 
-	make_helper().draw<
-		render_layer::DYNAMIC_BODY,
-		render_layer::OVER_DYNAMIC_BODY,
-		render_layer::SMALL_DYNAMIC_BODY,
-		render_layer::OVER_SMALL_DYNAMIC_BODY,
-		render_layer::GLASS_BODY
-	>();
-	
+	renderer.call_triangles(D::WALL_LIGHTED_BODIES);
+	renderer.call_triangles(D::SMALL_AND_GLASS_BODIES);
 
 	if (fog_of_war_effective) {
 		const auto& appearance = settings.fog_of_war_appearance;
@@ -526,45 +428,17 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 		shaders.illuminated->set_as_current(renderer);
 
-		{
-			auto drawing_input = make_drawing_input();
-
-			visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
-				handle.template dispatch_on_having_all<components::sentience>(
-					[&](const auto& typed_sentience) {
-						if (typed_sentience.get_official_faction() != viewed_character_faction) {
-							::specific_draw_entity(typed_sentience, drawing_input);
-						}
-					}
-				);
-			});
-		}
-
-		renderer.call_and_clear_triangles();
+		renderer.call_triangles(D::ENEMY_SENTIENCES);
 		renderer.set_stencil(false);
 
-		auto drawing_input = make_drawing_input();
-
-		visible.for_each<render_layer::SENTIENCES>(cosm, [&](const auto& handle) {
-			handle.template dispatch_on_having_all<components::sentience>(
-				[&](const auto& typed_sentience) {
-					if (typed_sentience.get_official_faction() == viewed_character_faction) {
-						::specific_draw_entity(typed_sentience, drawing_input);
-					}
-				}
-			);
-		});
+		renderer.call_triangles(D::FRIENDLY_SENTIENCES);
 	}
 	else {
-		make_helper().draw<render_layer::SENTIENCES>();
+		renderer.call_triangles(D::FRIENDLY_SENTIENCES);
 	}
 
-	make_helper().draw<
-		render_layer::INSECTS,
-		render_layer::OVER_SENTIENCES
-	>();
-
-	renderer.call_and_clear_triangles();
+	renderer.call_triangles(D::INSECTS);
+	renderer.call_triangles(D::OVER_SENTIENCES);
 
 	renderer.set_active_texture(1);
 
@@ -577,11 +451,8 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 
 	shaders.standard->set_as_current(renderer);
 	
-	make_helper().draw<
-		render_layer::FLYING_BULLETS,
-		render_layer::NEON_CAPTIONS
-	>();
-	
+	renderer.call_triangles(D::CAPTIONS_AND_BULLETS);
+
 	if (settings.draw_crosshairs) {
 		auto draw_crosshair = [&](const auto it) {
 			if (const auto s = it.find_crosshair_def()) {
@@ -631,256 +502,68 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 	draw_particles(particle_layer::NEONING_PARTICLES);
 	draw_particles(particle_layer::ILLUMINATING_PARTICLES);
 
-	{
-		auto drawing_input = make_drawing_input();
-
-		visible.for_each<render_layer::ILLUMINATING_WANDERING_PIXELS>(cosm, [&](const auto e) {
-			draw_wandering_pixels_as_sprites(wandering_pixels, e, game_images, drawing_input.make_input_for<invariants::sprite>());
-		});
-	}
-
-
-	renderer.call_and_clear_triangles();
+	renderer.call_triangles(D::ILLUMINATING_WANDERING_PIXELS);
 
 	set_shader_with_matrix(shaders.circular_bars);
 
-	const auto set_center_uniform = [&](const augs::atlas_entry& tex) {
-		set_uniform(shaders.circular_bars, U::texture_center, tex.get_center());
-	};
+	{
+		const auto set_center_uniform = [&](const auto& tex_id) {
+			set_uniform(shaders.circular_bars, U::texture_center, necessarys[tex_id].get_center());
+		};
 
-	auto& nicknames_output = renderer.dedicated[D::NICKNAMES].triangles;
-	auto& health_numbers_output = renderer.dedicated[D::HEALTH_NUMBERS].triangles;
-	auto& indicators_output = renderer.dedicated[D::INDICATORS].triangles;
+		if (viewed_character) {
+			std::array<assets::necessary_image_id, 3> circles = {
+				assets::necessary_image_id::CIRCULAR_BAR_LARGE,
+				assets::necessary_image_id::CIRCULAR_BAR_UNDER_LARGE,
+				assets::necessary_image_id::CIRCULAR_BAR_UNDER_UNDER_LARGE
+			};
 
-	if (viewed_character) {
-		auto make_input_for = [&](const auto& tex_type, const auto meter) {
-			const auto tex = necessarys.at(tex_type);
-			const bool is_health = meter == meter_id::of<health_meter_instance>();
-			const bool draw_other_indicators = is_health;
+			int current_circle = 0;
 
-			set_center_uniform(tex);
+			set_center_uniform(circles[current_circle++]);
+			renderer.call_triangles(DV::SENTIENCE_HUDS, 0);
 
-			real32 color_indicator_angle = 45.f;
-
-			if (!settings.draw_nicknames) {
-				color_indicator_angle = 0.f;
+			if (settings.draw_pe_bar) {
+				set_center_uniform(circles[current_circle++]);
+				renderer.call_triangles(DV::SENTIENCE_HUDS, 1);
 			}
 
-			auto sentience_queried_cone = queried_cone;
-			sentience_queried_cone.eye.zoom *= 0.8f;
+			if (settings.draw_cp_bar) {
+				set_center_uniform(circles[current_circle++]);
+				renderer.call_triangles(DV::SENTIENCE_HUDS, 2);
+			}
+		}
 
-			return draw_sentiences_hud_input {
-				nicknames_output,
-				health_numbers_output,
-				indicators_output,
-				cone,
-				sentience_queried_cone,
-				visible,
-				settings,
-				get_drawer(),
-				renderer.get_special_buffer(),
-				cosm,
-				viewed_character,
-				interp,
-				global_time_seconds,
-				gui_font,
-				tex,
-				meter,
+		{
+			int current_hud = 0;
 
-				draw_other_indicators,
-
-				necessarys.at(assets::necessary_image_id::BIG_COLOR_INDICATOR),
-				necessarys.at(assets::necessary_image_id::DANGER_INDICATOR),
-				necessarys.at(assets::necessary_image_id::DEATH_INDICATOR),
-				necessarys.at(assets::necessary_image_id::BOMB_INDICATOR),
-				necessarys.at(assets::necessary_image_id::DEFUSING_INDICATOR),
-
-				color_indicator_angle,
-				in.indicator_meta
+			auto draw_explosives_hud = [&](const auto tex_id) {
+				set_center_uniform(tex_id);
+				renderer.call_triangles(DV::EXPLOSIVE_HUDS, current_hud++);
 			};
-		};
 
-		std::array<assets::necessary_image_id, 3> circles = {
-			assets::necessary_image_id::CIRCULAR_BAR_LARGE,
-			assets::necessary_image_id::CIRCULAR_BAR_UNDER_LARGE,
-			assets::necessary_image_id::CIRCULAR_BAR_UNDER_UNDER_LARGE
-		};
-
-		int current_circle = 0;
-
-		draw_sentiences_hud(
-			make_input_for(
-				circles[current_circle++], 
-				meter_id::of<health_meter_instance>()
-			)
-		);
-
-		renderer.call_and_clear_triangles();
-
-		if (settings.draw_pe_bar) {
-			draw_sentiences_hud(
-				make_input_for(
-					circles[current_circle++], 
-					meter_id::of<personal_electricity_meter_instance>()
-				)
-			);
-
-			renderer.call_and_clear_triangles();
+			draw_explosives_hud(assets::necessary_image_id::CIRCULAR_BAR_SMALL);
+			draw_explosives_hud(assets::necessary_image_id::CIRCULAR_BAR_MEDIUM);
+			draw_explosives_hud(assets::necessary_image_id::CIRCULAR_BAR_OVER_MEDIUM);
 		}
-
-		if (settings.draw_cp_bar) {
-			draw_sentiences_hud(
-				make_input_for(
-					circles[current_circle++], 
-					meter_id::of<consciousness_meter_instance>()
-				)
-			);
-
-			renderer.call_and_clear_triangles();
-		}
-	}
-	
-	{
-		auto draw_explosives_hud = [&](const auto tex_id, const auto type) {
-			const auto tex = necessarys.at(tex_id);
-
-			set_center_uniform(tex);
-
-			draw_hud_for_explosives({
-				get_drawer(),
-				renderer.get_special_buffer(),
-				settings,
-				interp,
-				cosm,
-				viewed_character,
-				global_time_seconds,
-				tex,
-				type
-			});
-
-			renderer.call_and_clear_triangles();
-		};
-
-		draw_explosives_hud(
-			assets::necessary_image_id::CIRCULAR_BAR_SMALL,
-			circular_bar_type::SMALL
-		);
-
-		draw_explosives_hud(
-			assets::necessary_image_id::CIRCULAR_BAR_MEDIUM,
-			circular_bar_type::MEDIUM
-		);
-
-		draw_explosives_hud(
-			assets::necessary_image_id::CIRCULAR_BAR_OVER_MEDIUM,
-			circular_bar_type::OVER_MEDIUM
-		);
 	}
 
 	set_shader_with_non_zoomed_matrix(shaders.standard);
 
 	if (settings.draw_nicknames) {
-		renderer.call_triangles(nicknames_output);
+		renderer.call_triangles(D::NICKNAMES);
 	}
 
 	if (settings.draw_health_numbers) {
-		renderer.call_triangles(health_numbers_output);
+		renderer.call_triangles(D::HEALTH_NUMBERS);
 	}
 
-	renderer.call_triangles(indicators_output);
-
-	if (settings.draw_tactical_indicators.is_enabled) {
-		const auto alpha = settings.draw_tactical_indicators.value;
-
-		for (const auto& special : special_indicators) {
-			auto col = special.color;
-			col.mult_alpha(alpha);
-
-			const auto world_pos = special.transform.pos;
-			const auto pos = cone.to_screen_space(world_pos);
-
-			std::string primary_text;
-
-			if (const auto callout = cosm[::get_current_callout(cosm, world_pos)]) {
-				primary_text = callout.get_name();
-			}
-
-			const auto& tex = special.offscreen_tex;
-
-			::draw_offscreen_indicator(
-				get_drawer(),
-				settings.draw_offscreen_indicators,
-				special.draw_onscreen,
-				col,
-				tex,
-				pos,
-				screen_size,
-				false,
-				std::nullopt,
-				in.gui_font,
-				primary_text,
-				{},
-				cone.to_screen_space(viewed_character.get_viewing_transform(interp).pos),
-				settings.offscreen_reference_mode
-			);
-		}
-	}
-
-	{
-		const auto& callouts = settings.draw_callout_indicators;
-
-		if (callouts.is_enabled) {
-			visible.for_each<render_layer::CALLOUT_MARKERS, render_layer::OVERLAID_CALLOUT_MARKERS>(cosm, [&](const auto e) {
-				e.template dispatch_on_having_all<invariants::box_marker>([&](const auto typed_handle) { 
-					const auto where = typed_handle.get_logic_transform();
-					const auto& callout_alpha = callouts.value;
-
-					::draw_area_indicator(typed_handle, get_line_drawer(), where, callout_alpha, drawn_indicator_type::INGAME);
-
-					using namespace augs::gui::text;
-
-					const auto& callout_name = typed_handle.get_name();
-
-					print_stroked(
-						get_drawer(),
-						cone.to_screen_space(typed_handle.get_logic_transform().pos),
-						formatted_string { callout_name, { gui_font, white } },
-						{ augs::ralign::CX, augs::ralign::CY }
-					);
-				});
-			});
-
-			renderer.call_and_clear_triangles();
-		}
-	}
-
-	if (settings.print_current_character_callout) {
-		if (const auto result = cosm[::get_current_callout(viewed_character, interp)]) {
-			const auto& name = result.get_name();
-
-			using namespace augs::gui::text;
-
-			const auto indicator_pos = augs::get_screen_pos_from_offset(screen_size, settings.radar_pos); 
-
-			print_stroked(
-				get_drawer(),
-				indicator_pos,
-				formatted_string { name, { gui_font, yellow } }
-			);
-		}
-
-		renderer.call_and_clear_triangles();
-	}
+	renderer.call_triangles(D::SENTIENCE_INDICATORS);
+	renderer.call_triangles(D::INDICATORS_AND_CALLOUTS);
 
 	set_shader_with_matrix(shaders.exploding_rings);
 
-	exploding_rings.draw_rings(
-		get_drawer(),
-		renderer.get_special_buffer(),
-		queried_cone
-	);
-
-	renderer.call_and_clear_triangles();
+	renderer.call_triangles(D::EXPLODING_RINGS);
 
 	shaders.pure_color_highlight->set_as_current(renderer);
 
@@ -891,15 +574,11 @@ void illuminated_rendering(const illuminated_rendering_input in) {
 		for (const auto& h : additional_highlights) {
 			draw_color_highlight(cosm[h.id], h.col, drawing_input);
 		}
+
+		renderer.call_and_clear_triangles();
 	}
 
-	thunders.draw_thunders(
-		get_line_drawer(),
-		queried_cone
-	);
-
-	renderer.call_and_clear_triangles();
-	renderer.call_and_clear_lines();
+	renderer.call_triangles(D::THUNDERS);
 
 	shaders.standard->set_as_current(renderer);
 

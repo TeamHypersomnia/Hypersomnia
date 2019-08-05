@@ -18,14 +18,12 @@ namespace augs {
 		special_buffers.reset();
 
 		for (auto& d : dedicated.single) {
-			d.triangles.clear();
-			d.specials.clear();
+			d.clear();
 		}
 
 		for (auto& d : dedicated.vectors) {
 			for (auto& v : d) {
-				v.triangles.clear();
-				v.specials.clear();
+				v.clear();
 			}
 		}
 	}

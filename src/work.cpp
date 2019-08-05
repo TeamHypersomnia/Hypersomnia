@@ -2007,9 +2007,7 @@ and then hitting Save settings.
 				}
 			};
 
-			auto perform_illuminated_rendering = [&](augs::renderer& chosen_renderer, const config_lua_table& viewing_config) {
-				auto scope = measure_scope(game_thread_performance.rendering_script);
-
+			auto make_illuminated_rendering_input = [&](augs::renderer& chosen_renderer, const config_lua_table& viewing_config) {
 				thread_local std::vector<additional_highlight> highlights;
 				highlights.clear();
 
@@ -2046,8 +2044,11 @@ and then hitting Save settings.
 					});
 				}
 
-				illuminated_rendering({
-					{ viewed_character, get_camera_cone() },
+				auto cone = get_camera_cone();
+				cone.eye.transform.pos.discard_fract();
+
+				return illuminated_rendering_input {
+					{ viewed_character, cone },
 					get_queried_cone(viewing_config),
 					calc_pre_step_crosshair_displacement(viewing_config),
 					get_audiovisuals(),
@@ -2070,7 +2071,13 @@ and then hitting Save settings.
 					write_buffer.particle_buffers,
 					cached_visibility.light_requests,
 					thread_pool
-				});
+				};
+			};
+
+			auto perform_illuminated_rendering = [&](const illuminated_rendering_input& input) {
+				auto scope = measure_scope(game_thread_performance.rendering_script);
+
+				illuminated_rendering(input);
 			};
 
 			auto draw_call_imgui = [&](augs::renderer& chosen_renderer) {
@@ -2109,32 +2116,30 @@ and then hitting Save settings.
 				);
 			};
 
-			auto show_developer_details = [&](augs::renderer& chosen_renderer, const config_lua_table& viewing_config) {
-				if (viewing_config.session.show_developer_console) {
-					auto scope = measure_scope(game_thread_performance.debug_details);
+			auto show_developer_details = [&](augs::renderer& chosen_renderer) {
+				auto scope = measure_scope(game_thread_performance.debug_details);
 
-					const auto viewed_character = get_viewed_character();
+				const auto viewed_character = get_viewed_character();
 
-					debug_summaries.acquire(
-						viewed_character.get_cosmos(),
-						game_thread_performance,
-						network_performance,
-						network_stats,
-						server_stats,
-						streaming.performance,
-						streaming.general_atlas_performance,
-						render_thread_performance,
-						get_audiovisuals().performance
-					);
+				debug_summaries.acquire(
+					viewed_character.get_cosmos(),
+					game_thread_performance,
+					network_performance,
+					network_stats,
+					server_stats,
+					streaming.performance,
+					streaming.general_atlas_performance,
+					render_thread_performance,
+					get_audiovisuals().performance
+				);
 
-					draw_debug_details(
-						get_drawer_for(chosen_renderer),
-						streaming.get_loaded_gui_fonts().gui,
-						screen_size,
-						viewed_character,
-						debug_summaries
-					);
-				}
+				draw_debug_details(
+					get_drawer_for(chosen_renderer),
+					streaming.get_loaded_gui_fonts().gui,
+					screen_size,
+					viewed_character,
+					debug_summaries
+				);
 			};
 
 			/* Flow */
@@ -2247,9 +2252,11 @@ and then hitting Save settings.
 				);
 			};
 
+			const auto illuminated_input = make_illuminated_rendering_input(general_renderer, new_viewing_config);
+
 			auto illuminated_rendering_job = [&]() {
 				/* #1 */
-				perform_illuminated_rendering(general_renderer, new_viewing_config);
+				perform_illuminated_rendering(illuminated_input);
 				/* #2 */
 				draw_debug_lines(general_renderer, new_viewing_config);
 
@@ -2285,28 +2292,26 @@ and then hitting Save settings.
 			};
 
 			auto show_developer_details_job = [&]() {
-				show_developer_details(debug_details_renderer, new_viewing_config);
+				show_developer_details(debug_details_renderer);
 			};
 
+			enqueue_visibility_jobs();
+
+			if (new_viewing_config.session.show_developer_console) {
+				thread_pool.enqueue(show_developer_details_job);
+			}
+
 			if (non_zero_cosmos) {
-				/*
-					Illuminated rendering leaves the renderer in a state
-					where the default shader is being used and the game world atlas is still bound.
-
-					It is the configuration required for further viewing of GUI.
-				*/
-
 				thread_pool.enqueue(illuminated_rendering_job);
 
 				/* #3 */
 				if (should_draw_game_gui()) {
 					thread_pool.enqueue(game_gui_job);
 				}
+
+				::enqueue_illuminated_rendering_jobs(thread_pool, illuminated_input);
 			}
 
-			enqueue_visibility_jobs();
-
-			thread_pool.enqueue(show_developer_details_job);
 			thread_pool.enqueue(post_game_gui_job);
 
 			thread_pool.submit();

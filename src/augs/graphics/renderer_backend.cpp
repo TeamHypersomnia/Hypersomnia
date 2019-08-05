@@ -183,9 +183,16 @@ namespace augs {
 					using C = remove_cref<decltype(typed_cmd)>;
 
 					auto perform_drawcall_for = [&](const auto& buffers) {
-						const auto triangles_n = buffers.triangles.size();
+						if (const auto lines_n = buffers.lines.size(); lines_n > 0) {
+							drawcall_command translated_cmd;
 
-						if (triangles_n > 0) {
+							translated_cmd.lines = buffers.lines.data();
+							translated_cmd.count = lines_n;
+
+							perform(translated_cmd);
+						}
+
+						if (const auto triangles_n = buffers.triangles.size(); triangles_n > 0) {
 							drawcall_command translated_cmd;
 
 							translated_cmd.triangles = buffers.triangles.data();

@@ -16,19 +16,26 @@
 #include "game/detail/gun/gun_cooldowns.h"
 
 void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
-	const auto dt = in.cosm.get_fixed_delta();
+	using C = circular_bar_type;
 
+	const auto dt = in.cosm.get_fixed_delta();
 	const auto& cosm = in.cosm;
-	const auto tex = in.circular_bar_tex;
-	const auto t = in.only_type;
+	const auto& requests = in.requests;
 	const auto clk = cosm.get_clock();
 	const auto global_time_seconds = in.global_time_seconds;
 
-	auto draw_circle_at = [&](const auto& tr, const auto highlight_amount, const rgba first_col, const rgba second_col) {
+	auto get_drawer = [&](const auto& reh) {
+		return augs::drawer { reh.output->triangles };
+	};
+
+	auto draw_circle_at = [&](const auto& reh_id, const auto& tr, const auto highlight_amount, const rgba first_col, const rgba second_col) {
 		if (highlight_amount >= 0.f && highlight_amount <= 1.f) {
+			const auto& reh = requests[reh_id];
+			const auto& tex = reh.tex;
 			const auto highlight_color = augs::interp(first_col, second_col, (1 - highlight_amount)* (1 - highlight_amount));
 
-			in.output.aabb_centered(tex, vec2(tr.pos).discard_fract(), highlight_color);
+			auto drawer = get_drawer(reh);
+			drawer.aabb_centered(tex, vec2(tr.pos).discard_fract(), highlight_color);
 
 			augs::special s;
 
@@ -38,20 +45,22 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 			s.v1.set(0.f, 0.f);
 			s.v2.set(-90 + empty_angular_amount, -90) /= 180;
 
-			in.specials.push_back(s);
-			in.specials.push_back(s);
-			in.specials.push_back(s);
+			auto& specials = reh.output->specials;
 
-			in.specials.push_back(s);
-			in.specials.push_back(s);
-			in.specials.push_back(s);
+			specials.push_back(s);
+			specials.push_back(s);
+			specials.push_back(s);
+
+			specials.push_back(s);
+			specials.push_back(s);
+			specials.push_back(s);
 		}
 	};
 
-	auto draw_circle = [&](const auto& it, const auto highlight_amount, const rgba first_col, const rgba second_col, const vec2 offset = vec2::zero) {
+	auto draw_circle = [&](const auto& reh_id, const auto& it, const auto highlight_amount, const rgba first_col, const rgba second_col, const vec2 offset = vec2::zero) {
 		if (auto tr = it.find_viewing_transform(in.interpolation)) {
 			tr->pos += offset;
-			draw_circle_at(*tr, highlight_amount, first_col, second_col);
+			draw_circle_at(reh_id, *tr, highlight_amount, first_col, second_col);
 		}
 	};
 
@@ -66,15 +75,15 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 	};
 
 	cosm.for_each_having<components::hand_fuse>(
-		[&](const auto it) {
+		[&](const auto& it) {
 			const auto& fuse = it.template get<components::hand_fuse>();
 			const auto& fuse_def = it.template get<invariants::hand_fuse>();
 
-			auto do_draw_circle = [&](auto&&... args) {
-				draw_circle(it, args...);
+			auto do_draw_circle = [&](const auto& reh_id, auto&&... args) {
+				draw_circle(reh_id, it, args...);
 			};
 
-			if (t == circular_bar_type::MEDIUM && fuse_def.has_delayed_arming()) {
+			if (fuse_def.has_delayed_arming()) {
 				if (fuse.arming_requested) {
 					if (const auto slot = it.get_current_slot()) {
 						if (viewer_faction_matches(slot.get_container())) {
@@ -97,7 +106,7 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 								/ (fuse_def.arming_duration_ms / 1000.f) 
 							);
 
-							do_draw_circle(highlight_amount, first_col, second_col);
+							do_draw_circle(C::MEDIUM, highlight_amount, first_col, second_col);
 						}
 					}
 				}
@@ -109,14 +118,14 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 					/ (fuse_def.fuse_delay_ms / 1000.f) 
 				));
 
-				if (t == circular_bar_type::MEDIUM && fuse_def.has_delayed_arming()) {
-					do_draw_circle(highlight_amount, white, red_violet);
+				if (fuse_def.has_delayed_arming()) {
+					do_draw_circle(C::MEDIUM, highlight_amount, white, red_violet);
 				}
-				else if (t == circular_bar_type::SMALL && !fuse_def.has_delayed_arming()) {
-					do_draw_circle(highlight_amount, white, red_violet);
+				else if (!fuse_def.has_delayed_arming()) {
+					do_draw_circle(C::SMALL, highlight_amount, white, red_violet);
 				}
 
-				if (t == circular_bar_type::OVER_MEDIUM && fuse_def.defusing_enabled()) {
+				if (fuse_def.defusing_enabled()) {
 					if (const auto amount_defused = fuse.amount_defused; amount_defused >= 0.f) {
 						if (const auto defusing_character = cosm[fuse.character_now_defusing]) {
 							if (viewer_faction_matches(defusing_character)) {
@@ -124,7 +133,7 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 									amount_defused / fuse_def.defusing_duration_ms
 								);
 
-								do_draw_circle(highlight_amount, white, red_violet);
+								do_draw_circle(C::OVER_MEDIUM, highlight_amount, white, red_violet);
 							}
 						}
 					}
@@ -133,93 +142,91 @@ void draw_hud_for_explosives(const draw_hud_for_explosives_input in) {
 		}
 	);
 
-	if (t == circular_bar_type::SMALL) {
-		const bool enemy_hud = in.settings.draw_enemy_hud;
+	const bool enemy_hud = in.settings.draw_enemy_hud;
 
-		cosm.for_each_having<components::gun>(
-			[&](const auto& it) {
-				if (const auto tr = it.find_viewing_transform(in.interpolation)) {
-					const auto& gun = it.template get<components::gun>();
+	cosm.for_each_having<components::gun>(
+		[&](const auto& it) {
+			if (const auto tr = it.find_viewing_transform(in.interpolation)) {
+				const auto& gun = it.template get<components::gun>();
 
-					auto draw_progress = [&](const auto& amount) {
-						auto shell_spawn_offset = ::calc_shell_offset(it);
-						shell_spawn_offset.pos.rotate(tr->rotation);
+				auto draw_progress = [&](const auto& amount) {
+					auto shell_spawn_offset = ::calc_shell_offset(it);
+					shell_spawn_offset.pos.rotate(tr->rotation);
 
-						draw_circle(it, amount, white, red_violet, shell_spawn_offset.pos);
-					};
+					draw_circle(C::SMALL, it, amount, white, red_violet, shell_spawn_offset.pos);
+				};
 
-					if (const auto chambering_duration = ::calc_current_chambering_duration(it); augs::is_positive_epsilon(chambering_duration)) {
-						const auto& progress = gun.chambering_progress_ms;
+				if (const auto chambering_duration = ::calc_current_chambering_duration(it); augs::is_positive_epsilon(chambering_duration)) {
+					const auto& progress = gun.chambering_progress_ms;
 
-						if (progress > 0.f) {
-							if (!enemy_hud) { 
-								if (const auto c = it.get_owning_transfer_capability()) {
-									if (!viewer_faction_matches(c)) {
-										return;
-									}
-								}
-							}
-
-							draw_progress(progress / chambering_duration);
-						}
-					}
-					else {
-						const auto& gun_def = it.template get<invariants::gun>();
-						const auto cooldown = gun_def.shot_cooldown_ms;
-
-						if (cooldown > 1000.f) {
-							if (const auto slot = it.get_current_slot(); slot && slot.is_hand_slot()) {
-								const auto r = clk.get_ratio_of_remaining_time(cooldown, gun.fire_cooldown_object);
-								const auto transfer_r = clk.get_ratio_of_remaining_time(
-									gun_def.get_transfer_shot_cooldown(), 
-									it.when_last_transferred()
-								);
-
-								const auto later_r = std::max(r, transfer_r);
-
-								if (augs::is_positive_epsilon(later_r)) {
-									draw_progress(1.f - later_r);
+					if (progress > 0.f) {
+						if (!enemy_hud) { 
+							if (const auto c = it.get_owning_transfer_capability()) {
+								if (!viewer_faction_matches(c)) {
+									return;
 								}
 							}
 						}
-					}
-				}
-			}
-		);
 
-		const auto& global = cosm.get_global_solvable();
-
-		for (const auto& m : global.pending_item_mounts) {
-			const auto& item = cosm[m.first];
-
-			if (item.dead()) {
-				continue;
-			}
-
-			const auto& request = m.second;
-
-			const auto& progress = request.progress_ms;
-
-			if (progress > 0.f) {
-				const auto highlight_amount = 1.f - (progress / request.get_mounting_duration_ms(item));
-
-				if (!enemy_hud) { 
-					if (const auto c = item.get_owning_transfer_capability()) {
-						if (!viewer_faction_matches(c)) {
-							return;
-						}
-					}
-				}
-
-				if (!request.is_unmounting(item)) {
-					if (const auto slot = cosm[request.target]) {
-						const auto tr = slot.get_container().find_viewing_transform(in.interpolation);
-						draw_circle_at(*tr, highlight_amount, white, red_violet);
+						draw_progress(progress / chambering_duration);
 					}
 				}
 				else {
-					draw_circle(item, highlight_amount, white, red_violet);
+					const auto& gun_def = it.template get<invariants::gun>();
+					const auto cooldown = gun_def.shot_cooldown_ms;
+
+					if (cooldown > 1000.f) {
+						if (const auto slot = it.get_current_slot(); slot && slot.is_hand_slot()) {
+							const auto r = clk.get_ratio_of_remaining_time(cooldown, gun.fire_cooldown_object);
+							const auto transfer_r = clk.get_ratio_of_remaining_time(
+								gun_def.get_transfer_shot_cooldown(), 
+								it.when_last_transferred()
+							);
+
+							const auto later_r = std::max(r, transfer_r);
+
+							if (augs::is_positive_epsilon(later_r)) {
+								draw_progress(1.f - later_r);
+							}
+						}
+					}
 				}
+			}
+		}
+	);
+
+	const auto& global = cosm.get_global_solvable();
+
+	for (const auto& m : global.pending_item_mounts) {
+		const auto& item = cosm[m.first];
+
+		if (item.dead()) {
+			continue;
+		}
+
+		const auto& request = m.second;
+
+		const auto& progress = request.progress_ms;
+
+		if (progress > 0.f) {
+			const auto highlight_amount = 1.f - (progress / request.get_mounting_duration_ms(item));
+
+			if (!enemy_hud) { 
+				if (const auto c = item.get_owning_transfer_capability()) {
+					if (!viewer_faction_matches(c)) {
+						return;
+					}
+				}
+			}
+
+			if (!request.is_unmounting(item)) {
+				if (const auto slot = cosm[request.target]) {
+					const auto tr = slot.get_container().find_viewing_transform(in.interpolation);
+					draw_circle_at(C::SMALL, *tr, highlight_amount, white, red_violet);
+				}
+			}
+			else {
+				draw_circle(C::SMALL, item, highlight_amount, white, red_violet);
 			}
 		}
 	}

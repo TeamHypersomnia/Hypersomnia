@@ -33,7 +33,6 @@ struct randomization;
 struct light_system_input {
 	augs::renderer& renderer;
 	frame_profiler& profiler;
-	additive_time_scope& total_layer_scope;
 
 	const cosmos& cosm;
 	std::array<float, 16> projection_matrix;

@@ -66,4 +66,9 @@ struct illuminated_rendering_input {
 	augs::thread_pool& pool;
 };
 
+void enqueue_illuminated_rendering_jobs(
+	augs::thread_pool& pool, 
+	const illuminated_rendering_input& in
+);
+
 void illuminated_rendering(const illuminated_rendering_input in);
