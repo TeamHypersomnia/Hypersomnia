@@ -2,7 +2,7 @@
 #include <type_traits>
 
 namespace augs {
-	template <class M, template <class> class C, class S, class... K>
+	template <class M, template <class> class C, class S, class SA, class... K>
 	class pool;
 
 	template <class, class... K>
@@ -17,8 +17,8 @@ namespace augs {
 	template <class>
 	struct is_pool : std::false_type {};
 
-	template <class M, template <class> class C, class S, class... K>
-	struct is_pool<pool<M, C, S, K...>> : std::true_type {};
+	template <class M, template <class> class C, class S, class SA, class... K>
+	struct is_pool<pool<M, C, S, SA, K...>> : std::true_type {};
 
 	template <class T>
 	constexpr bool is_pool_v = is_pool<T>::value;

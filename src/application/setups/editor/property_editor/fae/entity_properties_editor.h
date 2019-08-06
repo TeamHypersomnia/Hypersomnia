@@ -83,7 +83,7 @@ void edit_entity(
 	text_disabled(typesafe_sprintf("(%x)", handle.get_id()));
 
 	for_each_through_std_get(
-		handle.get().components,
+		handle.get().component_state,
 		[&](const auto& component) {
 			const auto component_label = format_struct_name(component) + " component";
 			const auto node = scoped_tree_node_ex(component_label);

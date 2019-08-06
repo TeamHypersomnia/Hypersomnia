@@ -9,19 +9,11 @@ void interpolation_system::set_interpolation_enabled(const bool flag) {
 	enabled = flag;
 }
 
-void interpolation_system::set_updated_interpolated_transform(
-	const const_entity_handle subject,
-	const transformr updated_value
-) {
-	auto& info = subject.get<components::interpolation>();
-	info.interpolated_transform = updated_value;
-}
-
 void interpolation_system::update_desired_transforms(const cosmos& cosm) {
-	cosm.for_each_having<components::interpolation>( 
+	cosm.for_each_having<invariants::interpolation>( 
 		[&](const auto& e) {
 			if (const auto current = e.find_logic_transform()) {
-				const auto& info = e.template get<components::interpolation>();
+				const auto& info = get_corresponding<components::interpolation>(e);
 				info.desired_transform = *current;
 			}
 		}
@@ -48,9 +40,9 @@ void interpolation_system::integrate_interpolated_transforms(
 
 	const float slowdown_multipliers_decrease = seconds / fixed_delta_for_slowdowns.in_seconds();
 
-	cosm.for_each_having<components::interpolation>( 
+	cosm.for_each_having<invariants::interpolation>( 
 		[&](const auto& e) {
-			const auto& info = e.template get<components::interpolation>();
+			const auto& info = get_corresponding<components::interpolation>(e);
 			//const auto& def = e.template get<invariants::interpolation>();
 
 			auto& integrated = info.interpolated_transform;

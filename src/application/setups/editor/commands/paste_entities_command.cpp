@@ -44,7 +44,7 @@ void paste_entities_command::redo(const editor_command_input in) {
 			using E = entity_type_of<decltype(e.content)>;
 
 			const auto pasted = cosmic::specific_paste_entity(
-				cosm, typed_entity_flavour_id<E>(e.content.flavour_id), e.content.components
+				cosm, typed_entity_flavour_id<E>(e.content.flavour_id), e.content.component_state
 			);
 
 			selections.emplace(pasted.get_id());

@@ -244,6 +244,9 @@ class specific_entity_handle :
 	friend specific_entity_handle<!is_const, entity_type, identifier_provider>;
 	friend used_identifier_provider;
 
+	template <class T, class H>
+	friend auto& get_corresponding(const H& handle);
+
 	using used_identifier_provider::get_subject;
 	using used_identifier_provider::find_subject;
 
@@ -392,7 +395,7 @@ public:
 		const auto& immutable_subject = get_subject();
 
 		for_each_through_std_get(
-			immutable_subject.components, 
+			immutable_subject.component_state, 
 			std::forward<F>(callback)
 		);
 	}
@@ -485,4 +488,10 @@ auto subscript_handle_getter(C& cosm, const typed_entity_id<E> id)
 		cosm, 
 		{ ptr, id } 
 	};
+}
+
+template <class T, class H>
+auto& get_corresponding(const H& handle) {
+	using entity_type = entity_type_of<H>;
+	return handle.get_cosmos().get_solvable({}).significant.template get_pool<entity_type>().template get_corresponding<T>(handle.get_subject());
 }

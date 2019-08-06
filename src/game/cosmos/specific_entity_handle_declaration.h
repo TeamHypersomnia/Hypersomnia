@@ -58,3 +58,6 @@ struct detail_entity_type_of<specific_entity_handle<A, B, C>> {
 
 template <class T>
 using entity_type_of = typename detail_entity_type_of<T>::type;
+
+template <class H, class T>
+auto& get_corresponding(H& handle);

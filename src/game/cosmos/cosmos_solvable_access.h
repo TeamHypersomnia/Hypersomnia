@@ -39,5 +39,8 @@ class cosmos_solvable_access {
 		-> basic_entity_handle<std::is_const_v<C>>
 	;
 
+	template <class T, class H>
+	friend auto& get_corresponding(const H& handle);
+
 	cosmos_solvable_access() {}
 };

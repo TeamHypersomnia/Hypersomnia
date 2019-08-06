@@ -9,9 +9,9 @@
 #endif
 
 namespace augs {
-	template <class A, template <class> class B, class C, class... D>
+	template <class A, template <class> class B, class C, class D, class... E>
 	template <class Archive>
-	void pool<A, B, C, D...>::write_object_bytes(Archive& ar) const {
+	void pool<A, B, C, D, E...>::write_object_bytes(Archive& ar) const {
 		auto w = [&ar](const auto& object) {
 			augs::write_capacity_bytes(ar, object);
 			augs::write_bytes(ar, object);
@@ -23,9 +23,9 @@ namespace augs {
 		w(free_indirectors);
 	}
 
-	template <class A, template <class> class B, class C, class... D>
+	template <class A, template <class> class B, class C, class D, class... E>
 	template <class Archive>
-	void pool<A, B, C, D...>::read_object_bytes(Archive& ar) {
+	void pool<A, B, C, D, E...>::read_object_bytes(Archive& ar) {
 		auto r = [&ar](auto& object) {
 			augs::read_capacity_bytes(ar, object);
 			augs::read_bytes(ar, object);
@@ -41,9 +41,9 @@ namespace augs {
 		Lua exports/imports don't need to be deterministic so we rebuild the free indirectors and slots manually.
 	*/
 
-	template <class A, template <class> class B, class C, class... D>
+	template <class A, template <class> class B, class C, class D, class... E>
 	template <class Archive>
-	void pool<A, B, C, D...>::write_object_lua(Archive& into) const {
+	void pool<A, B, C, D, E...>::write_object_lua(Archive& into) const {
 		auto objects_table = into.create();
 		auto indirectors_table = into.create();
 
@@ -67,9 +67,9 @@ namespace augs {
 		into["indirectors"] = indirectors_table;
 	}
 
-	template <class A, template <class> class B, class C, class... D>
+	template <class A, template <class> class B, class C, class D, class... E>
 	template <class Archive>
-	void pool<A, B, C, D...>::read_object_lua(const Archive& from) {
+	void pool<A, B, C, D, E...>::read_object_lua(const Archive& from) {
 		objects.clear();
 		slots.clear();
 		indirectors.clear();
@@ -80,7 +80,7 @@ namespace augs {
 
 		int counter = 1;
 
-		using P = pool<A, B, C, D...>;
+		using P = pool<A, B, C, D, E...>;
 		using size_type = typename P::used_size_type;
 
 		while (true) {

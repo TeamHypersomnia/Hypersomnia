@@ -1,3 +1,4 @@
+#include "augs/drawing/drawing.hpp"
 #include "augs/templates/logically_empty.h"
 #include "view/mode_gui/arena/arena_mode_gui.h"
 #include "view/viewables/images_in_atlas_map.h"

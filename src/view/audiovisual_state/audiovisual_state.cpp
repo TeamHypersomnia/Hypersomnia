@@ -341,24 +341,28 @@ void audiovisual_state::standard_post_solve(
 				continue;
 			}
 
-			if (from) {
-				from.dispatch_on_having_all<components::interpolation>([&](const auto& typed_from) {
-					const auto target_transform = interp.get_interpolated(typed_from);
+			subject.dispatch_on_having_all<invariants::interpolation>(
+				[&](const auto& typed_subject) {
+					if (from) {
+						from.dispatch_on_having_all<invariants::interpolation>([&](const auto& typed_from) {
+							const auto target_transform = interp.get_interpolated(typed_from);
 
-					interp.set_updated_interpolated_transform(
-						subject,
-						target_transform
-					);
-				});
-			}
-			else {
-				const auto target_transform = c.set_previous_transform_value;
+							interp.set_updated_interpolated_transform(
+								typed_subject,
+								target_transform
+							);
+						});
+					}
+					else {
+						const auto target_transform = c.set_previous_transform_value;
 
-				interp.set_updated_interpolated_transform(
-					subject,
-					target_transform
-				);
-			}
+						interp.set_updated_interpolated_transform(
+							typed_subject,
+							target_transform
+						);
+					}
+				}
+			);
 		}
 	}
 

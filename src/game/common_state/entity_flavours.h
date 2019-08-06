@@ -22,7 +22,7 @@ class entity_flavour {
 	static auto& get_impl(E& self) {
 		if constexpr(is_invariant_v<D>) {
 			static_assert(E::template has<D>(), "Entity type does not have this invariant.");
-			return std::get<D>(self.invariants); 
+			return std::get<D>(self.invariant_state); 
 		}
 		else {
 			static_assert(E::template has<D>(), "Unknown initial component type.");
@@ -33,7 +33,7 @@ class entity_flavour {
 	template <class D, class E>
 	static auto find_impl(E& self) -> maybe_const_ptr_t<std::is_const_v<E>, D> {
 		if constexpr(E::template has<D>()) {
-			return std::addressof(std::get<D>(self.invariants));
+			return std::addressof(std::get<D>(self.invariant_state));
 		}
 
 		return nullptr; 
@@ -44,7 +44,7 @@ public:
 	using used_entity_type = entity_type;
 
 	// GEN INTROSPECTOR class entity_flavour class entity_type
-	invariants_type invariants;
+	invariants_type invariant_state;
 	initial_components_type initial_components;
 	// END GEN INTROSPECTOR
 
@@ -119,6 +119,7 @@ using entity_flavours_container =
 		entity_flavour<E>, 
 		of_size<E::statically_allocated_flavours>::template make_nontrivial_constant_vector,
 		unsigned short,
+		type_list<>,
 		raw_flavour_id_key
 	>
 ;
@@ -132,6 +133,7 @@ using entity_flavours_container =
 		entity_flavour<E>, 
 		make_vector
 		unsigned short,
+		type_list<>,
 		raw_flavour_id_key
 	>
 ;

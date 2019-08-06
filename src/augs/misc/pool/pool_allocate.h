@@ -2,13 +2,13 @@
 #include "augs/misc/pool/pool.h"
 
 namespace augs {
-	template <class T, template <class> class M, class size_type, class... K>
+	template <class T, template <class> class M, class size_type, class SA, class... K>
 	template <
 		unsigned expansion_mult, 
 		unsigned expansion_add, 
 		class... Args
 	>
-	typename pool<T, M, size_type, K...>::allocation_result pool<T, M, size_type, K...>::allocate(Args&&... args) {
+	typename pool<T, M, size_type, SA, K...>::allocation_result pool<T, M, size_type, SA, K...>::allocate(Args&&... args) {
 		if (size_at_capacity()) {
 			if (can_still_expand()) {
 				const auto old_size = size();
@@ -41,11 +41,19 @@ namespace augs {
 		slots.push_back(allocated_slot);
 		objects.emplace_back(std::forward<Args>(args)...);
 
+		if constexpr(has_synchronized_arrays) {
+			synchronized_arrays.for_each_container(
+				[&](auto& container) {
+					container.emplace_back();
+				}
+			);
+		}
+
 		return { allocated_id, objects.back() };
 	}
 
-	template <class T, template <class> class M, class size_type, class... K>
-	void pool<T, M, size_type, K...>::undo_last_allocate(const key_type key) {
+	template <class T, template <class> class M, class size_type, class SA, class... K>
+	void pool<T, M, size_type, SA, K...>::undo_last_allocate(const key_type key) {
 		if (!correct_range(key)) {
 			return;
 		}
@@ -72,12 +80,20 @@ namespace augs {
 
 			slots.pop_back();
 			objects.pop_back();
+
+			if constexpr(has_synchronized_arrays) {
+				synchronized_arrays.for_each_container(
+					[&](auto& container) {
+						container.pop_back();
+					}
+				);
+			}
 		}
 	}
 
-	template <class T, template <class> class M, class size_type, class... K>
-	auto pool<T, M, size_type, K...>::free(const key_type key) 
-		-> std::optional<typename pool<T, M, size_type, K...>::undo_free_input_type>
+	template <class T, template <class> class M, class size_type, class SA, class... K>
+	auto pool<T, M, size_type, SA, K...>::free(const key_type key) 
+		-> std::optional<typename pool<T, M, size_type, SA, K...>::undo_free_input_type>
 	{
 		if (!correct_range(key)) {
 			return std::nullopt;
@@ -120,23 +136,39 @@ namespace augs {
 
 			slots[removed_at_index] = std::move(slots.back());
 			objects[removed_at_index] = std::move(objects.back());
+
+			if constexpr(has_synchronized_arrays) {
+				synchronized_arrays.for_each_container(
+					[&](auto& container) {
+						container[removed_at_index] = std::move(container.back());
+					}
+				);
+			}
 		}
 
 		slots.pop_back();
 		objects.pop_back();
 
+		if constexpr(has_synchronized_arrays) {
+			synchronized_arrays.for_each_container(
+				[&](auto& container) {
+					container.pop_back();
+				}
+			);
+		}
+
 		return result;
 	}
 
-	template <class T, template <class> class M, class size_type, class... K>
-	auto pool<T, M, size_type, K...>::free(const unversioned_id_type key) {
+	template <class T, template <class> class M, class size_type, class SA, class... K>
+	auto pool<T, M, size_type, SA, K...>::free(const unversioned_id_type key) {
 		return free(get_versioned(key));
 	}
 
-	template <class T, template <class> class M, class size_type, class... K>
+	template <class T, template <class> class M, class size_type, class SA, class... K>
 	template <class... Args>
-	typename pool<T, M, size_type, K...>::allocation_result pool<T, M, size_type, K...>::undo_free(
-		const typename pool<T, M, size_type, K...>::undo_free_input_type in,
+	typename pool<T, M, size_type, SA, K...>::allocation_result pool<T, M, size_type, SA, K...>::undo_free(
+		const typename pool<T, M, size_type, SA, K...>::undo_free_input_type in,
 		Args&&... removed_content
 	) {
 		static_assert(sizeof...(Args) > 0, "Specify what to construct.");
@@ -179,8 +211,18 @@ namespace augs {
 			slots.emplace_back(std::move(new_slot_space));
 			objects.emplace_back(std::move(new_object_space));
 
+			if constexpr(has_synchronized_arrays) {
+				synchronized_arrays.for_each_container(
+					[&](auto& container) {
+						auto& new_space = container[real_index];
+						container.emplace_back(std::move(new_space));
+						std::destroy_at(std::addressof(new_space));
+					}
+				);
+			}
+
 			new_slot_space.pointing_indirector = indirection_index;
-			new_object_space.~mapped_type();
+			std::destroy_at(std::addressof(new_object_space));
 			new (std::addressof(new_object_space)) mapped_type(std::forward<Args>(removed_content)...);
 
 			return { get_new_key(), new_object_space };
@@ -191,6 +233,14 @@ namespace augs {
 
 			objects.emplace_back(std::forward<Args>(removed_content)...);
 			slots.emplace_back(std::move(slot));
+
+			if constexpr(has_synchronized_arrays) {
+				synchronized_arrays.for_each_container(
+					[&](auto& container) {
+						container.emplace_back();
+					}
+				);
+			}
 
 			return { get_new_key(), objects.back() };
 		}

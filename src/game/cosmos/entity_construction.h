@@ -45,14 +45,17 @@ template <class handle_type>
 void construct_post_inference(const handle_type h) {
 	auto& cosm = h.get_cosmos();
 
-	if (const auto interpolation = h.template find<components::interpolation>()) {
+	if constexpr(handle_type::template has<invariants::interpolation>()) {
+		auto& interpolation = get_corresponding<components::interpolation>(h);
+
 		if (const auto t = h.find_logic_transform()) {
-			interpolation->set_place_of_birth(*t);
+			interpolation.set_place_of_birth(*t);
 		}
 		else {
 			warning_other(h, "interpolation found but no transform could be found at time of birth");
 		}
 	}
+
 
 	if (const auto missile = h.template find<components::missile>()) {
 		missile->initial_speed = h.get_effective_velocity().length();

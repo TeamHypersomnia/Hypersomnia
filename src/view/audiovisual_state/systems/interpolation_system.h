@@ -11,6 +11,7 @@
 #include "game/components/transform_component.h"
 
 #include "view/audiovisual_state/systems/audiovisual_cache_common.h"
+#include "game/cosmos/specific_entity_handle_declaration.h"
 
 struct interpolation_settings;
 
@@ -44,7 +45,7 @@ public:
 
 	template <class E>
 	transformr get_interpolated(const E& handle) const {
-		auto result = handle.template get<components::interpolation>().interpolated_transform;
+		auto result = get_corresponding<components::interpolation>(handle).interpolated_transform;
 
 		/*
 			Here, we integerize the transform of the viewed entity, (and later possibly of the vehicle that it drives)
@@ -69,10 +70,14 @@ public:
 
 	void reserve_caches_for_entities(const size_t);
 
+	template <class E>
 	void set_updated_interpolated_transform(
-		const const_entity_handle subject,
+		const E& subject,
 		const transformr updated_value
-	);
+	) {
+		auto& info = get_corresponding<components::interpolation>(subject);
+		info.interpolated_transform = updated_value;
+	}
 
 	void clear();
 

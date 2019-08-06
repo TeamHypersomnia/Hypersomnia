@@ -32,7 +32,7 @@ struct entity_solvable : entity_solvable_meta {
 	using introspect_base = entity_solvable_meta;
 
 	// GEN INTROSPECTOR struct entity_solvable class E
-	components_type components;	
+	components_type component_state;	
 	// END GEN INTROSPECTOR
 
 	template <class C>
@@ -42,21 +42,21 @@ struct entity_solvable : entity_solvable_meta {
 
 	template <class C>
 	auto& get() {
-		return std::get<C>(components);
+		return std::get<C>(component_state);
 	}
 
 	template <class C>
 	const auto& get() const {
-		return std::get<C>(components);
+		return std::get<C>(component_state);
 	}
 
 	template <class F>
 	void for_each(F&& callback) {
-		for_each_through_std_get(components, std::forward<F>(callback));
+		for_each_through_std_get(component_state, std::forward<F>(callback));
 	}
 
 	template <class F>
 	void for_each(F&& callback) const {
-		for_each_through_std_get(components, std::forward<F>(callback));
+		for_each_through_std_get(component_state, std::forward<F>(callback));
 	}
 };

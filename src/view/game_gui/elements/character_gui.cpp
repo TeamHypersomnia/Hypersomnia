@@ -35,7 +35,6 @@
 
 #include "game/detail/describers.h"
 
-#include "augs/drawing/drawing.h"
 #include "augs/templates/get_by_dynamic_id.h"
 #include "game/detail/inventory/wielding_result.h"
 #include "game/detail/spells/spell_structs.h"

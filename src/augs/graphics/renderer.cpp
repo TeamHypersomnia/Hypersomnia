@@ -3,7 +3,7 @@
 
 #include "augs/templates/container_templates.h"
 
-#include "augs/drawing/drawing.h"
+#include "augs/drawing/drawing.hpp"
 #include "augs/graphics/imgui_payload.h"
 
 #include "augs/texture_atlas/atlas_entry.h"

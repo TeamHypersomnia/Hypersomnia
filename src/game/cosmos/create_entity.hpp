@@ -23,7 +23,7 @@ ref_typed_entity_handle<E> cosmic::specific_create_entity_detail(
 
 	{
 		auto& object = new_allocation.object;
-		object.components = initial_components;
+		object.component_state = initial_components;
 	}
 
 	pre_construction(handle, handle.get({}));
@@ -110,7 +110,7 @@ ref_typed_entity_handle<E> cosmic::undo_delete_entity(
 	auto& s = cosm.get_solvable({});
 
 	const auto new_allocation = s.template undo_free_entity<E>(undo_delete_input, deleted_content);
-	new_allocation.object.components = deleted_content.components;
+	new_allocation.object.component_state = deleted_content.component_state;
 	
 	const auto handle = ref_typed_entity_handle<E> { cosm, { new_allocation.object, new_allocation.key } };
 
@@ -126,7 +126,7 @@ ref_typed_entity_handle<E> cosmic::undo_delete_entity(
 
 template <class E>
 void cosmic::make_suitable_for_cloning(entity_solvable<E>& solvable) {
-	auto& new_components = solvable.components;
+	auto& new_components = solvable.component_state;
 
 	if constexpr(entity_solvable<E>::template has<components::item>()) {
 		std::get<components::item>(new_components).clear_slot_info();
@@ -141,9 +141,9 @@ auto cosmic::specific_clone_entity(
 	auto& cosm = source_entity.get_cosmos();
 
 	return cosmic::specific_create_entity(cosm, source_entity.get_flavour_id(), [&](const auto new_entity, auto&&...) {
-		const auto& source_components = source_entity.get({}).components;
+		const auto& source_components = source_entity.get({}).component_state;
 		auto& new_solvable = new_entity.get({});
-		auto& new_components = new_solvable.components;
+		auto& new_components = new_solvable.component_state;
 
 		/* Initial copy-assignment */
 		new_components = source_components; 

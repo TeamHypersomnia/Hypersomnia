@@ -28,7 +28,7 @@ public:
 
 		if constexpr(E::is_specific) {
 			const auto& handle = *static_cast<const entity_handle_type*>(this);
-			auto& components = handle.get(keys...).components;
+			auto& components = handle.get(keys...).component_state;
 
 			if constexpr(E::template has<components::rigid_body>()) {
 				if (!has_independent_transform()) {
@@ -59,8 +59,8 @@ public:
 		const auto& handle = *static_cast<const entity_handle_type*>(this);
 
 		if constexpr(E::is_specific) {
-			if constexpr(E::template has<components::interpolation>()) {
-				return handle.template get<components::interpolation>().desired_transform;
+			if constexpr(E::template has<invariants::interpolation>()) {
+				return get_corresponding<components::interpolation>(handle).desired_transform;
 			}
 			else if constexpr(E::template has<components::transform>()) {
 				return handle.template get<components::transform>();
@@ -89,7 +89,7 @@ public:
 			});
 		}
 		else {
-			if constexpr (E::template has<components::interpolation>()) {
+			if constexpr (E::template has<invariants::interpolation>()) {
 				if (sys.is_enabled()) {
 					const auto& cosm = handle.get_cosmos();
 

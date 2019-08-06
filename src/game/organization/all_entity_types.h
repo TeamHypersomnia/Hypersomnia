@@ -10,7 +10,7 @@ struct controlled_character {
 	static constexpr std::size_t statically_allocated_entities = 300;
 	static constexpr std::size_t statically_allocated_flavours = 20;
 
-	using invariants = type_list<
+	using invariant_list = type_list<
 		invariants::rigid_body,
 		invariants::fixtures,
 		invariants::movement,
@@ -29,7 +29,7 @@ struct controlled_character {
 		invariants::interpolation
 	>;
 
-	using components = type_list<
+	using component_list = type_list<
 		components::rigid_body,
 		components::movement,
 
@@ -40,8 +40,10 @@ struct controlled_character {
 
 		components::driver,
 		components::attitude,
-		components::head,
+		components::head
+	>;
 
+	using synchronized_arrays = type_list<
 		components::interpolation
 	>;
 };
@@ -52,7 +54,7 @@ struct plain_sprited_body {
 	static constexpr std::size_t statically_allocated_entities = 3000;
 	static constexpr std::size_t statically_allocated_flavours = 300;
 
-	using invariants = type_list<
+	using invariant_list = type_list<
 		invariants::rigid_body,
 		invariants::fixtures,
 		invariants::sprite,
@@ -62,10 +64,13 @@ struct plain_sprited_body {
 		invariants::interpolation
 	>;
 
-	using components = type_list<
+	using component_list = type_list<
 		components::sprite,
 		components::overridden_geo,
-		components::rigid_body,
+		components::rigid_body
+	>;
+
+	using synchronized_arrays = type_list<
 		components::interpolation
 	>;
 };
@@ -76,7 +81,7 @@ struct shootable_weapon {
 	static constexpr std::size_t statically_allocated_entities = 1500;
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
-	using invariants = type_list<
+	using invariant_list = type_list<
 		invariants::gun,
 
 		invariants::container,
@@ -90,13 +95,15 @@ struct shootable_weapon {
 		invariants::interpolation
 	>;
 
-	using components = type_list<
+	using component_list = type_list<
 		components::gun,
 
 		components::item,
 
-		components::rigid_body,
+		components::rigid_body
+	>;
 
+	using synchronized_arrays = type_list<
 		components::interpolation
 	>;
 };
@@ -107,7 +114,7 @@ struct melee_weapon {
 	static constexpr std::size_t statically_allocated_entities = 1500;
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
-	using invariants = type_list<
+	using invariant_list = type_list<
 		invariants::sprite,
 		invariants::animation,
 		invariants::melee,
@@ -122,14 +129,16 @@ struct melee_weapon {
 		invariants::continuous_sound
 	>;
 
-	using components = type_list<
+	using component_list = type_list<
 		components::animation,
 		components::continuous_particles,
 		components::melee,
 		components::item,
 		components::rigid_body,
-		components::sender,
+		components::sender
+	>;
 
+	using synchronized_arrays = type_list<
 		components::interpolation
 	>;
 };
@@ -140,7 +149,7 @@ struct shootable_charge {
 	static constexpr std::size_t statically_allocated_entities = 1500;
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
-	using invariants = type_list<
+	using invariant_list = type_list<
 		invariants::item,
 		invariants::cartridge,
 
@@ -152,10 +161,12 @@ struct shootable_charge {
 		invariants::interpolation
 	>;
 
-	using components = type_list<
+	using component_list = type_list<
 		components::item,
-		components::rigid_body,
+		components::rigid_body
+	>;
 
+	using synchronized_arrays = type_list<
 		components::interpolation
 	>;
 };
@@ -166,54 +177,60 @@ struct sprite_decoration {
 	static constexpr std::size_t statically_allocated_entities = 20000;
 	static constexpr std::size_t statically_allocated_flavours = 300;
 
-	using invariants = type_list<
+	using invariant_list = type_list<
 		invariants::sprite,
 		invariants::render,
 		invariants::ground
 	>;
 
-	using components = type_list<
+	using component_list = type_list<
 		components::sprite,
 		components::transform,
 		components::overridden_geo
 	>;
+
+	using synchronized_arrays = type_list<>;
 };
 
 struct wandering_pixels_decoration {
 	static constexpr std::size_t statically_allocated_entities = 2000;
 	static constexpr std::size_t statically_allocated_flavours = 20;
 
-	using invariants = type_list<
+	using invariant_list = type_list<
 		invariants::wandering_pixels,
 		invariants::render
 	>;
 
-	using components = type_list<
+	using component_list = type_list<
 		components::position,
 		components::overridden_geo,
 		components::wandering_pixels
 	>;
+
+	using synchronized_arrays = type_list<>;
 };
 
 struct static_light {
 	static constexpr std::size_t statically_allocated_entities = 2000;
 	static constexpr std::size_t statically_allocated_flavours = 50;
 
-	using invariants = type_list<
+	using invariant_list = type_list<
 		invariants::light
 	>;
 
-	using components = type_list<
+	using component_list = type_list<
 		components::transform,
 		components::light
 	>;
+
+	using synchronized_arrays = type_list<>;
 };
 
 struct hand_explosive {
 	static constexpr std::size_t statically_allocated_entities = 1500;
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
-	using invariants = type_list<
+	using invariant_list = type_list<
 		invariants::sprite,
 		invariants::animation,
 		invariants::item,
@@ -226,13 +243,15 @@ struct hand_explosive {
 		invariants::interpolation
 	>;
 
-	using components = type_list<
+	using component_list = type_list<
 		components::animation,
 		components::rigid_body,
 		components::hand_fuse,
 		components::item,
-		components::sender,
+		components::sender
+	>;
 
+	using synchronized_arrays = type_list<
 		components::interpolation
 	>;
 };
@@ -241,7 +260,7 @@ struct plain_missile {
 	static constexpr std::size_t statically_allocated_entities = 1500;
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
-	using invariants = type_list<
+	using invariant_list = type_list<
 		invariants::rigid_body,
 		invariants::fixtures,
 
@@ -256,12 +275,14 @@ struct plain_missile {
 		invariants::explosive
 	>;
 
-	using components = type_list<
+	using component_list = type_list<
 		components::rigid_body,
 		components::missile,
 		components::sender,
-		components::trace,
+		components::trace
+	>;
 
+	using synchronized_arrays = type_list<
 		components::interpolation
 	>;
 };
@@ -270,16 +291,19 @@ struct finishing_trace {
 	static constexpr std::size_t statically_allocated_entities = 3000;
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
-	using invariants = type_list<
+	using invariant_list = type_list<
 		invariants::sprite,
 		invariants::render,
 		invariants::trace,
 		invariants::interpolation
 	>;
 
-	using components = type_list<
+	using component_list = type_list<
 		components::transform,
-		components::trace,
+		components::trace
+	>;
+
+	using synchronized_arrays = type_list<
 		components::interpolation
 	>;
 };
@@ -288,7 +312,7 @@ struct container_item {
 	static constexpr std::size_t statically_allocated_entities = 1500;
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
-	using invariants = type_list<
+	using invariant_list = type_list<
 		invariants::rigid_body,
 		invariants::fixtures,
 
@@ -301,10 +325,12 @@ struct container_item {
 		invariants::interpolation
 	>;
 
-	using components = type_list<
+	using component_list = type_list<
 		components::rigid_body,
-		components::item,
+		components::item
+	>;
 
+	using synchronized_arrays = type_list<
 		components::interpolation
 	>;
 };
@@ -313,7 +339,7 @@ struct complex_decoration {
 	static constexpr std::size_t statically_allocated_entities = 2000;
 	static constexpr std::size_t statically_allocated_flavours = 300;
 
-	using invariants = type_list<
+	using invariant_list = type_list<
 		invariants::sprite,
 		invariants::animation,
 		invariants::render,
@@ -321,12 +347,14 @@ struct complex_decoration {
 		invariants::movement_path
 	>;
 
-	using components = type_list<
+	using component_list = type_list<
 		components::sprite,
 		components::animation,
 		components::transform,
 		components::movement_path
 	>;
+
+	using synchronized_arrays = type_list<>;
 };
 
 /* E.g. a bullet shell, a round remnant */
@@ -335,7 +363,7 @@ struct remnant_body {
 	static constexpr std::size_t statically_allocated_entities = 4000;
 	static constexpr std::size_t statically_allocated_flavours = 300;
 
-	using invariants = type_list<
+	using invariant_list = type_list<
 		invariants::rigid_body,
 		invariants::fixtures,
 		invariants::sprite,
@@ -346,11 +374,14 @@ struct remnant_body {
 		invariants::remnant
 	>;
 
-	using components = type_list<
+	using component_list = type_list<
 		components::sprite,
 		components::rigid_body,
 
-		components::remnant,
+		components::remnant
+	>;
+
+	using synchronized_arrays = type_list<
 		components::interpolation
 	>;
 };
@@ -359,64 +390,72 @@ struct sound_decoration {
 	static constexpr std::size_t statically_allocated_entities = 1000;
 	static constexpr std::size_t statically_allocated_flavours = 500;
 
-	using invariants = type_list<
+	using invariant_list = type_list<
 		invariants::continuous_sound
 	>;
 
-	using components = type_list<
+	using component_list = type_list<
 		components::transform
 	>;
+
+	using synchronized_arrays = type_list<>;
 };
 
 struct particles_decoration {
 	static constexpr std::size_t statically_allocated_entities = 1000;
 	static constexpr std::size_t statically_allocated_flavours = 500;
 
-	using invariants = type_list<
+	using invariant_list = type_list<
 		invariants::continuous_particles
 	>;
 
-	using components = type_list<
+	using component_list = type_list<
 		components::continuous_particles,
 		components::transform,
 		components::overridden_geo
 	>;
+
+	using synchronized_arrays = type_list<>;
 };
 
 struct point_marker {
 	static constexpr std::size_t statically_allocated_entities = 1000;
 	static constexpr std::size_t statically_allocated_flavours = 100;
 
-	using invariants = type_list<
+	using invariant_list = type_list<
 		invariants::point_marker
 	>;
 
-	using components = type_list<
+	using component_list = type_list<
 		components::marker,
 		components::transform
 	>;
+
+	using synchronized_arrays = type_list<>;
 };
 
 struct box_marker {
 	static constexpr std::size_t statically_allocated_entities = 1000;
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
-	using invariants = type_list<
+	using invariant_list = type_list<
 		invariants::box_marker
 	>;
 
-	using components = type_list<
+	using component_list = type_list<
 		components::marker,
 		components::transform,
 		components::overridden_geo
 	>;
+
+	using synchronized_arrays = type_list<>;
 };
 
 struct explosion_body {
 	static constexpr std::size_t statically_allocated_entities = 2000;
 	static constexpr std::size_t statically_allocated_flavours = 300;
 
-	using invariants = type_list<
+	using invariant_list = type_list<
 		invariants::rigid_body,
 		invariants::fixtures,
 		invariants::cascade_explosion,
@@ -424,10 +463,13 @@ struct explosion_body {
 		invariants::interpolation
 	>;
 
-	using components = type_list<
+	using component_list = type_list<
 		components::rigid_body,
 		components::cascade_explosion,
-		components::sender,
+		components::sender
+	>;
+
+	using synchronized_arrays = type_list<
 		components::interpolation
 	>;
 };
@@ -436,7 +478,7 @@ struct tool_item {
 	static constexpr std::size_t statically_allocated_entities = 1500;
 	static constexpr std::size_t statically_allocated_flavours = 150;
 
-	using invariants = type_list<
+	using invariant_list = type_list<
 		invariants::sprite,
 		invariants::animation,
 		invariants::item,
@@ -448,12 +490,14 @@ struct tool_item {
 		invariants::interpolation
 	>;
 
-	using components = type_list<
+	using component_list = type_list<
 		components::animation,
 		components::rigid_body,
 		components::item,
-		components::sender,
+		components::sender
+	>;
 
+	using synchronized_arrays = type_list<
 		components::interpolation
 	>;
 };

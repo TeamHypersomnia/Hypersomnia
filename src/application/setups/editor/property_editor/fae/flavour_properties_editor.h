@@ -180,7 +180,7 @@ void edit_flavour(
 	do_edit_invariant(text_details_invariant);
 
 	for_each_through_std_get(
-		flavour.invariants,
+		flavour.invariant_state,
 		[&do_edit_invariant](auto& invariant) {
 			using T = remove_cref<decltype(invariant)>;
 

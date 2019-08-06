@@ -66,7 +66,7 @@ namespace augs {
 			--count;
 
 			if constexpr(!is_trivially_copyable) {
-				nth_ptr(count)->~value_type();
+				std::destroy_at(nth_ptr(count));
 			}
 		}
 

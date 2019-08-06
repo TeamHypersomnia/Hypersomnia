@@ -63,7 +63,7 @@ void find_flavours_that_use(
 				};
 
 				for_each_through(flavour.initial_components);
-				for_each_through(flavour.invariants);
+				for_each_through(flavour.invariant_state);
 			});
 		}
 	});

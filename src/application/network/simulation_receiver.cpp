@@ -98,9 +98,9 @@ void simulation_receiver::drag_mispredictions_into_past(
 	const cosmos& predicted_cosmos, 
 	const std::vector<misprediction_candidate_entry>& mispredictions
 ) const {
-	for (const auto e : mispredictions) {
-		const const_entity_handle reconciliated_entity = predicted_cosmos[e.id];
-		
+	for (const auto& e : mispredictions) {
+		const auto reconciliated_entity = predicted_cosmos[e.id];
+
 		const bool identity_matches = reconciliated_entity.alive();
 
 		if (!identity_matches) {
@@ -113,28 +113,34 @@ void simulation_receiver::drag_mispredictions_into_past(
 			continue;
 		}
 
-		const bool is_contagious_agent = reconciliated_entity.get_flag(entity_flag::IS_PAST_CONTAGIOUS);
-		const bool should_smooth_rotation = !is_contagious_agent || predicted_cosmos[reconciliated_entity.get<components::driver>().owned_vehicle].alive();
+		reconciliated_entity.dispatch_on_having_all<invariants::interpolation>(
+			[&](const auto& typed_handle) {
+				const auto maybe_driver = typed_handle.template find<components::driver>();
 
-		(void)interp;
-		auto& interp_data = reconciliated_entity.template get<components::interpolation>();
+				const bool is_contagious_agent = typed_handle.get_flag(entity_flag::IS_PAST_CONTAGIOUS);
+				const bool should_smooth_rotation = !is_contagious_agent || (maybe_driver && predicted_cosmos[maybe_driver->owned_vehicle].alive());
 
-		bool misprediction_detected = false;
+				(void)interp;
+				auto& interp_data = get_corresponding<components::interpolation>(typed_handle);
 
-		const float num_predicted_steps = static_cast<float>(predicted_entropies.size());
+				bool misprediction_detected = false;
 
-		if ((reconciliated_transform->pos - e.transform.pos).length_sq() > 1.f) {
-			interp_data.positional_slowdown_multiplier = std::max(1.f, settings.misprediction_smoothing_multiplier * num_predicted_steps);
-			misprediction_detected = true;
-		}
+				const float num_predicted_steps = static_cast<float>(predicted_entropies.size());
 
-		if (should_smooth_rotation && std::abs(reconciliated_transform->rotation - e.transform.rotation) > 1.f) {
-			interp_data.rotational_slowdown_multiplier = std::max(1.f, settings.misprediction_smoothing_multiplier * num_predicted_steps);
-			misprediction_detected = true;
-		}
+				if ((reconciliated_transform->pos - e.transform.pos).length_sq() > 1.f) {
+					interp_data.positional_slowdown_multiplier = std::max(1.f, settings.misprediction_smoothing_multiplier * num_predicted_steps);
+					misprediction_detected = true;
+				}
 
-		if (identity_matches || (!misprediction_detected && !is_contagious_agent)) {
-			past.uninfect(reconciliated_entity);
-		}
+				if (should_smooth_rotation && std::abs(reconciliated_transform->rotation - e.transform.rotation) > 1.f) {
+					interp_data.rotational_slowdown_multiplier = std::max(1.f, settings.misprediction_smoothing_multiplier * num_predicted_steps);
+					misprediction_detected = true;
+				}
+
+				if (identity_matches || (!misprediction_detected && !is_contagious_agent)) {
+					past.uninfect(typed_handle);
+				}
+			}
+		);
 	}
 }

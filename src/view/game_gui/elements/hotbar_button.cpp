@@ -1,3 +1,4 @@
+#include "augs/drawing/drawing.hpp"
 #include "augs/templates/container_templates.h"
 #include "hotbar_button.h"
 #include "augs/gui/button_corners.h"

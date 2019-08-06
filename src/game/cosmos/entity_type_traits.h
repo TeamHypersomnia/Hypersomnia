@@ -14,12 +14,12 @@
 
 template <class T>
 using invariants_of = concatenate_lists_t<
-	typename T::invariants, 
+	typename T::invariant_list, 
 	always_present_invariants
 >;
 
 template <class T>
-using components_of = typename T::components;
+using components_of = typename T::component_list;
 
 template <class T>
 using invariants_and_components_of = concatenate_lists_t<invariants_of<T>, components_of<T>>;

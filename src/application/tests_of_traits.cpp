@@ -108,7 +108,7 @@ struct tests_of_traits {
 				return 10.0;
 			}
 			else {
-				return double(num_types_in_list_v<typename T::components>);
+				return double(num_types_in_list_v<typename T::component_list>);
 			}
 		};
 
@@ -201,8 +201,6 @@ struct tests_of_traits {
 
 	static_assert(has_any_of_v<controlled_character, invariants::sprite, invariants::polygon>);
 	static_assert(!has_any_of_v<controlled_character, invariants::trace>);
-
-	static_assert(has_all_of_v<controlled_character, components::interpolation>);
 
 	//static_assert(std::is_trivially_copyable_v<absolute_or_local>);
 	static_assert(same<double, type_argument_t<std::is_trivially_copyable<double>>>);
@@ -533,7 +531,7 @@ struct game_state_checks {
 			using E = decltype(e);
 			using F = entity_flavour<E>;
 
-			static_assert(!can_type_contain_v<decltype(F::invariants), entity_id_base>);
+			static_assert(!can_type_contain_v<decltype(F::invariant_state), entity_id_base>);
 		});
 	}
 

@@ -90,7 +90,6 @@ namespace components {
 using assert_always_together = type_list<
 	type_pair<invariants::gun, components::gun>,
 	type_pair<invariants::trace, components::trace>,
-	type_pair<invariants::interpolation, components::interpolation>,
 	type_pair<invariants::rigid_body, components::rigid_body>,
 	type_pair<invariants::rigid_body, invariants::fixtures>,
 	type_pair<invariants::item, components::item>,
@@ -110,7 +109,6 @@ using assert_always_together = type_list<
 
 using assert_first_implies_second = type_list<
 	type_pair<invariants::item, invariants::sprite>,
-	type_pair<components::rigid_body, components::interpolation>,
 	type_pair<invariants::wandering_pixels, components::position>,
 	type_pair<components::continuous_particles, invariants::continuous_particles>,
 	type_pair<invariants::light, components::transform>,

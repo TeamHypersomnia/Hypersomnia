@@ -9,9 +9,10 @@
 
 #include "augs/misc/pool/pool_structs.h"
 #include "augs/misc/pool/pooled_object_id.h"
+#include "augs/templates/per_type.h"
 
 namespace augs {
-	template <class T, template <class> class make_container_type, class size_type, class... id_keys>
+	template <class T, template <class> class make_container_type, class size_type, class synchronized_array_list = type_list<>, class... id_keys>
 	class pool {
 	public:
 		using value_type = T;
@@ -29,11 +30,13 @@ namespace augs {
 		using pool_indirector_type = pool_indirector<size_type>;
 
 		static constexpr bool constexpr_max_size = has_constexpr_max_size_v<object_pool_type>;
+		static constexpr bool has_synchronized_arrays = !std::is_same_v<synchronized_array_list, type_list<>>;
 
 		make_container_type<pool_slot_type> slots;
 		object_pool_type objects;
 		make_container_type<pool_indirector_type> indirectors;
 		make_container_type<size_type> free_indirectors;
+		per_type_container<synchronized_array_list, make_container_type> synchronized_arrays;
 
 		auto& get_indirector(const key_type key) {
 			return indirectors[key.indirection_index];
@@ -98,6 +101,10 @@ namespace augs {
 
 			slots.reserve(new_capacity);
 			objects.reserve(new_capacity);
+
+			if constexpr(has_synchronized_arrays) {
+				synchronized_arrays.reserve(new_capacity);
+			}
 
 			indirectors.resize(new_capacity);
 			free_indirectors.reserve(new_capacity);
@@ -376,7 +383,23 @@ namespace augs {
 			indirectors.clear();
 			free_indirectors.clear();
 
+			if constexpr(has_synchronized_arrays) {
+				synchronized_arrays.clear();
+			}
+
 			reserve(c);
+		}
+
+		template <class C>
+		C& get_corresponding(mapped_type& object) {
+			const auto idx = index_in(objects, object);
+			return synchronized_arrays.template get_for<C>()[idx];
+		}
+
+		template <class C>
+		const C& get_corresponding(const mapped_type& object) const {
+			const auto idx = index_in(objects, object);
+			return synchronized_arrays.template get_for<C>()[idx];
 		}
 
 		template <class Archive>
@@ -417,23 +440,23 @@ namespace augs {
 
 
 namespace augs {
-	template <class A, class M, template <class> class C, class S, class... K>
-	void read_object_bytes(A& ar, pool<M, C, S, K...>& storage) {
+	template <class A, class M, template <class> class C, class S, class SA, class... K>
+	void read_object_bytes(A& ar, pool<M, C, S, SA, K...>& storage) {
 		storage.read_object_bytes(ar);
 	}
 	
-	template <class A, class M, template <class> class C, class S, class... K>
-	void write_object_bytes(A& ar, const pool<M, C, S, K...>& storage) {
+	template <class A, class M, template <class> class C, class S, class SA, class... K>
+	void write_object_bytes(A& ar, const pool<M, C, S, SA, K...>& storage) {
 		storage.write_object_bytes(ar);
 	}
 
-	template <class A, class M, template <class> class C, class S, class... K>
-	void read_object_lua(const A& ar, pool<M, C, S, K...>& storage) {
+	template <class A, class M, template <class> class C, class S, class SA, class... K>
+	void read_object_lua(const A& ar, pool<M, C, S, SA, K...>& storage) {
 		storage.read_object_lua(ar);
 	}
 
-	template <class A, class M, template <class> class C, class S, class... K>
-	void write_object_lua(A& ar, const pool<M, C, S, K...>& storage) {
+	template <class A, class M, template <class> class C, class S, class SA, class... K>
+	void write_object_lua(A& ar, const pool<M, C, S, SA, K...>& storage) {
 		storage.write_object_lua(ar);
 	}
 }

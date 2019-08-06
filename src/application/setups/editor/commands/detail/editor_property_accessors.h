@@ -41,7 +41,7 @@ struct editor_property_accessors {
 
 						for (const auto& f : flavour_ids) {
 							const auto result = on_field_address(
-								std::get<Invariant>(cosm.get_flavour({}, typed_entity_flavour_id<E>(f)).invariants),
+								std::get<Invariant>(cosm.get_flavour({}, typed_entity_flavour_id<E>(f)).invariant_state),
 								self.field,
 
 								[&](auto& resolved_field) -> callback_result {
@@ -133,7 +133,7 @@ struct editor_property_accessors {
 							auto specific_handle = cosm[typed_entity_id<E>(e)];
 
 							const auto result = on_field_address(
-								std::get<Component>(specific_handle.get({}).components),
+								std::get<Component>(specific_handle.get({}).component_state),
 								self.field,
 								[&](auto& resolved_field) -> callback_result {
 									return callback(resolved_field);

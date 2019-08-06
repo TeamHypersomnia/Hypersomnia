@@ -39,7 +39,7 @@ namespace invariants {
 		using bound = augs::bound<float>;
 		using finishing_trace_flavour_type = constrained_entity_flavour_id<
 			components::trace,
-			components::interpolation
+			invariants::interpolation
 		>; 
 
 		// GEN INTROSPECTOR struct invariants::trace
