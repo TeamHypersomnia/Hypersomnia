@@ -22,6 +22,7 @@
 
 #include "game/detail/sentience/sentience_getters.h"
 #include "game/detail/inventory/perform_wielding.hpp"
+#include "game/detail/inventory/wielding_setup.hpp"
 
 #define LOG_BOMB_MODE 0
 
