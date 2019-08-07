@@ -393,6 +393,7 @@ private:
 	// GEN INTROSPECTOR class bomb_mode
 	unsigned rng_seed_offset = 0;
 
+	entity_id bomb_entity;
 	cosmos_clock clock_before_setup;
 	arena_mode_state state = arena_mode_state::INIT;
 	per_actual_faction<bomb_mode_faction_state> factions;
@@ -535,28 +536,7 @@ public:
 	}
 
 	template <class F>
-	decltype(auto) on_bomb_entity(const const_input in, F callback) const {
-		auto& rules = in.rules;
-		auto& cosm = in.cosm;
-
-		const auto bomb_flavour = rules.bomb_flavour;
-		const auto& flavours = cosm.get_solvable_inferred().flavour_ids;
-
-		if (!bomb_flavour.is_set()) {
-			return callback(std::nullopt);
-		}
-
-		return bomb_flavour.dispatch([&](const auto& typed_bomb_flavour_id) {
-			const auto& bombs = flavours.get_entities_by_flavour_id(typed_bomb_flavour_id);
-
-			if (bombs.size() == 1) {
-				return callback(cosm[*bombs.begin()]);
-			}
-			else {
-				return callback(std::nullopt);
-			}
-		});
-	}
+	decltype(auto) on_bomb_entity(const const_input in, F callback) const;
 
 	augs::maybe<rgba> get_current_fallback_color_for(const_input, faction_type faction) const;
 

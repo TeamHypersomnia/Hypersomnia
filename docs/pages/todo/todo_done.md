@@ -3650,3 +3650,17 @@ which can be done from Settings->Reset all settings to factory default.
 	- void clear_special_vertex_data(); was really never used?
 
 
+- We badly badly need some non-serialized metadata components for simplicity
+	- what for
+		- high performance fields would otherwise fuck up padding (pointers, e.g. vectors)
+		- faster processing for some data (interpolation)
+		- avoid serialization of irrelevant garbage serialized pointlessly
+	- pool name: synchronized_arrays
+		- can be empty
+	- manually specify synchronized arrays
+	- pool vectors are forced to be nontrivial so we can make an empty overload for interpolation and physical caches
+	- Could be held in pool 
+	- Same for all entities anyway
+		- Actually not, some might want to have a cached colliders connection
+	- Keep same index as real objects
+

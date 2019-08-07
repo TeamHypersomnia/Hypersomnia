@@ -16,15 +16,14 @@ void processing_lists_cache::infer_all(const cosmos& cosm) {
 }
 
 void processing_lists_cache::destroy_cache_of(const const_entity_handle& handle) {
+	const auto old_flags = calculate_processing_flags(handle);
 	const auto id = handle.get_id();
 
-	if (const auto cache = mapped_or_nullptr(per_entity_cache, id)) {
-		for (auto& list : lists) {
-			erase_element(list, id);
+	augs::for_each_enum_except_bounds([&](const processing_subjects key) {
+		if (old_flags.test(key)) {
+			erase_element(lists[key], id);
 		}
-
-		per_entity_cache.erase(id);
-	}
+	});
 }
 
 void processing_lists_cache::infer_cache_for(const const_entity_handle& handle) {
@@ -35,8 +34,8 @@ void processing_lists_cache::infer_cache_for(const const_entity_handle& handle) 
 	);
 }
 
-void processing_lists_cache::reserve_caches_for_entities(size_t n) {
-	per_entity_cache.reserve(n);
+void processing_lists_cache::reserve_caches_for_entities(std::size_t) {
+
 }
 
 const std::vector<entity_id>& processing_lists_cache::get(const processing_subjects list) const {

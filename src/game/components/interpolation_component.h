@@ -3,7 +3,7 @@
 
 namespace components {
 	struct interpolation {
-		static constexpr bool is_cache = true;
+		static constexpr bool is_cache = false;
 
 		// GEN INTROSPECTOR struct components::interpolation
 		mutable transformr desired_transform;

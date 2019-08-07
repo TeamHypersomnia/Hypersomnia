@@ -476,3 +476,5 @@ summary: Just a hidden scratchpad.
 		- Each job could draw the light right away to once again avoid dependencies
 		- We can still do this before introducing the pool
 
+- We might even be able to remove unordered_map header from the vast majority of the code
+

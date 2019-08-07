@@ -14,13 +14,7 @@ using all_processing_flags = augs::enum_boolset<processing_subjects>;
 class cosmos;
 
 class processing_lists_cache {
-	struct cache {
-		all_processing_flags recorded_flags;
-	};
-	
 	augs::enum_array<std::vector<entity_id>, processing_subjects> lists;
-
-	inferred_cache_map<cache> per_entity_cache;
 
 public:
 	template <class E>

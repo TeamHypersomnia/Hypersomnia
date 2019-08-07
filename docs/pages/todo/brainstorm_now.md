@@ -6,22 +6,6 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
-- We might even be able to remove unordered_map header from the vast majority of the code
-
-- We badly badly need some non-serialized metadata components for simplicity
-	- what for
-		- high performance fields would otherwise fuck up padding (pointers, e.g. vectors)
-		- faster processing for some data (interpolation)
-		- avoid serialization of irrelevant garbage serialized pointlessly
-	- pool name: synchronized_arrays
-		- can be empty
-	- manually specify synchronized arrays
-	- pool vectors are forced to be nontrivial so we can make an empty overload for interpolation and physical caches
-	- Could be held in pool 
-	- Same for all entities anyway
-		- Actually not, some might want to have a cached colliders connection
-	- Keep same index as real objects
-
 - Use pointers for sound source identification?
 	- We could also "request" new sound source to be put into a unique ptr
 

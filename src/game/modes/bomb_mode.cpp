@@ -719,7 +719,9 @@ void bomb_mode::spawn_bomb_near_players(const input_type in) {
 
 
 entity_handle bomb_mode::spawn_bomb(const input_type in) {
-	return cosmic::create_entity(in.cosm, in.rules.bomb_flavour);
+	const auto new_bomb = cosmic::create_entity(in.cosm, in.rules.bomb_flavour);
+	bomb_entity = new_bomb;
+	return new_bomb;
 }
 
 bool bomb_mode::give_bomb_to_random_player(const input_type in, const logic_step step) {
