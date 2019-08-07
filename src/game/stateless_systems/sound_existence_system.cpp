@@ -27,6 +27,7 @@
 
 #include "game/detail/sentience/sentience_logic.h"
 #include "augs/misc/randomization.h"
+#include "game/detail/calc_ammo_info.hpp"
 
 void play_collision_sound(
 	const real32 strength,
@@ -117,60 +118,65 @@ void sound_existence_system::play_sounds_from_events(const logic_step step) cons
 
 	for (const auto& g : gunshots) {
 		const auto subject = cosm[g.subject];
-		const auto& gun_def = subject.get<invariants::gun>();
 
-		const auto gun_transform = subject.get_logic_transform();
-		const auto owning_capability = cosm[g.capability];
-		const auto predictability = predictable_only_by(owning_capability);
+		subject.dispatch_on_having_all<invariants::gun>(
+			[&](const auto& typed_subject) {
+				const auto& gun_def = typed_subject.template get<invariants::gun>();
 
-		{
-			const auto& effect = gun_def.muzzle_shot_sound;
+				const auto gun_transform = typed_subject.get_logic_transform();
+				const auto owning_capability = cosm[g.capability];
+				const auto predictability = predictable_only_by(owning_capability);
 
-			effect.start(
-				step,
-				sound_effect_start_input::at_entity(subject).set_listener(owning_capability),
-				predictability
-			);
-
-			::mark_caused_danger(owning_capability, effect.modifier);
-		}
-
-		for (auto& r : g.spawned_rounds) {
-			const auto spawned_round = cosm[r];
-
-			{
-				if (const auto missile = spawned_round.find<invariants::missile>()) {
-					const auto& effect = missile->trace_sound;
-
-					auto start = sound_effect_start_input::at_entity(cosm[r]);
-					start.clear_when_target_entity_deleted = true;
-
-					effect.start(step, start, predictability);
-				}
-			}
-		}
-
-		{
-			const auto cued_count = gun_def.num_last_bullets_to_trigger_low_ammo_cue;
-
-			if (cued_count > 0) {
-				const auto ammo_info = calc_ammo_info(subject);
-
-				if (ammo_info.total_charges <= cued_count) {
-					auto effect = gun_def.low_ammo_cue_sound;
-
-					if (ammo_info.total_charges == cued_count - 1) {
-						effect.modifier.gain *= 0.65f;
-					}
+				{
+					const auto& effect = gun_def.muzzle_shot_sound;
 
 					effect.start(
 						step,
-						sound_effect_start_input::fire_and_forget(gun_transform).set_listener(owning_capability),
+						sound_effect_start_input::at_entity(typed_subject).set_listener(owning_capability),
 						predictability
 					);
+
+					::mark_caused_danger(owning_capability, effect.modifier);
+				}
+
+				for (auto& r : g.spawned_rounds) {
+					const auto spawned_round = cosm[r];
+
+					{
+						if (const auto missile = spawned_round.find<invariants::missile>()) {
+							const auto& effect = missile->trace_sound;
+
+							auto start = sound_effect_start_input::at_entity(cosm[r]);
+							start.clear_when_target_entity_deleted = true;
+
+							effect.start(step, start, predictability);
+						}
+					}
+				}
+
+				{
+					const auto cued_count = gun_def.num_last_bullets_to_trigger_low_ammo_cue;
+
+					if (cued_count > 0) {
+						const auto ammo_info = calc_ammo_info(typed_subject);
+
+						if (ammo_info.total_charges <= cued_count) {
+							auto effect = gun_def.low_ammo_cue_sound;
+
+							if (ammo_info.total_charges == cued_count - 1) {
+								effect.modifier.gain *= 0.65f;
+							}
+
+							effect.start(
+								step,
+								sound_effect_start_input::fire_and_forget(gun_transform).set_listener(owning_capability),
+								predictability
+							);
+						}
+					}
 				}
 			}
-		}
+		);
 	}
 
 	for (const auto& h : healths) {

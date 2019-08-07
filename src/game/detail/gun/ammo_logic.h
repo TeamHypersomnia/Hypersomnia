@@ -1,6 +1,6 @@
 #pragma once
-#include "game/detail/entity_scripts.h"
 #include "game/detail/inventory/calc_reloading_context.hpp"
+#include "game/detail/calc_ammo_info.hpp"
 
 template <class E, class C>
 bool is_ammo_depleted(const E& gun_entity, const C& capability) {

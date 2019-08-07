@@ -11,7 +11,7 @@
 #include "game/components/transform_component.h"
 
 #include "view/audiovisual_state/systems/audiovisual_cache_common.h"
-#include "game/cosmos/specific_entity_handle_declaration.h"
+#include "game/cosmos/get_corresponding.h"
 
 struct interpolation_settings;
 

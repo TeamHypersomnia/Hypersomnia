@@ -59,29 +59,33 @@ struct item_button : game_gui_rect_node {
 		const auto& cosm = context.get_cosmos();
 		const auto container_entity = cosm[this_id.get_location().item_id];
 
-		if (const auto container = container_entity.template find<invariants::container>()) {
-			for (const auto& s : container->slots) {
-				{
-					slot_button_in_container child_slot_location;
-					child_slot_location.slot_id.type = s.first;
-					child_slot_location.slot_id.container_entity = container_entity;
-					generic_call(context.dereference_location(child_slot_location));
-				}
+		container_entity.template dispatch_on_having_all<invariants::container>(
+			[&](const auto& typed_container) {
+				const auto& container = typed_container.template get<invariants::container>();
 
-				const auto items_inside = ::get_items_inside(container_entity, s.first);
+				for (const auto& s : container.slots) {
+					{
+						slot_button_in_container child_slot_location;
+						child_slot_location.slot_id.type = s.first;
+						child_slot_location.slot_id.container_entity = typed_container;
+						generic_call(context.dereference_location(child_slot_location));
+					}
 
-				for (std::size_t i = 0; i < items_inside.size(); ++i) {
-					const auto& in = items_inside[i];
+					const auto items_inside = ::get_items_inside(typed_container, s.first);
 
-					item_button_in_item child_item_location;
-					child_item_location.item_id = in;
+					for (std::size_t i = 0; i < items_inside.size(); ++i) {
+						const auto& in = items_inside[i];
 
-					const auto dereferenced = context.dereference_location(child_item_location);
-					dereferenced->previous_item.item_id = i > 0 ? items_inside[i - 1] : entity_id();
-					generic_call(dereferenced);
+						item_button_in_item child_item_location;
+						child_item_location.item_id = in;
+
+						const auto dereferenced = context.dereference_location(child_item_location);
+						dereferenced->previous_item.item_id = i > 0 ? items_inside[i - 1] : entity_id();
+						generic_call(dereferenced);
+					}
 				}
 			}
-		}
+		);
 	}
 
 	static vec2 griddify_size(const vec2 size, const vec2 expander);

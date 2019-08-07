@@ -341,7 +341,7 @@ void missile_system::detonate_expired_missiles(const logic_step step) {
 	const auto& delta = step.get_delta();
 
 	cosm.for_each_having<components::missile>(
-		[&](const auto it) {
+		[&](const auto& it) {
 			auto& missile = it.template get<components::missile>();
 			auto& missile_def = it.template get<invariants::missile>();
 		

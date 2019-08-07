@@ -24,6 +24,7 @@
 
 #include "game/detail/melee/like_melee.h"
 #include "game/detail/explosive/like_explosive.h"
+#include "game/inferred_caches/relational_cache.hpp"
 
 void drop_from_all_slots(const invariants::container& container, const entity_handle handle, const impulse_mults impulse, const logic_step step) {
 	drop_from_all_slots(container, handle, impulse, [step](const auto& result) { result.notify(step); result.play_effects(step); });
@@ -84,7 +85,9 @@ perform_transfer_result perform_transfer_impl::operator()(
 	cosmos& cosm
 ) const {
 	const auto access = write_synchronized_component_access();
+#if TODO_ACCESS
 	const auto inferred_access = cosmos_solvable_inferred_access();
+#endif
 
 	auto deguidize = [&](const auto s) {
 		/* No-op */
@@ -159,8 +162,6 @@ perform_transfer_result perform_transfer_impl::operator()(
 		}
 	}
 
-	auto& items_of_slots = cosm.get_solvable_inferred(inferred_access).relational.items_of_slots;
-
 	const auto& common_assets = cosm.get_common_assets();
 
 	const bool target_slot_exists = target_slot.alive();
@@ -180,7 +181,7 @@ perform_transfer_result perform_transfer_impl::operator()(
 		/* The slot will no longer have this item. */
 
 		item.current_slot.unset();
-		items_of_slots.unset_parenthood(transferred_item, source_slot);
+		unset_parenthood(source_slot, transferred_item);
 
 		if (source_slot.is_hand_slot()) {
 			unset_input_flags_of_orphaned_entity(transferred_item);
@@ -306,13 +307,13 @@ perform_transfer_result perform_transfer_impl::operator()(
 			auto& slot = get_item_of(moved_item).current_slot;
 
 			if (slot.is_set()) {
-				items_of_slots.unset_parenthood(moved_item, deguidize(slot));
+				unset_parenthood(cosm[slot], moved_item);
 			}
 
 			slot = target_slot.operator inventory_slot_id();
 		}
 
-		items_of_slots.assign_parenthood(moved_item, target_slot);
+		assign_parenthood(target_slot, moved_item);
 	}
 
 	/* 

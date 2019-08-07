@@ -6,6 +6,8 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- We might even be able to remove unordered_map header from the vast majority of the code
+
 - We badly badly need some non-serialized metadata components for simplicity
 	- what for
 		- high performance fields would otherwise fuck up padding (pointers, e.g. vectors)

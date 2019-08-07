@@ -10,10 +10,8 @@ protected:
 	using base::handle;
 public:
 	void infer_caches() const {
-		const auto h = handle.to_const_generic();
-
-		handle.get_cosmos().get_solvable_inferred({}).relational.infer_cache_for(h);
-		handle.get_cosmos().get_solvable_inferred({}).physics.infer_cache_for(h);
+		handle.get_cosmos().get_solvable_inferred({}).relational.infer_cache_for(handle);
+		handle.get_cosmos().get_solvable_inferred({}).physics.infer_cache_for(handle);
 	}
 
 	using base::get_raw_component;

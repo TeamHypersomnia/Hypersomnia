@@ -8,25 +8,27 @@
 
 #include "augs/templates/enum_introspect.h"
 
-void relational_cache::infer_cache_for(const const_entity_handle& handle) {
+void relational_cache::infer_cache_for(const entity_handle& handle) {
 	handle.dispatch_on_having_all<entity_types_passing<concerned_with>>([this](const auto& typed_handle) {
 		specific_infer_cache_for(typed_handle);
 	});
 }
 
-void relational_cache::infer_all(const cosmos& cosm) {
+void relational_cache::infer_all(cosmos& cosm) {
 	cosm.for_each_entity<concerned_with>([this](const auto& typed_handle) {
 		specific_infer_cache_for(typed_handle);
 	});
 }
 
-void relational_cache::destroy_cache_of(const const_entity_handle& handle) {
-	handle.dispatch_on_having_all<components::item>([this](const auto& typed_handle) {
+void relational_cache::destroy_cache_of(const entity_handle& handle) {
+	auto& cosm = handle.get_cosmos();
+
+	handle.dispatch_on_having_all<components::item>([&cosm](const auto& typed_handle) {
 		const auto& item = typed_handle.template get<components::item>();
 		const auto slot = item->get_current_slot();
 
 		if (slot.is_set()) {
-			items_of_slots.unset_parenthood(typed_handle, slot);
+			unset_parenthood(cosm[slot], typed_handle);
 		}
 	});
 }

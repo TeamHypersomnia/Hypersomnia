@@ -4,6 +4,8 @@
 #include "game/organization/all_components_declaration.h"
 #include "game/organization/all_entity_types_declaration.h"
 
+struct items_of_slots_cache;
+
 /* E.g. a player as a resistance soldier or metropolitan guard */
 
 struct controlled_character {
@@ -44,7 +46,8 @@ struct controlled_character {
 	>;
 
 	using synchronized_arrays = type_list<
-		components::interpolation
+		components::interpolation,
+		items_of_slots_cache
 	>;
 };
 
@@ -104,7 +107,8 @@ struct shootable_weapon {
 	>;
 
 	using synchronized_arrays = type_list<
-		components::interpolation
+		components::interpolation,
+		items_of_slots_cache
 	>;
 };
 
@@ -331,7 +335,8 @@ struct container_item {
 	>;
 
 	using synchronized_arrays = type_list<
-		components::interpolation
+		components::interpolation,
+		items_of_slots_cache
 	>;
 };
 

@@ -14,6 +14,8 @@
 #include "game/detail/inventory/inventory_slot_id.h"
 #include "game/detail/inventory/inventory_slot_types.h"
 #include "game/components/transform_component.h"
+#include "augs/templates/traits/is_nullopt.h"
+#include "game/cosmos/get_corresponding.h"
 
 #include "game/detail/inventory/inventory_slot_types.h"
 
@@ -393,7 +395,18 @@ inventory_space_type basic_inventory_slot_handle<E>::calc_local_space_available(
 
 template <class E>
 const std::vector<entity_id>& basic_inventory_slot_handle<E>::get_items_inside() const {
-	return get_cosmos().get_solvable_inferred().relational.get_items_of_slots().get_children_of(get_id());
+	thread_local const std::vector<entity_id> zero;
+
+	return get_container().template dispatch_on_having_all_ret<invariants::container>(
+		[&](const auto& typed_container) -> const auto& {
+			if constexpr(is_nullopt_v<decltype(typed_container)>) {
+				return zero;
+			}
+			else {
+				return get_corresponding<items_of_slots_cache>(typed_container).tracked_children[get_type()];
+			}
+		}
+	);
 }
 
 template <class E>

@@ -231,16 +231,18 @@ void intent_contextualization_system::contextualize_movement_intents(const logic
 		}
 
 		if (!callee_resolved) {
-			if (const auto* const maybe_container = subject.find<invariants::container>();) {
-				if (e.intent == game_intent_type::SPACE_BUTTON) {
-					const auto hand = subject.get_primary_hand();
+			subject.dispatch_on_having_all<invariants::container>(
+				[&](const auto& typed_subject) {
+					if (e.intent == game_intent_type::SPACE_BUTTON) {
+						const auto hand = subject.get_primary_hand();
 
-					if (hand.alive() && hand.get_items_inside().size() > 0) {
-						callee = hand.get_items_inside()[0];
-						callee_resolved = true;
+						if (hand.alive() && hand.get_items_inside().size() > 0) {
+							callee = hand.get_items_inside()[0];
+							callee_resolved = true;
+						}
 					}
 				}
-			}
+			);
 		}
 
 		if (callee_resolved) {

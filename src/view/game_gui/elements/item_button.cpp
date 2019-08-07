@@ -35,6 +35,7 @@
 #include "game/detail/entity_scripts.h"
 #include "view/rendering_scripts/draw_entity.h"
 #include "view/viewables/images_in_atlas_map.h"
+#include "game/detail/calc_ammo_info.hpp"
 
 using namespace augs::gui::text;
 

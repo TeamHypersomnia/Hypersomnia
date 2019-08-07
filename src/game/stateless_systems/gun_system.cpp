@@ -42,6 +42,7 @@
 #include "game/detail/inventory/wielding_setup.hpp"
 #include "game/detail/entity_handle_mixins/find_target_slot_for.hpp"
 #include "game/detail/organisms/startle_nearbly_organisms.h"
+#include "game/detail/calc_ammo_info.hpp"
 
 template <class T>
 bool gun_try_to_fire_and_reset(
@@ -62,8 +63,9 @@ using namespace augs;
 
 #define ENABLE_RECOIL 1
 
+template <class E>
 static entity_id find_next_cartridge(
-	const const_entity_handle gun_entity
+	const E& gun_entity
 ) {
 	thread_local std::vector<entity_id> next_cartridge_from;
 	next_cartridge_from.clear();
@@ -81,9 +83,13 @@ static entity_id find_next_cartridge(
 		if (detachable_magazine_slot.alive() && detachable_magazine_slot.has_items()) {
 			const auto magazine = cosm[detachable_magazine_slot.get_items_inside()[0]];
 
-			if (nullptr == magazine.find_mounting_progress()) {
-				next_cartridge_from = magazine[slot_function::ITEM_DEPOSIT].get_items_inside();
-			}
+			magazine.template dispatch_on_having_all<invariants::container>(
+				[&](const auto& typed_mag) {
+					if (nullptr == typed_mag.find_mounting_progress()) {
+						next_cartridge_from = typed_mag[slot_function::ITEM_DEPOSIT].get_items_inside();
+					}
+				}
+			);
 		}
 	}
 
@@ -94,13 +100,12 @@ static entity_id find_next_cartridge(
 	return {};
 }
 
+template <class E>
 static void load_next_cartridge(
-	const entity_id gun_entity_id,
+	const E& gun_entity,
 	const entity_id next_cartridge,
 	const logic_step step
 ) {
-	const auto gun_entity = step.get_cosmos()[gun_entity_id];
-
 	item_slot_transfer_request into_chamber_transfer;
 
 	into_chamber_transfer.item = next_cartridge;
@@ -111,13 +116,11 @@ static void load_next_cartridge(
 	perform_transfer(into_chamber_transfer, step);
 }
 
+template <class E>
 static void find_and_load_next_cartridge(
-	const entity_id gun_entity_id,
+	const E& gun_entity,
 	const logic_step step
 ) {
-	auto& cosm = step.get_cosmos();
-	const auto gun_entity = cosm[gun_entity_id];
-
 	if (const auto next_cartridge = find_next_cartridge(gun_entity); next_cartridge.is_set()) {
 		load_next_cartridge(gun_entity, next_cartridge, step);
 	}
@@ -642,23 +645,25 @@ void gun_system::launch_shots_due_to_pressed_triggers(const logic_step step) {
 								thread_local std::vector<entity_id> bullet_stacks;
 								bullet_stacks.clear();
 
-								const auto pellets_slot = cartridge_in_chamber[slot_function::ITEM_DEPOSIT];
-
 								thread_local destruction_queue destructions;
 								destructions.clear();
 
-								if (pellets_slot.alive()) {
-									bullet_stacks = pellets_slot.get_items_inside();
+								{
+									const auto pellets_slot = cartridge_in_chamber[slot_function::ITEM_DEPOSIT];
 
-									/* 
-										apart from the pellets stacks inside the cartridge,
-										we must additionally queue the cartridge itself
-									*/
+									if (pellets_slot.alive()) {
+										bullet_stacks = pellets_slot.get_items_inside();
 
-									destructions.emplace_back(cartridge_in_chamber);
-								}
-								else {
-									bullet_stacks.push_back(cartridge_in_chamber);
+										/* 
+											apart from the pellets stacks inside the cartridge,
+											we must additionally queue the cartridge itself
+										*/
+
+										destructions.emplace_back(cartridge_in_chamber);
+									}
+									else {
+										bullet_stacks.push_back(cartridge_in_chamber);
+									}
 								}
 
 								ensure_greater(bullet_stacks.size(), 0);

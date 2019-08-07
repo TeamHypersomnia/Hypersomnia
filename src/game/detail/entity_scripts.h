@@ -26,17 +26,6 @@ attitude_type calc_attitude(
 	const const_entity_handle target
 );
 
-struct ammunition_information {
-	unsigned total_charges = 0;
-	real32 total_ammo_space = 0.f;
-	real32 available_ammo_space = 0.f;
-
-	real32 get_ammo_ratio() const;
-};
-
-ammunition_information calc_ammo_info(const const_entity_handle handle);
-ammunition_information calc_reloadable_ammo_info(const const_entity_handle handle);
-
 struct b2Filter;
 
 entity_id get_closest_hostile(

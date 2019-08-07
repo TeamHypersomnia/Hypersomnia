@@ -88,9 +88,8 @@ entity_handle cosmic::create_entity(
 
 void cosmic::infer_caches_for(const entity_handle& in) {
 	auto& inferred = in.get_cosmos().get_solvable_inferred({});
-	const auto h = const_entity_handle(in);
 
-	h.dispatch([&](const auto& typed_handle) {
+	in.dispatch([&](const auto& typed_handle) {
 		auto constructor = [&](auto, auto& sys) {
 			using S = remove_cref<decltype(sys)>;
 
@@ -105,10 +104,9 @@ void cosmic::infer_caches_for(const entity_handle& in) {
 
 void cosmic::destroy_caches_of(const entity_handle& in) {
 	auto& inferred = in.get_cosmos().get_solvable_inferred({});
-	const auto h = const_entity_handle(in);
 
-	auto destructor = [&h](auto, auto& sys) {
-		sys.destroy_cache_of(h);
+	auto destructor = [&in](auto, auto& sys) {
+		sys.destroy_cache_of(in);
 	};
 
 	augs::introspect(destructor, inferred);
@@ -131,7 +129,7 @@ void cosmic::infer_all_entities(cosmos& in) {
 	*/
 
 	auto constructor = [&in](auto, auto& sys) {
-		const auto& cosm = in;
+		auto& cosm = in;
 		sys.infer_all(cosm);
 	};
 
@@ -191,7 +189,7 @@ void entity_deleter(
 	/* Collect dependent entities so that we might reinfer them */
 	std::vector<entity_id> dependent_items;
 
-	handle.dispatch_on_having_all<invariants::container>([&](const auto typed_handle){
+	handle.dispatch_on_having_all<invariants::container>([&](const auto& typed_handle) {
 		const auto& container = typed_handle.template get<invariants::container>();
 
 		for (const auto& s : container.slots) {
