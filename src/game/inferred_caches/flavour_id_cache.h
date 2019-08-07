@@ -45,4 +45,6 @@ public:
 
 	void infer_cache_for(const const_entity_handle&);
 	void destroy_cache_of(const const_entity_handle&);
+
+	bool enabled = false;
 };

@@ -35,7 +35,9 @@ std::string editor_folder::get_display_path() const {
 editor_folder::editor_folder(const augs::path_type& p) : 
 	current_path(p), 
 	commanded(std::make_unique<editor_commanded_state>()) 
-{}
+{
+	set_flavour_id_cache_enabled(true, commanded->work.world);
+}
 
 editor_paths editor_folder::get_paths() const {
 	return { current_path, ::get_project_name(current_path) };

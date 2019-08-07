@@ -3,6 +3,10 @@
 
 template <class T>
 void flavour_id_cache::specific_infer_cache_for(const T& typed_handle) {
+	if (!enabled) {
+		return;
+	}
+
 	using E = entity_type_of<T>;
 
 	auto& m = caches.get_for<E>();
