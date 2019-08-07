@@ -35,6 +35,14 @@ namespace augs {
 		r(slots);
 		r(indirectors);
 		r(free_indirectors);
+
+		if constexpr(has_synchronized_arrays) {
+			synchronized_arrays.for_each_container(
+				[&](auto& container) {
+					container.resize(objects.size());
+				}
+			);
+		}
 	}
 
 	/* 
@@ -122,6 +130,14 @@ namespace augs {
 			if (indirectors[i].real_index == static_cast<size_type>(-1)) {
 				free_indirectors.push_back(static_cast<size_type>(i));
 			}
+		}
+
+		if constexpr(has_synchronized_arrays) {
+			synchronized_arrays.for_each_container(
+				[&](auto& container) {
+					container.resize(objects.size());
+				}
+			);
 		}
 	}
 }

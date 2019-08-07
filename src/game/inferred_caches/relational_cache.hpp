@@ -33,12 +33,12 @@ void relational_cache::specific_infer_cache_for(const E& typed_handle) {
 	*/
 
 	const auto& item = typed_handle.template get<components::item>();
-	const auto slot = item->get_current_slot();
+	const auto slot = typed_handle.get_cosmos()[item->get_current_slot()];
 
 	/* Contrary to other relations, here having a parent is optional */
 
-	if (slot.is_set()) {
-		assign_parenthood(typed_handle.get_cosmos()[slot], typed_handle);
+	if (slot) {
+		assign_parenthood(slot, typed_handle);
 	}
 
 	/*

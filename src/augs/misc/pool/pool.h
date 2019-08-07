@@ -391,6 +391,16 @@ namespace augs {
 		}
 
 		template <class C>
+		auto& get_corresponding_array() {
+			return synchronized_arrays.template get_for<C>();
+		}
+
+		template <class C>
+		const auto& get_corresponding_array() const {
+			return synchronized_arrays.template get_for<C>();
+		}
+
+		template <class C>
 		C& get_corresponding(mapped_type& object) {
 			const auto idx = index_in(objects, object);
 			return synchronized_arrays.template get_for<C>()[idx];

@@ -45,13 +45,28 @@ void cosmos_solvable::reserve_storage_for_entities(const cosmic_pool_size_type n
 
 void cosmos_solvable::destroy_all_caches() {
 	inferred.~cosmos_solvable_inferred();
+
+	significant.entity_pools.for_each_container(
+		[&](auto& entity_pool) {
+			using E = entity_type_of<typename remove_cref<decltype(entity_pool)>::value_type>;
+
+			for_each_type_in_list<typename E::synchronized_arrays>(
+				[&](auto t) {
+					using T = decltype(t);
+
+					if constexpr(T::is_cache) {
+						auto& caches = entity_pool.template get_corresponding_array<T>();
+
+						const auto n = caches.size();
+						caches.clear();
+						caches.resize(n);
+					}
+				}
+			);
+		}
+	);
+
 	new (&inferred) cosmos_solvable_inferred;
-
-#if TODO
-	const auto n = significant.entity_pool.capacity();
-
-	augs::introspect(make_reserver(n), inferred);
-#endif
 }
 
 void cosmos_solvable::increment_step() {

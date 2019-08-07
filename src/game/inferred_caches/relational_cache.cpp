@@ -25,10 +25,10 @@ void relational_cache::destroy_cache_of(const entity_handle& handle) {
 
 	handle.dispatch_on_having_all<components::item>([&cosm](const auto& typed_handle) {
 		const auto& item = typed_handle.template get<components::item>();
-		const auto slot = item->get_current_slot();
+		const auto slot = cosm[item->get_current_slot()];
 
-		if (slot.is_set()) {
-			unset_parenthood(cosm[slot], typed_handle);
+		if (slot) {
+			unset_parenthood(slot, typed_handle);
 		}
 	});
 }

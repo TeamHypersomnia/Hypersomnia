@@ -23,6 +23,4 @@ public:
 
 	void infer_cache_for(const entity_handle&);
 	void destroy_cache_of(const entity_handle&);
-
-	void destroy_caches_of_children_of(const entity_id);
 };

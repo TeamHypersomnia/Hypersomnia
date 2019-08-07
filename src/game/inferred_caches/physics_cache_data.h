@@ -7,6 +7,8 @@ class b2Fixture;
 class cosmos;
 
 struct rigid_body_cache {
+	static constexpr bool is_cache = true;
+
 	augs::propagate_const<b2Body*> body = nullptr;
 
 	void clear(cosmos&, physics_world_cache&);
@@ -17,6 +19,8 @@ struct rigid_body_cache {
 };
 
 struct colliders_cache {
+	static constexpr bool is_cache = true;
+
 	augs::constant_size_vector<
 		augs::propagate_const<b2Fixture*>, 
 		POLY_VERTEX_COUNT
@@ -25,6 +29,7 @@ struct colliders_cache {
 	colliders_connection connection;
 
 	void clear(physics_world_cache&);
+	void clear_fields();
 
 	bool is_constructed() const {
 		return constructed_fixtures.size() > 0;

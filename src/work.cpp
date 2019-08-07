@@ -1285,6 +1285,12 @@ and then hitting Save settings.
 				);
 			}
 			else {
+				if constexpr(std::is_same_v<S, editor_setup>) {
+					if (setup.is_editing_mode()) {
+						pending_new_state_sample = true;
+					}
+				}
+
 				setup.advance(
 					{ 
 						frame_delta, 

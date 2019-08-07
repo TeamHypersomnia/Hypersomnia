@@ -58,7 +58,7 @@ void rigid_body_cache::clear(cosmos& cosm, physics_world_cache& owner) {
 	for (const b2Fixture* f = body->m_fixtureList; f != nullptr; f = f->m_next) {
 		if (const auto fixture_owner = cosm[f->GetUserData()]) {
 			if (const auto cache = find_colliders_cache(fixture_owner)) {
-				cache->clear(owner);
+				cache->clear_fields();
 			}
 		}
 	}
@@ -78,13 +78,17 @@ void rigid_body_cache::clear(cosmos& cosm, physics_world_cache& owner) {
 	body = nullptr;
 }
 
+void colliders_cache::clear_fields() {
+	constructed_fixtures.clear();
+	connection = {};
+}
+
 void colliders_cache::clear(physics_world_cache&) {
 	for (b2Fixture* f : constructed_fixtures) {
 		f->GetBody()->DestroyFixture(f);
 	}
 
-	constructed_fixtures.clear();
-	connection = {};
+	clear_fields();
 }
 
 #if TODO_JOINTS

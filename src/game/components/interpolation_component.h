@@ -3,6 +3,8 @@
 
 namespace components {
 	struct interpolation {
+		static constexpr bool is_cache = true;
+
 		// GEN INTROSPECTOR struct components::interpolation
 		mutable transformr desired_transform;
 		mutable transformr interpolated_transform;
@@ -12,7 +14,7 @@ namespace components {
 
 		template <class T>
 		void set_place_of_birth(T&& t) {
-			interpolated_transform = std::forward<T>(t);
+			desired_transform = interpolated_transform = std::forward<T>(t);
 		}
 	};
 }
