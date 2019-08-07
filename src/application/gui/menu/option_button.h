@@ -8,6 +8,7 @@
 
 #include "game/assets/ids/asset_ids.h"
 
+#include "augs/drawing/drawing.hpp"
 #include "application/gui/menu/appearing_text.h"
 
 using button_corners_info = basic_button_corners_info<assets::necessary_image_id>;

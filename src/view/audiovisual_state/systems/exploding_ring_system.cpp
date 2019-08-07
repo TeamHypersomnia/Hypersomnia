@@ -1,3 +1,4 @@
+#include "augs/drawing/drawing.hpp"
 #include "augs/misc/randomization.h"
 #include "augs/templates/container_templates.h"
 

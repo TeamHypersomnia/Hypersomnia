@@ -1,4 +1,5 @@
 #include "augs/misc/http/http_requests.h"
+#include "augs/drawing/drawing.hpp"
 #include "augs/misc/action_list/standard_actions.h"
 
 #include "augs/filesystem/file.h"
