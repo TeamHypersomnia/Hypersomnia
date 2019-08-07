@@ -85,9 +85,7 @@ const colliders_connection* physics_mixin<E>::find_colliders_connection() const 
 	const auto cache = find_colliders_cache(self);
 
 	if (cache) {
-		if (cache->connection.owner.is_set()) {
-			return std::addressof(cache->connection);
-		}
+		return std::addressof(cache->connection);
 	}
 
 	return nullptr;

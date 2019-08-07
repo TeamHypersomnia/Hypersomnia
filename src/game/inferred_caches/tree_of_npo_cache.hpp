@@ -1,6 +1,12 @@
 #pragma once
 #include "game/inferred_caches/tree_of_npo_cache.h"
 #include "game/detail/calc_render_layer.h"
+#include "game/cosmos/find_cache.h"
+
+template <class E>
+auto* find_tree_of_npo_cache(const E& handle) {
+	return general_find_cache<tree_of_npo_cache_data>(handle);
+}
 
 template <class E>
 std::optional<tree_of_npo_node_input> create_default_for(const E& handle) {
@@ -50,10 +56,9 @@ std::optional<tree_of_npo_node_input> create_default_for(const E& handle) {
 template <class E>
 void tree_of_npo_cache::specific_infer_cache_for(const E& handle) {
 	const auto id = handle.get_id().to_unversioned();
-	const auto it = per_entity_cache.try_emplace(id);
 
-	auto& cache = (*it.first).second;
-	const bool cache_existed = !it.second;
+	auto& cache = get_corresponding<tree_of_npo_cache_data>(handle);
+	const bool cache_existed = cache.is_constructed();
 
 	if (const auto tree_node = ::create_default_for(handle)) {
 		const auto data = *tree_node;

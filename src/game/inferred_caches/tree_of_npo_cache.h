@@ -6,13 +6,15 @@
 #include "augs/misc/enum/enum_array.h"
 
 #include "game/enums/tree_of_npo_type.h"
-#include "game/inferred_caches/inferred_cache_common.h"
 #include "game/cosmos/entity_handle_declaration.h"
 
 #include "augs/math/camera_cone.h"
 
 #include "game/detail/entities_with_render_layer.h"
 #include "game/cosmos/entity_type_traits.h"
+#include "game/cosmos/entity_id.h"
+#include "game/inferred_caches/tree_of_npo_cache_data.h"
+
 /* NPO stands for "non-physical objects" */
 
 namespace components {
@@ -39,26 +41,16 @@ struct tree_of_npo_node_input {
 };
 
 class tree_of_npo_cache {
+	using cache = tree_of_npo_cache_data;
+	friend cache;
+
 	struct tree {
 		b2DynamicTree nodes;
 	};
 
 	augs::enum_array<tree, tree_of_npo_type> trees;
 
-	struct cache {
-		tree_of_npo_type type = tree_of_npo_type::COUNT;
-		ltrb recorded_aabb;
-		int tree_proxy_id = -1;
-
-		void clear(tree_of_npo_cache& owner);
-	};
-
-	inferred_cache_map<cache> per_entity_cache;
-
 	tree& get_tree(const cache&);
-
-	cache* find_cache(const unversioned_entity_id);
-	const cache* find_cache(const unversioned_entity_id) const;
 
 public:
 	template <class E>
@@ -68,14 +60,6 @@ public:
 			&& !has_any_of_v<E, invariants::fixtures, invariants::rigid_body>
 		;
 	};	
-
-	/* Used for example for debugging the created nodes */
-	template <class F>
-	void for_each_aabb(F callback) const {
-		for (const auto& cache : per_entity_cache) {
-			callback(cache.second.recorded_aabb);
-		}
-	}
 
 	template <class F>
 	void for_each_in_camera(
@@ -110,11 +94,11 @@ public:
 
 	void reserve_caches_for_entities(const size_t n);
 
-	void infer_all(const cosmos&);
+	void infer_all(cosmos&);
 
 	template <class E>
 	void specific_infer_cache_for(const E&);
 
-	void infer_cache_for(const const_entity_handle&);
-	void destroy_cache_of(const const_entity_handle&);
+	void infer_cache_for(const entity_handle&);
+	void destroy_cache_of(const entity_handle&);
 };

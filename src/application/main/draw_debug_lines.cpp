@@ -15,6 +15,8 @@ void draw_debug_lines(
 	const camera_cone cone
 ) {
 	if (DEBUG_DRAWING.draw_npo_tree_nodes) {
+		(void)viewed_cosmos;
+#if TODO
 		viewed_cosmos.get_solvable_inferred().tree_of_npo.for_each_aabb([](const ltrb aabb){
 			auto& lines = DEBUG_FRAME_LINES;
 
@@ -23,6 +25,7 @@ void draw_debug_lines(
 			lines.emplace_back(red, aabb.right_bottom(), aabb.left_bottom());
 			lines.emplace_back(red, aabb.left_bottom(), aabb.left_top());
 		});
+#endif
 	}
 
 	renderer.draw_debug_lines(

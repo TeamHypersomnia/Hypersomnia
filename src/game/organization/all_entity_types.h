@@ -7,6 +7,7 @@
 struct items_of_slots_cache;
 struct rigid_body_cache;
 struct colliders_cache;
+struct tree_of_npo_cache_data;
 
 /* E.g. a player as a resistance soldier or metropolitan guard */
 
@@ -205,7 +206,9 @@ struct sprite_decoration {
 		components::overridden_geo
 	>;
 
-	using synchronized_arrays = type_list<>;
+	using synchronized_arrays = type_list<
+		tree_of_npo_cache_data
+	>;
 };
 
 struct wandering_pixels_decoration {
@@ -223,7 +226,9 @@ struct wandering_pixels_decoration {
 		components::wandering_pixels
 	>;
 
-	using synchronized_arrays = type_list<>;
+	using synchronized_arrays = type_list<
+		tree_of_npo_cache_data
+	>;
 };
 
 struct static_light {
@@ -239,7 +244,9 @@ struct static_light {
 		components::light
 	>;
 
-	using synchronized_arrays = type_list<>;
+	using synchronized_arrays = type_list<
+		tree_of_npo_cache_data
+	>;
 };
 
 struct hand_explosive {
@@ -324,7 +331,8 @@ struct finishing_trace {
 	>;
 
 	using synchronized_arrays = type_list<
-		components::interpolation
+		components::interpolation,
+		tree_of_npo_cache_data
 	>;
 };
 
@@ -377,7 +385,9 @@ struct complex_decoration {
 		components::movement_path
 	>;
 
-	using synchronized_arrays = type_list<>;
+	using synchronized_arrays = type_list<
+		tree_of_npo_cache_data
+	>;
 };
 
 /* E.g. a bullet shell, a round remnant */
@@ -423,7 +433,9 @@ struct sound_decoration {
 		components::transform
 	>;
 
-	using synchronized_arrays = type_list<>;
+	using synchronized_arrays = type_list<
+		tree_of_npo_cache_data
+	>;
 };
 
 struct particles_decoration {
@@ -440,7 +452,9 @@ struct particles_decoration {
 		components::overridden_geo
 	>;
 
-	using synchronized_arrays = type_list<>;
+	using synchronized_arrays = type_list<
+		tree_of_npo_cache_data
+	>;
 };
 
 struct point_marker {
@@ -456,7 +470,9 @@ struct point_marker {
 		components::transform
 	>;
 
-	using synchronized_arrays = type_list<>;
+	using synchronized_arrays = type_list<
+		tree_of_npo_cache_data
+	>;
 };
 
 struct box_marker {
@@ -473,7 +489,9 @@ struct box_marker {
 		components::overridden_geo
 	>;
 
-	using synchronized_arrays = type_list<>;
+	using synchronized_arrays = type_list<
+		tree_of_npo_cache_data
+	>;
 };
 
 struct explosion_body {

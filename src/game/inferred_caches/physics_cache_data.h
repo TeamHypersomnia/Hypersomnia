@@ -32,6 +32,6 @@ struct colliders_cache {
 	void clear_fields();
 
 	bool is_constructed() const {
-		return constructed_fixtures.size() > 0;
+		return connection.owner.is_set();
 	}
 };
