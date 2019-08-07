@@ -1,4 +1,4 @@
-#include <Box2D/Box2D.h>
+#include "3rdparty/Box2D/Box2D.h"
 
 #include "game/cosmos/cosmos.h"
 #include "game/cosmos/entity_handle.h"

@@ -8,6 +8,7 @@
 #include "game/detail/entity_handle_mixins/get_current_slot.hpp"
 #include "game/components/fixtures_component.h"
 #include "game/components/rigid_body_sync.h"
+#include "game/inferred_caches/find_physics_cache.h"
 
 struct rigid_body_cache_info;
 
@@ -80,13 +81,12 @@ real32 physics_mixin<E>::calc_density(
 
 template <class E>
 const colliders_connection* physics_mixin<E>::find_colliders_connection() const {
-	const auto self = *static_cast<const E*>(this);
+	const auto& self = *static_cast<const E*>(this);
+	const auto cache = find_colliders_cache(self);
 
-	if (const auto rb = self.template find<components::rigid_body>()) {
-		const auto& cached = rb.get_raw_component().cached_colliders_connection;
-
-		if (cached.owner.is_set()) {
-			return std::addressof(cached);
+	if (cache) {
+		if (cache->connection.owner.is_set()) {
+			return std::addressof(cache->connection);
 		}
 	}
 

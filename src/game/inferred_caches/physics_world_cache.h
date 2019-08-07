@@ -1,10 +1,8 @@
 #pragma once
-#include "3rdparty/Box2D/Box2D.h"
-
+#include "3rdparty/Box2D/Dynamics/b2Filter.h"
 #include "augs/misc/constant_size_vector.h"
 #include "augs/templates/propagate_const.h"
 
-#include "game/inferred_caches/inferred_cache_common.h"
 #include "game/cosmos/entity_handle_declaration.h"
 #include "game/cosmos/step_declaration.h"
 
@@ -12,33 +10,17 @@
 
 #include "game/detail/physics/physics_queries_declaration.h"
 #include "game/detail/physics/colliders_connection.h"
+#include "game/cosmos/get_corresponding.h"
 
 class cosmos;
 class physics_world_cache;
 
-struct rigid_body_cache {
-	augs::propagate_const<b2Body*> body = nullptr;
+class b2Joint;
+class b2Fixture;
+class b2Body;
+class b2World;
 
-	void clear(physics_world_cache&);
-
-	bool is_constructed() const {
-		return body.get() != nullptr;
-	}
-};
-
-struct colliders_cache {
-	augs::constant_size_vector<
-		augs::propagate_const<b2Fixture*>, 
-		POLY_VERTEX_COUNT
-	> constructed_fixtures;
-
-	void clear(physics_world_cache&);
-
-	bool is_constructed() const {
-		return constructed_fixtures.size() > 0;
-	}
-};
-
+#if TODO_JOINTS
 struct joint_cache {
 	augs::propagate_const<b2Joint*> joint = nullptr;
 
@@ -48,6 +30,7 @@ struct joint_cache {
 		return joint.get() != nullptr;
 	}
 };
+#endif
 
 struct physics_raycast_output {
 	bool hit = false;
@@ -59,11 +42,11 @@ struct physics_raycast_output {
 class physics_world_cache {
 	friend rigid_body_cache;
 	friend colliders_cache;
-	friend joint_cache;
 
-	inferred_cache_map<rigid_body_cache> rigid_body_caches;
-	inferred_cache_map<colliders_cache> colliders_caches;
+#if TODO_JOINTS
+	friend joint_cache;
 	inferred_cache_map<joint_cache> joint_caches;
+#endif
 
 	template <class E>
 	void specific_infer_colliders_from_scratch(
@@ -83,12 +66,15 @@ public:
 	std::vector<messages::collision_message> accumulated_messages;
 
 	physics_world_cache();
+	~physics_world_cache();
 
 	physics_world_cache(const physics_world_cache&);
 	physics_world_cache& operator=(const physics_world_cache&);
 
 	physics_world_cache& operator=(physics_world_cache&&) = delete;
 	physics_world_cache(physics_world_cache&&) = delete;
+
+	void clone_from(const physics_world_cache& source_world, cosmos& target_cosmos, const cosmos& source_cosmos);
 
 	std::vector<physics_raycast_output> ray_cast_all_intersections(
 		const vec2 p1_meters,
@@ -170,13 +156,10 @@ public:
 	void step_and_set_new_transforms(const logic_step);
 	void post_and_clear_accumulated_collision_messages(const logic_step);
 
-	rigid_body_cache* find_rigid_body_cache(const entity_id);
-	colliders_cache* find_colliders_cache(const entity_id);
+#if TODO_JOINTS
 	joint_cache* find_joint_cache(const entity_id);
-
-	const rigid_body_cache* find_rigid_body_cache(const entity_id) const;
-	const colliders_cache* find_colliders_cache(const entity_id) const;
 	const joint_cache* find_joint_cache(const entity_id) const;
+#endif
 
 	b2World& get_b2world() {
 		return *b2world.get();
@@ -196,7 +179,7 @@ public:
 
 	void reserve_caches_for_entities(const size_t n);
 
-	void infer_all(const cosmos&);
+	void infer_all(cosmos&);
 
 	template <class E>
 	void specific_infer_cache_for(const E&);
@@ -213,18 +196,21 @@ public:
 	template <class E>
 	void specific_infer_colliders(const E&);
 
+	void infer_cache_for(const entity_handle&);
+	void destroy_cache_of(const entity_handle&);
+
+	void infer_colliders_from_scratch(const entity_handle&);
+	void infer_colliders(const entity_handle&);
+	void infer_rigid_body(const entity_handle&);
+
+	void destroy_colliders_cache(const entity_handle&);
+	void destroy_rigid_body_cache(const entity_handle&);
+
+#if TODO_JOINTS
+	void infer_joint(const entity_handle&);
+	void destroy_joint_cache(const entity_handle&);
+
 	template <class E>
 	void specific_infer_joint(const E&);
-
-	void infer_cache_for(const const_entity_handle&);
-	void destroy_cache_of(const const_entity_handle&);
-
-	void infer_colliders_from_scratch(const const_entity_handle&);
-	void infer_colliders(const const_entity_handle&);
-	void infer_rigid_body(const const_entity_handle&);
-	void infer_joint(const const_entity_handle&);
-
-	void destroy_colliders_cache(const const_entity_handle&);
-	void destroy_rigid_body_cache(const const_entity_handle&);
-	void destroy_joint_cache(const const_entity_handle&);
+#endif
 };

@@ -33,6 +33,17 @@ public:
 	cosmos() = default;
 	explicit cosmos(const cosmic_pool_size_type reserved_entities);
 
+	cosmos(const cosmos&);
+	cosmos& operator=(const cosmos&);
+
+	/* 
+		Forbid these because a cosmos might statically allocate huge arrays. 
+		Keep cosmos in a unique_ptr instead.
+	*/
+
+	cosmos(cosmos&&) = delete;
+	cosmos& operator=(cosmos&&) = delete;
+
 	/* 
 		If exception is thrown during alteration,
 		these metods will properly refresh inferred caches with what state was left.

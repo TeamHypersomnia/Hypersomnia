@@ -105,12 +105,11 @@ void physics_world_cache::specific_infer_cache_for(const E& typed_handle) {
 
 template <class E>
 void physics_world_cache::specific_infer_rigid_body_from_scratch(const E& handle) {
-	const auto it = rigid_body_caches.try_emplace(unversioned_entity_id(handle));
-	auto& cache = (*it.first).second;
+	auto& cache = get_corresponding<rigid_body_cache>(handle);
 
 	const auto& physics_def = handle.template get<invariants::rigid_body>();
 
-	cache.clear(*this);
+	cache.clear(handle.get_cosmos(), *this);
 
 	const auto rigid_body = handle.template get<components::rigid_body>();
 	const auto& physics_data = rigid_body.get_raw_component();
@@ -164,10 +163,9 @@ void physics_world_cache::specific_infer_rigid_body_from_scratch(const E& handle
 
 template <class E>
 void physics_world_cache::specific_infer_rigid_body(const E& handle) {
-	const auto it = rigid_body_caches.try_emplace(unversioned_entity_id(handle));
-	auto& cache = (*it.first).second;
+	auto& cache = get_corresponding<rigid_body_cache>(handle);
 
-	if (!it.second) {
+	if (cache.is_constructed()) {
 		/* The cache already existed. */
 		auto& body = *cache.body;
 
@@ -234,30 +232,32 @@ void physics_world_cache::specific_infer_rigid_body(const E& handle) {
 
 template <class E>
 void physics_world_cache::specific_infer_colliders_from_scratch(const E& handle, const colliders_connection& connection) {
-	const auto& cosm = handle.get_cosmos();
+	auto& cosm = handle.get_cosmos();
 
-	const auto it = colliders_caches.try_emplace(handle.get_id().to_unversioned());
-
-	auto& cache = (*it.first).second;
+	auto& cache = get_corresponding<colliders_cache>(handle);
 	cache.clear(*this);
 
-	auto& cached_connection = handle.get().template get<components::rigid_body>().cached_colliders_connection;
+	auto& cached_connection = cache.connection;
 	cached_connection.owner = {};
 
 	const auto new_owner = cosm[connection.owner];
 
 	if (new_owner.dead()) {
-		colliders_caches.erase(it.first);
+		cache.clear(*this);
 		return;
 	}
 
-	new_owner.template dispatch_on_having_all<invariants::rigid_body>([&](const auto& typed_new_owner) {
-		specific_infer_rigid_body_existence(typed_new_owner);
+	const auto body_cache = new_owner.template dispatch_on_having_all_ret<invariants::rigid_body>([&](const auto& typed_new_owner) -> rigid_body_cache* {
+		if constexpr(is_nullopt_v<decltype(typed_new_owner)>) {
+			return nullptr;
+		}
+		else {
+			specific_infer_rigid_body_existence(typed_new_owner);
+			return std::addressof(get_corresponding<rigid_body_cache>(typed_new_owner));
+		}
 	});
 
-	const auto body_cache = find_rigid_body_cache(new_owner);
-
-	if (!body_cache) {
+	if (!body_cache || !body_cache->is_constructed()) {
 		/* 
 			No body to attach to. 
 			Might happen if we once implement it that the logic deactivates bodies for some reason. 
@@ -469,14 +469,13 @@ void physics_world_cache::specific_infer_colliders(const E& handle) {
 		return *calculated_connection;
 	};
 
-	const auto it = colliders_caches.try_emplace(handle.get_id().to_unversioned());
-	auto& cache = (*it.first).second;
+	auto& cache = get_corresponding<colliders_cache>(handle);
 
-	if (!it.second) {
+	if (cache.is_constructed()) {
 		/* Cache already existed. */
 		bool only_update_properties = true;
 
-		const auto& cached_connection = handle.get().template get<components::rigid_body>().cached_colliders_connection;
+		const auto& cached_connection = cache.connection;
 		
 		if (get_calculated_connection() != cached_connection) {
 			only_update_properties = false;
@@ -524,10 +523,10 @@ void physics_world_cache::specific_infer_colliders(const E& handle) {
 	specific_infer_colliders_from_scratch(handle, get_calculated_connection());
 }
 
+#if TODO_JOINTS
 template <class E>
 void physics_world_cache::specific_infer_joint(const E& /* handle */) {
-#if TODO_JOINTS
-	const auto& cosm = handle.get_cosmos();
+	auto& cosm = handle.get_cosmos();
 
 	if (const auto motor_joint = handle.find<components::motor_joint>();
 
@@ -555,5 +554,5 @@ void physics_world_cache::specific_infer_joint(const E& /* handle */) {
 
 		cache->joint = b2world->CreateJoint(&def);
 	}
-#endif
 }
+#endif

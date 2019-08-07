@@ -76,8 +76,6 @@ namespace components {
 		real32 angular_velocity = 0.f;
 
 		special_physics special;
-
-		mutable colliders_connection cached_colliders_connection;
 		// END GEN INTROSPECTOR
 	};
 }

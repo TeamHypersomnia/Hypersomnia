@@ -16,6 +16,10 @@
 #include "game/inferred_caches/flavour_id_cache.hpp"
 #include "game/inferred_caches/physics_world_cache.hpp"
 
+void cosmic::after_copy(cosmos& to, const cosmos& from) {
+	to.get_solvable_inferred({}).physics.clone_from(from.get_solvable_inferred().physics, to, from);
+}
+
 entity_handle just_create_entity(
 	cosmos& cosm,
 	const entity_flavour_id id

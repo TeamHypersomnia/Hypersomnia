@@ -1,11 +1,16 @@
 #pragma once
+#include "3rdparty/Box2D/Box2D.h"
+
 #include "augs/math/transform.h"
 #include "game/cosmos/component_synchronizer.h"
 #include "game/debug_drawing_settings.h"
 #include "game/components/rigid_body_component.h"
+#include "augs/templates/maybe_const.h"
+#include "game/inferred_caches/find_physics_cache.h"
 
 class physics_world_cache;
 class physics_system;
+class b2Body;
 
 template <class E, class B>
 void infer_damping(const E& handle, B& b);
@@ -18,10 +23,10 @@ class component_synchronizer<E, components::rigid_body>
 	friend ::physics_system;
 
 	auto find_cache() const {
-		return handle.get_cosmos().get_solvable_inferred({}).physics.find_rigid_body_cache(handle);
+		return find_rigid_body_cache(handle);
 	}
 
-	const decltype(std::declval<E&>().get_cosmos().get_solvable_inferred({}).physics.find_rigid_body_cache(std::declval<E&>())->body.get()) body_ptr;
+	const maybe_const_ptr_t<is_handle_const_v<E>, b2Body> body_ptr;
 
 	auto find_body_impl() const {	
 		using T = decltype(find_cache()->body.get());
@@ -37,7 +42,7 @@ class component_synchronizer<E, components::rigid_body>
 		return body_ptr;
 	}
 
-	auto body() const {
+	auto& body() const {
 		auto maybe_body = find_body();
 		ensure(maybe_body != nullptr);
 		return *maybe_body;
@@ -314,7 +319,6 @@ void component_synchronizer<E, components::rigid_body>::set_transform(const tran
 	}	
 }
 
-class b2Body;
 struct b2AABB;
 
 std::optional<b2AABB> find_aabb(const b2Body& body);

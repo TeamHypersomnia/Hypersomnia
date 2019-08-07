@@ -2,12 +2,11 @@
 #include "game/cosmos/entity_handle.h"
 #include "game/detail/physics/shape_helpers.h"
 #include "augs/templates/traits/is_nullopt.h"
+#include "game/inferred_caches/find_physics_cache.h"
 
 template <class E, class F>
 auto for_each_fixture(const E& handle, F callback) -> decltype(callback(std::declval<b2Fixture&>())) {
-	const auto& physics = handle.get_cosmos().get_solvable_inferred().physics;
-
-	if (const auto ch = physics.find_colliders_cache(handle.get_id())) {
+	if (const auto ch = find_colliders_cache(handle)) {
 		for (const auto& f : ch->constructed_fixtures) {
 			decltype(auto) result = callback(*f);
 

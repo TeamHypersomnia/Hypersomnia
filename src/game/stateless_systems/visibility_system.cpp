@@ -3,7 +3,7 @@
 #include <limits>
 #include <unordered_set>
 
-#include <Box2D/Box2D.h>
+#include "3rdparty/Box2D/Box2D.h"
 
 #include "augs/math/math.h"
 #include "augs/templates/container_templates.h"

@@ -19,6 +19,19 @@ cosmos::cosmos(const cosmic_pool_size_type reserved_entities)
 	: solvable(reserved_entities) 
 {}
 
+cosmos::cosmos(const cosmos& b) : common(b.common), solvable(b.solvable), profiler(b.profiler) {
+	cosmic::after_copy(*this, b);
+}
+
+cosmos& cosmos::operator=(const cosmos& b) {
+	common = b.common;
+	solvable = b.solvable;
+	profiler = b.profiler;
+
+	cosmic::after_copy(*this, b);
+	return *this;
+}
+
 const cosmos cosmos::zero = {};
 
 template <class T>

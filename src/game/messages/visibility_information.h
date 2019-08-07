@@ -4,7 +4,7 @@
 #include "augs/graphics/rgba.h"
 #include "augs/misc/simple_pair.h"
 #include "game/components/transform_component.h"
-#include "3rdparty/Box2D/Dynamics/b2Fixture.h"
+#include "3rdparty/Box2D/Dynamics/b2Filter.h"
 #include "augs/math/vec2.h"
 #include "augs/pad_bytes.h"
 

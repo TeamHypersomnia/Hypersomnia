@@ -1,6 +1,6 @@
 #pragma once
 #include <optional>
-#include <Box2D/Dynamics/b2Fixture.h>
+#include "3rdparty/Box2D/Dynamics/b2Filter.h"
 
 #include "augs/pad_bytes.h"
 

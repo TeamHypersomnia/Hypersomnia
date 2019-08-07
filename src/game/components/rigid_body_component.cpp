@@ -1,6 +1,6 @@
 #include "rigid_body_component.h"
 
-#include <Box2D/Box2D.h>
+#include "3rdparty/Box2D/Box2D.h"
 
 #include "fixtures_component.h"
 

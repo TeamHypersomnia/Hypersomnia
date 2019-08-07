@@ -5,6 +5,8 @@
 #include "game/organization/all_entity_types_declaration.h"
 
 struct items_of_slots_cache;
+struct rigid_body_cache;
+struct colliders_cache;
 
 /* E.g. a player as a resistance soldier or metropolitan guard */
 
@@ -47,7 +49,9 @@ struct controlled_character {
 
 	using synchronized_arrays = type_list<
 		components::interpolation,
-		items_of_slots_cache
+		items_of_slots_cache,
+		rigid_body_cache,
+		colliders_cache
 	>;
 };
 
@@ -74,7 +78,9 @@ struct plain_sprited_body {
 	>;
 
 	using synchronized_arrays = type_list<
-		components::interpolation
+		components::interpolation,
+		rigid_body_cache,
+		colliders_cache
 	>;
 };
 
@@ -108,7 +114,9 @@ struct shootable_weapon {
 
 	using synchronized_arrays = type_list<
 		components::interpolation,
-		items_of_slots_cache
+		items_of_slots_cache,
+		rigid_body_cache,
+		colliders_cache
 	>;
 };
 
@@ -143,7 +151,9 @@ struct melee_weapon {
 	>;
 
 	using synchronized_arrays = type_list<
-		components::interpolation
+		components::interpolation,
+		rigid_body_cache,
+		colliders_cache
 	>;
 };
 
@@ -171,7 +181,9 @@ struct shootable_charge {
 	>;
 
 	using synchronized_arrays = type_list<
-		components::interpolation
+		components::interpolation,
+		rigid_body_cache,
+		colliders_cache
 	>;
 };
 
@@ -256,7 +268,9 @@ struct hand_explosive {
 	>;
 
 	using synchronized_arrays = type_list<
-		components::interpolation
+		components::interpolation,
+		rigid_body_cache,
+		colliders_cache
 	>;
 };
 
@@ -287,7 +301,9 @@ struct plain_missile {
 	>;
 
 	using synchronized_arrays = type_list<
-		components::interpolation
+		components::interpolation,
+		rigid_body_cache,
+		colliders_cache
 	>;
 };
 
@@ -336,7 +352,9 @@ struct container_item {
 
 	using synchronized_arrays = type_list<
 		components::interpolation,
-		items_of_slots_cache
+		items_of_slots_cache,
+		rigid_body_cache,
+		colliders_cache
 	>;
 };
 
@@ -387,7 +405,9 @@ struct remnant_body {
 	>;
 
 	using synchronized_arrays = type_list<
-		components::interpolation
+		components::interpolation,
+		rigid_body_cache,
+		colliders_cache
 	>;
 };
 
@@ -475,7 +495,9 @@ struct explosion_body {
 	>;
 
 	using synchronized_arrays = type_list<
-		components::interpolation
+		components::interpolation,
+		rigid_body_cache,
+		colliders_cache
 	>;
 };
 
@@ -503,6 +525,8 @@ struct tool_item {
 	>;
 
 	using synchronized_arrays = type_list<
-		components::interpolation
+		components::interpolation,
+		rigid_body_cache,
+		colliders_cache
 	>;
 };

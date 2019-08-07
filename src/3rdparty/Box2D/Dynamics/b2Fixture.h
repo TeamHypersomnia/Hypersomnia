@@ -22,6 +22,7 @@
 #include <Box2D/Dynamics/b2Body.h>
 #include <Box2D/Collision/b2Collision.h>
 #include <Box2D/Collision/Shapes/b2Shape.h>
+#include "3rdparty/Box2D/Dynamics/b2Filter.h"
 
 class b2BlockAllocator;
 class b2Body;
@@ -30,35 +31,6 @@ class b2Fixture;
 
 #include "game/cosmos/entity_id.h"
 typedef unversioned_entity_id FixtureUserdata;
-
-/// This holds contact filtering data.
-struct b2Filter
-{
-	b2Filter()
-	{
-		categoryBits = 0x0001;
-		maskBits = 0xFFFF;
-		groupIndex = 0;
-	}
-
-	// GEN INTROSPECTOR struct b2Filter
-	uint16 categoryBits;
-	uint16 maskBits;
-	int16 groupIndex;
-	// END GEN INTROSPECTOR
-
-	bool operator==(const b2Filter& b) const {
-		return 
-			categoryBits == b.categoryBits 
-			&& maskBits == b.maskBits
-			&& groupIndex == b.groupIndex
-		;
-	}
-
-	bool operator!=(const b2Filter& b) const {
-		return !operator==(b);
-	}
-};
 
 /// A fixture definition is used to create a fixture. This class defines an
 /// abstract fixture definition. You can reuse fixture definitions safely.

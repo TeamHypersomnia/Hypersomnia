@@ -1,7 +1,7 @@
 #pragma once
 #include "augs/math/vec2.h"
 #include "game/cosmos/entity_id.h"
-#include "3rdparty/Box2D/Dynamics/b2Fixture.h"
+#include "3rdparty/Box2D/Dynamics/b2Filter.h"
 #include "augs/pad_bytes.h"
 
 class pathfinding_system;
