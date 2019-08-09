@@ -6,6 +6,14 @@ permalink: brainstorm_now
 summary: That which we are brainstorming at the moment.
 ---
 
+- Fixes to audio
+	- crash on exit
+		- terminating with uncaught exception of type std::__1::system_error: thread::join failed: Invalid argument
+		- fixed: we had twice the quit
+	- heap-after-free usage in generic sound cache init
+	- sounds disappearing randomly
+	- seek_to crash
+
 - Let's do the delegation thing later, I think openal is thread safe and just creating and loading new sound buffers should not at all alter existing ptrs
 
 - Since it will happen rarily and it'll be good for performance to just pass naked pointers,

@@ -56,7 +56,7 @@ void sound_system::generic_sound_cache::stop_and_free(const update_properties_in
 bool sound_system::start_fading(generic_sound_cache& cache, const float fade_per_sec) {
 	if (!container_full(fading_sources)) {
 		if (cache.probably_still_playing()) {
-			fading_sources.push_back({ cache.original.input.id, std::move(cache.source), fade_per_sec });
+			fading_sources.push_back({ cache.original.input.id, cache.source, fade_per_sec });
 			return true;
 		}
 	}
@@ -461,8 +461,8 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 				}
 			}
 
-				if (!id_pool.full()) {
-					const auto new_id = id_pool.allocate();
+			if (!id_pool.full() && short_sounds.size() < short_sounds.max_size()) {
+				const auto new_id = id_pool.allocate();
 
 				auto release_id = [&]() {
 					id_pool.free(new_id);
@@ -471,14 +471,14 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 				try {
 					short_sounds.emplace_back(new_id, e.payload, in);
 				}
-			catch (const effect_not_found&) {
+				catch (const effect_not_found&) {
 					release_id();
-			}
-			catch (const shouldnt_play&) {
+				}
+				catch (const shouldnt_play&) {
 					release_id();
-			}
-			catch (const augs::too_many_sound_sources_error& err) {
-				LOG("Warning: maxmimum number of sound sources reached at sound_system.cpp.");
+				}
+				catch (const augs::too_many_sound_sources_error& err) {
+					LOG("Warning: maxmimum number of sound sources reached at sound_system.cpp.");
 					release_id();
 				}
 			}
@@ -569,17 +569,17 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 					}
 				}
 				else {
-						if (!id_pool.full()) {
-							const auto new_id = id_pool.allocate();
+					if (!id_pool.full()) {
+						const auto new_id = id_pool.allocate();
 
 						auto release_id = [&]() {
 							id_pool.free(new_id);
 						};
 
 						try {
-							firearm_engine_caches.try_emplace(id, continuous_sound_cache { { new_id, *sound, in }, { gun_entity.get_name() } });
+							firearm_engine_caches.try_emplace(id, continuous_sound_cache { { new_id, *sound, in }, { gun_entity.get_name() } } );
 						}
-					catch (...) {
+						catch (...) {
 							release_id();
 						}
 					}
@@ -630,8 +630,8 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 				}
 			}
 			else {
-					if (!id_pool.full()) {
-						const auto new_id = id_pool.allocate();
+				if (!id_pool.full()) {
+					const auto new_id = id_pool.allocate();
 
 					auto release_id = [&]() {
 						id_pool.free(new_id);
@@ -640,7 +640,7 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 					try {
 						continuous_sound_caches.try_emplace(id, continuous_sound_cache { { new_id, sound, in }, { sound_entity.get_name() } } );
 					}
-				catch (...) {
+					catch (...) {
 						release_id();
 					}
 				}
@@ -785,7 +785,7 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 			return true;
 		};
 
-		if (!logical_subject) {
+		if (logical_subject.dead()) {
 			if (in.clear_when_target_entity_deleted) {
 				return erase_by_fade();
 			}

@@ -12,7 +12,7 @@ static constexpr int num_audio_buffers_v = 50;
 namespace augs {
 	class audio_command_buffers {
 		augs::audio_backend backend;
-		std::thread audio_thread;
+		std::optional<std::thread> audio_thread;
 
 		std::condition_variable for_new_buffers;
 		std::condition_variable for_completion;
@@ -111,15 +111,13 @@ namespace augs {
 		}
 
 	public:
-		audio_command_buffers() : audio_thread(make_worker_lambda()) {}
-
-		~audio_command_buffers() {
-			quit();
+		audio_command_buffers() {
+			audio_thread.emplace(make_worker_lambda());
 		}
 
 		void quit() {
 			request_quit();
-			audio_thread.join(); 
+			audio_thread->join(); 
 			stop_all_sources();
 		}
 
