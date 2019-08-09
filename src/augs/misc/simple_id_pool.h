@@ -35,7 +35,7 @@ namespace augs {
 			ids.resize(max_size);
 
 			for (std::size_t i = 0; i < max_size; ++i) {
-				ids[i] = i;
+				ids[i] = max_size - i - 1;
 			}
 		}
 

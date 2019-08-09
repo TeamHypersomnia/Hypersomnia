@@ -52,7 +52,7 @@ namespace augs {
 			const std::size_t variation_index
 		) const {
 			commands.push_command(bind_sound_buffer { proxy.id, std::addressof(buf), variation_index });
-			proxy.buffer_meta = buf.variations[variation_index].get_meta();
+			proxy.buffer_meta = buf.get_buffer(variation_index).get_meta();
 		}
 	};
 }

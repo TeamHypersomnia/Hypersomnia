@@ -289,7 +289,7 @@ void viewables_streaming::finalize_load(viewables_finalize_input in) {
 
 			for (const auto& r : sound_requests) {
 				if (const auto loaded_sound = mapped_or_nullptr(loaded_sounds, r.first)) {
-					for (const auto& v : loaded_sound->variations) {
+					for (const auto& v : loaded_sound->get_variations()) {
 						all_unloaded_buffers.emplace(v.get_id());
 					}
 				}

@@ -498,7 +498,7 @@ return {
     camera_query_aabb_mult = 1.0
   },
   test_scene = {
-    create_minimal_test_scene = false,
+    create_minimal = false,
     scene_tickrate = 60
   },
   unit_tests = {

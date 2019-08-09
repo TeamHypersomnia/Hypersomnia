@@ -45,10 +45,14 @@ namespace augs {
 	class sound_buffer {
 		void from_file(const sound_buffer_loading_input);
 
+		std::vector<single_sound_buffer> variations;
 	public:
 		sound_buffer(const sound_buffer_loading_input);
-		std::vector<single_sound_buffer> variations;
 
 		const single_sound_buffer& get_buffer(std::size_t variation_index) const;
+
+		const auto& get_variations() {
+			return variations;
+		}
 	};
 }

@@ -414,7 +414,7 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 					}
 				}
 				else {
-					id_pool.free(c.source.id);
+					c.stop_and_free(in);
 				}
 
 				return true;
@@ -681,7 +681,7 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		const bool result = update_facade(cache);
 
 		if (result) {
-			id_pool.free(cache.source.id);
+			cache.stop_and_free(in);
 		}
 
 		return result;
@@ -769,16 +769,16 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		}
 
 		if (result) {
-			id_pool.free(cache.source.id);
+			cache.stop_and_free(in);
 		}
 
 		return result;
 	});
 
 	erase_if(short_sounds, [&](generic_sound_cache& cache) {
-		const auto& in = cache.original.start;
+		const auto& start = cache.original.start;
 
-		const auto logical_subject = cosm[in.positioning.target];
+		const auto logical_subject = cosm[start.positioning.target];
 
 		auto erase_by_fade = [&]() {
 			fade_or_stop(cache);
@@ -786,18 +786,18 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		};
 
 		if (logical_subject.dead()) {
-			if (in.clear_when_target_entity_deleted) {
+			if (start.clear_when_target_entity_deleted) {
 				return erase_by_fade();
 			}
 		}
 		else {
-			if (in.clear_when_target_alive) {
+			if (start.clear_when_target_alive) {
 				if (::sentient_and_alive(logical_subject)) {
 					return erase_by_fade();
 				}
 			}
 
-			if (in.clear_when_target_conscious) {
+			if (start.clear_when_target_conscious) {
 				if (::sentient_and_conscious(logical_subject)) {
 					return erase_by_fade();
 				}
@@ -807,7 +807,7 @@ void sound_system::update_sound_properties(const update_properties_input in) {
 		const bool result = update_facade(cache);
 
 		if (result) {
-			id_pool.free(cache.source.id);
+			cache.stop_and_free(in);
 		}
 
 		return result;
