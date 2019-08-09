@@ -4,7 +4,6 @@
 #include "augs/misc/timing/delta.h"
 #include "augs/templates/hash_templates.h"
 
-#include "augs/audio/sound_source.h"
 #include "augs/math/camera_cone.h"
 #include "augs/audio/sound_source_proxy.h"
 
@@ -168,9 +167,6 @@ class sound_system {
 	float after_flash_passed_ms = 0.f;
 	float last_registered_flash_mult = 0.f;
 
-	augs::sound_source flash_noise_source;
-	std::optional<unsigned int> lowpass_filter_id;
-
 public:
 	void reserve_caches_for_entities(const std::size_t) const {}
 
@@ -190,10 +186,4 @@ public:
 	auto get_effective_flash_mult() const {
 		return last_registered_flash_mult;
 	}
-
-	auto get_lowpass_filter() const {
-		return lowpass_filter_id;
-	}
-
-	//	void set_listening_character(entity_id);
 };

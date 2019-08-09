@@ -7,7 +7,7 @@
 #include "augs/audio/audio_command.h"
 #include "augs/audio/audio_backend.h"
 
-static constexpr int num_audio_buffers_v = 50;
+static constexpr int num_audio_buffers_v = 2;
 
 namespace augs {
 	class audio_command_buffers {

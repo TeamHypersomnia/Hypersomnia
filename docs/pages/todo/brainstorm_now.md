@@ -7,12 +7,16 @@ summary: That which we are brainstorming at the moment.
 ---
 
 - Fixes to audio
-	- crash on exit
-		- terminating with uncaught exception of type std::__1::system_error: thread::join failed: Invalid argument
-		- fixed: we had twice the quit
-	- heap-after-free usage in generic sound cache init
-	- sounds disappearing randomly
 	- seek_to crash
+		- would it be too due to bad meta?
+	- crash on exit
+		- terminating with uncaught exception of type std::__3::system_error: thread::join failed: Invalid argument
+		- fixed: we had twice the quit
+	- sounds disappearing randomly
+		- we were reading wrong variations
+	- heap-after-free usage in generic sound cache init
+		- might have been due to those variations too
+	- too many sources?
 
 - Let's do the delegation thing later, I think openal is thread safe and just creating and loading new sound buffers should not at all alter existing ptrs
 
@@ -26,7 +30,8 @@ summary: That which we are brainstorming at the moment.
 	- we just have to either finish processing ascertain that
 	- we need to ascertain that we only ever post existing pointers
 
-- test if lowpass_gainhf >= 0.f really cuts it
+- test if lowpass_gainhf >= really cuts it
+	- just test flashbang basically
 
 - WHILE SOUND BUFFERS ARE LOADING, remember to finish and halt the execution of sound system  to avoid data races, e.g. due to meta writing
 	- A command for bufferdata?

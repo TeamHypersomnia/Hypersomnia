@@ -1,7 +1,6 @@
 #pragma once
 #include "augs/math/vec2.h"
 #include "augs/gui/appearance_detector.h"
-#include "augs/audio/sound_source.h"
 
 #include "game/detail/spells/all_spells.h"
 
@@ -16,9 +15,6 @@ public:
 	using const_this_in_item = const_dereferenced_location<action_button_in_character_gui>;
 
 	augs::gui::appearance_detector detector;
-
-	augs::sound_source hover_sound;
-	augs::sound_source click_sound;
 
 	spell_id bound_spell;
 	

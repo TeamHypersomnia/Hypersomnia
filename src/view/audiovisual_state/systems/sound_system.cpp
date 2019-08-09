@@ -477,10 +477,6 @@ void sound_system::update_effects_from_messages(const const_logic_step step, con
 				catch (const shouldnt_play&) {
 					release_id();
 				}
-				catch (const augs::too_many_sound_sources_error& err) {
-					LOG("Warning: maxmimum number of sound sources reached at sound_system.cpp.");
-					release_id();
-				}
 			}
 		}
 	};
